@@ -80,6 +80,10 @@ SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio, PFSignal_handler sigchld,
     pe->faccpt = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", PFFileCallback, NULL);
     pe->frejct = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", PFFileCallback, NULL);
 
+    SC_array_resize(pe->fd,     512, -1.0);
+    SC_array_resize(pe->faccpt, 512, -1.0);
+    SC_array_resize(pe->frejct, 512, -1.0);
+
     pe->wait    = wait;
     pe->raw     = FALSE;
     pe->maccpt  = (accept == -1) ? (POLLIN | POLLPRI) : accept;

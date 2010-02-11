@@ -10,9 +10,6 @@
 
 #include "pdb_int.h"
 
-#define _PD_entry_blocks(ep)                                                 \
-    ((ep->blocks == NULL) ? NULL : SC_array_array((ep)->blocks, 0))
-
 typedef struct s_symblock symblock;
 
 struct s_symblock
@@ -46,7 +43,9 @@ void dprbl(SC_array *bl)
 	for (i = 0; i < nb; i++)
 	    {PRINT(stdout, "  %5d %8ld %8ld     %2d  %s\n",
 		   i+1, sp[i].number, (long) sp[i].diskaddr, sp[i].valid,
-		   sp[i].checksum);};};
+		   sp[i].checksum);};
+
+	SC_array_unarray(bl, 0);};
 
     return;}
 
@@ -160,6 +159,8 @@ off_t _PD_block_get_address(SC_array *bl, long n)
     else
        addr = -1;
 
+    SC_array_unarray(bl, 0);
+
     return(addr);}
 
 /*--------------------------------------------------------------------------*/
@@ -175,6 +176,8 @@ off_t _PD_block_set_address(SC_array *bl, long n, off_t addr)
     sp = SC_array_array(bl, 0);
 
     sp[n].diskaddr = addr;
+
+    SC_array_unarray(bl, 0);
 
     return(addr);}
 
@@ -195,6 +198,8 @@ long _PD_block_get_number(SC_array *bl, long n)
     else
        ni = -1;
 
+    SC_array_unarray(bl, 0);
+
     return(ni);}
 
 /*--------------------------------------------------------------------------*/
@@ -210,6 +215,8 @@ long _PD_block_set_number(SC_array *bl, long n, long ni)
     sp = SC_array_array(bl, 0);
 
     sp[n].number = ni;
+
+    SC_array_unarray(bl, 0);
 
     return(ni);}
 
@@ -244,6 +251,8 @@ void _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n)
     if (pni != NULL)
        *pni = ni;
 
+    SC_array_unarray(bl, 0);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -262,6 +271,8 @@ void _PD_block_set_desc(off_t addr, long ni, SC_array *bl, long n)
 
     sp[n].diskaddr = addr;
     sp[n].number   = ni;
+
+    SC_array_unarray(bl, 0);
 
     return;}
 
@@ -283,6 +294,8 @@ PD_block_type _PD_block_get_valid(SC_array *bl, long n)
     else
        vl = PD_BLOCK_UNINIT;
 
+    SC_array_unarray(bl, 0);
+
     return(vl);}
 
 /*--------------------------------------------------------------------------*/
@@ -298,6 +311,8 @@ int _PD_block_set_valid(SC_array *bl, long n, PD_block_type vl)
     sp = SC_array_array(bl, 0);
 
     sp[n].valid = vl;
+
+    SC_array_unarray(bl, 0);
 
     return(vl);}
 
@@ -334,6 +349,8 @@ int _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig)
     else
        rv = FALSE;
 
+    SC_array_unarray(bl, 0);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -356,6 +373,8 @@ int _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig)
     else
        {sp[n].valid = PD_BLOCK_INVALID;
 	rv          = FALSE;};
+
+    SC_array_unarray(bl, 0);
 
     return(rv);}
 
@@ -487,7 +506,9 @@ long _PD_block_find(PDBfile *file, syment *ep, off_t addr)
 	        break;};
 
 	if (i >= n)
-	   i = -1;};
+	   i = -1;
+
+	SC_array_unarray(bl, 0);};
 
     return(i);}
 
@@ -513,6 +534,9 @@ SC_array *_PD_block_copy_seg(SC_array *bl, long imn, long imx)
         nsp[i] = sp[i];
 
     SC_array_set_n(nbl, n);
+
+    SC_array_unarray(bl, 0);
+    SC_array_unarray(nbl, 0);
 
     return(nbl);}
 
@@ -544,6 +568,7 @@ void _PD_block_switch(syment *ep, SC_array *bln)
     
     nb  = SC_array_get_n(bln);
     spn = SC_array_array(bln, 0);
+
     bln->array = NULL;
     _PD_block_free(bln);
 
@@ -555,6 +580,8 @@ void _PD_block_switch(syment *ep, SC_array *bln)
 
 /* GOTCHA: the ref count may be correct because of its origin in bln */
 /*    SC_mark(spn, 1); */
+
+    SC_array_unarray(bln, 0);
 
     return;}
 
@@ -570,8 +597,8 @@ void _PD_block_truncate(syment *ep, long ni)
     symblock *sp;
 
     if (ep != NULL)
-       {sp = _PD_entry_blocks(ep);
-	n  = _PD_n_blocks(ep);
+       {n  = _PD_n_blocks(ep);
+	sp = SC_array_array(ep->blocks, 0);
 
 	PD_entry_number(ep) = ni;
 
@@ -588,7 +615,9 @@ void _PD_block_truncate(syment *ep, long ni)
 /* zero out any remaining blocks */
 	    for (; i < n; i++)
 	        {sp[i].number   = 0;
-		 sp[i].diskaddr = 0;};};};
+		 sp[i].diskaddr = 0;};};
+
+	SC_array_unarray(ep->blocks, 0);};
 
     return;}
 
@@ -628,6 +657,8 @@ long _PD_effective_addr(off_t *paddr, long *pnitems,
 
     *paddr   = eaddr;
     *pnitems = (addr + nb - eaddr)/bpi;
+
+    SC_array_unarray(bl, 0);
 
     return(i);}
 
@@ -690,7 +721,9 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
 		     st  = _PD_block_get_csum(bl, j, dig);
 		     ok &= _PD_put_string(1, " %ld %s", j, dig);};};
 
-	    ok &= _PD_put_string(1, "\n");};};
+	    ok &= _PD_put_string(1, "\n");};
+
+	SC_array_unarray(bl, 0);};
 
     return(ok);}
 
@@ -742,7 +775,9 @@ int _PD_block_csum_read(PDBfile *file)
 
 	     if (j < nb)
 	        {_PD_block_set_csum(bl, j, dig);
-		 _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};};
+		 _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};
+
+	SC_array_unarray(bl, 0);};
 
     return(ok);}
 

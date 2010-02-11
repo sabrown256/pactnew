@@ -782,13 +782,12 @@ int SC_exec(char ***out, char *cmnd, char *shell, int to)
     static int dbg = FALSE;
 
     str = SC_string_array("SC_EXEC");
+    SC_array_resize(str, 512, -1.0);
 
     st = _SC_exec(str, cmnd, shell, NULL, to, 1, dbg);
 
 /* return command output in good condition */
-    *out = _SC_array_string_join(str);
-
-    SC_free_array(str, NULL);
+    *out = _SC_array_string_join(&str);
 
     return(st);}
 
@@ -951,6 +950,7 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
         {cm = cmnds[i];
 
 	 out = SC_string_array("SC_EXEC_COMMANDS");
+	 SC_array_resize(out, 512, -1.0);
 
 	 p   = _SC_put_command(out, cm, show);
 	 err = _SC_exec(out, p, shell, env, to, na, dmp);

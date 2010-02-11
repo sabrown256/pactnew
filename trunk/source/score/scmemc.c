@@ -708,7 +708,7 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 
 	SC_LOCKON(SC_mm_lock);
 
-	if (na)
+	if (na == TRUE)
 	   SC_mem_stats(&a, &f, NULL, NULL);
 
 	SAVE_LINKS(desc);
@@ -751,24 +751,29 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 		    else
 		       space->block.prev = space;
 
-		    _SC_prim_free((void *) osp, obp, ph);};};
+		    _SC_prim_free((void *) osp, obp, ph);};};};
     
-	    if (space != NULL)
-	       {desc = &space->block;
-		BLOCK_LENGTH(desc) = nb;
-		_SC_mem_stats_acc((long) db, 0L, ph);
+	if (space != NULL)
+	   {desc = &space->block;
 
-		space++;
+/* reset the reference count - nobody is pointing to this space
+ * GOTCHA: should we allow a realloc with multiple references
+ */
+	    desc->ref_count = 0;
+	    BLOCK_LENGTH(desc) = nb;
+	    _SC_mem_stats_acc((long) db, 0L, ph);
+
+	    space++;
 
 /* zero out the new space */
-		if ((db > 0) && ((zsp == 1) || (zsp == 2)))
-		   memset(((char *) space + ob), 0, db);
+	    if ((db > 0) && ((zsp == 1) || (zsp == 2)))
+	       memset(((char *) space + ob), 0, db);
 
 /* log this entry if doing memory history */
-		if (_SC_mem_hst_hook != NULL)
-		   (*_SC_mem_hst_hook)(SC_MEM_REALLOC, desc);};};
+	    if (_SC_mem_hst_hook != NULL)
+	       (*_SC_mem_hst_hook)(SC_MEM_REALLOC, desc);};
 
-	if (na)
+	if (na == TRUE)
 	   SC_mem_stats_set(a, f);
 
 	SC_LOCKOFF(SC_mm_lock);};
