@@ -1,0 +1,23 @@
+#
+# test dependency analysis - mimic the frequently used link target
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+AROpt = rsc
+
+.c.a:
+	@(echo "Step 1" ; \
+          touch foo.o ; \
+          ar ${AROpt} libfoo.a foo.o 2> /dev/null ; \
+          rm foo.o 2> /dev/null)
+
+libfoo.a : libfoo.a(foo.o)
+
+foo : libfoo.a
+	@echo "Step 2"
+	@touch foo
+
+work: libfoo.a foo
+

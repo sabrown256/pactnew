@@ -1,0 +1,20 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+AIX	2	: aix
+HP-UX	A.09.01	: hp
+IRIX	4.0.5	: irixg irix
+IRIX64	6.0.1	: irix64	
+Linux   1.0.0   : linux-1
+Linux   2.0.0   : linux
+OSF1    V1.3    : osfg osf
+RiscOS	4_51	: mips
+SunOS	3.4	: sung sun
+SunOS	4.1.2	: sung sun
+SunOS	5.1	: solaris
+ULTRIX	4.3	: ultrix
+UNICOS	7.0.4.2	: unicos

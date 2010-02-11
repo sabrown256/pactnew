@@ -1,0 +1,235 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+                           PACT Coding Style Guide
+
+This is a summary outline of the coding conventions used in PACT.  Coding
+consistency is extremely important.  Exceptions are permissible in the
+name of clarity, but should be avoid if at all possible because of confusion
+due to style deviations.
+
+In future versions explanations and rationales may be provided.  Some general
+remarks now may offer some insight: 1) this coding style is strongly influenced
+by how debuggers and the debugging process work; 2) this style is predicated
+on the notion that you have a decent editor which can do auto indentation,
+balance parentheses and brackets, and similar work; and 3) this style
+seeks to squeeze the most utility out of white space - not just have
+white space splattered on the page.
+
+
+
+1) Function definitions
+
+   a) Functions are delimited by '-' line comments (see example)
+   b) Function name (all caps) with descriptive comment
+      precedes the function body
+   c) opening parenthesis of function body is indented three characters
+   d) one return at the end (if possible)
+   e) avoid local variable declarations with assignment - for example
+
+         int x = 3;
+
+      should be
+      
+         int x;
+
+         x = 3;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FUNCA - this function has local variables
+ *       - what it does including
+ *       - description of the arguments
+ *       - NOTE: alignment of comments and the hyphens
+ */
+
+type funca(type1 arg1, type2 arg2, ...)
+   {t1 local1, local2;
+    t2 local3;
+    type val;
+
+    statement1;
+    statement2;
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FUNCB - this function does NOT have local variables
+ *       - what it does including
+ *       - description of the arguments
+ *       - NOTE: alignment of comments and the hyphens
+ */
+
+type func(type arg1, type2 arg2, ...)
+   {
+
+    statement1;
+    statement2;
+
+    return(arg1);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+2) Declarations (file static or external)
+
+   a) one object per line
+   b) scope, storage class, and type (upto pointer) on first line.
+   c) group all variable of a type together
+   c) group all functions of a type together
+
+extern type
+ x,
+ y,
+ *z;
+
+static type
+ foo(type1 arg1, type2 arg2,
+     type3 arg3, ...),
+ bar(type1 arg1, type2 arg2);
+
+
+3) Special statements and indentation:
+
+   if (expr)
+      simple_statement;
+
+   if (expr)
+      {statement1;
+       statement2;};
+
+   if (expr)
+      {statement1;
+       statement2;}
+   else
+      {statement1;
+       statement2;};         <---- notice terminating ;
+
+   if (expr)
+      {statement1;
+       statement2;}
+   else if (expr)
+      {statement1;
+       statement2;}
+   else
+      {statement1;
+       statement2;};         <---- notice terminating ;
+
+   for (specs)
+       statement;   
+
+   for (specs)
+       {statement1;
+        statement2;};        <---- notice terminating ;
+
+   while (expr)
+      statement;   
+
+   while (expr)
+      {statement1;
+       statement2;};         <---- notice terminating ;
+
+   switch (expr)
+      {case 1 :
+            statement;
+            break;
+       case 2 :
+       case 3 :
+            statement;
+            break;
+       default :
+            statement;
+            break;};         <---- notice terminating ;
+
+   
+4) Arithmetic expressions
+
+   a) space around + and -
+   b) no space around * and /
+   c) operator ends continued line
+
+   x = 3*a + b;
+   y = (a + b)/(c + d);
+   z = a + b + c +
+       d + e + f;
+
+
+5) Logical expressions
+
+   a) space around operators
+   b) use parentheses for subexpressions
+   c) avoid assignments in logical expressions
+
+   if (x < y)
+
+   if ((x < y) || (y > z))
+
+
+6) Assignment expressions
+
+   a) in related groups of assignments align the '='
+
+   foobar = 3*x;
+   a      = 4/foobar;
+   b      = abs(a);
+   c     += b;
+
+
+7) Casts
+
+   x = (double) y;
+   s = (char *) s;
+
+   NOT
+
+   x = (double)y;
+   s = (char*) s;
+
+
+8) Naming Conventions
+
+   a) start with AB_ or _AB_ where AB refers to a package
+      (e.g. SC for SCORE)
+   b) file static variables may be excepted for legibility
+   c) use foo_bar instead of FooBar
+   d) macro names should be all uppercase
+   e) Loose rules:
+      FOO_I for integer macro constant
+      FOO_S for string macro constant
+   f) in procedural macros (ones that take arguments) the
+      arguments and temporary variables should begin with '_'
+      because local variables in functions do not.
+   g) individual packages may have their own naming conventions
+
+
+9) Typedefs and structs
+
+   a) note the three space indent
+   b) s_ for struct and u_ for union
+
+typedef struct s_foo foo;
+
+struct s_foo
+  {type1 member1;
+   type2 member2;
+         .
+         .
+         .
+   typen membern;};
+
+typedef union u_bar bar;
+
+union u_bar
+  {type1 member1;
+   type2 member2;
+         .
+         .
+         .
+   typen membern;};
+

@@ -1,0 +1,15 @@
+typedef t1
+typedef t2
+struct s1
+typedef s2
+struct s_s2
+variable d1: extern char *
+variable d2: extern char *
+variable d3: extern t1 (derived)
+variable v1: extern s2 (derived)
+Function f1 requires:
+   typedef: t1
+   typedef: s2
+   derived type: struct s_s2
+   variable: t1 d3
+   variable: s2 v1

@@ -1,0 +1,9 @@
+typedef info
+struct s_info
+variable st: static info (derived)
+Function bar requires:
+   typedef: info
+   derived type: struct s_info
+   variable: info st
+Function main requires:
+   function: double bar

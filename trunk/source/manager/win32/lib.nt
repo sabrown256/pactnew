@@ -1,0 +1,40 @@
+@echo off
+
+lib /out:%1 *.o
+goto quit
+
+:la
+if "%8" == "" goto lb
+lib /out:%1 %2 %3 %4 %5 %6 %7 %8
+goto quit
+
+:lb
+if "%7" == "" goto lc
+lib /out:%1 %2 %3 %4 %5 %6 %7
+goto quit
+
+:lc
+if "%6" == "" goto ld
+lib /out:%1 %2 %3 %4 %5 %6
+goto quit
+
+:ld
+if "%5" == "" goto le
+lib /out:%1 %2 %3 %4 %5
+goto quit
+
+:le
+if "%4" == "" goto lf
+lib /out:%1 %2 %3 %4
+goto quit
+
+:lf
+if "%3" == "" goto lg
+lib /out:%1 %2 %3
+goto quit
+
+:lg
+if "%2" == "" lib /out:%1 %2
+
+:quit
+echo on

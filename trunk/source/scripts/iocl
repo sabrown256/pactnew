@@ -1,0 +1,47 @@
+#!/bin/csh -f
+#
+# IOCL - run a command and report its I/O resource usage
+#      - pronounced "yokel"
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/iocl") then
+   set path = ( $Exe $path )
+endif
+
+set ArgL = ""
+while ($#argv)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: iocl [-h] <command>"
+           echo "Run <command> and report I/O usage"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set ArgL = ( $ArgL $1 )
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set Start = `iopr -r`
+
+$ArgL
+
+iopr -b $Start
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($status)

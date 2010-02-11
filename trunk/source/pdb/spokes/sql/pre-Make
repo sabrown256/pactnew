@@ -1,0 +1,45 @@
+#
+# pre-Makefile for SQL spoke
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+TGTBin = none
+TGTLib = ${LibDir}/libpdb.a
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${CDebug} -I. -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags = -L${LibDir}
+
+CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+
+#
+# Files to remove in directory clean (make clean)
+#
+CleanFiles = *~ core #*#
+
+#
+# Headers Files
+#
+Hdrs = trsql.h ../../pdb_int.h
+
+#
+# Object Files
+#
+Objs = trsql.o trsqlg.o trsqlite.o trmysql.o
+
+ArObjs = ${TGTLib}(trsql.o) ${TGTLib}(trsqlg.o) \
+         ${TGTLib}(trsqlite.o) ${TGTLib}(trmysql.o)
+       
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+spoke : ${TGTLib} ${LibDep}

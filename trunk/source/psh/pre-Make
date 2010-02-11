@@ -1,0 +1,84 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+TGTBin = nobin
+TGTInc = noinc
+
+targets :
+	@echo "Targets for PSH"
+	@echo "   atdbg   : make atdbg utility"
+	@echo "   do-net  : make do-net utility"
+	@echo "   do-run  : make do-run utility"
+	@echo "   install : install PSH headers and utilities in dev/arch"
+	@echo "   link    : link PSH utilities for public use"
+	@echo "   pcsh    : make pcsh utility"
+	@echo "   pco     : make PACT configuration utility"
+	@echo "   perdb   : make persistent database utility"
+	@echo "   smake   : simple make utility"
+	@echo "   test    : run the PSH test suite"
+
+
+InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
+             ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
+             ${BinDir}/smake
+
+CcFlags = ${COptimize}
+PCC     = ${CCCfg}
+#PCC     = cc -g
+
+LibFiles = libpsh.c libasync.c libeval.c libtime.c libfifo.c libsock.c libdb.c
+
+IncFiles : common.h nonstd.h ${LibFiles}
+
+${InstallDep} : ${IncFiles}
+
+pco : ${BinDir}/pco
+
+${BinDir}/pco : pco.c libpsh.c
+	${PCC} pco.c -o ${BinDir}/pco
+
+do-net : ${BinDir}/do-net
+
+${BinDir}/do-net : do-net.c ${LibFiles}
+	${PCC} do-net.c -o ${BinDir}/do-net
+
+do-run : ${BinDir}/do-run
+
+${BinDir}/do-run : do-run.c ${LibFiles}
+	${PCC} do-run.c -o ${BinDir}/do-run
+
+atdbg : ${BinDir}/atdbg
+
+${BinDir}/atdbg : atdbg.c libpsh.c
+	${PCC} atdbg.c -o ${BinDir}/atdbg
+
+pcsh : ${BinDir}/pcsh
+
+${BinDir}/pcsh : pcsh.c libpsh.c
+	${PCC} pcsh.c -o ${BinDir}/pcsh
+
+perdb : ${BinDir}/perdb
+
+${BinDir}/perdb : perdb.c ${LibFiles}
+	${PCC} perdb.c -o ${BinDir}/perdb
+
+smake : ${BinDir}/smake
+
+${BinDir}/smake : smake.c common.h
+	${PCC} -DSYSTEM_ID=\"${System}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
+
+link : ${InstallDep}
+	cp common.h nonstd.h ${LibFiles} ${IncDir}/shell
+
+install :
+	pact link
+
+#
+# Run the PSH test suite
+#
+test :
+	@./pstest

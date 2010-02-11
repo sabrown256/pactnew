@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# LEX - analyze the platform LEX
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: lex"
+
+NoteD $ALog -n "   Lex: "
+Note $ALog ""
+
+SafeEnv Lex_Exe           ""
+SafeEnv Lex_Flags         ""
+SafeEnv Cfg_Lex_Flags     ""
+SafeEnv Cfe_Lex_Flags     ""
+SafeEnv HAVE_FLEX_SCANNER FALSE
+
+cat << EOF >! $Tmp.l
+%{
+%}
+%%
+.              {return(yytext[0]);}
+%%
+EOF
+
+foreach i ($path /usr/bin /bin)
+   set lLex = $i/lex
+   set fLex = $i/flex
+   if (-x $lLex) then
+      $lLex $Tmp.l >& /dev/null
+      if ($status == 0) then
+         NoteD $ALog -n "$lLex"
+         setenv Lex_Exe $lLex
+         grep FLEX lex.yy.c >& /dev/null
+         if ($status == 0) then
+            NoteD $ALog -n " (FLEX)"
+            setenv HAVE_FLEX_SCANNER TRUE
+         endif
+         break
+      endif
+   else if (-x $fLex) then
+      $fLex $Tmp.l >& /dev/null
+      if ($status == 0) then
+         NoteD $ALog -n "$fLex"
+         setenv Lex_Exe $fLex
+         setenv HAVE_FLEX_SCANNER TRUE
+         NoteD $ALog -n " (FLEX)"
+      endif
+      break
+   endif
+end
+
+NoteD $ALog ""
+
+rm -f $Tmp.l
+
+# export the results
+SetParent Lex_Exe
+SetParent Lex_Flags
+SetParent Cfg_Lex_Flags
+SetParent Cfe_Lex_Flags
+SetParent HAVE_FLEX_SCANNER
+
+exit(0)
+

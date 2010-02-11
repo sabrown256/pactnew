@@ -1,0 +1,846 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+                     A Field Guide to Installing PACT
+                            on UNIX Systems
+
+PACT (Portable Application Code Toolkit) is a set of libraries and utilities
+to facilitate the development of portable software systems. It has a bias
+toward scientific and engineering applications especially in terms of the
+data handling services.  It also supports shared memory and distributed
+parallelism (although this is incomplete it is maturing and you may find
+what support there is to be useful).
+
+Consult the PACT User's Guide which is included in the document distribution
+for some additional information.
+
+	PACT Web Site: http://pact.llnl.gov
+
+The PACT team can be reached at 925-423-4889 during business hours 
+(9am - 5pm Pacific Time), if you have questions on PACT and its
+installation.
+
+
+                             TO INSTALL PACT
+
+   IMPORTANT: You may use any directory you choose to do the
+   install. One of your own (e.g.; ~myhome/pactdir) or one
+   in /usr/local (e.g.; /usr/local/src). Of course you must
+   have read/write/execute permissions for the install to work.
+   You do not want to have a subdirectory of the directory
+   in which you have put the distribution file named pact. The
+   installation process will mangle it thoroughly if you do!
+
+1) Obtain the distribution file (e.g. pact08_3_17-src) by some means and put it
+   in a place such as /usr/local/src as follows:
+
+     -> cd /usr/local/src
+
+     -> ftp                  OR    
+        cp <somewhere>/pact08_3_17-src .
+
+     -> chmod a+x pact08_3_17-src
+
+     -> mv pact08_3_17-src pact-src
+
+   For the rest of this document the distribution file will be called
+   pact-src (you may or may not want to rename it to this).
+
+   If you have obtained the PACT documents as well as the distribution
+   (e.g. pact08_3_17-doc.tar.gz), you may wish to get them out and start
+   printing the ones of interest before proceeding on to the installation
+   which may take minutes to hours.
+
+     -> mkdir pact-docs
+
+     -> mv pact08_3_17-doc.tar.gz pact-docs/pact-doc.tar.gz
+
+     -> cd pact-docs
+
+     -> gzip -d pact-doc.tar.gz
+
+     -> tar xvf pact-doc.tar
+
+     -> lpr <document>.ps ...
+
+2) After reading the section "PACT DISTRIBUTION BUILDER DESCRIPTION" below,
+   run the distribution file (the C Shell must be installed on your system).
+   Running the distribution file without arguments will give you a usage
+   summary. Select the arguments you wish and run it again.  For example:
+
+     -> pact-src -h
+                          .
+                 <usage summary>
+                          .
+                          .
+    
+     -> pact-src -i /usr/local/pact
+
+   This does the following things: configures the distribution, compiles all
+   packages, runs all of the PACT tests, and finally installs it in the
+   designated place (unless "-i none" is used). On a fast machine all of
+   the above will take a few minutes and on a slow machine it will take
+   an hour or so.
+
+   NOTE: The directory designated for installation, if any, must contain
+   at least the following subdirectories: include, bin, lib, and scheme
+   and it and the subdirectories must be writable by you.
+
+   As the installation proceeds, most messages from component programs
+   and scripts are routed into a file called Build.Log. When the installation
+   completes the name is changed to <site>.BUILD and the file is moved up
+   one directory level so as to be out of the way in case another attempt
+   or a build on a different system is to be done next. You may wish to check
+   this file for problems or information about the process itself. There
+   should be no error or warning messages in a normal installation.
+
+3) If the installation failed skip over to step (4).
+
+   Now that PACT is installed. You may get any environment variable
+   settings special to PACT by sourcing either
+
+       <pact-dir>/include/env-pact.csh
+
+   or
+
+       <pact-dir>/include/env-pact.sh
+
+   depending on which SHELL you are using.  <pact-dir> refers to the
+   value of the -i flag you specified when building.
+
+   These should probably be put into your .cshrc or your .profile so that
+   they appear when you log into your system.
+
+4) If everything has completed successfully, you are done and PACT is
+   installed on your system. Otherwise you have some work cut out for you.
+
+5) Here is some guidance for trouble shooting. We start off with a partial
+   list of assumptions (we try to have as few of these as possible).
+
+
+                       ASSUMPTIONS ABOUT UNIX SYSTEMS
+
+   A) You have configured your environment for code development.
+      This means that you have your path set to find compilers and
+      debuggers, that your manpath is right to access man pages on
+      development tools such as the compiler. If you don't know your
+      own system DSYS CONFIG certainly can't be expected to either.
+      It uses your environment ($path, etc) to know where to find
+      what it needs to know.
+
+   B) You have the CSH on your system.
+      If you do not have the C Shell on your system you can obtain csh or
+      tcsh on the Internet.
+
+   C) You have X Windows on your system.
+      If you do not have it, either get it or work around the graphical
+      applications (ignore complaints about compiling or loading the
+      graphical components of PACT).  This assumption is one we plan to
+      remove.
+
+   D) We have had trouble in the past when "." was not on the default
+      CSH path.  This is a system wide thing which you cannot control
+      by adding "." to the path in your private .cshrc.  We think we
+      have this taken care of and if you find out differently let us
+      know.
+
+
+
+                       WHAT TO DO TO GET PACT TO BUILD
+
+   A) Read the sections below to orient yourself to the organization of PACT.
+      PACT will probably compile and load correctly if you can create a
+      good configuration file.  That should be your first thrust.
+      If you can't get PACT to configure you can try to create
+      the Makefiles in each sub-directory, and run make over them by hand.
+      This should be done in the order stated below with SCORE first and
+      ULTRA last.
+
+   B) If PACT fails to configure itself, you will need to build a
+      configuration file as follows:
+
+      i) Build a <site> file for your installation.  For example, if
+         your host machine is foo with its various features, you should
+         create a file "foo".  The "foo" base will be used by
+         'dsys config' as described below.  Use one of the supplied
+         configurations (in pact/manager/std) as an example and run
+         PACT-ANALYZE to obtain some more information about your system.
+
+           -> cd pact/manager
+           -> dsys analyze
+
+         Consult the list of configuration parameters and the syntax
+         description below for more information about the configuration
+         files and how to build them.
+
+         CAVEAT: C compiler and library implementations are not as uniform
+                 as one would like. In particular, it may be necessary to add
+                 declarations of functions and variables which PACT uses to
+                 your configuration file because the system header files leave
+                 them out. Use CDeclarations to do this.
+
+      ii) Configure the distribution as follows ('dsys config' takes the
+          same arguments as pact-src):
+
+            -> dsys config <site>
+
+          Where <site> is the identifier for the base of the local
+          configuration file that was prepared in step (i).
+
+          For example, if you're at the host site, foo, type
+
+            -> dsys config foo
+
+          NOTE: If you want to ease a future update of PACT, make a
+                directory outside of the PACT directory tree and save your
+                custom configuration file (e.g. foo) there.  Then
+                when you update PACT with a new distribution, you can use
+                pact-update and its -f option to use your custom
+                configuration file.  (Run PACT-UPDATE with no arguments
+                to get a brief description of its use.)
+
+      iii) Follow the instructions which 'dsys config' prints out and
+           source the indicated file (which is written by 'dsys config')
+           into your environment. This sets up your environment to
+           work with the configuration of directories for a particular
+           platform which 'dsys config' creates.
+
+      iv) Then do:
+
+             -> dsys build
+
+   C) If there is a problem compiling some part of PACT and you change the
+      sources to correct the problem, that part of PACT can be compiled
+      in two different ways: first, from the pact/manager directory by
+      doing a pact on that part; and second, in the source directory by
+      doing pact install.  For example, suppose that your compiler
+      complained about something in ultra (and your shell is /bin/tcsh.
+      You would do the following:
+
+          -> source <pact-dir>/include/env-pact.csh
+
+          -> cd pact/ultra
+
+           <edit and fix the appropriate files>
+
+      Then you would do the one of the following:
+
+          -> pact install
+
+          -> cd ../manager
+
+      or
+
+          -> cd ../manager
+
+          -> dsys build
+
+   D) Test the distribution as follows:
+
+          -> cd pact/manager
+
+          -> dsys test
+
+   E) Even if there are problems with some parts of PACT you can still
+      install it so that you can use the functioning parts. To do so
+      type the following:
+
+          -> cd pact/manager
+
+          -> install-pact
+
+
+                         PARALLEL PACT ISSUES
+
+PACT can be built with or without knowledge of parallel programming
+considerations.  With regard to SMP parallelism it can be: unaware
+of threads; simply thread safe; or actively using threads.  It turns
+out that two common SMP standards, pthreads and OpenMP, do not always
+work well together.  This seems to be mainly due to vendor implementation
+issues.  Nevertheless, when you are building PACT you should be aware
+of this so that you can build the PACT libraries to suit your needs.
+There are two "visible" places that this appears.  You will find several
+config files which differ only by how the SMP parallelism is controlled.
+Also the naming convention of the libraries tells you which kind of
+parallelism or which SMP standard is used.
+
+Config files whose names end with "-t" refer to SMP parallelism with
+the pthread standard.  Config files whose names end with "-s" 
+refer to SMP parallelism compatible with OpenMP.
+
+Similarly, if PACT is configured for pthreads, then the libraries
+will have names like, libscore_r.a where the "_r" follows a common
+convention employed by vendors.  On the other hand, if PACT is
+configured for compatibility with OpenMP compilers/libraries, then
+the libraries will have names like, libscore_s.a where the "_s"
+indicates the distinction.  A non-SMP version of PACT will have
+libraries with names like, libscore.a.
+
+
+
+                         BUILDING SHARED LIBRARIES
+
+The PACT libraries can now be built as shared libraries.  To do so chose
+a configuration with the "-sl" qualifier (see std/README) or create
+your own config file (see CShared and LDShared below).  After PACT is
+configured do the following:
+
+          -> pact shared
+
+This will build static PACT libraries, PACT utilities, and then the
+shared versions of the PACT libraries.  This is a new and evolving
+capability and there are apt to be some rough edges.  Please let us
+know of any problems which you experience so that we can fix them.
+
+
+                       MULTIPLE PLATFORM INSTALLATIONS
+
+If you have a network setup in which you have a single network path
+(independent of node) to the PACT sources, you can build PACT for each
+machine type on your net by doing an appropriate 'dsys config' on each
+different platform. This creates separate bin, lib, include, and scheme
+directories for each platform and keeps machine dependent files (libraries,
+executables, etc) out of the source directories and in the machine
+dependent ones.
+
+Perform the following steps (assuming for example that the sources are in
+/usr/local/src/pact on all platforms):
+
+   1) Follow the instructions in TO INSTALL PACT and install PACT
+      on one system.
+
+   2) For each additional platform:
+
+      a) log onto the platform (ssh, telnet, rlogin, rsh, etc)
+
+         -> ssh <next-platform>
+
+      b) go into the manager directory (pact/manager)
+
+         -> cd /usr/local/src/pact/manager
+
+      c) do a dsys config
+
+         -> dsys config -i /usr/local/pact
+
+         -i defines directory where PACT will be installed
+            during step (2-e).
+         NOTE: The directory designated for installation, if any,  
+         must contain at least the following subdirectories: 
+                include, bin, lib, and scheme
+         and it must be writable by you.
+
+      d) source <pact-dir>/include/env-pact.csh
+                      or
+         . <pact-dir>/include/env-pact.sh
+
+      e) do a pact update to compile, test, and install PACT
+
+         -> pact update
+
+         This should be all that is required for this platform!
+
+If any there are any problems with (2-c) or (2-e) see the trouble shooting
+discussion in the TO INSTALL PACT section.
+
+NOTE: This is a new feature and we hope to improve it in coming releases;
+however, it is oriented toward the C shell at this point and if you are
+using another shell you will have to jump in and understand what is going
+on in order for everything to work properly.
+
+
+                  PACT DISTRIBUTION BUILDER DESCRIPTION
+
+The PACT distribution is a C shell script prepended to the compressed
+tar file containing the PACT sources.  In this fashion the distribution is
+self-extracting, self-configuring, self-compiling, self-testing, and self-
+installing. Recognizing that there is a certain minimal set of information
+which the installer may wish to specify, the distribution file takes command
+line arguments.  The script will write a log file called Build.Log which
+should be monitored (using tail -f) for problems in the build.
+
+Here is a synopsis of the distribution file.
+
+     Usage: pact-src [-b <mail-dest>] [-c] [-f <directory>]
+                     [-i <directory>] [-k] [[+-n <host>] | [-s]]
+                     [-t <tar-file>] [<config>]
+     
+     -b		When building PACT, which can take a while, the installer
+		may wish to turn to other tasks. The -b flag causes the
+		compilation to occur in the background and to have mail
+		sent to the designated address when the compilation,
+		testing, and installation are complete.
+
+     -c         Stop after configuring the distribution.
+
+     -f		It is possible, even likely, that each site at which
+		PACT is installed will have its own configuration file.
+		It is a bad idea to keep this configuration file with
+		the PACT sources since they may be deleted. The -f flag
+		is used to tell the distribution where to find your
+		configuration file.
+
+     -i		By default the distribution file will try to install
+		PACT in /usr/local.  If you want it to be installed
+		off of another directory, use the -i flag to specify
+		the alternate base directory. A value of "none" will
+		cause PACT to be compiled and tested but not installed.
+		The installation will warn you of required sub-directories
+		(e.g. include, bin, lib, scheme) which do not exist
+		(even if only in the log file).
+
+     -k		When updating PACT you may or may not want to remove
+		any old sources.  The default behavior is to remove
+		them.  The -k flag causes the old sources to be kept.
+
+     -n,+n	Once PACT has been installed at a site, it can be
+		updated from a distribution that is available via
+		anonymous FTP in the pub directory on any internet
+		node. This means that new postings of distributions
+		can be conveniently built at your site. The -n flag
+		updates PACT without also updating the documentation
+		while the +n flag simultaneously updates PACT and its
+		documentation.
+
+     -s         The sources are out and only need to be configured.
+
+     -t		PACT can be updated if you have a compressed tar file
+		containing the sources. This method is older and more
+		error prone than using the distribution file directly,
+		but is still supported. The file specified may be
+		compressed or uncompressed. In any case, it should be
+		specified as something such as pact.tar, i.e. if you
+		have pact.tar.gz type -t pact.tar.
+
+     <config>	This is the configuration for the installation.
+                At this point it is best to let the configuration system
+                choose or make the proper config for you.  If you must,
+                look in manager/std for some standard, generic configs.
+                Supported OS's are:
+                    aix     IBM RS6000 systems
+                    darwin  Mac OS X systems
+                    hp      HP RISC 700 systems
+                    irix64  64 bit SGI systems running IRIX64 6.x
+                    linux   LINUX systems with libc 2.0 and later
+                    osf     OSF systems
+                    sunos   Sun Solaris systems
+		If you supply your own configuration file its name must
+		be the same as your site. For example, create a file
+		foo in ~/myconfig with your configuration for
+		site foo, and do: pact-src -f ~/myconfig foo
+
+NOTE: the distribution installation process assumes that the umask may not
+be appropriately set for the purpose of installing PACT. It therefore sets
+the umask to 002.
+
+
+                  BACKGROUND AND ORGANIZATION OF PACT
+
+PACT includes the following software libraries and applications:
+
+   SCORE    - a low level, environment balancing library
+   PML      - a portable math library
+   PDB      - a portable binary data base management library
+   PPC      - a portable process control library
+   PGS      - a portable graphics library
+   PANACEA  - a portable numerical simulation code development system
+   SCHEME   - a portable Scheme interpreter
+   SX       - Scheme with extensions (PDBVIEW is an SX program)
+   ULTRA    - a 1d presentation, analysis, and manipulation application
+
+In the standard distribution each of the components resides in a subdirectory
+of the main pact directory.  In addition there is a subdirectory called manager
+which contains various configuration files and shell scripts to automate the
+installation of PACT.  In the following discussion, it will be assumed
+that there is a base directory called pact which is a subdirectory of some
+other directory such as /usr/local/src, so that when the directory score
+is referred to as pact/score, the directory /usr/local/src/pact/score is
+meant.
+
+To make it as easy as possible to port/maintain/install PACT on
+a variety of systems, PACT uses the MAKE utility to control compilation, loading,
+and other tasks related to management of the system.  Due to differences in
+operating systems and site installations, the PACT system uses a three part
+Makefile.  The first part has site dependent information and this will be the
+same for all of the components of PACT.  This part is called make-def.
+The second part contains the specifics of the components and therefore each
+component of PACT has a separate file called pre-Make.  In pact/score,
+pact/pml, pact/ppc, and so on there are pre-Make files which contain
+dependencies particular to those parts of PACT.  The third part contains a
+number of macros and dependencies common to all of PACT but which depend on
+the operating system.  The utility PACT runs builds the Makefile from these
+pieces, runs MAKE over it, then deletes the Makefile.  The reason for the
+deletion is that the Makefile has system dependencies and in the context of
+multi-platform builds such a file cannot persist indefinitely lest it interfere
+with the Makefile from another platform.
+
+The files make-def and make-macros are built for you automatically using a
+few pieces of information supplied in your configuration file (see below) and
+live in the dev/<system>/include directory thereafter.
+
+I have found the mechanism to be very simple and portable.  I have used it in
+preference to such alternate mechanisms as Imake because it is much easier to
+manage and depends only on standard UNIX facilities.
+
+
+                     CONFIGURATION FILE SYNTAX
+
+The syntax of a configuration file is fairly simple. Blank lines and lines
+beginning with a '#' are ignored.  The following directives define the
+configuration specifications:
+
+   1) include <filename>
+      this allows you to add specifications from another file
+
+   2) define <variable> <value>
+      this adds "#define <variable> <value>" to the scconfig.h file
+
+   3) setenv <variable> <value>
+      this adds "setenv <variable> <value>" to the env-pact.csh and
+      env-pact.dk files and "export <variable>=<value>" to the
+      env-pact.sh file
+
+   4) <var> <oper> <value>
+      this defines or modifies variable <var>
+      <oper> defines the exact behavior and must be one of:
+
+      a) '='
+         Standard assigment operator.
+         This also adds "<variable> = <value>" to the make-def file.
+
+      b) '+='
+         Appends <value> to the front of existing <variable> value.
+
+      c) '=+'
+         Appends <value> to the end of existing <variable> value.
+
+      d) '-='
+         Removes <value> from the existing <variable> value.  This
+         is a literal string substitution ala 'sed s/<value>//'.
+
+      e) '=?'
+         Assigns <value> to <variable> only if <variable> has
+         no existing value.
+
+   5) Group <foo> {
+      this defines and groups together related variables. For example,
+
+      Group Shared {
+         LD_Exe    = gcc
+         CC_Shared = -fPIC
+         LD_Shared = -shared
+      }
+
+      This defines the variables which control construction of shared
+      libraries.
+
+   6) Tool <foo> {
+      this defines the variables which specify the behavior of
+      the tool <foo>.  For example,
+
+      Tool AR {
+         Exe   = /bin/ar
+         IFlag = rc
+      }
+
+In addition to the variable definitions there are the following special
+sections: ".c.i:", ".c.o:", ".c.a:", ".l.o:", ".l.a:", ".l.c", ".y.o:", ".y.a:",
+".y.c", ".f.o:", and ".f.a:".  These are to define the make rules for
+preprocessing a C source file, compiling a C source file into an object file,
+compiling a C source file "directly" into an archive file (if your system's
+make is capable of doing so), compiling a LEX source file into an object
+module, compiling a LEX source file directly into an archive file (make
+willing), processeing a LEX source file into a C source file, the
+equivalents for YACC source files (the .y suffix), compiling a FORTRAN
+source file into an object file, and compiling a FORTRAN source file
+directly into an archive file (make willing) respectively.  These sections
+are begun by a line containing the section name.
+
+
+                     CONFIGURATION PARAMETERS DESCRIBED
+
+This group of parameters is used by the configuration building and make processes
+to distinguish various operating system characteristics as well as the utilities
+which come with a UNIX/POSIX system.
+
+Some of these are implied by the PACT coding and are listed here to give you
+an idea of what they are there for (just in case you need to look in the code).
+
+BuildStrategy
+   UNIX systems with a sufficiently smart make can save
+   lots of disk space by building the objects directly into
+   library archives. Use "SpaceSaving" if your make is good enough
+   and "none" otherwise.  PACT-ANALYZE will detect this for you.
+   Default is "SpaceSaving".
+
+CCmpLdr
+   The name of the C compiler/loader driver to be used.  On some systems,
+   especially parallel ones, you need to load with a particular
+   set of libraries and object files which the loader driver knows about
+   but you don't.  Default is the value of CCompiler.
+
+CSpokes
+   A list of C coded binary file translation spokes to be built with SX.
+   An NACF spoke is included with the distribution. Default is "nacf".
+
+FrontEnd
+   On some systems (particularly parallel machines) the target codes
+   must be run in a special way. This is used to execute the target
+   appropriately.  Default is "".
+
+GraphicsDevices
+   Host graphics systems/devices available. Current possibilities are
+   PS and CGM (PostScript and Computer Graphics Metafile) are generic
+   to all systems. X, GL, XGL, SUN, and PEX (X Windows System, SGI's GL,
+   SUN's latest, SUN's suncore, and Phigs Extension to X) are
+   usually to be found only on UNIX based systems. BGI and MSC (Borland
+   Graphics Interface and Microsoft Graphics Library) are for
+   DOS based systems. QD (QuickDraw) is on Apple Macintosh systems.
+   More recently we have added JPEG and MPEG capabilities as well.
+   Default is "PS CGM".
+
+GraphicsFlag
+   Any special graphics flag (not usually needed with X11).  Default is "".
+
+INSTALL
+   Place holder for either "install <options>" or "cp" depending on whether
+   or not your system has install.  Default is "cp".
+
+InstBase
+   The directory in which the PACT manager expects to find lib, bin, include,
+   and scheme directories into which to install PACT.  Default is "/usr/local".
+
+IPCSupport
+   Specify the support for IPC.  Some non-standard operating systems
+   force a choice here.  Current choices are: POSIX or NOIPC. The
+   default is POSIX.
+
+NoExe
+   On some systems (particularly parallel machines) the target codes
+   are cross-compiled and must be run in a special way by the front
+   end machine. In this situation it may be pointless to build the
+   PACT executables but necessary to build the libraries.  If this
+   is TRUE then no executables will be linked and installed (e.g.
+   no ULTRA or SX).  Default is "FALSE".
+
+RM
+   Place holder for "rm <options>" depending on the options your system's
+   rm has.  Default is "rm -f".
+
+SchemeSpokes
+   A list of Scheme coded binary file translation spokes to be used with SX.
+   A netCDF spoke is included with the distribution.  Default is "netcdf".
+
+ScmDir
+   A directory in which to install scheme source files.  This should also be
+   a subdirectory of InstBase.  Default is "scheme".
+
+ShLD
+   The linker to use when building shared libraries.  This
+   makes the "shared" target meaningful.  Default is "ld".
+
+UPDATE
+   Place holder for either "ranlib" or "touch" depending on whether or not
+   your system needs ranlib to update archives which have been copied.
+   Default is "touch".
+
+
+UseGnuMake
+   This variable if present in your config file tells GNU make to
+   suppress the messages about entering and leaving directories.
+   Default is to run GNU make without the suppression option.
+
+Yacc
+   The name of the yacc equivalent program to be used.  Default is "yacc".
+
+
+                               TOOLS
+
+CC
+   Specification of C compiler.
+   Variables: Exe, Linker, Flags, Version, Debug, Optimize, Profile, Shared, Inc, MDGInc, DPInc
+   Defaults are: Exe = cc, Linker = "", Flags = "", Debug = "-g", Optimize = "-O", Profile = "-p",
+                 Shared = "", Inc = "", MDGInc = "", DPInc = "".
+
+
+FC
+   Specification of Fortran compiler.
+   Variables: Exe, Linker, Flags, Version, Debug, Optimize, Profile, Inc, MDGInc, DPInc
+   Defaults are: Exe = f90, Linker = "", Flags = "", Debug = "-g", Optimize = "-O", Profile = "".
+
+
+LD
+   Specification of loader/linker.
+   Variables: Exe, Flags, Version, Profile, Shared, Lib, MDGLib, DPLib
+   Defaults are: Exe = ld, Flags = "", Shared = "",
+                 Lib = "", MDGLib = "", DPLib = "".
+
+
+Ar
+   Specifications to use ar.  IFlag is specific to insert and XFlag is
+   specific to extract operation of ar.
+   Variables: Exe, Flags, Version, IFlag, XFlag
+   Defaults are: Exe = ar, Flags = "", IFlag = <computed>, XFlag = <computed>.
+
+
+Lex
+   Specifications to use lex (the lexical scanner generator).
+   Variables: Exe, Flags, Version
+   Defaults are: Exe = lex, Flags = "".
+
+
+Ranlib
+   Specifications to use ranlib (not often needed anymore).
+   Variables: Exe
+   Defaults are: Exe = touch.
+
+
+                       C ENVIRONMENT PARAMETERS
+
+This group of parameters is used in C header files to set up and define the
+C compilation environment for the PACT sources.  These can be specified
+using the "define" syntax explained above.
+
+
+                      C Language Standard
+
+These parameters define which C standard is to be assumed when compiling
+PACT sources. This is determined for you by PACT-ANALYZE from the compiler.
+
+ANSI
+   Conforming to ANSI C (this is the default).
+
+
+                    FORTRAN Language Standard
+
+ANSI_F77
+   Conforming to ANSI FORTRAN 77. Specifically, this means that when calling
+   FORTRAN routines from C or C routines from FORTRAN, the compiler maps
+   names to all upper-case.
+
+
+             System Dependent Parameters Which Must Exist
+
+The following parameters are implied by other selected options:
+
+UNIX
+   UNIX/POSIX Operating System (as opposed to DOS or MAC).
+
+HAVE_X11
+   PACT uses X11 R4 or later graphics (goes with GraphicsDevices).
+
+
+                   Other System Dependent Parameters
+
+AIX
+   This indicates the IBM UNIX variant.
+
+BINARY_MODE_R
+   Binary file mode parameter for read only mode. Default is "rb".
+
+BINARY_MODE_RPLUS
+   Binary file mode parameter for open for update mode. Default is "r+b".
+
+BINARY_MODE_W
+   Binary file mode parameter for create mode. Default is "wb".
+
+BINARY_MODE_WPLUS 
+   Binary file mode parameter for create for update. Default is "w+b".
+
+BSD
+   This indicates the presence of BSD UNIX 4.2 or later.
+
+FIXNUM
+   C type corresponding to FORTRAN integer. Defaults to int. Don't set this.
+
+HAVE_MPI
+   Indicate the presence of the MPI parallel message passing system.
+   This tells PACT to use MPI for some internal purposes as well as
+   supporting applications which want to use PACT in a distributed parallel
+   mode.
+
+HAVE_NO_RUSAGE
+   Indicate the absence of the "getrusage" utility which provides information
+   about resource utilization.
+
+HAVE_NO_SIGFPE
+   Indicate the absence of the floating point exception handler package.
+
+HAVE_SELECT_P
+   Indicate the presence of a working "select" system call iff there is
+   no working STREAMS package available.
+   PACT-ANALYZE detects this for you.
+
+HAVE_SOCKETS_P
+   Indicate the presence of a working socket library. Default is off.
+   If you have X windows you have this.
+
+HAVE_STREAMS_P
+   Indicate the presence of a working STREAMS package. Default is off.
+   PACT-ANALYZE detects this for you.
+
+HPUX
+   This indicates the HP UNIX variant.
+
+HYPOT
+   This allows the user to specify a routine to be used in place of the
+   standard math library's "hypot". The PACT routine PM_hypot may be used
+   here, or the user may provide their own.
+
+LINUX
+   This indicates the presence of the LINUX OS.
+
+MAC
+   This indicates the presence of Apple Macintosh OS.
+
+POW
+   This allows the user to specify a routine to be used in place of the
+   standard math library's "pow". The PACT routine PM_pow may be used
+   here, or the user may provide their own.
+
+PTHREAD_POSIX
+   This indicates the presence of a POSIX compliant thread library
+   for the system.  This is one of the thread standards which PACT
+   can use to support shared memory parallel applications.
+
+RAND_MAX
+   This allows the user to set a value for the maximum value returned by
+   the random number generator. It should only be used on systems where
+   this value is not already defined. Check the man pages for "rand" to
+   be sure.
+
+REMOVE
+   This allows the user to specify a routine to be used in place of the
+   standard i/o library's "remove". The PACT routine SC_remove may be used
+   here, or the user may provide their own.
+
+SIGNAL_FUNCTION
+   This allows the user to specify a routine to be used in place of the
+   standard signal library's "signal". The PACT routine SC_signal may be
+   used here, or the user may provide their own. (NOTE: SC_signal is a
+   stub routine provided to prevent unsatisfied externals; it does not
+   perform any actual signal handling.)
+
+SOLARIS
+   This indicates the presence of the SOLARIS OS.
+
+STRTOD_FUNCTION
+   This allows the user to specify a routine to be used in place of the
+   standard math library's "strtod". The PACT routine _SC_strtod may be
+   used here, or the user may provide their own.
+
+SYSTEM
+   This allows the user to specify a routine to be used in place of the
+   standard i/o library's "system". The PACT routine SC_system may be used
+   here, or the user may provide their own. (NOTE: SC_system is a stub
+   routine provided to prevent unsatisfied externals; it does not perform
+   any actual system calls.)
+
+SYSV
+   This indicates the presence of UNIX System V.
+
+

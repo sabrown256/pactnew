@@ -1,0 +1,408 @@
+#!/bin/csh -f
+#
+# CFGMAN - manage PACT code configurations
+#        - With this facility it will be possible to have
+#        - multiple versions of the codes configured from a
+#        - single source on a single platform.
+#        - This represents an improvement over the previous
+#        - scheme which permitted only a single configuration
+#        - per architecture
+#
+#        - Configuration management is achieved by the following
+#        - operations:
+#        -
+#        -   add    - add a configuration to the managed database
+#        -   delete - remove a configuration to the managed database
+#        -   first  - return the first configuration for the current architecture
+#        -   use    - return the effective config designation for builds
+#        -   list   - return all configurations  for the current architecture
+#        -   alias  - set or unset alias for the first configuration
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# make the most common usage as fast as possible
+# also if SESSION_CONFIG is set do NOT change the database at all
+# this will virtually eliminate corruption of the database as
+# well as speeding things up
+# if you need to change the database you MUST unset SESSION_CONFIG
+if ($?PACT_CONFIG) then
+   echo $PACT_CONFIG
+   exit(0)
+endif
+
+if ($?PACT_CONFIG) then
+   if ("$PACT_CONFIG" == "") then
+      echo "CFGMAN: PACT_CONFIG is null"
+      exit(113)
+   else
+      echo $PACT_CONFIG
+      exit(0)
+   endif
+endif
+
+set Cmnd = $0
+if ("$Cmnd" == "") then
+   echo "CFGMAN: bad invocation"
+   exit(110)
+endif
+
+set SGN   = .pc
+set ret   = 0
+set Tgt   = ""
+set Arch  = ""
+set LockT = 300
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           set Arch = $1
+           breaksw
+      case -h:
+           echo "cfgman [-a <arch>] [-h] [-to <#sec>] add | alias | delete | first | list | use"
+           exit(1)
+           breaksw
+      case -to:
+           shift
+           set LockT = $1
+           breaksw
+      default:
+           set Tgt = $1
+           shift
+           break
+           breaksw
+   endsw
+   shift
+end
+
+@ count = 1
+while (1)
+   set ExeRoot = `dirname $Cmnd`
+   if ("$ExeRoot" != "") break
+   if ($count >= 10) then
+      echo "CFGMAN: dirname returned null"
+      exit(111)
+   endif
+   @ count = $count + 1
+   sleep 1
+end
+
+pushd $ExeRoot >& /dev/null
+set path = ( $ExeRoot $path )
+
+set Base   = $cwd:h
+set MngDir = $Base/manager
+set ScrDir = $Base/scripts
+set PLOCK  = "$Base/scripts/plock"
+set Which  = "./pwhich"
+
+if (1) then
+   set Arch = `$ScrDir/system-id`
+
+else
+   if ("$Arch" == "") then
+      @ count = 1
+      while (1)
+         set Arch = `$ScrDir/system-id`
+         if ("$Arch" != "") break
+         if ($count >= 10) then
+            echo "CFGMAN: system-id returned null"
+            exit(112)
+         endif
+         @ count = $count + 1
+         sleep 1
+      end
+   endif
+endif
+
+if (-d $MngDir) then
+   set BaseDev = $Base/dev
+else
+   set Tmp = `$Which pact`
+   set Tmp = $Tmp:h
+   set Tmp = $Tmp:h
+   pushd $Tmp >& /dev/null
+   set BaseDev = $cwd
+   popd >& /dev/null
+endif
+
+popd >& /dev/null
+
+if (!(-d $BaseDev)) then
+   mkdir -p $BaseDev
+endif
+
+set DB      = $BaseDev/$SGN-$Arch
+set DBBack  = $DB.back
+set LockDir = $BaseDev/$SGN.lock-$Arch
+
+rm -f $DBBack >& /dev/null
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# READ_DB - read the existing database
+
+onintr INTERRUPT
+
+# lock the DB
+   $PLOCK lock -d $LockDir -t $LockT
+
+   if (!(-e $DB)) then
+      touch $DB
+   endif
+
+   set Current = `cat $DB`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - setup the session data before processing options
+
+# break out the first item into a name and alias
+   if ("$Current" == "") then
+      set Name  = ""
+      set Alias = ""
+
+   else
+
+# if it has an alias get the base
+      set First = $Current[1]
+      if (`expr "$First" : '.*@.*'` > 0) then
+         set Name  = `expr "$First" : '\(.*\)@.*'`
+         set Alias = `expr "$First" : '.*@\(.*\)'`
+
+# otherwise the entry is the base
+      else
+         set Name  = $First
+         set Alias = ""
+      endif
+   endif
+
+#   cat $DB
+#   echo "arch    = |$Arch|"
+#   echo "current = |$Current|"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+switch ($Tgt)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ADD - add the specified config or make it first on the current host
+
+   case add:
+        if ($#argv == 1) then
+           set Add = $1
+        else
+           set Add = $1@$2
+        endif
+        if ("$1" != "$Name") then
+
+# get everybody on the current list except for the one to add
+# this avoids duplicates
+           set New = ""
+           foreach i ($Current)
+              if ("$i" == "$Add") continue
+
+              if (`expr "$i" : '.*@.*'` > 0) then
+                 set base = `expr "$i" : '\(.*\)@.*'`
+                 set alia = `expr "$i" : '.*@\(.*\)'`
+                 if (("$i" != "$Add") && ("$base" != "$Add") && ("$alia" != "$Add")) then
+                    set New = ( $New $i )
+                 else
+                    set Add = "$i"
+                 endif
+              endif
+           end
+
+# make sure the added one is first on the list
+# this also means that add moves a config to first position
+           set New = ( $Add $New )
+
+           goto REWRITE
+
+        else
+           set New = ( $Current )
+           goto USE
+        endif
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ALIAS - set/unset an alias for the current config of the current host
+
+   case alias:
+        if ("$Current" != "") then
+           if ($#argv > 0) then
+              set Name = "$Name@$1"
+           endif
+
+           if ("$Name" != "$Current[1]") then
+              shift Current
+
+              set New = ( $Name $Current )
+           
+              goto REWRITE
+           else
+              set New = ( $Current )
+              goto USE
+           endif
+        endif
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DELETE - remove the specified config on the current host
+
+   case delete:
+        set Del = $1
+        set New = ""
+        if ($Del != all) then
+
+# get everybody on the current list except for the one to delete
+           foreach i ($Current)
+
+              if (`expr "$i" : '.*@.*'` > 0) then
+                 set name = `expr "$i" : '\(.*\)@.*'`
+                 set alia = `expr "$i" : '.*@\(.*\)'`
+
+# otherwise the entry is the base
+              else
+                 set name = $i
+                 set alia = ""
+              endif
+
+              if (("$Del" == "$i") || ("$Del" == "$name") || ("$Del" == "$alia")) then
+                 continue
+              else
+                 set New = ( $New $i )
+              endif
+           end
+        endif
+
+        goto REWRITE
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIRST - return the name of the current config on the current host
+
+   case first:
+        echo "$Name"
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIST - list all configs for the current host
+
+   case list:
+        echo "$Current"
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# USE - return the correct name for the current config on the current host
+
+   case use:
+        set New = ( $Current )
+        goto USE
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HELP - describe cfgman
+
+   case -h:
+   case help:
+        echo " "
+        echo "Usage: cfgman <tgt> [<opt>]"
+        echo " "
+        echo " Targets:"
+        echo "    add    - add the specified configuration (and optionally alias)"
+        echo "    alias  - set/unset an alias for the current configuration"
+        echo "    delete - delete the specified configuration"
+        echo "    first  - return the name of the current configuration"
+        echo "    help   - this help message"
+        echo "    list   - list all configurations"
+        echo "    use    - return the name or alias of the current configuration"
+        echo " "
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   default:
+        echo "CFGMAN: Unknown operation $1"
+        set ret = 1
+        breaksw
+endsw
+
+INTERRUPT:
+
+# unlock the DB
+$PLOCK unlock -d $LockDir
+
+exit($ret)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# rewrite the config database
+
+REWRITE:
+
+   set ret = 1
+   mv $DB $DBBack >& /dev/null
+   if ($status == 0) then
+      if ("$New" != "") then
+         echo "$New" >! $DB
+         chmod 664 $DB
+         set ret = $status
+      endif
+   endif
+   
+   if ($ret != 0) then
+      echo "CFGMAN - Failed to rewrite config database"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# USE - report the current configuration
+
+USE:
+   if ($?PACT_CONFIG) then
+      set Use = $PACT_CONFIG
+   else
+      set Use = "$Arch"
+      if ("$New" != "") then
+         set First = $New[1]
+         if (`expr "$First" : '.*@.*'` > 0) then
+            set Use = `expr "$First" : '.*@\(.*\)'`
+         endif
+      endif
+   endif
+   echo "$Use"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# unlock the DB
+$PLOCK unlock -d $LockDir
+
+exit($ret)
+

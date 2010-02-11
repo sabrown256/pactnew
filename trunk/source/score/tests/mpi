@@ -1,0 +1,127 @@
+#!/bin/csh -f
+#
+# MPI - test MPI in SCORE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+# Extra SIGIOs sent during read/open calls are causing zombies on OS X again
+# and I don't have the time now to fix it.
+if ("$TEST_MPI" == "YES") then
+   NoteD $LogF ""
+   NoteD $LogF "                    SCORE MPI Test .............. "
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE -i mpitty
+   set TStatus = $status
+   flog $LogF popd
+
+   set ETime   = `$TIMER -b $UTime`
+
+   if ($TStatus != 0) then
+      if (!(-x $BinDir/sctty)) then
+         NoteD $LogF ""
+         NoteD $LogF "                         ERROR Building MPI Wrap Tests"
+         NoteD $LogF "                    SCORE MPI Wrap Test ......... FAILED ($ETime)"
+         set Err = 1
+      endif
+   else
+
+      set lErr = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STDIN
+
+      Separator $LogF
+      NoteD $LogF -n "                       stdin ... "
+      Note $LogF ""
+      if ("$MPI" != "") then
+         set lTime = `$TIMER -r`
+         flog $Log $PFE -dr -p 2 $BinDir/sctty -t
+         @ NOut = `echo "a" | $PFE -p 2 $BinDir/sctty -t |& grep "Proc" |& wc -l`
+         set lTime = `$TIMER -b $lTime`
+         if ($NOut < 2) then
+            NoteD $LogF "one process only ($lTime)"
+         else
+            NoteD $LogF "all processes ($lTime)"
+         endif
+      else
+         NoteD $LogF "not MPI (0)"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WRAP
+
+      Separator $LogF
+      NoteD $LogF -n "                       wrap .... "
+      Note $LogF ""
+      set lTime = `$TIMER -r`
+      if ("$MPI" == "") then
+         if (-x $BinDir/mpi-io-wrap) then
+            Note $LogF "Running non-MPI version of test"
+            Note $LogF "(echo a; echo b; echo end) | $BinDir/mpi-io-wrap $BinDir/sctty -q > scmpiwrap.res"
+            (echo "a"; echo "b"; echo "end") | $BinDir/mpi-io-wrap $BinDir/sctty -q > scmpiwrap.res
+            set LStat = $status
+         else
+            Note $LogF "Running non-MPI version of test (without mpi-io-wrap)"
+            Note $LogF "(echo a; echo b; echo end) | $DORUN -m $BinDir/sctty -q > scmpiwrap.res"
+            (echo "a"; echo "b"; echo "end") | $DORUN -m $BinDir/sctty -q > scmpiwrap.res
+            set LStat = $status
+         endif
+      else
+         Note $LogF "Running MPI version of test"
+         Note $LogF "(echo a; echo b; echo end) | $PFE -f -p 1 $BinDir/sctty -q > scmpiwrap.res"
+         (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $BinDir/sctty -q |& grep -v ATTENTION: >! scmpiwrap.res
+         set LStat = $status
+      endif
+
+      flog $Log cat scmpiwrap.res
+      @ nl = ( `cat scmpiwrap.res | wc -l` )
+      Note $Log "Status  = $LStat"
+      Note $Log "# lines = $nl"
+
+# equate no output with unavailable resources and go the omitted route
+      if ($nl == 0) then
+         flog $Log set LStat = 255
+      endif
+
+      set lTime = `$TIMER -b $lTime`
+      if (($LStat == -1) || ($LStat == 255)) then
+         NoteD $LogF "omitted ($lTime)"
+      else
+         flog $Log ( diff scmpiwrap.res $RefDir/scmpiwrap >! scmpiwrap.res.diff )
+         flog $Log cat scmpiwrap.res.diff
+         set Files = `find . -name "scmpiwrap.res.diff" -size 0 -print`
+         if ($#Files == 0) then
+            NoteD $LogF "differ ($LStat/$lTime)"
+            set lErr = 1
+         else
+            NoteD $LogF "ok ($LStat/$lTime)"
+            flog $LogF rm -f scmpiwrap.res scmpiwrap.res.diff
+         endif
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($lErr == 0) then
+         NoteD $LogF "                    SCORE MPI Test .............. PASSED ($ETime)"
+      else
+         NoteD $LogF "                    SCORE MPI Test .............. FAILED ($ETime)"
+         set Err = 1
+      endif
+   endif
+endif
+
+exit($Err)
+

@@ -1,0 +1,1045 @@
+#!/bin/csh -f
+#
+# DO-PACT - do the specific local part of the do-net process
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $CSHSubr
+HAVE_SUBROUTINES
+
+set Code    = pact
+set Builder = manager
+
+set Which = "$WrkDir/$Builder/pwhich"
+set RSYNC = `$Which rsync`
+if (-x "$RSYNC")  then
+   set UsingRSYNC = TRUE
+else
+   set UsingRSYNC = FALSE
+endif
+
+setenv Err  0
+
+umask 007
+
+set argv  = `cat $ArgFile`
+set Phase = $1
+shift
+
+set UseTmp = no
+
+switch ($Phase)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - handle interrupts
+
+   case -interrupt:
+
+        set Pids = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -pid:
+                   shift
+                   while ($#argv > 0)
+                      set Pids = ( $Pids $1 )
+                      shift
+                   end
+                   break
+                   breaksw
+           endsw
+           shift
+        end
+
+# send SIGTERM to any descendants
+        foreach i ($Pids)
+           if ($i != $$) then
+              flog $LogHost /bin/kill $i
+           endif
+        end
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - handle setup phase
+
+   case -setup:
+        setenv SyncOnly    no
+        setenv MultiConfig no
+
+        call GET_NET_ARG($LogHost)
+
+	if ($MultiConfig == yes) then
+           setenv PACT_CONFIG $UHost+$Cfg
+           Note $LogHost "Using multiconfig name $PACT_CONFIG"
+        endif
+
+        flog $LogHost cd $WrkDir
+
+        if (-d repository) then
+           Note $LogHost "Directory $WrkDir contains the repository"
+           Note $LogHost "You cannot work here"
+           setenv Err  1
+
+        else
+
+# check for missing $Builder directory
+# can't sync what isn't there
+           if (!(-d $Builder)) then
+              setenv SyncOnly no
+           endif
+
+           if ("$Repo" != "") then
+              setenv CVSROOT $Repo
+              Note $LogHost "CVS Setup: $CVSROOT $CVS_RSH"
+           endif
+
+# if syncing from the repository
+           if (($SyncOnly == "yes") && ("$Repo" != "")) then
+              flog $LogHost cd $Builder
+              set Arch = `./cfgman use`
+              Note $LogHost "System id = $Arch"
+
+# clean out old builds first
+              flog $LogHost ./dsys delete -a
+
+# NOTE: if dsys sync would modify dsys itself this is a problem for
+# platforms like cygwin - so do a cvs update first
+              flog $LogHost cvs update
+              flog $LogHost ./dsys sync
+              setenv Err $status
+
+# send sync log to update file
+              tlog "(LOG)" cat $WrkDir/dev/$Arch/log/sync
+
+# any other source option
+           else
+   
+              set TmpDir = _foo_$Code
+	      set TBase  = $cwd:h
+              flog $LogHost mkdir $TBase/$TmpDir
+              flog $LogHost cd $TBase/$TmpDir
+
+              if ("$Repo" != "") then
+                 if ($Tag == "none") then
+                    set CO = "cvs co $Code"
+                 else
+                    set CO = "cvs co -r $Tag $Code"
+                 endif
+
+                 flog $LogHost eval $CO
+                 setenv Err $status
+
+              else if ("$Dist" != "") then
+                 if (!(-e $Dist)) then
+                    flog $LogHost cp ~/$Dist .
+                 endif
+                 flog $LogHost chmod 770 $Dist
+                 flog $LogHost $Dist -x
+                 flog $LogHost $MV $Dist $Code
+                 setenv Err $status
+              endif
+
+              if ($Err == 0) then
+	         set Prnt = $cwd:h
+                 if (!(-d $Prnt/repository)) then
+                    flog $LogHost $RMDir $Prnt/$Base
+                 endif
+                 flog $LogHost $MV $Code $Prnt/$Base
+                 flog $LogHost cd $Prnt
+                 if (!(-d $TmpDir/repository)) then
+                    flog $LogHost $RMDir $TmpDir
+                 endif         
+                 flog $LogHost find . -type d chmod 2770 {} \;
+                 flog $LogHost chmod -R ug+rw,g+X $Base
+              else
+                 Note $LogHost "Source setup FAILED"
+              endif
+           endif
+        endif
+
+# clean out residue from a previous MultiConfig build
+        flog $LogHost cd $WrkDir/$Builder
+        flog $LogHost dsys delete -a
+
+        if ($UsingRSYNC == FALSE) then
+           if ($?TmpTar) then
+              if ($TmpTar == yes) then
+                 flog $LogHost cd $WrkDir
+                 flog $LogHost tar cf pact-tmp.tar [mpsu]*
+              endif
+           endif
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ARCH - setup the architecture and related directories
+
+   case -arch:
+        pushd $Builder >& /dev/null
+
+# this is all to get the MultiConfig option to work right if invoked
+        call GET_HOST_ARG(/dev/null)
+
+        call QUALIFY()
+
+        set arch   = `./cfgman use`
+        set DevDir = $WrkDir/dev/$arch
+        set LogDir = $DevDir/log
+        set IncDir = $DevDir/include
+        set Passed = $LogDir/passed
+        set path   = ( $DevDir/bin $path )
+
+        $RM Confl.Sources >& /dev/null
+
+# create the directories if they don't exist
+        if ("$Phase" != netinstall) then
+           ./dsys dirs >& /dev/null
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BUILD_TEST - do the build/test phase
+
+   case -build:
+
+        call GET_HOST_ARG($LogHost)
+
+        if ($UseTmp == yes) then
+           call TOTMP()
+        endif
+
+        call QUALIFY()
+
+# figure out parallel build options
+        set ParOpt = ""
+        if (("$ParN" != "") && ("$ParN" != "0")) then
+           set ParOpt = ( -p $ParN )
+        endif
+
+# convert options to control representation
+        set DOList = ""
+        while ("$DbgOpt" != "")
+           switch ($DbgOpt)
+              case g*:
+                   set DOList = ( $DOList "-g" )
+                   set DbgOpt = `echo $DbgOpt | sed 's+g++'`
+                   breaksw
+              case o*:
+                   set DOList = ( $DOList "-O" )
+                   set DbgOpt = `echo $DbgOpt | sed 's+o++'`
+                   breaksw
+           endsw
+        end
+
+# Sequential/Parallel options:
+#   s - sequential
+#   t - PTHREADS
+#   p - OpenMP threads
+#   m - distributed parallel
+#   d - both m and t (dual)
+        if ($MultiConfig == yes) then
+           set SPList = "-none"
+           NoteNT "MultiConfig: Sequential/Parallel options are being collapsed to Literal."
+        else
+           set SPList = ""
+           while ("$SerPar" != "")
+              switch ($SerPar)
+                 case l*:
+                      set SPList = ( $SPList "-none" )
+                      set SerPar = `echo $SerPar | sed 's+l++'`
+                      breaksw
+                 case s*:
+                      set SPList = ( $SPList "-none" )
+                      set SerPar = `echo $SerPar | sed 's+s++'`
+                      breaksw
+                 case p*:
+                      set SPList = ( $SPList "-s" )
+                      set SerPar = `echo $SerPar | sed 's+p++'`
+                      breaksw
+                 case t*:
+                      set SPList = ( $SPList "-t" )
+                      set SerPar = `echo $SerPar | sed 's+t++'`
+                      breaksw
+                 case m*:
+                      set SPList = ( $SPList "-m" )
+                      set SerPar = `echo $SerPar | sed 's+m++'`
+                      breaksw
+                 case d*:
+                      set SPList = ( $SPList "-mt" )
+                      set SerPar = `echo $SerPar | sed 's+d++'`
+                      breaksw
+              endsw
+           end
+        endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# on each local host do the builds with specified options
+
+        set EnvCsh = $IncDir/env-pact.csh
+        if (-e $EnvCsh) then
+           source $EnvCsh
+        endif
+        if ($MultiConfig == yes) then
+           Note $LogHost "   Using MultiConfig with PACT_CONFIG = |$PACT_CONFIG|"
+        endif
+
+        Note $LogHost "   Debug/Optimization options: $DOList"
+
+        set LineCnt = `wc -l $LogHost | awk '{ print $1 }'`
+
+        foreach spopt ($SPList)
+
+           foreach dbgopt ($DOList)
+
+              set IErr = 0
+              set dbgchar = `echo $dbgopt | sed 's/-//' | tr "[A-Z]" "[a-z]"`
+	      set Opt     = ( $CfgOptions "$dbgopt" )
+
+# sequential
+              if ("$spopt" == "-none") then
+                 set CfgQual = $tCfg
+
+# parallel
+              else
+                 set CfgQual = "$tCfg$spopt"
+   	         set Opt     = ( $Opt "$spopt" )
+              endif
+
+              set StatQual = "${dbgchar}_$CfgQual"
+
+              flog $LogHost $RM $Passed
+
+# assure a clean make of dmake in the config
+              if (-d $WrkDir/dev/$arch/lib) then
+                 flog $LogHost touch $WrkDir/dev/$arch/lib/libscore.foo
+                 flog $LogHost $RM $WrkDir/dev/$arch/lib/libscore*.*
+              endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# configure
+
+              if (($IErr == 0) && ($TestOnly == no)) then
+                 set Where = ( -c -i $InstBase )
+                 set Opt   = ( $Opt $Where )
+
+                 if ($DeleteOld == yes) then
+                    set OldCfg = `./cfgman delete all`
+                 endif
+
+# add standard config/option message to enable do-net watch option
+                 NoteNT "configure $CfgQual option $dbgopt $UseTmp"
+
+                 if (-f ./.pact-version-tag) then
+                    set PTag = `cat ./.pact-version-tag`
+                 else
+                    set PTag = unknown
+                 endif
+
+                 Separator $LogHost
+                 if ($?PACT_CONFIG == 0) then
+                    set Alias = ""
+                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt"
+                 else
+                    set Alias = "-a $PACT_CONFIG"
+                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt ($PACT_CONFIG)"
+                 endif
+
+                 Note $LogHost `date`
+                 echo "   Configuring source tag $PTag from $CfgQual using $dbgopt $Alias"
+
+                 if ($Cfg == none) then
+                    flog $LogHost ./dsys config $Opt $Alias
+                    set xstatus = $status
+                 else
+                    flog $LogHost ./dsys config $dbgopt $Where $CfgQual $Alias
+                    set xstatus = $status
+                 endif
+                 if ($xstatus != 0) then
+                    echo "   Failed to configure"
+                    echo "   Look in $LogHost on $UHost"
+                    set IErr = 1
+                 endif
+     
+# send analyze log to update file
+                 tlog "(LOG)" cat $DevDir/log/analyze
+
+# send config log to update file
+                 tlog "(LOG)" cat $DevDir/log/config
+
+                 if (-e $EnvCsh) then
+                    Note $LogHost "source $EnvCsh"
+                    source $EnvCsh
+                 else
+                    Note $LogHost "$EnvCsh not found"
+                 endif
+                 flog $LogHost $Which pact
+              endif
+   
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# now that we are configured check the pattern for warnings and errors
+
+              set Cnfgrd = $WrkDir/dev/$arch/include/configured
+
+              set WarnPattern = `pact +l -info WARN_PATTERN | sed 's| |+sp+|g'`
+              if ("$WarnPattern" == "") then
+                 set WarnPattern = ( "warning" "WARNING" )
+              endif
+
+              set ErrPattern = `pact +l -info ERR_PATTERN | sed 's| |+sp+|g'`
+              if ("$ErrPattern" == "") then
+                 set ErrPattern = ( "error" "ERROR" )
+              endif
+
+              set SysPattern = `pact +l -info SYS_PATTERN | sed 's| |+sp+|g'`
+              if ("$SysPattern" == "") then
+                 set SysPattern = ( "error" "ERROR" "NFS" )
+              endif
+
+# eliminate entries in system pattern list that appear in other lists
+              set NewSys = ""
+              foreach i ($SysPattern)
+                 set DupPat = FALSE
+                 foreach j ($WarnPattern $ErrPattern)
+                    if ("$i" == "$j") then
+                       set DupPat = TRUE
+                       break
+                    endif
+                 end
+                 if ($DupPat == FALSE) then
+                    set NewSys = ($NewSys $i)
+                 endif
+              end
+              set SysPattern = ($NewSys)
+
+              Note $LogHost "Pattern for caution messages: |$WarnPattern| ($#WarnPattern)"
+              Note $LogHost "Pattern for fatal condition messages: |$ErrPattern| ($#ErrPattern)"
+              Note $LogHost "Pattern for system error messages: |$SysPattern| ($#SysPattern)"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# remove
+
+              if (($IErr == 0) && ($TestOnly == no)) then
+                 Separator $LogHost
+                 Note $LogHost "Removing"
+                 echo -n "   Removing ... "
+                 flog $LogHost ./dsys remove
+                 if ($status != 0) then
+                    echo "Failed"
+                    set IErr = 2
+                 else
+                    echo "OK"
+                 endif
+
+# send remove log to update file
+                 tlog "(LOG)" cat $DevDir/log/remove
+
+              endif
+   
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# build
+
+              if (($IErr == 0) && ($TestOnly == no)) then
+                 Separator $LogHost
+                 Note $LogHost "Building"
+                 echo -n "   Building ... "
+
+                 set UTime = `$TIMER -r`
+
+                 flog $LogHost ./dsys build -na 3 $ParOpt
+                 set ErrStat = $status
+
+                 set ETime = `$TIMER -b $UTime`
+
+                 set clc = `wc -l $LogHost | awk '{ print $1 }'`
+                 set tlc = `expr $clc \- $LineCnt`
+
+# count all kinds of compiler warning messages
+                 @ nc = 0
+                 foreach pttrn ($WarnPattern)
+                    set pt = `echo "$pttrn" | sed 's|+sp+| |g'`
+                    @ ic = `tail -n $tlc $LogHost | grep "$pt" | grep -v "Pattern for" | grep -v "Clock skew" | wc -l`
+                    @ nc = $nc + $ic
+                 end
+                 set WarnMsg = ""
+                 if ($nc > 0) then
+                    set WarnMsg = "  ($nc warnings)"
+                 endif
+
+# count all kinds of compiler error messages
+                 @ nc = 0
+                 foreach pttrn ($ErrPattern)
+                    set pt = `echo "$pttrn" | sed 's|+sp+| |g'`
+                    @ ic = `tail -n $tlc $LogHost | grep "$pt" | grep -v "Pattern for" | wc -l`
+                    @ nc = $nc + $ic
+                 end
+                 set ErrMsg = ""
+                 if ($nc > 0) then
+                    set ErrMsg = "  ($nc errors)"
+                 endif
+
+# count all kinds of non-compiler error messages
+                 @ nc = 0
+                 foreach pttrn ($SysPattern)
+                    @ ic = `tail -n $tlc $LogHost | sed 's|:|_|g' | grep -w "$pttrn" | grep -v "Pattern for" | grep -v "SCORE Error Test" | wc -l`
+                    @ nc = $nc + $ic
+                 end
+                 set SysErrMsg = ""
+                 if ($nc > 0) then
+                    set SysErrMsg = "  ($nc system)"
+                 endif
+
+# count all retries
+                 @ nc = `tail -n $tlc $LogHost | grep 'attempt' | grep 'failed' | grep -v 'after' | wc -l`
+                 set RetryMsg = ""
+                 if ($nc > 0) then
+                    set RetryMsg = "  ($nc retries)"
+                 endif
+
+                 if ($ErrStat != 0) then
+                    echo "Failed ($ETime) $WarnMsg $ErrMsg $SysErrMsg $RetryMsg"
+                    set IErr = 3
+                 else
+                    echo "OK ($ETime) $WarnMsg $ErrMsg $SysErrMsg $RetryMsg"
+                 endif
+   
+# send total and successful retry counts to update file
+                 NoteT "(STAT)" "retry_total_${StatQual} ($nc)"
+                 @ nc = `tail -n $tlc $LogHost | grep 'attempt' | grep 'succeeded' | wc -l`
+                 NoteT "(STAT)" "retry_ok_${StatQual} ($nc)"
+
+# send build time to update file
+                 NoteT "(STAT)" "build_${StatQual} ($ETime)"
+
+# send build log to update file
+                 tlog "(LOG)" cat $DevDir/log/build
+
+              endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# test
+
+              if ($IErr == 0) then
+                 Separator $LogHost
+                 Note $LogHost "Testing"
+                 Note $LogHost `date`
+                 echo -n "   Testing .... "
+
+                 set UTime = `$TIMER -r`
+
+                 flog $LogHost ./dsys test -na 3 $ParOpt
+                 set ErrStat = $status
+
+                 set ETime = `$TIMER -b $UTime`
+
+                 if ($ErrStat != 0) then
+                    echo "Failed ($ETime)"
+                    set IErr = 4
+                 else
+                    echo "OK ($ETime)"
+                    flog $LogHost touch $Passed
+                 endif
+
+                 if ($?DoValgrind == 1) then
+                    flog $LogHost set TestLog = $WrkDir/dev/$arch/log/test-vg
+                 else
+                    flog $LogHost set TestLog = $WrkDir/dev/$arch/log/test
+                 endif
+
+                 if ("$ParOpt" == "") then
+                    set TestConc = 0
+                  else
+                    set TestConc = 1
+                 endif
+
+# send concurrent test flag to update file
+                 NoteT "(STAT)" "conc_test_${StatQual} $TestConc"
+
+# send total test time to update file
+                 NoteT "(STAT)" "test_total_${StatQual} ($ETime)"
+
+# send individual test times to update file
+                 cat $TestLog | sed 's/^[a-z]*[0-9]*[ ]*| //' |                                         \
+                 awk '$2 == "TEST" && NF == 5 { printf "DO-NET: (STAT) test_%s_%s %s\n", v1, $1, $NF }' \
+                                                v1=${StatQual} |                                      \
+                 tr "[A-Z]" "[a-z]" | sed 's/do-net: (stat)/DO-NET: (STAT)/g'
+
+# send test log to update file
+                 tlog "(LOG)" cat $TestLog
+
+              endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# figure out the error situation for this build/test
+
+              set LineCnt = `wc -l $LogHost | awk '{ print $1 }'`
+              if ($IErr > 0) then
+                 setenv Err  1
+              endif
+
+              echo " "
+           end
+        end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+        if ($UseTmp == yes) then
+           call FROMTMP()
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NETINSTALL - do the net install phase
+
+   case -netinstall:
+
+        call GET_NET_ARG($LogHost)
+
+        flog $LogHost setenv Err  2
+
+        if (($InstBase != none) && ($Cancel == FALSE)) then
+
+       	   flog $LogHost set WhichType = $InstBase:t
+	   if ($WhichType == "pactnew") then
+	      flog $LogHost set SrcType = "new_sources"
+	   else if ($WhichType == "pact") then
+	      flog $LogHost set SrcType = "std_sources"
+	   else
+	      flog $LogHost set SrcType = "othr_sources"
+	   endif
+
+	   flog $LogHost set FooDir = $WrkDir:h
+	   flog $LogHost set SrcDir = $FooDir/$SrcType
+
+           flog $LogHost cp -R $WrkDir/* $SrcDir
+           set xstatus = $status
+
+	   flog $LogHost $RMDir $SrcDir/CVS
+	   flog $LogHost $RMDir $SrcDir/z-*
+	   flog $LogHost $RMDir $SrcDir/dev
+	   flog $LogHost $RMDir $SrcDir/manager/*
+	   flog $LogHost $RMDir $SrcDir/panacea/abc/*
+
+	   flog $LogHost $RMDir $SrcDir/*/CVS
+	   flog $LogHost $RMDir $SrcDir/*/z-*
+	   flog $LogHost $RMDir $SrcDir/*/tests
+
+           if ($xstatus == 0) then
+              setenv Err  0
+           else
+              setenv Err  1
+           endif
+
+# send netinstall log to update file
+           tlog "(LOG)" cat $DevDir/log/netinstall
+
+	endif
+
+        set QuotaDB = /usr/global/etc/gapps-quota-report
+        if (-e $QuotaDB) then
+           Note $LogHost "Checking file space quota"
+           set UQP   = `grep " $Code " $QuotaDB`
+           if ($#UQP >= 4) then
+              @ Usage = `expr "$UQP[2]" : '\([0-9]*\)'`
+              @ Quota = `expr "$UQP[3]" : '\([0-9]*\)'`
+              @ Prcnt = `expr "$UQP[4]" : '\([0-9]*\)'`
+              NoteT "(STAT)" "gapps_${Code}_usage   $Usage"
+              NoteT "(STAT)" "gapps_${Code}_quota   $Quota"
+              NoteT "(STAT)" "gapps_${Code}_percent $Prcnt"
+
+              if ($Prcnt >= 99) then
+                 NoteD $LogHost "FILE SPACE WARNING: /usr/gapps/$Code is ${Prcnt}% full"
+              endif
+           endif
+        endif
+        Note $LogHost "done"
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+# HOSTINSTALL - do the host install phase
+
+   case -hostinstall:
+
+        call GET_HOST_ARG($LogHost)
+
+        call QUALIFY()
+
+        flog $LogHost pwd
+        flog $LogHost set System = `./cfgman use`
+        flog $LogHost set path = ( . $WrkDir/dev/$System/bin $path )
+
+        flog $LogHost setenv Err  2
+        if (($InstBase != none) && (-e "$Passed")) then
+           Note $LogHost "Doing dsys install (verbose mode)"
+           flog $LogHost ./dsys install
+           set xstatus = $status
+           if ($xstatus == 0) then
+              flog $LogHost setenv Err  0
+              tlog "(LOG)" cat $LogHost
+              if ($MultiConfig == yes) then
+                 ./dsys delete $PACT_CONFIG >& /dev/null
+              endif
+           else
+              flog $LogHost ls -lR $InstBase
+              flog $LogHost setenv Err  1
+              tlog "(LOG)" cat $LogHost
+           endif
+
+# send hostinstall log to update file
+
+        endif
+
+        breaksw
+
+endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+goto END
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_NET_ARG - process args for per net phases
+
+GET_NET_ARG:
+
+    set lFile = $args_[1]
+
+# set default values
+    Note $lFile "Set default values for get_net_arg"
+    flog $lFile setenv SysID       none
+    flog $lFile setenv RawWrkDir   none
+
+    flog $lFile set Cfg      = none
+    flog $lFile set Cancel   = FALSE
+    flog $lFile set InstBase = none
+
+    Note $lFile "Get values for get_net_arg from command line"
+    while ($#argv > 0)
+       switch ($1)
+          case -ni
+               flog $LogHost set Cancel = TRUE
+               breaksw
+          case -host_vars:
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ -*) then
+                     flog $lFile set argv = ( "end" $argv )
+                     break
+                  else
+                     flog $lFile eval "setenv $1 $2"
+                     shift
+                     shift
+                  endif
+               end
+               breaksw
+          case -host_fields:
+               flog $LogHost shift
+               flog $LogHost setenv SysID $1
+               flog $LogHost shift
+               flog $LogHost set RawWrkDir = $1
+               flog $LogHost shift
+               if ($#argv > 0) then 
+                  flog $LogHost set InstBase = $1
+                  flog $LogHost shift
+	       endif
+               if ($#argv > 0) then 
+                  flog $LogHost set Cfg = $1
+                  flog $LogHost shift
+	       endif
+
+# anything else
+               set larg = ( `echo "$argv" | sed 's/=/ /g'` )
+               Note $LogHost "Remaining specs: $larg"
+               while ($#larg > 1)
+                  set Var = $larg[1]
+                  set Val = $larg[2]
+                  flog $LogHost eval "setenv $Var $Val"
+                  shift larg
+                  shift larg
+               end
+               break
+               breaksw
+       endsw
+       shift
+    end
+
+# make WrkDir a full path
+    if (`expr "$WrkDir" : '/.*'` == 0) then
+       flog $lFile set WrkDir = $HOME/$WrkDir
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_HOST_ARG - process args for per host phases
+
+GET_HOST_ARG:
+
+    set lFile = $args_[1]
+
+# set default values
+    Note $lFile "Set default values for get_host_arg"
+    flog $lFile setenv SysID    none
+    flog $lFile setenv WrkDir   none
+    flog $lFile set UseTmp      = no
+    flog $lFile set DbgOpt      = g
+    flog $lFile set SerPar      = s
+    flog $lFile set Cfg         = none
+    flog $lFile set ParN        = ""
+    flog $lFile set InstBase    = none
+    flog $lFile set UseTmp      = no
+    flog $lFile set TestOnly    = no
+    flog $lFile set CfgOptions  = ""
+
+# for generality setenv host file variables
+    flog $lFile setenv DeleteOld   no
+    flog $lFile setenv MultiConfig no
+
+    Note $lFile "Get values for get_host_arg from command line"
+    while ($#argv > 0)
+       switch ($1)
+          case -host_vars:
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ -*) then
+                     flog $lFile set argv = ( "end" $argv )
+                     break
+                  else
+                     flog $lFile eval "setenv $1 $2"
+                     shift
+                     shift
+                  endif
+               end
+               breaksw
+          case -host_fields:
+               shift
+               flog $lFile setenv SysID $1
+               shift
+               flog $lFile setenv WrkDir $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set DbgOpt = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set SerPar = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set Cfg = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set ParN = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set InstBase = $1
+	       shift
+
+# anything else
+               set larg = ( `echo "$argv" | sed 's/=/ /g'` )
+               Note $lFile "Remaining specs: $larg"
+               while ($#larg > 1)
+                  set Var = $larg[1]
+                  set Val = $larg[2]
+                  flog $lFile eval "setenv $Var $Val"
+                  shift larg
+                  shift larg
+               end
+               break
+               breaksw
+          case -to:
+               flog $lFile set TestOnly = yes
+               breaksw
+       endsw
+       shift
+    end
+
+# if we are in temp than we cannot go off box in a parallel
+# build - so do not do parallel build
+    if ($UseTmp != no) then
+       flog $lFile set ParN = ""
+    endif
+
+# make WrkDir a full path
+    if (`expr "$WrkDir" : '/.*'` == 0) then
+       flog $lFile set WrkDir = $HOME/$WrkDir
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# QUALIFY - figure out qualifications on the configuration
+
+QUALIFY:
+
+    if ($Cfg == none) then
+       set tCfg = $UHost
+    else
+       set tCfg = $Cfg
+    endif
+
+# figure out qualifications on Cfg
+   if (`expr "$tCfg" : '.*@.*'` > 0) then
+      set Alias = `expr "$tCfg" : '.*@\(.*\)'`
+      set tCfg  = `expr "$tCfg" : '\(.*\)@.*'`
+      setenv PACT_CONFIG $Alias
+   
+   else if ($MultiConfig == yes) then
+      setenv PACT_CONFIG $UHost+$tCfg
+   endif
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TOTMP - move sources to somewhere in /tmp
+
+TOTMP:
+
+   flog $LogHost set TrueWrkDir = $WrkDir
+   if (`expr "$TrueWrkDir" : '/.*'` == 0) then
+      flog $LogHost set TrueWrkDir = $HOME/$WrkDir
+   endif
+
+   flog $LogHost set SemDir = /tmp/$USER/pact.$Stamp
+   flog $LogHost setenv WrkDir /tmp/$USER/pact
+
+   mkdir -p $SemDir
+
+# only one working here can be active
+# the active one will be responsible for getting the source down
+# and later putting the binaries back
+   if ($status == 0) then
+      flog $LogHost set TmpActive = TRUE
+      flog $LogHost touch $SemDir/loading
+
+      if ($UsingRSYNC == TRUE) then
+         flog $LogHost $RSYNC -arclp --exclude=doc/ --exclude=dev/ --exclude=CVS/ '--exclude=z-*/' $TrueWrkDir $WrkDir:h
+         flog $LogHost $MV $WrkDir:h/$TrueWrkDir:t $WrkDir
+         flog $LogHost pushd $WrkDir/$Builder
+      else
+         if (!(-d $WrkDir)) then
+            flog $LogHost mkdir -p $WrkDir
+         endif
+         flog $LogHost pushd $WrkDir
+
+         flog $LogHost tar xof $TrueWrkDir/pact-tmp.tar
+         find . -type d -name "z-*" -exec rm -r {} \;
+         flog $LogHost cd $Builder
+      endif
+
+      flog $LogHost $RM $SemDir/loading
+
+# the non-active one waits for the semaphore to go away
+# then proceeds knowing all the files are available
+   else
+      flog $LogHost set TmpActive = FALSE
+      while (-e $SemDir/loading)
+         sleep 10
+      end
+      flog $LogHost pushd $WrkDir/$Builder
+   endif
+
+   flog $LogHost touch $SemDir/$$
+   flog $LogHost pwd
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FROMTMP - copy back files from where the build in /tmp happened
+
+FROMTMP:
+
+   flog $LogHost pwd
+   flog $LogHost $RM $SemDir/$$
+   flog $LogHost ls -l $SemDir
+   set NF = `ls -1 $SemDir | wc -l`
+   Note $LogHost "NF = |$NF|"
+
+   if ($NF == 0) then
+      if ($UsingRSYNC == TRUE) then
+         flog $LogHost $RSYNC -arclp $WrkDir/dev $TrueWrkDir
+         flog $LogHost cd ../..
+      else
+         flog $LogHost cd ..
+         flog $LogHost scripts/px cp -rf dev/* $TrueWrkDir/dev
+         flog $LogHost cd ..
+         if ($Err != 0) then
+            flog $LogHost ls -laR
+         endif
+         flog $LogHost $RM $TrueWrkDir/pact-tmp.tar
+      endif
+      flog $LogHost $RMDir pact
+      flog $LogHost $RMDir $SemDir
+      flog $LogHost pushd $TrueWrkDir/$Builder
+
+# NOTE: IErr == 1 is config failure so do not wipe out the evidence
+      if ($IErr != 1) then
+         flog $LogHost ./dsys config $dbgopt $Where $CfgQual
+      endif
+
+      flog $LogHost popd
+   endif
+
+   flog $LogHost set WrkDir = $TrueWrkDir
+   flog $LogHost popd
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+END:
+
+   if ($Err == 1) then
+      if ($?tCfg == 1) then
+         NoteT "(RETRY) $tCfg"
+      else
+         NoteT "(RETRY) unknown"
+      endif
+   endif
+
+   endinclude
+

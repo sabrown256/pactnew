@@ -1,0 +1,20 @@
+Defined primitive variables: f = (), g = 3, h = ()
+STRUCT Tests
+   Defined 'struct NAME {body}'
+   Defined 'typdef struct NAME NAME'
+   Defined 'struct NAME var1, var2'
+   Defined 'struct NAME {body} var1, var2'
+   Defined 'struct {body} var1, var2'
+   Defined '<typedef-name> var1, var2' (#1 struct typedef)
+   Defined 'typedef struct NAME {body} var'
+   Defined '<typedef-name>' var' (#2 struct typedef)
+UNION Tests
+   Defined 'union NAME {body}'
+   Defined 'typdef union NAME NAME'
+   Defined 'union NAME var'
+   Defined '<typedef-name> var1, var2' (#1 union typedef)
+ENUM Tests
+   Defined 'enum NAME {body}'
+   Defined 'typdef enum NAME NAME'
+   Defined 'enum NAME var'
+   Defined '<typedef-name> var1, var2' (#1 enum typedef)

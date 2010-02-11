@@ -1,0 +1,336 @@
+#!/bin/csh -f
+#
+# DSYS - developer's work script
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias cd
+unalias rm
+unalias mv
+
+umask 002
+
+alias flog  'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias Note  'echo \!\!:2-$ ; echo \!\!:2-$ >>& \!\!:^'
+
+set Here = `pwd` ; cd ; set RealHome = `pwd` ; cd $Here ; unset $Here
+set Here = `pwd | sed "s|$RealHome|$home|"`
+set Root = $Here:h
+
+set WhoIAm = $user
+
+alias GOSUB   'set Return = "\!\!:2" ; goto \!\!:1'
+alias RETURN  'goto $Return'
+
+set Base     = $Root:h
+set Base     = $Base:h
+set HostArch = `$Base/manager/cfgman use`
+set DevDir   = "dev/$HostArch"
+set BuildDir = "$Root/builder"
+
+setenv DevBin    "$DevDir/bin"
+setenv DevLib    "$DevDir/lib"
+setenv DevInc    "$DevDir/include"
+setenv DevLog    "$Root/$DevDir/log"
+
+set SX = "$Base/$DevDir/bin/sx"
+
+set codename = "abc"
+set CODENAME = `echo $codename | tr "[a-z]" "[A-Z]"`
+set System   = $codename
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+switch ($1)
+   case -h:
+        echo " "
+        echo "DSYS - simulation system developers script "
+        echo " "
+        echo "Usage: dsys <command> <options> "
+        echo " "
+        echo "Commands: build      - compile and load the system codes"
+        echo "          config     - configure the sources for the current platform"
+        echo "          dist       - make a distribution file"
+        echo "          sync       - update sources with repository "
+        echo "          remove     - remove the binaries for this platform"
+        echo "          test       - test the system codes"
+        echo "          -h         - print this help message"
+        echo " "
+        exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case sync:
+
+        GOSUB CVS_SETUP Sync_CVS
+Sync_CVS:
+
+        set Date    = `/bin/date '+%y_%m_%d_%H_%M_%S'`
+        set Message = (\"<$WhoIAm|$Date> $argv\")
+        if ($ExistLock == TRUE) then
+           echo ""
+           echo "A DSYS COMMIT/SYNC is already in progress"
+           echo ""
+           CatLock
+           echo ""
+           exit(1)
+        else
+           Makelock
+           echo $Message >>& $Lock
+        endif
+
+        cd ..
+	set LogFile = $DevLog/sync
+	set TMP     = $DevLog/sync.tmp
+        rm -f $LogFile
+        touch $LogFile
+
+	Note $LogFile "Updating $CODENAME distribution"
+
+        set List    = `find . -type d -name CVS -print`
+        set DirList = ""
+        foreach i ($List)
+           set DirList = (`echo "$i:h"` $DirList)
+        end
+
+# sync the sources in each of the $SCSName managed directories
+        foreach i ($DirList)
+           cd $i
+           echo $i
+           rm -f $TMP
+           touch $TMP
+
+           echo Checking $i >& $TMP
+
+           cvs update -l  >>& $TMP
+           set UpStatus = $status
+	   KillZombie
+           if ($UpStatus != 0) then
+              Note $TMP "CVS UPDATE failed - terminating DSYS SYNC"
+              exit(1)
+           endif
+
+# take care of conflicting changes
+           awk '($1 == "C")&&($2 !~ /Makefile/) {print $2}' $TMP > Confl
+           foreach mod (`cat Confl`)
+              echo "   C $mod                  <---"
+           end
+
+           cat Confl >>& $LogFile
+           rm Confl
+           cd $Here:h
+
+# report changed files
+           awk '($1 ~ /[PUMAR]/) {print $1 " " $2}' $TMP > Files.OK
+           set Files = `cat Files.OK`
+           while ($#Files > 1)
+              echo "   $Files[1] $Files[2]"
+              shift Files
+              shift Files
+           end
+           rm Files.OK
+
+           cat $TMP >>& $LogFile
+           rm $TMP
+        end
+
+        Unlock
+
+        Note $LogFile "   Remaking links in $DevInc directory"
+        Note $LogFile " "
+
+        flog $LogFile cd builder
+        flog $LogFile for-sys ../builder/sys-links
+
+	if ("$RemoteHost" != "") then
+           flog $LogFile $RCP $RemUpdateTag $RepUpdateTag
+        endif
+
+        if (-e $RepUpdateTag) then
+           flog $LogFile rm -f $LocUpdateTag
+           flog $LogFile cp $RepUpdateTag $LocUpdateTag
+        endif
+
+	Note $LogFile "$CODENAME synchronized"
+	Note $LogFile " "
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case test:
+
+        GOSUB CVS_SETUP Test_CVS
+Test_CVS:
+
+        echo " "
+
+	shift
+	set Test     = ""
+        set NProc    = 1
+        set NTOpt    = ""
+        set Valgrind = ""
+	while ($#argv > 0)
+	   switch ($1)
+	      case -h:
+	           echo "Usage: dsys test [-h] [-n #] [-s #] [tests]+"
+	           echo ""
+	           echo "Options:"
+	           echo "       h  - this help message"
+	           echo "       n  - # of processors to use"
+	           echo "       t  - # of threads to use"
+	           echo ""
+	           exit(1)
+	           breaksw
+	      case -n:
+                   shift
+                   set NProc = $1
+	           breaksw
+	      case -r:
+                   set Test = ( $1 $Test )
+	           breaksw
+              case -s:
+     	           shift
+	           set Levels = $1
+                   breaksw
+	      case -t:
+                   shift
+                   set NTOpt = ( "-t" $1 )
+	           breaksw
+	      case -vg:
+                   set Valgrind = -vg
+	           breaksw
+	      default:
+	           set Test = ( $Test $1 )
+                   breaksw
+	   endsw
+   	   shift
+	end
+
+        pushd ../test >>& /dev/null
+        ./do-test $Valgrind
+        set TStatus = $status
+        popd >>& /dev/null
+
+        if ($TStatus != 0) then
+           echo " "
+           exit(1)
+        else
+           echo " "
+           exit(0)
+        endif
+	breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case config:
+	set LogFile = $Here/log.config
+        rm -f $LogFile
+        touch $LogFile
+
+        dsys-config -a $HostArch
+	if ($status != 0) then
+           echo "Configuration process failed"
+           exit(1)
+        endif
+
+        set codename = "abc"
+        set CODENAME = `echo $codename | tr "[a-z]" "[A-Z]"`
+
+        Note $LogFile "   Generating code from the dictionary"
+        flog $LogFile pushd ..
+
+        pact dict
+
+#        flog $LogFile $SX -l panache.scm \(ld abc.dict\)
+#	foreach c (global lag misc source)
+#           flog $LogFile touch $c/$c.h
+#           flog $LogFile rm -f $c/$c.[ch]
+#           if (-e $c.c) then
+#              flog $LogFile mv $c.c $c
+##	      flog $LogFile cp $c.h $c
+#           endif
+#        end
+#        flog $LogFile mv *.h $DevInc
+#        flog $LogFile mv *.c main
+
+	Note $LogFile "$CODENAME configured"
+
+	mv $LogFile $DevLog/config
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case build:
+        shift
+        set Opt = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -na:
+                   shift
+                   set Opt = ( "+na" $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+	set LogFile = $DevLog/build
+        rm -f $LogFile
+        touch $LogFile
+
+	Note $LogFile "Building $CODENAME distribution"
+	flog $LogFile touch ../main/$codename.c
+        time for-sys -l $LogFile pact $Opt install
+	Note $LogFile "$CODENAME built"
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case remove:
+	echo "Removing contents of $DevLib directory"
+	touch ../$DevLib/foo
+	rm -f ../$DevLib/*
+	touch foo.o
+	rm -f ../*/*.o
+	echo "Removing contents of $DevBin directory"
+        touch ../$DevBin/foo
+        rm -f ../$DevBin/*
+	echo "Removing headers in $DevInc directory"
+        touch ../$DevInc/fooin.h
+        rm -f ../$DevInc/*in.h
+        rm -f ../$DevInc/mesh.h
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+CVS_SETUP:
+   if ($?CVSROOT == 0) then
+      if (-f ~/.cshrc) then
+         source ~/.cshrc
+      endif
+   endif
+
+RETURN
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

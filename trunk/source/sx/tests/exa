@@ -1,0 +1,86 @@
+#!/bin/csh -f
+#
+# EXA - SX PDBView example test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDBVIEW EXAMPLE TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PDBView Example Test ......... "
+   Note $Log ""
+
+   touch Afoo.diff Afoo.ps demo.dx
+
+   set files = ""
+   set files = ( $files pdbvtest.log pdbvtest.pdb pdbvtest.asc )
+   set files = ( $files pdbvtest.err pdbvtest.tmp )
+   set files = ( $files pdbvtest.pdb.chk pdbvtest.ps.diff )
+   set files = ( $files table1.tmp )
+   set files = ( $files [ABC]*.diff [ABC]*.ps demo.d? )
+
+   flog $Log rm -f $files
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $PDBView -l $RootDir/sx/applications/pdbvbatch.scm >& pdbvbatch.res)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/applications/pdbvbatch.scm |& \
+      grep "ERROR SUMMARY:"                                                             |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log @ xstatus = 0
+      foreach i (A.ps B.ps C.ps)
+         if (-f $RootDir/sx/tests/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+            @ st = $status
+            @ xstatus = $xstatus + $st
+            Note $Log "Test $i:r status $st"
+         endif
+      end
+      flog $Log (diff pdbvbatch.res $RootDir/sx/tests/ref/pdbvbatch > pdbvbatch.res.diff)
+      @ st = $status
+      @ xstatus = $xstatus + $st
+      Note $Log "Test pdbvbatch status $st"
+
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm pdbvbatch.res.diff pdbvbatch.res
+         flog $Log rm -f A.ps B.ps C.ps plots.ps
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

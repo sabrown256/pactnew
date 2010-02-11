@@ -1,0 +1,9 @@
+/*
+ * TRCONFIG.DST - configure SX TRANSLATION spokes
+ *
+ */
+
+
+#define DEF_SX(cd, vrs)                                               \
+    SX_init(cd, vrs);                                                 \
+    TR_install_funcs()

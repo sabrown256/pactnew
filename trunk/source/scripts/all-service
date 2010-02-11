@@ -1,0 +1,61 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# ALL-SERVICE - check services on all hosts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $PACT/include/env-csh
+
+set Types = "-t all"
+set Mode  = "-exh"
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: all-service [-h] [-s] [-t <type>]"
+           echo "   h   this help message"
+           echo "   s   check by system type rather than by host"
+           echo "   t   check system type (default all)"
+           echo ""
+           exit(1)
+      case -s:
+           set Mode = "-ext"
+           breaksw
+      case -t:
+           shift
+           set Types = "-t $1"
+           breaksw
+   endsw
+   shift
+end
+
+set Tmp = $cwd/.log.all-service
+@ Err   = 0
+
+# run check-service everwhere and log the result in Tmp
+hserve -q $Types $Mode check-service -q | \
+sed 's/|/ /'                            >&! $Tmp
+
+# check Tmp for anything that is not "good"
+set NProb = `awk '$0 !~ /check-service/ && $3 != "good" { print }' $Tmp | wc -l`
+if ("$NProb" == "0") then
+   echo "No problems to report"
+else if ("$NProb" == "1") then
+   echo "$NProb problem to report:"
+   awk '$0 !~ /check-service/ && $3 != "good" { printf("   %s\n", $0); }' $Tmp
+else
+   echo "$NProb problems to report:"
+   awk '$0 !~ /check-service/ && $3 != "good" { printf("   %s\n", $0); }' $Tmp
+endif
+
+# cleanup
+$RM $Tmp
+
+exit($Err)
+

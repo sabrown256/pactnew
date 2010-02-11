@@ -1,0 +1,79 @@
+#!/bin/csh -f
+#
+# SUBR - test csh-subroutines
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = scripts
+source ../../test-env
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: subr [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+@ Err = 0
+
+set BTime = `$TIMER -r`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SUBROUTINE - test csh-subroutines
+
+NoteD $Log "                    SUBROUTINE Test ................"
+
+set List = (subr1 subr2 subr3 subr4)
+set lErr = 0
+
+flog $Log cp $RootDir/scripts/tests/{subr*} .
+flog $Log setenv PATH $RootDir/scripts:$PATH
+
+foreach t ($List)
+   Separator $Log
+   NoteD $Log -n "                        $t ... "
+   Note $Log ""
+
+   set Res = $t.res
+   set Ref = $t.ref
+
+   $t run >&! $Res
+   $t ans >&! $Ref
+
+   flog $Log diff $Res $Ref
+   set xstatus = $status
+   if ($xstatus == 0) then
+      NoteD $Log "ok"
+      flog $Log rm -f $Res $Ref
+   else
+      flog $Log set lErr = 1
+      NoteD $Log "ng"
+   endif
+end
+
+set ETime = `$TIMER -b $BTime`
+
+if ($lErr != 0) then
+   NoteD $Log "                    SUBROUTINE Test ................ FAILED"
+   @ Err = $Err + 1
+else
+   NoteD $Log "                    SUBROUTINE Test ................ PASSED"
+   flog $Log rm -f run.* s*
+endif
+NoteD $Log ""
+
+exit($Err)
+

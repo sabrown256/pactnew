@@ -1,0 +1,53 @@
+#!/bin/csh -f
+#
+# AXIS - ULTRA AXIS test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           AXIS TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    ULTRA AXIS Test .............. "
+   Note $Log ""
+
+   flog $Log $RM ulaxs.log ulaxs.err
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $Ultra -l $TDir/ulaxs.scm >& ulaxs.log)
+      set xstatus = $status
+      flog $Log ($CFE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
+      set Files = `find . -name "ulaxs.ps.diff" -size 0c -print`
+   else
+      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulaxs.scm  |& \
+      grep "ERROR SUMMARY:"                                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+      flog $Log $RM ulaxs.*
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

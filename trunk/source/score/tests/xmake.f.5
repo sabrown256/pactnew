@@ -1,0 +1,3 @@
+--job--- 1:/bin/csh:.:(rm -f a.out1;ls xmake.f.1 fubar >& a.out1;ls xmake.f.1 fubar >&! a.out1;ls xmake.f.1 fubar >>& a.out1)
+--job--- 2:/bin/csh:.:(rm -f a.out2;echo a b >& a.out2;echo c d >&! a.out2;echo e f >>& a.out2)
+--exit--

@@ -1,0 +1,57 @@
+#!/bin/csh -f
+#
+# PROC - SCHEME process tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PROCESS TESTS
+
+#--------------------------------------------------------------------------
+
+   if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
+      NoteD $Log ""
+      NoteD $Log -n "                    SCHEME Proc Test ............. "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         $CFE $BinDir/scheme -e -l $FilesDir/shproc.scm >! shproc.res
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shproc.scm |& \
+         grep "ERROR SUMMARY:"                                         |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+
+# NOTE: you really cannot compare the results
+#       make it a crash test
+#      diff shproc.res $FilesDir/ref/shproc >! shproc.res.diff
+#      set Files = `find . -name "shproc.res.diff" -size 4c -print`
+#      if (($xstatus != 0) || ($#Files != 0)) then
+#         flog $Log cat shproc.res
+#         flog $Log cat shproc.res.diff
+
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f shproc.res shproc.res.diff
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

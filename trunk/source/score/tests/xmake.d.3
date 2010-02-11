@@ -1,0 +1,5 @@
+--job--- 0:/bin/sh:.:pwd
+--job--- 1:/bin/sh:.:pwd 2> /dev/null
+--job--- 2:/bin/sh:.:if [ ! -f "foo.d" ]; then echo no; fi
+--log---
+--exit--

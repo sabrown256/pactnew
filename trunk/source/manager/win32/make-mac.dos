@@ -1,0 +1,52 @@
+#
+# MAKE-MACROS.DOS - PACT Makefile macros under DOS
+#
+
+# --------------------------------------------------------------------------
+
+#		       MODULE INDEPENDENT MACROS
+
+# --------------------------------------------------------------------------
+
+#
+# the standard places
+#
+BinDir = ${RootDir}\bin
+LibDir = ${RootDir}\lib
+IncDir = ${RootDir}\include
+ScmDir = ${RootDir}\scheme
+
+#
+# install library
+#
+libinstall : ${TGTLib}
+	cp ${TGTLib} ${LibDir}\${TGTLib}
+#
+# install includes
+#
+incinstall : ${TGTInc}
+	cp ${TGTInc} ${IncDir}
+
+#
+# install binaries
+#
+bininstall : ${TGTBin}
+	cp ${TGTBin} ${BinDir}
+
+#
+# install binaries
+#
+scminstall : ${TGTScm}
+	cp ${TGTScm} ${ScmDir}
+
+#
+# clean up the directory
+#
+clean :
+	rm -f ${CleanFiles}
+#
+# remove binaries and libraries
+#
+remove :
+	make -i clean
+	rm -f *.o *.lib

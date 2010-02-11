@@ -1,0 +1,98 @@
+#
+# COMPILER-XLC - compiler info for IBM XLC compilers
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath aix
+
+# NOTE: this should eventually be put in a site specific file
+setenv PATH     ${PATH}:/usr/local/bin
+
+WARN_PATTERN = "WARNING: (E) (W) (I)"
+ERR_PATTERN  = "Error: (S)"
+
+Tool CC {
+   Exe       = xlc
+   Flags     = -D_ALL_SOURCE -qlanglvl=extc99 -qsuppress=1500-010:1506-1300:1506-1298:1506-273 
+   Flags    += [ _env_ = Bits ;              # address bit size
+                 *     = -q* ]
+   Flags    += [ _cmd_ = -p ;                # profiling
+	         on    = -qpdf1 ]
+   Debug     = -g -qnooptimize
+   Optimize  = -g -O -qmaxmem=32768
+   Version   = -qversion
+}
+
+Tool FC {
+   Exe     = xlf90
+   Flags   = -qrecur
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -q* ]
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -qpdf1 ]
+   Version = -qversion
+}
+
+Tool LD {
+   RPath = -bsvr4 -bnoexpfull -R @
+   Flags = [ _env_ = Bits ;                  # address bit size
+             *     = -b* ]
+   DPLib = -binitfini:poe_remote_main
+}
+
+Tool Lex {
+   Flags  = -D_ALL_SOURCE -D_LARGE_FILES -qlanglvl=extc99 -qsuppress=1506-1300:1506-1298
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -q* ]
+}
+
+Tool AR {
+   Exe   = /bin/ar
+   Flags = [ _env_ = Bits ;                  # address bit size
+             *     = -X* ]
+}
+
+Group Cfg {
+   Use      = CC
+   Use      = FC
+   LD_Flags = ${LD_Flags}
+}
+
+Group Shared {
+   LD_Exe     = cc
+   LD_Shared  = -G
+   LD_Shared += [ _env_ = Bits ;             # address bit size
+                  *     = -q* ]
+}
+
+Group PThread {
+   CC_Exe = xlc_r
+   FC_Exe = xlf90_r
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Exe    = xlc_r
+   FC_Exe    = xlf90_r
+   CC_Flags  = -qsmp=omp:noauto
+   FC_Flags  = -qsmp=omp:noauto
+   Lex_Flags = -qsmp=omp:noauto
+   LD_Flags  = -qsmp=omp:noauto
+}
+
+.c.i:
+	${CC} -P $<
+
+.f.o:
+	${FC} ${FFLAGS} ${LDFLAGS} -c $<
+
+setenv DO_RUN_MPI   poe
+define GETSOCKNAME_LONG
+define HAVE_THREAD_SAFE_MPI
+
+include aix-dp-env
+

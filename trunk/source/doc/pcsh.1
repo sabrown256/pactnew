@@ -1,0 +1,237 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH PCSH 1 "4 December 2007"
+.SH NAME
+pcsh \- C Shell wrapped to know where to find PACT
+.SH SYNOPSIS
+.B pcsh [<csh options>]
+.SH DESCRIPTION
+
+Pcsh exists for three reasons: 1) to be provide user control over initializations
+which only belong to system administrators with the C shell; 2) to provide the
+PACT C shell subroutine extensions in a completely transparent fashion; and
+3) to launch shell scripts and sessions that know where to find PACT utilities,
+includes, and other PACT information.
+
+Pcsh is not an re-implementation of the C shell.  Rather it is a wrapper
+that takes arguments for a C shell session and execs the specified shell
+session with the environment modified by the addition of some environment
+variables and aliases.  This approach is used because the standard C shell
+method of configuring /etc/csh.cshrc and /etc/csh.login is not available
+to ordinary users.
+
+If the environment variable PCSHRC is defined then the file it names will
+be sourced into the environment before other commands are executed.  The
+PACT environment info will be sourced in after anything from PCSHRC.
+
+.SH USING THE ENV UTILITY
+
+Because pcsh is unlikely to be in any standard place, the best way to
+write scripts for PCSH is to use the env utility to find pcsh for you.
+This will permit you to write more portable scripts using pcsh.  See
+the examples below.
+
+On just about every system there is a problem between exec and env
+which causes the following:
+
+   #!/usr/bin/env foo bar
+
+to be interpreted as
+
+   /usr/bin/env "foo bar"
+
+It also precludes
+
+   #!/usr/bin/env FOO=BAR foo
+
+from working the same way it does from a shell command line.
+
+In order to get around this problem pcsh looks at the second line in
+the script.  If it begins in '#OPT' the remainder of the line is interpreted
+as containing argument to the C shell which will be invoked.  For example:
+
+   #!/usr/bin/env pcsh
+   #OPT -vx
+
+would be equivalent to:
+
+   #!/bin/csh -vx
+
+
+.SH CSH EXTENSIONS
+
+Pcsh adds a useful subroutine capability for C shell users to use in writing
+scripts.  Here are the extensions:
+
+    call <entry-point>(<arglist>)
+         <entry-point> := <C-shell label>
+         <arglist>     := <arg> | <arg>, <arglist>
+
+         This syntax causes the <arglist> to be loaded into the internal
+         variable, args_, and control transferred to the location
+         <entry-point>
+
+    return    
+         This syntax causes control to be tranferred to the location
+         immediately after the corresponding call.
+
+    quit
+         This syntax permits a shell script to exit from within a
+         subroutine.  It should be used rather than 'exit' in any
+         pcsh script.
+
+    include <file>
+         This syntax does what the 'source' command does in normal
+         C shell scripts.
+
+    endinclude
+         This syntax marks the end of commands in a <file> being
+         'include'd.
+
+.SH EXPLANATION AND RATIONALE
+
+The C shell does not really support subroutines.  However, the 'source'
+command has almost all of the semantics needed to support a subroutine
+mechanism.  In particular 'source' returns control to the command
+immediately after its invocation.  This is essential for a call/return
+type of mechanism.
+
+The syntax described above is merely a set of C shell aliases
+which use standard C shell mechanisms and a handful of shell variables
+to hold the state.  You can find the implementation in
+$PACT/include/csh-subroutines.
+
+The use of 'source' provides an acceptable emulation of actual subroutines.
+The downside of this approach is that each call causes the entire file
+to be 'source'd in.  As such each call is rather expensive.
+
+The call/return mechanism keeps a call stack, argument lists, and dispatch
+label in shell variables and uses 'source' to transfer control.  There are
+a few more details but this should convey the gist of the mechanism.
+
+Because we don't want the call/return mechanism to preclude other uses
+of the 'source' command or at least the functionality of the 'source'
+command, the 'include' command was added.  This works with the dispatch
+variable to keep track of where control flows.  The 'endinclude' is
+required to terminate the reading of an include'd file.
+
+Subroutines may be nested and even recursive subject only to the limitations
+of the size of a shell variable.  You can trace subroutine flow control
+by setting the shell variable 'Trace' to TRUE.
+
+
+.SH EXAMPLES
+
+Suppose you have a pcsh script called foo
+
+   #!/usr/bin/env pcsh
+   #OPT -f
+
+   call foo(3, 4, a, (a b c))
+   echo "> $ok"
+   quit(0)
+
+   foo:
+      echo "foo($args_)"
+      include "bar.sh"
+      set ok = TRUE
+      return
+
+and a file of commands bar.sh
+
+   date
+   endinclude
+
+Running foo would give the following output:
+
+% foo
+foo(3 4 a '(a b c)')
+Tue Dec  4 13:32:53 PST 2007
+> TRUE
+
+
+.SH USING SUBROUTINES WITHOUT PCSH
+
+You do not have to use pcsh to have subroutines emulated in C shell.  If you
+choose to do so you can have them in any C shell script by adding the two lines:
+
+   include $PACT/include/csh-subroutines
+   HAVE_SUBROUTINES
+
+where $PACT is the root path to your local PACT installation.  The additional
+alias HAVE_SUBROUTINES is essential in as much as it contains the actual
+jump to the subroutine entry point referred to in a call.
+
+The above example could be modified as follows:
+
+   #!/bin/csh -f
+
+   include $PACT/include/csh-subroutines
+   HAVE_SUBROUTINES
+
+   call foo(3, 4, a, (a b c))
+   echo "> $ok"
+   quit(0)
+
+   foo:
+      echo "foo($args_)"
+      include "bar.sh"
+      set ok = TRUE
+      return
+
+
+.SH SHELL VARIABLES
+
+The following shell variables are used to implement the call/return mechanism:
+
+   SRC_     contains the name of the shell script
+   FIRST_   a flag used to mark the first use of a call
+   SUBR_    the name of the next entry point to be called
+   QUIT_    a flag used to mark when the session is done
+   DISP_    the next label to which control will be dispatched
+   args_    the argument list delivered to the next call
+
+Do not use any of these in your shell scripts or you will be pretty unhappy
+with the results.
+
+
+.SH FILES
+
+To fill the role played by /etc/csh.cshrc (which an ordinary user cannot
+control) the PCSHRC environment variable specifies one or two files to
+be sourced into a PCSH session.  The first file is named by the PCSHRC
+environment variable and is sourced in before any PACT environment
+files are sourced.  The second file is the value of PCSHRC with a ".post"
+suffix added.  This second file is sourced in after any PACT environment
+files are sourced.  Needless to say, whether or not the files are
+sourced depends on their existence.
+
+For example you might have:
+
+    setenv PCSHRC $HOME/.foo
+
+and two files in $HOME
+
+    .foo
+    .foo.post
+
+The file .foo will be sourced in before PACT files and .foo.post will
+be source in after PACT files.
+
+
+.SH ENVIRONMENT VARIABLES
+
+PCSHRC   this variable names file which, if it exists, will be 'source'd
+into the C shell environment when a script using PCSH is run.  This is
+intended to give users the control that is reserved for system adminstrators
+(/etc/csh.chsrc and /etc/csh.login) in the standard C shell setup.
+
+.SH BUGS
+.TP 
+.B None known.
+

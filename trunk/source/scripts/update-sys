@@ -1,0 +1,547 @@
+#!/bin/csh
+#
+# UPDATE-SYS - manage semaphore driven code updates
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+onintr INTERRUPT
+
+unalias ssh
+unalias ls
+unalias cd
+
+umask 002
+
+# PACT must be on your path - end of story
+set Which = "swhich -1"
+set Exe   = `rpath $0`
+set Root  = $Exe:h
+if (!(-d $Root/include)) then
+   set Exe  = `$Which pact`
+   set Root = $Exe:h
+   set Root = $Root:h
+endif
+source $Root/include/env-csh
+
+Intervene help.update-sys
+
+set lsys  = `$Which sys-site`
+eval `$lsys`
+
+set SSH      = ( `$Which ssh` -o TCPKeepAlive=yes )
+set SCP      = `$Which scp`
+set UpF      = ""
+set Tags     = ""
+set Oper     = "add"
+set TestOnly = FALSE
+set AllSites = FALSE
+set Watch    = update-watch
+set Err      = 0
+set LSite    = $SYS_SITE
+set Quiet    = FALSE
+set Verbose  = FALSE
+set UnLock   = FALSE
+
+@ NAttempts = 3
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           set AllSites = TRUE
+           breaksw
+      case -d:
+           set Oper = "daemon"
+           breaksw
+      case -f:
+           shift
+           set UpF = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: update-sys [-a] [-d] [-h] [-f <update-file>] [-na #] [-q] [-s <site>]"
+           echo "                  [-t] [-u] [-v] [-l <tags>* | -r <tags>* | <tags>*]"
+           echo ""
+           echo "   a  - do <tags> for all sites"
+           echo "   d  - run in daemon mode to execute commands"
+           echo "   f  - use the specified <update-file>"
+           echo "   h  - this help message"
+           echo "   l  - list specified tags"
+           echo "   na - number of consecutive SSH failures before exiting"
+           echo "   q  - quiet mode"
+           echo "   r  - remove specified tags"
+           echo "   s  - operate as specified site"
+           echo "   t  - print but do not execute the commands"
+           echo "   u  - unlock before running"
+           echo "   v  - verbose mode"
+           echo "   <tags> are of the form <project>.<tag>"
+           echo ""
+           exit(1)
+           breaksw
+      case -l:
+           set Oper = "list"
+           breaksw
+      case -na:
+           shift
+           @ NAttempts = $1
+           breaksw
+      case -q:
+           set Quiet   = TRUE
+           set Verbose = FALSE
+           breaksw
+      case -r:
+           set Oper = "remove"
+           breaksw
+      case -s:
+           shift
+           set LSite = $1
+           breaksw
+      case -t:
+           set TestOnly = TRUE
+           breaksw
+      case -u:
+           set UnLock = TRUE
+           breaksw
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      default:
+           set Tags = ( $Tags $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ((($Oper == "list") || ($Oper == "remove")) && ("$Tags" == "")) then
+   set Tags = "all"
+endif
+
+if ("$UpF" == "") then
+   if ($?UPDATE_SYS_DB == 1) then
+      set UpF = $UPDATE_SYS_DB
+   else if (-f $DAI_ROOT/pact/db/update-sys-db) then
+      set UpF = "$DAI_ROOT/pact/db/update-sys-db"
+   else
+      if ($Quiet == FALSE) then
+         echo "No update file specified - exiting"
+      endif
+      exit(1)
+   endif
+endif
+
+if ("$UpF" !~ /*) then
+   set UpF = $HOME/$UpF
+endif
+
+set Lock = $UpF:h/.lock.update-sys
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - read the update file and setup the session
+
+    set Host  = `awk '$1 ~ /Host/  {print $3}' $UpF`
+    set Loc   = `awk '$1 ~ /Loc/   {print $3}' $UpF`
+    set Sites = `awk '$1 ~ /Sites/ {for (i = 3; i <= NF; i++) {printf(" %s", $i);};}' $UpF`
+
+# allow for dynamic host
+    set Host = `hserve -m $Host`
+    if ("$Host" == "-none-") then
+       set Host  = `awk '$1 ~ /Host/  {print $3}' $UpF`
+       echo ""
+       echo "No host found matching $Host - exiting"
+       echo ""
+       exit(1)
+    endif
+
+# check that the user has authority/permission for the tags
+    set NTags = ""
+    foreach i ($Tags)
+       set TagPart = ( `echo $i | sed 's/\./ /g'` )
+       if ($#TagPart >= 2) then
+          set lProj = $TagPart[1]       
+          set Match = `awk '$1 ~ /project/ && $2 ~ /'$lProj'/ && $0 ~ /'$USER'/ {print $2}' $UpF`
+       else
+          set Match = ""
+       endif
+       if (("$Match" == "") && ($i != all)) then
+          if ($Quiet == FALSE) then
+             echo "$USER has no permission for tag $i - rejected"
+          endif
+       else
+          set NTags = ( $NTags $i )
+       endif
+    end
+    set Tags = ( $NTags )
+
+# check that tags are legal ones according to the update file
+    set NTags = ""
+    foreach i ($Tags)
+       set TagPart = ( `echo $i | sed 's/\./ /g'` )
+       if ($#TagPart >= 2) then
+          set lProj = $TagPart[1]       
+          set lTag  = $TagPart[2]
+          set Match = `awk '$1 ~ /entry/ && $3 ~ /'$lProj'/ && $4 ~ /'$lTag'/ {print NR}' $UpF`
+       else
+          set Match = ""
+       endif
+       if (("$Match" == "") && ($i != all)) then
+          if ($Quiet == FALSE) then
+             echo "$i matches no tag in the database - rejected"
+          endif
+       else
+          set NTags = ( $NTags $i )
+       endif
+    end
+    set Tags = ( $NTags )
+
+    switch ($Oper)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# REMOVE - remove existing semaphores
+
+case remove:
+    if ("$Tags" == "") then
+       if ($Quiet == FALSE) then
+          echo "No tags to remove"
+       endif
+       set Err = 1
+    else
+       if ($Quiet == FALSE) then
+          echo "Removing tags: $Tags"
+       endif
+
+       if ("$Tags" == all) then
+          if ($Verbose == TRUE) then
+             echo "$SSH $Host rm -f $Loc/$LSite.*"
+          endif
+          $SSH $Host 'rm -f '$Loc'/'$LSite'.*'
+       else
+          foreach i ($Tags)
+             if ($AllSites == TRUE) then
+                set TagF = ""
+                foreach site ($Sites)
+                   set TagF = ( $TagF $Loc/$site.$i )
+                end
+                if ($Verbose == TRUE) then
+                   echo "$SSH $Host rm -f $TagF"
+                endif
+                $SSH $Host rm -f $TagF
+             else
+                if ($Verbose == TRUE) then
+                   echo "$SSH $Host rm -f $Loc/$LSite.$i"
+                endif
+                $SSH $Host rm -f $Loc/$LSite.$i
+             endif
+          end
+       endif
+    endif
+
+    breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIST - list current semaphores
+
+case list:
+    if ("$Tags" == "") then
+       if ($Quiet == FALSE) then
+          echo "No tags to list"
+       endif
+       set Err = 1
+    else
+       if ($Quiet == FALSE) then
+          echo "Listing tags: $Tags"
+       endif
+
+       if ("$Tags" == all) then
+          if ($Verbose == TRUE) then
+             echo "$SSH $Host ls -1rt $Loc | grep -v $UpF:t"
+          endif
+          $SSH $Host ls -1rt $Loc | grep -v $UpF:t
+       else
+          foreach i ($Tags)
+             if ($AllSites == TRUE) then
+                set TagF = ""
+                foreach site ($Sites)
+                   set TagF = ( $TagF $Loc/$site.$i )
+                end
+                if ($Verbose == TRUE) then
+                   echo "$SSH $Host ls -1rt $TagF"
+                endif
+                $SSH $Host ls -1 $TagF
+             else
+                if ($Verbose == TRUE) then
+                   echo "$SSH $Host ls -1rt $Loc/$LSite.$i"
+                endif
+                $SSH $Host ls -1rt $Loc/$LSite.$i
+             endif
+          end
+       endif
+    endif   
+
+    breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ADD - add semaphores
+#     - Examples: update-sys pact.new
+#     -           update-sys pact.std basis.exp
+
+case add:
+    if ("$Tags" == "") then
+       if ($Quiet == FALSE) then
+          echo "No tags to add"
+       endif
+       set Err = 1
+    else
+       if ($Quiet == FALSE) then
+          echo "Adding tags: $Tags"
+       endif
+
+       foreach i ($Tags)
+          if ($AllSites == TRUE) then
+             set List = ""
+             foreach site ($Sites)
+                set List = ( $List $Loc/$site.$i )
+             end
+             if ($Verbose == TRUE) then
+                echo "$SSH $Host touch $List"
+             endif
+             $SSH $Host touch $List
+             sleep 1
+          else
+             if ($Verbose == TRUE) then
+                echo "$SSH $Host touch $Loc/$LSite.$i"
+             endif
+             $SSH $Host touch $Loc/$LSite.$i
+             sleep 1
+          endif
+       end
+    endif
+
+    breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DAEMON - run as daemon and execute commands
+
+case daemon:
+
+    set CHst    = `uname -n`
+    set LogName = $HOME/.log.update-sys.$CHst
+
+    if ($UnLock == TRUE) then
+       $RM $Lock
+       sign update-sys
+    endif
+
+# check for a running session which owns the current lock
+    if (-f $Lock) then
+
+# quit if an update-sys is running on a different host
+       set OldHst = `awk '$1 == "Host:" { print $2 }' $Lock`
+       if ($OldHst != $CHst) then
+          echo ""
+          echo "An update-sys session is running on $OldHst - exiting"
+          echo "   Host: $CHst"
+          echo "   User: $USER"
+          echo "   Date: `date`"
+          echo "   PID:  $$"
+          echo "Lock info ($Lock):"
+          cat $Lock |& awk '{printf("   %s\n", $0);}'
+          echo ""
+          exit(1)
+       endif
+
+# quit if another update-sys is running
+       set OldPID = `awk '$1 == "PID:" { print $2 }' $Lock`
+       set Info   = ( `ls-jobs -q /update-sys |& awk '$2 == "'$OldPID'" { print }'` )
+       if ("$Info" != "") then
+          echo ""
+          echo "Another update-sys session (pid $OldPID) is running - exiting"
+          echo "   Host: $CHst"
+          echo "   User: $USER"
+          echo "   Date: `date`"
+          echo "   PID:  $$"
+          echo "Lock info:"
+          cat $Lock |& awk '{printf("   %s\n", $0);}'
+          echo ""
+          exit(1)
+       endif
+    endif
+
+# setup the log file - keep one backup version
+    if (-f $LogName) then
+       mv $LogName $LogName.bck
+    endif
+    InitLog Log $LogName
+    chmod g+r $Log
+
+# make a lock for this session
+    flog $Log $RM $Lock
+    flog $Log touch $Lock
+    echo "Host: $CHst" >>& $Lock
+    echo "User: $USER" >>& $Lock
+    echo "Date: `date`" >>& $Lock
+    echo "PID:  $$" >>& $Lock
+    flog $Log chmod 660 $Lock
+    flog $Log cat $Lock
+
+    flog $Log uname -a
+
+    set LPath   = `awk '$1 ~ /Path/  {print $3}' $UpF`
+    set Tmp     = `awk '$1 ~ /Tmp/   {print $3}' $UpF`
+    set Wrapper = `awk '$1 ~ /Wrap/  {print $3}' $UpF`
+
+    if (-d "$Tmp") then
+       set Tmp = "$Tmp/"
+    else
+       set Tmp = ""
+    endif
+
+    set Running = `ls-jobs -q /update-sys |& awk 'NF > 0 { print }' | wc -l`
+    if ($Running[1] > 2) then
+       Note $Log "Job Info: $Running"
+       if ($Quiet == FALSE) then
+          NoteD $Log ""
+          NoteD $Log "There is already an update-sys daemon running - exiting"
+          NoteD $Log ""
+       else
+          Note $Log ""
+          Note $Log "There is already an update-sys daemon running - exiting"
+          Note $Log ""
+       endif
+       exit($Err)
+    endif
+
+    set TStamp = `/bin/date +%y%m%d%H%M%S`
+    flog $Log set rUpF = $Tmp.update-sys-db.$LSite.$USER.$TStamp
+
+    flog $Log $SSH $Host $LPath/sign -9 $Watch
+    flog $Log $SCP $UpF ${Host}:$rUpF
+
+    while (1)
+
+       Separator $Log
+       
+       @ ia = 0
+       while ($ia < $NAttempts)
+          if ($Verbose == TRUE) then
+             flog $Log $SSH $Host $LPath/$Watch -l -s $LSite -f $rUpF
+             set Status = $status
+          else
+             flog $Log $SSH $Host $LPath/$Watch -s $LSite -f $rUpF
+             set Status = $status
+          endif
+          if ($Status > 3) break
+          @ ia = $ia + 1
+       end
+       if ($ia >= $NAttempts) then
+          NoteD $Log ""
+          NoteD $Log "Cannot SSH to $Host - exiting"
+          NoteD $Log ""
+          exit(1)
+       endif
+
+       flog $Log date
+       Note $Log "Status     = $Status"
+       if ($Status == 0) then
+          Note $Log "Found tag matching nothing in $rUpF"
+
+       else
+
+          set USpec = ( `awk '$1 ~ /entry/ && NR == '$Status' { print }' $UpF` )
+
+          Note $Log "UpdateFile = $UpF"
+          Note $Log "USpec      = |$USpec|"
+ 
+          if ($#USpec < 6) then
+             Note $Log "Bad or incomplete USpec"
+
+          else
+             shift USpec
+             set Site   = $USpec[1]
+             shift USpec
+             set Proj   = $USpec[1]
+             shift USpec
+             set Tag    = $USpec[1]
+             shift USpec
+             set WrkDir = $USpec[1]
+             shift USpec
+       
+             set Cmnd = ( $Wrapper $USpec )
+ 
+             Note $Log " Site   = |$Site|"
+             Note $Log " Proj   = |$Proj|"
+             Note $Log " Tag    = |$Tag|"
+             Note $Log " Cmnd   = |$Cmnd|"
+ 
+             if ("$WrkDir" !~ /*) then
+                set WrkDir = $HOME/$WrkDir
+             endif
+
+             flog $Log cd $HOME
+             if (-d "$WrkDir") then
+                if ($TestOnly == TRUE) then
+                   NoteD $Log "-> cd $WrkDir"
+                   NoteD $Log "-> $Cmnd"
+                   NoteD $Log ""
+                else
+                   flog $Log pushd $WrkDir
+                   flog $Log $Cmnd
+                   flog $Log popd
+                endif
+
+             else
+                Note $Log "Error: directory |$WrkDir| does not exist"
+             endif
+          endif
+       endif
+    end
+
+    flog $Log $SSH $Host $LPath/sign -9 $Watch
+    flog $Log $SSH $RM $rUpF
+    flog $Log $RM $Lock
+
+    breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+default:
+    if ($Quiet == FALSE) then
+       echo "Unknown operation - $Oper"
+    endif
+    set Err = 1
+    breaksw
+
+endsw
+
+if ($Quiet == FALSE) then
+   echo ""
+endif
+
+exit($Err)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - cleanup any remains
+
+INTERRUPT:
+
+$SSH $Host $LPath/sign -9 $Watch >& /dev/null
+$SSH $RM $rUpF
+$RM $Lock
+
+exit(1)
+

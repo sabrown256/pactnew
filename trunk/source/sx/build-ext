@@ -1,0 +1,53 @@
+#!/bin/csh -f
+#
+# BUILD-EXT - build local SX extensions
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+# generate stubs if no extensions directory exists
+if (!(-d extensions)) then
+   mkdir extensions
+   pushd extensions >>& /dev/null
+
+# write sxext.c
+   cat >&! sxext.c << EOF
+#include "cpyright.h"
+#include "sx_int.h"
+void SX_install_ext_funcs(void)
+   {return;}
+EOF
+
+# write pre-Make
+   cat >&! pre-Make << EOF
+TGTLib = \${LibDir}/libsx.a
+UniFlags =
+CcFlags  = \${CDebug} -I\${IncDir} \${MDInc} \${MDGInc}
+FcFlags  =
+LdFlags  = -L\${LibDir} \${LDFLAGS}
+CCAnnounce = \${CCompiler} \${CDebug} \${CShared} \${CFLAGS}
+InstallDep = \${TGTLib}
+BinDep = \${Hdrs} \${TGTLib}
+Hdrs = ../sx_int.h
+Objs = sxext.o
+ArObjs = \${TGTLib}(sxext.o)
+\${Objs} : \${Hdrs}
+\${ArObjs} : \${Hdrs}
+EOF
+
+   popd >>& /dev/null
+endif
+
+# go and compile the extensions
+pushd extensions >>& /dev/null
+pact devlib
+@ err = $status
+popd >>& /dev/null
+
+exit($err)
+

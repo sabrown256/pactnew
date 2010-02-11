@@ -1,0 +1,49 @@
+#!/bin/csh -f
+#
+# DATTR - ULTRA PDB attribute test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDB ATTRIBUTE TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SX PDB Attribute Test ........ "
+   Note $Log ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $SX -l $RootDir/sx/tests/sxpdba.scm > sxpdba.res)
+      flog $Log (diff sxpdba.res $RootDir/sx/tests/ref/sxpdba > sxpdba.res.diff)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxpdba.scm |& \
+      grep "ERROR SUMMARY:"                                                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+      flog $Log rm -f sxpdba.res sxpdba.res.diff
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

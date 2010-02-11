@@ -1,0 +1,25 @@
+#
+# test dependency analysis - not working hard enough
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+a.x :
+	touch a.x
+
+b.x :
+	touch b.x
+
+a.o : a.x
+	rm -f $*.o
+	wc -l $< > $*.o
+
+a.o : b.x
+# NOTE: this is an error and would be good to test
+#       but comparing output is chancy
+#	@echo "doing b.x dependencies"
+
+all: a.o
+	@echo "dependency analysis - multiple specifications"
+	rm -f [ab].[xo]

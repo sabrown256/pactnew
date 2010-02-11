@@ -1,0 +1,13 @@
+#
+# AUTO-AIX - default AIX configuration
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include spokes
+include 64-bit
+include compiler-xlc
+

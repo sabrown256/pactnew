@@ -1,0 +1,243 @@
+#
+# pre-Makefile for Portable Math Library
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=pml
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTInc = ${Hdrs}
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${COptimize} -I${IncDir} ${MDInc}
+FcFlags =
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${TGTLib} ${BinDir}/mlcsum
+BinDep =
+BinObj =
+
+#
+# Required Libraries
+#
+Libs = ${LPML} ${LSCORE} -lm ${MDLib}
+
+targets :
+	@echo "Targets for PML"
+	@echo "   cgsolv    : make sparse linear CG solvers test"
+	@echo "   checksum  : make checksum routines test"
+	@echo "   fpe       : make FPE tests"
+	@echo "   funcs     : make functions test"
+	@echo "   icsolv    : make matrix ICG solvers test"
+	@echo "   install   : install PML headers and utilities in dev/arch"
+	@echo "   interp    : make interpolation test"
+	@echo "   link      : link PML utilities for public use"
+	@echo "   lnnorm    : make ln norm test"
+	@echo "   lrac      : make LR to AC mapping test"
+	@echo "   matrix    : make matrix tests"
+	@echo "   sharedlib : build and install PML shared libs in dev/arch"
+	@echo "   svdsolv   : make SVD solvers test"
+	@echo "   topsort   : make topological sort test"
+	@echo "   test      : run the PML test suite"
+
+#
+# Headers Files
+#
+Hdrs = pml.h pml_int.h scope_complex.h
+
+#
+# Object Files
+#
+Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
+       mlrfnc.o mlcfnc.o mlsfnc.o mlsolv.o mlsvd.o                \
+       mlcg.o mliccg.o mlicgs.o                                   \
+       mlfft.o mlfpe.o mloper.o mlgeom.o mlsort.o mlmm.o          \
+       mlintm.o mlintp.o mlints.o                                 \
+       mlchksm.o mlmesh.o mlmsrch.o mlcmsh.o mlmextr.o            \
+       mlfia.o mlvect.o mlsmp.o 
+
+ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)  \
+         ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)  \
+         ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)  ${TGTLib}(mlsfnc.o) \
+         ${TGTLib}(mlsolv.o)  ${TGTLib}(mlsvd.o)                       \
+         ${TGTLib}(mlcg.o)    ${TGTLib}(mliccg.o)  ${TGTLib}(mlicgs.o) \
+         ${TGTLib}(mlintm.o)  ${TGTLib}(mlintp.o)  ${TGTLib}(mlints.o) \
+         ${TGTLib}(mlfpe.o)   ${TGTLib}(mloper.o)                      \
+	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)   \
+         ${TGTLib}(mlmesh.o)  ${TGTLib}(mlmsrch.o) ${TGTLib}(mlcmsh.o) \
+         ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o) ${TGTLib}(mlfia.o)  \
+         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)
+
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+# extra commands needed when building TGTLib
+LibAction = pact patch-fpe
+
+#
+# make new test executable
+#
+matrix : ${BinDir}/mlmtrt
+
+${BinDir}/mlmtrt : mlmtrt.c ${TGTLib}
+	${CC} -c mlmtrt.c -o ${PACTTmpDir}/mlmtrt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlmtrt.o -o ${BinDir}/mlmtrt ${Libs}
+
+#
+# test functions
+#
+funcs : ${BinDir}/mlfnts
+
+${BinDir}/mlfnts : mlfnts.c ${TGTLib}
+	${CC} -c mlfnts.c -o ${PACTTmpDir}/mlfnts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlfnts.o -o ${BinDir}/mlfnts ${Libs}
+
+#
+# test LR to AC mapping
+#
+lrac : ${BinDir}/mlacts
+
+${BinDir}/mlacts : mlacts.c ${TGTLib}
+	${CC} -c mlacts.c -o ${PACTTmpDir}/mlacts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlacts.o -o ${BinDir}/mlacts ${Libs}
+
+#
+# test topological sort
+#
+topsort : ${BinDir}/mlstst
+
+${BinDir}/mlstst : mlstst.c ${TGTLib}
+	${CC} -c mlstst.c -o ${PACTTmpDir}/mlstst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlstst.o -o ${BinDir}/mlstst ${Libs}
+
+#
+# test matrix ICG solvers
+#
+icsolv : ${BinDir}/mlicts ${BinDir}/mlicst ${BinDir}/mlcgts
+
+${BinDir}/mlicts : mlicts.c ${TGTLib}
+	${CC} -c mlicts.c -o ${PACTTmpDir}/mlicts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlicts.o -o ${BinDir}/mlicts ${Libs}
+
+${BinDir}/mlicst : mlicst.c ${TGTLib}
+	${CC} -c mlicst.c -o ${PACTTmpDir}/mlicst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlicst.o -o ${BinDir}/mlicst ${Libs}
+
+#
+# test sparse linear CG solvers
+#
+cgsolv : ${BinDir}/mlcgts
+
+${BinDir}/mlcgts : mlcgts.c ${TGTLib}
+	${CC} -c mlcgts.c -o ${PACTTmpDir}/mlcgts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlcgts.o -o ${BinDir}/mlcgts ${Libs}
+
+#
+# test SVD solvers
+#
+svdsolv : ${BinDir}/mlsvdt
+
+${BinDir}/mlsvdt : mlsvdt.c ${TGTLib}
+	${CC} -c mlsvdt.c -o ${PACTTmpDir}/mlsvdt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlsvdt.o -o ${BinDir}/mlsvdt ${Libs}
+
+#
+# test interpolation
+#
+interp : ${BinDir}/mlitst
+
+${BinDir}/mlitst : mlitst.c ${TGTLib}
+	${CC} -c mlitst.c -o ${PACTTmpDir}/mlitst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlitst.o -o ${BinDir}/mlitst ${Libs}
+
+#
+# test ln norm
+#
+lnnorm : ${BinDir}/mllnnmts
+
+${BinDir}/mllnnmts : mllnnmts.c ${TGTLib}
+	${CC} -c mllnnmts.c -o ${PACTTmpDir}/mllnnmts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mllnnmts.o -o ${BinDir}/mllnnmts ${Libs}
+
+#
+# test checksum routines
+#
+checksum : ${BinDir}/mlckts ${BinDir}/mlcsum
+
+${BinDir}/mlckts : mlckts.c ${TGTLib}
+	${CC} -c mlckts.c -o ${PACTTmpDir}/mlckts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlckts.o -o ${BinDir}/mlckts ${Libs}
+
+${BinDir}/mlcsum : mlcsum.c ${TGTLib}
+	${CC} -c mlcsum.c -o ${PACTTmpDir}/mlcsum.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlcsum.o -o ${BinDir}/mlcsum ${Libs}
+
+#
+# test FPE
+#
+fpe : ${BinDir}/mlfpets ${BinDir}/mlnants
+
+${BinDir}/mlfpets : mlfpets.c ${TGTLib}
+	${CC} -c mlfpets.c -o ${PACTTmpDir}/mlfpets.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlfpets.o -o ${BinDir}/mlfpets ${Libs}
+
+${BinDir}/mlnants : mlnants.c ${TGTLib}
+	${CC} -c mlnants.c -o ${PACTTmpDir}/mlnants.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlnants.o -o ${BinDir}/mlnants ${Libs}
+
+#
+# link 
+#
+link: ${InstallDep}
+
+#
+# install 
+#
+install:
+	pact link
+	pact incinstall
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the PML test suite
+#
+test :
+	@./mltest
+

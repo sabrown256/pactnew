@@ -1,0 +1,59 @@
+#
+# COMPILER-ICC - Intel compiler specifications
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
+run features/rpath intel
+
+WARN_PATTERN = ":+sp+warning+sp+"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe      = icc
+   Flags    = -wd267,1357
+   Flags   += [ _env_ = Bits ;
+                64    = -fPIC ]
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -qp ]
+   Debug    = -g
+   Optimize = -g
+# Use this when icc PML Function test bug is fixed
+#   Optimize = -g -O1
+   Version  = -V
+}
+
+Tool FC {
+   Exe     = ifort
+   Version = -V
+}
+
+Tool LD {
+   RPath = -Wl,-rpath,@
+   Lib   = -lc
+}
+
+Tool Lex {
+   Flags = -wd266
+}
+
+Group Cfg {
+   Use      = Std
+   LD_Flags = ${LD_Flags}
+   LD_Lib   =
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags = -openmp
+   LD_Lib   = -lpthread 
+}
+
+include cpp-rule

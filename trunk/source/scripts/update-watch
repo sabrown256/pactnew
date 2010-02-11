@@ -1,0 +1,154 @@
+#!/bin/csh -f
+#
+# UPDATE-WATCH - manage semaphore driven code updates (slave side)
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Exe   = `dirname $0`
+set Which = "$Exe/swhich -1"
+
+# look for PACT and use it if available
+# if you have PACT you get certain defaults and otherwise
+# you have to specify everything in the command line
+set PACT = `$Which pact`
+if (-x "$PACT") then
+   set Exe  = `rpath $0`
+   set Root = $Exe:h
+   set Root = $Root:h
+   if (!(-d $Root/include)) then
+      set Exe  = `$Which pact`
+      set Root = $Exe:h
+      set Root = $Root:h
+   endif
+   source $Root/include/env-csh
+
+# PACT must be on your path - end of story
+   set lsys = `$Which sys-site`
+   eval `$lsys`
+
+else
+   setenv SYS_SITE unknown
+   alias flog      'echo "Command: \!\!:2-$" >>& \!\!:^ ; \!\!:2-$ >>& \!\!:^'
+   alias Note      'echo \!\!:2-$ >>& \!\!:^'
+   alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
+endif
+
+set SSH       = `$Which ssh`
+set UpF       = ""
+set Tags      = ""
+set AllSites  = FALSE
+set Watch     = update-watch
+set STime     = 60
+set LSite     = $SYS_SITE
+set LogAction = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           set AllSites = TRUE
+           breaksw
+      case -f:
+           shift
+           set UpF = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: update-watch [-a] [-h] [-f <update-file>] [-l] [-s <site>] [<tags>]"
+           echo ""
+           echo "   a  - do <tags> for all sites"
+           echo "   f  - use the specified <update-file>"
+           echo "   h  - this help message"
+           echo "   l  - log activity for debugging"
+           echo "   s  - specify the <site> to monitor"
+           echo "   <tags> are of the form <project>.<tag>"
+           echo ""
+           exit(1)
+           breaksw
+      case -l:
+           set LogAction = TRUE
+           breaksw
+      case -s:
+           shift
+           set LSite = $1
+           breaksw
+      default:
+           set Tags = ( $Tags $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$UpF" == "") then
+   if ($?UPDATE_SYS_DB == 1) then
+      set UpF = $UPDATE_SYS_DB
+   else if ($?DAI_ROOT == 1) then
+      if (-f $DAI_ROOT/pact/db/update-sys-db) then
+         set UpF = "$DAI_ROOT/pact/db/update-sys-db"
+      endif
+   endif
+   if ("$UpF" == "") then
+      echo "No update file specified - exiting"
+      exit(1)
+   endif
+endif
+
+if ("$UpF" !~ /*) then
+   set UpF = $HOME/$UpF
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WORK - do the main business
+
+set Loc = `awk '$1 ~ /Loc/  {print $3}' $UpF`
+
+cd $Loc >& /dev/null
+
+set Ret = 0
+
+if ($LogAction == TRUE) then
+   InitLog Log $cwd/.log.$LSite.$USER
+endif
+
+while (1)
+   touch $LSite.+
+   set SemFL = ( `ls -t -1 $LSite.* |& grep -v $LSite.+ | grep -v $UpF:t` )
+   rm -f $LSite.+
+   if ("$SemFL" != "") then
+      set SemF = ( `echo "$SemFL[1]" | sed 's/\./ /g'` )
+      set Site = $SemF[1]
+      set Proj = $SemF[2]
+      set Tag  = $SemF[3]
+
+      if ($LSite == $Site) then
+         @ Ret = `awk '$1 == "entry" && $2 == "'$Site'" && $3 == "'$Proj'" && $4 == "'$Tag'" {print NR}' $UpF`
+         rm -f $SemFL[1] >& /dev/null
+         if ($LogAction == TRUE) then
+            Note $Log "UpF   = |$UpF|"
+            Note $Log "SemFL = |$SemFL|"
+            Note $Log "Site  = |$Site|"
+            Note $Log "Proj  = |$Proj|"
+            Note $Log "Tag   = |$Tag|"
+            Note $Log "Ret   = |$Ret|"
+            Note $Log "Line  = |`head -n $Ret $UpF | tail -n 1`|"
+         endif
+         break
+      endif
+   endif
+   sleep $STime
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($LogAction == TRUE) then
+   Note $Log "Tag matches line $Ret in $UpF"
+endif
+
+exit($Ret)
+

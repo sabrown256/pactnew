@@ -1,0 +1,92 @@
+#!/bin/csh -f
+#
+# NUMER - SCHEME numeric tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           INTEGER SYNTAX TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SCHEME Integer Syntax Test ... "
+   Note $Log ""
+
+   flog $Log pwd
+   if ( $?autotool ) then
+     if ( !(-e ../shsint.scm) ) then 
+       flog $Log cp $FilesDir/shsint.scm ..
+     endif
+   endif 
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/scheme -e -l $FilesDir/shsint.scm
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shsint.scm  |& \
+      grep "ERROR SUMMARY:"                                          |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+   set ETime   = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log rm -f '#tmp#'
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+
+#                           NUMERIC TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SCHEME Numeric Test .......... "
+   Note $Log ""
+
+   flog $Log pwd
+   if ( $?autotool ) then
+     if ( !(-e ../shnum.scm) ) then 
+       flog $Log cp $FilesDir/shnum.scm ..
+     endif
+   endif 
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/scheme -e -l $FilesDir/shnum.scm
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shnum.scm  |& \
+      grep "ERROR SUMMARY:"                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+   set ETime   = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log rm -f '#tmp#'
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

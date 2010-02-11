@@ -1,0 +1,103 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# PDBVIEW - the editor
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set VERSION = "2.2"
+
+# determine the bin directory path
+set BinDir = $PACT/bin
+
+# determine the scheme directory path
+set ScmDir = $PACT/scheme
+
+# only extend SCHEME env var if it is already set!
+# allow SCHEME env var to trump scheme dir relative to sx binary
+if ($?SCHEME) then
+  setenv SCHEME ${SCHEME}:$ScmDir
+endif
+
+# determine if tracker is available
+set TRACKER = "none"
+
+foreach directory ( "/usr/local/apps/tracker" `echo $PATH | sed 's/:/ /g'` )
+   if (-d $directory) then
+      if (-x $directory/bin/tracker) then
+         set TRACKER = $directory/bin/tracker
+         break
+      endif
+   endif
+end
+
+# determine if sx is available
+if (!(-x $BinDir/sx)) then
+   echo ""
+   echo "No SX executable found in '$BinDir' derived from '$0'"
+   echo "Your path is: $PATH"
+   echo ""
+   exit(1)
+endif
+
+set CFE = ""
+
+# setup default values
+set track  = 1
+set Mode   = 0
+set Digits = 4
+set Argl   =
+
+# handle args
+while ($#argv > 0)
+   switch ($argv[1])
+      case -d:
+         set Mode = 1
+         breaksw
+      case -h:
+	 echo ""
+	 echo "Usage: pdbview [-d] [-h] [-l <command-file>] [-p n] [-r] [<data-file>]"
+	 echo ""
+	 echo "Options:   d - dump the formatted contents in ASCII to stdout"
+	 echo "           h - display this usage information"
+	 echo "           l - execute commands in <command-file>"
+	 echo "               (not available with -d option)"
+	 echo "           p - display floating point numbers with n digits"
+	 echo "               (only available with -d option)"
+	 echo "           r - don't use the .pdbviewrc file"
+	 echo ""
+         exit(0)
+      case -p:
+         shift
+         set Digits = $argv[1]
+         breaksw
+      case -x:
+         set track = 0
+         breaksw
+      default:
+         set Argl = "$Argl$argv[1] "
+         breaksw
+   endsw
+   shift
+end
+
+# track this run
+if ((-x "$TRACKER") && ($track == 1)) then
+  $TRACKER -b -n pdbview -v $VERSION -P 1 -T 1 -W 1.0
+endif
+
+# do the browsing of the PDB file
+if ($Mode == 1) then
+   $CFE $BinDir/sx -s -l sxview.scm \(binls $Argl $Digits\)
+   set RetVal = $status;
+else
+   $CFE $BinDir/sx -p $Argl
+   set RetVal = $status;
+endif
+
+exit($RetVal)
+

@@ -1,0 +1,211 @@
+#!/bin/csh -f
+#
+# SQL - analyze platform SQL
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: sql"
+
+# vanilla place to look if previously undefined
+SafeEnv SQL_Path /usr
+SafeEnv SQLLib   ""
+SafeEnv SQLInc   ""
+SafeEnv HAVE_SQL FALSE
+
+# if we have explicitly said we do not want SQL
+# do NOT detect it
+if ($SQL_Path == none) then
+   NoteD $ALog "      no SQL (by request)"
+
+else
+
+   set incl = ""
+   set libl = ""
+   set spkl = ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MYSQL
+
+   set UTime = `timer -r`
+
+# write a little MYSQL test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <mysql.h>
+int main(int c, char **v)
+{MYSQL *conn;
+ conn = mysql_init(NULL);
+ if (mysql_real_connect(conn, v[1], v[2], NULL, v[3], 0, NULL, 0) != NULL)
+    mysql_query(conn, "SET NAMES 'utf8'");
+ return(0);}
+EOF
+
+   if ($?SQL_Path == 1) then
+      set lIncDirs = ( $SQL_Path/include /usr/local/include $RootInc/mysql $RootInc )
+      set lLibDirs = ( $SQL_Path/$LIB /usr/local/lib /usr/lib/mysql /usr/$LIB )
+   else
+      set lIncDirs = ( /usr/local/include $RootInc/mysql $RootInc )
+      set lLibDirs = ( /usr/local/lib /usr/lib/mysql /usr/$LIB )
+   endif
+   set lHdrs    = ( mysql.h )
+   set ASList   = ( a so )
+   set lLib     = mysqlclient
+   set lFile    = $Tmp
+   set lALibs   = ( $LD_Lib -lm -lz )
+   set Implicit = FALSE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         set incl = ( $incl $PckInc )
+      endif
+      set libl = ( $libl $PckLib $LD_Lib )
+      set spkl = ( $spkl mysql )
+
+      setenv HAVE_MYSQL  TRUE
+   else
+      setenv HAVE_MYSQL  ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SQLITE - version 1
+
+   set UTime = `timer -r`
+
+# write a little SQLITE test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <sqlite3.h>
+int main(int c, char **v)
+{sqlite3 *conn;
+ sqlite3_open(v[1], &conn);
+ return(0);}
+EOF
+
+   if ($?SQL_Path == 1) then
+      set lIncDirs = ( $SQL_Path/include /usr/local/include $RootInc )
+      set lLibDirs = ( $SQL_Path/$LIB /usr/local/lib /usr/$LIB )
+   else
+      set lIncDirs = ( /usr/local/include $RootInc )
+      set lLibDirs = ( /usr/local/lib /usr/$LIB )
+   endif
+   set lHdrs    = ( sqlite3.h )
+   set ASList   = ( a so )
+   set lLib     = sqlite3
+   set lFile    = $Tmp
+   set lALibs   = ( $LD_Lib )
+   set Implicit = FALSE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         set incl = ( $incl $PckInc )
+      endif
+      set libl = ( $libl $PckLib $LD_Lib )
+      set spkl = ( $spkl sqlite )
+
+      setenv HAVE_SQLITE TRUE
+   else
+      setenv HAVE_SQLITE ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SQLITE - version 2
+
+   set UTime = `timer -r`
+
+# write a little SQLITE test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <sqlite3.h>
+int main(int c, char **v)
+{sqlite3 *conn;
+ sqlite3_open_v2(v[1], &conn,
+		 SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX,
+  	         NULL);
+ return(0);}
+EOF
+
+   if ($?SQL_Path == 1) then
+      set lIncDirs = ( $SQL_Path/include /usr/local/include $RootInc )
+      set lLibDirs = ( $SQL_Path/lib /usr/local/lib /usr/$LIB )
+   else
+      set lIncDirs = ( /usr/local/include $RootInc )
+      set lLibDirs = ( /usr/local/lib /usr/$LIB )
+   endif
+   set lHdrs    = ( sqlite3.h )
+   set ASList   = ( a so )
+   set lLib     = sqlite3
+   set lFile    = $Tmp
+   set lALibs   = ( $LD_Lib )
+   set Implicit = FALSE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         set incl = ( $incl $PckInc )
+      endif
+      set libl = ( $libl $PckLib $LD_Lib )
+
+      setenv HAVE_SQLITE_V2 TRUE
+      setenv HAVE_SQLITE    TRUE
+   else
+      setenv HAVE_SQLITE_V2 ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   setenv SQLLib "$libl"
+   setenv SQLInc "$incl"
+
+   setenv CC_Inc  "$CC_Inc $SQLInc"
+   setenv LD_Lib  "$LD_Lib $SQLLib"
+
+   if ("$SQLLib" != "") then
+      setenv HAVE_SQL TRUE
+      NoteD $ALog "      has SQL ($spkl)"
+   else
+      NoteD $ALog "      no SQL"
+   endif
+
+# export the results
+   SetParent CC_Inc
+   SetParent LD_Lib
+   SetParent SQLInc
+   SetParent SQLLib
+   SetParent HAVE_SQL
+   SetParent HAVE_MYSQL
+   SetParent HAVE_SQLITE
+   SetParent HAVE_SQLITE_V2
+
+endif
+
+exit(0)
+

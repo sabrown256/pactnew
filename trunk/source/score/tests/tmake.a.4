@@ -1,0 +1,12 @@
+#
+# test some things about SHELL
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+SHELL = /bin/csh
+
+all :
+	@echo "Make shell variable is ${SHELL}"
+	@echo "Shell environment variable is $$SHELL (gmake non-POSIX)"

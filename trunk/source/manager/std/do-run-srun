@@ -1,0 +1,42 @@
+#
+# DO-RUN-SRUN - DO-RUN database entry for srun
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Env SLURM_EXIT_ERROR     = 254
+Env SLURM_EXIT_IMMEDIATE = 255
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+MPI : srun {
+   TArg  = ($NThread > 0) ? -c $NThread : -O
+#   NArg  = -N $NNode
+   NArg  = ($NNode < 2) ? "" : --nodes=$NNode-$NNode
+
+# do it this way for codes that unconditionally call MPI_Init
+   Exe   = ($MPICnd == FALSE) ? srun
+   Flags = ($MPICnd == FALSE) ? -i all -I $MPI_TArg -n $NProc $MPI_NArg -p $Pool
+
+# handle nonMPI codes
+   Exe   = ("$MPIFE" == "") ? "" : -noop-
+   Flags = ("$MPIFE" == "") ? "" : -noop-
+
+# do it this way for codes that conditionally call MPI_Init
+# they run serial for 0 or 1 processes
+   Exe   = (($MPICnd == TRUE) && (($NProc > 1) || ($Force == TRUE))) ? srun : -noop-
+   Flags = (($MPICnd == TRUE) && (($NProc > 1) || ($Force == TRUE))) ? -i all -I $MPI_TArg -n $NProc $MPI_NArg -p $Pool : -noop-
+
+# NOTE: they have a non-functional srun on BG/P which gets us into here
+# rather than the desired mpirun clause
+# do parallel this way on BG/P
+   Exe   = (($BGP == TRUE) && ($MPINot == FALSE)) ? mpirun : -noop-
+   Flags = (($BGP == TRUE) && ($MPINot == FALSE)) ? -np $NProc -partition $Pool -host dawnhtcsn : -noop-
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------

@@ -1,0 +1,147 @@
+#!/bin/csh -f
+#
+# CONFIGURE - autoconf simulacrum for building PACT
+#
+
+manager/pre-check
+if ($status > 1) then
+   exit(1)
+endif
+
+set Args = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case --enable-32-bit:
+           set Args = ( $Args -b 32 )
+           breaksw
+      case --enable-64-bit:
+           set Args = ( $Args -b 64 )
+           breaksw
+      case --enable-debug:
+           set Args = ( $Args -g )
+           breaksw
+      case --enable-mpi:
+           set Args = ( $Args -mpi )
+           breaksw
+      case --enable-optimize:
+           set Args = ( $Args -o )
+           breaksw
+      case --enable-profiling:
+           set Args = ( $Args -p )
+           breaksw
+      case --enable-pthread:
+           set Args = ( $Args -t )
+           breaksw
+      case --enable-python:
+           set Args = ( $Args -py )
+           breaksw
+      case --enable-openmp:
+           set Args = ( $Args -s )
+           breaksw
+      case --enable-shared:
+           set Args = ( $Args -sl )
+           breaksw
+      case --create-missing-dirs:
+           set Args = ( $Args -c )
+           breaksw
+      case --prefix=*:
+	   set Args = ( $Args -i `echo $1 | sed 's/--prefix=//'` )
+           breaksw
+      case --with-python=*:
+	   set Args = ( $Args -ipy `echo $1 | sed 's/--with-python=//'` )
+           breaksw
+      case --with-feature=*:
+	   set Args = ( $Args -feature `echo $1 | sed 's/--with-feature=//'` )
+           breaksw
+      case --with-cc=*:
+	   set CC   = `echo $1 | sed 's/--with-cc=//'`
+           set Args = ( $Args -cc $CC )
+           breaksw
+
+      case -b:
+      case -i:
+      case -f:
+      case -md:
+      case -os:
+      case -ipy:
+           set Args = ( $Args $1 $2 )
+           shift
+           breaksw
+
+      case -bgl:
+      case -gcc:
+      case -icc:
+      case -pgi:
+      case -path:
+      case -c:
+      case -g:
+      case -mpi:
+      case -o:
+      case -p:
+      case -py:
+      case -s:
+      case -sl:
+      case -t:
+           set Args = ( $Args $1 )
+           breaksw
+
+      case --help:
+      case -h:
+           echo ""
+           echo "Usage: configure [options]"
+           echo ""
+           echo "        --enable-32-bit  or  -b 32"
+           echo "        --enable-64-bit  or  -b 64"
+           echo "                   size of pointers in bits for platforms with option (default 64)"
+           echo "        --create-missing-dirs  or  -c"
+           echo "                   create missing directories for -i option"
+           echo "        --enable-debug  or  -g"
+           echo "                   build a fully debuggable version"
+           echo "        --help  or  -h"
+           echo "                   this help message"
+           echo "        --prefix=PREFIX  or  -i PREFIX"
+           echo "                   base installation directory (default /usr/local)"
+           echo '                   to omit installation use "none"'
+           echo "        --with-python=DIR  or  -ipy DIR"
+           echo "                   path to python, implies -py"
+           echo "        --with-feature=FEATURE  or  -feature FEATURE"
+           echo "                   build with the specified feature"
+           echo "        --enable-mpi  or  -mpi"
+           echo "                   build MPI version (if no config file given)"
+           echo "        --enable-optimize  or  -o"
+           echo "                   build a fully optimized version"
+           echo "        --enable-profiling  or  -p"
+           echo "                   build a profiling version"
+           echo "        --enable-python  or  -py"
+           echo "                   build python bindings"
+           echo "        --enable-shared  or  -sl"
+           echo "                   build shared libraries"
+           echo "        --enable-openmp  or  -s"
+           echo "                   build OpenMP version"
+           echo "        --enable-pthread  or  -t"
+           echo "                   build pthreaded version"
+           echo ""
+           echo "   To select among supported compilers on Linux platforms:"
+           echo ""
+           echo "        --with-cc=CC  or  -cc CC"
+           echo "                   specify the compiler to be used"
+           echo "                   the full path to the compiler may be given"
+           echo "                   or just the name of the compiler (in which"
+           echo "                   case it must be on your PATH)."
+           echo "                   The following compilers are treated specially"
+           echo "                   because PACT has been tuned for them:"
+           echo "                      gcc (GNU), pgcc (PGI), pathcc (PathScale),"
+           echo "                      and icc (Intel)"
+           echo "                   The default is 'gcc'."
+           echo ""
+           exit(1)
+           breaksw
+   endsw
+   shift
+end
+
+cd manager
+dsys config $Args
+
+exit($status)

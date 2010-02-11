@@ -1,0 +1,231 @@
+;
+; CODE.DICT - test dictionary for whole code system
+;
+; Source Version: 3.0
+; Software Release #: LLNL-CODE-422942
+;
+; include "cpyright.h"
+;
+
+;--------------------------------------------------------------------------
+
+;                     SYSTEM WIDE INFORMATION
+
+;--------------------------------------------------------------------------
+
+; NOTE: system-scalars and system-files information is required unless:
+;
+;       1) "generator-init-problem"
+;          "simulation-init-problem"
+;          "simulation-run-problem"
+;          "simulation-fin-problem"
+;
+;   or
+;
+;       2) "combined-init-problem"
+;          "combined-run-problem"
+;          "combined-fin-problem"
+;
+;   functions are supplied
+
+(system-scalars
+	PARAM[1]       ; system time
+        PARAM[2]       ; system start time
+	PARAM[3]       ; system stop time
+	PARAM[4]       ; system time step fraction
+	PARAM[5]       ; mimimum time step fraction
+	PARAM[6]       ; maximum time step fraction
+	PARAM[7]       ; maximum time step fractional increase
+	SWTCH[3]       ; system time cycle number
+	SWTCH[12])     ; number of computional units (zones)
+
+(system-files
+	NAME[2]       ; state file name
+	NAME[3]       ; edit file name
+	NAME[4]       ; pp file name
+	NAME[5])      ; PVA file name
+
+(system-functions
+        "generator-arg-processor"   gen_args
+        "generator-unit-setup"      init_unit
+        "simulation-init-problem"   init_problem
+        "combined-init-problem"     my_init_problem
+        "combined-run-problem"      my_run_problem
+        "combined-fin-problem"      my_fin_problem)
+
+;--------------------------------------------------------------------------
+
+;                              PACKAGE #1
+
+;--------------------------------------------------------------------------
+
+(package "pkg1")
+
+(declare-variable
+
+   const CYLINDER 2
+
+   double t ()
+   double dt ()
+   int cycle ()
+
+   static int N_one () 1)
+
+(declare-function
+   char *gen_args ("int c" "char **v")
+   int init_unit ()
+   int init_problem ("int c" "char **v")
+   void clearh ()
+   void viewh ()
+   void printh ())
+
+(package-functions
+    "intern-variables"           intern_pkg1
+    "initialize"                 init_pkg1
+    "main-entry"                 pkg1_entry)
+
+(mesh scalar N_one)
+
+(def-var (t dt) double scalar
+         (requ)
+	 (sec))
+
+(control ascii 1  NULL "not used"
+	 ascii 2  NULL "restart file name (PDB)"
+	 ascii 3  NULL "edit file name (ASCII)"
+	 ascii 4  NULL "post processor file (PDB)"
+	 ascii 5  NULL "graph file name (PDB)"
+
+	 integer 1   0  "on/off switch"
+	 integer 2   0  "current cycle number (INTERNAL)"
+	 integer 3   0  "N_plots, number of plot requests (INTERNAL)"
+
+	 real 1  0.0     "current problem time (internal units)"
+	 real 2  0.0     "start time (internal units)"
+	 real 3  1.0e100 "stop time (internal units)"
+	 real 4  1.0e-4  "initial/current dt fraction of tstop-tstart"
+	 real 5  1.0e-6  "minimum dt fraction of tstop-tstart"
+	 real 6  0.1     "maximum dt fraction of tstop-tstart"
+	 real 7  2.0     "fractional increase in dt per cycle")
+
+(command    make       make_mesh  PA_zargs
+	    clear      clearh     PA_zargs
+	    view       viewh      PA_zargs
+	    start-time real       PARAM    2
+	    stop-time  real       PARAM    3)
+
+;--------------------------------------------------------------------------
+
+;                             PACKAGE #2
+
+;--------------------------------------------------------------------------
+
+(package "pkg2")
+
+(declare-variable
+   double *n ()
+   double *p ()
+   double *rho ()
+   double *rpdv ()
+   extern int N_zones ())
+
+(package-functions
+    "intern-variables"           intern_pkg2
+    "initialize"                 init_pkg2
+    "main-entry"                 pkg2)
+
+(mesh spatial N_zones)
+
+(def-var rho double spatial
+         (restart requ zone)
+	 (g per cc))
+
+(control integer 1 1 "on/off switch"
+	 real 1 0.0      "unused")
+
+;--------------------------------------------------------------------------
+
+;                            PACKAGE #3
+
+;--------------------------------------------------------------------------
+
+(package "pkg3")
+
+(declare-variable
+   static int kav    () 10
+   static double kbv () 2.71
+   static double pi  () 3.1415
+   int knoba ()
+   double knobb ()
+   extern double *rho ())
+
+(package-functions
+    "intern-variables"           intern_pkg3
+    "initialize"                 init_pkg3
+    "main-entry"                 update_tm)
+
+(mesh spatial N_zones
+      scalar N_one)
+
+; RESTART VARIABLES
+
+(def-var tm double spatial
+         (restart requ zone)
+	 (K))
+
+; TEST VARIABLES
+
+(def-var lindex long spatial (restart))
+
+(def-var findex float spatial (restart))
+
+(def-var knob-a integer nil
+	(restart static)
+	nil
+	kav nil knoba)
+
+(def-var knob-b double nil
+	(restart static)
+	nil
+	kbv nil knobb)
+
+(def-var cache-f-1 double spatial
+	(restart requ cache-f zone)
+	(K))
+
+(def-var cache-f-4 double spatial
+	(restart cache-r zone)
+	(K)
+	pi)
+
+; RUNTIME VARIABLES
+
+(def-var tr double spatial
+	(demand zone)
+	(K))
+
+(def-var T-cmplx complex spatial
+	(demand zone)
+	(K))
+
+(def-var cache-f-2 double spatial
+	(cache-f zone)
+	(K)
+	pi)
+
+(def-var cache-f-3 double spatial
+	(cache-r zone)
+	(K)
+	pi)
+
+;--------------------------------------------------------------------------
+
+;                              COMPLETION
+
+;--------------------------------------------------------------------------
+
+;(generate <lang> <combined> <interactive> <name>)
+(generate C #t #t cgen crun)
+
+;(compile)
+

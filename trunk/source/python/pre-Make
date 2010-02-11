@@ -1,0 +1,171 @@
+#
+# pre-Makefile for Python wrappers
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=py
+PyDir  = ${LibDir}/python${PyVers}/pact
+TGTLib = ${LibDir}/lib${LibName}.a
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${CDebug} -I. -I../.. -I${PyIncDir} -I${IncDir} ${MDInc} ${MDGInc}
+FcFlags = ${FDebug}
+LdFlags = -L${LibDir} ${LDFLAGS}
+# other flags -Wl,-bhalt:4 -Wl,-bM:SRE -Wl,-T512 -Wl,-H512
+LDShared0 = -b32 -Wl,-bnoentry -Wl,-bE:/g/g14/taylor/pact/src/python/pypdb.exp -Wl,-bI:${PyCfgDir}/python.exp -Wl,-bM:SRE
+
+
+CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = *~
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${TGTShPDB} ${TGTShPGS}
+BinDep =
+BinObj =
+
+targets :
+	@echo "Targets for PYTHON"
+	@echo "   install   : install PYTHON headers and utilities in dev/arch"
+	@echo "   link      : link PYTHON utilities for public use"
+	@echo "   sharedlib : build and install PYTHON shared libs in dev/arch"
+	@echo "   test      : run the PYTHON test suite"
+
+
+PySrc = pact/pgs.py pact/pdb.py pact/__init__.py
+
+Hdrs = pdbmodule.h  pdbrw.h  pgsmodule.h  pputil.h  utilpgs.h
+
+OPDBO = pdbmodule.o pdbPDBfile.o pdbmemdes.o \
+        pdbdefstr.o pdbpdbdata.o pdbhashtab.o pdbhasharr.o \
+        pdbassoc.o
+
+OPMLO = pmlfield.o pmlset.o pmltopology.o \
+        pmlmapping.o
+
+OPPO  = pputil.o pptypes.o pparrays.o \
+        ppdefstr.o pphashtab.o pphasharr.o ppassoc.o \
+        pppdbr.o pypdbr.o pypdbl.o \
+        pypdbd.o struct.o pppml.o
+
+OPGSO = pgsmodule.o pgsdevice.o pgsgraph.o \
+        pgsimage.o pgspalette.o utilpgs.o
+
+OPDB = ${OPDBO} ${OPMLO} ${OPPO}
+OPGS = ${OPDBO} ${OPMLO} ${OPPO} ${OPGSO}
+Objs = ${OPGS}
+
+
+ArPDBO = ${TGTLib}(pdbmodule.o) ${TGTLib}(pdbPDBfile.o) ${TGTLib}(pdbmemdes.o) \
+         ${TGTLib}(pdbdefstr.o) ${TGTLib}(pdbpdbdata.o) \
+         ${TGTLib}(pdbhashtab.o) ${TGTLib}(pdbhasharr.o) \
+         ${TGTLib}(pdbassoc.o)
+
+ArPMLO = ${TGTLib}(pmlfield.o) ${TGTLib}(pmlset.o) ${TGTLib}(pmltopology.o) \
+         ${TGTLib}(pmlmapping.o)
+
+ArPPO  = ${TGTLib}(pputil.o) ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
+         ${TGTLib}(ppdefstr.o) ${TGTLib}(ppassoc.o) \
+         ${TGTLib}(pphashtab.o) ${TGTLib}(pphasharr.o) \
+         ${TGTLib}(pppdbr.o) ${TGTLib}(pypdbr.o) ${TGTLib}(pypdbl.o) \
+         ${TGTLib}(pypdbd.o) ${TGTLib}(struct.o) ${TGTLib}(pppml.o)
+
+ArPGSO = ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o) ${TGTLib}(pgsgraph.o) \
+         ${TGTLib}(pgsimage.o) ${TGTLib}(pgspalette.o) ${TGTLib}(utilpgs.o)
+
+ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO}
+
+${Objs} : ${Hdrs}
+${ArObjs} : ${Hdrs}
+
+TGTSPDB  = ${PyDir}/libpypdb.so
+TGTShPDB = ${TGTSPDB}.1
+
+TGTSPGS  = ${PyDir}/libpypgs.so
+TGTShPGS = ${TGTSPGS}.1
+
+LibAction = @(mkdir -p ${PyDir} ; sync)
+
+Libs =  ${MDGLib} -lc -lm ${DPLib} ${MDLib}
+
+${TGTShPDB} : ${TGTLib}
+	@(cd ${PyDir} ; \
+	  rm -f ${TGTSPDB} $@ _pdb.so ; \
+	  ${AR} -x ${TGTLib} ; \
+	  ${AR} -x ../../libscore.a ; \
+	  ${AR} -x ../../libpml.a ; \
+	  ${AR} -x ../../libpdb.a ; \
+          rm -f ${OPGSO} ; \
+	  echo "${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs}" ; \
+	  ${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs} ; \
+	  ln -s ${TGTShPDB} ${TGTSPDB} ; \
+	  ln -s ${TGTShPDB} _pdb.so ; \
+	  rm -f *.o _____* )
+
+${TGTShPGS} : ${TGTLib}
+	@(cd ${PyDir} ; \
+	  rm -f ${TGTSPGS} $@ _pgs.so ; \
+	  ${AR} -x ${TGTLib} ; \
+	  ${AR} -x ../../libscore.a ; \
+	  ${AR} -x ../../libpml.a ; \
+	  ${AR} -x ../../libpdb.a ; \
+	  ${AR} -x ../../libpgs.a ; \
+	  echo "${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs}" ; \
+	  ${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs} ; \
+	  ln -s ${TGTShPGS} ${TGTSPGS} ; \
+	  ln -s ${TGTShPGS} _pgs.so ; \
+	  rm -f *.o _____* )
+
+
+#
+# link 
+#
+link: ${TGTLib} ${PySrc}
+	./link
+
+#
+# install 
+#
+install:
+	pact link
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the PDB test suite
+#
+test :
+	@./pytest
+
+

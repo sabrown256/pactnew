@@ -1,0 +1,192 @@
+#!/bin/csh -f
+#
+# TEST-PCO - test pco against a fiducial version
+#          - ensure that we get the same generated files
+#          - from the same config files when pco.c changes
+#
+
+umask 007
+
+set Which  = "$cwd/pwhich"
+
+set Setup     = TRUE
+set Configure = TRUE
+set Compare   = TRUE
+set OSOnly    = FALSE
+set ValGrind  = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           set Configure = FALSE
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: test-pco [-c] [-h] [-os] [-s] [-t] [-vg]"
+           echo "  c   do not do configurations"
+           echo "  h   this help message"
+           echo "  os  test configuration only for host os"
+           echo "  s   do not do setup"
+           echo "  t   do not compare test results"
+           echo "  vg  run valgrind if available"
+           echo ""
+           exit(1)
+      case -os:
+           set OSOnly = TRUE
+           breaksw
+      case -s:
+           set Setup = FALSE
+           breaksw
+      case -t:
+           set Compare = FALSE
+           breaksw
+      case -vg:
+           set ValGrind = `$Which valgrind`
+           if (!(-x "$ValGrind")) then
+              set ValGrind = ""
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+source ../scripts/env-csh
+
+set OS     = `uname -s | tr "[A-Z]" "[a-z]"`
+set TstDir = cfg-test-$OS
+
+InitLog Log $cwd/log.test-pco-$OS
+
+flog $Log uname -a
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# setup directories
+
+if ($Setup == TRUE) then
+   Separator $Log
+   NoteD $Log -n "   setup ................. "
+   Note $Log ""
+   flog $Log rm -rf $TstDir
+   flog $Log mkdir $TstDir
+   flog $Log cp -R . $TstDir/manager
+   flog $Log cp -R ../scripts $TstDir
+   NoteD $Log "done"
+endif
+
+flog $Log cd $TstDir
+flog $Log set DIFF = $cwd/scripts/diff-code
+flog $Log cd manager
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# configure
+
+if ($Configure == TRUE) then
+
+   foreach v (pco pco-ref)
+
+      @ CCount = `echo $v | wc -c`
+      @ NDots  = 23 - $CCount
+      set FillP = "$v "
+      while ($NDots > 0)
+         set FillP = "$FillP."
+         @ NDots = $NDots - 1
+      end
+
+      NoteD $Log "   $FillP "
+      Note $Log ""
+      Separator $Log
+      Note $Log "Version $v"
+      flog $Log mkdir ../dev
+      flog $Log cc -g $v.c -o $v
+
+      if ($OSOnly == TRUE) then
+         flog $Log set Lst = ( $OS )
+      else
+         flog $Log set Lst = ( aix darwin linux sunos )
+      endif
+
+      foreach c ($Lst)
+         Separator $Log
+         Note $Log "Configuration $c"
+         Note $Log ""
+
+         @ CCount = `echo $c | wc -c`
+         @ NDots  = 20 - $CCount
+         set Fill = "$c "
+         while ($NDots > 0)
+            set Fill = "$Fill."
+            @ NDots = $NDots - 1
+         end
+         NoteD $Log -n "      $Fill "
+         Note $Log ""
+
+         flog $Log mkdir ../dev/$c
+         flog $Log mkdir ../dev/$c/log
+         flog $Log mkdir ../dev/$c/bin
+         flog $Log mkdir ../dev/$c/lib
+         flog $Log mkdir ../dev/$c/include
+         flog $Log $ValGrind $v -s $c auto-$c
+         if ($status == 0) then
+            NoteD $Log "ok"
+         else
+            NoteD $Log "ng"
+         endif
+      end
+
+      flog $Log mv ../dev ../dev-$v
+      NoteD $Log "   $FillP done"
+   end
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# compare results
+
+if ($Compare == TRUE) then
+   Separator $Log
+   NoteD $Log "   compare ............... "
+   flog $Log pwd
+   flog $Log cd ..
+   flog $Log pwd
+   flog $Log ls
+
+   flog $Log set New = $cwd/dev-pco
+   flog $Log set Ref = $cwd/dev-pco
+   flog $Log cd $New
+   foreach i (*)
+      flog $Log pushd $i
+      foreach j (log include bin)
+
+         @ CCount = `echo $i/$j | wc -c`
+         @ NDots  = 20 - $CCount
+         set Fill = "$i/$j "
+         while ($NDots > 0)
+            set Fill = "$Fill."
+            @ NDots = $NDots - 1
+         end
+
+         Note $Log ""
+         flog $Log pushd $j
+         flog $Log $DIFF . $Ref/$i/$j
+         if ($status == 0) then
+            NoteD $Log "      $Fill ok"
+         else
+            NoteD $Log "      $Fill ng"
+         endif
+         flog $Log popd
+      end
+      flog $Log popd
+   end
+   NoteD $Log "   compare ............... done"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($status)

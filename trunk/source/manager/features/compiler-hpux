@@ -1,0 +1,46 @@
+#
+# COMPILER-HPUX - HP Unix 9 compiler specifications
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Tool CC {
+   Exe   = c89
+   Flags = -D_HPUX_SOURCE -DHPUX_9 +e +DAportable
+}
+
+Tool FC {
+   Exe   = f90
+   Flags = +U77
+}
+
+Tool Lex {
+   Flags = -D_HPUX_SOURCE -DHPUX_9 +e +DAportable
+}
+
+Tool Yacc {
+   Flags = -Ns2000
+}
+
+# Believe it or not HP's LEX creates a static function __yy__unused which drags
+# in a worthless reference to main.  This function is not referenced and
+# could be empty and hence benign. But no, it will foul up the loading of
+# FORTRAN programs which don't have a call to main!!!!!!!!!!
+
+.l.o:
+	${LEX} $< 2> /dev/null
+	@( echo 'e lex.yy.c' ; echo '1,$$ s+yy+$*_+g' ; echo '1,$$ s+main+rand+g' ; echo 'w $*.c' ; echo 'q' ) | ed > /dev/null
+	${LX} -c $*.c
+	@${RM} lex.yy.c $*.c
+
+.l.a:
+	${LEX} $< 2> /dev/null
+	@( echo 'e lex.yy.c' ; echo '1,$$ s+yy+$*_+g' ; echo '1,$$ s+main+rand+g' ; echo 'w $*.c' ; echo 'q' ) | ed > /dev/null
+	${LX} -c $*.c
+	@${AR} ${AROpt} ${TGTLib} $*.o 2> /dev/null
+	@${RM} lex.yy.c $*.c $*.o
+
+define STRTOLL_FUNCTION strtol

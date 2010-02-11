@@ -1,0 +1,129 @@
+#!/bin/csh -f
+#
+# SMAKE - compile the smake program
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    Separator $Log
+    NoteD $Log -n "   System make wrapper - smake"
+    Note $Log " "
+
+    flog $Log pushd $CfgDir
+
+    set InstOld = instold
+
+    set Tmp    = tmp-$System
+    set TPACTX = pactx.$Tmp
+    set TMAKEF = mk.$Tmp
+
+# backup the public files
+    if ($InstBase != "none") then
+       if (-d $InstOld) then
+          flog $Log $RMDir $InstOld
+       endif
+       flog $Log mkdir $InstOld
+
+       if (-e $InstBase/bin/pact) then
+          flog $Log cp $InstBase/bin/pact $InstOld
+       endif
+       if (-e $InstBase/include/make-def) then
+          flog $Log cp $InstBase/include/make-def $InstOld
+       endif
+       if (-e $InstBase/include/make-macros) then
+          flog $Log cp $InstBase/include/make-macros $InstOld
+       endif
+
+       if (-d $InstBase/include) then
+          sed "s|$RootDir|$InstBase|" $IncDir/make-def > $InstBase/include/make-def
+          flog $Log cp $IncDir/make-macros $InstBase/include/make-macros
+       endif
+    endif
+
+# write a test Makefile
+    flog $Log $RM $TMAKEF
+    flog $Log touch $TMAKEF pre-Make
+
+cat << EOF >! $TMAKEF
+b:
+	@csh -c "echo OK"
+
+a:
+	@$BinDir/smake -f $TMAKEF b
+
+EOF
+
+    flog $Log cat $TMAKEF
+
+# build the small version of the PACT program (call it smake)
+    set MakeOpt = ""
+    set MakeOpt = ( $MakeOpt -g )
+
+    set MakeOpt = ( $MakeOpt -DSYSTEM_ID=\"${System}\" )
+    set MakeOpt = ( $MakeOpt -DPACT_VERSION=\"${PACTVer}\" )
+    set MakeOpt = ( $MakeOpt $GnuMakeOpt )
+
+    if ("$FilterDir" != "") then
+       set FiltFile = $FilterDir/$Arch
+       set MakeOpt = ( $MakeOpt -DFILTER=\"$FiltFile\" )
+    endif
+    set MakeOpt = ( $MakeOpt -I${IncDir} )
+
+    set RootOpt = ( $MakeOpt )
+    if ($UseTmpDir == TRUE) then
+       set RootOpt = ( $RootOpt -DUSE_TMP_DIR )
+    endif
+
+    set smkc = ../../psh/smake.c
+
+    flog $Log $Cfg_CC_Exe $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags $smkc -o $BinDir/smake
+    flog $Log ls -l $BinDir/smake
+    flog $Log $BinDir/smake -f $TMAKEF a
+    if ($status == 0) then
+       NoteD $Log " (Does use PATH)"
+
+# if that failed try building for STUPID makes
+    else
+       flog $Log ${RM} $BinDir/smake
+
+       set RootOpt = ( $RootOpt -DSTUPID_MAKE )
+
+       flog $Log $Cfg_CC_Exe $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags $smkc -o $BinDir/smake
+       flog $Log ls -l $BinDir/smake
+       flog $Log $BinDir/smake -f $TMAKEF a
+       if ($status == 0) then
+          NoteD $Log " (Does NOT use PATH)"
+       else
+          flog $Log ${RM} $BinDir/smake
+          NoteD $Log " "
+          NoteD $Log " "
+          NoteD $Log "ERROR: SERIOUS MAKE PROBLEM ON THIS PLATFORM"
+          NoteD $Log " "
+          exit(1)
+       endif
+    endif
+
+    flog $Log $RMDir z-*
+    flog $Log $RM `ls`
+    flog $Log popd
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

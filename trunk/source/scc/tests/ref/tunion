@@ -1,0 +1,7 @@
+union u_info
+variable v1s: static union u_info
+variable v1e: extern union u_info
+variable v1d: union u_info
+variable v2s: static union anonymous
+variable v2e: extern union anonymous
+variable v2d: union anonymous

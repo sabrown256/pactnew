@@ -1,0 +1,33 @@
+#!/bin/csh -f
+#
+# CSH - analyze the platform C Shell
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: csh"
+
+NoteD $ALog -n "   CSH: "
+Note $ALog ""
+
+Note $ALog "cwd    = |$cwd|"
+Note $ALog "MngDir = |$MngDir|"
+Note $ALog "AnaDir = |$AnaDir|"
+source $AnaDir/backslash
+
+if ("$BackSlash" == "\") then
+   NoteD $ALog "uses \"
+else
+   NoteD $ALog "uses \\\\"
+endif
+
+SetParent BackSlash
+
+exit(0)

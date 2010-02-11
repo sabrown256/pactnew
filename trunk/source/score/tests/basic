@@ -1,0 +1,139 @@
+#!/bin/csh -f
+#
+# BASIC - test basic dmake capability
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Package = score
+if (-d ../../scripts) then
+   source ../../scripts/env-csh
+else if (-d ../../../scripts) then
+   source ../../../scripts/env-csh
+endif
+
+if (-x ../../manager/cfgman) then
+   set TMFiles = ( `ls tmake.a.*` darg )
+   cp $TMFiles $TestDir
+   pushd $TestDir >>& /dev/null
+endif
+
+setenv Log log.basic
+touch foo.core core.foo foo~
+rm -f $Log *.core core* *~
+touch $Log
+flog $Log date
+
+source ../../tests/common-make
+
+setenv SC_EXEC_CPU_FACTOR   1024
+setenv SC_EXEC_TIME_LIMIT     64
+setenv SC_EXEC_TIME_FACTOR    16
+
+@ Err = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set Series = 1
+   Separator $Log
+   NoteD $Log -n "                       basic  "
+   Note $Log ""
+
+   set UTime = `$TIMER -r`
+
+   set Tsts = ""
+   set Tsts = ($Tsts a.1 all)
+   set Tsts = ($Tsts a.2 all)
+   set Tsts = ($Tsts a.3 fooa.c)
+   set Tsts = ($Tsts a.4 all)
+   set Tsts = ($Tsts a.5 all)
+   set Tsts = ($Tsts a.6 all)
+   set Tsts = ($Tsts a.7 all)
+
+   set LErr = 0
+   while ($#Tsts > 1)
+      Separator $Log
+      Note $Log "            basic tmake.$Tsts[1]"
+      Note $Log " "
+      Separator $Log
+
+      flog $Log set i   = $Tsts[1]
+      flog $Log set mkf = tmake.$i
+      flog $Log set tgt = $Tsts[2]
+      shift Tsts
+      shift Tsts
+
+      foreach m (dmake $Make)
+
+         set Opt = ""
+         if ($m == gmake) then
+            set Opt = --no-print-directory
+         endif
+         if ($m == dmake) then
+            set Sfx = dmake
+         else
+            set Sfx = make
+         endif
+
+         set lg = log-$Series.$i.$Sfx
+         rm -f $lg
+         touch $lg
+
+         flog $Log ($CFE $m $Opt -f $mkf $tgt |& grep -v gmake >>& $lg)
+      end
+      flog $Log (diff log-$Series.$i.dmake log-$Series.$i.make >! log-$Series.$i.diff)
+      set LStat = $status
+
+      if ($LStat == 0) then
+         echo -n "."
+         flog $Log rm -f log-$Series.$i.*
+      else
+         Note $Log "   -----------------------------------"
+         flog $Log cat log-$Series.$i.dmake
+         Note $Log "   -----------------------------------"
+         flog $Log cat log-$Series.$i.make
+         Note $Log "   -----------------------------------"
+         flog $Log cat log-$Series.$i.diff
+         Note $Log "   -----------------------------------"
+
+         flog $Log (awk '$1 !~ /***>/ { print $0 }' log-$Series.$i.dmake >&! log-$Series.$i.dmakf)
+         flog $Log (diff log-$Series.$i.dmakf log-$Series.$i.make >! log-$Series.$i.diff)
+         set LStat = $status
+
+         if ($LStat == 0) then
+            Note $Log "FAIL: results compared after retries"
+            echo -n "o"
+            flog $Log rm -f log-$Series.$i.*
+         else
+            Note $Log "FAIL: results differed"
+            echo -n "x"
+            set LErr = 1
+         endif
+      endif
+   end
+
+   set ETime = `$TIMER -b $UTime`
+
+   Separator $Log
+   if ($LErr == 0) then
+      NoteD $Log ". ok ($ETime)"
+      flog $Log *.[chlyoa]
+   else
+      NoteD $Log ". ng ($ETime)"
+      @ Err = $Err + 32
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($?TMFiles) then
+   flog $Log rm -f $TMFiles
+   NoteD $Log ""
+   popd >& /dev/null
+else
+   Note $Log ""
+endif
+
+exit($Err)

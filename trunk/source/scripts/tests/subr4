@@ -1,0 +1,33 @@
+#!/bin/csh -f
+#
+# SUBR4 - test of include
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $IncDir/csh-subroutines
+HAVE_SUBROUTINES
+
+# run the test
+if ($1 == run) then
+   set Trace = TRUE
+   call foo()
+
+# print the fiducial answers
+else
+   echo "Calling foo with ( )"
+   echo "Calling bar with ( )"
+   echo "here"
+   echo "Returning from bar"
+   echo "Returning from foo"
+endif
+
+quit(0)
+
+foo:
+   include subr4.inc
+   return
+

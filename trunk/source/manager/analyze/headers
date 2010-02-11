@@ -1,0 +1,124 @@
+#!/bin/csh -f
+#
+# HEADERS - analyze the C header files
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+if ($?CDecls == 0) then
+   setenv CDecls FALSE
+endif
+
+if ($CDecls == TRUE) then
+
+   NoteD $ALog "      checking C header files"
+
+   set ANSIHdrs  = ( "stdlib.h" "stddef.h" "stdarg.h" "limits.h" "errno.h" "float.h" )
+   set OtherHdrs = ( "alloc.h" "conio.h" "ctype.h" "errno.h" "malloc.h" )
+   set OtherHdrs = ( $OtherHdrs "math.h" "setjmp.h" "signal.h" "stdio.h" )
+   set OtherHdrs = ( $OtherHdrs "string.h" "time.h" "sys/types.h" "varargs.h" )
+
+   flog $ALog rm -f $Tmp
+   flog $ALog touch $Tmp
+
+   Note $Tmp "#\!/bin/csh -f"
+   Note $Tmp ""
+
+   Note $Tmp 'set nlines = `cat $1 | wc -l`'
+   Note $Tmp 'set iline  = 0'
+   Note $Tmp 'set ANSI   = $2'
+   Note $Tmp "rm -f _${Tmp}_"
+   Note $Tmp ""
+
+#   Note $Tmp "if (-f $CDFile) then"
+#   Note $Tmp "   set OutDev = $CDFile"
+#   Note $Tmp 'else'
+   Note $Tmp '   if ($?prompt) then'
+   Note $Tmp '      set OutDev = /dev/tty'
+   Note $Tmp '   else'
+   Note $Tmp "      set OutDev = _${Tmp}_"
+   Note $Tmp '      touch $OutDev'
+   Note $Tmp '   endif'
+#   Note $Tmp 'endif'
+   Note $Tmp ""
+
+   Note $Tmp 'set noglob'
+   Note $Tmp 'while (`expr $iline \< $nlines`)'
+   Note $Tmp '   set iline = `expr $iline + 1`'
+   Note $Tmp '   set Line  = `echo $<`'
+   Note $Tmp '   if ($#Line > 3) then'
+   Note $Tmp '      set Func  = $Line[1]'
+   Note $Tmp '      set Decl  = "$Line[3-4]"'
+   Note $Tmp '      if ($#Line > 4) then'
+   Note $Tmp '         set Args  = "$Line[5-]"'
+   Note $Tmp '      else'
+   Note $Tmp '         set Args  = "Variable"'
+   Note $Tmp '      endif'
+   Note $Tmp "      set Pattn = '[^a-zA-Z0-9_]'"'$Func'"'[^a-zA-Z0-9_]'"
+   Note $Tmp ""
+   Note $Tmp '      unset noglob'
+
+   if ("$ANSI" == "ANSI") then
+      Note $Tmp '      set Hdrs = (' "$ANSIHdrs" "$OtherHdrs" ')'
+   else
+      Note $Tmp '      set Hdrs = (' "$OtherHdrs" ')'
+   endif
+
+   Note $Tmp '      set GotIt = FALSE'
+   Note $Tmp '      foreach file ($Hdrs)'
+   Note $Tmp '         if (-e "$RootInc/$file") then'
+   Note $Tmp '            egrep "$Pattn" $RootInc/$file >>& /dev/null'
+   Note $Tmp '            if ($status == 0) then'
+   Note $Tmp '               set GotIt = TRUE'
+   Note $Tmp '               break'
+   Note $Tmp '            endif'
+   Note $Tmp '         endif'
+   Note $Tmp '      end'
+   Note $Tmp '      if ($GotIt == FALSE) then'
+   Note $Tmp '         if ("$Args" == "Variable") then'
+   Note $Tmp '            echo "extern $Decl;" >>& $OutDev'
+   Note $Tmp '         else if ($ANSI == ANSI) then'
+   Note $Tmp '            echo "extern $Decl$Args;" >>& $OutDev'
+   Note $Tmp '         else '
+   Note $Tmp '            echo "extern $Decl();" >>& $OutDev'
+   Note $Tmp '         endif'
+   Note $Tmp '      endif'
+
+   Note $Tmp '      set noglob'
+   Note $Tmp '   endif'
+   Note $Tmp 'end'
+
+   Note $Tmp "if (-e _${Tmp}_) then"
+   Note $Tmp "   cat _${Tmp}_"
+   Note $Tmp "   rm -f _${Tmp}_"
+   Note $Tmp 'endif'
+   Note $Tmp 'unset noglob'
+   Note $Tmp ""
+
+   Note $Tmp 'exit($status)'
+   Note $Tmp ""
+
+   set CF = $MngDir/clib.fncs
+   chmod a+x $Tmp
+   cat $CF | $Tmp $CF $ANSI
+
+   rm -f $Tmp
+
+   if ($MeOnly == TRUE) then
+      goto done
+   endif
+
+else
+
+   Note $ALog "      Checking C header files"
+
+endif
+
+#exit(0)
+

@@ -1,0 +1,66 @@
+#!/bin/csh -f
+#
+# USE-PGI - decide on the correct PGI environment
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../scripts/env-csh
+
+set Which   = "$cwd/pwhich"
+set CmpPath = ""
+while ($#argv > 0)
+   switch ($1)
+      default:
+           if ("$CmpPath" == "") then
+              set CmpPath = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+# if blank find pgcc on your path
+if ("$CmpPath" == "") then
+   set CmpPath = ( `$Which pgcc` )
+
+# if not a full path find it on your path
+else if ("$CmpPath" !~ /*) then
+   set CmpPath = ( `$Which $CmpPath` )
+endif
+
+if (-xf "$CmpPath") then
+   set CCRoot = $CmpPath:h
+   set CCRoot = $CCRoot:h
+else if (-x "$CmpPath/bin/pgcc") then
+   set CCRoot = $CmpPath
+endif
+
+set Info = ( `$CCRoot/bin/pgcc -V |& grep pgcc` )
+
+setenv COMPILER_PGI_VERSION   $Info[2]
+setenv PGRoot                 $CCRoot
+setenv PATH                   $CCRoot/bin':$PATH'
+
+expr "$COMPILER_PGI_VERSION" '>' "7.0" >& /dev/null
+if ($status == 0) then
+   setenv NUMA  "-Mconcur=numa"
+else
+   expr "$COMPILER_PGI_VERSION" '>' "6.2" >& /dev/null
+   if ($status == 0) then
+      setenv NUMA  "-Mconcur=nonuma"
+   else
+      setenv NUMA  ""
+   endif
+endif
+
+SetParent PATH
+SetParent PGRoot
+SetParent COMPILER_PGI_VERSION
+SetParent NUMA
+
+exit(0)
+

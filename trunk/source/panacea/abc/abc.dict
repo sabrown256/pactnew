@@ -1,0 +1,371 @@
+;
+; ABC.DICT - dictionary for ABC the PANACEA test code
+;
+; Source Version: 3.0
+; Software Release #: LLNL-CODE-422942
+;
+; include "cpyright.h"
+;
+
+;--------------------------------------------------------------------------
+
+;                     SYSTEM WIDE INFORMATION
+
+;--------------------------------------------------------------------------
+
+; NOTE: system-scalars and system-files information is required unless:
+;
+;       1) "generator-init-problem"
+;          "simulation-init-problem"
+;          "simulation-run-problem"
+;          "simulation-fin-problem"
+;
+;   or
+;
+;       2) "combined-init-problem"
+;          "combined-run-problem"
+;          "combined-fin-problem"
+;
+;   functions are supplied
+
+(system-scalars
+	PARAM[1]       ; system time
+        PARAM[2]       ; system start time
+	PARAM[3]       ; system stop time
+	PARAM[4]       ; system time step fraction
+	PARAM[5]       ; mimimum time step fraction
+	PARAM[6]       ; maximum time step fraction
+	PARAM[7]       ; maximum time step fractional increase
+	SWTCH[3]       ; system time cycle number
+	SWTCH[12])     ; number of computional units (zones)
+
+(system-files
+	NAME[2]       ; state file name
+	NAME[3]       ; edit file name
+	NAME[4]       ; pp file name
+	NAME[5])      ; PVA file name
+
+(system-functions
+        "generator-arg-processor"   gen_args
+        "generator-unit-setup"      init_unit
+        "simulation-init-problem"   init_problem_b
+        "combined-init-problem"     my_init_problem
+        "combined-run-problem"      my_run_problem
+        "combined-fin-problem"      my_fin_problem
+	"generator-termination"     global_end_graphics
+	"interrupt-handler"         PA_interrupt_handler
+	"region-name-to-index"      part_reg
+	"pre-intern"	            load_reg
+	"domain-builder"	    LR_build_domain
+	"mapping-builder"           LR_build_mapping)
+
+;--------------------------------------------------------------------------
+
+;                              GLOBAL PACKAGE
+
+;--------------------------------------------------------------------------
+
+(package "global")
+
+(declare-variable
+   const SLAB     1
+   const CYLINDER 2
+   const SPHERE   3
+   const WEDGE    4
+   double t ()
+   double dt ()
+   double *rx ()
+   double *ry ()
+   double *vx ()
+   double *vy ()
+   double *node ()
+   double *nodet ()
+   double *vol ()
+   double *zone ()
+   int cycle ()
+   int frn ()
+   int frz ()
+   int kbnd ()
+   int kmax ()
+   int kmin ()
+   int lbnd ()
+   int lmax ()
+   int lmin ()
+   int lrn ()
+   int lrz ()
+   int *reg_map ()
+   PM_part *parts ()
+   int N_nodes ()
+   int N_zones ()
+   int Autoplot ()
+   static int N_one () 1)
+
+(declare-function
+   "PM_set *" LR_build_domain ("char *base_name" "C_array *arr" "double t")
+   "PM_mapping *" LR_build_mapping ("PA_plot_request *pr" "double t")
+   char *gen_args ("int c" "char **v")
+   int part_reg ("char *s")
+   int init_problem_b ("int c" "char **v")
+   int init_unit ()
+   int volumew ("double *vol" "double *rx" "double *ry")
+   void B_init ()
+   void global_end_graphics ("int err")
+   void make_mesh ()
+   void clearh ()
+   void curveh ()
+   void parth ()
+   void recth ()
+   void sideh ()
+   void viewh ()
+   void printh ()
+   void turn ())
+
+(package-functions
+    "intern-variables"           intern_global
+    "initialize"                 init_vars
+    "main-entry"                 global_entry)
+
+(mesh zonal N_zones
+      nodal N_nodes
+      scalar N_one)
+
+(def-var (zone reg_map) double zonal
+         (restart requ zone))
+
+(def-var (node nodet k-ratio l-ratio k-product l-product) double nodal
+         (restart requ node))
+
+(def-var (r rx ry) double nodal
+         (restart node)
+	 (cm))
+
+(def-var (vx vy) double nodal
+         (restart node)
+	 (cm per sec))
+
+(def-var vol double zonal
+         (restart zone)
+	 (cc))
+
+(def-var (t dt) double scalar
+         (requ)
+	 (sec))
+
+(control ascii 1  NULL "not used"
+	 ascii 2  NULL "restart file name (PDB)"
+	 ascii 3  NULL "edit file name (ASCII)"
+	 ascii 4  NULL "post processor file (PDB)"
+	 ascii 5  NULL "graph file name (PDB)"
+	 ascii 6  NULL "X host name - <host>:0.0"
+	 ascii 7  NULL "display type MONOCHROME or COLOR"
+	 ascii 8  NULL "input deck name (ASCII)"
+	 ascii 9  NULL "PS/EPSF conformance"
+
+	 integer 1   0  "not used"
+	 integer 2   0  "not used"
+	 integer 3   0  "current cycle number (INTERNAL)"
+	 integer 4   0  "N_plots, number of plot requests (INTERNAL)"
+	 integer 5   0  "N_regs, number of regions (INTERNAL)"
+	 integer 6   0  "N_nodes, number of logical points (INTERNAL)"
+	 integer 7   0  "lrz, index of last real zone (INTERNAL)"
+	 integer 8   0  "frn, index of first real node (INTERNAL)"
+	 integer 9   0  "lrn, index of last real node (INTERNAL)"
+	 integer 10  0  "maximum k index - kmax (INTERNAL)"
+	 integer 11  0  "maximum l index - lmax (INTERNAL)"
+	 integer 12  0  "N_zones, number of logical zones (INTERNAL)"
+	 integer 13  0  "frz, index of first real zone (INTERNAL)"
+	 integer 14  0  "generation time mesh dumps if TRUE"
+	 integer 15  1  "mesh generation method"
+	 integer 16  1  "impose mesh generation constraint"
+	 integer 17  4  "solver strategy: 1 dscg, 2 decsol, 3 iccg, 4 bicg"
+
+	 real 1  0.0     "current problem time (internal units)"
+	 real 2  0.0     "start time (internal units)"
+	 real 3  1.0e100 "stop time (internal units)"
+	 real 4  1.0e-4  "initial/current dt fraction of tstop-tstart"
+	 real 5  1.0e-6  "minimum dt fraction of tstop-tstart"
+	 real 6  0.1     "maximum dt fraction of tstop-tstart"
+	 real 7  2.0     "fractional increase in dt per cycle"
+	 real 8  1.0     "1.0 -> 9 point, 0.0 -> 5 point differencing of spatial mesh"
+	 real 9  1.0     "1.0 -> 9 point, 0.0 -> 5 point differencing of ratio mesh"
+	 real 10 0.5     "0.0 -> k oriented, 1.0 -> l oriented")
+
+(command    make       make_mesh  PA_zargs
+	    clear      clearh     PA_zargs
+	    curve      curveh     PA_zargs
+	    part       parth      PA_zargs
+	    rect       recth      PA_zargs
+	    side       sideh      PA_zargs
+	    view       viewh      PA_zargs
+	    print      printh     PA_zargs
+	    turn       turn       PA_zargs
+	    dimension  integer    SWTCH    1
+	    start-time real       PARAM    2
+	    stop-time  real       PARAM    3
+	    geometry   string     NAME     1
+	    host       string     NAME     5)
+
+;--------------------------------------------------------------------------
+
+;                              LAG PACKAGE
+
+;--------------------------------------------------------------------------
+
+(package "lag")
+
+(declare-variable
+   double *n ()
+   double *p ()
+   double *rho ()
+   double *rpdv ()
+   extern int N_zones ())
+
+(package-functions
+    "intern-variables"           intern_lag
+    "initialize"                 init_lag
+    "main-entry"                 lag)
+
+(mesh spatial N_zones)
+
+(def-var n double spatial
+         (restart requ zone)
+	 (per cc))
+
+(def-var p double spatial
+         (restart requ zone)
+	 (erg per cc))
+
+(def-var rho double spatial
+         (restart requ zone)
+	 (g per cc))
+
+(def-var rpdv double spatial
+         (zone)
+	 (ev per sec))
+
+(control integer 1 1 "lag switch"
+	 integer 2 0 "not used"
+	 integer 3 0 "not used"
+	 integer 4 0 "N_zones, (INTERNAL)"
+
+	 real 1 0.2      "Courant timestep multiplier"
+	 real 2 0.0      "unused"
+	 real 3 0.0      "unused"
+	 real 4 0.0      "unused"
+	 real 5 0.2      "fractional volume change for timestep"
+         real 6 0.0      "unused"
+	 real 7 0.2      "dt multiplier for dv/v timestep control"
+	 real 8 1.0      "pressure multiplier (p = mult*nT)"
+	 real 9 0.0      "minimum sound speed"
+	 real 10 1.0     "not used"
+	 real 11 1.5     "half the number of degrees of freedom"
+	 real 12 1.0e-6  "minimum lag dt frac"
+	 real 13 0.1     "maximum lag dt frac"
+	 real 14 2.0     "fractional increase in dt per cycle")
+
+;--------------------------------------------------------------------------
+
+;                              MISC PACKAGE
+
+;--------------------------------------------------------------------------
+
+(package "misc")
+
+(declare-variable
+   static int kav    () 10
+   static double kbv () 2.71
+   static double pi  () 3.1415
+   int knoba ()
+   double knobb ()
+   extern double *n ()
+   extern double *p ()
+   extern double *rpdv ()
+   extern int N_zones ())
+
+(declare-function
+   void load_reg ()
+   void materialh ()
+   void componenth ())
+
+(package-functions
+    "intern-variables"           intern_misc
+    "initialize"                 init_misc
+    "main-entry"                 update_temp)
+
+(mesh spatial N_zones
+      scalar N_one)
+
+; RESTART VARIABLES
+
+(def-var ab double spatial
+         (restart requ zone)
+	 (g per mole))
+
+(def-var zb double spatial (restart requ zone))
+
+(def-var tm double spatial
+         (restart requ zone)
+	 (K))
+
+; TEST VARIABLES
+
+(def-var lindex long spatial (restart))
+
+(def-var findex float spatial (restart))
+
+(def-var knob-a integer nil
+	(restart static)
+	nil
+	kav nil knoba)
+
+(def-var knob-b double nil
+	(restart static)
+	nil
+	kbv nil knobb)
+
+(def-var cache-f-1 double spatial
+	(restart requ cache-f zone)
+	(K))
+
+(def-var cache-f-4 double spatial
+	(restart cache-r zone)
+	(K)
+	pi)
+
+; RUNTIME VARIABLES
+
+(def-var tr double spatial
+	(demand zone)
+	(K))
+
+(def-var T-cmplx complex spatial
+	(demand zone)
+	(K))
+
+(def-var cache-f-2 double spatial
+	(cache-f zone)
+	(K)
+	pi)
+
+(def-var cache-f-3 double spatial
+	(cache-r zone)
+	(K)
+	pi)
+
+(command material  materialh  PA_zargs
+	 component componenth PA_zargs)
+
+;--------------------------------------------------------------------------
+
+;                              COMPLETION
+
+;--------------------------------------------------------------------------
+
+;(generate <lang> <combined> <interactive> <name>)
+;(generate C #t #t ab)
+;(generate C #t #f ab)
+(generate C #t #t a b)
+;(generate C #t #f a b)
+
+;(compile)
+

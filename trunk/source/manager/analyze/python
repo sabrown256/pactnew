@@ -1,0 +1,169 @@
+#!/bin/csh -f
+#
+# PYTHON - analyze the platform PYTHON
+#        - PyExe       the full path to the python executable
+#        - PyVers      the version of the python executable
+#        - Python_Path addition to path in order to find python executable
+#        -             this comes from config files only
+#        - PyDirSrc    pact/dev/$arch/lib (install this to PyDirDst and PyDirPy)
+#        - PyDirDst    pact    lib/.../site-packages  (install into)
+#        - PyDirPy     python  lib/.../site-packages  (install into)
+#
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: python"
+
+SafeEnv HavePython        FALSE
+SafeEnv HavePythonNumeric FALSE
+SafeEnv HavePythonNumpy   FALSE
+SafeEnv PyExe      ""
+SafeEnv PyVers     ""
+SafeEnv PyDirPy    ""
+SafeEnv PyDirDst   ""
+SafeEnv PyDirSrc   ""
+
+SafeEnv PyCC       ""
+SafeEnv PyCfg      ""
+SafeEnv PyInc      ""
+
+SafeEnv Python_Path  ""
+
+# if there is no python directory no need to look further
+if (-d ../../python) then
+
+   NoteD $ALog -n "   Python: "
+   Note $ALog ""
+
+   set lDirs = ( $path /usr/bin /bin )
+   if (-d "$Python_Path") then
+      set lDirs = ( $Python_Path/bin $lDirs )
+      Note $ALog "Specified python path: $Python_Path"
+   else
+      setenv Python_Path ""
+   endif
+
+   Note $ALog "Search Dirs = |$lDirs|"
+   flog $ALog set found = FALSE
+   foreach i ($lDirs)
+      if (-x $i/python) then
+         Note $ALog ""
+         Note $ALog "Checking $i/python"
+         setenv PyExe $i/python
+
+# NOTE: get it into the log what is going on here
+         flog $ALog $PyExe ../../python/python-cc.py
+         set LStat1 = $status
+         set lpyinc = ( `$PyExe ../../python/python-inc-dir.py |& cat` )
+         if (($LStat1 != 0) || !(-f "$lpyinc/Python.h")) then
+            flog $ALog setenv PyExe ""
+         else
+            set pyv = `$PyExe -V |& awk '{ print $2 }'`
+            if ($#pyv > 2) continue
+
+            flog $ALog setenv HavePython TRUE
+            setenv PyCC  `$PyExe ../../python/python-cc.py |& awk '{ print $1 }'`
+            setenv PyInc `$PyExe ../../python/python-inc-dir.py`
+            setenv PyCfg `$PyExe ../../python/python-cfg-dir.py`
+
+            NoteD $ALog "$PyExe ($pyv)"
+            NoteD $ALog "      compiled with $PyCC"
+            NoteD $ALog "      has include directory $PyInc"
+            set lPyVers = `$PyExe ../../python/python-version.py`
+
+            if (-d $PyInc/Numeric) then
+               NoteD $ALog "      has numeric extensions"
+               flog $ALog setenv HavePythonNumeric TRUE
+            endif
+            if (-d $PyInc/NumPy) then
+               NoteD $ALog "      has numpy extensions"
+               flog $ALog setenv HavePythonNumpy TRUE
+            endif
+            if (($HavePythonNumeric == FALSE) && ($HavePythonNumpy == FALSE)) then
+               NoteD $ALog "      does not have numeric extensions"
+# NOTE: if we can build sensibly without any numeric extensions delete these
+               flog $ALog setenv PyExe "no-numeric"
+               flog $ALog setenv HavePython FALSE
+            endif
+
+            if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PyCC == cc)) then
+               flog $ALog setenv PyCC gcc
+            endif
+            if ($HostOS == "AIX") then
+               set CCVer = `$CC_Exe -qversion`
+               set PCVer = `$PyCC -qversion`
+               Note $ALog "CCVer = |$CCVer|"
+               Note $ALog "PCVer = |$PCVer|"
+               if ("$CCVer" != "$PCVer") then
+                  flog $ALog setenv PyExe "wrong-cc"
+                  flog $ALog setenv HavePython FALSE
+               endif      
+            else if ($PyCC != $CC_Exe) then
+               Note $ALog "PyCC   = |$PyCC|"
+               Note $ALog "CC_Exe = |$CC_Exe|"
+               flog $ALog setenv PyExe "wrong-cc"
+               flog $ALog setenv HavePython FALSE
+            endif
+            flog $ALog set found = TRUE
+            break
+         endif
+      endif
+   end
+
+   if ($found == FALSE) then
+      NoteD $ALog "none recognizable"
+   endif
+
+   if ($BuildSharedLibs == FALSE) then
+      flog $ALog setenv HavePython FALSE
+   endif
+
+   if ($HavePython == TRUE) then
+      if (`expr "$lPyVers" : '.*\..*\..*'` > 0) then
+         set lPyVers = $lPyVers:r
+      endif
+      flog $ALog setenv PyVers     $lPyVers
+      set PyRoot = $RootDir
+      set PyHead = python${PyVers}/pact
+      if ("$Python_Path" != "") then
+         set PyRoot = $PyExe
+         set PyRoot = $PyRoot:h
+         set PyRoot = $PyRoot:h
+         set PyHead = python${PyVers}/site-packages/pact
+      endif
+
+# install destination in python tree
+      setenv PyDirPy  $PyRoot/lib/$PyHead
+
+# install destination in PACT tree
+      setenv PyDirDst $InstBase/lib/$PyHead
+
+# install source (local build destination)
+      set PyDirSrc = $RootDir/lib/python${PyVers}/pact
+   endif
+endif
+
+# export the results
+SetParent Python_Path
+SetParent HavePython
+SetParent HavePythonNumeric
+SetParent HavePythonNumpy
+SetParent PyExe
+SetParent PyCC
+SetParent PyCfg
+SetParent PyDirSrc
+SetParent PyDirDst
+SetParent PyDirPy
+SetParent PyInc
+SetParent PyVers
+
+exit(0)
+

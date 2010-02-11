@@ -1,0 +1,11 @@
+/* Microsoft Visual Studio .NET Configuration 01/27/04 */
+
+#define MSC
+#define DOS
+#define ANSI
+#define byte void
+#define Register register
+#define NO_LONG_LONG
+#define NEED_MEM_TRACE
+#define PACT_VERSION "WIN32-01282004"
+

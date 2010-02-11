@@ -1,0 +1,40 @@
+#!/bin/csh -f
+#
+# OSX-EVOLUTION - dynamically handle things that change from OS X rev to rev
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+set OS = `uname -r`
+
+# check for 10.3 family
+expr "$OS" '<' "8.0" >& /dev/null
+if ($status == 0) then
+   setenv OSX_SHARED_LIBS "-lcc_dynamic /usr/lib/bundle1.o"
+else
+
+# check for 10.4 family
+   expr "$OS" '<' "9.0" >& /dev/null
+   if ($status == 0) then
+      setenv OSX_SHARED_LIBS "/usr/lib/bundle1.o -lSystemStubs -lstdc++.6.0.4"
+   else
+      setenv OSX_SHARED_LIBS ""
+   endif
+endif
+
+SetParent OSX_SHARED_LIBS
+
+exit(0)
+

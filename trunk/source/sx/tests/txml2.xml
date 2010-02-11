@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE types SYSTEM "txml2.dtd">
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+<types>
+   <float>
+      <ord>normal</ord>
+      <sz>4</sz>
+      <eb>8</eb>
+      <mb>23</mb>
+   </float> 
+
+   <float>
+      <ord>reverse</ord>
+      <sz>4</sz>
+      <eb>8</eb>
+      <mb>23</mb>
+   </float> 
+
+   <int ord='normal' sz='4' />
+</types>
+

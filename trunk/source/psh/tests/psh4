@@ -1,0 +1,18 @@
+#!/usr/bin/env pcsh
+#OPT -lang c
+/*
+ * PSH4 - test finding PSH includes in C scripting
+ *
+ */
+
+#include <shell/common.h>
+#include <shell/libpsh.c>
+
+int main(int c, char **v)
+   {
+
+    execute(TRUE, "echo 'PSH4: hello world'");
+
+    unlink(v[0]);
+
+    return(0);}

@@ -1,0 +1,41 @@
+#!/bin/csh -f
+#
+# CTOS - C to Scheme translation
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Incl = ""
+set File = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: ctos [-I <path>]* <C-file>"
+           echo ""
+           exit(1);
+      case -I:
+           shift
+           set Incl = ( $1 $Incl )
+           breaksw
+      default:
+           set File = $1
+           breaksw
+   endsw
+   shift
+end
+
+if (!($?SCHEME)) then
+   setenv SCHEME .
+endif
+
+foreach i ($Incl)
+   setenv SCHEME ${i}:$SCHEME
+end
+
+scheme -e \(translate-c-file \"$File\"\)
+
+exit($status)

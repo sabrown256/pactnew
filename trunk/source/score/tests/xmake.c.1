@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+alias flog        'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias Separator   'echo "--------------------------------------------------------------------------" >>& \!\!:^ ; echo "" >>& \!\!:^'
+alias Note        'echo \!\!:2-$ >>& \!\!:1'
+alias NoteD       'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
+
+set Mkf = tmake.c.1
+
+set Tsts = (a b c d e f pa pb pc pd)
+
+foreach m (dmake $Make)
+
+   set Opt = ""
+   if ($m == gmake) then
+      set Opt = --no-print-directory
+   endif
+   if ($m == dmake) then
+      set Sfx = dmake
+   else
+      set Sfx = make
+   endif
+
+   set lg = $LogF.$Sfx
+   rm -f $lg
+   touch $lg
+
+   foreach i ($Tsts)
+      Separator $lg
+      Note $lg "Target $i"
+      Note $lg ""
+
+      $m $Opt -f $Mkf $i |& grep -v gmake >>& $lg
+      Note $lg ""
+   end
+end
+
+exit($status)

@@ -1,0 +1,11 @@
+#
+# 32-BIT - define make variables for 32-bit configuration
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Bits = 32
+

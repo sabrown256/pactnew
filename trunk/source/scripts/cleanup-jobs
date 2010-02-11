@@ -1,0 +1,130 @@
+#!/bin/csh -f
+#
+# CLEANUP-JOBS - clean out dead jobs on specified hosts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/cleanup-jobs") then
+   set path = ( $Exe $path )
+endif
+
+if (-e ~/.cleanup-jobs) then
+   set Jobs = `cat ~/.cleanup-jobs`
+else
+   set Jobs = ""
+endif
+
+set HostFile = $HOME/.all-hosts
+set Hosts    = ""
+set Verbose  = FALSE
+set SSH      = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'
+set All      = FALSE
+set HArgs    = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -j:
+           set Jobs = ""
+      case -a:
+           shift
+           while ($#argv > 0)
+              set Jobs = ( $Jobs $1 )
+              shift
+           end
+           break
+           breaksw
+      case -e:
+           set Hosts = `awk '$1 !~ /#/ { print }' $HostFile`
+           set All   = TRUE
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: cleanup-jobs [-e] [-h] [-v] [-dt <msec>] [host]* [-a name*] [-j name*]"
+           echo ""
+           echo "Options:"
+           echo "   a     add remaining fields to default list of jobs to kill"
+           echo "   e     run on each host in $HOME/.all-hosts"
+           echo "   h     this help message"
+           echo "   j     use remaining fields to make list of jobs to kill"
+           echo "   dt    time in milliseconds to wait for remove access"
+           echo "   v     be more verbose"
+           echo ""
+           echo "  host   list hosts on which the list of jobs will be killed"
+           echo ""
+           exit(1)
+           breaksw
+      case -dt:
+           shift
+           set HArgs = ( $HArgs -dt $1 )
+           breaksw
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      default:
+           set Hosts = ( $Hosts $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Jobs" == "") then
+   echo ""
+   echo "No jobs specified"
+   echo "You may put the default patterns identifying jobs"
+   echo "in ~/.cleanup-jobs"
+   echo ""
+   exit(1)
+endif
+
+set Hdr = TRUE
+if ("$Hosts" == "") then
+   set Hosts = `uname -n`
+   set Hdr   = FALSE
+endif
+
+if ($All == TRUE) then
+
+# do everybody else
+# NOTE: cleanup-jobs interacts very badly with hserve on the host
+# on which it is launched so use the not me option, -me
+
+   set HostLst = ( -t all )
+   set Nc = 0
+   set Hosts = (`hserve $HArgs $HostLst -q -lst`)
+   foreach i ($Hosts)
+      @ lc = `echo $i | wc -c`
+      if ($lc > $Nc) then
+         @ Nc = $lc
+      endif
+   end
+   @ Nc = $Nc - 2
+
+   hserve -q -me $HArgs $HostLst -exh sign -9 -q $Jobs
+   set LStat = $status
+   if ($LStat != 0) then
+      echo "Failed to reach remote hosts ($LStat)"
+   endif
+
+# do the current host
+   set hst = `uname -n | sed 's/\./ /g' | awk '{print $1}'`
+   (echo ' ' ; sign -9 -q $Jobs ; ls-jobs -q -ds )      |& \
+   grep -v "Warning:"                                   |& \
+   sed 's/'$USER'  //'                                  |& \
+   awk '{printf("%-'$Nc's | %s\n", "'$hst'", $0);}'
+
+else
+   foreach hst ($Hosts)
+      $SSH $hst "( sign -9 -q $Jobs ; ls-jobs -q -ds )" |& \
+      grep -v "Warning:"                                |& \
+      sed 's/'$USER'  //'                               |& \
+      awk '{printf("%-8s | %s\n", "'$hst'", $0);}'
+   end
+endif
+
+exit($status)

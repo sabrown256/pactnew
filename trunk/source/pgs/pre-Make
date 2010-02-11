@@ -1,0 +1,365 @@
+#
+# pre-Makefile for PGS
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=pgs
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTInc = ${Hdrs} ${XHdr}
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags  = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+FcFlags  = ${FDebug}
+LdFlags  = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${GraphicsPackages} ${TGTLib}
+BinDep = ${TGTLib}
+BinObj =
+
+#
+# Required Libraries
+#
+Libs = ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+
+targets :
+	@echo "Targets for PGS"
+	@echo "   axis      : make axis test"
+	@echo "   colormap  : make show colormap utility"
+	@echo "   contour   : make contour test"
+	@echo "   Cstd      : make basic drawing test"
+	@echo "   curve     : make curve drawing test"
+	@echo "   event     : make event handling test"
+	@echo "   Fcontour  : make fortran contour test"
+	@echo "   fillpoly  : make fill-poly test"
+	@echo "   Fstd      : make fortran API test"
+	@echo "   grotrian  : make grotrian test"
+	@echo "   image     : make image test"
+	@echo "   install   : install PGS headers and utilities in dev/arch"
+	@echo "   line      : make line drawing test"
+	@echo "   link      : link PGS utilities for public use"
+	@echo "   mpeg      : make MPEG test"
+	@echo "   polyseg   : make poly segment test"
+	@echo "   raster    : make raster test"
+	@echo "   scontour  : make simple contour test"
+	@echo "   sharedlib : build and install PGS shared libs in dev/arch"
+	@echo "   surface   : make surface test"
+	@echo "   test      : run the PGS test suite"
+	@echo "   text      : make text handling test"
+	@echo "   trans     : make tranformation test"
+	@echo "   vector    : make vector test"
+
+#
+# Headers Files
+#
+Hdrs   = pgs.h pgs_int.h scope_cgm.h scope_raster.h
+MpgHdr = scope_mpeg.h
+XHdr   = scope_x11.h
+
+#
+# Object Files
+#
+GObjsA = gsaux.o gsaxis.o gsscale.o gsdlin.o gscrv.o gscntr.o gsvect.o gsimag.o gssurf.o gshls.o
+GObjsB = gsdvb.o gspolf.o gsdplt.o gsgrot.o gsscat.o gsiob.o gsiod.o gsrwi.o
+GObjsC = gsmm.o gsattr.o gstxt.o gsclr.o gshigh.o gsdv.o gspr.o gsvsp.o gsrend.o
+GObjsD = gsdv_im.o gsdv_rst.o gspr_rst.o gsdlr.o gsold.o gssfnt.o
+GObjsE = gsfia.o gsfib.o
+Objs = ${GObjsA} ${GObjsB} ${GObjsC} ${GObjsD} ${GObjsE} ${GraphicsDevices}
+
+${Objs} : ${Hdrs}
+
+OPS  = gsdv_ps.o gspr_ps.o
+OCGM = gsdv_cgm.o gspr_cgm.o
+OQD  = gsdv_qd.o gspr_qd.o
+OX   = gsdv_X.o gspr_X.o
+OOGL = gsdv_GL.o gspr_GL.o
+OJPG = gsdv_jpg.o
+OMPG = gsdv_mpg.o gspr_mpg.o gsmpeg.o
+OPNG = gsdv_png.o
+
+${OX} : ${XHdr}
+${OOGL} : ${XHdr}
+
+ArObjs = ${TGTLib}(gsdv.o) ${TGTLib}(gspr.o) ${TGTLib}(gsvsp.o) \
+         ${TGTLib}(gsdv_im.o) ${TGTLib}(gsevmn.o) \
+         ${TGTLib}(gsdv_rst.o) ${TGTLib}(gspr_rst.o) ${TGTLib}(gsdlr.o) \
+	 ${TGTLib}(gsaux.o) ${TGTLib}(gsmm.o) ${TGTLib}(gsattr.o) \
+	 ${TGTLib}(gshigh.o) ${TGTLib}(gsrend.o) \
+         ${TGTLib}(gstxt.o) ${TGTLib}(gstx_X.o) \
+         ${TGTLib}(gsiob.o) ${TGTLib}(gsiod.o) ${TGTLib}(gsrwi.o) \
+	 ${TGTLib}(gsdplt.o) ${TGTLib}(gsaxis.o) ${TGTLib}(gsscale.o) ${TGTLib}(gsdlin.o) \
+	 ${TGTLib}(gscrv.o) ${TGTLib}(gscntr.o) ${TGTLib}(gsncnt.o) ${TGTLib}(gsvect.o) \
+         ${TGTLib}(gsimag.o) ${TGTLib}(gssurf.o) ${TGTLib}(gsdvb.o) ${TGTLib}(gspolf.o) \
+         ${TGTLib}(gsgrot.o) ${TGTLib}(gshls.o) ${TGTLib}(gsscat.o) \
+         ${TGTLib}(gsclr.o) ${TGTLib}(gsfia.o) ${TGTLib}(gsfib.o) \
+         ${TGTLib}(gsold.o) ${TGTLib}(gssfnt.o)
+
+ArPS  = ${TGTLib}(gsdv_ps.o) ${TGTLib}(gspr_ps.o)
+ArCGM = ${TGTLib}(gsdv_cgm.o) ${TGTLib}(gspr_cgm.o)
+ArQD  = ${TGTLib}(gsdv_qd.o) ${TGTLib}(gspr_qd.o)
+ArX   = ${TGTLib}(gsdv_X.o) ${TGTLib}(gspr_X.o)
+ArOGL = ${TGTLib}(gsdv_GL.o) ${TGTLib}(gspr_GL.o)
+ArJPG = ${TGTLib}(gsdv_jpg.o)
+ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
+ArPNG = ${TGTLib}(gsdv_png.o)
+
+GrDep = ${GraphicsDevices} ${LibDep}
+${GrDep}  : ${Hdrs}
+${TGTLib} : ${GrDep}
+
+${ArMPG} : ${MpgHdr}
+${ArX}   : ${XHdr}
+${ArOGL} : ${XHdr}
+
+#${TGTLib}(gspr_mpg.o) : ${MpgHdr}
+#${TGTLib}(gsmpeg.o) : ${MpgHdr}
+
+#
+# link 
+#
+link: ${InstallDep}
+
+#
+# install 
+#
+install:
+	pact link
+	pact incinstall
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# Basic drawing test
+#
+Cstd : ${BinDir}/gsatst
+
+${BinDir}/gsatst : gsatst.c ${TGTLib}
+	${CC} -c gsatst.c -o ${PACTTmpDir}/gsatst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsatst.o -o ${BinDir}/gsatst ${Libs}
+
+foo : foo.c ${TGTLib}
+	${CC} -c foo.c -o foo.o
+	${CLD} ${LdFlags} foo.o -o foo ${Libs}
+
+#
+# fortran API test
+#
+Fstd : ${BinDir}/gsftst
+
+${BinDir}/gsftst : gsftst.f ${TGTLib}
+	${FC} -c gsftst.f -o ${PACTTmpDir}/gsftst.o
+	${FC} ${LdFlags} ${PACTTmpDir}/gsftst.o -o ${BinDir}/gsftst ${Libs}
+
+#
+# event handling test
+#
+
+event : ${BinDir}/gsevts
+
+${BinDir}/gsevts : ${TGTLib} gsevts.c
+	${CC} -c gsevts.c -o ${PACTTmpDir}/gsevts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsevts.o -o ${BinDir}/gsevts ${Libs}
+
+#
+# line drawing test
+#
+line : ${BinDir}/gsclts
+
+${BinDir}/gsclts : gsclts.c ${TGTLib}
+	${CC} -c gsclts.c -o ${PACTTmpDir}/gsclts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsclts.o -o ${BinDir}/gsclts ${Libs}
+
+#
+# poly segment test
+#
+polyseg : ${BinDir}/gsmlts
+
+${BinDir}/gsmlts : gsmlts.c ${TGTLib}
+	${CC} -c gsmlts.c -o ${PACTTmpDir}/gsmlts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsmlts.o -o ${BinDir}/gsmlts ${Libs}
+
+#
+# text handling test
+#
+text : ${BinDir}/gstxts
+
+${BinDir}/gstxts : gstxts.c ${TGTLib}
+	${CC} -c gstxts.c -o ${PACTTmpDir}/gstxts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gstxts.o -o ${BinDir}/gstxts ${Libs}
+
+#
+# transformation test
+#
+trans : ${BinDir}/gstrts
+
+${BinDir}/gstrts : gstrts.c ${TGTLib}
+	${CC} -c gstrts.c -o ${PACTTmpDir}/gstrts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gstrts.o -o ${BinDir}/gstrts ${Libs}
+
+#
+# curve drawing test
+#
+curve : ${BinDir}/gsltst
+
+${BinDir}/gsltst : gsltst.c ${TGTLib}
+	${CC} -c gsltst.c -o ${PACTTmpDir}/gsltst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsltst.o -o ${BinDir}/gsltst ${Libs}
+
+#
+# surface test
+#
+surface : ${BinDir}/gssfts
+
+${BinDir}/gssfts : gssfts.c ${TGTLib}
+	${CC} -c gssfts.c -o ${PACTTmpDir}/gssfts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gssfts.o -o ${BinDir}/gssfts ${Libs}
+
+#
+# fill-poly test
+#
+fillpoly: ${BinDir}/gsfpts
+
+${BinDir}/gsfpts : gsfpts.c ${TGTLib}
+	${CC} -c gsfpts.c -o ${PACTTmpDir}/gsfpts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsfpts.o -o ${BinDir}/gsfpts ${Libs}
+
+#
+# contour test
+#
+contour : ${BinDir}/gsctst
+
+${BinDir}/gsctst : gsctst.c ${TGTLib}
+	${CC} -c gsctst.c -o ${PACTTmpDir}/gsctst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsctst.o -o ${BinDir}/gsctst ${Libs}
+
+#
+# simple contour test
+#
+scontour : ${BinDir}/gssctst
+
+${BinDir}/gssctst : gssctst.c ${TGTLib}
+	${CC} -c gssctst.c -o ${PACTTmpDir}/gssctst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gssctst.o -o ${BinDir}/gssctst ${Libs}
+
+#
+# fortran contour test
+#
+Fcontour : ${BinDir}/gsfctst
+
+${BinDir}/gsfctst : gsfctst.f ${TGTLib}
+	${FC} -c gsfctst.f -o ${PACTTmpDir}/gsfctst.o
+	${FC} ${LdFlags} ${PACTTmpDir}/gsfctst.o -o ${BinDir}/gsfctst ${Libs}
+
+
+#
+# vector test
+#
+vector : ${BinDir}/gsvtst
+
+${BinDir}/gsvtst : gsvtst.c ${TGTLib}
+	${CC} -c gsvtst.c -o ${PACTTmpDir}/gsvtst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsvtst.o -o ${BinDir}/gsvtst ${Libs}
+
+#
+# image test
+#
+image : ${BinDir}/gsimts
+
+${BinDir}/gsimts : gsimts.c ${TGTLib}
+	${CC} -c gsimts.c -o ${PACTTmpDir}/gsimts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsimts.o -o ${BinDir}/gsimts ${Libs}
+
+#
+# show colormap
+#
+colormap : ${BinDir}/gsshcm
+
+${BinDir}/gsshcm : gsshcm.c ${TGTLib}
+	${CC} -c gsshcm.c -o ${PACTTmpDir}/gsshcm.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsshcm.o -o ${BinDir}/gsshcm ${Libs}
+
+${BinDir}/gscmts : gscmts.c ${TGTLib}
+	${CC} -c gscmts.c -o ${PACTTmpDir}/gscmts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gscmts.o -o ${BinDir}/gscmts ${Libs}
+
+#
+# Raster test
+#
+raster : ${BinDir}/gsrstt
+
+${BinDir}/gsrstt : gsrstt.c ${TGTLib}
+	${CC} -c gsrstt.c -o ${PACTTmpDir}/gsrstt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsrstt.o -o ${BinDir}/gsrstt ${Libs}
+
+#
+# axis test
+#
+axis : ${BinDir}/gslaxt
+
+${BinDir}/gslaxt : gslaxt.c ${TGTLib}
+	${CC} -c gslaxt.c -o ${PACTTmpDir}/gslaxt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gslaxt.o -o ${BinDir}/gslaxt ${Libs}
+
+#
+# grotrian test
+#
+grotrian : ${BinDir}/gsgrts
+
+${BinDir}/gsgrts : gsgrts.c ${TGTLib}
+	${CC} -c gsgrts.c -o ${PACTTmpDir}/gsgrts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsgrts.o -o ${BinDir}/gsgrts ${Libs}
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${GObjsA} ${GObjsB} ${GObjsC} ${GObjsD} ${OPS} ${OCGM} ${ORST} > required.objs
+
+#
+# Run the PGS test suite
+#
+test :
+	@./gstest
+
+#
+# MPEG test
+#
+mpeg : ${BinDir}/gsmpgt1 ${BinDir}/gsmpgt2
+
+${BinDir}/gsmpgt1 : gsmpgt1.c ${TGTLib}
+	${CC} -c gsmpgt1.c -o ${PACTTmpDir}/gsmpgt1.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsmpgt1.o -o ${BinDir}/gsmpgt1 ${Libs}
+
+${BinDir}/gsmpgt2 : gsmpgt2.c ${TGTLib}
+	${CC} -c gsmpgt2.c -o ${PACTTmpDir}/gsmpgt2.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/gsmpgt2.o -o ${BinDir}/gsmpgt2 ${Libs}

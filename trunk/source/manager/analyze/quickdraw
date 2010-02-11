@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# QUICKDRAW - analyze OSX platform for Quickdraw
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+SafeEnv HostOS           `uname -s`
+SafeEnv GraphicsDevices  ""
+SafeEnv GraphicsFlag     ""
+SafeEnv Cfg_CC_Exe       "cc"
+SafeEnv Cfg_LD_Lib       ""
+SafeEnv AnaDir           analyze
+SafeEnv ALog             $cwd/log.analyze
+SafeEnv Std_UseQD        FALSE
+
+if ($HostOS == Darwin) then
+
+   Separator $Log
+   Note $Log "Analyze: Quickdraw"
+
+   set UTime = `timer -r`
+
+# write a little QD test
+   cat << EOF >! $Tmp.c
+#include <ApplicationServices/ApplicationServices.h>
+#include <Carbon/Carbon.h>
+int main(int c, char **v)
+{FontInfo font_data;
+ GrafPtr port;
+ InitCursor();
+ GetFontInfo(&font_data);
+ TextSize(12);
+ SetPort(port);
+ MoveTo(10, 20);
+ return(0);}
+EOF
+
+   setenv LD_Flags     "$LD_Flags -framework Carbon"
+
+   flog $ALog $Cfg_CC_Exe $LD_Flags $Tmp.c -o $Tmp $Cfg_LD_Lib
+   set xstatus = $status
+   if ($xstatus == 0) then
+      if ($Std_UseQD == TRUE) then
+         NoteD $ALog "      has Quickdraw (Carbon)"
+         setenv GSYS             "QD"
+         setenv GraphicsDevices  "$GraphicsDevices QD"
+         setenv GraphicsFlag     "$GraphicsFlag -framework Carbon"
+      else
+         NoteD $ALog "      no Quickdraw (by request)"
+      endif
+   else
+      NoteD $ALog "      no Quickdraw"
+      setenv Std_UseQD   FALSE
+   endif
+
+   set ETime = `timer -b $UTime`
+
+# export the results
+   SetParent GraphicsDevices
+   SetParent Std_UseQD
+   SetParent LD_Flags
+
+endif
+
+exit(0)
+

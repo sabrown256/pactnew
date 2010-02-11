@@ -1,0 +1,122 @@
+#!/bin/csh -f
+#
+# CCTEST - test SCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = scc
+source ../scripts/test-env
+
+setenv LogF  $Log
+
+set Test = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: cctest [-h] [<test>]*"
+           echo "  h       this help message"
+           echo "  <test>  one of: t1 t2"
+           echo "          ttype tstruct tenum tunion ttypdef"
+           echo "          tfunc tinc tdepa tdepb tdepc tdepd"
+           echo ""
+           exit(1)
+      case -*:
+           breaksw
+      default:
+           set Test = ( $Test $1 )
+           breaksw
+   endsw
+   shift
+end
+
+exit(0)
+
+flog $Log pact scc
+
+flog $Log cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "SCC TESTS ... omitted"
+
+# run the tests
+else if (-e $RootDir/scc/scc_int.h) then
+   set BeginTime = `$TIMER -r`
+
+   NoteD $Log ""
+   NoteD $Log "SCC TEST ....."
+
+   Note $Log "BinDir  = $BinDir"
+   Note $Log "path    = $path"
+   Note $Log "MAKE    = $MAKE"
+   Note $Log "RootDir = $RootDir"
+   Note $Log "SrcDir  = $SrcDir"
+   Note $Log "DORUN   = $DORUN"
+
+   setenv Tmp $cwd/.tmp.$$
+   if ("$Valgrind" != "") then
+      setenv Valgrind  "$Valgrind --suppressions=$SrcDir/tests/vg.suppress"
+      setenv Valgrind  "$Valgrind --suppressions=$SrcDir/tests/vg.suppress-test"
+   endif
+
+   Note $Log "PACT        = $PACT"
+   flog $Log ../../../manager/pwhich pact
+   flog $Log ../../../manager/pwhich cc
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ("$Test" == "") then
+      set Test = ""
+      set Test = ( $Test t1 t2 )
+      set Test = ( $Test ttype tenum tstruct tunion ttypdef )
+      set Test = ( $Test tfunc tinc tdepa tdepb tdepc tdepd )
+   endif
+
+   foreach i ($Test)
+      $SrcDir/tests/driver $i
+      if ($status == 1) then
+         set ERROR = TRUE
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP - we are all done now
+
+   flog $Log $RM $Tmp
+
+   set ETime = `$TIMER -b $BeginTime`
+
+   NoteD $Log ""
+
+   if ($ERROR == "TRUE") then
+      NoteD $Log ""
+      NoteD $Log "SCC TEST ..... FAILED ($ETime)"
+      NoteD $Log ""
+      NoteD $Log "See $Log for details"
+   else
+      NoteD $Log "SCC TEST ..... PASSED ($ETime)"
+   endif
+
+endif
+
+NoteD $Log ""
+NoteD $Log " --------------------------------------------------------"
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+#   set xstatus = 1
+endif
+
+Note $Log "Exiting with status $xstatus"
+
+exit($xstatus)
+

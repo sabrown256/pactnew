@@ -1,0 +1,107 @@
+#!/bin/csh -f
+#
+# F90-INTERFACE - write F90 include file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    if (($Cfe_FC_Exe != "") && ($F_STD == 'F90')) then
+       Separator $Log
+       NoteD $Log "   F90 Include File - f90types.h f90kinds.inc"
+
+       if (!(-d f90kinds)) then
+          NoteD $Log ""
+          NoteD $Log "      The f90kinds directory is missing"
+          NoteD $Log "      It should be checked out of the source repository"
+          NoteD $Log ""
+          exit(1)
+       endif
+
+       set Tmp = tmp-f90.$Host.$$
+
+       flog $Log pushd f90kinds
+       if (!(-d $Tmp)) then
+          flog $Log mkdir $Tmp
+       endif
+       flog $Log pushd $Tmp
+
+       flog $Log set lCC = ( $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_RPath )
+       flog $Log set lFC = ( $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_RPath )
+
+# run getkinds to generate getbytes.f
+       flog $Log $lFC ../getkinds.f -o getkinds
+       flog $Log ($CFE ./getkinds >&! getbytes.f)
+       if ($status != 0) then
+          NoteD $Log "      Cannot determine Fortran kinds"
+          flog $Log cat getbytes.f
+       endif
+
+# compile and link getbytes
+       flog $Log $Cfe_CC_Exe $Cfe_CC_Flags -I../.. -c ../csizer.c -o csizer.o
+       flog $Log $lFC getbytes.f csizer.o -o getbytes
+       if ($status != 0) then
+          NoteD $Log "      Cannot compute Fortran primitive byte sizes"
+       endif
+
+# run getbytes to generate from_c and from_h
+       flog $Log $CFE -v ./getbytes
+       if ($status != 0) then
+          Note $Log "***> Cannot run getbytes"
+       endif
+
+# run genfiles to generate f90types.h and f90kinds.inc
+# requires from_c and from_h as input
+       flog $Log $lCC -I../.. ../genfiles.c -o genfiles
+       flog $Log $CFE -v ./genfiles
+       if ($status != 0) then
+          Note $Log "***> Cannot run genfiles"
+       endif
+
+       flog $Log mv f90types.h f90kinds.inc $IncDir
+
+# run sizeint as input to sizefix
+       flog $Log $lFC ../sizeint.f -o sizeint
+       if ($status != 0) then
+          NoteD $Log "      Cannot compute Fortran integer size"
+       else
+          set si = `$CFE ./sizeint`
+          Note $Log "sizeint = $si"
+
+# run sizefix to generate Finteger.bytes
+          flog $Log $lCC -I../.. ../sizefix.c -o sizefix
+          flog $Log ($CFE ./sizefix $si >&! $IncDir/Finteger.bytes)
+          if ($status != 0) then
+             NoteD $Log "      Cannot compute Fortran integer size"
+             flog $Log cat $IncDir/Finteger.bytes
+             flog $Log ${RM} $IncDir/Finteger.bytes
+          else
+             flog $Log cat $IncDir/Finteger.bytes
+          endif
+       endif
+
+       flog $Log popd
+       flog $Log $RMDir $Tmp
+       flog $Log popd
+
+    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

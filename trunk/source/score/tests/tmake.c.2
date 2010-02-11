@@ -1,0 +1,32 @@
+#
+# test dependency analysis - update following explicit dependency update
+#                          - a.o updated after a.h updated
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+Hdrs = a.h
+Objs = a.o b.o
+
+a.o : al.l ay.y
+	@echo "LY -> $@"
+	@touch a.o
+
+.c.o:
+	@echo "CO $< -> $@"
+	@touch $@
+
+${Objs} : ${Hdrs}
+
+work : ${Objs}
+
+setup :
+	touch al.l ay.y b.c
+	touch a.o b.o
+	sleep 1
+	touch a.h
+
+cleanup :
+	rm a*.[chlyo] b.[co]
+

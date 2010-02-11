@@ -1,0 +1,97 @@
+#!/bin/csh -f
+#
+# OPENGL - analyze platform Open GL options
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: opengl"
+
+SafeEnv HostOS           `uname -s`
+SafeEnv GraphicsDevices  ""
+SafeEnv GraphicsFlag     ""
+SafeEnv Std_UseOGL       FALSE
+
+set UTime = `timer -r`
+
+if ($HostOS == Darwin) then
+   Note $ALog "Finding GL on MAC OS X"
+   setenv LD_MDGLib "$LD_MDGLib -framework GLUT -framework OpenGL"
+   setenv Cfe_LD_Flags  "$LD_MDGLib"
+endif
+
+set lLibDirs = ""
+foreach i ($LD_MDGLib)
+   set j = $i:h
+   if (-d $j) then
+      set lLibDirs = ( $lLibDirs $j )
+   endif
+end
+
+Note $ALog "MDGLibs  = |$LD_MDGLib|"
+Note $ALog "lLibDirs = |$lLibDirs|"
+
+      cat << EOF >! $Tmp.c
+#include <GL/gl.h>
+#include <GL/glx.h>
+int main(int c, char **v)
+{void *x;
+ x = (void *) glXQueryExtension;
+ return(0);}
+EOF
+
+set lIncDirs = ( $RootInc /usr/X11R6/include )
+set lLibDirs = ( $lLibDirs /usr/lib64 /usr/lib /usr/openwin/lib /usr/X11R6/lib )
+set lHdrs    = ( GL/gl.h GL/glx.h )
+set ASList   = ( a so )
+set lLib     = GL
+set lFile    = $Tmp
+set lALibs   = ""
+set Implicit = TRUE
+
+source $AnaDir/find-package
+
+if (("$PckLib" != "") && ("$PckInc" != "")) then
+   NoteD $ALog "      has OpenGL ($PckLib)"
+   Note $ALog "Include = |$PckInc|"
+
+   setenv GSYS             "OGL"
+   setenv GraphicsDevices  "$GraphicsDevices OGL"
+   setenv GraphicsFlag     "$GraphicsFlag -DOGL"
+
+   if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+      setenv CC_MDGInc "$CC_MDGInc $PckInc"
+   endif
+   Note $ALog "MDG Include = |$CC_MDGInc|"
+
+   setenv LD_MDGLib  "$LD_MDGLib $PckLib"
+   setenv Std_UseOGL TRUE
+else
+   NoteD $ALog "      no OpenGL"
+   setenv Std_UseOGL FALSE
+endif
+
+set ETime = `timer -b $UTime`
+
+if ($Std_UseOGL == TRUE) then
+
+# export the results
+   SetParent GraphicsDevices
+#   SetParent OGLLib
+#   SetParent OGLInc
+   SetParent CC_MDGInc
+   SetParent LD_MDGLib
+
+endif
+
+SetParent Std_UseOGL
+
+exit(0)
+

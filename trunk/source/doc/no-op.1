@@ -1,0 +1,39 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH NO-OP 1 "6 July 2005"
+.SH NAME
+no-op \- do nothing
+.SH SYNOPSIS
+.B no-op [arg]*
+.SH DESCRIPTION
+
+Sometimes when doing shell programming a placeholder is needed
+which does nothing but returns an exit status of 0.  For example,
+trying to write a portable shell script that can work around missing
+commands.  Use the no-op command to substitute for the missing
+commands.  It will take the same arguments as any command and it
+always succeeds.
+
+.SH RETURN VALUE
+
+Unconditionally returns and exit status of 0.
+
+.SH EXAMPLES
+
+   no-op -s 5
+   no-op -u fred
+   no-op -a -t 20 -c
+
+.SH SEE ALSO
+
+.B dargs(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

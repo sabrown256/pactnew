@@ -1,0 +1,53 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH CLEANUP-JOBS 1 "6 December 2004"
+.SH NAME
+cleanup-jobs \- kill processes by name rather than by pid on multiple hosts
+.SH SYNOPSIS
+.B cleanup-jobs [-e] [-h] [-v] [host]* [-a name*] [-j name*]
+.SH DESCRIPTION
+Send SIGKILL to the processes specified by name possibly on
+another host.  Cleanup-jobs uses sign to do the actual signalling.
+
+.SH OPTIONS
+.TP
+.B \-a
+Add remaining fields to default list of jobs to kill.
+.TP
+.B \-e
+Run on each host listed in the $HOME/.all-hosts file.
+.TP
+.B \-h
+A short summary help message.
+.TP
+.B \-j
+Use remaining fields to make list of jobs to kill.
+.TP
+.B \-v
+Verbose mode.
+
+
+.SH EXAMPLES
+
+   cleanup-jobs make
+   cleanup-jobs -e make
+   cleanup-jobs host1 host2
+
+.SH FILES
+
+~/.cleanup-jobs  file specifying default list of job names to kill
+~/.all-hosts     file specifying hosts on which to do cleanup operation
+
+.SH SEE ALSO
+
+.B ls-jobs(1), sign(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

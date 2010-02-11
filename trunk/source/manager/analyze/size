@@ -1,0 +1,130 @@
+#!/bin/csh -f
+#
+# SIZE - analyze the integer type sizes
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Note $ALog "      Find Integer Sizes"
+
+if ($?INT4 == 0) then
+   setenv INT4  int
+endif
+if ($?INT8 == 0) then
+   setenv INT8  long
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+cat << EOF >! $Tmp.c
+#include <stdio.h>
+#include <stdlib.h>
+int main(int c, char **v)
+{long long i;
+ i = strtoll("3", NULL, 10);
+ return(0);}
+EOF
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+if ($status != 0) then
+   setenv NO_LONG_LONG TRUE
+else
+   setenv NO_LONG_LONG FALSE
+endif
+flog $ALog rm -f $Tmp.c $Tmp
+
+if ($NO_LONG_LONG == TRUE) then
+   goto VERSIONA
+else
+   goto VERSIONB
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# VERSIONA - no long long
+
+VERSIONA:
+
+cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{
+ if (sizeof(int) == 4)
+    printf("setenv INT4 int\n");
+ else if (sizeof(long) == 4)
+    printf("setenv INT4 long\n");
+ else
+    printf("setenv INT4 unknown\n");
+ printf(";\n");
+ if (sizeof(int) == 8)
+    printf("setenv INT8 int\n");
+ else if (sizeof(long) == 8)
+    printf("setenv INT8 long\n");
+ else
+    printf("setenv INT8 unknown\n");
+return(0);}
+EOF
+
+goto COMPILE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# VERSIONB - with long long
+
+VERSIONB:
+
+cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{
+ if (sizeof(int) == 4)
+    printf("setenv INT4 int\n");
+ else if (sizeof(long) == 4)
+    printf("setenv INT4 long\n");
+ else
+    printf("setenv INT4 unknown\n");
+ printf(";\n");
+ if (sizeof(int) == 8)
+    printf("setenv INT8 int\n");
+ else if (sizeof(long) == 8)
+    printf("setenv INT8 long\n");
+ else if (sizeof(long long) == 8)
+    printf("setenv INT8 \'long long\'\n");
+ else
+    printf("setenv INT8 unknown\n");
+return(0);}
+EOF
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+COMPILE:
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+eval `$Tmp`
+
+Note $ALog ""
+Note $ALog "Integer size info:"
+Note $ALog "   INT4         = $INT4"
+Note $ALog "   INT8         = $INT8"
+Note $ALog "   NO_LONG_LONG = $NO_LONG_LONG"
+Note $ALog ""
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+# export the results
+SetParent INT4
+SetParent INT8
+SetParent NO_LONG_LONG
+
+#exit(0)
+

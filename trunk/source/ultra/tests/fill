@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# FILL - ULTRA FILL test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           FILL TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    ULTRA FILL Test .............. "
+   Note $Log ""
+
+   flog $Log $RM ulfill.log ulfill.err
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $Ultra -l $TDir/ulfill.scm >& ulfill.log)
+      set xstatus = $status
+      flog $Log (grep -i "error" ulfill.log > ulfill.err)
+      set Files = `find . -name "ulfill.err" -size 0c -print`
+   else
+      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulfill.scm  |& \
+      grep "ERROR SUMMARY:"                                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

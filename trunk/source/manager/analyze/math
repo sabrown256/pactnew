@@ -1,0 +1,39 @@
+#!/bin/csh -f
+#
+# MATH - analyze math library options
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: math"
+
+set MathLib = ""
+foreach i ("foo" "blas" "linpack" "slatec" "imsl" "mathlib")
+   rm -f $Tmp.res
+   (man $i | head) >& $Tmp.res
+
+# AIX grep says: "No match found in database for foo"
+# UNIX grep says: "No manual entry for foo"
+# ULTRIX says: grep exits with 0 if it doesn't crash outright (can't use $status)
+
+   set res = `grep -i "no ma" $Tmp.res`
+   if (("$res" == "") && ($i != "foo")) then
+      set MathLib = ($MathLib $i)
+   endif
+end
+
+if ("$MathLib" != "") then
+   NoteD $ALog "      Math Libraries: $MathLib"
+endif
+
+flog $ALog rm -f $Tmp.res
+
+exit(0)
+

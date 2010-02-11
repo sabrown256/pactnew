@@ -1,0 +1,108 @@
+#!/bin/csh -f
+#
+# PATEST - test PANACEA
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = panacea
+source ../scripts/test-env
+
+setenv LogF  $Log
+
+set Test = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: patest [-h] [<test>]*"
+           echo "  h       this help message"
+           echo "  <test>  one of: history gen abc"
+           echo ""
+           exit(1)
+      case -*:
+           breaksw
+      default:
+           set Test = ( $Test $1 )
+           breaksw
+   endsw
+   shift
+end
+
+cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "PANACEA TESTS ... omitted"
+
+# run the tests
+else if (-e $RootDir/panacea/panace.h) then
+   set BeginTime = `$TIMER -r`
+
+   NoteD $Log ""
+   NoteD $Log "PANACEA TEST ..."
+
+   Note $Log "BinDir = $BinDir"
+   Note $Log "path   = $path"  
+   Note $Log "MAKE   = $MAKE"  
+
+   setenv Tmp $cwd/.tmp.$$
+   if ("$Valgrind" != "") then
+      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
+   endif
+
+   if ( !($?autotool) ) then
+      Note $Log "PACT     = $PACT"
+      Note $Log "Parallel = |$Parallel|"
+      Note $Log "MPI      = |$MPI|"
+      flog $Log ../../../manager/pwhich pact
+      flog $Log ../../../manager/pwhich cc
+   endif
+
+   if ("$Test" == "") then
+      set Test = (history gen abc)
+   endif
+
+   foreach i ($Test)
+      $SrcDir/tests/$i
+      if ($status == 1) then
+         set ERROR = TRUE
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP - we are all done now
+
+   flog $Log $RM $Tmp
+
+   set ETime = `$TIMER -b $BeginTime`
+
+   NoteD $Log ""
+
+   if ($ERROR == "TRUE") then
+      NoteD $Log ""
+      NoteD $Log "PANACEA TEST ... FAILED ($ETime)"
+      NoteD $Log ""
+      NoteD $Log "See $Log for details"
+   else
+      NoteD $Log "PANACEA TEST ... PASSED ($ETime)"
+   endif
+
+endif
+
+NoteD $Log ""
+NoteD $Log " --------------------------------------------------------"
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+   set xstatus = 1
+endif
+
+exit($xstatus)
+

@@ -1,0 +1,66 @@
+#!/bin/csh -f
+#
+# INTRP - SX PDBView interpolation test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDBVIEW INTERPOLATION TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PDBView Interpolation Test ... "
+   Note $Log ""
+
+   flog $Log rm -f 3x1.ps
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/pdbvinterp.scm >& pdbvinterp.tmp)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvinterp.scm |& \
+      grep "ERROR SUMMARY:"                                                       |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      grep -i "error" pdbvinterp.tmp > pdbvinterp.err
+      set Files = `find . -name "pdbvinterp.err" -size 0c -print`
+      if ($#Files == 0) then
+         NoteD $Log ""
+         set Err = 1
+         NoteD $Log "FAILED ($ETime)"
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f pdbvinterp.err pdbvinterp.tmp
+         flog $Log rm -f 3x1.ps
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

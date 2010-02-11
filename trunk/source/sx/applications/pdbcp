@@ -1,0 +1,93 @@
+#!/usr/bin/env pdbview
+;
+; PDBCP - command line PDB file copy utility
+;
+; Source Version: 3.0
+; Software Release #: LLNL-CODE-422942
+;
+; include "cpyright.h"
+;
+
+(define inf #f)
+(define outf #f)
+(define vars (list '*))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (help)
+    (printf nil "\n")
+    (printf nil "Usage: pdbcp [-h] [-v #] <in-file> [<out-file>] [-a <var>*]\n")
+    (printf nil "   a  all remaining arguments specify variables to copy\n")
+    (printf nil "   h  this help message\n")
+    (printf nil "   v  PDB format version for output (default 3)\n")
+    (printf nil "\n")
+    (printf nil "Examples:\n")
+    (printf nil "   pdbcp -v 2 file1\n")
+    (printf nil "         Make a copy of file1 to file.out in format verion 2\n")
+    (printf nil "   pdbcp file1 file2 ~ bird cat\n")
+    (printf nil "         Make a copy of file1 to file2 and\n")
+    (printf nil "         exclude variables bird and cat\n")
+    (printf nil "   pdbcp file1 bird cat dog\n")
+    (printf nil "         Make a copy of file1 to file.out and\n")
+    (printf nil "         include only variables bird, cat, and dog\n")
+    (printf nil "\n")
+
+    (quit 1))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (process-args v)
+    (if v
+	(let* ((arg (list-ref v 0))
+	       (rst (list-tail v 1)))
+
+              (cond ((eqv? arg "-a")
+		     (set! vars rst)
+		     (set! rst nil))
+
+		    ((eqv? arg "-h")
+		     (help))
+
+		    ((eqv? arg "-v")
+		     (format-version (car rst))
+		     (set! rst (cdr rst)))
+
+		    ((not inf)
+		     (set! inf arg))
+
+		    ((not outf)
+		     (set! outf arg)))
+
+	      (process-args rst))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (main v)
+  
+   (if (not v)
+       (help))
+
+   (process-args v)
+
+   (if (not inf)
+       (begin (printf nil "No input file specified\n")
+	      (help)))
+
+   (if (not outf)
+       (set! outf "file.out"))
+
+; open the input file
+   (change-file* inf)
+
+; copy the variables
+   (apply cp `(-R -w ,@vars ,outf)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(main argv)
+
+(quit)

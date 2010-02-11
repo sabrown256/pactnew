@@ -1,0 +1,35 @@
+To build PDBlib on Windows NT, using MS Visual C++ compiler and NMAKE:
+
+1.  In pact/manager edit bmake.bat, replace %MANAGER% with the full path
+    for your pact/manager directory.
+
+2.  In pact/manager edit ld.nt, put the path to your pact/dev/lib directory
+    after /LIBPATH:.
+
+3.  In pact/manager edit make-def.nt, set RootDr to the path for your pact
+    directory.
+
+4.  In pact/manager, type: 
+    pconfig win nt
+
+    You should get messages about Makefiles being made and other configuration
+    actions.
+
+5.  In pact/manager, type:
+    nmake pact
+
+    This should cause the score, pml and pdb libraries to be built and
+    installed in pact/dev/lib, and headers to be installed in pact/dev/include.
+
+6.  To make the pdbtst program:
+    in pact/pdb, type
+    nmake pdbtst
+
+    This creates pdbtst.exe.
+
+    Type:
+    pdbtst
+
+    to run the test program.  If it doesn't complain of errors or differences
+    you are finished.
+    

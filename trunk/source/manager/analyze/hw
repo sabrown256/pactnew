@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+# HW - analyze the hardware
+#    - Computes: CPU, FPU
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: hw"
+
+if ($?Arch == 0) then
+   setenv Arch `../scripts/system-id`
+endif
+
+NoteD $ALog -n "   Hardware: "
+Note $ALog ""
+
+SafeEnv CPU           ""
+SafeEnv FPU           ""
+
+set HostOS    = `uname -s`
+set HostOSRel = `uname -r`
+set HostHW    = `uname -m`
+
+if ($CPU == "") then
+   setenv CPU "$HostHW"
+   if ("$HostHW" =~ i*86) then
+      setenv CPU  ia32
+   else if ("$Arch" =~ osx-*-x86) then
+      setenv CPU  ia32
+   else if ("$Arch" =~ osx-*-ppc) then
+      setenv CPU  ppc
+   endif
+endif
+
+if ($FPU == "") then
+   if ("$HostHW" == "alpha") then
+      setenv FPU  alpha
+   else if ("$HostHW" =~ sun*) then
+      setenv FPU  sparc
+   else if ("$HostHW" == x86_64) then
+      setenv FPU  x87
+   else if ("$HostHW" =~ i*86) then
+      setenv FPU  x87
+   else if ("$Arch" =~ osx-*-x86) then
+      setenv FPU  x87
+   else if ("$Arch" =~ osx-*-ppc) then
+      setenv FPU  ppc
+   else
+      setenv FPU  unknown
+   endif
+endif
+
+NoteD $ALog -n "$HostHW"
+if ("$CPU" != "unknown") then
+   NoteD $ALog -n " $CPU"
+endif
+if ("$FPU" != "unknown") then
+   NoteD $ALog -n " ($FPU)"
+endif
+NoteD $ALog ""
+
+SetParent CPU
+SetParent FPU
+
+exit(0)
+

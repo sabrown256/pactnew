@@ -1,0 +1,14 @@
+/* Borland v3.0 Turbo C Configuration */
+
+#define TURBOC
+#define DOS
+#define NO_WINDOWS
+/* #define WINDOWS  */
+#define ANSI
+#define byte void
+#define Register register
+#define SIGNED signed
+#define NO_LONG_LONG
+
+#define NEED_MEM_TRACE
+

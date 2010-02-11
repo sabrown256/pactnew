@@ -1,0 +1,834 @@
+#!/bin/csh -f
+#
+# FOR-PACT - issue a command for each PACT package (possibly in parallel)
+#          - a package is synonomous with a directory in PACT
+#          - a parallel command means to have each of the processors
+#          - specified do the command in one package concurrently 
+#          - until all of the packages have been processed
+#          - constraints:
+#          -   1) all output from a command in a package must
+#          -      be reported to the terminal or log file contiguously
+#          -      i.e. parallel builds could intermix output from
+#          -      concurrent processes into an incoherent jumble
+#          -   2) when work is done in a package it must be reported
+#          -      immediately and not saved up until all packages
+#          -      are done
+#          -   3) parallel operations could overwhelm NFS so any
+#          -      temporary files are created in /tmp which is assumed
+#          -      to be directly mounted and all thought is given to
+#          -      avoiding unnecessary NFS operations
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+onintr CLEANUP
+
+source ../scripts/env-csh
+source ../scripts/csh-subroutines
+HAVE_SUBROUTINES
+
+alias dlog      '\!\!:1-$ >>& /dev/null'
+alias flog      'echo "FOR-PACT: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias Separator 'echo "FOR-PACT: --------------------------------------------------------------------------" >>& \!\!:^'
+
+set STDOUT    = ""
+set Offset    = 1
+set NProc     = 1
+set ProcN     = 0
+set OK        = 0
+set Dir       = ""
+set Base      = ""
+set HaveGMake = FALSE
+set NameSeed  = FALSE
+set DoneTest  = "   All done"
+set Cntinue   = FALSE
+set GetQName  = ""
+set LastDir   = 0
+set Tee       = FALSE
+set MPId      = $$
+set HostName  = `uname -n`
+set Master    = ""
+set PIndx     = ""
+
+@ NAttempts = 1
+set Delay   = 10
+
+set Make = `pact -info make`
+set Make = $Make:t
+
+if ($Make == "gmake") then
+   set HaveGMake  = TRUE
+   set ThreadMake = ( -j 4 )
+else
+   set HaveGMake  = FALSE
+   set ThreadMake = ""
+endif
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# READ - process the command line
+
+set Cmmnd       = ""
+set Directories = ""
+set LogRoot     = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           set Base = $1
+           shift
+           set Dir = `echo $1 | sed 's/*//'`
+           shift
+           set PIndx = "$1"
+           shift
+           set MPId = "$1"
+           shift
+           set Master = "$1"
+           shift
+           set HostInd = "$1"
+           while ("$1" != "+a")
+              shift
+           end
+           breaksw
+      case -d:
+           shift
+           while ($#argv > 0)
+              set Directories = ( $Directories $1 )
+              shift
+           end
+           break
+           breaksw
+      case -e:
+           shift
+           setenv PACT_CONFIG "$1"
+           breaksw
+      case -f:
+           shift
+           set Directories = `px cat $1`
+           breaksw
+      case -g:
+           set HaveGMake  = FALSE
+           set ThreadMake = ""
+           breaksw
+      case -h:
+           echo "    for-pact [-b <base>] [-g] [-i] [-l <logfile>] [-lr <dir>]"
+           echo "             [-n #] [-na # | #,#] [-o <seed>] [-p #] [-q <name>] [-s]"
+           echo "             [-tee] [-x] <command> [-f <file>] [-d <dirs>*]"
+           echo " "
+           echo "where the options are:"
+           echo " "
+           echo "      f   - Get list of packages from file"
+           echo "      g   - Do NOT use gmake even if it is available"
+           echo "      i   - Continue doing all packages even if the"
+           echo "            command fails for one package"
+           echo "      l   - Log all output to the specified file"
+           echo "      lr  - directory for log files"
+           echo "      n   - Tell gmake to use the specified number of"
+           echo "            threads (the -j option to gmake)"
+           echo "      na  - Number of times to attempt command (fault tolerance)"
+           echo "          - Form is <n-attempts> or"
+           echo "          -         <n-attempts>,<seconds delay>"
+           echo "      o   - Initial node number with -s option"
+           echo "            forces -s also"
+           echo "      p   - Using the specified number of CPU's do the"
+           echo "            packages in parallel"
+           echo "      q   - Return the fully qualified host name of"
+           echo "            the given host name"
+           echo "      s   - Use the specified string as a name seed when"
+           echo "            working on a cluster where the host names"
+           echo "            are: foo1, foo2, foo3, etc"
+           echo "      tee - in conjunction with -l option send output to"
+           echo "            both the log file and to the terminal"
+           echo "      x   - do not treat last directory specially"
+           exit(1)
+           breaksw
+      case -i:
+           set Cntinue = TRUE
+           breaksw
+      case -l:
+           shift
+           set STDOUT = $1
+           breaksw
+      case -lr:
+           shift
+           set LogRoot = $1
+           breaksw
+      case -n:
+           shift
+           set ThreadMake = ( -j $1 )
+           breaksw
+      case -na:
+           shift
+           set TArg = $1
+           if (`expr "$TArg" : '.*,.*'` > 0) then
+              @ NAttempts = `expr "$TArg" : '\(.*\),.*'`
+              set Delay   = `expr "$TArg" : '.*,\(.*\)'`
+           else
+              @ NAttempts = $TArg
+           endif
+           breaksw
+      case -o:
+           shift
+           set Offset   = $1
+           set NameSeed = TRUE
+           breaksw
+      case -p:
+           shift
+           set ProcN = $1
+           breaksw
+      case -q:
+           shift
+           set GetQName = $1
+           breaksw
+      case -s:
+           set NameSeed = TRUE
+           breaksw
+      case -tee:
+           set Tee = TRUE
+           breaksw
+      case -x:
+           set LastDir = 0
+           breaksw
+
+      default:
+           set Cmmnd = ( $Cmmnd $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if (($HaveGMake == TRUE) && ($NProc > 1)) then
+   set Cmmnd = ( $Cmmnd "-j" $NProc )
+   if ($NameSeed == FALSE) then
+      set NProc = 1
+   endif
+endif
+
+set Attempts = ""
+while ($NAttempts > 0)
+   set Attempts = ( $NAttempts $Attempts )
+   @ NAttempts  = $NAttempts - 1
+end
+@ NAttempts = $#Attempts
+
+if ("$Base" == "") then
+   set Base = $cwd
+endif
+
+set arch    = `$Base/manager/cfgman use`
+set Root    = $Base/dev/$arch
+set CFDFile = $Root/include/configured
+set FORPACT = $Root/bin/for-pact
+
+# echo "Cmmnd  = |$Cmmnd|"
+# echo "Base   = |$Base|"
+# echo "Dir    = |$Dir|"
+# echo "Root   = |$Root|"
+# echo "STDOUT = |$STDOUT|"
+# echo "NProc  = |$NProc|"
+# echo "ProcN  = |$ProcN|"
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# GETQNAME - return fully qualified host name and exit
+
+if ("$GetQName" != "") then
+
+   set UHost = $GetQName
+
+   call QNAME ()
+
+   echo "   $UHost -> $QHost (domain `echo $Domain | sed 's/.//'`)"
+   exit(0)
+
+endif
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# MAIN - do serial or parallel work but start here
+
+# serial
+if (($NProc == 1) && ($ProcN == 0)) then
+   call SERIAL_MASTER()
+
+else
+
+   call SETUP_PARALLEL()
+
+# if we do not have a specific directory or package we are the master
+   if ("$Dir" == "") then
+      call DO_PARALLEL_MASTER()
+   else
+      call DO_PACKAGE()
+   endif
+endif
+
+# cleanup and exit
+call CLEANUP()
+
+# we will never get here
+exit(0)
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# SERIAL_MASTER - do work serially and do not incur parallel overhead
+
+SERIAL_MASTER:
+
+   call HANDLE_ENV($STDOUT)
+
+   if ("$Directories" == "") then
+      set Directories = `cat $CFDFile | awk '($1 == "Packages") { for (i = 3; i <= NF; i++) print $i }' | sed 's/\*//g'`
+      cd .. >& /dev/null
+   endif
+
+   set Dirs = ( $Directories )
+DLoop_1:
+   if ($#Dirs > 0) then
+      set dir = $Dirs[1]
+      shift Dirs
+
+      if (-d $dir) then
+         echo " "
+         cd $dir >& /dev/null
+         if ("$STDOUT" != "") then
+            echo "Doing $Cmmnd in directory $dir" |& tee -ai $STDOUT
+
+# execute command in fault tolerant way
+            call EXEC_CMD(tee $STDOUT)
+
+            if ($AErr != 0) then
+               set OK = 1
+               if ($Cntinue == FALSE) goto EC_RetC
+            endif
+         else
+            echo "Doing $Cmmnd in directory $dir"
+
+# execute command in fault tolerant way
+            call EXEC_CMD(none stdout)
+
+            if ($AErr != 0) then
+               set OK = 1
+               if ($Cntinue == FALSE) goto EC_RetC
+            endif
+         endif
+         cd .. >& /dev/null
+      endif
+
+      goto DLoop_1
+   endif
+
+EC_RetC:
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# SETUP_PARALLEL - setup parallel session work
+
+SETUP_PARALLEL:
+
+   if (`expr "$ProcN" : '.*x.*'` > 0) then
+      @ NNodes = `expr "$ProcN" : '\(.*\)x.*'`
+      @ NCPUs  = `expr "$ProcN" : '.*x\(.*\)'`
+   else
+      @ NNodes = $ProcN
+      @ NCPUs  = 1
+   endif
+
+   @ NProc = ${NNodes} * ${NCPUs}
+
+# get unqualified host name
+   set QHost = `uname -n`
+   set UHost = `expr $QHost : '\(.*\)\..*\..*'`
+   if ("$UHost" == "") then
+      set UHost = $QHost
+      call QNAME()
+   endif
+
+   if ($NameSeed == TRUE) then
+      set UHost = `echo $UHost | tr -d "[0-9]"`
+   endif
+
+# make list of hosts to run tasks
+   if (`expr "$Offset" : '.*,.*'`) then
+      set Hosts  = `echo $Offset | sed 's|,| |g'`
+      set Offset = ""
+   else
+
+# decrement offset after command line processing
+      @ Offset = $Offset - 1
+
+      set Hosts = ""
+      @ n = $NNodes
+      while ($n > 0)
+         @ m = $n + $Offset
+         if ($NameSeed == TRUE) then
+            set Hosts = ( $UHost$m$Domain $Hosts )
+         else
+            set Hosts = ( $Hosts $QHost )
+         endif
+         @ n = $n - 1
+      end
+   endif
+
+   if ($NameSeed == TRUE) then
+      echo "Using hosts: $Hosts"
+   endif
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# DO_PARALLEL_MASTER - worker for the master process
+
+DO_PARALLEL_MASTER:
+
+   setenv PACT_CONFIG "$arch"
+
+   if ("$Directories" == "") then
+      cd .. >& /dev/null
+      set Dirs    = `cat $CFDFile | awk '($1 == "Packages") { for (i = 3; i <= NF; i++) print $i }' | sed 's/\*//g'`
+   else
+      set Dirs = ( $Directories )
+   endif
+
+   if ("$LogRoot" == "") then
+      set LogRoot = "/tmp/for-pact-$USER-$MPId"
+   endif
+
+# build list and filter out non-existent directories
+   set Directories = ""
+   set NonDirs     = ""
+   foreach i ($Dirs)
+      if (-d $Base/$i) then
+         set Directories = ( $Directories $i )
+      else
+         set NonDirs = ( $NonDirs $i )
+      endif
+   end
+
+   if ("$NonDirs" != "") then
+      echo ""
+      echo "Cannot run $Cmmnd in the following:"
+      echo "   $NonDirs"
+      echo "Directories do not exist"
+      echo ""
+   endif
+
+   call PACKAGE_LOOP()
+
+   call PACKAGE_WAIT()
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# PACKAGE-LOOP - loop over the packages to be done in parallel
+
+PACKAGE_LOOP:
+
+# remove any existing $LogRoot files and setup some helper files
+   touch ${LogRoot}.+
+   rm ${LogRoot}.*
+   @ n = $NProc
+   while ($n > 0)
+      touch ${LogRoot}.+.$n
+      @ n = $n - 1
+   end
+
+   set InUse = ""
+   set NPck  = $#Directories
+   set lst   = ( $Directories )
+
+DirLoop:
+   if ($#lst > $LastDir) then
+      set Dir = $lst[1]
+      shift lst
+
+# find an idle processor and give it some work
+# idle means no logfile for that host
+# if not idle monitor progress to see when it becomes idle
+      set Looking = 1
+DispLoop:
+      if ($Looking == 1) then
+         @ n = $NProc
+ProcLoop:
+         if (($n > 0) && ($Looking == 1)) then
+            @ m = 1 + ($n - 1) / $NCPUs
+            call CHECK($n)
+            if ($Avail == TRUE) then
+               set host = $Hosts[$m]
+               set hout = "${LogRoot}.$Dir.$n"
+
+               if ($host == $QHost) then
+                  set HInd = "+"
+               else
+                  set HInd = "-"
+               endif
+
+               set Job = ( $FORPACT )
+               set Job = ( $Job -na $NAttempts,$Delay )
+               set Job = ( $Job -l $hout )
+               set Job = ( $Job -e $PACT_CONFIG )
+               set Job = ( $Job -p $m )
+               set Job = ( $Job -a $Base $Dir $n $MPId $HostName $HInd +a)
+               set Job = ( $Job $Cmmnd )
+
+# if the available host is the same as the current host
+# just run it without SSH
+               if ($host == $QHost) then
+                  dlog ( $Job & )
+
+# if the available host is NOT the same as the current host
+# we must SSH over to it
+               else
+                  dlog ( ssh $host $Job & )
+               endif
+
+               set InUse   = ( $InUse $n )
+               set Looking = 0
+
+# give the child process a chance to start up
+# otherwise this loop will hog the whole CPU
+               sleep 1
+
+            endif
+
+            @ n = $n - 1
+
+            goto ProcLoop
+         endif
+
+         goto DispLoop
+      endif
+
+      goto DirLoop
+   endif
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# PACKAGE-WAIT - wait for all the packages to finish
+
+PACKAGE_WAIT:
+
+   set Looking = 1
+
+WaitLoop:
+   if (($Looking == 1) && ("$InUse" != "")) then
+      set Looking = 0
+      @ n = $NProc
+
+WProcLoop:
+      if ($n > 0) then
+         call CHECK($n)
+         if ($Avail == FALSE) then
+            set Looking = 1
+         endif
+         @ n = $n - 1
+
+         goto WProcLoop
+      endif
+
+# NOTE: we do NOT want to spin wait this in order to give the
+# children a chance to do their business
+      sleep 1
+
+      goto WaitLoop
+   endif
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# DO_PACKAGE - do one package in a parallel job
+
+DO_PACKAGE:
+   if (-d $Base/$Dir) then
+
+      set LogFile = $STDOUT
+
+      touch $LogFile
+      flog $LogFile cd $Base/$Dir
+
+      call HANDLE_ENV($LogFile)
+
+      Note $LogFile "FOR-PACT: PACT_CONFIG = |$PACT_CONFIG|"
+      Note $LogFile "FOR-PACT: Arch        = |$arch|"
+      Note $LogFile "FOR-PACT: LogFile     = |$LogFile|"
+      Note $LogFile "FOR-PACT: CWD         = |$cwd|"
+      Note $LogFile "FOR-PACT: Base        = |$Base|"
+      Note $LogFile "FOR-PACT: Dir         = |$Dir|"
+      Note $LogFile "FOR-PACT: ProcN       = |$ProcN|"
+      Note $LogFile "FOR-PACT: NameSeed    = |$NameSeed|"
+      Note $LogFile "FOR-PACT: HostName    = |$HostName|"
+      Note $LogFile "FOR-PACT: Master      = |$Master|"
+      Note $LogFile "FOR-PACT: PIndx       = |$PIndx|"
+
+      Note $LogFile "Doing $Cmmnd in directory $Dir ($HostInd $ProcN)"
+
+# execute command in fault tolerant way
+      call EXEC_CMD(log, $LogFile)
+
+      if ($AErr != 0) then
+         set OK = 1
+         Note $LogFile "FOR-PACT: Failed for $Dir"
+      else
+         set OK = 0
+         Note $LogFile "FOR-PACT: Succeeded for $Dir ($attempt)"
+      endif
+      sync
+
+      if ("$HostName" != "$Master") then
+         scp $LogFile ${Master}:$LogFile
+         rm -f $LogFile
+      endif
+   endif
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# CHECK - check for a finished package and take care of
+#       - exit status and disposition of the logfile
+
+CHECK:
+
+   set Indx = $CallArgs[1]
+
+   set This  = UNUSED
+   set Avail = TRUE
+   set Other = ""
+   foreach i ($InUse)
+      if ($i == $Indx) then
+         set This  = USED
+         set Avail = FALSE
+      else
+         set Other = ( $Other $i )
+      endif
+   end
+
+   if ($This == USED) then
+      set done = FALSE
+      set Err  = 0
+
+      set files = `ls ${LogRoot}.*.$Indx`
+      if ($#files == 2) then
+         set hout = $files[2]
+      else
+         set hout = ""
+      endif
+
+      if (-e "$hout") then
+         grep "FOR-PACT: Succeeded for" $hout > /dev/null
+         if ($status == 0) then
+            set done = TRUE
+         endif
+
+         grep "FOR-PACT: Failed for" $hout > /dev/null
+         if ($status == 0) then
+            set done = TRUE
+            set Err  = 1
+         endif
+      endif
+
+      if ($done == TRUE) then
+         if ("$STDOUT" == "") then
+            echo " "
+            awk '$1 !~ /FOR-PACT:/ { print }' $hout
+         else if ($Tee == TRUE) then
+            echo " " |& tee -ai $STDOUT
+            awk '$1 !~ /FOR-PACT:/ { print }' $hout |& tee -ai $STDOUT
+         else
+            echo " " >>& $STDOUT
+            awk '$1 !~ /FOR-PACT:/ { print }' $hout >>& $STDOUT
+         endif
+
+         rm $hout
+         set InUse = ( $Other )
+         set This  = UNUSED
+         set Avail = TRUE
+      endif
+
+# stop and clean up on error
+      if ($Err == 1) then
+         set OK = 1
+         if ($Cntinue == FALSE) then
+            echo ""
+            echo "Error in parallel command - exiting"
+            echo ""
+            exit($OK)
+         else
+            echo ""
+            echo "Error in parallel command - continuing"
+            echo ""
+         endif
+      endif
+
+   endif
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# QNAME - get the fully qualified host name
+#       - input is UHost
+#       - output is QHost and Domain
+
+QNAME:
+
+   set NLSExe = `which nslookup`
+
+   if (-x "$NLSExe") then
+      set QHost = `$NLSExe $UHost |& awk '($1 == "Name:") { print $2 }'`
+   else
+      set NLSExe = `which ping`
+      if (-x "$NLSExe") then
+         set QHost = `$NLSExe -c 1 $UHost |& awk '($1 == "PING") { print $2 }'`
+      else
+         echo "No NS lookup tool available"
+         exit(3)
+      endif
+   endif
+
+   if ("$QHost" == "") then
+      echo "Can't determine fully qualified host name - watch out"
+      set QHost = $UHost
+   endif
+
+   set Domain = `echo $QHost | sed 's/'$UHost'//'`
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# HANDLE_ENV - set environment variables specfied in config file
+
+HANDLE_ENV:
+
+   if ("$Directories" == "") then
+      set Paths   = `cat $CFDFile | awk '($1 == "Path") { for (i = 3; i <= NF; i++) print $i }'`
+      set EnvVars = `cat $CFDFile | awk '($1 == "setenv") { print $1 " " $2 " " $3 " ;" }'`
+   else
+      set Paths   = ""
+      set EnvVars = ""
+   endif
+
+   set path = ( $Paths $Root/bin $path )
+   eval "$EnvVars"
+
+# NOTE: this will not make it into the log files such as build or auto
+# it will only make it to the log files such as log-1, etc
+# this is because anything else would require do-net to know about the application
+   if ($#CallArgs > 0) then
+      set EnvLog = $CallArgs[1]
+      Note $EnvLog "FOR-PACT: Path: $path"
+      Note $EnvLog "FOR-PACT: Variables: $EnvVars"
+#      Note $EnvLog "FOR_PACT: `which pact`"
+#      env | sort | awk '{ printf("FOR_PACT: %s\n", $0);}' >>& $EnvLog
+   endif
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# EXEC_CMD - execute command in fault tolerant way
+
+EXEC_CMD:
+
+   set EMeth = $CallArgs[1]
+   set ELog  = $CallArgs[2]
+
+   foreach attempt ( $Attempts )
+
+# execute the command according to the specified method for
+# handling the output
+      switch ($EMeth)
+         case none:
+              eval $Cmmnd
+              set nstatus = $status
+              breaksw
+         case tee:
+              eval $Cmmnd | tee -ai $ELog
+              set nstatus = $status
+              breaksw
+         case log:
+              flog $ELog eval $Cmmnd
+              set nstatus = $status
+              breaksw
+      endsw
+
+# evaluate the exit status
+      set ErrPr = "*--------------------------------"
+      if ($nstatus != 0) then
+         set AErr = 1
+         if ($NAttempts > 1) then
+            set Txt = "$ErrPr Attempt ($attempt/$NAttempts) failed |$Cmmnd| ($nstatus)"
+            if ($ELog == stdout) then
+               echo "$Txt"
+            else
+               Note $ELog "$Txt"
+            endif
+         endif
+
+         if ($attempt < $NAttempts) then
+            set Txt = "$ErrPr Retry in $Delay seconds"
+            if ($ELog == stdout) then
+               echo "$Txt"
+            else
+               Note $ELog "$Txt"
+            endif
+         endif
+         sleep $Delay
+
+      else
+         set AErr = 0
+         if ($attempt > 1) then
+            set Txt = "$ErrPr Attempt ($attempt/$NAttempts) successful"
+            if ($ELog == stdout) then
+               echo "$Txt"
+            else
+               Note $ELog "$Txt"
+            endif
+         endif
+         break
+      endif
+   end
+
+   return
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+
+# CLEANUP - make sure the temporary files are gone
+
+CLEANUP:
+
+   if ("$LogRoot" != "") then
+      rm -rf ${LogRoot}.*
+   endif
+
+   exit($OK)
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+

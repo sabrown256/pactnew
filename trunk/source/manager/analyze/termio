@@ -1,0 +1,143 @@
+#!/bin/csh -f
+#
+# TERMIO - analyze the handling of termios or termio
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: termio"
+
+set termio = ""
+
+set NO_TERMINAL = TRUE
+
+echo "" >! $Tmp.h
+Note $Tmp.h "#include <unistd.h>"
+Note $Tmp.h "#include <sys/ioctl.h>"
+Note $Tmp.h "#include <fcntl.h>"
+
+switch ($HostOS)
+   case Darwin:
+   case FreeBSD:
+        Note $Tmp.h "#include <sys/termios.h>"
+        Note $Tmp.h "#include <term.h>"
+        Note $Tmp.h "#include <sys/ioctl_compat.h>"
+        breaksw
+   case SunOS:
+        Note $Tmp.h "#include <sys/termios.h>"
+        Note $Tmp.h "#include <sys/termio.h>"
+        breaksw
+   case AIX:
+        Note $Tmp.h "#include <termios.h>"
+        Note $Tmp.h "#include <sys/termio.h>"
+        breaksw
+   case OSF1:
+        Note $Tmp.h "#include <sys/termios.h>"
+        Note $Tmp.h "#include <sys/termio.h>"
+        Note $Tmp.h "#include <sys/ioctl_compat.h>"
+        breaksw
+   case IRIX64:
+        Note $Tmp.h "#include <sys/termios.h>"
+        Note $Tmp.h "#include <sys/termio.h>"
+        breaksw
+   case HPUX:
+        breaksw
+   case Linux:
+        Note $Tmp.h "#include <sys/termios.h>"
+   default:
+        breaksw
+endsw
+Note $Tmp.h "#ifndef TIOCGETP"
+Note $Tmp.h "# define TIOCGETP TCGETA"
+Note $Tmp.h "#endif"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for POSIX terminal handling
+
+cat << EOF >> $Tmp.c
+#include "$Tmp.h"
+int main(int c, char **v)
+{int rv;
+ struct termios t;
+ rv = ioctl(0, TIOCGETP, &t);
+ t.c_lflag = ICANON | ISIG | ECHO;
+ return(0);}
+EOF
+
+flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   set NO_TERMINAL = FALSE
+   set termio = ( $termio posix )
+endif
+
+rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for SYSV terminal handling
+
+cat << EOF >> $Tmp.c
+#include "$Tmp.h"
+int main(int c, char **v)
+{int rv;
+ struct termio t;
+ rv = ioctl(0, TIOCGETP, &t);
+ t.c_lflag = ICANON | ISIG | ECHO;
+ return(0);}
+EOF
+
+flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   set NO_TERMINAL = FALSE
+   set termio = ( $termio sysv )
+endif
+
+rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for BSD terminal handling
+
+cat << EOF >! $Tmp.c
+#include "$Tmp.h"
+int main(int c, char **v)
+{int rv;
+ struct sgttyb t;
+ rv = ioctl(0, TIOCGETP, &t);
+ t.sg_flags |= ( ECHO | CRMOD | CBREAK | TANDEM | ALLDELAY );
+ return(0);}
+EOF
+
+flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   set NO_TERMINAL = FALSE
+   set termio = ( $termio bsd )
+endif
+
+rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($NO_TERMINAL == TRUE) then
+   NoteD $ALog "      no terminal handling"
+else
+   NoteD $ALog "      has $termio terminal handling"
+endif
+
+# export the results
+SetParent NO_TERMINAL
+
+exit(0)
+

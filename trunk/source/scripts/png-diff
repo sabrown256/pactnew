@@ -1,0 +1,115 @@
+#!/bin/csh -f
+#
+# PNG-DIFF - try to do for PNG files what PS-DIFF does for PostScript
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+set fa = ""
+set fb = ""
+set cmp = bits
+set sfx = png
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: png-diff [-h] [-i] [-s <sfx>] <file1> <file2>"
+           echo "   h  this help message"
+           echo "   i  visually compare the files"
+           echo "   s  set suffix to <sfx>"
+           echo "      use jpg to compare JPEG files"
+           echo "      use png to compare PNG files (default)"
+           echo "   <file>  can be 'foo.001.png' for a single file"
+           echo "           or 'foo' for all files matching foo.*.png"
+           echo ""
+           exit(1)
+           breaksw
+      case -i:
+           set cmp = visual
+           breaksw
+      default:
+           if ("$fa" == "") then
+              if ("$1" =~ *.png) then
+                 set sfx = png
+                 set fa = $1:r
+              else if ("$1" =~ *.jpg) then
+                 set sfx = jpg
+                 set fa = $1:r
+              else
+                 set fa = $1
+              endif
+           else if ("$fb" == "") then
+              if ("$1" =~ *.png) then
+                 set sfx = png
+                 set fb = $1:r
+              else if ("$1" =~ *.jpg) then
+                 set sfx = jpg
+                 set fb = $1:r
+              else
+                 set fb = $1
+              endif
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if (("$fa" == "") || ("$fb" == "")) then
+   echo "Two files are required - exiting"
+   exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+else
+   
+   foreach i ($fa*.$sfx)
+      if (-e $i) then
+         set j = $i:r
+
+         if ($j == $fa) then
+            set s = ".$sfx"
+         else
+            set s = .$j:e.$sfx
+         endif
+      else
+         set s = .$j:e.$sfx
+      endif
+
+      set ga = $fa$s
+      set gb = $fb$s
+
+      diff $ga $gb >& /dev/null
+      if ($status == 0) then
+         echo "   $ga and $gb compare"
+      else
+         echo "   $ga and $gb differ"
+         @ err = $err + 1
+      endif
+
+      if ($cmp == visual) then
+         ( display -geometry 800x800+0+0 $ga & ) >& /dev/null
+         ( display -geometry 800x800+800+0 $gb & ) >& /dev/null
+         echo -n "-> "
+         set rsp = ( $< )
+         set ids = ( `ls-jobs -rn -q display |& awk '{print $2}'` )
+         kill $ids >& /dev/null
+         if ("$rsp" =~ q*) then
+            break
+         endif
+      endif
+   end
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
+

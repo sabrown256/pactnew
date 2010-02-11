@@ -1,0 +1,123 @@
+#!/bin/csh -f
+#
+# NBIT - determine whether the current CPU supports 32 and/or 64 bit mode
+#      - and what the default is
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Err = 0
+set Tmp = $cwd/.tmp-nbit.$$
+set OS  = `uname -s`
+
+set Which   = "swhich -1"
+set DefOnly = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           set DefOnly = TRUE
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: nbit [-h] [-d]"
+           echo "  List address modes available (default listed first)"
+           echo "  h   this help message"
+           echo "  d   only print the default"
+           echo ""
+           exit(1)
+   endsw
+   shift
+end
+
+set CList = ""
+if ("$OS" == AIX) then
+   set CList = ( $CList xlc -q32 -q64 )
+else if ("$OS" == OSF1) then
+   set CList = ( $CList cc -xtaso -g )
+endif
+set CList = ( $CList gcc -m32 -m64 )
+set CList = ( $CList gcc -mpowerpc -mpowerpc64 )
+
+cat << EOF >&! $Tmp.c 
+#include <stdio.h>
+int main(int c, char **v)
+   {printf("%d\n", 8*sizeof(char *));
+    return(0);}
+EOF
+
+set lst = ( $CList )
+while ($#lst > 0)
+   set Cmp   = $lst[1]
+   set Check = ( 32 $lst[2] 64 $lst[3] )
+   shift lst
+   shift lst
+   shift lst
+
+   set CExe = `$Which $Cmp`
+   if (-x "$CExe") then
+
+      if ("$Cmp" == gcc) then
+         set cbin = $CExe:h
+         set clib = $cbin:h/lib
+         setenv LD_LIBRARY_PATH $clib
+      endif
+
+      set BuildOK = TRUE
+      set List    = ""
+
+# check default mode
+      set ResDf = ""
+      $Cmp $Tmp.c -o $Tmp >& /dev/null
+      if (-x $Tmp) then
+         set ResDf = `$Tmp`
+         set List  = ( $List $ResDf )
+      endif
+
+      while ($#Check > 0)
+         set NBit  = $Check[1]
+         set CFlag = $Check[2]
+         shift Check
+         shift Check
+
+         $Cmp $CFlag $Tmp.c -o $Tmp >& /dev/null
+         if (-x $Tmp) then
+            $Tmp >& /dev/null
+            if ($status == 0) then
+               set Res = `$Tmp`
+               if ($Res == $NBit) then
+                  set ok = TRUE
+                  foreach i ( $List )
+                     if ($Res == $i) then
+                        set ok = FALSE
+                        break
+                     endif
+                  end
+                  if ($ok == TRUE) then
+                     set List = ( $List $Res )
+                  endif
+               endif
+            endif
+         else
+            set BuildOK = FALSE
+         endif
+      end
+
+      if ($BuildOK == TRUE) then
+         if ($DefOnly == TRUE) then
+            echo "${ResDf}"
+         else
+            echo "Address modes: $List"
+         endif
+         break
+      endif
+   endif
+end
+
+rm -f $Tmp $Tmp.c >& /dev/null
+
+exit($Err)
+

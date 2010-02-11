@@ -1,0 +1,50 @@
+#!/bin/csh -f
+#
+# MEM - SCHEME memory tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           MEMORY TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SCHEME Memory Test ........... "
+   Note $Log ""
+
+   flog $Log pwd
+   flog $Log cp $FilesDir/mmtst.scm .
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/scheme -e -l $FilesDir/mmtst.scm
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/mmtst.scm  |& \
+      grep "ERROR SUMMARY:"                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log rm -f '#tmp#' mmtst.scm
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

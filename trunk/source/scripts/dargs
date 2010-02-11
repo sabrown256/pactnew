@@ -1,0 +1,32 @@
+#!/bin/csh -f
+#
+# DARGS - display command line args
+#       - it takes any number of arguments
+#       - and returns an exit status of 0
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: dargs [-h] <arg>*"
+           echo ""
+           echo "   h - this help message"
+           echo ""
+           exit(1)
+
+      default:
+           echo -n "$1 "
+           breaksw
+   endsw
+   shift
+end
+
+echo ""
+
+exit(0)
+

@@ -1,0 +1,86 @@
+#!/bin/csh -f
+#
+# HDF5 - analyze platform HDF5
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: hdf5"
+
+# vanilla place to look if previously undefined
+SafeEnv HDF_Path /usr
+
+# if we have explicitly said we do not want HDF5
+# do NOT detect it
+if ($HDF_Path == none) then
+   NoteD $ALog "      no HDF5 (by request)"
+   setenv HAVE_HDF5 ""
+
+else
+
+   set UTime = `timer -r`
+
+# write a little HDF5 test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <hdf5.h>
+int main(int c, char **v)
+{H5_init_library();
+ H5Eset_auto(NULL, stderr);
+ H5check_version(H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
+ return(0);}
+EOF
+
+   if ($?HDF_Path) then
+      set lIncDirs = ( $HDF_Path/include /usr/local/hdf5/include /usr/local/include $RootInc )
+      set lLibDirs = ( $HDF_Path/lib /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
+   else
+      set lIncDirs = ( /usr/local/hdf5/include /usr/local/include $RootInc )
+      set lLibDirs = ( /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
+   endif
+   set lHdrs    = ( hdf5.h )
+   set ASList   = ( a so )
+   set lLib     = hdf5
+   set lFile    = $Tmp
+   set lALibs   = ( $LD_Lib )
+   set Implicit = FALSE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+      NoteD $ALog "      has HDF5 ($PckLib)"
+
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         setenv CC_Inc "$CC_Inc $PckInc"
+      endif
+
+      setenv LD_Lib     "$PckLib $LD_Lib"
+      setenv HAVE_HDF5  TRUE
+   else
+      NoteD $ALog "      no compatible HDF5 version"
+      setenv HAVE_HDF5 ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   setenv HDFLib "$PckLib"
+   setenv HDFInc "$PckInc"
+
+# export the results
+   SetParent HAVE_HDF5
+   SetParent HDFInc
+   SetParent HDFLib
+   SetParent CC_Inc
+   SetParent LD_Lib
+
+endif
+
+exit(0)
+

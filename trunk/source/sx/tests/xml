@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# XML - SX XML DB test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                                XML TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SX PDB XML Test .............. "
+   Note $Log ""
+
+   flog $Log rm -f sxxml.log sxxml.res foo.xml
+
+   flog $Log cp $TDir/txml* .
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/sxxml.scm >& sxxml.res)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/sxxml.scm |& \
+      grep "ERROR SUMMARY:"                                                  |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set Ref   = $RootDir/sx/tests/ref/sxxml
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set xstatus = 2
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($xstatus/$ETime)"
+      set xstatus = 2
+   else if (-f $Ref) then
+      flog $Log diff sxxml.res $Ref
+      set xstatus = $status
+   else
+      flog $Log cp sxxml.res $Ref
+   endif
+
+   if ($xstatus == 2) then
+      set Err = 1
+   else if ($xstatus != 0) then
+      NoteD $Log "FAILED ($ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+      flog $Log touch foo.sxxml sxxml.foo
+      flog $Log rm -f sxxml.* *.sxxml
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

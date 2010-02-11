@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# CSUM - PML checksum tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PML CHECKSUM TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PML Checksum Test ...... "
+
+   set FAIL = ok
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE checksum
+   set TStatus = $status
+   set Ref     = $cwd/tests/ref/checksum
+   flog $Log popd
+
+   set UTime = `$TIMER -r`
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PML Checksum Test Program"
+      set xstatus = $TStatus
+      set FAIL    = build
+   else
+      if ("$Valgrind" == "") then
+         flog $Log ($CFE $BinDir/mlckts $RootDir/pml/mlcmsh.c >&! checksum.res)
+         set xstatus = $status
+      else
+         flog $Log $Valgrind $BinDir/mlckts $RootDir/pml/mlcmsh.c
+         set xstatus = $status
+      endif
+      if ($xstatus != 0) then
+         NoteD $Log ""
+         NoteD $Log "                         Error in Checksum Test Program"
+         set FAIL = ng
+      endif
+
+      if ((-f $Ref) && ("$Valgrind" == "")) then
+         flog $Log (diff checksum.res $Ref >&! checksum.diff)
+         set xstatus = $status
+         if ($xstatus != 0) then
+            set FAIL = differ
+         endif
+      endif
+
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($FAIL/$ETime)"
+      @ Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

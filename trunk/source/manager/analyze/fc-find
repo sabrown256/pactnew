@@ -1,0 +1,119 @@
+#!/bin/csh -f
+#
+# FC-FIND - find Fortran compilers on the current path
+#         - this only runs from pact/manager
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+set F90     = TRUE
+set Verbose = FALSE
+set nfclst  = ""
+while ($#argv > 0)
+   switch ($1)
+       case -h:
+            echo ""
+            echo "Usage: fc-find [-h] [-v] [-w] <fc>*"
+            echo "  h   this help message"
+            echo "  v   verbose mode"
+            echo "  w   compiler works F90 or not"
+            echo ""
+            exit(1)
+       case -v:
+            set Verbose = TRUE
+            breaksw
+       case -w:
+            set F90 = FALSE
+            breaksw
+       default:
+            set ok = TRUE
+            foreach i ($nfclst)
+               if ($i == $1) then
+                  set ok = FALSE
+                  break
+               endif
+            end
+            if ($ok == TRUE) then
+               set nfclst = ( $nfclst $1 )
+            endif
+   endsw
+   shift
+end
+
+cat << EOF >! $Tmp.f
+      subroutine foo(bar)
+      integer :: bar
+      integer, intrinsic :: selected_int_kind
+      bar = selected_int_kind(5)
+      end subroutine foo
+EOF
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIST - make sure the list elements are unique and the requested
+#      - compiler is listed first
+
+set fclst = ( gfortran pgf90 ifort pathf90 xlf90 xlf f90 f95)
+
+foreach i ($fclst)
+    set ok = TRUE
+    foreach j ($nfclst)
+       if ($i == $j) then
+          set ok = FALSE
+          break
+       endif
+    end
+    if ($ok == TRUE) then
+       set nfclst = ( $nfclst $i )
+    endif
+end
+
+set fclst = ( $nfclst )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECK - try the compilers on the list
+
+set allfc = ""
+set f90fc = ""
+
+foreach fc ($fclst)
+   set res = `$MngDir/pwhich $fc`
+   if ("$res[1]" =~ /*) then
+
+      set bindir = $res:h
+      set libdir = $bindir:h/lib
+      setenv LD_LIBRARY_PATH $libdir
+
+      rm -f $Tmp.o
+      $fc -c $Tmp.f >& /dev/null
+      set xstatus = $status
+
+      if (-f $Tmp.o) then
+         set allfc = ( $allfc $fc )
+         if ($xstatus == 0) then
+            set f90fc = ( $f90fc $fc )
+         endif
+      endif
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($F90 == TRUE) then
+   echo "$f90fc"
+else
+   echo "$allfc"
+endif
+
+exit(0)
+

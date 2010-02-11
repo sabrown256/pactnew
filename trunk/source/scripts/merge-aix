@@ -1,0 +1,145 @@
+#!/bin/csh
+#
+# MERGE-AIX - combine 32 bit and 64 bit objects into a single archive
+#           - something special for AIX only
+#           - contributed by Mike Kumbera
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set AR = /usr/bin/ar
+# assume the temporary files are going to be out in the CWD
+if ($?TMPDIR) then 
+   set tmp_name = $TMPDIR/.tmp.$$
+else
+   set tmp_name = .tmp.$$
+endif
+
+# the maximum length of a single command in the shell
+set max_line = 512
+
+# check usage
+if ($#argv != 3) then 
+   echo "Usage: " $0 32_bit_lib 64_bit_lib result_lib 
+   echo "The $0 program merges 32 and 64 bit libraries into a single"
+   echo "library that can be linked to 32 OR 64bit codes. It is only"
+   echo "known to work on AIX 5.2."
+   exit(1)
+endif
+
+# sanity check the arguments
+
+# 32 bit lib argument
+if !(-r $1) then 
+   echo "Error: " File $1 cannot be read
+   exit(1)
+endif
+set count = 0
+$AR -X32 -w $1 > $tmp_name.32
+set count = `cat  $tmp_name.32 | wc -l`
+if ($count == 0) then
+   echo "Error: " Archive $1 does not contain any 32bit symbols
+   rm -f  $tmp_name.32
+   exit(1)
+endif
+
+# 64 bit lib argument
+if !(-r $2) then 
+   echo "Error: " File $2 cannot be read
+   exit(1)
+endif
+
+$AR -X64 -w $2 > $tmp_name.64
+set count = `cat $tmp_name.64 | wc -l`
+if ($count == 0) then
+   echo "Error: " Archive $2 does not contain any 64bit symbols
+   rm -f  $tmp_name.32
+   rm -f  $tmp_name.64
+   exit(1)
+endif
+
+# output lib argument
+touch $3
+if !(-r $3) then 
+   echo "Error: " File $3 cannot be created
+   rm -f  $tmp_name.32
+   rm -f  $tmp_name.64
+   exit(1)
+endif
+
+# Warn the users if there might not be a good symbol match between
+# the 32 and 64 bit libs
+
+cat $tmp_name.32 | awk '{ print $1}' | sort  > $tmp_name.32s
+cat $tmp_name.64 | awk '{ print $1}' | sort  > $tmp_name.64s 
+set count = `diff $tmp_name.32s $tmp_name.64s | wc -l`
+if !($count == 0) then
+   echo "Warning: $count symbols differ betweent the 32 and 64bit libraries."
+   diff $tmp_name.32s $tmp_name.64s
+endif
+rm -f  $tmp_name.32
+rm -f  $tmp_name.64
+
+set here = $cwd
+
+# extract the .o files from the libs
+mkdir  $tmp_name.d32 
+pushd $tmp_name.d32 >& /dev/null
+set count = `echo $1 | grep -e "^/" | wc -l `
+
+# relative path
+if ($count == 0) then
+   $AR -X32 -x $here/$1 > $tmp_name.32
+
+# absolute path
+else
+   $AR -X32 -x $1 > $tmp_name.32
+endif
+
+popd >& /dev/null
+
+mkdir  $tmp_name.d64
+pushd $tmp_name.d64 >& /dev/null
+set count = `echo $2 | grep -e "^/" | wc -l `
+
+# relative path
+if ($count == 0) then
+   $AR -X64 -x $here/$2 > $tmp_name.64
+
+# absolute path
+else
+   $AR -X64 -x $2 > $tmp_name.64
+endif
+
+popd >& /dev/null
+
+# make the merged library
+rm -f $3
+set count = `echo "$AR -X32_64 cq $3" | wc -c`
+@ count = `ls $tmp_name.d32/*.o | wc -c`
+@ count += `ls $tmp_name.d64/*.o | wc -c`
+if ($count > $max_line) then
+   foreach i ($tmp_name.d32/*.o)
+      $AR -X32_64 cq $3 $i
+   end
+   foreach i ($tmp_name.d64/*.o)
+      $AR -X32_64 cq $3 $i
+   end
+
+else
+   $AR -X32_64 cq $3 $tmp_name.d32/*.o $tmp_name.d64/*.o 
+endif
+
+# clean up
+rm -f  $tmp_name.32
+rm -f  $tmp_name.32s
+rm -f  $tmp_name.64
+rm -f  $tmp_name.64s
+rm -rf  $tmp_name.d32
+rm -rf  $tmp_name.d64
+
+exit($status)
+

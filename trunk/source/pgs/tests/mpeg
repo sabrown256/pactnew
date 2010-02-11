@@ -1,0 +1,91 @@
+#!/bin/csh -f
+#
+# MPEG - PGS MPEG tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PGS MPEG TEST
+
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   NoteD $Log ""
+   NoteD $Log "                    PGS MPEG Test .......... "
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE mpeg
+   set TStatus = $status
+   flog $Log popd
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PGS MPEG Test Program"
+      NoteD $Log "                    PGS MPEG Test .......... FAILED (-1)"
+      set Err = 1
+   else
+      flog $Log rm -f gsmpg1.mpg gsmpg2.mpg
+
+      set UTime = `$TIMER -r`
+
+      NoteD $Log -n "                        curve ..... "
+      set BTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log $CFE $BinDir/gsmpgt1
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gsmpgt1     |& \
+         grep "ERROR SUMMARY:"                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $BTime`
+      if ($xstatus != 0) then
+         NoteD $Log "ng ($xstatus/$ETime)"
+      else
+         NoteD $Log "ok ($ETime)"
+      endif
+
+      NoteD $Log -n "                        fill ...... "
+      set BTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log $CFE $BinDir/gsmpgt2
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gsmpgt2     |& \
+         grep "ERROR SUMMARY:"                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $BTime`
+      if ($xstatus != 0) then
+         NoteD $Log "ng ($xstatus/$ETime)"
+      else
+         NoteD $Log "ok ($ETime)"
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus != 0) then
+         NoteD $Log "                    PGS MPEG Test .......... FAILED ($ETime)"
+         set Err = 1
+      else
+         flog $Log rm -f gsmpg1.mpg gsmpg2.mpg
+         NoteD $Log "                    PGS MPEG Test .......... PASSED ($ETime)"
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

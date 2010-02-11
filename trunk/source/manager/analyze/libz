@@ -1,0 +1,81 @@
+#!/bin/csh -f
+#
+# LIBZ - analyze platform libz
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: libz"
+
+# vanilla place to look if previously undefined
+SafeEnv Z_Path /usr
+
+# if we have explicitly said we do not want libZ do NOT detect it
+if ($Z_Path == none) then
+   NoteD $ALog "      no libz (by request)"
+   setenv HAVE_ZLIB ""
+
+else
+
+   set UTime = `timer -r`
+
+# write a little Z test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <zlib.h>
+int main(int c, char **v)
+{int rv;
+ gzFile fp;
+ fp = gzopen("$Tmp.gz", "w");
+ rv = gzclose(fp);
+ return(rv);}
+EOF
+
+   set lIncDirs = ( $Z_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $Z_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lHdrs    = ( zlib.h )
+   set ASList   = ( a so )
+   set lLib     = z
+   set lFile    = $Tmp
+   set lALibs   = ( -lm )
+   set Implicit = TRUE
+
+   source $AnaDir/find-package
+
+   setenv ZLib "-lz"
+   if (("$PckLib" != "") && ("$ZLib" != "") && ("$PckInc" != "")) then
+      NoteD $ALog "      has libz ($PckLib)"
+
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         set ltmp = ( $PckInc $CC_Inc )
+         setenv CC_Inc "$ltmp"
+      endif
+
+      set ltmp = ( $PckLib $LD_Lib )
+      setenv LD_Lib      "$ltmp"
+      setenv HAVE_ZLIB   TRUE
+   else
+      NoteD $ALog "      no libz"
+      setenv HAVE_ZLIB ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+# export the results
+   SetParent HAVE_ZLIB
+   SetParent Z_Path
+   SetParent ZLib
+   SetParent CC_Inc
+   SetParent LD_Lib
+
+endif
+
+exit(0)
+

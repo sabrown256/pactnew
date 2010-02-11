@@ -1,0 +1,178 @@
+#!/bin/csh -f
+#
+# ASYNC - test SC_exec_async
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+# no point in running these tests if you don't have the host server setup
+if (!($?HOST_SERVER_DB)) then
+   exit(0)
+endif
+
+set Package = score
+if (-d ../../scripts) then
+   source ../../scripts/env-csh
+else if (-d ../../../scripts) then
+   source ../../../scripts/env-csh
+endif
+
+set KillSrv = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -k:
+           set KillSrv = TRUE
+           breaksw
+
+      case -h:
+           echo "Usage: do-async [-k] [-h]"
+           echo "   k   list and kill other 'dmake -srv' instances"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+   endsw
+   shift
+end
+
+if (-x ../../manager/cfgman) then
+   set TMFiles = ( `ls [tx]make*` darg )
+   cp $TMFiles $TestDir
+   pushd $TestDir >>& /dev/null
+endif
+
+setenv Log log.async
+touch foo.core core.foo
+rm -f $Log *.core core*
+
+setenv SC_EXEC_CPU_FACTOR   1024
+setenv SC_EXEC_TIME_LIMIT     64
+setenv SC_EXEC_TIME_FACTOR    16
+
+rm -f $Log
+touch $Log
+
+flog $Log date
+
+@ Err = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set Series = 5
+   Separator $Log
+   NoteD $Log -n "                       async  "
+   Note $Log ""
+
+   Note $Log "Current shell $SHELL"
+
+   set UTime = `$TIMER -r`
+
+   set Tsts = ""
+   set Tsts = ($Tsts 1 a.6 all)
+   set Tsts = ($Tsts 2 c.1 pc)
+
+   if ($KillSrv == TRUE) then
+      flog $Log sign -9 srv
+   endif
+
+   flog $Log set LErr = 0
+   while ($#Tsts > 0)
+      Separator $Log
+      Note $Log "            async tmake.$Tsts[2]"
+      Note $Log " "
+      Separator $Log
+
+      flog $Log set tst = $Tsts[1]
+      flog $Log set i   = $Tsts[2]
+      flog $Log set tgt = $Tsts[3]
+      shift Tsts
+      shift Tsts
+      shift Tsts
+
+      flog $Log set MkF = tmake.$i
+
+      set lg = log-$Series.$i
+      flog $Log rm $lg.sync $lg.async
+
+      flog $Log ($CFE dmake -f $MkF -na 1 $tgt >&! $lg.sync)
+      flog $Log ($CFE dmake -f $MkF -na 1 -async 1 $tgt >&! $lg.tmp)
+      set LStat = $status
+      Note $Log "Asynchronous dmake status = $LStat"
+
+      set Hst = `grep '| ' $lg.tmp | head -n 1`
+      set Hst = `expr "$Hst" : '\(.*\)|.*'`
+      set noglob
+      Note $Log "Eliminate '$Hst *| ' from $lg.tmp -> $lg.async"
+      cat $lg.tmp | sed "s/$Hst *| //g" >&! $lg.async
+      unset noglob
+
+      Note $Log "   -----------------------------------"
+      flog $Log cat $lg.tmp
+      Note $Log "   -----------------------------------"
+      flog $Log cat $lg.async
+      Note $Log "   -----------------------------------"
+      flog $Log cat $lg.sync
+      Note $Log "   -----------------------------------"
+
+      if ($LStat != 0) then
+         Note $Log "FAIL: dmake crashed ($LStat)"
+         echo -n "x"
+      else
+         flog $Log diff $lg.sync $lg.async
+         set CStat = $status
+         if ($CStat == 0) then
+            echo -n "."
+         else
+            flog $Log (awk '$1 !~ /***>/ { print }' $lg.async >&! $lg.asynd)
+            flog $Log diff $lg.sync $lg.asynd
+            set CStat = $status
+            if ($CStat == 0) then
+               Note $Log "FAIL: results compare after retries"
+               echo -n "o"
+            else
+               Note $Log "FAIL: results differ"
+               echo -n "x"
+            endif
+         endif
+      endif
+      flog $Log rm $lg.*
+
+      Note $Log ""
+      if ($KillSrv == TRUE) then
+         flog $Log ls-jobs srv
+         flog $Log sign -9 srv
+      endif
+
+      if ($LStat == 0) then
+         Note $Log "   async $tst succeeded ($LStat)"
+      else
+         Note $Log "   async $tst failed ($LStat)"
+         flog $Log set LErr = 1
+      endif
+   end
+
+   set ETime = `$TIMER -b $UTime`
+
+   Separator $Log
+   if ($LErr == 0) then
+      NoteD $Log "...... ok ($ETime)"
+   else
+      NoteD $Log "...... ng ($ETime)"
+      @ Err = $Err + 1
+   endif
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($?TMFiles) then
+   flog $Log rm -f $TMFiles
+   NoteD $Log ""
+   popd >& /dev/null
+else
+   Note $Log ""
+endif
+
+exit($Err)

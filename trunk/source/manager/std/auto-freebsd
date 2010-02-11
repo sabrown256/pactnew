@@ -1,0 +1,14 @@
+#
+# AUTO-FREEBSD - default Free BSD configuration with GNU LibC 6.x
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+define FREEBSD
+
+include spokes
+include compiler-gnu
+

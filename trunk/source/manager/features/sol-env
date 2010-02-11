@@ -1,0 +1,28 @@
+#
+# SOL-ENV - SOLARIS variable specifications
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath solaris
+
+Tool LD {
+   RPath   = -Wl,-rpath,@
+   Lib    += -ldl -lsocket -lw -lnsl -lsunmath -lrt
+   MDGLib += /usr/openwin/lib/libX11.a  /usr/openwin/lib/libXext.a
+}
+
+Group Cfg {
+   LD_RPath   = -Wl,-rpath,@
+   LD_Lib    += -ldl -lsocket -lw -lnsl -lsunmath -lrt
+   LD_MDGLib += /usr/openwin/lib/libX11.a  /usr/openwin/lib/libXext.a
+}
+
+define SOLARIS
+
+# NOTE: the Solaris linker does NOT support any kind of -rpath option
+setenv LD_LIBRARY_PATH ${RPATH}
+

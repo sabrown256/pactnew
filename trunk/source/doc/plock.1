@@ -1,0 +1,58 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH PLOCK 1 "16 March 2005"
+.SH NAME
+plock \- manage a lock on behalf of an application
+.SH SYNOPSIS
+.B plock [-h] [-d <name>] [-t <lifetime>] lock | unlock
+.SH DESCRIPTION
+When multiple applications are competing for resources (such as
+a specific file name to create) it is useful to be able to create
+a lock which permits only one process at a time to access the
+resource.
+
+Plock does this by making a lock which is actually a directory.
+If several plocks try to create the same lock at the same time
+only one will succeed.  The rest will wait until the lock has
+been removed by a 'plock unlock'.
+
+If the application that does a 'plock lock' dies without doing
+a 'plock unlock' then the next plock will remove the stale lock.
+
+.SH OPTIONS
+.TP
+.B \-h
+A short summary help message.
+.TP
+.B \-d
+Name of the lock.
+.TP
+.B \-t
+Lifetime of the lock in seconds. Default is 1 year.
+
+.SH RETURN
+
+Plock returns 0 if it succeeds and 1 if it fails.
+
+.SH EXAMPLES
+
+   plock -d foo -t 20 lock
+   plock -d foo unlock
+
+.SH FILES
+
+None.
+
+.SH SEE ALSO
+
+.B system-id(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

@@ -1,0 +1,34 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Do 'dsys config -h' in the pact/manager directory to see a list
+of options.
+
+Examples:
+
+1) dsys config -g -i /usr/local -pgi -s
+
+   Build a debuggable, OpenMP version using the PGI compilers on
+   a Linux system and install in /usr/local/{bin,lib,include,scheme,man,doc}
+
+
+2) dsys config -g -i none -mpi -t -py
+
+   Build a debuggable, pthreaded MPI version with Python bindings
+   with the default compiler for the system and do not install.
+
+
+3) dsys config -o
+
+   Build an optimized version with no threads, MPI, or Python support
+   with the default compiler for the system and install in
+   /usr/local (the default).
+
+4) dsys config -sl
+
+   Build a shared libraries with all other settings defaulted.
+

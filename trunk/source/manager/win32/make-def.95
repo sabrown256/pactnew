@@ -1,0 +1,77 @@
+#
+# MAKE-DEF.BC - installation dependent definitions
+#
+
+# SYSTEM  = DOS
+SYSTEM  =
+MACHINE = DOS
+RootDir = c:\pactdir\pact
+ScmDir  = ${RootDir}\scheme
+
+#
+# Site Dependent Graphics Information
+#
+
+HGIDir = c:\bc5\include
+HGLDir = c:\bc5\lib
+HGLibs = 
+LDF    = tld
+GSYS= 
+
+LR = ls
+
+DATE="V"
+
+#
+# Compiler/Loader Options
+#
+# Notes: -a force alignments to word boundaries (most natural to hardware)
+#
+
+MemModel = l
+#CFLAGS   = -m${MemModel} -v -Y -a -Ic:\bc5\include
+IncFlag  = -I
+CPPFlags = 
+#CPPFlags = -UMSDOS -D__TURBOC__ -I${HGIDir} -I${IncDir}
+#(16 bit) CFLAGS   = -m${MemModel} -v -a -w-aus -w-par -w-pro -Ic:\bc5\include
+CFLAGS   = -v -a -w-aus -w-par -w-pro -Ic:\bc5\include
+
+#
+# Compiler/Loader Invokations
+#
+CC = bcc32 ${CPPFlags} ${CFLAGS} ${UniFlags} ${CcFlags}
+LD = ..\manager\ld
+LINK = bcc32 -v -L${LibDir};${HGLDir} 
+AR = ..\manager\lib ${TGTLib}
+# AR = tlib ${TGTLib} /E /C
+
+.SUFFIXES : .i .p .l
+
+.l.o :
+        flex $<
+        mv lexyy.c $*.c
+        rm -f $*.o $*.obj
+        ${CC} -c $*.c
+        ren $*.obj $*.o > NUL
+        rm $*.c
+
+.c.o :
+        rm -f $*.o $*.obj
+        ${CC} -c $<
+        ren $*.obj $*.o > NUL
+
+.c.i :
+        rm -f $*.i
+        c:\bc5\bin\cpp ${UniFlags} -Ic:\bc5\include ${CcFlags} $<
+
+.c.p :
+        rm -f $*.p
+        proto $< $*.p ${CPPFlags}
+
+
+
+
+
+
+
+

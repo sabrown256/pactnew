@@ -1,0 +1,66 @@
+#
+# pre-Make for S
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include ../dev/${System}/include/pre-Make.defs
+
+TGTBin = none
+TGTExe = ${DevBin}/s
+TGTLib = ${DevLib}/libs.a
+TGTInc = ${Hdrs}
+
+#
+# Things upon which install depends (pact install)
+#
+DepLib     = 
+InstallDep = ${Hdrs} ${TGTLib} ${TGTExe}
+BinDep     = ${TGTLib} s.c
+BinObj     = ${TGTLib} s.c
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
+CcFlags  = ${CDebug} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+
+PactLibs = ${LSX} ${LSCHEME} ${LPANACEA} ${LPGS} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLibs}
+SysLibs  = -lmesh -llag \
+           -lmisc
+Libs     = ${TGTLib} ${SysLibs} ${PactLibs} ${MDGLib} ${MDLib} -lm
+
+#
+# Files to remove in directory clean (make clean)
+#
+CleanFiles = *~ core #*#
+
+#
+# Code Units
+#
+Hdrs = s.h
+
+Objs = scmd.o
+
+ArObjs = ${TGTLib}(scmd.o)
+
+${Objs} : ${Hdrs}
+${TGTLib} : ${Hdrs}
+
+
+${TGTExe} : ${BinDep}
+	${CC} -c s.c -o ${PACTTmpDir}/s.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/s.o -o ${TGTExe} ${Libs}
+
+install : ${InstallDep}
+	@cp ${Hdrs} ${DevInc}
+
+lib :
+	rm -f ${TGTLib}
+	pact install

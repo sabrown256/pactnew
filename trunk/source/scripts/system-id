@@ -1,0 +1,154 @@
+#!/bin/csh -f
+#
+# SYSTEM-ID - print a hopefully unique system identifier
+#           - which is concise (short) and specifies the
+#           - hardware (CPU), operarting system, and OS release
+#           - NOTE: this is too slow for anything but boot strapping
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/system-id") then
+   set path = ( $Exe $path )
+endif
+
+set Which = "swhich -1"
+
+set Here = $0
+set Here = $Here:h
+if (-d "$Here") then
+   cd $Here
+endif
+
+set PX = `$Which px`
+if (!(-x "$PX")) then
+   set PX = ""
+endif
+
+set OS = `$PX uname -s | tr "[A-Z]" "[a-z]"`
+set RL = `$PX uname -r`
+
+switch ($OS[1])
+   case "aix" :
+        set VS = `uname -v`
+        echo "aix-${VS}.${RL}"
+        breaksw
+
+   case "cygwin*" :
+        set VS = ( `echo "$RL" | sed 's/\./ /g'` )
+        echo "cygwin-$VS[1].$VS[2]"
+        breaksw
+
+   case "darwin" :
+
+        @ DaRel = `/usr/bin/uname -r | sed 's/\..*//'`
+        @ DaRel = $DaRel - 4;
+
+        set CPU = `/usr/bin/uname -p`
+        if ($CPU =~ *86*) then
+           set CPQ = "-x86"
+        else if ($CPU =~ *powerpc*) then
+           set CPQ = "-ppc"
+        else
+           set CPQ = ""
+        endif
+        echo "osx-10.$DaRel$CPQ"
+        breaksw
+
+   case "hp-ux" :
+        set inf = ( `echo $RL | tr "[A-Z]" "[a-z]" | sed 's/\./ /'` )
+        echo "hpux-$inf[2]$inf[1]"
+        breaksw
+
+   case "irix*" :
+        echo "irix-$RL"
+        breaksw
+
+   case "linux" :
+        set Concise = unk
+        foreach i (/lib/libc*.so*)
+           set ve = `echo $i | sed 's/-/ /' | sed 's/\./ /g'`
+           if (($ve[1] == /lib/libc) && ($#ve > 3)) then
+              set Concise = "$ve[2].$ve[3]"
+              break
+           endif
+        end
+
+        if ($Concise == unk) then
+           foreach i (/lib/libc*.so*)
+              @ ni = `nm $i | grep -w T | grep "@@GLIBC_2.1" | wc -l`
+              if ($ni > 50) then
+                 set Concise = "2.3"
+                 break
+              endif
+           end
+        endif
+
+        set HW = `uname -m | tr "[A-Z]" "[a-z]"`
+        switch ($HW)
+           case ia64:
+                echo "lnx-$Concise-i64"
+                breaksw
+           case *86:
+           case ia32:
+                grep elan /proc/modules >& /dev/null
+                if ($status == 0) then
+                   echo "lnx-$Concise-q"
+                else if (-d /proc/elan) then
+                   echo "lnx-$Concise-q"
+                else
+                   echo "lnx-$Concise"
+                endif
+                breaksw
+           case alpha:
+                echo "lnx-$Concise-a"
+                breaksw
+           case x86_64:
+                grep ib_core /proc/modules >& /dev/null
+                if ($status == 0) then
+                   echo "lnx-$Concise-ib"
+                else
+                   echo "lnx-$Concise-o"
+                endif
+                breaksw
+           case ppc64:
+                echo "lnx-$Concise-ppc"
+                breaksw
+           default:
+                echo "lnx-$Concise-$HW"
+                breaksw
+        endsw
+        breaksw
+
+   case "freebsd*" :
+        set rl = `expr "$RL" : '\(.*\)-RELEASE'`
+        echo "freebsd-$rl"
+        breaksw
+
+   case "osf*" :
+        set rl = `expr "$RL" : 'V\(.*\)'`
+        echo "osf-$rl"
+        breaksw
+
+   case "sunos" :
+        echo "sol-$RL"
+        breaksw
+
+   default :
+        if ($OS[1] != "") then
+           echo "$OS[1]-$RL"
+        else
+           echo "$RL"
+        endif
+        breaksw
+
+endsw
+
+exit($status)
+
+

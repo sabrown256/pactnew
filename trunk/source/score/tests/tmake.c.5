@@ -1,0 +1,35 @@
+#
+# test dependency analysis - mimic the SCORE lex dependency usage
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+.l.o:
+	@echo "LO $< -> $@"
+	@touch $@
+
+.c.o:
+	@echo "CO $< -> $@"
+	@touch $@
+
+.l.a:
+	@echo "LA $< -> $*"
+
+a.o : a.l b.h
+
+TGTLib = libtst.a
+ArObjs = ${TGTLib}(a.o)
+
+work : ${ArObjs}
+
+setup :
+	touch a.o
+	ar r ${TGTLib} a.o 2> /dev/null
+	rm a.o
+	sleep 1
+	touch a.l b.h
+
+cleanup :
+	rm -f [ab].[lcho] libtst.a
+

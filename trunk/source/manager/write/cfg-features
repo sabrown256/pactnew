@@ -1,0 +1,63 @@
+#!/bin/csh -f
+#
+# CFG-FEATURES - common code to generate the feature list of a config
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+foreach f ($flst)
+   if (-f features/$f) then
+      echo "include features/$f" >> $Tmp
+   else if ($vrb == TRUE) then
+      echo "unknown feature $f - ignored"
+   endif
+end
+
+if (($shared == TRUE) && ($python == FALSE)) then
+   echo "include shared" >> $Tmp
+   set cfg = "$cfg-sl"
+   if ($vrb == TRUE) then
+      echo "   add shared library support"
+   endif
+endif
+
+if (($pthread == TRUE) && ($openmp == FALSE)) then
+   echo "include pthread" >> $Tmp
+   set cfg = "$cfg-t"
+   if ($vrb == TRUE) then
+      echo "   add pthread"
+   endif
+endif
+
+if (($openmp == TRUE) && ($pthread == FALSE)) then
+   echo "include openmp" >> $Tmp
+   set cfg = "$cfg-s"
+   if ($vrb == TRUE) then
+      echo "   add openmp"
+   endif
+endif
+
+if ($python == TRUE) then
+   echo "include python" >> $Tmp
+   if ("$pydir" != "") then
+      echo "Group Python {" >> $Tmp
+      echo "   Path = $pydir" >> $Tmp
+      echo "}" >> $Tmp
+   endif
+   set cfg = "$cfg-py"
+   if ($vrb == TRUE) then
+      echo "   add python"
+   endif
+endif
+
+if ($mpi == TRUE) then
+   echo "include mpi" >> $Tmp
+   set cfg = "$cfg-mpi"
+   if ($vrb == TRUE) then
+      echo "   add mpi"
+   endif
+endif
+

@@ -1,0 +1,117 @@
+#!/bin/csh -f
+#
+# GRTEST - graphical display test for PGS
+#
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+#include "cpyright.h"
+
+
+set GPLOT = `which \gplot`
+set GIST  = `which \gist`
+set GS    = `which \gs`
+
+if (("$GIST" != "") && ($#GIST == 1)) then
+   set CGMView = "$GIST"
+else if (("$GPLOT" != "") && ($#GPLOT == 1)) then
+   set CGMView = "$GPLOT"
+else
+   set CGMView = ""
+endif
+
+echo " "
+echo "Using $CGMView as the CGM viewer"
+
+if ($GS != "") then
+   set PSView = $GS
+else
+   set PSView = ""
+endif
+
+echo "Using $PSView as the PS viewer"
+echo " "
+
+touch __foo__.ps __foo__.cgm
+rm *.ps *.cgm
+rm -f graphics.log
+touch graphics.log
+
+pact image >& /dev/null
+
+echo "-----------------------------------------------------------------------------"
+echo "Image Test"
+(echo "" ; echo "") | gsimts
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "Image Test" >>& graphics.log
+if ($PSView != "") then
+   echo quit | $PSView gsimts-m.ps >>& graphics.log
+   echo quit | $PSView gsimts-c.ps >>& graphics.log
+endif
+if ($CGMView != "") then
+   echo quit | $CGMView gsimts-m.cgm >>& graphics.log
+   echo quit | $CGMView gsimts-c.cgm >>& graphics.log
+endif
+echo "" >>& graphics.log
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "-----------------------------------------------------------------------------"
+
+pact fillpoly >& /dev/null
+
+echo "-----------------------------------------------------------------------------"
+echo "Polygon Fill Test"
+(echo "" ; echo "") | gsfpts
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "Polygon Fill Test" >>& graphics.log
+if ($PSView != "") then
+   echo quit | $PSView gsfpts-m.ps >>& graphics.log
+   echo quit | $PSView gsfpts-c.ps >>& graphics.log
+endif
+if ($CGMView != "") then
+   echo quit | $CGMView gsfpts-m.cgm >>& graphics.log
+   echo quit | $CGMView gsfpts-c.cgm >>& graphics.log
+endif
+echo "" >>& graphics.log
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "-----------------------------------------------------------------------------"
+
+pact surface >& /dev/null
+
+echo "-----------------------------------------------------------------------------"
+echo "Wire Frame Test"
+(echo "0 10" ; echo "") | gssfts -f > /dev/null
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "Wire Frame Test" >>& graphics.log
+if ($PSView != "") then
+   echo quit | $PSView gssfts-m.ps >>& graphics.log
+   echo quit | $PSView gssfts-c.ps >>& graphics.log
+endif
+if ($CGMView != "") then
+   echo quit | $CGMView gssfts-m.cgm >>& graphics.log
+   echo quit | $CGMView gssfts-c.cgm >>& graphics.log
+endif
+echo "" >>& graphics.log
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "-----------------------------------------------------------------------------"
+
+echo "-----------------------------------------------------------------------------"
+echo "Surface Test"
+(echo "0 10" ; echo "") | gssfts -f -s > /dev/null
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "Surface Test" >>& graphics.log
+if ($PSView != "") then
+   echo quit | $PSView gssfts-m.ps >>& graphics.log
+   echo quit | $PSView gssfts-c.ps >>& graphics.log
+endif
+if ($CGMView != "") then
+   echo quit | $CGMView gssfts-m.cgm >>& graphics.log
+   echo quit | $CGMView gssfts-c.cgm >>& graphics.log
+endif
+echo "" >>& graphics.log
+echo "-----------------------------------------------------------------------------" >>& graphics.log
+echo "-----------------------------------------------------------------------------"
+
+exit($status)
+

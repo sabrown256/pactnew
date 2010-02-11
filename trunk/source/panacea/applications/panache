@@ -1,0 +1,27 @@
+#!/bin/csh -f
+#
+# PANACHE - generate the PANACEA interface coding from a dictionary
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+pushd `dirname $0` >& /dev/null
+set BinDir = $cwd
+popd >& /dev/null
+
+set ScmDir = $BinDir:h/scheme
+setenv SCHEME ${SCHEME}:$ScmDir
+
+set CFE = ""
+if ($?CROSS_COMPILE == 1) then
+   if ($CROSS_COMPILE == TRUE) then
+      set CFE = $BinDir/do-run
+   endif
+endif
+
+$CFE $BinDir/sx -q -l panache.scm \(ld $1\)
+
+exit($status)

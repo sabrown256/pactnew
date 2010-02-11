@@ -1,0 +1,65 @@
+#!/bin/csh -f
+#
+# GLIBC - analyze GNU LibC version
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+SafeEnv HAVE_GNU_LIBC_6 FALSE
+
+set GCC = `$Which gcc`
+if (-x "$GCC") then
+
+cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+   {char *s;
+    extern char *gnu_get_libc_version(void);
+
+    s = gnu_get_libc_version();
+    printf("%s\n", s);
+
+    return(0);}
+EOF
+
+   flog $ALog gcc $Tmp.c -o $Tmp -lc
+   
+   set ok = FALSE
+   if (-x $Tmp) then
+      set lvers = `$Tmp`
+      set inf   = ( `echo "$lvers" | sed 's/\./ /g'`)
+      if ($#inf > 1) then
+         @ MajorV = $inf[1]
+         @ MinorV = $inf[2]
+   
+         if (($MajorV >= 2) && ($MinorV >= 2)) then
+            set ok = TRUE
+         endif
+      endif
+      NoteD $ALog "      has GNU LibC $lvers"
+      unset inf
+      unset lvers
+else
+      NoteD $ALog "      no GNU LibC version"
+   endif
+
+   if ($ok == TRUE) then
+      setenv HAVE_GNU_LIBC_6 TRUE
+   endif
+
+   rm -f $Tmp.c $Tmp
+
+else
+   NoteD $ALog "      no GCC found on this system"
+endif
+
+SetParent HAVE_GNU_LIBC_6
+
+#exit(0)
+

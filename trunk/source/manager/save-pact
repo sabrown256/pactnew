@@ -1,0 +1,210 @@
+#!/bin/csh -f
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Public    = `grep InstDir installx | awk  '{print $4}'`
+set VarDir    = /var/tmp
+set SchemeDir = `grep SchemeDir installx | awk  '{print $4}'`
+set Owner     = `grep Owner installx | awk  '{print $4}'`
+set Group     = `groups | awk '{print $1}'`
+
+rm -f installx
+
+set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+
+set TmpDir = $VarDir/pactold
+set machine = `cat machinex`
+if ($machine == "helix64") then
+  set TmpDir = $VarDir/pactold64
+endif
+if ($machine == "helixn32") then
+  set TmpDir = $VarDir/pactoldn32
+endif
+if ($machine == "helixo32") then
+  set TmpDir = $VarDir/pactoldo32
+endif
+
+rm -f machinex
+
+echo ""
+echo "BACKING UP Current Version of PACT ..."
+echo "  from $Public to $TmpDir"
+
+chdir $Public/bin
+
+set IsOk = 1
+if (-e $TmpDir) then
+   set IsOk = 0
+endif
+if ($IsOk == 1) then
+   mkdir $TmpDir
+   chgrp $Group $TmpDir
+   chmod 775 $TmpDir
+endif
+set DestDir = $TmpDir/bin
+
+# backup executable files
+echo ""
+echo "Copying PACT files from $Public/bin  to $TmpDir/bin"
+
+set IsOk = 1
+if (-e $DestDir) then
+   set IsOk = 0
+endif
+if ($IsOk == 1) then
+   mkdir $DestDir
+   chgrp $Group $DestDir
+   chmod 775 $DestDir
+endif
+
+foreach file ($Scrs)
+   if (-e $file) then
+      cp $file $DestDir
+      if ($status != 0) then
+         echo "   $file COPY FAILED ($status)"
+      else
+         echo "   $file"
+      endif
+   endif
+end
+
+# [use -s to strip executables]
+foreach file ($Bins)
+   if (-e $file) then
+      cp $file $DestDir
+      if ($status != 0) then
+         echo "   $file COPY FAILED ($status)"
+      else
+         echo "   $file"
+      endif
+   endif
+end
+chgrp $Group $DestDir/*
+chmod 775 $DestDir/*
+
+# backup include files
+chdir ../include
+set DestDir = $TmpDir/include
+echo ""
+set IsOk = 1
+if (-e $DestDir) then
+   set IsOk = 0
+endif
+if ($IsOk == 1) then
+   mkdir $DestDir
+   chgrp $Group $DestDir
+   chmod 775 $DestDir
+endif
+echo "Copying PACT files from $Public/include to $DestDir"
+foreach file ($Incs)
+   if (-e $file) then
+      cp $file $DestDir
+      if ($status != 0) then
+         echo "   $file   COPY FAILED ($status)"
+      else
+         echo "   $file"
+      endif
+   endif
+end
+chgrp $Group $DestDir/*
+chmod 664 $DestDir/*
+
+# backup lib files
+chdir ../lib
+set DestDir = $TmpDir/lib
+echo ""
+set IsOk = 1
+if (-e $DestDir) then
+   set IsOk = 0
+endif
+if ($IsOk == 1) then
+   mkdir $DestDir
+   chgrp $Group $DestDir
+   chmod 775 $DestDir
+endif
+echo "Copying PACT files from $Public/lib to $DestDir"
+foreach file ($Libs)
+   if (-e $file) then
+      cp $file $DestDir
+      if ($status != 0) then
+         echo "   $file COPY FAILED ($status)"
+      else
+         echo "   $file"
+      endif
+   endif
+end
+chgrp $Group $DestDir/*
+chmod 664 $DestDir/*
+
+# backup scheme files
+chdir $SchemeDir
+set DestDir = $TmpDir/scheme
+echo ""
+set IsOk = 1
+if (-e $DestDir) then
+   set IsOk = 0
+endif
+if ($IsOk == 1) then
+   mkdir $DestDir
+   chgrp $Group $DestDir
+   chmod 775 $DestDir
+endif
+echo "Copying PACT files from $SchemeDir to $DestDir"
+foreach file ($Scms)
+   if (-e $file) then
+      if (!(-d $file)) then
+         cp $file $DestDir
+         if ($status != 0) then
+            echo "   $file COPY FAILED ($status)"
+         else
+            echo "   $file"
+         endif
+      endif
+   endif
+end
+chgrp $Group $DestDir/*
+chmod 664 $DestDir/*
+
+# backup extensions files (if present)
+if (-e extensions) then
+   chdir extensions
+   set DestDir = $SchemeDir/extensions
+   echo ""
+   set IsOk = 1
+   if (-e $DestDir) then
+      set IsOk = 0
+   endif
+   if ($IsOk == 1) then
+      mkdir $DestDir
+      chgrp $Group $DestDir
+      chmod 775 $DestDir
+   endif
+   echo "Copying PACT files from $SchemeDir/extensions to $DestDir"
+   foreach file (*)
+      if (!(-d $file)) then
+         cp $file $DestDir
+         if ($status != 0) then
+            echo "   $file COPY FAILED ($status)"
+         else
+            echo "   $file"
+         endif
+      endif
+   end
+   chgrp $Group $DestDir/*
+   chmod 664 $DestDir/*
+endif
+
+echo ""
+echo "... PACT BACKUP COMPLETE"
+echo ""
+
+exit(0)

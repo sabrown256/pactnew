@@ -1,0 +1,49 @@
+#!/bin/csh -f
+#
+# PGS - SX PGS test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PGS TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SX PGS Test .................. "
+   Note $Log ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $SX -l $RootDir/sx/tests/sxpgs.scm > sxpgs.res)
+      $CFE $PSDIFF sxpgs.ps $RootDir/sx/tests/ref/sxpgs.ps > /dev/null
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxpgs.scm |& \
+      grep "ERROR SUMMARY:"                                                  |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+      flog $Log rm -f sxpgs.ps
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

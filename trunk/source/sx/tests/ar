@@ -1,0 +1,78 @@
+#!/bin/csh -f
+#
+# AR - SX PDB archive test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+if (($THREADING == no) && ($HAVE_MPI == no)) then
+
+#--------------------------------------------------------------------------
+
+#                              ARCHIVE TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SX PDB Archive Test .......... "
+   Note $Log ""
+
+   flog $Log rm -f pdbvar.log pdbvar.tar pdbvar.a pdbvar.res
+
+   flog $Log tar cvf pdbvar.tar demo.d?
+   flog $Log ar -rsc pdbvar.a demo.d?
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/pdbvar.scm >& pdbvar.res)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvar.scm |& \
+      grep "ERROR SUMMARY:"                                                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set Ref   = $RootDir/sx/tests/ref/pdbvar
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set xstatus = 2
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($xstatus/$ETime)"
+      set xstatus = 2
+   else if (-f $Ref) then
+      flog $Log diff pdbvar.res $Ref
+      set xstatus = $status
+   else
+      flog $Log cp pdbvar.res $Ref
+   endif
+
+   if ($xstatus == 2) then
+      set Err = 1
+   else if ($xstatus != 0) then
+      NoteD $Log "FAILED ($ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+      flog $Log touch pdbvar.foo
+      flog $Log rm -f pdbvar.*
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+exit($Err)

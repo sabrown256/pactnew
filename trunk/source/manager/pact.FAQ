@@ -1,0 +1,154 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+PACT Frequently Asked Questions (FAQ)
+
+Last-Modified:  Fri May  9 10:36:16 PDT 2003
+
+
+Welcome to the FAQ for PACT!
+
+INTRODUCTION
+PACT is the environment and toolkit that we use to create portable 
+applications, and to create functionality not readily available. 
+PACT is our environment of choice for handling unique data,
+portable computing environments, and the distributed computing 
+arenas; and for converting data for the visualization application 
+or algorithm of choice. We have created PACT to shield ourselves 
+from new software, and hardware so we can concentrate on the 
+applications at hand. PACT is beginning to emphasize design that 
+takes advantage of massively parallel environments.
+
+We would like to hear of your experiences with PACT. And, we would 
+be especially pleased to try to add your mathematical, graphical, 
+or other functionality to future distributions of PACT. 
+
+NOTICE
+
+     Absolute portability is our GOAL! 
+
+Most of the time we install PACT 
+without problems, the other times take varying amounts of effort to 
+track down. Usually the problems are simple, such as missing 
+headers. If your experience with PACT is not absolute portability, 
+we would like to hear from you so we can try to make it so. Please 
+direct all portability issues to:
+
+     sabrown@llnl.gov
+ or  minner1@llnl.gov
+ or  smethells1@llnl.gov
+
+
+Thanks to all who have contributed to this FAQ.  Corrections and 
+contributions always welcome. Please e-mail comments, additions, 
+and corrections to:
+
+                  rodrigues2@llnl.gov 
+
+and use SUBJECT: PACT FAQ
+
+Items needing more input from you and others are marked with a ???.
+
+----------------------------------------------------------------------
+TABLE OF CONTENTS
+----------------------------------------------------------------------
+
+1) What is PACT?
+2) What machines does PACT run on?
+3) Where can I get PACT?
+4) How can I get in touch with PACT developers and users?
+5) What are the PACT packages?
+6) ???
+
+----------------------------------------------------------------------
+1) What is PACT?
+
+   PACT stands for Portable Application Code Toolkit. It is a
+   self-contained set of tools which support developing and
+   using portable programs particularly scientific and engineering
+   applications.  It attacks several portability problem areas:
+             Binary Data
+             Graphics
+             Interprocess Communication
+   PACT is composed of several (currently 9) specific packages
+   each of which address a specific functionality.
+
+2) What machines does PACT run on?
+
+   PACT has been tested on the following systems:
+        AIX 2 and up
+        HP-UX
+        Irix 4.x
+        Irix 5.x
+        Linux 1.x
+        MAC OS 6 and up
+        OSF 1.x
+	SunOS 4.x
+        SunOS 5.x (Solaris)
+        Ultrix 
+        Unicos 7 and up
+
+   The Macintosh version is hard to manage because of the tools
+   available on the platform.  We are trying to improve the
+   ease of installation on the Macintosh.
+
+   PACT has run on DOS boxes in the past but needs to be updated.
+   The plan has been to use DJGPP and the BGI version of the
+   associated library (Desqview X is another possibility).
+   MS Windows is also a possibility since alpha ports of the key
+   pieces of PACT have been done there from time to time.
+
+3) Where can I get PACT?
+
+Please use ftp to connect to: 
+
+          ftp.llnl.gov 
+
+log in as anonymous, using your email address for the password, 
+cd pub/pact - to change directory,
+binary      - to set the transfer mode,
+get the three pact files (yy_mm_dd indicates the date):
+          pact-unix.README
+          pactyy_mm_dd-doc.tar.gz
+          pactyy_mm_dd-src
+
+or the two Mac files:
+          pact-mac.README
+          pactyy_mm_dd-mac.tar.gz
+
+   pact-???.README explains how to install PACT; pactyy_mm_dd-src
+   is the self configuring, self installing distribution file;
+   and pactyy_mm_dd-doc.tar.gz contains the PostScript and FrameMaker
+   form of the documents for PACT.
+
+4) How can I get in touch with PACT developers and users?
+
+    You can contact the PACT developers by sending email to 
+
+      pactdev@llnl.gov 
+
+   The PACT team has setup a Majordomo based mailing list for
+   PACT users.  You can subscribe to it by sending the following
+   message to Majordomo@lists.llnl.gov
+
+         subscribe pact-users
+
+5) What are the PACT packages?
+
+     SCORE   - hash functions, string handling, environment leveling
+     PML     - math routines, geometry, linear solvers, etc
+     PDB     - portable binary data handling
+     PPC     - portable IPC, RPC, message passing
+     PGS     - portable graphics and GUI tools
+     PANACEA - simulation code services
+     SCHEME  - a R3RS level SCHEME interpreter library
+     SX      - a SCHEME with extensions/bindings for all of PACT
+     ULTRA   - 1d data presentation, manipulation, analysis code
+
+   PACT is held together by a system of C shell scripts called the
+   manager.  The PACT manager can also be used by other code systems
+   to assist with source maintenance and control.
+
+6) ???

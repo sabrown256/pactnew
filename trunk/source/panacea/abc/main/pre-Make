@@ -1,0 +1,52 @@
+#
+# pre-Makefile for
+#
+# Flags and Targets
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include ../dev/${System}/include/pre-Make.defs
+
+TGTBin = none
+TGTLib =
+TGTInc =
+
+TGTA = ${DevBin}/a
+TGTB = ${DevBin}/b
+
+BinDep     = 
+InstallDep = a.c b.c
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
+CcFlags  = ${CDebug} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+
+#
+# Things upon which install depends (pact install)
+#
+PACTLibs = -lsx -lscheme -lpanacea -lpgs -lppc -lpdb -lpml -lscore
+LDLibs   = ${PACTLibs} ${MDGLib} ${MDLib} -lm
+
+LibGrp = -ls -lmisc -llag -lmesh  
+ 
+Libs   = ${LibGrp} ${LDLibs}
+ 
+purify :
+	purify ${CLD} ${MDIncs} ${LdFlags} a.c -o ${TGTA} ${Libs}
+	purify ${CLD} ${MDIncs} ${LdFlags} b.c -o ${TGTB} ${Libs}
+
+install : ${InstallDep}
+	${CC} -c a.c -o ${PACTTmpDir}/a.o
+	${CLD} ${LdFlags} ${MDIncs} ${PACTTmpDir}/a.o -o ${TGTA} ${Libs}
+	${CC} -c b.c -o ${PACTTmpDir}/b.o
+	${CLD} ${LdFlags} ${MDIncs} ${PACTTmpDir}/b.o -o ${TGTB} ${Libs}
+
+test :
+

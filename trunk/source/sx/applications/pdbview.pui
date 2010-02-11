@@ -1,0 +1,347 @@
+#
+# PGS User Interface Object Description
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+# <type> [<oper>(<parameters>)]* BND(<param>) <boundary points>*
+#
+# Operators:
+# NAME - object name
+# FLG  - state flags
+# CLR  - fore and background colors
+# DRW  - names function that draws object when visible
+# ACT  - names function that does object action when active
+# SEL  - names function that identifies object as selected when selectable
+# BND  - boundary specifier
+#
+# FLG parameters
+#   IsVis - object is visible
+#   IsAct - object is active
+#   IsSel - object is selectable
+#
+# BND parameters
+#   <n>  - n NDC points to follow (x1,y1) ... (xn, yn)
+#   RECT - two NDC points to follow (x1,y1) (x2,y2)
+#
+# BND takes n points defining a boundary relative to the parent object limits
+# The descriptions of children of an object are indented relative to their parent
+# with 3 spaces but are otherwise just like any interface object
+#
+
+# --------------------------------------------------------------------------
+
+#                             AXIS CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TAxis) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+# Flags
+  {Container CLR(0,0) BND(RECT) (0.005,0.705) (0.495,0.995)
+     {Text NAME(On) CLR(1,-1) FLG(IsVis) BND(RECT) (0.6,0.66) (0.7,0.97)
+      Text NAME(Off) CLR(1,-1) FLG(IsVis) BND(RECT) (0.8,0.66) (0.9,0.97)
+      Variable NAME(Axis) CLR(9,-1) BND(RECT) (0.05,0.48) (0.5,0.75)
+        {Button CLR(3,2) ACT(1) BND(RECT) (1.1,0.0) (1.5,0.8)
+         Button CLR(3,2) ACT(0) BND(RECT) (1.55,0.0) (1.95,0.8)}
+      Variable NAME(Grid) CLR(9,-1) BND(RECT) (0.05,0.08) (0.5,0.35)
+        {Button CLR(3,2) ACT(1) BND(RECT) (1.1,0.0) (1.5,0.8)
+         Button CLR(3,2) ACT(0) BND(RECT) (1.55,0.0) (1.95,0.8)}}
+
+   Container CLR(0,0) BND(RECT) (0.505,0.705) (0.995,0.995)
+     {Text NAME(Axis Formats) CLR(1,-1) FLG(IsVis) BND(RECT) (0.05,0.68) (0.95,0.98)
+      Variable NAME(X Axis) CLR(9,-1) BND(RECT) (0.05,0.34) (0.4,0.66)
+        {Container CLR(1,0) BND(RECT) (1.05,0.05) (2.5,0.9)
+           {Text NAME(%10.2g) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.95)}}
+      Variable NAME(Y Axis) CLR(9,-1) BND(RECT) (0.05,0.02) (0.4,0.32)
+        {Container CLR(1,0) BND(RECT) (1.05,0.05) (2.5,0.9)
+           {Text NAME(%10.2g) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.95)}}}
+
+   Container CLR(0,0) BND(RECT) (0.005,0.005) (0.495,0.695)
+     {Text NAME(Tick Properties) CLR(1,-1) FLG(IsVis) BND(RECT) (0.05,0.88) (0.95,0.98)
+      Variable NAME(Max Major Ticks) CLR(9,-1) BND(RECT) (0.05,0.68) (0.7,0.76)
+        {Container CLR(1,0) BND(RECT) (1.05,-0.4) (1.4,1.0)
+           {Text NAME(10) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(# Minor Ticks) CLR(9,-1) BND(RECT) (0.05,0.52) (0.7,0.60)
+        {Container CLR(1,0) BND(RECT) (1.05,-0.4) (1.4,1.0)
+           {Text NAME(8) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(Tick Size) CLR(9,-1) BND(RECT) (0.05,0.36) (0.7,0.44)
+        {Container CLR(1,0) BND(RECT) (1.05,-0.4) (1.4,1.0)
+           {Text NAME(0.01) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(# Decades) CLR(9,-1) BND(RECT) (0.05,0.20) (0.7,0.28)
+        {Container CLR(1,0) BND(RECT) (1.05,-0.4) (1.4,1.0)
+           {Text NAME(8) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(Line Width) CLR(9,-1) BND(RECT) (0.05,0.04) (0.7,0.12)
+        {Container CLR(1,0) BND(RECT) (1.05,-0.4) (1.4,1.0)
+           {Text NAME(0.1) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}}
+
+   Container CLR(0,0) BND(RECT) (0.505,0.005) (0.995,0.695)
+     {Text NAME(Axis Offsets) CLR(1,-1) FLG(IsVis) BND(RECT) (0.05,0.88) (0.95,0.98)
+      Variable NAME(Bottom Offset) CLR(9,-1) BND(RECT) (0.05,0.66) (0.7,0.74)
+        {Container CLR(1,0) BND(RECT) (1.0,-0.4) (1.4,1.0)
+           {Text NAME(0.01) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(Left Offset) CLR(9,-1) BND(RECT) (0.05,0.46) (0.7,0.54)
+        {Container CLR(1,0) BND(RECT) (1.0,-0.4) (1.4,1.0)
+           {Text NAME(0.01) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(Top Offset) CLR(9,-1) BND(RECT) (0.05,0.26) (0.7,0.34)
+        {Container CLR(1,0) BND(RECT) (1.0,-0.4) (1.4,1.0)
+           {Text NAME(0.01) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}
+      Variable NAME(Right Offset) CLR(9,-1) BND(RECT) (0.05,0.06) (0.7,0.14)
+        {Container CLR(1,0) BND(RECT) (1.0,-0.4) (1.4,1.0)
+           {Text NAME(0.01) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.96)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             FONT CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TFont) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+  {Container CLR(0,0) BND(RECT) (0.2,0.2) (0.8,0.8)
+     {Variable NAME(Type Face) CLR(9,-1) BND(RECT) (0.05,0.67) (0.5,0.98)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (2.0,0.8)
+           {Text NAME(helvetica) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}
+      Variable NAME(Type Size) CLR(9,-1) BND(RECT) (0.05,0.34) (0.5,0.66)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (2.0,0.8)
+           {Text NAME(20) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}
+      Variable NAME(Type Style) CLR(9,-1) BND(RECT) (0.05,0.02) (0.5,0.33)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (2.0,0.8)
+           {Text NAME(medium) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             LABEL CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TLabel) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+  {Container CLR(0,0) BND(RECT) (0.2,0.2) (0.8,0.8)
+     {Variable NAME(Label Length) CLR(9,-1) BND(RECT) (0.05,0.67) (0.65,0.98)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (1.5,0.8)
+           {Text NAME(35) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}
+      Variable NAME(Label Type Size) CLR(9,-1) BND(RECT) (0.05,0.34) (0.65,0.66)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (1.5,0.8)
+           {Text NAME(8) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}
+      Variable NAME(Label Space) CLR(9,-1) BND(RECT) (0.05,0.02) (0.65,0.33)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (1.5,0.8)
+           {Text NAME(0.0) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             MARKER CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TMarker) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+  {Container CLR(0,0) BND(RECT) (0.2,0.2) (0.8,0.8)
+     {Variable NAME(Marker Index) CLR(9,-1) BND(RECT) (0.05,0.67) (0.65,0.98)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (1.5,0.8)
+           {Text NAME(0) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}
+      Variable NAME(Orientation) CLR(9,-1) BND(RECT) (0.05,0.34) (0.65,0.66)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (1.5,0.8)
+           {Text NAME(0.0) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}
+      Variable NAME(Marker Scale) CLR(9,-1) BND(RECT) (0.05,0.02) (0.65,0.33)
+        {Container CLR(1,0) BND(RECT) (1.0,0.2) (1.5,0.8)
+           {Text NAME(0.2) CLR(1,-1) BND(RECT) (0.05,0.4) (0.95,0.8)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             MATH CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TMath) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+  {Container CLR(0,0) BND(RECT) (0.1,0.3) (0.9,0.7)
+     {Variable NAME(Smooth Method) CLR(9,-1) BND(RECT) (0.05,0.33) (0.5,0.66)
+        {Container CLR(1,0) BND(RECT) (1.0,0.1) (1.95,0.8)
+           {Text NAME(averaging) CLR(1,-1) BND(RECT) (0.05,0.5) (0.95,0.9)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             MOUSE CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TMouse) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+# Flags
+  {Container CLR(0,0) BND(RECT) (0.25,0.75) (0.75,0.95)
+     {Text NAME(On) CLR(1,-1) FLG(IsVis) BND(RECT) (0.6,0.66) (0.7,0.97)
+      Text NAME(Off) CLR(1,-1) FLG(IsVis) BND(RECT) (0.8,0.66) (0.9,0.97)
+      Variable NAME(Mouse) CLR(9,-1) BND(RECT) (0.05,0.35) (0.5,0.62)
+        {Button CLR(3,2) ACT(1) BND(RECT) (1.1,0.0) (1.5,1.0)
+         Button CLR(3,2) ACT(0) BND(RECT) (1.55,0.0) (1.95,1.0)}}
+
+   Container CLR(0,0) BND(RECT) (0.145,0.305) (0.855,0.595)
+     {Variable NAME(X Location) CLR(9,-1) BND(RECT) (0.05,0.55) (0.6,0.95)
+        {Container CLR(1,0) BND(RECT) (1.0,0.0) (1.5,1.0)
+           {Text NAME(0.0) CLR(1,-1) BND(RECT) (0.05,0.2) (0.95,0.8)}}
+      Variable NAME(Y Location) CLR(9,-1) BND(RECT) (0.05,0.05) (0.6,0.45)
+        {Container CLR(1,0) BND(RECT) (1.0,0.0) (1.5,1.0)
+           {Text NAME(0.0) CLR(1,-1) BND(RECT) (0.05,0.2) (0.95,0.8)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             OUTPUT CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TOutput) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+  {Container CLR(0,0) BND(RECT) (0.005,0.005) (0.495,0.995)
+     {Variable NAME(PostScript) CLR(9,-1) BND(RECT) (0.05,0.90) (0.95,0.98)
+        {Button CLR(3,2) ACT(1) BND(RECT) (0.20,-1.5) (0.40,-0.5)
+           {Text NAME(On) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}
+         Button CLR(3,2) ACT(0) BND(RECT) (0.60,-1.5) (0.80,-0.5)
+           {Text NAME(Off) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}}
+      Variable NAME(PS Type) CLR(9,-1) BND(RECT) (0.05,0.63) (0.95,0.72)
+        {Button CLR(3,2) ACT(COLOR) BND(RECT) (0.05,-1.5) (0.45,-0.5)
+           {Text NAME(COLOR) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}
+         Button CLR(3,2) ACT(MONOCHROME) BND(RECT) (0.55,-1.5) (0.95,-0.5)
+           {Text NAME(B/W) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}}
+      Variable NAME(PS Name) CLR(9,-1) BND(RECT) (0.05,0.29) (0.95,0.38)
+        {Container CLR(1,0) BND(RECT) (0.0,-1.5) (1.0,-0.5)
+           {Text NAME(plots) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.95)}}}
+
+   Container CLR(0,0) BND(RECT) (0.505,0.005) (0.995,0.995)
+     {Variable NAME(CGM) CLR(9,-1) BND(RECT) (0.05,0.90) (0.95,0.98)
+        {Button CLR(3,2) ACT(1) BND(RECT) (0.20,-1.5) (0.40,-0.5)
+           {Text NAME(On) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}
+         Button CLR(3,2) ACT(0) BND(RECT) (0.60,-1.5) (0.80,-0.5)
+           {Text NAME(Off) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}}
+      Variable NAME(CGM Type) CLR(9,-1) BND(RECT) (0.05,0.63) (0.95,0.72)
+        {Button CLR(3,2) ACT(COLOR) BND(RECT) (0.05,-1.5) (0.45,-0.5)
+           {Text NAME(COLOR) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}
+         Button CLR(3,2) ACT(MONOCHROME) BND(RECT) (0.55,-1.5) (0.95,-0.5)
+           {Text NAME(B/W) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.05) (0.95,0.95)}}
+      Variable NAME(CGM Name) CLR(9,-1) BND(RECT) (0.05,0.29) (0.95,0.38)
+        {Container CLR(1,0) BND(RECT) (0.0,-1.5) (1.0,-0.5)
+           {Text NAME(plots) CLR(1,-1) BND(RECT) (0.05,0.05) (0.95,0.95)}}}}
+
+# --------------------------------------------------------------------------
+
+#                             RENDERING CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TRendering) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+# Palette Control
+  {Container CLR(0,0) BND(RECT) (0.005,0.605) (0.495,0.995)
+     {Text NAME(Spectrum) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.5) (0.7,0.75)
+      Text NAME(Rainbow) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.25) (0.7,0.5)
+      Text NAME(B/W) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.0) (0.7,0.25)
+      Variable NAME(Palette) CLR(1,-1) BND(RECT) (0.05,0.75) (0.95,1.0)
+        {Button CLR(3,2) ACT(spectrum) BND(RECT) (0.8,-0.8) (0.9,-0.2)
+         Button CLR(3,2) ACT(rainbow) BND(RECT) (0.8,-1.8) (0.9,-1.2)
+         Button CLR(3,2) ACT(bw) BND(RECT) (0.8,-2.8) (0.9,-2.2)}}
+
+# Theta/Phi Control
+   Container CLR(0,0) BND(RECT) (0.005,0.005) (0.495,0.595)
+     {Variable NAME(Theta) CLR(1,0) BND(RECT) (0.05,0.90) (0.45,0.99)
+        {Text NAME(0) CLR(9,-1) BND(RECT) (0.05,-0.95) (0.95,-0.05)}
+      Variable NAME(Phi) CLR(1,0) BND(RECT) (0.55,0.90) (0.95,0.99)
+        {Text NAME(0) CLR(9,-1) BND(RECT) (0.05,-0.95) (0.95,-0.05)}
+      Container CLR(2,2) BND(RECT) (0.0,0.0) (1.0,0.75)
+        {Button CLR(0,0) DRW(draw-slider) ACT(slider) BND(RECT) (0.0,0.0) (0.1,0.1)}}
+
+# 1D->1D Rendering
+   Container CLR(0,0) BND(RECT) (0.505,0.705) (0.995,0.995)
+     {Text NAME(Cartesian) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.5) (0.7,0.75)
+      Text NAME(Polar) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.25) (0.7,0.5)
+      Text NAME(Inselberg) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.0) (0.7,0.25)
+      Variable NAME(1D->1D) CLR(1,-1) BND(RECT) (0.05,0.75) (0.95,1.0)
+        {Button CLR(3,2) ACT(-1) BND(RECT) (0.8,-0.8) (0.9,-0.2)
+         Button CLR(3,2) ACT(-2) BND(RECT) (0.8,-1.8) (0.9,-1.2)
+         Button CLR(3,2) ACT(-3) BND(RECT) (0.8,-2.8) (0.9,-2.2)}}
+
+# 2D->1D Rendering
+   Container CLR(0,0) BND(RECT) (0.505,0.205) (0.995,0.695)
+     {Text NAME(Contour) CLR(9,-1) FLG(IsVis) BND(RECT)   (0.05,0.68) (0.7,0.85)
+      Text NAME(Image) CLR(9,-1) FLG(IsVis) BND(RECT)     (0.05,0.51) (0.7,0.68)
+      Text NAME(WireFrame) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.34) (0.7,0.51)
+      Text NAME(Surface) CLR(9,-1) FLG(IsVis) BND(RECT)   (0.05,0.17) (0.7,0.34)
+      Text NAME(PolyFill) CLR(9,-1) FLG(IsVis) BND(RECT)  (0.05,0.0) (0.7,0.17)
+      Variable NAME(2D->1D) CLR(1,-1) BND(RECT) (0.05,0.85) (0.95,1.0)
+        {Button CLR(3,2) ACT(11) BND(RECT) (0.8,-1.0) (0.9,-0.4)
+         Button CLR(3,2) ACT(12) BND(RECT) (0.8,-2.1) (0.9,-1.5)
+         Button CLR(3,2) ACT(9) BND(RECT) (0.8,-3.2) (0.9,-2.6)
+         Button CLR(3,2) ACT(14) BND(RECT) (0.8,-4.3) (0.9,-3.7)
+         Button CLR(3,2) ACT(16) BND(RECT) (0.8,-5.4) (0.9,-4.8)}}
+
+# 2D->2D Rendering
+   Container CLR(0,0) BND(RECT) (0.505,0.005) (0.995,0.195)
+     {Text NAME(Vector) CLR(9,-1) FLG(IsVis) BND(RECT)  (0.05,0.33) (0.7,0.66)
+      Text NAME(Surface) CLR(9,-1) FLG(IsVis) BND(RECT) (0.05,0.00) (0.7,0.33)
+      Variable NAME(2D->2D) CLR(1,-1) BND(RECT) (0.05,0.66) (0.95,1.0)
+        {Button CLR(3,2) ACT(15) BND(RECT) (0.8,-0.82) (0.9,-0.22)
+         Button CLR(3,2) ACT(14) BND(RECT) (0.8,-1.82) (0.9,-1.22)}}}
+
+# --------------------------------------------------------------------------
+
+#                             WINDOW CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container NAME(TWindow) CLR(0,0) FLG( ) BND(RECT) (0.202,0.005) (0.998,0.995)
+
+  {Container CLR(0,0) BND(RECT) (0.1,0.2) (0.9,0.8)
+     {Variable NAME(Clear Mode) CLR(9,-1) BND(RECT) (0.05,0.85) (0.95,0.95)
+        {Button CLR(3,2) ACT(-5) BND(RECT) (0.04,-2.0) (0.28,-0.5)
+           {Text NAME(Screen) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.4) (0.95,0.9)}
+         Button CLR(3,2) ACT(-6) BND(RECT) (0.38,-2.0) (0.62,-0.5)
+           {Text NAME(Port) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.4) (0.95,0.9)}
+         Button CLR(3,2) ACT(-7) BND(RECT) (0.70,-2.0) (0.94,-0.5)
+           {Text NAME(Frame) CLR(0,-1) FLG(IsVis) BND(RECT) (0.05,0.4) (0.95,0.9)}}
+      Variable NAME(Border Width) CLR(9,-1) BND(RECT) (0.05,0.31) (0.6,0.39)
+        {Container CLR(1,0) BND(RECT) (1.0,-0.6) (1.5,1.0)
+           {Text NAME(1) CLR(1,-1) BND(RECT) (0.05,0.15) (0.95,0.95)}}}}
+
+# --------------------------------------------------------------------------
+
+#                            MASTER CONTROL PANEL
+
+# --------------------------------------------------------------------------
+
+Container CLR(0,0) BND(RECT) (0.002,0.005) (0.198,0.995)
+
+# SX Control Panel
+  {Container CLR(0,0) BND(RECT) (0.005,0.245) (0.995,1.0)
+     {Variable NAME(Which-Panel) CLR(0,0) ACT(toggle) BND(RECT) (0.0,0.1) (1.0,1.0)
+        {Button CLR(3,2) DRW(draw-button) ACT(TAxis) BND(RECT) (0.0,0.88) (1.0,1.0)
+           {Text NAME(Axis) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TFont) BND(RECT) (0.0,0.77) (1.0,0.88)
+           {Text NAME(Font) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TLabel) BND(RECT) (0.0,0.66) (1.0,0.77)
+           {Text NAME(Label) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TMarker) BND(RECT) (0.0,0.55) (1.0,0.66)
+           {Text NAME(Marker) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TMath) BND(RECT) (0.0,0.44) (1.0,0.55)
+           {Text NAME(Math) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TMouse) BND(RECT) (0.0,0.33) (1.0,0.44)
+           {Text NAME(Mouse) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TOutput) BND(RECT) (0.0,0.22) (1.0,0.33)
+           {Text NAME(Output) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TRendering) BND(RECT) (0.0,0.11) (1.0,0.22)
+           {Text NAME(Render) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+         Button CLR(3,2) DRW(draw-button) ACT(TWindow) BND(RECT) (0.0,0.0) (1.0,0.11)
+           {Text NAME(Window) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}}
+      Button CLR(3,2) DRW(draw-button) ACT(End) BND(RECT) (0.0,0.0) (1.0,0.1)
+        {Text NAME(End) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}}
+
+# Interface Control Panel
+   Container CLR(0,0) BND(RECT) (0.05,0.01) (0.95,0.235)
+     {Button CLR(3,2) DRW(draw-button) ACT(Edit) BND(RECT) (0.0,0.67) (1.0,1.0)
+        {Text NAME(Edit) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+      Button CLR(3,2) DRW(draw-button) ACT(ReDraw) BND(RECT) (0.0,0.33) (1.0,0.67)
+        {Text NAME(ReDraw) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}
+      Button CLR(3,2) DRW(draw-button) ACT(Save) BND(RECT) (0.0,0.0) (1.0,0.33)
+        {Text NAME(Save) CLR(10,-1) FLG(IsVis) DRW(draw-text) BND(RECT) (0.05,0.3) (0.95,0.95)}}}
+
+

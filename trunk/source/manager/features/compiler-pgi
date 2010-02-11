@@ -1,0 +1,60 @@
+#
+# COMPILER-PGI - define basic variables to use PGI compilers
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
+run features/rpath pgi
+
+WARN_PATTERN = "PGFTN-W- PGF90-W- PGC-W-"
+ERR_PATTERN  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
+
+Tool CC {
+   Exe      = pgcc
+   Flags    = -Kieee
+   Flags   += [ _env_ = Bits ;              # address bit size
+                32    = -tp px ;
+                64    = -tp k8-64 -fpic ]
+   Flags   += [ _cmd_ = -p ;                # profiling
+	        on    = -Mprof=func ]
+   Debug    = -g
+   Optimize = -g -O1
+   Version  = -V
+}
+
+Tool FC {
+   Exe     = pgf90
+   Flags   = [ _env_ = Bits ;               # address bit size
+               32    = -tp px ;
+               64    = -tp k8-64 -fpic ]
+   Version = -V
+}
+
+Tool LD {
+   RPath   = -Wl,-rpath,@
+   Flags   = -Ktrap=fp ${NUMA}
+   Flags   += [ _cmd_ = -p ;                # profiling
+	        on    = -Mprof=func ]
+}
+
+Group Cfg {
+   Use      = Std
+   LD_Flags = ${LD_Flags}
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags += -mp
+   LD_Flags += -mp
+   LD_Lib    =
+}
+
+include cpp-rule
+

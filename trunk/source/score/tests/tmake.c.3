@@ -1,0 +1,27 @@
+#
+# test dependency analysis - update following implicit dependency update
+#                          - a.o updated after a.c updated
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+Hdrs = a.h
+Objs = a.o
+
+.c.o:
+	@echo "CO $< -> $@"
+	@touch $@
+
+${Objs} : ${Hdrs}
+
+work : ${Objs}
+
+setup :
+	touch a.h a.o
+	sleep 1
+	touch a.c
+
+cleanup :
+	rm a*.[cho]
+

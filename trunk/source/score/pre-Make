@@ -1,0 +1,518 @@
+#
+# pre-Makefile for SCORE
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=score
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
+         scope_term.h scope_mpi.h scope_make.h \
+         scope_lex.h scope_thread.h
+
+MMLib = ${LibDir}/libpsmm.a
+
+#
+# Compiler/Loader Options
+#
+CcFlags = ${COptimize} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
+FcFlags = ${FDebug} -mp
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (make save)
+#
+SaveFiles = *.c *.h *.r
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
+             ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
+             ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${TGTLib} ${MMLib}
+BinDep =
+BinObj =
+
+#
+# Required Libraries
+#
+Libs  = ${LSCORE} -lm ${MDLib}
+MLibs = ${LSCORE} ${LMM} -lm ${MDLib}
+
+targets :
+	@echo "Targets for SCORE"
+	@echo "   compre       : make comprehensive unit test programs"
+	@echo "   disk         : make simple utility to measure available disk space"
+	@echo "   dmake        : make the dmake utility"
+	@echo "   dmt          : make and test the dmake utility"
+	@echo "   error        : make test program for error handling routines in SCORE"
+	@echo "   exec         : make test program for SC_exec_server"
+	@echo "   fcscan       : make simple utility to scan containers such as tar files"
+	@echo "   fha          : make test program for fortran API of hash functionality"
+	@echo "   ha           : make scatst and sctrts test programs for hash and alist functionality"
+	@echo "   install      : install SCORE headers and utilities in dev/arch"
+	@echo "   io           : make sciots test program for I/O functionality"
+	@echo "   latency      : make simple utility to measure file system latencies"
+	@echo "   lf           : make scofft test program for large file access functionality"
+	@echo "   link         : link SCORE utilities for public use"
+	@echo "   memchk       : make the scmtrt and scmpft memory management testing programs"
+	@echo "   mf           : make scmfts test program for memory mapped file functionality"
+	@echo "   mm           : make memory manager testing and performance measurement utility"
+	@echo "   mmlib        : make archive containing replacements for malloc, etc"
+	@echo "   mpitty       : make mpi-io-wrap and sctty for MPI testing"
+	@echo "   omp          : make scompt test program for OMP functionality"
+	@echo "   print        : make scprts test program for isprint, isspace functions"
+	@echo "   resource     : make scrsts test program for resource usage functionality"
+	@echo "   retrace      : make scrtrt test program for debug/retrace functionality"
+	@echo "   scan         : make test program for lexical scanner functionality"
+	@echo "   score-config : make SCORE memory manager configuration utility"
+	@echo "   sharedlib    : build and install SCORE shared libs in dev/arch"
+	@echo "   smp          : make scthrt scsmp and scsmpb for SMP parallel testing"
+	@echo "   test         : run the SCORE test suite"
+
+#
+# Headers Files
+#
+Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
+       sclnx.h scosx.h sccyg.h scaix.h scsol.h schpux.h scirix.h \
+       score.h score_int.h \
+       scope_hash.h scope_typeh.h scope_io.h scope_array.h
+
+#
+# Object Files
+#
+DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
+
+MObjs = scmemc.o scmemda.o scmemdb.o scmeme.o scmemf.o \
+        scmemg.o scmemh.o scmemt.o sctyp.o
+
+PObjs = scerr.o schp.o scpman.o schttp.o \
+        scmmap.o sclmmap.o scmmaps.o \
+        scsysa.o scsysb.o scsysc.o scsysd.o scsyse.o \
+        scfio.o scudl.o scioctl.o scsig.o schsrv.o scterm.o
+
+TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
+
+OW32Objs = sclpwin32.o scwin32.o
+OUnxObjs = sclppsx.o scunix.o scbgl.o
+
+Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
+       scctl.o scfia.o scfis.o scfnca.o scfncb.o scfnct.o \
+       scarrd.o scarrs.o \
+       schash.o sctree.o sctab.o \
+       scstr.o scrsca.o scrscb.o \
+       sclexs.o sctrk.o sclog.o scold.o scf77lr.o
+
+ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
+          ${TGTLib}(sctar.o) ${TGTLib}(scfcnr.o)
+
+ArMObjs = ${TGTLib}(scmemc.o) ${TGTLib}(scmemda.o) ${TGTLib}(scmemdb.o) \
+          ${TGTLib}(scmeme.o) ${TGTLib}(scmemf.o) ${TGTLib}(scmemg.o) \
+          ${TGTLib}(scmemh.o) ${TGTLib}(scmemt.o) ${TGTLib}(sctyp.o)
+
+ArPObjs = ${TGTLib}(scerr.o) ${TGTLib}(schp.o) ${TGTLib}(scpman.o) \
+          ${TGTLib}(sclppsx.o) ${TGTLib}(schttp.o) \
+          ${TGTLib}(scmmap.o) ${TGTLib}(sclmmap.o) ${TGTLib}(scmmaps.o) \
+	  ${TGTLib}(scsysa.o) ${TGTLib}(scsysb.o) \
+          ${TGTLib}(scsysc.o) ${TGTLib}(scsysd.o) ${TGTLib}(scsyse.o) \
+          ${TGTLib}(scfio.o) ${TGTLib}(scudl.o) \
+          ${TGTLib}(scioctl.o) ${TGTLib}(scsig.o) \
+          ${TGTLib}(schsrv.o) ${TGTLib}(scterm.o)
+
+ArSObjs = ${TGTLib}(sclexs.o)
+
+ArTObjs = ${TGTLib}(scpar.o) ${TGTLib}(scthn.o) ${TGTLib}(scthe.o) \
+          ${TGTLib}(scthp.o) ${TGTLib}(sctho.o) ${TGTLib}(scths.o)
+
+ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
+ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) ${TGTLib}(scbgl.o)
+
+ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} ${ArSObjs} ${ArTObjs} ${OSSupport} \
+         ${TGTLib}(scctl.o) ${TGTLib}(scfia.o) ${TGTLib}(scfis.o) \
+	 ${TGTLib}(scfnca.o) ${TGTLib}(scfncb.o) ${TGTLib}(scfnct.o) \
+         ${TGTLib}(scarrd.o) ${TGTLib}(scarrs.o) ${TGTLib}(scstr.o) \
+         ${TGTLib}(schash.o) ${TGTLib}(sctree.o) ${TGTLib}(sctab.o) \
+         ${TGTLib}(scrsca.o) ${TGTLib}(scrscb.o) \
+         ${TGTLib}(sctrk.o) ${TGTLib}(sclog.o)   \
+         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o)
+
+scf77lr.o : scf77lr.l sclexan.h
+
+${ArDObjs} : scope_make.h scope_proc.h
+${ArMObjs} : scope_mem.h
+${ArPObjs} : scope_proc.h
+${ArSObjs} : scope_lex.h
+${ArTObjs} : scope_thread.h
+${ArObjs}  : ${Hdrs}
+
+${DObjs} : scope_make.h scope_proc.h
+${MObjs} : scope_mem.h
+${PObjs} : scope_proc.h
+${TObjs} : scope_thread.h
+${Objs}  : ${Hdrs}
+
+${LibDep} : ${Hdrs}
+${MMDep}  : ${Hdrs}
+
+#
+# MMLib 
+#
+${MMLib} : scmemr.c
+	@echo "${CCAnnounce} -c $<"
+	@(cd ${PACTTmpDir} ; \
+          ${CC} -c ${PACTSrcDir}/$< -o scmemr.o ; \
+          ${AR} ${AROpt} ${MMLib} scmemr.o 2> /dev/null ; \
+          ${RM} scmemr.o 2> /dev/null )
+
+mmlib :
+	pact ${MMLib}
+
+#
+# CONFIG
+#
+score-config :
+	${CLD} -DMM_CONFIG scmemi.c -o ${BinDir}/score-config -lc
+
+#
+# FCSCAN
+#
+fcscan : ${BinDir}/fcscan
+
+${BinDir}/fcscan : ${TGTLib} scfcsc.c
+	${CC} -c scfcsc.c -o ${PACTTmpDir}/scfcsc.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scfcsc.o -o ${BinDir}/fcscan ${Libs}
+
+#
+# RPATH
+#
+${BinDir}/rpath : ${TGTLib} scrp.c
+	${CC} -c scrp.c -o ${PACTTmpDir}/scrp.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scrp.o -o ${BinDir}/rpath ${Libs}
+
+#
+# PTIME
+#
+${BinDir}/ptime : ${TGTLib} sctime.c
+	${CC} -c sctime.c -o ${PACTTmpDir}/sctime.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sctime.o -o ${BinDir}/ptime ${Libs}
+
+#
+# NCPU
+#
+${BinDir}/ncpu : ${TGTLib} scncpu.c
+	${CC} -c scncpu.c -o ${PACTTmpDir}/scncpu.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scncpu.o -o ${BinDir}/ncpu ${Libs}
+
+#
+# LATENCY
+#
+${BinDir}/latency : ${TGTLib} sclatnt.c
+	${CC} -c sclatnt.c -o ${PACTTmpDir}/sclatnt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sclatnt.o -o ${BinDir}/latency ${Libs}
+
+latency : ${BinDir}/latency
+
+#
+# PS-DIFF
+#
+${BinDir}/ps-diff : ${TGTLib} scpsd.c
+	${CC} -c scpsd.c -o ${PACTTmpDir}/scpsd.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scpsd.o -o ${BinDir}/ps-diff ${Libs}
+
+#
+# DMNZ
+#
+${BinDir}/dmnz : ${TGTLib} scdmnz.c
+	${CC} -c scdmnz.c -o ${PACTTmpDir}/scdmnz.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scdmnz.o -o ${BinDir}/dmnz ${Libs}
+
+#
+# PROPR
+#
+${BinDir}/propr : ${TGTLib} scprpr.c
+	${CC} -c scprpr.c -o ${PACTTmpDir}/scprpr.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scprpr.o -o ${BinDir}/propr ${Libs}
+
+#
+# HSERVE
+#
+${BinDir}/hserve : ${TGTLib} schsru.c
+	${CC} -c schsru.c -o ${PACTTmpDir}/schsru.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/schsru.o -o ${BinDir}/hserve ${Libs}
+
+#
+# DSK-SPACE
+#
+disk : ${BinDir}/dspace
+
+${BinDir}/dspace : scdsk.c ${TGTLib}
+	${CC} -c scdsk.c -o ${PACTTmpDir}/scdsk.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scdsk.o -o ${BinDir}/dspace ${Libs}
+#
+# ERROR
+#
+error : ${BinDir}/scerts
+
+${BinDir}/scerts : ${TGTLib} scerts.c
+	${CCCfe} -c scerts.c -o ${PACTTmpDir}/scerts.o
+	${CCCfe} ${LdFlags} ${PACTTmpDir}/scerts.o -o ${BinDir}/scerts ${Libs}
+
+#
+# EXEC SERVER
+#
+
+exec : ${BinDir}/scexts
+
+${BinDir}/scexts : ${TGTLib} scexts.c
+	${CCCfe} -c scexts.c -o ${PACTTmpDir}/scexts.o
+	${CCCfe} ${LdFlags} ${PACTTmpDir}/scexts.o -o ${BinDir}/scexts ${Libs}
+
+#
+# MPI
+#
+mpitty : ${BinDir}/sctty ${BinDir}/mpi-io-wrap
+
+# GOTCHA: mpi-io-wrap cannot be built this way in a CROSS_COMPILE situation
+# the /bin/true gets us by for now - remove when properly fixed
+${BinDir}/mpi-io-wrap : ${TGTLib} scwrap.c
+	( ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs} ; /bin/true )
+
+${BinDir}/sctty : ${TGTLib} sctty.c
+	${CC} -c sctty.c -o ${PACTTmpDir}/sctty.o
+	${CC} ${LdFlags} ${PACTTmpDir}/sctty.o -o ${BinDir}/sctty ${Libs} ${DPLib}
+
+#
+# shared memory parallel test
+#
+smp : ${BinDir}/scthrt ${BinDir}/sctlts ${BinDir}/scsmp ${BinDir}/scsmpb
+
+${BinDir}/scthrt : scthrt.c ${TGTLib}
+	${CC} -c scthrt.c -o ${PACTTmpDir}/scthrt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scthrt.o -o ${BinDir}/scthrt ${Libs}
+
+${BinDir}/sctlts : sctlts.c ${TGTLib}
+	${CC} -c sctlts.c -o ${PACTTmpDir}/sctlts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sctlts.o -o ${BinDir}/sctlts ${Libs}
+
+${BinDir}/scsmp : scsmp.c ${TGTLib}
+	${CC} -c scsmp.c -o ${PACTTmpDir}/scsmp.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scsmp.o -o ${BinDir}/scsmp ${Libs}
+
+${BinDir}/scsmpb : scsmpb.c ${TGTLib}
+	${CC} -c scsmpb.c -o ${PACTTmpDir}/scsmpb.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scsmpb.o -o ${BinDir}/scsmpb ${Libs}
+
+#
+# memory management test
+#
+mm : ${BinDir}/scmm
+
+${BinDir}/scmm : scmm.c ${TGTLib}
+	${CC} -c scmm.c -o ${PACTTmpDir}/scmm.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scmm.o -o ${BinDir}/scmm ${Libs}
+#
+# memory diagnostic test
+#
+memchk : ${MMLib} ${BinDir}/scmtrt ${BinDir}/scmpft
+
+${BinDir}/scmtrt : scmtrt.c ${TGTLib}
+	${CC} -c scmtrt.c -o ${PACTTmpDir}/scmtrt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scmtrt.o -o ${BinDir}/scmtrt ${MLibs}
+
+${BinDir}/scmpft : scmpft.c ${TGTLib}
+	${CC} -c scmpft.c -o ${PACTTmpDir}/scmpft.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scmpft.o -o ${BinDir}/scmpft ${Libs}
+#
+# lexical scanner test
+#
+scan : ${BinDir}/sclsts
+
+${BinDir}/sclsts : ${TGTLib} sclsts.c
+	${CC} -c sclsts.c -o ${PACTTmpDir}/sclsts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sclsts.o -o ${BinDir}/sclsts ${Libs}
+#
+# hash/alist test
+#
+ha : ${BinDir}/scatst ${BinDir}/sctrts
+
+${BinDir}/scatst : ${TGTLib} scatst.c
+	${CC} -c scatst.c -o ${PACTTmpDir}/scatst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scatst.o -o ${BinDir}/scatst ${Libs}
+
+${BinDir}/sctrts : ${TGTLib} sctrts.c
+	${CC} -c sctrts.c -o ${PACTTmpDir}/sctrts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sctrts.o -o ${BinDir}/sctrts ${Libs}
+
+#
+# fortran hash test
+#
+fha : ${BinDir}/schtst
+
+${BinDir}/schtst : schtst.f ${TGTLib} ${Hdrs}
+	${FC} -c ${FDebug} schtst.f -o ${PACTTmpDir}/schtst.o
+	${FC} ${FDebug} ${LdFlags} ${PACTTmpDir}/schtst.o -o ${BinDir}/schtst ${Libs}
+
+#
+# resource usage test
+#
+resource : ${BinDir}/scrsts
+
+${BinDir}/scrsts : ${TGTLib} scrsts.c
+	${CC} -c scrsts.c -o ${PACTTmpDir}/scrsts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scrsts.o -o ${BinDir}/scrsts ${Libs}
+
+#
+# fortran OMP/sproc test
+#
+omp : ${BinDir}/scompt
+
+${BinDir}/scompt : scompt.f ${TGTLib} ${Hdrs}
+	${FC} -c ${FDebug} scompt.f -o ${PACTTmpDir}/scompt.o
+	${FC} ${FDebug} ${LdFlags} ${PACTTmpDir}/scompt.o -o ${BinDir}/scompt ${Libs}
+
+#
+# io file test
+#
+io : ${BinDir}/sciots
+
+${BinDir}/sciots : sciots.c ${TGTLib}
+	${CC} -c sciots.c -o ${PACTTmpDir}/sciots.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sciots.o -o ${BinDir}/sciots ${Libs}
+
+#
+# mapped file test
+#
+mf : ${BinDir}/scmfts
+
+${BinDir}/scmfts : scmfts.c ${TGTLib}
+	${CC} -c scmfts.c -o ${PACTTmpDir}/scmfts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scmfts.o -o ${BinDir}/scmfts ${Libs}
+
+#
+# isprint test
+#
+print : ${BinDir}/scprts
+
+${BinDir}/scprts : scprts.c ${TGTLib}
+	${CC} -c scprts.c -o ${PACTTmpDir}/scprts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scprts.o -o ${BinDir}/scprts ${Libs}
+
+#
+# retrace test
+#
+
+retrace : ${BinDir}/scrtrt
+
+${BinDir}/scrtrt : ${TGTLib} scrtrt.c
+	${CC} -c scrtrt.c -o ${PACTTmpDir}/scrtrt.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scrtrt.o -o ${BinDir}/scrtrt ${Libs}
+
+#
+# large file types
+#
+lf : ${BinDir}/scofft
+
+${BinDir}/scofft : scofft.c
+	${CC} -c scofft.c -o ${PACTTmpDir}/scofft.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scofft.o -o ${BinDir}/scofft ${Libs}
+
+#
+# comprehensive test suite
+#
+compre : ${BinDir}/tscstr ${BinDir}/tscctl ${BinDir}/tscmemc \
+         ${BinDir}/interact ${BinDir}/scvsts ${BinDir}/scarts
+
+${BinDir}/tscstr : ${TGTLib} tscstr.c
+	${CC} -c tscstr.c -o ${PACTTmpDir}/tscstr.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/tscstr.o -o ${BinDir}/tscstr ${Libs}
+
+${BinDir}/tscctl : ${TGTLib} tscctl.c
+	${CC} -c tscctl.c -o ${PACTTmpDir}/tscctl.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/tscctl.o -o ${BinDir}/tscctl ${Libs}
+
+${BinDir}/tscmemc : ${TGTLib} tscmemc.c
+	${CC} -c tscmemc.c -o ${PACTTmpDir}/tscmemc.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/tscmemc.o -o ${BinDir}/tscmemc ${Libs}
+
+${BinDir}/interact : ${TGTLib} interact.c
+	${CC} -c interact.c -o ${PACTTmpDir}/interact.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/interact.o -o ${BinDir}/interact ${Libs}
+
+${BinDir}/scvsts : ${TGTLib} scvsts.c
+	${CC} -c scvsts.c -o ${PACTTmpDir}/scvsts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scvsts.o -o ${BinDir}/scvsts ${Libs}
+
+${BinDir}/dmake : ${TGTLib} scmkut.c
+	${CC} -c scmkut.c -o ${PACTTmpDir}/scmkut.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scmkut.o -o ${BinDir}/dmake ${Libs}
+
+${BinDir}/scarts : ${TGTLib} scarts.c
+	${CC} -c scarts.c -o ${PACTTmpDir}/scarts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scarts.o -o ${BinDir}/scarts ${Libs}
+
+foo : ${TGTLib} foo.c
+	${CC} -c foo.c -o foo.o
+	${CLD} ${LdFlags} foo.o -o foo ${Libs}
+
+#
+# dmake - build and test dmake
+#       - this is a special target that you cannot build with dmake
+#       - it must be built with smake
+#
+dmake :
+	${BinDir}/smake ${BinDir}/dmake
+
+dmt :
+	${BinDir}/smake ${BinDir}/dmake
+	(cd tests ; do-test)
+
+#
+# link 
+#
+link: ${InstallDep} ${BinDir}/ps-diff ${BinDir}/ptime \
+      ${BinDir}/ncpu ${BinDir}/propr ${BinDir}/dmnz \
+      ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/latency \
+      ${BinDir}/mpi-io-wrap ${BinDir}/fcscan
+
+#
+# install
+#
+install:
+	pact link
+	pact incinstall
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the SCORE test suite
+#
+test :
+	@./sctest
+
+
+

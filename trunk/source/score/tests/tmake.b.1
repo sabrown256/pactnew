@@ -1,0 +1,31 @@
+#
+# test dependency analysis - multiple explict rules for target
+#                          - a.o depends on a.x and c.y
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+a.x :
+	touch a.x
+
+b.x :
+	touch b.x
+
+c.y :
+	touch c.y
+
+a.o : a.x
+	rm -f $*.o
+	wc -l $< > $*.o
+
+b.o : b.x
+	rm -f $*.o
+	wc -l $< > $*.o
+
+Objs = a.o b.o
+
+${Objs} : c.y
+
+all: a.x b.x ${Objs}
+	rm -f [ab].[xo] c.y

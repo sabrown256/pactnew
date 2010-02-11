@@ -1,0 +1,69 @@
+#!/bin/csh -f
+#
+# S3T1 - test 1 of signature file 3
+#      - pure parse test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Code = do-run
+set Opt  = ans
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set Code = $1
+           breaksw
+      case '-h':
+           echo "Usage: $0 [-c <code>] [-h] run | ans"
+           echo "   c     test <code> (default do-run on path)"
+           echo "   h     this help message"
+           echo "   run   run the test"
+           echo "   ans   print the fiducial answer"
+           echo ""
+           exit(1)
+      default:
+           set Opt = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($Opt == run) then
+   if ("$Valgrind" == "") then
+      $Code -level 3 -dr -mpi foo -s run.s3 s3t1
+      set xstatus = $status
+   else
+      $Valgrind $Code -level 3 -dr -mpi foo -s run.s3 s3t1
+      set xstatus = $status
+   endif
+
+# print the fiducial answer for this test
+else
+   echo "Using signature file 'run.s3'"
+   echo 'CROSS = '
+   echo 'MPI   = foo'
+   echo '> setenv Cmd foo'
+   echo '> if -f run.s3 {run.s3} else {}'
+   echo '>    Consequent: run.s3'
+   echo '> setenv var0 run.s3'
+   echo '> if $?var0 {a} else {}'
+   echo '>    Consequent: a'
+   echo '> setenv var1 a'
+   echo '> setenv var3 ( 1 = 1 ) a'
+   echo '*** error: bad syntax for var4: "(1 == 1) : a"'
+   echo '*** error: bad syntax for var5: "(1 == 1) : a ? b"'
+   echo '*** error: bad syntax for var6: "(1 == 1) ? : a"'
+   echo '> if ( 1 = 1 ) {""} else {a}'
+   echo '>    Consequent: ""'
+   echo '> setenv var7 '
+   echo '*** error: bad syntax for var8: "(1 == 1) a ? : b"'
+   echo '*** error: bad syntax for var9: "(1 == 1) a b ? :"'
+   echo 'foo'
+endif
+
+exit(0)

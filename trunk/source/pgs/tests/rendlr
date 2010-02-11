@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# RENDLR - PGS basic LR rendering tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PGS LR RENDERING TEST
+
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PGS Basic Test ........."
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE Cstd
+   set TStatus = $status
+   flog $Log popd
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PGS Basic Test Program"
+      NoteD $Log "                    PGS Line Plot Test ..... FAILED"
+      set Err = 1
+   else
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         ftee $Log $CFE $BinDir/gsatst -A -3 -8 -11 -12 -r 500
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gsatst -A -3 -8 -11 -12 -r 500 |&  \
+         grep "ERROR SUMMARY:"                                      |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+
+      if ($xstatus == 0) then
+         flog $Log $CFE $PSDIFF gspsts.ps $RefDir/gspsts.ps
+         set DiffStat = $status
+      else
+         set DiffStat = 0
+      endif
+      set ETime    = `$TIMER -b $UTime`
+
+      NoteD $Log ""
+
+      if ($xstatus != 0) then
+         NoteD $Log "                    PGS Basic Test ......... CRASHED ($xstatus/$ETime)"
+         set Err = 1
+      else if ($DiffStat != 0) then
+         NoteD $Log "                    PGS Basic Test ......... FAILED ($DiffStat/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "                    PGS Basic Test ......... PASSED ($ETime)"
+         flog $Log touch gsjpgt.jpg.foo
+         flog $Log rm -f gscgmt.cgm gspsts.ps gscgmt.cgm gsjpgt.jpg.* gspngt.png.*
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

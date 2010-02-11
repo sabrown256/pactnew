@@ -1,0 +1,47 @@
+#
+# PROGRAM-ANALYZE - analyze PACT configuration dependencies
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# fix rpath for analysis scripts that need the final value
+run ../analyze/fix-rpath
+
+# greater context
+run ../analyze/site
+
+# hardware
+run ../analyze/hw
+
+# operating system
+run ../analyze/os
+
+# shells
+run ../analyze/csh
+run ../analyze/sh
+
+# compilers/linkers
+run ../analyze/cc
+run ../analyze/fc
+run ../analyze/ld
+run ../analyze/yacc
+run ../analyze/lex
+
+# system level utilities
+run ../analyze/make
+run ../analyze/python
+run ../analyze/util
+run ../analyze/tracker
+
+# system features
+run ../analyze/features
+
+# graphics
+run ../analyze/graphics
+
+# wrap up
+run ../analyze/finish
+

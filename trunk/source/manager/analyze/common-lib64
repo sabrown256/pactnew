@@ -1,0 +1,60 @@
+#
+# COMMON-LIB64 - analyze 64-bit archive directories depending on $Bits
+#              - input is shell variable LRoot
+#              - output is shell variable LibT
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# initial guess is that we will have $LRoot/lib as the answer
+set LibT  = lib
+
+set lBits = ""
+set lDir  = ""
+foreach dir ($LRoot/lib64 $LRoot/lib)
+   ls $dir/*.o >& /dev/null
+   if ($status == 0) then
+      set Objs = ( `ls $dir/*.o` )
+      foreach o ($Objs)
+         if (-f $o) then
+            set lBits = `file $o`
+            set lDir  = $dir:t
+            break
+         endif
+      end
+      unset Objs
+   endif
+   if ("$lDir" != "") then
+      break
+   endif
+end
+
+# find out whether we have 64 bit objects or not
+set lLib = `echo $lBits | awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bit/) {print $i};};}' | sed 's/-bit//'`
+if ($#lLib > 1) then
+   set lLib = $lLib[1]
+endif
+if ($lLib == 64) then
+
+# determine whether we want to use 64 bit objects or not (default is yes)
+   set lUSE_64 = TRUE
+   if ($?Bits == 1) then
+      if ($Bits == 32) then
+         set lUSE_64 = FALSE
+      endif
+   endif
+
+# if everything agrees use <path>/lib64
+   if ($lUSE_64 == TRUE) then
+      set LibT = $lDir
+   endif
+endif
+
+unset lDir
+unset lBits
+unset lLib
+unset lUSE_64
+

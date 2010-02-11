@@ -1,0 +1,21 @@
+#
+# RUN.S1 - check basic operation
+#
+
+NCPU = $NProc * $NThread
+Cmd  = $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs
+
+MPI : foo {
+   Exe   = foorun
+   Flags = -p $NCPU
+}
+
+DBG : bar {
+   Exe   = bardbg
+   Delim = -a
+}
+
+DBG : baz {
+   Exe = bazgrind
+}
+

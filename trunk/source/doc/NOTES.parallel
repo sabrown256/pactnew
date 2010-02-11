@@ -1,0 +1,141 @@
+
+                 NOTES on PARALLEL OPERATION and DO-RUN
+
+These notes are intended to explain the parallel operation model upon
+which do-run is based.  Do-run attempts to provide a single common
+user interface to running one of the many parallel systems in common
+use today.  There is no standard for these systems and each vendor can
+and does do whatever they want as far as user control is concerned.
+This is a horrible burden on end users in environments where more than
+one parallel system is available.
+
+
+Terms:
+
+CPU either a single core CPU chip or a core of a multi-core CPU chip
+    this is consistent with the contents of /proc/cpuinfo on a linux system.
+
+NODE a computer system with integrated CPU and memory subsystems. A node
+     may have one or more CPUs as defined above.  These usually reside on
+     a single motherboard.  The presence of special interconnect swith
+     hardware for distributed parallel communications does not count as
+     part of an integrated memory subsystem.
+
+THREAD a lightweight process commonly used to implement SMP parallelism.
+
+PROCESS a full UNIX process (also used by MPI for nearly the same entity).
+
+
+I) Parallel Strategies
+
+   A) SMP (shared memory parallel)
+      Uses threads which may shared blocks of memory.  SMP parallelism
+      is always confined to a single node (at least in all current cases).
+      This is a memory bandwidth hardware constraint.
+
+   B) DP (distribued parallel)
+      Uses processes and a message passing system (MPI is the de facto
+      standard) to communicate data and coordinate work across many
+      nodes.  This tends to avoid limitations of how much total memory
+      may be used in a large application.
+
+   It is possible for a single application to employ both parallel
+   strategies simultaneously.
+
+
+II) Parallel Control
+
+   A) Number of Threads
+      The unit of control for SMP parallelism is the number of threads
+      to be used in the run of an application.  Generally, more threads
+      results in less wall clock time consumed for the same number of
+      operations.  This is the -t flag.
+
+   B) Number of Processes
+      The unit of control for DP applications is the number of processes
+      to be used in a run.  Since processes may be spread out across
+      many nodes and any given node may run many processes, this kind of
+      control cannot be really be specified unambiguously with a single
+      number the way the the number of threads is for SMP applications.
+      This is the -p flag.
+
+   C) Number of Nodes
+      Distributed parallel systems invariably include a frontend
+      application which recruits a number of nodes, initializes process,
+      and allocates any other system wide resources needed before running
+      the application.  Each frontend has algorithms for assigning
+      processes to nodes and most of them take input from the user to
+      control the distribution.  In general the main issue is how many
+      processes to assign to each node.  However, the option presented
+      to the user is generally how many nodes to use.  We follow this
+      usage (reluctantly).  This is the -n flag.
+
+III) DO-RUN
+
+   The script do-run takes specifications from the user to run an application
+   which may be sequential, SMP, DP, or both.  It examines the application
+   to determine whether or not it is DP and if so runs the appropriate
+   frontend code.  Its input is independent of any particulare frontend
+   so part of its function is mapping the input specifications given by
+   the user into a form appropriate to the particular frontend.
+
+   Do-run will also run an application under a debugger and in that case
+   also determines how to run the combination of debugger and frontend.
+   Currently, do-run really only knows how to use the Totalview debugger.
+   
+   The parallel control flags of do-run are a simple intersection of the
+   various frontends that it knows about.  The syntax is:
+
+      -t <Nthreads>
+
+      -p <Nprocesses>[,<Nnodes>]
+
+      -n <Nnodes>
+
+   For a DP application the -p flag is sufficient to run a job.  Users
+   may specify the number of nodes if desired.  Specifying the number
+   of nodes alone is not sufficient in general.  The default value
+   for the number of threads, processes, and nodes is 1.  The rationale
+   is that if the user specifies no parallel options the job should be
+   run in the nearest approximation to a serial mode possible.
+
+   In the case where a DP application is told to run with just one
+   process the attempt is made to not use the frontend.  The reason for
+   this is that the application may run in a DP mode as a runtime option.
+   Most DP frontends operate on the false assumption that DP mode is
+   a compile time option only.  In case it really is the intention of
+   the user to run in DP mode with only one process, the -f option is
+   used to force do-run to use the DP frontend.
+
+IV) Examples
+
+    Here are some examples of using do-run to run a code named foo
+    which is both SMP and DP parallel, both of which are runtime
+    selectable options.
+
+    A) do-run -t 4 foo
+
+       Run foo with 4 threads and no DP parallelism.
+
+    B) do-run -p 1 foo
+
+       Run foo essentially in sequential mode.
+
+    C) do-run -p 2 foo
+
+       Run foo with 1 thread and 2 DP processes.  The frontend
+       may run this on 1 or 2 nodes.
+
+    D) do-run -t 4 -p 2 foo
+
+       Run foo with 4 threads and 2 DP processes.  The frontend
+       may run this on 1 or 2 nodes.
+
+    E) do-run -t 4 -p 2 -n 2
+
+       Run foo with 4 threads and 2 DP processes.  The frontend
+       must run this on 2 nodes.  This might be optimal on a
+       4 CPU/node cluster.
+
+
+

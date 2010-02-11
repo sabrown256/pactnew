@@ -1,0 +1,19 @@
+#
+# CLEAR-ENV - unset all environment variables
+#           - does what 'unsetenv *' does on modern csh implementations
+#           - NOTE: this is not executable - it must be sourced
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+#
+
+set noglob
+
+foreach i (`/usr/bin/env`)
+   set var = `echo $i | sed 's/=/ /g'`
+   unsetenv $var[1]
+end
+

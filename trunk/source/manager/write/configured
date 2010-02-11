@@ -1,0 +1,67 @@
+#!/bin/csh -f
+#
+# CONFIGURED - write the CONFIGURED file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    set lCfg = $1
+
+    Separator $Log
+    NoteD $Log "   Configuration record - configured"
+
+    set STDOUT = $IncDir/configured
+
+    flog $Log $RM $STDOUT
+    flog $Log touch $STDOUT
+
+    Note $STDOUT "Config       = $lCfg"
+    Note $STDOUT "DbgOpt       = $DbgOpt"
+    Note $STDOUT "User         = $USER"
+    Note $STDOUT "Date         = `date`"
+    Note $STDOUT "Host         = $Host"
+    Note $STDOUT "OS           = $HostOS"
+    if ("$HAVE_JPEGLIB" == "") then
+       Note $STDOUT "JPEG         = no"
+    else
+       Note $STDOUT "JPEG         = yes"
+    endif
+
+    if ("$HAVE_PNGLIB" == "") then
+       Note $STDOUT "PNG          = no"
+    else
+       Note $STDOUT "PNG          = yes"
+    endif
+
+    set Shared = `grep Shared $lCfg`
+    if ("$Shared" == "") then
+       Note $STDOUT "Shared       = no"
+    else
+       Note $STDOUT "Shared       = yes"
+    endif
+
+    Note $STDOUT "UseTmpDir    = $UseTmpDir"
+    Note $STDOUT "FilterDir    = $FilterDir"
+    Note $STDOUT "WARN_PATTERN = $WARN_PATTERN"
+    Note $STDOUT "ERR_PATTERN  = $ERR_PATTERN"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

@@ -1,0 +1,114 @@
+#!/bin/csh -f
+#
+# MLTEST - test PML
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = pml
+source ../scripts/test-env
+
+setenv LogF  $Log
+
+set Test = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: mltest [-h] [-vg] [<test>]*"
+           echo "  h       this help message"
+           echo "  vg      run tests under valgrind"
+           echo "  <test>  one of: matrix func"
+           echo "                  fpe nan"
+           echo "                  solv svd csum cgsolv"
+           echo ""
+           exit(1)
+      case -*:
+           breaksw
+      default:
+           set Test = ( $Test $1 )
+           breaksw
+   endsw
+   shift
+end
+
+cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "PML TESTS ... omitted"
+
+# run the tests
+else if (-e $RootDir/pml/pml.h) then
+   set BeginTime = `$TIMER -r`
+
+   echo ""
+   echo "PML TEST ..."
+
+   rm -f $Log
+   touch $Log
+
+   Note $Log "BinDir = $BinDir"
+   Note $Log "path   = $path"  
+   Note $Log "MAKE   = $MAKE"
+
+   if ("$Valgrind" != "") then
+      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
+   endif
+
+   if ( !($?autotool) ) then
+      Note $Log "PACT     = $PACT"
+      Note $Log "Parallel = |$Parallel|"
+      flog $Log ../../../manager/pwhich pact
+      flog $Log ../../../manager/pwhich cc
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ("$Test" == "") then
+      set Test = ""
+      set Test = ( $Test matrix func fpe nan solv svd csum cgsolv )
+   endif
+
+   foreach i ($Test)
+      $SrcDir/tests/$i
+      if ($status == 1) then
+         set ERROR = TRUE
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP             
+
+   set ETime = `$TIMER -b $BeginTime`
+
+   NoteD $Log ""
+
+   if ($ERROR == "TRUE") then
+      NoteD $Log ""
+      NoteD $Log "PML TEST ... FAILED ($ETime)"
+      NoteD $Log ""
+      NoteD $Log "See $Log for details"
+   else
+      NoteD $Log "PML TEST ... PASSED ($ETime)"
+   endif
+
+endif
+
+NoteD $Log ""
+NoteD $Log " --------------------------------------------------------"
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+   set xstatus = 1
+endif
+
+exit($xstatus)
+

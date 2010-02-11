@@ -1,0 +1,58 @@
+#!/bin/csh -f
+#
+# PCO - test pco
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if (-f test-env) then
+   source test-env
+   pushd $TestDir >& /dev/null
+else
+   source ../../../scripts/test-env
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: pco [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+@ Err = 0
+
+
+NoteD $Log ""
+NoteD $Log -n "                    PCO Test ....................... "
+Note $Log ""
+
+set BTime = `$TIMER -r`
+
+flog $Log pushd ../../../manager
+
+# GOTCHA: need a lighter weight test for the greater test suite
+#   flog $Log ./test-pco
+set xstatus = $status
+flog $Log popd
+
+set ETime = `$TIMER -b $BTime`
+if ($xstatus == 0) then
+   NoteD $Log "PASSED ($ETime)"
+else
+   NoteD $Log "FAILED ($xstatus/$ETime)"
+   set ERROR = "TRUE"
+endif
+
+exit($Err)
+

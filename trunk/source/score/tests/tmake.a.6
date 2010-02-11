@@ -1,0 +1,38 @@
+#
+# test handling of echo commands
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+SHELL = /bin/csh
+
+all :
+	@echo a
+	@echo "a"
+	@echo 'a'
+	@echo '"a"'
+	@echo "'a'"
+	@echo b c
+	@echo "b c"
+	@echo 'b c'
+	@echo b1"c1"
+	@echo b1'c1'
+	@echo "b2"c2
+	@echo 'b2'c2
+	@(echo "c" ; echo 'd')
+	@(echo c ; echo "d")
+	@(echo e f ; echo 'g h')
+	@(echo e f ; echo 'g "h"')
+	@(echo "e" f ; echo 'g "h"')
+	@((echo "j(k)" ; (echo "l")))
+	@(echo -n "m" ; echo "n")
+	@echo "n" $$USER
+	@echo "n $$USER"
+	@(echo a ; touch a.c ; echo b ; rm -f a.c)
+	@(if (1) then ; echo a; endif)
+	@(if (1) then ; echo a; endif ; echo b)
+
+almost :
+	@(echo "here" ; cd .. ; pwd)
+	@(cd .. ; echo "   there I go" ; pwd)

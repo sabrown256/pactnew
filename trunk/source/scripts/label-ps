@@ -1,0 +1,72 @@
+#!/bin/csh -f
+#
+# LABEL-PS - label PostScript output files
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($#argv < 2) then
+   echo ""
+   echo "Usage: label-ps <file> <message>"
+   echo ""
+   exit(1)
+endif
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/label-ps") then
+   set path = ( $Exe $path )
+endif
+
+if ("$1" == "-l") then
+   set mode = "LANDSCAPE"
+   shift
+else
+   set mode = "PORTRAIT"
+endif
+set File  = $1
+shift
+set Label = ($argv)
+
+@ Length = 0
+foreach i ($Label)
+   @ Length = 1 + $Length + `expr $i : '.*'`
+end
+@ Length = (($Length - 1) * 4)
+
+# compute the x offset for the label so that it is centered on the page
+echo $mode
+if ("$mode" == "PORTRAIT") then
+   @ XOffs = 306 - $Length
+
+   awk ' /showpage/  {print " ";                                           \
+                      print "% Define headers/footers";                    \
+                      print "gsave";                                       \
+                      print "initgraphics initmatrix";                     \
+                      print "/Helvetica findfont 9 scalefont setfont";     \
+                      print "'$XOffs'  16 moveto ('"$Label"') show";       \
+                      print "'$XOffs' 768 moveto ('"$Label"') show";       \
+                      print "grestore";                                    \
+                      print " " }                                          \
+                     {print $$0}'  $File > $File:r.pr
+else
+   @ XOffs = 396 - $Length
+
+   awk ' /showpage/  {print " ";                                           \
+                      print "% Define headers/footers";                    \
+                      print "gsave";                                       \
+                      print "initgraphics initmatrix";                     \
+                      print "612 0 translate 90 rotate";                   \
+                      print "/Helvetica findfont 9 scalefont setfont";     \
+                      print "'$XOffs'  16 moveto ('"$Label"') show";       \
+                      print "'$XOffs' 598 moveto ('"$Label"') show";       \
+                      print "grestore";                                    \
+                      print " " }                                          \
+                     {print $$0}'  $File > $File:r.pr
+endif
+
+exit($status)
+

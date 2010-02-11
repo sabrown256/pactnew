@@ -1,0 +1,212 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH UPDATE-SYS 1 "5 September 2006"
+.SH NAME
+update-sys \- manage the process of building/updating code systems at
+multiple sites.
+.SH SYNOPSIS
+.B update-sys [-a] [-d] [-h] [-f <update-file>] [-q] [-s <site>]
+[-l <tags>* | -r <tags>* | <tags>*]
+.SH DESCRIPTION
+The do-net utility was written to coordinate the building, testing,
+and installing of code systems on multiple platforms concurrently.  It
+was designed with the restriction that the user had access to all the
+platforms via SSH and without password challenges (using RSA keys or
+Kerberos for authentication).  This is not always possible.  For example,
+one may wish to manage code systems on networks which do not grant
+the necessary privileges to one another.
+The update-sys utility brings two important new capabilities to help:
+1) it only requires that all networks involved have passwordless SSH
+access to a single common file system and 2) runs any specified
+commands as defined by a file called an update file.
+
+.SH OPTIONS
+.TP
+.B a
+- Operate on <tags> for all sites.
+.TP
+.B d
+- Run in daemon mode to execute commands.
+.TP
+.B f
+- Use the specified <update-file>.
+.TP
+.B h
+- A short summary help message.
+.TP
+.B l
+- List the specified tags.
+.TP
+.B q
+- Quiet mode.
+.TP
+.B r
+- Remove specified tags.
+.TP
+.B s
+- Operate as the specified site.
+.TP
+.B t
+- Print but do not execute the commands.
+.TP
+.B v
+- Verbose mode.
+.TP
+.B tags
+- Specifications of the form <project>.<id> where <project> is
+defined in the <update-file> and <id> is a token unique to a
+<project>.
+
+.SH OPERATION
+
+Update-sys works by checking for semaphore files (referred to
+as tags) in a directory of a shared file system.  The tags
+indicate commands to be executed.  A plain text update file
+supplies all the information that an update-sys session
+needs and the lists of tags and commands.
+
+Update-sys reads an update file for specifications of a 
+shared directory in which semaphores will be managed, a host
+which has access to the semaphore directory, a list
+of projects, the names of users who are permitted to execute
+commands on behalf of each individual project, and a set of
+entries.  Each entry is identified by a site, project, and
+id.  It also specifies a directory and a command.
+
+Update-sys runs the specified command but does NOT check the
+exit status of the command.  The command must be responsible
+for all of its actions and status.  Any output from the command
+is routed into a log file along with other information which
+update-sys logs for diagnostic purposes.  This log file is
+named ~/.log.update-sys.
+
+When update-sys is started as a daemon it does the following:
+   1) reads the update file for specifications
+   2) launches an auxilliary script, update-watch, on the specified
+      host which looks for semaphores and processes them in the
+      order in which they are created
+   3) when update-watch returns its exit status indicates which
+      entry in the update file to consult
+   4) changes directory to the specified directory
+   5) launches the specfied command
+   6) when done with the command it repeats steps (2) - (6)
+   
+All other uses of update-sys are intended to create, destroy,
+or list tags.
+
+.SH UPDATE FILE SYNTAX
+
+The syntax of the update file is simple.  Blank lines and lines
+beginning with # are ignored.  There are the following specifications:
+
+Host = <host>
+      where <host> is the name of a host which mounts the shared
+      file system.
+
+Loc  = <dir>
+      where <dir> is a directory in the shared file system containing
+      the tags.
+
+Path = <dir>[:<dir>]*
+      where <dir> is a directory to be added to the PATH variable.
+
+Sites = <site>*
+      where <site> is an arbitrary designation of a network on which
+      work is to be done and on which hosts have SSH access to each
+      other without password challenges.
+
+Wrap = <script>
+      where <script> is a shell script which update-sys passes the
+      <command> specifications from the chosen entry.  This script
+      is responsible for running the command but may take other
+      actions before or after running the command.
+
+project <name> <user>*
+      where <name> is the name of the project and <user> is the
+      user name of someone has permission to carry out commands for
+      the project.
+
+entry <site> <project> <id> <dir> <command>
+      where <site> is one of the tokens listed in the Sites
+      specification, <project> is one of the projects, <id> is
+      an arbitrary token used to distinguish among commands for
+      each project (they don't usually distinguish among sites),
+      <dir> is the directory in which the <command> will be
+      launched by the update-sys daemon.
+
+.SH SAMPLE UPDATE FILE
+
+Here is an example of what an update file might contain:
+
+   # my update-sys database
+   
+   Host  = myws
+   Path  = /usr/local/pact/bin
+   Loc   = /usr/local/pact/semaphores
+   Sites = NET1 NET2
+   
+   project mycode bill sue
+   project yourcode jill jack
+   
+   entry NET1 mycode    all  src/mycode  make all
+   entry NET1 mycode    part src/mycode  make part
+   entry NET2 mycode    all  mycode/src  make all
+   entry NET2 mycode    part mycode/src  make part
+   
+   entry NET1 yourcode  new  src/yrcode  do-net hosts/new
+   entry NET2 yourcode  new  ycode       do-net hosts/new
+
+.SH EXAMPLES
+
+Assuming that you have set the UPDATE_SYS_DB environment
+variable with the full path of the file containing the
+above specification, you can do any of the following:
+
+# Create a tag for project mycode if you are bill or sue
+   update-sys mycode.all
+
+# Create a tag for project yourcode for all sites if you are jill or jack
+   update-sys -a yourcode.new
+
+# List all tags
+   update-sys -l
+
+# List specific tags
+   update-sys -l mycode.all yourcode.new
+
+# Remove all tags
+   update-sys -r
+
+# Remove specific tags
+   update-sys -r mycode.part
+
+# Remove specific tags for a particular site
+   update-sys -s NET2 -r mycode.all
+
+# Run in daemon mode to process tags run their commands
+   update-sys -q -d
+
+
+.SH FILES
+
+~/.log.update-sys - contains logging information including
+commands executed by update-sys.  Useful for record keeping
+and debugging.
+
+.SH ENVIRONMENT VARIABLES
+
+UPDATE_SYS_DB - if set specifies path to default update file
+
+.SH SEE ALSO
+
+.B do-net(1)
+
+.SH BUGS
+.TP 
+None known.
+

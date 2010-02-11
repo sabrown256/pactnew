@@ -1,0 +1,55 @@
+#!/bin/csh -f
+#
+# HISTORY - test time history
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+
+NoteD $LogF ""
+NoteD $LogF -n "                    Building PANACEA Test ....."
+Note $LogF ""
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE Cth
+set xstatus = $status
+flog $LogF popd
+
+if ($xstatus != 0) then
+   NoteD $LogF ""
+   NoteD $LogF "                         Can't build PANACEA Test ($xstatus)"
+   set ERROR = "TRUE"
+else
+   NoteD $LogF " DONE"
+   NoteD $LogF ""
+   NoteD $LogF "                    PANACEA Time History Test ....."
+
+   if ("$Valgrind" == "") then
+      ftee $LogF $CFE ${BinDir}/pathts -c 2
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/pathts -c 2   |&  \
+      grep "ERROR SUMMARY:"                      |&  \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+	 flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $LogF "                    PANACEA Time History Test ..... FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    PANACEA Time History Test ..... PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)

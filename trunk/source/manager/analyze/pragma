@@ -1,0 +1,43 @@
+#!/bin/csh -f
+#
+# PRAGMA - analyze the handling of _Pragma
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+cat << EOF >! $Tmp.c
+#define LOCKON(_l)         \
+  _Pragma("omp critical")  \
+  {
+#define LOCKOFF(_l)  }
+int main(int c, char **v)
+   {static int first = 1;
+    if (first)
+       {LOCKON(foo);
+	first = 0;
+	LOCKOFF(foo);};
+    return(0);}
+EOF
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_Lib
+if ($status == 0) then
+   setenv GOOD_OPENMP_PRAGMAS  TRUE
+   NoteD $ALog "      proper pragma handling"
+else
+   setenv GOOD_OPENMP_PRAGMAS  FALSE
+   NoteD $ALog "      bad pragma handling"
+endif
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+# export the results
+SetParent GOOD_OPENMP_PRAGMAS
+
+exit(0)
+

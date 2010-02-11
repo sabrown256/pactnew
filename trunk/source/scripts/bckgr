@@ -1,0 +1,93 @@
+#!/bin/csh -f
+#
+# BCKGR - return 0 if foreground and flavor of background otherwise
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias ps
+
+set OSType     = `uname -s`
+set Verbose    = TRUE
+set PID        = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ''
+           echo 'Usage:  bckgr [-h] [-q] [pid]'
+           echo ''
+           echo 'Report foreground/background condition'
+           echo ''
+           echo '        h   - this help message'
+           echo '        q   - quiet mode'
+           echo '        pid - process id (defaults to parent pid)"
+           echo ''
+           exit(1)
+           breaksw
+
+      case -q:
+           set Verbose = FALSE
+           breaksw
+
+      default:
+           set PID = $1
+           breaksw
+   endsw
+   shift
+end
+
+if (($OSType == "Darwin") || ($OSType == "FreeBSD")) then
+   set PS = "ps -axwo pid,ppid,stat,tpgid"
+
+else
+   if (($OSType == "AIX") && ($OSType == "IRIX64")) then
+      set PSOpt = ""
+   else
+      set PSOpt = ",tpgid"
+   endif
+   set PS = "ps -eo pid,ppid,stat$PSOpt"
+endif
+
+if ("$PID" == "") then
+   set PID = `$PS |& awk '$1 == "'$$'" {print $2}'`
+endif
+set Info = ( `$PS |& grep $PID |& awk '$1 == "'$PID'" {print}'` )
+set FG   = $Info[3]
+if ($#Info > 3) then
+   set TGID = $Info[4]
+else
+   set TGID = 0
+endif
+
+@ LStat = 0
+set Msg = ""
+
+if ($FG =~ *s*) then
+   set Msg = "${Msg}session leader,"
+   @ LStat = $LStat + 4
+endif
+
+if ($FG =~ *+*) then
+   set Msg = "${Msg}foreground process group,"
+   @ LStat = $LStat + 2
+endif
+
+if ($TGID == $PID) then
+   set Msg = "${Msg}foreground process"
+   @ LStat = 0
+else
+   set Msg = "${Msg}background process"
+   @ LStat = $LStat + 1
+endif
+
+if ($Verbose == TRUE) then
+#   echo "pid($PID) tgid($TGID) $Msg ($FG)"
+   echo "tgid($TGID): $Msg ($FG)"
+endif
+
+exit($LStat)
+

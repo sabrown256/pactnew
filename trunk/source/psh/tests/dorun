@@ -1,0 +1,113 @@
+#!/bin/csh -f
+#
+# DORUN - test do-run
+#       - mostly for expression parsing
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if ($?Log == 0) then
+   if (-f test-env) then
+      source test-env
+      pushd $TestDir >& /dev/null
+   else
+      mv $Log $Log.tmp
+      source ../../../scripts/test-env
+      mv $Log.tmp $Log
+   endif
+else
+   source ../../../scripts/env-csh
+endif
+
+set DORUN = do-run
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set DORUN = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: dorun [-c <code>] [-h]"
+           echo "  c  test code (defaults to do-run)"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+InitLog Log $TestDir/log.dorun.$LogSfx
+
+@ Err = 0
+
+set BTime = `$TIMER -r`
+
+NoteD $Log ""
+NoteD $Log "                    DO-RUN Test ...................."
+
+set List = (s1t1 s1t2 s2t1 s3t1 s4t1 s5t1 s6t1)
+set lErr = 0
+
+flog $Log rm -f run.* s*
+flog $Log cp $SrcDir/tests/{run.*,s*} .
+flog $Log setenv PATH $RootDir/scripts:$PATH
+
+Note $Log "Using $DORUN"
+Note $Log "Path = $PATH"
+
+foreach t ($List)
+   Separator $Log
+
+   set f = ( `fill-string -n 28 $t` )
+   NoteD $Log -n "                        $f "
+   Note $Log ""
+
+   set Res = $t.res
+   set Ref = $t.ref
+
+   flog $Log ls ${t}*
+
+   set noglob
+   flog $Log ($t -c $DORUN run |& sed 's|1 \* 1|1|g' |& sed 's|\./||g' | grep -v "DBG   = " >&! $Res)
+   set xstatus = $status
+   flog $Log ($t -c $DORUN ans >&! $Ref)
+   unset noglob
+
+   if ("$Valgrind" == "") then
+      flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
+      set xstatus = $status
+   else
+      grep "ERROR SUMMARY: 0" $Res >! $Res.diff
+      set xstatus = $status
+   endif
+   if ($xstatus == 0) then
+      NoteD $Log "ok"
+      flog $Log rm -f $Res $Ref $Res.diff
+   else
+      flog $Log cat $Res.diff
+      flog $Log set lErr = 1
+      NoteD $Log "ng"
+   endif
+end
+
+set ETime = `$TIMER -b $BTime`
+
+if ($lErr != 0) then
+   NoteD $Log "                    DO-RUN Test .................... FAILED ($lErr/$ETime)"
+   @ Err = $Err + 1
+else
+   NoteD $Log "                    DO-RUN Test .................... PASSED ($ETime)"
+   flog $Log rm -f run.* s*
+endif
+NoteD $Log ""
+
+exit($Err)
+

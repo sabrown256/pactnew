@@ -1,0 +1,305 @@
+#!/bin/csh -f
+#
+# DO-STATS - create ultra files with timing information from update logs
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Err        = 0
+set Version    = 5
+set NG         = FALSE
+set Partial    = FALSE
+set Concurrent = FALSE
+set Sequential = TRUE
+set Remove     = FALSE
+set Verbose    = TRUE
+set After      = FALSE
+set UpdateDir  = ""
+set StatsDir   = ""
+
+# seconds from 00:00:00 1/1/1970 to 00:00:00 1/1/2000
+# according to  'date -d "00:00:00 1/1/2000" +%s' on a linux box
+# must be consistent with pact/scripts/do-stats
+@ ref2000 = 946713600
+
+# time right now in seconds from 00:00:00 1/1/2000
+@ refsecs = `date +%s`
+@ refsecs = $refsecs - $ref2000
+
+@ Start = 0
+@ Stop  = 1999999999
+
+while ($#argv > 0)
+   switch ($1)
+      case -after:
+           shift
+           set After = TRUE
+           @ Start = $1
+           breaksw
+
+      case -before:
+           shift
+           @ Stop = $1
+           breaksw
+
+      case -conc:
+           set Concurrent = TRUE
+           breaksw
+
+      case -h:
+      case help:
+           echo ""
+           echo "STATS-UPDATE - process timing information in update logs"
+           echo ""
+           echo "Usage: dsys stats-update [-after <time>] [-before <time>] [-conc] [-h] [-ng]"
+           echo "                         [-partial] [-q] [-r] [-s <sdir>] [-u <udir>] [-vers <vers>]"
+           echo ""
+           echo "Options:"
+           echo "       after   - process files with time after <time>"
+           echo "       before  - process files with time before <time>"
+           echo "       conc    - process tests even if run concurrently"
+           echo "       h       - this help message"
+           echo "       ng      - process all stats even if some failures"
+           echo "       partial - process all stats even for partial builds (no remove)"
+           echo "       q       - quiet mode"
+           echo "       r       - remove existing stats files"
+           echo "       s       - create/update stats files in directory <sdir>"
+           echo "       u       - process update logs in directory <udir>"
+           echo "       vers    - process update logs with version <vers>"
+           echo ""
+           exit(1)
+           breaksw
+
+      case -ng:
+           set NG = TRUE
+           breaksw
+
+      case -partial:
+           set Partial = TRUE
+           breaksw
+
+      case -q:
+           set Verbose = FALSE
+           breaksw
+
+      case -r:
+           set Remove = TRUE
+           breaksw
+
+      case -s:
+           shift
+           set StatsDir = $1
+           breaksw
+
+      case -u:
+           shift
+           set UpdateDir = $1
+           breaksw
+
+      case -vers*:
+           shift
+           set Version = $1
+           breaksw
+
+      default:
+           echo ""
+           echo "Unknown option: $1"
+           echo ""
+           exit(1)
+           breaksw
+   endsw
+   shift
+end
+
+foreach dir ($StatsDir $UpdateDir)
+   if (!(-d $dir)) then
+      echo ""
+      echo "Directory $dir not found"
+      echo ""
+      exit(1)
+   endif
+end
+
+if ($Remove == TRUE) then
+   rm -f $StatsDir/* >& /dev/null
+endif
+
+if (($After == FALSE) && (-e $StatsDir/Domain)) then
+   set jumpstart = `tail -n 1 $StatsDir/Domain`
+   @ Start = $jumpstart[1]
+endif
+
+ls $UpdateDir/*.update $UpdateDir/*/update >& /dev/null
+if ($status != 0) then
+   if ($Verbose == TRUE) then
+      echo ""
+      echo "No update files in directory $UpdateDir"
+      echo ""
+   endif
+   exit(1)
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# search update logs for STAT entries
+
+if ($Verbose == TRUE) then
+   echo "     Session         days ago      # raw    # match"
+endif
+
+foreach ufile ($UpdateDir/*.update $UpdateDir/*/update)
+
+# skip if not current version
+   set vers  = 0
+   set lines = `grep "DO-NET: (STAT) Version" $ufile`
+   if ($status == 0) then
+      set vers = $lines[4]
+   endif
+   if ($vers != $Version) continue
+
+# skip if domain missing or not in specified range
+   @ domain = 0
+   set lines = `grep "DO-NET: (STAT) Domain" $ufile`
+   if ($status == 0) then
+      if ($#lines >= 4) then
+         @ domain = `echo $lines | awk '{print int($4)}'`
+      else
+         if ($Verbose == TRUE) then
+            echo "     $ufile:t skipped - missing domain"
+         endif
+         continue
+      endif
+   endif
+   if (($domain <= $Start) || ($domain >= $Stop)) continue
+
+   set ltail = $ufile:t
+   set lhead = $ufile:h
+   if ($ltail == update) then
+      set ustat = $lhead/stat
+      set tstat = $lhead:t
+   else
+      set ustat = $lhead/$ltail:r.stat
+      set tstat = $ltail:r
+   endif
+
+   if ($Verbose == TRUE) then
+      echo -n "     $tstat ...... "
+   endif
+
+   if ($NG == TRUE) then
+      set Successful = TRUE
+   else
+      set Successful = FALSE
+      grep "Succeeded on ALL hosts:" $ufile >& /dev/null
+      set status1 = $status
+      grep "Succeeded for ALL configurations:" $ufile >& /dev/null
+      set status2 = $status
+      if (($status1 == 0) || ($status2 == 0)) then
+         grep "Some host timed out" $ufile >& /dev/null
+         if ($status == 1) then
+            grep ">>> interrupted" $ufile >& /dev/null
+            if ($status == 1) then
+               set Successful = TRUE
+            endif
+         endif
+      endif
+   endif
+
+   if ($Partial == TRUE) then
+      set Clean = TRUE
+   else
+      set Clean = FALSE
+      grep "Removing ..." $ufile >& /dev/null
+      if ($status == 0) then
+         set Clean = TRUE
+      endif
+   endif
+
+   set files = ""
+   set files = ( $files `grep "DO-NET: (STAT)" $ufile | awk '{ printf "%s\n", $3 }'` )
+   if (-f $ustat) then
+      set files = ( $files `awk '{ printf "%s\n", $1 }' $ustat` )
+   endif
+
+   set times = ""
+   set times = ( $times `grep "DO-NET: (STAT)" $ufile | awk '{ printf "%s\n", $4 }'` )
+   if (-f $ustat) then
+      set times = ( $times `awk '{ printf "%s\n", $2 }' $ustat` )
+   endif
+
+   @ i  = 0
+   @ nt = $#times
+   @ ne = 0
+   while ($i < $nt)
+      @ i = $i + 1
+
+      set ltime = $times[$i]
+      set lfile = $files[$i]
+
+      switch ($lfile)
+         case conc_test_*:
+              if (("$ltime" == "0") || ("$ltime" == "(0)") || ($Concurrent == TRUE)) then
+                 set Sequential = TRUE
+              else
+                 set Sequential = FALSE
+              endif
+              breaksw
+         case test_*:
+              if (($Successful == FALSE) || ($Sequential == FALSE)) continue
+              breaksw
+         case sysinfo_*:
+         case retry_*:
+              breaksw
+         case *_nfs_*:
+         case *_rpc_*:
+         case build_*:
+         case setup*:
+              if (($Successful == FALSE) || ($Clean == FALSE)) continue
+              breaksw
+         case *install*:
+         case size_*:
+              if ($Successful == FALSE) continue
+              breaksw
+         default:
+              breaksw
+      endsw
+
+      set sec = `echo $ltime | sed "s/[^0-9]/ /g"`
+      if ("$sec" != "") then
+         @ ne = $ne + 1
+         @ ind  = $#sec
+         @ mult = 1
+         @ secs = 0
+         while ($ind > 0)
+            @ sc   = `expr "$sec[$ind]" : '0*\(.*\)'`
+            @ secs = $mult * $sc + $secs
+            @ ind  = $ind - 1
+            @ mult = $mult * 60
+         end
+         set file = `echo $lfile | sed "s*/*-*g"`
+         set file = $StatsDir/$file
+         if (!(-e $file)) then
+            echo "# $file:t" > $file
+            @ dummy = $domain - 1
+            echo "$dummy $secs" >> $file
+         endif
+         echo "$domain $secs" >> $file
+      endif
+   end
+
+   @ days = ( $refsecs - $domain ) / 86400
+
+   if ($Verbose == TRUE) then
+      echo "$days $i $ne" | awk '{printf("%5d     %6d      %5d\n", $1, $2, $3);}'
+   endif
+
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

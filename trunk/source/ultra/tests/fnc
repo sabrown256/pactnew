@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# FNC - ULTRA function test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           FUNCTION TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    ULTRA FNC Test ............... "
+   Note $Log ""
+
+   flog $Log $RM ulfnc.log ultest.err
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+
+# CYGWIN 1.5 simply will not write output to ulfnc.log
+# the other tests are fine
+      if ($OS =~ CYGWIN*) then
+         flog $Log $CFE $Ultra -l $TDir/ulfnc.scm
+         set xstatus = $status
+         set Files = 1
+      else
+         flog $Log ($CFE $Ultra -l $TDir/ulfnc.scm >& ulfnc.log)
+         set xstatus = $status
+         flog $Log (grep -i "error" ulfnc.log > ultest.err)
+         set Files = `find . -name "ultest.err" -size 0c -print`
+      endif
+   else
+      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulfnc.scm  |& \
+      grep "ERROR SUMMARY:"                                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

@@ -1,0 +1,26 @@
+BAZ should be 3: 3
+--> 0
+--> 1
+--> 2
+
+Passed #ifdef/#endif test #1
+Passed #ifndef/#endif test #1
+Passed #if/#endif test #1
+Passed #ifdef/#else/#endif test #1
+Passed #ifndef/#else/#endif test #1
+Passed #if/#else/#endif test #1
+Passed #if/#else/#endif test #2
+Passed imbedded #ifdef/#else/#endif test #1
+-----------------------------
+FOO1(a) should set a to 3: 3
+FOO2(a) should set a to 3: 3
+BLAT1(a) should set a to 3: 3
+BLAT2(a, 4) should set a to 4: 4
+-----------------------------
+cat(a, b) should expand to ab: ab
+FOO should expand to cd: cd
+-----------------------------
+stringify(a) to 'a': a
+-----------------------------
+Passed FOO is now undefined
+-----------------------------

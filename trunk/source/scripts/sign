@@ -1,0 +1,156 @@
+#!/bin/csh
+#
+# SIGN - Send a signal to UNIX processes by name.  After finding the process IDs
+#      - of the requested program/process, run kill on it.
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias ps
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/sign") then
+   set path = ( $Exe $path )
+endif
+
+set Which = "swhich -1"
+
+# absolutely must have ls-jobs - stop without it (update-sys for example)
+set LSJOBS = `$Which ls-jobs`
+if (!(-x "$LSJOBS")) then
+   echo "SIGN error - no ls-jobs found on path:"
+   echo "    $path"
+   exit(1)
+endif
+
+set OSType  = `uname -s`
+set SIG     = ""
+set PName   = ""
+set Signal  = TRUE
+set Verbose = FALSE
+set Quiet   = FALSE
+set Opt     = "-q"
+
+set Help = FALSE
+if ($#argv < 1) then
+   set Help = TRUE
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           set Opt = ( $Opt -rn none- )
+           breaksw
+      case -h:
+           set Help = TRUE
+           break
+           breaksw
+      case -n:
+           set Signal = FALSE
+           breaksw
+      case -q:
+           set Quiet = TRUE
+           breaksw
+
+# NOTE: this is stupid on the face of it but on some systems ps reports
+# uid instead of username
+# this gives a chance to override
+      case -u:
+           shift
+           set USER = $1
+           breaksw
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      case -*
+           if (("$SIG" == "") && ("$PName" == "")) then
+              set SIG = $1
+              breaksw
+           endif
+      default:
+           set PName = ( $PName $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ($Help == TRUE) then
+        echo ''
+        echo 'Usage:  sign [-a] [-h] [-n] [-v] sig [name]*'
+        echo ''
+        echo 'Signal jobs by name or command line pattern and'
+        echo 'by user.  This is guaranteed to run the same way'
+        echo 'on all platforms and different versions of PS.'
+        echo 'Unlike killall it is available everywhere.'
+        echo ''
+        echo '        a    - consider all jobs owned by user'
+        echo '        h    - this help message'
+        echo '        n    - tell but do not signal'
+        echo '        q    - quiet flag'
+        echo '        v    - verbose flag'
+        echo '        sig  - signal to be sent (e.g. -9)'
+        echo '        name - executable name or command line pattern'
+        echo '               used to identify processes'
+        echo ''
+        exit(1)
+endif
+
+if ($Quiet == FALSE) then
+   echo ""
+endif
+
+if ("$SIG" == "") then
+   set SIG = "-15"
+endif
+
+@ Nothing = 0
+foreach name ($PName)
+
+# find the process ids to signal
+   if ($Verbose == TRUE) then
+      $LSJOBS $Opt "$name" | sed '/sign /d'
+   endif
+
+   set pids = `$LSJOBS $Opt "$name" | sed '/sign /d' | awk '{print $2}'`
+
+# remove the current process, sign, from the list
+   set npids = ""
+   foreach i ($pids)
+      if ($i != $$) then
+         set npids = ( $npids $i )
+      endif
+   end
+   set pids = ( $npids )
+
+# act on the list of process ids
+   if ("$pids" == "") then
+      @ Nothing = $Nothing + 1
+      if ($Quiet == FALSE) then
+         echo "No processes found under '$name'"
+      endif
+
+   else
+      if ($#pids == 1) then
+         echo "Sending signal $SIG to '$name' PID: $pids"
+      else
+         echo "Sending signal $SIG to '$name' PIDs: $pids"
+      endif
+      if ($Signal == TRUE) then
+         kill $SIG $pids >& /dev/null
+      endif
+   endif
+
+end
+
+# NOTE: when running under cleanup-jobs you want this blank line
+# and it is harmless when running standalone
+echo ""
+
+# return the number of patterns that matched no jobs
+set Err = $Nothing
+
+exit($Err)

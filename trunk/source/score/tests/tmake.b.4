@@ -1,0 +1,17 @@
+#
+# test dependency analysis - explicit rules should win over implicit ones
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+a.c :
+	touch a.c
+
+.c.o:
+	@echo "implicit-rule $<"
+
+a.o : a.c
+	@echo "explicit-rule a.c"
+	rm -f a.[co]
+

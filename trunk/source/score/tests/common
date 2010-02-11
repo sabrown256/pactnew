@@ -1,0 +1,51 @@
+#!/bin/csh -f
+#
+# COMMON - support for SCORE test scripts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../../scripts/env-csh
+
+if ($?LogF == 0) then
+   set TestName = "$0:t"
+
+   InitLog LogF $cwd/log.$TestName.$LogSfx
+   pushd ../../../manager >& /dev/null
+   set Arch = `cfgman use`
+   cd ../dev/$Arch >& /dev/null
+   set Root = $cwd
+   popd >& /dev/null
+
+   setenv BinDir    $Root/bin
+   setenv LibDir    $Root/lib
+   setenv MAKE      $BinDir/pact
+   setenv TIMER     $BinDir/timer
+   setenv CFE       $BinDir/do-run
+   setenv PFE       $BinDir/do-run
+   setenv MPI       `pact +l -info HAVE_MPI`
+   setenv TEST_MPI  YES
+endif
+
+set TDir   = $RootDir/score/tests
+set RefDir = $TDir/ref
+
+if ($?SrcDir == 0) then
+   pushd ../.. >& /dev/null
+   set SrcDir = $cwd
+   popd >& /dev/null
+endif
+
+if ($?Log == 1) then
+   Note $Log "Log file: $LogF"
+endif
+
+if ($?CROSS_COMPILE == 0) then
+   setenv CROSS_COMPILE FALSE
+endif
+
+set Err = 0
+

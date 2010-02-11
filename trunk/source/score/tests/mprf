@@ -1,0 +1,53 @@
+#!/bin/csh -f
+#
+# MPRF - test performance of SCORE MM
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF "                    SCORE MM Performance Test ... "
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE memchk
+set TStatus = $status
+flog $LogF popd
+
+set ETime   = `$TIMER -b $UTime`
+
+if ($TStatus != 0) then
+   NoteD $LogF "                         ERROR Building MM Performance Program"
+   NoteD $LogF "                    SCORE MM Performance Test ......... FAILED ($ETime)"
+   set Err = 1
+else
+
+   if ("$Valgrind" == "") then
+      ftee $LogF $CFE $BinDir/scmpft -m 1
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/scmpft -m 1  |& \
+      grep "ERROR SUMMARY:"                     |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "                    SCORE MM Performance Test ... PASSED ($ETime)"
+   else then
+      NoteD $LogF "                    SCORE MM Performance Test ... FAILED ($xstatus/$ETime)"
+      set Err = 1
+   endif
+endif
+
+exit($Err)
+

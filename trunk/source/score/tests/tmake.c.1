@@ -1,0 +1,47 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+ADir = ..
+
+a:
+	echo "   Target a"
+	echo '<<command>>'
+
+b:
+	@echo "   Target b"
+	echo '<<command>>'
+
+c:
+	(cd ${ADir} ; echo "   Target c" ; echo '<<command>>')
+
+d:
+	@(cd ${ADir} ; echo "   Target d" ; echo '<<command>>')
+
+e:
+	(cd ${ADir} ; \
+	 echo "   Target e" ; \
+	 echo '<<command>>')
+
+f:
+	@(cd ${ADir} ; \
+	  echo "   Target f" ; \
+	  echo '<<command>>')
+
+pa:
+	dmake -f tmake.c.1 a
+
+pb:
+	@dmake -f tmake.c.1 b
+
+pc:
+	dmake -f tmake.c.1 c
+	dmake -f tmake.c.1 pa
+
+pd:
+	dmake -f tmake.c.1 d
+	dmake -f tmake.c.1 pb
+
+
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# PSH1 - basic test of PCSH
+#
+
+echo "Exe:  $0"
+echo "Args: $argv"
+
+exit($status)
+

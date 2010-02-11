@@ -1,0 +1,21 @@
+#!/bin/csh -f
+#
+# XMAKE.C.6 - test expansion of recursive dmake invocations
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Mkf = tmake.c.6
+
+touch $LogF.make
+touch $LogF.dmake
+
+echo "a" >>& $LogF.make
+echo "b" >>& $LogF.make
+echo "c" >>& $LogF.make
+echo "done" >>& $LogF.make
+
+dmake -rcr -f $Mkf MAKE=dmake a >>& $LogF.dmake
+
+exit($status)

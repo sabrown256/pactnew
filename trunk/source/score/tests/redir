@@ -1,0 +1,168 @@
+#!/bin/csh -f
+#
+# REDIR - test output redirection in SC_exec_commands
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Package = score
+if (-d ../../scripts) then
+   source ../../scripts/env-csh
+else if (-d ../../../scripts) then
+   source ../../../scripts/env-csh
+endif
+
+set KillSrv = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -k:
+           set KillSrv = TRUE
+           breaksw
+
+      case -h:
+           echo "Usage: do-async [-k] [-h]"
+           echo "   k   list and kill other 'dmake -srv' instances"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+   endsw
+   shift
+end
+
+if (-x ../../manager/cfgman) then
+   set TMFiles = ( `ls xmake.f.*` darg )
+   cp $TMFiles $TestDir
+   pushd $TestDir >>& /dev/null
+endif
+
+setenv Log log.redir
+touch foo.core core.foo
+rm -f $Log *.core core*
+
+setenv SC_EXEC_CPU_FACTOR   1024
+setenv SC_EXEC_TIME_LIMIT     64
+setenv SC_EXEC_TIME_FACTOR    16
+
+rm -f $Log
+touch $Log
+
+flog $Log date
+
+@ Err = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set Series = 4
+   Separator $Log
+   NoteD $Log -n "                       redir  "
+   Note $Log ""
+
+   Note $Log "Current shell $SHELL"
+
+   set UTime = `$TIMER -r`
+
+   set Tsts = ""
+   set Tsts = ($Tsts f.1 4)
+   set Tsts = ($Tsts f.2 2)
+   set Tsts = ($Tsts f.3 0)
+   set Tsts = ($Tsts f.4 3)
+   set Tsts = ($Tsts f.5 0)
+
+   if ($KillSrv == TRUE) then
+      flog $Log sign -9 srv
+   endif
+
+   flog $Log set LErr = 0
+   while ($#Tsts > 0)
+      Separator $Log
+      Note $Log "            redir xmake.$Tsts[1]"
+      Note $Log " "
+      Separator $Log
+
+      flog $Log set i = $Tsts[1]
+      flog $Log @ nle = $Tsts[2]
+      shift Tsts
+      shift Tsts
+
+      flog $Log set Script = xmake.$i
+
+      set lg = log-$Series.$i
+      flog $Log rm $lg.tot $lg.job
+
+      flog $Log ($CFE dmake -i -na 1 -srv < $Script >&! $lg.tot)
+      set LStat = $status
+
+      flog $Log (awk '$1 ~ /Job/ && $3 ~ /out/ { print }' $lg.tot >&! $lg.job)
+
+      Note $Log "   -----------------------------------"
+      flog $Log cat $lg.tot
+      Note $Log "   -----------------------------------"
+      flog $Log cat $lg.job
+      Note $Log "   -----------------------------------"
+
+      if ($LStat != 2) then
+         Note $Log "FAIL: dmake crashed ($LStat)"
+         flog $Log set DStat = 1
+         echo -n "x"
+      else
+         flog $Log wc -l $lg.job
+         @ nla = `wc -l $lg.job | awk '{ print $1 }'`
+         if ($nle != $nla) then
+            flog $Log (awk '$4 !~ /***>/ { print }' $lg.job >&! $lg.joba)
+            flog $Log wc -l $lg.joba
+            @ nlb = `wc -l $lg.joba | awk '{ print $1 }'`
+            if ($nle == $nlb) then
+               Note $Log "FAIL: expected $nle lines of output and got $nlb lines after retries"
+               flog $Log set DStat = 0
+               echo -n "o"
+            else
+               Note $Log "FAIL: expected $nle lines of output but got $nla ($nlb after retries)"
+               flog $Log set DStat = 1
+               echo -n "x"
+            endif
+         else
+            flog $Log set DStat = 0
+            echo -n "."
+         endif
+         flog $Log rm $lg.tot $lg.job $lg.joba
+      endif
+
+      Note $Log ""
+      if ($KillSrv == TRUE) then
+         flog $Log ls-jobs srv
+         flog $Log sign -9 srv
+      endif
+
+      if (($LStat == 2) && ($DStat == 0)) then
+         Note $Log "   $Script succeeded ($LStat)"
+      else
+         Note $Log "   $Script failed ($LStat)"
+         flog $Log set LErr = 1
+      endif
+   end
+
+   set ETime = `$TIMER -b $UTime`
+
+   Separator $Log
+   if ($LErr == 0) then
+      NoteD $Log "... ok ($ETime)"
+   else
+      NoteD $Log "... ng ($ETime)"
+      @ Err = $Err + 4
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($?TMFiles) then
+   flog $Log rm -f $TMFiles
+   NoteD $Log ""
+   popd >& /dev/null
+else
+   Note $Log ""
+endif
+
+exit($Err)

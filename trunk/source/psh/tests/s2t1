@@ -1,0 +1,96 @@
+#!/bin/csh -f
+#
+# S2T1 - test 1 of signature file 2
+#      - pure parse test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Code = do-run
+set Opt  = ans
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set Code = $1
+           breaksw
+      case '-h':
+           echo "Usage: $0 [-c <code>] [-h] run | ans"
+           echo "   c     test <code> (default do-run on path)"
+           echo "   h     this help message"
+           echo "   run   run the test"
+           echo "   ans   print the fiducial answer"
+           echo ""
+           exit(1)
+      default:
+           set Opt = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($Opt == run) then
+   if ("$Valgrind" == "") then
+      $Code -level 3 -dr -mpi foo -s run.s2 s2t1
+      set xstatus = $status
+   else
+      $Valgrind $Code -level 3 -dr -mpi foo -s run.s2 s2t1
+      set xstatus = $status
+   endif
+
+# print the fiducial answer for this test
+else
+   echo "Using signature file 'run.s2'"
+   echo 'CROSS = '
+   echo 'MPI   = foo'
+   echo '> setenv Cmd foo'
+   echo '> setenv var0 val'
+   echo '> if ( 1 = 1 ) {val} else {}'
+   echo '>    Consequent: val'
+   echo '> setenv var1 val'
+   echo '> if ( 1 = 0 ) {val} else {}'
+   echo '>    Alternate: '
+   echo '> setenv var2 '
+   echo '> if ( 1 = 1 ) {a} else {b}'
+   echo '>    Consequent: a'
+   echo '> setenv var3 a'
+   echo '> if ( 1 = 0 ) {a} else {b}'
+   echo '>    Alternate: b'
+   echo '> setenv var4 b'
+   echo '> if ( 1 = 1 ) {-noop-} else {val}'
+   echo '>    Consequent: -noop-'
+   echo '> if ( 1 = 0 ) {-noop-} else {val}'
+   echo '>    Alternate: val'
+   echo '> setenv var6 val'
+   echo '> if ( 1 = 1 ) {val} else {-noop-}'
+   echo '>    Consequent: val'
+   echo '> setenv var7 val'
+   echo '> if ( 1 = 0 ) {val} else {-noop-}'
+   echo '>    Alternate: -noop-'
+   echo '> if ( 1 = 1 ) {val} else {-die-}'
+   echo '>    Consequent: val'
+   echo '> setenv var9 val'
+   echo '> if ( 1 = 0 ) {val} else {-die-}'
+   echo '>    Alternate: -die-'
+   echo 'Error: unexpected test result for var10'
+   echo 'Exiting if trace level < 2'
+   echo '> if ( 1 = 1 ) {val} else {-warn-}'
+   echo '>    Consequent: val'
+   echo '> setenv var11 val'
+   echo '> if ( 1 = 0 ) {val} else {-warn-}'
+   echo '>    Alternate: -warn-'
+   echo 'Warning: unexpected test result for var12'
+   echo '> if ( 1 = 1 ) {val} else {-unsetenv-}'
+   echo '>    Consequent: val'
+   echo '> setenv var13 val'
+   echo '> if ( 1 = 0 ) {val} else {-unsetenv-}'
+   echo '>    Alternate: -unsetenv-'
+   echo '> unsetenv var14'
+   echo 'foo'
+endif
+
+exit(0)

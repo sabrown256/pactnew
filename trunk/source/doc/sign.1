@@ -1,0 +1,52 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH SIGN 1 "6 December 2004"
+.SH NAME
+sign \- signal processes by name rather than pid
+.SH SYNOPSIS
+.B sign [-a] [-h] [-n] [-v] sig [name]*
+.SH DESCRIPTION
+Signal jobs by name or command line pattern and
+by user.  This is guaranteed to run the same way
+on all platforms and different versions of PS.
+Unlike killall it is available everywhere.
+
+.SH OPTIONS
+.TP
+.B \-a
+Consider all jobs owned by user.
+.TP
+.B \-h
+A short summary help message.
+.TP
+.B \-n
+Show which jobs would be signalled but does not actually signal anyone.
+.TP
+.B \-q
+Quiet mode.  Prints only essential information.  Useful when invoking
+sign from another script.
+.TP
+.B \-v
+Verbose mode.
+
+Signals can be specified by number of by the same mnemonics used
+by kill.
+
+.SH EXAMPLES
+
+   sign sleep
+   sign -USR1 make
+
+.SH SEE ALSO
+
+.B cleanup-jobs(1), ls-jobs(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

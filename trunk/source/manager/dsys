@@ -1,0 +1,2873 @@
+#!/bin/csh -f
+#
+# DSYS - developer's work script 
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# a little mess curtesy of cygwin
+if ($?SHELL == 0) then
+   if (-x /bin/csh) then
+      setenv SHELL /bin/csh
+   else if (-x /bin/bash) then
+      setenv SHELL /bin/bash
+   else
+      setenv SHELL /bin/sh
+   endif
+endif
+
+# invoking this dsys moves you into the manager directory
+set BldDir = `dirname $0`
+pushd $BldDir >& /dev/null
+
+set Which = "$cwd/pwhich"
+
+set MngDir = $cwd
+set Base   = $MngDir:h
+setenv ScrDir $Base/scripts
+
+if (-f extensions/sys-site) then
+   eval `extensions/sys-site`
+else
+   setenv DAI_ROOT /usr/share
+   setenv DAS_ROOT /usr/local
+endif
+
+source $ScrDir/env-csh
+source $ScrDir/csh-subroutines
+HAVE_SUBROUTINES
+
+unalias cp
+unalias rm
+unalias mv
+unalias ls
+unalias cd
+unalias find
+unalias grep
+unalias sed
+unalias sort
+
+unsetenv BASH_ENV
+umask 007
+
+set CfgMan = $MngDir/cfgman
+
+setenv System  `$CfgMan use`
+setenv PACTVer `cat $MngDir/.pact-version`
+
+set BaseDev = $Base/dev
+set Root    = $BaseDev/$System
+set IncDir  = $Root/include
+set BinDir  = $Root/bin
+set LibDir  = $Root/lib
+set LogDir  = $Root/log
+set ScmDir  = $Root/scheme
+set PACT    = $BinDir/pact
+set PCKS    = "-"
+set EnvCsh  = $IncDir/env-pact.csh
+set Tmp     = tmp_$System
+set Host    = `uname -n`
+set Time    = time
+
+set DSYS    = $MngDir/dsys
+set TIMER   = $ScrDir/timer
+
+set path = ( $path . )
+
+# put ../scripts on the end of the path just in case - bootstrap
+set path = ( $path $ScrDir )
+
+# if we have the issue ticket tracker available note it
+set HaveTicket = FALSE
+set BugTck     = /usr/gapps/pact/pactbug
+if (-x $BugTck) then
+   set HaveTicket = TRUE
+endif
+
+set Cmnd = $1
+shift
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+#
+# Make sure that the installation directories exist
+#
+
+if ("$Cmnd" != "dirs") then
+   $DSYS dirs
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set LogFile = $LogDir/$Cmnd
+$RM $LogFile
+
+if ($#argv > 0) then
+   if ("$1" == "-time") then
+      set Time = ""
+      shift
+   endif
+endif
+
+if ((-e $EnvCsh) && ("$Cmnd" != config) && ("$Cmnd" != reconfig)) then
+   source $EnvCsh
+endif
+
+set RStatus = 0
+
+switch ($Cmnd)
+   case -h:
+   case help:
+        echo " "
+        echo "DSYS - simulation system developers script "
+        echo " "
+        echo "Usage: dsys <command> <options> "
+        echo " "
+        echo "Commands: analyze      - analyze the current platform"
+        echo "          build        - compile and load the system codes"
+        echo "          clean        - clean out the source directories"
+        echo "          commit       - commit source/builder/doc changes into repository"
+        echo "                       - commit message is built from remaining args"
+        echo "          config       - configure the sources for the current platform"
+        echo "          configured   - report the current configuration"
+        echo "          delete       - remove all subdirectories and ancillary files"
+        echo "                         pertaining to a specified architecture"
+        echo "                         (Type 'dsys delete -h' for options.)"
+        echo "          diff-hdrs    - diff the headers against the repository"
+        echo "          dist         - make a distribution file"
+        echo "          import       - import sources (repository to repository)"
+        echo "          info         - print info about PACT including"
+        echo "                         log - review commit log"
+        echo "                         tags - list revision tags"
+        echo "                         space - find size of bins, libs, and includes"
+        echo "          install      - install the system codes in public"
+        echo "          net-update   - run a do-net without some bootstrapping problems"
+        echo "          pact         - control the pact link to either smake or dmake"
+        echo "          reconfig     - re-configure according to last configuration"
+        echo "          remove       - remove the binaries in ../dev"
+        echo "          post         - post a new distribution"
+        echo "          select       - change configuration when using multiple"
+        echo "                         configurations per platform"
+        echo "          shared       - build PACT and its shared libraries"
+        echo "          stats        - plot timing information from update logs"
+        echo "          stats-update - create ultra files with timing information from update logs"
+        echo "          sync         - update sources with repository "
+        echo "          tag          - tag the sources"
+        echo "          test         - test the system codes"
+        echo "          test-ssh     - test the SSH connections"
+        echo "          update-sys   - update PACT versions at all sites using"
+        echo "                         the update-sys utility"
+
+        if ($HaveTicket == TRUE) then
+           echo "          ticket       - interact with the issue ticket tracker"
+        endif
+
+        echo "          unlock       - unlock the repository"
+        echo "          update       - update an installation"
+        echo "          -h           - print this help message"
+        echo "          -V           - force make macros to be verbose during compilation"
+        echo " "
+        exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case analyze:
+        $Time pact-analyze $argv
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case build:
+        echo ""
+
+        InitLog Log $LogDir/build
+
+        flog $Log $Which pact
+
+        set Shared = ( `dsys configured | awk '$1 == "Shared" { print $3 }'` )
+        if ("$Shared" == "yes") then
+           set MTgt = shared
+           set Msg  = "shared and static"
+        else
+           set MTgt = link
+           set Msg  = "static"
+        endif
+
+        set ThreadMake = ""
+        set Make = `pact -info make`
+        set Make = $Make:t
+        if ($Make == "gmake") then
+           set HaveGMake  = TRUE
+        else
+           set HaveGMake  = FALSE
+        endif
+
+#        set Args = "-dbg"
+        set Args = ""
+        set Tgts = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -a :
+                   ./bpc $argv
+                   exit($status)
+                   breaksw
+              case -dbg :
+                   set Args = ( $Args $1 )
+                   breaksw
+              case -h :
+                   echo ""
+                   echo "Usage: dsys build [-a] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
+                   echo ""
+                   echo "     a  - build all current configurations"
+                   echo "     h  - this help message"
+                   echo "     na - number of attempts when commands fail"
+                   echo "     p  - number of nodes to use"
+                   echo "     s  - build shared libraries if configured"
+                   echo "     u  - build static libraries only (default)"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -na :
+                   shift
+                   set Args = ( $Args +na $1 )
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+              case -s :
+                   shift
+                   set MTgt = shared
+                   breaksw
+              case -u :
+                   shift
+                   set MTgt = build
+                   breaksw
+              case -o :
+                   shift
+                   breaksw
+              case -* :
+                   set Args = ( $Args $argv )
+                   breaksw
+              default :
+                   set Tgts = ( $Tgts $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+        flog $Log umask
+	flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/build.error
+
+        set BeginTime = `$TIMER -r`
+
+# provide context for child processes
+        setenv DSYS_TARGET pact_build
+
+        if ("$Tgts" == "") then
+           NoteD $Log "Building PACT on $Host ($Msg) ..."
+
+           flog $Log $DSYS linstall
+           flog $Log pushd ..
+
+           flog $Log setenv PACT_CONFIG $System
+           flog $Log setenv PACTRoot $cwd
+
+           flog $Log setenv  SC_EXEC_SERVER_WAIT     300
+           flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
+           flog $Log setenv  SC_EXEC_TIME_FACTOR     80
+           flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
+           Note $Log "pact -log $Log -f $IncDir/Makefile $Args build"
+           pact -log $Log -f $IncDir/Makefile $Args build
+           set RStatus = $status
+           set Build   = "build"
+
+           flog $Log popd
+        else
+           NoteD $Log "Building packages on $Host ($Msg) ..."
+           NoteD $Log ""
+           while ($#Tgts > 0)
+              set tgt = $Tgts[1]
+              shift Tgts
+              if (-d $Base/$tgt) then
+                 flog $Log pushd $Base/$tgt
+
+                 NoteD $Log "$Base/$tgt"
+                 flog $Log $PACT $Args install
+                 NoteD $Log ""
+
+                 flog $Log popd
+              endif
+           end
+           set RStatus = $status
+           set Build   = "packages"
+        endif
+
+        flog $Log pushd ../doc
+        flog $Log pact install
+        flog $Log popd
+
+        if ($RStatus == 0) then
+           Separator $Log
+           Note $Log "Building F90 interfaces"
+           flog $Log ./itf90
+           Note $Log "done"
+        endif
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        if ($RStatus != 0) then
+           Separator $Log
+           Note $Log "Build failed - some hints may be found in the files:"
+           flog $Log ls -l ../*/z-$System/obj/errlog
+        endif
+
+        Separator $Log
+        NoteD $Log ""
+        NoteD $Log "PACT $Build on $Host complete ($RStatus/$ETime)"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case load:
+        echo ""
+
+        InitLog Log $LogDir/load
+
+        flog $Log $Which pact
+
+#        set Args = "-dbg"
+        set Args = ""
+        set Tgts = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -a :
+                   ./bpc $argv
+                   exit($status)
+                   breaksw
+              case -dbg :
+                   set Args = ( $Args $1 )
+                   breaksw
+              case -h :
+                   echo ""
+                   echo "Usage: dsys build [-a] [-h] [-na #] [-p #] [-s] [-u] [tgts]*"
+                   echo ""
+                   echo "     a  - build all current configurations"
+                   echo "     h  - this help message"
+                   echo "     na - number of attempts when commands fail"
+                   echo "     p  - number of nodes to use"
+                   echo "     s  - build shared libraries if configured"
+                   echo "     u  - build static libraries only (default)"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -na :
+                   shift
+                   set Args = ( $Args +na $1 )
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+              case -s :
+                   shift
+                   set MTgt = shared
+                   breaksw
+              case -u :
+                   shift
+                   set MTgt = build
+                   breaksw
+              case -o :
+                   shift
+                   breaksw
+              case -* :
+                   set Args = ( $Args $argv )
+                   breaksw
+              default :
+                   set Tgts = ( $Tgts $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+        flog $Log umask
+
+        set BeginTime = `$TIMER -r`
+
+        if ("$Tgts" == "") then
+           NoteD $Log "Linking PACT on $Host ..."
+
+           flog $Log pushd ..
+           flog $Log setenv PACT_CONFIG $System
+           flog $Log setenv PACTRoot $cwd
+
+           flog $Log setenv  SC_EXEC_SERVER_WAIT     300
+           flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
+           flog $Log setenv  SC_EXEC_TIME_FACTOR     80
+           flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
+           Note $Log "pact -log $Log -f $IncDir/Makefile $Args link"
+           pact -log $Log -f $IncDir/Makefile $Args link
+           set RStatus = $status
+           set Build   = "link"
+
+           flog $Log popd
+        else
+           NoteD $Log "Linking packages on $Host ..."
+           NoteD $Log ""
+           while ($#Tgts > 0)
+              set tgt = $Tgts[1]
+              shift Tgts
+              if (-d $Base/$tgt) then
+                 flog $Log pushd $Base/$tgt
+
+                 NoteD $Log "$Base/$tgt"
+                 flog $Log $PACT $Args link
+                 NoteD $Log ""
+
+                 flog $Log popd
+              endif
+           end
+           set RStatus = $status
+           set Build   = "packages"
+        endif
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        if ($RStatus != 0) then
+           Note $Log "Link failed - some hints may be found in the files:"
+           flog $Log ls -l ../*/z-$System/obj/errlog
+        endif
+
+        NoteD $Log ""
+        NoteD $Log "PACT $Build on $Host complete ($RStatus/$ETime)"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case clean:
+        InitLog Log $LogDir/clean
+
+        flog $Log $Which pact
+
+        set Args = "-i"
+        while ($#argv > 0)
+           switch ($1)
+              case -h :
+                   echo ""
+                   echo "Usage: dsys clean [-h] [-p #]"
+                   echo ""
+                   echo "     h  - this help message"
+                   echo "     p  - number of nodes to use"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+              case -* :
+                   breaksw
+           endsw
+           shift
+        end
+
+        NoteD $Log ""
+        NoteD $Log "Cleaning Up PACT Directories ... "
+        NoteD $Log ""
+
+        flog $Log touch foo~ foo.log
+        flog $Log $RM $Tmp.mk pact *~ core *.log
+
+        flog $Log pushd ..
+        pact -log $Log $Args -cmd $PCKS pact -i clean
+        set RStatus = $status
+
+        NoteD $Log ""
+        NoteD $Log "done"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case commit:
+        pact-commit $argv
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case config:
+
+        if ($?USER == 0) then
+           if ($?LOGNAME == 0) then
+              set USER = "anonymous"
+           else
+              set USER = $LOGNAME
+           endif
+        endif
+
+        setenv DbgOpt  partial
+
+        set DoingConfig = TRUE
+
+# do not let the current environment dictate compiler choices
+        unsetenv COMPILER_GNU_VERSION
+        unsetenv COMPILER_IC_VERSION
+        unsetenv COMPILER_PATH_VERSION
+        unsetenv COMPILER_PGI_VERSION
+
+        set ConfigDir = ""
+        if ($?SYS_SITE == 1) then
+           set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
+           set ConfigDir = ( $ConfigDir local/$lsite )
+           unset lsite
+        endif
+        set ConfigDir = ( $ConfigDir local std )
+
+        setenv CCompiler  gcc
+
+        set Arch          = `$ScrDir/system-id`
+        set Configuration = ""
+        set ExplSystem    = FALSE
+        set Method        = 2
+        set mpi           = FALSE
+        set python        = FALSE
+        set shared        = FALSE
+        set openmp        = FALSE
+        set pthread       = FALSE
+        set pydir         = ""
+	set bits          = `$ScrDir/nbit -d`
+        set Alias         = ""
+        set flst          = ""
+
+        set HelpCode      = ./$0
+        set WhoIAm        = $USER
+
+        set SCSRepository = ""
+        set SRCDate       = ""
+ 
+        set Opt   = "$HelpCode:t  $argv"
+        set PArgs = ""
+
+        while ($#argv > 0)
+           switch ($1)
+              case -a:
+                   shift
+                   set Alias = $1
+                   breaksw
+              case -b:
+                   shift
+                   set bits = $1
+                   breaksw
+              case -cc:
+                   shift
+                   setenv CCompiler  $1
+                   breaksw
+              case -c:
+                   set PArgs = ( $PArgs "-c" )
+                   breaksw
+              case -f:
+                   shift
+                   set ConfigDir = ( $1 $ConfigDir )
+                   breaksw
+              case -F:
+                   set PArgs = ( $PArgs "-F" )
+                   breaksw
+              case -feature:
+                   shift
+                   set flst = ( $flst $1 )
+                   breaksw
+              case -g:
+                   setenv DbgOpt  debug
+                   set PArgs = ( $PArgs "-g" )
+                   breaksw
+              case -gsys:
+                   shift
+                   switch ("$1")
+                      case gl:
+                           setenv Std_UseOGL TRUE
+                           breaksw
+                      case qd:
+                           setenv Std_UseQD  TRUE
+                           breaksw
+                      case x11:
+                           setenv Std_UseX  TRUE
+                           breaksw
+                   endsw
+                   breaksw
+              case -h:
+                   echo ""
+                   echo "Usage: dsys config [-a <alias>] [-b 32 | 64] [-c]"
+                   echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
+                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp] [-os <sys-id>] [-p]"
+                   echo "                   [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
+                   echo ""
+                   echo "        -a         set the alias/id for this config"
+                   echo "        -c         create missing directories for -i option"
+                   echo "        -f         a directory containing your configuration file"
+                   echo "        -F         do fast builds using /tmp"
+                   echo "        -g         build an absolutely debuggable version"
+                   echo "        -gsys      use specified graphics system"
+                   echo "                   options are: gl (OpenGL), qd (Apple Quickdraw), and x11 (default)"
+                   echo "        -h         this help message"
+                   echo "        -i         base installation directory (default /usr/local)"
+                   echo "                   to omit installation use "-i none""
+                   echo "        -llp       use LD_LIBRARY_PATH when analyzing compilers"
+                   echo "        -os        explicitly set the hardware/OS/release system id"
+                   echo "        -p         build a profiling version"
+                   echo "        -v         display the Version of the Source Control System"
+                   echo "        -V         configuration/build makefiles verbose"
+                   echo ""
+                   echo "   The following options apply only if no config file is specified:"
+                   echo "        -b         size of pointers in bits for platforms with option"
+                   echo "                   the default is determined by the platform defaults"
+                   echo "        -cc        specify the C compiler to be used (default gcc)"
+                   echo "                   partial list:"
+                   echo "                      icc        Intel compilers"
+                   echo "                      gcc        GNU compilers"
+                   echo "                      gnu-bgl    GNU for IBM BG/L backend"
+                   echo "                      gnu-bgp    GNU for IBM BG/P backend"
+                   echo "                      pathcc     PathScale compilers"
+                   echo "                      pgcc       PGI compilers"
+                   echo "                      sun        SUN compilers"
+                   echo "                      xlc-bgl    XL compilers for IBM BG/L backend"
+                   echo "                      xlc-bgp    XL compilers for IBM BG/P backend"
+                   echo "        -feature   use the specified feature"
+                   echo "        -ipy       path to python, implies -py"
+                   echo "        -mpi       build MPI version"
+                   echo "        -py        build python bindings"
+                   echo "        -s         build OpenMP version"
+                   echo "        -sl        build shared libraries"
+                   echo "        -t         build threaded version"
+                   echo ""
+                   echo "   Config files are optional and should be used to exercise"
+                   echo "   more control than is available from the command line options"
+                   echo "        <config>   the configuration for the installation"
+                   echo "                   sample configs (see manager/std) are:"
+                   echo "                        -    auto-aix     IBM RS6000 systems"
+                   echo "                        -    auto-darwin  Mac OS X systmes"
+                   echo "                        -    auto-hp      HP RISC 700 systems"
+                   echo "                        -    auto-irix64  64 bit SGI systems running IRIX64 6.x"
+                   echo "                        -    auto-linux   LINUX systems"
+                   echo "                        -    auto-osf     OSF systems"
+                   echo "                        -    auto-sol     Sun Solaris systems"
+                   echo "                   (check manager/local for any local configs)"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -i:
+                   shift
+                   if (("$1" == none) || ("$1" =~ /*)) then
+                      set PArgs = ( $PArgs "-i" $1 )
+                   else
+                      set PArgs = ( $PArgs "-i" $cwd/$1 )
+                   endif
+                   breaksw
+              case -ipy:
+                   shift
+                   set pydir  = $1
+                   set python = TRUE
+                   breaksw
+              case -llp:
+                   setenv UseLDLibPath "-l"
+                   breaksw
+              case -md:
+                   shift
+                   set Method = $1
+                   breaksw
+              case -mpi:
+                   set mpi = TRUE
+                   breaksw
+              case -O:
+                   setenv DbgOpt  mixed
+                   breaksw
+              case -o:
+                   setenv DbgOpt  optimize
+                   set PArgs = ( $PArgs "-o" )
+                   breaksw
+              case -os:
+                   shift
+                   set ExplSystem = TRUE
+                   set System     = $1
+                   set RootDir    = $Root/dev/$System
+                   set IncDir     = $RootDir/include
+                   set EnvCsh     = $IncDir/env-pact.csh
+                   set EnvSh      = $IncDir/env-pact.sh
+                   breaksw
+              case -p:
+                   set PArgs = ( $PArgs "-p" )
+                   breaksw
+              case -py:
+                   set python = TRUE
+                   breaksw
+              case -s:
+                   set openmp = TRUE
+                   breaksw
+              case -sl:
+                   set shared = TRUE
+                   breaksw
+              case -strict:
+                   shift
+                   set PArgs = ( $PArgs "-strict" $1 )
+                   breaksw
+              case -t:
+                   set pthread = TRUE
+                   breaksw
+              case -v*:
+                   source pact-scs
+                   echo "  Source Version:   " $SCSVersion
+                   echo "  Software Release: " $SCSRelease
+                   echo ""
+                   exit(1)
+              case -V:
+                   set PArgs = ( $PArgs "-v" )
+                   breaksw
+              default:
+                   set Configuration = $1
+           endsw
+           shift
+        end
+
+        unsetenv LD_LIBRARY_PATH
+
+        set BeginTime = `$TIMER -r`
+
+# provide context for child processes
+        setenv DSYS_TARGET pact_config
+
+# find the configuration file
+        set UCfg = ""
+
+# if no configuration is specified - generate from scratch
+        if ("$Configuration" == "") then
+           call GEN_CONFIG()
+           set dir  = gen/$Arch
+           set UCfg = $dir/$Configuration
+
+# if file exists as is use it
+        else if (-f $Configuration) then
+           set dir  = gen/$Arch
+           set UCfg = $dir/$Configuration
+
+# otherwise look in the configs directories
+        else
+           foreach dir ($ConfigDir)
+              set lCfg = $dir/$Configuration
+              if (-f $lCfg) then
+                 set UCfg = $lCfg
+                 break
+              endif
+           end
+        endif
+
+# if there still is no config file - generate from what we know
+        if ("$UCfg" == "") then
+           set dir  = gen/$Arch
+           set UCfg = `gen-cfg $Configuration`
+        endif
+
+# set the configuration for this system
+        set System = `$CfgMan add $Configuration $Alias`
+
+# now that we have the system, reset the variables that depend on it
+        set Root   = $BaseDev/$System
+        set IncDir = $Root/include
+        set BinDir = $Root/bin
+        set LibDir = $Root/lib
+        set LogDir = $Root/log
+        set ScmDir = $Root/scheme
+        set PACT   = $BinDir/pact
+
+        if ($ExplSystem == FALSE) then
+           set EnvCsh = $IncDir/env-pact.csh
+           set EnvSh  = $IncDir/env-pact.sh
+        endif
+
+        set temp   = $SHELL
+        set CurrSh = $temp:t
+        setenv CURR_SH $CurrSh
+
+# source control system variables
+        source pact-scs
+
+# set up some items in the working environment
+        set path = ( . $BinDir $path )
+
+# make sure the log directory is there - do not wait for later
+        if (!(-d $LogDir)) then
+           mkdir -p $LogDir
+        endif
+
+        InitLog Log $LogDir/config
+
+        Note $Log "System = $System"
+        Note $Log "Root   = $Root"
+
+        flog $Log umask
+
+# make sure that the installation directories exist
+        setenv HostOS     `uname -s`
+        setenv HostOSRel  `uname -r`
+        setenv HostArch   `uname -m`
+        set InstBase  = $BaseDev/$System
+        if (!(-d $BaseDev)) then
+           mkdir $BaseDev
+        endif
+        if (!(-d $InstBase)) then
+           mkdir $InstBase
+        endif
+        if (!(-d $InstBase/bin)) then
+           mkdir $InstBase/bin
+        endif
+        if (!(-d $InstBase/lib)) then
+           mkdir $InstBase/lib
+        endif
+        if (!(-d $InstBase/include)) then
+           mkdir $InstBase/include
+        endif
+        if (!(-d $InstBase/include/shell)) then
+           mkdir $InstBase/include/shell
+        endif
+        if (!(-d $InstBase/scheme)) then
+           mkdir $InstBase/scheme
+        endif
+        if (!(-d $InstBase/scheme/extensions)) then
+           mkdir $InstBase/scheme/extensions
+        endif
+        if (!(-d $InstBase/log)) then
+           mkdir $InstBase/log
+        endif
+
+        set RStatus = $status
+
+        flog $Log pushd ../psh
+        unsetenv LD_LIBRARY_PATH
+        flog $Log ./ccw -g pco.c -o $BinDir/pco
+        if ($status == 0) then
+           flog $Log ./ccw -g do-run.c -o $BinDir/do-run
+           flog $Log ./ccw -g perdb.c -o $BinDir/perdb
+        endif
+        flog $Log popd
+
+        flog $Log setenv PERDB_PATH $IncDir/cfg
+        flog $Log $RM $IncDir/cfg.*
+        flog $Log $BinDir/perdb -l -c -s
+
+	if (($Method == 2) && (-x $BinDir/pco)) then
+           flog $Log set PConf = ( $BinDir/pco -l )
+           Note $Log "Using binary pco to process input"
+        else
+           flog $Log set PConf = ./pact-config
+           Note $Log "Using script pact-config to process input"
+        endif
+
+# start the env files
+        $RM $EnvCsh
+        touch $EnvCsh
+        Note $EnvCsh ""
+        Note $EnvCsh "set System = $System"
+        Note $EnvCsh "set path   = ( . $BaseDev/"'$System/bin $path )'
+        Note $EnvCsh ""
+
+        $RM $EnvSh
+        touch $EnvSh
+        Note $EnvSh ""
+        Note $EnvSh "export System=$System"
+        Note $EnvSh "export PATH=.:$BaseDev/"'$System/bin:$PATH'
+        Note $EnvSh ""
+
+# remove files we are about to generate
+# so that if generation fails we are not left with ghosts from old configs
+        set GenFiles = ""
+        set GenFiles = ( $GenFiles package configured f90-interface )
+        set GenFiles = ( $GenFiles make-def make-macros makefile )
+        set GenFiles = ( $GenFiles scconfig.h scdecls.h syntax.h)
+        set GenFiles = ( $GenFiles spokes.scm )
+        set GenFiles = ( $GenFiles env-mio )
+        foreach i ( $GenFiles )
+           flog $Log $RM $IncDir/$i
+        endif
+
+        set GenFiles = ""
+        set GenFiles = ( $GenFiles install-pact )
+        foreach i ( $GenFiles )
+           flog $Log $RM $BinDir/$i
+        endif
+
+# do the main configuration work
+        if ("$UCfg" != "") then
+           NoteD $Log "Using $Configuration in $dir to configure this PACT installation."
+           Note $Log "Command: $PConf $PArgs -s $System $UCfg"
+           $PConf $PArgs -s $System $UCfg
+           set RStatus = $status
+           if ($RStatus != 0) then
+              goto CFG_DONE
+           endif
+        else
+           echo "There is no $Configuration in $ConfigDir"
+           set RStatus = 3
+           goto CFG_DONE
+        endif
+
+# now that PConf made us one, source it        
+        source $EnvCsh
+        
+# cleanup path so as not to tax wimpy OSs such as Solaris
+        eval `$ScrDir/simplify-path`
+
+        flog $Log chmod a+x code-date
+        flog $Log pwd
+
+        flog $Log csh $DSYS linstall
+        set RStatus = $status
+        Note $Log "Status = $RStatus"
+        if ($RStatus != 0) then
+           echo "   PACT install PROBLEM during 'dsys config'"
+           goto CFG_DONE
+        endif
+
+        if ($?IBM_BGL == 0) then
+
+# using existing dmake/smake build new dmake
+           Separator $Log
+           NoteD $Log "   Persistent Portable Parallel Make - dmake"
+           flog $Log pushd $Base/score
+           if (-x ${BinDir}/dmake) then
+              flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
+           endif
+
+           set LStat = 1
+           foreach i (dmake.exec smake)
+              Note $Log ""
+              Note $Log "Check $i for building dmake"
+              set Mk = ${BinDir}/$i
+              if (-x $Mk) then
+                 Note $Log "   $i is executable - trying"
+
+# if the configuration we are doing, UCfg, is different than
+# the one Mk used we must do a remove and start clean
+                 set MCfg = `$Mk -info Config`
+                 if ("$MCfg" != "$UCfg") then
+                    flog $Log $Mk remove
+                 endif
+
+# NOTE: do it twice as a fault tolerance measure
+# this role will be assumed by dmake after it is successfully built
+                 flog $Log $Mk ${BinDir}/dmake
+                 flog $Log $Mk ${BinDir}/dmake
+                 set LStat = $status
+                 if ($LStat == 0) then
+                    Note $Log "Build of dmake succeeded"
+                    break
+                 else
+                    Note $Log "Build of dmake failed"
+                 endif
+              else
+                 Note $Log "   $i is not executable"
+              endif
+           end
+           flog $Log $RM ${BinDir}/dmake.exec
+           flog $Log popd
+        else
+           set LStat = 1
+        endif
+
+        flog $Log set Opt = smake
+        if ($?CROSS_COMPILE == 1) then
+           if ($CROSS_COMPILE == TRUE) then
+              set LStat = 2
+           endif
+        endif
+        if ($LStat == 0) then
+           flog $Log ${BinDir}/dmake -v
+           if ($status == 0) then
+              flog $Log set Opt = dmake
+           endif
+        else
+           flog $Log cat $Base/score/z-$System/test/log.tmake
+        endif
+        ftee $Log $DSYS pact $Opt
+
+        Separator $Log
+        NoteD $Log ""
+        NoteD $Log "Configuration for version $PACTVer complete"
+        NoteD $Log ""
+
+        echo $cwd
+        rehash
+
+# create empty extensions directories if they don't exist already
+        set ExtDirs = ( $Base/sx/applications/extensions $Base/ultra/applications/extensions )
+        foreach dir ($ExtDirs)
+           if (-d $dir:h) then
+              if (!(-d $dir)) then
+                 flog $Log mkdir $dir
+              endif
+           endif
+        end
+
+# figure out which shell you are using
+        NoteD $Log ""
+        NoteD $Log "Your shell is $CURR_SH.  Consequently, you should do:"
+        NoteD $Log ""
+        if (($CURR_SH != csh) && ($CURR_SH != tcsh)) then
+           NoteD $Log "   . $EnvSh"
+        else
+           NoteD $Log "   source $EnvCsh"
+        endif
+        NoteD $Log ""
+        NoteD $Log "into your current environment before proceeding to do work"
+        NoteD $Log "on the PACT system not covered by the installation process."
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        NoteD $Log ""
+        NoteD $Log "PACT configured ($RStatus/$ETime)"
+        NoteD $Log ""
+
+CFG_DONE:
+        flog $Log $BinDir/perdb -l quit:
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case configured:
+
+        while ($#argv > 0)
+           switch ($1)
+              case -a:
+                   set Lst = ( `$CfgMan list` )
+                   echo -n "Configuration list:    "
+                   echo "$Lst"
+                   echo -n "Current configuration: "
+                   echo "$Lst[1]"
+                   echo -n "Current config file:   "
+                   head -n 1 $IncDir/configured | awk '{ print $3 }'
+                   echo ""
+                   exit(0)
+                   breaksw
+              case -h:
+              case help:
+                   echo ""
+                   echo 'Usage: dsys configured [-a] [-h]'
+                   echo ""
+                   echo "   a      - show config name and alias"
+                   echo "   h      - this help message"
+                   echo ""
+                   exit(1)
+                   breaksw
+           endsw
+           shift
+        end
+
+        cat $IncDir/configured
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case delete:
+
+        InitLog Log $LogDir/delete
+
+        set Cfgs = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -a:
+                   foreach i ($BaseDev/*)
+                      set c    = $i:t
+                      set spec = `echo $c | sed 's/+/ /'`
+                      Note $Log "spec = $spec"
+                      if ($#spec > 1) then
+                         set hst   = $spec[1]
+                         set cfg   = $spec[2]
+                         set ishst = `host $hst | awk '{ print $1 }'`
+                         set iscfg = `find . -name $cfg`
+                         Note $Log "   Host: |$hst| |$ishst| |$Host|"
+                         Note $Log "   Cfg : |$cfg| |$iscfg|"
+                         if ("$cfg" == "none") then
+                            set Cfgs = ( $Cfgs $c )
+                         else if (("$ishst" != "Host") && ("$iscfg" != "")) then
+                            set Cfgs = ( $Cfgs $c )
+                         else if ("$c" == "$hst+$hst") then
+                            set Cfgs = ( $Cfgs $c )
+			 else
+                            set ishst = `host $hst-pub | awk '{ print $1 }'`
+                            set iscfg = `find . -name $cfg`
+                            if (("$ishst" != "Host") && ("$iscfg" != "")) then
+                               set Cfgs = ( $Cfgs $c )
+	   		    endif
+                         endif
+                      else if (($c =~ *+none) || ($c =~ *-none)) then
+                         set Cfgs = ( $Cfgs $c )
+                      endif
+                   end
+# NOTE: we are about to wipe out the log file and directory if this
+# is being done from do-pact
+                   set Log = /dev/null
+                   break
+                   breaksw
+              case -h:
+              case help:
+                   echo ""
+                   echo 'Usage: dsys delete [-a] [-h] <config>*'
+                   echo ""
+                   echo "   a      - delete all multiconfig type configurations"
+                   echo "   h      - this help message"
+                   echo ""
+                   exit(1)
+                   breaksw
+              default:
+                   set Cfgs = ( $Cfgs $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+# no point in logging since the log directory is to be removed
+        foreach c ($Cfgs)
+           Separator $Log
+           NoteD $Log -n "Deleting configuration $c ... "
+           Note $Log ""
+
+           flog $Log pwd
+           flog $Log $CfgMan delete $c
+
+           if (-f ../dev/.pc-$c) then
+              flog $Log mv ../dev/.pc-$c ../dev/.pc-save
+              find .. -name "*$c*" -exec rm -rf {} \;
+              set RStatus = $status
+              flog $Log mv ../dev/.pc-save ../dev/.pc-$c
+           else
+              find .. -name "*$c*" -exec rm -rf {} \;
+              set RStatus = $status
+           endif
+
+           NoteD $Log "done"
+        end
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case diff-hdrs:
+        InitLog Log $LogDir/diff-hdrs
+
+        flog $Log $Which pact
+
+        set Args = "-i"
+        while ($#argv > 0)
+           switch ($1)
+              case -h :
+                   echo ""
+                   echo "Usage: dsys diff-hdrs [-h] [-p #]"
+                   echo ""
+                   echo "     h  - this help message"
+                   echo "     p  - number of nodes to use"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+              case -* :
+                   breaksw
+           endsw
+           shift
+        end
+
+        NoteD $Log ""
+        NoteD $Log "Reporting PACT Changes ..."
+        NoteD $Log ""
+
+        flog $Log pushd ..
+        pact -log $Log $Args -cmd $PCKS pact diff-hdr
+        set RStatus = $status
+
+        NoteD $Log ""
+        NoteD $Log "done"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case dirs:
+
+        if (!(-d $BaseDev)) then
+           mkdir $BaseDev
+        endif
+        if (!(-d $Root)) then
+           mkdir $Root
+        endif
+        if (!(-d $Root/bin)) then
+           mkdir $Root/bin
+        endif
+        if (!(-d $Root/lib)) then
+           mkdir $Root/lib
+        endif
+        if (!(-d $Root/include)) then
+           mkdir $Root/include
+        endif
+        if (!(-d $Root/scheme)) then
+           mkdir $Root/scheme
+        endif
+        if (!(-d $Root/scheme/extensions)) then
+           mkdir $Root/scheme/extensions
+        endif
+        if (!(-d $Root/log)) then
+           mkdir $Root/log
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case dist:
+        $Time ./pact-dist $argv
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case import:
+        ./pact-import $argv
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case info:
+        set HelpCode  = $MngDir/$0
+        set CvsOpt    = ""
+
+        set SCSRepository = ""
+        set SRCDate       = ""
+
+        set All = "seld"
+
+        set ROOT   = `$Which smake`
+        set BINDIR = $ROOT:h
+        set CVSROOTDir = ""
+        set SrcDir = ""
+        set BinDir = ""
+        set LibDir = ""
+        set IncDir = ""
+        set MgrDir = ""
+        set DocDir = ""
+        set ManDir = ""
+        set Tags   = ""
+        set ChkVer = ""
+
+        while ($#argv > 0)
+           set All = ""
+           switch ($1)
+              case -c:
+              case log:
+                   set TDir = ( `echo "$CVSROOT" | sed 's/:/ /'` )
+                   set CVSROOTDir = `echo $TDir[$#TDir]/CVSROOT`
+                   shift
+                   if ($#argv > 0) then
+                      set Date = ""
+                      while ($#argv > 0)
+                         switch ($1)
+                            case -d:
+                                 shift
+                                 set Date = `echo "$1" | sed 's|/|_|g' | sed 's|-|_|g'`
+                                 breaksw
+                            case -h:
+                                 echo "Usage: dsys info -c [-h] [[-d <date>] <tag>]*"
+                                 echo "  h  this help message"
+                                 echo "  d  search for tags after <date>"
+                                 echo "     <date> may be yy/mm/dd, yy-mm-dd, or yy_mm_dd"
+                                 echo "  <tag> may be one of F, B, M, S, X"
+                                 breaksw
+                            default:
+                                 set Tag = "|$1|"
+                                 if ("$Date" == "") then
+                                    grep $Tag $CVSROOTDir/commitlog
+                                 else
+                                    grep $Tag $CVSROOTDir/commitlog |&  \
+                                    sed "s/'//g"                    |&  \
+                                    sed 's/\"//g'                   |&  \
+                                    awk '$4 >= "D'$Date'" { print }'
+                                 endif
+                                 set Date = ""
+                                 breaksw
+                         endsw
+                         shift
+                      end
+                   else
+                      echo ""
+                      echo "PACT commit log:"
+                      eval "more $CVSROOTDir/commitlog"
+                   endif
+                   break
+                   breaksw
+
+              case -h:
+                   echo ""
+                   echo " Usage: dsys info [-c] [-t] [-h] [-d] [-e] [-i] [-l] [-m] [-s] [-x]"
+                   echo "        display info about the installed PACT"
+                   echo ""
+                   echo "    c - Display the source repository commit log"
+                   echo "        (this has suboption which may be seen with -c -h)"
+                   echo "    t - Display info for the Version Tags"
+                   echo ""
+                   echo "    h - Display the help package"
+                   echo ""
+                   echo "    d - Display info for the documents"
+                   echo "    e - Display info for the executables"
+                   echo "    i - Display info for the include (header) files"
+                   echo "    l - Display info for the libraries"
+                   echo "    m - Display info for the manager script files"
+                   echo "    s - Display info for the source files"
+                   echo "    x - report number of MBytes of source, libraries, and binaries"
+                   echo ""
+                   echo "    (default) - Display info for the sources, executables,"
+                   echo "                libraries and documents."
+                   echo ""
+                   exit(1)
+                   breaksw
+
+              case -d:
+                   set DocDir = $DAI_ROOT/pact/docs
+                   breaksw
+
+              case -e:
+                   set BinDir = "$BINDIR"
+                   breaksw
+
+              case -i:
+                   set IncDir = ( "$BINDIR:h""/include" )
+                   breaksw
+
+              case -l:
+                   set LibDir = ( "$BINDIR:h""/lib" )
+                   breaksw
+
+              case -m:
+                   set MgrDir = "$MngDir"
+                   breaksw
+
+              case -s:
+                   if ($?CVSROOT == 1) then
+                      set SrcDir = `echo $CVSROOT`
+                      set SrcDir = $SrcDir:h/wrk
+                   endif
+                   breaksw
+
+              case -t:
+                   source $MngDir/pact-scs
+                   set Tags = "-T -a"
+                   breaksw
+
+              case -x:
+                   set System  = `$CfgMan use`
+                   set Root    = $BaseDev/$System
+                   set IncDir  = $Root/include
+                   set Pck     = `cat $IncDir/package`
+                   pushd .. >& /dev/null
+                   set NB = `du -sb $Pck manager python $Root | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
+                   popd >& /dev/null
+                   echo "Approximately $NB MB of sources, objects, libraries, and binaries"
+                   exit(0)
+                   breaksw
+
+              case -v:
+                   set ChkVer = "yes"
+                   breaksw
+           endsw
+           shift
+        end
+
+        if ($All != "") then
+           if ($?CVSROOT == 1) then
+              set SrcDir = `echo $CVSROOT`
+              set SrcDir = $SrcDir:h/wrk
+           endif
+           set BinDir = "$BINDIR"
+           set LibDir = ( "$BINDIR:h""/lib" )
+           set IncDir = ( "$BINDIR:h""/include" )
+           set ManDir = $DAI_ROOT/pact/new_sources/doc
+           set DocDir = $DAI_ROOT/pact/docs
+        endif
+
+        set LS = 'ls -l'
+
+        set Libs = ( `awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Incs = ( `awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Bins = ( `awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Scrs = ( `awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Mods = ( `awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Scms = ( `awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Docs = ( `awk '$1 == "doc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Pact = ( `awk '$1 == "pkg"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+        set Mgrs = ( `awk '$1 == "mgr"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+
+        set ScrB = ( $Scrs )
+
+        echo ""
+        echo `date`
+        echo ""
+
+# SOURCES
+
+        if ($SrcDir != "") then
+           set STDOUT = $cwd/src.count
+           $RM $STDOUT
+           touch $STDOUT
+
+           cd $SrcDir
+
+           echo "PACT sources reside in $SrcDir"
+           set CSrc = ""
+           foreach i ($Pact)
+              set CSrc = ( $CSrc `find $i -name "*.[ch]" -print` )
+           end
+           wc -l $CSrc     |&                                                 \
+           grep -v "wc:"   |                                                  \
+           tail -n 1       |                                                  \
+           awk '{ printf "%8d\tlines C source", $1 }' >>& $STDOUT
+           echo " in $#CSrc files" >>& $STDOUT
+
+           touch foobar
+           set FSrc = ""
+           foreach i ($Pact)
+              set FSrc = ( $FSrc `find $i -name "*.f" -print` )
+           end
+           wc -l $FSrc     |&                                                 \
+           grep -v "wc:"   |                                                  \
+           tail -n 1       |                                                  \
+           awk '{ printf "%8d\tlines F77 source", $1 }' >>& $STDOUT
+           $RM foobar
+           echo " in $#FSrc files" >>& $STDOUT
+
+           set SSrc = ""
+           set SSrc = ( $SSrc `find panacea -name "*.scm" -print` )
+           set SSrc = ( $SSrc `find scheme -name "*.scm" -print` )
+           set SSrc = ( $SSrc `find sx -name "*.scm" -print` )
+           set SSrc = ( $SSrc `find ultra -name "*.scm" -print` )
+           wc -l $SSrc     |&                                                 \
+           grep -v "wc:"   |                                                  \
+           tail -n 1       |                                                  \
+           awk '{ printf "%8d\tlines SCHEME source", $1 }' >>& $STDOUT
+           echo " in $#SSrc files" >>& $STDOUT
+
+           set PSrc = ""
+           set PSrc = ( $PSrc `find manager -name "pre-Make" -print` )
+           foreach i ($Pact)
+              set PSrc = ( $PSrc `find $i -name "pre-Make" -print` )
+           end
+           wc -l $PSrc     |&                                                 \
+           grep -v "wc:"   |                                                  \
+           tail -n 1       |                                                  \
+           awk '{ printf "%8d\tlines pre-Make file", $1 }' >>& $STDOUT
+           echo " in $#PSrc files" >>& $STDOUT
+
+           cd manager
+           wc -l $Mgrs     |&                                                 \
+           grep -v "wc:"   |                                                  \
+           tail -n 1       |                                                  \
+           awk '{ printf "%8d\tlines manager source", $1 }' >>& $STDOUT
+           echo " in $#Mgrs files" >>& $STDOUT
+           cd ..
+
+           cd scripts
+           wc -l $Scrs     |&                                                 \
+           grep -v "wc:"   |                                                  \
+           tail -n 1       |                                                  \
+           awk '{ printf "%8d\tlines script source", $1 }' >>& $STDOUT
+           echo " in $#Scrs files" >>& $STDOUT
+           cd ..
+
+           awk '    { lines = lines + $1                                      \
+                      print }                                                 \
+                END { printf "Total maintained source is %d lines\n", lines }' $STDOUT
+
+           echo ""
+           $RM $STDOUT
+        endif
+
+# EXECUTABLES
+
+        if ($BinDir != "") then
+           echo ""
+           echo "PACT executables reside in $BinDir"
+           cd $BinDir
+           $LS $Bins |&                                                              \
+           grep -v "ls:"   |                                                         \
+           awk '    { bytes = bytes + $5                                             \
+                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }             \
+                END { printf "Total space for executables is %d bytes\n\n", bytes }'
+
+           echo ""
+           echo "PACT scripts reside in $BinDir"
+           cd $BinDir
+           $LS $ScrB |&                                                              \
+           grep -v "ls:"   |                                                         \
+           awk '    { bytes = bytes + $5                                             \
+                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }             \
+                END { printf "Total space for scripts is %d bytes\n\n", bytes }'
+        endif
+
+# LIBRARIES
+
+        if ($LibDir != "") then
+           echo ""
+           echo "PACT libraries reside in $LibDir"
+           cd $LibDir
+           set NLibs = ""
+           foreach lib ($Libs)
+              set base = $lib:r
+              set NLibs = ( $NLibs `ls $base*` )
+           end
+           $LS $NLibs | awk '    { bytes = bytes + $5                                                \
+                                         printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }          \
+                                   END { printf "Total space for libraries is %d bytes\n\n", bytes }'
+        endif
+
+# HEADERS
+
+        if ($IncDir != "") then
+           echo ""
+           echo "PACT headers reside in $IncDir"
+           cd $IncDir
+           $LS $Incs | awk '    { bytes = bytes + $5                                              \
+                                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }          \
+                                END { printf "Total space for headers is %d bytes\n\n", bytes }'
+        endif
+
+# SCRIPTS
+
+        if ($MgrDir != "") then
+           echo ""
+           echo "PACT manager scripts reside in $MgrDir"
+           cd $MgrDir
+           $LS $Mgrs | awk '    { bytes = bytes + $5                                      \
+                                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }  \
+                                END { printf "Total space for manager scripts is %d bytes (~%d lines)\n\n", bytes, bytes/26 }'
+        endif
+
+# MAN PAGES
+
+        if ($ManDir != "") then
+           echo ""
+           echo "PACT man pages reside in $ManDir"
+           cd $ManDir
+           $LS *.1 | awk '    { bytes = bytes + $5                                       \
+                                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 } \
+                                END { printf "Total space for man pages is %d bytes (~%d lines)\n\n", bytes, bytes/26 }'
+        endif
+
+# DOCS
+
+        if ($DocDir != "") then
+           echo ""
+           echo "PACT FAQ files and postscript documents reside in $DocDir"
+           cd $DocDir
+           $LS $Docs | awk '    { bytes = bytes + $5                                       \
+                                        printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 } \
+                                  END { printf "Total space for FAQ and ps docs is %d bytes (~%d pages)\n\n", bytes, bytes/3668 }'
+        endif
+
+# REPOSITORY
+        if ("$Tags" != "") then
+           echo ""
+           echo "PACT revision tags (cvs history -T -a):"
+           eval "($History $Tags | tail -n 20 )"
+        endif
+
+        if ($ChkVer == "yes") then
+           echo ""
+           echo "Version info for PACT:"
+           echo "   pact-date    =  `cat $DAI_ROOT/pact/std_sources/manager/.pact-date`" 
+           echo "   pact-version =  `cat $DAI_ROOT/pact/std_sources/manager/.pact-version`" 
+           echo "   pact-tag     =  `cat $DAI_ROOT/pact/std_sources/manager/.pact-version-tag`" 
+           echo ""
+           echo "Version info for PACTNEW:"
+           echo "   pact-date    =  `cat $DAI_ROOT/pact/new_sources/manager/.pact-date`" 
+           echo "   pact-version =  `cat $DAI_ROOT/pact/new_sources/manager/.pact-version`" 
+           echo "   pact-tag     =  `cat $DAI_ROOT/pact/new_sources/manager/.pact-version-tag`" 
+        endif
+
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case install:
+#        $Time install-pact | tee -ai $LogFile
+        ftee $LogFile install-pact
+        set RStatus = $status
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case linstall:
+        if (-e extensions/pre-Make) then
+           pushd extensions >& /dev/null
+           pact -sys . install
+           popd >& /dev/null
+        endif
+
+        set InstF = ( pact-dist pact-update code-date )
+        set InstF = ( $InstF for-pact install-ext )
+
+        cp gdbinit $BinDir/.gdbinit
+        cp dbxinit $BinDir/.dbxinit
+        cp cpyright.h $IncDir
+        cp $InstF $BinDir
+        set RStatus = $status
+
+        echo ""
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NET-UPDATE - handle some of the boot-strapping issues for a successful
+#            - do-net run
+
+   case net-update:
+
+        set CArgs    = ""
+        set DArgs    = ""
+        set HostFile = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -a:
+                   shift
+                   set CArgs = "-a"
+                   while ($#argv > 0)
+                      set CArgs = ( $CArgs $1 )
+                      shift
+                   end
+                   break
+                   breaksw
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys net-update -h <do-net-args>"
+                   echo ""
+                   echo " These are the do-net-args"
+                   echo ""
+                   echo "    a   - all following args are passed to the script"
+                   echo "    b   - do not build (-) or build only (+)"
+                   echo "    c   - clean up after aborted attempt"
+                   echo "    d   - use distribution file"
+                   echo "    e   - use the specified script"
+                   echo "    g   - test hosts for availability"
+                   echo "    h   - this help message"
+                   echo "    i   - do not install (-) or install only (+)"
+                   echo "    I   - installs may proceed even with a down host"
+                   echo "    m   - do setup in parallel (-) or serial (+) default is -m"
+                   echo "    p   - report progress"
+                   echo "    q   - don't print tty messages"
+                   echo "    s   - do not setup (-) or setup only (+)"
+                   echo "    t   - use version, <tag>, for repository update (after -a only)"
+                   echo "    v   - verbose mode"
+                   exit(1)
+                   breaksw
+              case -*:
+              case +*:
+                   set DArgs = ( $DArgs $1 )
+                   breaksw
+              default:
+                   if ("$HostFile" == "") then
+                      if (`expr "$1" : '.*:.*'` > 0) then
+                         set HostFile = "$1"
+                      else if (-e $1) then
+                         set HostFile = "$1"
+                      else
+                         set HostFile = "hosts/$1"
+                      endif
+                      set DArgs = ( $DArgs $HostFile )
+                   else
+                      set DArgs = ( $DArgs $1 )
+                   endif
+                   breaksw
+           endsw
+           shift
+        end
+
+        InitLog LogFile $LogDir/net-update
+
+        set DO_PACT = $MngDir/do-pact
+
+        flog $LogFile cvs update
+        Note $LogFile do-net -e $DO_PACT $DArgs $CArgs
+
+        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PACT - set the pact link to the wrapper (smake) or the
+#      - portable, persistent (dmake) version
+
+   case pact:
+        set Log = /dev/null
+
+        flog $Log pushd $BinDir
+        if ($#argv == 0) then
+           set Lst = `ls -l pact`
+           echo "   pact linked to $Lst[$#Lst]"
+        else
+           $RM pact
+           if (`expr "$1" : 's.*'` > 0) then
+              NoteD $Log "   Linking pact as smake"
+              ln -s smake pact
+              set RStatus = $status
+           else
+              NoteD $Log "   Linking pact as dmake"
+              ln -s dmake pact
+              set RStatus = $status
+           endif
+        endif
+        flog $Log popd
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# REBUILD - attempt to recover and complete a failed NET-UPDATE host/config
+
+   case rebuild:
+
+        set Cfg = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys rebuild <dev>"
+                   echo ""
+                   echo "Try to recover from a net-update build failure."
+                   echo "This will work best for irreproducible failures"
+                   echo "such as NFS errors.  This must be run on the same"
+                   echo "kind of machine that the original failed on."
+                   echo "   dev  - the configuration to be rebuilt"
+                   exit(1)
+                   breaksw
+              case -*:
+              case +*:
+                   set DArgs = ( $DArgs $1 )
+                   breaksw
+              default:
+                   set Cfg = $1
+                   breaksw
+           endsw
+           shift
+        end
+
+        if ("$Cfg" == "") then
+           echo "No config supplied"
+           exit(1)
+        else if (!(-d $BaseDev/$Cfg)) then
+           echo "Supplied config, $Cfg, does not exist"
+           exit(1)
+        else
+           echo "Rebuilding $Cfg"
+        endif
+
+        InitLog LogFile $LogDir/rebuild
+
+        flog $LogFile setenv PACT_CONFIG $Cfg
+        flog $LogFile source $BaseDev/$Cfg/include/env-pact.csh
+
+        NoteD $LogFile -n "   Re-compiling ... "
+        Note $LogFile ""
+        flog $LogFile $DSYS build
+        set BStat = $status
+        if ($BStat != 0) then
+           NoteD $LogFile "failed"
+           exit($BStat)
+        else
+           NoteD $LogFile "succeeded"
+        endif
+        
+        NoteD $LogFile -n "   Re-testing ..... "
+        Note $LogFile ""
+        flog $LogFile $DSYS test
+        set TStat = $status
+        if ($TStat != 0) then
+           NoteD $LogFile "failed"
+           exit($TStat)
+        else
+           NoteD $LogFile "succeeded"
+        endif
+
+        NoteD $LogFile -n "   Installing ..... "
+        Note $LogFile ""
+        flog $LogFile install-pact
+        set IStat = $status
+        if ($IStat != 0) then
+           NoteD $LogFile "failed"
+           exit($IStat)
+        else
+           NoteD $LogFile "succeeded"
+        endif
+
+        NoteD $LogFile -n "   Deleting ....... "
+        Note $LogFile ""
+        flog $LogFile $DSYS delete $Cfg
+        set DStat = $status
+        if ($DStat != 0) then
+           NoteD $LogFile "failed"
+           exit($DStat)
+        else
+           NoteD $LogFile "succeeded"
+        endif
+
+        set RStatus = 0
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case reconfig:
+        set Inst = ( -i none )
+        set Args = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys reconfig [-i] [-h]"
+                   echo ""
+                   echo "   i - reconfigure installable (default is non-installable)"
+                   echo "   h - this help message"
+                   exit(1)
+                   breaksw
+              case -i:
+                   set Inst = ""
+                   breaksw
+              default:
+                   set Args = ( $Args $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+        set Cfg = `awk '($1 == "Config") { print $3 }' $IncDir/configured`
+
+        $DSYS config $Args $Inst $Cfg:t
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case post:
+        echo ""
+
+        if (-x extensions/pact-post) then
+           extensions/pact-post $argv
+        endif
+
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case remove:
+        echo ""
+
+        InitLog Log $LogDir/remove
+
+# cleanup path so as not to tax wimpy OSs such as Solaris
+        eval `$ScrDir/simplify-path`
+
+        set BeginTime = `$TIMER -r`
+
+        flog $Log date
+        flog $Log $Which pact
+
+        NoteD $Log "Removing PACT"
+
+        set BinFiles = ( smake dmake pact timer px do-run )
+        set BinFiles = ( $BinFiles make-syntax )
+        set BinFiles = ( $BinFiles install-pact install-ext )
+
+        set IncFiles = ( scconfig.h scdecls.h cpyright.h syntax.h )
+        set IncFiles = ( $IncFiles env-pact.csh env-pact.sh env-pact.dk env-pact.mod )
+        set IncFiles = ( $IncFiles env-mio )
+        set IncFiles = ( $IncFiles package configured make-def make-macros Makefile )
+        set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
+        set IncFiles = ( $IncFiles do-run-db cfg.db )
+
+        set ScmFiles = ( spokes.scm )
+
+# remove scheme files
+        NoteD $Log "    in $ScmDir"
+        flog $Log pushd $ScmDir
+        flog $Log mkdir tmp
+        flog $Log $MV $ScmFiles tmp
+        flog $Log touch foo
+        flog $Log $RM *
+        flog $Log $MV tmp/* .
+        flog $Log rmdir tmp
+        flog $Log popd
+
+# remove headers
+        NoteD $Log "    in $IncDir"
+        flog $Log pushd $IncDir
+        flog $Log mkdir tmp
+        flog $Log $MV $IncFiles tmp
+        flog $Log touch foo
+        flog $Log $RM *
+        flog $Log $MV tmp/* .
+        flog $Log rmdir tmp
+        flog $Log popd
+ 
+# remove binaries
+        NoteD $Log "    in $BinDir"
+        flog $Log pushd $BinDir
+        flog $Log mkdir tmp
+        flog $Log $MV $BinFiles tmp
+        flog $Log touch foo
+        flog $Log $RM *
+        flog $Log $MV tmp/* .
+        flog $Log rmdir tmp
+        flog $Log popd
+ 
+# remove libraries
+        NoteD $Log "    in $LibDir"
+        flog $Log pushd $LibDir
+        flog $Log touch foo.a foo.so
+        flog $Log $RM *.a *.so*
+        flog $Log popd
+
+# remove other files
+        NoteD $Log "    in $Base/"'*'"/z-$System directories"
+        flog $Log $RM ../*/z-$System/obj/*.o
+        flog $Log $RM ../*/*.o ../sx/spokes/*/*.o ../score/scf77lr.c
+
+# check the result
+        flog $Log ls -lR $Root
+
+        set RStatus = $status
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        NoteD $Log "PACT removed ($RStatus/$ETime)"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SELECT - select the configuration (for multiple configs per platform)
+
+   case select:
+        echo -n "Changing from configuration `$CfgMan use` to "
+        $CfgMan add $1
+        set RStatus = $status
+        echo ""
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case send:
+        InitLog Log $LogDir/send
+
+        flog $Log $Which pact
+
+        NoteD $Log ""
+        NoteD $Log "Sending PACT Directories ..."
+        NoteD $Log ""
+
+        pact -log $Log -cmd $PCKS pact -i send
+        set RStatus = $status
+
+        NoteD $Log ""
+        NoteD $Log "done"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case shared:
+        InitLog Log $LogDir/shared
+
+        flog $Log $Which pact
+
+        set Args = "-i"
+        while ($#argv > 0)
+           switch ($1)
+              case -h :
+                   echo ""
+                   echo "Usage: dsys shared [-h] [-p #]"
+                   echo ""
+                   echo "     h  - this help message"
+                   echo "     p  - number of nodes to use"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+              case -* :
+                   breaksw
+           endsw
+           shift
+        end
+
+        NoteD $Log ""
+        NoteD $Log "Building PACT (with shared libraries)"
+        NoteD $Log ""
+
+        flog $Log pushd ..
+        pact -log $Log $Args -cmd $PCKS pact shared
+        set RStatus = $status
+
+        NoteD $Log ""
+        NoteD $Log "done"
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STATS - plot timing information from update logs
+
+   case stat:
+   case stats:
+
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   ultra -q -s -l stats.scm \(sh\)
+                   exit(1)
+                   breaksw
+
+              default:
+                   echo ""
+                   echo "Unknown option: $1"
+                   echo ""
+                   exit(1)
+                   breaksw
+           endsw
+           shift
+        end
+
+        echo ""
+        ultra -q -l stats.scm
+        set RStatus = $status
+        $RM curves.a
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STATS-UPDATE - create ultra files with timing information from update logs
+
+   case stats-update:
+
+        set PrntDir   = $Base:h
+        set UpdateDir = $PrntDir/update
+        set StatsDir  = $PrntDir/stats
+
+        set DArgs = ""
+
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   do-stats -h
+                   exit(1)
+                   breaksw
+              case -s:
+                   shift
+                   set StatsDir = $1
+                   breaksw
+              case -u:
+                   shift
+                   set UpdateDir = $1
+                   breaksw
+              default:
+                   set DArgs = ( $DArgs $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+        do-stats -s $StatsDir -u $UpdateDir $DArgs
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case sync:
+
+        cd ..
+
+        if ($?USER == 0) then
+           if ($?LOGNAME == 0) then
+              set USER = "anonymous"
+           else
+              set USER = $LOGNAME
+           endif
+        endif
+
+        InitLog Log $LogDir/sync
+
+        set WhoIAm      = $USER
+        set Manager     = manager
+        set Operation   = "Syncing sources with repository"
+        set CvsOpt      = "-q"
+        set Quiet       = FALSE
+
+        set ConflFile = $MngDir/Confl.Sources
+        set HelpCode  = $MngDir/$0
+        set Merges    = $MngDir/merge.el
+        set Host      = `uname -n`
+        set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
+
+        set SCSRepository = ""
+        set SRCDate       = ""
+        set Sleep         = "NO"
+
+# define the Source Control System (called twice)
+        source ./manager/pact-scs
+
+        set Opt = "$HelpCode:t  $argv"
+
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys sync [-h] [-n] [-q] [-s] [-v]"
+                   echo ""
+                   echo "   h - this help message"
+                   echo "   n - do not change any files. Issue report only, do not"
+                   echo "       update, or merge any esisting files."
+                   echo "   q - quiet mode, just the facts"
+                   echo "   s - sleep if lock on"
+                   echo "   v - display the Version and Release of the Source Control System"
+                   echo ""
+                   exit(1)
+                   breaksw
+
+              case -n:                                   # NO update, report only
+                   set Operation = "Sources differing from repository"
+                   set CvsOpt    = ( $CvsOpt -n )
+                   breaksw
+
+              case -q:
+                   set Quiet = TRUE
+                   breaksw
+
+              case -s*:
+                   set Sleep = "YES"
+                   breaksw
+
+              case -v*:                                  # display version
+                   echo "  Source Version:   " $SCSVersion
+                   echo "  Software Release: " $SCSRelease
+                   echo ""
+                   exit(1)
+
+              default:
+                   echo ""
+                   echo "Unknown option: $1"
+                   echo ""
+                   exit(1)
+                   breaksw
+           endsw
+           shift
+        end
+
+# check if repository locked
+        if ($Sleep == "YES") then
+           manager/check.lock
+        else
+           if ($ExistLock == TRUE) then
+              echo ""
+              echo " *** REPOSITORY IS LOCKED ***"
+              echo ""
+              CatLock
+              echo ""
+              echo ""
+              exit(1)
+           endif
+        endif
+
+# define the Source Control System (repeat to define -n cvs option)
+        source ./manager/pact-scs
+
+        if ($Quiet == FALSE) then
+           NoteD $Log " "
+           NoteD $Log "$Operation (`date`)"
+           echo ""
+        else
+           Note $Log " "
+           Note $Log "$Operation (`date`)"
+        endif
+        Note $Log "  Host: $Host running $OS"
+        Note $Log "  User:  $WhoIAm             Date: `date`"
+        Note $Log " "  
+
+        flog $Log $RM manager/.pact-version manager/.pact-version-tag
+
+        Separator $Log
+        flog $Log pwd
+        flog $Log printenv
+        if ($?CVSROOT == 1) then
+           flog $Log cvs $CvsOpt -d $CVSROOT update -d
+           set ErrStat = $status
+        else
+           flog $Log cvs $CvsOpt update -d
+           set ErrStat = $status
+        endif
+
+# take care of conflicting changes
+        flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)
+        flog $Log set Confl = `cat Confl`
+        foreach mod ($Confl)
+           NoteD $Log "   C $mod      <-------"
+           set ErrStat = 10
+        end
+
+        cat Confl >&! $ConflFile
+        flog $Log $RM Confl
+
+# report changed files
+        flog $Log (awk '/^ *[PUMAR] +.*/ {print $1 " " $2}' $Log | grep -v manager/.pact-version > Files.OK)
+        flog $Log set Files = `cat Files.OK`
+        while ($#Files > 1)
+           NoteD $Log "   $Files[1] $Files[2]"
+           shift Files
+           shift Files
+        end
+
+        flog $Log $RM Files.OK
+
+        Separator $Log
+
+# if there are no conflicts remove the misleading evidence
+        if (-z $ConflFile) then
+           flog $Log $RM $ConflFile
+        endif
+
+# display list of files in conflict
+        if (-e $ConflFile) then
+           Note $Log "The following files are in conflict"  
+           Note $Log ""                                        
+           Note $Log `cat $ConflFile`                          
+           Note $Log ""                                        
+        endif
+
+        if ($Quiet == FALSE) then
+           NoteD $Log ""
+           NoteD $Log "(see $Log for detailed information)"
+           NoteD $Log ""
+        else
+           Note $Log ""
+           Note $Log "(see $Log for detailed information)"
+           Note $Log ""
+        endif
+
+        flog $Log cd $Manager
+
+        set RStatus = $ErrStat
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case tag:
+        pact-commit -t
+        set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case test:
+
+	set TLog = test
+        set Args = "-i"
+        set NA   = ( -na 1 )
+        set Tgts = ""
+        setenv Valgrind  ""
+        while ($#argv > 0)
+           switch ($1)
+              case -dmp :
+                   set Args = ( $Args $1 )
+                   breaksw
+              case -h :
+                   echo ""
+                   echo "Usage: dsys test [-h] [-na #] [-p #] [-vg] [tgts]*"
+                   echo ""
+                   echo "     h  - this help message"
+                   echo "     na - number of attempts for each test (default is 1)"
+                   echo "     p  - number of nodes to use"
+                   echo "     vg - run most tests under valgrind"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -na :
+                   shift
+                   set NA = ( -na $1 )
+                   breaksw
+              case -p :
+                   shift
+                   if ($1 > 0) then
+                      set Args = ( $Args "-async" $1 )
+                   endif
+                   breaksw
+              case -vg :
+#                   setenv Valgrind  "valgrind --tool=memcheck"
+                   setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+                   breaksw
+              case -* :
+                   breaksw
+              default :
+                   set Tgts = ( $Tgts $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+# provide context for child processes
+        setenv DSYS_TARGET pact_test
+
+# work with mpi-io-wrap to suppress messages from MPI front ends
+# that cannot be silenced by their own means
+        setenv SC_MPI_SUPPRESS_UNTAGGED
+
+# allow a do-net to activate valgrind testing by doing
+# 'var DoValgrind yes' in the host file
+        if ($?DoValgrind == 1) then
+#           setenv Valgrind  "valgrind --tool=memcheck"
+           setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+        endif
+
+# verify that valgrind exists before trying to use it
+        if ("$Valgrind" != "") then
+           set lvg = ( `$Which valgrind` )
+           if (-x "$lvg") then
+              set TLog = test-vg
+              InitLog Log $LogDir/$TLog
+              Note $Log "Using valgrind: `$Which valgrind`"
+              flog $Log setenv SC_EXEC_N_ATTEMPTS 1
+              flog $Log set NA = ( -na 1 )
+           else
+              setenv Valgrind  ""
+              InitLog Log $LogDir/$TLog
+              Note $Log "Valgrind requested but not found"
+           endif
+        else
+           InitLog Log $LogDir/$TLog
+        endif
+
+        flog $Log $Which pact
+        flog $Log umask
+	flog $Log setenv SC_EXEC_LOG_FILE ${LogDir}/test.error
+
+        set BeginTime = `$TIMER -r`
+
+        NoteD $Log ""
+        NoteD $Log "Running PACT Tests ..."
+
+        flog $Log (ls -l `$Which pact` |& grep smake)
+
+# do it for smake
+        if ($status == 0) then
+           set PCKS = ( `awk '$1 == "pkg" {print}' pact.manifest | sed 's/^pkg//'` )
+           flog $Log pushd ..
+           NoteD $Log " --------------------------------------------------------"
+           foreach d ($PCKS)
+              flog $Log pushd $d
+              ftee $Log pact $NA test
+              if ($status != 0) then
+                 set RStatus = 1
+              endif
+              flog $Log popd
+           end
+           flog $Log popd
+
+# do it for dmake
+        else
+
+# NOTE: this is for the outer pact - the package level one is controlled by NA
+           set Args = ( $Args -na 1 )
+           set Tmp  = /tmp/pact-test.$Host.$$
+
+           if ("$Tgts" == "") then
+              flog $Log set Tgts = $PCKS
+           else
+              echo $Tgts >! $Tmp
+              flog $Log cat $Tmp
+              flog $Log set Tgts = $Tmp
+           endif
+
+           flog $Log pushd ..
+           Note $Log "pact -log $Log $Args -cmd $Tgts pact $NA test"
+           NoteD $Log " --------------------------------------------------------"
+           pact -log $Log $Args -cmd $Tgts pact $NA test
+           set RStatus = $status
+
+           flog $Log $RM $Tmp
+           flog $Log popd
+        endif
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        NoteD $Log ""
+        if ($RStatus == 0) then
+           NoteD $Log "All tests passed ($RStatus/$ETime)"
+        else
+           NoteD $Log "At least one test failed ($RStatus/$ETime)"
+
+# NOTE: NFS may prevent this from always working
+           set Failed = ( `grep 'TEST ... FAILED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
+           NoteD $Log "   $Failed"
+        endif
+        NoteD $Log ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case test-do-net:
+        echo ""
+        echo "Testing do-net ..."
+
+        foreach i (dnt1 dnt2)
+           echo "Starting test $i"
+           echo ""
+           rm -r test/*
+           mkdir -p test/inst
+
+           do-net hosts/$i
+           cat test/*.report
+        end
+
+        echo "done"
+        echo ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case test-ssh:
+        echo ""
+        echo -n "Testing SSH ..."
+
+        set HFile = hosts/pactnew
+        while ($#argv > 0)
+           switch ($1)
+              case -f:
+                   shift
+                   set HFile = $1
+                   breaksw
+              case -h:
+              case help:
+                   echo ""
+                   echo 'Usage: dsys test-ssh [-f <file>] [-h]'
+                   echo ""
+                   echo "   f      - use file for list of hosts"
+                   echo "   h      - this help message"
+                   echo ""
+                   exit(1)
+                   breaksw
+           endsw
+           shift
+        end
+
+        set Tmp = .tmp-dsys-test-ssh.$System
+        flog $LogFile $RM $Tmp
+        echo "ssh-test" > $Tmp
+
+        set Hosts = `awk '$1 == "host" { print $2 }' $HFile`
+        set HFail = ""
+        set CFail = ""
+
+        Note $LogFile "Testing hosts: $Hosts"
+
+        foreach i ($Hosts)
+           echo -n '.'
+
+           Separator $LogFile
+           Note $LogFile "Testing host $i"
+           Note $LogFile ""
+
+# test scp to the host
+           Note $LogFile "Command: pcexec -c 30 scp -v $Tmp ${i}:"
+           pcexec -c 30 scp -v $Tmp ${i}: >>& $LogFile
+           set cstat = $status
+           if ($cstat != 0) then
+              set CFail = ( $CFail $i )
+           endif
+
+# test ssh to the host
+           Note $LogFile "Command: pcexec -c 30 ssh -v $i rm -f $Tmp"
+           pcexec -c 30 ssh -v $i rm -f $Tmp >>& $LogFile
+           set hstat = $status
+           if ($hstat != 0) then
+              set HFail = ( $HFail $i )
+           endif
+
+        end
+
+        echo " done"
+
+# look for and report failures
+        set Rstatus = 0
+        if ("$HFail" == "") then
+           NoteD $LogFile "   Your SSH setup is OK"
+        else
+           NoteD $LogFile "   Your SSH setup needs work ($HFail)"
+           set Rstatus = 1
+        endif
+
+        if ("$CFail" == "") then
+           NoteD $LogFile "   Your SCP setup is OK"
+        else
+           NoteD $LogFile "   Your SCP setup needs work ($CFail)"
+           set Rstatus = 1
+        endif
+
+        flog $LogFile $RM $Tmp
+        echo " "
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TICKET - run the ticket suite
+
+   case ticket:
+        set Err = 0
+        if ($HaveTicket == TRUE) then
+           while ($#argv > 0)
+              switch ($1)
+                 case close:
+                      shift
+                      if ($#argv > 1) then
+                         set Tmp = /tmp/bb.$$
+                         echo "$argv[2-]" >! $Tmp
+                         $BugTck "close $1 $Tmp"
+                         $RM $Tmp
+                      else
+                         $BugTck "close $1"
+                      endif
+                      set Err = 0
+                      break
+                      breaksw
+                 case -h:
+                 case help:
+                      echo ""
+                      echo "Usage: dsys ticket [close <ticket> [<msg>]] [give <owner> <ticket>]"
+                      echo "                   [list [<user>]] [key <token>] [show <ticket>]"
+                      echo "                   [submit <msg>] [summarize [<user>]]"
+                      echo ""
+                      echo "   close     - close a ticket"
+                      echo "   give      - give ticket to owner"
+                      echo "   list      - list all tickets or for specified user"
+                      echo "   key       - search all tickets for specified keyword"
+                      echo "   show      - display a ticket"
+                      echo "   submit    - submit a bug report"
+                      echo "   summarize - print summaries for your or any single developer's tickets"
+                      echo ""
+                      set Err = 1
+                      break
+                      breaksw
+                 case give:
+                      shift
+                      $BugTck "give $1 $2"
+                      set Err = 0
+                      break
+                      breaksw
+                 case key:
+                      shift
+                      $BugTck "cd .. ; grep -i $1 */*"
+                      set Err = 0
+                      break
+                      breaksw
+                 case list:
+                      shift
+                      if ($#argv == 0) then
+                         echo "Listing tickets belonging to ${USER}:"
+                         $BugTck "ls -CF"
+                      else
+                         $BugTck "cd .. ; ls -CF $argv"
+                      endif
+                      set Err = 0
+                      break
+                      breaksw
+                 case show:
+                      shift
+                      $BugTck "cd .. ; grep -v FB_ */$argv"
+                      set Err = 0
+                      break
+                      breaksw
+                 case submit:
+                      shift
+                      $BugTck "echo $argv | submit"
+                      set Err = 0
+                      break
+                      breaksw
+                 case summarize:
+                      shift
+                      if ($#argv == 0) then
+                         echo "Summarizing tickets belonging to ${USER}:"
+                         $BugTck "grep 'FB_summary:' * | sed 's/FB_summary://'"
+                      else
+                         $BugTck "cd ../$argv ; grep 'FB_summary:' * | sed 's/FB_summary://'"
+                      endif
+                      set Err = 0
+                      break
+                      breaksw
+              endsw
+              shift
+           end
+           echo " "
+
+           exit($Err)
+        endif
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case unlock:
+
+        set SCSRepository = ""
+        set SRCDate       = ""
+
+        call CVS_SETUP()
+
+        Unlock
+        set RStatus = $status
+        breaksw        
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case update:
+        echo ""
+        echo "Updating PACT ..."
+        echo ""
+
+        set TIMER     = $Base/scripts/timer
+        set BeginTime = `$TIMER -r`
+
+        $DSYS remove
+        set RStatus = $status
+
+        $DSYS build
+        set RStatus = $status
+
+        if ($RStatus == 0) then
+           $DSYS test
+           set RStatus = $status
+        endif
+
+        if ($RStatus == 0) then
+           $BinDir/install-pact
+        endif
+        set RStatus = $status
+
+        set ETime = `$TIMER -b $BeginTime`
+
+        echo ""
+        if ($RStatus == 0) then
+           echo "PACT Update succeeded ($RStatus/$ETime)"
+        else
+           echo "PACT Update failed ($ETime)"
+        endif
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# UPDATE-SYS - update pact everywhere using update-sys
+
+   case update-sys:
+
+        shift
+
+        set Opt  = ""
+        set Tag  = ""
+        set Site = "-a"
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys update-sys [-h] [-s <site>] -l | new | exp | <vers>"
+                   echo ""
+                   echo "   h   this help message"
+                   echo "   l   list any existing tags"
+                   echo "   s   update only <site>"
+                   echo ""
+                   echo "Example:"
+                   echo "   dsys update-sys -l      list tags"
+                   echo "   dsys update-sys std     update pact at all sites"
+                   echo "   dsys update-sys new     update pactnew at all sites"
+                   echo ""
+                   exit(1)
+                   breaksw
+              case -s:
+                   shift
+                   set Site = ( -s $1 )
+                   breaksw
+              case -*:
+                   set Opt = ( $Opt $1 )
+                   breaksw
+              default:
+                   switch ($1)
+                      case new:
+                      default:
+                           set Tag = pact.new
+                           breaksw
+                      case std:
+                           set Tag = pact.std
+                           breaksw
+                   endsw
+                   breaksw
+           endsw
+           shift
+        end
+
+        set Log = $DevLog/update-sys
+        $RM $Log
+        touch $Log
+
+        set Cmd = "update-sys $Opt $Site $Tag"
+
+        Note $Log "Command: $Cmd"
+
+        $Cmd |& tee -ai $Log
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case use:
+
+        set Cfg = $1
+
+        echo ""
+        echo -n "Changing configuration to $Cfg ... "
+
+        $CfgMan add $Cfg
+        set RStatus = $status
+
+        echo "done"
+        echo ""
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   default:
+       echo "Unknown option: $Cmnd"
+
+endsw
+
+exit($RStatus)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+GEN_CONFIG:
+
+   if (($pthread == TRUE) && ($openmp == TRUE)) then
+      echo "pthread and openmp are mutually exclusive options - pick one"
+      exit(1)
+   endif
+
+   set vrb = FALSE
+
+   set droot = gen/$Arch
+   if (!(-d $droot)) then
+      mkdir -p $droot
+   endif
+
+   set Tmp = $droot/tmp.$$
+
+   source write/cfg-base
+   source write/cfg-features
+ 
+   mv $Tmp $droot/$cfg
+   set Configuration = $cfg
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+CVS_SETUP:
+
+   if ($?CVSROOT == 0) then
+      source ~/.cshrc
+   endif
+
+   source $MngDir/pact-scs
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

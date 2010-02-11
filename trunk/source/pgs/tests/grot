@@ -1,0 +1,63 @@
+#!/bin/csh -f
+#
+# GROT - PGS grotrian tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PGS GROTRIAN TEST
+
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PGS Grotrian Test ...... "
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE grotrian
+   set TStatus = $status
+   flog $Log popd
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PGS Grotrian Test Program"
+      NoteD $Log "                    PGS Grotrian Test ...... FAILED (-1)"
+      set Err = 1
+   else
+      flog $Log rm -f gsgrts.res gsgrts.ps
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         $CFE $BinDir/gsgrts -1 -d > gsgrts.res
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gsgrts -1 -d     |& \
+         grep "ERROR SUMMARY:"                        |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+      mv ps_test.ps gsgrts.ps
+
+      if ($xstatus != 0) then
+         NoteD $Log "                    PGS Grotrian Test ...... FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         flog $Log rm -f gsgrts.ps gsgrts.res
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

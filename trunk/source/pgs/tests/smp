@@ -1,0 +1,102 @@
+#!/bin/csh -f
+#
+# SMP - PGS parallel rendering tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PGS PARALLEL RENDERING TEST
+
+#--------------------------------------------------------------------------
+
+   if ("$Parallel" != "") then
+      Separator $Log
+
+      NoteD $Log ""
+      NoteD $Log "                    PGS Parallel Test ...... "
+
+      set lErr  = 0
+      set BTime = `$TIMER -r`
+
+      if ($?IBM_BGP == 1) then
+         set nthread = 2
+      else
+         set nthread = 4
+      endif
+
+      set opt   = ""
+      set opt   = ( -t $nthread )
+      set opt   = ( $opt -f -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log $CFE $BinDir/gsatst $opt
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gsatst $opt |& \
+         grep "ERROR SUMMARY:"                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 123) then
+         NoteD $Log "                       new ....... to ($ETime)"
+         set lErr = 1
+      else if ($xstatus != 0) then
+         NoteD $Log "                       new ....... ng ($xstatus/$ETime)"
+         set lErr = 2
+      else
+         NoteD $Log "                       new ....... ok ($ETime)"
+         flog $Log rm -f gscgmt.cgm
+      endif
+
+      set opt   = ""
+      set opt   = ( -t $nthread )
+      set opt   = ( $opt -s -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log $CFE $BinDir/gsatst $opt
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gsatst $opt |& \
+         grep "ERROR SUMMARY:"                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 123) then
+         NoteD $Log "                       pool ...... to ($ETime)"
+         set lErr = 3
+      else if ($xstatus != 0) then
+         NoteD $Log "                       pool ...... ng ($xstatus/$ETime)"
+         set lErr = 4
+      else
+         NoteD $Log "                       pool ...... ok ($ETime)"
+         flog $Log rm -f gscgmt.cgm
+      endif
+
+      set ETime = `$TIMER -b $BTime`
+
+      if ($lErr == 0) then
+         NoteD $Log "                    PGS Parallel Test ...... PASSED ($ETime)"
+      else
+         NoteD $Log "                    PGS Parallel Test ...... FAILED ($ETime)"
+         set Err = 1
+      endif
+
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

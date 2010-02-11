@@ -1,0 +1,68 @@
+#
+# COMMON - common setup for programs in analyze
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Cmd    = $0
+set Exe    = $Cmd:t
+set ExeDir = $Cmd:h
+if ($?AnaDir == 0) then
+   setenv AnaDir $ExeDir
+endif
+if ($?ALog == 0) then
+   setenv ALog $cwd/log.analyze
+endif
+
+if (-f ../scripts/env-csh) then
+   set MngDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set MngDir = $cwd:h
+endif
+set ldir = $MngDir:h/scripts
+set Which = "$MngDir/pwhich"
+
+if ($?FirstCommon == 0) then
+   if (-x cfgman) then
+      set larch = `cfgman use`
+      set lroot = $cwd:h
+   else if (-x ../cfgman) then
+      set larch = `../cfgman use`
+      set lroot = $cwd:h
+      set lroot = $lroot:h
+   endif
+
+   set lbin = $lroot/dev/$larch/bin
+   set path = ( $ldir $lbin $path )
+
+   unset lbin
+   unset lroot
+   unset larch
+
+   setenv FirstCommon FALSE
+endif
+
+source $ldir/env-csh
+source $ldir/csh-subroutines
+
+set Tmp = tmp-$Exe
+
+Note $ALog ""
+Separator $ALog
+Note $ALog "Command: $Cmd"
+Note $ALog "Current: $cwd"
+Note $ALog "Date: `date`"
+Note $ALog "Temporary file base: $Tmp"
+Note $ALog "Manager directory: $MngDir"
+Note $ALog ""
+
+SafeEnv MngDir     $cwd
+SafeEnv CFE        ""
+SafeEnv PFE        "do-run -m"
+SafeEnv BE         ""
+SafeEnv CList      ""
+SafeEnv NM         nm
+

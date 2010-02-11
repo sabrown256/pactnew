@@ -1,0 +1,59 @@
+#!/bin/csh
+#
+# FILL-STRING - pad out a string with supplied characters
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set c = "."
+@ ln  = 40
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set c = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: fill-string [-n <length>] [-c <char>] <string>"
+           echo ""
+           echo "    c - fill with <char> (default '.')"
+           echo "    h - this help message"
+           echo "    n - fill to <length> (default 40)"
+           echo ""
+           exit(1)
+           breaksw
+      case -n:
+           shift
+           @ ln = $1
+           breaksw
+      default:
+           set s = ( $argv )
+           break
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FORMAT - fill ragged UHost name with "." to column 20 
+
+@ i = `echo $s | wc -c`
+@ n  = $ln - $i
+set t = "$s "
+while ($n > 0)
+   set t = "$t$c"
+   @ n = $n - 1
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo "$t"
+
+exit($status)

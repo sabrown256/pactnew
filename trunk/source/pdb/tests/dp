@@ -1,0 +1,63 @@
+#!/bin/csh -f
+#
+# DP - PDB distributed parallel test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set tst = $1
+
+if ("$MPI" != "") then
+   NoteD $LogF ""
+   NoteD $LogF "                    PDB Distributed Parallel Test ...... "
+   NoteD $LogF ""
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE dp
+   set TStatus = $status
+   flog $LogF popd
+
+   if ($TStatus != 0) then
+      NoteD $LogF ""
+      NoteD $LogF "                         ERROR Building Distributed Parallel Tests"
+      NoteD $LogF "                    PDB Distributed Parallel Test . FAILED (-1)"
+      set Err = 1
+
+   else
+      set UTime = `$TIMER -r`
+      if (-x $PFE) then
+
+         flog $LogF $PFE -dr -p 2 -t 0 $BinDir/pddpts -v $tst
+         ftee $LogF ( $PFE -p 2 -t 0 $BinDir/pddpts -v $tst |& awk '$1 !~ /MPI/ && $1 !~ /ERROR/ && $1 !~ /srun/ {print}' | grep -v filenoexist | grep -v salloc )
+         set xstatus = $status
+
+      else
+         Note $LogF "No MPI - test omitted"
+         set xstatus = 255
+      endif
+      set ETime   = `$TIMER -b $UTime`
+
+# Not enough resources error:
+#   poe  exits with status 255
+#   prun exits with status 126
+#   srun exits with status 1
+# NFS error:
+#   srun exits with status 134
+      NoteD $LogF ""
+      if (($xstatus == 255) || ($xstatus == 126) || ($xstatus == 1) || ($xstatus == 134)) then
+         NoteD $LogF "                    PDB Distributed Parallel Test ...... OMITTED ($ETime)"
+      else if ($xstatus != 0) then
+         NoteD $LogF "                    PDB Distributed Parallel Test ...... FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $LogF "                    PDB Distributed Parallel Test ...... PASSED ($ETime)"
+      endif
+   endif
+endif
+
+exit($Err)

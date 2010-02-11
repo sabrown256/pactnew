@@ -1,0 +1,27 @@
+#
+# test dependency analysis - update following implicit dependency update
+#                          - libtst.a updated after a.c updated
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+.c.a:
+	@echo "CA $< -> $*"
+
+TGTLib = libtst.a
+ArObjs = ${TGTLib}(a.o)
+
+work : ${ArObjs}
+
+setup :
+	touch a.h a.o
+	ar r ${TGTLib} a.o 2> /dev/null
+	rm a.o
+	sleep 1
+	touch a.c
+
+
+cleanup :
+	rm -f [a].[cho] libtst.a
+

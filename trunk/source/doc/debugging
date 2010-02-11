@@ -1,0 +1,95 @@
+
+Debugging AIDS in PACT
+
+There are several functions in PACT that are designed to be called from
+a debugger (such as gdb) in a debugging session.  For the most part they
+print out data that would be much harder to get at using standard debugger
+commands.  By convention, the names of all such functions begin with "d".
+This way they are not confused with PACT API calls or internal routines.
+
+I) SCORE
+
+   daprint(pcons *alst)
+      Print out the association list, ALST.
+
+   dhash(HASHTAB *self, char *patt)
+      Print out the contents of the hash table SELF whose keys
+      match PATT.
+
+   dsocket(int s)
+      Print out all of the flags that getsockopt can get for the
+      socket S.  Useful to know the state of a socket.
+
+   dsighnd(int sigmn, int sigmx)
+      Print out the name or address of the signal handler associated
+      with each signal between SIGMN and SIGMX inclusive.
+
+   dflpr(int j)
+      Print out the contents of the free memory list for the bin
+      whose index is J.  Calls to SC_mem_chk are most often the
+      more useful thing to do.
+
+   dpmfblock(SC_mapped_file *mf)
+      Print the list of blocks associated with the mapped file MF.
+
+   drproc(int ev, int pid)
+      Print out info about PROCESS structures recorded in the
+      internal table _SC_process_list.  Neither argument is critical
+      in an interactive debugging session.  Occasionally, this has
+      been used in lieu of a print statement if one is reduced to
+      debugging that way.
+
+   drwait(void)
+      Print out info about every process id for which we have
+      received termination notice via waitpid.
+
+II) PDB
+
+   dpstack(int tid, int n)
+      Print the locator stack of the parse of an index expression.
+      A thread index, TID - usually 0, and a stack depth, N, are
+      supplied.  This helps in the tar pit.
+
+
+III) SCHEME
+
+    dproc(object *pp)
+       Print out a compound procedure object.  This is a procedure
+       defined in SCHEME as opposed to a compiled in procedure.
+       Handy for viewing SCHEME procedures that are giving trouble.
+
+    dpenv(object *penv)
+       Print out the environment frame stack starting from PENV.
+       Handy for figuring out function call arguments and local
+       variable values.
+
+    dpreg(void)
+       Print out the values of all of the registers of the interpreter
+       engine.  This shows at once what several calls to dprint
+       would be needed to show.
+
+    dprint(object *obj)
+       Print the value (i.e. binding) of a SCHEME object.  This
+       calls the routines which print objects for display and as
+       such gives the most useful view of an object.  It also
+       clarifies which object you have in a way that looking at
+       the address of the contents of the struct cannot do.
+       This is probably the most useful function in the entire
+       SCHEME library.
+
+    dbgst(objp *st)
+       Print the stack of one of the YACC parsers for C or FORTRAN
+       interpreting with the SCHEME engine.  Better than working
+       with YACC generated code.
+
+    dot(int kind)
+       If KIND is 1, prints out info for all SCHEME objects known
+       known to the SCORE memory manager.  So this is all objects
+       in a SCHEME session.  If KIND is 2, prints out info about
+       all objects that have a bad print name.  In the latter mode
+       this is sometimes useful for tracking down objects that have
+       been corrupted - most likely having been used after being
+       released.
+
+
+

@@ -1,0 +1,41 @@
+#!/bin/csh -f
+#
+# PERDB3 - test auto server spawn
+#        - use environment variable specification of DB
+#        - test atomic set and get
+#        - test suitability for environment variable
+#        - no FIFO
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db3-$1
+else
+   set db  = ./db3-socket
+endif
+
+alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+
+setenv PERDB_PATH $db
+
+dbset v1 1
+dbset v2 "baz blat"
+
+echo "-----------------------------------"
+perdb $opt v1
+perdb $opt v2
+
+echo "-----------------------------------"
+dbget v1
+echo "v1 : |$v1|"
+
+echo "-----------------------------------"
+dbget v2
+echo "v2 : |$v2|"
+
+echo "-----------------------------------"
+perdb $opt quit:
+
+exit($status)

@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+# COMMON - support for SX test scripts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv Package sx
+
+source ../../../scripts/env-csh
+source ../../../scripts/test-env
+
+#if ($?LogF == 0) then
+   set TestName = "$0"
+   set TestName = "$TestName:t"
+
+   InitLog LogF $cwd/log.$TestName.$LogSfx
+   pushd ../../../manager >& /dev/null
+   set Arch = `cfgman use`
+   cd ../dev/$Arch >& /dev/null
+   set Root = $cwd
+   popd >& /dev/null
+
+   set BinDir   = $Root/bin
+   set LibDir   = $Root/lib
+   set MAKE     = $BinDir/pact
+   set TIMER    = $BinDir/timer
+   set CFE      = $BinDir/do-run
+   set PFE      = $BinDir/do-run
+#endif
+
+grep '#define THREADING' $Root/include/scconfig.h >& /dev/null
+if ($status == 0) then
+   setenv THREADING yes
+else
+   setenv THREADING no
+endif
+
+grep '#define HAVE_MPI' $Root/include/scconfig.h >& /dev/null
+if ($status == 0) then
+   setenv HAVE_MPI yes
+else
+   setenv HAVE_MPI no
+endif
+
+grep '#define HAVE_SQLITE' $Root/include/scconfig.h >& /dev/null
+if ($status == 0) then
+   setenv HAVE_SQLITE yes
+else
+   setenv HAVE_SQLITE no
+endif
+
+set TDir    = $RootDir/sx/tests
+set RefDir  = $RootDir/sx/tests/ref
+set Ultra   = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
+set SX      = "$CFE $BinDir/sx -e -r -s $ZeroSpace"
+set PDBView = "$CFE $BinDir/sx -e -p -q $ZeroSpace"
+set PDBDiff = "$BinDir/pdbdiff -e -x -q $ZeroSpace"
+
+if ($?SrcDir == 0) then
+   pushd ../.. >& /dev/null
+   set SrcDir = $cwd
+   popd >& /dev/null
+endif
+
+if ($?Log == 1) then
+   Note $Log "Log file: $LogF"
+endif
+
+set Err = 0
+

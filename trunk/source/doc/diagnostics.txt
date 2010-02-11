@@ -1,0 +1,184 @@
+
+These routines exist in PACT to aid in debugging.  They are mainly
+intended to be called from a debugger in order to display state
+that is too tedious for explicit debugger commands to show.
+
+They follow the convention that they all begin with the letter 'd'
+which no other PACT routines should do.
+
+
+                                   /* SCORE */
+
+/* DAPRINT - print an alist for debug purposes (scctl.c) */
+
+   void daprint(pcons *alst)
+
+/* DHASH - debugging printout of names in hash table (schash.c) */
+
+   void dhash(HASHTAB *self, char *patt)
+
+/* DSOCKET - diagnostic print of socket info (schp.c) */
+
+   void dsocket(int s)
+
+/* DPRFREE - print the free memory lists (scmemda.c) */
+
+   void dprfree(void)
+
+/* DFLPR - show the free list for the specified bin (scmemda.c) */
+
+   void dflpr(int j)
+
+/* DPMFBLOCK - diagnostic print of the block list (scmmaps.c) */
+
+   void dpmfblock(SC_mapped_file *mf)
+
+/* DPRBLK - print info about memory block */
+
+   void dprblk(void *p)
+
+/* DTID - return the id of the current thread - debugging version (scpar.c) */
+
+   int dtid(void)
+
+/* DRPROC - report the managed processes (scpman.c) */
+
+   void drproc(int ev, int pid)
+
+/* DRWAIT - report the list of processes which the OS tells
+ *        - us have finished (scpman.c)
+ */
+
+   void drwait(void)
+
+/* DSIGACT - report signals blocked when SIG has been raised (scsig.c) */
+
+   void dsigact(int sig)
+
+/* DSIGHND - diagnostic print of signal handlers (scsig.c) */
+
+   void dsighnd(int sigmn, int sigmx)
+
+/* DSTATELOG - help with generic debug logging (scsysc.c) */
+
+   void dstatelog(char *fmt, ...)
+
+/* DBCK - diagnostic print of info for background determination (scterm.c) */
+
+   void dbck(void)
+
+/* DPTERM - print the term size (scterm.c) */
+
+   void dpterm(void)
+
+/* DPRN - print the tree nod(sctrts.c) es
+
+
+                                   /* PML */
+
+/* DPRVCT - diagnostic print of vectors (mlgeom.c) */
+
+   void dprvct(int nd, int n, double **v)
+
+/* DPRPLY - diagnostic print of polygons (mlgeom.c) */
+
+   void dprply(PM_polygon *py)
+
+/* DARREQ - print the number of elements of P equal to F (mlmath.c) */
+
+   long darreq(REAL *p, int n, double f)
+
+/* DARRLT - print the number of elements of P less than F (mlmath.c) */
+
+   long darrlt(REAL *p, int n, double f)
+
+/* DARRGT - print the number of elements of P greater than F (mlmath.c) */
+
+   long darrgt(REAL *p, int n, double f)
+
+/* DMINMAX - print the max and min value of the given
+ *         - SCORE allocated array (mlsrch.c)
+ */
+
+   void dminmax(void *p, int n)
+
+
+                                   /* PDB */
+
+/* DPRBL - diagnostic print of block list (pdblk.c) */
+
+   void dprbl(SC_dynamic_array *bl)
+
+/* DPSTACK - print the locator stack for debug purposes (pdpath.c) */
+
+   void dpstack(int _t_index, int n)
+
+/* DSTCKTR - debugging aid (pdpath.c) */
+
+   void dstcktr(int cmnd, int i, off_t addr, long numb, int end)
+
+/* DPRAP - diagnostic print of address lists (pdptr.c) */
+
+   void dprap(PDBfile *file)
+
+
+                                   /* PGS */
+
+/* DACRST - diagnostic print of number of red, green, and blue pixels
+ *        - the raster frame FR (gsdlr.c)
+ */
+
+   void dacrst(frame *fr)
+
+/* DPRST - do ASCII display of raster components
+ *       - do not try this with a large image (gsdlr.c)
+ */
+
+   void dprst(frame *fr)
+
+/* DPRNODES - diagnostic print of N nodes (gshls.c) */
+
+   void dprnodes(PG_node *a, int n)
+
+/* DPRANOM - diagnostic print to find anomalies in raster image
+ *         - list lines with various anomalies (gspr_rst.c)
+ */
+
+   void dpranom(PG_device *dev)
+
+/* DVIEWBOX - diagnostic print for sorting out geometrical
+ *          - transformations (gsvsp.c)
+ */
+
+   void dviewbox(PG_dev_geometry *g, double *vbx, int n, double **x)
+
+
+/* DPRITF - print out the interface descriptions to the terminal (gsrwi.c) */
+
+   int dpritf(PG_device *dev)
+
+                                   /* SCHEME */
+
+/* DPROC - print out the given compound procedure object (shenvr.c) */
+
+   void dproc(object *pp)
+
+/* DPENV - print out the entire environment frame stack given (shenvr.c) */
+
+   void dpenv(object *penv)
+
+/* DOT - debugging object trace (shprm1.c) */
+
+   long dot(int kind)
+
+/* DPREG - print all of the SCHEME registers (shprnt.c) */
+
+   void dpreg(void)
+
+/* DPRINT - an easy to use debug time object printer (shprnt.c) */
+
+   void dprint(object *obj)
+
+/* DBGST - debug aid - print the parser stack (shsynt.c) */
+
+   void dbgst(objp *st)

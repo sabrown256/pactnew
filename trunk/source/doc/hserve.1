@@ -1,0 +1,136 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH HSERVE 1 "6 December 2004"
+.SH NAME
+hserve \- work with hosts by system type rather than by name
+.SH SYNOPSIS
+.B hserve [-dt #] [-exh <command>] [-ext <command>] [-f <host-db>] [-h]
+.B        [-lst] [-n] [-m <name>] [-me] [-q] [-sys <list>] [-t <type>] [-typ] [-vfy]
+.SH DESCRIPTION
+
+On networks of many hosts of diverse types it is often useful
+to think about and work with the hosts in terms of the type of
+system that they run rather than a specific host.  For example,
+you may want to do a compilation on any host that is running a
+particular version of Linux.
+
+By maintaining a database of hosts listed by system type, hserve
+lets you deal with hosts in an abstract, system type centered way.
+The system type designations are those defined by PACT.  The actual
+database is maintained by someone with knowledge about system types
+and available hosts.
+
+Operations that can be performed include: querying the database for
+numbers and types of systems; verifying that hosts are available for
+login; and executing commands by host or by system type.
+
+.SH HOST SERVER DATABASE
+
+The host server database is simply a text file which specifies information
+that the host server uses to respond to queries.  Here is an example:
+
+.nf
+   #
+   # HOST-SERVER-DB - define database for hserve
+   #
+   
+   .net foo
+   
+   # FOO Net servers
+   lnx-2.3@foo        (new1 new2 new3)
+   lnx-2.2@foo        (old1
+   osx-3.3@foo        (mac1)
+   
+   # BAR Net servers
+   lnx-2.3@bar       lbar 1 16
+   aix-5.2@bar       (ibm1 ibm2 hal1 hal2)
+.fi
+
+In this example you have two networks, foo and bar.  By network
+I mean a cluster of hosts which shares such file systems as
+/home or other user oriented file systems.
+
+System type entries are of the form: <systype>@<network>.
+For each system type a specification for a number of hosts is
+given.  Two forms are supported: 1) an explicit list of hosts;
+and 2) a base host name followed by a range.  The latter form
+is useful for clustered host names.  In the example above, the
+lnx-2.3 hosts on bar net are lbar1, ..., lbar16.
+
+This database file should exist somewhere on foo net.  The '.net'
+specification tells the host server to supply '@foo' if an
+unqualified name is given but a qualified name is needed.
+
+Searches can be done by: fully qualified specifications; unqualified
+system type specifications; network (e.g. @foo); or the keyword 'all'.
+
+.SH OPTIONS
+.TP
+.B \-dt
+Number of milliseconds to wait for hosts (default 5000).
+.TP
+.B \-exh
+Exec command on all hosts of the specified type.
+.TP
+.B \-ext
+Exec command on one host of each specified type.
+.TP
+.B \-f
+Use specified file for host database.
+.TP
+.B \-h
+A short summary help message.
+.TP
+.B \-lst
+List all hosts of the specified type.
+.TP
+.B \-m
+Report a host that matches a host or system type specification.
+.TP
+.B \-me
+Exclude the current host when executing commands.
+.TP
+.B \-n
+Report number of hosts of the specified type.
+.TP
+.B \-q
+Quiet mode, just the relevant facts.
+.TP
+.B \-sys
+List a host for each system type in comma delimited list.
+.TP
+.B \-t
+Perform queries for specified system type (defaults to current host type).
+.TP
+.B \-typ
+List known system types.
+.TP
+.B \-vfy
+Verify that you can login to all hosts of the specified type.
+
+
+.SH EXAMPLES
+
+   hserve -vfy
+   hserve -t all -vfy
+   hserve -t @foo -exec uptime
+   hserve -t lnx-2.3@bar -lst
+
+
+.SH ENVIRONMENT VARIABLES
+
+HOST_SERVER_DB  this variable names the default database file used by hserve.
+The '-f' option is used to override this default.
+
+HOST_SERVER_NET  if this variable is set, its value overrides the .net
+setting in the database file.
+
+.SH BUGS
+.TP 
+.B None known.
+

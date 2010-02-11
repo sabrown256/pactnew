@@ -1,0 +1,29 @@
+#
+# AUTO-BGP-GNU - 32-bit BGP back end configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
+
+run features/locate-mpi ibm bgp any
+
+include 32-bit
+include compiler-gnu-bgp
+include no-x11
+include no-sql
+include no-jpeg
+include no-png
+include no-libz
+
+setenv CROSS_COMPILE  TRUE
+setenv DO_RUN_MPI     "salloc.bgp"
+setenv DO_RUN_CROSS   "submit"
+setenv IBM_BGP
+define IBM_BGP
+define GETSOCKNAME_LONG
+
+

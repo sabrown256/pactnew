@@ -1,0 +1,70 @@
+#
+# COMPILER-SUN - define basic variables to use Sun compilers
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath sun
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe      = suncc
+   Flags   += [ _env_ = Bits ;               # address bit size
+                *     = -m* ]
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -xinstrument=datarace ]
+   Debug    = -g -v
+   Optimize = -g -xO3
+   Version  = -V
+}
+
+Tool FC {
+   Exe     = sunf90
+   Version = -V
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -m* ]
+}
+
+Tool LD {
+   RPath   = -Wl,-rpath,@
+   Lib     = -lc
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -m* ]
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -xinstrument=datarace ]
+}
+
+Tool Lex {
+   Flags  = -w
+   Flags += [ _env_ = Bits ;                # address bit size
+              *     = -m* ]
+}
+
+Tool OpenMP_Lex {
+   Debug    = -xopenmp=noopt
+   Optimize = -xopenmp=parallel -xO3
+}
+
+Group Cfg {
+   Use      = Std
+   LD_Flags = ${LD_Flags}
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Debug    = -xopenmp=noopt
+   CC_Optimize = -xopenmp=parallel -xO3
+#   LD_Flags = -xopenmp=parallel -xO3
+#   LD_Lib   = -xopenmp=parallel -xO3
+}
+
+include cpp-rule
+

@@ -1,0 +1,498 @@
+#!/bin/csh
+#
+# DO-HOSTS - build a host file and run do-net over it
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+onintr INTERRUPT
+
+source ../scripts/env-csh
+source ../scripts/csh-subroutines
+HAVE_SUBROUTINES
+
+alias CALLSTACK 'set \!\!:1 = `expr $SUBR_[\!\!:2] : '"'.*_\(.*\)'"' | tr "[A-Z]" "[a-z]"`'
+
+# add the directory with do-net to the path
+set path = ( `dirname $0` $path )
+
+unalias mail
+unalias mailx
+
+unset time
+
+umask 002
+
+set Root = $cwd:h
+set This = $cwd:t
+
+set Stamp = `date +%m_%d_%H_%M`
+set Host  = `uname -n`
+set UHost = `expr $Host : '\(.*\)\..*\..*'`
+if ("$UHost" == "") then
+   set UHost = $Host
+endif
+
+set SSH = ""
+foreach i ($path $cwd /usr/local/bin /usr/local/apps/pactnew/bin)
+   if ("$i" == ".") then
+      set dir = $cwd
+   else
+      set dir = $i
+   endif
+   if (("$SSH" == "") && (-x $dir/ssh)) then
+      set SSH = "$dir/ssh -q -x"
+   endif
+end
+
+set RM = "rm -f"
+set MV = 'mv -f'
+
+set HandTOut            = "pass"
+set Finishing           = FALSE
+set HaveTimeOuts        = FALSE
+set InterruptInProgress = FALSE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# READ COMMAND LINE
+
+set Verbose        = TRUE
+set Silent         = FALSE
+set ClearOut       = FALSE
+set Trace          = FALSE
+set HostFile       = ""
+set CLArgs         = ""
+
+set Flags    = ""
+set CfgFiles = ""
+
+set Setup  = TRUE
+set Work   = TRUE
+set Remove = TRUE
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           while ($#argv > 0)
+              set CLArgs = ( $CLArgs $1 )
+              shift
+           end
+           set Flags = ( $Flags $CLArgs )
+           break
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: do-hosts [-h] [-r] <config-file>* [<do-net args>]*"
+           echo ""
+           echo "    h   - this help message"
+           echo ""
+           exit(1)
+           breaksw
+      case -r:
+           set Work  = FALSE
+           breaksw
+
+      case -d:
+      case -e:
+      case -t:
+           set Flags = ( $Flags $1 $2 )
+           breaksw
+      case +*:
+      case -*:
+           set Flags = ( $Flags $1 )
+           breaksw
+      default:
+           set CfgFiles = ( $CfgFiles $1 )
+           breaksw
+   endsw
+   shift
+end
+
+InitLog Log $cwd/log.do-host
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAIN - decide what to do
+
+MAIN:
+
+if ($Setup == TRUE) then
+
+# settle on the config files
+    if ("$CfgFiles" == "") then
+       flog $Log pushd local
+       flog $Log set CfgFiles = `ls -1`
+       flog $Log popd
+    endif
+    set lst = ""
+    foreach i ( $CfgFiles )
+       if (!(-d "$i")) then
+          set lst = ( $lst $i )
+       endif
+    end
+    flog $Log set CfgFiles = ( $lst )
+
+# match hosts with configs
+    call MATCH_HOSTS($CfgFiles)
+
+# produce nets from hosts
+    call FIND_NETS($Hosts)
+
+endif
+
+if ($Work == TRUE) then
+
+# write host file
+    call WRITE_HOST()
+
+# run do-net over it
+    NoteD $Log -n "Making /tmp/pact/wrk on all hosts ... "
+    Note $Log ""
+    flog $Log set nhst = ( $NetHosts )
+    while ($#nhst > 0)
+       flog $Log set hst = $nhst[1]
+       flog $Log set nfs = $nhst[2]
+       shift nhst
+       shift nhst
+       if ($nfs == no) then
+          flog $Log ssh $hst mkdir -p /tmp/pact/wrk
+       endif
+    end
+    NoteD $Log "done"
+
+    NoteD $Log "Running do-net ... "
+    Note $Log ""
+    ftee $Log do-net $HostFile $Flags
+    set Err = $status
+    NoteD $Log "done"
+
+    $RM $HostFile
+
+endif
+
+if ($Remove == TRUE) then
+    NoteD $Log -n "Removing /tmp/pact/wrk on all hosts ... "
+    Note $Log ""
+    flog $Log set nhst = ( $NetHosts )
+    while ($#nhst > 0)
+       flog $Log set hst = $nhst[1]
+       flog $Log set nfs = $nhst[2]
+       shift nhst
+       shift nhst
+       if ($nfs == no) then
+          flog $Log ssh $hst rm -r /tmp/pact/wrk
+       endif
+    end
+    NoteD $Log "done"
+endif
+
+    exit($Err)
+
+#--------------------------------------------------------------------------
+
+#                      AUXILLIARY FUNCTION ROUTINES
+
+#--------------------------------------------------------------------------
+
+# MATCH_HOSTS - match each config file with a host that can successfuly
+#             - build from it
+
+MATCH_HOSTS:
+
+   set Cfgs      = ( $args_ )
+   set Hosts     = ""
+   set UnMatched = ""
+   set HostDB    = hosts/host-db
+
+   foreach i ($Cfgs)
+#echo "--> $i"
+      set clst = ( `echo $i | sed 's/-/ /g'` )
+      set net  = $clst[1]
+      set os   = $clst[2]
+      shift clst
+      shift clst
+
+#echo "--> net  = |$net|"
+#echo "--> os   = |$os|"
+      set hlst = `awk '$1 ~ /'$net'/ && $2 ~ /'$os'/ { printf("%s-'$os' ", $1); for (i = 3; i <= NF; i++) print $i }' $HostDB`
+#echo "--> hlst = |$hlst|"
+#echo "--> clst = |$clst|"
+#echo ""
+
+      set hst = ""
+
+      if (("$clst" == "") && ($#hlst > 3)) then
+         set id   = $hlst[1]
+         set attr = $hlst[2]
+         set info = $hlst[3]
+         set hsts = $hlst[4]
+         set hst  = $hsts
+
+      else
+
+# check for MPI restrictions on hosts
+         foreach c ( $clst )
+            set ht = ( $hlst )
+            while ($#ht > 0)
+               set id   = $ht[1]
+               set attr = $ht[2]
+               set info = $ht[3]
+               set hsts = $ht[4]
+               shift ht
+               shift ht
+               shift ht
+               shift ht
+
+#echo "----> |$c| |$attr|"
+               if ($c == mpi) then
+                  if ((`expr "$attr" : '.*yes.*'` > 0) || (`expr "$attr" : '.*all.*'` > 0)) then
+                     set hst = $hsts
+                     break
+                  endif
+               else
+                  if ((`expr "$attr" : '.*no.*'` > 0) || (`expr "$attr" : '.*all.*'` > 0)) then
+                     set hst = $hsts
+                     break
+                  endif
+               endif
+            end
+
+            if ("$hst" != "") then
+               break
+            endif
+         end
+      endif
+
+      if ("$hst" == "") then
+         set UnMatched = ( $UnMatched $i )
+      else
+         set Hosts = ( $Hosts $i $info $hst )
+      endif
+   end
+
+   if ("$UnMatched" != "") then
+      echo ""
+      echo "There are $#UnMatched configs which cannot be matched with a host"
+      echo "UnMatched = |$UnMatched|"
+      echo ""
+   endif
+
+# sort the host specs
+# this will make assigning one host from a list easier
+   call SORT_HOSTS($Hosts)
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIND_NETS - find a unique list of entries for the net specifications
+#           - in the host file
+
+FIND_NETS:
+
+    Note $Log "Finding net hosts ... "
+    set hst = ( $args_ )
+
+# make a unique list of hosts for the net entries
+    flog $Log set Tmp  = tmp.uniq.1
+    flog $Log set TmpB = tmp.uniq.2
+
+    flog $Log $RM $Tmp $TmpB
+    flog $Log touch $Tmp
+    while ($#hst)
+       echo "$hst[1] $hst[2] $hst[3]" |\
+       awk '{ printf("%-20s %10s %s\n", $1, $2, $3); }' >>& $Tmp
+       shift hst
+       shift hst
+       shift hst
+    end
+
+    flog $Log ( sort $Tmp | uniq -w 20 >&! $TmpB )
+
+    flog $Log set Nets     = `cat $TmpB`
+
+# NOTE: shell bug dies on this iff flog'd
+    set NetHosts = `awk '$2 ~ /nfs/ { printf("%s yes ", $1); } $2 !~ /nfs/ { printf("%s no ", $1); }' $TmpB`
+    Note $Log "NetHosts = |$NetHosts|"
+
+    flog $Log $RM $Tmp $TmpB
+    Note $Log "done"
+
+    RETURN
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WRITE_HOST - write the host file with the known info
+
+WRITE_HOST:
+
+    NoteD $Log -n "Writing the host file $HostFile ... "
+    Note $Log ""
+
+    InitLog HostFile ./host-tmp
+
+    Note $HostFile "system       pact"
+    Note $HostFile "script       /usr/gapps/pact/wrk/manager/do-pact"
+    Note $HostFile "repository   fire:/usr/gapps/pact/repository"
+    Note $HostFile "timelimit    2700"
+    Note $HostFile "installtime  600"
+    Note $HostFile "setuptime    300"
+    Note $HostFile "logdir       /usr/gapps/pact/update"
+    Note $HostFile "localinstall yes"
+    Note $HostFile ""
+    Note $HostFile "var SyncOnly    yes"
+    Note $HostFile "var DeleteOld   yes"
+    Note $HostFile "var MultiConfig yes"
+    Note $HostFile ""
+
+    Note $HostFile "#   net-host   base	      instdir"
+
+    set nt = ( $Nets )
+    while ($#nt > 0)
+       flog $Log set hs   = $nt[1]
+       set info = ( `echo $nt[2] | sed 's/,/ /g'` )
+       Note $Log "info = |$info|"
+       flog $Log set cf   = $nt[3]
+
+       flog $Log set nfs  = `expr "$nt[2]" : '.*\(nfs\).*'`
+
+       if ("$nfs" == "nfs") then
+          set dir = /usr/gapps/pact/wrk
+       else
+          set dir = /tmp/pact/wrk
+       endif
+
+       echo "$nt[1] $dir $nt[3]" | \
+       awk '{printf("net %-10s %-20s  none  %-18s\n", $1, $2, $3);}' >>& $HostFile
+
+       shift nt
+       shift nt
+       shift nt
+    end
+
+    Note $HostFile " "
+    Note $HostFile "#    host            base          use   dbg  par config        #cpu  seq   install                         link"
+    Note $HostFile "                                   tmp   opt                                base"
+
+    set hst = ( $Hosts )
+    while ($#hst > 0)
+       flog $Log set hs   = $hst[1]
+       set info = ( `echo $hst[2] | sed 's/,/ /g'` )
+       Note $Log "info = |$info|"
+       flog $Log set cf   = $hst[3]
+       flog $Log set ncpu = $info[1]
+
+       flog $Log set nfs  = `expr "$hst[2]" : '.*\(nfs\).*'`
+
+       if ("$nfs" == "nfs") then
+          flog $Log set dir = /usr/gapps/pact/wrk
+       else
+          flog $Log set dir = /tmp/pact/wrk
+       endif
+
+       echo "$hs $dir $cf $ncpu" | \
+       awk '{printf("host %-10s %-20s   no   g      l  %-18s %2s   off   none\n", $1, $2, $3, $4);}' >>& $HostFile
+
+       shift hst
+       shift hst
+       shift hst
+    end
+    Note $HostFile " "
+
+    Note $HostFile "mail sabrown@llnl.gov"
+    Note $HostFile " "
+
+    flog $Log cat $HostFile
+    NoteD $Log "done"
+
+    RETURN
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SORT_HOSTS - sort the host specifications so that
+#            - they are order by hosts instead of by config which
+#            - is the case on entry
+#            - the list is also reordered in the sense that
+#            - on exit the entries are: <host> <info> <config>
+
+SORT_HOSTS:
+
+    set hst = ( $args_ )
+
+# sort and reorder the host entries into alphabetical by host order
+    set Tmp = tmp.sort
+    $RM $Tmp
+    touch $Tmp
+    while ($#hst)
+       echo "$hst[3] $hst[2] $hst[1]" >>& $Tmp
+       shift hst
+       shift hst
+       shift hst
+    end
+
+    set Hosts = ""
+
+# assign unique host from the comma delimited host specification
+    set hst  = `sort $Tmp`
+    set last = ""
+    set lst  = ""
+    while ($#hst)
+       set host = $hst[1]
+       set info = $hst[2]
+       set cfg  = $hst[3]
+
+       if (("$host" != "$last") || ("$lst" == "")) then
+          set lst = `echo $host | sed 's/,/ /g'`
+       endif
+
+       set Hosts = ( $Hosts $lst[1] $info $cfg )
+
+       shift lst
+       set last = $host
+       shift hst
+       shift hst
+       shift hst
+    end
+
+    $RM $Tmp
+
+    RETURN
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - cleanup properly after an interrupt
+
+INTERRUPT:
+
+# fake the flow control into thinking this was called as a subroutine
+   set SUBR_ = ( INTERRUPT $SUBR_ )
+   if ($Trace == TRUE) then
+      echo "Calling INTERRUPT (from $SUBR_[2])"
+   endif
+
+   if ($InterruptInProgress == FALSE) then
+      set InterruptInProgress = TRUE
+
+      CALLSTACK sect 2
+
+      NoteD $LogNet ">>> interrupted in $sect"
+
+      call CLEAN()
+
+   endif
+
+   exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

@@ -1,0 +1,35 @@
+#
+# MPI - MPI feature
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH   ${MPIBin}:${PATH}
+
+Group MPI {
+   CC_Inc = ${IncMPI}
+   LD_Lib = ${LibMPI}
+}
+
+Tool CC {
+   Exe    =? ${MPI_CC_Exe}
+   Linker =? ${MPI_CC_Linker}
+   Flags  += ${MPI_CC_Flags}
+   DPInc  =? ${MPI_CC_Inc}
+}
+
+Tool FC {
+   Exe    =? ${MPI_FC_Exe}
+   Linker =? ${MPI_FC_Linker}
+   Flags  += ${MPI_FC_Flags}
+}
+
+Tool LD {
+   Exe   =? ${MPI_LD_Exe}
+   Flags += ${MPI_LD_Flags}
+   DPLib += ${MPI_LD_Lib}
+}
+

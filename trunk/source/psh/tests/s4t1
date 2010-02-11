@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+# S4T1 - test 1 of signature file 4
+#      - environment variables
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Code = do-run
+set Opt  = ans
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set Code = $1
+           breaksw
+      case '-h':
+           echo "Usage: $0 [-c <code>] [-h] run | ans"
+           echo "   c     test <code> (default do-run on path)"
+           echo "   h     this help message"
+           echo "   run   run the test"
+           echo "   ans   print the fiducial answer"
+           echo ""
+           exit(1)
+      default:
+           set Opt = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($Opt == run) then
+   if ("$Valgrind" == "") then
+      $Code -level 3 -dr -mpi foo -s run.s4 s4t1
+      set xstatus = $status
+   else
+      $Valgrind $Code -level 3 -dr -mpi foo -s run.s4 s4t1
+      set xstatus = $status
+   endif
+
+# print the fiducial answer for this test
+else
+   echo "Using signature file 'run.s4'"
+   echo 'CROSS = '
+   echo 'MPI   = foo'
+   echo '> if ( 1 = 0 ) {$bar} else {b}'
+   echo '>    Alternate: b'
+   echo '> setenv var10 b'
+   echo '> if ( 1 = 1 ) {a} else {$bar}'
+   echo '>    Consequent: a'
+   echo '> setenv var11 a'
+   echo '*** error: undefined variable for var0: "(1 == 1) ? $bar : b"'
+   echo '*** error: undefined variable for var1: "(1 == 0) ? a : $bar"'
+   echo '*** error: undefined variable for var2: "($bar == 1) ? a"'
+   echo '> setenv var0 a'
+   echo '> setenv var1 b'
+   echo '> setenv var2 c'
+   echo '> setenv var3 2'
+   echo '> setenv var3 a b 2 c'
+   echo '> setenv var3 0 a b 2 c'
+   echo '> setenv var3 0 a b 2 c 4'
+   echo '> setenv var4 0 a b 2 c 4'
+   echo '> if ( 1 = 1 ) {`printenv var3`} else {}'
+   echo '>    Consequent: `printenv var3`'
+   echo '> setenv var5 0 a b 2 c 4'
+   echo '> setenv Cmd $var4'
+   echo '0 a b 2 c 4'
+endif
+
+exit(0)

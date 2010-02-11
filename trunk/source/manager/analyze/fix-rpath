@@ -1,0 +1,43 @@
+#!/bin/csh -f
+#
+# FIX-RPATH - expand group and tool flags with RPath
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+set noglob
+
+# for Cfg group
+set varl = ( `env | grep _RPath | grep Cfg_ | sed 's|=.*$| |'` )
+
+foreach var ( $varl )
+   if ("$Cfg_RPATH" != "") then
+      set lst = ( `printenv $var` )
+      set val = ( `echo "$lst" | sed 's|\@|'$Cfg_RPATH'|'` )
+   else
+      set val = ""
+   endif
+   echo "parent $var($val)"
+end
+
+# for Std group and related ones
+set varl = ( `env | grep _RPath | grep -v Cfg_ | sed 's|=.*$| |'` )
+
+foreach var ( $varl )
+   if ("$RPATH" != "") then
+      set lst = ( `printenv $var` )
+      set val = ( `echo "$lst" | sed 's|\@|'$RPATH'|'` )
+   else
+      set val = ""
+   endif
+   echo "parent $var($val)"
+end
+
+exit(0)
+

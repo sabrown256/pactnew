@@ -1,0 +1,303 @@
+#!/bin/csh -f
+
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+#include "cpyright.h"
+
+
+pathts -c 0
+
+mv thts1.u00 othts1.u00
+mv thts1a.u00 othts1a.u00
+mv thts1b.u00 othts1b.u00
+
+echo "toul -x -s thts1"
+echo ""
+toul -x -s thts1
+pdbdiff -x othts1.u00 thts1.u00
+rm thts1.u00
+echo "toul -x -o -l thts1.t04"
+echo ""
+toul -x -o -l thts1.t04
+pdbdiff -x othts1.u00 thts1.u00
+rm thts1.u00
+echo "toul -x -f thts1.t00 thts1.t01 thts1.t02 thts1.t03 thts1.t04"
+echo ""
+toul -x -f thts1.t00 thts1.t01 thts1.t02 thts1.t03 thts1.t04
+pdbdiff -x othts1.u00 thts1.u00
+rm thts1.u00
+
+echo "toul -x -o -l thts1a.t01"
+echo ""
+toul -x -o -l thts1a.t01
+pdbdiff -x othts1a.u00 thts1a.u00
+rm thts1a.u00
+echo "toul -x -f thts1.t00 thts1.t01 thts1.t02 thts1a.t00 thts1a.t01"
+echo ""
+toul -x -f thts1.t00 thts1.t01 thts1.t02 thts1a.t00 thts1a.t01
+pdbdiff -x othts1a.u00 thts1.u00
+rm thts1.u00
+
+echo "toul -x -s thts1b"
+echo ""
+toul -x -s thts1b
+pdbdiff -x othts1b.u00 thts1b.u00
+rm thts1b.u00
+echo "toul -x -o -l thts1b.t00"
+echo ""
+toul -x -o -l thts1b.t00
+pdbdiff -x othts1b.u00 thts1b.u00
+rm thts1b.u00
+echo "toul -x -f thts1b.t00"
+echo ""
+toul -x -f thts1b.t00
+pdbdiff -x othts1b.u00 thts1b.u00
+rm thts1b.u00
+
+mv thts2.u00 othts2.u00
+mv thts2a.u00 othts2a.u00
+mv thts2b.u00 othts2b.u00
+
+echo "toul -x -s thts2"
+echo ""
+toul -x -s thts2
+pdbdiff -x othts2.u00 thts2.u00
+rm thts2.u00
+echo "toul -x -o -l thts2.t06"
+echo ""
+toul -x -o -l thts2.t06
+pdbdiff -x othts2.u00 thts2.u00
+rm thts2.u00
+echo "toul -x -f thts2.t00 thts2.t01 thts2.t02 thts2.t03 thts2.t04 thts2.t05 thts2.t06"
+echo ""
+toul -x -f thts2.t00 thts2.t01 thts2.t02 thts2.t03 thts2.t04 thts2.t05 thts2.t06
+pdbdiff -x othts2.u00 thts2.u00
+rm thts2.u00
+
+echo "toul -x -o -l thts2a.t01"
+echo ""
+toul -x -o -l thts2a.t01
+pdbdiff -x othts2a.u00 thts2a.u00
+rm thts2a.u00
+echo "toul -x -f thts2.t00 thts2.t01 thts2.t02 thts2a.t00 thts2a.t01"
+echo ""
+toul -x -f thts2.t00 thts2.t01 thts2.t02 thts2a.t00 thts2a.t01
+pdbdiff -x othts2a.u00 thts2.u00
+rm thts2.u00
+
+echo "toul -x -s thts2b"
+echo ""
+toul -x -s thts2b
+pdbdiff -x othts2b.u00 thts2b.u00
+rm thts2b.u00
+echo "toul -x -o -l thts2b.t00"
+echo ""
+toul -x -o -l thts2b.t00
+pdbdiff -x othts2b.u00 thts2b.u00
+rm thts2b.u00
+echo "toul -x -f thts2b.t00"
+echo ""
+toul -x -f thts2b.t00
+pdbdiff -x othts2b.u00 thts2b.u00
+rm thts2b.u00
+
+mv thts3.u00 othts3.u00
+mv thts3.u01 othts3.u01
+mv thts3a.u00 othts3a.u00
+mv thts3a.u01 othts3a.u01
+mv thts3b.u00 othts3b.u00
+mv thts3b.u01 othts3b.u01
+
+echo "toul -x -s thts3"
+echo ""
+toul -x -s thts3
+pdbdiff -x othts3.u00 thts3.u00
+pdbdiff -x othts3.u01 thts3.u01
+rm thts3.u00
+rm thts3.u01
+echo "toul -x -o -l thts3.t07"
+echo ""
+toul -x -o -l thts3.t07
+pdbdiff -x othts3.u00 thts3.u00
+pdbdiff -x othts3.u01 thts3.u01
+rm thts3.u00
+rm thts3.u01
+echo "toul -x -f thts3.t00 thts3.t01 thts3.t02 thts3.t03 thts3.t04 thts3.t05 thts3.t06 thts3.t07"
+echo ""
+toul -x -f thts3.t00 thts3.t01 thts3.t02 thts3.t03 thts3.t04 thts3.t05 thts3.t06 thts3.t07
+pdbdiff -x othts3.u00 thts3.u00
+pdbdiff -x othts3.u01 thts3.u01
+rm thts3.u00
+rm thts3.u01
+
+echo "toul -x -o -l thts3a.t01"
+echo ""
+toul -x -o -l thts3a.t01
+pdbdiff -x othts3a.u00 thts3a.u00
+pdbdiff -x othts3a.u01 thts3a.u01
+rm thts3a.u00
+rm thts3a.u01
+echo "toul -x -f thts3.t00 thts3.t01 thts3.t02 thts3a.t00 thts3a.t01"
+echo ""
+toul -x -f thts3.t00 thts3.t01 thts3.t02 thts3a.t00 thts3a.t01
+pdbdiff -x othts3a.u00 thts3.u00
+pdbdiff -x othts3a.u01 thts3.u01
+rm thts3.u00
+rm thts3.u01
+
+echo "toul -x -s thts3b"
+echo ""
+toul -x -s thts3b
+pdbdiff -x othts3b.u00 thts3b.u00
+pdbdiff -x othts3b.u01 thts3b.u01
+rm thts3b.u00
+rm thts3b.u01
+echo "toul -x -o -l thts3b.t00"
+echo ""
+toul -x -o -l thts3b.t00
+pdbdiff -x othts3b.u00 thts3b.u00
+pdbdiff -x othts3b.u01 thts3b.u01
+rm thts3b.u00
+rm thts3b.u01
+echo "toul -x -f thts3b.t00"
+echo ""
+toul -x -f thts3b.t00
+pdbdiff -x othts3b.u00 thts3b.u00
+pdbdiff -x othts3b.u01 thts3b.u01
+rm thts3b.u00
+rm thts3b.u01
+
+mv thts4.u00 othts4.u00
+mv thts4a.u00 othts4a.u00
+mv thts4b.u00 othts4b.u00
+
+echo "toul -x -s thts4"
+echo ""
+toul -x -s thts4
+pdbdiff -x othts4.u00 thts4.u00
+rm thts4.u00
+echo "toul -x -o -l thts4.t04"
+echo ""
+toul -x -o -l thts4.t04
+pdbdiff -x othts4.u00 thts4.u00
+rm thts4.u00
+echo "toul -x -f thts4.t00 thts4.t01 thts4.t02 thts4.t03 thts4.t04"
+echo ""
+toul -x -f thts4.t00 thts4.t01 thts4.t02 thts4.t03 thts4.t04
+pdbdiff -x othts4.u00 thts4.u00
+rm thts4.u00
+
+echo "toul -x -o -l thts4a.t01"
+echo ""
+toul -x -o -l thts4a.t01
+pdbdiff -x othts4a.u00 thts4a.u00
+rm thts4a.u00
+echo "toul -x -f thts4.t00 thts4.t01 thts4.t02 thts4a.t00 thts4a.t01"
+echo ""
+toul -x -f thts4.t00 thts4.t01 thts4.t02 thts4a.t00 thts4a.t01
+pdbdiff -x othts4a.u00 thts4.u00
+rm thts4.u00
+
+echo "toul -x -s thts4b"
+echo ""
+toul -x -s thts4b
+pdbdiff -x othts4b.u00 thts4b.u00
+rm thts4b.u00
+echo "toul -x -o -l thts4b.t00"
+echo ""
+toul -x -o -l thts4b.t00
+pdbdiff -x othts4b.u00 thts4b.u00
+rm thts4b.u00
+echo "toul -x -f thts4b.t00"
+echo ""
+toul -x -f thts4b.t00
+pdbdiff -x othts4b.u00 thts4b.u00
+rm thts4b.u00
+
+echo "toul -m othts1"
+echo ""
+toul -m othts1
+pdbdiff -x mothts1.u00 othts1.u00
+echo "toul -m -s othts1a"
+echo ""
+toul -m -s othts1a
+pdbdiff -x mothts1a.u00 othts1a.u00
+echo "toul -m -f othts1b.u00"
+echo ""
+toul -m -f othts1b.u00
+pdbdiff -x mothts1b.u00 othts1b.u00
+
+echo "toul -m othts2"
+echo ""
+toul -m othts2
+pdbdiff -x mothts2.u00 othts2.u00
+echo "toul -m -s othts2a"
+echo ""
+toul -m -s othts2a
+pdbdiff -x mothts2a.u00 othts2a.u00
+echo "toul -m -f othts2b.u00"
+echo ""
+toul -m -f othts2b.u00
+pdbdiff -x mothts2b.u00 othts2b.u00
+
+echo "toul -m othts3"
+echo ""
+toul -m othts3
+echo "toul -m -s othts3a"
+echo ""
+toul -m -s othts3a
+echo "toul -m -f othts3b.u00 othts3b.u01"
+echo ""
+toul -m -f othts3b.u00 othts3b.u01
+
+echo "toul -m othts4"
+echo ""
+toul -m othts4
+pdbdiff -x mothts4.u00 othts4.u00
+echo "toul -m -s othts4a"
+echo ""
+toul -m -s othts4a
+pdbdiff -x mothts4a.u00 othts4a.u00
+echo "toul -m -f othts4b.u00"
+echo ""
+toul -m -f othts4b.u00
+pdbdiff -x mothts4b.u00 othts4b.u00
+
+rm othts1.u00
+rm othts1a.u00
+rm othts1b.u00
+
+rm mothts1.u00
+rm mothts1a.u00
+rm mothts1b.u00
+
+rm othts2.u00
+rm othts2a.u00
+rm othts2b.u00
+
+rm mothts2.u00
+rm mothts2a.u00
+rm mothts2b.u00
+
+rm othts3.u00
+rm othts3.u01
+rm othts3a.u00
+rm othts3a.u01
+rm othts3b.u00
+rm othts3b.u01
+
+rm mothts3.u00
+rm mothts3a.u00
+rm mothts3b.u00
+
+rm othts4.u00
+rm othts4a.u00
+rm othts4b.u00
+
+rm mothts4.u00
+rm mothts4a.u00
+rm mothts4b.u00
+

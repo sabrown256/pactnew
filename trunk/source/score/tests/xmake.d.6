@@ -1,0 +1,5 @@
+--job--- 0:/bin/sh:.:(echo "foo";pwd;cd ..;pwd 2> /dev/null;uname)
+--job--- 1:/bin/sh:.:(echo "foo";pwd;cd ..;pwd 2> /dev/null;uname)
+--job--- 2:/bin/sh:.:(if [ ! -f "foo.d" ];then echo no;fi;echo a)
+--log---
+--exit--

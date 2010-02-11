@@ -1,0 +1,41 @@
+#!/bin/csh -f
+#
+# DOT-SILENT - predicate script to test whether dot files chat
+#            - which some shell scripts cannot tolerate 
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Sh = $SHELL
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: dot-silent [-h] [<shell>]"
+           echo ""
+           echo "   Return exit status of 0 if the dot files for the specified"
+           echo "   shell do not print messages to the terminal otherwise"
+           echo "   exit with a status of 1"
+           echo ""
+           echo "      h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set Sh = $1
+           breaksw
+   endsw
+   shift
+end
+
+@ nlines = `$Sh -c 'echo a' | wc -l`
+if ($nlines > 1) then
+   set Err = 1
+else
+   set Err = 0
+endif
+
+exit($Err)

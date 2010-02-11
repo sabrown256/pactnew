@@ -1,0 +1,38 @@
+#!/bin/csh -f
+#
+# PERDB2 - test use of existing PERDB database
+#        - use environment variable specification of DB
+#        - test atomic get
+#        - test suitability for environment variable
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db1-$1
+else
+   set db  = ./db1-socket
+endif
+
+alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+
+setenv PERDB_PATH $db
+
+perdb $opt -s
+
+echo "-----------------------------------"
+perdb $opt v1
+perdb $opt v2
+
+echo "-----------------------------------"
+dbget v1
+echo "v1 : |$v1|"
+
+echo "-----------------------------------"
+dbget v2
+echo "v2 : |$v2|"
+
+echo "-----------------------------------"
+perdb $opt quit:
+
+exit($status)

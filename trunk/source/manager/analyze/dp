@@ -1,0 +1,25 @@
+#!/bin/csh -f
+#
+# DP - analyze distributed parallel options
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+if ($?Log == 1) then
+   Separator $Log
+   Note $Log "Analyze: dp"
+endif
+
+NoteD $ALog -n "   Parallel Communication Support: "
+Note $ALog ""
+
+$AnaDir/mpi
+
+exit(0)
+

@@ -1,0 +1,48 @@
+#!/bin/csh -f
+#
+# SUBR2 - recursive test of csh-subroutines
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $IncDir/csh-subroutines
+HAVE_SUBROUTINES
+
+# run the test
+if ($1 == run) then
+   set Trace = TRUE
+
+   call fact(4, 1)
+
+   echo "fact(4) = $f"   
+
+# print the fiducial answers
+else
+   echo "Calling fact with ( 4, 1 )"
+   echo "Calling fact with ( 3, 4 )"
+   echo "Calling fact with ( 2, 12 )"
+   echo "Calling fact with ( 1, 24 )"
+   echo "Calling fact with ( 0, 24 )"
+   echo "Returning from fact"
+   echo "Returning from fact"
+   echo "Returning from fact"
+   echo "Returning from fact"
+   echo "Returning from fact"
+   echo "fact(4) = 24"
+endif
+
+exit(0)
+
+fact:
+   @ n = $args_[1]
+   @ f = $args_[2]
+   if ($n > 0) then
+      @ f = $f * $n
+      @ n = $n - 1
+      call fact($n, $f)
+   endif
+   return
+

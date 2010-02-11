@@ -1,0 +1,426 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH DO-NET 1 "22 August 2006"
+.SH NAME
+do-net \- automated code distribution and update system
+.SH SYNOPSIS
+.B do-net [+/-b] [-c <stamp>] [-d <file>] [-e <script>] [-g]
+.B        [-h] [+/-i] [-I] [+/-m] [-p <stamp>] [-q] [+/-s] [-t <tag>]
+.B        [-v] <hostfile> [-a ...]
+
+
+.SH COMMAND LINE OPTIONS
+
+   a   - all following args are passed to the script
+   b   - do not build (-) or build only (+)
+   c   - clean up after aborted attempt
+   d   - use distribution file
+   e   - use the specified script
+   g   - test hosts for availability
+   h   - this help message
+   i   - do not install (-) or install only (+)
+   I   - installs may proceed even with a down host
+   m   - do setup in parallel (-) or serial (+) default is -m
+   p   - report progress
+   q   - don't print tty messages
+   s   - do not setup (-) or setup only (+)
+   t   - use version, <tag>, for repository update
+   v   - verbose mode
+
+.SH INTRODUCTION
+
+Do-net is a script to automate the setup, building, testing, and installation
+of a code system on multiple hosts possibly on multiple networks as efficiently
+as possible.  This means that codes for which multiple simultaneous builds from
+a single set of sources is possible can be built in the shortest time. There
+are four phases to this process: setup, build/test, network install, and host
+install.  Usually only one of the last two will actually do anything and that
+is up to the developer of the code system.
+
+A file called a host file describes most of what do-net needs in order to
+do this work.  A C shell script is supplied for do-net to run on each host
+to do the specific commands needed to carry out each phase.  This is referred
+to as the local script.  Do-net also takes command line arguments that are
+to be passed down to the local script.
+
+Do-net primarily handles process control and logging activities.  Do-net has
+an auxilliary helper script called do-local which runs on the individual
+host machines and mediates between do-net and the local script.  It passes
+most information and most command line arguments straight through to the
+local script.  It does NOT understand anything about a particular code system
+except in the most abstract way in terms of four phases.  The phases are:
+
+1) Source setup
+
+   Sources are prepared for compilation either from some kind of source
+   repository or from some kind of distribution file.
+
+2) Build/Test
+
+   The sources are configured for the platform by the local script.
+   They are then compiled and the resulting libraries and executable
+   are tested, again by the local script.
+
+3) Network Install
+
+   If all tests from the prior phase pass then a network based
+   installation can be done by the local script.  Network based means
+   that a single host on a network can accomplish the "installation"
+   for all hosts on that network.
+   
+4) Host Install
+
+   If all tests from the prior phase pass then a host based
+   installation can be done by the local script.  Host based means that
+   each host has to do an "installation" for itself.
+
+   
+.SH HOST FILE
+
+The information specified in the host file is of two kinds.  The first kind
+tells do-net how to manage the work it has to do.  The second kind is simply
+gathered up and passed to the local script.  The following specifcations
+constitute the host file "language":
+
+   host          - the name of a specific computer on which to
+                   do a build or hostinstall phase operation
+   installtime   - the maximum time to allow for an installation to
+                   occur before declaring a time out for a fault of
+                   some kind
+   logdir        - the directory in which all logging information for
+                   the final report is kept
+   mail          - the mailing list for the final report
+   mailprogram   - the mailing program to be used
+   net           - the name of a specific computer on which to
+                   do a setup or netinstall phase operation
+   repository    - the complete specification of a source repository
+                   or the removal of existing sources
+   script        - the path to the local script
+   setuptime     - the maximum time to allow for source setup to
+                   occur before declaring a time out for a fault of
+                   some kind
+   system        - a name for the code system being updated
+   timelimit     - the maximum time to allow for a build to
+                   occur before declaring a time out for a fault of
+                   some kind
+   timeout       - if the value is "pass" then a host which times out
+                   counts as passing, if "fail" a timed out host counts
+                   as a failure.  The default is "pass".
+
+The second kind of information which is gathered by do-net and passed on
+to the local script is specified by three "commands":
+
+   var           - specify a variable/value pair which is not
+                   associated with hosts or networks
+   net           - specify information used in operations that are
+                   performed once per network (or filesystem)
+   host          - specify information used in operations that are
+                   performed once per host
+
+Example of a host file:
+
+   system      pact
+   script      pact/manager/do-pact
+   repository  foo:/bar/repository
+   timelimit   3600
+   logdir      /bar/logs
+   timeout     fail
+
+   var SyncOnly yes
+
+   #   net-host
+   net ha1      proj/pact
+   net hb2      proj/pact
+
+   #    host     work base   opt1  opt2  opt3
+   host ha1      proj/pact    g     t     3
+   host ha2      proj/pact    go    t     8
+   host ha3      proj/pact    g     r     2
+   host hb1      proj/pact    g     t     2
+   host hb2      proj/pact    g     t     4
+
+   mail henry
+
+Do-net does understand the first two fields of a host or net command.
+These are the name of the computer on which do-local and the local script
+will be run and the working directory on that computer where the do-local
+and the local script will be doing their work.  Any and all remaining
+fields are simply gathered together and sent down the local script via
+do-local as arguments.  These arguments are preceded by '-host_fields'
+so that the local script can test for these separately from any
+arguments to do-net that occur following '-a' and which are also
+passed down to the local script.
+
+
+.SH LOCAL SCRIPT
+
+   The local script is not strictly an executable shell script.  Since
+it is sourced by the do-local script, it merely contains a set of commands
+to be executed.  This means that its commands are executed in the
+environment created by the do-local script.  In particular certain environemnt
+variables and aliases are guaranteed to be in the environment in which
+the local script runs.  It is also to be emphasized that since the local
+script is sourced in, it must not contain an 'exit' statement.  Finally,
+the local script sets and returns an environment variable called Err
+to communicate its success or failure to do-local and do-net.
+
+The gross structure of the local script is as follows:
+
+  set argv  = `cat $ArgFile`
+  set Phase = $1
+  shift
+
+  switch ($Phase)
+     case -setup:
+          breaksw
+     case -arch:
+          breaksw
+     case -build:
+           while ($#argv > 0)
+              switch ($1)
+                 case -host_fields:
+                      shift
+                      set WrkDir = $1
+                      shift
+                      set DbgOpt = $1
+                      shift
+                      break
+                      breaksw
+                 case -v:
+                      set Flag = 1
+                      breaksw
+              endsw
+              shift
+          end
+          breaksw
+     case -netinstall:
+          breaksw
+     case -hostinstall:
+          breaksw
+  endsw
+
+The environment variable ArgFile provided by do-local tells the local
+script where to find information that would be the arguments to the
+local script if it were executed rather than sourced.  Notice in the
+case -build how the arguments are procesed.  Those from the host file
+will be preceeded by -host_fields and will be the last arguments
+in the argument list.  Consequently there must be the explicit break.
+Those from the command line will appear just as they appeared on the
+command line.
+
+
+.SH ENVIRONMENT FOR LOCAL SCRIPT PROVIDED BY DO-NET
+
+The local script will see the following things in the environment
+in which it runs.  These provide information that the local script
+is likely to need in its task.
+
+Environment Variables:
+
+  ArgFile   - names a file in which "command arguments" are to be
+              found.
+  Dist      - the name of a distribution file if that is to be the
+              source setup medium.
+  LogHost   - the name of the file where logging information is
+              kept.
+  Repo      - the full specification of the location of the source
+              repository if that is the medium for source setup.
+  Stamp     - a time stap of the form: MM_DD_hh_mm. This is used
+              to distinguish do-net invocations.  Note the resolution
+              is minutes not seconds.
+  Verbose   - Run in a verbose mode with considerable diagnostic
+              information in the log file.
+  WrkDir    - The base directory in which the sources will be setup
+              and from which all subseqent operations will be launched.
+
+
+  MV        - a reliable version of the 'mv' command.  Set to 'mv -f'.
+  RM        - a reliable version of the 'rm' command.  Set to 'rm -f'.
+  RMDir     - a reliable way to remove a directory.  Set to 'rm -rf'.
+  SSH       - a clean invocation of ssh.  Set to 'ssh -q -x'.
+
+Aliases:
+
+  vlog      - verbose logging command.  Form: vlog <file> <command>
+              If the Verbose flag is TRUE the command will be echo'd
+              to the log file.  In any case the output of the command
+              will be echo'd to the log file.  This is to replace
+              the following scenario:
+                     if ($Verbose == TRUE) then
+                        echo "<command>" >>& $Log
+                     endif
+                     <command> >>& $Log
+              with
+                     vlog $Log <command>
+  flog      - similar to vlog except that the echo of the command to
+              the log file is unconditional.  So
+                     echo "<command>" >>& $Log
+                     <command> >>& $Log
+              becomes
+                     flog $Log <command>
+  Separator  - echo a line of hyphens to the specified file
+                     Separator $Log
+  Note       - echo text to the specfied file
+                     Note $Log <comment>
+               This is mainly for notational consistency with flog and
+               vlog.
+
+Return:
+
+The local script must communicate with the do-local script.  Since it
+must not exit, it cannot do so via a return status.  Consequently, it
+does so through an environment variable.  It is called Err.  Each phase
+can interpret Err differently.
+
+  A) setup
+       0            - successful source setup
+       1            - source setup failed
+
+  B) build
+       0            - successful build
+       1            - build failed
+
+  C) hostinstall
+       OK           - host installation was requested and completed
+                      successfully
+       FAILED       - host installation was requested but failed
+       NO_INSTALL   - the host file or the command line arguments
+                      specified that no host installation be done
+       DONT_INSTALL - the local script does not do host installation
+
+  D) netinstall
+       OK           - net installation was requested and completed
+                      successfully
+       FAILED       - net installation was requested but failed
+       NO_INSTALL   - the host file or the command line arguments
+                      specified that no net installation be done
+       DONT_INSTALL - the local script does not do net installation
+
+In the case of the install phases if DONT_INSTALL is returned no
+logging is attempted of this non-action.
+
+
+.SH LOGGING
+
+Do-net logs information about the conduct of its operation including
+that of the four phases.  Some of the information is generated in
+do-net, some in do-local, and some in the local script.  Most timing
+information is generated in do-net and in do-local.  The local
+script can log additional information if that is desired, but even
+if it does not do-net will produce a report which is very useful for
+ascertaining what happened and how long it took.
+
+
+.SH APPENDIX A.  OTHER DO-NET FUNCTIONS
+
+Because do-net's operation spans networks and hosts monitoring some
+of its functions is tedious.  The following operations are to
+help the do-net user in actual distributed executions:
+
+  A) Progress Reporting
+
+     You can monitor the progress of a do-net run from another shell
+     by executing:
+
+          do-net -p <stamp> <host>
+
+     where <host> is the same host file used by the do-net you are
+     monitoring and <stamp> is the time stamp or tag which the original
+     do-net reported.
+
+     For example, suppose you are running a do-net with host file foo
+     to update the bar code system:
+
+          > do-net foo
+          Beginning update of bar (10_22_09_59)
+                        .
+                        .
+                        .
+
+     In another shell you can issue the command:
+
+          > do-net -p 10_22_09_59 foo
+
+     This will print a report similar to the one which you will receive
+     upon completion of the original do-net run.
+
+  B) Cleaning Up a Cancelled Do-net
+
+     Sometimes you have to stop a do-net while it is in progress.
+     You will want to clean up the interim files which do-net has
+     created as a part of its operation.  You can do this by executing:
+
+          do-net -c <stamp> <host>
+
+     where <host> is the same host file used by the do-net you have 
+     cancelled and <stamp> is the time stamp or tag which the original
+     do-net reported.
+
+     For example, suppose you are running a do-net with host file foo
+     to update the bar code system:
+
+          > do-net foo
+          Beginning update of bar (10_22_09_59)
+                        .
+                        .
+                        .
+
+          ^C     (kill/interrupt the do-net)
+
+     You can issue the command:
+
+          > do-net -c 10_22_09_59 foo
+
+     This will cleanup files and locks from the original do-net
+     run.
+
+
+  C) Checking on the Status of the Hosts
+
+     Sometimes you may want to check to determine whether the hosts
+     you will be having do-net access are available for login
+     (i.e. up).  You can do this by executing:
+
+          do-net -g <host>
+
+     where <host> is the same host file used by the do-net you are
+     going to be using.
+
+     For example, suppose you want to run a do-net with host file
+     foo to update the bar code system:
+
+          > do-net -g foo
+
+     This will print out the status of each host mentioned in both
+     the net and host commands in the host file foo.
+
+
+.SH APPENDIX B.  YOUR ENVIRONMENT
+
+Do-net uses ssh.  Consequently it is imperative that a user
+of do-net have his/her ssh setup correctly to operate between all
+hosts and networks specified in the host file.  This should be
+checked before ever running do-net.  Using an optimal authentication
+strategy with ssh will produce the best results for do-net.
+
+Do-net depends on PACT.  Consquently PACT must be installed on all
+hosts with which do-net will communicate in the course of its operation
+as specified in the host file.  Furthermore, the PACT executables
+must be found via your PATH environment variable.  NOTE: many users
+setup their shell environments to distinguish between interactive
+shells and non-interactive shells.  Do-net requires PACT executables
+to be visible on your PATH from non-interactive shell sessions.
+
+.SH SEE ALSO
+
+.B hserve(1), cleanup-jobs(1), ls-jobs(1), sign(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

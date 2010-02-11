@@ -1,0 +1,43 @@
+#!/bin/csh -f
+#
+# LINE - analyze the line directive handling of CPP
+#      - Computes: BadLineDirectives
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+set AC = a$$.c
+set AO = a$$.o
+set BC = b$$.c
+
+cat << EOF >! $AC
+#line 2 "/foo/bar/baz"
+#include "$BC"
+int x = 3;
+EOF
+
+cat << EOF >! $BC
+#define FOO BAR
+EOF
+
+flog $ALog $Cfe_CC_Exe -c $AC -o $AO
+if ($status == 0) then
+   setenv BadLineDirectives FALSE
+   NoteD $ALog "      proper line directive handling"
+else
+   setenv BadLineDirectives TRUE
+   NoteD $ALog "      bad line directive handling"
+endif
+
+rm -f $AC $AO $BC
+
+# export the result
+SetParent BadLineDirectives
+
+#exit(0)

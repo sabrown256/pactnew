@@ -1,0 +1,45 @@
+#!/bin/csh -f
+#
+# IPC - analyze the IPC support
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: ipc"
+
+# check for fork
+
+cat << EOF >! $Tmp.c
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+int main(int c, char **v)
+{int pid, st, w;
+ pid = fork();
+ st  = waitpid(-1, &w, WNOHANG);
+ return(0);}
+EOF
+
+flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   setenv IPCSupport "POSIX"
+   NoteD $ALog "      has posix process support"
+else
+   setenv IPCSupport "NOIPC"
+   NoteD $ALog "      no process support"
+endif
+
+rm -f $Tmp.c $Tmp
+
+# export the results
+SetParent IPCSupport
+
+exit(0)
+

@@ -1,0 +1,177 @@
+#!/bin/csh -f
+#
+# CC-FIND - find ANSI C compilers on the current path
+#         - this only runs from pact/manager
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+set ANSI     = TRUE
+set FullPath = FALSE
+set LibPath  = FALSE
+set ncclst   = ""
+
+@ Verbose  = 0
+
+while ($#argv > 0)
+   switch ($1)
+       case -h:
+            echo ""
+            echo "Usage: cc-find [-h] [-l] [-p] [-v] [-w] <cc>*"
+            echo "  h   this help message"
+            echo "  l   set and use LD_LIBRARY_PATH to detect compiler"
+            echo "  p   use full path to compiler"
+            echo "  v   increment verbosity level"
+            echo "  w   compiler works ANSI or not"
+            echo ""
+            exit(1)
+       case -l:
+            set LibPath = TRUE
+            breaksw
+       case -p:
+            set FullPath = TRUE
+            breaksw
+       case -v:
+            @ Verbose = $Verbose + 1
+            breaksw
+       case -w:
+            set ANSI = FALSE
+            breaksw
+       default:
+            set ok = TRUE
+            foreach i ($ncclst)
+               if ($i == $1) then
+                  set ok = FALSE
+                  break
+               endif
+            end
+            if ($ok == TRUE) then
+               set ncclst = ( $ncclst $1 )
+            endif
+   endsw
+   shift
+end
+
+#if ($Verbose > 0) then
+#   echo "Initial list of compilers: $ncclst"
+#endif
+
+cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{
+#ifdef __STDC__
+printf("ANSI");
+#else
+printf("PCC");
+#endif
+return(0);}
+EOF
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIST - make sure the list elements are unique and the requested
+#      - compiler is listed first
+
+set cclst = (gcc pgcc icc pathcc xlc cc)
+foreach i ($cclst)
+    set ok = TRUE
+    foreach j ($ncclst)
+       if ($i == $j) then
+          set ok = FALSE
+          break
+       endif
+    end
+    if ($ok == TRUE) then
+       set ncclst = ( $ncclst $i )
+    endif
+end
+
+set cclst = ( $ncclst )
+
+if ($Verbose > 0) then
+   echo "Complete list of potential compilers: $cclst"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECK - try the compilers on the list
+
+set allcc  = ""
+set ansicc = ""
+
+foreach cc ($cclst)
+   set res = `$MngDir/pwhich $cc`
+   if ("$res[1]" =~ /*) then
+
+      set bindir = $res:h
+      set libdir = $bindir:h/lib
+
+# if forced to - use LD_LIBRARY_PATH in compiler detection
+      if ($LibPath == TRUE) then
+         setenv LD_LIBRARY_PATH $libdir
+         if ($Verbose > 1) then
+            echo ""
+            echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"
+         endif
+      endif
+
+      rm -f $Tmp
+      if ($Verbose > 1) then
+         echo "$cc $Tmp.c -o $Tmp"
+         $cc $Tmp.c -o $Tmp
+      else
+         $cc $Tmp.c -o $Tmp >& /dev/null
+      endif
+      if (-x $Tmp) then
+         if ($Verbose > 2) then
+            echo "$CFE $Tmp"
+            $CFE $Tmp
+	    set xstatus = $status
+         else
+            $CFE $Tmp >& /dev/null
+	    set xstatus = $status
+         endif
+         if ($xstatus == 0) then
+            if ($FullPath == TRUE) then
+               set allcc = ( $allcc $res )
+            else
+               set allcc = ( $allcc $cc )
+            endif
+            set ret = `$CFE $Tmp |& awk '{ print $1 }' | tr -d "[0-9]:"`
+            if ("$ret" =~ *ANSI*) then
+               if ($FullPath == TRUE) then
+                  set ansicc = ( $ansicc $res )
+               else
+                  set ansicc = ( $ansicc $cc )
+               endif
+            endif
+         else if ($Verbose > 0) then
+            echo "Test built by $cc failed - check for shared libraries"
+            ldd $Tmp
+         endif
+      endif
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+rm -f $Tmp.c $Tmp
+
+if ($ANSI == TRUE) then
+   echo "$ansicc"
+else
+   echo "$allcc"
+endif
+
+exit(0)
+

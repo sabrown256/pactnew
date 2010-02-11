@@ -1,0 +1,89 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+Notes on the PACT host server
+
+Overview
+
+We have made the attempt to abstract out the use of hosts in doing
+code development.  A combination of hardware and OS is referred to
+as a system type.
+
+When issuing some commands such as a compilation of source code
+any host of the correct system type is as good as any other for
+doing the work.
+
+With this abstraction we can use the host server to supply hosts
+that are up and running to execute commands rather than making
+requests to specific hosts which might be down.  This model gives
+dmake a great deal of robustness while executing commands
+asynchronously.
+
+
+Database File
+
+The host server reads a database file at start up which describes
+the assocation of hosts and system types.  Here is a sample host
+server database:
+
+   #
+   # HOST-SERVER-DB - define database for hserve
+   #
+
+   lnx-2.3     lcl 1 4
+   irix-6.5    (sgia sgib)
+
+The first line specifies hosts lcl1, lcl2, lcl3, and lcl4 for system
+type 'lnx-2.3'.  The secon line specifies hosts sgia and sgib for
+system type 'irix-6.5'.
+
+The environment variable HOST_SERVER_DB can be used to specify the
+default database file name.  The command line '-f' option will override
+the default and specify the database file
+
+
+Library Functions
+
+The following functions control the host server from initialization
+through termination:
+
+   int SC_host_server_init(char *file, int reset)
+   int SC_host_server_fin(void)
+
+   int SC_host_server_query(char *out, int nc, char *req)
+   int SC_verify_host(char *hst, int to)
+   int SC_get_host_name(char *hst, int nc, char *sys)
+   int SC_get_nhosts(char *sys)
+   char **SC_get_host_types(void)
+
+Utility
+
+The hserve utility accesses the capabilities of the host server to
+process queries or execute commands.
+
+Usage: hserve [-dt #] [-exh <command>] [-ext <command>] [-f <host-db>]
+              [-h] [-lst] [-n] [-q] [-t <type>] [-typ] [-vfy]
+
+   dt   - number of seconds to wait for hosts (default 5)
+   exh  - exec command on all hosts of the specified type
+   ext  - exec command on all one host of each specified type
+   f    - use specified file for host database
+   h    - this help message
+   lst  - list all hosts of the specified type
+   n    - report number of hosts of the specified type
+   q    - quiet mode, just the facts
+   t    - perform queries for specified system type (defaults to current host type)
+   typ  - list known system types
+   vfy  - verify that you can login to all hosts of the specified type
+
+Examples:
+
+   hserve -vfy
+   hserve -dt 10 -vfy
+   hserve -t aix-5.2 -vfy
+   hserve -exh uname -a
+   hserve -q -lst
+   hserve -q -n -t aix-5.2
+

@@ -1,0 +1,91 @@
+#
+# COMPILER-GNU-AIX - compiler info for GNU compilers on AIX
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath gnu
+
+# NOTE: this should eventually be put in a site specific file
+setenv PATH  ${PATH}:/usr/local/bin
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe       = gcc
+   Flags     = -fsignaling-nans -mminimal-toc
+   Flags    += [ _env_ = Bits ;              # address bit size
+                 *     = -maix* ]
+   Flags    += [ _cmd_ = -p ;                # profiling
+	         on    = -pg ]
+   Flags    += [ _cmd_ = -cov ;              # coverage analysis
+	         on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool FC {
+   Exe      = gfortran
+   Flags    = -fsignaling-nans -mminimal-toc
+   Flags   += [ _env_ = Bits ;               # address bit size
+                *     = -maix* ]
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -fprofile-arcs -ftest-coverage ]
+   Debug    = -g -O0 -Wall
+   Optimize = -g -O -Wunused
+   Version  = -v
+}
+
+Tool LD {
+   RPath    = -Wl,-bsvr4,-R,@
+   Flags    = [ _env_ = Bits ;               # address bit size
+                *     = -Wl,-b* ]
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -lgcov ]
+}
+
+Tool Lex {
+   Flags  = -w
+}
+
+Tool AR {
+   Exe   = /bin/ar
+   Flags = [ _env_ = Bits ;                 # address bit size
+             *     = -X* ]
+}
+
+Group Std {
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use    = Std
+   CC_Exe = gcc
+}
+
+Group OpenMP {
+   CC_Flags = -fopenmp
+   LD_Flags = -fopenmp
+   LD_Lib   = -lgomp
+}
+
+Group Shared {
+   LD_Exe    = gcc
+   CC_Shared = -fPIC
+   LD_Shared = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+include cpp-rule

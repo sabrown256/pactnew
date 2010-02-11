@@ -1,0 +1,29 @@
+#
+# test dependency analysis - implicit and explicit rules for target
+#                          - a.o depends on a.x and c.y
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+.SUFFIXES : .x
+
+.x.o :
+	@echo "XO $< -> $@"
+	@touch $@
+
+a.x :
+	touch a.x
+
+b.x :
+	touch b.x
+
+c.y :
+	touch c.y
+
+Objs = a.o b.o
+
+${Objs} : c.y
+
+all: a.x b.x ${Objs}
+	rm -f [ab].[xo] c.y

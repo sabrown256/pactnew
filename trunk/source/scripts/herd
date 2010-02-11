@@ -1,0 +1,269 @@
+#!/bin/csh
+#
+# HERD - herd cron'd jobs to execution via ssh-agent
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+onintr INTERRUPT
+
+set Where = `dirname $0`
+set Herd  = $Where/herd
+
+alias flog   'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias Note   'echo \!\!:2-$ >>& \!\!:1'
+alias NoteT  'if ($Quiet == FALSE) echo \!*'
+
+set Agent     = ssh-agent
+set Add       = ssh-add
+set Kerberos  = FALSE
+@ KrbTLife    = 8
+@ KrbRLife    = 1000
+@ Interval    = 300
+
+set Daemon    = FALSE
+set UrHerd    = FALSE
+set KillHerd  = FALSE
+set Quiet     = FALSE
+set HerdDir   = ~/.herd
+set HerdLog   = ~/.herd.log
+set Command   = ""
+set TStamp    = `/bin/date +%y-%m-%d-%H-%M-%S`
+set Separator = "----------------------------------------------------------------"
+
+setenv KRB5CCNAME "FILE:$HerdDir/.ticket"
+
+while ($#argv)
+   switch ($1)
+      case -d:
+           set Daemon = TRUE
+           breaksw
+      case -dk:
+           set Daemon   = TRUE
+           set Kerberos = TRUE
+           breaksw
+      case -h:
+           goto HELP
+           breaksw
+      case -i:
+           shift
+           @ Interval = $1
+           breaksw
+      case -k:
+           set KillHerd = TRUE
+           breaksw
+      case -q:
+           set Quiet = TRUE
+           breaksw
+      case -u:
+           set UrHerd = TRUE
+           breaksw
+      default:
+           set Command = ( $argv )
+           break
+           breaksw
+   endsw
+   shift
+end
+
+if (!(-d $HerdDir)) then
+   mkdir $HerdDir
+   chmod 700 $HerdDir
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($Daemon == TRUE) then
+
+   if ($Quiet == TRUE) then
+      ( nohup $Agent $Herd -u -i $Interval & ) >>& /dev/null
+   else
+      nohup $Agent $Herd -u -i $Interval &
+   endif
+
+   NoteT "Running herd daemon"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+else if ($KillHerd == TRUE) then
+
+   if (-e $HerdLog) then
+      set PID = `awk '$1 ~ /PID/ { print $3 }' $HerdLog`
+
+      NoteT -n "Halting herd daemon ($PID) ... "
+      Note $HerdLog "Halting herd daemon ($PID)"
+      flog $HerdLog kill -9 $PID
+      NoteT "done"
+   else
+      NoteT "There is no herd daemon running"
+   endif
+
+   mv -f $HerdLog $HerdLog.old
+   rm -r $HerdDir
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+else if ($UrHerd == TRUE) then
+
+   if (-e $HerdLog) then
+      $Herd -k
+      sleep 5
+      mkdir $HerdDir
+      chmod 700 $HerdDir
+   endif
+
+   cd $HerdDir >& /dev/null
+
+   rm -f $HerdLog
+   touch $HerdLog
+   chmod 600 $HerdLog
+
+   Note $HerdLog "Starting herd daemon on `date`"
+   Note $HerdLog "PID            = $$"
+   Note $HerdLog "Kerberos       = $Kerberos"
+   Note $HerdLog "Interval       = $Interval seconds"
+   Note $HerdLog "Herd Directory = `pwd`"
+   Note $HerdLog "Host           = `uname -n`"
+   
+   Note $HerdLog " "
+
+# get a kerberos ticket
+   if ($Kerberos == TRUE) then
+      Note $HerdLog "Obtaining ticket"
+      flog $HerdLog kinit -r ${KrbRLife}h
+   endif
+
+# register with the controlling agent
+   Note $HerdLog "Contacting agent"
+   flog $HerdLog $Add
+
+   Note $HerdLog "done"
+   Note $HerdLog " "
+
+   flog $HerdLog set SessNam = .tag.$TStamp
+   flog $HerdLog rm -f $SessNam
+   flog $HerdLog touch $SessNam
+
+   @ Total     = 0
+   @ LastTotal = 0
+   while (1)
+      set Quit = FALSE
+
+      foreach i (j.* .tag.*)
+         if ($i == $SessNam) then
+            continue
+
+         else if (-f $i) then
+
+	    set Now = `/bin/date +%y-%m-%d-%H-%M-%S`
+	    
+            Note $HerdLog $Separator
+            Note $HerdLog "Submitted: $i"
+            Note $HerdLog "Executed :   $Now"
+	    
+            Note $HerdLog "Command: `cat $i`"
+            (source $i) >>& $HerdLog
+            flog $HerdLog rm $i
+         endif
+      end
+
+      sleep $Interval
+      @ Total = $Total + $Interval
+
+# renew the kerberos ticket every KrbTLife hours
+      if ($Kerberos == TRUE) then
+         @ dT = ( $Total - $LastTotal ) / 3600
+         if ($dT > $KrbTLife) then
+            flog $HerdLog kinit -R
+            flog $HerdLog @ LastTotal = $Total
+         endif
+      endif
+
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# add a job for the daemon to do
+
+else if ("$Command" != "") then
+   set Prm = `ls -ld $HerdDir | awk '{print $1}'`
+   set Usr = `ls -ld $HerdDir | awk '{print $3}'`
+   set Job = $HerdDir/j.$TStamp
+
+# do not run if permission on HerdDir is not 700
+   if ("$Prm" != "drwx------") then
+      Note $HerdLog "Job $Job refused because of bad permission"
+      Note $HerdLog "on $HerdDir ($Prm)"
+
+# do not run if user running herd is not the owner of HerdDir
+   else if ("$Usr" != $USER) then
+      Note $HerdLog "Job $Job refused because of bad owner"
+      Note $HerdLog "on $HerdDir ($Usr vs $USER)"
+
+# submit the job
+   else
+      echo "$Command" >! $Job
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# help
+
+else
+   goto HELP
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HELP - print out the help message
+
+HELP:
+
+   NoteT ""
+   NoteT "Usage: herd [-d] [-dk] [-h] [-i <n>] [-k] [-q] [-u]"
+   NoteT "   or  herd [-q] <command>"
+   NoteT ""
+   NoteT "   d          start the herd daemon"
+   NoteT "   dk         start the herd daemon with Kerberos"
+   NoteT "   h          this help message"
+   NoteT "   i          check for jobs to run every n seconds"
+   NoteT "   k          halt the herd daemon"
+   NoteT "   q          be very quiet (especially for cron)"
+   NoteT ""
+   NoteT "   <command>  have herd run the following command"
+   NoteT ""
+
+   exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - end this herd session on an interrupt
+
+INTERRUPT:
+
+   Note $HerdLog "Shutting down herd on SIGINT"
+
+   if ($Kerberos == TRUE) then
+      kdestroy
+   endif
+
+   exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

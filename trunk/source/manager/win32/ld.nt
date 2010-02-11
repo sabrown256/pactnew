@@ -1,0 +1,79 @@
+@echo off
+
+rem Example: ld main.o fubar pdb dosx
+
+del tmp.tld
+
+echo /LIBPATH:\home\minner\pact\dev\lib  >> tmp.tld
+echo %1 >> tmp.tld
+rem echo %2 >> tmp.tld
+
+if not "%3" == "ultra" goto la
+echo ult_%4.lib scm_%4.lib pgs_%4.lib ppc_%4.lib pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:la
+if not "%3" == "sx" goto lb
+echo sx_%4.lib scm_%4.lib pan_%4.lib pgs_%4.lib ppc_%4.lib pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:lb
+if not "%3" == "scheme" goto lc
+echo scm_%4.lib ppc_%4.lib pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:lc
+if not "%3" == "panacea" goto ld
+echo pan_%4.lib pgs_%4.lib ppc_%4.lib pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:ld
+if not "%3" == "pgs" goto le
+echo pgs_%4.lib ppc_%4.lib pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:le
+if not "%3" == "ppc" goto lf
+echo ppc_%4.lib pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:lf
+if not "%3" == "pdb" goto lg
+echo pdb_%4.lib pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:lg
+if not "%3" == "pml" goto lh
+echo pml_%4.lib sc_%4.lib >> tmp.tld
+goto quit
+
+:lh
+if not "%3" == "score" goto error
+echo sc_%4.lib >> tmp.tld
+goto quit
+
+:error
+echo.
+echo Usage: ld 'objects' 'name' 'libraries' 'system'
+echo.
+echo        objects   - the object module(s) to be loaded
+echo                  - one of: foo.o or *.o
+echo.
+echo        name      - name of the executable will be
+echo                    'name'.exe
+echo.
+echo        libraries - name referring to the set of libraries to be used
+echo                  - must be one of:
+echo                  -   ultra, sx, scheme, panacea, pgs, ppc, pdb,
+echo                  -   pml, score
+echo.
+echo        system    - the version being loaded
+echo                  - must be one of:
+echo                  -   dos, dosx, win
+echo.
+
+:quit
+link @tmp.tld
+rem rm tmp.tld
+
+echo on

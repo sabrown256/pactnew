@@ -1,0 +1,185 @@
+#!/bin/csh -f
+#
+# VERIFY - verify that the workings of do-run on sctty
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if (-f test-env) then
+   source test-env
+   pushd $TestDir >& /dev/null
+else if ($?Log == 1) then
+   if (-f $Log) then
+      mv $Log $Log.tmp
+      source ../../../scripts/test-env
+      mv $Log.tmp $Log
+   else
+      source ../../../scripts/test-env
+   endif
+else
+   source ../../../scripts/test-env
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: verify [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+InitLog Log $TestDir/log.verify.$LogSfx
+
+flog $Log pushd $RootDir/score
+flog $Log $MAKE -i mpitty
+flog $Log popd
+flog $Log rehash
+
+@ Err  = 0
+@ lerr = 0
+
+flog $Log cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log "                    VERIFY Test .................... omitted"
+   NoteD $Log ""
+
+else
+
+   set BTime = `$TIMER -r`
+
+   NoteD $Log "                    VERIFY Test .................... "
+   Note $Log ""
+
+   if ("$MPI" == "") then
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      if (!(-x $BinDir/mpi-io-wrap)) then
+         setenv DORUN     "$BinDir/do-run -m"
+      endif
+
+# debugging - not in a test
+      foreach d ( off )
+
+# threads
+         foreach t ( 0 2 )
+            set args = ""
+            if ($d == on) then
+               set args = ( $args -d )
+            endif
+            if ($t == 2) then
+               set args = ( $args -t $t )
+            endif
+
+            set f = ( `fill-string -n 28 thread $t` )
+
+            Separator $Log
+            NoteD $Log -n "                        $f "
+            Note $Log ""
+            Note $Log "run $args ($d | $t)"
+
+            flog $Log ( echo "end" | $DORUN -v $args sctty )
+            set xstatus = $status
+            if ($xstatus == 0) then
+               NoteD $Log "ok"
+            else
+               NoteD $Log "ng ($xstatus)"
+               flog $Log @ lerr = 1
+            endif
+
+            flog $Log $RM .tv.*
+         end
+      end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   else
+
+# debugging - not in a test
+      foreach d ( off )
+
+# processes
+         foreach p ( 0 1 1f 2 )
+
+# threads
+            foreach t ( 0 2 )
+               set args = ""
+               if ($d == on) then
+                  set args = ( $args -d )
+               endif
+               switch ($p)
+                  case 0:
+                     breaksw
+                  case 1f:
+                     set args = ( $args -p 1 -f )
+                     breaksw
+                  default:
+                     set args = ( $args -p $p )
+                     breaksw
+               endsw
+               if ($t == 2) then
+                  set args = ( $args -t $t )
+               endif
+
+               set f = ( `fill-string -n 28 proc $p thread $t` )
+
+               Separator $Log
+               NoteD $Log -n "                        $f "
+               Note $Log ""
+               Note $Log "run $args ($d | $p | $t)"
+
+               flog $Log ( echo "end" | $DORUN -v $args sctty )
+               set xstatus = $status
+               if ($xstatus == 0) then
+                  NoteD $Log "ok"
+               else if ($xstatus == 255) then
+                  NoteD $Log "omitted"
+               else
+                  NoteD $Log "ng ($xstatus)"
+                  flog $Log @ lerr = 1
+               endif
+
+               flog $Log $RM .tv.*
+            end
+         end
+      end
+
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   set ETime = `$TIMER -b $BTime`
+
+   if ($lerr != 0) then
+      NoteD $Log "                    VERIFY Test .................... FAILED ($xstatus/$ETime)"
+      @ Err = 1
+   else
+      NoteD $Log "                    VERIFY Test .................... PASSED ($ETime)"
+      flog $Log rm -f *.do-run*
+   endif
+   NoteD $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+exit($Err)
+

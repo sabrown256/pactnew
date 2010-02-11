@@ -1,0 +1,22 @@
+#!/bin/csh -f
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Mkf = tmake.c.7
+
+set Opt = ""
+if ($Make == gmake) then
+   set Opt = --no-print-directory
+endif
+
+touch foo.c
+$Make $Opt -f $Mkf work |& grep -v gmake >>& $LogF.make
+rm -f foo foo.c libfoo.a
+
+touch foo.c
+dmake -f $Mkf work >>& $LogF.dmake
+rm -f foo foo.c libfoo.a
+
+exit($status)

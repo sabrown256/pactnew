@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# GETPWUID - analyze platform getpwuid
+#          - Computes: HAVE_GETPWUID
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: getpwuid"
+
+cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <pwd.h>
+int main(int c, char **v)
+   {int rv;
+    struct passwd *pw;
+    pw = getpwuid(0);
+    rv = (pw == NULL);
+    return(rv);}
+EOF
+
+setenv HAVE_GETPWUID FALSE
+
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+if ($status == 0) then
+   setenv HAVE_GETPWUID TRUE
+   flog $ALog rm -f $Tmp.c $Tmp
+endif
+
+if ($HAVE_GETPWUID == FALSE) then
+   NoteD $ALog "      no getpwuid"
+endif
+
+SetParent HAVE_GETPWUID
+
+exit(0)
+

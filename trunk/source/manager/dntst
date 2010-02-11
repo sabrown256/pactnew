@@ -1,0 +1,451 @@
+#!/bin/csh -f
+#
+# DNTST - a dummy script to test do-net
+#       - there is a do-net-test host file in pact/manager/hosts
+#       - to go with this
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $CSHSubr
+HAVE_SUBROUTINES
+
+set Code    = pact
+set Builder = manager
+
+setenv Err  0
+
+set argv  = `cat $ArgFile`
+set Phase = $1
+shift
+
+set UseTmp = no
+
+switch ($Phase)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - handle interrupts
+
+   case -interrupt:
+
+        set Pids = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -pid:
+                   shift
+                   while ($#argv > 0)
+                      set Pids = ( $Pids $1 )
+                      shift
+                   end
+                   break
+                   breaksw
+           endsw
+           shift
+        end
+
+# send SIGTERM to any descendants
+        foreach i ($Pids)
+           if ($i != $$) then
+              flog $LogHost /bin/kill $i
+           endif
+        end
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - handle setup phase
+
+   case -setup:
+        setenv SyncOnly    no
+        setenv MultiConfig no
+        set Cfg         = "none"
+        while ($#argv > 0)
+           switch ($1)
+              case -host_vars:
+                   shift
+                   while ($#argv > 0)
+                      if ($1 =~ -*) then
+                         set argv = ( "end" $argv )
+                         break
+                      else
+                         flog $LogHost eval "setenv $1 $2"
+                         shift
+                         shift
+                      endif
+                   end
+                   breaksw
+              case -host_fields:
+                   flog $LogHost shift
+                   flog $LogHost set RawWrkDir = $1
+                   flog $LogHost shift
+                   flog $LogHost if ($#argv == 0) break
+                   flog $LogHost shift
+                   flog $LogHost set Cfg = $1
+                   break
+                   breaksw
+           endsw
+           shift
+        end
+
+	if ($MultiConfig == yes) then
+           setenv PACT_CONFIG $UHost-$Cfg
+           Note $LogHost "Using multiconfig name $PACT_CONFIG"
+        endif
+
+        flog $LogHost cd $WrkDir
+
+        if (-d repository) then
+           Note $LogHost "Directory $WrkDir contains the repository"
+           Note $LogHost "You cannot work here"
+           setenv Err  1
+
+        else
+
+           setenv Err  0
+
+        endif
+
+        if ($?TmpTar) then
+           if ($TmpTar == yes) then
+              Note $LogHost "tar cvf pact-tmp.tar [mpsu]*"
+           endif
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ARCH - setup the architecture and related directories
+
+   case -arch:
+
+# this is all to get the MultiConfig option to work right if invoked
+        call GET_HOST_ARG(/dev/null)
+
+        call QUALIFY()
+
+        set arch   = `../cfgman use`
+        set DevDir = $WrkDir/dev/$arch
+
+        mkdir -p $DevDir
+        mkdir -p $DevDir/log
+
+        set LogDir = $DevDir/log
+        set Passed = $LogDir/passed
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BUILD_TEST - do the build/test phase
+
+   case -build:
+
+        call GET_HOST_ARG($LogHost)
+
+        call QUALIFY()
+
+        if ($MultiConfig == yes) then
+           set SPList = "-none"
+        else
+           set SPList = ""
+        endif
+
+        set EnvCsh = ../dev/$arch/include/env-pact.csh
+        if (-e $EnvCsh) then
+           source $EnvCsh
+        endif
+        if ($MultiConfig == yes) then
+           Note $LogHost "   Using MultiConfig with PACT_CONFIG = |$PACT_CONFIG|"
+        endif
+
+        set IErr = 0
+
+        if ($MultiConfig == yes) then
+           setenv PACT_CONFIG $UHost-$Cfg
+           Note $LogHost "  Multiconfig name: $PACT_CONFIG"
+        endif
+
+        flog $LogHost $RM $Passed
+
+# configure
+        if ($IErr == 0) then
+           echo "DO-NET: configure $Cfg option g"
+           Note $LogHost ./dsys config $Cfg
+           set IErr = $CStat
+        endif
+   
+# remove
+        if ($IErr == 0) then
+           Separator $LogHost
+           Note $LogHost "Removing"
+           echo -n "   Removing ... "
+           Note $LogHost ./dsys remove
+           if ($status != 0) then
+              echo "Failed"
+              set IErr = 1
+           else
+              echo "OK"
+           endif
+        endif
+   
+# build
+        if ($IErr == 0) then
+           Separator $LogHost
+           Note $LogHost "Building"
+           echo -n "   Building ... "
+	
+           set UTime = `timer -r`
+           Note $LogHost ./dsys build -na 3
+           set ErrStat = $BStat
+           set ETime = `timer -b $UTime`
+	
+           if ($ErrStat != 0) then
+              echo "Failed ($ETime)"
+              set IErr = 1
+           else
+              echo "OK ($ETime)"
+           endif
+        endif
+
+# test
+        if ($IErr == 0) then
+           Separator $LogHost
+           Note $LogHost "Testing"
+           Note $LogHost `date`
+           echo -n "   Testing .... "
+	
+           set UTime = `timer -r`
+	
+           Note $LogHost ./dsys test
+           set ErrStat = 0
+	
+           set ETime = `timer -b $UTime`
+	
+           if ($ErrStat != 0) then
+              echo "Failed ($ETime)"
+              set IErr = 1
+           else
+              echo "OK ($ETime)"
+              flog $LogHost touch $Passed
+           endif
+        endif
+
+# figure out the error situation for this build/test
+        if ($IErr == 1) then
+           setenv Err  1
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NETINSTALL - do the net install phase
+
+   case -netinstall:
+
+	flog $LogHost set InstBase = none
+        flog $LogHost set Cancel   = FALSE
+
+        while ($#argv > 0)
+           switch ($1)
+              case -ni
+                   flog $LogHost set Cancel = TRUE
+                   breaksw
+              case -host_vars:
+                   shift
+                   while ($#argv > 0)
+                      if ($1 =~ -*) then
+                         flog $LogHost set argv = ( "end" $argv )
+                         break
+                      else
+                         flog $LogHost eval "setenv $1 $2"
+                         shift
+                         shift
+                      endif
+                   end
+                   breaksw
+              case -host_fields:
+                   shift
+                   flog $LogHost set WrkDir = $1
+                   shift
+		   if ($#argv > 0) then 
+                      flog $LogHost set InstBase = $1
+                      shift
+		   endif
+                   break
+                   breaksw
+           endsw
+           shift
+        end
+
+        flog $LogHost setenv Err  NO_INSTALL
+
+        if (($InstBase != none) && ($Cancel == FALSE)) then
+
+           Note $LogHost cp -R $WrkDir foo
+           set xstatus = $status
+
+           if ($xstatus == 0) then
+              setenv Err  OK
+           else
+              setenv Err  FAILED
+           endif
+
+	endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+# HOSTINSTALL - do the host install phase
+
+   case -hostinstall:
+
+        call GET_HOST_ARG($LogHost)
+
+        call QUALIFY()
+
+        flog $LogHost pwd
+
+        flog $LogHost setenv Err  NO_INSTALL
+        if (($InstBase != none) && (-e "$Passed")) then
+           Note $LogHost "Doing dsys install (verbose mode)"
+           Note $LogHost ./dsys install
+           set xstatus = $status
+
+           if ($xstatus == 0) then
+              flog $LogHost setenv Err  OK
+              if ($MultiConfig == yes) then
+                 Note $LogHost ./dsys delete $PACT_CONFIG
+              endif
+           else
+              flog $LogHost setenv Err  FAILED
+           endif
+        endif
+
+        breaksw
+
+endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+goto END
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_HOST_ARG - process args for per host phases
+
+GET_HOST_ARG:
+
+    set lFile = $args_[1]
+
+# set default values
+    Note $lFile "Set default values for get_host_arg"
+    flog $lFile set WrkDir      = none
+    flog $lFile set UseTmp      = no
+    flog $lFile set DbgOpt      = g
+    flog $lFile set SerPar      = s
+    flog $lFile set Cfg         = none
+    flog $lFile set CStat        = ""
+    flog $lFile set BStat       = 0
+    flog $lFile set InstBase    = none
+
+# for generality setenv host file variables
+    flog $lFile setenv DeleteOld      no
+    flog $lFile setenv MultiConfig    no
+
+    Note $lFile "Get values for get_host_arg from command line"
+    while ($#argv > 0)
+       switch ($1)
+          case -host_vars:
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ -*) then
+                     flog $lFile set argv = ( "end" $argv )
+                     break
+                  else
+                     flog $lFile eval "setenv $1 $2"
+                     shift
+                     shift
+                  endif
+               end
+               breaksw
+          case -host_fields:
+               shift
+               flog $lFile set WrkDir = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set UseTmp = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set DbgOpt = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set SerPar = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set Cfg = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set CStat = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set BStat = $1
+               shift
+               if ($#argv == 0) break
+               flog $lFile set InstBase = $1
+               break
+               breaksw
+       endsw
+       shift
+    end
+
+# make WrkDir a full path
+    if (`expr "$WrkDir" : '/.*'` == 0) then
+       flog $lFile set WrkDir = $HOME/$WrkDir
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# QUALIFY - figure out qualifications on the configuration
+
+QUALIFY:
+
+# figure out qualifications on Cfg
+   if (`expr "$Cfg" : '.*@.*'` > 0) then
+      set Alias = `expr "$Cfg" : '.*@\(.*\)'`
+      set Cfg   = `expr "$Cfg" : '\(.*\)@.*'`
+      setenv PACT_CONFIG $Alias
+   endif
+   
+   if ($MultiConfig == yes) then
+      setenv PACT_CONFIG $UHost-$Cfg
+   endif
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+END:
+
+   if (($Err == 1) || ($Err == FAILED)) then
+      echo "DO-NET: RETRY: $Cfg"
+   endif

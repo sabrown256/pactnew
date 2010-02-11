@@ -1,0 +1,440 @@
+/*
+ * MLFIA.C - FORTRAN interface to PML
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "cpyright.h"
+
+#include "pml_int.h"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMSZFT - return the largest M such that 2^M <= N  */
+
+FIXNUM F77_FUNC(pmszft, PMSZFT)(FIXNUM *pn)
+   {
+
+    *pn = (FIXNUM) PM_next_exp_two((int) *pn);
+
+    return((FIXNUM) TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMRFFT - perform an FFT on real data
+ *        - this a wrapper for PM_fft_sc_real_data
+ */
+
+FIXNUM F77_FUNC(pmrfft, PMRFFT)(REAL *outyr, REAL *outyi, REAL *outx,
+			     FIXNUM *pn, REAL *inx, REAL *iny,
+			     REAL *pxn, REAL *pxx, FIXNUM *po)
+   {int i, n, np, ordr;
+    double xmn, xmx;
+    complex *cy;
+    REAL *rx;
+
+    n    = *pn;
+    xmn  = *pxn;
+    xmx  = *pxx;
+    ordr = *po;
+
+    if (!PM_fft_sc_real_data(&cy, &rx, inx, iny, n, xmn, xmx, ordr))
+       return((FIXNUM) FALSE);
+
+    np = n + 1;
+    for (i = 0; i < np; i++)
+        {outyr[i] = PM_REAL_C(cy[i]);
+         outyi[i] = PM_IMAGINARY_C(cy[i]);
+	 outx[i]  = rx[i];};
+
+    SFREE(rx);
+    SFREE(cy);
+
+    return((FIXNUM) TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMCFFT - perform an FFT on complex data
+ *        - this a wrapper for PM_fft_sc_complex_data
+ */
+
+FIXNUM F77_FUNC(pmcfft, PMCFFT)(REAL *outyr, REAL *outyi, REAL *outx,
+			     FIXNUM *pn, REAL *inx, REAL *inyr,
+			     REAL *inyi, REAL *pxn, REAL *pxx,
+			     FIXNUM *pf, FIXNUM *po)
+   {int i, n, np, flag, ordr;
+    double xmn, xmx;
+    complex *cy, *incy;
+    REAL *rx;
+
+    n    = *pn;
+    xmn  = *pxn;
+    xmx  = *pxx;
+    flag = *pf;
+    ordr = *po;
+
+    incy = FMAKE_N(complex, n, "PMCFFT:incy");
+    for (i = 0; i < n; i++)
+        {PM_REAL_C(incy[i])      = inyr[i];
+         PM_IMAGINARY_C(incy[i]) = inyi[i];};
+
+    if (!PM_fft_sc_complex_data(&cy, &rx, inx, incy, n,
+				xmn, xmx, flag, ordr))
+       return((FIXNUM) FALSE);
+
+    np = n + 1;
+    for (i = 0; i < np; i++)
+        {outyr[i] = PM_REAL_C(cy[i]);
+         outyi[i] = PM_IMAGINARY_C(cy[i]);
+	 outx[i]  = rx[i];};
+
+    SFREE(rx);
+    SFREE(cy);
+    SFREE(incy);
+
+    return((FIXNUM) TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMBSET - begin making a set */
+
+FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
+			     F77_string ftype, FIXNUM *pcp, FIXNUM *pnd,
+			     FIXNUM *pnde, FIXNUM *pmx, FIXNUM *ptp,
+			     FIXNUM *inxt)
+   {int i, cp, nd, nde, *maxes;
+    long ne, tp, d;
+    FIXNUM rv;
+    char name[MAXLINE], type[MAXLINE], bf[MAXLINE], *topt, *s;
+    void **elem;
+    pcons *info;
+    PM_set *set, *next;
+    PM_mesh_topology *top;
+
+    SC_FORTRAN_STR_C(name, fname, *pn);
+    SC_FORTRAN_STR_C(type, ftype, *pt);
+
+    next = SC_GET_POINTER(PM_set, *inxt);
+    cp   = *pcp;
+    nd   = *pnd;
+    nde  = *pnde;
+    tp   = *ptp;
+
+    if (tp == -1)
+       {maxes = FMAKE_N(int, nd, "PMBSET:maxes");
+	ne    = 1L;
+        for (i = 0; i < nd; i++)
+	    {d = pmx[i];
+	     maxes[i] = d;
+	     ne *= d;};
+        topt = NULL;
+	top  = NULL;}
+
+    else
+       {topt  = PM_MESH_TOPOLOGY_P_S;
+        top   = SC_GET_POINTER(PM_mesh_topology, *ptp);
+	maxes = NULL;
+        ne    = top->n_cells[0];};
+
+    info = NULL;
+    SC_CHANGE_VALUE_ALIST(info, int, SC_INTEGER_P_S, "COPY-MEMORY", cp);
+
+    elem = FMAKE_N(void *, nde, "PMBSET:elem");
+
+    rv = -1;
+
+/* build the set */
+    set = FMAKE(PM_set, "PMBSET:set");
+    if (set != NULL)
+       {set->name           = SC_strsavef(name, "char*:PMBSET:name");
+	set->n_elements     = ne;
+	set->dimension      = nd;
+	set->dimension_elem = nde;
+	set->max_index      = maxes;
+	set->elements       = (void *) elem;
+	set->opers          = NULL;
+	set->metric         = NULL;
+	set->symmetry_type  = NULL;
+	set->symmetry       = NULL;
+	set->topology_type  = topt;
+	set->topology       = (void *) top;
+	set->info_type      = SC_PCONS_P_S;
+	set->info           = (void *) info;
+	set->next           = next;
+    
+	strcpy(bf, type);
+	SC_strtok(bf, " *", s);
+	if (bf == NULL)
+	   {set->extrema = NULL;
+	    set->scales  = NULL;}
+
+	else if (strcmp(bf, SC_DOUBLE_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(double, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(double, nde,
+					    "PMBSET:scales");}
+
+	else if (strcmp(bf, SC_FLOAT_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(float, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(float, nde,
+					    "PMBSET:scales");}
+
+	else if (strcmp(bf, SC_LONG_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(long, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(long, nde,
+					    "PMBSET:scales");}
+
+	else if (strcmp(bf, SC_INTEGER_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(int, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(int, nde,
+					    "PMBSET:scales");}
+
+	else if (strcmp(bf, SC_SHORT_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(short, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(short, nde,
+					    "PMBSET:scales");}
+	
+	else if (strcmp(bf, SC_CHAR_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(char, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(char, nde,
+					    "PMBSET:scales");}
+	
+	else
+	   {set->extrema = NULL;
+	    set->scales  = NULL;};
+
+	SC_strcat(bf, MAXLINE, " *");
+	set->es_type = SC_strsavef(bf, "char*:PMBSET:type");
+
+	SC_strcat(bf, MAXLINE, "*");
+	set->element_type = SC_strsavef(bf, "char*:PMBSET:type");
+
+	rv = SC_ADD_POINTER(set);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMESET - complete making a set */
+
+FIXNUM F77_FUNC(pmeset, PMESET)(FIXNUM *iset)
+   {PM_set *set;
+
+    set = SC_GET_POINTER(PM_set, *iset);
+
+    PM_find_extrema(set);
+
+    return((FIXNUM) TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMASET - add a component to a set */
+
+FIXNUM F77_FUNC(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
+   {int ie, cp;
+    pcons *info;
+    void **elem;
+    PM_set *set;
+    char *s;
+
+    set  = SC_GET_POINTER(PM_set, *iset);
+    ie   = *pie - 1;
+    elem = (void **) set->elements;
+    info = (pcons *) set->info;
+    SC_assoc_info(info,
+		  "COPY-MEMORY", &cp,
+		  NULL);
+
+/* if requested copy the incoming data */
+    if (cp)
+       {int bpi;
+        long ne;
+	void *nv;
+        char bf[MAXLINE], *type;
+
+	strcpy(bf, set->es_type);
+	type = SC_strtok(bf, " *", s);
+        bpi  = SIZEOF(type);
+	ne   = set->n_elements;
+
+	elem[ie] = nv = SC_alloc_nzt(ne, bpi, "PMASET:nv", NULL);
+	memcpy(nv, px, ne*bpi);}
+
+    else
+       elem[ie] = px;
+
+    return((FIXNUM) TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMMTOP - make a PM_mesh_topology */
+
+FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
+			     FIXNUM *pbnd)
+   {int i, j, n, nd, ndp;
+    int *nc, *nbp;
+    long **bnd, *pbd;
+    FIXNUM *pbs;
+    PM_mesh_topology *mt;
+    
+    nd  = *pnd;
+    ndp = nd + 1;
+
+/* setup the number of cells array */
+    nc = FMAKE_N(int, ndp, "PMMTOP:nc");
+    for (i = 0; i < ndp; i++)
+        nc[i] = pnc[i];
+
+/* setup the number of boundary parameters array */
+    nbp = FMAKE_N(int, ndp, "PMMTOP:nbp");
+    for (i = 0; i < ndp; i++)
+        nbp[i] = pbp[i];
+
+    pbs = pbnd;
+    bnd = FMAKE_N(long *, ndp, "PMMTOP:bnd");
+    for (i = 1; i < ndp; i++)
+        {n = nbp[i]*nc[i];
+
+	 bnd[i] = FMAKE_N(long, n, "PMMTOP:bnd[]");
+
+         pbd = bnd[i];
+	 for (j = 0; j < n; j++)
+	     *pbd++ = *pbs++;};
+
+    bnd[0] = NULL;
+
+/* put it all together */
+    mt = PM_make_topology(nd, nbp, nc, bnd);
+
+    if (mt == NULL)
+       return(-1);
+
+    else
+       return((FIXNUM) SC_ADD_POINTER(mt));}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMEFPE - enable/disable FPE handling */
+
+void F77_FUNC(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
+   {int flg;
+
+    flg = *pflg;
+
+    PM_enable_fpe(flg, hnd);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMFPTF - classify float type wrt NaN */
+
+FIXNUM F77_FUNC(pmfptf, PMFPTF)(float *pf)
+   {FIXNUM rv;
+
+    rv = PM_fp_typef(*pf);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMFPTD - classify double type wrt NaN */
+
+FIXNUM F77_FUNC(pmfptd, PMFPTD)(double *pd)
+   {FIXNUM rv;
+
+    rv = PM_fp_typed(*pd);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMFXNF - fix float NaNs */
+
+FIXNUM F77_FUNC(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, REAL *pv)
+   {int msk;
+    long n;
+    FIXNUM rv;
+    float v;
+
+    n   = *pn;
+    msk = *pmsk;
+    v   = *pv;
+
+    rv = PM_fix_nanf(n, pf, msk, v);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMCNNF - count float NaNs */
+
+FIXNUM F77_FUNC(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
+   {int msk;
+    long n;
+    FIXNUM rv;
+
+    n   = *pn;
+    msk = *pmsk;
+
+    rv = PM_count_nanf(n, pf, msk);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMFXND - fix double NaNs */
+
+FIXNUM F77_FUNC(pmfxnd, PMFXND)(FIXNUM *pn, double *pd, FIXNUM *pmsk, REAL *pv)
+   {int msk;
+    long n;
+    FIXNUM rv;
+    double v;
+
+    n   = *pn;
+    msk = *pmsk;
+    v   = *pv;
+
+    rv = PM_fix_nand(n, pd, msk, v);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMCNND - count double NaNs */
+
+FIXNUM F77_FUNC(pmcnnd, PMCNND)(FIXNUM *pn, double *pd, FIXNUM *pmsk)
+   {int msk;
+    long n;
+    FIXNUM rv;
+
+    n   = *pn;
+    msk = *pmsk;
+
+    rv = PM_count_nand(n, pd, msk);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

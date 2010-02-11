@@ -1,0 +1,39 @@
+#!/bin/csh -f
+#
+# COMPARE-DATE - compare code-date generated time stamps
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set d1 = `expr $1 : '[^0-9]*\([0-9]*\)'`
+set d2 = `expr $2 : '[^0-9]*\([0-9]*\)'`
+set m1 = `expr $1 : '[^0-9]*[0-9]*.\([0-9]*\)'`
+set m2 = `expr $2 : '[^0-9]*[0-9]*.\([0-9]*\)'`
+set y1 = `expr $1 : '.*\.\(.*\)'`
+set y2 = `expr $2 : '.*\.\(.*\)'`
+
+# echo year $y1 $y2 month $m1 $m2 day $d1 $d2
+
+if ($y1 == $y2) then
+   if ($m1 == $m2) then
+      if ($d1 == $d2) then
+         exit(0)
+      else if (`expr $d1 \< $d2`) then
+         exit(-1)
+      else
+         exit(1)
+      endif
+   else if (`expr $m1 \< $m2`) then
+      exit(-1)
+   else
+      exit(1)
+   endif
+else if (`expr $y1 \< $y2`) then
+   exit(-1)
+else
+   exit(1)
+endif
+

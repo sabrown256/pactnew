@@ -1,0 +1,39 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH SYSTEM-ID 1 "16 March 2005"
+.SH NAME
+system-id \- compute a brief, unique name identifying a computer system
+.SH SYNOPSIS
+.B system-id
+.SH DESCRIPTION
+The uname utility does not sufficiently distinguish features that
+are important to configuring and compiling portable programs.  The
+'-a' option does not yield information in a concise or systematic
+way.  For these reasons the system-id utility exists to return a
+concise token which is more suitable for use in configuring software
+systems.
+
+The typical form of the name returned by system-id looks like:
+
+   <os name>-<os version>[-<feature>]*
+
+Some examples are:
+
+   lnx-2.2         Linux with GLibC 2.2 on IA32 processor
+   lnx-2.3-i64     Linux with GLibC 2.3 on IA64 processor
+   lnx-2.3-o       Linux with GLibC 2.3 on AMD64 processor
+   aix-5.2         AIX version 5.2
+
+.SH FILES
+
+None.
+
+.SH BUGS
+.TP 
+.B None known.
+

@@ -1,0 +1,47 @@
+#!/bin/csh -f
+#
+# IO - ULTRA I/O test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           I/O TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    ULTRA I/O Test ............... "
+   Note $Log ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $Ultra -l $TDir/uliot.scm >& uliot.log)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/uliot.scm  |& \
+      grep "ERROR SUMMARY:"                                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

@@ -1,0 +1,16 @@
+typedef t1
+typedef t2
+struct s_t2
+struct s_t3
+variable v1: char
+variable v2: char
+variable v3: char
+variable v4: t1 (derived)
+variable v5: t2 (derived)
+Function main requires:
+   typedef: t1
+   typedef: t2
+   derived type: struct s_t2
+   derived type: struct s_t3
+   variable: t1 v4
+   variable: t2 v5

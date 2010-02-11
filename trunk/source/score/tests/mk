@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# MAKE - test dmake
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set ok = TRUE
+if ($?CROSS_COMPILE == 1) then
+   if ($CROSS_COMPILE == TRUE) then
+      set ok = FALSE
+   endif
+endif
+
+if ($ok == TRUE) then
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE Make Test ............. "
+   NoteD $LogF ""
+
+   set UTime = `$TIMER -r`
+   flog $LogF pushd $SrcDir/tests
+   ftee $LogF do-test $argv
+   set TStatus = $status
+   flog $LogF popd
+
+   set ETime   = `$TIMER -b $UTime`
+
+# NOTE: exit status is sum of values for each test
+#   basic  fails -> 32
+#   depend fails -> 16
+#   script fails -> 8
+#   redir  fails -> 4
+#   server fails -> 2
+#   async  fails -> 1
+# server and async are currently prone to race type failures
+# so do not fail the test if they do not succeed
+
+   if ($TStatus > 3) then
+      NoteD $LogF "                    SCORE Make Test ............. FAILED ($ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    SCORE Make Test ............. PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)
+

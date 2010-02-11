@@ -1,0 +1,10 @@
+#!/usr/bin/env pcsh
+#
+# PSH2 - basic test of PCSH
+#
+
+echo "Exe:  $0"
+echo "Args: $argv"
+
+exit($status)
+

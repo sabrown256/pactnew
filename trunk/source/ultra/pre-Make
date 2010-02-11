@@ -1,0 +1,133 @@
+#
+# pre-Make for ULTRA
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=ultra
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTExe = ${BinDir}/ultra
+TGTInc = ultra.h
+
+TGTScmA = applications/ultra.scm applications/consts.scm applications/func.scm
+TGTScmB = applications/annotate.scm applications/compare.scm applications/trig.scm
+TGTScmC = applications/help.scm applications/synon.scm
+TGTScmD = applications/toolbox.scm applications/mouse.scm applications/ultra.pui
+TGTScmE = applications/slib.scm
+TGTScm  = ${TGTScmA} ${TGTScmB} ${TGTScmC} ${TGTScmD} ${TGTScmE}
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags  = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+FcFlags  =
+LdFlags  = -L${LibDir} ${LDFLAGS} 
+
+CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h .scm
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+DepLib = ${LibDir}/libsx.a \
+         ${LibDir}/libscheme.a \
+         ${LibDir}/libpanacea.a \
+         ${LibDir}/libpgs.a \
+	 ${LibDir}/libppc.a \
+         ${LibDir}/libpdb.a \
+         ${LibDir}/libpml.a \
+	 ${LibDir}/libscore.a
+
+InstallDep = ${TGTLib} ${TGTExe}
+BinDep = ${Hdrs} ${TGTLib} ultra.c ${DepLib}
+BinObj = ${LdFlags} ultra.c
+
+#
+# Required Libraries
+#
+Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib} ${MDLibCfg}
+
+targets :
+	@echo "Targets for ULTRA"
+	@echo "   install   : install ULTRA headers and utilities in dev/arch"
+	@echo "   link      : link ULTRA utilities for public use"
+	@echo "   sharedlib : build and install ULTRA shared libs in dev/arch"
+	@echo "   test      : run the ULTRA test suite"
+
+#
+# Headers Files
+#
+Hdrs = ultra.h
+
+#
+# Object Files
+#
+Objs = ulfunc.o ulauxf.o ulhand.o ulcntl.o
+
+ArObjs = ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
+	 ${TGTLib}(ulhand.o) ${TGTLib}(ulcntl.o)
+
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+#
+# pixie version
+#
+pixie : ${TGTBin}
+	pixie -o ultra.pixie ultra
+	ultra.pixie -s -l ulperf.scm
+	rm -f pixie.stats
+	prof -pixie ultra ultra.Addrs ultra.Counts > pixie.stats
+
+#
+# make the executable
+#
+${TGTExe} : ${BinDep}
+	${CC} -c ultra.c -o ${PACTTmpDir}/ultra.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/ultra.o -o ${TGTExe} ${Libs}
+
+#
+# link 
+#
+link: ${InstallDep}
+	cp ultra.ini.user ${ScmDir}/ultra.ini
+	pact scminstall
+
+#
+# install 
+#
+install:
+	pact link
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the ULTRA test suite
+#
+test :
+	@./ultest

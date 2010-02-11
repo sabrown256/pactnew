@@ -1,0 +1,29 @@
+#
+# RUN.S3 - check for syntax errors
+#
+
+Cmd = foo
+
+# legal
+Env var0 = -f run.s3 ? run.s3
+Env var1 = $?var0 ? a
+
+# NOTE: this one only works when using TCSH for CSH which Linux does
+# only TCSH allow :t, :h, :r, etc to work on environment variables
+# CSH restricts them to working on shell variables only
+#Env var2 = $var0:r == run ? a
+
+Env var3 = (1 == 1) a
+
+# syntax errors
+Env var4 = (1 == 1) : a
+Env var5 = (1 == 1) : a ? b
+Env var6 = (1 == 1) ? : a
+
+# this is a way to do var6
+Env var7 = (1 == 1) ? "" : a
+
+# syntax errors
+Env var8 = (1 == 1) a ? : b
+Env var9 = (1 == 1) a b ? :
+

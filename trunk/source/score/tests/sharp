@@ -1,0 +1,162 @@
+#!/bin/csh -f
+#
+# SHARP - SCORE unit tests
+#       - mostly due to Carolyn Sharp
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF "                    SCORE Unit Tests ............ "
+Note $LogF ""
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE compre
+set TStatus = $status
+flog $LogF popd
+
+if ($TStatus != 0) then
+   NoteD $LogF ""
+   NoteD $LogF "                         Can't build SCORE Test Programs"
+   set Err = 1
+else
+
+   if ("$CFE" != "") then
+      setenv CFE   "$CFE -v"
+   endif
+
+   set DataFiles = ( fltfil intfil regxfil tokfil )
+
+   foreach i ($DataFiles)
+      flog $LogF cp $TDir/$i .
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $LogF -n "                       scctl ......... "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/tscctl
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/tscctl  |& \
+      grep "ERROR SUMMARY:"                |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "ok ($ETime)"
+   else
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $LogF -n "                       string-a ...... "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/tscmemc
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/tscmemc  |& \
+      grep "ERROR SUMMARY:"                 |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "ok ($ETime)"
+   else
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $LogF -n "                       string-b ...... "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/tscstr
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/tscstr  |& \
+      grep "ERROR SUMMARY:"                |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "ok ($ETime)"
+   else
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $LogF -n "                       vsnprintf ..... "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/scvsts
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/scvsts  |& \
+      grep "ERROR SUMMARY:"                |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "ok ($ETime)"
+   else
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   flog $LogF $RM ts*.res $DataFiles
+
+   NoteD $LogF ""
+   if ($Err == 0) then
+      NoteD $LogF "                    SCORE Unit Tests ............ PASSED"
+   else
+      NoteD $LogF "                    SCORE Unit Tests ............ FAILED"
+   endif
+
+endif
+
+exit($Err)
+

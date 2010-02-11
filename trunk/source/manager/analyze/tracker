@@ -1,0 +1,37 @@
+#!/bin/csh -f
+#
+# TRACKER - analyze tracker availability
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: tracker"
+
+SafeEnv TRACKERExe  ""
+SafeEnv HaveTRACKER ""
+
+foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
+   if (-d $d) then
+      set OK = FALSE
+      if (-x $d/bin/tracker) then
+         setenv TRACKERExe $d/bin/tracker
+         setenv HaveTRACKER TRUE
+         break
+      else
+      endif
+   endif
+end
+
+# export the results
+SetParent TRACKERExe
+SetParent HaveTRACKER
+
+exit(0)
+

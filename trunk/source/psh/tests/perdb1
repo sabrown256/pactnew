@@ -1,0 +1,32 @@
+#!/bin/csh -f
+#
+# PERDB1 - simplest test of PERDB
+#        - use command line specification of DB
+#        - test atomic set and get
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db1-$1
+else
+   set db  = ./db1-socket
+endif
+
+perdb -f $db $opt -c -s
+
+echo "-----------------------------------"
+
+perdb -f $db $opt v1=1
+perdb -f $db $opt v2="baz blat"
+
+echo "-----------------------------------"
+
+perdb -f $db $opt v1
+perdb -f $db $opt v2
+
+echo "-----------------------------------"
+
+perdb -f $db $opt quit:
+
+exit($status)

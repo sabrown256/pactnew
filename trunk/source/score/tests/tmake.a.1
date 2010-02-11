@@ -1,0 +1,60 @@
+#
+# test whitespace handling with variables
+# test simple rules and recursion
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+Foo=bar
+Bar=
+Baz = blat
+Blat =
+
+a:
+	echo "   Target a"
+	echo '<<command>>'
+
+b:
+	@echo "   Target b"
+	echo '<<command>>'
+
+c:
+	(cd .. ; echo "   Target c" ; echo '<<command>>')
+
+d:
+	@(cd .. ; echo "   Target d" ; echo '<<command>>')
+
+e:
+	(cd .. ; \
+	 echo "   Target e" ; \
+	 echo '<<command>>')
+
+f:
+	@(cd .. ; \
+	  echo "   Target f" ; \
+	  echo '<<command>>')
+
+pa:
+	dmake -f tmake.b a
+
+pb:
+	@dmake -f tmake.b b
+
+pc:
+	dmake -f tmake.b c
+	dmake -f tmake.b pa
+
+pd:
+	dmake -f tmake.b d
+	dmake -f tmake.b pb
+
+all :
+	@echo "ok"
+	@echo "`pwd`"
+	@(darg FOO=\\\"bar\\\" ; echo "baz")
+	@(darg FOO=\\\"bar baz\\\" ; echo "blat")
+	@(darg FOO=\\\"a b\\\" ;	echo "c")  
+	@(darg FOO=\\\"x y\\\" ;	echo "z")
+
+

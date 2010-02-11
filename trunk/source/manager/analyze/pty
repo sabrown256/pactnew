@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# PTY - analyze the handling of PTYs
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: pty"
+
+# check for PTY functions grantpt, unlockpt, and ptsname
+
+cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <fcntl.h>
+int main(int c, char **v)
+{int err, pty;
+ char *ps;
+ extern char *ptsname(int fd);
+ extern int grantpt(int fd);
+ extern int unlockpt(int fd);
+ pty  = open("/dev/ptmx", O_RDWR|O_NOCTTY);
+ err  = grantpt(pty);
+ err |= unlockpt(pty);
+ if ((pty >= 0) && (err == 0))
+    ps = ptsname(pty);
+ return(0);}
+EOF
+
+setenv HAVE_UNIX98_PTY FALSE
+flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   setenv HAVE_UNIX98_PTY TRUE
+   NoteD $ALog "      has unix98 PTY's"
+else
+   setenv HAVE_UNIX98_PTY FALSE
+   NoteD $ALog "      has /dev PTY's"
+endif
+
+rm -f $Tmp.c $Tmp
+
+# export the results
+SetParent HAVE_UNIX98_PTY
+
+exit(0)
+

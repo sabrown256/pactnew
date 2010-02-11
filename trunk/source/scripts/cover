@@ -1,0 +1,186 @@
+#!/bin/csh -f
+#
+# COVER - simple code coverage info tool
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set LPact    = `which pact`
+set PACTRoot = $LPact:h
+set PACTRoot = $PACTRoot:h
+source $PACTRoot/include/csh-subroutines
+HAVE_SUBROUTINES
+
+set Dir     = ""
+set Process = Coverage
+
+while ($#argv > 0)
+   switch ($1)
+      case -e:
+            set Process = Export
+            breaksw
+      case -h:
+           echo "Usage: cover [-h] <dir>"
+           echo "  h  this help message"
+           echo "  <dir> root directory for executables and archives"
+           exit(1)
+           breaksw
+      case -p:
+           shift
+           set Process = $1
+           breaksw
+      default:
+           set Dir = $1
+           breaksw
+   endsw
+   shift
+end
+
+set NMArgs = ( -A -p )
+
+switch ($Process)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case Check:
+        set lCodes = ( `echo $Codes | sed 's/:/ /g'` )
+
+        echo "unused functions or variables:"
+
+        set Maps = ""
+        foreach i ($lCodes)
+           set Maps = ( $Maps nm-$i )
+        end
+
+        @ count = 0
+        @ dead  = 0
+        while (1)
+           set line = ( $< )
+           if ("$line" == "") break
+           if ($#line > 2) then
+              set Sym = $line[3]
+              grep -w $Sym $Maps >& /dev/null
+              if ($status != 0) then
+                 echo "         $Sym"
+                 @ dead = $dead + 1
+              endif
+              @ count = $count + 1
+           else
+              break
+           endif
+        end
+        echo "      Checked $count entries and found $dead unused symbols"
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case Coverage:
+
+        call FIND_CODES($Dir)
+
+        call MAP_CODES($Dir, $Codes)
+
+        echo ""
+        echo "Checking package:"
+        foreach i ($Dir/lib/*.a $Dir/lib/*.so)
+
+           set lib = lib$i.a
+           set pck = nm-$i:t:r
+
+           nm $NMArgs $i >! $pck
+
+           echo ""
+           echo -n "      Package $i:t "
+           cat $pck | cover -p Check
+        end
+        echo ""
+
+        rm nm-*
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case Export:
+
+        set lDir = $Dir:h
+        set lAr  = $Dir:t
+
+        echo ""
+        echo "Symbols defined by ${Dir}:"
+
+        pushd $lDir >& /dev/null
+        nm $NMArgs $lAr                   |& \
+        grep " T "                        |  \
+        sed 's/:/ /g'                     |  \
+        awk '{printf("   %-12s  %10s  %s\n", $2, $3, $5);}'
+        popd >& /dev/null
+
+        echo ""
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIND_CODES - look for binary executables in $lDir/bin
+
+FIND_CODES:
+
+   set lDir = $args_[1]
+   pushd $lDir/bin >& /dev/null
+   
+   setenv Codes ""
+   foreach i (*)
+      if (-x $i) then
+         file $i |& grep "text" >& /dev/null
+         if ($status != 0) then
+            setenv Codes  ${Codes}:$i
+         endif
+      endif
+   end
+
+   popd >& /dev/null
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAP_CODES - dump the symbols for each code
+
+MAP_CODES:
+
+   set lDir   = $args_[1]
+   shift args_
+   set lCodes = ( `echo "$args_" |& sed 's/:/ /g'` )
+   set lBase  = $cwd
+
+   set Maps = ""
+
+   pushd $lDir/bin >& /dev/null
+
+   echo "Getting map of codes:"
+   foreach i ($lCodes)
+      echo "   $i"
+      nm $NMArgs $i >! $lBase/nm-$i
+      set Maps = ( $Maps nm-$i )
+   end
+   popd >& /dev/null
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

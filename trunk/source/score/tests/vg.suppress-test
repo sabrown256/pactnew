@@ -1,0 +1,51 @@
+#
+# These come from testing paged memory protection where
+# we deliberately try to break things so valgrind is not
+# telling us anything we don't already know
+#
+
+{
+   pathscale-32-memory-guarded
+   Memcheck:Addr4
+   fun:_SC_free_guarded
+   fun:free
+}
+
+{
+   pgi-32-memory-protection-test-4
+   Memcheck:Addr4
+   fun:test_4
+   fun:main
+}
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+{
+   linux-64-fortran-test-1
+   Memcheck:Cond
+   fun:SC_arrtype
+   fun:PM_minmax
+   fun:PM_maxmin
+   fun:PD_wrt_pdb_curve_y
+   fun:pfwuly_
+   fun:wrtcur_
+   fun:MAIN__
+}
+
+{
+   gnu-64-pointer-check-1
+   Memcheck:Addr1
+   fun:SC_pointer_ok
+}
+
+{
+   pgi-64-memory-protection-test-8
+   Memcheck:Addr8
+   fun:test_4
+   fun:main
+}
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

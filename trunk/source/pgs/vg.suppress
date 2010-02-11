@@ -1,0 +1,19 @@
+#
+# SCORE Memory Manager mem_descriptor under reference - 
+# we hand some static memory which we expect SCORE to
+# identify as not having been allocated by SCORE (which it does)
+# but valgrind is upset by this
+#
+
+# from AMD 64 bit Intel
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XReply
+   fun:XInternAtom
+   fun:XSetWMProperties
+}

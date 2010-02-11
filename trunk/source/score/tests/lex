@@ -1,0 +1,60 @@
+#!/bin/csh -f
+#
+# LEX - test lexical scanners in SCORE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF -n "                    SCORE Lexical Scan Test ..... "
+Note $LogF ""
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE scan
+set TStatus = $status
+flog $LogF popd
+
+set ETime   = `$TIMER -b $UTime`
+
+if ($TStatus != 0) then
+   NoteD $LogF ""
+   NoteD $LogF "                         ERROR Building Lexical Scan Tests"
+   NoteD $LogF "                    SCORE Lexical Scan Test ..... FAILED ($ETime)"
+   set Err = 1
+else
+
+   if ("$Valgrind" == "") then
+      $CFE $BinDir/sclsts $TDir/sclsts.src > sclsts.res
+      set xstatus = $status
+      diff sclsts.res $RefDir/sclsts > sclsts.res.diff
+      set Files = `find . -name "sclsts.res.diff" -size 0 -print`
+   else
+      ftee $LogF $Valgrind $BinDir/sclsts $TDir/sclsts.src          |& \
+      grep "ERROR SUMMARY:"                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $LogF ""
+      NoteD $LogF "                    SCORE Lexical Scan Test ..... FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "PASSED ($ETime)"
+      flog $LogF rm -f sclsts.res sclsts.res.diff
+   endif
+endif
+
+exit($Err)
+

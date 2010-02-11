@@ -1,0 +1,56 @@
+#
+# COMPILER-SOL - SOLARIS compiler specifications
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath solaris
+
+Tool CC {
+   Exe      = cc
+   Flags    = -Xa -w
+   Optimize = -xO1
+   Version  = -V
+}
+
+Group FC {
+   Exe     = f90
+   Version = -V
+}
+
+Tool LD {
+   Lib     = -ldl -lsocket -lw -lnsl -lsunmath -lrt
+   MDGLib += /usr/openwin/lib/libX11.so  /usr/openwin/lib/libXext.so
+}
+
+Tool Lex {
+   Flags = -Xa -w
+}
+
+Group Cfg {
+   Use  = Std
+   Use += LD
+}
+
+Group Shared {
+   LD_Exe    = cc
+   CC_Shared = -KPIC
+   LD_Shared = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group X11 {
+   Path = /usr/openwin
+}
+
+define SOLARIS
+
+# NOTE: the Solaris linker does NOT support any kind of -rpath option
+setenv LD_LIBRARY_PATH ${RPATH}
+

@@ -1,0 +1,14 @@
+#
+# RUN.S6 - check conditional expressions
+#
+
+Cmd = foo
+
+Env var1 = (1 == 1) ? val
+Env var2 = (1 != 0) ? val
+Env var3 = ((1 == 1) && (0 == 0)) ? a : b
+Env var4 = ((1 == 1) || (0 == 0)) ? a : b
+Env var5 = ("abc" =~ *b*) ? a : b
+Env var5 = ("abc" =~ *d*) ? a : b
+Env var6 = ("abc" !~ *b*) ? a : b
+Env var6 = ("abc" !~ *d*) ? a : b

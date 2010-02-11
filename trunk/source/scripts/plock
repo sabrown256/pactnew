@@ -1,0 +1,167 @@
+#!/bin/csh -f
+#
+# PLOCK - PACT lock manager
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/plock") then
+   set path = ( $Exe $path )
+endif
+
+unalias ls
+unalias cd
+
+set OSType = `uname -s`
+
+set Cmnd = $0
+if ("$Cmnd" == "") then
+   echo "PLOCK: bad invocation"
+   exit(110)
+endif
+
+set Err     = 0
+set Verbose = FALSE
+set Tgt     = ""
+set LockDir = ""
+@ LifeTime  = 3140000
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: plock [-h] [-d <name>] [-t <lifetime>] [-v] lock | unlock"
+           echo "   d   supply the name of the lock directory"
+           echo "   h   this help message"
+           echo "   t   lifetime in seconds of the lock"
+           echo "   v   run in verbose mode"
+           echo ""
+           exit(1)
+           breaksw
+      case -d:
+           shift
+           set LockDir = $1
+           breaksw
+      case -t:
+           shift
+           @ LifeTime = $1
+           breaksw
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      default:
+           set Tgt = $1
+           breaksw
+   endsw
+   shift
+end
+
+# if we were not supplied with a LockDir then compute one
+if ("$LockDir" == "") then
+
+   @ count = 1
+   while (1)
+      set ExeRoot = `dirname $Cmnd`
+      if ("$ExeRoot" != "") break
+      if ($count >= 10) then
+         echo "PLOCK: dirname returned null"
+         exit(111)
+      endif
+      @ count = $count + 1
+      sleep 1
+   end
+
+   set path = ( $ExeRoot $path )
+   
+   set Base    = $cwd
+   set Arch    = `system-id`
+   set LockDir = $Base/.pc.lock-$Arch
+endif
+
+# get the parent PID
+if (($OSType == "Darwin") || ($OSType == "FreeBSD")) then
+   set PS = "ps -axo pid,ppid"
+else if ($OSType =~ CYGWIN*) then
+   set PS = "ps -W"
+else
+   set PS = "ps -eo pid,ppid"
+endif
+set PPID = ( `$PS | awk '$1 == "'$$'" { print $2 }'` )
+if ($#PPID > 1) then
+   echo "PLOCK: improper parent PID - $PPID"
+   set PPID = $PPID[1]
+endif
+
+switch ($Tgt)
+   case lock:
+        @ i = 0
+        while (1)
+           set Msg   = `(mkdir $LockDir ; echo $status) |& awk '{print}'`
+           set LStat = $Msg[$#Msg]
+           if (("$Msg" =~ *Permission*denied*) || ("$Msg" =~ *Read*only*file*system*)) then
+              if ($Verbose == TRUE) then
+                 echo "PLOCK: no permissions to make lock"
+              endif
+              set Err = 2
+              break
+           else if ($LStat == 0) then
+              mkdir -p $LockDir/$PPID >& /dev/null
+              break
+           else
+              set LPIDS = `/bin/sh -c '(ls '$LockDir' 2> /dev/null)'`
+# If more than one file, use the first one.
+# They probably resulted from a race condition which could not be avoided.
+              set LPID = `echo $LPIDS | awk '{ print $1 }'`
+              set IsPP = `$PS | awk '$1 == "'$LPID'" { print "ok" }'`
+
+# if the original locking parent is still running wait for it
+              if ("$IsPP" == "ok") then
+                 @ i = $i + 1
+                 if ($i > $LifeTime) then
+                    rm -rf $LockDir >& /dev/null
+                    if ($Verbose == TRUE) then
+                       echo "PLOCK: expired lock after $LifeTime seconds"
+                    endif
+                 endif
+                 sleep 1
+
+# if the original locking parent is not still running clear the lock
+              else
+                 rm -rf $LockDir >& /dev/null
+		 if ($status != 0) then
+                    if ($Verbose == TRUE) then
+                       echo "PLOCK: cannot remove stale lock"
+                    endif
+                    set Err = 3
+                    break
+                 else if ($Verbose == TRUE) then
+                    echo "PLOCK: removed stale lock"
+                 endif
+              endif
+           endif
+        end
+        breaksw
+
+   case unlock:
+
+# only the original locking parent may remove this lock
+        if (-d $LockDir/$PPID) then
+           rm -rf $LockDir >& /dev/null
+        endif
+        breaksw
+
+   default:
+        if ($Verbose == TRUE) then
+           echo "PLOCK: unknown option $Tgt"
+        endif
+        set Err = 1
+        breaksw
+endsw
+
+exit($Err)
+
+

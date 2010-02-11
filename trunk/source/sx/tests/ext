@@ -1,0 +1,45 @@
+#!/bin/csh -f
+#
+# EXT - SX extensions test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           SX EXTENSIONS TEST
+
+#--------------------------------------------------------------------------
+
+   set ExtDir = ../../applications/extensions
+   if ((-d $ExtDir) && (-x $ExtDir/do-test) && (!($?autotool))) then
+
+      NoteD $Log ""
+      NoteD $Log -n "                    SX Extension Test ............ "
+      Note $Log ""
+
+      flog $Log pushd $ExtDir
+      set UTime = `$TIMER -r`
+      ./do-test >&! ext.res
+      set TStat = $status
+      set ETime = `$TIMER -b $UTime`
+      flog $Log popd
+
+      if ($TStat != 0) then
+         NoteD $Log "FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f ext.res
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

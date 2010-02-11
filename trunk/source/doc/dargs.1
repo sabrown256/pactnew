@@ -1,0 +1,37 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH DARGS 1 "6 July 2005"
+.SH NAME
+dargs \- do nothing
+.SH SYNOPSIS
+.B dargs [-h] <arg>*
+.SH DESCRIPTION
+
+Sometimes it is useful to know what the result of the shell is
+when processing expressions, especially those used as arguments
+to other commands.  Dargs simply prints its arguments (space
+delimited).  This gives the user a look at exactly what another
+command might see with the same expression used as an argument.
+
+.SH OPTIONS
+.TP
+.B \-h
+A short summary help message.
+
+.SH RETURN VALUE
+
+Unconditionally returns an exit status of 0.
+
+.SH SEE ALSO
+
+.B no-op(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

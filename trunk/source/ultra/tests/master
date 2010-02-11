@@ -1,0 +1,93 @@
+#!/bin/csh -f
+#
+# MASTER - ULTRA master test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           MASTER TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    ULTRA Master Test ............ "
+   Note $Log ""
+
+   set FAIL = "NO"
+   flog $Log $RM ultest.log ultest.pdb ultest.asc ultest.err ultest.tmp
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $Ultra -l $TDir/ultest.scm >& ultest.tmp)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ultest.scm  |& \
+      grep "ERROR SUMMARY:"                                                          |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+ 
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+
+# any return status other than 0 is an error
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($ETime)"
+      set FAIL = "CRASH"
+      set Err  = 1
+
+   else
+      flog $Log (grep -i "error" ultest.tmp > ultest.err)
+      flog $Log /bin/ls -l ultest.err
+      if (-z ultest.err) then
+         flog $Log rm -f ultest.err
+
+         awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
+         flog $Log mv ultest.ps.tmp ultest.ps
+
+         flog $Log $CFE $PSDIFF ultest.ps $TDir/ref/ultest.ps
+         set DiffStat = $status
+         set ETime    = `$TIMER -b $UTime`
+
+         if ($DiffStat != 0) then
+            set FAIL = "DIFFER"
+         endif
+   
+         if ($FAIL == "NO") then
+            NoteD $Log "PASSED ($ETime)"
+         else
+            NoteD $Log "FAILED ($ETime)"
+      
+            if ($FAIL == "CRASH") then
+               NoteD $Log "                         Executable crashed"
+            else if ($FAIL == "DIFFER") then
+               NoteD $Log "                         PS files differ"
+            endif
+      
+            set Err = 1
+         endif
+      else
+         NoteD $Log "FAILED ($ETime)"
+         set FAIL  = "YES"
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

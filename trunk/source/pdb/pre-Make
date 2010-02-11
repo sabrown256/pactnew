@@ -1,0 +1,309 @@
+#
+# pre-Makefile for Portable Data Base Library
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=pdb
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTInc = ${Hdrs} ${PACTTmpDir}/pdform.h
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${CDebug} -I. -I${PACTTmpDir} -I${IncDir} ${MDInc}
+FcFlags = ${FDebug}
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h *.f
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles  = *~ core ${IncDir}/pdform.h ${PACTTmpDir}/pdform.h
+RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
+              ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
+              ${BinDir}/pdfrts \
+              ${BinDir}/pdlsts ${BinDir}/pdnormtst ${BinDir}/pdcsts \
+              ${BinDir}/pdftst ${BinDir}/pdfhyts ${BinDir}/pdntst   \
+              ${BinDir}/pdb2hdf ${BinDir}/pdsmp ${BinDir}/pddpts    \
+              ${BinDir}/pdfdpt ${BinDir}/pxrdts ${BinDir}/pxntst    \
+              ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdtime \
+              ${BinDir}/exambin ${BinDir}/exam
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${TGTLib} ${PACTTmpDir}/pdform.h
+BinDep =
+BinObj =
+
+#
+# Required Libraries
+#
+Libs = ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+
+
+targets :
+	@echo "Targets for PDB"
+	@echo "   Cstd      : make standard tests"
+	@echo "   Apps      : make pdb2hdf   "
+	@echo "   Gst       : make gather test"
+	@echo "   Lst       : make list test"
+	@echo "   Fstd      : make standard Fortran API tests"
+	@echo "   net       : make net IO test"
+	@echo "   pdb2hdf   : make pdb2hdf"
+	@echo "   smp       : make SMP IO test"
+	@echo "   dp        : make DP IO test"
+	@echo "   fdp       : make Fortran DP IO test"
+	@echo "   attr      : make attribute tests"
+	@echo "   def       : make typedef and cast tests"
+	@echo "   time      : make timing test"
+	@echo "   exambin   : make exambin utility"
+	@echo "   exam      : make exam utility"
+	@echo "   link      : link PDB utilities for public use"
+	@echo "   install   : install PDB headers and utilities in dev/arch"
+	@echo "   sharedlib : build and install PDB shared libs in dev/arch"
+	@echo "   test      : run the PDB test suite"
+
+#
+# Headers Files
+#
+Hdrs = pdb.h pdb_int.h
+
+#
+# Object Files
+#
+Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
+       pdrdwr.o pdptr.o pdprnt.o pdmemb.o \
+       pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o \
+       pdcsum.o pdbx.o pdszof.o pdfia.o pdbdir.o pdpar.o pdcomm.o \
+       pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
+
+ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)    \
+         ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)  \
+         ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o) \
+         ${TGTLib}(pdcomm.o) ${TGTLib}(pdbmp.o) ${TGTLib}(pdser.o)   \
+         ${TGTLib}(pdlow.o) ${TGTLib}(pdrdwr.o) ${TGTLib}(pdptr.o)   \
+         ${TGTLib}(pdmemb.o) ${TGTLib}(pdgs.o) ${TGTLib}(pdcsum.o)   \
+         ${TGTLib}(pdblk.o) ${TGTLib}(pdbmm.o) ${TGTLib}(pdconv.o)   \
+         ${TGTLib}(pdpath.o) ${TGTLib}(pdbfc.o) ${TGTLib}(pdbnet.o) \
+         ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) \
+         ${TGTLib}(pdbx.o) ${TGTLib}(pdfia.o)  ${TGTLib}(pdbdir.o)   \
+         ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
+         ${TGTLib}(pdspoke.o)
+
+${Objs} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
+${LibDep} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
+
+#
+# detect
+#
+${BinDir}/detect : detect.c ${Hdrs} 
+	${CCCfe} ${Cfe_LD_Flags} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
+
+${PACTTmpDir}/pdform.h : ${BinDir}/detect
+	${RM} ${PACTTmpDir}/pdform.h
+	${CFE} ${BinDir}/detect -c ${BE} > ${PACTTmpDir}/pdform.h
+
+pdspoke.c : config-spokes pdshar.c
+	config-spokes
+
+#
+# standard tests
+#
+
+Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
+       ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
+       ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
+       ${BinDir}/pdfrts
+Apps : ${BinDir}/pdb2hdf
+
+Gst : ${BinDir}/pdgsts
+Lst : ${BinDir}/pdlsts
+
+${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs}
+	${CC} -c pdbtst.c -o ${PACTTmpDir}/pdbtst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdbtst.o -o ${BinDir}/pdbtst ${Libs}
+
+${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs}
+	${CC} -c pdatst.c -o ${PACTTmpDir}/pdatst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdatst.o -o ${BinDir}/pdatst ${Libs}
+
+${BinDir}/pdasts : pdasts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdasts.c -o ${PACTTmpDir}/pdasts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdasts.o -o ${BinDir}/pdasts ${Libs}
+
+${BinDir}/pdopts : pdopts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdopts.c -o ${PACTTmpDir}/pdopts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdopts.o -o ${BinDir}/pdopts ${Libs}
+
+${BinDir}/pdapts : pdapts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdapts.c -o ${PACTTmpDir}/pdapts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdapts.o -o ${BinDir}/pdapts ${Libs}
+
+${BinDir}/pdgsts : pdgsts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdgsts.c -o ${PACTTmpDir}/pdgsts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdgsts.o -o ${BinDir}/pdgsts ${Libs}
+
+${BinDir}/pdlsts : pdlsts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdlsts.c -o ${PACTTmpDir}/pdlsts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdlsts.o -o ${BinDir}/pdlsts ${Libs}
+
+${BinDir}/pdnormtst : pdnormtst.c ${InstallDep} ${Hdrs}
+	${CC} -c pdnormtst.c -o ${PACTTmpDir}/pdnormtst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdnormtst.o -o ${BinDir}/pdnormtst ${Libs}
+
+${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdcsts.c -o ${PACTTmpDir}/pdcsts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdcsts.o -o ${BinDir}/pdcsts ${Libs}
+        
+${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdfrts.c -o ${PACTTmpDir}/pdfrts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdfrts.o -o ${BinDir}/pdfrts ${Libs}
+        
+Fstd : ${BinDir}/pdftst ${BinDir}/pdfhyts
+
+${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
+	${FC} -c pdftst.f -o ${PACTTmpDir}/pdftst.o
+	${FC} ${LdFlags} ${PACTTmpDir}/pdftst.o -o ${BinDir}/pdftst ${Libs}
+
+${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
+	${FC} -c pdfhyts.f -o ${PACTTmpDir}/pdfhyts.o
+	${FC} ${LdFlags} ${PACTTmpDir}/pdfhyts.o -o ${BinDir}/pdfhyts ${Libs}
+
+#
+# net io test
+#
+net : ${BinDir}/pdntst
+
+${BinDir}/pdntst : pdntst.c ${InstallDep} ${Hdrs}
+	${CC} -c pdntst.c -o ${PACTTmpDir}/pdntst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdntst.o -o ${BinDir}/pdntst ${Libs}
+
+#
+# pdb to hdf converter
+#
+pdb2hdf :
+
+${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs}
+	${CC} -c applications/pdb2hdf.c -o ${PACTTmpDir}/pdb2hdf.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdb2hdf.o -o ${BinDir}/pdb2hdf ${Libs}
+
+#
+# smp i/o test
+#
+smp : ${BinDir}/pdsmp
+
+${BinDir}/pdsmp : pdsmp.c ${InstallDep} ${Hdrs}
+	${CC} -c pdsmp.c -o ${PACTTmpDir}/pdsmp.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdsmp.o -o ${BinDir}/pdsmp ${Libs}
+
+#
+# distributed mp i/o test
+#
+dp : ${BinDir}/pddpts
+
+${BinDir}/pddpts : pddpts.c ${InstallDep} ${Hdrs}
+	${CC} -c pddpts.c -o ${PACTTmpDir}/pddpts.o
+	${CC} ${LdFlags} ${PACTTmpDir}/pddpts.o -o ${BinDir}/pddpts ${Libs} ${DPLib}
+
+fdp : ${BinDir}/pdfdpt
+
+${BinDir}/pdfdpt : pdfdpt.f ${InstallDep} ${Hdrs}
+	${FC} -c pdfdpt.f -o ${PACTTmpDir}/pdfdpt.o
+	${FC} ${LdFlags} ${PACTTmpDir}/pdfdpt.o -o ${BinDir}/pdfdpt ${Libs} ${DPLib}
+
+#
+# test attribute handling
+#
+attr : ${BinDir}/pdatst ${BinDir}/pxrdts ${BinDir}/pxntst
+
+${BinDir}/pxrdts : pxrdts.c ${InstallDep} ${Hdrs}
+	${CC} -c pxrdts.c -o ${PACTTmpDir}/pxrdts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pxrdts.o -o ${BinDir}/pxrdts ${Libs}
+
+${BinDir}/pxntst : pxntst.c ${InstallDep} ${Hdrs}
+	${CC} -c pxntst.c -o ${PACTTmpDir}/pxntst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pxntst.o -o ${BinDir}/pxntst ${Libs}
+
+#
+# test cast and typedef of primitives handling
+#
+def : ${BinDir}/pdrcts ${BinDir}/pdtdeftst
+
+${BinDir}/pdrcts : pdrcts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdrcts.c -o ${PACTTmpDir}/pdrcts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdrcts.o -o ${BinDir}/pdrcts ${Libs}
+
+${BinDir}/pdtdeftst : pdtdeftst.c ${InstallDep} ${Hdrs}
+	${CC} -c pdtdeftst.c -o ${PACTTmpDir}/pdtdeftst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdtdeftst.o -o ${BinDir}/pdtdeftst ${Libs}
+
+#
+# timing test
+#
+time : ${BinDir}/pdtime
+
+${BinDir}/pdtime : pdtime.c ${InstallDep} ${Hdrs}
+	${CC} -c pdtime.c -o ${PACTTmpDir}/pdtime.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdtime.o -o ${BinDir}/pdtime ${Libs}
+
+#
+# exam
+#
+exambin :
+	${CC} -c exambin.c -o ${PACTTmpDir}/exambin.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/exambin.o -o ${BinDir}/exambin
+
+exam :
+	${CC} -c exam.c -o ${PACTTmpDir}/exam.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/exam.o -o ${BinDir}/exam
+
+# extra commands needed when building TGTLib
+LibAction = build-spokes
+
+#
+# link 
+#
+link: ${InstallDep}
+
+#
+# install 
+#
+install:
+	pact incinstall
+	pact link
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the PDB test suite
+#
+test :
+	@./pdtest
+

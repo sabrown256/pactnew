@@ -1,0 +1,28 @@
+
+work
+
+(* REAL char character character varying date datetime decimal double double precision float function int integer interval long long_long national character national character varying nchar numeric nvarchar real serial short smallint time timestamp u_char u_int u_integer u_long u_long_long u_short varchar work)
+
+Type: work
+Alignment: 0
+Members: {integer id;
+          real fval;
+          double dval;
+          varchar name[12];}
+Size in bytes: 65
+
+Name: work
+Type: work
+Dimensions: (1:2)
+Length: 2
+Address: 0
+
+work(1).id =                             1
+work(1).fval =  3.140e+00
+work(1).dval =  3.14150e+00
+work(1).name = "pi"
+work(2).id =                             2
+work(2).fval =  2.720e+00
+work(2).dval =  2.71830e+00
+work(2).name = "e"
+

@@ -1,0 +1,29 @@
+#
+# PRE-MAKE - to build dictionary
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include dev/${System}/include/pre-Make.defs
+
+GFiles = global/global.c ${DevInc}/global.h
+LFiles = lag/lag.c ${DevInc}/lag.h
+MFiles = misc/misc.c ${DevInc}/misc.h
+
+Files = ${GFiles} ${LFiles} ${MFiles}
+
+${Files} :: abc.dict
+	@(cd ${PACTTmpDir} ; \
+	  cp ${PACTSrcDir}/abc.dict . ; \
+ 	  ${PANACHE} abc.dict ; \
+	  mv a.c b.c b.h ${PACTSrcDir}/main ; \
+	  mv *.h ${DevInc} ; \
+	  mv global.c ${PACTSrcDir}/global ; \
+	  mv lag.c ${PACTSrcDir}/lag ; \
+	  mv misc.c ${PACTSrcDir}/misc)
+
+dict : ${Files}
+

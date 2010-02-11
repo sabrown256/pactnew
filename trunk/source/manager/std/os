@@ -1,0 +1,17 @@
+#
+# OS - supported OS
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# VendorName	PACTName	Header
+Linux		LINUX		sclnx.h
+CYGWIN		CYGWIN		sccyg.h
+Darwin		MACOSX		scosx.h
+AIX		AIX		scaix.h
+SunOS		SOLARIS		scsol.h
+IRIX64		SGI		scirix.h
+HP-UX		HPUX		schpux.h

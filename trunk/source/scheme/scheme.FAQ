@@ -1,0 +1,114 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+SCHEME Frequently Asked Questions (FAQ)
+
+Last-Modified:  Fri May  9 10:36:16 PDT 2003
+
+
+
+Welcome to the FAQ for SCHEME!
+
+INTRODUCTION
+SCHEME is a small part of a much bigger effort called PACT. PACT is
+the portable environment and toolkit that we use to create portable 
+applications, and to create functionality not readily available. 
+PACT is our environment of choice for handling unique data,
+portable computing environments, and the distributed computing 
+arenas; and for converting data for the visualization application 
+or algorithm of choice. We have created PACT to shield ourselves 
+from new software, and hardware so we can concentrate on the 
+applications at hand. PACT is beginning to emphasize design that 
+takes advantage of massively parallel environments.
+
+We would like to hear of your experiences with PACT. And, we would 
+be especially pleased to try to add your mathematical, graphical, 
+or other functionality to future distributions of PACT. 
+
+
+NOTICE
+
+     Absolute portability is our GOAL! 
+
+Most of the time we install PACT 
+without problems, the other times take varying amounts of effort to 
+track down. Usually the problems are simple, such as missing 
+headers. If your experience with PACT is not absolute portability, 
+we would like to hear from you so we can try to make it so. Please 
+direct all portability issues to:
+
+     sabrown@llnl.gov
+ or  minner1@llnl.gov
+ or  smethells1@llnl.gov
+
+
+Thanks to all who have contributed to this FAQ.  Corrections and 
+contributions always welcome. Please e-mail comments, additions, 
+and corrections to:
+
+                  rodrigues2@llnl.gov 
+
+and use SUBJECT: SCHEME FAQ
+
+Items needing more input from you and others are marked with a ???.
+
+----------------------------------------------------------------------
+TABLE OF CONTENTS
+----------------------------------------------------------------------
+
+1) What is SCHEME?
+2) What is PACT?
+3) Where can I get the complete SCHEME source and documentation?
+4) ???
+
+----------------------------------------------------------------------
+1) What is SCHEME?
+
+   SCHEME is an implementation of the Scheme programming language.
+   The interpreter is implemented as a libary which may be loaded
+   into applications to provide user extensibility.  The interface
+   between applications and the interpreter is as simple as possible
+   for ease of use.  Garbage collection is done with a reference
+   counting technique to distribute garbage collection time throughout
+   a session and eliminate annoying breaks which stop and copy or
+   mark and sweep are heir to.
+   It is substantially compliant with the Revised^3 Report on Scheme
+   standard.  Some feature of Revised^4 Report on Scheme standard
+   have been implemented as well.  Deviations and extensions include:
+
+     a) Case sensitive identifiers
+     b) Ignoring the Scheme numerics in favor of C or FORTRAN style
+     c) Hash table extensions
+     d) C like string manipulation and I/O functions
+
+2) What is PACT?
+
+   PACT stands for Portable Application Code Toolkit. It is a
+   self-contained set of tools which support developing and
+   using portable programs particularly scientific and engineering
+   applications.  See the pact.FAQ
+
+3) Where can I get the complete SCHEME source and documentation?
+
+Since SCHEME is an intimate part of PACT, this will get the complete PACT 
+including SCHEME. You may selectively install SCHEME.
+
+Please use ftp to connect to: 
+
+          ftp.llnl.gov
+
+log in as anonymous, using your email address for the password,
+cd pub/pact - to change directory,
+binary           - to set the transfer mode,
+get the three pact files (yy_mm_dd indicates the date):
+          pact-unix.README
+          pactyy_mm_dd-doc.tar.gz
+          pactyy_mm_dd-src
+
+The pact-unix.README file describes the PACT installation process. 
+
+4) ???
+
+

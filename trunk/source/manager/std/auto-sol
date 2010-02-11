@@ -1,0 +1,14 @@
+#
+# AUTO-SOL - default SOLARIS configuration
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv SOLRoot /opt/SUNWspro
+
+include spokes
+include compiler-sol
+

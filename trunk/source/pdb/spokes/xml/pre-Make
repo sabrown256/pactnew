@@ -1,0 +1,46 @@
+#
+# pre-Makefile for XML spoke
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+TGTBin = none
+TGTLib = ${LibDir}/libpdb.a
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags = -L${LibDir}
+
+CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+
+#
+# Files to remove in directory clean (make clean)
+#
+CleanFiles = *~ core #*#
+
+#
+# Headers Files
+#
+Hdrs = trxml.h ../../pdb_int.h
+
+#
+# Object Files
+#
+Objs = trxml.o trxmlp.o trxmldtd.o trxmlxsd.o
+
+ArObjs = ${TGTLib}(trxml.o) ${TGTLib}(trxmlp.o)        \
+         ${TGTLib}(trxmldtd.o) ${TGTLib}(trxmlxsd.o)
+       
+
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+spoke : ${TGTLib} ${LibDep}

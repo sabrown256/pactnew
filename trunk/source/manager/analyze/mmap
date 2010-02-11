@@ -1,0 +1,77 @@
+#!/bin/csh -f
+#
+# MMAP - analyze the handling of mmap
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: mmap"
+
+cat << EOF >! $Tmp.c
+#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+int main(int c, char **v)
+   {int rv, fd, err, act, prot, shar;
+    long nbp, len;
+    char e;
+    char *name;
+    void *p;
+    name = v[1];
+    len  = 1000;
+    rv   = 1;
+    act  = O_RDWR | O_CREAT;
+    prot = PROT_READ | PROT_WRITE;
+    shar = MAP_SHARED;
+    fd   = open(name, act, 0666);
+    if (fd >= 0)
+       {nbp = getpagesize();
+	len = (len + nbp - 1) & ~(nbp - 1);
+	p   = NULL;
+	e   = '\0';
+	err = write(fd, &e, 1);
+	if (err == 1)
+	   {p = mmap(0, len, prot, shar, fd, len);
+	    if (p == (void *) -1)
+	       p = NULL;};
+        if (p != NULL)
+	   {rv = 0;
+            printf("working mmap\n");}
+        else
+	   {rv = 1;
+            printf("non-working mmap\n");};};
+    return(rv);}
+EOF
+
+setenv HAVE_MMAP FALSE
+
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+if ($status == 0) then
+   flog $ALog $CFE $Tmp $Tmp.dat
+   if ($status == 0) then
+      if ($?IBM_BGP == 0) then
+         setenv HAVE_MMAP TRUE
+      endif
+      flog $ALog rm -f $Tmp.c $Tmp $Tmp.dat
+   endif
+endif
+
+if ($HAVE_MMAP == TRUE) then
+   NoteD $ALog "      has working mmap"
+else
+   NoteD $ALog "      no working mmap"
+endif
+
+# export the results
+SetParent HAVE_MMAP
+
+exit(0)
+

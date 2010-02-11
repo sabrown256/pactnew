@@ -1,0 +1,145 @@
+#!/bin/csh -f
+#
+# DO-RUN-DB - write the DO-RUN database file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+source $ScrDir/csh-subroutines
+HAVE_SUBROUTINES
+
+@ err = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+NoteD $Log "   Do-run signature database - do-run-db"
+
+flog $Log set db = $IncDir/do-run-db
+cat >&! $db << EOF
+#
+# DO-RUN-DB - execution signatures for do-run
+#
+
+EOF
+
+if ($?DO_RUN_DBG == 1) then
+   set ldbg = $DO_RUN_DBG
+   echo "default DBG $ldbg:r" >>& $db
+endif
+if ($?DO_RUN_MPI == 1) then
+   set lmpi = $DO_RUN_MPI
+   echo "default MPI $lmpi:r" >>& $db
+endif
+if ($?DO_RUN_CROSS == 1) then
+   set lcross = $DO_RUN_CROSS
+   echo "default CROSS $lcross:r" >>& $db
+endif
+
+set lsite     = ""
+set ConfigDir = ""
+if ($?SYS_SITE == 1) then
+   set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
+   set ConfigDir = ( $ConfigDir local/$lsite )
+endif
+set ConfigDir = ( $ConfigDir local std )
+
+foreach d ($ConfigDir)
+   if (-f $d/do-run-prolog) then
+      call ADD($d/do-run-prolog)
+      break
+   endif
+end
+
+flog $Log ls -l $db
+
+set cnd = ""
+if ($?DO_RUN_DBG == 1) then
+   set cnd = ( $cnd $DO_RUN_DBG )
+else
+   set cnd = ( gdb tv vg vgd zf )
+endif
+
+if ($?DO_RUN_MPI == 1) then
+   set cnd = ( $cnd $DO_RUN_MPI )
+else
+   set cnd = ( $cnd poe srun dmpirun mpirun )
+endif
+
+if ($?DO_RUN_CROSS == 1) then
+   set cnd = ( $cnd $DO_RUN_CROSS )
+else
+   set cnd = ( $cnd submit )
+endif
+
+foreach i ( $cnd )
+   Note $Log "Checking $i"
+
+   set file = ""
+   if (-f $i) then
+      set file = $i
+   else
+      foreach d ($ConfigDir)
+         if (-f $d/do-run-$i) then
+            set file = $d/do-run-$i
+            break
+         endif
+      end
+   endif
+   if ("$file" == "") continue
+
+   set exe = `swhich -1 $i:r`
+   Note $Log "   candidate for $i name = |$exe|"
+   if (-x "$exe") then
+      call ADD($file)
+   else
+      set inf = ( `grep Exe $file` )
+      if ($#inf > 2) then
+         set exe = `swhich -1 $inf[3]`
+         Note $Log "   candidate for $i file = |$exe|"
+         if (-x "$exe") then
+            call ADD($file)
+         endif
+      endif
+   endif
+end
+
+echo "" >>& $db
+
+flog $Log ls -l $db
+
+exit($err)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ADD - add an entry to the database
+
+ADD:
+
+   set lf = $args_[1]
+
+   cat $lf | grep -v '#' >>& $db
+
+   echo "" >>& $db
+   echo "#-------------------------------------------------------------------------" >>& $db
+
+   Note $Log "Using $lf"
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

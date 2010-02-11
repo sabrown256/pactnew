@@ -1,0 +1,55 @@
+#!/bin/csh -f
+#
+# S5T1 - test 1 of signature file 5
+#      - environment variables
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Code = do-run
+set Opt  = ans
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set Code = $1
+           breaksw
+      case '-h':
+           echo "Usage: $0 [-c <code>] [-h] run | ans"
+           echo "   c     test <code> (default do-run on path)"
+           echo "   h     this help message"
+           echo "   run   run the test"
+           echo "   ans   print the fiducial answer"
+           echo ""
+           exit(1)
+      default:
+           set Opt = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($Opt == run) then
+   if ("$Valgrind" == "") then
+      $Code -level 2 -dr -mpi foo -s run.s5 s5t1
+      set xstatus = $status
+   else
+      $Valgrind $Code -level 2 -dr -mpi foo -s run.s5 s5t1
+      set xstatus = $status
+   endif
+
+# print the fiducial answer for this test
+else
+   echo "Using signature file 'run.s5'"
+   echo "> NProc already has value '1'"
+   echo '> setenv Foo a'
+   echo "> Foo already has value 'a'"
+   echo '> setenv Cmd no-op'
+   echo 'no-op'
+endif
+
+exit(0)

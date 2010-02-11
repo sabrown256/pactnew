@@ -1,0 +1,26 @@
+#
+# COMMON-MAKE - sort out which make/gmake is being used
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+flog $Log rm -f ./gmake
+
+setenv Make "`which gmake`"
+if (-x "$Make") then
+   flog $Log setenv Make gmake
+else
+   make -v |& grep GNU >>& /dev/null
+   if ($status == 0) then
+      ln -s `which make` gmake
+      flog $Log setenv Make gmake
+   else
+      flog $Log setenv Make make
+   endif
+endif
+
+Note $Log "Using system make $Make"
+flog $Log which gmake
+flog $Log which make
+

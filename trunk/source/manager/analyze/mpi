@@ -1,0 +1,184 @@
+#!/bin/csh -f
+#
+# MPI - analyze MPI issues
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me   = $0
+set Base = $Me:h
+source $Base/common
+
+if ($?Log == 1) then
+   Separator $Log
+   Note $Log "Analyze: mpi"
+endif
+
+SafeEnv ParCommSupport  PARC
+SafeEnv MPIAllStdin     FALSE
+SafeEnv HAVE_OPENMPI    FALSE
+SafeEnv LibMPI          ""
+SafeEnv MPILib          ""
+SafeEnv CC_DPInc        ""
+SafeEnv LD_DPLib        ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MPI Include
+
+set lParComm = ""
+
+Note $ALog "CC_DPInc = $CC_DPInc"
+
+foreach j ($CC_DPInc $RootInc)
+   set k = `echo $j | sed 's/-I//g'`
+   Note $ALog "Looking for include directory $k"
+
+# check for <path>/<pkg>/<pkg>.h form
+   set GotIt = FALSE
+   if (-f "$k/mpi/mpi.h") then
+      flog $ALog set GotIt = TRUE
+      Note $ALog "   have $k/mpi/mpi.h"
+   else if (-f "$k/mpi.h") then
+      flog $ALog set GotIt = TRUE
+      Note $ALog "   have $k/mpi.h"
+   endif
+
+# check for <path>/<pkg>/<pkg>.h form
+   if ($GotIt == TRUE) then
+      flog $ALog set lParComm = ( mpi $lParComm )
+      if ("$ParCommSupport" == "") then
+         set ParCommSupport = `echo mpi | tr "[a-z]" "[A-Z]"`
+      endif
+      break
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MPI Library
+
+if ($?MPILib == 0) then
+   set LRoot = /usr
+   source $Base/common-lib64
+   setenv MPILib /usr/$LibT
+endif
+
+Note $ALog "MPILib   = $MPILib"
+Note $ALog "lParComm = $lParComm"
+
+if ("$lParComm" =~ *mpi*) then
+
+#   setenv LD_DPLib  "$LibMPI"
+   set llib = ""
+   foreach i ($MPILib)
+      set llib = ( $llib -L$i )
+   end
+   setenv lLib   "$llib $LibMPI"
+
+   set UTime = `timer -r`
+
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+#include <mpi.h>
+#define MAXLINE 255
+int main(int c, char **v)
+   {int i, rnk, sz;
+    char s[MAXLINE];
+    char *p;
+    MPI_Init(&c, &v);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rnk);
+    MPI_Comm_size(MPI_COMM_WORLD, &sz);
+    p = fgets(s, MAXLINE, stdin);
+    if (p != NULL)
+       printf("Proc %d : %s\n", rnk, s);
+    MPI_Finalize();
+    return(0);}
+EOF
+
+# NOTE: we have so far gone to extraordinary lengths to avoid using
+# the compiler requested in the config file during configuration
+# this is mainly to avoid MPI complications
+# but here we really need an MPI compiler so use the Save_CC
+# which was the one requested in the configs
+
+   Note $ALog "Save_CC  = $Save_CC"
+   Note $ALog "CC_Flags = $CC_Flags"
+   Note $ALog "CC_DPInc = $CC_DPInc"
+   Note $ALog "LD_Flags = $LD_Flags"
+   Note $ALog "LD_DPLib = $LD_DPLib"
+   Note $ALog "lLib     = $lLib"
+
+   flog $ALog cat $Tmp.c
+
+   flog $ALog $Save_CC $CC_Flags $CC_DPInc $Tmp.c -o $Tmp $LD_Flags $lLib
+   if ($status != 0) then
+      set lParComm = "no"
+      setenv LibMPI    ""
+      setenv LD_DPLib  ""
+   else
+      flog $ALog ldd $Tmp
+
+      flog $Log $PFE -dr -v -p 2 $Tmp $BE
+      echo "a" | $PFE -v -p 2 $Tmp $BE >&! $Tmp.res
+      set LStat = $status
+      if ($LStat == 0) then
+         @ NOut = `grep "Proc" $Tmp.res |& wc -l`
+         if ($NOut > 1) then
+            setenv MPIAllStdin TRUE
+            set MPIStdIO = "all processes"
+         else
+            set MPIStdIO = "one process"
+         endif
+      else
+         set MPIStdIO = "one process (assumed)"
+      endif
+   endif
+
+   flog $ALog rm -f $Tmp $Tmp.c $Tmp.res
+
+   set ETime = `timer -b $UTime`
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ("$lParComm" == no) then
+   setenv LibMPI    ""
+   setenv MPILib    ""
+   setenv CC_DPInc  ""
+   setenv LD_DPLib  ""
+   NoteD $ALog "      no MPI"
+
+else if ("$lParComm" != "") then
+   NoteD $ALog "      has MPI"
+   NoteD $ALog "         $LibMPI"
+   NoteD $ALog "         stdin $MPIStdIO"
+
+else
+   setenv LibMPI    ""
+   setenv MPILib    ""
+   setenv CC_DPInc  ""
+   setenv LD_DPLib  ""
+   NoteD $ALog "      no MPI (by request)"
+endif
+
+setenv ParComm "$lParComm"
+
+# export the results
+SetParent ParCommSupport
+SetParent MPIAllStdin
+SetParent HAVE_OPENMPI
+SetParent MPILib
+SetParent LibMPI
+SetParent CC_DPInc
+SetParent LD_DPLib
+
+exit(0)
+
