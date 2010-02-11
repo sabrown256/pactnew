@@ -149,19 +149,18 @@ static void _SC_array_grow(SC_array *a, long nn)
     if (nn < 0)
        {n  = max(nx, a->n);
 	gf = a->gf;
-	fc = pow(10.0, 1.0 - gf*n);
-	nn = fc*n;
-        nn = 2*nx;};
+	fc = pow(2.0, -gf*n);
+	nn = (n + 1)*(1.0 + fc);
+/*        nn = 2*nx; */};
 
 /* if never allocated */
     if (arr == NULL)
        {if (nn == 0)
 	   {nx = 0;
 	    nn = 1;
-	    nn = 512;};
+/*	    nn = 512; */};
 	arr = FMAKE_N(char, nn*bpi, a->name);
-	chg = TRUE;
-	SC_mark(arr, 1);}
+	chg = TRUE;}
 
 /* if too small */
     else if (nn > nx)
@@ -178,7 +177,9 @@ static void _SC_array_grow(SC_array *a, long nn)
 	   memset(arr + nx*bpi, 0, (nn-nx)*bpi);
 
 	a->nx    = nn;
-	a->array = arr;};
+	a->array = arr;
+
+	SC_mark(arr, 1);};
 
     return;}
 
@@ -222,8 +223,6 @@ void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
      a->init  = init;
 
      _SC_array_set_method(a);
-
-/*     _SC_array_grow(a, 0); */
 
      return;}
 
@@ -380,7 +379,8 @@ long SC_array_resize(SC_array *a, long n, double g)
  */
 
 void *SC_array_set(SC_array *a, long n, void *v)
-    {void *rv;
+    {long m;
+     void *rv;
 
      rv = NULL;
 
@@ -393,9 +393,10 @@ void *SC_array_set(SC_array *a, long n, void *v)
 	 if (n < 0)
 	    n = a->n;
 
-	 a->n = max(a->n, n+1);
+	 m    = n + 1;
+	 a->n = max(a->n, m);
 
-	 if (n >= a->nx)
+	 if (m >= a->nx)
 	    _SC_array_grow(a, -1);
 
 	 rv = a->set(a->array, a->bpi, SET, n, v);};
@@ -450,7 +451,15 @@ void *SC_array_array(SC_array *a, int flag)
      if (a != NULL)
         {if (a->array == NULL)
 	    _SC_array_grow(a, -1);
-	 rv = a->array;};
+
+	 rv = a->array;
+
+#if 1
+	 if (flag & 1)
+	    SC_mark(rv, 1);
+#endif
+
+         a->nref++;};
 
      return(rv);}
 
@@ -466,11 +475,11 @@ void *SC_array_array(SC_array *a, int flag)
 void SC_array_unarray(SC_array *a, int flag)
     {int n;
 
-#if 0
      n = a->nref;
      n--;
      a->nref = max(n, 0);
 
+#if 1
      if (flag & 1)
         SFREE(a->array);
 #endif
@@ -629,15 +638,19 @@ int SC_array_string_append(SC_array *out, SC_array *in)
  *                       - with each string ending with a '\n'
  */
 
-char **_SC_array_string_join(SC_array *sa)
+char **_SC_array_string_join(SC_array **psa)
    {int i, no, c;
     char *s, *p, *bf, **sao, **san;
-    SC_array *na;
+    SC_array *na, *sa;
+
+    sa   = *psa;
+    *psa = NULL;
 
     no  = SC_array_get_n(sa);
-    sao = SC_array_array(sa, 0);
+    sao = SC_array_done(sa);
 
     na = SC_string_array("_SC_ARRAY_STRING_JOIN");
+    SC_array_resize(na, 512, -1.0);
 
     bf = NULL;
 
@@ -660,11 +673,9 @@ char **_SC_array_string_join(SC_array *sa)
 			 bf = NULL;
 			 s  = p;
 			 if (SC_is_print_char(*s, 4))
-			    bf = SC_dstrcat(bf, s);};};
+			    bf = SC_dstrcat(bf, s);};};};};
 
-		 SFREE(sao[i]);};};
-
-	SFREE(sao);
+	SC_free_strings(sao);
 
 /* add the whatever is left if anything */
 	if (bf != NULL) 

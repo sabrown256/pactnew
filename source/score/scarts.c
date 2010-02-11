@@ -112,6 +112,10 @@ static int test_1(void)
 	 err += (ib[na+i] != ia[i]);
 	 err += (db[na+i] != da[i]);};
     
+    SC_array_unarray(ac, 0);
+    SC_array_unarray(ai, 0);
+    SC_array_unarray(ad, 0);
+
     SC_free_array(ac, NULL);
     SC_free_array(ai, NULL);
     SC_free_array(ad, NULL);
@@ -183,6 +187,10 @@ static int test_2(void)
 	 err += (*ib[na+i] != *ia[i]);
 	 err += (*db[na+i] != *da[i]);};
     
+    SC_array_unarray(ac, 0);
+    SC_array_unarray(ai, 0);
+    SC_array_unarray(ad, 0);
+
     SC_free_array(ac, SC_array_free_n);
     SC_free_array(ai, SC_array_free_n);
     SC_free_array(ad, SC_array_free_n);
@@ -230,6 +238,8 @@ static int test_3(void)
         {err += (sb[i].n != sa[i].n);
 	 err += (strcmp(sb[i].c, sa[i].c) != 0);}
     
+    SC_array_unarray(as, 0);
+
     SC_free_array(as, NULL);
 
     return(err);}
@@ -279,6 +289,7 @@ static int test_4(void)
         {err += (sb[i].n != sa[i].n);
 	 err += (strcmp(sb[i].c, sa[i].c) != 0);}
     
+    SC_array_unarray(as, 0);
     SC_free_array(as, ts_free);
 
     return(err);}
@@ -338,7 +349,147 @@ static int test_5(void)
          SFREE(sa[i]);};
     SFREE(sa);
 
+    SC_array_unarray(as, 0);
     SC_free_array(as, ts_free);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_6_ADD - add N integers to IA */
+
+static void test_6_add(SC_array *ia, int n, int recy)
+   {int i, ni;
+    int *pi;
+
+    ni = ia->nx;
+
+    for (i = 0; i < n; i++)
+        SC_array_set(ia, i, &i);
+
+/* attempt to recycle the original space from IA
+ * this call will grow IA and this means the original
+ * pointer will be available
+ */
+    if (recy == TRUE)
+       {pi = FMAKE_N(int, ni, "TEST_6_ADD:pi");
+	for (i = 0; i < ni; i++)
+	    pi[i] = 100;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_6 - test asynchronous race */
+
+static int test_6(void)
+   {int i, ni, err;
+    int *pi;
+    SC_array *ia;
+
+    ia = SC_MAKE_ARRAY("TEST_6", int, NULL);
+    test_6_add(ia, 10, FALSE);
+
+    ni = SC_array_get_n(ia);
+    pi = SC_array_array(ia, 0);
+
+    for (i = 0; i < ni; i++)
+        {pi[i] *= -1;
+
+/* emulate an interrupt that adds to ia */
+         if (i == 2)
+	    test_6_add(ia, 20, TRUE);};
+
+/* now compare */
+    err = 0;
+
+    for (i = 0; i < ni; i++)
+        err += (pi[i] != -i);
+
+    SC_array_unarray(ia, 0);
+    SC_free_array(ia, NULL);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_7 - performance test */
+
+static int test_7(void)
+   {int i, ms, mm, mg, ls, lm, lg, na, err;
+    double fc, tm, ts, tg, tr;
+    double *dp;
+    SC_array *da;
+
+    err = TRUE;
+
+    na = 1000000;
+
+    da = SC_MAKE_ARRAY("TEST_7", double, NULL);
+    SC_array_resize(da, na, -1.0);
+
+    dp = FMAKE_N(double, na, "TEST_7:dp");
+
+/* time setting DP */
+    lm = 0;
+    tm = 0.0;
+    for (mm = 0; TRUE; mm++)
+        {tr = SC_wall_clock_time();
+
+         for (i = 0; i < na; i++, lm++)
+/*             {fc    = log10(1.0 + i); */
+             {fc    = i;
+              dp[i] = fc;};
+
+	 tm += (SC_wall_clock_time() - tr);
+
+	 if (tm > 2.0)
+	    break;};
+
+/* time setting DA */
+    ls = 0;
+    ts = 0.0;
+    for (ms = 0; TRUE; ms++)
+        {tr = SC_wall_clock_time();
+
+         for (i = 0; i < na; i++, ls++)
+/*             {fc    = log10(1.0 + i); */
+             {fc    = i;
+              SC_array_set(da, i, &fc);};
+
+	 ts += (SC_wall_clock_time() - tr);
+
+	 if (ts > 2.0)
+	    break;};
+
+/* time fetching DA */
+    lg = 0;
+    tg = 0.0;
+    for (mg = 0; TRUE; mg++)
+        {tr = SC_wall_clock_time();
+
+         for (i = 0; i < na; i++, lg++)
+             dp[i] = *(double *) SC_array_get(da, i);
+
+	 tg += (SC_wall_clock_time() - tr);
+
+	 if (tg > 2.0)
+	    break;};
+
+    printf("\n");
+    printf("\t\t\t          Acesses      usec/access\n"); 
+    printf("\t\t\tdirect   %9.2e   %11.3e\n",
+	   (double) lm, 1.0e6*tm/((double) lm));
+    printf("\t\t\tset      %9.2e   %11.3e\n",
+	   (double) ls, 1.0e6*ts/((double) ls));
+    printf("\t\t\tget      %9.2e   %11.3e\n",
+	   (double) lg, 1.0e6*tg/((double) lg));
+
+    SC_free_array(da, NULL);
+    SFREE(dp);
 
     return(err);}
 
@@ -371,6 +522,9 @@ int main(int c, char **v)
     err += run_test(3, test_3);
     err += run_test(4, test_4);
     err += run_test(5, test_5);
+    err += run_test(6, test_6);
+
+    test_7();
 
     io_printf(STDOUT, "\n");
 

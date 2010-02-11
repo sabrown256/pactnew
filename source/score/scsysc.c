@@ -371,6 +371,7 @@ void _SC_exec_setup_state(parstate *state, char *shell, char **env,
 
     state->tasks = SC_MAKE_ARRAY("_SC_EXEC_SETUP_STATE", taskdesc *, NULL);
     state->log   = SC_string_array("_SC_EXEC_SETUP_STATE");
+    SC_array_resize(state->log, 512, -1.0);
 
     state->acc        = acc;
     state->rej        = rej;
@@ -938,6 +939,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
     term  = FALSE;
 
     tf = SC_string_array("_SC_INIT_SUBTASKS");
+    SC_array_resize(tf, 512, -1.0);
 
     for (n = 0; n < na; n++)
         {t = ta[n];
@@ -971,7 +973,8 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
 	 if (term == TRUE)
 	    {if (tf->n > 0)
 	        {_SC_push_subtask(sub, it++, shell, tf, dosh, pipe);
-		 tf = SC_string_array("_SC_INIT_SUBTASKS");};
+		 tf = SC_string_array("_SC_INIT_SUBTASKS");
+		 SC_array_resize(tf, 512, -1.0);};
 	     term = FALSE;
 	     pipe = FALSE;
 	     dosh = FALSE;}
@@ -1794,6 +1797,7 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
 	id = inf->id;
 
 	inf->out = SC_string_array("_SC_LAUNCH_JOB");
+	SC_array_resize(inf->out, 512, -1.0);
 
 /* launch job on remote host
  * NOTE: by doing SC_open_remote we do a SC_verify_host
@@ -1864,16 +1868,18 @@ static int _SC_fin_job(taskdesc *job, asyncstate *as, int srv)
 	       p = _SC_show_command(as, inf->full, state->show);
 
 /* print job output thru filter */
-	    if (SC_array_array(inf->out, 0) == NULL)
+	    if (SC_array_get_n(inf->out) == 0L)
 	       job->print(job, as,
 			  "***> no output for job - _SC_FIN_JOB\n");
 
 	    else
-	       {out = _SC_array_string_join(inf->out);
+	       {out = _SC_array_string_join(&inf->out);
+
 		_SC_print_filtered(as, out, job->filter, pid, job->host);
 
 		SC_free_strings(out);
-		SC_array_set_n(inf->out, 0);};
+
+		inf->out = SC_MAKE_ARRAY("_SC_FIN_JOB", char *, NULL);};
 
 	    state->n_complete++;};
 
@@ -1908,7 +1914,8 @@ static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
 	    if (ok == FALSE)
 	       {SFREE(job);};}
 	else
-	   inf->out = SC_string_array("_SC_START_JOB");
+	   {inf->out = SC_string_array("_SC_START_JOB");
+	    SC_array_resize(inf->out, 512, -1.0);};
 
 	SC_END_ACTIVITY(state);};
 

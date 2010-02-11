@@ -68,9 +68,12 @@ tr_layer *_PD_lookup(char *type)
 
     n  = SC_array_get_n(_PD_file_types);
     tr = SC_array_array(_PD_file_types, 0);
+
     for (i = 0; i < n; i++, tr++)
         {if (strcmp(tr->type, type) == 0)
 	    break;};
+
+    SC_array_unarray(_PD_file_types, 0);
 
     if (i >= n)
        tr = NULL;
@@ -337,7 +340,9 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 	        {file = _PD_open_bin_aux(pu, name, mode, tr, a);
 		 if (file != NULL)
 		    {_PD_def_real(type, file);
-		     break;};};};};
+		     break;};};};
+
+	SC_array_unarray(_PD_file_types, 0);};
 
     return(file);}
 

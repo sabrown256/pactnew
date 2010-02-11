@@ -1064,6 +1064,7 @@ char **SC_tokenize(char *s, char *delim)
        {strcpy(t, s);
 
 	arr = SC_string_array("SC_TOKENIZE");
+	SC_array_resize(arr, 512, -1.0);
 
 	for (ps = t; TRUE; ps = NULL)
 	    {tok = SC_strtok(ps, delim, u);
@@ -1194,6 +1195,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl)
 
     sa  = NULL;
     arr = SC_string_array("SC_TOKENIZE_LITERAL");
+    SC_array_resize(arr, 512, -1.0);
 
     t = SC_strsavef(s, "SC_TOKENIZE_LITERAL:t");
     if (t == NULL)

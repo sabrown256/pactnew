@@ -262,7 +262,8 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
 
     if (fl == TRUE)
        {pc->taska = SC_MAKE_ARRAY("SC_INIT_CONNECTION", contask *, NULL);
-	pc->log   = SC_string_array("SC_INIT_CONNECTION");};
+	pc->log   = SC_string_array("SC_INIT_CONNECTION");
+	SC_array_resize(pc->log, 512, -1.0);};
 
     return;}
 
@@ -563,6 +564,7 @@ static void _SC_exec_pool_job(conpool *cp, int ic, contask *pt)
        cmd++;
 
     inf->out = SC_string_array("_SC_POOL_JOB");
+    SC_array_resize(inf->out, 512, -1.0);
 
 /* document the number of running jobs at launch time */
     _SC_pool_log(pco, "client",
@@ -744,7 +746,8 @@ static void _SC_print_task_output(conpool *cp, int ic, contask *pt)
 
     _SC_show_command(as, t, cp->show);
 
-    out = _SC_array_string_join(inf->out);
+    out = _SC_array_string_join(&inf->out);
+
     _SC_print_filtered(as, out, cp->filter, -1, pco->host);
 
     SC_free_strings(out);
@@ -753,8 +756,6 @@ static void _SC_print_task_output(conpool *cp, int ic, contask *pt)
 		 "%s [job %2d] %d %d %.2f",
 		 _SC_EXEC_COMPLETE, inf->id,
 		 inf->signal, inf->status, pt->dt);
-
-    SC_free_array(inf->out, NULL);
 
     return;}
 

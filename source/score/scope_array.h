@@ -243,7 +243,7 @@ extern void
  *SC_array_pop(SC_array *a);
 
 extern char
- **_SC_array_string_join(SC_array *sa);
+ **_SC_array_string_join(SC_array **psa);
 
 extern long
  SC_array_resize(SC_array *a, long n, double g),
