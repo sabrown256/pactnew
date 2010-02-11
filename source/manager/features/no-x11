@@ -1,0 +1,13 @@
+#
+# NO-X11 - override finding and using X11
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group X11 {
+   Path = none
+}
+

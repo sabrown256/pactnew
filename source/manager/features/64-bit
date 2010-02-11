@@ -1,0 +1,13 @@
+#
+# 64-BIT - define make variables for 64-bit configuration
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Bits = 64
+
+run analyze/lib64 -q
+

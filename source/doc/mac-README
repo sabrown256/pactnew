@@ -1,0 +1,116 @@
+
+
+           Field Guide to Installing PACT on Macintosh Systems
+
+Once you have obtained the PACT Mac distribution you will need to follow
+these steps:
+
+   1) Use the public domain uncompress utility (*) to uncompress the file
+   2) Use the public domain tar utility (*) to extract the sources (best
+      done in a folder such as PACT)
+   3) Obtain or construct THINK C or CODE WARRIOR "project" files for
+      the parts of PACT you want to build.
+   4) Start up THINK C or CODE WARRIOR on the project you want and
+      build the desired part of PACT
+   5) If you wish to build either ULTRA or PDBView, you will also need to
+      use the public domain uncompress utility (*) to uncompress the file
+      ULTRA.proj.RSRC (for ULTRA) or PDBView.proj.RSRC (for PDBView).  The
+      resource file will need to be included in your project file.
+
+ (*)  The public domain uncompress and tar utilities can be obtained in
+      the following ways:
+
+      --  via World Wide Web from http://www.umich.edu/~archive/mac/ or
+          gopher://gopher.archive.merit.edu:7055/11/mac
+
+      --  via gopher from gopher.archive.merit.edu. Look for:
+          "Merit Software Archives", then "Macintosh Archives"
+
+      --  via anonymous FTP from mac.archive.umich.edu or its mirror sites.
+          (This is probably the worst choice; the umich server has a very
+           limited number of logins, and is almost always busy.)
+
+      Once you have reached the archive site, go into directory "util",
+      then directory "compression", and retrieve the latest versions of
+      "suntar" (should be version 2.0.3 or later) and "macgzip" (should be
+      version 1.0b0 or later).  Note: Do not use the "tar" utility to
+      extract the source files, since if you tell it to convert linefeeds
+      it will mangle the RSRC files, and if you do not tell it to convert
+      linefeeds it will mangle the text files. "suntar" is smart enough to
+      do the right thing with both types of files.
+
+
+                     NOTES on Macintosh Tools
+
+Primary PACT development takes place on UNIX based systems.  UNIX offers
+a very rich set of code development tools which are almost entirely
+absent on the Macintosh.  For this reason, while the PACT distribution
+is self configuring, compiling, testing and installing on UNIX systems,
+on Macintosh systems considerably more effort is required.
+
+
+                      Building a Project File
+
+Building project files is tedious and error-prone; however, here are some
+tips that may help:
+
+   1) PACT is a hierarchical system in which higher layers build
+      on lower layers.  So when you build a part of PACT you will
+      need to be aware of the dependencies and build the lower
+      level parts as well.  The parts are:
+
+           SCORE   - lowest level layer, the foundation
+           PML     - math library
+           PDB     - binary data handling library (esp. file I/O)
+           PPC     - interprocess communication (largely irrelevant to MAC)
+           PGS     - graphics library
+           PANACEA - simulation code support library
+           SCHEME  - interpreter for SCHEME dialect of LISP
+           SX      - SCHEME + PACT extensions
+           ULTRA   - 1d data analysis tool (highest level layer)
+
+   2) The PACT sources follow a naming convention which you can use
+      to determine which files go with which part of PACT.  File
+      names begin with a two letter package identifier.  For example,
+      the file schash.c is a part of the SCORE package.  The ids are:
+
+           sc   SCORE
+           ml   PML
+           pd   PDB
+           pc   PPC
+           gs   PGS
+           pa   PANACEA
+           sh   SCHEME
+           sx   SX
+           ul   ULTRA
+
+    3) To facilitate the selection of files to include in your project
+       file, you will find for each PACT package a file called
+       source.<package>.  This file lists all of the source files needed
+       to build that package.  The possible exception is that packages
+       which build executables and libraries may be missing the file
+       which contains the main routine.  You may have to do some
+       experimentation to get your particular project right.
+
+       In order to build ULTRA, for example, your project file will
+       need to include the files listed in source.ultra, source.sx,
+       source.scheme, source.panacea, source.pgs, source.ppc,
+       source.pdb, source.pml, and source.score.
+
+       NOTE: In order to go from building ULTRA to building PDBView,
+       remove the files listed in source.ultra and add the file
+       sxmain.c.  (This is really just the same as building SX.)  You
+       should also replace the file ULTRA.proj.RSRC with PDBView.proj.RSRC.
+
+    4) To build PDB first build the stand alone program detect from the
+       single source file, detect.c (and the standard C library). Run
+       detect and paste its output into a file called pdform.h. Then
+       build the PDB library just as the other PACT libraries are
+       constructed.
+
+    5) Depending on your compiler, you may have to figure out how to
+       distribute the files in segments within the projects.  Each
+       segment must be smaller than 32K bytes.  Libraries must also
+       obey this restriction.  As far as I know, Think C is the only
+       compiler which has this restriction.
+

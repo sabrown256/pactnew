@@ -1,0 +1,9 @@
+--job--- 1:/bin/sh:.:(rm -f a.out1;ls xmake.f.1 fubar > a.out1)
+--job--- 2:/bin/sh:.:(rm -f a.out2;ls xmake.f.1 fubar 1> a.out2)
+--job--- 3:/bin/sh:.:(rm -f a.out3;echo a b > a.out3)
+--job--- 4:/bin/sh:.:(rm -f a.out4;echo a b 1> a.out4)
+--job--- 5:/bin/sh:.:(rm -f a.out5;ls xmake.f.1 fubar >> a.out5)
+--job--- 6:/bin/sh:.:(rm -f a.out6;ls xmake.f.1 fubar 1>> a.out6)
+--job--- 7:/bin/sh:.:(rm -f a.out7;echo a b >> a.out7)
+--job--- 8:/bin/sh:.:(rm -f a.out8;echo a b 1>> a.out8)
+--exit--

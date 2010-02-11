@@ -1,0 +1,166 @@
+#!/bin/csh -f
+#
+# SMP - test SMP facilities in SCORE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+
+   NoteD $LogF ""
+   NoteD $LogF "                    SCORE Parallel Test ........."
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE smp
+   set TStatus = $status
+   flog $LogF popd
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($TStatus != 0) then
+      NoteD $LogF ""
+      cat $LogF
+      NoteD $LogF "                         ERROR Building Parallel Tests"
+      NoteD $LogF "                    SCORE Parallel Test ......... FAILED ($ETime)"
+      set Err = 1
+   else
+      if ($?IBM_BGP == 1) then
+         set NThrds = (1 2)
+      else
+         flog $Log ( grep THREADING $IncDir/scconfig.h | grep openmp )
+         if ($status == 0) then
+            set NThrds = ""
+            @ nc = `ncpu`
+            @ ic = 1
+            while (($ic <= $nc) && ($ic < 16))
+               set NThrds = ( $NThrds $ic )
+               @ ic = 2 * $ic
+            end          
+         else
+            set NThrds = (1 2 8 16)
+         endif
+      endif
+      set lerr   = 0
+
+      if ("$CFE" != "") then
+         setenv CFE   "$CFE -v"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# THREAD - test thread execution
+
+      foreach arg (" " "-m 100")
+         NoteD $LogF ""
+
+         switch ("$arg")
+            case "-m*" :
+              NoteD $LogF "                       Parallel Memory Test"
+              breaksw
+            default :
+              NoteD $LogF "                       Simple Parallel Test"
+              breaksw
+         endsw
+
+         NoteD $LogF "                          Mode    # Threads ($NThrds)"
+
+         foreach mode ("  " "-t" "-p")
+            set LUTime = `$TIMER -r`
+
+            switch ($mode)
+               case "-p" :
+                 set Name = "pool"
+                 breaksw
+               case "-t" :
+                 set Name = "new "
+                 breaksw
+               default :
+                 set Name = "low "
+                 breaksw
+            endsw
+
+            NoteD $LogF -n "                          $Name      "
+
+            foreach n ($NThrds)
+               flog $LogF $CFE $BinDir/scthrt $arg -n $n $mode -d 1 -s
+               set xstatus = $status
+
+               if ($xstatus == 123) then
+                  NoteD $LogF -n "*"
+                  Note $LogF ""
+               else if ($xstatus != 0) then
+                  NoteD $LogF -n "x"
+                  set lerr = 1
+                  Note $LogF ""
+               else
+                  NoteD $LogF -n "."
+                  Note $LogF ""
+               endif
+            end
+
+            set LETime = `$TIMER -b $LUTime`
+            NoteD $LogF "   ($LETime)"
+         end
+      end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LOCK - test thread locking
+
+      NoteD $LogF ""
+      NoteD $LogF "                       Thread Lock Test"
+
+      NoteD $LogF "                          # Items   # Threads ($NThrds)"
+
+      foreach mode (10 100 1000)
+         set LUTime = `$TIMER -r`
+
+         NoteD $LogF -n "                          "
+         echo $mode | awk '{printf("%-4s      ", $1);}'
+
+         foreach n ($NThrds)
+            flog $LogF $CFE $BinDir/sctlts -nd $mode -nt $n
+            set xstatus = $status
+
+            if ($xstatus == 123) then
+               NoteD $LogF -n "*"
+               Note $LogF ""
+            else if ($xstatus != 0) then
+               NoteD $LogF -n "x"
+               set lerr = 1
+               Note $LogF ""
+            else
+               NoteD $LogF -n "."
+               Note $LogF ""
+            endif
+         end
+
+         set LETime   = `$TIMER -b $LUTime`
+         NoteD $LogF "   ($LETime)"
+      end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($lerr != 0) then
+         NoteD $LogF ""
+         NoteD $LogF "                    SCORE Parallel Test ......... FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $LogF ""
+         NoteD $LogF "                    SCORE Parallel Test ......... PASSED ($ETime)"
+      endif
+   endif
+
+exit($Err)
+

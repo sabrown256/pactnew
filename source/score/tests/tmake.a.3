@@ -1,0 +1,15 @@
+#
+# test macro expansion in explicit rules
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+a.c :
+	@touch a.c
+
+fooa.c : a.c
+	@echo "Expect: |fooa.c| |fooa| |a.c|"
+	@echo "        |$@| |$*| |$<|"
+	@rm a.c
+

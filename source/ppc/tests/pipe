@@ -1,0 +1,82 @@
+#!/bin/csh -f
+#
+# PIPE - PPC pipe tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PIPE TEST
+
+#--------------------------------------------------------------------------
+
+# Pipe Test
+
+      NoteD $Log ""
+      NoteD $Log "                    PPC Pipe Test .................. "
+
+      set FAIL  = NO
+      set UTime = `$TIMER -r`
+      flog $Log rm -f pcexec.refi pcexec.refp
+
+      NoteD $Log -n "                       polling ............. "
+      set BTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         $CFE $PCEXEC -c 30 -i -p $TEST > pcexec.refp
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $PCEXEC -c 30 -i -p $TEST     |& \
+         grep "ERROR SUMMARY:"                             |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $BTime`
+      if ($xstatus == 0) then
+         NoteD $Log "ok ($ETime)"
+      else
+         NoteD $Log "ng ($xstatus/$ETime)"
+         set FAIL  = "YES"
+      endif
+
+      NoteD $Log -n "                       interrupt ........... "
+      set BTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         $CFE $PCEXEC -c 30 -p $TEST > pcexec.refi
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $PCEXEC -c 30 -p $TEST        |& \
+         grep "ERROR SUMMARY:"                             |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $BTime`
+      if ($xstatus == 0) then
+         NoteD $Log "ok ($ETime)"
+      else
+         NoteD $Log "ng ($xstatus/$ETime)"
+         set FAIL  = "YES"
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($FAIL == "YES") then
+         NoteD $Log "                    PPC Pipe Test .................. FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $Log "                    PPC Pipe Test .................. PASSED ($ETime)"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

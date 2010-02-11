@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# SVD - PML SVD tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                                  PML SVD TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PML SVD Test ........... "
+
+   set FAIL = "NO"
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE svdsolv
+   set TStatus = $status
+   flog $Log popd
+
+   set UTime = `$TIMER -r`
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PML SVD Test Program"
+      set xstatus = $TStatus
+   else
+      if ("$Valgrind" == "") then
+         flog $LogF $CFE $BinDir/mlsvdt
+         set xstatus = $status
+      else
+         flog $Log $Valgrind $BinDir/mlsvdt
+         set xstatus = $status
+      endif
+      if ($xstatus != 0) then
+         NoteD $Log ""
+         NoteD $Log "                         Error in SVD Test Program"
+      endif
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "                    PML SVD Test ........... FAILED ($ETime)"
+      @ Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

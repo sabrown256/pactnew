@@ -1,0 +1,370 @@
+#!/bin/csh -f
+#
+# LOCATE-MPI - find the directory contains mpi.h
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+source $ldir/csh-subroutines
+HAVE_SUBROUTINES
+
+set ok      = FALSE
+set HW      = ""
+set SW      = ""
+set Comp    = ""
+set Verbose = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: locate-mpi [-h] [-v] <sw> <hw> <compiler>"
+           echo "   h   this help message"
+           echo "   v   run in verbose mode"
+           echo "   <sw>        the MPI software (e.g. openmpi)"
+           echo "   <hw>        the DP hardware (e.g. ib)"
+           echo "   <compiler>  the compiler (e.g. gnu)"
+           echo ""
+           exit(1)
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      default:
+           if ("$SW" == "") then
+              set SW = $1
+           else if ("$HW" == "") then
+              set HW = $1
+           else if ("$Comp" == "") then
+              set Comp = $1
+           endif
+   endsw
+   shift
+end
+
+setenv HAVE_OPENMPI FALSE
+unsetenv MPIBin
+unsetenv MPILib
+unsetenv IncMPI
+unsetenv LibMPI
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DATABASE - if a database exists try to find an implementation
+#          - accept the first match
+#          - database consists of one or more stanzas
+#          - lines beginning in '#' are comments
+#          - blank lines are ignored
+#          -
+#          -   <stanza>     := Group '{' <spec> <link-line> '}'
+#          -   <spec>       := <sw-line> | <hw-line> | <cmp-line> |
+#          -                   <root-line> | <dir-lines>
+#          -   <sw-line>    := 'SW' '=' <software implementation/vendor>
+#          -   <hw-line>    := 'HW' '=' <switch hardware>
+#          -   <cmp-line>   := 'Compiler' '=' <compiler> (defaults to 'any')
+#          -   <link-line>  := 'Link' '=' [<archive> | <so>]+
+#          -   <root-line>  := 'Root' '=' <path to bin lib and include directories>
+#          -   <dir-lines>  := <bin-line> <lib-line> <inc-line>
+#          -   <bin-line>   := 'Bin' '=' <path to MPI frontend - such as mpirun>
+#          -   <lib-line>   := 'Lib' '=' <path to MPI libraries - such as libmpi.a>
+#          -   <inc-line>   := 'Inc' '=' <path to MPI headers - particularly mpi.h>
+#          -   <archive>    := use 'foo' for libfoo.a
+#          -   <so>         := use 'foo' for libfoo.so
+#
+
+if (-f local/mpi-db) then
+   set noglob
+
+   @ nl = `wc -l local/mpi-db | awk '{print $1}'`
+   @ il = 0
+
+   call RESET_STATE()
+
+   while ($il < $nl)
+      @ il = $il + 1
+      set line = ( `head -n $il local/mpi-db | tail -n 1` )
+
+      if (("$line" =~ \#*) || ("$line" == "")) continue
+
+      if ("$line" == "}") then
+
+         set match = TRUE
+
+# check for compiler mismatch
+         if (("$Comp" != $lcmp) && ("$lcmp" != any)) then
+            set match = FALSE
+         endif
+
+# check for implementation or HW mismatch
+         if ((($limp != $SW) && ("$SW" != any)) || (($lhw != $HW) && ("$HW" != any))) then
+            set match = FALSE
+         endif
+
+# check for imcomplete specifications
+         if (("$lbin" == "") || ("$llib" == "")  || ("$linc" == "")  || ("$link" == "")) then
+            set match = FALSE
+         endif
+
+         if ($match == TRUE) then
+            if ($Verbose == TRUE) then
+               echo "Match: $SW $HW $Comp"
+            endif
+            call TRY($lbin, end, $llib, end, $linc, end, $link)
+            if ($ok == TRUE) then
+               if ($Verbose == TRUE) then
+                  echo "Match: found"
+                  echo "   $linc"
+                  echo "   $llib"
+                  echo "   $lbin"
+                  echo "   $link"
+               endif
+               break
+            else
+               if ($Verbose == TRUE) then
+                  echo "Match: not found"
+                  echo "   $linc"
+                  echo "   $llib"
+                  echo "   $lbin"
+                  echo "   $link"
+               endif
+            endif
+         endif
+         call RESET_STATE()
+
+      else
+         switch ($line[1])
+            case SW:
+                 set limp = $line[3]
+                 breaksw
+            case Compiler:
+                 set lcmp = $line[3]
+                 breaksw
+            case HW:
+                 set lhw = $line[3]
+                 breaksw
+            case Bin:
+                 set lbin = ( $line[3-] )
+                 breaksw
+            case Lib:
+                 set llib = ( $line[3-] )
+                 breaksw
+            case Inc:
+                 set linc = ( $line[3-] )
+                 breaksw
+            case Root:
+                 set lbin = ""
+                 set llib = ""
+                 set linc = ""
+                 foreach i ( $line[3-] )
+                    set lbin = ( $lbin $line[3]/bin )
+                    set llib = ( $llib $line[3]/lib )
+                    set linc = ( $linc $line[3]/include )
+                 end
+                 breaksw
+            case Link:
+                 set link = ( $line[3-] )
+                 breaksw
+            case Group:
+                 call RESET_STATE()
+                 breaksw
+         endsw
+      endif
+   end
+   unset noglob
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GUESS - try a guess because we have no database
+
+else
+   set lbin = /usr/bin
+   set llib = /usr/lib
+   set linc = $RootInc
+   set link = mpi
+   call TRY($lbin, end, $llib, end, $linc, end, $link)
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - set the ultimate environment variables and prepare to export
+
+if ($ok == TRUE) then
+   setenv MPIBin "$lbin"
+   setenv MPILib "$llib"
+
+   set tinc = ""
+   foreach i ( $linc )
+      set tinc = ( $tinc -I$i )
+   end
+   setenv IncMPI "$tinc"
+
+   set libs = ""
+   foreach i ( $link )
+      set libs = ( $libs -l$i )
+   end   
+   setenv LibMPI "$libs"
+
+endif
+
+if ($SW == openmpi) then
+   setenv HAVE_OPENMPI TRUE
+else
+   setenv HAVE_OPENMPI FALSE
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXPORT - export the results
+
+if ($?MPIBin == 1) then
+   foreach i ( $MPILib )
+      setenv RPATH `features/rpath -a $i -o echo`
+   end
+
+   SetParent HAVE_OPENMPI
+   SetParent MPIBin
+   SetParent MPILib
+   SetParent IncMPI
+   SetParent LibMPI
+   SetParent RPATH
+endif
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TRY - see if the specifications for bin, lib, include, and load libraries
+#     - make any sense at all
+#     - set ok to TRUE if so and FALSE if not
+
+TRY:
+
+   set larg = ( $args_ )
+
+# get the bin list
+   set tbin = ""
+   while ($#larg > 0)
+      set t = $larg[1]
+      shift larg
+      if ($t == end) then
+         break
+      else
+         set tbin = ( $tbin $t )
+      endif
+   end
+
+# get the lib list
+   set tlib = ""
+   while ($#larg > 0)
+      set t = $larg[1]
+      shift larg
+      if ($t == end) then
+         break
+      else
+         set tlib = ( $tlib $t )
+      endif
+   end
+
+# get the inc list
+   set tinc = ""
+   while ($#larg > 0)
+      set t = $larg[1]
+      shift larg
+      if ($t == end) then
+         break
+      else
+         set tinc = ( $tinc $t )
+      endif
+   end
+
+   set tlink = ( $larg )
+
+   set ok = FALSE
+
+   @ i = 0
+
+# test for the bin directory
+   foreach e ( $tbin )
+      if (-d $e) then
+         @ i = $i + 1
+      endif
+   end
+
+# test for the lib directory
+   foreach e ( $tlib )
+      if (-d $e) then
+         @ i = $i + 1
+      endif
+   end
+
+# test for the include directory
+   foreach e ( $tinc )
+      if (-d $e) then
+         @ i = $i + 1
+
+# test that mpi.h exists in the include directory
+         if (-f $e/mpi.h) then
+            @ i = $i + 1
+         endif
+      endif
+   end
+
+#   @ n = $#tbin + $#tlib + ( 2 * $#tinc )
+   @ n = $#tbin + $#tlib + $#tinc + 1
+
+# if everything is ok look for the load libraries
+   if ($i == $n) then
+      set ok = TRUE
+      foreach i ($tlink)
+         if ("$i" =~ *mpi*) then
+            set found = FALSE
+            foreach e ( $tlib )
+               if ((-f $e/lib$i.a) || (-f $e/lib$i.so)) then
+                  set found = TRUE
+                  break
+               endif
+            end
+            if ($found == FALSE) then
+               set ok = FALSE
+               break
+            endif
+         endif
+      end
+   endif
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# RESET_STATE - (re)initialize the state variables
+
+RESET_STATE:
+
+   set lbin = ""
+   set llib = ""
+   set linc = ""
+   set link = ""
+   set limp = ""
+   set lhw  = ""
+   set lcmp = any
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

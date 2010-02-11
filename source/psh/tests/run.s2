@@ -1,0 +1,22 @@
+#
+# RUN.S2 - check for correct conditional action
+#
+
+Cmd = foo
+
+Env var0  = val
+Env var1  = (1 == 1) ? val
+Env var2  = (1 == 0) ? val
+Env var3  = (1 == 1) ? a : b
+Env var4  = (1 == 0) ? a : b
+Env var5  = (1 == 1) ? -noop- : val
+Env var6  = (1 == 0) ? -noop- : val
+Env var7  = (1 == 1) ? val : -noop-
+Env var8  = (1 == 0) ? val : -noop-
+Env var9  = (1 == 1) ? val : -die-
+Env var10 = (1 == 0) ? val : -die-
+Env var11 = (1 == 1) ? val : -warn-
+Env var12 = (1 == 0) ? val : -warn-
+Env var13 = (1 == 1) ? val : -unsetenv-
+Env var14 = (1 == 0) ? val : -unsetenv-
+

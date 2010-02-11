@@ -1,0 +1,140 @@
+#!/bin/csh -f
+#>
+#> CODE-DATE - turn the current date into a nice version number for codes
+#>
+#> Usage:  code-date [-h] [-d] [-u] [-f mmddyy|mdy ]
+#>
+#> Options:
+#>    -h         Help package 
+#>
+#>    -d         Use dash (-) for date separator.       Default (.)
+#>    -u         Use underscore (_) for date separator. Default (.)
+#>
+#>    -f mmddyy  Select the order of the mm-month, dd-day and
+#>    -f mdy     yy-year. Default mmddyy (mdy).
+#>
+#>
+# We would do this on a system with "real" up to date software
+#
+#    /bin/date +%m.%d.%y | sed 's/^0//' | sed 's/\.0/\./'
+#
+# On rotten old crufty systems we have to do this
+#
+# Modification History:
+#	01/12/2000	Art Rodrigues	Fixed Y2K glitch.
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Base         = $cwd
+set HelpCode     = $Base/$0
+
+set help  = "FALSE"
+
+set Separ = "."
+set Format = "mmddyy"
+
+while ($#argv > 0)
+   switch ($argv[1])
+      case -h:
+               set help = "TRUE"
+               breaksw
+      case -d:
+               set Separ = "-"
+               breaksw
+      case -u:
+               set Separ = "_"
+               breaksw
+      case -f:
+               set Format = $argv[2]
+               shift
+               breaksw
+      default:
+               set help = "TRUE"
+   endsw
+   shift
+end
+
+
+if ($help == "TRUE") then
+   goto Help
+endif
+
+
+set Raw = `date`
+set Month = $Raw[2]
+set Day = $Raw[3]
+if ($#Raw == 5) then
+   set Year = `echo $Raw[5] | awk '{print $1 - 2000}'`
+else
+   set Year = `echo $Raw[6] | awk '{print $1 - 2000}'`
+endif
+
+if ($Year < 10) then
+   set Year = `echo "0"$Year`
+endif
+
+switch ($Month)
+   case "Jan" :
+        set Month = 1
+        breaksw
+   case "Feb" :
+        set Month = 2
+        breaksw
+   case "Mar" :
+        set Month = 3
+        breaksw
+   case "Apr" :
+        set Month = 4
+        breaksw
+   case "May" :
+        set Month = 5
+        breaksw
+   case "Jun" :
+        set Month = 6
+        breaksw
+   case "Jul" :
+        set Month = 7
+        breaksw
+   case "Aug" :
+        set Month = 8
+        breaksw
+   case "Sep" :
+        set Month = 9
+        breaksw
+   case "Oct" :
+        set Month = 10
+        breaksw
+   case "Nov" :
+        set Month = 11
+        breaksw
+   case "Dec" :
+        set Month = 12
+        breaksw
+endsw
+
+if ($Format == "mmddyy" || $Format == "mdy") then
+   echo "$Month$Separ$Day$Separ$Year"
+else if ($Format == "yymmdd" || $Format == "ymd") then 
+   echo "$Year$Separ$Month$Separ$Day"
+else if ($Format == "yyddmm" || $Format == "ydm") then
+   echo "$Year$Separ$Day$Separ$Month"
+else if ($Format == "mmyydd" || $Format == "myd") then
+   echo "$Month$Separ$Year$Separ$Day"
+else if ($Format == "ddmmyy" || $Format == "dmy") then
+   echo "$Day$Separ$Month$Separ$Year"
+else if ($Format == "ddyymm" || $Format == "dym") then
+   echo "$Day$Separ$Year$Separ$Month"
+else
+   goto Help
+endif
+
+exit($status)
+
+
+Help:
+   awk '($1 == "#>") {print}' $HelpCode      #Print Usage:
+   exit(1)

@@ -1,0 +1,150 @@
+#!/bin/csh -f
+#
+# ENVF - write out environment information
+#      - write versions for CSH, SH, and dotkit families
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    set lnotice = $1
+
+    Separator $Log
+    if ($lnotice == TRUE) then
+       NoteD $Log "   Environment setup files - env-pact.csh, env-pact.sh, and env-pact.dk"
+       Note $Log " "
+    else
+       Note $Log "   Environment setup files - env-pact.csh, env-pact.sh, and env-pact.dk"
+       Note $Log " "
+    endif
+
+    set tmpF = $SEFile.tmp
+    $RM $tmpF
+    touch $tmpF
+    Note $tmpF "setenv SYS_TYPE $SYS_TYPE"
+    Note $tmpF "setenv SYS_SITE $SYS_SITE"
+    Note $tmpF "setenv DAS_ROOT $DAS_ROOT"
+    Note $tmpF "setenv DAI_ROOT $DAI_ROOT"
+
+# make a temporary approximation to EnvCsh
+    cat $SEFile | \
+    awk '$1 != "PATH" {print "setenv " $0}' >> $tmpF
+
+# use the C Shell to expand and print unique environment variable settings
+# in Bourne Shell syntax
+    /bin/csh -fc '(source clearenv ; source '$tmpF' ; env)' |&   \
+    awk '{printf("export %s\"\n", $0);}'               |    \
+    sed 's/=/="/' >&! $EnvSh
+
+# reprocess to get C Shell settings
+    cat $EnvSh | sed 's/export/setenv/' | sed 's/=/ /' >&! $EnvCsh
+
+# the dotkit representation is the same as the C Shell at this point
+    cp $EnvCsh $EnvDk
+    $RM $tmpF
+    unset tmpF
+
+# do special handling for PATH and RPATH
+    flog $Log set EPath = ""
+    set length = `wc -l $SEFile`
+    @ nl = $length[1]
+    @ il = 1
+    while ($il <= $nl)
+       set ln = `head -n $il $SEFile | tail -n 1`
+       set var = $ln[1]
+       set val = "$ln[2-]"
+
+       if ("$var" == PATH) then
+          set tPath = `echo "$val" | sed 's|\${PATH}|'$EPath'|g'`
+          set EPath = `echo "$tPath" | sed 's|\$PATH|'$EPath'|g'`
+       endif
+       @ il = $il + 1
+    end
+
+    Note $EnvCsh ""
+    Note $EnvSh ""
+    Note $EnvDk ""
+
+# emit MANPATH settings
+    Note $EnvCsh 'if ($?MANPATH == 1) then'
+    Note $EnvCsh '   setenv MANPATH '$RootDir'/man:$MANPATH'
+    Note $EnvCsh 'else'
+    Note $EnvCsh '   setenv MANPATH '$RootDir'/man:'
+    Note $EnvCsh 'endif'
+    Note $EnvCsh ""
+
+    Note $EnvSh 'if [ "$MANPATH" != "" ]; then'
+    Note $EnvSh "   export MANPATH=$RootDir/man"':$MANPATH'
+    Note $EnvSh "else"
+    Note $EnvSh "   export MANPATH=$RootDir/man"
+    Note $EnvSh "fi"
+    Note $EnvSh ""
+
+    Note $EnvDk 'dk_alter MANPATH '$RootDir'/man'
+    Note $EnvDk ""
+
+    if ($?HavePython) then
+       if ($HavePython == TRUE) then
+          set lPython = $LibDir/python$PyVers
+          if ($?PYTHONPATH) then
+             if (`expr "$PYTHONPATH" : '.*'$lPython'.*'` == 0) then
+                setenv PYTHONPATH ${lPython}:$PYTHONPATH
+             endif
+          else
+             setenv PYTHONPATH ${lPython}
+          endif
+          unset lPython
+          Note $EnvCsh "setenv PYTHONPATH $PYTHONPATH"
+          Note $EnvDk  "dk_setenv PYTHONPATH $PYTHONPATH"
+          Note $EnvSh  "export PYTHONPATH=$PYTHONPATH"
+       endif
+    endif
+
+# emit PATH settings
+    if ("$EPath" != "") then
+       foreach dir (`echo $EPath | sed 's/:/ /g'`)
+          Note $EnvDk  "dk_alter PATH $dir"
+       end
+       set EPath = `echo "$EPath"':$PATH' | sed 's/::/:/g'`
+       Note $EnvCsh "setenv PATH    $RootDir/bin:${EPath}"
+       Note $EnvSh  "export PATH=$RootDir/bin:${EPath}"
+    else
+       Note $EnvCsh 'setenv PATH    '$RootDir'/bin:$PATH'
+       Note $EnvSh 'export PATH='$RootDir'/bin:$PATH'
+       Note $EnvDk 'dk_alter  PATH    '$RootDir'/bin'
+    endif
+
+    Note $EnvCsh "setenv SCHEME  $RootDir/scheme"
+    Note $EnvCsh "setenv ULTRA   $RootDir/scheme"
+    Note $EnvSh "export SCHEME=$RootDir/scheme"
+    Note $EnvSh "export ULTRA=$RootDir/scheme"
+    Note $EnvDk "dk_setenv SCHEME  $RootDir/scheme"
+    Note $EnvDk "dk_setenv ULTRA   $RootDir/scheme"
+
+    flog $Log cat $EnvCsh
+    flog $Log cat $EnvSh
+    flog $Log cat $EnvDk
+
+# source this now before trying to compile smake in WriteMAKEM
+    Note $Log "Sourcing $EnvCsh"
+    source $EnvCsh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

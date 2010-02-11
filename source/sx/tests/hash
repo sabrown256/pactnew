@@ -1,0 +1,68 @@
+#!/bin/csh -f
+#
+# HASH - SX HASH test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           HASH TEST
+
+#--------------------------------------------------------------------------
+
+   set sys = `uname`
+
+   if (("$sys[1]" != "AIX") && ("$LARGE_FILES" == ""))  then
+      NoteD $Log ""
+      NoteD $Log -n "                    SX HASH Test ................. "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log ($CFE $SX -l $RootDir/sx/tests/sxhash.scm > sxhash.res.tmp)
+
+         cat sxhash.res.tmp          | \
+         sed -e '/diskaddr =/d'        \
+             -e '/size =/d'            \
+             -e '/alignment =/d'       \
+             -e '/member_offs =/d'     \
+             -e '/cast_offs =/d'       \
+             -e '/number =/d'          \
+             -e '/bpi =/d'             \
+             -e '/order/d'             \
+             -e '/format/d'            \
+             -e 's/\(\"haelem \* \*\"\).* 5 512/\(\"haelem \* \*\"\) d 5 512/g'   \
+             -e 's/long_long/long/g'   \
+             -e 's/#([^A-Za-z)]*)//g' > sxhash.res
+
+         flog $Log (diff -b sxhash.res $RootDir/sx/tests/ref/sxhash > sxhash.res.diff)
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxhash.scm |& \
+         grep "ERROR SUMMARY:"                                                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f sxhash.res.tmp sxhash.res sxhash.res.diff
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

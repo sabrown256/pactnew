@@ -1,0 +1,191 @@
+#!/bin/csh -f
+#
+# MPI-INFO - report inferred information about the MPI most likely to
+#          - relevant to the given executable
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Exe    = ""
+set Tgt    = "bin"
+set HostOS = `uname -s`
+
+while ($#argv > 0)
+   switch ($1)
+      case -b:
+           set Tgt = "bin"
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: mpi-info [-b] [-h] [-l] [-x] <exe>"
+           echo "  b  return the MPI front end needed"
+           echo "  h  this help message"
+           echo "  l  return the MPI library used"
+           echo "  x  return yes iff the executable invokes MPI"
+           echo ""
+           exit(1)
+      case -l:
+           set Tgt = "lib"
+           breaksw
+      case -x:
+           set Tgt = "exe"
+           breaksw
+      default:
+           set Exe = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Exe" == "") then
+   echo ""
+   echo "No executable specified - exiting"
+   echo ""
+   exit(1)
+endif
+
+if ("$Exe" !~ /*) then
+   set Exe = `which $Exe`
+endif
+
+switch ($Tgt)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BIN - return the MPI frontend code needed to run the executable
+
+case bin:
+
+     set FEL = ""
+
+     set IsMPI = `mpi-info -x $Exe`
+     if ($IsMPI == yes) then
+        set RPATH = ( `which rpath` )
+        set IsCROSS = `cross-info -x $RPATH`
+        if ("$IsCROSS" != "") then
+           set RPATH = echo
+        else if (!(-x "$RPATH")) then
+           set RPATH = echo
+        endif
+
+# search specifically for MPI related directories
+# NOTE: this works for many derivatives of MPICH
+        if ($HostOS == SunOS) then
+           set Lst = ( `strings -a $Exe |& grep '/lib' | grep '^/' | grep -i mpi | grep -v intel/compiler | grep -v /home | grep -v /src | sed 's/:/ /g'` )
+        else
+           set Lst = ( `strings -a $Exe |& grep -e '/lib' | grep -e '^/' | grep -i mpi | grep -v intel/compiler | grep -v /home | grep -v /src | sed 's/:/ /g'` )
+        endif
+
+        if ("$Lst" != "") then
+           set Tgts = ( srun dmpirun mpirun prun run )
+           set Dir  = ( `echo "$Lst" | awk '{for (i = 1; i <= NF; i++) {if ($i ~ /mpi/ || $i ~ /MPI/) {print $i};};}'` )
+
+# search directories generally
+        else
+           set Tgts = ( srun dmpirun mpirun prun run poe )
+           if ($HostOS == SunOS) then
+              set tLst = ( `strings -a $Exe |& grep '/lib' | grep '^/' | grep -v intel/compiler | grep -v /home | grep -v -e '\.c$' | sed 's/:/ /g'` )
+           else
+              set tLst = ( `strings -a $Exe |& grep -e '/lib' | grep -e '^/' | grep -v intel/compiler | grep -v /home | grep -v -e '\.c$' | sed 's/:/ /g'` )
+           endif
+
+           set Dir = ""
+           foreach d ($tLst)
+              if (-d $d) then
+                 echo "$Dir" | grep -w $d >& /dev/null
+                 if ($status == 1) then
+                    set Dir = ( $Dir $d )
+                 endif
+              endif
+           end
+
+        endif
+
+# now search the Dirs for the frontend
+        foreach d ($Dir /usr/local/bin)
+           if ("$FEL" != "") break
+           
+           while (("$d" != "") && !(-d $d/bin))
+              set d = $d:h
+           end
+           set Bin = $d/bin
+           foreach f ($Tgts)
+              set fexe = `$RPATH $Bin/$f`
+              if (-x $fexe) then
+                 echo "$FEL" | grep -w $fexe >& /dev/null
+                 if ($status == 1) then
+                    set FEL = ( $FEL $fexe )
+                    break
+                 endif
+              endif
+           end
+        end
+     endif
+
+     echo "$FEL"
+     breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIB - return the library supplying MPI_Init
+
+case lib:
+     set Lib = ""
+     set IsMPI = `mpi-info -x $Exe`
+     if ($IsMPI == yes) then
+        if ($HostOS == AIX) then
+           dump -X32_64 -H $Exe |& egrep -e 'libmpi_*r*.a' >& /dev/null
+           if ($status == 0) then
+              set Lib = /usr/lpp/ppe.poe/lib
+           endif
+
+        else
+           set Libs = ( `ldd $Exe |& sed 's/^.*=>//' | sed 's/(.*)//'` )
+           foreach l ( $Libs )
+              nm $l |& grep -i mpi_init >& /dev/null
+              if ($status == 0) then
+                 set Lib = $l
+              endif
+           end
+           if ("$Lib" == "") then
+              set Bin = `mpi-info -b $Exe`
+              set Lib = $Bin:h
+              set Lib = $Lib:h/lib
+           endif
+        endif
+     endif
+
+     echo "$Lib"
+     breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXE - return the yes iff the executable has MPI_Init linked in
+
+case exe:
+     if ($HostOS == AIX) then
+        set havempi = `dump -X32_64 -H $Exe |& egrep -e 'libmpi_*r*.a'`
+     else
+        set havempi = `nm $Exe |& grep -i mpi_init`
+     endif
+
+     if ("$havempi" == "") then
+        echo "no"
+     else
+        echo "yes"
+     endif
+     breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+exit($status)
+

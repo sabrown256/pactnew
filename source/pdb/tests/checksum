@@ -1,0 +1,36 @@
+#!/bin/csh -f
+#
+# CHECKSUM - PDB checksum test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set tst = $1
+
+NoteD $LogF ""
+NoteD $LogF "                    PDB Checksum Test  ................. "
+Note $LogF ""
+
+set UTime = `$TIMER -r`
+if ("$Valgrind" == "") then
+   ftee $LogF $CFE $BinDir/pdcsts -v $tst
+   set xstatus = $status
+else
+   flog $LogF $Valgrind $BinDir/pdcsts -v $tst
+   set xstatus = $status
+endif
+set ETime = `$TIMER -b $UTime`
+
+if ($xstatus != 0) then
+   NoteD $LogF "                    PDB Checksum Test  ................. FAILED ($ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    PDB Checksum Test  ................. PASSED ($ETime)"
+endif
+
+exit($Err)

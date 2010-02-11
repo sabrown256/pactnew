@@ -1,0 +1,48 @@
+#
+# PRE-MAKE for Global package
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include ../dev/${System}/include/pre-Make.defs
+
+TGTBin = none
+TGTLib = ${DevLib}/libmesh.a
+
+#
+# Things upon which install depends (pact install)
+#
+DepLib     = 
+InstallDep = ${TGTLib}
+BinDep     = ${TGTLib}
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags  = ${CDebug} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags  = -L${LibDir} ${LDFLAGS}
+
+#
+# Code Units
+#
+
+Hdrs = mesh.h gloin.h
+
+Objs = global.o ginit.o gmesh.o gplot.o gpp.o
+
+ArObjs = ${TGTLib}(global.o) ${TGTLib}(ginit.o) ${TGTLib}(gmesh.o) \
+	 ${TGTLib}(gplot.o) ${TGTLib}(gpp.o)
+
+${Objs} : ${Hdrs}
+${TGTLib} : ${Hdrs}
+
+install : ${InstallDep}
+	@cp *.h ${DevInc}
+
+lib :
+	rm -f ${TGTLib}
+	pact install

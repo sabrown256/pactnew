@@ -1,0 +1,30 @@
+#!/bin/csh -f
+#
+# PERDB4 - test dump command
+#        - use environment variable specification of DB
+#        - no FIFO
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db3-$1
+else
+   set db  = ./db3-socket
+endif
+
+setenv PERDB_PATH $db
+
+echo "-----------------------------------"
+perdb $opt dump: v1
+
+echo "-----------------------------------"
+perdb $opt dump: v2
+
+echo "-----------------------------------"
+perdb $opt dump:
+
+echo "-----------------------------------"
+perdb $opt quit:
+
+exit($status)

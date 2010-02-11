@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<!ELEMENT types (float*, int*)>
+
+<!ELEMENT float (ord, sz, eb, mb)>
+<!ELEMENT ord (#PCDATA)>
+<!ELEMENT sz  (#PCDATA)>
+<!ELEMENT eb  (#PCDATA)>
+<!ELEMENT mb  (#PCDATA)>
+
+<!ELEMENT int EMPTY>
+<!ATTLIST int
+   ord (normal | reverse) #REQUIRED
+   sz  (1 | 2 | 4 | 8)    #REQUIRED
+>

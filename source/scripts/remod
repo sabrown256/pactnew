@@ -1,0 +1,77 @@
+#!/bin/csh -f
+#
+# REMOD - change permissions on files you don't own
+#
+
+set PERM  = ""
+set Files = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: remod -h <perm> [<file> | <dir>]*"
+           echo ""
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           if ("$PERM" == "") then
+	       set PERM = $1
+           else
+	       set Files = ( $Files $1 )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if (("$PERM" == "") || (-e "$PERM")) then
+   echo "remod:  No permission specified - exiting"
+   exit(2)
+endif
+
+if ("$Files" == "") then
+   echo "remod:  No files specified - exiting"
+   exit(3)
+endif
+
+foreach i ($Files)
+
+# change link
+   if (-l $i) then
+      set lnkinf = ( `ls -l $i` )
+      @ iold = $#lnkinf
+      set old = $lnkinf[$iold]
+      mv $i $i.tmp
+      if ($status == 0) then
+         ln -s $old $i
+         if ($status == 0) then
+            rm -rf $i.tmp
+         endif
+      endif
+
+# change directory tree
+   else if (-d $i) then
+      mv $i $i.tmp
+      if ($status == 0) then
+         cp -r $i.tmp $i
+         if ($status == 0) then
+            rm -rf $i.tmp
+         endif
+         chmod -R $PERM $i
+      endif
+
+# change file
+   else
+      mv $i $i.tmp
+      if ($status == 0) then
+         cp $i.tmp $i
+         if ($status == 0) then
+            rm -f $i.tmp
+         endif
+         chmod $PERM $i
+      endif
+   endif
+end
+
+exit($status)

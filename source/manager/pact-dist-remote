@@ -1,0 +1,28 @@
+#!/bin/csh
+#
+# PACT-DIST-REMOTE - Get a distribution
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($#argv > 0) then
+   set Tag = "-T $1"
+else
+   set Tag = ""
+endif
+
+setenv CVSROOT /usr/gapps/pact/repository
+set path = ( $path $CVSROOT/CVSROOT )
+
+unalias cd
+umask 002
+
+cd pact/manager
+touch pact-llnl-src
+rm -f pact*-llnl-src
+./pact-dist -l $Tag
+
+exit($status)

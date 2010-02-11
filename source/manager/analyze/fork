@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# FORK - analyze platform fork/exec
+#      - Computes: HAVE_FORK_EXEC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: fork/exec"
+
+cat << EOF >! $Tmp.c
+#include <stdlib.h>
+int main(int c, char **v)
+   {int rv;
+    rv = system("date");
+    return(rv);}
+EOF
+
+setenv HAVE_FORK_EXEC FALSE
+
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+if ($status == 0) then
+   flog $ALog $CFE $Tmp
+   if ($status == 0) then
+      setenv HAVE_FORK_EXEC TRUE
+      flog $ALog $RM $Tmp.c $Tmp
+   endif
+endif
+
+if ($HAVE_FORK_EXEC == FALSE) then
+   NoteD $ALog "      no working fork/exec"
+else
+   NoteD $ALog "      has working fork/exec"
+endif
+
+SetParent HAVE_FORK_EXEC
+
+exit(0)
+

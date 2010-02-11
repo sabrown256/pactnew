@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# VSNPRINTF - check for the vsnprintf function
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: vsnprinft"
+
+set CC = ( $Cfe_CC_Exe )
+
+cat << EOF >! $Tmp.c
+#include <stdarg.h>
+int main(int c, char **v)
+   {int nc;
+    char s[10];
+    va_list ap;
+    nc = vsnprintf(s, 10, "%s", "foo");
+    return(0);}
+EOF
+
+flog $ALog $CC $Tmp.c -o $Tmp
+if ($status == 0) then
+   setenv HAVE_VSNPRINTF TRUE
+   NoteD $ALog "      has vsnprintf "
+else
+   setenv HAVE_VSNPRINTF FALSE
+   NoteD $ALog "      no vsnprintf "
+endif
+
+flog $ALog rm -f $Tmp $Tmp.c $Tmp.o
+
+# export the results
+SetParent HAVE_VSNPRINTF
+
+exit(0)
+

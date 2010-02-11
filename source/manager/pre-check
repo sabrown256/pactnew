@@ -1,0 +1,82 @@
+#!/bin/csh -f
+#
+# PRE-CHECK - verify that the current host has all the
+#           - required system software to install PACT
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ Err = 0
+
+set Which = "$cwd/pwhich"
+
+# check for required utilities
+set Requ = ""
+set Requ = ( $Requ chmod cp ln ls mkdir mv pwd rm sync touch )
+set Requ = ( $Requ awk cat expr grep sed sort tail tee tr wc )
+set Requ = ( $Requ find gzip tar )
+set Requ = ( $Requ date dirname env nm ps sleep uname )
+set Requ = ( $Requ csh make ar )
+
+set Missing = ""
+foreach i ($Requ)
+   if (!(-x `$Which $i`)) then
+      set Missing = ( $Missing $i )
+   endif
+end
+if ("$Missing" != "") then
+   echo ""
+   echo "FATAL: The following required utilities are either not installed"
+   echo "on your system or are not to be found on your PATH:"
+   echo "   $Missing"
+   @ Err = $Err + 2
+endif
+
+# check for lex/flex
+set HaveLex = FALSE
+if (-x `$Which lex`) then
+   set HaveLex = TRUE
+endif
+set HaveFlex = FALSE
+if (-x `$Which flex`) then
+   set HaveFlex = TRUE
+endif
+if (($HaveLex == FALSE) && ($HaveFlex == FALSE)) then
+   echo ""
+   echo "FATAL: You must have either lex or flex installed or on your PATH"
+   @ Err = $Err + 4
+endif
+
+# check for yacc/bison
+set HaveYacc = FALSE
+if (-x `$Which yacc`) then
+   set HaveYacc = TRUE
+endif
+set HaveBison = FALSE
+if (-x `$Which bison`) then
+   set HaveBison = TRUE
+endif
+if (($HaveYacc == FALSE) && ($HaveBison == FALSE)) then
+   echo ""
+   echo "WARNING: You must have yacc or bison installed or on your PATH in"
+   echo "order to have full PACT functionality.  PACT can be built without it"
+   echo "but you will be warned about missing capabilities during"
+   echo "configuration"
+   @ Err = $Err + 1
+endif
+
+# other tests
+if ($Err > 1) then
+   echo ""
+   echo "You must correct the FATAL problems before proceding to build PACT"
+   @ Err = $Err + 1
+endif
+
+if ($Err != 0) then
+   echo ""
+endif
+
+exit($Err)

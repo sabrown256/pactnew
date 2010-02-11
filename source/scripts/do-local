@@ -1,0 +1,873 @@
+#!/bin/csh
+#
+# DO-LOCAL - do the generic local part of the do-net process
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# print an indicator that we actually started as the VERY FIRST thing
+# so that we can distinguish between launching and not launching do-local
+if ($?lFirstEntry == 0) then
+   set lFirstEntry = FALSE
+   echo "DO-NET: Exec do-local $argv"
+endif
+
+if ($?SHARED == 0) then
+   set texe = $0
+   set tdir = $texe:h
+   set tprg = $texe:t
+   if ($1 =~ /.*) then
+      setenv SHARED $tdir
+   else
+      setenv SHARED $HOME
+   endif
+   setenv CSHSubr `echo "$SHARED/$tprg" | sed 's/do-local/do-csh-subr/' | sed 's^/\./^/^g'`
+   unset texe
+   unset tdir
+   unset tprg
+endif
+
+source $CSHSubr
+HAVE_SUBROUTINES
+
+unalias mail
+unalias cd
+unalias rm
+unalias mv
+unalias ps
+
+unset time
+
+umask 002
+
+alias vlog  '(if ($Verbose == TRUE) echo "Command: \!\!:2-$") >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias flog  'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias nlog  'echo "DO-NET: Command: \!*" ; \!*'
+
+# tag command output
+alias slog      '\!* | awk '"'"'{ print "DO-NET: " $0 }'"'"
+alias tlog      '\!\!:2-$ | awk '"'"'{ print "DO-NET: '"'"'\!\!:1'"'"' " $0 }'"'"
+
+alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
+alias Separator 'echo "--------------------------------------------------------------------------" >>& \!\!:^ ; echo "" >>& \!\!:^'
+alias Note      'echo \!\!:2-$ >>& \!\!:1'
+alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
+alias Intervene 'test -f ~/\!\!:1 && source ~/\!\!:1'
+
+# tag logging text
+alias NoteV     'if ($Verbose == TRUE) echo "DO-NET: \!\!:1-$"'
+alias NoteVT    'if ($Verbose == TRUE) echo "DO-NET:" \!\!:1 \!\!:2-$'
+alias NoteT     'echo "DO-NET:" \!\!:1 \!\!:2-$'
+alias NoteNT    'echo "DO-NET:" \!\!:1-$'
+
+Intervene help.do-local
+
+set Host    = `uname -n`
+set UHost   = `expr $Host : '\(.*\)\..*\..*'`
+if ("$UHost" == "") then
+   set UHost = $Host
+endif
+
+if ($?CVS_RSH == 0) then
+   setenv CVS_RSH   ssh
+endif
+
+setenv xstatus    0
+setenv Verbose    FALSE
+setenv Stamp      none
+setenv HostName   `uname -n`
+setenv SetupName  setup
+
+setenv RM     'rm -f'
+setenv RMDir  'rm -rf'
+setenv MV     'mv -f'
+
+set Script = $SHARED/$1:t
+shift
+
+set Phase = $1
+shift
+
+switch ($Phase)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - handle interrupts
+
+   case -interrupt:
+        setenv Dist      ""
+        setenv Repo      ""
+        setenv Tag       "none"
+
+        set Args = ( $argv )
+        while ($#argv > 0)
+           switch ($1)
+              case -dist:
+                   shift
+                   setenv Dist  $1
+                   breaksw
+              case -log:
+                   shift
+                   setenv LogDir  $1
+                   breaksw
+              case -repo:
+                   shift
+                   setenv Repo  $1
+                   shift
+                   setenv Tag   $1
+                   breaksw
+              case -host_fields:
+                   shift
+                   setenv SysID   $1
+                   shift
+                   setenv WrkDir  $1
+                   break
+                   breaksw
+              case -t:
+                   shift
+                   setenv Stamp  $1
+                   breaksw
+              case -v:
+                   setenv Verbose  TRUE
+                   breaksw
+           endsw
+           shift
+        end
+
+# fixup the working directory path variable
+        call DIRVAR()
+
+        cd $WrkDir >& /dev/null
+
+# setup the log file
+        setenv LogHost interrupt
+        call INITLOG()
+
+        set SemDir = ./interrupt.$Stamp.$HostName
+        flog $LogHost mkdir -p $SemDir
+        if ($status == 0) then
+
+           set BeginTime = `$TIMER -r`
+
+# get the list of all process ids associated with this Stamp
+           call DESCENDANTS()
+
+           Note $LogHost "The process of $Stamp do-local: $$"
+           Note $LogHost "Descendant processes to kill: $DPids"
+
+           set Args = ( $Args -pid $DPids )
+
+# the worker script gets first chance to kill off jobs
+           Note $LogHost "Script $Script pass to kill descendants"
+           echo "-interrupt $Args" >! $ArgFile
+           include $Script
+           $RM $ArgFile
+           Note $LogHost "done"
+
+# now we get to kill any descendants
+           Note $LogHost "Script do-local pass to kill descendants"
+           foreach i ($DPids)
+              if ($i != $$) then
+                 flog $LogHost /bin/kill -9 $i
+                 Note $LogHost "   killed $i"
+              endif
+           end
+           Note $LogHost "done"
+
+           flog $LogHost $RMDir $SemDir
+
+           set ElapsedTime = `$TIMER -b $BeginTime`
+
+           call FORMAT()
+
+           if ($Err == 0) then
+              NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
+              NoteD $LogHost "Succeeded on $UHost"
+              flog $LogHost setenv xstatus 0
+           else
+              NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
+              NoteD $LogHost "      Look in $LogHost on $UHost"
+              NoteD $LogHost "Failed on $UHost"
+              flog $LogHost setenv xstatus 1
+           endif
+
+# if this host didn't make the semaphore just pass and finish
+        else
+           NoteD $LogHost "   $Fill OK  (0)"
+           NoteD $LogHost "Succeeded on $UHost"
+           flog $LogHost setenv xstatus 0
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - handle setup phase
+
+   case -setup:
+        setenv Dist      ""
+        setenv Repo      ""
+        setenv Tag       "none"
+
+        set Args = ( $argv )
+        while ($#argv > 0)
+           switch ($1)
+              case -time_limit:
+                   shift
+                   @ tl = $1 / 3
+#                   setenv SC_EXEC_TIME_LIMIT $tl
+                   breaksw
+              case -dist:
+                   shift
+                   setenv Dist  $1
+                   breaksw
+              case -log:
+                   shift
+                   setenv LogDir  $1
+                   breaksw
+              case -repo:
+                   shift
+                   setenv Repo  $1
+                   shift
+                   setenv Tag   $1
+                   breaksw
+              case -host_fields:
+                   shift
+                   setenv SysID   $1
+                   shift
+                   setenv WrkDir  $1
+                   break
+                   breaksw
+              case -t:
+                   shift
+                   setenv Stamp  $1
+                   breaksw
+              case -v:
+                   setenv Verbose  TRUE
+                   breaksw
+           endsw
+           shift
+        end
+
+# fixup the working directory path variable
+        call DIRVAR()
+
+# setup the log file
+        setenv LogHost $SetupLog
+        call INITLOG()
+
+        set BeginTime = `$TIMER -r`
+        set BeginIO   = `$IOPR -q -r`
+        set BeginNFS  = `$NFSMON -q -r`
+
+        echo "-setup $Args" >! $ArgFile
+        include $Script
+        $RM $ArgFile
+
+        set ElapsedTime = `$TIMER -b $BeginTime`
+        set IOStats     = `$IOPR -q -b $BeginIO`
+        set NFSStats    = `$NFSMON -q -r -d -a $BeginNFS`
+
+        call FORMAT()
+
+        if ($Err == 0) then
+           NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
+           NoteD $LogHost "Succeeded on $UHost"
+           flog $LogHost setenv xstatus 0
+        else
+           NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
+           NoteD $LogHost "      Look in $LogHost on $UHost"
+           NoteD $LogHost "Failed on $UHost"
+           flog $LogHost setenv xstatus 1
+        endif
+
+        call STATS()
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BUILD_TEST - do the build/test phase
+
+   case -build:
+
+        set Args = ( $argv )
+        while ($#argv > 0)
+           switch ($1)
+              case -time_limit:
+                   shift
+                   @ tl = $1 / 3
+#                   setenv SC_EXEC_TIME_LIMIT $tl
+                   breaksw
+              case -host_fields:
+                   shift
+                   setenv SysID   $1
+                   shift
+                   setenv WrkDir  $1
+                   break
+                   breaksw
+              case -t:
+                   shift
+                   setenv Stamp  $1
+                   breaksw
+              case -v:
+                   setenv Verbose  TRUE
+                   breaksw
+           endsw
+           shift
+        end
+
+# fixup the working directory path variable
+        call DIRVAR()
+
+        if (-d $WrkDir) then
+           cd $WrkDir >& /dev/null
+
+# setup the log file
+           setenv LogHost auto
+           call INITLOG()
+
+           set StartTime = `date +%r\ on\ %a\ %D`
+           NoteD $LogHost "Starting build/test on $UHost ($arch) at $StartTime"
+           NoteD $LogHost " "
+
+           NoteNT "Get starting time: $TIMER -r"
+           set BeginTime = `$TIMER -r`
+	   set xstatus   = $status
+           if ($xstatus != 0) then
+              Note $LogHost "Error $TIMER -r ($xstatus)"
+           endif
+           NoteNT "Get starting NIC I/O info: $IOPR -q -r"
+           set BeginIO = `$IOPR -q -r`
+           set xstatus = $status
+           if (($xstatus != 0) && ($xstatus != 10)) then
+              Note $LogHost "Error $IOPR -q -r ($xstatus)"
+           endif
+           NoteNT "Get starting NFS stats: $NFSMON -q -r"
+           set BeginNFS = `$NFSMON -q -r`
+	   set xstatus  = $status
+           if ($xstatus != 0) then
+              Note $LogHost "Error $NFSMON -q -r ($xstatus)"
+           endif
+           NoteNT "Collected all starting info"
+
+           echo "-build $Args" >! $ArgFile
+           include $Script
+           $RM $ArgFile
+
+           NoteNT "Get ending time: $TIMER -b $BeginTime"
+           set ElapsedTime = `$TIMER -b $BeginTime`
+	   set xstatus     = $status
+           if ($xstatus != 0) then
+              Note $LogHost "Error $TIMER -b $BeginTime ($xstatus)"
+           endif
+           NoteNT "Get ending NIC I/O info: $IOPR -q -b $BeginIO"
+           set IOStats = `$IOPR -q -b $BeginIO`
+	   set xstatus = $status
+           if (($xstatus != 0) && ($xstatus != 10)) then
+              Note $LogHost "Error $IOPR -q -b $BeginIO ($xstatus)"
+           endif
+           NoteNT "Get ending NFS stats: $NFSMON -q -r -d -a $BeginNFS"
+           set NFSStats = `$NFSMON -q -r -d -a $BeginNFS`
+	   set xstatus  = $status
+           if ($xstatus != 0) then
+              Note $LogHost "Error $NFSMON -q -r -d -a $BeginNFS ($xstatus)"
+           endif
+           NoteNT "Collected all ending info"
+
+# move the setup log to the log directory
+           if (-f $SetupLog) then
+              flog $LogHost $MV $SetupLog $LogDir/$SetupName
+           endif
+
+           if ($Err == 0) then
+              NoteD $LogHost "Succeeded on $UHost ($ElapsedTime)"
+              flog $LogHost setenv xstatus 0
+           else
+              NoteD $LogHost "Failed on $UHost ($ElapsedTime)"
+              NoteD $LogHost "Look in $LogHost on $UHost"
+              flog $LogHost setenv xstatus 1
+           endif
+
+           call STATS()
+
+        else
+           setenv Err DONT_INSTALL
+           NoteD $LogHost "Succeeded on $UHost (work directory gone)"
+           flog $LogHost setenv xstatus 0
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HOSTINSTALL - do the host install phase
+
+   case -hostinstall:
+
+        set Args = ( $argv )
+        while ($#argv > 0)
+           switch ($1)
+              case -time_limit:
+                   shift
+                   @ tl = $1 / 3
+#                   setenv SC_EXEC_TIME_LIMIT $tl
+                   breaksw
+              case -host_fields:
+                   shift
+                   setenv SysID   $1
+                   shift
+                   setenv WrkDir  $1
+                   break
+                   breaksw
+              case -t:
+                   shift
+                   setenv Stamp  $1
+                   breaksw
+              case -v:
+                   setenv Verbose  TRUE
+                   breaksw
+           endsw
+           shift
+        end
+
+# fixup the working directory path variable
+        call DIRVAR()
+
+        if (-d $WrkDir) then
+           cd $WrkDir >& /dev/null
+
+# setup the log file
+           setenv LogHost hostinstall
+           call INITLOG()
+
+           set BeginTime = `$TIMER -r`
+
+           echo "-hostinstall $Args" >! $ArgFile
+           include $Script
+           $RM $ArgFile
+
+	   if (!(-e $LogHost)) then
+              setenv LogHost /dev/null
+           endif
+
+           set ElapsedTime = `$TIMER -b $BeginTime`
+
+           call FORMAT()
+
+           switch ($Err)
+
+# ok
+              case 0:
+                   NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
+                   NoteD $LogHost "Succeeded on $UHost"
+                   flog $LogHost setenv xstatus 0
+                   breaksw
+
+# failed
+              case 1:
+                   NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
+                   NoteD $LogHost "      Look in $LogHost on $UHost"
+                   NoteD $LogHost "Failed on $UHost"
+                   flog $LogHost setenv xstatus 1
+                   breaksw
+
+# no install
+              case 2:
+                   NoteD $LogHost "   $Fill NONE  ($ElapsedTime)"
+                   NoteD $LogHost "Succeeded on $UHost"
+                   flog $LogHost setenv xstatus 0
+                   breaksw
+
+# do not install
+              case 3:
+                   NoteD $LogHost "Succeeded on $UHost"
+                   flog $LogHost setenv xstatus 0
+                   breaksw
+           endsw
+           NoteVT "(STAT)" "hostinstall_$SysID ($ElapsedTime)"
+        else
+           setenv Err DONT_INSTALL
+           NoteD $LogHost "Succeeded on $UHost (work directory gone)"
+           flog $LogHost setenv xstatus 0
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NETINSTALL - do the net install phase
+
+   case -netinstall:
+        set Dist = "none"
+
+        set Args = ( $argv )
+        while ($#argv > 0)
+           switch ($1)
+              case -time_limit:
+                   shift
+                   @ tl = $1 / 3
+#                   setenv SC_EXEC_TIME_LIMIT $tl
+                   breaksw
+              case -host_fields:
+                   shift
+                   setenv SysID   $1
+                   shift
+                   setenv WrkDir  $1
+                   break
+                   breaksw
+              case -t:
+                   shift
+                   setenv Stamp  $1
+                   breaksw
+              case -v:
+                   setenv Verbose  TRUE
+                   breaksw
+           endsw
+           shift
+        end
+
+# fixup the working directory path variable
+        call DIRVAR()
+
+        cd $WrkDir >& /dev/null
+
+# setup the log file
+        setenv LogHost netinstall
+        call INITLOG()
+
+        set BeginTime = `$TIMER -r`
+
+        echo "-netinstall $Args" >! $ArgFile
+        include $Script
+        $RM $ArgFile
+
+        if (!(-e $LogHost)) then
+           setenv LogHost /dev/null
+        endif
+
+        set ElapsedTime = `$TIMER -b $BeginTime`
+
+        call FORMAT()
+
+        switch ($Err)
+           case OK:
+                NoteD $LogHost "   $Fill OK  ($ElapsedTime)"
+                NoteD $LogHost "Succeeded on $UHost"
+                flog $LogHost setenv xstatus 0
+                breaksw
+           case FAILED:
+                NoteD $LogHost "   $Fill FAILED  ($ElapsedTime)"
+                NoteD $LogHost "      Look in $LogHost on $UHost"
+                NoteD $LogHost "Failed on $UHost"
+                flog $LogHost setenv xstatus 1
+                breaksw
+           case NO_INSTALL:
+                NoteD $LogHost "   $Fill NONE  ($ElapsedTime)"
+                NoteD $LogHost "Succeeded on $UHost"
+                flog $LogHost setenv xstatus 0
+                breaksw
+           case DONT_INSTALL:
+                NoteD $LogHost "Succeeded on $UHost"
+                flog $LogHost setenv xstatus 0
+                breaksw
+        endsw
+
+        NoteVT "(STAT)" "netinstall_$SysID ($ElapsedTime)"
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# END - finish up and return the proper exit status
+
+END:
+
+   exit($xstatus)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DIRVAR - process the directory related environment variables
+
+DIRVAR:
+   if (`expr $WrkDir : '/.*'` == 0) then
+      setenv WrkDir  $SHARED/$WrkDir
+   endif
+   if (!(-d $WrkDir)) then
+      mkdir $WrkDir
+   endif
+
+# NOTE: this intermediate shell variable is necessary because the
+#       OSF1 csh won't work with an environment variable!!!!!
+   set WrkDirTmp = $WrkDir
+
+   setenv Base      $WrkDirTmp:t
+   setenv Root      $WrkDirTmp:h
+   setenv SetupLog  $Root/$UHost.$Stamp.setup
+   setenv ArgFile   $SHARED/.do-local-args.$UHost.$Stamp.$$
+
+   setenv TIMER    "$SHARED/.do-timer.$Stamp"
+   setenv NFSMON   "$SHARED/.do-nfsmon.$Stamp"
+   setenv IOPR     "$SHARED/.do-iopr.$Stamp"
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INITLOG - initialize the log file for this phase
+
+INITLOG:
+
+   set CurrUMask = `umask`
+
+   if ("$Phase" != "-setup") then
+
+# make LogHost a full path name
+      if (`expr "$LogHost" : '/.*'` < 1) then
+         setenv LogHost $cwd/$LogHost
+      endif
+
+# at this point we do not necessarily know the architecture
+# so if we have multiconfig the LogHost name may be ambiguous
+# for example the current name may be "auto" which could be
+# operated on by multiple hosts
+# add the PID to make it unique and unambiguous
+# NOTE: most local scripts will not care about this point
+# it is even probably a bad idea but some will do it anyway
+      setenv TLog    $LogHost
+      setenv LogHost $LogHost.$HostName.$$
+
+      $RM $LogHost
+      touch $LogHost
+   
+      echo "-arch $Args" >! $ArgFile
+      include $Script
+      $RM $ArgFile
+
+# now that we have LogDir we can make the full
+# log file path name unambiguously
+      flog $LogHost set tLogHost = $LogHost
+      flog $LogHost set tTLog    = $TLog
+      flog $LogHost set tTLog    = $tTLog:t
+      if (`expr "$LogDir" : '/.*'` > 0) then
+         setenv LogHost $LogDir/$tTLog
+      else
+         setenv LogHost $SHARED/$LogDir/$tTLog
+      endif
+
+      mv $tLogHost $LogHost
+
+   else
+      $RM $LogHost
+      touch $LogHost
+   endif
+
+   Note $LogHost "Base directory: $Base"
+   Note $LogHost "Root directory: $Root"
+   Note $LogHost "Argument File : $ArgFile"
+   Note $LogHost "Setup log file: $SetupLog"
+   Note $LogHost "Log directory : $LogDir"
+   Note $LogHost "Current umask : $CurrUMask"
+   
+   Note $LogHost `date`
+   Note $LogHost ""
+   Note $LogHost "User $USER on $HostName "
+   Note $LogHost ""
+   
+   Separator $LogHost
+   Note $LogHost "Logging environment for $Phase on $UHost"
+   
+   Note $LogHost ""
+   Note $LogHost "----- SET -----"
+   Note $LogHost ""
+   set | sort >>& $LogHost
+   Note $LogHost ""
+   
+   Note $LogHost ""
+   Note $LogHost "----- ENV -----"
+   Note $LogHost ""
+   env | sort >>& $LogHost
+   Note $LogHost ""
+   
+   Note $LogHost ""
+   Note $LogHost "----- ALIAS -----"
+   Note $LogHost ""
+   alias | sort >>& $LogHost
+   Note $LogHost ""
+
+   Note $LogHost ""
+   Note $LogHost "----- LIMIT -----"
+   Note $LogHost ""
+   limit | sort >>& $LogHost
+   Note $LogHost ""
+
+   Note $LogHost ""
+   Note $LogHost "----- SYSTEM -----"
+   Note $LogHost ""
+# uptime gives errors on some systems
+#   flog $LogHost uptime
+# this works everywhere
+   w | head -n 1 >>& $LogHost
+
+   set TmpFile = ~/.do-local-tmp-$UHost-$$
+   $RM $TmpFile
+
+   which ls-jobs >& $TmpFile
+   set LSJobs = `cat $TmpFile`
+   $RM $TmpFile
+
+   if (-x "$LSJobs") then
+      flog $LogHost $LSJobs -a -t 20 -s 4
+   endif
+   Note $LogHost ""
+
+   Separator $LogHost
+   Note $LogHost ""
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FORMAT - fill ragged UHost name with "." to column 20 
+
+FORMAT:
+
+   @ CCount = `echo $UHost | wc -c`
+   @ NDots  = 20 - $CCount
+   set Fill = "$UHost "
+   while ($NDots > 0)
+      set Fill = "$Fill."
+      @ NDots = $NDots - 1
+   end
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STATS - print out the NFS, IO, and timing statistics
+
+STATS:
+
+   set ph = `expr "$Phase" : '-\(.*\)'`
+
+   NoteVT "(STAT)" "${ph}_${SysID}_rpc_calls      $NFSStats[1]"
+   NoteVT "(STAT)" "${ph}_${SysID}_rpc_retrans    $NFSStats[2]"
+   NoteVT "(STAT)" "${ph}_${SysID}_nfs_ops        $NFSStats[8]"
+   NoteVT "(STAT)" "${ph}_${SysID}_nfs_read       $NFSStats[3]"
+   NoteVT "(STAT)" "${ph}_${SysID}_nfs_write      $NFSStats[4]"
+   NoteVT "(STAT)" "${ph}_${SysID}_nfs_lookup     $NFSStats[5]"
+   NoteVT "(STAT)" "${ph}_${SysID}_nfs_getattr    $NFSStats[6]"
+   NoteVT "(STAT)" "${ph}_${SysID}_nfs_setattr    $NFSStats[7]"
+
+   if ($#IOStats > 4) then
+      NoteVT "(STAT)" "${ph}_${SysID}_mbytes_sent    $IOStats[1]"
+      NoteVT "(STAT)" "${ph}_${SysID}_rate_sent      $IOStats[2]"
+      NoteVT "(STAT)" "${ph}_${SysID}_mbytes_recv    $IOStats[3]"
+      NoteVT "(STAT)" "${ph}_${SysID}_rate_recv      $IOStats[4]"
+      NoteVT "(STAT)" "${ph}_${SysID}_io_time        $IOStats[5]"
+   endif
+
+   NoteVT "(STAT)" "${ph}_${SysID}_time           ($ElapsedTime)"
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DESCENDANTS - find the descendants associated with Stamp
+
+DESCENDANTS:
+
+# for HP-UX
+   nlog setenv UNIX95
+
+   set MList = `ps -eo user,pid,ppid | grep $USER | awk '{ printf("%s %s ", $2, $3); }'`
+   nlog @ lentries = $#MList
+   nlog @ ljobs    = $lentries / 2
+   NoteV "There are $ljobs processes running under $USER at `date`"
+
+# get the PIDs associated with Stamp
+   nlog set OSType = `uname -s`
+   if ("$OSType" == "Linux") then
+      nlog set Options = -efw
+   else if ("$OSType" == "IRIX64") then
+      nlog set Options = -ef
+   else
+      ps -x >>& /dev/null
+      if ($status == 0) then
+         nlog set Options = -aux
+      else
+         nlog set Options = -ef
+      endif
+   endif
+
+   NoteV "Finding processes associated with $Stamp"
+   if ($Verbose == TRUE) then
+      nlog (ps $Options | grep $USER | grep "$Stamp" | sed '/grep/d' | sort | awk '{ print "DO-NET: " $0 }')
+   endif
+
+   nlog set NPids = `ps $Options | grep $USER | grep "$Stamp" | sed '/grep/d' | sort | awk '{print $2}'`
+
+   NoteV "Finding descendants of: $NPids"
+   
+# remove the current process from the NPids list
+   set lNPids = ""
+   foreach i ($NPids)
+      if ($i != $$) then
+         set lNPids = ( $lNPids $i )
+      endif
+   end
+   nlog set NPids = ( $lNPids )
+
+# find all the desendants associated with Stamp - except this one
+   set DPids = ""
+   set OK    = TRUE
+   while ($OK == TRUE)
+      set LPids = ""
+      set OK    = FALSE
+   
+      NoteV "   Now finding descendants of: $NPids"
+   
+      foreach i ( $NPids )
+         nlog set List = ( $MList )
+         while ($#List > 0)
+            set pid  = $List[1]
+            set ppid = $List[2]
+            shift List
+            shift List
+            if (($i == $ppid) && ($pid != $$)) then
+               nlog set LPids = ( $pid $LPids )
+               nlog set OK    = TRUE
+            endif
+         end
+      end
+   
+      nlog set DPids = ( $LPids $DPids )
+      nlog set NPids = ( $LPids )
+   end
+
+   NoteV "Descendants of $Stamp do-net: $DPids"
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

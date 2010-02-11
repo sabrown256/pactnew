@@ -1,0 +1,58 @@
+#!/bin/csh -f
+#
+# ENV - ULTRA environment test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           ENVIRONMENT TEST
+
+#--------------------------------------------------------------------------
+
+# there is no scheme dir (yet) for autotool until ultra is installed
+   if ( !($?autotool) ) then
+     NoteD $Log ""
+     NoteD $Log -n "                    ULTRA Env Test ............... "
+     Note $Log ""
+
+     set FAIL = "NO"
+     flog $Log $RM ulenv.log
+
+     set UTime = `$TIMER -r`
+     unsetenv SCHEME
+     unsetenv ULTRA  
+     if ("$Valgrind" == "") then
+        flog $Log ($CFE $Ultra -e -s \(end\) >& ulenv.log)
+        set xstatus = $status
+     else
+        ftee $Log $Valgrind $BinDir/ultra -e -s \(end\)  |& \
+        grep "ERROR SUMMARY:"                            |& \
+        awk '{ print $4 }'   >&! $Tmp
+        set xstatus = `cat $Tmp`
+        flog $Log $RM $Tmp
+     endif
+   
+     set ETime = `$TIMER -b $UTime`
+
+# any return status other than 0 is an error
+     if ($xstatus != 0) then
+        NoteD $Log "FAILED ($xstatus/$ETime)"
+        set FAIL  = "FAIL"
+        set Err = 1
+     else
+        NoteD $Log "PASSED ($ETime)"
+        flog $Log $RM ulenv.log
+     endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

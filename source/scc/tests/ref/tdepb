@@ -1,0 +1,11 @@
+typedef s1
+typedef s2
+struct s_s1
+struct s_s2
+variable is2: s2 (derived)
+Function main requires:
+   typedef: s1
+   typedef: s2
+   derived type: struct s_s1
+   derived type: struct s_s2
+   variable: s2 is2

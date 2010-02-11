@@ -1,0 +1,49 @@
+#!/bin/csh -f
+#
+# USE-GNU - decide on the correct GNU environment
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../scripts/env-csh
+
+set Which   = "$cwd/pwhich"
+set CmpPath = ""
+while ($#argv > 0)
+   switch ($1)
+      default:
+           if ("$CmpPath" == "") then
+              set CmpPath = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+# if blank find gcc on your path
+if ("$CmpPath" == "") then
+   set CmpPath = ( `$Which gcc` )
+
+# if not a full path find it on your path
+else if ("$CmpPath" !~ /*) then
+   set CmpPath = ( `$Which $CmpPath` )
+endif
+
+if (-x "$CmpPath") then
+   set GNU = $CmpPath:h
+   set GNU = $GNU:h
+else if (-x "$CmpPath/bin/gcc") then
+   set GNU = $CmpPath
+endif
+
+setenv PATH     $GNU/bin':$PATH'
+setenv GNURoot  $GNU
+
+SetParent PATH
+SetParent GNURoot
+
+exit(0)
+

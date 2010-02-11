@@ -1,0 +1,60 @@
+#!/bin/csh -f
+#
+# OS - analyze the platform OS
+#    - Computes: OSType MACRev
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+if ($?Log == 0) then
+   setenv Log $ALog
+endif
+
+Separator $Log
+Note $Log "Analyze: os"
+
+NoteD $ALog -n "   Operating System: "
+Note $ALog ""
+
+SafeEnv HostOS        `uname -s`
+SafeEnv HostOSRel     `uname -r`
+SafeEnv MACRev        ""
+
+if ($?Arch == 0) then
+   setenv Arch `../scripts/system-id`
+endif
+
+if ($?OSType == 0) then
+   Note $ALog "HostOS  = $HostOS"
+   Note $ALog "RootInc = $RootInc"
+   if (("$HostOS" == "Windows_NT") || \
+       (("$HostOS" == "Linux") && (-e $RootInc/termio.h)) || \
+       ($?IBM_BGP == 1) || \
+       (-e $RootInc/sys/termio.h)) then
+      setenv OSType "SYSV"
+   else
+      setenv OSType "BSD"
+   endif
+endif
+
+if ($HostOS == Darwin) then
+   setenv MACRev `echo $Arch | sed 's/osx-10\.//' | sed 's/-.*//'`
+endif
+
+# there are systems that put out garbage if this is on a single echo (AIX)
+NoteD $ALog -n "$HostOS $HostOSRel"
+NoteD $ALog " ($OSType)"
+
+setenv OSType USE_$OSType
+
+SetParent OSType
+SetParent MACRev
+
+exit(0)
+

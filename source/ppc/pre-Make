@@ -1,0 +1,191 @@
+#
+# pre-Makefile for Portable Process Control Library
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=ppc
+
+TGTExe = ${BinDir}/pcexec
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTInc = ${Hdrs}
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${CDebug} -I${IncDir} ${MDInc}
+FcFlags =
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${TGTLib} ${TGTExe}
+BinDep = ${Hdrs} ${TGTLib} pcexec.c
+BinObj = ${LdFlags} pcexec.c
+
+#
+# Required Libraries
+#
+Libs  = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${DPLib} -lm ${MDLib}
+SLibs = ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+
+
+targets :
+	@echo "Targets for PPC"
+	@echo "   Cstd      : make standard tests and pcexec"
+	@echo "   Fstd      : make Fortran tests"
+	@echo "   install   : install PPC headers and utilities in dev/arch"
+	@echo "   link      : link PPC utilities for public use"
+	@echo "   parallel  : make parallel process tests"
+	@echo "   proc      : make process report"
+	@echo "   sharedlib : build and install PPC shared libs in dev/arch"
+	@echo "   test      : run the PPC test suite"
+	@echo "   web       : make http reader"
+
+#
+# Headers Files
+#
+Hdrs = ppc.h ppc_int.h
+
+#
+# Object Files
+#
+ObjsA = ppc.o pcbin.o pcpio.o
+Objs = ${MPassDevices} ${IPCDevices} ${ObjsA}
+
+${Objs} : ${Hdrs}
+
+OMPSC  = pcmpsc.o
+OLMPS  = pclmps.o
+OPARC  = pcparc.o pcparmp.o
+
+ONOIPC = pcnil.o
+
+ArObjs = ${MPassDevices} ${IPCDevices} \
+         ${TGTLib}(ppc.o) ${TGTLib}(pcbin.o) \
+         ${TGTLib}(pcpio.o)
+
+ArMPSC = ${TGTLib}(pcmpsc.o)
+ArLMPS = ${TGTLib}(pclmps.o)
+ArPARC = ${TGTLib}(pcparc.o) ${TGTLib}(pcparmp.o)
+
+ArNOIPC = ${TGTLib}(pcnil.o)
+
+${TGTLib} : ${LibDep} ${Hdrs}
+
+Cstd : ${BinDir}/pcexec ${BinDir}/pcmtst \
+       ${BinDir}/pcbtst ${BinDir}/pcctst
+
+Fstd : ${BinDir}/pcftst
+
+parallel : ${BinDir}/pcptst ${BinDir}/pcexec
+
+web : ${BinDir}/pcweb
+
+#
+# binary data tests
+#
+${BinDir}/pcbtst : ${TGTLib} pcbtst.c
+	${CC} -c pcbtst.c -o ${PACTTmpDir}/pcbtst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pcbtst.o -o ${BinDir}/pcbtst ${Libs}
+
+${BinDir}/pcctst : ${TGTLib} pcctst.c
+	${CC} -c pcctst.c -o ${PACTTmpDir}/pcctst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pcctst.o -o ${BinDir}/pcctst ${Libs}
+
+${BinDir}/pcftst : ${TGTLib} pcftst.f
+	${FC} -c pcftst.f -o ${PACTTmpDir}/pcftst.o
+	${FC} ${LdFlags} ${PACTTmpDir}/pcftst.o -o ${BinDir}/pcftst ${Libs}
+#
+# multiple process tests
+#
+${BinDir}/pcmtst : ${TGTLib} pcmtst.c
+	${CC} -c pcmtst.c -o ${PACTTmpDir}/pcmtst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pcmtst.o -o ${BinDir}/pcmtst ${Libs}
+#
+# parallel process tests
+#
+${BinDir}/pcptst : ${TGTLib} pcptst.c
+	${CC} -c pcptst.c -o ${PACTTmpDir}/pcptst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pcptst.o -o ${BinDir}/pcptst ${Libs}
+#
+# http reader
+#
+${BinDir}/pcweb : ${TGTLib} pcweb.c
+	${CC} -c pcweb.c -o ${PACTTmpDir}/pcweb.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pcweb.o -o ${BinDir}/pcweb ${Libs}
+
+#
+# process report
+#
+
+proc : ${BinDir}/pcchld
+
+${BinDir}/pcchld : ${TGTLib} pcchld.c
+	${CCCfe} -c pcchld.c -o ${PACTTmpDir}/pcchld.o
+	${CCCfe} ${LdFlags} ${PACTTmpDir}/pcchld.o -o ${BinDir}/pcchld ${Libs}
+
+#
+# make the executable
+#
+${TGTExe} : ${BinDep}
+	${CLD} ${LdFlags} pcexec.c -o ${TGTExe} ${SLibs}
+
+#
+# async - run the shell script pc-async in the resulting xterm 
+#       - run it twice and watch for pollable event type complaints
+#
+async : ${TGTExe}
+	csh -c 'xterm -geometry 60x20-0+0 -e csh'
+
+#
+# link 
+#
+link: ${InstallDep}
+
+#
+# install 
+#
+install:
+	pact link
+	pact incinstall
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${ObjsA} > required.objs
+
+#
+# Run the PPC test suite
+#
+test :
+	@./pctest
+

@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+# SIMPLIFY-PATH - eliminate duplicate path entries
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Synt = csh
+set Var  = PATH
+
+while ($#argv > 0)
+   switch ($1)
+      case -csh:
+           set Synt = csh
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: simplify-path -h [-sh] [<var>]"
+           echo "    csh    emit result in C Shell syntax (default)"
+           echo "    h      this help message"
+           echo "    sh     emit result in Bourne Shell syntax"
+           echo "    <var>  variable to simplify, e.g. PATH or MANPATH"
+           echo "           default is PATH"
+           echo ""
+           exit(1)
+      case -sh:
+           set Synt = sh
+           breaksw
+      default:
+           set Var = $1
+           breaksw
+   endsw
+   shift
+end
+
+# get the variable value in list form
+set val = ( `printenv $Var | sed 's/^:/--:/' | sed 's/:$/:--/' | sed 's/:/ /g'` )
+
+# compute a new val in list form
+set nval = ""
+foreach i ($val)
+   set ok = TRUE
+   foreach j ($nval)
+      if ($j == $i) then
+         set ok = FALSE
+         break
+      endif
+   end
+   if ($ok == TRUE) then
+      set nval = ( $nval $i )
+   endif
+end
+
+# convert to back to environment valiable form
+setenv NVAL ""
+foreach i ($nval)
+   if ("$NVAL" == "") then
+      setenv NVAL ${i}
+   else
+      setenv NVAL ${NVAL}:${i}
+   endif
+end
+
+setenv NVAL `echo $NVAL | sed 's/--//g'`
+
+# print the new val
+if ($Synt == csh) then
+   echo "setenv $Var $NVAL"
+else
+   echo "export $Var=$NVAL"
+endif
+
+exit($status)

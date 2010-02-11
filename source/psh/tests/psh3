@@ -1,0 +1,18 @@
+#!/usr/bin/env pcsh
+#OPT -lang c
+/*
+ * PSH3 - test C scripting with PCSH
+ *
+ */
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int c, char **v)
+   {
+
+    printf("PSH3: hello world\n");
+
+    unlink(v[0]);
+
+    return(0);}

@@ -1,0 +1,219 @@
+#!/bin/csh -f
+#
+# NFSMON - monitor NFS statistics
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+onintr FINISH
+
+set HostOS = `uname -s`
+set Host   = `uname -n`
+set Tmp    = .tmp-nfsmon-$Host-$$
+set TmpR   = .tmp-nfsmon-rpt-$Host-$$
+set TmpD   = .tmp-nfsmon-dif-$Host-$$
+
+set Cont   = FALSE
+set Diff   = FALSE
+set Quiet  = FALSE
+set Raw    = FALSE
+set Old    = ""
+set Sample = 5
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           set Old = ( $argv )
+           break
+           breaksw
+      case -c:
+           set Cont = TRUE
+           breaksw
+      case -d:
+           set Diff = TRUE
+           breaksw
+      case -h:
+           echo "Usage: nfsmon [-c] [-d] [-h] [-q] [-r] [-t #] [-a <values>]"
+           echo "  a   - values for differences between sessions"
+           echo "  c   - continuous reporting"
+           echo "  d   - report differenced"
+           echo "  h   - this help message"
+           echo "  q   - quiet, no captions"
+           echo "  r   - report raw values"
+           echo "  t   - sample time (default 5 sec)"
+           exit(1)
+           breaksw
+      case -q:
+           set Quiet = TRUE
+           breaksw
+      case -r:
+           set Raw = TRUE
+           breaksw
+      case -t:
+           shift
+           set Sample = $1
+           breaksw
+      default:
+           echo "Unknown option: $1"
+           breaksw
+   endsw
+   shift
+end
+
+# be sure to get path that will have nfsstat
+set path = ( $path /usr/bin /usr/sbin /usr/etc )
+
+if ($HostOS == Linux) then
+
+   set Cmnd = ( cat /proc/net/rpc/nfs )
+   cat << EOF >! $Tmp
+\$1 ~ /proc3/ { n = 0;
+                for (i = 3; i <= NF; i++) n += \$i;
+                printf(" %8d", \$9);
+                printf(" %8d", \$10);
+                printf(" %8d", \$6);
+                printf(" %8d", \$4);
+                printf(" %8d", \$5);
+                printf(" %8d", n);
+                printf("\n"); }
+\$1 ~ /rpc/   { printf("%8d", \$2);
+                printf(" %8d", \$3); }
+EOF
+
+else
+
+   set Cmnd = ( nfsstat )
+   cat << EOF >! $Tmp
+BEGIN          { vgetattr = 0;
+                 vsetattr = 0;
+                 vlookup  = 0;
+                 vread    = 0;
+                 vwrite   = 0;
+                 vcalls   = 0;
+                 vretrns  = 0;
+                 fattr    = 0;
+                 frw      = 0;
+                 ftr      = 0; }
+fattr == 1     { vgetattr = vgetattr + \$3;
+                 vsetattr = vsetattr + \$5;
+                 vlookup  = vlookup + \$7;
+                 fattr    = 0; }
+frw == 1       { vread    = vread + \$1;
+                 vwrite   = vwrite + \$3;
+                 frw      = 0; }
+ftrl == 1      { vcalls   = vcall + \$1;
+                 vretrns  = vretrns + \$2;
+                 ftrl     = 0; }
+ftri == 1      { vcalls   = vcall + \$1;
+                 vretrns  = vretrns + \$3;
+                 ftri     = 0; }
+\$2 ~ /getattr/ { fattr = 1; }
+\$2 ~ /write/   { frw   = 1; }
+\$2 ~ /retrans/ { ftrl  = 1; }
+\$3 ~ /retrans/ { ftri  = 1; }
+END            { n = vread + vwrite + vgetattr + vsetattr + vlookup;
+                 printf("%8d", vcalls);
+                 printf(" %8d", vretrns);
+                 printf(" %8d", vread);
+                 printf(" %8d", vwrite);
+                 printf(" %8d", vlookup);
+                 printf(" %8d", vgetattr);
+                 printf(" %8d", vsetattr);
+                 printf(" %8d", n);                              
+                 printf("\n"); }
+EOF
+
+endif
+
+if ($HostOS == Linux) then
+   set Res = `awk '$1 ~ /Ip:/ { print $17 }' /proc/net/snmp`
+   @ LostB = $Res[2]
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WORK - do the work of the session
+
+   if ($Quiet == FALSE) then
+      echo "   # RPC  Retrans    # Ops     Read    Write   Lookup  Getattr  Setattr"
+   endif
+
+   while (1)
+      $Cmnd |& awk -f $Tmp >! $TmpR
+      if ($Diff == TRUE) then
+         if (-e $TmpD) then
+   	    set Old = `cat $TmpD`
+         endif
+         if ("$Old" != "") then
+            set New = `cat $TmpR`
+            set Del = ""
+            while ($#New > 0)
+               @ i = $New[1]
+               @ j = $Old[1]
+               @ k = $i - $j
+               set Del = ( $Del $k )
+               shift New
+               shift Old
+            end
+   	       echo $Del >! $TmpD
+         endif
+         set file = $TmpD
+      else
+         set file = $TmpR
+      endif
+   
+      if (-e $file) then
+         if ($Raw == TRUE) then
+            cat $file
+         else
+            awk '{ if ($1 == 0)                           \
+                      n = 1                               \
+                   else                                   \
+                      n = $1;                             \
+                   printf("%8d %7d%%", $1, 100*$2/n);     \
+                   if ($NF == 0)                          \
+                      n = 1                               \
+                   else                                   \
+                      n = $NF;                            \
+                   printf(" %8d", $NF);                   \
+                   for (i = 3; i < NF; i++)               \
+                       printf(" %7d%%", 100*$i/n);        \
+                   printf("\r"); }' $file
+         endif
+         if ($Cont != TRUE) then
+            break
+         endif
+      endif
+      mv -f $TmpR $TmpD
+      sleep 1
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - wrap up this session
+
+FINISH:
+   echo ""
+   if ($HostOS == Linux) then
+      if ($Quiet == FALSE) then
+         echo -n "Total packets lost: "
+         set Res = `awk '$1 ~ /Ip:/ { print $17 }' /proc/net/snmp`
+         @ LostA = $Res[2]
+         if ($Diff == TRUE) then
+            @ NLost = $LostA - $LostB
+            echo $NLost
+         else
+            echo $LostA
+         endif
+         echo ""
+      endif
+   endif
+   rm -f $Tmp $TmpR $TmpD
+
+   exit($status)

@@ -1,0 +1,657 @@
+/*
+ * PDFMT.C - generic support for the different PDB format versions
+ *
+ * Source Version: 9.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "cpyright.h"
+
+#include "pdb_int.h"
+
+#define OldHeadTok           "!<><PDB><>!"
+#define PDB_ATTRIBUTE_TABLE  "!pdb_att_tab!"
+
+#define BUFINCR   4096
+
+int
+ PD_default_format_version = 2;
+
+/*--------------------------------------------------------------------------*/
+
+/*                           READ/WRITE SUPPORT                             */
+
+/*--------------------------------------------------------------------------*/
+
+/* _PD_GET_TOK - an fgets clone looks for specified char in addition to
+ *             - the newline
+ *             - it is also guaranteed to not split tokens in the input
+ *             - stream
+ */
+
+static char *_PD_get_tok(char *s, int n, FILE *fp, int ch)
+   {int i, c, LineSep;
+    long nb;
+    off_t loc;
+    char *ps;
+
+/* this is for old NLTSS generated files - sigh! */
+    LineSep = 0x1f;
+    
+/* find the current location and remember it */
+    loc = lio_tell(fp);
+    nb  = lio_read(s, 1, n, fp);
+    ps  = s;
+
+/* check for EOF and reset the file pointer if at EOF */
+    if (((c = *(ps++)) == EOF) || (nb == 0))
+       {lio_seek(fp, loc, SEEK_SET);
+        *s = '\0';
+        return(NULL);};
+    ps--;
+
+/* search for \n, EOF, LineSep, or given delimiter */
+    n = nb - 1;
+    for (i = 0; i < n; i++)
+        {c = *(ps++);
+         if ((c == '\n') || (c == LineSep) || (c == ch))
+            {ps--;
+             *ps++ = '\0';
+             loc += (long) (ps - s);
+             break;}
+         else if (c == EOF)
+            {ps--;
+             *ps++ = '\0';
+             loc += (long) (ps - s + 1);
+             break;};};
+
+/* if we got a full buffer backup to the last space so as to not split
+ * a token
+ */
+   if ((i >= n) && (c != '\n') && (c != LineSep) && (c == ch))
+      {ps--;
+       n >>= 1;
+       for (; i > n; i--)
+           {c = *(--ps);
+            loc--;
+	    if ((c == '\t') || (c == ' '))
+               {*ps = '\0';
+                break;};};};
+
+/* reset the file pointer to the end of the string */
+    lio_seek(fp, loc, SEEK_SET);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_GET_TOKEN - get a token from a buffer which is handled like strtok
+ *               - each time BF is non-NULL it is remembered for the next
+ *               - call
+ *               - the return buffer is handled like fgets with the space
+ *               - and maximum size being passed in
+ *               - this function is guaranteed to not split tokens in the
+ *               - input buffer
+ */
+
+char *_PD_get_token(char *bf, char *s, int n, int ch)
+   {int i;
+    char c;
+    char *ps;
+    PD_smp_state *pa;
+    static char leof = EOF;
+
+/* this is for old NLTSS generated files - sigh! */
+    static char LineSep = 0x1f;
+
+    pa = _PD_get_state(-1);
+
+    if (bf != NULL)
+       pa->tbf = bf;
+
+    ps = s;
+
+/* check for EOF and reset the file pointer if at EOF */
+    c     = *pa->tbf++;
+    *ps++ = c;
+    if ((c == leof) || (n == 0))
+       {pa->tbf--;
+        *s = '\0';
+        return(NULL);};
+    ps--;
+    pa->tbf--;
+
+/* search for \n, EOF, LineSep, or given delimiter */
+    n--;
+    for (i = 0; i < n; i++)
+        {c = *ps++ = *pa->tbf++;
+         if ((c == '\n') || (c == LineSep) || (c == ch))
+            {ps--;
+             *ps++ = '\0';
+             break;}
+         else if (c == leof)
+            {ps--;
+             pa->tbf--;
+             *ps++ = '\0';
+             break;};};
+
+/* if we got a full buffer backup to the last space so as to not split
+ * a token
+ */
+   if ((i >= n) && (c != '\n') && (c != LineSep) && (c == ch))
+      {ps--;
+       pa->tbf--;
+       n >>= 1;
+       for (; i > n; i--)
+           {c = *(--ps) = *(--pa->tbf);
+	    if ((c == '\t') || (c == ' '))
+               {*ps = '\0';
+                break;};};};
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_RFGETS - our fgets looks for specified line separator in addition to
+ *            - the given system version
+ *            - it is also guaranteed to not split tokens in the input
+ *            - stream
+ */
+
+char *_PD_rfgets(char *s, int n, FILE *fp)
+   {char *rv;
+
+    rv = _PD_get_tok(s, n, fp, '\n');
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PUT_TEXT - build up the contents of the current output buffer
+ *              - return TRUE iff the number of characters added is > 0
+ */
+
+int _PD_put_text(int reset, int ns, char *s)
+   {int ok;
+    long nc, ncx;
+    char *bf, *spl;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    nc  = pa->nc;
+    ncx = pa->ncx;
+    spl = pa->spl;
+    bf  = pa->tbuffer;
+
+    if (bf == NULL)
+       {ncx = BUFINCR;
+	bf  = FMAKE_N(char, ncx, "PERM|_PD_PUT_TEXT:tbuffer");
+	spl = bf;
+        nc  = 0;}
+
+    else if (!reset)
+       {spl = bf;
+        nc  = 0;
+        memset(bf, 0, ncx);};
+    
+    if (nc + ns + 10 > ncx)
+       {ncx += BUFINCR;
+	REMAKE_N(bf, char, ncx);
+	spl = bf + strlen(bf);};
+
+    SC_strncpy(spl, ncx, s, ns+1);
+    ok = ((ns > 0) && (strcmp(spl, s) == 0));
+
+    spl += ns;
+    nc  += ns;
+
+    pa->nc      = nc;
+    pa->ncx     = ncx;
+    pa->spl     = spl;
+    pa->tbuffer = bf;
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PUT_STRING - build up the contents of the current output buffer
+ *                - in an fprintf style
+ *                - return TRUE iff the number of characters added is > 0
+ */
+
+int _PD_put_string(int reset, char *fmt, ...)
+   {int ok;
+    long ns;
+    char *s;
+
+    SC_VDSNPRINTF(FALSE, s, fmt);
+
+    ns = strlen(s);
+
+    ok = _PD_put_text(reset, ns, s);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CP_TBUFFER - copy the current contents of PA->TBUFFER into a
+ *                - newly allocated buffer
+ * 
+ */
+
+int _PD_cp_tbuffer(char **buf)
+   {int nc;
+    char *bf;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    bf   = pa->tbuffer;
+    nc   = strlen(bf) + 1;
+    *buf = FMAKE_N(char, nc, "_PD_CP_TBUFFER:buf");
+
+    strcpy(*buf, bf);
+
+    return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_GET_TBUFFER - return a copy of the current output buffer */
+
+char *_PD_get_tbuffer(void)
+   {int nc;
+    char *ret, *bf;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    bf  = pa->tbuffer;
+    nc  = strlen(bf) + 1;
+    ret = FMAKE_N(char, nc, "_PD_GET_TBUFFER:ret");
+
+    strcpy(ret, bf);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CHECK_CASTS_LIST - complete the set up of
+ *                      - the casts in the given chart
+ */
+
+void _PD_check_casts_list(hasharr *chrt, char **lst, long n)
+   {long i, j;
+    memdes *memb, *desc;
+    defstr *dp;
+
+/* assume a single-element, linked-list hasharr */
+    for (i = 0; SC_hasharr_next(chrt, &i, NULL, NULL, (void **) &dp); i++)
+        {for (desc = dp->members; desc != NULL; desc = desc->next)
+	     {for (j = 0L; j < n; j += 3)
+		  {if ((strcmp(dp->type, lst[j]) == 0) &&
+		       (strcmp(desc->member, lst[j+1]) == 0))
+		      {desc->cast_memb = lst[j+2];
+		       desc->cast_offs = _PD_member_location(desc->cast_memb,
+							     chrt, dp,
+							     &memb);};};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CHECK_CASTS_HASH - complete the set up of the casts
+ *                      - in the given chart
+ */
+
+void _PD_check_casts_hash(hasharr *chrt, char **lst, long n)
+   {long i, j;
+    defstr *dp;
+    memdes *memb, *desc;
+
+/* check each hash element
+ * do not assume a single-element, linked-list hasharr
+ */
+    for (i = 0; SC_hasharr_next(chrt, &i, NULL, NULL, (void **) &dp); i++)
+        {for (desc = dp->members; desc != NULL; desc = desc->next)
+	     {for (j = 0L; j < n; j += 3)
+		  {if ((strcmp(dp->type, lst[j]) == 0) &&
+		       (strcmp(desc->member, lst[j+1]) == 0))
+		      {desc->cast_memb = lst[j+2];
+		       desc->cast_offs = _PD_member_location(desc->cast_memb,
+							     chrt, dp,
+							     &memb);};};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CHECK_CASTS - work over the casts */
+
+void _PD_check_casts(PDBfile *file)
+   {int i, nc;
+    char **clst;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    nc    = pa->n_casts;
+    clst  = pa->cast_lst;
+
+    if (nc > 0)
+
+/* check the casts for the file->chart */
+       {_PD_check_casts_list(file->chart, clst, nc);
+
+/* check the casts for the file->host_chart */
+	_PD_check_casts_list(file->host_chart, clst, nc);
+
+/* clean up the mess */
+	for (i = 0L; i < nc; i += 3)
+	    {SFREE(clst[i]);
+	     SFREE(clst[i+1]);};};
+
+    SFREE(pa->cast_lst);
+    pa->n_casts = 0L;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            FORMAT VERSION                                */
+
+/*--------------------------------------------------------------------------*/
+
+/* _PD_HEADER_TOKEN - return the old or new header token */
+
+char *_PD_header_token(int which)
+   {
+
+    if (which < 2)
+       strcpy(_PD.id_token, OldHeadTok);
+
+    else if (which == 2)
+       snprintf(_PD.id_token, MAXLINE, "!<<PDB:%s>>!", "II");
+
+    else
+       snprintf(_PD.id_token, MAXLINE, "!<<PDB:%d>>!", which);
+
+    return(_PD.id_token);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_IDENTIFY_VERSION - return the format version number
+ *                      - corresponding to the tag S
+ */
+
+int _PD_identify_version(char *s)
+   {int vers;
+    char *token, *r;
+
+    if (strncmp(s, OldHeadTok, strlen(OldHeadTok)) == 0)
+       vers = 1;
+
+    else
+       {token = SC_strtok(s+7, ">", r);
+	if (token == NULL)
+	   vers = 0;
+	else if (strcmp(token, "II") == 0)
+	   vers = 2;
+	else if (SC_numstrp(token) == FALSE)
+	   vers = 0;
+	else
+	   vers = SC_stoi(token);};
+
+    return(vers);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_IDENTIFY_FILE - identify the format version of the PDBfile FILE
+ *                   - set the methods appropriately and
+ *                   - return the format version number
+ *                   - or -1 iff the file is not a PDB file
+ */
+
+int _PD_identify_file(PDBfile *file)
+   {int vers, ok, nb;
+    char str[MAXLINE];
+    char *p;
+    FILE *fp;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    fp = pa->ofp;
+
+/* attempt to read an ASCII header */
+    if (lio_seek(fp, (off_t) 0, SEEK_SET))
+       PD_error("FSEEK FAILED TO FIND ORIGIN - _PD_IDENTIFY_FILE", PD_OPEN);
+
+    if (_PD_rfgets(str, MAXLINE, fp) == NULL)
+       vers = -1;
+
+    else
+       {str[MAXLINE-1] = '\0';
+
+/* the first token should be the identifying header token */
+	vers = _PD_identify_version(str);
+
+/* if the header does not give us a version, try the trailer */
+	if (vers == 0)
+
+/* attempt to read an ASCII trailer */
+	   {if (lio_seek(fp, (off_t) -32, SEEK_END))
+	       PD_error("FSEEK FAILED TO END - _PD_IDENTIFY_FILE", PD_OPEN);
+
+	    nb = lio_read(str, (size_t) 1, (size_t) 32, fp);
+	    str[32] = '\0';
+
+/* the first token should be the identifying header token */
+	    p = SC_strstr(str, "!<<PDB:");
+	    if (p == NULL)
+	       vers = -1;
+	    else
+	       vers = _PD_identify_version(p);};
+
+	ok = _PD_format_version(file, vers);};
+
+    return(vers);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_FORMAT_VERSION - set the format version for FILE to VERS */
+
+int _PD_format_version(PDBfile *file, int vers)
+   {
+
+    if ((vers < 1) || (3 < vers))
+       vers = PD_default_format_version;
+
+    switch (vers)
+       {case 1 :
+	     _PD_set_format_i(file);
+	     break;
+
+	default :
+	case 2 :
+	     _PD_set_format_ii(file);
+	     break;
+
+        case 3 :
+	     _PD_set_format_iii(file);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             ATTRIUBUTE_TABLE                             */
+
+/*--------------------------------------------------------------------------*/
+
+/* _PD_WRITE_ATTRTAB - write the attribute table out */
+
+int _PD_write_attrtab(PDBfile *file)
+   {int ok;
+    char *ob;
+    syment *ep;
+    SC_array *oa;
+
+    if (file->attrtab == NULL)
+       return(TRUE);
+
+/* write attribute table out in its own space */
+    if (PDB_SYSTEM_VERSION > 18)
+       {ep = PD_inquire_entry(file, "/&etc", TRUE, NULL);
+	if (ep == NULL)
+	   PD_mkdir(file, "/&etc");
+	PD_cd(file, "/&etc");
+
+	PD_reset_ptr_list(file);
+
+	ob = file->ptr_base;
+	oa = file->ap;
+
+	file->ptr_base = "/&etc/ia_";
+	file->ap       = NULL;
+
+	ok = PD_write(file, "attributes", "hasharr *", &file->attrtab);
+
+	SFREE(file->ap);
+
+	file->ptr_base = ob;
+	file->ap       = oa;
+
+	PD_cd(file, NULL);}
+
+    else
+       {ok = TRUE;
+	if (file->attrtab != NULL)
+	   {PD_cd(file, NULL);
+	    PD_reset_ptr_list(file);
+	    ok = PD_write(file, PDB_ATTRIBUTE_TABLE,
+			  "hasharr *", &file->attrtab);};};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_READ_ATTRTAB_A - read the attribute table
+ *                    - for PDB files prior to version 19
+ */
+
+int _PD_read_attrtab_a(PDBfile *file)
+   {int ok;
+    char *name;
+    syment *ep;
+
+    name = PDB_ATTRIBUTE_TABLE;
+
+    ok = FALSE;
+    ep = PD_inquire_entry(file, name, TRUE, NULL);
+    if (ep != NULL)
+       {if (!PD_read(file, name, &file->attrtab))
+           {PD_close(file);
+            PD_error("FAILED TO READ ATTRIBUTE TABLE - _PD_READ_ATTRTAB_A",
+		     PD_OPEN);};
+
+/* reset the pointer lists after reading the attribute table */
+	_PD_ptr_free_list(file);
+	if (file->use_itags == FALSE)
+	   _PD_ptr_open_setup(file);
+
+	_PD_convert_attrtab(file);
+        file->chrtaddr = PD_entry_address(ep);
+        _PD_rl_syment(ep);
+    
+        file->flushed = FALSE;
+        if (!SC_hasharr_remove(file->symtab, _PD_fixname(file, name)))
+	   SC_hasharr_remove(file->symtab, name);
+
+	ok = TRUE;};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_READ_ATTRTAB_B - read the attribute table
+ *                    - for PDB files after version 18
+ */
+
+int _PD_read_attrtab_b(PDBfile *file)
+   {int ok;
+    char *name, *ob;
+    syment *ep;
+    SC_array *oa;
+
+    name = "/&etc/attributes";
+
+    ok = FALSE;
+    ep = PD_inquire_entry(file, name, TRUE, NULL);
+    if (ep != NULL)
+       {ob = file->ptr_base;
+	oa = file->ap;
+
+	file->ptr_base = "/&etc/ia_";
+	file->ap       = NULL;
+
+	if (file->use_itags == FALSE)
+	   _PD_ptr_open_setup(file);
+
+	if (!PD_read(file, name, &file->attrtab))
+           {PD_close(file);
+            PD_error("FAILED TO READ ATTRIBUTE TABLE - _PD_READ_ATTRTAB_B",
+		     PD_OPEN);};
+
+	SFREE(file->ap);
+
+	file->ptr_base = ob;
+	file->ap       = oa;
+
+	_PD_convert_attrtab(file);
+        file->chrtaddr = PD_entry_address(ep);
+        _PD_rl_syment(ep);
+    
+        file->flushed = FALSE;
+        if (!SC_hasharr_remove(file->symtab, _PD_fixname(file, name)))
+	   SC_hasharr_remove(file->symtab, name);
+
+	ok = TRUE;};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_READ_ATTRTAB - read the attribute table in */
+
+int _PD_read_attrtab(PDBfile *file)
+   {int ok;
+
+    ok = _PD_read_attrtab_a(file);
+    if ((ok == FALSE) && (PDB_SYSTEM_VERSION > 18))
+       ok = _PD_read_attrtab_b(file);
+
+    if (ok == FALSE)
+       file->attrtab = NULL;
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+ 

@@ -1,0 +1,77 @@
+#!/bin/csh -f
+#
+# MASTER - SX master test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           MASTER TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PDBView Master Test .......... "
+   Note $Log ""
+
+   flog $Log rm -f pdbvtest.log pdbvtest.pdb pdbvtest.asc pdbvtest.err pdbvtest.tmp
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/pdbvtest.scm >& pdbvtest.tmp)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvtest.scm |& \
+      grep "ERROR SUMMARY:"                                                     |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      grep -i "error" pdbvtest.tmp > pdbvtest.err
+      set Files = `find . -name "pdbvtest.err" -size 0c -print`
+      if ($#Files == 0) then
+         NoteD $Log "FAILED ($ETime)"
+         set Err = 1
+      else
+         awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtest.ps > pdbvtest.ps.tmp
+         flog $Log mv pdbvtest.ps.tmp pdbvtest.ps
+
+         flog $Log $CFE $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
+         set xstatus = $status
+   
+         if ($xstatus != 0) then
+            NoteD $Log "FAILED ($ETime)"
+            NoteD $Log "                         PS files differ"
+            set Err = 1
+	 else
+            NoteD $Log "PASSED ($ETime)"
+            flog $Log touch pdbvtest.foo
+            flog $Log rm -f foofoo pdbvtest.*
+         endif
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

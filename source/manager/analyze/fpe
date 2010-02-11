@@ -1,0 +1,71 @@
+#!/bin/csh -f
+#
+# FPE - analyze platform FPE handling
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: fpe"
+
+set fpe = ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for standard FPE handling
+
+if (-e $RootInc/fenv.h) then
+   setenv HaveANSIFenv TRUE
+   set fpe = ( $fpe "ANSI C9X" )
+else
+   setenv HaveANSIFenv FALSE
+   set fpe = ( $fpe "old" )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for GNU FPE extensions
+
+set Tmp = fpe
+
+cat >&! $Tmp.c << EOF
+#include <fenv.h>
+#define __USE_GNU
+int main(int c, char **v)
+{feenableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
+ return(0);}
+EOF
+
+flog $ALog gcc $Tmp.c -o $Tmp -lc -lm
+if ($status == 0) then
+   setenv HaveGNUFenv TRUE
+   set fpe = ( $fpe "with GNU extensions" )
+else
+   setenv HaveGNUFenv FALSE
+endif
+
+flog $ALog rm -f $Tmp $Tmp.c
+
+if ("$fpe" == "") then
+   NoteD $ALog "      no FPE handling"
+else
+   NoteD $ALog "      has $fpe FPE handling"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# export the results
+SetParent HaveANSIFenv
+SetParent HaveGNUFenv
+
+exit(0)
+

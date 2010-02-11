@@ -1,0 +1,78 @@
+#!/bin/csh -f
+#>
+#> PACT-DIST-ALL - build the PACT distributions for all platforms
+#>
+#> Usage: pact-dist-all [-l] [-h]
+#>        Build PACT distributions for UNIX, DOS, and MACOS
+#>  
+#> Options: 
+#>    -l  Include the distribution for LLNL
+#>    -h  Print this message
+#>  
+#
+# Modification History:
+#   08-16-94 Jan Moura, LLNL:  Extended prolog
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set LogFile = distrib.log
+set LLNL    = FALSE
+set Help    = FALSE
+
+while ($#argv >= 1)
+   switch ($argv[1])
+      case -l:
+               set LLNL = TRUE
+               breaksw
+      case -h:
+               set Help = TRUE
+               breaksw
+   endsw
+   shift
+end
+
+if ($Help == "TRUE") then
+   echo " "
+   echo "Usage: pact-dist-all [-l] [-h]"
+   echo "       Build PACT distributions for UNIX, DOS, and MACOS"
+   echo " "
+   echo "Options: "
+   echo "   -l  Include the distribution for LLNL"
+   echo "   -h  Print this message"
+   echo " "
+   exit(1)
+endif
+
+if (-d dist) then
+   echo "Dist directory exists"
+else
+   echo "Creating dist directory"
+   mkdir dist
+endif
+
+cd dist
+
+./pact-dist -s ..
+mv $LogFile dist-def.log
+echo "UNIX distribution complete"
+
+./pact-dist -s .. -m
+mv $LogFile dist-mac.log
+echo "Macintosh distribution complete"
+
+./pact-dist -s .. -d
+mv $LogFile dist-dos.log
+echo "DOS distribution complete"
+
+if ($LLNL == TRUE) then
+   ./pact-dist -s .. -l
+   mv $LogFile dist-llnl.log
+endif
+
+cd ..
+
+exit($status)

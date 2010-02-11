@@ -1,0 +1,184 @@
+#!/bin/csh -f
+#
+# GCC-INFO - find libraries and other info for a GCC
+#
+
+unalias ls
+
+set Gcc = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: gcc-info [-h] [<path to gcc>]"
+           echo "    h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set Gcc = $1
+	   breaksw
+   endsw
+   shift
+end
+
+if ("$Gcc" == "") then
+   set Gcc = ( `swhich -1 gcc` )
+endif
+
+if ("$Gcc" !~ /*) then
+   set Gcc = ( `swhich -1 $Gcc` )
+endif
+
+if (!(-x "$Gcc")) then
+   echo "No gcc found or specified - exiting"
+   exit(1)
+endif
+
+if ("$Gcc" =~ *xlc*) then
+   set Info = ( no no no no no )
+else
+   set Resp = ( `$Gcc -vrb -v |& grep "Compile line:"` )
+   if ("$Resp" != "") then
+      set Gcc = $Resp[3]   
+   endif
+
+   set Root = $Gcc:h
+   set Root = $Root:h
+   if ("$Root" == "") then
+      set Root = "/"
+   endif
+
+   set Info = ( `$Gcc -v |& cat` )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GNU - is it GCC
+
+set noglob
+
+set GNU = no
+foreach i ($Info)
+   if ("$i" == "PathScale(TM)") then
+      set GNU = no
+      break
+   endif
+   if ("$i" == gcc) then
+      set GNU = yes
+      break
+   endif
+end
+
+echo "GNU:     $GNU"
+
+unset noglob
+
+if ($GNU == yes) then
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# VERSION - get the GCC version
+
+   set noglob
+
+   set Vers = ""
+   set Next = FALSE
+   foreach i ($Info)
+      if ($Next == TRUE) then
+         set Vers = $i
+         break
+      endif
+      if ("$i" == version) then
+         set Next = TRUE
+      endif
+   end
+
+   unset noglob
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TARGET - get the GNU system type target
+
+   set noglob
+
+   set Tgt  = ""
+   set Next = FALSE
+   foreach i ($Info)
+      if ($Next == TRUE) then
+         set Tgt = $i
+         break
+      endif
+      if ("$i" =~ --target=*) then
+         set Tgt = ( `echo "$i" |& sed 's/--target=//'` )
+         break
+      else if ("$i" == "Target:") then
+         set Next = TRUE
+      endif
+   end
+
+   unset noglob
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIBRARY - get the GCC library path
+
+   set Lib = ""
+   if (-f $Root/lib/libgcc.a) then
+      set Lib = $Root/lib
+   else
+      set Lst = ""
+
+# scout out potential locations
+      foreach i ( $Root /usr /opt/freeware )
+         ls $i/lib/gcc* >& /dev/null
+         if ($status == 0) then
+            set Lst = ( $Lst `find $i/lib/gcc* -type d -follow` )
+         endif
+      end
+
+# look at selected locations for the right version
+      set LibL = ""
+      foreach i ($Lst)
+         if ("$i" =~ */$Vers) then
+            set LibL = ( $LibL $i )
+         endif
+      end
+
+# look at selected locations for the right target
+# if we only have one choice then we must take it
+      if ($#LibL == 1) then
+         set Lib = $LibL
+      else
+         foreach i ($LibL)
+            if ("$i" =~ *$Tgt*) then
+               set Lib = $i
+               break
+            endif
+         end
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ("$Tgt" == "") then
+      set Tgt = $Lib:h
+      set Tgt = $Tgt:t
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   echo "Root:    $Root"
+   echo "Exe:     $Gcc"
+   echo "Lib:     $Lib"
+   echo "Version: $Vers"
+   echo "Target:  $Tgt"
+
+endif
+
+exit($status)

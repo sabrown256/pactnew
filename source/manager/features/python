@@ -1,0 +1,41 @@
+#
+# PYTHON - control building Python bindings
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include shared
+
+Tool CC {
+   Exe      =? ${Python_CC_Exe}
+   Debug    =? ${Python_CC_Debug}
+   Optimize =? ${Python_CC_Optimize}
+   Linker   =? ${Python_CC_Linker}
+   Flags    =? ${Python_CC_Flags}
+}
+
+Tool FC {
+   Exe    =? ${Python_FC_Exe}
+   Linker =? ${Python_FC_Linker}
+   Flags  =? ${Python_FC_Flags}
+}
+
+Tool LD {
+   Exe   =? ${Python_LD_Exe}
+   Flags =? ${Python_LD_Flags}
+}
+
+Tool AR {
+   Exe   =? ${Python_AR_Exe}
+   Flags =? ${Python_AR_Flags}
+}
+
+Group Cfg {
+   CC_Exe    =? ${Python_CC_Exe}
+   FC_Exe    =? ${Python_FC_Exe}
+   CC_Linker =? ${Python_CC_Linker}
+}
+

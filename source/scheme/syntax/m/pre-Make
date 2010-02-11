@@ -1,0 +1,59 @@
+#
+# pre-Makefile for PACT SCHEME BASIS Syntax
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=scheme
+
+TGTBin = none
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTScm = msynt.scm
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${COptimize} -I. -I${RootSrc}/scheme -I${PACTSrcDir} -I${IncDir} ${MDInc}
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = shgrm.c shlrm.c *~ core #*# 
+
+#
+# Headers Files
+#
+Hdrs = shm.h
+
+#
+# Object Files
+#
+Objs = shgrm.o shmsup.o
+
+ArObjs = ${TGTLib}(shgrm.o) ${TGTLib}(shmsup.o)
+
+shgrm.y : shlrm.c
+
+${Objs} : shgrm.y ${Hdrs}
+
+${LibDep} : shgrm.y ${Hdrs}
+
+#
+# work
+#
+work: ${TGTLib} ${LibDep}
+
+#
+# syntax
+#
+syntax:
+	@(cp *.[ylhc] pre-Make ${PACTTmpDir} ; cd ${PACTTmpDir} ; pact work ; rm *.[ylch] pre-Make)
+	pact scminstall
+	rm -f shgrm.c shlrm.c

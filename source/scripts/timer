@@ -1,0 +1,218 @@
+#!/bin/csh -f
+#
+# TIMER - return the time in [[HH:]MM:]SS since the last invocation of timer
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set path = ( /usr/bin /bin )
+
+set Host   = `uname -n`
+set OS     = `uname -s | tr "[A-Z]" "[a-z]"`
+set Rel    = `uname -r`
+
+if ($?TIMER_FILE) then
+   set TFile = $TIMER_FILE
+else
+   set TFile = ~/.timer-$Host
+endif
+
+set TTF    = $TFile-tmp
+set Delete = FALSE
+
+set RM    = 'rm -f'
+set RMDir = 'rm -rf'
+
+set TimeSrc = ""
+set TimeVal = ""
+set Mode    = PROCESSED
+
+while ($#argv > 0)
+   switch ($1)
+      case -b:
+           shift
+           set TimeSrc = $1
+           breaksw
+      case -c:
+           shift
+           set TimeVal = $1
+           breaksw
+      case -d:
+           $RM $TFile 
+           exit(0)
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: timer [-b <time>] [-c <time>] [-d] [-h] [-r] [-t <time>]"
+           echo ""
+           echo "   b   use <time> in HH:MM:SS form as from a raw call"
+           echo "   c   convert <time> in seconds to HH:MM:SS form"
+           echo "   t   convert <time> in HH:MM:SS to seconds form"
+           echo "   d   delete the timer reference file"
+           echo "   h   this help message"
+           echo "   r   raw time from date"
+           echo ""
+           exit(1)
+           breaksw
+      case -r:
+           set Mode = RAW
+           breaksw
+      case -t:
+           shift
+           set Mode    = HMStoS
+           set TimeSrc = $1
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - get the beginning time
+
+if ("$TimeSrc" == "") then
+
+# if the regular time file doesn't exist get rid of ANYTHING
+# that is there and create the time file
+
+   if (($Mode != RAW) && ("$TimeVal" == "")) then
+      if (!(-f $TFile)) then
+         $RMDir $TFile
+         echo "0" >! $TFile
+      endif
+   endif
+
+   if (-f $TFile) then
+      @ BeginTime = `cat $TFile`
+   else
+      @ BeginTime = 0
+   endif
+
+else
+
+   set inf = ""
+   foreach i ( `echo "$TimeSrc" | sed 's/:/ /g'` )
+      if (($i == "0") || ($i == "00")) then
+         set inf = ( $inf 0 )
+      else
+         set inf = ( $inf `echo $i | sed 's/^0*//g'` )
+      endif
+   end
+
+   if ($#inf == 3) then
+      @ Hour   = $inf[1]
+      @ Minute = $inf[2]
+      @ Second = $inf[3]
+
+   else if ($#inf == 2) then
+      @ Hour   = 0
+      @ Minute = $inf[1]
+      @ Second = $inf[2]
+
+   else
+      @ Hour   = 0
+      @ Minute = 0
+      @ Second = $inf[1]
+
+   endif
+
+   @ SH = $Hour * 3600
+   @ SM = $Minute * 60
+   @ SS = $Second
+
+   @ BeginTime = $SH + $SM + $SS
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_TIME - get the current time in seconds
+
+set str = `date +%H:%M:%S`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FORMAT_TIME - format the time as requested
+
+if ($Mode == RAW) then
+
+   set ElapsedTime = $str
+
+else if ($Mode == HMStoS) then
+
+   set ElapsedTime = $BeginTime
+
+else
+
+   set inf = ""
+   foreach i ( `echo "$str" | sed 's/:/ /g'` )
+      if (($i == "0") || ($i == "00")) then
+         set inf = ( $inf 0 )
+      else
+         set inf = ( $inf `echo $i | sed 's/^0*//g'` )
+      endif
+   end
+
+   if ($#inf < 3) then
+      echo "timer: error |$str| and |$inf| ($#inf)"
+      exit(1)
+   endif
+
+   @ Hour   = $inf[1]
+   @ Minute = $inf[2]
+   @ Second = $inf[3]
+
+   @ SH = $Hour * 3600
+   @ SM = $Minute * 60
+   @ SS = $Second
+
+   @ ShellTime = $SH + $SM + $SS
+
+# reset the time in the time file
+   if (-f $TFile) then
+      $RM $TFile
+      echo $ShellTime >! $TFile
+   endif
+
+# get the time difference
+   if ("$TimeVal" != "") then
+      @ ET = $TimeVal
+   else
+      @ ET = $ShellTime - $BeginTime
+      if ($ShellTime < $BeginTime) then
+         @ Day = 24 * 3600
+         @ ET  = $ET + $Day
+      endif
+   endif
+
+   @ SH = $ET / 3600
+   @ sh = $SH * 3600
+   @ em = $ET - $sh
+   @ SM = $em / 60
+   @ sm = $SM * 60
+   @ SS = $em - $sm
+
+   if ($SH == 0) then
+      if ($SM == 0) then
+         set ElapsedTime = `echo $SS`
+      else
+         set ElapsedTime = `echo $SM $SS | awk '{ printf("%d:%02d", $1, $2) }'`
+      endif
+   else
+      set ElapsedTime = `echo $SH $SM $SS | awk '{ printf("%d:%02d:%02d", $1, $2, $3) }'`
+   endif
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo $ElapsedTime
+
+exit($status)

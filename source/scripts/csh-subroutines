@@ -1,0 +1,84 @@
+#
+# CSH-SUBROUTINES - implement subroutines for the C Shell
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# SUBROUTINE STATE
+#
+#  FIRST_    TRUE until the first use of 'call'
+#  SUBR_     the call stack
+#  ARGL_     temporary for raw argument list
+#            this is processed into args_ before
+#            transferring control to entry point
+#  DISP_     the next entry point - where you go when the file is re-sourced
+#  SRC_      the include stack
+#            to be able to use the subroutine mechanism in a file that
+#            is sourced otherwise $SRC_ only points to the top level file
+#  TRACE     iff TRUE trace calls and returns
+#
+# SUBROUTINE SYNTAX
+#
+#   call               implementation of call
+#   return             implementation of return
+#   include            to be able to use the subroutine mechanism in a
+#                      file that is sourced
+#   endinclude 
+#   quit               to be able to quit the shell process (with exit
+#                      status) from within a subroutine call
+#   HAVE_SUBROUTINES   need a dispatch point for when the file is
+#                      re-sourced for a call
+#
+# NOTE: 'exit' in a source only stops sourcing the file
+#
+
+# if a shell script is starting up SUBR_ will not be defined
+if ($?SUBR_ == 0) then
+   set Trace  = FALSE
+
+   if ("$0" =~ /*) then
+      set SRC_ = $0
+   else
+      set SRC_ = $cwd/$0
+   endif
+   set FIRST_ = TRUE
+   set SUBR_  = ""
+   set QUIT_  = "CSH_SUBR_CONTINUE"
+   set DISP_  = "CSH_SUBR_NO_LABEL"
+
+   if ($?PCSH_TMP_ == 1) then
+      alias _terminate_  'if (\!*) exit( { rm -f $PCSH_TMP_ } && $QUIT_ )'
+   else
+      alias _terminate_  'if (\!*) exit($QUIT_)'
+   endif
+   alias _end_source_      'exit(0)'
+
+# the subroutine syntax extensions
+   alias call              'set FIRST_ = FALSE ; set SUBR_ = ( \!\!:1 $SUBR_ ) ; setenv ARGL_ "\!\!:2-$" ; if ($Trace == TRUE) echo "Calling $SUBR_[1] with $ARGL_" ; source $SRC_[1] ; _terminate_ ("$QUIT_" != "CSH_SUBR_CONTINUE")'
+   alias return            'if ($Trace == TRUE) echo "Returning from $SUBR_[1]" ; shift SUBR_ ; unsetenv ARGL_ ; _end_source_'
+   alias quit              'set QUIT_ = \!* ; _terminate_ ("$SUBR_" == "") && _end_source_'
+   alias include           'set FIRST_ = TRUE ; set SRC_ = ( \!\!:1 $SRC_ ) ; source $SRC_[1]'
+   alias endinclude        'if ($#SRC_ > 0) shift SRC_ ; _end_source_ ; echo \!* >>& /dev/null'
+   alias HAVE_SUBROUTINES  'if ($DISP_ != "CSH_SUBR_NO_LABEL") goto $DISP_'
+
+# if we are in the process of invoking a subroutine
+else if ($?ARGL_ == 1) then
+
+   set args_ = ""   
+   set lst_  = $ARGL_
+   foreach i ($lst_)
+      set args_ = ( $args_ `echo "$i" | sed 's/,$//'` )
+   end
+
+endif
+   
+# need a dispatch point for when the file is re-sourced for a call
+if (($FIRST_ == FALSE) && ("$SUBR_" != "")) then
+   set DISP_ = $SUBR_[1]
+else
+   set DISP_ = "CSH_SUBR_NO_LABEL"
+endif
+

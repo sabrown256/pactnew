@@ -1,0 +1,397 @@
+#!/usr/bin/env scheme
+(c-mode)
+
+/*
+ * BPC - build PACT in a very parallel and fault tolerant way
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "exec.scm"
+
+typedef void object;
+typedef void FILE;
+
+/* the PACT packages */
+
+char
+ hostf = NULL,
+ *dirs[] = { "pact/score",
+	     "pact/pml",
+	     "pact/pdb",
+	     "pact/ppc",
+	     "pact/pgs",
+	     "pact/panacea",
+	     "pact/scheme",
+	     "pact/sx",
+	     "pact/ultra" };
+
+/* the systems on which PACT is to be built */
+
+object
+ **hsts;
+
+int
+ method = 2,
+ remove = FALSE,
+ shared = FALSE,
+ testf  = FALSE,
+ watchf = FALSE;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PROCESS_COMMAND_LINE - process the command line arguments
+ *                      - supplied in X
+ */
+
+void process_command_line(char **x)
+   {int i, n;
+    char *arg;
+
+    if (x != NULL)
+       {n = length(x);
+        for (i = 0; i < n; i++)
+            {arg = x[i];
+	     switch (arg)
+	        {case "-f":
+		      i++;
+		      hostf  = x[i];
+                      method = 3;
+		      break;
+		 case "-h":
+		      printf(stdout, "\n");
+		      printf(stdout, "Usage: bp [-f <hostfile>] [-h] [-m #] [-r] [-s] [-t] [-w]\n");
+		      printf(stdout, "  h - this help message\n");
+		      printf(stdout, "  m - host selection method\n");
+		      printf(stdout, "      1 - all known hosts types\n");
+		      printf(stdout, "      2 - all configurations in ..dev (default)\n");
+		      printf(stdout, "      3 - implied by -f\n");
+		      printf(stdout, "  r - remove libraries and binaries first\n");
+		      printf(stdout, "  s - build shared objects\n");
+		      printf(stdout, "  t - test PACT\n");
+		      printf(stdout, "  w - run a watch on the work\n");
+		      printf(stdout, "\n");
+		      quit(1);
+		      break;
+		 case "-m":
+		      method = x[++i];
+		      break;
+		 case "-r":
+		      remove = TRUE;
+		      break;
+		 case "-s":
+		      shared = TRUE;
+		      break;
+		 case "-t":
+		      testf = TRUE;
+		      break;
+		 case "-w":
+		      watchf = TRUE;
+		      break;};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BY_CONFIG - find the system id from the scconfig.h file
+ *           - found by looking in the architecture directory DR
+ *           - in the ../dev tree
+ */
+
+object *by_config(char *dr)
+   {int j, na;
+    char *cfg, *sys, *cmd, *ar;
+    object *rv;
+
+    cmd = sprintf("grep SYSTEM_ID ../dev/%s/include/scconfig.h",
+		  dr);
+    cfg = sprintf("%s", list_ref(syscmnd(cmd), 0));
+    sys = lasttok(sprintf("%s", cfg), " \t\n");
+    rv  = list(sys, "PACT_CONFIG", dr);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BY_HOST - make a list of host/configs using the host file HOST
+ *         - one entry per "host" line in HOST
+ */
+
+object *by_host(char *host)
+   {int i, n;
+    char **hl, *cmd, *s, *hst, *cfg, *sys, *ent;
+    object *rv;
+
+    cmd = sprintf("awk '$1 == \"host\" {print $2 , $7}' %s", host);
+    hl  = syscmnd(cmd);
+
+    n  = length(hl);
+    rv = NULL;
+    for (i = 0; i < n; i++)
+        {s   = hl[i];
+	 hst = strtok(s, " ");
+	 cfg = strtok(s, " ");
+
+/* try at most twice to set the system id */
+         sys = hostsystem(hst);
+         if (not(sys))
+	    sys = hostsystem(hst);
+
+         ent = list(sys, "PACT_CONFIG", cfg);
+         rv  = cons(ent, rv);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SELECT_HOSTS - make up the list of hosts/configs
+ *              - for which the work of this session is to be done
+ */
+
+object *select_hosts(int method)
+   {int i, j, na, nd;
+    char **dirs, *dr, *ent;
+    object *lst, **arch, *ar;
+
+    arch = get_host_types();
+    switch (method)
+       {case 1:
+	     lst = arch;
+             break;
+        case 2:
+             dirs = syscmnd("ls ../dev");
+             nd   = length(dirs);
+             lst  = NULL;
+             for (i = 0; i < nd; i++)
+                 {dr  = dirs[i];
+		  ent = by_config(dr, arch);
+		  lst = cons(ent, lst);};
+             break;
+        case 3:
+	     lst = by_host(hostf);
+             break;};
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAKE_LOG_FILE_NAME - decide where the command output goes
+ *                    - NOTE: this replaces the pre-defined default
+ *                    - function supplied with exec
+ */
+
+char *make_log_file_name(char *sys, char *cmd)
+   {int i, n;
+    char *log, *path, *arch, *cfg;
+
+    cfg = NULL;
+    if (pairp(sys))
+       {n = length(sys);
+        for (i = 1; i < n; i += 2)
+            {if (sys[i] == "PACT_CONFIG")
+                {cfg = sys[i+1];
+	         break;};};
+        if (cfg == NULL)
+           cfg = sys[0];}
+    else
+       cfg = sys;
+
+    if (strstr(cmd, "devlib") != NULL)
+       log = "build";
+    else if (strstr(cmd, "incinstall") != NULL)
+       log = "build";
+    else if (strstr(cmd, "link") != NULL)
+       log = "build";
+    else if (strstr(cmd, "remove") != NULL)
+       log = "remove";
+    else if (strstr(cmd, "test") != NULL)
+       log = "test";
+    else
+       log = "unknown";
+
+    arch = car(syscmnd(sprintf("./cfgman -a %s use", cfg)));
+    path = sprintf("../dev/%s/log/%s", arch, log);
+
+    return(path);}
+
+/* NOTE: debugging replacement only
+char *make_log_file_name(char *sys, char *cmd)
+   {return(NULL);}
+*/
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* REMOVE_LOG_FILES - remove old versions of the log files
+ *                  - we will be writing in this session
+ */
+
+void remove_log_files(object *hsts)
+   {int m, n, nh;
+    char *path, *arch, *cfg, *sys;
+
+    nh = length(hsts);
+    for (m = 0; m < nh; m++)
+        {sys = hsts[m];
+
+/* figure out the architecture for this specification */
+	 cfg = NULL;
+	 if (pairp(sys))
+            {n = length(sys);
+	     if ((2 < n) && (sys[1] == "PACT_CONFIG"))
+		cfg = sys[2];
+	     else
+	        cfg = sys[0];}
+	 else
+	    cfg = sys;
+
+	 arch = car(syscmnd(sprintf("./cfgman -a %s use", cfg)));
+
+/* now remove the log files */
+	 path = sprintf("../dev/%s/log/build", arch);
+	 unlink(path);
+
+         if (remove == TRUE)
+	    {path = sprintf("../dev/%s/log/remove", arch);
+	     unlink(path);};
+
+	 if (testf == TRUE)
+	    {path = sprintf("../dev/%s/log/test", arch);
+	     unlink(path);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COMMAND - take the base command S and tack on environment setup
+ *         - boilerplate instructions
+ */
+
+char *command(char *s)
+   {char *t;
+
+    t = sprintf("source ../dev/`../manager/cfgman use/include/env-pact.csh` ; %s", s);
+    printf(stdout, "   %s\n", t);
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FILTER - print strings that do not match the restricted list
+ *        - NOTE: all strings coming in here end with \n
+ */
+
+void filter(FILE *fp, char *s)
+   {
+
+    printf(fp, "   %s", s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ANNOUNCE - politely announce what is happening in this session */
+
+void announce(object **hsts)
+   {int i, j, n;
+    object *spec;
+
+    if (vectorp(hsts))
+       hsts = vector_to_list(hsts);
+
+    printf(stdout, "\n");
+    printf(stdout, "Building PACT configurations:\n   ");
+
+    n = length(hsts);
+    for (i = 0, j = 0; i < n; i++, j++)
+        {if (j >= 6)
+            {j = 0;
+	     printf(stdout, "\n   ");};
+
+         spec = hsts[i];
+	 if (pairp(spec))
+            printf(stdout, "%-12s ", list_ref(spec, 2));
+         else
+            printf(stdout, "%-12s ", spec);};
+
+    if ((0 < j) && (j < 5))
+       printf(stdout, "\n");
+
+    printf(stdout, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WORK - do the required work */
+
+char
+ *Link = "pact link";
+
+int
+ status = 0;
+
+process_command_line(argv);
+
+if (shared == TRUE)
+   {Link = "pact shared";
+    printf(stdout, "Building PACT with shared libraries\n");};
+
+/* NOTE: watch is defined by the exec package
+ *       we are simply removing it here if watchf is FALSE
+ */
+
+if (watchf == FALSE)
+   {watch = NULL;};
+
+hsts = select_hosts(method);
+
+announce(hsts);
+remove_log_files(hsts);
+
+/* remove if requested */
+if ((status == 0) && (remove == TRUE))
+   {printf(stdout, "Remove libraries and executables:\n");
+    status = exec(command("pact remove"), dirs, hsts, watch, filter);
+    printf(stdout, "\n");};
+
+/* install headers */
+if (status == 0)
+   {printf(stdout, "Install Headers:\n");
+    status = exec(command("pact incinstall"), dirs, hsts, watch, filter);
+    printf(stdout, "\n");};
+
+/* build libraries */
+if (status == 0)
+   {printf(stdout, "Compile Libraries:\n");
+    status = exec(command("pact devlib"), dirs, hsts, watch, filter,
+                  NULL, "pact remove");
+    printf(stdout, "\n");};
+
+/* link executables */
+if (status == 0)
+   {printf(stdout, "Link Executables:\n");
+    status = exec(command(Link), dirs, hsts, watch, filter);
+    printf(stdout, "\n");};
+
+/* test PACT */
+if ((status == 0) && (testf == TRUE))
+   {printf(stdout, "Test PACT:\n");
+    status = exec(command("pact test"), dirs, hsts, watch, filter);
+    printf(stdout, "\n");};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+quit(status);

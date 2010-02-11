@@ -1,0 +1,102 @@
+#!/bin/csh
+#
+# LS-ALL - list the selected jobs on all platforms specified by HostFile
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/ls-all") then
+   set path = ( $Exe $path )
+endif
+
+unalias ps
+
+set Which   = "swhich -1"
+set PName   = ""
+set Verbose = "-q"
+set LUser   = ""
+set SSH     = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'
+
+set HostFile = $HOME/.all-hosts
+if (-x `$Which hserve`) then
+   set Method = hserve
+else
+   set Method = script
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -f:
+           shift
+           set HostFile = $1
+           breaksw
+
+      case -h:
+           echo ''
+           echo 'Usage:  ls-all [-f <file>] [-h] [-q] [-u user] [-v] [name]*'
+           echo ''
+           echo 'List jobs by name or command line pattern and'
+           echo 'by user on all hosts specified.  Currently the'
+           echo 'list of hosts is built in, but that can change.'
+           echo 'This is guaranteed to run the same way'
+           echo 'on all platforms and different versions of PS.'
+           echo ''
+           echo '        f    - use file to define hosts'
+           echo '        h    - this help message'
+           echo '        q    - quiet flag'
+           echo '        u    - name of owner of processes'
+           echo '        v    - verbose flag'
+           echo '        name - executable name or command line pattern'
+           echo '               used to identify processes'
+           echo ''
+           exit(1)
+           breaksw
+
+      case -u:
+           shift
+           set LUser = ( -u $1 )
+           breaksw
+
+      case -q:
+           set Verbose = -q
+           breaksw
+
+      case -v:
+           set Verbose = -v
+           breaksw
+
+      default:
+           set PName = ( $PName $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if (-e $HostFile) then
+   set Hosts = `awk '$1 !~ /#/ { print }' $HostFile`
+else
+   echo ""
+   echo "Cannot find $HostFile"
+   echo "You may put the names of the hosts to be used"
+   echo "in ~/.all-hosts"
+   echo ""
+   exit(1)
+endif
+
+if ($Method == hserve) then
+   hserve -q -t all -exh ls-jobs -q -ds
+else
+   foreach hst ($Hosts)
+      $SSH $hst ls-jobs -q -ds $Verbose $LUser $PName |\
+      awk '{printf("%-8s | %s\n", "'$hst'", $0);}'
+   end
+endif
+
+echo " "
+
+exit($status)

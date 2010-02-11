@@ -1,0 +1,53 @@
+#!/bin/csh -f
+#
+# RETRC - test SCORE retrace facility
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+if ($?CROSS_COMPILE == 0) then
+
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE Retrace Test .......... "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE retrace
+   set xstatus = $status
+   flog $LogF popd
+
+   if ("$CFE" != "") then
+      setenv CFE   "$CFE -v"
+   endif
+
+   if ("$Valgrind" == "") then
+      flog $LogF $CFE $BinDir/scrtrt
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/scrtrt     |& \
+      grep "ERROR SUMMARY:"                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $LogF "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "PASSED ($ETime)"
+   endif
+
+endif
+
+exit($Err)
+

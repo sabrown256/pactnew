@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# PERFD - measure the performance characteristics of dmake
+#
+
+source /usr/local/apps/pactnew/include/env-csh
+
+set Host = `uname -n`
+set Host = $Host:r
+set Host = $Host:r
+set Log  = $cwd/perfd-$Host.log
+set Dat  = $cwd/perfd-$Host.dat
+
+$RM $Log $Dat
+touch $Log
+touch $Dat
+
+flog $Log uname -n
+flog $Log @ NCpu  = `ncpu`
+flog $Log @ NNode = `hserve -q -n`
+
+foreach f (-2 1 2 4 8 16 32 64 128)
+   if ($f > $NCpu) continue
+
+   if ($f > 0) then
+      @ j = $NCpu / $f
+   else
+      @ j = - ( $NCpu * $f )
+   endif
+
+   NoteD $Log -n "   $f "
+   Note $Log ""
+   Note $Dat "# t vs nodes ($j jobs/node)"
+
+   foreach n (1 2 4 6 8 10 12 14 16)
+      if ($n > $NNode) continue
+
+      Separator $Log
+      Note $Log "# Nodes    = $n"
+      Note $Log "CPU factor = $f"
+
+      flog $Log setenv SC_EXEC_CPU_FACTOR $f
+      flog $Log dsys remove -p $n
+
+      set UTime = `timer -r`
+      flog $Log dsys build -p $n
+      set ErrStat = $status
+      set ETime   = `timer -b $UTime`
+      set ETime   = `timer -t $ETime`
+
+      if ($ErrStat == 0) then
+         NoteD $Log -n "."
+         Note $Dat " $n  $ETime"
+      else
+         NoteD $Log -n "x"
+      endif
+   end
+   NoteD $Log " done"
+end
+
+exit(0)

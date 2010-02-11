@@ -1,0 +1,153 @@
+#!/bin/csh -f
+#
+# AXIS - PGS log axis tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set DDir = $RootDir/pgs/tests
+
+set Replace = FALSE
+
+Note $Log "Args = $argv"
+
+while ($#argv > 0)
+   switch ($1)
+      case -r:
+           set Replace = TRUE
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+
+#                           PGS AXIS TEST
+
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PGS Axis Test .......... "
+   Note $Log ""
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE axis
+   set TStatus = $status
+   flog $Log popd
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PGS Log Axis Test Program"
+      NoteD $Log "                    PGS Axis Test .......... FAILED (-1)"
+      set Err = 1
+   else
+      flog $Log rm -f gslax*.res gslax*.ps
+      flog $Log cp $SrcDir/tests/gslax*.dat .
+
+      @ nerr = 0
+      set first = TRUE
+      set UTime = `$TIMER -r`
+
+      foreach o (lin log)
+         switch ($o)
+            case lin:
+                 set opt = ( -l )
+                 breaksw
+            case log:
+                 set opt = ""
+                 breaksw
+         endsw
+
+         foreach i (gslax*.dat)
+            Separator $Log
+            Note $Log "Test $i ($o)"
+            flog $Log set bs = $i:r
+            flog $Log set ob = $bs.$o
+            if ("$Valgrind" == "") then
+
+               flog $Log ( $CFE $BinDir/gslaxt $opt -s $DDir/$i | sed 's|e-00|e+00|g' > $ob.res )
+               flog $Log mv $bs.ps $ob.ps
+
+               if ($Replace == TRUE) then
+                  if ($first == TRUE) then
+                     set first = FALSE
+                     NoteD $Log ""
+                  endif
+                  flog $Log cp $ob.res $RefDir/$ob
+                  flog $Log cp $ob.ps $RefDir/$ob.ps
+                  NoteD $Log "                       $ob fiducials replaced"
+               endif
+
+               if (-f $RefDir/$ob) then
+                  flog $Log ( diff $ob.res $RefDir/$ob > $ob.res.diff )
+                  if (-z $ob.res.diff) then
+                     flog $Log rm $ob.res.diff
+                     flog $Log set ResFile = ""
+                  else
+                     flog $Log set ResFile = "$ob.res.diff"
+                  endif
+               else
+                  flog $Log mv $ob.res $RefDir/$ob
+                  NoteD $Log "Adding $ob.res fiducial to $RefDir - rerun"
+                  flog $Log set ResFile = ""
+               endif
+
+               if (-f $RefDir/$ob.ps) then
+                  flog $Log ( $CFE $PSDIFF -tp 2 $ob.ps $RefDir/$ob.ps > $ob.ps.diff )
+                  set DiffStat = $status
+                  if (-z $ob.ps.diff) then
+                     flog $Log rm $ob.ps.diff
+                  endif
+               else
+                  flog $Log mv $ob.ps $RefDir/$ob.ps
+                  NoteD $Log "Adding $ob.ps fiducial to $RefDir - rerun"
+                  set DiffStat = 0
+               endif
+               Note $Log "Status results: |$ResFile| |$DiffStat|"
+
+               if ("$ResFile" != "") then
+                  flog $Log set xstatus = results
+                  @ nerr = $nerr + 1
+               else if ($DiffStat != 0) then
+                  flog $Log set xstatus = plots
+                  @ nerr = $nerr + 1
+               else
+                  flog $Log set xstatus = 0
+                  flog $Log rm -f $ob*
+               endif
+            else
+               ftee $Log $Valgrind $BinDir/gslaxt $opt -s $RootDir/pgs/$i     |& \
+               grep "ERROR SUMMARY:"                                          |& \
+               awk '{ print $4 }'   >&! $Tmp
+               set xstatus = `cat $Tmp`
+               flog $Log $RM $Tmp
+            endif
+         end
+      end
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($first == FALSE) then
+         NoteD $Log -n "                    "
+      endif
+
+      if ($nerr > 0) then
+         NoteD $Log "FAILED ($nerr/$ETime)"
+         flog $Log set Err = 1
+      else
+         flog $Log rm -f gslax*.dat gslax*.ps gslax*.res gslax*.diff
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

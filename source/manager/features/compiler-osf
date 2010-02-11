@@ -1,0 +1,65 @@
+#
+# COMPILER-OSF - OSF compiler specifications
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+WARN_PATTERN = ":+sp+Warning: warning WARNING Info:"
+ERR_PATTERN  = ":+sp+Error:"
+
+Tool CC {
+   Exe     = cc
+   Flags   = -isoc94 -msg_disable longlongtype
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -pg ]
+}
+
+Tool FC {
+   Exe = f90
+}
+
+Tool LD {
+   RPath   = -Wl,-rpath,@
+   Flags   = -w1 -std1
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -pg ]
+   Lib     = -lrt -ldnet_stub
+}
+
+Tool Lex {
+   Flags = -w1 -std1
+}
+
+Tool PThread_Lex {
+   Flags = -w -pthread
+}
+
+Group Cfg {
+   Use      = Std
+   LD_Flags = ${LD_Flags}
+}
+
+Group Shared {
+   LD_Exe    = cc
+   CC_Shared =
+   LD_Shared = -shared
+}
+
+Group PThread {
+   CC_Flags = -pthread
+   LD_Lib   = -lots3 -lpthread 
+}
+
+Group Python {
+   LD_Flags = -call_shared
+}
+
+Group PythonCfg {
+   Use = Python
+}
+
+define OSF
+

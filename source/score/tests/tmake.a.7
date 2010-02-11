@@ -1,0 +1,13 @@
+#
+# test exec scenarios
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+all :
+	ls -l /bin/sh
+	cat /bin/sh* | wc -c
+	cat /bin/sh* | cat | wc -c
+	@if [ ! -f "foo.d" ]; then echo no; fi
+	@(if [ ! -f "foo.d" ]; then echo no; fi ; echo a)

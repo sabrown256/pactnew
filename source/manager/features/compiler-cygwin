@@ -1,0 +1,28 @@
+#
+# COMPILER-CYGWIN - basic configuration for compiling with CYGWIN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv GNURoot
+
+include features/compiler-gnu
+
+# cygwin does not support -rpath
+run features/rpath init
+
+Tool LD {
+   Flags =
+}
+
+Group Std {
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   LD_Flags = ${LD_Flags}
+}
+

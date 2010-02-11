@@ -1,0 +1,85 @@
+#!/bin/csh -f
+#
+# LOOKUP - test hash tables and trees in SCORE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE ha
+set TStatus = $status
+flog $LogF popd
+
+set ETime   = `$TIMER -b $UTime`
+
+if ($TStatus != 0) then
+   NoteD $LogF "                         ERROR Building HASH Test Program"
+   NoteD $LogF "                    SCORE HASH Test ............. FAILED ($ETime)"
+   set Err = 1
+else
+
+#
+# HASH test
+#
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE HASH Test ............."
+   Note $LogF ""
+
+   if ("$Valgrind" == "") then
+      ftee $LogF $CFE $BinDir/scatst
+      set xstatus = $status
+   else
+      NoteD $LogF ""
+      ftee $LogF $Valgrind $BinDir/scatst  |& \
+      grep "ERROR SUMMARY:"                |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "                    SCORE HASH Test ............. PASSED ($ETime)"
+   else
+      NoteD $LogF "                    SCORE HASH Test ............. FAILED ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+#
+# TREE test
+#
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE TREE Test ............. "
+   Note $LogF ""
+
+   if ("$Valgrind" == "") then
+      flog $LogF $CFE $BinDir/sctrts
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/sctrts  |& \
+      grep "ERROR SUMMARY:"                |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "PASSED ($ETime)"
+   else
+      NoteD $LogF "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   endif
+endif
+
+exit($Err)
+

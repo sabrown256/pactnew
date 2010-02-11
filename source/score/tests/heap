@@ -1,0 +1,63 @@
+#!/bin/csh -f
+#
+# HEAP - test heap management facilities in SCORE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+# NOTE: OSF1 is incapable of building this test properly when statically linked
+if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE Heap Check Test ....... "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE memchk
+   set TStatus = $status
+   flog $LogF popd
+
+   set ETime   = `$TIMER -b $UTime`
+
+   if ($TStatus != 0) then
+      NoteD $LogF "                         ERROR Building Heap Check Test Program"
+      NoteD $LogF "                    SCORE Heap Check Test ............. FAILED ($ETime)"
+      set Err = 1
+   else
+
+      if ("$CFE" != "") then
+         setenv CFE   "$CFE -v"
+      endif
+
+      if ("$Valgrind" == "") then
+         flog $LogF $CFE $BinDir/scmtrt
+         set xstatus = $status
+      else
+         ftee $LogF $Valgrind $BinDir/scmtrt   |& \
+         grep "ERROR SUMMARY:"                 |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $LogF $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 0) then
+         NoteD $LogF "PASSED ($ETime)"
+      else if (-e /dev/zero) then
+         NoteD $LogF "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $LogF "INCOMPLETE ($ETime)"
+      endif
+   endif
+endif
+
+exit($Err)
+

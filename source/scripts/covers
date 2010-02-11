@@ -1,0 +1,214 @@
+#!/bin/csh -f
+#
+# COVERS - simple code coverage info tool at the subroutine level
+#
+# example of a call
+# > objdump -xdr ../dev/spgi/bin/pdsmp | grep print_help
+# 0804bce0 g     F .text  000001a1              print_help
+# 0804bce0 <print_help>:
+# 804bf20:       e8 bb fd ff ff          call   804bce0 <print_help>
+#
+# example of function pointer being the only reference
+# > objdump -xdr ../dev/spgi/bin/pdsmp | grep '804ba90'
+# 0804ba90 g     F .text  0000024a              readits
+# 0804ba90 <readits>:
+#  804ba90:       55                      push   %ebp
+#  804c1a8:       b8 90 ba 04 08          mov    $0x804ba90,%eax
+#
+# Lines of the form
+#   ADDR <SUBR-NAME>:
+# are processed into $SUBR
+#
+# Lines of the form
+#   ... CALL ... <SUBR-NAME...
+# are processed into $CALLS
+#
+# TODO:
+# Need to get lines of the form
+#   ... $0xADDR ...
+# into $CALLS as SUBR-NAME
+# then function pointers will not turn up as uncalled
+# problem is that it is an n-squared proposition
+#
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set LPact    = `which pact`
+set PACTRoot = $LPact:h
+set PACTRoot = $PACTRoot:h
+source $PACTRoot/include/env-csh
+source $PACTRoot/include/csh-subroutines
+HAVE_SUBROUTINES
+
+set Dir     = ""
+set Process = Coverage
+
+while ($#argv > 0)
+   switch ($1)
+      case -e:
+            set Process = Export
+            breaksw
+      case -h:
+           echo "Usage: covers [-h] <dir>"
+           echo "  h  this help message"
+           echo "  <dir> root directory for executables and archives"
+           exit(1)
+           breaksw
+      case -p:
+           shift
+           set Process = $1
+           breaksw
+      default:
+           set Dir = $1
+           breaksw
+   endsw
+   shift
+end
+
+set TIMER = `which timer`
+set Tmp   = calldb
+set SUBR  = $cwd/subr.db
+set CALLS = $cwd/call.db
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($Process == UnCalled) then
+
+   while (1)
+      set Sub = "$<"
+      if ("$Sub" == "") then
+         break
+      else
+         grep $Sub $CALLS >& /dev/null
+         if ($status != 0) then
+            echo "   $Sub"
+         endif
+      endif
+   end
+
+   exit(0)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+else
+
+   InitLog Log $cwd/log.covers
+
+   flog $Log pushd $Dir
+   set Dir = $cwd
+   flog $Log popd
+
+   flog $Log rm -f $SUBR $CALLS
+   flog $Log touch $SUBR $CALLS
+
+   flog $Log rm -rf $Tmp
+   flog $Log mkdir $Tmp
+   flog $Log pushd $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set BTime = `$TIMER -r`
+   NoteD $Log ""
+   NoteD $Log -n "Processing libs .......... "
+   Note $Log ""
+   flog $Log cp $Dir/lib/*.a .
+   foreach a (*.a)
+      Note $Log "   $a"
+      flog $Log ar -x $a
+      foreach o (*.o)
+         Note $SUBR "------ $o ---------------"
+         Note $CALLS "------ $o ---------------"
+         objdump -xdr $o |& grep '>:'             >> $SUBR
+         objdump -xdr $o |& grep call | grep '<'  >> $CALLS
+         rm -f $o
+      end
+      flog $Log rm -f $a
+   end
+   set ETime = `$TIMER -b $BTime`
+   NoteD $Log "done ($ETime)"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set BTime = `$TIMER -r`
+   NoteD $Log -n "Processing executables ... "
+   Note $Log ""
+   flog $Log cp $Dir/bin/* .
+   foreach b (*)
+      Note $Log "   $b"
+      if (-x $b) then
+         Note $SUBR "------ $b ---------------"
+         Note $CALLS "------ $b ---------------"
+         objdump -xdr $b |& grep '>:'             >> $SUBR
+         objdump -xdr $b |& grep call | grep '<'  >> $CALLS
+      endif
+      flog $Log rm -f $b
+   end
+   set ETime = `$TIMER -b $BTime`
+   NoteD $Log "done ($ETime)"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set BTime = `$TIMER -r`
+   NoteD $Log -n "Processing subr.db ....... "
+   Note $Log ""
+   flog $Log mv $SUBR $SUBR.raw
+   awk '{print $2}' $SUBR.raw | \
+   sed 's/<//'                | \
+   sed 's/>\://'              | \
+   sed 's/-/ /'               | \
+   grep -v '\.C'              | \
+   awk '{print $1}'           | \
+   sort                       | \
+   uniq >& $SUBR
+#   flog $Log $RM $SUBR.raw
+   set ETime  = `$TIMER -b $BTime`
+   set NLines = `wc -l $SUBR`
+   NoteD $Log "done ($NLines[1]/$ETime)"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   set BTime = `$TIMER -r`
+   NoteD $Log -n "Processing call.db ....... "
+   Note $Log ""
+   flog $Log mv $CALLS $CALLS.raw
+   cat $CALLS.raw             | \
+   awk '{print $NF}'          | \
+   sed 's/<//'                | \
+   sed 's/>//'                | \
+   sed 's/+/ /'               | \
+   sed 's/-/ /'               | \
+   grep -v '\.C'              | \
+   awk '{print $1}'           | \
+   sort                       | \
+   uniq >& $CALLS
+#   flog $Log $RM $CALLS.raw
+   set ETime = `$TIMER -b $BTime`
+   set NLines = `wc -l $CALLS`
+   NoteD $Log "done ($NLines[1]/$ETime)"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   flog $Log popd
+
+   set BTime = `$TIMER -r`
+   NoteD $Log "Uncalled functions:"
+   ftee $Log ( cat $SUBR | $0 -p UnCalled | awk '{printf("   %s\n", $1);}')
+   set ETime = `$TIMER -b $BTime`
+   NoteD $Log "done ($ETime)"
+   NoteD $Log ""
+
+endif
+
+exit ($status)
+

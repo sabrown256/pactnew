@@ -1,0 +1,41 @@
+variable v1: char
+variable v2: short
+variable v3: int
+variable v4: long
+variable v5: int
+variable v6: long
+variable v7: float
+variable v8: double
+variable s1: char
+variable s2: short
+variable s3: int
+variable s4: long
+variable s5: int
+variable s6: long
+variable u1: char
+variable u2: short
+variable u3: int
+variable u4: long
+variable u5: int
+variable u6: long
+variable p1: int *
+variable p2: int **
+variable p3: int *
+variable p4: int *
+variable p5: int *
+variable p6: int *
+variable p7: char *
+variable p8: char *
+variable p9: char*
+variable a1: int
+variable a2: int *
+variable a3: int **
+variable a4: int
+variable a5: int *
+variable a6: int **
+variable a7: int
+variable a8: int *
+variable a9: int **
+variable a10: int
+variable a11: int *
+variable a12: int **

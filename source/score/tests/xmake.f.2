@@ -1,0 +1,5 @@
+--job--- 1:/bin/sh:.:(rm -f a.err1;ls xmake.f.1 fubar 2> a.err1)
+--job--- 2:/bin/sh:.:(rm -f a.err2;echo a b 2> a.err2)
+--job--- 3:/bin/sh:.:(rm -f a.err3;ls xmake.f.1 fubar 2>> a.err3)
+--job--- 4:/bin/sh:.:(rm -f a.err4;echo a b 2>> a.err4)
+--exit--

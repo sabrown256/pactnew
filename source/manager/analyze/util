@@ -1,0 +1,163 @@
+#!/bin/csh -f
+#
+# UTIL - analyze the platform utilities
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: util"
+
+NoteD $ALog "   System Utilities: "
+
+# get the AR options sorted out if they were not pre-defined
+SafeEnv AR_Exe    ar
+SafeEnv AR_Flags  ""
+
+rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
+
+Note $ALog "analyze/util"
+Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
+Note $ALog "Cfe_CC_Flags = |$Cfe_CC_Flags|"
+Note $ALog "Cfe_LD_Flags = |$Cfe_LD_Flags|"
+
+# this script is necessary because some idiot ld writers insist
+# that error messages be printed directly to /dev/tty in addition to
+# stdout or stderr
+
+rm -f load
+touch load
+
+Note load '#\!/bin/csh -f'
+Note load "rm -f $Tmp.err"
+Note load "$Cfe_CC_Exe $Cfe_CC_Flags main.c -o $Tmp" '$1' ">& $Tmp.err"
+Note load 'grep -i "$1"' "$Tmp.err"
+Note load 'set Value = $status'
+Note load "rm -f $Tmp.err"
+Note load 'exit($Value)'
+
+chmod a+x load
+
+if ($Cfe_CC_Exe != "") then
+
+# build something to stick in an archive
+
+cat << EOF >! foo.c
+extern int bar();
+foo(x){return(bar(x));}
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c foo.c
+
+cat << EOF >! bar.c
+bar(x){return(x);}
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c bar.c
+
+# build a main to load with
+
+cat << EOF >! main.c
+extern int foo();
+int main(int c, char **v)
+{return(foo(0));}
+EOF
+
+   if ($?AR_IFlag == 0) then
+      foreach i (rsc rc)
+         setenv AR_IFlag $i
+         flog $ALog $AR_Exe $AR_Flags $AR_IFlag libfoo.a bar.o foo.o
+         if ($status == 0) then
+            break
+         endif
+      end
+   endif
+
+   if ($?AR_XFlag == 0) then
+      foreach i (x -x)
+         setenv AR_XFlag $i
+         flog $ALog $AR_Exe $AR_Flags $AR_XFlag libfoo.a
+         if ($status == 0) then
+            break
+         endif
+      end
+   endif
+
+# figure out what to do about RANLIB
+   if ($?Ranlib_Exe == 0) then
+      foreach i (touch ranlib)
+
+         rm -f libfoo.a
+         flog $ALog $AR_Exe $AR_Flags $AR_IFlag libfoo.a bar.o foo.o
+
+         $i libfoo.a
+         if ($status != 0) then
+            continue
+         endif
+
+         load libfoo.a
+         if ($status == 0) then
+            continue
+         endif
+
+         setenv Ranlib_Exe "$i"
+         break
+      end
+
+# GOTCHA: what if we still do not have ranlib?
+      if ($?Ranlib_Exe == 0) then
+         setenv Ranlib_Exe touch
+      endif
+   endif
+
+   if ($Ranlib_Exe == ranlib) then
+      flog $ALog ranlib -t libfoo.a
+      if ($status == 0) then
+         setenv UPDATE "ranlib -t"
+      else
+         setenv UPDATE "ranlib"
+      endif
+      NoteD $ALog "      uses ranlib"
+   else
+      setenv UPDATE $Ranlib_Exe
+      NoteD $ALog "      no ranlib"
+   endif
+
+endif
+
+rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp load
+
+# let's understand install on this system
+# but let's not use it
+
+SafeEnv INSTALL "cp"
+
+set res = `$MngDir/pwhich install`
+if (`expr $res[1] : "/."` >= 1) then
+   set MINSTALL = "install"
+   NoteD $ALog "      has install"
+else if (-e /etc/install) then
+   set MINSTALL = "install"
+   NoteD $ALog "      has install"
+else   
+   set MINSTALL = "cp"
+   NoteD $ALog "      no install"
+endif
+
+# export the results
+SetParent AR_Exe
+SetParent AR_Flags
+SetParent AR_IFlag
+SetParent AR_XFlag
+SetParent Ranlib_Exe
+SetParent UPDATE
+SetParent INSTALL
+
+exit(0)
+

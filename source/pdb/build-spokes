@@ -1,0 +1,19 @@
+#!/bin/csh -f
+#
+# BUILD-SPOKES - configure and compile the TRANSLATION spokes
+#
+
+cd spokes
+
+# make sure there is a spoke and build it
+foreach entry (*)
+   if ((-d $entry) && ($entry != CVS)) then
+      echo "          Building $entry spoke"
+      pushd $entry >>& /dev/null
+      pact spoke
+      popd >>& /dev/null
+   endif
+end
+
+exit($status)
+

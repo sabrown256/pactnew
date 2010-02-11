@@ -1,0 +1,223 @@
+#!/usr/bin/env pcsh
+#OPT -f
+#
+# PDBDIFF
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set VERSION = "2.2"
+
+# determine the bin directory path
+set BinDir = $PACT/bin
+
+# determine the scheme directory path
+set ScmDir = $PACT/scheme
+
+# only extend SCHEME env var if it is already set!
+# allow SCHEME env var to trump scheme dir relative to sx binary
+if ($?SCHEME) then
+  setenv SCHEME ${SCHEME}:$ScmDir
+endif
+
+# determine if tracker is available
+set TRACKER = "none"
+
+foreach directory ( "/usr/local/apps/tracker" `echo $PATH | sed 's/:/ /g'` )
+   if (-d $directory) then
+      if (-x $directory/bin/tracker) then
+         set TRACKER = $directory/bin/tracker
+         break
+      endif
+   endif
+end
+
+# determine if sx is available
+if (!(-x $BinDir/sx)) then
+   echo ""
+   echo "No SX executable found in $BinDir"
+   echo ""
+   exit(1)
+endif
+
+set CFE = ""
+if ($?CROSS_COMPILE == 1) then
+   if ($CROSS_COMPILE == TRUE) then
+      set CFE = $BinDir/do-run
+   endif
+endif
+
+# setup default values
+set track     = 1
+set Mode      = 0
+set Bits      = 128
+set Individ   = 1
+set Promote   = 0
+set DiffUltra = 0
+set DiffPVA   = 0
+set Toler     = 1.0e-8
+set Quiet     = ""
+set Batch     = 0
+set MinMax    = "#f"
+set CArgs     = ( "-p" "-i" )
+set SX        = ( $CFE $BinDir/sx )
+set ULTRA     = ( $CFE $BinDir/ultra )
+set Mappings  = ""
+set Vselect   = 0
+set Varlist   = ""
+set f1        = ""
+set f2        = ""
+
+# make sure we have the correct number of args
+if ($#argv < 2) then
+    echo ""
+    echo "Usage: pdbdiff [-a] [-b n] [-d] [-i] [-l] [-p f] [-q] [-r] [-s] [-t #]"
+    echo "               [-u] [-v] <pdb-file1> <pdb-file2> [-I <list> | -C <list> | -M <list>]"
+    echo ""
+    echo "Options:   a - display all entries if any differ"
+    echo "           b - number of mantissa bits to use in floating point comparisions"
+    echo "           C - compare only variables in <list>"
+    echo "           d - compare different floating point types"
+    echo "           i - enter interactive mode"
+    echo "           I - ignore variables in <list>"
+    echo "           l - compare different fixed point types"
+    echo "           M - compare only curves/mappings in <list>"
+    echo "           p - fractional decimal precision to use in floating point comparisons"
+    echo "           q - no banner"
+    echo "           r - report min and max differences"
+    echo "           s - display only the entries which differ"
+    echo "           t - comparison tolerance for -v option defaults to 1.0e-8"
+    echo "           u - compare ULTRA files"
+    echo "           v - compare PVA (Portable Visualization and Analysis) files"
+    echo "           w - do not display mappings that differ when comparing PVA files"
+    echo ""
+
+    exit(0)
+endif
+
+# handle args
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+               set Individ = 0
+               breaksw
+      case -b:
+               shift
+               set Bits = $1
+               breaksw
+      case -d:
+               if ($Promote == 0) then
+                   set Promote = 2
+               else if ($Promote == 1) then
+                   set Promote = 3
+               endif
+               breaksw
+      case -i:
+               set Mode = 1
+               breaksw
+      case -I:
+               set Vselect = 1
+      case -C: 
+               if ($Vselect == 0) then
+                  set Vselect = 2
+               endif
+
+               shift
+               while ($#argv)
+                  set Varlist = ( $Varlist \"$1\" )
+                  shift
+               end
+               break
+
+      case -l:
+               if ($Promote == 0) then
+                   set Promote = 1
+               else if ($Promote == 2) then
+                   set Promote = 3
+               endif
+               breaksw
+      case -M: 
+               shift
+               while ($#argv)
+                  set Mappings = ( $Mappings $1 )
+                  shift
+               end
+               break
+      case -p:
+               shift
+               set Bits = $1
+               breaksw
+      case -r:
+               set MinMax = "#t"
+               breaksw
+      case -s:
+               set Individ = 1
+               breaksw
+      case -t:
+               shift
+               set Toler = $1
+               breaksw
+      case -u:
+               set DiffUltra = 1
+               breaksw
+      case -v:
+               set DiffPVA = 1
+               breaksw
+      case -w:
+               set Batch = 1
+               breaksw
+      case -x:
+               set track = 0
+               breaksw
+      case -z:
+               shift
+               set CArgs = ( $CArgs -z $1 )
+               breaksw
+      case -*:
+               set CArgs = ( $CArgs $1 )
+               breaksw
+      default:
+               set f1 = $1
+               set f2 = $2
+               shift
+               breaksw
+   endsw
+   shift
+end
+
+# track this run 
+if ((-x "$TRACKER") && ($track == 1)) then
+   $TRACKER -b -n pdbdiff -v $VERSION -P 1 -T 1 -W 1.0
+endif
+
+if (!(-e $f1)) then
+ echo "pdbdiff: $f1 does NOT exist"
+ exit(1)
+endif
+
+if (!(-e $f2)) then
+ echo "pdbdiff: $f2 does NOT exist"
+ exit(2)
+endif
+
+# do the comparison
+if ($DiffPVA == 1) then
+   $SX $CArgs -e -l sxdm.scm \(compare $f1 $f2 $Toler $Batch $MinMax $Mappings\)
+   set DiffStat = $status
+else if ($DiffUltra == 1) then
+   $ULTRA -e -s \(compare $f1 $f2 $Toler\)
+   set DiffStat = $status
+else
+   if ($Mode == 1) then
+      $SX -e -l sxcomp.scm \(pdbcomp $f1 $f2 $Bits $Individ $Promote\)
+      set DiffStat = $status
+   else
+      $SX -s -e -l sxcomp.scm \(pdbdiff $f1 $f2 $Bits $Individ $Promote $Vselect $Varlist\)
+      set DiffStat = $status
+   endif
+endif
+
+exit($DiffStat)

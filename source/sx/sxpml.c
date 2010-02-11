@@ -1,0 +1,2033 @@
+/*
+ * SXPML.C - PML extensions in SX
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "cpyright.h"
+ 
+#include "sx_int.h"
+
+typedef int (*PF_int_dd)(double, double);
+
+#define GET_ARRAY_FP_VALUE(type, arr, n)                                      \
+    {type *p;                                                                 \
+     p = (type *) arr->data;                                                  \
+     ret = SS_mk_float((double) p[n]);}
+
+#define GET_ARRAY_FIX_VALUE(type, arr, n)                                     \
+    {type *p;                                                                 \
+     p = (type *) arr->data;                                                  \
+     ret = SS_mk_integer((BIGINT) p[n]);}
+
+#define SET_ARRAY_FP_VALUE(type, arr, n, val)                                 \
+    {type *p;                                                                 \
+     double v;                                                                \
+     p = (type *) arr->data;                                                  \
+     SS_args(val,                                                             \
+	     SC_DOUBLE_I, &v,                                                 \
+	     0);                                                              \
+     p[n] = (type) v;}
+
+#define SET_ARRAY_FIX_VALUE(type, arr, n, val)                                \
+    {type *p;                                                                 \
+     long v;                                                                  \
+     p = (type *) arr->data;                                                  \
+     SS_args(val,                                                             \
+	     SC_LONG_I, &v,                                                   \
+	     0);                                                              \
+     p[n] = (type) v;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_NUMERIC_ARRAYP - function version of SX_NUMERIC_ARRAYP macro */
+
+static object *_SXI_numeric_arrayp(object *obj)
+   {object *o;
+
+    o = SX_NUMERIC_ARRAYP(obj) ? SS_t : SS_f;
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MAPPINGP - function version of SX_MAPPINGP macro */
+
+static object *_SXI_mappingp(object *obj)
+   {object *o;
+
+    o = SX_MAPPINGP(obj) ? SS_t : SS_f;
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SETP - function version of SX_SETP macro */
+
+static object *_SXI_setp(object *obj)
+   {object *o;
+
+    o = SX_SETP(obj) ? SS_t : SS_f;
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MK_ARRAY - allocate and return a C_array
+ *               - form: (pm-make-array <type> <size>)
+ */
+
+static object *_SXI_mk_array(object *argl)
+   {long size, bpi;
+    char *type;
+    C_array *arr;
+    object *rv;
+
+    rv   = SS_null;
+    type = NULL;
+    size = 0L;
+    SS_args(argl,
+            SC_STRING_I, &type,
+            SC_LONG_I, &size,
+            0);
+
+    if (SX_vif != NULL)
+       {defstr *dp;
+
+	dp = PD_inquire_host_type(SX_vif, type);
+	if (dp != NULL)
+	   type = dp->type;
+
+	bpi = _PD_lookup_size(type, SX_vif->host_chart);
+	arr = PM_make_array(type, size, NULL);
+
+	rv = SX_mk_C_array(arr);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_RESZ_ARRAY - doublelocate and return a C_array
+ *                 - form: (pm-resize-array <array> <size>)
+ */
+
+static object *_SXI_resz_array(object *argl)
+   {long os, size, bpi;
+    C_array *arr;
+    void *d;
+    object *o;
+
+    arr  = NULL;
+    size = 0L;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            SC_LONG_I, &size,
+            0);
+
+    if (arr != NULL)
+       {PM_ARRAY_CONTENTS(arr, void, os, NULL, d);
+
+	bpi = SC_arrlen(d)/os;
+
+        arr->length = size;
+        arr->data   = SC_realloc_na(d, size, bpi, FALSE);};
+
+    o = SS_car(argl);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SUB_ARRAY - allocate and return a C_array that is a sub-array of the
+ *                - input array.
+ *                - form: (pm-sub-array <array> <dimensions> <region>)
+ */
+
+static object *_SXI_sub_array(object *argl)
+   {int i, nd, nr;
+    long n, length, rlength, bpi;
+    long *idims, *ireg, *pd, *pr;
+    char typ[MAXLINE];
+    void *d;
+    C_array *arr, *newarr;
+    object *dims, *reg, *obj, *rv;
+
+    arr  = NULL;
+    n    = 0;
+    d    = NULL;
+    rv   = SS_null;
+    dims = SS_null;
+    reg  = SS_null;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            SS_OBJECT_I, &dims,
+            SS_OBJECT_I, &reg,
+            0);
+
+    if (arr == NULL)
+       SS_error("NO ARRAY SPECIFIED - _SXI_SUB_ARRAY", argl);
+    else
+       {PM_ARRAY_CONTENTS(arr, void, n, typ, d);};
+
+/* extract the array dimensions */
+    nd    = 0;
+    idims = NULL;
+    if (SS_nullobjp(dims))
+       SS_error("NO ARRAY DIMENSIONS SPECIFIED - _SXI_SUB_ARRAY", argl);
+
+    else
+       {nd       = SS_length(dims);
+        idims    = FMAKE_N(long, nd + 1, "_SXI_SUB_ARRAY:idims");
+        idims[0] = nd/2;
+        for (pd = idims + 1; !SS_nullobjp(dims); pd++)
+            SX_GET_INTEGER_FROM_LIST(*pd, dims,
+                                     "BAD ARRAY DIMENSIONS - _SXI_SUB_ARRAY");};
+
+/* extract the region specifications */
+    ireg = NULL;
+    if (SS_nullobjp(reg))
+       SS_error("NO REGION SPECIFIED - _SXI_SUB_ARRAY", argl);
+
+    else
+       {nr      = SS_length(reg);
+        ireg    = FMAKE_N(long, nr + 1, "_SXI_SUB_ARRAY:ireg");
+        ireg[0] = nr/2;
+        for (pr = ireg + 1; !SS_nullobjp(reg); pr++)
+            SX_GET_INTEGER_FROM_LIST(*pr, reg,
+                                     "BAD REGION - _SXI_SUB_ARRAY");};
+
+/* do some error checking */
+    length = 1;
+    if (idims != NULL)
+       {for (pd = idims + 1, i = 0; i < idims[0]; i++)
+	    length *= pd[2*i + 1] - pd[2*i] + 1;};
+
+    rlength = 1;
+    if (ireg != NULL)
+       {for (pr = ireg + 1, i = 0; i < ireg[0];  i++)
+	    rlength *= pr[2*i + 1] - pr[2*i] + 1;};
+
+    if (length != n)
+       SS_error("BAD DIMENSIONS SPECIFIED FOR ARRAY - _SXI_SUB_ARRAY", argl);
+
+    if ((rlength > length)  || (rlength < 0))
+       SS_error("BAD REGION SPECIFIED FOR ARRAY - _SXI_SUB_ARRAY", argl);
+    
+/* allocate the output array */
+    newarr = PM_make_array(typ, rlength, NULL);
+
+    bpi = SIZEOF(typ);
+
+    PM_sub_array(d, newarr->data, idims, ireg, bpi);
+
+    rv = SX_mk_C_array(newarr);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_ARRAY_REF - reference the nth element of a pm-array
+ *                - form: (pm-array-ref <array> <n>)
+ */
+
+static object *_SXI_array_ref(object *argl)
+   {C_array *arr;
+    long n;
+    object *ret;
+
+    arr = NULL;
+    n   = 0L;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            SC_LONG_I, &n,
+            0);
+
+    ret = SS_null;
+    if (arr != NULL)
+       {char type[MAXLINE];
+
+/* get the array type and dereference indirections down to a base type */
+        strcpy(type, arr->type);
+	while (_PD_indirection(type))
+	   PD_dereference(type);
+
+/* in case the type is a typedef resolve it to a native type */
+        if (SX_vif != NULL)
+           {defstr *dp;
+
+            dp = PD_inquire_host_type(SX_vif, type);
+            if (dp != NULL)
+               strcpy(type, dp->type);};
+
+        if (strcmp(type, SC_DOUBLE_S) == 0)
+	   {GET_ARRAY_FP_VALUE(double, arr, n);}
+        else if (strcmp(type, SC_FLOAT_S) == 0)
+	   {GET_ARRAY_FP_VALUE(float, arr, n);}
+        else if (strcmp(type, SC_DOUBLE_S) == 0)
+	   {GET_ARRAY_FP_VALUE(double, arr, n);}
+        else if (strcmp(type, SC_SHORT_S) == 0)
+	   {GET_ARRAY_FIX_VALUE(short, arr, n);}
+        else if (strncmp(type, SC_INTEGER_S, 3) == 0)
+	   {GET_ARRAY_FIX_VALUE(int, arr, n);}
+        else if (strcmp(type, SC_LONG_S) == 0)
+	   {GET_ARRAY_FIX_VALUE(long, arr, n);}
+        else if (strcmp(type, SC_CHAR_S) == 0)
+	   {GET_ARRAY_FIX_VALUE(char, arr, n);};}
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_ARRAY_SET - set the nth element of a pm-array
+ *                - form: (pm-array-set! <array> <n> <value>)
+ */
+
+static object *_SXI_array_set(object *argl)
+   {C_array *arr;
+    long n;
+    object *val;
+
+    arr = NULL;
+    n   = 0L;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            SC_LONG_I, &n,
+            SS_OBJECT_I, &val,
+            0);
+
+    if (arr != NULL)
+       {char type[MAXLINE];
+
+        strcpy(type, arr->type);
+        if (SX_vif != NULL)
+           {defstr *dp;
+
+            dp = PD_inquire_host_type(SX_vif, type);
+            if (dp != NULL)
+               strcpy(type, dp->type);};
+
+	while (_PD_indirection(type))
+	   PD_dereference(type);
+
+        if (strcmp(type, SC_DOUBLE_S) == 0)
+	   {SET_ARRAY_FP_VALUE(double, arr, n, val);}
+        else if (strcmp(type, SC_FLOAT_S) == 0)
+	   {SET_ARRAY_FP_VALUE(float, arr, n, val);}
+        else if (strcmp(type, SC_DOUBLE_S) == 0)
+	   {SET_ARRAY_FP_VALUE(double, arr, n, val);}
+        else if (strcmp(type, SC_SHORT_S) == 0)
+	   {SET_ARRAY_FIX_VALUE(short, arr, n, val);}
+        else if (strncmp(type, SC_INTEGER_S, 3) == 0)
+	   {SET_ARRAY_FIX_VALUE(int, arr, n, val);}
+        else if (strcmp(type, SC_LONG_S) == 0)
+	   {SET_ARRAY_FIX_VALUE(long, arr, n, val);}
+        else if (strcmp(type, SC_CHAR_S) == 0)
+	   {SET_ARRAY_FIX_VALUE(char, arr, n, val);};}
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_LIST_ARRAY - turn a list of numbers into a numeric array */
+
+object *SX_list_array(object *argl)
+   {int n, fixp;
+    long *lp;
+    double *fp;
+    C_array *arr;
+    object *num, *lst, *rv;
+
+    n    = 0;
+    lst  = argl;
+    for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst))
+        {num = SS_car(lst);
+         if (!SS_numbp(num))
+            SS_error("LIST ELEMENT NOT A NUMBER - SX_LIST_ARRAY", num);
+
+         n++;};
+
+/* determine whether the list is all integers */
+    fixp = TRUE;
+    for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst))
+        fixp &= SS_integerp(SS_car(lst));
+
+    if (fixp)
+       {arr = PM_make_array(SC_LONG_S, n, NULL);
+	lp  = (long *) arr->data;
+	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst), lp++)
+	    {SS_args(lst,
+		     SC_LONG_I, lp,
+		     0);};}
+    else
+       {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
+	fp  = (double *) arr->data;
+	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst), fp++)
+	    {SS_args(lst,
+		     SC_DOUBLE_I, fp,
+		     0);};};
+
+    rv = SX_mk_C_array(arr);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_ARRAY_LIST - turn a numeric array into a list of numbers */
+
+static object *_SXI_array_list(object *argl)
+   {object *obj, *lst;
+    C_array *arr;
+    long i, n;
+    char type[MAXLINE];
+    char *cp;
+    short *sp;
+    int *ip;
+    long *lp;
+    float *fp;
+    double *dp;
+    void *data;
+
+    arr = NULL;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            0);
+
+    if (arr == NULL)
+       return(SS_null);
+
+    PM_ARRAY_CONTENTS(arr, void, n, type, data);
+
+    lst = SS_null;
+    if (strcmp(type, SC_DOUBLE_S) == 0)
+       {dp = (double *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_float((double) *dp++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if (strcmp(type, SC_FLOAT_S) == 0)
+       {fp = (float *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_float((double) *fp++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if (strcmp(type, SC_LONG_S) == 0)
+       {lp = (long *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_integer((BIGINT) *lp++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if ((strcmp(type, SC_INTEGER_S) == 0) ||
+	     (strcmp(type, "int") == 0))
+       {ip = (int *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_integer((BIGINT) *ip++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if (strcmp(type, SC_SHORT_S) == 0)
+       {sp = (short *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_integer((BIGINT) *sp++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if (strcmp(type, SC_CHAR_S) == 0)
+       {cp = (char *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_integer((BIGINT) *cp++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else
+       SS_error("DATA TYPE NOT SUPPORTED - _SXI_ARRAY_LIST", SS_null);
+
+    if (lst != SS_null)
+       lst = SS_reverse(lst);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_NUM_ARR_LEN - return the length of a numeric array */
+
+static object *_SXI_num_arr_len(object *obj)
+   {long n;
+    object *o;
+
+    if (!SX_NUMERIC_ARRAYP(obj))
+       SS_error("ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_LEN", obj);
+
+    n = NUMERIC_ARRAY_LENGTH(obj);
+
+    o = SS_mk_integer((BIGINT) n);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_NUM_ARR_EXTR - return the extrema of a numeric array */
+
+static object *_SXI_num_arr_extr(object *arg)
+   {int n, imin, imax;
+    char *type;
+    void *data;
+    object *lst, *obj;
+    double fmin, fmax;
+    double *d;
+
+    if (!SX_NUMERIC_ARRAYP(arg))
+       SS_error("ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_EXTR", arg);
+
+    n    = NUMERIC_ARRAY_LENGTH(arg);
+    type = NUMERIC_ARRAY_TYPE(arg);
+    data = NUMERIC_ARRAY_DATA(arg);
+
+    d = PM_array_real(type, data, n, NULL);
+
+    PM_minmax(d, n, &fmin, &fmax, &imin, &imax);
+
+    SFREE(d);
+
+    lst = SS_null;
+    obj = SS_mk_integer((BIGINT) imax);
+    lst = SS_mk_cons(obj, lst);
+    obj = SS_mk_integer((BIGINT) imin);
+    lst = SS_mk_cons(obj, lst);
+    obj = SS_mk_float(fmax);
+    lst = SS_mk_cons(obj, lst);
+    obj = SS_mk_float(fmin);
+    lst = SS_mk_cons(obj, lst);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SET_PDBDATA - given a PM_set object
+ *                  - allocate and fill a PDB data object with the
+ *                  - PM_set and return it
+ */
+
+static object *_SXI_set_pdbdata(object *argl)
+   {char *mn, set_name[MAXLINE];
+    PM_set *s;
+    g_file *po;
+    PDBfile *file;
+    object *rv;
+
+    s    = NULL;
+    po   = NULL;
+    mn   = NULL;
+    file = NULL;
+    SS_args(argl,
+            G_SET, &s,
+            G_FILE, &po,
+            SC_STRING_I, &mn,
+            0);
+
+    if ((po == NULL) || (po == SX_gvif))
+       file = SX_vif;
+
+    else if (strcmp(po->type, PDBFILE_S) == 0)
+       file = FILE_FILE(PDBfile, po);
+
+    else
+       SS_error("BAD FILE - _SXI_SET_PDBDATA", argl);
+
+    if (mn == NULL)
+       strcpy(set_name, s->name);
+    else
+       {strcpy(set_name, mn);
+        SFREE(mn);};
+
+    if (s == NULL)
+       SS_error("BAD ARGUMENT - _SXI_SET_PDBDATA", argl);
+
+    rv = SX_pdbdata_handler(file, set_name, "PM_set *", &s, TRUE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_PDBDATA_SET - read a PM_set out of a PDB file and
+ *                  - return a PML set object
+ *                  - FORM:
+ *                  -    (pdbdata->pm-set <file> <name>)
+ */
+
+static object *_SXI_pdbdata_set(object *argl)
+   {char *name;
+    PDBfile *file;
+    g_file *po;
+    syment *ep;
+    SC_address data;
+    PM_set *s;
+    object *obj;
+
+    if (!SS_consp(argl))
+       SS_error("BAD ARGUMENT LIST - _SXI_PDBDATA_SET", argl);
+
+/* if the first object is a pdbfile, use it, otherwise, use default file */
+    argl = SX_get_file(argl, &po);
+    file = FILE_FILE(PDBfile, po);
+
+    obj  = SS_car(argl);
+    argl = SS_cdr(argl);
+    name = SC_strsavef(SS_get_string(obj),
+               "char*:_SXI_PDBDATA_SET:name");
+
+/* check to see whether or not the variable is in the file */
+    ep = PD_inquire_entry(file, name, TRUE, NULL);
+    if (ep == NULL)
+       obj = SS_null;
+
+    else
+
+/* read the set */
+       {if (file == SX_vif)
+	   {data.diskaddr = PD_entry_address(ep);
+	    s = *(PM_set **) data.memaddr;}
+        else
+	   {if (!PD_read(file, name, &data.memaddr))
+	       SS_error(PD_err, obj);
+	    s = (PM_set *) data.memaddr;};
+
+	if (s->info_type == NULL)
+	   s->info_type = SC_PCONS_P_S;
+
+	obj = SX_mk_set(s);};
+
+    return(obj);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MAKE_PML_SET - build a PM_set from some numeric arrays at SX level
+ *                   -
+ *                   - Form:
+ *                   -
+ *                   - (pm-make-set <name>
+ *                   -               <mesh-shape-list>
+ *                   -               <element-arrays>)
+ *                   -
+ *                   - <name>            - name of the set
+ *                   - <mesh-shape-list> - List of numbers specifying the mesh
+ *                   -                   - shape.  These numbers are the 
+ *                   -                   - maximum values of the indexes in 
+ *                   -                   - each direction.  The minima are
+ *                   -                   - assumed to be zero.
+ *                   - <element-arrays>  - List of numeric arrays whose
+ *                   -                   - entries specify the elements of
+ *                   -                   - the set.
+ *                   - Example:
+ *                   -
+ *                   - (pm-make-set "section" '(10 20) '(x y z))
+ *                   -
+ *                   - This specifies a two dimensional section of a three
+ *                   - dimensional space.  The mesh has 10x20 elements and
+ *                   - the numeric arrays x, y, and z are each 200 long.
+ *                   -
+ *                   - If no element arrays are given a logical set is
+ *                   - built from the type and shape specifications.
+ *                   -
+ *                   - (pm-make-set "section" '(10 20))
+ *                   -
+ *                   - This specifies a two dimensional set of 2 vectors.
+ *                   - The mesh has 10x20 elements which go from (0,0) to (9,19).
+ *                   -
+ *                   - Note: Logical rectangular meshes are assumed.
+ *                   -       This can be generalized later by having the
+ *                   -       <mesh-shape-list> specify the mesh connectivity
+ *                   -       more generally.
+ */
+
+static object *_SXI_make_pml_set(object *argl)
+   {int *maxes, *pm, nd, ne, nde;
+    char *name, *type;
+    void **elem, **pe;
+    PM_set *set;
+    C_array *arr;
+    object *obj, *shape, *components, *rv;
+
+    nd    = 0;
+    name  = NULL;
+    shape = SS_null;
+    components = SS_null;
+    SS_args(argl,
+            SC_STRING_I, &name,
+            SS_OBJECT_I, &shape,
+            SS_OBJECT_I, &components,
+            0);
+
+/* extract the name */
+    if (name == NULL)
+       SS_error("BAD NAME - _SXI_MAKE_PML_SET", argl);
+
+/* extract the mesh shape */
+    maxes = NULL;
+    if (SS_nullobjp(shape))
+       SS_error("BAD MESH SHAPE - _SXI_MAKE_PML_SET", argl);
+    else
+       {nd    = SS_length(shape);
+        maxes = FMAKE_N(int, nd, "_SXI_MAKE_PML_SET:maxes");
+        for (pm = maxes; !SS_nullobjp(shape); )
+            SX_GET_INTEGER_FROM_LIST(*pm++, shape,
+                                     "BAD MESH INDEX - _SXI_MAKE_PML_SET");};
+
+/* extract the set elements */
+    if (SS_nullobjp(components))
+       set = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nd,
+				     maxes, NULL, NULL);
+
+    else
+       {nde  = SS_length(components);
+	elem = FMAKE_N(void *, nde, "_SXI_MAKE_PML_SET:elem");
+
+/* get the number of elements */
+	obj = SS_car(components);
+	if (!SX_NUMERIC_ARRAYP(obj))
+	   SS_error("OBJECT NOT NUMERIC ARRAY - _SXI_MAKE_PML_SET", obj);
+
+	ne      = NUMERIC_ARRAY_LENGTH(obj);
+	type    = NUMERIC_ARRAY_TYPE(obj);
+	elem[0] = NUMERIC_ARRAY_DATA(obj);
+
+	for (pe = elem; !SS_nullobjp(components); )
+	    {arr        = NULL;
+	     obj        = SS_car(components);
+	     components = SS_cdr(components);
+	     if (SX_NUMERIC_ARRAYP(obj))
+	        arr = SS_GET(C_array, obj);
+	     else
+	        SS_error("BAD ELEMENT ARRAY - _SXI_MAKE_PML_SET", obj);
+
+	     if (arr != NULL)
+	        {if (strcmp(SX_promotion_type, "none") != 0)
+		    {PM_promote_array(arr, SX_promotion_type, TRUE);
+		     type = arr->type;};
+
+		 *pe++ = arr->data;};};
+
+	set = PM_mk_set(name, type, FALSE,
+			ne, nd, nde, maxes, elem,
+			NULL, NULL,
+			NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL);};
+
+    rv = SX_mk_set(set);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MAKE_CP_SET - build and return the PML set object which is the
+ *                  - cartesian product of the argument sets
+ *                  -
+ *                  - FORM:
+ *                  - (pm-make-cartesian-product-set [<set>]*)
+ */
+
+static object *_SXI_make_cp_set(object *argl)
+   {int i, n;
+    char *name;
+    PM_set **sets, *cp;
+    object *obj;
+
+    n = SS_length(argl);
+    sets = FMAKE_N(PM_set *, n, "_SXI_MAKE_CP_SET:sets");
+
+    for (i = 0; i < n; i++)
+        {SX_GET_SET_FROM_LIST(sets[i], argl,
+			      "ARGUMENT NOT SET - _SXI_MAKE_CP_SET");};
+
+    name = SC_dsnprintf(FALSE, "CP %d", n);
+
+    cp = PM_make_lr_cp_domain(name, SC_DOUBLE_S, n, sets);
+
+    SFREE(sets);
+
+    obj = SX_mk_set(cp);
+
+    return(obj);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MAKE_PML_MAPPING - build a PML mapping object out of a domain, range
+ *                       - and attribute set
+ *                       -
+ *                       - FORM:
+ *                       - (pm-make-mapping <domain> <range>
+ *                       -                  [<centering> <category> <name>
+ *                       -                   <emap> <next>])
+ *                       -
+ *                       - Centering defaults to zone
+ *                       - Existence map thru which to plot defaults to all 1's
+ *                       - mapping name
+ */
+
+static object *_SXI_make_pml_mapping(object *argl)
+   {char *lbl, *name, *category;
+    PM_centering centering;
+    PM_mapping *f, *next;
+    PM_set *domain, *range;
+    C_array *arr;
+    object *o;
+
+    centering = N_CENT;
+    category  = PM_LR_S;
+    arr       = NULL;
+    name      = NULL;
+    next      = NULL;
+    SS_args(argl,
+            G_SET, &domain,
+            G_SET, &range,
+            SC_ENUM_I, &centering,
+            SC_STRING_I, &category,
+            SC_STRING_I, &name,
+	    G_NUM_ARRAY, &arr,
+	    G_MAPPING, &next,
+            0);
+
+    if (name == NULL)
+       lbl = SC_dsnprintf(FALSE, "%s->%s", domain->name, range->name);
+    else
+       lbl = SC_dsnprintf(FALSE, name);
+
+    f = PM_make_mapping(lbl, category, domain, range, centering, next);
+
+/* if an existence map was supplied add it to the mapping's attribute list */
+    if (arr != NULL)
+       {long n;
+	char type[MAXLINE];
+	char *emap;
+	void *data;
+
+	PM_ARRAY_CONTENTS(arr, void, n, type, data);
+
+        emap = NULL;
+        CONVERT(SC_CHAR_S, (void **) &emap, type, data, n, FALSE);
+
+	PG_set_attrs_mapping(f,
+			     "EXISTENCE", SC_CHAR_I, TRUE, emap,
+			     NULL);};
+
+    o = SX_mk_mapping(f);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_WR_GSET - print a g_set */
+
+static void _SX_wr_gset(object *obj, object *strm)
+   {
+
+    PRINT(SS_OUTSTREAM(strm), "<SET|%s,%s>",
+                              SET_NAME(obj),
+                              SET_ELEMENT_TYPE(obj));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_RL_GSET - gc a set */
+
+static void _SX_rl_gset(object *obj)
+   {
+
+/* you don't know whether a mapping is pointing to this
+    PM_set *set;
+    set = SS_GET(PM_set, obj);
+
+    PM_rel_set(set, FALSE);
+*/
+
+    SS_rl_object(obj);;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_MK_SET - encapsulate a PM_set as an object */
+
+object *SX_mk_set(PM_set *set)
+   {object *op;
+
+    op = SS_mk_object(set, G_SET, SELF_EV, set->name,
+		      _SX_wr_gset, _SX_rl_gset);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_GET_TEXT_SET_NAME - given a file and reference to a set by
+ *                        - name or menu number,
+ *                        - return the set name as an object
+ */
+
+static object *_SXI_get_text_set_name(object *set)
+   {PM_set *s;
+    object *o;
+
+    o = SS_null;
+    if (SX_SETP(set))
+       {s = SS_GET(PM_set, set);
+        o = SS_mk_string(s->name);};
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SET_ATTR_SET - set an attribute of a PM_set
+ *                   - usage: (pm-set-set-attribute! <set>
+ *                   -                               <name> <type> <value>)
+ */
+
+static object *_SXI_set_attr_set(object *argl)
+   {PM_set *s;
+    char *name, *type;
+    object *val;
+    pcons *inf;
+
+    s    = NULL;
+    name = NULL;
+    type = NULL;
+    val  = SS_null;
+    SS_args(argl,
+            G_SET, &s,
+            SC_STRING_I, &name,
+            SC_STRING_I, &type,
+            SS_OBJECT_I, &val,
+            0);
+
+    if ((s == NULL) || (name == NULL) || (type == NULL))
+       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SET_ATTR_SET", argl);
+
+    else
+
+/* get the current list */
+       {if (s->info_type != NULL)
+	   {if (strcmp(s->info_type, SC_PCONS_P_S) == 0)
+	       inf = (pcons *) s->info;
+	    else
+	       inf = NULL;}
+        else
+	   inf = NULL;
+
+	s->info      = SX_set_attr_alist(inf, name, type, val);
+	s->info_type = SC_PCONS_P_S;};
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SET_MAP_TYPE - set the type of a PM_mapping or the mapping part of
+ *                   - a PG_graph object
+ */
+
+static object *_SXI_set_map_type(object *argl)
+   {PM_mapping *f;
+    char *name;
+
+    f    = NULL;
+    name = NULL;
+    SS_args(argl,
+            G_MAPPING, &f,
+            SC_STRING_I, &name,
+            0);
+
+    if ((f == NULL) || (name == NULL))
+       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SET_MAP_TYPE", argl);
+
+    else
+       f->map_type = SC_strsavef(name,"char*:_SXI_SET_MAP_TYPE:type");
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MAPPING_PDBDATA - given a PM_mapping object
+ *                      - allocate and fill a PDB data object with the
+ *                      - PM_mapping and return it
+ */
+
+static object *_SXI_mapping_pdbdata(object *argl)
+   {PM_mapping *f, *pf;
+    g_file *po;
+    PDBfile *file;
+    char *mn, *name;
+    long i;
+    object *ret;
+
+    f    = NULL;
+    po   = NULL;
+    mn   = NULL;
+    file = NULL;
+    SS_args(argl,
+            G_MAPPING, &f,
+            G_FILE, &po,
+            SC_STRING_I, &mn,
+            0);
+
+    if ((po == NULL) || (po == SX_gvif))
+       {po   = SX_gvif;
+        file = SX_vif;}
+
+    else if (strcmp(po->type, PDBFILE_S) == 0)
+       file = FILE_FILE(PDBfile, po);
+
+    else
+       SS_error("BAD FILE - _SXI_MAPPING_PDBDATA", argl);
+
+    if (f == NULL)
+       SS_error("BAD ARGUMENT - _SXI_MAPPING_PDBDATA", argl);
+
+    if (mn == NULL)
+       {_SX_get_menu(po);
+        for (i = 0; TRUE; i++)
+            {name = SC_dsnprintf(FALSE, "Mapping%ld", i);
+             if (PD_inquire_entry(file, name, TRUE, NULL) == NULL)
+                break;};}
+    else
+       {name = SC_dsnprintf(FALSE, mn);
+        SFREE(mn);};
+
+/* disconnect any function pointers or undefined structs/members */
+    for (pf = f; pf != NULL; pf = pf->next)
+        {pf->domain->opers = NULL;
+         pf->range->opers = NULL;};
+
+/* make sure that the necessary types are known */
+    if (PD_inquire_type(file, "PM_mapping") == NULL)
+       PD_def_mapping(file);
+
+    ret = SX_pdbdata_handler(file, name, "PM_mapping *", &f , TRUE);
+
+/* add to menu */
+    _SX_push_menu_item(po, name, "PM_mapping *");
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_PDBDATA_MAPPING - read a PM_mapping out of a PDB file and
+ *                      - return a PML mapping object
+ *                      - FORM:
+ *                      -    (pdbdata->pm-mapping <file> <name>)
+ */
+
+static object *_SXI_pdbdata_mapping(object *argl)
+   {int i, ret;
+    char *name, dname[MAXLINE];
+    PDBfile *file;
+    g_file *po;
+    syment *ep;
+    SC_address data;
+    PM_set *domain, *range;
+    PM_mapping *pf, *f;
+    SX_menu_item *mi;
+    object *obj, *rv;
+
+    rv = SS_null;
+
+    if (!SS_consp(argl))
+       SS_error("BAD ARGUMENT LIST - _SXI_PDBDATA_MAPPING", argl);
+
+/* if the first object is a pdbfile, use it, otherwise, use default file */
+    argl = SX_get_file(argl, &po);
+    file = FILE_FILE(PDBfile, po);
+
+    obj = SS_car(argl);
+    if (SS_integerp(obj))
+       {i    = SS_INTEGER_VALUE(obj);
+	mi   = _SX_get_menu_item(po, i);
+	name = (mi == NULL) ? NULL : mi->vname;}
+    else
+       {argl = SS_cdr(argl);
+        name = SC_strsavef(SS_get_string(obj),
+			   "char*:_SXI_PDBDATA_MAPPING:name");};
+
+    if (name == NULL)
+       return(SS_null);
+
+/* check to see whether or not the variable is in the file */
+    ep = PD_inquire_entry(file, name, TRUE, NULL);
+    if (ep == NULL)
+       return(SS_null);
+
+/* read the mapping */
+    if (file == SX_vif)
+       {data.diskaddr = PD_entry_address(ep);
+        data.memaddr  = DEREF(data.memaddr);}
+    else
+       {if (!PD_read(file, name, &data.memaddr))
+           SS_error(PD_err, obj);};
+
+    PD_reset_ptr_list(file);
+
+/* reconnect any function pointers or undefined structs/members */
+    f = (PM_mapping *) data.memaddr;
+    if (f != NULL)
+       {if (f->domain == NULL)
+	   {strcpy(dname, f->name);
+	    PD_process_set_name(dname);
+
+	    if (!PD_read(file, dname, &data.memaddr))
+	       SS_error(PD_err, SS_null);
+
+	    f->domain = (PM_set *) data.memaddr;};
+
+	ret = TRUE;
+	for (pf = f; pf != NULL; pf = pf->next)
+	    {domain = pf->domain;
+	     range  = pf->range;
+	     if (domain != NULL)
+	        {ret &= PM_set_opers(domain);
+		 if (domain->info_type == NULL)
+		    domain->info_type = SC_PCONS_P_S;};
+
+	     if (range != NULL)
+	        {ret &= PM_set_opers(range);
+		 if (range->info_type == NULL)
+		    range->info_type = SC_PCONS_P_S;};
+
+	     if (ret == FALSE)
+	        SS_error("NO FIELD FOR TYPE - _SXI_PDBDATA_MAPPING", SS_null);};
+
+	rv = SX_mk_mapping(f);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_WR_GMAPPING - print a g_mapping */
+
+static void _SX_wr_gmapping(object *obj, object *strm)
+   {
+
+    PRINT(SS_OUTSTREAM(strm), "<MAPPING|%s>", MAPPING_NAME(obj));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_RL_GMAPPING - gc a mapping */
+
+static void _SX_rl_gmapping(object *obj)
+   {PM_mapping *f;
+
+    f = SS_GET(PM_mapping, obj);
+    PM_rel_mapping(f, TRUE, TRUE);
+
+    SS_rl_object(obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_MK_MAPPING - encapsulate a PM_mapping as an object */
+
+object *SX_mk_mapping(PM_mapping *f)
+   {object *op;
+
+    op = SS_mk_object(f, G_MAPPING, SELF_EV, f->name,
+		      _SX_wr_gmapping, _SX_rl_gmapping);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_ARRAYS_SET - convert the data from a list of C_array objects to
+ *                 - a set of one higher dimension than the arrays
+ *                 - FORM:
+ *                 -    (pm-arrays->set name <array> ...)
+ */
+
+static object *_SXI_arrays_set(object *argl)
+   {int i, j, n, *maxes, *pm, nd, ne, nde, nep, tflag;
+    char type[MAXLINE];
+    char *name;
+    double **elem, *pe;
+    void *data;
+    object *obj, *components, *shape, *lst;
+    PM_set *set;
+
+    n     = 0;
+    name  = NULL;
+    shape = SS_null;
+    components = SS_null;
+    tflag = FALSE;
+    SS_args(argl,
+            SC_STRING_I, &name,
+            SC_INTEGER_I, &tflag,
+            SS_OBJECT_I, &shape,
+            0);
+
+    components = SS_cdddr(argl);
+
+/* extract the name */
+    if (name == NULL)
+       SS_error("BAD NAME - _SXI_ARRAYS_SET", argl);
+
+/* extract the mesh shape */
+    if (SS_nullobjp(shape))
+       {nd    = SS_length(components) + tflag;
+        maxes = FMAKE_N(int, nd, "_SXI_ARRAYS_SET:maxes");
+        maxes[nd-1] = SS_length(SS_car(components));}
+    else
+       {nd    = SS_length(shape);
+        maxes = FMAKE_N(int, nd, "_SXI_ARRAYS_SET:maxes");
+        for (pm = maxes; !SS_nullobjp(shape); )
+            SX_GET_INTEGER_FROM_LIST(*pm++, shape,
+                                     "BAD MESH INDEX - _SXI_ARRAYS_SET");};
+
+/* each component is a list of arrays */
+    nde  = SS_length(components) + tflag;
+    elem = FMAKE_N(double *, nde, "_SXI_ARRAYS_SET:elem");
+    for (lst = components; !SS_nullobjp(lst); lst = SS_cdr(lst))
+        {if (lst == components)
+            n = SS_length(SS_car(lst));
+         else if (n != SS_length(SS_car(lst)))
+            SS_error("COMPONENT LISTS NOT SAME LENGTH - _SXI_ARRAYS_SET",
+                     lst);};
+
+/* get the number of elements */
+    lst = SS_caar(components);
+    if (!SX_NUMERIC_ARRAYP(lst))
+       SS_error("OBJECT NOT NUMERIC ARRAY - _SXI_ARRAYS_SET", lst);
+
+    strcpy(type, NUMERIC_ARRAY_TYPE(lst));
+    PD_dereference(type);
+
+    data = NUMERIC_ARRAY_DATA(lst);
+    nep  = NUMERIC_ARRAY_LENGTH(lst);
+    ne   = nep*n;
+
+    for (j = 0; !SS_nullobjp(components); j++, components = SS_cdr(components))
+        {pe = FMAKE_N(double, ne, "_SXI_ARRAYS_SET:pe");
+         elem[j] = pe;
+         lst = SS_car(components);
+         for (i = 0; i < n; i++)
+             {SX_GET_ARRAY_FROM_LIST(data, lst,
+                                     "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
+
+              CONVERT(SC_DOUBLE_S, (void **) &pe, type, data, nep, FALSE);
+
+              pe += nep;};};
+
+/* the new component must be made */
+    if (tflag)
+       {pe = FMAKE_N(double, ne, "_SXI_ARRAYS_SET:pe");
+        elem[j] = pe;
+        for (i = 0; i < n; i++)
+            {for (j = 0; j < nep; j++)
+                 *pe++ = i;};};
+
+    set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
+		    ne, nd, nde, maxes, elem,
+		    NULL, NULL,
+		    NULL, NULL, NULL, NULL, NULL, NULL,
+		    NULL);
+
+    obj = SX_mk_set(set);
+
+    return(obj);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_LR_AC - convert an LR based mapping into an AC based one
+ *            - FORM:
+ *            -    (pm-lr->ac <mapping>)
+ */
+
+static object *_SXI_lr_ac(object *argl)
+   {int ord, *maxes;
+    void **elements;
+    PM_centering cent;
+    PM_mapping *f, *g;
+    PM_set *odom, *oran, *ndom, *nran;
+    PM_mesh_topology *mt;
+    object *rv;
+
+    rv  = SS_null;
+    f   = NULL;
+    ord = BND_CELL_MAX;
+    SS_args(argl,
+            G_MAPPING, &f,
+            SC_INTEGER_I, &ord,
+            0);
+
+    if (f == NULL)
+       SS_error("BAD MAPPING - _SXI_LR_AC", argl);
+
+    else
+       {odom = f->domain;
+	oran = f->range;
+
+/* find the additional mapping information */
+	cent = N_CENT;
+	PM_mapping_info(f,
+			"CENTERING", &cent,
+			NULL);
+
+	if (odom->dimension != 2)
+	   SS_error("ONLY 2D MESHES CURRENTLY - _SXI_LR_AC", SS_null);
+
+	else
+	   {int kmax, lmax;
+	    double *x, *y, *px, *py;
+
+	    maxes = odom->max_index;
+	    kmax = maxes[0];
+	    lmax = maxes[1];
+
+	    elements = (void **) odom->elements;
+	    px = x = (double *) elements[0];
+	    py = y = (double *) elements[1];
+
+	    mt = PM_lr_ac_mesh_2d(&x, &y, kmax, lmax, 1, kmax, 1, lmax, ord);
+
+/* check the new mesh */
+	    {int i, nn;
+	     nn = kmax*lmax;
+	     for (i = 0; i < nn; i++)
+	         {if ((x[i] != px[i]) || (y[i] != py[i]))
+		     SS_error("BAD CONVERSION - _SXI_LR_AC", SS_null);};};
+
+	    elements = FMAKE_N(void *, 2, "_SXI_LR_AC:elements");
+	    elements[0] = (void *) x;
+	    elements[1] = (void *) y;
+
+	    ndom = PM_mk_set(odom->name, SC_DOUBLE_S, FALSE, odom->n_elements,
+			     odom->dimension, odom->dimension_elem,
+			     odom->max_index, elements,
+			     odom->opers, odom->metric,
+			     odom->symmetry_type, odom->symmetry,
+			     PM_MESH_TOPOLOGY_P_S, mt,
+			     odom->info_type, odom->info, NULL);
+
+	    nran = PM_copy_set(oran);
+
+	    g = PM_make_mapping(f->name, PM_AC_S, ndom, nran, cent, NULL);
+
+	    rv = SX_mk_mapping(g);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MAKE_AC_SET - make an Arbitrarily-Connect set from
+ *                  - lists of cell boundary specs
+ *                  -    (pm-make-ac-set nodes edges faces zones ... )
+ *                  - where
+ *                  -
+ *                  - nodes is a list of n-tuples (list of number)
+ *                  -       representing the node position
+ *                  - edges is a list of 1cells, faces 2cells, etc
+ *                  - an ncell is a list of numbers describing the
+ *                  - boundary of the ncell
+ *                  - see the description in pml.h for details
+ */
+
+static object *_SXI_make_ac_set(object *argl)
+   {int i, j, k;
+    int ne, nd, nde;
+    int *nbp, *ncs, nc, ord;
+    long **bnd, *pb;
+    double **elem;
+    char *name;
+    object *nodes, *node, *ncells, *ncell, *o;
+    PM_set *set;
+    PM_mesh_topology *mt;
+
+    nd = SS_length(argl);
+    if (nd < 1)
+       SS_error("NO DOMAIN INFO - _SXI_MAKE_AC_SET", argl);
+
+    nodes = SS_car(argl);
+    argl  = SS_cdr(argl);
+
+    ne = SS_length(nodes);
+    if (ne < 1)
+       SS_error("BAD NODE LIST - _SXI_MAKE_AC_SET", nodes);
+
+    nde = SS_length(SS_car(nodes));
+
+/* construct the element arrays from the lists */
+    elem = FMAKE_N(double *, nde, "_SXI_MAKE_AC_SET:elem");
+    for (i = 0; i < nde; i++)
+        elem[i] = FMAKE_N(double, ne, "_SXI_MAKE_AC_SET:elem[]");
+
+    for (i = 0; i < ne; i++, nodes = SS_cdr(nodes))
+        {node = SS_car(nodes);
+	 for (j = 0; j < nde; j++, node = SS_cdr(node))
+             {SS_args(node,
+		      SC_DOUBLE_I, elem[j]+i,
+		      0);};};
+
+/* construct the cell boundary arrays */
+    bnd = FMAKE_N(long *, nd, "_SXI_MAKE_AC_SET:bnd");
+    ncs = FMAKE_N(int, nd, "_SXI_MAKE_AC_SET:ncs");
+    nbp = FMAKE_N(int, nd, "_SXI_MAKE_AC_SET:nbp");
+    for (j = 1; j < nd; j++, argl = SS_cdr(argl))
+        {ncells = SS_car(argl);
+         ord = SS_length(SS_car(ncells));
+         nc  = SS_length(ncells);
+         pb  = FMAKE_N(long, ord*nc, "_SXI_MAKE_AC_SET:pb");
+         bnd[j] = pb;
+         ncs[j] = (ord == 1) ? nc - 1 : nc;
+         nbp[j] = ord;
+         for (i = 0; i < nc; i++, ncells = SS_cdr(ncells))
+             {ncell = SS_car(ncells);
+	      for (k = 0; k < ord; k++, ncell = SS_cdr(ncell))
+                  {SS_args(ncell,
+			   SC_LONG_I, pb++,
+			   0);};};};
+
+/* reduce the number of dimensions to its proper value now */
+    nd--;
+
+/* fill in the 0d part */
+    bnd[0] = NULL;
+    ncs[0] = ne;
+    nbp[0] = 1;
+
+/* put it all together */
+    mt = PM_make_topology(nd, nbp, ncs, bnd);
+
+    name = SC_dsnprintf(FALSE, "D%d-%d", nd, nde);
+
+    set = PM_mk_set(name, SC_DOUBLE_S, FALSE,
+		    ne, nd, nde, NULL, elem,
+		    NULL, NULL, NULL, NULL,
+		    PM_MESH_TOPOLOGY_P_S, mt,
+		    NULL, NULL, NULL);
+
+    o = SX_mk_set(set);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_ARRAY_PDBDATA - convert the data from a C_array object to
+ *                    - a pdbdata object
+ *                    - FORM:
+ *                    -    (pm-array->pdbdata <array> <file> [<name>])
+ */
+
+static object *_SXI_array_pdbdata(object *argl)
+   {char *mn, *name;
+    C_array *arr;
+    g_file *po;
+    PDBfile *file;
+    object *rv;
+
+    rv   = SS_null;
+    arr  = NULL;
+    po   = NULL;
+    mn   = NULL;
+    file = NULL;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            G_FILE, &po,
+            SC_STRING_I, &mn,
+            0);
+
+    if ((po == NULL) || (po == SX_gvif))
+       file = SX_vif;
+
+    else if (strcmp(po->type, PDBFILE_S) == 0)
+       file = FILE_FILE(PDBfile, po);
+
+    else
+       SS_error("BAD FILE - _SXI_ARRAY_PDBDATA", argl);
+
+    if (arr == NULL)
+       SS_error("INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA", argl);
+
+    else if (mn == NULL)
+       name = SC_dsnprintf(FALSE, "Pm-Array%d", _SX.ap++);
+
+    else
+       {name = SC_dsnprintf(FALSE, mn);
+        SFREE(mn);};
+
+    rv = SX_pdbdata_handler(file, name, "C_array", arr, TRUE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_ARRAY_PDBDATA_I - inverse of PDBDATA->PM-ARRAY
+ *                      - a C_array object
+ *                      - FORM:
+ *                      -    (pm-array->pdbdata-i <array> <file> [<name>])
+ */
+
+static object *_SXI_array_pdbdata_i(object *argl)
+   {char type[MAXLINE];
+    char *mn, *pt, *name;
+    void *x;
+    C_array *arr;
+    g_file *po;
+    PDBfile *file;
+    object *rv;
+
+    rv   = SS_null;
+    arr  = NULL;
+    po   = NULL;
+    mn   = NULL;
+    file = NULL;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            G_FILE, &po,
+            SC_STRING_I, &mn,
+            0);
+
+    if ((po == NULL) || (po == SX_gvif))
+       file = SX_vif;
+
+    else if (strcmp(po->type, PDBFILE_S) == 0)
+       file = FILE_FILE(PDBfile, po);
+
+    else
+       SS_error("BAD FILE - _SXI_ARRAY_PDBDATA_I", argl);
+
+    if (arr == NULL)
+       SS_error("INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA_I", argl);
+
+    else if (mn == NULL)
+       name = SC_dsnprintf(FALSE, "Pm-Array%d", _SX.api++);
+
+    else
+       {name = SC_dsnprintf(FALSE, mn);
+        SFREE(mn);};
+
+    if (arr != NULL)
+       {strcpy(type, arr->type);
+	pt = SC_firsttok(type, " *");
+	x  = arr->data;
+
+	rv = SX_pdbdata_handler(file, name, pt, x, TRUE);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_PDBDATA_ARRAY - convert the data from a pdbdata object to
+ *                    - a C_array object
+ *                    - NOTE: if the pdbdata object contains a C_array already
+ *                    -       just use it
+ *                    - FORM:
+ *                    -    (pdbdata->pm-array <pdbdata>)
+ */
+
+static object *_SXI_pdbdata_array(object *arg)
+   {g_pdbdata *pd;
+    syment *ep;
+    C_array *arr;
+    object *rv;
+
+    rv = SS_null;
+    pd = NULL;
+    SS_args(arg,
+            G_PDBDATA, &pd,
+            0);
+
+    if (pd == NULL)
+       SS_error("INVALID PDBDATA OBJECT - _SXI_PDBDATA_ARRAY", arg);
+
+    else
+       {ep = pd->ep;
+
+	if (strcmp(PD_entry_type(ep), "C_array") == 0)
+	   arr = (C_array *) pd->data;
+	else
+	   arr = PM_make_array(PD_entry_type(ep), PD_entry_number(ep),
+			       pd->data);
+
+	rv = SX_mk_C_array(arr);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_WR_GNUM_ARRAY - print a g_num_array */
+
+static void _SX_wr_gnum_array(object *obj, object *strm)
+   {
+
+    PRINT(SS_OUTSTREAM(strm), "<ARRAY|%s>", NUMERIC_ARRAY_TYPE(obj));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_RL_GNUM_ARRAY - release g_num_array */
+
+static void _SX_rl_gnum_array(object *obj)
+   {C_array *arr;
+
+    arr = SS_GET(C_array, obj);
+
+/*  GOTCHA - it's currently possible that some PM_set may still be pointing
+ *  at type and/or array even though the reference count doesn't reflect it
+ *  SFREE(arr->type);
+ *  SFREE(arr->data);
+ */
+    SFREE(arr);
+    SS_rl_object(obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_MK_C_ARRAY - encapsulate a C_array as an object */
+
+object *SX_mk_C_array(C_array *arr)
+   {object *op;
+
+    op = SS_mk_object(arr, G_NUM_ARRAY, SELF_EV, arr->type,
+		      _SX_wr_gnum_array, _SX_rl_gnum_array);
+
+    SC_mark(arr, 1);
+    SC_mark(arr->type, 1);
+    SC_mark(arr->data, 1);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_REP_TO_AC - map a the given connectivity representation into
+ *              - the PACT mesh topology representation
+ *              - and return a domain set
+ */
+
+PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
+		     int n_nodes, int n_zones, int *zones)
+   {int iz, j, j1, j2, incr;
+    int n_sides, *nc, *nbp, *pzone;
+    double **elem;
+    PM_set *s;
+    PM_mesh_topology *mt;
+    long **bnd, *ncell, *pcell;
+
+    elem = FMAKE_N(double *, 2, "SX_REP_TO_AC:elem");
+    elem[0] = rx;
+    elem[1] = ry;
+
+/* allocate the boundary arrays */
+    bnd = FMAKE_N(long *, 3, "SX_REP_TO_AC:bnd");
+    bnd[2] = FMAKE_N(long, 2*n_zones,
+                     "SX_REP_TO_AC:bnd[2]");
+
+/* fill the 2-cells */
+    ncell   = bnd[2];
+    n_sides = 0;
+    pzone   = zones;
+    for (iz = 0; iz < n_zones; iz++)
+        {incr  = 0;
+         while (pzone[incr] != -1)
+            incr++;
+         pcell = ncell + 2*iz;
+	 pcell[BND_CELL_MIN] = n_sides;
+	 pcell[BND_CELL_MAX] = n_sides + incr - 1;
+	 n_sides += incr;
+         pzone   += incr + 1;};
+
+    bnd[1] = FMAKE_N(long, 2*n_sides,
+                     "SX_REP_TO_AC:bnd[1]");
+
+/* fill the 1-cells */
+    pcell = bnd[1];
+    pzone = zones;
+    for (iz = 0; iz < n_zones; iz++)
+        {incr  = 0;
+         while (pzone[incr] != -1)
+            incr++;
+         for (j = 0; j < incr; j++)
+             {j1 = j;
+	      j2 = (j + 1) % incr;
+	      pcell[BND_CELL_MIN] = pzone[j1];
+	      pcell[BND_CELL_MAX] = pzone[j2];
+              pcell += 2;};
+         pzone   += incr + 1;};
+
+    bnd[0] = NULL;
+
+/* setup the number of cells array */
+    nc = FMAKE_N(int, 3, "SX_REP_TO_AC:nc");
+    nc[0] = n_nodes;
+    nc[1] = n_sides;
+    nc[2] = n_zones;
+
+/* setup the number of boundary parameters array */
+    nbp = FMAKE_N(int, 3, "SX_REP_TO_AC:nbp");
+    nbp[0] = 1;
+    nbp[1] = 2;
+    nbp[2] = 2;
+
+/* put it all together */
+    mt = PM_make_topology(2, nbp, nc, bnd);
+    s  = PM_mk_set(name, SC_DOUBLE_S, FALSE, n_nodes, 2, 2,
+		   NULL, elem,
+		   NULL, NULL, NULL, NULL, 
+		   PM_MESH_TOPOLOGY_P_S, mt,
+		   NULL, NULL, NULL);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_REP_AC_DOMAIN - build an Arbitrarily-Connected domain from a
+ *                    - specified representation of the connectivity
+ *                    - which is: an array of nodes bounding the zones;
+ *                    - an offset; and a maximum number of nodes per zone
+ */
+
+static object *_SXI_rep_ac_domain(object *argl)
+   {int incr;
+    int n_zones, n_nodes, *zones;
+    char *xname, *yname, *nzname, *nnname, *sname;
+    double *rx, *ry;
+    PM_set *s;
+    g_file *po;
+    PDBfile *file;
+    C_array *connct;
+    object *rv;
+
+    rv     = SS_null;
+    file   = NULL;
+    xname  = NULL;
+    yname  = NULL;
+    connct = NULL;
+    nzname = NULL;
+    nnname = NULL;
+    SS_args(argl,
+            G_FILE, &po,
+            SC_STRING_I, &xname,
+            SC_STRING_I, &yname,
+            SC_STRING_I, &nzname,
+            SC_STRING_I, &nnname,
+            G_NUM_ARRAY, &connct,
+	    LAST);
+
+    if ((po == NULL) || (po == SX_gvif))
+       file = SX_vif;
+
+    else if (strcmp(po->type, PDBFILE_S) == 0)
+       file = FILE_FILE(PDBfile, po);
+
+    else
+       SS_error("BAD FILE - _SXI_REP_AC_DOMAIN", argl);
+
+    if (file != NULL)
+       {if (!PD_read(file, nnname, &n_nodes))
+	   SS_error("CAN'T READ NUMBER OF NODES - _SXI_REP_AC_DOMAIN", argl);
+
+	if (!PD_read(file, nzname, &n_zones))
+	   SS_error("CAN'T READ NUMBER OF ZONES - _SXI_REP_AC_DOMAIN", argl);
+
+	rx = FMAKE_N(double, n_nodes, "_SXI_REP_AC_DOMAIN:rx");
+	ry = FMAKE_N(double, n_nodes, "_SXI_REP_AC_DOMAIN:ry");
+
+	incr = PD_read(file, xname, rx);
+	if (incr != n_nodes)
+	   SS_error("READING X VALUES - _SXI_REP_AC_DOMAIN", argl);
+
+	incr = PD_read(file, yname, ry);
+	if (incr != n_nodes)
+	   SS_error("READING Y VALUES - _SXI_REP_AC_DOMAIN", argl);
+
+	zones = (int *) connct->data;
+
+	sname = SC_dsnprintf(FALSE, "{%s,%s}", xname, yname);
+
+	s = SX_rep_to_ac(sname, rx, ry, n_nodes, n_zones, zones);
+
+	rv = SX_mk_set(s);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_FIND_INDEX - find values matching the specified conditions
+ *                 - Usage:  (find-value array oper val indeces)
+ */
+
+static object *_SXI_find_index(object *argl)
+   {int nx, no, ni;
+    int *out, *in;
+    double val;
+    char nt[MAXLINE];
+    void *na;
+    C_array *arr, *indx, *iarr;
+    C_procedure *pred;
+    PF_int_dd fnc;
+    object *rv;
+
+    rv   = SS_null;
+    val  = 0.0;
+    arr  = NULL;
+    indx = NULL;
+    pred = NULL;
+    SS_args(argl,
+            G_NUM_ARRAY, &arr,
+            SS_PROCEDURE_I, &pred,
+            SC_DOUBLE_I, &val,
+            G_NUM_ARRAY, &indx,
+            0);
+
+    if (pred == NULL)
+       SS_error("NO PREDICATE SPECIFIED - _SXI_FIND_INDEX", argl);
+
+    else if (arr == NULL)
+       SS_error("NO ARRAY SPECIFIED - _SXI_FIND_INDEX", argl);
+
+    else
+       {fnc = (PF_int_dd) pred->proc;
+
+	if (indx == NULL)
+	   {ni = 0; 
+	    in = NULL;}
+	else
+	   PM_ARRAY_CONTENTS(indx, void, ni, nt, in);
+
+	PM_ARRAY_CONTENTS(arr, void, nx, nt, na);
+
+	_PM_find_value(&no, &out, nx, nt, na, fnc, val, ni, in);
+
+	iarr = PM_make_array(SC_INTEGER_S, no, out);
+
+	rv = SX_mk_C_array(iarr);};
+
+    return(rv);}
+        
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* SX_INSTALL_PML_FUNCS - install the PML extensions to Scheme */
+ 
+void SX_install_pml_funcs(void)
+   {
+
+    SS_install("find-index",
+               "Returns the array of indeces for which a predicate it true",
+               SS_nargs,
+               _SXI_find_index, SS_PR_PROC);
+
+    SS_install("pm-array?",
+               "Returns #t if the object is a numeric array, and #f otherwise",
+               SS_sargs,
+               _SXI_numeric_arrayp, SS_PR_PROC);
+
+    SS_install("list->pm-array",
+               "Returns a numeric array built from a list of numbers",
+               SS_nargs,
+               SX_list_array, SS_PR_PROC);
+
+    SS_install("pm-array->list",
+               "Returns a list of numbers built from a numeric array",
+               SS_sargs,
+               _SXI_array_list, SS_PR_PROC);
+
+    SS_install("pm-make-array",
+               "Allocate and return a pm-array of the specified type and size",
+               SS_nargs,
+               _SXI_mk_array, SS_PR_PROC);
+
+    SS_install("pm-resize-array",
+               "reallocate the given pm-array to the specified size",
+               SS_nargs,
+               _SXI_resz_array, SS_PR_PROC);
+
+    SS_install("pm-array-ref",
+               "Reference the nth element of a pm-array",
+               SS_nargs,
+               _SXI_array_ref, SS_PR_PROC);
+
+    SS_install("pm-array-set!",
+               "Set the nth element of a pm-array",
+               SS_nargs,
+               _SXI_array_set, SS_PR_PROC);
+
+    SS_install("pm-array-length",
+               "Returns the length of the given numeric array",
+               SS_sargs,
+               _SXI_num_arr_len, SS_PR_PROC);
+
+    SS_install("pm-array-extrema",
+               "Returns the extrema of the given numeric array",
+               SS_sargs,
+               _SXI_num_arr_extr, SS_PR_PROC);
+
+    SS_install("pm-sub-array",
+               "Return a sub-array of the given numeric array",
+               SS_nargs,
+               _SXI_sub_array, SS_PR_PROC);
+
+    SS_install("pm-set?",
+               "Returns #t if the object is a PML set, and #f otherwise",
+               SS_sargs,
+               _SXI_setp, SS_PR_PROC);
+
+    SS_install("pm-set-mapping-type",
+               "Set the type of a mapping object to the given string",
+               SS_nargs,
+               _SXI_set_map_type, SS_PR_PROC);
+
+    SS_install("pm-mapping?",
+               "Returns #t if the object is a PML mapping, and #f otherwise",
+               SS_sargs,
+               _SXI_mappingp, SS_PR_PROC);
+
+    SS_install("pm-grotrian-mapping?",
+               "Returns #t if the object is a PML grotrian mapping, and #f otherwise",
+               SS_sargs,
+               _SXI_grotrian_mappingp, SS_PR_PROC);
+
+    SS_install("pm-mapping->pdbdata",
+               "Write a PML mapping object to a PDB file\nFORM (pm-mapping->pdbdata <mapping> <file> <name>)",
+               SS_nargs,
+               _SXI_mapping_pdbdata, SS_PR_PROC);
+
+    SS_install("pdbdata->pm-mapping",
+               "Read a PML mapping object from a PDB file\nFORM (pdbdata->pm-mapping <file> <name>)",
+               SS_nargs,
+               _SXI_pdbdata_mapping, SS_PR_PROC);
+
+    SS_install("pm-set-name",
+               "Return the name of the object iff it is a PM_set and () otherwise",
+               SS_sargs,
+               _SXI_get_text_set_name, SS_PR_PROC);
+
+    SS_install("pm-set->pdbdata",
+               "Write a PML set object to a PDB file\nFORM (pm-set->pdbdata <set> <file> <name>)",
+               SS_nargs,
+               _SXI_set_pdbdata, SS_PR_PROC);
+
+    SS_install("pdbdata->pm-set",
+               "Read a PML set object from a PDB file\nFORM (pdbdata->pm-set <file> <name>)",
+               SS_nargs,
+               _SXI_pdbdata_set, SS_PR_PROC);
+
+    SS_install("pdbdata->pm-array",
+               "Convert a PDBDATA object to a numeric array object\nFORM (pdbdata->pm-array <pdbdata>)",
+               SS_nargs,
+               _SXI_pdbdata_array, SS_PR_PROC);
+
+    SS_install("pm-array->pdbdata",
+               "Convert a numeric array object to a PDBDATA object\nFORM (pm-array->pdbdata <array>)",
+               SS_nargs,
+               _SXI_array_pdbdata, SS_PR_PROC);
+
+    SS_install("pm-array->pdbdata-i",
+               "Inverse of pdbdata->pm-array\nFORM (pm-array->pdbdata-i <array> <file> [<name>])",
+               SS_nargs,
+               _SXI_array_pdbdata_i, SS_PR_PROC);
+
+    SS_install("pm-lr->ac",
+               "Convert a logical rectangular mesh based mapping into an arbitrarily connected mesh base one\nFORM (pm-lr->ac <mapping>)",
+               SS_nargs,
+               _SXI_lr_ac, SS_PR_PROC);
+
+    SS_install("pm-make-ac-set",
+               "Construct an arbitrarily connected set",
+               SS_nargs,
+               _SXI_make_ac_set, SS_PR_PROC);
+
+    SS_install("pm-arrays->set",
+               "Convert a list of numeric array objects to a set\nFORM (pm-arrays->set (<array> ...) ...)",
+               SS_nargs,
+               _SXI_arrays_set, SS_PR_PROC);
+
+    SS_install("pm-make-set",
+               "Returns a PML set\nFORM (pm-make-set <name> <mesh-shape-list> <element-arrays>)",
+               SS_nargs,
+               _SXI_make_pml_set, SS_PR_PROC);
+
+    SS_install("pm-make-mapping",
+               "Returns a PML mapping\nFORM (pm-make-mapping <domain> <range> [<centering> <category> <name> <emap> <next>])",
+               SS_nargs,
+               _SXI_make_pml_mapping, SS_PR_PROC);
+
+    SS_install("pm-make-cartesian-product-set",
+               "Returns a newly constructed set\nFORM (pm-make-cartesian-product-set [<set>]*)",
+               SS_nargs,
+               _SXI_make_cp_set, SS_PR_PROC);
+
+    SS_install("pm-set-set-attribute!",
+               "Set an attribute of the given set",
+               SS_nargs,
+               _SXI_set_attr_set, SS_PR_PROC);
+
+    SS_install("pm-connection->ac-domain",
+               "Build an Arbitrarily-Connected domain set from the given connectivity representation",
+	       SS_nargs,
+	       _SXI_rep_ac_domain, SS_PR_PROC);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SXDTAC - F77 interface to SX_rep_to_ac */
+
+FIXNUM F77_FUNC(sxdtac, SXDTAC)(FIXNUM *pnc, F77_string pname,
+                                double *rx, double *ry,
+                                FIXNUM *pnn, FIXNUM *pnz, FIXNUM *pzones)
+   {int n_nodes, n_zones;
+    FIXNUM rv;
+    char name[MAXLINE];
+    PM_set *set;
+
+    SC_FORTRAN_STR_C(name, pname, *pnc);
+
+    n_nodes = *pnn;
+    n_zones = *pnz;
+
+    set = SX_rep_to_ac(name, rx, ry, n_nodes, n_zones, (int *) pzones);
+
+    rv = SC_ADD_POINTER(set);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

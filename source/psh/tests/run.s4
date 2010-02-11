@@ -1,0 +1,26 @@
+#
+# RUN.S4 - check for environment variable errors
+#
+
+# undefined environment variables ok
+Env var10 = (1 == 0) ? $bar : b
+Env var11 = (1 == 1) ? a : $bar
+
+# undefined environment variables ng
+Env var0 = (1 == 1) ? $bar : b
+Env var1 = (1 == 0) ? a : $bar
+Env var2 = ($bar == 1) ? a
+
+Env var0 = a
+Env var1 = b
+Env var2 = c
+Env var3 = 2
+Env var3 = $var0 $var1 $@ $var2
+Env var3 = 0 $@
+Env var3 = $@ 4
+
+Env var4 = `printenv var3`
+Env var5 = (1 == 1) ? `printenv var3`
+
+Cmd = $var4
+

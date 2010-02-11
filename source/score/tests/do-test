@@ -1,0 +1,114 @@
+#!/bin/csh -f
+#
+# DO-TEST - test the dmake utility
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Package = score
+
+#source ../../scripts/test-env
+source ../../scripts/env-csh
+
+if ($?TestDir == 0) then
+   pushd .. >& /dev/null
+   setenv System `../manager/cfgman use`
+   setenv TestDir $cwd/z-$System/test
+   setenv TIMER timer
+   popd >& /dev/null
+endif
+
+set Tests   = ""
+set KillSrv = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -basic:
+      case -depend:
+      case -redir:
+      case -script:
+      case -server:
+      case -async:
+           set Tests = ( $Tests `echo $1 | sed 's/-//'` )
+           breaksw
+
+      case -k:
+           set KillSrv = "-k"
+           breaksw
+
+      case -h:
+           echo "Usage: do-test [-basic] [-depend] [-redir] [-script] [-server] [-async] [-k] [-h]"
+           echo "   async   test client side of SC_exec_async"
+           echo "   basic   test fundamental make operations"
+           echo "   depend  test dependency analysis"
+           echo "   k       list and kill other 'dmake -srv' instances"
+           echo "   h       this help message"
+           echo "   redir   test I/O redirection"
+           echo "   script  test multiple target and interactions"
+           echo "   server  test server side of SC_exec_async"
+           echo ""
+           exit(1)
+   endsw
+   shift
+end
+
+if ("$Tests" == "") then
+   set Tests = ( server redir basic depend script async darg )
+endif
+
+set TMFiles = `ls [tx]make*`
+cp $TMFiles $Tests $TestDir
+pushd $TestDir >>& /dev/null
+
+setenv Log $cwd/log.tmake
+
+mkdir coredir.0 >& /dev/null
+rm -rf coredir.* >& /dev/null
+touch foo.core core.foo >& /dev/null
+rm -f $Log *.core core* >& /dev/null
+
+touch $Log
+flog $Log date
+
+source ../../tests/common-make
+
+if ($?CFE == 0) then
+   flog $Log setenv CFE
+endif
+
+setenv SC_EXEC_CPU_FACTOR   1024
+setenv SC_EXEC_TIME_LIMIT     64
+setenv SC_EXEC_TIME_FACTOR    16
+
+@ Err = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+foreach tst ($Tests)
+
+   ./$tst $KillSrv
+
+   @ LErr = $status
+   @ Err  = $Err + $LErr
+
+   flog $Log cat log.$tst
+
+   Note $Log ""
+   Note $Log "Test $tst exited with status $LErr"
+   Note $Log ""
+
+   flog $Log rm log.$tst
+
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $Log rm -f $TMFiles $Tests
+flog $Log popd
+NoteD $Log ""
+
+exit($Err)
+

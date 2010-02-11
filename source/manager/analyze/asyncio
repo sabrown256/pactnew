@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# ASYNCIO - analyze platform asynchronous I/O in STREAMS
+#         - Computes: HAVE_ASYNC_STREAMS
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: asynchronous I/O in STREAMS"
+
+cat << EOF >! $Tmp.c
+#include <stropts.h>
+int main(int c, char **v)
+   {int rv, fd, arg;
+    fd   = 1;
+    arg  = 0;
+    rv   = ioctl(fd, I_GETSIG, &arg);
+    arg |= (S_INPUT | S_HIPRI);
+    return(rv);}
+EOF
+
+setenv HAVE_ASYNC_STREAMS FALSE
+
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+if ($status == 0) then
+   setenv HAVE_ASYNC_STREAMS TRUE
+   flog $ALog rm -f $Tmp.c $Tmp
+endif
+
+if ($HAVE_ASYNC_STREAMS == FALSE) then
+   NoteD $ALog "      no async I/O in streams"
+else
+   NoteD $ALog "      has async I/O in streams"
+endif
+
+SetParent HAVE_ASYNC_STREAMS
+
+exit(0)
+

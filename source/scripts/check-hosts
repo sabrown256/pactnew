@@ -1,0 +1,58 @@
+#!/bin/csh -f
+#
+# CHECK_HOSTS - check for access to hosts
+#             - necessary for successful do-nets
+#
+
+set Hosts = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: check-hosts [-h] <host>*"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set Hosts = ( $Hosts $1 )
+           breaksw
+   endsw
+   shift
+end
+
+# check for host specified in CVSROOT variable
+if ($?CVSROOT) then
+   set Name = `echo $CVSROOT | sed 's/:/ /g'`
+   if ($#Name > 1) then
+      set Hosts = ( $Hosts $Name[1] )
+   endif
+endif
+
+# check for host specified in CVS/Root file
+if (-f CVS/Root) then
+   set Name = `cat CVS/Root | sed 's/:/ /g'`
+   if ($#Name > 1) then
+      set Hosts = ( $Hosts $Name[1] )
+   endif
+endif
+
+set Failed = ""
+
+foreach hst ($Hosts)
+   hserve $hst -vfy >& /dev/null
+   if ($status != 1) then
+      set Failed = ( $Failed $hst )
+   endif
+end
+
+if ("$Failed" != "") then
+   echo "The following required hosts cannot be accessed:"
+   echo "   $Failed"
+   set Err = 1
+else
+   echo "All required hosts are accessible:"
+   echo "   $Hosts"
+   set Err = 0
+endif
+
+exit($Err)

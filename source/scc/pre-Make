@@ -1,0 +1,122 @@
+#
+# pre-Make for PACT SCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=scc
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTExe = ${BinDir}/scc
+TGTInc = scc.h scc_int.h
+
+# Compiler/Loader Options
+UniFlags =
+CcFlags = ${COptimize} -I. -I../.. -I${IncDir} ${MDInc}
+FcFlags =
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+
+# files to Save for Backup (pact save)
+SaveFiles = *.c *.h *.y *.l
+
+# files to remove in directory clean (pact clean)
+CleanFiles = *~ core
+
+# things upon which install depends (pact install)
+DepLib = ${LibDir}/libscore.a
+
+InstallDep = ${TGTLib} ${TGTExe}
+BinDep = ${Hdrs} ${TGTLib} sccmain.c ${DepLib}
+BinObj = ${LdFlags} sccmain.c
+
+# required Libraries
+Libs = ${TGTLib} ${LSCORE} -lm ${MDLib}
+
+
+targets :
+	@echo "Targets for SCC"
+	@echo "   install   : install SCC headers and utilities in dev/arch"
+	@echo "   link      : link SCC utilities for public use"
+	@echo "   profiler  : make a profiling version"
+	@echo "   scc       : make the SCC executable"
+	@echo "   sharedlib : build and install SCC shared libs in dev/arch"
+	@echo "   test      : run the SCC test suite"
+
+
+# headers Files
+Hdrs = ${TGTInc}
+
+${TGTLib}(sccgr.o) : scclr.l sccgr.y
+	@(cd ${PACTTmpDir} ; \
+	  ${RM} lex.yy.c y.tab.c scclr.c sccgr.c errlog ; \
+          touch errlog ; \
+	  echo "lex scclr.l" ; \
+	  ${LEX} ${PACTSrcDir}/scclr.l >> errlog 2>&1 ; \
+          sed "s|lex.yy.c|scclr.c|" lex.yy.c | sed "s|yy|scclr_|g" > scclr.c ; \
+	  ${RM} lex.yy.c ; \
+	  echo "yacc sccgr.y" ; \
+	  ${YACC} ${PACTSrcDir}/sccgr.y 2>> errlog ; \
+          sed "s|y.tab.c|sccgr.c|" y.tab.c | sed "s|yy|sccgr_|g" > sccgr.c ; \
+	  ${RM} y.tab.c ; \
+	  echo "${YC} -c sccgr.c" ; \
+	  ${YC} -c sccgr.c -o sccgr.o ; \
+	  ${AR} ${AROpt} ${TGTLib} sccgr.o 2>> errlog ; \
+	  ${RM} sccgr.c sccgr.o scclr.c )
+#	  ${RM} sccgr.o )
+
+${Obj} : ${Hdrs}
+${ArObjs} : ${Hdrs}
+
+# Object Files
+Objs   = sccsynt.o sccinf.o sccem.o scchk.o sccsup.o sccgr.o
+ArObjs = ${TGTLib}(sccsynt.o) ${TGTLib}(sccinf.o)       \
+         ${TGTLib}(sccem.o) ${TGTLib}(scchk.o)          \
+         ${TGTLib}(sccsup.o) ${TGTLib}(sccgr.o)
+
+${LibDep} : ${Hdrs}
+${TGTLib} : ${SyntaxModes}
+
+profiler : 
+	pact remove
+	pact ${TGTLib}
+	${CC} -c sccmain.c
+	${CLD} ${MainObj} -o ${TGTBin} ${Libs}
+
+# make the executable
+${TGTExe} : ${BinDep}
+	${CC} -c sccmain.c -o ${PACTTmpDir}/sccmain.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sccmain.o -o ${TGTExe} ${Libs}
+
+scc :
+	pact install
+
+#
+# link 
+#
+link: ${InstallDep}
+
+#
+# install 
+#
+install:
+	pact link
+	pact incinstall
+
+#
+# inform
+#
+inform :
+	@${RM} required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the SCC test suite
+#
+test :
+	@./cctest
+

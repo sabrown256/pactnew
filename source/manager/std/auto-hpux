@@ -1,0 +1,11 @@
+#
+# AUTO-HPUX - default HP700 configuration for HP Unix 9
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include spokes
+include compiler-hpux

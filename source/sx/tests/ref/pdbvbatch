@@ -1,0 +1,211 @@
+
+
+(BATCH) Create some data files for the demo
+
+
+(BATCH) Open a data file
+       List the contents of the file
+-> cf demo.d1
+-> ls
+
+arec    brec
+-> ls -a
+
+&ptrs/    arec      brec
+
+
+(BATCH) Describe arec
+       Display the structure of the tv type
+-> desc arec
+
+Name: arec
+Type: tv
+Length: 1
+Address: 2
+
+
+(BATCH) Create a window to display some data
+       Display mapping #1 from the menu
+       Change the rendering of the mapping
+-> cw "A" "COLOR" "WINDOW" 0.1 0.01 0.35 0.35
+
+
+(BATCH) Construct and plot a mapping from data in a file
+       First A: {(X,Y)} -> {f} a mapping with a 1d range and 2d domain
+-> plot arec.f ''(arec.x arec.y)
+-> palette "rainbow"
+-> vr fill-poly
+
+
+(BATCH) Make 3D data set
+       Plot it as a 3D contour plot
+-> hyper-plane 0 '(1 0 1 20) '(1 0 1 20) '(1 0 1 20)
+-> vr contour
+-> va 30 -30
+-> sqrx 1
+-> wu
+
+
+(BATCH) Create a second window to display other data
+       Display mapping #2 from the menu
+-> cw "B" "COLOR" "WINDOW" 0.5 0.01 0.35 0.35
+
+
+(BATCH) Construct and plot another mapping from data in a file
+       Second V: {(X,Y)} -> {u,v} a mapping with a 2d range and 2d domain
+-> plot '(arec.u arec.v) ''(arec.x arec.y)
+
+
+(BATCH) Construct and plot a mapping with a cartesian product domain
+       Second G: {(X,Y)} -> {real} a mapping with a 2d range and 1d domain
+-> dl
+-> plot brec.g (cps brec.x brec.y)
+-> label-drawable "g->{x,y}" 1
+-> vr shaded
+-> palette iron
+-> va 60 -35 0
+-> wu
+
+
+(BATCH) Show the display list of the newly constructed mappings
+-> lsv
+
+Plots in viewport A of window B
+   1 m g->{x,y}
+
+
+(BATCH) Open an ULTRA file
+       Create a third window to display more data
+       Plot a set of intensity curves
+-> cf demo.d2
+-> cw "C" "COLOR" "WINDOW" 0.1 0.5 0.35 0.35
+-> pl 3 4 5 6 7 8 9 10 11 12
+
+
+(BATCH) Find indeces/values in the xval0 array
+-> xval0
+
+/xval0(0) =  1.0000000000000009e-02
+/xval0(1) =  2.3111111111111113e-01
+/xval0(2) =  4.5222222222222225e-01
+/xval0(3) =  6.7333333333333334e-01
+/xval0(4) =  8.9444444444444449e-01
+/xval0(5) =  1.1155555555555556e+00
+/xval0(6) =  1.3366666666666667e+00
+/xval0(7) =  1.5577777777777777e+00
+/xval0(8) =  1.7788888888888887e+00
+/xval0(9) =  1.9999999999999998e+00
+-> find xval0 < 1 and > 0.5
+Indices of values matching: xval0 < 1 and > 0.5
+
+   (3)   (4)
+
+-> xval0 > 0.1 and < 0.75 or > 1.25 and < 1.75
+Indices of values matching: xval0 > 0.1 and < 0.75 or > 1.25 and < 1.75
+
+   (1)   (2)   (3)   (6)
+   (7)
+
+-> find-mode index-only
+   1
+-> xval0 < 0.15 or > 0.75 and < 1.25 or > 1.75
+Indices of values matching: xval0 < 0.15 or > 0.75 and < 1.25 or > 1.75
+
+   (0)   (4)   (5)   (8)
+   (9)
+
+-> find-mode index+value
+   2
+-> xval0 < 0.15 or > 0.75 and < 1.25 or > 1.75
+Values matching: xval0 < 0.15 or > 0.75 and < 1.25 or > 1.75
+
+/xval0(0) =  1.0000000000000009e-02
+/xval0(4) =  8.9444444444444449e-01
+/xval0(5) =  1.1155555555555556e+00
+/xval0(8) =  1.7788888888888887e+00
+/xval0(9) =  1.9999999999999998e+00
+
+
+
+(BATCH) Create a second viewport in the window
+       Construct a mapping f: {t,x} -> {real} from the curves
+-> cv "v2" 0.51 0.01 0.48 0.98
+-> pl (lrs '("f"    0 (yval0 yval1 yval2 yval3 yval4 yval5
+                       yval6 yval7 yval8 yval9
+                       yval10 yval11 yval12 yval13 yval14 yval15
+                       yval16 yval17 yval18 yval19))
+           '("{t,x}" 1 (xval0 xval0 xval0 xval0 xval0 xval0
+                        xval0 xval0 xval0 xval0
+                        xval0 xval0 xval0 xval0 xval0 xval0
+		             xval0 xval0 xval0 xval0)))
+-> vr wire-frame
+-> va 60.0 25.0 0.0
+
+
+(BATCH) Animation - rotate the mapping through 360 degrees
+-> animate 60.0 125 0.0
+
+
+(BATCH) Clear the viewport
+-> dl
+
+
+(BATCH) Open a PVA file
+       Take the difference between two mappings (#1 and #2)
+       Take the ratio of the same two mappings
+       Plot the difference mapping as a contour plot
+       Change viewport
+       Plot the product of two mappings (#2 and #3) as a contour plot
+-> cf demo.d3
+-> pl 1 2
+-> vr contour
+-> m- 1 2
+-> overlay on
+-> dr 1 (render fill-poly)
+-> m* 2 3
+
+
+(BATCH) Re-open a multi-viewport window
+-> nxm 2 1
+
+
+(BATCH) Generate a hyper-plane of data
+-> hyper-plane 0 '(1 0 1 20) '(1 0 1 30)
+
+
+(BATCH) Make a copy of the hyperplane
+-> copy-map 1
+
+
+(BATCH) Move the copy to the other viewport
+-> move "V1" "C" 2
+
+
+(BATCH) Refine the hyper plane to a different resolution
+-> refine 1 '(25 25)
+-> dl 2
+
+
+(BATCH) Go to the other frame, compute and plot the interpolation weights
+-> cv "V1"
+-> interpolation-weights 1 '(25 25)
+-> dl 2
+-> wu
+
+
+(BATCH) Plot curves in each viewport
+-> pl 1
+-> cv ; pl 2
+-> wu
+
+
+(BATCH) Turn highlights off
+       Make a hardcopy to a PostScript file
+-> show-highlight off
+-> wu
+-> ps-flag on
+-> hc
+
+
+(BATCH) End of demonstration
+

@@ -1,0 +1,57 @@
+#!/bin/csh -f
+#
+# RMALBUT - Remove all but listed files in current directory
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set opts =
+set keep =
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: rmalbut [-h] <file>*"
+           echo "  h   this help message"
+           echo ""
+           exit(1)
+      case -*:
+           set opts = "$1"
+           breaksw
+      default:
+           if (`expr "$1" : '/.*'` > 0) then
+              set Hd = $1:h
+           else
+              set Hd = $cwd
+           endif
+           if ($Hd == $cwd) then
+              set keep = ( $keep $1:t )
+           endif
+   endsw
+   shift
+end
+
+set files =
+
+foreach f (*)
+   set remove = TRUE
+   foreach k ($keep)
+      if ($k == $f) then
+         set remove = FALSE
+         break
+      endif
+   end
+   if ($remove == TRUE) then
+      set files = ( $files $f )
+   endif
+end
+
+if ("$files[1]" != "") then
+   rm $opts $files
+endif
+
+exit(0)

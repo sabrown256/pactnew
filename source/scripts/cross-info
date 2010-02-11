@@ -1,0 +1,125 @@
+#!/bin/csh -f
+#
+# CROSS-INFO - report inferred information about the execution environment
+#            - most likely to relevant to the given cross compiled executable
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Exe    = ""
+set Tgt    = "bin"
+set HostOS = `uname -s`
+
+while ($#argv > 0)
+   switch ($1)
+      case -b:
+           set Tgt = "bin"
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: cross-info [-b] [-h] [-x] <exe>"
+           echo "  b  return the front end needed"
+           echo "  h  this help message"
+           echo "  x  return yes iff the executable must be run elsewhere"
+           echo ""
+           exit(1)
+      case -x:
+           set Tgt = "exe"
+           breaksw
+      default:
+           set Exe = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Exe" == "") then
+   echo ""
+   echo "No executable specified - exiting"
+   echo ""
+   exit(1)
+endif
+
+if ("$Exe" !~ /*) then
+   set Exe = `which $Exe`
+endif
+
+switch ($Tgt)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BIN - return the frontend code needed to run the executable
+
+case bin:
+
+     set iscross = `cross-info -x $Exe`
+     switch ($iscross)
+        case BG/L:
+             set ismpi = `mpi-info -x $Exe`
+             if ($ismpi == yes) then
+                echo ""
+             else
+                echo ""
+             endif
+             breaksw
+
+        case no-op:
+             which no-op
+             breaksw
+
+        case submit:
+             set ismpi = `mpi-info -x $Exe`
+             if ($ismpi == yes) then
+                echo "/usr/local/bin/mpirun"
+             else
+                echo "/bgsys/drivers/ppcfloor/bin/submit"
+             endif
+             breaksw
+
+        case local:
+             breaksw
+     endsw
+
+     breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXE - return the target iff the executable was cross compiled
+#     - for another system
+
+case exe:
+
+     set host = local
+
+# BG/L
+     if (-d /bgl) then
+        set iscross = `nm $Exe |& grep _nl_global_locale | grep -w D`
+        if ("$iscross" != "") then
+           set host = "no-op"
+        endif
+     endif
+
+# BG/P
+     if (-d /bgsys) then
+        set iscross = `nm $Exe |& grep _nl_global_locale | grep -w D`
+        if ("$iscross" != "") then
+           set host = "submit"
+        endif
+     endif
+
+     echo $host
+
+     breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+exit($status)
+

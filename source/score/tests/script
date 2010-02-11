@@ -1,0 +1,143 @@
+#!/bin/csh -f
+#
+# SCRIPT - test dmake from scripts
+#        - gets multiple targets, environment interaction, ...
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Package = score
+if (-d ../../scripts) then
+   source ../../scripts/env-csh
+else if (-d ../../../scripts) then
+   source ../../../scripts/env-csh
+endif
+
+if (-x ../../manager/cfgman) then
+   set TMFiles = ( `ls [tx]make.c.*` darg )
+   cp $TMFiles $TestDir
+   pushd $TestDir >>& /dev/null
+endif
+
+setenv Log log.script
+touch foo.core core.foo
+rm -f $Log *.core core*
+touch $Log
+flog $Log date
+
+source ../../tests/common-make
+
+setenv SC_EXEC_CPU_FACTOR   1024
+setenv SC_EXEC_TIME_LIMIT     64
+setenv SC_EXEC_TIME_FACTOR    16
+
+@ Err = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# Group 3
+
+   set Series = 3
+   Separator $Log
+   NoteD $Log -n "                       script "
+   Note $Log ""
+
+   set UTime = `$TIMER -r`
+
+   set Tsts = ""
+   set Tsts = ($Tsts c.1)
+   set Tsts = ($Tsts c.2)
+   set Tsts = ($Tsts c.3)
+   set Tsts = ($Tsts c.4)
+   set Tsts = ($Tsts c.5)
+   set Tsts = ($Tsts c.6)
+   set Tsts = ($Tsts c.7)
+   set Tsts = ($Tsts c.8)
+
+   flog $Log *.[chlyoa]
+
+   set LErr = 0
+   while ($#Tsts > 0)
+      Separator $Log
+      Note $Log "            script xmake.$Tsts[1]"
+      Note $Log " "
+      Separator $Log
+
+      flog $Log set i      = $Tsts[1]
+      flog $Log set Script = xmake.$i
+
+      shift Tsts
+
+      flog $Log chmod 770 $Script
+#      flog $Log ls
+
+      setenv LogF log-$Series.$i
+      flog $Log rm -f $LogF.*
+      flog $Log $CFE $Script
+      flog $Log (diff $LogF.dmake $LogF.make >! $LogF.diff)
+      set LStat = $status
+
+      if ("$i" == "c.1") then
+         set Resp = `wc -l $LogF.diff`
+         Note $Log "Resp = |$Resp| ($#Resp)"
+         flog $Log set NL = $Resp[1]
+         if ($NL == 6) then
+            set LStat = 0
+         else
+            set LStat = 1
+         endif
+      endif
+
+      if ($LStat == 0) then
+         echo -n "."
+         flog $Log rm -f $LogF.*
+      else
+         Note $Log "   -----------------------------------"
+         flog $Log cat $LogF.dmake
+         Note $Log "   -----------------------------------"
+         flog $Log cat $LogF.make
+         Note $Log "   -----------------------------------"
+         flog $Log cat $LogF.diff
+         Note $Log "   -----------------------------------"
+
+         flog $Log (awk '$1 !~ /***>/ { print $0 }' $LogF.dmake >&! $LogF.dmakf)
+         flog $Log (diff $LogF.dmakf $LogF.make >! $LogF.diff)
+         set LStat = $status
+
+         if ($LStat == 0) then
+            Note $Log "FAIL: results compared after retries"
+            echo -n "o"
+            flog $Log rm -f $LogF.*
+	 else
+            Note $Log "FAIL: results differed"
+            echo -n "x"
+            set LErr = 1
+         endif
+      endif
+   end
+
+   set ETime = `$TIMER -b $UTime`
+
+   Separator $Log
+   if ($LErr == 0) then
+      NoteD $Log " ok ($ETime)"
+      flog $Log *.[chlyoa]
+   else
+      NoteD $Log " ng ($ETime)"
+      @ Err = $Err + 8
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($?TMFiles) then
+   flog $Log rm -f $TMFiles
+   NoteD $Log ""
+   popd >& /dev/null
+else
+   Note $Log ""
+endif
+
+exit($Err)

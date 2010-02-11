@@ -1,0 +1,24 @@
+
+define environment variable FOO
+3-> (($FOO 3))
+
+verify that FOO made it out to the environment
+expect: 3
+-> (3
+)
+
+list SCM files
+-> (../../sxpdba.c
+ ../../sxpdbc.c
+ ../../sxpdbd.c
+ ../../sxpdbf.c
+ ../../sxpdbl.c
+ ../../sxpdbr.c
+)
+
+test pipelines without a shell
+expect: ../../sxpdbd.c ../../sxpdbf.c
+-> (../../sxpdbd.c
+ ../../sxpdbf.c
+)
+

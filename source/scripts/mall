@@ -1,0 +1,132 @@
+#!/usr/bin/env pcsh
+#
+# MALL - run command (a make is the impetus) on specified hosts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set cmd  = ""
+set vrb  = FALSE
+set hsts = all
+set md   = type
+set SSH  = 'ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no'
+
+while ($#argv > 0)
+   switch ("$1")
+      case -a:
+           set md = all
+           breaksw
+
+      case -c:
+           set md = config
+           breaksw
+
+      case -h:
+           echo ''
+           echo 'Usage: mall [-a] [-c] [-h] [-t <spec>] [-v] <cmd>'
+           echo '   a     combine -t and -c option'
+           echo '   c     run command for each known configuration'
+           echo '   h     this help message'
+           echo '   t     run command for specified system-types'
+           echo '         use PACT system types (default all)'
+           echo '   v     verbose flag'
+           echo '   <cmd> command to be executed'
+           echo ''
+           exit(1)
+           breaksw
+
+      case -t:
+           shift
+           set hsts = $1
+           breaksw
+
+      case -v:
+           set vrb = TRUE
+           breaksw
+
+      default:
+           set cmd = ( $cmd "$1" )
+           breaksw
+   endsw
+   shift
+end
+
+set wd = ( `echo $cwd | sed 's|'$HOME'|$HOME|'` )
+
+switch ($md)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ALL - run command by system type and configuration
+
+   case all:
+        hserve -q -t $hsts -ext '(cd '$wd' ; mall -c '$cmd')'
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TYPE - run command by system type
+
+   case type:
+        hserve -q -t $hsts -ext '(cd '$wd' ; '$cmd')'
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CONFIG - run command by configuration
+
+   case config:
+        set syst = `system-id`
+        set sysc = `cpu -r`
+        if (-f ../dev/.pc-$syst) then
+           set clst = ( `cat ../dev/.pc-$syst` )
+           set var  = PACT_CONFIG
+        else if (-f ../dev/.mc-$sysc) then
+           set clst = ( `cat ../dev/.mc-$sysc` )
+           set var  = SESSION_CONFIG
+        else
+           set clst = $syst
+           set var  = PACT_CONFIG
+        endif
+
+        if ($?SHELL == 1) then
+           set sh = $SHELL
+        else
+           set sh = /bin/csh
+        endif
+
+        set mkf = $cwd/.mk.$syst.$$
+        rm -f $mkf
+        touch $mkf
+        Note $mkf "all: "
+
+        foreach c ($clst)
+           if ("$c" =~ *@*) then
+              set cfg = ( `echo $c | sed 's/^.*@//'` )
+           else
+              set cfg = "$c"
+           endif
+
+           if ("$sh" =~ *csh) then
+              Note $mkf "	@$sh -c '(setenv $var $cfg ; source "'$HOME'"/.cshrc ; cd $wd ; $cmd)'"
+           else
+              Note $mkf "	@(export $var=$cfg ; . "'$HOME'"/.profile ; cd $wd ; $cmd)"
+           endif
+        end
+
+        dmake -f $mkf -na 1 -async 10 all
+        rm -f $mkf
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+exit($status)

@@ -1,0 +1,130 @@
+#!/bin/csh -f
+#
+# SCTEST - test SCORE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = score
+source ../scripts/test-env
+
+setenv LogF  $Log
+
+set Test = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: sctest [-h] [<test>]*"
+           echo "  h       this help message"
+           echo "  <test>  one of: sharp ar mk error mpi array"
+           echo "                  lookup lex heap mprf resrc retrc"
+           echo "                  smp mmap io"
+           echo ""
+           exit(1)
+      case -*:
+           breaksw
+      default:
+           set Test = ( $Test $1 )
+           breaksw
+   endsw
+   shift
+end
+
+cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "SCORE TESTS ... omitted"
+
+# run the tests
+else if (-e $RootDir/score/scstd.h) then
+   set BeginTime = `$TIMER -r`
+
+   NoteD $Log ""
+   NoteD $Log "SCORE TEST ..."
+
+   Note $Log "BinDir           = $BinDir"
+   Note $Log "path             = $path"
+   Note $Log "MAKE             = $MAKE"
+   Note $Log "RootDir          = $RootDir"
+   Note $Log "SrcDir           = $SrcDir"
+   Note $Log "DORUN            = $DORUN"
+   if ($?CFE == 1) then
+      Note $Log "CFE              = $CFE"
+   endif
+   if ($?RUN_SIGNATURE_DB == 1) then
+      Note $Log "RUN_SIGNATURE_DB = $RUN_SIGNATURE_DB"
+   endif
+
+   setenv Tmp $cwd/.tmp.$$
+   if ("$Valgrind" != "") then
+      setenv Valgrind  "$Valgrind --suppressions=$SrcDir/tests/vg.suppress"
+      setenv Valgrind  "$Valgrind --suppressions=$SrcDir/tests/vg.suppress-test"
+   endif
+
+   if ($?autotool == 0) then
+      Note $Log "PACT        = $PACT"
+      Note $Log "Parallel    = |$Parallel|"
+      Note $Log "MPI         = |$MPI|"
+      Note $Log "HaveDevZero = |$HaveDevZero|"
+      flog $Log ../../../manager/pwhich pact
+      flog $Log ../../../manager/pwhich cc
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ("$Test" == "") then
+      set Test = ""
+      set Test = ($Test sharp ar mk error mpi)
+      set Test = ($Test array lookup lex)
+      set Test = ($Test heap mprf resrc retrc)
+      set Test = ($Test smp mmap io)
+   endif
+
+   foreach i ($Test)
+      $SrcDir/tests/$i
+      if ($status == 1) then
+         set ERROR = TRUE
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP - we are all done now
+
+   flog $Log $RM $Tmp
+
+   set ETime = `$TIMER -b $BeginTime`
+
+   NoteD $Log ""
+
+   if ($ERROR == "TRUE") then
+      NoteD $Log ""
+      NoteD $Log "SCORE TEST ... FAILED ($ETime)"
+      NoteD $Log ""
+      NoteD $Log "See $Log for details"
+   else
+      NoteD $Log "SCORE TEST ... PASSED ($ETime)"
+   endif
+
+endif
+
+NoteD $Log ""
+NoteD $Log " --------------------------------------------------------"
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+   set xstatus = 1
+endif
+
+Note $Log "Exiting with status $xstatus"
+
+exit($xstatus)
+

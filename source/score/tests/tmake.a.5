@@ -1,0 +1,15 @@
+#
+# test some things about BARRIER
+# NOTE: other makes do not know about BARRIER so we
+#       cannot test the default value automatically
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+BARRIER = sleep 1
+
+all :
+	@echo "BARRIER is ${BARRIER}"
+	${BARRIER}
+	@echo "ok"

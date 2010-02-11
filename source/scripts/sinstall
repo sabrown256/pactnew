@@ -1,0 +1,151 @@
+#!/bin/csh -f
+#
+# SINSTALL - execute install type command upto NA times
+#          - until it succeeds
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?SC_EXEC_N_ATTEMPTS) then
+   @ na = $SC_EXEC_N_ATTEMPTS
+else
+   @ na = 3
+endif
+
+set prm = ""
+set src = ""
+set dst = ""
+set cmd = ""
+
+while ($#argv)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: sinstall [-h] [-na #] [-p <prm>] <src> <dst> [<cmd>]"
+           echo ""
+           echo "Install source to destination and be sure that everything"
+           echo "is correct.  Try up to NA times to be absolutely sure."
+           echo ""
+           echo "   h      this help message"
+           echo "   na     number of attempts to make (default 3)"
+           echo "   p      set permissions of <dst> (e.g. a+rX)"
+           echo "   <src>  file to be copied"
+           echo "   <dst>  destination of file"
+           echo "   <cmd>  command to run on destination file"
+           echo ""
+           exit(1)
+      case -na:
+           shift
+           @ na = $1
+	   breaksw
+      case -p:
+           shift
+           set prm = $1
+	   breaksw
+      default:
+           if ("$src" == "") then
+              set src = $1
+           else if ("$dst" == "") then
+              set dst = $1
+           else
+              set cmd = ( $cmd $1 )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if (!(-f $src)) then
+   echo "No such file $src"
+   exit(1)
+endif
+if (-d $dst) then
+   set dst = $dst/$src
+endif
+
+# decide on MD5 checksumming command
+set md5cmd = ( `swhich -1 md5sum` )
+if (-x "$md5cmd") then
+   set md5cmd = ( $md5cmd -b )
+else
+   set md5cmd = ( `swhich -1 md5` )
+   if (!(-x "$md5cmd")) then
+      set md5cmd = ( wc -c )
+   endif
+endif
+
+@ count  = 1
+@ NSleep = 0
+set chksrc = ( `$md5cmd $src` )
+
+set noglob
+
+while ($count <= $na)
+   if ($count > 1) then
+      echo "***> failed ($Err) [$Stamp] - attempt $count in $NSleep seconds"
+      sleep $NSleep
+   endif
+
+   set Stamp = `date +"%Y/%m/%d %H:%M:%S"`
+   @ Err     = 0
+
+# remove the destination to foil nefarious NFS caching
+   rm -f $dst >& /dev/null
+   if ($status != 0) then
+      @ Err = $Err + 1
+   endif
+
+# copy it
+   cp $src $dst >& /dev/null
+   if ($status != 0) then
+      @ Err = $Err + 1
+   endif
+
+# set the permissions
+   if ("$prm" != "") then
+      chmod $prm $dst
+      if ($status != 0) then
+         @ Err = $Err + 2
+      endif
+   endif
+
+# verify the checksum because we do not trust NFS
+   set chkdst = ( `$md5cmd $dst` )
+   if ($chksrc[1] != $chkdst[1]) then
+      @ Err = $Err + 4
+   endif
+
+# run specified command
+   if ("$cmd" != "") then
+      pushd $dst:h >>& /dev/null
+      $cmd
+      if ($status != 0) then
+         @ Err = $Err + 8
+      endif
+      popd >>& /dev/null
+   endif
+
+   if ($Err == 0) then
+      if ($count > 1) then
+         echo "***> succeeded [$Stamp] - on attempt $count"
+      endif
+      break
+   else
+      @ count = $count + 1
+      if ($count < 3) then
+         @ NSleep = 1
+      else
+         @ NSleep = 31
+      endif
+   endif
+end
+
+if (($count > $na) && ($Err != 0)) then
+   @ count = $count - 1
+   echo "***> failed ($Err) - quitting after $count attempts"
+endif
+
+exit($Err)

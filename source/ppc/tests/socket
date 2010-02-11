@@ -1,0 +1,97 @@
+#!/bin/csh -f
+#
+# SOCKET - PPC socket tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           SOCKET TEST
+
+#--------------------------------------------------------------------------
+
+# PPC Socket test
+
+      NoteD $Log ""
+      NoteD $Log "                    PPC Socket Test ................ "
+
+      set FAIL = "NO"
+
+      set UTime = `$TIMER -r`
+      flog $Log rm -f pcexec.sockp pcexec.socki
+
+      NoteD $Log -n "                       polling ............. "
+      set BTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         $CFE $PCEXEC -c 30 -i -s $TEST > pcexec.sockp
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $PCEXEC -c 30 -i -s $TEST     |& \
+         grep "ERROR SUMMARY:"                             |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $BTime`
+      if ($xstatus == 0) then
+         NoteD $Log "ok ($ETime)"
+      else
+         NoteD $Log "ng ($xstatus/$ETime)"
+         set FAIL  = "YES"
+      endif
+
+      NoteD $Log -n "                       interrupt ........... "
+      set BTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         $CFE $PCEXEC -c 30 -s $TEST > pcexec.socki
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $PCEXEC -c 30 -s $TEST        |& \
+         grep "ERROR SUMMARY:"                             |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $BTime`
+      if ($xstatus == 0) then
+         NoteD $Log "ok ($ETime)"
+      else
+         NoteD $Log "ng ($xstatus/$ETime)"
+         set FAIL  = "YES"
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($FAIL == "YES") then
+         NoteD $Log "                    PPC Socket Test ................ FAILED ($ETime)"
+         set ERROR = "FALSE"
+      else
+         if ("$Valgrind" == "") then
+            diff pcexec.refi pcexec.socki > pcexec.diffi
+            set Files = `find . -name "pcexec.diffi" -size 0c -print`
+            diff pcexec.refp pcexec.sockp > pcexec.diffp
+            set Files = `find . -name "pcexec.diffp" -size 0c -print`
+         else
+            set Files = 1
+         endif
+         if ($#Files == 0) then
+            NoteD $Log "                    PPC Socket Test ................ FAILED ($ETime)"
+            set Err = 1
+         else
+            NoteD $Log "                    PPC Socket Test ................ PASSED ($ETime)"
+            flog $Log rm pcexec.diff* pcexec.sock*
+         endif
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

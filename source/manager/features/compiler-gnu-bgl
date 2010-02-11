@@ -1,0 +1,83 @@
+#
+# COMPILER-GNU-BGL - compiler info for IBM BG/L MPI compilers
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath gnu
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+setenv OBJECT_MODE ${Bits}
+
+Tool CC {
+   Exe       = mpgcc
+   Flags     = -fsignaling-nans -ffloat-store
+   Flags    += [ _env_ = Bits ;              # address bit size
+                 *     = -m* ]
+   Flags    += [ _cmd_ = -p ;                # profiling
+	         on    = -pg ]
+   Flags    += [ _cmd_ = -cov ;              # coverage analysis
+	         on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool FC {
+   Exe     = mpf90
+   Flags   = [ _env_ = Bits ;                # address bit size
+               *     = -m* ]
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -pg ]
+   Flags  += [ _cmd_ = -cov ;                # coverage analysis
+	       on    = -fprofile-arcs -ftest-coverage ]
+   Version = -v
+}
+
+Tool LD {
+   RPath    = -Wl,-rpath,@
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -lgcov ]
+   Lib      = -lc
+}
+
+Tool Lex {
+   Flags  = -w
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -m* ]
+}
+
+Group Std {
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use    = Std
+   CC_Exe = gcc
+}
+
+Group OpenMP {
+   CC_Flags = -fopenmp
+   LD_Flags = -fopenmp
+   LD_Lib   = -lgomp
+}
+
+Group Shared {
+   LD_Exe    = gcc
+   CC_Shared = -fPIC
+   LD_Shared = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+include cpp-rule
+

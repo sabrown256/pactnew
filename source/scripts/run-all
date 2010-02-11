@@ -1,0 +1,88 @@
+#!/bin/csh
+#
+# RUN-ALL - run the job on all platforms specified by HostFile
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set noglob
+
+unalias ps
+
+set Cmmnd   = ""
+set Verbose = ""
+set SSH     = 'ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no'
+
+set HostFile = $HOME/.all-hosts
+
+while ($#argv > 0)
+   switch ("$1")
+      case -f:
+           shift
+           set HostFile = $1
+           breaksw
+
+      case -h:
+           echo ''
+           echo 'Usage:  run-all [-f <file>] [-h] [-v] <command>'
+           echo ''
+           echo 'Run a command on all hosts specified.  Currently the'
+           echo 'list of hosts is built in, but that can change.'
+           echo 'This is guaranteed to run the same way'
+           echo 'on all platforms and different versions of PS.'
+           echo ''
+           echo '        h    - this help message'
+           echo '        v    - verbose flag'
+           echo '        name - executable name or command line pattern'
+           echo '               used to identify processes'
+           echo ''
+           exit(1)
+           breaksw
+
+      case -v:
+           set Verbose = -v
+           breaksw
+
+      default:
+           set Cmmnd = ( $Cmmnd "$1" )
+           breaksw
+   endsw
+   shift
+end
+
+if (-e $HostFile) then
+   set Hosts = `awk '$1 !~ /#/ { print }' $HostFile`
+else
+   echo ""
+   echo "Cannot find $HostFile"
+   echo "You may put the names of the hosts to be used"
+   echo "in ~/.all-hosts"
+   echo ""
+   exit(1)
+endif
+
+foreach i ($Hosts)
+   pcexec -q -c 20 $SSH $i pwd >& /dev/null
+   set LStat = $status
+   if ($LStat == 0) then
+      echo "-------------------------------------"
+      echo " "
+      echo "On $i"
+      echo " "
+      $SSH $i $Cmmnd
+      echo " "
+   else
+      echo " "
+      echo "$i is down"
+      echo " "
+   endif
+end
+
+unset noglob
+
+echo " "
+
+exit($status)

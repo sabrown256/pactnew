@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# LD - analyze the platform linker
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: ld"
+
+NoteD $ALog -n "   Ld: "
+Note $ALog ""
+
+SafeEnv LD_Exe     ""
+SafeEnv LD_Flags   ""
+SafeEnv LD_Shared  ""
+SafeEnv LD_Lib     ""
+SafeEnv LD_MDGLib  ""
+SafeEnv LD_DPLib   ""
+
+if (!(-x "$LD_Exe")) then
+   if (-x `$Which ld`) then
+      flog $ALog setenv LD_Exe `$Which ld`
+   else
+      flog $ALog setenv LD_Exe ""
+   endif
+endif
+
+cat << EOF >! $Tmp.c
+int main(int c, char **v)
+{return(0);}
+EOF
+
+Note $ALog ""
+Note $ALog "Checking for -rpath flag"
+flog $ALog $Cfe_CC_Exe -c $Tmp.c -o $Tmp.o
+if ($HostOS == AIX) then
+   flog $ALog $LD_Exe $Tmp.o -o $Tmp -bsvr4 -R $cwd
+   set LStat = $status
+else
+   flog $ALog $LD_Exe $Tmp.o -o $Tmp -rpath $cwd
+   set LStat = $status
+endif
+if ($LStat == 0) then
+   NoteD $ALog "$LD_Exe (has -rpath)"
+   setenv HaveRPATH TRUE
+else
+   NoteD $ALog "$LD_Exe (no -rpath)"
+   setenv HaveRPATH FALSE
+endif
+
+SafeEnv Shared_LD_Exe "$LD_Exe"
+
+flog $ALog $RM $Tmp $Tmp.c $Tmp.o
+
+# export the results
+SetParent LD_Exe
+SetParent LD_Flags
+SetParent LD_Lib
+SetParent LD_MDGLib
+SetParent LD_DPLib
+SetParent LD_Shared
+SetParent Shared_LD_Exe
+SetParent HaveRPATH
+
+exit(0)
+

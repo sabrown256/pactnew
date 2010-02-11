@@ -1,0 +1,86 @@
+#!/bin/csh -f
+#
+# JPEG - analyze platform JPEG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: jpeg"
+
+# vanilla place to look if previously undefined
+SafeEnv JPEG_Path     /usr
+SafeEnv HAVE_JPEGLIB  FALSE
+
+# if we have explicitly said we do not want JPEG
+# do NOT detect it
+if ($JPEG_Path == none) then
+   NoteD $ALog "      no JPEG (by request)"
+
+else
+
+   set UTime = `timer -r`
+
+# write a little JPEG test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <jpeglib.h>
+int main(int c, char **v)
+{struct jpeg_error_mgr jerr;
+ struct jpeg_compress_struct cinfo;
+ cinfo.err = jpeg_std_error(&jerr);
+ jpeg_create_compress(&cinfo);
+ return(0);}
+EOF
+
+   set lIncDirs = ( $JPEG_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $JPEG_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lHdrs    = ( jpeglib.h jconfig.h jmorecfg.h jerror.h )
+   set ASList   = ( a so )
+   set lLib     = jpeg
+   set lFile    = $Tmp
+   set lALibs   = ""
+   set Implicit = FALSE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+      NoteD $ALog "      has JPEG ($PckLib)"
+
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         setenv CC_MDGInc "$CC_MDGInc $PckInc"
+      endif
+
+      setenv LD_MDGLib      "$LD_MDGLib $PckLib"
+      setenv HAVE_JPEGLIB   TRUE
+   else
+      NoteD $ALog "      no JPEG"
+      setenv HAVE_JPEGLIB FALSE
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   setenv JPEGLib "$PckLib"
+   setenv JPEGInc "$PckInc"
+
+# export the results
+   SetParent JPEGInc
+   SetParent JPEGLib
+   SetParent CC_MDGInc
+   SetParent LD_MDGLib
+
+endif
+
+SetParent HAVE_JPEGLIB
+
+exit(0)
+

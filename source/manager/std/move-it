@@ -1,0 +1,12 @@
+#!/bin/csh -f
+
+foreach i (sp2-mpi-*)
+   set j = `echo "$i" | sed 's/sp2/aix/'`
+   echo " "
+   echo "Moving $i"
+   mv $i $j
+   cvs remove $i
+   cvs add $j
+end
+
+exit($status)

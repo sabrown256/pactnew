@@ -1,0 +1,14 @@
+directory ../../../score
+directory ../../../pml
+directory ../../../pdb
+directory ../../../pdb/spokes/sql
+directory ../../../pdb/spokes/xml
+directory ../../../pdb/spokes/nacf
+directory ../../../pdb/spokes/llf
+directory ../../../ppc
+directory ../../../pgs
+directory ../../../panacea
+directory ../../../scheme
+directory ../../../sx
+directory ../../../ultra
+

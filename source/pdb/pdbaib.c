@@ -1,0 +1,446 @@
+/*
+ * PDBAIB.C - API routines for PDB
+ *
+ * Source Version: 9.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "cpyright.h"
+
+#include "pdb_int.h"
+#include "scope_mem.h"
+
+#define SET_PRIM_INT(_hs, _fs, _ha, _fa, _t, _n, _a)                         \
+   {_hs->_t##_bytes     = _n;                                                \
+    _ha->_t##_alignment = _a;                                                \
+    if (file->mode == PD_CREATE)                                             \
+       {_fs->_t##_bytes     = _n;                                            \
+	_fa->_t##_alignment = _a;};}
+
+#define SET_PRIM_FLT(_hs, _fs, _ha, _fa, _t, _o, _f, _a)                     \
+   {_hs->_t##_order     = _o;                                                \
+    _hs->_t##_format    = _f;                                                \
+    _ha->_t##_alignment = _a;                                                \
+    if (file->mode == PD_CREATE)                                             \
+       {_fs->_t##_order     = _o;                                            \
+        _fs->_t##_format    = _f;                                            \
+	_fa->_t##_alignment = _a;};}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_VERIFY_WRITES - set global flag that will verify all file writes
+ *                  - by reading the data back after the write
+ *                  - and comparing the results
+ *                  - on failure 0 is returned as the number of items written
+ *                  - this a global operation, not per file, because
+ *                  - you want to do this with flaky hardware of file systems
+ *                  - as such all files are likely to be effected
+ *                  - return the old value of the flag
+ */
+
+int PD_verify_writes(int st)
+   {int ost;
+
+    ost = SC_verify_writes;
+
+    SC_verify_writes = st;
+
+    return(ost);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_CONTENTS - dump the contents of the structure chart, symbol table,
+ *             - and the extras of any PDBfile *file to the file OUT
+ *             - if FH == 0 write the file chart and if 1
+ *             - write the host chart
+ */
+
+void PD_contents(PDBfile *file, FILE *out, int fh, int vers)
+   {
+
+    if ((vers == 1) || (vers == 2))
+       _PD_write_meta_ii(file, out, fh);
+    else
+       _PD_write_meta_iii(file, out, fh);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_TYPEDEF - define an alias for a type which exists in the host chart
+ *            - the intended use is to provide a correspondence
+ *            - between a type that has been defined to PDBLib (ONAME)
+ *            - and a typedef'd type in programs (TNAME)
+ *            - can be used in conjunction with PD_defix and PD_defloat
+ *            - to have a primitive type known to both charts
+ *            - return a pointer to the original type's defstr if
+ *            - successful and NULL otherwise
+ */
+
+defstr *PD_typedef(PDBfile *file, char *oname, char *tname)
+   {defstr *dp;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    dp = PD_inquire_host_type(file, oname);
+    if (dp == NULL)
+       snprintf(pa->err, MAXLINE,
+		"ERROR: HOST TYPE %s UNKNOWN - PD_TYPEDEF\n", oname);
+    else
+       {if (PD_inquire_host_type(file, tname) == NULL)
+           _PD_d_install(file, tname, dp, TRUE);};
+
+    dp = PD_inquire_type(file, oname);
+    if (dp == NULL)
+       snprintf(pa->err, MAXLINE,
+		"ERROR: FILE TYPE %s UNKNOWN - PD_TYPEDEF\n", oname);
+    else
+       {if (PD_inquire_type(file, tname) == NULL)
+           _PD_d_install(file, tname, dp, FALSE);};
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFNCV - define a primitive type that will not be format converted
+ *           - do it in both charts
+ */
+
+defstr *PD_defncv(PDBfile *file, char *name, long bpi, int align)
+   {defstr *dp;
+
+/* install in the file chart */
+    dp = _PD_defstr(file, FALSE, name, NON_CONVERT_KIND,
+		    NULL, bpi, align,
+		    NO_ORDER, FALSE, NULL, NULL, FALSE, FALSE);
+
+/* install an independent copy in the host chart - garbage collection! */
+    dp = _PD_defstr(file, TRUE, name, NON_CONVERT_KIND,
+		    NULL, bpi, align,
+		    NO_ORDER, FALSE, NULL, NULL, FALSE, FALSE);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFCHR - define a primitive character based type
+ *           - this is needed in connection with TEXT
+ *           - e.g. SQL date and time types
+ */
+
+defstr *PD_defchr(PDBfile *file, char *name, long bpi, int align,
+		  PD_byte_order ord, int unsgned)
+   {defstr *dp;
+
+/* file chart */
+    dp = _PD_defstr(file, FALSE, name, CHAR_KIND,
+		    NULL, bpi, align, ord, FALSE,
+		    NULL, NULL, unsgned, FALSE);
+
+/* host chart */
+    dp = _PD_defstr(file, TRUE, name, CHAR_KIND,
+		    NULL, bpi, align, ord, FALSE,
+		    NULL, NULL, unsgned, FALSE);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFIXNUM - define an new integer primitive type for the file chart */
+
+defstr *PD_defixnum(PDBfile *file, char *name, long bpi,
+		    int align, PD_byte_order ord, int unsgned, int onescmp)
+   {defstr *dp;
+
+/* file chart */
+    dp = _PD_defstr(file, FALSE, name, INT_KIND,
+		    NULL, bpi, align, ord, TRUE, 
+                    NULL, NULL, unsgned, onescmp);
+
+/* host chart */
+    dp = _PD_defstr(file, TRUE, name, INT_KIND,
+		    NULL, bpi, align, ord, TRUE, 
+                    NULL, NULL, unsgned, onescmp);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFIX - define an new integer primitive type */
+
+defstr *PD_defix(PDBfile *file, char *name, long bpi,
+		 int align, PD_byte_order ord)
+   {defstr *dp;
+
+    dp = PD_defixnum(file, name, bpi, align, ord, FALSE, FALSE);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFLOAT - define an new floating point primitive type
+ * 
+ */
+
+defstr *PD_defloat(PDBfile *file, char *name, long bpi,
+		   int align, int *ordr,
+		   long expb, long mantb, long sbs, long sbe,
+		   long sbm, long hmb, long bias)
+   {defstr *dp;
+    long *formt;
+    int *order;
+
+    formt    = FMAKE_N(long, 8, "PD_DEFLOAT:long");
+    formt[0] = bpi*8;
+    formt[1] = expb;
+    formt[2] = mantb;
+    formt[3] = sbs;
+    formt[4] = sbe;
+    formt[5] = sbm;
+    formt[6] = hmb;
+    formt[7] = bias;
+
+    order    = FMAKE_N(int, bpi, "PD_DEFLOAT:order");
+    memcpy(order, ordr, sizeof(int)*bpi);
+
+/* file chart */
+    dp = _PD_defstr(file, FALSE, name, FLOAT_KIND,
+		    NULL, bpi, align,
+		    NO_ORDER, TRUE, order, formt, FALSE, FALSE);
+
+/* host chart */
+    dp = _PD_defstr(file, TRUE, name, FLOAT_KIND,
+		    NULL, bpi, align,
+		    NO_ORDER, TRUE, order, formt, FALSE, FALSE);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFSTR - a structure definition mechanism for PDBLib
+ *           -
+ *           - sample syntax:
+ *           -
+ *           -   PD_defstr(<PDB file>, "<struct name>",
+ *           -                         "<member1>", "<member2>",
+ *           -                 ...     "<membern>", LAST);
+ *           -
+ *           - where
+ *           - 
+ *           -   <member> := <primitive type> <member name>[(<dimensions>)] |
+ *           -               <derived type> <member name>[(<dimensions>)]
+ *           -
+ *           -   <dimensions> := <non-negative int> |
+ *           -                   <non-negative int>,<dimensions> |
+ *           -                   <non-negative int>, <dimensions> |
+ *           -                   <non-negative int> <dimensions>
+ *           -
+ *           -   <primitive type> := short | integer | long | float |
+ *           -                       double | char | short * | integer *
+ *           -                       long * | float * | double * | char *
+ *           - 
+ *           -   <derived type> := any defstr'd type | any defstr'd type *
+ *           -
+ *           - LAST is a pointer to a integer zero and is specifically
+ *           - allocated by PDBLib to be used to terminate argument lists
+ *           - which consist of pointers
+ *           -
+ *           - Returns NULL if member types are unknown
+ */
+
+defstr *PD_defstr(PDBfile *file, char *name, ...)
+   {char *nxt, *ptype;
+    int doffs;
+    hasharr *fchrt;
+    memdes *desc, *lst, *prev;
+    defstr *dp, *dp2;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    SC_VA_START(name);
+
+    prev  = NULL;
+    lst   = NULL;
+    fchrt = file->chart;
+    doffs = file->default_offset;
+    for (nxt = SC_VA_ARG(char *); (int) *nxt != 0;
+         nxt = SC_VA_ARG(char *))
+        {desc  = _PD_mk_descriptor(nxt, doffs);
+         ptype = desc->base_type;
+         if (SC_hasharr_lookup(fchrt, ptype) == NULL)
+            if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
+               {snprintf(pa->err, MAXLINE,
+			 "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR\n",
+			 nxt);
+                return(NULL);};
+         
+         dp2 = PD_inquire_table_type(fchrt, ptype);
+         if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
+            if (dp2->n_indirects > 0)
+               {snprintf(pa->err, MAXLINE,
+			 "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
+			 ptype);
+                return(NULL);};
+
+         if (lst == NULL)
+            lst = desc;
+         else
+	    {prev->next = desc;
+	     SC_mark(desc, 1);};
+
+         prev = desc;};
+
+    SC_VA_END;
+
+/* install the type in all charts */
+    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
+			 NO_ORDER, NULL, NULL, FALSE);
+
+    if (dp == NULL)
+       PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR", PD_GENERIC);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_DEFSTR_ALT - an alternate structure definition mechanism for PDBLib
+ *               -
+ *               - sample syntax:
+ *               -
+ *               -   PD_defstr_alt(<PDB file>, "<struct name>", n_members,
+ *               -                 <member-array>);
+ *               - the member array elements have the same syntax as for
+ *               - PD_defstr
+ */
+
+defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
+		      char **members)
+   {int i, doffs;
+    char *nxt, *ptype, *type;
+    hasharr *fchrt;
+    memdes *desc, *lst, *prev;
+    defstr *dp, *dp2;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    prev  = NULL;
+    lst   = NULL;
+    fchrt = file->chart;
+    doffs = file->default_offset;
+    for (i = 0; i < nmemb; i++)
+        {nxt   = members[i];
+         desc  = _PD_mk_descriptor(nxt, doffs);
+         type  = SC_strsavef(nxt, "char*:PD_DEFSTR_ALT:type");
+         ptype = SC_firsttok(type, " \n");
+         if (SC_hasharr_lookup(fchrt, ptype) == NULL)
+            if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
+               {snprintf(pa->err, MAXLINE,
+			 "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR_ALT\n",
+			 nxt);
+                return(NULL);};
+
+         dp2 = PD_inquire_table_type(fchrt, ptype);
+         if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
+            if (dp2->n_indirects > 0)
+               {snprintf(pa->err, MAXLINE,
+			 "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
+			 ptype);
+                return(NULL);};
+
+         SFREE(type);
+         if (lst == NULL)
+            lst = desc;
+         else
+	    {prev->next = desc;
+	     SC_mark(desc, 1);};
+
+         prev = desc;};
+
+/* install the type in all charts */
+    dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
+			 NO_ORDER, NULL, NULL, FALSE);
+
+    if (dp == NULL)
+       PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR_ALT", PD_GENERIC);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_CHANGE_PRIMITIVE - change the description of a primitive type
+ *                     - the type is known by index
+ */
+
+int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
+			long *fpfmt, int *fpord)
+   {int err;
+    data_standard *fstd, *hstd;
+    data_alignment *falign, *halign;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    err = TRUE;
+    if (file == NULL)
+       return(FALSE);
+
+    fstd   = file->std;
+    falign = file->align;
+
+    hstd   = file->host_std;
+    halign = file->host_align;
+
+    if (ityp == SC_SHORT_I)
+       {SET_PRIM_INT(hstd, fstd, halign, falign, short, nb, algn);}
+
+    else if (ityp == SC_INTEGER_I)
+       {SET_PRIM_INT(hstd, fstd, halign, falign, int, nb, algn);}
+
+    else if (ityp == SC_LONG_I)
+       {SET_PRIM_INT(hstd, fstd, halign, falign, long, nb, algn);}
+
+    else if (ityp == SC_BIGINT_I)
+       {SET_PRIM_INT(hstd, fstd, halign, falign, longlong, nb, algn);}
+
+    else if (ityp == SC_FLOAT_I)
+       {SET_PRIM_FLT(hstd, fstd, halign, falign, float, fpord, fpfmt, algn);}
+
+    else if (ityp == SC_DOUBLE_I)
+       {SET_PRIM_FLT(hstd, fstd, halign, falign, double, fpord, fpfmt, algn);}
+
+    else
+       {snprintf(pa->err, MAXLINE,
+		 "UNKNOWN TYPE %d - PD_CHANGE_PRIMITIVE", ityp);
+	err = 1;};
+
+    _PD_setup_chart(file->host_chart,        hstd, NULL, halign, NULL, FALSE);
+
+/* NOTE: we must change the file chart unconditionally but this only
+ * ends up changing the dp->convert flag for this type and this is
+ * essential
+ */
+    _PD_setup_chart(file->chart, fstd, hstd, falign, halign, TRUE);
+
+/* if we opened the file in write mode we need to change the formats */
+    if (file->mode == PD_CREATE)
+       err &= (*file->wr_fmt)(file);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

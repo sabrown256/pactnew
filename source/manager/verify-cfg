@@ -1,0 +1,172 @@
+#!/bin/csh -f
+#
+# VERIFY-CFG - verify that the compiled codes is consistent with
+#            - the configuration specifications
+#
+
+set Arch = `./cfgman use`
+set Base = ""
+set Err  = 0
+
+while ($#argv > 0)
+   switch ($1)
+      case -b:
+           shift
+           set Base = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: verify-cfg [-b <path>] [-h] [<arch>]"
+           echo "   b       the full path to the configuration to be verified"
+           echo "   h       this help message"
+           echo "   <arch>  the configuration to be verified"
+           echo ""
+           exit(1)
+      default:
+           set Arch = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Base" == "") then
+   set Base = $cwd:h/dev/$Arch
+endif
+
+set CfgLog = $Base/log/config
+set BinDir = $Base/bin
+set IncDir = $Base/include
+
+source ../scripts/env-csh
+
+InitLog Log $cwd/log.verify-cfg.$Arch
+
+set Cfg = `awk '$2 ~ /SCCONFIG.H/ { print $7 }' $IncDir/scconfig.h`
+
+NoteD $Log ""
+NoteD $Log "Verifying configuration $Cfg in $Base"
+
+# Debug/Optimize
+Separator $Log
+set CfgDO = `grep "Building absolutely" $CfgLog | awk '{ print $3 }'`
+if ("$CfgDO" == debuggable) then
+   set Req = `grep "Command: setenv CC_Optimize" $CfgLog | sed 's/Command: setenv CC_Optimize //'`
+   set Got = `grep "CC_Optimize" $IncDir/make-def | tail -n 1 | sed 's/CC_Optimize = //'`
+   if ("$Req" == "$Got") then
+      echo "   debuggable ... yes"
+   else
+      echo "   debuggable ... no"
+      set Err = 1
+   endif
+else if ("$CfgDO" == optimized) then
+   set Req = `grep "Command: setenv CC_Debug" $CfgLog | sed 's/Command: setenv CC_Debug //'`
+   set Got = `grep "CC_Debug" $IncDir/make-def | tail -n 1 | sed 's/CC_Debug = //'`
+   if ("$Req" == "$Got") then
+      echo "   optimized .... yes"
+   else
+      echo "   optimized .... no"
+      set Err = 1
+   endif
+else
+   Note $Log "   mixed debug/optimize"
+endif
+
+# PTHREAD
+Separator $Log
+flog $Log grep "include pthread" $CfgLog 
+if ($status == 0) then
+   echo -n "   pthread ...... "
+   flog $Log (grep '#define THREADING' $IncDir/scconfig.h | grep pthread)
+   set LStat = $status
+   if ($LStat == 0) then
+      echo "yes"
+   else
+      echo "no"
+      set Err = 2
+   endif
+endif
+
+# OPENMP
+Separator $Log
+flog $Log (grep "include" $CfgLog | grep openmp)
+if ($status == 0) then
+   echo -n "   openmp ....... "
+   flog $Log grep '#define HAVE_OPENMP' $IncDir/scconfig.h
+   set LStat = $status
+   if ($LStat == 0) then
+      echo "yes"
+   else
+      echo "no"
+      set Err = 3
+   endif
+endif
+
+# MPI
+Separator $Log
+flog $Log grep "include mpi" $CfgLog 
+if ($status == 0) then
+   echo -n "   mpi .......... "
+   flog $Log grep '#define HAVE_MPI' $IncDir/scconfig.h
+   set LStat = $status
+   if ($LStat == 0) then
+      echo "yes"
+   else
+      echo "no"
+      set Err = 4
+   endif
+endif
+
+# PYTHON
+Separator $Log
+flog $Log grep "include python" $CfgLog 
+if ($status == 0) then
+   echo -n "   python ....... "
+   set PyDir = `grep "setenv PYTHONPATH" $CfgLog | awk '{ print $3 }'`
+   Note $Log "PyDir = |$PyDir|"
+   if (-d "$PyDir/pact") then
+      flog $Log ls -l $PyDir/pact
+      if ((-e "$PyDir/pact/libpypdb.so") && (-e "$PyDir/pact/libpypgs.so")) then
+         echo "yes"
+      else
+         echo "no"
+         set Err = 5
+      endif
+   else
+      Note $Log "No directory |$PyDir|"
+      echo "no"
+      set Err = 5
+   endif
+endif
+
+# SHARED
+Separator $Log
+flog $Log grep "Building shared libraries" $CfgLog
+set LStat = $status
+if ($LStat == 0) then
+   echo -n "   shared ....... "
+   flog $Log grep -w CShared $IncDir/make-def
+   set have_cshared = $status
+   flog $Log grep -w LDShared $IncDir/make-def
+   set have_ldshared = $status
+   flog $Log grep -w ShLD $IncDir/make-def
+   set have_shld = $status
+   if (($have_cshared == 0) || ($have_ldshared == 0) || ($have_shld == 0)) then
+      echo "yes"
+   else
+      echo "no"
+      set Err = 6
+   endif
+endif
+
+Separator $Log
+
+if ($Err != 0) then
+   NoteD $Log "Code is NOT consistent with configuration"
+else
+   NoteD $Log "Code is consistent with configuration"
+endif
+
+NoteD $Log ""
+
+exit($Err)
+

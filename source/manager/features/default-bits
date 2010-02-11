@@ -1,0 +1,26 @@
+#!/bin/csh -f
+#
+# DEFAULT-BITS - figure out default address size
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+setenv Bits `nbit -d`
+
+SetParent Bits
+
+exit($status)
+
+

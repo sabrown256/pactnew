@@ -1,0 +1,313 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH DO-RUN 1 "22 May 2007"
+.SH NAME
+do-run \- run programs under MPI front ends, debuggers, and profilers
+.SH SYNOPSIS
+.B do-run [-b] [-bf <file>] [-d] [-dbg <dbg>] [-dr] [-f] [-h] [-m]
+.B        [-mpi <mpi-fe>] [-m] [-n #] [-o <file>] [-p #] [-q]
+.B        [-s <file>] [-t #] [-trace] [-v] [-vg] [-vgd] [-x] [-z] args
+
+.SH DESCRIPTION
+
+do-run provides a single user interface to run programs under
+special conditions.  The two main special conditions are running
+an MPI program under its proper MPI frontend program (e.g. mpirun),
+and running a program under a debugger.  It is doubly helpful when
+you are doing both at the same time - that is running an MPI
+program under a debugger.  It should also be mentioned that do-run
+helps with running SMP parallel codes as well.
+
+By using do-run a user only need specify information that can only
+be supplied by a user.  It examines the executable to determine
+whether or not it is an MPI program.  It uses a text file, called
+a signature file, to determine the proper way to run the specified
+program under a debugger or MPI front end.  Together with the
+command line arguments and the information from the signature file,
+do-run executes the desired command to accomplish the user's intention.
+
+do-run was necessitated by the deplorable lack of a standard
+user interface for running MPI (and indeed any distributed parallel)
+programs.  It is hard to believe that the user community has
+tolerated this state of affairs and not demanded a standard.
+As do-run developed, it became clear that the same consideration applies
+to other activities such as debugging.  A user may have to use
+different debuggers on different platforms and can become very
+confused by different user interfaces.
+
+do-run will take all given information and define an environment variable
+named Cmd.  Starting with commmand line arguments, do-run parses the
+signature database and defines environemnt variables which can be used
+to build up $Cmd. After gathering all spefications it executes the command
+contained in $Cmd.  The variable command has a built-in default value
+which can be overridden in the signature file, thus giving complete
+control to the writer of the signature file.
+
+do-run examines the specified program to determine whether or not it
+is a parallel program (i.e. has a call to MPI_Init).  It examines the
+users PATH for MPI frontend programs and debuggers.  It consults the
+SC_DEBUGGER environment variable in case more than one debugger
+is found in order to select the default debugger.  All this saves the
+user from having to specify more that then number of processes and
+threads desired for a parallel run.
+
+
+.SH OPTIONS
+
+.TP
+.B \-b
+Run in batch.
+.TP
+.B \-bf
+File containing info for local batch system.
+.TP
+.B \-d
+Run the code under the debugger.
+.TP
+.B \-dbg
+Override default debugger.
+.TP
+.B \-dr
+Show command but do not execute it.
+.TP
+.B \-f
+Force a distributed run even with 1 MPI process.
+.TP
+.B \-h
+This help message.
+.TP
+.B \-m
+Suppress MPI I/O bug fix.
+.TP
+.B \-mpi
+Override default MPI front end.
+.TP
+.B \-n
+Number of nodes to use - default is 1 (MPI).
+.TP
+.B \-o
+Output file for DP runs.
+.TP
+.B \-p
+Number of processes to use (MPI).
+.TP
+.B \-q
+Suppress do-batch messages in logs.
+.TP
+.B \-s
+Use signature file.
+.TP
+.B \-t
+Number of threads to use (SMP).
+.TP
+.B \-v
+Verbose mode.
+.TP
+.B \-vg
+Run under Valgrind.
+.TP
+.B \-vgd
+Run with interactive GDB Valgrind.
+.TP
+.B \-x
+Suppress MPI frontend (sometimes useful in batch).
+.TP
+.B \-z
+Run under ZeroFault on AIX only.
+
+.SH EXAMPLES
+
+   Run program foo with 10 processes:
+
+      do-run -p 10 foo
+
+   Run program foo with 10 processes but first print the exact
+   command executed including the MPI front end details:
+
+      do-run -v -p 10 foo
+
+   Run program foo (with argument bar) under the debugger with
+   5 processes and 2 thread per process:
+
+      do-run -d -p 5 -t 2 foo bar
+
+   Run program SMP program bar with 4 threads:
+
+      do-run -t 4 bar
+
+   Run program serial program baz under valgrind:
+
+      do-run -vg baz
+
+
+.SH ENVIRONMENT VARIABLES
+
+RUN_SIGNATURE_DB  this variable names the default run signature file
+used by do-run.  The '-f' option is used to override this default.
+SC_DEBUGGER  this variable contains an ordered list of debuggers.
+do-run will search the list in order and use the first one which
+is found to be executable on the current host.
+
+
+.SH RUN SIGNATURE DATABASE
+
+Most users can ignore this section.  It is only for those people who have
+to setup and maintain a run signature database.   Most users just need to
+set the RUN_SIGNATURE_DB environment variable in their $HOME/.cshrc or
+$HOME/.profile and then proceed to simply use do-run.  They should ask
+the person who setup the database for the correct setting.
+
+A run signature database is simply a text file which contains
+a number of stanzas each of which defines specifications for
+running either an MPI front end or a debugging type tool (which
+includes things such as valgrind).
+Here is an example:
+
+.nf
+   
+   NCPU = $NProc * $NThread
+   Cmd  = $Wrap $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs
+   
+   MPI : mpirun {
+      Exe    = ($NProc > 0) ? mpirun
+      Flags  = ($NProc > 0) ? -q -np $NCPU
+      Flags  = ($Force == TRUE) ? $lNODES[1]
+   }
+   
+   MPI : dmpirun {
+      Exe   = dmpirun
+      Flags = -np $NCPU
+   }
+   
+   DBG : gdb {
+      Exe   = gdb
+      Flags = 
+      Delim =
+   }
+
+   DBG : vg {
+      Exe   = valgrind
+      Flags = --tool=memcheck
+      Delim = 
+   }
+   
+   DBG : tv {
+      Exe   = totalview
+      Flags = 
+      Delim = -a
+   }
+   
+.fi
+
+In this example two different MPI frontend programs, mpirun
+and dmpirun, are described along with debugging tools gdb,
+valgrind, and totalview.
+
+A run signature database contains two basic kinds of elements.
+The main element is a stanza which specifies the tool to
+be defined and the possible values it is to be given.  The
+second element is variable definitions for use at any
+point in the process of specifying how to run the program.
+
+The syntax for defining local variables is:
+
+  <expr>        := <simple> | <conditional>
+  <simple>      := <var> = <value>
+  <conditional> := <var> = <test> ? <consequent> [ : <alternate> ]
+
+where <var> is the variable name and <value>, <consequent>, or
+<alternate> are evaluated by the C shell (do-run is a C shell
+script) so more or less arbitrary expression may be used.  Because
+of this last point the '?' and ':' must be space delimited.
+The <test> expression will be evaluated by /bin/test; however,
+any C syntax will be translated into /bin/test syntax.  For example,
+'==' will be translated to '=' and '&&' translated to '-a'.
+
+The syntax for a stanza defining a tool is:
+
+  <type> : <tool> {
+     <definition>+
+  }
+
+where
+
+  <type>       := MPI | DBG
+  <definition> := [Env] <expr>
+
+Only the stanzas which match the MPI and DBG tools selected on
+the command line are parsed.
+
+Unless the 'Env' specification is included in a definition the
+environment variable defined will be named as:
+
+   <type>_<var>
+
+With the exception of Cmd all variables are subject to eager evaluation.
+That means any environment variables contained in their "value"
+are fully expanded at the time of definition.
+
+The variable Cmd is special in that it is subject to lazy evaluation.
+This means that any environment variables contained in its definition
+are left unexpanded until the end when $Cmd is evaluated to execute
+the desired command.  Because is is special Cmd does not require 'Env'
+if redefined in a stanza.
+
+do-run has several built-in environment variables which are set from
+the command line.  They are:
+
+   Cmd      The initial value of Cmd is '$Code $CArgs'.
+   Code     The program which do-run will execute
+            (do-run expands this to a full path before execution).
+   CArgs    The command line arguments for the program.
+   Force    Force a distributed parallel run even with only 1 process
+            set by the '-f' option (default FALSE).
+   MPICnd   Set to TRUE if the -c option to do-run is specified
+   MPIFE    The executable in $Code is examined to determine
+            the full path to the MPI front end code needed to
+            run it (e.g. /<somewhere>/bin/mpirun)
+   MPILib   The executable in $Code is examined to determine
+            the path to the library which supplies MPI_Init.
+            This can be useful for writing rules in the database.
+   NNode    The number of nodes requested for an MPI run
+            set by the '-n' option (default 1).
+   NProc    The number of MPI processes requested for an MPI run
+            set by the '-p' option (default 1).
+   NThread  The number of threads requested for SMP
+            set by the '-t' option (default 1).
+   STDERR   Suppress output from stderr (usually to quiet down
+            blabby MPI front ends).
+   TVDirs   Specifies a file which tells do-run all the directories
+            in which source files are to be found for debugging.
+
+These may be used or reset in the run signature database.
+
+.SH USING DEBUGGERS
+
+One important issue in connnection with debugging your application
+is how to tell your favorite debugger where to find the sources.
+Different debuggers require this information couched in various
+syntaxes.  Nevertheless, the essential information is a list of
+directories.  Do-run helps in a limited two step way.
+
+The first part is to write a text file with the directories
+containing your sources - one per line.  Set the TVDirs environemnt
+variable to the full path of this file.  Usually this is done
+just before invoking do-run.
+
+The second part is to write a wrapper script for your debugger
+which looks for TVDirs and maps the list of directories into the
+form required by your debugger and invokes the debugger (passing
+its command line arguments to the debugger).  This should be done
+when writing your run signature file.  The wrapper should be
+specified in the run signature database in place of the actual
+debugger.
+
+.SH BUGS
+.TP 
+.B None known.
+

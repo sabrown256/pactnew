@@ -1,0 +1,143 @@
+Interleaved if and declaration test
+-> before a = foo
+-> intermediate a = bar
+-> after a = baz
+-> after b = 1
+-> after c = 2.0
+done
+
+RETURN Test
+Negative branch - -2
+
+RETURN Test
+Positive branch - 15
+
+RETURN Test
+Zero branch - 0
+
+SWITCH Test
+   case 0 : 0
+   case 3 : 0
+
+SWITCH Test
+   case 3 : 6
+
+SWITCH Test
+   default : 15
+
+WHILE Test #1 - while (exp) statement
+   0 0
+   1 1.1
+   2 3.3
+   3 6.6
+   4 11
+
+WHILE Test #2 - do statement while (exp)
+   0 0
+   1 2.2
+   2 6.6
+   3 13.2
+   4 22
+
+WHILE Test #3 - with compound exp
+   0 0 0
+   1 -1 0.909297
+   2 -2 0.152495
+   3 -3 -0.126921
+   4 -4 0.862438
+
+WHILE Test #4 - with break
+   1
+   2
+   3
+   4
+   5
+   6
+
+FOR Test #1 - for (exp; exp; exp) statement
+   0 0
+   1 1.1
+   2 3.3
+   3 6.6
+   4 11
+
+FOR Test #2 - for ( ; exp; exp) statement
+   5 11
+   6 24.2
+   7 39.6
+   8 57.2
+   9 77
+
+FOR Test #3 - for (exp; ; exp) statement
+   0 0
+   1 3.3
+   2 9.9
+   3 19.8
+   4 33
+   5 49.5
+   6 69.3
+
+FOR Test #4 - for (exp; exp; ) statement
+   0 0
+   1 4.4
+   2 13.2
+   3 26.4
+   4 44
+
+FOR Test #5 - for (exp; ; ) statement
+   0 0
+   1 5.5
+   2 16.5
+   3 33
+   4 55
+   5 82.5
+
+FOR Test #6 - for ( ; exp; ) statement
+   6 39.6
+   7 85.8
+   8 138.6
+   9 198
+
+FOR Test #7 - for ( ; ; exp) statement
+   0 0
+   1 7.7
+   2 23.1
+   3 46.2
+   4 77
+   5 115.5
+   6 161.7
+
+FOR Test #8 - with compound clauses
+   0 -1 -0.958924
+   1 -2 -1.91785
+   2 -3 -2.87677
+   3 -4 -3.8357
+
+FOR Test #9 - with continue
+   0 0
+   2 29.7
+   3 59.4
+   4 99
+
+Increment Test
+   3
+   3
+   5
+
+Deccrement Test
+   5
+   4
+   4
+
+SIZEOF Test
+   int    4
+   short  2
+   float  4
+   double 8
+
+CAST Test
+   int 3 -> double  3.00
+   double 3.1 -> int 3
+
+ARRAY Test
+   sum = 6

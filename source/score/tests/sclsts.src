@@ -1,0 +1,12 @@
+
+      x=(6.022e23*exp(-k*T) - 12*sinh(+k*T))**2
+
+c Here we go
+      if (x.gt.3) then
+         x = y-12.0
+      else
+         x = y+12b-#14
+      endif
+
+c Test hollerith
+ 100  format 7hFoo Bar

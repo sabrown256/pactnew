@@ -1,0 +1,45 @@
+#!/bin/csh -f
+#
+# SH - analyze the platform Bourne Shell
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: sh"
+
+NoteD $ALog -n "   SH: "
+Note $ALog ""
+
+setenv DEFAULT_SHELL ""
+
+foreach i ($path /usr/bin /bin)
+   if (-x $i/bash) then
+      NoteD $ALog "$i/bash"
+      setenv DEFAULT_SHELL $i/bash
+      SetParent DEFAULT_SHELL
+      exit(0)
+   endif
+end
+
+foreach i ($path /usr/bin /bin)
+   if (-x $i/sh) then
+      NoteD $ALog "$i/sh"
+      setenv DEFAULT_SHELL $i/sh
+      SetParent DEFAULT_SHELL
+      exit(0)
+   endif
+end
+
+SetParent DEFAULT_SHELL
+
+exit(1)
+
+
+

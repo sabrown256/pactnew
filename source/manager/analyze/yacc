@@ -1,0 +1,69 @@
+#!/bin/csh -f
+#
+# YACC - analyze the platform YACC
+#      - compute Yacc_Exe, Yacc_Flags
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: yacc"
+
+NoteD $ALog -n "   Yacc: "
+Note $ALog ""
+
+SafeEnv Yacc_Exe    yacc
+SafeEnv Yacc_Flags  ""
+
+# find an executable
+if (!(-x "$Yacc_Exe")) then
+   set ypath = ""
+   set yexe  = `$Which $Yacc_Exe`
+   if (-x "$yexe") then
+      set ypath = $yexe:h
+   endif
+
+   setenv Yacc_Exe ""
+
+   foreach i ($ypath $path /usr/bin /bin)
+      foreach ycode (yacc bison)
+         set y = $i/$ycode
+         if (-x $y) then
+            setenv Yacc_Exe $y
+            break
+         endif
+      end
+      if (-x "$Yacc_Exe") then
+         break
+      endif
+   end
+endif
+
+# report none if there is nothing available
+if ("$Yacc_Exe" == "") then
+   NoteD $ALog "none"
+
+# check whether this is bison or yacc
+else
+   NoteD $ALog -n "$Yacc_Exe"
+   flog $ALog ( $Yacc_Exe --help |& grep bison )
+   if ($status == 0) then
+      setenv Yacc_Flags "-y $Yacc_Flags"
+      NoteD $ALog " (bison)"
+   else
+      NoteD $ALog ""
+   endif
+endif
+
+# export the results
+SetParent Yacc_Exe
+SetParent Yacc_Flags
+
+exit(0)
+

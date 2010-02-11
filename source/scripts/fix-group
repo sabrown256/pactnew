@@ -1,0 +1,93 @@
+#!/bin/csh -f
+#
+# FIX-GROUP - fix up the group and associated permission
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/fix-group") then
+   set path = ( $Exe $path )
+endif
+
+set Grp  = none
+set Dirs = ""
+set Prm  = "g+rwX"
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: fix-group [-h] [-p <perm>] <group> [<dir>]*"
+           echo ""
+           echo "  h  - this help message"
+           echo "  p  - permission (default g+rwX)"
+           echo ""
+           echo " <group> specifies the group to which assign the dirs"
+           echo " <dir>   a directory tree whose files and directories"
+           echo "         are to be in <group>"
+           echo ""
+           exit(1)
+      case -p:
+           shift
+           set Prm = $1
+           breaksw
+      default:
+           if ($Grp == none) then
+              set Grp = $1
+           else
+              set Dirs = ( $Dirs $1 )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Grp" == "") then
+   echo "No group has been specified - exiting"
+   exit(2)
+endif
+
+if ("$Dirs" == "") then
+   echo "No directories have been specified - exiting"
+   exit(3)
+endif
+
+foreach d ($Dirs)
+   if (-d $d) then
+      set BTime = `timer -r`
+      echo -n "   $d ."
+
+      chgrp -R $Grp $d >& /dev/null
+      if ($status == 0) then
+         echo -n "."
+      else
+         echo -n "x"
+      endif
+
+      chmod -R $Prm $d >& /dev/null
+      if ($status == 0) then
+         echo -n "."
+      else
+         echo -n "x"
+      endif
+
+      (find $d -type d -exec chmod g+s {} \;)  >& /dev/null
+      if ($status == 0) then
+         echo -n "."
+      else
+         echo -n "x"
+      endif
+
+      set ETime = `timer -b $BTime`
+      echo " ok ($ETime)"
+
+   endif
+end
+echo ""
+
+exit($status)
+

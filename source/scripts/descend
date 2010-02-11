@@ -1,0 +1,137 @@
+#!/bin/csh
+#
+# DESCEND - list/show the desendants of the specified process
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/descend") then
+   set path = ( $Exe $path )
+endif
+
+unalias cd
+unalias rm
+unalias mv
+unalias ps
+
+# for HP-UX
+setenv UNIX95
+
+set OSType = `uname -s`
+set Others = ""
+set Pids   = "$$"
+set Quiet  = FALSE
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: descend [-h] [-n] [-q] <pid>*"
+           echo ""
+           echo "   List descendants of specified process ids"
+           echo "   in depth first order for safe signalling"
+           echo ""
+           echo "      h   this help message"
+           echo "      n   make it a list of process which are NOT descendants"
+           echo "      q   simply print PID numbers"
+           echo ""
+           exit(1)
+      case -n:
+           set Others = TRUE
+           breaksw
+      case -q:
+           set Quiet = TRUE
+           breaksw
+      default:
+           set Pids = ( $Pids $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if (($OSType == "Darwin") || ($OSType == "FreeBSD")) then
+    set PS = "ps -axwo user,pid,ppid"
+else
+    set PS = "ps -eo user,pid,ppid"
+endif
+
+# GOTCHA: grrrrrr - the fool ps utility will report uid instead
+# of user name if something doesn't force it to update some
+# internal state and it happens that a cd to $USER home will 
+# do the job
+if ($OSType == "Darwin") then
+   pushd ~$USER >& /dev/null
+   popd >& /dev/null
+endif
+
+set MList = `$PS | grep $USER | awk '{ printf("%s %s ", $2, $3); }'`
+set NPids = ( $Pids )
+
+# find all the desendants of the given process id - except this one
+set DPids = ""
+set OK    = TRUE
+while ($OK == TRUE)
+   set LPids = ""
+   set OK    = FALSE
+
+   foreach i ( $NPids )
+      set List = ( $MList )
+      while ($#List > 0)
+         set pid  = $List[1]
+         set ppid = $List[2]
+         shift List
+         shift List
+         if (($i == $ppid) && ($pid != $$)) then
+            set LPids = ( $pid $LPids )
+            set OK    = TRUE
+         endif
+      end
+   end
+
+   set DPids = ( $LPids $DPids )
+   set NPids = ( $LPids )
+end
+
+# find the processes which are NOT descendants of the specified PIDs
+if ($Others == TRUE) then
+
+   set PLst = ""
+   set List = ( $MList )
+   while ($#List > 0)
+      set pid = $List[1]
+      shift List
+      shift List
+      set PLst = ( $PLst $pid)
+   end
+
+   set LPids = ""
+   set List  = ( $PLst )
+   while ($#List > 0)
+      set pid = $List[1]
+      shift List
+
+      set Match = FALSE
+      foreach i ( $Pids $DPids )
+         if ($pid == $i) then
+            set Match = TRUE
+         endif
+      end
+      if ($Match == FALSE) then
+         set LPids = ( $LPids $pid )
+      endif
+   end
+   set DPids = ( $LPids )
+endif
+
+if ($Quiet == TRUE) then
+   echo "$DPids"
+else
+   ls-jobs -d $DPids
+   echo ""
+endif
+
+exit($#DPids)

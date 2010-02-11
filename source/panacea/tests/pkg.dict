@@ -1,0 +1,130 @@
+;
+; PKG.DICT
+;
+
+(package "pkg")
+
+(include "pkgmac.h")
+
+;--------------------------------------------------------------------------
+
+;                                   TYPEDEFS
+
+;--------------------------------------------------------------------------
+
+(typedef intvect       "int intvect[3]")
+
+(typedef box
+   "int min_pt[3]"
+   "int max_pt[3]"
+   "int len[3]"
+   "int nd"
+   "int btyp")
+
+(typedef init_data_function
+   "void (*init_data_function)(REAL *vol)")
+
+;--------------------------------------------------------------------------
+
+;                             VARIABLE DECLARATIONS
+
+;--------------------------------------------------------------------------
+
+(declare-variable
+
+   const LOWER_BND    0
+   const UPPER_BND    1
+
+   static int N_one     ()  1
+   static int N_three   ()  3
+
+   int n_dimensions      ()
+   int problem_cycle     ()
+   int *pkg_swtch        ()
+
+   double machine_precision ()
+   double problem_time      ()
+
+   double *pkg_param     ()
+
+   init_data_function        init_data_handler                  ())
+
+;--------------------------------------------------------------------------
+
+;                             FUNCTION DECLARATIONS
+
+;--------------------------------------------------------------------------
+
+(declare-function
+
+; BOX.C declarations
+   box *box_copy ("box *b" "const box *s")
+   box *box_init_empty ("box *b")
+   box *box_and ("box *bc" "const box *b" "const box *c")
+   box *box_contain ("box *b" "const box *c")
+   box *box_intersect ("box *b" "const box *c")
+
+; INTVECT.C declarations
+   void iv_clear ("int *iv")
+   int *iv_init_c ("int *iv" "int i" "int j" "int k")
+   int *iv_plus ("int *p" "const int *i1" "const int *i2")
+   int *iv_minus ("int *p" "const int *i1" "const int *i2")
+   int *iv_times ("int *p" "const int *i1" "const int *i2")
+   int *iv_divide ("int *p" "const int *i1" "const int *i2"))
+
+(package-functions
+    "intern-variables"           pkg_intern_db
+    "initialize"                 pkg_init_db)
+
+;--------------------------------------------------------------------------
+
+;                             MESH DEFINITIONS
+
+;--------------------------------------------------------------------------
+
+(mesh scalar N_one
+      by-three N_three)
+
+;--------------------------------------------------------------------------
+
+;                             DATABASE VARIABLES
+
+;--------------------------------------------------------------------------
+
+(def-var machine-precision double nil (runtime static)
+         nil nil nil machine_precision)
+
+(def-var problem-cycle integer nil (restart static)
+         nil nil nil problem_cycle)
+
+(def-var problem-time double nil (restart static)
+	 nil nil nil problem_time)
+
+;--------------------------------------------------------------------------
+
+;                          CONTROL DECLARATIONS
+
+;--------------------------------------------------------------------------
+
+(control
+
+    integer  1   0            "verbose level"
+    integer  2   2            "simplify"
+    double   1  0.1           "error tolerance")
+
+;--------------------------------------------------------------------------
+
+;                          INPUT COMMAND DECLARATIONS
+
+;--------------------------------------------------------------------------
+
+(command
+
+    verbose          integer      SWTCH   1
+    lite             integer      SWTCH   2
+    error-tol        double       PARAM   1)
+
+;--------------------------------------------------------------------------
+
+(generate-current-package C)
+

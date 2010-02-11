@@ -1,0 +1,530 @@
+#!/bin/csh
+#
+# PACT-UPDATE - update/install the PACT distribution system on this machine
+# (PACT-SRC)    Some of the complexity of this process stems from the fact
+#               that there are several ways of obtaining the source:
+#                -  from a CVS repository
+#                -  from an anonymous FTP node as a distribution tar file
+#                -  from an executable PACT distribution file. PACT-SRC
+#               and that the other parts of the manager interlock with
+#               this script
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
+alias Note      'echo \!\!:2-$ >>& \!\!:1'
+alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
+alias Separator '(echo "--------------------------------------------------------------------------" ; echo "") >>& \!\!:1'
+alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
+
+if ($?USER == 0) then
+   if ($?LOGNAME == 0) then
+      set USER = "anonymous"
+   else
+      set USER = $LOGNAME
+   endif
+endif
+
+# don't assume the umask is reasonable
+umask 002
+
+unalias cd
+unalias cp
+unalias rm
+unalias mv
+
+set Base       = $cwd
+set KEEP       = FALSE
+set SaveDocs   = FALSE
+set Manager    = manager
+set ConfigDir  = ""
+set ConfigOnly = FALSE
+set Host       = ""
+set LstCfg     = FALSE
+set MailAddr   = $USER
+set Nodename   = `uname -n`
+set Pattern    = 'pact.README pact*-src pact*.tar.gz'
+set InstArg    = ""
+set WhoIAm     = $USER
+set SrcOnly    = FALSE
+set TmpFile    = tmp-file
+set TmpDir     = tmp-dir
+set Host       = `uname -n`
+set OS         = `uname -s | tr "[A-Z]" "[a-z]"`
+
+set Name = $0
+set Name = $Name:t
+
+if ($Name == "pact-update") then
+   set SrcMode = "cvs"
+else
+   set SrcMode = "self"
+endif
+
+# Source Control System variables
+set CheckOut  = "cvs co"
+set ADM       = "CVS"
+
+# --------------------------------------------------------------------------
+
+#                       HANDLE COMMAND LINE ARGUMENTS
+
+# --------------------------------------------------------------------------
+
+set Opt = "$Name  $argv"
+
+set CArgs = ""
+while ($#argv > 0)
+   switch ($1)
+      case -cc:
+           shift
+           set CArgs = ( $CArgs -cc $1 )
+           breaksw
+      case -cfg:
+           set ConfigOnly = TRUE
+           breaksw
+      case -h:
+           echo ""
+           if ($Name == "pact-update") then
+              echo "Usage:"
+              echo "       pact-update [-cfg] [-extr] [-h] [-keep] [-lst]"
+              echo "                   [+-net <host>] | [-src] | [-tar <tar-file>] [-vers]"
+              echo "                   ..."
+              echo ""
+              echo "update the PACT installation on this machine"
+           else
+              echo "Usage:"
+              echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-extr] [-g]"
+              echo "                [-h] [-i <dir>] [-keep] [-vers] [-t]"
+              echo "                ..."
+              echo ""
+              echo "Self-building PACT distribution."
+              echo "Run with selected options to configure, compile, test,"
+              echo "and install PACT:"
+           endif
+
+           echo ""
+           echo "    -cfg         stop after configuring the distribution"
+           echo "    -extr        setup/extract sources only"
+           echo "    -h           this help package"
+           echo "    -keep        keep existing PACT distribution, ie. keep 'pact/'"
+           echo "                 in directory where new distribution being built"
+           echo "    -lst         list some possible configurations that are available"
+           echo "    -vers        only print the PACT Version (No update)"
+           if ($Name == "pact-update") then
+              echo "    +net         get the PACT source from the specified host"
+              echo "                 via anonymous FTP without the documentation"
+              echo "    -net         get the PACT source from the specified host"
+              echo "                 via anonymous FTP with the documenation"
+              echo "    -src         sources are out and only need to be configured (default)"
+              echo "    -tar         compressed or uncompressed tar file, example"
+              echo "                 for pact.tar.gz type:   -tar pact.tar"
+              echo ""
+              echo "    all other arguments are passed to 'dsys config'"
+              echo "    do 'dsys config -h' for more information"
+           else
+              echo "    -c           create missing directories for -i option"
+              echo "    -cc          specify the C compiler to be used (default gcc)"
+              echo "    -i           specify base directory into which PACT will be installed"
+              echo "                 for example, '-i /usr/local'"
+              echo "    -ipy         path to python (implies -py)"
+              echo "    -g           build debuggable version"
+              echo "    -mpi         build MPI version"
+              echo "    -py          build python bindings"
+              echo "    -s           build OpenMP version"
+              echo "    -sl          build shared libraries (implied by -py or -ipy)"
+              echo "    -t           build threaded version"
+              echo ""
+           endif
+           echo ""
+           exit(1)
+           breaksw
+      case -lst:
+           set LstCfg = TRUE
+           breaksw
+      case -keep:
+           set KEEP = TRUE
+           breaksw
+      case +net:
+           set SaveDocs = TRUE
+      case -net:
+           shift
+           set Host    = $1
+           set SrcMode = "net"
+           breaksw
+      case -src:
+           set SrcMode = "source"
+           set KEEP    = TRUE
+           breaksw
+      case -tar:
+           shift
+           set TarFile = $1
+           set SrcMode = "tar"
+           breaksw
+      case -extr:
+           set SrcOnly = TRUE
+           breaksw
+      case -vers:
+           if (-e ../score/score.h) then
+              set Vers = `grep "define VERSION" ../score/score.h`
+              if ($#Vers > 0) then
+                 echo "PACT Version:" $Vers[4]
+              endif
+           else
+              echo "Version unknown"
+           endif
+           exit(0)
+           breaksw
+      default:
+           set CArgs = ( $CArgs $1 )
+   endsw
+   shift
+end
+
+InitLog Log $Base/Build.Log
+
+Note $Log "Operation:  $Opt "
+Note $Log "Update PACT installation on $Nodename"
+Note $Log ""				 
+Note $Log "Update Log		Host: $Host running $OS"
+Note $Log "User: $WhoIAm		Date: `date`"
+Note $Log ""				 
+Note $Log ""				 
+
+# --------------------------------------------------------------------------
+
+#                                 OBTAIN SOURCES
+
+# --------------------------------------------------------------------------
+
+switch ($SrcMode)
+
+# sources are out and ready
+   case source:
+        breaksw
+
+# cvs repository based update
+   case cvs:
+        breaksw
+
+# anonymous ftp based update
+   case net:
+        NoteD $Log "Getting the PACT sources from $Host"
+
+# echo the FTP command into the log
+        Note $Log ""
+        Note $Log "FTP Commands for Update"
+        Note $Log "   open $Host"
+        Note $Log "   user anonymous password $USER@$Nodename"
+        Note $Log "   prompt"
+        Note $Log "   bin"
+        Note $Log "   cd pub"
+        Note $Log "   mget $Pattern"
+        Note $Log "   quit"
+        Note $Log ""
+
+# do the transfer
+        (echo "open $Host" ; \
+         echo "user anonymous password $USER@$Nodename" ; \
+         echo "prompt" ; \
+         echo "bin" ; \
+         echo "cd pub" ; \
+         echo "mget $Pattern" ; \
+         echo "quit" ) | ftp -n >>& $Log
+
+        flog $Log pact-foo-doc.tar.gz
+        if ($SaveDocs == TRUE) then
+           foreach i (pact*-doc.tar.gz)
+              if ($i == pact-foo-doc.tar.gz) then
+                 flog $Log rm $i
+              else
+                 flog $Log gzip -d $i
+              endif
+           end
+        else
+           flog $Log rm -f pact*-doc.tar.gz
+        endif
+
+        set Name = ""
+        flog $Log touch pact-foo-src
+        foreach i (pact*-src)
+          if ($i != pact-foo-src) then
+             flog $Log set Name = $i
+          else
+             flog $Log rm $i
+          endif
+        end
+        if ($Name == "") then
+           Note $Log "FTP failed to find PACT sources on $Host"
+           exit(1)
+        endif
+
+        if (-e pact/manager/.pact-date) then
+           set OldDate = `cat pact/manager/.pact-date`
+           set NewDate = $Name
+           flog $Log pact/manager/compare-date $NewDate $OldDate
+           switch ($status)
+              case 1:
+                   NoteD $Log "Local PACT distribution is out of date"
+                   breaksw
+              case 0:
+              case -1:
+                   NoteD $Log "Local PACT distribution is up to date"
+                   rm -f pact*.tar*
+                   exit(0)
+                   breaksw
+           endsw
+        endif
+
+# self extraction update
+   case self:
+
+# check if grep supports -a option (-a: process binary files as well as text files, necessary on some Linux systems)
+        set GrepArgs = '-a'
+        flog $Log mkdir $TmpDir
+        flog $Log cd $TmpDir
+        echo "foo" > file.$TmpFile
+        flog $Log grep $GrepArgs foo file.$TmpFile
+        if ($status != 0) then
+           set GrepArgs = ""
+        endif
+        flog $Log cd ..
+        flog $Log rm -r $TmpDir
+
+# determine where pact.tar begins
+# the >& /dev/null following is to throw away complaints from grep about line being too long
+        (grep $GrepArgs -n  '\-----------------------\*\*\*   SEPARATOR   \*\*\*-----------------------' ./$Name > ln_.$TmpFile) >& /dev/null
+        set nlines = `grep -v echo ln_.$TmpFile | awk -F: '{print $1}'`
+        rm ln_.$TmpFile
+
+# write the shell script to extract the compressed tar file
+        set STDOUT = extr.$TmpFile
+        rm -f $STDOUT
+        touch $STDOUT
+
+        Note $STDOUT "#\!/bin/csh -f"
+        Note $STDOUT "@ nlines = $nlines"
+        Note $STDOUT "@ rlines = 0"
+        Note $STDOUT 'while (1)'
+        Note $STDOUT '   set Input = "$<"'
+        Note $STDOUT '   @ rlines += 1' 
+        Note $STDOUT '   if ("$rlines" == "$nlines") then'
+        Note $STDOUT '      set File = "$<"'
+        Note $STDOUT '      break'
+        Note $STDOUT '   endif'
+        Note $STDOUT 'end'
+        Note $STDOUT 'if ($?File) then'
+        Note $STDOUT '   set File = $File:t'
+        Note $STDOUT '   echo $File'
+        Note $STDOUT '   cat > $File'
+        Note $STDOUT 'endif'
+        Note $STDOUT 'exit($status)'
+
+        flog $Log cat $STDOUT
+        flog $Log chmod a+x $STDOUT
+
+# extract the tar file
+        Note $Log "cat ./$Name | ./$STDOUT"
+        set TarFile = `cat ./$Name | ./$STDOUT`
+        flog $Log set TarFile = $TarFile:r
+        flog $Log set SrcMode = "tar"
+
+        flog $Log rm -f $STDOUT
+        breaksw
+
+# error
+   default:
+        echo ""
+        echo "I have no idea how to do an update without a tar file, a"
+        echo "CVS repository, or a network node."
+        echo ""
+        exit(1)
+        breaksw
+endsw
+
+if ($LstCfg == TRUE) then
+   tar tzvf $TarFile.gz |& grep "std/auto-" |& awk '{ print "     " $6}' |& sed 's+pact/manager/std/auto-++'
+   exit(1)
+endif
+
+# --------------------------------------------------------------------------
+
+#                                 SETUP SOURCES
+
+# --------------------------------------------------------------------------
+
+if ($KEEP == "FALSE") then
+   if (-d pact) then
+      NoteD $Log "Removing old PACT files"
+      flog $Log rm -r pact
+   endif
+endif
+
+Note $Log ""
+switch ($SrcMode)
+   case tar:
+        NoteD $Log "Unpacking the PACT sources"
+        flog $Log rm -f $TarFile
+
+        if (-e $TarFile.gz) then
+           flog $Log gzip -d $TarFile.gz
+        endif
+	if (-e $TarFile.Z) then
+	   flog $Log uncompress $TarFile.Z
+	endif
+
+        if ("$OS" == sunos) then
+           set TarArgs = xvomf
+        else
+           set TarArgs = xvmf
+        endif
+        flog $Log tar $TarArgs $TarFile
+        if ($status != 0) then
+           NoteD $Log ""
+           NoteD $Log "  ERROR: TAR failed"
+           NoteD $Log ""
+           exit($status)
+        endif
+
+        flog $Log cd pact
+
+        NoteD $Log "PACT sources unpacked"
+        breaksw
+
+   case source:
+        flog $Log cd pact
+        breaksw
+
+   default:
+
+        NoteD $Log "Checking out the PACT Sources"
+
+        flog $Log $CheckOut pact
+        if ($status != 0) then
+           NoteD $Log ""
+           NoteD $Log "  ERROR: Source Control System failed"
+           NoteD $Log ""
+           exit($status)
+        endif
+
+# delete an unnecessary directory layer */
+        flog $Log mv pact/* .
+        flog $Log rmdir pact
+
+# remove the $SCSName sub-directories
+        NoteD $Log "Removing Source Control Information"
+        set List = `find . -name $ADM`
+        foreach i ($List)
+           rm -r $i
+        end
+
+        NoteD $Log "PACT sources checked out"
+        breaksw
+endsw
+
+if ($SrcOnly == TRUE) then
+   exit(0)
+endif
+
+Note $Log "Current directory after source setup $cwd"
+
+# --------------------------------------------------------------------------
+
+#                              CONFIGURE DISTRIBUTION
+
+# --------------------------------------------------------------------------
+
+NoteD $Log "Changing to manager directory: $Manager"
+flog $Log cd $Manager
+
+./pre-check
+if ($status > 1) then
+   exit(1)
+endif
+
+set CfgMan    = $cwd/cfgman
+set System    = `$CfgMan use`
+set Base      = $cwd:h
+set Root      = $Base/dev/$System
+set IncDir    = $Root/include
+set EnvFile   = $IncDir/env-pact.csh
+set VersionID = `cat ./.pact-version`
+
+NoteD $Log "Configuring PACT version $VersionID with: $CArgs"
+flog $Log ./dsys config $CArgs
+set LStat = $status
+if ($LStat == 2) then
+   tail -n 12 $Log
+   exit(2)
+else if ($LStat != 0) then
+   NoteD $Log ""
+   NoteD $Log "  ERROR: DSYS CONFIG failed"
+   NoteD $Log ""
+   exit($LStat)
+endif
+
+if ($ConfigOnly == TRUE) then
+   exit(0)
+endif
+
+NoteD $Log "Sourcing environment file $EnvFile for $System"
+if (-e $EnvFile) then
+   source $EnvFile
+   rehash
+else
+   NoteD $Log ""
+   NoteD $Log "  ERROR: bad environment file"
+   NoteD $Log ""
+   exit(1)
+endif
+
+# --------------------------------------------------------------------------
+
+#                               COMPILE DISTRIBUTION
+
+# --------------------------------------------------------------------------
+
+   NoteD $Log "Compiling the PACT distribution"
+
+   set DName = `cat ./.pact-date`
+
+   flog $Log ./dsys update
+   set upresult = $status
+   Note $Log "Host: $Host"
+   Note $Log "Date: `date`"
+
+   if ($upresult != 0) then
+      NoteD $Log ""
+      NoteD $Log "  ERROR: Make PACT failed"
+      NoteD $Log ""
+      NoteD $Log "See the log file:  $Log"
+      exit($status)
+   endif
+
+   tail -n 8 $Log
+   NoteD $Log "Compilation complete"
+
+   flog $Log rm -f .pact-date
+   NoteD $Log $DName 
+   echo $DName > .pact-date
+
+# move the log now
+   set nLogDir = $cwd:h
+   set nLogDir = $nLogDir:h
+   mv $Log $nLogDir/$Nodename.BUILD
+   set Log = $nLogDir/$Nodename.BUILD
+
+   NoteD $Log "See the log file $Nodename.BUILD"
+
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+
+flog $Log cd $Base
+echo ""
+
+exit($status)

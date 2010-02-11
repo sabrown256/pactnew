@@ -1,0 +1,50 @@
+#!/bin/csh -f
+#
+# GETHOST - analyze platform gethostbyname
+#         - Computes: HAVE_GETHOSTBYNAME
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: gethostbyname"
+
+cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <netdb.h>
+int main(int c, char **v)
+   {int rv;
+    struct hostent *hp;
+    hp = gethostbyname(v[1]);
+    if (hp != NULL)
+       rv = 0;
+    else
+       rv = 1;
+    return(rv);}
+EOF
+
+setenv HAVE_GETHOSTBYNAME FALSE
+
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+if ($status == 0) then
+   flog $ALog $CFE $Tmp `uname -n`
+   if ($status == 0) then
+      setenv HAVE_GETHOSTBYNAME TRUE
+      flog $ALog rm -f $Tmp.c $Tmp
+   endif
+endif
+
+if ($HAVE_GETHOSTBYNAME == FALSE) then
+   NoteD $ALog "      no gethostbyname"
+endif
+
+SetParent HAVE_GETHOSTBYNAME
+
+exit(0)
+

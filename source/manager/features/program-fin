@@ -1,0 +1,26 @@
+#
+# PROGRAM-FIN - define the actions to complete a configuration of PACT
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run write/do-run-db
+run write/package
+run write/configured $ConfigFile
+run write/f90-interface
+run write/make-def
+run write/make-macros
+run write/makefile
+run write/scconfig.h
+run write/scdecls.h
+run write/syntax.h
+
+run write/spokes.scm
+
+run write/env-mio
+
+run write/install-pact
+run write/smake

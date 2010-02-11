@@ -1,0 +1,30 @@
+		PACT Corporate Memory File
+
+This file is to be a record of the thinking, objectives and
+consensus of PACT developers about various important issues
+that arise during the development process.
+
+PACT threads:
+
+	1.  From the application's point of view the API should
+            be consistent for the SC_do_threads approach whether
+            using a threadpool or new threads.
+
+	2.  Should achieve n thread scaling, where n is the requested
+            number of threads as specified through the API.
+
+	3.  Participating threads (either pool or new) should have
+	    indexes in the range of 0 through n-1.
+
+	4.  It is still an open question as whether or not compatibility
+	    with Open MP is desirable, and if so, how to define that.
+	    In the current PACT implementation the major difference
+	    is that PACT assigns a thread id of nthreads to the main
+	    process, while Open MP uses id 0.  In parallel sections
+	    under Open MP, the main process participates, while PACT
+	    the SC_do_threads approach does not have the main process
+	    participate.
+ 
+
+
+

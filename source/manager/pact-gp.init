@@ -1,0 +1,205 @@
+#!/bin/csh -f
+#
+# PACT-GET-PACKAGE - make a copy of some PACT package on which to work
+#
+# Usage:  (see Help package... next page)
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Code   = pact
+set LocDir = $cwd
+set IncDir = /usr/local/include
+set HELP   = "FALSE"
+
+set CodeDir     = $LocDir/$Code
+set Manager     = $CodeDir/manager
+set CodeManager = manager
+set COLog       = $LocDir/checkout.log
+set ConfigDir   = "./"
+set SITE        = ""
+set NONE        = ""
+set PkgList     = ""
+set AllPackages = PCKS
+set PactPackage = PACTPK
+set Packages    = ""
+
+# Source Control System Variables
+set SCSName       = CVS
+set CVSROOT       = ""
+set SCSRepository = ""
+set SRCDate       = ""
+
+#check the command line arguments
+if ($#argv < 1) then
+   set HELP = "TRUE"
+endif
+
+while ($#argv >= 1) 
+    if (`expr $argv[1] : "-."` == 2) then
+   	 switch ($1)
+   	    case -c:
+   		     shift
+   		     set SITE = $1
+   		     breaksw
+   	    case -d:
+   		     shift
+   		     set SCSRepository = "-d $1"
+   		     breaksw
+   	    case -f:
+   		     shift
+   		     set ConfigDir = $1
+   		     breaksw
+   	    case -h:
+   		     set HELP = "TRUE"
+   		     breaksw
+   	    default:
+   		     set HELP = "TRUE"
+   		     breaksw
+   	 endsw
+   	 shift
+    else
+         set PkgList = ($PkgList $1)
+         shift
+    endif
+end
+
+if ($HELP == "TRUE") then
+   echo ""
+   echo " Usage: pact-get-package -c <site> [-d <CVSROOT>] [-f <directory>] <package 1> ... "
+   echo ""
+   echo " Options:  c - configure the environment for <site>, gets the site configuration info "
+   echo "               from <site>.config, Note: -c <site> may be omited if a pact/manager "
+   echo "               configured directory exists."
+   echo "               sample <site> configs (see manager/std) are:"
+   echo "                  -    auto    auto-configuration       	   " 
+   echo "                  -    aix     IBM RS6000 systems		   " 
+   echo "                  -    hp      HP RISC 700 systems		   " 
+   echo "                  -    irix    SGI systems			   " 
+   echo "                  -    linux   LINUX systems			   " 
+   echo "                  -    osf     OSF systems			   " 
+   echo "                  -    solaris Sun Solaris systems		   " 
+   echo "               (check manager/local for any local configs)" 
+   echo ""
+   echo "           d - specify a CVSROOT instead of the environment variable"
+   echo "           f - a directory containing configuration files"
+   echo "               (default ...pact/manager/std)"
+   echo ""
+   echo " Current packages: score     - PACT Core"
+   echo "                   ppc       - Portable Process Control"
+   echo "                   pml       - Portable Math Library"
+   echo "                   pdb       - Portable DataBase Library"
+   echo "                   scheme    - Scheme Interpreter/Library"
+   echo "                   pgs       - Portable Graphics System Library"
+   echo "                   panacea   - Portable Numerical Simulation Support"
+   echo "                   ultra     - 1D data analysis tool"
+   echo "                   sx        - Scheme plus eXtenstions"
+   echo ""
+   echo " Special package options: "
+   echo "                   none   - get the base PACT system with no packages"
+   echo "                   all    - get the entire PACT system"
+   echo "Examples:"
+   echo "  To force reconfiguration if manager changes"
+   echo "       pact-get-package -c <site> none"
+   echo "  To add/replace a package to an existing pact directory (No configuration)"
+   echo "       pact-get-package ultra"
+   echo "  To add/replace a package to an existing pact directory AND re-configure"
+   echo "       pact-get-package -c <site> ultra"
+   echo ""
+   exit(1)
+endif
+
+if ($PkgList[1] == "") then
+   echo " "
+   echo "ERROR: PACKAGE must be selected"
+   echo " "
+   exit(1)
+endif
+
+set CheckOut   = "cvs co $SCSRepository"
+set GetManager = "FALSE"
+set GotManager = "FALSE"
+if (!(-d $CodeDir)) then
+   echo ""
+   echo "Creating the $Code directory"
+   mkdir $CodeDir
+endif
+
+cd $CodeDir
+
+if (!(-d $Manager)) then
+   if ($SITE == "") then
+      echo " "
+      echo "ERROR: SITE must be supplied"
+      echo " "
+      exit(1)
+   endif
+   set GetManager = "TRUE"
+endif
+ 
+if ($PkgList[1] == "none") then
+   set GetManager = "TRUE"
+endif
+
+if ($GetManager == "TRUE") then
+   echo ""
+   echo "Getting the PACT Manager"
+   $CheckOut $CodeManager >>& $COLog
+   if (-d $Manager/$Code/doc/$CodeManager) then
+      mv $Manager/$Code/doc/$CodeManager $Manager/doc
+      rm -r $Manager/$Code
+   endif
+   set GotManager = "TRUE"
+endif
+
+# determine the list of packages being requested
+if ($PkgList[1] == "none") then
+   set NONE = "none"
+   set Packages = `echo $NONE`
+else
+   if ($PkgList[1] == "all") then
+      set Packages = `echo $AllPackages`
+   else
+      set Packages = `echo $PkgList`
+   endif
+endif
+
+echo ""
+echo "Requested PACT packages: $Packages"
+echo "Requested PACT packages: $Packages" >>& $COLog
+
+# copy the requested packages
+if ($NONE != "none") then
+   while ($#Packages > 0)
+
+      set pck = $Packages[1]
+
+      echo "Getting the $pck package"
+      echo "Getting the $pck package" >>& $COLog
+      $CheckOut $pck >>& $COLog
+      if (-d $pck/$Code/doc/$pck) then
+         mv $pck/$Code/doc/$pck $pck/doc
+         rm -r $pck/$Code
+      endif
+      shift Packages
+   end
+endif
+
+# change the configuration if requested
+if (($GotManager == "TRUE") || ($SITE != "")) then
+
+   cd $Manager
+   chmod a+x pact-*
+   echo "Configure local copy of PACT"
+
+   ./dsys config -f $ConfigDir $SITE
+   cd ..
+
+endif
+
+echo ""
+
+exit($status)

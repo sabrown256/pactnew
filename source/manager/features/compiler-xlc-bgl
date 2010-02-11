@@ -1,0 +1,88 @@
+#
+# COMPILER-XLC-BGL - IBM XLC compilers on BG/L
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+WARN_PATTERN = "WARNING: (E) (W) (I)"
+ERR_PATTERN  = "Error: (S)"
+
+setenv OBJECT_MODE ${Bits}
+#XArch = -qarch=ppc
+XArch = ""
+
+Tool CC {
+   Exe       = mpxlc
+   Flags     = ${XArch} -D_ALL_SOURCE -qsuppress=1500-010:1506-1300:1506-1298:1506-383
+   Flags    += [ _env_ = Bits ;              # address bit size
+                 *     = -q* ]
+   Optimize  = -O -qmaxmem=32768
+   Version   = -qversion
+}
+
+Tool FC {
+   Exe     = mpxlf
+   Flags   = ${XArch} -qrecur
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -q* ]
+   Version = -qversion
+}
+
+Tool LD {
+   Lib = -lc
+}
+
+Tool Lex {
+   Flags  = ${XArch} -D_ALL_SOURCE -D_LARGE_FILES -qsuppress=1506-1300:1506-1298
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -q* ]
+}
+
+Tool Cfg_Lex {
+   Flags = -w
+}
+
+Group Cfg {
+   Use         = Std
+   CC_Exe      = gcc
+   CC_Flags    = -g
+   CC_Flags   += [ _env_ = Bits ;                # address bit size
+                   *     = -m* ]
+   CC_Debug    = -Wall
+   CC_Optimize = -O -Wunused
+   CC_Version  = -v
+   LD_Lib      = -lc
+   FC_Exe      = g77
+   LD_Flags    = ${LD_Flags}
+}
+
+Group PThread {
+   FC_Exe   = mpxlf
+   LD_Flags = -qsmp
+   LD_Lib   = -lpthread 
+}
+
+Group OpenMP {
+   FC_Exe = mpxlf
+   LD_Lib =
+}
+
+Group MPI {
+   CC_Exe = mpxlc
+   FC_Exe = mpxlf
+}
+
+.c.i:
+	${CC} -P $<
+
+.f.o:
+	${FC} ${FFLAGS} ${LDFLAGS} -c $<
+
+#setenv CROSS_COMPILE  TRUE
+setenv IBM_BGL
+define IBM_BGL
+define GETSOCKNAME_LONG
+

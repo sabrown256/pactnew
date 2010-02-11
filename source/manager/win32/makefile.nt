@@ -1,0 +1,107 @@
+#
+# Makefile for the PACT Distribution
+#
+
+RootDr = f:\home\minner\pact
+PactDir = $(RootDr)
+InstDir = $(RootDr)\dev
+MANAGER = $(PactDir)\manager
+
+pact :
+	@echo Building Pact ...
+	nmake score
+	nmake pml
+	nmake pdb
+#	nmake ppc
+#	nmake pgs
+#	nmake panacea
+#	nmake scheme
+#	nmake sx
+#	nmake ultra
+	nmake install
+	@echo Installation Complete
+
+score :
+	@echo Building SCORE ...
+	chdir ..\score
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo SCORE installed
+pml :
+	@echo Building Portable Mathematics Library ...
+	chdir ..\pml
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo PML installed
+ppc :
+	@echo Building Portable Process Control Library ...
+	chdir ..\ppc
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo PPC installed
+pdb :
+	@echo Building Portable Data Base Library ...
+	chdir ..\pdb
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo PDB installed
+pgs :
+	@echo Building Portable Graphics Library ...
+	chdir ..\pgs
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo PGS installed
+panacea :
+	@echo Building Portable Code Development Library ...
+	chdir ..\panacea
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo PANACEA installed
+scheme :
+	@echo Building Portable SCHEME Library ...
+	chdir ..\scheme
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo SCHEME installed
+sx :
+	@echo Building Scheme with Extensions ...
+	chdir ..\sx
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo SX installed
+ultra :
+	@echo Building ULTRA II ...
+	chdir ..\ultra
+	..\manager\bmake
+	nmake install
+	chdir ..\manager
+	@echo ULTRA installed
+
+install:
+	cp scdecls.h scconfig.h cpyright.h $(InstDir)\include
+	cp pupdate.bat $(InstDir)\bin
+
+makes :
+	@echo Making Pact Makefiles ...
+#	set MANAGER=$(PactDir)
+	for-pact $(PactDir)\manager\bmake
+	@echo Pact Makefiles made
+
+remove :
+	@echo Removing Pact ...
+	for-pact nmake remove
+	@echo Pact removed
+
+clean :
+	@echo Cleaning up Pact directories ...
+	for-pact nmake -i clean
+	@echo Pact cleaned
+

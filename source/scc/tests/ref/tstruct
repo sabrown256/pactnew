@@ -1,0 +1,7 @@
+struct s_info
+variable v1s: static struct s_info
+variable v1e: extern struct s_info
+variable v1d: struct s_info
+variable v2s: static struct anonymous
+variable v2e: extern struct anonymous
+variable v2d: struct anonymous

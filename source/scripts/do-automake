@@ -1,0 +1,716 @@
+#!/bin/csh -f
+#
+# DO-AUTOMAKE - do the GNU automake specific part of a do-net process
+#             - this is not a stand alone script
+#             - it is sourced by do-local
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $CSHSubr
+HAVE_SUBROUTINES
+
+setenv Err  0
+
+umask 007
+
+unalias ls
+
+set Which = "swhich -1"
+set argv  = `cat $ArgFile`
+set Phase = $1
+shift
+
+switch ($Phase)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - handle interrupts
+
+   case -interrupt:
+
+        set Pids = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -pid:
+                   shift
+                   while ($#argv > 0)
+                      set Pids = ( $Pids $1 )
+                      shift
+                   end
+                   break
+                   breaksw
+           endsw
+           shift
+        end
+
+# send SIGTERM to any descendants
+        foreach i ($Pids)
+           if ($i != $$) then
+              flog $LogHost /bin/kill $i
+           endif
+        end
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - handle setup phase
+
+   case -setup:
+
+        call GET_NET_ARG(/dev/null)
+
+        Note $LogHost Dist = $Dist
+        flog $LogHost pwd
+        flog $LogHost cd $WrkDir
+
+        flog $LogHost $RM auto.* hostinstall.* netinstall.*
+        flog $LogHost $RMDir interrupt.*
+        flog $LogHost ls -l
+
+        if (-f $HOME/$Dist) then
+           flog $LogHost mv $HOME/$Dist .
+
+           if ($SingleSrc == TRUE) then
+
+# remove any existing source tree
+              foreach dr (`ls -1drt *$Code*`)
+                 if ((-d $dr) && ($dr != dev)) then
+                    flog $LogHost $RMDir $dr
+                 endif
+              end
+              flog $LogHost tar xzf $Dist
+           endif
+
+        else
+           Note $LogHost "File $HOME/$Dist does not exist"
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ARCH - setup the architecture and related directories
+
+   case -arch:
+
+# check phase to determine which args we have to process
+        switch ($TLog)
+           case *setup:
+           case *netinstall:
+                set NetPhase = TRUE
+                breaksw
+           default:
+                set NetPhase = FALSE
+                breaksw
+        endsw
+
+        if ($NetPhase == TRUE) then
+           call GET_NET_ARG(/dev/null)
+        else
+           call GET_HOST_ARG(/dev/null)
+        endif
+
+        set BldDir    = $DevDir/wrk/$Code
+        set LogDir    = $DevDir/log
+        set BinDir    = $DevDir/bin
+        set IncDir    = $DevDir/include
+        set Passed    = $LogDir/passed
+        set path      = ( $DevDir/bin $path )
+
+        flog $LogHost set HaveGMake = FALSE
+        flog $LogHost set UMake     = make
+        foreach i (gmake make)
+           set lMake = `$Which $i`
+           if (-x "$lMake") then
+              flog $LogHost $lMake --version
+              if ($status == 0) then
+                 flog $LogHost set HaveGMake = TRUE
+                 flog $LogHost set UMake     = $lMake
+                 break
+              endif
+           endif
+        end
+
+        set Dist = `ls $WrkDir/*$Code*.gz`
+        if ("$Dist" == "") then
+           Note $LogHost "No distribution file matching $WrkDir/*$Code*.gz found"
+           set Dist = none
+        endif
+
+        flog $LogHost pwd
+        Note $LogHost "WrkDir = |$WrkDir|"
+        Note $LogHost "Code   = |$Code|"
+        Note $LogHost "Dist   = |$Dist|"
+
+        if ($#Dist > 1) then
+           set Dist = $Dist[1]
+        endif
+
+# get the true source tree name in case the distribution had a different one
+        if ("$Phase" != setup) then
+           foreach dr (`ls -1drt $WrkDir/*$Code*`)
+              if ((-d $dr) && ($dr:t != dev)) then
+                 flog $LogHost set SrcDir = $dr
+                 break
+              endif
+           end
+        endif
+
+# create the directories if they don't exist
+        if ("$Phase" != netinstall) then
+           flog $LogHost pushd $WrkDir
+           if (!(-d $DevDir)) then
+              flog $LogHost mkdir -p $DevDir
+
+              flog $LogHost mkdir $DevDir/src
+              flog $LogHost mkdir $DevDir/bin
+              flog $LogHost mkdir $DevDir/include
+              flog $LogHost mkdir $DevDir/lib
+              flog $LogHost mkdir $DevDir/man
+              flog $LogHost mkdir $DevDir/log
+
+              flog $LogHost mkdir $DevDir/etc
+              flog $LogHost mkdir $DevDir/com
+              flog $LogHost mkdir $DevDir/info
+              flog $LogHost mkdir $DevDir/var
+              flog $LogHost mkdir $DevDir/share
+              flog $LogHost mkdir $DevDir/libexec
+              flog $LogHost mkdir $DevDir/sbin
+           endif
+           flog $LogHost popd
+
+
+# rename the log with an extension of $Code
+           flog $LogHost setenv TLog $TLog.$Code
+        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BUILD_TEST - do the build/test phase
+
+   case -build:
+
+        call GET_HOST_ARG($LogHost)
+
+# convert options to control representation
+        set DOList = ""
+        while ("$DbgOpt" != "")
+           switch ($DbgOpt)
+              case g*:
+                   set DOList = ( $DOList "-g" )
+                   set DbgOpt = `echo $DbgOpt | sed 's+g++'`
+                   breaksw
+              case o*:
+                   set DOList = ( $DOList "-o" )
+                   set DbgOpt = `echo $DbgOpt | sed 's+o++'`
+                   breaksw
+           endsw
+        end
+
+# on each local host do the builds with specified options
+        Note $LogHost "  Debug/Optimization options: $DOList"
+
+        flog $LogHost $RM $Passed
+
+        set LineCnt = `wc -l $LogHost | awk '{ print $1 }'`
+
+        foreach dbgopt ($DOList)
+
+           set IErr = 0
+           set dbgchar = `echo $dbgopt | sed 's/-//' | tr "[A-Z]" "[a-z]"`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+           if ($SingleSrc == FALSE) then
+
+              Note $LogHost ""
+              Note $LogHost "Set up host for single source mode"
+              flog $LogHost pushd $DevDir/wrk
+
+# remove any existing source tree
+              foreach dr (`ls -1drt *$Code*`)
+                 if ((-d $dr) && ($dr != dev)) then
+                    flog $LogHost $RMDir $dr
+                 endif
+              end
+
+              flog $LogHost tar xzf $Dist
+              if ($status != 0) then
+                 set IErr = 10
+              endif
+              flog $LogHost ls -lrtd *$Code*
+              set ADir = `ls -1rtd *$Code* | tail -n 1`
+              if ($cwd/$ADir != $BldDir) then
+                 flog $LogHost mv $ADir $BldDir
+              endif
+              flog $LogHost popd
+           endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+           if ($Code == gcc) then
+
+              Note $LogHost ""
+              Note $LogHost "Remove the path to $BinDir/gcc (which we are about to rebuild)"
+              set exc = `rpath $BinDir/gcc`
+              if (-x "$exc") then
+
+# remove the gcc we are about to build/rebuild from the path
+                 set npath = ""
+                 foreach d ($path)
+                    if (-x $d/gcc) then
+                       set ex = `rpath $d/gcc`
+                       Note $LogHost "   $ex"
+                       if ($ex =~ $exc) then
+                          continue
+                       else
+                          Note $LogHost "   reject $d"
+                       endif
+                    endif
+                    set npath = ( $npath $d )
+                 end
+                 flog $LogHost set path = ( $npath )
+              endif
+           endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# configure
+           if ($IErr == 0) then
+              Separator $LogHost
+              Note $LogHost "Configuring source using $dbgopt"
+              Note $LogHost `date`
+              Note $LogHost `system-id`
+              echo "   Configuring using $dbgopt"
+
+# add standard config/option message to enable do-net watch option
+              NoteNT "configure automake option $dbgopt"
+
+              InitLog CnfLog $DevDir/log/config.$Code
+
+              flog $CnfLog cd $WrkDir
+
+              if (!(-d $BldDir)) then
+                 flog $CnfLog mkdir -p $BldDir
+              endif
+              flog $CnfLog cd $BldDir
+              if ($SingleSrc == TRUE) then
+                 flog $CnfLog $RM $SrcDir/config.cache
+                 flog $CnfLog $SrcDir/configure --prefix=$DevDir --srcdir=$SrcDir $ConfOpt
+              else
+                 flog $CnfLog $RM config.cache
+                 flog $CnfLog ./configure --prefix=$DevDir $ConfOpt
+              endif
+
+              Note $LogHost ""
+              flog $LogHost cat $CnfLog
+
+              if ($status != 0) then
+                 echo "   Failed to configure"
+                 echo "   Look in $LogHost on $UHost"
+                 set IErr = 1
+              endif
+           endif
+   
+           set WarnPattern = ( "warning:" "WARNING:" )
+           set ErrPattern  = ( "error:" "Error" )
+           set SysPattern  = ( "NFS" )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# remove
+           if ($IErr == 0) then
+              Separator $LogHost
+              Note $LogHost "Removing"
+              echo -n "   Removing ... "
+              InitLog RmLog $DevDir/log/remove.$Code
+              if ($HaveGMake == TRUE) then
+                 flog $RmLog $UMake clean
+                 set xstatus = $status
+              else
+                 flog $RmLog $UMake clean
+                 set xstatus = $status
+              endif
+
+              if ($xstatus != 0) then
+                 echo "Failed"
+                 set IErr = 2
+              else
+                 echo "OK"
+              endif
+
+              Note $LogHost ""
+              flog $LogHost cat $RmLog
+
+           endif
+   
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# build
+           if ($IErr == 0) then
+              Separator $LogHost
+              Note $LogHost "Building"
+              echo -n "   Building ... "
+
+              set UTime = `timer -r`
+
+              InitLog BldLog $DevDir/log/build.$Code
+              if ($HaveGMake == TRUE) then
+                 flog $BldLog $UMake -j `ncpu`
+                 set ErrStat = $status
+              else
+                 flog $BldLog $UMake
+                 set ErrStat = $status
+              endif
+
+              set ETime = `timer -b $UTime`
+
+              Note $LogHost ""
+              flog $LogHost cat $BldLog
+
+              set clc = `wc -l $LogHost | awk '{ print $1 }'`
+              set tlc = `expr $clc \- $LineCnt`
+
+# count all kinds of compiler warning messages
+              @ nc = 0
+              foreach pttrn ($WarnPattern)
+                 set pt = `echo "$pttrn" | sed 's|<sp>| |g'`
+                 @ ic = `tail -n $tlc $LogHost | grep "$pt" | grep -v "Pattern for" | grep -v "Clock skew" | wc -l`
+                 @ nc = $nc + $ic
+              end
+              set WarnMsg = ""
+              if ($nc > 0) then
+                 set WarnMsg = "  ($nc warnings)"
+              endif
+
+# count all kinds of compiler error messages
+              @ nc = 0
+              foreach pttrn ($ErrPattern)
+                 set pt = `echo "$pttrn" | sed 's|<sp>| |g'`
+                 @ ic = `tail -n $tlc $LogHost | grep "$pt" | grep -v "Pattern for" | wc -l`
+                 @ nc = $nc + $ic
+              end
+              set ErrMsg = ""
+              if ($nc > 0) then
+                 set ErrMsg = "  ($nc errors)"
+              endif
+
+# count all kinds of non-compiler error messages
+              @ nc = 0
+              foreach pttrn ($SysPattern)
+                 @ ic = `tail -n $tlc $LogHost | grep -w "$pttrn" | grep -v "Pattern for" | grep -v "SCORE Error Test" | wc -l`
+                 @ nc = $nc + $ic
+              end
+              set SysErrMsg = ""
+              if ($nc > 0) then
+                 set SysErrMsg = "  ($nc system)"
+              endif
+
+              if ($ErrStat != 0) then
+                 echo "Failed ($ETime) $WarnMsg $ErrMsg $SysErrMsg"
+                 set IErr = 3
+              else
+                 echo "OK ($ETime) $WarnMsg $ErrMsg $SysErrMsg"
+              endif
+           endif
+   
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# test
+           if ($IErr == 0) then
+              Separator $LogHost
+              Note $LogHost "Testing"
+              Note $LogHost `date`
+              echo -n "   Testing .... "
+
+              set UTime = `timer -r`
+
+              InitLog TstLog $DevDir/log/test.$Code
+              if ($HaveGMake == TRUE) then
+                 flog $TstLog $UMake check
+                 set ErrStat = $status
+              else
+                 flog $TstLog $UMake check
+                 set ErrStat = $status
+              endif
+
+              set ETime = `timer -b $UTime`
+
+              Note $LogHost ""
+              flog $LogHost cat $TstLog
+
+# force it to conclude that the tests pass
+              if ($?PassTests) then
+                 if ($ErrStat != 0) then
+                    echo "Failed* ($ETime)"
+                 else
+                    echo "OK ($ETime)"
+                 endif
+                 flog $LogHost touch $Passed
+              else
+                 if ($ErrStat != 0) then
+                    echo "Failed ($ETime)"
+                    set IErr = 4
+                 else
+                    echo "OK ($ETime)"
+                    flog $LogHost touch $Passed
+                 endif
+              endif
+           endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# figure out the error situation for this build/test
+
+           set LineCnt = `wc -l $LogHost | awk '{ print $1 }'`
+           if ($IErr > 0) then
+              setenv Err  1
+           endif
+
+           echo " "
+        end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NETINSTALL - do the net install phase
+
+   case -netinstall:
+
+        call GET_NET_ARG($LogHost)
+
+        flog $LogHost setenv Err  NO_INSTALL
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+# HOSTINSTALL - do the host install phase
+
+   case -hostinstall:
+
+        call GET_HOST_ARG($LogHost)
+
+        flog $LogHost pwd
+        flog $LogHost set System = `system-id`
+        flog $LogHost set path = ( . $WrkDir/dev/$System/bin $path )
+
+        flog $LogHost setenv Err  NO_INSTALL
+
+        flog $LogHost date
+        flog $LogHost pwd
+
+        Note $LogHost "Install base = $InstBase"
+        if (-f $Passed) then
+           Note $LogHost "All tests passed"
+        else
+           Note $LogHost "Not all tests passed"
+        endif
+
+        if (($InstBase != none) && (-f "$Passed")) then
+           flog $LogHost cd $BldDir
+           if ($HaveGMake == TRUE) then
+              flog $LogHost $UMake install
+              set xstatus = $status
+           else
+              flog $LogHost $UMake install
+              set xstatus = $status
+           endif
+
+# NOTE: we are assuming that InstBase is expected to
+# be a link to where the code really is
+# therefore InstBase should not be something like /usr/local
+# but something like /usr/local/gnu might acceptable
+
+           flog $LogHost $RM $InstBase
+           if (!(-d $InstBase)) then
+              flog $LogHost ln -s $DevDir $InstBase
+           endif
+
+           if ($xstatus == 0) then
+              flog $LogHost setenv Err  OK
+           else
+              flog $LogHost ls -lR $InstBase
+              flog $LogHost setenv Err  FAILED
+           endif
+        else
+           Note $LogHost "Host install not attempted"
+        endif
+
+        breaksw
+
+endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+goto END
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_HOST_ARG - process args for per host phases
+
+GET_HOST_ARG:
+
+    set lFile = $args_[1]
+
+    set path = ( . /usr/local/apps/pactnew/bin $path )
+    set arch   = `system-id`
+    Note $lFile "Arch = $arch"
+    flog $lFile set DevDir = $WrkDir/dev/$arch
+
+# set default values
+    Note $lFile "Set default values for get_host_arg"
+    flog $lFile set DbgOpt  = g
+    flog $lFile set ConfOpt = ""
+    flog $lFile setenv SysID     none
+    flog $lFile setenv WrkDir    none
+    flog $lFile setenv InstBase  none
+    flog $lFile setenv SingleSrc TRUE
+
+    Note $lFile "Get values for get_host_arg from command line"
+    while ($#argv > 0)
+       switch ($1)
+          case -host_vars:
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ -*) then
+                     flog $lFile set argv = ( "end" $argv )
+                     break
+                  else
+                     flog $lFile eval "setenv $1 $2"
+                     shift
+                     shift
+                  endif
+               end
+               breaksw
+          case -host_fields:
+               shift
+               flog $lFile setenv SysID $1
+               shift
+               flog $lFile setenv WrkDir $1
+               shift
+               flog $lFile set DbgOpt = $1
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ --*) then
+                     flog $lFile set ConfOpt = ( $ConfOpt $1 )
+                  else if (`expr "$1" : '.*=.*'` > 0) then
+                     set Var = `expr "$1" : '\(.*\)=.*'`
+                     set Val = `expr "$1" : '.*=\(.*\)' | sed 's/,/ /g'`
+                     flog $lFile eval setenv $Var '"' $Val '"'
+                  endif
+                  shift
+               end
+               break
+               breaksw
+       endsw
+       shift
+    end
+
+# make WrkDir a full path
+    if (`expr "$WrkDir" : '/.*'` == 0) then
+       flog $lFile set WrkDir = $HOME/$WrkDir
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_NET_ARG - process args for per net phases
+
+GET_NET_ARG:
+
+    set lFile = $args_[1]
+
+    set path = ( . /usr/local/apps/pactnew/bin $path )
+    set arch   = `system-id`
+    Note $lFile "Arch = $arch"
+    flog $lFile set DevDir = $WrkDir/dev/$arch
+
+# set default values
+    Note $lFile "Set default values for get_net_arg"
+    flog $lFile setenv SysID     none
+    flog $lFile setenv WrkDir    none
+    flog $lFile setenv InstBase  none
+    flog $lFile setenv Code      none
+    flog $lFile setenv SingleSrc TRUE
+
+    Note $lFile "Get values for get_net_arg from command line"
+    while ($#argv > 0)
+       switch ($1)
+          case -host_vars:
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ -*) then
+                     set argv = ( "end" $argv )
+                     break
+                  else
+                     flog $lFile eval "setenv $1 $2"
+                     shift
+                     shift
+                  endif
+               end
+               breaksw
+          case -host_fields:
+               shift
+               flog $lFile setenv SysID $1
+               shift
+               flog $lFile setenv WrkDir $1
+               shift
+               while ($#argv > 0)
+                  if ($1 =~ --*) then
+                     flog $lFile set ConfOpt = ( $ConfOpt $1 )
+                  else if (`expr "$1" : '.*=.*'` > 0) then
+                     set Var = `expr "$1" : '\(.*\)=.*'`
+                     set Val = `expr "$1" : '.*=\(.*\)' | sed 's/,/ /g'`
+                     flog $lFile eval setenv $Var '"' $Val '"'
+                  endif
+                  shift
+               end
+               break
+               breaksw
+       endsw
+       shift
+    end
+
+# make WrkDir a full path
+    if (`expr "$WrkDir" : '/.*'` == 0) then
+       flog $lFile set WrkDir = $HOME/$WrkDir
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+END:
+
+   endinclude
+

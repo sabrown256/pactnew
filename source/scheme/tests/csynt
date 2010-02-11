@@ -1,0 +1,172 @@
+#!/bin/csh -f
+#
+# CSYNT - SCHEME C syntax tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           C SYNTAX TESTS
+
+#--------------------------------------------------------------------------
+
+   set do_syntax = 0
+
+   if ( !($?autotool) ) then
+      grep -w Arc $IncDir/make-def >& /dev/null
+      set do_syntax = $status
+   endif
+
+   if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/c)) then
+      NoteD $Log ""
+      NoteD $Log "                    SCHEME C Syntax Test"
+
+      flog $Log cp $FilesDir/shctst.c $FilesDir/shcdcl.c $FilesDir/shcppts.[ch] .
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      Separator $Log 
+      NoteD $Log -n "                       C Declaration Syntax ...... "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log ( $CFE $BinDir/scheme -e -l shcdcl.c >! shcdcl.res )
+         flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/scheme -e -l shcdcl.c    |& \
+         grep "ERROR SUMMARY:"                                |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 0) then
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f shcdcl.res shcdcl.res.diff shcdcl.[ch]
+      else
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         flog $Log set ERROR = "TRUE"
+         flog $Log shcdcl.res
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      Separator $Log 
+      NoteD $Log -n "                       CPP Syntax ................ "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log ( $CFE $BinDir/scheme -e -l shcppts.c >! shcppts.res )
+         flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
+      else
+         ftee $Log $Valgrind $BinDir/scheme -e -l shcppts.c   |& \
+         grep "ERROR SUMMARY:"                                |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 0) then
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f shcppts.res shcppts.res.diff shcppts.[ch]
+      else
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         flog $Log set ERROR = "TRUE"
+         flog $Log cat shcppts.res
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      Separator $Log 
+      NoteD $Log -n "                       C Syntax .................. "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log ( $CFE $BinDir/scheme -e -l shctst.c >! shctst.res )
+         flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/scheme -e -l shctst.c    |& \
+         grep "ERROR SUMMARY:"                                |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 0) then
+         NoteD $Log "PASSED ($ETime)"
+      else
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         flog $Log set ERROR = "TRUE"
+         flog $Log cat shctst.res
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      Separator $Log 
+      NoteD $Log -n "                       C Translation ............. "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         Note $Log "Command: $CFE $BinDir"'/scheme -e \(translate-c-file \"shctst.c\"\) >! shctst.scm'
+         Note $Log "Command: $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res"
+         $CFE $BinDir/scheme -e \(translate-c-file \"shctst.c\"\) >! shctst.scm
+         $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res
+
+# GOTCHA: OSF's diff does not allow "-B" option (revert this when they go away)
+#      diff -B shctst-scm.res $FilesDir/ref/shctst >! shctst-scm.res.diff
+
+# begin fix
+         cat shctst-scm.res | sed -e '/^$/d' >! junk
+         flog $Log mv junk shctst-scm.res 
+         cat $FilesDir/ref/shctst | sed -e '/^$/d' >! junk
+         flog $Log mv junk shctst 
+
+         diff shctst-scm.res shctst >! shctst-scm.res.diff
+         set xstatus = $status
+# end fix
+      else
+         ftee $Log $Valgrind $BinDir/scheme -e \(translate-c-file \"shctst.c\"\)  |& \
+         grep "ERROR SUMMARY:"                                                    |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 0) then
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f shctst-scm.res shctst-scm.res.diff
+      else
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         flog $Log set Err = 1
+         flog $Log cat shctst.scm
+         flog $Log cat shctst-scm.res
+      endif
+      flog $Log rm -f shctst.res shctst.res.diff shctst.c
+
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

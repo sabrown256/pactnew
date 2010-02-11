@@ -1,0 +1,83 @@
+#!/bin/csh -f
+#
+# SWHICH - find the real executable
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set This = `dirname $0`
+pushd $This >& /dev/null
+set Here = $cwd
+popd >& /dev/null
+
+# this is to have SWHICH do the right thing when in the
+# directory in which the script lives
+set ExcludeDot = FALSE
+if (($Here == $cwd) || ("$Here" == '.')) then
+   set ExcludeDot = TRUE
+endif
+
+set Exe       = ""
+set Me        = $USER
+set OK        = FALSE
+set FirstOnly = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -1 :
+           set FirstOnly = TRUE
+           breaksw
+      case -h :
+           echo ''
+           echo 'Usage: swhich [-1] [-h] <program>'
+           echo ''
+           echo 'Searches your path for instances of the named'
+           echo 'executable except for ones in the same directory'
+           echo 'as that in which swhich lives.  This aids writing'
+           echo 'wrapper scripts around other utilities such as make.'
+           echo 'Guaranteed to run the same way on all platforms.'
+           echo ''
+           echo '    1       - report only the first instance found'
+           echo '    h       - this help message'
+           echo '    program - the executable to be found'
+           echo ''
+           exit(1)
+           breaksw
+      default :
+           set Exe = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Exe" == "") then
+   echo "No executable specified"
+   exit(1)
+
+else if ((-x "$Exe") && (-f "$Exe")) then
+   echo "$Exe"
+
+else
+   foreach i ($path)
+      if (($i != '.') || ($ExcludeDot == FALSE)) then
+         if ((-x $i/$Exe) && (-f $i/$Exe)) then
+            echo "$i/$Exe"
+            if ($FirstOnly == TRUE) then
+               exit(0)
+            else
+               set OK = TRUE
+            endif
+         endif
+      endif
+   end
+
+   if ($OK == FALSE) then
+      echo "No $Exe found in $path"
+   endif
+
+endif
+
+exit(-100)

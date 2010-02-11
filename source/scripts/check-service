@@ -1,0 +1,114 @@
+#!/bin/csh -f
+#
+# CHECK-SERVICE - check file systems and NFS servers on this host
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/check-service") then
+   set path = ( $Exe $path )
+endif
+
+set Root   = $Exe:h
+set BinDir = $Root/bin
+set IncDir = $Root/include
+
+source $IncDir/env-csh
+
+InitLog Log $HOME/.log.check-service
+
+set RC    = $HOME/.chk-srv-rc
+set Quiet = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: check-service [-h] [-q] [-r <rc-file>]"
+           echo "   h   this help message"
+           echo "   q   quiet mode"
+           echo "   r   rc file specifying checks to be done"
+           echo ""
+           exit(1)
+      case -q:
+           set Quiet = TRUE
+           breaksw
+      case -r:
+           shift
+           set RC = $1
+           breaksw
+   endsw
+   shift
+end
+
+set IOPR = $BinDir/iopr
+
+if (!(-f $RC)) then
+   echo "No file $RC - exiting"
+   exit(-1)
+endif
+
+@ Err = 0
+
+set Services = ( `awk '$1 == "Services" { print $0 }' $RC` )
+set FSys     = ( `awk '$1 == "Dir" { print $0 }' $RC` )
+
+shift Services
+shift FSys
+
+if (("$FSys" != "") && ($Quiet == FALSE)) then
+   NoteD $Log ""
+   NoteD $Log "   File System              Status  NFS Server       Ave dT (ms)"
+endif
+foreach i ($FSys)
+   Separator $Log
+   Note $Log "Checking directory $i"
+   flog $Log pushd $i
+   if ($status != 0) then
+      ftee $Log (echo "$i not mounted" | awk '{printf("   %-24s down    %s %s\n", $1, $2, $3);}')
+      @ Err = $Err + 1
+   else
+      set SrvInf = `$IOPR -v |& sed 's/(.*)//' | awk '$1 == "NFS" && NF == 4 { printf("%s %s", $3, $4);}'`
+      if ($#SrvInf != 2) then
+         ftee $Log (echo "$i server unresponsive" | awk '{printf("   %-24s down    %s %s\n", $1, $2, $3);}')
+         @ Err = $Err + 2
+      else
+         set Srv   = `echo "$SrvInf[1]" | sed 's/\./ /g' | awk '{ print $1 }'`
+         set SrvdT = ( `echo $SrvInf[2] | sed 's/\./ /'` )
+         if ($SrvdT[1] > 10) then
+            ftee $Log (echo "$i $Srv $SrvInf[2]" | awk '{printf("   %-24s bad     %-16s %s (too long)\n", $1, $2, $3);}')
+            @ Err = $Err + 4
+         else
+            ftee $Log (echo "$i $Srv $SrvInf[2]" | awk '{printf("   %-24s good    %-16s %s\n", $1, $2, $3);}')
+         endif
+      endif
+      flog $Log popd
+   endif
+end
+
+if (("$Services" != "") && ($Quiet == FALSE)) then
+   NoteD $Log ""
+   NoteD $Log "   Service                  Status"
+endif
+foreach s ($Services)
+   Separator $Log
+   Note $Log "Checking service $s"
+   flog $Log ls-jobs -a $s
+   if ($status != 0) then
+      ftee $Log (echo $s | awk '{printf("   %-24s down\n", $1);}')
+   else
+      ftee $Log (echo $s | awk '{printf("   %-24s good\n", $1);}')
+   endif
+end
+
+if ($Quiet == FALSE) then
+   NoteD $Log ""
+endif
+
+exit($Err)
+

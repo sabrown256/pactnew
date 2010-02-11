@@ -1,0 +1,106 @@
+<?xml version="1.0"/>
+<tst xmlns="file:tst0">
+<doc>
+  <name><![CDATA[name of dataset]]></name>
+  <desc><![CDATA[description of dataset]]></desc>
+  <ts>2001-01-01 12:00:00</ts>
+
+  <sm id="def">
+    <pr>
+      <key>a</key>
+      <su>#def_a</su>
+    </pr>
+    <pr>
+      <key>b</key>
+      <su>#def_b</su>
+    </pr>
+  </sm>
+
+  <st id="def_a">
+    <is>
+      <sc>1</sc>
+      <ic>
+        <href>http://foo.bar/baz.png</href>
+      </ic>
+    </is>
+    <lns>
+      <fg>ffffffff</fg>
+      <w>2</w>
+    </lns>
+    <bs>
+      <bg>00000000</bg>
+    </bs>
+  </st>
+  
+  <st id="def_b">
+    <is>
+      <sc>1</sc>
+      <ic>
+        <href>http://foo.bar/blat.png</href>
+      </ic>
+    </is>
+    <lns>
+      <fg>ffffffff</fg>
+      <w>2</w>
+    </lns>
+    <bs>
+      <bg>00000000</bg>
+    </bs>
+  </st>
+
+  <cn>
+    <su>#def</su>
+    <ed>
+      <d name='FOO>
+	<dn><![CDATA[Foo]]></dn>
+	<val><![CDATA[0.1]]></val>
+      </d>
+      <d name='BAR'>
+	<dn><![CDATA[Bar]]></dn>
+	<val><![CDATA[0.2]]></val>
+      </d>
+    </ed>
+    
+    <gr>
+      <pg>
+	<x>
+	  -1.0,1.1 -2.0,2.1 -3.0,3.1 -4.0,4.1 -5.0,5.1 -6.0,6.1 -7.0,7.1 -8.0,8.1 -9.0,9.1
+	</x>
+      </pg>
+      <pt>
+	<x>
+	  -1.0,1.1
+	</x>
+      </pt>
+    </gr>
+  </cn>
+
+  <cn>
+    <su>#def</su>
+    <ed>
+      <d name='ABC>
+	<dn><![CDATA[Abc]]></dn>
+	<val><![CDATA[1.0]]></val>
+      </d>
+      <d name='XYZ'>
+	<dn><![CDATA[Xyz]]></dn>
+	<val><![CDATA[2.0]]></val>
+      </d>
+    </ed>
+    
+    <gr>
+      <pg>
+	<x>
+	  -10.0,10.1 -11.0,11.1 -12.0,12.1 -13.0,13.1 -14.0,14.1 -15.0,15.1 -16.0,16.1
+	</x>
+      </pg>
+      <pt>
+	<x>
+	  -10.0,10.1
+	</x>
+      </pt>
+    </gr>
+  </cn>
+
+</doc>
+</tst>

@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# FFT - ULTRA FFT test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           FFT TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    ULTRA FFT Test ............... "
+   Note $Log ""
+
+   flog $Log $RM ulfft.log ulfft.err
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $Ultra -l $TDir/ulfft.scm >& ulfft.log)
+      set xstatus = $status
+      flog $Log (grep -i "error" ulfft.log > ulfft.err)
+      set Files = `find . -name "ulfft.err" -size 0c -print`
+   else
+      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulfft.scm  |& \
+      grep "ERROR SUMMARY:"                                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

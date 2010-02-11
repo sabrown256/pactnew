@@ -1,0 +1,33 @@
+#!/bin/csh -f
+#
+# GEN - test panache
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF ""
+NoteD $LogF "                    PANACHE Test .................."
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir/tests
+do-test
+set xstatus = $status
+flog $LogF popd
+
+set ETime = `$TIMER -b $UTime`
+
+if ($xstatus != 0) then
+   NoteD $LogF "                    PANACHE Test .................. FAILED ($ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    PANACHE Test .................. PASSED ($ETime)"
+endif
+
+exit($Err)

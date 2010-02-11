@@ -1,0 +1,18 @@
+#
+# test expansion of recursive dmake invocations
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+c:
+	@echo "c"
+	@echo "done"
+
+b :
+	@echo "b"
+	${MAKE} c
+
+a :
+	@echo "a"
+	${MAKE} b

@@ -1,0 +1,79 @@
+#!/bin/csh -f
+#
+# BROADCAST - broadcast a file to replace instances one or more
+#           - directory trees
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Dir     = ""
+set File    = ""
+set DirLst  = ""
+set Verbose = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           set Dir = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: broadcast [-d <dir>] [-h] [-v] <file> [<dir>]+"
+           echo ""
+           echo "Broadcast <file> to replace any instances in"
+           echo "the directory trees specified by the <dir>s"
+           echo ""
+           echo "   d   rather than replace insert in any terminal directory"
+           echo "   h   this help message"
+           echo "   v   verbose flag"
+           echo ""
+           exit(1)
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      default
+           if ("$File" == "") then
+              set File = $1
+           else
+              set DirLst = ( $DirLst $1 )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+set Name = $File:t
+if (`expr "$File" : '/.*'` > 0) then
+   set FullPath = TRUE   
+else if (`expr "$File" : '~.*'` > 0) then
+   set FullPath = TRUE
+else
+   set File = "$cwd/$File"
+endif
+
+if (-f $File) then
+
+# replace instances in trees
+   if ("$Dir" == "") then
+      if ($Verbose == TRUE) then
+         echo "find $DirLst -name $Name -exec cp $File {} \;"
+      endif
+
+      find $DirLst -name $Name -exec cp $File {} \;
+
+# insert instances in trees
+   else
+      if ($Verbose == TRUE) then
+         echo "find $DirLst -type d -name $Dir -exec cp $File {} \;"
+      endif
+
+      find $DirLst -type d -name $Dir -exec cp $File {} \;
+   endif
+
+else
+   echo "broadcast: no such file $File"
+endif
+
+exit($status)

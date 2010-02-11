@@ -1,0 +1,20 @@
+#
+# BACKSLASH - analyze the treatment of backslash
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv BackSlash "\\"
+
+set Tmp = "tmp-backslash"
+
+echo $BackSlash >! $Tmp
+if (`cat $Tmp` == "$BackSlash") then
+   set BackSlash = "\"
+endif
+
+rm -f $Tmp
+

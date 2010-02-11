@@ -1,0 +1,70 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+                    Multiple Configurations per Platform
+
+I) Introduction
+
+On some platforms it is sometimes convenient to have multiple
+versions of PACT built simultaneously from one set of sources.
+For example, comparing two compilers.  With the aid of a new
+script called cfgman, this is now possible to do.
+
+II) Overview
+
+In order to have multiple configurations per platform we have
+to replace 'system-id' as the identifier for a configuration.
+Recall that 'system-id' returns an identifier of the host OS
+and version (possibly hardware too).  This was used as the sole
+identifier for a platform and is based on 'uname'.  With multiple
+configurations per platform you must now run a small database
+which records which configurations exist for a particular
+hardware/OS platform as identified by 'system-id'.
+
+III) CFGMAN
+
+The script pact/manager/cfgman maintains a database of configurations
+for a set of sources.  The database file is pact/dev/cfgdb.  The
+operations which cfgman performs on the database are:
+
+    add    - add a configuration to the database
+    delete - remove a configuration from the database
+    first  - return the first configuration for the current architecture
+    use    - return the effective config designation for builds
+    list   - return all configurations for the current architecture
+    alias  - set or unset alias for the first configuration
+  
+All of this interacts with various dsys targets as follows:
+
+1) dsys config ... <config>
+   <config> is added to or replaces the current configuration in the
+   database of configurations for that 'cpu -r' and is made the current
+   configuration.  If it already exists then it is
+   only made the current configuration.  The name of the configuration
+   as returned by 'cfgman use' will be of the form `cpu -r`.
+
+2) dsys config ... <config> -a <alias>
+   <config> is added to or replaces the configuration under <alias> in
+   the database of configurations for that 'cpu -r' and is made the
+   current configuration.  However, the name of the configuration
+   as returned by 'cfgman use' (and hence the name you will see on
+   directories) will be <alias>.
+
+3) dsys delete <config>
+   Not only are pact/dev/<config> and similar directories deleted, but
+   the entry is deleted from the database.  The argument may be one of:
+   the literal name you see in the pact/dev directories; an alias name;
+   or the config file name.
+
+4) dsys use <config>
+   Makes the named configuration be the current one.  That means that
+   it will be the one return by 'cfgman use' and hence the one used
+   for builds.
+
+All of the rest of cfgman is transparent to the user.  In fact, if you
+only ever build a single configuration on a given platform, you will not
+notice any changes at all.  

@@ -1,0 +1,105 @@
+#!/bin/csh -f
+#
+# PTY - PPC pty tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set DPE = ""
+
+#--------------------------------------------------------------------------
+
+#                           PTY TEST
+
+#--------------------------------------------------------------------------
+
+# this test fails too often on DP machines so don't run there
+      if ("$DPE" == "") then
+         NoteD $Log ""
+         NoteD $Log "                    PPC PTY Test ................... "
+
+         set FAIL = "NO"
+
+         set UTime = `$TIMER -r`
+         flog $Log rm -f pcexec.ptyi pcexec.ptyp
+
+         NoteD $Log -n "                       polling ............. "
+         set BTime = `$TIMER -r`
+         if ("$Valgrind" == "") then
+            $CFE $PCEXEC -c 30 -i -t $TEST | tr -d "\015" > pcexec.ptyp
+            set xstatus = $status
+         else
+            ftee $Log $Valgrind $PCEXEC -c 30 -i -t $TEST     |& \
+            grep "ERROR SUMMARY:"                             |& \
+            awk '{ print $4 }'   >&! $Tmp
+            set xstatus = `cat $Tmp`
+            flog $Log $RM $Tmp
+         endif
+
+         set ETime = `$TIMER -b $BTime`
+         if ($xstatus == 0) then
+            NoteD $Log "ok ($ETime)"
+         else
+            NoteD $Log "ng ($xstatus/$ETime)"
+            if ($xstatus != 123) then
+               set FAIL = "YES"
+            endif
+         endif
+
+         NoteD $Log -n "                       interrupt ........... "
+         set BTime = `$TIMER -r`
+         if ("$Valgrind" == "") then
+            $CFE $PCEXEC -c 30 -t $TEST | tr -d "\015" > pcexec.ptyi
+            set xstatus = $status
+         else
+            ftee $Log $Valgrind $PCEXEC -c 30 -t $TEST        |& \
+            grep "ERROR SUMMARY:"                             |& \
+            awk '{ print $4 }'   >&! $Tmp
+            set xstatus = `cat $Tmp`
+            flog $Log $RM $Tmp
+         endif
+
+         set ETime = `$TIMER -b $BTime`
+         if ($xstatus == 0) then
+            NoteD $Log "ok ($ETime)"
+         else
+            NoteD $Log "ng ($xstatus/$ETime)"
+            if ($xstatus != 123) then
+               set FAIL = "YES"
+            endif
+         endif
+
+         set ETime = `$TIMER -b $UTime`
+
+         if ($FAIL == "YES") then
+            NoteD $Log "                    PPC PTY Test ................... FAILED ($ETime)"
+            set ERROR = "FALSE"
+         else
+            if ("$Valgrind" == "") then
+               diff pcexec.refi pcexec.ptyi > pcexec.diffi
+               set Files = `find . -name "pcexec.diffi" -size 0c -print`
+               diff pcexec.refp pcexec.ptyp > pcexec.diffp
+               set Files = `find . -name "pcexec.diffp" -size 0c -print`
+            else
+               set Files = 1
+            endif
+            if ($#Files == 0) then
+               NoteD $Log "                    PPC PTY Test ................... FAILED ($ETime)"
+# ignore this test until PTYs are fixed on Mac OS X
+#               set Err = 1
+            else
+               NoteD $Log "                    PPC PTY Test ................... PASSED ($ETime)"
+               flog $Log rm -f pcexec.diff* pcexec.pty* pcexec.ref*
+            endif
+         endif
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

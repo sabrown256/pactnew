@@ -1,0 +1,102 @@
+#!/bin/csh -f
+#
+# STRERROR_R - check for the strerror_r function
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: strerror_r"
+
+set str = ""
+
+set CC = ( $Cfe_CC_Exe $Cfe_LD_Flags )
+
+# look for POSIX standard strerror_r
+
+Note $ALog "Check for POSIX strerror_r"
+cat << EOF >! $Tmp.c
+#include <string.h>
+#include <errno.h>
+int main(int c, char **v)
+   {int st;
+    char s[100];
+    st = strerror_r(errno, s, 100);
+    return(st);}
+EOF
+
+Note $ALog ""
+Note $ALog " CC           = |$CC|"
+Note $ALog " Cfe_LD_Flags = |$Cfe_LD_Flags|"
+Note $ALog " PATH         = |$PATH|"
+Note $ALog ""
+
+set noglob
+
+# NOTE: any warnings must be taken as fatal and some compilers
+# return exit status of 0 if there are only warnings
+# the only alternative is to insist that there be no output
+
+Note $ALog "Command: $CC $Tmp.c -o $Tmp $Cfe_LD_Lib"
+set t = (`$CC $Tmp.c -o $Tmp $Cfe_LD_Lib |& cat`)
+Note $ALog "Result: $t"
+if ("$t" == "") then
+   flog $ALog setenv HAVE_POSIX_STRERROR TRUE
+   set str = ( $str posix )
+else
+   flog $ALog setenv HAVE_POSIX_STRERROR FALSE
+endif
+
+flog $ALog rm -f $Tmp $Tmp.c $Tmp.o
+
+# look for wonky GNU strerror_r
+
+Note $ALog "Check for GNU strerror_r"
+cat << EOF >! $Tmp.c
+#include <string.h>
+#include <errno.h>
+int main(int c, char **v)
+   {int st;
+    char s[100];
+    char *t;
+    t  = strerror_r(errno, s, 100);
+    st = (t != s);
+    return(st);}
+EOF
+
+Note $ALog "Command: $CC $Tmp.c -o $Tmp $Cfe_LD_Lib"
+set t = (`$CC $Tmp.c -o $Tmp $Cfe_LD_Lib |& cat`)
+Note $ALog "Result: $t"
+if ("$t" == "") then
+   flog $ALog setenv HAVE_GNU_STRERROR TRUE
+   set str = ( $str gnu )
+else
+   flog $ALog setenv HAVE_GNU_STRERROR FALSE
+endif
+
+# select POSIX handling if both are available
+if (($HAVE_GNU_STRERROR == TRUE) && ($HAVE_POSIX_STRERROR == TRUE)) then
+   flog $ALog setenv HAVE_GNU_STRERROR FALSE
+   set str = ( $str "(using posix)" )
+endif
+
+flog $ALog rm -f $Tmp $Tmp.c $Tmp.o
+
+if ("$str" == "") then
+   NoteD $ALog "      no strerror_r"
+else
+   NoteD $ALog "      has strerror_r ($str)"
+endif
+
+# export the results
+SetParent HAVE_POSIX_STRERROR
+SetParent HAVE_GNU_STRERROR
+
+exit(0)
+

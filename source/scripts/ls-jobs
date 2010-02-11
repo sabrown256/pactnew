@@ -1,0 +1,308 @@
+#!/bin/csh -f
+#
+# LS-JOBS - list the selected jobs
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias ps
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/ls-jobs") then
+   set path = ( $Exe $path )
+endif
+
+set OSType     = `uname -s`
+set PName      = ""
+set Verbose    = TRUE
+@ TOP          = 10000
+@ SORT         = 1
+set Continuous = FALSE
+set Remove     = "$HOME/.ls-jobs-remove"
+set Pids       = ""
+set Not        = FALSE
+set JStat      = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           set USER = ""
+           breaksw
+
+      case -c:
+           set Continuous = TRUE
+           breaksw
+
+      case -d:
+           shift
+           set Pids = ( $Pids `echo $1 | sed 's/,/ /g'` )
+           breaksw
+
+      case -ds:
+           set Pids = ( $Pids $$ )
+           breaksw
+
+      case -dn:
+           shift
+           set Pids = ( $Pids `echo $1 | sed 's/,/ /g'` )
+           set Not  = TRUE
+           breaksw
+
+      case -h:
+           echo ''
+           echo 'Usage:  ls-jobs [-a] [-c] [-d <lst>] [-dn <lst>] [-ds] [-h] [-q]'
+           echo '                [-r <name>] [-rn] [-s #] [-st] [-t #] [-u user] [-v] [name]*'
+           echo ''
+           echo 'List jobs by name or command line pattern and'
+           echo 'by user.  This is guaranteed to run the same way'
+           echo 'on all platforms and different versions of PS.'
+           echo ''
+           echo '        a    - All users (i.e. do not restrict to a specified single user).'
+           echo '        c    - Run continuously ala top.'
+           echo '        d    - Suppress descendants of the comma-delimited list of PIDs.'
+           echo '        dn   - Show only descendants of the list of PIDs.'
+           echo '        ds   - Suppress descendants of this process (ls-jobs).'
+           echo '        h    - This help message.'
+           echo '        q    - quiet mode; prints only essential information;'
+           echo '               useful when invoking ls-jobs from another script.'
+           echo '        r    - Use specified file to supply names and remove lines'
+           echo '               matching specified patterns from results.'
+           echo '        rn   - Do not use a remove file to suppress any processes.'
+	   echo '               Default:  ~/.ls-jobs-remove'
+           echo '        s    - Sort results by specified field.'
+           echo '        st   - Show job status (e.g. R, S, T, ...).'
+           echo '        t    - Print the topmost # lines only.'
+           echo '        u    - Print only processes owned by the specified user.'
+           echo '        v    - Verbose mode.'
+           echo '        name - Executable name or command line pattern'
+           echo '               used to identify processes.'
+           echo ''
+           exit(1)
+           breaksw
+
+      case -q:
+           set Verbose = FALSE
+           breaksw
+
+      case -r:
+           shift
+           set Remove = ( $Remove $1 )
+           breaksw
+
+      case -rn:
+           set Remove = ""
+           breaksw
+
+      case -s:
+           shift
+           @ SORT = $1
+           breaksw
+
+      case -st:
+           set JStat = TRUE
+           breaksw
+
+      case -t:
+           shift
+           @ TOP = $1
+           breaksw
+
+      case -u:
+           shift
+           set USER = $1
+           breaksw
+
+      case -v:
+           set Verbose = TRUE
+           breaksw
+
+      default:
+           set PName = ( $PName $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ($OSType == SunOS) then
+   set path = ( /usr/xpg4/bin $path )
+endif
+
+set LOADAVE = w
+set CLEAR   = clear
+
+if (($OSType == "Darwin") || ($OSType == "FreeBSD")) then
+   if ($JStat == TRUE) then
+      set PS = "ps -axwo user,pid,ppid,pcpu,time,stat,command"
+   else
+      set PS = "ps -axwo user,pid,ppid,pcpu,time,command"
+   endif
+
+else if ($OSType == "IRIX64") then
+   if ($JStat == TRUE) then
+      set PS = "ps -eo user,pid,ppid,pcpu,time,state,args"
+   else
+      set PS = "ps -eo user,pid,ppid,pcpu,time,args"
+   endif
+
+# CYGWIN has no -o option - the 'elf' combination is the best we can do
+else if ($OSType =~ CYGWIN*) then
+   set PS      = "ps -elf"
+   set CED     = "[2J"    # clear all
+   set Home    = "[1;1H"
+   set LOADAVE = ( echo "No load info available" )
+   set CLEAR   = ( echo $CED$Home )
+
+else
+   set PSOpt = ""
+   if ($OSType == "Linux") then
+      set PSOpt = "-w"
+   else if ($OSType == "HP-UX") then
+      setenv UNIX95 1
+   endif
+   if ($JStat == TRUE) then
+      set PS = "ps $PSOpt -eo user,pid,ppid,pcpu,time,stat,args"
+   else
+      set PS = "ps $PSOpt -eo user,pid,ppid,pcpu,time,args"
+   endif
+endif
+
+# GOTCHA: grrrrrr - the fool ps utility will report uid instead
+# of user name if something doesn't force it to update some
+# internal state and it happens that a cd to $USER home will 
+# do the job
+if ($OSType == "Darwin") then
+   pushd ~$USER >& /dev/null
+   popd >& /dev/null
+endif
+
+# define the filter
+if ("$USER" == "") then
+   set Prog = '($1 != "USER") && ($2 != '$$') && ($3 != '$$')'
+else
+   set Prog = '($1 == "'$USER'") && ($2 != '$$') && ($3 != '$$')'
+endif
+
+# suppress things named by items in Remove file
+foreach File ($Remove)
+    if (-f $File) then
+       set Entries = `cat $File`
+       foreach i ($Entries)
+          set Prog = ( $Prog '&& ($0 !~ /'$i'/)' )
+       end
+    endif
+end
+
+# suppress processes in Pids
+if ("$Pids" != "") then
+   if ($Not == FALSE) then
+      foreach i ( $Pids `descend -q $Pids` )
+         set Prog = ( $Prog '&& ($2 !~ /'$i'/)' )
+      end
+   else
+      foreach i ( `descend -q -n $Pids` )
+         set Prog = ( $Prog '&& ($2 !~ /'$i'/)' )
+      end
+   endif
+endif
+
+set Prog = ( $Prog '{ print }' )
+
+# define the sort
+if ($SORT > 1) then
+   set Sort = "sort -r -k $SORT"
+else
+   set Sort = "sort"
+endif
+
+if ($Verbose == TRUE) then
+   echo ""
+endif
+
+if ($Continuous == TRUE) then
+   $CLEAR
+   echo ""
+   $LOADAVE | head -n 1
+   echo ""
+endif
+
+loop:
+   if ($Verbose == TRUE) then
+      echo "Processes owned by $USER"
+   endif
+
+# for all user processes
+   if ("$PName" == "") then
+
+      $PS            |\
+      cut -b 1-256   |\
+      awk "$Prog"    |\
+      $Sort          |\
+      head -n $TOP
+
+# for named user processes
+   else
+      foreach name ($PName)
+
+         if ($Verbose == TRUE) then
+            echo "Checking for processes under $name"
+         endif
+
+         $PS              |\
+         cut -b 1-256     |\
+         grep -e "$name"  |\
+         awk "$Prog"      |\
+         $Sort            |\
+         head -n $TOP
+         echo ""
+      end
+   endif
+
+   if ($Continuous == TRUE) then
+
+# check for messages from the tty
+# NOTE: this will be expanded into another layer of control
+# suplementing the interrupt handling
+      echo " "
+      set TtyState = `tty`
+      if ("$TtyState" != "not a tty") then
+         stty -icanon min 0 time 0
+         set In = "$<"
+         stty cooked
+         if ("$In" != "") then
+            switch ("$In")
+               case q:
+                    exit(0)
+                    breaksw
+               case k:
+                    echo -n "Signal: "
+                    set In = "$<"
+                    sign $In
+                    breaksw
+               case h:
+                    echo "Options:"
+                    echo "  q  quit"
+                    echo "  k  signal the specified jobs (see sign man page)"
+                    echo " "
+                    breaksw
+               default:
+                    echo "Option ignored: $In"
+                    breaksw
+            endsw
+         endif
+      endif
+
+      sleep 5
+      $CLEAR
+      echo ""
+      $LOADAVE | head -n 1
+      echo ""
+      goto loop
+   endif
+
+unset noglob
+
+exit($status)

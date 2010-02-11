@@ -1,0 +1,60 @@
+#!/bin/csh -f
+#
+# USE-INTEL - decide on the correct Intel environment
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../scripts/env-csh
+
+set Which   = "$cwd/pwhich"
+set CmpPath = ""
+while ($#argv > 0)
+   switch ($1)
+      default:
+           if ("$CmpPath" == "") then
+              set CmpPath = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+# because Intel puts its compilers in different
+# directories check both ifort and icc to get
+# both on the PATH
+# do icc last to get its environment as the final result
+foreach c (ifort icc)
+
+# if blank find compiler on your path
+   if ("$CmpPath" == "") then
+      set lcp = ( `$Which $c` )
+
+# if not a full path find it on your path
+   else if ("$CmpPath" !~ /*) then
+      set lcp = ( `$Which $CmpPath` )
+   endif
+
+   if (-xf "$lcp") then
+      set CCRoot = $lcp:h
+      set CCRoot = $CCRoot:h
+   else if (-x "$lcp/bin/$c") then
+      set CCRoot = $lcp
+   endif
+
+   set Info = ( `$CCRoot/bin/$c -v |& cat` )
+
+   setenv COMPILER_IC_VERSION   $Info[2]
+   setenv ICRoot                $CCRoot
+   setenv PATH                  $CCRoot/bin':$PATH'
+end
+
+SetParent PATH
+SetParent ICRoot
+SetParent COMPILER_IC_VERSION
+
+exit(0)
+

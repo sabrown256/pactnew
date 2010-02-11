@@ -1,0 +1,91 @@
+#!/bin/csh -f
+#
+# BG - PPC foreground/background tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set PCFGBG = $SrcDir/tests/pcfgbg
+
+set LogFB = log.fgbg.$LogSfx
+
+#--------------------------------------------------------------------------
+
+#                           BG TEST
+
+#--------------------------------------------------------------------------
+
+# PPC Background test
+
+      set TCSH = `which tcsh`
+      if (("$MPIBin" == "") && ($?CROSS_COMPILE == 0) && (-x "$TCSH")) then
+         NoteD $Log ""
+         NoteD $Log "                    PPC Background Test ............ "
+         Note $Log ""
+
+         set FAIL  = "NO"
+         set LStat = 0
+
+# do foreground part
+         NoteD $Log "                       foreground .......... "
+         set UTime = `$TIMER -r`
+         Note $Log "( $CFE tcsh -f $PCFGBG -fg ) >&! res.fg"
+         $CFE tcsh -f $PCFGBG -fg >&! res.fg
+         set lStat = $status
+         set ETime = `$TIMER -b $UTime`
+
+         cat res.fg
+         flog $Log cat $LogFB
+         if ($lStat != 0) then
+            NoteD $Log "                       foreground .......... ng ($ETime)"
+            set LStat = 1
+         else
+            NoteD $Log "                       foreground .......... ok ($ETime)"
+         endif
+
+# do background part
+         NoteD $Log "                       background .......... "
+         set UTime = `$TIMER -r`
+         Note $Log "( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg"
+         ( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg
+         set lStat = $status
+
+         @ count = 0
+         while ($count < 20)
+            sleep 5
+            flog $Log grep "Exit status = " $LogFB
+            if ($status == 0) break
+            @ count = $count + 1
+         end
+         flog $Log sign pcfgbg
+
+         set ETime = `$TIMER -b $UTime`
+
+         cat res.bg
+         flog $Log cat $LogFB
+         if ($lStat != 0) then
+            NoteD $Log "                       background .......... ng ($ETime)"
+            set LStat = 2
+         else
+            NoteD $Log "                       background .......... ok ($ETime)"
+         endif
+
+         if ($LStat != 0) then
+            NoteD $Log "                    PPC Background Test ............ FAILED ($ETime)"
+            set Err = 1
+         else
+            NoteD $Log "                    PPC Background Test ............ PASSED ($ETime)"
+            flog $Log $RM res.fg res.bg
+         endif
+
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

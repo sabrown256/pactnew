@@ -1,0 +1,21 @@
+#
+# AUTO-BGP-XLC - 32-bit BGP back end configuration with XLC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
+
+run features/locate-mpi mpich bgp xlc
+
+include 32-bit
+include compiler-xlc-bgp
+include no-x11
+include no-sql
+include no-jpeg
+include no-png
+include no-libz
+

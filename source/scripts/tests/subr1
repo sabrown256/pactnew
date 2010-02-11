@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# SUBR1 - basic test of csh-subroutines
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $IncDir/csh-subroutines
+HAVE_SUBROUTINES
+
+# run the test
+if ($1 == run) then
+   set Trace = TRUE
+
+   call foo(1)
+   call bar()
+
+# print the fiducial answers
+else
+   echo "Calling foo with ( 1 )"
+   echo "foo( 1 )"
+   echo "Returning from foo"
+   echo "Calling bar with ( )"
+   echo "bar"
+   echo "Calling foo with ( 2 )"
+   echo "foo( 2 )"
+   echo "Returning from foo"
+   echo "Returning from bar"
+endif
+
+exit(0)
+
+foo:
+   echo "foo( $args_ )"
+   return
+
+bar:
+   echo "bar"
+   call foo(2)
+   return
+

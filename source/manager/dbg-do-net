@@ -1,0 +1,95 @@
+#!/bin/csh -f
+#
+# DBG-DO-NET - setup circumstances to reproduce do-local failure
+#            - on remote hosts when .do- files have been removed
+#            - the arguments are either one of two lines in the
+#            - update file: the launch from do-net or the command
+#            - line from the phase log which is cat'd to update
+#            - both begin with DO-NET:.  The first has the ssh
+#            - invocation and the second does not
+#
+
+set Cmd    = ""
+set Stamp  = ""
+set Pact   = ""
+set Remove = TRUE
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: dbg-do-net [-h] [-p <pact>] <log-line>"
+           echo "  h        this help message"
+           echo "  p        path to pact utility"
+           echo "  r        leave the .do files when done"
+           echo "  log-line line from update log including 'DO-NET:"
+           echo ""
+           exit(1)
+      case -p:
+           shift
+           set Pact = $1
+           breaksw
+      case -r:
+           set Remove = FALSE
+           breaksw
+      default:
+
+# ignore tokens until we get to the do-local invocation
+           if (("$1" == do-local) || ("$1" =~ ./.do-local.*)) then
+              shift
+              set Inf = ( `echo "$1" | sed 's/\./ /g' | sed 's+/+ +g'` )
+              set DoCode = $Inf[1]
+              set Stamp  = $Inf[2]
+              set Cmd = "~/.do-local.$Stamp"
+              while ($#argv > 0)
+                 set Cmd = ( $Cmd $1 )
+                 shift
+              end
+              break
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if ("$Pact" == "") then
+   set Pact = `swhich -1 pact`
+endif
+
+set Root   = $Pact:h
+set Root   = $Root:h
+set BinDir = $Root/bin
+set IncDir = $Root/include
+
+cp $DoCode ~/.$DoCode.$Stamp
+chmod 600 ~/.$DoCode.$Stamp
+
+cp $BinDir/do-local ~/.do-local.$Stamp
+chmod 700 ~/.do-local.$Stamp
+
+cp $BinDir/timer ~/.do-timer.$Stamp
+chmod 700 ~/.do-timer.$Stamp
+
+cp $BinDir/nfsmon ~/.do-nfsmon.$Stamp
+chmod 700 ~/.do-nfsmon.$Stamp
+
+cp $BinDir/iopr ~/.do-iopr.$Stamp
+chmod 700 ~/.do-iopr.$Stamp
+
+cp $IncDir/csh-subroutines ~/.do-csh-subr.$Stamp
+chmod 600 ~/.do-csh-subr.$Stamp
+
+cd ~
+
+echo "Running command"
+
+$Cmd
+
+echo "Completed with exit status $status"
+
+if ($Remove == TRUE) then
+   rm -f ~/.$DoCode.$Stamp ~/.do-local.$Stamp ~/.do-timer.$Stamp ~/.do-nfsmon.$Stamp ~/.do-iopr.$Stamp ~/.do-csh-subr.$Stamp
+endif
+
+exit($status)
+

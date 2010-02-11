@@ -1,0 +1,51 @@
+#
+# OPENMP - define the use of OpenMP threads
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PTHREAD_OMP
+
+ThreadLibExt = _s
+
+Tool CC {
+   Exe      =? ${OpenMP_CC_Exe}
+   Flags    += ${OpenMP_CC_Flags}
+   Debug    += ${OpenMP_CC_Debug}
+   Optimize += ${OpenMP_CC_Optimize}
+   Inc      += ${OpenMP_CC_Inc}
+}
+
+Tool FC {
+   Exe      =? ${OpenMP_FC_Exe}
+   Flags    += ${OpenMP_FC_Flags}
+   Debug    += ${OpenMP_FC_Debug}
+   Optimize += ${OpenMP_FC_Optimize}
+}
+
+Tool LD {
+   Exe   =? ${OpenMP_LD_Exe}
+   Flags += ${OpenMP_LD_Flags}
+   Lib   += ${OpenMP_LD_Lib}
+}
+
+Tool Lex {
+   Flags    += ${OpenMP_Lex_Flags}
+   Debug    += ${OpenMP_Lex_Debug}
+   Optimize += ${OpenMP_Lex_Optimize}
+}
+
+Group Cfg {
+   CC_Flags    += ${OpenMP_CC_Flags}
+   CC_Debug    += ${OpenMP_CC_Debug}
+   CC_Optimize += ${OpenMP_CC_Optimize}
+   FC_Flags    += ${OpenMP_FC_Flags}
+   FC_Debug    += ${OpenMP_FC_Debug}
+   FC_Optimize += ${OpenMP_FC_Optimize}
+   LD_Flags    += ${OpenMP_LD_Flags}
+   LD_Lib      += ${OpenMP_LD_Lib}
+}
+

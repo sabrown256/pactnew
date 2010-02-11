@@ -1,0 +1,30 @@
+Old # read attempts: 100
+New # read attempts: 10000
+
+Status for process :15764: Running
+| 
+|            SCHEME 4.0  -  11.30.92
+| 
+| Scheme-> 
+
+Sending: (car (list 1 2 3))
+| (| 0): 1
+| Stack Usage (S/R): (24/18)   Continuations (S/G): (7/7)
+| Memory Usage(A/F): (832/0)   Net (A-F): (832)   Time: ( 0.000e+00)
+| 
+| Scheme-> 
+Status for process 15764: Running
+
+Sending: (describe process-status)
+|  |     Procedure: Returns a list of the process id, in, out, status,|  reason
+| (0): #f
+| Stack Usage (S/R): (5/5)   Continuations (S/G): (3/3)
+| Memory Usage(A/F): (152/700)   Net (A-F): (284)   Time: ( 1.000e-02)
+| 
+| Scheme-> 
+Status for process 15764: Running
+
+Sending: (quit)
+
+Status for process 15764: Exited (0)
+

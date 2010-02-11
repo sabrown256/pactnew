@@ -1,0 +1,54 @@
+#!/bin/csh -f
+#
+# STRING - SCHEME string test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           STRING TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SCHEME String Test ........... "
+   Note $Log ""
+
+   flog $Log pwd
+   if ( $?autotool ) then
+     if ( !(-e ../shstr.scm) ) then 
+       flog $Log cp $FilesDir/shstr.scm ..
+     endif
+   endif 
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/scheme -e -l $FilesDir/shstr.scm
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shstr.scm  |& \
+      grep "ERROR SUMMARY:"                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log rm -f '#tmp#'
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

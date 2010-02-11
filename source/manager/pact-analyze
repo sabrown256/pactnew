@@ -1,0 +1,279 @@
+#!/bin/csh -f
+#>
+#> PACT-ANALYZE - analyze the current UNIX environment
+#>
+#> Generally used by the script dsys via pact-config
+#>
+#> Usage: pact-analyze [-c] [-h] [-t]
+#>
+#> Options:
+#>   -c     Check C Declarations
+#>   -h     Help Package
+#>   -t     Analyzing Programming Environment Characteristics for
+#>          $HostName
+#> WARNING: This analysis is partly based on your PATH and MANPATH.
+#>          The analysis may not reflect the complete state of this system.
+#>
+#
+#-----------------------------------------------------------------------
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?MngDir == 0) then
+   if (-f ../scripts/env-csh) then
+      setenv MngDir $cwd
+   else if (-f ../../scripts/env-csh) then
+      setenv MngDir $cwd:h
+   endif
+endif
+set Base   = $MngDir:h
+set ScrDir = $Base/scripts
+source $ScrDir/env-csh
+source $ScrDir/csh-subroutines
+HAVE_SUBROUTINES
+
+set help     = FALSE
+set HelpCode = ./$0                      
+
+setenv HostOS        `uname -s`
+setenv HostOSRel     `uname -r`
+setenv HostName      `uname -n`
+setenv MajorVersion  `expr $HostOSRel : "\(.\)"`
+
+set Which = "$MngDir/pwhich"
+
+SafeEnv CfgMan  $MngDir/cfgman
+SafeEnv System  `$CfgMan use`
+SafeEnv RootDir $Base/dev/$System
+
+InitLog ALog $RootDir/log/analyze
+
+Note $ALog "HostName         = $HostName"
+Note $ALog "HostOS           = $HostOS"
+Note $ALog "HostOSRel        = $HostOSRel"
+Note $ALog "MajorVersion     = $MajorVersion"
+Note $ALog "Source Directory = $MngDir"
+
+if ($?USER == 0) then
+   if ($?LOGNAME == 0) then
+      flog $ALog set USER = "anonymous"
+   else
+      flog $ALog set USER = $ALogNAME
+   endif
+endif
+
+if ("$HostOS" == "Windows_NT") then
+   flog $ALog setenv CDecls TRUE
+else
+   flog $ALog setenv CDecls FALSE
+endif
+flog $ALog setenv ANSI    ANSI
+flog $ALog setenv MeOnly  TRUE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+setenv ToTTY  FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           flog $ALog setenv CDecls  TRUE
+           shift
+           flog $ALog setenv ANSI    $1
+           breaksw
+
+      case -h:
+           flog $ALog setenv help  "TRUE"
+
+      case -t:
+           setenv ToTTY  TRUE
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# initialization of non-graphics flags
+
+set lTmp = ( "tmp-"`echo $HostOS-$$ | tr "[A-Z]" "[a-z]"` )
+setenv Tmp "$lTmp"
+
+flog $ALog setenv DORUN  $BinDir/do-run
+flog $ALog setenv TIMER  $ScrDir/timer
+
+if ($HostOS == "AIX") then
+   set lNM = ( /usr/bin/nm -g )
+else
+   set lNM = ( `$Which nm` -g )
+endif
+flog $ALog setenv NM "$lNM"
+
+SafeEnv CPU  ""
+SafeEnv FPU  ""
+
+if ($HostOS == Linux) then
+   set i = `uname -m`
+   if ($i == "alpha") then
+      flog $ALog setenv FPU "alpha"
+   else if (`expr $i : 'i.86'` != 0) then
+      flog $ALog setenv FPU "x87"
+   else if ($CPU == "x86") then
+      flog $ALog setenv FPU "x87"
+   endif
+endif
+
+SafeEnv CFE        ""
+SafeEnv PFE        "$DORUN -m"
+SafeEnv BE         ""
+SafeEnv CC_Inc     ""
+SafeEnv CC_Flags   ""
+SafeEnv LD_Lib     ""
+SafeEnv LD_Flags   ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# initialization of graphics flags
+
+Separator $ALog
+
+SafeEnv GSYS       "X"
+SafeEnv Std_UseX   TRUE
+SafeEnv Std_UseOGL FALSE
+SafeEnv Std_UseQD  FALSE
+
+SafeEnv CC_MDGInc       ""
+SafeEnv LD_MDGLib       ""
+SafeEnv GraphicsDevices "PS CGM MPG PNG JPG"
+SafeEnv GraphicsFlag    ""
+
+Note $ALog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# initialize Cfg group flags
+
+Separator $ALog
+
+SafeEnv Cfg_CC_Flags  "$CC_Flags"
+SafeEnv Cfg_CC_Inc    "$CC_Inc"
+SafeEnv Cfg_LD_Flags  "$LD_Flags"
+SafeEnv Cfg_LD_Lib    "$LD_Lib"
+
+Note $ALog "Cfg_CC_Inc   = |$Cfg_CC_Inc|"
+Note $ALog "Cfg_LD_Flags = |$Cfg_LD_Flags|"
+
+Note $ALog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $ALog
+
+if ($help == "TRUE") then
+   awk '($1 == "#>") {print}' $HelpCode  #Print Usage:
+   endinclude
+endif
+
+if ($ToTTY == TRUE) then
+
+   NoteD $ALog ""
+   NoteD $ALog "Analyzing Programming Environment Characteristics for $HostName"
+   NoteD $ALog ""
+   NoteD $ALog "WARNING: This analysis is partly based on your PATH and MANPATH."
+   NoteD $ALog "         The analysis may not reflect the complete state of this system."
+   NoteD $ALog ""
+
+endif
+
+if (-d analyze) then
+   setenv AnaDir  analyze
+else
+   setenv AnaDir  ../analyze
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# run programs to analyze specific features
+
+set Features = ""
+set Features = ( $Features fix-rpath site hw os )
+set Features = ( $Features csh sh cc fc ld yacc lex )
+set Features = ( $Features make python util tracker )
+set Features = ( $Features features graphics )
+
+#set Features = ""
+#set Features = ( $Features hw os csh sh cc fc ld yacc lex make python util )
+#set Features = ( $Features termio ipc signal poll pty socket mmap )
+#set Features = ( $Features openmp dp )
+#set Features = ( $Features math fpe )
+#set Features = ( $Features opengl x11 )
+#set Features = ( $Features libz png jpeg hdf5 tracker )
+#
+set Functions = ""
+#set Functions = ( $Functions vsnprintf strerror_r )
+
+set Post = ""
+set Post = ( $Post finish )
+
+set Fncs = FALSE
+foreach f ($Features "-fnc-" $Functions "-pst-" $Post)
+   if ("$f" == "-fnc-") then
+      set Fncs = TRUE
+      NoteD $ALog "   Library Functions:"
+   else if ("$f" == "-pst-") then
+      set Fncs = FALSE
+   else
+      Separator $ALog
+
+# run the program f
+      set Text = (`$AnaDir/$f | awk '{ printf("%s ; \n", $0); }'`)
+
+# look through the output for setenvs and other text to echo
+      set Line = ""
+      set First = TRUE
+      foreach i ($Text)
+         if ("$i" == ";") then
+
+# catch exports to parent environment
+            if ("$Line[1]" == parent) then
+               set lst = ( `echo $Line | sed 's/(/ /' | sed 's/)/ /'` )
+               set Cmd = ( 'setenv '$lst[2]' "'$lst[3-]'"' )
+               eval "$Cmd"
+               Note $ALog "Command: $Cmd"
+               Note $Log "Command: $Cmd"
+
+# indent the first printed line with 3 spaces 
+            else if (($First == TRUE) && ($Fncs == FALSE)) then
+               set First = FALSE
+               echo "   $Line"
+
+# indent the all other printed line with 6 spaces 
+            else
+               echo "      $Line"
+            endif
+            set Line = ""
+
+         else
+            set Line = ( $Line $i )
+         endif
+      end
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+NoteD $ALog ""
+
+endinclude
+

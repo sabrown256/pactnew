@@ -1,0 +1,93 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH ULTRA 1 "10 January 2005"
+.SH NAME
+ultra \- 1d data analysis and visualization tool
+.SH SYNOPSIS
+.B ultra [-e] [-h] [-i] [-l <file>]* [-m] [-n] [-q] [-r] [-s] [-u] [-w]
+.B       <file> | (<scheme-command>)
+
+.SH DESCRIPTION
+
+Ultra is used to visualize and analyze 1d data sets.  By 1d data
+sets we mean single valued functions of a single variable, f(x).
+You can plot data, perform a wide variety of operations on your
+data, and send the results to one or more output media.
+
+Using ultra you can work with data from files or data created with
+a variety of built in commands.  Ultra reads data from ASCII files
+of a certain form. It also reads binary ultra files which are a kind
+of PDB file.  The process of producing ultra files is explained in
+the Ultra Manual.
+
+Ultra has a built in interpreter which allows the user to define
+arbitrary functions which can be use to manipulate or generate data.
+The SCHEME language is the primary language of ULTRA, but it also
+parses C (at the beta level) and Fortran (at the alpha level).
+
+Ultra can be run without any graphics simply to process 1d data.
+With graphics, data can be displayed to the screen or sent to
+media files as Postscript, JPEG, PNG, MPEG, or CGM.
+
+A complete description of Ultra cannot be given here.  Consult the
+web pages at http://pact.llnl.gov
+
+
+.SH OPTIONS
+.TP
+.B \-e
+Abort on error instead of returning to the interpreter.
+.TP
+.B \-h
+A summary help message.
+.TP
+.B \-i
+Do not use interrupt driven I/O.
+.TP
+.B \-l
+Load file containing commands (Scheme or C syntax).
+.TP
+.B \-m
+On X systems do drawing to pixmap and then blt.
+.TP
+.B \-n
+Do not load the standard interpreted command files.
+.TP
+.B \-q
+Do not display the ULTRA banner.
+.TP
+.B \-r
+Do not load the .ultrarc file.
+.TP
+.B \-s
+Start up in command mode with no graphics window.
+.TP
+.B \-u
+Start up in graphics mode with a window (default).
+.TP
+.B \-w
+On X systems do all drawing directly to the window.
+
+.SH EXAMPLES
+
+   ultra
+   ultra foo.dat
+   ultra -l foo.scm foo.dat
+   ultra -i foo.dat
+
+
+.SH ENVIRONMENT VARIABLES
+
+ULTRA  path variable to tell interpreter where to look for files
+containing interpreted code.  (Do not set this unless you know what
+you are doing).
+
+.SH BUGS
+.TP 
+.B None known.
+

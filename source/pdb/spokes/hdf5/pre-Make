@@ -1,0 +1,44 @@
+#
+# pre-Makefile for HDF5 spoke
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+TGTBin = none
+TGTLib = ${LibDir}/libpdb.a
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags = -L${LibDir} ${MechDepLib}
+
+CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+
+#
+# Files to remove in directory clean (make clean)
+#
+CleanFiles = *~ core #*#
+
+#
+# Headers Files
+#
+Hdrs = trhdf5.h ../../pdb_int.h
+
+#
+# Object Files
+#
+Objs = trhdf5.o
+
+ArObjs = ${TGTLib}(trhdf5.o)
+
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+spoke : ${TGTLib} ${LibDep}

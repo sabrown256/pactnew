@@ -1,0 +1,43 @@
+#!/bin/csh -f
+#
+# CCW - wrapper for C compiler to manifest POSIX compliance
+#
+
+set os  = `uname -s`
+set lib = ""
+
+switch ($os)
+
+   case HP-UX:
+        set cc = ( c89 -DNO_UNSETENV -DHPUX -D_INCLUDE_HPUX_SOURCE -D_XOPEN_SOURCE_EXTENDED -D_INCLUDE_XOPEN_SOURCE_EXTENDED +DAportable )
+        breaksw
+
+   case SunOS:   
+        set cc  = ( cc -DSOLARIS )
+        set lib = ( -lsocket -lnsl )
+        breaksw
+
+   case IRIX64:
+        set cc  = ( cc -DNO_UNSETENV )
+        breaksw
+
+# find gcc or cc on path without using unreliable 'which'
+   default:
+        set cc = none
+        foreach d ( $path )
+           foreach i ( gcc cc )
+              set cx = $d/$i
+              if (-x $cx) then
+                 set cc = $cx
+                 break
+              endif
+           end
+           if ($cc != none) then
+              break
+           endif
+        end
+        breaksw
+endsw
+
+exec $cc $argv $lib
+

@@ -1,0 +1,48 @@
+#!/bin/csh -f
+#
+# TV.DO-RUN - do-run wrapper for Totalview
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Host  = `uname -n`
+set TInit = $cwd/.tv-init.$Host.$$
+set Tmp   = $cwd/.tmp.$Host.$$
+set RM    = ( /bin/rm -f )
+
+set path = ( $path <your-tv-path> )
+
+# set up the debugger to know about the sources
+if ($?TVDirs == 1) then
+
+# figure out the back slash treatment
+   set BackSlash = "\\"
+   echo $BackSlash >! $Tmp
+   if (`cat $Tmp` == "$BackSlash") then
+      set BackSlash = "\"
+   endif
+   $RM $Tmp
+
+   $RM $TInit
+   touch $TInit
+   echo "totalview*geometry: 640x960+0+30" >>& $TInit
+   echo "totalview*searchPath: .,$BackSlash" >>& $TInit
+   awk '{ printf("                      %s,\\\n", $0); }' $TVDirs >>& $TInit
+   echo "                      .." >>& $TInit
+
+   xrdb -merge $TInit >& /dev/null
+
+   $RM $TInit
+endif
+
+totalview $argv
+set xstatus = $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($xstatus)
+

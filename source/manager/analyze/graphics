@@ -1,0 +1,28 @@
+#!/bin/csh -f
+#
+# GRAPHICS - manage detected graphics
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: system graphics"
+
+NoteD $ALog "   System Graphics:"
+
+source $AnaDir/quickdraw
+source $AnaDir/opengl
+source $AnaDir/x11
+
+#source $AnaDir/libz
+source $AnaDir/png
+source $AnaDir/jpeg
+
+exit(0)
+

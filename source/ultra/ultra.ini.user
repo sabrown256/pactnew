@@ -1,0 +1,30 @@
+;
+; ULTRA.INI - Standard Ultra Init File
+;
+;;;;;;;;;;;;;;;;;;;;
+; Source Version: 3.0
+; Software Release #: LLNL-CODE-422942
+;
+; include "cpyright.h"
+;
+
+; Window Controls
+
+(background-color-flag white)
+(border-width 2)
+(window-origin-x 0.5)
+(window-origin-y 0.15)
+(window-width 0.48)
+(window-height 0.48)
+
+; Viewport Controls
+
+; (view-origin-x 0.18)
+; (view-origin-y 0.18)
+; (view-width 0.75)
+; (view-height 0.75)
+
+(open-device "WINDOW" "COLOR" "ULTRA II")
+
+(ps-flag on)
+(print-flag off)

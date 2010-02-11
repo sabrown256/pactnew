@@ -1,0 +1,1408 @@
+/*
+ * SCTERM.C - terminal mode control routines
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "cpyright.h"
+
+#include "scope_term.h"
+#include "scope_proc.h"
+
+#define SET_ATTR(_v, _a, _s)                                                 \
+    switch (_s)                                                              \
+       {case 1 :                                                             \
+	     _v |= _a;                                                       \
+	     break;                                                          \
+	case 0 :                                                             \
+	     _v &= ~_a;                                                      \
+	     break;                                                          \
+	case -1 :                                                            \
+	     _v = _a;                                                        \
+	     break;}
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef BSD_TERMINAL
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_GET_TTY_ATTR - get the attributes of the file descriptor FD into
+ *                  - the TERMINAL struct T
+ */
+
+static int _SC_get_tty_attr(int fd, TERMINAL *t)
+   {int rv;
+
+    rv = ioctl(fd, TIOCGETP, t);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_TTY_ATTR - set the attributes of the file descriptor FD from
+ *                  - the TERMINAL struct T
+ */
+
+static int _SC_set_tty_attr(int fd, TERMINAL *t, int now)
+   {int rv;
+
+    if (now == TRUE)
+       rv = ioctl(fd, TIOCSETN, t);
+    else
+       rv = ioctl(fd, TIOCSETP, t);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_GET_TTY_ATTR - get the attributes of the file descriptor FD into
+ *                  - the TERMINAL struct T
+ */
+
+static int _SC_get_tty_attr(int fd, TERMINAL *t)
+   {int rv;
+
+    rv = tcgetattr(fd, t);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_TTY_ATTR - set the attributes of the file descriptor FD from
+ *                  - the TERMINAL struct T
+ */
+
+static int _SC_set_tty_attr(int fd, TERMINAL *t, int now)
+   {int rv;
+
+    if (now == TRUE)
+       rv = tcsetattr(fd, TCSANOW, t);
+    else
+       rv = tcsetattr(fd, TCSAFLUSH, t);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_IO_ATTR - set the ATTR to STATE in terminal T
+ *                 - STATE is either 1 (on), 0 (off), -1 (only)
+ */
+
+static void _SC_set_io_attr(TERMINAL *t, int class, int attr, int state)
+   {
+
+#ifdef TERMINAL
+
+# ifdef BSD_TERMINAL
+
+    SET_ATTR(t->sg_flags, attr, state);
+
+# else
+
+/* input mode constants (POSIX)
+ * IGNBRK - ignore break
+ * BRKINT - break causes input and output to be flushed
+ * IGNPAR - ignore parity error
+ * PARMRK - prefix character with parity error
+ * INPCK  - enable input parity check
+ * ISTRIP - strip off bit 8
+ * IGNCR  - ignore CR on input
+ * INLCR  - NL -> CR on input
+ * ICRNL  - CR -> NL on input
+ * IXON   - enable XON/XOFF on output
+ * IXOFF  - enable XON/XOFF on input
+ * IUCLC  - UC -> LC on input   (non-POSIX)
+ * IXANY  - enable any character restart   (non-POSIX)
+ */
+    if (class == SC_TERM_INPUT)
+       {SET_ATTR(t->c_iflag, attr, state);}
+
+/* output mode constants (POSIX)
+ * OPOST  - enable output processing
+ * ONLCR  - NL -> CR-NL on output
+ * OCRNL  - CR -> NL on output
+ * ONOCR  - no CR at column 0
+ * ONLRET - no CR
+ * OFILL  - fill for delay
+ * NLDLY  - NL delay mask
+ * CRDLY  - CR delay mask
+ * TABDLY - hor. tab delay mask
+ * BSDLY  - backspace delay mask
+ * VTDLY  - vert. tab delay mask
+ * FFDLY  - form feed delay mask
+ * OLCUC  - LC -> UC on output (non-POSIX)
+ * OFDEL  - fill is DEL (NUL be default) (non-POSIX)
+ */
+    else if (class == SC_TERM_OUTPUT)
+       {SET_ATTR(t->c_oflag, attr, state);}
+
+/* control mode constants (POSIX)
+ * CSIZE   - char size mask
+ * CSTOPB  - 2 stop bits
+ * CREAD   - enable recv
+ * PARENB  - enable parity gen on output and chk on input
+ * PARODD  - parity for in and out is odd
+ * HUPCL   - hang up after last process
+ * CLOCAL  - ignore modem control lines
+ * CBAUD   - baud mask (non-POSIX)
+ * CBAUDEX - extra baud mask (non-POSIX)
+ * CIBAUD  - input baud mask (non-POSIX)
+ * CRTSCTS - enable RTS/CTS control (non-POSIX)
+ */
+    else if (class == SC_TERM_CONTROL)
+       {SET_ATTR(t->c_cflag, attr, state);}
+
+/* local mode constants (POSIX)
+ * ISIG    - pass on INTR, QUIT, SUSP, DSUSP signals
+ * ICANON  - enable canonical mode (buffers by line)
+ * ECHO    - echo input
+ * ECHOE   - if ICANON enable ERASE/WERASE
+ * ECHOK   - if ICANON enable KILL
+ * ECHONL  - if ICANON echo NL
+ * NOFLSH  - disable flush on signals
+ * TOSTOP  - send SIGTTOU when needed
+ * IEXTEN  - enable input processing
+ * ECHOCTL - if ECHO Ctl-X echos as ^X (non-POSIX)
+ * ECHOPRT - if ICANON and IECHO print char as they are erased (non-POSIX)
+ * ECHOKE  - if ICANON echo KILL by erasing line (non-POSIX)
+ */
+    else if (class == SC_TERM_LOCAL)
+       {SET_ATTR(t->c_lflag, attr, state);}
+
+/* c_cc defines the special control characters (POSIX)
+ * VINTR    - ^C or DEL - send SIGINT
+ * VQUIT    - send SIGQUIT
+ * VERASE   - DEL or ^H - erase char
+ * VKILL    - ^U - kill line
+ * VEOF     - ^D - end of file
+ * VMIN     - min number of chars for read
+ * VEOL     - NUL - end of line
+ * VTIME    - timeout in deciseconds
+ * VSTART   - ^Q - start char
+ * VSTOP    - ^S - stop char
+ * VSUSP    - ^Z - suspend char
+ * VEOL2    - NUL - another end of line (non-POSIX)
+ * VLNEXT   - ^V - literal next (non-POSIX)
+ * VWERASE  - ^W - word erase (non-POSIX)
+ * VREPRINT - ^R - reprint unread chars (non-POSIX)
+ */
+    else if (class == SC_TERM_CHAR)
+       t->c_cc[attr] = state;
+
+# endif
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_IO_ATTR - set the specified attribute to be ON or OFF */
+
+int SC_set_io_attr(int fd, int attr, int state)
+   {int rv, ok;
+
+    rv = FALSE;
+
+#ifdef TERMINAL
+
+    ok = SC_ERR_TRAP();
+    if (ok == 0)
+       {TERMINAL s;
+
+	rv = _SC_get_tty_attr(fd, &s);
+	if (rv == -1)
+	   SC_error(-1, "COULDN'T GET STATE - SC_SET_IO_ATTR");
+
+	_SC_set_io_attr(&s, SC_TERM_LOCAL, attr, state);
+
+	rv = _SC_set_tty_attr(fd, &s, TRUE);
+	if (rv == -1)
+	   SC_error(-1, "COULDN'T SET STATE - SC_SET_IO_ATTR");
+	else
+	   rv = TRUE;};
+
+    SC_ERR_UNTRAP();
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_IO_ATTRS - set the specified set off attributes to be ON or OFF
+ *                 - terminated by attribute value of 0
+ */
+
+int SC_set_io_attrs(int fd, ...)
+   {int rv, ok, attr, state, class;
+
+    rv = FALSE;
+
+#ifdef TERMINAL
+
+    ok = SC_ERR_TRAP();
+    if (ok == 0)
+       {int ond, offd;
+	TERMINAL s;
+
+	rv = _SC_get_tty_attr(fd, &s);
+	if (rv == -1)
+	   SC_error(-1, "COULDN'T GET STATE - SC_SET_IO_ATTR");
+
+	ond  = 0;
+	offd = 0;
+
+	SC_VA_START(fd);
+
+	while (TRUE)
+	   {attr = SC_VA_ARG(int);
+	    if (attr == 0)
+	       break;
+
+	    class = SC_VA_ARG(int);
+	    state = SC_VA_ARG(int);
+
+	    if (class == SC_TERM_DESC)
+	       {if (state == 0)
+		   offd |= attr;
+	        else if (state == 1)
+		   ond |= attr;}
+
+	    else
+	       _SC_set_io_attr(&s, class, attr, state);};
+
+	SC_VA_END;
+
+/* set the attributes that go via ioctl first */
+	rv = _SC_set_tty_attr(fd, &s, TRUE);
+	if (rv == -1)
+	   SC_error(-1, "COULDN'T SET STATE - SC_SET_IO_ATTR");
+	else
+	   rv = TRUE;
+
+/* now set the attribute that go via fcntl last */
+	if (offd != 0)
+	   rv = SC_set_fd_attr(fd, offd, FALSE);
+
+	if (ond != 0)
+	   rv = SC_set_fd_attr(fd, ond, TRUE);};
+
+    SC_ERR_UNTRAP();
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_FD_ATTR - set the control flags on a file descriptor
+ *                - the following are more or less portable
+ *                -
+ *                - SC_NDELAY  non-blocking I/O
+ *                - SC_APPEND  append (writes guaranteed at the end)
+ *                - SC_SYNC    synchronous write option
+ *                -
+ *                - the STATE argument specifies how the flag is to
+ *                - be set from I
+ *                -    1  I added to flag (with |)
+ *                -    0  I removed from flag (with & ~)
+ *                -   -1  flag set to I
+ *                - return TRUE iff successful
+ */
+
+int SC_set_fd_attr(int fd, int i, int state)
+   {int rv, ok;
+
+    rv = FALSE;
+
+#ifdef HAVE_POSIX_SYS
+
+    ok = SC_ERR_TRAP();
+    if (ok == 0)
+       {if (i != SC_ASYNC)
+	   {int arg, status;
+
+	    arg = fcntl(fd, F_GETFL);
+	    if (arg < 0)
+	       SC_error(-1, "COULDN'T GET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
+
+	    SET_ATTR(arg, i, state);
+
+	    status = fcntl(fd, F_SETFL, arg);
+	    if (status < 0)
+	       SC_error(-1, "COULDN'T SET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
+
+	    rv = TRUE;};};
+
+    SC_ERR_UNTRAP();
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_PRINT_TERM_STATE - print to the specified file the state of the
+ *                     - specified file descriptor
+ */
+
+void SC_print_term_state(FILE *fp, int fd)
+   {
+
+#ifdef TERMINAL
+    int c, rv;
+    TERMINFO s;
+
+    if (fp != NULL)
+       fd = fileno(fp);
+
+    rv = tcgetattr(fd, &s);
+    if (rv == -1)
+       SC_error(-1, "COULDN'T GET STATE - SC_PRINT_TERM_STATE");
+
+/* input mode constants */
+    c = s.c_iflag;
+# ifdef IGNBRK
+    if (c & IGNBRK) printf("i> IGNBRK - ignore break\n");
+# endif
+# ifdef BRKINT
+    if (c & BRKINT) printf("i> BRKINT - break causes input and output to be flushed\n");
+# endif
+# ifdef IGNPAR
+    if (c & IGNPAR) printf("i> IGNPAR - ignore parity error\n");
+# endif
+# ifdef PARMRK
+    if (c & PARMRK) printf("i> PARMRK - prefix character with parity error\n");
+# endif
+# ifdef INPCK
+    if (c & INPCK)  printf("i> INPCK  - enable input parity check\n");
+# endif
+# ifdef ISTRIP
+    if (c & ISTRIP) printf("i> ISTRIP - strip off bit 8\n");
+# endif
+# ifdef IGNCR
+    if (c & IGNCR)  printf("i> IGNCR  - ignore CR on input\n");
+# endif
+# ifdef INLCR
+    if (c & INLCR)  printf("i> INLCR  - NL -> CR on input\n");
+# endif
+# ifdef ICRNL
+    if (c & ICRNL)  printf("i> ICRNL  - CR -> NL on input\n");
+# endif
+# ifdef IXON
+    if (c & IXON)   printf("i> IXON   - enable XON/XOFF on output\n");
+# endif
+# ifdef IXOFF
+    if (c & IXOFF)  printf("i> IXOFF  - enable XON/XOFF on input\n");
+# endif
+# ifdef IUCLC
+    if (c & IUCLC)  printf("i> IUCLC  - UC -> LC on input   (non-POSIX)\n");
+# endif
+# ifdef IXANY
+    if (c & IXANY)  printf("i> IXANY  - enable any character restart   (non-POSIX)\n");
+# endif
+
+/* output mode constants */
+    c = s.c_oflag;
+# ifdef OPOST
+    if (c & OPOST)  printf("o> OPOST  - enable output processing\n");
+# endif
+# ifdef ONLCR
+    if (c & ONLCR)  printf("o> ONLCR  - NL -> CR-NL on output\n");
+# endif
+# ifdef OCRNL
+    if (c & OCRNL)  printf("o> OCRNL  - CR -> NL on output\n");
+# endif
+# ifdef ONOCR
+    if (c & ONOCR)  printf("o> ONOCR  - no CR at column 0\n");
+# endif
+# ifdef ONLRET
+    if (c & ONLRET) printf("o> ONLRET - no CR\n");
+# endif
+# ifdef OFILL
+    if (c & OFILL)  printf("o> OFILL  - fill for delay\n");
+# endif
+# ifdef NLDLY
+    if (c & NLDLY)  printf("o> NLDLY  - NL delay mask\n");
+# endif
+# ifdef CRDLY
+    if (c & CRDLY)  printf("o> CRDLY  - CR delay mask\n");
+# endif
+# ifdef TABDLY
+    if (c & TABDLY) printf("o> TABDLY - hor. tab delay mask\n");
+# endif
+# ifdef BSDLY
+    if (c & BSDLY)  printf("o> BSDLY  - backspace delay mask\n");
+# endif
+# ifdef VTDLY
+    if (c & VTDLY)  printf("o> VTDLY  - vert. tab delay mask\n");
+# endif
+# ifdef FFDLY
+    if (c & FFDLY)  printf("o> FFDLY  - form feed delay mask\n");
+# endif
+# ifdef OLCUC
+    if (c & OLCUC)  printf("o> OLCUC  - LC -> UC on output (non-POSIX)\n");
+# endif
+# ifdef OFDEL
+    if (c & OFDEL)  printf("o> OFDEL  - fill is DEL (NUL be default) (non-POSIX)\n");
+# endif
+
+/* control mode constants */
+    c = s.c_cflag;
+# ifdef CSIZE
+    if (c & CSIZE)   printf("c> CSIZE   - char size mask\n");
+# endif
+# ifdef CSTOPB
+    if (c & CSTOPB)  printf("c> CSTOPB  - 2 stop bits\n");
+# endif
+# ifdef CREAD
+    if (c & CREAD)   printf("c> CREAD   - enable recv\n");
+# endif
+# ifdef PARENB
+    if (c & PARENB)  printf("c> PARENB  - enable parity gen on output and chk on input\n");
+# endif
+# ifdef PARODD
+    if (c & PARODD)  printf("c> PARODD  - parity for in and out is odd\n");
+# endif
+# ifdef HUPCL
+    if (c & HUPCL)   printf("c> HUPCL   - hang up after last process\n");
+# endif
+# ifdef CLOCAL
+    if (c & CLOCAL)  printf("c> CLOCAL  - ignore modem control lines\n");
+# endif
+# ifdef CBAUD
+    if (c & CBAUD)   printf("c> CBAUD   - baud mask (non-POSIX)\n");
+# endif
+# ifdef CBAUDEX
+    if (c & CBAUDEX) printf("c> CBAUDEX - extra baud mask (non-POSIX)\n");
+# endif
+# ifdef CIBAUD
+    if (c & CIBAUD)  printf("c> CIBAUD  - input baud mask (non-POSIX)\n");
+# endif
+# ifdef CRTSCTS
+    if (c & CRTSCTS) printf("c> CRTSCTS - enable RTS/CTS control (non-POSIX)\n");
+# endif
+
+/* local mode constants */
+    c = s.c_lflag;
+# ifdef ISIG
+    if (c & ISIG)    printf("l> ISIG    - pass on INTR, QUIT, SUSP, DSUSP signals\n");
+# endif
+# ifdef ICANON
+    if (c & ICANON)  printf("l> ICANON  - enable canonical mode (buffers by line)\n");
+# endif
+# ifdef ECHO
+    if (c & ECHO)    printf("l> ECHO    - echo input\n");
+# endif
+# ifdef ECHOE
+    if (c & ECHOE)   printf("l> ECHOE   - if ICANON enable ERASE/WERASE\n");
+# endif
+# ifdef ECHOK
+    if (c & ECHOK)   printf("l> ECHOK   - if ICANON enable KILL\n");
+# endif
+# ifdef ECHONL
+    if (c & ECHONL)  printf("l> ECHONL  - if ICANON echo NL\n");
+# endif
+# ifdef NOFLSH
+    if (c & NOFLSH)  printf("l> NOFLSH  - disable flush on signals\n");
+# endif
+# ifdef TOSTOP
+    if (c & TOSTOP)  printf("l> TOSTOP  - send SIGTTOU when needed\n");
+# endif
+# ifdef IEXTEN
+    if (c & IEXTEN)  printf("l> IEXTEN  - enable input processing\n");
+# endif
+# ifdef ECHOCTL
+    if (c & ECHOCTL) printf("l> ECHOCTL - if ECHO Ctl-X echos as ^X (non-POSIX)\n");
+# endif
+# ifdef ECHOPRT
+    if (c & ECHOPRT) printf("l> ECHOPRT - if ICANON and IECHO print char as they are erased (non-POSIX)\n");
+# endif
+# ifdef ECHOKE
+    if (c & ECHOKE)  printf("l> ECHOKE  - if ICANON echo KILL by erasing line (non-POSIX)\n");
+# endif
+
+    printf("s> VMIN   %d\n", s.c_cc[VMIN]);
+    printf("s> VTIME  %d\n", s.c_cc[VTIME]);
+
+#endif
+
+    c = fcntl(fd, F_GETFL);
+    if (c & O_CREAT)     printf("f> O_CREAT     - create file\n");
+#ifdef O_EXCL
+    if (c & O_EXCL)      printf("f> O_EXCL      - fail to open existing file\n");
+#endif
+#ifdef O_NOCTTY
+    if (c & O_NOCTTY)    printf("f> O_NOCTTY    - cannot be controlling term\n");
+#endif
+#ifdef O_TRUNC
+    if (c & O_TRUNC)     printf("f> O_TRUNC     - truncate existing file\n");
+#endif
+#ifdef O_APPEND
+    if (c & O_APPEND)    printf("f> O_APPEND    - append mode\n");
+#endif
+#ifdef O_NONBLOCK
+    if (c & O_NONBLOCK)  printf("f> O_NONBLOCK  - non-blocking I/O\n");
+#endif
+#ifdef O_NDELAY
+    if (c & O_NDELAY)    printf("f> O_NDELAY    - non-blocking I/O\n");
+#endif
+#ifdef O_SYNC
+    if (c & O_SYNC)      printf("f> O_SYNC      - synchronous I/O\n");
+#endif
+#ifdef O_ASYNC  /* Solaris does not have this */
+    if (c & O_ASYNC)     printf("f> O_ASYNC     - asynchronous I/O - SIGIO\n");
+#endif
+#ifdef O_LARGEFILE
+    if (c & O_LARGEFILE) printf("f> O_LARGEFILE - allow large files\n");
+#endif
+#ifdef O_NOFOLLOW
+    if (c & O_NOFOLLOW)  printf("f> O_NOFOLLOW  - no sym links\n");
+#endif
+#ifdef O_DIRECTORY
+    if (c & O_DIRECTORY) printf("f> O_DIRECTORY - open directory\n");
+#endif
+#ifdef O_DIRECT
+    if (c & O_DIRECT)    printf("f> O_DIRECT    - user space buffers\n");
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                        TERMINAL SPECIFIC ROUTINES                        */
+
+/*--------------------------------------------------------------------------*/
+
+/* DBCK - diagnostic print of info for background determination */
+
+void dbck(void)
+   {int bg, pid, ppid, pgid, ptid;
+
+    pid  = getpid();
+    ppid = getppid();
+    pgid = getpgrp();
+    ptid = tcgetpgrp(fileno(stdin));
+    bg   = SC_is_background_process(pid);
+
+    printf("-> ppid(%d) ptid(%d) pgid(%d) pid(%d) background(%d)\n",
+	   ppid, ptid, pgid, pid, bg);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_RAW_STATE - set the RAW processing on the given descriptor
+ *                  - don't do anything else if you can't get the
+ *                  - parameters for the stream
+ *                  - this also weeds out descriptors (e.g. sockets
+ *                  - and pipes) for which this is inappropriate
+ *                  - (TTY's and PTY's need this stuff)
+ */
+
+int SC_set_raw_state(int fd, int trap)
+   {int rv, ok;
+
+    rv = FALSE;
+
+#ifdef TERMINAL
+
+    ok = (trap == TRUE) ? SC_ERR_TRAP() : 0;
+    if (ok == 0)
+
+# ifdef BSD_TERMINAL
+
+       {TERMINAL t;
+
+	rv = _SC_get_tty_attr(fd, &t);
+	if (rv > -1)
+	   {t.sg_flags |= RAW;
+
+	    rv = _SC_set_tty_attr(fd, &t, TRUE);
+	    if (rv < 0)
+	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - SC_SET_RAW_STATE",
+			errno);};};
+
+# else
+
+#  if 0
+       {TERMINAL t;
+
+	rv = _SC_get_tty_attr(fd, &t);
+	if (rv > -1)
+	   {cfmakeraw(&t);
+
+	    rv = _SC_set_tty_attr(fd, &t, TRUE);
+	    if (rv < 0)
+	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - SC_SET_RAW_STATE",
+			errno);};};
+#  else
+       rv = SC_set_io_attrs(fd,
+			    SC_NDELAY, SC_TERM_DESC,     TRUE,
+			    ICRNL,     SC_TERM_INPUT,    FALSE,
+			    IXON,      SC_TERM_INPUT,    FALSE,
+			    OPOST,     SC_TERM_OUTPUT,   FALSE,
+			    ISIG,      SC_TERM_LOCAL,    FALSE,
+			    ICANON,    SC_TERM_LOCAL,    FALSE,
+			    ECHO,      SC_TERM_LOCAL,    FALSE,
+			    ECHOE,     SC_TERM_LOCAL,    FALSE,
+			    ECHOK,     SC_TERM_LOCAL,    FALSE,
+			    IEXTEN,    SC_TERM_LOCAL,    FALSE,
+			    ECHOCTL,   SC_TERM_LOCAL,    FALSE,
+			    ECHOKE,    SC_TERM_LOCAL,    FALSE,
+			    CSIZE,     SC_TERM_CONTROL,  FALSE,
+			    PARENB,    SC_TERM_CONTROL,  FALSE,
+			    CS8,       SC_TERM_CONTROL,  TRUE,
+			    VMIN,      SC_TERM_CHAR,     0,
+			    VTIME,     SC_TERM_CHAR,     0,
+			    0);
+#  endif
+# endif
+
+    if (trap)
+       {SC_ERR_UNTRAP();};
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_COOKED_STATE - set the COOKED processing on the given descriptor
+ *                     - don't do anything else if you can't get the
+ *                     - parameters for the stream
+ *                     - this also weeds out descriptors (e.g. sockets
+ *                     - and pipes) for which this is inappropriate
+ *                     - (TTY's and PTY's need this stuff)
+ */
+
+int SC_set_cooked_state(int fd, int trap)
+   {int rv, ok;
+
+    rv = FALSE;
+
+#ifdef TERMINAL
+
+    ok = (trap == TRUE) ? SC_ERR_TRAP() : 0;
+    if (ok == 0)
+
+# ifdef BSD_TERMINAL
+       {TERMINAL t;
+
+	rv = _SC_get_tty_attr(fd, &t);
+	if (rv > -1)
+
+/* this is cooked */
+	   {t.sg_flags |= ( ECHO | CRMOD | CBREAK | TANDEM | ALLDELAY );
+
+	    rv = _SC_set_tty_attr(fd, &t, TRUE);
+	    if (rv < 0)
+	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - SC_SET_COOKED_STATE",
+			errno);};};
+# else
+
+       rv = SC_set_io_attrs(fd,
+			    ICRNL,     SC_TERM_INPUT,    TRUE,
+			    IXON,      SC_TERM_INPUT,    TRUE,
+			    OPOST,     SC_TERM_OUTPUT,   TRUE,
+			    ISIG,      SC_TERM_LOCAL,    TRUE,
+			    ICANON,    SC_TERM_LOCAL,    TRUE,
+			    ECHO,      SC_TERM_LOCAL,    TRUE,
+			    ECHOE,     SC_TERM_LOCAL,    TRUE,
+			    ECHOK,     SC_TERM_LOCAL,    TRUE,
+			    IEXTEN,    SC_TERM_LOCAL,    TRUE,
+			    ECHOCTL,   SC_TERM_LOCAL,    TRUE,
+			    ECHOKE,    SC_TERM_LOCAL,    TRUE,
+			    CSIZE,     SC_TERM_CONTROL,  TRUE,
+			    PARENB,    SC_TERM_CONTROL,  TRUE,
+			    CS8,       SC_TERM_CONTROL,  TRUE,
+			    VMIN,      SC_TERM_CHAR,     1,
+			    VTIME,     SC_TERM_CHAR,     1,
+			    0);
+# endif
+
+    if (trap)
+       {SC_ERR_UNTRAP();};
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_TERM_STATE - get the terminal state on the given descriptor
+ *                   - allocate and return a TERMINAL_STATE
+ *                   - containing the old state
+ *                   - don't do anything else if you can't get the
+ *                   - parameters for the stream
+ *                   - this also weeds out descriptors (e.g. sockets and
+ *                   - pipes) for which this is inappropriate (PTY's need
+ *                   - this stuff)
+ */
+
+void *SC_get_term_state(int fd, int size)
+   {TERMINAL_STATE *t;
+    void *rv;
+
+    t = NULL;
+
+#ifdef TERMINAL
+    {int st;
+
+     t = FMAKE(TERMINAL_STATE, "SC_GET_TERM_STATE:t");
+     t->fd        = fd;
+     t->full_info = TRUE;
+
+     st = _SC_get_tty_attr(fd, &t->term);
+     if (st < 0)
+        {SFREE(t);
+	 return(NULL);};
+
+# ifdef BSD_TERMINAL
+
+    if (ioctl(fd, TIOCGETC, &t->tch) < 0)
+       return(NULL);
+
+    if (ioctl(fd, TIOCGLTC, &t->ltc) < 0)
+       return(NULL);
+
+    if (ioctl(fd, TIOCLGET, &t->localmode) < 0)
+       return(NULL);
+
+/* Mac OS X does not implement this and complains only at runtime! */
+#  ifndef MACOSX
+    if (ioctl(fd, TIOCGETD, &t->discipline) < 0)
+       return(NULL);
+#  endif
+# endif
+
+      t->valid_size = size;
+      if (size == TRUE)
+	 {SC_set_term_size(fd, -1, -1, -1, -1);
+	  st = ioctl(fd, TIOCGWINSZ, &t->window_size);
+	  if (st < 0)
+	     {SFREE(t);
+	      return(NULL);};};};
+#endif
+
+    rv = t;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_TERM_STATE - set the terminal state on the given descriptor
+ *                   - don't do anything else if you can't get the
+ *                   - parameters for the stream
+ *                   - this also weeds out descriptors (e.g. sockets and
+ *                   - pipes) for which this is inappropriate (PTY's need
+ *                   - this stuff)
+ *                   - return TRUE iff successful
+ */
+
+int SC_set_term_state(void *pt, int trmfd)
+   {int fd, rv, st;
+    TERMINAL_STATE *t;
+    PFSignal_handler oh;
+
+    t  = (TERMINAL_STATE *) pt;
+    rv = FALSE;
+    oh = SC_signal(SIGTTOU, SIG_IGN);
+
+#ifdef TERMINAL
+
+    if (t != NULL)
+       {if (trmfd >= 0)
+	   fd = trmfd;
+        else
+	   fd = t->fd;
+
+	st = _SC_set_tty_attr(fd, &t->term, TRUE);
+	if (st >= 0)
+	   {rv = TRUE;
+
+# ifdef BSD_TERMINAL
+	    if (t->full_info)
+	       {if (ioctl(fd, TIOCSETC, &t->tch) < 0)
+		   rv = FALSE;
+
+		else if (ioctl(fd, TIOCSLTC, &t->ltc) < 0)
+		   rv = FALSE;
+
+		else if (ioctl(fd, TIOCLSET, &t->localmode) < 0)
+		   rv = FALSE;
+
+		else if (ioctl(fd, TIOCSETD, &t->discipline) < 0)
+		   rv = FALSE;};
+# endif
+
+	    if (t->valid_size == TRUE)
+	       {if (ioctl(fd, TIOCSWINSZ, &t->window_size) < 0)
+		   rv = FALSE;};};};
+
+#endif
+
+    SC_signal(SIGTTOU, oh);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_MPI_PROC_STR - copy the input string S into D replacing all occurences
+ *                  - of '\n' with '\n'TAG
+ *                  - return string D
+ *                  - this structure is predicated on the fact that
+ *                  - while messages can be constructed on the sender
+ *                  - in arbitrary pieces the receiver gets full lines
+ *                  - terminated by \n
+ */
+
+static char *_SC_mpi_proc_str(const char *s, int trm)
+   {char *tag, *pt, *d, *t, *pe;
+
+    d = NULL;
+
+    tag = getenv("SC_MPI_TAG_IO");
+    if (tag == NULL)
+       d = SC_dstrcat(d, (char *) s);
+
+    else
+       {if (s != NULL)
+	   {d = SC_dstrcat(d, tag);
+
+	    t = SC_strsavef((char *) s, "char*:_SC_MPI_PROC_STR:s");
+
+	    for (pt = t; TRUE; )
+	        {pe = strchr(pt, '\n');
+		 if (pe == NULL)
+		    {d = SC_dstrcat(d, pt);
+		     break;}
+		 else
+		    {*pe = '\0';
+		     d = SC_dstrcat(d, pt);
+		     d = SC_dstrcat(d, "\n");
+		     d = SC_dstrcat(d, tag);
+
+		     pt = pe + 1;};};
+
+	    SFREE(t);
+
+	    if (trm == TRUE)
+	       d = SC_dstrcat(d, SC_DEFEAT_MPI_BUG);};};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MPI_FPUTS - do MPI output according to POSIX standards
+ *              - with mpi-io-wrap this evades the MPI buffer flush
+ *              - bug
+ */
+
+int SC_mpi_fputs(const char *s, FILE *fp)
+   {int nc;
+    char *p;
+
+#ifdef HAVE_MPI
+
+    if (fp == stdout)
+       p = _SC_mpi_proc_str(s, TRUE);
+    else
+       p = SC_strsavef((char *) s, "char*:SC_MPI_FPUTS:s");
+#else
+    p = SC_strsavef((char *) s, "char*:SC_MPI_FPUTS:s");
+#endif
+
+    nc = SAFE_FPUTS(p, fp);
+
+    SFREE(p);
+
+    return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MPI_PRINTF - do MPI output according to POSIX standards
+ *               - with mpi-io-wrap this evades the MPI buffer flush
+ *               - bug
+ */
+
+int SC_mpi_printf(FILE *fp, char *fmt, ...)
+   {int nc;
+    char *s;
+
+    SC_VDSNPRINTF(TRUE, s, fmt);
+
+    nc = SC_mpi_fputs(s, fp);
+
+    SFREE(s);
+
+    return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MPI_FTN_SNPRINTF - do MPI output according to POSIX standards
+ *                     - with mpi-io-wrap this evades the MPI buffer flush bug
+ *                     - this prepares a buffer for Fortran output
+ *                     - Fortran supplies a trailing \n which we cannot control
+ */
+
+int SC_mpi_ftn_snprintf(char *bf, int nc, char *fmt, ...)
+   {char *s, *t;
+
+    SC_VDSNPRINTF(TRUE, s, fmt);
+
+    t = _SC_mpi_proc_str(s, FALSE);
+    strncpy(bf, t, nc);
+    nc = strlen(bf);
+
+    SFREE(s);
+    SFREE(t);
+
+    return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MPI_IO_SUPPRESS - send a special message to the receiver that is
+ *                    - interpreted to start suppressing subsequent untagged
+ *                    - output if ON is TRUE and resume processing output if
+ *                    - ON is FALSE
+ *                    - return the value of the prior suppress state
+ */
+
+int SC_mpi_io_suppress(int on)
+   {int rv;
+    char *s;
+
+    rv = SC_mpi_suppress(on);
+
+    if (on == TRUE)
+       s = "+SC_SUPPRESS_UNTAGGED_ON+\n";
+    else
+       s = "+SC_SUPPRESS_UNTAGGED_OFF+\n";
+
+    SAFE_FPUTS(s, stdout);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MPI_SUPPRESS - set the MPI IO suppress state to ST
+ *                 - legal values are 1 for ON, 0 for OFF, and -1 to query
+ *                 - return the prior state
+ *                 - if ST is -1 just return the current state
+ */
+
+int SC_mpi_suppress(int st)
+   {int rv;
+
+    if (_SC.suppress == -1)
+
+#ifdef HAVE_MPI
+       _SC.suppress = (getenv("SC_MPI_SUPPRESS_UNTAGGED") != NULL);
+#else
+       _SC.suppress = FALSE;
+#endif
+
+    rv = _SC.suppress;
+
+    if (st != -1)
+       _SC.suppress = st;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                    TERMINAL WINDOW SIZE ROUTINES                         */
+
+/*--------------------------------------------------------------------------*/
+
+#ifndef MACOSX
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_QUERY_STATE - set up the given descriptor
+ *                     - for nicely querying escape codes from the terminal
+ */
+
+static int _SC_set_query_state(int fd)
+   {int rv;
+
+    rv = SC_set_io_attrs(fd,
+			 SC_NDELAY, SC_TERM_DESC,     TRUE,
+
+			 ICANON,    SC_TERM_LOCAL,    FALSE,
+			 ECHO,      SC_TERM_LOCAL,    FALSE,
+
+			 CS8,       SC_TERM_CONTROL,  TRUE,
+
+			 VMIN,      SC_TERM_CHAR,     0,
+			 VTIME,     SC_TERM_CHAR,     0,
+			 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_GET_TERM_TIMEOUT - timeout waiting for terminal response */
+
+static void _SC_get_term_timeout(int sig)
+   {
+
+    LONGJMP(_SC.gtt, ABORT);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_GET_TERM_SIZE - read and parse the reply of terminal
+ *                   - in response to a width/height query
+ */
+
+static void _SC_get_term_size(int fd, int *pw, int *ph)
+   {int i, w, h, nc;
+    char s[MAXLINE];
+    char *t;
+
+    h = -1;
+    w = -1;
+
+/* we will wait one second to hear back from the terminal */
+    SC_timeout(2, _SC_get_term_timeout);
+
+    if (SETJMP(_SC.gtt) == 0)
+
+/* get the reply to the query from the terminal */
+       {for (i = 0; i < MAXLINE; )
+	    {nc = SC_read_sigsafe(fd, s+i, MAXLINE);
+	     if (nc > 0)
+	        i += nc;
+	     else if ((i > 0) && (strchr(s, 't') != NULL))
+	        break;
+	     SC_sleep(10);};
+
+	s[i] = '\0';
+
+/* parse out the width and height - throw away the sequence id */
+	t = SC_firsttok(s, ";\n");
+	t = SC_firsttok(s, ";\n");
+	h = SC_stoi(t);
+	t = SC_firsttok(s, ";t\n");
+	w = SC_stoi(t);};
+
+/* cancel the timer */
+    SC_timeout(0, _SC_get_term_timeout);
+
+    if (pw != NULL)
+       *pw = w;
+
+    if (ph != NULL)
+       *ph = h;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_TERM_SIZE - get the number of lines NR and columns NC
+ *                  - in the current program session
+ *                  - return TRUE iff successful
+ */
+
+int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
+   {int rv;
+
+#ifdef MACOSX
+
+    rv  = FALSE;
+
+#else
+
+    int fd, bg, act;
+    int pw, ph, cw, ch;
+    char *name, *s;
+    TERMINAL_STATE *ts;
+
+    rv  = FALSE;
+    bg  = SC_is_background_process(-1);
+    act = bg & 5;
+
+    if (act == 0)
+       {SC_putenv("TERM=xterm");
+
+/* open the actual terminal device */
+	fd   = fileno(stderr);
+	name = ttyname(fd);
+	if (name == NULL)
+	   name = "/dev/tty";
+
+	fd = open(name, O_RDWR | O_NDELAY | O_NOCTTY);
+
+	if (fd < 0)
+	   rv = FALSE;
+
+	else
+	   {ts = SC_get_term_state(fd, FALSE);
+
+/* set the terminal for nice querying */
+	    _SC_set_query_state(fd);
+
+/* send the code to report the pixel height and width of
+ * the terminal window: ESC[14t
+ */
+	    pw = -1;
+	    ph = -1;
+	    if ((ppr != NULL) || (ppc != NULL))
+	       {s = SC_dsnprintf(TRUE, "%c[14t", SC_ESC_CHAR);
+		SC_write_sigsafe(fd, s, strlen(s));
+                SFREE(s);
+
+		_SC_get_term_size(fd, &pw, &ph);
+		if (ppr != NULL)
+		   *ppr = ph;
+
+		if (ppc != NULL)
+		   *ppc = pw;
+
+		rv = TRUE;};
+
+/* send the code to report the character height and width of
+ * the terminal text area: ESC[18t
+ */
+	    cw = -1;
+	    ch = -1;
+	    if ((pcr != NULL) || (pcc != NULL))
+	       {s = SC_dsnprintf(TRUE, "%c[18t", SC_ESC_CHAR);
+		SC_write_sigsafe(fd, s, strlen(s));
+                SFREE(s);
+
+		_SC_get_term_size(fd, &cw, &ch);
+		if (pcr != NULL)
+		   *pcr = ch;
+
+		if (pcc != NULL)
+		   *pcc = cw;
+
+		rv = TRUE;};
+
+/* close the terminal */
+	    SC_set_term_state(ts, fd);
+	    close(fd);};};
+
+# if 0
+printf("-> (%d) set term size = %dx%d background(%d) ppid(%d) pgid(%d)\n",
+       getpid(), cw, ch, bg,
+       getppid(),
+       getpgrp());
+# endif
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPTERM - print the term size
+ *        - intended to be called under the debugger
+ */
+
+void dpterm(void)
+   {int cw, ch;
+
+    SC_get_term_size(&ch, &cw, NULL, NULL);
+
+    io_printf(stdout, "# rows = %d\n", ch);
+    io_printf(stdout, "# cols = %d\n", cw);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_TERM_SIZE - set the number of lines NR and columns NC of text
+ *                  - in the terminal session identified by FD
+ *                  - return TRUE iff successful
+ */
+
+int SC_set_term_size(int fd, int nr, int nc, int pw, int ph)
+   {int rv, pr, pc, pid;
+    char *s;
+    struct winsize w;
+
+    rv  = FALSE;
+    pid = getpid();
+
+    pr = pw;
+    pc = ph;
+
+/* query the terminal if reqested via specific nonsense request */
+    if ((nr == -1) && (nc == -1))
+       SC_get_term_size(&nr, &nc, &pr, &pc);
+    else
+       SC_get_term_size(NULL, NULL, &pr, &pc);
+
+    if ((0 < nr) && (0 < nc))
+
+/* try to set them using ioctls */
+       {rv = ioctl(fd, TIOCGWINSZ, &w);
+	if (rv != -1)
+	   {w.ws_row = nr;
+	    w.ws_col = nc;
+	    if ((0 < pr) && (0 < pc))
+	       {w.ws_xpixel = pc;
+		w.ws_ypixel = pr;};
+	    rv = ioctl(fd, TIOCSWINSZ, &w);};
+
+/* try to set them using LINES/COLUMNS environment variables */
+	s = SC_dsnprintf(FALSE, "LINES=%d", nr);
+	SC_putenv(s);
+	s = SC_dsnprintf(FALSE, "COLUMNS=%d", nc);
+	SC_putenv(s);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_IS_BACKGROUND - signal handler serving SC_IS_BACKGROUND_PROCESS */
+
+static void _SC_is_background(int sig)
+   {
+
+    longjmp(_SC.btt, 1);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_BACKGROUND_PROCESS - determine whether the process PID is
+ *                          - running in the background
+ *                          - if PID is -1 check the current process
+ *                          - the return value is a bit array
+ *                          -   set bit 1 if PID cannot write to its
+ *                          -   controlling terminal without incurring a
+ *                          -   a suspend signal
+ *                          -   set bit 2 if PID is different from the
+ *                          -   process group leader
+ *                          -   set bit 4 if PID is different from the
+ *                          -   terminal group ID
+ */
+
+int SC_is_background_process(int pid)
+   {int rv, fd, ppid, pgid, ptid;
+    PFSignal_handler oh;
+
+    if (pid == -1)
+       pid = getpid();
+    ppid = getppid();
+    pgid = getpgrp();
+    ptid = tcgetpgrp(fileno(stdin));
+
+    rv = 0;
+
+/* set bit 4 if terminal group id is different from the pid */
+    if (pid != ptid)
+       rv |= 4;
+
+/* set bit 2 if the parent is init or the process group id
+ * is different from the pid
+ */
+    if ((ppid == 1) || (pid != pgid))
+       rv |= 2;
+
+/* set bit 1 if we cannot write to the
+ * controlling terminal without getting SIGTTOU
+ */
+    oh = SC_signal(SIGTTOU, _SC_is_background);
+
+    if (SETJMP(_SC.btt) == 0)
+       {fd = fileno(stdout);
+	SC_set_io_attr(fd, TOSTOP, 0);}
+
+    else
+       rv |= 1;
+
+    SC_signal(SIGTTOU, oh);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_DISCONNECT_TTY - break the association with the controlling terminal */
+
+void SC_disconnect_tty(void)
+   {
+
+#ifdef HAVE_SYSV
+    if ((cp->ischild == TRUE) && (setsid() < 0))
+       SC_error(SC_NO_SETSID,
+		"COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
+#endif
+
+#ifdef BSD_TERMINAL
+    int fd;
+
+    fd = open("/dev/tty", O_RDWR);
+    if (fd >= 0)
+       {if (ioctl(fd, TIOCNOTTY, NULL) < 0)
+	   SC_error(SC_NO_TTY,
+		    "COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
+	close(fd);};
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IO_SUSPEND - have process suspend on I/O if FL is TRUE
+ *               - and proceed if FL is FALSE
+ */
+
+int SC_io_suspend(int fl)
+   {
+
+    if (fl == FALSE)
+       {SC_signal(SIGTTOU, SIG_IGN);
+	SC_signal(SIGTTIN, SIG_IGN);
+	SC_signal(SIGTSTP, SIG_IGN);}
+    else
+       {SC_signal(SIGTTOU, SIG_DFL);
+	SC_signal(SIGTTIN, SIG_DFL);
+	SC_signal(SIGTSTP, SIG_DFL);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

@@ -1,0 +1,7 @@
+variable a: static int
+variable b: double
+variable c: short
+Function foo requires:
+   variable: double b
+Function main requires:
+   function: double foo

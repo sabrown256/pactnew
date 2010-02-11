@@ -1,0 +1,48 @@
+#!/bin/csh -f
+#
+# TO-TOBY - build a TOBY database in order to look at call trees
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Which = "$cwd/pwhich"
+set Exe   = `$Which toby`
+
+if (-x "$Exe") then
+   set Arch = `./cfgman use`
+   set Base = $cwd:h
+   set Root = $Base/dev/$Arch/lib
+   set Libs = `ls $Root`
+
+   set Tmp    = tobydb
+   set TobyDB = "."
+
+   rm -rf $Tmp
+   if (!(-d $Tmp)) then
+      mkdir $Tmp
+   endif
+
+   set Opt  = ( -d $TobyDB )
+   set Oper = "-rm"
+
+   foreach lib ($Libs)
+      set Name = `expr $lib : 'lib\(.*\)\.a'`
+
+      echo "Processing package $Name"
+      cp $Root/$lib $Tmp
+      pushd $Tmp >& /dev/null
+
+      ar -x $lib
+      toby $Oper $Opt -p $Name *.o
+      rm -f *.o $lib
+
+      popd >& /dev/null
+   end
+else
+   echo "The program toby is not on your path"
+endif
+
+exit($status)

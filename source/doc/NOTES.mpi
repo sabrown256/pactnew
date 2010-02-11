@@ -1,0 +1,98 @@
+
+These notes document some of the steps taken in PACT to overcome
+serious defects in MPI I/O handling.
+
+1) MPI Output
+
+   Virtually all MPI vendors take over I/O from the standard
+   system libraries and force line buffering on MPI applications.
+   The unwarranted presumption is that application developers don't
+   know how to manage I/O in distributed parallel applications and
+   that it is essential that only full lines of text may be printed
+   at a time.  It is true that a jumble of parts of messages from
+   different processes at different times would be intelligible.
+   The MPI solution precludes a developer who know what s/he is doing
+   from controlling I/O as needed.
+
+   The solution adopted in PACT consists of two parts.  First, in
+   the application use SC_mpi_printf or SC_mpi_fputs rather than
+   printf or fputs (or fprintf to stdout or stderr).  This allows
+   PACT to do whatever is necessary to overcome the MPI defects
+   and do it in one controlled place.  Second, use a program,
+   mpi-io-wrap, to run the application as a child process.  Mpi-io-wrap
+   and SC_mpi_printf (also SC_mpi_fputs - all remarks made about
+   one apply to the other and only one will be mentioned subsequently)
+   surround the MPI I/O on both ends and can therefore manipulate the
+   I/O stream to work around its defects.
+
+2) Line buffering
+
+   To fix the MPI line buffering defect, SC_mpi_printf appends a
+   unique sequence of characters ending in a newline to each output
+   request.  This sequence will be referred to as the EOM tag - end
+   of message tag.  Because the EOM tag ends in a newline the
+   resulting output request is immediately printed by MPI.
+   Mpi-io-wrap examines its child process's output stream for the
+   EOM tag and simply removes the tag, and prints the message to
+   its stdout.  This reconstitutes the intended output stream.
+
+3) Unwanted messages from MPI
+
+   Another problem with MPI is the fact that some vendors cannot
+   resist insisting that their front end must insert its own
+   messages into the output stream.  Some in fact are so conversational
+   that there is no way to filter such messages from the output
+   stream, i.e. there is no recognizable signature in the messages
+   from the front end on which to base a filter.
+
+   Since we have mpi-io-wrap and SC_mpi_printf already in place we
+   can put them to work to solve this problem.  The solution is
+   to have SC_mpi_printf prepend a unique tag to each message it
+   sends out and to have mpi-io-wrap suppress any message that does
+   not have the tag.  Messages from MPI and front ends will not have
+   the tag and so will be suppressed.
+
+   In PACT we recognize that there may be circumstances in which the
+   application cannot use SC_mpi_printf (for example if the application
+   itself runs a child process such as a shell which does its own
+   printing).  Therefore mpi-io-wrap also has to have a measure of
+   control over when to suppress unwanted messages and when not to.
+   This means that there has to be some bi-directional communication
+   between mpi-io-wrap and SC_mpi_printf.
+
+   On the application end there are two additional functions,
+   SC_mpi_io_suppress and SC_mpi_suppress, which send specially tagged
+   messages to mpi-io-wrap turning on and off message suppression and
+   informing the application which state mpi-io-wrap is in.  These two
+   function solely by sending tagged message to mpi-io-wrap through the
+   standard parent/child I/O chain - no special devices or communication
+   channels are used here.
+
+   An application developer may want to use mpi-io-wrap and SC_mpi_printf
+   to handle the line buffering problem but not want to use them to
+   suppress unwanted messages.  An environment variable, SC_MPI_TAG_IO,
+   is used to control this mechanism.  If this environment variable
+   exists, its value is used as the tag that SC_mpi_printf prepends to
+   messages.  If it is does not exist then no message suppression is
+   done.  Mpi-io-wrap sets this variable by default.  The -t option
+   to mpi-io-wrap tells it to not set the variable.  The variable could
+   however be set by the user of mpi-io-wrap.
+
+   If you are an application developer who want to use this machinery,
+   there are two things to keep in mind:
+
+   1) the messages have to flow from the application process up through
+      any number of intermediate processes to mpi-io-wrap via the
+      standard communication channels between processes (stdout, stderr,
+      and stdin).  Pipes, sockets, or PTY's may be used, but direct
+      writes to terminal devices will prevent this mechanism from working.
+
+   2) the SC_MPI_TAG_IO environment variable must be set for the
+      application at the end of the process chain.  Normal fork/exec
+      operations will ensure that this happens.  However, if you have
+      an interaction with some kind of batch system in the process
+      chain and it requires that a script be written which the batch
+      system will execute, this could result in the environment variable
+      not being passed on.  The likely fix is to write the batch script
+      so that it sets SC_MPI_TAG_IO.
+

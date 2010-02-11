@@ -1,0 +1,23 @@
+#!/bin/csh -f
+#
+# PDBLS - list the contents of a PDB file
+#
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Root = `echo $SCHEME`
+
+if ($#argv != 1) then
+   echo ""
+   echo "Usage: pdbls <pdb-file>"
+   echo ""
+   exit(0)
+endif
+
+sx -l $Root/sxview.scm \(pdbls $1\)
+
+exit($status)

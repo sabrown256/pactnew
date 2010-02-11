@@ -1,0 +1,275 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+Notes on the SC_exec family of functions
+
+I) Variants
+
+      filtering the output using the filter file FNAME
+
+      SHOW governs how commands are displayed:
+         0 do not echo command
+         1 echo commands not begining with '@'
+         2 echo all commands
+
+      IGNORE controls error behavior
+         0 do not execute more commands after one fails
+         1 execute all commands
+
+      use SHELL
+
+      the commands are attempted NA times with a random
+      time upto 30 seconds between attempts
+      if a command fails after NA attempts do not process
+      any remaining commands
+
+      command output in OUT and
+      no line in OUT will have a newline except at the very end
+
+Server side:
+
+int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
+		   int debug)
+      execute each command in from stdin asynchronously
+      and with persistence on the local host
+      a NULL command causes no further commands to be accepted
+      return TRUE iff all commands succeed
+
+Client side:
+
+int SC_exec_async(char *shell, char **cmnds, char **dirs,
+		  char *consh, char **conenv, int nc,
+		  char *lname, char *fname,
+		  int na, int show, int ignore, log)
+      execute each command in CMNDS under SHELL asynchronously
+      and with persistence
+      send output to file LNAME as well as stdout
+      a word about shells:
+         there is the connection shell CONSH and
+         there is the command SHELL
+      they do not have to be the same
+      and are not in general
+      CONENV contains the environment variables to
+      be set in the connection
+      if TRUE the LOG flag causes the internal logs to be
+      printed to the terminal on completion
+      the array of commands is terminated by a NULL entry
+      return TRUE iff all commands succeed
+
+
+int SC_exec_async_s(char *shell, char **env,
+		    char **sysl, char **cmnds, char **dirs,
+		    int to, char *fname, int na, int show, int ignore)
+      execute each command in CMNDS under SHELL asynchronously
+      and with persistence on each system in SYSL
+      filtering the output using the filter file FNAME
+      SHOW governs how commands are displayed:
+         0 do not echo command
+         1 echo commands not begining with '@'
+         2 echo all commands
+      IGNORE controls error behavior
+         0 do not execute more commands after one fails
+         1 execute all commands
+      the array of commands is terminated by a NULL entry
+      the commands are attempted NA times with a random
+      time upto 30 seconds between attempts
+      if a command fails after NA attempts do not process
+      any remaining commands
+      return TRUE iff all commands succeed
+      this version does one SSH per command
+
+
+int SC_exec_async_h(char *shell, char **env,
+		    char **hstl, char **cmnds, char **dirs,
+		    int to, char *fname, int na, int show, int ignore)
+      execute each command in CMNDS under SHELL asynchronously
+      and with persistence on each host in HSTL
+      filtering the output using the filter file FNAME
+      SHOW governs how commands are displayed:
+         0 do not echo command
+         1 echo commands not begining with '@'
+         2 echo all commands
+      IGNORE controls error behavior
+         0 do not execute more commands after one fails
+         1 execute all commands
+      the array of commands is terminated by a NULL entry
+      the commands are attempted NA times with a random
+      time upto 30 seconds between attempts
+      if a command fails after NA attempts do not process
+      any remaining commands
+      return TRUE iff all commands succeed
+      this version does one SSH per command
+
+
+int SC_exec(char ***out, char *cmnd, char *shell, int to)
+      the SCORE equivalent of the system() command
+      use SHELL if non-NULL
+      otherwise use value of SHELL environment variable
+      wait no more than TO milliseconds if TO > 0
+      if TO == -1 wait as long as it takes
+      return command output in OUT and
+      no line in OUT will have a newline except at the very end
+      return the exit status
+
+
+int SC_execa(char ***out, char *shell, int to, char *fmt, ...)
+      alternate form of SC_exec
+      the command line is derived from the variable arg list
+      use SHELL if non-NULL
+      otherwise use value of SHELL environment variable
+      wait no more than TO milliseconds if TO > 0
+      if TO == -1 wait as long as it takes
+      return command output in OUT and
+      no line in OUT will have a newline except at the very end
+      return the exit status
+
+
+int SC_execs(char *out, int nc, char *shell, int to, char *fmt, ...)
+      alternate form of SC_exec
+      the command line is derived from the variable arg list
+      use SHELL if non-NULL
+      otherwise use value of SHELL environment variable
+      wait no more than TO milliseconds if TO > 0
+      if TO == -1 wait as long as it takes
+      a single line of output of no more than NC characters
+      is returned in OUT iff the command complete within TO seconds
+      if TO is less than 0 the timeout is infinite
+      return the exit status or -1 on timeout
+
+
+int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
+		     char *lname, char *fname, int na, int show,
+		     int ignore, int dmp)
+      execute each command in CMNDS with persistence
+      using SHELL
+      send output to file LNAME as well as stdout
+      filtering the output using the filter file FNAME
+      SHOW governs how commands are displayed:
+         0 do not echo command
+         1 echo commands not begining with '@'
+         2 echo all commands
+      IGNORE controls error behavior
+         0 do not execute more commands after one fails
+         1 execute all commands
+      DMP causes all internal logs to be dumped
+      the array of commands is terminated by a NULL entry
+      the commands are attempted NA times with a random
+      time upto 30 seconds between attempts
+      if a command fails after NA attempts do not process
+      any remaining commands
+      return TRUE iff all commands succeed
+
+-------------------------------------------------------------------------------
+
+SCORE IPC Model
+
+    Use a structure called a PROCESS to contain all state info relating to
+    one child process.
+
+    FORK, EXEC, and WAITPID are the system level calls used to launch
+    and handle/verify completion of the child (at least on UNIX variant
+    operating systems).  SCORE also requires possession of the handler for
+    SIGCHLD while it is in control of child processes.  It relies heavily on
+    the operating system to deliver SIGCHLD interrupts correctly.  In this
+    way it is possible for a program to manage many, many child processes
+    executing asynchronously.
+
+    Communication between the parent and child may be handled using pipes,
+    sockets, and pseudo-terminals.  Each has its advantages and disadvantages
+    and each has proven invaluable in one context or another.  SCORE will
+    temporarily grab the handler for SIGPIPE when it is doing I/O between
+    the parent and child processes.  This greatly enhances its robustness
+    and fault tolerance.
+
+    Points:
+
+    1) because waitpid is like a delta function (delivering the termination
+       information of a child process only one time), coordinating multiple
+       child processes with interrupts flying about is very tricky.
+
+       SCORE implements two wrapper functions that effectively give a
+       step function view of processes (i.e. when a child terminates its
+       termination info is available for the life of the application).  First,
+       is:
+
+          int SC_child_status(int pid, int *pcnd, int *psts)
+
+       and second is:
+
+          void SC_save_exited_children(void)
+
+       The former is mainly aimed at capturing information about a
+       particular child process while the latter captures any available
+       child termination(s).
+
+       The function
+
+          int SC_process_status(PROCESS *pp)
+
+       lets the application get the status of the specified process at
+       any time.  It is built on the foundation provided by the above two
+       functions.
+
+       Why we care about the persistence: setting up to monitor a child
+       process is a layered thing: initializing pipes/sockets/pty; forking;
+       each process completing its setup of the I/O channels (e.g. dup2).
+       We are not fully ready to handle a waitpid until every part of
+       setup is complete.  However, sometimes the child finishes and we
+       get the interrupt before we are ready.  By saving the state, we
+       can return to look after we are fully prepared to act on the
+       information that the waitpid returned.
+
+    2) the interrupt handler for SIGCHLD is established before a FORK
+       because the child can complete before the parent returns from the
+       FORK.
+
+    3) SCORE uses poll or select to monitor the file descriptors of the
+       pipe, socket, or PTY between the parent and child.  This permits
+       the I/O to be interrupt driven as well.  In practice, when managing
+       multiple children, interrupt driven I/O seems to work very unreliably.
+       In any event, a parent process managing many children can spend
+       much of it life asleep waiting for some sort of event to wake it
+       up and do its work.  This make for applications that play well with
+       others on time shared hosts as well as dedicated work stations.
+
+    4) at the level of the SC_exec functions, SCORE looks at the commands
+       specified and determines whether it can execute them without the
+       shell.  It is a considerable savings of system resources to avoid
+       spawning extra processes and it allows SCORE to be less subject to
+       bad behavior from shells on heavily loaded systems.  (Much more to
+       say here).
+
+
+SC_EXEC Architecture
+
+   The SC_exec family of functions take one or more commands.  A command
+   can be defined as:
+
+     <command>          := <simple command> | <compound command>
+     <simple command>   := specification of execution of one process
+     <compound command> := ( <simple command> [; <simple command>] )
+
+   Although some members of the SC_exec family do asynchronous execution
+   of commands, the parts of a compound commands (often referred to as
+   tasks) must be run sequentially in the specified order.
+
+   Each simple command or task is examined to determine whether or not
+   a shell is needed to run it.  If a command contains syntax such as
+   '*.c' the specified shell will be used to run the command.  The
+   SC_exec family of functions:
+
+     1) handle any number of command line arguments
+     2) do I/O redirections
+     3) do 'echo', 'sleep', 'cd' without spawning a process
+
+   The SC_exec family of functions do not:
+
+     1) handle wild card expansions such as '*'
+     2) handle commands which are pipe together
+     3) handle environment variable expansions
+
+   In the these cases the commands are handed to the specified shell
+   to be executed.
+

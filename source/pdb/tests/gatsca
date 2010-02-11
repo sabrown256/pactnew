@@ -1,0 +1,39 @@
+#!/bin/csh -f
+#
+# GATSCA - PDB gather/scatter test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set tst = $1
+
+NoteD $LogF ""
+NoteD $LogF "                    PDB Gather/Scatter Test ............ "
+Note $LogF ""
+
+set UTime = `$TIMER -r`
+if ("$Valgrind" == "") then
+   ftee $LogF $CFE $BinDir/pdgsts -v $tst
+   set xstatus = $status
+else
+   ftee $LogF $Valgrind $BinDir/pdgsts -v $tst |& \
+   grep "ERROR SUMMARY:"                      |& \
+   awk '{ print $4 }'   >&! $Tmp
+   set xstatus = `cat $Tmp`
+	 flog $LogF $RM $Tmp
+endif
+set ETime = `$TIMER -b $UTime`
+
+if ($xstatus != 0) then
+   NoteD $LogF "                    PDB Gather/Scatter Test ............ FAILED ($xstatus/$ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    PDB Gather/Scatter Test ............ PASSED ($ETime)"
+endif
+
+exit($Err)

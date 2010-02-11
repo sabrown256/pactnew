@@ -1,0 +1,191 @@
+#!/bin/csh -f
+#
+# GEN-CFG - generate a config file from a name
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Err  = 0
+set cfg  = ""
+set vrb  = FALSE
+set flst = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -f:
+           shift
+           set flst = ( $flst $1 )
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: gen-cfg [-f <feature>[,<feature>]*] [-h] [-v] <name>"
+           echo "  h   this help message"
+           echo "  v   verbose mode"
+           echo ""
+           exit(1)
+      case -v:
+           set vrb = TRUE
+           breaksw
+      default:
+           set cfg = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($?CCompiler == 0) then
+   setenv CCompiler  gcc
+endif
+
+set flst = ( `echo "$flst" | sed 's/,/ /g'` )
+
+if ("$cfg" == "") then
+   echo "No name specified - exiting"
+   exit(1)
+endif
+
+set lsite     = ""
+set ConfigDir = ""
+if ($?SYS_SITE == 1) then
+   set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
+   set ConfigDir = ( $ConfigDir local/$lsite )
+endif
+set ConfigDir = ( $ConfigDir local std )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set features = ( `echo $cfg | sed 's/-/ /g'` )
+
+set croot = ""
+set ok    = FALSE
+@ i = $#features
+while (($i > 0) && ($ok == FALSE))
+   set lname = `echo $features[1-$i] | sed 's/ /-/g'`
+   foreach d ($ConfigDir)
+      if (-f $d/$lname) then
+         set croot = $d/$lname
+         set ok    = TRUE
+         break
+      endif
+   end
+   @ i = $i - 1
+end
+
+@ i = $i + 1
+set features = ( $features[$i-] )
+
+if ($vrb == TRUE) then
+   echo "Config directories: $ConfigDir"
+   echo "Root config file:   $croot"
+   echo "Feature list:       $features"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check list of features and setup environment
+
+set bits    = ""
+set pthread = FALSE
+set openmp  = FALSE
+set shared  = FALSE
+set mpi     = FALSE
+set python  = FALSE
+set pydir   = ""
+
+foreach i ($features)
+   switch ($i)
+      case 32:
+      case 64:
+           set bits = $i
+           breaksw
+      case t:
+           set pthread = TRUE
+           breaksw
+      case s:
+           set openmp = TRUE
+           breaksw
+      case sl:
+           set shared = TRUE
+           breaksw
+      case mpi:
+           set mpi = TRUE
+           breaksw
+      case py:
+           set python = TRUE
+           breaksw
+   endsw
+end
+
+if (($pthread == TRUE) && ($openmp == TRUE)) then
+   echo "pthread and openmp are mutually exclusive options - pick one"
+   exit(1)
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set arch = `system-id`
+set droot = gen/$arch
+if (!(-d $droot)) then
+   mkdir -p $droot
+endif
+
+set Tmp = $droot/$cfg
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# generate a config file from scratch
+
+if ("$croot" == "") then
+
+   if ($vrb == TRUE) then
+      echo "Generate from scratch"
+   endif
+
+   source write/cfg-base
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# use an existing config file
+
+else if ("$features" == "") then
+
+   if ($vrb == TRUE) then
+      echo "Use existing config $croot"
+   endif
+
+   set Tmp = $croot
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# copy an existing config file which can be used as a base
+
+else
+   if ($vrb == TRUE) then
+      echo "Start with existing config $croot"
+   endif
+
+   rm -f $Tmp
+   cp $croot $Tmp
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+source write/cfg-features
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo "$Tmp"
+
+exit($Err)
+

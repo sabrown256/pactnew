@@ -1,0 +1,280 @@
+#!/bin/csh -f
+#
+# ENV-MIO - write the ENV-MIO file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+source $ScrDir/csh-subroutines
+HAVE_SUBROUTINES
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    Separator $Log
+    NoteD $Log "   MIO specifications - env-mio"
+
+    set FOUT = $IncDir/env-mio
+
+    flog $Log $RM $FOUT
+    flog $Log touch $FOUT
+
+    Note $FOUT "#"
+    Note $FOUT "# ENV-MIO - installation dependent specifications for MIO"
+    Note $FOUT "#         - configuration defined by $Sys"
+    Note $FOUT "#"
+    Note $FOUT ""
+
+    set lccexe = `pwhich $Cfe_CC_Exe`
+    if (-x "$lccexe") then
+       set CCBin = $lccexe:h
+    else
+       set CCBin = none
+    endif
+
+    set lfcexe = `pwhich $Cfe_FC_Exe`
+    if (-x "$lfcexe") then
+       set FCBin = $lfcexe:h
+    else
+       set FCBin = none
+    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILER - generate the compiler info
+
+    Note $FOUT '# COMPILER specifications'
+    Note $FOUT ''
+
+    set cmplib = ""
+    set lnuma  = ""
+
+    set lbits = $Bits
+    set lgnu  = ""
+    if (($CPU == ia64) || ("$Arch" =~ osx-10.3-*)) then
+       set lbits = ""
+    else if ("$Arch" =~ osx-10.3-*) then
+       set lbits = ""
+    else if ($?GNURoot == 1) then
+       set lgnu = $GNURoot
+    endif
+
+    if ($?COMPILER_GNU_VERSION == 1) then
+       set PACTSpec = /gnu
+       set CmpBin   = $GNURoot/bin
+       set cmplib   = $GNURoot/$LIB
+       Note $FOUT 'VMake += COMPILER_GNU_VERSION COMPILER_GNU_PATH $@'
+       Note $FOUT 'VEnv  += COMPILER_GNU_VERSION COMPILER_GNU_PATH $@'
+       Note $FOUT ''
+       Note $FOUT "COMPILER_GNU_VERSION = $COMPILER_GNU_VERSION"
+       Note $FOUT "COMPILER_GNU_PATH    = $lgnu"
+
+    else if ($?COMPILER_PGI_VERSION == 1) then
+       set PACTSpec = /pgi
+       set cmplib   = $PGRoot/lib
+       set lnuma    = $NUMA
+       Note $FOUT 'VMake += COMPILER_PGI_VERSION NUMA $@'
+       Note $FOUT 'VEnv  += COMPILER_PGI_VERSION $@'
+       Note $FOUT ''
+       Note $FOUT "COMPILER_PGI_VERSION = $COMPILER_PGI_VERSION"
+       Note $FOUT "NUMA                 = $NUMA"
+
+    else if ($?COMPILER_IC_VERSION == 1) then
+       set PACTSpec = /intel
+       set cmplib   = $ICRoot/lib
+       Note $FOUT 'VMake += COMPILER_IC_VERSION $@'
+       Note $FOUT 'VEnv  += COMPILER_IC_VERSION $@'
+       Note $FOUT ''
+       Note $FOUT "COMPILER_IC_VERSION = $COMPILER_IC_VERSION"
+
+# crap Solaris cannot handle long variable names so bail now
+    else if ($HostOS == SunOS) then
+       Note $FOUT ''
+
+    else
+       if ($?COMPILER_PATH_VERSION == 1) then
+          set PACTSpec = /path
+          if ("$Bits" == 32) then
+             set cmplib = ${PSRoot}:${PSRoot}/32
+          else
+             set cmplib = $PSRoot
+          endif
+          Note $FOUT 'VMake += COMPILER_PATH_VERSION $@'
+          Note $FOUT 'VEnv  += COMPILER_PATH_VERSION $@'
+          Note $FOUT ''
+          Note $FOUT "COMPILER_PATH_VERSION = $COMPILER_PATH_VERSION"
+       endif
+    endif
+
+    Note $FOUT "Path += $CCBin"
+    Note $FOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SYSTEM - generate the System group
+
+    Note $FOUT '# PACT SYSTEM specifications'
+    Note $FOUT ''
+
+    if ($InstBase == none) then
+       set proot = $RootDir
+    else
+       set proot = $InstBase
+    endif
+    set pvers = `cat .pact-version`
+
+    set lrpath = `features/rpath -o list`
+
+    Note $FOUT 'CFE           = '$CFE
+    Note $FOUT 'PFE           = '$PFE
+    Note $FOUT 'CROSS_COMPILE = '$CROSS_COMPILE
+    Note $FOUT 'VMake        += CFE PFE CROSS_COMPILE'
+
+# NOTE: PathScale/Intel build of Basis/MPPL requires this
+    if ("$cmplib" != "") then
+       Note $FOUT 'RPATH = '$cmplib' $@'
+    endif
+    Note $FOUT ''
+
+    Note $FOUT 'System : pact {'
+    Note $FOUT '  PACT          = '$proot
+    Note $FOUT '  PACTRoot      = '$proot
+    Note $FOUT '  PACTVersion   = '$pvers
+    Note $FOUT '  PACTLibs      = -lpdb -lpml -lscore '${LD_Lib}
+    Note $FOUT '  PACTMDGL      = '${LD_MDGLib}
+    Note $FOUT '  PACTMDL       = '${LD_Lib}
+    Note $FOUT '  VMake         = PACT PACTRoot PACTVersion PACTMDGL PACTMDL PACTLibs'
+    Note $FOUT '  VEnv          = PACT'
+    Note $FOUT '}'
+    Note $FOUT ''
+
+    Note $FOUT 'Tool : config_pact {'
+    Note $FOUT '  AddressSize = '$lbits
+    Note $FOUT '}'
+    Note $FOUT ''
+
+    if ($CCBin != none) then
+       Note $FOUT 'Tool : cc_pact {'
+       Note $FOUT '  ToolClass    = CGroup'
+       Note $FOUT '  BinDir       = '$CCBin
+       Note $FOUT '  LibDir       = '$cmplib
+       Note $FOUT '  Exe          = '$Cfe_CC_Exe
+
+# NOTE: eventually remove this when Lee says so
+       Note $FOUT '  MPI_Compiler = '$CC_Exe
+       Note $FOUT '  MPI_Exe      = '$CC_Exe
+       Note $FOUT '  Flags        = '$Cfe_CC_Flags
+       Note $FOUT '  LXFlags      = '$Lex_Flags
+       Note $FOUT '  AddressSize  = '$lbits
+       Note $FOUT '  Numa         = '$lnuma
+       Note $FOUT '}'
+       Note $FOUT ''
+    endif
+
+    if ($FCBin != none) then
+       Note $FOUT 'Tool : fc_pact {'
+       Note $FOUT '  ToolClass    = FGroup'
+       Note $FOUT '  BinDir       = '$FCBin
+       Note $FOUT '  LibDir       = '$cmplib
+       Note $FOUT '  Exe          = '$Cfe_FC_Exe
+
+# NOTE: eventually remove this when Lee says so
+       Note $FOUT '  MPI_Compiler = '$FC_Exe
+       Note $FOUT '  MPI_Exe      = '$FC_Exe
+       Note $FOUT '  Flags        = '$Cfe_FC_Flags
+       Note $FOUT '  AddressSize  = '$lbits
+       Note $FOUT '  Numa         = '$lnuma
+       Note $FOUT '}'
+       Note $FOUT ''
+    endif
+
+    Note $FOUT 'Tool : lib_pact {'
+    Note $FOUT '  ToolClass   = LibGroup'
+    Note $FOUT '  LibFlags    = -r'
+    Note $FOUT '  ARFlags     = '$AR_Flags $AR_IFlag
+    Note $FOUT '  AddressSize = '$lbits
+    Note $FOUT '}'
+    Note $FOUT ''
+
+    Note $FOUT 'Library : pact {'
+    Note $FOUT '  Archives = pgs ppc pdb pml score'
+    Note $FOUT '  LibPaths = '$proot/lib
+    Note $FOUT '  IncPaths = '$proot/include
+    Note $FOUT '  LDFlags  = '$LD_Lib $LD_MDGLib
+    Note $FOUT '  RPaths   = '$lrpath
+#    if ("$cmplib" != "") then
+#       Note $FOUT '  RPaths   = '${cmplib}:/usr/X11R6/${LIB}:/usr/${LIB}
+#    else
+#       Note $FOUT '  RPaths   = '/usr/X11R6/${LIB}:/usr/${LIB}
+#    endif
+    Note $FOUT '}'
+    Note $FOUT ''
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MPI - generate MPI configuration info
+
+    if ("$LD_DPLib" != "") then
+       Note $FOUT '# MPI specifications'
+       Note $FOUT ''
+
+       if ($?MPIBin == 1) then
+          Note $FOUT 'Path = '${MPIBin}' $@'
+       endif
+       Note $FOUT ''
+
+       set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
+
+# more convenient access to include path for mio
+       Note $FOUT "IncMPI = $linc"
+
+       if ($CCBin != none) then
+          Note $FOUT 'CGroup : cc_pact_mpi {'
+          Note $FOUT '  MPI_Flags = -I'$linc
+          Note $FOUT '}'
+          Note $FOUT ''
+       endif
+
+       if ($FCBin != none) then
+          Note $FOUT 'FGroup : fc_pact_mpi {'
+          Note $FOUT '  MPI_Flags = -I'$linc
+          Note $FOUT '}'
+          Note $FOUT ''
+       endif
+
+       set lar = ""
+       foreach i ($LibMPI)
+          if ("$i" =~ \-L*) then
+             continue
+          else if ("$i" =~ \-l*) then
+             set lar = ( $lar `echo "$i" | sed 's/-l//'` )
+          endif
+       end
+       Note $FOUT 'Library : lib_pact_mpi {'
+       Note $FOUT '  Archives = '$lar
+       Note $FOUT '  LibPaths = '${MPILib}
+       Note $FOUT '  RPaths   = '${MPILib}
+       Note $FOUT '}'
+       Note $FOUT ''
+
+    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

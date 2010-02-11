@@ -1,0 +1,70 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# package list
+# except for psh and scripts, ordered by number of lines of code
+# for parallel load balancing
+pkg psh scripts
+pkg pgs score pdb pml sx python
+pkg scheme panacea ultra ppc scc
+
+bin atdbg do-net detect pcexec ps-diff ncpu scheme sx
+bin toul ultra mpi-io-wrap ptime dmnz propr rpath
+bin hserve fcscan pcsh do-run
+
+lib libpanacea.a libpdb.a libpgs.a libpml.a libppc.a
+lib libpsmm.a libscheme.a libscore.a libsx.a
+
+inc cpyright.h scconfig.h scdecls.h
+inc f77std.h f90kinds.inc f90types.h
+inc score.h scstd.h scunix.h scwin32.h scbgl.h
+inc sclnx.h scosx.h sccyg.h scaix.h scsol.h schpux.h scirix.h
+inc scope_array.h scope_hash.h scope_io.h
+inc scope_make.h scope_mem.h scope_mpi.h scope_proc.h
+inc scope_thread.h scope_term.h scope_typeh.h
+inc scope_lex.h sclexan.h pml.h scope_complex.h
+inc pdb.h pdform.h pgs.h scope_x11.h scope_cgm.h scope_raster.h ppc.h
+inc panace.h scheme.h syntax.h sx.h
+inc do-run-db
+
+f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
+f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod
+f90 scoretypes.mod sx.mod
+
+scm annotate.scm binedit.scm compare.scm consts.scm csynt.scm
+scm fsynt.scm func.scm exec.scm help.scm lang.scm
+scm msynt.scm netcdf.scm panabgc.scm
+scm panache.scm panagc.scm panbgc.scm panint.scm panpgc.scm
+scm ezn.scm pdbvbatch.scm pdbvcmd.scm pdbvdat.scm pdbvdemo.scm
+scm pdbview.pui pdbview.rc pdbview.scm pdbvio.scm pdbvplt.scm
+scm pdbvxmpl.scm pdbvthemes.scm nature.scm
+scm gcel.scm vcel.scm runt.scm rmath.scm slib.scm spokes.scm
+scm sxcomp.scm sxdm.scm sxview.scm synon.scm toolbox.scm
+scm tpu.scm trig.scm ultra.ini ultra.pui ultra.scm mouse.scm
+
+script do-local do-automake do-stats iopr iocl nbit
+script nfsmon timer rmalbut px sinstall ls-jobs ls-all
+script run-all load-all mall sign swhich gcc-info system-id
+script update-sys update-watch plock cleanup-jobs fix-group
+script herd cover find-fnc diff-code diff-tree descend bckgr
+script broadcast check-hosts check-service all-service dot-silent
+script no-op dargs env-csh csh-subroutines merge-aix panache
+script pdbdiff pdbview pdbcp label-ps tpu tzu remod
+script which-cfg sys-site use-tcsh fill-string mpi-info
+script simplify-path sunrace cross-info
+
+doc pact.ps panacea.ps pdb.ps pdbdiff.ps pdbview.ps pgs.ps
+doc pml.ps ppc.ps score.ps sx.ps ultra.ps
+doc pact.FAQ panacea.FAQ pdb.FAQ pgs.FAQ pml.FAQ ppc.FAQ
+doc scheme.FAQ score.FAQ sx.FAQ ultra.FAQ
+
+mgr clib.fncs code-date compare-date pact-analyze pact-changes
+mgr pact-commit pact-config cpyright.h pact-dist pact-dist-all
+mgr pact-dist-remote pact-gp.init pact-import pact-scs pact-send
+mgr pact-there pact-transfer pact-update pact.c pact.manifest
+mgr cfgman systems.unix
+

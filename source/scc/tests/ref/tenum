@@ -1,0 +1,7 @@
+enum e_info
+variable v1s: static enum e_info
+variable v1e: extern enum e_info
+variable v1d: enum e_info
+variable v2s: static enum anonymous
+variable v2e: extern enum anonymous
+variable v2d: enum anonymous

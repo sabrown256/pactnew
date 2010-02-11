@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+<!DOCTYPE types [
+
+   <!ELEMENT types (float*, int*)>
+
+      <!ELEMENT float (ord, sz, eb, mb)>
+         <!ELEMENT ord (#PCDATA)>
+         <!ELEMENT sz  (#PCDATA)>
+         <!ELEMENT eb  (#PCDATA)>
+         <!ELEMENT mb  (#PCDATA)>
+
+      <!ELEMENT int EMPTY>
+      <!ATTLIST int
+         ord (normal | reverse) #REQUIRED
+         sz  (1 | 2 | 4 | 8)    #REQUIRED
+      >
+
+]>
+
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+<types>
+   <float>
+      <ord>normal</ord>
+      <sz>4</sz>
+      <eb>8</eb>
+      <mb>23</mb>
+   </float> 
+
+   <int ord='normal' sz='4' />
+
+   <float>
+      <ord>reverse</ord>
+      <sz>4</sz>
+      <eb>8</eb>
+      <mb>23</mb>
+   </float> 
+
+</types>
+

@@ -1,0 +1,33 @@
+#
+# test dependency analysis - greater depth and breadth of dependency tree
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+a.c :
+	@touch a.c
+
+b.c :
+	@touch b.c
+
+c.c :
+	@touch c.c
+
+a.o : a.c
+	@echo "a.c"
+
+b.o : b.c
+	@echo "b.c"
+
+c.o : c.c
+	@echo "c.c"
+
+Hdrs = 
+Objs =  a.o b.o	c.o
+
+${Objs} : ${Hdrs}
+
+d.o : ${Objs}
+	@echo "d.o"
+	rm -f [abc].[co]

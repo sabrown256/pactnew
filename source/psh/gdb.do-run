@@ -1,0 +1,29 @@
+#!/bin/csh -f
+#
+# GDB.DO-RUN - do-run wrapper for GDB
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Host  = `uname -n`
+set GInit = $cwd/.gdb-init.$Host.$$
+
+if ($?TVDirs == 1) then
+   awk '{ printf("dir %s\n", $0); }' $TVDirs >&! $GInit
+else
+   touch $GInit
+endif
+
+gdb -x $GInit $argv
+set xstatus = $status
+
+rm -f $GInit
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($xstatus)
+

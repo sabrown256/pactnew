@@ -1,0 +1,75 @@
+#!/bin/csh -f
+#
+# CONFIG_SPOKES - see which C spokes we have
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias ls
+
+# find the available spokes
+pushd spokes >& /dev/null
+
+set spokes = ( `ls -1r | grep -v CVS` )
+
+popd >& /dev/null
+
+rm -f pdspoke.c
+touch pdspoke.c
+
+cat >&! pdspoke.c << EOF
+/*
+ * PDSPOKE.C - automatically generated routine to register C coded spokes
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#include "cpyright.h"
+ 
+#include "pdb_int.h"
+ 
+extern SC_array
+ *_PD_file_types;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_REGISTER_SPOKES - return TRUE iff the named spoke is present */
+
+int _PD_register_spokes(void)
+   {int n;
+    static int ns = 0;
+EOF
+
+foreach i ($spokes)
+    echo "    extern int PD_register_${i}(void);" >>& pdspoke.c
+end
+
+echo "    extern int PD_register_pdb(void);" >>& pdspoke.c
+echo "" >>& pdspoke.c
+echo "    if (ns == 0)" >>& pdspoke.c
+echo "       {ns += PD_register_pdb();" >>& pdspoke.c
+
+foreach i ($spokes)
+    echo "        ns += PD_register_${i}();" >>& pdspoke.c
+end
+
+echo "        };" >>& pdspoke.c
+
+cat >>& pdspoke.c << EOF
+
+    n = SC_array_get_n(_PD_file_types);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+EOF
+
+exit($status)

@@ -1,0 +1,37 @@
+#
+# PROGRAM-INIT - define PACT wide variables and give them default values
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/default-bits
+run features/rpath init
+
+# GOTCHA: this root may be different for CROSS_COMPILE
+# need script to figure out root includes for given compiler
+setenv RootInc  /usr/include
+
+setenv LIB      lib
+setenv MPIBin   /usr/bin
+setenv MPILib   /usr/lib
+setenv IncMPI   ""
+setenv LibMPI   ""
+
+setenv SUFFIXES  '.i'
+
+BuildSharedLibs = FALSE
+FilterDir       =
+WARN_PATTERN    =
+ERR_PATTERN     =
+SchemeSpokes    = netcdf
+CSpokes         =
+ThreadLibExt    =
+
+Tool LD {
+   SpokeDepLib =
+}
+
+

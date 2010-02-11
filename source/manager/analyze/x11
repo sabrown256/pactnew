@@ -1,0 +1,142 @@
+#!/bin/csh -f
+#
+# X11 - analyze platform X11
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: x11"
+
+SafeEnv HostOS           `uname -s`
+SafeEnv GraphicsDevices  ""
+SafeEnv GraphicsFlag     ""
+SafeEnv Cfe_CC_Exe       "cc"
+SafeEnv Cfe_CC_Flags     "-g"
+SafeEnv Cfe_LD_Flags     ""
+SafeEnv Cfe_LD_Lib       ""
+SafeEnv CC_MDGInc        ""
+SafeEnv LD_MDGLib        ""
+SafeEnv AnaDir           analyze
+SafeEnv ALog             $cwd/log.analyze
+SafeEnv Std_UseX         TRUE
+SafeEnv X11_Path         /usr
+
+# if we have explicitly said we do not want X11
+# do NOT detect it
+if ($X11_Path == none) then
+   NoteD $ALog "      no X11 (by request)"
+   setenv Std_UseX FALSE
+   SetParent Std_UseX
+
+else if ($Std_UseX == TRUE) then
+
+   set UTime = `timer -r`
+
+   set lLibDirs = ""
+   foreach i ($LD_MDGLib)
+      set j = $i:h
+      if (-d $j) then
+         set lLibDirs = ( $lLibDirs $j )
+      endif
+   end
+
+# write a little X test that works around dumb Solaris
+# on which XOpenDisplay hangs forever if it does not
+# like the DISPLAY variable value
+   if ($HostOS == SunOS) then
+
+      cat << EOF >! $Tmp.c
+#include <X11/Xlib.h>
+int main(int c, char **v)
+{char *dsp;
+ Display *d;
+ volatile Display (*pf)(char *name);
+ extern char *getenv(char *s);
+
+ pf = XOpenDisplay;
+
+ return(0);}
+EOF
+
+# write a little X test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   else
+
+      cat << EOF >! $Tmp.c
+#include <X11/Xlib.h>
+int main(int c, char **v)
+{char *dsp;
+ Display *d;
+ extern char *getenv(char *s);
+ dsp = getenv("DISPLAY");
+ if (dsp == NULL)
+    dsp = ":0.0";
+ d = XOpenDisplay(dsp);
+ return(0);}
+EOF
+   endif
+
+   set lIncDirs = ( $X11_Path/include /usr/X11R6/include $RootInc )
+   set lLibDirs = ( $X11_Path/$LIB $lLibDirs /usr/X11R6/$LIB )
+   set lLibDirs = ( $lLibDirs /usr/X11R6/lib )
+   set lHdrs    = ( X11/Xlib.h )
+   set ASList   = ( so a )
+   set lLib     = X11
+   set lFile    = $Tmp
+   set lALibs   = ""
+   set Implicit = TRUE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "") && ($?IBM_BGL == 0)) then
+      NoteD $ALog "      has X11 ($PckLib)"
+
+      setenv HAVE_SOCKETS_P   Envir
+      setenv GSYS             "X"
+      setenv GraphicsDevices  "$GraphicsDevices X"
+      setenv GraphicsFlag     "$GraphicsFlag -DX11"
+
+      set lok = FALSE
+      if ("$PckInc" != "none") then
+         if (("$PckInc" != "-I$RootInc") || ($?IBM_BGP == 1)) then
+            set lok = TRUE
+         endif
+      endif
+
+      if ($lok == TRUE) then
+         set lmdginc = ( $CC_MDGInc $PckInc )
+         setenv CC_MDGInc "$lmdginc"
+      endif
+      unset lok
+
+      setenv LD_MDGLib   "$LD_MDGLib $PckLib"
+      setenv Std_UseX    TRUE
+   else
+      NoteD $ALog "      no X11"
+      setenv Std_UseX    FALSE
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   setenv X11Lib "$PckLib"
+   setenv X11Inc "$PckInc"
+
+# export the results
+   SetParent GraphicsDevices
+   SetParent X11Lib
+   SetParent X11Inc
+   SetParent Std_UseX
+   SetParent CC_MDGInc
+   SetParent LD_MDGLib
+
+endif
+
+exit(0)
+

@@ -1,0 +1,488 @@
+#!/bin/csh -f
+#>
+#>  Builds a self-extracting compressed tar file
+#>  of the last revision Tag from the CVSROOT source
+#>  repository for UNIX distribution.             
+#>              
+#>  Usage:
+#>    dsys dist [-c <CVSROOT>] [-s SCSdir] [-h]
+#>              [-v | +v | -T] [-l [-x]]
+#>              [-r] [-k] [-Z]
+#>  
+#> Options: 
+#>    -c    use the specified CVS repository (default CVSROOT)
+#>    -h    help, prints this message
+#>    -s    directory for Source Control System info file
+#>    -v    get the distribution as of the given date mm/dd/yy
+#>    +v    get the distribution as of the given date mm/dd/yy_hh:mm:ss
+#>    -T    get the distribution for revision Tag Tyy_mm_dd_hh_mm_ss
+#>          (for tag use 'dsys info -c' or 'dsys info -t')
+#>    -l    prepare a distribution for LLNL
+#>    -x    put the extensions in a separate tar file (with -l only)
+#>    -r    export to remote source repository
+#>    -k    keep the source directory
+#>
+#  
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?MngDir == 0) then
+   set MngDir = $cwd
+   set Base   = $MngDir:h
+   setenv ScrDir $Base/scripts
+endif
+
+source $ScrDir/env-csh
+source $ScrDir/csh-subroutines
+HAVE_SUBROUTINES
+
+if ($?USER == 0) then
+   if ($?LOGNAME == 0) then
+      set USER = "anonymous"
+   else
+      set USER = $LOGNAME
+   endif
+endif
+
+set System        = `./cfgman use`
+set Manager       = manager
+set HelpCode      = $MngDir/$0
+set DTag          = ( `./pact-get-tag -d` )
+set DName         = "pact$DTag"
+set SCSDir        = "."
+set SCSRepository = ""
+set SRCDate       = ( -D "`./pact-get-tag`" )
+set WhoIAm        = $USER
+set HeaderFile    = "../pact-update"
+set VersionID     = `cat ./.pact-version`
+set TmpFile       = tmp-file
+set TmpDir        = tmp-dir
+set Host          = `uname -n`
+set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
+
+set LLNL = FALSE
+set KEEP = FALSE
+set help = FALSE
+set Extn = FALSE
+set RepositoryExport = FALSE
+
+set MV    = "mv -f"
+set RM    = "rm -f"
+set RMDir = "rm -rf"
+
+InitLog Log $Base/dev/$System/log/dist
+
+set Opt = "$HelpCode:t  $argv"
+
+while ($#argv >= 1)
+   switch ($1)
+      case -c:
+               shift
+               set SCSRepository = "-d $1"
+               breaksw
+      case help:
+      case -h*:
+               set help = TRUE
+               breaksw
+      case -k:
+               set KEEP = TRUE
+               breaksw
+      case -l:
+               set LLNL = TRUE
+               breaksw
+      case -r:
+               set RepositoryExport = TRUE
+               breaksw
+      case -s:
+               shift
+               set SCSDir = $1
+               breaksw
+      case -v:
+      case +v:
+      case -T:
+               shift
+               set raw     = ( `date -d "$1" '+%Y_%m_%d %H:%M'` )
+               set SRCDate = ( -D "$raw" )
+               set DTag    = ( `echo $raw[1] | sed 's/^20//'` )
+               set DName   = "pact$DTag"
+               breaksw
+      case -x:
+               set Extn = TRUE
+               breaksw
+      default:
+               echo " "
+               echo ">>>>>>>>>>  Illegal option $1  <<<<<<<<<<"
+               echo " "
+               set help = TRUE
+               breaksw
+   endsw
+   shift
+end
+
+if ($help == "TRUE") then
+   awk '($1 == "#>") {print}' $HelpCode | sed -e 's/^.. \{0,1\}//'      #print Usage:
+   exit(1)
+endif
+
+Note $Log "Source tag: $SRCDate[2]"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAIN - start working here
+
+   call INIT()
+
+   call GET_SOURCE()
+
+   call PREP_TREE()
+
+# handle the extensions before later phases get rid of them
+   if (($Extn == "TRUE") && ($LLNL == "TRUE")) then
+      call SAVE_EXT()
+   endif
+
+# remove the local extensions directories
+   if ($LLNL != "TRUE") then
+      flog $Log (find .. -type d -name extensions -exec $RMDir {} \;)
+   endif
+
+# for non export distributions
+   if ($RepositoryExport == TRUE) then
+         call EXPORT_DIST()
+
+   else
+
+      call UNIX_DIST()
+
+# handle the LLNL specific material
+      if ($LLNL != "TRUE") then
+         call REMOVE_LOCAL()
+      endif
+   endif
+
+   flog $Log cd ..
+
+   Separator $Log
+   NoteD $Log "Archiving the distribution"
+   flog $Log $RM pact.tar
+   flog $Log tar $TarArgs pact.tar pact
+   flog $Log pwd
+   flog $Log ls -l pact.tar
+
+   NoteD $Log "Compressing the distribution"
+   flog $Log $RM pact.tar.gz
+   flog $Log gzip pact.tar
+   flog $Log ls -l pact.tar.gz
+
+   call FINISH()
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INIT - get ready to make a distribution
+
+INIT:
+
+   Separator $Log
+   NoteD $Log " "
+
+   if (!(-e $SCSDir/pact-scs)) then
+      NoteD $Log "Can't find Source Control System Information in $SCSDir"
+      NoteD $Log " "
+      exit(25)
+   endif
+
+# Source Control System Variables
+   source $SCSDir/pact-scs
+
+# check if repository locked
+   if ($ExistLock == TRUE) then
+      NoteD $Log " *** REPOSITORY IS LOCKED ***"
+      NoteD $Log ""
+      CatLock
+      NoteD $Log ""
+      exit(26)
+   endif
+
+# lock repository
+   Makelock
+   echo "  pact-dist in progress - " $USER  `date`>> $Lock
+   echo "" >>& $Lock
+
+   if (!(-d distribution)) then
+      echo "Creating distribution directory" >>& $Lock
+      flog $Log mkdir distribution
+   endif
+
+   flog $Log cd distribution
+
+   NoteD $Log "PACT Distribution for UNIX platforms"
+
+   if ($LLNL == "TRUE") then
+      NoteD $Log "   LLNL specific material included"
+   endif
+
+   if ($KEEP == "TRUE") then
+      NoteD $Log "   The sources will be kept out"
+   endif
+
+   if (-d pact) then
+      flog $Log $RMDir pact
+   endif
+
+   Note $Log "Distribution Log             Host: $Host running $OS"
+   Note $Log "User: $WhoIAm                Date: `date`"
+   Note $Log " " 
+   Note $Log "Operation: $Opt " 
+   Note $Log " " 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_SOURCE - check out the source
+
+GET_SOURCE:
+
+   Separator $Log
+   NoteD $Log "Getting out the sources for $DTag"
+   echo "Getting out the sources" >>& $Lock
+
+   set PactList = ( `awk '$1 == "pkg" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' ../pact.manifest` )
+   Note $Log "packages to add to distribution: $PactList"
+
+   flog $Log pwd
+   flog $Log mkdir pact
+   flog $Log cd pact
+   Note $Log " " 
+   flog $Log cvs $CvsOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" manager auto $PactList 
+
+   if ($status == 0) then
+      Note $Log "Sources checked out" 
+   else
+      Note $Log "Source check out failed" 
+      Note $Log "CVSROOT = $CVSROOT"
+      echo "Source check out failed" 
+      echo "See $Log"
+
+# release the lock
+      Unlock
+      exit(1)
+   endif
+   Note $Log " " 
+
+   KillZombie
+
+   if (-d auto) then
+      flog $Log cd auto
+      flog $Log $RMDir CVS
+      flog $Log mv * ..
+      flog $Log cd ..
+      flog $Log $RMDir auto
+   endif
+
+   NoteD $Log "Getting the documents"
+   Note $Log " " 
+   flog $Log cvs $CvsOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
+   KillZombie
+   Note $Log " " 
+
+   flog $Log cd ..
+
+# release the lock
+   Unlock
+
+   flog $Log ls -lR pact
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SAVE_EXT - save the local extensions
+
+SAVE_EXT:
+
+   Separator $Log
+   NoteD $Log "Copying PACT extensions"
+   flog $Log mkdir foo
+   foreach i (*/applications/extensions/*)
+      cp $i foo
+   end
+
+   NoteD $Log "Archiving PACT extensions"
+   flog $Log cd foo
+   flog $Log tar $TarArgs ../pact-ext.tar *
+   flog $Log cd ..
+   flog $Log $RMDir foo
+
+   NoteD $Log "Compressing PACT extensions using gzip"
+   flog $Log gzip pact-ext.tar
+
+   flog $Log $MV pact-ext.tar.gz ../$DName-ext.tar.gz
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PREP_TREE - prepare the source tree to be made into a distribution
+
+PREP_TREE:
+
+   Separator $Log
+
+# remove the $SCSName sub-directories
+   NoteD $Log "Cleaning up the sources"
+   flog $Log set List = `find . -name $ADM -print`
+   foreach i ($List)
+      $RMDir $i
+   end
+
+   flog $Log cd pact
+   mkdir -p $cwd/$Manager
+   echo $DName > $Manager/.pact-date
+
+   Note $Log Current Directory: $cwd
+   Note $Log Manager Directory: $Manager
+
+# determine whether local tar supports o option
+   Note $Log "Determining whether tar support o option"
+   flog $Log set TarArgs = cvof
+   flog $Log mkdir $TmpDir
+   flog $Log cd $TmpDir
+   echo "foo" > $TmpFile.file
+   flog $Log tar $TarArgs $TmpFile.tar $TmpFile.file
+   if ($status != 0) then
+      flog $Log set TarArgs = cvf
+      flog $Log set status = 0
+   endif
+   flog $Log cd ..
+   flog $Log $RMDir $TmpDir
+   Note $Log "done"
+   Note $Log ""
+
+# add read to permissions for debugging purposes
+   flog $Log chmod -R a+r *
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# UNIX_DIST - make this a distribution for a UNIX box
+
+UNIX_DIST:
+
+   Separator $Log
+   NoteD $Log "Setting up UNIX distribution"
+
+   set NoGoDirs = ( "manager/mac" "scheme/runtime" )
+   if ($LLNL != "TRUE") then
+      flog $Log set NoGoDirs = ( $NoGoDirs manager/local manager/hosts )
+   endif
+
+   foreach dir ($NoGoDirs)
+      flog $Log $RMDir $dir
+   end
+
+   flog $Log $RM ultra/ultra.ini.mac
+   flog $Log $RM */*.tld
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# REMOVE_LOCAL - remove local stuff from the distribution
+
+REMOVE_LOCAL:
+
+   Separator $Log
+   NoteD $Log "Remove local facilities sources"
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXPORT_DIST - make a distribution for export to another repository
+
+EXPORT_DIST:
+
+   Separator $Log
+   NoteD $Log "Setting up Repository export"
+
+   flog $Log $RMDir manager/local
+   flog $Log $RMDir manager/hosts
+
+   call REMOVE_LOCAL()
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - complete the details of the distribution
+
+FINISH:
+
+   Separator $Log
+   Note $Log "Finishing up"
+
+   if ($KEEP == "FALSE") then
+      NoteD $Log "The sources will NOT be kept out"
+      flog $Log $RMDir pact
+   else
+      NoteD $Log "The sources will be kept out"
+   endif
+
+   if ($RepositoryExport == "TRUE") then
+      flog $Log $MV pact.tar.gz ../$DName.tar.gz
+
+   else
+      set Signature = "-----------------------***   SEPARATOR   ***-----------------------"
+
+      flog $Log $RM pact-src
+      flog $Log touch pact-src
+
+#      flog pact-src cat $HeaderFile
+#      Note pact-src echo "$Signature"
+#      Note pact-src echo "pact.tar.gz"
+#      flog pact-src cat pact.tar.gz
+
+      cat $HeaderFile >> pact-src
+      echo "$Signature" >> pact-src
+      echo "pact.tar.gz" >> pact-src
+      cat pact.tar.gz >> pact-src
+
+      flog $Log chmod a+x pact-src
+
+      flog $Log $RM pact.tar.gz
+      if ($LLNL == "TRUE") then
+         flog $Log $MV pact-src ../$DName-llnl-src
+      else
+         flog $Log $MV pact-src ../$DName-src
+      endif
+   endif
+
+   flog $Log touch $TmpFile
+   flog $Log $RM *
+
+   NoteD $Log "Distribution for PACT version $VersionID made"
+   NoteD $Log ""
+   NoteD $Log "See the file $Log for more information"
+   NoteD $Log ""
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

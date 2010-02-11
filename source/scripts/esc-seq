@@ -1,0 +1,59 @@
+#!/bin/csh -f
+#
+# ESC-SEQ - demonstrate X escape sequences in a shell script
+#
+
+set SUL = "[4m"      # underline
+set SSO = "[7m"      # standout
+set SBo = "[1m"      # bold
+set EHM = "[m"
+
+set CUp = "[1A"      # cursor up 1 time
+set CDn = "[1B"      # cursor down 1 time
+set CFw = "[1C"      # cursor forward 1 time
+set CBw = "[1D"      # cursor backward 1 time
+set CNx = "[1E"      # cursor next line 1 time
+set CPr = "[1F"      # cursor previous line 1 time
+set CCo = "[10G"     # cursor at column 10
+set CPs = "[20;10H"  # cursor at (20,10)
+set CED = "[2J"      # clear screen
+
+set Home = "[1;1H"   # cursor at home position
+
+echo "${SUL}the quick brown$EHM"
+echo "${SBo}fox jumps over$EHM"
+echo "${SSO}the lazy dog$EHM"
+
+# up 3 lines
+echo -n $CUp$CUp$CUp
+sleep 1
+
+# forward 3 characters
+echo -n $CFw$CFw$CFw
+sleep 1
+
+# down a line
+echo -n $CDn
+sleep 1
+
+# backward 2 characters
+echo -n $CBw$CBw
+sleep 1
+
+# at column 10
+echo -n $CCo
+sleep 1
+
+# at 20,10
+echo -n $CPs
+sleep 1
+
+# clear all
+echo -n $CED
+sleep 1
+
+# Home
+echo -n $Home
+
+exit($status)
+

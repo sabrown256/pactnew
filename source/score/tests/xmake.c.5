@@ -1,0 +1,22 @@
+#!/bin/csh -f
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+set Mkf = tmake.c.5
+
+set Opt = ""
+if ($Make == gmake) then
+   set Opt = --no-print-directory
+endif
+
+dmake -f $Mkf setup
+$Make $Opt -f $Mkf work |& grep -v gmake >>& $LogF.make
+dmake -f $Mkf cleanup
+
+dmake -f $Mkf setup
+dmake -f $Mkf work >>& $LogF.dmake
+dmake -f $Mkf cleanup
+
+exit($status)

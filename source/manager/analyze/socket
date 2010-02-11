@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# SOCKET - analyze the handling of sockets
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: socket"
+
+NoteD $ALog -n "      getsockopt type: "
+Note $ALog ""
+
+SafeEnv HAVE_SOCKETS_P    TRUE
+
+cat << EOF >! $Tmp.c
+#include <sys/socket.h>
+int main(int c, char **v)
+{int iv, nb;
+ getsockopt(NULL, 0, 0, &iv, &nb);
+ return(0);}
+EOF
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+@ NErr = `$Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags |& wc -l`
+if ($NErr == 0) then
+   setenv GETSOCKOPT_TYPE "int"
+else
+   setenv GETSOCKOPT_TYPE "unsigned int"
+endif
+NoteD $ALog $GETSOCKOPT_TYPE
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+# export the results
+SetParent HAVE_SOCKETS_P
+SetParent GETSOCKOPT_TYPE
+
+exit(0)
+

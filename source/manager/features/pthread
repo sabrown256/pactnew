@@ -1,0 +1,45 @@
+#
+# PTHREAD - define the use of POSIX Pthreads
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PTHREAD_POSIX
+
+ThreadLibExt = _r
+
+Tool CC {
+   Exe   =? ${PThread_CC_Exe}
+   Flags += ${PThread_CC_Flags}
+   Inc   += ${PThread_CC_Inc}
+}
+
+Tool FC {
+   Exe   =? ${PThread_FC_Exe}
+   Flags += ${PThread_FC_Flags}
+}
+
+Tool LD {
+   Exe   =? ${PThread_LD_Exe}
+   Flags += ${PThread_LD_Flags}
+   Lib   += ${PThread_LD_Lib}
+}
+
+Tool Lex {
+   Flags += ${PThread_Lex_Flags}
+}
+
+Tool Cfg_Lex {
+   Flags += ${PThread_Lex_Flags}
+}
+
+Group Cfg {
+   CC_Flags += ${PThread_CC_Flags}
+   FC_Flags += ${PThread_FC_Flags}
+   LD_Flags += ${PThread_LD_Flags}
+   LD_Lib   += ${PThread_LD_Lib}
+}
+

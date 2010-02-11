@@ -1,0 +1,80 @@
+#!/bin/csh -f
+#
+# PX - execute the given command upto NA times
+#    - until it succeeds
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?SC_EXEC_N_ATTEMPTS) then
+   @ na = $SC_EXEC_N_ATTEMPTS
+else
+   @ na = 3
+endif
+
+set ArgL = ""
+while ($#argv)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: px [-h] [-na #] <command>"
+           echo "Run <command> and until it succeeds"
+           echo "   na  number of attempts to make (default 3)"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      case -na:
+           shift
+           @ na = $1
+      default:
+           set ArgL = ( $ArgL $1 )
+           breaksw
+   endsw
+   shift
+end
+
+@ Err    = 0
+@ count  = 1
+@ NSleep = 0
+set Out  = ""
+
+set noglob
+
+while ($count <= $na)
+   if ($count > 1) then
+      echo "***> failed ($Err) [$Stamp] - attempt $count in $NSleep seconds"
+      echo "***>       $ArgL"
+      sleep $NSleep
+      echo "***> retry '"$ArgL"'"
+   endif
+
+   set Stamp = `date +"%Y/%m/%d %H:%M:%S"`
+   set Out   = `eval $ArgL`
+   set Err   = $status
+   if ($Err == 0) then
+      if ($count > 1) then
+         echo "***> succeeded [$Stamp] - on attempt $count"
+         echo "***>       $ArgL"
+      endif
+      break
+   else
+      @ count = $count + 1
+      if ($count < 3) then
+         @ NSleep = 1
+      else
+         @ NSleep = 31
+      endif
+   endif
+end
+
+if (($count > $na) && ($Err != 0)) then
+   @ count = $count - 1
+   echo "***> failed ($Err) - quitting after $count attempts"
+endif
+
+echo "$Out"
+
+exit($Err)

@@ -1,0 +1,54 @@
+#!/bin/csh -f
+#
+# RUNNING - see who is running a job
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/running") then
+   set path = ( $Exe $path )
+endif
+
+set Job   = ""
+set User  = "-a"
+set Type  = "-t all"
+set Exact = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: running [-h] [-t <sys-type>] [-u <user>] [-w] <job>"
+           echo "   h   this help message"
+           echo "   t   look on hosts of <sys-type> (default all)"
+           echo "   u   look for jobs owned by <user> (default all users)"
+           echo "   w   word match ala 'grep -w'"
+           echo ""
+           exit(1)
+      case -t:
+           shift
+           set Type = ( -t $1 )
+           breaksw
+      case -u:
+           shift
+           set User = ( -u $1 )
+           breaksw
+      case -w:
+           set Exact = -w
+           breaksw
+      default:
+           set Job = ( $Job $1 )
+           breaksw
+   endsw
+   shift
+end
+
+hserve -q $Type -exh ls-jobs -ds -q $User "$Job"    |& \
+grep $Exact "$Job"                                  |& \
+sed '/running/d'                                    |& \
+sed '/ls-jobs/d'                                    |& \
+sed '/hserve/d'                                     |& \
+sed '/grep/d'
+
+exit($status)
+

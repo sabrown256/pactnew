@@ -1,0 +1,473 @@
+#!/bin/csh -f
+#
+#  CDLOG - CVS Delta Log - processor for messages to a cvs log file
+#        - combine individual log messages from a multi-directory
+#        - commit into a single log message. If this is not done, you may
+#        - see the same log message repeated for every directory involved
+#        - in a commit.
+#        -
+#        - run "cdlog -p" during pre-commit (commitinfo), to leave the
+#        - name of the last directory to be committed in a temporary file
+#        - run "cdlog ..." during commit (loginfo), to group the lists of
+#        - files by log message, and produce a single consolidated message
+#        - this message may optionally be sent to a specified mailing list
+#        -
+#        - In the loginfo file, put in a line to call this script. For
+#        - example:
+#        -    DEFAULT       /usr/local/bin/cdlog -b -t -u foo@bar.baz $CVSROOT/CVSROOT/commitlog %s
+#  
+#        - In the commitinfo file, put in a line to call this script. For
+#        - example:
+#        -    ALL           cdlog -p log_file %s
+#  
+# Variables:
+#    CVSAdded     - prefix for names of files recording added files
+#    CVSModified  - prefix for names of files recording changed files
+#    CVSRemoved   - prefix for names of files recording removed files
+#    CVSLast      - name of file containing list of directories to process
+#    CVSDir       - name of directory currently being processed
+#    CVSCommitLog - name of the permanent log file
+#    MailExe      - mail program
+#    MailList     - list of users to receive mail message
+#    LogFile      - prefix for names of the temporary log files
+#    PlaceLogMsg  - where to add the new log message - to the end 
+#                   or the beginning of the log file
+#    ID           - unique suffix id for temporary file names
+#    Title        - flag to include a title in the log message
+#    Files        - directory and its files currently being processed (spaces)
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+alias flog      'echo "Command: \!\!:2-$" >>& \!\!:^ ; \!\!:2-$ >>& \!\!:^'
+alias Separator 'echo "--------------------------------------------------------------------------" >>& \!\!:^ ; echo "" >>& \!\!:^'
+alias Note      'echo \!\!:2-$ >>& \!\!:^'
+alias NoteD     'echo \!\!:2-$ >>& \!\!:^ ; echo \!\!:2-$'
+alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
+
+alias GOSUB     'set Return = \!\!:2 ; goto \!\!:1'
+alias RETURN    'goto $Return'
+
+# set some inital values
+
+set ID           = `perl -e '$id = getpgrp ; print "$id"'`
+set CVSLast      = "/tmp/cvs.lastdir.$ID"
+set CVSModified  = "/tmp/cvs.files.changed.$ID"
+set CVSAdded     = "/tmp/cvs.files.added.$ID"
+set CVSRemoved   = "/tmp/cvs.files.removed.$ID"
+set LogFile      = "/tmp/cvs.files.log.$ID"
+
+set PlaceLogMsg = "end"
+set MailExe     = "Mail"
+set MailList    = ""
+set MailNote    = ""
+set Title       = FALSE
+set Action      = "accum"
+set Verbose     = FALSE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HANDLE_ARGS - process command line arguments
+
+   InitLog DLog /tmp/cdlog.$USER.log
+   Note $DLog "Invocation: $0 $argv"
+
+# process command line arguments
+   while ($#argv > 0)
+      switch ($1)
+         case -b:
+              set PlaceLogMsg = "beginning"
+              breaksw
+         case -n:
+              shift
+              set MailNote = $1
+              breaksw
+         case -p:
+              shift
+              set Action = "prep"
+              set Input  = ( $argv )
+              break
+              breaksw
+         case -h:
+              echo "Usage:"
+              echo "  cdlog -p"
+              echo "         or"
+              echo "  cdlog [-b] [-h] [-n <txt>] [-t] [-u <users>]* [...] <logfile> %s"
+              echo "    b          add the message to the beginning of the log file"
+              echo "               (the default is to add it to the end)"
+              echo "    h          this help message"
+              echo "    n          add the specified text to the top and bottom of the mail message"
+              echo "    u <users>  quoted, space delimited string of mail names, or"
+              echo "               a single user name (may be given more than once)"
+              echo "    t          add a title to the log file"
+              echo "    <logfile>  name of the log file"
+              echo "    %s         signals loginfo to include a single-quoted list"
+              echo "               of modified files"
+              echo ""
+              exit(1)
+         case -t:
+              set Title = TRUE
+              breaksw
+         case -u:
+              shift
+              set MailList = ( $MailList $1 )
+              breaksw
+         default:
+              break
+              breaksw
+      endsw
+      shift
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PREP - do the preparation work (invoked by commitinfo)
+
+if ($Action == prep) then
+
+   Note $DLog "*********** PREP"
+   Note $DLog "Date      = `date`"
+   Note $DLog "User      = $USER"
+   Note $DLog "Args      = $argv"
+   Note $DLog "Input     = $Input"
+   Note $DLog "ID        = $ID"
+   Note $DLog "CVSLAST   = $CVSLast"
+   Note $DLog ""
+   flog $DLog ls -l /tmp/cvs.*
+   Separator $DLog
+
+   if (-f $CVSLast) then
+      grep "$Input" $CVSLast >& /dev/null
+      if ($status != 0) then
+         Note $CVSLast "$Input"
+      endif
+   else
+      Note $CVSLast "$Input"
+   endif
+
+   flog $DLog cat $CVSLast
+
+   Separator $DLog
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ACCUM - do the accumulation work (invoked by loginfo)
+
+else if ($Action == accum) then
+
+   set CVSCommitLog = $1
+   shift
+
+# expand any variables in the arg list
+   set tmp    = ( `echo $argv` )
+   set CVSDir = "$tmp[1]"
+   shift tmp
+   set Files  = ( $tmp )
+
+   GOSUB FORMAT ACC_Dir
+ACC_Dir:
+
+   Separator $DLog
+   Note $DLog "*********** ACCUM"
+   Note $DLog "Date      = `date`"
+   Note $DLog "User      = $USER"
+   Note $DLog "Args      = $argv"
+   Note $DLog "ID        = $ID"
+   Note $DLog "CommitLog = $CVSCommitLog"
+   Note $DLog ""
+   flog $DLog ls -l /tmp/cvs.*
+
+   if (!(-w $CVSCommitLog)) then
+      NoteD $DLog "-------------------"
+      NoteD $DLog "NO WRITE ACCESS FOR LOG FILE $CVSCommitLog - CDLOG"
+      flog $DLog pwd
+      flog $DLog ls -l $CVSCommitLog
+      Note $DLog "User = $USER"
+      flog $DLog groups
+      NoteD $DLog "-------------------"
+      exit(1)
+   endif
+
+# check for a new directory first
+# this will always appear as a single item in the arg list
+# and an empty log message
+#   if ($CVSDir =~ /New directory/) then
+#      exit(1)
+#   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECK_LAST - check whether this is the last directory
+#            - if not then quit
+
+   Separator $DLog
+   set LastText = `cat $CVSLast`
+   @ NLines     = `wc -l $CVSLast | awk '{ print $1 }'`
+   @ num        = 1
+
+   Note $DLog "In file $CVSLast"
+   Note $DLog "   Line Count = $NLines"
+
+# first time CVSLast has full text of all change lines
+   if ($NLines > 1) then
+      Note $DLog "   Line text  = ... "
+      Note $DLog "   Lines by count"
+      @ num = $NLines
+
+# other times CVSLast has single line with the count of changes remaining
+   else if (`expr "$LastText" : "[0-9]*"` > 0) then
+      @ num = $LastText
+      Note $DLog "   Line text  = $LastText"
+      Note $DLog "   Lines by text"
+   endif
+
+   Note $DLog "Number of lines left = |$num|"     
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DO_BODY - iterate over the body of the message collecting information
+
+   set state_none    = 0
+   set state_changed = 1
+   set state_added   = 2
+   set state_removed = 3
+   set state_log     = 4
+   set state         = $state_none
+
+   Separator $DLog
+   flog $DLog set noglob
+
+   @ i      = 0
+   @ nblank = 0
+   while (1)
+      set raw  = "$<"
+      set line = ( $raw )
+      if ("$line" == "") then
+         @ nblank = $nblank + 1
+         if ($nblank > 5) then
+            break
+         endif
+         continue
+      endif
+      @ nblank = 0
+
+      Note $DLog "--> $raw"
+      if ("$line" =~ "Modified Files:") then
+         set state = $state_changed
+      else if ("$line" =~ "Added Files:") then
+         set state = $state_added
+      else if ("$line" =~ "Removed Files:") then
+         set state = $state_removed
+      else if ("$line" =~ "Log Message:") then
+         set state = $state_log
+      else
+         if ($state == $state_changed) then
+            Note $CVSModified.$i "         $Fill   $line"
+         else if ($state == $state_added) then
+            Note $CVSAdded.$i "         $Fill   $line"
+         else if ($state == $state_removed) then
+            Note $CVSRemoved.$i "         $Fill   $line"
+         else if ($state == $state_log) then
+            if ($num == 1) then
+               Note $LogFile.$i "$raw"
+            endif
+         endif
+      endif
+   end
+
+   flog $DLog unset noglob
+
+   if (-f $CVSModified.$i) then
+      Separator $DLog
+      Note $DLog "Modified"
+      flog $DLog cat $CVSModified.$i
+   endif
+
+   if (-f $CVSAdded.$i) then
+      Separator $DLog
+      Note $DLog "Added"
+      flog $DLog cat $CVSAdded.$i
+   endif
+
+   if (-f $CVSRemoved.$i) then
+      Separator $DLog
+      Note $DLog "Removed"
+      flog $DLog cat $CVSRemoved.$i
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECK_FIN - we are finished if this is not the last directory
+
+   if ($num > 1) then
+      Separator $DLog
+      Note $DLog "Not the last directory"
+      flog $DLog rm -f $CVSLast
+
+      @ num = $num - 1
+      Note $CVSLast "$num"
+      exit(0)
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROC_LOG - create a temporary file to hold the log message
+
+   Separator $DLog
+   Note $DLog "Creating temporary file for log message"
+
+   set new_log_msg = "/tmp/cvs.new.$ID"
+
+   flog $DLog rm -f $new_log_msg
+   flog $DLog touch $new_log_msg
+
+   if ($Title == TRUE) then
+
+      set author = `whoami`
+      set now    = `date`
+
+      Note $new_log_msg "====================================================================="
+      Note $new_log_msg ""
+      Note $new_log_msg "AUTHOR:     $author"
+      Note $new_log_msg "DATE/TIME:  $now"
+      Note $new_log_msg ""
+      Note $new_log_msg "                   -------------------------"
+
+      set OK = TRUE
+      @ i = 0
+      while ($OK == TRUE)
+         set OK = FALSE
+         if (-f "$CVSModified.$i") then
+            Note $new_log_msg "   Modified: "
+            cat $CVSModified.$i >>& $new_log_msg
+            set OK = TRUE
+         endif
+         if (-f "$CVSAdded.$i") then
+            Note $new_log_msg "   Added: "
+            cat $CVSAdded.$i >>& $new_log_msg
+            set OK = TRUE
+         endif
+         if (-f "$CVSRemoved.$i") then
+            Note $new_log_msg "   Removed: "
+            cat $CVSRemoved.$i >>& $new_log_msg
+            set OK = TRUE
+         endif
+         if (-f "$LogFile.$i") then
+            Note $new_log_msg "   Log:"
+            Note $new_log_msg ""
+            cat $LogFile.$i | sed 's/"//g' >>& $new_log_msg
+            Note $new_log_msg ""
+            set OK = TRUE
+         endif
+         @ i = $i + 1
+      end
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIN_LOG - write out the complete log file
+
+   Separator $DLog
+   Note $DLog "Writing the complete log message"
+
+   set hold_file = "/tmp/cvs.hold.$ID"
+   flog $DLog rm -f $hold_file
+   flog $DLog touch $hold_file
+   if ($PlaceLogMsg == "beginning") then
+      cat $new_log_msg $CVSCommitLog >>& $hold_file
+   else
+      cat $CVSCommitLog $new_log_msg >>& $hold_file
+   endif
+
+   flog $DLog cp $hold_file $CVSCommitLog
+   if ($status != 0) then
+      NoteD $DLog "FAILED COPYING TO LOG FILE - CDLOG"
+      exit(1)
+   endif
+
+# send mail
+   if ("$MailList" != "") then
+      Note $DLog "Sending mail notification"
+
+      set tmp_log_msg = ${new_log_msg}-tmp
+      flog $DLog rm -f $tmp_log_msg
+      flog $DLog touch $tmp_log_msg
+
+      if ("$MailNote" != "") then
+         set Hdr = "---------------------------------- $MailNote ----------------------------------"
+         Note $tmp_log_msg ""
+         Note $tmp_log_msg "$Hdr"
+         Note $tmp_log_msg ""
+      endif
+
+      cat $new_log_msg >>& $tmp_log_msg
+
+      if ("$MailNote" != "") then
+         Note $tmp_log_msg ""
+         Note $tmp_log_msg "$Hdr"
+         Note $tmp_log_msg ""
+      endif
+
+      flog $DLog cat $tmp_log_msg
+
+      Note $DLog "Command: $MailExe -s Message to log file $CVSCommitLog $MailList"
+      $MailExe -s "Message to log file $CVSCommitLog" $MailList < $tmp_log_msg
+      if ($status != 0) then
+         NoteD $DLog "FAILED TO SEND MAIL - CDLOG"
+         exit(1)
+      endif
+
+      flog $DLog rm -f $tmp_log_msg
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - cleanup the temporary files
+
+   Separator $DLog
+   Note $DLog "Doing cleanup"
+
+   flog $DLog rm /tmp/cvs*.$ID*
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FORMAT - fill ragged CVSDir name with " " to column 18
+
+FORMAT:
+
+   @ CCount = `echo $CVSDir | wc -c`
+   @ NDots  = 18 - $CCount
+   set Fill = "$CVSDir "
+   while ($NDots > 0)
+      set Fill = "$Fill."
+      @ NDots = $NDots - 1
+   end
+
+RETURN
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

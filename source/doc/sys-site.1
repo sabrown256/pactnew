@@ -1,0 +1,158 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH SYS-SITE 1 "18 January 2007"
+.SH NAME
+sys-site \- define environment variables with site specific values.
+.SH SYNOPSIS
+.B sys-site [-csh] [-sh] [-f <sign>] [-h] [-v]
+.SH DESCRIPTION
+
+Sys-site provides a means of defining environment variables and
+giving them site specific values.  This is hardly ground breaking.
+The fact that sys-site is table driven gives it its utility.
+
+Maintaining a file of specifying variables and the tests that
+select among possible values is easier to do than maintaining a
+number of similar shell scripts.  The table approach allows one
+to capture the essential information and not be concerned as
+much with the mechanics of shell scripting.
+
+When you run sys-site it prints out a sequence of variable definition
+commands to the terminal.  You can copy this into a file
+or evaluate the result into your current shell session.
+
+Sys-site reads the site signature database file in two passes.
+The first pass looks for local variable definitions which will
+be used to facilitate the process of defining the site dependent
+variables.  In the second pass stanzas specifying the variables
+are parsed one by one.  The result goes into the environment of
+sys-site session and later stanzas may use the results of
+earlier ones.
+
+
+.SH SITE SIGNATURE DATABASE
+
+A site signature database is simply a text file which specifies
+a number of stanzas each of which defines an environment variable.
+Here is an example:
+
+.nf
+    #
+    # SITE-SIGNATURE - sample database for sys-site
+    #                - the contents are nonsense intended to illustrate
+    #                - actual specifications
+    #
+    
+    # the SYS_TYPE is imbedded in the path name to which the symbolic
+    # links point - just extract them now for later possible use
+    asyst = `ls -l /usr/asys     |& awk '{print $NF}' | sed 's+/mnt/apps++' | sed 's|/||g'`
+    bsyst = `ls -l /usr/local/bs |& awk '{print $NF}' | sed 's+/mnt/apps++' | sed 's|/||g'`
+    
+    # define a variable SYS_SITE which will be one of A, B, or local
+    # depending on the outcome of the tests
+    variable : SYS_SITE {
+      B      ls -d /mnt/apps/b_*
+      A      (-d /usr/asys/hosts)
+      local  true
+    }
+    
+    variable : AI_ROOT {
+      /mnt/apps    (-d /mnt/apps)
+      /usr/share   true
+    }
+    
+    variable : AS_ROOT {
+      /usr/local/apps  ($AI_ROOT == /mnt/apps)
+      /usr/local       true
+    }
+    
+    variable : SYS_TYPE {
+      $asyst       ($SYS_SITE == A)
+      $bsyst       ($SYS_SITE == B)
+      `system-id`  true
+    }
+
+.fi
+
+In this example 4 variables are to be defined and initialized:
+SYS_SITE, SYS_TYPE, AI_ROOT, AS_ROOT.  Default values can be
+given by the use of a clause whose test is "true".
+
+
+.SH SITE SIGNATURE DATABASE SYNTAX
+
+A site signature database contains two basic kinds of elements.
+The main element is a stanza which specifies the variable to
+be defines and the possible values it is to be given.  The
+second element is local variable definitions for use at any
+point in the process of defining the site dependent variables.
+
+The syntax for defining local variables is:
+
+  <var> = <value>
+
+where <var> is the variable name and <value> is evaluated by
+the C shell (sys-site is a C shell script) so more or less
+arbitrary expression may be used.
+
+The syntax for a stanza defining a site dependent variable
+is:
+
+  variable : <var> {
+     <clause>+
+  }
+
+where
+
+  <clause>                 := <value> <test-expression>
+  <test-expression>        := <conditional-expression> | <command> | true
+  <conditional-expression> := ( <logical-expression> )
+  <logical-expression>     := any canonical logical shell expression
+  <command>                := executable command with arguments
+
+<value> is evaluated by the shell and assigned to <var> if and
+only if <test-expression> is "true".  A <conditional-expression> is
+"true" if it evaluates so a value other than 0.  A <command> is
+"true" if its exit status is 0.  The constant "true" is "true".
+
+
+.SH OPTIONS
+.TP
+.B \-csh
+Output is to be in C shell syntax (default).
+.TP
+.B \-sh
+Output is to be in Bourne shell syntax.
+.TP
+.B \-f
+Use specified file for site signature database.
+.TP
+.B \-h
+A short summary help message.
+.TP
+.B \-v
+Verbose mode.
+
+
+.SH EXAMPLES
+
+   sys-site
+   eval `sys-site`
+   sys-site -v
+   sys-site -f myfile -sh
+
+
+.SH ENVIRONMENT VARIABLES
+
+SITE_SIGNATURE_DB  this variable names the default site signature file
+used by sys-site.  The '-f' option is used to override this default.
+
+.SH BUGS
+.TP 
+.B None known.
+

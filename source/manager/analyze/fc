@@ -1,0 +1,273 @@
+#!/bin/csh -f
+#
+# FC - analyze the platform Fortran Compiler
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: fc"
+
+NoteD $ALog -n "   Fortran Compiler: "
+Note $ALog ""
+
+SafeEnv FC_Exe      "f90"
+SafeEnv FC_Linker   ""
+SafeEnv FC_Flags    ""
+SafeEnv FC_Debug    "-g"
+SafeEnv FC_Optimize "-O"
+
+SafeEnv FC_ID_UNDERSCORE "_"
+SafeEnv FC_ID_CASE       "lower"
+SafeEnv F_STD            "F90"
+
+set UTime = `timer -r`
+
+cat << EOF >! $Tmp.f
+      subroutine foo(bar)
+      integer :: bar
+      integer, intrinsic :: selected_int_kind
+      bar = selected_int_kind(5)
+      end subroutine foo
+EOF
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set fclst = ""
+if ($?FC_Exe == 1) then
+   set fclst   = ( $fclst $FC_Exe )
+   set Save_FC = $FC_Exe
+endif
+if ($?Cfg_FC_Exe == 1) then
+   set fclst = ( $fclst $Cfg_FC_Exe )
+endif
+
+# find the available F90 compilers
+set F90C = ( `../analyze/fc-find $fclst` )
+
+Note $ALog ""
+Note $ALog "Fortran 90 compilers: $F90C"
+Note $ALog ""
+
+if ("$F90C" != "") then
+   if ($#F90C > 1) then
+      NoteD $ALog "$F90C[1] (others $F90C[2-])"
+   else
+      NoteD $ALog "$F90C"
+   endif
+else
+   NoteD $ALog " none"
+   NoteD $ALog "      No FORTRAN compiler found"
+
+   flog $ALog setenv FC_Exe        none
+   flog $ALog setenv Cfe_FC_Exe    none
+   flog $ALog setenv Cfe_FC_Flags  ""
+   flog $ALog setenv Cfg_FC_Exe    none
+   flog $ALog setenv Cfg_FC_Flags  ""
+
+   goto DONE
+endif
+
+# make sure that we have the main Fortran compiler
+SafeEnv FC_Exe "$F90C[1]"
+if ($FC_Exe == "") then
+   flog $ALog setenv FC_Exe "$F90C[1]"
+endif
+
+# make sure we have a configuration compiler defined
+if ($?Cfg_FC_Exe == 0) then
+   flog $ALog setenv Cfg_FC_Exe "$FC_Exe"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set Save_FFLAGS = ( $FC_Flags )
+
+SafeEnv Cfg_FC_Flags "$FC_Flags"
+
+if ("$FC_Linker" == "") then
+   flog $ALog setenv FC_Linker "$FC_Exe"
+endif
+
+# temporarily add link flags to compiler flags for config
+if ($?Cfg_LD_Flags == 1) then
+   set tmp = ($FC_Flags $Cfg_LD_Flags)
+   flog $ALog setenv FC_Flags "$tmp"
+   set tmp = ($Cfg_FC_Flags $Cfg_LD_Flags)
+   flog $ALog setenv Cfg_FC_Flags "$tmp"
+endif
+
+# temporarily add rpath to compiler flags for config
+if ($?Cfg_LD_RPath == 1) then
+   set tmp = ($FC_Flags $Cfg_LD_RPath)
+   flog $ALog setenv FC_Flags "$tmp"
+   set tmp = ($Cfg_FC_Flags $Cfg_LD_RPath)
+   flog $ALog setenv Cfg_FC_Flags "$tmp"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($CROSS_COMPILE == TRUE) then
+   flog $ALog setenv Cfe_FC_Exe    $FC_Exe
+   flog $ALog setenv Cfe_FC_Flags  "$FC_Flags"
+else
+   flog $ALog setenv Cfe_FC_Exe    $Cfg_FC_Exe
+   flog $ALog setenv Cfe_FC_Flags  "$Cfg_FC_Flags"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# now lets look at this compiler
+
+if ($FC_Exe != "") then
+   Note $ALog ""
+
+# check the compiler version
+   Note $ALog "Check the version of the FORTRAN compiler"
+   if ($HostOS == SunOS) then
+      flog $ALog $Cfg_FC_Exe $FC_Version
+      set CmpVers = any
+      set xstatus = $status
+   else if ($?COMPILER_GNU_VERSION == 1) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $COMPILER_GNU_VERSION )
+      set CmpVers = $COMPILER_GNU_VERSION
+      set xstatus = $status
+   else if ($?COMPILER_PGI_VERSION == 1) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $COMPILER_PGI_VERSION )
+      set CmpVers = $COMPILER_PGI_VERSION
+      set xstatus = $status
+   else if ($?COMPILER_IC_VERSION == 1) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $COMPILER_IC_VERSION )
+      set CmpVers = $COMPILER_IC_VERSION
+      set xstatus = $status
+   else if ($?COMPILER_PATH_VERSION == 1) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $COMPILER_PATH_VERSION )
+      set CmpVers = $COMPILER_PATH_VERSION
+      set xstatus = $status
+   else
+      flog $ALog $Cfg_FC_Exe $FC_Version
+      set CmpVers = any
+      set xstatus = $status
+   endif
+   if ($xstatus == 0) then
+      NoteD $ALog "      requested version $CmpVers"
+   else if (("$CmpVers" != any) && ($STRICT > 0)) then
+      NoteD $ALog "      requested version $CmpVers (not found)"
+      setenv STOP ""
+      SetParent STOP
+      exit(0)
+   else
+      NoteD $ALog "      requested version $CmpVers (not found)"
+   endif
+   Note $ALog ""
+
+   Note $ALog "Verify the standard of $FC_Exe"
+   flog $ALog $FC_Exe $Tmp.f -c $FC_Flags
+   if ($status == 0) then
+      setenv F_STD "F90"
+   else
+      setenv F_STD "F77"
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   Note $ALog ""
+   Note $ALog "Results of Fortran compiler analysis ($ETime)"
+   Note $ALog "   FC_Exe = |$FC_Exe|"
+   Note $ALog "   F90C   = |$F90C|"
+   Note $ALog "   F_STD  = |$F_STD|"
+   Note $ALog ""
+
+# make a file to test how Fortran compilers map identifiers
+cat << EOF >! $Tmp.f
+      subroutine foo
+      end subroutine foo
+      subroutine Bar
+      end subroutine Bar
+EOF
+   flog $ALog $FC_Exe $FC_Flags -c $Tmp.f -o $Tmp.o
+   if (-f $Tmp.o) then
+
+# check for appended characters (such as underscores)
+      flog $ALog $NM $Tmp.o
+      Note $ALog "Command: ($NM $Tmp.o | grep -i foo | tr [A-Z] [a-z] >! $Tmp.nm)"
+      $NM $Tmp.o | grep -i foo | tr "[A-Z]" "[a-z]" >! $Tmp.nm
+      flog $ALog cat $Tmp.nm
+      set FID = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /foo/) { print $i };};}' $Tmp.nm`
+      Note $ALog "Number of tokens = $#FID"
+
+# SGI nm uses bar as field delimiter without space between delimiter and field
+# AIX nm prints with dot in front of id to distinguish definition from reference
+      set FID = `expr "$FID[1]" : '.*\(foo.*\)'`
+
+      rm $Tmp.nm
+      Note $ALog "FID = |$FID|"
+      flog $ALog set FID_app = `expr "$FID" : 'foo\(.*\)'`
+      if ("$FID_app" == "") then
+         NoteD $ALog "      $FC_Exe appends nothing to identifiers"
+      else
+         NoteD $ALog "      $FC_Exe appends '$FID_app' to identifiers"
+      endif
+
+      flog $ALog setenv FC_ID_UNDERSCORE "$FID_app"
+
+# check for handling of identifier case
+      flog $ALog ($NM $Tmp.o | grep -i bar >! $Tmp.nm)
+      flog $ALog cat $Tmp.nm
+      set Lower = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bar/) { print $i };};}' $Tmp.nm`
+      set Upper = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /BAR/) { print $i };};}' $Tmp.nm`
+      flog $ALog rm $Tmp.nm
+      flog $ALog set FID_case = nomap
+      if ("$Lower" != "") then
+         NoteD $ALog "      $FC_Exe maps identifiers to lower case"
+         flog $ALog set FID_case = lower
+      endif
+      if ("$Upper" != "") then
+         NoteD $ALog "      $FC_Exe maps identifiers to upper case"
+         flog $ALog set FID_case = upper
+      endif
+      if ($?FC_ID_CASE == 0) then
+         flog $ALog setenv FC_ID_CASE $FID_case
+      endif
+   endif
+
+endif
+
+flog $ALog rm -f $Tmp.f $Tmp $Tmp.o
+
+setenv FC_Flags "$Save_FFLAGS"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+DONE:
+
+# export the results
+SetParent FC_Exe
+SetParent FC_Flags
+SetParent FC_Debug
+SetParent FC_Optimize
+SetParent FC_Linker
+
+SetParent Cfg_FC_Exe
+SetParent Cfg_FC_Flags
+
+SetParent Cfe_FC_Exe
+SetParent Cfe_FC_Flags
+
+SetParent F_STD
+SetParent FC_ID_UNDERSCORE
+SetParent FC_ID_CASE
+
+exit(0)
+

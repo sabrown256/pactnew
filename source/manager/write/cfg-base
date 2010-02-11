@@ -1,0 +1,102 @@
+#!/bin/csh -f
+#
+# CFG-BASE - common code to generate the main part of a config
+#          - from OS, Compiler, and bits
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# NOTE: use node name for config file base
+# if multiple hosts have the same SYS_TYPE there will be contention
+# over the file - the node name is truly host specific
+   set cfg = `uname -n | tr "[A-Z]" "[a-z]" | sed 's/\..*\..*$//'`
+   set los = `uname -s | tr "[A-Z]" "[a-z]"`
+   set lhw = `uname -m | tr "[A-Z]" "[a-z]"`
+
+   rm -f $Tmp
+   touch $Tmp
+
+   echo "include spokes" >>& $Tmp
+   switch ($los)
+      case aix:
+           set cfg = "$cfg-$bits"
+           echo "include ${bits}-bit" >>& $Tmp
+           echo "include compiler-xlc" >>& $Tmp
+           breaksw
+      case cygwin*:
+           echo "include ${bits}-bit" >>& $Tmp
+           echo "include compiler-cygwin" >>& $Tmp
+           breaksw
+      case darwin:
+           echo "include compiler-gnu-osx" >>& $Tmp
+           breaksw
+      case freebsd:
+           echo "define FREEBSD" >>& $Tmp
+           echo "include ${bits}-bit" >>& $Tmp
+           echo "include compiler-gnu" >>& $Tmp
+           breaksw
+      case hp-ux*:
+           echo "include compiler-hpux" >>& $Tmp
+           breaksw
+      case irix*:
+           echo "include ${bits}-bit" >>& $Tmp
+           echo "include cpp-rule" >>& $Tmp
+           echo "include compiler-irix" >>& $Tmp
+           breaksw
+      case osf1:
+           echo "include compiler-osf" >>& $Tmp
+           breaksw
+      case sunos:
+           set CCRoot = `$Which cc`
+           set CCRoot = $CCRoot:h
+           set CCRoot = $CCRoot:h
+           echo "setenv SOLRoot $CCRoot" >>& $Tmp
+           echo "include compiler-sol" >>& $Tmp
+           breaksw
+      default:
+      case linux:
+           switch ($CCompiler)
+              case gnu-bgl:
+                   echo "include auto-bgl-gnu" >>& $Tmp
+                   breaksw
+              case gnu-bgp:
+                   echo "include auto-bgp-gnu" >>& $Tmp
+                   breaksw
+              case *icc:
+                   echo "run std/use-intel $CCompiler" >>& $Tmp
+                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include compiler-icc" >>& $Tmp
+                   breaksw
+              case *pathcc:
+                   echo "run std/use-path $CCompiler" >>& $Tmp
+                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include compiler-path" >>& $Tmp
+                   breaksw
+              case *pgcc:
+                   echo "run std/use-pgi $CCompiler" >>& $Tmp
+                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include compiler-pgi" >>& $Tmp
+                   breaksw
+	      case sun:
+		   set CCRoot = '/usr/apps/gnu/sun/sunstudio12/bin'
+		   echo "setenv SOLRoot $CCRoot" >>& $Tmp
+		   echo "include compiler-sun" >>& $Tmp
+                   breaksw
+              case xlc-bgl:
+                   echo "include auto-bgl-xlc" >>& $Tmp
+                   breaksw
+              case xlc-bgp:
+                   echo "include auto-bgp-xlc" >>& $Tmp
+                   breaksw
+              default:
+              case *gcc:
+                   echo "run std/use-gnu $CCompiler" >>& $Tmp
+                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include compiler-gnu" >>& $Tmp
+                   breaksw
+           endsw
+           breaksw
+   endsw

@@ -1,0 +1,72 @@
+#!/bin/csh -f
+#
+# MESH - SX PDBView mesh test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDBVIEW MESH TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    PDBView Mesh Test ............ "
+   Note $Log ""
+
+   flog $Log rm -f pdbvmesh*.diff pdbvmesh*.ps
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/pdbvmesh.scm >& pdbvmesh.res)
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvmesh.scm |& \
+      grep "ERROR SUMMARY:"                                                     |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ("$Valgrind" != "") then
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   else if ($xstatus != 0) then
+      NoteD $Log "CRASHED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log @ xstatus = 0
+      foreach i (pdbvmesh.ps)
+         if (-f $RootDir/sx/tests/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+            @ st = $status
+            @ xstatus = $xstatus + $st
+            Note $Log "Test $i:r status $st"
+         endif
+      end
+
+      if ($xstatus != 0) then
+         NoteD $Log "FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f pdbvmesh.res.diff pdbvmesh.res pdbvmesh.ps pdbvmesh*.diff
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

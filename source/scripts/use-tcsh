@@ -1,0 +1,39 @@
+#!/bin/csh -f
+#
+# USE-TCSH - respawn under TCSH if there is any way possible to do so
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?tcsh == 0) then
+
+# first check your SHELL environment variable
+   if ($SHELL =~ */tcsh) then
+      set TCSH = $SHELL
+
+   else
+      set TCSH = ""
+
+# next check /etc/shells
+      foreach i ( `grep tcsh /etc/shells` )
+         if (-x "$i") then
+            set TCSH = "$i"
+            break
+         endif
+      end
+
+# finally check your PATH
+      if ("$TCSH" == "") then
+         set TCSH = `which tcsh`
+      endif
+   endif
+
+# if we have an executable tcsh then respawn
+   if (-x "$TCSH") then
+      exec $TCSH -f $0 $argv
+   endif
+endif
+

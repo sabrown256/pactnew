@@ -1,0 +1,185 @@
+#!/bin/csh -f
+#
+# DO-TEST - full PANACEA test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+while ($#argv > 0)
+   switch ($1)
+      case -vg:
+           setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+           breaksw
+      case -vgd:
+           setenv Valgrind  "valgrind --tool=memcheck --db-attach=yes"
+           breaksw
+      case -vgs:
+           setenv Valgrind  "valgrind --tool=memcheck"
+           breaksw
+   endsw
+   shift
+end
+
+if ($?Valgrind == 0) then
+   setenv Valgrind ""
+endif
+
+set Base     = $cwd
+set Base     = $Base:h
+set RootDir  = $Base/dev
+
+set PBase    = $Base:h
+set PBase    = $PBase:h
+set PRootDir = $PBase/dev
+set MgrDir   = $PBase/manager
+
+set System   = `$MgrDir/cfgman use`
+set RootDir  = $RootDir/$System
+set BinDir   = $RootDir/bin
+set IncDir   = $RootDir/include
+set PIncDir  = $PRootDir/$System/include
+set PBinDir  = $PRootDir/$System/bin
+set TstDir   = z-$System
+set Log      = log.test
+set ERROR    = 0
+set ABCError = FALSE
+set FAIL     = "NO"
+set status   = 0
+
+set PACT = $PBinDir/pact
+
+source $PIncDir/env-csh
+source $PIncDir/env-pact.csh
+
+set CFE = ""
+if ($?CROSS_COMPILE) then
+   if ($CROSS_COMPILE == TRUE) then
+      set CFE = "$PBinDir/do-run"
+   endif
+endif
+set DPE = `which pact-dpe`
+if ("$DPE" != "") then
+   if (-e "$DPE[1]") then
+      source $DPE
+   endif
+endif
+
+if (!(-d $TstDir)) then
+   mkdir $TstDir
+endif
+
+cd $TstDir
+rm -f $Log
+touch $Log
+
+Note $Log `$MgrDir/pwhich pact`
+Note $Log `$MgrDir/pwhich cc`
+Note $Log "BinDir = $BinDir"
+
+set Tmp = $cwd/.tmp.$$
+if ("$Valgrind" != "") then
+   setenv Valgrind  "$Valgrind --suppressions=$PBase/score/tests/vg.suppress"
+   setenv Valgrind  "$Valgrind --suppressions=$PBase/pdb/vg.suppress"
+   setenv Valgrind  "$Valgrind --suppressions=$PBase/pgs/vg.suppress"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   cp ../tsrc1 .
+   Note $Log "Running source preprocessor S ... "
+
+   if ("$Valgrind" == "") then
+      flog $Log $CFE $BinDir/s tsrc1
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/s tsrc1     |& \
+      grep "ERROR SUMMARY:"                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   flog $Log rm tsrc1
+
+   if ($xstatus != 0) then
+      NoteD $Log "                       S ..... FAILED ($xstatus)"
+      set ERROR    = 2
+      if ("$Valgrind" == "") then
+         set ABCError = "TRUE"
+      endif
+   else
+      NoteD $Log "                       S ..... PASSED"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ($ABCError == "FALSE") then
+
+      Note $Log "Running generator code A ... "
+
+      if ("$Valgrind" == "") then
+         flog $Log $CFE $BinDir/a ../st.g
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/a ../st.g    |& \
+         grep "ERROR SUMMARY:"                    |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+
+      if ($xstatus != 0) then
+         NoteD $Log "                       A ..... FAILED ($xstatus)"
+         set ERROR    = 3
+         if ("$Valgrind" == "") then
+            set ABCError = "TRUE"
+         endif
+      else
+         NoteD $Log "                       A ..... PASSED"
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ($ABCError == "FALSE") then
+
+      Note $Log "Running simulation code B ... "
+      if ("$Valgrind" == "") then
+         flog $Log $CFE $BinDir/b st.r00
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/b st.r00    |& \
+         grep "ERROR SUMMARY:"                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+
+      if ($xstatus != 0) then
+         NoteD $Log "                       B ..... FAILED ($xstatus)"
+         set ERROR    = 4
+         set ABCError = "TRUE"
+      else
+         NoteD $Log "                       B ..... PASSED"
+      endif
+   endif
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+flog $Log $RM $Tmp
+
+if ($ERROR == 0) then
+   flog $Log rm st.* test.* tsrc1.*
+endif
+
+exit($ERROR)
+

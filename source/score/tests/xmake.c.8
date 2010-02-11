@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+# this tests the server's ability to keep track of directories
+# when different jobs may be changing directories
+
+set Mkf = tmake.c.8
+
+rm -f $Mkf
+rm -rf a-c.8 b-c.8
+mkdir a-c.8 b-c.8
+
+# write hang script
+cat << EOF >! hang
+#!/bin/csh -f
+sleep 2
+exit($status)
+EOF
+
+# write server command file
+cat << EOF >! $Mkf
+--job--- 0:/bin/sh:.:(cd a-c.8;pwd;../hang)
+--job--- 1:/bin/sh:.:(cd b-c.8;pwd;../hang)
+--exit--
+EOF
+
+chmod a+x hang
+
+set NRetry = `dmake -na 2 -srv < $Mkf |& grep retry | wc -l`
+echo 'dmake -na 2 -srv < '$Mkf" had $NRetry retries"
+echo "NOTE: expect no retries in this test"
+
+# write some logs to make script give the correct pass/fail determination
+echo "0" >! $LogF.make
+echo "$NRetry" >! $LogF.dmake
+
+# cleanup
+rm -f $Mkf hang
+rm -rf a-c.8 b-c.8
+
+exit($status)

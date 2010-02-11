@@ -1,0 +1,33 @@
+#!/bin/csh -f
+#
+# SITE - analyze and set site information
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: site"
+
+if (-f $MngDir/extensions/sys-site) then
+   eval `$MngDir/extensions/sys-site`
+else
+   setenv SYS_TYPE `$ScrDir/system-id`
+   setenv SYS_SITE LONER
+   setenv DAI_ROOT /usr/share
+   setenv DAS_ROOT /usr/local
+endif
+
+# export the results
+SetParent SYS_TYPE
+SetParent SYS_SITE
+SetParent DAI_ROOT
+SetParent DAS_ROOT
+
+exit(0)
+

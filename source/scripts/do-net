@@ -1,0 +1,2534 @@
+#!/bin/csh
+#
+# DO-NET - execute scripts around a list of networks and hosts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias mail
+unalias mailx
+unalias cd
+unalias rm
+unalias mv
+
+unset time
+
+umask 002
+
+onintr INTERRUPT
+
+set Which = "swhich -1"
+
+# NOTE: horrible bootstrap to find csh-subroutines
+set IncPath = ""
+foreach i (`dirname $0` $cwd $cwd/.. $path)
+   set base = $i:h
+   if (-f $base/include/csh-subroutines) then
+      set IncPath = $base/include
+      break
+   endif
+end
+if ("$IncPath" == "") then
+   foreach i ($cwd/../include)
+      if (-f $i/csh-subroutines) then
+         set IncPath = $i
+         break
+      endif
+   end
+endif
+
+if (-d "$IncPath") then
+   pushd $IncPath >& /dev/null
+   set IncPath = ( $cwd )
+   set CSUBR   = $IncPath/csh-subroutines
+   popd >& /dev/null
+
+# we are going exactly nowhere without csh-subroutines
+# so quit now if you cannot find it
+else
+   echo ""
+   echo "Cannot find required includes - exiting"
+   echo ""
+   exit(1)
+endif
+
+source $CSUBR
+HAVE_SUBROUTINES
+
+# add the directory with do-net to the path
+set path = ( `dirname $0` $path )
+
+alias CALLSTACK 'set \!\!:1 = `expr $SUBR_[\!\!:2] : '"'.*_\(.*\)'"' | tr "[A-Z]" "[a-z]"`'
+
+alias vlog  '(if ($Verbose == TRUE) echo "DO-NET: \!\!:2-$") >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias dlog  '(if ($Verbose == TRUE) echo "DO-NET: \!\!:3-$") >>& \!\!:1 ; \!\!:3-$ >>& \!\!:2'
+alias flog  'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias nlog  'echo "DO-NET: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+
+# this one is necessary for SSHs that want to display a banner to stderr
+alias qlog  'echo "DO-NET: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& /dev/null'
+
+alias InitLog     'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
+alias Separator   'echo "--------------------------------------------------------------------------" >>& \!\!:^ ; echo "" >>& \!\!:^'
+alias SeparatorV  'if ($Verbose == TRUE) echo "DO-NET: ------------------------------------------------------------------" >>& \!\!:^ ; echo "DO-NET:" >>& \!\!:^'
+alias NoteV       '(if ($Verbose == TRUE) echo "DO-NET:" \!\!:2-$) >>& \!\!:1'
+alias Note        'echo \!\!:2-$ >>& \!\!:1'
+alias NoteD       'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
+alias NoteN       'echo "DO-NET:" \!\!:2-$ >>& \!\!:1'
+
+# new, generic tag aliases
+alias NoteVT    '(if ($Verbose == TRUE) echo "DO-NET:" \!\!:2 \!\!:3-$) >>& \!\!:1'
+
+set Root = $cwd:h
+set This = $cwd:t
+
+set Stamp = `date +%m_%d_%H_%M`
+set Host  = `uname -n`
+set UHost = `expr $Host : '\(.*\)\..*\..*'`
+if ("$UHost" == "") then
+   set UHost = $Host
+endif
+
+set RM = "rm -f"
+set MV = 'mv -f'
+
+set SetupTime    = 0
+set BuildTime    = 0
+set NetInstTime  = 0
+set HostInstTime = 0
+set CleanTime    = 0
+
+set HandTOut            = "pass"
+set Finishing           = FALSE
+set HaveTimeOuts        = FALSE
+set InterruptInProgress = FALSE
+
+# this can be overridden in the host file
+setenv ReportConfig  yes
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# READ COMMAND LINE
+
+set Dist           = ""
+set Check          = TRUE
+set Send           = TRUE
+set Build          = TRUE
+set Install        = TRUE
+set InstallWDH     = FALSE
+set Verbose        = TRUE
+set Silent         = FALSE
+set ClearOut       = FALSE
+set ReportProgress = FALSE
+set WatchProgress  = FALSE
+set WatchOut       = TEXT
+set ParallelSetup  = TRUE
+set LocalInstall   = FALSE
+set TestHost       = FALSE
+set Trace          = FALSE
+set Watch          = FALSE
+set UseSCP         = TRUE
+set UseX           = "-x"
+set HostFile       = ""
+set HostOnly       = ""
+set InterAct       = TRUE
+set Exe            = ""
+set Tag            = "none"
+set CArgs          = ( "-v -t" $Stamp )
+set CLArgs         = ""
+set ArgvCP         = ( $argv )
+
+# NOTE: you must have UseSCP FALSE when two bad things happen
+# First, the user's shell is KSH which is misfeatured wrt to login
+# environment - specifically no ~/.kshrc for users to overcome what
+# the sysadmins give the user (unhappy when you have bad sys admins)
+# Second, some admins cannot setup ssh worth shucks and consequently
+# the remote end of the SCP cannot find its side of ssh
+# the net effect is that you get a message like:
+# /bin/ksh: scp: no file or directory
+if ("$SHELL" =~ ksh) then
+   set UseSCP = FALSE
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           while ($#argv > 0)
+              set CLArgs = ( $CLArgs $1 )
+              shift
+           end
+           set CArgs = ( $CArgs $CLArgs )
+           break
+           breaksw
+      case -b:
+           set Build = FALSE
+           breaksw
+      case +b:
+           set Send    = FALSE
+           set Build   = TRUE
+           set Install = FALSE
+           breaksw
+      case -c:
+           shift
+           set Stamp    = $1
+           set ClearOut = TRUE
+           breaksw
+      case -ch:
+           set Check = FALSE
+           breaksw
+      case -d:
+           shift
+           set Dist  = $1
+           if (`expr "$Dist" : '/.*'` == 0) then
+              set Dist = $cwd/$Dist
+           endif
+           set LDist = $Dist:t
+           breaksw
+      case -e:
+           shift
+           set Exe  = $1
+           breaksw
+      case -g:
+           shift
+           set TestHost = TRUE
+           break
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: do-net [+/-b]"
+           echo "              [-c <stamp>] [-ch]"
+           echo "              [-d <file>] [-e <script>] [-g]"
+           echo "              [-h] [+/-i] [-int] [-I] [+/-m]"
+           echo "              [-o <host>[,<host>]*] [-p <stamp>] [-q]"
+           echo "              [+/-s] [-scp] [-t <tag>] [-v] [-watch] [+/-x]"
+           echo "              <hostfile>"
+           echo "              [-a ...]"
+           echo ""
+           echo "    a   - all following args are passed to the script"
+           echo "    b   - do not build (-) or build only (+)"
+           echo "    c   - clean up after aborted attempt"
+           echo "    ch  - do not check whether hosts are up or down"
+           echo "    d   - use distribution file"
+           echo "    e   - use the specified script"
+           echo "    g   - test hosts for availability"
+           echo "    h   - this help message"
+           echo "    i   - do not install (-) or install only (+)"
+           echo "    int - turn off interactive queries and commands"
+           echo "    I   - installs may proceed even with a down host"
+           echo "    l   - defer install decision to local hosts"
+           echo "    m   - do setup in parallel (-) or serial (+) default is -m"
+           echo "    o   - only do the comma delimited subset of hosts or configs"
+           echo "          from the hostfile"
+           echo "    p   - report progress"
+           echo "    q   - don't print tty messages"
+           echo "    s   - do not setup (-) or setup only (+)"
+           echo "    scp - use SSH instead of SCP for file transport"
+           echo "    t   - use version, <tag>, for repository update"
+           echo "    v   - verbose mode"
+           echo "    x   - do not forward X11 display (-) or ignore X (+)"
+           echo ""
+           exit(1)
+           breaksw
+      case -i:
+           set Install = FALSE
+           breaksw
+      case +i:
+           set Send    = FALSE
+           set Build   = FALSE
+           set Install = TRUE
+           breaksw
+      case -int:
+           set InterAct = FALSE
+           breaksw
+      case -I:
+           set InstallWDH = TRUE
+           breaksw
+      case -l:
+           set LocalInstall = TRUE
+           breaksw
+      case +m:
+           set ParallelSetup = FALSE
+           breaksw
+      case -m:
+           set ParallelSetup = TRUE
+           breaksw
+      case -o:
+           shift
+           set HostOnly = `echo $1 | sed 's/,/ /g'`
+           breaksw
+      case -p:
+           shift
+           set Stamp          = $1
+           set ReportProgress = TRUE
+           breaksw
+      case -q:
+           set Silent = TRUE
+           breaksw
+      case -s:
+           set Send = FALSE
+           breaksw
+      case +s:
+           set Send    = TRUE
+           set Build   = FALSE
+           set Install = FALSE
+           breaksw
+      case -scp:
+           set UseSCP = FALSE
+           breaksw
+      case -t:
+           shift
+           set Tag = $1
+           breaksw
+      case -trace:
+           set Trace = TRUE
+           breaksw
+      case -v:
+#           set CArgs = ( $CArgs $1 )
+#           set Verbose = TRUE
+           breaksw
+      case -watch:
+           set Watch    = TRUE
+           set WatchOut = TEXT
+           breaksw
+      case -hwatch:
+           set Watch    = TRUE
+           set WatchOut = HTML
+           breaksw
+      case +watch:
+           shift
+           set WatchProgress = TRUE
+           set WatchOut      = TEXT
+           break
+           breaksw
+      case +hwatch:
+           shift
+           set WatchProgress = TRUE
+           set WatchOut      = HTML
+           break
+           breaksw
+      case +x:
+           set SSH = "ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no"
+           breaksw
+      case -x:
+           set UseX = ""
+           breaksw
+      case -*:
+           breaksw
+      default:
+           if (`expr "$1" : '/.*'` == 0) then
+              set HostFile = $cwd/$1
+           else
+              set HostFile = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+set RPATH  = `$Which rpath`
+set SSH    = ""
+set TIMER  = ""
+set HSERVE = ""
+set NFSMON = ""
+set IOPR   = ""
+set PTIME  = ""
+foreach i ($path $cwd /usr/local/bin /usr/local/apps/pactnew/bin /usr/local/pact/new/bin)
+   if ("$i" == ".") then
+      set dir = $cwd
+   else
+      set dir = $i
+   endif
+   if (("$SSH" == "") && (-x $dir/ssh)) then
+      set SSH = "$dir/ssh -q $UseX -o BatchMode=yes -o StrictHostKeyChecking=no"
+   endif
+   if (("$TIMER" == "") && (-x $dir/timer)) then
+      set TIMER = "$dir/timer"
+      if (-x "$RPATH") then
+         set TIMER = `$RPATH $TIMER`
+      endif
+   endif
+   if (("$HSERVE" == "") && (-x $dir/hserve)) then
+      set HSERVE = "$dir/hserve"
+      if (-x "$RPATH") then
+         set HSERVE = `$RPATH $HSERVE`
+      endif
+   endif
+   if (("$NFSMON" == "") && (-x $dir/nfsmon)) then
+      set NFSMON = "$dir/nfsmon"
+      if (-x "$RPATH") then
+         set NFSMON = `$RPATH $NFSMON`
+      endif
+   endif
+   if (("$IOPR" == "") && (-x $dir/iopr)) then
+      set IOPR = "$dir/iopr"
+      if (-x "$RPATH") then
+         set IOPR = `$RPATH $IOPR`
+      endif
+   endif
+   if (("$PTIME" == "") && (-x $dir/ptime)) then
+      set PTIME = "$dir/ptime"
+      if (-x "$RPATH") then
+         set PTIME = `$RPATH $PTIME`
+      endif
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAIN - decide what to do
+
+set Err = 0
+
+# let us know how we are doing - at the terminal
+if ($ReportProgress == TRUE) then
+
+   call PROGRESS()
+
+# let us know how we are doing - in its own window
+else if ($WatchProgress == TRUE) then
+
+   call WATCH()
+
+# verify that all hosts specified in a host file are available
+else if ($TestHost == TRUE) then
+
+   call TESTHOSTS()
+
+# clean out the trash from an old or failed do-net
+else if ($ClearOut == TRUE) then
+
+   call CLEAROUT()
+
+else if ("$HostFile" == "") then
+   echo ""
+   echo "Must specify a host file to describe actions"
+   echo ""
+   exit(2)
+
+else if (!(-e "$HostFile")) then
+   echo ""
+   echo "Host file $HostFile does not exist"
+   echo ""
+   exit(3)
+
+# run the session
+else
+
+   call SESSION()
+
+endif
+
+exit($Err)
+
+#--------------------------------------------------------------------------
+
+#                      AUXILLIARY FUNCTION ROUTINES
+
+#--------------------------------------------------------------------------
+
+# PROGRESS - prepare a progress report for a specified do-net session
+#          - usage: do-net <hostfile> -p <stamp>
+#          - example: do-net foo:hosts/bar -p 07_26_18
+
+PROGRESS:
+
+   set Separator = "-----------------------------------------------------------------"
+   set HFile = $HostFile
+
+   if (`expr $HFile : '.*:.*'` == 0) then
+      set Host = ""
+      set File = $HFile
+   else
+      set Host = `expr $HFile : '\(.*\):.*'`
+      set File = `expr $HFile : '.*:\(.*\)'`
+   endif
+
+   if ("$Host" != "") then
+
+      $SSH $Host do-net -p $Stamp $File
+
+   else
+
+      set LogDir = `cat $File | awk '$1 == "logdir" { print $2 }'`
+      if (`expr $LogDir : '/.*'` == 0) then
+         set LogDir = $HOME/$LogDir
+      endif
+
+      cd $LogDir
+
+      echo ""
+      cat $Stamp.update
+      echo ""
+
+      touch $Stamp.setup.t $Stamp.build.t $Stamp.netinstall.t $Stamp.hostinstall.t $Stamp.interrupt.t
+      foreach i ($Stamp.setup.* $Stamp.build.* $Stamp.netinstall.* $Stamp.hostinstall.* $Stamp.interrupt.*)
+         if ($i =~ $Stamp.*.t) then
+            $RM $i
+         else if ($i != $Stamp.update) then
+            echo $Separator
+            echo $i
+            echo ""
+            cat $i | awk '($1 != "DO-NET:") { print }'
+            echo ""
+         endif
+      end
+
+   endif
+
+   quit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WATCH - continuous monitor of do-net session
+
+WATCH:
+
+   set File = $1
+   if ("$File" !~ /*) then
+      set File = $cwd/$1
+   endif
+
+   set Code   = `awk '$1 == "system" { print $2 }' $File`
+   set LogDir = `awk '$1 == "logdir" { print $2 }' $File`
+   if ("$LogDir" !~ /*) then
+      set LogDir = $HOME/$LogDir
+   endif
+
+# find out the time stamp
+   if ($#argv > 1) then
+      set Stamp = $2
+   else
+      set Stamp  = ""
+      set lName  = $File:t
+      set lFiles = 
+      foreach f ( `ls -1t $LogDir/*.update` )
+         set ok = `grep "Updating" $f | awk '$2 == "'$Code'" && $7 ~ /'$lName'/ {print "yes"}'`
+         if ($ok == "yes") then
+            set Stamp = $f:t:r
+            break
+         endif
+      end
+      if ("$Stamp" == "") then
+         echo ""
+         echo "No update log matching $Code and $lName - exiting"
+         echo ""
+         exit(1)
+      endif
+   endif
+
+   set Separator = "---------------------------------------------------------------"
+   set Working   = "..."
+   set SkippedR  = "---"
+   set Skipped   = "---       ---"
+   set Passed    = "ok"
+   set Failed    = "fail"
+
+   InitLog LogFile $LogDir/$Stamp.watch
+
+   Note $LogFile "Starting do-net watch using $File"
+   Note $LogFile "Timer is $TIMER"
+
+   cd $LogDir
+
+   call GETTIMES($File)
+
+   if ($Send == TRUE) then
+      flog $LogFile set Phase = setup
+      flog $LogFile @ TimLft  = $SrcTime
+   else if ($Build == TRUE) then
+      flog $LogFile set Phase = build
+      flog $LogFile @ TimLft  = $BldTime
+   else if ($Install == TRUE) then
+      flog $LogFile set Phase = hostinstall
+      flog $LogFile @ TimLft  = $InstTime
+   else
+      flog $LogFile set Phase = ""
+      flog $LogFile @ TimLft  = $CleanupTime
+   endif
+
+   while ("$Phase" != "")
+      while (1)
+         if (-e $Stamp.update) then
+            set Files = `ls $Stamp.* | grep $Phase`
+            if ($#Files > 0) then
+               break
+            endif
+         endif
+         sleep 10
+      end
+    
+# NOTE: do not use InitLog here because we do not want the header
+      set RepFile = $LogDir/$Stamp.$USER.$Phase
+      $RM $RepFile
+      touch $RepFile
+
+# NOTE: this works on Linux at least
+      set Visual = TRUE
+
+      if ($Visual == TRUE) then
+         set SHM = "[4m"    # underline
+         set SHM = "[7m"    # standoud
+         set SHM = "[1m"    # bold
+         set EHM = "[m"
+      else
+         set SHM = ""
+         set EHM = ""
+      endif
+
+      if ($TimLft >= 0) then
+         set tlft = `$TIMER -c $TimLft`
+      else
+         set tlft = "00:00"
+      endif
+      Note $RepFile "$SHM Phase         Time Left  Time Stamp   Host File$EHM"
+      if ($Visual != TRUE) then
+         Note $RepFile " -----         ---------  ----------   ---------"
+      endif
+      echo "$Phase $tlft $Stamp $File" | \
+      awk '{printf(" %-12s   %8s  %-11s  %s\n", $1, $2, $3, $4);}' >>& $RepFile
+
+      Note $RepFile ""
+
+      @ GotOne = 0
+      if ($Phase == build) then
+         Note $RepFile "$SHM Host       Config                D/O Remove Build   Time   Test    Time   Final   Time$EHM"
+         if ($Visual != TRUE) then
+            Note $RepFile " ----       ------                --- ------ ------------   ------------   ------------"
+         endif
+      else
+         Note $RepFile "$SHM Host       $Phase     Time$EHM"
+         @ CCount   = `echo $Phase | wc -c` - 3
+         set Blanks = ""
+         while ($CCount > 0)
+            set Blanks = "${Blanks} "
+            @ CCount = $CCount - 1
+         end
+         @ CCount    = `echo $Phase | wc -c` + 7
+         set Hyphens = ""
+         while ($CCount > 0)
+            set Hyphens = "${Hyphens}-"
+            @ CCount = $CCount - 1
+         end
+         if ($Visual != TRUE) then
+            Note $RepFile " ----       $Hyphens"
+         endif
+      endif
+
+      touch $Stamp.$Phase.t
+      foreach i ($Stamp.$Phase.*)
+         if ($i =~ $Stamp.*.t) then
+            rm -f $i
+         else if ($i != $Stamp.update) then
+            set Done = `awk '($1 ~ /Succeeded/) || ($1 ~ /Failed/) { print "done" }' $i`
+            if ("$Done" != "done") then
+               @ GotOne = $GotOne + 1
+            endif
+
+# process build phase in a special way
+            if ($Phase == build) then
+               set Hst = `awk '$1 == "Starting"    { print $4 }' $i | tail -n 1`
+   
+               set CfgFail = `awk '$0 ~ /Failed to configure/ { print "TRUE" }' $i | tail -n 1`
+
+               set Cfg    = `awk '$1 == "DO-NET:" && $2 == "configure" && $4 == "option" { print $3 }' $i | tail -n 1`
+               set DO     = `awk '$1 == "DO-NET:" && $2 == "configure" && $4 == "option" { print $5 }' $i | tail -n 1`
+               set UseTmp = `awk '$1 == "DO-NET:" && $2 == "configure" && $4 == "option" { print $6 }' $i | tail -n 1`
+   
+               if ("$UseTmp" == "yes") then
+                  set Cfg = "$Cfg*"
+               endif
+
+               set RmH = `awk '$1 == "Removing"    { print "have" }' $i | tail -n 1`
+               set RmS = `awk '$1 == "Removing"    { print $3 }' $i | tail -n 1`
+               set BlS = `awk '$1 == "Building"    { print $3 }' $i | tail -n 1`
+               set BlT = `awk '$1 == "Building"    { print $4 }' $i | tail -n 1`
+               set TsS = `awk '$1 == "Testing"     { print $3 }' $i | tail -n 1`
+               set TsT = `awk '$1 == "Testing"     { print $4 }' $i | tail -n 1`
+   
+               if ("$RmH" == have) then
+                  if ("$RmS" == "OK") then
+                     set RmS = $Passed
+                  else if ("$RmS" == "Failed") then
+                     set RmS = $Failed
+                  else
+                     set RmS = $Working
+                  endif
+               else
+                  set RmS = $SkippedR
+               endif
+   
+               if ("$BlS" == "OK") then
+                  set BlS = $Passed
+               else if ("$BlS" == "Failed") then
+                  set BlS = $Failed
+               else if (("$RmS" == $Passed) || ("$RmS" == $SkippedR)) then
+                  set BlS = $Working
+                  set BlT = ( "("$Working")" )
+               endif
+   
+               if ("$CfgFail" == "TRUE") then
+                  set RmS = $SkippedR
+                  set BlS = ( $Skipped )
+                  set BlT = ( $Skipped )
+                  set TsS = ( $Skipped )
+                  set TsT = ( $Skipped )
+               endif
+
+               if ("$TsS" == "OK") then
+                  set TsS = $Passed
+               else if ("$TsS" == "Failed") then
+                  set TsS = $Failed
+
+# allow the do-<specific> script to override test failure via PassTests
+# and denote it with the '*'
+               else if ("$TsS" == "Failed*") then
+                  set TsS = "$Failed*"
+
+               else if ("$BlS" == $Passed) then
+                  set TsS = $Working
+                  set TsT = ( "("$Working")" )
+               else if ("$BlS" == $Failed) then
+                  set TsS = ( $Skipped )
+                  set TsT = ( $Skipped )
+               endif
+   
+               if (("$TsS" == "") || ("$TsS" == $Working)) then
+                  set FnS = ""
+                  set FnT = ""
+               else
+                  set FnS = `awk '$1 == "Succeeded" { print "Pass" }' $i`
+                  set FnT = `awk '$1 == "Succeeded" { print $4 }' $i`
+                  if ("$FnS" == "") then
+                     set FnS = `awk '$1 == "Failed" { print "Fail" }' $i`
+                     set FnT = `awk '$1 == "Failed" { print $4 }' $i`
+                  endif
+               endif
+   
+               set BlT = `expr "$BlT" : '(\(.*\))'`
+               set TsT = `expr "$TsT" : '(\(.*\))'`
+               set FnT = `expr "$FnT" : '(\(.*\))'`
+   
+               set noglob
+               echo "$Hst $Cfg $DO $RmS $BlS $BlT $TsS $TsT $FnS $FnT" | \
+               awk '{ printf(" %-10s %-22s %-3s  %-4s %-4s %7s   %-4s %7s   %-4s %7s\n", \
+                             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10) }' >>& $RepFile
+               unset noglob
+
+# process all other phases
+            else
+	       set Hst = `awk '$1 != "DO-NET:" && $1 != "Succeeded" && $1 != "Failed" && $1 != "Look" { print $1 }' $i`
+	       set Sts = `awk '$1 != "DO-NET:" && $1 != "Succeeded" && $1 != "Failed" && $1 != "Look" { print $3 }' $i`
+	       set Tim = `awk '$1 != "DO-NET:" && $1 != "Succeeded" && $1 != "Failed" && $1 != "Look" { print $4 }' $i`
+               set Tim = `expr "$Tim" : '(\(.*\))'`
+
+               if ("$Sts" == "OK") then
+                  set Sts = $Passed
+               else if ("$Sts" == "Failed") then
+                  set Sts = $Failed
+               else if ("$Sts" == "NONE") then
+                  set Sts = ( $Skipped )
+                  set Tim = ( $Skipped )
+               else
+                  if ("$Hst" == "") then
+                     set Hst = $Working
+                  endif
+                  set Sts = $Working
+                  set Tim = $Working
+               endif
+
+               echo "$Hst $Sts $Tim" | \
+               awk '{ printf(" %-10s %-4s  %7s\n", $1, $2, $3) }' >>& $RepFile
+            endif
+         endif
+      end
+
+      if ($WatchOut == TEXT) then
+         clear
+         cat $RepFile
+
+      else if ($WatchOut == HTML) then
+         set HTML = $HOME/$File:t.html
+         rm -f $HTML
+         touch $HTML
+         Note $HTML "<html>"
+         Note $HTML "<head>"
+         Note $HTML "<title>DO-NET $File:t</title>"
+         Note $HTML "</head>"
+         Note $HTML "<body>"
+         Note $HTML "<pre>"
+         cat $RepFile | sed 's|\\[1m|<b color="#0000ff">|g' | sed 's|\\[m|</b>|g' >> $HTML
+         Note $HTML "</pre>"
+         Note $HTML "</body>"
+         Note $HTML "</html>"
+      endif
+
+      if ($GotOne == 0) then
+         if ($Phase == setup) then
+            if ($Build == TRUE) then
+               flog $LogFile set Phase = build
+               flog $LogFile @ TimLft  = $BldTime
+            else if ($Install == TRUE) then
+               flog $LogFile set Phase = hostinstall
+               flog $LogFile @ TimLft  = $InstTime
+            else
+               flog $LogFile set Phase = ""
+               flog $LogFile @ TimLft  = $CleanupTime
+            endif
+         else if ($Phase == build) then
+            if ($Install == TRUE) then
+               flog $LogFile set Phase = hostinstall
+               flog $LogFile @ TimLft  = $InstTime
+               set Skipped = "---             ---"
+            else
+               flog $LogFile set Phase = ""
+               flog $LogFile @ TimLft  = $CleanupTime
+            endif
+         else if ($Phase == hostinstall) then
+            flog $LogFile set Phase = netinstall
+            flog $LogFile @ TimLft  = $InstTime
+            set Skipped = "---            ---"
+         else
+            flog $LogFile set Phase = ""
+            flog $LogFile @ TimLft  = $CleanupTime
+         endif
+      else
+         sleep 10
+         @ TimLft = $TimLft - 10
+      endif
+   end
+
+   if ($WatchOut == TEXT) then
+      Note $LogFile "Continuing do-net watch until killed"
+      while(1)
+      end
+   endif
+
+#   Note $LogFile "Ending do-net watch"
+
+   quit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TESTHOSTS - check to see which hosts are down
+#            - usage: do-net -g <hostfile>
+#            - example: do-net -g foo:hosts/bar
+
+TESTHOSTS:
+
+   set DownOnly = FALSE
+   set Args     = ""
+
+   while ($#argv > 0)
+      switch ($1)
+         case -d:
+              set DownOnly = TRUE
+              set Args     = ( $Args $1 )
+              breaksw
+         default:
+              set Args = ( $Args $1 )
+              breaksw
+      endsw
+      shift
+   end
+
+   set HFile = $Args[1]
+   if (`expr $HFile : '.*:.*'` == 0) then
+      set Host = ""
+      set File = $HFile
+   else
+      set Host = `expr $HFile : '\(.*\):.*'`
+      set File = `expr $HFile : '.*:\(.*\)'`
+   endif
+
+   if ("$Host" != "") then
+
+      $SSH $Host do-net -g $File $Args
+
+   else
+
+      set NetSpecs  = `cat $File | awk '$1 == "net"    { print $2 }'`
+      set HostSpecs = `cat $File | awk '$1 == "host"   { print $2 }'`
+
+      set HSDB = `cat $File | grep -v "#" | awk '$0 ~ /HOST_SERVER_DB/ { print $3 }'`
+      if ("$HSDB" != "") then
+         setenv HOST_SERVER_DB $HSDB[1]
+      endif
+
+      set Hosts = `echo $NetSpecs $HostSpecs | sort | uniq`
+      if (($DownOnly == FALSE) && ("$Hosts" != "")) then
+         echo "Host status ($HOST_SERVER_DB):"
+      endif
+
+HostLoop:
+      if ("$Hosts" != "") then
+         set UHost = $Hosts[1]
+         shift Hosts
+
+         call FORMAT()
+
+         set RHost = `$HSERVE -m $UHost`
+	 if ("$RHost" != "-none-") then
+            $SSH $RHost pwd >& /dev/null
+            set LErr = $status
+            if ($DownOnly == TRUE) then
+               if ($LErr != 0) then
+                  echo "$UHost "
+               endif
+            else if ($LErr == 0) then
+               echo "   $Fill up"
+            else
+               echo "   $Fill down"
+            endif
+         endif
+         goto HostLoop
+      endif
+   endif
+
+   quit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAROUT - clear out the debris from an old do-net session
+#          - usage: do-net <hostfile> -c <stamp>
+#          - example: do-net foo:hosts/bar -c 07_26_18
+
+CLEAROUT:
+
+   set HFile = $HostFile
+
+   if (`expr $HFile : '.*:.*'` == 0) then
+      set Host = ""
+      set File = $HFile
+   else
+      set Host = `expr $HFile : '\(.*\):.*'`
+      set File = `expr $HFile : '.*:\(.*\)'`
+   endif
+
+   if ("$Host" != "") then
+
+      $SSH $Host do-net -c $Stamp $File
+
+   else
+
+      set BeginTime = `$TIMER -r`
+
+      call CLEAN()
+
+# remove the log files
+#      echo "   Removing the log files $LogDir/$Stamp.*"
+#      cd $LogDir >& /dev/null
+#      $RM $Stamp.* >& /dev/null
+
+   endif
+
+   quit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SESSION - do the central do-net work
+#         - usage: do-net <hostfile>
+#         - example: do-net hosts/bar
+
+SESSION:
+
+# initialize the session
+   call INIT()
+
+# start a do-watch if possible and requested
+   if ($Watch == TRUE) then
+      set Title    = "DO-NET-WATCH"
+      set Geometry = ( 90x15-10+10 )
+      set DO_NET   = `$Which do-net`
+
+      if ($WatchOut == TEXT) then
+         set WArgs = "+watch"
+      else if ($WatchOut == HTML) then
+         set WArgs = "+hwatch"
+      endif
+
+      if ($Send == FALSE) then
+         set WArgs = "-s $WArgs"
+      endif
+      if ($Build == FALSE) then
+         set WArgs = "-b $WArgs"
+      endif
+      if ($Install == FALSE) then
+         set WArgs = "-i $WArgs"
+      endif
+
+      set Tmp = $HOME/.do-watch-$Stamp
+      nlog $LogNet $RM $Tmp
+      nlog $LogNet touch $Tmp
+      Note $Tmp '#\!/bin/csh -f'
+      Note $Tmp "$DO_NET $WArgs $HostFile $Stamp"
+      Note $Tmp "rm -f $Tmp"
+      Note $Tmp 'exit($status)'
+      nlog $LogNet chmod a+x $Tmp
+      if ($WatchOut == TEXT) then
+         nlog $LogNet ( xterm -geometry $Geometry -T $Title +sb -e $Tmp & )
+      else if ($WatchOut == HTML) then
+         nlog $LogNet ( $Tmp & )
+      endif
+   endif
+
+# check to see which hosts are down
+   if ($Check == TRUE) then
+      call CHECKHOSTS()
+   endif
+
+   Note $LogNet ""
+
+# report the following when verbose
+   NoteV $LogNet ""
+   NoteV $LogNet "MailProgram =      |$Mailer|"
+   NoteV $LogNet "MailList    = ($#MailList)  |$MailList|"
+   NoteV $LogNet "NetSpecs    = ($#NetSpecs)  |$NetSpecs|"
+   NoteV $LogNet "HostSpecs   = ($#HostSpecs)  |$HostSpecs|"
+   if ($?SysInAccess) then
+      NoteV $LogNet "SysInAccess = ($#SysInAccess)  |$SysInAccess|"
+   endif
+   SeparatorV $LogNet
+   NoteV $LogNet ""
+   NoteV $LogNet "                               PER NET"
+   NoteV $LogNet ""
+
+# lock out any competitors
+   call LOCKOUT()
+
+# send the scripts where they need to be
+   call SENDSCRIPT()
+
+# setup the sources on the nets specified
+   if ($Send == TRUE) then
+      call SETUP()
+   endif
+
+# dispatch the builds
+   if ($Build == TRUE) then
+      call BUILD()
+   endif
+
+# host install if successful
+   if (($Install == TRUE) || ($LocalInstall == TRUE)) then
+      call HOSTINSTALL()
+   endif
+
+# net install if successful
+   if (($Install == TRUE) || ($LocalInstall == TRUE)) then
+      call NETINSTALL()
+   endif
+
+# gather the results into the log file
+
+   call FINISH()
+
+return
+
+#--------------------------------------------------------------------------
+
+#                            HELPER ROUTINES
+
+#--------------------------------------------------------------------------
+
+# INIT - initialize the main state of a do-net session
+
+INIT:
+
+   set BeginTime = `$TIMER -r`
+
+   call READHOST()
+
+   if ($Silent == FALSE) then
+      echo "Beginning update of $System ($Stamp)"
+   endif
+
+   $RM $LogNet >& /dev/null
+   touch $LogNet
+
+# determine whether we are working from a distribution or
+# a source repository
+   if ("$Dist" != "") then
+      set UsingRepo = FALSE
+      set CArgs     = ( $CArgs -dist $LDist )
+   else if ("$Repo" != "") then
+      set UsingRepo = TRUE
+      set CArgs     = ( $CArgs "-repo" $Repo $Tag )
+   else if ($Send == TRUE) then
+      Note $LogNet "No means to get sources defined"
+      quit(2)
+   endif
+
+   Note $LogNet ""
+   Note $LogNet "Updating $System from $UHost according to $HostFile"
+   if ("$CLArgs" != "") then
+      Note $LogNet "Command line args: $CLArgs"
+   endif
+   if ($LocalInstall == TRUE) then
+      Note $LogNet "Installs will be done on hosts which pass tests"
+   endif
+
+   Note $LogNet "User: $USER   Date: `date`   Tag: $Stamp"
+
+   Note $LogNet -n "Time limits in minutes are: "
+   if ($ParallelSetup == TRUE) then
+      @ SMin = $SrcTime / 60
+      Note $LogNet -n "$SMin setup; "
+   endif
+
+   @ BMin = $BldTime / 60
+   Note $LogNet -n "$BMin build; "
+
+   @ IMin = $InstTime / 60
+   Note $LogNet "$IMin install"
+
+   NoteN $LogNet "Dist           = |$Dist|"
+   NoteN $LogNet "Check          = |$Check|"
+   NoteN $LogNet "Send           = |$Send|"
+   NoteN $LogNet "Build          = |$Build|"
+   NoteN $LogNet "Install        = |$Install|"
+   NoteN $LogNet "InstallWDH     = |$InstallWDH|"
+   NoteN $LogNet "Verbose        = |$Verbose|"
+   NoteN $LogNet "Silent         = |$Silent|"
+   NoteN $LogNet "ClearOut       = |$ClearOut|"
+   NoteN $LogNet "ReportProgress = |$ReportProgress|"
+   NoteN $LogNet "WatchProgress  = |$WatchProgress|"
+   NoteN $LogNet "ParallelSetup  = |$ParallelSetup|"
+   NoteN $LogNet "LocalInstall   = |$LocalInstall|"
+   NoteN $LogNet "TestHost       = |$TestHost|"
+   NoteN $LogNet "Trace          = |$Trace|"
+   NoteN $LogNet "Watch          = |$Watch|"
+   NoteN $LogNet "HostFile       = |$HostFile|"
+   NoteN $LogNet "Exe            = |$Exe|"
+   NoteN $LogNet "Tag            = |$Tag|"
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# READHOST - read the host file
+
+READHOST:
+
+# read the host file
+   set MailList = `cat $HostFile | awk '$1 == "mail"         { for (i = 2; i <= NF; i++) print $i }'`
+   set Mailer   = `cat $HostFile | awk '$1 == "mailprogram"  { for (i = 2; i <= NF; i++) print $i }'`
+   set VarSpecs = `cat $HostFile | awk '$1 == "var"          { print $2 " " $3 }'`
+   set System   = `cat $HostFile | awk '$1 == "system"       { print $2 }'`
+   set Repo     = `cat $HostFile | awk '$1 == "repository"   { print $2 }'`
+   set LogDir   = `cat $HostFile | awk '$1 == "logdir"       { print $2 }'`
+   set HandTOut = `cat $HostFile | awk '$1 == "timeout"      { print $2 }'`
+   set LocInst  = `cat $HostFile | awk '$1 == "localinstall" { print $2 }'`
+
+# NOTE: if set in host file the user is responsible for having
+# it on the path or giving a full path here
+   set LocSSH = `cat $HostFile | awk '$1 == "ssh" { print $2 }'`
+   if ("$LocSSH" != "") then
+      set SSH = "$LocSSH -q $UseX -o BatchMode=yes -o StrictHostKeyChecking=no"
+   endif
+
+# the Stat variables are templates for use in comparing with the done list
+# the Specs variables contain the specifications for actual work
+   set NetSpecs = `cat $HostFile | awk '$1 == "net"  { for (i = 1; i <= NF; i++) print $i }'`
+   set NetStat  = `cat $HostFile | awk '$1 == "net"  { print $2 " " 8 }'`
+
+   @ NChar = `cat $HostFile | awk '$1 == "host" { for (i = 1; i <= NF; i++) print $i }' | wc -c`
+   if ($NChar > 4090) then
+      echo ""
+      echo "Shell limitations exceeded"
+      echo "Too many host specifications in host file:"
+      echo "   $HostFile"
+      echo ""
+      quit(1)
+   endif
+
+   if ("$HostOnly" == "") then
+      set HostSpecs = `cat $HostFile | awk '$1 == "host" { for (i = 1; i <= NF; i++) print $i }'`
+      set HostStat  = `cat $HostFile | awk '$1 == "host" { print $2 " " 8 }'`
+   else
+      set HostSpecs = ""
+      set HostStat  = ""
+      foreach i ($HostOnly)
+         set lSpec = `cat $HostFile | awk '$1 == "host" && $0 ~ /'$i' / { print $0 }'`
+         if (`expr "$lSpec" : '.*[ \t]*'$i'[ \t]*.*'` > 0) then
+            set HostSpecs = ( $HostSpecs `echo $lSpec | awk '$1 == "host" { for (i = 1; i <= NF; i++) print $i }'` )
+            set HostStat  = ( $HostStat  `echo $lSpec | awk '$1 == "host" { print $2 " " 8 }'` )
+         endif
+      end
+   endif
+
+# check for variables of interest to the do-net front end 
+   foreach var (HOST_SERVER_DB SC_EXEC_TIME_VERIFY)
+      set lVal = `cat $HostFile | awk '$0 ~ /'$var'/ { print $3 }'`
+      if ("$lVal" != "") then
+         eval "setenv $var $lVal[1]"
+      endif
+   end
+
+# get the various phase time limits
+   call GETTIMES($HostFile)
+
+   if ("$Exe" == "") then
+      set Exe = `cat $HostFile | awk '($1 == "script")       { print $2 }'`
+   endif
+
+# make sure Exe is henceforth a full, absolute path
+   if (`expr "$Exe" : '/.*'` == 0) then
+      set Exe = $HOME/$Exe
+   endif
+
+# check the script name and the version to be transmitted
+   if ("$Exe" == "") then
+      echo ""
+      echo "You must have a script specification in host file $HostFile"
+      echo ""
+      quit(4)
+   endif
+
+# check that the script exists
+   if (!(-f "$Exe")) then
+      echo ""
+      echo "The script $Exe specified in"
+      echo "host file $HostFile not found"
+      echo ""
+      quit(4)
+   endif
+
+   if ("$System" == "") then
+      set System = "code"
+   endif
+   if ("$HandTOut" == "") then
+      set HandTOut = "pass"
+   endif
+   if ("$LocInst" == "yes") then
+      set LocalInstall = TRUE
+   endif
+
+   if ("$LogDir" == "") then
+      set LogDir = "~"
+   else if (`expr $LogDir : '/.*'` == 0) then
+      set LogDir = $HOME/$LogDir
+   endif
+   if ("$LogDir" != "") then
+      set CArgs = ( $CArgs "-log" $LogDir )
+   endif
+
+   if ("$Mailer" == "") then
+      $Which mailx >& /dev/null
+      if ($status == 0) then
+         set Mailer = `$Which mailx`
+      else
+         $Which mail >& /dev/null
+         if ($status == 0) then
+            set Mailer = `$Which mail`
+         else
+            echo ""
+            echo "Can't determine the mail program to be used"
+            echo ""
+            quit(5)
+         endif
+      endif
+   endif
+
+# setup the log files names
+   set UpLog  = $LogDir/$Stamp
+   set LogNet = $UpLog.update
+   if (`expr $LogNet : '/.*'` == 0) then
+      set LogNet = $HOME/$LogNet
+   endif
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GETTIMES - read in the various time limits
+
+GETTIMES:
+
+   set hf = $args_[1]
+
+   @ BldTime     = `cat $hf | awk '$1 == "timelimit"    { print $2 }'`
+   @ InstTime    = `cat $hf | awk '$1 == "installtime"  { print $2 }'`
+   @ SrcTime     = `cat $hf | awk '$1 == "setuptime"    { print $2 }'`
+   @ CleanupTime = `cat $hf | awk '$1 == "cleantime"    { print $2 }'`
+
+# set defaults
+   if ("$SrcTime" == "") then
+      @ SrcTime = 900
+   endif
+   if ("$BldTime" == "") then
+      @ BldTime = 3600
+   endif
+   if ("$InstTime" == "") then
+      @ InstTime = 120
+   endif
+   if ($CleanupTime == 0) then
+      @ CleanupTime  = 600
+   endif
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECKLIST - check a list of specifications for hosts that are down
+
+CHECKLIST:
+
+   set delim = $args_[1]
+   shift args_
+   set specs = ( $args_ )
+
+   set nspecs = ""
+   set nstat  = ""
+   while ($#specs > 0)
+      shift specs
+      set host = $specs[1]
+      shift specs
+
+# convert host or system type to host
+      set ahst = `$HSERVE -m $host`
+
+# check for accessibility of real host
+      set HostUp = TRUE
+      if ("$ahst" == "-none-") then
+         set SysInAccess = ( $SysInAccess $host )
+         set HostUp      = FALSE
+      endif
+
+# if we have a host keep the specs
+      if ($HostUp == TRUE) then
+         set nspecs = ( $nspecs $delim $ahst )
+         set nstat  = ( $nstat $host 8 )
+         while ($#specs > 0)
+            if ($specs[1] == $delim) break
+            set nspecs = ( $nspecs $specs[1] )
+            shift specs
+         end
+
+# otherwise drop the specs
+      else
+         while ($#specs > 0)
+            if ($specs[1] == $delim) break
+            shift specs
+         end
+      endif
+   end
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECKHOSTS - check to find out which hosts are down
+
+CHECKHOSTS:
+
+   set CheckTime = `$TIMER -r`
+
+# see which hosts are down
+   if ($Silent == FALSE) then
+      echo -n "   checking hosts ... "
+   endif
+
+   set SysInAccess = ""
+
+# remove dead hosts from the HostSpecs and HostStat
+   call CHECKLIST(host, $HostSpecs)
+
+   set HostSpecs = ( $nspecs )
+   set HostStat  = ( $nstat )
+
+# remove dead hosts from the NetSpecs and NetStat
+   call CHECKLIST(net, $NetSpecs)
+
+   set NetSpecs = ( $nspecs )
+   set NetStat  = ( $nstat )
+
+   if ("$SysInAccess" != "") then
+      set Install = $InstallWDH
+   endif
+
+   set CheckTime = `$TIMER -b $CheckTime`
+
+   if ($Silent == FALSE) then
+      echo "done ($CheckTime)"
+   endif
+
+   if ("$SysInAccess" != "") then
+      if ($Silent == FALSE) then
+         echo ""
+         echo "      $SysInAccess (inaccessible)"
+      endif
+      Note $LogNet ""
+      Note $LogNet "Inaccessible systems: $SysInAccess"
+   endif
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SENDSCRIPT - send the local script
+
+SENDSCRIPT:
+
+# figure out the executables names and locations
+   call FINDRUN()
+
+   set sysids = ( $NetStat )
+   set specs  = ( $NetSpecs )
+   while ($#specs > 0)
+
+# get the specifications for the current net host 
+# these are arguments to the worker script
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set nhst = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ($specs[1] == "net") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+# get unqualified host name
+      set uhst = `expr $nhst : '\(.*\)\..*\..*'`
+      if ("$uhst" == "") then
+         set uhst = $nhst
+      endif
+
+      set Trans = ""
+      set Trans = ( $Trans $Exe     $DExe )
+      set Trans = ( $Trans $DoLocal $DLocal )
+      set Trans = ( $Trans $TIMER   $LTimer )
+      set Trans = ( $Trans $NFSMON  $LNFSMon )
+      set Trans = ( $Trans $IOPR    $LIopr )
+      set Trans = ( $Trans $CSUBR   $LCSubr )
+      NoteV $LogNet "Transmit scripts: $Trans"
+
+      set plst  = ""
+      set trns  = ( $Trans )
+      while ($#trns > 0)
+         set src = $trns[1]
+         set dst = $trns[2]
+         shift trns
+         shift trns
+
+         if ($UseSCP == TRUE) then
+            qlog $LogNet scp $src ${nhst}:$dst
+         else
+
+# NOTE: see earlier note about KSH and SCP
+# NOTE: the 2 second delay is so that high latency process creation
+# does not result in the data being lost
+            qlog $LogNet ( (sleep 2 ; cat $src) | ssh ${nhst} 'cat >! '$dst )
+
+         endif
+
+	 set plst = ( $plst $dst )
+      end
+
+      qlog $LogNet $SSH $nhst chmod a+x $plst
+   end
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LOCKOUT - lock out a competitor
+#         - this is NOT a distributed lock and perhaps it should be
+
+LOCKOUT:
+
+   set specs = ( $NetSpecs )
+   if ($#specs > 0) then
+
+      shift specs
+      set nhst = $specs[1]
+      shift specs
+      set WDir = $specs[1]
+      if (`expr $WDir : '/.*'` == 0) then
+         set WDir = $HOME/$WDir
+      endif
+
+      if (($nhst == $Host) || ($nhst == $UHost)) then
+         set TDir = $WDir:t
+         set Lock = $WDir:h/$System.$TDir.lock
+
+         if (-e $Lock) then
+            NoteD $LogNet ""
+            NoteD $LogNet "Another do-net is running in directory $WDir"
+            NoteD $LogNet ""
+            flog $LogNet cat $Lock
+            NoteD $LogNet ""
+
+            call REPORT()
+
+            quit(1)
+         endif
+
+         touch $Lock
+         if (-e $Lock) then
+            Note $Lock "Host file = $HostFile"
+            Note $Lock "Command line arguments = $CLArgs"
+            Note $Lock "Date = `date`"
+            Note $Lock "User = $USER"
+         endif
+      endif
+
+   endif
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WAIT - wait for parallel jobs to finish
+#      - Input:
+#      -    Mode     one of BY_HOST or BY_NET
+#      -    WaitTime the time to wait before checking status
+#      -    WaitMax  the total time to wait before declaring timout
+#      -    Report   if non-blank issue report info
+#      - Output:
+#      -    OK       if all jobs finished successfully
+
+WAIT:
+
+      set sect = $args_[1]
+
+      if ($Silent == FALSE) then
+         echo -n "   $sect ."
+         @ ndot = 1
+      endif
+
+      @ WaitCount = 0
+
+WaitLoopMain:
+
+# check for messages from the tty
+# NOTE: this will be expanded into another layer of control
+# suplementing the interrupt handling
+      if ($InterAct == TRUE) then
+
+# see if we are attached to a terminal
+         tty -s >& /dev/null
+         if ($status == 0) then
+
+# do a non-blocking read to see if a message is waiting
+            stty -icanon min 0 time 0
+            set In = "$<"
+            stty cooked
+
+            if ("$In" != "") then
+               switch ("$In")
+                  case done:
+                       echo "Phase $sect declared done"
+                       echo -n "   $sect ..."
+                       goto WaitLoopEnd
+                       breaksw
+                  case help:
+                       echo " "
+                       echo "Options:"
+                       echo "  done   declare the current phase done"
+                       echo "  help   this help message"
+                       echo " "
+                       echo -n "   $sect ..."
+                       breaksw
+                  default:
+                       echo " "
+                       echo "Option ignored: $In"
+                       echo -n "   $sect ..."
+                       breaksw
+               endsw
+            endif
+         endif
+      endif
+
+      set done     = ""
+      set notdone  = ""
+
+      if ($Mode == BY_HOST) then
+         set sysids = ( $HostStat )
+         set specs  = ( $HostSpecs )
+         set delim  = "host"
+      else
+         set sysids = ( $NetStat )
+         set specs  = ( $NetSpecs )
+         set delim  = "net"
+      endif
+
+      @ DoneCount = $#sysids
+
+      @ count = 1
+      while ($#specs > 0)
+
+# get the specifications for the current host
+# these are arguments to the worker script
+         set HFields = ( $sysids[1] )
+         shift sysids
+         shift sysids
+         shift specs
+         set host = $specs[1]
+         shift specs
+         while ($#specs > 0)
+            if ($specs[1] == $delim) break
+            set HFields = ( $HFields $specs[1] )
+            shift specs
+         end
+
+         set file    = "$UpLog.$sect.$host.$count"
+         set handled = FALSE
+
+# if there is a complaint about the auto log file
+# conclude that this host and configuration has failed
+         if ($sect == build) then
+            grep "log/auto:" $file >& /dev/null
+            if ($status == 0) then
+               set LTmp = $HFields[2]
+               set LCfg = $HFields[4]
+               set LOpt = $HFields[5]
+               $RM $file
+               touch $file
+               Note $file "Starting build/test on $host ($host-$LCfg) at `date`"
+               Note $file " "
+               Note $file "DO-NET: configure $LCfg option $LOpt $LTmp"
+               Note $file "   Configuring from $LCfg using $LOpt"
+               Note $file "   Removing ... OK"
+               Note $file "   Building ... OK (0:00)"
+               Note $file "   Testing .... OK (0:00)"
+               Note $file " "
+               Note $file "Failed on $host (0:00)"
+
+# NOTE: this is a diagnostic to debug the above assignment of LTmp, LCfg, and LOpt
+               Note $file " "
+               Note $file "HFields = |$HFields|"
+            endif
+
+            set CfgID = `grep "configure" $file |& awk '$2 ~/configure/ {print $3}'`
+	    if (("$CfgID" == "") || ($ReportConfig != yes)) then
+               set CfgID = $host
+            endif
+         else
+            grep "log/${sect}:" $file >& /dev/null
+            if ($status == 0) then
+               $RM $file
+               touch $file
+               Note $file "   $host ................. FAILED (0:00)"
+               Note $file "Failed on $host (0:00)"
+            endif
+            set CfgID = $host
+         endif
+   	    
+# make sure that the configuration id is a single token
+         set CfgID = $CfgID[1]
+
+# look to see if the phase failed on the current host
+         grep "Failed on " $file >& /dev/null
+         if ($status == 0) then
+            set done    = ( $done $CfgID 0 )
+            set handled = TRUE
+         endif
+   	    
+# look to see if the phase succeeded on the current host
+         grep "Succeeded on " $file >& /dev/null
+         if ($status == 0) then
+            set done    = ( $done $CfgID 1 )
+            set handled = TRUE
+         endif
+
+# if not positively finished (succeeded or failed) it is not done
+         if ($handled == FALSE) then
+            set notdone = ( $notdone $CfgID )
+            set handled = TRUE
+         endif
+
+         @ count = $count + 1
+      end
+
+      if ($Silent == FALSE) then
+         if ($ndot >= 5) then
+            echo -n "."
+            @ ndot = 1
+         else
+            @ ndot = $ndot + 1
+         endif
+      endif
+
+# if not done try again in WaitTime seconds
+      NoteV $LogNet "is $#done < $DoneCount  and  $WaitCount <= $WaitMax"
+      if (($#done != $DoneCount) && ($WaitCount <= $WaitMax)) then
+         NoteV $LogNet "done = |$done|"
+         sleep $WaitTime
+         @ WaitCount = $WaitCount + $WaitTime
+         goto WaitLoopMain
+      endif
+
+WaitLoopEnd:
+      if ($Silent == FALSE) then
+         set Waited = `$TIMER -c $WaitCount`
+         echo " done ($Waited)"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check to see who passed and who failed
+
+# passed
+      set ilast  = ""
+      set Passed = ""
+      foreach i ($done)
+         if ($i == 1) then
+            set Passed = ( $Passed $ilast )
+         endif
+         set ilast = $i
+      end
+
+# failed
+      set OK     = TRUE
+      set Failed = ""
+      set ilast  = ""
+      foreach i ($done)
+         if ($i == 0) then
+            set OK     = FALSE
+            set Failed = ( $Failed $ilast )
+         endif
+         set ilast = $i
+      end
+
+# timedout
+      if ($HandTOut != "pass") then
+         if ("$notdone" != "") then
+            set OK           = FALSE
+            set HaveTimeOuts = TRUE
+         endif
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# report success and failure
+      if ($Report == TRUE) then
+
+# passed
+         if ("$Passed" != "") then
+            if ($ReportConfig == yes) then
+               if (("$notdone" == "") && ("$Failed" == "")) then
+                  Note $LogNet "Succeeded for ALL configurations:"
+               else
+                  Note $LogNet "Succeeded for configurations:"
+               endif
+            else
+               if (("$notdone" == "") && ("$Failed" == "")) then
+                  Note $LogNet "Succeeded on ALL hosts:"
+               else
+                  Note $LogNet "Succeeded on hosts:"
+               endif
+            endif
+            echo $Passed                                    | \
+            awk '{for (i = 0; i < NF; i++)                    \
+                      {if (i == 0)                            \
+                          {printf("  ");}                     \
+                       else if (i % 4 == 0)                   \
+                          {printf("\n  ");};                  \
+                       j = i + 1;                             \
+                       printf(" %-18s", $j);};                \
+                  printf("\n");}' >>& $LogNet
+         endif
+
+# timedout
+         if ("$notdone" != "") then
+            if ($ReportConfig == yes) then
+               Note $LogNet "Timed out for configurations:"
+            else
+               Note $LogNet "Timed out on hosts:"
+            endif
+            echo $notdone                                   | \
+            awk '{for (i = 0; i < NF; i++)                    \
+                      {if (i == 0)                            \
+                          {printf("  ");}                     \
+                       else if (i % 4 == 0)                   \
+                          {printf("\n  ");};                  \
+                       j = i + 1;                             \
+                       printf(" %-18s", $j);};                \
+                  printf("\n");}' >>& $LogNet
+         endif
+
+# failed
+         if ("$Failed" != "") then
+            if ($ReportConfig == yes) then
+               Note $LogNet "Failed for configurations:"
+            else
+               Note $LogNet "Failed on hosts:"
+            endif
+            echo $Failed                                    | \
+            awk '{for (i = 0; i < NF; i++)                    \
+                      {if (i == 0)                            \
+                          {printf("  ");}                     \
+                       else if (i % 4 == 0)                   \
+                          {printf("\n  ");};                  \
+                       j = i + 1;                             \
+                       printf(" %-18s", $j);};                \
+                  printf("\n");}' >>& $LogNet
+         endif
+
+         Note $LogNet ""
+      endif
+   endif
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FORMAT - fill ragged UHost name with "." to column 20 
+
+FORMAT:
+
+   @ CCount = `echo $UHost | wc -c`
+   @ NDots  = 20 - $CCount
+   set Fill = "$UHost "
+   while ($NDots > 0)
+      set Fill = "$Fill."
+      @ NDots = $NDots - 1
+   end
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# REPORT - send the cleaned up report
+
+REPORT:
+
+   set Report = $UpLog.report
+
+# remove messages from stty
+   $MV $LogNet $LogNet.tmp
+   cat $LogNet.tmp | awk '($1 != "stty:") { print }' > $LogNet
+   $RM $LogNet.tmp
+
+# get rid of any message with "warning:"
+# we don't print any such thing ourselves but
+# ssh prints such warnings for compatibility modes
+   $MV $LogNet $LogNet.tmp
+   cat $LogNet.tmp | awk '($3 != "authentication") && ($1 != "warning:") && ($1 != "Warning:") { print }' > $LogNet
+   $RM $LogNet.tmp
+
+# remove DO-NET messages
+   cat $LogNet | awk '($1 != "DO-NET:") { print }' >! $Report
+
+   if (("$Mailer" != "") && ("$MailList" != "")) then
+      vlog $LogNet ( $Mailer -s "$System auto build log ($HostFile:t)" $MailList < $Report )
+   endif
+
+# check for failure on any hosts
+   grep "Failed on" $Report >& /dev/null
+   if ($status == 0) then
+      set Err = 10
+   endif
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# RECOMMEND - make recommendations possibly for a retry
+
+RECOMMEND:
+
+   Note $LogNet ""
+   Note $LogNet "Making recommendations for follow up action"
+   Note $LogNet ""
+
+# look for retry hints
+   set RetrySpec = `cat $LogNet | awk '$1 == "DO-NET:" && $2 == "(RETRY)" { print $3 }' | sort | uniq`
+   set RetrySpec = `echo $RetrySpec | sed 's/ /,/g'`
+   if ("$RetrySpec" != "") then
+      if ($Silent == FALSE) then
+         NoteD $LogNet ""
+         NoteD $LogNet "Some hosts failed to complete their work successfully."
+         NoteD $LogNet "You may want to retry those hosts as follows:"
+         NoteD $LogNet "    do-net $ArgvCP -o $RetrySpec"
+         NoteD $LogNet ""
+      else
+         Note $LogNet ""
+         Note $LogNet "Some hosts failed to complete their work successfully."
+         Note $LogNet "You may want to retry those hosts as follows:"
+         Note $LogNet "    do-net $ArgvCP -o $RetrySpec"
+         Note $LogNet ""
+      endif
+   endif
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - write up the report and call it a day
+
+FINISH:
+
+   set Finishing = TRUE
+
+# cleanup if there were timeouts
+   if ($HaveTimeOuts == TRUE) then
+      Note $LogNet "Some host timed out - cleaning up"
+
+      set HaveTimeOuts = FALSE
+
+      call CLEAN()
+   endif
+
+# we are really done so finish up
+   if ($Silent == FALSE) then
+      echo -n "   reporting ..."
+   endif
+
+# report the elapsed time
+# technically this doesn't include the report and cleanup time
+# which is hopefully very small
+   set ETime = `$TIMER -b $BeginTime`
+
+   Note $LogNet "Total time to completion $ETime"
+
+# report do-stat version, domain (seconds since 1/1/2000), and total time
+   NoteVT $LogNet "(STAT)" "Version 5"
+   NoteVT $LogNet "(STAT)" "Domain `$PTIME -p 0`"
+   NoteVT $LogNet "(STAT)" "total ($ETime)"
+
+   Note $LogNet ""
+
+   nlog $LogNet ( rm -f $LogDir/log.* >& /dev/null )
+
+   set SLog = $UpLog.stat
+   touch $SLog
+
+   set results = ""
+   set results = ( $results "setup"       "net"  $SetupTime )
+   set results = ( $results "build"       "host" $BuildTime )
+   set results = ( $results "netinstall"  "net"  $NetInstTime )
+   set results = ( $results "hostinstall" "host" $HostInstTime )
+   set results = ( $results "clean"       "host" $CleanTime )
+   while ($#results > 0)
+
+      set sect = $results[1]
+      shift results
+
+      if ($results[1] == "net") then
+         set specs = ( $NetSpecs )
+         set delim = "net"
+      else
+         set specs = ( $HostSpecs )
+         set delim = "host"
+      endif
+      shift results
+
+      set ETime = $results[1]
+      shift results
+
+      if ($sect == "build") then
+         @ count = 1
+         while ($#specs > 0)
+
+# the specifications for the current host are arguments to the
+# worker script
+            shift specs
+            set host = $specs[1]
+            shift specs
+            while ($#specs > 0)
+               if ($specs[1] == $delim) break
+               shift specs
+            end
+
+            set ELog = $LogDir/log.$host
+            touch $ELog
+
+            set file = $UpLog.$sect.$host.$count
+            if (-e $file) then
+               Separator $LogNet
+
+# add the non-LOG text to LogNet
+               grep -v "DO-NET: (LOG)" $file >>& $LogNet
+               echo " " >>& $LogNet
+
+# add the LOG tagged text to ELog
+               grep "DO-NET: (LOG)" $file >& /dev/null
+               if ($status == 0) then
+                  grep "DO-NET: (LOG)" $file |& sed 's/DO-NET: (LOG) //' >>& $ELog
+               endif
+
+# add the STAT tagged text to the stat file
+               grep "DO-NET: (STAT)" $file >& /dev/null
+               if ($status == 0) then
+                  grep "DO-NET: (STAT)" $file |& sed 's/DO-NET: (STAT) //' >>& $SLog
+               endif
+
+               $RM $file
+            endif
+
+            @ count = $count + 1
+         end
+
+      else
+
+         touch $UpLog.$sect.nil
+         set NLines = `wc -l $UpLog.$sect.* | awk '($2 != "total") { nlines = nlines + $1 - 1 } END { print nlines }'`
+         if ($NLines > 0) then
+            Separator $LogNet
+            Note $LogNet "Starting $sect"
+            @ count = 1
+            while ($#specs > 0)
+               shift specs
+               set host = $specs[1]
+               shift specs
+               while ($#specs > 0)
+                  if ($specs[1] == $delim) break
+                  shift specs
+               end
+
+               set ELog = $LogDir/log.$host
+               touch $ELog
+
+               set file = $UpLog.$sect.$host.$count
+
+# add the non-LOG text to LogNet
+               grep -v "DO-NET: (LOG)" $file | awk '$1 !~ /Succeeded/ && $1 !~ /Failed/ { print }' >>& $LogNet
+
+# add the LOG tagged text to ELog
+               grep "DO-NET: (LOG)" $file >& /dev/null
+               if ($status == 0) then
+                  grep "DO-NET: (LOG)" $file |& sed 's/DO-NET: (LOG) //' >>& $ELog
+               endif
+
+# add the STAT tagged text to the stat file
+               grep "DO-NET: (STAT)" $file >& /dev/null
+               if ($status == 0) then
+                  grep "DO-NET: (STAT)" $file |& sed 's/DO-NET: (STAT) //' >>& $SLog
+               endif
+
+               $RM $file
+
+               @ count = $count + 1
+            end
+            Note $LogNet "Done with $sect ($ETime)"
+            if (($sect == "setup") || ($sect == "hostinstall") || ($sect == "netinstall")) then
+               NoteVT $LogNet "(STAT)" "$sect ($ETime)"
+            endif
+            Note $LogNet " "
+         else
+            $RM $UpLog.$sect.*
+         endif
+         $RM $UpLog.$sect.nil
+
+      endif
+   end
+
+# remove empty log.<host> files
+   find . -size 0c -name "log.*" -exec rm {} \;
+
+# remove empty <stamp>.stat files
+   find . -size 0c -name "*.stat" -exec rm {} \;
+
+   Separator $LogNet
+
+   if ($Silent == FALSE) then
+      echo " done"
+   endif
+
+# unlock the working directory
+   set specs = ( $NetSpecs )
+   if ($#specs > 0) then
+
+      shift specs
+      set nhst = $specs[1]
+      shift specs
+      set WDir = $specs[1]
+      if (`expr $WDir : '/.*'` == 0) then
+         set WDir = $HOME/$WDir
+      endif
+
+      set TDir = $WDir:t
+      set Lock = $WDir:h/$System.$TDir.lock
+
+      $RM $Lock
+
+   endif
+
+# notify the people on the mailing list
+   call REPORT()
+
+# make recommendations for proceeding
+   call RECOMMEND()
+
+# delete the local scripts
+   set specs  = ( $NetSpecs )
+   set sysids = ( $NetStat )
+   while ($#specs > 0)
+
+# get the current net host specifications
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set host = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ($specs[1] == "net") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+# get unqualified host name
+      set uhst = `expr $host : '\(.*\)\..*\..*'`
+      if ("$uhst" == "") then
+         set uhst = $host
+      endif
+
+# cleanup the scripts copied up in the beginning
+      set flst  = ""
+      set trns  = ( $Trans )
+      while ($#trns > 0)
+         set file = $trns[2]
+         shift trns
+         shift trns
+         set flst = ( $flst $file )
+      end
+      qlog $LogNet $SSH $host $RM $flst
+   end
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINDRUN - figure out which do-net/do-local to run
+
+FINDRUN:
+
+   set DoBin   = `$Which do-net`
+   set DoBin   = $DoBin:h
+   set DoLocal = $DoBin/do-local
+   set DLocal  = .$DoLocal:t.$Stamp
+   set LTimer  = .do-timer.$Stamp
+   set LNFSMon = .do-nfsmon.$Stamp
+   set LIopr   = .do-iopr.$Stamp
+   set LCSubr  = .do-csh-subr.$Stamp
+
+   set Exe = `echo $Exe | sed 's/~/$HOME/'`
+   if (`expr $Exe : '/.*'` == 0) then
+      set Exe = $HOME/$Exe
+   endif
+   set DExe = .$Exe:t.$Stamp
+   set Run  = ( ./$DLocal "$DExe" )
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INTERRUPT - cleanup properly after an interrupt
+
+INTERRUPT:
+
+# fake the flow control into thinking this was called as a subroutine
+   set SUBR_ = ( INTERRUPT $SUBR_ )
+   if ($Trace == TRUE) then
+      echo "Calling INTERRUPT (from $SUBR_[2])"
+   endif
+
+   if ($InterruptInProgress == FALSE) then
+      set InterruptInProgress = TRUE
+
+      CALLSTACK sect 2
+
+# the watch option process does not have LogNet defined and
+# does not need to cleanup
+      if ($?LogNet) then
+         NoteD $LogNet ">>> interrupted in $sect"
+         call CLEAN()
+      endif
+   endif
+
+   quit(1)
+
+#--------------------------------------------------------------------------
+
+#                             PHASE SUBROUTINES
+
+#--------------------------------------------------------------------------
+
+# SETUP - dispatch the setup of the sources on the nets specified
+
+SETUP:
+
+   set SetupTime = `$TIMER -r`
+
+   set sysids = ( $NetStat )
+   set specs  = ( $NetSpecs )
+   if ($#specs > 0) then
+      Note $LogNet -n "For source setup using"
+      if ($UsingRepo == FALSE) then
+         Note $LogNet " distribution:"
+         Note $LogNet "    $Dist"
+      else
+         Note $LogNet " repository:"
+         Note $LogNet "    $Repo (tag $Tag)"
+      endif
+         Note $LogNet " "
+   endif
+
+   set OK  = TRUE
+   @ count = 1
+   while ($#specs > 0)
+
+# get the specifications for the current net host 
+# these are arguments to the worker script
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set host = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ($specs[1] == "net") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+# get unqualified host name
+      set uhst = `expr $host : '\(.*\)\..*\..*'`
+      if ("$uhst" == "") then
+         set uhst = $host
+      endif
+
+      SeparatorV $LogNet
+
+# update sources from a distribution file
+      if ($UsingRepo == FALSE) then
+         vlog $LogNet chmod 770 $Dist
+         NoteV $LogNet "Current directory: $cwd"
+
+# NOTE: see earlier note about KSH and SCP
+         if (-f $Dist) then
+            if ($UseSCP == TRUE) then
+               qlog $LogNet scp $Dist ${host}:$LDist
+            else
+               qlog $LogNet ( (sleep 2 ; cat $Dist) | ssh ${host} 'cat >! '$LDist )
+            endif
+
+         else
+            NoteV $LogNet "Distribution file $Dist does not exist"
+            set OK = FALSE
+         endif
+
+      endif
+
+      set file = $UpLog.setup.$host.$count
+      touch $file
+
+      if ($ParallelSetup == TRUE) then
+         dlog $LogNet $file ( $SSH $host $Run -setup $CArgs -time_limit $SrcTime -host_vars $VarSpecs -host_fields $HFields & )
+      else
+         dlog $LogNet $file $SSH $host $Run -setup $CArgs -time_limit $SrcTime -host_vars $VarSpecs -host_fields $HFields
+         if ($status != 0) then
+            set OK = FALSE
+         endif
+      endif
+
+      @ count = $count + 1
+   end
+
+   SeparatorV $LogNet
+
+   if ($ParallelSetup == TRUE) then
+
+# setup and call wait routine
+      set Mode    = BY_NET
+      @ WaitTime  = $SrcTime / 80
+      set WaitMax = $SrcTime
+      set Report  = FALSE
+
+      call WAIT(setup)
+   endif
+
+   if ($Build == TRUE) then
+      set Build = $OK
+   endif
+   if ($Install == TRUE) then
+      set Install = $OK
+   endif
+
+   set SetupTime = `$TIMER -b $SetupTime`
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BUILD - dispatch the build and test phase
+
+BUILD:
+
+   set BuildTime = `$TIMER -r`
+
+   SeparatorV $LogNet
+   NoteV $LogNet "                               PER HOST"
+   NoteV $LogNet ""
+
+   set sysids = ( $HostStat )
+   set specs  = ( $HostSpecs )
+   @ count    = 1
+   while ($#specs > 0)
+
+# get the specifications for the current host 
+# these are arguments to the worker script
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set host = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ("$specs[1]" == "host") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+      set file = $UpLog.build.$host.$count
+      $RM $file >& /dev/null
+      touch $file
+
+      SeparatorV $LogNet
+
+      NoteV $LogNet "Dispatching build/test on $host"
+      dlog $LogNet $file ( $SSH $host $Run -build $CArgs -time_limit $BldTime -host_vars $VarSpecs -host_fields $HFields & )
+
+      @ count = $count + 1
+   end
+
+   SeparatorV $LogNet
+
+# setup and call wait routine
+   set Mode    = BY_HOST
+   @ WaitTime  = $BldTime / 80
+   set WaitMax = $BldTime
+   set Report  = TRUE
+
+   call WAIT(build)
+
+   if ($Install == TRUE) then
+      set Install = $OK
+   endif
+
+   set BuildTime = `$TIMER -b $BuildTime`
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HOSTINSTALL - dispatch the host install
+
+HOSTINSTALL:
+
+   set HostInstTime = `$TIMER -r`
+
+   set sysids = ( $HostStat )
+   set specs  = ( $HostSpecs )
+   @ count    = 1
+   while ($#specs > 0)
+
+# get the specifications for the current host are arguments to the
+# worker script
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set host = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ("$specs[1]" == "host") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+      set file = $UpLog.hostinstall.$host.$count
+      touch $file
+
+      SeparatorV $LogNet
+
+      NoteV $LogNet "Dispatching host install on $host"
+      dlog $LogNet $file ( $SSH $host $Run -hostinstall $CArgs -time_limit $InstTime -host_vars $VarSpecs -host_fields $HFields & )
+
+      @ count = $count + 1
+   end
+
+   SeparatorV $LogNet
+
+# setup and call wait routine
+   set Mode    = BY_HOST
+   @ WaitTime  = $InstTime / 80
+   set WaitMax = $InstTime
+   set Report  = FALSE
+
+   call WAIT(hostinstall)
+
+   set HostInstTime = `$TIMER -b $HostInstTime`
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NETINSTALL - dispatch the net install phase
+
+NETINSTALL:
+
+   set NetInstTime = `$TIMER -r`
+
+   set sysids = ( $NetStat )
+   set specs  = ( $NetSpecs )
+   @ count    = 1
+   while ($#specs > 0)
+
+# get the specifications for the current host 
+# these are arguments to the worker script
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set host = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ($specs[1] == "net") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+      set file = $UpLog.netinstall.$host.$count
+      touch $file
+
+      SeparatorV $LogNet
+
+      NoteV $LogNet "Dispatching net install on $host"
+      dlog $LogNet $file ( $SSH $host $Run -netinstall $CArgs -time_limit $InstTime -host_vars $VarSpecs -host_fields $HFields & )
+
+      NoteV $LogNet "done"
+
+      @ count = $count + 1
+   end
+
+   SeparatorV $LogNet
+
+# setup and call wait routine
+   set Mode    = BY_NET
+   @ WaitTime  = $InstTime / 80
+   set WaitMax = $InstTime
+   set Report  = FALSE
+
+   call WAIT(netinstall)
+
+   set NetInstTime = `$TIMER -b $NetInstTime`
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN - dispatch the cleanup phase of a do-net
+#       - by killing all descendants on all hosts
+#       - and removing locks
+
+CLEAN:
+   set CleanTime = `$TIMER -r`
+   NoteV $LogNet "Entering clean"
+
+   if (!($?HostSpecs)) then
+      NoteV $LogNet "   Read host file"
+      call READHOST()
+   endif
+
+   if (!($?Run)) then
+      NoteV $LogNet "   Find run info"
+      call FINDRUN()
+   endif
+
+   set sysids = ( $HostStat )
+   set specs  = ( $HostSpecs )
+   @ count    = 1
+   while ($#specs > 0)
+
+# get the specifications for the current host 
+# these are arguments to the worker script
+      set HFields = ( $sysids[1] )
+      shift sysids
+      shift sysids
+      shift specs
+      set host = $specs[1]
+      shift specs
+      while ($#specs > 0)
+         if ("$specs[1]" == "host") break
+         set HFields = ( $HFields $specs[1] )
+         shift specs
+      end
+
+      set file = $UpLog.clean.$host.$count
+      vlog $LogNet $RM $file
+      vlog $LogNet touch $file
+
+      SeparatorV $LogNet
+
+      NoteV $LogNet "   Dispatching interrupt on $host"
+      dlog $LogNet $file ( $SSH $host $Run -interrupt $CArgs -time_limit $CleanupTime -host_vars $VarSpecs -host_fields $HFields & )
+
+      @ count = $count + 1
+   end
+
+# now that the local cleanups have been launched it
+# should be irrevocable and hence safe to remove the lock
+#   $RM $Lock
+
+   SeparatorV $LogNet
+
+# setup and call wait routine
+   set Mode    = BY_HOST
+   @ WaitTime  = $CleanupTime / 80
+   set WaitMax = $CleanupTime
+   set Report  = TRUE
+   NoteV $LogNet "   Waiting for $WaitMax seconds in $WaitTime increments"
+
+   call WAIT(clean)
+
+   NoteV $LogNet "   All jobs completed"
+
+   set CleanTime = `$TIMER -b $CleanTime`
+
+# if we were not already finishing up do so now
+   if ($Finishing == FALSE) then
+      NoteV $LogNet "   Finishing"
+      call FINISH()
+   endif
+
+   NoteV $LogNet "Leaving clean"
+
+return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

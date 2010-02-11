@@ -1,0 +1,89 @@
+#!/bin/csh -f
+#
+# PNG - analyze platform PNG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: png"
+
+# vanilla place to look if previously undefined
+SafeEnv PNG_Path     /usr
+SafeEnv HAVE_PNGLIB  FALSE
+
+# if we have explicitly said we do not want PNG
+# do NOT detect it
+if ($PNG_Path == none) then
+   NoteD $ALog "      no PNG (by request)"
+
+else if ($Z_Path == none) then
+   NoteD $ALog "      has PNG (no libz)"
+
+else
+
+   set UTime = `timer -r`
+
+# write a little PNG test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <png.h>
+int main(int c, char **v)
+{png_structp pw;
+ pw = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+		              (png_voidp) NULL, NULL, NULL);
+ if (pw == NULL)
+    return(1);
+ else
+    {png_destroy_write_struct(&pw, (png_infopp) NULL);
+     return(0);};}
+EOF
+
+   set lIncDirs = ( $PNG_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $PNG_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lHdrs    = ( png.h )
+   set ASList   = ( a so )
+   set lLib     = png
+   set lFile    = $Tmp
+   set lALibs   = ( $LD_Lib -lm )
+   set Implicit = FALSE
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$ZLib" != "") && ("$PckInc" != "")) then
+      NoteD $ALog "      has PNG ($PckLib)"
+
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         setenv CC_MDGInc "$CC_MDGInc $PckInc"
+      endif
+
+      setenv LD_MDGLib    "$LD_MDGLib $PckLib"
+      setenv HAVE_PNGLIB  TRUE
+   else
+      NoteD $ALog "      no PNG"
+      setenv HAVE_PNGLIB FALSE
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   setenv PNGLib "$PckLib"
+   setenv PNGInc "$PckInc"
+
+# export the results
+   SetParent PNGLib
+   SetParent PNGInc
+   SetParent CC_MDGInc
+   SetParent LD_MDGLib
+
+endif
+
+SetParent HAVE_PNGLIB
+
+exit(0)
+

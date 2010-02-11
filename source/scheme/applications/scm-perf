@@ -1,0 +1,16 @@
+#!/bin/csh -f
+#
+####################
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+echo "Reference version: "
+/usr/local/new/bin/scheme -l scmperf.scm
+
+echo "Local version: "
+./scheme -l scmperf.scm
+
+exit($status)

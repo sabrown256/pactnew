@@ -1,0 +1,137 @@
+# !/bin/csh -f
+#
+# PACT-SCS - define the Source Control System being used
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set SCSName    = CVS
+set SCSVersion = "3.0"
+set SCSRelease = "LLNL-CODE-422942"
+
+#
+# new CVS variables
+#
+set SCSRoot = CVSROOT
+set ADM     = CVS
+
+# be sure to define the CvsOpt if undefined by this time
+if ($?CvsOpt == 0) then
+   set CvsOpt = ""
+endif
+
+set RemoteHost = ""
+
+if ($?CVSROOT) then
+   set RemoteUser = `expr "$CVSROOT" : '\(.*\)@.*:.*'`
+   set RemoteRepo = `expr "$CVSROOT" : '.*:\(.*\)'`
+   if ("$RemoteUser" != "") then
+      set RemoteHost = `expr "$CVSROOT" : '.*@\(.*\):.*'`
+   else
+      set RemoteHost = `expr "$CVSROOT" : '\(.*\):.*'`
+   endif
+endif
+
+if ("$RemoteHost" == "") then
+
+# handle the LOCAL repository case
+
+   if ($?CVSROOT) then
+      if (`expr "$CVSROOT" : '.*\(:\).*'` == "") then
+         set Lock = $CVSROOT/commit.lock
+      else
+         set Lock = commit.lock
+      endif
+   else
+      set Lock = commit.lock
+   endif
+
+   alias Unlock     "rm -f $Lock"
+   alias Makelock   "touch $Lock ; chmod 660 $Lock"
+   alias CatLock    "cat $Lock"
+   alias KillZombie ""
+
+   if (-e $Lock) then
+      set ExistLock = TRUE
+   else
+      set ExistLock = FALSE
+   endif
+
+else
+
+# handle the REMOTE repository case
+
+   if ($?CVS_RSH == 0) then
+      setenv CVS_RSH  ssh
+   endif
+   if ($?RCP == 0) then
+      setenv RCP      scp
+   endif
+
+   set Host    = `uname -n`
+   set WhoIAm  = $USER
+
+# for commits
+   if ($?TagOnly) then
+      if ($TagOnly == TRUE) then
+         set Date = `/bin/date '+T%y_%m_%d_%H_%M_%S'`
+      else
+         set Date = `/bin/date '+D%y_%m_%d_%H_%M_%S'`
+      endif
+
+# for other repository interactions
+   else
+      set Date = `/bin/date '+%y_%m_%d_%H_%M_%S'`
+   endif
+
+   if ($?TagAnn) then
+      set Message = (\'<$WhoIAm $TagAnn $Date|Remote $Host> $argv\')
+   else
+      set Message = (\'<$WhoIAm|$Date|Remote $Host> $argv\')
+   endif
+
+   set Stage   = "$MngDir/stage"
+   set Lock    = "$Stage/commit.lock"
+   set RemLock = "$RemoteRepo/commit.lock"
+
+   if (!(-d $Stage)) then
+      mkdir $Stage
+      chmod 770 $Stage
+   endif
+
+   alias Unlock     "$CVS_RSH $RemoteHost rm -f $RemLock ; rm -f $Lock"
+   alias Makelock   'touch' $Lock '; chmod 660' $Lock '; echo' $Message '>>' $Lock ';' $RCP $Lock $RemoteHost':'$RemoteRepo' >& /dev/null'
+   alias CatLock    "$CVS_RSH $RemoteHost cat $RemLock"
+
+# current CVS doesn't leave zombies
+# but hedge against the future
+   alias KillZombie ""
+
+   if ($?DoingConfig == 0) then
+      set LockTest  = `$CVS_RSH $RemoteHost ls $RemoteRepo`
+      set ExistLock = FALSE
+      foreach i ($LockTest)
+         set entry = $i:h
+         if ("$entry" == "commit.lock") then
+            set ExistLock = TRUE
+         endif
+      end
+   endif
+
+   if (!(-d $Stage)) then
+      mkdir $Stage
+   endif
+
+endif
+
+#
+# Source Control Systems operations
+#
+set Commit   = ( cvs $CvsOpt  commit )
+set History  = ( cvs $CvsOpt  history )
+set Tag      = ( cvs $CvsOpt  rtag )
+set Update   = ( cvs $CvsOpt  update )
+

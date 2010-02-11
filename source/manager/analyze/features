@@ -1,0 +1,53 @@
+#!/bin/csh -f
+#
+# FEATURES - manage detected features
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: system features"
+
+NoteD $ALog "   System Features:"
+
+$AnaDir/fork
+$AnaDir/ipc
+
+$AnaDir/signal
+$AnaDir/mmap
+
+$AnaDir/gethost
+$AnaDir/rusage
+$AnaDir/getpwuid
+
+$AnaDir/poll
+$AnaDir/pty
+$AnaDir/socket
+$AnaDir/termio
+$AnaDir/asyncio
+
+$AnaDir/fpe
+
+$AnaDir/math
+$AnaDir/libz
+$AnaDir/hdf5
+$AnaDir/sql
+
+NoteD $ALog "   C Library Features:"
+
+$AnaDir/vsnprintf
+$AnaDir/strerror_r
+
+NoteD $ALog "   Parallel Programming Features:"
+
+$AnaDir/openmp
+$AnaDir/mpi
+
+exit(0)
+

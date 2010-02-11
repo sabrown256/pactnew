@@ -1,0 +1,220 @@
+#!/bin/csh -f
+#
+# RPATH - figure out RPATH at various points
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+source $ldir/csh-subroutines
+HAVE_SUBROUTINES
+
+set Tgt = ""
+set Dir = ""
+set Var = ""
+set Out = "parent"
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           shift
+           set Dir = $1
+           set Var = ""
+           set Tgt = add
+           breaksw
+      case -e:
+           shift
+           set Dir = ""
+           set Var = $1
+           set Tgt = add
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: rpath [-a <dir>] [-e <var>] [-h] [-o parent | echo | list]"
+           echo "  a   add <dir> to the RPATH"
+           echo "  e   add value of <var> to the RPATH"
+           echo "  h   this help message"
+           echo "  o   return result in specified mode"
+           echo "      parent displays as parent(a:b:c)"
+           echo "      echo displays as a:b:c"
+           echo "      list displays as 'a b c'"
+           echo "      link displays as '-La -Lb -Lc'"
+           echo "      default is parent"
+           echo ""
+           exit(1)
+      case -o:
+           shift
+           set Out = $1
+           breaksw
+      default:
+           set Tgt = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($?RPATH == 0) then
+   setenv RPATH ""
+endif
+
+if ($?Cfg_RPATH == 0) then
+   setenv Cfg_RPATH ""
+endif
+
+switch ($Tgt)
+
+# AIX cannot tolerate an empty RPATH
+   case aix:
+        if ($?MPILib == 0) then
+           setenv RPATH     /lib
+           setenv Cfg_RPATH /lib
+        endif
+        breaksw
+
+# GNU compiler configs may have GNURoot
+   case gnu:
+	if ($?GNURoot == 1) then
+           if ($GNURoot != "/usr") then
+              setenv RPATH     ${GNURoot}/${LIB}:${RPATH}
+              setenv Cfg_RPATH ${GNURoot}/${LIB}:${RPATH}
+           endif
+        endif
+        breaksw
+
+   case init:
+        setenv RPATH ""
+        setenv Cfg_RPATH ""
+        breaksw
+
+# Intel compiler configs may have ICRoot
+   case intel:
+	if ($?ICRoot == 1) then
+           setenv RPATH     ${ICRoot}/lib:${RPATH}
+           setenv Cfg_RPATH ${ICRoot}/lib:${RPATH}
+        endif
+        breaksw
+
+   case linux:
+        setenv RPATH     /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
+        setenv Cfg_RPATH /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
+        breaksw
+
+# PathScale compiler configs may have PSRoot
+   case path:
+	if ($?PSRoot == 1) then
+           setenv RPATH     ${PSRoot}/32:${RPATH}
+           setenv Cfg_RPATH ${PSRoot}/32:${RPATH}
+           if ($Bits == 64) then
+              setenv RPATH     ${PSRoot}:${RPATH}
+              setenv Cfg_RPATH ${PSRoot}:${RPATH}
+           endif
+        endif
+        breaksw
+
+# PGI compiler configs may have PGRoot
+   case pgi:
+	if ($?PGRoot == 1) then
+           setenv RPATH     ${PGRoot}/lib:${RPATH}
+           setenv Cfg_RPATH ${PGRoot}/lib:${RPATH}
+        endif
+        breaksw
+
+   case sun:
+        if ($?SOLRoot == 1) then
+           setenv RPATH     ${SOLRoot}/lib:${RPATH}
+           setenv Cfg_RPATH ${SOLRoot}/lib:${RPATH}
+        endif
+        breaksw
+
+   case solaris:
+        if ($?SOLRoot == 1) then
+           setenv RPATH     ${SOLRoot}/lib:${RPATH}
+           setenv Cfg_RPATH ${SOLRoot}/lib:${RPATH}
+        endif
+        breaksw
+
+   case add:
+        if ("$Var" != "") then
+           set lvar = `printenv $Var`
+           if ("$RPATH" == "") then
+              setenv RPATH $lvar
+           else
+              setenv RPATH ${lvar}:${RPATH}
+           endif
+        else if ("$Dir" != "") then
+           if ("$RPATH" == "") then
+              setenv RPATH $Dir
+           else
+              setenv RPATH ${Dir}:${RPATH}
+           endif
+        endif
+        breaksw
+endsw
+
+call CLEAN_RPATH()
+
+switch ($Out)
+   case parent:
+        SetParent RPATH
+        SetParent Cfg_RPATH
+        breaksw
+   case echo:
+        echo $RPATH
+        breaksw
+   case list:
+        echo $npath
+        breaksw
+   case link:
+        set nlink = ""
+        foreach l ($npath)
+           set nlink = ( $nlink -L$l )
+        end
+        echo $nlink
+        breaksw
+endsw
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN_RPATH - make sure each entry in RPATH exists and is unique
+
+CLEAN_RPATH:
+
+    set npath = ""
+    if ("$RPATH" != "") then
+       set lpath = ( `echo $RPATH | sed 's/:/ /g'` )
+       foreach i ($lpath)
+          if (-d $i) then
+             set ok = TRUE
+             foreach n ($npath)
+                if ($i == $n) then
+                   set ok = FALSE
+                   break
+                endif
+             end
+             if ($ok == TRUE) then
+                set npath = ( $npath $i )
+             endif
+          endif
+       end
+       set lpath = ( `echo "$npath" | sed 's/ /:/g'` )
+       setenv RPATH $lpath
+    endif
+
+    return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

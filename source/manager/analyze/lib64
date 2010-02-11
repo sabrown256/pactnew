@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# LIB64 - analyze 64-bit archive directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me   = $0
+set Base = $Me:h
+source $Base/common
+
+unalias file
+
+set lQuiet = FALSE
+while ($#argv > 0)
+   switch ($1)
+      case -q:
+           set lQuiet = TRUE
+           breaksw
+   endsw
+   shift
+end
+
+if ($lQuiet == FALSE) then
+   NoteD $ALog -n "   Library base: "
+   Note $ALog ""
+endif
+
+set LRoot = /usr
+source $Base/common-lib64
+setenv LIB $LibT
+
+if ($lQuiet == FALSE) then
+   NoteD $ALog $LIB
+endif
+
+# export the results
+SetParent LIB
+
+exit(0)
+

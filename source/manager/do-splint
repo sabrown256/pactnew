@@ -1,0 +1,34 @@
+#!/bin/csh -f
+#
+# DO-SPLINT - map splint over source code in current directory
+#
+
+@ err = 0
+
+set lst = ( $argv )
+if ("$lst" == "") then
+   set lst = ( `ls *.c` )
+endif
+
+set path = ( /usr/gapps/pact/scripts $path )
+set arch = `../manager/cfgman use`
+
+source ../dev/$arch/include/env-csh
+
+InitLog log $cwd/log.splint
+
+set opt = ( -warnposix -retvalint +boolint +matchanyintegral )
+
+foreach i ($lst)
+   if (($i =~ foo*) || ($i =~ bar*) || ($i =~ fu*) || ($i =~ baz*)) continue
+
+   NoteD $log ""
+   NoteD $log "------------------------------------------------------------"
+   NoteD $log ""
+   NoteD $log "splint $opt -I../dev/$arch/include $i"
+   splint $opt -I../dev/$arch/include $i |& tee -a $log
+   set xstatus = $status
+   @ err = $err + $xstatus
+end
+
+exit($err)

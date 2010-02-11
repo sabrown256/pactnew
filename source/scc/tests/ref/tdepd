@@ -1,0 +1,7 @@
+struct s1
+typedef t1
+typedef t2
+Function f1 requires:
+   derived type: struct s1
+   typedef: t1
+   typedef: t2

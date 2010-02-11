@@ -1,0 +1,91 @@
+#!/bin/csh -f
+#
+# INSTALL-EXT - install any existing scheme or script extensions
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set System = $1
+shift
+set ScrX   = ( $argv )
+
+set BinDir  = $System/bin
+set ScmDir  = $System/scheme/extensions
+set SrcDirX = applications/extensions
+
+if (!(-d $ScmDir)) then
+   mkdir $ScmDir
+endif
+
+if (-d $SrcDirX) then
+
+   set FFile = $SrcDirX/__foo__.scm
+   touch $FFile
+
+# copy scheme files
+   set IScm = ""
+   foreach i ($SrcDirX/*)
+      if (`expr "$i" : '.*~'` == 0) then
+         if ($i == $FFile) then
+            rm -f $i
+         else if (($i =~ */Makefile*) || ($i =~ */do-test)) then
+            continue
+         else if (-f $i) then
+            set IScm = ( $IScm $i:t )
+         endif
+      endif
+   end
+
+   if ("$IScm" == "") then
+      echo "   No extension scheme files to install"
+   else
+      echo -n "   Copying extension scheme files:"
+      @ Count = 10
+      foreach i ($IScm)
+         if ($Count > 4) then
+            echo ""
+            echo -n "     "
+            @ Count = 1
+         endif
+         echo -n " $i"
+
+         cp $SrcDirX/$i $ScmDir
+         @ Count = $Count + 1
+      end
+      echo ""
+   endif
+
+# copy scripts
+   set IScr = ""
+   foreach i ($ScrX)
+      if (-e $SrcDirX/$i) then
+         set IScr = ( $IScr $i )
+      endif
+   end
+
+   if ("$IScr" == "") then
+      echo "   No extension scripts to install"
+   else
+      echo -n "   Copying extension scripts: $IScr"
+      @ Count = 10
+      foreach i ($IScr)
+         if ($Count > 4) then
+            echo ""
+            echo -n "     "
+            @ Count = 1
+         endif
+         echo -n " $i"
+
+         cp $SrcDirX/$i $BinDir
+         chmod a+x $BinDir/$i
+         @ Count = $Count + 1
+      end
+      echo ""
+   endif
+
+endif
+
+exit($status)

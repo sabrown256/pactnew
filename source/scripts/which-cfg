@@ -1,0 +1,86 @@
+#!/bin/csh -f
+#
+# WHICH-CFG - find a config file for the current host
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/which-cfg") then
+   set path = ( $Exe $path )
+endif
+
+if ($?CONFIG_HOST_FILE == 1) then
+   set HostF = $CONFIG_HOST_FILE
+else
+   set HostF = ""
+endif
+
+set Qual = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -f:
+           shift
+           set HostF = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: which-cfg [-h] [-f <host>] [<qual>]*"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set Qual = ( $Qual $1 )
+           breaksw
+   endsw
+   shift
+end
+
+eval `sys-site`
+source $DAS_ROOT/pactnew/include/env-csh
+
+set ID   = `system-id`
+set Site = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
+set Prop = $ID@$Site
+
+# find nearest sys-type/sys-site match
+set Lst = ( `cat $HostF | awk '$2 ~ /@/ { print $2 }' | grep $ID | uniq` )
+@ imx   = 0
+set NID = ""
+foreach i ($Lst)
+   @ im = `expr "$Prop" : $i`
+   if ($im > $imx) then
+      @ imx   = $im
+      set NID = $i
+   endif
+end
+
+# find all items associated with the match which refer to files
+set Lst = ( `cat $HostF |& awk '$1 == "host" && $2 == "'$NID'" { print }'` )
+set CfgLst = ""
+while ($#Lst > 0)
+   set f = $Lst[1]
+   shift Lst
+   ls */$f >& /dev/null
+   if ($status == 0) then
+      set CfgLst = ( $CfgLst $f )
+   endif
+end
+
+# search file names for best match with qualifiers
+if ("$Qual" != "") then
+   while ($#Qual > 0)
+      set q = $Qual[1]
+      shift Qual
+
+      set CfgLst = ( `echo "$CfgLst" | sed 's/ /\n/g' | grep $q` )
+   end
+endif
+
+if ("$CfgLst" != "") then
+   echo $CfgLst[1]
+else
+   echo "none"
+endif
+
+exit($status)

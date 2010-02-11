@@ -1,0 +1,45 @@
+Defining attribute parent for VIF
+Defining attribute child for VIF
+Defining attribute sibling for VIF
+Defining attribute friend for VIF
+
+Setting parent attribute of foo
+Setting friend attribute of foo
+
+Setting parent attribute of bar
+Setting child attribute of bar
+Setting sibling attribute of bar
+Setting friend attribute of bar
+
+Attributes for VIF:
+parent    child     sibling   friend
+
+Foo Attributes: 
+parent = "Dad"
+foo does not have the sibling attribute
+foo does not have the child attribute
+friend = "B"
+
+Bar Attributes: 
+parent = "Mom"
+sibling =   6.022e+23
+child =      3
+friend = "A"
+
+Removing the child attribute
+
+Attributes for VIF:
+parent    sibling   friend
+
+Foo Attributes: 
+parent = "Dad"
+foo does not have the sibling attribute
+foo does not have the child attribute
+friend = "B"
+
+Bar Attributes: 
+parent = "Mom"
+sibling =   6.022e+23
+bar does not have the child attribute
+friend = "A"
+

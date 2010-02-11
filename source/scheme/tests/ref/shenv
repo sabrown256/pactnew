@@ -1,0 +1,23 @@
+
+define environment variable FOO
+3
+-> (($FOO 3))
+
+verify that FOO made it out to the environment
+expect: 3
+-> (3
+)
+
+list SCM files
+-> (../../shprm1.c
+ ../../shprm2.c
+ ../../shprm3.c
+ ../../shprnt.c
+ ../../shproc.c
+)
+
+test pipelines without a shell
+expect: shprm2.c shprm3.c
+-> (../../shprm2.c
+ ../../shprm3.c
+)

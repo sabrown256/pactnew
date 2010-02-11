@@ -1,0 +1,77 @@
+#!/bin/csh -f
+#
+# PACT-CHANGES - list pact changes in package header files
+#              - using ideas from Carolyn Sharp's original
+#
+# Modification History:
+#   08-16-94 Jan Moura, LLNL:  Extended prolog
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Old      = $1
+set New      = $cwd
+set Pck      = $New:t
+set DiffFile = $Pck.changes
+set First    = TRUE
+set TmpHdr   = ._tmp_.hdr
+set TmpDif   = ._tmp_.dif
+
+if ($Pck == "ultra") then
+   exit(0)
+endif
+
+set Vers = `awk '($1 == "#define") && ($2 == "VERSION") {print $3}' $Old/score.h`
+set OldVersion = "old Version $Vers"
+
+if (-d ../score) then
+   set Vers = `awk '($1 == "#define") && ($2 == "VERSION") {print $3}' ../score/score.h`
+else
+   set Vers = "`./code-date` (local)"
+endif
+set NewVersion = "new Version $Vers"
+
+shift
+
+rm -f $TmpHdr $DiffFile
+echo " " >>& $TmpHdr
+echo "Interface changes for PACT package: $Pck" >>& $TmpHdr
+echo " " >>& $TmpHdr
+echo "Legend: < corresponds to $OldVersion in $Old" >>& $TmpHdr
+echo "        > corresponds to $NewVersion to be installed" >>& $TmpHdr
+echo " " >>& $TmpHdr
+
+rm -f $TmpDif
+foreach hdr ($argv)
+   diff $Old/$hdr $New/$hdr >>& $TmpDif
+   if ($status > 0) then
+      if ($First == "TRUE") then
+         cat $TmpHdr >>& $DiffFile
+         set First = FALSE
+      endif
+      echo " " >>& $DiffFile
+      echo "===============================================================" >>& $DiffFile
+      echo "                             $hdr" >>& $DiffFile
+      echo "===============================================================" >>& $DiffFile
+      echo " " >>& $DiffFile
+      cat $TmpDif >>& $DiffFile
+   endif
+   rm -f $TmpDif
+end
+rm -f $TmpHdr
+
+if ($First == "FALSE") then
+   echo " " >>& $DiffFile
+   echo "===============================================================" >>& $DiffFile
+   echo " " >>& $DiffFile
+endif
+
+# if (-e $DiffFile) then
+#    cat $DiffFile
+# endif
+
+exit($status)
+

@@ -1,0 +1,27 @@
+#
+# SHARED - build shared libraries
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+BuildSharedLibs = TRUE
+
+Tool CC {
+   Shared =? ${Shared_CC_Shared}
+}
+
+Tool FC {
+   Shared =? ${Shared_FC_Shared}
+}
+
+Tool LD {
+   Shared =? ${Shared_LD_Shared}
+}
+
+Tool Lex {
+   Flags += ${Shared_CC_Shared}
+}
+

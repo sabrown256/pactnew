@@ -1,0 +1,129 @@
+#!/bin/csh -f
+#
+# SXTEST - test SX
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = sx
+source ../scripts/test-env
+
+setenv LogF  $Log
+
+set Test = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: sxtest [-h] [-vg] [<test>]*"
+           echo "  h       this help message"
+           echo "  vg      run tests under valgrind"
+           echo "  <test>  one of: oper hash pdb dattr text sqlite xml vif pgs"
+           echo "                  master exa ar shell mesh intrp diff ext"
+           echo ""
+           exit(1)
+      case -*:
+           breaksw
+      default:
+           set Test = ( $Test $1 )
+           breaksw
+   endsw
+   shift
+end
+
+cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "SX TESTS ... omitted"
+
+# run the tests
+else if (-e $BinDir/sx) then
+
+# (Template of test on size of DIFF compare (i.e. 12 char date differs)
+#   set Files = `find . -name "sxpdb.res.diff" -size 12c -print`
+#   if ($#Files == 0) then....  compare fails!
+
+   rm -f sxpdb.res sxpdba.res sxpdbi.res sxhash.res sxpgs.ps
+   rm -f sxpdb.res.diff sxpdba.res.diff sxpdbi.res.diff sxhash.res.diff sxpgs.ps.diff
+
+   set BeginTime = `$TIMER -r`
+
+   NoteD $Log ""
+   NoteD $Log "SX TEST ..."
+
+   Note $Log "BinDir = $BinDir"
+   Note $Log "path   = $path"  
+   Note $Log "SCHEME = $SCHEME"
+   Note $Log "Ultra  = $Ultra" 
+
+   setenv Tmp $cwd/.tmp.$$
+   if ("$Valgrind" != "") then
+      setenv Valgrind  "$Valgrind --suppressions=$RootDir/pgs/vg.suppress"
+      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
+   endif
+
+   if ( !($?autotool) ) then
+      Note $Log "PACT        = $PACT"
+      Note $Log "MPI         = |$MPI|"
+      Note $Log "LARGE_FILES = |$LARGE_FILES|"
+      flog $Log ../../../manager/pwhich pact
+      flog $Log ../../../manager/pwhich cc
+   endif
+
+   flog $Log pwd
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ("$Test" == "") then
+      set Test = ""
+      set Test = ( $Test oper hash pdb dattr text sqlite xml vif pgs axis )
+      set Test = ( $Test master exa ar shell mesh intrp diff ext )
+   endif
+
+   foreach i ($Test)
+      $SrcDir/tests/$i
+      if ($status == 1) then
+         set ERROR = TRUE
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# Clean up
+
+   flog $Log $RM $Tmp
+
+   set ETime = `$TIMER -b $BeginTime`
+
+   NoteD $Log ""
+   if ($ERROR == "TRUE") then
+      NoteD $Log ""
+      NoteD $Log "SX TEST ... FAILED ($ETime)"
+      NoteD $Log ""
+      NoteD $Log "See $Log for details"
+      NoteD $Log ""
+   else
+      NoteD $Log "SX TEST ... PASSED ($ETime)"
+   endif
+
+else
+   NoteD $Log ""
+   NoteD $Log "$BinDir/sx does not exist"
+endif
+
+NoteD $Log ""
+NoteD $Log " --------------------------------------------------------"
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+   set xstatus = 1
+endif
+
+exit($xstatus)

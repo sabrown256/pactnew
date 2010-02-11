@@ -1,0 +1,79 @@
+#!/bin/csh -f
+#
+# FINISH - final environment adjustments
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: finish"
+
+if ($Std_UseX == FALSE) then
+
+# have OpenGL
+   if ($Std_UseOGL == "TRUE") then
+      flog $ALog setenv GSYS OGL
+
+# have Quickdraw
+   else if ($Std_UseQD == "TRUE") then
+      flog $ALog setenv GSYS QD
+
+# no screen graphics
+   else
+      flog $ALog setenv GSYS       ""
+      flog $ALog setenv Std_UseX   FALSE
+      flog $ALog setenv Std_UseOGL FALSE
+      flog $ALog setenv Std_UseQD  FALSE
+
+      SetParent Std_UseX
+      SetParent Std_UseOGL
+      SetParent Std_UseQD
+   endif
+   SetParent GSYS
+
+endif
+
+if ("$Cfe_CC_Inc" == "$RootInc") then
+   flog $ALog setenv Cfe_CC_Inc ""
+endif
+
+#if (("$CC_MDGInc" == "-I$RootInc") && ($?IBM_BGP == 0)) then
+if ("$CC_MDGInc" == "-I$RootInc") then
+   flog $ALog setenv CC_MDGInc ""
+endif
+
+if ($?Save_CC == 1) then
+   flog $ALog setenv CC_Exe "$Save_CC"
+endif
+
+set tmp = ($Save_CFLAGS)
+flog $ALog setenv CC_Flags "$tmp"
+
+if ($AbsoluteDeb == TRUE) then
+   flog $Log setenv CC_Optimize "$CC_Debug"
+   flog $Log setenv FC_Optimize "$FC_Debug"
+endif
+
+if ($AbsoluteOpt == TRUE) then
+   flog $Log setenv CC_Debug "$CC_Optimize"
+   flog $Log setenv FC_Debug "$FC_Optimize"
+endif
+
+# export the results
+SetParent Cfe_CC_Inc
+SetParent CC_Exe
+SetParent CC_Flags
+SetParent CC_MDGInc
+SetParent CC_Optimize
+SetParent FC_Optimize
+SetParent CC_Debug
+SetParent FC_Debug
+
+exit(0)
+

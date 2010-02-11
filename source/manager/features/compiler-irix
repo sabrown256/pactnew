@@ -1,0 +1,68 @@
+#
+# COMPILER-IRIX - IRIX/SGI 6.x compiler specifications
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+WARN_PATTERN = "Warning: warning WARNING"
+
+Tool CC {
+   Exe      = c99
+   Flags    = -woff 799,1110,1172,1174,1177,1429,1551,1552,3184
+   Flags   += [ _env_ = Bits ;              # address bit size
+                *     = -* ]
+   Optimize = -g3 -O -OPT:Olimit=0
+}
+
+Tool FC {
+   Exe   = f90
+   Flags = [ _env_ = Bits ;                 # address bit size
+             *     = -* ]
+}
+
+Tool LD {
+   Flags  = -Wl,-dont_warn_unused
+   MDGLib = -lX11
+}
+
+Tool Lex {
+   Exe    = cc
+   Flags  = -woff 581,1167,1110,1196,3322
+   Flags += [ _env_ = Bits ;                # address bit size
+              *     = -* ]
+}
+
+Group Std {
+   UseX   = TRUE
+   UseOGL = FALSE
+}
+
+Group Cfg {
+   Use      = Std
+   Use      = CC
+   LD_Flags = ${LD_Flags}
+}
+
+Group Shared {
+   LD_Exe    = c99
+   CC_Shared = -KPIC
+   LD_Shared = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   LD_Lib = -lpthread
+}
+
+define HAVE_NO_SIGFPE
+define HYPOT PM_hypot
+#define STRTOD_FUNCTION _SC_strtod
+
+include cpp-rule
+

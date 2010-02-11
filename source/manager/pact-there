@@ -1,0 +1,129 @@
+#!/bin/csh -f
+#>
+#> PACT-THERE - query a host for a PACT distribution
+#>
+#> Usage: pact-there -d <directory> -h -l <name> [-g] -sh <host>
+#>  
+#> Options: 
+#>    -d  Source directory
+#>    -h  Help Package
+#>    -l  Login name
+#>    -g  Request password
+#>    -sh Source host
+#>  
+#
+# Modification History:
+#   08-16-94 Jan Moura, LLNL:  Extended prolog
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias cd
+
+if ($?USER == 0) then
+   if ($?LOGNAME == 0) then
+      set USER = "anonymous"
+   else
+      set USER = $LOGNAME
+   endif
+endif
+
+set PACTDir  = $cwd
+set System   = `./cfgman use`
+set Root     = $PACTDir:h
+set LogFile  = $Root/dev/$System/log/there
+set Src      = "FALSE"
+set SrcDir   = "FALSE"
+set help     = "FALSE"
+set LogID    = $USER
+set Passwd   = ""
+set Pattern  = 'pact.README pact*-src pact*.tar.gz'
+set $TmpFile = .tmp
+set Host     = `uname -n`
+
+while ($#argv >= 1)
+   switch ($1)
+
+      case -d:
+	       shift
+               set SrcDir = $1
+               breaksw
+
+      case -g:
+               echo -n "Password: "
+               stty -echo
+               set Passwd = $<
+               stty echo
+               echo ""
+               breaksw
+
+      case -h:
+               set help = TRUE
+               breaksw
+
+      case -l:
+	       shift
+               set LogID = $1
+               if ($LogID == "anonymous") then
+                  set Passwd = "$USER@$Host"
+               endif
+               breaksw
+
+      case -sh:
+	       shift
+               set Src = $1
+               breaksw
+
+      default:
+               set help = TRUE
+               breaksw
+   endsw
+   shift
+end
+
+if (($SrcDir == "FALSE") || ($Src == "FALSE") || ($help == "TRUE")) then
+   echo " "
+   echo "Usage: pact-there -d <directory> -h -l <name> [-g] -sh <host>"
+   echo " "
+   echo "Options: "
+   echo "   -d  Source directory"
+   echo "   -h  Help Package"
+   echo "   -l  Login name"
+   echo "   -g  request password"
+   echo "   -sh Source host"
+   echo " "
+   exit(1)
+endif
+
+touch $TmpFile
+
+(echo "open $Src" ; \
+ echo "user $LogID $Passwd" ; \
+ echo "prompt" ; \
+ echo "bin" ; \
+ echo "cd $SrcDir" ; \
+ echo "ls" ; \
+ echo "quit" ) | ftp -n | grep pact >>& $TmpFile
+
+set Try = `grep pact.README $TmpFile`
+if ("$Try" != "") then
+   echo "The PACT README file is there"
+endif
+
+set Try = `egrep '.*pact.*-src' $TmpFile`
+if ("$Try" != "") then
+   echo "The PACT distribution is there"
+endif
+
+set Try = `egrep '.*pact.*-doc.tar.gz' $TmpFile`
+if ("$Try" != "") then
+   echo "The PACT documentation is there"
+endif
+
+rm $TmpFile
+
+exit($status)
+

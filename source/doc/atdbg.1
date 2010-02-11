@@ -1,0 +1,83 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH ATDBG 1 "6 December 2004"
+.SH NAME
+atdbg \- attach a debugger to a named process
+.SH SYNOPSIS
+.B atdbg [-a] [-e <path>] [-h] [-p <pid>] [-q] [-r] [-v] [-w] [name]*
+.SH DESCRIPTION
+Present list of named jobs and attach a debugger to selected one.
+The preferred debugger may be specified in order of preference with
+the SC_DEBUGGER environment variable.  If SC_DEBUGGER is not defined,
+it will check for one of the following debuggers in order: totalview,
+gdb, or dbx.
+
+
+.SH OPTIONS
+.TP
+.B \-a
+Ignore user's ~/.ls-jobs-remove file to find all processes.
+.TP
+.B \-e
+Full path to desired program.
+.TP
+.B \-h
+A short summary help message.
+.TP
+.B \-p
+Attach to the specified PID.
+.TP
+.B \-q
+Quiet mode.
+.TP
+.B \-r
+Do a call stack trace only.
+.TP
+.B \-v
+Verbose mode.
+.TP
+.B \-w
+Print the debugger being used and exit.
+
+
+.SH EXAMPLES
+
+   atdbg make
+         This example will check all user jobs with the string make
+         in the command and present each one to you with the option
+         to attach a debugger it or not.
+
+   atdbg -r -p 314 -e `which sx`
+         This example will print the call stack of the executable sx
+         running in process 314.
+
+   atdbg -r -p 314
+         This example will determine the executable running in
+         process 314 and print the call stack of the current execution
+         state.
+
+   atdbg -w
+         Prints out the full path of the debugger being used.
+
+.SH ENVIRONMENT VARIABLES
+
+SC_DEBUGGER  should be one or more "totalview", "gdb", or "dbx".
+             For example, setenv SC_DEBUGGER gdb:totalview, will
+             cause atdbg to look first for gdb then totalview.
+.SH FILES
+
+None.
+
+.SH SEE ALSO
+
+.B cleanup-jobs(1), ls-jobs(1), sign(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

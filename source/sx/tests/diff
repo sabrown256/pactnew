@@ -1,0 +1,99 @@
+#!/bin/csh -f
+#
+# DIFF - SX PDBDiff test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDBDIFF TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log "                    PDBDiff Test ................. "
+   Note $Log ""
+
+   flog $Log rm -f pdbd*.dat pdbd.res pdbd.res.diff
+
+   flog $Log touch pdbd.res
+
+   flog $Log $Ultra -l $RootDir/sx/tests/pdbdtu.scm
+   set xstatus = $status
+
+   if ($xstatus != 0) then
+      NoteD $Log " FAILED (-1)"
+      NoteD $Log "                       Making data failed"
+      set Err = 1
+   else
+      set LErr = 0
+      set UTime = `$TIMER -r`
+
+      if ($?autotool == 1) then
+         flog $Log cp -f $RootDir/sx/applications/pdbdiff $BinDir/pdbdiff
+      endif
+
+# test 1 - all mappings
+      NoteD $Log -n "                       All mappings .............. "
+      Note $Log ""
+      flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat >>& pdbd.res)
+      set xstatus = $status
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus == 0) then
+         NoteD $Log "FAILED ($ETime)"
+         NoteD $Log "                       Erroneous agreement"
+         set Err = 1
+      else
+         echo  "Checking for 1 different mapping" >>& pdbd.res
+         grep "1 mapping out of 4 differs between pdbda.dat and pdbdb.dat:" pdbda.dat.chk >>& pdbd.res
+         if ($status != 0) then
+            set Err = 1
+            NoteD $Log "ng"
+            NoteD $Log ""
+            cat pdbd.res
+            NoteD $Log ""
+         else
+            NoteD $Log "ok"
+         endif
+      endif
+
+# test 2 - selected mappings
+      NoteD $Log -n "                       Selected mappings ......... "
+      Note $Log ""
+      flog $Log $PDBDiff -v -w pdbda.dat pdbdb.dat -M 2 4
+      set xstatus = $status
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus != 0) then
+         NoteD $Log "ng"
+         set LErr = 1
+      else
+         NoteD $Log "ok"
+      endif
+
+      if ($LErr == 1) then
+         NoteD $Log "                    PDBDiff Test ................. FAILED ($ETime)"
+         set Err = 1
+      else
+         NoteD $Log "                    PDBDiff Test ................. PASSED ($ETime)"
+         flog $Log rm -f pdbd*.dat pdbd.res pdbd*.dat.chk
+      endif
+   
+      if ( $?autotool ) then
+        flog $Log rm -f $BinDir/pdbdiff
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

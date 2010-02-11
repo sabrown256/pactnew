@@ -1,0 +1,110 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH LS-JOBS 1 "22 August 2006"
+.SH NAME
+ls-jobs \- list processes by name rather than by pid
+.SH SYNOPSIS
+.B ls-jobs [-a] [-c] [-d <lst>] [-dn <lst>] [-ds] [-h] [-q] [-r <name>]
+[-rn] [-s #] [-st] [-t #] [-u user] [-v] [name]*
+.SH DESCRIPTION
+List jobs by name or command line pattern and
+by user.  This is guaranteed to run the same way
+on all platforms and different versions of PS.
+
+.SH OPTIONS
+.TP
+.B a
+- All users (i.e. do not restrict to a specified single user).
+.TP
+.B c
+- Run continuously ala top.
+.TP
+.B d
+- Suppress descendants of the comma-delimited list of PIDs.
+.TP
+.B dn
+- Show only descendants of the list of PIDs.
+.TP
+.B ds
+- Suppress descendants of this process (ls-jobs).
+.TP
+.B h
+- A short summary help message.
+.TP
+.B q
+- quiet mode; prints only essential information; useful when invoking
+ls-jobs from another script.
+.TP
+.B r
+- Use specified file to supply names and remove lines matching specified
+patterns from results.
+.TP
+.B rn
+- Do not use a remove file to suppress any processes.
+Default:  ~/.ls-jobs-remove
+.TP
+.B s
+- Sort results by specified field.
+.TP
+.B st
+- Show job status (e.g. R, S, T, ...).
+.TP
+.B t
+- Print the topmost # lines only.
+.TP
+.B u
+- Print only processes owned by the specified user.
+.TP
+.B v
+- Verbose mode.
+.TP
+.B name
+- Executable name or command line pattern
+used to identify processes.
+
+
+.SH EXAMPLES
+
+   ls-jobs
+   ls-jobs -h
+   ls-jobs -s 5
+   ls-jobs -a -t 20 -c
+
+   # Quiet mode.  Suppress fluff.
+   ls-jobs -q my_job
+
+   # Verbose mode.  Supply additional fluff.
+   ls-jobs -v my_job
+
+   # Sort by field 1 (line begins with field 0).
+   ls-jobs my_job -s 1
+
+   # List only processes owned by specified owner name.
+   ls-jobs -u fred
+
+   # Suppress descendants of the comma delimited list of pids.
+   ls-jobs -d 814,8263,32730
+
+   # Show only descendants of the list of pids.
+   ls-jobs -dn 814,8263,32730
+
+   # Run continuously.
+   ls-jobs -c -q my_job
+
+.SH FILES
+
+~/.ls-jobs-remove  filter out lines matching patterns specified in file
+
+.SH SEE ALSO
+
+.B cleanup-jobs(1), sign(1)
+
+.SH BUGS
+.TP 
+.B None known.
+

@@ -1,0 +1,68 @@
+
+11/10/2009
+
+For developers, moved and consolidated "most"
+#define'd constants into named enum's.  This allows the
+compiler to do better error checking and helps in debugging
+where you see symbolic names rather than numerical values.
+
+
+For end users, there are many, many new features:
+
+1) ULTRA now has a fill command to allow you to color
+   the area under curves or fill closed curves.
+
+2) Colors can be expressed as RGB values in many
+   contexts.  I intend to get them all in time.
+   An RGB color is specified as:
+
+      #x7frrggbb
+
+   where r, g, and b above are hex digits.
+
+3) If you do the following in your .ultrarc
+
+   ld mouse.scm
+
+   you can can control the viewport with the
+   mouse.  The functionality is more or less modelled
+   after the Google map and other similar usages.
+
+4) PDBView can now look at PDB files inside TAR
+   files or AR archives.  This currently works only
+   with a serial version of PDBView
+
+5) PDBView can read mySQL and SQLite databases.
+   Writing capabilities will come next.  This capability
+   depends on the appropriate libraries and headers
+   being installed on the platform where PACT is built.
+
+6) A rudimentary ability to write PDB files which are
+   plain text.  This will be fully developed in future
+   releases.
+
+01/10/2008
+
+Collect PGS global attribute variables into struct and add
+PG_get_attrs_glb, PG_set_attrs_glb, and PG_ptr_attrs_glb as the
+sole accessors.  This keeps PGS state from conflicting with
+applications or forcing them to change unnecessarily.
+
+11/18/2007
+
+Divide headers into public and private parts.  The publics parts
+have the old names (e.g. score.h).  The private parts have the
+old name with _int added (e.g. score_int.h).  Move most of the
+_XX variables and functions into the private headers to hide them
+from applications which should use standard accessors in the
+public parts.
+
+
+04/19/2006
+
+Introduce PDB format version III.
+
+
+08/13/2004
+
+Introduce the hserve utility.

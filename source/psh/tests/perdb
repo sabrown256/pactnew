@@ -1,0 +1,149 @@
+#!/bin/csh -f
+#
+# PERDB - test perdb
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if ($?Log == 0) then
+   if (-f test-env) then
+      source test-env
+      pushd $TestDir >& /dev/null
+   else
+      mv $Log $Log.tmp
+      source ../../../scripts/test-env
+      mv $Log.tmp $Log
+   endif
+else
+   source ../../../scripts/env-csh
+endif
+
+set PERDB = perdb
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set PERDB = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: perdb [-h]"
+           echo "  c  test code (defaults to perdb)"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+rm -f $TestDir/*.*
+
+InitLog Log $TestDir/log.perdb.$LogSfx
+
+@ Err = 0
+
+set BTime = `$TIMER -r`
+
+NoteD $Log ""
+NoteD $Log "                    PERDB Test ....................."
+
+set TstDir = $SrcDir/tests
+set RefDir = $TstDir/ref
+
+# struct tests require shell to allow things like: 'setenv a.b foo'
+# don't do them if the shell will not allow variable names of that sort
+set too_strict = FALSE
+/bin/csh -c '(setenv a.b foo)' >& /dev/null
+if ($status != 0) then
+   set too_strict = TRUE
+endif
+
+if ($too_strict == TRUE) then
+   set List = (perdb1 perdb2 perdb3 perdb4)
+else
+   set List = (perdb1 perdb2 perdb3 perdb4 perdb5)
+endif
+
+set lErr = 0
+
+flog $Log setenv PATH $RootDir/scripts:$PATH
+
+Note $Log "Using $PERDB"
+Note $Log "Path = $PATH"
+
+#set ltst = ( socket fifo )
+set ltst = ( socket )
+
+foreach comm ($ltst)
+   NoteD $Log "                        $comm "
+   foreach t ($List)
+      Separator $Log
+
+# don't do tests with "no FIFO" - they hang
+      if ($comm == fifo) then
+         flog $Log pwd
+         flog $Log grep "no FIFO" $TstDir/$t
+         if ($status == 0) then
+            continue
+         endif
+      endif
+
+      set f = ( `fill-string -n 25 $t` )
+      NoteD $Log -n "                           $f "
+      Note $Log ""
+
+      flog $Log set Res = $t-$comm.res
+      flog $Log set Ref = $RefDir/$t
+
+     flog $Log $RM ${t}-${comm}* *= *@*
+
+      set noglob
+      flog $Log ( $TstDir/$t $comm |& grep -v '\[' >&! $Res )
+      set xstatus = $status
+      unset noglob
+
+      if (-f $Ref) then
+         flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
+         set xstatus = $status
+      else
+         flog $Log cp $Res $Ref
+         set xstatus = $status
+      endif
+
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+         flog $Log rm -f $Res $Res.diff
+      else
+         if (-d $Res.log) then
+            flog $Log cat $Res.log
+         endif
+         flog $Log cat $Res
+         flog $Log cat $Res.diff
+         NoteD $Log "ng"
+         if ($comm == socket) then
+            flog $Log set lErr = 1
+         endif
+      endif
+   end
+end
+
+set ETime = `$TIMER -b $BTime`
+
+if ($lErr != 0) then
+   NoteD $Log "                    PERDB Test ..................... FAILED ($lErr/$ETime)"
+   @ Err = $Err + 1
+else
+   NoteD $Log "                    PERDB Test ..................... PASSED ($ETime)"
+   flog $Log rm -f db*
+endif
+NoteD $Log ""
+
+exit($Err)
+

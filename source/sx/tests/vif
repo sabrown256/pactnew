@@ -1,0 +1,56 @@
+#!/bin/csh -f
+#
+# VIF - ULTRA PDB VIF test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDB VIF TEST
+
+#--------------------------------------------------------------------------
+
+   set sys = `uname -m`
+
+   if (("$sys[1]" != "CRAY") && ("$MPI" == "")) then
+      NoteD $Log ""
+      NoteD $Log -n "                    SX PDB VIF Test .............. "
+      Note $Log ""
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         flog $Log ($CFE $PDBView -l $RootDir/sx/tests/sxpdbi.scm > sxpdbi.res)
+         flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxpdbi.scm |& \
+         grep "ERROR SUMMARY:"                                                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $Log $RM $Tmp
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus != 0) then
+         if ("$Valgrind" == "") then
+            flog $Log cp sxpdbi.res sxpdbi.res.crash
+         endif
+         NoteD $Log "FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+         flog $Log rm -f sxpdbi.res sxpdbi.res.diff
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

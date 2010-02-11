@@ -1,0 +1,45 @@
+#!/bin/csh -f
+#
+# RESRC - test SCORE resource handling
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF -n "                    SCORE Resource Test ......... "
+NoteD $LogF ""
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE resource
+set xstatus = $status
+flog $LogF popd
+
+if ("$Valgrind" == "") then
+   ftee $LogF $CFE $BinDir/scrsts
+   set xstatus = $status
+else
+   ftee $LogF $Valgrind $BinDir/scrsts     |& \
+   grep "ERROR SUMMARY:"                   |& \
+   awk '{ print $4 }'   >&! $Tmp
+   set xstatus = `cat $Tmp`
+   flog $LogF $RM $Tmp
+endif
+
+set ETime = `$TIMER -b $UTime`
+
+if ($xstatus != 0) then
+   NoteD $LogF "                    SCORE Resource Test ......... FAILED ($xstatus/$ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    SCORE Resource Test ......... PASSED ($ETime)"
+endif
+
+exit($Err)
+

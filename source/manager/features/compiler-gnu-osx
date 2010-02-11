@@ -1,0 +1,89 @@
+#
+# COMPILER-GNU-OSX - GNU compiler specifications for MAC OS X
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/osx-evolution
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe       = gcc
+   Flags     = -fsignaling-nans -ffloat-store
+   Flags    += [ _env_ = Bits ;              # address bit size
+                 *     = -m* ]
+   Flags    += [ _cmd_ = -p ;                # profiling
+	         on    = -pg ]
+   Flags    += [ _cmd_ = -cov ;              # coverage analysis
+	         on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool FC {
+   Exe     = gfortran
+   Flags   = -fsignaling-nans -ffloat-store
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -m* ]
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -pg ]
+   Flags  += [ _cmd_ = -cov ;                # coverage analysis
+	       on    = -fprofile-arcs -ftest-coverage ]
+   Version = -v
+}
+
+Tool LD {
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -lgcov ]
+   Lib      = -lc
+   MDGLib   = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+}
+
+Tool Lex {
+   Flags  = -w
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -m* ]
+}
+
+Tool Ranlib {
+   Exe = ranlib
+}
+
+Group Std {
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use    = Std
+   CC_Exe = gcc
+}
+
+Group OpenMP {
+   CC_Flags = -fopenmp
+   LD_Flags = -fopenmp
+   LD_Lib   = -lgomp
+}
+
+Group Shared {
+   LD_Shared = -bundle -flat_namespace -undefined suppress
+   LD_Lib    = ${OSX_SHARED_LIBS}
+}
+
+Group Python {
+   CC_Exe      = gcc
+   CC_Debug    = -g
+   CC_Optimize = -g -O -Wunused
+}
+
+include cpp-rule
+
+setenv PATH /sw/bin:/usr/apps/gnu/bin:$PATH
+

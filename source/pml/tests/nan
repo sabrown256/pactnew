@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# NAN - PML NAN tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                               PML NAN TEST
+
+#--------------------------------------------------------------------------
+
+   if ($TEST_ERROR_TRAPS == YES) then
+      NoteD $Log ""
+      NoteD $Log  -n "                    PML NAN Test ........... "
+
+      flog $Log pushd $SrcDir
+      flog $Log $MAKE fpe
+      set TStatus = $status
+      flog $Log popd
+
+      set UTime = `$TIMER -r`
+
+      if ($TStatus != 0) then
+         NoteD $Log ""
+         NoteD $Log "                         Can't build PML NAN Test Program"
+         set xstatus = $TStatus
+      else
+         if ("$Valgrind" == "") then
+            flog $LogF $CFE $BinDir/mlnants
+            set xstatus = $status
+         else
+            flog $Log $Valgrind $BinDir/mlnants
+            set xstatus = $status
+         endif
+         if ($xstatus != 0) then
+           NoteD $Log ""
+           NoteD $Log "                         Error in NAN Test program"
+         endif
+      endif
+
+      set ETime = `$TIMER -b $UTime`
+
+      if ($xstatus != 0) then
+         NoteD $Log  "FAILED ($xstatus/$ETime)"
+         @ Err = 1
+      else
+         NoteD $Log "PASSED ($ETime)"
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

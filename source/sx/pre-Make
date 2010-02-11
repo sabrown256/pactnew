@@ -1,0 +1,166 @@
+#
+# pre-Make for SX
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=sx
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTExe = ${BinDir}/sx
+TGTInc = sx.h sx_int.h
+
+ExtDir = ${ScmDir}/extensions
+
+TGTScm = applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm \
+         applications/pdbvcmd.scm \
+         applications/pdbvdat.scm applications/pdbview.rc applications/pdbvio.scm \
+         applications/pdbview.scm applications/pdbvplt.scm \
+         applications/pdbvthemes.scm applications/binedit.scm \
+         applications/pdbvdemo.scm applications/pdbvbatch.scm \
+         applications/pdbvxmpl.scm applications/pdbview.pui \
+         applications/gcel.scm applications/vcel.scm applications/nature.scm \
+         applications/netcdf.scm applications/ezn.scm
+TGTScr = applications/pdbview applications/pdbdiff applications/pdbcp
+
+TGTScrX = tpu tzu
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags  = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+FcFlags  =
+LdFlags  = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (pact save)
+#
+SaveFiles = *.c *.h *.scm
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+DepLib = ${LibDir}/libscheme.a \
+         ${LibDir}/libpanacea.a \
+         ${LibDir}/libpgs.a \
+	 ${LibDir}/libppc.a \
+         ${LibDir}/libpdb.a \
+         ${LibDir}/libpml.a \
+	 ${LibDir}/libscore.a
+
+InstallDep = ${TGTLib} ${TGTExe} ${TGTScm} ${TGTScr}
+BinDep = ${Hdrs} ${TGTLib} sxmain.c ${DepLib}
+BinObj = ${LdFlags} sxmain.c
+
+#
+# Required Libraries
+#
+#Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LMM} ${LSCORE} -lm ${MDLib}
+Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+
+SPDBXLibs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LMM} ${LSCORE} -lm ${MDLib}
+
+targets :
+	@echo "Targets for SX"
+	@echo "   install    : install SX headers and utilities in dev/arch"
+	@echo "   link       : link SX utilities for public use"
+	@echo "   sharedlib  : build and install SX shared libs in dev/arch"
+	@echo "   remove-sys : remove everything"
+	@echo "   test       : run the SX test suite"
+
+#
+# Headers Files
+#
+Hdrs = ${TGTInc}
+
+#
+# Object Files
+#
+ObjsA = sxhook.o sxmm.o sxmode.o sxgc.o sxhand.o sxfunc.o sxhbo.o
+ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
+ObjsC = sxpan.o sxpanw.o
+ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
+ObjsE = sxpml.o
+ObjsY = sxshar.o
+ObjsZ = sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
+Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ}
+
+ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
+         ${TGTLib}(sxgc.o) \
+         ${TGTLib}(sxhand.o) ${TGTLib}(sxfunc.o) ${TGTLib}(sxhbo.o) \
+         ${TGTLib}(sxpdb.o) ${TGTLib}(sxpdba.o) ${TGTLib}(sxpdbr.o) \
+         ${TGTLib}(sxpdbc.o) ${TGTLib}(sxpdbd.o) ${TGTLib}(sxpdbf.o) \
+         ${TGTLib}(sxpdbl.o) ${TGTLib}(sxpan.o) \
+         ${TGTLib}(sxpanw.o) ${TGTLib}(sxpml.o) \
+         ${TGTLib}(sxgri.o) ${TGTLib}(sxpgs.o) ${TGTLib}(sxpgsp.o) ${TGTLib}(sxgrot.o) \
+         ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o) \
+         ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o)
+
+sxmain.o : ${Hdrs}
+${ObjsY} : ${Hdrs}
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+#
+# make the executable
+#
+${TGTExe} : ${BinDep}
+	${CC} -c sxmain.c -o ${PACTTmpDir}/sxmain.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sxmain.o -o ${TGTExe} ${Libs}
+
+# extra commands needed when building TGTLib
+LibAction = build-ext
+
+#
+# link 
+#
+link: ${InstallDep}
+	pact scminstall
+	pact scrinstall
+	@${BinDir}/install-ext ${RootDir} ${TGTScrX}
+
+#
+# install 
+#
+install:
+	pact link
+	pact incinstall
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+	pact incinstall
+
+#
+# remove everything
+#
+remove-sys :
+	pact remove
+	cd spokes ; pact remove
+
+#
+# inform
+#
+inform :
+	@rm -f required.objs
+	@echo ${Objs} > required.objs
+
+#
+# Run the SX test suite
+#
+test :
+	@./sxtest
+

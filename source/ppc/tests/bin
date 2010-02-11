@@ -1,0 +1,67 @@
+#!/bin/csh -f
+#
+# BIN - PPC binary communication tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set DPE = ""
+
+#--------------------------------------------------------------------------
+
+#                           BIN TEST
+
+#--------------------------------------------------------------------------
+
+# PPC Binary test
+# this test fails too often on DP machines so don't run there
+
+# NOTE: remove this when the PPC binary stuff is rehosted on PDB Net
+if (0) then
+      if ("$DPE" != "") then
+         NoteD $Log ""
+         NoteD $Log -n "                    PPC Binary Test ................ "
+         Note $Log ""
+
+         set FAIL = "NO"
+
+         flog $Log rm -f pcbtst.res
+         set UTime = `$TIMER -r`
+         (echo "hello" ; echo "end") | $CFE $BinDir/pcbtst > pcbtst.res
+
+         set BinaryStat = $status
+         if ($BinaryStat != 0) then
+            if ($BinaryStat != 123) then
+               NoteD $Log ""
+               NoteD $Log "                         Binary test died ($BinaryStat)"
+            else
+               NoteD $Log ""
+               NoteD $Log "                         Binary test timed out ($BinaryStat)"
+            endif
+         endif
+   
+         set ETime = `$TIMER -b $UTime`
+
+# don't consider a timeout a failure
+         if ($BinaryStat != 0 && $BinaryStat != 123) then
+            NoteD $Log "                    PPC Binary Test ................ FAILED ($ETime)"
+            set Err = 1
+         else if ($BinaryStat == 123) then
+            flog $Log rm -f pcbtst.res
+            NoteD $Log "                    PPC Binary Test ................ PASSED ($ETime)"
+         else
+            flog $Log rm -f pcbtst.res
+            NoteD $Log "PASSED ($ETime)"
+         endif
+      endif
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

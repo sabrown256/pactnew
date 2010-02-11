@@ -1,0 +1,193 @@
+#
+# FIND-PACKAGE - see if the specified package exists
+#              - if so PckInc will point to the headers directory
+#              - and be in the form of a list of -I<dir> specification
+#              - also PckLib will contain a list of libraries found
+#              - Example:
+#
+#    set lIncDirs = ( $JPEG_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
+#    set lLibDirs = ( $JPEG_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/lib /lib )
+#    set lHdrs    = ( jpeglib.h jconfig.h jmorecfg.h jerror.h )
+#    set ASList   = ( a so )
+#
+#    source find-package(libjpeg, $Tmp)
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Note $ALog ""
+Note $ALog "Entering FIND_PACKAGE"
+Note $ALog ""
+Note $ALog "lIncDirs: ($#lIncDirs) $lIncDirs"
+Note $ALog "lLibDirs: ($#lLibDirs) $lLibDirs"
+Note $ALog "lHdrs:    ($#lHdrs) $lHdrs"
+Note $ALog ""
+
+# look for the headers first of all and set PckInc
+if ("$lHdrs" == "none") then
+   flog $ALog set PckInc = none
+else
+   Note $ALog "Looking for $lHdrs in:"
+   flog $ALog set PckInc = ""
+   foreach i ($lIncDirs)
+      Note $ALog "  $i"
+      if (-d $i) then
+         set HdrOK = TRUE
+         foreach hdr ($lHdrs)
+            if (!(-e $i/$hdr)) then
+               set HdrOK = FALSE
+               break
+            endif
+         end
+         if ($HdrOK == TRUE) then
+            flog $ALog set PckInc = "-I$i"
+            Note $ALog "   found $lHdrs in $i"
+            break            
+         endif
+      endif
+   end 
+   Note $ALog ""
+endif
+
+if ("$lFile" != "none") then
+   flog $ALog cat $lFile.c
+   Note $ALog ""
+endif
+
+# now look for the library
+
+Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
+Note $ALog "Cfe_CC_Flags = |$Cfe_CC_Flags|"
+Note $ALog "Cfe_LD_Flags = |$Cfe_LD_Flags|"
+flog $ALog set Opts = ""
+flog $ALog set Opts = ( $Opts $Cfe_CC_Flags $Cfe_LD_Flags )
+flog $ALog set Opts = ( $Opts $PckInc $lFile.c -o $lFile )
+flog $ALog set Opts = ( $Opts )
+
+# check for implicit library reference - does the linker know how to find it
+
+if ($Implicit == TRUE) then
+   Note $ALog ""
+   Note $ALog "See if implicit library reference works"
+   Note $ALog ""
+   foreach i ( noL $lLibDirs )
+      Note $ALog ""
+      Note $ALog "Implicit -------------------------------"
+      Note $ALog "   $i"
+      if (-d "$i") then
+         flog $ALog set lLPath = "-L$i"
+      else
+         flog $ALog set lLPath = ""
+      endif
+      flog $ALog set PckLib = ( $lLPath -l$lLib )
+      flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
+      set xstatus = $status
+      if ($xstatus == 0) then
+         flog $ALog eval $lFile
+         set xstatus = $status
+         if ($xstatus == 0) then
+            flog $ALog set PckOK = TRUE
+            Note $ALog "    success with -l$lLib (implicit)"
+            goto GotIt
+         else
+            Note $ALog "    exec failed ($xstatus) with -l$lLib (implicit)"
+            flog $ALog ls -l $lFile*
+         endif
+      else
+         Note $ALog "    build failed ($xstatus) with -l$lLib (implicit)"
+      endif
+   end
+endif
+
+# check for explicit library reference
+
+Note $ALog ""
+Note $ALog "See if explicit library reference works"
+Note $ALog ""
+flog $ALog set PckLib = ""
+foreach i ($lLibDirs)
+   if ("$i" == "none") then
+      break
+   endif
+
+   if (-d $i) then
+      Note $ALog ""
+      Note $ALog "Explicit -------------------------------"
+      Note $ALog "   $i"
+      flog $ALog set RLib = $i/lib$lLib
+      foreach a ( none $ASList )
+         if ("$a" == none) then
+            set LDir = "-L$i -l$lLib"
+            flog $ALog set PckLib = ( -L$i -l$lLib )
+            flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
+            set xstatus = $status
+            if ($xstatus == 0) then
+               flog $ALog eval $lFile
+               set xstatus = $status
+               if ($xstatus == 0) then
+                  flog $ALog set PckOK = TRUE
+                  Note $ALog "    success with -L$i -l$lLib (explicit)"
+                  goto GotIt
+               else
+                  Note $ALog "    exec failed ($xstatus) with -L$i -l$lLib (explicit)"
+                  flog $ALog ls -l $lFile*
+               endif
+            else
+               Note $ALog "    build failed ($xstatus) with -L$i -l$lLib (explicit)"
+            endif
+
+         else if (-e $RLib.$a) then
+            Note $ALog "   Checking $RLib.$a in $i"
+            flog $ALog set PckLib = $RLib.$a
+            flog $ALog set PckOK  = FALSE
+            if ("$lFile" == "none") then
+               flog $ALog set PckOK = TRUE
+            else
+               flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
+               set xstatus = $status
+               if ($xstatus == 0) then
+                  flog $ALog eval $lFile
+                  set xstatus = $status
+                  if ($xstatus == 0) then
+                     flog $ALog set PckOK = TRUE
+                     Note $ALog "    success with $RLib.$a (explicit)"
+                  else
+                     Note $ALog "    exec failed ($xstatus) with $RLib.$a (explicit)"
+                     flog $ALog ls -l $lFile*
+                  endif
+               endif
+            else
+               Note $ALog "    build failed ($xstatus) with $RLib.$a (explicit)"
+            endif
+            Note $ALog "    $i ==> $PckOK"
+            if ($PckOK == FALSE) then
+               flog $ALog set PckLib = ""
+            else
+               Note $ALog "    success with $i (explicit)"
+               goto GotIt
+            endif
+            Note $ALog ""
+         else
+            Note $ALog "   No $RLib.$a in $i"
+         endif
+      end
+   else
+      Note $ALog "   No $i on this host"
+   endif
+end
+Note $ALog ""
+
+flog $ALog set PckLib = ""
+
+GotIt:
+
+if ("$lFile" != "none") then
+   flog $ALog $RM $lFile $lFile.c
+endif
+
+Note $ALog "Leaving FIND_PACKAGE"
+Note $ALog ""
+

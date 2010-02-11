@@ -1,0 +1,13 @@
+#
+# AUTO-IRIX64 - default IRIX/SGI 6.x configuration
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include spokes
+include cpp-rule
+include compiler-irix
+

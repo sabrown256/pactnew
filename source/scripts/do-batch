@@ -1,0 +1,300 @@
+#!/bin/csh -f
+#
+# DO-BATCH - run a batch job at LC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Which   = "swhich -1"
+
+set HostOS  = `uname -s`
+set HostHW  = `uname -m`
+
+set Host    = none
+set Prob    = unknown
+set Bank    = `/usr/apps/pactnew/bin/pcexec -q -s /usr/local/bin/bac | awk '$3 !~ /default/ && $1 !~ /USERNAME/ { print $2 }'`
+set Bank    = $Bank[$#Bank]
+set NNodes  = 1
+set NCpus   = 1
+set TimeMax = 10
+set Notify  = "n"
+set Date    = `date`
+set Count   = $$
+set TTY     = ""
+set Quiet   = FALSE
+set Literal = FALSE
+set Info    = ""
+
+# use environment variable so that do-run can set this if needed
+if (!($?Wrap)) then
+   set Wrap = ""
+endif
+
+alias Note 'echo \!\!:2-$ >>& \!\!:^'
+
+set Cmnd   = ""
+set EnvVar = ""
+while ($#argv > 0)
+   switch ($1)
+      case -b:
+           shift
+           set Bank = $1
+           breaksw
+      case -e:
+           shift
+           set EnvVar = ( $EnvVar $1 )
+           shift
+           set EnvVar = ( $EnvVar $1 )
+           breaksw
+      case -f:
+           shift
+           set Info = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: do-batch [-b <bank>] [-e <var> <value>] [-f <file>] [-h]"
+           echo "                [-H <host>] [-l] [-m] [-n #] [-o <file>] [-p #]"
+           echo "                [-q] [-t #] [-w]"
+           echo ""
+           echo "Options:"
+           echo "     b - which bank to use (uses bac by default)"
+           echo "     e - add environment variables to the batch script"
+           echo "     f - file containing batch control specifications"
+           echo "     h - this help message"
+           echo "     H - host on which to run"
+           echo "     l - run literal command (needed by debuggers)"
+           echo "     m - notify by mail"
+           echo "     n - number of nodes to use"
+           echo "     o - set the name of the output file"
+           echo "     p - number of processes to use"
+           echo "     q - suppress do-batch messages in the logs"
+           echo "     t - time limit in seconds"
+           echo "     w - notify via the write utiliy"
+           echo ""
+           echo "Other batch utilties:"
+           echo "     pstat - list batch jobs in queues"
+           echo "     prm   - remove batch jobs from queues"
+           echo "     rinfo - display resource usage for parallel jobs"
+           exit(1)
+           breaksw
+      case -H:
+           shift
+           set Host = $1
+           breaksw
+      case -l:
+           set Literal = TRUE
+           breaksw
+      case -m:
+           set Notify = "m"
+           breaksw
+      case -n:
+           shift
+           set NNodes = $1
+           breaksw
+      case -o:
+           shift
+           set TTY = $1
+           breaksw
+      case -p:
+           shift
+           set NCpus = $1
+           breaksw
+      case -q:
+           set Quiet = TRUE
+           breaksw
+      case -t:
+           shift
+           set TimeMax = $1
+           breaksw
+      case -w:
+           set Notify = "w"
+           breaksw
+      default:
+           set Prob = $1
+           set Prob = $Prob:t
+           while ($#argv > 0)
+              set Cmnd = ( $Cmnd $1 )
+              shift
+           end
+
+           break
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROCESS_INFO_FILE
+
+# Batch info file may contain any of the following:
+#   bank = <bank>
+#   host = <host>
+#   time = <time>
+# Note: time is in seconds
+
+if ($Info != "") then
+   set Batch    = `awk '$1 == "batch"  { print $3 }' $Info`
+   set tBank    = `awk '$1 == "bank"   { print $3 }' $Info`
+   set tHost    = `awk '$1 == "host"   { print $3 }' $Info`
+   set tTimeMax = `awk '$1 == "time"   { print $3 }' $Info`
+   set HaveMPI  = `awk '$1 == "mpi"    { print $3 }' $Info`
+   set EnvVar   = `awk '$1 == "setenv" { printf("%s %s\n", $2, $3); }' $Info`
+
+   if ("$tBank" != "") then
+      set Bank = $tBank
+   endif
+   if ("$tHost" != "") then
+      set Host = $tHost
+   endif
+   if ("$tTimeMax" != "") then
+      set TimeMax = $tTimeMax
+   endif
+   if ("$HaveMPI" != "") then
+      setenv Wrap `$Which mpi-io-wrap`
+   endif
+
+# Note: count on the Info file having been automatically generated
+# in a script that may never regain control to remove it
+   rm -f $Info
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CHECK
+
+if ("$Bank" == "") then
+   echo ""
+   echo "No bank found - exiting DO-BATCH"
+   echo ""
+   exit(1)
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WRITE_SCRIPT
+
+set Script = "b.$Prob.$Count"
+set Log    = "$cwd/$Script.err"
+if ("$TTY" == "") then
+   set TTY = "$cwd/$Script.out"
+endif
+
+rm -f $Script
+touch $Script
+
+Note $Script '#\!/bin/csh'
+if ("$Host" != "none") then
+   Note $Script '# PSUB -c' "$Host"
+endif
+
+Note $Script '# PSUB -o' $Log
+Note $Script '# PSUB -b' $Bank
+if (($NNodes > 1) || ($NCpus > 1)) then
+   Note $Script '# PSUB -ln' $NNodes -g $NCpus
+else if ("$HostOS" == "Linux") then
+   Note $Script '# PSUB -ln 1'
+endif
+Note $Script '# PSUB -x'
+Note $Script '# PSUB -ro -eo'
+Note $Script '# PSUB -tM' $TimeMax
+Note $Script ''
+
+Note $Script 'cd' $cwd
+Note $Script ''
+
+Note $Script 'set TTY = "'$TTY'"'
+Note $Script 'rm -f $TTY'
+Note $Script 'touch $TTY'
+Note $Script ''
+
+if ($Quiet == FALSE) then
+   if ("$Wrap" != "") then
+      Note $Script 'echo "Batch Job: '$Wrap $Cmnd'" >> $TTY'
+      Note $Script 'echo "MPI Job  : yes" >> $TTY'
+   else
+      Note $Script 'echo "Batch Job: '$Cmnd'" >> $TTY'
+      Note $Script 'echo "MPI Job  : no" >> $TTY'
+   endif
+   Note $Script 'echo "Date     : '$Date'" >> $TTY'
+   Note $Script 'echo "----------------------------------------------------" >> $TTY'
+   Note $Script ''
+endif
+
+# add specified environment variables
+while ($#EnvVar > 0)
+   set Var = $EnvVar[1]
+   set Val = $EnvVar[2]
+   shift EnvVar
+   shift EnvVar
+   Note $Script "setenv $Var $Val" '>>& $TTY'
+end
+Note $Script ''
+
+if ($Literal == TRUE) then
+   Note $Script "$Cmnd" '>>& $TTY'
+else
+   switch ($HostOS)
+      case Linux:
+           if ($HostHW != "alpha") then
+              if ("$Cmnd[1]" == "/usr/bin/prun") then
+                 Note $Script "$Wrap $Cmnd" '>>& $TTY'
+              else
+                 Note $Script "$Wrap /usr/bin/prun -c$NNodes -n$NCpus $Cmnd" '>>& $TTY'
+              endif
+              breaksw
+           endif
+      case OSF1:
+      case AIX:
+           Note $Script "/usr/local/bin/run -rsi $Wrap $Cmnd" '>>& $TTY'
+           breaksw
+   endsw
+endif
+Note $Script 'set Err = $status'
+Note $Script ''
+
+if ($Quiet == FALSE) then
+   Note $Script 'echo "----------------------------------------------------" >> $TTY'
+   Note $Script ''
+   Note $Script 'if ($Err == 0) then'
+   Note $Script '   set ErrMsg = "'$Prob' succeeded"'
+   Note $Script 'else'
+   Note $Script '   set ErrMsg = "'$Prob' failed ($Err)"'
+   Note $Script 'endif'
+   Note $Script 'echo "$ErrMsg" >> $TTY'
+   Note $Script ''
+endif
+
+switch ($Notify)
+   case m:
+        Note $Script '(echo "UPCS jobs for '$Prob' has finished in '$cwd'" ; \'
+        Note $Script ' echo "$ErrMsg" ) | \'
+        Note $Script 'mail "'$USER'"'
+        breaksw
+   case w:
+        Note $Script '(echo "UPCS jobs for '$Prob' has finished in '$cwd'" ; \'
+        Note $Script ' echo "$ErrMsg" ) | \'
+        Note $Script 'write "'$USER'"'
+        breaksw
+        breaksw
+endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXECUTE
+
+chmod 750 $Script
+/usr/local/bin/psub $Script
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($status)

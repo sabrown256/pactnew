@@ -1,0 +1,257 @@
+#
+# TEST-ENV - standard environment for PACT tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+umask 007
+
+foreach f (../scripts ../../scripts ../../../scripts)
+   if (-f $f/env-csh) then
+      source $f/env-csh
+      break
+   endif
+end
+
+set Which = "swhich -1"
+set TLog  = test
+if (-x "`$Which valgrind`") then
+   set largs = ( $argv )
+   while ($#largs > 0)
+      switch ($largs[1])
+         case -vg:
+              set TLog = test-vg
+              setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+              breaksw
+         case -vgd:
+              set TLog = test-vg
+              setenv Valgrind  "valgrind --tool=memcheck --db-attach=yes"
+              breaksw
+         case -vgs:
+              set TLog = test-vgs
+              setenv Valgrind  "valgrind --tool=memcheck"
+              breaksw
+      endsw
+      shift largs
+   end
+endif
+
+if ($?Valgrind == 0) then
+   setenv Valgrind ""
+endif
+
+set DbgOpt = `pact -info DbgOpt`
+switch ($DbgOpt)
+   case debug:
+        setenv LogSfx  g
+        breaksw
+   case optmize:
+        setenv LogSfx  o
+        breaksw
+   case mixed:
+   default:
+        setenv LogSfx  O
+        breaksw
+endsw
+
+# tests run concurrently with the DISPLAY environment variable
+# set, may result in X11 connection failures on some systems
+unsetenv DISPLAY
+
+setenv OS  `uname`
+
+# GOTCHA: we have MPI, TEST_MPI, DPE
+# some consolidation, especially wrt logic and control, is needed
+
+setenv TEST_ERROR_TRAPS  "YES"
+
+switch ($OS)
+   case "CYGWIN*":
+# NOTE: CYGWIN can't handle multi-level error trapping
+        setenv TEST_ERROR_TRAPS  "NO"
+        setenv TEST_MPI          "NO"
+        breaksw
+   case "Darwin":
+   case "SunOS":
+        setenv TEST_MPI  "NO"
+        breaksw
+   default:
+        setenv TEST_MPI  "YES"
+        breaksw
+endsw
+
+setenv ZeroSpace  "-z 2"
+
+# manager way
+# if ($?autotool == 0) then
+   pushd .. >& /dev/null
+   while (!(-d dev) && !(-d manager))
+      cd .. >& /dev/null
+   end
+   setenv RootDir  $cwd
+   popd >& /dev/null
+
+   setenv System    `$RootDir/manager/cfgman use`
+   setenv BuildDir  $RootDir/dev/$System
+   setenv SrcDir    $RootDir/$Package
+
+   setenv IncDir    $BuildDir/include
+   setenv LibDir    $BuildDir/lib
+   setenv BinDir    $BuildDir/bin
+
+   setenv TestDir   $SrcDir/z-$System/test
+   setenv FilesDir  $SrcDir/tests
+
+   setenv TIMER     $BinDir/timer
+   setenv MAKE      $BinDir/pact
+   setenv DORUN     $BinDir/do-run
+   setenv PSDIFF    $BinDir/ps-diff
+   setenv PX        $RootDir/scripts/px
+
+   source $IncDir/env-pact.csh
+
+   if ($?IBM_BGL == 1) then
+      setenv RUN_TESTS FALSE
+   else
+      setenv RUN_TESTS TRUE
+   endif
+
+   if ($?CROSS_COMPILE == 0) then
+      setenv CROSS_COMPILE FALSE
+   endif
+
+   setenv CFE ""
+   if ($CROSS_COMPILE == TRUE) then
+      setenv CFE $DORUN
+   endif
+   setenv PFE       $DORUN
+
+   setenv PACT  "$CFE $BinDir/pact"
+
+   setenv Parallel     `$PACT -info THREADING`
+   setenv MPI          `$PACT +l -info HAVE_MPI`
+   setenv HaveDevZero  `$PACT +l -info HAVE_DEV_ZERO`
+   setenv LARGE_FILES  `$PACT -info _LARGE_FILES`
+
+   setenv PYVER      `$PACT -info PyVers`
+   setenv PYTHONBIN  `$PACT -info Python_Path`
+   setenv PYTHON     $PYTHONBIN/python
+   setenv LPYTHON    $LibDir/python$PYVER
+
+   if (-e $IncDir/noipc) then
+      setenv HaveIPC  NO
+   else
+      setenv HaveIPC  YES
+   endif
+
+   set Ultra = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
+
+# autoconf way
+# else if ($?autotool == 1) then
+#    # RootDir in autotool is where we have untarred
+#    pushd .. >& /dev/null
+#    while (!(-e COPYING) && !(-e README))
+#       cd .. >& /dev/null
+#    end
+#    setenv RootDir  $cwd
+#    popd >& /dev/null
+#    
+#    # BuildDir in autotool is where we ran configure (not necessarily == RootDir)
+#    pushd .. >& /dev/null
+#    while (!(-e config/scconfig.h) && !(-e config.h))
+#       cd .. >& /dev/null
+#    end
+#    setenv BuildDir  $cwd
+#    popd >& /dev/null
+#    
+#    # SrcDir is where there exists a package's Makefile
+#    setenv SrcDir    $BuildDir/$Package
+#    # BinDir is where gmake/make places binaries
+#    setenv BinDir    $BuildDir/$Package
+#    setenv LibDir    $BuildDir/$Package/.libs 
+#    
+#    setenv TestDir   $testsubdir
+#    setenv FilesDir  $RootDir/$Package/tests
+#    
+#    setenv CFE       $BinDir/do-run
+#    setenv PFE       $BinDir/do-run
+# 
+#    setenv TIMER     $BuildDir/scripts/timer
+#    setenv DORUN     $BinDir/do-run
+#    setenv PX        $RootDir/scripts/px
+#    
+# # GOTCHA: we should be getting this via 'pact -info'
+# # FIXME: add info finding ability for both build systems
+#    set LARGE_FILES = ""
+#    switch ($OS)
+#       case "AIX":
+#            # FIX ME
+#            setenv TEST_MPI  "NO"
+#            setenv HaveIPC  YES
+#            setenv HaveDevZero  "HAVE_DEV_ZERO"
+#            breaksw
+#       case "HP-UX":
+#       default:
+#            setenv HaveIPC  YES
+#            setenv HaveDevZero  "HAVE_DEV_ZERO"
+#            breaksw
+#    endsw
+# 
+#    setenv LPYTHON  $BinDir
+# 
+# # GOTCHA: gmake/make leaves binaries in the CWD 
+#    setenv PSDIFF   "$BuildDir/score/ps-diff"
+#    set Ultra   = "$CFE $BuildDir/ultra/ultra -e -r -x -q -s $ZeroSpace"
+# 
+# endif
+
+set path = ( . $BinDir $path )
+
+set PCEXEC  = "$BinDir/pcexec"
+set SX      = "$CFE $BinDir/sx -e -r -s $ZeroSpace"
+set PDBView = "$CFE $BinDir/sx -e -p -q $ZeroSpace"
+set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
+
+setenv SCHEME $RootDir/scheme/applications
+setenv SCHEME $RootDir/scheme/applications/extensions:${SCHEME}
+setenv SCHEME $RootDir/scheme/tests:${SCHEME}
+setenv SCHEME $RootDir/sx/applications:${SCHEME}
+setenv SCHEME $RootDir/sx/applications/extensions:${SCHEME}
+setenv SCHEME $RootDir/sx/tests:${SCHEME}
+setenv SCHEME $RootDir/ultra:${SCHEME}
+setenv SCHEME $RootDir/ultra/applications:${SCHEME}
+setenv SCHEME $RootDir/ultra/applications/extensions:${SCHEME}
+setenv SCHEME $RootDir/panacea/applications:${SCHEME}
+
+# Need spokes.scm generated by build system
+if ( $?autotool ) then
+  setenv SCHEME $BuildDir/config:${SCHEME}
+else
+  setenv SCHEME $RootDir/dev/$System/scheme:${SCHEME}
+endif
+
+if ($?PYTHONPATH == 1) then
+   setenv PYTHONPATH ${LPYTHON}:$PYTHONPATH
+else
+   setenv PYTHONPATH ${LPYTHON}
+endif
+ 
+# test inside a subdirectory
+if (!(-d $TestDir)) then
+  mkdir -p $TestDir
+endif
+
+InitLog Log $TestDir/log.$TLog.$LogSfx
+
+set ERROR  = "FALSE"
+set FAIL   = "NO"
+set status = 0
+
+if ("$Valgrind" != "") then
+   Note $Log "Using valgrind: `$Which valgrind`"
+endif
+
+

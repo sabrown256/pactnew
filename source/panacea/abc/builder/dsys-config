@@ -1,0 +1,206 @@
+#!/bin/csh -f
+#
+# DSYS-CONFIG - do the work of configuring the simulation system
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias cd
+
+set Here = `pwd` ; cd ; set RealHome = `pwd` ; cd $Here ; unset $Here
+set Here = `pwd | sed "s|$RealHome|$home|"`
+
+set Root = $Here:h
+set Base = $Root:h
+set Base = $Base:h
+
+set System   = `$Base/manager/cfgman use`
+set PACTDir  = $Base/dev/$System
+set PACTBin  = $PACTDir/bin
+set PACTInc  = $PACTDir/include
+set PACTExe  = $PACTBin/pact
+
+set ThreadLibExt = `$PACTExe -info ThreadLibExt | sed s-ThreadLibExt=--`
+set configname   = "none"
+
+set MDGInc   = `awk '($1 == "MDGInc") { print $3 }' $PACTInc/make-def`
+set PUBInc   = `awk '($1 == "PubInc") { print $3 }' $PACTInc/make-def`
+set Optimize = FALSE
+
+set tmp         = `uname -m`
+set HostArch    = `echo $tmp | tr " " "."`
+set Interactive = TRUE
+
+# setup default machine dependant directories
+set MDDir = ""
+
+# --------------------------------------------------------------------------
+
+#                    HANDLE COMMAND LINE ARGUMENTS
+
+# --------------------------------------------------------------------------
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+               shift
+               set HostArch = $1
+               breaksw
+      case -o:
+               set Optimize = TRUE
+               breaksw
+      case -h:
+               echo "Usage: dsys-config [-o] [code]"
+               exit(1)
+               breaksw
+      default:
+               set configname = $1
+               breaksw
+   endsw
+   shift
+end
+
+# --------------------------------------------------------------------------
+
+#                     SETUP DIRECTORY NAMES
+
+# --------------------------------------------------------------------------
+
+set DevDir   = "dev/$HostArch"
+set DevBin   = "$DevDir/bin"
+set DevLib   = "$DevDir/lib"
+set DevInc   = "$DevDir/include"
+
+# --------------------------------------------------------------------------
+
+#                     SETUP C COMPILER CONFIGURATION
+
+# --------------------------------------------------------------------------
+
+set CDebug  = "-g"
+set COptim  = "-O"
+set CLibs   = "-lm"
+set LDOpt   = ""
+
+# --------------------------------------------------------------------------
+
+#                          PROCESS CONFIGURATION FILE
+
+# --------------------------------------------------------------------------
+
+set PckLibs = ( "-ls" "-lmisc" "-llag" "-lmesh" )
+set SysLibs = ()
+
+set codename = abc
+set CODENAME = `echo $codename | tr "[a-z]" "[A-Z]"`
+
+# --------------------------------------------------------------------------
+
+#                         SETUP DIRECTORIES
+
+# --------------------------------------------------------------------------
+
+set STDOUT = log.config
+
+echo "Configuring $CODENAME distribution"
+echo "Configuring $CODENAME distribution" >>& $STDOUT
+
+if (!(-d ../dev)) then
+   echo "   Making dev directory"
+   echo "   Making dev directory" >>& $STDOUT
+   mkdir ../dev
+endif
+
+if (!(-d ../$DevDir)) then
+   echo "   Making $DevDir directory"
+   echo "   Making $DevDir directory" >>& $STDOUT
+   mkdir ../$DevDir
+endif
+
+if (!(-d ../$DevBin)) then
+   echo "   Making $DevBin directory"
+   echo "   Making $DevBin directory" >>& $STDOUT
+   mkdir ../$DevBin
+endif
+
+if (!(-d ../$DevInc)) then
+   echo "   Making $DevInc directory"
+   echo "   Making $DevInc directory" >>& $STDOUT
+   mkdir ../$DevInc
+endif
+
+if (!(-d ../$DevLib)) then
+   echo "   Making $DevLib directory"
+   echo "   Making $DevLib directory" >>& $STDOUT
+   mkdir ../$DevLib
+endif
+
+if (!(-d ../$DevDir/log)) then
+   echo "   Making $DevDir/log directory"
+   echo "   Making $DevDir/log directory" >>& $STDOUT
+   mkdir ../$DevDir/log
+endif
+
+# --------------------------------------------------------------------------
+
+#                      SYSTEM DEPENDENT MODIFICATIONS
+
+# --------------------------------------------------------------------------
+
+if ($Optimize == TRUE) then
+   set COD = $COptim
+else
+   set COD = $CDebug
+endif
+
+set CcFlags = $COD
+set FcFlags = 
+
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+
+# WRITE_PRE_MAKE.DEFS - write the pre-Make.defs file
+
+    echo "   Writing the root config - $DevInc/pre-Make.defs"
+
+    set STDOUT = ../$DevInc/pre-Make.defs
+    rm -f $STDOUT
+    touch $STDOUT
+
+    echo '#' >>& $STDOUT
+    echo '# System wide pre-Make defining rules and compiler options' >>& $STDOUT
+    echo '#' >>& $STDOUT
+    echo '' >>& $STDOUT
+
+    echo 'DevDir = '$Root'/dev/${System}' >>& $STDOUT
+    echo 'DevBin = ${DevDir}/bin' >>& $STDOUT
+    echo 'DevLib = ${DevDir}/lib' >>& $STDOUT
+    echo 'DevInc = ${DevDir}/include' >>& $STDOUT
+    echo '' >>& $STDOUT
+
+    echo 'PACTDir = ${RootDir}' >>& $STDOUT
+    echo 'PACTInc = ${PACTDir}/include' >>& $STDOUT
+    echo 'PACTLib = ${PACTDir}/lib' >>& $STDOUT
+    echo 'PANACHE = ${PACTDir}/bin/panache' >>& $STDOUT
+    echo '' >>& $STDOUT
+
+    echo "ThreadLibExt =$ThreadLibExt" >>& $STDOUT
+    echo '' >>& $STDOUT
+
+    echo '#' >>& $STDOUT
+    echo '# Compiler/Loader Options' >>& $STDOUT
+    echo '#' >>& $STDOUT
+    echo '' >>& $STDOUT
+
+    echo '# trust no make to get this right' >>& $STDOUT
+    echo '.SUFFIXES : .i .F .f .C .c .a .o' >>& $STDOUT
+    echo '' >>& $STDOUT
+
+# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+
+exit($status)
+

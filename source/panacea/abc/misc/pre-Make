@@ -1,0 +1,52 @@
+#
+# PRE-MAKE for MISC package
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include ../dev/${System}/include/pre-Make.defs
+
+TGTBin = none
+TGTLib = ${DevLib}/libmisc.a
+
+#
+# Things upon which install depends (pact install)
+#
+DepLib     = 
+InstallDep = ${TGTLib}
+BinDep     = ${TGTLib}
+
+#
+# Compiler/Loader Options
+#
+UniFlags =
+CcFlags  = ${CDebug} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+LdFlags  = -L${LibDir} ${LDFLAGS}
+
+#
+# Files to remove in directory clean (make clean)
+#
+CleanFiles = *~ core #*#
+
+#
+# Code Units
+#
+
+Hdrs = miscin.h
+
+Objs = misc.o miscin.o
+
+ArObjs = ${TGTLib}(misc.o) ${TGTLib}(miscin.o)
+
+${Objs} : ${Hdrs}
+${TGTLib} : ${Hdrs}
+
+install : ${InstallDep}
+	@cp *.h ${DevInc}
+
+lib :
+	rm -f ${TGTLib}
+	pact install

@@ -1,0 +1,1648 @@
+#!/usr/bin/env python
+#
+# Gregory J. Smethells
+# Lawrence Livermore National Lab
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# MOTIVATION:
+#
+# This script is capable of distributing a package-version.tar.gz 
+# tarball, configuring it, building it, checking it and 
+# (optionally) installing it for all configurations listed in 
+# the specified config file. 
+#
+# Additionally, this script can configure, build, check, etc
+# a source directory that pre-exists on remote hosts; hence,
+# the script can skip the distribution step and simply do
+# any specified build system operations.
+#
+# DEVELOPER NOTES:
+#
+# This script forks other processes. To prevent a big mess of zombies,
+# make sure exceptions are avoided. In particular, make sure all 
+# concatenations of strings using the '+' operator encapsulate all
+# non-strings with the built-in 'str()' function
+#
+# If you plan on editing this file, please try to keep the same coding style
+# as is already present, especially when it comes to the use of white space,
+# newlines, and parenthesis. Thank you.
+#
+
+from time import localtime, time, strftime, sleep
+from string import split
+from re import search, sub
+from getopt import getopt
+from signal import *
+from socket import *
+from select import *
+from smtplib import SMTP
+from exceptions import RuntimeError
+from types import *
+from traceback import print_exc
+import os
+import sys 
+import traceback
+import curses
+
+#
+# CONFIGURATION VARIABLES
+#
+
+# Main configuration info
+version    = '1.6.8'  
+quiet      = 1
+dbg        = 0
+
+# PIDs
+childPIDs  = {}
+
+# Watcher
+states     = ['UNAVAILABLE', 'Sending', 'Configure', 'System', 'Build', \
+              'Check', 'Install', 'Clean', 'PASS', 'FAIL', 'DONE'] 
+keywords   = {}
+
+
+#
+# HELPER FUNCTIONS
+#
+
+# Print the string to stdout    
+def inform(string):
+  global quiet
+
+  if not(quiet):
+    print ('[PID ' + str(os.getpid()) + ']: ' + str(string))   
+    
+    
+# Print the string to stdout and the logFile
+def log(string):
+  inform(string)
+
+  print >>logFile, ('[PID ' + str(os.getpid()) + ']: ' + str(string))
+  logFile.flush()
+
+
+# Print the string to stdout and exit
+def die(string):
+  print string
+  sys.exit(2)
+
+
+# Print the string to stderr 
+def debug(string):
+  global dbg
+
+  if dbg:
+    print ('[PID ' + str(os.getpid()) + ']: DEBUG: ' + str(string))
+
+    
+# Make a list into a set (remove non-unique elements)          
+def unique(seq):
+  seq.sort()
+  i = 0
+  
+  while i < (len(seq) - 1):
+    if seq[i] == seq[i+1]:
+      seq.pop(i)
+    else:
+      i += 1
+  
+# Master process: handle SIGCHLD
+def masterSIGCHLDHander(signum, frame):
+  inform('PARENT received SIGCHLD ' + str(signum))
+
+
+# Master process: handle SIGQUIT
+def masterSIGINTHandler(signum, frame):
+  signal(SIGINT, masterSIGINTHandler)
+  inform('PARENT received signal ' + str(signum))
+ 
+  if len(childPIDs) > 0:
+    inform('child PIDs are ' + str(childPIDs) + '\nCleaning them up')
+
+    # Kill off the child processes
+    for pid in childPIDs:
+      if pid != os.getpid():
+        inform('  kill -9 ' + str(pid)) 
+        os.kill(pid, SIGINT)  # Halt any os.system calls
+        os.kill(pid, SIGKILL) # Immediately kill the process
+  
+    childPIDs.clear()
+ 
+    inform('\nShutting down.')
+
+  sys.exit(1)
+
+
+# Child process: handle SIGQUIT 
+def childSIGINTHandler(signum, frame):
+  signal(SIGINT, childSIGINTHandler)
+  inform('CHILD received signal ' + str(signum))
+
+    
+# From ats
+def clockReadout(time):
+  hours   = int(time / 3600.)
+  minutes = int((time - hours*3600.) / 60.)
+  seconds = int(time - hours*3600. - minutes*60.)
+
+  ans = ''
+
+  if hours > 10:
+    ans += '%d' % hours
+  else:
+    ans += '0%d' % hours
+
+  ans += ':'
+
+  if minutes > 10:
+    ans += '%d' % minutes
+  else:
+    ans += '0%d' % minutes
+
+  ans += ':'
+
+  if seconds > 10:
+    ans += '%d' % seconds
+  else:
+    ans += '0%d' % seconds
+
+  return ans
+
+def command(cmd):
+  proc = os.popen(cmd)
+  output = proc.read()
+  proc.close()
+
+  return str(output)
+
+
+#
+# CLASSES
+#
+
+class HostFlags:
+  def __init__(self, options):
+    self.gmake      = options.gmake        # Whether to use gmake (instead of just make)
+    self.basedir    = options.basedir      # Whether to use configname as the base dir
+    self.parallel   = options.parallel     # What parallel flag to use (e.g., gmake -j2)
+    self.blowAway   = options.blowAway     # Whether to rm -rf build dir
+    self.mkdir      = options.mkdir        # Whether to mkdir -p build dir
+    self.configure  = options.configure    # Whether to configure
+    self.systemcmd  = options.systemcmd    # System command to run if any
+    self.build      = options.build        # Whether to build
+    self.check      = options.check        # Whether to check afterwards
+    self.install    = options.install      # Whether to install afterwards
+    self.clean      = options.clean        # Whether to clean afterwards
+    self.cleanafter = options.cleanafter   # Whether to clean afterwards
+    self.save       = options.saveLogs     # Whether to save the log file
+    self.rc         = options.rc           # Whether to source rc file
+
+  def parallelFlag(self):
+    return self.parallel
+
+  def useBase(self):
+    return self.basedir
+
+  def useGNUMake(self):
+    return self.gmake != None and self.gmake == 1
+
+  def shouldBlowAway(self):
+    return self.blowAway != None and self.blowAway == 1
+ 
+  def shouldMkdir(self):
+    return self.mkdir != None and self.mkdir == 1
+
+  def runSystem(self):
+    return sub(r'"', '', self.systemcmd)
+ 
+  def shouldConfigure(self):
+    return self.configure != None and self.configure == 1
+ 
+  def shouldBuild(self):
+    return self.build != None and self.build == 1
+ 
+  def shouldCheck(self):
+    return self.check != None and self.check == 1
+ 
+  def shouldInstall(self):
+    return self.install != None and self.install == 1
+ 
+  def shouldCleanBefore(self):
+    return self.clean != None and self.clean == 1
+ 
+  def shouldCleanAfter(self):
+    return self.cleanafter != None and self.cleanafter == 1
+ 
+  def saveLogs(self):
+    return self.save != None and self.save == 1
+
+  def sourceRCFile(self):
+    return str(self.rc)
+
+    
+class Host:
+  """ Build a package on a host for the configurations given
+      in the dict named options.
+  """
+
+  def __init__(self, hostname, nodelist, dirname, tarball, flags, options, logDir):
+    self.host      = hostname
+    self.nodes     = []
+    self.base      = dirname  
+    self.logDir    = logDir    
+    self.log       = None
+    self.flags     = flags
+    self.options   = options
+    self.config    = None
+    self.package   = sub('.tar.gz', '', tarball)
+    self.next      = 0
+    self.shutdown  = 0           
+    self.fail      = 0
+    self.status    = 0       
+    
+    for node in nodelist:  
+      self.nodes.append(Node(node, flags))
+   
+  def configurations(self):
+    debug(str(self.host) + ' has configs ' + str(self.options.keys()))
+    return self.options.keys()
+    
+  def doConfiguration(self, config):
+    self.config = [config]
+    debug(str(self.host) + ' doing config ' + str(self.config))
+                 
+  def hostname(self):
+    """ Return the name of the host we are supporting.
+    """
+    return self.host
+    
+  def isAlive(self):
+    """ Host is up if at least one node is up.
+    """
+    verdict = False
+    nodelist = list(self.nodes)
+    
+    for node in nodelist:
+      if node.isAlive():
+        verdict = True
+      else:
+        self.nodes.remove(node)
+    
+    return verdict        
+    
+  def shutdown(self):
+    """ Stop running. Now.
+    """
+    self.shutdown = 1
+      
+  def checkFileSystemAvailability(self, fileSystemsUp):
+    """ Only run if our file system is up.          
+    """
+    if self.base not in fileSystemsUp:
+      self.shutdown = 1
+      
+  def markAsFailed(self, entry):
+    """ Raise an exception after entering it in the log.
+    """
+    log(entry)
+    self.fail   = 1  
+    self.status = 123
+    
+  def nextNode(self):
+    self.next = (self.next + 1) % len(self.nodes)
+    
+    return self.next
+      
+  def execute(self, title, configname, path, subcmd, retry=3):
+    i = self.nextNode()
+    
+    log(title + ' ' + str(configname))
+        
+    status, runtime = self.nodes[i].execute(subcmd, self.log, retry)
+        
+    if status != 0:
+      entry  = keywords['FAIL'] + ' ' + str(configname) 
+      entry += ' -- look in ' + path + '\n'
+
+      Host.markAsFailed(self, entry)
+    else:
+      entry = ''
+      
+    return [status, runtime, entry]
+            
+  def run(self):
+    """ Run builds, checks, etc as prescribed in the options on our nodes.
+    """
+    absPath = str(self.base) + '/' + str(self.package)
+
+    # Determine which make to use
+    if self.flags.useGNUMake():
+      make = 'gmake'
+    else:
+      make = 'make'
+
+    # Determine what the parallel flag should be set to
+    parallel = self.flags.parallelFlag()
+
+    # Start our email entry
+    now = str(strftime('%a %d %b %Y %H:%M:%S', localtime(time())))
+    emailEntry = '\nRunning on ' + self.host + ' on ' + now + '\n'
+
+    # Allow Master process to control configurations to be done
+    if self.config != None:
+      configlist = self.config
+    else:
+      configlist = self.options.keys()
+      
+    # Do a separate build for each configuration
+    # NOTE: builddir is a relative path to package dir because we sometimes `rm -rf`
+    # the builddir and a relative path is significantly safer to do recursive removes on, 
+    # compared to absolute paths concatenated together 
+    for configname in configlist: 
+      if self.shutdown:
+        log('Shutting down run on ' + self.host)
+        break
+  
+      # Determine if the host is up
+      if not self.isAlive():
+        emailEntry += self.host + ' -- host unreachable\n'
+        self.fail   = 1
+        self.status = 9
+        break
+      else:
+        self.fail = 0
+
+      self.log = str(self.logDir) + '/' + str(configname) + '.log'
+      sys.stderr.close()
+      sys.stderr = open(self.log, 'w')  # stderr goes to a log             
+      
+      configopt = self.options[configname]
+
+      # Create a unique build dir name (relative to absPath)
+      if self.flags.useBase():
+        builddir  = str(configname)
+        configure = '../configure'
+      else:
+        builddir  = 'build/' + str(configname)
+        configure = '../../configure'
+
+      # Setup installdir relative to builddir if install is FALSE
+      # Otherwise, assume a --prefix=SOMETHING is already in configopt
+      if not self.flags.shouldInstall() and configopt.find('prefix') == -1:
+        installdir = str(absPath) + '/' + str(builddir) + '/install'
+        configopt += ' --prefix=' + str(installdir) + ' '
+
+      # Setup some constants for this iteration
+      cmdCHDIR  = 'cd ' + absPath + ' && cd ' + builddir + ' && '
+      hostpath = self.host + ':' + str(absPath) + '/' + str(builddir)
+
+      # Continue our email entry
+      now = str(strftime('%a %d %b %Y %H:%M:%S', localtime(time())))
+      emailEntry += '\nHandling configuration ' + configname + ' starting on ' + now + '\n'
+
+      # Blow Away 
+      if not self.fail and self.flags.shouldBlowAway():
+        subcmd = 'cd ' + absPath + ' && rm -rf '+ builddir  
+        title  = 'Blow Away build dir'
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+  
+      # Compensate for NFS being slooow to react
+      os.system('sleep 4')
+ 
+      # Make Dir 
+      if not self.fail and self.flags.shouldMkdir():
+        subcmd = 'cd ' + absPath + ' && mkdir -p '+ builddir  
+        title = 'Make Dir build dir'
+        status, runtime, entry = Host.execute(self, 'Env', configname, hostpath, ' printenv ') 
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+         
+      # Compensate for NFS being slooow to react          
+      os.system('sleep 4')
+
+      # Configure
+      if not self.fail and self.flags.shouldConfigure():
+        subcmd = cmdCHDIR + configure + ' ' + configopt 
+        title = keywords['Configure']
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+  
+        if status == 0:
+          entry = 'Configure -- OK (' + runtime + ')\n'
+
+        emailEntry += entry
+
+      # Clean before
+      if not self.fail and self.flags.shouldCleanBefore():
+        subcmd = cmdCHDIR + make + ' ' + parallel + ' clean ' 
+        title = keywords['Clean']
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+
+      # System
+      if not self.fail and len(self.flags.runSystem()) > 0:
+        subcmd = cmdCHDIR + self.flags.runSystem()
+        title = keywords['System']
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+
+      os.system('sleep 1')
+
+      # Build 
+      if not self.fail and self.flags.shouldBuild():
+        subcmd = cmdCHDIR + make + ' ' + parallel 
+        title = keywords['Build']
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+  
+        if status == 0:
+          entry = 'Build -- OK (' + runtime + ')\n'
+
+        emailEntry += entry
+  
+      # Check 
+      if not self.fail and self.flags.shouldCheck():
+        subcmd = cmdCHDIR + make + ' check ' 
+        title = keywords['Check']
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+  
+        if status == 0:
+          entry = keywords['PASS'] + ' ' + str(configname)
+          log(entry)
+
+          entry = 'Test -- PASS (' +  runtime + ')\n'
+
+        emailEntry += entry
+ 
+      # Install 
+      if not self.fail and self.flags.shouldInstall():
+        subcmd = cmdCHDIR + make + ' ' + parallel + ' install '
+        title = keywords['Install']
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+
+        if status == 0:
+          prefix = configopt[configopt.find('--prefix='):]
+          prefix = prefix[:prefix.find(' ')]
+          prefix = sub('--prefix=', '', prefix)
+         
+          entry  = 'Install -- OK (' + runtime + ')\n'
+          entry += 'Installed into ' + prefix + '\n'
+
+        emailEntry += entry
+ 
+      # Clean after
+      if not self.fail and self.flags.shouldCleanAfter():
+        subcmd = 'cd ' + absPath + ' && rm -rf '+ builddir  
+        title  = 'Blow Away build dir afterwards'
+        status, runtime, entry = Host.execute(self, title, configname, hostpath, subcmd) 
+        
+      # Finished with run
+      if not self.fail or self.flags.shouldCheck():
+        log(keywords['DONE'] + ' ' + str(configname))
+      
+    sys.stderr.close()
+    
+    if not self.flags.saveLogs():
+      os.remove(self.log)
+
+    return [emailEntry, self.status]
+
+                  
+class Node:
+  """ Encapsulate a node within a host
+  """
+
+  def __init__(self, hostname, flags):
+    self.host      = hostname    # Node to build on
+    self.flags     = flags       # Boolean flags for Node customization
+    
+  def isAlive(self):
+    """ Determine if the host is up
+    """
+
+    alive = 0
+    sock  = socket()
+    
+    if sock != None:
+      sock.setblocking(0)
+      
+      try:
+        err = sock.connect_ex((self.host, 22))
+
+        if err >= 0:
+          rfd, wfd, efd = select([sock], [], [sock], 5)
+      
+          if sock in rfd: 
+            err = sock.getsockopt(SOL_SOCKET, SO_ERROR)
+          
+            if not err: 
+              alive = 1 
+      except Exception, e:
+        print str(e)
+                    
+      sock.close()
+      
+    if not alive:
+      entry = keywords['UNAVAILABLE'] + ' ' + self.host + ' -- host unreachable'
+      log(entry)
+            
+    return alive
+
+  def execute(self, subcmd, logname, retry=3):
+    """ Run a command after conditionally printing it to stderr and/or the log.
+    """
+    # Do we need to source an rc file first?
+    rc = self.flags.sourceRCFile()
+   
+    if rc != '':
+      rc += ' && '
+
+    # How to prefix and suffix command lines
+    cmdPrefix = 'ssh ' + self.host + ' \'' + rc + ' '
+    cmdSuffix = '\' >> ' + logname + ' 2>&1'
+    cmd       = cmdPrefix + subcmd + cmdSuffix
+
+    # Log the command
+    debug(cmd)
+
+    status = 1
+
+    # Re-try cmd "retry" times before failing
+    while status != 0 and retry > 0:  
+      # Time the system call
+      tBegin = time()
+      status = os.system(cmd)
+      tEnd   = time()
+      retry -= 1
+      
+      if retry > 0:
+        # Compensate for NFS being slooow to react          
+        os.system('sleep 5')
+
+    # Report
+    runtime = clockReadout(tEnd - tBegin) 
+        
+    return [status, runtime]
+
+
+class FileSystem:
+  """ Initialize the file system by sending over the tarball
+      and extracting it in the proper dir so that the Host 
+      can begin configuring, building, etc.
+  """
+  
+  def  __init__(self, host, dirname, tarball, logFilename):
+    self.host    = str(host)                        # Host to scp to
+    self.dir     = str(dirname)                     # Dir to put tarball in
+    self.tarball = str(tarball)                     # Tarball name
+    self.log     = logFilename                      # Log filename
+    self.package = sub('.tar.gz', '', self.tarball) # Dir name after untar
+    self.active  = 0                                # setup and cleanup are NOPs
+    self.remove  = 0                                # do not remove tarball when done
+
+    # Sanity checks
+    if self.host == '' or self.dir == '':
+      die('ERROR: host or dir empty: host<' + self.host + '> dir<' + self.dir + '>')
+
+    debug('FileSystem: ' + host + ' ' + dirname + ' created')
+
+  def activate(self):
+    """ Activate this file system, not allowing setup to be a NOP.
+        Cleanup is still a NOP unless removeWhenDone() is also called.
+    """
+    self.active = 1
+
+  def deactivate(self):
+    """ Deactivate this file system, allowing setup and cleanup to be NOPs.
+    """
+    self.active = 0
+
+  def removeWhenDone(self):
+    """ Activate this file system, not allowing cleanup to be a NOP.
+    """
+    self.remove = 1
+
+  def dirname(self):
+    """ Return the name of the directory we are supporting.
+    """
+
+    return self.dir
+
+  def hostname(self):
+    """ Return the name of the host we are supporting.
+    """
+
+    return self.host
+    
+  def setup(self):
+    """ Copy the tarball to and extract in the remote dir we are managing.
+    """
+    status = 0
+
+    if self.active:
+      status += FileSystem.copy(self)
+      status += FileSystem.extract(self)
+
+    return status
+
+  def copy(self):
+    """ Use scp to send the tarball to the remote dir on the remote host
+    """
+    global quiet
+
+    if quiet:
+      redirect = ' > /dev/null'
+    else:
+      redirect = ''
+
+    # Make sure tarball actually exists
+    if not(os.access(self.tarball, os.F_OK)):
+      die('Cannot find tarball: ' + str(self.tarball))
+
+    # Make sure destination dir exists 
+    cmd = 'ssh ' + self.host + ' \'mkdir -p ' + self.dir + '\'' + redirect
+
+    debug(cmd)
+    log('Making dir ' + self.host + ':' + self.dir)
+
+    status = os.system(cmd)
+ 
+    # If both exist: copy the file over
+    if status == 0:
+      dest = self.host + ':' + self.dir + '/'
+      cmd = 'scp ' + self.tarball + ' ' + dest + redirect
+
+      debug(cmd)
+      log(keywords['Sending'] + ' ' + self.host + ' => ' + self.tarball + ' to ' + dest)
+
+      status = os.system(cmd)
+
+      if status != 0:
+        log(keywords['FAIL'] + ' ' + self.host + ' copying tarball [' + str(status) + ']')
+    else:
+      log('MKDIR on ' + self.host + ' at ' + self.dir + ' FAILED: ' + str(status))
+
+    return status
+
+  def extract(self):
+    """ Use ssh to unzip and untar the tarball
+    """
+
+    tarfile = sub('.gz', '', self.tarball)
+
+    # Unzip and untar the tarball on host in the destination dir
+    cmd = 'ssh ' + self.host + ' \'' + \
+               'cd '       + self.dir      + ' && ' + \
+               'rm -f '    + tarfile       + ' && ' + \
+               'gunzip '   + self.tarball  + ' && ' + \
+               'tar xf '   + tarfile       + ' && ' + \
+               'rm -f '    + tarfile                + \
+               '\' >> ' + self.log + ' 2>&1'
+
+    debug(cmd)
+    log('Unzipping and untarring file on ' + self.host)
+
+    status = os.system(cmd)
+
+    if status != 0:
+      log('Unzip and untar FAILED: ' + str(status))
+    else:
+      log(keywords['DONE'] + ' ' + self.host + ' extracting tarball')
+
+    return status
+
+  def cleanup(self):
+    """ Remove the tarball and the dir it unzipped to 
+    """
+    status = 0
+
+    if self.active and self.remove:
+      tarfile   = sub('.gz', '', self.tarball)
+  
+      # Remove the tarball and dir it unzipped to 
+      cmd = 'ssh ' + self.host + ' \'' + \
+              'cd '       + self.dir    + ' && ' + \
+              'rm -f  '   + tarfile     + ' && ' + \
+              'rm -rf '   + self.package         + \
+              '\' >> ' + self.log + ' 2>&1'
+
+      debug(cmd)
+      log('Tarball cleaned up on ' + self.host + ':' + self.dir)
+    
+      status = os.system(cmd)
+    else:
+      debug(str(self.host) + " active " + str(self.active) + " remove " + str(self.remove))
+
+    return status
+
+
+
+class Options:
+  """ Options that are read from the command line 
+      and the config file are handled and stored here.
+  """ 
+
+  def __init__(self, args):
+    # Default options
+    self.basedir         = 0  # Should we use configname as base dir?
+    self.blowAway        = 0  # Should we rm -rf build dir first?
+    self.mkdir           = 1  # Should we mkdir -p build dir first?
+    self.configure       = 0  # Should we run configure?
+    self.build           = 0  # Should we run gmake all?
+    self.check           = 0  # Should we run gmake check?
+    self.install         = 0  # Should we run gmake install?
+    self.clean           = 0  # Should we run gmake clean before?
+    self.cleanafter      = 0  # Should we run gmake clean after?
+    self.gmake           = 1  # Should we use gmake?
+    self.parallel        = '' # Should gmake spawn extra processes?
+    self.systemcmd       = '' # Command to run after configuration step
+    self.rc              = '' # Command to source rc file
+
+    self.saveLogs        = 0  # Should we save host log files?
+    self.distDir         = '' # Should we distribute the tarball?
+
+    self.list            = 0  # List confignames
+
+    self.configFilename  = '' # Filename of the config file
+    self.ignoreList      = [] # Ignore hosts in this list
+    self.onlyList        = [] # Only do configs for these hosts
+    self.onlyConfList    = [] # Only do confignames from this list
+    self.tarball         = '' # Filename of the tarball
+
+    self.mailaddr        = '' # Email to send results to
+    self.popserver       = '' # POP3 server
+
+    self.watchBuild      = 0
+    self.logName         = 'distribute.log'
+    self.logDir          = os.getcwd() # Directory to leave log file in
+
+    self.remove          = 0  # Whether to remove the tarball from each file system
+
+    self.fileSystemConfigs = {} # File systems to send tarball to
+    self.hostConfigs       = {} # Hosts to configure for
+    self.clusters          = {} # Cluster's and their available login nodes
+
+    # Initialize ourself using args
+    Options.parseFlags(self, args) 
+ 
+    # Once we know what config file to use: parse it
+    Options.readConfigFile(self) 
+
+  def usage(self):
+    print '\nUSAGE: distribute [option(s)] [-d SUBDIR | <tarball>] <configfile>' 
+    print '\nOPTIONS:\n' 
+    print '  -B  --build            run \'gmake\' on each host' 
+    print '  -c  --configure        run \'configure\' on each host' 
+    print '  -C  --check            run \'gmake check\' on each host' 
+    print '  -d  --dist-dir=SUBDIR  ignore distribution of tarball and do builds in remote SUBDIR'
+    print '  -D  --debug            print debug information at runtime' 
+    print '  -h  --help             print this help screen'                
+    print '  -i  --ignore=LIST      ignore all hosts in LIST when reading from <configfile>'
+    print '  -I  --install          run \'gmake install\' on each host' 
+    print '  -j  --parallel=N       utilize gmake\'s -j N feature'
+    print '  -k  --clean            run \'gmake clean\' on each host before building' 
+    print '  -K  --clean-after      run \'gmake clean\' on each host after everything else' 
+    print '  -l  --log-dir=DIR      put all log files in DIR'
+    print '  -L  --list             list all confignames in <configfile>'
+    print '  -m  --make             use just "make" instead of "gmake"'                
+    print '  -n  --named            use configname of each host as its base build dir name'
+    print '  -o  --only=LIST        only do hosts in LIST, ignore the remainder of <configfile>'
+    print '  -O  --only-conf=LIST   only do confignames in LIST, ignore the remainder of <configfile>'
+    #print '  -P  --mkdir            mkdir -p build dir before configuring and building on each host' 
+    print '  -q  --quiet            print only output from errors'
+    print '  -r  --remove-dist      remove distributed tarball package when finished on host'
+    print '  -R  --remove-old       rm -rf and mkdir the build dir before building on each host' 
+    print '  -s  --save-logs        save all log files, do not remove log files on success'
+    print '  -S  --system=CMD       run command in build dir after configuration step'
+    print '  -t  --test             short hand for -RcBC'
+    print '  -T  --test-client=NAME short hand for -ncBC -d NAME'
+    print '  -U  --update           short hand for -RcBCI' 
+    print '  -v  --verbose          print a lot of runtime status output' 
+    print '  -V  --version          print version information' 
+    print '  -w  --watch            watch the build process in an xterm in addition to building'
+    print '  -z  --bashrc           source your ~/.bashrc before running commands'
+    print '  -Z  --cshrc            source your ~/.cshrc before running commands'
+    print ' '
+    print 'Where LIST is a comma delimited list of strings and'
+    print 'where N is a small integer greater than one and'
+    print 'where DIR is a valid absolute path and'
+    print 'where SUBDIR is a valid relative path sub-directory'
+    print ' '
+    print 'EXAMPLES:\n'
+    print '  distribute --test project-2.0.0.tar.gz configfile'
+    print ' '
+    print '  distribute --list configfile'
+    print '  distribute --only-conf=ilx-gcc,ilx-pgi --test project-2.0.0.tar.gz configfile'
+    print ' '
+    print '  distribute --test-client=clientname configfile'
+    print '  distribute --ignore=gps --test-client=clientname configfile'
+    print ' '
+
+    sys.exit(0)
+
+  def startWatcher(self):
+    """ Fork a process that spawns an xterm window that
+        watches and summarizes the distribute log file
+    """
+    # If requested, pop a window to watch the build in
+    watcherPID = os.fork()
+  
+    script = 'distribute-watch-script'
+
+    if watcherPID == 0:
+      body  = '#!/bin/sh\n'
+      body += 'xterm -geometry 90x40-0+0 -T Distribute -e \'' + sys.argv[0]
+      body += ' -l ' + self.logDir + ' -W\'  &\n'
+
+      tempFile = file(script, 'w')
+      tempFile.write(body)
+      tempFile.close()
+    
+      os.system('chmod 755 ' + str(script))
+      os.execlp(script, '')
+    else: 
+      os.system('sleep 2')
+
+      # We should not need the watch script any more
+      if os.access(script, os.F_OK):
+        os.remove(script)
+
+  def parseFlags(self, args):
+    """ Parse flags given on the command line and 
+        modify any internal variables approriately in response
+    """
+    global quiet
+    global dbg
+        
+    # Get the flags 
+    shortOpts = 'bBcCd:Dhi:Ij:kKl:Lmno:O:PqrRsS:tT:UvVwWzZ'
+    longOpts  = ['build', 'configure', 'check', 'dist-dir=', 'debug', 'help', \
+                 'ignore=', 'install', 'parallel=', 'clean', 'clean-after', \
+                 'log-dir=', 'list', 'make', 'only=', 'only-conf=', 'mkdir', 'named', 'quiet', \
+                 'remove-dist', 'remove-old', 'save-logs', 'system', 'test', \
+                 'test-client=', 'update', 'verbose', 'version', 'watch', 'watcher', \
+                 'bashrc', 'cshrc']
+    opts, remainingArgv = getopt(args, shortOpts, longOpts)
+  
+    # Parse any flags
+    for flag, arg in opts:
+      if flag == '-B' or flag == '--build':
+        self.build = 1
+      elif flag == '-c' or flag == '--configure':
+        self.configure = 1
+      elif flag == '-C' or flag == '--check':
+        self.check = 1
+      elif flag == '-d' or flag == '--dist-dir':
+        self.distDir = arg
+      elif flag == '-D' or flag == '--debug':
+        dbg = 1
+      elif flag == '-h' or flag == '--help':
+        Options.usage(self)  
+      elif flag == '-i' or flag == '--ignore':
+        self.ignoreList = arg.split(',')
+      elif flag == '-I' or flag == '--install':
+        self.install = 1
+      elif flag == '-j' or flag == '--parallel':
+        self.parallel = ' -j ' + arg
+      elif flag == '-k' or flag == '--clean':
+        self.clean = 1
+      elif flag == '-K' or flag == '--clean-after':
+        self.cleanafter = 1
+      elif flag == '-l' or flag == '--log-dir':
+        self.logDir = arg
+        self.logName = os.path.join(self.logDir, self.logName)
+      elif flag == '-L' or flag == '--list':
+        self.list = 1
+      elif flag == '-m' or flag == '--make':
+        self.gmake = 0
+      elif flag == '-n' or flag == '--named':
+        self.basedir = 1
+      elif flag == '-o' or flag == '--only':
+        self.onlyList = arg.split(',')
+      elif flag == '-O' or flag == '--only-conf':
+        self.onlyConfList = arg.split(',')
+      elif flag == '-P' or flag == '--mkdir':
+        self.mkdir = 1
+      elif flag == '-q' or flag == '--quiet':
+        quiet = 1 
+      elif flag == '-r' or flag == '--remove-dist':
+        self.remove = 1 
+      elif flag == '-R' or flag == '--remove-old':
+        self.blowAway = 1
+        self.mkdir    = 1
+      elif flag == '-s' or flag == '--save-logs':
+        self.saveLogs = 1 
+      elif flag == '-S' or flag == '--system':
+        self.systemcmd = arg 
+      elif flag == '-t' or flag == '--test':
+        self.blowAway  = 1
+        self.mkdir     = 1
+        self.configure = 1
+        self.build     = 1
+        self.check     = 1
+      elif flag == '-T' or flag == '--test-client':
+        self.distDir   = arg
+        self.basedir   = 1
+        self.configure = 1
+        self.build     = 1
+        self.check     = 1
+      elif flag == '-U' or flag == '--update':
+        self.blowAway  = 1
+        self.mkdir     = 1
+        self.configure = 1
+        self.build     = 1
+        self.check     = 1
+        self.install   = 1
+      elif flag == '-v' or flag == '--verbose':
+        quiet = 0
+      elif flag == '-V' or flag == '--version':
+        print str(version)
+        sys.exit(0) 
+      elif flag == '-w' or flag == '--watch':
+        self.watchBuild = 1
+      elif flag == '-W' or flag == '--watcher':
+        # XXX: Watcher must be the very last flag given
+        watcher = Watcher(self)
+        watcher.watch(states)
+        sys.exit(0)
+      elif flag == '-z' or flag == '--bashrc':
+        self.rc = '. ~/.bashrc'
+      elif flag == '-Z' or flag == '--cshrc':
+        self.rc = 'source ~/.cshrc'
+      else:
+        print 'Unknown flag (' + flag + ') with arg (' + arg + ')'
+  
+    # Anything left in argv should be the required arguments
+    if len(remainingArgv) == 2:
+      self.tarball        = remainingArgv[0]
+      self.configFilename = remainingArgv[1]
+    elif len(remainingArgv) == 1:
+      self.tarball        = self.distDir + '.tar.gz'
+      self.configFilename = remainingArgv[0]
+    else: 
+      Options.usage(self)
+   
+    debug('argv after getopts = ' + str(remainingArgv))
+    debug('configfile         = ' + str(self.configFilename))
+    debug('tarball            = ' + str(self.tarball))
+
+  def readConfigLine(self, file):
+    """ Read a line of input from the config file
+    """
+    line = file.readline()
+
+    # FIXME: these should be raw strings (r'.*')
+    # Concat lines that end in a '\' char
+    while search('\\\\', line):
+      line = sub('\\\\.*', '', line)
+      line = sub('\n', '', line)
+      #debug('[readConfigLine extend] \'' + str(line) + '\'')
+      line += file.readline()
+
+    if line == '':
+      line = None
+    else:
+      line = sub('\n', '', line)     # Remove newline
+      #debug('[readConfigLine presub] \'' + str(line) + '\'')
+      line = sub('#.*',  '', line)   # Remove comments
+      line = sub('\"',   '', line)   # Remove quotes
+      line = sub('^\s+', '', line)   # Remove leading white-space
+      line = sub('\s+$', '', line)   # Remove trailing white-space
+      line = sub('\s+', ' ', line)   # Remove multiple white-space
+      line = sub(';.*',  '', line)   # Remove extra cmds
+      line = sub('||.*', '', line)   # Remove extra cmds
+      line = sub('&&.*', '', line)   # Remove extra cmds
+
+      #debug('[readConfigLine   read] \'' + str(line) + '\'')
+
+    return line
+ 
+  def readConfigFile(self):
+    """  Read a config file of the form:
+
+         [Distribute Configuration]  
+         logdir=AbsolutePathToLogDir  @
+         systemcmd=CommandRunOnEachHostAfterConfigure  @
+         mail=ValidEmailAddress        !
+         popserver=LocalPOPServerName  !
+
+         [Clusters]
+         name=HumanReadableClusterName     +  !
+         hosts=SpaceSeparatedNodeNameList  +  !
+         
+         [File System]  *
+         name=HumanReadableName
+         host=HostnameThatHasDirMounted
+         dir=AbsolutePathToSrcDir
+
+         [Build Configuration]  *
+         host=ValidHostname
+         fs=PreviouslyDefinedFileSystemName
+         common=OptionsCommonToAllConfignames
+         parallel=IntegerValueForGMakeDashJ  @
+         configname=HumanReadableName      +  !
+         configoptions=ConfigNamesOptions  +  !
+
+         * -- There can be more than one of these sections
+         + -- These can repeat more than once per section
+         ! -- These must be paired together
+         @ -- These are optional
+    """
+    debug('parsing config file ' + str(self.configFilename))
+  
+    # Open the host for reading
+    file = open(self.configFilename, 'r' ) 
+  
+    if file == None:
+      die('Could not open ' + str(self.configFilename) + ' for reading')
+   
+    # Read each line of the file one by one 
+    line = Options.readConfigLine(self, file)
+
+    while line != None:
+      # DISTRIBUTE CONFIGURATION
+      if line == '':
+        pass
+      elif search('^.*Distribute Configuration.*', line):
+        debug('Handling Distribute Configuration')
+
+        while line != '':
+          if   search('^.*mail\s*=.*', line):
+            self.mailaddr = sub('^.*mail\s*=\s*', '', line)
+            line = Options.readConfigLine(self, file)
+
+            # Each mail better be followed by a popserver
+            if line != '' and search('^.*popserver\s*=.*', line):
+              self.popserver = sub('^.*popserver\s*=\s*', '', line)
+            else:
+              die('BAD CONFIG FILE: missing popserver for ' + self.mailaddr)
+          elif search('^.*logdir\s*=.*', line):
+            # Only change logDir if the cmd line left it alone
+            if self.logDir == os.getcwd():
+              self.logDir = sub('^.*logdir\s*=\s*', '', line)
+          elif search('^.*systemcmd\s*=.*', line):
+            # Command line arguments trump the config file
+            if self.systemcmd != None and len(self.systemcmd) == 0:
+              self.systemcmd = sub('^.*systemcmd\s*=\s*', '', line)
+          else:
+            debug('IGNORED LINE: ' + line)
+
+          line = Options.readConfigLine(self, file)
+
+        # Extend the log filename to be an absolute path
+        self.logName = os.path.join(self.logDir, self.logName)    
+
+        # Remove any old log file (prettify watcher window)
+        if os.access(self.logName, os.W_OK):
+          os.remove(self.logName)
+
+        # We are ready to start a log file watcher if needed
+        if self.watchBuild:
+          Options.startWatcher(self)
+
+        debug('[CONFIG] logdir    = ' + str(self.logDir))
+        debug('[CONFIG] systemcmd = ' + str(self.systemcmd))
+        debug('[CONFIG] mail      = ' + str(self.mailaddr))
+        debug('[CONFIG] popserver = ' + str(self.popserver))
+      # CLUSTER
+      elif search('^.*Cluster.*', line):
+        debug('Handling Cluster listings')      
+        
+        name  = ''
+        hosts = []
+        
+        while line != '':
+          if   search('^.*name\s*=.*', line):
+            name = sub('^.*name\s*=\s*', '', line)
+            line = Options.readConfigLine(self, file)
+
+            # Each name line better be followed by a hosts line
+            if line != '' and search('^.*hosts\s*=.*', line):
+              hosts = sub('^.*hosts\s*=\s*', '', line)
+              hosts = hosts.split(' ')
+            else:
+              die('BAD CONFIG FILE: missing options for ' + configname)
+          else:
+            debug('IGNORED LINE: ' + line)
+  
+          debug('[CLUSTER] name  = ' + str(name))
+          debug('[CLUSTER] hosts = ' + str(hosts))
+            
+          self.clusters[name] = hosts
+          
+          line = Options.readConfigLine(self, file)
+                               
+      # FILE SYSTEM
+      elif search('^.*File System.*', line):
+        debug('Handling File System Configuration')
+
+        name   = ''
+        host   = ''
+        dir    = ''
+        ignore = 0
+
+        while line != '':
+          if   search('^.*name\s*=.*', line):
+            name = sub('^.*name\s*=\s*', '', line)
+          elif search('^.*host\s*=.*', line):
+            host = sub('^.*host\s*=\s*', '', line)
+
+            if host in self.ignoreList:
+              ignore = 1
+          elif search('^.*dir\s*=.*', line):
+            dir  = sub('^.*dir\s*=\s*', '', line)
+          else:
+            debug('IGNORED LINE: ' + line)
+  
+          line = Options.readConfigLine(self, file)
+
+        if not ignore:
+          debug('[FS] name = ' + str(name))
+          debug('[FS] host = ' + str(host))
+          debug('[FS] dir  = ' + str(dir))
+
+          self.fileSystemConfigs[name] = FileSystem(host, dir, self.tarball, self.logName)
+      # BUILD CONFIGURATION
+      elif search('^.*Build Configuration.*', line):
+        debug('Handling Build Configuration')
+
+        host       = ''
+        nodelist   = []
+        fs         = ''
+        common     = ''
+        parallel   = None
+        configname = ''
+        options    = {} 
+        ignore     = 0
+
+        while line != '' and line != None:
+          if   search(r'^.*host\s*=.*', line):
+            host    = sub('^.*host\s*=\s*', '', line)
+
+            if self.clusters.has_key(host):
+              nodelist = self.clusters[host]
+            else:
+              nodelist = [host]
+               
+            if host in self.ignoreList:
+              ignore = 1
+
+            if len(self.onlyList) > 0 and host not in self.onlyList:
+              ignore = 1
+          elif search('^.*fs\s*=.*', line):
+            fs      = sub('^.*fs\s*=\s*', '', line)
+          elif search('^.*common\s*=.*', line):
+            common = sub('^.*common\s*=\s*', '', line)
+          elif search('^.*parallel\s*=.*', line):
+            parallel = ' -j ' + str(sub('^.*parallel\s*=\s*', '', line))
+          elif search('^.*configname\s*=.*', line):
+            configname = sub('^.*configname\s*=\s*', '', line)
+            line = Options.readConfigLine(self, file)
+
+            # Print confignames as we go, if asked to list them      
+            if self.list:
+              print configname
+ 
+            # If we only want to run some confignames, obey the list 
+            if len(self.onlyConfList) == 0 or configname in self.onlyConfList:
+              # Each configname line better be followed by an options line
+              if line != '' and search('^.*options\s*=.*', line):
+                options[configname] = sub('^.*options\s*=\s*', '', line)
+                options[configname] += ' ' + common 
+              else:
+                die('BAD CONFIG FILE: missing options for ' + configname)
+          else:
+            debug('IGNORED LINE: ' + line)
+
+          line = Options.readConfigLine(self, file)
+
+        # Ignore hosts with no options
+        if len(options) == 0:
+          ignore = 1
+
+        if not ignore:
+          debug('[BUILD] host       = ' + str(host))
+          debug('[BUILD] fs         = ' + str(fs))
+          debug('[BUILD] parallel   = ' + str(parallel))
+          debug('[BUILD] configname = ' + str(configname))
+          debug('[BUILD] options    = ' + str(options))
+
+          # Let this FileSystem know it should actually do setup/cleanup
+          self.fileSystemConfigs[fs].activate()
+
+          # Let this FileSystem know it should actually do removal afterwards
+          if self.remove:
+            self.fileSystemConfigs[fs].removeWhenDone()
+
+          # Build the Host instance to handle this request 
+          if parallel:
+            oldValue = self.parallel 
+            self.parallel = parallel
+ 
+          dirname = self.fileSystemConfigs[fs].dirname() 
+          tarball = self.tarball
+          flags   = HostFlags(self)
+          logDir  = self.logDir
+  
+          if parallel:
+            self.parallel = oldValue
+
+          hostObj = Host(host, nodelist, dirname, tarball, flags, options, logDir)
+  
+          if not hostObj.isAlive():
+            for fs in self.fileSystemConfigs.keys():
+              if host == self.fileSystemConfigs[fs].hostname():
+                self.fileSystemConfigs[fs].deactivate()
+          
+          self.hostConfigs[host] = hostObj
+            
+      # ERROR IN CONFIG FILE
+      else:
+        print 'UNPARSABLE CONFIG LINE: ' + str(line) 
+    
+      line = Options.readConfigLine(self, file)
+   
+    # Finished parsing the config file 
+    file.close()
+
+    # Exit if all we are doing is listing the confignames
+    if self.list:
+      sys.exit(0)
+  
+    # No file system distributions if -d option given
+    if len(self.distDir) > 0:
+      for name in self.fileSystemConfigs:
+        self.fileSystemConfigs[name].deactivate()
+
+  def tarfileName(self):
+    """ Filename of the tarball
+    """
+    return self.tarball
+
+  def packageName(self):
+    """ Package name of what we are distributing
+    """
+    return sub('.tar.gz', '', self.tarball)
+
+  def configFile(self):
+    """ Name of the config file we read options from 
+    """
+    return self.configFilename
+
+  def logDirectory(self):
+    """ Directory to store log files within
+    """
+    return self.logDir
+
+  def emailTo(self):
+    """ Email address retrieved from the config file
+    """
+    return str(self.mailaddr)
+
+  def popServer(self):
+    """ POP server retrieved from the config file
+    """
+    return self.popserver
+  
+  def fileSystems(self):
+    """ Dict of the file systems given in the config file
+    """
+    return self.fileSystemConfigs 
+  
+  def hosts(self):
+    """ Dict of the host build configs given in the config file
+    """
+    return self.hostConfigs
+
+  def logFilename(self):
+    """ Absolute path to the log file
+    """
+    return self.logName
+
+
+ 
+class Watcher:
+  """ Parse the distribute log file and display the status
+      of builds that are described there. If used while log file
+      is being written to, does real-time display of
+      builds in progress. Uses curses to control the terminal.
+  """
+
+  def __init__(self, args):
+    self.stop    = 0
+    self.args    = args
+    self.logFile = str(self.args.logFilename())
+
+  def shutdown(self):
+    self.stop = 1
+    curses.endwin()
+
+  def watch(self, states):
+    """ Use curses to print status information found in the log file
+    """
+    start = strftime('%a %d %b %Y %H:%M:%S', localtime(time()))
+
+    # Take over the window
+    window = curses.initscr()
+
+    # Display the status of the builds 
+    while(not(self.stop)):
+      # Reset
+      stateList = {}
+      maxChars  = 0
+ 
+      # Assume nothing about everyone's current state
+      for state in states:
+        stateList[state] = []
+
+      try:
+        # Grep for state keywords in the log file
+        for state in states:
+          data = command('grep ' + str(state) + ' ' + self.logFile)
+          
+          # Split data read at newline chars
+          lines = split(data, '\n')
+          # Remove last line, which is always ''
+          lines = lines[:-1] 
+
+          # Parse configuration status
+          for line in lines:
+            configuration = split(line, ' ')[3]
+            stateList[state].append(configuration)
+            
+        # Clear the window
+        window.clear()
+        window.addstr('Distribute ' + str(version) + '   ' + str(start) + '\n')
+        #window.addstr('Parsing ' + self.logFile + '\n') # DEBUG
+        window.addstr('-------------------------------------------\n\n')
+
+        # Sort the first state's list in place
+        stateList[states[0]].sort()
+
+        #window.addstr(str(stateList) + '\n') # DEBUG
+
+        # List what configuration types to parse the status of
+        confignames = []
+        
+        for state in states:
+          confignames.extend(stateList[state])
+        
+        unique(confignames)
+
+        # Find the longest configuration name
+        for configuration in confignames:
+          if len(configuration) > maxChars:
+            maxChars = len(configuration)
+            
+        #window.addstr(str(confignames) + '\n') # DEBUG
+
+        # Print out the current status for those who have
+        # made it to at least 'Configure' or are 'UNAVAILABLE'
+        for configuration in confignames:
+          window.addstr(str(configuration))
+
+          # Pretty print up to maxChars worth
+          for i in xrange(0, (maxChars - len(configuration))):
+            window.addstr(' ')
+
+          window.addstr('  |  ')
+
+          # Add an entry for each state this configuration 
+          # has made it to so far
+          for state in states:
+            if configuration in stateList[state]:
+              window.addstr(str(state) + '  ')
+
+          window.addstr('\n')
+
+        # Let the user see the output
+        window.refresh()
+        sleep(5)
+      except Exception, e:
+        window.clear()
+        print str(e) + '\n'
+        window.refresh()
+    
+
+#
+# MAIN
+#
+
+if __name__ == '__main__':
+  """ Parse the config file given and do distribute
+      as described in the config file and command line options.
+  """
+  startTime = strftime('%a %d %b %Y %H:%M:%S', localtime(time()))
+
+  # Open the temp log file 
+  logFile = sys.stdout
+  
+  # Init the keywords
+  for state in states:
+    keywords[state] = state
+
+  # Parse the command line options
+  # Execution may finish here (in Watcher or in usage)
+  args = Options(sys.argv[1:])
+  
+  # Open the log file 
+  logFile = open(args.logFilename(), 'w')
+  
+  # Set the signal handlers
+  signal(SIGINT, masterSIGINTHandler)
+  signal(SIGQUIT, masterSIGINTHandler)
+ 
+  # Init some variables 
+  fileSystems = args.fileSystems()
+  hosts       = args.hosts()
+
+  try:
+    # Distribute the tarball to the fileSystems listed in the config file
+    fileSystemsUp = []
+
+    for name in fileSystems:
+      status = fileSystems[name].setup()
+
+      if status == 0:
+        fileSystemsUp.append(fileSystems[name].dirname())
+       
+    # Reset the log file after sending
+    logFile.close()
+    sleep(5)
+    os.remove(args.logFilename())
+    logFile = open(args.logFilename(), 'w')
+    
+    log(' ')
+    log('send SIGQUIT (control-\) to quit -- do NOT send SIGINT (control-c)')
+    log(' ')
+    
+    logFile.flush()
+    
+    successful  = [] 
+    unavailable = []
+    emailLog = 'distribute-email.log'
+
+    if os.access(emailLog, os.F_OK):
+      os.remove(emailLog)
+      os.system('touch ' + emailLog)
+
+
+    # FORK LOOP
+    for hostname in hosts:
+#      configurations = hosts[hostname].configurations()
+      
+#      for config in configurations:
+        pid = os.fork()
+   
+        # CHILD 
+        if pid == 0: 
+          childPIDs.clear() 
+  
+          hosts[hostname].checkFileSystemAvailability(fileSystemsUp)
+#          hosts[hostname].doConfiguration(config)
+        
+          # Do the configure, build, check, and (optionally) install        
+          try:
+            entry, status = hosts[hostname].run() 
+          except RuntimeError, e:
+            entry = str(e)
+            print entry 
+            status = 111
+
+          fd = file(emailLog, 'a+')
+          fd.write(entry)
+          fd.close()
+
+          log('CHILD exiting with status ' + str(status))
+
+          os._exit(status)  # CHILD EXIT
+        # PARENT
+        else:
+          childPIDs[pid] = hostname
+  
+          log('forked child PID ' + str(pid))
+          logFile.flush()
+
+  
+    # Ignore SIGINT while we wait for child processes
+    signal(SIGCHLD, masterSIGCHLDHander)
+    signal(SIGINT, SIG_IGN)
+  
+    # Wait for children to halt 
+    while len(childPIDs) > 0:
+      pid, status = os.wait()
+
+      exitsignal = int(status % 256) # low byte
+      exitstatus = int(status / 256) # high byte
+
+      if childPIDs.has_key(pid):
+        hostname = childPIDs[pid]
+    
+        # Remember which ones are the successful ones    
+        if exitstatus == 0:
+          successful.append(hostname)
+        elif exitstatus == 9:  
+          unavailable.append(hostname)
+        else:
+          pass
+          
+        log(hostname + ' has finished [status = ' + hex(status) + ']')
+        del childPIDs[pid]
+
+        if len(childPIDs.keys()):
+          log('Still running: ' + str(childPIDs.values()))
+  
+    # Allow SIGINT again
+    signal(SIGINT, masterSIGINTHandler)
+    signal(SIGCHLD, SIG_DFL)
+
+  
+    # Cleanup the mess for the fileSystems listed in the config file
+    for name in fileSystems:
+      fileSystems[name].cleanup()
+ 
+ 
+    # Begin a report detailing what happened
+    packageName = args.packageName()
+
+    hostname = command('hostname')[:-1]
+    user     = command('whoami')[:-1]
+
+    emailBody  = 'Distributing ' + packageName + ' from ' + hostname
+    emailBody += ' according to ' + str(args.configFile()) + '\n'
+    emailBody += 'User: ' + user + '   Date: ' + str(startTime) + '\n\n'
+    emailBody += 'Logs stored in ' + args.logDirectory() + '\n\n'
+
+    successMsg = ''
+    failedMsg  = ''
+    unavailMsg = ''
+    
+    for hostname in hosts:
+      if hostname in successful:
+        successMsg += hostname + ' ' 
+      elif hostname in unavailable:
+        unavailMsg += hostname + ' '  
+      else:
+        failedMsg  += hostname + ' '            
+
+    if len(failedMsg) == 0 and len(unavailMsg) == 0 and len(successMsg) > 0:
+      emailBody += 'Succeeded on ALL hosts:\n\t' + successMsg + '\n\n'
+    elif len(successMsg) == 0 and len(unavailMsg) == 0 and len(failedMsg) > 0:
+      emailBody += 'Failed on ALL hosts:\n\t' + failedMsg + '\n\n'
+    else:
+      if len(successMsg):
+        successMsg = 'Succeeded on hosts:\n\t' + successMsg + '\n'
+      if len(failedMsg):
+        failedMsg  = 'Failed on hosts:\n\t' + failedMsg + '\n'
+      if len(unavailMsg):
+        unavailMsg  = 'Unavailable hosts:\n\t' + unavailMsg + '\n'
+      emailBody += successMsg + unavailMsg + failedMsg + '\n'
+      
+    emailBody += command('cat ' + emailLog)
+ 
+    # Mail the results to the email address in the config file
+    if args.emailTo() != '':
+      emailFrom = args.emailTo()
+
+      msg  = 'Subject:' + 'Distribute (' + packageName + ')\n'
+      msg += 'From:'    + emailFrom + '\n'
+      msg += 'To:'      + args.emailTo() + '\n\n' 
+      msg += emailBody
+   
+      debug('Email msg:\n' + msg)
+ 
+      server = SMTP(args.popServer())
+    
+      try:
+        server.sendmail(emailFrom, args.emailTo(), msg) 
+        
+        if os.access(emailLog, os.F_OK):
+          os.remove(emailLog)
+      except Exception, e:
+        log('Error sending mail: ' + str(e))
+    
+      server.quit()
+    else:
+      log(emailBody)
+  except Exception, e:
+    print_exc(file=sys.stdout)
+    error = str(e)
+
+    if error != '0':
+      inform('Returned: ' + error)
+      masterSIGINTHandler(SIGINT, 0)
+    
+  # Clean up watcher
+  ps = command('ps aux | grep Distribute | grep xterm').split('\n')
+
+  for line in ps:
+    if line != '' and line.find('geometry') != -1 and line.find(user) != -1:
+      ans = line.split(' ')
+
+      debug('Watch window ps is:' + str(ans))
+      
+      # On at least Linux, OS X, and AIX: PID is 2nd for a 'ps aux'
+      if len(ans) > 1:
+        pid = int(ans[1])
+
+        if pid > 1:
+          os.kill(pid, SIGKILL)
+

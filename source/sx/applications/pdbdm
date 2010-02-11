@@ -1,0 +1,22 @@
+#!/bin/csh -f
+#
+# PDBDM - run the mapping comparator
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Root = `echo $SCHEME`
+
+if ($#argv == 0) then
+   echo ""
+   echo "Usage: pdbdm <pdb-file1> <pdb-file2>"
+   echo ""
+   exit(0)
+endif
+
+sx -l $Root/sxdm.scm \(validate $1 $2\)
+
+exit($status)

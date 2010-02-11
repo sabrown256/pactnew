@@ -1,0 +1,112 @@
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+PDB Frequently Asked Questions (FAQ)
+
+Last-Modified:  Fri May  9 10:36:16 PDT 2003 
+
+
+
+Welcome to the FAQ for PDB!
+
+INTRODUCTION
+PDB is a small part of a much bigger effort called PACT. PACT is
+the portable environment and toolkit that we use to create portable 
+applications, and to create functionality not readily available. 
+PACT is our environment of choice for handling unique data,
+portable computing environments, and the distributed computing 
+arenas; and for converting data for the visualization application 
+or algorithm of choice. We have created PACT to shield ourselves 
+from new software, and hardware so we can concentrate on the 
+applications at hand. PACT is beginning to emphasize design that 
+takes advantage of massively parallel environments.
+
+We would like to hear of your experiences with PACT. And, we would 
+be especially pleased to try to add your mathematical, graphical, 
+or other functionality to future distributions of PACT. 
+
+
+NOTICE
+
+     Absolute portability is our GOAL! 
+
+Most of the time we install PACT 
+without problems, the other times take varying amounts of effort to 
+track down. Usually the problems are simple, such as missing 
+headers. If your experience with PACT is not absolute portability, 
+we would like to hear from you so we can try to make it so. Please 
+direct all portability issues to:
+
+     sabrown@llnl.gov
+ or  minner1@llnl.gov
+ or  smethells1@llnl.gov
+
+
+Thanks to all who have contributed to this FAQ.  Corrections and 
+contributions always welcome. Please e-mail comments, additions, 
+and corrections to:
+
+                  rodrigues2@llnl.gov 
+
+and use SUBJECT: PDB FAQ
+
+Items needing more input from you and others are marked with a ???.
+
+----------------------------------------------------------------------
+TABLE OF CONTENTS
+----------------------------------------------------------------------
+
+1) What is PDB?
+2) What is PACT?
+3) Where can I get the complete PDB source and documentation?
+4) ???
+
+----------------------------------------------------------------------
+1) What is PDB?
+
+   PDB is a system for handling binary data in a portable way.
+   It can move data between files and memory and (with PPC) between
+   processes. In contrast to other systems which aim at FORTRAN
+   level functionality, PDB supports programmers in using natural
+   C idioms (this also covers FORTRAN as a subset).
+
+     a) Self-describing files
+     b) Efficient conversion scheme (not XDR based)
+     c) Uses C model for data typing and meaning
+     d) Supports user defined structures
+     e) Supports use of pointers in data trees
+     f) File variables can be appended to (indefinite dimension)
+     g) Partial reads and writes
+     h) Supports row major or column major ordering
+     i) Primitives support accessing other file types
+
+2) What is PACT?
+
+   PACT stands for Portable Application Code Toolkit. It is a
+   self-contained set of tools which support developing and
+   using portable programs particularly scientific and engineering
+   applications.  See the pact.FAQ
+
+3) Where can I get the complete PDB source and documentation?
+
+Since PDB is an intimate part of PACT, this will get the complete PACT including PDB. You may selectively install PDB.
+
+Please use ftp to connect to:
+
+          ftp.llnl.gov
+
+log in as anonymous, using your email address for the password,
+cd pub/pact - to change directory,
+binary      - to set the transfer mode,
+get the three pact files (yy_mm_dd indicates the date):
+          pact-unix.README
+          pactyy_mm_dd-doc.tar.gz
+          pactyy_mm_dd-src
+
+The pact-unix.README file describes the PACT installation process. 
+
+4) ???
+
+

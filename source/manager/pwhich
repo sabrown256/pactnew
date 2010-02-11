@@ -1,0 +1,23 @@
+#!/bin/csh -f
+#
+# PWHICH - a silent, unbuggy which, used by PACT manager
+#        - does not do alias substitution which ought not to matter here
+#
+#  Arguments same as for which
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+foreach i ($path)
+   if (-e $i/$1) then
+      echo $i/$1
+      exit(0)
+   endif
+end
+
+echo "No $1 found in $path"
+
+exit(1)

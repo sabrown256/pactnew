@@ -1,0 +1,117 @@
+#!/bin/csh -f
+#
+# AR - test SCORE archive reading capability (for dmake)
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF "                    SCORE Archive Scan Test ..... "
+Note $LogF ""
+
+set UTime = `$TIMER -r`
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE fcscan
+set TStatus = $status
+flog $LogF popd
+
+if ($TStatus == 0) then
+
+   if ("$CFE" != "") then
+      setenv CFE   "$CFE -v"
+   endif
+
+# test long or space-filled names
+   NoteD $LogF -n "                       name .......... "
+   Note $LogF ""
+
+   set BTime = `$TIMER -r`
+
+   flog $LogF rm -f f*.o libar.a
+
+   echo "text 1" >! fx123.o
+   echo "text 2" >! fabcdefghijklmnopqrstuvwxyz.o 
+   echo "text 3" >! 'f0123456789 0123456789.o'
+   echo "text 4" >! 'foo bar .o'
+
+   set AR    = `pact +l -info AR`
+   set AROpt = `pact +l -info AROpt`
+
+   flog $LogF $AR $AROpt libar.a f*.o
+   flog $LogF $AR -t libar.a
+
+   if ("$Valgrind" == "") then
+      flog $LogF $CFE $BinDir/fcscan libar.a
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind fcscan libar.a  |& \
+      grep "ERROR SUMMARY:"                |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   flog $LogF cat libar.a
+   flog $LogF rm -f f*.o libar.a
+
+   set ETime = `$TIMER -b $BTime`
+   if ($xstatus == 0) then
+      NoteD $LogF "ok ($ETime)"
+   else
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+# test working archive
+   NoteD $LogF -n "                       working ....... "
+   Note $LogF ""
+
+   set BTime = `$TIMER -r`
+
+   if ("$Valgrind" == "") then
+      flog $LogF $CFE $BinDir/fcscan -a $LibDir/libscore.a
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/fcscan -a $LibDir/libscore.a  |& \
+      grep "ERROR SUMMARY:"                                      |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+   @ NL = `$CFE $BinDir/fcscan -a $LibDir/libscore.a | sort | wc -l`
+   @ NL = $NL
+
+   flog $LogF ar -t $LibDir/libscore.a
+   @ NLAr = `ar -t $LibDir/libscore.a | sort | wc -l`
+
+   Note $LogF "fcscan count = $NL"
+   Note $LogF "ar     count = $NLAr"
+
+   set ETime = `$TIMER -b $BTime`
+
+   if ($xstatus == 0) then
+      NoteD $LogF "ok ($ETime)"
+   else
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+endif
+
+set ETime   = `$TIMER -b $UTime`
+
+NoteD $LogF ""
+if ($TStatus != 0) then
+   NoteD $LogF "                    SCORE Archive Scan Test ..... FAILED ($ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    SCORE Archive Scan Test ..... PASSED ($ETime)"
+endif
+
+exit($Err)
+

@@ -1,0 +1,14 @@
+#
+# DO-RUN-PROLOG - DO-RUN database prolog
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Env MPINot = (($NProc < 2) && ($Batch == FALSE)) ? TRUE : FALSE
+
+Pool ?= pdebug
+NCPU  = $NProc * $NThread
+Cmd   = $Wrap $CROSS_Exe $CROSS_Flags $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs

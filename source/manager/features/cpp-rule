@@ -1,0 +1,12 @@
+#
+# CPP-RULE - define a commonly used CPP rule
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+.c.i:
+	${CC} -E $< > $*.i
+

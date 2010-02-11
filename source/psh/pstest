@@ -1,0 +1,90 @@
+#!/bin/csh -f
+#
+# PSTEST - test PSH
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+source ../scripts/test-env
+
+set Tests = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: pstest [-h] [<test>*]"
+           echo "  h  this help message"
+           echo ""
+           echo "Tests: pco do-net dorun verify"
+           echo ""
+           exit(1);
+      default:
+           set Tests = ( $1 )
+           breaksw
+   endsw
+   shift
+end
+
+flog $Log pact install
+
+cd $TestDir
+
+if ("$Valgrind" != "") then
+   setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
+endif
+
+set BeginTime = `$TIMER -r`
+
+NoteD $Log ""
+NoteD $Log "PSH TEST ..."
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ("$Tests" == "") then
+   set Tests = ""
+   set Tests = ($Tests do-net pco pcsh perdb dorun verify)
+endif
+
+foreach i ($Tests)
+   $SrcDir/tests/$i
+   if ($status == 1) then
+      set ERROR = TRUE
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP - we are all done now
+
+set ETime = `$TIMER -b $BeginTime`
+
+NoteD $Log ""
+
+if ($ERROR == "TRUE") then
+   NoteD $Log ""
+   NoteD $Log "PSH TEST ... FAILED ($ETime)"
+   NoteD $Log ""
+   NoteD $Log "See $Log for details"
+else
+   NoteD $Log "PSH TEST ... PASSED ($ETime)"
+endif
+
+NoteD $Log ""
+NoteD $Log " --------------------------------------------------------"
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+   set xstatus = 1
+endif
+
+Note $Log "Exiting with status $xstatus"
+
+exit($xstatus)
+

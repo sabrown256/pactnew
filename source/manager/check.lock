@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#>
+#> CHECK.LOCK - check if repository is locked
+#>
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set MngDir        = $cwd
+set SCSRepository = ""
+set SRCDate       = ""
+set LockOn        = "NO"
+
+# define the Source Control System
+source $MngDir/pact-scs
+
+#
+# check if repository is locked
+#
+if (-e $Lock) then
+   echo ""
+   echo " *** REPOSITORY IS LOCKED ***"
+   echo ""
+   CatLock
+   echo ""
+   set LockOn = "YES"
+endif
+
+if ($LockOn == "NO") then
+   set nstatus = 0
+else
+   echo -n "Sleeping ZZZZZ"
+Loop:
+   if (-e $Lock) then
+      echo -n "Z"
+      sleep 30
+      goto Loop
+   else
+      echo ""
+      set nstatus = 0
+   endif
+endif
+
+exit($nstatus)

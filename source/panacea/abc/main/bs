@@ -1,0 +1,11 @@
+#!/bin/csh -f
+#
+# BS - the B shell
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+b -l main/b.scm \(bs $argv\)

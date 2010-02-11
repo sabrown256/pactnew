@@ -1,0 +1,101 @@
+#!/bin/csh
+#
+# LOAD-ALL - report the loads on all the machines specified in HostFile
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/load-all") then
+   set path = ( $Exe $path )
+endif
+
+unalias ps
+
+set Cont = FALSE
+set SSH  = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'
+
+set HostFile = $HOME/.all-hosts
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           set Cont = TRUE
+           breaksw
+
+      case -f:
+           shift
+           set HostFile = $1
+           breaksw
+
+      case -h:
+           echo ''
+           echo 'Usage:  load-all [-c] [-f <file>] [-h]'
+           echo ''
+           echo 'Report the load averages on all hosts specified.'
+           echo 'This is guaranteed to run the same way'
+           echo 'on all platforms and different versions of PS.'
+           echo ''
+           echo '        c    - run continuously'
+           echo '        f    - use file to define hosts'
+           echo '        h    - this help message'
+           echo ''
+           exit(1)
+           breaksw
+
+   endsw
+   shift
+end
+
+if (-e $HostFile) then
+   set Hosts = `awk '$1 !~ /#/ { print }' $HostFile`
+else
+   echo ""
+   echo "Cannot find $HostFile"
+   echo "You may put the names of the hosts to be used"
+   echo "in ~/.all-hosts"
+   echo ""
+   exit(1)
+endif
+
+if ($Cont == TRUE) then
+   clear
+endif
+echo "Load Averages:"
+
+Loop:
+
+foreach i ($Hosts)
+   pcexec -q -c 15 $SSH $i pwd >& /dev/null
+   set LStat = $status
+   if ($LStat == 0) then
+      $SSH $i '(w | head -n 1 )' |&                                       \
+      awk '{gsub(/,/, " ");                                               \
+   	       for (i = 1; i <= NF; i++)                                  \
+                {if ($i ~ /average/)                                      \
+                    {j1 = i + 1;                                          \
+                     j2 = i + 3;                                          \
+                     for (j = j1; j <= j2; j++)                           \
+                         { printf("\t%5.2f ", $j)};};};}'
+   else
+      echo -n "         down    down    down "
+   endif
+   echo " : $i"
+end
+
+if ($Cont == TRUE) then
+
+# move the cursor back up
+   echo "[H"
+
+   goto Loop
+
+else
+   echo " "
+endif
+
+exit($status)

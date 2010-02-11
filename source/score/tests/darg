@@ -1,0 +1,10 @@
+#!/bin/csh -f
+
+@ count = 1
+while ($#argv > 0)
+   echo "$count    |$1|"
+   shift
+   @ count = $count + 1
+end
+
+exit(0)

@@ -1,0 +1,112 @@
+#!/bin/csh -f
+#
+# SUMMARY - summarize important PACT configuration information
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    NoteD $Log "Configuration Summary"
+
+    if (($?Cfe_CC_Exe == 0) || ("$Cfe_CC_Exe" == "none") || ("$Cfe_CC_Exe" == "")) then
+       NoteD $Log "   ERROR: No C compiler available - check your system or your path"
+       NoteD $Log ""
+       exit(1)
+    else
+       set UCC = `$MngDir/pwhich $CC_Exe`
+       NoteD $Log "   C Compiler used is $UCC"
+    endif
+
+    if (($?Cfe_FC_Exe == 0) || ("$Cfe_FC_Exe" == "none")) then
+       NoteD $Log "   No Fortran compiler found"
+    else if ("$Cfe_FC_Exe" == "") then
+       NoteD $Log "   ERROR: No Fortran compiler available - check your system or your path"
+       NoteD $Log ""
+    else
+       set UFC = `$MngDir/pwhich $FC_Exe`
+       if (-x "$UFC") then
+          NoteD $Log "   Fortran Compiler used is $UFC"
+       else
+          NoteD $Log "   Fortran Compiler requested is $Cfe_FC_Exe (not available)"
+       endif
+    endif
+
+    if ($BuildSharedLibs == TRUE) then
+       NoteD $Log "   Building shared libraries"
+    else
+       NoteD $Log "   Building static libraries"
+    endif
+
+    Note $Log "   Cfg C Compiler used is $Cfe_CC_Exe"
+    Note $Log "   Cfg Fortran Compiler used is $Cfe_FC_Exe"
+
+    if ($AbsoluteDeb == TRUE) then
+       NoteD $Log "   Building absolutely debuggable version"
+    endif
+
+    if ($AbsoluteOpt == TRUE) then
+       NoteD $Log "   Building absolutely optimized version"
+    endif
+
+# PyExe       the full path to the python executable
+# PyVers      the version of the python executable
+# Python_Path addition to path in order to find python executable
+#             this comes from config files only
+# PyDirSrc    pact/dev/$arch/lib (install this to PyDirDst and PyDirPy)
+# PyDirDst    pact    lib/.../site-packages  (install into)
+# PyDirPy     python  lib/.../site-packages  (install into)
+
+    if (("$PyExe" != "") && ("$PyExe" != "wrong-cc") && \
+        ("$PyExe" != "no-numeric") && ($BuildSharedLibs == TRUE)) then
+       flog $ALog mkdir -p $PyDirPy
+
+       NoteD $Log "   Python bindings will be built in:"
+       NoteD $Log "      $PyDirSrc"
+       if ("$InstBase" != none) then
+          NoteD $Log "   Python bindings will be installed in:"
+          NoteD $Log "      $PyDirDst"
+          if (-d $PyDirPy) then
+             NoteD $Log "      $PyDirPy"
+          else
+             NoteD $Log "      $PyDirPy (no permissions)"
+          endif
+       endif
+    else if ($BuildSharedLibs == FALSE) then
+       NoteD $Log "   Python bindings will not be built (need shared library option)"
+    else if ("$PyExe" == "wrong-cc") then
+       NoteD $Log "   Python bindings will not be built (wrong compiler)"
+    else if ("$PyExe" == "no-numeric") then
+       NoteD $Log "   Python bindings will not be built (no numeric extensions)"
+    else if ("$PyExe" == "") then
+       NoteD $Log "   Python bindings will not be built (no python)"
+    endif
+
+    if ("$Yacc_Exe" == "") then
+       NoteD $Log "   Scheme syntax modes will not be built (no yacc or bison)"
+    endif
+
+    if ($Profile == TRUE) then
+       NoteD $Log "   Building profiling version"
+    endif
+       
+    if ($UseTmpDir == TRUE) then
+       NoteD $Log "   Doing fast builds using /tmp"
+    endif
+
+    NoteD $Log "   Building into $cwd:h/dev/$System"
+
+    NoteD $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

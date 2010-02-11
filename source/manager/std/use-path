@@ -1,0 +1,57 @@
+#!/bin/csh -f
+#
+# USE-PATH - decide on the correct PathScale environment
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../scripts/env-csh
+
+set Which   = "$cwd/pwhich"
+set CmpPath = ""
+while ($#argv > 0)
+   switch ($1)
+      default:
+           if ("$CmpPath" == "") then
+              set CmpPath = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+# if blank find pathcc on your path
+if ("$CmpPath" == "") then
+   set CmpPath = ( `$Which pathcc` )
+
+# if not a full path find it on your path
+else if ("$CmpPath" !~ /*) then
+   set CmpPath = ( `$Which $CmpPath` )
+endif
+
+if (-xf "$CmpPath") then
+   set CCRoot = $CmpPath:h
+   set CCRoot = $CCRoot:h
+else if (-x "$CmpPath/bin/pathcc") then
+   set CCRoot = $CmpPath
+endif
+
+setenv LD_LIBRARY_PATH /lib
+foreach v ($CCRoot/lib/*)
+   setenv LD_LIBRARY_PATH ${v}:$LD_LIBRARY_PATH
+end
+
+set Info = ( `$CCRoot/bin/pathcc -v |& egrep 'PathScale\(TM\)|EKOPath'` )
+
+setenv COMPILER_PATH_VERSION  $Info[6]
+setenv PSRoot                 $CCRoot/lib/$COMPILER_PATH_VERSION
+setenv PATH                   $CCRoot/bin':$PATH'
+
+SetParent PATH
+SetParent PSRoot
+SetParent COMPILER_PATH_VERSION
+
+exit(0)

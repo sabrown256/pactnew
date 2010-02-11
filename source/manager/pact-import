@@ -1,0 +1,920 @@
+#!/bin/csh -f
+#
+# PACT-IMPORT - import PACT sources from another repository
+#
+# Usage:   pact-import
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../scripts/env-csh
+source ../scripts/csh-subroutines
+HAVE_SUBROUTINES
+
+if ($?USER == 0) then
+   if ($?LOGNAME == 0) then
+      set USER = "anonymous"
+   else
+      set USER = $LOGNAME
+   endif
+endif
+
+# Remove next line when able to do FULL round trips again. <<<<<<<<
+set OneOpt	  = TRUE
+
+set help          = FALSE
+set DEBUG         = FALSE
+set DateFile      = $CVSROOT/.import-date
+set TagFile       = $CVSROOT/.import-tag
+set ImportingDir  = $cwd
+set SCSDir        = "."
+set SCSRepository = ""
+set SRCDate       = ""
+set Host          = `uname -n`
+set Message       = (\" $USER on "$Host", Running import.\")
+set TmpScr        = tmp-script
+set TmpFile       = tmp-file
+
+if (-e $TagFile) then
+   set ImportTag = `cat $TagFile`
+   set SCSTag    = "-r $ImportTag"
+else
+   set SCSTag    = ""
+endif
+
+while ($#argv >= 1)
+   switch ($argv[1])
+      case -1:
+# Remove next line when able to do FULL round trips again.  <<<<<<<<
+         set OneOpt = FALSE
+         set SCSTag = ""
+         echo ""
+         echo "Doing import to repository head"
+         echo ""
+         breaksw
+
+      case -d:
+         set DEBUG = TRUE
+         echo ""
+         echo "Running in DEBUG mode"
+         echo ""
+         breaksw
+
+      case -h:
+         set help = TRUE
+         echo " "
+         echo " PACT-IMPORT - import PACT sources from another repository"
+         echo " "
+         echo "Usage:   pact-import [-1] [-d] [-h]"
+         echo " "
+         echo "Options: "
+         echo "   -1  Import to repository head"
+         echo "   -d  DEBUG mode; prints more info to import.log"
+         echo "   -h  Print this message"
+         echo " "
+         exit(1)
+         breaksw
+   endsw
+   shift
+end
+
+InitLog Log $cwd/import.log
+
+# Remove if test when able to do FULL round trips again.  <<<<<<<<
+if ($OneOpt == TRUE) then
+   flog $Log set SCSTag = ""
+   NoteD $Log ""
+   NoteD $Log "Doing import to repository head"
+   NoteD $Log "     (Half Round Trip)"
+   NoteD $Log ""
+endif
+
+# do an ls to wake up the automounter if one is present
+flog $Log ls $CVSROOT
+
+flog $Log set Repository = `find $CVSROOT -name manager | grep -v dead-packages`
+flog $Log set Repository = $Repository:h
+
+if (!(-d $Repository)) then
+   NoteD $Log ""
+   NoteD $Log "Non existent repository: $Repository"
+   NoteD $Log ""
+   exit(1)
+endif
+
+if (!(-e $SCSDir/pact-scs)) then
+   NoteD $Log " "
+   NoteD $Log "Can't find Source Control System Information in $SCSDir"
+   NoteD $Log " "
+   exit(1)
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAIN - start the work here
+
+# Source Control System Variables
+   flog $Log source $SCSDir/pact-scs
+
+# check if repository is locked
+   if ($ExistLock == TRUE) then
+      NoteD $Log ""
+      NoteD $Log " *** REPOSITORY IS LOCKED ***"
+      NoteD $Log ""
+      CatLock
+      NoteD $Log ""
+      exit(1)
+   endif
+
+   call SETUP_SRC()
+   call SETUP_DIR(import)
+   call BACKUP(import)
+
+   if (-e $DateFile) then
+      call GET_NEW(import, new)
+      call GET_OLD(import, old)
+      call PROCESS_OLD(import/old)
+      call PROCESS_NEW(import/new)
+      call RECONCILE(import/old)
+      call UPDATE(import/old)
+      call COMMIT(import/old)
+      call TAG(import/old)
+   else
+      call CVS_IMPORT(import)
+   endif
+
+   call FINISH()
+
+exit(0)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP_SRC - obtain a tar file with the new sources
+#           - we do this before locking the repository
+#           - creating directory trees and so forth
+#           - so that we can quit early if there is a problem
+
+SETUP_SRC:
+
+   set Source = ""
+   flog $Log touch pact-foo.tar.gz
+   foreach i (pact*tar.gz)
+      if ($i != pact-foo.tar.gz) then
+         flog $Log set Source = $i
+      else
+         flog $Log rm -f $i
+      endif
+   end
+
+   flog $Log set Distr = ""
+   flog $Log touch pact-foo-src
+   foreach i (pact*-src)
+      if ($i != pact-foo-src) then
+         flog $Log set Distr = $i
+      else
+         flog $Log rm -f $i
+      endif
+   end
+
+   Note $Log "Getting new sources"
+   if ($Source != "") then
+
+      flog $Log set CodeDate = `expr $Source : 'pact\(.*\).tar.gz'`
+      flog $Log set SrcFile  = "pact$CodeDate.tar.gz"
+
+   else if ($Distr != "" ) then
+      NoteD $Log "Distributions must be of the form pact.*.tar.gz"
+      exit(1)
+
+      flog $Log set CodeDate = `expr $Distr : 'pact\(.*\)-src'`
+      flog $Log set SrcFile  = "pact$CodeDate.tar.gz"
+
+      set ltmp = $cwd/extr.$TmpScr
+
+      flog $Log set STDOUT = $ltmp
+      flog $Log rm -f $STDOUT
+      flog $Log touch $STDOUT
+
+      Note $Log "writing the shell script to extract the compressed tar file"
+      Note $STDOUT "#\!/bin/csh -f"
+      Note $STDOUT 'set Signature = "-----------------------***   SEPARATOR   ***-----------------------"'
+      Note $STDOUT 'while (1)'
+      Note $STDOUT '   set Input = "$<"'
+      Note $STDOUT '   if ("$Input" == "$Signature") then'
+      Note $STDOUT '      set File = "$<"'
+      Note $STDOUT '      break'
+      Note $STDOUT '   endif'
+      Note $STDOUT 'end'
+      Note $STDOUT 'if ($?File) then'
+      Note $STDOUT '   cat > '$SrcFile
+      Note $STDOUT 'endif'
+      Note $STDOUT 'exit($status)'
+      flog $Log chmod a+x $ltmp
+      flog $Log cat $ltmp
+
+      Note $Log "extract the compressed tar file"
+      flog $Log (cat $Distr | $ltmp)
+
+      flog $Log rm -f $Distr
+      flog $Log rm -f $ltmp
+
+   else
+
+      NoteD $Log "No sources to import"
+      exit(1)
+
+   endif
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP_DIR - setup the import directory
+#           - move the new source tar file into place
+#           - and uncompress it
+#           - make and work in the import directory
+
+SETUP_DIR:
+
+   set Import = $args_[1]
+
+   Separator $Log
+   NoteD $Log "Setting up the import sources"
+   NoteD $Log "   Version:     $CodeDate"
+   NoteD $Log "   Source File: $SrcFile"
+   NoteD $Log "   Date/Time:   `date`"
+   Note $Log ""
+
+   if (-d $Import) then
+      Note $Log "Removing old $Import directory"
+      flog $Log rm -rf $Import
+   endif
+   Note $Log "Creating import directory"
+   flog $Log mkdir $Import
+
+   Note $Log "Moving new sources into $Import directory"
+   flog $Log mv $SrcFile $Import/pact.tar.gz
+
+   flog $Log pushd $Import
+
+   Note $Log "Uncompressing new sources"
+   flog $Log gzip -d pact.tar.gz
+   if ($status != 0) then
+      NoteD $Log "Uncompress failed, check tar file in manager/$Import"
+      NoteD $Log "Entering sub-shell to correct tar file"
+      NoteD $Log "Type exit at the prompt to resume"
+      flog $Log set here = $cwd
+      csh -f
+      flog $Log cd $here
+   endif
+
+   flog $Log popd
+   NoteD $Log ""
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BACKUP - lock the repository and
+#        - make a backup for error recovery
+#        - working directory should be import
+
+BACKUP:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Backing up repository .............. " 
+   NoteD $Log "Backing up repository"
+   Note $Log "   Current Directory:    $cwd"
+   Note $Log ""
+
+# initiate a lock on the repository
+   Makelock
+   Note $Lock $Message
+   Note $Lock "Source: $SrcFile" 
+
+   NoteD $Log "   Backup is pact/manager/import/repos.tar.gz"
+   flog $Log (tar cvf - $CVSROOT | gzip > repos.tar.gz)
+
+   flog $Log popd
+   Note $Log ""
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_NEW - untar the imported sources
+#         - these will be referred to as the new sources
+#         - work in the import directory
+#         - make the new directory
+
+GET_NEW:
+
+   set Import = $args_[1]
+   set New    = $args_[2]
+   flog $Log pushd $Import
+
+   Separator $Log
+   Note $Lock -n "Unpacking new sources .............. " 
+   NoteD $Log "Unpacking new sources"
+   Note $Log "   Current Directory:    $cwd"
+   Note $Log ""
+
+   flog $Log mkdir $New
+   flog $Log cd $New
+   flog $Log mv ../pact.tar .
+
+   flog $Log tar xvf pact.tar
+   if ($status != 0) then
+      NoteD $Log "TAR extract failed, check sources in manager/import"
+      NoteD $Log "Entering sub-shell to correct sources"
+      NoteD $Log "Type exit at the prompt to resume"
+      flog $Log set here = $cwd
+      csh -f
+      flog $Log cd $here
+   endif
+   Note $Log ""
+
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GET_OLD - cvs checkout the sources tagged from the last import
+#         - these will be referred to as the old sources
+#         - work in the import directory
+#         - make the old directory
+
+GET_OLD:
+
+   set Import = $args_[1]
+   set Old    = $args_[2]
+   flog $Log pushd $Import
+
+   Separator $Log
+   Note $Lock -n "Checking out old sources ........... " 
+   NoteD $Log "Checking out sources from $Repository"
+   Note $Log "   Current Directory:    $cwd" 
+   Note $Log ""
+
+   flog $Log mkdir $Old
+   flog $Log cd $Old
+   flog $Log set Repository = $Repository:h
+
+   flog $Log cvs co $SCSTag pact
+   flog $Log set ErrStat = $status
+
+   KillZombie
+
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROCESS_OLD - rename the old files to *.old
+#             - touch *.chk files corresponding to each *.old
+#             - working directory should be import/old
+
+PROCESS_OLD:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Processing old sources ............. " 
+   NoteD $Log "Processing old sources"
+   Note $Log "   Current Directory:    $cwd" 
+   Note $Log ""
+
+   set ltmp = $cwd/$TmpScr
+
+   Note $Log "writing the shell script to process the old sources"
+   flog $Log set STDOUT = $ltmp
+   flog $Log rm -f $STDOUT
+   flog $Log touch $STDOUT
+
+   Note $STDOUT "#\!/bin/csh -f"
+   Note $STDOUT 'while (1)'
+   Note $STDOUT '   set x = $<'
+   Note $STDOUT '   if (($#x < 1) || ($x == "")) then'
+   Note $STDOUT '      exit(0)'
+   Note $STDOUT '   endif'
+   Note $STDOUT '   if (!(-d "$x")) then'
+   Note $STDOUT '      mv $x $x.old'
+   Note $STDOUT '      touch $x.chk'
+   Note $STDOUT '   endif'
+   Note $STDOUT 'end'
+   flog $Log chmod a+x $ltmp
+   flog $Log cat $ltmp
+
+   Note $Log "process the old sources"
+   flog $Log cd pact
+   flog $Log (find . -name CVS -prune -o -print >! ../$TmpFile.lst)
+   flog $Log (cat ../$TmpFile.lst | $ltmp)
+   flog $Log cd ..
+   Note $Log ""
+
+   Note $Log "Old directory file list: $TmpFile.lst"
+   flog $Log cat $TmpFile.list
+   Note $Log ""
+
+   flog $Log rm -f $ltmp $TmpFile.lst
+   flog $Log popd
+   Note $Lock "done" 
+
+# remove directories from the old sources which have no counterpart
+# in the new sources
+   call ADJUST_OLD_TREE($WDir)
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ADJUST_OLD_TREE - eliminate old directories with no new counterparts
+#                 - saves making repository changes erroneously
+#                 - working directory should be import/old
+
+ADJUST_OLD_TREE:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Adjusting the old directory tree ... " 
+   NoteD $Log "Adjusting the old directory tree"
+   Note $Log "   Current Directory:    $cwd" 
+   Note $Log ""
+
+   set ltmp = $cwd/$TmpScr
+
+   Note $Log "writing shell script to prune old directories"
+   flog $Log set STDOUT = $ltmp
+   flog $Log rm -f $STDOUT
+   flog $Log touch $STDOUT
+
+   Note $STDOUT "#\!/bin/csh -f"
+   Note $STDOUT 'while (1)'
+   Note $STDOUT '   set x = $<'
+   Note $STDOUT '   if ($x == ".") then'
+   Note $STDOUT '      exit(0)'
+   Note $STDOUT '   endif'
+   Note $STDOUT '   if ((-d $x) && !(-d ../../new/pact/$x)) then'
+   Note $STDOUT '      echo "      $x"'
+   Note $STDOUT '      rm -rf $x'
+   Note $STDOUT '   endif'
+   Note $STDOUT 'end'
+   flog $Log chmod a+x $ltmp
+   flog $Log cat $ltmp
+
+# list all the directories of this tree sorted from most nested to least
+# then remove them if they have no counterpart in the other tree
+   flog $Log cd pact
+   flog $Log (find . -type d \! -name CVS | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
+
+   NoteD $Log "   The following directories do not exist for import:"
+   ftee $Log (cat ../$TmpFile.lst | $ltmp)
+   Note $Log ""
+
+   flog $Log cd ..
+   flog $Log rm -f $ltmp $TmpFile.lst
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROCESS_NEW - move the new files to the old directories as *.new
+#             - touch a corresponding *.chk into existence
+#             - working directory should be import/new
+
+PROCESS_NEW:
+
+   set WDir = $args_[1]
+
+# add directories from the new sources which have no counterpart
+# in the old sources before processing new sources
+   call ADJUST_NEW_TREE($WDir)
+
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Processing new sources ............. " 
+   NoteD $Log "Processing new sources"
+   Note $Log "   Current Directory:    $cwd" 
+   Note $Log ""
+
+   set ltmp = $cwd/$TmpScr
+
+   Note $Log "writing shell script to process the new sources"
+   flog $Log set STDOUT = $ltmp
+   flog $Log rm -f $STDOUT
+   flog $Log touch $STDOUT
+
+   Note $STDOUT "#\!/bin/csh -f"
+   Note $STDOUT 'if (!(-d $1)) then'
+   Note $STDOUT '   mv $1 ../../old/pact/$1.new'
+   Note $STDOUT '   touch ../../old/pact/$1.chk'
+   Note $STDOUT 'endif'
+   flog $Log chmod a+x $ltmp
+   flog $Log cat $ltmp
+
+   Note $Log "process the new sources"
+   flog $Log cd pact
+   flog $Log (find . -exec $ltmp {} \;)
+   flog $Log cd ..
+   Note $Log ""
+
+   flog $Log rm -f $ltmp
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ADJUST_NEW_TREE - add new directories with no old counterparts
+#                 - saves having to add directories manually later
+#                 - working directory should be import/new
+
+ADJUST_NEW_TREE:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Adjusting the new directory tree ... " 
+   NoteD $Log "Adjusting the new directory tree"
+   Note $Log "   Current Directory:    $cwd" 
+   Note $Log ""
+
+   set ltmp = $cwd/$TmpScr
+
+   Note $Log "writing shell script to add new directories"
+   flog $Log set STDOUT = $ltmp
+   flog $Log rm -f $STDOUT
+   flog $Log touch $STDOUT
+
+   Note $STDOUT "#\!/bin/csh -f"
+   Note $STDOUT 'if ((-d $1) && !(-d ../../old/pact/$1)) then'
+   Note $STDOUT '   echo $1'
+   Note $STDOUT 'endif'
+   flog $Log chmod a+x $ltmp
+   flog $Log cat $ltmp
+
+# list all the directories of this tree sorted from most nested to least
+   flog $Log cd pact
+   flog $Log (find . -type d \! -name CVS -exec $ltmp {} \; >! ../$TmpFile.lst)
+   flog $Log cat ../$TmpFile.lst
+   flog $Log @ AddNew = `wc -l ../$TmpFile.lst | awk '{print $1}'`
+   Note $Log ""
+
+   if ($AddNew > 0) then
+      NoteD $Log "   Do you want the new directories:"
+      ftee $Log awk '{printf("      %s\n", $0);}' ../$TmpFile.lst
+      NoteD $Log -n "   added to the repository (y/n)? "
+
+      set ans = $<
+      Note $Log "$ans"
+
+      if ($ans =~ y*) then
+         NoteD $Log "   Adding new directories"
+         flog $Log cp ../$TmpFile.lst ../../old
+         flog $Log pushd ../../old/pact
+         foreach dir (`cat ../$TmpFile.lst`)
+            Note $Log "Adding $dir"
+            flog $Log mkdir $dir
+            flog $Log cvs add $dir
+         end
+         flog $Log popd
+      else
+         NoteD $Log "   Not adding new directories"
+      endif
+   endif
+   Note $Log ""
+
+   flog $Log cd ..
+   flog $Log rm -f $ltmp $TmpFile.lst
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# RECONCILE - reconcile the sets of sources
+#           - working directory should be import/old
+
+RECONCILE:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Reconciling sources ................ " 
+   NoteD $Log "Reconciling sources"
+   Note $Log "   Current Directory:    $cwd"
+   Note $Log ""
+
+   set ltmp = $cwd/$TmpScr
+
+   Note $Log "writing shell script to reconcile sources"
+   flog $Log set STDOUT = $ltmp
+   flog $Log rm -f $STDOUT
+   flog $Log touch $STDOUT
+
+   Note $STDOUT "#\!/bin/csh -f"
+   Note $STDOUT 'set Base    = $1:r'
+   Note $STDOUT 'set BaseDir = $Base:h'
+   Note $STDOUT 'set File    = $Base:t'
+   Note $STDOUT 'if ((-e $Base.new) && (-e $Base.old)) then'
+   Note $STDOUT '   cp $Base.new $Base'
+   Note $STDOUT 'else if (-e $Base.new) then'
+   Note $STDOUT '   cp $Base.new $Base'
+   Note $STDOUT '   pushd $BaseDir >& /dev/null'
+   Note $STDOUT '   cvs add $File'
+   Note $STDOUT '   popd >& /dev/null'
+   Note $STDOUT 'else if (-e $Base.old) then'
+   Note $STDOUT '   pushd $BaseDir >& /dev/null'
+   Note $STDOUT '   cvs update -A $File'
+   Note $STDOUT '   rm -f $File' 
+   Note $STDOUT '   cvs remove $File'
+   Note $STDOUT '   popd >& /dev/null'
+   Note $STDOUT 'endif'
+   Note $STDOUT 'rm -f $1'
+   flog $Log chmod a+x $ltmp
+   flog $Log cat $ltmp
+
+   flog $Log cd pact
+
+   flog $Log set noglob
+
+# reconcile the sources
+   Note $Log  Find nnn.CHK from $cwd
+   flog $Log (find . \( -name "*.chk" -o -name ".*.chk" \) -exec $ltmp {} \;)
+
+# remove the .new and .old files
+   Note $Log  "Remove .NEW and .OLD starting from $cwd"
+   flog $Log (find . \( -name "*.new" -o -name ".*.new" \) -exec rm {} \;)
+   flog $Log (find . \( -name "*.old" -o -name ".*.old" \) -exec rm {} \;)
+
+   flog $Log unset noglob
+
+   if ( $DEBUG == TRUE) then
+      Separator $Log
+
+      Note $Log "       find . in import/old/pact directory              DEBUG MODE     "
+      Note $Log ""
+      flog $Log find .
+
+      Separator $Log
+   endif
+
+   flog $Log cd ..
+
+   flog $Log rm -f $ltmp
+   Note $Log ""
+
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# UPDATE - bring the modified sources up to the head of the repository
+#        - working directory should be import/old
+
+UPDATE:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Updating the sources ............... " 
+   NoteD $Log "Updating the new source"
+   Note $Log "   Current Directory:    $cwd" 
+   Note $Log ""
+
+   if ($SCSTag != "") then
+      flog $Log (cvs update -A >&! $TmpFile)
+      KillZombie
+   else
+      flog $Log cd pact
+      flog $Log (cvs update >&! ../$TmpFile)
+      flog $Log cd ..
+   endif
+
+   flog $Log cat $TmpFile
+   Note $Log "Looking for file changes"
+   awk '($1 ~ /^[UCMAR]$/) {print $1 "   " $2}' $TmpFile >&! Update.list
+   if (-z Update.list ) then
+      NoteD $Log "UPDATE failed, NOTHING to update, Update.list is empty"
+      NoteD $Log "check sources in manager/import"
+      NoteD $Log "Entering sub-shell to correct sources"
+      NoteD $Log "Type exit at the prompt to resume"
+      flog $Log set here = $cwd
+      csh -f
+      flog $Log cd $here
+   endif
+   NoteD $Log ""
+
+   flog $Log grep "C " Update.list
+   if ($status == 0 ) then
+      NoteD $Log "   *** UPDATE SOURCE HAS CONFLICTS. ***"
+      NoteD $Log "   FIRST correct conflicting sources,"
+      NoteD $Log "   THEN check file Update.list in"
+   else
+      NoteD $Log "   Check file Update.list in"
+   endif
+
+   NoteD $Log "   manager/import/old to verify the files to commit"
+   NoteD $Log ""
+   NoteD $Log "   Entering sub-shell for ACTION. When ready,"
+   NoteD $Log "   type exit at the prompt to COMMIT sources."
+   flog $Log set here = $cwd
+   csh -f
+   NoteD $Log ""
+   flog $Log cd $here
+ 
+   flog $Log rm -f $TmpFile
+
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMMIT - commit the new sources
+#        - working directory should be import/old
+
+COMMIT:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Committing the sources ............. " 
+   NoteD $Log "Committing the new sources"
+   Note $Log "   Current Directory:    $cwd"
+   Note $Log ""
+
+   flog $Log cvs commit -m "***** Import from $CodeDate *****"
+   set ErrStat = $status
+
+   KillZombie
+   if ($ErrStat != 0) then
+      NoteD $Log "Error status = " $Error
+      NoteD $Log "COMMIT failed, check sources in manager/import"
+      NoteD $Log "Entering sub-shell to correct sources"
+      NoteD $Log "Type exit at the prompt to resume"
+      flog $Log set here = $cwd
+      csh -f
+      NoteD $Log ""
+      flog $Log cd $here
+   endif
+
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TAG - tag this new version
+#     - working directory should be import/old
+
+TAG:
+
+   set WDir = $args_[1]
+   flog $Log pushd $WDir
+
+   Separator $Log
+   Note $Lock -n "Tagging the sources ................ " 
+   NoteD $Log "Tagging the sources"
+   Note $Log "   Current Directory:    $cwd"
+   Note $Log ""
+
+   flog $Log set TagID = `/bin/date '+X%y_%m_%d_%H_%M_%S'`
+   NoteD $Log "   Version Tag: $TagID"
+
+   flog $Log cvs rtag $TagID pact
+
+   KillZombie
+
+   flog $Log popd
+   Note $Lock "done" 
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CVS_IMPORT - not quite what we want for our "imports"
+#            - coded up anyway to experiment
+#            - or to make a repository if there is not one existing
+#            - working directory should be import
+
+CVS_IMPORT:
+
+   set WDir = $args_[1]
+
+   Separator $Log
+   NoteD $Log "Unpacking new sources"
+   Note $Log ""
+
+   flog $Log pushd $WDir
+
+   flog $Log tar xvf pact.tar
+   if ($status != 0) then
+      NoteD $Log "TAR extract failed, check sources in manager/import"
+      exit(1)
+   endif
+
+   flog $Log cd pact
+
+   NoteD $Log "Importing sources from $cwd into $Repository"
+   flog $Log cvs import -m "Import from $CodeDate" $Repository v$CodeDate r$CodeDate
+   set ErrStat = $status
+   KillZombie
+   if ($ErrStat != 0) then
+      NoteD $Log "IMPORT failed, check sources in manager/import"
+      exit(1)
+   endif
+
+   flog $Log cd ../../..
+
+   NoteD $Log "Merging sources"
+
+   flog $Log cvs update -jv$CodeDate:yesterday -jv$CodeDate
+   set ErrStat = $status
+   KillZombie
+   if ($ErrStat != 0) then
+      NoteD $Log "MERGE failed, check sources in manager/import"
+      exit(1)
+   endif
+
+   flog $Log popd
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - complete the import process
+
+FINISH:
+
+   Separator $Log
+
+   flog $Log cd $ImportingDir
+
+   flog $Log rm -f $DateFile $TagFile
+
+# create the date and tag for this version
+# which will be needed at the next import session
+   Note $DateFile `date '+%D %T '` "PDT"
+   Note $TagFile  "$TagID"
+
+# remove temporary files and directories
+   NoteD $Log "Cleaning up the import directory"
+   Note $Lock -n "Cleaning up the import directory ... "
+   flog $Log rm -rf import
+
+# release the lock
+   NoteD $Log "The repository is unlocked"
+   Unlock
+
+   NoteD $Log ""
+   NoteD $Log "Version $CodeDate imported"
+   NoteD $Log "Date/Time: " `date`
+   NoteD $Log ""
+
+   return
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------

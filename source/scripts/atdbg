@@ -1,0 +1,264 @@
+#!/bin/csh -f
+#
+# ATDBG - attach a debugger to one of the named jobs 
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/atdbg") then
+   set path = ( $Exe $path )
+endif
+
+unalias ps
+
+set Which    = "swhich -1"
+set OSType   = `uname -s`
+set PName    = ""
+set Verbose  = FALSE
+set Mode     = attach
+set Quiet    = FALSE
+set Opt      = "-q"
+set Pid      = ""
+set Exe      = ""
+set WhichDBG = FALSE
+
+set Help = FALSE
+if ($#argv < 1) then
+   set Help = TRUE
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -a:
+           set Opt = ( $Opt -r none- )
+           breaksw
+      case -e:
+           shift
+           set Exe   = $1
+           breaksw
+      case -h:
+           set Help = TRUE
+           break
+           breaksw
+      case -p:
+           shift
+           set Pid   = $1
+           breaksw
+      case -r:
+           set Mode = trace
+           breaksw
+      case -q:
+           set Quiet = TRUE
+           breaksw
+
+# NOTE: this is stupid on the face of it but on some systems ps reports
+# uid instead of username
+# this gives a chance to override
+      case -u:
+           shift
+           set USER = $1
+           breaksw
+
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      case -w:
+           set WhichDBG = TRUE
+           breaksw
+      case -*
+           breaksw
+      default:
+           set PName = ( $PName $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ($Help == TRUE) then
+        echo ''
+        echo 'Usage:  atdbg [-a] [-e <path>] [-h] [-p <pid>] [-q] [-r] [-v] [-w] [name]*'
+        echo ''
+        echo 'Present list of named jobs and attach debugger to selected one.'
+        echo ''
+        echo '        a    - search all jobs (i.e. ignore .ls-jobs-remove file)'
+        echo '        e    - full path to the executable'
+        echo '        h    - this help message'
+        echo '        p    - attach to specified PID'
+        echo '        q    - quiet mode'
+        echo '        r    - just show the current call stack'
+        echo '        v    - verbose flag'
+        echo '        w    - show which debugger is being used'
+        echo '        name - executable name or command line pattern'
+        echo '               used to identify processes'
+        echo ''
+        exit(1)
+endif
+
+# determine which debugger to use
+if ($?SC_DEBUGGER) then
+   set dbglst = ( `echo $SC_DEBUGGER | sed 's/:/ /g'` )
+else
+   set dbglst = (totalview gdb dbx)
+endif
+
+set dbg = ""
+foreach i ($dbglst)
+   set j = `$Which $i`
+   if (-x "$j") then
+      set dbg = $j
+      break
+   endif
+end
+
+if ("$dbg" == "") then
+   echo "There is no recognized debugger - exiting"
+   exit(1)
+endif
+
+if ($WhichDBG == TRUE) then
+   echo "$dbg"
+   exit(0)
+endif
+
+if ($Quiet == FALSE) then
+   echo ""
+endif
+
+if ($Mode == trace) then
+   set Tmp = /tmp/dbg.$$
+   rm -f $Tmp
+   touch $Tmp
+endif
+
+if (("$PName" == "") && (("$Exe" != "") || ("$Pid" != ""))) then
+   set PName = $Pid
+endif
+
+set Err   = 0
+@ Nothing = 0
+foreach name ($PName)
+
+# find the candidate process ids
+   if (("$Exe" != "") && ("$Pid" != "")) then
+      set pids = ( $Pid $Exe )
+      echo "$Exe ($Pid)"
+   else
+      if ($Verbose == TRUE) then
+         ls-jobs $Opt "$name" | sed '/atdbg /d' | sed '/sign /d'
+      endif
+
+      set pids = `ls-jobs $Opt "$name" | sed '/atdbg /d' | sed '/sign /d' | awk '{print $2 " " $6}'`
+   endif
+
+# act on the list of process ids
+   if ("$pids" == "") then
+      @ Nothing = $Nothing + 1
+      if ($Quiet == FALSE) then
+         echo "No processes found under '$name'"
+      endif
+
+   else
+      set lst = ( $pids )
+      while ($#lst > 0)
+         set pid = $lst[1]
+         set exe = `rpath $lst[2]`
+         shift lst
+         shift lst
+
+# if no PID specified stop, present, and query
+         set ok = n
+         if ("$Pid" != "") then
+            if ($pid == $Pid) then
+               set ok = y
+            else
+               set ok = n
+            endif
+         else
+            echo -n "$Mode $exe ($pid) (y/n): "
+	    set ok = $<
+         endif
+
+         if ($Verbose == TRUE) then
+            echo "Debugger:   $dbg"
+            echo "Executable: $exe"
+            echo "PID:        $pid"
+         endif
+
+	 if ("$ok" == "y") then
+            if ($dbg =~ *totalview) then
+               if ($Mode == trace) then
+                  ${dbg}cli -e 'TV::respond {no} {dattach '"$exe $pid"'} ; dhalt ; dwait ; dwhere -a ; exit -force' |& \
+                  grep "PC="           |                \
+                  awk '{for (i = 1; i <= NF; i++)       \
+                            {if (($i !~ /PC=/) &&       \
+                                 ($i !~ /FP=/) &&       \
+                                 ($i != ">"))           \
+                                {printf("%s ", $i);};}; \
+                        printf("\n");}' |               \
+                  sed 's/#/:/'          |               \
+                  awk '{printf("%4d  %-20s   %s\n", $1, $2, $3);}'
+                  set Err = $status
+               else
+    	          $dbg $exe -pid $pid
+                  set Err = $status
+               endif
+            else if ($dbg =~ *gdb) then
+               if ($Mode == trace) then
+                  echo "set width -1" >> $Tmp
+                  echo "attach $pid" >> $Tmp
+                  echo "backtrace" >> $Tmp
+                  echo "quit" >> $Tmp
+	          $dbg $exe -x $Tmp                                |&         \
+                  sed 's/#/# /'                                    |&         \
+                  sed 's/) at /) [/'                               |&         \
+                  sed 's/) from /) [/'                             |&         \
+                  sed 's/ 0x[0-9a-f]* in//'                        |&         \
+                  awk 'BEGIN {nl = 0;}                                        \
+                       $1 == "#" {printf("%4d ", $2);                         \
+                                  for (i = 3; i <= NF; i++)                   \
+                                      {printf(" %s", $i);};                   \
+                                  printf("]\n");}'                 |&         \
+                  sed 's+\[.*/+\[+'                                |&         \
+                  sed 's/<signal/<----------signal/'               |&         \
+                  sed 's/>]/---------->/'                          |&         \
+                  sed 's/ (/(/'                                    |&         \
+                  sed 's/ )/)/'                                    |&         \
+                  sed 's/, /,/g'
+               else
+                  xterm -sb -e $dbg $exe $pid
+                  set Err = $status
+               endif
+
+            else if ($dbg =~ *dbx) then
+               if ($Mode == trace) then
+                  echo "attach $pid" >> $Tmp
+                  echo "where" >> $Tmp
+                  echo "quit" >> $Tmp
+	          $dbg $exe -c $Tmp  |&              \
+                  sed 's/>/ /'      |                \
+                  awk '$1 ~ /[0-9]+/ { print }'
+               else
+                  xterm -sb -e $dbg $exe -pid $pid
+                  set Err = $status
+               endif
+            endif
+            break
+         endif
+      end
+   endif
+end
+
+if ($Mode == trace) then
+   rm -f $Tmp
+endif
+
+if ($Quiet == FALSE) then
+   echo ""
+endif
+
+exit($Err)

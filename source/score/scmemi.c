@@ -1,0 +1,47 @@
+/*
+ * SCMEMI.C - config/init memory management functions
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ * #include "cpyright.h"
+ *
+ */
+
+#include <stdio.h>
+
+#define N_DOUBLES_MD 3
+
+#ifdef NO_LONG_LONG
+typedef long BIGINT;
+typedef unsigned long BIGUINT;
+#else
+typedef long long BIGINT;
+typedef unsigned long long BIGUINT;
+#endif
+
+#include "scope_mem.h"
+
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
+int main(int c, char **v)
+   {int na, nb, nd, ni;
+
+    nb = sizeof(mem_descriptor);
+    na = SC_MEM_ALIGN_SIZE;
+    nd = sizeof(double);
+
+/* compute how many SC_MEM_ALIGN_SIZE units cover the mem_descriptor */
+    ni = (nb + na - 1)/na;
+
+/* convert this to doubles */
+    ni *= (na/nd);
+
+    printf("#define N_DOUBLES_MD %d\n", ni);
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

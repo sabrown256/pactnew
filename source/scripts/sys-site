@@ -1,0 +1,145 @@
+#!/bin/csh -f
+#
+# SYS-SITE - define system types and sites
+#
+
+set END   = '}'
+set SignF = ""
+
+if ($?SITE_SIGNATURE_DB == 1) then
+   set SignF = $SITE_SIGNATURE_DB
+endif
+
+set Prog = $0
+set PDir = $Prog:h
+
+set Verbose  = FALSE
+set OutShell = csh
+
+while ($#argv > 0)
+   switch ($1)
+      case -csh:
+           set OutShell = csh
+           breaksw
+      case -f:
+           shift
+           set SignF = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: sys-site [-csh] [-f <sign>] [-h] [-sh] [-v]"
+           echo "   csh emit results in C shell syntax (default)"
+           echo "   f   use signature file <sign>"
+           echo "   h   this help message"
+           echo "   sh  emit results in Bourne shell syntax"
+           echo "   v   run in verbose mode"
+           echo ""
+           exit(1)
+      case -sh:
+           set OutShell = sh
+           breaksw
+      case -v:
+           set Verbose = TRUE
+           breaksw
+   endsw
+   shift
+end
+
+if (-f "$SignF") then
+
+# process any variable settings into shell variables of this session
+   set noglob
+   set VarLst = ( `cat $SignF | awk '$2 == "=" { print $1 }'` )
+   set ExpLst = ( `cat $SignF | awk '$2 == "=" { printf("set %s ; ", $0); }'` )
+
+   eval "$ExpLst"
+   unset noglob
+
+   if ($Verbose == TRUE) then
+      foreach var ($VarLst)
+         set val = `set | awk '$1 == "'$var'" { print }'`
+         shift val
+         echo ">>   $var = $val"
+      end
+   endif
+
+   set Section = $END
+   set skip    = FALSE
+   set nlines  = ( `wc -l $SignF` )
+   @ nline = $nlines[1]
+   @ iline = 0
+   while ($iline < $nline)
+      set noglob
+      @ iline = $iline + 1
+      set line = ( `head -n $iline $SignF |& tail -n 1` )
+      if (("$line" == "") || ("$line" =~ \#*)) continue
+ 
+# skip all remaining tests in a section
+      if (($skip == TRUE) && ("$line" != $END)) then
+         continue
+
+# recognize the end of a section and reset
+      else if ("$line" == $END) then
+         set Section = $END
+         set skip    = FALSE
+
+# single token line starts a section
+      else if ("$line" =~ variable*:*\{) then
+         set Section = $line[3]
+         set skip    = FALSE
+         if ($Verbose == TRUE) then
+            echo ">>   $Section"
+         endif
+
+# do tests until one succeeds
+      else if ($Section != $END) then
+         set Val = $line[1]
+         shift line
+
+         set Res = FALSE
+
+# do if test on things that match (...)
+         if ("$line" =~ \(*\)) then
+            eval "if $line set Res = TRUE"
+            if ($Verbose == TRUE) then
+               echo ">>      test $line => $Res"
+            endif
+
+# anything with TRUE succeeds
+         else if (("$line" == true) || ("$line" == TRUE)) then
+            set Res = TRUE
+
+# do test on status after executing any other form
+         else
+            unset noglob
+            $line >& /dev/null
+            if ($status == 0) set Res = TRUE
+            if ($Verbose == TRUE) then
+               echo ">>      $line => $Res"
+            endif
+         endif
+
+# if we have a TRUE result accept the value and skip the rest
+         if ($Res == TRUE) then
+            eval "setenv $Section $Val"
+            set skip = TRUE
+            if ($Verbose == TRUE) then
+               echo ">>   $Section = $Val"
+            endif
+            if ($OutShell == csh) then
+               echo "setenv $Section `printenv $Section` ; "
+            else if ($OutShell == sh) then
+               echo "$Section=`printenv $Section` ; export $Section ; "
+            endif
+         endif
+      endif
+   end
+
+endif
+
+echo "$PDir/no-op"
+
+unset noglob
+
+exit(0)
+

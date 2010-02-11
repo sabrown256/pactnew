@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# PACKAGE - write the PACKAGE file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    Separator $Log
+    NoteD $Log "   Package List - package"
+
+    set STDOUT = $IncDir/package
+
+    flog $Log $RM $STDOUT
+    flog $Log touch $STDOUT
+
+    set Pkgs = ( `awk '$1 == "pkg" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest` )
+
+# must have one package per line because dmake needs it that way
+    foreach i ($Pkgs)
+       if ($HavePython == TRUE) then
+          echo "$i" >>& $STDOUT
+       else if ($i != python) then
+          echo "$i" >>& $STDOUT
+       endif
+    end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

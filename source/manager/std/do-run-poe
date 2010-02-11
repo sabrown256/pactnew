@@ -1,0 +1,66 @@
+#
+# DO-RUN-POE - DO-RUN database entry for poe
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+MPI : poe {
+   Exe   = ("$DBG_Exe" == "") ? "" : poe
+   Flags = 
+
+# NOTE: do not do this unless we can figure immediate mode for poe
+#   Env Pool = ("$Pool" == pdebug) ? pbatch : -noop-
+
+   Env MP_LABELIO  = no
+   Env MP_NODES    = $NNode
+   Env MP_PROCS    = $NProc
+
+# parallel
+   Env MP_RMPOOL   = ($NProc > 1) ? $Pool : -unsetenv-
+
+# serial interactive
+   Env MP_NODES         = ($MPINot == TRUE) ? 1                : -noop-
+   Env MP_EUILIB        = ($MPINot == TRUE) ? ip               : -noop-
+   Env MP_RESD          = ($MPINot == TRUE) ? NO               : -noop-
+   Env MP_CPU_USE       = ($MPINot == TRUE) ? multiple         : -noop-
+   Env MP_TASK_AFFINITY = ($MPINot == TRUE) ? 0                : -noop-
+   Env MP_HOSTFILE      = ($MPINot == TRUE) ? .dp-aix.$Host.$$ : -noop-
+
+   Env MP_EUIDEVICE      = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_TASKS_PER_NODE = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_RMPOOL         = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env LOADLBATCH        = ($MPINot == TRUE) ? -unsetenv- : -noop-
+
+# NOTE: completely control the MPI environment
+# an MPI code might be running this do-run session
+# as a child process - it has happened
+
+   Env MP_CHILD           = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_CHILD_INET_ADDR = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_COMMON_TASKS    = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_COREFILE_FORMAT = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_ISATTY_STDERR   = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_ISATTY_STDIN    = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_ISATTY_STDOUT   = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_MPI_NETWORK     = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_PARTITION       = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_PGMMODEL        = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_PIPE_IN         = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_PIPE_OUT        = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_PRIORITY        = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_RMLIB           = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_SHARED_MEMORY   = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_STDIN_DESC      = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_STDOUT_DESC     = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_STDERR_DESC     = ($MPINot == TRUE) ? -unsetenv- : -noop-
+   Env MP_SYNC_ON_CONNECT = ($MPINot == TRUE) ? -unsetenv- : -noop-
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------

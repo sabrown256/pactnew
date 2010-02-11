@@ -1,0 +1,59 @@
+#!/bin/csh -f
+#
+# S1T1 - test 1 of signature file 1
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Code = do-run
+set Opt  = ans
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set Code = $1
+           breaksw
+      case '-h':
+           echo "Usage: $0 [-c <code>] [-h] run | ans"
+           echo "   c     test <code> (default do-run on path)"
+           echo "   h     this help message"
+           echo "   run   run the test"
+           echo "   ans   print the fiducial answer"
+           echo ""
+           exit(1)
+      default:
+           set Opt = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ($Opt == run) then
+   if ("$Valgrind" == "") then
+      $Code -level 2 -dr -mpi foo -s run.s1 s1t1 "a ; b"
+      set xstatus = $status
+   else
+      $Valgrind $Code -level 2 -dr -mpi foo -s run.s1 s1t1 "a ; b"
+      set xstatus = $status
+   endif
+
+# print the fiducial answer for this test
+else
+   echo "Using signature file 'run.s1'"
+   echo '> setenv NCPU 1'
+   echo '> setenv Cmd $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs'
+   echo 'Entering MPI section foo'
+   echo '> setenv MPI_Exe foorun'
+   echo '> setenv MPI_Flags -p 1'
+   echo 'Leaving section MPI'
+   echo 'Skipping DBG section bar'
+   echo 'Skipping DBG section baz'
+   echo '  foorun  -p 1 s1t1 \"a \; b\"'
+   set xstatus = 0
+endif
+
+exit($xstatus)

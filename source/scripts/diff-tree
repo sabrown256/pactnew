@@ -1,0 +1,131 @@
+#!/bin/csh -f
+#
+# DIFF-TREE - compare two source trees for entries or content
+#           - NOTE: use quotes to handle embedded spaces in directory names
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set DirA     = ""
+set Dirb     = ""
+set Content  = FALSE
+set NameOnly = FALSE
+set NoPerm   = FALSE
+set NoSize   = FALSE
+set All      = TRUE
+while ($#argv > 0)
+   switch ("$1")
+      case -c:
+           set Content = TRUE
+           breaksw
+      case -h:
+           echo "Usage: diff-tree [-c] [-h] [-n] [-p] [-s] <dir1> <dir2>"
+           echo "   c   - report entries whose content differs"
+           echo "   h   - this help message"
+           echo "   n   - compare file names only"
+           echo "   p   - do not compare file permissions"
+           echo "   s   - do not compare file sizes"
+           echo ""
+           exit(1)
+      case -n:
+           set NameOnly = TRUE
+           breaksw
+      case -p:
+           set NoPerm = TRUE
+           breaksw
+      case -s:
+           set NoSize = TRUE
+           breaksw
+      default:
+           if (-d "$1") then
+              if ("$DirA" == "") then
+                 pushd "$1" >& /dev/null
+                 set DirA = "$cwd"
+                 popd >& /dev/null
+              else
+                 pushd "$1" >& /dev/null
+                 set DirB = "$cwd"
+                 popd >& /dev/null
+              endif
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if (("$DirA" == "") || ("$DirB" == "")) then
+   echo "Require two directories for comparison - exiting"
+   exit(1)
+endif
+
+set HdA = $DirA:h
+set HdB = $DirB:h
+
+set ResA = $cwd/.diff-0-$$
+set ResB = $cwd/.diff-1-$$
+
+if ($Content == TRUE) then
+   set Exe = $cwd/.tmp-$$
+
+   echo '#\!/bin/csh -f' >! $Exe
+   echo 'set A = $1'    >>& $Exe
+   echo 'set B = `echo $A | sed "s|'$DirA'|'$DirB'|"`' >>& $Exe
+   echo 'cmp $A $B'     >>& $Exe
+   echo 'exit($status)' >>& $Exe
+
+   chmod a+x $Exe
+
+   find $DirA -exec $Exe {} \;                   | \
+   sed 's|'$HdA'/||'                             | \
+   sed 's|'$HdB'/||'                             | \
+   awk '{printf("%s\t%s\t%s\n", $1, $2, $3);}'   | \
+   sed 's|differ:|differ|'
+
+   rm -f $Exe
+
+else
+
+   @ n = 0
+   foreach i ("$DirA" "$DirB")
+      set Hd = "$i:h"
+      set Rs = $cwd/.diff-$n-$$
+      echo -n "Looking thru $i ... "
+      if ($NameOnly == TRUE) then
+         (echo `ls -d "$i"`":" ; ls -lR "$i" )                          |   \
+         awk '$0 ~ /:$/ {dir = $0 ; print}                                  \
+              NF > 6 {printf(" %s/%s\n", dir, $9);}'                    |   \
+         sed 's|:/|/|'                                                  |   \
+         sed 's|'$Hd'/||' >&! $Rs
+      else if ($NoPerm == TRUE) then
+         (echo `ls -d "$i"`":" ; ls -lR "$i" )                          |   \
+         awk '$0 ~ /:$/ {dir = $0 ; print}                                  \
+              NF > 6 {printf(" %-12s %s/%s\n", $5, dir, $9);}'          |   \
+         sed 's|:/|/|'                                                  |   \
+         sed 's|'$Hd'/||' >&! $Rs
+      else if ($NoSize == TRUE) then
+         (echo `ls -d "$i"`":" ; ls -lR "$i" )                          |   \
+         awk '$0 ~ /:$/ {dir = $0 ; print}                                  \
+              NF > 6 {printf(" %10s %s/%s\n", $1, dir, $9);}'           |   \
+         sed 's|:/|/|'                                                  |   \
+         sed 's|'$Hd'/||' >&! $Rs
+      else if ($All == TRUE) then
+         (echo `ls -d "$i"`":" ; ls -lR "$i" )                          |   \
+         awk '$0 ~ /:$/ {dir = $0 ; print}                                  \
+              NF > 6 {printf(" %10s %-12s %s/%s\n", $1, $5, dir, $9);}' |   \
+         sed 's|:/|/|'                                                  |   \
+         sed 's|'$Hd'/||' >&! $Rs
+      endif
+      echo "done"
+      @ n = $n + 1
+   end
+
+   diff $ResA $ResB
+
+   rm -f $ResA $ResB
+
+endif
+
+exit($status)

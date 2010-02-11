@@ -1,0 +1,64 @@
+#
+# MAKE-DEF.NT - installation dependent definitions
+#
+
+SYSTEM  = WIN
+MACHINE = DOS
+RootDr = f:\home\minner\pact
+ScmDir  = $(RootDr)\scheme
+
+#
+# Site Dependent Graphics Information
+#
+
+LDF    = link
+GSYS=win
+
+LR = ls
+
+DATE="V"
+
+#
+# Compiler/Loader Options
+#
+# Notes: -a force alignments to word boundaries (most natural to hardware)
+#
+#CFLAGS  = -Zi
+IncFlag  = /I
+#CFLAGS  = /DMM_CONFIG /Ze /Zi
+CFLAGS  = /Zi
+LDFLAGS = -MLd
+
+
+# Compiler/Loader Invokations
+#
+#CC = cl $(CFLAGS) $(UniFlags) $(CcFlags)
+CC = cl $(CFLAGS) $(UniFlags) $(CcFlags)
+LD = ..\manager\ld
+CPPFlags = -UMSDOS -D__MSC__ $(IncDir)
+AR = ..\manager\lib $(TGTLib)
+
+#.SUFFIXES : .c .o .i .p .l
+.SUFFIXES : .i .p .l
+
+.l.o :
+	flex $<
+	mv lexyy.c $*.c
+	rm -f $*.o $*.obj
+	$(CC) /c $*.c
+	ren $*.obj $*.o > NUL
+	rm $*.c
+
+.c.o :
+	rm -f $*.o $*.obj
+	$(CC) /c $<
+	ren $*.obj $*.o > NUL
+
+.c.i :
+	rm -f $*.i
+	$(CC) /P $*.c
+
+.c.p :
+	rm -f $*.p
+	proto $< $*.p $(CPPFlags)
+

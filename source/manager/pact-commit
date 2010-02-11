@@ -1,0 +1,584 @@
+#!/bin/csh -f
+#
+# PACT-COMMIT - commit to the PACT repository
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set MngDir = $cwd
+set Base   = $MngDir:h
+set ScrDir = $Base/scripts
+set PshDir = $Base/psh
+set SccDir = $Base/scc
+
+source $ScrDir/env-csh
+unalias ssh
+
+if ($?USER == 0) then
+   if ($?LOGNAME == 0) then
+      set USER = "anonymous"
+   else
+      set USER = $LOGNAME
+   endif
+endif
+
+set WhoIAm    = $USER
+set Manager   = manager
+set Message   = ""
+set MsgFile   = ""
+set Report    = ""
+set CvsOpt    = ""
+set ManOnly   = FALSE
+set DocOnly   = FALSE
+set ScrOnly   = FALSE
+set PshOnly   = FALSE
+set SccOnly   = FALSE
+set TagOnly   = FALSE
+set TmpMsg    = $MngDir/msg-tmp
+set TmpDir    = ftmp
+set Host      = `uname -n`
+set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
+
+set VersionID = `code-date`
+set HelpCode  = $MngDir/$0
+set CfgMan    = $MngDir/cfgman
+set System    = `$CfgMan use`
+set DevDir    = $Base/dev/$System
+set UpdateLog = $DevDir/log/update
+set Changed   = $MngDir/Changed
+set UnChanged = $MngDir/UnChanged
+
+set SCSRepository = ""
+set SRCDate       = ""
+set Sleep         = "NO"
+
+set CleanBuild   = FALSE
+
+InitLog Log $DevDir/log/commit
+
+switch ($OS)
+   case irix:
+        set MAIL = Mail
+        breaksw
+
+   default:
+        set MAIL = mail
+        breaksw
+endsw
+
+if ($#argv == 0) then
+   goto Help
+endif
+
+set Opt     = "$HelpCode:t  $argv"
+set BugFix  = FALSE
+set AddFeat = FALSE
+set DevRel  = FALSE
+set TagAnn  = "|"
+set Args    = ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+while ("$1" =~ -*)
+   switch ($1)
+      case -f*:
+	      set CleanBuild = TRUE
+	      breaksw
+
+      case -h*:                                  # print Usage:
+	      goto Help
+
+      case -M*:                                  # get log message from file
+              shift
+              set MsgFile = $MngDir/$1
+              if (! -e $MsgFile ) then
+                 NoteD $Log "Can not find message file $MsgFile"
+                 goto Help
+              endif
+              breaksw
+
+      case -n*:                                  # NO update, report only
+	      set Report = " Report ONLY..."
+	      set CvsOpt = "-nq"
+	      breaksw
+
+      case -p:                                   # parallel build/test
+              shift
+	      set Args = ( $Args -p $1 )
+	      breaksw
+
+      case -r*:
+              if (`expr "$1" : '.*b.*'`) then
+	         set BugFix = TRUE
+   	         set TagAnn  = ("$TagAnn""B|")
+              endif
+              if (`expr "$1" : '.*d.*'`) then
+   	         set TagAnn  = ("$TagAnn""D|")
+              endif
+              if (`expr "$1" : '.*f.*'`) then
+	         set AddFeat = TRUE
+   	         set TagAnn  = ("$TagAnn""F|")
+              endif
+              if (`expr "$1" : '.*m.*'`) then
+   	         set TagAnn  = ("$TagAnn""M|")
+              endif
+              if (`expr "$1" : '.*x.*'`) then
+	         set DevRel = TRUE
+   	         set TagAnn  = ("$TagAnn""X|")
+              endif
+              set Sleep = "YES"
+              breaksw
+
+      case -s*:
+              set Sleep = "YES"
+              breaksw
+
+      case -t:
+              set TagOnly = TRUE
+              breaksw
+
+      case -v*:                                  # Display version...
+              source $MngDir/pact-scs
+	      NoteD $Log "  Source Version:   " $SCSVersion
+	      NoteD $Log "  Software Release: " $SCSRelease
+	      NoteD $Log ""
+	      exit(1)
+
+      case -z:
+              shift
+	      set TagAnn  = ("$TagAnn""P|")
+              set ManOnly = FALSE
+              set DocOnly = FALSE
+              set ScrOnly = FALSE
+              set PshOnly = FALSE
+              set SccOnly = FALSE
+              switch ($1)
+                 case manager:
+                      set ManOnly = TRUE
+                      breaksw
+                 case doc:
+                      set DocOnly = TRUE
+                      breaksw
+                 case scripts:
+                      set ScrOnly = TRUE
+                      breaksw
+                 case psh:
+                      set PshOnly = TRUE
+                      breaksw
+                 case scc:
+                      set SccOnly = TRUE
+                      breaksw
+              endsw
+              breaksw
+
+      default:
+ 	      goto Help
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($TagOnly == TRUE) then
+   set TagID = `/bin/date '+T%y_%m_%d_%H_%M_%S'`
+else
+   set TagID = `/bin/date '+D%y_%m_%d_%H_%M_%S'`
+   if ("$TagAnn" == "|") then
+      NoteD $Log " "
+      NoteD $Log "You MUST specify at least one -r option "
+      NoteD $Log " "
+      exit(10)
+   endif
+endif
+
+set Message = (\"<$WhoIAm $TagAnn $TagID> $argv\")
+
+# define the Source Control System
+source $MngDir/pact-scs
+
+# do everything with full option
+if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
+   NoteD $Log -n "   Syncing sources ... "
+   flog $Log ./dsys sync
+   flog $Log set LStat = $status
+   if ($LStat != 0) then
+      Unlock
+      NoteD $Log ""
+      NoteD $Log "Your version failed to sync sources"
+      NoteD $Log "You may have a source conflict that needs to be resolved"
+      NoteD $Log ""
+      exit(1)
+   else
+      NoteD $Log "ok"
+   endif
+
+   if ($CleanBuild == TRUE) then
+      NoteD $Log -n "   Removing binaries ... "
+      flog $Log ./dsys remove
+      flog $Log set LStat = $status
+      if ($LStat != 0) then
+         Unlock
+         NoteD $Log ""
+         NoteD $Log "Your binaries could not be removed"
+         NoteD $Log "Check to see whether your permissions are set properly"
+         NoteD $Log ""
+         exit(1)
+      else
+         NoteD $Log "ok"
+      endif
+   endif
+
+   NoteD $Log -n "   Building ... "
+   flog $Log ./dsys build $Args
+   flog $Log set LStat = $status
+   if ($LStat != 0) then
+      Unlock
+      NoteD $Log ""
+      NoteD $Log "Your version failed to build after syncing"
+      NoteD $Log "This must be resolved before you may commit your changes"
+      NoteD $Log ""
+      exit(1)
+   else
+      NoteD $Log "ok"
+   endif
+endif
+
+#
+# check if repository is locked
+#
+Note $Log "Sleep = $Sleep"
+Note $Log "Lock  = $ExistLock"
+if ($Sleep == "YES") then
+   ./check.lock
+else
+   if ($ExistLock == TRUE) then
+      NoteD $Log ""
+      NoteD $Log " *** REPOSITORY IS LOCKED ***"
+      NoteD $Log ""
+      CatLock
+      NoteD $Log ""
+      NoteD $Log ""
+      exit(1)
+   endif
+endif
+
+#
+# initiate a lock on the repository
+#
+Makelock
+Note $Lock $Message
+
+#
+# run the test suite
+#
+if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
+   Note $Lock -n "Testing ................... "
+   ftee $Log ./dsys test $Args
+   if ($status != 0) then
+      Unlock
+      NoteD $Log ""
+      NoteD $Log "Your version failed the test suite"
+      NoteD $Log "All tests must pass before the commit will be allowed"
+      NoteD $Log ""
+      exit(1)
+   endif
+   Note $Lock "done"
+endif
+
+flog $Log rm -f $UpdateLog $Changed $UnChanged
+flog $Log touch $UpdateLog
+
+#
+# Start doing the actual commits
+#
+if ($TagOnly == FALSE) then
+   Note $Log "Commit Log		Host: $Host running $OS"
+   Note $Log "User:  $WhoIAm		Date: `date`"
+   Note $Log ""
+
+   Note $Log "Operation: $Opt"
+   if ("$RemoteHost" == "") then
+      Note $Log "Repository: local"
+   else
+      Note $Log "Repository: remote ($RemoteHost)"
+   endif
+   NoteD $Log ""
+
+   if ($ManOnly == TRUE) then
+      NoteD $Log "Committing changes to the Manager only"
+   
+   else if ($DocOnly == TRUE) then
+      flog $Log cd $Base/doc
+      NoteD $Log "Committing changes to the Documents only"
+
+# NOTE: we realize that the handling of .pact-version* is such
+#       that we will be out of sync here but this is a very hard
+#       problem and the sources matter most wrt the version
+
+   else if ($ScrOnly == TRUE) then
+      flog $Log cd $ScrDir
+      NoteD $Log "Committing changes to the scripts only"
+
+   else if ($PshOnly == TRUE) then
+      flog $Log cd $PshDir
+      NoteD $Log "Committing changes to psh only"
+
+   else if ($SccOnly == TRUE) then
+      flog $Log cd $SccDir
+      NoteD $Log "Committing changes to scc only"
+
+# NOTE: we realize that the handling of .pact-version* is such
+#       that we will be out of sync here but this is a very hard
+#       problem and the sources matter most wrt the version
+
+   else
+      flog $Log cd $Base
+      NoteD $Log "Committing source changes"
+   endif
+
+#
+# do the $SCSName update
+#
+   NoteD $Log " "
+   NoteD $Log "Checking Local PACT Sources"
+
+   Note $Lock -n "Checking PACT Sources ..... "
+
+   flog $Log rm -f $UpdateLog
+   flog $Log touch $UpdateLog
+   Note $UpdateLog "Host: $Host           Date: `date`"
+   Note $UpdateLog ""
+   flog $Log ($Update >> $UpdateLog)
+   if ($status != 0) then
+      Unlock
+      NoteD $Log "$SCSName UPDATE FAILED"
+      exit($status)
+   endif
+   NoteD $Log "Local PACT Sources Checked"
+   Note $Lock "done"
+
+#
+# categorize the update status of the files
+# as M,A,R - ok to commit and C - resolve conflicts
+#
+   awk '($1 ~ /[MAR]/) {print $2}' $UpdateLog > $UnChanged
+   awk '($1 == "C") {print $2}' $UpdateLog > $Changed
+
+   set ChangedList   = `cat $Changed`
+   set UnChangedList = `cat $UnChanged`
+
+   if ($#ChangedList > 0) then
+      Unlock
+      NoteD $Log ""
+      NoteD $Log "There are files with conflicts to be resolved."
+      NoteD $Log "See $Changed for the list."
+      NoteD $Log ""
+      flog $Log cd $Manager
+      exit(1)
+   else
+      flog $Log rm -f $Changed
+   endif
+endif
+
+#
+# Fixup the version id files
+# do this after the sync to avoid a meaningless conflict
+#
+if (($ManOnly == TRUE) || ($DocOnly == TRUE) || ($ScrOnly == TRUE) || ($PshOnly == TRUE) || ($SccOnly == TRUE) || ($TagOnly == TRUE)) then
+   flog $Log pushd $Base/manager
+else
+   flog $Log pushd manager
+endif
+
+flog $Log rm -f .pact-version .pact-version-tag
+echo $TagID > .pact-version-tag
+echo $VersionID > .pact-version
+
+flog $Log popd
+
+if ($TagOnly == TRUE) then
+   NoteD $Log " "
+   NoteD $Log "Committing the new TAG info"
+
+   echo > $TmpMsg
+   flog $Log $Commit -m 'Tagging repository'
+   if ($status != 0) then
+      flog $Log rm -f $TmpMsg
+      Unlock
+      NoteD $Log "Commit FAILED"
+      exit(1)
+   endif
+   flog $Log rm -f $TmpMsg
+
+else
+#
+# do the actual commit
+#
+   NoteD $Log " "
+   NoteD $Log "Committing Local PACT Sources"
+
+   Note $Lock -n "Committing PACT Sources ... "
+   if ($MsgFile == "" ) then
+        flog $Log $Commit -m "$Message"
+        if ($status != 0) then
+           Unlock
+           NoteD $Log "Commit FAILED"
+           exit(1)
+        endif
+   else
+        flog $Log rm -f $TmpMsg
+        echo $Message | sed s/\"//g > $TmpMsg
+        cat $MsgFile >> $TmpMsg
+
+        flog $Log $Commit -F $TmpMsg
+        if ($status != 0) then
+           flog $Log rm -f $TmpMsg
+           Unlock
+           NoteD $Log "Commit FAILED"
+           exit(1)
+        endif
+        flog $Log rm -f $TmpMsg
+   endif
+
+#
+# report on changed files
+#
+   NoteD $Log " "
+   NoteD $Log "   The following files have been updated:"
+   cat $UnChanged
+   NoteD $Log " "
+
+   NoteD $Log "Local PACT Sources Committed"
+   Note $Lock "done"
+
+   if (($ManOnly == TRUE) || ($DocOnly == TRUE) || ($ScrOnly == TRUE) || ($PshOnly == TRUE) || ($SccOnly == TRUE) || ($TagOnly == TRUE)) then
+      flog $Log cd $Base
+   endif
+endif
+
+#
+# tag the new repository version
+#
+#NoteD $Log " "
+#NoteD $Log "Tagging this version with $TagID"
+#
+#Note $Lock -n "Tagging ................... "
+#flog $Log $Tag $TagID pact
+#NoteD $Log "Version tagged"
+#Note $Lock "done"
+
+#
+# release the lock
+#
+NoteD $Log ""
+NoteD $Log "The Repository is Unlocked"
+Unlock
+
+#
+# untouch the local source libraries
+#
+# since CVS has touched the sources
+# lets touch the relevant files and keep the time stamps
+# properly ordered
+
+if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
+   NoteD $Log ""
+   NoteD $Log "Resetting time stamps on Local PACT Sources"
+
+   find . -name "*.[chf]" -exec touch {} \;
+   flog $Log cd dev/$System/lib
+   flog $Log touch foo.a
+   flog $Log mkdir $TmpDir
+   flog $Log mv *.a $TmpDir
+   flog $Log cd $TmpDir
+   foreach lib (*.a)
+      if ($lib == "foo.a") then
+         rm -f $lib >& /dev/null
+      else if ($lib == "libpdb.a") then
+         mv $lib ..
+      else
+         ar x $lib
+         rm -f $lib >& /dev/null
+         touch *.o
+         ar rc $lib *.o
+         mv $lib ..
+         touch ../$lib
+         rm -f *.o _* >& /dev/null
+      endif
+   end
+   flog $Log cd ..
+   flog $Log rm -rf $TmpDir
+   flog $Log touch ../bin/*
+
+# PDB depends on the detect executable so extra
+# measures must be taken now
+   if (-e libpdb.a) then
+      flog $Log touch ../../../pdb/z-$System/obj/pdform.h
+      flog $Log ar x libpdb.a
+      flog $Log rm -f libpdb.a
+      flog $Log touch *.o
+      flog $Log ar rc libpdb.a *.o
+      flog $Log rm -f *.o _*
+   endif
+   NoteD $Log "Time stamps reset"
+endif
+
+flog $Log cd $MngDir
+flog $Log $Update -l
+flog $Log cat .pact-version
+flog $Log cat .pact-version-tag
+
+NoteD $Log ""
+NoteD $Log "PACT Repository Updated"
+NoteD $Log "See the file $Log for more detail."
+NoteD $Log ""
+
+exit($status)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Help:
+
+   echo ""
+   echo "Usage: pact-commit [-f] [-h] [-n] [-p <n>] [-rbfx] [-s] [-t] [-v] [-z <pck>] [-M <msgfile>] <message>"
+   echo "         f - do sync and full, clean build first"
+   echo "         h - this help message"
+   echo "         n - do not change any files."
+   echo "             NOT USEFUL use "dsys sync -n""
+   echo "         p - do parallel build and test with <n> nodes"
+   echo "         r - change reason"
+   echo "                b  bug fix"
+   echo "                f  add feature"
+   echo "                x  development"
+   echo "         s - sleep if Lock on"
+   echo "         t - tag only"
+   echo "         v - display the Version and Release of the Source Control System"
+   echo "         z - commit specified package only: doc, manager, scripts, psh, or scc"
+   echo "         M - name of file with a message about the commit.  "
+   echo " <message> - brief message about the commit. Every thing following the"
+   echo "             options is included as part of the message. Use quotes to"
+   echo "             preserve blanks, special characters."
+   echo ""
+   echo "The <message> or at least one option MUST be specified."
+   echo ""
+   echo "NOTE on Tags:"
+   echo "Tags consist of a identifier and a time and date string   "
+   echo "The identifiers are:"
+   echo "   D - normal development version"
+   echo "   R - released version"
+   echo "   X - import/repository sync version for multiple repositories"
+   echo "   T - tagged version (intended for use when a commit is"
+   echo "       interrupted before tagging is complete)"
+   echo ""
+
+   exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

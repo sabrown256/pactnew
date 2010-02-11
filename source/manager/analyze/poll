@@ -1,0 +1,114 @@
+#!/bin/csh -f
+#
+# POLL - analyze the handling of poll or select
+#      - Computes: HAVE_STREAMS_P HAVE_SELECT_P
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: poll"
+
+set poll = ""
+
+set IOHandling = ""
+
+# check for select
+
+cat << EOF >! $Tmp.c
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main(int c, char **v)
+{fd_set as, bs, cs;
+ struct timeval ds;
+ select(0, &as, &bs, &cs, &ds);
+ return(0);}
+EOF
+
+set FOUND_SELECT = FALSE
+flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   set IOHandling   = ($IOHandling select)
+   set FOUND_SELECT = TRUE
+   set poll = ( $poll select )
+endif
+
+rm -f $Tmp.c $Tmp
+
+# check for poll
+
+cat << EOF >! $Tmp.c
+#include <sys/poll.h>
+#include <stropts.h>
+int main(int c, char **v)
+{struct pollfd as;
+ poll(&as, 0, 0);
+ return(0);}
+EOF
+
+set FOUND_POLL = FALSE
+flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+if ($status == 0) then
+   set IOHandling = ($IOHandling poll)
+   set FOUND_POLL = TRUE
+   set poll = ( $poll poll )
+endif
+
+rm -f $Tmp.c $Tmp
+
+if ("$poll" == "") then
+   NoteD $ALog "      no file polling"
+else
+   NoteD $ALog -n "      has $poll file polling"
+   Note $ALog ""
+endif
+
+SafeEnv HAVE_SELECT_P   FALSE
+SafeEnv HAVE_STREAMS_P  FALSE
+
+# make the decisions
+if ($HAVE_SELECT_P == File) then
+   if ($FOUND_SELECT == FALSE) then
+      NoteD $ALog "   select requested but not found"
+   else
+      set FOUND_POLL = FALSE
+   endif
+endif
+setenv HAVE_SELECT_P $FOUND_SELECT
+
+if ($HAVE_STREAMS_P == File) then
+   if ($FOUND_POLL == FALSE) then
+      NoteD $ALog "   poll requested but not found"
+   else
+      set FOUND_SELECT = FALSE
+   endif
+endif
+setenv HAVE_STREAMS_P $FOUND_POLL
+
+if (($HAVE_SELECT_P == TRUE) && ($HAVE_STREAMS_P == TRUE)) then
+   setenv HAVE_SELECT_P FALSE
+   NoteD $ALog -n " (using poll)"
+else if ($#IOHandling > 1) then
+   if ($HAVE_STREAMS_P == TRUE) then
+      NoteD $ALog -n " (using poll)"
+   else if ($HAVE_SELECT_P == TRUE) then
+      NoteD $ALog -n " (using select)"
+   endif
+endif
+
+NoteD $ALog ""
+
+# export the results
+SetParent HAVE_STREAMS_P
+SetParent HAVE_SELECT_P
+
+exit(0)
+
+

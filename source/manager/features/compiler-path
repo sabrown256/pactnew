@@ -1,0 +1,68 @@
+#
+# COMPILER-PATH - define basic variables to use pathscale compilers
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run features/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
+run features/rpath path
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe      = pathcc
+   Flags   += [ _env_ = Bits ;              # address bit size
+                32    = -m32 ;
+                64    = -m64 -fPIC ]
+   Flags   += [ _cmd_ = -p ;                # profiling
+	        on    = -pg ]
+   Debug    = -g -Wall
+   Optimize = -g -O1
+   Version  = --version
+}
+
+Tool FC {
+   Exe     = pathf90
+   Version = --version
+}
+
+Tool LD {
+   RPath   = -Wl,-rpath,@
+   Flags  += [ _env_ = Bits ;               # address bit size
+               *     = -m* ]
+   Flags  += [ _cmd_ = -p ;                 # profiling
+	       on    = -pg ]
+   Lib     = -lc
+}
+
+Tool Lex {
+   Flags  = -w
+   Flags += [ _env_ = Bits ;                # address bit size
+              *     = -m* ]
+}
+
+Tool OpenMP_Lex {
+   Flags = -mp
+}
+
+Group Cfg {
+   Use      = Std
+   LD_Flags = ${LD_Flags}
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags = -mp
+   LD_Flags = -mp
+   LD_Lib   = -lpthread
+}
+
+include cpp-rule
+

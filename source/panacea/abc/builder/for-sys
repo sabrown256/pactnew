@@ -1,0 +1,37 @@
+#!/bin/csh -f
+#
+# FOR-SYS - apply operation to the code system parts
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set STDOUT   = ""
+
+set Directories = ( global lag misc source main )
+
+while (`expr $1 : "-."` == 2)
+   switch ($1)
+      case -l:
+           shift
+           set STDOUT = $1
+   endsw
+   shift
+end
+
+cd ..
+foreach Dir ($Directories)
+   cd $Dir
+   if ("$STDOUT" != "") then
+      echo "Doing $argv in directory $Dir" | tee -ai $STDOUT
+      eval $argv | tee -a $STDOUT
+   else
+      echo "Doing $argv in directory $Dir"
+      eval $argv
+   endif
+   cd ..
+end
+
+exit($status)

@@ -1,0 +1,264 @@
+#!/bin/csh -f
+#
+# MAKE-MACROS - write the MAKE-MACROS file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-f ../scripts/env-csh) then
+   set SrcDir = $cwd
+else if (-f ../../scripts/env-csh) then
+   set SrcDir = $cwd:h
+endif
+set ldir = $SrcDir:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+
+set LibVers = 1
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+    Separator $Log
+    NoteD $Log "   System Dependent MAKE Macros - make-macros"
+
+    set STDOUT = $IncDir/make-macros
+
+    flog $Log $RM $STDOUT
+    flog $Log touch $STDOUT
+
+    Note $STDOUT '#'
+    Note $STDOUT '# MAKE-MACROS - PACT Makefile macros for '$Sys
+    Note $STDOUT '#'
+    Note $STDOUT ""
+
+    if ($BuildSharedLibs == TRUE) then
+       Note $STDOUT '#'
+       Note $STDOUT '# make shared library'
+       Note $STDOUT '#'
+
+       Note $STDOUT 'TGTSLib  = ${LibDir}/lib${LibName}.so'
+       Note $STDOUT 'TGTShLib = ${TGTSLib}.'$LibVers
+       Note $STDOUT ''
+
+       Note $STDOUT '${TGTShLib} : ${TGTLib}'
+       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+       Note $STDOUT '	  ${RM} ${TGTSLib} $@ ; \'
+       Note $STDOUT '	  ${AR} ${ARXOpt} ${TGTLib} ; \'
+       Note $STDOUT '	  echo "${ShLD} ${LD_Shared} -o $@ *.o -L${LibDir} ${Libs}" ; \'
+       Note $STDOUT '	  ${ShLD} ${LD_Shared} -o $@ *.o -L${LibDir} ${Libs} ; \'
+       Note $STDOUT '	  ln -s ${TGTShLib} ${TGTSLib} ; \'
+       Note $STDOUT '	  ${RM} *.o _____* )'
+       Note $STDOUT ''
+
+       Note $STDOUT 'shared :'
+       Note $STDOUT '	pact install'
+       Note $STDOUT '	@[ "${LibName}" != "noname" ] && { pact ${TGTShLib} ; } || { exit 0 ; }'
+       Note $STDOUT ''
+    else
+       Note $STDOUT 'shared :'
+       Note $STDOUT '	@echo "No shared libaries requested"'
+       Note $STDOUT ''
+    endif
+
+    Note $STDOUT '#'
+    Note $STDOUT '# make new library'
+    Note $STDOUT '#'
+    Note $STDOUT '${TGTLib} : ${LibDep}'
+    Note $STDOUT '	${LibAction}'
+    if ("$BuildStrategy" != "SpaceSaving") then
+       Note $STDOUT '	${AR} ${AROpt} ${TGTLib} ${Objs}'
+    endif
+    if ("$Ranlib_Exe" != "touch") then
+       Note $STDOUT "	$Ranlib_Exe "'${TGTLib}'
+    endif
+    Note $STDOUT ''
+
+    Note $STDOUT 'devlib : ${TGTLib}'
+    Note $STDOUT ''
+
+    if ($NoExe == TRUE) then
+       Note $STDOUT '#'
+       Note $STDOUT '# make place-holder for executable'
+       Note $STDOUT '#'
+       Note $STDOUT '${TGTBin} : ${BinDep}'
+       Note $STDOUT '	echo "${TGTBin}" > ${TGTBin}'
+    else
+       Note $STDOUT '#'
+       Note $STDOUT '# make new executable'
+       Note $STDOUT '#'
+
+       if ($BuildSharedLibs == TRUE) then
+          Note $STDOUT '${TGTBin} : ${BinDep} ${TGTShLib}'
+       else
+          Note $STDOUT '${TGTBin} : ${BinDep}'
+       endif
+       Note $STDOUT '	${BinAction}'
+       Note $STDOUT '	@[ "${TGTBin}" != "nobin" ] && { echo "${Load} ${BinObj} -o ${TGTBin} ${Libs}" ; ${Load} ${BinObj} -o ${TGTBin} ${Libs} ; } || { exit 0 ; }'
+    endif
+    Note $STDOUT ''
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install library'
+    Note $STDOUT '#'
+    if ($BuildSharedLibs == TRUE) then
+       Note $STDOUT 'libinstall : ${TGTLib} ${TGTShLib}'
+    else
+       Note $STDOUT 'libinstall : ${TGTLib}'
+    endif
+    Note $STDOUT '	${INSTALL} ${TGTLib} ${TGTLib}'
+
+    if ("$UPDATE" != "touch") then
+       Note $STDOUT "	$UPDATE "'${LibDir}/${TGTLib}'
+    endif
+    Note $STDOUT ''
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install library archive'
+    Note $STDOUT '#'
+    Note $STDOUT 'arcinstall : ${TGTLib}'
+    Note $STDOUT '	${AR} ${ARXOpt} ${TGTLib}'
+    Note $STDOUT '	${AR} ${AROpt} ${LibDir}/${TGTArc} *.o'
+    Note $STDOUT '	@${RM} *.o'
+
+# NOTE: this usage should reflect the libinstall target usage
+#       some SUN systems insist on it!
+    if ("$Ranlib_Exe" != "touch") then
+       Note $STDOUT "	$Ranlib_Exe "'${LibDir}/${TGTArc}'
+    endif
+    Note $STDOUT ''
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install includes'
+    Note $STDOUT '#'
+    Note $STDOUT 'incinstall : ${TGTInc}'
+    Note $STDOUT '	${IncAction}'
+    Note $STDOUT '	@[ "${TGTInc}" != "noinc" ] && { echo "cp ${TGTInc} ${IncDir}" ; cp ${TGTInc} ${IncDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	cp ${TGTInc} ${IncDir}'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install binaries'
+    Note $STDOUT '#'
+    Note $STDOUT 'bininstall : ${TGTBin}'
+    Note $STDOUT '	@[ "${TGTBin}" != "nobin" ] && { echo "cp ${TGTBin} ${BinDir}" ; cp ${TGTBin} ${BinDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	cp ${TGTBin} ${BinDir}'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install scheme files'
+    Note $STDOUT '#'
+    Note $STDOUT 'scminstall : ${TGTScm}'
+    Note $STDOUT '	@[ "${TGTScm}" != "noscm" ] && { echo "cp ${TGTScm} ${ScmDir}" ; cp ${TGTScm} ${ScmDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	cp ${TGTScm} ${ScmDir}'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install (scheme) extensions files'
+    Note $STDOUT '#'
+    Note $STDOUT 'extinstall :'
+    Note $STDOUT '	@[ "${TGTScmX}" != "noscmx" ] && { echo "cp ${TGTScmX} ${ExtDir}" ; cp ${TGTScmX} ${ExtDir} ; } || { exit 0 ; }'
+    Note $STDOUT '	@[ "${TGTScrX}" != "noscrx" ] && { echo "cp ${TGTScrX} ${BinDir}" ; cp ${TGTScrX} ${BinDir} ; } || { exit 0 ; }'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# install scripts'
+    Note $STDOUT '#'
+    Note $STDOUT 'scrinstall : ${TGTScr}'
+    Note $STDOUT '	@[ "${TGTScr}" != "noscr" ] && { echo "cp ${TGTScr} ${BinDir}" ; cp ${TGTScr} ${BinDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	cp ${TGTScr} ${BinDir}'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# clean up the directory'
+    Note $STDOUT '#'
+    Note $STDOUT 'clean :'
+    Note $STDOUT '	${CleanAction}'
+    Note $STDOUT '	@touch tarfu~ core'
+    Note $STDOUT '	@${RM} *~ core ${CleanFiles} > /dev/null 2>&1'
+
+    Note $STDOUT '#'
+    Note $STDOUT '# remove binaries and libraries'
+    Note $STDOUT '#'
+    Note $STDOUT 'remove :'
+    Note $STDOUT '	@pact -i clean'
+    Note $STDOUT '	${RemoveAction}'
+    Note $STDOUT '	@touch tarfu.o'
+    Note $STDOUT '	@${RM} ${PACTTmpDir}/*.o > /dev/null'
+    Note $STDOUT '	@${RM} *.o *.a *.so *.so.* ${RemoveFiles} > /dev/null'
+    Note $STDOUT '	@${RM} ${TGTLib} ${TGTBin}'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# patch FPE handling'
+    Note $STDOUT '#'
+    Note $STDOUT 'patch-fpe :'
+
+    if ("$FPU" == "x87") then
+       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+       if ($SYS_TYPE =~ cygwin*) then
+          Note $STDOUT '          echo "gcc -g -Wall -m'${Bits}' -c mlfpex86.c -o mlfpex86.o" ; \'
+          Note $STDOUT '          gcc -g -Wall -m'${Bits}' -I${IncDir} -c ${PACTSrcDir}/mlfpex86.c -o mlfpex86.o ; \'
+       else
+          Note $STDOUT '          echo "gcc -g -Wall -fPIC -c mlfpex86.c -o mlfpex86.o" ; \'
+          Note $STDOUT '          gcc -g -Wall -fPIC -I${IncDir} -c ${PACTSrcDir}/mlfpex86.c -o mlfpex86.o ; \'
+       endif
+       Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpex86.o 2> /dev/null ; \'
+       Note $STDOUT '          ${RM} mlfpex86.o 2> /dev/null )'
+    else if ("$FPU" == "ppc") then
+       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+       if ($?Bits == 1) then
+          Note $STDOUT '          echo "gcc -g -Wall -m'${Bits}' -c mlfpeppc.c -o mlfpeppc.o" ; \'
+          Note $STDOUT '          gcc -g -Wall -m'${Bits}' -I${IncDir} -c ${PACTSrcDir}/mlfpeppc.c -o mlfpeppc.o ; \'
+       else
+          Note $STDOUT '          echo "gcc -g -Wall -c mlfpeppc.c -o mlfpeppc.o" ; \'
+          Note $STDOUT '          gcc -g -Wall -I${IncDir} -c ${PACTSrcDir}/mlfpeppc.c -o mlfpeppc.o ; \'
+       endif
+       Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpeppc.o 2> /dev/null ; \'
+       Note $STDOUT '          ${RM} mlfpeppc.o 2> /dev/null )'
+    endif
+
+    if ($HaveGNUFenv == TRUE) then
+       set Opts = ( -g -Wall )
+       if ($BuildSharedLibs == TRUE) then
+          set Opts = ( $Opts -fPIC )
+       endif
+#       if ($?Bits == 1) then
+#          set Opts = ( $Opts -m${Bits} )
+#       endif
+       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+       Note $STDOUT '          gcc '${Opts}' -I${IncDir} -c ${PACTSrcDir}/mlfpegnu.c -o mlfpegnu.o ; \'
+       Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpegnu.o 2> /dev/null ; \'
+       Note $STDOUT '          ${RM} mlfpegnu.o 2> /dev/null )'
+    endif
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# Record the interface changes as defined in the headers'
+    Note $STDOUT '#'
+    Note $STDOUT 'diff-hdr :'
+    Note $STDOUT '	${Manager}/manager/pact-changes ${IncDir} ${Hdrs}'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# dummy rule for noinc pseudo target'
+    Note $STDOUT '#'
+    Note $STDOUT 'noinc :'
+    Note $STDOUT '	@cd .'
+    Note $STDOUT ""
+
+    Note $STDOUT "#"
+    Note $STDOUT "# report files/directories unknown to CVS"
+    Note $STDOUT "#"
+    Note $STDOUT "unmng :"
+    Note $STDOUT "	@cvs -q update | egrep '^\?' | sed 's/?/ /'"
+    Note $STDOUT ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit(0)
+

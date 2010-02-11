@@ -1,0 +1,76 @@
+#!/bin/csh -f
+#
+# DIFF-CODE - compare source files in two directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set DirA  = ""
+set Dirb  = ""
+set NoSpc = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: diff-code [-h] [-s] <dir1> <dir2>"
+           echo "   h   - this help message"
+           echo "   s   - ignore white space"
+           echo ""
+           exit(1)
+      case -s:
+           set NoSpc = "-b -w -E -B"
+           breaksw
+      default:
+           if (-d $1) then
+              if ("$DirA" == "") then
+                 pushd $1 >& /dev/null
+                 set DirA = $cwd
+                 popd >& /dev/null
+              else
+                 pushd $1 >& /dev/null
+                 set DirB = $cwd
+                 popd >& /dev/null
+              endif
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if (("$DirA" == "") || ("$DirB" == "")) then
+   echo "Require two directories for comparison - exiting"
+   exit(1)
+endif
+
+cd $DirA >& /dev/null
+touch __foo__.diff
+rm -f *.diff
+
+foreach i (*)
+   if ((-d $i) || ("$i" =~ *~) || ("$i" =~ *.o) || ("$i" =~ *.a)) then
+      continue
+   endif
+   set Kind = `file $i`
+   if ((-x $i) && ("$Kind" !~ *script*)) then
+      continue
+   endif
+
+   if (`expr "$i" : '.*~'` == 0) then
+      (diff $NoSpc $i $DirB/$i > $i.diff) >& /dev/null
+   endif
+end
+
+find . -size 0c -name "*.diff" -exec rm {} \;
+
+ls *.diff >& /dev/null
+if ($status == 0) then
+   ls -l *.diff
+   set Err = 1
+else
+   echo "All files compared"
+   set Err = 0
+endif
+
+exit($status)

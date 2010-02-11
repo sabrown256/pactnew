@@ -1,0 +1,397 @@
+#!/bin/csh -f
+#
+# CC - analyze the platform C Compiler
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: cc"
+
+NoteD $ALog -n "   C Compiler: "
+Note $ALog ""
+
+if ($CROSS_COMPILE == TRUE) then
+   Note $ALog "Cross compiling C compiler analysis"
+else
+   Note $ALog "Direct compiling C compiler analysis"
+endif
+
+SafeEnv UseLDLibPath ""
+
+# NOTE: we cannot have nothing for CC_Exec
+# if nothing is specified try cc
+SafeEnv CC_Exe       "cc"
+
+SafeEnv CC_Linker    ""
+SafeEnv CC_Flags     ""
+SafeEnv CC_Debug     "-g"
+SafeEnv CC_Optimize  "-O"
+SafeEnv CC_Shared    ""
+SafeEnv CC_Inc       ""
+SafeEnv CC_MDGInc    ""
+SafeEnv CC_DPInc     ""
+
+set UTime = `timer -r`
+
+setenv AnsiCC     ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# remember the requested compiler or at least cc
+flog $ALog setenv Save_CC $CC_Exe
+
+set cclst = ""
+if ($?CC_Exe == 1) then
+   set cclst = ( $cclst $CC_Exe )
+endif
+if ($?Cfg_CC_Exe == 1) then
+   set cclst = ( $cclst $Cfg_CC_Exe )
+endif
+
+Note $ALog ""
+Note $ALog "Candidate C compilers: $cclst"
+Note $ALog ""
+
+# find the available ANSI C compilers
+set AnsiCC = ( `../analyze/cc-find $UseLDLibPath $cclst` )
+
+Note $ALog ""
+Note $ALog "ANSI C compilers: $AnsiCC"
+Note $ALog ""
+
+if ("$AnsiCC" != "") then
+   if ($#AnsiCC > 1) then
+      NoteD $ALog "$AnsiCC[1] (others $AnsiCC[2-])"
+   else
+      NoteD $ALog "$AnsiCC"
+   endif
+else
+   NoteD $ALog " none"
+   NoteD $ALog "      No ANSI C compiler found, PACT cannot be built without one"
+   setenv STOP ""
+   SetParent STOP
+   exit(0)
+endif
+
+# make sure we have a Cfg compiler defined
+if ($?Cfg_CC_Exe == 0) then
+   flog $ALog setenv Cfg_CC_Exe "$CC_Exe"
+endif
+
+# check requested compilers against the list of ANSI compilers
+foreach cc ( $CC_Exe $Cfg_CC_Exe)
+   set ok = FALSE
+   foreach i ($AnsiCC)
+      if ($cc == $i) then
+         set ok = TRUE
+      endif
+   end
+   if ($ok == FALSE) then
+      NoteD $ALog " "
+      NoteD $ALog "      Requested compiler $cc is not ANSI by default"
+      NoteD $ALog " "
+   endif
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($CC_Linker != "") then
+   flog $ALog setenv CC_Exe "$CC_Linker"
+endif
+
+# make sure we have flags for configuration compiler
+if ($?Cfg_CC_Flags == 0) then
+   Note $ALog "Initialize Cfg_CC_Flags to be $Cfg_CC_Flags"
+   flog $ALog setenv Cfg_CC_Flags "$CC_Flags"
+   Note $ALog ""
+endif
+
+# remember the requested flags and setup for configuration purposes
+SafeEnv Cfg_CC_Inc ""
+flog $ALog setenv Save_CFLAGS "$CC_Flags"
+Note $ALog ""
+
+if ("$Cfg_CC_Inc" != "") then
+   Note $ALog "Add config include flags to CC_Flags: $Cfg_CC_Inc"
+   set inf = ($CC_Flags $Cfg_CC_Inc)
+   flog $ALog setenv CC_Flags "$inf"
+   Note $ALog ""
+endif
+
+SafeEnv Cfg_CC_Flags "$CC_Flags"
+
+# temporarily add debug flags to compiler flags for config
+if ($?Cfg_CC_Debug == 1) then
+   Note $ALog "Add config debug flags to CC_Flags: $CC_Debug"
+   set inf = ($CC_Flags $CC_Debug)
+   flog $ALog setenv CC_Flags "$inf"
+   set inf = ($Cfg_CC_Flags $Cfg_CC_Debug)
+   flog $ALog setenv Cfg_CC_Flags "$inf"
+   Note $ALog ""
+endif
+
+# temporarily add link flags to compiler flags for config
+if ($?Cfg_LD_Flags == 1) then
+   Note $ALog "Add config link flags to CC_Flags: $Cfg_LD_Flags"
+   set inf = ($CC_Flags $Cfg_LD_Flags)
+   flog $ALog setenv CC_Flags "$inf"
+   set inf = ($Cfg_CC_Flags $Cfg_LD_Flags)
+   flog $ALog setenv Cfg_CC_Flags "$inf"
+   Note $ALog ""
+endif
+
+# temporarily add rpath to compiler flags for config
+if ($?Cfg_LD_RPath == 1) then
+   Note $ALog "Add config rpath flags to CC_Flags: $Cfg_LD_RPath"
+   set inf = ($CC_Flags $Cfg_LD_RPath)
+   flog $ALog setenv CC_Flags "$inf"
+   set inf = ($Cfg_CC_Flags $Cfg_LD_RPath)
+   flog $ALog setenv Cfg_CC_Flags "$inf"
+   Note $ALog ""
+endif
+
+# temporarily add link libraries to compiler flags for config
+if ($?Cfg_LD_Lib == 1) then
+   Note $ALog "Add config link libs to CC_Flags: $Cfg_LD_Lib"
+   set inf = ($CC_Flags $Cfg_LD_Lib)
+   flog $ALog setenv CC_Flags "$inf"
+   Note $ALog ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($CROSS_COMPILE == TRUE) then
+   flog $ALog setenv Cfe_CC_Exe    $CC_Exe
+   flog $ALog setenv Cfe_CC_Flags  "$CC_Flags"
+   flog $ALog setenv Cfe_CC_Inc    "$CC_Inc"
+   flog $ALog setenv Cfe_LD_Flags  "$LD_Flags"
+   flog $ALog setenv Cfe_LD_Lib    "$LD_Lib"
+   flog $ALog setenv Cfe_LD_RPath  "$LD_RPath"
+else
+   flog $ALog setenv Cfe_CC_Exe    $Cfg_CC_Exe
+   flog $ALog setenv Cfe_CC_Flags  "$Cfg_CC_Flags"
+   flog $ALog setenv Cfe_CC_Inc    "$Cfg_CC_Inc"
+   flog $ALog setenv Cfe_LD_Flags  "$Cfg_LD_Flags"
+   flog $ALog setenv Cfe_LD_Lib    "$Cfg_LD_Lib"
+   flog $ALog setenv Cfe_LD_RPath  "$Cfg_LD_RPath"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# now lets look at this compiler
+if ($Cfg_CC_Exe != "") then
+
+# check the compiler version
+   Note $ALog ""
+   Note $ALog "Check the version of the C compiler"
+   Note $ALog "   PATH = $PATH"
+   if ($HostOS == SunOS) then
+      flog $ALog $Cfg_CC_Exe $CC_Version
+      flog $ALog set CmpVers = any
+      set xstatus = $status
+   else if ($?COMPILER_GNU_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_GNU_VERSION )
+      flog $ALog set CmpVers = $COMPILER_GNU_VERSION
+      set xstatus = $status
+   else if ($?COMPILER_PGI_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_PGI_VERSION )
+      flog $ALog set CmpVers = $COMPILER_PGI_VERSION
+      set xstatus = $status
+   else if ($?COMPILER_IC_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_IC_VERSION )
+      flog $ALog set CmpVers = $COMPILER_IC_VERSION
+      set xstatus = $status
+   else if ($?COMPILER_PATH_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_PATH_VERSION )
+      flog $ALog set CmpVers = $COMPILER_PATH_VERSION
+      set xstatus = $status
+   else
+      set inf  = ( `$Cfg_CC_Exe $CC_Version |& grep version` )
+      set gccv = ( `echo $inf | sed 's/gcc version//'` )
+      Note $ALog "Compiler version = $inf"
+      Note $ALog "GCC version      = $gccv"
+      if ("$gccv" =~ 3.*) then
+         set lcfg = ( `echo "$Cfg_CC_Flags" | sed "s| -fsignaling-nans||"` )
+         flog $ALog setenv Cfg_CC_Flags "$lcfg"
+
+         set lcfg = ( `echo "$CC_Flags" | sed "s| -fsignaling-nans||"` )
+         flog $ALog setenv CC_Flags "$lcfg"
+
+         set lcfg = ( `echo "$Save_CFLAGS" | sed "s| -fsignaling-nans||"` )
+         flog $ALog setenv Save_CFLAGS "$lcfg"
+      endif
+      flog $ALog $Cfg_CC_Exe $CC_Version
+      flog $ALog set CmpVers = any
+      set xstatus = $status
+   endif
+
+   if ($xstatus == 0) then
+      NoteD $ALog "      requested version $CmpVers"
+   else if (("$CmpVers" != any) && ($STRICT > 0)) then
+      NoteD $ALog "      requested version $CmpVers (not found)"
+      setenv STOP ""
+      SetParent STOP
+      exit(0)
+   else
+      NoteD $ALog "      requested version $CmpVers (not found)"
+   endif
+   Note $ALog ""
+
+# check the relative size of Fortran integer and pointer
+   Note $ALog "Determine whether a FORTRAN integer can hold a pointer"
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{if (sizeof(int) != sizeof(char *))
+    printf("F77_INT_SIZE_PTR_DIFFER");
+ return(0);}
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+   if ($status == 0) then
+      set F77IntPtrDiffer = `$CFE ./$Tmp $BE`
+   else
+      NoteD $ALog " "
+      NoteD $ALog " "
+      NoteD $ALog "One or more flags from:"
+      NoteD $ALog "   $Cfe_CC_Flags"
+      NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
+      setenv STOP ""
+      SetParent STOP
+      exit(0)
+   endif
+   Note $ALog ""
+
+# look at size of long
+   Note $ALog "Determine whether long is 64 bits"
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{if (sizeof(long) == 8)
+    printf("LONG64");
+ return(0);}
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+   if ($status == 0) then
+      set LONG64 = `$CFE ./$Tmp $BE`
+   else
+      NoteD $ALog " "
+      NoteD $ALog " "
+      NoteD $ALog "One or more flags from:"
+      NoteD $ALog "   $Cfe_CC_Flags"
+      NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
+      setenv STOP ""
+      SetParent STOP
+      exit(0)
+   endif
+   Note $ALog ""
+
+   flog $ALog rm -f $Tmp.c $Tmp $Tmp.o
+
+# look at size of size_t
+   Note $ALog "Determine whether size_t is 64 bits"
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{if (sizeof(size_t) != 8)
+    printf("TRUE");
+ return(0);}
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+   if ($status == 0) then
+      set NEED_ALT_LARGE_FILE = `$CFE ./$Tmp $BE`
+   else
+      NoteD $ALog " "
+      NoteD $ALog " "
+      NoteD $ALog "One or more flags from:"
+      NoteD $ALog "   $Cfe_CC_Flags"
+      NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
+      setenv STOP ""
+      SetParent STOP
+      exit(0)
+   endif
+   Note $ALog ""
+
+   flog $ALog rm -f $Tmp.c $Tmp $Tmp.o
+
+   if ("$F77IntPtrDiffer" != "") then
+      NoteD $ALog "      pointer size differs from Fortran INTEGER size"
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   setenv CList "$AnsiCC"
+
+   Note $ALog ""
+   Note $ALog "Results of C compiler analysis ($ETime)"
+   Note $ALog "   AnsiCC          = |$AnsiCC|"
+   Note $ALog "   CC_Exe          = |$CC_Exe|"
+   Note $ALog "   Cfg_CC_Exe      = |$Cfg_CC_Exe|"
+   Note $ALog "   F77IntPtrDiffer = |$F77IntPtrDiffer|"
+   Note $ALog "   LONG64          = |$LONG64|"
+   Note $ALog ""
+
+endif
+
+if ("$CC_Linker" == "") then
+   setenv CC_Linker "$CC_Exe"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# export the results
+SetParent CList
+SetParent CC_Exe
+SetParent CC_Flags
+SetParent CC_Debug
+SetParent CC_Optimize
+SetParent CC_Shared
+SetParent CC_Inc
+SetParent CC_MDGInc
+SetParent CC_DPInc
+SetParent CC_Linker
+
+SetParent Cfg_CC_Exe
+SetParent Cfg_CC_Flags
+SetParent Cfg_CC_Inc
+
+SetParent Cfe_CC_Exe
+SetParent Cfe_CC_Flags
+SetParent Cfe_CC_Inc
+SetParent Cfe_LD_Flags
+SetParent Cfe_LD_Lib
+SetParent Cfe_LD_RPath
+
+SetParent Save_CC
+SetParent Save_CFLAGS
+SetParent LONG64
+SetParent F77IntPtrDiffer
+SetParent NEED_ALT_LARGE_FILE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+source $AnaDir/line
+source $AnaDir/pragma
+source $AnaDir/valist
+source $AnaDir/inline
+source $AnaDir/headers
+source $AnaDir/glibc
+source $AnaDir/size
+
+exit(0)
+

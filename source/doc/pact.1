@@ -1,0 +1,959 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH PACT 1 "7 June 2005"
+.SH NAME
+pact \- a make-type utility featuring persistence and distributed parallel
+operation.  Also reports how it was configured.
+
+.SH SYNOPSIS
+.B pact [-async <n>] [-B] [-cmd <file> <cmd>] [-d] [-dbg] [-dmp] [-f <file>]
+.B      [-flt <file>] [-h] [-i] [-log <file>] [-n] [-na <n>] [+na <n>] 
+.B      [-rcr] [-s] [-sys <dir>] [-v]
+.B      <make-args> <target>
+
+.B pact [-incpath] [-info <pttrn> | <var>] [+info <var>] [-link] [+l]
+
+The pact utility fills two roles.  It provides a persistent make facility and
+it provides information about the configuration of the PACT distribution
+which compiled it.  The latter is very useful for applications that use PACT.
+They have an easy way of querying how PACT is configured so that they can
+configure themselves appropriately.  Most useful is determining which non-PACT
+libraries must also be used to link and the paths to them.
+
+.SH MAKE-MODE OPTIONS
+
+.TP
+.B \-async
+Issue commands asynchronously to <n> nodes.
+.TP
+.B \-B
+Build Makefile from pre-Make.
+.TP
+.B \-cmd
+Run command <cmd> in directories specified in <file>.
+This must come last in the argument list.
+.TP
+.B \-d
+Show all rules and variables.
+.TP
+.B \-dbg
+Attach a debugger when a trapped signal is received.
+.TP
+.B \-dmp
+Dump the internal logs at the end of the session.
+.TP
+.B \-f
+Use <file> for all targets, rules, and variables.
+.TP
+.B \-flt
+Use <file> for specifications to filter out unwanted output.
+.TP
+.B \-h
+A summary of pact options.
+.TP
+.B \-i
+Continue on after errors.
+.TP
+.B \-log
+Write output to <file> in addition to stdout.
+.TP
+.B \-n
+Only print commands, do not execute them.
+.TP
+.B \-na
+Attempt each command at most <n> times before failing.
+.TP
+.B \+na
+Like -na but applies to all child pact sessions too.
+.TP
+.B \-rcr
+Expand simple recursive invocations in place.
+.TP
+.B \-s
+Do not print commands before executing them.
+.TP
+.B \-sys
+Directory in which to put/find Makefile.
+.TP
+.B \-v
+Report the PACT version.
+.TP
+.B \-vrb
+Print all commands before executing them (overrides '@').
+
+.SH INFO-MODE OPTIONS
+
+.TP
+.B \-incpath
+Report elements needed to compile files.
+.TP
+.B \-info
+Report configuration elements matching the argument.
+.TP
+.B \+info
+Complete report of configuration variable matching the argument.
+.TP
+.B \-link
+Report elements needed to link applications.
+.TP
+.B \+l
+Report only exact matches of the argument.
+
+.SH DESCRIPTION
+
+The PACT project has a system for building code projects in an extremely
+high performance fashion.  Extremely high
+performance means that from a single set of sources on each
+specified network, the code is simultaneously built
+for each system type (each build being done in parallel).
+
+This system, called do-net, is a set of C Shell scripts which ultimately
+used the version of make provided on each computer system.  It exploits
+features of the build system for the code project which is also composed
+of shell scripts (or Perl, or Python, ...).  This system works very well
+when the networks are relatively unloaded.  As the network/system load
+increases we see the effects of lost data packets in the network to the
+degree that the failure rate of builds goes to an unacceptable level,
+rendering the system less useful than it was designed to be.
+
+The main motivation for the pact utility then is to make the system
+highly fault tolerant.  It addresses the following issues:
+
+  1) Lack of persistence in make.
+     For one reason or another a command under the control of make
+     will fail.  Two important examples are: inability to get a
+     compiler license; and temporary inability to access a header
+     file.  What a human being does in this case is to retry the
+     command.  Very often it works.  We are unaware of any make
+     that has this kind of persistence.
+
+     It is often insufficient to simply reissue the make command
+     because a partial, corrupt result (e.g., an object file) may
+     be left which fools the make dependency analysis into deciding
+     that there is no work to be done.  Instead, we need make to
+     retry each command until it either succeeds or the number of
+     retry attempts exceeds a user specified value.
+
+  2) Buggy make utilities.
+     Make utilities have various bugs on different systems.  
+     In the case of portable make utilities such as the GNU
+     make utility, gmake, they can be corrupted by latent bugs in
+     the operating system.  For example, on OSF where child
+     processes do not always deliver a SIGCHLD to their parents
+     when they exit, gmake sometimes fails and very ungracefully
+     at that.
+
+  3) Long process chains of scripts are more failure prone.
+     With scripts that invoke other scripts our builds develop
+     long chains of processes.  Under high load where dropped
+     packets occur, longer chains imply higher probability of
+     failure.
+
+  4) Difficulty managing hosts.
+     With distributed parallel builds we have to communicate
+     with other hosts on the networks we use.  We use SSH for
+     this purpose.  The difficulty is that there is a large
+     gap between what we need in order to do a distributed
+     build and what we can get from the standard system utilities.
+     We need to know which hosts are up and which are down.
+     We need to know which are heavily loaded and which are only
+     lightly loaded.  We need this information quicky and reliably.
+     Delays of seconds at a time to get this information and
+     use it cannot be tolerated.
+
+     Worse than the latency problem is that a host may not
+     respond to a query and also not time out.  With scripts it
+     is harder to manage this problem.  With a compiled program,
+     the control of timeouts can reside in our own code.
+
+     Technically this is a side issue but it is a significant
+     burden which must be overcome, and the solution we have
+     developed was designed to address this problem along with
+     the rest.
+
+  5) Facility to filter out junk messages.
+     Since we are doing many compilations on many hosts it
+     is very important to avoid visual clutter that hides
+     problems.  Chatty compilers are a nuisance.  The pact
+     utility provides means to filter out user specified
+     unwanted messages.
+
+The solution to our problem is to jump in and turn our pact utility
+into a full blown independent make.  By designing a feature set
+to address the problems outlined above we hope to reduce the
+set of problems, increase the fault tolerance, and have a utility
+that we can modify and debug to handle the most minute issues.
+
+NOTE: because there is a bootstrapping issue inherent in having
+a PACT utility that needs PACT to be built in order to build itself,
+we have two utilies: smake and dmake.  Smake is a simple wrapper
+around the system make (hence the name smake).  We use smake just
+long enough to build our full blown utility called dmake and let
+it do the rest. Then pact is a link to dmake.  This scheme provides
+maximum flexibility in the specification of our pre-Make files and
+gives us options when porting to new platforms (i.e. use smake until
+dmake is operational).  In the remainder of this document pact and
+dmake may be used interchangeably.
+
+
+.SH FEATURES
+
+The features built into dmake include:
+
+  1) Persistence
+     Attempts commands a specified number of times (3 by default).
+
+  2) Parallel
+     Using a facility (documented elsewhere) referred to as
+     the host-server, the set of commands obtained from the
+     dependency analysis are executed asynchronously on a
+     set of nodes matching a specific system type.  This can be
+     done efficiently at either fine or coarse granularity.  That
+     is to say, you can dispatch individual compilations or whole
+     subsystems with very low latency.
+
+     A BARRIER specification is added so that groups of commands
+     can be forced to finish before others are dispatched.
+
+  3) Client/Server Model
+
+     When dmake is run with the -async option it computes the number
+     of servers it will need to execute the given commands.  It will
+     then launch each server on a different host (supplied by the
+     host-server).  Each server will be sent requests to run commands,
+     it will run them, finally it will return the output and the exit
+     status of each job to the dmake client session.  The servers
+     persist until the client terminates them at the end of the
+     session.
+
+     The client and servers monitor commands that are run.  In an
+     effort to avoid commands that hang or are lost by the system
+     causing an entire session to fail, time limits are placed on
+     them.  If a command does not complete within the alloted time
+     it is killed and retried.  There are several controls that
+     determine the time limits for a command, but an important
+     factor in determining how long to wait is how long other
+     commands executed by the same server take.  So the client
+     records how long each command takes to run and calculates
+     an average for each server.
+
+     For diagnostic, debugging, and system monitoring reasons the
+     client keeps a log of all traffic with each server and each
+     server keeps a log of all traffic with each job as well as
+     the client.  The client also keeps a record (dubbed stats) of
+     the load average, free memory, average job time to completion,
+     NFS traffic, and job assignments for each server.
+
+     A server process is invoked as 'dmake -srv'.  Note the -srv
+     option is otherwise undocumented and should never be used.
+
+  4) Host Management
+     We have made the attempt to abstract out the use of hosts.
+     A combination of hardware and OS is referred to as a system
+     type. A configuration includes the specification of the system
+     type and the compilers.  When building a configuration any
+     host of the correct system type that mounts the file system
+     where the sources are is as good as any other for doing the
+     work.  Using a sub-system called the host server which
+     maintains a list of hosts associated with a system type, we
+     can build for a system type rather than building on a
+     specific host.
+
+     With this abstraction we can use the host server to supply
+     hosts that are up and running to execute commands rather
+     than making requests to specific hosts which might be down.
+     This model gives dmake a great deal of robustness while
+     executing commands asynchronously.
+
+  5) Library
+     The functionality of dmake is bound in a set of SCORE 
+     library calls. Figuratively they are:
+
+         state = SC_make_state()
+         SC_make_def_var(s, state)
+         SC_make_def_rule(s, state)
+         SC_parse_makefile(fname, state)
+         SC_parse_premake(fname, state)
+         SC_analyze_dependencies(target, state)
+         cmnds = SC_action_commands(state)
+         SC_free_state(state)
+         
+         SC_exec_commands(..., cmnds, ...)
+         SC_exec_async(..., cmnds, ...)
+
+     This approach allows you to build make-like capabilities into
+     your own application or to build a tailored make type utility.
+
+  6) Recursion
+     Simple recursions may be expanded in situ in order to reduce the
+     number of processes used.  This is controlled by the -rcr option.
+
+     For example, the following rule:
+
+         install:
+              pact link
+              pact incinstall
+
+     would normally cause two commands to be issued: 'pact link' and
+     'pact incinstall'.  With recursion the original session simply
+     does the dependency analysis for each of the targets 'link' and
+     'incinstall' and inserts any resulting commands into the command
+     set in place of the pact invocation commands.
+
+  7) No Default Rules
+     Because dmake is used in situations with multiple configurations
+     which can mean multiple compilers, the decision was made to
+     require all rules to be explicitly stated in the pre-Make or
+     Makefile.  This reduces confusion since incomplete specifications
+     of rules will not be propped up by built in, default rules.
+
+  8) Just Two Default Variables
+     Many make utilties define several default variables.  In dmake
+     only two exist: SHELL and BARRIER.  The SHELL variable is closely
+     tied to the SHELL environment variable in the canonical make way
+     (or at least the usage is the same as that of gmake).
+
+     The BARRIER variable is used in connection with asynchronous
+     execution of commands (the -async option).  When the commands
+     derived from the dependency analysis are executed asynchronously
+     the ordering in time is by definition lost.  Sometimes however
+     you may wish to ensure that one or more commands actually
+     finishes before another bunch of commands is started. BARRIER
+     is used to accomplish this.  Here is an example of the usage of
+     BARRIER.  Suppose you have a makefile, mkfoo containing:
+
+        build:
+             @(cd scripts ; pact incinstall)
+             @(cd pgs     ; pact incinstall)
+             @(cd sx      ; pact incinstall)
+             @(cd panacea ; pact incinstall)
+             @(cd scheme  ; pact incinstall)
+             @(cd score   ; pact incinstall)
+             @(cd pdb     ; pact incinstall)
+             @(cd pml     ; pact incinstall)
+             @(cd ppc     ; pact incinstall)
+             @(cd ultra   ; pact incinstall)
+             ${BARRIER}
+             @(cd scripts ; pact devlib)
+             @(cd pgs     ; pact devlib)
+             @(cd sx      ; pact devlib)
+             @(cd panacea ; pact devlib)
+             @(cd scheme  ; pact devlib)
+             @(cd score   ; pact devlib)
+             @(cd pdb     ; pact devlib)
+             @(cd pml     ; pact devlib)
+             @(cd ppc     ; pact devlib)
+             @(cd ultra   ; pact devlib)
+
+      Then doing the command:
+
+         dmake -async 4 -f mkfoo build
+
+      will result in all of the 'pact incinstall's being done
+      before any of the 'pact devlib's are started.
+  
+
+  9) Input
+
+     Input files for dmake are handled like most make utilities.
+     It has the familiar -f option.  If no file is specified via
+     the -f option dmake will look first for a file called pre-Make.
+     Failing that it will look for a file called Makefile.
+
+     The pre-Make file contains specific information about sources
+     in a particular directory.  The remaining specifications come
+     from files automatically generated when PACT is configured.
+
+ 10) Redirection
+
+     Commands in rules may have I/O redirection specifications
+     which will be processed by dmake itself rather than being
+     passed on to the shell.  Dmake uses the following grammar
+     for redirection:
+
+        <redirection> := [<left>]<out>[<right>]
+        <left>        := <fd> | '&'
+        <right>       := <filename> | <fd>
+        <oper>        := <out>['&'] | <in>
+        <out>         := '>' | '>!' | '>>'
+        <in>          := '<'
+        <fd>          := [digit]+
+
+     The <fd> is an open file descriptor and defaults to 1, i.e
+     stdout, if not explicitly supplied.
+
+     The output type operators have the following distinctions:
+
+         >  dst     create dst, error if it exists
+         >! dst     create dst, truncate if it exists
+         >> dst     append to dst, create if it does not exist
+
+     NOTE: dmake behaves as if noclobber is set.  This means
+     simple redirection to files that exist will fail!
+     
+     This grammar is a super set of the Bourne and CSH shell
+     families. Here are the variations actually tested in the
+     dmake test suite:
+
+     Bourne Shell type superset:
+
+         ls file1 file2 >   out
+         ls file1 file2 1>  out
+         ls file1 file2 >>  out
+         ls file1 file2 1>> out
+         ls file1 file2 2>  err
+         ls file1 file2 2>> err
+         ls file1 file2 1>  out 2>  err
+         ls file1 file2 1>> out 2>> err
+         ls file1 file2 >&  outb
+         ls file1 file2 &>  outb
+         ls file1 file2 >   outb 2>&1
+         ls file1 file2 >>& outb
+         ls file1 file2 &>> outb
+         ls file1 file2 >>  outb 2>>&1
+
+     CSH type superset:
+         ls file1 file2 >   out
+         ls file1 file2 >!  out
+         ls file1 file2 >>  out
+         ls file1 file2 >&  outb
+         ls file1 file2 >&! outb
+         ls file1 file2 >>& outb
+
+
+ 11) What Dmake Does NOT Support
+
+     Dmake does not support conditionals.
+
+
+ 12) Environment Variables
+     In addition to the command line arguments there are environment
+     variables which can be used to control how dmake works in
+     asynchronous mode.
+
+        SC_EXEC_CPU_FACTOR
+           Controls how many jobs can be issued to a node.  It is
+           based on the number of CPUs on the node.  A value of 1
+           means as many tasks can be issued as CPUs, 2 means 1/2
+           as many tasks as CPUs, and so on.  If a negative value
+           is supplied it works as a multiplier.  A value of -2
+           means twice as many tasks as CPUs can be issued, a
+           value of -4 means four times as many, and so on.  The
+           default is 4.
+
+        SC_EXEC_CPU_RECRUIT
+           Controls how quickly CPUs are recruited in distributed
+           parallel operations.  A value of 1 means linearly
+           increase the number of CPUs used on a node.  A value
+           of 2 means exponentially increase (by a factor of 2
+           each time).  Any other value means recruit them all
+           at once.  The default is -1.
+
+        SC_EXEC_N_ATTEMPTS
+           The initial or default number of attempts to be made
+           at running a command before failing.  This can be
+           overridden on the command line by the -na flag.
+           The default is 3.
+
+        SC_EXEC_OPEN_RETRY
+           Because of system load or NFS problems files for
+           redirection may fail to open.  Under special
+           circumstances the open will be retried after the number
+           of milliseconds specified by this variable.  The default
+           time is 100 milliseconds.
+
+        SC_EXEC_SERVER_WAIT
+           An absolute number of wall clock seconds that a server
+           will wait for a command to run on behalf of the client
+           before exiting.  Default is 300.
+
+        SC_EXEC_TIME_FACTOR
+           A limit on how long a command can run before being
+           killed and retried is formed by multiplying the average
+           time it takes any command that has been done already by
+           this factor.  The default is 80.
+
+        SC_EXEC_TIME_LIMIT
+           An absolute number of wall clock seconds that a command
+           can take before being killed and retried. Default is
+           about a year.
+
+        SC_EXEC_TIME_LOST
+           The client will assume that contact has been lost with
+           a server after this many seconds and initiate a restart
+           of the connection (possibly to a new host).  The default
+           is 100 seconds.
+
+        SC_EXEC_TIME_THRESHOLD
+           A upper limit on how long a command can run before it
+           becomes subject to being killed and retried.  The
+           default is 10 seconds.
+
+        SC_EXEC_TIME_VERIFY
+           A limit on how many milliseconds to wait when attempting
+           to verify that a remote host is available.  The default
+           is 10000.
+
+ 13) Output Filtering
+     With dmake one can have unwanted output removed via user supplied
+     files specifying messages to be filtered out.  In the following
+     example:
+
+       0    Clock skew detected
+       0    has modification time in the future
+       1    Info:
+
+     The number in the beginning of the line indicates which field in
+     a line of output to use for the purpose of finding a match. A 0
+     means to use the entire line.  If a line of output matches one of
+     the specifications, it is not printed to stdout.
+
+ 14) Command Mapping
+     The -cmd option of dmake allows you to conveniently have the
+     command specified be executed in each directory listed in the
+     file argument of the -cmd option.  For example,
+
+        dmake -cmd dirlist pact incinstall
+
+     would run the command 'pact incinstall' in each directory
+     mentioned in the file dirlist.
+
+ 15) Diagnostics
+     There are two command line options: -d and -vrb.
+     The -d option causes all the rules and variables to be printed
+     out. The -vrb option reports dependency matches and the rules
+     which are invoked.
+
+     A dmake server process responds to the following signals:
+        SIGINT    - silently ends
+        SIGUSR1   - sends its logs to the client and continues
+        SIGTERM   - sends its logs to the client and ends
+        trappable - treats as error and tries to restart upto
+                    specified number of attempts
+
+     A dmake client process responds to the following signals:
+        SIGINT    - silently ends
+        SIGUSR1   - shows the logs for all servers and continues
+        SIGUSR2   - shows the stats for all servers and continues
+        trappable - ends
+
+     In addition, by typing <Esc>C and a return at a running dmake
+     session, it will go into an interactive query mode.  You can
+     type 'help' at the prompt to get a summary of the options
+     available.
+
+.SH MAKE MODE EXAMPLES
+
+    pact -f <file> -async 9 build
+    pact -rcr install
+    pact -cmd <file> pact -i clean
+
+
+.SH INFO MODE DESCRIPTION
+
+The -info, +info, and +l options are supplied so that dmake
+can be used to obtain PACT configuration information.  The
+kind of information ranges from which compilers, to compiler
+options, graphics packages, include and load paths, and
+#defines.  This allows one to get such information without
+having to know where it is located in the PACT sources or
+directories.
+
+A partial list of configuration parameters and their meaning
+is:
+
+ArcInstOpt
+   The options needed by ar to run correctly and quietly in
+   the process of building PACT. These can depend on other
+   configuration parameters. Default is "rsc".
+
+BuildStrategy
+   UNIX systems with a sufficiently smart make can save
+   lots of disk space by building the objects directly into
+   library archives. Use "SpaceSaving" if your make is good
+   enough and "none" otherwise.  PACT-ANALYZE will detect
+   this for you. Default is "SpaceSaving".
+
+CCompiler
+   The name of the C compiler to be used.  Default is "cc".
+
+CCmpLdr
+   The name of the C compiler/loader driver to be used.  On
+   some systems, especially parallel ones, you need to load
+   with a particular set of libraries and object files which
+   the loader driver knows about but you don't.  Default is
+   the value of CCompiler.
+
+CDebug
+   C compiler flags to specify debuggable packages.  Default
+   is "-g".
+
+CFLAGS
+   C compiler flags to be used for all PACT packages.  This
+   is for those options which do not control debugging or
+   optimization. Use CDebug or COptimize for those purposes
+   Default is "".
+
+COptimize
+   C compiler flags to specify optimized packages.  Default
+   is "-O".
+
+CShared
+   The arguments to the C Compiler used when building shared
+   libraries.  This makes the "shared" target meaningful.
+   Default is "".
+
+CSpokes
+   A list of C coded binary file translation spokes to be
+   built with SX.  An NACF spoke is included with the
+   distribution. Default is "nacf".
+
+ExtensionBinaries
+   Any local extensions that need to be installed with PACT.
+   Default is "".
+
+FCompiler
+   The name of the FORTRAN compiler to be used.  Default
+   is "f77".
+
+FDebug
+   F77 compiler flags to specify debuggable packages.
+   Default is "-g".
+
+FFLAGS
+   F77 compiler flags to be used for all PACT packages.
+   This is for those options which do not control debugging
+   or optimization. Use FDebug or FOptimize for those
+   purposes. Default is "".
+
+FOptimize
+   F77 compiler flags to specify optimized packages.
+   Default is "-O".
+
+FrontEnd
+   On some systems (particularly parallel machines) the
+   target codes must be run in a special way. This is used
+   to execute the target appropriately.  Default is "".
+
+GraphicsDevices
+   Host graphics systems/devices available. Current
+   possibilities are PS, CGM (PostScript and Computer
+   Graphics Metafile), PNG, JPEG, and X (mostly) are
+   generic to all systems.  When PACT is configured it
+   looks for available graphics systems.
+
+GraphicsFlag
+   Any special graphics flag (not usually needed with
+   X11).  Default is "".
+
+Group
+   It is possible to define groups of variables (CCompiler,
+   CFLAGS, CDebug, COptimize, CCmpLdr, FCompiler, FFLAGS,
+   FDebug, FOptimize, LXFLAGS, LDFLAGS, MDInc, and
+   MDLib) so that individual packages or files can be
+   compiled specially.  For example, there are two groups
+   defined by default, the standard group and a Cfg group.
+   The Cfg group is use for configuration purposes in
+   PACT-ANALYZE.  On a parallel system, for example, these
+   two might be different.  If you do not define any groups,
+   all the variables are taken to be in the standard group
+   and the Cfg group will be the same as the standard
+   group.  See pdb/pre-Make for an example of the usage.
+
+INSTALL
+   Place holder for either "install <options>" or "cp"
+   depending on whether or not your system has install.
+   Default is "cp".
+
+InstBase
+   The directory in which the PACT manager expects to find
+   lib, bin, include, man, and scheme directories into which
+   to install PACT.  Default is "/usr/local".
+
+IPCSupport
+   Specify the support for IPC.  Some non-standard operating
+   systems force a choice here.  Current choices are: POSIX
+   or NOIPC. The default is POSIX.
+
+LDFLAGS
+   Special loader/linker flags. Default is "".
+
+LDShared
+   The arguments to the linker used when building shared
+   libraries.  This makes the "shared" target meaningful.
+   Default is "".
+
+LXFLAGS
+   Flags for C compilation of LEX generated files.
+   Default is "".
+
+MDGInc
+   Special specifications for the C compiler to find
+   graphics related include files (e.g. -I/usr/include/X11).
+   This is not often needed.  Default is "".
+
+MDGLib
+   Special specifications for graphics libraries to be loaded
+   (e.g. /usr/lib/libX11.a). Default is "".
+
+MDInc
+   Special specifications for the C compiler to find
+   non-graphics related include files (e.g. /usr/local/include).
+   This is not often needed. Default is "".
+
+MDLib
+   Special specifications for non-graphics libraries to be
+   loaded (e.g. -lbsd). Default is "".
+
+NoExe
+   On some systems (particularly parallel machines) the target
+   codes are cross-compiled and must be run in a special way
+   by the front end machine. In this situation it may be
+   pointless to build the PACT executables but necessary
+   to build the libraries.  If this is TRUE then no executables
+   will be linked and installed (e.g. no ULTRA or SX).
+   Default is "FALSE".
+
+PubInc
+   Specification for C compiler to find PACT include files
+   in some public directory.  This is primarily used for
+   developers who are working on a single package but need
+   headers from other parts of PACT. This follows the
+   InstBase variable by default so any resetting of PubInc
+   must come after the last setting of InstBase (e.g.
+   -I /home/pact/include).
+   Default is "-I /usr/local/include".
+
+PubLib
+   Specification for the loader to find PACT library files
+   in some public directory.  This is primarily used for
+   developers who are working on a single package but need
+   libraries from other parts of PACT. This follows the
+   InstBase variable by default so any resetting of PubLib
+   must come after the last setting of InstBase (e.g.
+   -L /home/pact/lib).
+   Default is "-L /usr/local/lib".
+
+RANLIB
+   Place holder for either "ranlib" or "touch" depending on
+   whether or not your system has ranlib. Default is "touch".
+
+RM
+   Place holder for "rm <options>" depending on the options
+   your system's rm has.  Default is "rm -f".
+
+SchemeSpokes
+   A list of Scheme coded binary file translation spokes
+   to be used with SX. A netCDF spoke is included with the
+   distribution.  Default is "netcdf".
+
+ScmDir
+   A directory in which to install scheme source files.
+   This should also be a subdirectory of InstBase.  Default
+   is "scheme".
+
+ShLD
+   The linker to use when building shared libraries.  This
+   makes the "shared" target meaningful.  Default is "ld".
+
+SyntaxModes
+   A list of Scheme syntax/languages which can be parsed.
+   A C syntax mode is included with the distribution.
+   Default is "c".
+
+UPDATE
+   Place holder for either "ranlib" or "touch" depending
+   on whether or not your system needs ranlib to update
+   archives which have been copied.  Default is "touch".
+
+UseGnuMake
+   This variable if present in your config file tells GNU
+   make to suppress the messages about entering and leaving
+   directories.  Default is to run GNU make without the
+   suppression option.
+
+Yacc
+   The name of the yacc equivalent program to be used.
+   Default is "yacc".
+
+
+             System Dependent Parameters Which Must Exist
+
+The following parameters are implied by other selected options:
+
+UNIX
+   UNIX/POSIX Operating System (as opposed to MAC or Windows).
+
+X11R4
+   PACT uses X11 R4 or later graphics (goes with GraphicsDevices).
+
+
+                   Other System Dependent Parameters
+
+AIX
+   This indicates the IBM UNIX variant.
+
+BINARY_MODE_R
+   Binary file mode parameter for read only mode.
+   Default is "rb".
+
+BINARY_MODE_RPLUS
+   Binary file mode parameter for open for update mode.
+   Default is "r+b".
+
+BINARY_MODE_W
+   Binary file mode parameter for create mode.
+   Default is "wb".
+
+BINARY_MODE_WPLUS 
+   Binary file mode parameter for create for update.
+   Default is "w+b".
+
+BSD
+   This indicates the presence of BSD UNIX 4.2 or later.
+
+FIXNUM
+   C type corresponding to FORTRAN integer. Defaults to
+   long. Don't set this.
+
+HAVE_MPI
+   Indicate the presence of the MPI parallel message
+   passing system. This tells PACT to use MPI for some
+   internal purposes as well as supporting applications
+   which want to use PACT in a distributed parallel mode.
+
+HAVE_NO_RUSAGE
+   Indicate the absence of the "getrusage" utility which
+   provides information about resource utilization.
+
+HAVE_NO_SIGFPE
+   Indicate the absence of the floating point exception
+   handler package.
+
+HAVE_SELECT_P
+   Indicate the presence of a working "select" system
+   call iff there is no working STREAMS package
+   available.  PACT-ANALYZE detects this for you.
+
+HAVE_SOCKETS_P
+   Indicate the presence of a working socket library.
+   Default is off.  If you have X windows you have this.
+
+HAVE_STREAMS_P
+   Indicate the presence of a working STREAMS package.
+   Default is off.  PACT-ANALYZE detects this for you.
+
+HPUX
+   This indicates the HP UNIX variant.
+
+HYPOT
+   This allows the user to specify a routine to be used
+   in place of the standard math library's "hypot". The
+   PACT routine PM_hypot may be used here, or the user
+   may provide their own.
+
+LINUX
+   This indicates the presence of the LINUX OS.
+
+MAC
+   This indicates the presence of Apple Macintosh OS.
+
+OSF
+   This indicates the presence of the OSF OS.
+
+POW
+   This allows the user to specify a routine to be used
+   in place of the standard math library's "pow". The
+   PACT routine PM_pow may be used here, or the user
+   may provide their own.
+
+PTHREAD_DRAFT4
+   This indicates the presence of a POSIX DRAFT 4
+   compliant thread library for the system.  This is
+   one of the thread standards which PACT can use to
+   support shared memory parallel applications.
+
+PTHREAD_POSIX
+   This indicates the presence of a POSIX compliant
+   thread library for the system.  This is one of the
+   thread standards which PACT can use to support
+   shared memory parallel applications.
+
+PTHREAD_PSEUDO_SGI_SROC
+   This directs the use of the SGI sproc facility
+   to emulate the pthread functionality used by PACT.
+   This is one of the thread "standards" which PACT
+   can use to support shared memory parallel
+   applications.
+
+RAND_MAX
+   This allows the user to set a value for the
+   maximum value returned by the random number
+   generator. It should only be used on systems where
+   this value is not already defined. Check the man
+   pages for "rand" to be sure.
+
+REMOVE
+   This allows the user to specify a routine to be
+   used in place of the standard i/o library's "remove".
+   The PACT routine SC_remove may be used
+   here, or the user may provide their own.
+
+SGI
+   This indicates the presence of an SGI machine.
+
+SIGNAL_FUNCTION
+   This allows the user to specify a routine to be
+   used in place of the standard signal library's
+   "signal". The PACT routine SC_signal may be
+   used here, or the user may provide their own.
+   (NOTE: SC_signal is a stub routine provided to
+   prevent unsatisfied externals; it does not
+   perform any actual signal handling.)
+
+SOLARIS
+   This indicates the presence of the SOLARIS OS.
+
+STRTOD_FUNCTION
+   This allows the user to specify a routine to be
+   used in place of the standard math library's
+   "strtod". The PACT routine _SC_strtod may be
+   used here, or the user may provide their own.
+
+SYSTEM
+   This allows the user to specify a routine to be
+   used in place of the standard i/o library's
+   "system". The PACT routine SC_system may be used
+   here, or the user may provide their own. (NOTE:
+   SC_system is a stub routine provided to prevent
+   unsatisfied externals; it does not perform
+   any actual system calls.)
+
+SYSV
+   This indicates the presence of UNIX System V.
+
+
+.SH INFO MODE EXAMPLES
+
+    pact -info make
+    pact -info PTHREAD
+    pact +info PTHREAD
+    pact -info LD_LIBRARY_PATH
+    pact +info MDG
+
+
+.SH SEE ALSO
+
+.B hserve(1)
+
+.SH BUGS
+
+Contact with servers is sometimes lost mysteriously.
+Reconnections some times fail.
+
+

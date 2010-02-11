@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# OPENMP - analyze the handling of OpenMP
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: openmp"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for OpenMP support
+
+cat << EOF >! $Tmp.c
+int main(int c, char **v)
+{int np;
+ extern int omp_get_num_procs(void);
+ np = omp_get_num_procs();
+ return(0);}
+EOF
+
+setenv HAVE_OPENMP FALSE
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_Lib
+if ($status == 0) then
+   if ($?PTHREAD_OMP == 0) then
+      NoteD $ALog "      no OpenMP (by request)"
+   else
+      setenv HAVE_OPENMP TRUE
+      NoteD $ALog "      has OpenMP"
+   endif
+else
+   NoteD $ALog "      no OpenMP"
+endif
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# export the results
+SetParent HAVE_OPENMP
+
+exit(0)
+

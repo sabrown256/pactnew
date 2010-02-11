@@ -1,0 +1,117 @@
+#!/bin/csh -f
+#
+# PYTEST - test PYTHON
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = python
+source ../scripts/test-env
+
+setenv LogF  $Log
+
+set Test = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo "Usage: pytest [-h] [-vg] [<test>]*"
+           echo "  h       this help message"
+           echo "  vg      run tests under valgrind"
+           echo "  <test>  one of: basic unit"
+           echo ""
+           exit(1)
+      case -*:
+           breaksw
+      default:
+           set Test = ( $Test $1 )
+           breaksw
+   endsw
+   shift
+end
+
+cd $TestDir
+
+# run the tests if Python bindings have been built
+if (-f $LPYTHON/pact/pdb.py) then
+   set BeginTime = `$TIMER -r`
+
+   echo ""
+   echo "PYTHON TEST ..."
+
+   # Clean up the test dir
+   rm -f $Log
+   touch $Log
+
+   Note $Log "BinDir     = $BinDir"
+   Note $Log "path       = $path"
+   Note $Log "MAKE       = $MAKE"
+   Note $Log "RootDir    = $RootDir"
+   Note $Log "SrcDir     = $SrcDir"
+   Note $Log "PYTHONPATH = $PYTHONPATH"
+   Note $Log "python     = $PYTHON"
+      
+   if ($?autotool == 0) then
+      Note $Log "PYVER       = |$PYVER|"
+      Note $Log "PYTHONBIN   = |$PYTHONBIN|"
+      Note $Log "LPYTHON     = |$LPYTHON|"
+      Note $Log "PYTHON      = |$PYTHON|"
+      Note $Log "PACT        = $PACT"
+      Note $Log "Parallel    = |$Parallel|"
+      Note $Log "MPI         = |$MPI|"
+      flog $Log ../../../manager/pwhich pact
+      flog $Log ../../../manager/pwhich cc
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   if ("$Test" == "") then
+      set Test = ""
+      set Test = ( $Test basic unit )
+   endif
+
+   foreach i ($Test)
+      $SrcDir/tests/$i
+      if ($status == 1) then
+         set ERROR = TRUE
+      endif
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP - we are all done now
+
+   set ETime = `$TIMER -b $BeginTime`
+
+   NoteD $Log ""
+
+   rm -f ../testfile
+   
+   if ($ERROR == "TRUE") then
+      NoteD $Log ""
+      NoteD $Log "PYTHON TEST ... FAILED ($ETime)"
+      NoteD $Log ""
+      NoteD $Log "See $Log for details"
+   else
+      NoteD $Log "PYTHON TEST ... PASSED ($ETime)"
+   endif
+
+   NoteD $Log ""
+   NoteD $Log " --------------------------------------------------------"
+
+endif
+
+set xstatus = 0
+if ($ERROR == "TRUE") then
+   set xstatus = 1
+endif
+
+Note $Log "Exiting with status $xstatus"
+
+exit($xstatus)
+

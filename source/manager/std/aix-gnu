@@ -1,0 +1,12 @@
+#
+# AIX-GNU - AIX configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include compiler-gnu
+include spokes
+

@@ -1,0 +1,86 @@
+#!/bin/csh -f
+#
+# FIND-FNC - find the linbrary containing a function or subroutine
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Path    = ""
+set Fnc     = ""
+set GrepOpt = ""
+set Defines = ""
+set Verbose = FALSE
+
+set OS = `uname -s`
+if ($OS == AIX) then
+   set NMArgs = "-X 32_64"
+else
+   set NMArgs = ""
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           set Defines = $1
+           breaksw
+      case -i:
+      case -w:
+           set GrepOpt = ( $GrepOpt $1 )
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: find-fnc [-d <flag>] [-i] [-w] [-v] <path> <fnc>"
+           echo ""
+           echo "   d   - list only occurences with flag, e.g. T"
+           echo "   i   - case insenstive search"
+           echo "   v   - verbose mode"
+           echo "   w   - exact token search"
+           echo ""
+           exit(1)
+           breaksw
+      case -v:
+           set Verbose = TRUE
+           breaksw
+      case -x:
+           set NMOpt = "-X64"
+           breaksw
+      default:
+           if ("$Path" == "") then
+              set Path = $1
+           else if ("$Fnc" == "") then
+              set Fnc = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if (-d $Path) then
+   pushd $Path >& /dev/null
+else
+   echo "No such directory: $Path"
+   exit(1)  
+endif
+
+foreach i (*.a *.so *.o *.dylib)
+   if ($Verbose == TRUE) then
+      echo "$i"
+   endif
+   set Txt = `nm $NMArgs $i |& grep $GrepOpt $Fnc | tr -d "[\[\]\|]"`
+   if ($#Txt != 0) then
+      echo "----- $i -----"
+      if ("$Defines" == "") then
+         nm $NMArgs $i |& grep $GrepOpt $Fnc
+      else
+         nm $NMArgs $i |& grep $GrepOpt $Fnc |& grep $Defines
+      endif
+   endif
+end
+
+popd >& /dev/null
+
+exit($status)

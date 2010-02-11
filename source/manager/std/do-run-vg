@@ -1,0 +1,21 @@
+#
+# DO-RUN-VG - DO-RUN database entry for valgrind
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+DBG : vg {
+   Exe   = valgrind
+   Flags = --tool=memcheck
+   Delim = 
+   Cmd   = $Wrap $MPI_Exe $MPI_Flags $DBG_Exe $DBG_Flags $Code $CArgs
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------

@@ -1,0 +1,14 @@
+#
+# NO-SQL - override finding an SQL which is in some way bad or not desired
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group SQL {
+   Path = none
+}
+
+

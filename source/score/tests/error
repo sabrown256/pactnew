@@ -1,0 +1,47 @@
+#!/bin/csh -f
+#
+# ERROR - test SCORE error handling
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+if ("$TEST_ERROR_TRAPS" == "YES") then
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE Error Test ............ "
+   NoteD $LogF ""
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE error
+   set xstatus = $status
+   flog $LogF popd
+
+   if ("$Valgrind" == "") then
+      ftee $LogF $CFE $BinDir/scerts
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDirscerts  |& \
+      grep "ERROR SUMMARY:"               |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $LogF "                    SCORE Error Test ............ FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    SCORE Error Test ............ PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)
+

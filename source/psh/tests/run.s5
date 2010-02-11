@@ -1,0 +1,10 @@
+#
+# RUN.S5 - check for ?= operator
+#
+
+NProc ?= 2
+Foo   ?= a
+Foo   ?= b
+
+Cmd = no-op
+

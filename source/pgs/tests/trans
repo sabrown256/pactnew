@@ -1,0 +1,62 @@
+#!/bin/csh -f
+#
+# TRANS - PGS geometrical transformation tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PGS TRANSFORMATIONS TEST
+
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   NoteD $Log ""
+   NoteD $Log "                    PGS Trans Test ........."
+
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE trans
+   set TStatus = $status
+   flog $Log popd
+
+   if ($TStatus != 0) then
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PGS Trans Test Program"
+      NoteD $Log "                    PGS Line Plot Test ..... FAILED"
+      set Err = 1
+   else
+
+      set UTime = `$TIMER -r`
+      if ("$Valgrind" == "") then
+         ftee $Log $CFE $BinDir/gstrts -A
+         set xstatus = $status
+      else
+         ftee $Log $Valgrind $BinDir/gstrts -A |&  \
+         grep "ERROR SUMMARY:"                 |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+	 flog $Log $RM $Tmp
+      endif
+
+      set ETime    = `$TIMER -b $UTime`
+
+      NoteD $Log ""
+
+      if ($xstatus != 0) then
+         NoteD $Log "                    PGS Trans Test ......... FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $Log "                    PGS Trans Test ......... PASSED ($ETime)"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)
