@@ -97,7 +97,7 @@
     if (initted)                                                             \
        {*(_no) = SC_array_get_n(temp);                                       \
         *(_o)  = FMAKE_N(int, *_no, "FIND_VALUE:_o");                        \
-        memcpy(*(_o), SC_array_array(temp), (*(_no))*sizeof(int));           \
+        memcpy(*(_o), SC_array_array(temp, 0), (*(_no))*sizeof(int));        \
         SC_free_array(temp, NULL);};}
 
 SC_THREAD_LOCK(PM_search_lock); /* Lock around initialization */

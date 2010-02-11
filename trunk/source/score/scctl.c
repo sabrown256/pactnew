@@ -641,7 +641,7 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 char **SC_get_search_path(void)
    {char **path;
 
-    path = SC_array_array(_SC.path);
+    path = SC_array_array(_SC.path, 0);
 
     return(path);}
 

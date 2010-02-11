@@ -67,7 +67,7 @@ tr_layer *_PD_lookup(char *type)
     _PD_register_spokes();
 
     n  = SC_array_get_n(_PD_file_types);
-    tr = SC_array_array(_PD_file_types);
+    tr = SC_array_array(_PD_file_types, 0);
     for (i = 0; i < n; i++, tr++)
         {if (strcmp(tr->type, type) == 0)
 	    break;};
@@ -315,7 +315,7 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 	   rfmt = SC_assoc(pu->info, "fmt");
 
 	n  = _PD_register_spokes();
-	tr = SC_array_array(_PD_file_types);
+	tr = SC_array_array(_PD_file_types, 0);
 	for (i = 0; i < n; i++, tr++)
 	    {type = tr->type;
 	     tfmt = tr->fmt;

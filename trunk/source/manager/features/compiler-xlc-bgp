@@ -87,7 +87,7 @@ Group MPI {
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
-setenv CROSS_COMPILE  TRUE
+setenv CROSS_COMPILE  BGP
 setenv IBM_BGP
 define IBM_BGP
 define GETSOCKNAME_LONG

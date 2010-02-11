@@ -389,9 +389,12 @@ static int make_distributed(char *tgt, char *file, char *server,
 	n = SC_array_get_n(arr);
 	SC_array_string_add(arr, NULL);
 
-	dirs = SC_array_array(arr);
+	dirs = SC_array_array(arr, 0);
+
 	ok   = SC_exec_async(shell, cmnds, dirs, server, env, 8,
-			     NULL, flt, na, show, ignore, FALSE);};
+			     NULL, flt, na, show, ignore, FALSE);
+
+	SC_array_unarray(arr, 0);};
 
     SC_free_array(arr, SC_array_free_n);
 

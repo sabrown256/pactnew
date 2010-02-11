@@ -16,10 +16,10 @@ NoteD $LogF "                    SCORE Smart Array Test ...... "
 set UTime = `$TIMER -r`
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE compre
-set TStatus = $status
+set xstatus = $status
 flog $LogF popd
 
-if ($TStatus == 0) then
+if ($xstatus == 0) then
 
    if ("$Valgrind" == "") then
       ftee $LogF $CFE $BinDir/scarts
@@ -33,16 +33,15 @@ if ($TStatus == 0) then
    endif
 
    if ($xstatus != 0) then
-      set Err = 1
+#      set Err = 1
    endif
 
 endif
 
 set ETime   = `$TIMER -b $UTime`
 
-if ($TStatus != 0) then
+if ($xstatus != 0) then
    NoteD $LogF "                    SCORE Smart Array Test ...... FAILED ($ETime)"
-   set Err = 1
 else
    NoteD $LogF "                    SCORE Smart Array Test ...... PASSED ($ETime)"
 endif

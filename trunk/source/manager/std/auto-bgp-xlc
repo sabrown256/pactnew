@@ -9,6 +9,8 @@
 
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
+setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
+
 run features/locate-mpi mpich bgp xlc
 
 include 32-bit
@@ -19,3 +21,8 @@ include no-jpeg
 include no-png
 include no-libz
 
+setenv CROSS_COMPILE  BGP
+setenv DO_RUN_MPI     "salloc.bgp"
+setenv DO_RUN_CROSS   "submit"
+setenv IBM_BGP
+define IBM_BGP

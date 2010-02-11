@@ -300,9 +300,11 @@ static long _PC_wait_d(PROCESS *pp)
 
     stats = FMAKE_N(MPI_Status, np, "_PC_WAIT_D:stats");
 
-    reqs = SC_array_array(_PC.reqs);
+    reqs = SC_array_array(_PC.reqs, 0);
 
     MPI_Waitall(np, reqs, stats);
+
+    SC_array_unarray(_PC.reqs, 0);
 
     SFREE(stats);}
 

@@ -101,9 +101,12 @@
  * proper conversion of multi-byte character types
  * This is important for SQL and TEXT_STD applications. 12/06/2009
  *
+ * Version 24 convert to use of SC_array and hasharr instead of
+ * SC_dynamic_array and HASHTAB. 02/03/2010
+ *
  */
 
-#define PDB_SYSTEM_VERSION  23
+#define PDB_SYSTEM_VERSION  24
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -113,6 +116,8 @@
 /*--------------------------------------------------------------------------*/
 
 #define PN_sizeof(type, tab)  _PD_lookup_size(type, tab)
+
+#define PD_get_file_type(file)         ((file)->type)
 
 #define PD_get_mode(file)              ((file)->mode)
 #define PD_set_mode(file, v)           (file)->mode = (v)

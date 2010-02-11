@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 # SIGN - Send a signal to UNIX processes by name.  After finding the process IDs
 #      - of the requested program/process, run kill on it.

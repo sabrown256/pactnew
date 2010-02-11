@@ -11,7 +11,7 @@
 
 set Exe    = ""
 set Tgt    = "bin"
-set HostOS = `uname -s`
+set HostOS = `system-id`
 
 while ($#argv > 0)
    switch ($1)
@@ -74,8 +74,10 @@ case bin:
 
 # search specifically for MPI related directories
 # NOTE: this works for many derivatives of MPICH
-        if ($HostOS == SunOS) then
+        if ($HostOS =~ sol*) then
            set Lst = ( `strings -a $Exe |& grep '/lib' | grep '^/' | grep -i mpi | grep -v intel/compiler | grep -v /home | grep -v /src | sed 's/:/ /g'` )
+        else if ($HostOS =~ lnx-2.4-ppc) then
+           set Lst = ""
         else
            set Lst = ( `strings -a $Exe |& grep -e '/lib' | grep -e '^/' | grep -i mpi | grep -v intel/compiler | grep -v /home | grep -v /src | sed 's/:/ /g'` )
         endif
@@ -87,8 +89,10 @@ case bin:
 # search directories generally
         else
            set Tgts = ( srun dmpirun mpirun prun run poe )
-           if ($HostOS == SunOS) then
+           if ($HostOS =~ sol*) then
               set tLst = ( `strings -a $Exe |& grep '/lib' | grep '^/' | grep -v intel/compiler | grep -v /home | grep -v -e '\.c$' | sed 's/:/ /g'` )
+           else if ($HostOS =~ lnx-2.4-ppc) then
+              set tLst = ( `strings -a $Exe |& grep -e '/lib' | grep -e '^/' | grep bgsys | grep -v include | grep -i mpi | sed 's|/[^/]*$||'` )
            else
               set tLst = ( `strings -a $Exe |& grep -e '/lib' | grep -e '^/' | grep -v intel/compiler | grep -v /home | grep -v -e '\.c$' | sed 's/:/ /g'` )
            endif
@@ -102,26 +106,31 @@ case bin:
                  endif
               endif
            end
-
         endif
 
 # now search the Dirs for the frontend
         foreach d ($Dir /usr/local/bin)
            if ("$FEL" != "") break
            
-           while (("$d" != "") && !(-d $d/bin))
+           set ok = FALSE
+           while ($ok == FALSE)
               set d = $d:h
-           end
-           set Bin = $d/bin
-           foreach f ($Tgts)
-              set fexe = `$RPATH $Bin/$f`
-              if (-x $fexe) then
-                 echo "$FEL" | grep -w $fexe >& /dev/null
-                 if ($status == 1) then
-                    set FEL = ( $FEL $fexe )
-                    break
-                 endif
-              endif
+              if ("$d" == "") then
+	         set ok = TRUE
+              else if (-d $d/bin) then
+                 set Bin = $d/bin
+                 foreach f ($Tgts)
+                    set fexe = `$RPATH $Bin/$f`
+                    if (-x $fexe) then
+                       echo "$FEL" | grep -w $fexe >& /dev/null
+                       if ($status == 1) then
+                          set FEL = ( $FEL $fexe )
+                          set ok = TRUE
+                          break
+                       endif
+                    endif
+                 end
+             endif
            end
         end
      endif
@@ -138,7 +147,7 @@ case lib:
      set Lib = ""
      set IsMPI = `mpi-info -x $Exe`
      if ($IsMPI == yes) then
-        if ($HostOS == AIX) then
+        if ($HostOS =~ aix*) then
            dump -X32_64 -H $Exe |& egrep -e 'libmpi_*r*.a' >& /dev/null
            if ($status == 0) then
               set Lib = /usr/lpp/ppe.poe/lib
@@ -169,7 +178,7 @@ case lib:
 # EXE - return the yes iff the executable has MPI_Init linked in
 
 case exe:
-     if ($HostOS == AIX) then
+     if ($HostOS =~ aix*) then
         set havempi = `dump -X32_64 -H $Exe |& egrep -e 'libmpi_*r*.a'`
      else
         set havempi = `nm $Exe |& grep -i mpi_init`

@@ -456,7 +456,7 @@ static void PG_align_interface_object(PG_interface_object *iob, int xo, int yo)
     PG_trans_point(dev, 2, NORMC, p, PIXELC, p);
 
     n  = SC_array_get_n(iob->children);
-    ch = SC_array_array(iob->children);
+    ch = SC_array_array(iob->children, 0);
     for (i = 0; i < n; i++)
         {crv = ch[i]->curve;
 
@@ -464,6 +464,8 @@ static void PG_align_interface_object(PG_interface_object *iob, int xo, int yo)
 	 crv->y_origin = p[1];
 
 	 PG_align_interface_object(ch[i], p[0], p[1]);};
+
+    SC_array_unarray(iob->children, 0);
 
     return;}
 
@@ -480,8 +482,8 @@ static void PG_align_interface_objects(PG_device *dev)
     PG_curve *crv;
 
 /* align the interface objects, setting the absolute origins of each */
-    iobs  = SC_array_array(dev->iobjs);
     niobs = SC_array_get_n(dev->iobjs);
+    iobs  = SC_array_array(dev->iobjs, 0);
 
     for (i = 0; i < niobs; i++)
         {iob = iobs[i];
@@ -490,6 +492,8 @@ static void PG_align_interface_objects(PG_device *dev)
 	     ix  = crv->x_origin;
 	     iy  = crv->y_origin;
 	     PG_align_interface_object(iob, ix, iy);};};
+
+    SC_array_unarray(dev->iobjs, 0);
 
     return;}
 
@@ -640,9 +644,12 @@ void PG_draw_interface_object(PG_interface_object *iob)
 		PG_set_axis_log_scale(dev, 2, oflg);};
 
 	    n  = SC_array_get_n(iob->children);
-	    ch = SC_array_array(iob->children);
+	    ch = SC_array_array(iob->children, 0);
+
 	    for (i = 0; i < n; i++)
-	        {PG_draw_interface_object(ch[i]);};};};
+	        PG_draw_interface_object(ch[i]);
+
+	    SC_array_unarray(iob->children, 0);};};
 
     return;}
 
@@ -657,11 +664,13 @@ void PG_draw_interface_objects(PG_device *dev)
    {int i, niobs;
     PG_interface_object **iobs;
 
-    iobs  = SC_array_array(dev->iobjs);
     niobs = SC_array_get_n(dev->iobjs);
+    iobs  = SC_array_array(dev->iobjs, 0);
 
     for (i = 0; i < niobs; i++)
         PG_draw_interface_object(iobs[i]);
+
+    SC_array_unarray(dev->iobjs, 0);
 
     return;}
 
@@ -680,9 +689,12 @@ void PG_map_interface_object(PG_interface_object *iob, PFEvCallback fnc, void *a
        {(*fnc)(iob, a);
 
 	n  = SC_array_get_n(iob->children);
-	ch = SC_array_array(iob->children);
+	ch = SC_array_array(iob->children, 0);
+
 	for (i = 0; i < n; i++)
-	    PG_map_interface_object(ch[i], fnc, a);};
+	    PG_map_interface_object(ch[i], fnc, a);
+
+	SC_array_unarray(iob->children, 0);};
 
     return;}
 
@@ -697,11 +709,13 @@ void PG_map_interface_objects(PG_device *dev, PFEvCallback fnc, void *a)
    {int i, niobs;
     PG_interface_object **iobs;
 
-    iobs  = SC_array_array(dev->iobjs);
     niobs = SC_array_get_n(dev->iobjs);
+    iobs  = SC_array_array(dev->iobjs, 0);
 
     for (i = 0; i < niobs; i++)
         PG_map_interface_object(iobs[i], fnc, a);
+
+    SC_array_unarray(dev->iobjs, 0);
 
     return;}
 
@@ -740,8 +754,8 @@ void PG_copy_interface_objects(PG_device *dvd, PG_device *dvs, int rm)
 
     sa = dvs->iobjs;
     if (sa != NULL)
-       {si = SC_array_array(dvs->iobjs);
-	sn = SC_array_get_n(dvs->iobjs);
+       {sn = SC_array_get_n(dvs->iobjs);
+	si = SC_array_array(dvs->iobjs, 0);
 
 	if (rm == TRUE)
 	   PG_clear_interface_objects(dvd);
@@ -751,7 +765,9 @@ void PG_copy_interface_objects(PG_device *dvd, PG_device *dvs, int rm)
             {iob = PG_copy_interface_object(dvd, si[i]);
 	     if (iob != NULL)
 	        {SC_array_push(da, &iob);
-		 SC_mark(iob, 1);};};};
+		 SC_mark(iob, 1);};};
+
+	SC_array_unarray(dvs->iobjs, 0);};
 
     PG_align_interface_objects(dvd);
 
@@ -917,7 +933,8 @@ static void _PG_draw_variable_object(PG_interface_object *iob)
     _PG_find_registered(iob, &hp, &ityp);
     if (hp != NULL)
        {nch = SC_array_get_n(iob->children);
-	chn = SC_array_array(iob->children);
+	chn = SC_array_array(iob->children, 0);
+
 	for (i = 0; i < nch; i++)
 	    {ch = chn[i];
 	     if (ch->is_selectable)
@@ -936,7 +953,9 @@ static void _PG_draw_variable_object(PG_interface_object *iob)
                     {b = (PG_text_box *) ch->obj;
 		     strcpy(s, b->text_buffer[0]);
 		     if (_PG_value_string(ityp, hp, s))
-		        strcpy(b->text_buffer[0], s);};};};};
+		        strcpy(b->text_buffer[0], s);};};};
+
+	SC_array_unarray(iob->children, 0);};
 
     _PG_draw_text_object(iob);
 
@@ -1023,7 +1042,8 @@ static void _PG_draw_slider_button(PG_interface_object *iob)
 
     piob = iob->parent->parent;
     nch  = SC_array_get_n(piob->children);
-    chn  = SC_array_array(piob->children);
+    chn  = SC_array_array(piob->children, 0);
+
     nv   = 0;
     for (i = 0; i < nch; i++)
         {ch = chn[i];
@@ -1041,6 +1061,8 @@ static void _PG_draw_slider_button(PG_interface_object *iob)
 		 else if (dx[1] != 0)
 		    {crv->y_origin = _PG_get_val(hp, pcrv->y_origin, dx[1]);
 		     break;};};};};
+
+    SC_array_unarray(piob->children, 0);
 
     _PG_draw_button_object(iob);
 
@@ -1132,7 +1154,8 @@ static void PG_slider(PG_interface_object *iob, PG_event *ev)
         if ((dx[0] != 0) || (dx[1] != 0))
 	   {piob = piob->parent;
 	    nch  = SC_array_get_n(piob->children);
-	    chn  = SC_array_array(piob->children);
+	    chn  = SC_array_array(piob->children, 0);
+
 	    nv   = 0;
 	    for (i = 0; i < nch; i++)
 	        {ch = chn[i];
@@ -1151,7 +1174,9 @@ static void PG_slider(PG_interface_object *iob, PG_event *ev)
 			 else if (dx[1] != 0)
 			    {obx[3] = crv->y_origin;
 			     _PG_set_val(hp, (obx[3] - obx[2]), dx[1]);
-			     break;};};};};};
+			     break;};};};};
+
+	    SC_array_unarray(piob->children, 0);};
 
         PG_draw_interface_object(piob);};
 
@@ -1229,7 +1254,8 @@ static void PG_toggle(PG_interface_object *iob, PG_event *ev)
         val   = **(char ***) hp->def;
 
 	niobs = SC_array_get_n(iob->children);
-	iobs  = SC_array_array(iob->children);
+	iobs  = SC_array_array(iob->children, 0);
+
         ths   = NULL;
         for (i = 0; i < niobs; i++)
             {ch = iobs[i];
@@ -1243,6 +1269,8 @@ static void PG_toggle(PG_interface_object *iob, PG_event *ev)
 		        _PG_switch_object_state(trans,
 						FALSE, FALSE, FALSE,
 						FALSE, FALSE);};};};
+	SC_array_unarray(iob->children, 0);
+
 	if (ths != NULL)
 	   _PG_switch_object_state(ths,
 				   TRUE, TRUE, FALSE,
@@ -1493,7 +1521,7 @@ PG_device *PG_handle_key_press(void *d, PG_event *ev)
 
 static PG_interface_object *PG_event_select_visual(PG_interface_object *iob,
                                                    PG_event *ev)
-   {
+   {PG_interface_object *rv;
 
 #ifdef HAVE_WINDOW_DEVICE
 
@@ -1504,34 +1532,40 @@ static PG_interface_object *PG_event_select_visual(PG_interface_object *iob,
     PG_device *dev;
     PG_curve *crv;
 
-    if (!iob->is_selectable || PG_is_inactive_text_box(iob))
-       return(NULL);
+    rv = NULL;
 
-    dev = iob->device;
+    if (iob->is_selectable && !PG_is_inactive_text_box(iob))
+       {dev = iob->device;
 
-    PG_mouse_event_info(dev, ev, iev, &button, &qualifier);
+	PG_mouse_event_info(dev, ev, iev, &button, &qualifier);
 
-    crv = iob->curve;
+	crv = iob->curve;
 
-    iev[0] -= crv->x_origin;
-    iev[1] -= crv->y_origin;
-    n       = crv->n - 1;
+	iev[0] -= crv->x_origin;
+	iev[1] -= crv->y_origin;
+	n       = crv->n - 1;
 
-    if (PM_inside_fix(iev[0], iev[1], crv->x, crv->y, n, 1))
-       {nch = SC_array_get_n(iob->children);
-	chn = SC_array_array(iob->children);
-        for (i = 0; i < nch; i++)
-            {ch = PG_event_select_visual(chn[i], ev);
-             if (ch != NULL)
-                return(ch);};
+	if (PM_inside_fix(iev[0], iev[1], crv->x, crv->y, n, 1))
+	   {nch = SC_array_get_n(iob->children);
+	    chn = SC_array_array(iob->children, 0);
 
-        return(iob);}
+	    rv = iob;
 
-    else
+	    for (i = 0; i < nch; i++)
+	        {ch = PG_event_select_visual(chn[i], ev);
+		 if (ch != NULL)
+		    {rv = ch;
+		     break;};};
+
+	    SC_array_unarray(iob->children, 0);};};
+
+#else
+
+    rv = NULL;
 
 #endif
 
-       return(NULL);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1565,7 +1599,8 @@ static PG_interface_object *PG_event_select_logical(PG_interface_object *iob,
 	PG_mouse_event_info(dev, ev, jev, &button, &qualifier);
 
 	nch = SC_array_get_n(iob->children);
-	chn = SC_array_array(iob->children);
+	chn = SC_array_array(iob->children, 0);
+
 	for (i = 0; i < nch; i++)
 	    {ch = chn[i];
 	     if (ch->is_selectable)
@@ -1588,7 +1623,9 @@ static PG_interface_object *PG_event_select_logical(PG_interface_object *iob,
 	    iev[1] = jev[1] - crv->y_origin;
 	    n      = crv->n - 1;
 	    if (PM_inside_fix(iev[0], iev[1], crv->x, crv->y, n, -1))
-	       lch = iob;};}; 
+	       lch = iob;};
+
+	SC_array_unarray(iob->children, 0);};
 
 #endif
 
@@ -1606,8 +1643,8 @@ PG_interface_object *PG_get_object_event(PG_device *dev, PG_event *ev)
     PG_interface_object *tiob, *iob, **iobs;
 
     iob   = NULL;
-    iobs  = SC_array_array(dev->iobjs);
     niobs = SC_array_get_n(dev->iobjs);
+    iobs  = SC_array_array(dev->iobjs, 0);
 
     for (i = 0; i < niobs; i++)
         {tiob = iobs[i];
@@ -1617,6 +1654,8 @@ PG_interface_object *PG_get_object_event(PG_device *dev, PG_event *ev)
 	        {iob = (*tiob->select)(tiob, ev);
 		 if (iob != NULL)
 		    break;};};};
+
+    SC_array_unarray(dev->iobjs, 0);
 
     return(iob);}
 
@@ -1777,11 +1816,13 @@ PG_interface_object *PG_copy_interface_object(PG_device *dvd,
 
 /* copy the children */
     sn  = SC_array_get_n(iob->children);
-    sch = SC_array_array(iob->children);
+    sch = SC_array_array(iob->children, 0);
 
     da = SC_MAKE_ARRAY("PG_COPY_INTERFACE_OBJECT", PG_interface_object *, NULL);
     for (i = 0; i < sn; i++)
         SC_array_push(da, sch[i]);
+
+    SC_array_unarray(iob->children, 0);
 
     niob->children = da;
 
@@ -1803,10 +1844,12 @@ void _PG_rl_interface_object(PG_interface_object *iob, int flag)
 
     if (flag)
        {n  = SC_array_get_n(iob->children);
-	ch = SC_array_array(iob->children);
+	ch = SC_array_array(iob->children, 0);
+
         for (i = 0; i < n; i++)
             _PG_rl_interface_object(ch[i], TRUE);
 
+	SC_array_unarray(iob->children, 0);
         SFREE(ch);};
 
     if (strcmp(iob->type, PG_TEXT_OBJECT_S) == 0)

@@ -29,8 +29,10 @@ int SC_send_tracker(char *code, char *version, int status, char *dst)
      char *trk, *cmd, **pa;
 
      path = SC_make_search_path(1, "PATH");
-     pa   = SC_array_array(path);
+     pa   = SC_array_array(path, 0);
      trk  = SC_search_file(pa, "tracker");
+     SC_array_unarray(path, 0);
+
      SC_free_search_path(path);
      if (trk == NULL)
         trk = SC_strsavef(TRACKER_EXE, "char*:SC_SEND_TRACKER:trk");

@@ -863,7 +863,7 @@ static void setup_analyze_env(char *base)
     cinitenv("PFE",       "%s/do-run -m", st.dir.bin);
 
 /* cross compile front end */
-    if (cmpenv("CROSS_COMPILE", "TRUE") == 0)
+    if (cmpenv("CROSS_COMPILE", "FALSE") != 0)
        cinitenv("CFE", "%s/do-run -m", st.dir.bin);
     else
        cinitenv("CFE", "");

@@ -11,6 +11,8 @@
 
 #include "score_int.h" 
 
+#define GROWTH_FACTOR(x)   ((x)/pow(2.0, 32.0))
+
 enum {SET, GET};
 
 /*--------------------------------------------------------------------------*/
@@ -133,7 +135,8 @@ static void _SC_array_set_method(SC_array *a)
 
 static void _SC_array_grow(SC_array *a, long nn)
    {int chg;
-    long i, nx, bpi;
+    long i, n, nx, bpi;
+    double gf, fc;
     char *arr;
     void *e;
 
@@ -142,16 +145,20 @@ static void _SC_array_grow(SC_array *a, long nn)
     bpi = a->bpi;
     chg = FALSE;
 
-/* if new size not specified - double the old size */
+/* if new size not specified - grow exponentially from the old size */
     if (nn < 0)
-       nn = 2*nx;
+       {n  = max(nx, a->n);
+	gf = a->gf;
+	fc = pow(10.0, 1.0 - gf*n);
+	nn = fc*n;
+        nn = 2*nx;};
 
 /* if never allocated */
     if (arr == NULL)
        {if (nn == 0)
 	   {nx = 0;
-	    nn = 512;
-	    nn = max(nn, 2);};
+	    nn = 1;
+	    nn = 512;};
 	arr = FMAKE_N(char, nn*bpi, a->name);
 	chg = TRUE;
 	SC_mark(arr, 1);}
@@ -180,6 +187,9 @@ static void _SC_array_grow(SC_array *a, long nn)
 
 /* _SC_INIT_ARRAY - initialize an SC_array A
  *                - array has NAME, TYPE, and BPI
+ *                - NOTE: default growth factor is chosen to give
+ *                - exponential with factor of 10 for 0 items
+ *                - to 1% at 1 GB
  */
 
 void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
@@ -206,12 +216,14 @@ void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
      a->bpi   = bpi;
      a->nx    = 0;
      a->n     = 0;
+     a->nref  = 0;
+     a->gf    = GROWTH_FACTOR(3.0);
      a->array = NULL;
      a->init  = init;
 
      _SC_array_set_method(a);
 
-     _SC_array_grow(a, 0);
+/*     _SC_array_grow(a, 0); */
 
      return;}
 
@@ -302,6 +314,7 @@ void *SC_array_done(SC_array *a)
 
      if (a != NULL)
         {rv = a->array;
+	 a->array = NULL;
 	 SFREE(a->name); 
 	 SFREE(a->type);
 	 SFREE(a);};
@@ -332,6 +345,36 @@ void SC_array_init(SC_array *a, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_ARRAY_RESIZE - resize the array A to N elements
+ *                 - used when you know a good working
+ *                 - size for the array and don't want to incur
+ *                 - the penalty for incrementally growing it
+ *                 - also set growth factor to G
+ *                 - growth is Nn = (No + 1)*(1 + 2^(-f*No))
+ *                 - where f = G/2^32
+ *                 - G = 3 means that for No = 2^32 (1 GB) grow by 1/8
+ *                 - G = 2 means that for No = 2^32 (1 GB) grow by 1/4
+ *                 - G = 1 means that for No = 2^32 (1 GB) grow by 1/2
+ *                 - G < 0 is ignored to prevent big growth at large size
+ *                 - return the old size
+ */
+
+long SC_array_resize(SC_array *a, long n, double g)
+   {long nn;
+
+    nn = a->nx;
+
+/* disallow growth greater that 100% at 1 GB */
+    if (0.0 <= g)
+       a->gf = GROWTH_FACTOR(g);
+
+    _SC_array_grow(a, n);
+
+    return(nn);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_ARRAY_SET - set the Nth element of A to V
  *              - if N < 0 push V onto the end of A
  */
@@ -352,7 +395,7 @@ void *SC_array_set(SC_array *a, long n, void *v)
 
 	 a->n = max(a->n, n+1);
 
-	 if (n > a->nx - 4)
+	 if (n >= a->nx)
 	    _SC_array_grow(a, -1);
 
 	 rv = a->set(a->array, a->bpi, SET, n, v);};
@@ -394,17 +437,45 @@ void *SC_array_get(SC_array *a, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ARRAY_ARRAY - return the actual array from A */
+/* SC_ARRAY_ARRAY - return the actual array from A
+ *                - FLAG is a bit array
+ *                -   1   mark the array iff on
+ */
 
-void *SC_array_array(SC_array *a)
+void *SC_array_array(SC_array *a, int flag)
     {void *rv;
 
      rv = NULL;
 
      if (a != NULL)
-        rv = a->array;
+        {if (a->array == NULL)
+	    _SC_array_grow(a, -1);
+	 rv = a->array;};
 
      return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_ARRAY_UNARRAY - decrement the reference count
+ *                  - bookending SC_array_array
+ *                  - FLAG is a bit array
+ *                  -   1   SFREE the array iff on
+ */
+
+void SC_array_unarray(SC_array *a, int flag)
+    {int n;
+
+#if 0
+     n = a->nref;
+     n--;
+     a->nref = max(n, 0);
+
+     if (flag & 1)
+        SFREE(a->array);
+#endif
+
+     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -505,6 +576,11 @@ void SC_array_string_add(SC_array *a, char *s)
      if (s != NULL)
         SC_mark(s, 1);
 
+/* add a terminating NULL for conventional usages */
+     s = NULL;
+     SC_array_push(a, &s);
+     SC_array_dec_n(a, 1, -1);
+
      return;}
 
 /*--------------------------------------------------------------------------*/
@@ -532,7 +608,7 @@ int SC_array_string_append(SC_array *out, SC_array *in)
    {int i, no;
     char **sa;
 
-    sa = SC_array_array(in);
+    sa = SC_array_array(in, 0);
 
     if (sa != NULL)
        {no = SC_array_get_n(in);
@@ -540,6 +616,8 @@ int SC_array_string_append(SC_array *out, SC_array *in)
 	    SC_array_string_add(out, sa[i]);}
     else
        no = 0;
+
+    SC_array_unarray(in, 0);
 
     return(no);}
 
@@ -557,7 +635,7 @@ char **_SC_array_string_join(SC_array *sa)
     SC_array *na;
 
     no  = SC_array_get_n(sa);
-    sao = SC_array_array(sa);
+    sao = SC_array_array(sa, 0);
 
     na = SC_string_array("_SC_ARRAY_STRING_JOIN");
 
@@ -591,9 +669,9 @@ char **_SC_array_string_join(SC_array *sa)
 /* add the whatever is left if anything */
 	if (bf != NULL) 
 	   {if (bf[0] != '\0')
-	       {SC_array_string_add(na, bf);}
+	       SC_array_string_add(na, bf);
 	    else
-	       {SFREE(bf);};};};
+	       SFREE(bf);};};
 
 /* add a terminating NULL */
     SC_array_string_add(na, NULL);
@@ -612,7 +690,7 @@ int _SC_array_is_member(SC_array *a, char *s)
     char **str;
 
     n   = SC_array_get_n(a);
-    str = SC_array_array(a);
+    str = SC_array_array(a, 0);
 
     rv = FALSE;
 
@@ -622,6 +700,8 @@ int _SC_array_is_member(SC_array *a, char *s)
 	    {if (strcmp(s, str[i]) == 0)
 	        {rv = TRUE;
 		 break;};};};
+
+    SC_array_unarray(a, 0);
 
     return(rv);}
 

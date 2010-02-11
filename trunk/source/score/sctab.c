@@ -377,7 +377,7 @@ int SC_hasharr_data(hasharr *ha, long *pne, haelem ***php)
        {a = ha->a;
 
 	*pne = SC_array_get_n(a);
-        *php = SC_array_array(a);
+        *php = SC_array_array(a, 0);
 	rv   = TRUE;};
 
     return(rv);}
@@ -411,12 +411,14 @@ int SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
 
     arr = ha->a;
     if ((arr != NULL) && (f != NULL))
-       {hp = SC_array_array(arr);
-	n  = SC_array_get_n(arr);
+       {n  = SC_array_get_n(arr);
+	hp = SC_array_array(arr, 0);
 
 	for (i = 0; i < n; i++)
 	    {if (hp[i] != NULL)
-	        rv &= f(hp[i], a);};};
+	        rv &= f(hp[i], a);};
+
+	SC_array_unarray(arr, 0);};
 
     return(rv);}
 
@@ -691,7 +693,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
     if ((ha != NULL) && (ha->a != NULL))
        {arr = ha->a;
 	ne  = SC_array_get_n(arr);
-	tb  = SC_array_array(arr);
+	tb  = SC_array_array(arr, 0);
 
 	sa = FMAKE_N(char *, ne+1, "SC_HASHARR_DUMP:sa");
 	if (sa != NULL)
@@ -709,7 +711,9 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 
 /* sort the names */
 	    if ((sort == TRUE) && (HA_STRING_KEY(ha->hash) == TRUE))
-	       SC_string_sort(sa, ns);};};
+	       SC_string_sort(sa, ns);};
+
+	SC_array_unarray(arr, 0);};
 
     return(sa);}
 

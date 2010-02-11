@@ -31,10 +31,11 @@
 
 #define GET_TASKS(tsk, n, state)                                             \
     n   = SC_array_get_n(state->tasks);                                      \
-    tsk = SC_array_array(state->tasks);                                      \
+    tsk = SC_array_array(state->tasks, 0);                                   \
     SC_mark(tsk, 1);
 
 #define REL_TASKS(tsk)                                                       \
+    SC_array_unarray(state->tasks, 0);                                       \
     SFREE(tsk)
 
 #define BUILD_STRING(_s, _t)                                                 \
@@ -1863,7 +1864,7 @@ static int _SC_fin_job(taskdesc *job, asyncstate *as, int srv)
 	       p = _SC_show_command(as, inf->full, state->show);
 
 /* print job output thru filter */
-	    if (SC_array_array(inf->out) == NULL)
+	    if (SC_array_array(inf->out, 0) == NULL)
 	       job->print(job, as,
 			  "***> no output for job - _SC_FIN_JOB\n");
 
@@ -2075,9 +2076,8 @@ static void _SC_add_job(taskdesc *job)
     SC_array *ta;
 
     ta  = job->context->tasks;
-    tsk = SC_array_array(ta);
     n   = SC_array_get_n(ta);
-
+    tsk = SC_array_array(ta, 0);
     SC_mark(tsk, 1);
 
     for (i = 0; i < n; i++)
@@ -2085,6 +2085,7 @@ static void _SC_add_job(taskdesc *job)
 	    {tsk[i] = job;
 	     break;};};
 
+    SC_array_unarray(ta, 0);
     SFREE(tsk);
 
     if (i >= n)
@@ -2103,15 +2104,15 @@ static void _SC_remove_job(taskdesc *job)
     SC_array *ta;
 
     ta  = job->context->tasks;
-    tsk = SC_array_array(ta);
     n   = SC_array_get_n(ta);
-
+    tsk = SC_array_array(ta, 0);
     SC_mark(tsk, 1);
 
     for (i = 0; i < n; i++)
         {if (job == tsk[i])
 	    tsk[i] = NULL;};
 
+    SC_array_unarray(ta, 0);
     SFREE(tsk);
 
     return;}

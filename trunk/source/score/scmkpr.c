@@ -196,54 +196,54 @@ void _SC_print_rule_info(anadep *state, int n, ruledes *rd)
 
     fp = state->log;
 
-    na = SC_array_get_n(state->actions);
-    as = SC_array_array(state->actions);
+    ns = SC_array_get_n(state->actions);
+    as = SC_array_array(state->actions, 0);
 
-    if (ns == 0)
-       return;
+    if (ns > 0)
+       {if ((n < 0) || (ns < n))
+	   n = ns - 1;
 
-    if ((n < 0) || (ns < n))
-       n = ns - 1;
+	tgt  = as[n].target;
+	dep  = as[n].dependent;
+	whch = as[n].kind;
+	na   = as[n].n;
+	acts = as[n].actions;
 
-    tgt  = as[n].target;
-    dep  = as[n].dependent;
-    whch = as[n].kind;
-    na   = as[n].n;
-    acts = as[n].actions;
+	n++;
 
-    n++;
+	if (rd == NULL)
+	   {switch (whch)
+	       {case IMPLICIT :
+		     io_printf(fp, "#%d implicit rule\n", n);
+		     break;
+		case ARCHIVE :
+		     io_printf(fp, "#%d archive rule\n", n);
+		     break;
+	        default:
+		     io_printf(fp, "#%d explicit rule\n", n);
+		     break;};}
 
-    if (rd == NULL)
-       {switch (whch)
-	   {case IMPLICIT :
-	         io_printf(fp, "#%d implicit rule\n", n);
-		 break;
-	    case ARCHIVE :
-		 io_printf(fp, "#%d archive rule\n", n);
-		 break;
-	    default:
-		 io_printf(fp, "#%d explicit rule\n", n);
-		 break;};}
+	else
+	   {switch (whch)
+	       {case IMPLICIT :
+		     io_printf(fp, "#%d implicit rule (%s) %s:%d\n",
+			       n, rd->name, rd->file, rd->line);
+		     break;
+		case ARCHIVE :
+		     io_printf(fp, "#%d archive rule  (%s) %s:%d\n",
+			       n, rd->name, rd->file, rd->line);
+		     break;
+		default:
+		     io_printf(fp, "#%d explicit rule  %s:%d\n",
+			       n, rd->file, rd->line);
+		     break;};};
 
-    else
-       {switch (whch)
-	   {case IMPLICIT :
-	         io_printf(fp, "#%d implicit rule (%s) %s:%d\n",
-			   n, rd->name, rd->file, rd->line);
-		 break;
-	    case ARCHIVE :
-		 io_printf(fp, "#%d archive rule  (%s) %s:%d\n",
-			   n, rd->name, rd->file, rd->line);
-		 break;
-	    default:
-		 io_printf(fp, "#%d explicit rule  %s:%d\n",
-			   n, rd->file, rd->line);
-		 break;};};
+	io_printf(fp, "     %s\n", tgt);
+	io_printf(fp, "  <- %s\n", dep);
+	for (i = 0; i < na; i++)
+	    io_printf(fp, "     %s\n", acts[i]);};
 
-    io_printf(fp, "     %s\n", tgt);
-    io_printf(fp, "  <- %s\n", dep);
-    for (i = 0; i < na; i++)
-        io_printf(fp, "     %s\n", acts[i]);
+    SC_array_unarray(state->actions, 0);
 
     return;}
 

@@ -98,11 +98,13 @@ static int _SC_eth_lookup_lock(SC_thread_lock *tl)
     _SC_eth_init();
 
     nl = SC_array_get_n(_SC.eth_locks);
-    la = SC_array_array(_SC.eth_locks);
+    la = SC_array_array(_SC.eth_locks, 0);
 
     for (n = 0; n < nl; n++)
         {if (tl == la[n])
 	    break;};
+
+    SC_array_unarray(_SC.eth_locks, 0);
 
     if (n >= nl)
        {SC_LOCKON(SC_ts_lock);
@@ -355,11 +357,13 @@ static int _SC_eth_lookup_key(SC_thread_key *tk)
     SC_LOCKON(SC_ts_lock);
 
     nk = SC_array_get_n(_SC.eth_keys);
-    ka = SC_array_array(_SC.eth_keys);
+    ka = SC_array_array(_SC.eth_keys, 0);
 
     for (n = 0; n < nk; n++)
         {if (tk == ka[n])
 	    break;};
+
+    SC_array_unarray(_SC.eth_keys, 0);
 
     if (n >= nk)
        _SC_eth_push_key(tk, n);
@@ -436,7 +440,7 @@ emu_cond_info *_SC_eth_lookup_cond(SC_thread_cond *tc)
     _SC_eth_init();
 
     nc = SC_array_get_n(_SC.eth_conds);
-    ci = SC_array_array(_SC.eth_conds);
+    ci = SC_array_array(_SC.eth_conds, 0);
 
     for (n = 0; n < nc; n++)
         {if (tc == ci[n].var)
@@ -446,12 +450,16 @@ emu_cond_info *_SC_eth_lookup_cond(SC_thread_cond *tc)
        cv.var     = tc;
        cv.waiting = FALSE;
 
+       SC_array_unarray(_SC.eth_conds, 0);
+
        SC_array_push(_SC.eth_conds, &cv);
 
-       ci = SC_array_array(_SC.eth_conds);
+       ci = SC_array_array(_SC.eth_conds, 0);
     END_SAFE;
 
     rv = ci + n;
+
+    SC_array_unarray(_SC.eth_conds, 0);
 
     return(rv);}
 
@@ -500,10 +508,12 @@ void _SC_eth_thread_broadcast(SC_thread_cond *tc)
     emu_cond_info *ci;
 
     nc = SC_array_get_n(_SC.eth_conds);
-    ci = SC_array_array(_SC.eth_conds);
+    ci = SC_array_array(_SC.eth_conds, 0);
 
     for (i = 0; i < nc; i++)
         ci[i].waiting = FALSE;
+
+    SC_array_unarray(_SC.eth_conds, 0);
 
     return;}
 

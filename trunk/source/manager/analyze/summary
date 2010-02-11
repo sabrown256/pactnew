@@ -39,6 +39,10 @@ source $Me:h/common
        endif
     endif
 
+    if ($CROSS_COMPILE != "FALSE") then
+       NoteD $Log "   Cross compiling for target $CROSS_COMPILE"
+    endif
+
     if ($BuildSharedLibs == TRUE) then
        NoteD $Log "   Building shared libraries"
     else

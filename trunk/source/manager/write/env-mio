@@ -118,6 +118,10 @@ HAVE_SUBROUTINES
        endif
     endif
 
+    if ($?CROSS_COMPILE == 1) then
+       set cmplib = ""
+    endif
+
     Note $FOUT "Path += $CCBin"
     Note $FOUT ''
 

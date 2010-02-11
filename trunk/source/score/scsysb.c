@@ -27,10 +27,11 @@
 
 #define GET_TASKS(tsk, n, state)                                              \
     n   = SC_array_get_n(state->tasks);                                       \
-    tsk = SC_array_array(state->tasks);                                       \
+    tsk = SC_array_array(state->tasks, 0);                                    \
     SC_mark(tsk, 1);
 
 #define REL_TASKS(tsk)                                                        \
+    SC_array_unarray(state->tasks, 0);                                        \
     SFREE(tsk)
 
 asyncstate
@@ -51,8 +52,8 @@ static void _SC_server_show_log(parstate *state, FILE *fp)
 
     state->is_stdout = (fp == stdout);
 
-    log = SC_array_array(state->log);
     n   = SC_array_get_n(state->log);
+    log = SC_array_array(state->log, 0);
 
     if (fp == NULL)
        {home = getenv("HOME");
@@ -81,6 +82,7 @@ static void _SC_server_show_log(parstate *state, FILE *fp)
 
     state->is_stdout = FALSE;
 
+    SC_array_unarray(state->log, 0);
     SFREE(log);
 
     SC_END_ACTIVITY(state);

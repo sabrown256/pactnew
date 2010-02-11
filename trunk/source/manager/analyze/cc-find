@@ -127,10 +127,11 @@ foreach cc ($cclst)
       rm -f $Tmp
       if ($Verbose > 1) then
          echo "$cc $Tmp.c -o $Tmp"
-         $cc $Tmp.c -o $Tmp
+         $cc $Tmp.c -o $Tmp >>& /dev/null
       else
-         $cc $Tmp.c -o $Tmp >& /dev/null
+         $cc $Tmp.c -o $Tmp >>& /dev/null
       endif
+
       if (-x $Tmp) then
          if ($Verbose > 2) then
             echo "$CFE $Tmp"
@@ -142,18 +143,20 @@ foreach cc ($cclst)
          endif
          if ($xstatus == 0) then
             if ($FullPath == TRUE) then
-               set allcc = ( $allcc $res )
+               set tcc = $res
             else
-               set allcc = ( $allcc $cc )
+               set tcc = $cc
             endif
+
             set ret = `$CFE $Tmp |& awk '{ print $1 }' | tr -d "[0-9]:"`
             if ("$ret" =~ *ANSI*) then
-               if ($FullPath == TRUE) then
-                  set ansicc = ( $ansicc $res )
-               else
-                  set ansicc = ( $ansicc $cc )
-               endif
+               set allcc = ( $allcc $tcc )
+               set ansicc = ( $ansicc $tcc )
+            else if ("$ret" =~ *PCC*) then
+               set allcc = ( $allcc $tcc )
             endif
+            unset tcc
+
          else if ($Verbose > 0) then
             echo "Test built by $cc failed - check for shared libraries"
             ldd $Tmp

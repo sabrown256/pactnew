@@ -554,7 +554,7 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
 
 /* get an alphabetic list of curves */
     ne    = SC_hasharr_get_n(fp->symtab);
-    names = SC_hasharr_dump(fp->symtab, "*curve*", NULL, FALSE);
+    names = SC_hasharr_dump(fp->symtab, "*curve*", NULL, TRUE);
       
     if (names == NULL)
        SS_error("NO CURVES IN FILE OR INSUFFICIENT MEMORY - SX_READ_PDB",

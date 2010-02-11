@@ -293,8 +293,8 @@ static object *_SX_list_vobjects(char *patt, g_file *po, int type)
 
     ret = SS_null;
 
-    mitems = SC_array_array(po->menu_lst);
     n      = SC_array_get_n(po->menu_lst);
+    mitems = SC_array_array(po->menu_lst, 0);
 
     if (n > 0L)
        {PRINT(stdout, "\n");
@@ -308,6 +308,8 @@ static object *_SX_list_vobjects(char *patt, g_file *po, int type)
 					   ret));}};
 
 	SS_Assign(ret, SS_reverse(ret));};
+
+    SC_array_unarray(po->menu_lst, 0);
 
     return(ret);}
 
@@ -407,10 +409,12 @@ void _SX_get_menu(g_file *po)
 	   _SX_push_menu_item(po, names[i], SX_CURVE_S);
     SFREE(names);
 
-    mitems = SC_array_array(po->menu_lst);
     n      = SC_array_get_n(po->menu_lst);
+    mitems = SC_array_array(po->menu_lst, 0);
 
     _SX_sort_lists(mitems, n);
+
+    SC_array_unarray(po->menu_lst, 0);
 
 /* let's give the next place a break */
     PD_reset_ptr_list(file);

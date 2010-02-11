@@ -16,7 +16,7 @@
 #include "trllf.h"
 
 char
- *TR_LLFILE_S = "LLFile";
+ *LLFILE_S = "LLfile";
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -78,7 +78,7 @@ static vld_header *LLF_parse_vld(PDBfile *file, fdir_header filehdr,
 static int _LLF_filep(char *type)
    {int rv;
 
-    rv = (strcmp(type, TR_LLFILE_S) == 0);
+    rv = (strcmp(type, LLFILE_S) == 0);
 
     return(rv);}
 
@@ -162,7 +162,7 @@ static PDBfile *_LLF_open(SC_udl *pu, char *name, char *mode)
 
 	file->default_offset = 1;
 	file->major_order    = COLUMN_MAJOR_ORDER;
-	file->type           = SC_strsavef(TR_LLFILE_S, "char*:_LLF_OPEN:type");
+	file->type           = SC_strsavef(LLFILE_S, "char*:_LLF_OPEN:type");
 
 	if (*mode == 'a')
 	   file->mode = PD_APPEND;
@@ -231,7 +231,7 @@ static PDBfile *_LLF_open(SC_udl *pu, char *name, char *mode)
 void PD_register_llf(void)
    {int n;
 
-    n = PD_REGISTER(TR_LLFILE_S, "llf", _LLF_filep,
+    n = PD_REGISTER(LLFILE_S, "llf", _LLF_filep,
 		    NULL, _LLF_open, _LLF_close, NULL, NULL);
 
     return;}

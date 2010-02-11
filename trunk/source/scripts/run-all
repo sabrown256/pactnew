@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 # RUN-ALL - run the job on all platforms specified by HostFile
 #

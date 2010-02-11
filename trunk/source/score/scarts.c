@@ -85,9 +85,9 @@ static int test_1(void)
 	 SC_array_push(ai, &ia[i]);
          SC_array_push(ad, &da[i]);};
     
-    cb = SC_array_array(ac);
-    ib = SC_array_array(ai);
-    db = SC_array_array(ad);
+    cb = SC_array_array(ac, 0);
+    ib = SC_array_array(ai, 0);
+    db = SC_array_array(ad, 0);
 
     nc = SC_array_get_n(ac);
     ni = SC_array_get_n(ai);
@@ -156,9 +156,9 @@ static int test_2(void)
 	 SC_array_push(ai, &ia[i]);
          SC_array_push(ad, &da[i]);};
     
-    cb = SC_array_array(ac);
-    ib = SC_array_array(ai);
-    db = SC_array_array(ad);
+    cb = SC_array_array(ac, 0);
+    ib = SC_array_array(ai, 0);
+    db = SC_array_array(ad, 0);
 
     nc = SC_array_get_n(ac);
     ni = SC_array_get_n(ai);
@@ -212,8 +212,8 @@ static int test_3(void)
     for (i = 0; i < na; i++)
         SC_array_push(as, &sa[i]);
     
-    sb = SC_array_array(as);
     ns = SC_array_get_n(as);
+    sb = SC_array_array(as, 0);
 
 /* now compare */
     err = 0;
@@ -261,8 +261,8 @@ static int test_4(void)
     for (i = 0; i < na; i++)
         SC_array_push(as, &sa[i]);
     
-    sb = SC_array_array(as);
     ns = SC_array_get_n(as);
+    sb = SC_array_array(as, 0);
 
 /* now compare */
     err = 0;
@@ -314,8 +314,8 @@ static int test_5(void)
     for (i = 0; i < na; i++)
         SC_array_push(as, &sa[i]);
     
-    sb = SC_array_array(as);
     ns = SC_array_get_n(as);
+    sb = SC_array_array(as, 0);
 
 /* now compare */
     err = 0;

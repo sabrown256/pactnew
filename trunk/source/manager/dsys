@@ -949,17 +949,23 @@ switch ($Cmnd)
            goto CFG_DONE
         endif
 
-        if ($?IBM_BGL == 0) then
-
 # using existing dmake/smake build new dmake
-           Separator $Log
-           NoteD $Log "   Persistent Portable Parallel Make - dmake"
+        Separator $Log
+        NoteD $Log "   Persistent Portable Parallel Make - dmake"
+
+        if ($?IBM_BGL == 1) then
+           SafeEnv CROSS_COMPILE none
+        else           
+           SafeEnv CROSS_COMPILE FALSE
+        endif
+
+        set LStat = 1
+        if ($CROSS_COMPILE == "FALSE") then
            flog $Log pushd $Base/score
            if (-x ${BinDir}/dmake) then
               flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
            endif
 
-           set LStat = 1
            foreach i (dmake.exec smake)
               Note $Log ""
               Note $Log "Check $i for building dmake"
@@ -992,15 +998,14 @@ switch ($Cmnd)
            flog $Log $RM ${BinDir}/dmake.exec
            flog $Log popd
         else
-           set LStat = 1
+           set dm = `which-dmake`
+           if (-x "$dm") then
+              cp $dm ${BinDir}/dmake
+              set LStat = 0
+           endif
         endif
 
         flog $Log set Opt = smake
-        if ($?CROSS_COMPILE == 1) then
-           if ($CROSS_COMPILE == TRUE) then
-              set LStat = 2
-           endif
-        endif
         if ($LStat == 0) then
            flog $Log ${BinDir}/dmake -v
            if ($status == 0) then

@@ -928,6 +928,21 @@ data sources/destinations have such dependencies:
    SQLite    sqlite3.h, libsqlite3.a
 </pre>
 
+The C macro can be PD_get_file_type can be used to query a PDBfile structure
+returned by PD_open regarding the type of file actually opened.  The
+standard kinds of files have the following types:
+<p>
+
+<center>
+<table>
+<tr><td align="center" width="100"><b>Type</b></td><td align="center" width="100"><b>Type Name</b></td></tr>
+<tr><td align="center" width="100">PDB</td><td align="center" width="100">PDBfile</td></tr>
+<tr><td align="center" width="100">HDF5</td><td align="center" width="100">HDF5file</td></tr>
+<tr><td align="center" width="100">SQL</td><td align="center" width="100">SQLdatabase</td></tr>
+<tr><td align="center" width="100">XML</td><td align="center" width="100">XMLfile</td></tr>
+</table>
+</center>
+
 <!-- -------------------------------------------------------------------- --> 
 <!-- -------------------------------------------------------------------- --> 
 
