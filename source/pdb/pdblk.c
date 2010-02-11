@@ -11,7 +11,7 @@
 #include "pdb_int.h"
 
 #define _PD_entry_blocks(ep)                                                 \
-    ((ep->blocks == NULL) ? NULL : SC_array_array((ep)->blocks))
+    ((ep->blocks == NULL) ? NULL : SC_array_array((ep)->blocks, 0))
 
 typedef struct s_symblock symblock;
 
@@ -40,7 +40,7 @@ void dprbl(SC_array *bl)
 
     nb = SC_array_get_n(bl);
     if (nb > 0)
-       {sp = SC_array_array(bl);
+       {sp = SC_array_array(bl, 0);
 
 	PRINT(stdout, "      #   Nitems  Address  Valid  Checksum\n");
 	for (i = 0; i < nb; i++)
@@ -77,6 +77,8 @@ SC_array *_PD_block_make(long n)
    {SC_array *bl;
 
     bl = SC_MAKE_ARRAY("_PD_BLOCK_MAKE", symblock, _PD_symblock_init);
+
+    SC_array_resize(bl, n, -1.0);
 
     return(bl);}
 
@@ -150,8 +152,8 @@ off_t _PD_block_get_address(SC_array *bl, long n)
     off_t addr;
     symblock *sp;
 
-    sp = SC_array_array(bl);
     nb = SC_array_get_n(bl);
+    sp = SC_array_array(bl, 0);
 
     if (n < nb)
        addr = sp[n].diskaddr;
@@ -170,7 +172,7 @@ off_t _PD_block_set_address(SC_array *bl, long n, off_t addr)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
 
     sp[n].diskaddr = addr;
 
@@ -185,8 +187,8 @@ long _PD_block_get_number(SC_array *bl, long n)
    {long ni, nb;
     symblock *sp;
 
-    sp = SC_array_array(bl);
     nb = SC_array_get_n(bl);
+    sp = SC_array_array(bl, 0);
 
     if (n < nb)
        ni = sp[n].number;
@@ -205,7 +207,7 @@ long _PD_block_set_number(SC_array *bl, long n, long ni)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
 
     sp[n].number = ni;
 
@@ -223,8 +225,8 @@ void _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n)
     off_t addr;
     symblock *sp;
 
-    sp = SC_array_array(bl);
     nb = SC_array_get_n(bl);
+    sp = SC_array_array(bl, 0);
 
     if (n < nb)
        addr = sp[n].diskaddr;
@@ -256,7 +258,7 @@ void _PD_block_set_desc(off_t addr, long ni, SC_array *bl, long n)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
 
     sp[n].diskaddr = addr;
     sp[n].number   = ni;
@@ -273,8 +275,8 @@ PD_block_type _PD_block_get_valid(SC_array *bl, long n)
     PD_block_type vl;
     symblock *sp;
 
-    sp = SC_array_array(bl);
     nb = SC_array_get_n(bl);
+    sp = SC_array_array(bl, 0);
 
     if (n < nb)
        vl = sp[n].valid;
@@ -293,7 +295,7 @@ int _PD_block_set_valid(SC_array *bl, long n, PD_block_type vl)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
 
     sp[n].valid = vl;
 
@@ -322,7 +324,8 @@ int _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
+
     if ((dig != NULL) &&
 	((sp[n].valid == PD_BLOCK_VALID) ||
 	 (sp[n].valid == PD_BLOCK_UNVERIFIED)))
@@ -344,7 +347,8 @@ int _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
+
     if (dig != NULL)
        {memcpy(sp[n].checksum, dig, PD_CKSUM_LEN);
 	sp[n].valid = PD_BLOCK_VALID;
@@ -474,7 +478,7 @@ long _PD_block_find(PDBfile *file, syment *ep, off_t addr)
 
 	bl  = ep->blocks;
 	n   = SC_array_get_n(bl);
-	sp  = SC_array_array(bl);
+	sp  = SC_array_array(bl, 0);
 
 	for (i = 0; i < n; i++)
 	    {start = sp[i].diskaddr;
@@ -500,8 +504,8 @@ SC_array *_PD_block_copy_seg(SC_array *bl, long imn, long imx)
     n   = imx - imn;
     nbl = _PD_block_make(n);
 
-    sp  = SC_array_array(bl);
-    nsp = SC_array_array(nbl);
+    sp  = SC_array_array(bl, 0);
+    nsp = SC_array_array(nbl, 0);
 
     sp += imn;
 
@@ -539,7 +543,7 @@ void _PD_block_switch(syment *ep, SC_array *bln)
     SC_array *bl;
     
     nb  = SC_array_get_n(bln);
-    spn = SC_array_array(bln);
+    spn = SC_array_array(bln, 0);
     bln->array = NULL;
     _PD_block_free(bln);
 
@@ -605,7 +609,7 @@ long _PD_effective_addr(off_t *paddr, long *pnitems,
     off_t addr, eaddr;
     symblock *sp;
 
-    sp = SC_array_array(bl);
+    sp = SC_array_array(bl, 0);
 
     eaddr = *paddr;
     i     = 0;
@@ -663,8 +667,8 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
 
     if (file->use_cksum & PD_MD5_RW)
        {bl = ep->blocks;
-	sp = SC_array_array(bl);
 	n  = SC_array_get_n(bl);
+	sp = SC_array_array(bl, 0);
 
 /* count the initialized checksums */
 	ne = 0;
@@ -724,8 +728,8 @@ int _PD_block_csum_read(PDBfile *file)
 
 	ep = PD_inquire_entry(file, name, FALSE, NULL);
 	bl = ep->blocks;
-	sp = SC_array_array(bl);
 	nb = SC_array_get_n(bl);
+	sp = SC_array_array(bl, 0);
 
 	for (ie = 0L; ie < ne; ie++)
 	    {token = SC_strtok(NULL, " \n", s);

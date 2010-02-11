@@ -29,10 +29,11 @@
 
 #define GET_CONNECTIONS(pc, nc, cp)                                              \
     nc = SC_array_get_n(cp->pool);                                               \
-    pc = SC_array_array(cp->pool);                                               \
+    pc = SC_array_array(cp->pool, 0);                                            \
     SC_mark(pc, 1);
 
 #define REL_CONNECTIONS(pc)                                                      \
+    SC_array_unarray(cp->pool, 0);                                               \
     SFREE(pc)
 
 #define GET_CONNECTION(cp, ic)                                                   \
@@ -45,10 +46,11 @@
 
 #define GET_TASKS(pt, nt, pc)                                                    \
     nt = SC_array_get_n(pc->taska);                                              \
-    pt = SC_array_array(pc->taska);                                              \
+    pt = SC_array_array(pc->taska, 0);                                           \
     SC_mark(pt, 1)
 
-#define REL_TASKS(pt)                                                            \
+#define REL_TASKS(pt, pc)                                                        \
+    SC_array_unarray(pc->taska, 0);                                              \
     SFREE(pt)
 
 typedef struct s_connectdes connectdes;
@@ -427,12 +429,13 @@ void SC_show_pool_logs(conpool *cp, int n)
 	 _SC_exec_printf(as,
 			 "-------------------------------------------------\n");
 
-	 log = SC_array_array(pco->log);
 	 nt  = SC_array_get_n(pco->log);
+	 log = SC_array_array(pco->log, 0);
 
 	 for (it = 0; it < nt; it++)
 	     _SC_exec_printf(as, "%2d> %s\n", ic, log[it]);
 
+	 SC_array_unarray(pco->log, 0);
 	 SFREE(log);
 
 	 _SC_exec_printf(as,
@@ -1002,7 +1005,7 @@ static void _SC_process_task_output(asyncstate *as, conpool *cp,
 /* OUTPUT from server controlled job looks like "<text>"
  * comes from _SC_server_complete via job->finish and _SC_print_filtered
  */
-	else if (SC_array_array(inf->out) != NULL)
+	else if (SC_array_array(inf->out, 0) != NULL)
 	   {SC_array_string_add_copy(inf->out, p);}
 				  
 /* any other non-empty output is unexpected and logged as such
@@ -1092,7 +1095,7 @@ static void _SC_pool_assign_others(conpool *cp, int ic)
 		    "reassigned tasks from %s to other connections",
 		    pco->host);
 
-    REL_TASKS(pt);
+    REL_TASKS(pt, pco);
     REL_CONNECTIONS(pc);
 
     return;}
@@ -1129,7 +1132,7 @@ static void _SC_pool_assign_current(conpool *cp, int ic)
 	     _SC_pool_job(cp, ic, inf->na, inf->shell,
 			  inf->directory, inf->full);};};
 
-    REL_TASKS(pt);
+    REL_TASKS(pt, pco);
 
     return;}
 
@@ -1495,7 +1498,7 @@ static void _SC_pool_output(int fd, int mask, void *a)
 	    s[0] = '\0';
 	    count++;};
 
-	REL_TASKS(pt);
+	REL_TASKS(pt, pco);
 
 	nb = pp->n_read - nb;
 
@@ -1700,7 +1703,7 @@ void SC_show_pool_stats(conpool *cp, int n, int full)
 				     inf->id, pto->group, pto->ack, inf->status,
 				     pto->dt, inf->full);};};
 
-	 REL_TASKS(pt);
+	 REL_TASKS(pt, pco);
 
 /* load average info */
 	 if (pco->load != -1.0)
@@ -2242,7 +2245,7 @@ static void _SC_check_job_time(conpool *cp)
 
 		      no++;};};};
 
-	 REL_TASKS(pt);};
+	 REL_TASKS(pt, pco);};
 #endif
 
     REL_CONNECTIONS(pc);
@@ -2342,7 +2345,7 @@ int SC_wait_pool_job(conpool *cp, int to)
 		 {dta += dt;
 		  ndt += 1.0;};};
 
-	 REL_TASKS(pt);
+	 REL_TASKS(pt, pco);
 
 	 if (ndt > 0.0)
 	    dta /= ndt;
@@ -2467,7 +2470,7 @@ int SC_connection_pool_status(conpool *cp)
 		 {stc = inf->status;
 		  st += (stc != 0);};};
 
-	 REL_TASKS(pt);};
+	 REL_TASKS(pt, pco);};
 
     REL_CONNECTIONS(pc);
 
@@ -2512,7 +2515,7 @@ int SC_connection_pool_anomalies(conpool *cp)
 	      na += (inf->signal == SC_EXIT_BAD);
 	      na += (pto->killed != 0);};
 
-	 REL_TASKS(pt);};
+	 REL_TASKS(pt, pco);};
 
     REL_CONNECTIONS(pc);
 

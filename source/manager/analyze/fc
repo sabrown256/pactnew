@@ -116,12 +116,12 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($CROSS_COMPILE == TRUE) then
-   flog $ALog setenv Cfe_FC_Exe    $FC_Exe
-   flog $ALog setenv Cfe_FC_Flags  "$FC_Flags"
-else
+if ($CROSS_COMPILE == "FALSE") then
    flog $ALog setenv Cfe_FC_Exe    $Cfg_FC_Exe
    flog $ALog setenv Cfe_FC_Flags  "$Cfg_FC_Flags"
+else
+   flog $ALog setenv Cfe_FC_Exe    $FC_Exe
+   flog $ALog setenv Cfe_FC_Flags  "$FC_Flags"
 endif
 
 #--------------------------------------------------------------------------

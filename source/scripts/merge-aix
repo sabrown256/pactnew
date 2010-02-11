@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 # MERGE-AIX - combine 32 bit and 64 bit objects into a single archive
 #           - something special for AIX only

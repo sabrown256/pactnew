@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 # LS-ALL - list the selected jobs on all platforms specified by HostFile
 #

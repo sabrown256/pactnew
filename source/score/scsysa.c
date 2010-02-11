@@ -22,10 +22,11 @@
 
 #define GET_TASKS(tsk, n, state)                                              \
     n   = SC_array_get_n(state->tasks);                                       \
-    tsk = SC_array_array(state->tasks);                                       \
+    tsk = SC_array_array(state->tasks, 0);                                    \
     SC_mark(tsk, 1);
 
 #define REL_TASKS(tsk)                                                        \
+    SC_array_unarray(state->tasks, 0);                                        \
     SFREE(tsk)
 
 extern asyncstate
@@ -292,12 +293,13 @@ void SC_show_state_log(parstate *state)
 
     as = NULL;
 
-    log = SC_array_array(state->log);
     nt  = SC_array_get_n(state->log);
+    log = SC_array_array(state->log, 0);
 
     for (it = 0; it < nt; it++)
         io_printf(stdout, "> %s", log[it]);
 
+    SC_array_unarray(state->log, 0);
     SFREE(log);
 
     io_printf(stdout, "\n");

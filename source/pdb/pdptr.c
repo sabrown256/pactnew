@@ -65,10 +65,10 @@ static PD_address *_PD_ptr_get_list(PDBfile *file, long nl)
        {da = SC_MAKE_ARRAY("_PD_PTR_GET_LIST", PD_address, _PD_ptr_init_addr);
 
 /* grow the array to at least na elements */
-	SC_array_get(da, na);
+	SC_array_resize(da, na, -1.0);
 
 /* NULL is the first pointer always */
-	ap         = SC_array_array(da);
+	ap         = SC_array_array(da, 0);
 	ap[0].indx = 0L;
 	ap[0].addr = 0L;
 	ap[0].ptr  = NULL;
@@ -88,7 +88,7 @@ static PD_address *_PD_ptr_get_list(PDBfile *file, long nl)
 	mx = max(nx, nl) + _PD.ninc;
 	SC_array_get(da, mx);};
 
-    ap = SC_array_array(file->ap);
+    ap = SC_array_array(file->ap, 0);
 
     SC_LOCKOFF(PD_ptr_lock);
 

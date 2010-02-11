@@ -41,7 +41,7 @@ end
 cd $TestDir
 
 # omit tests - usually in difficult CROSS_COMPILE situation
-if (($RUN_TESTS == FALSE) || ($CROSS_COMPILE == TRUE)) then
+if (($RUN_TESTS == FALSE) || ($CROSS_COMPILE != FALSE)) then
    NoteD $Log ""
    NoteD $Log "PPC TESTS ... omitted"
 

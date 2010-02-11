@@ -19,7 +19,7 @@ include no-jpeg
 include no-png
 include no-libz
 
-setenv CROSS_COMPILE  TRUE
+setenv CROSS_COMPILE  BGP
 setenv DO_RUN_MPI     "salloc.bgp"
 setenv DO_RUN_CROSS   "submit"
 setenv IBM_BGP

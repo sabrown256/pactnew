@@ -11,7 +11,7 @@
 #include "trnacf.h"
 
 char
- *TR_NACFILE_S = "NACfile";
+ *NACFILE_S = "NACfile";
 
 static int
  n_structs = 0;
@@ -455,7 +455,7 @@ static void _NAC_build_name_table(PDBfile *file, char *names,
 static int _NAC_filep(char *type)
    {int rv;
 
-    rv = (strcmp(type, TR_NACFILE_S) == 0);
+    rv = (strcmp(type, NACFILE_S) == 0);
 
     return(rv);}
 
@@ -532,7 +532,7 @@ static PDBfile *_NAC_open(SC_udl *pu, char *name, char *mode)
 
 	file->default_offset = 1;
 	file->major_order    = COLUMN_MAJOR_ORDER;
-	file->type           = SC_strsavef(TR_NACFILE_S,
+	file->type           = SC_strsavef(NACFILE_S,
 					   "char*:_NAC_OPEN:type");
 	if (*mode == 'a')
 	   file->mode = PD_APPEND;
@@ -663,7 +663,7 @@ static PDBfile *_NAC_open(SC_udl *pu, char *name, char *mode)
 void PD_register_nacf(void)
    {int n;
 
-    n = PD_REGISTER(TR_NACFILE_S, "nacf", _NAC_filep,
+    n = PD_REGISTER(NACFILE_S, "nacf", _NAC_filep,
 		    NULL, _NAC_open, _NAC_close, NULL, NULL);
 
     return;}

@@ -140,6 +140,8 @@ struct s_SC_array
    int bpi;                                              /* bytes per item */
    long n;                                       /* max referenced element */
    long nx;                                /* number of elements allocated */
+   int nref;
+   double gf;                                             /* growth factor */
    void *array;                                         /* the actual data */
    void (*init)(void *a);          /* initialize new elements when growing */
    void *(*set)(void *ra, int bpi, int oper, long n, void *v);};
@@ -151,6 +153,8 @@ struct s_SC_array
                     "int bpi",                                     \
                     "long n",                                      \
                     "long nx",                                     \
+                    "int nref",                                    \
+                    "double gf",                                   \
                     "char *array",                                 \
                     "function init",                               \
                     "function set",                                \
@@ -227,13 +231,14 @@ extern void
  SC_array_init(SC_array *a, long n),
  SC_free_array(SC_array *a, int (*rel)(void *a)),
  SC_array_string_add(SC_array *a, char *s),
- SC_array_string_add_copy(SC_array *a, char *s);
+ SC_array_string_add_copy(SC_array *a, char *s),
+ SC_array_unarray(SC_array *a, int flag);
 
 extern void
  *SC_array_done(SC_array *a),
  *SC_array_set(SC_array *a, long n, void *v),
  *SC_array_get(SC_array *a, long n),
- *SC_array_array(SC_array *a),
+ *SC_array_array(SC_array *a, int flag),
  *SC_array_push(SC_array *a, void *v),
  *SC_array_pop(SC_array *a);
 
@@ -241,6 +246,7 @@ extern char
  **_SC_array_string_join(SC_array *sa);
 
 extern long
+ SC_array_resize(SC_array *a, long n, double g),
  SC_array_set_n(SC_array *a, long n),
  SC_array_inc_n(SC_array *a, long n, int wh),
  SC_array_dec_n(SC_array *a, long n, int wh),

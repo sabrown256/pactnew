@@ -208,8 +208,8 @@ static char *_XML_entry_name(parse_state *st)
     char s[MAXLINE];
     char *name, *b, *u, **sa;
 
-    sa = SC_array_array(st->stack);
     ns = SC_array_get_n(st->stack);
+    sa = SC_array_array(st->stack, 0);
 
     name = NULL;
     for (is = 0; is < ns; is++)
@@ -222,6 +222,8 @@ static char *_XML_entry_name(parse_state *st)
 	 name = _XML_entry_uniq(st, name, b, is);};
 
     SC_trim_right(name, " \t\n\r\f");
+
+    SC_array_unarray(st->stack, 0);
 
     return(name);}
 

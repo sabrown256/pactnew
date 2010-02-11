@@ -735,14 +735,14 @@ long SC_mem_chk(int typ)
        {nt = _SC_flchk();
 	if (nt < 0L)
 	   nb = (nb < 0L) ? -3L : -2L;
-	else if (nb > 0L)
+	else if (nb >= 0L)
 	   nb += nt;};
 
-    if (typ & 3)
+    if (typ & 4)
        {nt = _SC_rgchk();
 	if (nt < 0L)
 	   nb = (nb < 0L) ? -3L : -2L;
-	else if (nb > 0L)
+	else if (nb >= 0L)
 	   nb += nt;};
 
     return(nb);}

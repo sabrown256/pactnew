@@ -217,16 +217,18 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
        fd = *(int *) p;
 
     n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pa = SC_array_array(pe->faccpt);
+    pd = SC_array_array(pe->fd, 0);
+    pa = SC_array_array(pe->faccpt, 0);
     SC_mark(pd, 1);
-    SC_mark(pd, 1);
+    SC_mark(pa, 1);
 
     for (i = 0; i < n; i++)
         {if (pd[i].fd == fd)
             {pa[i] = acc;
              break;};};
 
+    SC_array_unarray(pe->fd, 0);
+    SC_array_unarray(pe->faccpt, 0);
     SFREE(pd);
     SFREE(pa);
 
@@ -261,8 +263,8 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
        fd = *(int *) p;
 
     n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pr = SC_array_array(pe->frejct);
+    pd = SC_array_array(pe->fd, 0);
+    pr = SC_array_array(pe->frejct, 0);
     SC_mark(pd, 1);
     SC_mark(pr, 1);
 
@@ -271,6 +273,8 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
             {pr[i] = rej;
              break;};};
 
+    SC_array_unarray(pe->fd, 0);
+    SC_array_unarray(pe->frejct, 0);
     SFREE(pd);
     SFREE(pr);
 
@@ -311,9 +315,9 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
        fd = *(int *) p;
 
     n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pa = SC_array_array(pe->faccpt);
-    pr = SC_array_array(pe->frejct);
+    pd = SC_array_array(pe->fd, 0);
+    pa = SC_array_array(pe->faccpt, 0);
+    pr = SC_array_array(pe->frejct, 0);
     SC_mark(pd, 1);
     SC_mark(pa, 1);
     SC_mark(pr, 1);
@@ -329,6 +333,9 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
              pr[i] = pr[n];
              break;};};
 
+    SC_array_unarray(pe->fd, 0);
+    SC_array_unarray(pe->faccpt, 0);
+    SC_array_unarray(pe->frejct, 0);
     SFREE(pd);
     SFREE(pa);
     SFREE(pr);
@@ -374,9 +381,9 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
  * but these pointers will remain valid
  */
     n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pa = SC_array_array(pe->faccpt);
-    pr = SC_array_array(pe->frejct);
+    pd = SC_array_array(pe->fd, 0);
+    pa = SC_array_array(pe->faccpt, 0);
+    pr = SC_array_array(pe->frejct, 0);
     SC_mark(pd, 1);
     SC_mark(pa, 1);
     SC_mark(pr, 1);
@@ -427,6 +434,9 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
     else if (nrdy == -1)
        nrdy = -errno;
 
+    SC_array_unarray(pe->fd, 0);
+    SC_array_unarray(pe->faccpt, 0);
+    SC_array_unarray(pe->frejct, 0);
     SFREE(pd);
     SFREE(pa);
     SFREE(pr);

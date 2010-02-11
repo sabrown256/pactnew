@@ -17,10 +17,10 @@ Note $Log "Analyze: cc"
 NoteD $ALog -n "   C Compiler: "
 Note $ALog ""
 
-if ($CROSS_COMPILE == TRUE) then
-   Note $ALog "Cross compiling C compiler analysis"
-else
+if ($CROSS_COMPILE == "FALSE") then
    Note $ALog "Direct compiling C compiler analysis"
+else
+   Note $ALog "Cross compiling C compiler analysis"
 endif
 
 SafeEnv UseLDLibPath ""
@@ -170,20 +170,20 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ($CROSS_COMPILE == TRUE) then
-   flog $ALog setenv Cfe_CC_Exe    $CC_Exe
-   flog $ALog setenv Cfe_CC_Flags  "$CC_Flags"
-   flog $ALog setenv Cfe_CC_Inc    "$CC_Inc"
-   flog $ALog setenv Cfe_LD_Flags  "$LD_Flags"
-   flog $ALog setenv Cfe_LD_Lib    "$LD_Lib"
-   flog $ALog setenv Cfe_LD_RPath  "$LD_RPath"
-else
+if ($CROSS_COMPILE == "FALSE") then
    flog $ALog setenv Cfe_CC_Exe    $Cfg_CC_Exe
    flog $ALog setenv Cfe_CC_Flags  "$Cfg_CC_Flags"
    flog $ALog setenv Cfe_CC_Inc    "$Cfg_CC_Inc"
    flog $ALog setenv Cfe_LD_Flags  "$Cfg_LD_Flags"
    flog $ALog setenv Cfe_LD_Lib    "$Cfg_LD_Lib"
    flog $ALog setenv Cfe_LD_RPath  "$Cfg_LD_RPath"
+else
+   flog $ALog setenv Cfe_CC_Exe    $CC_Exe
+   flog $ALog setenv Cfe_CC_Flags  "$CC_Flags"
+   flog $ALog setenv Cfe_CC_Inc    "$CC_Inc"
+   flog $ALog setenv Cfe_LD_Flags  "$LD_Flags"
+   flog $ALog setenv Cfe_LD_Lib    "$LD_Lib"
+   flog $ALog setenv Cfe_LD_RPath  "$LD_RPath"
 endif
 
 #--------------------------------------------------------------------------

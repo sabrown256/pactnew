@@ -52,13 +52,15 @@ BIGINT SC_stash_pointer(void *p)
        _SC.ptr_lst = SC_MAKE_ARRAY("PERM|SC_STASH_POINTER", void *, NULL);
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
+    pl = SC_array_array(_SC.ptr_lst, 0);
 
     for (; _SC.ip < np; _SC.ip++)
         {if (pl[_SC.ip] == NULL)
             {pl[_SC.ip] = p;
              i = ++_SC.ip;
              break;};}
+
+    SC_array_unarray(_SC.ptr_lst, 0);
 
     if (i == -1)
        {SC_array_push(_SC.ptr_lst, &p);
@@ -92,11 +94,13 @@ void *SC_get_pointer(BIGINT n)
     p = NULL;
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
+    pl = SC_array_array(_SC.ptr_lst, 0);
 
     if ((1 <= n) && (n <= np))
        {n--;
         p = pl[n];};
+
+    SC_array_unarray(_SC.ptr_lst, 0);
 
     SC_LOCKOFF(SC_ptr_lock);
 
@@ -125,11 +129,13 @@ BIGINT SC_pointer_index(void *p)
     SC_LOCKON(SC_ptr_lock);
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
+    pl = SC_array_array(_SC.ptr_lst, 0);
 
     for (i = 0; i < np; i++)
         {if (pl[i] == p)
              break;}
+
+    SC_array_unarray(_SC.ptr_lst, 0);
 
     if (i >= np)
        i = -1;
@@ -163,7 +169,7 @@ void *SC_del_pointer(int n)
     p = NULL;
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
+    pl = SC_array_array(_SC.ptr_lst, 0);
 
     if ((1 <= n) && (n <= np))
        {n--;
@@ -179,6 +185,8 @@ void *SC_del_pointer(int n)
        _SC.ip = min(_SC.ip, n);
 
        SC_LOCKOFF(SC_ptr_lock);};
+
+    SC_array_unarray(_SC.ptr_lst, 0);
 
 #else
 

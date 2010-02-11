@@ -1461,14 +1461,17 @@ FIXNUM F77_FUNC(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
     fl   = fth->labels;
 
     nm = SC_array_get_n(fm);
-    sm = SC_array_array(fm);
+    sm = SC_array_array(fm, 0);
 
     nl = SC_array_get_n(fl);
-    sl = SC_array_array(fl);
+    sl = SC_array_array(fl, 0);
 
     dp = PA_th_def_rec(file, fth->entry_name, fth->type, nm, sm, sl);
 
     rv = (dp != NULL);
+
+    SC_array_unarray(fm, 0);
+    SC_array_unarray(fl, 0);
 
     return(rv);}
 

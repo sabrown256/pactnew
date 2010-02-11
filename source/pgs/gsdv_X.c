@@ -1138,12 +1138,14 @@ PG_device *_PG_X_find_device(Window window)
     PG_device *dev, **devs;
 
     n    = SC_array_get_n(_PG.devlst);
-    devs = SC_array_array(_PG.devlst);
+    devs = SC_array_array(_PG.devlst, 0);
 
     for (i = 0; i < n; i++)
         {dev = devs[i];
          if ((dev != NULL) && (dev->window == window))
              break;};
+
+    SC_array_unarray(_PG.devlst, 0);
 
     if (i > n)
        dev = NULL;

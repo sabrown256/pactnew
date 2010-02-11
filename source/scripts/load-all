@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 # LOAD-ALL - report the loads on all the machines specified in HostFile
 #

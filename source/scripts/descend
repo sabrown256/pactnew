@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 # DESCEND - list/show the desendants of the specified process
 #

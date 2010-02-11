@@ -13,18 +13,20 @@
 
 #define GET_PROCESSES(lst, np)                                                \
     np  = SC_array_get_n(_SC.process_list);                                   \
-    lst = SC_array_array(_SC.process_list);                                   \
+    lst = SC_array_array(_SC.process_list, 0);                                \
     SC_mark(lst, 1);
 
 #define REL_PROCESSES(lst)                                                    \
+    SC_array_unarray(_SC.process_list, 0);                                    \
     SFREE(lst)
 
 #define GET_SIGRECS(lst, np)                                                  \
     np  = SC_array_get_n(_SC.wait_list);                                      \
-    lst = SC_array_array(_SC.wait_list);                                      \
+    lst = SC_array_array(_SC.wait_list, 0);                                   \
     SC_mark(lst, 1)
 
 #define REL_SIGRECS(lst)                                                      \
+    SC_array_unarray(_SC.wait_list, 0);                                       \
     SFREE(lst)
 
 typedef struct s_sigchld_rec sigchld_rec;
