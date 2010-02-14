@@ -2016,7 +2016,7 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
 /* count the palettes and make an array of them */
     pa = SC_MAKE_ARRAY("PG_SHOW_PALETTES", PG_palette *, NULL);
     for (pal = sdev->palettes; TRUE; )
-        {SC_array_push(pa, pal);
+        {SC_array_push(pa, &pal);
          pal = pal->next;
          if (pal == sdev->palettes)
             break;};
