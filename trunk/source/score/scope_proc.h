@@ -495,6 +495,7 @@ extern void
 /* SCSYSA.C declarations */
 
 extern void
+ _SC_setup_output(jobinfo *inf, char *name),
  _SC_process_output(int fd, int mask, void *a),
  _SC_process_out_reject(int fd, int mask, void *a);
 

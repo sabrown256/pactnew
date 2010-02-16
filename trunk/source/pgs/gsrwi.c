@@ -221,7 +221,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 	     PRINT(fp, " (%5.3f,%5.3f)", xs[0], xs[1]);};};
 
     niobs = SC_array_get_n(iob->children);
-    iobs  = SC_array_array(iob->children, 0);
+    iobs  = SC_array_array(iob->children);
     if (niobs > 0)
        {PRINT(fp, "\n");
 
@@ -245,7 +245,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
     if (nopf)
        PRINT(fp, "\n");
 
-    SC_array_unarray(iob->children, 0);
+    SFREE(iobs);
 
     return(TRUE);}
 
@@ -270,7 +270,7 @@ int PG_write_interface(PG_device *dev, char *name)
     memset(indent, ' ', MAXLINE);
 
     niobs = SC_array_get_n(dev->iobjs);
-    iobs  = SC_array_array(dev->iobjs, 0);
+    iobs  = SC_array_array(dev->iobjs);
 
 /* print documentation */
     PRINT(fp, "#\n");
@@ -319,7 +319,7 @@ int PG_write_interface(PG_device *dev, char *name)
 	    break;
          PRINT(fp, "\n");};
 
-    SC_array_unarray(dev->iobjs, 0);
+    SFREE(iobs);
 
     io_close(fp);
 
@@ -426,11 +426,11 @@ PG_interface_object *PG_find_object(PG_device *dev, char *s,
 	        {if (strcmp(parent->name, s) == 0)
                     return(parent);};
 	niobs = SC_array_get_n(parent->children);
-	iobs  = SC_array_array(parent->children, 0);}
+	iobs  = SC_array_array(parent->children);}
 
     else
        {niobs = SC_array_get_n(dev->iobjs);
-        iobs  = SC_array_array(dev->iobjs, 0);};
+        iobs  = SC_array_array(dev->iobjs);};
 
     iob = NULL;
     for (i = 0; i < niobs; i++)
@@ -439,10 +439,7 @@ PG_interface_object *PG_find_object(PG_device *dev, char *s,
 	     if (iob != NULL)
 	        break;};};
 
-    if (parent != NULL)
-       SC_array_unarray(parent->children, 0);
-    else
-       SC_array_unarray(dev->iobjs, 0);
+    SFREE(iobs);
 
     return(iob);}
 
@@ -712,7 +709,7 @@ int dpritf(PG_device *dev)
     memset(indent, ' ', MAXLINE);
 
     niobs = SC_array_get_n(dev->iobjs);
-    iobs  = SC_array_array(dev->iobjs, 0);
+    iobs  = SC_array_array(dev->iobjs);
 
     ret = TRUE;
     indent[0] = '\0';
@@ -722,7 +719,7 @@ int dpritf(PG_device *dev)
 	    break;
          PRINT(stdout, "\n");};
 
-    SC_array_unarray(dev->iobjs, 0);
+    SFREE(iobs);
 
     return(ret);}
 

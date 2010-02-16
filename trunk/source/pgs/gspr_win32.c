@@ -598,7 +598,8 @@ void _PG_win32_shade_poly(PG_device *dev, int nd, int n, double **r)
 	     p.y = x[1];
 	     SC_array_push(_PG_win32_point_list, &p);};
 
-	points = SC_array_array(_PG_win32_point_list, 0);
+	points = SC_array_array(_PG_win32_point_list);
+
 	SC_array_set_n(_PG_win32_point_list, 0);
 
 	hdc = GetDC(dev->window);
@@ -607,7 +608,7 @@ void _PG_win32_shade_poly(PG_device *dev, int nd, int n, double **r)
 
 	ReleaseDC(dev->window, hdc);
 
-	SC_array_unarray(_PG_win32_point_list, 0);};
+	SFREE(points);};
 
     return;}
 
@@ -640,7 +641,8 @@ void _PG_win32_fill_curve(PG_device *dev, PG_curve *crv)
 
 	 SC_array_push(_PG_win32_point_list, &p);};
 
-    points = SC_array_array(_PG_win32_point_list, 0);
+    points = SC_array_array(_PG_win32_point_list);
+
     SC_array_set_n(_PG_win32_point_list, 0);
 
     hdc = GetDC(dev->window);
@@ -649,7 +651,7 @@ void _PG_win32_fill_curve(PG_device *dev, PG_curve *crv)
 
     ReleaseDC(dev->window, hdc);    
 
-    SC_array_unarray(_PG_win32_point_list, 0);
+    SFREE(points);
 
     return;}
 

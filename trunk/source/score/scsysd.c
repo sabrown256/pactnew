@@ -29,11 +29,9 @@
 
 #define GET_CONNECTIONS(pc, nc, cp)                                              \
     nc = SC_array_get_n(cp->pool);                                               \
-    pc = SC_array_array(cp->pool, 0);                                            \
-    SC_mark(pc, 1);
+    pc = SC_array_array(cp->pool)
 
 #define REL_CONNECTIONS(pc)                                                      \
-    SC_array_unarray(cp->pool, 0);                                               \
     SFREE(pc)
 
 #define GET_CONNECTION(cp, ic)                                                   \
@@ -46,11 +44,9 @@
 
 #define GET_TASKS(pt, nt, pc)                                                    \
     nt = SC_array_get_n(pc->taska);                                              \
-    pt = SC_array_array(pc->taska, 0);                                           \
-    SC_mark(pt, 1)
+    pt = SC_array_array(pc->taska)
 
 #define REL_TASKS(pt, pc)                                                        \
-    SC_array_unarray(pc->taska, 0);                                              \
     SFREE(pt)
 
 typedef struct s_connectdes connectdes;
@@ -262,8 +258,7 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
 
     if (fl == TRUE)
        {pc->taska = SC_MAKE_ARRAY("SC_INIT_CONNECTION", contask *, NULL);
-	pc->log   = SC_string_array("SC_INIT_CONNECTION");
-	SC_array_resize(pc->log, 512, -1.0);};
+	pc->log   = SC_string_array("SC_INIT_CONNECTION");};
 
     return;}
 
@@ -431,12 +426,11 @@ void SC_show_pool_logs(conpool *cp, int n)
 			 "-------------------------------------------------\n");
 
 	 nt  = SC_array_get_n(pco->log);
-	 log = SC_array_array(pco->log, 0);
+	 log = SC_array_array(pco->log);
 
 	 for (it = 0; it < nt; it++)
 	     _SC_exec_printf(as, "%2d> %s\n", ic, log[it]);
 
-	 SC_array_unarray(pco->log, 0);
 	 SFREE(log);
 
 	 _SC_exec_printf(as,
@@ -563,8 +557,7 @@ static void _SC_exec_pool_job(conpool *cp, int ic, contask *pt)
     if (cmd[0] == '@')
        cmd++;
 
-    inf->out = SC_string_array("_SC_POOL_JOB");
-    SC_array_resize(inf->out, 512, -1.0);
+    _SC_setup_output(inf, "_SC_POOL_JOB");
 
 /* document the number of running jobs at launch time */
     _SC_pool_log(pco, "client",
@@ -1006,8 +999,8 @@ static void _SC_process_task_output(asyncstate *as, conpool *cp,
 /* OUTPUT from server controlled job looks like "<text>"
  * comes from _SC_server_complete via job->finish and _SC_print_filtered
  */
-	else if (SC_array_array(inf->out, 0) != NULL)
-	   {SC_array_string_add_copy(inf->out, p);}
+	else if (inf->out->array != NULL)
+	   SC_array_string_add_copy(inf->out, p);
 				  
 /* any other non-empty output is unexpected and logged as such
  * in order to get a clue as to its origin

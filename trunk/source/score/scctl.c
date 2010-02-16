@@ -636,12 +636,14 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_GET_SEARCH_PATH - return path array */
+/* SC_GET_SEARCH_PATH - return a pointer to the path array
+ *                    - the caller must SFREE it
+ */
 
 char **SC_get_search_path(void)
    {char **path;
 
-    path = SC_array_array(_SC.path, 0);
+    path = SC_array_array(_SC.path);
 
     return(path);}
 
@@ -654,12 +656,17 @@ char **SC_get_search_path(void)
  */
 
 char *SC_search_file(char **path, char *name)
-   {char *s;
+   {int ok;
+    char *s;
 
-    if (path == NULL)
+    ok = (path == NULL);
+    if (ok == TRUE)
        path = SC_get_search_path();
 
     s = _SC_search_file(path, name, NULL, NULL);
+
+    if (ok == TRUE)
+       SFREE(path);
 
     return(s);}
 

@@ -28,8 +28,10 @@ static int _PP_pack_hashtab(void *p, PyObject *v, long nitems, PP_types tc)
 
 PyObject *_PP_unpack_hashtab(void *p, long nitems)
 {
-    int i, ok, ierr;
+    int i, ierr;
     long ne;
+    char *nm, *ty;
+    void *df;
     PyObject *dict, *item;
     hasharr *tab;
     haelem *np, **tb;
@@ -46,20 +48,16 @@ PyObject *_PP_unpack_hashtab(void *p, long nitems)
     if (dict == NULL)
         return NULL;
 
-    ok = SC_hasharr_data(tab, &ne, &tb);
-    if (ok == TRUE)
-       {for (i = 0; i < ne; i++)
-	    {np = tb[i];
-	     item = PP_unpack_hashtab_haelem(np->type, np->def);
-	     if (item == NULL) {
-                ierr = -1;
-                break;
-	     }
-	     ierr = PyDict_SetItemString(dict, np->name, item);
-	     if (ierr < 0)
-                break;
+    for (i = 0; SC_hasharr_next(tab, &i, &nm, &ty, &df); i++) {
+         item = PP_unpack_hashtab_haelem(ty, df);
+	 if (item == NULL) {
+	    ierr = -1;
+	    break;
+	 }
+	 ierr = PyDict_SetItemString(dict, nm, item);
+	 if (ierr < 0)
+	    break;
         }
-    }
 
     if (ierr < 0) {
         Py_DECREF(dict);

@@ -1064,7 +1064,7 @@ char **SC_tokenize(char *s, char *delim)
        {strcpy(t, s);
 
 	arr = SC_string_array("SC_TOKENIZE");
-	SC_array_resize(arr, 512, -1.0);
+	SC_array_resize(arr, n/2, -1.0);
 
 	for (ps = t; TRUE; ps = NULL)
 	    {tok = SC_strtok(ps, delim, u);
@@ -1189,17 +1189,18 @@ static int _SC_match_delim(char **ppi, char **ppo, int oc, int cc)
  */
 
 char **SC_tokenize_literal(char *s, char *delim, int nl)
-   {int c, front, more;
+   {int c, n, front, more;
     char *bf, *pi, *po, *t, *u, *sb, **sa;
     SC_array *arr;
-
-    sa  = NULL;
-    arr = SC_string_array("SC_TOKENIZE_LITERAL");
-    SC_array_resize(arr, 512, -1.0);
 
     t = SC_strsavef(s, "SC_TOKENIZE_LITERAL:t");
     if (t == NULL)
        return(NULL);
+
+    n   = strlen(s);
+    sa  = NULL;
+    arr = SC_string_array("SC_TOKENIZE_LITERAL");
+    SC_array_resize(arr, n/2, -1.0);
 
     bf   = FMAKE_N(char, MAX_BFSZ, "char*:SC_TOKENIZE_LITERAL:bf");
     pi   = t;

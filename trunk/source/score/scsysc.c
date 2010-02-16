@@ -31,11 +31,9 @@
 
 #define GET_TASKS(tsk, n, state)                                             \
     n   = SC_array_get_n(state->tasks);                                      \
-    tsk = SC_array_array(state->tasks, 0);                                   \
-    SC_mark(tsk, 1);
+    tsk = SC_array_array(state->tasks)
 
 #define REL_TASKS(tsk)                                                       \
-    SC_array_unarray(state->tasks, 0);                                       \
     SFREE(tsk)
 
 #define BUILD_STRING(_s, _t)                                                 \
@@ -371,7 +369,6 @@ void _SC_exec_setup_state(parstate *state, char *shell, char **env,
 
     state->tasks = SC_MAKE_ARRAY("_SC_EXEC_SETUP_STATE", taskdesc *, NULL);
     state->log   = SC_string_array("_SC_EXEC_SETUP_STATE");
-    SC_array_resize(state->log, 512, -1.0);
 
     state->acc        = acc;
     state->rej        = rej;
@@ -939,7 +936,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
     term  = FALSE;
 
     tf = SC_string_array("_SC_INIT_SUBTASKS");
-    SC_array_resize(tf, 512, -1.0);
+    SC_array_resize(tf, na, -1.0);
 
     for (n = 0; n < na; n++)
         {t = ta[n];
@@ -974,7 +971,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
 	    {if (tf->n > 0)
 	        {_SC_push_subtask(sub, it++, shell, tf, dosh, pipe);
 		 tf = SC_string_array("_SC_INIT_SUBTASKS");
-		 SC_array_resize(tf, 512, -1.0);};
+		 SC_array_resize(tf, na, -1.0);};
 	     term = FALSE;
 	     pipe = FALSE;
 	     dosh = FALSE;}
@@ -1796,8 +1793,7 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
 	cm = inf->full;
 	id = inf->id;
 
-	inf->out = SC_string_array("_SC_LAUNCH_JOB");
-	SC_array_resize(inf->out, 512, -1.0);
+	_SC_setup_output(inf, "_SC_LAUNCH_JOB");
 
 /* launch job on remote host
  * NOTE: by doing SC_open_remote we do a SC_verify_host
@@ -1914,8 +1910,7 @@ static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
 	    if (ok == FALSE)
 	       {SFREE(job);};}
 	else
-	   {inf->out = SC_string_array("_SC_START_JOB");
-	    SC_array_resize(inf->out, 512, -1.0);};
+	   _SC_setup_output(inf, "_SC_START_JOB");
 
 	SC_END_ACTIVITY(state);};
 
@@ -2084,15 +2079,13 @@ static void _SC_add_job(taskdesc *job)
 
     ta  = job->context->tasks;
     n   = SC_array_get_n(ta);
-    tsk = SC_array_array(ta, 0);
-    SC_mark(tsk, 1);
+    tsk = SC_array_array(ta);
 
     for (i = 0; i < n; i++)
         {if (tsk[i] == NULL)
 	    {tsk[i] = job;
 	     break;};};
 
-    SC_array_unarray(ta, 0);
     SFREE(tsk);
 
     if (i >= n)
@@ -2112,14 +2105,12 @@ static void _SC_remove_job(taskdesc *job)
 
     ta  = job->context->tasks;
     n   = SC_array_get_n(ta);
-    tsk = SC_array_array(ta, 0);
-    SC_mark(tsk, 1);
+    tsk = SC_array_array(ta);
 
     for (i = 0; i < n; i++)
         {if (job == tsk[i])
 	    tsk[i] = NULL;};
 
-    SC_array_unarray(ta, 0);
     SFREE(tsk);
 
     return;}

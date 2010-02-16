@@ -66,7 +66,7 @@ void return_child_text(PG_interface_object *iob, PG_event *ev)
     PG_interface_object *ch, **iobs;
 
     n    = SC_array_get_n(iob->children);
-    iobs = SC_array_array(iob->children, 0);
+    iobs = SC_array_array(iob->children);
 
     if (n >= 0)
        {ch = iobs[0];
@@ -74,7 +74,7 @@ void return_child_text(PG_interface_object *iob, PG_event *ev)
               "\nClicked on BUTTON object: %s\n",
               (char *) ch->obj);};
 
-    SC_array_unarray(iob->children, 0);
+    SFREE(iobs);
 
     return;}
 

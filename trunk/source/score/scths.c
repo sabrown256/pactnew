@@ -159,7 +159,7 @@ static emu_thread_info *_SC_sproc_lookup_thread(SC_thread *thread)
 					 _emu_thread_info, NULL);
 
     nt = SC_array_get_n(_SC_sproc_threads);
-    ta = SC_array_array(_SC_sproc_threads, 0);
+    ta = SC_array_array(_SC_sproc_threads);
 
 /* is there a current thread? */
     for (n = 0; n < nt; n++)
@@ -186,7 +186,7 @@ static emu_thread_info *_SC_sproc_lookup_thread(SC_thread *thread)
 
     rv = ta + n;
 
-    SC_array_unarray(_SC_sproc_threads, 0);
+    SFREE(ta);
 
     return(rv);}
 
@@ -203,14 +203,14 @@ static SC_thread _SC_sproc_thread_self(void)
     pid = getpid();
     id  = 0;
     np  = SC_array_get_n(_SC_sproc_threads);
-    ta  = SC_array_array(_SC_sproc_threads, 0);
+    ta  = SC_array_array(_SC_sproc_threads);
 
     for (i = 0; i < np; i++)
         {if (ta[i].pid == pid)
 	    {id = ta + i;
 	     break;};};
 
-    SC_array_unarray(_SC_sproc_threads, 0);
+    SFREE(ta);
 
     return(id);}
 

@@ -86,7 +86,7 @@ static void _SC_omp_do_work(void **rv)
     n = SC_array_get_n(_SC_omp_arr);
 
     if (n > 0)
-       {a = SC_array_array(_SC_omp_arr, 0);
+       {a = SC_array_array(_SC_omp_arr);
 
 	if (rv == NULL)
 	   {
@@ -102,7 +102,7 @@ static void _SC_omp_do_work(void **rv)
 	    for (i = 0; i < n; i++)
 	        rv[i] = (*a[i].f)(a[i].a);};
 
-	SC_array_unarray(_SC_omp_arr, 0);};
+	SFREE(a);};
 
     SC_array_set_n(_SC_omp_arr, 0);
 

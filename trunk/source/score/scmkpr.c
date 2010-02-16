@@ -197,7 +197,7 @@ void _SC_print_rule_info(anadep *state, int n, ruledes *rd)
     fp = state->log;
 
     ns = SC_array_get_n(state->actions);
-    as = SC_array_array(state->actions, 0);
+    as = SC_array_array(state->actions);
 
     if (ns > 0)
        {if ((n < 0) || (ns < n))
@@ -243,7 +243,7 @@ void _SC_print_rule_info(anadep *state, int n, ruledes *rd)
 	for (i = 0; i < na; i++)
 	    io_printf(fp, "     %s\n", acts[i]);};
 
-    SC_array_unarray(state->actions, 0);
+    SFREE(as);
 
     return;}
 

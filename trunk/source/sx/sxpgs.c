@@ -263,10 +263,10 @@ SX_menu_item *_SX_get_menu_item(g_file *po, int i)
    {int n;
     SX_menu_item *mi, *mitems;
 
-    mitems = SC_array_array(po->menu_lst, 0);
+    mitems = SC_array_array(po->menu_lst);
     if (mitems == NULL)
        {_SX_get_menu(po);
-	mitems = SC_array_array(po->menu_lst, 0);};
+	mitems = SC_array_array(po->menu_lst);};
 
     n = SC_array_get_n(po->menu_lst);
 
@@ -275,7 +275,7 @@ SX_menu_item *_SX_get_menu_item(g_file *po, int i)
     else
        mi = mitems + i - 1;
 
-    SC_array_unarray(po->menu_lst, 0);
+    SFREE(mitems);
 
     return(mi);}
 

@@ -66,7 +66,6 @@
 /hash_aaa.a.type = "haelem * *"
 /hash_aaa.a.n =        5
 /hash_aaa.a.nx =        7
-/hash_aaa.a.nref =      0
 /hash_aaa.a.gf =   6.985e-10
 /hash_aaa.a.array(0).iht =        0
 /hash_aaa.a.array(0).iar =        0
@@ -243,7 +242,6 @@
 /hash_bbb.a.type = "haelem * *"
 /hash_bbb.a.n =        3
 /hash_bbb.a.nx =        7
-/hash_bbb.a.nref =      0
 /hash_bbb.a.gf =   6.985e-10
 /hash_bbb.a.array(0).iht =        0
 /hash_bbb.a.array(0).iar =        0
@@ -1590,16 +1588,6 @@
 |   |       |__ next<4>
 |   |        ___|
 |   |       |   
-|   |       |__ member = "int nref"
-|   |       |__ cast_memb = (nil)
-|   |       |__ is_indirect =      0
-|   |       |__ type = "int"
-|   |       |__ base_type = "int"
-|   |       |__ name = "nref"
-|   |       |__ dimensions = (nil)
-|   |       |__ next<5>
-|   |        ___|
-|   |       |   
 |   |       |__ member = "double gf"
 |   |       |__ cast_memb = (nil)
 |   |       |__ is_indirect =      0
@@ -1607,7 +1595,7 @@
 |   |       |__ base_type = "double"
 |   |       |__ name = "gf"
 |   |       |__ dimensions = (nil)
-|   |       |__ next<6>
+|   |       |__ next<5>
 |   |        ___|
 |   |       |   
 |   |       |__ member = "char *array"
@@ -1617,7 +1605,7 @@
 |   |       |__ base_type = "char"
 |   |       |__ name = "array"
 |   |       |__ dimensions = (nil)
-|   |       |__ next<7>
+|   |       |__ next<6>
 |   |        ___|
 |   |       |   
 |   |       |__ member = "function init"
@@ -1627,7 +1615,7 @@
 |   |       |__ base_type = "function"
 |   |       |__ name = "init"
 |   |       |__ dimensions = (nil)
-|   |       |__ next<8>
+|   |       |__ next<7>
 |   |        ___|
 |   |       |   
 |   |       |__ member = "function set"
@@ -1637,7 +1625,7 @@
 |   |       |__ base_type = "function"
 |   |       |__ name = "set"
 |   |       |__ dimensions = (nil)
-|   |       |__ next<9> = (nil)
+|   |       |__ next<8> = (nil)
 |   |__ free =      1
 |   |__ next<0> = (nil)
 |   table(20)
@@ -2470,7 +2458,6 @@
     |__ type = "haelem * *"
     |__ n =       42
     |__ nx =       63
-    |__ nref =     42
     |__ gf =   6.985e-10
     |__ array(0)
     |   |__ iht =       11
@@ -3055,16 +3042,6 @@
     |   |       |__ next<4>
     |   |        ___|
     |   |       |   
-    |   |       |__ member = "int nref"
-    |   |       |__ cast_memb = (nil)
-    |   |       |__ is_indirect =      0
-    |   |       |__ type = "int"
-    |   |       |__ base_type = "int"
-    |   |       |__ name = "nref"
-    |   |       |__ dimensions = (nil)
-    |   |       |__ next<5>
-    |   |        ___|
-    |   |       |   
     |   |       |__ member = "double gf"
     |   |       |__ cast_memb = (nil)
     |   |       |__ is_indirect =      0
@@ -3072,7 +3049,7 @@
     |   |       |__ base_type = "double"
     |   |       |__ name = "gf"
     |   |       |__ dimensions = (nil)
-    |   |       |__ next<6>
+    |   |       |__ next<5>
     |   |        ___|
     |   |       |   
     |   |       |__ member = "char *array"
@@ -3082,7 +3059,7 @@
     |   |       |__ base_type = "char"
     |   |       |__ name = "array"
     |   |       |__ dimensions = (nil)
-    |   |       |__ next<7>
+    |   |       |__ next<6>
     |   |        ___|
     |   |       |   
     |   |       |__ member = "function init"
@@ -3092,7 +3069,7 @@
     |   |       |__ base_type = "function"
     |   |       |__ name = "init"
     |   |       |__ dimensions = (nil)
-    |   |       |__ next<8>
+    |   |       |__ next<7>
     |   |        ___|
     |   |       |   
     |   |       |__ member = "function set"
@@ -3102,7 +3079,7 @@
     |   |       |__ base_type = "function"
     |   |       |__ name = "set"
     |   |       |__ dimensions = (nil)
-    |   |       |__ next<9> = (nil)
+    |   |       |__ next<8> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
     |   array(21)
@@ -5309,4 +5286,4 @@
 
 ----- PRINT A HASH TABLE
 
-("/hash_aaa" ("type" "hasharr") (3 0 5   ("by-name") ((((0 4 ("long-number") ("object *") ((((()) (23) 1  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))))))))) () ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 1  ))) 1 (()))))) (((("SC_MAKE_HASHARR") (("haelem * *") d 5 7 0 6.98492e-10 ((((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (()))) ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 1  ))) 1 (()))) ((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))) ((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (()))))))))) ((0 4 ("long-number") ("object *") ((((()) (23) 1  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))))))))) () ()))  )))))
+("/hash_aaa" ("type" "hasharr") (3 0 5   ("by-name") ((((0 4 ("long-number") ("object *") ((((()) (23) 1  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))))))))) () ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 1  ))) 1 (()))))) (((("SC_MAKE_HASHARR") ("haelem * *") d 5 7 6.98492e-10 ((((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (()))) ((2 1 ("cat") ("object *") (((("kitty") (((5 ("kitty")))) 1  ))) 1 (()))) ((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))) ((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (()))))))))) ((0 4 ("long-number") ("object *") ((((()) (23) 1  ))) 1 (((0 3 ("double-number") ("object *") ((((()) (3.14159) 1  ))) 1 (((0 2 ("bird") ("object *") (((("birdy") (((5 ("birdy")))) 1  ))) 1 (((0 0 ("dog") ("object *") (((("doggie") (((6 ("doggie")))) 1  ))) 1 (())))))))))))) () ()))  )))))

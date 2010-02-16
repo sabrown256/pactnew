@@ -85,9 +85,9 @@ static int test_1(void)
 	 SC_array_push(ai, &ia[i]);
          SC_array_push(ad, &da[i]);};
     
-    cb = SC_array_array(ac, 0);
-    ib = SC_array_array(ai, 0);
-    db = SC_array_array(ad, 0);
+    cb = SC_array_array(ac);
+    ib = SC_array_array(ai);
+    db = SC_array_array(ad);
 
     nc = SC_array_get_n(ac);
     ni = SC_array_get_n(ai);
@@ -112,9 +112,9 @@ static int test_1(void)
 	 err += (ib[na+i] != ia[i]);
 	 err += (db[na+i] != da[i]);};
     
-    SC_array_unarray(ac, 0);
-    SC_array_unarray(ai, 0);
-    SC_array_unarray(ad, 0);
+    SFREE(cb);
+    SFREE(ib);
+    SFREE(db);
 
     SC_free_array(ac, NULL);
     SC_free_array(ai, NULL);
@@ -160,9 +160,9 @@ static int test_2(void)
 	 SC_array_push(ai, &ia[i]);
          SC_array_push(ad, &da[i]);};
     
-    cb = SC_array_array(ac, 0);
-    ib = SC_array_array(ai, 0);
-    db = SC_array_array(ad, 0);
+    cb = SC_array_array(ac);
+    ib = SC_array_array(ai);
+    db = SC_array_array(ad);
 
     nc = SC_array_get_n(ac);
     ni = SC_array_get_n(ai);
@@ -187,9 +187,9 @@ static int test_2(void)
 	 err += (*ib[na+i] != *ia[i]);
 	 err += (*db[na+i] != *da[i]);};
     
-    SC_array_unarray(ac, 0);
-    SC_array_unarray(ai, 0);
-    SC_array_unarray(ad, 0);
+    SFREE(cb);
+    SFREE(ib);
+    SFREE(db);
 
     SC_free_array(ac, SC_array_free_n);
     SC_free_array(ai, SC_array_free_n);
@@ -221,7 +221,7 @@ static int test_3(void)
         SC_array_push(as, &sa[i]);
     
     ns = SC_array_get_n(as);
-    sb = SC_array_array(as, 0);
+    sb = SC_array_array(as);
 
 /* now compare */
     err = 0;
@@ -238,7 +238,7 @@ static int test_3(void)
         {err += (sb[i].n != sa[i].n);
 	 err += (strcmp(sb[i].c, sa[i].c) != 0);}
     
-    SC_array_unarray(as, 0);
+    SFREE(sb);
 
     SC_free_array(as, NULL);
 
@@ -272,7 +272,7 @@ static int test_4(void)
         SC_array_push(as, &sa[i]);
     
     ns = SC_array_get_n(as);
-    sb = SC_array_array(as, 0);
+    sb = SC_array_array(as);
 
 /* now compare */
     err = 0;
@@ -289,7 +289,8 @@ static int test_4(void)
         {err += (sb[i].n != sa[i].n);
 	 err += (strcmp(sb[i].c, sa[i].c) != 0);}
     
-    SC_array_unarray(as, 0);
+    SFREE(sb);
+
     SC_free_array(as, ts_free);
 
     return(err);}
@@ -326,7 +327,7 @@ static int test_5(void)
         SC_array_push(as, &sa[i]);
     
     ns = SC_array_get_n(as);
-    sb = SC_array_array(as, 0);
+    sb = SC_array_array(as);
 
 /* now compare */
     err = 0;
@@ -349,7 +350,8 @@ static int test_5(void)
          SFREE(sa[i]);};
     SFREE(sa);
 
-    SC_array_unarray(as, 0);
+    SFREE(sb);
+
     SC_free_array(as, ts_free);
 
     return(err);}
@@ -393,7 +395,7 @@ static int test_6(void)
     test_6_add(ia, 10, FALSE);
 
     ni = SC_array_get_n(ia);
-    pi = SC_array_array(ia, 0);
+    pi = SC_array_array(ia);
 
     for (i = 0; i < ni; i++)
         {pi[i] *= -1;
@@ -408,7 +410,8 @@ static int test_6(void)
     for (i = 0; i < ni; i++)
         err += (pi[i] != -i);
 
-    SC_array_unarray(ia, 0);
+    SFREE(pi);
+
     SC_free_array(ia, NULL);
 
     return(err);}

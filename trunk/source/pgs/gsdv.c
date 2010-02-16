@@ -209,7 +209,7 @@ void _PG_remove_device(PG_device *dev)
     PG_device **devs;
 
     n    = SC_array_get_n(_PG.devlst);
-    devs = SC_array_array(_PG.devlst, 0);
+    devs = SC_array_array(_PG.devlst);
 
     for (i = 0; i < n; i++)
         {if (dev == devs[i])
@@ -224,7 +224,8 @@ void _PG_remove_device(PG_device *dev)
 
              break;};};
 
-    SC_array_unarray(_PG.devlst, 0);
+    SFREE(devs);
+
     SC_array_set_n(_PG.devlst, n);
 
 /* clean up the device */

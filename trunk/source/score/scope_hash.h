@@ -91,7 +91,6 @@ extern void
 
 extern int
  SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po),
- SC_hasharr_data(hasharr *ha, long *pne, haelem ***php),
  SC_hasharr_remove(hasharr *ha, void *key),
  SC_hasharr_free_n(void *d, void *a),
  SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),

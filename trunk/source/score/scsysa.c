@@ -22,11 +22,9 @@
 
 #define GET_TASKS(tsk, n, state)                                              \
     n   = SC_array_get_n(state->tasks);                                       \
-    tsk = SC_array_array(state->tasks, 0);                                    \
-    SC_mark(tsk, 1);
+    tsk = SC_array_array(state->tasks)
 
 #define REL_TASKS(tsk)                                                        \
-    SC_array_unarray(state->tasks, 0);                                        \
     SFREE(tsk)
 
 extern asyncstate
@@ -84,6 +82,25 @@ static void _SC_rejected_process(asyncstate *as, parstate *state,
 
     if (job->nzip++ > 0)
        SC_sleep(10);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SETUP_OUTPUT - setup the output string arrays for INF */
+
+void _SC_setup_output(jobinfo *inf, char *name)
+   {int ns;
+
+/* initial guess at number of output strings needed by job
+ * do not start too small or fatal thrashing on the dynamic
+ * arrays can happen because of interrupt handling
+ */
+    ns = 256;
+
+    inf->out = SC_string_array(name);
+    SC_array_resize(inf->out, ns, -1.0);
 
     return;}
 
@@ -294,12 +311,11 @@ void SC_show_state_log(parstate *state)
     as = NULL;
 
     nt  = SC_array_get_n(state->log);
-    log = SC_array_array(state->log, 0);
+    log = SC_array_array(state->log);
 
     for (it = 0; it < nt; it++)
         io_printf(stdout, "> %s", log[it]);
 
-    SC_array_unarray(state->log, 0);
     SFREE(log);
 
     io_printf(stdout, "\n");
@@ -782,7 +798,6 @@ int SC_exec(char ***out, char *cmnd, char *shell, int to)
     static int dbg = FALSE;
 
     str = SC_string_array("SC_EXEC");
-    SC_array_resize(str, 512, -1.0);
 
     st = _SC_exec(str, cmnd, shell, NULL, to, 1, dbg);
 
@@ -950,7 +965,6 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
         {cm = cmnds[i];
 
 	 out = SC_string_array("SC_EXEC_COMMANDS");
-	 SC_array_resize(out, 512, -1.0);
 
 	 p   = _SC_put_command(out, cm, show);
 	 err = _SC_exec(out, p, shell, env, to, na, dmp);

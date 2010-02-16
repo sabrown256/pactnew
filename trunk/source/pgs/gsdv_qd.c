@@ -409,8 +409,8 @@ static int _PG_qd_get_next_event(PG_event *ev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_X_FIND_DEVICE - return the device from the device list
- *                   - which containing WINDOW
+/* _PG_QD_FIND_DEVICE - return the device from the device list
+ *                    - which containing WINDOW
  */
 
 static PG_device *_PG_qd_find_device(WindowPtr window)
@@ -418,14 +418,14 @@ static PG_device *_PG_qd_find_device(WindowPtr window)
     PG_device **devs;
 
     n    = SC_array_get_n(_PG.devlst);
-    devs = SC_array_array(_PG.devlst, 0);
+    devs = SC_array_array(_PG.devlst);
 
     for (i = 0; i < n; i++)
         {dev = devs[i];
          if ((dev != NULL) && (dev->window == window))
              break;};
 
-    SC_array_unarray(_PG.devlst, 0);
+    SFREE(devs);
 
     if (i > n)
        dev = NULL;

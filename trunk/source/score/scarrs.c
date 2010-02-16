@@ -134,7 +134,7 @@ static void _SC_array_set_method(SC_array *a)
 /* _SC_ARRAY_GROW - grow the array A */
 
 static void _SC_array_grow(SC_array *a, long nn)
-   {int chg;
+   {int chg, nr;
     long i, n, nx, bpi;
     double gf, fc;
     char *arr;
@@ -145,20 +145,21 @@ static void _SC_array_grow(SC_array *a, long nn)
     bpi = a->bpi;
     chg = FALSE;
 
+/* GOTCHA: what to do when this is greater than 1? */
+    nr = SC_ref_count(arr);
+
 /* if new size not specified - grow exponentially from the old size */
     if (nn < 0)
        {n  = max(nx, a->n);
 	gf = a->gf;
 	fc = pow(2.0, -gf*n);
-	nn = (n + 1)*(1.0 + fc);
-/*        nn = 2*nx; */};
+	nn = (n + 1)*(1.0 + fc);};
 
 /* if never allocated */
     if (arr == NULL)
        {if (nn == 0)
 	   {nx = 0;
-	    nn = 1;
-/*	    nn = 512; */};
+	    nn = 1;};
 	arr = FMAKE_N(char, nn*bpi, a->name);
 	chg = TRUE;}
 
@@ -217,7 +218,6 @@ void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
      a->bpi   = bpi;
      a->nx    = 0;
      a->n     = 0;
-     a->nref  = 0;
      a->gf    = GROWTH_FACTOR(3.0);
      a->array = NULL;
      a->init  = init;
@@ -439,11 +439,13 @@ void *SC_array_get(SC_array *a, long n)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ARRAY_ARRAY - return the actual array from A
- *                - FLAG is a bit array
- *                -   1   mark the array iff on
+ *                - the array is marked and the caller
+ *                - must SFREE the returned pointer
+ *                - this convention makes it possible for _SC_array_grow
+ *                - to detect whether the array it will grow is in use
  */
 
-void *SC_array_array(SC_array *a, int flag)
+void *SC_array_array(SC_array *a)
     {void *rv;
 
      rv = NULL;
@@ -454,37 +456,9 @@ void *SC_array_array(SC_array *a, int flag)
 
 	 rv = a->array;
 
-#if 1
-	 if (flag & 1)
-	    SC_mark(rv, 1);
-#endif
-
-         a->nref++;};
+	 SC_mark(rv, 1);};
 
      return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_ARRAY_UNARRAY - decrement the reference count
- *                  - bookending SC_array_array
- *                  - FLAG is a bit array
- *                  -   1   SFREE the array iff on
- */
-
-void SC_array_unarray(SC_array *a, int flag)
-    {int n;
-
-     n = a->nref;
-     n--;
-     a->nref = max(n, 0);
-
-#if 1
-     if (flag & 1)
-        SFREE(a->array);
-#endif
-
-     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -617,7 +591,7 @@ int SC_array_string_append(SC_array *out, SC_array *in)
    {int i, no;
     char **sa;
 
-    sa = SC_array_array(in, 0);
+    sa = SC_array_array(in);
 
     if (sa != NULL)
        {no = SC_array_get_n(in);
@@ -626,7 +600,7 @@ int SC_array_string_append(SC_array *out, SC_array *in)
     else
        no = 0;
 
-    SC_array_unarray(in, 0);
+    SFREE(sa);
 
     return(no);}
 
@@ -650,7 +624,7 @@ char **_SC_array_string_join(SC_array **psa)
     sao = SC_array_done(sa);
 
     na = SC_string_array("_SC_ARRAY_STRING_JOIN");
-    SC_array_resize(na, 512, -1.0);
+    SC_array_resize(na, 2*no, -1.0);
 
     bf = NULL;
 
@@ -701,7 +675,7 @@ int _SC_array_is_member(SC_array *a, char *s)
     char **str;
 
     n   = SC_array_get_n(a);
-    str = SC_array_array(a, 0);
+    str = SC_array_array(a);
 
     rv = FALSE;
 
@@ -712,7 +686,7 @@ int _SC_array_is_member(SC_array *a, char *s)
 	        {rv = TRUE;
 		 break;};};};
 
-    SC_array_unarray(a, 0);
+    SFREE(str);
 
     return(rv);}
 
@@ -723,20 +697,24 @@ int _SC_array_is_member(SC_array *a, char *s)
 
 SC_array *SC_array_copy(SC_array *a)
     {long nb, nx, bpi;
+     void *arr;
      SC_array *ca;
-
-     ca  = FMAKE(SC_array, "SC_ARRAY_COPY:ca");
-     *ca = *a;
 
      nx  = a->nx;
      bpi = a->bpi;
      nb  = nx*bpi;
 
-     ca->name = SC_strsavef(a->name, "SC_ARRAY_COPY:name");
-     ca->type = SC_strsavef(a->type, "SC_ARRAY_COPY:type");
+     arr = FMAKE_N(char, nb, "SC_ARRAY_COPY:arr");
+     memcpy(arr, a->array, nb);
 
-     ca->array = FMAKE_N(char, nb, "SC_ARRAY_COPY:array");
-     memcpy(ca->array, a->array, nb);
+     ca  = FMAKE(SC_array, "SC_ARRAY_COPY:ca");
+     *ca = *a;
+
+     ca->name  = SC_strsavef(a->name, "SC_ARRAY_COPY:name");
+     ca->type  = SC_strsavef(a->type, "SC_ARRAY_COPY:type");
+     ca->array = arr;
+
+     SC_mark(arr, 1);
 
      return(ca);}
 
