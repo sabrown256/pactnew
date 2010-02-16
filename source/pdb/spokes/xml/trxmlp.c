@@ -209,7 +209,7 @@ static char *_XML_entry_name(parse_state *st)
     char *name, *b, *u, **sa;
 
     ns = SC_array_get_n(st->stack);
-    sa = SC_array_array(st->stack, 0);
+    sa = SC_array_array(st->stack);
 
     name = NULL;
     for (is = 0; is < ns; is++)
@@ -223,7 +223,7 @@ static char *_XML_entry_name(parse_state *st)
 
     SC_trim_right(name, " \t\n\r\f");
 
-    SC_array_unarray(st->stack, 0);
+    SFREE(sa);
 
     return(name);}
 

@@ -37,7 +37,7 @@ void dprbl(SC_array *bl)
 
     nb = SC_array_get_n(bl);
     if (nb > 0)
-       {sp = SC_array_array(bl, 0);
+       {sp = SC_array_array(bl);
 
 	PRINT(stdout, "      #   Nitems  Address  Valid  Checksum\n");
 	for (i = 0; i < nb; i++)
@@ -45,7 +45,7 @@ void dprbl(SC_array *bl)
 		   i+1, sp[i].number, (long) sp[i].diskaddr, sp[i].valid,
 		   sp[i].checksum);};
 
-	SC_array_unarray(bl, 0);};
+	SFREE(sp);};
 
     return;}
 
@@ -152,14 +152,14 @@ off_t _PD_block_get_address(SC_array *bl, long n)
     symblock *sp;
 
     nb = SC_array_get_n(bl);
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     if (n < nb)
        addr = sp[n].diskaddr;
     else
        addr = -1;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(addr);}
 
@@ -173,11 +173,11 @@ off_t _PD_block_set_address(SC_array *bl, long n, off_t addr)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     sp[n].diskaddr = addr;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(addr);}
 
@@ -191,14 +191,14 @@ long _PD_block_get_number(SC_array *bl, long n)
     symblock *sp;
 
     nb = SC_array_get_n(bl);
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     if (n < nb)
        ni = sp[n].number;
     else
        ni = -1;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(ni);}
 
@@ -212,11 +212,11 @@ long _PD_block_set_number(SC_array *bl, long n, long ni)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     sp[n].number = ni;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(ni);}
 
@@ -233,7 +233,7 @@ void _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n)
     symblock *sp;
 
     nb = SC_array_get_n(bl);
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     if (n < nb)
        addr = sp[n].diskaddr;
@@ -251,7 +251,7 @@ void _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n)
     if (pni != NULL)
        *pni = ni;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return;}
 
@@ -267,12 +267,12 @@ void _PD_block_set_desc(off_t addr, long ni, SC_array *bl, long n)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     sp[n].diskaddr = addr;
     sp[n].number   = ni;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return;}
 
@@ -287,14 +287,14 @@ PD_block_type _PD_block_get_valid(SC_array *bl, long n)
     symblock *sp;
 
     nb = SC_array_get_n(bl);
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     if (n < nb)
        vl = sp[n].valid;
     else
        vl = PD_BLOCK_UNINIT;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(vl);}
 
@@ -308,11 +308,11 @@ int _PD_block_set_valid(SC_array *bl, long n, PD_block_type vl)
 
     _PD_block_check(bl, n+1);
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     sp[n].valid = vl;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(vl);}
 
@@ -339,7 +339,7 @@ int _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     if ((dig != NULL) &&
 	((sp[n].valid == PD_BLOCK_VALID) ||
@@ -349,7 +349,7 @@ int _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig)
     else
        rv = FALSE;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(rv);}
 
@@ -364,7 +364,7 @@ int _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     if (dig != NULL)
        {memcpy(sp[n].checksum, dig, PD_CKSUM_LEN);
@@ -374,7 +374,7 @@ int _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig)
        {sp[n].valid = PD_BLOCK_INVALID;
 	rv          = FALSE;};
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(rv);}
 
@@ -497,7 +497,7 @@ long _PD_block_find(PDBfile *file, syment *ep, off_t addr)
 
 	bl  = ep->blocks;
 	n   = SC_array_get_n(bl);
-	sp  = SC_array_array(bl, 0);
+	sp  = SC_array_array(bl);
 
 	for (i = 0; i < n; i++)
 	    {start = sp[i].diskaddr;
@@ -508,7 +508,7 @@ long _PD_block_find(PDBfile *file, syment *ep, off_t addr)
 	if (i >= n)
 	   i = -1;
 
-	SC_array_unarray(bl, 0);};
+	SFREE(sp);};
 
     return(i);}
 
@@ -525,8 +525,8 @@ SC_array *_PD_block_copy_seg(SC_array *bl, long imn, long imx)
     n   = imx - imn;
     nbl = _PD_block_make(n);
 
-    sp  = SC_array_array(bl, 0);
-    nsp = SC_array_array(nbl, 0);
+    sp  = SC_array_array(bl);
+    nsp = SC_array_array(nbl);
 
     sp += imn;
 
@@ -535,8 +535,8 @@ SC_array *_PD_block_copy_seg(SC_array *bl, long imn, long imx)
 
     SC_array_set_n(nbl, n);
 
-    SC_array_unarray(bl, 0);
-    SC_array_unarray(nbl, 0);
+    SFREE(sp);
+    SFREE(nsp);
 
     return(nbl);}
 
@@ -567,7 +567,7 @@ void _PD_block_switch(syment *ep, SC_array *bln)
     SC_array *bl;
     
     nb  = SC_array_get_n(bln);
-    spn = SC_array_array(bln, 0);
+    spn = SC_array_array(bln);
 
     bln->array = NULL;
     _PD_block_free(bln);
@@ -581,7 +581,7 @@ void _PD_block_switch(syment *ep, SC_array *bln)
 /* GOTCHA: the ref count may be correct because of its origin in bln */
 /*    SC_mark(spn, 1); */
 
-    SC_array_unarray(bln, 0);
+    SFREE(spn);
 
     return;}
 
@@ -598,7 +598,7 @@ void _PD_block_truncate(syment *ep, long ni)
 
     if (ep != NULL)
        {n  = _PD_n_blocks(ep);
-	sp = SC_array_array(ep->blocks, 0);
+	sp = SC_array_array(ep->blocks);
 
 	PD_entry_number(ep) = ni;
 
@@ -617,7 +617,7 @@ void _PD_block_truncate(syment *ep, long ni)
 	        {sp[i].number   = 0;
 		 sp[i].diskaddr = 0;};};
 
-	SC_array_unarray(ep->blocks, 0);};
+	SFREE(sp);};
 
     return;}
 
@@ -638,7 +638,7 @@ long _PD_effective_addr(off_t *paddr, long *pnitems,
     off_t addr, eaddr;
     symblock *sp;
 
-    sp = SC_array_array(bl, 0);
+    sp = SC_array_array(bl);
 
     eaddr = *paddr;
     i     = 0;
@@ -658,7 +658,7 @@ long _PD_effective_addr(off_t *paddr, long *pnitems,
     *paddr   = eaddr;
     *pnitems = (addr + nb - eaddr)/bpi;
 
-    SC_array_unarray(bl, 0);
+    SFREE(sp);
 
     return(i);}
 
@@ -699,7 +699,7 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
     if (file->use_cksum & PD_MD5_RW)
        {bl = ep->blocks;
 	n  = SC_array_get_n(bl);
-	sp = SC_array_array(bl, 0);
+	sp = SC_array_array(bl);
 
 /* count the initialized checksums */
 	ne = 0;
@@ -723,7 +723,7 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
 
 	    ok &= _PD_put_string(1, "\n");};
 
-	SC_array_unarray(bl, 0);};
+	SFREE(sp);};
 
     return(ok);}
 
@@ -762,7 +762,7 @@ int _PD_block_csum_read(PDBfile *file)
 	ep = PD_inquire_entry(file, name, FALSE, NULL);
 	bl = ep->blocks;
 	nb = SC_array_get_n(bl);
-	sp = SC_array_array(bl, 0);
+	sp = SC_array_array(bl);
 
 	for (ie = 0L; ie < ne; ie++)
 	    {token = SC_strtok(NULL, " \n", s);
@@ -777,7 +777,7 @@ int _PD_block_csum_read(PDBfile *file)
 	        {_PD_block_set_csum(bl, j, dig);
 		 _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};
 
-	SC_array_unarray(bl, 0);};
+	SFREE(sp);};
 
     return(ok);}
 

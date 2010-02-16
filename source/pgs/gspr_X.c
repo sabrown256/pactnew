@@ -677,13 +677,14 @@ void _PG_X_shade_poly(PG_device *dev, int nd, int n, double **r)
 	     p.y = ix[1];
 	     SC_array_push(_PG_X_point_list, &p);};
 
-	points = SC_array_array(_PG_X_point_list, 0);
+	points = SC_array_array(_PG_X_point_list);
+
 	SC_array_set_n(_PG_X_point_list, 0);
 
 	XFillPolygon(disp, PG_X11_DRAWABLE(dev), dev->gc, points, n,
 		     Nonconvex, CoordModeOrigin);
 
-	SC_array_unarray(_PG_X_point_list, 0);};
+	SFREE(points);};
 
     return;}
 
@@ -720,13 +721,14 @@ void _PG_X_fill_curve(PG_device *dev, PG_curve *crv)
 
 	 SC_array_push(_PG_X_point_list, &p);};
 
-    points = SC_array_array(_PG_X_point_list, 0);
+    points = SC_array_array(_PG_X_point_list);
+
     SC_array_set_n(_PG_X_point_list, 0);
 
     XFillPolygon(disp, PG_X11_DRAWABLE(dev), dev->gc, points, n,
                  Nonconvex, CoordModeOrigin);
 
-    SC_array_unarray(_PG_X_point_list, 0);
+    SFREE(points);
 
     return;}
 

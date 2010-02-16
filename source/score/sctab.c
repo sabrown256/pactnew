@@ -363,28 +363,6 @@ haelem *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_DATA - return the number of elements and array for HA
- *                 - return TRUE iff successful
- */
-
-int SC_hasharr_data(hasharr *ha, long *pne, haelem ***php)
-   {int rv;
-    SC_array *a;
-
-    rv = FALSE;
-
-    if ((ha != NULL) && (ha->a != NULL))
-       {a = ha->a;
-
-	*pne = SC_array_get_n(a);
-        *php = SC_array_array(a, 0);
-	rv   = TRUE;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_HASHARR_FREE_N - do SC_free for hasharr element */
 
 int SC_hasharr_free_n(void *d, void *a)
@@ -412,13 +390,13 @@ int SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
     arr = ha->a;
     if ((arr != NULL) && (f != NULL))
        {n  = SC_array_get_n(arr);
-	hp = SC_array_array(arr, 0);
+	hp = SC_array_array(arr);
 
 	for (i = 0; i < n; i++)
 	    {if (hp[i] != NULL)
 	        rv &= f(hp[i], a);};
 
-	SC_array_unarray(arr, 0);};
+	SFREE(hp);};
 
     return(rv);}
 
@@ -432,16 +410,20 @@ int SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
 
 int SC_hasharr_next(hasharr *ha, long *pi,
 		    char **pname, char **ptype, void **po)
-   {int rv, ok;
+   {int rv;
     long i, ne;
     haelem **tb, *hp;
+    SC_array *a;
 
     rv = FALSE;
 
-/* count the number of scalar integers, reals, and strings */
-    ok = SC_hasharr_data(ha, &ne, &tb);
-    if (ok == TRUE)
-       {for (i = *pi; i < ne; i++)
+    if ((ha != NULL) && (ha->a != NULL))
+       {a = ha->a;
+
+	ne = SC_array_get_n(a);
+        tb = SC_array_array(a);
+
+	for (i = *pi; i < ne; i++)
 	    {hp = tb[i];
 	     if (hp != NULL)
 	        {if (pname != NULL)
@@ -456,7 +438,9 @@ int SC_hasharr_next(hasharr *ha, long *pi,
 		 *pi = i;
 		 rv  = TRUE;
 
-		 break;};};};
+		 break;};};
+
+	SFREE(tb);};
 
     return(rv);}
 
@@ -693,7 +677,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
     if ((ha != NULL) && (ha->a != NULL))
        {arr = ha->a;
 	ne  = SC_array_get_n(arr);
-	tb  = SC_array_array(arr, 0);
+	tb  = SC_array_array(arr);
 
 	sa = FMAKE_N(char *, ne+1, "SC_HASHARR_DUMP:sa");
 	if (sa != NULL)
@@ -713,7 +697,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 	    if ((sort == TRUE) && (HA_STRING_KEY(ha->hash) == TRUE))
 	       SC_string_sort(sa, ns);};
 
-	SC_array_unarray(arr, 0);};
+	SFREE(tb);};
 
     return(sa);}
 

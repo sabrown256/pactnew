@@ -62,23 +62,22 @@ int _PD_register(char *type, char *fmt, PFBinType hook,
 
 tr_layer *_PD_lookup(char *type)
    {int i, n;
-    tr_layer *tr;
+    tr_layer *tr, *ptr;
 		 
     _PD_register_spokes();
 
     n  = SC_array_get_n(_PD_file_types);
-    tr = SC_array_array(_PD_file_types, 0);
+    tr = SC_array_array(_PD_file_types);
 
-    for (i = 0; i < n; i++, tr++)
-        {if (strcmp(tr->type, type) == 0)
-	    break;};
+    ptr = NULL;
+    for (i = 0; i < n; i++)
+        {if (strcmp(tr[i].type, type) == 0)
+	    {ptr = tr + i;
+	     break;};};
 
-    SC_array_unarray(_PD_file_types, 0);
+    SFREE(tr);
 
-    if (i >= n)
-       tr = NULL;
-
-    return(tr);}
+    return(ptr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -318,10 +317,10 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 	   rfmt = SC_assoc(pu->info, "fmt");
 
 	n  = _PD_register_spokes();
-	tr = SC_array_array(_PD_file_types, 0);
-	for (i = 0; i < n; i++, tr++)
-	    {type = tr->type;
-	     tfmt = tr->fmt;
+	tr = SC_array_array(_PD_file_types);
+	for (i = 0; i < n; i++)
+	    {type = tr[i].type;
+	     tfmt = tr[i].fmt;
 
 /* work out whether this translation layer matches the request
  * when creating a file
@@ -337,12 +336,12 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 
 /* open the file */
 	     if (ok == TRUE)
-	        {file = _PD_open_bin_aux(pu, name, mode, tr, a);
+	        {file = _PD_open_bin_aux(pu, name, mode, tr+i, a);
 		 if (file != NULL)
 		    {_PD_def_real(type, file);
 		     break;};};};
 
-	SC_array_unarray(_PD_file_types, 0);};
+	SFREE(tr);};
 
     return(file);}
 

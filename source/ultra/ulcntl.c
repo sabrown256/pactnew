@@ -367,8 +367,8 @@ static void UL_draw_plot(PG_device *dev)
 	   {PG_copy_interface_objects(dev, SX_graphics_device, FALSE);
 
 	    niobs = SC_array_get_n(dev->iobjs);
-	    iobs  = SC_array_array(dev->iobjs, 0);
-	    piobs = SC_array_array(SX_graphics_device->iobjs, 0);
+	    iobs  = SC_array_array(dev->iobjs);
+	    piobs = SC_array_array(SX_graphics_device->iobjs);
 
 	    for (i = 0; i < niobs; i++)
 	        {iob  = iobs[i];
@@ -385,8 +385,8 @@ static void UL_draw_plot(PG_device *dev)
 
 	    PG_draw_interface_objects(dev);
 
-	    SC_array_unarray(dev->iobjs, 0);
-	    SC_array_unarray(SX_graphics_device->iobjs, 0);};}
+	    SFREE(iobs);
+	    SFREE(piobs);};}
 
     else
        PG_draw_interface_objects(dev);

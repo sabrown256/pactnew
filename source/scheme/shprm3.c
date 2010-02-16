@@ -662,11 +662,13 @@ static int _SS_filep(object *argl, char *dtype)
     ret = (_SC_search_file(list, pu->path, mode, type) != NULL);
 
     _SC_rel_udl(pu);
+
+    SFREE(list);
     SFREE(name);
     SFREE(mode);
+    SFREE(scope);
     if (type != dtype)
        SFREE(type);
-    SFREE(scope);
 
     return(ret);}
 

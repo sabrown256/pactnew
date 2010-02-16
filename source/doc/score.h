@@ -345,20 +345,6 @@ Return the number of elements in the hash array <tt>ha</tt>.
 <p>
 
 <pre>
-<i>C Binding: </i>int SC_hasharr_data(hasharr *ha, long *pne, haelem ***php)
-<i>F77 Binding: </i>
-<i>SX Binding: </i>
-<i>Python Binding: </i>
-</pre>
-
-This function return the number of elements and the array of elements, as
-a linear array, via the argument list.
-<p>
-
-If successful, it returns TRUE and returns FALSE otherwise.
-<p>
-
-<pre>
 <i>C Binding: </i>int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po)
 <i>F77 Binding: </i>
 <i>SX Binding: </i>

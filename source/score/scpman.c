@@ -13,20 +13,16 @@
 
 #define GET_PROCESSES(lst, np)                                                \
     np  = SC_array_get_n(_SC.process_list);                                   \
-    lst = SC_array_array(_SC.process_list, 0);                                \
-    SC_mark(lst, 1);
+    lst = SC_array_array(_SC.process_list)
 
 #define REL_PROCESSES(lst)                                                    \
-    SC_array_unarray(_SC.process_list, 0);                                    \
     SFREE(lst)
 
 #define GET_SIGRECS(lst, np)                                                  \
     np  = SC_array_get_n(_SC.wait_list);                                      \
-    lst = SC_array_array(_SC.wait_list, 0);                                   \
-    SC_mark(lst, 1)
+    lst = SC_array_array(_SC.wait_list)
 
 #define REL_SIGRECS(lst)                                                      \
-    SC_array_unarray(_SC.wait_list, 0);                                       \
     SFREE(lst)
 
 typedef struct s_sigchld_rec sigchld_rec;
@@ -190,9 +186,8 @@ static void _SC_init_wait(void)
 
 /* if never initialized do it now */
     if (_SC.wait_list == NULL)
-       {_SC.wait_list = SC_MAKE_ARRAY("PERM|_SC_INIT_WAIT",
-				      sigchld_rec *, _SC_make_wait);
-	SC_array_resize(_SC.wait_list, 512, -1.0);};
+       _SC.wait_list = SC_MAKE_ARRAY("PERM|_SC_INIT_WAIT",
+				     sigchld_rec *, _SC_make_wait);
 
     return;}
 
@@ -297,9 +292,8 @@ void _SC_manage_process(PROCESS *pp)
    {
 
     if (_SC.process_list == NULL)
-       {_SC.process_list = SC_MAKE_ARRAY("PERM|_SC_MANAGE_PROCESS",
-					 PROCESS *, NULL);
-	SC_array_resize(_SC.process_list, 512, -1.0);};
+       _SC.process_list = SC_MAKE_ARRAY("PERM|_SC_MANAGE_PROCESS",
+					PROCESS *, NULL);
 
     pp->index = SC_array_get_n(_SC.process_list);
 

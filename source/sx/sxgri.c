@@ -337,7 +337,7 @@ void SX_rem_iob(PG_interface_object *iob, int flag)
 
     dev   = iob->device;
     niobs = SC_array_get_n(dev->iobjs);
-    iobs  = SC_array_array(dev->iobjs, 0);
+    iobs  = SC_array_array(dev->iobjs);
 
     for (i = 0; i < niobs; i++)
         {if (iob == iobs[i])
@@ -346,7 +346,7 @@ void SX_rem_iob(PG_interface_object *iob, int flag)
              _PG_rl_interface_object(iob, flag);
              break;};};
 
-    SC_array_unarray(dev->iobjs, 0);
+    SFREE(iobs);
 
     SC_array_set_n(dev->iobjs, niobs);
 
