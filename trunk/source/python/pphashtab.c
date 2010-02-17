@@ -28,13 +28,12 @@ static int _PP_pack_hashtab(void *p, PyObject *v, long nitems, PP_types tc)
 
 PyObject *_PP_unpack_hashtab(void *p, long nitems)
 {
-    int i, ierr;
-    long ne;
+    int ierr;
+    long i;
     char *nm, *ty;
     void *df;
     PyObject *dict, *item;
     hasharr *tab;
-    haelem *np, **tb;
 
     ierr = 0;
     tab = (hasharr *) p;

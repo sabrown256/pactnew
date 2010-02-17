@@ -25,13 +25,6 @@
 #define JOB_COMPLETE      210
 #define SERVER_LOG        211
 
-#define GET_TASKS(tsk, n, state)                                              \
-    n   = SC_array_get_n(state->tasks);                                       \
-    tsk = SC_array_array(state->tasks)
-
-#define REL_TASKS(tsk)                                                        \
-    SFREE(tsk)
-
 asyncstate
  _SC_server_state;
 
@@ -44,14 +37,13 @@ asyncstate
 
 static void _SC_server_show_log(parstate *state, FILE *fp)
    {int i, n;
-    char **log, *home, *dir;
+    char *s, *home, *dir;
 
     SC_START_ACTIVITY(state, SERVER_LOG);
 
     state->is_stdout = (fp == stdout);
 
-    n   = SC_array_get_n(state->log);
-    log = SC_array_array(state->log);
+    n = SC_array_get_n(state->log);
 
     if (fp == NULL)
        {home = getenv("HOME");
@@ -62,7 +54,8 @@ static void _SC_server_show_log(parstate *state, FILE *fp)
 	io_printf(fp, "----- server log -----------------------\n");
 
 	for (i = 0; i < n; i++)
-	    {io_printf(fp, "%s", log[i]);};
+	    {s = *(char **) SC_array_get(state->log, i);
+	     io_printf(fp, "%s", s);};
 
 	io_printf(fp, "----- server log -----------------------\n");
 
@@ -73,14 +66,13 @@ static void _SC_server_show_log(parstate *state, FILE *fp)
 		  _SC_EXEC_SRV_ID, n);
 
 	for (i = 0; i < n; i++)
-	    {io_printf(fp, "%s %s", _SC_EXEC_SRV_ID, log[i]);};
+	    {s = *(char **) SC_array_get(state->log, i);
+	     io_printf(fp, "%s %s", _SC_EXEC_SRV_ID, s);};
 
         io_printf(fp, "%s ----- server log -----------------------\n",
 		  _SC_EXEC_SRV_ID);};
 
     state->is_stdout = FALSE;
-
-    SFREE(log);
 
     SC_END_ACTIVITY(state);
 
@@ -232,7 +224,7 @@ static int _SC_server_check_jobs(int *pst, int *pnr, int *pnc,
 				 parstate *state)
    {int i, n, more;
     int rst, lex, ex, nr, nc;
-    taskdesc **tsk, *job;
+    taskdesc *job;
     jobinfo *inf;
     asyncstate *as;
 
@@ -240,7 +232,7 @@ static int _SC_server_check_jobs(int *pst, int *pnr, int *pnc,
 
     as = &_SC_server_state;
 
-    GET_TASKS(tsk, n, state);
+    n = SC_array_get_n(state->tasks);
 
     rst = 0;
     lex = 0;
@@ -248,7 +240,7 @@ static int _SC_server_check_jobs(int *pst, int *pnr, int *pnc,
     nc  = 0;
 
     for (i = 0; i < n; i++)
-        {job = tsk[i];
+        {job = *(taskdesc **) SC_array_get(state->tasks, i);
 
 /* if there is no job it was finished prior to coming here */
 	 if (job == NULL)
@@ -276,8 +268,6 @@ static int _SC_server_check_jobs(int *pst, int *pnr, int *pnc,
 		     lex++;}
 		 else
 		    nr++;};};};
-
-    REL_TASKS(tsk);
 
     if (pst != NULL)
        *pst = rst;
@@ -498,7 +488,7 @@ static int _SC_server_env(parstate *state, char *t)
 static void _SC_server_command(parstate *state, char *t)
    {int i, n, jid, rtry;
     char *p, *r;
-    taskdesc **tsk, *job;
+    taskdesc *job;
     jobinfo *inf;
     asyncstate *as;
 
@@ -506,16 +496,16 @@ static void _SC_server_command(parstate *state, char *t)
 
     as = &_SC_server_state;
 
-    GET_TASKS(tsk, n, state);
-
     p = NULL;
 
 /* handle a kill job request */
     if (SC_EXEC_MSG_MATCH(r, t, _SC_EXEC_KILL))
        {t   = SC_strtok(r, " ", p);
         jid = SC_stoi(t);
+
+	n = SC_array_get_n(state->tasks);
 	for (i = 0; i < n; i++)
-	    {job = tsk[i];
+	    {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	     if (job != NULL)
 	        {inf = &job->inf;
 		 if (inf->id == jid)
@@ -537,8 +527,6 @@ static void _SC_server_command(parstate *state, char *t)
 /* handle a heartbeat notification - really a no-op */
     else if (SC_EXEC_MSG_MATCH(r, t, _SC_EXEC_HEARTBEAT))
        {};
-
-    REL_TASKS(tsk);
 
     SC_END_ACTIVITY(state);
 
@@ -672,17 +660,17 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
     parstate *state;
     asyncstate *as;
     PROCESS *pp;
-    taskdesc *job, **tsk;
+    taskdesc *job;
 
     as    = &_SC_server_state;
     state = (parstate *) a;
 
     SC_START_ACTIVITY(state, IN_REJECT);
 
-    GET_TASKS(tsk, n, state);
+    n = SC_array_get_n(state->tasks);
 
     for (i = 0; i < n; i++)
-        {job = tsk[i];
+        {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
@@ -697,8 +685,6 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
 		     nzp = job->nzip++;
 		     if (nzp > 16)
 		        {LONGJMP(_SC.srv_rstrt, SIGSTOP);};};};};};
-
-    REL_TASKS(tsk);
 
     SC_END_ACTIVITY(state);
 

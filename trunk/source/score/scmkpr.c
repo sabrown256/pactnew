@@ -197,17 +197,17 @@ void _SC_print_rule_info(anadep *state, int n, ruledes *rd)
     fp = state->log;
 
     ns = SC_array_get_n(state->actions);
-    as = SC_array_array(state->actions);
-
     if (ns > 0)
        {if ((n < 0) || (ns < n))
 	   n = ns - 1;
 
-	tgt  = as[n].target;
-	dep  = as[n].dependent;
-	whch = as[n].kind;
-	na   = as[n].n;
-	acts = as[n].actions;
+	as = SC_array_get(state->actions, n);
+
+	tgt  = as->target;
+	dep  = as->dependent;
+	whch = as->kind;
+	na   = as->n;
+	acts = as->actions;
 
 	n++;
 

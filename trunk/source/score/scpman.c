@@ -11,20 +11,6 @@
 
 #include "scope_proc.h"
 
-#define GET_PROCESSES(lst, np)                                                \
-    np  = SC_array_get_n(_SC.process_list);                                   \
-    lst = SC_array_array(_SC.process_list)
-
-#define REL_PROCESSES(lst)                                                    \
-    SFREE(lst)
-
-#define GET_SIGRECS(lst, np)                                                  \
-    np  = SC_array_get_n(_SC.wait_list);                                      \
-    lst = SC_array_array(_SC.wait_list)
-
-#define REL_SIGRECS(lst)                                                      \
-    SFREE(lst)
-
 typedef struct s_sigchld_rec sigchld_rec;
 
 struct s_sigchld_rec
@@ -45,9 +31,9 @@ extern void
 void drproc(int ev, int pid)
    {int i, np;
     char idx[10], prc[10], st[80];
-    PROCESS *pp, **lst;
+    PROCESS *pp;
 
-    GET_PROCESSES(lst, np);
+    np = SC_array_get_n(_SC.process_list);
 
     switch (ev)
        {case SC_PROC_EXEC :
@@ -71,46 +57,44 @@ void drproc(int ev, int pid)
 
     io_printf(stdout, "   #  Index       Address       PID  State  # Ref\n");
     for (i = 0; i < np; i++)
-         {pp = lst[i];
-	  if (pp == NULL)
-	     continue;
+        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
+	 if (pp == NULL)
+	    continue;
 
-	  st[0] = '\0';
-	  if (pp->flags & SC_PROC_EXEC)
-	     SC_strcat(st, 80, "e");
-	  if (pp->flags & SC_PROC_SIG)
-	     SC_strcat(st, 80, "t");
-	  if (pp->flags & SC_PROC_IO)
-	     SC_strcat(st, 80, "i");
-	  if (pp->flags & SC_PROC_RM)
-	     SC_strcat(st, 80, "f");
+	 st[0] = '\0';
+	 if (pp->flags & SC_PROC_EXEC)
+	    SC_strcat(st, 80, "e");
+	 if (pp->flags & SC_PROC_SIG)
+	    SC_strcat(st, 80, "t");
+	 if (pp->flags & SC_PROC_IO)
+	    SC_strcat(st, 80, "i");
+	 if (pp->flags & SC_PROC_RM)
+	    SC_strcat(st, 80, "f");
 
-	  switch (pp->index)
-	     {case SC_PROC_FREE :
-		   snprintf(idx, 10, "free ");
-		   break;
-	      case SC_PROC_ALLOC :
-		   snprintf(idx, 10, "alloc");
-		   break;
-	      case SC_PROC_DELETED :
-		   snprintf(idx, 10, " del ");
-		   break;
-	      case SC_PROC_CLOSED :
-		   snprintf(idx, 10, " cls ");
-		   break;
-	      default :
-		   snprintf(idx, 10, "%3d  ", pp->index);
-		   break;};
+	 switch (pp->index)
+	    {case SC_PROC_FREE :
+		  snprintf(idx, 10, "free ");
+		  break;
+	     case SC_PROC_ALLOC :
+		  snprintf(idx, 10, "alloc");
+		  break;
+	     case SC_PROC_DELETED :
+		  snprintf(idx, 10, " del ");
+		  break;
+	     case SC_PROC_CLOSED :
+		  snprintf(idx, 10, " cls ");
+		  break;
+	     default :
+		  snprintf(idx, 10, "%3d  ", pp->index);
+		  break;};
 
-	  snprintf(prc, 10, "%8d", pp->id);
+	 snprintf(prc, 10, "%8d", pp->id);
 
-	  if (!SC_process_alive(pp))
-	     io_printf(stdout, "PROCESS LIST CORRUPT\n\n");
-	  else
-	     io_printf(stdout, " %3d  %5s  %12p  %8s  %5s  %3d\n",
-		       i, idx, pp, prc, st, SC_ref_count(pp));};
-
-    REL_PROCESSES(lst);
+	 if (!SC_process_alive(pp))
+	    io_printf(stdout, "PROCESS LIST CORRUPT\n\n");
+	 else
+	    io_printf(stdout, " %3d  %5s  %12p  %8s  %5s  %3d\n",
+		      i, idx, pp, prc, st, SC_ref_count(pp));};
 
     return;}
 
@@ -124,17 +108,17 @@ void drproc(int ev, int pid)
 void drwait(void)
    {int i, np, nx, ic;
     char *cnd;
-    sigchld_rec **lst;
+    sigchld_rec *sr;
 
-    GET_SIGRECS(lst, np);
-
+    np  = SC_array_get_n(_SC.wait_list);
     nx  = _SC.wait_list->nx;
     cnd = "none";
 
     io_printf(stdout, "Finished process list (%d/%d)\n", np, nx);
     io_printf(stdout, "    #      PID   Exit Status\n");
     for (i = 0; i < np; i++)
-        {ic = lst[i]->condition;
+        {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
+	 ic = sr->condition;
 	 if (ic & SC_SIGNALED)
 	    cnd = "signaled";
 	 else if (ic & SC_KILLED)
@@ -147,9 +131,7 @@ void drwait(void)
 	    cnd = "ok";
 
          io_printf(stdout, " %4d  %8d  %3d  %s\n",
-		   i, lst[i]->pid, lst[i]->exit, cnd);};
-
-    REL_SIGRECS(lst);
+		   i, sr->pid, sr->exit, cnd);};
 
     return;}
 
@@ -227,29 +209,28 @@ static void _SC_record_wait(int pid, int cnd, int sts)
 
 static int _SC_hasharr_lookup_exited_child(int pid, int *pcnd, int *psts)
    {int i, n, rv;
-    sigchld_rec **sr;
+    sigchld_rec *sr;
 
     rv = FALSE;
     if (pid > 0)
-       {GET_SIGRECS(sr, n);
-										
+       {n = SC_array_get_n(_SC.wait_list);
+
 	for (i = n-1; 0 <= i; i--)
-	    {if (sr[i]->pid == pid)
+	    {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
+	     if (sr->pid == pid)
 	        {rv = TRUE;
 #if 0
                  dstatelog("lookup exited child %d %d/%d (%d/%d)\n",
-		           pid, i, n, sr[i]->condition, sr[i]->exit);
+		           pid, i, n, sr->condition, sr->exit);
 #endif
 
 		 if (pcnd != NULL)
-		    *pcnd = sr[i]->condition;
+		    *pcnd = sr->condition;
 
 		 if (psts != NULL)
-		    *psts = sr[i]->exit;
+		    *psts = sr->exit;
 
-		 break;};};
-
-	REL_SIGRECS(sr);};
+		 break;};};};
 
     return(rv);}
 
@@ -263,18 +244,17 @@ static int _SC_hasharr_lookup_exited_child(int pid, int *pcnd, int *psts)
 
 static void _SC_mark_exited_child(PROCESS *pp)
    {int i, n, pid;
-    sigchld_rec **sr;
+    sigchld_rec *sr;
 
     if (SC_process_alive(pp))
-       {GET_SIGRECS(sr, n);
+       {n = SC_array_get_n(_SC.wait_list);
 
 	pid = pp->id;
 	for (i = n-1; 0 <= i; i--)
-	    {if (sr[i]->pid == pid)
-	        {sr[i]->pid *= -1;
-		 break;};};
-
-	REL_SIGRECS(sr);};
+	    {sr = *(sigchld_rec **) SC_array_get(_SC.wait_list, i);
+	     if (sr->pid == pid)
+	        {sr->pid *= -1;
+		 break;};};};
 
     return;}
 
@@ -312,16 +292,13 @@ void _SC_manage_process(PROCESS *pp)
 
 PROCESS *SC_hasharr_lookup_process(int pid)
    {int i, n;
-    PROCESS *pp, **lst;
+    PROCESS *pp;
 
-    GET_PROCESSES(lst, n);
-
+    n = SC_array_get_n(_SC.process_list);
     for (i = 0; i < n; i++)
-        {pp = lst[i];
+        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
 	 if (pp->id == pid)
 	    break;};
-
-    REL_PROCESSES(lst);
 
     if (i >= n)
        pp = NULL;
@@ -344,12 +321,12 @@ PROCESS *SC_hasharr_lookup_process(int pid)
 
 void _SC_delete_pid(int pid)
    {int i, n, fl;
-    PROCESS *pp, **lst;
+    PROCESS *pp;
 
-    GET_PROCESSES(lst, n);
+    n = SC_array_get_n(_SC.process_list);
 
     for (i = 0; i < n; i++)
-        {pp = lst[i];
+        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
 
 /* do not remove the process if the I/O has not been finished
  * someone might still come looking for it
@@ -364,18 +341,11 @@ void _SC_delete_pid(int pid)
 
              SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
 
-	     n--;
-	     n = max(n, 0);
-
+	     n = SC_array_remove(_SC.process_list, i);
 	     if (i < n)
-	        {lst[i]        = lst[n];
-		 lst[i]->index = i;};
-
-	     lst[n] = NULL;
+	        pp->index = i;
 
 	     break;};};
-
-    REL_PROCESSES(lst);
 
     if (n == 0)
        SC_reset_terminal();
@@ -855,18 +825,16 @@ int SC_process_status(PROCESS *pp)
 
 int SC_check_children(void)
    {int i, n, np;
-    PROCESS *pp, **lst;
+    PROCESS *pp;
 
-    GET_PROCESSES(lst, n);
+    n = SC_array_get_n(_SC.process_list);
 
     np = 0;
     for (i = 0; i < n; i++)
-        {pp = lst[i];
+        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
 	 if (SC_process_alive(pp) && (SC_status(pp) == SC_RUNNING))
 	    {if (SC_process_status(pp) != SC_RUNNING)
 	        np++;};};
-
-    REL_PROCESSES(lst);
 
     return(np);}
 
@@ -882,13 +850,13 @@ int SC_check_children(void)
 
 int SC_running_children(void)
    {int i, n, nr, st, pid;
-    PROCESS *pp, **lst;
+    PROCESS *pp;
 
-    GET_PROCESSES(lst, n);
+    n = SC_array_get_n(_SC.process_list);
 
     nr = 0;
     for (i = 0; i < n; i++)
-        {pp = lst[i];
+        {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
 	 if (SC_process_alive(pp))
 	    {pid = pp->id;
 	     st  = SC_process_status(pp);
@@ -897,8 +865,6 @@ int SC_running_children(void)
 	     else if ((st & (SC_DEAD | SC_KILLED | SC_SIGNALED)) != 0)
 	        {nr = -1;
 		 break;};};};
-
-    REL_PROCESSES(lst);
 
     return(nr);}
 

@@ -368,15 +368,15 @@ static int make_distributed(char *tgt, char *file, char *server,
 
     ok = TRUE;
 
-    arr = SC_string_array("MAKE_DISTRIBUTED");
-
     snprintf(cm, MAXLINE, "pact %s", tgt);
     cmnds[0] = cm;
     cmnds[1] = NULL;
 
     fp = io_open(file, "r");
     if (fp != NULL)
-       {while (TRUE)
+       {arr = SC_string_array("MAKE_DISTRIBUTED");
+
+	while (TRUE)
 	   {p = io_gets(s, MAXLINE, fp);
 	    if (p == NULL)
 	       {io_close(fp);
@@ -389,14 +389,12 @@ static int make_distributed(char *tgt, char *file, char *server,
 	n = SC_array_get_n(arr);
 	SC_array_string_add(arr, NULL);
 
-	dirs = SC_array_array(arr);
+	dirs = SC_array_done(arr);
 
 	ok   = SC_exec_async(shell, cmnds, dirs, server, env, 8,
 			     NULL, flt, na, show, ignore, FALSE);
 
-	SFREE(dirs);};
-
-    SC_free_array(arr, SC_array_free_n);
+	SC_free_strings(dirs);};
 
     return(ok);}
 

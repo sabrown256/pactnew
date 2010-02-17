@@ -247,7 +247,8 @@ extern long
  SC_array_set_n(SC_array *a, long n),
  SC_array_inc_n(SC_array *a, long n, int wh),
  SC_array_dec_n(SC_array *a, long n, int wh),
- SC_array_get_n(SC_array *a);
+ SC_array_get_n(SC_array *a),
+ SC_array_remove(SC_array *a, long n);
 
 extern int
  _SC_array_is_member(SC_array *a, char *s),

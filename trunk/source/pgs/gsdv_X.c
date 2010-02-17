@@ -1135,19 +1135,15 @@ static int _PG_X_get_next_event(PG_event *ev)
 
 PG_device *_PG_X_find_device(Window window)
    {int i, n;
-    PG_device *dev, **devs;
+    PG_device *dev;
 
-    n    = SC_array_get_n(_PG.devlst);
-    devs = SC_array_array(_PG.devlst);
-
+    n = SC_array_get_n(_PG.devlst);
     for (i = 0; i < n; i++)
-        {dev = devs[i];
+        {dev = *(PG_device **) SC_array_get(_PG.devlst, i);
          if ((dev != NULL) && (dev->window == window))
              break;};
 
-    SFREE(devs);
-
-    if (i > n)
+    if (i >= n)
        dev = NULL;
 
     return(dev);}

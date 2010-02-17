@@ -63,18 +63,14 @@ void return_text(PG_interface_object *iob, PG_event *ev)
 
 void return_child_text(PG_interface_object *iob, PG_event *ev)
    {int n;
-    PG_interface_object *ch, **iobs;
+    PG_interface_object *ch;
 
-    n    = SC_array_get_n(iob->children);
-    iobs = SC_array_array(iob->children);
-
+    n = SC_array_get_n(iob->children);
     if (n >= 0)
-       {ch = iobs[0];
+       {ch = IOB(iob->children, 0);
         PRINT(STDOUT,
               "\nClicked on BUTTON object: %s\n",
               (char *) ch->obj);};
-
-    SFREE(iobs);
 
     return;}
 
@@ -269,6 +265,15 @@ void mouse_event_handler(PG_device *dev, PG_event *ev)
                  break;
             case MOUSE_RIGHT  :
                  SC_strcat(bf, 80, "Right");
+                 break;
+            case MOUSE_WHEEL_UP :
+                 SC_strcat(bf, 80, "Wheel Up");
+                 break;
+            case MOUSE_WHEEL_DOWN :
+                 SC_strcat(bf, 80, "Wheel Down");
+                 break;
+            default :
+                 SC_strcat(bf, 80, "Unknown");
                  break;};
 
         if (bf[0] != '\0')

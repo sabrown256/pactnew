@@ -35,6 +35,8 @@
     {if ((d)->quadrant == QUAD_FOUR)                                       \
         (b)[2] = (d)->g.pc[3] - (b)[3];}
 
+#define IOB(a_, i_)  (*(PG_interface_object **) SC_array_get(a_, i_))
+
 #ifdef __cplusplus
 extern "C" {
 #endif

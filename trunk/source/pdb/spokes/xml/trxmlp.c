@@ -206,24 +206,23 @@ static char *_XML_entry_uniq(parse_state *st, char *path, char *name, int lev)
 static char *_XML_entry_name(parse_state *st)
    {int is, ns;
     char s[MAXLINE];
-    char *name, *b, *u, **sa;
+    char *name, *b, *u;
+    SC_array *a;
 
-    ns = SC_array_get_n(st->stack);
-    sa = SC_array_array(st->stack);
+    a  = st->stack;
+    ns = SC_array_get_n(a);
 
     name = NULL;
     for (is = 0; is < ns; is++)
-        {name = _XML_entry_uniq(st, name, "/", is);
+        {b    = *(char **) SC_array_get(a, is);
+	 name = _XML_entry_uniq(st, name, "/", is);
 
-         b  = sa[is];
-	 SC_strncpy(s, MAXLINE, b, -1);
-	 b  = SC_strtok(s, " \t>", u);
+         SC_strncpy(s, MAXLINE, b, -1);
 
+	 b    = SC_strtok(s, " \t>", u);
 	 name = _XML_entry_uniq(st, name, b, is);};
 
     SC_trim_right(name, " \t\n\r\f");
-
-    SFREE(sa);
 
     return(name);}
 

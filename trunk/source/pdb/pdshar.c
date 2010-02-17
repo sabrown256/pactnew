@@ -67,15 +67,13 @@ tr_layer *_PD_lookup(char *type)
     _PD_register_spokes();
 
     n  = SC_array_get_n(_PD_file_types);
-    tr = SC_array_array(_PD_file_types);
 
     ptr = NULL;
     for (i = 0; i < n; i++)
-        {if (strcmp(tr[i].type, type) == 0)
-	    {ptr = tr + i;
+        {tr = SC_array_get(_PD_file_types, i);
+         if (strcmp(tr->type, type) == 0)
+	    {ptr = tr;
 	     break;};};
-
-    SFREE(tr);
 
     return(ptr);}
 
@@ -316,11 +314,11 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
         else
 	   rfmt = SC_assoc(pu->info, "fmt");
 
-	n  = _PD_register_spokes();
-	tr = SC_array_array(_PD_file_types);
+	n = _PD_register_spokes();
 	for (i = 0; i < n; i++)
-	    {type = tr[i].type;
-	     tfmt = tr[i].fmt;
+	    {tr = SC_array_get(_PD_file_types, i);
+	     type = tr->type;
+	     tfmt = tr->fmt;
 
 /* work out whether this translation layer matches the request
  * when creating a file
@@ -336,12 +334,10 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 
 /* open the file */
 	     if (ok == TRUE)
-	        {file = _PD_open_bin_aux(pu, name, mode, tr+i, a);
+	        {file = _PD_open_bin_aux(pu, name, mode, tr, a);
 		 if (file != NULL)
 		    {_PD_def_real(type, file);
-		     break;};};};
-
-	SFREE(tr);};
+		     break;};};};};
 
     return(file);}
 

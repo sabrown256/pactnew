@@ -93,18 +93,15 @@ static void _SC_eth_push_lock(SC_thread_lock *tl, int n)
 
 static int _SC_eth_lookup_lock(SC_thread_lock *tl)
    {int n, nl;
-    SC_thread_lock **la;
+    SC_thread_lock *lck;
 
     _SC_eth_init();
 
     nl = SC_array_get_n(_SC.eth_locks);
-    la = SC_array_array(_SC.eth_locks);
-
     for (n = 0; n < nl; n++)
-        {if (tl == la[n])
+        {lck = *(SC_thread_lock **) SC_array_get(_SC.eth_locks, n);
+	 if (tl == lck)
 	    break;};
-
-    SFREE(la);
 
     if (n >= nl)
        {SC_LOCKON(SC_ts_lock);
@@ -350,20 +347,17 @@ static void _SC_eth_push_key(SC_thread_key *tk, int n)
 
 static int _SC_eth_lookup_key(SC_thread_key *tk)
    {int n, nk;
-    SC_thread_key **ka;
+    SC_thread_key *key;
 
     _SC_eth_init();
 
     SC_LOCKON(SC_ts_lock);
 
     nk = SC_array_get_n(_SC.eth_keys);
-    ka = SC_array_array(_SC.eth_keys);
-
     for (n = 0; n < nk; n++)
-        {if (tk == ka[n])
+        {key = *(SC_thread_key **) SC_array_get(_SC.eth_keys, n);
+	 if (tk == key)
 	    break;};
-
-    SFREE(ka);
 
     if (n >= nk)
        _SC_eth_push_key(tk, n);
@@ -440,26 +434,19 @@ emu_cond_info *_SC_eth_lookup_cond(SC_thread_cond *tc)
     _SC_eth_init();
 
     nc = SC_array_get_n(_SC.eth_conds);
-    ci = SC_array_array(_SC.eth_conds);
-
     for (n = 0; n < nc; n++)
-        {if (tc == ci[n].var)
+        {ci = SC_array_get(_SC.eth_conds, n);
+	 if (tc == ci->var)
 	    break;};
 
     IF_SAFE(TRUE, &SC_ts_lock, n >= nc)
        cv.var     = tc;
        cv.waiting = FALSE;
 
-       SFREE(ci);
-
        SC_array_push(_SC.eth_conds, &cv);
-
-       ci = SC_array_array(_SC.eth_conds);
     END_SAFE;
 
-    rv = ci + n;
-
-    SFREE(ci);
+    rv = SC_array_get(_SC.eth_conds, n);
 
     return(rv);}
 
@@ -508,10 +495,10 @@ void _SC_eth_thread_broadcast(SC_thread_cond *tc)
     emu_cond_info *ci;
 
     nc = SC_array_get_n(_SC.eth_conds);
-    ci = SC_array_array(_SC.eth_conds);
 
     for (i = 0; i < nc; i++)
-        ci[i].waiting = FALSE;
+        {ci = SC_array_get(_SC.eth_conds, i);
+	 ci->waiting = FALSE;};
 
     SFREE(ci);
 

@@ -93,7 +93,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
     double ndc[PG_BOXSZ];
     char *type, s[MAXLINE];
     PG_device *dev;
-    PG_interface_object **iobs;
+    PG_interface_object *ch;
     PG_curve *crv;
 
     PRINT(fp, "%s%s", indent, iob->type);
@@ -190,7 +190,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 
     _PG_parent_limits(dev, iob->parent, ndc);
     dx = ndc[1] - ndc[0];
-    dy = ndc[3] - ndc[1];
+    dy = ndc[3] - ndc[2];
 
     x = crv->x;
     y = crv->y;
@@ -221,7 +221,6 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 	     PRINT(fp, " (%5.3f,%5.3f)", xs[0], xs[1]);};};
 
     niobs = SC_array_get_n(iob->children);
-    iobs  = SC_array_array(iob->children);
     if (niobs > 0)
        {PRINT(fp, "\n");
 
@@ -232,7 +231,8 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 	indent[npt+3] = '\0';
 
 	for (i = 0; i < niobs; i++)
-            {if (!PG_write_interface_object(fp, iobs[i], indent, FALSE))
+	    {ch = IOB(iob->children, i);
+	     if (!PG_write_interface_object(fp, ch, indent, FALSE))
 	        return(FALSE);
 	     if (i < niobs - 1)
                 PRINT(fp, "\n");
@@ -244,8 +244,6 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 
     if (nopf)
        PRINT(fp, "\n");
-
-    SFREE(iobs);
 
     return(TRUE);}
 
@@ -260,7 +258,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 int PG_write_interface(PG_device *dev, char *name)
    {int i, niobs, ret;
     char indent[MAXLINE];
-    PG_interface_object **iobs;
+    PG_interface_object *iob;
     FILE *fp;
 
     fp = io_open(name, "w");
@@ -270,7 +268,6 @@ int PG_write_interface(PG_device *dev, char *name)
     memset(indent, ' ', MAXLINE);
 
     niobs = SC_array_get_n(dev->iobjs);
-    iobs  = SC_array_array(dev->iobjs);
 
 /* print documentation */
     PRINT(fp, "#\n");
@@ -314,12 +311,11 @@ int PG_write_interface(PG_device *dev, char *name)
     ret = TRUE;
     indent[0] = '\0';
     for (i = 0; i < niobs; i++)
-        {ret = PG_write_interface_object(fp, iobs[i], indent, TRUE);
+        {iob = IOB(dev->iobjs, i);
+	 ret = PG_write_interface_object(fp, iob, indent, TRUE);
 	 if (!ret)
 	    break;
          PRINT(fp, "\n");};
-
-    SFREE(iobs);
 
     io_close(fp);
 
@@ -418,30 +414,33 @@ static void _PG_fix_flags(PG_device *dev, int *flags, char *ps)
 
 PG_interface_object *PG_find_object(PG_device *dev, char *s,
                                     PG_interface_object *parent)
-   {PG_interface_object *iob, **iobs;
-    int i, niobs;
+   {int i, niobs;
+    PG_interface_object *rv, *iob;
+
+    rv = NULL;
 
     if (parent != NULL)
        {if (parent->name != NULL)
 	        {if (strcmp(parent->name, s) == 0)
                     return(parent);};
 	niobs = SC_array_get_n(parent->children);
-	iobs  = SC_array_array(parent->children);}
+	for (i = 0; i < niobs; i++)
+	    {iob = IOB(parent->children, i);
+	     if (iob != NULL)
+	        {rv = PG_find_object(dev, s, iob);
+		 if (rv != NULL)
+		    break;};};}
 
     else
        {niobs = SC_array_get_n(dev->iobjs);
-        iobs  = SC_array_array(dev->iobjs);};
-
-    iob = NULL;
-    for (i = 0; i < niobs; i++)
-        {if (iobs[i] != NULL)
-	    {iob = PG_find_object(dev, s, iobs[i]);
+	for (i = 0; i < niobs; i++)
+	    {iob = IOB(dev->iobjs, i);
 	     if (iob != NULL)
-	        break;};};
+	        {rv = PG_find_object(dev, s, iob);
+		 if (rv != NULL)
+		    break;};};};
 
-    SFREE(iobs);
-
-    return(iob);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -704,22 +703,20 @@ int PG_read_interface(PG_device *dev, char *name)
 int dpritf(PG_device *dev)
    {int i, niobs, ret;
     char indent[MAXLINE];
-    PG_interface_object **iobs;
+    PG_interface_object *iob;
 
     memset(indent, ' ', MAXLINE);
 
-    niobs = SC_array_get_n(dev->iobjs);
-    iobs  = SC_array_array(dev->iobjs);
-
     ret = TRUE;
     indent[0] = '\0';
+
+    niobs = SC_array_get_n(dev->iobjs);
     for (i = 0; i < niobs; i++)
-        {ret = PG_write_interface_object(stdout, iobs[i], indent, TRUE);
+        {iob = IOB(dev->iobjs, i);
+	 ret = PG_write_interface_object(stdout, iob, indent, TRUE);
 	 if (!ret)
 	    break;
          PRINT(stdout, "\n");};
-
-    SFREE(iobs);
 
     return(ret);}
 
