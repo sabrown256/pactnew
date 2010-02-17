@@ -20,13 +20,6 @@
 #define EXEC_LOG            104
 #define EXEC_CORE           105
 
-#define GET_TASKS(tsk, n, state)                                              \
-    n   = SC_array_get_n(state->tasks);                                       \
-    tsk = SC_array_array(state->tasks)
-
-#define REL_TASKS(tsk)                                                        \
-    SFREE(tsk)
-
 extern asyncstate
  _SC_server_state;
 
@@ -118,7 +111,7 @@ void _SC_process_output(int fd, int mask, void *a)
     char s[MAX_BFSZ+1];
     char *ps;
     PROCESS *pp;
-    taskdesc *job, **tsk;
+    taskdesc *job;
     parstate *state;
     asyncstate *as;
 
@@ -127,10 +120,10 @@ void _SC_process_output(int fd, int mask, void *a)
 
     SC_START_ACTIVITY(state, EXEC_OUT_ACCEPT);
 
-    GET_TASKS(tsk, n, state);
+    n = SC_array_get_n(state->tasks);
 
     for (i = 0; i < n; i++)
-        {job = tsk[i];
+        {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
@@ -156,8 +149,6 @@ void _SC_process_output(int fd, int mask, void *a)
 
 		     break;};};};};
 
-    REL_TASKS(tsk);
-
     SC_END_ACTIVITY(state);
 
     return;}
@@ -174,7 +165,7 @@ void _SC_process_output(int fd, int mask, void *a)
 void _SC_process_out_reject(int fd, int mask, void *a)
    {int i, n, nr;
     PROCESS *pp;
-    taskdesc **tsk, *job;
+    taskdesc *job;
     parstate *state;
     asyncstate *as;
 
@@ -183,19 +174,16 @@ void _SC_process_out_reject(int fd, int mask, void *a)
 
     SC_START_ACTIVITY(state, EXEC_OUT_REJECT);
 
-    GET_TASKS(tsk, n, state);
-
     nr = SC_running_children();
 
+    n = SC_array_get_n(state->tasks);
     for (i = 0; i < n; i++)
-        {job = tsk[i];
+        {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
 	        {if ((pp->in == fd) && (SC_status(pp) == SC_RUNNING))
 		    _SC_rejected_process(as, state, job, mask);};};};
-
-    REL_TASKS(tsk);
 
     SC_END_ACTIVITY(state);
 
@@ -247,7 +235,7 @@ static int _SC_process_end(int *prv, void *a)
    {int i, n, ex, rv;
     int nr, nc;
     double tl, dt;
-    taskdesc *job, **tsk;
+    taskdesc *job;
     asyncstate *as;
     parstate *state;
 
@@ -256,13 +244,13 @@ static int _SC_process_end(int *prv, void *a)
 
     SC_START_ACTIVITY(state, EXEC_END);
 
-    GET_TASKS(tsk, n, state);
+    n = SC_array_get_n(state->tasks);
     
     nr = 0;
     nc = 0;
 
     for (i = 0; i < n; i++)
-        {job = tsk[i];
+        {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	 if (job != NULL)
 	    job->check(job, as, &nr, &nc);
 	 else
@@ -277,12 +265,10 @@ static int _SC_process_end(int *prv, void *a)
     if (ex == TRUE)
        {rv = 0;
 	for (i = 0; i < n; i++)
-	    {job = tsk[i];
+	    {job = *(taskdesc **) SC_array_get(state->tasks, i);
 	     if (job != NULL)
 	        rv += job->inf.status;};
 	*prv = rv;};
-
-    REL_TASKS(tsk);
 
 /* determine whether the time limit is exhausted */
     tl = 1.0e-3*((double) state->time_limit);
@@ -303,20 +289,17 @@ static int _SC_process_end(int *prv, void *a)
 
 void SC_show_state_log(parstate *state)
    {int it, nt;
-    char **log;
+    char *s;
     asyncstate *as;
 
     SC_START_ACTIVITY(state, EXEC_LOG);
 
     as = NULL;
 
-    nt  = SC_array_get_n(state->log);
-    log = SC_array_array(state->log);
-
+    nt = SC_array_get_n(state->log);
     for (it = 0; it < nt; it++)
-        io_printf(stdout, "> %s", log[it]);
-
-    SFREE(log);
+        {s = *(char **) SC_array_get(state->log, it);
+	 io_printf(stdout, "> %s", s);};
 
     io_printf(stdout, "\n");
 

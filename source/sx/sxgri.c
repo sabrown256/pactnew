@@ -332,23 +332,17 @@ static object *_SXI_free_iobs(object *argl)
 
 void SX_rem_iob(PG_interface_object *iob, int flag)
    {int i, niobs;
-    PG_interface_object **iobs;
+    PG_interface_object *diob;
     PG_device *dev;
 
     dev   = iob->device;
     niobs = SC_array_get_n(dev->iobjs);
-    iobs  = SC_array_array(dev->iobjs);
-
     for (i = 0; i < niobs; i++)
-        {if (iob == iobs[i])
-            {niobs--;
-             iobs[i] = iobs[niobs];
+        {diob = IOB(dev->iobjs, i);
+	 if (diob == iob)
+	    {niobs = SC_array_remove(dev->iobjs, i);
              _PG_rl_interface_object(iob, flag);
              break;};};
-
-    SFREE(iobs);
-
-    SC_array_set_n(dev->iobjs, niobs);
 
     return;}
 

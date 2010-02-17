@@ -31,7 +31,7 @@ if (($LStat == 0) && ("$MPI" == "")) then
    set UTime = `$TIMER -r`
 
    flog $LogF pushd $SrcDir
-   flog $LogF $MAKE Fstd
+   flog $LogF $MAKE +na 2 Fstd
    set TStatus = $status
    flog $LogF popd
 

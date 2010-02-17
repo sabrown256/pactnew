@@ -288,28 +288,26 @@ static object *_SX_list_vobjects(char *patt, g_file *po, int type)
    {long i, n;
     int t;
     char *s;
-    SX_menu_item *mitems;
+    SX_menu_item *mitem;
     object *ret;
 
     ret = SS_null;
 
-    n      = SC_array_get_n(po->menu_lst);
-    mitems = SC_array_array(po->menu_lst);
-
+    n = SC_array_get_n(po->menu_lst);
     if (n > 0L)
        {PRINT(stdout, "\n");
 
 	for (i = 0L; i < n; i++)
-	    {s = mitems[i].label;
-	     t = mitems[i].type[3];
+	    {mitem = SC_array_get(po->menu_lst, i);
+
+	     s = mitem->label;
+	     t = mitem->type[3];
 	     if (((type == 0) || (t == type)) && SC_regx_match(s, patt))
 	        {PRINT(stdout, " %ld  %c  %s\n", i+1, t, s);
 		 SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) (i+1)),
 					   ret));}};
 
 	SS_Assign(ret, SS_reverse(ret));};
-
-    SFREE(mitems);
 
     return(ret);}
 

@@ -2074,19 +2074,16 @@ static void _SC_report_job_exit(taskdesc *job, char *where)
 
 static void _SC_add_job(taskdesc *job)
    {int i, n;
-    taskdesc **tsk;
+    taskdesc *tsk;
     SC_array *ta;
 
-    ta  = job->context->tasks;
-    n   = SC_array_get_n(ta);
-    tsk = SC_array_array(ta);
-
+    ta = job->context->tasks;
+    n  = SC_array_get_n(ta);
     for (i = 0; i < n; i++)
-        {if (tsk[i] == NULL)
-	    {tsk[i] = job;
+        {tsk = *(taskdesc **) SC_array_get(ta, i);
+	 if (tsk == NULL)
+	    {SC_array_set(ta, i, &job);
 	     break;};};
-
-    SFREE(tsk);
 
     if (i >= n)
        SC_array_push(ta, &job);
@@ -2100,16 +2097,16 @@ static void _SC_add_job(taskdesc *job)
 
 static void _SC_remove_job(taskdesc *job)
    {int i, n;
-    taskdesc **tsk;
+    taskdesc *tsk;
     SC_array *ta;
 
-    ta  = job->context->tasks;
-    n   = SC_array_get_n(ta);
-    tsk = SC_array_array(ta);
-
+    ta = job->context->tasks;
+    n  = SC_array_get_n(ta);
     for (i = 0; i < n; i++)
-        {if (job == tsk[i])
-	    tsk[i] = NULL;};
+        {tsk = *(taskdesc **) SC_array_get(ta, i);
+	 if (tsk == job)
+	    {SC_array_set(ta, i, NULL);
+	     break;};};
 
     SFREE(tsk);
 

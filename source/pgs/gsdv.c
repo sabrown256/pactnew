@@ -187,7 +187,7 @@ void _PG_default_viewspace(PG_device *dev, int asp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_PUSH_DEVICE - push a device on the the device list */
+/* _PG_PUSH_DEVICE - push a device on the device list */
 
 void _PG_push_device(PG_device *dev)
    {
@@ -202,31 +202,20 @@ void _PG_push_device(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_REMOVE_DEVICE - push a device on the the device list */
+/* _PG_REMOVE_DEVICE - remove a device from the device list */
 
 void _PG_remove_device(PG_device *dev)
-   {int i, j, n;
-    PG_device **devs;
+   {int i, n;
+    PG_device *dv;
 
-    n    = SC_array_get_n(_PG.devlst);
-    devs = SC_array_array(_PG.devlst);
-
+    n = SC_array_get_n(_PG.devlst);
     for (i = 0; i < n; i++)
-        {if (dev == devs[i])
-            {n--;
-
-             for (j = i; j < n; j++)
-                 devs[j] = devs[j+1];
-
-             devs[n] = NULL;
+        {dv = *(PG_device **) SC_array_get(_PG.devlst, i);
+	 if (dv == dev)
+            {n = SC_array_remove(_PG.devlst, i);
 	     if (n == 0)
 	        SC_free_array(_PG.devlst, NULL);
-
              break;};};
-
-    SFREE(devs);
-
-    SC_array_set_n(_PG.devlst, n);
 
 /* clean up the device */
     PG_rl_device(dev);

@@ -418,8 +418,6 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
     PM_set_value(wgt, dne, 0.0);
 
 /* NOTE: by construction now the range is indexed the same as the domain */
-    wa = SC_array_array(wda);
-
     s = PM_convert_vectors(dnde, sne, sre, sty);
 
 /* compute the weighted sums */
@@ -436,16 +434,15 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 	      ina = nof[is];
 	      inb = nof[is+1];
 	      for (in = ina; in < inb; in++)
-		  {w = wa[in].w;
+		  {wa = SC_array_get(wda, in);
+		   w  = wa->w;
 		   if (w != 0.0)
-		      {id = wa[in].id;
+		      {id = wa->id;
 
 		       trc[id] += src*w;
 		       wgt[id] += w;};};};};
 
     PM_free_vectors(dnde, s);
-
-    SFREE(wa);
 
 /* invert the weights taking care with zero values */
     for (i = 0; i < dne; i++)

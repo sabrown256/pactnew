@@ -44,7 +44,7 @@ BIGINT SC_stash_pointer(void *p)
 
 #ifdef F77_INT_SIZE_PTR_DIFFER
     int np;
-    void **pl;
+    void *pl;
 
     SC_LOCKON(SC_ptr_lock);
 
@@ -52,15 +52,13 @@ BIGINT SC_stash_pointer(void *p)
        _SC.ptr_lst = SC_MAKE_ARRAY("PERM|SC_STASH_POINTER", void *, NULL);
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
 
     for (; _SC.ip < np; _SC.ip++)
-        {if (pl[_SC.ip] == NULL)
-            {pl[_SC.ip] = p;
+        {pl = *(void **) SC_array_get(_SC.ptr_lst, _SC.ip);
+         if (pl == NULL)
+            {SC_array_set(_SC.ptr_lst, _SC.ip, &p);
              i = ++_SC.ip;
              break;};}
-
-    SFREE(pl);
 
     if (i == -1)
        {SC_array_push(_SC.ptr_lst, &p);
@@ -87,20 +85,16 @@ void *SC_get_pointer(BIGINT n)
 
 #ifdef F77_INT_SIZE_PTR_DIFFER
     int np;
-    void **pl;
 
     SC_LOCKON(SC_ptr_lock);
 
     p = NULL;
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
 
     if ((1 <= n) && (n <= np))
        {n--;
-        p = pl[n];};
-
-    SFREE(pl);
+	p = *(void **) SC_array_get(_SC.ptr_lst, n);};
 
     SC_LOCKOFF(SC_ptr_lock);
 
@@ -129,13 +123,10 @@ BIGINT SC_pointer_index(void *p)
     SC_LOCKON(SC_ptr_lock);
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
-
     for (i = 0; i < np; i++)
-        {if (pl[i] == p)
+        {pl = *(void **) SC_array_get(_SC.ptr_lst, i);
+	 if (pl == p)
              break;}
-
-    SFREE(pl);
 
     if (i >= np)
        i = -1;
@@ -164,29 +155,25 @@ void *SC_del_pointer(int n)
     
 #ifdef F77_INT_SIZE_PTR_DIFFER
     int np;
-    void **pl;
 
     p = NULL;
 
     np = SC_array_get_n(_SC.ptr_lst);
-    pl = SC_array_array(_SC.ptr_lst);
 
     if ((1 <= n) && (n <= np))
        {n--;
 
-       SC_LOCKON(SC_ptr_lock);
+	SC_LOCKON(SC_ptr_lock);
 
-       p = pl[n];
+	p = *(void **) SC_array_get(_SC.ptr_lst, n);
 
 /* NULL out this slot */
-       pl[n] = NULL;
+	SC_array_set(_SC.ptr_lst, n, NULL);
 
 /* reset the first avaiable index */
-       _SC.ip = min(_SC.ip, n);
+	_SC.ip = min(_SC.ip, n);
 
-       SC_LOCKOFF(SC_ptr_lock);};
-
-    SFREE(pl);
+	SC_LOCKOFF(SC_ptr_lock);};
 
 #else
 

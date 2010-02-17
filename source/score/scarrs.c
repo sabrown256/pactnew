@@ -27,7 +27,7 @@ static void *_SC_array_set_1(void *a, int bpi, int oper, long n, void *v)
 
      s = (char *) a;
      if (oper == SET)
-        s[n] = *(char *) v;
+        s[n] = (v == NULL) ? 0 : *(char *) v;
      else if (oper == GET)
         v = &s[n];
 
@@ -45,7 +45,7 @@ static void *_SC_array_set_2(void *a, int bpi, int oper, long n, void *v)
 
      s = (short *) a;
      if (oper == SET)
-        s[n] = *(short *) v;
+        s[n] = (v == NULL) ? 0 : *(short *) v;
      else if (oper == GET)
         v = &s[n];
 
@@ -63,7 +63,7 @@ static void *_SC_array_set_4(void *a, int bpi, int oper, long n, void *v)
 
      s = (int *) a;
      if (oper == SET)
-        s[n] = *(int *) v;
+        s[n] = (v == NULL) ? 0 : *(int *) v;
      else if (oper == GET)
         v = &s[n];
 
@@ -81,7 +81,7 @@ static void *_SC_array_set_8(void *a, int bpi, int oper, long n, void *v)
 
      s = (BIGINT *) a;
      if (oper == SET)
-        s[n] = *(BIGINT *) v;
+        s[n] = (v == NULL) ? 0 : *(BIGINT *) v;
      else if (oper == GET)
         v = &s[n];
 
@@ -99,7 +99,10 @@ static void *_SC_array_set_n(void *a, int bpi, int oper, long n, void *v)
 
      s = (char *) a;
      if (oper == SET)
-        memcpy(s + n*bpi, v, bpi);
+        {if (v == NULL)
+	    memset(s + n*bpi, 0, bpi);
+	 else
+	    memcpy(s + n*bpi, v, bpi);}
      else if (oper == GET)
         v = s + n*bpi;
 
@@ -550,6 +553,38 @@ long SC_array_dec_n(SC_array *a, long n, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_ARRAY_REMOVE - remove the Nth element from A
+ *                 - slide the others down so there is no hole
+ *                 - return the new number of elements iff successful
+ *                 - and -1 otherwise
+ */
+
+long SC_array_remove(SC_array *a, long n)
+   {long no, bpi;
+    char *arr;
+
+    no = a->n - 1;
+    if (n <= no)
+       {bpi = a->bpi;
+	arr = a->array;
+
+	if (n < no)
+	   memmove(arr + n*bpi, arr + (n+1)*bpi, (no - n)*bpi);
+
+	SC_array_init(a, no);
+
+	a->n--;}
+    else
+       no = -1;
+
+    return(no);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            STRING ARRAY ROUTINES                         */
+
+/*--------------------------------------------------------------------------*/
+
 /* SC_ARRAY_STRING_ADD - add the string S to the array A */
 
 void SC_array_string_add(SC_array *a, char *s)
@@ -591,16 +626,13 @@ int SC_array_string_append(SC_array *out, SC_array *in)
    {int i, no;
     char **sa;
 
-    sa = SC_array_array(in);
-
     if (sa != NULL)
-       {no = SC_array_get_n(in);
+       {no = in->n;
+	sa = in->array;
         for (i = 0; i < no; i++)
 	    SC_array_string_add(out, sa[i]);}
     else
        no = 0;
-
-    SFREE(sa);
 
     return(no);}
 
@@ -674,19 +706,16 @@ int _SC_array_is_member(SC_array *a, char *s)
    {int i, n, rv;
     char **str;
 
-    n   = SC_array_get_n(a);
-    str = SC_array_array(a);
-
     rv = FALSE;
 
 /* NOTE: do not filter out barrier commands */
     if (!IS_BARRIER(s))
-       {for (i = 0; i < n; i++)
+       {n   = a->n;
+	str = a->array;
+	for (i = 0; i < n; i++)
 	    {if (strcmp(s, str[i]) == 0)
 	        {rv = TRUE;
 		 break;};};};
-
-    SFREE(str);
 
     return(rv);}
 
@@ -742,7 +771,7 @@ SC_array *SC_strings_array(int n, char **sa)
 
 /*--------------------------------------------------------------------------*/
 
-/*                           STACK ROUTINES                                 */
+/*                              STACK ROUTINES                              */
 
 /*--------------------------------------------------------------------------*/
 
@@ -777,6 +806,9 @@ void *SC_array_pop(SC_array *a)
      return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                               SORT ROUTINES                              */
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_ARRAY_SWAP - swap two elements of A

@@ -159,11 +159,11 @@ static emu_thread_info *_SC_sproc_lookup_thread(SC_thread *thread)
 					 _emu_thread_info, NULL);
 
     nt = SC_array_get_n(_SC_sproc_threads);
-    ta = SC_array_array(_SC_sproc_threads);
 
 /* is there a current thread? */
     for (n = 0; n < nt; n++)
-        {if (ta[n].thread == thread)
+        {ta = SC_array_get(_SC_sproc_threads, n);
+         if (ta->thread == thread)
 	    break;};
 
 /* if not setup a thread for use */
@@ -174,8 +174,9 @@ static emu_thread_info *_SC_sproc_lookup_thread(SC_thread *thread)
 
 /* is there an available idle thread? */
 	for (n = 0; n < nt; n++)
-	    {if (ta[n]->thread == NULL)
-	        {ta[n] = tv;
+	    {ta = SC_array_get(_SC_sproc_threads, n);
+	     if (ta->thread == NULL)
+	        {SC_array_set(_SC_sproc_threads, n, &tv);
 		 break;};};
 
 /* if not add a new one */
@@ -184,9 +185,7 @@ static emu_thread_info *_SC_sproc_lookup_thread(SC_thread *thread)
 
 	SC_LOCKOFF(SC_LOOK_THREAD);};
 
-    rv = ta + n;
-
-    SFREE(ta);
+    rv = SC_array_get(_SC_sproc_threads, n);
 
     return(rv);}
 
@@ -203,14 +202,12 @@ static SC_thread _SC_sproc_thread_self(void)
     pid = getpid();
     id  = 0;
     np  = SC_array_get_n(_SC_sproc_threads);
-    ta  = SC_array_array(_SC_sproc_threads);
 
     for (i = 0; i < np; i++)
-        {if (ta[i].pid == pid)
-	    {id = ta + i;
+        {ta = SC_array_get(_SC_sproc_threads, i);
+	 if (ta->pid == pid)
+	    {id = ta;
 	     break;};};
-
-    SFREE(ta);
 
     return(id);}
 

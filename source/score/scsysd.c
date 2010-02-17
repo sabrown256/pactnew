@@ -403,7 +403,7 @@ static void _SC_pool_printf(asyncstate *as, char *tag,
 
 void SC_show_pool_logs(conpool *cp, int n)
    {int ic, it, nc, nt;
-    char **log;
+    char *s;
     connectdes **pc, *pco;
     asyncstate *as;
 
@@ -425,13 +425,10 @@ void SC_show_pool_logs(conpool *cp, int n)
 	 _SC_exec_printf(as,
 			 "-------------------------------------------------\n");
 
-	 nt  = SC_array_get_n(pco->log);
-	 log = SC_array_array(pco->log);
-
+	 nt = SC_array_get_n(pco->log);
 	 for (it = 0; it < nt; it++)
-	     _SC_exec_printf(as, "%2d> %s\n", ic, log[it]);
-
-	 SFREE(log);
+	     {s = *(char **) SC_array_get(pco->log, it);
+	      _SC_exec_printf(as, "%2d> %s\n", ic, s);};
 
 	 _SC_exec_printf(as,
 			 "Load Ave: %.2f  Ave Free Mem: %.2f  Ave Job Time: %.2f\n",

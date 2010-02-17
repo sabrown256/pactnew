@@ -216,7 +216,6 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
 				 PFFileCallback acc)
    {int i, n, fd;
     SC_poll_desc *pd;
-    PFFileCallback *pa;
 
     if (type == SC_PROCESS_I)
        fd = ((PROCESS *) p)->in;
@@ -227,17 +226,12 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
     else
        fd = *(int *) p;
 
-    n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pa = SC_array_array(pe->faccpt);
-
+    n = SC_array_get_n(pe->fd);
     for (i = 0; i < n; i++)
-        {if (pd[i].fd == fd)
-            {pa[i] = acc;
+        {pd = SC_array_get(pe->fd, i);
+	 if (pd->fd == fd)
+	    {SC_array_set(pe->faccpt, i, &acc);
              break;};};
-
-    SFREE(pd);
-    SFREE(pa);
 
     if (i >= n)
        i = SC_register_event_loop_callback(pe, SC_INTEGER_I, &fd,
@@ -258,7 +252,6 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
 				 PFFileCallback rej)
    {int i, n, fd;
     SC_poll_desc *pd;
-    PFFileCallback *pr;
 
     if (type == SC_PROCESS_I)
        fd = ((PROCESS *) p)->in;
@@ -269,17 +262,12 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
     else
        fd = *(int *) p;
 
-    n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pr = SC_array_array(pe->frejct);
-
+    n = SC_array_get_n(pe->fd);
     for (i = 0; i < n; i++)
-        {if (pd[i].fd == fd)
-            {pr[i] = rej;
+        {pd = SC_array_get(pe->fd, i);
+	 if (pd->fd == fd)
+	    {SC_array_set(pe->frejct, i, &rej);
              break;};};
-
-    SFREE(pd);
-    SFREE(pr);
 
     if (i >= n)
        i = SC_register_event_loop_callback(pe, SC_INTEGER_I, &fd,
@@ -301,7 +289,6 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
     SC_poll_desc *pd;
     PROCESS *pp;
     FILE *fp;
-    PFFileCallback *pa, *pr;
 
     if (p == NULL)
        return;
@@ -317,25 +304,14 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
     else
        fd = *(int *) p;
 
-    n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pa = SC_array_array(pe->faccpt);
-    pr = SC_array_array(pe->frejct);
-
+    n = SC_array_get_n(pe->fd);
     for (i = 0; i < n; i++)
-        {if (pd[i].fd == fd)
-            {n--;
-	     SC_array_dec_n(pe->fd, 1L, 1);
-	     SC_array_dec_n(pe->faccpt, 1L, 1);
-	     SC_array_dec_n(pe->frejct, 1L, 1);
-	     pd[i] = pd[n];
-             pa[i] = pa[n];
-             pr[i] = pr[n];
+        {pd = SC_array_get(pe->fd, i);
+	 if (pd->fd == fd)
+            {SC_array_remove(pe->fd, i);
+	     SC_array_remove(pe->faccpt, i);
+	     SC_array_remove(pe->frejct, i);
              break;};};
-
-    SFREE(pd);
-    SFREE(pa);
-    SFREE(pr);
 
     return;}
 
@@ -356,7 +332,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
    {int i, n, nrdy, nacc, nrej, in;
     short rev;
     SC_poll_desc *pd;
-    PFFileCallback *pa, *pr, fn;
+    PFFileCallback fn;
     PFSignal_handler sc;
     SC_evlpdes *old, **ev;
 
@@ -377,13 +353,11 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
  * the dynamic arrays will change to reflect the new list
  * but these pointers will remain valid
  */
-    n  = SC_array_get_n(pe->fd);
-    pd = SC_array_array(pe->fd);
-    pa = SC_array_array(pe->faccpt);
-    pr = SC_array_array(pe->frejct);
+    n = SC_array_get_n(pe->fd);
 
     for (i = 0; i < n; i++)
-        pd[i].revents = 0;
+        {pd = SC_array_get(pe->fd, i);
+	 pd->revents = 0;};
 
 /* use the SIGCHLD handler specified for the loop */
     sc = pe->sigchld;
@@ -398,7 +372,9 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 			OPOST, SC_TERM_OUTPUT, TRUE,
 			0);};
 
+    pd   = SC_array_array(pe->fd);
     nrdy = SC_poll(pd, n, to);
+    SFREE(pd);
 
 /* restore the original SIGCHLD handler */
     if (sc != NULL)
@@ -408,18 +384,19 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
        {nacc = 0;
 	nrej = 0;
 	for (i = 0; i < n; i++)
-            {rev = pd[i].revents;
+	    {pd  = SC_array_get(pe->fd, i);
+	     rev = pd->revents;
              if (rev & pe->maccpt)
                 {nacc++;
-		 fn = pa[i];
+		 fn = *(PFFileCallback *) SC_array_get(pe->faccpt, i);
 		 if (fn != NULL)
-		    (*fn)(pd[i].fd, rev, a);}
+		    (*fn)(pd->fd, rev, a);}
 
              else if (rev & pe->mrejct)
                 {nrej++;
-		 fn = pr[i];
+		 fn = *(PFFileCallback *) SC_array_get(pe->frejct, i);
 		 if (fn != NULL)
-		    (*fn)(pd[i].fd, rev, a);};
+		    (*fn)(pd->fd, rev, a);};
 
              SC_catch_event_loop_interrupts(pe, SC_io_interrupts_on);};
 
@@ -427,10 +404,6 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
     else if (nrdy == -1)
        nrdy = -errno;
-
-    SFREE(pd);
-    SFREE(pa);
-    SFREE(pr);
 
 /* restore the current event loop descriptor */
     if (ev != NULL)

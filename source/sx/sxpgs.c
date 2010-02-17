@@ -261,21 +261,16 @@ static object *_SX_pdbcurve_graph(PDBfile *file, char *name, syment *ep)
 
 SX_menu_item *_SX_get_menu_item(g_file *po, int i)
    {int n;
-    SX_menu_item *mi, *mitems;
+    SX_menu_item *mi;
 
-    mitems = SC_array_array(po->menu_lst);
-    if (mitems == NULL)
-       {_SX_get_menu(po);
-	mitems = SC_array_array(po->menu_lst);};
+    mi = NULL;
 
     n = SC_array_get_n(po->menu_lst);
+    if ((0 < i) && (i <= n))
+       {if (po->menu_lst->array == NULL)
+	   _SX_get_menu(po);
 
-    if ((i < 1) || (i > n))
-       mi = NULL;
-    else
-       mi = mitems + i - 1;
-
-    SFREE(mitems);
+	mi = SC_array_get(po->menu_lst, i-1);};
 
     return(mi);}
 

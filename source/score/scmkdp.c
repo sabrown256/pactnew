@@ -134,18 +134,15 @@ int _SC_is_newer(char *fa, char *fb, int force, anadep *state)
     time_t tb;
     cmdes *as;
 
-    ns = SC_array_get_n(state->actions);
-    as = SC_array_array(state->actions);
-
 /* if there is a target matching FB then it will be newer as the
  * commands are executed
  */
+    ns = SC_array_get_n(state->actions);
     for (i = 0; i < ns; i++)
-        {if (strcmp(fb, as[i].target) == 0)
+        {as = SC_array_get(state->actions, i);
+	 if (strcmp(fb, as->target) == 0)
 	    {force = TRUE;
 	     break;};};
-
-    SFREE(as);
 
     rv = force;
     if ((force == FALSE) && (stat(fb, &bb) == 0))
@@ -316,28 +313,25 @@ static int _SC_add_actions(char *tgt, char *dep, char *sfx,
     else
         a.dependent = SC_strsavef(dep, "char*:_SC_ADD_ACTIONS:dependent");
 
-    ns = SC_array_get_n(state->actions);
-    as = SC_array_array(state->actions);
-
 /* check whether we have an explicit rule that should override 
  * an implicit one
  */
     ok = TRUE;
     if (whch == EXPLICIT)
-       {for (i = 0; i < ns; i++)
-	    {if ((strcmp(tgt, as[i].target) == 0) &&
-		 (strcmp(dep, as[i].dependent) == 0) &&
-		 (as[i].kind != EXPLICIT))
+       {ns = SC_array_get_n(state->actions);
+	for (i = 0; i < ns; i++)
+	    {as = SC_array_get(state->actions, i);
+	     if ((strcmp(tgt, as->target) == 0) &&
+		 (strcmp(dep, as->dependent) == 0) &&
+		 (as->kind != EXPLICIT))
 
 /* replace the implicit actions only if the explicit actions are not empty */
 	        {if (b != NULL)
 		    {_SC_rel_actions(state, i);
-		     as[i] = a;}
+		     SC_array_set(state->actions, i, &a);}
 
 		 ok = FALSE;
 		 break;};};};
-
-    SFREE(as);
 
 /* add the rule at the end of the list */
     if (ok)
@@ -363,7 +357,7 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
 			   int force, anadep *state)
    {int i, na, ns, knd, frc;
     char s[MAXLINE], src[MAXLINE];
-    char *base, *sfx, *ptrn, **sa;
+    char *base, *sfx, *ptrn, *t;
     ruledes *rd;
     int (*pred)(char *fa, char *fb, int force, anadep *state);
 
@@ -374,16 +368,15 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
     sfx  = "a";
     knd  = ARCHIVE;
 
-    ns = SC_array_get_n(state->suffices);
-    sa = SC_array_array(state->suffices);
-
 /* looping over suffices check each implicit rule for match */
     na = 0;
+    ns = SC_array_get_n(state->suffices);
     for (i = 0; i < ns; i++)
-        {ptrn = SC_dsnprintf(FALSE, "%s.%s", sa[i], sfx);
+        {t    = *(char **) SC_array_get(state->suffices, i);
+	 ptrn = SC_dsnprintf(FALSE, "%s.%s", t, sfx);
 	 rd = (ruledes *) SC_hasharr_def_lookup(state->rules, ptrn);
 	 if (rd != NULL)
-	    {snprintf(src, MAXLINE, "%s%s", base, sa[i]);
+	    {snprintf(src, MAXLINE, "%s%s", base, t);
 	     if (dep != NULL)
 	        {if (SC_isfile(src))
 		    frc = (strcmp(dep, src) == 0) || force;
@@ -393,10 +386,8 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
 	        frc = force;
 
 	     if ((*pred)(tgt, src, frc, state))
-	        {na += _SC_add_actions(tgt, NULL, sa[i], rd, knd, state);
+	        {na += _SC_add_actions(tgt, NULL, t, rd, knd, state);
 		 break;};};};
-
-    SFREE(sa);
 
     return(na);}
 
@@ -443,14 +434,11 @@ static int _SC_implicit_obj(char *tgt, char *dep, int nc,
 			    int force, anadep *state)
    {int i, na, ns, nt, found;
     char s[MAXLINE], src[MAXLINE];
-    char *base, *sfx, *ptrn, *ps, **sa;
+    char *base, *sfx, *ptrn, *ps, *t;
     ruledes *rd;
 
     nc = max(nc, 0);
     nc = min(nc, MAXLINE-1);
-
-    ns = SC_array_get_n(state->suffices);
-    sa = SC_array_array(state->suffices);
 
 /* find the base and suffix of the target */
     strcpy(s, tgt);
@@ -462,32 +450,34 @@ static int _SC_implicit_obj(char *tgt, char *dep, int nc,
     if (sfx[0] != 'a')
        {found = FALSE;
 
+	ns = SC_array_get_n(state->suffices);
+
 /* check each implicit rule matching dep */
 	if (dep != NULL)
 	   {for (i = 0; (i < ns) && (found == FALSE); i++)
-	        {ptrn = SC_dsnprintf(FALSE, "%s.%s", sa[i], sfx);
+	        {t    = *(char **) SC_array_get(state->suffices, i);
+	         ptrn = SC_dsnprintf(FALSE, "%s.%s", t, sfx);
 		 rd   = (ruledes *) SC_hasharr_def_lookup(state->rules, ptrn);
 		 if (rd != NULL)
-		    {snprintf(src, MAXLINE, "%s%s", base, sa[i]);
+		    {snprintf(src, MAXLINE, "%s%s", base, t);
 		     if (strcmp(dep, src) == 0)
-		        {na    = _SC_try_implicit_rule(tgt, dep, sa[i], rd,
+		        {na    = _SC_try_implicit_rule(tgt, dep, t, rd,
 						       FALSE, state);
 			 nt   += na;
 			 found = (na > 0);};};};};
 
 /* check each implicit rule period */
 	for (i = 0; (i < ns) && (found == FALSE); i++)
-	    {ptrn = SC_dsnprintf(FALSE, "%s.%s", sa[i], sfx);
+	    {t    = *(char **) SC_array_get(state->suffices, i);
+	     ptrn = SC_dsnprintf(FALSE, "%s.%s", t, sfx);
 	     rd   = (ruledes *) SC_hasharr_def_lookup(state->rules, ptrn);
 	     if (rd != NULL)
-	        {snprintf(src, MAXLINE, "%s%s", base, sa[i]);
+	        {snprintf(src, MAXLINE, "%s%s", base, t);
 		 ps    = (dep != NULL) ? dep : src;
-		 na    = _SC_try_implicit_rule(tgt, ps, sa[i], rd,
+		 na    = _SC_try_implicit_rule(tgt, ps, t, rd,
 					       FALSE, state);
 		 nt   += na;
 		 found = (na > 0);};};};
-
-    SFREE(sa);
 
     return(nt);}
 
@@ -860,30 +850,32 @@ char **SC_action_commands(anadep *state, int recur)
    {int i, j, m, na, nc, ns, whch;
     char *tgt, *dep, *sfx;
     char **cmnds, **ca, **cb, *p;
-    cmdes *as;
+    cmdes *ai, *aj;
 
     ns = SC_array_get_n(state->actions);
-    as = SC_array_array(state->actions);
 
 /* remove duplicate action sets */
     for (i = 0; i < ns; i++)
-        {ca = as[i].actions;
+        {ai = SC_array_get(state->actions, i);
+	 ca = ai->actions;
          if (ca == NULL)
 	    continue;
 
 	 for (j = i+1; j < ns; j++)
-	     {cb = as[j].actions;
+	     {aj = SC_array_get(state->actions, j);
+	      cb = aj->actions;
 	      if (cb == NULL)
 		 continue;
 
-	      if (_SC_is_same(&as[i], &as[j]))
+	      if (_SC_is_same(ai, aj))
 		 _SC_rel_actions(state, j);};};
 
 /* count the commands */
     nc = 0;
     for (i = 0; i < ns; i++)
-        {na = as[i].n;
-	 ca = as[i].actions;
+        {ai = SC_array_get(state->actions, i);
+	 na = ai->n;
+	 ca = ai->actions;
 	 if (ca != NULL)
 	    nc += na;};
 
@@ -895,13 +887,14 @@ char **SC_action_commands(anadep *state, int recur)
 
     m = 0;
     for (i = 0; i < ns; i++)
-        {na = as[i].n;
-	 ca = as[i].actions;
+        {ai = SC_array_get(state->actions, i);
+	 na = ai->n;
+	 ca = ai->actions;
 	 if (ca != NULL)
-	    {whch = as[i].kind;
-	     tgt  = as[i].target;
-	     dep  = as[i].dependent;
-	     sfx  = as[i].suffix;
+	    {whch = ai->kind;
+	     tgt  = ai->target;
+	     dep  = ai->dependent;
+	     sfx  = ai->suffix;
 
              if (state->verbose)
 	        _SC_print_rule_info(state, i, NULL);
@@ -923,8 +916,6 @@ char **SC_action_commands(anadep *state, int recur)
 	 _SC_rel_actions(state, i);};
 
     cmnds[m++] = NULL;
-
-    SFREE(as);
 
 /* join split command lines */
     cmnds = _SC_join_split_lines(cmnds);
