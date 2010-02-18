@@ -29,13 +29,6 @@
 #define REPORT_EXIT           313
 #define SERVER_PRINTF         314
 
-#define GET_TASKS(tsk, n, state)                                             \
-    n   = SC_array_get_n(state->tasks);                                      \
-    tsk = SC_array_array(state->tasks)
-
-#define REL_TASKS(tsk)                                                       \
-    SFREE(tsk)
-
 #define BUILD_STRING(_s, _t)                                                 \
    {strcat(_s, _t);                                                          \
     SC_LAST_CHAR(_s) = '\0';                                                 \

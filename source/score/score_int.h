@@ -208,8 +208,6 @@ struct s_SC_state
 
 /* SCTYP.C */
    hasharr *typ;
-   SC_array *typa;                      /* type management variables */
-   hasharr *typh;
 
 /* SCCTL.C */
    SC_array *path;

@@ -143,7 +143,7 @@ struct s_SC_array
    double gf;                                             /* growth factor */
    void *array;                                         /* the actual data */
    void (*init)(void *a);          /* initialize new elements when growing */
-   void *(*set)(void *ra, int bpi, int oper, long n, void *v);};
+   void *(*access)(int oper, void *ra, int bpi, long n, void *v);};
 
 #define PD_DEFINE_SMART_ARRAY(_f)                                  \
     {PD_defstr(_f, "SC_array",                                     \
@@ -155,7 +155,7 @@ struct s_SC_array
                     "double gf",                                   \
                     "char *array",                                 \
                     "function init",                               \
-                    "function set",                                \
+                    "function access",                             \
                     LAST);                                         \
      PD_cast(_f, "SC_array", "array", "type");}
 

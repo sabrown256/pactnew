@@ -33,7 +33,7 @@ if ($xstatus == 0) then
    endif
 
    if ($xstatus != 0) then
-#      set Err = 1
+      set Err = 1
    endif
 
 endif

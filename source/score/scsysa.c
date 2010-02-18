@@ -90,7 +90,7 @@ void _SC_setup_output(jobinfo *inf, char *name)
  * do not start too small or fatal thrashing on the dynamic
  * arrays can happen because of interrupt handling
  */
-    ns = 256;
+    ns = 512;
 
     inf->out = SC_string_array(name);
     SC_array_resize(inf->out, ns, -1.0);
