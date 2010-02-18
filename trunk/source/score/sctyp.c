@@ -74,41 +74,28 @@ char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_REGISTER_TYPE - register a data type with the type manager
- *                  - the types are referenced via a linear array
- *                  - and a hash table
- *                  - the linear array gives fast lookups when using
- *                  - the integer id number
- *                  - the hash table gives fast lookups when using
- *                  - the type name
- */
+/* SC_REGISTER_TYPE - register a data type with the type manager */
 
 int SC_register_type(char *name, int bpi, ...)
    {int n;
-    SC_type t;
-    SC_type *pt;
+    SC_type *t;
 
-    if (_SC.typh == NULL)
-       {_SC.typh = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
-	_SC.typa = SC_MAKE_ARRAY("SC_REGISTER_TYPE", SC_type, NULL);};
-
-    n = SC_array_get_n(_SC.typa);
+    if (_SC.typ == NULL)
+       _SC.typ = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
 
     SC_VA_START(bpi);
 
-    t.id   = n;
-    t.type = SC_strsavef(name, "PERM|char*:SC_REGISTER_TYPE:type");
-    t.free = SC_VA_ARG(PFVoidAPV);
-    t.bpi  = bpi;
+    n = SC_hasharr_get_n(_SC.typ);
+
+    t = FMAKE(SC_type, "PERM|SC_REGISTER_TYPE:t");
+    t->id   = n;
+    t->type = SC_strsavef(name, "PERM|char*:SC_REGISTER_TYPE:type");
+    t->free = SC_VA_ARG(PFVoidAPV);
+    t->bpi  = bpi;
 
     SC_VA_END;
 
-/* enter the type in the linear array */
-    SC_array_set(_SC.typa, -1, &t);
-
-/* enter the type in the hash table */
-    pt = SC_array_get(_SC.typa, n);
-    SC_hasharr_install(_SC.typh, name, pt, "SC_TYPE", TRUE, TRUE);
+    SC_hasharr_install(_SC.typ, name, t, "SC_TYPE", TRUE, TRUE);
 
     return(n);}
 
@@ -123,7 +110,7 @@ int SC_type_id(char *name)
    {int n;
     SC_type *t;
 
-    t = (SC_type *) SC_hasharr_def_lookup(_SC.typh, name);
+    t = (SC_type *) SC_hasharr_def_lookup(_SC.typ, name);
     n = (t != NULL) ? t->id : -1;
 
     return(n);}
@@ -140,7 +127,7 @@ char *SC_type_name(int id)
    {char *name;
     SC_type *t;
 
-    t    = SC_array_get(_SC.typa, id);
+    t    = SC_hasharr_get(_SC.typ, id);
     name = (t != NULL) ? t->type : NULL;
 
     return(name);}
@@ -156,7 +143,7 @@ int SC_type_size_i(int id)
    {int bpi;
     SC_type *t;
 
-    t   = SC_array_get(_SC.typa, id);
+    t   = SC_hasharr_get(_SC.typ, id);
     bpi = (t != NULL) ? t->bpi : -1;
 
     return(bpi);}
@@ -170,7 +157,7 @@ int SC_type_size_a(char *name)
    {int bpi;
     SC_type *t;
 
-    t   = (SC_type *) SC_hasharr_def_lookup(_SC.typh, name);
+    t   = (SC_type *) SC_hasharr_def_lookup(_SC.typ, name);
     bpi = (t != NULL) ? t->bpi : -1;
 
     return(bpi);}
@@ -183,7 +170,7 @@ int SC_type_size_a(char *name)
 void SC_type_free_i(int id, void *x)
    {SC_type *t;
 
-    t   = SC_array_get(_SC.typa, id);
+    t = SC_hasharr_get(_SC.typ, id);
     if (t != NULL)
        (*t->free)(x);
 
@@ -199,7 +186,7 @@ void SC_type_free_i(int id, void *x)
 void SC_type_free_a(char *name, void *x)
    {SC_type *t;
 
-    t   = (SC_type *) SC_hasharr_def_lookup(_SC.typh, name);
+    t = (SC_type *) SC_hasharr_def_lookup(_SC.typ, name);
     if (t != NULL)
        (*t->free)(x);
 

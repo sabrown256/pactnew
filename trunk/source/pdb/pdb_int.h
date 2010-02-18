@@ -201,7 +201,6 @@ extern PD_state
  _PD;
 
 extern char
- *PDBFILE_S,
  *SYMENT_P_S,
  *SYMENT_S;
 

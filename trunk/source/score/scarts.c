@@ -410,6 +410,9 @@ static int test_6(void)
     for (i = 0; i < ni; i++)
         err += (pi[i] != -i);
 
+/* there should be 10 differences */
+    err = (err != 10);
+
     SFREE(pi);
 
     SC_free_array(ia, NULL);
@@ -423,7 +426,7 @@ static int test_6(void)
 
 static int test_7(void)
    {int i, ms, mm, mg, ls, lm, lg, na, err;
-    double fc, tm, ts, tg, tr;
+    double fc, tm, ts, tg, tr, rs, rg;
     double *dp;
     SC_array *da;
 
@@ -482,14 +485,17 @@ static int test_7(void)
 	 if (tg > 2.0)
 	    break;};
 
+    rs = (ts*lm)/(tm*ls);
+    rg = (tg*lm)/(tm*lg);
+
     printf("\n");
-    printf("\t\t\t          Acesses      usec/access\n"); 
-    printf("\t\t\tdirect   %9.2e   %11.3e\n",
-	   (double) lm, 1.0e6*tm/((double) lm));
-    printf("\t\t\tset      %9.2e   %11.3e\n",
-	   (double) ls, 1.0e6*ts/((double) ls));
-    printf("\t\t\tget      %9.2e   %11.3e\n",
-	   (double) lg, 1.0e6*tg/((double) lg));
+    printf("\t\t\t          Acesses      usec/access   ratio\n"); 
+    printf("\t\t\tdirect   %9.2e   %11.3e   %11.3e\n",
+	   (double) lm, 1.0e6*tm/((double) lm), 1.0);
+    printf("\t\t\tset      %9.2e   %11.3e   %11.3e\n",
+	   (double) ls, 1.0e6*ts/((double) ls), rs);
+    printf("\t\t\tget      %9.2e   %11.3e   %11.3e\n",
+	   (double) lg, 1.0e6*tg/((double) lg), rg);
 
     SC_free_array(da, NULL);
     SFREE(dp);

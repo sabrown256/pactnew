@@ -27,27 +27,11 @@
  * if a suspected race condition is confirmed
  */
 
-#define GET_CONNECTIONS(pc, nc, cp)                                              \
-    nc = SC_array_get_n(cp->pool);                                               \
-    pc = SC_array_array(cp->pool)
-
-#define REL_CONNECTIONS(pc)                                                      \
-    SFREE(pc)
-
 #define GET_CONNECTION(cp, ic)                                                   \
-    *(connectdes **) SC_array_get(cp->pool, ic)
+   *(connectdes **) SC_array_get(cp->pool, ic)
 
-#define FREE_CONNECTION(cp, ic)                                                  \
-    {connectdes *v = NULL;                                                       \
-     _SC_free_connectdes(pco);	                                                 \
-     SC_array_set(cp->pool, ic, &v);}
-
-#define GET_TASKS(pt, nt, pc)                                                    \
-    nt = SC_array_get_n(pc->taska);                                              \
-    pt = SC_array_array(pc->taska)
-
-#define REL_TASKS(pt, pc)                                                        \
-    SFREE(pt)
+#define GET_TASK(pt, it)                                                         \
+   *(contask **) SC_array_get(pt, it)
 
 typedef struct s_connectdes connectdes;
 typedef struct s_contask contask;
@@ -109,14 +93,14 @@ static contask *_SC_make_contask(int jid, int na,
 				 connectdes *pco)
    {contask *pto;
 
-    pto = FMAKE(contask, "_SC_POOL_JOB:pto");
+    pto = FMAKE(contask, "_SC_MAKE_CONTASK:pto");
 
     pto->inf.id        = jid;
     pto->inf.ia        = 0;
     pto->inf.na        = na;
-    pto->inf.shell     = SC_strsavef(shell, "_SC_POOL_JOB:shell");
-    pto->inf.directory = SC_strsavef(dir, "_SC_POOL_JOB:dir");
-    pto->inf.full      = SC_strsavef(cmnd, "_SC_POOL_JOB:cmnd");
+    pto->inf.shell     = SC_strsavef(shell, "_SC_MAKE_CONTASK:shell");
+    pto->inf.directory = SC_strsavef(dir, "_SC_MAKE_CONTASK:dir");
+    pto->inf.full      = SC_strsavef(cmnd, "_SC_MAKE_CONTASK:cmnd");
     pto->inf.signal    = -1;
     pto->inf.status    = NOT_FINISHED;
     pto->inf.tstart    = SC_wall_clock_time();
@@ -173,36 +157,6 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
     else
        cpua = -1;
 
-/* get the absolute time limit - default 1 year */
-/* GOTCHA: deprecated - remove after 12/30/08 */
-#if 0
-    s = getenv("SC_EXEC_TIME_LIMIT");
-    if (s != NULL)
-       dtmx = SC_stoi(s);
-    else
-       dtmx = 3140000.0;
-#endif
-
-/* get the relative time limit factor - default 80 */
-/* GOTCHA: deprecated - remove after 12/30/08 */
-#if 0
-    s = getenv("SC_EXEC_TIME_FACTOR");
-    if (s != NULL)
-       fct = SC_stoi(s);
-    else
-       fct = HUGE;
-#endif
-
-/* get the relative time limit threshold - default 10 */
-/* GOTCHA: deprecated - remove after 12/30/08 */
-#if 0
-    s = getenv("SC_EXEC_TIME_THRESHOLD");
-    if (s != NULL)
-       thr = SC_stoi(s);
-    else
-       thr = 10.0;
-#endif
-
 /* check for specified number of server restart attempts */
     s = getenv("SC_EXEC_SERVER_N_RESTART");
     if (s != NULL)
@@ -258,7 +212,8 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
 
     if (fl == TRUE)
        {pc->taska = SC_MAKE_ARRAY("SC_INIT_CONNECTION", contask *, NULL);
-	pc->log   = SC_string_array("SC_INIT_CONNECTION");};
+	pc->log   = SC_string_array("SC_INIT_CONNECTION");
+        SC_array_resize(pc->taska, 512, -1.0);};
 
     return;}
 
@@ -271,13 +226,13 @@ static connectdes *_SC_make_connectdes(int na, char *sys,
 				       char *hst, char *shell, char **env)
    {connectdes *pc;
 
-    pc = FMAKE(connectdes, "SC_OPEN_CONNECTION_POOL:cp");
+    pc = FMAKE(connectdes, "_SC_MAKE_CONNNECTDES:cp");
 
     SC_init_connection(pc, na, TRUE);
 
-    pc->system = SC_strsavef(sys, "SC_OPEN_CONNECTION_POOL:sys");
-    pc->host   = SC_strsavef(hst, "SC_OPEN_CONNECTION_POOL:hst");
-    pc->shell  = SC_strsavef(shell, "SC_OPEN_CONNECTION_POOL:shell");
+    pc->system = SC_strsavef(sys, "_SC_MAKE_CONNNECTDES:sys");
+    pc->host   = SC_strsavef(hst, "_SC_MAKE_CONNNECTDES:hst");
+    pc->shell  = SC_strsavef(shell, "_SC_MAKE_CONNNECTDES:shell");
     pc->env    = env;
 
     return(pc);}
@@ -404,18 +359,17 @@ static void _SC_pool_printf(asyncstate *as, char *tag,
 void SC_show_pool_logs(conpool *cp, int n)
    {int ic, it, nc, nt;
     char *s;
-    connectdes **pc, *pco;
+    connectdes *pco;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
         {if ((n >= 0) && (n != ic))
 	    continue;
 
-	 pco = pc[ic];
+	 pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
@@ -440,8 +394,6 @@ void SC_show_pool_logs(conpool *cp, int n)
 
     _SC_exec_printf(as, "\n");
 
-    REL_CONNECTIONS(pc);
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -456,17 +408,16 @@ static void _SC_show_server_logs(conpool *cp, int n)
     char s[MAX_BFSZ];
     char *end;
     PROCESS *pp;
-    connectdes **pc, *pco;
+    connectdes *pco;
 
     end = SC_dsnprintf(TRUE, "%s %s\n", _SC_EXEC_SRV_ID, _SC_EXEC_LOG);
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
         {if ((n >= 0) && (n != ic))
 	    continue;
 
-	 pco = pc[ic];
+	 pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
@@ -483,8 +434,6 @@ static void _SC_show_server_logs(conpool *cp, int n)
 		    break;
 		 else
 		    io_printf(stdout, "%s", s);};};};
-
-    REL_CONNECTIONS(pc);
 
     SFREE(end);
 
@@ -617,20 +566,20 @@ static void _SC_pool_job(conpool *cp, int ic, int na,
 static int _SC_find_best_connection(conpool *cp)
    {int ic, nc, il, ir, it, rv, nr, nrn, nmx;
     double ld, dt, le, ldn, dtn;
-    connectdes **pc;
+    connectdes *pco, *pcr;
 #ifdef DEBUG
     char msgs[20][MAXLINE];
 #endif
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    pco = GET_CONNECTION(cp, 0);
     nmx = INT_MAX;
 
+    nc = SC_array_get_n(cp->pool);
     if (nc < 2)
-       {if ((pc == NULL) || (pc[0] == NULL))
+       {if (pco == NULL)
 	   rv = -2;
 	else
-	   rv = (pc[0]->n_running < pc[0]->n_srv_jobs_max) ? 0 : -2;}
+	   rv = (pco->n_running < pco->n_srv_jobs_max) ? 0 : -2;}
 
     else
        {il  = -1;
@@ -646,23 +595,24 @@ static int _SC_find_best_connection(conpool *cp)
 #endif
 
 	for (ic = 0; ic < nc; ic++)
-	    {if (pc[ic] == NULL)
+	    {pco = GET_CONNECTION(cp, ic);
+	     if (pco == NULL)
 	        continue;
 
-	     nr  = pc[ic]->n_running;
-	     nmx = pc[ic]->n_srv_jobs_lmt;
+	     nr  = pco->n_running;
+	     nmx = pco->n_srv_jobs_lmt;
 
 #ifdef DEBUG
 	     snprintf(msgs[2+ic], MAXLINE, "%3d  %12s  %3d  %3d  %3d  %6.2f  %6.2f",
-		     ic, pc[ic]->host, nr, pc[ic]->n_srv_jobs_lmt,
-		     pc[ic]->n_srv_jobs_max, pc[ic]->dt, pc[ic]->load);
+		     ic, pco->host, nr, pco->n_srv_jobs_lmt,
+		     pco->n_srv_jobs_max, pco->dt, pco->load);
 #endif
 
 	     if (nr >= nmx)
 	        continue;
 
-	     ld = pc[ic]->load;
-	     dt = pc[ic]->dt;
+	     ld = pco->load;
+	     dt = pco->dt;
 
 /* use a synthetic load figure which is the actual load average
  * plus the number of jobs running
@@ -697,7 +647,8 @@ static int _SC_find_best_connection(conpool *cp)
 /* if dt does not pick a connection try the first one available */
 	if (rv < 0)
 	   {for (rv = 0; rv < nc; rv++)
-	        {if (pc[rv]->n_running < nmx)
+	        {pcr = GET_CONNECTION(cp, rv);
+		 if ((pcr != NULL) && (pcr->n_running < nmx))
 		    break;};
 	    if (rv >= nc)
 	       rv = -2;};};
@@ -708,8 +659,6 @@ static int _SC_find_best_connection(conpool *cp)
         for (ic = 0; ic < nc+3; ic++)
 	    io_printf(stdout, "%s\n", msgs[ic]);};
 #endif
-
-    REL_CONNECTIONS(pc);
 
     return(rv);}
 
@@ -761,12 +710,10 @@ static void _SC_pool_job_done(conpool *cp, int ic, contask *pt,
 			      int retry, int sig, int st, double dt)
    {int jc, nc, it, nt, lmt, nmx, alg;
     double dtl, dtx;
-    connectdes **pc, *pco;
+    connectdes *pcj, *pco;
     jobinfo *inf;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
-    pco = pc[ic];
+    pco = GET_CONNECTION(cp, ic);
     if (pco != NULL)
        {inf = &pt->inf;
 
@@ -788,9 +735,12 @@ static void _SC_pool_job_done(conpool *cp, int ic, contask *pt,
 	dtx = min(dt, dtx);
 	it  = ic;
 	nt  = 1;
+
+	nc = SC_array_get_n(cp->pool);
 	for (jc = 0; jc < nc; jc++)
-	    {if (pc[jc] != NULL)
-	        {dtl = pc[jc]->dt;
+	    {pcj = GET_CONNECTION(cp, jc);
+	     if (pcj != NULL)
+	        {dtl = pcj->dt;
 		 if (dtx < dtl)
 		    {dtx = dtl;
 		     it  = jc;};
@@ -823,8 +773,6 @@ static void _SC_pool_job_done(conpool *cp, int ic, contask *pt,
 
 	pco->n_srv_jobs_lmt = lmt;
 	pco->n_running--;};
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -1048,31 +996,32 @@ static void _SC_process_task_output(asyncstate *as, conpool *cp,
 
 static void _SC_pool_assign_others(conpool *cp, int ic)
    {int it, lc, nc, nt;
-    connectdes **pc, *pco;
-    contask **pt, *pto;
+    connectdes *pcl, *pco;
+    contask *pto;
     jobinfo *inf;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
+    pco = GET_CONNECTION(cp, ic);
 
-    pco = pc[ic];
-
-    GET_TASKS(pt, nt, pco);
+    nt = SC_array_get_n(pco->taska);
 
 /* relaunch any job which is not finished to one of the other connections */
+    nc = SC_array_get_n(cp->pool);                                               \
     for (lc = 0, it = 0; it < nt; it++, lc++)
         {lc %= nc;
 	 if (lc == ic)
 	    lc = (lc + 1) % nc;
 
-	 pto = pt[it];
+	 pto = GET_TASK(pco->taska, it);
 	 inf = &pto->inf;
 	 if ((inf->status == NOT_FINISHED) && (pto->killed == FALSE))
-	    {_SC_pool_log(pco, "client",
+	    {pcl = GET_CONNECTION(cp, lc);
+
+	     _SC_pool_log(pco, "client",
 			  "relaunch job %d to connection %d, %s, as %d: %s",
-			  inf->id, lc, pc[lc]->host,
+			  inf->id, lc, pcl->host,
 			  SC_array_get_n(pco->taska), inf->full);
 
 	     pto->killed = TRUE;
@@ -1086,9 +1035,6 @@ static void _SC_pool_assign_others(conpool *cp, int ic)
 		    "reassigned tasks from %s to other connections",
 		    pco->host);
 
-    REL_TASKS(pt, pco);
-    REL_CONNECTIONS(pc);
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -1100,17 +1046,17 @@ static void _SC_pool_assign_others(conpool *cp, int ic)
 
 static void _SC_pool_assign_current(conpool *cp, int ic)
    {int it, nt;
-    contask **pt, *pto;
+    contask *pto;
     connectdes *pco;
     jobinfo *inf;
 
     pco = GET_CONNECTION(cp, ic);
 
-    GET_TASKS(pt, nt, pco);
+    nt = SC_array_get_n(pco->taska);
 
 /* relaunch any job which is not finished */
     for (it = 0; it < nt; it++)
-        {pto = pt[it];
+        {pto = GET_TASK(pco->taska, it);
 	 inf = &pto->inf;
 	 if ((inf->status == NOT_FINISHED) && (pto->killed == FALSE))
 	    {_SC_pool_log(pco, "client", "relaunch job %d as %d: %s",
@@ -1122,8 +1068,6 @@ static void _SC_pool_assign_current(conpool *cp, int ic)
 
 	     _SC_pool_job(cp, ic, inf->na, inf->shell,
 			  inf->directory, inf->full);};};
-
-    REL_TASKS(pt, pco);
 
     return;}
 
@@ -1137,19 +1081,17 @@ static void _SC_pool_assign_current(conpool *cp, int ic)
 int _SC_which_pool(conpool *cp, int fd)
    {int ic, nc;
     PROCESS *pp;
-    connectdes **pc;
+    connectdes *pco;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
-        {if (pc[ic] == NULL)
+        {pco = GET_CONNECTION(cp, ic);
+         if (pco == NULL)
 	    continue;
 
-	 pp = pc[ic]->pp;
+	 pp = pco->pp;
 	 if (pp->in == fd)
 	    break;};
-
-    REL_CONNECTIONS(pc);
 
     if (ic >= nc)
        ic = -1;
@@ -1180,7 +1122,9 @@ static void SC_free_connection(conpool *cp, int ic, int sig)
 
     _SC_pool_connection_close(cp, FALSE, "free", ic);
 
-    FREE_CONNECTION(cp, ic);
+    _SC_free_connectdes(pco);
+
+    SC_array_set(cp->pool, ic, NULL);
 
     return;}
 
@@ -1195,25 +1139,18 @@ static void SC_free_connection(conpool *cp, int ic, int sig)
 
 static int _SC_delete_pool_connection(conpool *cp, int ic)
    {int i, nc, nco;
-    connectdes **pc, *pco;
-
-    GET_CONNECTIONS(pc, nc, cp);
-
-    pco = pc[ic];
+    connectdes *pco;
 
     SC_free_connection(cp, ic, FALSE);
 
 /* remove the freed connection from the list */
+    nc  = SC_array_get_n(cp->pool);
     nco = nc - 1;
     for (i = 0; i < nco; i++)
-        {if (pc[i] == NULL)
-	    {pc[i]   = pc[nco];
-	     pc[nco] = NULL;
+        {pco = GET_CONNECTION(cp, i);
+	 if (pco == NULL)
+	    {nco = SC_array_remove(cp->pool, i);
 	     break;};};
-
-    REL_CONNECTIONS(pc);
-
-    SC_array_set_n(cp->pool, nco);
 
     return(nco);}
 
@@ -1252,7 +1189,8 @@ static int _SC_remove_connection_dup(conpool *cp)
     char *ha, *hb;
     connectdes **pc;
 
-    GET_CONNECTIONS(pc, nc, cp);
+    nc = SC_array_get_n(cp->pool);
+    pc = SC_array_array(cp->pool);
 
     for (i = 0; i < nc; i++)
         {ha = pc[i]->host;
@@ -1263,7 +1201,7 @@ static int _SC_remove_connection_dup(conpool *cp)
 		 {nc = _SC_remove_connection(cp, j, FALSE);
 		  j--;};};};
 
-    REL_CONNECTIONS(pc);
+    SFREE(pc);
 
     return(nc);}
 
@@ -1279,14 +1217,12 @@ static int _SC_remove_connection_dup(conpool *cp)
 static int _SC_shift_pool_connection(conpool *cp, int ic)
    {int jh, lc, nc, nh, ok;
     char **hsts, *hst;
-    connectdes **pc, *pco;
+    connectdes *pcl, *pco;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
-    pco = pc[ic];
+    pco = GET_CONNECTION(cp, ic);
 
 /* NOTE: do NOT try the same host twice
  * _SC_launch_pool_task is looping over the number of hosts
@@ -1303,18 +1239,18 @@ static int _SC_shift_pool_connection(conpool *cp, int ic)
 	     break;};};
 
 /* check for a new host */
+    nc = SC_array_get_n(cp->pool);
     for (jh = 0; jh < nh; jh++)
         {hst = hsts[jh];
 	 if (hst != NULL)
 	    {ok  = TRUE;
 	     for (lc = 0; lc < nc; lc++)
-	         {if (strcmp(hst, pc[lc]->host) == 0)
+	         {pcl = GET_CONNECTION(cp, lc);
+		  if (strcmp(hst, pcl->host) == 0)
 		     {ok = FALSE;
 		      break;};};
 	     if (ok == TRUE)
 	        break;};};
-
-    REL_CONNECTIONS(pc);
 
     if (jh >= nh)
        {_SC_pool_printf(as, "***>", pco, "client",
@@ -1416,8 +1352,8 @@ static void _SC_pool_output(int fd, int mask, void *a)
     char *p, *t, *u, *ps;
     PROCESS *pp;
     conpool *cp;
-    contask **pt;
-    connectdes **pc, *pco;
+    contask *pto;
+    connectdes *pco;
     asyncstate *as;
 
     as = NULL;
@@ -1427,17 +1363,14 @@ static void _SC_pool_output(int fd, int mask, void *a)
 
     cp = (conpool *) a;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     ic = _SC_which_pool(cp, fd);
 
     if ((ic != -1) && (ic < nc))
-       {pco = pc[ic];
+       {pco = GET_CONNECTION(cp, ic);
+	nt  = SC_array_get_n(pco->taska);
 	pp  = pco->pp;
-
-	GET_TASKS(pt, nt, pco);
-
-	nb = pp->n_read;
+	nb  = pp->n_read;
 
 	count = 0;
 	while (SC_gets(s, MAX_BFSZ, pp) != NULL)
@@ -1478,7 +1411,8 @@ static void _SC_pool_output(int fd, int mask, void *a)
 		    t  = SC_strtok(ps+5, " ", u);
 		    jid = SC_stoi(t);
 		    for (it = 0; it < nt; it++)
-		        {if (pt[it]->inf.id == jid)
+		        {pto = GET_TASK(pco->taska, it);
+		         if (pto->inf.id == jid)
 			    {_SC_process_task_output(as, cp, ic, it, p);
 			     break;};};};}
 
@@ -1489,8 +1423,6 @@ static void _SC_pool_output(int fd, int mask, void *a)
 	    s[0] = '\0';
 	    count++;};
 
-	REL_TASKS(pt, pco);
-
 	nb = pp->n_read - nb;
 
 /* since we came here off a poll the connection must be dead if we
@@ -1498,8 +1430,6 @@ static void _SC_pool_output(int fd, int mask, void *a)
  */
 	if (nb == 0)
 	   _SC_pool_rejected(as, cp, ic, pp);};
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -1514,27 +1444,25 @@ static void _SC_pool_reject(int fd, int mask, void *a)
    {int ic, nc;
     PROCESS *pp;
     conpool *cp;
-    connectdes **pc;
+    connectdes *pco;
     SC_evlpdes *pe;
     asyncstate *as;
 
     as = NULL;
     cp = (conpool *) a;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
     pe = cp->loop;
 
+    nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
-        {if (pc[ic] == NULL)
+        {pco = GET_CONNECTION(cp, ic);
+         if (pco == NULL)
 	    continue;
 
-	 pp = pc[ic]->pp;
+	 pp = pco->pp;
 	 if (SC_process_alive(pp) && (pp->in == fd))
             {_SC_pool_rejected(as, cp, ic, pp);
 	     break;};};
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -1548,12 +1476,11 @@ static void _SC_pool_reject(int fd, int mask, void *a)
 static void _SC_pulse_servers(conpool *cp)
    {int ic, nc, ok;
     PROCESS *pp;
-    connectdes **pc, *pco;
+    connectdes *pco;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
+        {pco = GET_CONNECTION(cp, ic);
          if (pco == NULL)
 	    continue;
 
@@ -1563,8 +1490,6 @@ static void _SC_pulse_servers(conpool *cp)
 	    {ok = SC_printf(pp, "%s\n", _SC_EXEC_HEARTBEAT);
 	     if (ok == FALSE)
 	        _SC_recover_connection(cp, ic);};};
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -1618,6 +1543,7 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
     cp->filter    = filter;
 
     cp->pool = SC_MAKE_ARRAY("SC_OPEN_CONNECTION_POOL", connectdes *, NULL);
+    SC_array_resize(cp->pool, 512, -1.0);
 
     shell = SC_get_shell(shell);
 
@@ -1642,24 +1568,23 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
 
 void SC_show_pool_stats(conpool *cp, int n, int full)
    {int ic, it, nc, nt, st;
-    connectdes **pc, *pco;
-    contask **pt, *pto;
+    connectdes *pco;
+    contask *pto;
     jobinfo *inf;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
         {if ((n >= 0) && (n != ic))
 	    continue;
 
-	 pco = pc[ic];
+	 pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
-	 GET_TASKS(pt, nt, pco);
+	 nt = SC_array_get_n(pco->taska);
 
 	 _SC_exec_printf(as, "\n");
 	 _SC_exec_printf(as,
@@ -1673,7 +1598,7 @@ void SC_show_pool_stats(conpool *cp, int n, int full)
 	    {_SC_exec_printf(as,
 			     "     ID Grp Ack Stat    Time   Command\n");
 	     for (it = 0; it < nt; it++)
-	         {pto = pt[it];
+	         {pto = GET_TASK(pco->taska, it);
 		  inf = &pto->inf;
 		  st  = inf->status;
 		  if (pto->killed == TRUE)
@@ -1694,8 +1619,6 @@ void SC_show_pool_stats(conpool *cp, int n, int full)
 				     inf->id, pto->group, pto->ack, inf->status,
 				     pto->dt, inf->full);};};
 
-	 REL_TASKS(pt, pco);
-
 /* load average info */
 	 if (pco->load != -1.0)
 	    {_SC_exec_printf(as,
@@ -1712,8 +1635,6 @@ void SC_show_pool_stats(conpool *cp, int n, int full)
 	 _SC_exec_printf(as,
 			 "   # Env sent: %d   # Env set: %d\n",
 			 pco->n_env_sent, pco->n_env_ack);};
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -1783,20 +1704,18 @@ static void _SC_pool_connection_env(connectdes *pc)
  */
 
 static int _SC_launch_pool_connection(conpool *cp, int ic)
-   {int nc, pi, st;
+   {int pi, st;
     int est, sgn, pta, nms;
     char s[MAXLINE];
     char **env;
     PROCESS *pp;
-    connectdes **pc, *pco;
+    connectdes *pco;
     asyncstate *as;
     SC_evlpdes *pe;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
-    pco = pc[ic];
+    pco = GET_CONNECTION(cp, ic);
     env = pco->env;
 
     pp = SC_open_remote(pco->host, pco->shell, NULL, env, "ap", NULL);
@@ -1833,8 +1752,6 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
 	_SC_shift_pool_connection(cp, ic);
 	ic = -1;};
 
-    REL_CONNECTIONS(pc);
-
     return(ic);}
 
 /*--------------------------------------------------------------------------*/
@@ -1852,34 +1769,28 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
 static int _SC_check_pool_connection(conpool *cp, int ic)
    {int nc;
     PROCESS *pp;
-    connectdes **pc, *pco;
+    connectdes *pco;
     asyncstate *as;
 
     as = cp->as;
     if (ic < 0)
        ic = _SC_find_best_connection(cp);
 
-    if (ic < 0)
-       {
-#if 0
-        _SC_exec_printf(as, "***> all connections busy\n");
-#endif
-       }
-       
-    else
-       {GET_CONNECTIONS(pc, nc, cp);
+    if (ic >= 0)
+       {nc = SC_array_get_n(cp->pool);
 
-	pco = pc[ic];
+        pco = GET_CONNECTION(cp, ic);
 	pp  = pco->pp;
 
 /* if there is no connection launch one */
 	if (!SC_process_alive(pp))
 	   {ic = _SC_launch_pool_connection(cp, ic);
 	    if (ic >= 0)
-	       {pp = pc[ic]->pp;
-		_SC_pool_log(pc[ic], "client",
+	       {pco = GET_CONNECTION(cp, ic);
+	        pp  = pco->pp;
+		_SC_pool_log(pco, "client",
 			     "launch connection %d, %s (%d)",
-			     ic, pc[ic]->host, pp->id);};};
+			     ic, pco->host, pp->id);};};
 
 /* if the connection died off re-establish it */
 	if (SC_process_alive(pp) && (SC_status(pp) != SC_RUNNING))
@@ -1887,12 +1798,11 @@ static int _SC_check_pool_connection(conpool *cp, int ic)
 
 	    ic = _SC_launch_pool_connection(cp, ic);
 	    if (ic >= 0)
-	       {pp = pc[ic]->pp;
-		_SC_pool_log(pc[ic], "client",
+	       {pco = GET_CONNECTION(cp, ic);
+	        pp  = pco->pp;
+		_SC_pool_log(pco, "client",
 			     "relaunch connection %d, %s (%d)",
-			     ic, pc[ic]->host, pp->id);};};
-
-	REL_CONNECTIONS(pc);};
+			     ic, pco->host, pp->id);};};};
 
     return(ic);}
 
@@ -1908,14 +1818,14 @@ static void _SC_reconnect_pool(conpool *cp, int ic, char *msg, int recon)
    {int ico, nc;
     char *hno;
     PROCESS *pp;
-    connectdes **pc, *pco;
+    connectdes *pco;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
+    nc = SC_array_get_n(cp->pool);
 
-    pco = pc[ic];
+    pco = GET_CONNECTION(cp, ic);
     pco->n_env_sent = 0;
     pco->n_env_ack  = 0;
 
@@ -1939,7 +1849,7 @@ static void _SC_reconnect_pool(conpool *cp, int ic, char *msg, int recon)
 			 ico, hno);
 	    LONGJMP(cp->cpu, SC_NO_CONN);}
 	else
-	   {pco = pc[ic];
+	   {pco = GET_CONNECTION(cp, ic);
 	    _SC_pool_printf(as, "***>", pco, "client",
 			    "connection %d re-opened on %s (%d)",
 			    ic, pco->host, pco->pp->id);};}
@@ -1949,8 +1859,6 @@ static void _SC_reconnect_pool(conpool *cp, int ic, char *msg, int recon)
 		    ic, hno, recon, pp->status, pp->id);
 
     _SC_pool_assign_current(cp, ic);
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -1972,13 +1880,12 @@ static void _SC_reconnect_pool(conpool *cp, int ic, char *msg, int recon)
 int _SC_launch_pool_task(conpool *cp, int na, int reset,
 			 char *shell, char *dir, char *cmnd)
    {int ic, ih, nc, nh, rv;
-    connectdes **pc, *pco;
+    connectdes *pco;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc  = SC_array_get_n(cp->pool);
     nh  = cp->n_hosts;
     pco = NULL;
 
@@ -1988,7 +1895,7 @@ int _SC_launch_pool_task(conpool *cp, int na, int reset,
  */
     if (reset == TRUE)
        {for (ic = 0; ic < nc; ic++)
-	    {pco = pc[ic];
+	    {pco = GET_CONNECTION(cp, ic);
 	     if (pco == NULL)
 	        continue;
 
@@ -2001,8 +1908,6 @@ int _SC_launch_pool_task(conpool *cp, int na, int reset,
 	     pco->n_launched = 0;
 	     _SC_pool_log(pco, "client", "reset connection %d at barrier",
 			  ic);};};
-
-    REL_CONNECTIONS(pc);
 
 /* look through no more than the number of hosts available for the
  * system type to make a connection
@@ -2024,12 +1929,6 @@ int _SC_launch_pool_task(conpool *cp, int na, int reset,
        {_SC_pool_printf(as, "***>", pco, "client",
 			"failed to launch '%s' (%d conns/%d hosts)\n",
 			cmnd, nc, nh);
-#if 0
-	_SC_exec_printf(as,
-			"***> failed to launch '%s' (%d conns/%d hosts)\n",
-			cmnd, nc, nh);
-#endif
-
 	rv = -2;}
 
 /* there is no host available to do any work - wait until later */
@@ -2072,9 +1971,6 @@ int SC_launch_pool_job(conpool *cp, int na, int reset,
 	if (ncn < 1)
 	   {_SC_pool_printf(as, "***>", NULL, "client",
 			    "no connections left in pool");
-#if 0
-	    _SC_exec_printf(as, "***> no connections left in pool\n");
-#endif
 	    break;};
 
 	rv = _SC_launch_pool_task(cp, na, reset, shell, dir, cmnd);
@@ -2099,19 +1995,18 @@ static void _SC_check_job_time(conpool *cp)
    {int ic, nc, ncmp;
     double dt, tf, ndt, thl;
     double dta, dtamn, dtamx;
-    connectdes **pc, *pco;
+    connectdes *pco;
     PROCESS *pp;
     asyncstate *as;
 
     as = cp->as;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     tf = SC_wall_clock_time();
 
 /* check each connection for timeouts (lost contact with server) */
     for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
+        {pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
@@ -2138,7 +2033,7 @@ static void _SC_check_job_time(conpool *cp)
     dtamn = HUGE;
     dtamx = 0.0;
     for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
+        {pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
@@ -2156,90 +2051,6 @@ static void _SC_check_job_time(conpool *cp)
 
     if (dta <= 0.0)
        ncmp = 0;
-
-/* GOTCHA: deprecated - remove after 12/30/08 */
-#if 0
-    int id, it, no, nt, st;
-    double dtmx, fct, fctdta, thr;
-    contask **pt, *pto;
-    jobinfo *inf;
-
-    fctdta = max(fct*dta, thr);
-    if (ncmp < 2)
-       fctdta = HUGE;
-
-/* check each job in each connection for timeouts */
-    for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
-	 if (pco == NULL)
-	    continue;
-
-	 GET_TASKS(pt, nt, pco);
-
-	 no = 0;
-	 for (it = 0; it < nt; it++)
-	     {pto = pt[it];
-	      inf = &pto->inf;
-	      if ((inf->status == NOT_FINISHED) && (pto->killed == FALSE))
-                 {dt = tf - inf->tstart;
-		  if ((dt > fctdta) || (dt > dtmx))
-		     {id = inf->id;
-		      pp = pco->pp;
-
-		      SC_printf(pp, "%s %d\n", _SC_EXEC_KILL, id);
-
-		      _SC_pool_log(pco, "client", "kill [job %2d] to reissue", id);
-
-		      _SC_pool_job_done(cp, ic, pto, 1, -1, REISSUED, dt);
-
-		      pco->n_complete++;
-		      pco->n_timeout++;
-
-		      st = SC_launch_pool_job(cp, inf->na, FALSE,
-					      inf->shell, inf->directory,
-					      inf->full);
-		      if (st < 0)
-			 {_SC_pool_log(pco,
-				       "client", "reissue - no accessible %s host",
-				       SYSTEM_ID);
-			  LONGJMP(cp->cpu, SC_EXIT_BAD);};
-
-		      if (dt > fctdta)
-			 _SC_pool_printf(as, "\n***>", pco, "client",
-					 "relative time limit (%.1f sec) exceeded for:",
-					 fctdta);
-		      else if (dt > dtmx)
-			 _SC_pool_printf(as, "\n***>", pco, "client",
-					 "absolute time limit (%.1f sec) exceeded for:",
-					 dtmx);
-
-		      _SC_pool_printf(as, "***>", pco, "client",
-				      "   %s",
-				      inf->full);
-
-		      _SC_pool_printf(as, "***>", pco, "client",
-				      "time limit parameters: \n***>   fct = %11e, dta = %11e, thr = %11e",
-				      fct, dta, thr);
-
-		      if (ic == st)
-			 _SC_pool_printf(as, "***>", pco, "client",
-					 "reissued on same host %s",
-					 pc[ic]->host);
-		      else
-			 _SC_pool_printf(as, "***>", pco, "client",
-					 "reissued from %s to %s",
-					 pc[ic]->host, pc[st]->host);
-
-		      _SC_pool_printf(as, "***>", pco, "client",
-				      "results from %s so far:",
-				      pc[ic]->host);
-
-		      no++;};};};
-
-	 REL_TASKS(pt, pco);};
-#endif
-
-    REL_CONNECTIONS(pc);
 
     return;}
 
@@ -2262,8 +2073,8 @@ int SC_wait_pool_job(conpool *cp, int to)
     char *p;
     double dt, ndt, dta;
     SC_evlpdes *pe;
-    connectdes **pc, *pco;
-    contask **pt, *pto;
+    connectdes *pco;
+    contask *pto;
 
 /* kill runaways */
     _SC_kill_runaways();
@@ -2291,15 +2102,6 @@ int SC_wait_pool_job(conpool *cp, int to)
 /* check the status of all the connection processes */
     nr = SC_running_children();
 
-#if 0
-/* this would preclude retries */
-    if (nr < 0)
-       {if (cp->active == TRUE)
-	   {LONGJMP(cp->cpu, SC_EXIT_BAD);}
-	else
-	   return(-1);};
-#endif
-
 /* wait for commands to complete */
     err = SC_event_loop_poll(pe, cp, to);
     if (err < 0)
@@ -2308,19 +2110,18 @@ int SC_wait_pool_job(conpool *cp, int to)
 /* compute average job info for each connection
  * to be used in assigning subsequent jobs to connections
  */
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     if (nc < 1)
        return(-1);
 
     nfr = 0;
     nrt = 0;
     for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
+        {pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
-	 GET_TASKS(pt, nt, pco);
+	 nt = SC_array_get_n(pco->taska);
 
 /* compute the average time taken by a task in the connection
  * in the current barrier group
@@ -2329,14 +2130,12 @@ int SC_wait_pool_job(conpool *cp, int to)
 	 ndt = 0.0;
 	 dta = 0.0;
 	 for (it = 0; it < nt; it++)
-	     {pto = pt[it];
+	     {pto = GET_TASK(pco->taska, it);
 
 	      dt = pto->dt;
 	      if ((dt > 0.0) && (pto->group == ng))
 		 {dta += dt;
 		  ndt += 1.0;};};
-
-	 REL_TASKS(pt, pco);
 
 	 if (ndt > 0.0)
 	    dta /= ndt;
@@ -2349,17 +2148,8 @@ int SC_wait_pool_job(conpool *cp, int to)
  */
 	 nr = pco->n_running;
 
-#if 0
-	 _SC_pool_log(pco,
-		      "client", "info - connection(%d %d %d) server(%d %d)",
-		      pco->n_running, pco->n_launched, pco->n_complete,
-		      pco->n_srv_running, pco->n_srv_complete);
-#endif
-
 	 nrt += nr; 
 	 nfr += (nr == 0);};
-
-    REL_CONNECTIONS(pc);
 
     if (nfr == 0)
        rv = 0;
@@ -2440,30 +2230,25 @@ int SC_connection_pool_net(conpool *cp)
 int SC_connection_pool_status(conpool *cp)
    {int ic, it, nc, nt;
     int st, stc;
-    connectdes **pc, *pco;
-    contask **pt, *pto;
+    connectdes *pco;
+    contask *pto;
     jobinfo *inf;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     st = 0;
     for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
+        {pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
-	 GET_TASKS(pt, nt, pco);
+	 nt = SC_array_get_n(pco->taska);
 
 	 for (it = 0; it < nt; it++)
-             {pto = pt[it];
+	     {pto = GET_TASK(pco->taska, it);
 	      inf = &pto->inf;
 	      if ((pto->killed != TRUE) && (pto->retry != 1))
 		 {stc = inf->status;
-		  st += (stc != 0);};};
-
-	 REL_TASKS(pt, pco);};
-
-    REL_CONNECTIONS(pc);
+		  st += (stc != 0);};};};
 
     return(st);}
 
@@ -2482,33 +2267,28 @@ int SC_connection_pool_status(conpool *cp)
 int SC_connection_pool_anomalies(conpool *cp)
    {int ic, it, nc, nt, na;
     int st;
-    connectdes **pc, *pco;
-    contask **pt, *pto;
+    connectdes *pco;
+    contask *pto;
     jobinfo *inf;
 
-    GET_CONNECTIONS(pc, nc, cp);
-
+    nc = SC_array_get_n(cp->pool);
     na = 0;
 
     for (ic = 0; ic < nc; ic++)
-        {pco = pc[ic];
+        {pco = GET_CONNECTION(cp, ic);
 	 if (pco == NULL)
 	    continue;
 
 	 na += (pco->n_launched != pco->n_complete);
 
-	 GET_TASKS(pt, nt, pco);
+	 nt = SC_array_get_n(pco->taska);
 
 	 for (it = 0; it < nt; it++)
-             {pto = pt[it];
+	     {pto = GET_TASK(pco->taska, it);
 	      inf = &pto->inf;
 
 	      na += (inf->signal == SC_EXIT_BAD);
-	      na += (pto->killed != 0);};
-
-	 REL_TASKS(pt, pco);};
-
-    REL_CONNECTIONS(pc);
+	      na += (pto->killed != 0);};};
 
     st = (na != 0);
 
@@ -2604,7 +2384,7 @@ int SC_query_connection_pool(conpool *cp)
    {int n, ic, nc, st, c;
     char s[MAXLINE];
     char *ps, *p, *cmd, *val;
-    connectdes **pc;
+    connectdes *pco;
 
     st = FALSE;
 
@@ -2647,22 +2427,21 @@ int SC_query_connection_pool(conpool *cp)
 	    io_printf(stdout, "\n");}
 
 	else if (strcmp(cmd, "load") == 0)
-	   {GET_CONNECTIONS(pc, nc, cp);
+	   {nc = SC_array_get_n(cp->pool);
 
 	    io_printf(stdout, "   #         Host  Running  LoadAvg  FreeMem  TimeAvg\n");
 	    for (ic = 0; ic < nc; ic++)
-	        {if ((n > 0) && (n-1 != ic))
+	        {pco = GET_CONNECTION(cp, ic);
+	         if ((n > 0) && (n-1 != ic))
 		    continue;
-		 if (pc[ic] == NULL)
+		 if (pco == NULL)
 		    continue;
 
 		 io_printf(stdout, "%4d %12s  %4d      %5.2f   %5.2f%%     %.2f\n",
-			   ic+1, pc[ic]->host, pc[ic]->n_running,
-			   pc[ic]->load, pc[ic]->memory, pc[ic]->dt);};
+			   ic+1, pco->host, pco->n_running,
+			   pco->load, pco->memory, pco->dt);};
 
-	    io_printf(stdout, "\n");
-
-	    REL_CONNECTIONS(pc);}
+	    io_printf(stdout, "\n");}
 
 	else if (strcmp(cmd, "log") == 0)
 	   SC_show_pool_logs(cp, n);

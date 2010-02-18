@@ -193,7 +193,7 @@
 /hash_aaa.a.array(5) = (nil)
 /hash_aaa.a.array(6) = (nil)
 /hash_aaa.a.init = <function>
-/hash_aaa.a.set = <function>
+/hash_aaa.a.access = <function>
 
 ----- HASH TABLE B
 
@@ -295,7 +295,7 @@
 /hash_bbb.a.array(5) = (nil)
 /hash_bbb.a.array(6) = (nil)
 /hash_bbb.a.init = <function>
-/hash_bbb.a.set = <function>
+/hash_bbb.a.access = <function>
 
 ----- A TYPES
 
@@ -1618,12 +1618,12 @@
 |   |       |__ next<7>
 |   |        ___|
 |   |       |   
-|   |       |__ member = "function set"
+|   |       |__ member = "function access"
 |   |       |__ cast_memb = (nil)
 |   |       |__ is_indirect =      0
 |   |       |__ type = "function"
 |   |       |__ base_type = "function"
-|   |       |__ name = "set"
+|   |       |__ name = "access"
 |   |       |__ dimensions = (nil)
 |   |       |__ next<8> = (nil)
 |   |__ free =      1
@@ -3072,12 +3072,12 @@
     |   |       |__ next<7>
     |   |        ___|
     |   |       |   
-    |   |       |__ member = "function set"
+    |   |       |__ member = "function access"
     |   |       |__ cast_memb = (nil)
     |   |       |__ is_indirect =      0
     |   |       |__ type = "function"
     |   |       |__ base_type = "function"
-    |   |       |__ name = "set"
+    |   |       |__ name = "access"
     |   |       |__ dimensions = (nil)
     |   |       |__ next<8> = (nil)
     |   |__ free =      1
@@ -5282,7 +5282,7 @@
     |   array(61) = (nil)
     |   array(62) = (nil)
     |__ init = <function>
-    |__ set = <function>
+    |__ access = <function>
 
 ----- PRINT A HASH TABLE
 

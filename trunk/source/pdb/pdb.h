@@ -117,7 +117,8 @@
 
 #define PN_sizeof(type, tab)  _PD_lookup_size(type, tab)
 
-#define PD_get_file_type(file)         ((file)->type)
+#define PD_get_file_type(file)                                               \
+   (((file)->type == NULL) ? PDBFILE_S : (file)->type)
 
 #define PD_get_mode(file)              ((file)->mode)
 #define PD_set_mode(file, v)           (file)->mode = (v)
@@ -715,6 +716,7 @@ extern PDBfile
  *PD_vif;
 
 extern char
+ *PDBFILE_S,
  *PD_ALIGNMENT_S,
  *PD_DEFSTR_S,
  *PD_STANDARD_S,

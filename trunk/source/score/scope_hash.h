@@ -87,7 +87,8 @@ extern haelem
 
 extern void
  SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- *SC_hasharr_def_lookup(hasharr *ha, void *key);
+ *SC_hasharr_def_lookup(hasharr *ha, void *key),
+ *SC_hasharr_get(hasharr *ha, long n);
 
 extern int
  SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po),

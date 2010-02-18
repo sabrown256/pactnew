@@ -18,11 +18,11 @@ enum {SET, GET};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_SET_1 - set a char size element of A
+/* _SC_ARRAY_ACC_1 - set/get a char size element of A
  *                 - A is guaranteed to be non-NULL
  */
 
-static void *_SC_array_set_1(void *a, int bpi, int oper, long n, void *v)
+static void *_SC_array_acc_1(int oper, void *a, int bpi, long n, void *v)
     {char *s;
 
      s = (char *) a;
@@ -36,11 +36,11 @@ static void *_SC_array_set_1(void *a, int bpi, int oper, long n, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_SET_2 - set a short size element of A
+/* _SC_ARRAY_ACC_2 - set/get a short size element of A
  *                 - A is guaranteed to be non-NULL
  */
 
-static void *_SC_array_set_2(void *a, int bpi, int oper, long n, void *v)
+static void *_SC_array_acc_2(int oper, void *a, int bpi, long n, void *v)
     {short *s;
 
      s = (short *) a;
@@ -54,11 +54,11 @@ static void *_SC_array_set_2(void *a, int bpi, int oper, long n, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_SET_4 - set a int size element of A
+/* _SC_ARRAY_ACC_4 - set/get a int size element of A
  *                 - A is guaranteed to be non-NULL
  */
 
-static void *_SC_array_set_4(void *a, int bpi, int oper, long n, void *v)
+static void *_SC_array_acc_4(int oper, void *a, int bpi, long n, void *v)
     {int *s;
 
      s = (int *) a;
@@ -72,11 +72,11 @@ static void *_SC_array_set_4(void *a, int bpi, int oper, long n, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_SET_8 - set a BIGINT size element of A
+/* _SC_ARRAY_ACC_8 - set/get a BIGINT size element of A
  *                 - A is guaranteed to be non-NULL
  */
 
-static void *_SC_array_set_8(void *a, int bpi, int oper, long n, void *v)
+static void *_SC_array_acc_8(int oper, void *a, int bpi, long n, void *v)
     {BIGINT *s;
 
      s = (BIGINT *) a;
@@ -90,11 +90,11 @@ static void *_SC_array_set_8(void *a, int bpi, int oper, long n, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_SET_N - set an arbitrary size element of A
+/* _SC_ARRAY_ACC_N - set/get an arbitrary size element of A
  *                 - A is guaranteed to be non-NULL
  */
 
-static void *_SC_array_set_n(void *a, int bpi, int oper, long n, void *v)
+static void *_SC_array_acc_n(int oper, void *a, int bpi, long n, void *v)
     {char *s;
 
      s = (char *) a;
@@ -111,23 +111,23 @@ static void *_SC_array_set_n(void *a, int bpi, int oper, long n, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_SET_METHOD - set the assignment method for A */
+/* _SC_ARRAY_ACC_METHOD - set the assignment method for A */
 
-static void _SC_array_set_method(SC_array *a)
+static void _SC_array_acc_method(SC_array *a)
    {int bpi;
 
     bpi = a->bpi;
 
     if (bpi == sizeof(char))
-       a->set = _SC_array_set_1;
+       a->access = _SC_array_acc_1;
     else if (bpi == sizeof(short))
-       a->set = _SC_array_set_2;
+       a->access = _SC_array_acc_2;
     else if (bpi == sizeof(int))
-       a->set = _SC_array_set_4;
+       a->access = _SC_array_acc_4;
     else if (bpi == sizeof(BIGINT))
-       a->set = _SC_array_set_8;
+       a->access = _SC_array_acc_8;
     else
-       a->set = _SC_array_set_n;
+       a->access = _SC_array_acc_n;
 
     return;}
 
@@ -148,9 +148,6 @@ static void _SC_array_grow(SC_array *a, long nn)
     bpi = a->bpi;
     chg = FALSE;
 
-/* GOTCHA: what to do when this is greater than 1? */
-    nr = SC_ref_count(arr);
-
 /* if new size not specified - grow exponentially from the old size */
     if (nn < 0)
        {n  = max(nx, a->n);
@@ -168,7 +165,17 @@ static void _SC_array_grow(SC_array *a, long nn)
 
 /* if too small */
     else if (nn > nx)
-       {REMAKE_N(arr, char, nn*bpi);
+
+/* GOTCHA: what to do when this is greater than 1? */
+       {nr = SC_ref_count(arr);
+
+#if 0
+	if (nr > 1)
+	   printf("ERROR: growing array %s from %ld to %ld (%d references) - _SC_ARRAY_GROW\n",
+		  a->name, nx, nn, nr);
+#endif
+
+	REMAKE_N(arr, char, nn*bpi);
 	chg = TRUE;};
 
 /* if we changed it - make it consistent */
@@ -225,7 +232,7 @@ void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
      a->array = NULL;
      a->init  = init;
 
-     _SC_array_set_method(a);
+     _SC_array_acc_method(a);
 
      return;}
 
@@ -390,8 +397,8 @@ void *SC_array_set(SC_array *a, long n, void *v)
      if (a != NULL)
 
 /* this can happen after reading from PDBfile */
-        {if (a->set == NULL)
-	    _SC_array_set_method(a);
+        {if (a->access == NULL)
+	    _SC_array_acc_method(a);
 
 	 if (n < 0)
 	    n = a->n;
@@ -402,7 +409,7 @@ void *SC_array_set(SC_array *a, long n, void *v)
 	 if (m >= a->nx)
 	    _SC_array_grow(a, -1);
 
-	 rv = a->set(a->array, a->bpi, SET, n, v);};
+	 rv = a->access(SET, a->array, a->bpi, n, v);};
 
      return(rv);}
 
@@ -424,8 +431,8 @@ void *SC_array_get(SC_array *a, long n)
      if (a != NULL)
 
 /* this can happen after reading from PDBfile */
-        {if (a->set == NULL)
-	    _SC_array_set_method(a);
+        {if (a->access == NULL)
+	    _SC_array_acc_method(a);
 
 	 if (n < 0)
 	    {n = a->n + n;
@@ -434,7 +441,7 @@ void *SC_array_get(SC_array *a, long n)
 	 if (n >= a->nx)
 	    _SC_array_grow(a, -1);
 
-	 rv = a->set(a->array, a->bpi, GET, n, NULL);};
+	 rv = a->access(GET, a->array, a->bpi, n, NULL);};
 
      return(rv);}
 
@@ -626,7 +633,7 @@ int SC_array_string_append(SC_array *out, SC_array *in)
    {int i, no;
     char **sa;
 
-    if (sa != NULL)
+    if ((in != NULL) && (in->array != NULL))
        {no = in->n;
 	sa = in->array;
         for (i = 0; i < no; i++)
@@ -765,7 +772,7 @@ SC_array *SC_strings_array(int n, char **sa)
     a->array = sa;
     a->init  = NULL;
 
-    _SC_array_set_method(a);
+    _SC_array_acc_method(a);
 
     return(a);}
 

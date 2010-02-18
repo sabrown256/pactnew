@@ -168,8 +168,9 @@ static void _SC_init_wait(void)
 
 /* if never initialized do it now */
     if (_SC.wait_list == NULL)
-       _SC.wait_list = SC_MAKE_ARRAY("PERM|_SC_INIT_WAIT",
+       {_SC.wait_list = SC_MAKE_ARRAY("PERM|_SC_INIT_WAIT",
 				     sigchld_rec *, _SC_make_wait);
+	SC_array_resize(_SC.wait_list, 512, -1.0);};
 
     return;}
 
@@ -272,8 +273,9 @@ void _SC_manage_process(PROCESS *pp)
    {
 
     if (_SC.process_list == NULL)
-       _SC.process_list = SC_MAKE_ARRAY("PERM|_SC_MANAGE_PROCESS",
-					PROCESS *, NULL);
+       {_SC.process_list = SC_MAKE_ARRAY("PERM|_SC_MANAGE_PROCESS",
+					 PROCESS *, NULL);
+	SC_array_resize(_SC.process_list, 512, -1.0);};
 
     pp->index = SC_array_get_n(_SC.process_list);
 
