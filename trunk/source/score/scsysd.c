@@ -1138,21 +1138,20 @@ static void SC_free_connection(conpool *cp, int ic, int sig)
  */
 
 static int _SC_delete_pool_connection(conpool *cp, int ic)
-   {int i, nc, nco;
+   {int i, nc;
     connectdes *pco;
 
     SC_free_connection(cp, ic, FALSE);
 
 /* remove the freed connection from the list */
-    nc  = SC_array_get_n(cp->pool);
-    nco = nc - 1;
-    for (i = 0; i < nco; i++)
+    nc = SC_array_get_n(cp->pool);
+    for (i = 0; i < nc; i++)
         {pco = GET_CONNECTION(cp, i);
 	 if (pco == NULL)
-	    {nco = SC_array_remove(cp->pool, i);
+	    {nc = SC_array_remove(cp->pool, i);
 	     break;};};
 
-    return(nco);}
+    return(nc);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1513,15 +1512,22 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
     connectdes *pc;
 
 /* determine all possible hosts */
-    nh   = SC_get_nhosts(sys);
-    hsts = FMAKE_N(char *, nh, "SC_OPEN_CONNECTION_POOL:hsts");
-    for (i = 0; i < nh; i++)
-        {if (n == 1)
-	    SC_hostname(hst, MAXLINE);
-	 else
-	    SC_get_host_name(hst, MAXLINE, sys);
+    if (n < 2)
+       {nh   = 1;
+	hsts = FMAKE_N(char *, nh, "SC_OPEN_CONNECTION_POOL:hsts");
+	SC_hostname(hst, MAXLINE);
+	hsts[0] = SC_strsavef(hst, "SC_OPEN_CONNECTION_POOL:hst");}
 
-	 hsts[i] = SC_strsavef(hst, "SC_OPEN_CONNECTION_POOL:hst");};
+    else
+       {nh   = SC_get_nhosts(sys);
+	hsts = FMAKE_N(char *, nh, "SC_OPEN_CONNECTION_POOL:hsts");
+	for (i = 0; i < nh; i++)
+	    {if (n == 1)
+	        SC_hostname(hst, MAXLINE);
+	     else
+	        SC_get_host_name(hst, MAXLINE, sys);
+
+	     hsts[i] = SC_strsavef(hst, "SC_OPEN_CONNECTION_POOL:hst");};};
 
     n  = max(n, 1);
     cp = FMAKE(conpool, "SC_OPEN_CONNECTION_POOL:cp");
