@@ -11,9 +11,35 @@
 
 #include "score_int.h" 
 
+/* #define DEBUG */
+
 #define GROWTH_FACTOR(x)   ((x)/pow(2.0, 32.0))
 
 enum {SET, GET};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_ARRAY_ERR - look for problems */
+
+static INLINE void _SC_array_err(SC_array *a, char *fmt, ...)
+    {
+
+#ifdef DEBUG
+     int nr;
+     char s[MAXLINE];
+
+     SC_VA_START(fmt);
+     SC_VSNPRINTF(s, MAXLINE, fmt);
+     SC_VA_END;
+
+     nr = SC_ref_count(a->array);
+
+     if (nr > 1)
+        io_printf(stdout, "\nERROR: %s (%ld references)\n\n", s, nr);
+#endif
+
+     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -137,7 +163,7 @@ static void _SC_array_acc_method(SC_array *a)
 /* _SC_ARRAY_GROW - grow the array A */
 
 static void _SC_array_grow(SC_array *a, long nn)
-   {int chg, nr;
+   {int chg;
     long i, n, nx, bpi;
     double gf, fc;
     char *arr;
@@ -165,15 +191,7 @@ static void _SC_array_grow(SC_array *a, long nn)
 
 /* if too small */
     else if (nn > nx)
-
-/* GOTCHA: what to do when this is greater than 1? */
-       {nr = SC_ref_count(arr);
-
-#if 0
-	if (nr > 1)
-	   printf("ERROR: growing array %s from %ld to %ld (%d references) - _SC_ARRAY_GROW\n",
-		  a->name, nx, nn, nr);
-#endif
+       {_SC_array_err(a, "growing array %s from %ld to %ld", a->name, nx, nn);
 
 	REMAKE_N(arr, char, nn*bpi);
 	chg = TRUE;};
@@ -384,6 +402,28 @@ long SC_array_resize(SC_array *a, long n, double g)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_ARRAY_FRAC_RESIZE - resize the array A
+ *                      - to have (1 + F) times a many elements
+ *                      - as are in current use
+ *                      - return the old size
+ */
+
+long SC_array_frac_resize(SC_array *a, double f)
+   {long n, nn;
+
+    nn = 0;
+
+    if (a != NULL)
+       {n  = a->n;
+	nn = (1.0 + f)*n;
+
+	_SC_array_grow(a, nn);};
+
+    return(nn);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_ARRAY_SET - set the Nth element of A to V
  *              - if N < 0 push V onto the end of A
  */
@@ -408,6 +448,8 @@ void *SC_array_set(SC_array *a, long n, void *v)
 
 	 if (m >= a->nx)
 	    _SC_array_grow(a, -1);
+
+	 _SC_array_err(a, "set array %s %ld", a->name, n);
 
 	 rv = a->access(SET, a->array, a->bpi, n, v);};
 
@@ -440,6 +482,8 @@ void *SC_array_get(SC_array *a, long n)
 
 	 if (n >= a->nx)
 	    _SC_array_grow(a, -1);
+
+	 _SC_array_err(a, "get array %s %ld", a->name, n);
 
 	 rv = a->access(GET, a->array, a->bpi, n, NULL);};
 
@@ -572,7 +616,9 @@ long SC_array_remove(SC_array *a, long n)
 
     no = a->n - 1;
     if (n <= no)
-       {bpi = a->bpi;
+       {_SC_array_err(a, "remove array %s %ld", a->name, n);
+
+        bpi = a->bpi;
 	arr = a->array;
 
 	if (n < no)

@@ -85,7 +85,7 @@ SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio, PFSignal_handler sigchld,
  * not crucial but start out with enough to prevent
  * fatal thrashing of dynamic arrays at the outset
  */
-    nfd = 64;
+    nfd = 512;
 
     SC_array_resize(pe->fd,     nfd, -1.0);
     SC_array_resize(pe->faccpt, nfd, -1.0);

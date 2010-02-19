@@ -244,6 +244,7 @@ extern char
 
 extern long
  SC_array_resize(SC_array *a, long n, double g),
+ SC_array_frac_resize(SC_array *a, double f),
  SC_array_set_n(SC_array *a, long n),
  SC_array_inc_n(SC_array *a, long n, int wh),
  SC_array_dec_n(SC_array *a, long n, int wh),
