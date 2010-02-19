@@ -47,7 +47,7 @@ static void SX_set_graphics_state(PG_device *d)
 /* view width and height are set by users so push it
  * into the view_x box
  */
-    SX_view_x[1] = SX_view_x[1] + SX_view_width;
+    SX_view_x[1] = SX_view_x[0] + SX_view_width;
     SX_view_x[3] = SX_view_x[2] + SX_view_height;
 
     d->view_aspect  = SX_view_aspect;
@@ -345,7 +345,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 		     "label-space", &labsp,
 		     NULL);
 
-    nvh  = (obx[3] - obx[2])/(1.0 + labsp);
+    nvh  = SX_view_height/(1.0 + labsp);
     nvoy = (obx[2] + labsp)/(1.0 + labsp);
 
     SX_view_x[2] = nvoy;
@@ -355,7 +355,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
     dev->view_x[3]   = nvoy + nvh;
 
 /* set the old school state */
-    SX_view_height    = nvh;
+/*    SX_view_height    = nvh; */
     SX_window_height *= mh;
 
     return;}

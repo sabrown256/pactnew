@@ -58,6 +58,8 @@ static void _SX_target(int data, int align)
     if (align != 0)
        REQ_ALIGNMENT = PD_std_alignments[align - 1];
 
+    PD_target(REQ_STANDARD, REQ_ALIGNMENT);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
