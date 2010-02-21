@@ -141,7 +141,7 @@ else if (-d .svn) then
    set Host       = `uname -n`
    set WhoIAm     = $USER
    set Date       = `/bin/date '+%y_%m_%d_%H_%M_%S'`
-   set Message    = (\'+$WhoIAm+$Date+Remote $Host+ $argv\')
+   set Message    = (\'<$WhoIAm|$Date|Remote $Host> $argv\')
    set Stage      = "$MngDir/stage"
    set Lock       = "$Stage/commit.lock"
    set RemoteHost = ""
