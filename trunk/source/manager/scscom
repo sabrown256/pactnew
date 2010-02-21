@@ -1,0 +1,21 @@
+#!/bin/csh -f
+#
+# SCCOM - commit sources whether CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-d CVS) then
+
+   cvs commit $argv
+
+else if (-d .svn) then
+
+   svn commit $argv
+
+endif
+
+exit($status)

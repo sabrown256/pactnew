@@ -1,0 +1,22 @@
+#!/bin/csh -f
+#
+# SCSUP - update sources whether CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if (-d CVS) then
+
+   cvs update $argv |& egrep -v '^\?' |& grep -v 'cvs update'
+
+else if (-d .svn) then
+
+   svn update $argv
+   svn status |& egrep -v '^\?'
+
+endif
+
+exit($status)

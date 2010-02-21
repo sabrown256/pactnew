@@ -30,7 +30,7 @@ set Manager   = manager
 set Message   = ""
 set MsgFile   = ""
 set Report    = ""
-set CvsOpt    = ""
+set SCSOpt    = ""
 set ManOnly   = FALSE
 set DocOnly   = FALSE
 set ScrOnly   = FALSE
@@ -103,7 +103,7 @@ while ("$1" =~ -*)
 
       case -n*:                                  # NO update, report only
 	      set Report = " Report ONLY..."
-	      set CvsOpt = "-nq"
+	      set SCSOpt = "-nq"
 	      breaksw
 
       case -p:                                   # parallel build/test
@@ -342,7 +342,7 @@ if ($TagOnly == FALSE) then
    endif
 
 #
-# do the $SCSName update
+# do the source control system update
 #
    NoteD $Log " "
    NoteD $Log "Checking Local PACT Sources"
@@ -353,10 +353,10 @@ if ($TagOnly == FALSE) then
    flog $Log touch $UpdateLog
    Note $UpdateLog "Host: $Host           Date: `date`"
    Note $UpdateLog ""
-   flog $Log ($Update >> $UpdateLog)
+   flog $Log (scsup >> $UpdateLog)
    if ($status != 0) then
       Unlock
-      NoteD $Log "$SCSName UPDATE FAILED"
+      NoteD $Log "$SCSExe UPDATE FAILED"
       exit($status)
    endif
    NoteD $Log "Local PACT Sources Checked"
@@ -406,7 +406,7 @@ if ($TagOnly == TRUE) then
    NoteD $Log "Committing the new TAG info"
 
    echo > $TmpMsg
-   flog $Log $Commit -m 'Tagging repository'
+   flog $Log $MngDir/scscom -m 'Tagging repository'
    if ($status != 0) then
       flog $Log rm -f $TmpMsg
       Unlock
@@ -424,7 +424,7 @@ else
 
    Note $Lock -n "Committing PACT Sources ... "
    if ($MsgFile == "" ) then
-        flog $Log $Commit -m "$Message"
+        flog $Log $MngDir/scscom -m "$Message"
         if ($status != 0) then
            Unlock
            NoteD $Log "Commit FAILED"
@@ -435,7 +435,7 @@ else
         echo $Message | sed s/\"//g > $TmpMsg
         cat $MsgFile >> $TmpMsg
 
-        flog $Log $Commit -F $TmpMsg
+        flog $Log $MngDir/scscom -F $TmpMsg
         if ($status != 0) then
            flog $Log rm -f $TmpMsg
            Unlock
@@ -460,17 +460,6 @@ else
       flog $Log cd $Base
    endif
 endif
-
-#
-# tag the new repository version
-#
-#NoteD $Log " "
-#NoteD $Log "Tagging this version with $TagID"
-#
-#Note $Lock -n "Tagging ................... "
-#flog $Log $Tag $TagID pact
-#NoteD $Log "Version tagged"
-#Note $Lock "done"
 
 #
 # release the lock
@@ -529,7 +518,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
 endif
 
 flog $Log cd $MngDir
-flog $Log $Update -l
+flog $Log scsup -l
 flog $Log cat .pact-version
 flog $Log cat .pact-version-tag
 

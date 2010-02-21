@@ -5,7 +5,7 @@
 #>  repository for UNIX distribution.             
 #>              
 #>  Usage:
-#>    dsys dist [-c <CVSROOT>] [-s SCSdir] [-h]
+#>    dsys dist [-c <CVSROOT>] [-s MngDir] [-h]
 #>              [-v | +v | -T] [-l [-x]]
 #>              [-r] [-k] [-Z]
 #>  
@@ -52,7 +52,7 @@ set Manager       = manager
 set HelpCode      = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )
 set DName         = "pact$DTag"
-set SCSDir        = "."
+set MngDir        = "."
 set SCSRepository = ""
 set SRCDate       = ( -D "`./pact-get-tag`" )
 set WhoIAm        = $USER
@@ -98,7 +98,7 @@ while ($#argv >= 1)
                breaksw
       case -s:
                shift
-               set SCSDir = $1
+               set MngDir = $1
                breaksw
       case -v:
       case +v:
@@ -192,14 +192,14 @@ INIT:
    Separator $Log
    NoteD $Log " "
 
-   if (!(-e $SCSDir/pact-scs)) then
-      NoteD $Log "Can't find Source Control System Information in $SCSDir"
+   if (!(-e $MngDir/pact-scs)) then
+      NoteD $Log "Can't find Source Control System Information in $MngDir"
       NoteD $Log " "
       exit(25)
    endif
 
 # Source Control System Variables
-   source $SCSDir/pact-scs
+   source $MngDir/pact-scs
 
 # check if repository locked
    if ($ExistLock == TRUE) then
@@ -262,7 +262,7 @@ GET_SOURCE:
    flog $Log mkdir pact
    flog $Log cd pact
    Note $Log " " 
-   flog $Log cvs $CvsOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" manager auto $PactList 
+   flog $Log cvs $SCSOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" manager auto $PactList 
 
    if ($status == 0) then
       Note $Log "Sources checked out" 
@@ -290,7 +290,7 @@ GET_SOURCE:
 
    NoteD $Log "Getting the documents"
    Note $Log " " 
-   flog $Log cvs $CvsOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
+   flog $Log cvs $SCSOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
    KillZombie
    Note $Log " " 
 
@@ -339,9 +339,9 @@ PREP_TREE:
 
    Separator $Log
 
-# remove the $SCSName sub-directories
+# remove the source control system sub-directories
    NoteD $Log "Cleaning up the sources"
-   flog $Log set List = `find . -name $ADM -print`
+   flog $Log set List = `find . -name $SCSDir -print`
    foreach i ($List)
       $RMDir $i
    end

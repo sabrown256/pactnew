@@ -68,7 +68,7 @@ endif
 
 # Source Control System variables
 set CheckOut  = "cvs co"
-set ADM       = "CVS"
+set SCSDir    = "CVS"
 
 # --------------------------------------------------------------------------
 
@@ -416,9 +416,9 @@ switch ($SrcMode)
         flog $Log mv pact/* .
         flog $Log rmdir pact
 
-# remove the $SCSName sub-directories
+# remove the source control sub-directories
         NoteD $Log "Removing Source Control Information"
-        set List = `find . -name $ADM`
+        set List = `find . -name $SCSDir`
         foreach i ($List)
            rm -r $i
         end

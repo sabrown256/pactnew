@@ -28,7 +28,7 @@ set PactPackage = PACTPK
 set Packages    = ""
 
 # Source Control System Variables
-set SCSName       = CVS
+set SCSExe        = CVS
 set CVSROOT       = ""
 set SCSRepository = ""
 set SRCDate       = ""
