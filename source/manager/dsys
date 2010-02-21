@@ -1277,7 +1277,7 @@ CFG_DONE:
 
    case info:
         set HelpCode  = $MngDir/$0
-        set CvsOpt    = ""
+        set SCSOpt    = ""
 
         set SCSRepository = ""
         set SRCDate       = ""
@@ -1613,7 +1613,7 @@ CFG_DONE:
         if ("$Tags" != "") then
            echo ""
            echo "PACT revision tags (cvs history -T -a):"
-           eval "($History $Tags | tail -n 20 )"
+           eval "($MngDir/scshist $Tags | tail -n 20 )"
         endif
 
         if ($ChkVer == "yes") then
@@ -2173,7 +2173,7 @@ CFG_DONE:
         set WhoIAm      = $USER
         set Manager     = manager
         set Operation   = "Syncing sources with repository"
-        set CvsOpt      = "-q"
+        set SCSOpt      = "-q"
         set Quiet       = FALSE
 
         set ConflFile = $MngDir/Confl.Sources
@@ -2210,7 +2210,7 @@ CFG_DONE:
 
               case -n:                                   # NO update, report only
                    set Operation = "Sources differing from repository"
-                   set CvsOpt    = ( $CvsOpt -n )
+                   set SCSOpt    = ( $SCSOpt -n )
                    breaksw
 
               case -q:
@@ -2272,13 +2272,18 @@ CFG_DONE:
         Separator $Log
         flog $Log pwd
         flog $Log printenv
+if (1) then
+        flog $Log $MngDir/scsup
+        set ErrStat = $status
+else
         if ($?CVSROOT == 1) then
-           flog $Log cvs $CvsOpt -d $CVSROOT update -d
+           flog $Log cvs $SCSOpt -d $CVSROOT update -d
            set ErrStat = $status
         else
-           flog $Log cvs $CvsOpt update -d
+           flog $Log cvs $SCSOpt update -d
            set ErrStat = $status
         endif
+endif
 
 # take care of conflicting changes
         flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)
@@ -2700,7 +2705,7 @@ CFG_DONE:
         set SCSRepository = ""
         set SRCDate       = ""
 
-        call CVS_SETUP()
+        call SCS_SETUP()
 
         Unlock
         set RStatus = $status
@@ -2864,7 +2869,7 @@ GEN_CONFIG:
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-CVS_SETUP:
+SCS_SETUP:
 
    if ($?CVSROOT == 0) then
       source ~/.cshrc

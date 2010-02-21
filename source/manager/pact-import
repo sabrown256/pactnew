@@ -30,7 +30,7 @@ set DEBUG         = FALSE
 set DateFile      = $CVSROOT/.import-date
 set TagFile       = $CVSROOT/.import-tag
 set ImportingDir  = $cwd
-set SCSDir        = "."
+set MngDir        = "."
 set SCSRepository = ""
 set SRCDate       = ""
 set Host          = `uname -n`
@@ -105,9 +105,9 @@ if (!(-d $Repository)) then
    exit(1)
 endif
 
-if (!(-e $SCSDir/pact-scs)) then
+if (!(-e $MngDir/pact-scs)) then
    NoteD $Log " "
-   NoteD $Log "Can't find Source Control System Information in $SCSDir"
+   NoteD $Log "Can't find Source Control System Information in $MngDir"
    NoteD $Log " "
    exit(1)
 endif
@@ -118,7 +118,7 @@ endif
 # MAIN - start the work here
 
 # Source Control System Variables
-   flog $Log source $SCSDir/pact-scs
+   flog $Log source $MngDir/pact-scs
 
 # check if repository is locked
    if ($ExistLock == TRUE) then
