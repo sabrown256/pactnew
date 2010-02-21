@@ -870,44 +870,27 @@ void *SC_array_pop(SC_array *a)
  */
 
 static void _SC_array_swap(SC_array *a, long il, long ir)
-   {void *xl, *xr;
+   {long n, nx;
+    void *xl, *xr, *t;
 
-    xl = SC_array_get(a, il);
-    xr = SC_array_get(a, ir);
-    SC_array_set(a, il, xr);
-    SC_array_set(a, ir, xl);
+    if (il != ir)
+       {n  = a->n;
+	nx = a->nx;
+	if (n >= nx-1)
+	   _SC_array_grow(a, -1);
+
+	xl = SC_array_get(a, il);
+	xr = SC_array_get(a, ir);
+
+	SC_array_set(a, n+1, xl);
+	t = SC_array_get(a, n+1);
+
+	SC_array_set(a, il, xr);
+	SC_array_set(a, ir, t);
+
+	SC_array_set(a, n+1, NULL);};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_ARRAY_PARTITION - do the partition step of the merge sort
- *                     - checks on the validity of A are done
- *                     - by SC_array_sort and are not repeated here
- */
-
-static long _SC_array_partition(SC_array *a, PFIntBin pred,
-				long il, long ir, long ip)
-   {long i, is;
-    void *pvl, *lvl;
-
-    pvl = SC_array_get(a, ip);
-
-/* move pivot to end */
-    _SC_array_swap(a, ip, ir);
-
-    is = il;
-    for (i = il; i < ir; i++)
-        {lvl = SC_array_get(a, i);
-	 if (pred(lvl, pvl) == TRUE)
-            {_SC_array_swap(a, i, is);
-             is++;};};
-
-/* move pivot to its final place */
-    _SC_array_swap(a, is, ir);
-
-    return(is);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -918,13 +901,27 @@ static long _SC_array_partition(SC_array *a, PFIntBin pred,
  */
 
 static int _SC_array_sort(SC_array *a, PFIntBin pred, long il, long ir)
-   {long ip, np;
+   {long i, ip, in;
+    void *pvl, *lvl;
 
-    if (ir > il)
+    if (il < ir)
        {ip = (il + ir)/2;
-        np = _SC_array_partition(a, pred, il, ir, ip);
-	_SC_array_sort(a, pred, il, np - 1);
-	_SC_array_sort(a, pred, np + 1, ir);};
+
+	_SC_array_swap(a, il, ip);
+
+	in = il;
+
+	pvl = SC_array_get(a, il);
+
+	for (i = il+1; i <= ir; i++)
+	    {lvl = SC_array_get(a, i);
+	     if (pred(lvl, pvl) == TRUE)
+	        _SC_array_swap(a, ++in, i);};
+
+	_SC_array_swap(a, il, in);
+
+	_SC_array_sort(a, pred, il, in-1);
+	_SC_array_sort(a, pred, in+1, ir);};
 
     return(TRUE);}
 

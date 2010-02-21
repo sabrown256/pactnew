@@ -149,21 +149,21 @@ void _PM_swap(REAL *v, int *ind, int i, int j)
  *            - 2nd Edition, by Kernighan and Ritchie, pp 87-88
  */
 
-static void _PM_q_sort(REAL *v, int *ind, int left, int right)
-   {int i, last;
+static void _PM_q_sort(REAL *v, int *ind, int il, int ir)
+   {int i, in;
 
-    if (left < right)
-       {_PM_swap(v, ind, left, (left+right)/2);
+    if (il < ir)
+       {_PM_swap(v, ind, il, (il+ir)/2);
 
-	last = left;
+	in = il;
 
-	for (i = left+1; i <= right; i++)
-	    {if (v[i] < v[left])
-	        _PM_swap(v, ind, ++last, i);};
+	for (i = il+1; i <= ir; i++)
+	    {if (v[i] < v[il])
+	        _PM_swap(v, ind, ++in, i);};
 
-	_PM_swap(v, ind, left, last);
-	_PM_q_sort(v, ind, left, last-1);
-	_PM_q_sort(v, ind, last+1, right);};
+	_PM_swap(v, ind, il, in);
+	_PM_q_sort(v, ind, il, in-1);
+	_PM_q_sort(v, ind, in+1, ir);};
 
     return;}
 
