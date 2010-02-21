@@ -359,9 +359,56 @@ static int test_5(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_6_ADD - add N integers to IA */
+/* TEST_6_LESS - sorting test predicate */
 
-static void test_6_add(SC_array *ia, int n, int recy)
+static int test_6_less(void *a, void *b)
+   {int ok;
+    long la, lb;
+
+    la = *(long *) a;
+    lb = *(long *) b;
+
+    ok = (la < lb);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_6 - test sorting dynamic arrays */
+
+static int test_6(void)
+   {int err;
+    long i, l, m, na;
+    SC_array *a;
+
+    na = 100;
+
+    a = SC_MAKE_ARRAY("TEST_6", long, NULL);
+    for (i = 0; i < na; i++)
+        {l = SC_random_int(1, na+1);
+	 SC_array_push(a, &l);};
+
+    SC_array_sort(a, test_6_less);
+
+/* now compare */
+    err = 0;
+
+    for (i = 1; i < na; i++)
+        {l = *(long *) SC_array_get(a, i);
+	 m = *(long *) SC_array_get(a, i-1);
+	 err += (m > l);};
+
+    SC_free_array(a, NULL);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_7_ADD - add N integers to IA */
+
+static void test_7_add(SC_array *ia, int n, int recy)
    {int i, ni;
     int *pi;
 
@@ -375,7 +422,7 @@ static void test_6_add(SC_array *ia, int n, int recy)
  * pointer will be available
  */
     if (recy == TRUE)
-       {pi = FMAKE_N(int, ni, "TEST_6_ADD:pi");
+       {pi = FMAKE_N(int, ni, "TEST_7_ADD:pi");
 	for (i = 0; i < ni; i++)
 	    pi[i] = 100;};
 
@@ -384,15 +431,15 @@ static void test_6_add(SC_array *ia, int n, int recy)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_6 - test asynchronous race */
+/* TEST_7 - test asynchronous race */
 
-static int test_6(void)
+static int test_7(void)
    {int i, ni, err;
     int *pi;
     SC_array *ia;
 
-    ia = SC_MAKE_ARRAY("TEST_6", int, NULL);
-    test_6_add(ia, 10, FALSE);
+    ia = SC_MAKE_ARRAY("TEST_7", int, NULL);
+    test_7_add(ia, 10, FALSE);
 
     ni = SC_array_get_n(ia);
     pi = SC_array_array(ia);
@@ -402,7 +449,7 @@ static int test_6(void)
 
 /* emulate an interrupt that adds to ia */
          if (i == 2)
-	    test_6_add(ia, 20, TRUE);};
+	    test_7_add(ia, 20, TRUE);};
 
 /* now compare */
     err = 0;
@@ -422,9 +469,9 @@ static int test_6(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_7 - performance test */
+/* TEST_8 - performance test */
 
-static int test_7(void)
+static int test_8(void)
    {int i, ms, mm, mg, ls, lm, lg, na, err;
     double fc, tm, ts, tg, tr, rs, rg;
     double *dp;
@@ -434,10 +481,10 @@ static int test_7(void)
 
     na = 1000000;
 
-    da = SC_MAKE_ARRAY("TEST_7", double, NULL);
+    da = SC_MAKE_ARRAY("TEST_8", double, NULL);
     SC_array_resize(da, na, -1.0);
 
-    dp = FMAKE_N(double, na, "TEST_7:dp");
+    dp = FMAKE_N(double, na, "TEST_8:dp");
 
 /* time setting DP */
     lm = 0;
@@ -532,8 +579,9 @@ int main(int c, char **v)
     err += run_test(4, test_4);
     err += run_test(5, test_5);
     err += run_test(6, test_6);
+    err += run_test(7, test_7);
 
-    test_7();
+    test_8();
 
     io_printf(STDOUT, "\n");
 
