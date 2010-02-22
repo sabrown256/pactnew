@@ -8,18 +8,18 @@
 # include "cpyright.h"
 #
 
-if ($?MngDir == 0) then
+if ($?lmngdir == 0) then
    set exe = `dirname $0`
    if ("$exe" == ".") then
-      set MngDir = $cwd
+      set lmngdir = $cwd
    else
-      set MngDir = $exe
+      set lmngdir = $exe
    endif
 endif
 
 set lmsg   = ""
 set lock   = ""
-set lstage = "$MngDir/stage"
+set lstage = "$lmngdir/stage"
 
 while ($#argv > 0)
    switch ($1)
@@ -184,15 +184,18 @@ else if (-d .svn) then
       chmod 770 $lstage
    endif
 
+   set root = $lmngdir:h
    set lock = "$lstage/commit.lock"
    switch ($oper)
       case lock:
            touch $lock
            chmod 660 $lock
            echo $lmsg >> $lock
+           svn lock $root/* >>& /dev/null
            breaksw
       case unlock:
            rm -f $lock
+           svn unlock $root/* >>& /dev/null
            breaksw
       case status:
            if (-e $lock) then
@@ -205,7 +208,6 @@ else if (-d .svn) then
            cat $lock
            breaksw
    endsw
-#   svn lock
 
 endif
 
