@@ -52,7 +52,6 @@ set Manager       = manager
 set HelpCode      = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )
 set DName         = "pact$DTag"
-set MngDir        = "."
 set SCSRepository = ""
 set SRCDate       = ( -D "`./pact-get-tag`" )
 set WhoIAm        = $USER
@@ -202,21 +201,22 @@ INIT:
    source $MngDir/pact-scs
 
 # check if repository locked
-   if ($ExistLock == TRUE) then
+   set lockst = `$MngDir/scslock status`
+   if ($lockst == "locked") then
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      CatLock
+      $MngDir/scslock cat
       NoteD $Log ""
       exit(26)
    endif
 
 # lock repository
-   Makelock
+   $MngDir/scslock lock
    echo "  pact-dist in progress - " $USER  `date`>> $Lock
-   echo "" >>& $Lock
+   Note $Lock ""
 
    if (!(-d distribution)) then
-      echo "Creating distribution directory" >>& $Lock
+      Note $Lock "Creating distribution directory"
       flog $Log mkdir distribution
    endif
 
@@ -253,7 +253,7 @@ GET_SOURCE:
 
    Separator $Log
    NoteD $Log "Getting out the sources for $DTag"
-   echo "Getting out the sources" >>& $Lock
+   Note $Lock "Getting out the sources"
 
    set PactList = ( `awk '$1 == "pkg" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' ../pact.manifest` )
    Note $Log "packages to add to distribution: $PactList"
@@ -273,12 +273,10 @@ GET_SOURCE:
       echo "See $Log"
 
 # release the lock
-      Unlock
+      $MngDir/scslock unlock
       exit(1)
    endif
    Note $Log " " 
-
-   KillZombie
 
    if (-d auto) then
       flog $Log cd auto
@@ -291,13 +289,12 @@ GET_SOURCE:
    NoteD $Log "Getting the documents"
    Note $Log " " 
    flog $Log cvs $SCSOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
-   KillZombie
    Note $Log " " 
 
    flog $Log cd ..
 
 # release the lock
-   Unlock
+   $MngDir/scslock unlock
 
    flog $Log ls -lR pact
 

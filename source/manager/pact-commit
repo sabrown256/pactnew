@@ -207,7 +207,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    flog $Log ./dsys sync
    flog $Log set LStat = $status
    if ($LStat != 0) then
-      Unlock
+      $MngDir/scslock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed to sync sources"
       NoteD $Log "You may have a source conflict that needs to be resolved"
@@ -222,7 +222,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
       flog $Log ./dsys remove
       flog $Log set LStat = $status
       if ($LStat != 0) then
-         Unlock
+         $MngDir/scslock unlock
          NoteD $Log ""
          NoteD $Log "Your binaries could not be removed"
          NoteD $Log "Check to see whether your permissions are set properly"
@@ -237,7 +237,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    flog $Log ./dsys build $Args
    flog $Log set LStat = $status
    if ($LStat != 0) then
-      Unlock
+      $MngDir/scslock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed to build after syncing"
       NoteD $Log "This must be resolved before you may commit your changes"
@@ -251,16 +251,18 @@ endif
 #
 # check if repository is locked
 #
+set lockst = `$MngDir/scslock status`
+
 Note $Log "Sleep = $Sleep"
-Note $Log "Lock  = $ExistLock"
+Note $Log "Lock  = $lockst"
 if ($Sleep == "YES") then
-   ./check.lock
+   $MngDir/check.lock
 else
-   if ($ExistLock == TRUE) then
+   if ($lockst == "locked") then
       NoteD $Log ""
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      CatLock
+      $MngDir/scslock cat
       NoteD $Log ""
       NoteD $Log ""
       exit(1)
@@ -270,7 +272,7 @@ endif
 #
 # initiate a lock on the repository
 #
-Makelock
+$MngDir/scslock lock
 Note $Lock $Message
 
 #
@@ -280,7 +282,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    Note $Lock -n "Testing ................... "
    ftee $Log ./dsys test $Args
    if ($status != 0) then
-      Unlock
+      $MngDir/scslock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed the test suite"
       NoteD $Log "All tests must pass before the commit will be allowed"
@@ -302,10 +304,10 @@ if ($TagOnly == FALSE) then
    Note $Log ""
 
    Note $Log "Operation: $Opt"
-   if ("$RemoteHost" == "") then
+   if ("$repohost" == "") then
       Note $Log "Repository: local"
    else
-      Note $Log "Repository: remote ($RemoteHost)"
+      Note $Log "Repository: remote ($repohost)"
    endif
    NoteD $Log ""
 
@@ -353,9 +355,9 @@ if ($TagOnly == FALSE) then
    flog $Log touch $UpdateLog
    Note $UpdateLog "Host: $Host           Date: `date`"
    Note $UpdateLog ""
-   flog $Log (scsup >> $UpdateLog)
+   flog $Log ($MngDir/scsup >> $UpdateLog)
    if ($status != 0) then
-      Unlock
+      $MngDir/scslock unlock
       NoteD $Log "$SCSExe UPDATE FAILED"
       exit($status)
    endif
@@ -373,7 +375,7 @@ if ($TagOnly == FALSE) then
    set UnChangedList = `cat $UnChanged`
 
    if ($#ChangedList > 0) then
-      Unlock
+      $MngDir/scslock unlock
       NoteD $Log ""
       NoteD $Log "There are files with conflicts to be resolved."
       NoteD $Log "See $Changed for the list."
@@ -409,7 +411,7 @@ if ($TagOnly == TRUE) then
    flog $Log $MngDir/scscom -m 'Tagging repository'
    if ($status != 0) then
       flog $Log rm -f $TmpMsg
-      Unlock
+      $MngDir/scslock unlock
       NoteD $Log "Commit FAILED"
       exit(1)
    endif
@@ -426,7 +428,7 @@ else
    if ($MsgFile == "" ) then
         flog $Log $MngDir/scscom -m "$Message"
         if ($status != 0) then
-           Unlock
+           $MngDir/scslock unlock
            NoteD $Log "Commit FAILED"
            exit(1)
         endif
@@ -438,7 +440,7 @@ else
         flog $Log $MngDir/scscom -F $TmpMsg
         if ($status != 0) then
            flog $Log rm -f $TmpMsg
-           Unlock
+           $MngDir/scslock unlock
            NoteD $Log "Commit FAILED"
            exit(1)
         endif
@@ -466,7 +468,7 @@ endif
 #
 NoteD $Log ""
 NoteD $Log "The Repository is Unlocked"
-Unlock
+$MngDir/scslock unlock
 
 #
 # untouch the local source libraries
@@ -518,7 +520,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
 endif
 
 flog $Log cd $MngDir
-flog $Log scsup -l
+flog $Log $MngDir/scsup -l
 flog $Log cat .pact-version
 flog $Log cat .pact-version-tag
 
