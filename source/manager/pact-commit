@@ -468,7 +468,8 @@ endif
 #
 NoteD $Log ""
 NoteD $Log "The Repository is Unlocked"
-$MngDir/scslock unlock
+flog $Log $MngDir/scslock unlock
+flog $Log $MngDir/scslock status
 
 #
 # untouch the local source libraries
