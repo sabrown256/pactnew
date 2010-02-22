@@ -8,14 +8,30 @@
 # include "cpyright.h"
 #
 
+set cvsopt = ""
+set svnopt = ""
+set args   = ""
+while ($#argv > 0)
+   switch ($1)
+      case -l:
+           set cvsopt = ( $cvsopt -l )
+           set svnopt = ( $svnopt --depth files )
+           breaksw
+      default:
+           set args = ( $args $1 )
+           breaksw
+   endsw
+   shift
+end
+
 if (-d CVS) then
 
-   cvs update $argv |& egrep -v '^\?' |& grep -v 'cvs update'
+   cvs update $opt $args |& egrep -v '^\?' |& grep -v 'cvs update'
 
 else if (-d .svn) then
 
-   svn update $argv
-   svn status |& egrep -v '^\?'
+   svn update $svnopt $args
+   svn status $svnopt |& egrep -v '^\?'
 
 endif
 
