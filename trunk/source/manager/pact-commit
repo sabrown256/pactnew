@@ -469,6 +469,7 @@ endif
 NoteD $Log ""
 NoteD $Log "The Repository is Unlocked"
 flog $Log $MngDir/scslock unlock
+flog $Log ls -la $MngDir/stage
 flog $Log $MngDir/scslock status
 flog $Log ls -la $MngDir/stage
 
