@@ -2,8 +2,6 @@
 #
 # PACT-GET-PACKAGE - make a copy of some PACT package on which to work
 #
-# Usage:  (see Help package... next page)
-#
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
 #
@@ -28,8 +26,6 @@ set PactPackage = PACTPK
 set Packages    = ""
 
 # Source Control System Variables
-set SCSExe        = CVS
-set CVSROOT       = ""
 set SCSRepository = ""
 set SRCDate       = ""
 
@@ -42,23 +38,23 @@ while ($#argv >= 1)
     if (`expr $argv[1] : "-."` == 2) then
    	 switch ($1)
    	    case -c:
-   		     shift
-   		     set SITE = $1
-   		     breaksw
+   		 shift
+   		 set SITE = $1
+   		 breaksw
    	    case -d:
-   		     shift
-   		     set SCSRepository = "-d $1"
-   		     breaksw
+   		 shift
+   		 set SCSRepository = "-d $1"
+   		 breaksw
    	    case -f:
-   		     shift
-   		     set ConfigDir = $1
-   		     breaksw
+   		 shift
+   		 set ConfigDir = $1
+   		 breaksw
    	    case -h:
-   		     set HELP = "TRUE"
-   		     breaksw
+   		 set HELP = "TRUE"
+   		 breaksw
    	    default:
-   		     set HELP = "TRUE"
-   		     breaksw
+   		 set HELP = "TRUE"
+   		 breaksw
    	 endsw
    	 shift
     else

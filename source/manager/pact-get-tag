@@ -1,13 +1,6 @@
 #!/bin/csh -f
-#>
-#> PACT-GET-TAG - Get the tag of the source repository header
-#>
-#> Usage:   pact-get-tag [-h] [-d]
-#>
-#> Options:
-#>    -h         Help package 
-#>    -d         Get the "date" only portion of the Code tag.
-#>
+#
+# PACT-GET-TAG - Get the tag of the source repository header
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -15,38 +8,44 @@
 # include "cpyright.h"
 #
 
-set Base        = $cwd
-set HelpCode    = $Base/$0
-
-set help     = "FALSE"
+set Base     = $cwd
 set DateOnly = "FALSE"
 
 while ($#argv > 0)
    switch ($argv[1])
       case -h:
-               set help = "TRUE"
-               breaksw
+           echo "Usage: pact-get-tag [-h] [-d]"
+           echo "   h   this help message"
+           echo "   d   get the 'date' only portion of the Code tag"
+           echo ""
+           exit(1)
+           breaksw
       case -d:
-               set DateOnly = "TRUE"
-               breaksw
+           set DateOnly = "TRUE"
       default:
-               set help = "TRUE"
+           breaksw
    endsw
    shift
 end
 
-if ($help == "TRUE") then
-   goto Help
-endif
-
 set yr = `date +%Y`
 set dt = "$yr-01-01"
 
-set inf = ( `cvs history -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
-if ($DateOnly == "TRUE") then
-   set ts  = ( `echo $inf[2] | sed 's/-/_/g' | sed 's/^20//'` )
+if (-d CVS) then
+   set inf = ( `cvs history -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
+   set inf = ( $inf[2] $inf[3] )
+else if (-d .svn) then
+   set inf = ( `svn info .pact-version |& grep "Text Last Updated" | head -n 1` )
+   set inf = ( $inf[4] $inf[5] )
 else
-   set tod = ( `echo $inf[3] | sed 's/:/ /g'` )
+   echo "none"
+   exit(1)
+endif
+
+if ($DateOnly == "TRUE") then
+   set ts  = ( `echo $inf[1] | sed 's/-/_/g' | sed 's/^20//'` )
+else
+   set tod = ( `echo $inf[2] | sed 's/:/ /g'` )
    @ hr    = $tod[1]
    @ mn    = `echo $tod[2] | sed 's/^0//'`
 
@@ -57,19 +56,10 @@ else
       @ hr = $hr + 1
       @ mn = $mn - 60
    endif
-   set ts  = ( `echo "$inf[2] $hr $mn" | awk '{printf("%s %02d:%02d", $1, $2, $3);}'` )
+   set ts  = ( `echo "$inf[1] $hr $mn" | awk '{printf("%s %02d:%02d", $1, $2, $3);}'` )
 endif
 
 echo $ts
 
-#if ($DateOnly == "TRUE") then
-#   expr "`cvs history -T -a | tail -n 1`"  : '.*\[.\(.*_.*_.*\)_.*_.*_.*'
-#else
-#   expr "`cvs history -T -a | tail -n 1`"  : '.*\[\(.*_.*_.*_.*_.*_.*\):.*'
-#endif
-
 exit($status)
 
-Help:
-   awk '($1 == "#>") {print}' $HelpCode      #Print Usage:
-   exit(1)
