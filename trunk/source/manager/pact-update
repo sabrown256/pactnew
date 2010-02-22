@@ -3,7 +3,7 @@
 # PACT-UPDATE - update/install the PACT distribution system on this machine
 # (PACT-SRC)    Some of the complexity of this process stems from the fact
 #               that there are several ways of obtaining the source:
-#                -  from a CVS repository
+#                -  from a source repository
 #                -  from an anonymous FTP node as a distribution tar file
 #                -  from an executable PACT distribution file. PACT-SRC
 #               and that the other parts of the manager interlock with
@@ -61,14 +61,10 @@ set Name = $0
 set Name = $Name:t
 
 if ($Name == "pact-update") then
-   set SrcMode = "cvs"
+   set SrcMode = "repo"
 else
    set SrcMode = "self"
 endif
-
-# Source Control System variables
-set CheckOut  = "cvs co"
-set SCSDir    = "CVS"
 
 # --------------------------------------------------------------------------
 
@@ -208,8 +204,8 @@ switch ($SrcMode)
    case source:
         breaksw
 
-# cvs repository based update
-   case cvs:
+# repository based update
+   case repo:
         breaksw
 
 # anonymous ftp based update
@@ -341,7 +337,7 @@ switch ($SrcMode)
    default:
         echo ""
         echo "I have no idea how to do an update without a tar file, a"
-        echo "CVS repository, or a network node."
+        echo "repository, or a network node."
         echo ""
         exit(1)
         breaksw
@@ -404,7 +400,9 @@ switch ($SrcMode)
 
         NoteD $Log "Checking out the PACT Sources"
 
-        flog $Log $CheckOut pact
+        set SCSDir = "CVS"
+
+        flog $Log cvs co pact
         if ($status != 0) then
            NoteD $Log ""
            NoteD $Log "  ERROR: Source Control System failed"
@@ -418,11 +416,7 @@ switch ($SrcMode)
 
 # remove the source control sub-directories
         NoteD $Log "Removing Source Control Information"
-        set List = `find . -name $SCSDir`
-        foreach i ($List)
-           rm -r $i
-        end
-
+        find . -name $SCSDir | xargs rm -r
         NoteD $Log "PACT sources checked out"
         breaksw
 endsw

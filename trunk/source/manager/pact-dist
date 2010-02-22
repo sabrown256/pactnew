@@ -1,27 +1,8 @@
 #!/bin/csh -f
-#>
-#>  Builds a self-extracting compressed tar file
-#>  of the last revision Tag from the CVSROOT source
-#>  repository for UNIX distribution.             
-#>              
-#>  Usage:
-#>    dsys dist [-c <CVSROOT>] [-s MngDir] [-h]
-#>              [-v | +v | -T] [-l [-x]]
-#>              [-r] [-k] [-Z]
-#>  
-#> Options: 
-#>    -c    use the specified CVS repository (default CVSROOT)
-#>    -h    help, prints this message
-#>    -s    directory for Source Control System info file
-#>    -v    get the distribution as of the given date mm/dd/yy
-#>    +v    get the distribution as of the given date mm/dd/yy_hh:mm:ss
-#>    -T    get the distribution for revision Tag Tyy_mm_dd_hh_mm_ss
-#>          (for tag use 'dsys info -c' or 'dsys info -t')
-#>    -l    prepare a distribution for LLNL
-#>    -x    put the extensions in a separate tar file (with -l only)
-#>    -r    export to remote source repository
-#>    -k    keep the source directory
-#>
+#
+# PACT-DIST - build a self-extracting compressed tar file
+#           - of the last revision from the source repository
+#           - repository for UNIX distribution
 #  
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -49,7 +30,7 @@ endif
 
 set System        = `./cfgman use`
 set Manager       = manager
-set HelpCode      = $MngDir/$0
+set Exe           = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )
 set DName         = "pact$DTag"
 set SCSRepository = ""
@@ -64,7 +45,6 @@ set OS            = `uname -s | tr "[A-Z]" "[a-z]"`
 
 set LLNL = FALSE
 set KEEP = FALSE
-set help = FALSE
 set Extn = FALSE
 set RepositoryExport = FALSE
 
@@ -74,57 +54,65 @@ set RMDir = "rm -rf"
 
 InitLog Log $Base/dev/$System/log/dist
 
-set Opt = "$HelpCode:t  $argv"
+set Opt = "$Exe:t  $argv"
 
 while ($#argv >= 1)
    switch ($1)
       case -c:
-               shift
-               set SCSRepository = "-d $1"
-               breaksw
+           shift
+           set SCSRepository = "-d $1"
+           breaksw
       case help:
       case -h*:
-               set help = TRUE
-               breaksw
+           echo "Usage: dsys dist [-c <CVSROOT>] [-s MngDir] [-h]"
+           echo "                 [-v | +v | -T] [-l [-x]] [-r] [-k] [-Z]"
+           echo "    -c    use the specified CVS repository (default CVSROOT)"
+           echo "    -h    this help message"
+           echo "    -s    directory for Source Control System info file"
+           echo "    -v    get the distribution as of the given date mm/dd/yy"
+           echo "    +v    get the distribution as of the given date mm/dd/yy_hh:mm:ss"
+           echo "    -T    get the distribution for revision Tag Tyy_mm_dd_hh_mm_ss"
+           echo "          (for tag use 'dsys info -c' or 'dsys info -t')"
+           echo "    -l    prepare a distribution for LLNL"
+           echo "    -x    put the extensions in a separate tar file (with -l only)"
+           echo "    -r    export to remote source repository"
+           echo "    -k    keep the source directory"
+           echo ""
+           exit(1)
+           breaksw
       case -k:
-               set KEEP = TRUE
-               breaksw
+           set KEEP = TRUE
+           breaksw
       case -l:
-               set LLNL = TRUE
-               breaksw
+           set LLNL = TRUE
+           breaksw
       case -r:
-               set RepositoryExport = TRUE
-               breaksw
+           set RepositoryExport = TRUE
+           breaksw
       case -s:
-               shift
-               set MngDir = $1
-               breaksw
+           shift
+           set MngDir = $1
+           breaksw
       case -v:
       case +v:
       case -T:
-               shift
-               set raw     = ( `date -d "$1" '+%Y_%m_%d %H:%M'` )
-               set SRCDate = ( -D "$raw" )
-               set DTag    = ( `echo $raw[1] | sed 's/^20//'` )
-               set DName   = "pact$DTag"
-               breaksw
+           shift
+           set raw     = ( `date -d "$1" '+%Y_%m_%d %H:%M'` )
+           set SRCDate = ( -D "$raw" )
+           set DTag    = ( `echo $raw[1] | sed 's/^20//'` )
+           set DName   = "pact$DTag"
+           breaksw
       case -x:
-               set Extn = TRUE
-               breaksw
+           set Extn = TRUE
+           breaksw
       default:
-               echo " "
-               echo ">>>>>>>>>>  Illegal option $1  <<<<<<<<<<"
-               echo " "
-               set help = TRUE
-               breaksw
+           echo " "
+           echo ">>>>>>>>>>  Illegal option $1  <<<<<<<<<<"
+           echo " "
+           breaksw
    endsw
    shift
 end
-
-if ($help == "TRUE") then
-   awk '($1 == "#>") {print}' $HelpCode | sed -e 's/^.. \{0,1\}//'      #print Usage:
-   exit(1)
-endif
 
 Note $Log "Source tag: $SRCDate[2]"
 
@@ -262,7 +250,8 @@ GET_SOURCE:
    flog $Log mkdir pact
    flog $Log cd pact
    Note $Log " " 
-   flog $Log cvs $SCSOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" manager auto $PactList 
+#   flog $Log cvs $SCSOpt $SCSRepository co $SRCDate[1] "$SRCDate[2-]" manager auto $PactList 
+   flog $Log $MngDir/scsco $SCSOpt $SCSRepository manager auto $PactList 
 
    if ($status == 0) then
       Note $Log "Sources checked out" 
@@ -280,7 +269,7 @@ GET_SOURCE:
 
    if (-d auto) then
       flog $Log cd auto
-      flog $Log $RMDir CVS
+      flog $Log $RMDir $SCSDir
       flog $Log mv * ..
       flog $Log cd ..
       flog $Log $RMDir auto
@@ -288,7 +277,8 @@ GET_SOURCE:
 
    NoteD $Log "Getting the documents"
    Note $Log " " 
-   flog $Log cvs $SCSOpt  $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
+#   flog $Log cvs $SCSOpt $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
+   flog $Log $MngDir/scsco $SCSOpt $SCSRepository doc
    Note $Log " " 
 
    flog $Log cd ..

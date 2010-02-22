@@ -64,7 +64,8 @@ doc scheme.FAQ score.FAQ sx.FAQ ultra.FAQ
 
 mgr clib.fncs code-date compare-date pact-analyze pact-changes
 mgr pact-commit pact-config cpyright.h pact-dist pact-dist-all
-mgr pact-dist-remote pact-gp.init pact-import pact-scs pact-send
+mgr pact-gp.init pact-import pact-scs
 mgr pact-there pact-transfer pact-update pact.c pact.manifest
 mgr cfgman systems.unix
+mgr scscom scshist scslock scstag scsup
 

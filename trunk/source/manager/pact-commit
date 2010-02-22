@@ -474,8 +474,8 @@ flog $Log $MngDir/scslock status
 #
 # untouch the local source libraries
 #
-# since CVS has touched the sources
-# lets touch the relevant files and keep the time stamps
+# since the source control system has touched the sources
+# touch the relevant files and keep the time stamps
 # properly ordered
 
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then

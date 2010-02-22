@@ -1,0 +1,59 @@
+#!/bin/csh -f
+#
+# SCSCO - check out sources whether CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?lmngdir == 0) then
+   set exe = `dirname $0`
+   if ("$exe" == ".") then
+      set lmngdir = $cwd
+   else
+      set lmngdir = $exe
+   endif
+endif
+
+set cvsopt = ""
+set svnopt = ""
+set hst    = ""
+set dir    = ""
+set pkg    = ""
+
+pushd $lmngdir >& /dev/null
+set srcdate = ( `./pact-get-tag` )
+popd >& /dev/null
+
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           set repo = $1
+           set hst  = `echo $repo | sed 's|:/.*$|'`
+           set dir  = `echo $repo | sed 's|^.*:|'`
+           set cvsopt = ( $cvsopt -d ${hst}:$dir )
+           set svnopt = ( $svnopt http://${hst}/$dir )
+           breaksw
+      default:
+           set pkg = ( $pkg $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if (-d $lmngdir/CVS) then
+
+   cvs $cvsopt co -D "$srcdate" $pkg
+
+else if (-d $lmngdir/.svn) then
+
+   svn co $svnopt -r '{' $srcdate[1] '}' $pkg
+
+endif
+
+unset lmngdir
+
+exit($status)
