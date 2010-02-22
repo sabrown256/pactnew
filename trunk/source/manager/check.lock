@@ -1,7 +1,7 @@
 #!/bin/csh -f
-#>
-#> CHECK.LOCK - check if repository is locked
-#>
+#
+# CHECK.LOCK - check if repository is locked
+#
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
 #
@@ -19,11 +19,12 @@ source $MngDir/pact-scs
 #
 # check if repository is locked
 #
-if (-e $Lock) then
+set lockst = `$MngDir/scslock status`
+if ($lockst == "locked") then
    echo ""
    echo " *** REPOSITORY IS LOCKED ***"
    echo ""
-   CatLock
+   $MngDir/scslock cat
    echo ""
    set LockOn = "YES"
 endif
@@ -33,7 +34,8 @@ if ($LockOn == "NO") then
 else
    echo -n "Sleeping ZZZZZ"
 Loop:
-   if (-e $Lock) then
+   set lockst = `$MngDir/scslock status`
+   if ($lockst == "locked") then
       echo -n "Z"
       sleep 30
       goto Loop

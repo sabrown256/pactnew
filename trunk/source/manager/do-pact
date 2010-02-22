@@ -98,7 +98,7 @@ switch ($Phase)
 
            if ("$Repo" != "") then
               setenv CVSROOT $Repo
-              Note $LogHost "CVS Setup: $CVSROOT $CVS_RSH"
+              Note $LogHost "CVS Setup: $CVSROOT"
            endif
 
 # if syncing from the repository

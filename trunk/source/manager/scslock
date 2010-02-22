@@ -1,0 +1,199 @@
+#!/bin/csh -f
+#
+# SCSLOCK - lock the repository whether CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+if ($?MngDir == 0) then
+   set MngDir = $cwd
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: scslock lock | unlock | status | cat"
+           echo ""
+           exit(1)
+      case lock:
+           set oper = lock
+           breaksw
+      case unlock:
+           set oper = unlock
+           breaksw
+      case status:
+           set oper = status
+           breaksw
+      case cat:
+           set oper = cat
+           breaksw
+   endsw
+   shift
+end
+
+# initial lock message
+if ($oper == lock) then
+   set Host    = `uname -n`
+   set WhoIAm  = $USER
+
+# for commits
+   if ($?TagOnly == 1) then
+      if ($TagOnly == TRUE) then
+         set Date = `/bin/date '+T%y_%m_%d_%H_%M_%S'`
+      else
+         set Date = `/bin/date '+D%y_%m_%d_%H_%M_%S'`
+      endif
+
+# for other repository interactions
+   else
+      set Date = `/bin/date '+%y_%m_%d_%H_%M_%S'`
+   endif
+
+   if ($?TagAnn == 1) then
+      set Message = (\'<$WhoIAm $TagAnn $Date|$Host> $argv\')
+   else
+      set Message = (\'<$WhoIAm|$Date|$Host> $argv\')
+   endif
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CVS
+
+if (-d CVS) then
+
+   if ($?CVSROOT == 1) then
+      set repohost = `echo $CVSROOT | sed 's|:/.*$||' | sed 's|^.*@||'`
+      set repodir  = `echo $CVSROOT | sed 's|^.*:||'`
+   else
+      set repohost = ""
+   endif
+
+# handle the LOCAL repository case
+   if ("$repohost" == "") then
+      if ($?CVSROOT) then
+         if (`expr "$CVSROOT" : '.*\(:\).*'` == "") then
+            set Lock = $CVSROOT/commit.lock
+         else
+            set Lock = commit.lock
+         endif
+      else
+         set Lock = commit.lock
+      endif
+
+      switch ($oper)
+         case lock:
+              touch $Lock
+              chmod 660 $Lock
+              echo $Message >> $Lock
+              breaksw
+         case unlock:
+              rm -f $Lock
+              breaksw
+         case status:
+              if (-e $Lock) then
+                 echo "locked"
+              else
+                 echo "unlocked"
+              endif
+              breaksw
+         case cat:
+              cat $Lock
+              breaksw
+      endsw
+
+# handle the REMOTE repository case
+   else
+      if ($?CVS_RSH == 0) then
+         setenv CVS_RSH  ssh
+      endif
+      if ($?RCP == 0) then
+         setenv RCP      scp
+      endif
+
+      set Stage   = "$MngDir/stage"
+      set Lock    = "$Stage/commit.lock"
+      set RemLock = "$repodir/commit.lock"
+
+      if (!(-d $Stage)) then
+         mkdir $Stage
+         chmod 770 $Stage
+      endif
+
+      switch ($oper)
+         case lock:
+              touch $Lock
+              chmod 660 $Lock
+              echo $Message >> $Lock
+              $RCP $Lock ${repohost}:${repodir} >& /dev/null
+              breaksw
+         case unlock:
+              rm -f $Lock
+              $CVS_RSH $repohost rm -f $RemLock
+              breaksw
+         case status:
+              if ($?DoingConfig == 0) then
+                 set inf   = `$CVS_RSH $repohost ls $repodir`
+                 set elock = FALSE
+                 foreach i ($inf)
+                    set entry = $i:h
+                    if ("$entry" == "commit.lock") then
+                       set elock = TRUE
+                    endif
+                 end
+                 unset inf
+                 if ($elock == TRUE) then
+                    echo "locked"
+                 else
+                    echo "unlocked"
+                 endif
+              endif
+              breaksw
+         case cat:
+              $CVS_RSH $repohost cat $RemLock
+              breaksw
+      endsw
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SVN
+
+else if (-d .svn) then
+
+   set Stage = "$MngDir/stage"
+   set Lock  = "$Stage/commit.lock"
+   switch ($oper)
+      case lock:
+           touch $Lock
+           chmod 660 $Lock
+           echo $Message >> $Lock
+           breaksw
+      case unlock:
+           rm -f $Lock
+           breaksw
+      case status:
+           if (-e $Lock) then
+              echo "locked"
+           else
+              echo "unlocked"
+           endif
+           breaksw
+      case cat:
+           cat $Lock
+           breaksw
+   endsw
+#   svn lock
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($status)

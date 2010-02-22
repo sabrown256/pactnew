@@ -2241,11 +2241,12 @@ CFG_DONE:
         if ($Sleep == "YES") then
            manager/check.lock
         else
-           if ($ExistLock == TRUE) then
+           set lockst = `$MngDir/scslock status`
+           if ($lockst == "locked") then
               echo ""
               echo " *** REPOSITORY IS LOCKED ***"
               echo ""
-              CatLock
+              $MngDir/scslock cat
               echo ""
               echo ""
               exit(1)
@@ -2707,7 +2708,7 @@ endif
 
         call SCS_SETUP()
 
-        Unlock
+        $MngDir/scslock unlock
         set RStatus = $status
         breaksw        
 

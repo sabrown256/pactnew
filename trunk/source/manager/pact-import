@@ -30,7 +30,7 @@ set DEBUG         = FALSE
 set DateFile      = $CVSROOT/.import-date
 set TagFile       = $CVSROOT/.import-tag
 set ImportingDir  = $cwd
-set MngDir        = "."
+set MngDir        = $cwd
 set SCSRepository = ""
 set SRCDate       = ""
 set Host          = `uname -n`
@@ -121,11 +121,12 @@ endif
    flog $Log source $MngDir/pact-scs
 
 # check if repository is locked
-   if ($ExistLock == TRUE) then
+   set lockst = `$MngDir/scslock status`
+   if ($lockst == "locked") then
       NoteD $Log ""
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      CatLock
+      $MngDir/scslock cat
       NoteD $Log ""
       exit(1)
    endif
@@ -298,7 +299,7 @@ BACKUP:
    Note $Log ""
 
 # initiate a lock on the repository
-   Makelock
+   $MngDir/scslock lock
    Note $Lock $Message
    Note $Lock "Source: $SrcFile" 
 
@@ -376,8 +377,6 @@ GET_OLD:
 
    flog $Log cvs co $SCSTag pact
    flog $Log set ErrStat = $status
-
-   KillZombie
 
    flog $Log popd
    Note $Lock "done" 
@@ -719,7 +718,6 @@ UPDATE:
 
    if ($SCSTag != "") then
       flog $Log (cvs update -A >&! $TmpFile)
-      KillZombie
    else
       flog $Log cd pact
       flog $Log (cvs update >&! ../$TmpFile)
@@ -785,7 +783,6 @@ COMMIT:
    flog $Log cvs commit -m "***** Import from $CodeDate *****"
    set ErrStat = $status
 
-   KillZombie
    if ($ErrStat != 0) then
       NoteD $Log "Error status = " $Error
       NoteD $Log "COMMIT failed, check sources in manager/import"
@@ -824,8 +821,6 @@ TAG:
 
    flog $Log cvs rtag $TagID pact
 
-   KillZombie
-
    flog $Log popd
    Note $Lock "done" 
 
@@ -860,7 +855,6 @@ CVS_IMPORT:
    NoteD $Log "Importing sources from $cwd into $Repository"
    flog $Log cvs import -m "Import from $CodeDate" $Repository v$CodeDate r$CodeDate
    set ErrStat = $status
-   KillZombie
    if ($ErrStat != 0) then
       NoteD $Log "IMPORT failed, check sources in manager/import"
       exit(1)
@@ -872,7 +866,6 @@ CVS_IMPORT:
 
    flog $Log cvs update -jv$CodeDate:yesterday -jv$CodeDate
    set ErrStat = $status
-   KillZombie
    if ($ErrStat != 0) then
       NoteD $Log "MERGE failed, check sources in manager/import"
       exit(1)
@@ -907,7 +900,7 @@ FINISH:
 
 # release the lock
    NoteD $Log "The repository is unlocked"
-   Unlock
+   $MngDir/scslock unlock
 
    NoteD $Log ""
    NoteD $Log "Version $CodeDate imported"
