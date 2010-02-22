@@ -32,10 +32,10 @@ while ($#argv > 0)
       case -d:
            shift
            set repo = $1
-           set hst  = `echo $repo | sed 's|:/.*$|'`
-           set dir  = `echo $repo | sed 's|^.*:|'`
+           set hst  = `echo $repo | sed 's|:/.*$||'`
+           set dir  = `echo $repo | sed 's|^.*:||'`
            set cvsopt = ( $cvsopt -d ${hst}:$dir )
-           set svnopt = ( $svnopt http://${hst}/$dir )
+           set svnopt = ( $svnopt http://${hst}$dir )
            breaksw
       default:
            set pkg = ( $pkg $1 )
@@ -50,7 +50,8 @@ if (-d $lmngdir/CVS) then
 
 else if (-d $lmngdir/.svn) then
 
-   svn co $svnopt -r '{' $srcdate[1] '}' $pkg
+   set dt = "$srcdate[1]"
+   svn co $svnopt -r "{${dt}}" $pkg
 
 endif
 
