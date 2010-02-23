@@ -145,7 +145,7 @@ endif
       call COMMIT(import/old)
       call TAG(import/old)
    else
-      call CVS_IMPORT(import)
+      call SCS_IMPORT(import)
    endif
 
    call FINISH()
@@ -354,7 +354,7 @@ GET_NEW:
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# GET_OLD - cvs checkout the sources tagged from the last import
+# GET_OLD - checkout the sources tagged from the last import
 #         - these will be referred to as the old sources
 #         - work in the import directory
 #         - make the old directory
@@ -424,7 +424,7 @@ PROCESS_OLD:
 
    Note $Log "process the old sources"
    flog $Log cd pact
-   flog $Log (find . -name CVS -prune -o -print >! ../$TmpFile.lst)
+   flog $Log (find . -name $SCSDir -prune -o -print >! ../$TmpFile.lst)
    flog $Log (cat ../$TmpFile.lst | $ltmp)
    flog $Log cd ..
    Note $Log ""
@@ -485,7 +485,7 @@ ADJUST_OLD_TREE:
 # list all the directories of this tree sorted from most nested to least
 # then remove them if they have no counterpart in the other tree
    flog $Log cd pact
-   flog $Log (find . -type d \! -name CVS | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
+   flog $Log (find . -type d \! -name $SCSDir | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
 
    NoteD $Log "   The following directories do not exist for import:"
    ftee $Log (cat ../$TmpFile.lst | $ltmp)
@@ -582,7 +582,7 @@ ADJUST_NEW_TREE:
 
 # list all the directories of this tree sorted from most nested to least
    flog $Log cd pact
-   flog $Log (find . -type d \! -name CVS -exec $ltmp {} \; >! ../$TmpFile.lst)
+   flog $Log (find . -type d \! -name $SCSDir -exec $ltmp {} \; >! ../$TmpFile.lst)
    flog $Log cat ../$TmpFile.lst
    flog $Log @ AddNew = `wc -l ../$TmpFile.lst | awk '{print $1}'`
    Note $Log ""
@@ -829,12 +829,12 @@ TAG:
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# CVS_IMPORT - not quite what we want for our "imports"
+# SCS_IMPORT - not quite what we want for our "imports"
 #            - coded up anyway to experiment
 #            - or to make a repository if there is not one existing
 #            - working directory should be import
 
-CVS_IMPORT:
+SCS_IMPORT:
 
    set WDir = $args_[1]
 

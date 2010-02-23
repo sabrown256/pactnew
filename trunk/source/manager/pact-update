@@ -400,9 +400,9 @@ switch ($SrcMode)
 
         NoteD $Log "Checking out the PACT Sources"
 
-        set SCSDir = "CVS"
-
-        flog $Log cvs co pact
+        set SCSDir = ".svn"
+        set root   = pactnew-read-only
+        flog $Log svn co http://pactnew.googlecode.com/svn/trunk/ $root
         if ($status != 0) then
            NoteD $Log ""
            NoteD $Log "  ERROR: Source Control System failed"
@@ -411,8 +411,8 @@ switch ($SrcMode)
         endif
 
 # delete an unnecessary directory layer */
-        flog $Log mv pact/* .
-        flog $Log rmdir pact
+        flog $Log mv $root/source/{.svn,*} .
+        flog $Log rm -r $root
 
 # remove the source control sub-directories
         NoteD $Log "Removing Source Control Information"

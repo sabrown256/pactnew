@@ -1284,26 +1284,26 @@ CFG_DONE:
 
         set All = "seld"
 
-        set ROOT   = `$Which smake`
-        set BINDIR = $ROOT:h
-        set CVSROOTDir = ""
-        set SrcDir = ""
-        set BinDir = ""
-        set LibDir = ""
-        set IncDir = ""
-        set MgrDir = ""
-        set DocDir = ""
-        set ManDir = ""
-        set Tags   = ""
-        set ChkVer = ""
+        set ROOT    = `$Which smake`
+        set BINDIR  = $ROOT:h
+        set RepoDir = ""
+        set SrcDir  = ""
+        set BinDir  = ""
+        set LibDir  = ""
+        set IncDir  = ""
+        set MgrDir  = ""
+        set DocDir  = ""
+        set ManDir  = ""
+        set Tags    = ""
+        set ChkVer  = ""
 
         while ($#argv > 0)
            set All = ""
            switch ($1)
               case -c:
               case log:
-                   set TDir = ( `echo "$CVSROOT" | sed 's/:/ /'` )
-                   set CVSROOTDir = `echo $TDir[$#TDir]/CVSROOT`
+                   set TDir    = ( `echo "$CVSROOT" | sed 's/:/ /'` )
+                   set RepoDir = `echo $TDir[$#TDir]/CVSROOT`
                    shift
                    if ($#argv > 0) then
                       set Date = ""
@@ -1323,9 +1323,9 @@ CFG_DONE:
                             default:
                                  set Tag = "|$1|"
                                  if ("$Date" == "") then
-                                    grep $Tag $CVSROOTDir/commitlog
+                                    grep $Tag $RepoDir/commitlog
                                  else
-                                    grep $Tag $CVSROOTDir/commitlog |&  \
+                                    grep $Tag $RepoDir/commitlog |&  \
                                     sed "s/'//g"                    |&  \
                                     sed 's/\"//g'                   |&  \
                                     awk '$4 >= "D'$Date'" { print }'
@@ -1338,7 +1338,7 @@ CFG_DONE:
                    else
                       echo ""
                       echo "PACT commit log:"
-                      eval "more $CVSROOTDir/commitlog"
+                      eval "more $RepoDir/commitlog"
                    endif
                    break
                    breaksw
@@ -1389,10 +1389,7 @@ CFG_DONE:
                    breaksw
 
               case -s:
-                   if ($?CVSROOT == 1) then
-                      set SrcDir = `echo $CVSROOT`
-                      set SrcDir = $SrcDir:h/wrk
-                   endif
+                   set SrcDir = $DAI_ROOT/pact/wrk
                    breaksw
 
               case -t:
@@ -1420,10 +1417,7 @@ CFG_DONE:
         end
 
         if ($All != "") then
-           if ($?CVSROOT == 1) then
-              set SrcDir = `echo $CVSROOT`
-              set SrcDir = $SrcDir:h/wrk
-           endif
+           set SrcDir = $DAI_ROOT/pact/wrk
            set BinDir = "$BINDIR"
            set LibDir = ( "$BINDIR:h""/lib" )
            set IncDir = ( "$BINDIR:h""/include" )
@@ -1612,7 +1606,7 @@ CFG_DONE:
 # REPOSITORY
         if ("$Tags" != "") then
            echo ""
-           echo "PACT revision tags (cvs history -T -a):"
+           echo "PACT revision tags:"
            eval "($MngDir/scshist $Tags | tail -n 20 )"
         endif
 
@@ -1736,7 +1730,7 @@ CFG_DONE:
 
         set DO_PACT = $MngDir/do-pact
 
-        flog $LogFile cvs update
+        flog $LogFile $MngDir/scsup
         Note $LogFile do-net -e $DO_PACT $DArgs $CArgs
 
         do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
@@ -2253,7 +2247,7 @@ CFG_DONE:
            endif
         endif
 
-# define the Source Control System (repeat to define -n cvs option)
+# define the Source Control System (repeat to define -n option)
         source ./manager/pact-scs
 
         if ($Quiet == FALSE) then
@@ -2273,18 +2267,9 @@ CFG_DONE:
         Separator $Log
         flog $Log pwd
         flog $Log printenv
-if (1) then
+
         flog $Log $MngDir/scsup
         set ErrStat = $status
-else
-        if ($?CVSROOT == 1) then
-           flog $Log cvs $SCSOpt -d $CVSROOT update -d
-           set ErrStat = $status
-        else
-           flog $Log cvs $SCSOpt update -d
-           set ErrStat = $status
-        endif
-endif
 
 # take care of conflicting changes
         flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)
