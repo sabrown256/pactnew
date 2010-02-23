@@ -17,6 +17,9 @@ if ($?lmngdir == 0) then
    endif
 endif
 
+# work in the manager directory
+cd $lmngdir >& /dev/null
+
 set lmsg   = ""
 set lock   = ""
 set lstage = "$lmngdir/stage"
