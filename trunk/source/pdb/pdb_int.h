@@ -28,6 +28,8 @@
 
 #define CRAY_BYTES_WORD   8
 
+#define PD_TYPE_PLACEHOLDER     "typename#placeholder"
+
 #define _PD_entry_get_number(_e, _n)                                         \
    (((_e) != NULL) ? _PD_block_get_number((_e)->blocks, _n) : 0)
 

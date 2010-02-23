@@ -27,10 +27,6 @@
 #define NPREFIX            26
 #define N_OUTPUT_DEVICES    5
 
-/* SX input spoke global definitions */
-#define SX_TYPE_PLACEHOLDER     "typename#placeholder"
-#define SX_TYPE_PLACEHOLDER_LEN 20
-
 /*--------------------------------------------------------------------------*/
 
 /*                            PROCEDURAL MACROS                             */

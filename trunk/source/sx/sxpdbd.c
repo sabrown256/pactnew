@@ -168,7 +168,7 @@ static int _SX_check_pointers(PDBfile *pfa, PDBfile *pfb,
  */
 
 int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
-   {int ret;
+   {int ret, ln;
     char *token;
     defstr *dpa, *dpb;
     memdes *dea, *deb;
@@ -194,8 +194,9 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
     ret = TRUE;
 
 /* ONLY do typename checking if both types are not input spoke placeholder typenames */
-    if ((strncmp(typa, SX_TYPE_PLACEHOLDER, SX_TYPE_PLACEHOLDER_LEN) != 0) && 
-        (strncmp(typb, SX_TYPE_PLACEHOLDER, SX_TYPE_PLACEHOLDER_LEN) != 0))
+    ln = strlen(PD_TYPE_PLACEHOLDER);
+    if ((strncmp(typa, PD_TYPE_PLACEHOLDER, ln) != 0) && 
+        (strncmp(typb, PD_TYPE_PLACEHOLDER, ln) != 0))
 
 /* this assumes typenames are of the form "T *" and not "T*" */
        {strcpy(bf, typa);
