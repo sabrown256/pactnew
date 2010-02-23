@@ -50,8 +50,12 @@ if (-d $lmngdir/CVS) then
 
 else if (-d $lmngdir/.svn) then
 
+   set root = `grep manager $lmngdir/.svn/entries | sed 's|/manager$||'`
+
    set dt = "$srcdate[1]"
-   svn co $svnopt -r "{${dt}}" $pkg
+   foreach p ( $pkg )
+      svn co $svnopt -r "{${dt}}" ${root}/$p
+   end
 
 endif
 

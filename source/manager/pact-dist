@@ -284,7 +284,8 @@ GET_SOURCE:
    flog $Log cd ..
 
 # release the lock
-   $MngDir/scslock unlock
+   flog $Log $MngDir/scslock unlock
+   flog $Log $MngDir/scslock status
 
    flog $Log ls -lR pact
 
