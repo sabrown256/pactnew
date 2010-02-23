@@ -285,8 +285,6 @@ ${BinDir}/scexts : ${TGTLib} scexts.c
 #
 mpitty : ${BinDir}/sctty ${BinDir}/mpi-io-wrap
 
-# GOTCHA: mpi-io-wrap cannot be built this way in a CROSS_COMPILE situation
-# the /bin/true gets us by for now - remove when properly fixed
 ${BinDir}/mpi-io-wrap : ${TGTLib} scwrap.c
 	( ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs} ; /bin/true )
 
