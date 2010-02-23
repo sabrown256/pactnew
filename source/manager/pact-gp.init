@@ -14,8 +14,7 @@ set IncDir = /usr/local/include
 set HELP   = "FALSE"
 
 set CodeDir     = $LocDir/$Code
-set Manager     = $CodeDir/manager
-set CodeManager = manager
+set MngDir      = $CodeDir/manager
 set COLog       = $LocDir/checkout.log
 set ConfigDir   = "./"
 set SITE        = ""
@@ -65,7 +64,7 @@ end
 
 if ($HELP == "TRUE") then
    echo ""
-   echo " Usage: pact-get-package -c <site> [-d <CVSROOT>] [-f <directory>] <package 1> ... "
+   echo " Usage: pact-get-package -c <site> [-d <repo>] [-f <directory>] <package 1> ... "
    echo ""
    echo " Options:  c - configure the environment for <site>, gets the site configuration info "
    echo "               from <site>.config, Note: -c <site> may be omited if a pact/manager "
@@ -80,7 +79,7 @@ if ($HELP == "TRUE") then
    echo "                  -    solaris Sun Solaris systems		   " 
    echo "               (check manager/local for any local configs)" 
    echo ""
-   echo "           d - specify a CVSROOT instead of the environment variable"
+   echo "           d - specify a repository instead of using the environment variable"
    echo "           f - a directory containing configuration files"
    echo "               (default ...pact/manager/std)"
    echo ""
@@ -126,7 +125,7 @@ endif
 
 cd $CodeDir
 
-if (!(-d $Manager)) then
+if (!(-d $MngDir)) then
    if ($SITE == "") then
       echo " "
       echo "ERROR: SITE must be supplied"
@@ -143,10 +142,10 @@ endif
 if ($GetManager == "TRUE") then
    echo ""
    echo "Getting the PACT Manager"
-   $CheckOut $CodeManager >>& $COLog
-   if (-d $Manager/$Code/doc/$CodeManager) then
-      mv $Manager/$Code/doc/$CodeManager $Manager/doc
-      rm -r $Manager/$Code
+   $CheckOut manager >>& $COLog
+   if (-d $MngDir/$Code/doc/manager) then
+      mv $MngDir/$Code/doc/manager $MngDir/doc
+      rm -r $MngDir/$Code
    endif
    set GotManager = "TRUE"
 endif
@@ -187,7 +186,7 @@ endif
 # change the configuration if requested
 if (($GotManager == "TRUE") || ($SITE != "")) then
 
-   cd $Manager
+   cd $MngDir
    chmod a+x pact-*
    echo "Configure local copy of PACT"
 

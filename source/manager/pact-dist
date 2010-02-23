@@ -64,9 +64,9 @@ while ($#argv >= 1)
            breaksw
       case help:
       case -h*:
-           echo "Usage: dsys dist [-c <CVSROOT>] [-s MngDir] [-h]"
+           echo "Usage: dsys dist [-c <repo>] [-s MngDir] [-h]"
            echo "                 [-v | +v | -T] [-l [-x]] [-r] [-k] [-Z]"
-           echo "    -c    use the specified CVS repository (default CVSROOT)"
+           echo "    -c    use the specified repository (default to current source repository)"
            echo "    -h    this help message"
            echo "    -s    directory for Source Control System info file"
            echo "    -v    get the distribution as of the given date mm/dd/yy"
@@ -250,15 +250,13 @@ GET_SOURCE:
    flog $Log mkdir pact
    flog $Log cd pact
    Note $Log " " 
-#   flog $Log cvs $SCSOpt $SCSRepository co $SRCDate[1] "$SRCDate[2-]" manager auto $PactList 
    flog $Log $MngDir/scsco $SCSOpt $SCSRepository manager auto $PactList 
 
    if ($status == 0) then
       Note $Log "Sources checked out" 
    else
-      Note $Log "Source check out failed" 
-      Note $Log "CVSROOT = $CVSROOT"
-      echo "Source check out failed" 
+      NoteD $Log "Source check out failed" 
+      Note $Log "SCSRepository = $SCSRepository"
       echo "See $Log"
 
 # release the lock
@@ -277,7 +275,6 @@ GET_SOURCE:
 
    NoteD $Log "Getting the documents"
    Note $Log " " 
-#   flog $Log cvs $SCSOpt $SCSRepository co $SRCDate[1] "$SRCDate[2-]" doc
    flog $Log $MngDir/scsco $SCSOpt $SCSRepository doc
    Note $Log " " 
 
