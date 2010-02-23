@@ -71,7 +71,7 @@ EOF
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
-      set libl = ( $libl $PckLib $LD_Lib )
+      set libl = ( $libl $PckLib )
       set spkl = ( $spkl mysql )
 
       setenv HAVE_MYSQL  TRUE
@@ -119,7 +119,7 @@ EOF
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
-      set libl = ( $libl $PckLib $LD_Lib )
+      set libl = ( $libl $PckLib )
       set spkl = ( $spkl sqlite )
 
       setenv HAVE_SQLITE TRUE
@@ -169,7 +169,7 @@ EOF
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
-      set libl = ( $libl $PckLib $LD_Lib )
+      set libl = ( $libl $PckLib )
 
       setenv HAVE_SQLITE_V2 TRUE
       setenv HAVE_SQLITE    TRUE

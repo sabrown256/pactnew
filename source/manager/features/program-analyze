@@ -39,6 +39,9 @@ run ../analyze/tracker
 # system features
 run ../analyze/features
 
+# I/O
+run ../analyze/io
+
 # graphics
 run ../analyze/graphics
 

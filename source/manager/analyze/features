@@ -36,8 +36,6 @@ $AnaDir/fpe
 
 $AnaDir/math
 $AnaDir/libz
-$AnaDir/hdf5
-$AnaDir/sql
 
 NoteD $ALog "   C Library Features:"
 

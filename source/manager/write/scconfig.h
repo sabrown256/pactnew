@@ -144,6 +144,7 @@ source $ldir/env-csh
     set lhave = ( $lhave HavePythonNumeric   HAVE_PYTHON_NUMERIC )
     set lhave = ( $lhave HavePythonNumpy     HAVE_PYTHON_NUMPY )
     set lhave = ( $lhave HAVE_FLEX_SCANNER   USE_FLEX )
+    set lhave = ( $lhave HAVE_HDF5           none )
     set lhave = ( $lhave HAVE_SQL            none )
     set lhave = ( $lhave HAVE_MYSQL          none )
     set lhave = ( $lhave HAVE_SQLITE         none )
