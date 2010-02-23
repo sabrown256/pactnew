@@ -1302,8 +1302,12 @@ CFG_DONE:
            switch ($1)
               case -c:
               case log:
-                   set TDir    = ( `echo "$CVSROOT" | sed 's/:/ /'` )
-                   set RepoDir = `echo $TDir[$#TDir]/CVSROOT`
+                   if (-d CVS) then
+                      set RepoDir = `cat CVS/Root | sed 's|^.*:||'`/CVSROOT
+                   else
+                      echo "Not prepared for SVN yet"
+                      exit(1)
+                   endif
                    shift
                    if ($#argv > 0) then
                       set Date = ""
@@ -1340,6 +1344,9 @@ CFG_DONE:
                       echo "PACT commit log:"
                       eval "more $RepoDir/commitlog"
                    endif
+
+                   unset RepoDir
+
                    break
                    breaksw
 
@@ -2856,10 +2863,6 @@ GEN_CONFIG:
 #--------------------------------------------------------------------------
 
 SCS_SETUP:
-
-   if ($?CVSROOT == 0) then
-      source ~/.cshrc
-   endif
 
    source $MngDir/pact-scs
 
