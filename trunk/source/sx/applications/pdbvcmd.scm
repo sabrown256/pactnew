@@ -197,8 +197,13 @@
 	   (lst nil))
 
           (define (match x)
-              (if (string=? d (substring x 0 n))
-		  (set! lst (cons x lst))))
+              (cond ((string=? d (substring x 0 n))
+		     (set! lst (cons x lst)))
+
+; for files without directories
+		    ((and (not (string=? (substring x 0 1) "/"))
+			  (string=? d "/"))
+		     (set! lst (cons x lst)))))
 
           (for-each match all)
 
@@ -3142,3 +3147,4 @@
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
+
