@@ -33,7 +33,7 @@ else
 #include <hdf5.h>
 int main(int c, char **v)
 {H5_init_library();
- H5Eset_auto(NULL, stderr);
+ H5Eset_auto(H5E_DEFAULT, NULL, stderr);
  H5check_version(H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
  return(0);}
 EOF
@@ -49,7 +49,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = hdf5
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib )
+   set lALibs   = ( $LD_Lib -lm $ZLib )
    set Implicit = FALSE
 
    source $AnaDir/find-package
@@ -74,11 +74,11 @@ EOF
    setenv HDFInc "$PckInc"
 
 # export the results
-   SetParent HAVE_HDF5
-   SetParent HDFInc
-   SetParent HDFLib
    SetParent CC_Inc
    SetParent LD_Lib
+   SetParent HDFInc
+   SetParent HDFLib
+   SetParent HAVE_HDF5
 
 endif
 

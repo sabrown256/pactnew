@@ -170,11 +170,15 @@ HAVE_SUBROUTINES
     Note $FOUT '}'
     Note $FOUT ''
 
+    set llibs = ""
+    set llibs = ( $llibs $cmplib )
+    set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
+
     if ($CCBin != none) then
        Note $FOUT 'Tool : cc_pact {'
        Note $FOUT '  ToolClass    = CGroup'
        Note $FOUT '  BinDir       = '$CCBin
-       Note $FOUT '  LibDir       = '$cmplib
+       Note $FOUT '  LibDir       = '$llibs
        Note $FOUT '  Exe          = '$Cfe_CC_Exe
 
 # NOTE: eventually remove this when Lee says so
@@ -192,7 +196,7 @@ HAVE_SUBROUTINES
        Note $FOUT 'Tool : fc_pact {'
        Note $FOUT '  ToolClass    = FGroup'
        Note $FOUT '  BinDir       = '$FCBin
-       Note $FOUT '  LibDir       = '$cmplib
+       Note $FOUT '  LibDir       = '$llibs
        Note $FOUT '  Exe          = '$Cfe_FC_Exe
 
 # NOTE: eventually remove this when Lee says so
