@@ -736,7 +736,7 @@ static char *_H5_handle_compound(hid_t dtid)
         DEBUG1("      # members %d\n", num_memb);
        
 /* create a unique type name placeholder */ 
-        snprintf(tempname, BUFFER_SIZE, "%s%d", SX_TYPE_PLACEHOLDER, _h5.nstr);
+        snprintf(tempname, BUFFER_SIZE, "%s%d", PD_TYPE_PLACEHOLDER, _h5.nstr);
         _h5.nstr++;
         typename = SC_strsavef(tempname, "_H5_HANDLE_COMPOUND:typename");
         _H5_register(dtid, typename);
@@ -830,7 +830,8 @@ static char *_H5_handle_compound(hid_t dtid)
 #endif
    
 /* after fully parsing the members, construct the defstr */
-        _PD_defstr_inst(typename, member_entry, -1, NULL, NULL, _h5.pf, FALSE);
+        _PD_defstr_inst(_h5.pf, typename, STRUCT_KIND, member_entry,
+			NO_ORDER, NULL, NULL, FALSE);
 
 #if 0
         struct_entry = _PD_mk_defstr(NULL, typename, member_entry, 
@@ -1088,7 +1089,7 @@ static PDBfile *_H5_create(SC_udl *pu, char *name, void *a)
     H5Eset_auto(H5E_DEFAULT, NULL, stderr);
 
 /* make sure it really is an HDF5 file */
-/*    _h5.hf = H5Fcreate(name, H5F_ACC_RW, H5P_DEFAULT); */
+    _h5.hf = H5Fcreate(name, H5F_ACC_RDWR, H5P_DEFAULT, H5P_DEFAULT);
 
 /* return if this is not a valid HDF5 file */
     if (_h5.hf < 0)
@@ -1248,8 +1249,7 @@ static PDBfile *_H5_open(SC_udl *pu, char *name, char *mode)
 /* if we were unsuccessful, alert the user */
     if (status < 0) 
        {_H5_close(file);
-	file = NULL;
-	SS_error("CAN'T PARSE FILE - _H5_OPEN", SS_null);};
+	file = NULL;};
 
     SFREE(_h5.group_prefix);
 

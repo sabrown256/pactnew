@@ -46,11 +46,11 @@ EOF
       set lLibDirs = ( /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
    endif
    set lHdrs    = ( hdf5.h )
-   set ASList   = ( a so )
+   set ASList   = ( so a )
    set lLib     = hdf5
    set lFile    = $Tmp
    set lALibs   = ( $LD_Lib -lm $ZLib )
-   set Implicit = FALSE
+   set Implicit = TRUE
 
    source $AnaDir/find-package
 
@@ -61,8 +61,10 @@ EOF
          setenv CC_Inc "$CC_Inc $PckInc"
       endif
 
-      setenv LD_Lib     "$PckLib $LD_Lib"
-      setenv HAVE_HDF5  TRUE
+      setenv Cfg_LD_RPath  ${Cfg_LD_RPath}:${HDF_RPath}
+      setenv LD_RPath      ${LD_RPath}:${HDF_RPath}
+      setenv LD_Lib        "$PckLib $LD_Lib"
+      setenv HAVE_HDF5     TRUE
    else
       NoteD $ALog "      no compatible HDF5 version"
       setenv HAVE_HDF5 ""
@@ -76,6 +78,8 @@ EOF
 # export the results
    SetParent CC_Inc
    SetParent LD_Lib
+   SetParent LD_RPath
+   SetParent Cfg_LD_RPath
    SetParent HDFInc
    SetParent HDFLib
    SetParent HAVE_HDF5

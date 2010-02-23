@@ -86,6 +86,7 @@ if ($Implicit == TRUE) then
       flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
       set xstatus = $status
       if ($xstatus == 0) then
+         flog $ALog setenv LD_LIBRARY_PATH $i
          flog $ALog eval $lFile
          set xstatus = $status
          if ($xstatus == 0) then
@@ -96,6 +97,7 @@ if ($Implicit == TRUE) then
             Note $ALog "    exec failed ($xstatus) with -l$lLib (implicit)"
             flog $ALog ls -l $lFile*
          endif
+         flog $ALog unsetenv LD_LIBRARY_PATH
       else
          Note $ALog "    build failed ($xstatus) with -l$lLib (implicit)"
       endif
