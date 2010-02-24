@@ -49,10 +49,10 @@
  *           -     X1 + (X2-X1)t1 = X3   and    X1 + (X2-X1)t2 = X4
  */
 
-static int _PM_cross(double x1, double y1, double x2, double y2,
-                     double x3, double y3, double x4, double y4,
-                     double *px0, double *py0,
-                     int line1, int line2)
+int _PM_cross(double x1, double y1, double x2, double y2,
+	      double x3, double y3, double x4, double y4,
+	      double *px0, double *py0,
+	      int line1, int line2)
    {int cross_flag;
     double a, b, dx21, dy21, dx43, dy43, dx13, dy13, idx, idy;
     double d, t1, t2;
