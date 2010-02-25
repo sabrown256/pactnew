@@ -12,7 +12,7 @@ source ../../tests/common
 
 set ok = TRUE
 if ($?CROSS_COMPILE == 1) then
-   if ($CROSS_COMPILE == TRUE) then
+   if ($CROSS_COMPILE != FALSE) then
       set ok = FALSE
    endif
 endif

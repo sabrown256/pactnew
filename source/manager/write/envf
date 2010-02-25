@@ -128,8 +128,15 @@ source $ldir/env-csh
        Note $EnvDk 'dk_alter  PATH    '$RootDir'/bin'
     endif
 
-    Note $EnvCsh "setenv SCHEME  $RootDir/scheme"
+# write the CSH version like this because PCSH scripts like
+# PDBView need to get the users SCHEME variable if defined
+    Note $EnvCsh 'if ($?SCHEME == 1) then
+    Note $EnvCsh "   setenv SCHEME  ${SCHEME}:$RootDir/scheme"
+    Note $EnvCsh 'else'
+    Note $EnvCsh "   setenv SCHEME  $RootDir/scheme"
+    Note $EnvCsh 'endif'
     Note $EnvCsh "setenv ULTRA   $RootDir/scheme"
+
     Note $EnvSh "export SCHEME=$RootDir/scheme"
     Note $EnvSh "export ULTRA=$RootDir/scheme"
     Note $EnvDk "dk_setenv SCHEME  $RootDir/scheme"
