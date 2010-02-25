@@ -1,0 +1,68 @@
+#!/bin/csh -f
+#
+# MAKE-WRAP - find or make an mpi-io-wrap that will work in CROSS-COMPILE situation
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 1
+
+set cmd = ""
+set tgt = ""
+while ($#argv > 0)
+   switch ($1)
+      case -o:
+           set tgt = $2
+      default:
+           set cmd = ( $cmd $1 )
+           breaksw
+   endsw
+   shift
+end
+
+# remove the existing target unconditionally
+rm -f $tgt
+
+# try the compilation
+$cmd
+@ err = $status
+
+# if it fails see if a viable executable can be found
+if ($err != 0) then
+
+   set exe   = $tgt:t
+   set ut    = ""
+   set extra = ""
+   set sys   = `system-id`
+
+   if ($?DAS_ROOT == 1) then
+      set extra = ( $DAS_ROOT/pactnew/bin/$exe $DAS_ROOT/pact/bin/$exe )
+   endif
+
+   foreach d ( ../dev/*/bin/$exe $extra )
+      set path = ( $d:h /usr/bin /bin . )
+      rehash
+
+# NOTE: this should be generalized - it is only good for mpi-io-wrap
+# and will fail there if the help message changes
+# hard to find too
+      set nl = `$exe -h |& wc -l`
+      if ($nl == 8) then
+         strings $d |& grep $sys >>& /dev/null
+         if ($status == 0) then
+            pushd $d:h >>& /dev/null
+            set ut = $cwd/$exe
+	    cp $ut $tgt
+            popd >>& /dev/null
+            @ err = 0
+            break
+         endif
+      endif
+   end
+
+endif
+
+exit($err)

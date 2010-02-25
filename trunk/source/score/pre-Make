@@ -286,7 +286,7 @@ ${BinDir}/scexts : ${TGTLib} scexts.c
 mpitty : ${BinDir}/sctty ${BinDir}/mpi-io-wrap
 
 ${BinDir}/mpi-io-wrap : ${TGTLib} scwrap.c
-	( ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs} ; /bin/true )
+	make-wrap ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs}
 
 ${BinDir}/sctty : ${TGTLib} sctty.c
 	${CC} -c sctty.c -o ${PACTTmpDir}/sctty.o

@@ -16,6 +16,7 @@ Note $Log "Analyze: hdf5"
 
 # vanilla place to look if previously undefined
 SafeEnv HDF_Path /usr
+SafeEnv ZLib     "-lz"
 
 # if we have explicitly said we do not want HDF5
 # do NOT detect it

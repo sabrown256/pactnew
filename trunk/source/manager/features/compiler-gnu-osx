@@ -84,6 +84,7 @@ Group Python {
 }
 
 include cpp-rule
+include serial
 
 setenv PATH /sw/bin:/usr/apps/gnu/bin:$PATH
 

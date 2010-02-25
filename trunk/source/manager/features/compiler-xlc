@@ -95,4 +95,5 @@ define GETSOCKNAME_LONG
 define HAVE_THREAD_SAFE_MPI
 
 include aix-dp-env
+include serial
 

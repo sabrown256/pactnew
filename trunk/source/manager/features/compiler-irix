@@ -65,4 +65,5 @@ define HYPOT PM_hypot
 #define STRTOD_FUNCTION _SC_strtod
 
 include cpp-rule
+include serial
 

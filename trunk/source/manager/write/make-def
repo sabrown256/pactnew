@@ -203,7 +203,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # emit items from the defined groups
 #    foreach g ($DefGroups)
-    foreach g (Std Cfg Cfe Shared)
+    foreach g (Std Cfg Cfe Ser Shared)
        Note $STDOUT ""
        Note $STDOUT "# group ${g}"
        foreach v ($ConfigVars)
@@ -431,6 +431,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'CLD            = ${CCmpLdr} ${CFLAGS} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${Cfg_CC_Flags} ${CShared} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${Cfg_FC_Flags} ${UniFlags} ${FcFlags}'
+
+    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${Ser_CC_Flags} ${CShared} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${Ser_FC_Flags} ${UniFlags} ${FcFlags}'
 
     Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${Cfe_CC_Flags} ${CShared} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${Cfe_FC_Flags} ${UniFlags} ${FcFlags}'

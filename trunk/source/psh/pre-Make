@@ -27,7 +27,7 @@ InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/smake
 
 CcFlags = ${COptimize}
-PCC     = ${CCCfg}
+PCC     = ${CCSer}
 #PCC     = cc -g
 
 LibFiles = libpsh.c libasync.c libeval.c libtime.c libfifo.c libsock.c libdb.c

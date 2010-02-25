@@ -196,6 +196,9 @@ if ($Cfg_CC_Exe != "") then
    Note $ALog ""
    Note $ALog "Check the version of the C compiler"
    Note $ALog "   PATH = $PATH"
+   flog $ALog which $Cfg_CC_Exe
+   flog $ALog which $Cfe_CC_Exe
+
    if ($HostOS == SunOS) then
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any

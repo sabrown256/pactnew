@@ -63,3 +63,4 @@ Group PythonCfg {
 
 define OSF
 
+include serial

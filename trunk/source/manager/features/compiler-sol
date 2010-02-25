@@ -54,3 +54,4 @@ define SOLARIS
 # NOTE: the Solaris linker does NOT support any kind of -rpath option
 setenv LD_LIBRARY_PATH ${RPATH}
 
+include serial
