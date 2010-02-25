@@ -62,6 +62,7 @@ EOF
          setenv CC_Inc "$CC_Inc $PckInc"
       endif
 
+      setenv RPATH         ${RPATH}:${HDF_RPath}
       setenv Cfg_LD_RPath  ${Cfg_LD_RPath}:${HDF_RPath}
       setenv LD_RPath      ${LD_RPath}:${HDF_RPath}
       setenv LD_Lib        "$PckLib $LD_Lib"
@@ -77,6 +78,7 @@ EOF
    setenv HDFInc "$PckInc"
 
 # export the results
+   SetParent RPATH
    SetParent CC_Inc
    SetParent LD_Lib
    SetParent LD_RPath
