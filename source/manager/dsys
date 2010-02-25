@@ -1000,7 +1000,7 @@ switch ($Cmnd)
         else
            set dm = `which-dmake`
            if (-x "$dm") then
-              cp $dm ${BinDir}/dmake
+              flog $Log cp $dm ${BinDir}/dmake
               set LStat = 0
            endif
         endif

@@ -86,3 +86,4 @@ setenv IBM_BGL
 define IBM_BGL
 define GETSOCKNAME_LONG
 
+include serial

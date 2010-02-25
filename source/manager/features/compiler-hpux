@@ -44,3 +44,5 @@ Tool Yacc {
 	@${RM} lex.yy.c $*.c $*.o
 
 define STRTOLL_FUNCTION strtol
+
+include serial

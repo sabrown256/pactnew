@@ -67,4 +67,4 @@ Group OpenMP {
 }
 
 include cpp-rule
-
+include serial

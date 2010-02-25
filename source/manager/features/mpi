@@ -7,7 +7,8 @@
 # include "cpyright.h"
 #
 
-setenv PATH   ${MPIBin}:${PATH}
+# NOTE: on BG/P MPIBin has to come after path to compiler
+setenv PATH   ${PATH}:${MPIBin}
 
 Group MPI {
    CC_Inc = ${IncMPI}

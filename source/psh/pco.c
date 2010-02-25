@@ -529,8 +529,16 @@ static void write_envf(int lnotice)
     note(fdk, TRUE, "");
     note(fmd, TRUE, "");
 
-    note(fcsh, TRUE, "setenv SCHEME  %s/scheme", st.dir.root);
+/* write the CSH version like this because PCSH scripts like
+ * PDBView need to get the users SCHEME variable if defined
+ */
+    note(fcsh, TRUE, "if ($?SCHEME == 1) then");
+    note(fcsh, TRUE, "   setenv SCHEME  ${SCHEME}:%s/scheme", st.dir.root);
+    note(fcsh, TRUE, "else");
+    note(fcsh, TRUE, "   setenv SCHEME  %s/scheme", st.dir.root);
+    note(fcsh, TRUE, "endif");
     note(fcsh, TRUE, "setenv ULTRA   %s/scheme", st.dir.root);
+
     note(fsh, TRUE, "export SCHEME=%s/scheme", st.dir.root);
     note(fsh, TRUE, "export ULTRA=%s/scheme", st.dir.root);
     note(fdk, TRUE, "dk_setenv SCHEME  %s/scheme", st.dir.root);

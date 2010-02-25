@@ -62,6 +62,7 @@ Group Std {
 Group Cfg {
    Use    = Std
    CC_Exe = gcc
+   FC_Exe = gfortran
 }
 
 Group OpenMP {
@@ -81,4 +82,4 @@ Group PThread {
 }
 
 include cpp-rule
-
+include serial

@@ -79,8 +79,8 @@ extern "C" {
 # else
 
 extern int
- bsd_ioctl(int fildes, int request, ...),
- ioctl(int fildes, int request, ...);
+ bsd_ioctl(int fildes, int request, ...);
+/* ioctl(int fildes, int request, ...); */
 
 # endif
 
