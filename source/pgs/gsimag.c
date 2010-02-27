@@ -1289,9 +1289,10 @@ PG_image *PG_make_image_n(char *label, char *type, void *z,
 			  int nd, PG_coord_sys cs, double *dbx, double *rbx,
 			  int w, int h, int bpp,
 			  PG_palette *palette)
-   {PG_image *im;
+   {int byp;
     long width, height, size;
     char bf[MAXLINE];
+    PG_image *im;
 
     if (dbx[0] == dbx[1])
        {dbx[0] = 0.0;
@@ -1301,9 +1302,12 @@ PG_image *PG_make_image_n(char *label, char *type, void *z,
        {dbx[2] = 0.0;
 	dbx[3] = (double) h;};
 
+    byp = bpp >> 3;
+    byp = max(byp, 1);
+
     width  = w;
     height = h;
-    size   = width*height;
+    size   = width*height*byp;
 
     im = FMAKE(PG_image, "PG_MAKE_IMAGE_N:im");
     if (im == NULL)
