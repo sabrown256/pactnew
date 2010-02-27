@@ -593,7 +593,8 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
  
     window_name = dev->title;
 
-    _PG_X_point_list = SC_MAKE_ARRAY("_PG_X_OPEN_SCREEN", XPoint, NULL);
+    if (_PG_X_point_list == NULL)
+       _PG_X_point_list = SC_MAKE_ARRAY("PERM|_PG_X_OPEN_SCREEN", XPoint, NULL);
 
 /* GOTCHA: if we do this it will be a memory leak
     window_name = SC_strsavef(dev->title,
