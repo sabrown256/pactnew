@@ -214,7 +214,8 @@ void _PG_remove_device(PG_device *dev)
 	 if (dv == dev)
             {n = SC_array_remove(_PG.devlst, i);
 	     if (n == 0)
-	        SC_free_array(_PG.devlst, NULL);
+	        {SC_free_array(_PG.devlst, NULL);
+		 _PG.devlst = NULL;};
              break;};};
 
 /* clean up the device */

@@ -446,7 +446,7 @@ void *SC_array_set(SC_array *a, long n, void *v)
 	 m    = n + 1;
 	 a->n = max(a->n, m);
 
-	 if (m >= a->nx)
+	 if ((m >= a->nx) || (a->array == NULL))
 	    _SC_array_grow(a, -1);
 
 	 _SC_array_err(a, "set array %s %ld", a->name, n);
