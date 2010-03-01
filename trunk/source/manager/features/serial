@@ -1,5 +1,6 @@
 #
-# SERIAL - define Serial group
+# SERIAL - define a serial group from bare tools before
+#        - parallel options are included
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -10,6 +11,7 @@
 Group Ser {
    Use = CC
    Use = FC
+   Use = Lex
    Use = LD
    Use = Cfg
 }
