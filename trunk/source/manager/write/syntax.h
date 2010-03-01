@@ -50,7 +50,7 @@ source $ldir/env-csh
        set Dirs = `ls`
        foreach dir ($Dirs)
           if (-d $dir) then
-             if ($dir != "CVS") then
+             if (($dir != CVS) && ($dir != .svn)) then
                 set lsm   = ( $lsm $dir )
                 @ nsyntxs = $nsyntxs + 1
              endif

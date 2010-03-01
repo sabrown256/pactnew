@@ -250,13 +250,6 @@ set LibVers = 1
     Note $STDOUT '	@cd .'
     Note $STDOUT ""
 
-    Note $STDOUT "#"
-    Note $STDOUT "# report files/directories unknown to CVS"
-    Note $STDOUT "#"
-    Note $STDOUT "unmng :"
-    Note $STDOUT "	@cvs -q update | egrep '^\?' | sed 's/?/ /'"
-    Note $STDOUT ""
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
