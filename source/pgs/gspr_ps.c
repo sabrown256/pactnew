@@ -799,7 +799,7 @@ int _PG_PS_put_raster(PG_device *dev,
 
 /* monochrome */
 		  else
-		     {y = 0.2988*r + 0.5869*g + 0.1143*b + 0.5;
+		     {y = PG_luminance(r, g, b);
 		      y = min(y, 255);
 		      if (tr == TRUE)
 			 io_printf(fp, "%02x%02x", a, y);

@@ -937,7 +937,8 @@ int SC_array_sort(SC_array *a, PFIntBin pred)
     rv = FALSE;
     if (a != NULL)
        {ne = SC_array_get_n(a);
-	rv = _SC_array_sort(a, pred, 0, ne-1);};
+	rv = _SC_array_sort(a, pred, 0, ne-1);
+        SC_array_set_n(a, ne);};
 
     return(rv);}
 

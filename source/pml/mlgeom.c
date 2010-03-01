@@ -309,23 +309,17 @@ static INLINE int _PM_insert_point(int i, int ln, int lx, int **pd, int *pn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CONVEX_HULL - create the polygon which is the convex hull of the
- *                - given set of points
+/* _PM_INIT_HULL - make the initial right handed triangle from which
+ *               - to grow the convex hull
  */
 
-PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
-   {int i, i0, i1, i2, i3;
-    int j, j0, j1, j2, j3;
-    int np, nd, l, ia, id;
-    int c1, c2, c3;
-    int *di;
-    double cp1, cp2, cp3;
-    double x0[2], x1[2], x2[2], x3[2], xn[2];
-    double *x, *y;
-    PM_polygon *py;
+static int _PM_init_hull(int *di, double *p1, double *p2, int nh)
+   {int i, i1, i2;
+    int np, nd, ia, id;
+    double cp1;
+    double x0[2], x1[2], x2[2];
 
     nd = nh;
-    di = FMAKE_N(int, nd, "PM_CONVEX_HULL:di");
     
 /* pick the first point as one of the initial hull vertices */
     di[0] = 0;
@@ -372,6 +366,31 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
 		 {di[2] = i;
 		  np++;
 		  break;};};};
+
+     return(np);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CONVEX_HULL - create the polygon which is the convex hull of the
+ *                - given set of points
+ */
+
+PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
+   {int i, i0, i1, i2, i3;
+    int j, j0, j1, j2, j3;
+    int np, nd, l;
+    int c1, c2, c3;
+    int *di;
+    double cp1, cp2, cp3;
+    double x0[2], x1[2], x2[2], x3[2], xn[2];
+    double *x, *y;
+    PM_polygon *py;
+
+    nd = nh;
+    di = FMAKE_N(int, nd, "PM_CONVEX_HULL:di");
+    
+    np = _PM_init_hull(di, p1, p2, nh);
 
 /* check against the current hull */
     for (i = 0; i < nh; i++)

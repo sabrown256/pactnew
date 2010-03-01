@@ -599,6 +599,8 @@
 #define PG_window_width(_d)     abs((_d)->g.hwin[1] - (_d)->g.hwin[0])
 #define PG_window_height(_d)    abs((_d)->g.hwin[3] - (_d)->g.hwin[2])
 
+#define PG_luminance(_r, _g, _b) (0.2988*(_r) + 0.5869*(_g) + 0.1143*(_b) + 0.5)
+
 #define PG_true_color(_r, _g, _b)                                            \
     ((0x7f) << 24 +                                                          \
      ((_r) & 0xff) << 16 +                                                   \
