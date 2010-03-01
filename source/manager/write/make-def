@@ -171,7 +171,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
        pushd $Base/scheme/syntax >& /dev/null
        foreach mod (*)
           if (-d $mod) then
-             if ($mod == CVS) continue
+             if (($mod == CVS) || ($mod == .svn)) continue
              set SynSCM = ( $SynSCM applications/${mod}synt.scm )
              if ($BuildStrategy == "SpaceSaving") then
    	        Note $STDOUT -n ' ${Ar'$mod'}'
