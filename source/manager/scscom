@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+set MngDir = `dirname $0`
+
 set args = ""
 set msg  = ""
 
@@ -25,11 +27,11 @@ while ($#argv > 0)
 end
 
 
-if (-d CVS) then
+if (-d $MngDir/CVS) then
 
    cvs commit $args -m "$msg"
 
-else if (-d .svn) then
+else if (-d $MngDir/.svn) then
 
    svn commit $args -m "$msg"
 

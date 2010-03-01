@@ -907,7 +907,7 @@ PM_set *PM_make_lr_cp_domain(char *name, char *type, int nd, PM_set **sets)
 
     _PM_fill_cp_array(nd-1, ne, 0, x, maxes, x1);
 
-    SFREE(x1);
+    PM_free_vectors(nd, x1);
 
 /* build the set
  * NOTE: since we just allocated the space in x above

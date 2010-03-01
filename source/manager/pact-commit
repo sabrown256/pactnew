@@ -51,6 +51,7 @@ set UpdateLog = $DevDir/log/update
 set Changed   = $MngDir/Changed
 set UnChanged = $MngDir/UnChanged
 
+set SCSCom        = $MngDir/scscom
 set SCSRepository = ""
 set SRCDate       = ""
 set Sleep         = "NO"
@@ -408,7 +409,7 @@ if ($TagOnly == TRUE) then
    NoteD $Log "Committing the new TAG info"
 
    echo > $TmpMsg
-   flog $Log $MngDir/scscom -m 'Tagging repository'
+   flog $Log $SCSCom -m 'Tagging repository'
    if ($status != 0) then
       flog $Log rm -f $TmpMsg
       $MngDir/scslock unlock
@@ -426,7 +427,7 @@ else
 
    Note $Lock -n "Committing PACT Sources ... "
    if ($MsgFile == "" ) then
-        flog $Log $MngDir/scscom -m "$Message"
+        flog $Log $SCSCom -m "$Message"
         if ($status != 0) then
            $MngDir/scslock unlock
            NoteD $Log "Commit FAILED"
@@ -437,7 +438,7 @@ else
         echo $Message | sed s/\"//g > $TmpMsg
         cat $MsgFile >> $TmpMsg
 
-        flog $Log $MngDir/scscom -F $TmpMsg
+        flog $Log $SCSCom -F $TmpMsg
         if ($status != 0) then
            flog $Log rm -f $TmpMsg
            $MngDir/scslock unlock
