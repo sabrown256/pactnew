@@ -333,6 +333,7 @@ object *SX_mode_text(void)
 void SX_setup_viewspace(PG_device *dev, double mh)
    {double labsp, nvh, nvoy;
     static double obx[PG_BOXSZ] = { -HUGE, -HUGE, -HUGE, -HUGE, -HUGE, -HUGE};
+    static int traditional = TRUE;
 
 /* remember the original view height in order to be able to
  * reference label-space against that value
@@ -345,18 +346,41 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 		     "label-space", &labsp,
 		     NULL);
 
-    nvh  = SX_view_height/(1.0 + labsp);
-    nvoy = (obx[2] + labsp)/(1.0 + labsp);
+/* this way respects the user controls in ULTRA and PDBView
+ * such as view-height and label-space
+ * it does this by preserving SX_view_x
+ */
+    if (traditional == TRUE)
+       {nvh  = SX_view_height/(1.0 + labsp);
+	nvoy = (obx[2] + labsp)/(1.0 + labsp);
 
-    SX_view_x[2] = nvoy;
-    SX_view_x[3] = nvoy + nvh;
+	SX_view_x[2] = nvoy;
+	SX_view_x[3] = nvoy + nvh;
 
-    dev->view_x[2]   = nvoy;
-    dev->view_x[3]   = nvoy + nvh;
+	dev->view_x[2] = nvoy;
+	dev->view_x[3] = nvoy + nvh;
 
 /* set the old school state */
-/*    SX_view_height    = nvh; */
-    SX_window_height *= mh;
+/*        SX_view_height    = nvh; */
+	SX_window_height *= mh;}
+
+/* this way make better use of space as the window is
+ * made larger or smaller
+ * it does this by modifying SX_view_x
+ */
+    else
+       {nvh  = (obx[3] - obx[2])/(1.0 + labsp);
+	nvoy = (obx[2] + labsp)/(1.0 + labsp);
+
+	SX_view_x[2] = nvoy;
+	SX_view_x[3] = nvoy + nvh;
+
+	dev->view_x[2] = nvoy;
+	dev->view_x[3] = nvoy + nvh;
+
+/* set the old school state */
+	SX_view_height    = nvh;
+	SX_window_height *= mh;};
 
     return;}
 
