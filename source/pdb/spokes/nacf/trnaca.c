@@ -493,7 +493,7 @@ static int _NAC_close(PDBfile *file)
 
 /* _NAC_OPEN - open an existing NAC File */
 
-static PDBfile *_NAC_open(SC_udl *pu, char *name, char *mode)
+static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
    {int numdir, numatt, numdim;
     long tptlen, tptaddr, dftaddr, dftlen, ntaddr, ntlen;
     long dtaddr, dtlen, aftaddr, aftlen, ataddr, atlen;
@@ -526,7 +526,7 @@ static PDBfile *_NAC_open(SC_udl *pu, char *name, char *mode)
 
     if ((str[0] == 0x6E) && (str[1] == 0x91) &&
         (strcmp(id, "nac-file") == 0))
-       {file = _PD_mk_pdb(pu, NULL, BINARY_MODE_RPLUS, TRUE, NULL, NULL);
+       {file = _PD_mk_pdb(pu, NULL, BINARY_MODE_RPLUS, TRUE, NULL, tr);
 	if (file == NULL)
 	   PD_error("CAN'T ALLOCATE NACFILE - _NAC_OPEN", PD_OPEN);
 

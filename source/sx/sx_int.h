@@ -315,8 +315,7 @@ extern object
 
 extern g_file
  *_SX_mk_file(char *name, char *type, void *file),
- *_SX_mk_open_file(char *name, char *type, char *ext_type,
-		   char *mode);
+ *_SX_mk_open_file(char *name, char *type, char *mode);
 
 extern g_pdbdata
  *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file);
@@ -343,6 +342,7 @@ extern void
  SX_type_container(char *dtype, char *stype);
 
 extern object
+ *_SX_open_file(object *arg, char *type, char *mode),
  *_SX_pdbfile_to_list(PDBfile *file),
  *_SX_syment_to_list(syment *ep),
  *_SX_defstr_to_list(defstr *dp),

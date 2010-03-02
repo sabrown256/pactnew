@@ -208,37 +208,26 @@ PDBfile *PD_open_vif(char *name)
 int PD_close(PDBfile *file)
    {int ret;
     PD_smp_state *pa;
-    FILE *fp;
+    PFBinClose fun;
+    tr_layer *tr;
 
-    if (file == NULL)
-       return(TRUE);
+    ret = FALSE;
 
-    pa = _PD_get_state(-1);
+    if (file != NULL)
+       {pa = _PD_get_state(-1);
 
-    switch (SETJMP(pa->close_err))
-       {case ABORT :
-	     return(FALSE);
-        case ERR_FREE :
-	     return(TRUE);
-        default :
-	     memset(pa->err, 0, MAXLINE);
-	     break;};
+	switch (SETJMP(pa->close_err))
+	   {case ABORT :
+	         return(FALSE);
+	    case ERR_FREE :
+	         return(TRUE);
+	    default :
+	         memset(pa->err, 0, MAXLINE);
+		 break;};
 
-    ret = _PD_csum_close(file);
-
-/* position the file pointer at the greater of the current position and
- * the location of the chart
- */
-    if ((file->mode == PD_CREATE) || (file->mode == PD_APPEND))
-       ret = PD_flush(file);
-
-    fp = file->stream;
-    if (fp != NULL)
-       {if (lio_close(fp) != 0)
-	   PD_error("CANNOT CLOSE FILE - PD_CLOSE", PD_CLOSE);};
-
-/* free the space */
-    _PD_rl_pdb(file);
+	tr  = file->tr;
+	fun = tr->close;
+	ret = fun(file);};
 
     return(ret);}
 

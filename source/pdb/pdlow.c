@@ -1078,7 +1078,7 @@ void _PD_set_standard(PDBfile *file, data_standard *std, data_alignment *algn)
  *            - if successful else NULL
  */
 
-PDBfile *_PD_create(SC_udl *pu, char *name, void *a)
+PDBfile *_PD_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
    {int ok;
     FILE *fp;
     PDBfile *file;
@@ -1092,7 +1092,7 @@ PDBfile *_PD_create(SC_udl *pu, char *name, void *a)
           PD_error("CANNOT SET FILE BUFFER - _PD_CREATE", PD_OPEN);
 
 /* make the PDBfile */
-    file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, NULL);
+    file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, tr);
     if (file != NULL)
        {file->mode = PD_CREATE;
     
@@ -1128,13 +1128,46 @@ FILE *_PD_data_source(SC_udl *pu)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_CLOSE - close a PDB file after writing out the symbol table and
+ *           - structure chart and completing the header
+ *           - return TRUE if successful and FALSE otherwise
+ */
+
+int _PD_close(PDBfile *file)
+   {int ret;
+    FILE *fp;
+
+    ret = FALSE;
+
+    if (file != NULL)
+       {ret = _PD_csum_close(file);
+
+/* position the file pointer at the greater of the current position and
+ * the location of the chart
+ */
+	if ((file->mode == PD_CREATE) || (file->mode == PD_APPEND))
+	   ret = PD_flush(file);
+
+	fp = file->stream;
+	if (fp != NULL)
+	   {if (lio_close(fp) != 0)
+	       PD_error("CANNOT CLOSE FILE - PD_CLOSE", PD_CLOSE);};
+
+/* free the space */
+	_PD_rl_pdb(file);};
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_OPEN - worker to setup PDB files
  *          - NOTE: MODE is the PDBLib mode - "r", "w", or "a"
  *          - these are different than the C fopen modes  - "r+b", etc
  *          - the C modes are contained in pu->mode
  */
 
-PDBfile *_PD_open(SC_udl *pu, char *name, char *mode, void *a)
+PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
    {int vers, ok;
     PDBfile *file;
     PD_smp_state *pa;
@@ -1147,7 +1180,7 @@ PDBfile *_PD_open(SC_udl *pu, char *name, char *mode, void *a)
        if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) pa->buffer_size))
 	  PD_error("CANNOT SET FILE BUFFER - _PD_OPEN", PD_OPEN);
 
-    file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, NULL);
+    file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, tr);
     if (file == NULL)
        PD_error("CANNOT ALLOCATE PDBFILE - _PD_OPEN", PD_OPEN);
 

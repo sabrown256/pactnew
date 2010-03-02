@@ -262,21 +262,31 @@ object *SX_mk_gfile(g_file *po)
  *                  - to it
  */
 
-g_file *_SX_mk_open_file(char *name, char *type,
-			 char *ext_type, char *mode)
+g_file *_SX_mk_open_file(char *name, char *type, char *mode)
    {PDBfile *file;
     object *obj;
     g_file *po;
 
 /* open the file */
     file = PD_open(name, mode);
+
+/* if append or write mode open failed then try read-only mode */
+    if ((file == NULL) && (strcmp(mode, "r") != 0))
+       file = PD_open(name, "r");
+
     if (file == NULL)
+
+/* complain about text file */
        {if (SC_isfile_text(name))
            SS_error("REQUESTED FILE IS ASCII - _SX_MK_OPEN_FILE",
                      SS_mk_string(name));
+
+/* complain if file exists but could not be opened */
         else if (SC_isfile(name))
            SS_error("BAD FILE TYPE OR MODE - _SX_MK_OPEN_FILE",
                     SS_mk_string(name));
+
+/* if file does not exist then create it */
         else
            {file = PD_open(name, "w");
             if (file == NULL)

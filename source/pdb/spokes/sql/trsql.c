@@ -70,9 +70,8 @@ static int _SQL_close(PDBfile *file)
 
 /* _SQL_CREATE - create an existing SQL File */
 
-static PDBfile *_SQL_create(SC_udl *pu, char *name, void *a)
+static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
    {char *lname;
-    tr_layer *tr;
     PDBfile *file;
     FILE *fp;
     PD_smp_state *pa;
@@ -88,7 +87,7 @@ static PDBfile *_SQL_create(SC_udl *pu, char *name, void *a)
 	   if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) pa->buffer_size))
 	      PD_error("CAN'T SET FILE BUFFER - _SQL_CREATE", PD_CREATE);};
 
-    tr = _PD_lookup(SQL_DATABASE_S);
+/*    tr = _PD_lookup(SQL_DATABASE_S); */
 
     file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, tr);
     if (file == NULL)
@@ -130,15 +129,14 @@ static PDBfile *_SQL_create(SC_udl *pu, char *name, void *a)
 
 /* _SQL_OPEN - open an existing SQL File */
 
-static PDBfile *_SQL_open(SC_udl *pu, char *name, char *mode)
+static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
    {unsigned char str[MAXLINE];
     char id[MAXLINE];
     char *lname;
-    tr_layer *tr;
     PDBfile *file;
     FILE *fp;
 
-    tr = _PD_lookup(SQL_DATABASE_S);
+/*    tr = _PD_lookup(SQL_DATABASE_S); */
 
     lname = pu->udl;
 

@@ -202,7 +202,7 @@ int PD_register_pdb(void)
    {int n;
 
     n = PD_REGISTER(PDBFILE_S, "pdb", _PD_pdbfilep,
-		    _PD_create, _PD_open, PD_close, _PD_write, _PD_read);
+		    _PD_create, _PD_open, _PD_close, _PD_write, _PD_read);
 
     return(TRUE);}
  
@@ -211,8 +211,8 @@ int PD_register_pdb(void)
 
 /* _PD_OPEN_BIN_AUX - open a PDB file */
 
-PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
-			  tr_layer *tr, void *a)
+static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
+				 tr_layer *tr, void *a)
    {PDBfile *file;
     PFBinOpen open;
     PFBinCreate create;
@@ -225,14 +225,14 @@ PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
     if (*mode == 'w')
        {if (create != NULL)
 	   {if (pu != NULL)
-	       file = create(pu, name, a);};}
+	       file = create(tr, pu, name, a);};}
 
 /* open an existing file */
     else if (open != NULL)
 
 /* if we have an open C level file try to open a PDB level file */
        {if (_PD_data_source(pu) != NULL)
-	   file = open(pu, name, mode, a);
+	   file = open(tr, pu, name, mode, a);
 
 /* if we cannot open existing file and it does not exist - try creating file */
 	if ((file == NULL) && (SC_isfile(name) == FALSE))

@@ -59,7 +59,7 @@ static int _XML_close(PDBfile *file)
 
 /* _XML_OPEN - open an existing XML File */
 
-static PDBfile *_XML_open(SC_udl *pu, char *name, char *mode)
+static PDBfile *_XML_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
    {char str[MAXLINE];
     FILE *fp;
     PDBfile *file;

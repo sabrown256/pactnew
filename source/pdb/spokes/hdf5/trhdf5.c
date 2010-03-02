@@ -1065,7 +1065,7 @@ static int _H5_close(PDBfile *file)
  *            - NAME the absolute pathname of the HDF5 file to create
  */
 
-static PDBfile *_H5_create(SC_udl *pu, char *name, void *a)
+static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
    {int status, depth;
     syment *ep;
     PDBfile *file;
@@ -1095,7 +1095,7 @@ static PDBfile *_H5_create(SC_udl *pu, char *name, void *a)
     if (_h5.hf < 0)
        return(NULL);
 
-    file = _PD_mk_pdb(pu, "temp.pdb", NULL, TRUE, &_H5_sys, NULL);
+    file = _PD_mk_pdb(pu, "temp.pdb", NULL, TRUE, &_H5_sys, tr);
     if (file == NULL)
        return(NULL);
 
@@ -1163,7 +1163,7 @@ static PDBfile *_H5_create(SC_udl *pu, char *name, void *a)
  *          - NAME the absolute pathname of the HDF5 file to open
  */
 
-static PDBfile *_H5_open(SC_udl *pu, char *name, char *mode)
+static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
    {int status, depth;
     hid_t hdf_root_group;
     syment *ep;
@@ -1194,7 +1194,7 @@ static PDBfile *_H5_open(SC_udl *pu, char *name, char *mode)
     if (_h5.hf < 0)
        return(NULL);
 
-    file = _PD_mk_pdb(pu, "temp.pdb", mode, TRUE, &_H5_sys, NULL);
+    file = _PD_mk_pdb(pu, "temp.pdb", mode, TRUE, &_H5_sys, tr);
     if (file == NULL)
        return(NULL);
 
