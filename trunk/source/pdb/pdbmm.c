@@ -15,7 +15,7 @@ static sys_layer
 
 static tr_layer
  _PD_tr = {"PDBfile", "pdb", _PD_pdbfilep,
-	   NULL, NULL, PD_close,
+	   NULL, NULL, _PD_close,
 	   _PD_read, _PD_write};
 
 /*--------------------------------------------------------------------------*/

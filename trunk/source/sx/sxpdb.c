@@ -613,12 +613,11 @@ object *SX_get_file(object *argl, g_file **pfile)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_OPEN_FILE - open up the named G_FILE and
- *              - cons its object to SX_file_list.
+/* _SX_OPEN_FILE - open up the named G_FILE and
+ *               - cons its object to SX_file_list.
  */
 
-static object *SX_open_file(object *arg, char *type,
-			    char *ext_type, char *mode)
+object *_SX_open_file(object *arg, char *type, char *mode)
    {char *name;
     g_file *po;
     object *o;
@@ -638,7 +637,7 @@ static object *SX_open_file(object *arg, char *type,
              return(o);};};
 
 /* add to file_list */
-    SX_file_list = _SX_mk_open_file(name, type, ext_type, mode);
+    SX_file_list = _SX_mk_open_file(name, type, mode);
 
     o = SX_file_list->file_object;
 
@@ -652,7 +651,7 @@ static object *SX_open_file(object *arg, char *type,
 static object *_SXI_create_pdbfile(object *arg)
    {object *o;
 
-    o = SX_open_file(arg, PDBFILE_S, PDBFILE_S, "w");
+    o = _SX_open_file(arg, PDBFILE_S, "w");
 
     return(o);}
 
@@ -676,7 +675,7 @@ static object *_SXI_open_pdbfile(object *argl)
     else
        obj = argl;
 
-    o = SX_open_file(obj, PDBFILE_S, PDBFILE_S, mode);
+    o = _SX_open_file(obj, PDBFILE_S, mode);
 
     return(o);}
 
@@ -3828,6 +3827,11 @@ void SX_install_pdb_funcs(void)
                SS_nargs,
                _SXI_change_directory, SS_PR_PROC);
 
+    SS_install("close-bin-file",
+               "Close a binary file",
+	       SS_nargs,
+	       _SXI_close_pdbfile, SS_PR_PROC);
+
     SS_install("close-pdbfile",
                "Close a PDB file",
                SS_sargs,
@@ -4017,6 +4021,11 @@ void SX_install_pdb_funcs(void)
                "Set the given file to row or column major order",
                SS_nargs,
                _SXI_major_order, SS_PR_PROC);
+
+    SS_install("open-bin-file",
+               "Open a binary file",
+	       SS_nargs,
+	       _SXI_open_pdbfile, SS_PR_PROC);
 
     SS_install("open-pdbfile",
                "Open a PDB file, return PDBfile",

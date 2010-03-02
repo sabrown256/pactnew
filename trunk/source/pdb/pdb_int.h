@@ -91,8 +91,9 @@
 /*--------------------------------------------------------------------------*/
 
 typedef int (*PFBinType)(char *type);
-typedef PDBfile *(*PFBinCreate)(SC_udl *pu, char *name, void *a);
-typedef PDBfile *(*PFBinOpen)(SC_udl *pu, char *name, char *mode, void *a);
+typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu, char *name, void *a);
+typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu, char *name,
+			      char *mode, void *a);
 typedef int (*PFBinClose)(PDBfile *file);
 typedef syment *(*PFBinWrite)(PDBfile *file, char *path,
 			      char *inty, char *outty,
@@ -473,7 +474,8 @@ extern int
  _PD_remove_type(PDBfile *file, char *name),
  _PD_rev_chrt(hasharr *ch),
  _PD_set_current_address(PDBfile *file, off_t addr, int wh, PD_major_op tag),
- _PD_init_s(void);
+ _PD_init_s(void),
+ _PD_close(PDBfile *file);
 
 extern off_t
  _PD_eod(PDBfile *file),
@@ -491,8 +493,8 @@ extern defstr
  *_PD_type_container(PDBfile *file, defstr *dp);
 
 extern PDBfile
- *_PD_create(SC_udl *pu, char *name, void *a),
- *_PD_open(SC_udl *pu, char *name, char *mode, void *a);
+ *_PD_create(tr_layer *tr, SC_udl *pu, char *name, void *a),
+ *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a);
 
 extern FILE
  *_PD_data_source(SC_udl *pu);
@@ -659,8 +661,6 @@ extern void
  _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long nitems);
 
 extern PDBfile
- *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
-		   tr_layer *tr, void *a),
  *_PD_open_bin(char *name, char *mode, void *a);
 
 extern long

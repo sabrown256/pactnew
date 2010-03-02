@@ -116,7 +116,7 @@ static int _LLF_close(PDBfile *file)
 
 /* _LLF_OPEN - open an existing LLFile */
 
-static PDBfile *_LLF_open(SC_udl *pu, char *name, char *mode)
+static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
    {int i;
     size_t ni;
     unsigned char signature[5] = "link";
@@ -156,7 +156,7 @@ static PDBfile *_LLF_open(SC_udl *pu, char *name, char *mode)
 
 /* start creating a PDB file representation */
     if (strncmp((char *) filehdr.name, (char *) signature, 4) == 0)
-       {file = _PD_mk_pdb(pu, NULL, BINARY_MODE_RPLUS, TRUE, NULL, NULL);
+       {file = _PD_mk_pdb(pu, NULL, BINARY_MODE_RPLUS, TRUE, NULL, tr);
 	if (file == NULL)
 	   PD_error("CAN'T ALLOCATE LFFILE - _LLF_OPEN", PD_OPEN);
 
