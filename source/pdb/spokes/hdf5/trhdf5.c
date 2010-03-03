@@ -63,11 +63,8 @@ struct s_hdf_state
 static char
  *H5FILE_S = "HDF5file";  /* Identifier string */
 
-static hdf_state
- _h5;
-
 static char
- *_H5_handle_compound(hid_t datatype_id);
+ *_H5_handle_compound(PDBfile *file, hid_t datatype_id);
 
 static long
  _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
@@ -88,12 +85,13 @@ static sys_layer
  *                   - DTID is the compound datatype to check
  */
 
-static char *_H5_is_registered(hid_t dtid)
-   {char *verdict, *tempname;
-    int i, matches;
+static char *_H5_is_registered(PDBfile *file, hid_t dtid)
+   {int i, matches;
+    char *verdict, *tempname;
     compound_desc *iter;
     compound_member_info *info;
     H5T_class_t type_class;
+    hdf_state *hst;
 
     type_class = H5Tget_class(dtid);
  
@@ -101,7 +99,8 @@ static char *_H5_is_registered(hid_t dtid)
     if (type_class != H5T_COMPOUND)
        return NULL;
 
-    iter    = _h5.registry; 
+    hst     = file->meta;
+    iter    = hst->registry; 
     verdict = NULL;
 
 /* find any matching datatype registered with us already */
@@ -145,15 +144,17 @@ static char *_H5_is_registered(hid_t dtid)
  *              - TYPE null-terminated string naming the type
  */
 
-static void _H5_register(hid_t id, char *type)
+static void _H5_register(PDBfile *file, hid_t id, char *type)
    {int i;
     char *verdict, *tempname;
     compound_desc *iter, *prev;
     compound_member_info *info;
+    hdf_state *hst;
 
     prev    = NULL;
-    iter    = _h5.registry; 
-    verdict = _H5_is_registered(id);
+    hst     = file->meta;
+    iter    = hst->registry; 
+    verdict = _H5_is_registered(file, id);
 
 /* do not register the compound type if it is already registered */
     if (verdict == NULL)
@@ -165,8 +166,8 @@ static void _H5_register(hid_t id, char *type)
 
 /* grow a compound_desc there (or at registry itself if it is empty) */
         if (prev == NULL)
-          {_h5.registry = FMAKE(compound_desc, "_H5_REGISTER:iter"); 
-           iter         = _h5.registry;}
+          {hst->registry = FMAKE(compound_desc, "_H5_REGISTER:iter"); 
+           iter         = hst->registry;}
         else 
           {prev->next = FMAKE(compound_desc, "_H5_REGISTER:iter");  
            iter       = prev->next;};
@@ -203,7 +204,7 @@ static void _H5_register(hid_t id, char *type)
 
 /* _H5_GET_ALIGNMENT - return the alignment for type TYPE */
 
-static int _H5_get_alignment(char *type)
+static int _H5_get_alignment(PDBfile *file, char *type)
    {int result;
 
     if (strcmp(type, "char") == 0 || strcmp(type, "u_char") == 0)
@@ -232,12 +233,14 @@ static int _H5_get_alignment(char *type)
  *                     - point format from the HDF5 file
  */
 
-static char *_H5_handle_fixed_pt(hid_t dtid) 
-   {char *typename;
+static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid) 
+   {int order;
     short precision;
-    int order;
+    char *typename;
     defstr *struct_entry;
+    hdf_state *hst;
 
+    hst          = file->meta;
     typename     = NULL;
     struct_entry = FMAKE(defstr, "_H5_HANDLE_FIXED_PT:struct_entry");
 
@@ -288,10 +291,10 @@ static char *_H5_handle_fixed_pt(hid_t dtid)
         DEBUG1("%s", "      little endian integers\n");};
 
 /* you never know who might use file->std in the future: fill it in */
-    _h5.pf->std->short_order    = order; 
-    _h5.pf->std->int_order      = order; 
-    _h5.pf->std->long_order     = order; 
-    _h5.pf->std->longlong_order = order;
+    hst->pf->std->short_order    = order; 
+    hst->pf->std->int_order      = order; 
+    hst->pf->std->long_order     = order; 
+    hst->pf->std->longlong_order = order;
 
 /* create a defstr with this information
  * NOTE: as far as we know -- HDF5 does not support 1's comp
@@ -302,7 +305,7 @@ static char *_H5_handle_fixed_pt(hid_t dtid)
     struct_entry->size        = precision / 8;
 
 /* GOTCHA: we have no alignment info from the file; so we guess */
-    struct_entry->alignment   = _H5_get_alignment(typename);
+    struct_entry->alignment   = _H5_get_alignment(file, typename);
 
 /* HDF5 files do not currently support indirection */
     struct_entry->n_indirects = 0;
@@ -317,7 +320,7 @@ static char *_H5_handle_fixed_pt(hid_t dtid)
     DEBUG1("      alignment: %d\n", _H5_get_alignment(typename));
 
 /* does not matter which one */
-    if (order != _h5.pf->host_std->int_order)
+    if (order != hst->pf->host_std->int_order)
 /*      || precision != XYZ   Not feasible since C type is unspecified */
 /*      || alignment != XYZ   Not feasible since C type is unspecified */  
        {struct_entry->convert = TRUE;
@@ -327,7 +330,7 @@ static char *_H5_handle_fixed_pt(hid_t dtid)
         DEBUG1("%s", "      conversions will NOT be done\n");};
 
 /* insert into the file charts */
-    _PD_d_install(_h5.pf, typename, struct_entry, FALSE);
+    _PD_d_install(hst->pf, typename, struct_entry, FALSE);
 
     DEBUG1("  Inserted definition for %s\n", typename);
 
@@ -340,15 +343,17 @@ static char *_H5_handle_fixed_pt(hid_t dtid)
  *                     - point format from the HDF5 file
  */
 
-static char *_H5_handle_float_pt(hid_t dtid) 
-   {char *typename;
-    int i;
+static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid) 
+   {int i;
     short precision;
     long *format;
+    char *typename;
     defstr *struct_entry;
     size_t spos, epos, esize, mpos, msize;
     herr_t status;
+    hdf_state *hst;
 
+    hst      = file->meta;
     typename = NULL;
 
     struct_entry = FMAKE(defstr, "_H5_HANDLE_FLOAT_PT:struct_entry");
@@ -360,33 +365,33 @@ static char *_H5_handle_float_pt(hid_t dtid)
        {DEBUG1("%s", "      big endian float\n");
 
 /* FLOAT */
-        _h5.pf->std->float_bytes = sizeof(float);
-        _h5.pf->std->float_order = MAKE_N(int, 4);
+        hst->pf->std->float_bytes = sizeof(float);
+        hst->pf->std->float_order = MAKE_N(int, 4);
 
-        for (i = 1 ; i <= _h5.pf->std->float_bytes ; i++)
-            {_h5.pf->std->float_order[i-1] = i;};
+        for (i = 1 ; i <= hst->pf->std->float_bytes ; i++)
+            {hst->pf->std->float_order[i-1] = i;};
 
 /* DOUBLE */
-        _h5.pf->std->double_bytes = sizeof(double);
-        _h5.pf->std->double_order = MAKE_N(int, 8);
+        hst->pf->std->double_bytes = sizeof(double);
+        hst->pf->std->double_order = MAKE_N(int, 8);
 
-        for (i = 1 ; i <= _h5.pf->std->double_bytes ; i++)
-            {_h5.pf->std->double_order[i-1] = i;};}
+        for (i = 1 ; i <= hst->pf->std->double_bytes ; i++)
+            {hst->pf->std->double_order[i-1] = i;};}
 
     else 
        {DEBUG1("%s", "      little endian float\n");
 
-        _h5.pf->std->float_bytes  = sizeof(float);
-        _h5.pf->std->float_order  = MAKE_N(int, 4);
+        hst->pf->std->float_bytes  = sizeof(float);
+        hst->pf->std->float_order  = MAKE_N(int, 4);
 
-        for (i = 0 ; i < _h5.pf->std->float_bytes ; i++)
-            {_h5.pf->std->float_order[i] = (sizeof(float) - i);};
+        for (i = 0 ; i < hst->pf->std->float_bytes ; i++)
+            {hst->pf->std->float_order[i] = (sizeof(float) - i);};
 
-        _h5.pf->std->double_bytes = sizeof(double);
-        _h5.pf->std->double_order = MAKE_N(int, 8);
+        hst->pf->std->double_bytes = sizeof(double);
+        hst->pf->std->double_order = MAKE_N(int, 8);
 
-        for (i = 0 ; i < _h5.pf->std->double_bytes ; i++)
-            {_h5.pf->std->double_order[i] = (sizeof(double) - i);};}
+        for (i = 0 ; i < hst->pf->std->double_bytes ; i++)
+            {hst->pf->std->double_order[i] = (sizeof(double) - i);};}
 
 /* grab the precision of this float pt value */
     precision = (short) H5Tget_precision(dtid);
@@ -399,22 +404,22 @@ static char *_H5_handle_float_pt(hid_t dtid)
  * this is required because HDF5 does not maintain type names
  */
     if (precision <= 32) 
-       {format   = _h5.pf->std->float_format;
+       {format   = hst->pf->std->float_format;
         typename = SC_strsavef("float", "_H5_HANDLE_FLOAT_PT:typename");
-        struct_entry->order = FMAKE_N(int, _h5.pf->std->float_bytes, 
+        struct_entry->order = FMAKE_N(int, hst->pf->std->float_bytes, 
                                       "_H5_HANDLE_FLOAT_PT:order");
 
-        for (i = 0; i < _h5.pf->std->float_bytes ; i++) 
-            {struct_entry->order[i] = _h5.pf->std->float_order[i];};}
+        for (i = 0; i < hst->pf->std->float_bytes ; i++) 
+            {struct_entry->order[i] = hst->pf->std->float_order[i];};}
 
     else 
-       {format   = _h5.pf->std->double_format;
+       {format   = hst->pf->std->double_format;
         typename = SC_strsavef("double", "_H5_HANDLE_FLOAT_PT:typename");
-        struct_entry->order = FMAKE_N(int, _h5.pf->std->double_bytes, 
+        struct_entry->order = FMAKE_N(int, hst->pf->std->double_bytes, 
                                       "_H5_HANDLE_FLOAT_PT:order");
 
-        for (i = 0; i < _h5.pf->std->double_bytes ; i++) 
-            {struct_entry->order[i] = _h5.pf->std->double_order[i];};};
+        for (i = 0; i < hst->pf->std->double_bytes ; i++) 
+            {struct_entry->order[i] = hst->pf->std->double_order[i];};};
 
 /* pdbconv.c contains information on how this is laid out
  *
@@ -463,13 +468,13 @@ static char *_H5_handle_float_pt(hid_t dtid)
 
     DEBUG1("%s", "}\n      float_order {");
 
-    for (i = 0; i < _h5.pf->std->float_bytes; i++)
-        {DEBUG1("%d, ", _h5.pf->std->float_order[i]);};
+    for (i = 0; i < hst->pf->std->float_bytes; i++)
+        {DEBUG1("%d, ", hst->pf->std->float_order[i]);};
 
     DEBUG1("%s", "}\n      double_order {");
 
-    for (i = 0; i < _h5.pf->std->double_bytes; i++)
-        {DEBUG1("%d, ", _h5.pf->std->double_order[i]);};
+    for (i = 0; i < hst->pf->std->double_bytes; i++)
+        {DEBUG1("%d, ", hst->pf->std->double_order[i]);};
 
     DEBUG1("%s", "}\n");
 #endif
@@ -480,19 +485,19 @@ static char *_H5_handle_float_pt(hid_t dtid)
  */
     if (precision <= 32) 
        {for (i = 0; i < 8; i++)
-            {if (struct_entry->format[i] != _h5.pf->host_std->float_format[i])
+            {if (struct_entry->format[i] != hst->pf->host_std->float_format[i])
                 {struct_entry->convert = TRUE;};};
 
-        for (i = 0; i < _h5.pf->host_std->float_bytes; i++)
-            {if (struct_entry->order[i] != _h5.pf->host_std->float_order[i])
+        for (i = 0; i < hst->pf->host_std->float_bytes; i++)
+            {if (struct_entry->order[i] != hst->pf->host_std->float_order[i])
                 {struct_entry->convert = TRUE;};};}
     else 
        {for (i = 0; i < 8; i++)
-            {if (struct_entry->format[i] != _h5.pf->host_std->double_format[i])
+            {if (struct_entry->format[i] != hst->pf->host_std->double_format[i])
                 {struct_entry->convert = TRUE;};};
 
-        for (i = 0; i < _h5.pf->host_std->double_bytes; i++)
-            {if (struct_entry->order[i] != _h5.pf->host_std->double_format[i])
+        for (i = 0; i < hst->pf->host_std->double_bytes; i++)
+            {if (struct_entry->order[i] != hst->pf->host_std->double_format[i])
                 {struct_entry->convert = TRUE;};};};
 
 /* NOTE: as far as we know -- HDF5 does not support 1's comp */
@@ -503,7 +508,7 @@ static char *_H5_handle_float_pt(hid_t dtid)
     struct_entry->size       = format[0] / 8;
 
 /* GOTCHA: we have no alignment info from the file; so we guess */
-    struct_entry->alignment  = _H5_get_alignment(typename);
+    struct_entry->alignment  = _H5_get_alignment(file, typename);
 
 /* HDF5 files do not currently support indirection */
     struct_entry->n_indirects = 0;
@@ -515,7 +520,7 @@ static char *_H5_handle_float_pt(hid_t dtid)
     DEBUG1("      alignment: %d\n", _H5_get_alignment(typename));
 
 /* insert into the file charts */
-    _PD_d_install(_h5.pf, typename, struct_entry, FALSE);
+    _PD_d_install(hst->pf, typename, struct_entry, FALSE);
  
     DEBUG1("  Inserted definition for %s\n", typename);
  
@@ -528,9 +533,9 @@ static char *_H5_handle_float_pt(hid_t dtid)
  *                    - DTID id of datatype
  */
 
-static char *_H5_parse_datatype(hid_t dtid) 
-   {char *typename;
-    char type_class;
+static char *_H5_parse_datatype(PDBfile *file, hid_t dtid) 
+   {char type_class;
+    char *typename;
     hid_t supertype_id;
 
     typename   = NULL;
@@ -539,16 +544,16 @@ static char *_H5_parse_datatype(hid_t dtid)
   
     switch (type_class) 
        {case H5T_INTEGER :   /* FIXED-PT NUMBERS */
-             typename = _H5_handle_fixed_pt(dtid);
+             typename = _H5_handle_fixed_pt(file, dtid);
 	     break;
         case H5T_FLOAT :   /* FLOATING-PT NUMBERS */
-             typename = _H5_handle_float_pt(dtid);
+             typename = _H5_handle_float_pt(file, dtid);
 	     break;
         case H5T_COMPOUND :   /* COMPOUND TYPES */
-             typename = _H5_handle_compound(dtid);
+             typename = _H5_handle_compound(file, dtid);
 	     break;
         case H5T_STRING :   /* NULL-TERMINATED STRINGS */
-             typename = _H5_handle_fixed_pt(dtid);
+             typename = _H5_handle_fixed_pt(file, dtid);
 	     break;  
         case H5T_BITFIELD :   /* BIT FIELDS */
 /* IGNORE this case? */
@@ -564,7 +569,7 @@ static char *_H5_parse_datatype(hid_t dtid)
              break;
         case H5T_ARRAY  :  /* ARRAYS */
              supertype_id = H5Tget_super(dtid);
-	     typename     = _H5_parse_datatype(supertype_id); 
+	     typename     = _H5_parse_datatype(file, supertype_id); 
 	     break;
         case H5T_REFERENCE :  /* REFERENCE ? */
 /* IGNORE this case? */
@@ -587,9 +592,9 @@ static char *_H5_parse_datatype(hid_t dtid)
  *                      - for documentation on parsing this layout
  */
 
-static dimdes* _H5_parse_dimensions(hid_t dtid, hid_t dataspace_id) 
-   {dimdes *dimensions, *dim;
-    int rank, status, i;
+static dimdes *_H5_parse_dimensions(PDBfile *file, hid_t dtid, hid_t dataspace_id) 
+   {int rank, status, i;
+    dimdes *dimensions, *dim;
     H5S_class_t class_id;
     hsize_t *dim_size;
     hid_t nativetype_id, tempType;
@@ -700,7 +705,7 @@ static dimdes* _H5_parse_dimensions(hid_t dtid, hid_t dataspace_id)
  *                     - DTID is the HDF5 ID for this datatype
  */
 
-static char *_H5_handle_compound(hid_t dtid) 
+static char *_H5_handle_compound(PDBfile *file, hid_t dtid) 
    {int i, num_memb, convert;
     off_t memb_offset;
     char *memb_name, tempname[BUFFER_SIZE], *regName;
@@ -710,13 +715,15 @@ static char *_H5_handle_compound(hid_t dtid)
     hid_t internal_dtid;
     dimdes *dimensions;
     H5T_class_t type_class;
+    hdf_state *hst;
 
+    hst        = file->meta;
     type_class = H5Tget_class(dtid);
   
     if (type_class != H5T_COMPOUND)
        return(NULL);
 
-    regName = _H5_is_registered(dtid);
+    regName = _H5_is_registered(file, dtid);
 
     if (regName == NULL)
        {typename = NULL;
@@ -736,10 +743,10 @@ static char *_H5_handle_compound(hid_t dtid)
         DEBUG1("      # members %d\n", num_memb);
        
 /* create a unique type name placeholder */ 
-        snprintf(tempname, BUFFER_SIZE, "%s%d", PD_TYPE_PLACEHOLDER, _h5.nstr);
-        _h5.nstr++;
+        snprintf(tempname, BUFFER_SIZE, "%s%d", PD_TYPE_PLACEHOLDER, hst->nstr);
+        hst->nstr++;
         typename = SC_strsavef(tempname, "_H5_HANDLE_COMPOUND:typename");
-        _H5_register(dtid, typename);
+        _H5_register(file, dtid, typename);
     
 /* begin creating a memdes for the defstr */ 
         member_next = member_entry;
@@ -772,13 +779,13 @@ static char *_H5_handle_compound(hid_t dtid)
                 {fprintf(stderr, "_H5_HANDLE_COMPOUND: error retrieving member type\n");
                  return(NULL);};
     
-             type = _H5_parse_datatype(internal_dtid); 
+             type = _H5_parse_datatype(file, internal_dtid); 
     
              DEBUG1("      type is %s\n", type);
     
              snprintf(tempname, BUFFER_SIZE, "%s %s", type, memb_name);
             
-             dimensions = _H5_parse_dimensions(internal_dtid, 0); 
+             dimensions = _H5_parse_dimensions(file, internal_dtid, 0); 
    
 /* fill in the memdes */ 
              member_next->member      = SC_strsavef(tempname, "_H5_HANDLE_COMPOUND:member");
@@ -796,7 +803,7 @@ static char *_H5_handle_compound(hid_t dtid)
                 {member_next->number = _PD_comp_num(dimensions);};
     
 /* a struct needs conversion if one of its members needs conversion */
-             result_def = (defstr*) SC_hasharr_def_lookup(_h5.pf->chart, type);
+             result_def = (defstr*) SC_hasharr_def_lookup(hst->pf->chart, type);
 
              if (result_def != NULL)
                 {convert = convert || result_def->convert;}
@@ -830,7 +837,7 @@ static char *_H5_handle_compound(hid_t dtid)
 #endif
    
 /* after fully parsing the members, construct the defstr */
-        _PD_defstr_inst(_h5.pf, typename, STRUCT_KIND, member_entry,
+        _PD_defstr_inst(hst->pf, typename, STRUCT_KIND, member_entry,
 			NO_ORDER, NULL, NULL, FALSE);
 
 #if 0
@@ -842,7 +849,7 @@ static char *_H5_handle_compound(hid_t dtid)
         DEBUG1("      size %ld\n", (long) H5Tget_size(dtid));
         DEBUG1("      alignment %d\n", 4);
 
-        _PD_d_install(_h5.pf, typename, struct_entry, TRUE);
+        _PD_d_install(hst->pf, typename, struct_entry, TRUE);
     
 /* make a copy of struct_entry for the file charts */
         host_entry = FMAKE(defstr, "_H5_HANDLE_COMPOUND:host_entry");
@@ -853,7 +860,7 @@ static char *_H5_handle_compound(hid_t dtid)
     
 /* set convert just before adding to the file charts */
         host_entry->convert = convert; 
-        _PD_d_install(_h5.pf, typename, host_entry, FALSE);
+        _PD_d_install(hst->pf, typename, host_entry, FALSE);
     
         DEBUG1("Inserted defstr for %s in both charts\n", typename); 
 #endif
@@ -873,10 +880,10 @@ static char *_H5_handle_compound(hid_t dtid)
  */
 
 static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
-				 void *pdbfile) 
+				 void *a)
    {int nc;
-    char *typename, *prev_group, *temp_prefix, *fullname;
     BIGINT addr;
+    char *typename, *prev_group, *temp_prefix, *fullname;
     herr_t status;
     hid_t  dataset_id;
     hid_t  dataspace_id; 
@@ -884,10 +891,14 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
     syment *ep;
     dimdes *dimensions, *dim;
     H5G_stat_t statbuf;
+    PDBfile *file;
+    hdf_state *hst;
 
+    file       = (PDBfile *) a;
+    hst        = file->meta;
     status     = (herr_t) 0;
     typename   = NULL; 
-    prev_group = _h5.group_prefix;
+    prev_group = hst->group_prefix;
     dimensions = NULL;
 
     ep = FMAKE(syment, "_H5_READ_GROUP_NODE:ep");
@@ -910,16 +921,16 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
              DEBUG1("Parsing H5G_GROUP: %s\n", memb_name);
 
 /* append to group prefix */
-	     nc = strlen(_h5.group_prefix) + strlen(memb_name) + 2,
+	     nc = strlen(hst->group_prefix) + strlen(memb_name) + 2,
 	     temp_prefix = FMAKE_N(char, nc, "H5_READ_GROUP_NODE:temp_prefix");
 	     temp_prefix[0] = '\0';
 
-	     SC_strcat(temp_prefix, nc, _h5.group_prefix);        /* ends in slash '/'   */
+	     SC_strcat(temp_prefix, nc, hst->group_prefix);        /* ends in slash '/'   */
 	     SC_strcat(temp_prefix, nc, (char *) memb_name);  /* append new name     */
 	     SC_strcat(temp_prefix, nc, "/");                 /* end it in slash '/' */
-	     _h5.group_prefix = temp_prefix;
+	     hst->group_prefix = temp_prefix;
 
-	     ep->type = SC_strsavef("Directory", "H5_read_group_node:type");
+	     ep->type = SC_strsavef("Directory", "H5_READ_GROUP_NODE:type");
 	     ep->number               = 1; 
 	     ep->dimensions           = NULL; 
 	     ep->indirects.addr       = 0;
@@ -930,17 +941,17 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
 	     _PD_entry_set_address(ep, 0, 0);
 	     _PD_entry_set_number(ep, 0, 0);
                
-	     _PD_e_install(_h5.pf, _h5.group_prefix, ep, FALSE);
+	     _PD_e_install(hst->pf, hst->group_prefix, ep, FALSE);
 
-	     DEBUG1("    Inserted syment for %s", _h5.group_prefix);
+	     DEBUG1("    Inserted syment for %s", hst->group_prefix);
 	     DEBUG1(" with type %s\n", "Directory");   
 
 /* recurse */
 	     status = H5Giterate(group_id, memb_name, NULL,
-				 &H5_read_group_node, pdbfile);
+				 &H5_read_group_node, a);
 
 /* return the group prefix to what it was before */
-	     _h5.group_prefix = prev_group;
+	     hst->group_prefix = prev_group;
 	     SFREE(temp_prefix);
 	     break;
  
@@ -955,8 +966,8 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
 	        {printf("   Group member %s had no address\n", memb_name);
 		 return(-1);};
 
-	     dimensions = _H5_parse_dimensions(dtid, dataspace_id);
-	     typename   = _H5_parse_datatype(dtid); 
+	     dimensions = _H5_parse_dimensions(file, dtid, dataspace_id);
+	     typename   = _H5_parse_datatype(file, dtid); 
 
 	     DEBUG1("TYPE is %s\n", typename);
  
@@ -986,13 +997,13 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
 	     ep->indirects.n_ind_type = 0;
 	     ep->indirects.arr_offs   = 0;
 	     
-	     nc = strlen(_h5.group_prefix) + strlen(memb_name) + 1;
+	     nc = strlen(hst->group_prefix) + strlen(memb_name) + 1;
 	     fullname = FMAKE_N(char, nc, "H5_READ_GROUP_NODE:fullname");
 	     fullname[0] = '\0';
-	     SC_strcat(fullname, nc, _h5.group_prefix);
+	     SC_strcat(fullname, nc, hst->group_prefix);
 	     SC_strcat(fullname, nc, (char *) memb_name); 
 
-	     _PD_e_install(_h5.pf, fullname, ep, FALSE);
+	     _PD_e_install(hst->pf, fullname, ep, FALSE);
 
 	     DEBUG1("    Inserted syment for %s", fullname);
 	     DEBUG1(" with type %s\n", typename);   
@@ -1015,7 +1026,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
 	     break;
 
         default :
-             fprintf(stderr, "H5_read_group_node: unknown node type %d\n",
+             fprintf(stderr, "UNKNOWN NODE TYPE %d - H5_READ_GROUP_NODE\n",
 		     statbuf.type);
 	     return(-1);};
  
@@ -1048,6 +1059,8 @@ static int _H5_filep(char *type)
 static int _H5_close(PDBfile *file)
    {FILE *fp;
 
+    SFREE(file->meta);
+
 /* this closes the FILE* stream shared by both hdf_file and file */
     fp = file->stream; 
     if (lio_close(fp) != 0)
@@ -1070,15 +1083,17 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     syment *ep;
     PDBfile *file;
     PD_smp_state *pa;
+    hdf_state *hst;
 
     pa = _PD_get_state(-1);
 
     DEBUG1("_H5_create called: name(%s)\n", name);
 
 /* setup any global variables we will not read from the file */
-    _h5.nstr         = 0;
-    _h5.registry     = NULL;
-    _h5.group_prefix = NULL;
+    hst = FMAKE(hdf_state, "_H5_OPEN:hst");
+    hst->nstr         = 0;
+    hst->registry     = NULL;
+    hst->group_prefix = NULL;
 
 /* setup any local variables */
     status = 0;
@@ -1089,17 +1104,17 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     H5Eset_auto(H5E_DEFAULT, NULL, stderr);
 
 /* make sure it really is an HDF5 file */
-    _h5.hf = H5Fcreate(name, H5F_ACC_RDWR, H5P_DEFAULT, H5P_DEFAULT);
+    hst->hf = H5Fcreate(name, H5F_ACC_RDWR, H5P_DEFAULT, H5P_DEFAULT);
 
 /* return if this is not a valid HDF5 file */
-    if (_h5.hf < 0)
+    if (hst->hf < 0)
        return(NULL);
 
     file = _PD_mk_pdb(pu, "temp.pdb", NULL, TRUE, &_H5_sys, tr);
     if (file == NULL)
        return(NULL);
 
-    _h5.pf = file;
+    hst->pf = file;
 
 /* fill in the host's std with default values */
     file->host_std   = _PD_copy_standard(pa->int_std);
@@ -1116,11 +1131,11 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     file->align            = _PD_copy_alignment(file->host_align); 
     file->mode             = PD_APPEND; 
     file->virtual_internal = FALSE; 
-    file->type             = SC_strsavef(H5FILE_S, "char*:_H5_CREATE:file->type");
+    file->type             = SC_strsavef(H5FILE_S, "char*:_H5_CREATE:type");
     file->current_prefix   = SC_strsavef("/", "char*:_H5_CREATE:current_prefix");
 
 /* init the group/directory prefix to the root dir */
-    _h5.group_prefix = SC_strsavef("/", "char*:_H5_CREATE:_h5.group_prefix");
+    hst->group_prefix = SC_strsavef("/", "char*:_H5_CREATE:group_prefix");
 
     ep = FMAKE(syment, "_H5_CREATE:ep");
     ep->type = SC_strsavef("Directory", "_H5_CREATE:type");
@@ -1134,25 +1149,25 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     _PD_entry_set_address(ep, 0, 0);
     _PD_entry_set_number(ep, 0, 0);
          
-    _PD_e_install(file, _h5.group_prefix, ep, FALSE);
+    _PD_e_install(file, hst->group_prefix, ep, FALSE);
 
-    DEBUG1("    Inserted syment for %s", _h5.group_prefix);
+    DEBUG1("    Inserted syment for %s", hst->group_prefix);
     DEBUG1(" with type %s\n", "Directory");   
 
 /*
  * stuff goes here
-    hdf_root_group = H5Gopen(_h5.hf, "/", H5P_DEFAULT);
-    status = H5Giterate(_h5.hf, "/", NULL, &H5_read_group_node, &file);
+    hdf_root_group = H5Gopen(hst->hf, "/", H5P_DEFAULT);
+    status = H5Giterate(hst->hf, "/", NULL, &H5_read_group_node, file);
     H5Gclose(hdf_root_group);
 */
 
 /* if we were unsuccessful, alert the user */
     if (status < 0) 
-       {fprintf(stderr, "_H5_create: error creating HDF5 file %s\n", name);
+       {fprintf(stderr, "ERROR CREATING HDF5 FILE %s - _H5_CREATE\n", name);
         _H5_close(file);
 	file = NULL;};
 
-    SFREE(_h5.group_prefix);
+    SFREE(hst->group_prefix);
 
     return(file);}
     
@@ -1169,15 +1184,17 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     syment *ep;
     PDBfile *file;
     PD_smp_state *pa;
+    hdf_state *hst;
 
     pa = _PD_get_state(-1);
 
     DEBUG1("_H5_open called: name(%s)\n", name);
 
 /* setup any global variables we will not read from the file */
-    _h5.nstr         = 0;
-    _h5.registry     = NULL;
-    _h5.group_prefix = NULL;
+    hst = FMAKE(hdf_state, "_H5_OPEN:hst");
+    hst->nstr         = 0;
+    hst->registry     = NULL;
+    hst->group_prefix = NULL;
 
 /* setup any local variables */
     status = 0;
@@ -1188,17 +1205,18 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     H5Eset_auto(H5E_DEFAULT, NULL, stderr);
 
 /* make sure it really is an HDF5 file */
-    _h5.hf = H5Fopen(name, H5F_ACC_RDONLY, H5P_DEFAULT);
+    hst->hf = H5Fopen(name, H5F_ACC_RDONLY, H5P_DEFAULT);
 
 /* return if this is not a valid HDF5 file */
-    if (_h5.hf < 0)
+    if (hst->hf < 0)
        return(NULL);
 
     file = _PD_mk_pdb(pu, "temp.pdb", mode, TRUE, &_H5_sys, tr);
     if (file == NULL)
        return(NULL);
 
-    _h5.pf = file;
+    hst->pf    = file;
+    file->meta = hst;
 
 /* fill in the host's std with default values */
     file->host_std   = _PD_copy_standard(pa->int_std);
@@ -1215,11 +1233,11 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     file->align            = _PD_copy_alignment(file->host_align); 
     file->mode             = PD_APPEND; 
     file->virtual_internal = FALSE; 
-    file->type             = SC_strsavef(H5FILE_S, "char*:_H5_OPEN:file->type");
+    file->type             = SC_strsavef(H5FILE_S, "char*:_H5_OPEN:type");
     file->current_prefix   = SC_strsavef("/", "char*:_H5_OPEN:current_prefix");
 
 /* init the group/directory prefix to the root dir */
-    _h5.group_prefix = SC_strsavef("/", "char*:_H5_OPEN:_h5.group_prefix");
+    hst->group_prefix = SC_strsavef("/", "char*:_H5_OPEN:group_prefix");
 
     ep = FMAKE(syment, "_H5_OPEN:ep");
     ep->type                 = SC_strsavef("Directory", "_H5_OPEN:type");
@@ -1233,17 +1251,17 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     _PD_entry_set_address(ep, 0, 0);
     _PD_entry_set_number(ep, 0, 0);
          
-    _PD_e_install(file, _h5.group_prefix, ep, FALSE);
+    _PD_e_install(file, hst->group_prefix, ep, FALSE);
 
-    DEBUG1("    Inserted syment for %s", _h5.group_prefix);
+    DEBUG1("    Inserted syment for %s", hst->group_prefix);
     DEBUG1(" with type %s\n", "Directory");   
 
 /* parse the entire HDF5 file
  * insert entries in the charts as we encounter types
  * insert entries in the symbol table as we encounter the objects
  */
-    hdf_root_group = H5Gopen(_h5.hf, "/", H5P_DEFAULT);
-    status = H5Giterate(_h5.hf, "/", NULL, &H5_read_group_node, &file);
+    hdf_root_group = H5Gopen(hst->hf, "/", H5P_DEFAULT);
+    status = H5Giterate(hst->hf, "/", NULL, &H5_read_group_node, file);
     H5Gclose(hdf_root_group);
 
 /* if we were unsuccessful, alert the user */
@@ -1251,7 +1269,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
        {_H5_close(file);
 	file = NULL;};
 
-    SFREE(_h5.group_prefix);
+    SFREE(hst->group_prefix);
 
     return(file);}
     
