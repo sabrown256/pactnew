@@ -37,6 +37,10 @@ while ($#argv > 0)
            set cvsopt = ( $cvsopt -d ${hst}:$dir )
            set svnopt = ( $svnopt http://${hst}$dir )
            breaksw
+      case -D:
+           shift
+           set srcdate = ( $1 )
+           breaksw
       default:
            set pkg = ( $pkg $1 )
            breaksw

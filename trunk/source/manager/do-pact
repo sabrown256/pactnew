@@ -131,7 +131,7 @@ switch ($Phase)
                  if ($Tag == "none") then
                     set CO = "cvs co $Code"
                  else
-                    set CO = "cvs co -r $Tag $Code"
+                    set CO = "cvs co -D "$Tag" $Code"
                  endif
 
                  flog $LogHost eval $CO
