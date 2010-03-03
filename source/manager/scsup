@@ -8,14 +8,22 @@
 # include "cpyright.h"
 #
 
+set unmngd = FALSE
 set cvsopt = ""
 set svnopt = ""
 set args   = ""
 while ($#argv > 0)
    switch ($1)
+      case -A:
+           set cvsopt = ( $cvsopt -A )
+           set svnopt = ( $svnopt --depth files )
+           breaksw
       case -l:
            set cvsopt = ( $cvsopt -l )
            set svnopt = ( $svnopt --depth files )
+           breaksw
+      case -u:
+           set unmngd = TRUE
            breaksw
       default:
            set args = ( $args $1 )
@@ -26,12 +34,20 @@ end
 
 if (-d CVS) then
 
-   cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
+   if ($unmngd == TRUE) then
+      cvs update $cvsopt $args |& egrep '^\?'
+   else
+      cvs update $cvsopt $args |& egrep -v '^\?' |& grep -v 'cvs update'
+   endif
 
 else if (-d .svn) then
 
    svn update $svnopt $args
-   svn status $svnopt |& egrep -v '^\?'
+   if ($unmngd == TRUE) then
+      svn status $svnopt |& egrep '^\?'
+   else
+      svn status $svnopt |& egrep -v '^\?'
+   endif
 
 endif
 

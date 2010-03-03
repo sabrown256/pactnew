@@ -84,8 +84,13 @@ endif
 if (-d CVS) then
 
    if ($?CVSROOT == 1) then
-      set repohost = `echo $CVSROOT | sed 's|:/.*$||' | sed 's|^.*@||'`
-      set repodir  = `echo $CVSROOT | sed 's|^.*:||'`
+      if ("$CVSROOT" =~ *:*) then
+         set repohost = `echo $CVSROOT | sed 's|:/.*$||' | sed 's|^.*@||'`
+         set repodir  = `echo $CVSROOT | sed 's|^.*:||'`
+      else
+         set repohost = `hostname`
+         set repodir  = $CVSROOT
+      endif
    else
       set repohost = ""
    endif

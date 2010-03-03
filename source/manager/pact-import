@@ -24,6 +24,8 @@ endif
 
 set MngDir = $cwd
 set SCSCom = $MngDir/scscom
+set SCSUp  = $MngDir/scsup
+set SCSCO  = $MngDir/scsco
 if (-d CVS) then
    set RepoDir = `cat CVS/Root | sed 's|^.*:||'`
    set SCSAdd  = ( cvs add )
@@ -55,7 +57,7 @@ set TmpFile       = tmp-file
 
 if (-e $TagFile) then
    set ImportTag = `cat $TagFile`
-   set SCSTag    = "-r $ImportTag"
+   set SCSTag    = "-D $ImportTag"
 else
    set SCSTag    = ""
 endif
@@ -158,9 +160,6 @@ endif
       call RECONCILE(import/old)
       call UPDATE(import/old)
       call COMMIT(import/old)
-      call TAG(import/old)
-   else
-      call SCS_IMPORT(import)
    endif
 
    call FINISH()
@@ -390,7 +389,7 @@ GET_OLD:
    flog $Log cd $Old
    flog $Log set Repository = $Repository:h
 
-   flog $Log cvs co $SCSTag pact
+   flog $Log $SCSCO $SCSTag pact
    flog $Log set ErrStat = $status
 
    flog $Log popd
@@ -670,7 +669,7 @@ RECONCILE:
    Note $STDOUT '   popd >& /dev/null'
    Note $STDOUT 'else if (-e $Base.old) then'
    Note $STDOUT '   pushd $BaseDir >& /dev/null'
-   Note $STDOUT '   cvs update -A $File'
+   Note $STDOUT "   $SCSUp -A" '$File'
    Note $STDOUT '   rm -f $File' 
    Note $STDOUT "   $SCSDel" '$File'
    Note $STDOUT '   popd >& /dev/null'
@@ -732,10 +731,10 @@ UPDATE:
    Note $Log ""
 
    if ($SCSTag != "") then
-      flog $Log (cvs update -A >&! $TmpFile)
+      flog $Log ($SCSUp -A >&! $TmpFile)
    else
       flog $Log cd pact
-      flog $Log (cvs update >&! ../$TmpFile)
+      flog $Log ($SCSUp >&! ../$TmpFile)
       flog $Log cd ..
    endif
 
@@ -811,82 +810,6 @@ COMMIT:
 
    flog $Log popd
    Note $Lock "done" 
-
-   return
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# TAG - tag this new version
-#     - working directory should be import/old
-
-TAG:
-
-   set WDir = $args_[1]
-   flog $Log pushd $WDir
-
-   Separator $Log
-   Note $Lock -n "Tagging the sources ................ " 
-   NoteD $Log "Tagging the sources"
-   Note $Log "   Current Directory:    $cwd"
-   Note $Log ""
-
-   flog $Log set TagID = `/bin/date '+X%y_%m_%d_%H_%M_%S'`
-   NoteD $Log "   Version Tag: $TagID"
-
-   flog $Log cvs rtag $TagID pact
-
-   flog $Log popd
-   Note $Lock "done" 
-
-   return
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# SCS_IMPORT - not quite what we want for our "imports"
-#            - coded up anyway to experiment
-#            - or to make a repository if there is not one existing
-#            - working directory should be import
-
-SCS_IMPORT:
-
-   set WDir = $args_[1]
-
-   Separator $Log
-   NoteD $Log "Unpacking new sources"
-   Note $Log ""
-
-   flog $Log pushd $WDir
-
-   flog $Log tar xvf pact.tar
-   if ($status != 0) then
-      NoteD $Log "TAR extract failed, check sources in manager/import"
-      exit(1)
-   endif
-
-   flog $Log cd pact
-
-   NoteD $Log "Importing sources from $cwd into $Repository"
-   flog $Log cvs import -m "Import from $CodeDate" $Repository v$CodeDate r$CodeDate
-   set ErrStat = $status
-   if ($ErrStat != 0) then
-      NoteD $Log "IMPORT failed, check sources in manager/import"
-      exit(1)
-   endif
-
-   flog $Log cd ../../..
-
-   NoteD $Log "Merging sources"
-
-   flog $Log cvs update -jv$CodeDate:yesterday -jv$CodeDate
-   set ErrStat = $status
-   if ($ErrStat != 0) then
-      NoteD $Log "MERGE failed, check sources in manager/import"
-      exit(1)
-   endif
-
-   flog $Log popd
 
    return
 
