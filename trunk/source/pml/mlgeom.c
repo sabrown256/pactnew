@@ -329,7 +329,10 @@ static int _PM_by_angle(void *a, void *b)
     aa = atan2(pa->y, pa->x);
     ab = atan2(pb->y, pb->x);
 
-    ok = (aa < ab);
+    if ((aa == 0.0) && (ab == 0.0))
+       ok = (pa->x < pb->x);
+    else
+       ok = (aa < ab);
 
     return(ok);}
 
