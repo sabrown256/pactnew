@@ -82,7 +82,7 @@ void dpenv(object *penv)
 	     if (lines != NULL)
 
 /* subtract 1 for the NULL entry in lines signalling the end */
-	        {SC_ptr_arr_len(lines, nx);
+	        {SC_ptr_arr_len(nx, lines);
 
 		 PRINT(stdout, "----------------------------------------\n");
 		 PRINT(stdout, "Frame %d: %s\n", ie, fname);

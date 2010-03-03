@@ -696,7 +696,7 @@ static long _SC_rgchk(void)
 			   "   Block: %12lx (corrupted registered memory block ",
 			   p);
 
-		 io_printf(stdout,	"- %ld,%ld)\n", i, j);
+		 io_printf(stdout,	"- %ld)\n", i);
 
 		 bad++;};};
 

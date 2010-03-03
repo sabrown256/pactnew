@@ -10,6 +10,13 @@
 
 #include "pml_int.h"
 
+typedef struct s_pt pt;
+
+struct s_pt
+   {int i;
+    double x;
+    double y;};
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -309,145 +316,84 @@ static INLINE int _PM_insert_point(int i, int ln, int lx, int **pd, int *pn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_INIT_HULL - make the initial right handed triangle from which
- *               - to grow the convex hull
- */
+/* _PM_BY_ANGLE - return TRUE iff angle of a < angle of b */
 
-static int _PM_init_hull(int *di, double *p1, double *p2, int nh)
-   {int i, i1, i2;
-    int np, nd, ia, id;
-    double cp1;
-    double x0[2], x1[2], x2[2];
+static int _PM_by_angle(void *a, void *b)
+   {int ok;
+    double aa, ab;
+    pt *pa, *pb;
 
-    nd = nh;
-    
-/* pick the first point as one of the initial hull vertices */
-    di[0] = 0;
-    np    = 1;
+    pa = (pt *) a;
+    pb = (pt *) b;
 
-/* loop over the list of points in forward and reverse order
- * until a right handed triangle can be constructed as the initial
- * hull
- */
-    for (ia = 0; (ia < 2) && (np < 3); ia++)
-        {np = 1;
-	 if (ia == 0)
-	    {i1 = 1;
-	     i2 = nh - 1;
-	     id = 1;}
-	 else
-	    {i1 = nh - 1;
-	     i2 = 1;
-	     id = -1;};
+    aa = atan2(pa->y, pa->x);
+    ab = atan2(pb->y, pb->x);
 
-/* find a second point different from the first */
-	 for (i = i1;
-	      ((i1 <= i) && (i <= i2)) || ((i2 <= i) && (i <= i1));
-	      i += id)
-	     {x0[0] = p1[i] - p1[0];
-	      x0[1] = p2[i] - p2[0];
-	      if (ABS(x0[0]) + ABS(x0[1]) > TOLERANCE)
-		 {di[1] = i;
-		  np++;
-		  break;};};
+    ok = (aa < ab);
 
-/* find a third non-colinear which makes a right hand triangle */
-	 for (i = 2; i < nh; i++)
-	     {x0[0] = p1[0];
-	      x0[1] = p2[0];
-	      x1[0] = p1[1];
-	      x1[1] = p2[1];
-	      x2[0] = p1[i];
-	      x2[1] = p2[i];
-
-	      cp1 = PM_DELTA_CROSS_2D(x0[0], x0[1], x1[0], x1[1], x2[0], x2[1]);
-
-	      if (cp1 > TOLERANCE)
-		 {di[2] = i;
-		  np++;
-		  break;};};};
-
-     return(np);}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PM_CONVEX_HULL - create the polygon which is the convex hull of the
  *                - given set of points
+ *                - use the Graham scan algorithm
  */
 
 PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
-   {int i, i0, i1, i2, i3;
-    int j, j0, j1, j2, j3;
-    int np, nd, l;
-    int c1, c2, c3;
-    int *di;
-    double cp1, cp2, cp3;
-    double x0[2], x1[2], x2[2], x3[2], xn[2];
+   {int i, imn, np;
+    double xc, yc, xmn, ymn, cp;
     double *x, *y;
+    pt *pa;
+    SC_array *a;
     PM_polygon *py;
 
-    nd = nh;
-    di = FMAKE_N(int, nd, "PM_CONVEX_HULL:di");
-    
-    np = _PM_init_hull(di, p1, p2, nh);
+    a = SC_MAKE_ARRAY("PM_CONVEX_HULL", pt, NULL);
+    SC_array_resize(a, nh+10, -1.0);
+    SC_array_set_n(a, nh);
 
-/* check against the current hull */
+    pa = SC_array_array(a);
+
+/* load the array and find the leftmost minimum y point */
+    xmn = HUGE;
+    ymn = HUGE;
+    imn = -1;
     for (i = 0; i < nh; i++)
+        {xc = p1[i];
+	 yc = p2[i];
+         pa[i].i = i;
+	 pa[i].x = xc;
+	 pa[i].y = yc;
+         if (yc < ymn)
+	    {xmn = xc;
+	     ymn = yc;
+	     imn = i;}
+	 else if ((yc == ymn) && (xc < xmn))
+	    {xmn = xc;
+	     imn = i;};};
 
-/* NOTE: 1->np crucial for getting the handedness right */
-        {for (j = 1; j <= np; j++)
-             {j0 = (j - 2 + np) % np;
-              j1 = (j - 1 + np) % np;
-              j2 = j % np;
-              j3 = (j + 1) % np;
+/* shift to minimum point */
+    for (i = 0; i < nh; i++)
+        {pa[i].x -= xmn;
+	 pa[i].y -= ymn;};
 
-	      i0 = di[j0];
-              i1 = di[j1];
-              i2 = di[j2];
-              i3 = di[j3];
+/* make the first point be the minimum y point */
+    SC_SWAP_VALUE(pt, pa[imn], pa[0]);
+    SFREE(pa);
 
-	      if ((i == i0) || (i == i1) || (i == i2) || (i == i3))
-		 continue;
+    SC_array_sort(a, _PM_by_angle);
+    pa = SC_array_array(a);
 
-              x0[0] = p1[i0];
-              x0[1] = p2[i0];
-              x1[0] = p1[i1];
-              x1[1] = p2[i1];
-              x2[0] = p1[i2];
-              x2[1] = p2[i2];
-              x3[0] = p1[i3];
-              x3[1] = p2[i3];
-              xn[0] = p1[i];
-              xn[1] = p2[i];
-
-/* by construction we have a right handed polygon */
-              cp1 = PM_DELTA_CROSS_2D(x0[0], x0[1], x1[0], x1[1], xn[0], xn[1]);
-              cp2 = PM_DELTA_CROSS_2D(x1[0], x1[1], x2[0], x2[1], xn[0], xn[1]);
-              cp3 = PM_DELTA_CROSS_2D(x2[0], x2[1], x3[0], x3[1], xn[0], xn[1]);
-
-	      c1 = ((cp1 + TOLERANCE) < 0.0);
-	      c2 = ((cp2 + TOLERANCE) <= 0.0);
-	      c3 = ((cp3 + TOLERANCE) < 0.0);
-
-/* replace j1 by i and splice out j2 */
-	      if (c1 && c2 && c3)
-		 {di[j1] = i;
-		  for (l = j2; l < np; l++)
-		      di[l] = di[l+1];
-		  np--;}
-
-/* replace j1 by i */
-	      else if (c1 && c2)
-		 di[j1] = i;
-
-/* replace j2 by i */
-	      else if (c2 && c3)
-		 di[j2] = i;
-
-/* break the (j1,j2) segment and splice in the current point */
-	      else if (c2)
-		 np = _PM_insert_point(i, j, np, &di, &nd);};};
+    pa[nh] = pa[0];
+    np = 1;
+    for (i = np+1; i <= nh; i++)
+        {for (cp = -1.0; (cp <= 0.0) && (np > 0); np--)
+	     cp = PM_DELTA_CROSS_2D(pa[np-1].x, pa[np-1].y,
+				    pa[np].x, pa[np].y,
+				    pa[i].x, pa[i].y);
+	 np += 2;
+	 SC_SWAP_VALUE(pt, pa[np], pa[i]);};
 
 /* make the return polygon */
     py = PM_init_polygon(2, np+1);
@@ -455,16 +401,16 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
     y  = py->x[1];
 
     for (i = 0; i < np; i++)
-        {j = di[i];
-         x[i] = p1[j];
-         y[i] = p2[j];};
+        {x[i] = pa[i].x + xmn;
+         y[i] = pa[i].y + ymn;};
 
     x[np] = x[0];
     y[np] = y[0];
 
     py->nn = py->np;
 
-    SFREE(di);
+    SFREE(pa);
+    SC_free_array(a, NULL);
 
     return(py);}
 
