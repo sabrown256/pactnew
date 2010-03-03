@@ -380,6 +380,8 @@ struct s_PDBfile
     sys_layer *sys;
     tr_layer *tr;
 
+    void *meta;                          /* container for metadata in the tr layer */
+    
 /* the db_layer methods */
     int (*create)(PDBfile *file, int mst);
     int (*open)(PDBfile *file);

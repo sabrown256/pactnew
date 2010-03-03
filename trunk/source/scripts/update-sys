@@ -372,7 +372,7 @@ case daemon:
           echo "   User: $USER"
           echo "   Date: `date`"
           echo "   PID:  $$"
-          echo "Lock info:"
+          echo "Lock info ($Lock):"
           cat $Lock |& awk '{printf("   %s\n", $0);}'
           echo ""
           exit(1)
