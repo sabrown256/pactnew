@@ -824,6 +824,7 @@ extern void
  PM_rotate_vectors(int nd, int n, double **x, double *x0, double *a);
 
 extern double
+ PM_polygon_area(PM_polygon *py),
  **PM_convert_vectors(int nd, int n, void *v, char *typ);
 
 

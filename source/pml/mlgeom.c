@@ -686,6 +686,34 @@ int PM_contains_3d(double x, double y, double z,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_POLYGON_AREA - compute the area of the polygon PY */
+
+double PM_polygon_area(PM_polygon *py)
+   {int i, np;
+    double x1, x2, x3, y1, y2, y3, ac;
+    double *x, *y;
+
+    x  = py->x[0];
+    y  = py->x[1];
+    np = py->np;
+
+    x1 = x[0];
+    y1 = y[0];
+
+    ac = 0.0;
+    for (i = 2; i < np; i++)
+        {x2 = x[i];
+	 y2 = y[i];
+	 x3 = x[i+1];
+         y3 = y[i+1];
+
+	 ac += (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);};
+
+    return(ac);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_INTERSECT_LINE_POLYGON - compute the intersection points of the
  *                           - given line (Xmn,Ymn) -> (Xmx,Ymx)
  *                           - with the given polygon (Px,Py) of Np nodes
@@ -698,7 +726,7 @@ int PM_contains_3d(double x, double y, double z,
 int PM_intersect_line_polygon(double *pxmn, double *pymn,
 			      double *pxmx, double *pymx,
 			      PM_polygon *py, int *pic)
-   {int i, ic, np, p1, p2;
+   {int i, ic, np, p1, p2, rv;
     double x0, y0, x1, x2, x3, x4, y1, y2, y3, y4;
     double xr[10], yr[10];
     double *x, *y;
@@ -753,7 +781,9 @@ int PM_intersect_line_polygon(double *pxmn, double *pymn,
     *pxmx = xr[1];
     *pymx = yr[1];
 
-    return((ic > 1) || p1 || p2);}
+    rv = ((ic > 1) || p1 || p2);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
