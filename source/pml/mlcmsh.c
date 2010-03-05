@@ -567,11 +567,13 @@ static int _PM_split_side(PM_part *prt, PM_side *base, double xi, double yi)
  */
 
 static int _PM_same_cp(PM_conic_curve *curvea, PM_conic_curve *curveb)
-   {
+   {int rv;
 
-    return(SAME(curvea->xx, curvea->yy, curveb->xx, curveb->yy) &&
-           SAME(curvea->xy, curvea->c, curveb->xy, curveb->c) &&
-           SAME(curvea->x, curvea->y, curveb->x, curveb->y));}
+    rv = SAME(curvea->xx, curvea->yy, curveb->xx, curveb->yy) &&
+         SAME(curvea->xy, curvea->c, curveb->xy, curveb->c) &&
+         SAME(curvea->x, curvea->y, curveb->x, curveb->y);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -597,11 +599,13 @@ double _PM_wherein(PM_side *base, double x, double y)
  */
 
 static int _PM_seg_orient(PM_side *basea, PM_side *baseb)
-   {
+   {int rv;
 
-    return((_PM_wherein(basea, baseb->x, baseb->y) <
-            _PM_wherein(basea, baseb->next->x, baseb->next->y)) ?
-           PARLLL : OPPST);}
+    rv = (_PM_wherein(basea, baseb->x, baseb->y) <
+	  _PM_wherein(basea, baseb->next->x, baseb->next->y)) ?
+	 PARLLL : OPPST;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -747,7 +751,9 @@ static int _PM_match_int(int type, PM_side *basea, PM_side *baseb)
 /* _PM_CROSS_CP - return TRUE if the segments cross */
 
 static int _PM_cross_cp(PM_side *basea, PM_side *baseb)
-   {return(FALSE);}
+   {
+
+    return(FALSE);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1025,10 +1031,10 @@ static double _PM_comp_ratio(double b0, int nz)
  *                    - complete generality
  */
 
-static void _PM_compute_ratios(REAL *fr, PM_side *base, PM_mesh *mesh)
+static void _PM_compute_ratios(double *fr, PM_side *base, PM_mesh *mesh)
    {int i, j, n, dk, dl, kbnd;
     double t, sdl, sdk, dkdl, dke, dldk, dle;
-    REAL *kra, *lra, *apk, *apl;
+    double *kra, *lra, *apk, *apl;
 
     kbnd = mesh->kmax + 1;
     kra  = mesh->kra;
@@ -1140,7 +1146,7 @@ static void _PM_compute_ratios(REAL *fr, PM_side *base, PM_mesh *mesh)
  *                       - fractions of the total arc length
  */
    
-static void _PM_compute_fractions(REAL *fr, PM_side *base, int n,
+static void _PM_compute_fractions(double *fr, PM_side *base, int n,
 				  PM_mesh *mesh)
    {int i, m;
     double drfn, drfx, srat, d, r, t;
@@ -1226,12 +1232,12 @@ static void _PM_compute_fractions(REAL *fr, PM_side *base, int n,
  *                 - (xp, yp)
  */
 
-static void _PM_find_points(REAL *xp, REAL *yp, PM_mesh *mesh,
-			    int m, double t, REAL *f, int *indx, int n,
+static void _PM_find_points(double *xp, double *yp, PM_mesh *mesh,
+			    int m, double t, double *f, int *indx, int n,
 			    PM_conic_curve *crv)
    {int i, j, l;
     double p, ps, ds, x1, x2, y1, y2, dx, dy, rt;
-    REAL *rx, *ry;
+    double *rx, *ry;
 
     rx = mesh->rx;
     ry = mesh->ry;
@@ -1270,14 +1276,14 @@ static void _PM_find_points(REAL *xp, REAL *yp, PM_mesh *mesh,
  */
 
 static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
-			       double x2, double y2, REAL *f,
+			       double x2, double y2, double *f,
 			       int *indx, int n, int dir,
 			       PM_conic_curve *crv)
    {int i, j, m;
     double axx, ayy, axy, ax, ay, ac, iax, iay;
     double x, y, t, dt, tx, ty, ds, dsa;
     double bx, by, cx, cy, sg;
-    REAL *xp, *yp, *rx, *ry;
+    double *xp, *yp, *rx, *ry;
 
     rx = mesh->rx;
     ry = mesh->ry;
@@ -1296,8 +1302,8 @@ static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
              ry[j] = y1 + f[i]*(y2 - y1);};}
     else
        {m  = 40*n;
-        xp = FMAKE_N(REAL, m, "_PM_COMPUTE_POINTS:xp");
-        yp = FMAKE_N(REAL, m, "_PM_COMPUTE_POINTS:yp");
+        xp = FMAKE_N(double, m, "_PM_COMPUTE_POINTS:xp");
+        yp = FMAKE_N(double, m, "_PM_COMPUTE_POINTS:yp");
 
         dt = 3.0*sqrt(ABS(ac/(axx*axx + ayy*ayy + axy*axy)))/(10.0*n);
         if (dt == 0.0)
@@ -1407,7 +1413,7 @@ static int _PM_map_base(PM_part *parts, PM_side *base, PM_mesh *mesh)
    {int i, j, n, l, dk, dl, kbnd;
     int sdk, sdl, dkdl, dldk, dke, dle, m, m1, bnd_fl;
     int indx[1000], *reg_map;
-    REAL t[1000], *nodet;
+    double t[1000], *nodet;
 
     reg_map = mesh->reg_map;
     nodet   = mesh->nodet;
@@ -1712,7 +1718,7 @@ static int _PM_sweep_nodes(int ks, int ls, PM_part *parta, PM_mesh *mesh)
    {int k, l, n, nn, kbnd;
     int i0, i1, i2, i3, i4;
     int kmn, kmx, lmn, lmx;
-    REAL *nodet;
+    double *nodet;
     PM_side *ib;
 
     kbnd  = mesh->kmax + 1;
@@ -1827,7 +1833,7 @@ void _PM_fill_part(PM_part *parts, PM_mesh *mesh, int strategy,
 		   int method, int constr, double dspat, double drat,
 		   double orient)
    {int i, k, l;
-    REAL *nodet;
+    double *nodet;
     PM_part *ipart;
     PM_side *ib;
 
@@ -1863,9 +1869,10 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     int i, j, kmin, kmax, lmin, lmax, kbnd, lbnd;
     int n_zones, n_nodes, frz, frn, lrz, lrn;
     int *reg_map;
-    REAL real, *n1, *n2, *n3, *n4;
-    REAL *kra, *lra, *apk, *apl;
-    REAL *nodet, *zone, *rx, *ry;
+    double real;
+    double *n1, *n2, *n3, *n4;
+    double *kra, *lra, *apk, *apl;
+    double *nodet, *zone, *rx, *ry;
     PM_mesh *mesh;
 
     if (parts == NULL)
@@ -1899,15 +1906,15 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     mesh->n_nodes = n_nodes;
 
     reg_map = FMAKE_N(int, n_zones, "_PM_FILL_MESH:reg_map");
-    rx      = FMAKE_N(REAL, n_nodes, "_PM_FILL_MESH:rx");
-    ry      = FMAKE_N(REAL, n_nodes, "_PM_FILL_MESH:ry");
-    nodet   = FMAKE_N(REAL, n_nodes, "_PM_FILL_MESH:nodet");
-    zone    = FMAKE_N(REAL, n_zones, "_PM_FILL_MESH:zone");
+    rx      = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:rx");
+    ry      = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:ry");
+    nodet   = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:nodet");
+    zone    = FMAKE_N(double, n_zones, "_PM_FILL_MESH:zone");
 
-    kra = FMAKE_N(REAL, n_nodes, "_PM_FILL_MESH:kra");
-    lra = FMAKE_N(REAL, n_nodes, "_PM_FILL_MESH:lra");
-    apk = FMAKE_N(REAL, n_zones, "_PM_FILL_MESH:apk");
-    apl = FMAKE_N(REAL, n_zones, "_PM_FILL_MESH:apl");
+    kra = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:kra");
+    lra = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:lra");
+    apk = FMAKE_N(double, n_zones, "_PM_FILL_MESH:apk");
+    apl = FMAKE_N(double, n_zones, "_PM_FILL_MESH:apl");
 
     mesh->reg_map = reg_map;
     mesh->nodet   = nodet;
@@ -1962,7 +1969,7 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     mesh->frz = frz;
     mesh->lrz = lrz;
 
-/* fill in the real zone map */
+/* fill in the double zone map */
     for (j = frz; j <= lrz; j++)
         {real = n1[j]*n2[j]*n3[j]*n4[j];
          if (real != 0.0)

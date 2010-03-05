@@ -42,7 +42,7 @@
      for (i = 0; i < _n; i++)                                               \
          PRINT(stdout, #_w "[%d] = %12.6e\n", i, _w[i]);}
 
-#define SP_SELEMENT(_s, _i, _js) (((REAL *) (_s)->aj[_i].array)[_js])
+#define SP_SELEMENT(_s, _i, _js) (((double *) (_s)->aj[_i].array)[_js])
 #define SP_COL_IND(_s, _i, _js)  (((int *) (_s)->j[_i].array)[_js])
 #define SP_FINDEX(_s, _i, _j)    ((_s)->indx[_i][_j])
 #define SP_N_ROW(_s, _i)         ((_s)->j[_i].n)
@@ -73,8 +73,8 @@ static void _PM_sort_sp(PM_sp_lin_sys *sls)
    {int i, n, js, njs;
     int lh, l1, l2, tj1, tj2, gap;
     int *pj, *diag;
-    REAL ta;
-    REAL *pa;
+    double ta;
+    double *pa;
     SC_array *jj, *aj; 
 
     if (sls == NULL)
@@ -136,9 +136,9 @@ static void _PM_sort_sp(PM_sp_lin_sys *sls)
 
 /* _PM_CG_CMP_AP - compute A.p for a sparse system */
 
-static void _PM_cg_cmp_Ap(REAL *Ax, PM_sp_lin_sys *sls, REAL *x)
+static void _PM_cg_cmp_Ap(double *Ax, PM_sp_lin_sys *sls, double *x)
    {int i, j, js, n, njs;
-    REAL aij;
+    double aij;
 
     n = sls->n_ups;
 
@@ -169,9 +169,9 @@ static void _PM_cg_cmp_Ap(REAL *Ax, PM_sp_lin_sys *sls, REAL *x)
 
 /* _PM_CG_CMP_LR - compute L.r for a sparse system */
 
-static void _PM_cg_cmp_Lr(REAL *Lr, PM_sp_lin_sys *sls, REAL *r)
+static void _PM_cg_cmp_Lr(double *Lr, PM_sp_lin_sys *sls, double *r)
    {int i, js, n, njs;
-    REAL aij;
+    double aij;
 
     n = sls->n_ups;
 
@@ -198,8 +198,8 @@ static void _PM_cg_cmp_Lr(REAL *Lr, PM_sp_lin_sys *sls, REAL *r)
 void PM_iccg_pre(PM_sp_lin_sys *sls)
    {int i, j, k, n, n_ods;
     int js, njs;
-    REAL lij, ljk, lik, li, lk;
-    REAL *d;
+    double lij, ljk, lik, li, lk;
+    double *d;
     PM_sp_lin_sys *sdl;
 
     n     = sls->n_ups;
@@ -260,11 +260,11 @@ void PM_iccg_pre(PM_sp_lin_sys *sls)
  *                - matrix A (by the ICCG construction)
  */
 
-void PM_iccg_cmp_Lr(REAL *Lr, PM_sp_lin_sys *sls, REAL *r)
+void PM_iccg_cmp_Lr(double *Lr, PM_sp_lin_sys *sls, double *r)
    {int i, j, n, is, js, njs;
     int *diag, *pj, *pjt;
-    REAL ri, li, lij, lji;
-    REAL *d, *w, *pa, *pat;
+    double ri, li, lij, lji;
+    double *d, *w, *pa, *pat;
     PM_sp_lin_sys *sdl;
     SC_array *jj, *aj, *jtj, *atj; 
 
@@ -350,8 +350,8 @@ void PM_iccg_cmp_Lr(REAL *Lr, PM_sp_lin_sys *sls, REAL *r)
 PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
 				int sym, int trans,
 				void (*pre)(PM_sp_lin_sys *sls),
-				void (*clr)(REAL *Lr, PM_sp_lin_sys *sls,
-					    REAL *r))
+				void (*clr)(double *Lr, PM_sp_lin_sys *sls,
+					    double *r))
    {int i;
     PM_sp_lin_sys *sls;
 
@@ -376,7 +376,7 @@ PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
 
     for (i = 0; i < n_ups; i++)
         {SC_INIT_ARRAY((sls->j  + i), "PM_MK_SP_LIN_SYS", int,  NULL);
-	 SC_INIT_ARRAY((sls->aj + i), "PM_MK_SP_LIN_SYS", REAL, NULL);};
+	 SC_INIT_ARRAY((sls->aj + i), "PM_MK_SP_LIN_SYS", double, NULL);};
 
     if (trans)
        {sls->jt  = FMAKE_N(SC_array, n_ups, "PM_MK_SP_LIN_SYS:jt");
@@ -384,7 +384,7 @@ PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
 
 	for (i = 0; i < n_ups; i++)
 	    {SC_INIT_ARRAY((sls->jt  + i), "PM_MK_SP_LIN_SYS", int,  NULL);
-	     SC_INIT_ARRAY((sls->atj + i), "PM_MK_SP_LIN_SYS", REAL, NULL);};};
+	     SC_INIT_ARRAY((sls->atj + i), "PM_MK_SP_LIN_SYS", double, NULL);};};
 
 
     sls->b      = PM_make_vectors(n_rhs, n_ups);
@@ -404,10 +404,10 @@ PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
  *                 - insert j      into JJ
  */
 
-void PM_set_sls_coef(PM_sp_lin_sys *sls, int i, int j, REAL a)
+void PM_set_sls_coef(PM_sp_lin_sys *sls, int i, int j, double a)
    {int is, js, nis, njs;
     int *pj;
-    REAL *pa;
+    double *pa;
     SC_array *jj, *aj, *jtj, *atj; 
 
     if (!sls->symmetric || (i <= j))
@@ -488,7 +488,7 @@ void PM_rl_sp_lin_sys(PM_sp_lin_sys *sls)
 int PM_sls_sym_chk(PM_sp_lin_sys *sls)
    {int i, j, is, js, n, nis, njs;
     int elems, rows, unsym, count, rv;
-    REAL vij, vji;
+    double vij, vji;
 
     if (sls == NULL)
        return(FALSE);
@@ -639,7 +639,7 @@ int PM_sls_col_chk(PM_sp_lin_sys *sls)
 int PM_sls_b_chk(PM_sp_lin_sys *sls)
    {int n, i, rv;
     int goodb, goodx0;
-    REAL *b, *x0;
+    double *b, *x0;
 
     if (sls == NULL)
        return(FALSE);
@@ -681,11 +681,11 @@ int PM_sls_b_chk(PM_sp_lin_sys *sls)
  *           - return number of iterations iff successful
  */
 
-int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, REAL *ptol)
+int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
    {int i, j, n, js, njs, its, itmx, zs;
-    REAL ibn, bn, tol, mtol, inn, aij;
-    REAL alpha, beta, omega, omhat, rho, rho_old, rn, sn, rtv, tts, ttt;
-    REAL *b, *x0, *x, *Ax, *p, *phat, *r, *rtil, *s, *shat, *t, *v, *w;
+    double ibn, bn, tol, mtol, inn, aij;
+    double alpha, beta, omega, omhat, rho, rho_old, rn, sn, rtv, tts, ttt;
+    double *b, *x0, *x, *Ax, *p, *phat, *r, *rtil, *s, *shat, *t, *v, *w;
 
     if (sls == NULL)
        return(-1);
@@ -704,17 +704,17 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, REAL *ptol)
 
     zs = SC_zero_space(2);
 
-    x    = FMAKE_N(REAL, n, "PM_DSBICG:x");
-    Ax   = FMAKE_N(REAL, n, "PM_DSBICG:Ax");
-    p    = FMAKE_N(REAL, n, "PM_DSBICG:p");
-    phat = FMAKE_N(REAL, n, "PM_DSBICG:ptil");
-    r    = FMAKE_N(REAL, n, "PM_DSBICG:r");
-    rtil = FMAKE_N(REAL, n, "PM_DSBICG:r");
-    s    = FMAKE_N(REAL, n, "PM_DSBICG:s");
-    shat = FMAKE_N(REAL, n, "PM_DSBICG:shat");
-    t    = FMAKE_N(REAL, n, "PM_DSBICG:t");
-    v    = FMAKE_N(REAL, n, "PM_DSBICG:v");
-    w    = FMAKE_N(REAL, n, "PM_DSBICG:w");
+    x    = FMAKE_N(double, n, "PM_DSBICG:x");
+    Ax   = FMAKE_N(double, n, "PM_DSBICG:Ax");
+    p    = FMAKE_N(double, n, "PM_DSBICG:p");
+    phat = FMAKE_N(double, n, "PM_DSBICG:ptil");
+    r    = FMAKE_N(double, n, "PM_DSBICG:r");
+    rtil = FMAKE_N(double, n, "PM_DSBICG:r");
+    s    = FMAKE_N(double, n, "PM_DSBICG:s");
+    shat = FMAKE_N(double, n, "PM_DSBICG:shat");
+    t    = FMAKE_N(double, n, "PM_DSBICG:t");
+    v    = FMAKE_N(double, n, "PM_DSBICG:v");
+    w    = FMAKE_N(double, n, "PM_DSBICG:w");
 
     inn = 1.0/((double) n);
 
@@ -875,10 +875,10 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, REAL *ptol)
  *         -    L = (diag A)^-1
  */
 
-int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, REAL *ptol)
+int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
    {int n, its, itmx;
-    REAL a, c, cstar, fac, ptAp, ibn, bn, rn, tol, mtol, inn;
-    REAL *b, *x0, *p, *r, *x, *Lr, *Ap, *Ax;
+    double a, c, cstar, fac, ptAp, ibn, bn, rn, tol, mtol, inn;
+    double *b, *x0, *p, *r, *x, *Lr, *Ap, *Ax;
 
     if (sls == NULL)
        return(-1);
@@ -895,12 +895,12 @@ int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, REAL *ptol)
     b  = sls->b[no];
     x0 = sls->x[no];
 
-    p   = FMAKE_N(REAL, n, "PM_DSCG:p");
-    r   = FMAKE_N(REAL, n, "PM_DSCG:r");
-    x   = FMAKE_N(REAL, n, "PM_DSCG:x");
-    Lr  = FMAKE_N(REAL, n, "PM_DSCG:Lr");
-    Ap  = FMAKE_N(REAL, n, "PM_DSCG:Ap");
-    Ax  = FMAKE_N(REAL, n, "PM_DSCG:Ax");
+    p   = FMAKE_N(double, n, "PM_DSCG:p");
+    r   = FMAKE_N(double, n, "PM_DSCG:r");
+    x   = FMAKE_N(double, n, "PM_DSCG:x");
+    Lr  = FMAKE_N(double, n, "PM_DSCG:Lr");
+    Ap  = FMAKE_N(double, n, "PM_DSCG:Ap");
+    Ax  = FMAKE_N(double, n, "PM_DSCG:Ax");
 
     inn = 1.0/((double) n);
 

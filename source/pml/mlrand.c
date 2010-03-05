@@ -287,20 +287,24 @@ double PM_random_s(double x)
 
 /* PMRNDF - F77 interface to PM_random_48 */
 
-REAL F77_FUNC(pmrndf, PMRNDF)(REAL *px)
-   {
+double F77_FUNC(pmrndf, PMRNDF)(double *px)
+   {double rv;
 
-    return((REAL) PM_random_48((double) *px));}
+    rv = PM_random_48(*px);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PMRNDF - F77 interface to PM_random_s */
 
-REAL F77_FUNC(pmrnds, PMRNDS)(REAL *px)
-   {
+double F77_FUNC(pmrnds, PMRNDS)(double *px)
+   {double rv;
 
-    return((REAL) PM_random_s((double) *px));}
+    rv = PM_random_s(*px);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

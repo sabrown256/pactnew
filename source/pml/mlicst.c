@@ -25,8 +25,8 @@
 
 int main(int c, char **v)
    {int i, j, k;
-    REAL ret;
-    REAL a0[KXL], a1[KXL], b0[KXL], b1[KXL], bm1[KXL], x[KXL], y[KXL];
+    double ret;
+    double a0[KXL], a1[KXL], b0[KXL], b1[KXL], bm1[KXL], x[KXL], y[KXL];
 
     for (i = 0; i < KXL; i++)
 	{a0[i]	= 0.0;
@@ -47,7 +47,7 @@ int main(int c, char **v)
     a1[2*KM-1] = 0.0;
     for (i = 0; i < KM; i++)
 	{k = KM + i;
-	 y[k] = (REAL) (i+1);};
+	 y[k] = (double) (i+1);};
 
     printf("\nProblem y :\n");
     for (j = 0; j < LM; j++)
@@ -86,7 +86,7 @@ int main(int c, char **v)
 	 bm1[i] = 0.0;};
 
     for (k = 1, i = 1; i < KXL; i += LM, k++)
-	y[i] = (REAL) k;
+	y[i] = (double) k;
 
     printf("\nProblem y :\n");
     for (j = 0; j < KM; j++)

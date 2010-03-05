@@ -22,7 +22,7 @@
 
 #ifdef __cplusplus
 
-typedef REAL complex[2];
+typedef double complex[2];
 
 # define PM_REAL_C(x)       ((x)[0])
 # define PM_IMAGINARY_C(x)  ((x)[1])
@@ -30,8 +30,8 @@ typedef REAL complex[2];
 #else
 
 struct s_complex
-   {REAL real;
-    REAL imag;};
+   {double real;
+    double imag;};
 
 typedef struct s_complex complex;
 
@@ -175,13 +175,13 @@ extern complex
 /* MLFFT.C declarations */
 
 extern complex
- *PM_uniform_complex_y(int no, REAL *xo, int ni, REAL *xi, complex *yi),
- *PM_fft_sc_real(REAL *x, int n, int flag);
+ *PM_uniform_complex_y(int no, double *xo, int ni, double *xi, complex *yi),
+ *PM_fft_sc_real(double *x, int n, int flag);
 
 extern int
- PM_fft_sc_real_data(complex **pyo, REAL **pxo, REAL *xi, REAL *yi,
+ PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
 		     int ni, double xmn, double xmx, int ordr),
- PM_fft_sc_complex_data(complex **pyo, REAL **pxo, REAL *xi,
+ PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,
 			complex *yi, int ni, double xmn, double xmx,
 			int flag, int ordr),
  PM_fft_sc_complex(complex *x, int n, int flag);
@@ -252,7 +252,7 @@ extern void
  PM_smooth_filter(complex *z, int n, double pts);
 
 extern int
- PM_smooth_fft(REAL *x, REAL *y, int n, int pts,
+ PM_smooth_fft(double *x, double *y, int n, int pts,
 	       void (*fnc)(complex *cx, int nt, double tol));
 
 #endif

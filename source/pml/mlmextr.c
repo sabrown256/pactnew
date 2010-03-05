@@ -99,7 +99,7 @@ static int
 
 /* SHOW_MESH - lets see the mesh at this point */
 
-static void show_mesh(REAL *x, int nd, int *mn, int *mx,
+static void show_mesh(double *x, int nd, int *mn, int *mx,
 		      int idr, int side, int ig)
    {
 
@@ -109,7 +109,7 @@ static void show_mesh(REAL *x, int nd, int *mn, int *mx,
     int maxes[2];
     char bf[MAXLINE];
     PM_set *dom;
-    REAL **y;
+    double **y;
 
 #include <pgs.h>
 
@@ -163,11 +163,11 @@ static void show_mesh(REAL *x, int nd, int *mn, int *mx,
 
 static void _PM_load_hier_tridi(PM_sp_lin_sys *axb, int i, int na,
 				PM_matrix *n_map,
-				REAL **x, int n, double *av,
+				double **x, int n, double *av,
 				int *unt, int *str)
    {int im, j, k, m, io, ih, ihm, jo, no, nr;
-    REAL lij, y0;
-    REAL *px, *py, *pb;
+    double lij, y0;
+    double *px, *py, *pb;
 
     im = i - 1;
 
@@ -231,11 +231,11 @@ static void _PM_load_hier_tridi(PM_sp_lin_sys *axb, int i, int na,
  *               - approach rather than LU decomposition
  */
 
-static void _PM_solv_lapl(REAL **x, PM_sp_lin_sys *axb, PM_matrix *n_map,
+static void _PM_solv_lapl(double **x, PM_sp_lin_sys *axb, PM_matrix *n_map,
                           int nr, int na)
    {int n, i, j, k, ni, itmx;
-    REAL tol;
-    REAL *pxi, *pxo;
+    double tol;
+    double *pxi, *pxo;
 
     ni   = 0;
     tol  = PM_machine_precision();
@@ -422,7 +422,7 @@ static void _PM_fill_unknown_templ(int *unt, int *str,
  */
 
 static void _PM_fill_lapl_op(PM_sp_lin_sys *axb, int *unt, int *str,
-                             int na, REAL **x, REAL *kra, REAL *lra,
+                             int na, double **x, double *kra, double *lra,
                              PM_matrix *n_map, int no,
                              double ts, double krc, double lrc, int crf)
    {int n, j, i;
@@ -474,7 +474,7 @@ static void _PM_fill_lapl_op(PM_sp_lin_sys *axb, int *unt, int *str,
  */
 
 static void _PM_laplace_sol(int *unt, int *str,
-                            int na, REAL **x, REAL *kra, REAL *lra,
+                            int na, double **x, double *kra, double *lra,
 			    PM_matrix *n_map, int no, int nr,
                             double ts, double krc, double lrc, int crf)
    {int n;
@@ -504,11 +504,9 @@ static void _PM_laplace_sol(int *unt, int *str,
 
 /* _PM_COMPUTE_A_BND - compute the a quantities on the given side */
 
-static void _PM_compute_a_bnd(as, xs, ae, xe, v,
-			      kmax, lmax, kmn, kmx, lmn, lmx)
-   double as, xs, ae, xe;
-   REAL *v;
-   int kmax, lmax, kmn, kmx, lmn, lmx;
+static void _PM_compute_a_bnd(double as, double xs, double ae, double xe,
+			      double *v, int kmax, int lmax,
+			      int kmn, int kmx, int lmn, int lmx)
    {int i, j, n, nt, sdk, sdl;
     double ps, pe, dk, dl;
 
@@ -562,19 +560,16 @@ static void _PM_compute_a_bnd(as, xs, ae, xe, v,
  *               -   XEL      l-product exponent end method 2 only (i)
  */
 
-static void _PM_compute_a(apk, apl, kra, lra, kmax, lmax,
-			  kmn, kmx, lmn, lmx,
-			  ask, xsk, aek, xek, asl, xsl, ael, xel,
-			  constr)
-   REAL *apk, *apl, *kra, *lra;
-   int kmax, lmax, kmn, kmx, lmn, lmx;
-   double ask, xsk, aek, xek;
-   double asl, xsl, ael, xel;
-   int constr;
+static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
+			  int kmax, int lmax,
+			  int kmn, int kmx, int lmn, int lmx,
+			  double ask, double xsk, double aek, double xek,
+			  double asl, double xsl, double ael, double xel,
+			  int constr)
    {int j, j0, k, l;
     int nz;
     double u, dk, dl, dkl;
-    REAL *x1, *x2, *x3, *x4, *s, *t;
+    double *x1, *x2, *x3, *x4, *s, *t;
 
     nz = kmax*lmax;
 
@@ -612,8 +607,8 @@ static void _PM_compute_a(apk, apl, kra, lra, kmax, lmax,
     _PM_compute_a_bnd(asl, xsl, ael, xel, apl,
 		      kmax, lmax, kmx, kmx, lmn, lmx);
 
-    t = FMAKE_N(REAL, nz, "COMPUTE_A:t");
-    s = FMAKE_N(REAL, nz, "COMPUTE_A:s");
+    t = FMAKE_N(double, nz, "COMPUTE_A:t");
+    s = FMAKE_N(double, nz, "COMPUTE_A:s");
 
 /* compute apl */
     PM_set_value(s, nz, 0.0);
@@ -700,17 +695,13 @@ static void _PM_compute_a(apk, apl, kra, lra, kmax, lmax,
  *                   - use constant ratios KRC and LRC
  */
 
-static void _PM_fill_lapl_opa(lapl, kmax, lmax,
-			      na, ar, dt, kra, lra, apk, apl,
-			      n_map, ts, krc, lrc, crf, theta)
-   PM_matrix *lapl;
-   int kmax, lmax, na;
-   PM_matrix **ar;
-   REAL **dt, *kra, *lra, *apk, *apl;
-   PM_matrix *n_map;
-   double ts, krc, lrc;
-   int crf;
-   double theta;
+static void _PM_fill_lapl_opa(PM_matrix *lapl, int kmax, int lmax, int na,
+			      PM_matrix **ar,
+			      double **dt, double *kra, double *lra,
+			      double *apk, double *apl,
+			      PM_matrix *n_map,
+			      double ts, double krc, double lrc,
+			      int crf, double theta)
    {int n, j, i;
     int indx[8], off[8];
     double alpha, beta;
@@ -804,17 +795,12 @@ static void _PM_fill_lapl_opa(lapl, kmax, lmax,
  *                  - spacing ratios
  */
 
-static void _PM_laplace_sola(lapl, kmax, lmax,
-			     no, na, b, x, kra, lra, apk, apl, n_map,
-			     ts, krc, lrc, crf, theta)
-   PM_matrix *lapl;
-   int kmax, lmax, na;
-   PM_matrix **b;
-   REAL **x, *kra, *lra, *apk, *apl;
-   PM_matrix *n_map;
-   double ts, krc, lrc;
-   int crf;
-   double theta;
+static void _PM_laplace_sola(PM_matrix *lapl, int kmax, int lmax, int na,
+			     PM_matrix **b, double **x,
+			     double *kra, double *lra, double *apk, double *apl,
+			     PM_matrix *n_map,
+			     double ts, double krc, double lrc,
+			     int crf, double theta)
    {
 
 /* fill in the laplacian, bx, by and n_map arrays */
@@ -858,13 +844,13 @@ static void _PM_laplace_sola(lapl, kmax, lmax,
  *              -   UNT      template of unknowns: 0 unknown, 1 known
  */
 
-void PM_mesh_exwk(REAL *y, int id, int side, int nd,
+void PM_mesh_exwk(double *y, int id, int side, int nd,
                   int *smn, int *smx, int *mn, int *mx,
-                  REAL *kra, REAL *lra, REAL *apk, REAL *apl,
+                  double *kra, double *lra, double *apk, double *apl,
                   int *unt, int *str, int method, int constr,
                   double dspat, double drat, double orient)
    {int j, jd, n, na, no, nn, nr, sr;
-    REAL **x;
+    double **x;
     PM_matrix **b, *n_map, *lapl;
 
     n_map = _PM_fill_map(id, side, nd, smn, smx, mn, mx);
@@ -882,7 +868,7 @@ void PM_mesh_exwk(REAL *y, int id, int side, int nd,
 
     na = 2;
     b  = FMAKE_N(PM_matrix *, na, "PM_MESH_EXWK:b");
-    x  = FMAKE_N(REAL *, na, "PM_MESH_EXWK:x");
+    x  = FMAKE_N(double *, na, "PM_MESH_EXWK:x");
     for (j = 0; j < na; j++)
         b[j] = PM_create(n, 1);
 
@@ -942,11 +928,11 @@ void PM_mesh_exwk(REAL *y, int id, int side, int nd,
  *                  -   MX       patch maximum index values
  */
 
-static void _PM_mesh_extr_1d(REAL *x, int *smn, int *smx, int *mn, int *mx,
+static void _PM_mesh_extr_1d(double *x, int *smn, int *smx, int *mn, int *mx,
                              int ng, int side)
    {int ig, im, in, nn;
     int ic, i0, i1, i2;
-    REAL r1, r2, r3;
+    double r1, r2, r3;
 
     nn = mx[0] - mn[0] + 1;
 
@@ -990,22 +976,22 @@ static void _PM_mesh_extr_1d(REAL *x, int *smn, int *smx, int *mn, int *mx,
  *                  -                         1.0 -> pure L orientation
  */
 
-static void _PM_mesh_extr_nd(REAL *x, int *smn, int *smx, int *mn, int *mx,
+static void _PM_mesh_extr_nd(double *x, int *smn, int *smx, int *mn, int *mx,
                              int ng, int nd, int id, int side,
                              int method, int constr,
                              double dspat, double drat, double orient)
    {int jd, ig, nn, nt;
     int *unt, *str;
-    REAL *kra, *lra, *apk, *apl;
+    double *kra, *lra, *apk, *apl;
 
     nn = 1;
     for (jd = 0; jd < nd; jd++)
         nn *= (mx[jd] - mn[jd] + 1);
 
-    kra = FMAKE_N(REAL, nn, "PM_MESH_EXTR_ND:kra");
-    lra = FMAKE_N(REAL, nn, "PM_MESH_EXTR_ND:lra");
-    apk = FMAKE_N(REAL, nn, "PM_MESH_EXTR_ND:apk");
-    apl = FMAKE_N(REAL, nn, "PM_MESH_EXTR_ND:apl");
+    kra = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:kra");
+    lra = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:lra");
+    apk = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:apk");
+    apl = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:apl");
 
     PM_set_value(kra, nn, 1.0);
     PM_set_value(lra, nn, 1.0);
@@ -1068,13 +1054,10 @@ static void _PM_mesh_extr_nd(REAL *x, int *smn, int *smx, int *mn, int *mx,
  *              -                         1.0 -> pure L orientation
  */
 
-void PM_mesh_extr(x, smn, smx, mn, mx, ng, nd, id, side,
-		  method, constr, dspat, drat, orient)
-   REAL *x;
-   int *smn, *smx, *mn, *mx;
-   int ng, nd, id, side;
-   int method, constr;
-   double dspat, drat, orient;
+void PM_mesh_extr(double *x, int *smn, int *smx, int *mn, int *mx,
+		  int ng, int nd, int id, int side,
+		  int method, int constr,
+		  double dspat, double drat, double orient)
    {
 
     if (nd == 1)

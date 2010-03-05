@@ -15,12 +15,12 @@
 
 /* PM_UNIFORM_REAL_X - compute evenly spaced x values for the given x array */
 
-REAL *PM_uniform_real_x(int no, double xmin, double xmax, int flag)
+double *PM_uniform_real_x(int no, double xmin, double xmax, int flag)
    {int i, na;
-    REAL step;
-    REAL *x;
+    double step;
+    double *x;
 
-    x = FMAKE_N(REAL, no, "PM_UNIFORM_REAL_X:x");
+    x = FMAKE_N(double, no, "PM_UNIFORM_REAL_X:x");
 
     na = (flag == 1) ? no - 1 : no;
 
@@ -43,13 +43,13 @@ REAL *PM_uniform_real_x(int no, double xmin, double xmax, int flag)
  *                   -   NO     number of points in output arrays
  */
 
-REAL *PM_uniform_real_y(int no, REAL *xo,
-			int ni, REAL *xi, REAL *yi)
+double *PM_uniform_real_y(int no, double *xo,
+			int ni, double *xi, double *yi)
    {int i, j;
-    REAL dx, xa, xb;
-    REAL *yo, *py;
+    double dx, xa, xb;
+    double *yo, *py;
 
-    yo = FMAKE_N(REAL, no, "PM_UNIFORM_REAL_Y:yo");
+    yo = FMAKE_N(double, no, "PM_UNIFORM_REAL_Y:yo");
 
     if (xi == NULL)
        {xa = xo[0];
@@ -92,14 +92,14 @@ REAL *PM_uniform_real_y(int no, REAL *xo,
  *                      -   NO     number of points in output arrays
  */
 
-complex *PM_uniform_complex_y(int no, REAL *xo,
-			      int ni, REAL *xi, complex *yi)
+complex *PM_uniform_complex_y(int no, double *xo,
+			      int ni, double *xi, complex *yi)
    {int i;
-    REAL *yti, *yto;
+    double *yti, *yto;
     complex *yo;
 
     yo  = FMAKE_N(complex, no, "PM_UNIFORM_COMPLEX_Y:yo");
-    yti = FMAKE_N(REAL, ni, "PM_UNIFORM_COMPLEX_Y:yti");
+    yti = FMAKE_N(double, ni, "PM_UNIFORM_COMPLEX_Y:yti");
     if ((yti != NULL) && (yo != NULL))
 
 /* interpolate the real part of y */
@@ -180,7 +180,7 @@ int PM_near_power(int n, int a)
  *             -   introducing a phase shift to get IFFT to match original
  */
 
-int _PM_fft_fin(complex *y, REAL *x, int np, int flag, int ordr)
+int _PM_fft_fin(complex *y, double *x, int np, int flag, int ordr)
    {int i, n, nh, nr;
     double dt;
 
@@ -222,7 +222,7 @@ int _PM_fft_fin(complex *y, REAL *x, int np, int flag, int ordr)
  *                     - adapted from Numerical Recipes in C
  */
 
-static int _PM_fft_sc_real_hsp(REAL *f, int n, int sgn)
+static int _PM_fft_sc_real_hsp(double *f, int n, int sgn)
    {int i, i1, i2, i3, i4, na, nh;
     double c1, c2, h1r, h1i, h2r, h2i;
     double wr, wi, dwr, dwi, wt, dth;
@@ -293,7 +293,7 @@ int PM_fft_sc_complex(complex *x, int n, int flag)
    {int m, mmax, istep;
     complex temp, w, dw;
     unsigned int i, j;
-    REAL nrm, dth, th0;
+    double nrm, dth, th0;
 
     m = PM_next_exp_two(n);
 
@@ -351,7 +351,7 @@ int PM_fft_sc_complex(complex *x, int n, int flag)
  *                - formerly in ULTRA
  */
 
-complex *PM_fft_sc_real(REAL *x, int n, int flag)
+complex *PM_fft_sc_real(double *x, int n, int flag)
    {int i;
     complex *cx;
 
@@ -382,10 +382,10 @@ complex *PM_fft_sc_real(REAL *x, int n, int flag)
  *                     - if successful and 0 otherwise
  */
 
-int PM_fft_sc_real_data(complex **pyo, REAL **pxo, REAL *xi, REAL *yi,
+int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
 			int ni, double xmn, double xmx, int ordr)
    {int n, np, nr;
-    REAL *x, *y;
+    double *x, *y;
     complex *cy;
 
     n  = PM_near_power(ni, 2);
@@ -428,11 +428,11 @@ int PM_fft_sc_real_data(complex **pyo, REAL **pxo, REAL *xi, REAL *yi,
  *                        - arrays if successful and 0 otherwise
  */
 
-int PM_fft_sc_complex_data(complex **pyo, REAL **pxo, REAL *xi,
+int PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,
 			   complex *yi, int ni, double xmn, double xmx,
 			   int flag, int ordr)
    {int i, n, nh, np, nr;
-    REAL *x;
+    double *x;
     complex *y, *ay;
 
     n  = PM_near_power(ni, 2);
@@ -477,7 +477,7 @@ int PM_fft_sc_complex_data(complex **pyo, REAL **pxo, REAL *xi,
  *                      - adapted from Numerical Recipes in C
  */
 
-int PM_fft_sc_real_simul(REAL *fx1, REAL *fx2, REAL *fw1, REAL *fw2, int n)
+int PM_fft_sc_real_simul(double *fx1, double *fx2, double *fw1, double *fw2, int n)
    {int i, j, nb, na;
     double rep, rem, aip, aim, nrm;
 
@@ -529,23 +529,23 @@ int PM_fft_sc_real_simul(REAL *fx1, REAL *fx2, REAL *fw1, REAL *fw2, int n)
  *             - contributed by Charles McMillan 8/94
  */
 
-int PM_convolve(REAL *gx, REAL *gy, int gn, REAL *hx, REAL *hy,
-	        int hn, double dt, REAL **pxr, REAL **pyr, int *pnr)
+int PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy,
+	        int hn, double dt, double **pxr, double **pyr, int *pnr)
    {int i, j, gtn, hin;
-    REAL *gty, *hty, *xret, *yret;
-    REAL *hix, *hiy;
-    REAL *gdy, *hdy;
+    double *gty, *hty, *xret, *yret;
+    double *hix, *hiy;
+    double *gdy, *hdy;
     double hdx, hxmn, hxmx;
     double gxmn, gxmx;
     double cxmn, cxmx;
     double igy, ihy, init_y, init_x, vx, nrm;
   
-    gdy = FMAKE_N(REAL, gn, "PM_CONVOLVE:gdy");
+    gdy = FMAKE_N(double, gn, "PM_CONVOLVE:gdy");
     if (gdy == NULL)
        return(FALSE);
     _PM_spline(gx, gy, gn, HUGE, HUGE, gdy);
 
-    hdy = FMAKE_N(REAL, hn, "PM_CONVOLVE:hdy");
+    hdy = FMAKE_N(double, hn, "PM_CONVOLVE:hdy");
     if (hdy == NULL) 
        return(FALSE);
     _PM_spline(hx, hy, hn, HUGE, HUGE, hdy);
@@ -564,11 +564,11 @@ int PM_convolve(REAL *gx, REAL *gy, int gn, REAL *hx, REAL *hy,
     gtn = (cxmx - cxmn + 2*hdx)/dt;
     gtn = PM_next_power_two(gtn);
 
-    xret = FMAKE_N(REAL, gtn, "PM_CONVOLVE:xret");
-    gty  = FMAKE_N(REAL, gtn, "PM_CONVOLVE:gty");
-    hty  = FMAKE_N(REAL, gtn, "PM_CONVOLVE:hty");
-    hix  = FMAKE_N(REAL, hin, "PM_CONVOLVE:hix");
-    hiy  = FMAKE_N(REAL, hin, "PM_CONVOLVE:hiy");
+    xret = FMAKE_N(double, gtn, "PM_CONVOLVE:xret");
+    gty  = FMAKE_N(double, gtn, "PM_CONVOLVE:gty");
+    hty  = FMAKE_N(double, gtn, "PM_CONVOLVE:hty");
+    hix  = FMAKE_N(double, hin, "PM_CONVOLVE:hix");
+    hiy  = FMAKE_N(double, hin, "PM_CONVOLVE:hiy");
 
 /* interpolate signal */
     init_y = gy[0];
@@ -618,7 +618,7 @@ int PM_convolve(REAL *gx, REAL *gy, int gn, REAL *hx, REAL *hy,
     nrm = 1.0/nrm;
 
 /* call fft convolution */
-    yret = FMAKE_N(REAL, 2*gtn, "PM_CONVOLVE:yret");
+    yret = FMAKE_N(double, 2*gtn, "PM_CONVOLVE:yret");
     PM_convolve_logical(gty, gtn, hty, gtn, 1, yret);
   
     SFREE(hix);
@@ -647,15 +647,15 @@ int PM_convolve(REAL *gx, REAL *gy, int gn, REAL *hx, REAL *hy,
  *                     - adapted from Numerical Recipes in C
  */
 
-int PM_convolve_logical(REAL *g, int n, REAL *h, int m, int sgn, REAL *cnv)
+int PM_convolve_logical(double *g, int n, double *h, int m, int sgn, double *cnv)
    {int i, nh, mh;
     double t, mg, in, a, b;
-    REAL *ft;
+    double *ft;
 
     if (sgn*sgn != 1)
        return(FALSE);
 
-    ft = FMAKE_N(REAL, 2*n, "PM_CONVOLVE_LOGICAL:ft");
+    ft = FMAKE_N(double, 2*n, "PM_CONVOLVE_LOGICAL:ft");
 
 /* pad h in the middle */
     mh = (m - 1)/2;

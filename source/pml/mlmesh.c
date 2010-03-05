@@ -31,13 +31,13 @@ struct s_solver_method
     int n_rhs;
     int nd;
     int *lmt;
-    REAL **x;
-    REAL **b;
+    double **x;
+    double **b;
     PM_matrix *lapl;
     PM_matrix **mb;
     PM_sp_lin_sys *axb;
     int strategy;
-    void (*set)(solver_method *sv, int i, int j, REAL a);
+    void (*set)(solver_method *sv, int i, int j, double a);
     void (*solve)(solver_method *sv, PM_matrix *n_map);};
 
 /*--------------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ struct s_solver_method
 
 /* _PM_DECSOL_SET - set the element A(I,J) = V */
 
-static void _PM_decsol_set(solver_method *sv, int i, int j, REAL v)
+static void _PM_decsol_set(solver_method *sv, int i, int j, double v)
    {PM_matrix *lapl;
 
     lapl = sv->lapl;
@@ -70,7 +70,7 @@ static void _PM_decsol_set(solver_method *sv, int i, int j, REAL v)
 static void _PM_decsol_lapl(solver_method *sv, PM_matrix *n_map)
    {int n, j, i, k, na, nd, nt, nh;
     int *ips;
-    REAL **x, **b;
+    double **x, **b;
     PM_matrix *lapl, **mb;
    
     nd   = sv->nd;
@@ -111,7 +111,7 @@ static void _PM_decsol_lapl(solver_method *sv, PM_matrix *n_map)
 
 /* _PM_CG_SET - set the element A(I,J) = V */
 
-static void _PM_cg_set(solver_method *sv, int i, int j, REAL v)
+static void _PM_cg_set(solver_method *sv, int i, int j, double v)
    {PM_sp_lin_sys *axb;
 
     axb = sv->axb;
@@ -130,8 +130,8 @@ static void _PM_cg_set(solver_method *sv, int i, int j, REAL v)
 static void _PM_cg_lapl(solver_method *sv, PM_matrix *n_map)
    {int n, j, i, k, na, nd, nt, nh, ni, in, itmx;
     int strategy;
-    REAL tol, itol;
-    REAL **x, **b, *pxi, *pxo;
+    double tol, itol;
+    double **x, **b, *pxi, *pxo;
     PM_sp_lin_sys *axb;
    
     nd       = sv->nd;
@@ -217,10 +217,10 @@ static void _PM_hypre_lapl(solver_method *sv, PM_matrix *n_map)
 /* _PM_MK_LIN_SYS - setup the linear system solver storage */
 
 static solver_method *_PM_mk_lin_sys(int n_unk, int n_rhs, int nd,
-				     int *lmt, REAL **x, int strategy)
+				     int *lmt, double **x, int strategy)
    {int j, ns;
     solver_method *sv;
-    REAL **b;
+    double **b;
     PM_matrix *lapl, **mb;
     PM_sp_lin_sys *axb;
 
@@ -268,7 +268,7 @@ static solver_method *_PM_mk_lin_sys(int n_unk, int n_rhs, int nd,
     else
        {lapl = PM_create(n_unk, n_unk);
 
-	b  = FMAKE_N(REAL *, n_rhs, "_PM_MK_LIN_SYS:b");
+	b  = FMAKE_N(double *, n_rhs, "_PM_MK_LIN_SYS:b");
 	mb = FMAKE_N(PM_matrix *, n_rhs, "_PM_MK_LIN_SYS:mb");
 	for (j = 0; j < n_rhs; j++)
 	    {mb[j] = PM_create(n_unk, 1);
@@ -322,7 +322,7 @@ static void _PM_rl_lin_sys(solver_method *sv)
 
 /* _PM_FILL_MAP - fill out the map array with nearest neighbor information */
 
-static PM_matrix *_PM_fill_map(REAL *nodet, int *unm, int *str,
+static PM_matrix *_PM_fill_map(double *nodet, int *unm, int *str,
 			       int n0, int nd, int *lmt)
    {int m, j, i, l, n, nt, nh;
     int imx, jmx;
@@ -368,7 +368,7 @@ static PM_matrix *_PM_fill_map(REAL *nodet, int *unm, int *str,
 
 /* _PM_FIN_SOL - map the solutions in tx and ty back into the mesh */
 
-static void _PM_fin_sol(PM_matrix *n_map, int m, int *reg_map, REAL *nodet)
+static void _PM_fin_sol(PM_matrix *n_map, int m, int *reg_map, double *nodet)
    {int i, j, n, nh;
 
     n  = n_map->nrow;
@@ -391,7 +391,7 @@ static void _PM_fin_sol(PM_matrix *n_map, int m, int *reg_map, REAL *nodet)
 static int _PM_mesh_converged(PM_matrix *xn, PM_matrix *yn,
 			      PM_matrix *xo, PM_matrix *yo, int n)
    {int i;
-    REAL *pxo, *pyo, *pxn, *pyn;
+    double *pxo, *pyo, *pxn, *pyn;
     double s, dx, dy, rx1, ry1, rx2, ry2, ax, ay;
 
     pxo = xo->array;
@@ -410,7 +410,7 @@ static int _PM_mesh_converged(PM_matrix *xn, PM_matrix *yn,
          ax  = 0.5*(rx2 + rx1);
          ay  = 0.5*(ry2 + ry1);
          s  += (dx*dx + dy*dy)/(ax*ax + ay*ay + SMALL);};
-    s = sqrt(s/((REAL) n));
+    s = sqrt(s/((double) n));
 
     return((s < 0.0001) ? TRUE : FALSE);}
 
@@ -474,7 +474,7 @@ static double _PM_curvature(int j, int s)
 static void _PM_copy_sol(PM_matrix *xo, PM_matrix *xn,
 			 PM_matrix *yo, PM_matrix *yn, PM_matrix *n_map)
    {int i, j, n;
-    REAL *pxo, *pyo, *pxn, *pyn;
+    double *pxo, *pyo, *pxn, *pyn;
 
     n   = xo->nrow;
     pxo = xo->array;
@@ -505,11 +505,11 @@ static void _PM_copy_sol(PM_matrix *xo, PM_matrix *xn,
 
 static void _PM_load_lin_sys(solver_method *sv,
 			     int i, PM_matrix *n_map,
-			     int n, REAL *av, int *unm, int *str)
+			     int n, double *av, int *unm, int *str)
    {int j, k, l, m, na, nd, nh;
-    REAL **x, **b;
+    double **x, **b;
     PM_matrix *lapl;
-    void (*a)(solver_method *sv, int i, int j, REAL v);
+    void (*a)(solver_method *sv, int i, int j, double v);
 
     na   = sv->n_rhs;
     nd   = sv->nd;
@@ -549,13 +549,13 @@ static void _PM_load_lin_sys(solver_method *sv,
  */
 
 static void _PM_fill_lapl_op(solver_method *sv,
-			     REAL *kra, REAL *lra,
+			     double *kra, double *lra,
 			     PM_matrix *n_map, int *unm, int *str,
 			     double ts, double krc, double lrc, int crf)
    {int i, j, n, nd, nt, nh;
     double sr, sl, sb, st;
     double pnt, cnt;
-    REAL a[9];
+    double a[9];
 
     nd = sv->nd;
     n  = n_map->nrow;
@@ -602,8 +602,8 @@ static void _PM_fill_lapl_op(solver_method *sv,
  *                 - spacing ratios
  */
 
-static void _PM_laplace_sol(int n, int nd, int na, int *lmt, REAL **x,
-			    REAL *kra, REAL *lra,
+static void _PM_laplace_sol(int n, int nd, int na, int *lmt, double **x,
+			    double *kra, double *lra,
 			    PM_matrix *n_map, int *unm, int *str,
 			    double ts, double krc, double lrc,
 			    int crf, int strategy)
@@ -630,7 +630,7 @@ static void _PM_laplace_sol(int n, int nd, int na, int *lmt, REAL **x,
 /* _PM_COMPUTE_A_BND - compute the a quantities on the given side */
 
 static void _PM_compute_a_bnd(double as, double xs, double ae, double xe,
-			      REAL *v, int *lmt,
+			      double *v, int *lmt,
 			      int kmn, int kmx, int lmn, int lmx)
    {int i, j, n, nt, sdk, sdl;
     int kbnd, lbnd;
@@ -680,7 +680,7 @@ static void _PM_compute_a_bnd(double as, double xs, double ae, double xe,
 
 /* _PM_COMPUTE_A - compute the a quantities */
 
-static void _PM_compute_a(REAL *apk, REAL *apl, REAL *kra, REAL *lra,
+static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
 			  int *lmt, int kmn, int kmx, int lmn, int lmx,
 			  double ask, double xsk, double aek, double xek,
 			  double asl, double xsl, double ael, double xel,
@@ -688,7 +688,7 @@ static void _PM_compute_a(REAL *apk, REAL *apl, REAL *kra, REAL *lra,
    {int j, j0, k, l;
     int kbnd, lbnd, nz;
     double u, dk, dl, dkl;
-    REAL *x1, *x2, *x3, *x4, *s, *t;
+    double *x1, *x2, *x3, *x4, *s, *t;
 
     kbnd = lmt[0];
     lbnd = lmt[1];
@@ -729,8 +729,8 @@ static void _PM_compute_a(REAL *apk, REAL *apl, REAL *kra, REAL *lra,
     _PM_compute_a_bnd(asl, xsl, ael, xel, apl,
 		      lmt, kmx, kmx, lmn, lmx);
 
-    t = FMAKE_N(REAL, nz, "COMPUTE_A:t");
-    s = FMAKE_N(REAL, nz, "COMPUTE_A:s");
+    t = FMAKE_N(double, nz, "COMPUTE_A:t");
+    s = FMAKE_N(double, nz, "COMPUTE_A:s");
 
 /* compute apl */
     PM_set_value(s, nz, 0.0);
@@ -817,7 +817,7 @@ static void _PM_compute_a(REAL *apk, REAL *apl, REAL *kra, REAL *lra,
  */
 
 static void _PM_fill_lapl_opa(solver_method *sv, int *lmt,
-			      REAL *kra, REAL *lra, REAL *apk, REAL *apl,
+			      double *kra, double *lra, double *apk, double *apl,
 			      PM_matrix *n_map, int *unm, int *str,
 			      double ts, double krc, double lrc,
 			      int crf, double theta)
@@ -829,7 +829,7 @@ static void _PM_fill_lapl_opa(solver_method *sv, int *lmt,
     double ckp, ck, ckm, clp, cl, clm;
     double bkp, bk, bkm, blp, bl, blm;
     double pnt, cnt;
-    REAL a[9];
+    double a[9];
 
     nd = sv->nd;
 
@@ -919,8 +919,8 @@ static void _PM_fill_lapl_opa(solver_method *sv, int *lmt,
  *                  - spacing ratios
  */
 
-static void _PM_laplace_sola(int n, int nd, int *lmt, int na, REAL **x,
-			     REAL *kra, REAL *lra, REAL *apk, REAL *apl,
+static void _PM_laplace_sola(int n, int nd, int *lmt, int na, double **x,
+			     double *kra, double *lra, double *apk, double *apl,
 			     PM_matrix *n_map, int *unm, int *str,
 			     double ts, double krc, double lrc,
 			     int crf, int strategy, double theta)
@@ -989,12 +989,12 @@ static void _PM_laplace_sola(int n, int nd, int *lmt, int na, REAL **x,
  *              -                         1.0 -> pure L orientation
  */
 
-void PM_mesh_part(REAL *rx, REAL *ry, REAL *nodet,
+void PM_mesh_part(double *rx, double *ry, double *nodet,
 		  int *reg_map, int n, int k, int l,
 		  int kmn, int kmx, int lmn, int lmx, 
 		  int kmax, int lmax, int m,
 		  double kr, double lr,
-		  REAL *kra, REAL *lra, REAL *apk, REAL *apl,
+		  double *kra, double *lra, double *apk, double *apl,
 		  double ask, double xsk, double aek, double xek,
 		  double asl, double xsl, double ael, double xel,
 		  int strategy, int method, int constr,
@@ -1002,7 +1002,7 @@ void PM_mesh_part(REAL *rx, REAL *ry, REAL *nodet,
    {int na, nd, nn, zs;
     int str[9], lmt[2];
     int *unm;
-    REAL **x;
+    double **x;
     PM_matrix *n_map;
 
     zs = SC_zero_space(2);
@@ -1042,7 +1042,7 @@ void PM_mesh_part(REAL *rx, REAL *ry, REAL *nodet,
        {case 1 :
 
 	     na = 2;
-	     x = FMAKE_N(REAL *, na, "PM_MESH_PART:x");
+	     x = FMAKE_N(double *, na, "PM_MESH_PART:x");
 
 	     x[0] = kra;
 	     x[1] = lra;
@@ -1061,7 +1061,7 @@ void PM_mesh_part(REAL *rx, REAL *ry, REAL *nodet,
         case 2 :
 
 	     na = 4;
-	     x  = FMAKE_N(REAL *, na, "PM_MESH_PART:x");
+	     x  = FMAKE_N(double *, na, "PM_MESH_PART:x");
 
 	     x[0] = kra;
 	     x[1] = lra;

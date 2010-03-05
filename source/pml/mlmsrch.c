@@ -77,7 +77,7 @@ static void _PM_init_search_map(PM_mesh_map *sm, int *map)
 
 /* PM_INIT_MESH_SEARCH - setup a mesh search database */
 
-PM_mesh_map *PM_init_mesh_search(int nd, int *dims, REAL **r, int *map)
+PM_mesh_map *PM_init_mesh_search(int nd, int *dims, double **r, int *map)
    {int i, n, id, nc, nl;
     long *indx;
     double rc, rmn, rmx;
@@ -153,7 +153,7 @@ void PM_fin_mesh_search(PM_mesh_map *sm)
  *                   - in the LR mesh containing it
  */
 
-long PM_lr_mesh_lookup(PM_mesh_map *sm, REAL *p)
+long PM_lr_mesh_lookup(PM_mesh_map *sm, double *p)
    {int i, l, n, np, id, ic, it, i1, i2, nd, ne, nl;
     int e1, e2;
     int *dim;

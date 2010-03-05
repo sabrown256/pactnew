@@ -118,7 +118,7 @@ void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, F77_string d, F77_string f, ...)
     char local[MAXLINE], tb[10], ce;
     char *fmt, *le, *lb, *pt, *dst, *s;
     FIXNUM *lv;
-    REAL *dv;
+    double *dv;
     F77_string sv;
 
     nc     = (int) *pnc;
@@ -204,7 +204,7 @@ void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, F77_string d, F77_string f, ...)
             case 'E' : 
             case 'g' : 
             case 'G' :
-	         dv = SC_VA_ARG(REAL *);
+	         dv = SC_VA_ARG(double *);
 		 s  = SC_dsnprintf(FALSE, local, (double) *dv);
 		 CAT(dst, nc, nd, s);
                  break;

@@ -16,7 +16,7 @@
 
 /* _PM_SETTOL - set the tolerances */
 
-static void _PM_settol(int neqns, REAL *tol, REAL *x,
+static void _PM_settol(int neqns, double *tol, double *x,
 		       double atol, double rtol)
    {int i;
 
@@ -30,7 +30,7 @@ static void _PM_settol(int neqns, REAL *tol, REAL *x,
 
 /* _PM_WVNORM - weighted vector norm */
 
-static double _PM_wvnorm(int neqns, REAL *x, REAL *tol)
+static double _PM_wvnorm(int neqns, double *x, double *tol)
    {int i;
     double val, t;
 
@@ -72,12 +72,12 @@ static double _PM_wvnorm(int neqns, REAL *x, REAL *tol)
  *             - the last iteration.
  */
 
-double PM_newtondl(int neqns, REAL *y, REAL *dy, REAL *tol,
+double PM_newtondl(int neqns, double *y, double *dy, double *tol,
 		   int maxiter, double atol, double rtol,
-                   void (*linsolv)(int neqns, REAL *dy, REAL *y, int iter, void *arg),
+                   void (*linsolv)(int neqns, double *dy, double *y, int iter, void *arg),
 		   void *arg)
-   {double err;
-    int i, n, iter;
+   {int i, n, iter, rv;
+    double err;
 
     iter = 0;
     err  = 2.0;
@@ -99,7 +99,9 @@ double PM_newtondl(int neqns, REAL *y, REAL *dy, REAL *tol,
 
         err = _PM_wvnorm(neqns, dy, tol);};
 
-    return((err <= 1.0) ? 0.0 : err);}
+    rv = (err <= 1.0) ? 0.0 : err;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -132,12 +134,12 @@ double PM_newtondl(int neqns, REAL *y, REAL *dy, REAL *tol,
  *             - the last iteration.
  */
 
-double PM_newtonul(int neqns, REAL *y2, REAL *y1, REAL *tol, int maxiter,
+double PM_newtonul(int neqns, double *y2, double *y1, double *tol, int maxiter,
 		   double atol, double rtol,
-                   void (*linsolv)(int neqns, REAL *dy, REAL *y, int iter, void *arg),
+                   void (*linsolv)(int neqns, double *dy, double *y, int iter, void *arg),
                    void *arg)
-   {double err;
-    int i, iter, n;
+   {int i, iter, n;
+    double err, rv;
 
     iter = 0;
     err  = 2.0;
@@ -167,7 +169,9 @@ double PM_newtonul(int neqns, REAL *y2, REAL *y1, REAL *tol, int maxiter,
 
         err = _PM_wvnorm(neqns, y1, tol);};
 
-    return((err <= 1.0) ? 0.0 : err);}
+    rv = (err <= 1.0) ? 0.0 : err;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -179,12 +183,18 @@ double PM_newtonul(int neqns, REAL *y2, REAL *y1, REAL *tol, int maxiter,
  *                      - non-linear iteration
  */
 
-static REAL _PM_compute_jacobian(REAL xm, REAL x1, REAL xp,
-				 REAL ym, REAL y1, REAL yp,
-				 int meth)
-   {REAL da = 0.0, db = 0.0, dc = 0.0, b, c, dsc, xs, x1s;
-    REAL ep, em, up, um, uep = 0.0, uem = 0.0, ie;
-    REAL jsn, rat;
+static double _PM_compute_jacobian(double xm, double x1, double xp,
+				   double ym, double y1, double yp,
+				   int meth)
+   {double da, db, dc, b, c, dsc, xs, x1s;
+    double ep, em, up, um, uep, uem, ie;
+    double jsn, rat;
+
+    da = 0.0;
+    db = 0.0;
+    dc = 0.0;
+    uep = 0.0;
+    uem = 0.0;
 
     ep = xp - x1;
     em = xm - x1;
@@ -304,14 +314,17 @@ static REAL _PM_compute_jacobian(REAL xm, REAL x1, REAL xp,
  *                 -        if convergence occured on x take -errx
  */
 
-void PM_nls_monotone(REAL *px, REAL *py, int *pitx, REAL *perr,
-		     REAL xm, REAL xp, REAL ym, REAL yp,
-		     REAL ytol, REAL xtol, int meth, REAL asymm,
-		     REAL (*fnc)(REAL x, void *data), void *arg)
+void PM_nls_monotone(double *px, double *py, int *pitx, double *perr,
+		     double xm, double xp, double ym, double yp,
+		     double ytol, double xtol, int meth, double asymm,
+		     double (*fnc)(double x, void *data), void *arg)
    {int it, itx;
-    REAL err, yerr = 0.0, xerr = 0.0, jsn;
-    REAL xt, dx, dxa, x1, y1;
-    REAL rat, x2, y2, iasymm, fltol;
+    double err, yerr, xerr, jsn;
+    double xt, dx, dxa, x1, y1;
+    double rat, x2, y2, iasymm, fltol;
+
+    yerr = 0.0;
+    xerr = 0.0;
 
     if (_PM.precision == -1.0)
        _PM.precision = PM_machine_precision();
@@ -524,6 +537,4 @@ void PM_nls_monotone(REAL *px, REAL *py, int *pitx, REAL *perr,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-
 

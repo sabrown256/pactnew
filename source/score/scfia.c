@@ -455,7 +455,7 @@ FIXNUM F77_FUNC(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, F77_string ps)
 
 FIXNUM F77_FUNC(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
                                 F77_string tok, FIXNUM *pntok, FIXNUM *nctok,
-                                FIXNUM *ixtok, FIXNUM *toktyp, REAL *tokval)
+                                FIXNUM *ixtok, FIXNUM *toktyp, double *tokval)
    {int i, indx, nc;
     int n_tok, n_tok_max, width;
     FIXNUM rv;
@@ -647,10 +647,10 @@ FIXNUM F77_FUNC(scapal, SCAPAL)(FIXNUM *pal1, FIXNUM *pal2)
  *          SINCE THE FIRST CALL
  */
 
-FIXNUM F77_FUNC(scctim, SCCTIM)(REAL *ptim)
+FIXNUM F77_FUNC(scctim, SCCTIM)(double *ptim)
    {FIXNUM rv;
 
-    *ptim = (REAL) SC_cpu_time();
+    *ptim = (double) SC_cpu_time();
 
     rv = TRUE;
 
@@ -663,10 +663,10 @@ FIXNUM F77_FUNC(scctim, SCCTIM)(REAL *ptim)
  *          SINCE THE FIRST CALL
  */
 
-FIXNUM F77_FUNC(scwtim, SCWTIM)(REAL *ptim)
+FIXNUM F77_FUNC(scwtim, SCWTIM)(double *ptim)
    {FIXNUM rv;
 
-    *ptim = (REAL) SC_wall_clock_time();
+    *ptim = (double) SC_wall_clock_time();
 
     rv = TRUE;
 

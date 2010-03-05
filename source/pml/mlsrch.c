@@ -133,7 +133,7 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
        {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
 
     else
-       {MIN_MAX(REAL, p, n, pn, px, imin, imax, DBL_MAX);};
+       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);};
 
     return;}
 
@@ -142,7 +142,7 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
 
 /* PM_MAXMIN - return the max and min value of the given array */
 
-void PM_maxmin(REAL *xp, REAL *xmin, REAL *xmax, int n)
+void PM_maxmin(double *xp, double *xmin, double *xmax, int n)
    {int i1, i2;
 
     PM_minmax(xp, n, xmin, xmax, &i1, &i2);
@@ -239,7 +239,7 @@ int PM_find_index(void *p, double f, int n)
        {FIND_INDEX(char, p, f, n, indx);}
 
     else
-       {FIND_INDEX(REAL, p, f, n, indx);};
+       {FIND_INDEX(double, p, f, n, indx);};
 
     return(indx);}
 
@@ -273,13 +273,13 @@ int PM_find_index(void *p, double f, int n)
  *           -           of each element of X in the Y table
  */
 
-void PM_search_slow(int nx REAL *x, int ny, REAL *y, int offs, int *indx)
+void PM_search_slow(int nx double *x, int ny, double *y, int offs, int *indx)
    {long ix, iy;
 
     y += offs;
 
     for (ix = 0; ix < nx; ix++)
-        {FIND_INDEX(REAL, y, x[ix], ny, iy);
+        {FIND_INDEX(double, y, x[ix], ny, iy);
 
 	 indx[ix] = iy + offs;};
 
@@ -315,7 +315,7 @@ void PM_search_slow(int nx REAL *x, int ny, REAL *y, int offs, int *indx)
  *           -           of each element of X in the Y table
  */
 
-void PM_search(int nx, REAL *x, int ny, REAL *y, int offs, int *indx)
+void PM_search(int nx, double *x, int ny, double *y, int offs, int *indx)
    {long ix, iy, my;
     PM_smp_state *ma;
     
@@ -328,7 +328,7 @@ void PM_search(int nx, REAL *x, int ny, REAL *y, int offs, int *indx)
     ma->last = max(0L, ma->last);
 
     for (ix = 0; ix < nx; ix++)
-        {FIND_INDEX_FAST(REAL, y, x[ix], ny, iy, ma->last);
+        {FIND_INDEX_FAST(double, y, x[ix], ny, iy, ma->last);
 
 	 indx[ix] = iy + offs;};
 
