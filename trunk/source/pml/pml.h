@@ -889,9 +889,10 @@ extern coefficient
 
 /* MLINTS.C declarations */
 
-extern int
- PM_cubic_spline_int(double *fx, double *fy, double *d2y, int n,
-		     double x, double *py);
+extern double
+ *PM_compute_splines(double *x, double *y, int n, double dyl, double dyr),
+ PM_cubic_spline_int(double *x, double *f, double *df, int n, double xc),
+ PM_linear_int(double *x, double *f, int n, double xc);
 
 
 /* MLMATH.C declarations */

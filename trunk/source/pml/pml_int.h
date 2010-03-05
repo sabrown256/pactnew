@@ -104,12 +104,6 @@ extern double
 	    double *x, double *y, int neq, int method);
 
 
-/* MLINTS.C declarations */
-
-extern void
- _PM_spline(double *x, double *y, int n, double yp1, double ypn, double *d2y);
-
-
 /* MLGEOM.C declarations */
 
 extern int

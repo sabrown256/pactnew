@@ -13,67 +13,190 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMPUTE_F - interpolate the mapping from voltages to positions
- *           - into one from positions to voltages
- */
+/* SETUP_1D_POINTS - setup NL points at which functions will be evaluated */
 
-double **compute_f(double **r, int ni, double **x, double **f,
-		   int nx, int ny)
-   {double **vals, **fncs;
-    PM_lagrangian_mesh *grid;
+double *setup_1d_points(int nl)
+   {int l;
+    double r0;
+    double *r;
 
-    grid       = FMAKE(PM_lagrangian_mesh, "COMPUTE_F:grid");
-    grid->x    = f[0];
-    grid->y    = f[1];
-    grid->kmax = nx;
-    grid->lmax = ny;
+    r = FMAKE_N(double, nl, "SETUP_1D_POINTS:r");
 
-    fncs    = FMAKE_N(double *, 4, "COMPUTE_F:fncs");
-    fncs[0] = x[0];
-    fncs[1] = x[1];
-    fncs[2] = f[0];
-    fncs[3] = f[1];
+    for (l = 0; l < nl; l++)
+        {r0 = ((double) l)/(nl - 1.0);
+	 r[l] = 0.2 + 0.5*(r0 + cos(PI*r0));};
 
-    vals = PM_interpol(grid, r, ni, fncs, 4);
-
-    return(vals);}
+    return(r);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DUMP - make an ASCII dump of a map */
+/* SETUP_2D_POINTS - setup NL points at which functions will be evaluated */
 
-void dump(char *s, double **p, int n, FILE *fp)
-   {int i;
-    double *px, *py;
+double **setup_2d_points(int nl)
+   {int l;
+    double r0;
+    double **r;
 
-    px = p[0];
-    py = p[1];
+    r  = PM_make_vectors(2, nl);
 
-    fprintf(fp, "\n\n%s\n\n", s);
+    for (l = 0; l < nl; l++)
+        {r0 = ((double) l)/(nl - 1.0);
+	 r[0][l] = 0.2 + 0.5*(r0 + cos(PI*r0));
+         r[1][l] = 0.2 + 0.5*(r0 + sin(PI*r0));};
 
-    for (i = 0; i < n; i++)
-        fprintf(fp, "(%6.3f, %6.3f) ", *px++, *py++);
-
-    fprintf(fp, "\n\n");
-
-    return;}
+    return(r);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                             TEST_1 ROUTINES                              */
+
 /*--------------------------------------------------------------------------*/
 
-/* TEST_1 - test 2d interpolation on LR mesh */
+/* TEST_1 - test 1d linear spline interpolation */
 
 int test_1(void)
-   {int i, j, l, ni, np, nx, ny, rv;
-    double inx, iny;
-    double **f, **x, **r, **vals;
+   {int i, l, nl, nx, rv;
+    double inx;
+    double *f, *x, *y, *r;
     FILE *out;
 
-/* interupt handler */
-    SC_signal(SIGINT, SIG_DFL);
+    nl = 20;
+    nx = 10;
 
-    ni = 20;
+    inx = 1.0/(nx - 1.0);
+
+    x = FMAKE_N(double, nx, "TEST_1:x");
+    f = FMAKE_N(double, nx, "TEST_1:f");
+
+    for (i = 0; i < nx; i++)
+
+/* setup the coordinates of the logical values */
+        {x[i] = i*inx;
+
+/* setup the logical values */
+	 f[i] = exp(i*inx);};
+
+/* setup the interpolation points */
+    r = setup_1d_points(nl);
+    y = FMAKE_N(double, nl, "TEST_1:y");
+
+/* compute Y(R) */
+    for (l = 0; l < nl; l++)
+        y[l] = PM_linear_int(x, f, nx, r[l]);
+
+/* print the results */
+    out = fopen("test_1.out", "w");
+    if (out == NULL)
+       {printf("CAN'T OPEN TEST_1.OUT\n");
+        rv = FALSE;}
+
+    else
+       {fprintf(out, "#   I         X             F\n");
+	for (i = 0; i < nx; i++)
+	    fprintf(out, " %4d   %12.6e   %12.6e\n",
+		    i, x[i], f[i]);
+
+	fprintf(out, "#   I        R            FI\n");
+	for (l = 0; l < nl; l++)
+	    fprintf(out, " %4d   %12.6e   %12.6e\n",
+		    l, r[l], y[l]);
+
+	fclose(out);
+
+	rv = TRUE;};
+
+    SFREE(x);
+    SFREE(f);
+    SFREE(r);
+    SFREE(y);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             TEST_2 ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_2 - test 1d cubic spline interpolation */
+
+int test_2(void)
+   {int i, l, nl, nx, rv;
+    double inx;
+    double *df, *f, *x, *y, *r;
+    FILE *out;
+
+    nl = 20;
+    nx = 10;
+
+    inx = 1.0/(nx - 1.0);
+
+    x = FMAKE_N(double, nx, "TEST_2:x");
+    f = FMAKE_N(double, nx, "TEST_2:f");
+
+    for (i = 0; i < nx; i++)
+
+/* setup the coordinates of the logical values */
+        {x[i] = i*inx;
+
+/* setup the logical values */
+	 f[i] = exp(i*inx);};
+
+/* setup the interpolation points */
+    r = setup_1d_points(nl);
+    y = FMAKE_N(double, nl, "TEST_2:y");
+
+/* compute Y(R) */
+    df = PM_compute_splines(x, f, nx, HUGE, HUGE);
+    for (l = 0; l < nl; l++)
+        y[l] = PM_cubic_spline_int(x, f, df, nx, r[l]);
+
+/* print the results */
+    out = fopen("test_2.out", "w");
+    if (out == NULL)
+       {printf("CAN'T OPEN TEST_2.OUT\n");
+        rv = FALSE;}
+
+    else
+       {fprintf(out, "#   I         X             F\n");
+	for (i = 0; i < nx; i++)
+	    fprintf(out, " %4d   %12.6e   %12.6e\n",
+		    i, x[i], f[i]);
+
+	fprintf(out, "#   I        R            FI\n");
+	for (l = 0; l < nl; l++)
+	    fprintf(out, " %4d   %12.6e   %12.6e\n",
+		    l, r[l], y[l]);
+
+	fclose(out);
+
+	rv = TRUE;};
+
+    SFREE(x);
+    SFREE(f);
+    SFREE(df);
+    SFREE(r);
+    SFREE(y);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             TEST_3 ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_3 - test 2d interpolation on LR mesh */
+
+int test_3(void)
+   {int i, j, l, nl, np, nx, ny, rv;
+    double inx, iny;
+    double **f, **x, **r, **vals, **fncs;
+    PM_lagrangian_mesh *grid;
+    FILE *out;
+
+    nl = 20;
     nx = 10;
     ny = 15;
     np = nx*ny;
@@ -83,9 +206,6 @@ int test_1(void)
 
     x = PM_make_vectors(2, np);
     f = PM_make_vectors(2, np);
-
-/* get in the number of interpolation points */
-    r = PM_make_vectors(2, ni);
 
     for (j = 0; j < ny; j++)
         for (i = 0; i < nx; i++)
@@ -99,24 +219,41 @@ int test_1(void)
 	     f[0][l] = i*inx + (ny - 1.0 - j)*iny;
 	     f[1][l] = (nx - 1.0 - i)*inx + j*iny;};
 
-/* get in the list of interpolation points */
-    for (i = 0; i < ni; i++)
-        {r[0][i] = i*inx + cos(PI*inx*i);
-         r[1][i] = i*inx + sin(PI*inx*i);};
+/* get in the number of interpolation points */
+    r = setup_2d_points(nl);
 
-    vals = compute_f(r, ni, f, x, nx, ny);
+    grid       = FMAKE(PM_lagrangian_mesh, "COMPUTE_F:grid");
+    grid->x    = f[0];
+    grid->y    = f[1];
+    grid->kmax = nx;
+    grid->lmax = ny;
 
-    out = fopen("test_1.out", "w");
+    fncs    = FMAKE_N(double *, 4, "COMPUTE_F:fncs");
+    fncs[0] = x[0];
+    fncs[1] = x[1];
+    fncs[2] = f[0];
+    fncs[3] = f[1];
+
+    vals = PM_interpol(grid, r, nl, fncs, 4);
+
+/* print the results */
+    out = fopen("test_3.out", "w");
     if (out == NULL)
-       {printf("CAN'T OPEN TEST_1.OUT\n");
+       {printf("CAN'T OPEN TEST_3.OUT\n");
         rv = FALSE;}
 
     else
-       {dump("LOGICAL VALUES - F", f, np, out);
-	dump("X", x, np, out);
-	dump("INTERPOLATION POINTS - R", r, ni, out);
-	dump("F(R)", vals, ni, out);
-	dump("R", vals + 2, ni, out);
+       {fprintf(out, "#   I    J         X            Y             Fx           Fy\n");
+	for (j = 0; j < ny; j++)
+	    for (i = 0; i < nx; i++)
+	        {l = j*nx + i;
+		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e %12.6e\n",
+			 i, j, x[0][l], x[1][l], f[0][l], f[1][l]);};
+
+	fprintf(out, "#   I        Rx           Ry            FIx          FIy\n");
+	for (l = 0; l < nl; l++)
+	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e %12.6e\n",
+		    l, vals[2][l], vals[3][l], vals[0][l], vals[1][l]);
 
 	fclose(out);
 
@@ -130,13 +267,174 @@ int test_1(void)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                             TEST_4 ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_4 - test 2d multi-quadric */
+
+int test_4(void)
+   {int i, j, l, nd, nl, nx, ny, rv, ok;
+    int mxo[2];
+    double inl;
+    double prm[3];
+    double **f, **r, **fo, **xo;
+    FILE *out;
+
+    nd = 2;
+    nx = 10;
+    ny = 15;
+    nl = 20;
+
+    inl = 1.0/(nl - 1.0);
+
+    f = PM_make_vectors(2, nl);
+    for (l = 0; l < nl; l++)
+        {f[0][l] = l*inl;
+	 f[1][l] = (nl - 1.0 - l)*inl;};
+
+/* setup the interpolation points */
+    nl = 20;
+    r  = setup_2d_points(nl);
+
+    xo = FMAKE_N(double *, nd, "TEST_4:xo");
+    fo = FMAKE_N(double *, nd, "TEST_4:fo");
+
+    mxo[0] = nx;
+    mxo[1] = ny;
+    prm[0] = 0.0;
+    prm[1] = 0.0;
+    prm[2] = 0.0;
+    ok = PM_interp_mesh_mq(2, 2, nl, r, f, mxo, xo, fo, prm);
+
+/* print the results */
+    out = fopen("test_4.out", "w");
+    if (out == NULL)
+       {printf("CAN'T OPEN TEST_4.OUT\n");
+        rv = FALSE;}
+
+    else
+       {fprintf(out, "#   I        Rx           Ry            Fx           Fy\n");
+	for (l = 0; l < nl; l++)
+	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e %12.6e\n",
+		    l, r[0][l], r[1][l], f[0][l], f[1][l]);
+
+	fprintf(out, "#   I    J         X            Y             Fx           Fy\n");
+	for (j = 0; j < ny; j++)
+	    for (i = 0; i < nx; i++)
+	        {l = j*nx + i;
+		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e %12.6e\n",
+			 i, j, xo[0][i], xo[1][j], fo[0][l], fo[1][l]);};
+
+	fclose(out);
+
+	rv = TRUE;};
+
+    PM_free_vectors(2, f);
+    PM_free_vectors(2, r);
+    PM_free_vectors(2, xo);
+    PM_free_vectors(2, fo);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             TEST_5 ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_5 - test 2d multi-quadric */
+
+int test_5(void)
+   {int i, j, l, nd, nl, nx, ny, rv, ok;
+    int mxo[2];
+    double inl;
+    double prm[3];
+    double **f, **r, **fo, **xo;
+    FILE *out;
+
+    nd = 2;
+    nx = 10;
+    ny = 15;
+    nl = 20;
+
+    inl = 1.0/(nl - 1.0);
+
+    f = PM_make_vectors(2, nl);
+    for (l = 0; l < nl; l++)
+        {f[0][l] = l*inl;
+	 f[1][l] = (nl - 1.0 - l)*inl;};
+
+/* setup the interpolation points */
+    nl = 20;
+    r  = setup_2d_points(nl);
+
+    xo = FMAKE_N(double *, nd, "TEST_5:xo");
+    fo = FMAKE_N(double *, nd, "TEST_5:fo");
+
+    mxo[0] = nx;
+    mxo[1] = ny;
+    prm[0] = 0.2;
+    prm[1] = 2.0;
+    prm[2] = 2.0;
+    ok = PM_interp_mesh_id(2, 2, nl, r, f, mxo, xo, fo, prm);
+
+/* print the results */
+    out = fopen("test_5.out", "w");
+    if (out == NULL)
+       {printf("CAN'T OPEN TEST_5.OUT\n");
+        rv = FALSE;}
+
+    else
+       {fprintf(out, "#   I        Rx           Ry            Fx           Fy\n");
+	for (l = 0; l < nl; l++)
+	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e %12.6e\n",
+		    l, r[0][l], r[1][l], f[0][l], f[1][l]);
+
+	fprintf(out, "#   I    J         X            Y             Fx           Fy\n");
+	for (j = 0; j < ny; j++)
+	    for (i = 0; i < nx; i++)
+	        {l = j*nx + i;
+		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e %12.6e\n",
+			 i, j, xo[0][i], xo[1][j], fo[0][l], fo[1][l]);};
+
+	fclose(out);
+
+	rv = TRUE;};
+
+    PM_free_vectors(2, f);
+    PM_free_vectors(2, r);
+    PM_free_vectors(2, xo);
+    PM_free_vectors(2, fo);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 int main(int argc, char **argv)
    {int rv;
 
+/* interupt handler */
+    SC_signal(SIGINT, SIG_DFL);
+
     rv = TRUE;
+
+/* linear */
     rv &= test_1();
+
+/* cubic spline */
+    rv &= test_2();
+
+/* 2d lagrangian mesh */
+    rv &= test_3();
+
+/* 2d multi-quadric */
+    rv &= test_4();
+
+/* 2d inverse-distance */
+    rv &= test_5();
 
 /* invert rv for exit status */
     rv = (rv == FALSE);
