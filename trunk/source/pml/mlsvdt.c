@@ -64,10 +64,10 @@ static double condition_number(double *w, int n)
 
 /* MAIN - */
 
-int main()
+int main(int argc, char **argv)
    {int i, j, k, n, ok;
-    REAL ret, wc;
-    REAL *a, *u, *w, *v;
+    double ret, wc;
+    double *a, *u, *w, *v;
     PM_matrix *ma, *mu, *mw, *mv, *one, *diff;
 
     PM_enable_fpe(TRUE, catch_fpe);

@@ -31,19 +31,19 @@ static int
 
 int test_1(int nir, int nim)
    {int i, j, jmx, ok, err;
-    REAL **a;
+    double **a;
 
     err = FALSE;
 
     io_printf(stdout, "\n-----------------------------\n");
     io_printf(stdout, "\nSimple memory allocation test\n\n");
 
-    a = FMAKE_N(REAL *, nir, "TEST_1:a");
+    a = FMAKE_N(double *, nir, "TEST_1:a");
 
     for (i = 0; i < nir; i++)
         {jmx = (i == 3) ? nim+10 : nim;
 
-	 a[i] = FMAKE_N(REAL, nim, "TEST_1:a[i]");
+	 a[i] = FMAKE_N(double, nim, "TEST_1:a[i]");
 	 for (j = 0; j < jmx; j++)
 	     a[i][j] = (j + 1.0)*(i + 1.0);
 
@@ -76,7 +76,7 @@ int test_2(int nir, int nim)
    {int i, err, na, nb, ma, mb;
     char msg[MAXLINE];
     float b[10];
-    REAL **a;
+    double **a;
 
     err = FALSE;
 
@@ -90,7 +90,7 @@ int test_2(int nir, int nim)
 
     SC_reg_mem(b, sizeof(b), "TEST_2:b");
 
-    a = FMAKE_N(REAL *, nir, "TEST_2:a");
+    a = FMAKE_N(double *, nir, "TEST_2:a");
 
     io_printf(stdout, "   First leak check\n\n");
     ma = SC_mem_monitor(na, 2, "t2a", msg);
@@ -185,7 +185,7 @@ int test_3(int nir, int nim)
 #if 0
 
 /* test over and under indexing the space */
-    a = FMAKE_N(REAL, ne, "TEST_3:a");
+    a = FMAKE_N(double, ne, "TEST_3:a");
 
     SC_signal(SIGSEGV, sigh_3);
     SC_signal(SIGBUS,  sigh_3);
@@ -271,7 +271,7 @@ int test_4(int nir, int nim)
 
 #else
     {long il, iu, ne;
-     REAL *a;
+     double *a;
      double *ad;
      float *af;
      long *al;
@@ -311,7 +311,7 @@ int test_4(int nir, int nim)
      SFREE(ac);
 
 /* test over and under indexing the space */
-     a = FMAKE_N(REAL, ne, "TEST_4:a");
+     a = FMAKE_N(double, ne, "TEST_4:a");
 
      SC_signal(SIGSEGV, sigh_4);
      SC_signal(SIGBUS,  sigh_4);

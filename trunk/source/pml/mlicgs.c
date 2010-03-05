@@ -15,11 +15,12 @@
 
 /* ICMATM - matrix multiply  Y = M*X */
 
-static void icmatm(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
-                   REAL *x, REAL *y, int km, int lm)
+static void icmatm(double *a0, double *a1,
+		   double *b0, double *b1, double *bm1,
+                   double *x, double *y, int km, int lm)
    {int i, n;
-    REAL *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
-    REAL *x1, *x2, *x3, *x4, *x5, *x6, *x7, *x8;
+    double *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
+    double *x1, *x2, *x3, *x4, *x5, *x6, *x7, *x8;
 
 /* set pointers for left/right up/down ... etc */
     x1 = x - km + 1;
@@ -87,15 +88,17 @@ static void icmatm(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
 
 /* ICDLDU - performs incomplete LDU decomposition of M */
  
-static void icdldu(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
-                   REAL *di, REAL *la1, REAL *lb0, REAL *lb1, REAL *lbm1,
-                   REAL *z, int km, int lm, int neq, int method)
+static void icdldu(double *a0, double *a1,
+		   double *b0, double *b1, double *bm1,
+                   double *di, double *la1,
+		   double *lb0, double *lb1, double *lbm1,
+                   double *z, int km, int lm, int neq, int method)
    {int i, n;
-    REAL *c1, *c2, *c3, *c4;
-    REAL *l1, *l2, *l3, *l4;
-    REAL *l5, *l6, *l7, *l8;
-    REAL *z1, *z2, *z3, *z4;
-    REAL *d1, *d2, *d3, *d4;
+    double *c1, *c2, *c3, *c4;
+    double *l1, *l2, *l3, *l4;
+    double *l5, *l6, *l7, *l8;
+    double *z1, *z2, *z3, *z4;
+    double *d1, *d2, *d3, *d4;
  
     n = km*lm;
  
@@ -169,11 +172,12 @@ static void icdldu(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
 
 /* ICILDU - solves LDU*X = Y for X given Y */
  
-static void icildu(REAL *di, REAL *la1, REAL *lb0, REAL *lb1, REAL *lbm1,
-                   REAL *x, REAL *y, int km, int lm, int neq, int method)
+static void icildu(double *di, double *la1,
+		   double *lb0, double *lb1, double *lbm1,
+                   double *x, double *y, int km, int lm, int neq, int method)
    {int i, n;
-    REAL *x1, *x2, *x3, *x4;
-    REAL *c1, *c2, *c3, *c4;
+    double *x1, *x2, *x3, *x4;
+    double *c1, *c2, *c3, *c4;
 
     n = km*lm;
 
@@ -252,13 +256,16 @@ static void icildu(REAL *di, REAL *la1, REAL *lb0, REAL *lb1, REAL *lbm1,
 
 /* _PM_GCG_S - generalized conjugate gradient */
 
-static REAL _PM_gcg_s(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
-                      REAL *x, REAL *y, REAL *di, REAL *la1, REAL *lb0,
-                      REAL *lb1, REAL *lbm1, REAL *r, REAL *q, REAL *p,
-                      int km, int lm, int neq, int method, int maxit,
-                      double eps)
+static double _PM_gcg_s(double *a0, double *a1,
+			double *b0, double *b1, double *bm1,
+			double *x, double *y, double *di,
+			double *la1, double *lb0,
+			double *lb1, double *lbm1, double *r,
+			double *q, double *p,
+			int km, int lm, int neq, int method, int maxit,
+			double eps)
    {int i, iter, exflag;
-    REAL yabsum, dotprev, dotp, dotr, aa, rerr, xerr, b, pnorm;
+    double yabsum, dotprev, dotp, dotr, aa, rerr, xerr, b, pnorm;
 
 /* form product r = M.x */
     icmatm(a0, a1, b0, b1, bm1, x, r, km, lm);
@@ -336,7 +343,7 @@ static REAL _PM_gcg_s(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
 /* end generalized conjugate gradient */
  
 /* set parameters to the values they must have on return */
-    eps = rerr + (REAL) iter;
+    eps = rerr + (double) iter;
     if (exflag)
        eps *= -1.0;
 
@@ -384,16 +391,17 @@ static REAL _PM_gcg_s(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
  *    or int(ret) >= maxit, or frac(ret) > eps.
  */ 
  
-REAL _PM_iccg_s(int km, int lm, REAL eps, int maxit, REAL *a0, REAL *a1,
-                REAL *b0, REAL *b1, REAL *bm1, REAL *x, REAL *y,
-                int neq, int method)
+double _PM_iccg_s(int km, int lm, double eps, int maxit,
+		  double *a0, double *a1,
+		  double *b0, double *b1, double *bm1, double *x, double *y,
+		  int neq, int method)
    {int nkl;
-    REAL *di, *la1, *lb0, *lb1, *lbm1, *p, *q, *r, *w;
+    double *di, *la1, *lb0, *lb1, *lbm1, *p, *q, *r, *w;
 
 /* assign temporary memory */
     nkl   = km*lm;
 
-    w    = FMAKE_N(REAL, 4*(neq+nkl), "_PM_ICCG_S:w");
+    w    = FMAKE_N(double, 4*(neq+nkl), "_PM_ICCG_S:w");
     di   = w;
     la1  = di + neq;
     lb0  = la1 + nkl;

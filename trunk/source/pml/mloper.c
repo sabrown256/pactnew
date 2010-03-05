@@ -582,10 +582,10 @@ C_array *PM_accumulate_oper(double (*fnc)(double x, double y), C_array *acc,
  *              - tolerance
  */
 
-int PM_set_equal(PM_set *a, PM_set *b, REAL tol)
+int PM_set_equal(PM_set *a, PM_set *b, double tol)
    {int id, nde, ne, ok;
     char *typ;
-    REAL *aed, *bed;
+    double *aed, *bed;
     void **ae, **be;
 
     ok = TRUE;

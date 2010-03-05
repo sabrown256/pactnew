@@ -22,14 +22,14 @@
 
 PM_matrix *PM_create(int nr, int nc)
    {PM_matrix *mp;
-    REAL *ap;
+    double *ap;
 
     mp = FMAKE(PM_matrix, "PM_CREATE:mp");
 
     mp->nrow = nr;
     mp->ncol = nc;
     
-    ap = FMAKE_N(REAL, nr*nc, "PM_CREATE:ap");
+    ap = FMAKE_N(double, nr*nc, "PM_CREATE:ap");
     mp->array = ap;
 
     return(mp);}
@@ -196,7 +196,7 @@ PM_matrix *PM_transpose(PM_matrix *a)
 
 PM_matrix *_PM_times(PM_matrix *m, PM_matrix *a, PM_matrix *b)
    {int mr, mc, ar, ac, br, bc;
-    REAL sum, ce, *va, *vb;
+    double sum, ce, *va, *vb;
     int k, j, i;
 
     if ((m == NULL) || (a == NULL) || (b == NULL))
@@ -255,7 +255,7 @@ PM_matrix *PM_times(PM_matrix *a, PM_matrix *b)
 
 PM_matrix *_PM_negative_times(PM_matrix *m, PM_matrix *a, PM_matrix *b)
    {int mr, mc, ar, ac, br, bc;
-    REAL sum, ce, *va, *vb;
+    double sum, ce, *va, *vb;
     int k, j, i;
 
     if ((m == NULL) || (a == NULL) || (b == NULL))
@@ -401,7 +401,7 @@ PM_matrix *PM_minus(PM_matrix *a, PM_matrix *b)
 int PM_del_col(PM_matrix *a, long *col, long ncol)
    {int i, j, nr, nc;
     long *dcolptr, ndcol;
-    REAL *new, *nptr, *optr;
+    double *new, *nptr, *optr;
 
     nr = a->nrow;
     nc = a->ncol;
@@ -410,7 +410,7 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
     if ((col[ncol-1] >= nc) || (col[0] < 0))
        return(FALSE);
 
-    new  = nptr = FMAKE_N(REAL, nr * (nc - ncol), "PM_DEL_COL:new");
+    new  = nptr = FMAKE_N(double, nr * (nc - ncol), "PM_DEL_COL:new");
     optr = a->array;
 
     for (i = 0; i < nr; i++)
@@ -437,9 +437,9 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
  */
 
 
-REAL *_PM_get_col(PM_matrix *a, int col)
+double *_PM_get_col(PM_matrix *a, int col)
    {int i, nr, nc;
-    REAL *get, *nptr, *optr;
+    double *get, *nptr, *optr;
 
     nr = a->nrow;
     nc = a->ncol;
@@ -447,7 +447,7 @@ REAL *_PM_get_col(PM_matrix *a, int col)
     if ((col >= nc) || (col < 0))
        return(NULL);
 
-    get  = nptr = FMAKE_N(REAL, nr, "_PM_GET_COL:get");
+    get  = nptr = FMAKE_N(double, nr, "_PM_GET_COL:get");
     optr = a->array + col;
 
     for (i = 0; i < nr; i++, nptr++)
@@ -465,9 +465,9 @@ REAL *_PM_get_col(PM_matrix *a, int col)
  */
 
 
-int _PM_put_col(PM_matrix *a, int col, REAL *put)
+int _PM_put_col(PM_matrix *a, int col, double *put)
    {int i, nr, nc;
-    REAL *optr;
+    double *optr;
 
     nr = a->nrow;
     nc = a->ncol;
@@ -494,7 +494,7 @@ int _PM_put_col(PM_matrix *a, int col, REAL *put)
 int PM_sort_on_col(PM_matrix *a, int col)
    {int i, j, nr, nc;
     int *ind;
-    REAL *rcol, *temp;
+    double *rcol, *temp;
 
     nr = a->nrow;
     nc = a->ncol;
@@ -511,7 +511,7 @@ int PM_sort_on_col(PM_matrix *a, int col)
 
     _PM_put_col(a, col, rcol);
 
-    temp = FMAKE_N(REAL, nr, "PM_SORT_ON_COL:temp");
+    temp = FMAKE_N(double, nr, "PM_SORT_ON_COL:temp");
     
     for (i = 0; i < nc; i++)
         {if (i != col)

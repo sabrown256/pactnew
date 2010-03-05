@@ -43,8 +43,8 @@ double
 
 int
  *PM_fft_index(int n),
- _PM_fold(int sgn, int na, REAL *xa, REAL *ya, int nb,
-	  REAL *xb, REAL *yb, REAL **pxf, REAL **pyf);
+ _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
+	  double *xb, double *yb, double **pxf, double **pyf);
 
 double
  _PM_jn(int n, double x),
@@ -124,7 +124,7 @@ void PM_shift_array(double *p, int n, double f)
 
 /* PM_SET_VALUE - broadcast a value into an array */
 
-void PM_set_value(REAL *p, int n, double f)
+void PM_set_value(double *p, int n, double f)
    {int i;
 
     if (p != NULL)
@@ -138,7 +138,7 @@ void PM_set_value(REAL *p, int n, double f)
 
 /* DARRLT - print the number of elements of P less than F */
 
-long darrlt(REAL *p, int n, double f)
+long darrlt(double *p, int n, double f)
    {int i, nl;
 
     nl = 0;
@@ -154,7 +154,7 @@ long darrlt(REAL *p, int n, double f)
 
 /* DARRGT - print the number of elements of P greater than F */
 
-long darrgt(REAL *p, int n, double f)
+long darrgt(double *p, int n, double f)
    {int i, ng;
 
     ng = 0;
@@ -170,7 +170,7 @@ long darrgt(REAL *p, int n, double f)
 
 /* DARREQ - print the number of elements of P equal to F */
 
-long darreq(REAL *p, int n, double f)
+long darreq(double *p, int n, double f)
    {int i, ng;
 
     ng = 0;
@@ -188,9 +188,9 @@ long darreq(REAL *p, int n, double f)
  *                - equal to within tolerance
  */
 
-int PM_equal_array(REAL *s, REAL *t, int n, REAL tol)
+int PM_equal_array(double *s, double *t, int n, double tol)
    {int i, ok;
-    REAL sc, tc, fc;
+    double sc, tc, fc;
 
     ok = TRUE;
     for (i = 0; (i < n) && ok; i++)
@@ -208,7 +208,7 @@ int PM_equal_array(REAL *s, REAL *t, int n, REAL tol)
  *               - that is copy N double values from array T to array S
  */
 
-void PM_copy_array(REAL *s, REAL *t, int n)
+void PM_copy_array(double *s, double *t, int n)
    {int i;
 
     if ((s != NULL) && (t != NULL))
@@ -222,10 +222,10 @@ void PM_copy_array(REAL *s, REAL *t, int n)
 
 /* PM_CURVE_LEN_2D - return the length of the given curve in 2 space */
 
-double PM_curve_len_2d(REAL *x, REAL *y, int n)
+double PM_curve_len_2d(double *x, double *y, int n)
    {int i;
     double s;
-    REAL *px1, *px2, *py1, *py2;
+    double *px1, *px2, *py1, *py2;
 
     px1 = x;
     px2 = x + 1;
@@ -241,10 +241,10 @@ double PM_curve_len_2d(REAL *x, REAL *y, int n)
 
 /* PM_CURVE_LEN_3D - return the length of the given curve in 3 space */
 
-double PM_curve_len_3d(REAL *x, REAL *y, REAL *z, int n)
+double PM_curve_len_3d(double *x, double *y, double *z, int n)
    {int i;
     double dx, dy, dz, s;
-    REAL *px1, *px2, *py1, *py2, *pz1, *pz2;
+    double *px1, *px2, *py1, *py2, *pz1, *pz2;
 
     px1 = x;
     px2 = x + 1;
@@ -309,7 +309,7 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
 /* PM_INTEGRATE_TZR - do simple trapezoid rule integeration of a data set */
 
 double PM_integrate_tzr(double xmn, double xmx, int *pn,
-			REAL *fncx, REAL *fncy, REAL *intx, REAL *inty)
+			double *fncx, double *fncy, double *intx, double *inty)
    {int i, k, n;
     double sum, lasty, xta;
 
@@ -366,9 +366,9 @@ double PM_integrate_tzr(double xmn, double xmx, int *pn,
  *               - derx and dery
  */
 
-void PM_derivative(int n, REAL *fncx, REAL *fncy, REAL *derx, REAL *dery)
+void PM_derivative(int n, double *fncx, double *fncy, double *derx, double *dery)
    {int i;
-    REAL x1, x2, y1, y2, yt;
+    double x1, x2, y1, y2, yt;
 
     x1 = *fncx++;
     y1 = *fncy++;
@@ -395,10 +395,10 @@ void PM_derivative(int n, REAL *fncx, REAL *fncy, REAL *derx, REAL *dery)
  *                - this uses a differential measure criterion
  */
 
-int PM_thin_1d_der(int n, REAL *fncx, REAL *fncy, REAL *thnx, REAL *thny,
+int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny,
 		   double toler)
    {int i, i0, j;
-    REAL x1, x2, y1, y2, xt, dydx, odydx;
+    double x1, x2, y1, y2, xt, dydx, odydx;
 
     if (toler == HUGE)
        {toler = 10.0/((double) n);
@@ -455,20 +455,20 @@ int PM_thin_1d_der(int n, REAL *fncx, REAL *fncy, REAL *thnx, REAL *thny,
  *                - this uses an integral measure criterion
  */
 
-int PM_thin_1d_int(int n, REAL *fncx, REAL *fncy, REAL *thnx, REAL *thny,
+int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny,
 		   double toler)
    {int i, nth, nc, iamn, iamna, iamnb;
-    REAL xc, yc, sm, b, ht, amn;
-    REAL *area;
+    double xc, yc, sm, b, ht, amn;
+    double *area;
 
-    memcpy(thnx, fncx, n*sizeof(REAL));
-    memcpy(thny, fncy, n*sizeof(REAL));
+    memcpy(thnx, fncx, n*sizeof(double));
+    memcpy(thny, fncy, n*sizeof(double));
 
     nth = -1;
     xc  = 0.0;
 
 /* compute the areas */
-    area = FMAKE_N(REAL, n, "PM_THIN_1D_INT:area");
+    area = FMAKE_N(double, n, "PM_THIN_1D_INT:area");
     for (i = 1; i < n-1; i++)
         {xc = thnx[i+1] - thnx[i-1];
          if (xc == 0.0)
@@ -554,15 +554,15 @@ int PM_thin_1d_int(int n, REAL *fncx, REAL *fncy, REAL *thnx, REAL *thny,
  *                 - return TRUE iff successful
  */
 
-int PM_filter_coeff(REAL *y, int n, REAL *coef, int nc)
+int PM_filter_coeff(double *y, int n, double *coef, int nc)
    {int i, j, nh, nm, nu, jn, jx;
-    REAL *ny, *py, *pc, yn;
+    double *ny, *py, *pc, yn;
 
     nh = nc >> 1;
     nm = nh*(3*nh + 1) >> 1;
     nu = n - nh;
 
-    ny = FMAKE_N(REAL, n, "PM_FILTER_COEFF:ny");
+    ny = FMAKE_N(double, n, "PM_FILTER_COEFF:ny");
 
     jn = 0;
     jx = 0;
@@ -591,7 +591,7 @@ int PM_filter_coeff(REAL *y, int n, REAL *coef, int nc)
 
          ny[i] = yn;};
 
-    memcpy(y, ny, n*sizeof(REAL));
+    memcpy(y, ny, n*sizeof(double));
     SFREE(ny);
 
     return(TRUE);}
@@ -604,18 +604,18 @@ int PM_filter_coeff(REAL *y, int n, REAL *coef, int nc)
  *                   - return TRUE iff successful
  */
 
-int PM_smooth_int_ave(REAL *x, REAL *y, int n, int pts)
+int PM_smooth_int_ave(double *x, double *y, int n, int pts)
    {int i, j, jn, jx, nh, nt;
-    REAL dx, Dx, ya, xo, xn, yo, yn;
-    REAL *nx, *ny, *px, *py;
+    double dx, Dx, ya, xo, xn, yo, yn;
+    double *nx, *ny, *px, *py;
 
     pts = max(pts, 3);
 
     nh = pts >> 1;
     nt = n - 1;
 
-    nx = FMAKE_N(REAL, n, "PM_SMOOTH_INT_AVE:nx");
-    ny = FMAKE_N(REAL, n, "PM_SMOOTH_INT_AVE:ny");
+    nx = FMAKE_N(double, n, "PM_SMOOTH_INT_AVE:nx");
+    ny = FMAKE_N(double, n, "PM_SMOOTH_INT_AVE:ny");
 
     for (i = 0; i < n; i++)
         {jn = i - nh;
@@ -643,7 +643,7 @@ int PM_smooth_int_ave(REAL *x, REAL *y, int n, int pts)
          ny[i] = ya/Dx;
          nx[i] = ((jx - i)*x[jn] + (i - jn)*x[jx])/(jx - jn);};
 
-    n *= sizeof(REAL);
+    n *= sizeof(double);
     memcpy(x, nx, n);
     memcpy(y, ny, n);
 
@@ -660,11 +660,11 @@ int PM_smooth_int_ave(REAL *x, REAL *y, int n, int pts)
  *               - return TRUE iff successful
  */
 
-int PM_smooth_fft(REAL *x, REAL *y, int n, int pts,
+int PM_smooth_fft(double *x, double *y, int n, int pts,
 		  void (*fnc)(complex *cx, int nt, double tol))
    {int i, j, nt, np, nh;
-    REAL xa, xb, yb, ya, dt, idn;
-    REAL *xo;
+    double xa, xb, yb, ya, dt, idn;
+    double *xo;
     complex *cx;
 
 /* remove the linear trend */
@@ -719,7 +719,7 @@ int PM_smooth_fft(REAL *x, REAL *y, int n, int pts,
 
 void PM_smooth_filter(complex *z, int n, double pts)
    {int i, nh;
-    REAL c0, m0, mlt;
+    double c0, m0, mlt;
 
     nh = n >> 1;
     c0 = pts/nh;
@@ -753,10 +753,10 @@ void PM_smooth_filter(complex *z, int n, double pts)
  *          - each curve is assumed to have the same fixed dx
  */
 
-int _PM_fold(int sgn, int na, REAL *xa, REAL *ya, int nb,
-	     REAL *xb, REAL *yb, REAL **pxf, REAL **pyf)
+int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
+	     double *xb, double *yb, double **pxf, double **pyf)
    {int i, j, ja, jb, nf, nm, nmn, nt;
-    REAL *xf, *yf, *yn;
+    double *xf, *yf, *yn;
     double Dxa, Dxb, dxa, dxb, xt, yt, xmn, xmx;
 
     Dxa = xa[na-1] - xa[0];
@@ -776,8 +776,8 @@ int _PM_fold(int sgn, int na, REAL *xa, REAL *ya, int nb,
         xmx = xa[na - 1] - xb[0];};
 
     nf = (xmx - xmn)/dxa + 1;
-    xf = *pxf = FMAKE_N(REAL, nf, "_PM_FOLD:xf");
-    yf = *pyf = FMAKE_N(REAL, nf, "_PM_FOLD:yf");
+    xf = *pxf = FMAKE_N(double, nf, "_PM_FOLD:xf");
+    yf = *pyf = FMAKE_N(double, nf, "_PM_FOLD:yf");
 
 /* decide how many points at most are in the product function */
     nm  = 0;
@@ -792,7 +792,7 @@ int _PM_fold(int sgn, int na, REAL *xa, REAL *ya, int nb,
 
          nm = max(nm, nt);};
 
-    yn = FMAKE_N(REAL, nm, "_PM_FOLD:yn");
+    yn = FMAKE_N(double, nm, "_PM_FOLD:yn");
 
     dxb *= 0.5;
     for (xt = xmn, i = 0; i < nf; i++, xt += dxa)

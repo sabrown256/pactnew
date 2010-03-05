@@ -15,10 +15,10 @@
 
 /* MATMUL - computes w = M.x */
  
-static void matmul(REAL *a0, REAL *a1, REAL *b0, REAL *b1,
-		   REAL *bm1, REAL *x, REAL *w, int km, int lm)
+static void matmul(double *a0, double *a1, double *b0, double *b1,
+		   double *bm1, double *x, double *w, int km, int lm)
    {int i, klm;
-    REAL a10, bm10, b10;
+    double a10, bm10, b10;
 
     a10     = a1[-1];
     bm10    = bm1[-1];
@@ -52,7 +52,7 @@ static void matmul(REAL *a0, REAL *a1, REAL *b0, REAL *b1,
 
 /* FORWARD - solves L*w = y */
 
-static void forward(REAL *d, REAL *a1, REAL *y, REAL *w,
+static void forward(double *d, double *a1, double *y, double *w,
 		    int nblocks, int step, int km)
    {int i, j, lastbl;
 
@@ -75,7 +75,7 @@ static void forward(REAL *d, REAL *a1, REAL *y, REAL *w,
 
 /* BACKWARD - solves DLt*x = w */
 
-static void backward(REAL *d, REAL *a1, REAL *w, REAL *x,
+static void backward(double *d, double *a1, double *w, double *x,
 		     int nblocks, int step, int km)
    {int i, j, jmax, lastbl;
 
@@ -99,12 +99,12 @@ static void backward(REAL *d, REAL *a1, REAL *w, REAL *x,
 
 /* ALTWS - compute next level of w's, the wtildes, for the solve */
  
-static void altws(REAL *wk, REAL *b0km1, REAL *b1km1, REAL *bm1km1,
-		  REAL *tkm1, REAL *b0k, REAL *b1k, REAL *bm1k,
-		  REAL *tkp1, REAL *wtilde, int nblkslo,
+static void altws(double *wk, double *b0km1, double *b1km1, double *bm1km1,
+		  double *tkm1, double *b0k, double *b1k, double *bm1k,
+		  double *tkp1, double *wtilde, int nblkslo,
 		  int nblkshi, int km)
    {int i, j, jj, kmt, lastnblo, lastnbhi;
-    REAL b1km10, bm1k0;
+    double b1km10, bm1k0;
 
 /* pointers to beginning of last new block */
     kmt      = 2*km;
@@ -140,7 +140,7 @@ static void altws(REAL *wk, REAL *b0km1, REAL *b1km1, REAL *bm1km1,
  *        - of xk (=x at level kq), for k even
  */
  
-static void movexe(REAL *xk, REAL *xtilde, int nblocks, int km)
+static void movexe(double *xk, double *xtilde, int nblocks, int km)
    {int i, j, jj, kmt, lastnewb;
 
 /* pointer to beginning of last new block */
@@ -159,11 +159,11 @@ static void movexe(REAL *xk, REAL *xtilde, int nblocks, int km)
 
 /* FORMT1 - compute intermediate term in backward solve */
  
-static void formt1(REAL *b0k, REAL *b1k, REAL *bm1k, REAL *xkp1,
-		   REAL *b0km1, REAL *b1km1, REAL *bm1km1,
-		   REAL *xkm1, REAL *q, int nblocks, int km)
+static void formt1(double *b0k, double *b1k, double *bm1k, double *xkp1,
+		   double *b0km1, double *b1km1, double *bm1km1,
+		   double *xkm1, double *q, int nblocks, int km)
    {int i, j, lastbl, kmt;
-    REAL b1km10, bm1k0;
+    double b1km10, bm1k0;
 
 /* pointer to beginning of last block */
     kmt    = 2*km;
@@ -202,8 +202,8 @@ static void formt1(REAL *b0k, REAL *b1k, REAL *bm1k, REAL *xkp1,
  *         - kept distinct here for purposes of clarity.
  */
 
-static void tssolve(REAL *x, REAL *y, REAL *d, REAL *a1,
-		    REAL *b0, REAL *b1, REAL *bm1, REAL *w, REAL *q,
+static void tssolve(double *x, double *y, double *d, double *a1,
+		    double *b0, double *b1, double *bm1, double *w, double *q,
 		    int ks, int km, int lm)
    {int nob[15], neb[15], ibo[15], ibe[15], inl[15];
     int i, kq, nevenb, inextlev, levlen, noddb, ibegino, ibegine;
@@ -305,12 +305,12 @@ static void tssolve(REAL *x, REAL *y, REAL *d, REAL *a1,
 
 /* _PM_GCG - do generalized conjugate gradient solution phase */
 
-static REAL _PM_gcg(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
-		    REAL *x, REAL *y, REAL *w, REAL *d, REAL *r,
-		    REAL *q, REAL *p, int km, int lm, int neq,
-		    int ks, int maxit, double eps)
+static double _PM_gcg(double *a0, double *a1, double *b0, double *b1, double *bm1,
+		      double *x, double *y, double *w, double *d, double *r,
+		      double *q, double *p, int km, int lm, int neq,
+		      int ks, int maxit, double eps)
    {int i, iter, exflag;
-    REAL yabsum, dotr, dotp, dotprev, aa, pnorm, rerr, xerr, b;
+    double yabsum, dotr, dotp, dotprev, aa, pnorm, rerr, xerr, b;
  
 /* form product w = M.x */
     matmul(a0, a1, b0, b1, bm1, x, w, km, lm);
@@ -386,7 +386,7 @@ static REAL _PM_gcg(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
 /* if this exflag is TRUE, no convergence after maxit passes
  * set parameters to the values they must have on return
  */
-    eps = rerr + (REAL) iter;
+    eps = rerr + (double) iter;
     if (exflag)
        eps *= -1.0;
 
@@ -400,7 +400,7 @@ static REAL _PM_gcg(REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
  *          - no check is made for small denominators.
  */
 
-static void tsdecomp(REAL *a0, REAL *a1, REAL *d, int nblocks,
+static void tsdecomp(double *a0, double *a1, double *d, int nblocks,
 		     int step, int km)
    {int i, j, lastbl;
 
@@ -424,8 +424,8 @@ static void tsdecomp(REAL *a0, REAL *a1, REAL *d, int nblocks,
 
 /* GENCEES - generate the arrays c0 and cm1 */
 
-static void gencees(REAL *b0, REAL *b1, REAL *bm1,
-		    REAL *a1, REAL *d, REAL *c0, REAL *cm1,
+static void gencees(double *b0, double *b1, double *bm1,
+		    double *a1, double *d, double *c0, double *cm1,
 		    int nblocks, int km)
    {int i, j, lastbl, kmt;
 
@@ -456,10 +456,10 @@ static void gencees(REAL *b0, REAL *b1, REAL *bm1,
 
 /* ALTEVENS - */
 
-static void altevens(REAL *a0k, REAL *a1k, REAL *c0km1,
-		     REAL *c1km1, REAL *cm1km1, REAL *dkm1,
-		     REAL *c0k, REAL *c1k, REAL *cm1k,
-		     REAL *dkp1, REAL *a0tild, REAL *a1tild,
+static void altevens(double *a0k, double *a1k, double *c0km1,
+		     double *c1km1, double *cm1km1, double *dkm1,
+		     double *c0k, double *c1k, double *cm1k,
+		     double *dkp1, double *a0tild, double *a1tild,
 		     int nbkm1, int nbkkp1, int km)
    {int i, j, jj, lastnewb, lastaltb, kmt;
 
@@ -526,10 +526,10 @@ static void altevens(REAL *a0k, REAL *a1k, REAL *c0km1,
 
 /* GENBEES - generate the arrays b0tild, b1tild, and bm1tild */
 
-static void genbees(REAL *c0kp1, REAL *c1kp1, REAL *cm1kp1,
-		    REAL *c0k, REAL *c1k, REAL *cm1k,
-		    REAL *dkp1, REAL *b0tild, REAL *b1tild,
-		    REAL *bm1tild, int nblocks, int km)
+static void genbees(double *c0kp1, double *c1kp1, double *cm1kp1,
+		    double *c0k, double *c1k, double *cm1k,
+		    double *dkp1, double *b0tild, double *b1tild,
+		    double *bm1tild, int nblocks, int km)
    {int i, j, jj, lastnewb, kmt;
 
     kmt = 2*km;
@@ -566,9 +566,9 @@ static void genbees(REAL *c0kp1, REAL *c1kp1, REAL *cm1kp1,
 
 /* _PM_ICD_CR - do incomplete Cholesky decomposition by cyclic reduction */
 
-static int _PM_icd_cr(REAL *a0, REAL *a1, REAL *b0, REAL *b1,
-		      REAL *bm1, REAL *di, REAL *c1, REAL *cm1,
-		      REAL *d, int km, int lm, int ks)
+static int _PM_icd_cr(double *a0, double *a1, double *b0, double *b1,
+		      double *bm1, double *di, double *c1, double *cm1,
+		      double *d, int km, int lm, int ks)
    {int j, kp, kmt;
     int nevenb, inextlev, kq, levlen, noddb, ibegino, ibegine;
     int noddcb, nevencb, nbb;
@@ -642,9 +642,9 @@ static int _PM_icd_cr(REAL *a0, REAL *a1, REAL *b0, REAL *b1,
  *        - this is outside of the matrix package style presently
  */
 
-REAL PM_dot(REAL *x, REAL *y, int n)
+double PM_dot(double *x, double *y, int n)
    {int i;
-    REAL dot;
+    double dot;
 
     for (dot = 0.0, i = 0; i < n; i++)
         dot += x[i]*y[i];
@@ -656,19 +656,19 @@ REAL PM_dot(REAL *x, REAL *y, int n)
 
 /* _PM_ICCG_V - the vectorizable version of ICCG */
 
-REAL _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
-	        REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
-		REAL *x, REAL *y)
+double _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
+		  double *a0, double *a1, double *b0, double *b1, double *bm1,
+		  double *x, double *y)
    {int j, numaux, neq, nw;
-    REAL *a0s, *d, *p, *r, *q;
-    REAL *di, *c1, *cm1;
+    double *a0s, *d, *p, *r, *q;
+    double *di, *c1, *cm1;
 
 /* set common variables */
     neq = km*lm;
  
 /* set pointers (note that many arrays share storage) */
     nw = 6*(neq + 1);
-    di = FMAKE_N(REAL, nw, "_PM_ICCG_V:di");
+    di = FMAKE_N(double, nw, "_PM_ICCG_V:di");
     PM_set_value(di, nw, 0.0);
 
     c1  = di + neq;
@@ -797,10 +797,10 @@ REAL _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
  *    or int(ret) >= maxit, or frac(ret) > eps.
  */
  
-REAL PM_iccg(int km, int lm, double eps, int ks, int maxit,
-	     REAL *a0, REAL *a1, REAL *b0, REAL *b1, REAL *bm1,
-	     REAL *x, REAL *y)
-   {REAL rv;
+double PM_iccg(int km, int lm, double eps, int ks, int maxit,
+	       double *a0, double *a1, double *b0, double *b1, double *bm1,
+	       double *x, double *y)
+   {double rv;
 
 #ifdef CRAY
     rv = _PM_iccg_v(km, lm, eps, ks, maxit, a0, a1, b0, b1, bm1, x, y);

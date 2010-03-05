@@ -10,11 +10,11 @@
  
 #include "pml.h"
 
-typedef void (*setter)(void *a, int i, int j, REAL v);
+typedef void (*setter)(void *a, int i, int j, double v);
 typedef void (*loader)(void *a, int nd, int *dim, setter set,
-		       int n, REAL *b, REAL *x0);
-typedef REAL *(*solver)(int n, int *pit, REAL *ptol,
-			int nd, int *dim, loader lt);
+		       int n, double *b, double *x0);
+typedef double *(*solver)(int n, int *pit, double *ptol,
+			  int nd, int *dim, loader lt);
 
 typedef struct s_operator operator;
 
@@ -32,7 +32,7 @@ struct s_operator
 
 /* SET_SLS - set the A(I,J) = V for a PM_sp_lin_sys */
 
-static void set_sls(void *a, int i, int j, REAL v)
+static void set_sls(void *a, int i, int j, double v)
    {PM_sp_lin_sys *sls;
 
     sls = (PM_sp_lin_sys *) a;
@@ -46,7 +46,7 @@ static void set_sls(void *a, int i, int j, REAL v)
 
 /* SET_MAT - set the A(I,J) = V for a PM_matrix */
 
-static void set_mat(void *a, int i, int j, REAL v)
+static void set_mat(void *a, int i, int j, double v)
    {PM_matrix *ma;
 
     ma = (PM_matrix *) a;
@@ -64,10 +64,10 @@ static void set_mat(void *a, int i, int j, REAL v)
 /* LOAD_LAPL - load up a Laplacian operator to test the solvers */
 
 static void load_lapl(void *a, int nd, int *dim, setter set,
-		      int n, REAL *b, REAL *x0)
+		      int n, double *b, double *x0)
    {int i, id, str;
     int lim, lmn, lmx;
-    REAL cnt;
+    double cnt;
 
     cnt = -2.0*nd;
 
@@ -101,10 +101,10 @@ static void load_lapl(void *a, int nd, int *dim, setter set,
 /* LOAD_BILPL - load up a bi-laplacian operator to test the solvers */
 
 static void load_bilpl(void *a, int nd, int *dim, setter set,
-		       int n, REAL *b, REAL *x0)
+		       int n, double *b, double *x0)
    {int i, j, il, jn, nt, str[9];
     int lim, lmn, lmx;
-    REAL cnt, cnr, edg, vc, v[9];
+    double cnt, cnr, edg, vc, v[9];
 
     cnr = -0.25;
     edg = 0.5;
@@ -180,11 +180,11 @@ static void load_bilpl(void *a, int nd, int *dim, setter set,
  *           - into a PM_sp_lin_sys structure
  */
 
-static REAL *test_dcsl(int n, int *pit, REAL *ptol, int nd, int *dim,
-		       loader lt)
+static double *test_dcsl(int n, int *pit, double *ptol, int nd, int *dim,
+			 loader lt)
    {int *ips;
     PM_matrix *ma, *mx;
-    REAL *x;
+    double *x;
    
     ma = PM_create(n, n);
     mx = PM_create(n, 1);
@@ -227,10 +227,10 @@ static REAL *test_dcsl(int n, int *pit, REAL *ptol, int nd, int *dim,
  *             - into a PM_sp_lin_sys structure
  */
 
-static REAL *test_dsbicg(int n, int *pit, REAL *ptol, int nd, int *dim,
-			 loader lt)
+static double *test_dsbicg(int n, int *pit, double *ptol, int nd, int *dim,
+			   loader lt)
    {PM_sp_lin_sys *sls;
-    REAL *x;
+    double *x;
    
 /* make the sparse array skeleton */
     sls = PM_mk_sp_lin_sys(n, 1, 2*nd + 1, FALSE, FALSE, NULL, NULL);
@@ -261,10 +261,10 @@ static REAL *test_dsbicg(int n, int *pit, REAL *ptol, int nd, int *dim,
  *           - loaded into a PM_sp_lin_sys structure
  */
 
-static REAL *test_dscg(int n, int *pit, REAL *ptol, int nd, int *dim,
-		       loader lt)
+static double *test_dscg(int n, int *pit, double *ptol, int nd, int *dim,
+			 loader lt)
    {PM_sp_lin_sys *sls;
-    REAL *x;
+    double *x;
    
     sls = PM_mk_sp_lin_sys(n, 1, 2*nd + 1, TRUE, FALSE, NULL, NULL);
 
@@ -294,10 +294,10 @@ static REAL *test_dscg(int n, int *pit, REAL *ptol, int nd, int *dim,
  *           - loaded into a PM_sp_lin_sys structure
  */
 
-static REAL *test_iccg(int n, int *pit, REAL *ptol, int nd, int *dim,
-		       loader lt)
+static double *test_iccg(int n, int *pit, double *ptol, int nd, int *dim,
+			 loader lt)
    {PM_sp_lin_sys *sls;
-    REAL *x;
+    double *x;
    
     sls = PM_mk_sp_lin_sys(n, 1, 2*nd + 1, TRUE, TRUE,
 			   PM_iccg_pre, PM_iccg_cmp_Lr);
@@ -328,11 +328,11 @@ static REAL *test_iccg(int n, int *pit, REAL *ptol, int nd, int *dim,
 
 /* RUN_TEST - run the given test */
 
-static REAL *run_test(solver f, char *s, int nd, int *dim,
-		      int *pit, REAL *ptol, loader lt)
+static double *run_test(solver f, char *s, int nd, int *dim,
+			int *pit, double *ptol, loader lt)
    {int i, n;
-    REAL time;
-    REAL *x;
+    double time;
+    double *x;
 
 /* count the number of unknowns */
     n = 1;
@@ -360,7 +360,7 @@ static REAL *run_test(solver f, char *s, int nd, int *dim,
 
 /* PLOT_ANSWER - dump the answers for ultra */
  
-static void plot_answers(FILE *fp, int nd, int *dim, char *label, REAL *x)
+static void plot_answers(FILE *fp, int nd, int *dim, char *label, double *x)
    {int i, n;
 
     n = 1;
@@ -380,9 +380,9 @@ static void plot_answers(FILE *fp, int nd, int *dim, char *label, REAL *x)
  *            - return the fractional difference
  */
 
-static REAL diff_array(REAL *a, REAL *b, int nc, REAL tol)
+static double diff_array(double *a, double *b, int nc, double tol)
    {int i;
-    REAL ac, bc, nmr, den, fd;
+    double ac, bc, nmr, den, fd;
 
     fd = 0.0;
     for (i = 0; i < nc; i++)
@@ -404,11 +404,11 @@ static REAL diff_array(REAL *a, REAL *b, int nc, REAL tol)
 
 /* COMPARE_ANSWER - compare the answers from the tests */
 
-static int compare_answer(REAL *xs, REAL *xc, REAL *xi, REAL *xb,
-			  int nd, int *dim, REAL tol)
+static int compare_answer(double *xs, double *xc, double *xi, double *xb,
+			  int nd, int *dim, double tol)
    {int i, nc;
     int cc, ci, cb, err;
-    REAL fdc, fdi, fdb, atol;
+    double fdc, fdi, fdb, atol;
 
     nc = 1;
     for (i = 0; i < nd; i++)
@@ -464,8 +464,8 @@ int main(int c, char **v)
     int itmx, its, itc, iti, itb;
     int *dim;
     char *oname;
-    REAL tol, tos, toc, toi, tob;
-    REAL *xs, *xc, *xi, *xb;
+    double tol, tos, toc, toi, tob;
+    double *xs, *xc, *xi, *xb;
     loader lt;
     FILE *fp;
     static int dimh[] = {20, 30, 3};

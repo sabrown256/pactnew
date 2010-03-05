@@ -29,13 +29,14 @@ FIXNUM F77_FUNC(pmszft, PMSZFT)(FIXNUM *pn)
  *        - this a wrapper for PM_fft_sc_real_data
  */
 
-FIXNUM F77_FUNC(pmrfft, PMRFFT)(REAL *outyr, REAL *outyi, REAL *outx,
-			     FIXNUM *pn, REAL *inx, REAL *iny,
-			     REAL *pxn, REAL *pxx, FIXNUM *po)
+FIXNUM F77_FUNC(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
+				FIXNUM *pn, double *inx, double *iny,
+				double *pxn, double *pxx, FIXNUM *po)
    {int i, n, np, ordr;
+    FIXNUM rv;
     double xmn, xmx;
+    double *rx;
     complex *cy;
-    REAL *rx;
 
     n    = *pn;
     xmn  = *pxn;
@@ -43,18 +44,21 @@ FIXNUM F77_FUNC(pmrfft, PMRFFT)(REAL *outyr, REAL *outyi, REAL *outx,
     ordr = *po;
 
     if (!PM_fft_sc_real_data(&cy, &rx, inx, iny, n, xmn, xmx, ordr))
-       return((FIXNUM) FALSE);
+       rv = FALSE;
 
-    np = n + 1;
-    for (i = 0; i < np; i++)
-        {outyr[i] = PM_REAL_C(cy[i]);
-         outyi[i] = PM_IMAGINARY_C(cy[i]);
-	 outx[i]  = rx[i];};
+    else
+       {np = n + 1;
+	for (i = 0; i < np; i++)
+	    {outyr[i] = PM_REAL_C(cy[i]);
+	     outyi[i] = PM_IMAGINARY_C(cy[i]);
+	     outx[i]  = rx[i];};
 
-    SFREE(rx);
-    SFREE(cy);
+	SFREE(rx);
+	SFREE(cy);
 
-    return((FIXNUM) TRUE);}
+	rv = TRUE;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -63,14 +67,15 @@ FIXNUM F77_FUNC(pmrfft, PMRFFT)(REAL *outyr, REAL *outyi, REAL *outx,
  *        - this a wrapper for PM_fft_sc_complex_data
  */
 
-FIXNUM F77_FUNC(pmcfft, PMCFFT)(REAL *outyr, REAL *outyi, REAL *outx,
-			     FIXNUM *pn, REAL *inx, REAL *inyr,
-			     REAL *inyi, REAL *pxn, REAL *pxx,
-			     FIXNUM *pf, FIXNUM *po)
+FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
+				FIXNUM *pn, double *inx, double *inyr,
+				double *inyi, double *pxn, double *pxx,
+				FIXNUM *pf, FIXNUM *po)
    {int i, n, np, flag, ordr;
+    FIXNUM rv;
     double xmn, xmx;
+    double *rx;
     complex *cy, *incy;
-    REAL *rx;
 
     n    = *pn;
     xmn  = *pxn;
@@ -85,19 +90,22 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(REAL *outyr, REAL *outyi, REAL *outx,
 
     if (!PM_fft_sc_complex_data(&cy, &rx, inx, incy, n,
 				xmn, xmx, flag, ordr))
-       return((FIXNUM) FALSE);
+       rv = FALSE;
 
-    np = n + 1;
-    for (i = 0; i < np; i++)
-        {outyr[i] = PM_REAL_C(cy[i]);
-         outyi[i] = PM_IMAGINARY_C(cy[i]);
-	 outx[i]  = rx[i];};
+    else
+       {np = n + 1;
+	for (i = 0; i < np; i++)
+	    {outyr[i] = PM_REAL_C(cy[i]);
+	     outyi[i] = PM_IMAGINARY_C(cy[i]);
+	     outx[i]  = rx[i];};
 
-    SFREE(rx);
-    SFREE(cy);
-    SFREE(incy);
+	SFREE(rx);
+	SFREE(cy);
+	SFREE(incy);
 
-    return((FIXNUM) TRUE);}
+	rv = TRUE;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -105,9 +113,9 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(REAL *outyr, REAL *outyi, REAL *outx,
 /* PMBSET - begin making a set */
 
 FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
-			     F77_string ftype, FIXNUM *pcp, FIXNUM *pnd,
-			     FIXNUM *pnde, FIXNUM *pmx, FIXNUM *ptp,
-			     FIXNUM *inxt)
+				F77_string ftype, FIXNUM *pcp, FIXNUM *pnd,
+				FIXNUM *pnde, FIXNUM *pmx, FIXNUM *ptp,
+				FIXNUM *inxt)
    {int i, cp, nd, nde, *maxes;
     long ne, tp, d;
     FIXNUM rv;
@@ -284,10 +292,11 @@ FIXNUM F77_FUNC(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
 /* PMMTOP - make a PM_mesh_topology */
 
 FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
-			     FIXNUM *pbnd)
+				FIXNUM *pbnd)
    {int i, j, n, nd, ndp;
     int *nc, *nbp;
     long **bnd, *pbd;
+    FIXNUM rv;
     FIXNUM *pbs;
     PM_mesh_topology *mt;
     
@@ -321,10 +330,12 @@ FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
     mt = PM_make_topology(nd, nbp, nc, bnd);
 
     if (mt == NULL)
-       return(-1);
+       rv = -1;
 
     else
-       return((FIXNUM) SC_ADD_POINTER(mt));}
+       rv = SC_ADD_POINTER(mt);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -369,7 +380,7 @@ FIXNUM F77_FUNC(pmfptd, PMFPTD)(double *pd)
 
 /* PMFXNF - fix float NaNs */
 
-FIXNUM F77_FUNC(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, REAL *pv)
+FIXNUM F77_FUNC(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, double *pv)
    {int msk;
     long n;
     FIXNUM rv;
@@ -405,7 +416,8 @@ FIXNUM F77_FUNC(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
 
 /* PMFXND - fix double NaNs */
 
-FIXNUM F77_FUNC(pmfxnd, PMFXND)(FIXNUM *pn, double *pd, FIXNUM *pmsk, REAL *pv)
+FIXNUM F77_FUNC(pmfxnd, PMFXND)(FIXNUM *pn, double *pd,
+				FIXNUM *pmsk, double *pv)
    {int msk;
     long n;
     FIXNUM rv;

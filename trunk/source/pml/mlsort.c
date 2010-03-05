@@ -32,11 +32,11 @@ static int _PM_comp(double x1, double x2)
 
 /* _PM_EXCH - exchange two (x, y) pairs */
 
-static void _PM_exch(REAL *x1, REAL *y1, REAL *x2, REAL *y2)
+static void _PM_exch(double *x1, double *y1, double *x2, double *y2)
    {
 
-    SC_SWAP_VALUE(REAL, *x1, *x2);
-    SC_SWAP_VALUE(REAL, *y1, *y2);
+    SC_SWAP_VALUE(double, *x1, *x2);
+    SC_SWAP_VALUE(double, *y1, *y2);
 
     return;}
 
@@ -45,7 +45,7 @@ static void _PM_exch(REAL *x1, REAL *y1, REAL *x2, REAL *y2)
 
 /* PM_VAL_SORT - sort arrays containing points by x value */
 
-void PM_val_sort(int n, REAL *xp, REAL *yp)
+void PM_val_sort(int n, double *xp, double *yp)
    {int gap, i, j;
 
     for (gap = n/2; gap > 0; gap /= 2)
@@ -134,10 +134,10 @@ int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
 
 /* _PM_SWAP - swap elements i and j in arrays v and ind */
 
-void _PM_swap(REAL *v, int *ind, int i, int j)
+void _PM_swap(double *v, int *ind, int i, int j)
    {
 
-    SC_SWAP_VALUE(REAL, v[i], v[j]);
+    SC_SWAP_VALUE(double, v[i], v[j]);
     SC_SWAP_VALUE(int, ind[i], ind[j]);
 
     return;}
@@ -149,7 +149,7 @@ void _PM_swap(REAL *v, int *ind, int i, int j)
  *            - 2nd Edition, by Kernighan and Ritchie, pp 87-88
  */
 
-static void _PM_q_sort(REAL *v, int *ind, int il, int ir)
+static void _PM_q_sort(double *v, int *ind, int il, int ir)
    {int i, in;
 
     if (il < ir)
@@ -171,14 +171,14 @@ static void _PM_q_sort(REAL *v, int *ind, int il, int ir)
 /*--------------------------------------------------------------------------*/
  
 /* PM_Q_SORT - Sort an array of indexes on z; 
- *           - input is z, an array of REALS, 
+ *           - input is z, an array of doubles,
  *           -        ind, array of indexes
  *           -          n, number of entries
  *           - output is array z sorted and
  *           -           array ind sorted
  */
 
-void PM_q_sort(REAL *z, int *ind, int n)
+void PM_q_sort(double *z, int *ind, int n)
    {
 
     _PM_q_sort(z, ind, 0, n-1);

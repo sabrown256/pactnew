@@ -10,11 +10,13 @@
 
 #include "pml.h"
 
-REAL a1[5][3] = { {0, 0, 1}, {1, 0, 1}, {0, 1, 1}, {.5, .5, 1}, {.7, .9, 1} };
-REAL b1[5][1] = { {.5}, {1.4}, {.93589}, {1.16795}, {1.52230} };
+double
+ a1[5][3] = { {0, 0, 1}, {1, 0, 1}, {0, 1, 1}, {.5, .5, 1}, {.7, .9, 1} },
+ b1[5][1] = { {.5}, {1.4}, {.93589}, {1.16795}, {1.52230} };
 
-/* REAL tstd[9] = {1, 4, 16,   1, 2, 4,   1, 1, 1}; */
-REAL tstd[9] = {0.30, 0.59, 0.11,   0.60, -0.28, -0.32,   0.21, -0.52, 0.31};
+/* double tstd[9] = {1, 4, 16,   1, 2, 4,   1, 1, 1}; */
+double
+ tstd[9] = {0.30, 0.59, 0.11,   0.60, -0.28, -0.32,   0.21, -0.52, 0.31};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -27,11 +29,11 @@ static int oper_test()
 
     m = PM_create(nrow, ncol);
     SFREE(m->array);
-    m->array = (REAL *) a1;
+    m->array = (double *) a1;
 
     b = PM_create(nrow, 1);
     SFREE(b->array);
-    b->array = (REAL *) b1;
+    b->array = (double *) b1;
         
     PRINT(STDOUT, "\nMatrix M\n");
     PM_print(m);
@@ -62,7 +64,7 @@ static int oper_test()
     PRINT(STDOUT, "\nTest LU decomposition\n");
     a = PM_create(3, 3);
     SFREE(a->array);
-    a->array = (REAL *) tstd;
+    a->array = (double *) tstd;
 
     PRINT(STDOUT, "\nMatrix A\n");
     PM_print(a);
@@ -86,7 +88,7 @@ static int oper_test()
 
 static int det_test()
    {int i, n;
-    REAL det;
+    double det;
     PM_matrix *m;
 
     n = 3;

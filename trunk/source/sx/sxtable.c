@@ -364,12 +364,12 @@ static object *_SXI_read_text_table(object *argl)
 
 /* SX_EXTRACT_VECTOR - extract a vector from the given array */
 
-static REAL *SX_extract_vector(PM_matrix *a, long o, long s, long n)
+static double *SX_extract_vector(PM_matrix *a, long o, long s, long n)
    {long i;
-    REAL *val, *src;
+    double *val, *src;
 
     src = a->array + o;
-    val = FMAKE_N(REAL, n, "SX_EXTRACT_VECTOR:val");
+    val = FMAKE_N(double, n, "SX_EXTRACT_VECTOR:val");
     for (i = 0L; i < n; i++)
         val[i] = src[i*s];
 
@@ -380,9 +380,9 @@ static REAL *SX_extract_vector(PM_matrix *a, long o, long s, long n)
 
 /* SX_INSERT_VECTOR - insert a vector into the given array */
 
-static void SX_insert_vector(PM_matrix *a, REAL *val, long o, long s, long n)
+static void SX_insert_vector(PM_matrix *a, double *val, long o, long s, long n)
    {long i;
-    REAL *src;
+    double *src;
 
     src = a->array + o;
 
@@ -396,9 +396,9 @@ static void SX_insert_vector(PM_matrix *a, REAL *val, long o, long s, long n)
 
 /* SX_NORMALIZE_VECTOR - normalize a vector */
 
-static void SX_normalize_vector(REAL *val, long n)
+static void SX_normalize_vector(double *val, long n)
    {long i;
-    REAL xmin, xmax, range;
+    double xmin, xmax, range;
     
     PM_maxmin(val, &xmin, &xmax, n); 
     if (xmax == xmin)
@@ -419,7 +419,7 @@ static void SX_normalize_vector(REAL *val, long n)
 static void _SX_cnormalize_table(PM_matrix *a)
    {long i;
     long nrow, ncol;
-    REAL *vect;
+    double *vect;
 
     nrow = a->nrow;
     ncol = a->ncol;
@@ -443,8 +443,8 @@ static PM_set *_SX_lr_zc_domain(char *name)
    {int nd, *maxes;
     PM_set *set;
     void **elements;
-    REAL *x, *y;
-    REAL *extrema;
+    double *x, *y;
+    double *extrema;
     int i, nelem;
 
     nd = 2;
@@ -456,8 +456,8 @@ static PM_set *_SX_lr_zc_domain(char *name)
 				  maxes, NULL, NULL);
 
     elements = (void **) set->elements;
-    x = (REAL *) elements[0];
-    y = (REAL *) elements[1];
+    x = (double *) elements[0];
+    y = (double *) elements[1];
 
     nelem = maxes[0] * maxes[1];
 
@@ -490,7 +490,7 @@ static PM_set *_SX_table_set(object *specs)
     int *maxes;
     long start, step, ne, npts;
     char *name;
-    REAL **elem;
+    double **elem;
     PM_set *set;
 
     name = NULL;
@@ -513,7 +513,7 @@ static PM_set *_SX_table_set(object *specs)
 
 	comps = SS_cddr(specs);
 	nde   = SS_length(comps);
-	elem  = FMAKE_N(REAL *, nde, "_SX_table_set:elem");
+	elem  = FMAKE_N(double *, nde, "_SX_table_set:elem");
 	ne    = 0;
 
 	for (i = 0; comps != SS_null; comps = SS_cdr(comps), i++)
@@ -616,7 +616,7 @@ static object *SX_wrt_text_table(object *argl)
    {long i, j, ne, ndd, ndr, nded, nder;
     int *maxes;
     object *outprt;
-    REAL **delem, **relem;
+    double **delem, **relem;
     PM_set *domain, *range;
     PM_mapping *f;
     FILE *fp;
@@ -640,8 +640,8 @@ static object *SX_wrt_text_table(object *argl)
          nder = range->dimension_elem;
          ne   = domain->n_elements;
 
-         delem = (REAL **) domain->elements;
-         relem = (REAL **) range->elements;
+         delem = (double **) domain->elements;
+         relem = (double **) range->elements;
 
 /* print the dimension info */
 	 io_printf(fp, "# %s (dimension", f->name);
@@ -679,7 +679,7 @@ static object *SX_wrt_text_table(object *argl)
 static object *SX_wrt_current_table(object *argl)
    {char *fname;
     int i, j, k, nr, nc;
-    REAL *ap;
+    double *ap;
     FILE *fp;
 
 
@@ -731,7 +731,7 @@ static object *SX_wrt_current_table(object *argl)
 
 static object *SX_print_column(object *argl)
    {long col, nr, nc, j;
-    REAL *val;
+    double *val;
     object *rv;
 
     rv = SS_null;

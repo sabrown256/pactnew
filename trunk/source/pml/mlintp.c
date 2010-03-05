@@ -41,12 +41,12 @@ void *PM_connectivity(PM_mapping *f)
  *                     - using a uniform fractional value (1/4)
  */
 
-static REAL *_PM_redist_nodes_lr(REAL *f, int km, int lm, int kmax, int lmax,
-                                 char *emap)
+static double *_PM_redist_nodes_lr(double *f, int km, int lm, int kmax, int lmax,
+				   char *emap)
    {int i, j, k, l, nn, nz, eflag;
-    REAL val;
-    REAL *fp, *fp1, *fp2, *fp3, *fp4;
-    REAL *ip, *ip1, *ip2, *ip3, *ip4;
+    double val;
+    double *fp, *fp1, *fp2, *fp3, *fp4;
+    double *ip, *ip1, *ip2, *ip3, *ip4;
 
     nn    = kmax*lmax;
     eflag = (emap == NULL);
@@ -54,8 +54,8 @@ static REAL *_PM_redist_nodes_lr(REAL *f, int km, int lm, int kmax, int lmax,
        {emap = FMAKE_N(char, nn, "_PM_REDIST_NODES_LR:emap");
 	memset(emap, 1, nn);};
 
-    ip = FMAKE_N(REAL, nn, "_PM_REDIST_NODES_LR:ip");
-    fp = FMAKE_N(REAL, nn, "_PM_REDIST_NODES_LR:fp");
+    ip = FMAKE_N(double, nn, "_PM_REDIST_NODES_LR:ip");
+    fp = FMAKE_N(double, nn, "_PM_REDIST_NODES_LR:fp");
     if (SC_zero_on_alloc() == FALSE)
        {PM_set_value(ip, nn, 0.0);
 	PM_set_value(fp, nn, 0.0);};
@@ -103,14 +103,14 @@ static REAL *_PM_redist_nodes_lr(REAL *f, int km, int lm, int kmax, int lmax,
  *                     - using a uniform fractional value
  */
 
-static REAL *_PM_redist_nodes_ac(REAL *f, int nz, int nn,
-                                 long *zones, long *sides,
-                                 int nzp, int nsp)
+static double *_PM_redist_nodes_ac(double *f, int nz, int nn,
+				   long *zones, long *sides,
+				   int nzp, int nsp)
    {int in, iz, is, is1, is2, os, oz;
     int *np;
-    REAL *fp, fv;
+    double *fp, fv;
 
-    fp = FMAKE_N(REAL, nn, "_PM_REDIST_NODES_AC:fp");
+    fp = FMAKE_N(double, nn, "_PM_REDIST_NODES_AC:fp");
     if (SC_zero_on_alloc() == FALSE)
        PM_set_value(fp, nn, 0.0);
 
@@ -134,7 +134,7 @@ static REAL *_PM_redist_nodes_ac(REAL *f, int nz, int nn,
     
 /* normalize the nodal values */
     for (in = 0; in < nn; in++)
-        {fv = (REAL) np[in] + SMALL;
+        {fv = (double) np[in] + SMALL;
 	 fp[in] /= fv;};
 
     SFREE(np);
@@ -149,21 +149,21 @@ static REAL *_PM_redist_nodes_ac(REAL *f, int nz, int nn,
  *                     - by interpolating the values to the nodes
  */
 
-static REAL *_PM_interp_nodes_lr(REAL *f, REAL *x, REAL *y,
-                                 int km, int lm, int kmax, int lmax,
-                                 char *emap)
+static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
+				   int km, int lm, int kmax, int lmax,
+				   char *emap)
    {int i, j, k, l, nn, nz, eflag;
-    REAL val, xc, yc, dm;
-    REAL x1c, x2c, x3c, x4c;
-    REAL y1c, y2c, y3c, y4c;
-    REAL dx1, dx2, dx3, dx4;
-    REAL dy1, dy2, dy3, dy4;
-    REAL ds1, ds2, ds3, ds4;
-    REAL w1, w2, w3, w4;
-    REAL *fp, *fp1, *fp2, *fp3, *fp4;
-    REAL *ip, *ip1, *ip2, *ip3, *ip4;
-    REAL *x1, *x2, *x3, *x4;
-    REAL *y1, *y2, *y3, *y4;
+    double val, xc, yc, dm;
+    double x1c, x2c, x3c, x4c;
+    double y1c, y2c, y3c, y4c;
+    double dx1, dx2, dx3, dx4;
+    double dy1, dy2, dy3, dy4;
+    double ds1, ds2, ds3, ds4;
+    double w1, w2, w3, w4;
+    double *fp, *fp1, *fp2, *fp3, *fp4;
+    double *ip, *ip1, *ip2, *ip3, *ip4;
+    double *x1, *x2, *x3, *x4;
+    double *y1, *y2, *y3, *y4;
 
     nn    = kmax*lmax;
     eflag = (emap == NULL);
@@ -171,8 +171,8 @@ static REAL *_PM_interp_nodes_lr(REAL *f, REAL *x, REAL *y,
        {emap = FMAKE_N(char, nn, "_PM_INTERP_NODES_LR:emap");
 	memset(emap, 1, nn);};
 
-    ip = FMAKE_N(REAL, nn, "_PM_INTERP_NODES_LR:ip");
-    fp = FMAKE_N(REAL, nn, "_PM_INTERP_NODES_LR:fp");
+    ip = FMAKE_N(double, nn, "_PM_INTERP_NODES_LR:ip");
+    fp = FMAKE_N(double, nn, "_PM_INTERP_NODES_LR:fp");
     if (SC_zero_on_alloc() == FALSE)
        {PM_set_value(ip, nn, 0.0);
 	PM_set_value(fp, nn, 0.0);};
@@ -255,17 +255,17 @@ static REAL *_PM_interp_nodes_lr(REAL *f, REAL *x, REAL *y,
  *                     - by interpolation
  */
 
-static REAL *_PM_interp_nodes_ac(REAL *f, REAL *x, REAL *y, int nz, int nn,
-                                 long *zones, long *sides, int nzp, int nsp)
+static double *_PM_interp_nodes_ac(double *f, double *x, double *y, int nz, int nn,
+				   long *zones, long *sides, int nzp, int nsp)
    {int in, iz, is, js, is1, is2;
     int os, oz, ns, off;
-    REAL nrm, fv, dm, wc;
-    REAL xc, yc, dxc, dyc;
-    REAL *fp, *np, *w;
+    double nrm, fv, dm, wc;
+    double xc, yc, dxc, dyc;
+    double *fp, *np, *w;
 
-    fp = FMAKE_N(REAL, nn, "_PM_INTERP_NODES_AC:fp");
-    np = FMAKE_N(REAL, nn, "_PM_INTERP_NODES_AC:np");
-    w  = FMAKE_N(REAL, 20, "_PM_INTERP_NODES_AC:w");
+    fp = FMAKE_N(double, nn, "_PM_INTERP_NODES_AC:fp");
+    np = FMAKE_N(double, nn, "_PM_INTERP_NODES_AC:np");
+    w  = FMAKE_N(double, 20, "_PM_INTERP_NODES_AC:w");
     if (SC_zero_on_alloc() == FALSE)
        {PM_set_value(fp, nn, 0.0);
 	PM_set_value(np, nn, 0.0);
@@ -283,7 +283,7 @@ static REAL *_PM_interp_nodes_ac(REAL *f, REAL *x, REAL *y, int nz, int nn,
          fv  = f[iz];
 
 	 ns  = is2 - is1 + 1;
-	 nrm = 1.0/((REAL) ns);
+	 nrm = 1.0/((double) ns);
 
 /* find the cell center */
 	 xc = 0.0;
@@ -340,11 +340,11 @@ static REAL *_PM_interp_nodes_ac(REAL *f, REAL *x, REAL *y, int nz, int nn,
  *              - return a node centered version
  */
 
-REAL *PM_z_n_lr_2d(REAL *f, REAL *x, REAL *y, int mode, void *cnnct,
-                   pcons *alist)
+double *PM_z_n_lr_2d(double *f, double *x, double *y, int mode, void *cnnct,
+		     pcons *alist)
    {int *maxes, n, km, lm, kmax, lmax, eflag;
     char *emap;
-    REAL *ret;
+    double *ret;
 
     maxes = (int *) cnnct;
     kmax  = maxes[0];
@@ -355,7 +355,7 @@ REAL *PM_z_n_lr_2d(REAL *f, REAL *x, REAL *y, int mode, void *cnnct,
 		  "EXISTENCE", &emap,
 		  NULL);
 
-    n = SC_arrlen(f)/sizeof(REAL);
+    n = SC_arrlen(f)/sizeof(double);
     if (n == (kmax - 1)*(lmax - 1))
        {km = kmax - 1;
 	lm = lmax - 1;}
@@ -387,8 +387,8 @@ REAL *PM_z_n_lr_2d(REAL *f, REAL *x, REAL *y, int mode, void *cnnct,
  *                    - using a uniform fractional value (1/4)
  */
 
-REAL *PM_zone_node_lr_2d(REAL *f, void *cnnct, pcons *alist)
-   {REAL *fp;
+double *PM_zone_node_lr_2d(double *f, void *cnnct, pcons *alist)
+   {double *fp;
 
     fp = PM_z_n_lr_2d(f, NULL, NULL, FALSE, cnnct, alist);
 
@@ -403,11 +403,11 @@ REAL *PM_zone_node_lr_2d(REAL *f, void *cnnct, pcons *alist)
  *                    - using a uniform fractional value (1/4)
  */
 
-REAL *PM_node_zone_lr_2d(REAL *f, void *cnnct, pcons *alist)
+double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
    {int *maxes, kmax, lmax, *pc, corner;
     int i, j, km, lm, n, eflag, npts, delta;
     char *emap;
-    REAL *fp, *f1, *f2, *f3, *f4;
+    double *fp, *f1, *f2, *f3, *f4;
 
     maxes = (int *) cnnct;
     kmax  = maxes[0];
@@ -449,7 +449,7 @@ REAL *PM_node_zone_lr_2d(REAL *f, void *cnnct, pcons *alist)
 
     emap += delta;
 
-    fp = FMAKE_N(REAL, npts, "PM_NODE_ZONE_LR_2D:fp");
+    fp = FMAKE_N(double, npts, "PM_NODE_ZONE_LR_2D:fp");
     if (SC_zero_on_alloc() == FALSE)
        PM_set_value(fp, npts, 0.0);
     PM_LOGICAL_ZONE(f, f1, f2, f3, f4, kmax);
@@ -478,10 +478,10 @@ REAL *PM_node_zone_lr_2d(REAL *f, void *cnnct, pcons *alist)
  *              - using a uniform fractional value
  */
 
-REAL *PM_z_n_ac_2d(REAL *f, REAL *x, REAL *y, int mode, void *cnnct,
-                   pcons *alist)
+double *PM_z_n_ac_2d(double *f, double *x, double *y, int mode, void *cnnct,
+		     pcons *alist)
    {PM_mesh_topology *mt;
-    REAL *fp;
+    double *fp;
     long **cells, *zones, *sides;
     int *nc, nz, *np, nzp, nsp, nn;
 
@@ -515,8 +515,12 @@ REAL *PM_z_n_ac_2d(REAL *f, REAL *x, REAL *y, int mode, void *cnnct,
  *                    - using a uniform fractional value
  */
 
-REAL *PM_zone_node_ac_2d(REAL *f, void *cnnct, pcons *alist)
-   {return(PM_z_n_ac_2d(f, NULL, NULL, FALSE, cnnct, alist));}
+double *PM_zone_node_ac_2d(double *f, void *cnnct, pcons *alist)
+   {double *rv;
+
+    rv = PM_z_n_ac_2d(f, NULL, NULL, FALSE, cnnct, alist);
+
+    return(rv);}
                        
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -527,9 +531,9 @@ REAL *PM_zone_node_ac_2d(REAL *f, void *cnnct, pcons *alist)
  *                    - using a uniform fractional value
  */
 
-REAL *PM_node_zone_ac_2d(REAL *f, void *cnnct, pcons *alist)
+double *PM_node_zone_ac_2d(double *f, void *cnnct, pcons *alist)
    {PM_mesh_topology *mt;
-    REAL *fp, fv;
+    double *fp, fv;
     long **cells, *zones, *sides;
     int *nc, nz, *np, nzp, nsp;
     int in, iz, is, is1, is2, os, oz;
@@ -547,7 +551,7 @@ REAL *PM_node_zone_ac_2d(REAL *f, void *cnnct, pcons *alist)
     nzp = np[2];
     nsp = np[1];
 
-    fp = FMAKE_N(REAL, nz, "PM_NODE_ZONE_AC_2D:fp");
+    fp = FMAKE_N(double, nz, "PM_NODE_ZONE_AC_2D:fp");
 
 /* accumulate nodal values from the zones */
     for (iz = 0; iz < nz; iz++)
@@ -561,7 +565,7 @@ REAL *PM_node_zone_ac_2d(REAL *f, void *cnnct, pcons *alist)
 	      in  = sides[os];
               fv += f[in];};
 
-         fp[iz] = fv/((REAL) (is2 - is1 + 1));};
+         fp[iz] = fv/((double) (is2 - is1 + 1));};
 
     return(fp);}
                        
@@ -572,16 +576,16 @@ REAL *PM_node_zone_ac_2d(REAL *f, void *cnnct, pcons *alist)
  *                          - from the given logical rectangular mesh
  */
 
-void PM_zone_centered_mesh_2d(REAL **px, REAL **py, REAL *rx, REAL *ry,
+void PM_zone_centered_mesh_2d(double **px, double **py, double *rx, double *ry,
                               int kmax, int lmax)
    {int i, n;
-    REAL *xc, *x1, *x2, *x3, *x4;
-    REAL *yc, *y1, *y2, *y3, *y4;
+    double *xc, *x1, *x2, *x3, *x4;
+    double *yc, *y1, *y2, *y3, *y4;
 
     n = kmax*lmax;
 
-    xc = FMAKE_N(REAL, n, "PM_ZONE_CENTERED_MESH_2D:xc");
-    yc = FMAKE_N(REAL, n, "PM_ZONE_CENTERED_MESH_2D:yc");
+    xc = FMAKE_N(double, n, "PM_ZONE_CENTERED_MESH_2D:xc");
+    yc = FMAKE_N(double, n, "PM_ZONE_CENTERED_MESH_2D:yc");
 
     PM_LOGICAL_ZONE(rx, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(ry, y1, y2, y3, y4, kmax);
@@ -607,8 +611,8 @@ static PM_set *_PM_shift_center_lr(PM_set *s)
    {int j, k, id, jd, nc, nd, ng, nn, nz;
     int io, jo, ig, off;
     int *mxn, *mxc, *ngb, *strn, *strc;
-    REAL nrm;
-    REAL **y, *py, *px;
+    double nrm;
+    double **y, *py, *px;
     void **x;
     PM_set *ns;
 
@@ -696,9 +700,9 @@ static PM_set *_PM_shift_center_lr(PM_set *s)
  *                     - number of contributing points
  */
 
-static void _PM_average_cell_pt(REAL *xc, int *pnc, int nd, int id,
+static void _PM_average_cell_pt(double *xc, int *pnc, int nd, int id,
 				long **bnd, int *bnp,
-				int j1, int j2, REAL **x)
+				int j1, int j2, double **x)
    {int ib, jd, i1, i2, l1, l2;
     int np;
 
@@ -734,8 +738,8 @@ static PM_set *_PM_shift_center_ac(PM_set *s)
    {int ic, id, nc, nd, ne, np;
     int *bnc, *bnp;
     long **bnd;
-    REAL nrm;
-    REAL *xc, **x, **y;
+    double nrm;
+    double *xc, **x, **y;
     void **elem;
     PM_set *ns;
     PM_mesh_topology *mt;
@@ -752,7 +756,7 @@ static PM_set *_PM_shift_center_ac(PM_set *s)
 
     nc = bnc[nd];
 
-    xc = FMAKE_N(REAL, nd, "_PM_SHIFT_CENTER_AC:xc");
+    xc = FMAKE_N(double, nd, "_PM_SHIFT_CENTER_AC:xc");
     y  = PM_make_vectors(nd, nc);
     x  = PM_make_vectors(nd, ne);
     for (id = 0; id < nd; id++)
@@ -854,16 +858,14 @@ PM_mapping *PM_node_centered_mapping(PM_mapping *s)
  *             - functions to interpolate to each interpolation point.
  */
 
-REAL **PM_interpol(PM_lagrangian_mesh *grid, REAL **pts, int n_pts,
-                   REAL **fncs, int n_fncs)
+double **PM_interpol(PM_lagrangian_mesh *grid, double **pts, int n_pts,
+		     double **fncs, int n_fncs)
    {int i, j;
-    REAL *rix, *riy, **vals;
+    double *rix, *riy, **vals;
     coefficient *vertices;
 
 /* allocate the return values */
-    vals = FMAKE_N(REAL *, n_fncs, "PM_INTERPOL:vals");
-    for (j = 0; j < n_fncs; j++)
-        vals[j] = FMAKE_N(REAL, n_pts, "PM_INTERPOL:vals[]");     
+    vals = PM_make_vectors(n_fncs, n_pts);
 
 /* get pointers to the points to interpolate to */
     rix = pts[0];
@@ -904,9 +906,9 @@ REAL **PM_interpol(PM_lagrangian_mesh *grid, REAL **pts, int n_pts,
  *           - if any cross product is negative the point is outside the zone
  */
 
-int PM_inside(double x, double  y, REAL *px, REAL *py, int *map, int n)
+int PM_inside(double x, double  y, double *px, double *py, int *map, int n)
    {int ia, ib, ja, jb;
-    REAL dxba, dyba, dx0a, dy0a, cross;
+    double dxba, dyba, dx0a, dy0a, cross;
 
     for (ja = 0; ja < n; ja++)
         {jb = (ja + 1) % n;
@@ -974,7 +976,7 @@ coefficient *PM_alloc_vertices(PM_lagrangian_mesh *grid)
     vertices->n_points = n_v = 4;
     vertices->indexes  = FMAKE_N(int, n_v,
                          "PM_ALLOC_VERTICES:indexes");
-    vertices->weights  = FMAKE_N(REAL, n_v,
+    vertices->weights  = FMAKE_N(double, n_v,
                          "PM_ALLOC_VERTICES:weights");
 
     return(vertices);}
@@ -1003,7 +1005,7 @@ coefficient *PM_alloc_vertices(PM_lagrangian_mesh *grid)
 int PM_find_vertices(double x, double y, PM_lagrangian_mesh *grid,
                      coefficient *vertices)
    {int i, km, lm, n, n_v, *map;
-    REAL *px, *py;
+    double *px, *py;
 
     px = grid->x;
     py = grid->y;
@@ -1078,13 +1080,13 @@ int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
                          coefficient *vertices)
    {int ia, j, ja, ka, kb, la, lb, n;
     int i1, i2, i3, *map;
-    REAL *px, *py;
-    REAL xi, yi, dx0i, dy0i, d0i;
-    REAL sx, sy, dsl;
-    REAL dxj1j, dyj1j, dxij, dyij, cross, parallelp;
-    REAL dsjx, dsjy, dsj, dj1j, dsign;
-    REAL u, v, w;
-    REAL *weights;
+    double *px, *py;
+    double xi, yi, dx0i, dy0i, d0i;
+    double sx, sy, dsl;
+    double dxj1j, dyj1j, dxij, dyij, cross, parallelp;
+    double dsjx, dsjy, dsj, dj1j, dsign;
+    double u, v, w;
+    double *weights;
 
     px = grid->x;
     py = grid->y;
@@ -1183,9 +1185,9 @@ int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
  *                      - value of the function at the interpolation point
  */
 
-REAL PM_interpolate_value(coefficient *vertices, REAL *f)
+double PM_interpolate_value(coefficient *vertices, double *f)
    {int i, j, n, *map;
-    REAL *weights, value;
+    double *weights, value;
 
     n       = vertices->n_points;
     map     = vertices->indexes;

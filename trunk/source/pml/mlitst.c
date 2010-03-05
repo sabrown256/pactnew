@@ -10,67 +10,45 @@
 
 #include "pml.h"
 
-int
- Ximax,
- XxY,
- Yimax;
-
-REAL
- *rtorx,
- *rtory,
- *rtovx,
- *rtovy,
- *rx,
- *ry,
- *vtorx,
- *vtory,
- *vx,
- *vy;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMPUTE_RTOV - interpolate the mapping from voltages to positions
- *              - into one from positions to voltages
+/* COMPUTE_F - interpolate the mapping from voltages to positions
+ *           - into one from positions to voltages
  */
 
-compute_rtov(int kmax, int lmax, int ni)
-   {int i, ix, iy, fsw, fsh;
-    REAL **vals, **pts, **fncs;
+double **compute_f(double **r, int ni, double **x, double **f,
+		   int nx, int ny)
+   {double **vals, **fncs;
     PM_lagrangian_mesh *grid;
 
-    grid       = FMAKE(PM_lagrangian_mesh, "COMPUTE_RTOV:grid");
-    grid->x    = vtorx;
-    grid->y    = vtory;
-    grid->kmax = kmax;
-    grid->lmax = lmax;
+    grid       = FMAKE(PM_lagrangian_mesh, "COMPUTE_F:grid");
+    grid->x    = f[0];
+    grid->y    = f[1];
+    grid->kmax = nx;
+    grid->lmax = ny;
 
-    pts     = FMAKE_N(REAL *, 2, "COMPUTE_RTOV:pts");
-    pts[0]  = rx;
-    pts[1]  = ry;
+    fncs    = FMAKE_N(double *, 4, "COMPUTE_F:fncs");
+    fncs[0] = x[0];
+    fncs[1] = x[1];
+    fncs[2] = f[0];
+    fncs[3] = f[1];
 
-    fncs    = FMAKE_N(REAL *, 4, "COMPUTE_RTOV:fncs");
-    fncs[0] = vx;
-    fncs[1] = vy;
-    fncs[2] = vtorx;
-    fncs[3] = vtory;
+    vals = PM_interpol(grid, r, ni, fncs, 4);
 
-    vals    = PM_interpol(grid, pts, ni, fncs, 4);
-
-    rtovx   = vals[0];
-    rtovy   = vals[1];
-    rtorx   = vals[2];
-    rtory   = vals[3];
-
-    return;}
+    return(vals);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* DUMP - make an ASCII dump of a map */
 
-dump(char *s, REAL *px, REAL *py, int n, FILE *fp)
-   {int i, j;
+void dump(char *s, double **p, int n, FILE *fp)
+   {int i;
+    double *px, *py;
+
+    px = p[0];
+    py = p[1];
 
     fprintf(fp, "\n\n%s\n\n", s);
 
@@ -84,80 +62,86 @@ dump(char *s, REAL *px, REAL *py, int n, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-main(int argc, char **argv)
-   {int i, n;
-    long d;
-    FILE *fp, *out;
-    char s[MAXLINE], *token, *t;
+/* TEST_1 - test 2d interpolation on LR mesh */
+
+int test_1(void)
+   {int i, j, l, ni, np, nx, ny, rv;
+    double inx, iny;
+    double **f, **x, **r, **vals;
+    FILE *out;
 
 /* interupt handler */
     SC_signal(SIGINT, SIG_DFL);
 
-    fp = fopen("remap.asc", "r");
-    if (fp == NULL)
-       {printf("CAN'T OPEN REMAP.ASC\n");
-        exit(1);};
+    ni = 20;
+    nx = 10;
+    ny = 15;
+    np = nx*ny;
 
-/* get in the number of logical voltages */
-    SC_fgets(s, MAXLINE, fp);
-    XxY   = atoi(s);
-    Ximax = Yimax = sqrt(XxY);
-    vtorx = FMAKE_N(REAL, XxY, "INTER.C:vtorx");
-    vtory = FMAKE_N(REAL, XxY, "INTER.C:vtory");
-    vx    = FMAKE_N(REAL, XxY, "INTER.C:vx");
-    vy    = FMAKE_N(REAL, XxY, "INTER.C:vy");
+    inx = 1.0/(nx - 1.0);
+    iny = 1.0/(ny - 1.0);
 
-/* get in the coordinates from the logical voltages */
-    for (i = 0; i < XxY; i++)
-        {SC_fgets(s, MAXLINE, fp);
-         token    = SC_strtok(s, " ", t);
-         vtorx[i] = ATOF(token);
-         token    = SC_strtok(NULL, " ", t);
-         vtory[i] = ATOF(token);};
-
-    SC_fgets(s, MAXLINE, fp);
-
-/* get in the logical voltages */
-    for (i = 0; i < XxY; i++)
-        {SC_fgets(s, MAXLINE, fp);
-         token = SC_strtok(s, " ", t);
-         vx[i] = ATOF(token);
-         token = SC_strtok(NULL, " ", t);
-         vy[i] = ATOF(token);};
-
-    SC_fgets(s, MAXLINE, fp);
+    x = PM_make_vectors(2, np);
+    f = PM_make_vectors(2, np);
 
 /* get in the number of interpolation points */
-    SC_fgets(s, MAXLINE, fp);
-    n  = atoi(s);
-    rx = FMAKE_N(REAL, n, "INTER.C:rx");
-    ry = FMAKE_N(REAL, n, "INTER.C:ry");
+    r = PM_make_vectors(2, ni);
+
+    for (j = 0; j < ny; j++)
+        for (i = 0; i < nx; i++)
+	    {l = j*nx + i;
+
+/* setup the coordinates of the logical values */
+	     x[0][l] = i*inx;
+	     x[1][l] = j*iny;
+
+/* setup the logical values */
+	     f[0][l] = i*inx + (ny - 1.0 - j)*iny;
+	     f[1][l] = (nx - 1.0 - i)*inx + j*iny;};
 
 /* get in the list of interpolation points */
-    for (i = 0; i < n; i++)
-        {SC_fgets(s, MAXLINE, fp);
-         token = SC_strtok(s, " ", t);
-         rx[i] = ATOF(token);
-         token = SC_strtok(NULL, " ", t);
-         ry[i] = ATOF(token);};
+    for (i = 0; i < ni; i++)
+        {r[0][i] = i*inx + cos(PI*inx*i);
+         r[1][i] = i*inx + sin(PI*inx*i);};
 
-    fclose(fp);
+    vals = compute_f(r, ni, f, x, nx, ny);
 
-    compute_rtov(Ximax, Yimax, n);
+    out = fopen("test_1.out", "w");
+    if (out == NULL)
+       {printf("CAN'T OPEN TEST_1.OUT\n");
+        rv = FALSE;}
 
-    if ((out = fopen("foo.bar", "w")) == NULL)
-       {printf("CAN'T OPEN FOO.BAR\n");
-        exit(1);};
+    else
+       {dump("LOGICAL VALUES - F", f, np, out);
+	dump("X", x, np, out);
+	dump("INTERPOLATION POINTS - R", r, ni, out);
+	dump("F(R)", vals, ni, out);
+	dump("R", vals + 2, ni, out);
 
-    dump("LOGICAL VOLTAGES - V", vx, vy, XxY, out);
-    dump("R(V)", vtorx, vtory, XxY, out);
-    dump("INTERPOLATION POINTS - Ri", rx, ry, n, out);
-    dump("V(Ri)", rtovx, rtovy, n, out);
-    dump("R(Ri)", rtorx, rtory, n, out);
+	fclose(out);
 
-    fclose(out);
+	rv = TRUE;};
 
-    return(0);}
+    PM_free_vectors(2, x);
+    PM_free_vectors(2, f);
+    PM_free_vectors(2, r);
+    PM_free_vectors(2, vals);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int main(int argc, char **argv)
+   {int rv;
+
+    rv = TRUE;
+    rv &= test_1();
+
+/* invert rv for exit status */
+    rv = (rv == FALSE);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -16,12 +16,12 @@
 /* MAIN - a sample program */
 
 int main(int c, char **v)
-   {PM_mesh_topology *mt;
-    REAL *x, *y, *px, *py;
-    int i, j, k, l;
+   {int i, j, k, l;
     int nd, nc, np;
     int kmax, lmax, k1, k2, l1, l2, ord;
     long *ncell, *pcell;
+    double *x, *y, *px, *py;
+    PM_mesh_topology *mt;
 
     kmax = 6;
     lmax = 8;
@@ -31,8 +31,8 @@ int main(int c, char **v)
     l1 = 1;
     l2 = 4;
 
-    x = FMAKE_N(REAL, kmax*lmax, "MLACTS.C:x");
-    y = FMAKE_N(REAL, kmax*lmax, "MLACTS.C:y");
+    x = FMAKE_N(double, kmax*lmax, "MLACTS.C:x");
+    y = FMAKE_N(double, kmax*lmax, "MLACTS.C:y");
     for (l = 0; l < lmax; l++)
         for (k = 0; k < kmax; k++)
             {i = l*kmax + k;
