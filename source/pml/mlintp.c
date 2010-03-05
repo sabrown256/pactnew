@@ -858,30 +858,32 @@ PM_mapping *PM_node_centered_mapping(PM_mapping *s)
  *             - functions to interpolate to each interpolation point.
  */
 
-double **PM_interpol(PM_lagrangian_mesh *grid, double **pts, int n_pts,
-		     double **fncs, int n_fncs)
-   {int i, j;
+double **PM_interpol(PM_lagrangian_mesh *grid, double **pts, int np,
+		     double **fncs, int nf)
+   {int i, j, ok;
     double *rix, *riy, **vals;
     coefficient *vertices;
 
 /* allocate the return values */
-    vals = PM_make_vectors(n_fncs, n_pts);
+    vals = PM_make_vectors(nf, np);
 
 /* get pointers to the points to interpolate to */
     rix = pts[0];
     riy = pts[1];
 
     vertices = PM_alloc_vertices(grid);
-    for (i = 0; i < n_pts; i++)
+
+    ok = TRUE;
+    for (i = 0; i < np; i++)
 
 /* find the vertices surrounding the IP */
-        {PM_find_vertices(rix[i], riy[i], grid, vertices);
+        {ok = PM_find_vertices(rix[i], riy[i], grid, vertices);
 
 /* build the coefficients for the IP */
-         PM_find_coefficients(rix[i], riy[i], grid, vertices);
+         ok = PM_find_coefficients(rix[i], riy[i], grid, vertices);
 
 /* interpolate all of the functions at the IP */
-         for (j = 0; j < n_fncs; j++)
+         for (j = 0; j < nf; j++)
              vals[j][i] = PM_interpolate_value(vertices, fncs[j]);};
 
     return(vals);}
@@ -1004,7 +1006,8 @@ coefficient *PM_alloc_vertices(PM_lagrangian_mesh *grid)
 
 int PM_find_vertices(double x, double y, PM_lagrangian_mesh *grid,
                      coefficient *vertices)
-   {int i, km, lm, n, n_v, *map;
+   {int i, km, lm, n, nv, ok;
+    int *map;
     double *px, *py;
 
     px = grid->x;
@@ -1013,19 +1016,20 @@ int PM_find_vertices(double x, double y, PM_lagrangian_mesh *grid,
     lm = grid->lmax;
     n  = km*lm;
 
-    n_v = vertices->n_points;
+    nv  = vertices->n_points;
     map = vertices->indexes;
 
-    for (i = km+1; i < n; i++)
+    ok = FALSE;
+    for (i = km+1; (i < n) && (ok == FALSE); i++)
         {map[0] = i - km;
          map[1] = i;
          map[2] = i - 1;
          map[3] = i - km - 1;
 
-         if (PM_inside(x, y, px, py, map, n_v))
-            break;};
+         if (PM_inside(x, y, px, py, map, nv))
+            ok = TRUE;};
 
-    return(TRUE);}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1079,7 +1083,8 @@ int PM_find_vertices(double x, double y, PM_lagrangian_mesh *grid,
 int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
                          coefficient *vertices)
    {int ia, j, ja, ka, kb, la, lb, n;
-    int i1, i2, i3, *map;
+    int i1, i2, i3, ok;
+    int *map;
     double *px, *py;
     double xi, yi, dx0i, dy0i, d0i;
     double sx, sy, dsl;
@@ -1101,7 +1106,8 @@ int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
     for (j = 0; j < n; j++)
         weights[j] = 0.0;
 
-    for (ja = 0; ja < n; ja++)
+    ok = TRUE;
+    for (ja = 0; (ja < n) && (ok == TRUE); ja++)
         {ia = map[ja];
 
          xi = px[ia];
@@ -1113,9 +1119,9 @@ int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
          d0i  = HYPOT(dx0i, dy0i);
 
 /* find the side crossed by the line from the vertex to the IP */
-         u  = HUGE;
-         v  = HUGE;
-         for (j = 1; j < n-1; j++)
+         u = HUGE;
+         v = HUGE;
+         for (j = 1; (j < n-1) && (ok == TRUE); j++)
              {ka = (ja + j) % n;
               kb = (ka + 1) % n;
               la = map[ka];
@@ -1159,23 +1165,24 @@ int PM_find_coefficients(double x, double y, PM_lagrangian_mesh *grid,
                       break;};};};
 
          if ((u > 1.0 + TOLERANCE) || (v > 1.0 + TOLERANCE))
-            {io_printf(stderr, "INTERPOLATION ERROR AT (%11.3e, %11.3e)",
-		       x, y);
-             exit(3);};
+            ok = FALSE;
+
          weights[i1] += 1.0 - v;
          weights[i2] += v*u;
          weights[i3] += v*(1.0 - u);};
 
+    if (ok == TRUE)
+
 /* renormalize the weights */
-    w = 0.0;
-    for (j = 0; j < n; j++)
-        w += weights[j];
+       {w = 0.0;
+	for (j = 0; j < n; j++)
+	    w += weights[j];
 
-    w = 1.0/w;
-    for (j = 0; j < n; j++)
-        weights[j] *= w;
+	w = 1.0/w;
+	for (j = 0; j < n; j++)
+	    weights[j] *= w;};
 
-    return(TRUE);}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -16,78 +16,109 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* _PM_SPLINE - set up cubic spline interpolation coefficients */
+/* PM_COMPUTE_SPLINES - set up cubic spline interpolation coefficients
+ *                    - for the N point function Y(X)
+ */
 
-void _PM_spline(double *x, double *y, int n, double yp1, double ypn, double *d2y)
+double *PM_compute_splines(double *x, double *y, int n,
+			   double dyl, double dyr)
    {int i, k, nm;
     double p, qn, sig, un, *u;
+    double *dy;
+
+    dy = FMAKE_N(double, n, "PM_COMPUTE_SPLINES:dy");
 
     nm = n - 1;
-    u  = FMAKE_N(double, nm, "_PM_SPLINE:u");
-    if (yp1 == HUGE)
-       d2y[0] = u[0] = 0.0;
+    u  = FMAKE_N(double, nm, "PM_COMPUTE_SPLINES:u");
+    if (dyl == HUGE)
+       dy[0] = u[0] = 0.0;
     else
-       {d2y[0] = -0.5;
-	u[0]   = (3.0/(x[1] - x[0]))*((y[1] - y[0])/(x[1] - x[0]) - yp1);};
+       {dy[0] = -0.5;
+	u[0]  = (3.0/(x[1] - x[0]))*((y[1] - y[0])/(x[1] - x[0]) - dyl);};
 
     for (i = 1; i < nm; i++)
-        {sig    = (x[i] - x[i-1])/(x[i+1] - x[i-1]);
-	 p      = sig*d2y[i-1] + 2.0;
-	 d2y[i] = (sig - 1.0)/p;
-	 u[i]   = (y[i+1] - y[i])/(x[i+1] - x[i]) -
-	          (y[i] - y[i-1])/(x[i] - x[i-1]);
-	 u[i]   = (6.0*u[i]/(x[i+1] - x[i-1]) - sig*u[i-1])/p;};
+        {sig   = (x[i] - x[i-1])/(x[i+1] - x[i-1]);
+	 p     = sig*dy[i-1] + 2.0;
+	 dy[i] = (sig - 1.0)/p;
+	 u[i]  = (y[i+1] - y[i])/(x[i+1] - x[i]) -
+	         (y[i] - y[i-1])/(x[i] - x[i-1]);
+	 u[i]  = (6.0*u[i]/(x[i+1] - x[i-1]) - sig*u[i-1])/p;};
 
-    if (ypn == HUGE)
+    if (dyr == HUGE)
        qn = un = 0.0;
     else
        {qn = 0.5;
 	un = (3.0/(x[nm] - x[nm-1]))*
-             (ypn - (y[nm] - y[nm-1])/(x[nm] - x[nm-1]));};
+             (dyr - (y[nm] - y[nm-1])/(x[nm] - x[nm-1]));};
 
-    d2y[nm] = (un - qn*u[nm-1])/(qn*d2y[nm-1] + 1.0);
+    dy[nm] = (un - qn*u[nm-1])/(qn*dy[nm-1] + 1.0);
     for (k = nm-1; k >= 0; k--)
-        d2y[k] = d2y[k]*d2y[k+1] + u[k];
+        dy[k] = dy[k]*dy[k+1] + u[k];
 
     SFREE(u);
 
-    return;}
+    return(dy);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PM_CUBIC_SPLINE_INT - find the value of the function represented in
- *                     - FX and FY at the point X and return it in PY
+ *                     - F(X) at the point XC and return it
  *                     - adapted from Numerical Recipes in C
  */
 
-int PM_cubic_spline_int(double *fx, double *fy, double *d2y, int n,
-                        double x, double *py)
+double PM_cubic_spline_int(double *x, double *f, double *df, int n, double xc)
    {int k0, kn, k;
-    double h, b, a;
+    double h, b, a, fc;
 
 /* find the appropriate bin */
     k0 = 0;
     kn = n - 1;
     while (kn-k0 > 1)
        {k = (kn + k0) >> 1;
-	if (fx[k] > x)
+	if (x[k] > xc)
 	   kn = k;
 	else
 	   k0 = k;};
 
-    h = fx[kn] - fx[k0];
+    h = x[kn] - x[k0];
     if (h == 0.0)
-       return(FALSE);
+       fc = -HUGE;
 
-    a = (fx[kn] - x)/h;
-    b = (x - fx[k0])/h;
+    else
+       {a = (x[kn] - xc)/h;
+	b = (xc - x[k0])/h;
 
-    h   = h*h/6.0;
-    *py = a*(fy[k0] + (a*a - 1.0)*d2y[k0]*h) +
-          b*(fy[kn] + (b*b - 1.0)*d2y[kn]*h);
+	h  = h*h/6.0;
+	fc = a*(f[k0] + (a*a - 1.0)*df[k0]*h) +
+	     b*(f[kn] + (b*b - 1.0)*df[kn]*h);};
 
-    return(TRUE);}
+    return(fc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_LINEAR_INT - find the value of the function represented in
+ *               - F(X) at the point XC and return it
+ */
+
+double PM_linear_int(double *x, double *f, int n, double xc)
+   {int k0, kn, k;
+    double fc;
+
+/* find the appropriate bin */
+    k0 = 0;
+    kn = n - 1;
+    while (kn-k0 > 1)
+       {k = (kn + k0) >> 1;
+	if (x[k] > xc)
+	   kn = k;
+	else
+	   k0 = k;};
+
+    PM_interp(fc, xc, x[k0], f[k0], x[kn], f[kn]);
+
+    return(fc);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

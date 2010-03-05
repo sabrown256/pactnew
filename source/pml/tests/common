@@ -28,6 +28,8 @@ if ($?LogF == 0) then
    set PFE      = $BinDir/do-run
 endif
 
+set RefDir = ../../../pml/tests/ref
+
 if ($?SrcDir == 0) then
    pushd ../.. >& /dev/null
    set SrcDir = $cwd

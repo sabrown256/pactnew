@@ -532,23 +532,21 @@ int PM_fft_sc_real_simul(double *fx1, double *fx2, double *fw1, double *fw2, int
 int PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy,
 	        int hn, double dt, double **pxr, double **pyr, int *pnr)
    {int i, j, gtn, hin;
-    double *gty, *hty, *xret, *yret;
-    double *hix, *hiy;
-    double *gdy, *hdy;
     double hdx, hxmn, hxmx;
     double gxmn, gxmx;
     double cxmn, cxmx;
     double igy, ihy, init_y, init_x, vx, nrm;
+    double *gty, *hty, *xret, *yret;
+    double *hix, *hiy;
+    double *gdy, *hdy;
   
-    gdy = FMAKE_N(double, gn, "PM_CONVOLVE:gdy");
+    gdy = PM_compute_splines(gx, gy, gn, HUGE, HUGE);
     if (gdy == NULL)
        return(FALSE);
-    _PM_spline(gx, gy, gn, HUGE, HUGE, gdy);
 
-    hdy = FMAKE_N(double, hn, "PM_CONVOLVE:hdy");
+    hdy = PM_compute_splines(hx, hy, hn, HUGE, HUGE);
     if (hdy == NULL) 
        return(FALSE);
-    _PM_spline(hx, hy, hn, HUGE, HUGE, hdy);
 
 /* setup limits, find number of points */
     gxmn = gx[0];
@@ -576,7 +574,7 @@ int PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy,
         {vx = cxmn + i*dt;
          xret[i] = vx;
 	 if ((gxmn <= vx) && (vx <= gxmx))
-	    {PM_cubic_spline_int(gx, gy, gdy, gn, vx, &gty[i]);
+	    {gty[i]  = PM_cubic_spline_int(gx, gy, gdy, gn, vx);
 	     gty[i] -= init_y;}
 
 /* pad the ends of the array */
@@ -587,7 +585,7 @@ int PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy,
     for (i = 0; i < hin; i++)
         {vx = hxmn + i*dt;
          hix[i] = vx;
-	 PM_cubic_spline_int(hx, hy, hdy, hn, vx, &hiy[i]);};
+	 hiy[i] = PM_cubic_spline_int(hx, hy, hdy, hn, vx);};
 
 /* reorder response for fft convolution */
     init_x = 0;
