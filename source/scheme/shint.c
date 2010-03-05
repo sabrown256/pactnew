@@ -88,7 +88,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
                  else if (hand == (PFVoid) SS_acc_long)
                     l = *(long *) u.memaddr;
                  else if (hand == (PFVoid) SS_acc_REAL)
-                    l = *(REAL *) u.memaddr;
+                    l = *(double *) u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - _SS_FIX_ARG", obj);};}
 
@@ -163,7 +163,7 @@ static void _SS_float_arg(object *obj, void *v, int type)
                  else if (hand == (PFVoid) SS_acc_long)
                     d = *(long *) u.memaddr;
                  else if (hand == (PFVoid) SS_acc_REAL)
-                    d = *(REAL *) u.memaddr;
+                    d = *(double *) u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
 
@@ -489,7 +489,7 @@ static object *_SS_make_list(int n, int *type, void **ptr)
 	     lst = SS_mk_cons(SS_mk_float(d), lst);}
 
 	 else if (ityp == SC_REAL_I)
-	    {d   = *(REAL *) ptr[i];
+	    {d   = *(double *) ptr[i];
 	     lst = SS_mk_cons(SS_mk_float(d), lst);}
 
 	 else if (ityp == SC_DOUBLE_I)

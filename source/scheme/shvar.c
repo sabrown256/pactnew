@@ -19,7 +19,7 @@ static object *_SS_exa_var(void *vr, int type)
    {char cv, *sv, **pv;
     int iv;
     long lv;
-    REAL rv;
+    double rv;
     object *ret;
 
     ret = SS_f;
@@ -42,7 +42,7 @@ static object *_SS_exa_var(void *vr, int type)
 	ret = SS_mk_integer((BIGINT) lv);}
 
     else if (type == SC_DOUBLE_I)
-       {rv = *(REAL *) vr;
+       {rv = *(double *) vr;
 	if (SS_interactive)
 	   PRINT(stdout, "    %g", rv);
 	ret = SS_mk_float((double) rv);}
@@ -131,10 +131,10 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 
     else if (type == SC_DOUBLE_I)
        {if (dv != -HUGE)
-	   *((REAL *) vr) = dv;
+	   *((double *) vr) = dv;
 
         else if (lv != -HUGE_INT)
-	   *((REAL *) vr) = (REAL) lv;
+	   *((double *) vr) = (double) lv;
 
 	else
 	   SS_error("OBJECT NOT REAL NUMBER - SS_ACC_VAR", vl);}
@@ -175,7 +175,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
  *               -   char   :  SS_acc_char
  *               -   int    :  SS_acc_int
  *               -   long   :  SS_acc_long
- *               -   REAL   :  SS_acc_REAL
+ *               -   double :  SS_acc_REAL
  *               -   char * :  SS_acc_string
  *               -   void * :  SS_acc_ptr
  *               -

@@ -435,7 +435,6 @@ void PA_cpp_default(void)
     PA_cpp_add_name(SC_LONG_S,      PA_CPP_TYPE_SC, SC_LONG_I);
     PA_cpp_add_name(SC_FLOAT_S,     PA_CPP_TYPE_SC, SC_FLOAT_I);
     PA_cpp_add_name(SC_DOUBLE_S,    PA_CPP_TYPE_SC, SC_DOUBLE_I);
-/*    PA_cpp_add_name(SC_REAL_S,      PA_CPP_TYPE_SC, SC_REAL_I);*/
     PA_cpp_add_name(SC_STRING_S,    PA_CPP_TYPE_SC, SC_STRING_I);
     PA_cpp_add_name(SC_POINTER_S,   PA_CPP_TYPE_SC, SC_POINTER_I);
     PA_cpp_add_name(SC_PCONS_P_S,   PA_CPP_TYPE_SC, SC_PCONS_P_I);
@@ -444,7 +443,6 @@ void PA_cpp_default(void)
     PA_cpp_add_name(SC_INTEGER_P_S, PA_CPP_TYPE_SC, SC_INTEGER_P_I);
     PA_cpp_add_name(SC_LONG_P_S,    PA_CPP_TYPE_SC, SC_LONG_P_I);
     PA_cpp_add_name(SC_FLOAT_P_S,   PA_CPP_TYPE_SC, SC_FLOAT_P_I);
-/*    PA_cpp_add_name(SC_REAL_P_S,    PA_CPP_TYPE_SC, SC_REAL_P_I); */
     PA_cpp_add_name(SC_DOUBLE_P_S,  PA_CPP_TYPE_SC, SC_DOUBLE_P_I);
     PA_cpp_add_name(SC_PCONS_S,     PA_CPP_TYPE_SC, SC_PCONS_I);
     PA_cpp_add_name(SC_STRUCT_S,    PA_CPP_TYPE_SC, SC_STRUCT_I);

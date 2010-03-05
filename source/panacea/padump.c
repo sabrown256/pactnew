@@ -459,7 +459,7 @@ int PA_dump_time(PA_set_spec *pi, double tc, double dtc, int cycle)
 
 /* or any cycle specification had better be first on the list */
     else if (strcmp("cycle", pi->var_name) == 0)
-       {if (stop > ((REAL) INT_MAX))
+       {if (stop > ((double) INT_MAX))
 	   istop = INT_MAX;
 	else
 	   istop  = stop;

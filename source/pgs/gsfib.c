@@ -84,7 +84,7 @@ FIXNUM F77_FUNC(pggupm, PGGUPM)(FIXNUM *flg)
 
 FIXNUM F77_FUNC(pgmg11, PGMG11)(FIXNUM *pid,
                                 FIXNUM *pnl, F77_string flabel,
-                                FIXNUM *pcp, FIXNUM *pn, REAL *x, REAL *y,
+                                FIXNUM *pcp, FIXNUM *pn, double *x, double *y,
                                 FIXNUM *pnx, F77_string fxname,
                                 FIXNUM *pny, F77_string fyname)
    {int id, cp, n;
@@ -117,7 +117,7 @@ FIXNUM F77_FUNC(pgmg11, PGMG11)(FIXNUM *pid,
 FIXNUM F77_FUNC(pgmg21, PGMG21)(FIXNUM *pid,
                                 FIXNUM *pnl, F77_string flabel,
                                 FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
-                                FIXNUM *pcen, REAL *x, REAL *y, REAL *r,
+                                FIXNUM *pcen, double *x, double *y, double *r,
                                 FIXNUM *pnd, F77_string fdname,
                                 FIXNUM *pnr, F77_string frname)
    {int id, cp, kmax, lmax;
@@ -155,7 +155,7 @@ FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
                                 FIXNUM *pnl, F77_string flabel,
                                 FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
                                 FIXNUM *pcen,
-                                REAL *x, REAL *y, REAL *u, REAL *v,
+                                double *x, double *y, double *u, double *v,
                                 FIXNUM *pnd, F77_string fdname,
                                 FIXNUM *pnr, F77_string frname)
    {int id, cp, kmax, lmax;
@@ -178,10 +178,10 @@ FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
     centering = (PM_centering) *pcen;
 
 /* build the domain set */
-    domain = PM_make_set(dname, SC_REAL_S, cp, 2, kmax, lmax, 2, x, y);
+    domain = PM_make_set(dname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, x, y);
 
 /* build the range set */
-    range = PM_make_set(rname, SC_REAL_S, cp, 2, kmax, lmax, 2, u, v);
+    range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, u, v);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
                                 SC_PCONS_P_S, NULL, id, NULL);
@@ -345,17 +345,17 @@ FIXNUM F77_FUNC(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
 
 /* PGSDLM - set a graph's domain limits */
 
-FIXNUM F77_FUNC(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, REAL *v)
+FIXNUM F77_FUNC(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
    {FIXNUM rv;
     long n;
-    REAL *pt;
+    double *pt;
     PG_graph *g;
 
     g = SC_GET_POINTER(PG_graph, *grid);
     n = *pn;
 
-    pt = FMAKE_N(REAL, n, "PGSDLM:pt");
-    memcpy(pt, v, n*sizeof(REAL));
+    pt = FMAKE_N(double, n, "PGSDLM:pt");
+    memcpy(pt, v, n*sizeof(double));
 
     PM_set_limits(g->f->domain, pt);
 
@@ -606,16 +606,16 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
 
 /* PGSRLM - set a graph's range limits */
 
-FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, REAL *v)
+FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
    {PG_graph *g;
     long n;
-    REAL *pt;
+    double *pt;
 
     g = SC_GET_POINTER(PG_graph, *grid);
     n = *pn;
 
-    pt = FMAKE_N(REAL, n, "PGSRLM:pt");
-    memcpy(pt, v, n*sizeof(REAL));
+    pt = FMAKE_N(double, n, "PGSRLM:pt");
+    memcpy(pt, v, n*sizeof(double));
 
     PM_set_limits(g->f->range, pt);
 
@@ -626,18 +626,18 @@ FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, REAL *v)
 
 /* PGSVLM - set a graph's viewport limits */
 
-FIXNUM F77_FUNC(pgsvlm, PGSVLM)(FIXNUM *grid, REAL *v)
+FIXNUM F77_FUNC(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
    {FIXNUM rv;
-    REAL *pv;
+    double *pv;
     PG_graph *g;
 
     g = SC_GET_POINTER(PG_graph, *grid);
 
-    pv = FMAKE_N(REAL, 4, "PGSVLM:pv");
-    memcpy(pv, v, 4*sizeof(REAL));
+    pv = FMAKE_N(double, 4, "PGSVLM:pv");
+    memcpy(pv, v, 4*sizeof(double));
 
     PG_set_attrs_graph(g,
-		       "VIEW-PORT", SC_REAL_I, TRUE, pv,
+		       "VIEW-PORT", SC_DOUBLE_I, TRUE, pv,
 		       NULL);
 
     rv = TRUE;

@@ -290,9 +290,9 @@ int PC_open_group(char **argv, int *pn)
 /* _PC_OPEN_MEMBER_N - open a copy of the specified executable on this node */
 
 static PROCESS *_PC_open_member_n(char **argv, int *pnn)
-   {PROCESS *pp;
+   {int port, argc;
     char *tok, t[MAXLINE], srvr[MAXLINE], *s, *p;
-    int port, argc;
+    PROCESS *pp;
 
 #ifdef HAVE_PROCESS_CONTROL
 
@@ -399,10 +399,9 @@ static long _PC_size_message_n(int sp, char *type, int tag)
 
 /* _PC_GLMN_MESSAGE_N - return the global minimum of some quantity */
 
-static REAL _PC_glmn_message_n(double vi)
-   {REAL vo;
-    int i, ip, np;
-    REAL vt;
+static double _PC_glmn_message_n(double vi)
+   {int i, ip, np;
+    double vo, vt;
     static int sp[] = {SC_MATCH_NODE, -1,
 		       SC_MATCH_TAG, 0,
 		       0};
@@ -411,7 +410,7 @@ static REAL _PC_glmn_message_n(double vi)
     np = PC_get_number_processors();
 
     sp[1] = -1;
-    PC_out(&vi, SC_REAL_S, 1, NULL, sp);
+    PC_out(&vi, SC_DOUBLE_S, 1, NULL, sp);
 
     vo = vi;
     vt = 0.0;
@@ -421,7 +420,7 @@ static REAL _PC_glmn_message_n(double vi)
 	    continue;
 
 	 sp[1] = i;
-	 PC_in(&vt, SC_REAL_S, 1, NULL, sp);
+	 PC_in(&vt, SC_DOUBLE_S, 1, NULL, sp);
 
 	 vo = min(vo, vt);};
 
@@ -522,9 +521,9 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
  */
 
 static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
-   {long nir, nb, nbt, nbr;
-    int ip, nis, ityp, nn, np, *nl, *pl;
+   {int ip, nis, ityp, nn, np, *nl, *pl;
     int type_index, block, buf_siz, bs;
+    long nir, nb, nbt, nbr;
     char reply[MAXLINE], types[MAXLINE], *bf, *pbf;
     PDBfile *vif, *tf;
 

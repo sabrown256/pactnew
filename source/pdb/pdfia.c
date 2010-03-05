@@ -1595,7 +1595,7 @@ FIXNUM F77_FUNC(pfclos, PFCLOS)(FIXNUM *fileid)
 
 FIXNUM F77_FUNC(pfwulc, PFWULC)(FIXNUM *fileid, FIXNUM *pnchr,
 				F77_string labl, FIXNUM *pnpts,
-				REAL *px, REAL *py, FIXNUM *pic)
+				double *px, double *py, FIXNUM *pic)
    {int i, n, rv;
     char s[MAXLINE];
     PDBfile *file;
@@ -1621,7 +1621,7 @@ FIXNUM F77_FUNC(pfwulc, PFWULC)(FIXNUM *fileid, FIXNUM *pnchr,
 
 FIXNUM F77_FUNC(pfwuly, PFWULY)(FIXNUM *fileid, FIXNUM *pnchr,
 				F77_string labl, FIXNUM *pnpts, FIXNUM *pix,
-				REAL *py, FIXNUM *pic)
+				double *py, FIXNUM *pic)
    {int i, n, rv;
     char s[MAXLINE];
     PDBfile *file;
@@ -1645,7 +1645,7 @@ FIXNUM F77_FUNC(pfwuly, PFWULY)(FIXNUM *fileid, FIXNUM *pnchr,
 
 /* _PD_BUILD_SET - build and return a set from FORTRAN type information */
 
-static PM_set *_PD_build_set(FIXNUM *si, REAL *sd, char *sname)
+static PM_set *_PD_build_set(FIXNUM *si, double *sd, char *sname)
    {int i, j, nd, nde, ne;
     int *maxes;
     void **elem;
@@ -1704,8 +1704,8 @@ static PM_set *_PD_build_set(FIXNUM *si, REAL *sd, char *sname)
  */
 
 FIXNUM F77_FUNC(pfwmap, PFWMAP)(FIXNUM *fileid, F77_string dname,
-				FIXNUM *dp, REAL *dm, F77_string rname,
-				FIXNUM *rp, REAL *rm, FIXNUM *pim)
+				FIXNUM *dp, double *dm, F77_string rname,
+				FIXNUM *rp, double *rm, FIXNUM *pim)
    {FIXNUM rv;
     char s[MAXLINE];
     PM_mapping *f;
@@ -1749,11 +1749,11 @@ FIXNUM F77_FUNC(pfwmap, PFWMAP)(FIXNUM *fileid, F77_string dname,
 FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
 				FIXNUM *pkn, FIXNUM *pkx,
 				FIXNUM *pln, FIXNUM *plx,
-				REAL *data, REAL *pxn, REAL *pxx,
-				REAL *pyn, REAL *pyx, FIXNUM *image)
+				double *data, double *pxn, double *pxx,
+				double *pyn, double *pyx, FIXNUM *image)
    {int n, kx, lx, kmin, kmax, lmin, k1, k2, l1, l2, k, l, i;
     FIXNUM rv;
-    REAL *pd, *d, xmin, xmax, ymin, ymax, zmin, zmax, z;
+    double *pd, *d, xmin, xmax, ymin, ymax, zmin, zmax, z;
     char s[MAXLINE];
     PD_image *im;
     PDBfile *file;
@@ -1783,7 +1783,7 @@ FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
 	kx   = k2 - k1 + 1;
 	lx   = l2 - l1 + 1;
 	n    = kx*lx;
-	d    = pd = FMAKE_N(REAL, n, "PFWIMA:d");
+	d    = pd = FMAKE_N(double, n, "PFWIMA:d");
 	zmax = -HUGE;
 	zmin =  HUGE;
 	for (l = l1; l <= l2; l++)
@@ -1830,7 +1830,7 @@ FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
  */
 
 FIXNUM F77_FUNC(pfwset, PFWSET)(FIXNUM *fileid, F77_string dname,
-				FIXNUM *dp, REAL *dm)
+				FIXNUM *dp, double *dm)
    {FIXNUM rv;
     char s[MAXLINE];
     PDBfile *file;
@@ -1892,7 +1892,7 @@ FIXNUM F77_FUNC(pfwset, PFWSET)(FIXNUM *fileid, F77_string dname,
 
 FIXNUM F77_FUNC(pfwrae, PFWRAE)(FIXNUM *fileid, F77_string dname,
 				FIXNUM *nchr, F77_string rname,
-				FIXNUM *rp, REAL *rm,
+				FIXNUM *rp, double *rm,
 				FIXNUM *inf, FIXNUM *pim)
    {int i;
     FIXNUM rv;
@@ -2006,7 +2006,7 @@ FIXNUM F77_FUNC(pfwrae, PFWRAE)(FIXNUM *fileid, F77_string dname,
 
 FIXNUM F77_FUNC(pfwran, PFWRAN)(FIXNUM *fileid, F77_string dname,
 				FIXNUM *nchr, F77_string rname,
-				FIXNUM *rp, REAL *rm, FIXNUM *pim)
+				FIXNUM *rp, double *rm, FIXNUM *pim)
    {FIXNUM rv;
 
     rv = F77_FUNC(pfwrae, PFWRAE)(fileid, dname, nchr,

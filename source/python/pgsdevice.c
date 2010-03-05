@@ -705,11 +705,11 @@ PP_device_draw_surface(PP_deviceObject *self,
                   PyObject *kwds)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.method.draw_surface) */
-    REAL *a1;
-    REAL *a2;
-    REAL *extr;
-    REAL *x;
-    REAL *y;
+    double *a1;
+    double *a2;
+    double *extr;
+    double *x;
+    double *y;
     double *r[PG_SPACEDM];
     int nn;
     double xmn;

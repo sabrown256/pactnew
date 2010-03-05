@@ -27,7 +27,7 @@ int
  mesh_vcolor,
  window_init = FALSE;
 
-REAL
+double
  mesh_botspace,
  mesh_gxmax,
  mesh_gxmin,
@@ -152,7 +152,7 @@ int plotw(dev, new, name)
 /* NEWFRAMEW - make a new frame, i.e. draw it */
 
 int newframew(PG_device *dev, int new)
-   {REAL dt;
+   {double dt;
     char label[MAXLINE];
     mesh_quality *mq;
     static int first = TRUE;

@@ -678,7 +678,7 @@ PP_make_set_1d(
     int nd;
     int max;
     int nde;
-    REAL *elem;
+    double *elem;
     char *kw_list[] = {"name", "type", "cp", "nd", "max", "nde", "elem", NULL};
     PM_set *result;
 
@@ -709,8 +709,8 @@ PP_make_ac_set(
     int cp;
     PM_mesh_topology *mt;
     int nde;
-    REAL *x;
-    REAL *y;
+    double *x;
+    double *y;
     PP_mesh_topologyObject *mtobj;
     char *kw_list[] = {"name", "type", "cp", "mt", "nde", "x", "y", NULL};
     PM_set *result;
@@ -961,8 +961,8 @@ PP_make_graph_1d(
     char *label;
     int cp;
     int n;
-    REAL *x;
-    REAL *y;
+    double *x;
+    double *y;
     char *xname;
     char *yname;
     char *kw_list[] = {"id", "label", "cp", "n", "x", "y", "xname", "yname", NULL};
@@ -1001,9 +1001,9 @@ PP_make_graph_r2_r1(
     int imx;
     int jmx;
     int centering;
-    REAL *x;
-    REAL *y;
-    REAL *r;
+    double *x;
+    double *y;
+    double *r;
     char *dname;
     char *rname;
     char *kw_list[] = {"id", "label", "cp", "imx", "jmx", "centering", "x", "y", "r", "dname", "rname", NULL};
@@ -1232,10 +1232,10 @@ PP_iso_limit(
   PyObject *kwds)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.method.iso_limit) UNMODIFIED */
-    REAL *a;
+    double *a;
     int npts;
-    REAL min;
-    REAL max;
+    double min;
+    double max;
     char *kw_list[] = {"a", "npts", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&i:iso_limit", kw_list,

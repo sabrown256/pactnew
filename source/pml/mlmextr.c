@@ -133,7 +133,7 @@ static void show_mesh(double *x, int nd, int *mn, int *mx,
 
 /* build the set */
     snprintf(bf, MAXLINE, "Dir = %d, Side = %d, I = %d", idr, side, ig);
-    dom = PM_mk_set(bf, SC_REAL_S, FALSE, nn, nd, nd,
+    dom = PM_mk_set(bf, SC_DOUBLE_S, FALSE, nn, nd, nd,
 		    maxes, y, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 

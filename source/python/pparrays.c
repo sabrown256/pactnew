@@ -136,7 +136,7 @@ int REAL_array_extractor(PyObject *obj, void *arg)
     if (arr == NULL)
         return 0;
 
-    *(REAL **) arg = (REAL *) arr->data;
+    *(double **) arg = (double *) arr->data;
 #endif
     
     return 1;

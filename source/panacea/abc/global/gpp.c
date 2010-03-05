@@ -184,9 +184,9 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
     set->max_index      = maxes;
     set->elements       = (byte *) elem;
     set->es_type        = SC_strsave("double *");
-    set->extrema        = (byte *) FMAKE_N(REAL, 2*nde,
+    set->extrema        = (byte *) FMAKE_N(double, 2*nde,
 					   "_LR_GET_N_SET:extrema");
-    set->scales         = (byte *) FMAKE_N(REAL, nde,
+    set->scales         = (byte *) FMAKE_N(double, nde,
 					   "_LR_GET_N_SET:scales");
     set->opers          = PM_REAL_Opers;
     set->metric         = NULL;
@@ -250,7 +250,7 @@ double *LR_map_centers(double *data, int centering)
                       break;
 
         case Z_CENT : nz  = kmax*lmax;
-                      fp  = FMAKE_N(REAL, nz, "LR_MAP_CENTERS:fp");
+                      fp  = FMAKE_N(double, nz, "LR_MAP_CENTERS:fp");
                       fp2 = fp;
                       fp1 = fp2 - kmax;
                       fp3 = fp2 - 1;
@@ -448,9 +448,9 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
     set->max_index      = maxes;
     set->elements       = (byte *) elem;
     set->es_type        = SC_strsave("double *");
-    set->extrema        = (byte *) FMAKE_N(REAL, 2*nde,
+    set->extrema        = (byte *) FMAKE_N(double, 2*nde,
                                            "LR_BUILD_DOMAIN:extrema");
-    set->scales         = (byte *) FMAKE_N(REAL, nde,
+    set->scales         = (byte *) FMAKE_N(double, nde,
                                            "LR_BUILD_DOMAIN:scales");
     set->opers          = PM_REAL_Opers;
     set->metric         = NULL;
@@ -504,7 +504,7 @@ static void _LR_fill_coordw(double **elem, int ne, int *pist)
 
 int LR_flatten_space(PA_plot_request *pr)
    {int i, j;
-    REAL rv, xv, yv, zv;
+    double rv, xv, yv, zv;
     C_array *arr;
     PA_set_index *dmap;
     int n;
@@ -604,7 +604,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
         default :
 	     break;};
 
-    ne = SC_arrlen(elem[0])/sizeof(REAL);
+    ne = SC_arrlen(elem[0])/sizeof(double);
 
 /* build the set */
     range                 = FMAKE(PM_set, "LR_INT_PLOT:range");
@@ -616,9 +616,9 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
     range->max_index      = maxes;
     range->elements       = (byte *) elem;
     range->es_type        = SC_strsave("double *");
-    range->extrema        = (byte *) FMAKE_N(REAL, 2*nde,
+    range->extrema        = (byte *) FMAKE_N(double, 2*nde,
                                              "LR_INT_PLOT:extrema");
-    range->scales         = (byte *) FMAKE_N(REAL, nde,
+    range->scales         = (byte *) FMAKE_N(double, nde,
                                              "LR_INT_PLOT:scales");
 
     PM_find_extrema(range);
@@ -655,7 +655,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
 object *LR_var_plot(object *argl)
    {int color, style, id, space;
     int lcolor, lstyle;
-    REAL width, lwidth;
+    double width, lwidth;
     char *dev_name, *name, label[MAXLINE], dname[MAXLINE];
     object *obj, *sobj, *head, *gr, *val;
     C_array *arr;

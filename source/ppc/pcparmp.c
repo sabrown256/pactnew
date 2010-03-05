@@ -100,8 +100,8 @@ static long _PC_size_message_d(int sp, char *type, int tag)
 
 /* _PC_GLMN_MESSAGE_D - return the global minimum of some quantity */
 
-static REAL _PC_glmn_message_d(double vi)
-   {REAL vo;
+static double _PC_glmn_message_d(double vi)
+   {double vo;
 
     MPI_Allreduce(&vi, &vo, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 

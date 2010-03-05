@@ -189,7 +189,7 @@ struct s_PC_par_fnc
    {PROCESS *(*open_member)(char **argv, int *pnn);
     void (*close_member)(PROCESS *pp);
     long (*size_message)(int sp, char *type, int tag);
-    REAL (*glmn_message)(double vi);
+    double (*glmn_message)(double vi);
     long (*out)(void *vr, char *type, size_t ni, PROCESS *pp, int *filt);
     long (*in)(void *vr, char *type, size_t ni, PROCESS *pp, int *filt);
     long (*wait)(PROCESS *pp);};
