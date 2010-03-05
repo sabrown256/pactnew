@@ -26,7 +26,7 @@ int
  mesh_vectr,
  mesh_vectr_r;
 
-REAL
+double
  pc;
 
 static object

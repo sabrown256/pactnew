@@ -142,13 +142,13 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
    int fcyc, nfirst, nlast, n_dom;
    {int i, j, n_arrays, nptm;
     double *stripe;
-    REAL **crve;
+    double **crve;
     char type[10];
     long ind[3];
 
 /* allocate the data arrays */
     n_arrays = nlast - nfirst + 1 + n_dom;
-    crve     = FMAKE_N(REAL *, n_arrays, "_PA_T_WR_DATA:crve");
+    crve     = FMAKE_N(double *, n_arrays, "_PA_T_WR_DATA:crve");
     stripe   = FMAKE_N(double, n_arrays, "_PA_T_WR_DATA:stripe");
     if (sizeof(REAL) == sizeof(double))
        strcpy(type, "double");
@@ -159,7 +159,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
     nptm = last_cycle - first_cycle + 1;
 
     for (i = 0; i < n_arrays; i++)
-        crve[i] = FMAKE_N(REAL, nptm, "_PA_T_WR_DATA:crve[]");
+        crve[i] = FMAKE_N(double, nptm, "_PA_T_WR_DATA:crve[]");
 
 /* read the data in from the pp file */
     for (i = 0; i < nptm; i++)
@@ -186,7 +186,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
     ind[0] = 1L;
     ind[2] = 1L;
     for (i = 0; i < n_dom; i++)
-        {nptm   = SC_arrlen(crve[i])/SIZEOF(SC_REAL_S);
+        {nptm   = SC_arrlen(crve[i])/SIZEOF(SC_DOUBLE_S);
          ind[1] = nptm;
 
          snprintf(_PA.pp_title, MAXLINE, "td%d", i);
@@ -198,7 +198,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
     ind[0] = 1L;
     ind[2] = 1L;
     for (i = nfirst, j = n_dom; i <= nlast; i++, j++)
-        {nptm   = SC_arrlen(crve[j])/SIZEOF(SC_REAL_S);
+        {nptm   = SC_arrlen(crve[j])/SIZEOF(SC_DOUBLE_S);
          ind[1] = nptm;
 
          snprintf(_PA.pp_title, MAXLINE, "tn%d", i);

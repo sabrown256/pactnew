@@ -723,7 +723,7 @@ PP_make_set_1d(
     int nd;
     int max;
     int nde;
-    REAL *elem;
+    double *elem;
     char *kw_list[] = {"name", "type", "cp", "nd", "max", "nde", "elem", NULL};
     PM_set *result;
 
@@ -756,8 +756,8 @@ PP_make_ac_set(
     int cp;
     PM_mesh_topology *mt;
     int nde;
-    REAL *x;
-    REAL *y;
+    double *x;
+    double *y;
     PP_mesh_topologyObject *mtobj;
     char *kw_list[] = {"name", "type", "cp", "mt", "nde", "x", "y", NULL};
     PM_set *result;

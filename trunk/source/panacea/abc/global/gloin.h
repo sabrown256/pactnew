@@ -129,7 +129,7 @@ extern char
  *DOMAIN_MAP_S,
  *MESH_CURVE;
 
-extern REAL
+extern double
  mesh_botspace,
  mesh_gxmax,
  mesh_gxmin,

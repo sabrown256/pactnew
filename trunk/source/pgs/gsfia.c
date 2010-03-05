@@ -20,12 +20,14 @@
  */
 
 PG_view_attributes *PG_view_attributes_pointer(int vwatid)
-   {
+   {PG_view_attributes *rv;
 
     if ((vwatid < 0) || (vwatid >= _PG.view_attr_indx))
-       return(NULL);
+       rv = NULL;
+    else
+       rv = _PG.view_attr_list[vwatid];
 
-    return(_PG.view_attr_list[vwatid]);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -55,10 +57,10 @@ FIXNUM F77_FUNC(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
  */
 
 FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
-                                REAL *pat, F77_string patc)
+                                double *pat, F77_string patc)
    {int i, nc, nn, type, linecolor, txtcolor, prec;
-    REAL *attr;
-    REAL charspace, chupx, chupy, chpthx, chpthy;
+    double *attr;
+    double charspace, chupx, chupy, chpthx, chpthy;
     char *pc, bf[MAXLINE];
     PG_device *dev;
 
@@ -188,7 +190,7 @@ FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
 
 /* PGGAXD - get axis decades */
 
-FIXNUM F77_FUNC(pggaxd, PGGAXD)(REAL *pd)
+FIXNUM F77_FUNC(pggaxd, PGGAXD)(double *pd)
    {
 
     PG_get_axis_decades(*pd);
@@ -258,8 +260,8 @@ FIXNUM F77_FUNC(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
 
 /* PGCLRG - clear the specified region */
 
-FIXNUM F77_FUNC(pgclrg, PGCLRG)(FIXNUM *devid, REAL *pxn, REAL *pxx,
-                                REAL *pyn, REAL *pyx, FIXNUM *pad)
+FIXNUM F77_FUNC(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
+                                double *pyn, double *pyx, FIXNUM *pad)
    {int pd;
     FIXNUM rv;
     double ndc[PG_BOXSZ];
@@ -316,7 +318,7 @@ FIXNUM F77_FUNC(pgclvp, PGCLVP)(FIXNUM *devid)
 
 /* PGDDP2 - draw 2d disjoint polyline */
 
-FIXNUM F77_FUNC(pgddp2, PGDDP2)(FIXNUM *devid, REAL *px, REAL *py,
+FIXNUM F77_FUNC(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
                                 FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
    {int f;
     long n;
@@ -345,7 +347,7 @@ FIXNUM F77_FUNC(pgddp2, PGDDP2)(FIXNUM *devid, REAL *px, REAL *py,
 
 /* PGDPL2 - draw 2d polyline */
 
-FIXNUM F77_FUNC(pgdpl2, PGDPL2)(FIXNUM *devid, REAL *px, REAL *py,
+FIXNUM F77_FUNC(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
                                 FIXNUM *pn, FIXNUM *pc)
    {FIXNUM rv;
     double *t[2];
@@ -367,7 +369,7 @@ FIXNUM F77_FUNC(pgdpl2, PGDPL2)(FIXNUM *devid, REAL *px, REAL *py,
 
 /* PGDDP3 - draw 3d disjoint polyline */
 
-FIXNUM F77_FUNC(pgddp3, PGDDP3)(FIXNUM *devid, REAL *px, REAL *py, REAL *pz,
+FIXNUM F77_FUNC(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
                                 FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
    {int f;
     long n;
@@ -397,9 +399,9 @@ FIXNUM F77_FUNC(pgddp3, PGDDP3)(FIXNUM *devid, REAL *px, REAL *py, REAL *pz,
 
 /* PGDRAX - draw a single axis */
 
-FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, REAL *pxl, REAL *pyl,
-                                REAL *pxr, REAL *pyr, REAL *pt1, REAL *pt2,
-                                REAL *pv1, REAL *pv2, REAL *psc,
+FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
+                                double *pxr, double *pyr, double *pt1, double *pt2,
+                                double *pv1, double *pv2, double *psc,
                                 FIXNUM *pnc, F77_string format,
                                 FIXNUM *ptd, FIXNUM *ptt, FIXNUM *plt)
    {int td;
@@ -433,8 +435,8 @@ FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, REAL *pxl, REAL *pyl,
 
 /* PGDAX3 - draw a 3D axis set */
 
-FIXNUM F77_FUNC(pgdax3, PGDAX3)(FIXNUM *devid, REAL *pxl, REAL *pyl,
-                                REAL *pzl, FIXNUM *pnp)
+FIXNUM F77_FUNC(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
+                                double *pzl, FIXNUM *pnp)
    {FIXNUM rv;
     double *p[PG_SPACEDM];
     PG_device *dev;
@@ -457,7 +459,7 @@ FIXNUM F77_FUNC(pgdax3, PGDAX3)(FIXNUM *devid, REAL *pxl, REAL *pyl,
 /* PGDRMK - draw marker characters */
 
 FIXNUM F77_FUNC(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
-			        REAL *px, REAL *py, FIXNUM *pmrk)
+			        double *px, double *py, FIXNUM *pmrk)
    {int n, mrk;
     FIXNUM rv;
     double *r[PG_SPACEDM];
@@ -481,8 +483,8 @@ FIXNUM F77_FUNC(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
 
 /* PGDMRK - define a marker character */
 
-FIXNUM F77_FUNC(pgdmrk, PGDMRK)(FIXNUM *pn, REAL *px1, REAL *py1,
-                                REAL *px2, REAL *py2)
+FIXNUM F77_FUNC(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
+                                double *px2, double *py2)
    {int n;
     FIXNUM rv;
 
@@ -513,8 +515,8 @@ FIXNUM F77_FUNC(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
 
 /* PGDRBX - draw a box */
 
-FIXNUM F77_FUNC(pgdrbx, PGDRBX)(FIXNUM *devid, REAL *px1, REAL *px2,
-			        REAL *py1, REAL *py2)
+FIXNUM F77_FUNC(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
+			        double *py1, double *py2)
    {FIXNUM rv;
     double bx[PG_BOXSZ];
     PG_device *dev;
@@ -552,8 +554,8 @@ FIXNUM F77_FUNC(pgdrif, PGDRIF)(FIXNUM *devid)
 
 /* PGDRLN - draw a line between the specified points */
 
-FIXNUM F77_FUNC(pgdrln, PGDRLN)(FIXNUM *devid, REAL *px1, REAL *py1,
-				REAL *px2, REAL *py2)
+FIXNUM F77_FUNC(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
+				double *px2, double *py2)
    {FIXNUM rv;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     PG_device *dev;
@@ -575,9 +577,9 @@ FIXNUM F77_FUNC(pgdrln, PGDRLN)(FIXNUM *devid, REAL *px1, REAL *py1,
 
 /* PGDRPA - draw the current palette */
 
-FIXNUM F77_FUNC(pgdrpa, PGDRPA)(FIXNUM *devid, REAL *px1, REAL *py1,
-				REAL *px2, REAL *py2, REAL *pz1, REAL *pz2,
-				REAL *pw)
+FIXNUM F77_FUNC(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
+				double *px2, double *py2, double *pz1, double *pz2,
+				double *pw)
    {FIXNUM rv;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_device *dev;
@@ -602,9 +604,9 @@ FIXNUM F77_FUNC(pgdrpa, PGDRPA)(FIXNUM *devid, REAL *px1, REAL *py1,
 
 /* PGDRPP - draw the current palette */
 
-FIXNUM F77_FUNC(pgdrpp, PGDRPP)(FIXNUM *devid, REAL *px1, REAL *py1,
-				REAL *px2, REAL *py2, REAL *pz1, REAL *pz2,
-				REAL *pw, FIXNUM *pe)
+FIXNUM F77_FUNC(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
+				double *px2, double *py2, double *pz1, double *pz2,
+				double *pw, FIXNUM *pe)
    {FIXNUM rv;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_device *dev;
@@ -645,7 +647,7 @@ FIXNUM F77_FUNC(pgfnpl, PGFNPL)(FIXNUM *devid)
 
 /* PGFPLY - draw and fill the specified polygon with the specified color */
 
-FIXNUM F77_FUNC(pgfply, PGFPLY)(FIXNUM *devid, REAL *px, REAL *py,
+FIXNUM F77_FUNC(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
 			        FIXNUM *pn, FIXNUM *pc)
    {FIXNUM rv;
     double *r[2];
@@ -701,7 +703,7 @@ FIXNUM F77_FUNC(pggclp, PGGCLP)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGCPW - get the char path direction in WC */
 
-FIXNUM F77_FUNC(pggcpw, PGGCPW)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pggcpw, PGGCPW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -717,7 +719,7 @@ FIXNUM F77_FUNC(pggcpw, PGGCPW)(FIXNUM *devid, REAL *px, REAL *py)
 
 /* PGGCSS - get the char size in NDC */
 
-FIXNUM F77_FUNC(pggcss, PGGCSS)(FIXNUM *devid, REAL *pw, REAL *ph)
+FIXNUM F77_FUNC(pggcss, PGGCSS)(FIXNUM *devid, double *pw, double *ph)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -737,7 +739,7 @@ FIXNUM F77_FUNC(pggcss, PGGCSS)(FIXNUM *devid, REAL *pw, REAL *ph)
 
 /* PGGCSW - get the char size in WC */
 
-FIXNUM F77_FUNC(pggcsw, PGGCSW)(FIXNUM *devid, REAL *pw, REAL *ph)
+FIXNUM F77_FUNC(pggcsw, PGGCSW)(FIXNUM *devid, double *pw, double *ph)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -757,7 +759,7 @@ FIXNUM F77_FUNC(pggcsw, PGGCSW)(FIXNUM *devid, REAL *pw, REAL *ph)
 
 /* PGGCUW - get the char up direction in WC */
 
-FIXNUM F77_FUNC(pggcuw, PGGCUW)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pggcuw, PGGCUW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -773,7 +775,7 @@ FIXNUM F77_FUNC(pggcuw, PGGCUW)(FIXNUM *devid, REAL *px, REAL *py)
 
 /* PGGDPI - get the PostScript dots per inch for 8.5 x 11 page */
 
-FIXNUM F77_FUNC(pggdpi, PGGDPI)(REAL *dpi)
+FIXNUM F77_FUNC(pggdpi, PGGDPI)(double *dpi)
    {FIXNUM rv;
 
     PG_get_ps_dots_inch(*dpi);
@@ -860,7 +862,7 @@ FIXNUM F77_FUNC(pgglns, PGGLNS)(FIXNUM *devid, FIXNUM *ps)
 
 /* PGGLNW - get the line width */
 
-FIXNUM F77_FUNC(pgglnw, PGGLNW)(FIXNUM *devid, REAL *pw)
+FIXNUM F77_FUNC(pgglnw, PGGLNW)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -876,7 +878,7 @@ FIXNUM F77_FUNC(pgglnw, PGGLNW)(FIXNUM *devid, REAL *pw)
 
 /* PGGMKO - get the marker orientation */
 
-FIXNUM F77_FUNC(pggmko, PGGMKO)(FIXNUM *devid, REAL *pw)
+FIXNUM F77_FUNC(pggmko, PGGMKO)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -892,7 +894,7 @@ FIXNUM F77_FUNC(pggmko, PGGMKO)(FIXNUM *devid, REAL *pw)
 
 /* PGGMKS - get the marker scale */
 
-FIXNUM F77_FUNC(pggmks, PGGMKS)(FIXNUM *devid, REAL *ps)
+FIXNUM F77_FUNC(pggmks, PGGMKS)(FIXNUM *devid, double *ps)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1011,7 +1013,7 @@ FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 
 FIXNUM F77_FUNC(pggtes, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 				FIXNUM *pnc, F77_string s,
-			        REAL *pdx, REAL *pdy)
+			        double *pdx, double *pdy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     char ls[MAXLINE];
@@ -1038,8 +1040,8 @@ FIXNUM F77_FUNC(pggtes, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 
 /* PGGVWP - get the viewport */
 
-FIXNUM F77_FUNC(pggvwp, PGGVWP)(FIXNUM *devid, REAL *px1, REAL *px2,
-				REAL *py1, REAL *py2)
+FIXNUM F77_FUNC(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
+				double *py1, double *py2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
@@ -1061,8 +1063,8 @@ FIXNUM F77_FUNC(pggvwp, PGGVWP)(FIXNUM *devid, REAL *px1, REAL *px2,
 
 /* PGGWCS - get the world coordinate system */
 
-FIXNUM F77_FUNC(pggwcs, PGGWCS)(FIXNUM *devid, REAL *px1, REAL *px2,
-				REAL *py1, REAL *py2)
+FIXNUM F77_FUNC(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
+				double *py1, double *py2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -1129,8 +1131,8 @@ FIXNUM F77_FUNC(pgmkdv, PGMKDV)(FIXNUM *pncn, F77_string name,
 
 /* PGOPEN - open the specified PG_device */
 
-FIXNUM F77_FUNC(pgopen, PGOPEN)(FIXNUM *devid, REAL *pxf, REAL *pyf,
-				REAL *pdxf, REAL *pdyf)
+FIXNUM F77_FUNC(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
+				double *pdxf, double *pdyf)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1203,9 +1205,9 @@ FIXNUM F77_FUNC(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
 
 /* PGPLLN - low level line plot routine */
 
-FIXNUM F77_FUNC(pgplln, PGPLLN)(FIXNUM *devid, REAL *px, REAL *py,
+FIXNUM F77_FUNC(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
 			        FIXNUM *pn, FIXNUM *ppty, FIXNUM *paxt,
-				FIXNUM *pcol, REAL *pwid,
+				FIXNUM *pcol, double *pwid,
 			        FIXNUM *psty, FIXNUM *psca, FIXNUM *pmrk,
 				FIXNUM *psta, FIXNUM *pl)
    {int axt, sty, sca, mrk, clr, sta;
@@ -1242,7 +1244,7 @@ FIXNUM F77_FUNC(pgplln, PGPLLN)(FIXNUM *devid, REAL *px, REAL *py,
 /* PGPTOS - convert from PC to NDC */
 
 FIXNUM F77_FUNC(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
-			        REAL *px, REAL *py)
+			        double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -1440,9 +1442,9 @@ FIXNUM F77_FUNC(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
 
 /* PGSAXD - set axis decades */
 
-FIXNUM F77_FUNC(pgsaxd, PGSAXD)(REAL *pd)
+FIXNUM F77_FUNC(pgsaxd, PGSAXD)(double *pd)
    {FIXNUM rv;
-    REAL d;
+    double d;
 
     d = *pd;
 
@@ -1530,7 +1532,7 @@ FIXNUM F77_FUNC(pgsclp, PGSCLP)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSCPW - set the char path direction in WC */
 
-FIXNUM F77_FUNC(pgscpw, PGSCPW)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pgscpw, PGSCPW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1546,7 +1548,7 @@ FIXNUM F77_FUNC(pgscpw, PGSCPW)(FIXNUM *devid, REAL *px, REAL *py)
 
 /* PGSCUW - set the char up direction in WC */
 
-FIXNUM F77_FUNC(pgscuw, PGSCUW)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pgscuw, PGSCUW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1562,7 +1564,7 @@ FIXNUM F77_FUNC(pgscuw, PGSCUW)(FIXNUM *devid, REAL *px, REAL *py)
 
 /* PGSDPI - set the PostScript dots per inch for 8.5 x 11 page */
 
-FIXNUM F77_FUNC(pgsdpi, PGSDPI)(REAL *dpi)
+FIXNUM F77_FUNC(pgsdpi, PGSDPI)(double *dpi)
    {FIXNUM rv;
 
     PG_set_ps_dots_inch(*dpi);
@@ -1576,10 +1578,10 @@ FIXNUM F77_FUNC(pgsdpi, PGSDPI)(REAL *dpi)
 
 /* PGSELC - select a color from the n-dimensional palette */
 
-FIXNUM F77_FUNC(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, REAL *av,
-				REAL *an, REAL *ax)
+FIXNUM F77_FUNC(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
+				double *an, double *ax)
    {FIXNUM rv;
-    REAL extr[2];
+    double extr[2];
     PG_device *dev;
 
     extr[0] = *an;
@@ -1678,7 +1680,7 @@ FIXNUM F77_FUNC(pgslns, PGSLNS)(FIXNUM *devid, FIXNUM *ps)
 
 /* PGSLNW - set the line width */
 
-FIXNUM F77_FUNC(pgslnw, PGSLNW)(FIXNUM *devid, REAL *pw)
+FIXNUM F77_FUNC(pgslnw, PGSLNW)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1694,7 +1696,7 @@ FIXNUM F77_FUNC(pgslnw, PGSLNW)(FIXNUM *devid, REAL *pw)
 
 /* PGSMKO - set the marker orientation */
 
-FIXNUM F77_FUNC(pgsmko, PGSMKO)(FIXNUM *devid, REAL *pw)
+FIXNUM F77_FUNC(pgsmko, PGSMKO)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1710,7 +1712,7 @@ FIXNUM F77_FUNC(pgsmko, PGSMKO)(FIXNUM *devid, REAL *pw)
 
 /* PGSMKS - set the marker scale */
 
-FIXNUM F77_FUNC(pgsmks, PGSMKS)(FIXNUM *devid, REAL *ps)
+FIXNUM F77_FUNC(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1759,7 +1761,7 @@ FIXNUM F77_FUNC(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSTOP - convert from NDC to PC */
 
-FIXNUM F77_FUNC(pgstop, PGSTOP)(FIXNUM *devid, REAL *px, REAL *py,
+FIXNUM F77_FUNC(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
 			        FIXNUM *pix, FIXNUM *piy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
@@ -1782,7 +1784,7 @@ FIXNUM F77_FUNC(pgstop, PGSTOP)(FIXNUM *devid, REAL *px, REAL *py,
 
 /* PGSTOW - convert from NDC to WC */
 
-FIXNUM F77_FUNC(pgstow, PGSTOW)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pgstow, PGSTOW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -1896,8 +1898,8 @@ FIXNUM F77_FUNC(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
 
 /* PGSVWP - set the viewport */
 
-FIXNUM F77_FUNC(pgsvwp, PGSVWP)(FIXNUM *devid, REAL *px1, REAL *px2,
-				REAL *py1, REAL *py2)
+FIXNUM F77_FUNC(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
+				double *py1, double *py2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
@@ -1919,7 +1921,7 @@ FIXNUM F77_FUNC(pgsvwp, PGSVWP)(FIXNUM *devid, REAL *px1, REAL *px2,
 
 /* PGSVPS - set viewport position */
 
-FIXNUM F77_FUNC(pgsvps, PGSVPS)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pgsvps, PGSVPS)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1936,7 +1938,7 @@ FIXNUM F77_FUNC(pgsvps, PGSVPS)(FIXNUM *devid, REAL *px, REAL *py)
 
 /* PGSVSH - set viewport shape */
 
-FIXNUM F77_FUNC(pgsvsh, PGSVSH)(FIXNUM *devid, REAL *pw, REAL *ph, REAL *pa)
+FIXNUM F77_FUNC(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *pa)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1953,8 +1955,8 @@ FIXNUM F77_FUNC(pgsvsh, PGSVSH)(FIXNUM *devid, REAL *pw, REAL *ph, REAL *pa)
 
 /* PGSWCS - set the world coordinate system */
 
-FIXNUM F77_FUNC(pgswcs, PGSWCS)(FIXNUM *devid, REAL *px1, REAL *px2,
-				REAL *py1, REAL *py2)
+FIXNUM F77_FUNC(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
+				double *py1, double *py2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -2008,7 +2010,7 @@ FIXNUM F77_FUNC(pgupvs, PGUPVS)(FIXNUM *devid)
 
 /* PGWRCL - write label centered wrt x */
 
-FIXNUM F77_FUNC(pgwrcl, PGWRCL)(FIXNUM *devid, REAL *psy,
+FIXNUM F77_FUNC(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
 				FIXNUM *pnc, F77_string label)
    {FIXNUM rv;
     char llabel[MAXLINE];
@@ -2049,7 +2051,7 @@ FIXNUM F77_FUNC(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, F77_string name)
  *        - at the specified screen coordinate in WC
  */
 
-FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, REAL *px, REAL *py,
+FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
 				FIXNUM *pnc, F77_string msg)
    {FIXNUM rv;
     double x, y;
@@ -2074,7 +2076,7 @@ FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, REAL *px, REAL *py,
 
 /* PGWTOS - convert from WC to NDC */
 
-FIXNUM F77_FUNC(pgwtos, PGWTOS)(FIXNUM *devid, REAL *px, REAL *py)
+FIXNUM F77_FUNC(pgwtos, PGWTOS)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -2096,7 +2098,7 @@ FIXNUM F77_FUNC(pgwtos, PGWTOS)(FIXNUM *devid, REAL *px, REAL *py)
 
 /* PGSVA - set the view angle */
 
-FIXNUM F77_FUNC(pgsva, PGSVA)(FIXNUM *devid, REAL *pt, REAL *pp, REAL *pc)
+FIXNUM F77_FUNC(pgsva, PGSVA)(FIXNUM *devid, double *pt, double *pp, double *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2113,7 +2115,7 @@ FIXNUM F77_FUNC(pgsva, PGSVA)(FIXNUM *devid, REAL *pt, REAL *pp, REAL *pc)
 
 /* PGSLA - set the lighting angle */
 
-FIXNUM F77_FUNC(pgsla, PGSLA)(FIXNUM *devid, REAL *pt, REAL *pp)
+FIXNUM F77_FUNC(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2131,7 +2133,7 @@ FIXNUM F77_FUNC(pgsla, PGSLA)(FIXNUM *devid, REAL *pt, REAL *pp)
 /* PGGVA - get the view angle */
 
 FIXNUM F77_FUNC(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
-			      REAL *pt, REAL *pp, REAL *pc)
+			      double *pt, double *pp, double *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2148,7 +2150,7 @@ FIXNUM F77_FUNC(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
 
 /* PGGLA - get the lighting angle */
 
-FIXNUM F77_FUNC(pggla, PGGLA)(FIXNUM *devid, FIXNUM *pcnv, REAL *pt, REAL *pp)
+FIXNUM F77_FUNC(pggla, PGGLA)(FIXNUM *devid, FIXNUM *pcnv, double *pt, double *pp)
    {FIXNUM rv;
     PG_device *dev;
 

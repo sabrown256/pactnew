@@ -360,7 +360,7 @@ PP_set_tp_init(PP_setObject *self, PyObject *args, PyObject *kwds)
     int *maxes;
     void *elem;
     PM_field *opers;
-    REAL *metric;
+    double *metric;
     char *symtype;
     void *sym;
     char *toptype;

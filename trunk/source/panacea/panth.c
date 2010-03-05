@@ -707,7 +707,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
    {int i, j, k, n_max, nc, np;
     long ind[3];
     char bf[MAXLINE], name2[MAXLINE], tag[MAXLINE], type[MAXLINE], *pl, *nm, *s;
-    REAL ext[2];
+    double ext[2];
     syment *ep;
     dimdes *dp;
     PDBfile *puf, *th;
@@ -853,12 +853,12 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
  *                      - the curve arrays which are of type double
  */
 
-static int _PA_transpose_stripe(PDBfile *file, REAL **crve, char *stripe,
+static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
 			        char *type, char *mix, int na, int nrd)
    {int j, k, nv, ns, rv;
     defstr *dp;
     memdes *desc;
-    REAL *data, *pd;
+    double *data, *pd;
 
     dp = PD_inquire_type(file, type);
     ns = 0;
@@ -904,7 +904,7 @@ static int _PA_transpose_stripe(PDBfile *file, REAL **crve, char *stripe,
     else
        {data = NULL;
         ns   = (nrd - na)*nv;
-        CONVERT(SC_REAL_S, (void **) &data, mix, stripe, ns, FALSE);
+        CONVERT(SC_DOUBLE_S, (void **) &data, mix, stripe, ns, FALSE);
 
         pd = data;
         for (k = na; k < nrd; k++)
@@ -954,7 +954,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
     long ns, na, nrd, nitems, offs, ind[3];
     off_t addr;
     char bf[MAXLINE], rname[MAXLINE], type[MAXLINE], *rtyp, *tmix;
-    REAL **crve;
+    double **crve;
     syment *ep, *en;
     dimdes *dp;
     PDBfile *pduf;
@@ -1000,7 +1000,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
     stripe = _PD_alloc_entry(th, rtyp, ns);
 
 /* allocate the curve arrays */
-    crve = FMAKE_N(REAL *, nv, "_PA_PROC_REC:crve");
+    crve = FMAKE_N(double *, nv, "_PA_PROC_REC:crve");
     if (sizeof(REAL) == sizeof(double))
        strcpy(type, "double");
     else
@@ -1008,7 +1008,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 
     nptm = _PA.ndpt[recn].number;
     for (i = 0; i < nv; i++)
-        crve[i] = FMAKE_N(REAL, nptm, "_PA_PROC_REC:crve[]");
+        crve[i] = FMAKE_N(double, nptm, "_PA_PROC_REC:crve[]");
 
     na  = 0L;
     nrd = 0L;
@@ -1071,7 +1071,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
 		      int ord, int flag)
    {int i, j, n, ret;
     int n_min, n_inc;
-    REAL *data, ext[2];
+    double *data, ext[2];
     char bf[MAXLINE], type[MAXLINE];
     PDBfile *th;
 
@@ -1112,7 +1112,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
 
     for (i = 0; i < _PA.ndom; i++)
 	{PD_read(_PA.uf[i], "npts0", &n);
-	 data = FMAKE_N(REAL, n, "PA_TH_TRANS_FILES:data");
+	 data = FMAKE_N(double, n, "PA_TH_TRANS_FILES:data");
 	 PD_read(_PA.uf[i], "xval0", data);
 	 PM_maxmin(data, ext, ext + 1, n);
 	 PD_write(_PA.uf[i], "xext0", type, ext);
@@ -1198,7 +1198,7 @@ int PA_merge_files(char *base, int n, char **files, int ncpf)
    {int i, ics, ix, ict, nc, npts, err;
     PDBfile *fpt, *fps;
     char s[MAXLINE], **names;
-    REAL xmin, xmax, ymin, ymax, *px, *py;
+    double xmin, xmax, ymin, ymax, *px, *py;
     
     if (n <= 0)
        {snprintf(PD_err, MAXLINE, "ERROR: NO FILES SPECIFIED - PA_MERGE_FILES");

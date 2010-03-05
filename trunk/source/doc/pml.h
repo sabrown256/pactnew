@@ -272,11 +272,11 @@ main()
 
 /* build the domain set */
 
-    domain = PM_make_set("{x, y}", SC_REAL_S, FALSE, 2, kmax, lmax, 2, x, y);
+    domain = PM_make_set("{x, y}", SC_DOUBLE_S, FALSE, 2, kmax, lmax, 2, x, y);
 
 /* build the range set */
 
-    range = PM_make_set("{u, v}", SC_REAL_S, FALSE, 2, kmax, lmax, 2, u, v);
+    range = PM_make_set("{u, v}", SC_DOUBLE_S, FALSE, 2, kmax, lmax, 2, u, v);
 
                       .
                       .

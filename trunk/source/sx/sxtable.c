@@ -452,7 +452,7 @@ static PM_set *_SX_lr_zc_domain(char *name)
     maxes[0] = SX_current_table->ncol + 1;
     maxes[1] = SX_current_table->nrow + 1;
 
-    set = PM_make_lr_index_domain(name, SC_REAL_S, nd, nd,
+    set = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nd,
 				  maxes, NULL, NULL);
 
     elements = (void **) set->elements;
@@ -533,7 +533,7 @@ static PM_set *_SX_table_set(object *specs)
 	     elem[i] = SX_extract_vector(SX_current_table, start, step, npts);
 	     ne = npts;};
 
-	set = PM_mk_set(name, SC_REAL_S, FALSE, ne, nd, nde,
+	set = PM_mk_set(name, SC_DOUBLE_S, FALSE, ne, nd, nde,
 			maxes, elem, NULL,
 			NULL, NULL, NULL,
 			NULL, NULL, NULL, NULL, NULL);};

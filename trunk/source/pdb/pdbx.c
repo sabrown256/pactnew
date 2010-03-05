@@ -24,8 +24,8 @@ char
  */
 
 attribute *PD_mk_attribute(char *at, char *type)
-   {attribute *attr;
-    int i;
+   {int i;
+    attribute *attr;
 
     attr = FMAKE(attribute, "PD_MK_ATTRIBUTE:attr");
 
@@ -187,9 +187,9 @@ void PD_rel_attr_table(PDBfile *file)
  */
 
 int PD_def_attribute(PDBfile *file, char *at, char *type)
-   {attribute *attr;
-    char atype[MAXLINE], path[MAXLINE];
-    
+   {char atype[MAXLINE], path[MAXLINE];
+    attribute *attr;
+
     if (SC_hasharr_lookup(file->chart, "attribute") == NULL)
        PD_def_attr_str(file);
   
@@ -315,11 +315,11 @@ int PD_set_attribute(PDBfile *file, char *vr, char *at, void *vl)
  */
 
 void *PD_get_attribute(PDBfile *file, char *vr, char *at)
-   {void *vl, **data;
+   {char fat[MAXLINE], favl[MAXLINE];
+    char *vt;
+    void *vl, **data;
     attribute *attr;
     attribute_value *avl;
-    char fat[MAXLINE], favl[MAXLINE];
-    char *vt;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -414,8 +414,8 @@ int PD_def_pdb_types(PDBfile *file)
  */
 
 int PD_def_hash_types(PDBfile *file, int flag)
-   {defstr *dp;
-    int err;
+   {int err;
+    defstr *dp;
 
     err = TRUE;
 
@@ -462,8 +462,8 @@ int PD_def_hash_types(PDBfile *file, int flag)
  */
 
 int PD_def_attr_str(PDBfile *file)
-   {defstr *dp;
-    int err;
+   {int err;
+    defstr *dp;
 
 /* hash table types */
     err = PD_def_hash_types(file, 3);
@@ -668,12 +668,12 @@ int _PD_contains_indirections(hasharr *tab, char *type)
  *                   - fill the x and y arrays depending on value of flag
  */
 
-int PD_read_pdb_curve(PDBfile *fp, char *name, REAL **pxp, REAL **pyp,
+int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
 		      int *pn, char *label,
-		      REAL *pxmn, REAL *pxmx, REAL *pymn, REAL *pymx,
+		      double *pxmn, double *pxmx, double *pymn, double *pymx,
 		      PD_curve_io flag)
    {int n, rv;
-    REAL *x[PG_SPACEDM];
+    double *x[PG_SPACEDM];
     double extr[2];
     char *s, *t;
     char desc[MAXLINE], prefix[MAXLINE];
@@ -759,7 +759,7 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, REAL **pxp, REAL **pyp,
 
 /* get the x array if requested or forced by lack of extrema */
     if ((flag == X_AND_Y) || (flag == X_ONLY))
-       {x[0] = FMAKE_N(REAL, n, "PD_READ_PDB_CURVE:x[0]");
+       {x[0] = FMAKE_N(double, n, "PD_READ_PDB_CURVE:x[0]");
         if (x[0] == NULL)
            {PD_error("INSUFFICIENT MEMORY - PD_READ_PDB_CURVE", PD_GENERIC);
             return(FALSE);};
@@ -785,7 +785,7 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, REAL **pxp, REAL **pyp,
 
 /* get the y array if requested or forced by lack of extrema */
     if ((flag == X_AND_Y) || (flag == Y_ONLY))
-       {x[1] = FMAKE_N(REAL, n, "PD_READ_PDB_CURVE:x[1]");
+       {x[1] = FMAKE_N(double, n, "PD_READ_PDB_CURVE:x[1]");
         if (x[1] == NULL)
            {PD_error("INSUFFICIENT MEMORY - PD_READ_PDB_CURVE", PD_GENERIC);
             rv = FALSE;}
@@ -824,10 +824,10 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, REAL **pxp, REAL **pyp,
  */
 
 int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
-		     REAL *px, REAL *py, int icurve)
-   {char name[MAXLINE], desc[MAXLINE], *dp, *lp;
-    REAL *x[PG_SPACEDM], *xext, *yext;
-    int i, *np;
+		     double *px, double *py, int icurve)
+   {int i, *np;
+    char name[MAXLINE], desc[MAXLINE], *dp, *lp;
+    double *x[PG_SPACEDM], *xext, *yext;
 
 /* make a curve entry consisting of:
  *    the name of the variable with the label;
@@ -849,13 +849,13 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
     lp  = SC_strsavef(labl, "char*:PD_wrt_pdb_curve");
     np  = FMAKE(int, "PD_WRT_PDB_CURVE:np");
     *np = n;
-    x[0]  = FMAKE_N(REAL, n, "PD_WRT_PDB_CURVE:x[0]");
-    x[1]  = FMAKE_N(REAL, n, "PD_WRT_PDB_CURVE:x[1]");
+    x[0]  = FMAKE_N(double, n, "PD_WRT_PDB_CURVE:x[0]");
+    x[1]  = FMAKE_N(double, n, "PD_WRT_PDB_CURVE:x[1]");
     for (i = 0; i < n; i++)
         {x[0][i] = px[i];
          x[1][i] = py[i];};
-    xext = FMAKE_N(REAL, 2, "PD_WRT_PDB_CURVE:xext");
-    yext = FMAKE_N(REAL, 2, "PD_WRT_PDB_CURVE:yext");
+    xext = FMAKE_N(double, 2, "PD_WRT_PDB_CURVE:xext");
+    yext = FMAKE_N(double, 2, "PD_WRT_PDB_CURVE:yext");
     PM_maxmin(x[0], &xext[0], &xext[1], n);
     PM_maxmin(x[1], &yext[0], &yext[1], n);
 
@@ -937,10 +937,10 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
  */
 
 int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
-		       REAL *py, int icurve)
-   {char name[MAXLINE], desc[MAXLINE];
-    REAL extr[2];
-    int i, len;
+		       double *py, int icurve)
+   {int i, len;
+    char name[MAXLINE], desc[MAXLINE];
+    double extr[2];
 
 /* NOTE: see comment about virtual internal files in PD_WRT_PDB_CURVE */
 
@@ -1262,8 +1262,8 @@ int PD_mesh_struct(PDBfile *file)
  */
 
 int PD_def_mapping(PDBfile *fp)
-   {defstr *ret;
-    int err;
+   {int err;
+    defstr *ret;
 
     ONCE_SAFE(TRUE, NULL)
 

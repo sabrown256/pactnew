@@ -571,9 +571,9 @@ char *PA_get_field(char *s, char *t, int optp)
  *                  - does alias expansion
  */
 
-REAL PA_get_num_field(char *s, char *t, int optp)
+double PA_get_num_field(char *s, char *t, int optp)
    {char *token;
-    REAL val;
+    double val;
 
     token = PA_get_field(s, t, optp);
 
@@ -718,7 +718,7 @@ void PA_pshand(PA_command *cp)
            ((double *) cp->vr)[i] = d;
 
         else if (cp->type == SC_REAL_I)
-           ((REAL *) cp->vr)[i] = (REAL) d;
+           ((double *) cp->vr)[i] = d;
 
         else if ((cp->type == SC_CHAR_I) ||
                  (cp->type == SC_STRING_I))
@@ -844,7 +844,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
    {int n, ret;
     char *ps;
     char fnc[MAXLINE], s[MAXLINE], arg[MAXLINE];
-    REAL vc;
+    double vc;
     SC_array *val;
 
     strcpy(s, t);
@@ -899,7 +899,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
 PA_set_spec *_PA_proc_set_spec(char *s, PA_set_spec *lst)
    {PA_set_spec *spec;
     char t[MAXLINE], *token;
-    REAL vc;
+    double vc;
 
     strcpy(t, s);
 
