@@ -882,6 +882,7 @@ int PG_clip_box(double *bx, double *wc, int *lgf)
     x1[2] = bx[4];
     x2[2] = bx[5];
 
+    rv = 0;
     PG_clip_line(&rv, x1, x2, wc, lgf);
 
     bx[0] = x1[0];

@@ -701,7 +701,7 @@ double PM_polygon_area(PM_polygon *py)
     y1 = y[0];
 
     ac = 0.0;
-    for (i = 2; i < np; i++)
+    for (i = 1; i < np; i++)
         {x2 = x[i];
 	 y2 = y[i];
 	 x3 = x[i+1];

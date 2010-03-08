@@ -210,16 +210,13 @@ PM_polygon *PM_copy_polygon(PM_polygon *py)
 /* PM_FREE_POLYGON - release a set of coordinate arrays */
 
 void PM_free_polygon(PM_polygon *py)
-   {int id, nd;
-    double **x;
+   {int nd;
 
     if (py != NULL)
        {nd = py->nd;
-	x  = py->x;
-	for (id = 0; id < nd; id++)
-	    SC_free(x[id]);
 
-	SFREE(x);
+	PM_free_vectors(nd, py->x);
+
 	SFREE(py);};
 
     return;}

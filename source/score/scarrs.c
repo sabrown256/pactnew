@@ -870,14 +870,11 @@ void *SC_array_pop(SC_array *a)
  */
 
 static void _SC_array_swap(SC_array *a, long il, long ir)
-   {long n, nx;
+   {long n;
     void *xl, *xr, *t;
 
     if (il != ir)
-       {n  = a->n;
-	nx = a->nx;
-	if (n >= nx-1)
-	   _SC_array_grow(a, -1);
+       {n  = SC_array_get_n(a);
 
 	xl = SC_array_get(a, il);
 	xr = SC_array_get(a, ir);
@@ -888,7 +885,8 @@ static void _SC_array_swap(SC_array *a, long il, long ir)
 	SC_array_set(a, il, xr);
 	SC_array_set(a, ir, t);
 
-	SC_array_set(a, n+1, NULL);};
+	SC_array_set(a, n+1, NULL);
+        SC_array_set_n(a, n);};
 
     return;}
 
@@ -932,13 +930,21 @@ static int _SC_array_sort(SC_array *a, PFIntBin pred, long il, long ir)
 
 int SC_array_sort(SC_array *a, PFIntBin pred)
    {int rv;
-    long ne;
+    long n, nx;
 
     rv = FALSE;
     if (a != NULL)
-       {ne = SC_array_get_n(a);
-	rv = _SC_array_sort(a, pred, 0, ne-1);
-        SC_array_set_n(a, ne);};
+       {n  = a->n;
+	nx = a->nx;
+
+/* make sure there is room for a temporary element to
+ * be used in swaps
+ */
+	if (n >= nx-1)
+	   _SC_array_grow(a, -1);
+
+	rv = _SC_array_sort(a, pred, 0, n-1);
+        SC_array_set_n(a, n);};
 
     return(rv);}
 

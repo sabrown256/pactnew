@@ -77,10 +77,8 @@ void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
 
 /* get MXCSR mask to find out if DAZ supported */
 	   {unsigned char pstate[528], *state;
-	    int i;
 
-	    for (state = pstate, i = 0 ; i < 528 ; i++)
-	        *state++ = '\0';
+	    memset(pstate, 0, 528);
 
 /* get a 16-byte aligned state buffer for fxsave */
 	    state = pstate + 15;

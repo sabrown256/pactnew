@@ -107,7 +107,7 @@ static int _SX_setup_clabels(char *label, int nc, int linelen)
 /*--------------------------------------------------------------------------*/
 
 /* SX_FIND_TEXT_TABLE - find the specified table in the given file
- *                    - return TRUE if successfTR, otherwise return FALSE
+ *                    - return TRUE if successful, otherwise return FALSE
  *
  * table-row :  line of one or more tokens, all numeric
  *                or
@@ -300,7 +300,8 @@ static object *_SXI_read_text_table(object *argl)
 
     memset(label, 0, linelen);
 
-    if (!SX_find_text_table(fp, n, linelen, linein, &fn, &nr, &nc, nl, &addrt, nlabel, &addrl))
+    if (!SX_find_text_table(fp, n, linelen, linein, &fn, &nr, &nc,
+			    nl, &addrt, nlabel, &addrl))
        {SFREE(linein);
         SFREE(label);
         SS_error("REQUESTED TABLE NOT FOUND - _SXI_READ_TEXT_TABLE", argl);}
@@ -504,7 +505,7 @@ static PM_set *_SX_table_set(object *specs)
 
     else
        {nd    = SS_length(dims);
-	maxes = FMAKE_N(int, nd, "_SX_table_set:maxes");
+	maxes = FMAKE_N(int, nd, "_SX_TABLE_SET:maxes");
 	for (i = 0; dims != SS_null; dims = SS_cdr(dims), i++)
 	    {SS_args(dims,
 		     SC_INTEGER_I, &dv,
@@ -513,7 +514,7 @@ static PM_set *_SX_table_set(object *specs)
 
 	comps = SS_cddr(specs);
 	nde   = SS_length(comps);
-	elem  = FMAKE_N(double *, nde, "_SX_table_set:elem");
+	elem  = FMAKE_N(double *, nde, "_SX_TABLE_SET:elem");
 	ne    = 0;
 
 	for (i = 0; comps != SS_null; comps = SS_cdr(comps), i++)
@@ -528,7 +529,7 @@ static PM_set *_SX_table_set(object *specs)
 		     0);
 
 	     if ((i > 0) && (npts != ne))
-	        SS_error("BAD SPECIFICATION - _SX_table_set", sp);
+	        SS_error("BAD SPECIFICATION - _SX_TABLE_SET", sp);
 
 	     elem[i] = SX_extract_vector(SX_current_table, start, step, npts);
 	     ne = npts;};
