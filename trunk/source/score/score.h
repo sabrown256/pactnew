@@ -270,6 +270,26 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_REMOVE_ELEMENTS - remove the NR element starting at Ith
+ *                    - from array A which is N long
+ *                    - N is decremented by NR and all the elements
+ *                    - are copied down
+ *                    - NOTE: not the most efficient thing to do but
+ *                    - it works for any type of array
+ */
+
+#define SC_REMOVE_ELEMENTS(_a, _n, _i, _nr)                                 \
+   {long _j, _l, _m, _k;                                                    \
+    _k = _nr;                                                               \
+    _m = ((_n) -= _k);                                                      \
+    _l = (_i);                                                              \
+    for (_j = _l; _j < _m; _j++)                                            \
+        (_a)[_j] = (_a)[_j+_k];                                             \
+    memset(&(_a[_j]), 0, _k*sizeof(_a[_j]));}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_REVERSE_LIST - generic linked list reverser macro */
 
 #define SC_REVERSE_LIST(_t, var, member)                                    \

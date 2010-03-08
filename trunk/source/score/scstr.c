@@ -937,7 +937,8 @@ char *SC_firsttokq(char *s, char *delim, char *quotes)
         if (*t == '\0')
            return(NULL);
 
-    strcpy(s, t);
+    if (t != s)
+       memmove(s, t, strlen(t)+1);
         
     len = strlen(s);
     k   = strcspn(s, quotes);
