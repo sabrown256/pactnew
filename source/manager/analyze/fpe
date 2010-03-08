@@ -23,7 +23,7 @@ set fpe = ""
 
 if (-e $RootInc/fenv.h) then
    setenv HaveANSIFenv TRUE
-   set fpe = ( $fpe "ANSI C9X" )
+   set fpe = ( $fpe "ANSI C99" )
 else
    setenv HaveANSIFenv FALSE
    set fpe = ( $fpe "old" )

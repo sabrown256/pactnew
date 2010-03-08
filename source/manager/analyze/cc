@@ -390,8 +390,9 @@ SetParent NEED_ALT_LARGE_FILE
 
 source $AnaDir/line
 source $AnaDir/pragma
-source $AnaDir/valist
 source $AnaDir/inline
+source $AnaDir/valist
+source $AnaDir/complex
 source $AnaDir/headers
 source $AnaDir/glibc
 source $AnaDir/size
