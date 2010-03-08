@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+# COMPLEX - analyze the handling of C99 complex
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+setenv HaveCOMPLEX TRUE
+
+cat << EOF >! $Tmp.c
+#include <complex.h>
+int main(int c, char **v)
+   {
+#ifdef complex
+    return(0);
+#else
+    return(1);
+#endif
+    }
+EOF
+
+   flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c $Tmp.c -o $Tmp.o
+   if ($status == 0) then
+      NoteD $ALog "      has C99 complex support"
+   else
+      setenv HaveCOMPLEX FALSE
+      NoteD $ALog "      no C99 complex support"
+   endif
+endif
+
+rm -f $Tmp $Tmp.c $Tmp.o
+
+# export the result
+SetParent HaveCOMPLEX
+
+#exit(0)

@@ -47,6 +47,7 @@ set help          = FALSE
 set DEBUG         = FALSE
 set DateFile      = $RepoDir/.import-date
 set TagFile       = $RepoDir/.import-tag
+set TagID         = ( `/bin/date '+%Y-%m-%d %H:%M'` )
 set ImportingDir  = $cwd
 set SCSRepository = ""
 set SRCDate       = ""
@@ -734,7 +735,7 @@ UPDATE:
       flog $Log ($SCSUp -A >&! $TmpFile)
    else
       flog $Log cd pact
-      flog $Log ($SCSUp >&! ../$TmpFile)
+      flog $Log ($SCSUp -A >&! ../$TmpFile)
       flog $Log cd ..
    endif
 
@@ -794,7 +795,7 @@ COMMIT:
    Note $Log "   Current Directory:    $cwd"
    Note $Log ""
 
-   flog $Log $SCSCom -m "***** Import from $CodeDate *****"
+   flog $Log $SCSCom -m "+++++ Import from $CodeDate +++++"
    set ErrStat = $status
 
    if ($ErrStat != 0) then
