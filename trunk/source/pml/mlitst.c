@@ -223,8 +223,8 @@ int test_3(void)
     r = setup_2d_points(nl);
 
     grid       = FMAKE(PM_lagrangian_mesh, "COMPUTE_F:grid");
-    grid->x    = f[0];
-    grid->y    = f[1];
+    grid->x    = x[0];
+    grid->y    = x[1];
     grid->kmax = nx;
     grid->lmax = ny;
 
