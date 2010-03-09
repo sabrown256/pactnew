@@ -109,7 +109,7 @@ complex *PM_uniform_complex_y(int no, double *xo,
 	yto = PM_uniform_real_y(no, xo, ni, xi, yti);
 
 	for (i = 0; i < no; i++)
-	    PM_REAL_C(yo[i]) = yto[i];
+	    yo[i] = PM_COMPLEX(yto[i], PM_IMAGINARY_C(yo[i]));
 
 	SFREE(yto);
 
@@ -120,7 +120,7 @@ complex *PM_uniform_complex_y(int no, double *xo,
 	yto = PM_uniform_real_y(no, xo, ni, xi, yti);
 
 	for (i = 0; i < no; i++)
-	    PM_IMAGINARY_C(yo[i]) = yto[i];
+	    yo[i] = PM_COMPLEX(PM_REAL_C(yo[i]), yto[i]);
 
 	SFREE(yto);
 	SFREE(yti);};

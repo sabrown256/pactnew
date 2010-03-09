@@ -742,7 +742,8 @@ void PM_smooth_filter(complex *z, int n, double pts)
     mlt = (1.0 - 0.25*pts*pts);
     if (mlt < 0.0)
        mlt = 0.0;
-    PM_IMAGINARY_C(z[nh]) *= mlt;
+
+    z[nh] = PM_COMPLEX(PM_REAL_C(z[nh]), mlt*PM_IMAGINARY_C(z[nh]));
 
     return;}
 

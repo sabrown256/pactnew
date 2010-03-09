@@ -58,6 +58,7 @@
 #include <unistd.h>
 #include "scconfig.h"
 #include "score.h"
+#undef I                 /* C99 pure imaginary */
 #ifndef PCC
 #include <limits.h>
 #endif
