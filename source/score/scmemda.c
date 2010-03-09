@@ -679,7 +679,7 @@ static long _SC_flchk(void)
 
 static long _SC_rgchk(void)
    {int bad, ok;
-    long i, j, nr;
+    long i, nr;
     void *p;
     mem_descriptor *md;
 
