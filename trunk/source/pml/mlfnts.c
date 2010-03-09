@@ -230,6 +230,10 @@ static int test_real_val(void)
     ok &= real_complex_test("tanh", tanh,    PM_ctanh, -2.0, 2.0, 10.0);
     ok &= real_complex_test("coth", PM_coth, PM_ccoth, -2.1, 2.0, 500.0);
 
+    ok &= real_complex_test("asinh", asinh,  PM_casinh, -4.0, 4.0, 10.0);
+    ok &= real_complex_test("acosh", acosh,  PM_cacosh,  1.0, 4.0, 10.0);
+    ok &= real_complex_test("atanh", atanh,  PM_catanh, -0.9, 0.9, 10.0);
+
     _PM_use_pml_bessel = TRUE;
 
     ok &= real_complex_test("i0", PM_i0, PM_ci0, 0.0001, 10.0, 1.0e1);

@@ -11,6 +11,12 @@
 #include "pml_int.h"
 #include "scope_math.h"
 
+/* the implementation here has superior accuracy to
+ * several vendor libraries - so the no-brainer is
+ * to continue to use these
+#define USE_C99_FUNCTIONS
+ */
+
 #define MEXP_CMP(_cx, _sx, _ey, _eyi, _c)                                   \
     {double _x, _y;                                                         \
      _x   = PM_REAL_C(_c);                                                  \
@@ -58,10 +64,17 @@
      d     = 1.0/(br*brovu + bi*biovu);                                     \
      _rc   = PM_COMPLEX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
 
+#ifdef HAVE_ANSI_C9X_COMPLEX
+complex
+ CPHUGE = HUGE,
+ CMHUGE = -HUGE,
+ Czero  = 0.0;
+#else
 complex
  CPHUGE = {HUGE, 0.0},
  CMHUGE = {-HUGE, 0.0},
  Czero  = {0.0, 0.0};
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -133,7 +146,15 @@ complex PM_crandom(complex c)
 /* PM_CABS - complex abs function */
 
 double PM_cabs(complex x)
-   {double xr, xi, ratio, modulus;
+   {double modulus;
+
+#ifdef USE_C99_FUNCTIONS
+
+    modulus = cabs(x);
+
+#else
+
+    double xr, xi, ratio;
 
     xr = fabs(PM_REAL_C(x));
     xi = fabs(PM_IMAGINARY_C(x));
@@ -147,6 +168,8 @@ double PM_cabs(complex x)
        {ratio = PM_REAL_C(x)/PM_IMAGINARY_C(x);
 	modulus = xi*sqrt( 1.0 + ratio*ratio );}
 
+#endif
+
     return(modulus);}
 
 /*--------------------------------------------------------------------------*/
@@ -157,7 +180,16 @@ double PM_cabs(complex x)
 complex PM_cconjugate(complex c)
    {
 
-    PM_IMAGINARY_C(c) *= -1.0;
+#ifdef USE_C99_FUNCTIONS
+
+    c = conj(c);
+
+#else
+
+    c = PM_REAL_C(c) + -1.0*PM_IMAGINARY_C(c);
+/*    PM_IMAGINARY_C(c) *= -1.0; */
+
+#endif
 
     return(c);}
 
@@ -167,12 +199,22 @@ complex PM_cconjugate(complex c)
 /* PM_CARG - complex arg function */
 
 double PM_carg(complex c)
-   {double r, x, y;
+   {double r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = carg(c);
+
+#else
+
+    double x, y;
 
     x = PM_REAL_C(c);
     y = PM_IMAGINARY_C(c);
 
     r = PM_atan(x, y);
+
+#endif
 
     return(r);}
 
@@ -242,9 +284,18 @@ double PM_cround(complex c)
 
 complex PM_cexp(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = cexp(c);
+
+#else
+
     double xl, yl, al, cl, sl;
 
     MEXP(r, c);
+
+#endif
 
     return(r);}
 
@@ -255,6 +306,13 @@ complex PM_cexp(complex c)
 
 complex PM_cln(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = clog(c);
+
+#else
+
     double x, y, a, b;
 
     a = PM_REAL_C(c);
@@ -264,6 +322,8 @@ complex PM_cln(complex c)
 
     else
        {MLOG(r, c);};
+
+#endif
 
     return(r);}
 
@@ -293,7 +353,15 @@ complex PM_clog(complex c)
 complex PM_csqr(complex c)
    {complex r;
 
+#ifdef USE_C99_FUNCTIONS
+
+    r = c*c;
+
+#else
+
     r = PM_TIMES_CC(c, c);
+
+#endif
 
     return(r);}
 
@@ -304,6 +372,13 @@ complex PM_csqr(complex c)
 
 complex PM_csqrt(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = csqrt(c);
+
+#else
+
     double x, y, a, b, cb;
 
     x = PM_REAL_C(c);
@@ -317,6 +392,7 @@ complex PM_csqrt(complex c)
 	y = a*sqrt(0.5*(1.0 - cb));};
 
     r = PM_COMPLEX(x, y);
+#endif
 
     return(r);}
 
@@ -327,11 +403,20 @@ complex PM_csqrt(complex c)
 
 complex PM_csin(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = csin(c);
+
+#else
+
     double cx, sx, ey, eyi;
 
     MEXP_CMP(cx, sx, ey, eyi, c);
 
     r = PM_COMPLEX(0.5*sx*(ey + eyi), 0.5*cx*(ey - eyi));
+
+#endif
 
     return(r);}
 
@@ -342,11 +427,20 @@ complex PM_csin(complex c)
 
 complex PM_ccos(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = ccos(c);
+
+#else
+
     double cx, sx, ey, eyi;
 
     MEXP_CMP(cx, sx, ey, eyi, c);
 
     r = PM_COMPLEX(0.5*cx*(ey + eyi), 0.5*sx*(eyi - ey));
+
+#endif
 
     return(r);}
 
@@ -356,7 +450,15 @@ complex PM_ccos(complex c)
 /* PM_CTAN - complex tan function */
 
 complex PM_ctan(complex c)
-   {complex r, sc, cc;
+   {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = ctan(c);
+
+#else
+
+    complex sc, cc;
     double cx, sx, ey, eyi;
 
     MEXP_CMP(cx, sx, ey, eyi, c);
@@ -365,6 +467,8 @@ complex PM_ctan(complex c)
     cc = PM_COMPLEX(cx*(ey + eyi), sx*(eyi - ey));
 
     MDIV(r, sc, cc);
+
+#endif
 
     return(r);}
 
@@ -393,11 +497,20 @@ complex PM_ccot(complex c)
 
 complex PM_csinh(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = csinh(c);
+
+#else
+
     double ex, exi, cy, sy;
 
     MEXP_CMPH(ex, exi, cy, sy, c);
 
     r = PM_COMPLEX(0.5*(ex - exi)*cy, 0.5*(ex + exi)*sy);
+
+#endif
 
     return(r);}
 
@@ -408,11 +521,20 @@ complex PM_csinh(complex c)
 
 complex PM_ccosh(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = ccosh(c);
+
+#else
+
     double ex, exi, cy, sy;
 
     MEXP_CMPH(ex, exi, cy, sy, c);
 
     r = PM_COMPLEX(0.5*(ex + exi)*cy, 0.5*(ex - exi)*sy);
+
+#endif
 
     return(r);}
 
@@ -422,7 +544,15 @@ complex PM_ccosh(complex c)
 /* PM_CTANH - complex tanh function */
 
 complex PM_ctanh(complex c)
-   {complex r, sc, cc;
+   {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = ctanh(c);
+
+#else
+
+    complex sc, cc;
     double ex, exi, cy, sy;
 
     MEXP_CMPH(ex, exi, cy, sy, c);
@@ -431,6 +561,8 @@ complex PM_ctanh(complex c)
     cc = PM_COMPLEX((ex + exi)*cy, (ex - exi)*sy);
 
     MDIV(r, sc, cc);
+
+#endif
 
     return(r);}
 
@@ -455,10 +587,19 @@ complex PM_ccoth(complex c)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CASIN - complex asin function */
+/* PM_CASIN - complex asin function
+ *          - asin(z) = -i*ln(i*z + sqrt(1 - z*z))
+ */
 
 complex PM_casin(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = casin(c);
+
+#else
+
     double a, b, x, y, xp, xm, pq, as, ac, rx;
 
     x = PM_REAL_C(c);
@@ -483,15 +624,26 @@ complex PM_casin(complex c)
 
     r = PM_COMPLEX(a, b);
 
+#endif
+
     return(r);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CACOS - complex acos function */
+/* PM_CACOS - complex acos function
+ *          - acos(z) = PI/2 + i*ln(i*z + sqrt(1 - z*z))
+ */
 
 complex PM_cacos(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = cacos(c);
+
+#else
+
     double a, b, x, y, xp, xm, pq, as, ac, rx;
 
     x = PM_REAL_C(c);
@@ -516,6 +668,7 @@ complex PM_cacos(complex c)
     b = (y > 0.0) ? -ac : ac;
 
     r = PM_COMPLEX(a, b);
+#endif
 
     return(r);}
 
@@ -523,6 +676,7 @@ complex PM_cacos(complex c)
 /*--------------------------------------------------------------------------*/
 
 /* PM_CATAN - complex atan function
+ *          - atan(z) = i*(ln(1 - i*z) - ln(1 + i*z))/2
  *          - NOTE: the volatile qualifier on the local doubles
  *          - are necessary because of problems with optimization
  *          - on the opteron
@@ -530,6 +684,13 @@ complex PM_cacos(complex c)
 
 complex PM_catan(complex c)
    {complex r;
+
+#ifdef USE_C99_FUNCTIONS
+
+    r = catan(c);
+
+#else
+
     double x, y, xs, yp, ym, a;
     volatile double b;
 
@@ -544,6 +705,110 @@ complex PM_catan(complex c)
     b = 0.25*log((yp*yp + xs)/(ym*ym + xs));
 
     r = PM_COMPLEX(a, b);
+
+#endif
+
+    return(r);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CASINH - complex asinh function
+ *           - asinh(z)	= ln(z + sqrt(z*z + 1))	
+ */
+
+complex PM_casinh(complex c)
+   {complex r;
+
+#ifdef HAVE_ANSI_C9X_COMPLEX
+
+    r = casinh(c);
+
+#else
+
+    double x, y;
+
+    x = PM_REAL_C(c);
+    y = PM_IMAGINARY_C(c);
+
+    r = PM_TIMES_CC(c, c);
+    r = PM_PLUS_RC(1.0, r);
+    r = PM_csqrt(r);
+    r = PM_PLUS_CC(c, r);
+    r = PM_clog(r);
+
+#endif
+
+    return(r);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CACOSH - complex acosh function
+ *           - acosh(z)	= ln(z + sqrt(z - 1)*sqrt(z + 1))	
+ */
+
+complex PM_cacosh(complex c)
+   {complex r;
+
+#ifdef HAVE_ANSI_C9X_COMPLEX
+
+    r = cacosh(c);
+
+#else
+
+    double x, y;
+    complex z1, z2;
+
+    x = PM_REAL_C(c);
+    y = PM_IMAGINARY_C(c);
+
+    z1 = PM_COMPLEX(1.0+x, y);
+    z2 = PM_COMPLEX(1.0-x, -y);
+
+    z1 = PM_csqrt(z1);
+    z2 = PM_csqrt(z2);
+
+    r = PM_TIMES_CC(z1, z2);
+    r = PM_PLUS_CC(c, r);
+    r = PM_clog(r);
+
+#endif
+
+    return(r);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CATANH - complex atanh function
+ *           - atanh(z)	= (ln(1 + z) - ln(1 - z))/2
+ */
+
+complex PM_catanh(complex c)
+   {complex r;
+
+#ifdef HAVE_ANSI_C9X_COMPLEX
+
+    r = catanh(c);
+
+#else
+
+    double x, y;
+    complex z1, z2;
+
+    x = PM_REAL_C(c);
+    y = PM_IMAGINARY_C(c);
+
+    z1 = PM_COMPLEX(1.0+x, y);
+    z2 = PM_COMPLEX(1.0-x, -y);
+
+    z1 = PM_log(z1);
+    z2 = PM_log(z2);
+
+    r = PM_MINUS_CC(z1, z2);
+    r = PM_TIMES_RC(0.5, r);
+
+#endif
 
     return(r);}
 
@@ -1052,7 +1317,15 @@ complex PM_ck1(complex x)
 complex PM_cadd(complex a, complex b)
    {complex c;
 
+#ifdef USE_C99_FUNCTIONS
+
+    c = a + b;
+
+#else
+
     c = PM_PLUS_CC(a, b);
+
+#endif
 
     return(c);}
 
@@ -1064,7 +1337,15 @@ complex PM_cadd(complex a, complex b)
 complex PM_csub(complex a, complex b)
    {complex c;
 
+#ifdef USE_C99_FUNCTIONS
+
+    c = a - b;
+
+#else
+
     c = PM_MINUS_CC(a, b);
+
+#endif
 
     return(c);}
 
@@ -1076,7 +1357,15 @@ complex PM_csub(complex a, complex b)
 complex PM_cmlt(complex a, complex b)
    {complex c;
 
+#ifdef USE_C99_FUNCTIONS
+
+    c = a*b;
+
+#else
+
     c = PM_TIMES_CC(a, b);
+
+#endif
 
     return(c);}
 
@@ -1086,7 +1375,15 @@ complex PM_cmlt(complex a, complex b)
 /* PM_CDIV - return a / b */
 
 complex PM_cdiv(complex a, complex b)
-   {double br, bi, ratio, den, x, y; complex c;
+   {complex c;
+
+#ifdef USE_C99_FUNCTIONS
+
+    c = a/b;
+
+#else
+
+    double br, bi, ratio, den, x, y; 
 
     br = fabs(PM_REAL_C(b));
     bi = fabs(PM_IMAGINARY_C(b));
@@ -1104,6 +1401,8 @@ complex PM_cdiv(complex a, complex b)
 
     c = PM_COMPLEX(x, y);
 
+#endif
+
     return(c);}
 
 /*--------------------------------------------------------------------------*/
@@ -1112,11 +1411,21 @@ complex PM_cdiv(complex a, complex b)
 /* PM_CPOW - return a^b */
 
 complex PM_cpow(complex a, complex b)
-   {complex c, l, x;
+   {complex c;
+
+#ifdef USE_C99_FUNCTIONS
+
+    c = cpow(a, b);
+
+#else
+
+    complex l, x;
 
     l = PM_cln(a);
     x = PM_cmlt(b, l);
     c = PM_cexp(x);
+
+#endif
 
     return(c);}
 
@@ -1127,6 +1436,13 @@ complex PM_cpow(complex a, complex b)
 
 int PM_cequal(complex a, complex b)
    {int eq;
+
+#ifdef USE_C99_FUNCTIONS
+
+    eq = a == b;
+
+#else
+
     double ar, ai, br, bi;
 
     ar = PM_REAL_C(a);
@@ -1136,6 +1452,8 @@ int PM_cequal(complex a, complex b)
     bi = PM_IMAGINARY_C(b);
 
     eq = ((ar == br) && (ai == bi));
+
+#endif
 
     return(eq);}
 

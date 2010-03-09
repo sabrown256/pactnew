@@ -16,6 +16,47 @@
 
 /*--------------------------------------------------------------------------*/
 
+/*                               C99 COMPLEX                                */
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_ANSI_C9X_COMPLEX
+
+#include <complex.h>
+#undef complex
+#define complex      double _Complex 
+
+/*--------------------------------------------------------------------------*/
+
+/*                       STANDARD PROCEDURAL MACROS                         */
+
+/*--------------------------------------------------------------------------*/
+
+#define PM_COMPLEX(_b, _c)            ((_b) + (_c)*I)
+#define PM_REAL_C(_c)                 creal(_c)
+#define PM_IMAGINARY_C(_c)            cimag(_c)
+#define PM_COMPLEX_CONJUGATE(_c)      conj(_c)
+#define PM_PLUS_CC(_b, _c)            ((_b) + (_c))
+#define PM_PLUS_RC(_b, _c)            ((_b) + (_c))
+#define PM_MINUS_CC(_b, _c)           ((_b) - (_c))
+#define PM_TIMES_CC(_b, _c)           ((_b) * (_c))
+#define PM_TIMES_RC(_b, _c)           ((_b) * (_c))
+#define PM_TIMES_IC(_b, _c)           ((_b) * (_c))
+#define PM_DIVIDE_CC(_b, _c)          ((_b) / (_c))
+#define PM_MODULUS_C(_c)              cabs(_c)
+#define PM_COMPLEX_SWAP(_b, _c)       SC_SWAP_VALUE(complex, _b, _c)
+
+#if 0
+extern double complex
+ cproj(double complex); 	/* complex projection[A] */
+#endif
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
 /*                               TYPEDEFS                                   */
 
 /*--------------------------------------------------------------------------*/
@@ -167,6 +208,10 @@ extern complex
 
 /*--------------------------------------------------------------------------*/
 
+#endif
+
+/*--------------------------------------------------------------------------*/
+
 /*                    STANDARD FUNCTION DECLARATIONS                        */
 
 /*--------------------------------------------------------------------------*/
@@ -206,6 +251,9 @@ extern complex
  PM_casin(complex c),
  PM_cacos(complex c),
  PM_catan(complex c),
+ PM_casinh(complex c),
+ PM_cacosh(complex c),
+ PM_catanh(complex c),
  PM_crandom(complex c),
  PM_cconjugate(complex c),
  PM_crecip(complex c),
@@ -236,8 +284,8 @@ extern double
  PM_cround(complex c);
 
 extern int
-  PM_cequal(complex x, complex y),
-  PM_cclose(complex x, complex y, double tol);
+ PM_cequal(complex x, complex y),
+ PM_cclose(complex x, complex y, double tol);
 
 
 /* MLSFNC.C declarations */

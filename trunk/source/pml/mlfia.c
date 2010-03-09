@@ -85,8 +85,7 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
 
     incy = FMAKE_N(complex, n, "PMCFFT:incy");
     for (i = 0; i < n; i++)
-        {PM_REAL_C(incy[i])      = inyr[i];
-         PM_IMAGINARY_C(incy[i]) = inyi[i];};
+        incy[i] = PM_COMPLEX(inyr[i], inyi[i]);
 
     if (!PM_fft_sc_complex_data(&cy, &rx, inx, incy, n,
 				xmn, xmx, flag, ordr))
