@@ -279,21 +279,6 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 	if ((tag != NULL) && (strcmp(_SC.ecbf, tag) == 0))
 	   continue;
 
-#if 1
-/* diagnostic to detect unexpected message structures
- * NOTE: this may be removed after 10/08
- */
-	{int i, ne;
-
-	 for (ne = 0, i = 0; i < ns; i++)
-	     ne += (_SC.ecbf[i] == '\n');
-# ifdef HAVE_MPI
-	 if ((ne != 1) || (_SC.ecbf[ns-1] != '\n'))
-	    printf("SC_EXEC_JOB unexpected %d/%d: %s\n", ne, suppress, _SC.ecbf);
-# endif
-        };
-#endif
-
 /* remove suppress-on tags and if there was one turn suppression on */
 	no = _SC_squeeze_tag(_SC.ecbf, nb, "+SC_SUPPRESS_UNTAGGED_ON+\n");
         if (no > 0)

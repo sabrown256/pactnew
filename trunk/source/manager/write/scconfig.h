@@ -235,6 +235,9 @@ source $ldir/env-csh
 
     if (("$LD_DPLib" != "") || ("$CC_DPInc" != "")) then
        Note $STDOUT "#define HAVE_MPI"
+       if ($MPIGoodIO == FALSE) then
+          Note $STDOUT "#define HAVE_BAD_MPI_IO"
+       endif
        if ($MPIAllStdin == TRUE) then
           Note $STDOUT "#define HAVE_MPI_STDIN_ALL"
        else

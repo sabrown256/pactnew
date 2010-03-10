@@ -78,7 +78,7 @@ int main(int c, char **v)
 
     flags = 2;
 
-#ifdef HAVE_MPI
+#ifdef HAVE_BAD_MPI_IO
     flags |= line_mode;
 #endif
 
