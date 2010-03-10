@@ -11,8 +11,8 @@ WARN_PATTERN = "WARNING: (E) (W) (I)"
 ERR_PATTERN  = "Error: (S)"
 
 setenv OBJECT_MODE ${Bits}
-#XArch = -qarch=ppc
-#XArch = ""
+setenv MPIGoodIO   TRUE
+
 XArch = -qarch=450
 
 Tool CC {

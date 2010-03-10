@@ -926,14 +926,17 @@ int SC_mpi_fputs(const char *s, FILE *fp)
    {int nc;
     char *p;
 
-#ifdef HAVE_MPI
+#ifdef HAVE_BAD_MPI_IO
 
     if (fp == stdout)
        p = _SC_mpi_proc_str(s, TRUE);
     else
        p = SC_strsavef((char *) s, "char*:SC_MPI_FPUTS:s");
+
 #else
+
     p = SC_strsavef((char *) s, "char*:SC_MPI_FPUTS:s");
+
 #endif
 
     nc = SAFE_FPUTS(p, fp);
@@ -997,6 +1000,8 @@ int SC_mpi_ftn_snprintf(char *bf, int nc, char *fmt, ...)
 
 int SC_mpi_io_suppress(int on)
    {int rv;
+
+#ifdef HAVE_BAD_MPI_IO
     char *s;
 
     rv = SC_mpi_suppress(on);
@@ -1007,6 +1012,9 @@ int SC_mpi_io_suppress(int on)
        s = "+SC_SUPPRESS_UNTAGGED_OFF+\n";
 
     SAFE_FPUTS(s, stdout);
+#else
+    rv = FALSE;
+#endif
 
     return(rv);}
 
@@ -1024,7 +1032,7 @@ int SC_mpi_suppress(int st)
 
     if (_SC.suppress == -1)
 
-#ifdef HAVE_MPI
+#ifdef HAVE_BAD_MPI_IO
        _SC.suppress = (getenv("SC_MPI_SUPPRESS_UNTAGGED") != NULL);
 #else
        _SC.suppress = FALSE;

@@ -18,6 +18,7 @@ if ($?Log == 1) then
 endif
 
 SafeEnv ParCommSupport  PARC
+SafeEnv MPIGoodIO       FALSE
 SafeEnv MPIAllStdin     FALSE
 SafeEnv HAVE_OPENMPI    FALSE
 SafeEnv LibMPI          ""
@@ -174,6 +175,7 @@ setenv ParComm "$lParComm"
 # export the results
 SetParent ParCommSupport
 SetParent MPIAllStdin
+SetParent MPIGoodIO
 SetParent HAVE_OPENMPI
 SetParent MPILib
 SetParent LibMPI

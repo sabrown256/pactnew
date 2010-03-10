@@ -64,18 +64,21 @@
      d     = 1.0/(br*brovu + bi*biovu);                                     \
      _rc   = PM_COMPLEX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
 
+/*
 #ifdef HAVE_ANSI_C9X_COMPLEX
 complex
  CPHUGE = HUGE,
  CMHUGE = -HUGE,
  Czero  = 0.0;
 #else
+*/
 complex
  CPHUGE = {HUGE, 0.0},
  CMHUGE = {-HUGE, 0.0},
  Czero  = {0.0, 0.0};
+/*
 #endif
-
+*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -186,8 +189,7 @@ complex PM_cconjugate(complex c)
 
 #else
 
-    c = PM_REAL_C(c) + -1.0*PM_IMAGINARY_C(c);
-/*    PM_IMAGINARY_C(c) *= -1.0; */
+    c = PM_COMPLEX(PM_REAL_C(c), -1.0*PM_IMAGINARY_C(c));
 
 #endif
 
@@ -720,22 +722,17 @@ complex PM_catan(complex c)
 complex PM_casinh(complex c)
    {complex r;
 
-#ifdef HAVE_ANSI_C9X_COMPLEX
+#ifdef USE_C99_FUNCTIONS
 
     r = casinh(c);
 
 #else
 
-    double x, y;
-
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
-
     r = PM_TIMES_CC(c, c);
     r = PM_PLUS_RC(1.0, r);
     r = PM_csqrt(r);
     r = PM_PLUS_CC(c, r);
-    r = PM_clog(r);
+    r = PM_cln(r);
 
 #endif
 
@@ -751,27 +748,23 @@ complex PM_casinh(complex c)
 complex PM_cacosh(complex c)
    {complex r;
 
-#ifdef HAVE_ANSI_C9X_COMPLEX
+#ifdef USE_C99_FUNCTIONS
 
     r = cacosh(c);
 
 #else
 
-    double x, y;
     complex z1, z2;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
-
-    z1 = PM_COMPLEX(1.0+x, y);
-    z2 = PM_COMPLEX(1.0-x, -y);
+    z1 = PM_PLUS_RC(1.0, c);
+    z2 = PM_PLUS_RC(-1.0, c);
 
     z1 = PM_csqrt(z1);
     z2 = PM_csqrt(z2);
 
     r = PM_TIMES_CC(z1, z2);
     r = PM_PLUS_CC(c, r);
-    r = PM_clog(r);
+    r = PM_cln(r);
 
 #endif
 
@@ -787,23 +780,20 @@ complex PM_cacosh(complex c)
 complex PM_catanh(complex c)
    {complex r;
 
-#ifdef HAVE_ANSI_C9X_COMPLEX
+#ifdef USE_C99_FUNCTIONS
 
     r = catanh(c);
 
 #else
 
-    double x, y;
     complex z1, z2;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    z1 = PM_PLUS_RC(1.0, c);
+    z2 = PM_PLUS_RC(-1.0, c);
+    z2 = PM_TIMES_RC(-1.0, z2);
 
-    z1 = PM_COMPLEX(1.0+x, y);
-    z2 = PM_COMPLEX(1.0-x, -y);
-
-    z1 = PM_log(z1);
-    z2 = PM_log(z2);
+    z1 = PM_cln(z1);
+    z2 = PM_cln(z2);
 
     r = PM_MINUS_CC(z1, z2);
     r = PM_TIMES_RC(0.5, r);
