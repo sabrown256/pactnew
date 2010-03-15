@@ -11,7 +11,9 @@
 set Me = $0
 source $Me:h/common
 
-setenv HaveCOMPLEX TRUE
+SafeEnv HaveCOMPLEX TRUE
+
+if ($HaveCOMPLEX == TRUE) then
 
 cat << EOF >! $Tmp.c
 #include <complex.h>
@@ -32,9 +34,11 @@ EOF
       setenv HaveCOMPLEX FALSE
       NoteD $ALog "      no C99 complex support"
    endif
-endif
 
-rm -f $Tmp $Tmp.c $Tmp.o
+   rm -f $Tmp $Tmp.c $Tmp.o
+else
+   NoteD $ALog "      no C99 complex support (by request)"
+endif
 
 # export the result
 SetParent HaveCOMPLEX

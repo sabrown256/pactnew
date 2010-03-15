@@ -186,6 +186,12 @@ source $ldir/env-csh
     end
     Note $STDOUT ""
 
+    if (($HostOS == AIX) && ($HaveCOMPLEX == TRUE)) then
+       Note $STDOUT '/* in lieu of xlc option: -qlanglvl=c99complexheader */'
+       Note $STDOUT '# define __C99_COMPLEX_HEADER__'
+       Note $STDOUT ''
+    endif
+
     if (($HaveVACOPY != TRUE) && ($HaveVALIST == FALSE)) then
        Note $STDOUT "#define NO_VA_LIST"
     endif

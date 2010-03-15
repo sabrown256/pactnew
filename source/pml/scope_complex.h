@@ -20,8 +20,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#if 0
-/* #ifdef HAVE_ANSI_C9X_COMPLEX */
+#ifdef HAVE_ANSI_C9X_COMPLEX
 
 #include <complex.h>
 #undef complex

@@ -234,9 +234,9 @@ static int _H5_get_alignment(PDBfile *file, char *type)
  */
 
 static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid) 
-   {int order;
-    short precision;
+   {short precision;
     char *typename;
+    PD_byte_order order;
     defstr *struct_entry;
     hdf_state *hst;
 
