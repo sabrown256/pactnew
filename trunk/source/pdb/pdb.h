@@ -215,7 +215,8 @@ enum e_PD_major_op
     PD_CLOSE,
     PD_TRACE,
     PD_PRINT,
-    PD_GENERIC};
+    PD_GENERIC,
+    PD_UNINIT};
 
 typedef enum e_PD_major_op PD_major_op;
 

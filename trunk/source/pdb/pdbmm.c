@@ -61,7 +61,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->chart             = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 	file->host_chart        = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 	file->attrtab           = NULL;
-	file->mode              = 0;            /* read only, write only, read-write ? */
+	file->mode              = PD_UNINIT;
 	file->file_mode         = SC_strsavef(md, "char*:_PD_MK_PDB:file_mode");
 
 	file->maximum_size     = _PD.maxfsize;                   /* family info */
