@@ -117,9 +117,11 @@
 			((io-function file "image-in") file x)))))
 
 	  ((pm-mapping? x)
-	   (pg-make-graph (pm-mapping-domain x)
-			  (pm-mapping-range x)
-			  (pm-mapping-name x)))
+	   (let* ((cent (list-ref (pg-get-attrs-mapping x "CENTERING" #f) 0)))
+	         (pg-make-graph (pm-mapping-domain x)
+				(pm-mapping-range x)
+				(pm-mapping-name x)
+				cent)))
 
 	  ((pg-graph? x)
 	   x)

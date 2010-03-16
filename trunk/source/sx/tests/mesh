@@ -24,7 +24,7 @@ source ../../tests/common
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/pdbvmesh.scm >& pdbvmesh.res)
+      flog $Log ($PDBView -l $RootDir/sx/tests/pdbvmesh.scm >& pdbvmesh.res)
       set xstatus = $status
    else
       ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvmesh.scm |& \

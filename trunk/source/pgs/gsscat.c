@@ -325,7 +325,7 @@ PG_picture_desc *PG_setup_picture_scatter(PG_device *dev, PG_graph *data,
 	SFREE(rdex);
 
 /* GOTCHA: this isn't the only time we want 3d axes */
-	if ((pd->va[0] != HUGE) || (nde == 3))
+	if (((data->f->range != NULL) && (pd->va[0] != HUGE)) || (nde == 3))
 	   pd->ax_type = CARTESIAN_3D;
 
 /* set scatter plot attribute values */

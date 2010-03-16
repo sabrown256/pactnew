@@ -275,7 +275,7 @@ int test_3(void)
 /* TEST_4 - test 2d multi-quadric */
 
 int test_4(void)
-   {int i, j, l, nd, nl, nx, ny, rv, ok;
+   {int i, j, l, nd, nf, nl, nx, ny, rv, ok;
     int mxo[2];
     double inl;
     double prm[3];
@@ -286,13 +286,13 @@ int test_4(void)
     nx = 10;
     ny = 15;
     nl = 20;
+    nf = 1;
 
     inl = 1.0/(nl - 1.0);
 
-    f = PM_make_vectors(2, nl);
+    f = PM_make_vectors(nf, nl);
     for (l = 0; l < nl; l++)
-        {f[0][l] = l*inl;
-	 f[1][l] = (nl - 1.0 - l)*inl;};
+        f[0][l] = l*inl;
 
 /* setup the interpolation points */
     nl = 20;
@@ -306,7 +306,7 @@ int test_4(void)
     prm[0] = 0.0;
     prm[1] = 0.0;
     prm[2] = 0.0;
-    ok = PM_interp_mesh_mq(2, 2, nl, r, f, mxo, xo, fo, prm);
+    ok = PM_interp_mesh_mq(nd, nf, nl, r, f, mxo, xo, fo, prm);
 
 /* print the results */
     out = fopen("test_4.out", "w");
@@ -315,26 +315,26 @@ int test_4(void)
         rv = FALSE;}
 
     else
-       {fprintf(out, "#   I        Rx           Ry            Fx           Fy\n");
+       {fprintf(out, "#   I        Rx           Ry            Fx\n");
 	for (l = 0; l < nl; l++)
-	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e %12.6e\n",
-		    l, r[0][l], r[1][l], f[0][l], f[1][l]);
+	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e\n",
+		    l, r[0][l], r[1][l], f[0][l]);
 
-	fprintf(out, "#   I    J         X            Y             Fx           Fy\n");
+	fprintf(out, "#   I    J         X            Y             Fx\n");
 	for (j = 0; j < ny; j++)
 	    for (i = 0; i < nx; i++)
 	        {l = j*nx + i;
-		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e %12.6e\n",
-			 i, j, xo[0][i], xo[1][j], fo[0][l], fo[1][l]);};
+		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e\n",
+			 i, j, xo[0][i], xo[1][j], fo[0][l]);};
 
 	fclose(out);
 
 	rv = TRUE;};
 
-    PM_free_vectors(2, f);
-    PM_free_vectors(2, r);
-    PM_free_vectors(2, xo);
-    PM_free_vectors(2, fo);
+    PM_free_vectors(nf, f);
+    PM_free_vectors(nd, r);
+    PM_free_vectors(nd, xo);
+    PM_free_vectors(nd, fo);
 
     return(rv);}
 
@@ -347,7 +347,7 @@ int test_4(void)
 /* TEST_5 - test 2d multi-quadric */
 
 int test_5(void)
-   {int i, j, l, nd, nl, nx, ny, rv, ok;
+   {int i, j, l, nd, nf, nl, nx, ny, rv, ok;
     int mxo[2];
     double inl;
     double prm[3];
@@ -358,13 +358,13 @@ int test_5(void)
     nx = 10;
     ny = 15;
     nl = 20;
+    nf = 1;
 
     inl = 1.0/(nl - 1.0);
 
-    f = PM_make_vectors(2, nl);
+    f = PM_make_vectors(nf, nl);
     for (l = 0; l < nl; l++)
-        {f[0][l] = l*inl;
-	 f[1][l] = (nl - 1.0 - l)*inl;};
+        f[0][l] = l*inl;
 
 /* setup the interpolation points */
     nl = 20;
@@ -378,7 +378,7 @@ int test_5(void)
     prm[0] = 0.2;
     prm[1] = 2.0;
     prm[2] = 2.0;
-    ok = PM_interp_mesh_id(2, 2, nl, r, f, mxo, xo, fo, prm);
+    ok = PM_interp_mesh_id(nd, nf, nl, r, f, mxo, xo, fo, prm);
 
 /* print the results */
     out = fopen("test_5.out", "w");
@@ -387,26 +387,26 @@ int test_5(void)
         rv = FALSE;}
 
     else
-       {fprintf(out, "#   I        Rx           Ry            Fx           Fy\n");
+       {fprintf(out, "#   I        Rx           Ry            Fx\n");
 	for (l = 0; l < nl; l++)
-	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e %12.6e\n",
-		    l, r[0][l], r[1][l], f[0][l], f[1][l]);
+	    fprintf(out, " %4d   %12.6e %12.6e   %12.6e\n",
+		    l, r[0][l], r[1][l], f[0][l]);
 
-	fprintf(out, "#   I    J         X            Y             Fx           Fy\n");
+	fprintf(out, "#   I    J         X            Y             Fx\n");
 	for (j = 0; j < ny; j++)
 	    for (i = 0; i < nx; i++)
 	        {l = j*nx + i;
-		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e %12.6e\n",
-			 i, j, xo[0][i], xo[1][j], fo[0][l], fo[1][l]);};
+		 fprintf(out, " %4d %4d   %12.6e %12.6e   %12.6e\n",
+			 i, j, xo[0][i], xo[1][j], fo[0][l]);};
 
 	fclose(out);
 
 	rv = TRUE;};
 
-    PM_free_vectors(2, f);
-    PM_free_vectors(2, r);
-    PM_free_vectors(2, xo);
-    PM_free_vectors(2, fo);
+    PM_free_vectors(nf, f);
+    PM_free_vectors(nd, r);
+    PM_free_vectors(nd, xo);
+    PM_free_vectors(nd, fo);
 
     return(rv);}
 

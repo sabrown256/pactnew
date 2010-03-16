@@ -11,26 +11,29 @@
 setenv Package sx
 
 source ../../../scripts/env-csh
-source ../../../scripts/test-env
+if ($?Log == 0) then
+   source ../../../scripts/test-env
+endif
 
 #if ($?LogF == 0) then
-   set TestName = "$0"
-   set TestName = "$TestName:t"
-
-   InitLog LogF $cwd/log.$TestName.$LogSfx
-   pushd ../../../manager >& /dev/null
-   set Arch = `cfgman use`
-   cd ../dev/$Arch >& /dev/null
-   set Root = $cwd
-   popd >& /dev/null
-
-   set BinDir   = $Root/bin
-   set LibDir   = $Root/lib
-   set MAKE     = $BinDir/pact
-   set TIMER    = $BinDir/timer
-   set CFE      = $BinDir/do-run
-   set PFE      = $BinDir/do-run
+#   InitLog LogF $cwd/log.$TestName.$LogSfx
 #endif
+
+set TestName = "$0"
+set TestName = "$TestName:t"
+
+pushd ../../../manager >& /dev/null
+set Arch = `cfgman use`
+cd ../dev/$Arch >& /dev/null
+set Root = $cwd
+popd >& /dev/null
+
+set BinDir = $Root/bin
+set LibDir = $Root/lib
+set MAKE   = $BinDir/pact
+set TIMER  = $BinDir/timer
+set CFE    = $BinDir/do-run
+set PFE    = $BinDir/do-run
 
 grep '#define THREADING' $Root/include/scconfig.h >& /dev/null
 if ($status == 0) then

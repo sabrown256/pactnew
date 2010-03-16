@@ -486,15 +486,16 @@ static PM_set *_SX_lr_zc_domain(char *name)
  */
 
 static PM_set *_SX_table_set(object *specs)
-   {object *sp, *dims, *comps;
-    int i, nd, nde, dv;
+   {int i, nd, nde, dv;
     int *maxes;
     long start, step, ne, npts;
     char *name;
     double **elem;
     PM_set *set;
+    object *sp, *dims, *comps;
 
     name = NULL;
+    dims = SS_null;
     SS_args(specs,
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &dims,
@@ -567,13 +568,13 @@ static object *SX_table_set(object *specs)
 /* SX_TABLE_MAP - create and return a graph from the current table using
  *              - the given specifications
  *              -
- *              - (table-map <name> <domain-list> <range-list> <centering>)
+ *              - (table->pm-mapping <name> <domain-list> <range-list> <centering>)
  *              - <set-list>  := (name <dims> <component-1> <component-2> ...)
  *              - <dims>      := (d1 d2 ...)
  *              - <component> := (start [stop] [stride])
  */
 
-static object *SX_table_map(object *argl)
+static object *_SXI_table_map(object *argl)
    {char *name, bf[MAXLINE];
     object *dmlst, *rnlst, *rv;
     PM_centering centering;
@@ -591,7 +592,10 @@ static object *SX_table_map(object *argl)
             0);
 
     domain = _SX_table_set(dmlst);
-    range  = _SX_table_set(rnlst);
+    if (SS_nullobjp(rnlst))
+       range = NULL;
+    else
+       range = _SX_table_set(rnlst);
 
     if (name == NULL)
        {static int tm = 1;
@@ -968,7 +972,7 @@ void SX_install_ascii_funcs(void)
     SS_install("table->pm-mapping",
                "Procedure: Extract a mapping from current table\n     Usage: table->pm-mapping <name> <domain-list> <range-list>",
                SS_nargs,
-               SX_table_map, SS_PR_PROC);
+               _SXI_table_map, SS_PR_PROC);
 
     SS_install("table->pm-set",
                "Procedure: Extract a set from current table\n     Usage: table->pm-set <name> <domain-list>",

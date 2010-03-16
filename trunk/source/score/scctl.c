@@ -1197,6 +1197,26 @@ void daprint(pcons *alst)
          if (strcmp(ths->cdr_type, SC_STRING_S) == 0)
             io_printf(stdout, "\t%s", ths->cdr);
 
+/* print the first value only */
+         else if (strncmp(ths->cdr_type, "int", 3) == 0)
+            io_printf(stdout, "\t%d", *(int *) ths->cdr);
+
+/* print the first value only */
+         else if (strncmp(ths->cdr_type, "short", 5) == 0)
+            io_printf(stdout, "\t%d", *(short *) ths->cdr);
+
+/* print the first value only */
+         else if (strncmp(ths->cdr_type, "long", 4) == 0)
+            io_printf(stdout, "\t%ld", *(long *) ths->cdr);
+
+/* print the first value only */
+         else if (strncmp(ths->cdr_type, "double", 6) == 0)
+            io_printf(stdout, "\t%g", *(double *) ths->cdr);
+
+/* print the first value only */
+         else if (strncmp(ths->cdr_type, "float", 5) == 0)
+            io_printf(stdout, "\t%g", *(float *) ths->cdr);
+
          io_printf(stdout, "\n");}
 
     return;}

@@ -25,7 +25,7 @@ source ../../tests/common
 
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ($CFE $PDBView -l $RootDir/sx/tests/sxpdbi.scm > sxpdbi.res)
+         flog $Log ($PDBView -l $RootDir/sx/tests/sxpdbi.scm > sxpdbi.res)
          flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
          set xstatus = $status
       else

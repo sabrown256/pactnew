@@ -131,8 +131,7 @@
 	   (n-zones (* km lm))
 	   (nodes   (cartesian-nodes km lm x1 x2 y1 y2))
 	   (vals    (apply list->pm-array (range-values fnc nodes))))
-
-	(pm-make-set "AC" (list n-zones) (list vals))))
+          (pm-make-set "AC" (list n-zones) (list vals))))
 
 ;-----------------------------------------------------------------------
 ;-----------------------------------------------------------------------
@@ -142,7 +141,8 @@
 
 (define (ac-mapping fnc k x1 x2 l y1 y2)
     (pm-make-mapping (ac-domain k x1 x2 l y1 y2)
-		     (ac-range fnc k x1 x2 l y1 y2)))
+		     (ac-range fnc k x1 x2 l y1 y2)
+		     zone))
 
 ;-----------------------------------------------------------------------
 ;-----------------------------------------------------------------------

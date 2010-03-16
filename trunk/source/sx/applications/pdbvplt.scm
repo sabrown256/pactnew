@@ -7,6 +7,7 @@
 ; #include <cpyright.h>
 ; 
 
+(define HUGE 1.0e100)
 (define window-manager-table #f)
 (define window-list nil)
 (define must-clear-viewport #t)
@@ -337,8 +338,8 @@
     (if l1
 	(let* ((l1n (list-ref l1 0))
 	       (l1x (list-ref l1 1))
-	       (l2n (list-ref l2 0))
-	       (l2x (list-ref l2 1))
+	       (l2n (if (pair? l2) (list-ref l2 0) HUGE))
+	       (l2x (if (pair? l2) (list-ref l2 1) (- HUGE)))
 	       (ln  (if (< l1n l2n) l1n l2n))
 	       (lx  (if (> l1x l2x) l1x l2x)))
 	  (get-extrema (list-tail l1 2)

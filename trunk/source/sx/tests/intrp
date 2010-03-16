@@ -20,11 +20,11 @@ source ../../tests/common
    NoteD $Log -n "                    PDBView Interpolation Test ... "
    Note $Log ""
 
-   flog $Log rm -f 3x1.ps
+   flog $Log $RM 3x1.ps
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $PDBView -l $RootDir/sx/tests/pdbvinterp.scm >& pdbvinterp.tmp)
+      flog $Log ($PDBView -l $RootDir/sx/tests/pdbvinterp.scm >& pdbvinterp.tmp)
       set xstatus = $status
    else
       ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvinterp.scm |& \
@@ -55,8 +55,8 @@ source ../../tests/common
          NoteD $Log "FAILED ($ETime)"
       else
          NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f pdbvinterp.err pdbvinterp.tmp
-         flog $Log rm -f 3x1.ps
+         flog $Log $RM pdbvinterp.err pdbvinterp.tmp
+         flog $Log $RM 3x1.ps
       endif
    endif
 

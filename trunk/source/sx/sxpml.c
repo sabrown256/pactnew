@@ -870,8 +870,11 @@ static void _SX_rl_gset(object *obj)
 object *SX_mk_set(PM_set *set)
    {object *op;
 
-    op = SS_mk_object(set, G_SET, SELF_EV, set->name,
-		      _SX_wr_gset, _SX_rl_gset);
+    if (set == NULL)
+       op = SS_null;
+    else
+       op = SS_mk_object(set, G_SET, SELF_EV, set->name,
+			 _SX_wr_gset, _SX_rl_gset);
 
     return(op);}
 
