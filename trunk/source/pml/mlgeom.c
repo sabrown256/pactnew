@@ -695,7 +695,7 @@ double PM_polygon_area(PM_polygon *py)
 
     x  = py->x[0];
     y  = py->x[1];
-    np = py->np;
+    np = py->np - 1;
 
     x1 = x[0];
     y1 = y[0];

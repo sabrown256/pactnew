@@ -628,7 +628,7 @@ object *_SX_open_file(object *arg, char *type, char *mode)
             0);
 
     if (name == NULL)
-       SS_error("BAD FILE NAME - SX_OPEN_FILE", arg);
+       SS_error("BAD FILE NAME - _SX_OPEN_FILE", arg);
 
 /* search for an existing file by this name */
     for (po = SX_file_list; po != NULL; po = po->next)

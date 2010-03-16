@@ -1665,7 +1665,7 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
     iob->select        = NULL;
 
     iob->parent        = parent;
-    iob->children        = SC_MAKE_ARRAY("PG_MAKE_INTERFACE_OBJECT",
+    iob->children      = SC_MAKE_ARRAY("PG_MAKE_INTERFACE_OBJECT",
 				       PG_interface_object *, NULL);
 
     if (strcmp(type, PG_TEXT_OBJECT_S) == 0)

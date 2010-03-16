@@ -410,6 +410,7 @@ typedef struct s_SC_mem_fnc SC_mem_fnc;
 typedef void (*PFFileCallback)(int fd, int mask, void *a);
 typedef PROCESS *(*PFProcInit)(char **argv, char *mode, int type);
 typedef void (*PFProcExit)(PROCESS *pp, void *a);
+typedef int (*PFIVA)(void *a);
 
 FUNCTION_POINTER(size_t, (*PFSize_t));
 FUNCTION_POINTER(pcons, *(*PFPPcons));
