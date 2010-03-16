@@ -25,7 +25,7 @@ source ../../tests/common
 
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ($CFE $SX -l $RootDir/sx/tests/sxhash.scm > sxhash.res.tmp)
+         flog $Log ($SX -l $RootDir/sx/tests/sxhash.scm > sxhash.res.tmp)
 
          cat sxhash.res.tmp          | \
          sed -e '/diskaddr =/d'        \

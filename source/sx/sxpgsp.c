@@ -2667,6 +2667,177 @@ static object *_SXI_set_color_type(object *argl)
     return(SS_t);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                            ATTRIBUTE RETRIEVAL                           */
+
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GATGL - wrapper for PG_get_attrs_glb */
+
+static object *_SXI_gatgl(object *argl)
+   {int n;
+    char *typ, *name;
+    void *pvo;
+    haelem *hp;
+    object *o, *rv;
+
+    PG_setup_attrs_glb();
+
+    rv = SS_null;
+    for (n = 0; !SS_nullobjp(argl); n++)
+        {name = NULL;
+	 SS_args(argl,
+		 SC_STRING_I, &name,
+		 0);
+	 argl = SS_cdr(argl);
+
+	 if (name == NULL)
+	    break;
+
+	 hp = PG_ptr_attr_entry(name);
+	 if (hp == NULL)
+	    break;
+	 else
+	    {typ = hp->type;
+	     pvo = hp->def;
+	     if (strcmp(typ, SC_INTEGER_S) == 0)
+	        {o = SS_mk_integer(*(int *) pvo);
+		 rv = SS_mk_cons(o, rv);}
+	     else if (strcmp(typ, SC_DOUBLE_S) == 0)
+	        {o  = SS_mk_float(*(double *) pvo);
+		 rv = SS_mk_cons(o, rv);}
+	     else if (strcmp(typ, SC_STRING_S) == 0)
+	        {o  = SS_mk_string((char *) pvo);
+		 rv = SS_mk_cons(o, rv);};};
+
+	 SFREE(name);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_GET_ATTRS_ALIST - get one or more graphics attribute
+ *                     - specifications are pairs:
+ *                          <attr>, <ptr>
+ *                     - where
+ *                     -    <attr> = string naming the attribute
+ *                     -             (e.g. "LINE-COLOR")
+ *                     -    <ptr>  = TRUE iff the attribute is an array
+ *                     - return the resulting list
+ */
+
+static object *_SX_get_attrs_alist(pcons *alst, object *argl)
+   {int i, ptr;
+    char *name, *typ;
+    long lv;
+    double dv;
+    pcons *pc;
+    object *o, *rv;
+
+    rv = SS_null;
+    for (i = 0; !SS_nullobjp(argl); i++)
+        {name = NULL;
+	 SS_args(argl,
+		 SC_STRING_I, &name,
+		 SC_INTEGER_I, &ptr,
+		 0);
+	 argl = SS_cddr(argl);
+
+	 pc = SC_assoc_entry(alst, name);
+	 if (pc == NULL)
+	    continue;
+
+	 typ = pc->cdr_type;
+	 if (strncmp(typ, "double", 6) == 0)
+	    {dv = *(double *) pc->cdr;
+	     o  = SS_mk_float(dv);
+	     rv = SS_mk_cons(o, rv);}
+
+	 else if (strncmp(typ, "float", 5) == 0)
+	    {dv = *(float *) pc->cdr;
+	     o  = SS_mk_float(dv);
+	     rv = SS_mk_cons(o, rv);}
+
+	 else if (strncmp(typ, "int", 3) == 0)
+	    {lv = *(int *) pc->cdr;
+	     o  = SS_mk_integer(lv);
+	     rv = SS_mk_cons(o, rv);}
+
+	 else if (strncmp(typ, "short", 5) == 0)
+	    {lv = *(short *) pc->cdr;
+	     o  = SS_mk_integer(lv);
+	     rv = SS_mk_cons(o, rv);}
+
+	 else if (strncmp(typ, "char", 4) == 0)
+	    {o  = SS_mk_string((char *) pc->cdr);
+	     rv = SS_mk_cons(o, rv);};
+
+	 SFREE(name);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GATGR - wrapper for PG_get_attrs_graph */
+
+static object *_SXI_gatgr(object *argl)
+   {PG_graph *g;
+    object *rv;
+
+    g = NULL;
+    SS_args(argl,
+	    G_GRAPH, &g,
+	    0);
+    argl = SS_cdr(argl);
+
+    rv = _SX_get_attrs_alist(g->info, argl);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GATMP - wrapper for PG_get_attrs_mapping */
+
+static object *_SXI_gatmp(object *argl)
+   {PM_mapping *f;
+    object *rv;
+
+    f = NULL;
+    SS_args(argl,
+	    G_MAPPING, &f,
+	    0);
+    argl = SS_cdr(argl);
+
+    rv = _SX_get_attrs_alist(f->map, argl);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GATST - wrapper for PG_get_attrs_set */
+
+static object *_SXI_gatst(object *argl)
+   {PM_set *s;
+    object *rv;
+
+    s = NULL;
+    SS_args(argl,
+	    G_SET, &s,
+	    0);
+    argl = SS_cdr(argl);
+
+    rv = _SX_get_attrs_alist(s->info, argl);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            ATTRIBUTE SETTING                             */
+
 /*--------------------------------------------------------------------------*/
  
 /* _SXI_SATGL - wrapper for PG_set_attrs_glb */
@@ -2783,18 +2954,6 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 	     else
 	        {SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_P_S,
 				       name, dv);};}
-
-	 else if (typ == SC_DOUBLE_I)
-	    {SS_args(argl,
-		     SC_DOUBLE_I, &dv,
-		     0);
-	     argl = SS_cdr(argl);
-	     if (ptr)
-	        {pv = &dv;
-		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
-	     else
-	       {SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_P_S,
-				      name, dv);};}
 
 	 else if (typ == SC_LONG_I)
 	    {SS_args(argl,
@@ -3056,6 +3215,26 @@ void _SX_install_pgs_primitives(void)
                SS_nargs,
                _SXI_get_frame, SS_PR_PROC);
 
+    SS_install("pg-get-attrs-global",
+               "Get the global graphics attributes",
+               SS_nargs,
+               _SXI_gatgl, SS_PR_PROC);
+
+    SS_install("pg-get-attrs-graph",
+               "Get the specified attributes for the given graph",
+               SS_nargs,
+               _SXI_gatgr, SS_PR_PROC);
+
+    SS_install("pg-get-attrs-mapping",
+               "Get the specified attributes for the given mapping",
+               SS_nargs,
+               _SXI_gatmp, SS_PR_PROC);
+
+    SS_install("pg-get-attrs-set",
+               "Get the specified attributes for the given set",
+               SS_nargs,
+               _SXI_gatst, SS_PR_PROC);
+
     SS_install("pg-line-color",
                "Get the line color on the given device",
                SS_nargs,
@@ -3146,7 +3325,7 @@ void _SX_install_pgs_primitives(void)
                SS_nargs,
                _SXI_satgl, SS_PR_PROC);
 
-    SS_install("pg-set-attrs-graphl!",
+    SS_install("pg-set-attrs-graph!",
                "Set the specified attributes for the given graph",
                SS_nargs,
                _SXI_satgr, SS_PR_PROC);

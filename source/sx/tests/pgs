@@ -22,7 +22,7 @@ source ../../tests/common
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $SX -l $RootDir/sx/tests/sxpgs.scm > sxpgs.res)
+      flog $Log ($SX -l $RootDir/sx/tests/sxpgs.scm > sxpgs.res)
       $CFE $PSDIFF sxpgs.ps $RootDir/sx/tests/ref/sxpgs.ps > /dev/null
       set xstatus = $status
    else

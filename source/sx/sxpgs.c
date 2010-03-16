@@ -1194,7 +1194,7 @@ static object *_SXI_make_pgs_graph(object *argl)
 	    G_NUM_ARRAY, &arr,
             0);
 
-    if (centering == -100)
+    if (centering == U_CENT)
        centering = (domain->n_elements == range->n_elements) ? N_CENT : Z_CENT;
 
     if (name == NULL)
@@ -1436,7 +1436,7 @@ static void _SX_attach_rendering_1d(PG_graph *data, PG_rendering pty,
 static object *_SXI_draw_plot(object *argl)
    {int domain_dim, range_dim;
     int *hsts;
-    PG_rendering pty;
+    PG_rendering pty, apty;
     PG_device *dev;
     PG_graph *data, *nxt, *g;
     PM_mapping *f;
@@ -1489,15 +1489,18 @@ static object *_SXI_draw_plot(object *argl)
     f          = data->f;
     domain     = f->domain;
     range      = f->range;
-    domain_dim = domain->dimension_elem;
-    range_dim  = range->dimension_elem;
+    domain_dim = (domain == NULL) ? 0 : domain->dimension_elem;
+    range_dim  = (range == NULL) ? 0 : range->dimension_elem;
     pty        = data->rendering;
     info       = (pcons *) data->info;
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SS_integerp(obj), pty,
+       {SX_GET_OBJECT_FROM_LIST(SS_integerp(obj), apty,
                                 SS_INTEGER_VALUE(obj),
                                 argl, "BAD PLOT TYPE - _SXI_DRAW_PLOT");
+
+/*	if ((pty == PLOT_NONE) && (apty != PLOT_NONE)) */
+	   pty = apty;
 
 	info = PG_set_plot_type(info, pty, CARTESIAN_2D);
 
@@ -1558,6 +1561,10 @@ static object *_SXI_draw_plot(object *argl)
 		          data->render = PG_mesh_plot;
 			  break;
 
+		     case PLOT_SCATTER :
+		          data->render = PG_scatter_plot;
+			  break;
+
 		     default :
 		     case PLOT_CONTOUR :
 		          if (SS_consp(argl))
@@ -1610,12 +1617,12 @@ static object *_SXI_draw_plot(object *argl)
     SC_set_put_line(SX_fprintf);
     SC_set_put_string(SX_fputs);
 
-    if (domain->info_type != NULL)
+    if ((domain != NULL) && (domain->info_type != NULL))
        {if (strcmp(domain->info_type, SC_PCONS_P_S) == 0)
 	  dev->autodomain = (SC_assoc_entry((pcons *) domain->info,
 					    "LIMITS") == NULL);};
 
-    if (range->info_type != NULL)
+    if ((range != NULL) && (range->info_type != NULL))
        {if (strcmp(range->info_type, SC_PCONS_P_S) == 0)
 	  dev->autorange  = (SC_assoc_entry((pcons *) range->info,
 					    "LIMITS") == NULL);};

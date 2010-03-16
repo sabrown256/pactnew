@@ -1564,7 +1564,7 @@ double *PM_get_limits(PM_set *s)
    {double *extr;
 
     extr = NULL;
-    if (s->info_type != NULL)
+    if ((s != NULL) && (s->info_type != NULL))
        if (strcmp(s->info_type, SC_PCONS_P_S) == 0)
 	  SC_assoc_info((pcons *) s->info,
 			"LIMITS", &extr,

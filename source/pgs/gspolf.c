@@ -171,6 +171,7 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	 alst = PM_mapping_info(h,
 				"CENTERING", &centering,
 				NULL);
+
 /* setup the graph's info list */
 	 alst = SC_copy_alist(alst);
 	 alst = SC_append_alist(SC_copy_alist((pcons *) range->info), alst);

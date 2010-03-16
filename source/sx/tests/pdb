@@ -24,7 +24,7 @@ source ../../tests/common
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $SX -l $RootDir/sx/tests/sxpdb.scm > sxpdb.res)
+      flog $Log ($SX -l $RootDir/sx/tests/sxpdb.scm > sxpdb.res)
       flog $Log (diff sxpdb.res $RootDir/sx/tests/ref/sxpdb > sxpdb.res.diff)
       set xstatus = $status
    else
