@@ -260,9 +260,11 @@ static void _SC_free_connectdes(connectdes *pc)
 
 /* free the tasks */
     SC_free_array(pc->taska, _SC_free_contask);
+    pc->taska = NULL;
 
 /* free the logs */
     SC_free_array(pc->log, SC_array_free_n);
+    pc->log = NULL;
 
     SFREE(pc);
 
@@ -1891,9 +1893,8 @@ int _SC_launch_pool_task(conpool *cp, int na, int reset,
 
     as = cp->as;
 
-    nc  = SC_array_get_n(cp->pool);
-    nh  = cp->n_hosts;
-    pco = NULL;
+    nc = SC_array_get_n(cp->pool);
+    nh = cp->n_hosts;
 
 /* reset the average time for a job in each connection
  * after a barrier has been reached
@@ -1932,7 +1933,7 @@ int _SC_launch_pool_task(conpool *cp, int na, int reset,
 
 /* there is no host up at all to do any work - just die now */
     if (ih >= nh)
-       {_SC_pool_printf(as, "***>", pco, "client",
+       {_SC_pool_printf(as, "***>", NULL, "client",
 			"failed to launch '%s' (%d conns/%d hosts)\n",
 			cmnd, nc, nh);
 	rv = -2;}
