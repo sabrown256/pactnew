@@ -299,7 +299,7 @@ int test_4(void)
     r  = setup_2d_points(nl);
 
     xo = FMAKE_N(double *, nd, "TEST_4:xo");
-    fo = FMAKE_N(double *, nd, "TEST_4:fo");
+    fo = FMAKE_N(double *, nf, "TEST_4:fo");
 
     mxo[0] = nx;
     mxo[1] = ny;
@@ -332,9 +332,9 @@ int test_4(void)
 	rv = TRUE;};
 
     PM_free_vectors(nf, f);
+    PM_free_vectors(nf, fo);
     PM_free_vectors(nd, r);
     PM_free_vectors(nd, xo);
-    PM_free_vectors(nd, fo);
 
     return(rv);}
 
@@ -371,7 +371,7 @@ int test_5(void)
     r  = setup_2d_points(nl);
 
     xo = FMAKE_N(double *, nd, "TEST_5:xo");
-    fo = FMAKE_N(double *, nd, "TEST_5:fo");
+    fo = FMAKE_N(double *, nf, "TEST_5:fo");
 
     mxo[0] = nx;
     mxo[1] = ny;
@@ -404,9 +404,9 @@ int test_5(void)
 	rv = TRUE;};
 
     PM_free_vectors(nf, f);
+    PM_free_vectors(nf, fo);
     PM_free_vectors(nd, r);
     PM_free_vectors(nd, xo);
-    PM_free_vectors(nd, fo);
 
     return(rv);}
 
