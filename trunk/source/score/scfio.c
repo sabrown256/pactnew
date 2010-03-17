@@ -310,10 +310,10 @@ char *SC_fgets(char *s, int n, FILE *fp)
 /* check for newlines */
 	if (nbr > 0)
 	   {for (i = 0; (i < n) && (s[i] != '\n') && (s[i] != '\r'); i++);
-	    if (i < n)
-	       s[i+1] = '\0';
-
 	    nb = i + 1;
+	    if (nb < n)
+	       s[nb] = '\0';
+
 	    nb = min(nb, nbr);
 	    fseek(fp, pos + nb, SEEK_SET);};
        
