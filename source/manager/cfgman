@@ -29,12 +29,8 @@
 # this will virtually eliminate corruption of the database as
 # well as speeding things up
 # if you need to change the database you MUST unset SESSION_CONFIG
-if ($?PACT_CONFIG) then
-   echo $PACT_CONFIG
-   exit(0)
-endif
 
-if ($?PACT_CONFIG) then
+if ($?PACT_CONFIG == 1) then
    if ("$PACT_CONFIG" == "") then
       echo "CFGMAN: PACT_CONFIG is null"
       exit(113)
@@ -50,19 +46,17 @@ if ("$Cmnd" == "") then
    exit(110)
 endif
 
+unalias ls
+unalias rm
+
 set SGN   = .pc
 set ret   = 0
 set Tgt   = ""
-set Arch  = ""
 set LockT = 300
 while ($#argv > 0)
    switch ($1)
-      case -a:
-           shift
-           set Arch = $1
-           breaksw
       case -h:
-           echo "cfgman [-a <arch>] [-h] [-to <#sec>] add | alias | delete | first | list | use"
+           echo "cfgman [-h] [-to <#sec>] add | alias | delete | first | list | use"
            exit(1)
            breaksw
       case -to:
@@ -98,25 +92,7 @@ set MngDir = $Base/manager
 set ScrDir = $Base/scripts
 set PLOCK  = "$Base/scripts/plock"
 set Which  = "./pwhich"
-
-if (1) then
-   set Arch = `$ScrDir/system-id`
-
-else
-   if ("$Arch" == "") then
-      @ count = 1
-      while (1)
-         set Arch = `$ScrDir/system-id`
-         if ("$Arch" != "") break
-         if ($count >= 10) then
-            echo "CFGMAN: system-id returned null"
-            exit(112)
-         endif
-         @ count = $count + 1
-         sleep 1
-      end
-   endif
-endif
+set Arch   = `$ScrDir/system-id`
 
 if (-d $MngDir) then
    set BaseDev = $Base/dev
@@ -136,10 +112,7 @@ if (!(-d $BaseDev)) then
 endif
 
 set DB      = $BaseDev/$SGN-$Arch
-set DBBack  = $DB.back
-set LockDir = $BaseDev/$SGN.lock-$Arch
-
-rm -f $DBBack >& /dev/null
+set LockDir = $BaseDev/$SGN-$Arch.lock
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -151,40 +124,33 @@ onintr INTERRUPT
 # lock the DB
    $PLOCK lock -d $LockDir -t $LockT
 
-   if (!(-e $DB)) then
-      touch $DB
-   endif
-
-   set Current = `cat $DB`
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# SETUP - setup the session data before processing options
-
-# break out the first item into a name and alias
-   if ("$Current" == "") then
-      set Name  = ""
-      set Alias = ""
-
-   else
-
-# if it has an alias get the base
-      set First = $Current[1]
-      if (`expr "$First" : '.*@.*'` > 0) then
-         set Name  = `expr "$First" : '\(.*\)@.*'`
-         set Alias = `expr "$First" : '.*@\(.*\)'`
-
-# otherwise the entry is the base
-      else
-         set Name  = $First
-         set Alias = ""
+# convert old file databases to directory form
+   if (-f $DB) then
+      mv $DB $DB.file
+      mkdir $DB
+      set first = ""
+      foreach i (`cat $DB.file`)
+         touch $DB/$i
+         if ("$first" == "") then
+            set first = $i
+         endif
+      end
+      pushd $DB >& /dev/null
+      if ("$first" != "") then
+         ln -s $first current
       endif
+      popd >& /dev/null
+      rm -f $DB.file
+
+# create the database initially
+   else if (!(-e $DB)) then
+      mkdir $DB
    endif
 
-#   cat $DB
-#   echo "arch    = |$Arch|"
-#   echo "current = |$Current|"
+   chmod 2770 $DB
+
+# all subsequent work to be done in database directory
+   pushd $DB >& /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -198,63 +164,18 @@ switch ($Tgt)
 
    case add:
         if ($#argv == 1) then
-           set Add = $1
+           set ent = $1
         else
-           set Add = $1@$2
+           set ent = $1@$2
         endif
-        if ("$1" != "$Name") then
 
-# get everybody on the current list except for the one to add
-# this avoids duplicates
-           set New = ""
-           foreach i ($Current)
-              if ("$i" == "$Add") continue
+	touch $ent
+        rm -f current
+	ln -s $ent current
 
-              if (`expr "$i" : '.*@.*'` > 0) then
-                 set base = `expr "$i" : '\(.*\)@.*'`
-                 set alia = `expr "$i" : '.*@\(.*\)'`
-                 if (("$i" != "$Add") && ("$base" != "$Add") && ("$alia" != "$Add")) then
-                    set New = ( $New $i )
-                 else
-                    set Add = "$i"
-                 endif
-              endif
-           end
+        unset ent
 
-# make sure the added one is first on the list
-# this also means that add moves a config to first position
-           set New = ( $Add $New )
-
-           goto REWRITE
-
-        else
-           set New = ( $Current )
-           goto USE
-        endif
-        breaksw
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# ALIAS - set/unset an alias for the current config of the current host
-
-   case alias:
-        if ("$Current" != "") then
-           if ($#argv > 0) then
-              set Name = "$Name@$1"
-           endif
-
-           if ("$Name" != "$Current[1]") then
-              shift Current
-
-              set New = ( $Name $Current )
-           
-              goto REWRITE
-           else
-              set New = ( $Current )
-              goto USE
-           endif
-        endif
+        goto USE
         breaksw
 
 #--------------------------------------------------------------------------
@@ -263,16 +184,19 @@ switch ($Tgt)
 # DELETE - remove the specified config on the current host
 
    case delete:
-        set Del = $1
-        set New = ""
-        if ($Del != all) then
+        set ent = $1
+        if ($ent == all) then
+           rm -f * >& /dev/null
 
-# get everybody on the current list except for the one to delete
-           foreach i ($Current)
+        else
 
-              if (`expr "$i" : '.*@.*'` > 0) then
-                 set name = `expr "$i" : '\(.*\)@.*'`
-                 set alia = `expr "$i" : '.*@\(.*\)'`
+# check everybody on the current list
+           foreach i (*)
+              if ($i == current) continue
+
+              if ("$i" =~ *@*) then
+                 set name = `echo $i | sed 's/@.*$//'`
+                 set alia = `echo $i | sed 's/^.*@//'`
 
 # otherwise the entry is the base
               else
@@ -280,25 +204,15 @@ switch ($Tgt)
                  set alia = ""
               endif
 
-              if (("$Del" == "$i") || ("$Del" == "$name") || ("$Del" == "$alia")) then
-                 continue
-              else
-                 set New = ( $New $i )
+              if (("$ent" == "$i") || ("$ent" == "$name") || ("$ent" == "$alia")) then
+                 rm -f $i >& /dev/null
               endif
            end
+           unset name
+           unset alia
         endif
+        unset ent
 
-        goto REWRITE
-
-        breaksw
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# FIRST - return the name of the current config on the current host
-
-   case first:
-        echo "$Name"
         breaksw
 
 #--------------------------------------------------------------------------
@@ -307,7 +221,7 @@ switch ($Tgt)
 # LIST - list all configs for the current host
 
    case list:
-        echo "$Current"
+        ls -1 |& grep -v current | awk '{printf("   %s\n", $0);}'
         breaksw
 
 #--------------------------------------------------------------------------
@@ -316,7 +230,6 @@ switch ($Tgt)
 # USE - return the correct name for the current config on the current host
 
    case use:
-        set New = ( $Current )
         goto USE
 
         breaksw
@@ -333,9 +246,7 @@ switch ($Tgt)
         echo " "
         echo " Targets:"
         echo "    add    - add the specified configuration (and optionally alias)"
-        echo "    alias  - set/unset an alias for the current configuration"
         echo "    delete - delete the specified configuration"
-        echo "    first  - return the name of the current configuration"
         echo "    help   - this help message"
         echo "    list   - list all configurations"
         echo "    use    - return the name or alias of the current configuration"
@@ -361,42 +272,24 @@ exit($ret)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# rewrite the config database
-
-REWRITE:
-
-   set ret = 1
-   mv $DB $DBBack >& /dev/null
-   if ($status == 0) then
-      if ("$New" != "") then
-         echo "$New" >! $DB
-         chmod 664 $DB
-         set ret = $status
-      endif
-   endif
-   
-   if ($ret != 0) then
-      echo "CFGMAN - Failed to rewrite config database"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
 # USE - report the current configuration
 
 USE:
    if ($?PACT_CONFIG) then
-      set Use = $PACT_CONFIG
+      set use = $PACT_CONFIG
    else
-      set Use = "$Arch"
-      if ("$New" != "") then
-         set First = $New[1]
-         if (`expr "$First" : '.*@.*'` > 0) then
-            set Use = `expr "$First" : '.*@\(.*\)'`
+      set use = "$Arch"
+      set inf = ( `ls -l current` )
+      if ("$inf" != "") then
+         set inf = "$inf[$#inf]"
+         if ("$inf" =~ *@*) then
+            set use = ( `echo "$inf" | sed 's/^.*@//'` )
          endif
       endif
+      unset inf
    endif
-   echo "$Use"
+   echo "$use"
+   unset use
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
