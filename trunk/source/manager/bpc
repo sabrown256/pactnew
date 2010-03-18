@@ -216,7 +216,7 @@ char *make_log_file_name(char *sys, char *cmd)
     else
        log = "unknown";
 
-    arch = car(syscmnd(sprintf("./cfgman -a %s use", cfg)));
+    arch = car(syscmnd(sprintf("./cfgman use")));
     path = sprintf("../dev/%s/log/%s", arch, log);
 
     return(path);}
@@ -252,7 +252,7 @@ void remove_log_files(object *hsts)
 	 else
 	    cfg = sys;
 
-	 arch = car(syscmnd(sprintf("./cfgman -a %s use", cfg)));
+	 arch = car(syscmnd(sprintf("./cfgman use")));
 
 /* now remove the log files */
 	 path = sprintf("../dev/%s/log/build", arch);
@@ -278,7 +278,7 @@ void remove_log_files(object *hsts)
 char *command(char *s)
    {char *t;
 
-    t = sprintf("source ../dev/`../manager/cfgman use/include/env-pact.csh` ; %s", s);
+    t = sprintf("source ../dev/`../manager/cfgman use`/include/env-pact.csh ; %s", s);
     printf(stdout, "   %s\n", t);
 
     return(t);}

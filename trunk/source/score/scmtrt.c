@@ -24,12 +24,58 @@ static int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_1 - simple test of memory manager
+/* TEST_1 - test registered memory and memory monitor
+ *        - NOTE: recently moved to be first test because some platforms
+ *        - have problems with all the overwrites in what is now test_2
+ *        - 32-bit GNU BG/P is the first culprit
+ */
+
+int test_1(int nir, int nim)
+   {int i, err, na, nb, ma, mb;
+    char msg[MAXLINE];
+    float b[10];
+    double **a;
+
+    err = FALSE;
+
+    io_printf(stdout, "\n-----------------------------\n");
+    io_printf(stdout, "\nMemory registration test\n\n");
+
+    SC_reg_mem(&i, sizeof(int), "TEST_1:i");
+
+    na = SC_mem_monitor(-1, 2, "t2a", msg);
+    nb = SC_mem_monitor(-1, 2, "t2b", msg);
+
+    SC_reg_mem(b, sizeof(b), "TEST_1:b");
+
+    a = FMAKE_N(double *, nir, "TEST_1:a");
+
+    io_printf(stdout, "   First leak check\n\n");
+    ma = SC_mem_monitor(na, 2, "t2a", msg);
+
+    SC_dereg_mem(b);
+    SFREE(a);
+
+    io_printf(stdout, "\n");
+    io_printf(stdout, "   Second leak check\n\n");
+    mb = SC_mem_monitor(nb, 2, "t2b", msg);
+
+    if (err == FALSE)
+       io_printf(stdout, "\nMemory registration test passed\n");
+    else
+       io_printf(stdout, "\nMemory registration test failed\n");
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_2 - simple test of memory manager
  *        - allocate some space and over index some of it
  *        - checking detection of bad blocks
  */
 
-int test_1(int nir, int nim)
+int test_2(int nir, int nim)
    {int i, j, jmx, ok, err;
     double **a;
 
@@ -38,12 +84,12 @@ int test_1(int nir, int nim)
     io_printf(stdout, "\n-----------------------------\n");
     io_printf(stdout, "\nSimple memory allocation test\n\n");
 
-    a = FMAKE_N(double *, nir, "TEST_1:a");
+    a = FMAKE_N(double *, nir, "TEST_2:a");
 
     for (i = 0; i < nir; i++)
         {jmx = (i == 3) ? nim+10 : nim;
 
-	 a[i] = FMAKE_N(double, nim, "TEST_1:a[i]");
+	 a[i] = FMAKE_N(double, nim, "TEST_2:a[i]");
 	 for (j = 0; j < jmx; j++)
 	     a[i][j] = (j + 1.0)*(i + 1.0);
 
@@ -64,48 +110,6 @@ int test_1(int nir, int nim)
        io_printf(stdout, "\nSimple memory allocation test passed\n");
     else
        io_printf(stdout, "\nSimple memory allocation test failed\n");
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TEST_2 - test registered memory and memory monitor */
-
-int test_2(int nir, int nim)
-   {int i, err, na, nb, ma, mb;
-    char msg[MAXLINE];
-    float b[10];
-    double **a;
-
-    err = FALSE;
-
-    io_printf(stdout, "\n-----------------------------\n");
-    io_printf(stdout, "\nMemory registration test\n\n");
-
-    SC_reg_mem(&i, sizeof(int), "TEST_2:i");
-
-    na = SC_mem_monitor(-1, 2, "t2a", msg);
-    nb = SC_mem_monitor(-1, 2, "t2b", msg);
-
-    SC_reg_mem(b, sizeof(b), "TEST_2:b");
-
-    a = FMAKE_N(double *, nir, "TEST_2:a");
-
-    io_printf(stdout, "   First leak check\n\n");
-    ma = SC_mem_monitor(na, 2, "t2a", msg);
-
-    SC_dereg_mem(b);
-    SFREE(a);
-
-    io_printf(stdout, "\n");
-    io_printf(stdout, "   Second leak check\n\n");
-    mb = SC_mem_monitor(nb, 2, "t2b", msg);
-
-    if (err == FALSE)
-       io_printf(stdout, "\nMemory registration test passed\n");
-    else
-       io_printf(stdout, "\nMemory registration test failed\n");
 
     return(err);}
 
