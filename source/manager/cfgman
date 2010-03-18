@@ -197,10 +197,7 @@ switch ($Tgt)
 
    case delete:
         set ent = $1
-        if ($ent == all) then
-           rm -f * >& /dev/null
-
-        else
+        if ($ent != all) then
 
 # check everybody on the current list
            foreach i (*)
