@@ -549,7 +549,9 @@ switch ($Cmnd)
 
         setenv CCompiler  gcc
 
-        set Arch          = `$ScrDir/system-id`
+        setenv Arch  `$ScrDir/system-id`
+	setenv bits  `$ScrDir/nbit -d`
+
         set Configuration = ""
         set ExplSystem    = FALSE
         set Method        = 2
@@ -559,7 +561,6 @@ switch ($Cmnd)
         set openmp        = FALSE
         set pthread       = FALSE
         set pydir         = ""
-	set bits          = `$ScrDir/nbit -d`
         set Alias         = ""
         set flst          = ""
 
@@ -580,7 +581,7 @@ switch ($Cmnd)
                    breaksw
               case -b:
                    shift
-                   set bits = $1
+                   setenv bits $1
                    breaksw
               case -cc:
                    shift
@@ -760,22 +761,21 @@ switch ($Cmnd)
 
 # find the configuration file
         set UCfg = ""
+        set gdir = gen/$Arch
 
 # if no configuration is specified - generate from scratch
         if ("$Configuration" == "") then
            call GEN_CONFIG()
-           set dir  = gen/$Arch
-           set UCfg = $dir/$Configuration
+           set UCfg = $gdir/$Configuration
 
 # if file exists as is use it
         else if (-f $Configuration) then
-           set dir  = gen/$Arch
-           set UCfg = $dir/$Configuration
+           set UCfg = $gdir/$Configuration
 
 # otherwise look in the configs directories
         else
-           foreach dir ($ConfigDir)
-              set lCfg = $dir/$Configuration
+           foreach dir ($ConfigDir $gdir)
+              set lCfg = $gdir/$Configuration
               if (-f $lCfg) then
                  set UCfg = $lCfg
                  break
@@ -785,9 +785,9 @@ switch ($Cmnd)
 
 # if there still is no config file - generate from what we know
         if ("$UCfg" == "") then
-           set dir  = gen/$Arch
            set UCfg = `gen-cfg $Configuration`
         endif
+        unset gdir
 
 # set the configuration for this system
         set System = `$CfgMan add $Configuration $Alias`
