@@ -64,8 +64,10 @@ while ($#argv > 0)
            echo "  delete  remove a configuration from the data base"
            echo "  list    list the available configurations for the"
            echo "          current real architecture"
+           echo "  reconst  reconstitute the database from a host file"
+           echo "           takes host file and architecture"
            echo "  use     return the effective architecture name derived"
-           echo "          from the first configuration listed"
+           echo "          from the current selected configuration"
            echo ""
            exit(1)
            breaksw
@@ -236,6 +238,34 @@ switch ($Tgt)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# RECONST - reconstitute the database from a host file
+
+   case reconst:
+        set hf = $1
+        if ($#argv > 1) then
+           set arch = $2
+        else
+           set arch = `system-id`
+        endif
+
+# remove old entries
+        rm -f * >& /dev/null
+
+# find the proper entries in the host file
+	set lst = ( `grep $arch $hf | grep host | awk '{print $6}'` )
+        foreach i ($lst)
+           touch $i
+           chmod 660 $i
+        end
+
+# first entry is defined to be current
+        ln -s $lst[1] current
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # USE - return the correct name for the current config on the current host
 
    case use:
@@ -254,11 +284,12 @@ switch ($Tgt)
         echo "Usage: cfgman <tgt> [<opt>]"
         echo " "
         echo " Targets:"
-        echo "    add    - add the specified configuration (and optionally alias)"
-        echo "    delete - delete the specified configuration"
-        echo "    help   - this help message"
-        echo "    list   - list all configurations"
-        echo "    use    - return the name or alias of the current configuration"
+        echo "    add     - add the specified configuration (and optionally alias)"
+        echo "    delete  - delete the specified configuration"
+        echo "    help    - this help message"
+        echo "    list    - list all configurations"
+        echo "    reconst - reconstitute databse from host file"
+        echo "    use     - return the name or alias of the current configuration"
         echo " "
         breaksw
 
