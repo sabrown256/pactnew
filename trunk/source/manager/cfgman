@@ -13,10 +13,8 @@
 #        -
 #        -   add    - add a configuration to the managed database
 #        -   delete - remove a configuration to the managed database
-#        -   first  - return the first configuration for the current architecture
 #        -   use    - return the effective config designation for builds
 #        -   list   - return all configurations  for the current architecture
-#        -   alias  - set or unset alias for the first configuration
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -56,7 +54,19 @@ set LockT = 300
 while ($#argv > 0)
    switch ($1)
       case -h:
-           echo "cfgman [-h] [-to <#sec>] add | alias | delete | first | list | use"
+           echo ""
+           echo "Usage: cfgman [-h] [-to <#sec>] add <cfg> | delete <cfg> | list | use"
+           echo ""
+           echo "  h    this help message"
+           echo "  to   number of seconds to wait for requisite locks (default 300)"
+           echo ""
+           echo "  add     add a configuration to the data base"
+           echo "  delete  remove a configuration from the data base"
+           echo "  list    list the available configurations for the"
+           echo "          current real architecture"
+           echo "  use     return the effective architecture name derived"
+           echo "          from the first configuration listed"
+           echo ""
            exit(1)
            breaksw
       case -to:
@@ -112,7 +122,7 @@ if (!(-d $BaseDev)) then
 endif
 
 set DB      = $BaseDev/$SGN-$Arch
-set LockDir = $BaseDev/$SGN-$Arch.lock
+set LockDir = $DB.lock
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -122,7 +132,7 @@ set LockDir = $BaseDev/$SGN-$Arch.lock
 onintr INTERRUPT
 
 # lock the DB
-   $PLOCK lock -d $LockDir -t $LockT
+   $PLOCK lock -d $LockDir -t $LockT >& /dev/null
 
 # convert old file databases to directory form
    if (-f $DB) then
@@ -131,6 +141,7 @@ onintr INTERRUPT
       set first = ""
       foreach i (`cat $DB.file`)
          touch $DB/$i
+         chmod 660 $DB/$i
          if ("$first" == "") then
             set first = $i
          endif
@@ -170,6 +181,7 @@ switch ($Tgt)
         endif
 
 	touch $ent
+        chmod 660 $ent
         rm -f current
 	ln -s $ent current
 
@@ -265,7 +277,7 @@ endsw
 INTERRUPT:
 
 # unlock the DB
-$PLOCK unlock -d $LockDir
+$PLOCK unlock -d $LockDir >& /dev/null
 
 exit($ret)
 
@@ -295,7 +307,7 @@ USE:
 #--------------------------------------------------------------------------
 
 # unlock the DB
-$PLOCK unlock -d $LockDir
+$PLOCK unlock -d $LockDir >& /dev/null
 
 exit($ret)
 
