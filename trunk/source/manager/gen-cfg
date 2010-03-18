@@ -89,7 +89,10 @@ endif
 
 # check list of features and setup environment
 
-set bits    = ""
+if ($?bits == 0) then
+   setenv bits ""
+endif
+
 set pthread = FALSE
 set openmp  = FALSE
 set shared  = FALSE
@@ -101,7 +104,7 @@ foreach i ($features)
    switch ($i)
       case 32:
       case 64:
-           set bits = $i
+           setenv bits $i
            breaksw
       case t:
            set pthread = TRUE
