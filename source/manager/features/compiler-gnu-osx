@@ -88,3 +88,14 @@ include serial
 
 setenv PATH /sw/bin:/usr/apps/gnu/bin:$PATH
 
+Group PNG {
+   Path = /sw
+}
+
+Group JPEG {
+   Path = /sw
+}
+
+Group HDF {
+   Path = /sw
+}

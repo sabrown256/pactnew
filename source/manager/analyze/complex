@@ -13,6 +13,8 @@ source $Me:h/common
 
 SafeEnv HaveCOMPLEX TRUE
 
+Note $ALog "HaveCOMPLEX = $HaveCOMPLEX"
+
 if ($HaveCOMPLEX == TRUE) then
 
 cat << EOF >! $Tmp.c

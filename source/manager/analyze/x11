@@ -30,7 +30,7 @@ SafeEnv X11_Path         /usr
 
 # if we have explicitly said we do not want X11
 # do NOT detect it
-if ($X11_Path == none) then
+if ("$X11_Path" == none) then
    NoteD $ALog "      no X11 (by request)"
    setenv Std_UseX FALSE
    SetParent Std_UseX
@@ -83,9 +83,15 @@ int main(int c, char **v)
 EOF
    endif
 
-   set lIncDirs = ( $X11_Path/include /usr/X11R6/include $RootInc )
-   set lLibDirs = ( $X11_Path/$LIB $lLibDirs /usr/X11R6/$LIB )
-   set lLibDirs = ( $lLibDirs /usr/X11R6/lib )
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($X11_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/$LIB )
+   end
+   set lIncDirs = ( $lIncDirs /usr/X11R6/include $RootInc )
+   set lLibDirs = ( $lLibDirs /usr/X11R6/$LIB /usr/X11R6/lib )
+
    set lHdrs    = ( X11/Xlib.h )
    set ASList   = ( so a )
    set lLib     = X11

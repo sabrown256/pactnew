@@ -18,7 +18,7 @@ Note $Log "Analyze: libz"
 SafeEnv Z_Path /usr
 
 # if we have explicitly said we do not want libZ do NOT detect it
-if ($Z_Path == none) then
+if ("$Z_Path" == none) then
    NoteD $ALog "      no libz (by request)"
    setenv HAVE_ZLIB ""
 
@@ -38,8 +38,15 @@ int main(int c, char **v)
  return(rv);}
 EOF
 
-   set lIncDirs = ( $Z_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
-   set lLibDirs = ( $Z_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($Z_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/lib )
+   end
+   set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+
    set lHdrs    = ( zlib.h )
    set ASList   = ( a so )
    set lLib     = z
