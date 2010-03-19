@@ -22,7 +22,7 @@ SafeEnv HAVE_SQL FALSE
 
 # if we have explicitly said we do not want SQL
 # do NOT detect it
-if ($SQL_Path == none) then
+if ("$SQL_Path" == none) then
    NoteD $ALog "      no SQL (by request)"
 
 else
@@ -51,13 +51,15 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   if ($?SQL_Path == 1) then
-      set lIncDirs = ( $SQL_Path/include /usr/local/include $RootInc/mysql $RootInc )
-      set lLibDirs = ( $SQL_Path/$LIB /usr/local/lib /usr/lib/mysql /usr/$LIB )
-   else
-      set lIncDirs = ( /usr/local/include $RootInc/mysql $RootInc )
-      set lLibDirs = ( /usr/local/lib /usr/lib/mysql /usr/$LIB )
-   endif
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($SQL_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/$LIB )
+   end
+   set lIncDirs = ( $lIncDirs /usr/local/include $RootInc/mysql $RootInc )
+   set lLibDirs = ( $lLibDirs /usr/local/lib /usr/lib/mysql /usr/$LIB )
+
    set lHdrs    = ( mysql.h )
    set ASList   = ( a so )
    set lLib     = mysqlclient

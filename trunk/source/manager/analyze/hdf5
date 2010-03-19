@@ -20,7 +20,7 @@ SafeEnv ZLib     "-lz"
 
 # if we have explicitly said we do not want HDF5
 # do NOT detect it
-if ($HDF_Path == none) then
+if ("$HDF_Path" == none) then
    NoteD $ALog "      no HDF5 (by request)"
    setenv HAVE_HDF5 ""
 
@@ -39,13 +39,15 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   if ($?HDF_Path) then
-      set lIncDirs = ( $HDF_Path/include /usr/local/hdf5/include /usr/local/include $RootInc )
-      set lLibDirs = ( $HDF_Path/lib /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
-   else
-      set lIncDirs = ( /usr/local/hdf5/include /usr/local/include $RootInc )
-      set lLibDirs = ( /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
-   endif
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($HDF_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/lib )
+   end
+   set lIncDirs = ( $lIncDirs /usr/local/hdf5/include /usr/local/include $RootInc )
+   set lLibDirs = ( $lLibDirs /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
+
    set lHdrs    = ( hdf5.h )
    set ASList   = ( so a )
    set lLib     = hdf5

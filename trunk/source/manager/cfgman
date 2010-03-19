@@ -55,7 +55,8 @@ while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: cfgman [-h] [-to <#sec>] add <cfg> | delete <cfg> | list | use"
+           echo "Usage: cfgman [-h] [-to <#sec>]"
+           echo "              add <cfg> | delete <cfg> | list | reconst <host> [<arch>] | use"
            echo ""
            echo "  h    this help message"
            echo "  to   number of seconds to wait for requisite locks (default 300)"
@@ -174,6 +175,11 @@ switch ($Tgt)
 #--------------------------------------------------------------------------
 
 # ADD - add the specified config or make it first on the current host
+#     - the following two cases must work:
+#     -   1) cfgman add <cfg> [ <alias> ]
+#     -      add cfg[@alias]
+#     -   2) cfgman add <cfg> | <alias>
+#     -      make cfg or cfg@alias the current configuration
 
    case add:
         if ($#argv == 1) then
@@ -182,11 +188,30 @@ switch ($Tgt)
            set ent = $1@$2
         endif
 
-	touch $ent
-        chmod 660 $ent
-        rm -f current
-	ln -s $ent current
+# check everybody on the current list
+        foreach i (*)
+           if ($i == current) continue
 
+           if ("$i" =~ *@*) then
+              set base = `echo $i | sed 's/@.*$//'`
+              set alia = `echo $i | sed 's/^.*@//'`
+
+# otherwise the entry is the base
+           else
+              set base = $i
+              set alia = ""
+           endif
+
+           if (("$i" == "$ent") || ("$base" == "$ent") || ("$alia" == "$ent")) then
+              touch $i
+              chmod 660 $i
+              rm -f current
+              ln -s $i current
+              break
+           endif
+        end
+        unset base
+        unset alia
         unset ent
 
         goto USE
@@ -206,20 +231,20 @@ switch ($Tgt)
               if ($i == current) continue
 
               if ("$i" =~ *@*) then
-                 set name = `echo $i | sed 's/@.*$//'`
+                 set base = `echo $i | sed 's/@.*$//'`
                  set alia = `echo $i | sed 's/^.*@//'`
 
 # otherwise the entry is the base
               else
-                 set name = $i
+                 set base = $i
                  set alia = ""
               endif
 
-              if (("$ent" == "$i") || ("$ent" == "$name") || ("$ent" == "$alia")) then
+              if (("$ent" == "$i") || ("$ent" == "$base") || ("$ent" == "$alia")) then
                  rm -f $i >& /dev/null
               endif
            end
-           unset name
+           unset base
            unset alia
         endif
         unset ent

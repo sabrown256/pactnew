@@ -65,8 +65,8 @@ extern double complex
 
 typedef double complex[2];
 
-# define PM_REAL_C(x)       ((x)[0])
-# define PM_IMAGINARY_C(x)  ((x)[1])
+# define PM_REAL_C(_z)       ((_z)[0])
+# define PM_IMAGINARY_C(_z)  ((_z)[1])
 
 #else
 
@@ -76,8 +76,8 @@ struct s_complex
 
 typedef struct s_complex complex;
 
-#  define PM_REAL_C(x)       x.real
-#  define PM_IMAGINARY_C(x)  x.imag
+#  define PM_REAL_C(_z)       (_z).real
+#  define PM_IMAGINARY_C(_z)  (_z).imag
 
 #endif
 

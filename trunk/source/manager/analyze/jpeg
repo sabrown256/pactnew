@@ -20,7 +20,7 @@ SafeEnv HAVE_JPEGLIB  FALSE
 
 # if we have explicitly said we do not want JPEG
 # do NOT detect it
-if ($JPEG_Path == none) then
+if ("$JPEG_Path" == none) then
    NoteD $ALog "      no JPEG (by request)"
 
 else
@@ -42,8 +42,15 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   set lIncDirs = ( $JPEG_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
-   set lLibDirs = ( $JPEG_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($JPEG_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/lib )
+   end
+   set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+
    set lHdrs    = ( jpeglib.h jconfig.h jmorecfg.h jerror.h )
    set ASList   = ( a so )
    set lLib     = jpeg

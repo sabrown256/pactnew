@@ -1387,7 +1387,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
            {strncpy(lval, t, MAXLINE);
             strncpy(nval, run(FALSE, "echo $%s", fvar), MAXLINE);
             note(Log, TRUE, "Change    |%s|", fvar);
-            note(Log, TRUE, "Add       |%s|", lval);
+            note(Log, TRUE, "Prepend   |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
 
             snprintf(mval, MAXLINE, "%s %s", lval, nval);
@@ -1410,10 +1410,10 @@ static void set_var(int rep, char *var, char *oper, char *val)
            {strncpy(lval, t, MAXLINE);
             strncpy(nval, run(FALSE, "echo $%s", fvar), MAXLINE);
             note(Log, TRUE, "Change    |%s|", fvar);
-            note(Log, TRUE, "Add       |%s|", lval);
+            note(Log, TRUE, "Append    |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
 
-            snprintf(mval, MAXLINE, "%s %s", lval, nval);
+            snprintf(mval, MAXLINE, "%s %s", nval, lval);
             note(Log, TRUE, "New value |%s|", mval);
 
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);

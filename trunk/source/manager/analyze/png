@@ -20,7 +20,7 @@ SafeEnv HAVE_PNGLIB  FALSE
 
 # if we have explicitly said we do not want PNG
 # do NOT detect it
-if ($PNG_Path == none) then
+if ("$PNG_Path" == none) then
    NoteD $ALog "      no PNG (by request)"
 
 else if ($Z_Path == none) then
@@ -45,8 +45,16 @@ int main(int c, char **v)
      return(0);};}
 EOF
 
-   set lIncDirs = ( $PNG_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
-   set lLibDirs = ( $PNG_Path/lib $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+
+   set lIncDirs = ""
+   set lLibDirs = ""
+   foreach i ($PNG_Path)
+      set lIncDirs = ( $lIncDirs $i/include )
+      set lLibDirs = ( $lLibDirs $i/lib )
+   end
+   set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+
    set lHdrs    = ( png.h )
    set ASList   = ( a so )
    set lLib     = png
