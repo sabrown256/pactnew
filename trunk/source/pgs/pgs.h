@@ -871,6 +871,7 @@ struct s_curve
 
 struct s_PG_axis_tick_def
    {int n;
+    int ndiv;        /* number of divisions - size of dx */
     int log_scale;
     double end;
     double start;

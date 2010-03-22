@@ -186,6 +186,8 @@ switch ($Tgt)
            set ent = $1
         else
            set ent = $1@$2
+           touch $ent
+           chmod 660 $ent
         endif
 
 # check everybody on the current list
