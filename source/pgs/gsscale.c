@@ -293,6 +293,7 @@ static void _PG_tick_div_dec(PG_axis_tick_def *td, double vn, double vx,
 	         dx[j] = t*sub[k];};};
 
     td->n         = na;
+    td->ndiv      = j;
     td->vn        = va;
     td->vx        = vb;
     td->dx        = dx;
@@ -316,7 +317,7 @@ static void _PG_tick_div_eqr(PG_axis_tick_def *td, double vn, double vx,
 			     double dv, int tick)
    {int i, j, k;
     int dexp, na, step;
-    double va, vb, vd, r, t;
+    double va, vb, vd, nv, r, t;
     double *dx;
 
 /* find the extremal values for major ticks and labels
@@ -324,21 +325,22 @@ static void _PG_tick_div_eqr(PG_axis_tick_def *td, double vn, double vx,
  */
     va = PM_round(vn/dv);
     vb = PM_round(vx/dv);
-    na = PM_round(vb - va) + 1.0;
+    nv = PM_round(vb - va) + 1.0;
 
 /* too many divisions - increase DV by factors of 10 */
-    while (na > 10)
+    while (nv > 10)
        {dv *= 10.0;
         va = PM_round(vn/dv);
 	vb = PM_round(vx/dv);
-	na = PM_round(vb - va) + 1.0;};
+	nv = PM_round(vb - va) + 1.0;};
 
 /* too few divisions - reduce DV by factors of 10 */
-    while (na <= 2)
+    while (nv <= 2)
        {dv *= 0.1;
         va = PM_round(vn/dv);
 	vb = PM_round(vx/dv);
-	na = PM_round(vb - va) + 1.0;};
+	nv = PM_round(vb - va) + 1.0;};
+    na  = nv;
     va *= dv;
     vb *= dv;
 
@@ -442,7 +444,7 @@ static void _PG_tick_div_nrm(PG_axis_tick_def *td)
 
 static void _PG_tick_div_log(PG_axis_tick_def *td,
 			     PG_axis_def *ad, int tick)
-   {double va, vn, vx, dlv, dv;
+   {double va, vn, vx, dlu, dlv, dv;
 
 /* get out the limits (VN, VX) */
     vn = ad->vn;
@@ -451,8 +453,14 @@ static void _PG_tick_div_log(PG_axis_tick_def *td,
     vn = max(vn, va);
  
 /* divide the interval into reasonable sized units wrt the scale of the values */
-    dlv = PM_round(log10(vx/vn));
-    dv  = POW(10.0, dlv);
+    dlv = log10(vx/vn);
+    dlu = (dlv > 0.0) ? floor(dlv) : ceil(dlv);
+    if (dlu == 0.0)
+       dlv = 0.0;
+    else
+       dlv = PM_round(dlv);
+
+    dv = POW(10.0, dlv);
 
 /* if the interval is greater than one decade the major ticks fall on decades */
     if (dlv > 0.0)
