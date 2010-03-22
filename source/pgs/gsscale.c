@@ -532,7 +532,7 @@ static void _PG_tick_div_lin(PG_axis_tick_def *td,
  */
 
 void _PG_tick(PG_axis_def *ad, int tick)
-   {double vx, vn, t1, t2, a, b, dvi, sp;
+   {double vx, vn, wx, wn, t1, t2, a, b, dvi, sp;
     PG_axis_tick_def *td;
 
     td = ad->tick + (tick >> 1);
@@ -558,15 +558,14 @@ void _PG_tick(PG_axis_def *ad, int tick)
 
 /* T1 and T2 are only used to compute the scale - not for drawing */
     dvi = ad->dr/((vx - vn)*ad->scale);
-/*    if ((t1 < t2) || (td->log_scale == FALSE)) */
-       {a = (vn*t2 - vx*t1)*dvi;
-	b = (t2 - t1)*dvi;}
-/*    else
-       {b = (vn*t2 - vx*t1)*dvi;
-	a = (t2 - t1)*dvi;}; */
+    a   = (vn*t2 - vx*t1)*dvi;
+    b   = (t2 - t1)*dvi;
 
-    td->start = b*(td->vn) - a;
-    td->end   = b*(td->vx) - a;
+    wn = b*(td->vn);
+    wx = b*(td->vx);
+
+    td->start = (PM_CLOSETO_REL(wn, a) == TRUE) ? 0.0 : wn - a;
+    td->end   = wx - a;
 
     return;}
 
