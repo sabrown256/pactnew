@@ -16,7 +16,7 @@ setenv MPIGoodIO   TRUE
 XArch = -qarch=450
 
 Tool CC {
-   Exe       = mpixlc
+   Exe       = mpixlc_r
    Flags     = ${XArch} -D_ALL_SOURCE -qsuppress=1500-010:1506-1300:1506-1298:1506-383:1506-377
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -q* ]
@@ -28,7 +28,7 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = mpixlf77
+   Exe     = mpixlf77_r
    Flags   = ${XArch} -qrecur
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -q* ]
@@ -77,8 +77,8 @@ Group OpenMP {
 }
 
 Group MPI {
-   CC_Exe = mpixlc
-   FC_Exe = mpixlf77
+   CC_Exe = mpixlc_r
+   FC_Exe = mpixlf77_r
 }
 
 .c.i:
