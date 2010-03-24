@@ -51,7 +51,8 @@ int _PD_csum_close(PDBfile *file)
  * before we flush/close the file, so that a valid checksum is recomputed
  * and added to the file
  */
-    if (((file->use_cksum & PD_MD5_FILE) == 0) &&
+    if ((((file->use_cksum & PD_MD5_FILE) == 0) &&
+	 ((file->file_cksum & PD_MD5_FILE) != 0)) &&
 	(file->virtual_internal == FALSE))
        {ok = PD_verify(file);
         if (ok == FALSE)
@@ -274,7 +275,9 @@ int _PD_csum_block_write(PDBfile *file, syment *ep, long n)
 	memset(cdig, 0, PD_CKSUM_LEN);
 	PM_md5_checksum_file(file->stream, start, stop, cdig);
 
-	rv = _PD_block_set_csum(bl, n, cdig);};
+	rv = _PD_block_set_csum(bl, n, cdig);
+
+        file->file_cksum |= PD_MD5_RW;};
                     
     return(rv);}
 
@@ -385,7 +388,9 @@ int PD_verify(PDBfile *file)
         
 		_PD_md5_checksum(file, (unsigned char *) csn);
   
-		ok = _PD_csum_compare(cso, csn);};};};
+		ok = _PD_csum_compare(cso, csn);
+
+		file->file_cksum |= PD_MD5_FILE;};};};
     
     return(ok);}
 

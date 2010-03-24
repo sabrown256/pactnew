@@ -509,9 +509,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     fp   = pu->stream;
     file = NULL;
 
-    if (PD_buffer_size != -1)
-       if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) PD_buffer_size*BUFSIZ))
-          PD_error("CAN'T SET FILE BUFFER - _NAC_OPEN", PD_OPEN);
+    _PD_set_io_buffer(pu);
 
 /* attempt to read an ASCII header */
     if (lio_seek(fp, 0L, SEEK_SET))

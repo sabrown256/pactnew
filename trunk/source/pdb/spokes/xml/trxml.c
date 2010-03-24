@@ -67,9 +67,7 @@ static PDBfile *_XML_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     fp   = pu->stream;
     file = NULL;
 
-    if (PD_buffer_size != -1)
-       if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) PD_buffer_size*BUFSIZ))
-          PD_error("CANNOT SET FILE BUFFER - _XML_OPEN", PD_OPEN);
+    _PD_set_io_buffer(pu);
 
 /* attempt to read an ASCII header */
     if (lio_seek(fp, 0L, SEEK_SET))
