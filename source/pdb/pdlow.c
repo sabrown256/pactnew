@@ -151,6 +151,31 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 
 /*--------------------------------------------------------------------------*/
 
+/* _PD_SET_IO_BUFFER - set the I/O buffer */
+
+void _PD_set_io_buffer(SC_udl *pu)
+   {BIGINT sz;
+    char *bf;
+    FILE *fp;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+    sz = pa->buffer_size;
+    if (pa->buffer_size != -1)
+       {fp = pu->stream;
+	bf = FMAKE_N(char, sz, "_PD_SET_IO_BUFFER:bf");
+
+	if (lio_setvbuf(fp, bf, _IOFBF, sz))
+	   {SFREE(bf);
+	    PD_error("CANNOT SET FILE BUFFER - _PD_SET_IO_BUFFER", PD_OPEN);}
+	else
+	   pu->buffer = bf;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PIO_OPEN - do an open in a parallel context */
 
 SC_udl *_PD_pio_open(char *name, char *mode)
@@ -175,14 +200,15 @@ SC_udl *_PD_pio_open(char *name, char *mode)
 	    else
 	       s = pu->path;
 
-	     fp = (*opn)(s, md);};
+	    fp = (*opn)(s, md);};
 
 	if (fp == NULL)
 	   {_SC_rel_udl(pu);
 	    pu = NULL;}
 	else
 	   {pu->stream = fp;
-	    pu->mode   = SC_strsavef(md, "char*:_PD_PIO_OPEN:md");};};
+	    pu->mode   = SC_strsavef(md, "char*:_PD_PIO_OPEN:md");
+	    _PD_set_io_buffer(pu);};};
 
     return(pu);}
 
@@ -1087,9 +1113,7 @@ PDBfile *_PD_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     pa = _PD_get_state(-1);
     fp = pu->stream;
 
-    if (pa->buffer_size != -1)
-       if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) pa->buffer_size))
-          PD_error("CANNOT SET FILE BUFFER - _PD_CREATE", PD_OPEN);
+    _PD_set_io_buffer(pu);
 
 /* make the PDBfile */
     file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, tr);
@@ -1176,9 +1200,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
     pa = _PD_get_state(-1);
     fp = _PD_data_source(pu);
 
-    if (pa->buffer_size != -1)
-       if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) pa->buffer_size))
-	  PD_error("CANNOT SET FILE BUFFER - _PD_OPEN", PD_OPEN);
+    _PD_set_io_buffer(pu);
 
     file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, tr);
     if (file == NULL)

@@ -131,9 +131,7 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     fp   = pu->stream;
     file = NULL;
 
-    if (PD_buffer_size != -1)
-       if (setvbuf(fp, NULL, _IOFBF, (size_t) PD_buffer_size*BUFSIZ))
-          PD_error("CAN'T SET FILE BUFFER - _LLF_OPEN", PD_OPEN);
+    _PD_set_io_buffer(pu);
 
 /* attempt to read an ASCII header: 4 words
  *                 +--------+

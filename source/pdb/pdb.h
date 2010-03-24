@@ -375,7 +375,8 @@ struct s_PDBfile
     off_t headaddr;
     off_t symtaddr;
     off_t chrtaddr;
-    PD_checksum_mode use_cksum;
+    PD_checksum_mode use_cksum;          /* session use of checksums */
+    PD_checksum_mode file_cksum;         /* file use of checksums */
     int fix_denorm;
 
     sys_layer *sys;

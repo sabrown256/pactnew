@@ -146,6 +146,7 @@ SC_udl *_SC_parse_udl(char *s)
 
     if (pu != NULL)
        {pu->stream   = NULL;
+	pu->buffer   = NULL;
         pu->mode     = NULL;
 	pu->udl      = SC_strsavef(s, "char*:_SC_PARSE_UDL:udl");
 	pu->protocol = proto;
@@ -171,6 +172,7 @@ void _SC_rel_udl(SC_udl *pu)
        {if (pu->stream != NULL)
 	   io_close(pu->stream);
 	SFREE(pu->stream);
+	SFREE(pu->buffer);
 	SFREE(pu->mode);
         SFREE(pu->udl);
 	SFREE(pu->protocol);

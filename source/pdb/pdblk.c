@@ -726,6 +726,8 @@ int _PD_block_csum_read(PDBfile *file)
 	        {_PD_block_set_csum(bl, j, dig);
 		 _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};};
 
+    file->file_cksum |= PD_MD5_RW;
+
     return(ok);}
 
 /*--------------------------------------------------------------------------*/

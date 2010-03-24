@@ -457,6 +457,7 @@ extern SC_udl
  *_PD_pio_open(char *name, char *mode);
 
 extern void
+ _PD_set_io_buffer(SC_udl *pu),
  _PD_set_standard(PDBfile *file, data_standard *std, data_alignment *algn),
  _PD_init_consts(void),
  _PD_init_chrt(PDBfile *file),

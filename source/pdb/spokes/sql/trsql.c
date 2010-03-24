@@ -74,20 +74,12 @@ static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
    {char *lname;
     PDBfile *file;
     FILE *fp;
-    PD_smp_state *pa;
-
-    pa = _PD_get_state(-1);
 
     lname = pu->udl;
 
     if (pu->server == NULL)
        {fp = pu->stream;
-
-	if (PD_buffer_size != -1)
-	   if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) pa->buffer_size))
-	      PD_error("CAN'T SET FILE BUFFER - _SQL_CREATE", PD_CREATE);};
-
-/*    tr = _PD_lookup(SQL_DATABASE_S); */
+	_PD_set_io_buffer(pu);};
 
     file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, tr);
     if (file == NULL)
@@ -136,16 +128,11 @@ static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     PDBfile *file;
     FILE *fp;
 
-/*    tr = _PD_lookup(SQL_DATABASE_S); */
-
     lname = pu->udl;
 
     if (pu->server == NULL)
        {fp = pu->stream;
-
-	if (PD_buffer_size != -1)
-	   if (lio_setvbuf(fp, NULL, _IOFBF, (size_t) PD_buffer_size*BUFSIZ))
-	      PD_error("CAN'T SET FILE BUFFER - _SQL_OPEN", PD_OPEN);
+	_PD_set_io_buffer(pu);
 
 /* attempt to read an ASCII header */
 	if (lio_seek(fp, 0L, SEEK_SET))

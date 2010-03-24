@@ -252,6 +252,7 @@ struct s_SC_udl
     char *entry;        /* entry in container */
     char *target;       /* data_standard for output files */
     char *format;       /* PDB, HDF5, ... */
+    char *buffer;       /* I/O buffer for setvbuf */
     off_t address;      /* file address for remote acceses */
     pcons *info;};      /* other attributes */
 
