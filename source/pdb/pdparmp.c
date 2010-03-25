@@ -795,7 +795,12 @@ static FILE *_PD_mpopen(char *name, char *mode)
 
 /* otherwise open a stdc file */      
         else
-           {fpstream  = SC_lfopen(name, mode);
+           {
+#ifdef SC_C_STD_BUFFERED_IO
+            fpstream = SC_lfopen(name, mode);
+#else
+	    fpstream = SC_lbopen(name, mode);
+#endif
             file_comm = comm;};};
     
     fa = FMAKE_N(SC_address, _PD_nthreads+1, "_PD_MPOPEN:fa");

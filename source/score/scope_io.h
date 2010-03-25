@@ -363,6 +363,13 @@ extern int
  _SC_is_archive(FILE *fp);
 
 
+/* SCBIO.C declarations */
+
+extern FILE
+ *SC_bopen(char *name, char *mode),
+ *SC_lbopen(char *name, char *mode);
+
+
 /* SCFCNTNR.C declarations */
 
 extern fcontainer
