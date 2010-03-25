@@ -1,6 +1,5 @@
 /*
  * SCFIO.C - I/O hooks suitable for mapped files and remote file access
- *         - formerly part of PPC (pcfio.c)
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -61,9 +60,19 @@ PFfputs
 
 /* declare the IO hooks */
 
+#ifdef SC_C_STD_BUFFERED_IO
+
 PFfopen
  io_open_hook = SC_fopen,
  lio_open_hook = SC_lfopen;
+
+#else
+
+PFfopen
+ io_open_hook = SC_bopen,
+ lio_open_hook = SC_lbopen;
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 

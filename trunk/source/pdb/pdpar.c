@@ -551,7 +551,12 @@ static FILE *_PD_popen(char *name, char *mode)
     if (name == NULL)
        fp = fail;
     else
-       {fp = SC_lfopen(name, mode);
+       {
+#ifdef SC_C_STD_BUFFERED_IO
+	fp = SC_lfopen(name, mode);
+#else
+	fp = SC_lbopen(name, mode);
+#endif
 
         if (fp == fail)
            return(fail);};

@@ -582,13 +582,25 @@ off_t _PD_get_current_address(PDBfile *file, PD_major_op tag)
 int _PD_set_current_address(PDBfile *file, off_t addr, int wh,
 			    PD_major_op tag)
    {int st;
+    off_t curr;
     FILE *fp;
 
     fp = file->stream;
 
-    st = lio_seek(fp, addr, wh);
-    if ((st != 0) && (tag != -1))
-       PD_error("FAILED TO FIND ADDRESS - _PD_SET_CURRENT_ADDRESS", tag);
+/* NOTE: important optimzation for high performance platforms
+ * the fseek causes a read which flushes the I/O buffer attached
+ * with setvbuf.  This guts the utility of setting the buffer
+ * size so as to obtain optimal write throughput
+ * An ftell does not have this effect - so do the ftell and avoid
+ * the fseek if the current address is where you want to be
+ */
+    curr = lio_tell(fp);
+    if (curr != addr)
+       {st = lio_seek(fp, addr, wh);
+	if ((st != 0) && (tag != -1))
+	   PD_error("FAILED TO FIND ADDRESS - _PD_SET_CURRENT_ADDRESS", tag);}
+    else
+       st = 0;
 
     return(st);}
 
