@@ -112,6 +112,21 @@ static PG_device
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PG_X_EVENTS_PENDING - return number of pending events */
+
+static int _PG_X_events_pending(PG_device *dev)
+   {int n;
+
+    n = 0;
+
+    if (_PG_X_display != NULL)
+       n = XEventsQueued(_PG_X_display, QueuedAfterFlush);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PG_GET_EVENT_CORE - respond to an events
  *                    - if check is TRUE then loop while there are events
  *                    - if check is FALSE loop forever
@@ -1746,6 +1761,9 @@ static void _PG_X_mouse_event_info(PG_device *dev, PG_event *ev,
 	     break;
 	case 5 :
 	     eb = MOUSE_WHEEL_DOWN;
+	     break;
+	default :
+	     eb = MOUSE_NONE;
 	     break;};
     *peb = eb;
 
@@ -1819,6 +1837,7 @@ int PG_setup_x11_device(PG_device *d)
     d->type_index   = GRAPHIC_WINDOW_DEVICE;
     d->is_visible   = TRUE;
 
+    d->events_pending         = _PG_X_events_pending;
     d->query_pointer          = _PG_X_query_pointer;
     d->mouse_event_info       = _PG_X_mouse_event_info;
     d->key_event_info         = _PG_X_key_event_info;

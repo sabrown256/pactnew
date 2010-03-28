@@ -767,15 +767,17 @@ switch ($Cmnd)
         if ("$Configuration" == "") then
            call GEN_CONFIG()
            set UCfg = $gdir/$Configuration
+	   set dir  = $gdir
 
 # if file exists as is use it
         else if (-f $Configuration) then
            set UCfg = $gdir/$Configuration
+	   set dir  = $gdir
 
 # otherwise look in the configs directories
         else
            foreach dir ($ConfigDir $gdir)
-              set lCfg = $gdir/$Configuration
+              set lCfg = $dir/$Configuration
               if (-f $lCfg) then
                  set UCfg = $lCfg
                  break

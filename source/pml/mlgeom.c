@@ -36,15 +36,16 @@ struct s_pt
  *           -                                     intersection
  *           -
  *           - if 0 <= t <= 1 and  0 <= s <= 1 then the segments intersect
+ *           -
  *           - the determinant of these two equations is
- *           - d = (X1-X2)x(X3-X4)
+ *           -    d = (X1-X2)x(X3-X4)
  *           -
  *           - if d = 0 then the lines are parallel and further tests
  *           - are:
  *           -
  *           - if the following condition is true:
  *           -
- *           - (2) (X2-X1)x(X3-X1) # 0
+ *           - (2) (X2-X1)x(X3-X1) != 0
  *           -
  *           - then the lines do not intersect
  *           - otherwise, the intersection is the point given by the
@@ -60,12 +61,12 @@ int _PM_cross(double x1, double y1, double x2, double y2,
 	      double x3, double y3, double x4, double y4,
 	      double *px0, double *py0,
 	      int line1, int line2)
-   {int cross_flag;
+   {int cross;
     double a, b, dx21, dy21, dx43, dy43, dx13, dy13, idx, idy;
     double d, t1, t2;
 
 /* assume they don't intersect */
-    cross_flag = FALSE;
+    cross = FALSE;
 
     t1 = -HUGE;
     t2 = -HUGE;
@@ -80,6 +81,11 @@ int _PM_cross(double x1, double y1, double x2, double y2,
     dy43 = y4 - y3;
     dx13 = x1 - x3;
     dy13 = y1 - y3;
+
+/* if either vector is zero */
+    if (((dx21 == 0.0) && (dy21 == 0.0)) ||
+	((dx43 == 0.0) && (dy43 == 0.0)))
+       return(cross);
 
 /* find determinant for equation (1) */
     a = dx21*dy43;
@@ -123,51 +129,51 @@ int _PM_cross(double x1, double y1, double x2, double y2,
        {case 0 :
 	     switch (line2)
 	         {case 0 :
-		       cross_flag = ((-TOLERANCE <= t1) &&
+		       cross = ((-TOLERANCE <= t1) &&
 				     (t1 <= 1.0000000001) &&
 				     (-TOLERANCE <= t2) &&
 				     (t2 <= 1.0000000001));
 		       break;
 		  case 1 :
-		       cross_flag = ((-TOLERANCE <= t1) &&
+		       cross = ((-TOLERANCE <= t1) &&
 				     (t1 <= 1.0000000001) &&
 				     (-TOLERANCE <= t2));
 		       break;
 		  case 2 :
-		       cross_flag = ((-TOLERANCE <= t1) &&
+		       cross = ((-TOLERANCE <= t1) &&
 				     (t1 <= 1.0000000001));
 		       break;};
 	     break;
 	case 1 :
 	     switch (line2)
 	        {case 0 :
-		      cross_flag = ((-TOLERANCE <= t1) &&
+		      cross = ((-TOLERANCE <= t1) &&
 				    (-TOLERANCE <= t2) &&
 					(t2 <= 1.0000000001));
 		      break;
 		 case 1 :
-		      cross_flag = ((-TOLERANCE <= t1) &&
+		      cross = ((-TOLERANCE <= t1) &&
 				    (-TOLERANCE <= t2));
 		      break;
 		 case 2 :
-		      cross_flag = (-TOLERANCE <= t1);
+		      cross = (-TOLERANCE <= t1);
 		      break;};
 	     break;
         case 2 :
 	     switch (line2)
 	        {case 0 :
-		      cross_flag = ((-TOLERANCE <= t2) &&
+		      cross = ((-TOLERANCE <= t2) &&
 				    (t2 <= 1.0000000001));
 		      break;
 		 case 1 :
-		      cross_flag = (-TOLERANCE <= t2);
+		      cross = (-TOLERANCE <= t2);
 		      break;
 		 case 2 :
-		      cross_flag = TRUE;
+		      cross = TRUE;
 		      break;};
 	     break;};
 
-    return(cross_flag);}
+    return(cross);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -223,7 +229,7 @@ int PM_cross_line_plane(double x1, double y1, double z1,
 			double *px, double *py, double *pz,
 			double *px0, double *py0, double *pz0,
 			int line)
-   {int cross_flag;
+   {int cross;
     double a, b, t;
     double nx, ny, nz;
     double x0, y0, z0;
@@ -231,7 +237,7 @@ int PM_cross_line_plane(double x1, double y1, double z1,
     double dx14, dy14, dz14, dx21, dy21, dz21;
 
 /* assume they don't intersect */
-    cross_flag = FALSE;
+    cross = FALSE;
 
     dx54 = px[0] - px[1];
     dy54 = py[0] - py[1];
@@ -261,29 +267,29 @@ int PM_cross_line_plane(double x1, double y1, double z1,
        {x0 = HUGE;
 	y0 = HUGE;
 	z0 = HUGE;
-        cross_flag = FALSE;}
+        cross = FALSE;}
     else
        {x0 = x1 + dx21*t;
 	y0 = y1 + dy21*t;
 	z0 = z1 + dz21*t;
-        cross_flag = TRUE;};
+        cross = TRUE;};
 
     switch (line)
        {case 0 :
-	     cross_flag &= ((-TOLERANCE <= t) && (t <= 1.0000000001));
+	     cross &= ((-TOLERANCE <= t) && (t <= 1.0000000001));
 	     break;
 	case 1 :
-	     cross_flag &= (-TOLERANCE <= t);
+	     cross &= (-TOLERANCE <= t);
 	     break;
         case 2 :
-	     cross_flag &= TRUE;
+	     cross &= TRUE;
 	     break;};
 
     *px0 = x0;
     *py0 = y0;
     *pz0 = z0;
 
-    return(cross_flag);}
+    return(cross);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

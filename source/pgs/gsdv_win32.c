@@ -959,6 +959,7 @@ int PG_setup_win32_device(PG_device *d)
 
     d->is_visible = TRUE;
 
+    d->events_pending         = NULL;
     d->query_pointer          = _PG_win32_query_pointer;
     d->mouse_event_info       = _PG_win32_mouse_event_info;
     d->key_event_info         = _PG_win32_key_event_info;

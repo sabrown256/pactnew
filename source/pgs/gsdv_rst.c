@@ -725,6 +725,7 @@ int PG_setup_raster_device(PG_device *d)
 
     d->type_index              = RASTER_DEVICE;
 
+    d->events_pending          = NULL;
     d->query_pointer           = _PG_rst_query_pointer;
     d->mouse_event_info        = NULL;
     d->key_event_info          = NULL;

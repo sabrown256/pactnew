@@ -780,6 +780,7 @@ int PG_setup_ps_device(PG_device *d)
     d->type_index             = PS_DEVICE;
     d->ps_color               = FALSE;
 
+    d->events_pending          = NULL;
     d->query_pointer           = _PG_PS_query_pointer;
     d->mouse_event_info        = NULL;
     d->key_event_info          = NULL;

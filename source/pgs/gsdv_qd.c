@@ -1804,6 +1804,7 @@ int PG_setup_qd_device(PG_device *d)
 
     d->is_visible = TRUE;
 
+    d->events_pending         = NULL;
     d->query_pointer          = _PG_qd_query_pointer;
     d->mouse_event_info       = _PG_qd_mouse_event_info;
     d->key_event_info         = _PG_qd_key_event_info;

@@ -1525,7 +1525,8 @@ static void process_use(char *sg, char *oper)
 /* READ_CONFIG - read the user configuration file */
 
 static void read_config(char *cfg, int quiet)
-   {char line[MAXLINE], key[MAXLINE], oper[MAXLINE], value[MAXLINE];
+   {int il;
+    char line[MAXLINE], key[MAXLINE], oper[MAXLINE], value[MAXLINE];
     char *path;
     gt_entry *ge;
 
@@ -1546,201 +1547,201 @@ static void read_config(char *cfg, int quiet)
     path = push_file(cfg, STACK_FILE);
 
 /* toplevel loop over the input to define configuration parameters */
-    while (TRUE)
-       {if (cdefenv("STOP") == TRUE)
-	   {noted(Log, " ");
-	    exit(1);};
+    for (il = 0; TRUE; il++)
+        {if (cdefenv("STOP") == TRUE)
+	    {noted(Log, " ");
+	     exit(1);};
 
-	read_line(line, MAXLINE);
+	 read_line(line, MAXLINE);
 
-        if (line[0] == '\0')
-           continue;
-        else if (strcmp(line, "++end++") == 0)
-           break;
+	 if (line[0] == '\0')
+            continue;
+	 else if (strcmp(line, "++end++") == 0)
+            break;
 
-        parse_line(line, key, oper, value);
+	 parse_line(line, key, oper, value);
 
-	ge = st.gstck.st + st.gstck.n - 1;
+	 ge = st.gstck.st + st.gstck.n - 1;
 
 /* handle include directives */
-        if (strcmp(key, "include") == 0)
-	   {int n;
-	    char ldepth[MAXLINE];
+	 if (strcmp(key, "include") == 0)
+	    {int n;
+	     char ldepth[MAXLINE];
 
-	    n = st.fstck.n;
-            memset(ldepth, ' ', 3*n);
-	    ldepth[3*n] = '\0';
+	     n = st.fstck.n;
+	     memset(ldepth, ' ', 3*n);
+	     ldepth[3*n] = '\0';
 
-	    path = push_file(oper, STACK_FILE);
-            note(Log, TRUE, "");
-            noted(Log, "%sincluding %s", ldepth, path);}
+	     path = push_file(oper, STACK_FILE);
+	     note(Log, TRUE, "");
+	     noted(Log, "%sincluding %s", ldepth, path);}
 
 /* handle run directives */
-        else if (strcmp(key, "run") == 0)
-	   {int n;
-	    char ldepth[MAXLINE];
+	 else if (strcmp(key, "run") == 0)
+	    {int n;
+	     char ldepth[MAXLINE];
 
-	    n = st.fstck.n;
-            memset(ldepth, ' ', 3*n);
-	    ldepth[3*n] = '\0';
+	     n = st.fstck.n;
+	     memset(ldepth, ' ', 3*n);
+	     ldepth[3*n] = '\0';
 
-	    path = push_file(line+4, STACK_PROCESS);
-            note(Log, TRUE, "");
-	    if (st.phase == PHASE_READ)
-	       noted(Log, "%srunning %s", ldepth, path);}
+	     path = push_file(line+4, STACK_PROCESS);
+	     note(Log, TRUE, "");
+	     if (st.phase == PHASE_READ)
+	        noted(Log, "%srunning %s", ldepth, path);}
 
 /* handle definition of the distributed parallel environment */
-	else if (strcmp(key, "DPEnvironment") == 0)
-	   dp_define();
+	 else if (strcmp(key, "DPEnvironment") == 0)
+	    dp_define();
 
-	else if (strcmp(key, "InstBase") == 0)
-	   {if (st.installp == FALSE)
-	       {dbset(NULL, "InstBase", value);
-		dbset(NULL, "PubInc",   "-I%s/include", value);
-		dbset(NULL, "PubLib",   "-L%s/lib", value);};}
+	 else if (strcmp(key, "InstBase") == 0)
+	    {if (st.installp == FALSE)
+	        {dbset(NULL, "InstBase", value);
+		 dbset(NULL, "PubInc",   "-I%s/include", value);
+		 dbset(NULL, "PubLib",   "-L%s/lib", value);};}
 
-	else if (strcmp(key, "exep") == 0)
-	   {st.exep = TRUE;
-            st.loadp  = FALSE;}
+	 else if (strcmp(key, "exep") == 0)
+	    {st.exep = TRUE;
+	     st.loadp  = FALSE;}
 
-	else if (strcmp(key, "define") == 0)
-	   {if (st.aux.CEF == NULL)
-	       st.aux.CEF = open_file("w", st.aux.cefn);
-	    note(st.aux.CEF, TRUE, "#define %s %s", oper, value);}
+	 else if (strcmp(key, "define") == 0)
+	    {if (st.aux.CEF == NULL)
+	        st.aux.CEF = open_file("w", st.aux.cefn);
+	     note(st.aux.CEF, TRUE, "#define %s %s", oper, value);}
 
-	else if (strcmp(key, "setenv") == 0)
-	   {char *s;
-	    note(st.aux.SEF, TRUE, "%s %s", oper, value);
-	    if (strcmp(oper, "PATH") == 0)
-               push_path(APPEND, epath, value);
-            s = run(FALSE, "echo %s", value);
-            dbset(NULL, oper, s);}
+	 else if (strcmp(key, "setenv") == 0)
+	    {char *s;
+	     note(st.aux.SEF, TRUE, "%s %s", oper, value);
+	     if (strcmp(oper, "PATH") == 0)
+                push_path(APPEND, epath, value);
+	     s = run(FALSE, "echo %s", value);
+	     dbset(NULL, oper, s);}
 
-	else if (strcmp(key, "parent") == 0)
-	   {char *s, *var, *val;
+	 else if (strcmp(key, "parent") == 0)
+	    {char *s, *var, *val;
 
-	    s    = line + 7;
-	    var  = s + strspn(s, " \t");
-	    s    = var + strcspn(var, "(");
-	    *s++ = '\0';
-	    val  = s;
-	    s    = val + strcspn(val, ")");
-	    *s++ = '\0';
-	    if (strcmp(var, "PATH") == 0)
-	       {push_path(APPEND, epath, val);
-		s = run(FALSE, "echo %s", val);
-		dbset(NULL, var, s);}
-	    else
-	       dbset(NULL, var, val);
+	     s    = line + 7;
+	     var  = s + strspn(s, " \t");
+	     s    = var + strcspn(var, "(");
+	     *s++ = '\0';
+	     val  = s;
+	     s    = val + strcspn(val, ")");
+	     *s++ = '\0';
+	     if (strcmp(var, "PATH") == 0)
+	        {push_path(APPEND, epath, val);
+		 s = run(FALSE, "echo %s", val);
+		 dbset(NULL, var, s);}
+	     else
+	        dbset(NULL, var, val);
 
-            if (st.phase == PHASE_READ)
-	       note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
-	    note(Log, TRUE, "Command: setenv %s %s", var, val);}
+	     if (st.phase == PHASE_READ)
+	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
+	     note(Log, TRUE, "Command: setenv %s %s", var, val);}
 
 /* handle Tool specifications */
-	else if (strcmp(key, "Tool") == 0)
-	   {note(Log, TRUE, "--- tool %s", oper);
-	    csetenv("CurrTool", oper);
-	    note(Log, TRUE, "Defining tool %s", oper);
-            push_struct(oper, st.def_tools, STACK_TOOL);}
+	 else if (strcmp(key, "Tool") == 0)
+	    {note(Log, TRUE, "--- tool %s", oper);
+	     csetenv("CurrTool", oper);
+	     note(Log, TRUE, "Defining tool %s", oper);
+	     push_struct(oper, st.def_tools, STACK_TOOL);}
 
 /* handle Group specifications */
-	else if (strcmp(key, "Group") == 0)
-	   {note(Log, TRUE, "--- group %s", oper);
-	    csetenv("CurrGrp", oper);
-            push_struct(oper, st.def_groups, STACK_GROUP);}
+	 else if (strcmp(key, "Group") == 0)
+	    {note(Log, TRUE, "--- group %s", oper);
+	     csetenv("CurrGrp", oper);
+	     push_struct(oper, st.def_groups, STACK_GROUP);}
 
 /* handle Use specifications */
-	else if (strcmp(key, "Use") == 0)
-	   process_use(value, oper);
+	 else if (strcmp(key, "Use") == 0)
+	    process_use(value, oper);
 
 /* handle struct close specifications */
-	else if (strcmp(key, "}") == 0)
-           pop_struct();
+	 else if (strcmp(key, "}") == 0)
+            pop_struct();
 
-	else if ((strcmp(oper, "=") == 0)  ||
-	         (strcmp(oper, "+=") == 0) ||
-		 (strcmp(oper, "=+") == 0) ||
-		 (strcmp(oper, "-=") == 0) ||
-		 (strcmp(oper, "=?") == 0))
-	        set_var(TRUE, key, oper, value);
+	 else if ((strcmp(oper, "=") == 0)  ||
+		  (strcmp(oper, "+=") == 0) ||
+		  (strcmp(oper, "=+") == 0) ||
+		  (strcmp(oper, "-=") == 0) ||
+		  (strcmp(oper, "=?") == 0))
+	    set_var(TRUE, key, oper, value);
 
 /* .c.i rule handler */
-	else if (strcmp(key, ".c.i:") == 0)
-	   {parse_rule(st.rules.ccp, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .c.i rule:\n%s\n", st.rules.ccp);}
+	 else if (strcmp(key, ".c.i:") == 0)
+	    {parse_rule(st.rules.ccp, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .c.i rule:\n%s\n", st.rules.ccp);}
 
 /* .c.o rule handler */
-	else if (strcmp(key, ".c.o:") == 0)
-	   {parse_rule(st.rules.co, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .c.o rule:\n%s\n", st.rules.co);}
+	 else if (strcmp(key, ".c.o:") == 0)
+	    {parse_rule(st.rules.co, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .c.o rule:\n%s\n", st.rules.co);}
 
 /* .c.a rule handler */
-	else if (strcmp(key, ".c.a:") == 0)
-	   {parse_rule(st.rules.ca, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .c.a rule:\n%s\n", st.rules.ca);}
+	 else if (strcmp(key, ".c.a:") == 0)
+	    {parse_rule(st.rules.ca, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .c.a rule:\n%s\n", st.rules.ca);}
 
 /* .f.o rule handler */
-	else if (strcmp(key, ".f.o:") == 0)
-	   {parse_rule(st.rules.fo, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .f.o rule:\n%s\n", st.rules.fo);}
+	 else if (strcmp(key, ".f.o:") == 0)
+	    {parse_rule(st.rules.fo, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .f.o rule:\n%s\n", st.rules.fo);}
 
 /* .f.a rule handler */
-	else if (strcmp(key, ".f.a:") == 0)
-	   {parse_rule(st.rules.fa, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .f.a rule:\n%s\n", st.rules.fa);}
+	 else if (strcmp(key, ".f.a:") == 0)
+	    {parse_rule(st.rules.fa, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .f.a rule:\n%s\n", st.rules.fa);}
 
 /* .l.o rule handler */
-	else if (strcmp(key, ".l.o:") == 0)
-	   {parse_rule(st.rules.lo, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .l.o rule:\n%s\n", st.rules.lo);}
+	 else if (strcmp(key, ".l.o:") == 0)
+	    {parse_rule(st.rules.lo, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .l.o rule:\n%s\n", st.rules.lo);}
 
 /* .l.a rule handler */
-	else if (strcmp(key, ".l.a:") == 0)
-	   {parse_rule(st.rules.la, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .l.a rule:\n%s\n", st.rules.la);}
+	 else if (strcmp(key, ".l.a:") == 0)
+	    {parse_rule(st.rules.la, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .l.a rule:\n%s\n", st.rules.la);}
 
 /* .l.c rule handler */
-	else if (strcmp(key, ".l.c:") == 0)
-	   {parse_rule(st.rules.lc, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .l.c rule:\n%s\n", st.rules.lc);}
+	 else if (strcmp(key, ".l.c:") == 0)
+	    {parse_rule(st.rules.lc, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .l.c rule:\n%s\n", st.rules.lc);}
 
 /* .y.o rule handler */
-	else if (strcmp(key, ".y.c:") == 0)
-	   {parse_rule(st.rules.yo, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .y.o rule:\n%s\n", st.rules.yo);}
+	 else if (strcmp(key, ".y.c:") == 0)
+	    {parse_rule(st.rules.yo, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .y.o rule:\n%s\n", st.rules.yo);}
 
 /* .y.a rule handler */
-	else if (strcmp(key, ".y.a:") == 0)
-	   {parse_rule(st.rules.ya, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .y.a rule:\n%s\n", st.rules.ya);}
+	 else if (strcmp(key, ".y.a:") == 0)
+	    {parse_rule(st.rules.ya, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .y.a rule:\n%s\n", st.rules.ya);}
 
 /* .y.c rule handler */
-	else if (strcmp(key, ".y.c:") == 0)
-	   {parse_rule(st.rules.yc, MAXLINE);
-	    if (st.verbose == TRUE)
-	       noted(Log, "Redefining .y.c rule:\n%s\n", st.rules.yc);}
+	 else if (strcmp(key, ".y.c:") == 0)
+	    {parse_rule(st.rules.yc, MAXLINE);
+	     if (st.verbose == TRUE)
+	        noted(Log, "Redefining .y.c rule:\n%s\n", st.rules.yc);}
 
 /* gather unknown specifications during read phase */
-       else if (st.phase == PHASE_READ)
-	  {if (st.aux.URF == NULL)
-	      st.aux.URF = open_file("w", st.aux.urfn);
+	 else if (st.phase == PHASE_READ)
+	    {if (st.aux.URF == NULL)
+	        st.aux.URF = open_file("w", st.aux.urfn);
 
-	   fputs(line, st.aux.URF);}
+	     fputs(line, st.aux.URF);}
 
 /* print unknown specifications during any non-read phase */
-       else
-          printf("%s\n", line);};
+	 else
+            printf("%s\n", line);};
 
     return;}
 

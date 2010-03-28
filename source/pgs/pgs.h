@@ -344,6 +344,8 @@
      if ((d) != NULL)                                                        \
         v = (d)->type_size;}
 
+#define PG_n_events_pending(d)                                               \
+    (((d) != NULL) ? (*((d)->events_pending))(d) : 0)
 #define PG_handle_expose_event(d, ev)                                        \
     {if ((d) != NULL)                                                        \
         (*((d)->expose_event_handler.fnc))(d, &ev);}
@@ -1351,6 +1353,7 @@ struct s_PG_device
     void (*update_vs)(PG_device *dev);
     void (*write_text)(PG_device *dev, FILE *fp, char *s);
 
+    int (*events_pending)(PG_device *dev);
     void (*mouse_event_info)(PG_device *dev, PG_event *ev,
 			     int *iev, PG_mouse_button *peb, int *peq);
     void (*key_event_info)(PG_device *dev, PG_event *ev, int *iev,

@@ -645,6 +645,7 @@ int PG_setup_cgm_device(PG_device *d)
     d->cgm_page_set            = FALSE;
     d->type_index              = CGMF_DEVICE;
 
+    d->events_pending          = NULL;
     d->query_pointer           = _PG_CGM_query_pointer;
     d->mouse_event_info        = NULL;
     d->key_event_info          = NULL;
