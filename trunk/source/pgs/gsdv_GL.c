@@ -1203,6 +1203,21 @@ static void _PG_GL_next_line(PG_device *dev, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PG_GL_EVENTS_PENDING - return number of pending events */
+
+static int _PG_GL_events_pending(PG_device *dev)
+   {int n;
+
+    n = 0;
+
+    if (_PG_X_display != NULL)
+       n = XEventsQueued(_PG_X_display, QueuedAfterFlush);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PG_GET_EVENT_CORE - respond to events
  *                    - if check is TRUE then loop while there are events
  *                    - if check is FALSE loop forever
@@ -1613,6 +1628,7 @@ int PG_setup_gl_device(PG_device *d)
     d->type_index   = GRAPHIC_WINDOW_DEVICE;
     d->is_visible   = TRUE;
 
+    d->events_pending         = _PG_GL_events_pending;
     d->query_pointer          = _PG_GL_query_pointer;
     d->mouse_event_info       = _PG_GL_mouse_event_info;
     d->key_event_info         = _PG_GL_key_event_info;
