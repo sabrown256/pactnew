@@ -395,11 +395,11 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "Linker     = ${LD_Exe}"
 
 # get the entries for RPATH
-    set npath = `features/rpath -o link`
+    set npath = `analyze/rpath -o link`
     Note $STDOUT "LDPath     = $npath"
 
     set lrpath = ""
-    set npath  = `features/rpath -o echo`
+    set npath  = `analyze/rpath -o echo`
     Note $STDOUT -n "LDRPath    = "
     if ("$npath" != "") then
        if ($?LD_RPath == 1) then

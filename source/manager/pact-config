@@ -289,8 +289,8 @@ Main:
     if ($Templates == FALSE) then
 
        if ($NoConfig == FALSE) then
-          if (-f features/program-init) then
-             call ReadConfig(features/program-init TRUE)
+          if (-f analyze/program-init) then
+             call ReadConfig(analyze/program-init TRUE)
           endif
           call ReadConfig($ConfigFile)
        endif

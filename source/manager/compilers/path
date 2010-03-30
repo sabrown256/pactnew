@@ -7,8 +7,8 @@
 # include "cpyright.h"
 #
 
-run features/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
-run features/rpath path
+run analyze/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
+run analyze/rpath path
 
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"

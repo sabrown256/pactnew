@@ -232,7 +232,7 @@ endif
 
 if ($?MPIBin == 1) then
    foreach i ( $MPILib )
-      setenv RPATH `features/rpath -a $i -o echo`
+      setenv RPATH `analyze/rpath -a $i -o echo`
    end
 
    SetParent HAVE_OPENMPI

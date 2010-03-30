@@ -9,7 +9,7 @@
 
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
-run features/locate-mpi ibm bgp any
+run analyze/locate-mpi ibm bgp any
 
 include 32-bit
 include compilers/gnu-bgp

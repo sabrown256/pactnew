@@ -11,7 +11,7 @@ setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
 setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
 
-run features/locate-mpi mpich bgp xlc
+run analyze/locate-mpi mpich bgp xlc
 
 include 32-bit
 include compilers/xlc-bgp
