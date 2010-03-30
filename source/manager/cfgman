@@ -144,7 +144,7 @@ onintr INTERRUPT
       set first = ""
       foreach i (`cat $DB.file`)
          touch $DB/$i
-         chmod 660 $DB/$i
+         chmod 660 $DB/$i >& /dev/null
          if ("$first" == "") then
             set first = $i
          endif
@@ -161,7 +161,7 @@ onintr INTERRUPT
       mkdir $DB
    endif
 
-   chmod 2770 $DB
+   chmod 2770 $DB >& /dev/null
 
 # all subsequent work to be done in database directory
    pushd $DB >& /dev/null
@@ -187,11 +187,11 @@ switch ($Tgt)
         else
            set ent = $1@$2
            touch $ent
-           chmod 660 $ent
+           chmod 660 $ent >& /dev/null
         endif
 
 # check everybody on the current list
-        foreach i (*)
+        foreach i (`ls -1`)
            if ($i == current) continue
 
            if ("$i" =~ *@*) then
@@ -206,7 +206,7 @@ switch ($Tgt)
 
            if (("$i" == "$ent") || ("$base" == "$ent") || ("$alia" == "$ent")) then
               touch $i
-              chmod 660 $i
+              chmod 660 $i >& /dev/null
               rm -f current
               ln -s $i current
               break
@@ -229,7 +229,7 @@ switch ($Tgt)
         if ($ent != all) then
 
 # check everybody on the current list
-           foreach i (*)
+           foreach i (`ls -1`)
               if ($i == current) continue
 
               if ("$i" =~ *@*) then
@@ -282,7 +282,7 @@ switch ($Tgt)
 	set lst = ( `grep $arch $hf | grep host | awk '{print $6}'` )
         foreach i ($lst)
            touch $i
-           chmod 660 $i
+           chmod 660 $i >& /dev/null
         end
 
 # first entry is defined to be current

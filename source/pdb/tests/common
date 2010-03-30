@@ -20,6 +20,7 @@ if ($?LogF == 0) then
    set Root = $cwd
    popd >& /dev/null
 
+   set OS       = `uname -s`
    set BinDir   = $Root/bin
    set LibDir   = $Root/lib
    set MAKE     = $BinDir/pact

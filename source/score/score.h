@@ -738,9 +738,6 @@ extern void
 extern long
  SC_bit_count(long c, int n);
 
-extern BIGINT
- SC_file_length(char *name);
-
 extern unsigned int
  SC_bit_reverse(unsigned int i, int n);
 

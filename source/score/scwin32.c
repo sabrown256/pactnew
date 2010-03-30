@@ -51,10 +51,9 @@ static BIGINT _SC_file_length_win32(char *path)
     FILE *fp;
 
     ln = 0L;
-    fp = io_open(path, "r");
+    fp = fopen(path, "r");
     if (fp != NULL)
-       {io_seek(fp, 0, SEEK_END);
-	ln = io_tell(fp);
+       {ln = SC_file_size(fp);
 	io_close(fp);};
 
     return(ln);}

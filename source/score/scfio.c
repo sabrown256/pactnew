@@ -493,7 +493,7 @@ int SC_file_access(int log)
            {case SC_FOPEN :
                  {int i, status, ok;
                   char *name, *mode;
-                  off_t here, len;
+                  off_t len;
 
                   ok = TRUE;
 		  ONCE_SAFE(TRUE, NULL)
@@ -540,10 +540,7 @@ int SC_file_access(int log)
 /* report the file length */
 		  len = 0;
 		  if (fp != NULL)
-		     {here = ftell(fp);
-		      fseek(fp, 0, SEEK_END);
-		      len  = ftell(fp);
-		      fseek(fp, here, SEEK_SET);};
+		     len = SC_file_size(fp);
 
                   REPLY(TELL_MSG, len);};
 
@@ -2306,7 +2303,52 @@ int SC_io_connect(int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FILELEN - return the length of the given file */
+/* SC_FILE_LENGTH - return the byte length of the named file
+ *                - return -1 if the file does not exist
+ */
+
+BIGINT SC_file_length(char *name)
+   {BIGINT ln;
+    char path[PATH_MAX];
+
+    ln = -1L;
+    if ((name != NULL) &&
+	(SC_file_path(name, path, PATH_MAX, TRUE) == 0))
+       ln = SC_FILE_LENGTH(path);
+
+    return(ln);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FILE_SIZE - return the byte length of the FILE fp
+ *              - NOTE: this is used by the hooks and must use the
+ *              - raw C library functions
+ *              - compare with SC_filelen
+ */
+
+BIGINT SC_file_size(FILE *fp)
+   {BIGINT ad, ln;
+
+/* remember where we are */
+    ad = ftell(fp);
+
+    fseek(fp, 0, SEEK_END);
+    ln = ftell(fp);
+
+/* return to where we started */
+    fseek(fp, ad, SEEK_SET);
+
+    return(ln);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FILELEN - return the length of the given file
+ *            - NOTE: this uses the hooks not the
+ *            - raw C library functions
+ *            - compare with SC_file_size
+ */
 
 off_t SC_filelen(FILE *fp)
    {off_t caddr, flen;

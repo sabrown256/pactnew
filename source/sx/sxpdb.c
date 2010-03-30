@@ -302,21 +302,15 @@ static object *_SXI_rd_raw(object *argl)
        {file = FILE_FILE(PDBfile, po);
 	fp   = file->stream;
 
-/* NOTE: this changes the file position on the CRAYS
- *       which is very bad for SEEK_CUR
-        if (lio_flush(fp))
-           SS_error("FFLUSH FAILED BEFORE READ - _SXI_RD_RAW", argl);
-*/
-
 	switch (addr)
 	   {case -1 :
-	         ret = lio_seek(fp, (off_t) 0, SEEK_SET);
+	         ret = lio_seek(fp, 0, SEEK_SET);
 		 break;
 	    case -2 :
 	         ret = FALSE;
 		 break;
 	    case -3 :
-	         ret = lio_seek(fp, (off_t) 0, SEEK_END);
+	         ret = lio_seek(fp, 0, SEEK_END);
 		 break;
 	    default :
 	         ret = lio_seek(fp, addr, SEEK_SET);
@@ -412,13 +406,13 @@ static object *_SXI_wr_raw(object *argl)
 
 	switch (addr)
 	   {case -1 :
-	         ret = lio_seek(fp, (off_t)0, SEEK_SET);
+	         ret = lio_seek(fp, 0, SEEK_SET);
 		 break;
 	    case -2 :
 		 ret = FALSE;
 		 break;
 	    case -3 :
-		 ret = lio_seek(fp, (off_t)0, SEEK_END);
+		 ret = lio_seek(fp, 0, SEEK_END);
 		 break;
 	    default :
 	         ret = lio_seek(fp, addr, SEEK_SET);
