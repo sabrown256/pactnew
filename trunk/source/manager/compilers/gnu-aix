@@ -1,5 +1,5 @@
 #
-# COMPILER-GNU-BGP - compiler info for GNU BG/P MPI compilers
+# GNU-AIX - define GNU compilers on AIX
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,17 +9,17 @@
 
 run features/rpath gnu
 
+# NOTE: this should eventually be put in a site specific file
+setenv PATH  ${PATH}:/usr/local/bin
+
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 
-setenv OBJECT_MODE ${Bits}
-setenv MPIGoodIO   TRUE
-
 Tool CC {
-   Exe       = mpicc
-   Flags     = -fsignaling-nans -ffloat-store
+   Exe       = gcc
+   Flags     = -fsignaling-nans -mminimal-toc
    Flags    += [ _env_ = Bits ;              # address bit size
-                 *     = -m* ]
+                 *     = -maix* ]
    Flags    += [ _cmd_ = -p ;                # profiling
 	         on    = -pg ]
    Flags    += [ _cmd_ = -cov ;              # coverage analysis
@@ -30,30 +30,37 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = mpif90
-   Flags   = -funderscoring
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
-	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                # coverage analysis
-	       on    = -fprofile-arcs -ftest-coverage ]
-   Version = -v
+   Exe      = gfortran
+   Flags    = -fsignaling-nans -mminimal-toc
+   Flags   += [ _env_ = Bits ;               # address bit size
+                *     = -maix* ]
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -fprofile-arcs -ftest-coverage ]
+   Debug    = -g -O0 -Wall
+   Optimize = -g -O -Wunused
+   Version  = -v
 }
 
 Tool LD {
-   RPath    = -Wl,-rpath,@
+   RPath    = -Wl,-bsvr4,-R,@
+   Flags    = [ _env_ = Bits ;               # address bit size
+                *     = -Wl,-b* ]
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
 	        on    = -lgcov ]
-   Lib      = -lc
 }
 
 Tool Lex {
    Flags  = -w
-   Flags += [ _env_ = Bits ;                 # address bit size
-              *     = -m* ]
+}
+
+Tool AR {
+   Exe   = /bin/ar
+   Flags = [ _env_ = Bits ;                 # address bit size
+             *     = -X* ]
 }
 
 Group Std {
@@ -63,7 +70,6 @@ Group Std {
 Group Cfg {
    Use    = Std
    CC_Exe = gcc
-   FC_Exe = gfortran
 }
 
 Group OpenMP {

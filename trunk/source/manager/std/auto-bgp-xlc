@@ -14,7 +14,7 @@ setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
 run features/locate-mpi mpich bgp xlc
 
 include 32-bit
-include compiler-xlc-bgp
+include compilers/xlc-bgp
 include no-x11
 include no-sql
 include no-jpeg

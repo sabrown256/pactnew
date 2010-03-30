@@ -1,5 +1,5 @@
 #
-# COMPILER-PGI - define basic variables to use PGI compilers
+# PGI - define PGI compiler
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942

@@ -10,5 +10,5 @@
 define FREEBSD
 
 include spokes
-include compiler-gnu
+include compilers/gnu
 

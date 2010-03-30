@@ -1,5 +1,5 @@
 #
-# COMPILER-GNU-OSX - GNU compiler specifications for MAC OS X
+# GNU-BGL - define GNU compiler for IBM BG/L backend
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -7,13 +7,15 @@
 # include "cpyright.h"
 #
 
-run features/osx-evolution
+run features/rpath gnu
 
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 
+setenv OBJECT_MODE ${Bits}
+
 Tool CC {
-   Exe       = gcc
+   Exe       = mpgcc
    Flags     = -fsignaling-nans -ffloat-store
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -m* ]
@@ -27,9 +29,8 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = gfortran
-   Flags   = -fsignaling-nans -ffloat-store
-   Flags  += [ _env_ = Bits ;                # address bit size
+   Exe     = mpf90
+   Flags   = [ _env_ = Bits ;                # address bit size
                *     = -m* ]
    Flags  += [ _cmd_ = -p ;                  # profiling
 	       on    = -pg ]
@@ -39,22 +40,18 @@ Tool FC {
 }
 
 Tool LD {
+   RPath    = -Wl,-rpath,@
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
 	        on    = -lgcov ]
    Lib      = -lc
-   MDGLib   = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
 Tool Lex {
    Flags  = -w
    Flags += [ _env_ = Bits ;                 # address bit size
               *     = -m* ]
-}
-
-Tool Ranlib {
-   Exe = ranlib
 }
 
 Group Std {
@@ -73,29 +70,14 @@ Group OpenMP {
 }
 
 Group Shared {
-   LD_Shared = -bundle -flat_namespace -undefined suppress
-   LD_Lib    = ${OSX_SHARED_LIBS}
+   LD_Exe    = gcc
+   CC_Shared = -fPIC
+   LD_Shared = -shared
 }
 
-Group Python {
-   CC_Exe      = gcc
-   CC_Debug    = -g
-   CC_Optimize = -g -O -Wunused
+Group PThread {
+   LD_Lib = -lpthread 
 }
 
 include cpp-rule
 include serial
-
-setenv PATH /sw/bin:/usr/apps/gnu/bin:$PATH
-
-Group PNG {
-   Path = /sw
-}
-
-Group JPEG {
-   Path = /sw
-}
-
-Group HDF {
-   Path = /sw
-}

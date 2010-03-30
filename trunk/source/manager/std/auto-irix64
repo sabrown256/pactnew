@@ -9,5 +9,5 @@
 
 include spokes
 include cpp-rule
-include compiler-irix
+include compilers/irix
 

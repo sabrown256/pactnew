@@ -8,4 +8,4 @@
 #
 
 include spokes
-include compiler-hpux
+include compilers/hpux

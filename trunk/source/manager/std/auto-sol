@@ -10,5 +10,5 @@
 setenv SOLRoot /opt/SUNWspro
 
 include spokes
-include compiler-sol
+include compilers/sol
 

@@ -1,5 +1,5 @@
 #
-# COMPILER-SUN - define basic variables to use Sun compilers
+# SUN - define Sun compilers pre-Solaris
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942

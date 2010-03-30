@@ -7,6 +7,6 @@
 # include "cpyright.h"
 #
 
-include compiler-gnu
+include compilers/gnu
 include spokes
 

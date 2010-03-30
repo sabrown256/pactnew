@@ -1,5 +1,5 @@
 #
-# COMPILER-PATH - define basic variables to use pathscale compilers
+# PATH - define PathScale compiler
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
