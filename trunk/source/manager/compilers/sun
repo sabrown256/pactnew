@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-run features/rpath sun
+run analyze/rpath sun
 
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"

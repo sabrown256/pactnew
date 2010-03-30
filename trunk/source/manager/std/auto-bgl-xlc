@@ -9,7 +9,7 @@
 
 setenv PATH  ${PATH}:/usr/local/bin
 
-run features/locate-mpi ibm bgl
+run analyze/locate-mpi ibm bgl
 
 include compilers/xlc-bgl
 include no-jpeg

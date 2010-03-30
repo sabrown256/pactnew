@@ -7,8 +7,8 @@
 # include "cpyright.h"
 #
 
-run features/default-bits
-run features/rpath init
+run analyze/default-bits
+run analyze/rpath init
 
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler

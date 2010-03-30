@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-run features/osx-evolution
+run analyze/osx-evolution
 
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"

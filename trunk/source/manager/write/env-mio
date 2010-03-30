@@ -140,7 +140,7 @@ HAVE_SUBROUTINES
     endif
     set pvers = `cat .pact-version`
 
-    set lrpath = `features/rpath -o list`
+    set lrpath = `analyze/rpath -o list`
 
     Note $FOUT 'CFE           = '$CFE
     Note $FOUT 'PFE           = '$PFE
