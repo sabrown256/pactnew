@@ -8,5 +8,5 @@
 #
 
 include spokes
-include compiler-osx-gnu
+include compilers/osx-gnu
 

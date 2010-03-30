@@ -1,5 +1,5 @@
 #
-# COMPILER-CYGWIN - basic configuration for compiling with CYGWIN
+# CYGWIN - basic configuration for compiling with CYGWIN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,7 +9,7 @@
 
 setenv GNURoot
 
-include features/compiler-gnu
+include compilers/gnu
 
 # cygwin does not support -rpath
 run features/rpath init

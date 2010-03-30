@@ -9,5 +9,5 @@
 
 include spokes
 include 64-bit
-include compiler-xlc
+include compilers/xlc
 

@@ -8,5 +8,5 @@
 #
 
 include spokes
-include compiler-osf
+include compilers/osf
 

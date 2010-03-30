@@ -11,7 +11,7 @@ setenv PATH  ${PATH}:/usr/local/bin
 
 run features/locate-mpi ibm bgl
 
-include compiler-gnu-bgl
+include compilers/gnu-bgl
 include no-jpeg
 include no-png
 include no-libz

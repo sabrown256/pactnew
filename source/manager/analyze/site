@@ -17,7 +17,9 @@ Note $Log "Analyze: site"
 if (-f $MngDir/extensions/sys-site) then
    eval `$MngDir/extensions/sys-site`
 else
-   setenv SYS_TYPE `$ScrDir/system-id`
+   if ($?SYS_TYPE == 0) then
+      setenv SYS_TYPE `$ScrDir/system-id`
+   endif
    setenv SYS_SITE LONER
    setenv DAI_ROOT /usr/share
    setenv DAS_ROOT /usr/local
