@@ -1146,7 +1146,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
  */
 
 static int _PD_wr_fmt_ii(PDBfile *file)
-   {int j, n, rv, sz;
+   {int j, n, rv, sz, nw;
     int *order;
     long *format, float_bias, double_bias;
     char outfor[MAXLINE];
@@ -1207,13 +1207,15 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	n         = (int) (p - outfor);
 	outfor[0] = n;
 
-	if (lio_write(outfor, (size_t) 1, (size_t) n, file->stream) != n)
+	nw = lio_write(outfor, (size_t) 1, (size_t) n, file->stream);
+	if (nw != n)
 	   PD_error("FAILED TO WRITE FORMAT DATA - _PD_WR_FMT_II", PD_CREATE);
     
 /* write out the biases */
 	snprintf(outfor, MAXLINE, "%ld\001%ld\001\n", float_bias, double_bias);
-	n = strlen(outfor);
-	if (lio_write(outfor, (size_t) 1, (size_t) n, file->stream) != n)
+	n  = strlen(outfor);
+	nw = lio_write(outfor, (size_t) 1, (size_t) n, file->stream);
+	if (nw != n)
 	   PD_error("FAILED TO WRITE BIASES - _PD_WR_FMT_II", PD_CREATE);
 
 	rv = TRUE;};

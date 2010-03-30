@@ -595,14 +595,15 @@ static char *_H5_parse_datatype(PDBfile *file, hid_t dtid)
 static dimdes *_H5_parse_dimensions(PDBfile *file, hid_t dtid, hid_t dataspace_id) 
    {int rank, status, i;
     dimdes *dimensions, *dim;
-    H5S_class_t class_id;
+    H5S_class_t scid;
+    H5T_class_t tcid;
     hsize_t *dim_size;
     hid_t nativetype_id, tempType;
 
     dimensions = NULL;
-    class_id   = (H5S_class_t)H5Tget_class(dtid);
+    tcid       = H5Tget_class(dtid);
 
-    if (class_id == H5T_ARRAY)
+    if (tcid == H5T_ARRAY)
        {rank = H5Tget_array_ndims(dtid);
 
         nativetype_id = H5Tcopy(dtid);
@@ -626,7 +627,7 @@ static dimdes *_H5_parse_dimensions(PDBfile *file, hid_t dtid, hid_t dataspace_i
 
         H5Tclose(nativetype_id);}
 
-    else if (class_id == H5T_STRING)
+    else if (tcid == H5T_STRING)
        {rank = 1;
 
         DEBUG1("      H5T_STRING rank(%d)\n", rank);
@@ -635,10 +636,10 @@ static dimdes *_H5_parse_dimensions(PDBfile *file, hid_t dtid, hid_t dataspace_i
         dim_size[0] = H5Tget_size(dtid);}
 
     else 
-       {class_id = H5Sget_simple_extent_type(dataspace_id);
+       {scid = H5Sget_simple_extent_type(dataspace_id);
 
 /* either we have a scalar space or an array (simple) space */
-       switch(class_id)
+       switch(scid)
           {case H5S_SCALAR :
 
 /* assume dimensionality info is NULL for scalars */
