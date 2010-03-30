@@ -55,6 +55,8 @@ BinObj =
 #
 Libs = ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
 
+DepLib = ${LibDir}/libpml.a \
+	 ${LibDir}/libscore.a
 
 targets :
 	@echo "Targets for PDB"
@@ -128,7 +130,7 @@ pdspoke.c : config-spokes pdshar.c
 Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
        ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
        ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
-       ${BinDir}/pdfrts ${BinDir}/pdbfts
+       ${BinDir}/pdfrts ${BinDir}/pdbfts ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
 Gst : ${BinDir}/pdgsts

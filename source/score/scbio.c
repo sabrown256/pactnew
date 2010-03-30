@@ -13,7 +13,7 @@
 #include "scope_proc.h"
 
 /* #define DEBUG */
-/* #define NEWWAY */
+#define NEWWAY
 
 #define ACCESS(_fp)                                                          \
     bf_io_desc *bid;                                                         \
@@ -70,6 +70,8 @@ static int _SC_bseek(FILE *fp, long offs, int wh)
 
     ACCESS(fp);
 
+    ret = 0;
+
     switch (wh)
        {case SEEK_SET :
 	     addr = offs;
@@ -81,7 +83,13 @@ static int _SC_bseek(FILE *fp, long offs, int wh)
              addr = bid->sz + offs;
              break;};
 
+#ifdef AIX
     ret = fseek(fp, offs, wh);
+#else
+/* if we are already there do not seek */
+    if (addr != bid->curr)
+       ret = fseek(fp, offs, wh);
+#endif
 
     _SC_bset_addr(bid, addr, FALSE, "seek");
 
@@ -161,6 +169,8 @@ static int _SC_blseek(FILE *fp, off_t offs, int wh)
 
     ACCESS(fp);
 
+    ret = 0;
+
     switch (wh)
        {case SEEK_SET :
 	     addr = offs;
@@ -172,7 +182,13 @@ static int _SC_blseek(FILE *fp, off_t offs, int wh)
              addr = bid->sz + offs;
              break;};
 
-    ret = fseeko(fp, offs, wh);
+#ifdef AIX
+    ret = fseek(fp, offs, wh);
+#else
+/* if we are already there do not seek */
+    if (addr != bid->curr)
+       ret = fseeko(fp, offs, wh);
+#endif
 
     _SC_bset_addr(bid, addr, FALSE, "seek");
 
@@ -222,7 +238,7 @@ static BIGUINT _SC_blread(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
 /* _SC_BLWRITE - large file method for fwrite */
 
 static BIGUINT _SC_blwrite(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
-   {size_t nw;    off_t ad;
+   {size_t nw;
 
     ACCESS(fp);
 
@@ -230,7 +246,6 @@ static BIGUINT _SC_blwrite(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
     SC_catch_io_interrupts(FALSE);
 
     nw = SC_fwrite_sigsafe(s, bpi, nitems, fp);
-    fflush(fp);   ad = ftello(fp);
 
     _SC_bset_addr(bid, bid->curr + nw*bpi, TRUE, "write");
 
