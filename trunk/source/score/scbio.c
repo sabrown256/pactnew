@@ -12,6 +12,9 @@
 
 #include "scope_proc.h"
 
+/* #define DEBUG */
+/* #define NEWWAY */
+
 #define ACCESS(_fp)                                                          \
     bf_io_desc *bid;                                                         \
     bid = (bf_io_desc *) (_fp);                                              \
@@ -26,10 +29,32 @@ struct s_bf_io_frame
     unsigned char *bf;};               /* frame buffer */
 
 struct s_bf_io_desc
-   {BIGINT sz;
-    BIGINT curr;
+   {BIGINT sz;                         /* file size */
+    BIGINT curr;                       /* current file address */
     SC_array *stack;
     FILE *fp;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BSET_ADDR - update the address and size of BID */
+
+static INLINE off_t _SC_bset_addr(bf_io_desc *bid, off_t addr, int chsz,
+				  char *tag)
+   {
+
+    addr = max(addr, 0);
+
+    bid->curr = addr;
+    if ((chsz == TRUE) && (addr > bid->sz))
+       bid->sz = addr;
+
+#ifdef DEBUG
+ printf(">>> set address %s to %ld (%ld)\n",
+	tag, (long) ftello(bid->fp), (long) bid->curr);
+#endif
+
+    return(addr);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -42,7 +67,6 @@ struct s_bf_io_desc
 static int _SC_bseek(FILE *fp, long offs, int wh)
    {int ret;
     off_t addr;
-    struct stat buf;
 
     ACCESS(fp);
 
@@ -54,14 +78,12 @@ static int _SC_bseek(FILE *fp, long offs, int wh)
              addr = bid->curr + offs;
              break;
         case SEEK_END :
-	     fstat(fileno(fp), &buf);
-             addr = buf.st_size + offs;
+             addr = bid->sz + offs;
              break;};
 
-    addr = max(addr, 0);
-    bid->curr = addr;
-
     ret = fseek(fp, offs, wh);
+
+    _SC_bset_addr(bid, addr, FALSE, "seek");
 
     return(ret);}
 
@@ -75,10 +97,14 @@ static long _SC_btell(FILE *fp)
 
     ACCESS(fp);
 
-#if 0
-    ret = ftell(fp);
-#else
+#ifdef NEWWAY
     ret = bid->curr;
+#else
+    ret = ftell(fp);
+#endif
+
+#ifdef DEBUG
+ printf(">>> small tell %ld (%ld)\n", (long) ftello(fp), (long) bid->curr);
 #endif
 
     return(ret);}
@@ -95,21 +121,9 @@ static size_t _SC_bread(void *s, size_t bpi, size_t nitems, FILE *fp)
 
     nr = SC_fread_sigsafe(s, bpi, nitems, fp);
 
-    bid->curr += (nr*bpi);
+    _SC_bset_addr(bid, bid->curr + nr*bpi, TRUE, "read");
 
     return(nr);}
- 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_BWRITE_ATM - atomic worker for _SC_bwrite */
-
-static size_t _SC_bwrite_atm(void *s, size_t bpi, size_t nitems, FILE *fp)
-   {size_t nw;
-
-    nw = SC_fwrite_sigsafe(s, bpi, nitems, fp);
-
-    return(nw);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -117,65 +131,16 @@ static size_t _SC_bwrite_atm(void *s, size_t bpi, size_t nitems, FILE *fp)
 /* _SC_BWRITE - small file method for fwrite */
 
 static size_t _SC_bwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
-   {int ok, flags, rw, fd;
-    BIGINT i, nb;
-    size_t nw, nr;
-    off_t addr;
-    char msg[MAXLINE];
-    char *ps, *t;
+   {size_t nw;
 
     ACCESS(fp);
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
 
-    if (SC_verify_writes == TRUE)
+    nw = SC_fwrite_sigsafe(s, bpi, nitems, fp);
 
-/* eliminate stdin, stdout, and stderr */
-       {fd = fileno(fp);
-	rw = (fd > 2);
-
-/* eliminate read-only and write-only streams */
-	flags = SC_fd_flags(fd);
-	rw   &= ((flags & O_RDWR) != 0);
-
-/* remember where we are and write it out */
-	addr = _SC_btell((FILE *) bid);
-	if (addr < 0)
-	   SC_strerror(errno, msg, MAXLINE);
-
-	nw = _SC_bwrite_atm(s, bpi, nitems, fp);
-
-/* go back and read it in
- * fseek will fail unless the file mode is read-write
- */
-	if ((addr >= 0) && (nw > 0) && (rw == TRUE))
-	   {nb = bpi*nitems;
-	    t  = FMAKE_N(char, nb, "char*:_SC_bWRITE:t");
-
-	    fseek(fp, addr, SEEK_SET);
-	    nr = _SC_bread(t, bpi, nitems, fp);
-
-/* compare */
-	    ok = TRUE;
-	    if (nr != nw)
-	       ok = FALSE;
-	    else
-	       {ps = (char *) s;
-		for (i = 0; (ok == TRUE) && (i < nb); i++)
-		    ok = (ps[i] == t[i]);};
-
-/* if they disagree move back to the start and return 0 */
-	    if (ok == FALSE)
-	       {nw = 0;
-		fseek(fp, addr, SEEK_SET);};
-
-	    SFREE(t);};}
-
-    else
-       nw = _SC_bwrite_atm(s, bpi, nitems, fp);
-
-    bid->curr += (nw*bpi);
+    _SC_bset_addr(bid, bid->curr + nw*bpi, TRUE, "write");
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_io_interrupts_on);
@@ -193,7 +158,6 @@ static size_t _SC_bwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 static int _SC_blseek(FILE *fp, off_t offs, int wh)
    {int ret;
     off_t addr;
-    struct stat buf;
 
     ACCESS(fp);
 
@@ -205,14 +169,12 @@ static int _SC_blseek(FILE *fp, off_t offs, int wh)
              addr = bid->curr + offs;
              break;
         case SEEK_END :
-	     fstat(fileno(fp), &buf);
-             addr = buf.st_size + offs;
+             addr = bid->sz + offs;
              break;};
 
-    addr = max(addr, 0);
-    bid->curr = addr;
-
     ret = fseeko(fp, offs, wh);
+
+    _SC_bset_addr(bid, addr, FALSE, "seek");
 
     return(ret);}
 
@@ -226,10 +188,14 @@ static off_t _SC_bltell(FILE *fp)
 
     ACCESS(fp);
 
-#if 0
-    ret = ftello(fp);
-#else
+#ifdef NEWWAY
     ret = bid->curr;
+#else
+    ret = ftello(fp);
+#endif
+
+#ifdef DEBUG
+ printf(">>> large tell %ld (%ld)\n", (long) ftello(fp), (long) bid->curr);
 #endif
 
     return(ret);}
@@ -246,7 +212,7 @@ static BIGUINT _SC_blread(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
 
     nr = SC_fread_sigsafe(s, bpi, nitems, fp);
 
-    bid->curr += (nr*bpi);
+    _SC_bset_addr(bid, bid->curr + nr*bpi, TRUE, "read");
 
     return(nr);}
  
@@ -256,65 +222,17 @@ static BIGUINT _SC_blread(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
 /* _SC_BLWRITE - large file method for fwrite */
 
 static BIGUINT _SC_blwrite(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
-   {int ok, flags, rw, fd;
-    BIGINT i, nb;
-    size_t nw, nr;
-    off_t addr;
-    char msg[MAXLINE];
-    char *ps, *t;
+   {size_t nw;    off_t ad;
 
     ACCESS(fp);
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
 
-    if (SC_verify_writes == TRUE)
+    nw = SC_fwrite_sigsafe(s, bpi, nitems, fp);
+    fflush(fp);   ad = ftello(fp);
 
-/* eliminate stdin, stdout, and stderr */
-       {fd = fileno(fp);
-	rw = (fd > 2);
-
-/* eliminate read-only and write-only streams */
-	flags = SC_fd_flags(fd);
-	rw   &= ((flags & O_RDWR) != 0);
-
-/* remember where we are and write it out */
-	addr = _SC_bltell((FILE *) bid);
-	if (addr < 0)
-	   SC_strerror(errno, msg, MAXLINE);
-
-	nw = _SC_bwrite_atm(s, bpi, nitems, fp);
-
-/* go back and read it in
- * fseek will fail unless the file mode is read-write
- */
-	if ((addr >= 0) && (nw > 0) && (rw == TRUE))
-	   {nb = bpi*nitems;
-	    t  = FMAKE_N(char, nb, "char*:_SC_bWRITE:t");
-
-	    fseek(fp, addr, SEEK_SET);
-	    nr = _SC_bread(t, bpi, nitems, fp);
-
-/* compare */
-	    ok = TRUE;
-	    if (nr != nw)
-	       ok = FALSE;
-	    else
-	       {ps = (char *) s;
-		for (i = 0; (ok == TRUE) && (i < nb); i++)
-		    ok = (ps[i] == t[i]);};
-
-/* if they disagree move back to the start and return 0 */
-	    if (ok == FALSE)
-	       {nw = 0;
-		fseek(fp, addr, SEEK_SET);};
-
-	    SFREE(t);};}
-
-    else
-       nw = _SC_bwrite_atm(s, bpi, nitems, fp);
-
-    bid->curr += (nw*bpi);
+    _SC_bset_addr(bid, bid->curr + nw*bpi, TRUE, "write");
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_io_interrupts_on);
@@ -330,45 +248,15 @@ static BIGUINT _SC_blwrite(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
 /* _SC_BOUT - worker for _SC_bputs and _SC_bwrite */
 
 static int _SC_bout(const char *s, bf_io_desc *bid)
-   {int i, nb, nc, ns, nz;
-    char *p;
+   {int nb, nc;
     FILE *fp;
 
     fp = bid->fp;
-
     nb = 0;
 
     if ((fp != NULL) && (s != NULL))
-       {p  = (char *) s;
-	nz = 0;
-	for (i = 0, nc = strlen(s); nc > 0; nc -= ns, i++)
-	    {ns = SC_fwrite_sigsafe(p, 1, nc, fp);
-
-/* count the number of consecutive zero writes */
-	     if (ns <= 0)
-	        nz++;
-	     else
-	        nz = 0;
-
-/* if we are not getting anywhere bail out and
- * return minus the number of chars written to signify an error
- * this is to be consistent with fputs error return
- */
-	     if (nz > 3)
-	        {nb = -nb;
-		 nb = min(nb, -1);
-		 break;};
-
-/* wait a tenth of a second if the whole thing did not get sent
- * presumably because the system is clogged
- */
-	     if (ns < nc)
-	        SC_sleep(100);
-
-	     nb += ns;
-	     p  += ns;};};
-
-    bid->curr += nb;
+       {nc = strlen(s);
+	nb = _SC_blwrite((void *) s, 1, nc, (FILE *) bid);};
 
     return(nb);}
 
@@ -397,14 +285,9 @@ static int _SC_bprintf(FILE *fp, char *fmt, va_list a)
 
     ACCESS(fp);
 
-    ret = 0;
-
-    if (fp != NULL)
-       {msg = SC_vdsnprintf(TRUE, fmt, a);
-	ret = _SC_bout(msg, bid);
-	SFREE(msg);};
-
-    FLUSH_ON(fp, NULL);
+    msg = SC_vdsnprintf(TRUE, fmt, a);
+    ret = _SC_bout(msg, bid);
+    SFREE(msg);
 
     return(ret);}
 
@@ -434,7 +317,7 @@ static int _SC_bgetc(FILE *fp)
 
     rv = fgetc(fp);
 
-    bid->curr++;
+    _SC_bset_addr(bid, bid->curr + 1, TRUE, "getc");
 
     return(rv);}
  
@@ -450,7 +333,7 @@ static int _SC_bungetc(int c, FILE *fp)
 
     rv = ungetc(c, fp);
 
-    bid->curr--;
+    _SC_bset_addr(bid, bid->curr - 1, TRUE, "ungetc");
 
     return(rv);}
  
@@ -502,7 +385,7 @@ static char *_SC_bgets(char *s, int n, FILE *fp)
 	r = (nbr > 0) ? s : NULL;};
 
     if (r != NULL)
-       bid->curr += strlen(r);
+       _SC_bset_addr(bid, bid->curr + strlen(r), TRUE, "gets");
 
     return(r);}
 
@@ -538,7 +421,8 @@ static int _SC_bflush(FILE *fp)
     ret = FALSE;
 
     if (fp != NULL)
-       ret = fflush(fp);
+       {ret = fflush(fp);
+	_SC_bset_addr(bid, ftell(fp), TRUE, "flush");};
 
     return(ret);}
 
@@ -558,7 +442,7 @@ FILE *SC_bopen(char *name, char *mode)
        {fp = fopen(name, mode);
 	if (fp != NULL)
 	   {bid        = FMAKE(bf_io_desc, "SC_BOPEN:bid");
-	    bid->sz    = -1;
+            bid->sz    = SC_file_size(fp);
 	    bid->curr  = 0;
 	    bid->stack = NULL;
 	    bid->fp    = fp;
@@ -608,7 +492,7 @@ FILE *SC_lbopen(char *name, char *mode)
        {fp = fopen(name, mode);
 	if (fp != NULL)
 	   {bid        = FMAKE(bf_io_desc, "SC_LBOPEN:bid");
-	    bid->sz    = -1;
+            bid->sz    = SC_file_size(fp);
 	    bid->curr  = 0;
 	    bid->stack = NULL;
 	    bid->fp    = fp;

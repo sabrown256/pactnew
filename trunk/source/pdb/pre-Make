@@ -128,7 +128,7 @@ pdspoke.c : config-spokes pdshar.c
 Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
        ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
        ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
-       ${BinDir}/pdfrts
+       ${BinDir}/pdfrts ${BinDir}/pdbfts
 Apps : ${BinDir}/pdb2hdf
 
 Gst : ${BinDir}/pdgsts
@@ -173,6 +173,10 @@ ${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs}
 ${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs}
 	${CC} -c pdfrts.c -o ${PACTTmpDir}/pdfrts.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/pdfrts.o -o ${BinDir}/pdfrts ${Libs}
+        
+${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdbfts.c -o ${PACTTmpDir}/pdbfts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdbfts.o -o ${BinDir}/pdbfts ${Libs}
         
 Fstd : ${BinDir}/pdftst ${BinDir}/pdfhyts
 

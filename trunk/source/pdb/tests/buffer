@@ -1,0 +1,91 @@
+#!/bin/csh -f
+#
+# BUFFER - PDB I/O buffer test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set STRACE = ( `which strace` )
+if ((-x "$STRACE") && ($OS != AIX)) then
+
+   set tst = $1
+
+   NoteD $LogF ""
+   NoteD $LogF "                    PDB Buffer Test .................... "
+   Note $LogF ""
+
+   set Exe = `which pdbfts`
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+
+      echo -n "                       "
+      echo "chunks  Dsize  Bsize    Ratio   # writes"
+      foreach n ( 100000 1000000 10000000 )
+         foreach m ( -1 10000 1000000 100000000 )
+            if ($m < 0) then
+               set rat = sys
+            else if ($m < $n) then
+               @ fr = $n / $m
+               set rat = "1/$fr"
+            else
+               @ fr = $m / $n
+               set rat = "$fr"
+            endif
+
+            if ($m < 0) then
+               set mr = sys
+            else if ($m < 1000000) then
+               @ mt = $m / 1000
+               set mr = ${mt}K
+            else if ($m < 1000000000) then
+               @ mt = $m / 1000000
+               set mr = ${mt}M
+            else
+               @ mt = $m / 1000000000
+               set mr = ${mt}G
+            endif
+
+            if ($n < 1000000) then
+               @ nt = $n / 1000
+               set nr = ${nt}K
+            else if ($n < 1000000000) then
+               @ nt = $n / 1000000
+               set nr = ${nt}M
+            else
+               @ nt = $n / 1000000000
+               set nr = ${nt}G
+            endif
+
+#            foreach c ( 1 4 16 )
+            foreach c ( 4 )
+               @ nwr = ( `$STRACE $Exe -n $n -b $m -c $c |& grep write | grep "\\0\\0\\0" | wc -l` )
+               echo "$c $nr $mr $rat $nwr" | \
+               awk '{printf("                       %3d      %4s  %5s %8s    %5d\n", $1, $2, $3, $4, $5);}'
+            end
+         end
+      end
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/pdbfts -v $tst |& \
+      grep "ERROR SUMMARY:"                       |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+   endif
+   set ETime   = `$TIMER -b $UTime`
+
+   if ($xstatus != 0) then
+      NoteD $LogF "                    PDB Buffer Test .................... FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    PDB Buffer Test .................... PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)

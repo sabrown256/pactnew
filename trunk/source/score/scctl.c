@@ -736,24 +736,6 @@ char *SC_itoa(int n, int radix, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FILE_LENGTH - return the byte length of the named file
- *                - return -1 if the file does not exist
- */
-
-BIGINT SC_file_length(char *name)
-   {BIGINT ln;
-    char path[PATH_MAX];
-
-    ln = -1L;
-    if ((name != NULL) &&
-	(SC_file_path(name, path, PATH_MAX, TRUE) == 0))
-       ln = SC_FILE_LENGTH(path);
-
-    return(ln);}
- 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_QUERY_FILE - return TRUE if the file is of the given type and can be
  *               - opened in the specified mode; otherwise, return FALSE.
  */

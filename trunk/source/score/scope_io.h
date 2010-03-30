@@ -431,6 +431,10 @@ extern BIGUINT
  lio_write(void *ptr, size_t sz, BIGUINT ni, FILE *fp),
  lio_segsize(void *fp, BIGINT n);
 
+extern BIGINT
+ SC_file_size(FILE *fp),
+ SC_file_length(char *name);
+
 extern off_t
  lio_tell(FILE *fp),
  SC_filelen(FILE *fp);
