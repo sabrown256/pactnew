@@ -149,25 +149,30 @@ static state
 /* PUSH_FILE - push S onto the file stack */
 
 static char *push_file(char *s, int itype)
-   {int n, ok;
+   {int id, n, nd, ok;
     file_entry *se;
     static char lfile[MAXLINE], t[MAXLINE];
+    static char *places[] = { NULL, "local", "std", "features",
+			      "compilers", "analyze", "." };
 
     n  = st.fstck.n++;
     se = st.fstck.file + n;
 
     ok = TRUE;
     if (itype == STACK_FILE)
-       {strcpy(lfile, s);
-	if (file_exists(lfile) == FALSE)
-	   {snprintf(lfile, MAXLINE, "local/%s", s);
-	    if (file_exists("%s/%s", st.dir.mng, lfile) == FALSE)
-	       {snprintf(lfile, MAXLINE, "std/%s", s);
-		if (file_exists("%s/%s", st.dir.mng, lfile) == FALSE)
-		   {snprintf(lfile, MAXLINE, "features/%s", s);
-		    if (file_exists("%s/%s", st.dir.mng, lfile) == FALSE)
-		       {noted(Log, "***> Cannot find file %s\n", s);
-			ok = FALSE;};};};};}
+       {nd = sizeof(places)/sizeof(char *);
+	ok = FALSE;
+	for (id = 0; (id < nd) && (ok == FALSE); id++)
+	    {if (places[id] == NULL)
+	        {strcpy(lfile, s);
+		 ok = file_exists(lfile);}
+	     else
+	        {snprintf(lfile, MAXLINE, "%s/%s", places[id], s);
+		 ok = file_exists("%s/%s", st.dir.mng, lfile);};};
+
+	if (ok == FALSE)
+	   {noted(Log, "***> Cannot find file %s\n", s);
+	    ok = FALSE;};}
 
     else if (itype == STACK_PROCESS)
        {if (strchr(s, '$') != NULL)
@@ -1767,7 +1772,7 @@ static void analyze_config(char *base)
     push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
-    if (file_exists("../features/program-analyze") == TRUE)
+    if (file_exists("../analyze/program-analyze") == TRUE)
        read_config("program-analyze", TRUE);
 
     run(BOTH, "rm * > /dev/null 2>&1");
@@ -1837,7 +1842,7 @@ static void finish_config(char *base)
 
     LOG_OFF;
 
-    if (file_exists("features/program-fin") == TRUE)
+    if (file_exists("analyze/program-fin") == TRUE)
        read_config("program-fin", TRUE);
 
     LOG_ON;
@@ -1987,7 +1992,7 @@ int main(int c, char **v)
     run(BOTH, "mkdir %s", st.dir.cfg);
 
     if (st.configp == FALSE)
-       {if (file_exists("features/program-init") == TRUE)
+       {if (file_exists("analyze/program-init") == TRUE)
 	   read_config("program-init", TRUE);
 
 	read_config(st.cfgf, FALSE);
