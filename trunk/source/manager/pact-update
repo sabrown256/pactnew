@@ -77,10 +77,6 @@ set Opt = "$Name  $argv"
 set CArgs = ""
 while ($#argv > 0)
    switch ($1)
-      case -cc:
-           shift
-           set CArgs = ( $CArgs -cc $1 )
-           breaksw
       case -cfg:
            set ConfigOnly = TRUE
            breaksw
@@ -105,37 +101,81 @@ while ($#argv > 0)
            endif
 
            echo ""
-           echo "    -cfg         stop after configuring the distribution"
-           echo "    -extr        setup/extract sources only"
-           echo "    -h           this help package"
-           echo "    -keep        keep existing PACT distribution, ie. keep 'pact/'"
-           echo "                 in directory where new distribution being built"
-           echo "    -lst         list some possible configurations that are available"
-           echo "    -vers        only print the PACT Version (No update)"
+           echo "    -cfg       stop after configuring the distribution"
+           echo "    -extr      setup/extract sources only"
+           echo "    -h         this help package"
+           echo "    -keep      keep existing PACT distribution, ie. keep 'pact/'"
+           echo "               in directory where new distribution being built"
+           echo "    -lst       list some possible configurations that are available"
+           echo "    -vers      only print the PACT Version (No update)"
            if ($Name == "pact-update") then
-              echo "    +net         get the PACT source from the specified host"
-              echo "                 via anonymous FTP without the documentation"
-              echo "    -net         get the PACT source from the specified host"
-              echo "                 via anonymous FTP with the documenation"
-              echo "    -src         sources are out and only need to be configured (default)"
-              echo "    -tar         compressed or uncompressed tar file, example"
-              echo "                 for pact.tar.gz type:   -tar pact.tar"
+              echo "    +net       get the PACT source from the specified host"
+              echo "               via anonymous FTP without the documentation"
+              echo "    -net       get the PACT source from the specified host"
+              echo "               via anonymous FTP with the documenation"
+              echo "    -src       sources are out and only need to be configured (default)"
+              echo "    -tar       compressed or uncompressed tar file, example"
+              echo "               for pact.tar.gz type:   -tar pact.tar"
               echo ""
               echo "    all other arguments are passed to 'dsys config'"
               echo "    do 'dsys config -h' for more information"
            else
-              echo "    -c           create missing directories for -i option"
-              echo "    -cc          specify the C compiler to be used (default gnu)"
-              echo "    -i           specify base directory into which PACT will be installed"
-              echo "                 for example, '-i /usr/local'"
-              echo "    -ipy         path to python (implies -py)"
-              echo "    -g           build debuggable version"
-              echo "    -mpi         build MPI version"
-              echo "    -py          build python bindings"
-              echo "    -s           build OpenMP version"
-              echo "    -sl          build shared libraries (implied by -py or -ipy)"
-              echo "    -t           build threaded version"
               echo ""
+              echo "    -c         create missing directories for -i option"
+              echo "    -f         a directory containing your configuration file"
+              echo "    -F         do fast builds using /tmp"
+              echo "    -g         build an absolutely debuggable version"
+              echo "    -gsys      use specified graphics system"
+              echo "               options are: gl (OpenGL), qd (Apple Quickdraw), and x11 (default)"
+              echo "    -i         base installation directory (default /usr/local)"
+              echo "               to omit installation use "-i none""
+              echo "    -llp       use LD_LIBRARY_PATH when analyzing compilers"
+              echo "    -os        explicitly set the hardware/OS/release system id"
+              echo "    -p         build a profiling version"
+              echo "    -v         display the Version of the Source Control System"
+              echo "    -V         configuration/build makefiles verbose"
+              echo ""
+              echo "   The following options apply only if no config file is specified:"
+              echo ""
+              echo "    -b         size of pointers in bits for platforms with option"
+              echo "               the default is determined by the platform defaults"
+              echo "    -cc        specify the compiler set to be used (default gnu)"
+              echo "               use only when compilers from multiple vendors are"
+              echo "               available on your system"
+              echo "               use your PATH variable to select among multiple"
+              echo "               installed versions of a single vendors compilers"
+              echo "               partial list of available compilers:"
+              echo "                  intel      Intel compilers"
+              echo "                  gnu        GNU compilers"
+              echo "                  gnu-bgl    GNU for IBM BG/L backend"
+              echo "                  gnu-bgp    GNU for IBM BG/P backend"
+              echo "                  path       PathScale compilers"
+              echo "                  pgi        PGI compilers"
+              echo "                  sun        SUN compilers"
+              echo "                  xlc-bgl    XL compilers for IBM BG/L backend"
+              echo "                  xlc-bgp    XL compilers for IBM BG/P backend"
+              echo "    -feature   <feature>[,<feature>]*"
+              echo "               look in pact/manager/features for available features"
+              echo "    -ipy       path to python, implies -py"
+              echo "    -mpi       build MPI version (equivalent to -feature mpi)"
+              echo "    -py        build python bindings (equivalent to -feature python)"
+              echo "    -s         build OpenMP version (equivalent to -feature openmp)"
+              echo "    -sl        build shared libraries (equivalent to -feature shared)"
+              echo "    -t         build threaded version (equivalent to -feature pthread)"
+              echo ""
+              echo "   Config files are optional and should be used to exercise"
+              echo "   more control than is available from the command line options"
+              echo ""
+              echo "    <config>   the configuration for the installation"
+              echo "               sample configs (see manager/std) are:"
+              echo "                    -    auto-aix     IBM RS6000 systems"
+              echo "                    -    auto-darwin  Mac OS X systmes"
+              echo "                    -    auto-hp      HP RISC 700 systems"
+              echo "                    -    auto-irix64  64 bit SGI systems running IRIX64 6.x"
+              echo "                    -    auto-linux   LINUX systems"
+              echo "                    -    auto-osf     OSF systems"
+              echo "                    -    auto-sol     Sun Solaris systems"
+              echo "               (check manager/local for any local configs)"
            endif
            echo ""
            exit(1)
@@ -175,6 +215,11 @@ while ($#argv > 0)
               echo "Version unknown"
            endif
            exit(0)
+           breaksw
+
+      case -cc:
+           shift
+           set CArgs = ( $CArgs -cc $1 )
            breaksw
       default:
            set CArgs = ( $CArgs $1 )
