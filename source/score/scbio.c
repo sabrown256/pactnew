@@ -348,7 +348,7 @@ static int _SC_bio_seek(bio_desc *bid, off_t offs, int wh)
 #ifdef USE_C_BUFFERED_IO
 
 # ifdef AIX
-    ret = fseek(fp, offs, wh);
+    ret = fseek(bid->fp, offs, wh);
 # else
     if (addr != bid->curr)
        ret = fseeko(bid->fp, offs, wh);
