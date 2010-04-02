@@ -35,8 +35,13 @@ if (-d CVS) then
    set inf = ( `cvs history -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
    set inf = ( $inf[2] $inf[3] )
 else if (-d .svn) then
-   set inf = ( `svn info .pact-version |& grep "Text Last Updated" | head -n 1` )
+   set rev = ( `svn update |& grep "At revision"` )
+   set rev = ( `echo $rev[3] | sed 's/\.$//'` )
+   set inf = ( `svn info -r $rev |& grep "Last Changed Date"` )
    set inf = ( $inf[4] $inf[5] )
+
+#   set inf = ( `svn info .pact-version |& grep "Text Last Updated" | head -n 1` )
+#   set inf = ( $inf[4] $inf[5] )
 else
    echo "none"
    exit(1)

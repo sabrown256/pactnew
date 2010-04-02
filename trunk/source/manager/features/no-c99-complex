@@ -1,0 +1,13 @@
+#
+# NO-C99-COMPLEX - do not use C99 complex type - emulate it instead
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv HaveCOMPLEX FALSE
+
+
+

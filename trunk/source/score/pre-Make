@@ -64,7 +64,7 @@ targets :
 	@echo "   fha          : make test program for fortran API of hash functionality"
 	@echo "   ha           : make scatst and sctrts test programs for hash and alist functionality"
 	@echo "   install      : install SCORE headers and utilities in dev/arch"
-	@echo "   io           : make sciots test program for I/O functionality"
+	@echo "   io           : make test programs for I/O functionality"
 	@echo "   latency      : make simple utility to measure file system latencies"
 	@echo "   lf           : make scofft test program for large file access functionality"
 	@echo "   link         : link SCORE utilities for public use"
@@ -384,11 +384,15 @@ ${BinDir}/scompt : scompt.f ${TGTLib} ${Hdrs}
 #
 # io file test
 #
-io : ${BinDir}/sciots
+io : ${BinDir}/sciots ${BinDir}/scbfts
 
 ${BinDir}/sciots : sciots.c ${TGTLib}
 	${CC} -c sciots.c -o ${PACTTmpDir}/sciots.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/sciots.o -o ${BinDir}/sciots ${Libs}
+
+${BinDir}/scbfts : scbfts.c ${TGTLib}
+	${CC} -c scbfts.c -o ${PACTTmpDir}/scbfts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/scbfts.o -o ${BinDir}/scbfts ${Libs}
 
 #
 # mapped file test
