@@ -125,7 +125,7 @@ while ($#argv > 0)
               echo "    do 'dsys config -h' for more information"
            else
               echo "    -c           create missing directories for -i option"
-              echo "    -cc          specify the C compiler to be used (default gcc)"
+              echo "    -cc          specify the C compiler to be used (default gnu)"
               echo "    -i           specify base directory into which PACT will be installed"
               echo "                 for example, '-i /usr/local'"
               echo "    -ipy         path to python (implies -py)"

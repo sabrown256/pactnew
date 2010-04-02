@@ -37,7 +37,7 @@ while ($#argv > 0)
 end
 
 if ($?CCompiler == 0) then
-   setenv CCompiler  gcc
+   setenv CCompiler  gnu
 endif
 
 set flst = ( `echo "$flst" | sed 's/,/ /g'` )
