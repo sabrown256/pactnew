@@ -70,11 +70,13 @@
                    echo "include ${bits}-bit" >>& $Tmp
                    echo "include compilers/icc" >>& $Tmp
                    breaksw
+              case *path:
               case *pathcc:
                    echo "run std/use-path $CCompiler" >>& $Tmp
                    echo "include ${bits}-bit" >>& $Tmp
                    echo "include compilers/path" >>& $Tmp
                    breaksw
+              case *pgi:
               case *pgcc:
                    echo "run std/use-pgi $CCompiler" >>& $Tmp
                    echo "include ${bits}-bit" >>& $Tmp
@@ -92,6 +94,7 @@
                    echo "include auto-bgp-xlc" >>& $Tmp
                    breaksw
               default:
+              case *gnu:
               case *gcc:
                    echo "run std/use-gnu $CCompiler" >>& $Tmp
                    echo "include ${bits}-bit" >>& $Tmp

@@ -547,7 +547,7 @@ switch ($Cmnd)
         endif
         set ConfigDir = ( $ConfigDir local std )
 
-        setenv CCompiler  gcc
+        setenv CCompiler  gnu
 
         setenv Arch  `$ScrDir/system-id`
 	setenv bits  `$ScrDir/nbit -d`
@@ -645,24 +645,29 @@ switch ($Cmnd)
                    echo "   The following options apply only if no config file is specified:"
                    echo "        -b         size of pointers in bits for platforms with option"
                    echo "                   the default is determined by the platform defaults"
-                   echo "        -cc        specify the C compiler to be used (default gcc)"
-                   echo "                   partial list:"
-                   echo "                      icc        Intel compilers"
-                   echo "                      gcc        GNU compilers"
+                   echo "        -cc        specify the compiler set to be used (default gnu)"
+                   echo "                   use only when compilers from multiple vendors are"
+                   echo "                   available on your system"
+                   echo "                   use your PATH variable to select among multiple"
+                   echo "                   installed versions of a single vendors compilers"
+                   echo "                   partial list of available compilers:"
+                   echo "                      intel      Intel compilers"
+                   echo "                      gnu        GNU compilers"
                    echo "                      gnu-bgl    GNU for IBM BG/L backend"
                    echo "                      gnu-bgp    GNU for IBM BG/P backend"
-                   echo "                      pathcc     PathScale compilers"
-                   echo "                      pgcc       PGI compilers"
+                   echo "                      path       PathScale compilers"
+                   echo "                      pgi        PGI compilers"
                    echo "                      sun        SUN compilers"
                    echo "                      xlc-bgl    XL compilers for IBM BG/L backend"
                    echo "                      xlc-bgp    XL compilers for IBM BG/P backend"
-                   echo "        -feature   use the specified feature"
+                   echo "        -feature   <feature>[,<feature>]*"
+                   echo "                   look in pact/manager/features for available features"
                    echo "        -ipy       path to python, implies -py"
-                   echo "        -mpi       build MPI version"
-                   echo "        -py        build python bindings"
-                   echo "        -s         build OpenMP version"
-                   echo "        -sl        build shared libraries"
-                   echo "        -t         build threaded version"
+                   echo "        -mpi       build MPI version (equivalent to -feature mpi)"
+                   echo "        -py        build python bindings (equivalent to -feature python)"
+                   echo "        -s         build OpenMP version (equivalent to -feature openmp)"
+                   echo "        -sl        build shared libraries (equivalent to -feature shared)"
+                   echo "        -t         build threaded version (equivalent to -feature pthread)"
                    echo ""
                    echo "   Config files are optional and should be used to exercise"
                    echo "   more control than is available from the command line options"
@@ -765,12 +770,14 @@ switch ($Cmnd)
 
 # if no configuration is specified - generate from scratch
         if ("$Configuration" == "") then
+           echo "Generating configuration $Configuration"
            call GEN_CONFIG()
            set UCfg = $gdir/$Configuration
 	   set dir  = $gdir
 
 # if file exists as is use it
         else if (-f $Configuration) then
+           echo "Using generated configuration $Configuration"
            set UCfg = $gdir/$Configuration
 	   set dir  = $gdir
 
@@ -783,10 +790,14 @@ switch ($Cmnd)
                  break
               endif
            end
+           if ("$UCfg" != "") then
+              echo "Using configuration $Configuration"
+           endif
         endif
 
 # if there still is no config file - generate from what we know
         if ("$UCfg" == "") then
+           echo "Generating configuration $Configuration from components"
            set UCfg = `gen-cfg $Configuration`
         endif
         unset gdir

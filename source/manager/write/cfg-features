@@ -8,6 +8,9 @@
 # include "cpyright.h"
 #
 
+# expand delimiters to spaces
+set flst = ( `echo $flst | sed 's/,/ /g'` )
+
 foreach f ($flst)
    if (-f features/$f) then
       echo "include features/$f" >> $Tmp
