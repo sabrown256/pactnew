@@ -598,6 +598,7 @@ switch ($Cmnd)
                    set PArgs = ( $PArgs "-F" )
                    breaksw
               case -feature:
+              case -features:
                    shift
                    set flst = ( $flst $1 )
                    breaksw
