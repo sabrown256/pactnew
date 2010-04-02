@@ -830,6 +830,8 @@ switch ($Cmnd)
 
         flog $Log umask
 
+        flog $Log $RM *.core *~
+
 # make sure that the installation directories exist
         setenv HostOS     `uname -s`
         setenv HostOSRel  `uname -r`
