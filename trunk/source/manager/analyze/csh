@@ -14,7 +14,16 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: csh"
 
-NoteD $ALog -n "   CSH: "
+set inf = ( `ls -l /bin/csh` )
+@ n = $#inf
+echo "$inf" | grep -e '->'
+if ($status == 0) then
+   set exe = ( `which $inf[$n]` )
+else
+   set exe = "/bin/csh"
+endif
+
+NoteD $ALog -n "   CSH: $exe "
 Note $ALog ""
 
 Note $ALog "cwd    = |$cwd|"
@@ -23,9 +32,9 @@ Note $ALog "AnaDir = |$AnaDir|"
 source $AnaDir/backslash
 
 if ("$BackSlash" == "\") then
-   NoteD $ALog "uses \"
+   NoteD $ALog "(uses \)"
 else
-   NoteD $ALog "uses \\\\"
+   NoteD $ALog "(uses \\\\)"
 endif
 
 SetParent BackSlash
