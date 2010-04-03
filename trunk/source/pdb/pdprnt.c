@@ -332,6 +332,93 @@ static int _PD_test_recursion(char *type, char *mtype)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PRINT_CHAR_KIND - print an entry of CHAR_KIND */
+
+static void _PD_print_char_kind(FILE *f0, char *prefix,
+				char *before, char *after, char *nodename,
+				char *vr, long nitems,
+				char *type, dimdes *dims, int mjr,
+				int quo, int idx, int nn,
+				long offset, int def_off, int n, 
+				long *ind)
+
+   {int k, max1, max2;
+    long i, j;
+    char bf[MAXLINE], s[MAXLINE];
+    char *cp;
+
+    cp = (char *) vr;
+
+    if (SC_strstr(PD_print_formats1[idx], "%s") != NULL)
+       {if ((nitems == 1L) && (offset == 0L))
+	   {if (PD_print_controls[5] == 0)
+	       {PRINT(f0, "%s%s%s = %c\n",
+		      prefix, before, nodename, *cp);}
+	    else if (PD_print_controls[5] == 1)
+	       {PRINT(f0, "%s%s = %c\n",
+		      before, nodename, *cp);}
+	    else
+	       {PRINT(f0, "        %c", *cp);};}
+
+        else
+	   {max1 = MAXLINE - 7 - strlen(prefix) -
+	           strlen(before) - strlen(nodename);
+	    max2 = max1 + strlen(before) - strlen(after);
+
+	    i = min(nitems, max1);
+	    nitems -= i;
+	    SC_strncpy(bf, MAXLINE, cp, i);
+
+	    cp += i;
+
+/* with quotes */
+	    if (quo == TRUE)
+	       {if (PD_print_controls[5] == 0)
+		   {PRINT(f0, "%s%s%s = \"%s\"\n",
+			  prefix, before, nodename, bf);}
+	        else if (PD_print_controls[5] == 1)
+		   {PRINT(f0, "%s%s = \"%s\"\n",
+			  before, nodename, bf);}
+		else
+		   {PRINT(f0, "        \"%s\"\n", bf);};
+
+		while (nitems > 0L)
+		   {i = min(nitems, max2);
+		    nitems -= i;
+		    SC_strncpy(bf, MAXLINE, cp, i);
+
+		    cp += i;
+		    PRINT(f0, "%s%s%s = \"%s\"\n", prefix, after,
+			  nodename, bf);};}
+
+/* without quotes */
+	    else
+	       {if (PD_print_controls[5] == 0)
+		   {PRINT(f0, "%s%s%s = %s\n",
+			  prefix, before, nodename, bf);}
+	        else if (PD_print_controls[5] == 1)
+		   {PRINT(f0, "%s%s = %s\n",
+			  before, nodename, bf);}
+		else
+		   {PRINT(f0, "        %s\n", bf);};
+
+		while (nitems > 0L)
+		   {i = min(nitems, max2);
+		    nitems -= i;
+		    SC_strncpy(bf, MAXLINE, cp, i);
+
+		    cp += i;
+		    PRINT(f0, "%s%s%s = %s\n", prefix, after,
+			  nodename, bf);};};};}
+
+    else
+       {DISP_DATA(f0, cp, nitems, idx, n, ind);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_IO_PRINT - display a primitive type
  *              - use N and IND to control printing of values at specific 
  *              - indices
@@ -341,12 +428,13 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
                         char *nodename, PDBfile *file, char *vr, long nitems,
                         char *type, dimdes *dims, int mjr, int def_off, int n, 
                         long *ind)
-   {long offset, i, j;
-    char bf[MAXLINE], s[MAXLINE], **t;
-    char *cp;
-    short *sp;
-    int k, m, nn, *ip, max1, max2, ityp, idx, status;
+   {int k, m, idx, nn, isz, status, quo;
+    int *ip;
+    long offset, i, j, ni;
     long *lp;
+    char bf[MAXLINE], s[MAXLINE];
+    char *cp, **t;
+    short *sp;
     BIGINT *llp;
     float *fp;
     double *dp;
@@ -368,7 +456,7 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
     memset(s, ' ', LINE_SIZE);
 
     pd   = PD_inquire_host_type(file, type);
-    ityp = pd->size;
+    isz = pd->size;
 
 /* check for floating point types */
     if (pd->format != NULL)
@@ -420,18 +508,18 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 	   {if (SC_strstr(PD_print_formats1[5], "%s") != NULL)
 	       {cp = (char *) vr;
 		t  = FMAKE_N(char *, nitems, "_PD_IO_PRINT:t");
-		for (i = 0; i < nitems; i++, cp += ityp)
-		    {t[i] = FMAKE_N(char, ityp + 1,
+		for (i = 0; i < nitems; i++, cp += isz)
+		    {t[i] = FMAKE_N(char, isz + 1,
                                           "_PD_IO_PRINT:t[]");
-		     memcpy(t[i], cp, ityp);
-		     t[i][ityp] = '\0';};
+		     memcpy(t[i], cp, isz);
+		     t[i][isz] = '\0';};
 		DISP_DATA(f0, t, nitems, 5, n, ind);
 		for (i = 0; i < nitems; i++)
 		    SFREE(t[i]);
 		SFREE(t);}
 	    else
 	       {cp = (char *) vr;
-		DISP_DATA(f0, cp, ityp*nitems, 5, n, ind);};}
+		DISP_DATA(f0, cp, isz*nitems, 5, n, ind);};}
 
 	else if (strcmp(type, "function") == 0)
 	   {if (PD_print_controls[5] == 0)
@@ -441,63 +529,33 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 	    else
 	       {PRINT(f0, "        <function>\n");};}
 
-	else if (ityp == sizeof(char))
+	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
 	   {if (strcmp(type, "char") == 0)
-               idx = 5;
-            else
-               idx = 7;
-            if (SC_strstr(PD_print_formats1[idx], "%s") != NULL)
-	       {if ((nitems == 1L) && (offset == 0L))
-		  {if (PD_print_controls[5] == 0)
-		      {PRINT(f0, "%s%s%s = %c\n",
-			     prefix, before, nodename, *(char *) vr);}
-		   else if (PD_print_controls[5] == 1)
-		      {PRINT(f0, "%s%s = %c\n",
-			     before, nodename, *(char *) vr);}
-		   else
-		      {PRINT(f0, "        %c", *(char *) vr);};}
+	       {idx = 5;
+		ni  = nitems;
+	        quo = TRUE;}
+	    else if (pd->kind == CHAR_KIND)
+	       {idx = 5;
+		ni  = isz;
+	        quo = FALSE;}
+	    else
+	       {idx = 7;
+		ni  = nitems;
+	        quo = FALSE;};
 
-	        else
-		   {max1 = MAXLINE - 7 - strlen(prefix) -
-		           strlen(before) - strlen(nodename);
-		    max2 = max1 + strlen(before) - strlen(after);
-		    cp = (char *) vr;
+	    _PD_print_char_kind(f0, prefix, before, after, nodename,
+				vr, ni, type, dims, mjr,
+				quo, idx, nn, offset, def_off, n, ind);}
 
-		    i = min(nitems, max1);
-		    nitems -= i;
-		    SC_strncpy(bf, MAXLINE, cp, i);
-
-		    cp += i;
-		    if (PD_print_controls[5] == 0)
-	 	       {PRINT(f0, "%s%s%s = \"%s\"\n",
-			      prefix, before, nodename, bf);}
-		    else if (PD_print_controls[5] == 1)
-		       {PRINT(f0, "%s%s = \"%s\"\n",
-			      before, nodename, bf);}
-		    else
-		       {PRINT(f0, "        \"%s\"\n", bf);};
-
-		    while (nitems > 0L)
-		       {i = min(nitems, max2);
-			nitems -= i;
-			SC_strncpy(bf, MAXLINE, cp, i);
-
-			cp += i;
-			PRINT(f0, "%s%s%s = \"%s\"\n", prefix, after,
-			      nodename, bf);};};}
-	   else
-	      {cp = (char *) vr;
-	       DISP_DATA(f0, cp, nitems, idx, n, ind);};}
-
-        else if (ityp == sizeof(short))
+        else if (isz == sizeof(short))
 	   {sp = (short *) vr;
 	    DISP_DATA(f0, sp, nitems, 7, n, ind);}
 
-	else if (ityp == sizeof(int))
+	else if (isz == sizeof(int))
 	   {ip = (int *) vr;
 	    DISP_DATA(f0, ip, nitems, 7, n, ind);}
 
-	else if (ityp == sizeof(long))
+	else if (isz == sizeof(long))
 	   {lp = (long *) vr;
 	    DISP_DATA(f0, lp, nitems, 7, n, ind);}
 
