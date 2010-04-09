@@ -1152,6 +1152,7 @@ extern char
  *SC_strsavef(char *s, char *name),
  *SC_strsaven(char *s, char *name),
  *SC_strcat(char *dest, size_t lnd, char *src),
+ *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...),
  *SC_dstrcat(char *dest, char *src),
  *SC_strncpy(char *d, size_t nd, char *s, size_t ns),
  *SC_dstrcpy(char *dest, char *src),
@@ -1267,10 +1268,10 @@ extern int
 		 int to, char *fname, int na, int show, int ignore),
  SC_exec_server(char *shell, char *fname, int na, int show,
 		int ignore, int debug),
- SC_system(char *cmnd);
+ SC_system(char *fmt, ...);
 
 extern char
- **SC_syscmnd(char *cmnd);
+ **SC_syscmnd(char *fmt, ...);
 
 
 /* SCSYSC.C declarations */

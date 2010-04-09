@@ -239,6 +239,31 @@ char *SC_strcat(char *dest, size_t lnd, char *src)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_VSTRCAT - this is to strcat as snprintf is to sprintf
+ *            - a safe string concatentation function
+ */
+
+char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
+   {size_t ld, ls;
+    char t[MAXLINE];
+    char *s;
+        
+    SC_VA_START(fmt);
+    SC_VSNPRINTF(t, MAXLINE, fmt);
+    SC_VA_END;
+
+    ld = strlen(dest);
+    ls = strlen(t);
+    if (ls + ld < lnd)
+       s = strcat(dest, t);
+    else
+       s = strncat(dest, t, lnd - ld - 1);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_DSTRCAT - this is to strcat as SC_dsnprintf is to sprintf
  *            - a safe string concatentation function
  */

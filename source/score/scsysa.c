@@ -865,14 +865,19 @@ int SC_execs(char *out, int nc, char *shell, int to, char *fmt, ...)
  *           - to complain on systems lacking fork/exec
  */
 
-int SC_system(char *cmnd)
+int SC_system(char *fmt, ...)
    {int rv;
+    char *cmd;
+
+    SC_VDSNPRINTF(TRUE, cmd, fmt);
 
 #ifdef HAVE_FORK_EXEC
-    rv = system(cmnd);
+    rv = system(cmd);
 #else
     rv = -1;
 #endif    
+
+    SFREE(cmd);
 
     return(rv);}
 
@@ -884,12 +889,16 @@ int SC_system(char *cmnd)
  *            - If flag is TRUE have sh parse the command
  */
 
-char **SC_syscmnd(char *cmnd)
+char **SC_syscmnd(char *fmt, ...)
    {int rv;
-    char **icmnd;
+    char **icmnd, *cmd;
 
-    rv = SC_exec(&icmnd, cmnd, NULL, -1);
+    SC_VDSNPRINTF(TRUE, cmd, fmt);
+
+    rv = SC_exec(&icmnd, cmd, NULL, -1);
     
+    SFREE(cmd);
+
     return(icmnd);}
 
 /*--------------------------------------------------------------------------*/
