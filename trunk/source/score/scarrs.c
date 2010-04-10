@@ -641,18 +641,18 @@ long SC_array_remove(SC_array *a, long n)
 /* SC_ARRAY_STRING_ADD - add the string S to the array A */
 
 void SC_array_string_add(SC_array *a, char *s)
-    {
+   {
 
-     SC_array_push(a, &s);
-     if (s != NULL)
-        SC_mark(s, 1);
+    SC_array_push(a, &s);
+    if (s != NULL)
+       SC_mark(s, 1);
 
 /* add a terminating NULL for conventional usages */
-     s = NULL;
-     SC_array_push(a, &s);
-     SC_array_dec_n(a, 1, -1);
+    s = NULL;
+    SC_array_push(a, &s);
+    SC_array_dec_n(a, 1, -1);
 
-     return;}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -660,13 +660,32 @@ void SC_array_string_add(SC_array *a, char *s)
 /* SC_ARRAY_STRING_ADD_COPY - add the a copy of the string S to the array A */
 
 void SC_array_string_add_copy(SC_array *a, char *s)
-    {char *t;
+   {char *t;
 
-     t = SC_strsavef(s, "char*:SC_ARRAY_STRING_ADD_COPY:t");
+    t = SC_strsavef(s, "char*:SC_ARRAY_STRING_ADD_COPY:t");
 
-     SC_array_string_add(a, t);
+    SC_array_string_add(a, t);
 
-     return;}
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_ARRAY_STRING_ADD_VCOPY - add the a copy of the string S to the array A */
+
+void SC_array_string_add_vcopy(SC_array *a, char *fmt, ...)
+   {char t[MAXLINE];
+    char *s;
+        
+    SC_VA_START(fmt);
+    SC_VSNPRINTF(t, MAXLINE, fmt);
+    SC_VA_END;
+
+    s = SC_strsavef(t, "char*:SC_ARRAY_STRING_ADD_COPY:s");
+
+    SC_array_string_add(a, s);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
