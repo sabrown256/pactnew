@@ -245,11 +245,11 @@ char *SC_strcat(char *dest, size_t lnd, char *src)
 
 char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
    {size_t ld, ls;
-    char t[MAXLINE];
+    char t[MAX_BFSZ];
     char *s;
         
     SC_VA_START(fmt);
-    SC_VSNPRINTF(t, MAXLINE, fmt);
+    SC_VSNPRINTF(t, MAX_BFSZ, fmt);
     SC_VA_END;
 
     ld = strlen(dest);
