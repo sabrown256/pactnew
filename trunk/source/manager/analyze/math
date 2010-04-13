@@ -15,7 +15,7 @@ Separator $Log
 Note $Log "Analyze: math"
 
 set MathLib = ""
-foreach i ("foo" "blas" "linpack" "slatec" "imsl" "mathlib")
+foreach i ("foo" "gsl" "blas" "linpack" "slatec" "imsl" "mathlib")
    rm -f $Tmp.res
    (man $i | head) >& $Tmp.res
 
