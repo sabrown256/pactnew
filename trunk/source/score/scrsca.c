@@ -430,8 +430,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 		        {nc = strlen(ps);
 
 			 if ((i != 1) || (strncmp(ps, pd, nc) != 0))
-			    {SC_strcat(pd, nr, ps);
-			     SC_strcat(pd, nr, " ");};
+			    SC_vstrcat(pd, nr, "%s ", ps);
 
 		         ps += nc;
 			 while ((ps != pe) && (*ps == '\0'))

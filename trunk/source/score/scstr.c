@@ -245,11 +245,12 @@ char *SC_strcat(char *dest, size_t lnd, char *src)
 
 char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
    {size_t ld, ls;
-    char t[MAX_BFSZ];
-    char *s;
+    char *s, *t;
         
+    t = FMAKE_N(char, lnd, "char*:SC_VSTRCAT:t");
+
     SC_VA_START(fmt);
-    SC_VSNPRINTF(t, MAX_BFSZ, fmt);
+    SC_VSNPRINTF(t, lnd, fmt);
     SC_VA_END;
 
     ld = strlen(dest);
@@ -258,6 +259,8 @@ char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
        s = strcat(dest, t);
     else
        s = strncat(dest, t, lnd - ld - 1);
+
+    SFREE(t);
 
     return(s);}
 
@@ -1343,8 +1346,7 @@ char *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add)
        {if (add == FALSE)
 	   s[0] = '\0';
 	for (i = 0; i < n; i++)
-	    {SC_strcat(s, nc, a[i]);
-	     SC_strcat(s, nc, delim);};
+	    SC_vstrcat(s, nc, "%s%s", a[i], delim);
 
 	SC_LAST_CHAR(s) = '\0';
 

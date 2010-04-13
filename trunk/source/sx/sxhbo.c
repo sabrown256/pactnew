@@ -238,8 +238,7 @@ static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
 
 /* build up the label */
     for (ph = h->next; ph != NULL; ph = ph->next)
-        {SC_strcat(label, MAXLINE, " ");
-         SC_strcat(label, MAXLINE, ph->name);
+        {SC_vstrcat(label, MAXLINE, " %s", ph->name);
 
 /* detect things like (+ a a) */
          if (ph == ph->next)
@@ -268,8 +267,7 @@ static void _SX_map_list_label(char *label, object *argl)
         {obj = SS_car(argl);
 	 snprintf(t, MAXLINE, "%s", SS_get_string(obj));
 
-	 SC_strcat(label, MAXLINE, " ");
-         SC_strcat(label, MAXLINE, t);};
+	 SC_vstrcat(label, MAXLINE, " %s", t);};
 
     SC_strcat(label, MAXLINE, ")");
 

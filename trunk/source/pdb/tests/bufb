@@ -1,0 +1,51 @@
+#!/bin/csh -f
+#
+# BUFB - PDB I/O buffer test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set STRACE = ( `which strace` )
+if ((-x "$STRACE") && ($OS != AIX)) then
+   if ("$Valgrind" == "") then
+
+      set tst = $1
+
+      NoteD $LogF ""
+      NoteD $LogF "                    PDB Buffer Test .................... "
+      Note $LogF ""
+
+      set Exe = `which pdbtst`
+
+      set UTime = `$TIMER -r`
+
+# scan prime number buffer sizes
+      @ lerr = 0
+      foreach n ( 3 13 127 4093 32749 )
+         set fill = `fill-string -n 32 $n`
+         flog $LogF pdbtst -n -b $n
+         set xstatus = $status
+         if ($xstatus == 0) then
+            NoteD $LogF "                        $fill (ok)"
+         else
+            NoteD $LogF "                        $fill (ng)"
+            @ lerr = $lerr + 1
+         endif
+      end
+      set ETime   = `$TIMER -b $UTime`
+
+      if ($lerr != 0) then
+         NoteD $LogF "                    PDB Buffer Test .................... FAILED ($xstatus/$ETime)"
+         set Err = 1
+      else
+         NoteD $LogF "                    PDB Buffer Test .................... PASSED ($ETime)"
+      endif
+   endif
+endif
+
+exit($Err)

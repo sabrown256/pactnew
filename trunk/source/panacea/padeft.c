@@ -187,7 +187,7 @@ PA_print_var_dim(PA_dimens *vdims)
     int ixx, ixn;
     PA_dimens *pvd;
     char *dim;
-    char s[MAXLINE], s1[MAXLINE];
+    char s[MAXLINE];
 
     printf("dim    : ");
     if (vdims == NULL)
@@ -220,8 +220,7 @@ PA_print_var_dim(PA_dimens *vdims)
 		      ixx = *mini + *maxi - 1L;
 		      ixx = max(ixn, ixx);
 		      break;};
-	     snprintf(s1, MAXLINE, "%d:%d,", ixn, ixx);
-	     SC_strcat(s, MAXLINE, s1);};
+	     SC_vstrcat(s, MAXLINE, "%d:%d,", ixn, ixx);};
 
 	SC_LAST_CHAR(s) = ']';
 	printf("%s\n", s);};

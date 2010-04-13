@@ -115,16 +115,12 @@ static void prep_test_1_data(void)
      
     nc    = 3 + strlen(STR_MULTIPLE) + 1;
     yname = FMAKE_N(char, nc, "char*:PREP_TEST_1_DATA:yname");
-    strcpy(yname, "y(");
-    SC_strcat(yname, LARGE_MULTIPLE, STR_MULTIPLE);
-    SC_strcat(yname, LARGE_MULTIPLE, ")");
+    snprintf(yname, LARGE_MULTIPLE, "y(%s)", STR_MULTIPLE);
      
     nc     = 5 + strlen(STR_NON_MULTIPLE) + 1;
     tsname = FMAKE_N(char, nc, "char*:PREP_TEST_1_DATA:tsname");
 
-    strcpy(tsname, "foo[]");
-    SC_strcat(tsname, nc, STR_NON_MULTIPLE);
-    SC_strcat(tsname, nc, "]");
+    snprintf(tsname, nc, "foo[%s]", STR_NON_MULTIPLE);
                
     return;}
 
@@ -302,15 +298,11 @@ static void prep_test_2_data(void)
      
     nc    = 3 + strlen(STR_MULTIPLE) + 1;
     yname = FMAKE_N(char, nc, "char*:PREP_TEST_2_DATA:yname");
-    strcpy(yname, "y(");
-    SC_strcat(yname, LARGE_MULTIPLE, STR_MULTIPLE);
-    SC_strcat(yname, LARGE_MULTIPLE, ")");
+    snprintf(yname, LARGE_MULTIPLE, "y(%s)", STR_MULTIPLE);
      
     nc     = 5 + strlen(STR_NON_MULTIPLE) + 1;
     tsname = FMAKE_N(char, nc, "char*:PREP_TEST_2_DATA:tsname");
-    strcpy(tsname, "foo[]");
-    SC_strcat(tsname, nc, STR_NON_MULTIPLE);
-    SC_strcat(tsname, nc, "]");
+    snprintf(tsname, nc, "foo[%s]", STR_NON_MULTIPLE);
                
     return;}
 

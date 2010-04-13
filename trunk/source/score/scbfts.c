@@ -18,7 +18,7 @@
  */
 
 static int test_1(void)
-   {int i, n, st, bpi, ni, cs;
+   {int i, n, st, bpi, ni, bu, cs;
     int *iv;
     char msg[MAXLINE];
     FILE *fp;
@@ -29,14 +29,15 @@ static int test_1(void)
     st  = TRUE;
     n   = 1000;
     bpi = sizeof(int);
+    bu  = 10;
 
     iv = FMAKE_N(int, n, "TEST_1:iv");
     for (i = 0; i < n; i++)
-        iv[i] = i;
+        iv[i] = i+1;
 
-    fp = SC_bopen("ts.dat", "w");
+    fp = SC_bopen("ts1.dat", "w");
 
-    io_setvbuf(fp, NULL, _IOFBF, 10*bpi);
+    io_setvbuf(fp, NULL, _IOFBF, bu*bpi);
 
     ni = 0;
 
@@ -49,7 +50,7 @@ static int test_1(void)
     ni += io_write(iv+ni, bpi, 9, fp);
 
 /* seek ahead out of buffer */
-    io_seek(fp, ni+2, SEEK_SET);
+    io_seek(fp, bpi*ni+2, SEEK_SET);
 
 /* write two contiguous blocks smaller than the buffer size */
     ni += io_write(iv+ni, bpi, 9, fp);
@@ -60,7 +61,7 @@ static int test_1(void)
     ni += io_write(iv+ni, bpi, 13, fp);
 
 /* seek ahead in buffer */
-    io_seek(fp, ni+2, SEEK_SET);
+    io_seek(fp, bpi*ni+2, SEEK_SET);
 
 /* write two contiguous blocks larger than the buffer size */
     ni += io_write(iv+ni, bpi, 11, fp);
@@ -74,6 +75,10 @@ static int test_1(void)
 
     SFREE(iv);
 
+    st = (ni == 123);
+    io_printf(stdout, "   write 1 .......... %s\n",
+	      (st == TRUE) ? "ok" : "ng");
+
     cs = SC_mem_monitor(cs, dbg, "T1", msg);
 
     return(st);}
@@ -86,7 +91,7 @@ static int test_1(void)
  */
 
 static int test_2(void)
-   {int i, n, st, bpi, ni, cs;
+   {int i, n, st, bpi, ni, bu, cs;
     int *iv;
     off_t addr;
     char msg[MAXLINE];
@@ -98,14 +103,15 @@ static int test_2(void)
     st  = TRUE;
     n   = 1000;
     bpi = sizeof(int);
+    bu  = 10;
 
     iv = FMAKE_N(int, n, "TEST_1:iv");
     for (i = 0; i < n; i++)
         iv[i] = 0;
 
-    fp = SC_bopen("ts.dat", "r");
+    fp = SC_bopen("ts1.dat", "r");
 
-    io_setvbuf(fp, NULL, _IOFBF, 10*bpi);
+    io_setvbuf(fp, NULL, _IOFBF, bu*bpi);
 
     addr = io_tell(fp);
 
@@ -120,7 +126,7 @@ static int test_2(void)
     ni += io_read(iv+ni, bpi, 9, fp);
 
 /* seek ahead out of buffer */
-    io_seek(fp, ni+2, SEEK_SET);
+    io_seek(fp, bpi*ni+2, SEEK_SET);
 
 /* read two contiguous blocks smaller than the buffer size */
     ni += io_read(iv+ni, bpi, 9, fp);
@@ -131,7 +137,7 @@ static int test_2(void)
     ni += io_read(iv+ni, bpi, 13, fp);
 
 /* seek ahead in buffer */
-    io_seek(fp, ni+2, SEEK_SET);
+    io_seek(fp, bpi*ni+2, SEEK_SET);
 
 /* read two contiguous blocks larger than the buffer size */
     ni += io_read(iv+ni, bpi, 11, fp);
@@ -146,7 +152,10 @@ static int test_2(void)
 /* check the results */
     st = TRUE;
     for (i = 0; i < ni; i++)
-        st &= (iv[i] == i);
+        st &= (iv[i] == i+1);
+
+    io_printf(stdout, "   read 1 ........... %s\n",
+	      (st == TRUE) ? "ok" : "ng");
 
     SFREE(iv);
 
@@ -157,14 +166,51 @@ static int test_2(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_3 - test editing memory mapped files
+/* TEST_3 - test "random" writes
  *        - return TRUE iff successful
  */
 
 static int test_3(void)
-   {int st;
+   {int i, n, st, bpi, ni, nw, nu, ad, bu, cs;
+    int *iv;
+    char msg[MAXLINE];
+    FILE *fp;
+    static long addr[] = { 8, 2, 5, 3, 9, 1, 7, 4, 6, 0 };
+    static int dbg = 0;
 
-    st = TRUE;
+    cs = SC_mem_monitor(-1, dbg, "T3", msg);
+
+    st  = TRUE;
+    n   = 1000;
+    bpi = sizeof(int);
+    bu  = 3;
+
+    iv = FMAKE_N(int, n, "TEST_1:iv");
+    for (i = 0; i < n; i++)
+        iv[i] = i+1;
+
+    ni = 0;
+    nw = sizeof(addr)/sizeof(long);
+    nu = 10;
+
+    fp = SC_bopen("ts2.dat", "w");
+
+    io_setvbuf(fp, NULL, _IOFBF, bu*bpi);
+
+    for (i = 0; i < nw; i++)
+        {ad = nu*addr[i];
+	 io_seek(fp, ad*bpi, SEEK_SET);
+	 ni += io_write(iv+ad, bpi, nu, fp);};
+
+    io_close(fp);
+
+    SFREE(iv);
+
+    st = (ni == nu*nw);
+    io_printf(stdout, "   write 2 .......... %s\n",
+	      (st == TRUE) ? "ok" : "ng");
+
+    cs = SC_mem_monitor(cs, dbg, "T3", msg);
 
     return(st);}
 
@@ -176,9 +222,50 @@ static int test_3(void)
  */
 
 static int test_4(void)
-   {int st;
+   {int i, n, st, bpi, ni, nw, nu, ad, bu, cs;
+    int *iv;
+    char msg[MAXLINE];
+    FILE *fp;
+    static long addr[] = { 4, 7, 6, 8, 2, 5, 9, 3, 0, 1 };
+    static int dbg = 0;
 
+    cs = SC_mem_monitor(-1, dbg, "T3", msg);
+
+    st  = TRUE;
+    n   = 1000;
+    bpi = sizeof(int);
+    bu  = 10;
+
+    iv = FMAKE_N(int, n, "TEST_1:iv");
+    for (i = 0; i < n; i++)
+        iv[i] = 0;
+
+    ni = 0;
+    nw = sizeof(addr)/sizeof(long);
+    nu = 7;
+
+    fp = SC_bopen("ts2.dat", "r");
+
+    io_setvbuf(fp, NULL, _IOFBF, bu*bpi);
+
+    for (i = 0; i < nw; i++)
+        {ad = nu*addr[i];
+	 io_seek(fp, ad*bpi, SEEK_SET);
+	 ni += io_read(iv+ad, bpi, nu, fp);};
+
+    io_close(fp);
+
+/* check the results */
     st = TRUE;
+    for (i = 0; i < ni; i++)
+        st &= (iv[i] == i+1);
+
+    SFREE(iv);
+
+    io_printf(stdout, "   read 2 ........... %s\n",
+	      (st == TRUE) ? "ok" : "ng");
+
+    cs = SC_mem_monitor(cs, dbg, "T3", msg);
 
     return(st);}
 

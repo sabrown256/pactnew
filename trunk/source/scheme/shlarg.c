@@ -352,8 +352,7 @@ static object *_SSI_printenv(object *argl)
 	     SS_args(v,
 		     SC_STRING_I, &vr,
 		     0);
-	     strcpy(s, "$");
-	     SC_strcat(s, MAXLINE, vr);
+	     snprintf(s, MAXLINE, "$%s", vr);
 	     vrs[n++] = SC_strsavef(s, "char*:_SSI_PRINTENV:vr");
 
 	     SFREE(vr);};
@@ -370,8 +369,7 @@ static object *_SSI_printenv(object *argl)
     for (i = 0; vrs[i] != NULL; i++)
         {vr = vrs[i];
 	 vl = _SS_lk_var_valc(vr, SS_Global_Env);
-	 strcpy(s, vr);
-	 SC_strcat(s, MAXLINE, " = ");
+	 snprintf(s, MAXLINE, "%s = ", vr);
 	 if (vl == NULL)
 	    SS_print(SS_null, s, "\n", SS_outdev);
 	 else

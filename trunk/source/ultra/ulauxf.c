@@ -504,7 +504,7 @@ static object *_ULI_fit_curve(object *argl)
     int *curid;
     double yv;
     double *x[PG_SPACEDM], *xp0, *yp0;
-    char frag[MAXLINE], local[MAXLINE];
+    char local[MAXLINE];
     PM_matrix *ay, *a, *solution;
     object *ch;
 
@@ -575,11 +575,10 @@ static object *_ULI_fit_curve(object *argl)
 	        {PRINT(stdout, " * curve @%d\n", id);};};
 
          if (alpha_id)
-            {snprintf(frag, MAXLINE, " %c", id);}
+            SC_vstrcat(local, MAXLINE, " %c", id);
          else
-            {snprintf(frag, MAXLINE, " @%d", id);}
+            SC_vstrcat(local, MAXLINE, " @%d", id);};
 
-         SC_strcat(local, MAXLINE, frag);};
     SC_strcat(local, MAXLINE, ")");
 
 /* find fit */

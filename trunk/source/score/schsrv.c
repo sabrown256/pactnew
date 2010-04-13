@@ -449,8 +449,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 		    {na = strlen(out);
 		     ns = strlen(t);
 		     if (na + ns + 1 < nc)
-		        {SC_strcat(out, nc, t);
-			 SC_strcat(out, nc, " ");}
+		        SC_vstrcat(out, nc, "%s ", t);
 		     else
 		        break;};};
 
@@ -473,8 +472,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 		    {na = strlen(out);
 		     ns = strlen(t);
 		     if (na + ns + 1 < nc)
-		        {SC_strcat(out, nc, t);
-			 SC_strcat(out, nc, " ");}
+		        SC_vstrcat(out, nc, "%s ", t);
 		     else
 		        break;};};
 
@@ -498,8 +496,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 		    {na = strlen(out);
 		     ns = strlen(t);
 		     if (na + ns + 1 < nc)
-		        {SC_strcat(out, nc, t);
-			 SC_strcat(out, nc, " ");}
+		        SC_vstrcat(out, nc, "%s ", t);
 		     else
 		        break;};};
 

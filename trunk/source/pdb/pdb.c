@@ -949,7 +949,7 @@ int PD_write_as_alt(PDBfile *file, char *name, char *intype, char *outtype,
 		    void *vr, int nd, long *ind)
    {int i, new, appnd, ret, nc;
     long start, stop, step, leng;
-    char expr[MAXLINE], index[MAXLINE], hname[MAXLINE], fullpath[MAXLINE];
+    char index[MAXLINE], hname[MAXLINE], fullpath[MAXLINE];
     dimdes *dims, *next, *prev;
     syment *ep;
     PD_smp_state *pa;
@@ -967,8 +967,7 @@ int PD_write_as_alt(PDBfile *file, char *name, char *intype, char *outtype,
          step  = ind[2];
          ind += 3;
 
-	 snprintf(expr, MAXLINE, "%ld:%ld:%ld,", start, stop, step);
-         SC_strcat(index, MAXLINE, expr);
+         SC_vstrcat(index, MAXLINE, "%ld:%ld:%ld,", start, stop, step);
 
          leng = stop - start + 1L;
          next = _PD_mk_dimensions(start, leng);

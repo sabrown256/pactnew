@@ -169,7 +169,9 @@ void _PD_set_io_buffer(SC_udl *pu)
 	   {SFREE(bf);
 	    PD_error("CANNOT SET FILE BUFFER - _PD_SET_IO_BUFFER", PD_OPEN);}
 	else
-	   pu->buffer = bf;};
+	   {if (pu->buffer != NULL)
+	       SFREE(pu->buffer);
+	    pu->buffer = bf;};};
 
     return;}
 

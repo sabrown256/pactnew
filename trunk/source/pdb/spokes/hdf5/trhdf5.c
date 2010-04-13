@@ -926,9 +926,11 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
 	     temp_prefix = FMAKE_N(char, nc, "H5_READ_GROUP_NODE:temp_prefix");
 	     temp_prefix[0] = '\0';
 
-	     SC_strcat(temp_prefix, nc, hst->group_prefix);        /* ends in slash '/'   */
-	     SC_strcat(temp_prefix, nc, (char *) memb_name);  /* append new name     */
-	     SC_strcat(temp_prefix, nc, "/");                 /* end it in slash '/' */
+/* end it in slash '/' */
+	     SC_vstrcat(temp_prefix, nc, "%s%s/",
+			hst->group_prefix,             /* ends in slash '/' */
+			(char *) memb_name);           /* append new name   */
+
 	     hst->group_prefix = temp_prefix;
 
 	     ep->type = SC_strsavef("Directory", "H5_READ_GROUP_NODE:type");
@@ -1001,8 +1003,8 @@ static herr_t H5_read_group_node(hid_t group_id, const char *memb_name,
 	     nc = strlen(hst->group_prefix) + strlen(memb_name) + 1;
 	     fullname = FMAKE_N(char, nc, "H5_READ_GROUP_NODE:fullname");
 	     fullname[0] = '\0';
-	     SC_strcat(fullname, nc, hst->group_prefix);
-	     SC_strcat(fullname, nc, (char *) memb_name); 
+	     SC_vstrcat(fullname, nc, "%s%s",
+			hst->group_prefix, (char *) memb_name); 
 
 	     _PD_e_install(hst->pf, fullname, ep, FALSE);
 
