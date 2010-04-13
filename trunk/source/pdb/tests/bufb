@@ -17,7 +17,7 @@ if ((-x "$STRACE") && ($OS != AIX)) then
       set tst = $1
 
       NoteD $LogF ""
-      NoteD $LogF "                    PDB Buffer Test .................... "
+      NoteD $LogF "                    PDB Buffer Test B .................. "
       Note $LogF ""
 
       set Exe = `which pdbtst`
@@ -40,10 +40,10 @@ if ((-x "$STRACE") && ($OS != AIX)) then
       set ETime   = `$TIMER -b $UTime`
 
       if ($lerr != 0) then
-         NoteD $LogF "                    PDB Buffer Test .................... FAILED ($xstatus/$ETime)"
+         NoteD $LogF "                    PDB Buffer Test B .................. FAILED ($xstatus/$ETime)"
          set Err = 1
       else
-         NoteD $LogF "                    PDB Buffer Test .................... PASSED ($ETime)"
+         NoteD $LogF "                    PDB Buffer Test B .................. PASSED ($ETime)"
       endif
    endif
 endif

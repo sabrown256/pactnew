@@ -81,6 +81,46 @@ static INLINE off_t _SC_bio_set_addr(bio_desc *bid, off_t addr, int chsz,
     return(addr);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BFR_FREE - free bio_frame */
+
+static void _SC_bfr_free(bio_frame *fr)
+   {
+
+    if (fr != NULL)
+       {SFREE(fr->bf);
+	SFREE(fr);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BFR_FREE_ELEM - free buffering */
+
+static int _SC_bfr_free_elem(void *a)
+   {bio_frame *fr;
+
+    fr = *(bio_frame **) a;
+    _SC_bfr_free(fr);
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BIO_FREE - free buffering */
+
+static void _SC_bio_free(bio_desc *bid)
+   {
+
+    if (bid->stack != NULL)
+       SC_free_array(bid->stack, _SC_bfr_free_elem);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 #ifndef USE_C_BUFFERED_IO
 
@@ -135,7 +175,8 @@ static void _SC_bio_buffer(bio_desc *bid, size_t bfsz)
    {
 
     bid->bfsz  = bfsz;
-    bid->stack = SC_MAKE_ARRAY("_SC_BIO_BUFFER", bio_frame *, NULL);
+    if (bid->stack == NULL)
+       bid->stack = SC_MAKE_ARRAY("_SC_BIO_BUFFER", bio_frame *, NULL);
 
     return;}
 
@@ -302,6 +343,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 	     if ((ri[0] <= fi[0]) && (fi[1] <= ri[1]))
 	        {if ((fa->rw == BIO_WRITE) && (fr->rw == BIO_READ))
 		    _SC_bfr_flush(bid, fa, TRUE);
+		 _SC_bfr_free(fa);
 		 n = SC_array_remove(bid->stack, i);
 		 i--;}
 
@@ -311,6 +353,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 	     else if ((ri[0] < fi[0]) && (fi[0] < ri[1]))
 	        {if ((fa->rw == BIO_WRITE) && (fr->rw == BIO_READ))
 		    _SC_bfr_flush(bid, fa, TRUE);
+		 _SC_bfr_free(fa);
 		 n = SC_array_remove(bid->stack, i);
 		 i--;}
 
@@ -329,46 +372,6 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 
 #endif
 
-/*--------------------------------------------------------------------------*/
-
-/* _SC_BFR_FREE - free bio_frame */
-
-static void _SC_bfr_free(bio_frame *fr)
-   {
-
-    if (fr != NULL)
-       {SFREE(fr->bf);
-	SFREE(fr);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_BFR_FREE_ELEM - free buffering */
-
-static int _SC_bfr_free_elem(void *a)
-   {bio_frame *fr;
-
-    fr = *(bio_frame **) a;
-    _SC_bfr_free(fr);
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_BIO_FREE - free buffering */
-
-static void _SC_bio_free(bio_desc *bid)
-   {
-
-    if (bid->stack != NULL)
-       SC_free_array(bid->stack, _SC_bfr_free_elem);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_BIO_SEEK - seek to location in file */
@@ -1065,6 +1068,42 @@ FILE *SC_lbopen(char *name, char *mode)
 	   ret = NULL;};
 
     return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_BF_SET_HOOKS - setup the buffered io hooks
+ *                 - this is for insane systems where C std library
+ *                 - buffering does not work
+ *                 - IBM BG/P is especially bad
+ *                 - modern Linux is iffy
+ */
+
+void SC_bf_set_hooks(void)
+   {
+
+    io_open_hook  = SC_bopen;
+    lio_open_hook = SC_lbopen;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LBF_SET_HOOKS - setup the buffered io hooks
+ *                  - this is for insane systems where C std library
+ *                  - buffering does not work
+ *                  - IBM BG/P is especially bad
+ *                  - modern Linux is iffy
+ */
+
+void SC_lbf_set_hooks(void)
+   {
+
+    io_open_hook  = SC_bopen;
+    lio_open_hook = SC_lbopen;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

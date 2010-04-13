@@ -320,6 +320,7 @@ struct s_fcontainer
 enum e_SC_file_cat
    {SC_LOCAL = 201,
     SC_REMOTE,
+    SC_BUFFERED,
     SC_PARALLEL};
 
 typedef enum e_SC_file_cat SC_file_cat;
@@ -368,6 +369,10 @@ extern int
 extern FILE
  *SC_bopen(char *name, char *mode),
  *SC_lbopen(char *name, char *mode);
+
+extern void
+ SC_bf_set_hooks(void),
+ SC_lbf_set_hooks(void);
 
 
 /* SCFCNTNR.C declarations */

@@ -2290,6 +2290,10 @@ int SC_io_connect(int flag)
 	     io_open_hook = _SC_ropen;
 	     break;
 
+        case SC_BUFFERED :
+	     io_open_hook = SC_bopen;
+	     break;
+
         case SC_LOCAL :
 	     io_open_hook = SC_fopen;
 	     break;

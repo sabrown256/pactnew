@@ -1212,7 +1212,7 @@ void PD_set_io_hooks(int which)
 
     switch (which)
        {case 0 :
-	     SC_io_connect(SC_LOCAL);
+	     SC_io_connect(SC_BUFFERED);
 	     break;
 
 	case 1 :
