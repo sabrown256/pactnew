@@ -594,10 +594,8 @@ char *SX_wrap_paren(char *open, char *form, char *close, size_t ln)
    {char tmp[MAXLINE];
 
    strcpy(tmp, form);
-   strcpy(form, open);
 
-   SC_strcat(form, ln, tmp);
-   SC_strcat(form, ln, close);
+   snprintf(form, ln, "%s%s%s", open, tmp, close);
 
    return(form);}
 

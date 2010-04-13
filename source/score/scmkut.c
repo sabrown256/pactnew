@@ -331,8 +331,7 @@ static int make_by_host(char *lst, char **v, char *shell, char **env,
 
     strcpy(cm, "pact");
     for (i = 0; v[i] != NULL; i++)
-        {SC_strcat(cm, MAXLINE, " ");
-	 SC_strcat(cm, MAXLINE, v[i]);};
+        SC_vstrcat(cm, MAXLINE, " %s", v[i]);
     cmnds[0] = cm;
     cmnds[1] = NULL;
 

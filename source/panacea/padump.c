@@ -587,7 +587,7 @@ void _PA_dump_package_mappings(PA_package *pck, double t, double dt,
 
 C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
    {int i, n;
-    char numval[MAXLINE], *pname, **ps;
+    char *pname, **ps;
     long size, indx, ndx;
     double *v, start;
     C_array *arr;
@@ -605,18 +605,14 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 
 	 strcat(dname, pi->var_name);
 	 if (pi->function != NULL)
-            {SC_strcat(dname, nc, "=");
-	     SC_strcat(dname, nc, pi->function);}
+            SC_vstrcat(dname, nc, "= %s,", pi->function);
             
          else if (start != -HUGE)
-            {SC_strcat(dname, nc, "=");
-             if (pi->text != NULL)
-                snprintf(numval, MAXLINE, "%s", pi->text);
+            {if (pi->text != NULL)
+                SC_vstrcat(dname, MAXLINE, "=%s,", pi->text);
              else
-                snprintf(numval, MAXLINE, "%.2e", start);
-             SC_strcat(dname, nc, numval);};
+                SC_vstrcat(dname, MAXLINE, "=%.2e,", start);};};
 
-         SC_strcat(dname, nc, ",");};
     SC_LAST_CHAR(dname) = '\0';
     SC_strcat(dname, nc, "}");
 
@@ -760,8 +756,7 @@ void PA_get_range_info(PA_plot_request *pr)
        {strcpy(rname, "{");
         for (pi = ps; pi != NULL; pi = pi->next)
             {vr = pi->var_name; 
-	     SC_strcat(rname, MAXLINE, vr);
-             SC_strcat(rname, MAXLINE, ",");
+	     SC_vstrcat(rname, MAXLINE, "%s,", vr);
              pp = PA_inquire_variable(vr);
              PA_ERR((pp == NULL),
                     "VARIABLE %s NOT IN DATABASE - PA_GET_RANGE_INFO", vr);

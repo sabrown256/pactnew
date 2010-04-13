@@ -320,6 +320,7 @@ static void _XML_end_tag(parse_state *st, char *t)
     SC_strncpy(s, MAXLINE, b, -1);
     b  = SC_strtok(s, " \t>", u);
     nb = strlen(b);
+
     if ((strncmp(b, t+2, nb) == 0) && (t[2+nb] == '>'))
        {val = st->value;
 	if (val != NULL)

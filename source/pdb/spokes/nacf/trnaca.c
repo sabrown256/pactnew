@@ -201,23 +201,20 @@ static defstr *_NAC_proc_str(PDBfile *file, char *names,
            {case NAC_ASCII :
 	         mult = CRAY_BYTES_WORD*((width + 7)/CRAY_BYTES_WORD);
 		 if (mult > 1)
-		    {snprintf(memb, MAXLINE, "%ld", mult);
-		     SC_strcat(mdims, MAXLINE, memb);
+		    {SC_vstrcat(mdims, MAXLINE, "%ld", mult);
 		     ndims++;};
 		 break;
 
             case NAC_CHARS :
 	         if (width > 1)
-		    {snprintf(memb, MAXLINE, "%ld", width);
-		     SC_strcat(mdims, MAXLINE, memb);
+		    {SC_vstrcat(mdims, MAXLINE, "%ld", width);
 		     ndims++;};
 		 break;
 
             case NAC_LJBF :
 	         mult = CRAY_BYTES_WORD*((width + 63)/64);
 		 if (mult > 1)
-		    {snprintf(memb, MAXLINE, "%ld", mult);
-		     SC_strcat(mdims, MAXLINE, memb);
+		    {SC_vstrcat(mdims, MAXLINE, "%ld", mult);
 		     ndims++;};
 		 break;
 
@@ -245,10 +242,8 @@ static defstr *_NAC_proc_str(PDBfile *file, char *names,
         if (pd[6] == 0)
            {if (ndims == 1)
                SC_strcat(mdims, MAXLINE, ",");
-            snprintf(memb, MAXLINE, "%ld", numb);
-            SC_strcat(mdims, MAXLINE, memb);
-            ndims++;
-            SC_strcat(mdims, MAXLINE, ")");}
+            SC_vstrcat(mdims, MAXLINE, "%ld)", numb);
+            ndims++;}
 
         else
            {if (ndims == 1)
@@ -274,10 +269,9 @@ static defstr *_NAC_proc_str(PDBfile *file, char *names,
 		    break;};
 
                 if (mini == 1)
-                   snprintf(memb, MAXLINE, "%ld", maxi);
+                   SC_vstrcat(mdims, MAXLINE, "%ld", maxi);
                 else
-                   snprintf(memb, MAXLINE, "%ld:%ld", mini, maxi);
-                SC_strcat(mdims, MAXLINE, memb);
+                   SC_vstrcat(mdims, MAXLINE, "%ld:%ld", mini, maxi);
                 ndims++;
 
                 if (pm[13] != 0)

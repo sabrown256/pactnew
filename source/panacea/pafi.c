@@ -691,8 +691,8 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
               pb = NULL;
 
               if (token[0] == '"')
-                 {snprintf(vname, MAXLINE, "%s ", &token[1]);
-                  SC_strcat(vname, MAXLINE, SC_strtok(pb, "\"", s));
+                 {snprintf(vname, MAXLINE, "%s %s",
+			   &token[1], SC_strtok(pb, "\"", s));
                   token = vname;};
 
 /* NOTE: clean this out using SC_add_alist */

@@ -1012,26 +1012,22 @@ void PA_name_files(char *base_name, char **ped, char **prs,
 
 /* name the first edit file */
     if (ped != NULL)
-       {strcpy(s, t);
-	SC_strcat(s, 50, ".e00");
+       {snprintf(s, 50, "%s.e00", t);
 	*ped = SC_strsavef(s, "char*:PA_NAME_FILES:ped");};
 
 /* name the restart dump file */
     if (prs != NULL)
-       {strcpy(s, t);
-	SC_strcat(s, 50, ".r00");
+       {snprintf(s, 50, "%s.r00", t);
 	*prs = _PA.rsname = SC_strsavef(s, "char*:PA_NAME_FILES:prs");};
 
 /* name the post-processor file */
     if (ppp != NULL)
-       {strcpy(s, t);
-	SC_strcat(s, 50, ".t00");
+       {snprintf(s, 50, "%s.t00", t);
 	*ppp = SC_strsavef(s, "char*:PA_NAME_FILES:ppp");};
 
 /* name the post-processor file */
     if (pgf != NULL)
-       {strcpy(s, t);
-	SC_strcat(s, 50, ".s00");
+       {snprintf(s, 50, "%s.s00", t);
 	*pgf = SC_strsavef(s, "char*:PA_NAME_FILES:pgf");};
 
     return;}

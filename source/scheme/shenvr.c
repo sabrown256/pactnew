@@ -828,10 +828,9 @@ void SS_env_vars(char **vrs, object *penv)
 
 		 nc = strlen(s) + 2;
 		 vr = FMAKE_N(char, nc, "char*:SS_ENV_VARS:s");
-		 strcpy(vr, "$");
-		 SC_strcat(vr, nc, s);
+		 snprintf(vr, nc, "$%s", s);
 
-		 vl  = SS_mk_string(p+1);
+		 vl = SS_mk_string(p+1);
 
 		 _SS_def_varc(vr, vl, penv);
 

@@ -489,7 +489,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     syment *ep;
     dimdes *dims, *pd;
     long start, stop, step;
-    char s[MAXLINE], lname[MAXLINE], index[MAXLINE], expr[MAXLINE];
+    char s[MAXLINE], lname[MAXLINE], index[MAXLINE];
     char *t, *rv;
 
     strcpy(s, name);
@@ -528,15 +528,13 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 	     break;};
 
          if (start == stop)
-            snprintf(expr, MAXLINE, "%ld,", start);
+            SC_vstrcat(index, MAXLINE, "%ld,", start);
 
          else if (step <= 1L)
-            snprintf(expr, MAXLINE, "%ld:%ld,", start, stop);
+            SC_vstrcat(index, MAXLINE, "%ld:%ld,", start, stop);
 
          else
-            snprintf(expr, MAXLINE, "%ld:%ld:%ld,", start, stop, step);
-            
-         SC_strcat(index, MAXLINE, expr);};
+            SC_vstrcat(index, MAXLINE, "%ld:%ld:%ld,", start, stop, step);};
     
     _PD_rl_syment_d(ep);
 
@@ -1390,7 +1388,7 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
                         int nd, long *ind, syment *ep)
    {int i, err;
     long start, stop, step;
-    char expr[MAXLINE], index[MAXLINE], hname[MAXLINE];
+    char index[MAXLINE], hname[MAXLINE];
     PD_smp_state *pa;
 
     err = 0;
@@ -1413,15 +1411,13 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
          step  = ind[2];
          ind  += 3;
          if (start == stop)
-            snprintf(expr, MAXLINE, "%ld,", start);
+            SC_vstrcat(index, MAXLINE, "%ld,", start);
 
          else if (step <= 1L)
-            snprintf(expr, MAXLINE, "%ld:%ld,", start, stop);
+            SC_vstrcat(index, MAXLINE, "%ld:%ld,", start, stop);
             
          else
-            snprintf(expr, MAXLINE, "%ld:%ld:%ld,", start, stop, step);
-            
-         SC_strcat(index, MAXLINE, expr);};
+            SC_vstrcat(index, MAXLINE, "%ld:%ld:%ld,", start, stop, step);};
 
     if (strlen(index) > 1)
        {SC_LAST_CHAR(index) = ')';

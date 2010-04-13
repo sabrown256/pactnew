@@ -45,14 +45,9 @@ int CC_preprocess(char *s, char *cmp, char **v)
 	 else if (strcmp(v[i], "-c") == 0)
 	    continue;
 	 else
-	    {SC_strcat(cmd, MAXLINE, " ");
-	     SC_strcat(cmd, MAXLINE, v[i]);};};
+	    SC_vstrcat(cmd, MAXLINE, " %s", v[i]);};
 
-    SC_strcat(cmd, MAXLINE, " -E ");
-    SC_strcat(cmd, MAXLINE, s);
-    SC_strcat(cmd, MAXLINE, " > ");
-    SC_strcat(cmd, MAXLINE, inm);
-    SC_strcat(cmd, MAXLINE, " 2>&1");
+    SC_vstrcat(cmd, MAXLINE, " -E %s > %s 2>&1", s, inm);
 
     st = system(cmd);
 
@@ -77,11 +72,9 @@ int CC_compile(char *s, char *cmp, char **v)
          else if (strncmp(v[i], "-I", 2) == 0)
             continue;
 	 else
-	    {SC_strcat(cmd, MAXLINE, " ");
-	     SC_strcat(cmd, MAXLINE, v[i]);};};
+	    SC_vstrcat(cmd, MAXLINE, " %s", v[i]);};
 
-    SC_strcat(cmd, MAXLINE, " ");
-    SC_strcat(cmd, MAXLINE, s);
+    SC_vstrcat(cmd, MAXLINE, " %s", s);
 
     st = system(cmd);
 

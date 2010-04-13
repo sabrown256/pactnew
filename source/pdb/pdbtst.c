@@ -306,6 +306,24 @@ static int PD_float_equal(double d1, double d2, double tol)
        return(0);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ERROR - get out on an error */
+
+static void error(int n, FILE *fp, char *fmt, ...)
+   {char t[MAXLINE];
+        
+    SC_VA_START(fmt);
+    SC_VSNPRINTF(t, MAXLINE, fmt);
+    SC_VA_END;
+
+    io_printf(fp, "%s", t);
+
+    exit(n);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            TEST #0 ROUTINES                              */
 
@@ -440,8 +458,7 @@ static int test_0(char *base, char *tgt, int n)
 /* create the named file */
     strm = PD_create(datfile);
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't create file %s\r\n", datfile);
     PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -468,8 +485,7 @@ static int test_0(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
     return(err);}
@@ -605,34 +621,26 @@ static void write_test_1_data(PDBfile *strm)
 
 /* write scalars into the file */
     if (PD_write(strm, "cs", "char",    &cs_w) == 0)
-       {PRINT(STDOUT, "CS WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "CS WRITE FAILED - WRITE_TEST_1_DATA\n");
     if (PD_write(strm, "ss", "short",   &ss_w) == 0)
-       {PRINT(STDOUT, "SS WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "SS WRITE FAILED - WRITE_TEST_1_DATA\n");
     if (PD_write(strm, "is", "integer", &is_w) == 0)
-       {PRINT(STDOUT, "IS WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "IS WRITE FAILED - WRITE_TEST_1_DATA\n");
     if (PD_write(strm, "fs", "float",   &fs_w) == 0)
-       {PRINT(STDOUT, "FS WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "FS WRITE FAILED - WRITE_TEST_1_DATA\n");
     if (PD_write(strm, "ds", "double",  &ds_w) == 0)
-       {PRINT(STDOUT, "DS WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "DS WRITE FAILED - WRITE_TEST_1_DATA\n");
 
 /* write primitive arrays into the file */
     ind[0] = 0L;
     ind[1] = len - 1;
     ind[2] = 1L;
     if (PD_write_alt(strm, "ca", "char", ca_w, 1, ind) == 0)
-       {PRINT(STDOUT, "CA WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "CA WRITE FAILED - WRITE_TEST_1_DATA\n");
     if (PD_write(strm, "sa(5)", "short", sa_w) == 0)
-       {PRINT(STDOUT, "SA WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "SA WRITE FAILED - WRITE_TEST_1_DATA\n");
     if (PD_write(strm, "ia(5)", "integer", ia_w) == 0)
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "IA WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     ind[0] = 0L;
     ind[1] = N_FLOAT - 1;
@@ -641,31 +649,26 @@ static void write_test_1_data(PDBfile *strm)
     ind[4] = N_DOUBLE - 1;
     ind[5] = 1L;
     if (PD_write_alt(strm, "fa2", "float", fa2_w, 2, ind) == 0)
-       {PRINT(STDOUT, "FA2 WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "FA2 WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     ind[0] = 0L;
     ind[1] = N_FLOAT - 1;
     ind[2] = 1L;
     if (PD_write_alt(strm, "da", "double", da_w, 1, ind) == 0)
-       {PRINT(STDOUT, "DA WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "DA WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     ind[0] = 0L;
     ind[1] = N_DOUBLE - 1;
     ind[2] = 1L;
     if (PD_write_alt(strm, "cap", "char *", cap_w, 1, ind) == 0)
-       {PRINT(STDOUT, "CAP WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "CAP WRITE FAILED - WRITE_TEST_1_DATA\n");
 
 /* write structures into the file */
     if (PD_write(strm, "view", "l_frame", &view_w) == 0)
-       {PRINT(STDOUT, "VIEW WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "VIEW WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     if (PD_write(strm, "graph", "plot", &graph_w) == 0)
-       {PRINT(STDOUT, "GRAPH WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "GRAPH WRITE FAILED - WRITE_TEST_1_DATA\n");
 
     return;}
 
@@ -678,8 +681,7 @@ static void append_test_1_data(PDBfile *strm)
    {long ind[6];
 
     if (PD_write(strm, "fs_app", "float", &fs_app_w) == 0)
-       {PRINT(STDOUT, "FS_APP WRITE FAILED - APPEND_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "FS_APP WRITE FAILED - APPEND_TEST_1_DATA\n");
 
     ind[0] = 0L;
     ind[1] = N_FLOAT - 1;
@@ -688,8 +690,7 @@ static void append_test_1_data(PDBfile *strm)
     ind[4] = N_DOUBLE - 1;
     ind[5] = 1L;
     if (PD_write_alt(strm, "fa2_app", "float", fa2_app_w, 2, ind) == 0)
-       {PRINT(STDOUT, "FA2_APP WRITE FAILED - APPEND_TEST_1_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "FA2_APP WRITE FAILED - APPEND_TEST_1_DATA\n");
 
     return;}
 
@@ -990,8 +991,7 @@ static int test_1(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	   error(1, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -1014,31 +1014,27 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	   error(1, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file to append */
 	strm = PD_open(datfile, "a");
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't open file %s to append\r\n", datfile);
-	    exit(1);};
+	   error(1, fp, "Test couldn't open file %s to append\r\n", datfile);
 	PRINT(fp, "File %s opened to append\n", datfile);
 
 	append_test_1_data(strm);
 
 /* close the file after append */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s after append\r\n",
-		  datfile);
-	    exit(1);};
+	   error(1, fp, "Test couldn't close file %s after append\r\n",
+		 datfile);
 	PRINT(fp, "File %s closed after append\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* dump the symbol table */
@@ -1052,8 +1048,7 @@ static int test_1(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -1311,12 +1306,10 @@ static void write_test_2_data(PDBfile *strm)
     ind[1] = N_INT;
     ind[2] = 1L;
     if (PD_write_alt(strm, "p", "integer", p_w, 1, ind) == 0)
-       {PRINT(STDOUT, "P WRITE FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "P WRITE FAILED - WRITE_TEST_2_DATA\n");
 
     if (PD_write(strm, "tar", "lev1 *",  &tar_w) == 0)
-       {PRINT(STDOUT, "TAR WRITE FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "TAR WRITE FAILED - WRITE_TEST_2_DATA\n");
 
     return;}
 
@@ -1750,8 +1743,7 @@ static int test_2(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* set the default offset */
@@ -1774,15 +1766,13 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* dump the symbol table */
@@ -1799,8 +1789,7 @@ static int test_2(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* cleanup test data memory */
@@ -1905,8 +1894,7 @@ static void write_test_3_data(PDBfile *strm)
    {
 
     if (PD_write(strm, "vr1", "st3", &vr1_w) == 0)
-       {PRINT(STDOUT, "VR1 WRITE FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "VR1 WRITE FAILED - WRITE_TEST_3_DATA\n");
 
     return;}
 
@@ -2046,8 +2034,7 @@ static int test_3(char *base, char *tgt, int n)
 
 /* create the named file */
        {if ((strm = PD_create(datfile)) == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -2070,8 +2057,7 @@ static int test_3(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);
 
 #ifdef LINUX
@@ -2084,8 +2070,7 @@ static int test_3(char *base, char *tgt, int n)
 
 /* reopen the file */
     if ((strm = PD_open(datfile, "r")) == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* dump the symbol table */
@@ -2099,8 +2084,7 @@ static int test_3(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print out the results */
@@ -2233,12 +2217,10 @@ static void write_test_4_data(PDBfile *strm)
    {
 
     if (PD_write(strm, "tab4", "hasharr *", &tab4_w) == 0)
-       {PRINT(STDOUT, "TAB4 WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "TAB4 WRITE FAILED - WRITE_TEST_4_DATA\n");
 
     if (PD_write(strm, "vr4", "st4 *", &vr4_w) == 0)
-       {PRINT(STDOUT, "VR4 WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "VR4 WRITE FAILED - WRITE_TEST_4_DATA\n");
 
     return;}
 
@@ -2420,8 +2402,7 @@ static int test_4(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 	strm->previous_file = SC_strsavef(base, "char*:TEST_4:prev");
@@ -2439,15 +2420,13 @@ static int test_4(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* dump the symbol table */
@@ -2464,8 +2443,7 @@ static int test_4(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* clean up test data memory */
@@ -2555,12 +2533,10 @@ static void write_test_5_data(PDBfile *strm)
    {
 
     if (PD_write(strm, "tar(2)", "lev1", tar_w) == 0)
-       {PRINT(STDOUT, "TAR WRITE FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "TAR WRITE FAILED - WRITE_TEST_5_DATA\n");
 
     if (PD_append(strm, "tar(2:3)", tar_w) == 0)
-       {PRINT(STDOUT, "TAR APPEND FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "TAR APPEND FAILED - WRITE_TEST_5_DATA\n");
 
     return;}
 
@@ -2697,8 +2673,7 @@ static int test_5(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 	strm->previous_file = SC_strsavef(base, "char*:TEST_5:prev");
@@ -2715,15 +2690,13 @@ static int test_5(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the structs */
@@ -2737,8 +2710,7 @@ static int test_5(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* clean up test data memory */
@@ -2808,12 +2780,10 @@ static void write_test_6_data(PDBfile *strm)
    {
 
     if (PD_write(strm, "d61", "st61", d61_w) == 0)
-       {PRINT(STDOUT, "D61 WRITE FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D61 WRITE FAILED - WRITE_TEST_6_DATA\n");
 
     if (PD_write(strm, "d62", "st62", d62_w) == 0)
-       {PRINT(STDOUT, "D62 WRITE FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D62 WRITE FAILED - WRITE_TEST_6_DATA\n");
 
     return;}
 
@@ -2923,8 +2893,7 @@ static int test_6(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -2943,15 +2912,13 @@ static int test_6(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the structs */
@@ -2965,8 +2932,7 @@ static int test_6(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* clean up test data memory */
@@ -3033,16 +2999,14 @@ static void write_test_7_data(PDBfile *strm)
    {int i;
 
     if (PD_write(strm, "d71", "st62", &d71_w) == 0)
-       {PRINT(STDOUT, "D71 WRITE FAILED - WRITE_TEST_7_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D71 WRITE FAILED - WRITE_TEST_7_DATA\n");
 
 /* reuse an area of memory to test PD_TRACK_POINTERS */
     for (i = 0; i < d71_w.n; i++)
         d71_w.a[i] = (double) i * 10.0;
 
     if (PD_write(strm, "d72", "st62", &d71_w) == 0)
-       {PRINT(STDOUT, "D72 WRITE FAILED - WRITE_TEST_7_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D72 WRITE FAILED - WRITE_TEST_7_DATA\n");
 
     return;}
 
@@ -3144,8 +3108,7 @@ static int test_7(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -3162,15 +3125,13 @@ static int test_7(char *base, char *tgt, int n)
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the structs */
@@ -3184,8 +3145,7 @@ static int test_7(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* clean up test data memory */
@@ -3257,28 +3217,23 @@ static void write_test_8_data(PDBfile *strm)
    {long ind[4];
 
     if (PD_write(strm, "d8a[10]", "double", d8_w) == 0)
-       {PRINT(STDOUT, "D8A WRITE FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8A WRITE FAILED - WRITE_TEST_8_DATA\n");
 
     if (PD_defent(strm, "d8b[1,10]", "double") == 0)
-       {PRINT(STDOUT, "D8B DEFENT FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8B DEFENT FAILED - WRITE_TEST_8_DATA\n");
 
     if (PD_write(strm, "d8b[0,0:9]", "double", d8_w) == 0)
-       {PRINT(STDOUT, "D8B WRITE FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8B WRITE FAILED - WRITE_TEST_8_DATA\n");
 
     if (PD_defent(strm, "d8c[0,10]", "double") == 0)
-       {PRINT(STDOUT, "D8C DEFENT FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8C DEFENT FAILED - WRITE_TEST_8_DATA\n");
 
     ind[0] = 1L;
     ind[1] = 0L;
     ind[2] = 0L;
     ind[3] = 9L;
     if (PD_defent_alt(strm, "d8d", "double", 2, ind) == 0)
-       {PRINT(STDOUT, "D8D DEFENT FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8D DEFENT FAILED - WRITE_TEST_8_DATA\n");
 
     return;}
 
@@ -3291,20 +3246,16 @@ static void append_test_8_data(PDBfile *strm)
    {
 
     if (PD_append(strm, "d8a[10:19]", d8_w) == 0)
-       {PRINT(STDOUT, "D8A APPEND FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8A APPEND FAILED - WRITE_TEST_8_DATA\n");
 
     if (PD_append(strm, "d8b[1:1,0:9]", d8_w) == 0)
-       {PRINT(STDOUT, "D8B APPEND FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8B APPEND FAILED - WRITE_TEST_8_DATA\n");
 
     if (PD_append(strm, "d8c[0:0,0:9]", d8_w) == 0)
-       {PRINT(STDOUT, "D8C APPEND FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8C APPEND FAILED - WRITE_TEST_8_DATA\n");
 
     if (PD_append(strm, "d8d[0:0,0:9]", d8_w) == 0)
-       {PRINT(STDOUT, "D8D APPEND FAILED - WRITE_TEST_8_DATA\n");
-        exit(1);};
+       error(1, STDOUT, "D8D APPEND FAILED - WRITE_TEST_8_DATA\n");
 
     return;}
 
@@ -3413,27 +3364,24 @@ static int test_8(char *base, char *tgt, int n)
 /* create the named file */
        {strm = PD_create(datfile);
 	if (strm == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* write the test data */
 	write_test_8_data(strm);
 
-/* appent the test data */
+/* append the test data */
 	append_test_8_data(strm);
 
 /* close the file */
 	if (PD_close(strm) == FALSE)
-	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the structs */
@@ -3447,8 +3395,7 @@ static int test_8(char *base, char *tgt, int n)
 
 /* close the file */
     if (PD_close(strm) == FALSE)
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
 /* clean up test data memory */
@@ -3492,8 +3439,7 @@ static int test_9(char *base, char *tgt, int n)
 /* create the named file */
        {file = PD_create(datfile);
 	if (file == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* turn on the checksum logic */
@@ -3504,8 +3450,7 @@ static int test_9(char *base, char *tgt, int n)
 /* reopen the file and see if the checksum is valid */
     file = PD_open(datfile, "a");
     if (file == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s reopened\n", datfile);
 
     PD_activate_cksum(file, PD_MD5_FILE);
@@ -3514,9 +3459,9 @@ static int test_9(char *base, char *tgt, int n)
     status = PD_verify(file);
    
     if (status != TRUE)
-       {err = FALSE;} 
+       err = FALSE;
     else
-       {PRINT(fp, "File %s verified\n", datfile);}
+       PRINT(fp, "File %s verified\n", datfile);
 
     PD_close(file);
 
@@ -3527,14 +3472,12 @@ static int test_9(char *base, char *tgt, int n)
 
     if (read_only == FALSE)
 
-
 /* do it again, except this time, don't activate the checksum
  * create the named file
  */
        {file = PD_create(datfile);
 	if (file == NULL)
-	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(2);};
+	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
 /* leave the checksum logic off */
@@ -3544,8 +3487,7 @@ static int test_9(char *base, char *tgt, int n)
 /* reopen the file and see if the checksum is valid */
     file = PD_open(datfile, "a");
     if (file == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(2);};
+       error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s reopened\n", datfile);
 
     PD_activate_cksum(file, PD_MD5_FILE);
@@ -3554,9 +3496,9 @@ static int test_9(char *base, char *tgt, int n)
     status = PD_verify(file);
    
     if (status != -1)
-       {err = FALSE;} 
+       err = FALSE;
     else
-       {PRINT(fp, "File %s (correctly) cannot be verified)\n", datfile);}
+       PRINT(fp, "File %s (correctly) cannot be verified)\n", datfile);
 
     PD_close(file);
 
@@ -3678,8 +3620,9 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDBTST - run basic PDB test suite\n\n");
-    PRINT(STDOUT, "Usage: pdbtst [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
+    PRINT(STDOUT, "Usage: pdbtst [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
     PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       b - set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c - verify low level writes\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
@@ -3711,10 +3654,13 @@ int main(int c, char **v)
     int test_four, test_five, test_six, test_seven;
     int test_eight, test_nine;
     int use_mapped_files, check_writes;
+    BIGINT bfsz;
 
     PD_init_threads(0, NULL);
 
     SC_zero_space(0);
+    bfsz             = -1;
+    bfsz             = 100000;
     check_writes     = FALSE;
     debug_mode       = FALSE;
     native_only      = FALSE;
@@ -3733,7 +3679,10 @@ int main(int c, char **v)
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
-                {case 'c' :
+                {case 'b' :
+		      bfsz = SC_stoi(v[++i]);
+		      break;
+                 case 'c' :
 		      check_writes = TRUE;
 		      break;
 		 case 'd' :
@@ -3790,6 +3739,8 @@ int main(int c, char **v)
 
     PD_set_io_hooks(use_mapped_files);
     PD_verify_writes(check_writes);
+
+    PD_set_buffer_size(bfsz);
 
     SC_signal(SIGINT, SIG_DFL);
 
