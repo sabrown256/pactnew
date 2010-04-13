@@ -488,6 +488,8 @@ static int test_0(char *base, char *tgt, int n)
        error(1, fp, "Test couldn't close file %s\r\n", datfile);
     PRINT(fp, "File %s closed\n", datfile);
 
+    io_close(fp);
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -3658,7 +3660,9 @@ int main(int c, char **v)
 
     PD_init_threads(0, NULL);
 
+    SC_bf_set_hooks();
     SC_zero_space(0);
+
     bfsz             = -1;
     bfsz             = 100000;
     check_writes     = FALSE;
