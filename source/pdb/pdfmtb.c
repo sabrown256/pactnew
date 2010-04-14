@@ -850,8 +850,6 @@ static off_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
     else
        lio_write(bf, 1, strlen(bf), fp);
 
-    _PD_safe_flush(file);
-
     SFREE(pa->tbuffer);
 
     return(addr);}
@@ -1122,8 +1120,6 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 
     ok &= (nbw == nbo);
 
-    _PD_safe_flush(file);
-
     SFREE(pa->tbuffer);
 
     return(ok);}
@@ -1383,7 +1379,7 @@ static int _PD_create_ii(PDBfile *file, int mst)
  *                   - to the file OUT
  */
 
-int _PD_write_meta_ii(PDBfile *file, FILE *out, int fh)
+static int _PD_write_meta_ii(PDBfile *file, FILE *out, int fh)
    {off_t addr;
     FILE *fp;
 
@@ -1462,28 +1458,24 @@ static int _PD_flush_ii(PDBfile *file)
 	     memset(pa->err, 0, MAXLINE);
 	     break;};
 
-    _PD_write_meta_ii(file, file->stream, 0);
+    if (IS_PDBFILE(file) == TRUE)
+       {_PD_write_meta_ii(file, file->stream, 0);
 
-    fp = file->stream;
+	fp = file->stream;
 
 /* update the header */
-    _PD_set_current_address(file, file->headaddr, SEEK_SET, PD_WRITE);
+	_PD_set_current_address(file, file->headaddr, SEEK_SET, PD_WRITE);
 
-    if (file->headaddr != lio_tell(fp))
-       PD_error("FSEEK FAILED TO FIND HEADER - _PD_FLUSH_II", PD_WRITE);
+	if (file->headaddr != lio_tell(fp))
+	   PD_error("FSEEK FAILED TO FIND HEADER - _PD_FLUSH_II", PD_WRITE);
 
-    lio_printf(fp, "%22lld\001%22lld\001\n",
-	       (BIGINT) file->chrtaddr, (BIGINT) file->symtaddr);
+	lio_printf(fp, "%22lld\001%22lld\001\n",
+		   (BIGINT) file->chrtaddr, (BIGINT) file->symtaddr);
 
 /* WARNING: no more writes to the file before the space
  * reserved for the checksum from here on out
  */
-    ok = _PD_csum_file_write(file);
-
-    if (_PD_safe_flush(file) == FALSE)
-       PD_error("FFLUSH FAILED AFTER HEADER - _PD_FLUSH_II", PD_WRITE);
-
-    _PD_MARK_AS_FLUSHED(file);
+	ok = _PD_csum_file_write(file);};
 
     return(TRUE);}
 
@@ -1499,6 +1491,7 @@ int _PD_set_format_ii(PDBfile *file)
     file->create        = _PD_create_ii;
     file->flush         = _PD_flush_ii;
 
+    file->wr_meta       = _PD_write_meta_ii;
     file->wr_symt       = _PD_wr_symt_ii;
     file->parse_symt    = _PD_parse_symt_ii;
     file->wr_prim_types = _PD_wr_prim_typ_ii;

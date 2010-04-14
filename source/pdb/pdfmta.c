@@ -209,6 +209,18 @@ static int _PD_wr_fmt_i(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_WRITE_META_I - noop
+ *                  - no format I files will be written
+ */
+
+static int _PD_write_meta_i(PDBfile *file, FILE *out, int fh)
+   {
+
+    return(FALSE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_SET_FORMAT_I - set the methods for a format version I file */
 
 int _PD_set_format_i(PDBfile *file)
@@ -220,7 +232,8 @@ int _PD_set_format_i(PDBfile *file)
     file->create = _PD_create_i;
     file->flush  = _PD_flush_i;
 
-    file->wr_fmt = _PD_wr_fmt_i;
+    file->wr_meta = _PD_write_meta_i;
+    file->wr_fmt  = _PD_wr_fmt_i;
 
     file->format_version = 1;
 

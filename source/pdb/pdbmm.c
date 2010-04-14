@@ -67,7 +67,6 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->maximum_size     = _PD.maxfsize;                   /* family info */
 	file->previous_file    = NULL;
 
-	file->flushed          = FALSE;                       /* born unflushed */
 	file->virtual_internal = FALSE;                 /* disk file by default */
 	file->current_prefix   = NULL;       /* read/write variable name prefix */
 	file->ptr_base         = SC_strsavef("/&ptrs/ia_", "_PD_MK_PDB:ptr_base");
@@ -106,6 +105,8 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->tr             = tr;
 	file->date           = SC_date();
 	file->system_version = PDB_SYSTEM_VERSION;
+
+	_PD_MARK_AS_FLUSHED(file, FALSE);
 
 /* set the default format version for the file */
 	_PD_format_version(file, -1);

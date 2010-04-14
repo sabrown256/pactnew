@@ -225,8 +225,9 @@ long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
 	     memset(pa->err, 0, MAXLINE);
 	     break;};
 
-    itags         = file->use_itags;
-    file->flushed = FALSE;
+    itags = file->use_itags;
+
+    _PD_MARK_AS_FLUSHED(file, FALSE);
 
 /* save the current ptr lists */
     if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))

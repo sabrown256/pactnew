@@ -248,6 +248,11 @@ int PD_flush(PDBfile *file)
 
     ret = _PD_FLUSH_FILE(file);
 
+    if (_PD_safe_flush(file) == FALSE)
+       PD_error("FFLUSH FAILED AFTER - PD_FLUSH", PD_WRITE);
+
+    _PD_MARK_AS_FLUSHED(file, TRUE);
+
     return(ret);}
 
 /*--------------------------------------------------------------------------*/

@@ -873,7 +873,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
     litype  = NULL;
     lotype  = NULL;
 
-    file->flushed = FALSE;
+    _PD_MARK_AS_FLUSHED(file, FALSE);
 
     _PD_init_stacks(100L, 1000L);
 
@@ -1714,9 +1714,6 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
     fp    = file->stream;
     vif   = file->virtual_internal;
     itags = file->use_itags;
-
-    if (_PD_safe_flush(file) == FALSE)
-       PD_error("FFLUSH FAILED BEFORE READ - _PD_RD_SYMENT", PD_READ);
 
     fp   = file->stream;
     iloc = ep->indirects;

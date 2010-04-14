@@ -901,8 +901,8 @@ static int _PD_pfm_add_d(PDBfile *file, off_t start_addr)
         fe = &_PD_pflst->elem[ins];
         for (i = ins; i < _PD_pflst->len; fe++, i++)
 	    {fe->available = TRUE;
-	     fe->addr      =    0;
-             fe->nflushed  =    0;
+	     fe->addr      = 0;
+             fe->nflushed  = 0;
              fe->file      = NULL;
              fe->name      = NULL;};}
                     
@@ -982,8 +982,8 @@ static void _PD_pfm_init_d(void)
             i < _PD_pflst->len; 
             i++, pf++)
 	  {pf->available = TRUE;
-	   pf->addr      =    0;
-           pf->nflushed  =    0;
+	   pf->addr      = 0;
+           pf->nflushed  = 0;
            pf->file      = NULL;
            pf->name      = NULL;};};
 
@@ -1232,8 +1232,7 @@ static int _PD_pfm_remote_flush(char *buf)
     rv   = (*file->parse_symt)(file, req.buf, TRUE);
 
 /* if everyone has checked in actually flush the file to disk */
-    if (++_PD_pflst->elem[req.id].nflushed == 
-         (_PD_pflst->elem[req.id].nprocs - 1))
+    if (++_PD_pflst->elem[req.id].nflushed == (_PD_pflst->elem[req.id].nprocs - 1))
        {rv = (*file->flush)(file);
         _PD_pflst->elem[req.id].nflushed = 0;
 
@@ -1548,7 +1547,7 @@ static int _PD_set_eod_d(PDBfile *file, off_t addr, long nb)
 
 /* _PD_PFM_MARK_AS_FLUSHED_D - remember that the file is flushed */
 
-static void _PD_pfm_mark_as_flushed_d(PDBfile *file)
+static void _PD_pfm_mark_as_flushed_d(PDBfile *file, int wh)
    {
 
     return;}
