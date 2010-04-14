@@ -59,7 +59,7 @@
 #define _PD_GET_FILE_SIZE(fp)       (*PD_par_fnc.get_file_size)(fp)
 #define _PD_GET_FILE_STREAM(f)      (*PD_par_fnc.get_file_stream)(f)
 #define _PD_GET_FILE_PTR(fp)        (*PD_par_fnc.get_file_ptr)(fp)
-#define _PD_MARK_AS_FLUSHED(f)      (*PD_par_fnc.mark_as_flushed)(f)
+#define _PD_MARK_AS_FLUSHED(f, w)   (*PD_par_fnc.mark_as_flushed)(f, w)
 #define _PD_SERIAL_FLUSH(fp, tid)   (*PD_par_fnc.serial_flush)(fp, tid)
 #define _PD_ADD_FILE(f, addr)       (*PD_par_fnc.add_file)(f, addr)
 #define _PD_REMOVE_FILE(f)          (*PD_par_fnc.remove_file)(f)
@@ -440,14 +440,12 @@ extern int
 /* PDFMTB.C declarations */
 
 extern int
- _PD_write_meta_ii(PDBfile *file, FILE *out, int fh),
  _PD_set_format_ii(PDBfile *file);
 
 
 /* PDFMTC.C declarations */
 
 extern int
- _PD_write_meta_iii(PDBfile *file, FILE *out, int fh),
  _PD_set_format_iii(PDBfile *file);
 
 

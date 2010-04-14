@@ -11,40 +11,38 @@
 source ../../tests/common
 
 set STRACE = ( `which strace` )
-if ((-x "$STRACE") && ($OS != AIX)) then
-   if ("$Valgrind" == "") then
+if ("$Valgrind" == "") then
 
-      set tst = $1
+   set tst = $1
 
-      NoteD $LogF ""
-      NoteD $LogF "                    PDB Buffer Test B .................. "
-      Note $LogF ""
+   NoteD $LogF ""
+   NoteD $LogF "                    PDB Buffer Test B .................. "
+   Note $LogF ""
 
-      set Exe = `which pdbtst`
+   set Exe = `which pdbtst`
 
-      set UTime = `$TIMER -r`
+   set UTime = `$TIMER -r`
 
 # scan prime number buffer sizes
-      @ lerr = 0
-      foreach n ( 3 13 127 4093 32749 )
-         set fill = `fill-string -n 32 $n`
-         flog $LogF pdbtst -n -b $n
-         set xstatus = $status
-         if ($xstatus == 0) then
-            NoteD $LogF "                        $fill (ok)"
-         else
-            NoteD $LogF "                        $fill (ng)"
-            @ lerr = $lerr + 1
-         endif
-      end
-      set ETime   = `$TIMER -b $UTime`
-
-      if ($lerr != 0) then
-         NoteD $LogF "                    PDB Buffer Test B .................. FAILED ($xstatus/$ETime)"
-         set Err = 1
+   @ lerr = 0
+   foreach n ( 3 13 127 4093 32749 )
+      set fill = `fill-string -n 32 $n`
+      flog $LogF $CFE pdbtst -n -b $n
+      set xstatus = $status
+      if ($xstatus == 0) then
+         NoteD $LogF "                        $fill (ok)"
       else
-         NoteD $LogF "                    PDB Buffer Test B .................. PASSED ($ETime)"
+         NoteD $LogF "                        $fill (ng)"
+         @ lerr = $lerr + 1
       endif
+   end
+   set ETime   = `$TIMER -b $UTime`
+
+   if ($lerr != 0) then
+      NoteD $LogF "                    PDB Buffer Test B .................. FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    PDB Buffer Test B .................. PASSED ($ETime)"
    endif
 endif
 

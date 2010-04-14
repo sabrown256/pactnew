@@ -577,7 +577,8 @@ int _PD_read_attrtab_a(PDBfile *file)
         file->chrtaddr = PD_entry_address(ep);
         _PD_rl_syment(ep);
     
-        file->flushed = FALSE;
+	_PD_MARK_AS_FLUSHED(file, FALSE);
+
         if (!SC_hasharr_remove(file->symtab, _PD_fixname(file, name)))
 	   SC_hasharr_remove(file->symtab, name);
 
@@ -626,7 +627,8 @@ int _PD_read_attrtab_b(PDBfile *file)
         file->chrtaddr = PD_entry_address(ep);
         _PD_rl_syment(ep);
     
-        file->flushed = FALSE;
+	_PD_MARK_AS_FLUSHED(file, FALSE);
+
         if (!SC_hasharr_remove(file->symtab, _PD_fixname(file, name)))
 	   SC_hasharr_remove(file->symtab, name);
 

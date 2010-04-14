@@ -792,10 +792,10 @@ static off_t _PD_get_file_size_t(PDBfile *file)
 
 /* _PD_PFM_MARK_AS_FLUSHED_T - remember that the file is flushed */
 
-static void _PD_pfm_mark_as_flushed_t(PDBfile *file)
+static void _PD_pfm_mark_as_flushed_t(PDBfile *file, int wh)
    {
 
-    file->flushed = TRUE;
+    file->flushed = wh;
 
     return;}
 
@@ -819,7 +819,7 @@ static int _PD_pfm_serial_flush_t(FILE *fp, int tid)
 static int _PD_pfm_flush_file_t(PDBfile *file)
    {int rv;
 
-    if (file->flushed)
+    if (file->flushed == TRUE)
        rv = TRUE;
     else
        rv = (*file->flush)(file);

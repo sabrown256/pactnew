@@ -1215,7 +1215,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
     else
        file->mode = PD_OPEN;
 
-    file->flushed = TRUE;
+    _PD_MARK_AS_FLUSHED(file, TRUE);
 
     if (a != NULL)
        _PD_SETUP_MP_FILE(file, *(SC_communicator *) a);

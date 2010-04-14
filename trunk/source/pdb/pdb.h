@@ -392,6 +392,7 @@ struct s_PDBfile
     off_t (*wr_symt)(PDBfile *file);
     int (*parse_symt)(PDBfile *file, char *bf, int flag);
 
+    int (*wr_meta)(PDBfile *file, FILE *out, int fh);
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
@@ -667,7 +668,7 @@ struct s_PD_pfm_fnc
     void (*init)(void);
     void (*add_file)(PDBfile *file, off_t start_addr);
     void (*remove_file)(FILE *file);
-    void (*mark_as_flushed)(PDBfile *file);
+    void (*mark_as_flushed)(PDBfile *file, int wh);
     void (*set_address)(PDBfile *file, off_t addr);};
 
 #ifdef __cplusplus

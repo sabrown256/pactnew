@@ -937,8 +937,6 @@ static off_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
     else
        lio_write(bf, 1, strlen(bf), fp);
 
-    _PD_safe_flush(file);
-
     SFREE(pa->tbuffer);
 
     return(addr);}
@@ -1168,8 +1166,6 @@ static int _PD_wr_ext_iii(PDBfile *file, FILE *out)
 
     ok &= (nbw == nbo);
 
-    _PD_safe_flush(file);
-
     SFREE(pa->tbuffer);
 
     return(ok);}
@@ -1321,7 +1317,7 @@ static int _PD_create_iii(PDBfile *file, int mst)
  *                    - to the file OUT
  */
 
-int _PD_write_meta_iii(PDBfile *file, FILE *out, int fh)
+static int _PD_write_meta_iii(PDBfile *file, FILE *out, int fh)
    {off_t addr;
     FILE *fp;
 
@@ -1376,7 +1372,6 @@ int _PD_write_meta_iii(PDBfile *file, FILE *out, int fh)
 
 static int _PD_flush_iii(PDBfile *file)
    {int ok;
-    off_t addrs;
     char *nht;
     FILE *fp;
     PD_smp_state *pa;
@@ -1402,30 +1397,18 @@ static int _PD_flush_iii(PDBfile *file)
     if (IS_PDBFILE(file) == TRUE)
        {_PD_write_meta_iii(file, file->stream, 0);
 
-	fp = file->stream;
-
-	addrs = _PD_get_current_address(file, PD_WRITE);
+	nht = _PD_header_token(3);
+	fp  = file->stream;
 
 /* WARNING: no more writes to the file before the space
  * reserved for the checksum from here on out
  */
 	ok = _PD_csum_file_write(file);
 
-/* write out the chart and symtab addresses */
+/* write out the chart, symtab addresses, and format version */
 	lio_printf(fp, "StructureChartAddress: %lld\n", (BIGINT) file->chrtaddr);
 	lio_printf(fp, "SymbolTableAddress: %lld\n", (BIGINT) file->symtaddr);
-
-/* write the format version token */
-	nht = _PD_header_token(3);
-
-	lio_printf(fp, "%s\n", nht);
-
-	if (_PD_safe_flush(file) == FALSE)
-	   PD_error("FFLUSH FAILED AFTER HEADER - _PD_FLUSH_III", PD_WRITE);
-
-	_PD_MARK_AS_FLUSHED(file);
-
-	_PD_set_current_address(file, file->chrtaddr, SEEK_SET, PD_WRITE);};
+	lio_printf(fp, "%s\n", nht);};
 
     return(TRUE);}
 
@@ -1441,6 +1424,7 @@ int _PD_set_format_iii(PDBfile *file)
     file->create        = _PD_create_iii;
     file->flush         = _PD_flush_iii;
 
+    file->wr_meta       = _PD_write_meta_iii;
     file->wr_symt       = _PD_wr_symt_iii;
     file->parse_symt    = _PD_parse_symt_iii;
     file->wr_prim_types = _PD_wr_prim_typ_iii;

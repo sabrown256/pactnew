@@ -315,10 +315,29 @@ static int _SC_bfr_flush(bio_desc *bid, bio_frame *fr, int orig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_BFR_REMOVE - free FR and remove it from BID stack
+ *                - return the new stack depth
+ */
+
+static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
+   {int n;
+
+    if (fl == TRUE)
+       _SC_bfr_flush(bid, fr, orig);
+
+    _SC_bfr_free(fr);
+
+    n = SC_array_remove(bid->stack, i);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BFR_NEXT - return the leftmost stack frame which overlaps FR */
 
 static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
-   {int i, n, imn;
+   {int i, n, imn, fl;
     off_t fi[2], ri[2], lmn;
     bio_frame *fa, *frn, *rv;
 
@@ -337,24 +356,13 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
              fi[0] = fa->addr;
 	     fi[1] = fi[0] + fa->nb;
 
-/* if a stack frame is completely covered by the request - throw it
- * away - read or write does not matter
- */
-	     if ((ri[0] <= fi[0]) && (fi[1] <= ri[1]))
-	        {if ((fa->rw == BIO_WRITE) && (fr->rw == BIO_READ))
-		    _SC_bfr_flush(bid, fa, TRUE);
-		 _SC_bfr_free(fa);
-		 n = SC_array_remove(bid->stack, i);
-		 i--;}
-
-/* if the front of a stack frame is covered by the back of the request
+/* if a stack frame is completely covered by the request or
+ * if the front of a stack frame is covered by the back of the request
  * throw it away - flushing write buffers first
  */
-	     else if ((ri[0] < fi[0]) && (fi[0] < ri[1]))
-	        {if ((fa->rw == BIO_WRITE) && (fr->rw == BIO_READ))
-		    _SC_bfr_flush(bid, fa, TRUE);
-		 _SC_bfr_free(fa);
-		 n = SC_array_remove(bid->stack, i);
+	     if (ri[0] <= fi[0])
+	        {fl = ((fa->rw == BIO_WRITE) && (fr->rw == BIO_READ));
+		 n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
 		 i--;}
 
 	     else if ((fi[0] < ri[1]) && (ri[0] <= fi[1]) && (fi[0] < lmn))
@@ -589,15 +597,16 @@ static int _SC_bio_flush(bio_desc *bid)
 
 #else
 
-   {int i, n;
+   {int i, n, fl;
     bio_frame *fr;
 
     if (bid->stack != NULL)
        {n = SC_array_get_n(bid->stack);
         for (i = 0; i < n; i++)
-	    {fr  = *(bio_frame **) SC_array_get(bid->stack, i);
-	     if (fr->rw == BIO_WRITE)
-	        ret = _SC_bfr_flush(bid, fr, FALSE);};};};
+	    {fr = *(bio_frame **) SC_array_get(bid->stack, i);
+	     fl = (fr->rw == BIO_WRITE);
+	     n  = _SC_bfr_remove(bid, i, fr, fl, FALSE);
+	     i--;};};};
 
 #endif
 

@@ -59,12 +59,9 @@ int PD_verify_writes(int st)
  */
 
 void PD_contents(PDBfile *file, FILE *out, int fh, int vers)
-   {
+   {int rv;
 
-    if ((vers == 1) || (vers == 2))
-       _PD_write_meta_ii(file, out, fh);
-    else
-       _PD_write_meta_iii(file, out, fh);
+    rv = file->wr_meta(file, out, fh);
 
     return;}
 
