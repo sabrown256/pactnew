@@ -54,11 +54,11 @@ BinObj = ${LdFlags} toul.c
 # Required Libraries
 #
 # NOTE: building shared seems to require these:
-Libs   = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
-NGLibs = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+Libs   = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+NGLibs = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 # NOTE: building static seems to require only these:
-#Libs   = ${LPANACEA} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
-#NGLibs = ${LPANACEA} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+#Libs   = ${LPANACEA} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+#NGLibs = ${LPANACEA} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PANACEA"

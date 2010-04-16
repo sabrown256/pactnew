@@ -51,7 +51,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = z
    set lFile    = $Tmp
-   set lALibs   = ( -lm )
+   set lALibs   = ( $LD_Lib $LibM )
    set Implicit = TRUE
 
    source $AnaDir/find-package

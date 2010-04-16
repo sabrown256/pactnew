@@ -49,8 +49,8 @@ BinObj =
 #
 # Required Libraries
 #
-Libs  = ${LSCORE} -lm ${MDLib}
-MLibs = ${LSCORE} ${LMM} -lm ${MDLib}
+Libs  = ${LSCORE} ${MDLib}
+MLibs = ${LSCORE} ${LMM} ${MDLib}
 
 targets :
 	@echo "Targets for SCORE"

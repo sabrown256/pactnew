@@ -42,7 +42,15 @@ struct s_bio_desc
     BIGINT bfsz;                       /* buffer size */
     SC_array *stack;
     int fd;
-    FILE *fp;};
+    FILE *fp;
+    long nhr;                          /* number of fread level calls */
+    long nhw;                          /* number of fwrite level calls */
+    long nlr;                          /* number of read calls */
+    long nlw;                          /* number of write calls */
+    long nbfmx;};
+
+static long
+ bio_stats[5] = { 0L, 0L, 0L, 0L, 0L };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -304,6 +312,8 @@ static int _SC_bfr_flush(bio_desc *bid, bio_frame *fr, int orig)
 /* GOTCHA: does this go past end of file? */
     nw = SC_write_sigsafe(bid->fd, fr->bf, nb);
 
+    bid->nlw++;
+
     if (orig == FALSE)
        {ad = fi[1];
 	_SC_bio_set_addr(bid, ad, TRUE, "flush");}
@@ -448,6 +458,8 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
     nr = 0;
     na = 0;
 
+    bid->nhr++;
+
 #ifdef USE_C_BUFFERED_IO
 
     nr = SC_fread_sigsafe(bf, bpi, ni, bid->fp);
@@ -460,7 +472,8 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
     bio_frame *fr, rq;
 
     if (bid->stack == NULL)
-       nr = SC_read_sigsafe(bid->fd, bf, nb);
+       {nr = SC_read_sigsafe(bid->fd, bf, nb);
+	bid->nlr++;}
     else
 
 /* encapsulate the requested write as a frame so that all subsequent
@@ -484,7 +497,8 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	    _SC_bfr_init(fr, bid->curr, fr->sz);
 	    nbr    = SC_read_sigsafe(bid->fd, fr->bf, fr->sz);
 	    fr->nb = nbr;
-	    fr->rw = BIO_READ;};
+	    fr->rw = BIO_READ;
+	    bid->nlr++;};
 
 	do {nbc = _SC_bfr_infill(&rq, fr);
 	    nr += nbc;
@@ -499,12 +513,14 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 		nbr    = SC_read_sigsafe(bid->fd, fr->bf, bsz);
 		fr->nb = nbr;
 		fr->rw = BIO_READ;
+		bid->nlr++;
 
 /* signify that something happened and we cannot exit the loop */
 	        nbc = -1;};}
 	while (nbc != 0);
 
-	SC_array_push(bid->stack, &fr);};};
+	SC_array_push(bid->stack, &fr);
+	bid->nbfmx = max(bid->nbfmx, bid->stack->n);};};
 #endif
 
     _SC_bio_set_addr(bid, bid->curr + na + nr, TRUE, "read");
@@ -525,6 +541,8 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
     nw = 0;
     na = 0;
 
+    bid->nhw++;
+
 #ifdef USE_C_BUFFERED_IO
 
     nw = SC_fwrite_sigsafe(bf, bpi, ni, bid->fp);
@@ -536,7 +554,8 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
     bio_frame *fr, rq;
 
     if (bid->stack == NULL)
-       nw = SC_write_sigsafe(bid->fd, bf, nb);
+       {nw = SC_write_sigsafe(bid->fd, bf, nb);
+	bid->nlw++;}
 
     else
 
@@ -565,11 +584,13 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 		   {na += (bid->curr - fr->addr);
 		    ad  = _SC_bio_seek(bid, fr->addr, SEEK_SET);};
 		nbw = SC_write_sigsafe(bid->fd, fr->bf, fr->nb);
-		_SC_bfr_init(fr, bid->curr + nbw, bid->bfsz);};}
+		_SC_bfr_init(fr, bid->curr + nbw, bid->bfsz);
+		bid->nlw++;};}
 	while (nbc != 0);
 
         if (fr->nb != 0)
-	   SC_array_push(bid->stack, &fr);
+	   {SC_array_push(bid->stack, &fr);
+	    bid->nbfmx = max(bid->nbfmx, bid->stack->n);}
 	else
 	   _SC_bfr_free(fr);};};
 
@@ -946,6 +967,12 @@ static int _SC_bclose(FILE *fp)
        {ret = _SC_bio_flush(bid);
 	ret = fclose(fp);};
 
+    bio_stats[0] += bid->nhr;
+    bio_stats[1] += bid->nlr;
+    bio_stats[2] += bid->nhw;
+    bio_stats[3] += bid->nlw;
+    bio_stats[4] = max(bio_stats[4], bid->nbfmx);
+
     _SC_bio_free(bid);
 
     SFREE(bid);
@@ -969,6 +996,16 @@ static int _SC_bflush(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_BINFO - return buffering statistics for FP */
+
+long *SC_binfo(void)
+   {
+
+    return(bio_stats);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_BOPEN - small file method for fopen */
 
 FILE *SC_bopen(char *name, char *mode)
@@ -988,6 +1025,11 @@ FILE *SC_bopen(char *name, char *mode)
 	    bid->stack = NULL;
 	    bid->fd    = fileno(fp);
 	    bid->fp    = fp;
+	    bid->nhr   = 0;
+	    bid->nlr   = 0;
+	    bid->nhw   = 0;
+	    bid->nlw   = 0;
+	    bid->nbfmx = 0;
 
 #ifndef USE_C_BUFFERED_IO
             lseek(bid->fd, 0, 0);
@@ -1044,6 +1086,11 @@ FILE *SC_lbopen(char *name, char *mode)
 	    bid->stack = NULL;
 	    bid->fd    = fileno(fp);
 	    bid->fp    = fp;
+	    bid->nhr   = 0;
+	    bid->nlr   = 0;
+	    bid->nhw   = 0;
+	    bid->nlw   = 0;
+	    bid->nbfmx = 0;
 
 #ifndef USE_C_BUFFERED_IO
             lseek(bid->fd, 0, 0);

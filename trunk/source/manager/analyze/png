@@ -59,7 +59,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = png
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib -lm )
+   set lALibs   = ( $LD_Lib $LibM )
    set Implicit = FALSE
 
    source $AnaDir/find-package

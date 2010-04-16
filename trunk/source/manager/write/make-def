@@ -396,10 +396,12 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # get the entries for RPATH
     set npath = `analyze/rpath -o link`
+    Note $Log "analyze/rpath -o link => |$npath|"
     Note $STDOUT "LDPath     = $npath"
 
     set lrpath = ""
     set npath  = `analyze/rpath -o echo`
+    Note $Log "analyze/rpath -o echo => |$npath|"
     Note $STDOUT -n "LDRPath    = "
     if ("$npath" != "") then
        if ($?LD_RPath == 1) then
@@ -411,7 +413,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "LDFLAGS    = ${LD_Flags}"' ${LDRPath} ${LDPath}'
     Note $STDOUT "LXFLAGS    = ${Lex_Flags}"
     Note $STDOUT "MDInc      = ${CC_Inc} ${CC_DPInc}"
-    Note $STDOUT "MDLib      = ${LD_Lib}"
+    Note $STDOUT "MDLib      = ${LibM} ${LD_Lib}"
     Note $STDOUT "DPInc      = ${CC_DPInc}"
     Note $STDOUT "DPLib      = ${LD_DPLib}"
     Note $STDOUT ""

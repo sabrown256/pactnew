@@ -14,6 +14,9 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: finish"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 if ($Std_UseX == FALSE) then
 
 # have OpenGL
@@ -38,6 +41,9 @@ if ($Std_UseX == FALSE) then
    SetParent GSYS
 
 endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 if ("$Cfe_CC_Inc" == "$RootInc") then
    flog $ALog setenv Cfe_CC_Inc ""
@@ -64,6 +70,9 @@ if ($AbsoluteOpt == TRUE) then
    flog $Log setenv CC_Debug "$CC_Optimize"
    flog $Log setenv FC_Debug "$FC_Optimize"
 endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # export the results
 SetParent Cfe_CC_Inc

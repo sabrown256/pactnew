@@ -44,7 +44,7 @@ BinObj =
 #
 # Required Libraries
 #
-Libs = ${LPML} ${LSCORE} -lm ${MDLib}
+Libs = ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PML"

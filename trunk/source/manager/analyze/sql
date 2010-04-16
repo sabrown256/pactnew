@@ -64,7 +64,7 @@ EOF
    set ASList   = ( a so )
    set lLib     = mysqlclient
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib -lm -lz )
+   set lALibs   = ( $LD_Lib $LibM -lz )
    set Implicit = FALSE
 
    source $AnaDir/find-package

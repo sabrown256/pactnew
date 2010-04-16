@@ -53,7 +53,7 @@ BinObj =
 #
 # Required Libraries
 #
-Libs = ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 DepLib = ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a

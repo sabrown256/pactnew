@@ -374,6 +374,9 @@ extern void
  SC_bf_set_hooks(void),
  SC_lbf_set_hooks(void);
 
+extern long
+ *SC_binfo(void);
+
 
 /* SCFCNTNR.C declarations */
 
