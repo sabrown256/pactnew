@@ -10,8 +10,8 @@
 
 source ../../tests/common
 
-set STRACE = ( `which strace` )
-if ((-x "$STRACE") && ($OS != AIX)) then
+#set STRACE = ( `which strace` )
+#if ((-x "$STRACE") && ($OS != AIX)) then
 
    set tst = $1
 
@@ -65,10 +65,11 @@ if ((-x "$STRACE") && ($OS != AIX)) then
 #            foreach c ( 1 4 16 )
             foreach c ( 4 )
                Separator $LogF
-               Note $LogF "Command: $STRACE $Exe -v $tst -n $n -b $m -c $c"
-               @ nwr = ( `$STRACE $Exe -v $tst -n $n -b $m -c $c |& grep write | tee -a $LogF | wc -l` )
-               echo "$c $nr $mr $rat $nwr" | \
-               awk '{printf("                       %3d      %4s  %5s %8s    %5d\n", $1, $2, $3, $4, $5);}'
+               $CFE $Exe -v $tst -n $n -b $m -c $c
+#               Note $LogF "Command: $STRACE $Exe -v $tst -n $n -b $m -c $c"
+#               @ nwr = ( `$STRACE $Exe -v $tst -n $n -b $m -c $c |& grep write | tee -a $LogF | wc -l` )
+#               echo "$c $nr $mr $rat $nwr" | \
+#               awk '{printf("                       %3d      %4s  %5s %8s    %5d\n", $1, $2, $3, $4, $5);}'
             end
          end
       end
@@ -88,6 +89,6 @@ if ((-x "$STRACE") && ($OS != AIX)) then
    else
       NoteD $LogF "                    PDB Buffer Test A .................. PASSED ($ETime)"
    endif
-endif
+#endif
 
 exit($Err)

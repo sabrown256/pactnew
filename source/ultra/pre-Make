@@ -59,7 +59,7 @@ BinObj = ${LdFlags} ultra.c
 #
 # Required Libraries
 #
-Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib} ${MDLibCfg}
+Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDLibCfg}
 
 targets :
 	@echo "Targets for ULTRA"

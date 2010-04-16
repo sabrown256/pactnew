@@ -15,7 +15,43 @@ Separator $Log
 Note $Log "Analyze: math"
 
 set MathLib = ""
-foreach i ("foo" "gsl" "blas" "linpack" "slatec" "imsl" "mathlib")
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# look for GNU Scientific library
+
+SafeEnv GSL_Path ""
+
+if (-d $RootInc/gsl) then
+   set rinc = $RootInc
+   set root = $rinc:h
+   flog $Log setenv GSL_Path $root
+   set MathLib = ( $MathLib gsl )
+else
+   flog $Log setenv GSL_Path ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# look for BLAS
+
+SafeEnv BLAS_Path ""
+#set MathLib = ( $MathLib blas )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# look for LAPACK
+
+SafeEnv LAPACK_Path ""
+#set MathLib = ( $MathLib lapack )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+foreach i ("linpack" "slatec" "imsl")
    rm -f $Tmp.res
    (man $i | head) >& $Tmp.res
 
@@ -30,10 +66,14 @@ foreach i ("foo" "gsl" "blas" "linpack" "slatec" "imsl" "mathlib")
 end
 
 if ("$MathLib" != "") then
-   NoteD $ALog "      Math Libraries: $MathLib"
+   NoteD $ALog "      math packages: $MathLib"
 endif
 
 flog $ALog rm -f $Tmp.res
+
+SetParent GSL_Path
+SetParent BLAS_Path
+SetParent LAPACK_Path
 
 exit(0)
 

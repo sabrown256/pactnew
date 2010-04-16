@@ -35,7 +35,7 @@ BinDep = ${Hdrs} ${TGTLib} sccmain.c ${DepLib}
 BinObj = ${LdFlags} sccmain.c
 
 # required Libraries
-Libs = ${TGTLib} ${LSCORE} -lm ${MDLib}
+Libs = ${TGTLib} ${LSCORE} ${MDLib}
 
 
 targets :

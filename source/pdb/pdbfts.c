@@ -8,7 +8,58 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdb_int.h"
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BYTE_SIZE_HR - print out human readable byte size */
+
+static void byte_size_hr(char *ns, int nc, BIGINT n)
+   {
+
+    if (n >= 1000000000)
+       snprintf(ns, nc, "%.0fG", n/1000000000.0);
+    else if (n >= 1000000)
+       snprintf(ns, nc, "%.0fM", n/1000000.0);
+    else if (n >= 1000)
+       snprintf(ns, nc, "%.0fK", n/1000.0);
+    else if (n > 0)
+       snprintf(ns, nc, "%d", (int) n);
+    else
+       snprintf(ns, nc, "sys");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ANALYZE - report the I/O stats */
+
+static void analyze(long nc, long ni, double dt)
+   {long nb;
+    long *stats;
+    char nis[MAXLINE], nbs[MAXLINE], rat[MAXLINE];
+
+    stats = SC_binfo();
+
+    nb = PD_get_buffer_size();
+
+    byte_size_hr(nis, MAXLINE, ni);
+    byte_size_hr(nbs, MAXLINE, nb);
+
+    if (nb < 0)
+       snprintf(rat, MAXLINE, "sys");
+    else if (nb < ni)
+       snprintf(rat, MAXLINE, "1/%ld", ni/nb);
+    else
+       snprintf(rat, MAXLINE, "%ld", nb/ni);
+
+    printf("                         ");
+    printf("%ld    %6s %6s %8s    %5ld   %.1e\n",
+	   nc, nis, nbs, rat, stats[3], dt);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -20,6 +71,7 @@ static void test_1(long ni, long nc)
     long ind[3];
     char *d, *pd;
     char name[MAXLINE];
+    double t0, dt;
     PDBfile *strm;
 
     d = FMAKE_N(char, ni, "TEST_1:d");
@@ -32,13 +84,19 @@ static void test_1(long ni, long nc)
     ind[1] = n - 1;
     ind[2] = 1L;
 
+    t0 = SC_wall_clock_time();
+
     for (i = 0; i < nc; i++)
         {pd = d + i*n;
 	 snprintf(name, MAXLINE, "v%08ld", i);
 	 PD_write_alt(strm, name, "char", pd, 1, ind);};
 
+    dt = SC_wall_clock_time() - t0;
+
 /* close the file */
     PD_close(strm);
+
+    analyze(nc, ni, dt);
 
     return;}
 

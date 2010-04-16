@@ -1,0 +1,77 @@
+#!/bin/csh -f
+#
+# LIBM - analyze options for libm.a
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: math"
+
+SafeEnv RPATH        ""
+SafeEnv Cfg_RPATH    ""
+SafeEnv LD_RPath     ""
+SafeEnv LD_Lib       ""
+SafeEnv LibM         "-lm"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# Intel Math library
+
+SafeEnv IMF_Path ""
+
+if (-d "$IMF_Path") then
+   set nbits = `nbit -d`
+   if ($nbits == 64) then
+      set inf = ( `ls -rt $IMF_Path/i*/lib/*64/libimf.a |& tail -n 1` )
+   else
+      set inf = ( `ls -rt $IMF_Path/i*/lib/libimf.a |& tail -n 1` )
+   endif
+else
+   set inf = ""
+endif
+
+if (-f "$inf") then
+   set root = $inf:h
+   flog $Log setenv IMF_Path $root
+else
+   flog $Log setenv IMF_Path ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# figure out the math library situation
+
+if ("$IMF_Path" != "") then
+   flog $ALog setenv RPATH         ${RPATH}:${IMF_Path}
+   flog $ALog setenv Cfg_RPATH     ${Cfg_RPATH}:${IMF_Path}
+   flog $ALog setenv LD_RPath      ${LD_RPath}:${IMF_Path}
+   flog $ALog setenv LD_Lib        "-L${IMF_Path} ${LD_Lib}"
+   flog $ALog setenv LibM          "-limf"
+
+else
+   flog $ALog setenv LibM      "-lm"
+
+endif
+NoteD $ALog "   Math library: $LibM"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+SetParent IMF_Path
+SetParent RPATH
+SetParent Cfg_RPATH
+SetParent LD_RPath
+SetParent LD_Lib
+SetParent LibM
+
+exit(0)
+

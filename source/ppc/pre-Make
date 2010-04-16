@@ -45,8 +45,8 @@ BinObj = ${LdFlags} pcexec.c
 #
 # Required Libraries
 #
-Libs  = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${DPLib} -lm ${MDLib}
-SLibs = ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+Libs  = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${DPLib} ${MDLib}
+SLibs = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 
 targets :

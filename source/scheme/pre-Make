@@ -43,7 +43,7 @@ BinDep = ${Hdrs} ${TGTLib} shmain.c ${DepLib}
 BinObj = ${LdFlags} shmain.c
 
 # required Libraries
-Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} -lm ${MDLib}
+Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 
 targets :
