@@ -318,22 +318,45 @@ switch ($Cmnd)
         flog $Log popd
 
         if ($RStatus == 0) then
+           NoteD $Log ""
            Separator $Log
-           Note $Log "Building F90 interfaces"
+           NoteD $Log "Building F90 interfaces"
            flog $Log ./itf90
-           Note $Log "done"
+           NoteD $Log "done"
+        endif
+
+# fix up cross compile executables that need to run on the current host
+# some things should be on the back end for testing
+# but some need to be used by the system on the front end
+# see score/make-wrap
+        SafeEnv CROSS_COMPILE FALSE
+        if ($CROSS_COMPILE != FALSE) then
+           NoteD $Log ""
+           Separator $Log
+           NoteD $Log "Cross compile fixes"
+           set CrossFix = ( hserve mpi-io-wrap ps-diff png-diff )
+           set CrossFix = ( hserve mpi-io-wrap )
+           foreach i ( $CrossFix )
+              set exe = `which-exe $i`
+              if (-x "$exe") then
+                 NoteD $Log "   $exe"
+                 flog $Log cp $exe ${BinDir}
+              endif
+           end
+           NoteD $Log "done"
         endif
 
         set ETime = `$TIMER -b $BeginTime`
 
         if ($RStatus != 0) then
+           NoteD $Log ""
            Separator $Log
            Note $Log "Build failed - some hints may be found in the files:"
            flog $Log ls -l ../*/z-$System/obj/errlog
         endif
 
-        Separator $Log
         NoteD $Log ""
+        Separator $Log
         NoteD $Log "PACT $Build on $Host complete ($RStatus/$ETime)"
         NoteD $Log ""
 
@@ -1014,7 +1037,7 @@ switch ($Cmnd)
            flog $Log $RM ${BinDir}/dmake.exec
            flog $Log popd
         else
-           set dm = `which-dmake`
+           set dm = `which-exe dmake`
            if (-x "$dm") then
               flog $Log cp $dm ${BinDir}/dmake
               set LStat = 0

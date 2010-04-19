@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# WHICH-EXE - find a version of EXE that will work in CROSS-COMPILE situation
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 1
+
+if ($#argv != 1) then
+   echo "Usage: which-exe <program>"
+   exit(1)
+else
+   set exe = $1
+endif
+
+set prg   = ""
+set extra = ""
+set sys   = `system-id`
+
+if ($?DAS_ROOT == 1) then
+   set extra = ( $DAS_ROOT/pactnew/bin/pact $DAS_ROOT/pact/bin/pact )
+endif
+
+foreach d ( ../dev/*/bin $extra )
+   set path = ( $d /usr/bin /bin . )
+   rehash
+   set nl = ( `$exe -h |& grep -iw usage | wc -l` )
+   if ("$nl" == 1) then
+      strings $d/$exe |& grep $sys >>& /dev/null
+      if ($status == 0) then
+         pushd $d >>& /dev/null
+         set prg = $cwd/$exe
+         popd >>& /dev/null
+         @ err = 0
+         break
+      endif
+   endif
+end
+
+echo "$prg"
+
+exit($err)

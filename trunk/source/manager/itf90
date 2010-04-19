@@ -16,11 +16,17 @@ set Which = "$cwd/pwhich"
 source ../dev/$Arch/include/env-pact.csh
 source ../dev/$Arch/include/env-csh
 
+if ($CROSS_COMPILE == FALSE) then
+   set CFE = ""
+else
+   set CFE = "do-run"
+endif
+
 InitLog Log $cwd:h/dev/$Arch/log/itf90
 
 set FC     = `pact +l -info FCompiler`
 set IncDir = $cwd:h/dev/$Arch/include
-set SzAddr = `detect | grep "A pointer is"`
+set SzAddr = `$CFE detect | grep "A pointer is"`
 set SzAddr = $SzAddr[4]
 
 if ("$FC" == "") then
