@@ -1319,14 +1319,6 @@ static void bad_pragma_rules(void)
 static void init_session(char *base, int append)
    {
 
-/* locate the tools needed for subshells */
-    build_path(NULL,
-	       "sed", "grep", "awk", "sort",
-	       "ls", "cp", "rm", "mv",
-	       "find", "chmod", "cat",
-	       "env", "mkdir", "nm",
-	       NULL);
-
 /* setup default variable values */
     default_var(base);
 
@@ -1862,6 +1854,43 @@ static void finish_config(char *base)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* LAUNCH_PERDB - look for -f arg and if found launch perdb first of all */
+
+int launch_perdb(int c, char **v)
+   {int i, ok, st;
+    char *db;
+
+    ok = FALSE;
+
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-f") == 0)
+	    {db = v[++i];
+	     csetenv("PERDB_PATH", db);
+	     st = execute(FALSE, "rm %s.*", db);
+	     st = execute(FALSE, "perdb -f %s -l -c -s", db);
+	     ok = ((st & 0xff) == 0);
+	     break;};};
+
+    return(ok);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* KILL_PERDB - shutdown perdb */
+
+int kill_perdb(void)
+   {int ok, st;
+    char *db;
+
+    db = cgetenv(FALSE, "PERDB_PATH");
+    st = execute(FALSE, "perdb -f %s -l quit:", db);
+    ok = (st == 0);
+
+    return(ok);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* HELP - give help message */
 
 static void help(void)
@@ -1893,13 +1922,23 @@ static void help(void)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, append;
+   {int i, append, havedb;
     char base[MAXLINE], name[MAXLINE];
     char *s;
 
     if (c == 0)
        {help();
 	return(1);};
+
+/* locate the tools needed for subshells */
+    build_path(NULL,
+	       "sed", "grep", "awk", "sort",
+	       "ls", "cp", "rm", "mv",
+	       "find", "chmod", "cat",
+	       "env", "mkdir", "nm", "perdb",
+	       NULL);
+
+    havedb = launch_perdb(c, v);
 
 /* NOTE: because of OSX's nefarious automounter we have to get the current
  * directory this way (rather that via the getcwd library call) so that
@@ -1929,10 +1968,6 @@ int main(int c, char **v)
 
                  case 'c':
                       st.create_dirs = TRUE;
-                      break;
- 
-                 case 'f':
-                      csetenv("PERDB_PATH", v[++i]);
                       break;
  
                  case 'F':
@@ -2023,6 +2058,9 @@ int main(int c, char **v)
     run(BOTH, "rm -rf %s", st.dir.cfg);
 
     LOG_OFF;
+
+    if (havedb == TRUE)
+       kill_perdb();
 
     return(0);}
 
