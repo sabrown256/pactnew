@@ -911,12 +911,11 @@ switch ($Cmnd)
         endif
         flog $Log popd
 
-        flog $Log setenv PERDB_PATH $IncDir/cfg
-        flog $Log $RM $IncDir/cfg.*
-        flog $Log $BinDir/perdb -l -c -s
+# set path for PERDB - spawned by PCO
+        flog $Log set dbopt = ( -f $IncDir/cfg )
 
 	if (($Method == 2) && (-x $BinDir/pco)) then
-           flog $Log set PConf = ( $BinDir/pco -l )
+           flog $Log set PConf = ( $BinDir/pco $dbopt -l )
            Note $Log "Using binary pco to process input"
         else
            flog $Log set PConf = ./pact-config
@@ -1093,7 +1092,7 @@ switch ($Cmnd)
         NoteD $Log ""
 
 CFG_DONE:
-        flog $Log $BinDir/perdb -l quit:
+	unset dbopt
 
         breaksw
 
