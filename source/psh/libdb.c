@@ -745,6 +745,24 @@ int dbcmp(char *root, char *var, char *val)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DBCMD - send a command to the database daemon
+ *       - one of: quit, dump
+ */
+
+int dbcmd(char *root, char *cmd)
+   {int rv;
+    char **ta;
+
+    ta = _db_clnt_ex(root, cmd);
+    rv = (ta != NULL);
+
+    lst_free(ta);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DBINITV - set the database variable VAR to VAL
  *         - only if it is undefined
  *         - (counterpart to cinitenv)
