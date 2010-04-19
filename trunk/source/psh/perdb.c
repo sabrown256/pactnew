@@ -47,12 +47,53 @@ static void sigrestart(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SRV_DUMP_DB - dump the database */
+
+char *srv_dump_db(char *fname, char *var)
+   {int ok;
+    char s[MAXLINE];
+    FILE *fp;
+    static char t[MAXLINE];
+
+    if (fname == NULL)
+       fp = NULL;
+    else
+       {snprintf(s, MAXLINE, "%s.%s", db->file, fname);
+	fp = fopen(s, "w");
+        if (fp == NULL)
+	   {snprintf(t, MAXLINE, "could not open %s - dump %s",
+		     fname, strerror(errno));
+	    return(t);};
+        fname = path_tail(s);};
+	   
+    ok = dump_db(db, var, fp);
+
+    if (fname == NULL)
+       {if (var == NULL)
+	   snprintf(t, MAXLINE, "dumped database");
+        else
+	   snprintf(t, MAXLINE, "dumped %s", var);}
+
+    else
+       {fclose(fp);
+	if (var == NULL)
+	   snprintf(t, MAXLINE, "dumped database to %s",
+		    fname);
+	else
+	   snprintf(t, MAXLINE, "dumped %s to %s",
+		    var, fname);};
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SERVER - run the server side of the database */
 
 int server(char *root, int init, int dmn)
    {int ok, nb, to;
     char s[MAXLINE], t[MAXLINE];
-    char *var, *val;
+    char *var, *val, *p;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
        {signal(SIGTERM, sigdone);
@@ -77,13 +118,25 @@ int server(char *root, int init, int dmn)
 
 /* decide on the action to take */
 		     if (nb > 0)
+
+/* quit session */
 		        {if (strncmp(s, "quit:", 5) == 0)
 			    {val = "done";
 			     ok  = FALSE;}
+
+/* dump to standard place */
 		         else if (strncmp(s, "dump:", 5) == 0)
 			    {key_val(NULL, &var, s, ": \t\n");
-			     ok  = dump_db(db, var, NULL);
-                             val = "";}
+			     val = srv_dump_db(NULL, var);}
+
+/* dump to specified place */
+		         else if (strncmp(s, "dump ", 5) == 0)
+			    {p = strchr(s+5, ':');
+			     *p++ = '\0';
+			     key_val(NULL, &var, s+5, " \t\n");
+			     val = srv_dump_db(s+5, var);}
+
+/* variable set/get */
 			 else
 			    {key_val(&var, &val, s, "= \t\n");
                              if (val == NULL)
@@ -95,6 +148,7 @@ int server(char *root, int init, int dmn)
 				 (strpbrk(val, " \t") != NULL))
 			        {snprintf(t, MAXLINE, "\"%s\"", val);
 				 val = t;};};}
+/* error case */
 		     else
 		        val = "error";
 

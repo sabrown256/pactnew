@@ -371,8 +371,9 @@ static int write_class(FILE *out, char *clss, char *ctype,
 
 /* WRITE_DB - write a text representation of the configuration database */
 
-static int write_db(char *name)
+static int write_db(char *name, char *dbname)
    {int rv;
+    char t[MAXLINE];
     FILE *out;
 
     if (name != NULL)
@@ -382,6 +383,13 @@ static int write_db(char *name)
 
     rv = write_class(out, st.def_tools, "Tool", NULL, NULL, "");
     rv = write_class(out, st.def_groups, "Group", st.def_tools, "Tool", "");
+
+/* dump PERDB */
+    if (dbname == NULL)
+       nstrncpy(t, MAXLINE, "dump:", -1);
+    else
+       snprintf(t, MAXLINE, "dump %s:", dbname);
+    dbcmd(NULL, t);
 
     if (name != NULL)
        fclose(out);
@@ -1794,7 +1802,7 @@ static void summarize_config(void)
        printf("%s\n", run(BOTH, "analyze/summary"));
 
     snprintf(name, MAXLINE, "%s/config.db", st.dir.inc);
-    write_db(name);
+    write_db(name, NULL);
 
     return;}
 
@@ -1998,7 +2006,7 @@ int main(int c, char **v)
 	read_config(st.cfgf, FALSE);
 
 	snprintf(name, MAXLINE, "%s/config.gen", st.dir.inc);
-	write_db(name);
+	write_db(name, "inp");
 
 	noted(Log, "");};
 

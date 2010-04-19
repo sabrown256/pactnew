@@ -96,9 +96,15 @@
               default:
               case *gnu:
               case *gcc:
-                   echo "run std/use-gnu $CCompiler" >>& $Tmp
+                   if ("$CCompiler" == gnu) then
+                      set lcc = gcc
+                   else
+                      set lcc = $CCompiler
+                   endif
+                   echo "run std/use-gnu $lcc" >>& $Tmp
                    echo "include ${bits}-bit" >>& $Tmp
                    echo "include compilers/gnu" >>& $Tmp
+                   unset lcc
                    breaksw
            endsw
            breaksw
