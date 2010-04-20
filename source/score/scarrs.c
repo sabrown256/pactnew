@@ -674,16 +674,11 @@ void SC_array_string_add_copy(SC_array *a, char *s)
 /* SC_ARRAY_STRING_ADD_VCOPY - add the a copy of the string S to the array A */
 
 void SC_array_string_add_vcopy(SC_array *a, char *fmt, ...)
-   {char t[MAXLINE];
-    char *s;
-        
-    SC_VA_START(fmt);
-    SC_VSNPRINTF(t, MAXLINE, fmt);
-    SC_VA_END;
+   {char *t;
 
-    s = SC_strsavef(t, "char*:SC_ARRAY_STRING_ADD_COPY:s");
+    SC_VDSNPRINTF(TRUE, t, fmt);
 
-    SC_array_string_add(a, s);
+    SC_array_string_add(a, t);
 
     return;}
 

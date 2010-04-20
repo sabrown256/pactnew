@@ -1310,6 +1310,31 @@ char **SC_tokenize_literal(char *s, char *delim, int nl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_FILE_STRINGS - return the lines of a text file as
+ *                 - an array of strings
+ */
+
+char **SC_file_strings(char *fname)
+   {char s[MAX_BFSZ];
+    char **sa;
+    SC_array *a;
+    FILE *fp;
+
+    a = SC_string_array("SC_FILE_STRINGS");
+
+    fp = fopen(fname, "r");
+    while (fgets(s, MAX_BFSZ, fp) != NULL)
+       SC_array_string_add_copy(a, s);
+
+    fclose(fp);
+
+    sa = SC_array_done(a);
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_FREE_STRINGS - free the an array of strings SA
  *                 - and each string in the array
  */
