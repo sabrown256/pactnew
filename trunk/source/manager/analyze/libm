@@ -19,6 +19,7 @@ SafeEnv Cfg_RPATH    ""
 SafeEnv LD_RPath     ""
 SafeEnv LD_Lib       ""
 SafeEnv LibM         "-lm"
+SafeEnv LibM_Path    ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -56,6 +57,7 @@ if ("$IMF_Path" != "") then
    flog $ALog setenv LD_RPath      ${LD_RPath}:${IMF_Path}
    flog $ALog setenv LD_Lib        "-L${IMF_Path} ${LD_Lib}"
    flog $ALog setenv LibM          "-limf"
+   flog $ALog setenv LibM_Path     ${IMF_Path}
 
 else
    flog $ALog setenv LibM      "-lm"
@@ -72,6 +74,7 @@ SetParent Cfg_RPATH
 SetParent LD_RPath
 SetParent LD_Lib
 SetParent LibM
+SetParent LibM_Path
 
 exit(0)
 

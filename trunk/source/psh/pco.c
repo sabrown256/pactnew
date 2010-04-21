@@ -275,8 +275,8 @@ static void pop_struct(void)
     n  = st.gstck.n - 1;
     ge = st.gstck.st + n;
 
-    csetenv("CurrGrp", ge->item);
-    csetenv("CurrTool", "");
+    dbset(NULL, "CurrGrp", ge->item);
+    dbset(NULL, "CurrTool", "");
 
     note(Log, TRUE, "--- end");
 
@@ -311,7 +311,7 @@ static int write_class(FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t   = cgetenv(TRUE, "Globals");
+	    {t   = dbget(NULL, TRUE, "Globals");
 	     dlm = " ";}
          else
 	    {fprintf(out, "%s%s %s {\n", ind, ctype, c);
@@ -334,7 +334,7 @@ static int write_class(FILE *out, char *clss, char *ctype,
 	     FOREACH(entry, t, dlm)
 	        if (global == TRUE)
 		   {var = entry;
-		    val = cgetenv(TRUE, var);}
+		    val = dbget(NULL, TRUE, var);}
 		else
 		   {var = entry + strlen(c) + 1;
 		    val = strchr(var, '=');
@@ -470,7 +470,7 @@ static void write_envf(int lnotice)
  */
     n = sizeof(site)/sizeof(char *);
     for (i = 0; i < n; i++)
-        env_out(fsh, fcsh, fdk, fmd, site[i], cgetenv(TRUE, site[i]));
+        env_out(fsh, fcsh, fdk, fmd, site[i], dbget(NULL, TRUE, site[i]));
 
     fseek(st.aux.SEF, 0, SEEK_SET);
     while (fgets(s, MAXLINE, st.aux.SEF) != NULL)
@@ -511,15 +511,15 @@ static void write_envf(int lnotice)
 
      if (st.have_python == TRUE)
         {snprintf(lPython, MAXLINE, "%s/python%s",
-		  st.dir.lib, cgetenv(TRUE, "PyVers"));
-	 t = getenv("PYTHONPATH");
+		  st.dir.lib, dbget(NULL, TRUE, "PyVers"));
+	 t = dbget(NULL, TRUE, "PYTHONPATH");
 	 if (t != NULL)
 	    {if (strstr(t, lPython) == NULL)
-	        csetenv("PYTHONPATH", "%s:$PYTHONPATH", lPython);}
+	        dbset(NULL, "PYTHONPATH", "%s:$PYTHONPATH", lPython);}
 	 else
-	    csetenv("PYTHONPATH", lPython);
+	    dbset(NULL, "PYTHONPATH", lPython);
 
-	 t = getenv("PYTHONPATH");
+	 t = dbget(NULL, TRUE, "PYTHONPATH");
 	 note(fcsh, TRUE, "setenv PYTHONPATH %s", t);
 	 note(fsh, TRUE,  "export PYTHONPATH=%s", t);
 	 note(fdk, TRUE,  "dk_setenv PYTHONPATH %s", t);
@@ -590,7 +590,7 @@ static void check_dir(void)
 			   "scheme", "man", "man/man1"};
 
     n   = sizeof(dlst)/sizeof(char *);
-    sib = cgetenv(TRUE, "InstBase");
+    sib = dbget(NULL, TRUE, "InstBase");
 
     if (st.create_dirs == TRUE)
        {Created[0] = '\0';
@@ -706,7 +706,7 @@ static void parse_opt(char *s)
 /* parse the _env_ key */
 	 else if (strcmp(vr, "_env_") == 0)
 	    {arg = trim(strtok(NULL, ";"), BOTH, " \t");
-	     avl = cgetenv(TRUE, arg);}
+	     avl = dbget(NULL, TRUE, arg);}
 
 /* select the value */
 	 else
@@ -831,81 +831,81 @@ static void setup_analyze_env(char *base)
     note(out, TRUE, "%s", get_date());
     fclose(out);
 
-    csetenv("Host",    st.host);
-    csetenv("Arch",    st.arch);
-    csetenv("System",  st.system);
-    csetenv("Sys",     st.sys);
-    csetenv("Base",    base);
-    csetenv("RootDir", st.dir.root);
-    csetenv("AnaDir",  "%s/analyze", st.dir.mng);
-    csetenv("Log",     st.logf);
-    csetenv("ALog",    alog);
+    dbset(NULL, "Host",    st.host);
+    dbset(NULL, "Arch",    st.arch);
+    dbset(NULL, "System",  st.system);
+    dbset(NULL, "Sys",     st.sys);
+    dbset(NULL, "Base",    base);
+    dbset(NULL, "RootDir", st.dir.root);
+    dbset(NULL, "AnaDir",  "%s/analyze", st.dir.mng);
+    dbset(NULL, "Log",     st.logf);
+    dbset(NULL, "ALog",    alog);
 
-    csetenv("AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
-    csetenv("AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");
-    csetenv("Profile",     st.profilep ? "TRUE" : "FALSE");
-    csetenv("UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
+    dbset(NULL, "AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
+    dbset(NULL, "AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");
+    dbset(NULL, "Profile",     st.profilep ? "TRUE" : "FALSE");
+    dbset(NULL, "UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
 
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';
 
-    csetenv("HostOS",      st.os);
-    csetenv("HostOSRel",   st.osrel);
+    dbset(NULL, "HostOS",      st.os);
+    dbset(NULL, "HostOSRel",   st.osrel);
 
     if (strcmp(st.os, "Windows_NT") == 0)
-       csetenv("CDecls", "TRUE");
+       dbset(NULL, "CDecls", "TRUE");
     else
-       csetenv("CDecls", "FALSE");
+       dbset(NULL, "CDecls", "FALSE");
 
-    csetenv("ANSI",   "ANSI");
-    csetenv("MeOnly", "TRUE");
+    dbset(NULL, "ANSI",   "ANSI");
+    dbset(NULL, "MeOnly", "TRUE");
 
 /* initialization of non-graphics flags */
     if (strcmp(st.os, "AIX") == 0)
-       csetenv("NM", "/usr/bin/nm -g -X %s", cgetenv(TRUE, "Bits"));
+       dbset(NULL, "NM", "/usr/bin/nm -g -X %s", dbget(NULL, TRUE, "Bits"));
     else
-       csetenv("NM", "%s -g", cwhich("nm"));
+       dbset(NULL, "NM", "%s -g", cwhich("nm"));
 
-    cinitenv("CC_Version",  "");
-    cinitenv("FC_Version",  "");
-    cinitenv("LD_Version",  "");
+    dbinitv(NULL, "CC_Version",  "");
+    dbinitv(NULL, "FC_Version",  "");
+    dbinitv(NULL, "LD_Version",  "");
 
-    cinitenv("CC_Inc",    "");
-    cinitenv("CC_Flags",  "");
-    cinitenv("LD_Lib",    "");
-    cinitenv("LD_RPath",  "");
-    cinitenv("LD_Flags",  "");
+    dbinitv(NULL, "CC_Inc",    "");
+    dbinitv(NULL, "CC_Flags",  "");
+    dbinitv(NULL, "LD_Lib",    "");
+    dbinitv(NULL, "LD_RPath",  "");
+    dbinitv(NULL, "LD_Flags",  "");
 
-    cinitenv("CPU",       "");
-    cinitenv("FPU",       "");
-    cinitenv("BE",        "");
+    dbinitv(NULL, "CPU",       "");
+    dbinitv(NULL, "FPU",       "");
+    dbinitv(NULL, "BE",        "");
 
 /* parallel front end */
-    cinitenv("PFE",       "%s/do-run -m", st.dir.bin);
+    dbinitv(NULL, "PFE",       "%s/do-run -m", st.dir.bin);
 
 /* cross compile front end */
-    if (cmpenv("CROSS_COMPILE", "FALSE") != 0)
-       cinitenv("CFE", "%s/do-run -m", st.dir.bin);
+    if (dbcmp(NULL, "CROSS_COMPILE", "FALSE") != 0)
+       dbinitv(NULL, "CFE", "%s/do-run -m", st.dir.bin);
     else
-       cinitenv("CFE", "");
+       dbinitv(NULL, "CFE", "");
 
 /* initialization of graphics flags */
-    cinitenv("GSYS",       "X");
-    cinitenv("Std_UseX",   "TRUE");
-    cinitenv("Std_UseOGL", "FALSE");
-    cinitenv("Std_UseQD",  "FALSE");
+    dbinitv(NULL, "GSYS",       "X");
+    dbinitv(NULL, "Std_UseX",   "TRUE");
+    dbinitv(NULL, "Std_UseOGL", "FALSE");
+    dbinitv(NULL, "Std_UseQD",  "FALSE");
 
-    cinitenv("CC_MDGInc",       "");
-    cinitenv("LD_MDGLib",       "");
-    cinitenv("GraphicsDevices", "PS CGM MPG PNG JPG");
-    cinitenv("GraphicsFlag",    "");
+    dbinitv(NULL, "CC_MDGInc",       "");
+    dbinitv(NULL, "LD_MDGLib",       "");
+    dbinitv(NULL, "GraphicsDevices", "PS CGM MPG PNG JPG");
+    dbinitv(NULL, "GraphicsFlag",    "");
 
 /* initialize Cfg group flags */
-    cinitenv("Cfg_CC_Flags",  cgetenv(TRUE, "CC_Flags"));
-    cinitenv("Cfg_CC_Inc",    cgetenv(TRUE, "CC_Inc"));
-    cinitenv("Cfg_LD_RPath",  cgetenv(TRUE, "LD_RPath"));
-    cinitenv("Cfg_LD_Flags",  cgetenv(TRUE, "LD_Flags"));
-    cinitenv("Cfg_LD_Lib",    cgetenv(TRUE, "LD_Lib"));
+    dbinitv(NULL, "Cfg_CC_Flags",  dbget(NULL, FALSE, "CC_Flags"));
+    dbinitv(NULL, "Cfg_CC_Inc",    dbget(NULL, FALSE, "CC_Inc"));
+    dbinitv(NULL, "Cfg_LD_RPath",  dbget(NULL, FALSE, "LD_RPath"));
+    dbinitv(NULL, "Cfg_LD_Flags",  dbget(NULL, FALSE, "LD_Flags"));
+    dbinitv(NULL, "Cfg_LD_Lib",    dbget(NULL, FALSE, "LD_Lib"));
 
     return;}
 
@@ -920,70 +920,70 @@ static void setup_output_env(char *base)
    {char *rv;
 
 /* close any open intermediate files and export their names */
-    csetenv("DPFile", st.aux.dpfn);
+    dbset(NULL, "DPFile", st.aux.dpfn);
     if (st.aux.DPF != NULL)
        fclose(st.aux.DPF);
 
-    csetenv("CEFile", st.aux.cefn);
+    dbset(NULL, "CEFile", st.aux.cefn);
     if (st.aux.CEF != NULL)
        fclose(st.aux.CEF);
 
-    csetenv("MVFile", st.aux.mvfn);
+    dbset(NULL, "MVFile", st.aux.mvfn);
     if (st.aux.MVF != NULL)
        fclose(st.aux.MVF);
 
-    csetenv("URFile", st.aux.urfn);
+    dbset(NULL, "URFile", st.aux.urfn);
     if (st.aux.URF != NULL)
        fclose(st.aux.URF);
 
 /* remove duplicate tokens in selected lists */
-    csetenv("CC_MDGInc", unique(cgetenv(TRUE, "CC_MDGInc"), FALSE, ' '));
-    csetenv("CC_Inc",    unique(cgetenv(TRUE, "CC_Inc"), FALSE, ' '));
-    csetenv("LD_Lib",    unique(cgetenv(TRUE, "LD_Lib"), FALSE, ' '));
+    dbset(NULL, "CC_MDGInc", unique(dbget(NULL, FALSE, "CC_MDGInc"), FALSE, ' '));
+    dbset(NULL, "CC_Inc",    unique(dbget(NULL, FALSE, "CC_Inc"), FALSE, ' '));
+    dbset(NULL, "LD_Lib",    unique(dbget(NULL, FALSE, "LD_Lib"), FALSE, ' '));
 
 /* NOTE: for OSX this would reduce -framework FOO -framework BAR
  * to -framework FOO BAR which is not legal
  */
     if (strcmp(st.os, "Darwin") != 0)
-       csetenv("LD_MDGLib", unique(cgetenv(TRUE, "LD_MDGLib"), FALSE, ' '));
+       dbset(NULL, "LD_MDGLib", unique(dbget(NULL, FALSE, "LD_MDGLib"), FALSE, ' '));
 
-    csetenv("BinDir",  st.dir.bin);
-    csetenv("IncDir",  st.dir.inc);
-    csetenv("ScrDir",  st.dir.scr);
-    csetenv("SchDir",  st.dir.sch);
-    csetenv("CfgDir",  st.dir.cfg);
+    dbset(NULL, "BinDir",  st.dir.bin);
+    dbset(NULL, "IncDir",  st.dir.inc);
+    dbset(NULL, "ScrDir",  st.dir.scr);
+    dbset(NULL, "SchDir",  st.dir.sch);
+    dbset(NULL, "CfgDir",  st.dir.cfg);
 
-    rv = cgetenv(TRUE, "HavePython");
+    rv = dbget(NULL, TRUE, "HavePython");
     if (rv == NULL)
        {if (strcmp(rv, "FALSE") == 0)
-	   csetenv("HavePython", "FALSE");
+	   dbset(NULL, "HavePython", "FALSE");
 	else
-	   csetenv("HavePython",  "TRUE");};
+	   dbset(NULL, "HavePython",  "TRUE");};
 
-    csetenv("Load",        st.loadp ? "TRUE" : "FALSE");
-    csetenv("NoExe",       st.exep ? "TRUE" : "FALSE");
-    csetenv("ConfigVars",  st.cfgv);
-    csetenv("DefGroups",   st.def_groups);
-    csetenv("ConfigFile",  st.cfgf);
+    dbset(NULL, "Load",        st.loadp ? "TRUE" : "FALSE");
+    dbset(NULL, "NoExe",       st.exep ? "TRUE" : "FALSE");
+    dbset(NULL, "ConfigVars",  st.cfgv);
+    dbset(NULL, "DefGroups",   st.def_groups);
+    dbset(NULL, "ConfigFile",  st.cfgf);
 
-    csetenv("CCP",     st.rules.ccp);
-    csetenv("CCObj",   st.rules.co);
-    csetenv("CCArc",   st.rules.ca);
-    csetenv("LexObj",  st.rules.lo);
-    csetenv("LexArc",  st.rules.la);
-    csetenv("LexC",    st.rules.lc);
-    csetenv("YaccObj", st.rules.yo);
-    csetenv("YaccArc", st.rules.ya);
-    csetenv("YaccC",   st.rules.yc);
-    csetenv("FCObj",   st.rules.fo);
-    csetenv("FCArc",   st.rules.fa);
+    dbset(NULL, "CCP",     st.rules.ccp);
+    dbset(NULL, "CCObj",   st.rules.co);
+    dbset(NULL, "CCArc",   st.rules.ca);
+    dbset(NULL, "LexObj",  st.rules.lo);
+    dbset(NULL, "LexArc",  st.rules.la);
+    dbset(NULL, "LexC",    st.rules.lc);
+    dbset(NULL, "YaccObj", st.rules.yo);
+    dbset(NULL, "YaccArc", st.rules.ya);
+    dbset(NULL, "YaccC",   st.rules.yc);
+    dbset(NULL, "FCObj",   st.rules.fo);
+    dbset(NULL, "FCArc",   st.rules.fa);
 
-    csetenv("CCObj_BP",   st.rules.co_bp);
-    csetenv("CCArc_BP",   st.rules.ca_bp);
-    csetenv("LexObj_BP",  st.rules.lo_bp);
-    csetenv("LexArc_BP",  st.rules.la_bp);
-    csetenv("YaccObj_BP", st.rules.yo_bp);
-    csetenv("YaccArc_BP", st.rules.ya_bp);
+    dbset(NULL, "CCObj_BP",   st.rules.co_bp);
+    dbset(NULL, "CCArc_BP",   st.rules.ca_bp);
+    dbset(NULL, "LexObj_BP",  st.rules.lo_bp);
+    dbset(NULL, "LexArc_BP",  st.rules.la_bp);
+    dbset(NULL, "YaccObj_BP", st.rules.yo_bp);
+    dbset(NULL, "YaccArc_BP", st.rules.ya_bp);
 
     return;}
 
@@ -997,9 +997,9 @@ static void default_var(char *base)
 
     if (cdefenv("USER") == FALSE)
        {if (cdefenv("LOGNAME") == FALSE)
-	   csetenv("USER", "anonymous");
+	   dbset(NULL, "USER", "anonymous");
         else
-	   csetenv("USER", cgetenv(TRUE, "LOGNAME"));};
+	   dbset(NULL, "USER", cgetenv(TRUE, "LOGNAME"));};
 
     csetenv("PATH", "%s:%s", st.dir.mng, cgetenv(TRUE, "PATH"));
 
@@ -1061,15 +1061,15 @@ static void default_var(char *base)
     if (st.system[0] == '\0')
        strncpy(st.system, run(BOTH, "%s/cfgman use", st.dir.mng), MAXLINE);
 
-    cinitenv("CfgMan",        "%s/cfgman", run(BOTH, "pwd"));
-    cinitenv("Globals",       "");
-    cinitenv("MngDir",        st.dir.mng);
-    cinitenv("InstBase",      "none");
-    cinitenv("PubInc",        "");
-    cinitenv("PubLib",        "");
-    cinitenv("ScmDir",        "scheme");
-    cinitenv("ManDir",        "man/man1");
-    cinitenv("CROSS_COMPILE", "FALSE");
+    dbinitv(NULL, "CfgMan",        "%s/cfgman", run(BOTH, "pwd"));
+    dbinitv(NULL, "Globals",       "");
+    dbinitv(NULL, "MngDir",        st.dir.mng);
+    dbinitv(NULL, "InstBase",      "none");
+    dbinitv(NULL, "PubInc",        "");
+    dbinitv(NULL, "PubLib",        "");
+    dbinitv(NULL, "ScmDir",        "scheme");
+    dbinitv(NULL, "ManDir",        "man/man1");
+    dbinitv(NULL, "CROSS_COMPILE", "FALSE");
 
 /* global variables */
     snprintf(st.dir.root, MAXLINE, "%s/dev/%s",       base, st.system);
@@ -1349,8 +1349,8 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* attach the current group suffix */
     if (strcmp(prfx, "Glb") == 0)
-       {snprintf(s, LRG, "%s %s", cgetenv(TRUE, "Globals"), var);
-	csetenv("Globals", unique(s, FALSE, ' '));
+       {snprintf(s, LRG, "%s %s", dbget(NULL, FALSE, "Globals"), var);
+	dbset(NULL, "Globals", unique(s, FALSE, ' '));
 	strncpy(fvar, var, MAXLINE);}
     else
        snprintf(fvar, MAXLINE, "%s_%s", prfx, var);
@@ -1358,7 +1358,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
     clean_space(val);
 
     if ((strcmp(oper, "+=") == 0) || (strcmp(oper, "=+") == 0))
-       {if (cdefenv(fvar) == FALSE)
+       {if (dbdef(NULL, fvar) == FALSE)
            {note(Log, TRUE, "Variable %s does not exist changing %s to =",
                  fvar, oper);
             oper = "=";};};
@@ -1488,11 +1488,11 @@ static void process_use(char *sg, char *oper)
 /* fill out a group */
        {case STACK_GROUP:
              note(Log, TRUE, "Use group %s to fill group %s",
-		  sg, cgetenv(FALSE, "CurrGrp"));
+		  sg, dbget(NULL, FALSE, "CurrGrp"));
              FOREACH(var, st.cfgv, " ")
                 snprintf(nvr, MAXLINE, "%s_%s", sg, var);
-                if (cdefenv(nvr) == TRUE)
-                   {val = cgetenv(TRUE, nvr);
+                if (dbdef(NULL, nvr) == TRUE)
+                   {val = dbget(NULL, TRUE, nvr);
                     if (strcmp(var, "Exe") == 0)
                        set_var(FALSE, var, "=", val);
                     else
@@ -1502,22 +1502,22 @@ static void process_use(char *sg, char *oper)
 
 /* fill out a tool */
         case STACK_TOOL:
-             if (cmpenv("CurrTool", "") == 0)
+             if (dbcmp(NULL, "CurrTool", "") == 0)
                 {note(Log, TRUE, "Use tool %s to fill group %s",
-		      sg, cgetenv(FALSE, "CurrGrp"));
+		      sg, dbget(NULL, FALSE, "CurrGrp"));
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, MAXLINE, "%s_%s", sg, var);
-                    if (cdefenv(nvr) == TRUE)
-                       {val = cgetenv(TRUE, nvr);
+                    if (dbdef(NULL, nvr) == TRUE)
+                       {val = dbget(NULL, TRUE, nvr);
                         set_var(FALSE, nvr, oper, val);};
                  ENDFOR}
              else
                 {note(Log, TRUE, "Use tool %s to fill tool %s",
-		      sg, cgetenv(FALSE, "CurrTool"));
+		      sg, dbget(NULL, FALSE, "CurrTool"));
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, MAXLINE, "%s_%s", sg, var);
-                    if (cdefenv(nvr) == TRUE)
-                       {val = cgetenv(TRUE, nvr);
+                    if (dbdef(NULL, nvr) == TRUE)
+                       {val = dbget(NULL, TRUE, nvr);
                         set_var(FALSE, var, oper, val);};
                  ENDFOR};
              break;};
@@ -1545,7 +1545,7 @@ static void read_config(char *cfg, int quiet)
     note(Log, TRUE, "");
 
     note(Log, TRUE, "");
-    note(Log, TRUE, "Strict checking level is %s", cgetenv(TRUE, "STRICT"));
+    note(Log, TRUE, "Strict checking level is %s", dbget(NULL, TRUE, "STRICT"));
     note(Log, TRUE, "");
     separator(Log);
 
@@ -1553,7 +1553,7 @@ static void read_config(char *cfg, int quiet)
 
 /* toplevel loop over the input to define configuration parameters */
     for (il = 0; TRUE; il++)
-        {if (cdefenv("STOP") == TRUE)
+        {if (dbdef(NULL, "STOP") == TRUE)
 	    {noted(Log, " ");
 	     exit(1);};
 
@@ -1646,14 +1646,14 @@ static void read_config(char *cfg, int quiet)
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
 	    {note(Log, TRUE, "--- tool %s", oper);
-	     csetenv("CurrTool", oper);
+	     dbset(NULL, "CurrTool", oper);
 	     note(Log, TRUE, "Defining tool %s", oper);
 	     push_struct(oper, st.def_tools, STACK_TOOL);}
 
 /* handle Group specifications */
 	 else if (strcmp(key, "Group") == 0)
 	    {note(Log, TRUE, "--- group %s", oper);
-	     csetenv("CurrGrp", oper);
+	     dbset(NULL, "CurrGrp", oper);
 	     push_struct(oper, st.def_groups, STACK_GROUP);}
 
 /* handle Use specifications */
@@ -1819,7 +1819,7 @@ static void finish_config(char *base)
     note(Log, TRUE, "");
 
 /* if T3D, fiddle pdb fortran interface regression test source */
-    if (cmpenv("PFE", "mppexec") == 0)
+    if (dbcmp(NULL, "PFE", "mppexec") == 0)
        {char tmpf[MAXLINE];
 
 	snprintf(tmpf, MAXLINE, "tmp-%s", st.system);
@@ -1879,12 +1879,12 @@ int launch_perdb(int c, char **v)
 /* KILL_PERDB - shutdown perdb */
 
 int kill_perdb(void)
-   {int ok, st;
-    char *db;
+   {int ok;
+    char *db, *bf;
 
     db = cgetenv(FALSE, "PERDB_PATH");
-    st = execute(FALSE, "perdb -f %s -l quit:", db);
-    ok = (st == 0);
+    bf = run(TRUE, "perdb -f %s -l quit:", db);
+    ok = (bf != NULL);
 
     return(ok);}
  
@@ -1949,7 +1949,7 @@ int main(int c, char **v)
 
     strcpy(base, path_head(st.dir.mng));
     strcpy(st.cfgf, "DEFAULT");
-    csetenv("STRICT", "0");
+    dbset(NULL, "STRICT", "0");
 
     append = FALSE;
 
@@ -1958,7 +1958,7 @@ int main(int c, char **v)
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-strict") == 0)
-	    csetenv("STRICT", v[++i]);
+	    dbset(NULL, "STRICT", v[++i]);
 
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
@@ -1982,9 +1982,9 @@ int main(int c, char **v)
 		      s = v[++i];
                       if (LAST_CHAR(s) == '/')
 			 LAST_CHAR(s) = '\0';
-                      csetenv("InstBase", s);
-                      csetenv("PubInc",   "-I%s/include", s);
-                      csetenv("PubLib",   "-L%s/lib", s);
+                      dbset(NULL, "InstBase", s);
+                      dbset(NULL, "PubInc",   "-I%s/include", s);
+                      dbset(NULL, "PubLib",   "-L%s/lib", s);
                       st.installp = TRUE;
                       break;
  

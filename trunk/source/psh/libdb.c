@@ -690,8 +690,14 @@ char *dbget(char *root, int lit, char *fmt, ...)
     if (ta == NULL)
        t = none;
 
-    else if (lit == FALSE)
-       t = strip_quote(ta[0]);
+    else
+       {if (lit == FALSE)
+	   t = strip_quote(ta[0]);
+
+        else
+	   t = ta[0];
+
+	ta[0] = NULL;};
 
     lst_free(ta);
 
@@ -714,7 +720,7 @@ int dbdef(char *root, char *fmt, ...)
     VA_END;
 
     ta = _db_clnt_ex(root, var);
-    rv = (ta != NULL);
+    rv = ((ta != NULL) && (ta[0] != NULL) && (ta[0][0] != '\0'));
 
     lst_free(ta);
 
