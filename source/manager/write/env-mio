@@ -234,6 +234,22 @@ HAVE_SUBROUTINES
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# MATH - generate MATH library configuration info
+
+    if ("$LibM" != "") then
+       Note $FOUT '# MATH specifications'
+       Note $FOUT ''
+       Note $FOUT 'Library : lib_math {'
+       Note $FOUT '  Archives = '$LibM
+       Note $FOUT '  LibPaths = '$LibM_Path
+       Note $FOUT '  RPaths   = '$LibM_Path
+       Note $FOUT '}'
+       Note $FOUT ''
+    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # MPI - generate MPI configuration info
 
     if ("$LD_DPLib" != "") then
