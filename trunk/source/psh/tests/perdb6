@@ -1,0 +1,61 @@
+#!/bin/csh -f
+#
+# PERDB6 - test adding members
+#        - GOTCHA: does not work as desired - some redesign required
+#        - no FIFO
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db6-$1
+else
+   set db  = ./db6-socket
+endif
+
+alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+
+rm -f db6-*
+
+setenv PERDB_PATH $db
+
+echo "-----------------------------------"
+
+dbset v1 "(m1 m2)"
+echo "v1 = `printenv 'v1'`"
+
+dbset v1.m3 new
+echo "v1 = `printenv 'v1'`"
+
+dbget v1.m3
+echo "v1.m3 = `printenv 'v1.m3'`"
+
+echo ""
+perdb $opt dump: v1
+
+echo "-----------------------------------"
+
+dbset v2 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+echo "v2 = `printenv 'v2'`"
+
+dbset v2.m7 new
+echo "v2 = `printenv 'v2'`"
+
+dbget v2.m7
+echo "v2 = `printenv 'v2'`"
+
+dbset v2.m1 2
+echo "v2 = `printenv 'v2'`"
+
+dbget v2.m1
+echo "v2 = `printenv 'v2'`"
+
+echo ""
+perdb $opt dump: v2
+
+echo "-----------------------------------"
+
+perdb $opt quit:
+
+exit($status)

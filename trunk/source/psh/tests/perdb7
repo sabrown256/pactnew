@@ -1,0 +1,128 @@
+#!/bin/csh -f
+#
+# PERDB7 - test def and init
+#        - no FIFO
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db7-$1
+else
+   set db  = ./db7-socket
+endif
+
+alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+alias dbdef     'perdb $opt \!\!:1 \?'
+alias dbini     'set t_ = ( `perdb $opt \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+
+set res = ( "defined" "undefined" "whoa" )
+
+rm -f db7-*
+
+setenv PERDB_PATH $db
+
+echo "-----------------------------------"
+
+dbdef v1
+@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
+dbdef v1
+@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
+
+dbset v1 abc
+echo "v1 = `printenv 'v1'`"
+
+dbdef v1
+@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
+
+echo ""
+perdb $opt dump: v1
+
+echo "-----------------------------------"
+
+dbdef v2
+@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
+
+dbini v2 abc
+echo "v2 = `printenv 'v2'`"
+
+dbdef v2
+@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
+
+dbini v2 xyz
+echo "v2 = `printenv 'v2'`"
+
+dbdef v2
+@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
+
+echo ""
+perdb $opt dump: v2
+
+echo "-----------------------------------"
+
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+
+dbset v3 "(m1 m2)"
+echo "v3 = `printenv 'v3'`"
+
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+
+dbset v3.m3 new
+echo "v3 = `printenv 'v3'`"
+
+dbdef v3.m3
+@ xstat = $status + 1 ; echo "v3.m3 ? $res[$xstat]"
+
+dbget v3.m3
+echo "v3.m3 = `printenv 'v3.m3'`"
+
+echo ""
+perdb $opt dump: v3
+
+echo "-----------------------------------"
+
+dbdef v4.m7
+@ xstat = $status + 1 ; echo "v4.m7 ? $res[$xstat]"
+
+dbset v4 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+echo "v4 = `printenv 'v4'`"
+
+dbini v4.m7 new
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m7
+echo "v4 = `printenv 'v4'`"
+
+dbini v4.m7 old
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m7
+echo "v4 = `printenv 'v4'`"
+
+dbini v4.m1 2
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m1
+echo "v4 = `printenv 'v4'`"
+
+dbset v4.m1 2
+echo "v4 = `printenv 'v4'`"
+
+dbget v4.m1
+echo "v4 = `printenv 'v4'`"
+
+echo ""
+perdb $opt dump: v4
+
+echo "-----------------------------------"
+
+perdb $opt quit:
+
+exit($status)
