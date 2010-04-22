@@ -93,11 +93,11 @@ ObjsC = sxpan.o sxpanw.o
 ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
 ObjsE = sxpml.o
 ObjsY = sxshar.o
-ObjsZ = sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
+ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
 Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ}
 
 ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
-         ${TGTLib}(sxgc.o) \
+         ${TGTLib}(sxgc.o) ${TGTLib}(sxcmd.o) \
          ${TGTLib}(sxhand.o) ${TGTLib}(sxfunc.o) ${TGTLib}(sxhbo.o) \
          ${TGTLib}(sxpdb.o) ${TGTLib}(sxpdba.o) ${TGTLib}(sxpdbr.o) \
          ${TGTLib}(sxpdbc.o) ${TGTLib}(sxpdbd.o) ${TGTLib}(sxpdbf.o) \
@@ -118,6 +118,19 @@ ${LibDep} : ${Hdrs}
 ${TGTExe} : ${BinDep}
 	${CC} -c sxmain.c -o ${PACTTmpDir}/sxmain.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/sxmain.o -o ${TGTExe} ${Libs}
+
+# extra commands needed when building TGTLib
+LibAction = build-ext
+
+#
+# make the command test wrapper
+#
+${BinDir}/sxcmts : ${BinDep}
+	${CC} -c sxcmts.c -o ${PACTTmpDir}/sxcmts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/sxcmts.o -o ${BinDir}/sxcmts ${Libs}
+
+command :
+	pact ${BinDir}/sxcmts
 
 # extra commands needed when building TGTLib
 LibAction = build-ext

@@ -66,16 +66,15 @@ alias Note      'echo \!\!:2-$ >>& \!\!:1'
 alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
 alias Separator 'echo "--------------------------------------------------------------------------" >>& \!\!:1 ; echo "" >>& \!\!:1'
 alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
-alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
-alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
-alias SetParent 'echo "parent \!\!:1($\!\!:1)"'
 alias Intervene 'test -f ~/\!\!:1 && source ~/\!\!:1'
+alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
 
 # dbset sets a variable in the database and the current environment
 # use dbset instead of setenv
 # matches C call dbset
 # usage: dbset <var> <value>
 alias dbset     'setenv \!\!:1 "`perdb \!\!:1 = \!\!:2-$`"'
+alias dbset     'set t_ = ( `perdb \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
 # dbget imports a database variable into the current environment
 # use dbget before referencing the variable
@@ -83,6 +82,27 @@ alias dbset     'setenv \!\!:1 "`perdb \!\!:1 = \!\!:2-$`"'
 # usage: dbget <var>
 #        echo $<var>
 alias dbget     'setenv \!\!:1 "`perdb \!\!:1`"'
+
+# dbdef queries database for existence of a variable
+# matches C call dbdef
+# usage: dbdef <var>
+#        if ($status == 0) then
+#           echo "defined"
+#        else
+#           echo "undefined"
+alias dbdef     'perdb \!\!:1 \?'
+
+# dbini initializes <var> to <val> in the database iff <var>
+# does not already have a value
+# matches C call dbinitv
+# usage: dbini <var> <val>
+alias dbini     'set t_ = ( `perdb \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+
+alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
+#alias SafeEnv   'set t_ = ( `perdb \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias SetParent 'echo "parent \!\!:1($\!\!:1)"'
+#alias SetParent 'set t_ = ( `perdb \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+#alias SetParent 'perdb -l \!\!:1 = $\!\!:1'
 
 setenv MV     "mv -f"
 setenv RM     "rm -f"
