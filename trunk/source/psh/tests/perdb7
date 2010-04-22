@@ -19,7 +19,7 @@ alias dbini     'set t_ = ( `perdb $opt \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$
 
 set res = ( "defined" "undefined" )
 
-rm -f db7-*
+rm -f db7-* >& /dev/null
 
 setenv PERDB_PATH $db
 
