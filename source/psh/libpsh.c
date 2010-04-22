@@ -895,6 +895,18 @@ int cunsetenv(char *var)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CNOVAL - return a non-NULL, empty string which uniquely identifies
+ *        - a non-existent variable value
+ */
+
+char *cnoval(void)
+   {static char none[] = "";
+
+    return(none);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CGETENV - get the value of environment variable VAR
  *         - if LIT is TRUE return as is otherwise strip off
  *         - surrounding quotes
@@ -903,7 +915,6 @@ int cunsetenv(char *var)
 char *cgetenv(int lit, char *fmt, ...)
    {char var[MAXLINE];
     char *t;
-    static char none[] = "";
 
     VA_START(fmt);
     VSPRINTF(var, fmt);
@@ -911,7 +922,7 @@ char *cgetenv(int lit, char *fmt, ...)
 
     t = getenv(var);
     if ((t == NULL) || (strcmp(t, UNDEFINED) == 0))
-       t = none;
+       t = cnoval();
 
     else if (lit == FALSE)
        t = strip_quote(t);

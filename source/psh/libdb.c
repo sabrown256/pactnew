@@ -293,7 +293,7 @@ char *get_db(database *db, char *var)
     for (ps = s; TRUE; ps = NULL)
         {pm = strtok(ps, ".");
 
-/* we are at the end the val has the answer */
+/* we are at the end and val has the answer */
          if (pm == NULL)
 	    break;
 
@@ -680,7 +680,6 @@ int dbset(char *root, char *var, char *fmt, ...)
 char *dbget(char *root, int lit, char *fmt, ...)
    {char var[MAXLINE];
     char *t, **ta;
-    static char none[] = "";
 
     VA_START(fmt);
     VSPRINTF(var, fmt);
@@ -688,7 +687,7 @@ char *dbget(char *root, int lit, char *fmt, ...)
 
     ta = _db_clnt_ex(root, var);
     if (ta == NULL)
-       t = none;
+       t = cnoval();
 
     else
        {if (lit == FALSE)

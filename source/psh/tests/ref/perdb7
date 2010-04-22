@@ -1,0 +1,46 @@
+rm: No match.
+-----------------------------------
+v1 ? undefined
+v1 ? undefined
+v1 = abc
+v1 ? defined
+
+v1=abc
+dumped v1
+-----------------------------------
+v2 ? undefined
+v2 = abc
+v2 ? defined
+v2 = abc
+v2 ? defined
+
+v2=abc
+dumped v2
+-----------------------------------
+v3.m3 ? undefined
+v3.m3 ? undefined
+v3 = (m1 m2)
+v3.m3 ? defined
+v3.m3 ? defined
+v3 = (m1 m2)
+v3.m3 ? defined
+v3.m3 = (m1 m2)
+
+v3="(m1 m2)"
+dumped v3
+-----------------------------------
+v4.m7 ? undefined
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+v4 = (m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)
+
+v4="(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+dumped v4
+-----------------------------------
+done

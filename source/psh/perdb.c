@@ -91,9 +91,9 @@ char *srv_dump_db(char *fname, char *var)
 /* SERVER - run the server side of the database */
 
 int server(char *root, int init, int dmn)
-   {int ok, nb, to;
+   {int ok, nb, to, st;
     char s[MAXLINE], t[MAXLINE];
-    char *var, *val, *p;
+    char *var, *val, *nvl, *p;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
        {signal(SIGTERM, sigdone);
@@ -136,6 +136,19 @@ int server(char *root, int init, int dmn)
 			     key_val(NULL, &var, s+5, " \t\n");
 			     val = srv_dump_db(s+5, var);}
 
+/* variable def/init */
+			 else if (strchr(s, '?') != NULL)
+			    {key_val(&var, &nvl, s, "? \t\n");
+			     val = get_db(db, var);
+			     st  = (val != cnoval());
+			     if (nvl[0] == '\0')
+			        {if (st == TRUE)
+				    val = "defined{TRUE}";
+				 else
+				    val = "defined{FALSE}";}
+			     else if (st == FALSE)
+			        val = put_db(db, var, nvl);}
+
 /* variable set/get */
 			 else
 			    {key_val(&var, &val, s, "= \t\n");
@@ -174,12 +187,17 @@ int exchange(char *root, char *req)
 
     ta = _db_clnt_ex(root, req);
 
+    rv = (ta != NULL);
+
 /* print the reply */
     n = lst_length(ta);
     for (i = 0; i < n; i++)
-        printf("%s\n", ta[i]);
-
-    rv = (ta != NULL);
+        {if (strcmp(ta[i], "defined{TRUE}") == 0)
+	    rv = TRUE;
+	 else if (strcmp(ta[i], "defined{FALSE}") == 0)
+	    rv = FALSE;
+	 else
+	    printf("%s\n", ta[i]);};
 
     lst_free(ta);
 
