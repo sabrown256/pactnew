@@ -146,6 +146,35 @@ static state
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* ECHO - run echo command
+ *      - only exec shell if necessary
+ */
+
+static char *echo(int log, char *fmt, ...)
+   {char s[LRG];
+    char *rv;
+
+    VA_START(fmt);
+    VSPRINTF(s, fmt);
+    VA_END;
+
+/*
+    run(BOTH, "echo \"%s\"", s)
+    run(FALSE, "echo %s", val)
+    run(FALSE, "echo $%s", fvar)
+    run(FALSE, "echo %s | sed 's|%s||'", nval, val)
+*/
+
+    if (strpbrk(s, "$*|{}[]\"'") == NULL)
+       rv = s;
+    else
+       rv = run(BOTH, "echo %s", s);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PUSH_FILE - push S onto the file stack */
 
 static char *push_file(char *s, int itype)
@@ -176,7 +205,7 @@ static char *push_file(char *s, int itype)
 
     else if (itype == STACK_PROCESS)
        {if (strchr(s, '$') != NULL)
-	   strncpy(lfile, run(BOTH, "echo \"%s\"", s), MAXLINE);
+	   strncpy(lfile, echo(BOTH, "\"%s\"", s), MAXLINE);
 	else
 	   strncpy(lfile, s, MAXLINE);};
 
@@ -505,7 +534,7 @@ static void write_envf(int lnotice)
     note(fsh, TRUE, "");
 
     note(fdk, TRUE, "dk_alter MANPATH %s/man", st.dir.root);
-    note(fmd, TRUE, "prepend-path MANPATH %s/man;", run(FALSE, "echo %s", st.dir.root));
+    note(fmd, TRUE, "prepend-path MANPATH %s/man;", echo(FALSE, st.dir.root));
 
     {char lPython[MAXLINE];
 
@@ -529,7 +558,7 @@ static void write_envf(int lnotice)
     if (epath[0] != '\0')
        {FOREACH(u, epath, ":\n")
 	   note(fdk, TRUE, "dk_alter PATH %s", u);
-	   note(fmd, TRUE, "prepend-path PATH    %s;", run(FALSE, "echo %s", u));
+	   note(fmd, TRUE, "prepend-path PATH    %s;", echo(FALSE, u));
 	ENDFOR
         note(fcsh, TRUE, "setenv PATH    %s/bin:%s:$PATH", st.dir.root, epath);
         note(fsh, TRUE,  "export PATH=%s/bin:%s:$PATH", st.dir.root, epath);}
@@ -538,7 +567,7 @@ static void write_envf(int lnotice)
         note(fsh, TRUE, "export PATH=%s/bin:$PATH", st.dir.root);};
 
     note(fdk, TRUE, "dk_alter PATH    %s/bin", st.dir.root);
-    note(fmd, TRUE, "prepend-path PATH    %s/bin;", run(FALSE, "echo %s", st.dir.root));
+    note(fmd, TRUE, "prepend-path PATH    %s/bin;", echo(FALSE, st.dir.root));
     note(fdk, TRUE, "");
     note(fmd, TRUE, "");
 
@@ -1365,7 +1394,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* set variable */
     if (strcmp(oper, "=") == 0)
-       {t = run(FALSE, "echo %s", val);
+       {t = echo(FALSE, val);
         if ((t != NULL) && (*t != '\0'))
            {strncpy(nval, t, MAXLINE);
             if (rep == TRUE)
@@ -1387,10 +1416,10 @@ static void set_var(int rep, char *var, char *oper, char *val)
  * we want things such as "foo += $bar" to do nothing if
  * "$bar" is not defined
  */
-       {t = run(FALSE, "echo %s", val);
+       {t = echo(FALSE, val);
         if ((t != NULL) && (*t != '\0'))
            {strncpy(lval, t, MAXLINE);
-            strncpy(nval, run(FALSE, "echo $%s", fvar), MAXLINE);
+            strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
             note(Log, TRUE, "Change    |%s|", fvar);
             note(Log, TRUE, "Prepend   |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
@@ -1410,10 +1439,10 @@ static void set_var(int rep, char *var, char *oper, char *val)
  * we want things such as "foo =+ $bar" to do nothing if
  * "$bar" is not defined
  */
-       {t = run(FALSE, "echo %s", val);
+       {t = echo(FALSE, val);
         if ((t != NULL) && (*t != '\0'))
            {strncpy(lval, t, MAXLINE);
-            strncpy(nval, run(FALSE, "echo $%s", fvar), MAXLINE);
+            strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
             note(Log, TRUE, "Change    |%s|", fvar);
             note(Log, TRUE, "Append    |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
@@ -1428,12 +1457,13 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* remove literal item from variable */
     else if (strcmp(oper, "-=") == 0)
-       {strncpy(nval, run(FALSE, "echo $%s", fvar), MAXLINE);
+       {strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
         note(Log, TRUE, "Change    |%s|", fvar);
         note(Log, TRUE, "Remove    |%s|", val);
         note(Log, TRUE, "Old value |%s|", nval);
 
-        strncpy(nval, run(FALSE, "echo %s | sed 's|%s||'", nval, val), MAXLINE);
+/*        strncpy(nval, run(FALSE, "echo %s | sed 's|%s||'", nval, val), MAXLINE); */
+        strncpy(nval, echo(FALSE, "%s | sed 's|%s||'", nval, val), MAXLINE);
         note(Log, TRUE, "New value |%s|", nval);
 
         note(Log, TRUE, "Change expression |setenv %s %s|", fvar, nval);
@@ -1446,7 +1476,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
  * we want things such as "foo =? $bar" to do nothing if
  * "$bar" is not defined
  */
-       {t = run(FALSE, "echo %s", val);
+       {t = echo(FALSE, val);
         if ((t != NULL) && (*t != '\0'))
 	   dbset(NULL, fvar, t);
         else
@@ -1619,7 +1649,7 @@ static void read_config(char *cfg, int quiet)
 	     note(st.aux.SEF, TRUE, "%s %s", oper, value);
 	     if (strcmp(oper, "PATH") == 0)
                 push_path(APPEND, epath, value);
-	     s = run(FALSE, "echo %s", value);
+	     s = echo(FALSE, value);
 	     dbset(NULL, oper, s);}
 
 	 else if (strcmp(key, "parent") == 0)
@@ -1634,7 +1664,7 @@ static void read_config(char *cfg, int quiet)
 	     *s++ = '\0';
 	     if (strcmp(var, "PATH") == 0)
 	        {push_path(APPEND, epath, val);
-		 s = run(FALSE, "echo %s", val);
+		 s = echo(FALSE, val);
 		 dbset(NULL, var, s);}
 	     else
 	        dbset(NULL, var, val);

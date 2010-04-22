@@ -219,9 +219,14 @@ HAVE_SUBROUTINES
 
     Note $FOUT 'Library : pact {'
     Note $FOUT '  Archives = pgs ppc pdb pml score'
-    Note $FOUT '  LibPaths = '$proot/lib
     Note $FOUT '  IncPaths = '$proot/include
-    Note $FOUT '  LDFlags  = '$LD_Lib $LD_MDGLib
+
+# temporary expedient
+    Note $FOUT '  LibPaths = '$proot/lib $LibM_Path
+    Note $FOUT '  LDFlags  = '$LD_Lib $LD_MDGLib $LibM
+#    Note $FOUT '  LibPaths = '$proot/lib
+#    Note $FOUT '  LDFlags  = '$LD_Lib $LD_MDGLib
+
     Note $FOUT '  RPaths   = '$lrpath
 #    if ("$cmplib" != "") then
 #       Note $FOUT '  RPaths   = '${cmplib}:/usr/X11R6/${LIB}:/usr/${LIB}
@@ -237,10 +242,12 @@ HAVE_SUBROUTINES
 # MATH - generate MATH library configuration info
 
     if ("$LibM" != "") then
+       set libm = `echo $LibM | sed 's/-l//'`
+
        Note $FOUT '# MATH specifications'
        Note $FOUT ''
        Note $FOUT 'Library : lib_math {'
-       Note $FOUT '  Archives = '$LibM
+       Note $FOUT '  Archives = '$libm
        Note $FOUT '  LibPaths = '$LibM_Path
        Note $FOUT '  RPaths   = '$LibM_Path
        Note $FOUT '}'
