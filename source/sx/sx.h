@@ -691,6 +691,18 @@ extern PG_device
 
 /*--------------------------------------------------------------------------*/
 
+/* SXCMD.C declarations */
+
+extern void
+ SX_end(int val),
+ SX_init_view(void),
+ SX_init_mappings(void),
+ SX_init_env(void);
+
+extern int
+ SX_rd_scm(char *name),
+ SX_command(char *file, char *cmd);
+
 
 /* SXCONT.C declarations */
 
