@@ -325,8 +325,8 @@ static int write_class(FILE *out, char *clss, char *ctype,
 		       char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
     char cl[MAXLINE], fmt[MAXLINE];
-    char *c, *pc, *t, *var, *val, *dlm;
-    char **vars, **vals;
+    char *c, *pc, *t, *var, *val, *dlm, *entry;
+    char **vars, **vals, **sa;
 
     strncpy(cl, clss, MAXLINE);
     for (c = cl; c != NULL; c = pc)
@@ -347,10 +347,8 @@ static int write_class(FILE *out, char *clss, char *ctype,
 	     t   = run(BOTH, "env | egrep '^%s_' | sort", c);
 	     dlm = "\n";};
 
-	 n = 0;
-	 FOREACH(entry, t, dlm)
-	    n++;
-	 ENDFOR
+	 sa = tokenize(t, "\n\r");
+         for (n = 0; sa[n] != NULL; n++);
 
 	 if ((global == TRUE) && (n > 0))
 	    fprintf(out, "# Global variables\n");
@@ -358,38 +356,40 @@ static int write_class(FILE *out, char *clss, char *ctype,
 	 vars = MAKE_N(char *, n);
 	 vals = MAKE_N(char *, n);
 	 if ((vars != NULL) && (vals != NULL))
-	    {i  = 0;
-	     nc = 0;
-	     FOREACH(entry, t, dlm)
-	        if (global == TRUE)
-		   {var = entry;
-		    val = dbget(NULL, TRUE, var);}
-		else
-		   {var = entry + strlen(c) + 1;
-		    val = strchr(var, '=');
-		    if (val != NULL)
-		       *val++ = '\0';};
+	    {nc = 0;
+	     for (i = 0; i < n; i++)
+	         {entry = sa[i];
+		  if (entry[0] == '\0')
+		     continue;
+		  if (global == TRUE)
+		     {var = entry;
+		      val = dbget(NULL, TRUE, var);}
+		  else
+		     {var = entry + strlen(c) + 1;
+		      val = strchr(var, '=');
+		      if (val != NULL)
+			 *val++ = '\0';};
 
-	        ic = strlen(var);
-   	        nc = max(nc, ic);
+		  ic = strlen(var);
+		  nc = max(nc, ic);
 
-	        vars[i] = var;
-	        vals[i] = val;
-	        i++;
-	     ENDFOR
+		  vars[i] = var;
+		  vals[i] = val;};
 
 	     if (global == TRUE)
 	        snprintf(fmt, MAXLINE, "%%s%%-%ds = %%s\n", nc);
 	     else
 	        snprintf(fmt, MAXLINE, "%%s   %%-%ds = %%s\n", nc);
 	     for (i = 0; i < n; i++)
-	         fprintf(out, fmt, ind, vars[i], vals[i]);
+	         {if ((vars[i] != NULL) && (vals[i] != NULL))
+		     fprintf(out, fmt, ind, vars[i], vals[i]);};
 
 	     if (global == TRUE)
 	        fprintf(out, "\n");
 	     else
 	        fprintf(out, "}\n\n");};
 
+	 free_strings(sa);
 	 FREE(vars);
 	 FREE(vals);};
 
@@ -398,9 +398,9 @@ static int write_class(FILE *out, char *clss, char *ctype,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_DB - write a text representation of the configuration database */
+/* PCO_SAVE_DB - write a text representation of the configuration database */
 
-static int write_db(char *name, char *dbname)
+static int pco_save_db(char *name, char *dbname)
    {int rv;
     char t[MAXLINE];
     FILE *out;
@@ -413,6 +413,9 @@ static int write_db(char *name, char *dbname)
     rv = write_class(out, st.def_tools, "Tool", NULL, NULL, "");
     rv = write_class(out, st.def_groups, "Group", st.def_tools, "Tool", "");
 
+    if (name != NULL)
+       fclose(out);
+
 /* save PERDB */
     if (dbname == NULL)
        nstrncpy(t, MAXLINE, "save:", -1);
@@ -420,8 +423,28 @@ static int write_db(char *name, char *dbname)
        snprintf(t, MAXLINE, "save %s:", dbname);
     dbcmd(NULL, t);
 
-    if (name != NULL)
-       fclose(out);
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PCO_LOAD_DB - load the specified database */
+
+static int pco_load_db(char *dbname)
+   {int rv, ok;
+    char t[MAXLINE];
+
+    rv = TRUE;
+
+/* load PERDB */
+    if (dbname == NULL)
+       nstrncpy(t, MAXLINE, "load:", -1);
+    else
+       snprintf(t, MAXLINE, "load %s:", dbname);
+
+    ok = dbcmd(NULL, t);
+
+/* great the server has the database - we need it now */
 
     return(rv);}
 
@@ -1378,7 +1401,8 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* attach the current group suffix */
     if (strcmp(prfx, "Glb") == 0)
-       {snprintf(s, LRG, "%s %s", dbget(NULL, FALSE, "Globals"), var);
+       {t = dbget(NULL, TRUE, "Globals");
+	snprintf(s, LRG, "%s %s", t, var);
 	dbset(NULL, "Globals", unique(s, FALSE, ' '));
 	strncpy(fvar, var, MAXLINE);}
     else
@@ -1824,7 +1848,7 @@ static void summarize_config(void)
        printf("%s\n", run(BOTH, "analyze/summary"));
 
     snprintf(name, MAXLINE, "%s/config.db", st.dir.inc);
-    write_db(name, NULL);
+    pco_save_db(name, NULL);
 
     return;}
 
@@ -1887,16 +1911,23 @@ static void finish_config(char *base)
 /* LAUNCH_PERDB - look for -f arg and if found launch perdb first of all */
 
 int launch_perdb(int c, char **v)
-   {int i, ok, st;
+   {int i, l, n, ok, st;
+    char t[MAXLINE];
     char *db;
+    static char *sfx[] = { "db", "log", "pid" };
 
     ok = FALSE;
+    n  = sizeof(sfx)/sizeof(char *);
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-f") == 0)
 	    {db = v[++i];
 	     csetenv("PERDB_PATH", db);
-	     st = execute(FALSE, "rm %s.*", db);
+
+	     for (l = 0; l < n; l++)
+	         {snprintf(t, MAXLINE, "%s.%s", db, sfx[l]);
+		  unlink(t);};
+
 	     st = execute(FALSE, "perdb -f %s -l -c -s", db);
 	     ok = ((st & 0xff) == 0);
 	     break;};};
@@ -2071,9 +2102,11 @@ int main(int c, char **v)
 	read_config(st.cfgf, FALSE);
 
 	snprintf(name, MAXLINE, "%s/config.gen", st.dir.inc);
-	write_db(name, "inp");
+	pco_save_db(name, "inp");
 
-	noted(Log, "");};
+	noted(Log, "");}
+    else
+       pco_load_db("inp");
 
     check_dir();
 

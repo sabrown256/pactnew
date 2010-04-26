@@ -62,7 +62,7 @@ char *srv_save_db(char *fname, char *var)
 	fp = fopen(s, "w");
         if (fp == NULL)
 	   {snprintf(t, MAXLINE, "could not open %s - save %s",
-		     fname, strerror(errno));
+		     s, strerror(errno));
 	    return(t);};
         fname = path_tail(s);};
 	   
@@ -102,7 +102,7 @@ char *srv_load_db(char *fname, char *var)
 	fp = fopen(s, "r");
         if (fp == NULL)
 	   {snprintf(t, MAXLINE, "could not open %s - load %s",
-		     fname, strerror(errno));
+		     s, strerror(errno));
 	    return(t);};
         fname = path_tail(s);};
 	   

@@ -613,6 +613,9 @@ switch ($Cmnd)
               case -c:
                    set PArgs = ( $PArgs "-c" )
                    breaksw
+              case -db:
+                   set PArgs = ( $PArgs "-n" )
+                   breaksw
               case -f:
                    shift
                    set ConfigDir = ( $1 $ConfigDir )
