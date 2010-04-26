@@ -68,7 +68,7 @@ endif
 if ($too_strict == TRUE) then
    set List = (perdb1 perdb2 perdb3 perdb4)
 else
-   set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7)
+   set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7 perdb8)
 endif
 
 set lErr = 0

@@ -1,0 +1,21 @@
+-----------------------------------
+v1 = a
+v2 = b
+v3 = c
+
+saved database to db8-socket.db.dba
+-----------------------------------
+v2 = w
+v3 = x
+v4 = y
+v5 = z
+
+saved database to db8-socket.db.dbb
+-----------------------------------
+reset
+loaded database from db8-socket.db.dba
+v2 : |b|
+v3 : |c|
+v4 : ||
+-----------------------------------
+done

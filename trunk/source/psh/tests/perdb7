@@ -37,7 +37,7 @@ dbdef v1
 @ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
 
 echo ""
-perdb $opt dump: v1
+perdb $opt save: v1
 
 echo "-----------------------------------"
 
@@ -57,7 +57,7 @@ dbdef v2
 @ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
 
 echo ""
-perdb $opt dump: v2
+perdb $opt save: v2
 
 echo "-----------------------------------"
 
@@ -84,7 +84,7 @@ dbget v3.m3
 echo "v3.m3 = `printenv 'v3.m3'`"
 
 echo ""
-perdb $opt dump: v3
+perdb $opt save: v3
 
 echo "-----------------------------------"
 
@@ -119,7 +119,7 @@ dbget v4.m1
 echo "v4 = `printenv 'v4'`"
 
 echo ""
-perdb $opt dump: v4
+perdb $opt save: v4
 
 echo "-----------------------------------"
 

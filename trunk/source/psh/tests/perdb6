@@ -32,7 +32,7 @@ dbget v1.m3
 echo "v1.m3 = `printenv 'v1.m3'`"
 
 echo ""
-perdb $opt dump: v1
+perdb $opt save: v1
 
 echo "-----------------------------------"
 
@@ -52,7 +52,7 @@ dbget v2.m1
 echo "v2 = `printenv 'v2'`"
 
 echo ""
-perdb $opt dump: v2
+perdb $opt save: v2
 
 echo "-----------------------------------"
 
