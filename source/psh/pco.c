@@ -166,7 +166,7 @@ static char *echo(int log, char *fmt, ...)
 */
 
     if (strpbrk(s, "$*|{}[]\"'") == NULL)
-       rv = s;
+       rv = trim(s, BOTH, " \t\n");
     else
        rv = run(BOTH, "echo %s", s);
 
@@ -413,11 +413,11 @@ static int write_db(char *name, char *dbname)
     rv = write_class(out, st.def_tools, "Tool", NULL, NULL, "");
     rv = write_class(out, st.def_groups, "Group", st.def_tools, "Tool", "");
 
-/* dump PERDB */
+/* save PERDB */
     if (dbname == NULL)
-       nstrncpy(t, MAXLINE, "dump:", -1);
+       nstrncpy(t, MAXLINE, "save:", -1);
     else
-       snprintf(t, MAXLINE, "dump %s:", dbname);
+       snprintf(t, MAXLINE, "save %s:", dbname);
     dbcmd(NULL, t);
 
     if (name != NULL)

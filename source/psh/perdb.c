@@ -47,9 +47,9 @@ static void sigrestart(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SRV_DUMP_DB - dump the database */
+/* SRV_SAVE_DB - save the database */
 
-char *srv_dump_db(char *fname, char *var)
+char *srv_save_db(char *fname, char *var)
    {int ok;
     char s[MAXLINE];
     FILE *fp;
@@ -61,26 +61,66 @@ char *srv_dump_db(char *fname, char *var)
        {snprintf(s, MAXLINE, "%s.%s", db->file, fname);
 	fp = fopen(s, "w");
         if (fp == NULL)
-	   {snprintf(t, MAXLINE, "could not open %s - dump %s",
+	   {snprintf(t, MAXLINE, "could not open %s - save %s",
 		     fname, strerror(errno));
 	    return(t);};
         fname = path_tail(s);};
 	   
-    ok = dump_db(db, var, fp);
+    ok = save_db(db, var, fp);
 
     if (fname == NULL)
        {if (var == NULL)
-	   snprintf(t, MAXLINE, "dumped database");
+	   snprintf(t, MAXLINE, "saved database");
         else
-	   snprintf(t, MAXLINE, "dumped %s", var);}
+	   snprintf(t, MAXLINE, "saved %s", var);}
 
     else
        {fclose(fp);
 	if (var == NULL)
-	   snprintf(t, MAXLINE, "dumped database to %s",
+	   snprintf(t, MAXLINE, "saved database to %s",
 		    fname);
 	else
-	   snprintf(t, MAXLINE, "dumped %s to %s",
+	   snprintf(t, MAXLINE, "saved %s to %s",
+		    var, fname);};
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SRV_LOAD_DB - load the database */
+
+char *srv_load_db(char *fname, char *var)
+   {char s[MAXLINE];
+    FILE *fp;
+    static char t[MAXLINE];
+
+    if (fname == NULL)
+       fp = NULL;
+    else
+       {snprintf(s, MAXLINE, "%s.%s", db->file, fname);
+	fp = fopen(s, "r");
+        if (fp == NULL)
+	   {snprintf(t, MAXLINE, "could not open %s - load %s",
+		     fname, strerror(errno));
+	    return(t);};
+        fname = path_tail(s);};
+	   
+    load_db(db, var, fp);
+
+    if (fname == NULL)
+       {if (var == NULL)
+	   snprintf(t, MAXLINE, "loaded database");
+        else
+	   snprintf(t, MAXLINE, "loaded %s", var);}
+
+    else
+       {fclose(fp);
+	if (var == NULL)
+	   snprintf(t, MAXLINE, "loaded database from %s",
+		    fname);
+	else
+	   snprintf(t, MAXLINE, "loaded %s from %s",
 		    var, fname);};
 
     return(t);}
@@ -124,17 +164,32 @@ int server(char *root, int init, int dmn)
 			    {val = "done";
 			     ok  = FALSE;}
 
-/* dump to standard place */
-		         else if (strncmp(s, "dump:", 5) == 0)
-			    {key_val(NULL, &var, s, ": \t\n");
-			     val = srv_dump_db(NULL, var);}
+/* reset database */
+		         else if (strncmp(s, "reset:", 6) == 0)
+			    {reset_db(db);
+			     val = "reset";}
 
-/* dump to specified place */
-		         else if (strncmp(s, "dump ", 5) == 0)
+/* save to standard place */
+		         else if (strncmp(s, "save:", 5) == 0)
+			    {key_val(NULL, &var, s, ": \t\n");
+			     val = srv_save_db(NULL, var);}
+
+/* save to specified place */
+		         else if (strncmp(s, "save ", 5) == 0)
 			    {p = strchr(s+5, ':');
 			     *p++ = '\0';
 			     key_val(NULL, &var, s+5, " \t\n");
-			     val = srv_dump_db(s+5, var);}
+			     val = srv_save_db(s+5, var);}
+
+/* load from standard place */
+		         else if (strncmp(s, "load:", 5) == 0)
+			    val = srv_load_db(NULL, NULL);
+
+/* load from specified place */
+		         else if (strncmp(s, "load ", 5) == 0)
+			    {p = strchr(s+5, ':');
+			     *p++ = '\0';
+			     val = srv_load_db(s+5, NULL);}
 
 /* variable def/init */
 			 else if (strchr(s, '?') != NULL)

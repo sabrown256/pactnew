@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# PERDB4 - test dump command
+# PERDB4 - test save command
 #        - use environment variable specification of DB
 #        - no FIFO
 #
@@ -16,19 +16,19 @@ endif
 setenv PERDB_PATH $db
 
 echo "-----------------------------------"
-perdb $opt dump: v1
+perdb $opt save: v1
 
 echo "-----------------------------------"
-perdb $opt dump: v2
+perdb $opt save: v2
 
 echo "-----------------------------------"
-perdb $opt dump intera: v1
+perdb $opt save intera: v1
 
 echo "-----------------------------------"
-perdb $opt dump interb:
+perdb $opt save interb:
 
 echo "-----------------------------------"
-perdb $opt dump:
+perdb $opt save:
 
 echo "-----------------------------------"
 perdb $opt quit:

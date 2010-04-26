@@ -86,7 +86,7 @@ echo "v4.m2.m1 : |`printenv v4.m2.m1`|"
 
 foreach i (v1 v2 v3 v4)
    echo "-----------------------------------"
-   perdb $opt dump: $i
+   perdb $opt save: $i
 end
 
 echo "-----------------------------------"

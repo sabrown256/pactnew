@@ -180,6 +180,28 @@ char *name_pid(char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* RESET_DB - reset DB */
+
+void reset_db(database *db)
+   {int i, nv;
+    char **vars;
+
+    nv   = db->ne;
+    vars = db->entries;
+    for (i = 0; i < nv; i++)
+        {cunsetenv(vars[i]);
+	 FREE(vars[i]);
+	 vars[i] = NULL;};
+
+    db->ne = 0;
+
+    log_activity(db->flog, dbg_db, "SERVER", "reset");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PUT_DB - add VAR to DB */
 
 char *put_db(database *db, char *var, char *val)
@@ -337,9 +359,9 @@ char *get_db(database *db, char *var)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DUMP_DB - dump variable VAR to FP */
+/* SAVE_DB - save variable VAR to FP */
 
-int dump_db(database *db, char *var, FILE *fp)
+int save_db(database *db, char *var, FILE *fp)
    {int i, rv, nv;
     char s[LRG], t[LRG];
     char *vl, *vr, **vrs;
@@ -373,13 +395,14 @@ int dump_db(database *db, char *var, FILE *fp)
 
 /* LOAD_DB - load the DB into memory from FP */
 
-void load_db(database *db, FILE *fp)
+void load_db(database *db, char *vr, FILE *fp)
    {char s[LRG];
     char *var, *val;
 
     while (fgets(s, LRG, fp) != NULL)
        {key_val(&var, &val, s, "=\n");
-	val = put_db(db, var, val);};
+	if ((vr == NULL) || (strcmp(vr, var) == 0))
+	   val = put_db(db, var, val);};
 
     return;}
 
@@ -454,7 +477,7 @@ database *db_srv_load(char *root)
 
     fp = fopen(db->file, "r");
     if (fp != NULL)
-       {load_db(db, fp);
+       {load_db(db, NULL, fp);
 	fclose(fp);};
 
     log_activity(db->flog, dbg_db, "SERVER", "load %d |%s|", db->ne, db->file);
@@ -523,7 +546,7 @@ int db_srv_save(database *db)
     if (db != NULL)
        {fp = fopen(db->file, "w");
 	if (fp != NULL)
-	   {dump_db(db, NULL, fp);
+	   {save_db(db, NULL, fp);
 	    fclose(fp);
 	    rv = TRUE;};};
 
@@ -751,7 +774,7 @@ int dbcmp(char *root, char *var, char *val)
 /*--------------------------------------------------------------------------*/
 
 /* DBCMD - send a command to the database daemon
- *       - one of: quit, dump
+ *       - one of: quit, save, load, reset
  */
 
 int dbcmd(char *root, char *cmd)

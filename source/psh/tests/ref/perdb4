@@ -1,16 +1,16 @@
 -----------------------------------
 v1=1
-dumped v1
+saved v1
 -----------------------------------
 v2="baz blat"
-dumped v2
+saved v2
 -----------------------------------
-dumped database to db3-socket.db.intera
+saved database to db3-socket.db.intera
 -----------------------------------
-dumped database to db3-socket.db.interb
+saved database to db3-socket.db.interb
 -----------------------------------
 v1=1
 v2="baz blat"
-dumped 
+saved 
 -----------------------------------
 done

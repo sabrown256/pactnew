@@ -1,0 +1,71 @@
+#!/bin/csh -f
+#
+# PERDB8 - test reset and load
+#        - no FIFO
+#
+
+set opt = "-l"
+if ($#argv > 0) then
+   set opt = ( $opt -x $1 )
+   set db  = ./db8-$1
+else
+   set db  = ./db8-socket
+endif
+
+alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+
+rm -f db8-* >& /dev/null
+
+setenv PERDB_PATH $db
+
+echo "-----------------------------------"
+
+dbset v1 a
+echo "v1 = `printenv 'v1'`"
+
+dbset v2 b
+echo "v2 = `printenv 'v2'`"
+
+dbset v3 c
+echo "v3 = `printenv 'v3'`"
+
+echo ""
+perdb $opt save dba:
+
+echo "-----------------------------------"
+
+dbset v2 w
+echo "v2 = `printenv 'v2'`"
+
+dbset v3 x
+echo "v3 = `printenv 'v3'`"
+
+dbset v4 y
+echo "v4 = `printenv 'v4'`"
+
+dbset v5 z
+echo "v5 = `printenv 'v5'`"
+
+echo ""
+perdb $opt save dbb:
+
+echo "-----------------------------------"
+
+perdb $opt reset:
+perdb $opt load dba:
+
+dbget v2
+echo "v2 : |$v2|"
+
+dbget v3
+echo "v3 : |$v3|"
+
+dbget v4
+echo "v4 : |$v4|"
+
+echo "-----------------------------------"
+
+perdb $opt quit:
+
+exit($status)
