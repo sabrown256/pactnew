@@ -3,17 +3,17 @@ v1 = a
 v2 = b
 v3 = c
 
-saved database to db8-socket.db.dba
+saved database to db8-socket.dba.db
 -----------------------------------
 v2 = w
 v3 = x
 v4 = y
 v5 = z
 
-saved database to db8-socket.db.dbb
+saved database to db8-socket.dbb.db
 -----------------------------------
 reset
-loaded database from db8-socket.db.dba
+loaded database from db8-socket.dba.db
 v2 : |b|
 v3 : |c|
 v4 : ||
