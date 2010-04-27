@@ -400,28 +400,31 @@ static int write_class(FILE *out, char *clss, char *ctype,
 
 /* PCO_SAVE_DB - write a text representation of the configuration database */
 
-static int pco_save_db(char *name, char *dbname)
+static int pco_save_db(char *dbname)
    {int rv;
     char t[MAXLINE];
     FILE *out;
 
-    if (name != NULL)
-       out = open_file("w", name);
-    else
-       out = stdout;
+    dbset(NULL, "Tools",  st.def_tools);
+    dbset(NULL, "Groups", st.def_groups);
 
-    rv = write_class(out, st.def_tools, "Tool", NULL, NULL, "");
-    rv = write_class(out, st.def_groups, "Group", st.def_tools, "Tool", "");
-
-    if (name != NULL)
-       fclose(out);
-
-/* save PERDB */
+/* save the persistent database */
     if (dbname == NULL)
        nstrncpy(t, MAXLINE, "save:", -1);
     else
        snprintf(t, MAXLINE, "save %s:", dbname);
     dbcmd(NULL, t);
+
+    if (dbname != NULL)
+       snprintf(t, MAXLINE, "%s.%s.pl", cgetenv(FALSE, "PERDB_PATH"), dbname);
+    else
+       snprintf(t, MAXLINE, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
+    out = open_file("w", t);
+
+    rv = write_class(out, st.def_tools, "Tool", NULL, NULL, "");
+    rv = write_class(out, st.def_groups, "Group", st.def_tools, "Tool", "");
+
+    fclose(out);
 
     return(rv);}
 
@@ -431,20 +434,9 @@ static int pco_save_db(char *name, char *dbname)
 /* PCO_LOAD_DB - load the specified database */
 
 static int pco_load_db(char *dbname)
-   {int rv, ok;
-    char t[MAXLINE];
+   {int rv;
 
-    rv = TRUE;
-
-/* load PERDB */
-    if (dbname == NULL)
-       nstrncpy(t, MAXLINE, "load:", -1);
-    else
-       snprintf(t, MAXLINE, "load %s:", dbname);
-
-    ok = dbcmd(NULL, t);
-
-/* great the server has the database - we need it now */
+    rv = db_restore(NULL, dbname);
 
     return(rv);}
 
@@ -1842,13 +1834,12 @@ static void analyze_config(char *base)
 /* SUMMARIZE_CONFIG - make a summary report of the configuration */
 
 static void summarize_config(void)
-   {char name[MAXLINE];
+   {
 
     if (file_executable("analyze/summary") == TRUE)
        printf("%s\n", run(BOTH, "analyze/summary"));
 
-    snprintf(name, MAXLINE, "%s/config.db", st.dir.inc);
-    pco_save_db(name, NULL);
+    pco_save_db(NULL);
 
     return;}
 
@@ -1984,12 +1975,16 @@ static void help(void)
 
 int main(int c, char **v)
    {int i, append, havedb;
-    char base[MAXLINE], name[MAXLINE];
+    char base[MAXLINE];
     char *s;
 
     if (c == 0)
        {help();
 	return(1);};
+
+/* technically these are set by 'dsys config' */
+    cinitenv("DbgOpt", "-g");
+    cinitenv("PACTVer", "debug");
 
 /* locate the tools needed for subshells */
     build_path(NULL,
@@ -2101,8 +2096,7 @@ int main(int c, char **v)
 
 	read_config(st.cfgf, FALSE);
 
-	snprintf(name, MAXLINE, "%s/config.gen", st.dir.inc);
-	pco_save_db(name, "inp");
+	pco_save_db("inp");
 
 	noted(Log, "");}
     else

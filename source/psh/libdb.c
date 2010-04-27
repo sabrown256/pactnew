@@ -812,3 +812,52 @@ int dbinitv(char *root, char *var, char *fmt, ...)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* DB_RESTORE - have the server load the specified database
+ *            - and set all the variables in the environment
+ *            - of the current process
+ */
+
+int db_restore(char *root, char *db)
+   {int i, rv, ok;
+    char t[MAXLINE];
+    char **ta, *s, *vl;
+
+    rv = TRUE;
+
+/* load the database */
+    if (db == NULL)
+       nstrncpy(t, MAXLINE, "load:", -1);
+    else
+       snprintf(t, MAXLINE, "load %s:", db);
+
+    ok = dbcmd(NULL, t);
+
+/* the server has the database - now we need it
+ * GOTCHA: this can go when utilities using this are
+ * completely converted away from using the environment
+ */
+    ta = _db_clnt_ex(NULL, "save:");
+    for (i = 0; ta[i] != NULL; i++)
+        {s = ta[i];
+	 if (strncmp(s, "saved", 5) == 0)
+	    break;
+	 else
+#if 1
+	    {vl = strchr(s, '=');
+	     if (vl != NULL)
+	        {*vl++ = '\0';
+		 vl = subst(vl, "\"", "", -1);
+		 csetenv(s, vl);};};};
+    lst_free(ta);
+#else
+	    {s  = subst(s, "\"", "", -1);
+	     ok = putenv(s);
+	     note(Log, TRUE, "setenv %s", s);};};
+
+    FREE(ta);
+#endif
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

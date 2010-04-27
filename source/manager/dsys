@@ -1921,10 +1921,11 @@ CFG_DONE:
               case -h:
               case help:
                    echo ""
-                   echo "Usage: dsys reconfig [-i] [-h]"
+                   echo "Usage: dsys reconfig [-db] [-i] [-h]"
                    echo ""
-                   echo "   i - reconfigure installable (default is non-installable)"
-                   echo "   h - this help message"
+                   echo "   db    reconfigure from the database"
+                   echo "   i     reconfigure installable (default is non-installable)"
+                   echo "   h     this help message"
                    exit(1)
                    breaksw
               case -i:
