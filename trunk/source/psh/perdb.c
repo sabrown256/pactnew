@@ -55,12 +55,12 @@ char *srv_save_db(char *fname, char *var)
     FILE *fp;
     static char t[MAXLINE];
 
-    if (fname == NULL)
+    if ((fname == NULL) || (strcmp(fname, "stdout") == 0))
        fp = NULL;
     else
-       {snprintf(s, MAXLINE, "%s.%s", db->file, fname);
+       {snprintf(s, MAXLINE, "%s.%s.db", db->root, fname);
 	fp = fopen(s, "w");
-        if (fp == NULL)
+	if (fp == NULL)
 	   {snprintf(t, MAXLINE, "could not open %s - save %s",
 		     s, strerror(errno));
 	    return(t);};
@@ -68,6 +68,9 @@ char *srv_save_db(char *fname, char *var)
 	   
     ok = save_db(db, var, fp);
 
+    if (fp != NULL)
+       fclose(fp);
+	
     if (fname == NULL)
        {if (var == NULL)
 	   snprintf(t, MAXLINE, "saved database");
@@ -75,8 +78,7 @@ char *srv_save_db(char *fname, char *var)
 	   snprintf(t, MAXLINE, "saved %s", var);}
 
     else
-       {fclose(fp);
-	if (var == NULL)
+       {if (var == NULL)
 	   snprintf(t, MAXLINE, "saved database to %s",
 		    fname);
 	else
@@ -98,7 +100,7 @@ char *srv_load_db(char *fname, char *var)
     if (fname == NULL)
        fp = NULL;
     else
-       {snprintf(s, MAXLINE, "%s.%s", db->file, fname);
+       {snprintf(s, MAXLINE, "%s.%s.db", db->root, fname);
 	fp = fopen(s, "r");
         if (fp == NULL)
 	   {snprintf(t, MAXLINE, "could not open %s - load %s",
