@@ -48,12 +48,17 @@ EOF
    set lIncDirs = ( $lIncDirs /usr/local/hdf5/include /usr/local/include $RootInc )
    set lLibDirs = ( $lLibDirs /usr/local/hdf5/lib /usr/local/lib /usr/$LIB )
 
+   set Implicit = TRUE
    set lHdrs    = ( hdf5.h )
    set ASList   = ( so a )
    set lLib     = hdf5
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib $LibM $ZLib )
-   set Implicit = TRUE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib $LibM $ZLib )
 
    source $AnaDir/find-package
 
@@ -65,9 +70,9 @@ EOF
       endif
 
       setenv RPATH         ${RPATH}:${HDF_RPath}
+      setenv LD_RPath      ${LD_RPath}:${HDF_RPath}
       setenv Cfg_RPATH     ${Cfg_RPATH}:${HDF_RPath}
       setenv Cfg_LD_RPath  ${Cfg_LD_RPath}:${HDF_RPath}
-      setenv LD_RPath      ${LD_RPath}:${HDF_RPath}
       setenv LD_Lib        "$PckLib $LD_Lib"
       setenv HAVE_HDF5     TRUE
    else
@@ -82,11 +87,11 @@ EOF
 
 # export the results
    SetParent RPATH
+   SetParent LD_RPath
    SetParent Cfg_RPATH
+   SetParent Cfg_LD_RPath
    SetParent CC_Inc
    SetParent LD_Lib
-   SetParent LD_RPath
-   SetParent Cfg_LD_RPath
    SetParent HDFInc
    SetParent HDFLib
    SetParent HAVE_HDF5

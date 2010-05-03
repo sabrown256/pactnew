@@ -47,12 +47,17 @@ EOF
    set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
    set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
 
+   set Implicit = TRUE
    set lHdrs    = ( zlib.h )
    set ASList   = ( a so )
    set lLib     = z
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib $LibM )
-   set Implicit = TRUE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib $LibM )
 
    source $AnaDir/find-package
 
@@ -65,6 +70,10 @@ EOF
          setenv CC_Inc "$ltmp"
       endif
 
+      if ("$PckPath" != "") then
+         setenv RPATH         ${RPATH}:${PckPath}
+         setenv LD_RPath      ${LD_RPath}:${PckPath}
+      endif
       set ltmp = ( $PckLib $LD_Lib )
       setenv LD_Lib      "$ltmp"
       setenv HAVE_ZLIB   TRUE
@@ -76,6 +85,8 @@ EOF
    set ETime = `timer -b $UTime`
 
 # export the results
+   SetParent RPATH
+   SetParent LD_RPath
    SetParent HAVE_ZLIB
    SetParent Z_Path
    SetParent ZLib

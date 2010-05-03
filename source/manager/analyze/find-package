@@ -2,7 +2,8 @@
 # FIND-PACKAGE - see if the specified package exists
 #              - if so PckInc will point to the headers directory
 #              - and be in the form of a list of -I<dir> specification
-#              - also PckLib will contain a list of libraries found
+#              - PckLib will contain a list of libraries found
+#              - PckPath will contain a list of directories for libraries
 #              - Example:
 #
 #    set lIncDirs = ( $JPEG_Path/include $DAS_ROOT/include /usr/local/include $RootInc )
@@ -78,12 +79,14 @@ if ($Implicit == TRUE) then
       Note $ALog "Implicit -------------------------------"
       Note $ALog "   $i"
       if (-d "$i") then
-         flog $ALog set lLPath = "-L$i"
+         flog $ALog set PckPath = ( $i )
+         flog $ALog set lLPath  = "-L$i"
       else
-         flog $ALog set lLPath = ""
+         flog $ALog set PckPath = ""
+         flog $ALog set lLPath  = ""
       endif
-      flog $ALog set PckLib = ( $lLPath -l$lLib )
-      flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
+      flog $ALog set PckLib = ( -l$lLib )
+      flog $ALog $Cfe_CC_Exe $Opts $lLPath $PckLib $lALibs $Cfe_LD_Lib
       set xstatus = $status
       if ($xstatus == 0) then
          flog $ALog setenv LD_LIBRARY_PATH $i
@@ -109,7 +112,8 @@ endif
 Note $ALog ""
 Note $ALog "See if explicit library reference works"
 Note $ALog ""
-flog $ALog set PckLib = ""
+flog $ALog set PckPath = ""
+flog $ALog set PckLib  = ""
 foreach i ($lLibDirs)
    if ("$i" == "none") then
       break
@@ -123,8 +127,9 @@ foreach i ($lLibDirs)
       foreach a ( none $ASList )
          if ("$a" == none) then
             set LDir = "-L$i -l$lLib"
-            flog $ALog set PckLib = ( -L$i -l$lLib )
-            flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
+            flog $ALog set PckPath = ( $i )
+            flog $ALog set PckLib  = ( -l$lLib )
+            flog $ALog $Cfe_CC_Exe $Opts $LDir $lALibs $Cfe_LD_Lib
             set xstatus = $status
             if ($xstatus == 0) then
                flog $ALog eval $lFile
@@ -182,7 +187,8 @@ foreach i ($lLibDirs)
 end
 Note $ALog ""
 
-flog $ALog set PckLib = ""
+flog $ALog set PckPath = ""
+flog $ALog set PckLib  = ""
 
 GotIt:
 
