@@ -150,7 +150,9 @@ static void report_cl(char *q, anadep *state)
 	report("MDGInc", FALSE, TRUE, TRUE, state);}
 
     else if (strcmp(q, "-link") == 0)
-       {report("MDGLib", FALSE, TRUE, FALSE, state);
+       {report("LDRPath", FALSE, TRUE, FALSE, state);
+        report("LDPath", FALSE, TRUE, FALSE, state);
+	report("MDGLib", FALSE, TRUE, FALSE, state);
 	report("DPLib", FALSE, TRUE, FALSE, state);
 	report("MDLib", FALSE, TRUE, TRUE, state);};
 

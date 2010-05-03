@@ -92,12 +92,16 @@ EOF
    set lIncDirs = ( $lIncDirs /usr/X11R6/include $RootInc )
    set lLibDirs = ( $lLibDirs /usr/X11R6/$LIB /usr/X11R6/lib )
 
+   set Implicit = TRUE
    set lHdrs    = ( X11/Xlib.h )
    set ASList   = ( so a )
    set lLib     = X11
    set lFile    = $Tmp
-   set lALibs   = ""
-   set Implicit = TRUE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
 
    source $AnaDir/find-package
 
@@ -122,6 +126,10 @@ EOF
       endif
       unset lok
 
+      if ("$PckPath" != "") then
+         setenv RPATH         ${RPATH}:${PckPath}
+         setenv LD_RPath      ${LD_RPath}:${PckPath}
+      endif
       setenv LD_MDGLib   "$LD_MDGLib $PckLib"
       setenv Std_UseX    TRUE
    else
@@ -135,6 +143,8 @@ EOF
    setenv X11Inc "$PckInc"
 
 # export the results
+   SetParent RPATH
+   SetParent LD_RPath
    SetParent GraphicsDevices
    SetParent X11Lib
    SetParent X11Inc

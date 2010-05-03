@@ -35,8 +35,9 @@ char *expand(char *expr, int nc, char *varn)
 	        {snprintf(t, MAXLINE, "%d", getpid());
 		 val = t;}
 	     else if (var[1] == '{')
-	        {LAST_CHAR(var) = '\0';
-		 val = cgetenv(TRUE, var+2);}
+	        {nstrncpy(t, MAXLINE, var, -1);
+		 LAST_CHAR(t) = '\0';
+		 val = cgetenv(TRUE, t+2);}
 	     else if (var[1] == '?')
 		val = cdefenv(var+2) ? "1" : "0";
 	     else if ((var[1] == '@') && (varn != NULL))

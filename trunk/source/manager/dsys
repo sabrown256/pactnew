@@ -596,6 +596,9 @@ switch ($Cmnd)
         set Opt   = "$HelpCode:t  $argv"
         set PArgs = ""
 
+# save a copy of the args for the log
+        set nargs = ( $argv )
+
         while ($#argv > 0)
            switch ($1)
               case -a:
@@ -865,6 +868,7 @@ switch ($Cmnd)
 
         Note $Log "System = $System"
         Note $Log "Root   = $Root"
+        Note $Log "Args   = $nargs"
 
         flog $Log umask
 
@@ -916,6 +920,7 @@ switch ($Cmnd)
 
 # set path for PERDB - spawned by PCO
         flog $Log set dbopt = ( -f $IncDir/cfg )
+        flog $Log $RM $IncDir/cfg*
 
 	if (($Method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -l )
@@ -1984,7 +1989,7 @@ CFG_DONE:
         set IncFiles = ( $IncFiles env-mio )
         set IncFiles = ( $IncFiles package configured make-def make-macros Makefile )
         set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
-        set IncFiles = ( $IncFiles do-run-db cfg.db )
+        set IncFiles = ( $IncFiles do-run-db cfg.db cfg.pco cfg.pl )
 
         set ScmFiles = ( spokes.scm )
 

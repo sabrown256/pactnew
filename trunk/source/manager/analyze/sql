@@ -28,6 +28,7 @@ if ("$SQL_Path" == none) then
 else
 
    set incl = ""
+   set pthl = ""
    set libl = ""
    set spkl = ""
 
@@ -60,18 +61,26 @@ EOF
    set lIncDirs = ( $lIncDirs /usr/local/include $RootInc/mysql $RootInc )
    set lLibDirs = ( $lLibDirs /usr/local/lib /usr/lib/mysql /usr/$LIB )
 
+   set Implicit = FALSE
    set lHdrs    = ( mysql.h )
    set ASList   = ( a so )
    set lLib     = mysqlclient
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib $LibM -lz )
-   set Implicit = FALSE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib $LibM -lz )
 
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
+      endif
+      if ("$PckPath" != "") then
+         set pthl = ( $pthl $PckPath )
       endif
       set libl = ( $libl $PckLib )
       set spkl = ( $spkl mysql )
@@ -108,18 +117,26 @@ EOF
       set lIncDirs = ( /usr/local/include $RootInc )
       set lLibDirs = ( /usr/local/lib /usr/$LIB )
    endif
+   set Implicit = FALSE
    set lHdrs    = ( sqlite3.h )
    set ASList   = ( a so )
    set lLib     = sqlite3
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib )
-   set Implicit = FALSE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib )
 
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
+      endif
+      if ("$PckPath" != "") then
+         set pthl = ( $pthl $PckPath )
       endif
       set libl = ( $libl $PckLib )
       set spkl = ( $spkl sqlite )
@@ -171,6 +188,9 @@ EOF
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
+      if ("$PckPath" != "") then
+         set pthl = ( $pthl $PckPath )
+      endif
       set libl = ( $libl $PckLib )
 
       setenv HAVE_SQLITE_V2 TRUE
@@ -187,6 +207,10 @@ EOF
    setenv SQLLib "$libl"
    setenv SQLInc "$incl"
 
+   foreach p ($pthl)
+      setenv RPATH         ${RPATH}:$p
+      setenv LD_RPath      ${LD_RPath}:$p
+   end
    setenv CC_Inc  "$CC_Inc $SQLInc"
    setenv LD_Lib  "$LD_Lib $SQLLib"
 
@@ -198,6 +222,8 @@ EOF
    endif
 
 # export the results
+   SetParent RPATH
+   SetParent LD_RPath
    SetParent CC_Inc
    SetParent LD_Lib
    SetParent SQLInc

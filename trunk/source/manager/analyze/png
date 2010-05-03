@@ -52,15 +52,21 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/lib )
    end
-   set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
+   set lLibDirs = ( $lLibDirs `echo $RPATH | sed 's|:| |g'` )
    set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
+   set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
 
+   set Implicit = FALSE
    set lHdrs    = ( png.h )
    set ASList   = ( a so )
    set lLib     = png
    set lFile    = $Tmp
-   set lALibs   = ( $LD_Lib $LibM )
-   set Implicit = FALSE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib $LibM )
 
    source $AnaDir/find-package
 
@@ -71,6 +77,10 @@ EOF
          setenv CC_MDGInc "$CC_MDGInc $PckInc"
       endif
 
+      if ("$PckPath" != "") then
+         setenv RPATH         ${RPATH}:${PckPath}
+         setenv LD_RPath      ${LD_RPath}:${PckPath}
+      endif
       setenv LD_MDGLib    "$LD_MDGLib $PckLib"
       setenv HAVE_PNGLIB  TRUE
    else
@@ -84,6 +94,8 @@ EOF
    setenv PNGInc "$PckInc"
 
 # export the results
+   SetParent RPATH
+   SetParent LD_RPath
    SetParent PNGLib
    SetParent PNGInc
    SetParent CC_MDGInc

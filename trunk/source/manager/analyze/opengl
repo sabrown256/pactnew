@@ -47,14 +47,18 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+set Implicit = TRUE
 set lIncDirs = ( $RootInc /usr/X11R6/include )
 set lLibDirs = ( $lLibDirs /usr/lib64 /usr/lib /usr/openwin/lib /usr/X11R6/lib )
 set lHdrs    = ( GL/gl.h GL/glx.h )
 set ASList   = ( a so )
 set lLib     = GL
 set lFile    = $Tmp
-set lALibs   = ""
-set Implicit = TRUE
+
+set lALibs = ""
+foreach i ( `echo $RPATH | sed 's|:| |g'` )
+    set lALibs = ( $lALibs -L$i )
+end
 
 source $AnaDir/find-package
 

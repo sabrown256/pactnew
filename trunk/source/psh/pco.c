@@ -317,12 +317,13 @@ static void pop_struct(void)
 
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_CLASS - write a text representation of a class CLSS of type CTYPE
- *             - look for sub-class SUB of type STYPE
+/* WRITE_CLASS_PCO - write a PCO form text representation of
+ *                 - a class CLSS of type CTYPE
+ *                 - look for sub-class SUB of type STYPE
  */
 
-static int write_class(FILE *out, char *clss, char *ctype,
-		       char *sub, char *stype, char *ind)
+static int write_class_pco(FILE *out, char *clss, char *ctype,
+			   char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
     char cl[MAXLINE], fmt[MAXLINE];
     char *c, *pc, *t, *var, *val, *dlm, *entry;
@@ -340,21 +341,22 @@ static int write_class(FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t   = dbget(NULL, TRUE, "Globals");
-	     dlm = " ";}
+	    {t   = dbget(NULL, FALSE, "Globals");
+	     dlm = " ";
+	     sa  = tokenize(t, " \t\n\r");}
          else
 	    {fprintf(out, "%s%s %s {\n", ind, ctype, c);
 	     t   = run(BOTH, "env | egrep '^%s_' | sort", c);
-	     dlm = "\n";};
+	     dlm = "\n";
+	     sa  = tokenize(t, "\n\r");};
 
-	 sa = tokenize(t, "\n\r");
          for (n = 0; sa[n] != NULL; n++);
 
 	 if ((global == TRUE) && (n > 0))
 	    fprintf(out, "# Global variables\n");
 
-	 vars = MAKE_N(char *, n);
-	 vals = MAKE_N(char *, n);
+	 vars = MAKE_N(char *, n+1);
+	 vals = MAKE_N(char *, n+1);
 	 if ((vars != NULL) && (vals != NULL))
 	    {nc = 0;
 	     for (i = 0; i < n; i++)
@@ -374,12 +376,16 @@ static int write_class(FILE *out, char *clss, char *ctype,
 		  nc = max(nc, ic);
 
 		  vars[i] = var;
-		  vals[i] = val;};
+		  vals[i] = STRSAVE(val);};
+
+	     vars[n] = NULL;
+	     vals[n] = NULL;
 
 	     if (global == TRUE)
 	        snprintf(fmt, MAXLINE, "%%s%%-%ds = %%s\n", nc);
 	     else
 	        snprintf(fmt, MAXLINE, "%%s   %%-%ds = %%s\n", nc);
+
 	     for (i = 0; i < n; i++)
 	         {if ((vars[i] != NULL) && (vals[i] != NULL))
 		     fprintf(out, fmt, ind, vars[i], vals[i]);};
@@ -387,13 +393,159 @@ static int write_class(FILE *out, char *clss, char *ctype,
 	     if (global == TRUE)
 	        fprintf(out, "\n");
 	     else
-	        fprintf(out, "}\n\n");};
+	        fprintf(out, "}\n\n");
 
-	 free_strings(sa);
-	 FREE(vars);
-	 FREE(vals);};
+	     free_strings(vals);
+	     FREE(vars);};
+
+	 free_strings(sa);};
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_PCO - write the input form of the database
+ *           - to be read back in by pco
+ */
+
+static void write_pco(state *st, char *dbname)
+   {int rv;
+    char t[MAXLINE];
+    FILE *out;
+
+    if (dbname != NULL)
+       snprintf(t, MAXLINE, "%s.%s.pco", cgetenv(FALSE, "PERDB_PATH"), dbname);
+    else
+       snprintf(t, MAXLINE, "%s.pco", cgetenv(FALSE, "PERDB_PATH"));
+
+    out = open_file("w", t);
+
+    rv = write_class_pco(out, st->def_tools, "Tool", NULL, NULL, "");
+    rv = write_class_pco(out, st->def_groups, "Group", st->def_tools, "Tool", "");
+
+    fclose(out);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_CLASS_PERL - write a PERL form text representation of
+ *                  - a class CLSS of type CTYPE
+ *                  - look for sub-class SUB of type STYPE
+ */
+
+static int write_class_perl(FILE *out, char *clss, char *ctype,
+			    char *sub, char *stype, char *ind)
+   {int i, n, ic, nc, global;
+    char cl[MAXLINE], fmt[MAXLINE];
+    char *c, *pc, *t, *var, *val, *dlm, *entry;
+    char **vars, **vals, **sa;
+
+    strncpy(cl, clss, MAXLINE);
+    for (c = cl; c != NULL; c = pc)
+        {pc = strchr(c, ' ');
+         if (pc == NULL)
+            {if (c[0] == '\0')
+                break;}
+         else
+            *pc++ = '\0';
+
+	 global = (strcmp(c, "Glb") == 0);
+
+	 if (global == TRUE)
+	    {t   = dbget(NULL, FALSE, "Globals");
+	     dlm = " ";
+	     sa  = tokenize(t, " \t\n\r");}
+         else
+	    {fprintf(out, "%s'%s:%s_pact' => {\n", ind, ctype, c);
+	     t   = run(BOTH, "env | egrep '^%s_' | sort", c);
+	     dlm = "\n";
+	     sa  = tokenize(t, "\n\r");};
+
+         for (n = 0; sa[n] != NULL; n++);
+
+	 if ((global == TRUE) && (n > 0))
+	    fprintf(out, "# Global variables\n");
+
+	 vars = MAKE_N(char *, n+1);
+	 vals = MAKE_N(char *, n+1);
+	 if ((vars != NULL) && (vals != NULL))
+	    {nc = 0;
+	     for (i = 0; i < n; i++)
+	         {entry = sa[i];
+		  if (entry[0] == '\0')
+		     continue;
+		  if (global == TRUE)
+		     {var = entry;
+		      val = dbget(NULL, FALSE, var);}
+		  else
+		     {var = entry + strlen(c) + 1;
+		      val = strchr(var, '=');
+		      if (val != NULL)
+			 *val++ = '\0';};
+
+		  ic = strlen(var);
+		  nc = max(nc, ic);
+
+		  vars[i] = var;
+		  vals[i] = STRSAVE(val);};
+
+	     vars[n] = NULL;
+	     vals[n] = NULL;
+
+	     if (global == TRUE)
+	        snprintf(fmt, MAXLINE, "%%s%%-%ds => '%%s',\n", nc);
+	     else
+	        snprintf(fmt, MAXLINE, "%%s   %%-%ds => '%%s',\n", nc);
+
+	     for (i = 0; i < n; i++)
+	         {if ((vars[i] != NULL) && (vals[i] != NULL))
+		     fprintf(out, fmt, ind, vars[i], vals[i]);};
+
+	     if (global == TRUE)
+	        fprintf(out, "\n");
+	     else
+	        fprintf(out, "%s},\n\n", ind);
+
+	     free_strings(vals);
+	     FREE(vars);};
+
+	 free_strings(sa);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_PERL - write the input form of the database
+ *            - to be read by mio
+ */
+
+static void write_perl(state *st, char *dbname)
+   {int rv;
+    char t[MAXLINE];
+    FILE *out;
+
+    if (dbname != NULL)
+       snprintf(t, MAXLINE, "%s.%s.pl", cgetenv(FALSE, "PERDB_PATH"), dbname);
+    else
+       snprintf(t, MAXLINE, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
+    out = open_file("w", t);
+
+    fprintf(out, "{\n");
+
+    rv = write_class_perl(out, st->def_tools, "Tool",
+			  NULL, NULL, "   ");
+    rv = write_class_perl(out, st->def_groups, "Group",
+			  st->def_tools, "Tool", "   ");
+
+    fprintf(out, "}\n");
+
+    fclose(out);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -403,7 +555,6 @@ static int write_class(FILE *out, char *clss, char *ctype,
 static int pco_save_db(char *dbname)
    {int rv;
     char t[MAXLINE];
-    FILE *out;
 
     dbset(NULL, "Tools",  st.def_tools);
     dbset(NULL, "Groups", st.def_groups);
@@ -415,16 +566,11 @@ static int pco_save_db(char *dbname)
        snprintf(t, MAXLINE, "save %s:", dbname);
     dbcmd(NULL, t);
 
-    if (dbname != NULL)
-       snprintf(t, MAXLINE, "%s.%s.pl", cgetenv(FALSE, "PERDB_PATH"), dbname);
-    else
-       snprintf(t, MAXLINE, "%s.pl", cgetenv(FALSE, "PERDB_PATH"));
-    out = open_file("w", t);
+/* write the input form of the database - to be read back in by pco */
+    write_pco(&st, dbname);
 
-    rv = write_class(out, st.def_tools, "Tool", NULL, NULL, "");
-    rv = write_class(out, st.def_groups, "Group", st.def_tools, "Tool", "");
-
-    fclose(out);
+/* write the perl form of the database - to be read back in by mio */
+    write_perl(&st, dbname);
 
     return(rv);}
 
@@ -1393,7 +1539,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* attach the current group suffix */
     if (strcmp(prfx, "Glb") == 0)
-       {t = dbget(NULL, TRUE, "Globals");
+       {t = dbget(NULL, FALSE, "Globals");
 	snprintf(s, LRG, "%s %s", t, var);
 	dbset(NULL, "Globals", unique(s, FALSE, ' '));
 	strncpy(fvar, var, MAXLINE);}

@@ -51,12 +51,16 @@ EOF
    set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
    set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
 
+   set Implicit = FALSE
    set lHdrs    = ( jpeglib.h jconfig.h jmorecfg.h jerror.h )
    set ASList   = ( a so )
    set lLib     = jpeg
    set lFile    = $Tmp
-   set lALibs   = ""
-   set Implicit = FALSE
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
 
    source $AnaDir/find-package
 
@@ -67,6 +71,10 @@ EOF
          setenv CC_MDGInc "$CC_MDGInc $PckInc"
       endif
 
+      if ("$PckPath" != "") then
+         setenv RPATH         ${RPATH}:${PckPath}
+         setenv LD_RPath      ${LD_RPath}:${PckPath}
+      endif
       setenv LD_MDGLib      "$LD_MDGLib $PckLib"
       setenv HAVE_JPEGLIB   TRUE
    else
@@ -80,6 +88,8 @@ EOF
    setenv JPEGInc "$PckInc"
 
 # export the results
+   SetParent RPATH
+   SetParent LD_RPath
    SetParent JPEGInc
    SetParent JPEGLib
    SetParent CC_MDGInc
