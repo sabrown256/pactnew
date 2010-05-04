@@ -35,8 +35,8 @@ SafeEnv CC_Debug     "-g"
 SafeEnv CC_Optimize  "-O"
 SafeEnv CC_Shared    ""
 SafeEnv CC_Inc       ""
-SafeEnv CC_MDGInc    ""
-SafeEnv CC_DPInc     ""
+SafeEnv MDG_Inc      ""
+SafeEnv DP_Inc       ""
 
 set UTime = `timer -r`
 
@@ -122,8 +122,7 @@ Note $ALog ""
 
 if ("$Cfg_CC_Inc" != "") then
    Note $ALog "Add config include flags to CC_Flags: $Cfg_CC_Inc"
-   set inf = ($CC_Flags $Cfg_CC_Inc)
-   flog $ALog setenv CC_Flags "$inf"
+   flog $ALog setenv CC_Flags "$CC_Flags $Cfg_CC_Inc"
    Note $ALog ""
 endif
 
@@ -132,38 +131,32 @@ SafeEnv Cfg_CC_Flags "$CC_Flags"
 # temporarily add debug flags to compiler flags for config
 if ($?Cfg_CC_Debug == 1) then
    Note $ALog "Add config debug flags to CC_Flags: $CC_Debug"
-   set inf = ($CC_Flags $CC_Debug)
-   flog $ALog setenv CC_Flags "$inf"
-   set inf = ($Cfg_CC_Flags $Cfg_CC_Debug)
-   flog $ALog setenv Cfg_CC_Flags "$inf"
+   flog $ALog setenv CC_Flags "$CC_Flags $CC_Debug"
+   flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $Cfg_CC_Debug"
    Note $ALog ""
 endif
 
 # temporarily add link flags to compiler flags for config
 if ($?Cfg_LD_Flags == 1) then
    Note $ALog "Add config link flags to CC_Flags: $Cfg_LD_Flags"
-   set inf = ($CC_Flags $Cfg_LD_Flags)
-   flog $ALog setenv CC_Flags "$inf"
-   set inf = ($Cfg_CC_Flags $Cfg_LD_Flags)
-   flog $ALog setenv Cfg_CC_Flags "$inf"
+   flog $ALog setenv CC_Flags "$CC_Flags $Cfg_LD_Flags"
+   flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $Cfg_LD_Flags"
    Note $ALog ""
 endif
 
 # temporarily add rpath to compiler flags for config
-if ($?Cfg_LD_RPath == 1) then
-   Note $ALog "Add config rpath flags to CC_Flags: $Cfg_LD_RPath"
-   set inf = ($CC_Flags $Cfg_LD_RPath)
-   flog $ALog setenv CC_Flags "$inf"
-   set inf = ($Cfg_CC_Flags $Cfg_LD_RPath)
-   flog $ALog setenv Cfg_CC_Flags "$inf"
+if ($?Cfg_RPATH == 1) then
+   set lrpath = `../analyze/rpath -o rpath`
+   Note $ALog "Add config rpath flags to CC_Flags: $lrpath"
+   flog $ALog setenv CC_Flags "$CC_Flags $lrpath"
+   flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $lrpath"
    Note $ALog ""
 endif
 
 # temporarily add link libraries to compiler flags for config
 if ($?Cfg_LD_Lib == 1) then
    Note $ALog "Add config link libs to CC_Flags: $Cfg_LD_Lib"
-   set inf = ($CC_Flags $Cfg_LD_Lib)
-   flog $ALog setenv CC_Flags "$inf"
+   flog $ALog setenv CC_Flags "$CC_Flags $Cfg_LD_Lib"
    Note $ALog ""
 endif
 
@@ -364,9 +357,9 @@ SetParent CC_Debug
 SetParent CC_Optimize
 SetParent CC_Shared
 SetParent CC_Inc
-SetParent CC_MDGInc
-SetParent CC_DPInc
 SetParent CC_Linker
+SetParent MDG_Inc
+SetParent DP_Inc
 
 SetParent Cfg_CC_Exe
 SetParent Cfg_CC_Flags

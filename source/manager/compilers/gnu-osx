@@ -44,7 +44,6 @@ Tool LD {
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
 	        on    = -lgcov ]
    Lib      = -lc
-   MDGLib   = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
 Tool Lex {
@@ -64,6 +63,10 @@ Group Std {
 Group Cfg {
    Use    = Std
    CC_Exe = gcc
+}
+
+Group MDG {
+   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
 Group OpenMP {

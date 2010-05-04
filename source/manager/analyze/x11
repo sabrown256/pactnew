@@ -14,33 +14,36 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: x11"
 
+SafeEnv AnaDir           analyze
+SafeEnv ALog             $cwd/log.analyze
 SafeEnv HostOS           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 SafeEnv Cfe_CC_Exe       "cc"
 SafeEnv Cfe_CC_Flags     "-g"
 SafeEnv Cfe_LD_Flags     ""
-SafeEnv Cfe_LD_Lib       ""
-SafeEnv CC_MDGInc        ""
-SafeEnv LD_MDGLib        ""
-SafeEnv AnaDir           analyze
-SafeEnv ALog             $cwd/log.analyze
-SafeEnv Std_UseX         TRUE
+
+SafeEnv MDG_Inc          ""
+SafeEnv MDG_Lib          ""
+SafeEnv MDG_Pck          ""
 SafeEnv X11_Path         /usr
+SafeEnv X11_RPath        /usr/lib
+SafeEnv X11_Inc          ""
+SafeEnv X11_Lib          ""
+SafeEnv Std_UseX         TRUE
 
 # if we have explicitly said we do not want X11
 # do NOT detect it
 if ("$X11_Path" == none) then
    NoteD $ALog "      no X11 (by request)"
    setenv Std_UseX FALSE
-   SetParent Std_UseX
 
 else if ($Std_UseX == TRUE) then
 
    set UTime = `timer -r`
 
    set lLibDirs = ""
-   foreach i ($LD_MDGLib)
+   foreach i ($MDG_Lib)
       set j = $i:h
       if (-d $j) then
          set lLibDirs = ( $lLibDirs $j )
@@ -121,16 +124,15 @@ EOF
       endif
 
       if ($lok == TRUE) then
-         set lmdginc = ( $CC_MDGInc $PckInc )
-         setenv CC_MDGInc "$lmdginc"
+         setenv MDG_Inc "$MDG_Inc $PckInc"
       endif
       unset lok
 
       if ("$PckPath" != "") then
-         setenv RPATH         ${RPATH}:${PckPath}
-         setenv LD_RPath      ${LD_RPath}:${PckPath}
+         setenv RPATH    ${RPATH}:${PckPath}
       endif
-      setenv LD_MDGLib   "$LD_MDGLib $PckLib"
+      setenv MDG_Lib     "$MDG_Lib $PckLib"
+      setenv MDG_Pck     "$MDG_Pck X11"
       setenv Std_UseX    TRUE
    else
       NoteD $ALog "      no X11"
@@ -139,20 +141,24 @@ EOF
 
    set ETime = `timer -b $UTime`
 
-   setenv X11Lib "$PckLib"
-   setenv X11Inc "$PckInc"
+   setenv X11_RPath "$PckPath"
+   setenv X11_Lib   "$PckLib"
+   setenv X11_Inc   "$PckInc"
 
 # export the results
    SetParent RPATH
-   SetParent LD_RPath
+   SetParent MDG_Inc
+   SetParent MDG_Lib
+   SetParent MDG_Pck
+   SetParent X11_Path
+   SetParent X11_RPath
+   SetParent X11_Lib
+   SetParent X11_Inc
    SetParent GraphicsDevices
-   SetParent X11Lib
-   SetParent X11Inc
-   SetParent Std_UseX
-   SetParent CC_MDGInc
-   SetParent LD_MDGLib
 
 endif
+
+SetParent Std_UseX
 
 exit(0)
 

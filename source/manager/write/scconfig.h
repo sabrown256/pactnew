@@ -239,7 +239,7 @@ source $ldir/env-csh
        Note $STDOUT "#define HAVE_OPENMPI"
     endif
 
-    if (("$LD_DPLib" != "") || ("$CC_DPInc" != "")) then
+    if (("$DP_Lib" != "") || ("$DP_Inc" != "")) then
        Note $STDOUT "#define HAVE_MPI"
        if ($MPIGoodIO == FALSE) then
           Note $STDOUT "#define HAVE_BAD_MPI_IO"

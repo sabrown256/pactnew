@@ -15,7 +15,13 @@ Separator $Log
 Note $Log "Analyze: jpeg"
 
 # vanilla place to look if previously undefined
+SafeEnv MDG_Inc       ""
+SafeEnv MDG_Lib       ""
+SafeEnv MDG_Pck       ""
 SafeEnv JPEG_Path     /usr
+SafeEnv JPEG_RPath    /usr/lib
+SafeEnv JPEG_Inc      ""
+SafeEnv JPEG_Lib      ""
 SafeEnv HAVE_JPEGLIB  FALSE
 
 # if we have explicitly said we do not want JPEG
@@ -68,32 +74,35 @@ EOF
       NoteD $ALog "      has JPEG ($PckLib)"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv CC_MDGInc "$CC_MDGInc $PckInc"
+         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
       endif
 
       if ("$PckPath" != "") then
-         setenv RPATH         ${RPATH}:${PckPath}
-         setenv LD_RPath      ${LD_RPath}:${PckPath}
+         flog $ALog setenv RPATH       ${RPATH}:${PckPath}
       endif
-      setenv LD_MDGLib      "$LD_MDGLib $PckLib"
-      setenv HAVE_JPEGLIB   TRUE
+      flog $ALog setenv MDG_Lib        "$MDG_Lib $PckLib"
+      flog $ALog setenv MDG_Pck        "$MDG_Pck JPEG"
+      flog $ALog setenv HAVE_JPEGLIB   TRUE
    else
       NoteD $ALog "      no JPEG"
-      setenv HAVE_JPEGLIB FALSE
+      flog $ALog setenv HAVE_JPEGLIB FALSE
    endif
 
    set ETime = `timer -b $UTime`
 
-   setenv JPEGLib "$PckLib"
-   setenv JPEGInc "$PckInc"
+   setenv JPEG_RPath "$PckPath"
+   setenv JPEG_Lib   "$PckLib"
+   setenv JPEG_Inc   "$PckInc"
 
 # export the results
    SetParent RPATH
-   SetParent LD_RPath
-   SetParent JPEGInc
-   SetParent JPEGLib
-   SetParent CC_MDGInc
-   SetParent LD_MDGLib
+   SetParent MDG_Inc
+   SetParent MDG_Lib
+   SetParent MDG_Pck
+   SetParent JPEG_Path
+   SetParent JPEG_RPath
+   SetParent JPEG_Lib
+   SetParent JPEG_Inc
 
 endif
 

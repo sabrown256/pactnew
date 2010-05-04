@@ -41,7 +41,6 @@ Tool LD {
    RPath = -bsvr4 -bnoexpfull -R @
    Flags = [ _env_ = Bits ;                  # address bit size
              *     = -b* ]
-   DPLib = -binitfini:poe_remote_main
 }
 
 Tool Lex {
@@ -60,6 +59,10 @@ Group Cfg {
    Use      = CC
    Use      = FC
    LD_Flags = ${LD_Flags}
+}
+
+Group DP {
+   Lib = -binitfini:poe_remote_main
 }
 
 Group Shared {

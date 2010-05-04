@@ -16,6 +16,8 @@ set Which = "$cwd/pwhich"
 source ../dev/$Arch/include/env-pact.csh
 source ../dev/$Arch/include/env-csh
 
+SafeEnv CROSS_COMPILE FALSE
+
 if ($CROSS_COMPILE == FALSE) then
    set CFE = ""
 else
@@ -24,10 +26,12 @@ endif
 
 InitLog Log $cwd:h/dev/$Arch/log/itf90
 
-set FC     = `pact +l -info FCompiler`
-set IncDir = $cwd:h/dev/$Arch/include
-set SzAddr = `$CFE detect | grep "A pointer is"`
-set SzAddr = $SzAddr[4]
+set FC      = `pact +l -info FCompiler`
+set BaseDir = $cwd:h/dev/$Arch
+set IncDir  = $BaseDir/include
+set LibDir  = $BaseDir/lib
+set SzAddr  = `$CFE detect | grep "A pointer is"`
+set SzAddr  = $SzAddr[4]
 
 if ("$FC" == "") then
    NoteD $Log "No Fortran compiler specified - exiting"
@@ -40,11 +44,16 @@ if (!(-x "$FCExe")) then
    exit(2)
 endif
 
+set AR    = `pact +l -info AR`
+set AROpt = `pact +l -info AROpt`
+
 NoteD $Log ""
 NoteD $Log "Generating F90 interfaces using:"
 NoteD $Log "   Compiler:  $FCExe"
 NoteD $Log "   Includes:  $IncDir"
 NoteD $Log "   Addr size: $SzAddr"
+NoteD $Log "   AR:        $AR"
+NoteD $Log "   AROpt:     $AROpt"
 NoteD $Log ""
 
 #--------------------------------------------------------------------------
@@ -269,7 +278,12 @@ foreach d ($Dirs)
    flog $Log $FC -c $lMod
    set xstatus = $status
 
+   flog $Log ls $d*
    flog $Log mv $d*.mod $IncDir
+   flog $Log set TGTLib = $LibDir/lib${d}.a
+   if (-f $TGTLib) then
+      flog $Log $AR $AROpt $TGTLib $d*.o
+   endif
    flog $Log $RM $d*.o
    flog $Log popd
 

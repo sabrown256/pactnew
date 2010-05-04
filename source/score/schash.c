@@ -720,15 +720,15 @@ void *SC_hash_lookup(HASHTAB *tab, void *key)
 
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASH_SIZE - Return the number of elements in the hash table */
+/* SC_HASH_SIZE - return the number of elements in the hash table */
 
 int SC_hash_size(HASHTAB *tab)
    {int size;
 
     if (tab == NULL)
-       {size = -1;}
+       size = -1;
     else
-       {size = tab->nelements;}
+       size = tab->nelements;
 
     return(size);}
 
@@ -738,22 +738,22 @@ int SC_hash_size(HASHTAB *tab)
 
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASH_BUCKET_COUNT - Return the number of buckets in the hash table */
+/* SC_HASH_BUCKET_COUNT - return the number of buckets in the hash table */
 
 int SC_hash_bucket_count(HASHTAB *tab)
    {int buckets;
 
     if (tab == NULL)
-       {buckets = -1;}
+       buckets = -1;
     else 
-       {buckets = tab->size;}
+       buckets = tab->size;
 
     return(buckets);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASH_HASH_RESIZE - Resize so that we use BUCKETS worth of buckets */
+/* SC_HASH_HASH_RESIZE - resize so that we use BUCKETS worth of buckets */
 
 void SC_hash_resize(HASHTAB *tab, int buckets)
    {HASHTAB *temp;
@@ -775,8 +775,7 @@ void SC_hash_resize(HASHTAB *tab, int buckets)
 /* put all of the hashels into a temp hash table */ 
             iter = SC_hashiter_alloc(tab);
         
-            do
-               {SC_hash_ins(temp, iter);}
+            do {SC_hash_ins(temp, iter);}
             while (SC_hashiter_inc(iter) == 0);
         
             SC_hashiter_free(iter);

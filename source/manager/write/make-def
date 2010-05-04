@@ -32,21 +32,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Separator $Log
     NoteD $Log "   Site Dependent MAKE Configuration - make-def"
 
-# add each groups DPInc to its Inc
-    Note $Log "Merging DPInc into Inc group by group"
-    foreach g ($DefGroups)
-       DEFD_VAR ${g}_DPInc
-       if ("$ok" != "") then
-          VAR_VALUE ${g} DPInc
-          set Dpinc = "$value"
-          VAR_VALUE ${g} Inc
-          set Mdepinc = "$value"
-          set t = ( $Mdepinc $Dpinc )
-	  RESET_VAR ${g} Inc "$t"
-          Note $Log "${g}_Inc => $t"
-       endif
-    end
-    Note $Log "Merging done"
+# add DP_Inc to CC_Inc
+    flog $Log setenv CC_Inc  "$CC_Inc $DP_Inc"
 
     set STDOUT = $IncDir/make-def
 
@@ -143,8 +130,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "# Site Dependent Graphics Information"
     Note $STDOUT "#"
     Note $STDOUT "GraphicsFlag    = $GraphicsFlag"
-    Note $STDOUT "MDGInc          = $CC_MDGInc"
-    Note $STDOUT "MDGLib          = $LD_MDGLib"
+    Note $STDOUT "MDGInc          = $MDG_Inc"
+    Note $STDOUT "MDGLib          = $MDG_Lib"
 
     Note $STDOUT -n "GraphicsDevices ="
     foreach dev ($GraphicsDevices)
@@ -219,7 +206,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT "# tool CC"
-    foreach v (Exe Flags Debug Optimize Shared Inc MDGInc DPInc)
+    foreach v (Exe Flags Debug Optimize Shared Inc)
        DEFD_VAR CC_${v}
        if ("$ok" == "") then
           Note $STDOUT "CC_${v} = `printenv ${v}`"
@@ -243,7 +230,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT "# tool LD"
-    foreach v (Exe Flags Shared Lib MDGLib DPLib)
+    foreach v (Exe Flags Shared Lib)
        DEFD_VAR LD_${v}
        if ("$ok" == "") then
           Note $STDOUT "LD_${v} = `printenv ${v}`"
@@ -399,23 +386,16 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $Log "analyze/rpath -o link => |$npath|"
     Note $STDOUT "LDPath     = $npath"
 
-    set lrpath = ""
-    set npath  = `analyze/rpath -o echo`
-    Note $Log "analyze/rpath -o echo => |$npath|"
-    Note $STDOUT -n "LDRPath    = "
-    if ("$npath" != "") then
-       if ($?LD_RPath == 1) then
-          set lrpath = ( `echo "$LD_RPath" | sed 's|\@|'$npath'|'` )
-       endif
-    endif
-    Note $STDOUT "$lrpath"
+    set lrpath  = `analyze/rpath -o rpath`
+    Note $Log "analyze/rpath -o rpath => |$npath|"
+    Note $STDOUT "LDRPath    = $lrpath"
 
     Note $STDOUT "LDFLAGS    = ${LD_Flags}"' ${LDRPath} ${LDPath}'
     Note $STDOUT "LXFLAGS    = ${Lex_Flags}"
-    Note $STDOUT "MDInc      = ${CC_Inc} ${CC_DPInc}"
-    Note $STDOUT "MDLib      = ${LibM} ${LD_Lib}"
-    Note $STDOUT "DPInc      = ${CC_DPInc}"
-    Note $STDOUT "DPLib      = ${LD_DPLib}"
+    Note $STDOUT "MDInc      = ${MD_Inc} ${CC_Inc}"
+    Note $STDOUT "MDLib      = ${MD_Lib} ${LD_Lib} ${LibM}"
+    Note $STDOUT "DPInc      = ${DP_Inc}"
+    Note $STDOUT "DPLib      = ${DP_Lib}"
     Note $STDOUT ""
 
     Note $STDOUT "AR         = ${AR_Exe}"

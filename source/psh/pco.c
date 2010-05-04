@@ -556,6 +556,8 @@ static int pco_save_db(char *dbname)
    {int rv;
     char t[MAXLINE];
 
+    rv = TRUE;
+
     dbset(NULL, "Tools",  st.def_tools);
     dbset(NULL, "Groups", st.def_groups);
 
@@ -602,10 +604,10 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
     nstrncpy(s, LRG, val, -1);
     vl = expand(s, LRG, NULL);
 
-    note(fsh, TRUE,  "export %s=%s",    var, vl);
+    note(fsh,  TRUE, "export %s=%s",    var, vl);
     note(fcsh, TRUE, "setenv %s %s",    var, vl);
-    note(fdk, TRUE,  "dk_setenv %s %s", var, vl);
-    note(fmd, TRUE,  "setenv %s %s;",   var, vl);
+    note(fdk,  TRUE, "dk_setenv %s %s", var, vl);
+    note(fmd,  TRUE, "setenv %s %s;",   var, vl);
 
     return;}
 
@@ -1085,8 +1087,12 @@ static void setup_analyze_env(char *base)
     dbinitv(NULL, "Std_UseOGL", "FALSE");
     dbinitv(NULL, "Std_UseQD",  "FALSE");
 
-    dbinitv(NULL, "CC_MDGInc",       "");
-    dbinitv(NULL, "LD_MDGLib",       "");
+    dbinitv(NULL, "DP_Inc",          "");
+    dbinitv(NULL, "DP_Lib",          "");
+    dbinitv(NULL, "MDG_Inc",         "");
+    dbinitv(NULL, "MDG_Lib",         "");
+    dbinitv(NULL, "MD_Inc",          "");
+    dbinitv(NULL, "MD_Lib",          "");
     dbinitv(NULL, "GraphicsDevices", "PS CGM MPG PNG JPG");
     dbinitv(NULL, "GraphicsFlag",    "");
 
@@ -1127,15 +1133,20 @@ static void setup_output_env(char *base)
        fclose(st.aux.URF);
 
 /* remove duplicate tokens in selected lists */
-    dbset(NULL, "CC_MDGInc", unique(dbget(NULL, FALSE, "CC_MDGInc"), FALSE, ' '));
-    dbset(NULL, "CC_Inc",    unique(dbget(NULL, FALSE, "CC_Inc"), FALSE, ' '));
-    dbset(NULL, "LD_Lib",    unique(dbget(NULL, FALSE, "LD_Lib"), FALSE, ' '));
+    dbset(NULL, "DP_Inc",  unique(dbget(NULL, FALSE, "DP_Inc"),  FALSE, ' '));
+    dbset(NULL, "MDG_Inc", unique(dbget(NULL, FALSE, "MDG_Inc"), FALSE, ' '));
+    dbset(NULL, "MD_Inc",  unique(dbget(NULL, FALSE, "MD_Inc"),  FALSE, ' '));
+    dbset(NULL, "CC_Inc",  unique(dbget(NULL, FALSE, "CC_Inc"),  FALSE, ' '));
+
+    dbset(NULL, "DP_Lib",  unique(dbget(NULL, FALSE, "DP_Lib"),  FALSE, ' '));
+    dbset(NULL, "MD_Lib",  unique(dbget(NULL, FALSE, "MD_Lib"),  FALSE, ' '));
+    dbset(NULL, "LD_Lib",  unique(dbget(NULL, FALSE, "LD_Lib"),  FALSE, ' '));
 
 /* NOTE: for OSX this would reduce -framework FOO -framework BAR
  * to -framework FOO BAR which is not legal
  */
     if (strcmp(st.os, "Darwin") != 0)
-       dbset(NULL, "LD_MDGLib", unique(dbget(NULL, FALSE, "LD_MDGLib"), FALSE, ' '));
+       dbset(NULL, "MDG_Lib", unique(dbget(NULL, FALSE, "MDG_Lib"), FALSE, ' '));
 
     dbset(NULL, "BinDir",  st.dir.bin);
     dbset(NULL, "IncDir",  st.dir.inc);
@@ -1206,10 +1217,6 @@ static void default_var(char *base)
     push_tok(st.toolv, MAXLINE, ' ', "Inc");
     push_tok(st.toolv, MAXLINE, ' ', "Lib");
     push_tok(st.toolv, MAXLINE, ' ', "RPath");
-    push_tok(st.toolv, MAXLINE, ' ', "MDGInc");
-    push_tok(st.toolv, MAXLINE, ' ', "MDGLib");
-    push_tok(st.toolv, MAXLINE, ' ', "DPInc");
-    push_tok(st.toolv, MAXLINE, ' ', "DPLib");
     push_tok(st.toolv, MAXLINE, ' ', "IFlag");
     push_tok(st.toolv, MAXLINE, ' ', "XFlag");
 
@@ -1221,8 +1228,6 @@ static void default_var(char *base)
     push_tok(st.cfgv, MAXLINE, ' ', "CC_Debug");
     push_tok(st.cfgv, MAXLINE, ' ', "CC_Optimize");
     push_tok(st.cfgv, MAXLINE, ' ', "CC_Inc");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_DPInc");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_MDGInc");
     push_tok(st.cfgv, MAXLINE, ' ', "FC_Exe");
     push_tok(st.cfgv, MAXLINE, ' ', "FC_Linker");
     push_tok(st.cfgv, MAXLINE, ' ', "FC_Flags");
@@ -1232,13 +1237,12 @@ static void default_var(char *base)
     push_tok(st.cfgv, MAXLINE, ' ', "LD_RPath");
     push_tok(st.cfgv, MAXLINE, ' ', "LD_Flags");
     push_tok(st.cfgv, MAXLINE, ' ', "LD_Lib");
-    push_tok(st.cfgv, MAXLINE, ' ', "LD_MDGLib");
     push_tok(st.cfgv, MAXLINE, ' ', "CC_Shared");
     push_tok(st.cfgv, MAXLINE, ' ', "LD_Shared");
 
     strcpy(st.sys, path_tail(st.cfgf));
 
-    unamef(st.host,      MAXLINE, "n");
+    unamef(st.host,  MAXLINE, "n");
     unamef(st.os,    MAXLINE, "s");
     unamef(st.osrel, MAXLINE, "r");
     unamef(st.hw,    MAXLINE, "m");

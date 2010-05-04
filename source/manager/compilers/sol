@@ -22,8 +22,7 @@ Group FC {
 }
 
 Tool LD {
-   Lib     = -ldl -lsocket -lw -lnsl -lsunmath -lrt
-   MDGLib += /usr/openwin/lib/libX11.so  /usr/openwin/lib/libXext.so
+   Lib = -ldl -lsocket -lw -lnsl -lsunmath -lrt
 }
 
 Tool Lex {
@@ -33,6 +32,10 @@ Tool Lex {
 Group Cfg {
    Use  = Std
    Use += LD
+}
+
+Group MDG {
+   Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
 }
 
 Group Shared {

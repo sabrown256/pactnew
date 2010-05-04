@@ -17,25 +17,33 @@ Note $Log "Analyze: opengl"
 SafeEnv HostOS           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
+
+SafeEnv MDG_Inc          ""
+SafeEnv MDG_Lib          ""
+SafeEnv MDG_Pck          ""
+SafeEnv OGL_Path         /usr
+SafeEnv OGL_RPath        /usr/lib
+SafeEnv OGL_Inc          ""
+SafeEnv OGL_Lib          ""
 SafeEnv Std_UseOGL       FALSE
 
 set UTime = `timer -r`
 
 if ($HostOS == Darwin) then
    Note $ALog "Finding GL on MAC OS X"
-   setenv LD_MDGLib "$LD_MDGLib -framework GLUT -framework OpenGL"
-   setenv Cfe_LD_Flags  "$LD_MDGLib"
+   setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
+   setenv Cfe_LD_Flags  "$MDG_Lib"
 endif
 
 set lLibDirs = ""
-foreach i ($LD_MDGLib)
+foreach i ($MDG_Lib)
    set j = $i:h
    if (-d $j) then
       set lLibDirs = ( $lLibDirs $j )
    endif
 end
 
-Note $ALog "MDGLibs  = |$LD_MDGLib|"
+Note $ALog "MDG_Lib  = |$MDG_Lib|"
 Note $ALog "lLibDirs = |$lLibDirs|"
 
       cat << EOF >! $Tmp.c
@@ -71,27 +79,35 @@ if (("$PckLib" != "") && ("$PckInc" != "")) then
    setenv GraphicsFlag     "$GraphicsFlag -DOGL"
 
    if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-      setenv CC_MDGInc "$CC_MDGInc $PckInc"
+      setenv MDG_Inc "$MDG_Inc $PckInc"
    endif
-   Note $ALog "MDG Include = |$CC_MDGInc|"
+   Note $ALog "MDG Include = |$MDG_Inc|"
 
-   setenv LD_MDGLib  "$LD_MDGLib $PckLib"
+   setenv MDG_Lib    "$MDG_Lib $PckLib"
+   setenv MDG_Pck    "$MDG_Pck OGL"
    setenv Std_UseOGL TRUE
 else
    NoteD $ALog "      no OpenGL"
    setenv Std_UseOGL FALSE
 endif
 
+setenv OGL_RPath "$PckPath"
+setenv OGL_Lib   "$PckLib"
+setenv OGL_Inc   "$PckInc"
+
 set ETime = `timer -b $UTime`
 
 if ($Std_UseOGL == TRUE) then
 
 # export the results
+   SetParent MDG_Inc
+   SetParent MDG_Lib
+   SetParent MDG_Pck
+   SetParent OGL_Path
+   SetParent OGL_RPath
+   SetParent OGL_Lib
+   SetParent OGL_Inc
    SetParent GraphicsDevices
-#   SetParent OGLLib
-#   SetParent OGLInc
-   SetParent CC_MDGInc
-   SetParent LD_MDGLib
 
 endif
 

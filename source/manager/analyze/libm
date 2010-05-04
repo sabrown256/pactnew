@@ -16,7 +16,6 @@ Note $Log "Analyze: math"
 
 SafeEnv RPATH        ""
 SafeEnv Cfg_RPATH    ""
-SafeEnv LD_RPath     ""
 SafeEnv LibM         "-lm"
 SafeEnv LibM_Path    ""
 
@@ -52,7 +51,6 @@ endif
 
 if ("$IMF_Path" != "") then
    flog $ALog setenv RPATH         ${RPATH}:${IMF_Path}
-   flog $ALog setenv LD_RPath      ${LD_RPath}:${IMF_Path}
    flog $ALog setenv Cfg_RPATH     ${Cfg_RPATH}:${IMF_Path}
    flog $ALog setenv LibM          "-limf"
    flog $ALog setenv LibM_Path     ${IMF_Path}
@@ -68,7 +66,6 @@ NoteD $ALog "   Math library: $LibM"
 
 SetParent IMF_Path
 SetParent RPATH
-SetParent LD_RPath
 SetParent Cfg_RPATH
 SetParent LibM
 SetParent LibM_Path
