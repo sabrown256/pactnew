@@ -223,16 +223,9 @@ HAVE_SUBROUTINES
 
 # temporary expedient
     Note $FOUT '  LibPaths = '$proot/lib $LibM_Path
-    Note $FOUT '  LDFlags  = '$LD_Lib $MDG_Lib $LibM
-#    Note $FOUT '  LibPaths = '$proot/lib
-#    Note $FOUT '  LDFlags  = '$LD_Lib $MDG_Lib
-
+    Note $FOUT '  LDFlags  = '$LD_Lib $MDG_Lib $MD_Lib $LibM
     Note $FOUT '  RPaths   = '$lrpath
-#    if ("$cmplib" != "") then
-#       Note $FOUT '  RPaths   = '${cmplib}:/usr/X11R6/${LIB}:/usr/${LIB}
-#    else
-#       Note $FOUT '  RPaths   = '/usr/X11R6/${LIB}:/usr/${LIB}
-#    endif
+
     Note $FOUT '}'
     Note $FOUT ''
 
