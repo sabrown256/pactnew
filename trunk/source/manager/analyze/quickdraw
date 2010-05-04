@@ -15,9 +15,16 @@ SafeEnv HostOS           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 SafeEnv Cfg_CC_Exe       "cc"
-SafeEnv Cfg_LD_Lib       ""
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/log.analyze
+
+SafeEnv MDG_Inc          ""
+SafeEnv MDG_Lib          ""
+SafeEnv MDG_Pck          ""
+SafeEnv QD_Path          /usr
+SafeEnv QD_RPath         /usr/lib
+SafeEnv QD_Inc           ""
+SafeEnv QD_Lib           ""
 SafeEnv Std_UseQD        FALSE
 
 if ($HostOS == Darwin) then
@@ -49,9 +56,16 @@ EOF
    if ($xstatus == 0) then
       if ($Std_UseQD == TRUE) then
          NoteD $ALog "      has Quickdraw (Carbon)"
+
          setenv GSYS             "QD"
          setenv GraphicsDevices  "$GraphicsDevices QD"
          setenv GraphicsFlag     "$GraphicsFlag -framework Carbon"
+
+         setenv QD_RPath         ""
+         setenv QD_Lib           ""
+         setenv QD_Inc           "-framework Carbon"
+         setenv MDG_Pck          "$MDG_Pck QD"
+
       else
          NoteD $ALog "      no Quickdraw (by request)"
       endif
@@ -63,11 +77,18 @@ EOF
    set ETime = `timer -b $UTime`
 
 # export the results
+   SetParent MDG_Inc
+   SetParent MDG_Lib
+   SetParent MDG_Pck
+   SetParent QD_Path
+   SetParent QD_RPath
+   SetParent QD_Lib
+   SetParent QD_Inc
    SetParent GraphicsDevices
-   SetParent Std_UseQD
-   SetParent LD_Flags
 
 endif
+
+SetParent Std_UseQD
 
 exit(0)
 

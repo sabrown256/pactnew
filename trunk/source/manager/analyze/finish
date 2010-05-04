@@ -49,9 +49,9 @@ if ("$Cfe_CC_Inc" == "$RootInc") then
    flog $ALog setenv Cfe_CC_Inc ""
 endif
 
-#if (("$CC_MDGInc" == "-I$RootInc") && ($?IBM_BGP == 0)) then
-if ("$CC_MDGInc" == "-I$RootInc") then
-   flog $ALog setenv CC_MDGInc ""
+#if (("$MDG_Inc" == "-I$RootInc") && ($?IBM_BGP == 0)) then
+if ("$MDG_Inc" == "-I$RootInc") then
+   flog $ALog setenv MDG_Inc ""
 endif
 
 if ($?Save_CC == 1) then
@@ -78,11 +78,11 @@ endif
 SetParent Cfe_CC_Inc
 SetParent CC_Exe
 SetParent CC_Flags
-SetParent CC_MDGInc
 SetParent CC_Optimize
 SetParent FC_Optimize
 SetParent CC_Debug
 SetParent FC_Debug
+SetParent MDG_Inc
 
 exit(0)
 

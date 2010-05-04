@@ -15,7 +15,13 @@ Separator $Log
 Note $Log "Analyze: png"
 
 # vanilla place to look if previously undefined
+SafeEnv MDG_Inc      ""
+SafeEnv MDG_Lib      ""
+SafeEnv MDG_Pck      ""
 SafeEnv PNG_Path     /usr
+SafeEnv PNG_RPath    /usr/lib
+SafeEnv PNG_Inc      ""
+SafeEnv PNG_Lib      ""
 SafeEnv HAVE_PNGLIB  FALSE
 
 # if we have explicitly said we do not want PNG
@@ -70,18 +76,18 @@ EOF
 
    source $AnaDir/find-package
 
-   if (("$PckLib" != "") && ("$ZLib" != "") && ("$PckInc" != "")) then
+   if (("$PckLib" != "") && ("$Z_Lib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has PNG ($PckLib)"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv CC_MDGInc "$CC_MDGInc $PckInc"
+         setenv MDG_Inc "$MDG_Inc $PckInc"
       endif
 
       if ("$PckPath" != "") then
-         setenv RPATH         ${RPATH}:${PckPath}
-         setenv LD_RPath      ${LD_RPath}:${PckPath}
+         setenv RPATH     ${RPATH}:${PckPath}
       endif
-      setenv LD_MDGLib    "$LD_MDGLib $PckLib"
+      setenv MDG_Lib      "$MDG_Lib $PckLib"
+      setenv MDG_Pck      "$MDG_Pck PNG"
       setenv HAVE_PNGLIB  TRUE
    else
       NoteD $ALog "      no PNG"
@@ -90,16 +96,19 @@ EOF
 
    set ETime = `timer -b $UTime`
 
-   setenv PNGLib "$PckLib"
-   setenv PNGInc "$PckInc"
+   setenv PNG_RPath "$PckPath"
+   setenv PNG_Lib   "$PckLib"
+   setenv PNG_Inc   "$PckInc"
 
 # export the results
    SetParent RPATH
-   SetParent LD_RPath
-   SetParent PNGLib
-   SetParent PNGInc
-   SetParent CC_MDGInc
-   SetParent LD_MDGLib
+   SetParent MDG_Inc
+   SetParent MDG_Lib
+   SetParent MDG_Pck
+   SetParent PNG_Path
+   SetParent PNG_RPath
+   SetParent PNG_Lib
+   SetParent PNG_Inc
 
 endif
 

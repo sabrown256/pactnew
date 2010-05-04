@@ -15,11 +15,15 @@ Group MPI {
    LD_Lib = ${LibMPI}
 }
 
+Group DP {
+   Inc =? ${MPI_CC_Inc}
+   Lib += ${MPI_LD_Lib}
+}
+
 Tool CC {
    Exe    =? ${MPI_CC_Exe}
    Linker =? ${MPI_CC_Linker}
    Flags  += ${MPI_CC_Flags}
-   DPInc  =? ${MPI_CC_Inc}
 }
 
 Tool FC {
@@ -31,6 +35,5 @@ Tool FC {
 Tool LD {
    Exe   =? ${MPI_LD_Exe}
    Flags += ${MPI_LD_Flags}
-   DPLib += ${MPI_LD_Lib}
 }
 

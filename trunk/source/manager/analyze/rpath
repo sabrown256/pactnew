@@ -9,10 +9,15 @@
 #
 
 if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
+   pushd ../scripts >& /dev/null
 else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
+   pushd ../../scripts >& /dev/null
+else if (-f ../../../scripts/env-csh) then
+   pushd ../../../scripts >& /dev/null
 endif
+set SrcDir = $cwd
+popd >& /dev/null
+
 set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/env-csh
@@ -49,6 +54,7 @@ while ($#argv > 0)
            echo "      echo displays as a:b:c"
            echo "      list displays as 'a b c'"
            echo "      link displays as '-La -Lb -Lc'"
+           echo "      rpath expands LD_RPath, for example '-Wl,-rpath,a:b:c'"
            echo "      default is parent"
            echo ""
            exit(1)
@@ -179,6 +185,13 @@ switch ($Out)
         foreach l ($npath)
            set nlink = ( $nlink -L$l )
         end
+        echo $nlink
+        breaksw
+   case rpath:
+        set nlink = ""
+        if ($?LD_RPath == 1) then
+           set nlink = ( `echo "$LD_RPath" | sed 's|\@|'$RPATH'|'` )
+        endif
         echo $nlink
         breaksw
 endsw

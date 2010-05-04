@@ -146,15 +146,15 @@ static void report_cl(char *q, anadep *state)
    {
 
     if (strcmp(q, "-incpath") == 0)
-       {report("MDInc", FALSE, TRUE, FALSE, state);
-	report("MDGInc", FALSE, TRUE, TRUE, state);}
+       {report("MDGInc", FALSE, TRUE, FALSE, state);
+        report("MDInc", FALSE, TRUE, TRUE, state);}
 
     else if (strcmp(q, "-link") == 0)
        {report("LDRPath", FALSE, TRUE, FALSE, state);
         report("LDPath", FALSE, TRUE, FALSE, state);
+	report("DP_Lib", FALSE, TRUE, FALSE, state);
 	report("MDGLib", FALSE, TRUE, FALSE, state);
-	report("DPLib", FALSE, TRUE, FALSE, state);
-	report("MDLib", FALSE, TRUE, TRUE, state);};
+	report("MDLib",  FALSE, TRUE, TRUE, state);};
 
     return;}
 

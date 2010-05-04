@@ -34,4 +34,30 @@ Tool LD {
    SpokeDepLib =
 }
 
+# define some groups for analysis
+
+Group Z {
+}
+
+Group PNG {
+}
+
+Group JPEG {
+}
+
+Group X11 {
+}
+
+Group OGL {
+}
+
+Group QD {
+}
+
+Group SQL {
+}
+
+Group HDF {
+}
+
 

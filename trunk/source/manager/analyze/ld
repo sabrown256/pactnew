@@ -21,8 +21,8 @@ SafeEnv LD_Exe     ""
 SafeEnv LD_Flags   ""
 SafeEnv LD_Shared  ""
 SafeEnv LD_Lib     ""
-SafeEnv LD_MDGLib  ""
-SafeEnv LD_DPLib   ""
+SafeEnv MDG_Lib    ""
+SafeEnv DP_Lib     ""
 
 if (!(-x "$LD_Exe")) then
    if (-x `$Which ld`) then
@@ -63,9 +63,9 @@ flog $ALog $RM $Tmp $Tmp.c $Tmp.o
 SetParent LD_Exe
 SetParent LD_Flags
 SetParent LD_Lib
-SetParent LD_MDGLib
-SetParent LD_DPLib
 SetParent LD_Shared
+SetParent MDG_Lib
+SetParent DP_Lib
 SetParent Shared_LD_Exe
 SetParent HaveRPATH
 

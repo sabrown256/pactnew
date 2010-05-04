@@ -23,8 +23,8 @@ SafeEnv MPIAllStdin     FALSE
 SafeEnv HAVE_OPENMPI    FALSE
 SafeEnv LibMPI          ""
 SafeEnv MPILib          ""
-SafeEnv CC_DPInc        ""
-SafeEnv LD_DPLib        ""
+SafeEnv DP_Inc          ""
+SafeEnv DP_Lib          ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -33,9 +33,9 @@ SafeEnv LD_DPLib        ""
 
 set lParComm = ""
 
-Note $ALog "CC_DPInc = $CC_DPInc"
+Note $ALog "DP_Inc = $DP_Inc"
 
-foreach j ($CC_DPInc $RootInc)
+foreach j ($DP_Inc $RootInc)
    set k = `echo $j | sed 's/-I//g'`
    Note $ALog "Looking for include directory $k"
 
@@ -75,7 +75,7 @@ Note $ALog "lParComm = $lParComm"
 
 if ("$lParComm" =~ *mpi*) then
 
-#   setenv LD_DPLib  "$LibMPI"
+#   setenv DP_Lib  "$LibMPI"
    set llib = ""
    foreach i ($MPILib)
       set llib = ( $llib -L$i )
@@ -110,18 +110,18 @@ EOF
 
    Note $ALog "Save_CC  = $Save_CC"
    Note $ALog "CC_Flags = $CC_Flags"
-   Note $ALog "CC_DPInc = $CC_DPInc"
    Note $ALog "LD_Flags = $LD_Flags"
-   Note $ALog "LD_DPLib = $LD_DPLib"
+   Note $ALog "DP_Inc   = $DP_Inc"
+   Note $ALog "DP_Lib   = $DP_Lib"
    Note $ALog "lLib     = $lLib"
 
    flog $ALog cat $Tmp.c
 
-   flog $ALog $Save_CC $CC_Flags $CC_DPInc $Tmp.c -o $Tmp $LD_Flags $lLib
+   flog $ALog $Save_CC $CC_Flags $DP_Inc $Tmp.c -o $Tmp $LD_Flags $lLib
    if ($status != 0) then
       set lParComm = "no"
       setenv LibMPI    ""
-      setenv LD_DPLib  ""
+      setenv DP_Lib    ""
    else
       flog $ALog ldd $Tmp
 
@@ -153,8 +153,8 @@ endif
 if ("$lParComm" == no) then
    setenv LibMPI    ""
    setenv MPILib    ""
-   setenv CC_DPInc  ""
-   setenv LD_DPLib  ""
+   setenv DP_Inc    ""
+   setenv DP_Lib    ""
    NoteD $ALog "      no MPI"
 
 else if ("$lParComm" != "") then
@@ -165,8 +165,8 @@ else if ("$lParComm" != "") then
 else
    setenv LibMPI    ""
    setenv MPILib    ""
-   setenv CC_DPInc  ""
-   setenv LD_DPLib  ""
+   setenv DP_Inc    ""
+   setenv DP_Lib    ""
    NoteD $ALog "      no MPI (by request)"
 endif
 
@@ -179,8 +179,8 @@ SetParent MPIGoodIO
 SetParent HAVE_OPENMPI
 SetParent MPILib
 SetParent LibMPI
-SetParent CC_DPInc
-SetParent LD_DPLib
+SetParent DP_Inc
+SetParent DP_Lib
 
 exit(0)
 

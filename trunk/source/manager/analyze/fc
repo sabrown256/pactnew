@@ -99,18 +99,15 @@ endif
 
 # temporarily add link flags to compiler flags for config
 if ($?Cfg_LD_Flags == 1) then
-   set tmp = ($FC_Flags $Cfg_LD_Flags)
-   flog $ALog setenv FC_Flags "$tmp"
-   set tmp = ($Cfg_FC_Flags $Cfg_LD_Flags)
-   flog $ALog setenv Cfg_FC_Flags "$tmp"
+   flog $ALog setenv FC_Flags "$FC_Flags $Cfg_LD_Flags"
+   flog $ALog setenv Cfg_FC_Flags "$Cfg_FC_Flags $Cfg_LD_Flags"
 endif
 
 # temporarily add rpath to compiler flags for config
-if ($?Cfg_LD_RPath == 1) then
-   set tmp = ($FC_Flags $Cfg_LD_RPath)
-   flog $ALog setenv FC_Flags "$tmp"
-   set tmp = ($Cfg_FC_Flags $Cfg_LD_RPath)
-   flog $ALog setenv Cfg_FC_Flags "$tmp"
+if ($?Cfg_RPATH == 1) then
+   set lrpath = `../analyze/rpath -o rpath`
+   flog $ALog setenv FC_Flags "$FC_Flags $lrpath"
+   flog $ALog setenv Cfg_FC_Flags "$Cfg_FC_Flags $lrpath"
 endif
 
 #--------------------------------------------------------------------------

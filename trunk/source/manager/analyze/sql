@@ -15,10 +15,14 @@ Separator $Log
 Note $Log "Analyze: sql"
 
 # vanilla place to look if previously undefined
-SafeEnv SQL_Path /usr
-SafeEnv SQLLib   ""
-SafeEnv SQLInc   ""
-SafeEnv HAVE_SQL FALSE
+SafeEnv MD_Inc     ""
+SafeEnv MD_Lib     ""
+SafeEnv MD_Pck     ""
+SafeEnv SQL_Path   /usr
+SafeEnv SQL_RPath  /usr/lib
+SafeEnv SQL_Inc    ""
+SafeEnv SQL_Lib    ""
+SafeEnv HAVE_SQL   FALSE
 
 # if we have explicitly said we do not want SQL
 # do NOT detect it
@@ -204,18 +208,19 @@ EOF
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   setenv SQLLib "$libl"
-   setenv SQLInc "$incl"
+   setenv SQL_RPath "$pthl"
+   setenv SQL_Lib   "$libl"
+   setenv SQL_Inc   "$incl"
 
    foreach p ($pthl)
-      setenv RPATH         ${RPATH}:$p
-      setenv LD_RPath      ${LD_RPath}:$p
+      setenv RPATH   ${RPATH}:$p
    end
-   setenv CC_Inc  "$CC_Inc $SQLInc"
-   setenv LD_Lib  "$LD_Lib $SQLLib"
 
-   if ("$SQLLib" != "") then
-      setenv HAVE_SQL TRUE
+   if ("$SQL_Lib" != "") then
+      flog $ALog setenv MD_Inc     "$MD_Inc $incl"
+      flog $ALog setenv MD_Lib     "$libl $MD_Lib"
+      flog $ALog setenv MD_Pck     "$MD_Pck SQL"
+      flog $ALog setenv HAVE_SQL   TRUE
       NoteD $ALog "      has SQL ($spkl)"
    else
       NoteD $ALog "      no SQL"
@@ -223,17 +228,20 @@ EOF
 
 # export the results
    SetParent RPATH
-   SetParent LD_RPath
-   SetParent CC_Inc
-   SetParent LD_Lib
-   SetParent SQLInc
-   SetParent SQLLib
-   SetParent HAVE_SQL
+   SetParent MD_Inc
+   SetParent MD_Lib
+   SetParent MD_Pck
+   SetParent SQL_Path
+   SetParent SQL_RPath
+   SetParent SQL_Lib
+   SetParent SQL_Inc
    SetParent HAVE_MYSQL
    SetParent HAVE_SQLITE
    SetParent HAVE_SQLITE_V2
 
 endif
+
+SetParent HAVE_SQL
 
 exit(0)
 

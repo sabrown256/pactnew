@@ -148,6 +148,8 @@ else
                   NoteD $Log "ok"
                else if ($xstatus == 255) then
                   NoteD $Log "omitted"
+               else if ($xstatus == 254) then
+                  NoteD $Log "system"
                else
                   NoteD $Log "ng ($xstatus)"
                   flog $Log @ lerr = 1

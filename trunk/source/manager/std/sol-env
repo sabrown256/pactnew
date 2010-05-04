@@ -12,13 +12,15 @@ run analyze/rpath solaris
 Tool LD {
    RPath   = -Wl,-rpath,@
    Lib    += -ldl -lsocket -lw -lnsl -lsunmath -lrt
-   MDGLib += /usr/openwin/lib/libX11.a  /usr/openwin/lib/libXext.a
 }
 
 Group Cfg {
    LD_RPath   = -Wl,-rpath,@
    LD_Lib    += -ldl -lsocket -lw -lnsl -lsunmath -lrt
-   LD_MDGLib += /usr/openwin/lib/libX11.a  /usr/openwin/lib/libXext.a
+}
+
+Group MDG {
+   Lib += /usr/openwin/lib/libX11.a  /usr/openwin/lib/libXext.a
 }
 
 define SOLARIS

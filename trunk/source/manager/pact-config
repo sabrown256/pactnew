@@ -130,15 +130,15 @@ flog $Log (env | sort)
 # define the set of specifications which define a tool
 set lToolSpec = ""
 set lToolSpec = ( $lToolSpec Exe Flags Version Debug Optimize Shared )
-set lToolSpec = ( $lToolSpec Inc Lib MDGInc MDGLib DPInc DPLib )
+set lToolSpec = ( $lToolSpec Inc Lib )
 set lToolSpec = ( $lToolSpec IFlag XFlag )
 
 # define and initialize the (special) config variables
 set lConfigVars = ""
 set lConfigVars = ( $lConfigVars CC_Exe CC_Linker CC_Flags CC_Debug CC_Optimize )
-set lConfigVars = ( $lConfigVars CC_Inc CC_DPInc CC_MDGInc )
+set lConfigVars = ( $lConfigVars CC_Inc )
 set lConfigVars = ( $lConfigVars FC_Exe FC_Linker FC_Flags FC_Debug FC_Optimize )
-set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib LD_MDGLib )
+set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
 set lConfigVars = ( $lConfigVars CC_Shared LD_Shared )
 
 # variable defaults
@@ -1324,17 +1324,17 @@ Finish:
     endif
 
 # remove duplicate tokens in selected lists
-    set ULst = ($CC_MDGInc)
+    set ULst = ($MDG_Inc)
     call Unique()
-    setenv CC_MDGInc "$NewULst"
+    setenv MDG_Inc "$NewULst"
 
     set ULst = ($CC_Inc)
     call Unique()
     setenv CC_Inc "$NewULst"
 
-    set ULst = ($LD_MDGLib)
+    set ULst = ($MDG_Lib)
     call Unique()
-    setenv LD_MDGLib "$NewULst"
+    setenv MDG_Lib "$NewULst"
 
     set ULst = ($LD_Lib)
     call Unique()

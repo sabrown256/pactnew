@@ -149,8 +149,8 @@ SafeEnv Std_UseX   TRUE
 SafeEnv Std_UseOGL FALSE
 SafeEnv Std_UseQD  FALSE
 
-SafeEnv CC_MDGInc       ""
-SafeEnv LD_MDGLib       ""
+SafeEnv MDG_Inc         ""
+SafeEnv MDG_Lib         ""
 SafeEnv GraphicsDevices "PS CGM MPG PNG JPG"
 SafeEnv GraphicsFlag    ""
 

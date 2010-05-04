@@ -25,7 +25,6 @@ Tool FC {
 
 Tool LD {
    Flags  = -Wl,-dont_warn_unused
-   MDGLib = -lX11
 }
 
 Tool Lex {
@@ -44,6 +43,10 @@ Group Cfg {
    Use      = Std
    Use      = CC
    LD_Flags = ${LD_Flags}
+}
+
+Group MDG {
+   Lib = -lX11
 }
 
 Group Shared {

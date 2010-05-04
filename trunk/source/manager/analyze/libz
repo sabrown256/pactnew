@@ -15,7 +15,13 @@ Separator $Log
 Note $Log "Analyze: libz"
 
 # vanilla place to look if previously undefined
-SafeEnv Z_Path /usr
+SafeEnv MD_Inc    ""
+SafeEnv MD_Lib    ""
+SafeEnv MD_Pck    ""
+SafeEnv Z_Path    /usr
+SafeEnv Z_RPath   /usr/lib
+SafeEnv Z_Inc     ""
+SafeEnv Z_Lib     ""
 
 # if we have explicitly said we do not want libZ do NOT detect it
 if ("$Z_Path" == none) then
@@ -61,39 +67,44 @@ EOF
 
    source $AnaDir/find-package
 
-   setenv ZLib "-lz"
-   if (("$PckLib" != "") && ("$ZLib" != "") && ("$PckInc" != "")) then
+   setenv Z_Lib "-lz"
+   if (("$PckLib" != "") && ("$Z_Lib" != "") && ("$PckInc" != "")) then
       NoteD $ALog "      has libz ($PckLib)"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         set ltmp = ( $PckInc $CC_Inc )
-         setenv CC_Inc "$ltmp"
+         flog $ALog setenv MD_Inc "$PckInc $MD_Inc"
       endif
 
       if ("$PckPath" != "") then
-         setenv RPATH         ${RPATH}:${PckPath}
-         setenv LD_RPath      ${LD_RPath}:${PckPath}
+         flog $ALog setenv RPATH    ${RPATH}:${PckPath}
       endif
-      set ltmp = ( $PckLib $LD_Lib )
-      setenv LD_Lib      "$ltmp"
-      setenv HAVE_ZLIB   TRUE
+      flog $ALog setenv MD_Lib      "$MD_Lib $PckLib"
+      flog $ALog setenv MD_Pck      "$MD_Pck Z"
+      flog $ALog setenv HAVE_ZLIB   TRUE
    else
       NoteD $ALog "      no libz"
-      setenv HAVE_ZLIB ""
+      flog $ALog setenv HAVE_ZLIB   ""
    endif
+
+   setenv Z_RPath "$PckPath"
+   setenv Z_Lib   "$PckLib"
+   setenv Z_Inc   "$PckInc"
 
    set ETime = `timer -b $UTime`
 
 # export the results
    SetParent RPATH
-   SetParent LD_RPath
-   SetParent HAVE_ZLIB
+   SetParent MD_Inc
+   SetParent MD_Lib
+   SetParent MD_Pck
    SetParent Z_Path
-   SetParent ZLib
-   SetParent CC_Inc
-   SetParent LD_Lib
+   SetParent Z_RPath
+   SetParent Z_Lib
+   SetParent Z_Inc
 
 endif
+
+SetParent HAVE_ZLIB
 
 exit(0)
 

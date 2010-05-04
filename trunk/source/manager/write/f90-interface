@@ -40,8 +40,9 @@ source $ldir/env-csh
        endif
        flog $Log pushd $Tmp
 
-       flog $Log set lCC = ( $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_RPath )
-       flog $Log set lFC = ( $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_RPath )
+       set lrpath = `../../analyze/rpath -o rpath`
+       flog $Log set lCC = ( $Cfe_CC_Exe $Cfe_CC_Flags $lrpath )
+       flog $Log set lFC = ( $Cfe_FC_Exe $Cfe_FC_Flags $lrpath )
 
 # run getkinds to generate getbytes.f
        flog $Log $lFC ../getkinds.f -o getkinds

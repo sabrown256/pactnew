@@ -11,7 +11,7 @@
 run ../analyze/libm
 
 # fix rpath for analysis scripts that need the final value
-run ../analyze/fix-rpath
+#run ../analyze/fix-rpath
 
 # greater context
 run ../analyze/site

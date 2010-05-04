@@ -15,8 +15,14 @@ Separator $Log
 Note $Log "Analyze: hdf5"
 
 # vanilla place to look if previously undefined
-SafeEnv HDF_Path /usr
-SafeEnv ZLib     "-lz"
+SafeEnv MD_Inc     ""
+SafeEnv MD_Lib     ""
+SafeEnv MD_Pck     ""
+SafeEnv HDF_Path   /usr
+SafeEnv HDF_RPath  /usr/lib
+SafeEnv HDF_Inc    ""
+SafeEnv HDF_Lib    ""
+SafeEnv Z_Lib      "-lz"
 
 # if we have explicitly said we do not want HDF5
 # do NOT detect it
@@ -58,7 +64,7 @@ EOF
    foreach i ( `echo $RPATH | sed 's|:| |g'` )
        set lALibs = ( $lALibs -L$i )
    end
-   set lALibs = ( $lALibs $LD_Lib $LibM $ZLib )
+   set lALibs = ( $lALibs $LD_Lib $LibM $Z_Lib )
 
    source $AnaDir/find-package
 
@@ -66,37 +72,37 @@ EOF
       NoteD $ALog "      has HDF5 ($PckLib)"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv CC_Inc "$CC_Inc $PckInc"
+         setenv MD_Inc "$MD_Inc $PckInc"
       endif
 
-      setenv RPATH         ${RPATH}:${HDF_RPath}
-      setenv LD_RPath      ${LD_RPath}:${HDF_RPath}
-      setenv Cfg_RPATH     ${Cfg_RPATH}:${HDF_RPath}
-      setenv Cfg_LD_RPath  ${Cfg_LD_RPath}:${HDF_RPath}
-      setenv LD_Lib        "$PckLib $LD_Lib"
-      setenv HAVE_HDF5     TRUE
+      flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}
+      flog $ALog setenv MD_Lib        "$PckLib $MD_Lib"
+      flog $ALog setenv MD_Pck        "$MD_Pck HDF"
+      flog $ALog setenv HAVE_HDF5     TRUE
    else
       NoteD $ALog "      no compatible HDF5 version"
-      setenv HAVE_HDF5 ""
+      flog $ALog setenv HAVE_HDF5 ""
    endif
 
    set ETime = `timer -b $UTime`
 
-   setenv HDFLib "$PckLib"
-   setenv HDFInc "$PckInc"
+   setenv HDF_RPath "$PckPath"
+   setenv HDF_Lib   "$PckLib"
+   setenv HDF_Inc   "$PckInc"
 
 # export the results
    SetParent RPATH
-   SetParent LD_RPath
-   SetParent Cfg_RPATH
-   SetParent Cfg_LD_RPath
-   SetParent CC_Inc
-   SetParent LD_Lib
-   SetParent HDFInc
-   SetParent HDFLib
-   SetParent HAVE_HDF5
+   SetParent MD_Inc
+   SetParent MD_Lib
+   SetParent MD_Pck
+   SetParent HDF_Path
+   SetParent HDF_RPath
+   SetParent HDF_Inc
+   SetParent HDF_Lib
 
 endif
+
+SetParent HAVE_HDF5
 
 exit(0)
 
