@@ -2073,6 +2073,9 @@ int launch_perdb(int c, char **v)
 	     ok = ((st & 0xff) == 0);
 	     break;};};
 
+/* give the server some time to initialize */
+    nsleep(100);
+
     return(ok);}
  
 /*--------------------------------------------------------------------------*/
@@ -2132,10 +2135,6 @@ int main(int c, char **v)
        {help();
 	return(1);};
 
-/* technically these are set by 'dsys config' */
-    cinitenv("DbgOpt", "-g");
-    cinitenv("PACTVer", "debug");
-
 /* locate the tools needed for subshells */
     build_path(NULL,
 	       "sed", "grep", "awk", "sort",
@@ -2145,6 +2144,10 @@ int main(int c, char **v)
 	       NULL);
 
     havedb = launch_perdb(c, v);
+
+/* technically these are set by 'dsys config' */
+    cinitenv("DbgOpt", "-g");
+    cinitenv("PACTVer", "debug");
 
 /* NOTE: because of OSX's nefarious automounter we have to get the current
  * directory this way (rather that via the getcwd library call) so that

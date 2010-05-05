@@ -780,7 +780,7 @@ int SC_exec(char ***out, char *cmnd, char *shell, int to)
     SC_array *str;
     static int dbg = FALSE;
 
-    str = SC_string_array("SC_EXEC");
+    str = SC_STRING_ARRAY();
 
     st = _SC_exec(str, cmnd, shell, NULL, to, 1, dbg);
 
@@ -956,7 +956,7 @@ int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
     for (i = 0; i < n; i++)
         {cm = cmnds[i];
 
-	 out = SC_string_array("SC_EXEC_COMMANDS");
+	 out = SC_STRING_ARRAY();
 
 	 p   = _SC_put_command(out, cm, show);
 	 err = _SC_exec(out, p, shell, env, to, na, dmp);

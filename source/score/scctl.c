@@ -332,7 +332,7 @@ SC_array *SC_make_search_path(int nd, ...)
     char *ptr, *t, *token;
     SC_array *path;
 
-    path = SC_string_array("SC_MAKE_SEARCH_PATH");
+    path = SC_STRING_ARRAY();
 
     SC_PATH_DELIMITER(delim);
 

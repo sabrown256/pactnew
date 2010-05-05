@@ -51,7 +51,7 @@ static hrng *_SC_range(char *base, int mn, int mx)
     SC_array *arr;
     hrng *rng;
 
-    arr = SC_string_array("_SC_RANGE");
+    arr = SC_STRING_ARRAY();
 
     for (i = mn; i <= mx; i++)
         {s = SC_dsnprintf(TRUE, "%s%d", base, i);
@@ -822,7 +822,7 @@ char **SC_get_host_file(char *f)
     SC_array *arr;
     FILE *fp;
 
-    arr = SC_string_array("SC_GET_HOST_FILE");
+    arr = SC_STRING_ARRAY();
 
     fp = io_open(f, "r");
     while (TRUE)
@@ -897,7 +897,7 @@ char **SC_get_host_list(char *sys, int single)
     ss = SC_get_system_list(sys);
     SC_ptr_arr_len(ns, ss);
 
-    arr = SC_string_array("SC_GET_HOST_LIST");
+    arr = SC_STRING_ARRAY();
 
     for (is = 0; is < ns; is++)
 

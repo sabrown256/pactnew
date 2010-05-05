@@ -1092,7 +1092,7 @@ char **SC_tokenize(char *s, char *delim)
     if (t != NULL)
        {strcpy(t, s);
 
-	arr = SC_string_array("SC_TOKENIZE");
+	arr = SC_STRING_ARRAY();
 	SC_array_resize(arr, n/2, -1.0);
 
 	for (ps = t; TRUE; ps = NULL)
@@ -1228,7 +1228,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl)
 
     n   = strlen(s);
     sa  = NULL;
-    arr = SC_string_array("SC_TOKENIZE_LITERAL");
+    arr = SC_STRING_ARRAY();
     SC_array_resize(arr, n/2, -1.0);
 
     bf   = FMAKE_N(char, MAX_BFSZ, "char*:SC_TOKENIZE_LITERAL:bf");
@@ -1320,7 +1320,7 @@ char **SC_file_strings(char *fname)
     SC_array *a;
     FILE *fp;
 
-    a = SC_string_array("SC_FILE_STRINGS");
+    a = SC_STRING_ARRAY();
 
     fp = fopen(fname, "r");
     while (fgets(s, MAX_BFSZ, fp) != NULL)

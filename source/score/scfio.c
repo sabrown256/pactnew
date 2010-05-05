@@ -389,19 +389,12 @@ FILE *SC_fopen(char *name, char *mode)
  */
 
 static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
-   {char *bf, *ps;
-    long nbw, nbt, nbr;
+   {char *bf;
+    long nbw, nbr;
 
-    bf = FMAKE_N(char, nbe, "_SC_TRANSFER_BYTES:bf");
+    bf = CMAKE_N(char, nbe);
 
-/* read the data looping until all expected bytes come in */
-    nbt = nbe;
-    for (ps = bf; TRUE; ps += nbr)
-        {nbr  = SC_read_sigsafe(cfd, ps, nbt);
-	 nbt -= nbr;
-	 if (nbt <= 0)
-	    break;};
-
+    nbr = SC_read_sigsafe(cfd, bf, nbe);
     nbw = _SC_fwrite(bf, 1, nbe, fp);
 
     SFREE(bf);
@@ -2377,7 +2370,9 @@ off_t SC_filelen(FILE *fp)
  */
 
 ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
-   {ssize_t rv;
+   {long nbo, nbr, zc;
+    ssize_t rv;
+    char *pbf;
 
 #ifdef AIX
     PFSignal_handler oh;
@@ -2386,16 +2381,40 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
     if (SC_io_interrupts_on == TRUE)
        oh = SC_signal_action(SC_SIGIO, SIG_IGN, 0, -1);
 
-    rv = read(fd, bf, n);
+#endif
+
+    nbo = n;
+    nbr = -1;
+    pbf = bf;
+    zc  = 0;
+    rv  = 0;
+
+    while ((nbo > 0) && (zc < 10) && (nbr != 0))
+       {nbr = read(fd, pbf, nbo);
+	if (nbr < 0)
+
+/* if EAGAIN/EWOULDBLOCK try sleeping 10 ms to let the system catch up
+ * limit the number of attempts to 10
+ */
+	   {if (errno == EAGAIN)
+               {SC_sleep(10);
+                zc++;
+		continue;}
+	    else
+	       break;}
+	else
+	   zc = 0;
+
+	pbf += nbr;
+	nbo -= nbr;
+        rv  += nbr;};
+
+#ifdef AIX
 
 /* turn on SIGIO handler */
     if (SC_io_interrupts_on == TRUE)
        SC_signal_action(SC_SIGIO, oh, 0, BLOCK_WITH_SIGIO, -1);
  
-#else
-
-    rv = read(fd, bf, n);
-
 #endif
 
     return(rv);}

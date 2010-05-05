@@ -722,7 +722,7 @@ char **_SC_array_string_join(SC_array **psa)
     no  = SC_array_get_n(sa);
     sao = SC_array_done(sa);
 
-    na = SC_string_array("_SC_ARRAY_STRING_JOIN");
+    na = SC_STRING_ARRAY();
     SC_array_resize(na, 2*no, -1.0);
 
     bf = NULL;
