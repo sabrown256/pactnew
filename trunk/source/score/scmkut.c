@@ -375,7 +375,7 @@ static int make_distributed(char *tgt, char *file, char *server,
 
     fp = io_open(file, "r");
     if (fp != NULL)
-       {arr = SC_string_array("MAKE_DISTRIBUTED");
+       {arr = SC_STRING_ARRAY();
 
 	while (TRUE)
 	   {p = io_gets(s, MAXLINE, fp);

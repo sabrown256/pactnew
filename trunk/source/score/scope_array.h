@@ -65,6 +65,8 @@
 #define SC_MAKE_ARRAY(_n, _t, _init)                                         \
     SC_make_array(_n, #_t, sizeof(_t), _init)
 
+#define SC_STRING_ARRAY()    SC_string_array((char *) __func__)
+
 /*--------------------------------------------------------------------------*/
 
 #if 0

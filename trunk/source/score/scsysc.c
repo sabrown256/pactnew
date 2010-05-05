@@ -361,7 +361,7 @@ void _SC_exec_setup_state(parstate *state, char *shell, char **env,
     _SC_chg_dir(".", &state->directory);
 
     state->tasks = SC_MAKE_ARRAY("_SC_EXEC_SETUP_STATE", taskdesc *, NULL);
-    state->log   = SC_string_array("_SC_EXEC_SETUP_STATE");
+    state->log   = SC_STRING_ARRAY();
 
     state->acc        = acc;
     state->rej        = rej;
@@ -928,7 +928,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
     pipe  = FALSE;
     term  = FALSE;
 
-    tf = SC_string_array("_SC_INIT_SUBTASKS");
+    tf = SC_STRING_ARRAY();
     SC_array_resize(tf, na, -1.0);
 
     for (n = 0; n < na; n++)
@@ -963,7 +963,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
 	 if (term == TRUE)
 	    {if (tf->n > 0)
 	        {_SC_push_subtask(sub, it++, shell, tf, dosh, pipe);
-		 tf = SC_string_array("_SC_INIT_SUBTASKS");
+		 tf = SC_STRING_ARRAY();
 		 SC_array_resize(tf, na, -1.0);};
 	     term = FALSE;
 	     pipe = FALSE;

@@ -1,0 +1,65 @@
+#!/bin/csh -f
+#
+# PACT-LIB - make unified libpact.a
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+set MngDir = $cwd
+set CfgMan = $MngDir/cfgman
+setenv System  `$CfgMan use`
+
+set Base    = $MngDir:h
+set BaseDev = $Base/dev
+set Root    = $BaseDev/$System
+set IncDir  = $Root/include
+set BinDir  = $Root/bin
+set LibDir  = $Root/lib
+setenv ScrDir $Base/scripts
+
+source $ScrDir/env-csh
+
+set AR     = `pact +l -info AR`
+set AROpt  = `pact +l -info AROpt`
+set ARXOpt = `pact +l -info ARXOpt`
+
+pushd $LibDir >& /dev/null
+
+# make a temporary directory to work in
+set tmp = tmp.$$
+mkdir $tmp
+
+# copy the .a files to the temporary directory
+cp *.a $tmp
+cd $tmp >& /dev/null
+
+rm -f libpsmm.a libscc.a libultra.a libpact.a
+
+# extract all the .o files from all the .a files
+echo "Extracting:"
+foreach i (*.a)
+   echo "  $i"
+   $AR $ARXOpt $i
+end
+
+# make libpact.a with all the .o files
+echo -n "Making libpact.a ... "
+$AR $AROpt libpact.a *.o
+echo "done"
+
+mv libpact.a ..
+
+# cleanup
+cd .. >& /dev/null
+$RMDir $tmp
+
+ls -l libpact.a
+
+popd >& /dev/null
+
+exit($err)

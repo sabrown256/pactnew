@@ -731,7 +731,7 @@ void _SC_do_substitutions(anadep *state)
 static void _SC_init_suffices(anadep *state)
    {SC_array *a;
 
-    a = SC_string_array("_SC_INIT_SUFFICES");
+    a = SC_STRING_ARRAY();
 
     state->suffices = a;
 

@@ -551,7 +551,7 @@ int PA_th_family_list(char *name, int c, char ***pfiles)
     char bf[MAXLINE];
     SC_array *fa;
 
-    fa = SC_string_array("PA_TH_FAMILY_LIST");
+    fa = SC_STRING_ARRAY();
 
     for (n = 0; TRUE; n++)
         {snprintf(bf, MAXLINE, "%s.%c%s", name, c, SC_itoa(n, 36, 2));
@@ -608,7 +608,7 @@ int PA_th_name_list(int n, char **names, char ***pthfiles)
     PDBfile *fp;
     SC_array *fa;
 
-    fa = SC_string_array("PA_TH_NAME_LIST");
+    fa = SC_STRING_ARRAY();
 
     for (i = 0; i < n; i++)
         {fp = PD_open(names[i], "r");
@@ -671,7 +671,7 @@ int PA_th_link_list(int n, char **names, char ***pthfiles)
     PDBfile *fp;
     SC_array *fa;
 
-    fa = SC_string_array("PA_TH_LINK_LIST");
+    fa = SC_STRING_ARRAY();
 
     for (i = 0; i < n; i++)
         {strcpy(bf, names[i]);
@@ -1348,8 +1348,8 @@ FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, F77_string fname,
 
     fth = FMAKE(f77_th_record, "PABREC:fth");
     
-    fth->labels     = SC_string_array("PABREC:labels");
-    fth->members    = SC_string_array("PABREC:members");
+    fth->labels     = SC_STRING_ARRAY();
+    fth->members    = SC_STRING_ARRAY();
     fth->type       = SC_strsavef(ltype, "char*:PABREC:type");
     fth->entry_name = SC_strsavef(lname, "char*:PABREC:name");
 

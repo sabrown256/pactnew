@@ -212,7 +212,7 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
 
     if (fl == TRUE)
        {pc->taska = SC_MAKE_ARRAY("SC_INIT_CONNECTION", contask *, NULL);
-	pc->log   = SC_string_array("SC_INIT_CONNECTION");
+	pc->log   = SC_STRING_ARRAY();
         SC_array_resize(pc->taska, 512, -1.0);};
 
     return;}
