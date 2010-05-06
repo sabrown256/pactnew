@@ -2370,7 +2370,8 @@ off_t SC_filelen(FILE *fp)
  */
 
 ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
-   {long nbo, nbr, zc;
+   {int blk;
+    long nbo, nbr;
     ssize_t rv;
     char *pbf;
 
@@ -2383,31 +2384,27 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 
 #endif
 
-    nbo = n;
-    nbr = -1;
-    pbf = bf;
-    zc  = 0;
-    rv  = 0;
+    blk = SC_isblocked_fd(fd);
 
-    while ((nbo > 0) && (zc < 10) && (nbr != 0))
-       {nbr = read(fd, pbf, nbo);
-	if (nbr < 0)
+/* non-blocking read or terminal - take what you get */
+    if ((blk == FALSE) || (isatty(fd) == TRUE))
+       rv = read(fd, bf, n);
 
-/* if EAGAIN/EWOULDBLOCK try sleeping 10 ms to let the system catch up
- * limit the number of attempts to 10
- */
-	   {if (errno == EAGAIN)
-               {SC_sleep(10);
-                zc++;
-		continue;}
-	    else
-	       break;}
-	else
-	   zc = 0;
+/* blocking read - insist on the specified number of bytes or an error */
+    else
+       {nbo = n;
+	nbr = -1;
+	pbf = bf;
+	rv  = 0;
 
-	pbf += nbr;
-	nbo -= nbr;
-        rv  += nbr;};
+	while ((nbo > 0) && (nbr != 0))
+	   {nbr = read(fd, pbf, nbo);
+	    if (nbr < 0)
+	       {rv = nbr;
+		break;};
+	    pbf += nbr;
+	    nbo -= nbr;
+	    rv  += nbr;};};
 
 #ifdef AIX
 
