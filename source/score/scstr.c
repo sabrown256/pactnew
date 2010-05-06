@@ -1656,8 +1656,8 @@ double SC_stof(char *s)
  *         - returns 0 if string is NULL
  */
 
-int SC_stoi(char *s)
-   {int rv;
+BIGINT SC_stoi(char *s)
+   {BIGINT rv;
 
     rv = 0;
     if (s != NULL)
@@ -1672,8 +1672,8 @@ int SC_stoi(char *s)
  *         - returns 0 if string is NULL
  */
 
-long SC_stol(char *s)
-   {long rv;
+BIGINT SC_stol(char *s)
+   {BIGINT rv;
 
     rv = 0L;
     if (s != NULL)

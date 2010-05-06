@@ -38,27 +38,38 @@ mkdir $tmp
 cp *.a $tmp
 cd $tmp >& /dev/null
 
-rm -f libpsmm.a libscc.a libultra.a libpact.a
+rm -f libpsmm.a libscc.a libultra.a libpy.a libpact.a
 
 # extract all the .o files from all the .a files
-echo "Extracting:"
+echo "   Extracting:"
 foreach i (*.a)
-   echo "  $i"
+   echo "      $i"
    $AR $ARXOpt $i
 end
 
 # make libpact.a with all the .o files
-echo -n "Making libpact.a ... "
+echo -n "   Making libpact.a .... "
 $AR $AROpt libpact.a *.o
+mv libpact.a ..
 echo "done"
 
-mv libpact.a ..
+# make libpact.so with all the .o files
+set bshld = `pact +l -info BuildSharedLibs | tail -n 1`
+set sld   = `pact +l -info ShLD`
+set ldf   = `pact +l -info LDShared`
+if ("$bshld" == TRUE) then
+   echo -n "   Making libpact.so ... "
+   $sld $ldf -o libpact.so.1 *.o
+   mv libpact.so.1 ..
+   ln -s ../libpact.so.1 ../libpact.so
+   echo "done"
+endif
 
 # cleanup
 cd .. >& /dev/null
 $RMDir $tmp
 
-ls -l libpact.a
+# ls -l libpact.*
 
 popd >& /dev/null
 

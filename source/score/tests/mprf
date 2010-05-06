@@ -41,7 +41,9 @@ else
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus == 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "                    SCORE MM Performance Test ... OMITTED ($xstatus/$ETime)"
+   else if ($xstatus == 0) then
       NoteD $LogF "                    SCORE MM Performance Test ... PASSED ($ETime)"
    else then
       NoteD $LogF "                    SCORE MM Performance Test ... FAILED ($xstatus/$ETime)"

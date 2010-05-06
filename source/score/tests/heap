@@ -48,7 +48,9 @@ if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
 
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus == 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+      else if ($xstatus == 0) then
          NoteD $LogF "PASSED ($ETime)"
       else if (-e /dev/zero) then
          NoteD $LogF "FAILED ($xstatus/$ETime)"

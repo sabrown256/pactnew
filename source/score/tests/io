@@ -37,7 +37,9 @@ set ETime = `$TIMER -b $UTime`
 
 rm -f sciots.txt
 
-if ($xstatus != 0) then
+if (($xstatus == 254) || ($xstatus == 255)) then
+   NoteD $LogF "                    SCORE I/O Test .............. OMITTED ($xstatus/$ETime)"
+else if ($xstatus != 0) then
    NoteD $LogF "                    SCORE I/O Test .............. FAILED ($xstatus/$ETime)"
 #   set Err = 1
 else

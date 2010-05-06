@@ -40,7 +40,9 @@ if ($?CROSS_COMPILE == 0) then
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus != 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
       NoteD $LogF "FAILED ($xstatus/$ETime)"
       set Err = 1
    else

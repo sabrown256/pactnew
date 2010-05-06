@@ -26,8 +26,10 @@ else
 endif
 set ETime = `$TIMER -b $UTime`
 
-if ($xstatus != 0) then
-   NoteD $LogF "                    PDB Checksum Test  ................. FAILED ($ETime)"
+if (($xstatus == 254) || ($xstatus == 255)) then
+   NoteD $LogF "                    PDB Checksum Test  ................. OMITTED ($xstatus/$ETime)"
+else if ($xstatus != 0) then
+   NoteD $LogF "                    PDB Checksum Test  ................. FAILED ($xstatus/$ETime)"
    set Err = 1
 else
    NoteD $LogF "                    PDB Checksum Test  ................. PASSED ($ETime)"

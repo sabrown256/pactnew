@@ -106,7 +106,9 @@ endif
 set ETime   = `$TIMER -b $UTime`
 
 NoteD $LogF ""
-if ($TStatus != 0) then
+if (($TStatus == 254) || ($TStatus == 255)) then
+   NoteD $LogF "                    SCORE Archive Scan Test ..... OMITTED ($ETime)"
+else if ($TStatus != 0) then
    NoteD $LogF "                    SCORE Archive Scan Test ..... FAILED ($ETime)"
    set Err = 1
 else

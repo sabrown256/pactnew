@@ -514,3 +514,133 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* SC_SET_RESOURCE_LIMITS - set limits on resource usage
+ *                        - return TRUE iff successful
+ */
+
+int SC_set_resource_limits(BIGINT mem, BIGINT cpu, BIGINT fsz,
+			   int nfd, int nprc)
+   {int rv;
+    struct rlimit rl;
+
+    rv = 0;
+
+/* set virtual memory usage limit */
+    if (mem == -1)
+       mem = SC_stoi(getenv("SC_EXEC_RLIMIT_AS"));
+    if (mem > 0)
+       {rv |= getrlimit(RLIMIT_AS, &rl);
+	if (rv == 0)
+	   rl.rlim_cur = mem;
+	rv |= setrlimit(RLIMIT_AS, &rl);};
+
+/* set CPU time limit */
+    if (cpu == -1)
+       cpu = SC_stoi(getenv("SC_EXEC_RLIMIT_CPU"));
+    if (cpu > 0)
+       {rv |= getrlimit(RLIMIT_CPU, &rl);
+	if (rv == 0)
+	   rl.rlim_cur = cpu;
+	rv |= setrlimit(RLIMIT_CPU, &rl);};
+
+/* set file size limit */
+    if (fsz == -1)
+       fsz = SC_stoi(getenv("SC_EXEC_RLIMIT_FSIZE"));
+    if (fsz > 0)
+       {rv |= getrlimit(RLIMIT_FSIZE, &rl);
+	if (rv == 0)
+	   rl.rlim_cur = fsz;
+	rv |= setrlimit(RLIMIT_FSIZE, &rl);};
+
+/* set file descriptor limit */
+    if (nfd == -1)
+       nfd = SC_stoi(getenv("SC_EXEC_RLIMIT_NOFILE"));
+    if (nfd > 0)
+       {rv |= getrlimit(RLIMIT_NOFILE, &rl);
+	if (rv == 0)
+	   rl.rlim_cur = nfd;
+	rv |= setrlimit(RLIMIT_NOFILE, &rl);};
+
+/* set number of processes limit */
+#ifndef AIX
+    if (nprc == -1)
+       nprc = SC_stoi(getenv("SC_EXEC_RLIMIT_NPROC"));
+    if (nprc > 0)
+       {rv |= getrlimit(RLIMIT_NPROC, &rl);
+	if (rv == 0)
+	   rl.rlim_cur = nprc;
+	rv |= setrlimit(RLIMIT_NPROC, &rl);};
+#endif
+
+/* invert the sense */
+    rv = (rv == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_RESOURCE_LIMITS - get limits on resource usage
+ *                        - return TRUE iff successful
+ */
+
+int SC_get_resource_limits(BIGINT *pmem, BIGINT *pcpu, BIGINT *pfsz,
+			   int *pnfd, int *pnprc)
+   {int rv;
+    struct rlimit rl;
+
+    rv = 0;
+
+/* get virtual memory usage limit */
+    if (pmem != NULL)
+       {rv |= getrlimit(RLIMIT_AS, &rl);
+	if (rv == 0)
+	   *pmem = rl.rlim_cur;
+	else
+	   *pmem = -1;};
+
+/* get CPU time limit */
+    if (pcpu != NULL)
+       {rv |= getrlimit(RLIMIT_CPU, &rl);
+	if (rv == 0)
+	   *pcpu = rl.rlim_cur;
+	else
+	   *pcpu = -1;};
+
+/* get file size limit */
+    if (pfsz != NULL)
+       {rv |= getrlimit(RLIMIT_FSIZE, &rl);
+	if (rv == 0)
+	   *pfsz = rl.rlim_cur;
+	else
+	   *pfsz = -1;};
+
+/* get file descriptor limit */
+    if (pnfd != NULL)
+       {rv |= getrlimit(RLIMIT_NOFILE, &rl);
+	if (rv == 0)
+	   *pnfd = rl.rlim_cur;
+	else
+	   *pnfd = -1;};
+
+/* get number of processes limit */
+#ifndef AIX
+    if (pnprc != NULL)
+       {rv |= getrlimit(RLIMIT_NPROC, &rl);
+	if (rv == 0)
+	   *pnprc = rl.rlim_cur;
+	else
+	   *pnprc = -1;};
+#else
+    if (pnprc != NULL)
+       *pnprc = -1;
+#endif
+
+/* invert the sense */
+    rv = (rv == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

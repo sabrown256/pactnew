@@ -37,7 +37,9 @@ source ../../tests/common
       endif
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus == 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+      else if ($xstatus == 0) then
          NoteD $Log "PASSED ($ETime)"
          flog $Log rm -f shmtst.res shmtst.res.diff shmtst.m
       else

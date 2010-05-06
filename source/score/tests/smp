@@ -130,7 +130,7 @@ source ../../tests/common
             flog $LogF $CFE $BinDir/sctlts -nd $mode -nt $n
             set xstatus = $status
 
-            if ($xstatus == 123) then
+            if (($xstatus == 123) || ($xstatus == 255) || ($xstatus == 254)) then
                NoteD $LogF -n "*"
                Note $LogF ""
             else if ($xstatus != 0) then

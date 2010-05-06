@@ -43,7 +43,9 @@ if ("$Parallel" != "") then
       endif
       set ETime   = `$TIMER -b $UTime`
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $LogF "FAILED ($xstatus/$ETime)"
 
 # GOTCHA: temporarily prevent Version III from failing the test suite

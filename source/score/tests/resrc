@@ -34,7 +34,9 @@ endif
 
 set ETime = `$TIMER -b $UTime`
 
-if ($xstatus != 0) then
+if (($xstatus == 254) || ($xstatus == 255)) then
+   NoteD $LogF "                    SCORE Resource Test ......... OMITTED ($xstatus/$ETime)"
+else if ($xstatus != 0) then
    NoteD $LogF "                    SCORE Resource Test ......... FAILED ($xstatus/$ETime)"
    set Err = 1
 else

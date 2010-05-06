@@ -38,7 +38,9 @@ if ("$Valgrind" == "") then
    end
    set ETime   = `$TIMER -b $UTime`
 
-   if ($lerr != 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "                    PDB Buffer Test B .................. OMITTED ($xstatus/$ETime)"
+   else if ($lerr != 0) then
       NoteD $LogF "                    PDB Buffer Test B .................. FAILED ($xstatus/$ETime)"
       set Err = 1
    else
