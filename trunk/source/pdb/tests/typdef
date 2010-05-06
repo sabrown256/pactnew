@@ -31,7 +31,9 @@ set ETime   = `$TIMER -b $UTime`
 unalias grep
 set check = `tail out.pdb | grep Float | sed -e 's|Float.*double.*|pass|'`
 
-if (($xstatus != 0) || ("$check" != "pass")) then
+if (($xstatus == 254) || ($xstatus == 255)) then
+   NoteD $LogF "OMITTED ($xstatus/$ETime)"
+else if (($xstatus != 0) || ("$check" != "pass")) then
    NoteD $LogF ">$check<"
    NoteD $LogF "FAILED ($xstatus/$ETime)"
    set Err = 1

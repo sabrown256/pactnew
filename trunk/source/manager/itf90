@@ -34,27 +34,27 @@ set SzAddr  = `$CFE detect | grep "A pointer is"`
 set SzAddr  = $SzAddr[4]
 
 if ("$FC" == "") then
-   NoteD $Log "No Fortran compiler specified - exiting"
+   NoteD $Log "   No Fortran compiler specified - exiting"
    exit(1)
 endif
 
 set FCExe = `$Which $FC`
 if (!(-x "$FCExe")) then
-   NoteD $Log "Fortran compiler $FC not found - exiting"
+   NoteD $Log "   Fortran compiler $FC not found - exiting"
    exit(2)
 endif
 
 set AR    = `pact +l -info AR`
 set AROpt = `pact +l -info AROpt`
 
-NoteD $Log ""
-NoteD $Log "Generating F90 interfaces using:"
-NoteD $Log "   Compiler:  $FCExe"
-NoteD $Log "   Includes:  $IncDir"
-NoteD $Log "   Addr size: $SzAddr"
-NoteD $Log "   AR:        $AR"
-NoteD $Log "   AROpt:     $AROpt"
-NoteD $Log ""
+Note $Log ""
+NoteD $Log "   Generating F90 interfaces using:"
+Note $Log "      Compiler:  $FCExe"
+Note $Log "      Includes:  $IncDir"
+Note $Log "      Addr size: $SzAddr"
+Note $Log "      AR:        $AR"
+Note $Log "      AROpt:     $AROpt"
+Note $Log ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -75,7 +75,7 @@ foreach d ($Dirs)
       @ NDots = $NDots - 1
    end
 
-   NoteD $Log -n "   $Fill "
+   NoteD $Log -n "      $Fill "
    Note $Log ""
 
    flog $Log set Mod = $ZArch/$d-itf.f90

@@ -97,7 +97,7 @@ if ("$TEST_MPI" == "YES") then
       endif
 
       set lTime = `$TIMER -b $lTime`
-      if (($LStat == -1) || ($LStat == 255)) then
+      if (($LStat == -1) || ($LStat == 255) || ($LStat == 254)) then
          NoteD $LogF "omitted ($lTime)"
       else
          flog $Log ( diff scmpiwrap.res $RefDir/scmpiwrap >! scmpiwrap.res.diff )

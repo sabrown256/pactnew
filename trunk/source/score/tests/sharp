@@ -137,7 +137,9 @@ else
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus == 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "omitted ($ETime)"
+   else if ($xstatus == 0) then
       NoteD $LogF "ok ($ETime)"
    else
       NoteD $LogF "ng ($xstatus/$ETime)"

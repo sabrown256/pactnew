@@ -46,7 +46,9 @@ else
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus == 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "                    SCORE HASH Test ............. OMITTED ($xstatus/$ETime)"
+   else if ($xstatus == 0) then
       NoteD $LogF "                    SCORE HASH Test ............. PASSED ($ETime)"
    else
       NoteD $LogF "                    SCORE HASH Test ............. FAILED ($xstatus/$ETime)"
@@ -73,7 +75,9 @@ else
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus == 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   else if ($xstatus == 0) then
       NoteD $LogF "PASSED ($ETime)"
    else
       NoteD $LogF "FAILED ($xstatus/$ETime)"

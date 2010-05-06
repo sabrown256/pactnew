@@ -1151,7 +1151,11 @@ extern PFTid
 /* SCRSCA.C declarations */
 
 extern int
- SC_resource_usage(SC_rusedes *ru, int pid);
+ SC_resource_usage(SC_rusedes *ru, int pid),
+ SC_set_resource_limits(BIGINT mem, BIGINT cpu, BIGINT fsz,
+			int nfd, int nprc),
+ SC_get_resource_limits(BIGINT *pmem, BIGINT *pcpu, BIGINT *pfsz,
+			int *pnfd, int *pnprc);
 
 
 /* SCRSCB.C declarations */
@@ -1206,6 +1210,10 @@ extern double
 extern long
  SC_strtol(char *str, char **ptr, int base);
 
+extern BIGINT
+ SC_stol(char *s),
+ SC_stoi(char *s);
+
 extern unsigned int
  SC_char_index(char *s, int n);
 
@@ -1226,11 +1234,7 @@ extern int
  SC_fltstrp(char *s),
  SC_chrstrp(char *s),
  SC_str_icmp(char *s, char *t),
- SC_stoi(char *s),
  SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list a);
-
-extern long
- SC_stol(char *s);
 
 #ifndef NO_LONG_LONG
 extern long long

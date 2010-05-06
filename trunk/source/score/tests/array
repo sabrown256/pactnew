@@ -40,7 +40,9 @@ endif
 
 set ETime   = `$TIMER -b $UTime`
 
-if ($xstatus != 0) then
+if (($xstatus == 254) || ($xstatus == 255)) then
+   NoteD $LogF "                    SCORE Smart Array Test ...... OMITTED ($ETime)"
+else if ($xstatus != 0) then
    NoteD $LogF "                    SCORE Smart Array Test ...... FAILED ($ETime)"
 else
    NoteD $LogF "                    SCORE Smart Array Test ...... PASSED ($ETime)"

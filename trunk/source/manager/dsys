@@ -320,8 +320,14 @@ switch ($Cmnd)
         if ($RStatus == 0) then
            NoteD $Log ""
            Separator $Log
+           NoteD $Log "Making integrated PACT library"
+           ftee $Log ./pact-lib
+           NoteD $Log "done"
+
+           NoteD $Log ""
+           Separator $Log
            NoteD $Log "Building F90 interfaces"
-           flog $Log ./itf90
+           ftee $Log ./itf90
            NoteD $Log "done"
         endif
 

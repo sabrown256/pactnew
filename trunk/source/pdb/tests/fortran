@@ -77,7 +77,10 @@ if (($LStat == 0) && ("$MPI" == "")) then
          set xstatus = `cat $Tmp`
          flog $LogF $RM $Tmp
       endif
-      if ($xstatus == 0) then
+
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "omitted"
+      else if ($xstatus == 0) then
          NoteD $LogF "ok"
       else
          NoteD $LogF "ng"

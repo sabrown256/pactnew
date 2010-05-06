@@ -46,6 +46,9 @@ if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
       else
          NoteD $Log "PASSED ($ETime)"
       endif
+   else if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $Log "OMITTED ($xstatus/$ETime)"
+      set xstatus = 0
    else if ($xstatus != 0) then
       NoteD $Log "CRASHED ($xstatus/$ETime)"
       set xstatus = 2

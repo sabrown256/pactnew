@@ -43,13 +43,13 @@ if ("$MPI" != "") then
       set ETime   = `$TIMER -b $UTime`
 
 # Not enough resources error:
-#   poe  exits with status 255
-#   prun exits with status 126
-#   srun exits with status 1
+#   SLURM exits with status 254 or 255 by request
+#   prun  exits with status 126
+#   srun  exits with status 1
 # NFS error:
 #   srun exits with status 134
       NoteD $LogF ""
-      if (($xstatus == 255) || ($xstatus == 126) || ($xstatus == 1) || ($xstatus == 134)) then
+      if (($xstatus == 254) || ($xstatus == 255) || ($xstatus == 126) || ($xstatus == 1) || ($xstatus == 134)) then
          NoteD $LogF "                    PDB Distributed Parallel Test ...... OMITTED ($ETime)"
       else if ($xstatus != 0) then
          NoteD $LogF "                    PDB Distributed Parallel Test ...... FAILED ($ETime)"

@@ -46,7 +46,9 @@ source ../../tests/common
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus != 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $Log  "                    PML Function Test ........ OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
       NoteD $Log  "                    PML Function Test ........ FAILED ($ETime)"
       @ Err = 1
    else

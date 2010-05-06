@@ -25,7 +25,7 @@ if ($ok == TRUE) then
    set UTime = `$TIMER -r`
    flog $LogF pushd $SrcDir/tests
    ftee $LogF do-test $argv
-   set TStatus = $status
+   set xstatus = $status
    flog $LogF popd
 
    set ETime   = `$TIMER -b $UTime`
@@ -40,7 +40,9 @@ if ($ok == TRUE) then
 # server and async are currently prone to race type failures
 # so do not fail the test if they do not succeed
 
-   if ($TStatus > 3) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "                    SCORE Make Test ............. OMITTED ($xstatus/$ETime)"
+   else if ($xstatus > 3) then
       NoteD $LogF "                    SCORE Make Test ............. FAILED ($ETime)"
       set Err = 1
    else
