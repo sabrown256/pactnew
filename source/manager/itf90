@@ -115,10 +115,11 @@ foreach d ($Dirs)
 #   sed 's/char *\*/integer(isizea) /g'   char **          -> integer(isizea)
 #   sed 's/void *\*/integer(isizea) /g'   void [*]*        -> integer(isizea)
 #   sed 's/integer *\*/integer /g'        integer *        -> integer
-#   sed 's/REAL *\*/real /g'              REAL *           -> real
-#   sed 's/double *\*/real /g'            double *         -> real
-#   sed 's/REAL/real/g'                   REAL             -> real
-#   sed 's/double/real/g'                 double           -> real
+#   sed 's/REAL *\*/real /g'              REAL *           -> real*8
+#   sed 's/double *\*/real /g'            double *         -> real*8
+#   sed 's/REAL/real*8/g'                 REAL             -> real*8
+#   sed 's/double/real*8/g'               double           -> real*8
+#   sed 's/float/real*4/g'                float            -> real*4
 #   sed 's/*//g'                          '*'              -> ''
 #   sed 's/,/ /g'                         ','              -> ' '
 #   sed 's/F77_string/character*(*)/g'    F77_string       -> character*(*)
@@ -142,15 +143,17 @@ foreach d ($Dirs)
    sed 's/char *\*/integer(isizea) /g'            | \
    sed 's/void *\*/integer(isizea) /g'            | \
    sed 's/integer *\*/integer /g'                 | \
-   sed 's/REAL *\*/real /g'                       | \
-   sed 's/double *\*/real /g'                     | \
-   sed 's/REAL/real/g'                            | \
-   sed 's/double/real/g'                          | \
+   sed 's/REAL *\*/real--8 /g'                    | \
+   sed 's/double *\*/real--8 /g'                  | \
+   sed 's/REAL/real--8/g'                         | \
+   sed 's/double/real--8/g'                       | \
+   sed 's/float/real--4/g'                        | \
    sed 's/*//g'                                   | \
    sed 's/,/ /g'                                  | \
    sed 's/F77_string/character*(*)/g'             | \
    sed 's/PF[^ ]* /external /g'                   | \
    sed 's/.*:/      /'                            | \
+   sed 's/--/*/g'                                 | \
    cat >&! $Mod.tmp
 
    flog $Log cat $Mod.tmp

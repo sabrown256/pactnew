@@ -193,7 +193,15 @@ int server(char *root, int init, int dmn)
 			     *p++ = '\0';
 			     val = srv_load_db(s+5, NULL);}
 
-/* variable def/init */
+/* variable conditional init */
+			 else if (strstr(s, "=\?") != NULL)
+			    {key_val(&var, &nvl, s, "=? \t\n");
+			     val = get_db(db, var);
+			     st  = (val != cnoval());
+			     if (st == FALSE)
+			        val = put_db(db, var, nvl);}
+
+/* variable defined? */
 			 else if (strchr(s, '?') != NULL)
 			    {key_val(&var, &nvl, s, "? \t\n");
 			     val = get_db(db, var);

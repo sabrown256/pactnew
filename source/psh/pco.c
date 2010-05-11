@@ -108,6 +108,8 @@ struct s_state
     int profilep;
     int tmp_dirp;
     int verbose;
+    int launched;               /* TRUE iff PCO launched PERDB
+                                 * FALSE if PERDB was already running */
 
     int na;
     char **args;
@@ -141,7 +143,7 @@ struct s_state
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,
 	FALSE, FALSE, FALSE, PHASE_READ, FALSE,
-	FALSE, FALSE, };
+	FALSE, FALSE, FALSE, };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2052,29 +2054,34 @@ static void finish_config(char *base)
 /* LAUNCH_PERDB - look for -f arg and if found launch perdb first of all */
 
 int launch_perdb(int c, char **v)
-   {int i, l, n, ok, st;
+   {int i, l, n, ok, rv;
     char t[MAXLINE];
     char *db;
     static char *sfx[] = { "db", "log", "pid" };
 
-    ok = FALSE;
-    n  = sizeof(sfx)/sizeof(char *);
+    st.launched = FALSE;
 
-    for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-f") == 0)
-	    {db = v[++i];
-	     csetenv("PERDB_PATH", db);
+    if (cdefenv("PERDB_PATH") == FALSE)
+       {ok = FALSE;
+	n  = sizeof(sfx)/sizeof(char *);
 
-	     for (l = 0; l < n; l++)
-	         {snprintf(t, MAXLINE, "%s.%s", db, sfx[l]);
-		  unlink(t);};
+	for (i = 1; i < c; i++)
+	    {if (strcmp(v[i], "-f") == 0)
+	        {db = v[++i];
+		 csetenv("PERDB_PATH", db);
 
-	     st = execute(FALSE, "perdb -f %s -l -c -s", db);
-	     ok = ((st & 0xff) == 0);
-	     break;};};
+		 for (l = 0; l < n; l++)
+		     {snprintf(t, MAXLINE, "%s.%s", db, sfx[l]);
+		      unlink(t);};
+
+		 rv = execute(FALSE, "perdb -f %s -l -c -s", db);
+		 ok = ((rv & 0xff) == 0);
+		 break;};};
 
 /* give the server some time to initialize */
-    nsleep(100);
+	nsleep(100);
+
+	st.launched = ok;};
 
     return(ok);}
  
@@ -2087,9 +2094,11 @@ int kill_perdb(void)
    {int ok;
     char *db, *bf;
 
-    db = cgetenv(FALSE, "PERDB_PATH");
-    bf = run(TRUE, "perdb -f %s -l quit:", db);
-    ok = (bf != NULL);
+    ok = TRUE;
+    if (st.launched == TRUE)
+       {db = cgetenv(FALSE, "PERDB_PATH");
+	bf = run(TRUE, "perdb -f %s -l quit:", db);
+	ok = (bf != NULL);};
 
     return(ok);}
  

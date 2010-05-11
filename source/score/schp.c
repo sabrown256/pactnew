@@ -1057,7 +1057,7 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
     else
        SC_ptr_arr_len(na, argv);
 
-    ca = FMAKE_N(char *, na+5, "_SC_OPEN_REMOTE:ca");
+    ca = FMAKE_N(char *, na+7, "_SC_OPEN_REMOTE:ca");
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -1065,6 +1065,8 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
 	if (st > 0)
 	   {i = 0;
 	    ca[i++] = "ssh";
+	    ca[i++] = "-o";
+	    ca[i++] = "SendEnv=SC_EXEC_RLIMIT_AS";
 	    ca[i++] = "-q";
 	    ca[i++] = host;
 	    ca[i++] = cmnd;

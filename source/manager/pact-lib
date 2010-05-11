@@ -61,6 +61,7 @@ if ("$bshld" == TRUE) then
    echo -n "   Making libpact.so ... "
    $sld $ldf -o libpact.so.1 *.o
    mv libpact.so.1 ..
+   rm -f ../libpact.so*
    ln -s ../libpact.so.1 ../libpact.so
    echo "done"
 endif

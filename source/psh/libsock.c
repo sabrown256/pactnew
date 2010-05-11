@@ -85,7 +85,7 @@ static char *name_sock(char *root, int ch)
 static int sock_exists(char *fmt, ...)
    {int rv;
     char s[MAXLINE];
-    char *sock, *flog, *wh;
+    char *sock, *wh;
 
     rv = FALSE;
 
@@ -102,10 +102,14 @@ static int sock_exists(char *fmt, ...)
 	else
 	   wh = "SERVER";
 
-	flog = name_log(s);
-	log_activity(flog, dbg_sock, wh, "exist |%s| (%s)",
-		     sock,
-		     (rv == TRUE) ? "yes" : "no");};
+#ifdef VERBOSE
+	{char *flog;
+	 flog = name_log(s);
+	 log_activity(flog, dbg_sock, wh, "exist |%s| (%s)",
+		      sock,
+		      (rv == TRUE) ? "yes" : "no");};
+#endif
+       };
 
     return(rv);}
 
@@ -173,7 +177,6 @@ static void fin_server()
 
 static int connect_server(char *root)
    {int fd, err, sasz;
-    char *flog;
     socklen_t len;
     struct sockaddr *sa;
 
@@ -190,9 +193,13 @@ static int connect_server(char *root)
 	if (err >= 0)
 	   fd = accept(srv.server, sa, &len);
 
-	flog = name_log(root);
-	log_activity(flog, dbg_sock,
-		     "SERVER", "connect %d", fd);};
+#ifdef VERBOSE
+	{char *flog;
+	 flog = name_log(root);
+	 log_activity(flog, dbg_sock,
+		      "SERVER", "connect %d", fd);};
+#endif
+       };
 
     return(fd);}
 
@@ -205,7 +212,6 @@ static int connect_client(char *root)
    {int sasz, fd, err, port;
     char s[MAXLINE];
     char *res, *host, *prt;
-    char *flog;
     struct sockaddr_in *srvr;
     in_addr_t haddr;
 
@@ -245,11 +251,15 @@ static int connect_client(char *root)
 		    if (err < 0)
 		       close(fd);
 
-		    flog = name_log(root);
-		    log_activity(flog, dbg_sock,
-				 "CLIENT", "connect %s@%s  %d  %s (%d)",
-				 host, prt, fd,
-				 strerror(errno), errno);};};};};
+#ifdef VERBOSE
+		    {char *flog;
+		     flog = name_log(root);
+		     log_activity(flog, dbg_sock,
+				  "CLIENT", "connect %s@%s  %d  %s (%d)",
+				  host, prt, fd,
+				  strerror(errno), errno);};
+#endif
+		   };};};};
 
     return(fd);}
 

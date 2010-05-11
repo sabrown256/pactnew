@@ -96,13 +96,15 @@ alias dbdef     'perdb \!\!:1 \?'
 # does not already have a value
 # matches C call dbinitv
 # usage: dbini <var> <val>
-alias dbini     'set t_ = ( `perdb \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbini     'set t_ = ( `perdb \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+
+setenv PERDB `which perdb`
 
 alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
-#alias SafeEnv   'set t_ = ( `perdb \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+#alias SafeEnv   'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias SetParent 'echo "parent \!\!:1($\!\!:1)"'
-#alias SetParent 'set t_ = ( `perdb \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-#alias SetParent 'perdb -l \!\!:1 = $\!\!:1'
+#alias SetParent 'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+#alias SetParent '$PERDB -l \!\!:1 = $\!\!:1'
 
 setenv MV     "mv -f"
 setenv RM     "rm -f"

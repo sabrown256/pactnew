@@ -408,6 +408,7 @@ case daemon:
        set Tmp = ""
     endif
 
+    flog $Log ls-jobs -q /update-sys
     set Running = `ls-jobs -q /update-sys |& awk 'NF > 0 { print }' | wc -l`
     if ($Running[1] > 2) then
        Note $Log "Job Info: $Running"
