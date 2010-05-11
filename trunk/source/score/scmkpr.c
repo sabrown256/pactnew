@@ -330,11 +330,11 @@ static int _SC_rel_rule(haelem *hp, void *a)
        {if (SC_ref_count(rd) < 2)
 	   {sa = rd->dependencies;
 	    SC_free_strings(sa);
-	    SFREE(rd->dependencies);
+	    rd->dependencies = NULL;
 
 	    sa = rd->actions;
 	    SC_free_strings(sa);
-	    SFREE(rd->actions);
+	    rd->actions = NULL;
 
 	    SFREE(rd->act);
 	    SFREE(rd->depend);

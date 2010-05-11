@@ -15,7 +15,7 @@ endif
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
 alias dbdef     'perdb $opt \!\!:1 \?'
-alias dbini     'set t_ = ( `perdb $opt \!\!:1 \? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbini     'set t_ = ( `perdb $opt \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
 set res = ( "defined" "undefined" )
 

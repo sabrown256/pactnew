@@ -30,7 +30,7 @@ inc scope_thread.h scope_term.h scope_typeh.h
 inc scope_lex.h sclexan.h pml.h scope_complex.h
 inc pdb.h pdform.h pgs.h scope_x11.h scope_cgm.h scope_raster.h ppc.h
 inc panace.h scheme.h syntax.h sx.h
-inc do-run-db
+inc do-run-db cfg.pl
 
 f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
 f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod

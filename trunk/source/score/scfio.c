@@ -389,12 +389,19 @@ FILE *SC_fopen(char *name, char *mode)
  */
 
 static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
-   {char *bf;
-    long nbw, nbr;
+   {char *bf, *ps;
+    long nbw, nbt, nbr;
 
-    bf = CMAKE_N(char, nbe);
+    bf = FMAKE_N(char, nbe, "_SC_TRANSFER_BYTES:bf");
 
-    nbr = SC_read_sigsafe(cfd, bf, nbe);
+/* read the data looping until all expected bytes come in */
+    nbt = nbe;
+    for (ps = bf; TRUE; ps += nbr)
+        {nbr  = SC_read_sigsafe(cfd, ps, nbt);
+	 nbt -= nbr;
+	 if (nbt <= 0)
+	    break;};
+
     nbw = _SC_fwrite(bf, 1, nbe, fp);
 
     SFREE(bf);

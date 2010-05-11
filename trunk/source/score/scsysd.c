@@ -467,7 +467,7 @@ static void _SC_pool_connection_close(conpool *cp, int vrb, char *tag,
 
 	if (vrb == TRUE)
 	   _SC_pool_printf(as, "***>", NULL, tag,
-			   "close connection %d, %s, for %s - process %d (%d %d)\n",
+			   "close connection %d, %s, for %s - process %d (%d %d)",
 			   ic, pco->host, tag, id, pp->status, pp->reason);
 
 	SC_remove_event_loop_callback(pe, SC_PROCESS_I, pp);
@@ -1034,7 +1034,7 @@ static void _SC_pool_assign_others(conpool *cp, int ic)
 			  inf->directory, inf->full);};};
 
     _SC_pool_printf(as, "***>", pco, "client",
-		    "reassigned tasks from %s to other connections",
+		    "reassigned tasks from %s to other connections\n",
 		    pco->host);
 
     return;}

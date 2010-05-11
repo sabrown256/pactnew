@@ -66,6 +66,7 @@ set LibDir  = $Root/lib
 set LogDir  = $Root/log
 set ScmDir  = $Root/scheme
 set PACT    = $BinDir/pact
+set PERDB   = $BinDir/perdb
 set PCKS    = "-"
 set EnvCsh  = $IncDir/env-pact.csh
 set Tmp     = tmp_$System
@@ -928,6 +929,9 @@ switch ($Cmnd)
         flog $Log set dbopt = ( -f $IncDir/cfg )
         flog $Log $RM $IncDir/cfg*
 
+        flog $Log setenv PERDB_PATH $IncDir/cfg
+	flog $Log $PERDB -l -c -s
+
 	if (($Method == 2) && (-x $BinDir/pco)) then
            flog $Log set PConf = ( $BinDir/pco $dbopt -l )
            Note $Log "Using binary pco to process input"
@@ -1085,6 +1089,8 @@ switch ($Cmnd)
               endif
            endif
         end
+
+	flog $Log $PERDB -l quit:
 
 # figure out which shell you are using
         NoteD $Log ""
