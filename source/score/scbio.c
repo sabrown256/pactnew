@@ -137,6 +137,20 @@ static int
 
 /*--------------------------------------------------------------------------*/
 
+/* _SC_BFR_MARK - mark a bio_frame FR */
+
+static void _SC_bfr_mark(bio_frame *fr, bio_oper rw, int fl)
+   {
+
+    if (fr != NULL)
+       {fr->rw      = rw;
+	fr->flushed = fl;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BFR_INIT - initialize a buffered io frame */
 
 static void _SC_bfr_init(bio_frame *fr, off_t addr, size_t bfsz)
@@ -151,11 +165,11 @@ static void _SC_bfr_init(bio_frame *fr, off_t addr, size_t bfsz)
 
         memset(fr->bf, 0, bfsz);
 
-	fr->sz      = bfsz;
-        fr->nb      = 0;
-	fr->addr    = addr;
-	fr->rw      = BIO_EMPTY;
-	fr->flushed = TRUE;};
+	fr->sz   = bfsz;
+        fr->nb   = 0;
+	fr->addr = addr;
+
+	_SC_bfr_mark(fr, BIO_EMPTY, TRUE);};
 
     return;}
 
@@ -217,7 +231,7 @@ static BIGINT _SC_bfr_infill(bio_frame *fd, bio_frame *fs)
     no[0] = ov[0] - fs->addr;
     no[1] = ov[0] - fd->addr;
 
-    nb  = ov[1] - ov[0];
+    nb     = ov[1] - ov[0];
     fsi[1] = no[0] + nb;
     fsi[1] = max(fsi[1], fsr);
     fdi[1] = no[1] + nb;
@@ -230,10 +244,6 @@ static BIGINT _SC_bfr_infill(bio_frame *fd, bio_frame *fs)
 
     fs->nb = fsi[1];
     fd->nb = fdi[1];
-
-    if (nb > 0)
-       {fd->flushed = FALSE;
-	fd->rw      = BIO_READ;};
 
     return(nb);}
 
@@ -253,7 +263,6 @@ static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
     fdw = fd->nb;
 
 /* decide overlap based on file address */
-/*    fdi[0] = fd->addr + fdw; */
     fdi[0] = fd->addr;
     fdi[2] = fd->addr + fd->sz;
 
@@ -267,7 +276,7 @@ static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
     no[0] = ov[0] - fs->addr;
     no[1] = ov[0] - fd->addr;
 
-    nb  = ov[1] - ov[0];
+    nb     = ov[1] - ov[0];
     fsi[1] = no[0] + nb;
     fsi[1] = max(fsi[1], fsw);
     fdi[1] = no[1] + nb;
@@ -282,45 +291,9 @@ static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
     fd->nb = fdi[1];
 
     if (nb > 0)
-       {fd->flushed = FALSE;
-	fd->rw      = BIO_WRITE;};
+       _SC_bfr_mark(fd, BIO_WRITE, FALSE);
 
     return(nb);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_BFR_FLUSH - flush the frame FR
- *               - return file pointer to original location if ORIG is TRUE
- */
-
-static int _SC_bfr_flush(bio_desc *bid, bio_frame *fr, int orig)
-   {int ret, ok, nw;
-    off_t fi[2], ad, nb;
-
-    ret = FALSE;
-
-    nb = fr->nb;
-    fi[0] = fr->addr;
-    fi[1] = fi[0] + nb;
-
-    if (orig == TRUE)
-       ad = bid->curr;
-
-    ok = _SC_bio_seek(bid, fi[0], SEEK_SET);
-
-/* GOTCHA: does this go past end of file? */
-    nw = SC_write_sigsafe(bid->fd, fr->bf, nb);
-
-    bid->nlw++;
-
-    if (orig == FALSE)
-       {ad = fi[1];
-	_SC_bio_set_addr(bid, ad, TRUE, "flush");}
-    else
-       _SC_bio_seek(bid, ad, SEEK_SET);
-
-    return(ret);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -330,16 +303,59 @@ static int _SC_bfr_flush(bio_desc *bid, bio_frame *fr, int orig)
  */
 
 static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
-   {int n;
+   {int n, ok, nw;
+    off_t fi[2], ad, nb;
+	
+    if ((fr->rw == BIO_WRITE) && (fl == TRUE))
+       {nb    = fr->nb;
+	fi[0] = fr->addr;
+	fi[1] = fi[0] + nb;
 
-    if (fl == TRUE)
-       _SC_bfr_flush(bid, fr, orig);
+	if (orig == TRUE)
+	   ad = bid->curr;
+
+	ok = _SC_bio_seek(bid, fi[0], SEEK_SET);
+
+/* GOTCHA: does this go past end of file? */
+	nw = SC_write_sigsafe(bid->fd, fr->bf, nb);
+
+	bid->nlw++;
+
+	if (orig == FALSE)
+	   {ad = fi[1];
+	    _SC_bio_set_addr(bid, ad, TRUE, "flush");}
+	else
+	   _SC_bio_seek(bid, ad, SEEK_SET);};
 
     _SC_bfr_free(fr);
 
     n = SC_array_remove(bid->stack, i);
 
     return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BFR_CONTAINS - return a stack frame which contains ADDR */
+
+static bio_frame *_SC_bfr_contains(bio_desc *bid, off_t addr)
+   {int i, n;
+    off_t fi[2];
+    bio_frame *fr, *rv;
+
+    rv = NULL;
+    if (bid->stack != NULL)
+       {n = SC_array_get_n(bid->stack);
+        for (i = 0; i < n; i++)
+	    {fr = *(bio_frame **) SC_array_get(bid->stack, i);
+             fi[0] = fr->addr;
+	     fi[1] = fi[0] + fr->nb;
+
+	     if ((fi[0] <= addr) && (addr < fi[1]))
+	        {rv = fr;
+		 break;};};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -368,10 +384,10 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 
 /* if a stack frame is completely covered by the request or
  * if the front of a stack frame is covered by the back of the request
- * throw it away - flushing write buffers first
+ * throw it away
  */
-	     if (ri[0] <= fi[0])
-	        {fl = ((fa->rw == BIO_WRITE) && (fr->rw == BIO_READ));
+	     if (ri[0] < fi[0])
+	        {fl = (fr->rw == BIO_READ);
 		 n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
 		 i--;}
 
@@ -424,7 +440,18 @@ static int _SC_bio_seek(bio_desc *bid, off_t offs, int wh)
 
 #else
 
-    addr = lseek(bid->fd, offs, wh);
+    if (addr != bid->curr)
+       {int sk;
+	bio_frame *fr;
+
+	fr = _SC_bfr_contains(bid, addr);
+
+	sk = TRUE;
+	if (fr != NULL)
+	   sk &= ((fr->rw != BIO_READ) || (fr->flushed == TRUE));
+
+	if (sk == TRUE)
+	   addr = lseek(bid->fd, offs, wh);};
 
 #endif
 
@@ -480,12 +507,11 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
  * operations can be posed in terms of frames
  */
        {nba = bid->sz - bid->curr;
-	rq.sz      = min(nb, nba);
-	rq.nb      = 0;
-	rq.addr    = bid->curr;
-	rq.bf      = bf;
-	rq.rw      = BIO_READ;
-	rq.flushed = FALSE;
+	rq.sz   = min(nb, nba);
+	rq.nb   = 0;
+	rq.addr = bid->curr;
+	rq.bf   = bf;
+	_SC_bfr_mark(&rq, BIO_READ, FALSE);
 
 /* get the frame to use for staging the request from disk
  * at the end if the buffer is not completely full it
@@ -497,7 +523,7 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	    _SC_bfr_init(fr, bid->curr, fr->sz);
 	    nbr    = SC_read_sigsafe(bid->fd, fr->bf, fr->sz);
 	    fr->nb = nbr;
-	    fr->rw = BIO_READ;
+	    _SC_bfr_mark(fr, BIO_READ, FALSE);
 	    bid->nlr++;};
 
 	do {nbc = _SC_bfr_infill(&rq, fr);
@@ -512,7 +538,7 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 		_SC_bfr_init(fr, nlc, bsz);
 		nbr    = SC_read_sigsafe(bid->fd, fr->bf, bsz);
 		fr->nb = nbr;
-		fr->rw = BIO_READ;
+		_SC_bfr_mark(fr, BIO_READ, FALSE);
 		bid->nlr++;
 
 /* signify that something happened and we cannot exit the loop */
@@ -562,12 +588,11 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 /* encapsulate the requested write as a frame so that all subsequent
  * operations can be posed in terms of frames
  */
-       {rq.sz      = nb;
-	rq.nb      = 0;
-	rq.addr    = bid->curr;
-	rq.bf      = bf;
-	rq.rw      = BIO_WRITE;
-	rq.flushed = FALSE;
+       {rq.sz   = nb;
+	rq.nb   = 0;
+	rq.addr = bid->curr;
+	rq.bf   = bf;
+	_SC_bfr_mark(&rq, BIO_WRITE, FALSE);
 
 /* get the frame to use for staging the request to disk
  * at the end if the buffer is not completely full it
@@ -618,15 +643,14 @@ static int _SC_bio_flush(bio_desc *bid)
 
 #else
 
-   {int i, n, fl;
+   {int i, n;
     bio_frame *fr;
 
     if (bid->stack != NULL)
        {n = SC_array_get_n(bid->stack);
         for (i = 0; i < n; i++)
 	    {fr = *(bio_frame **) SC_array_get(bid->stack, i);
-	     fl = (fr->rw == BIO_WRITE);
-	     n  = _SC_bfr_remove(bid, i, fr, fl, FALSE);
+	     n  = _SC_bfr_remove(bid, i, fr, TRUE, FALSE);
 	     i--;};};};
 
 #endif

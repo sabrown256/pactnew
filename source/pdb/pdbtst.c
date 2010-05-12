@@ -3500,7 +3500,7 @@ static int test_9(char *base, char *tgt, int n)
     if (status != -1)
        err = FALSE;
     else
-       PRINT(fp, "File %s (correctly) cannot be verified)\n", datfile);
+       PRINT(fp, "File %s cannot be verified (as expected)\n", datfile);
 
     PD_close(file);
 
