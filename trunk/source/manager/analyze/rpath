@@ -189,7 +189,7 @@ switch ($Out)
         breaksw
    case rpath:
         set nlink = ""
-        if ($?LD_RPath == 1) then
+        if (($?LD_RPath == 1) && ("$RPATH" != "")) then
            set nlink = ( `echo "$LD_RPath" | sed 's|\@|'$RPATH'|'` )
         endif
         echo $nlink

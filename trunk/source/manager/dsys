@@ -585,6 +585,7 @@ switch ($Cmnd)
         set Configuration = ""
         set ExplSystem    = FALSE
         set Method        = 2
+        set reconfig      = FALSE
         set mpi           = FALSE
         set python        = FALSE
         set shared        = FALSE
@@ -766,6 +767,9 @@ switch ($Cmnd)
               case -py:
                    set python = TRUE
                    breaksw
+              case -r:
+                   set reconfig = TRUE
+                   breaksw
               case -s:
                    set openmp = TRUE
                    breaksw
@@ -820,7 +824,15 @@ switch ($Cmnd)
 
 # otherwise look in the configs directories
         else
-           foreach dir ($ConfigDir $gdir)
+
+# when doing reconfig we can use the generated configs
+# but we want to regenerate them if doing a config
+           if ($reconfig == TRUE) then
+              set clst = ( $ConfigDir $gdir )
+           else
+              set clst = ( $ConfigDir )
+           endif
+           foreach dir ($clst)
               set lCfg = $dir/$Configuration
               if (-f $lCfg) then
                  set UCfg = $lCfg
@@ -830,6 +842,7 @@ switch ($Cmnd)
            if ("$UCfg" != "") then
               echo "Using configuration $Configuration"
            endif
+           unset clst
         endif
 
 # if there still is no config file - generate from what we know
@@ -1932,7 +1945,7 @@ CFG_DONE:
 
    case reconfig:
         set Inst = ( -i none )
-        set Args = ""
+        set Args = "-r"
         while ($#argv > 0)
            switch ($1)
               case -h:

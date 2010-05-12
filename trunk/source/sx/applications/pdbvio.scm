@@ -295,9 +295,12 @@
 		      (if (not (file? name mode))
 			  (set! mode "r"))
 		      (set! fp
-			    (or (scheme-spoke-open name mode)
-                                (open-bin-file name mode)
-				(printf nil
+
+; try C coded first to optimize performance by minimizing opens
+; which is crucial for inferior HPC machines such as BG/P
+			    (or (open-bin-file name mode)
+				(scheme-spoke-open name mode)
+                                (printf nil
 					"\nFile %s of unknown format\n"
 					name))))
 		    (if (and name (not (eqv? name "f0")))

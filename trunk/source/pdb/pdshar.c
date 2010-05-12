@@ -291,9 +291,12 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 	          memset(pa->err, 0, MAXLINE);
 		  break;};
 
+	pu = NULL;
+
 /* try to open the file read/write */
-	md = BINARY_MODE_RPLUS;
-	pu = _PD_pio_open(name, md);
+	if (*mode == 'a')
+	   {md = BINARY_MODE_RPLUS;
+	    pu = _PD_pio_open(name, md);};
 
 /* if that fails try to read only */
 	if (_PD_data_source(pu) == NULL)
