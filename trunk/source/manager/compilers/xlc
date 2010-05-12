@@ -29,7 +29,10 @@ Tool CC {
 
 Tool FC {
    Exe     = xlf90
-   Flags   = -qrecur
+   Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
+# Grrr - config analysis uses .f but itf90 uses .f90
+# IBM cannot seem to do both
+#   Flags  += -qfree=f90 -qsuffix=f=f90
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -q* ]
    Flags  += [ _cmd_ = -p ;                  # profiling

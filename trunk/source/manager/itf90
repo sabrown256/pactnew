@@ -44,8 +44,9 @@ if (!(-x "$FCExe")) then
    exit(2)
 endif
 
-set AR    = `pact +l -info AR`
-set AROpt = `pact +l -info AROpt`
+set FCFlags = `pact +l -info FFLAGS`
+set AR      = `pact +l -info AR`
+set AROpt   = `pact +l -info AROpt`
 
 Note $Log ""
 NoteD $Log "   Generating F90 interfaces using:"
@@ -230,11 +231,11 @@ foreach d ($Dirs)
       @ NDots = $NDots - 1
    end
 
-   Note $Mod "!"
-   Note $Mod "! $FName - F90 interfaces for $d"
-   Note $Mod "! $Fill - NOTE: this file was automatically generated"
-   Note $Mod "! $Fill - any manual changes will not be effective"
-   Note $Mod "!"
+   Note $Mod "\!"
+   Note $Mod "\! $FName - F90 interfaces for $d"
+   Note $Mod "\! $Fill - NOTE: this file was automatically generated"
+   Note $Mod "\! $Fill - any manual changes will not be effective"
+   Note $Mod "\!"
    Note $Mod ""
 
 # if there are no interfaces there is no need for the types module
@@ -278,7 +279,7 @@ foreach d ($Dirs)
 
    flog $Log pushd $ZArch
    flog $Log set lMod = $Mod:t
-   flog $Log $FC -c $lMod
+   flog $Log $FC $FCFlags -c $lMod
    set xstatus = $status
 
    flog $Log ls $d*

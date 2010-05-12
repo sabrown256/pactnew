@@ -14,6 +14,11 @@ unalias ls
 unalias rm
 unalias mv
 
+# nasty bootstrapping issue here when building PACT for the first time
+# we are not supposed to be doing a lot of work in this script
+#setenv PERDB `swhich -1 perdb`
+setenv PERDB perdb
+
 # these two go together
 alias GOSUB     'set tJump = \!\!:1 ; set Return = ( \!\!:2 $Return ) ; set CallArgs = \!\!:3-$ ; if ($Trace == TRUE) echo "Calling $tJump (from $Return[2])" ; goto $tJump'
 alias RETURN    'set tReturn = $Return[1] ; shift Return ; if ($Trace == TRUE) echo "Returning to $tReturn (stack $Return)" ; goto $tReturn'
@@ -73,15 +78,15 @@ alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
 # use dbset instead of setenv
 # matches C call dbset
 # usage: dbset <var> <value>
-alias dbset     'setenv \!\!:1 "`perdb \!\!:1 = \!\!:2-$`"'
-alias dbset     'set t_ = ( `perdb \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbset     'setenv \!\!:1 "`$PERDB \!\!:1 = \!\!:2-$`"'
+alias dbset     'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
 # dbget imports a database variable into the current environment
 # use dbget before referencing the variable
 # matches C call dbget
 # usage: dbget <var>
 #        echo $<var>
-alias dbget     'setenv \!\!:1 "`perdb \!\!:1`"'
+alias dbget     'setenv \!\!:1 "`$PERDB \!\!:1`"'
 
 # dbdef queries database for existence of a variable
 # matches C call dbdef
@@ -90,15 +95,13 @@ alias dbget     'setenv \!\!:1 "`perdb \!\!:1`"'
 #           echo "defined"
 #        else
 #           echo "undefined"
-alias dbdef     'perdb \!\!:1 \?'
+alias dbdef     '$PERDB \!\!:1 \?'
 
 # dbini initializes <var> to <val> in the database iff <var>
 # does not already have a value
 # matches C call dbinitv
 # usage: dbini <var> <val>
-alias dbini     'set t_ = ( `perdb \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-
-setenv PERDB `which perdb`
+alias dbini     'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
 alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 #alias SafeEnv   'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
