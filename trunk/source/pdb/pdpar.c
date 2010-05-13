@@ -566,17 +566,12 @@ static FILE *_PD_popen(char *name, char *mode)
     if (_PD_pfman == NULL)
        _PD_pfm_init_t();
 
-    fid          = FMAKE(file_io_desc, "_PD_POPEN:fid");
-    fid->info    = pf;
+    fid          = SC_make_io_desc(pf);
     fid->fopen   = _PD_popen;
 
-    fid->ftell   = NULL;
     fid->lftell  = _PD_ptell;
-    fid->fseek   = NULL;
     fid->lfseek  = _PD_pseek;
-    fid->fread   = NULL;
     fid->lfread  = _PD_pread;
-    fid->fwrite  = NULL;
     fid->lfwrite = _PD_pwrite;
 
     fid->setvbuf = _PD_psetvbuf;
@@ -587,9 +582,6 @@ static FILE *_PD_popen(char *name, char *mode)
     fid->ungetc  = _PD_pungetc;
     fid->fflush  = _PD_pflush;
     fid->fgets   = _PD_pgets;
-    fid->feof    = NULL;
-    fid->pointer = NULL;
-    fid->segsize = NULL;
 
     fp = (FILE *) fid;
 

@@ -325,17 +325,12 @@ static FILE *_PN_bopen(char *name, char *mode)
 
     rf = _PD_SETUP_PSEUDO_FILE(fb);
 
-    fid          = FMAKE(file_io_desc, "_PN_BOPEN:fid");
-    fid->info    = rf;
+    fid          = SC_make_io_desc(rf);
     fid->fopen   = _PN_bopen;
 
-    fid->ftell   = NULL;
     fid->lftell  = _PN_btell;
-    fid->fseek   = NULL;
     fid->lfseek  = _PN_bseek;
-    fid->fread   = NULL;
     fid->lfread  = _PN_bread;
-    fid->fwrite  = NULL;
     fid->lfwrite = _PN_bwrite;
 
     fid->setvbuf = _PN_bsetvbuf;
@@ -346,9 +341,6 @@ static FILE *_PN_bopen(char *name, char *mode)
     fid->ungetc  = _PN_bungetc;
     fid->fflush  = _PN_bflush;
     fid->fgets   = _PN_bgets;
-    fid->feof    = NULL;
-    fid->pointer = NULL;
-    fid->segsize = NULL;
 
     fp = (FILE *) fid;
 

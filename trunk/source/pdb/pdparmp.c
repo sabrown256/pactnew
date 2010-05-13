@@ -818,17 +818,12 @@ static FILE *_PD_mpopen(char *name, char *mode)
     if (_PD_pflst == NULL)
        _PD_pfm_init_d();
 
-    fid          = FMAKE(file_io_desc, "_PD_MPOPEN:fid");
-    fid->info    = pf;
+    fid          = SC_make_io_desc(pf);
     fid->fopen   = _PD_mpopen;
 
-    fid->ftell   = NULL;
     fid->lftell  = _PD_mptell;
-    fid->fseek   = NULL;
     fid->lfseek  = _PD_mpseek;
-    fid->fread   = NULL;
     fid->lfread  = _PD_mpread;
-    fid->fwrite  = NULL;
     fid->lfwrite = (_PD.mp_collective == TRUE) ? _PD_mpwritec : _PD_mpwrite;
 
     fid->setvbuf = _PD_mpsetvbuf;
@@ -839,9 +834,6 @@ static FILE *_PD_mpopen(char *name, char *mode)
     fid->ungetc  = _PD_mpungetc;
     fid->fflush  = _PD_mpflush;
     fid->fgets   = _PD_mpgets;
-    fid->feof    = NULL;
-    fid->pointer = NULL;
-    fid->segsize = NULL;
 
     fp = (FILE *) fid;
  

@@ -106,17 +106,12 @@ FILE *SC_lmf_bind(void *mf)
 
     ret = NULL;
     if (mf != NULL)
-       {fid          = FMAKE(file_io_desc, "SC_LMF_BIND:fid");
-	fid->info    = mf;
+       {fid          = SC_make_io_desc(mf);
 	fid->fopen   = SC_lmf_open;
 
-	fid->ftell   = NULL;
 	fid->lftell  = _SC_mf_core_tell;
-	fid->fseek   = NULL;
 	fid->lfseek  = _SC_mf_core_seek;
-	fid->fread   = NULL;
 	fid->lfread  = _SC_lmf_read;
-	fid->fwrite  = NULL;
 	fid->lfwrite = _SC_lmf_write;
 
 	fid->setvbuf = _SC_mf_setvbuf;

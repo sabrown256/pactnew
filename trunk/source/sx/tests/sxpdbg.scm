@@ -18,6 +18,47 @@
 		   "cs" "as" "es" "ss"
 		   "struct1" "struct2" "struct3" "struct3a" "struct4"))
 
+(collect-io-info 0)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; IO-STATS - report the I/O stats on FP
+;          - use collect-io-info to control gathering of timing info
+;          - duplicate of function in pdbview.scm which we don't
+;          - want to load
+
+(define (io-stats fp)
+    "Procedure: Print the I/O operation statistics for the given file.
+     Usage: io-stats <file>"
+
+    (let* ((stats (get-io-info fp)))
+
+          (define io-opers (list "none" "fopen" "fclose"
+				 "ftell" "lftell" "fseek" "lfseek"
+				 "fread" "lfread" "fwrite" "lfwrite"
+				 "fprintf" "fputs" "fgets" "fgetc"
+				 "ungetc" "fflush" "feof" "setvbuf"
+				 "pointer" "segsize"))
+          (define (do-one sl ol)
+	      (if sl
+		  (let* ((sd (list-ref sl 0))
+			 (nh (car sd))
+			 (ns (cdr sd))
+			 (on (list-ref ol 0)))
+
+; GOTCHA: some 32 bit machines get a different number of tells than
+; 64 bit machines
+		        (if (and (> nh 0) (not (string=? on "lftell")))
+			    (printf nil "      %-10s %8d %11.3e\n"
+				    on nh (/ ns nh)))
+
+			(do-one (cdr sl) (cdr ol)))))
+
+	  (printf nil "I/O stats:\n")
+	  (printf nil "   Operation       # Hits   Tave (sec)\n")
+	  (do-one stats io-opers)))
+
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 

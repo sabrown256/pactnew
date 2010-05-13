@@ -640,6 +640,58 @@ object *_SX_open_file(object *arg, char *type, char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SXI_COLLECT_IO_INFO - return the file_io_desc stats */
+
+static object *_SXI_collect_io_info(object *arg)
+   {int wh;
+    object *o;
+
+    wh = FALSE;
+    SS_args(arg,
+            SC_INTEGER_I, &wh,
+            0);
+
+    wh = SC_collect_io_info(wh);
+
+    o = SS_mk_integer(wh);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_GET_IO_INFO - return the file_io_desc stats */
+
+static object *_SXI_get_io_info(object *arg)
+   {int i;
+    int *nh;
+    double *ns;
+    g_file *po;
+    PDBfile *file;
+    object *o, *c;
+
+    po = NULL;
+    SS_args(arg,
+            G_FILE, &po,
+            0);
+
+    o = SS_null;
+    if (po != NULL)
+       {file = FILE_FILE(PDBfile, po);
+	SC_get_io_info(file->stream, &nh, &ns);
+
+	for (i = 0; i < SC_N_IO_OPER; i++)
+	    {c = SS_mk_cons(SS_mk_integer(nh[i]),
+			    SS_mk_float(ns[i]));
+	     o = SS_mk_cons(c, o);};
+
+	o = SS_reverse(o);};
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_CREATE_PDBFILE - create up the named PDBFile */
 
 static object *_SXI_create_pdbfile(object *arg)
@@ -3836,6 +3888,11 @@ void SX_install_pdb_funcs(void)
                SS_nargs,
                _SXI_close_raw_file, SS_PR_PROC);
 
+    SS_install("collect-io-info",
+               "Globally control collection of stats on I/O operations on files",
+               SS_sargs,
+               _SXI_collect_io_info, SS_PR_PROC);
+
     SS_install("create-link",
                "Create a link to a variable in a file",
                SS_nargs,
@@ -3940,6 +3997,11 @@ void SX_install_pdb_funcs(void)
                "Flush a PDB file",
                SS_sargs,
                _SXI_flush_pdbfile, SS_PR_PROC);
+
+    SS_install("get-io-info",
+               "Return a list of stats on I/O operations on a PDB file",
+               SS_sargs,
+               _SXI_get_io_info, SS_PR_PROC);
 
     SS_install("hash->pdbdata",
                "Convert a hash table to a pdbdata object",

@@ -1059,17 +1059,12 @@ FILE *SC_bopen(char *name, char *mode)
             lseek(bid->fd, 0, 0);
 #endif
 
-	    fid          = FMAKE(file_io_desc, "SC_BOPEN:fid");
-	    fid->info    = bid;
+	    fid          = SC_make_io_desc(bid);
 	    fid->fopen   = SC_bopen;
 	    fid->ftell   = _SC_btell;
-	    fid->lftell  = NULL;
 	    fid->fseek   = _SC_bseek;
-	    fid->lfseek  = NULL;
 	    fid->fread   = _SC_bread;
-	    fid->lfread  = NULL;
 	    fid->fwrite  = _SC_bwrite;
-	    fid->lfwrite = NULL;
 	    fid->setvbuf = _SC_bsetvbuf;
 	    fid->fclose  = _SC_bclose;
 	    fid->fprintf = _SC_bprintf;
@@ -1079,8 +1074,6 @@ FILE *SC_bopen(char *name, char *mode)
 	    fid->fflush  = _SC_bflush;
 	    fid->feof    = _SC_beof;
 	    fid->fgets   = _SC_bgets;
-	    fid->pointer = NULL;
-	    fid->segsize = NULL;
 
 	    ret = (FILE *) fid;}
 	else
@@ -1120,16 +1113,11 @@ FILE *SC_lbopen(char *name, char *mode)
             lseek(bid->fd, 0, 0);
 #endif
 
-	    fid          = FMAKE(file_io_desc, "SC_LBOPEN:fid");
-	    fid->info    = bid;
+	    fid          = SC_make_io_desc(bid);
 	    fid->fopen   = SC_lbopen;
-	    fid->ftell   = NULL;
 	    fid->lftell  = _SC_bltell;
-	    fid->fseek   = NULL;
 	    fid->lfseek  = _SC_blseek;
-	    fid->fread   = NULL;
 	    fid->lfread  = _SC_blread;
-	    fid->fwrite  = NULL;
 	    fid->lfwrite = _SC_blwrite;
 	    fid->setvbuf = _SC_bsetvbuf;
 	    fid->fclose  = _SC_bclose;
@@ -1140,8 +1128,6 @@ FILE *SC_lbopen(char *name, char *mode)
 	    fid->fflush  = _SC_bflush;
 	    fid->feof    = _SC_beof;
 	    fid->fgets   = _SC_bgets;
-	    fid->pointer = NULL;
-	    fid->segsize = NULL;
 
 	    ret = (FILE *) fid;}
 	else
