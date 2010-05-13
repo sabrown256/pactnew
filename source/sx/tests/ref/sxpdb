@@ -169,6 +169,10 @@
     x(3) =     15
 Creating file foofoo
 (<PDBfile|PDBfile|foofoo>)
+I/O stats:
+   Operation       # Hits   Tave (sec)
+      lfseek           20   0.000e+00
+      lfwrite          73   0.000e+00
 reading file foofoo
 /c = "bar"
 /a = "foo"
@@ -341,6 +345,10 @@ reading file foofoo
     x(1) =     13
     x(2) =     14
     x(3) =     15
+I/O stats:
+   Operation       # Hits   Tave (sec)
+      lfseek           81   0.000e+00
+      lfread           77   0.000e+00
 testing pdb->list
 /c = "bar"
 /a = "foo"

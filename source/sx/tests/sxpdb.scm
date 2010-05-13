@@ -22,11 +22,13 @@
 (display (list-file))
 (newline)
 (pdb-data-write vars set file1)
+(io-stats file1)
 (close-pdbfile file1)
 
 (printf nil "reading file foofoo\n")
 (define file2 (open-pdbfile "foofoo"))
 (pdb-data-read file2 vars)
+(io-stats file2)
 (close-pdbfile file2)
 
 (printf nil "testing pdb->list\n")

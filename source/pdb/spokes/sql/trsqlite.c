@@ -269,30 +269,8 @@ FILE *_SQLITE_file(sql_file *fs)
    {file_io_desc *fid;
     FILE *fp;
 
-    fid          = FMAKE(file_io_desc, "_SQLITE_file:fid");
-    fid->info    = fs;
-    fid->fopen   = NULL;
-
-    fid->ftell   = NULL;
-    fid->lftell  = NULL;
-    fid->fseek   = NULL;
-    fid->lfseek  = NULL;
-    fid->fread   = NULL;
-    fid->lfread  = NULL;
-    fid->fwrite  = NULL;
-    fid->lfwrite = NULL;
-
-    fid->setvbuf = NULL;
-    fid->fclose  = _SQLITE_db_close;
-    fid->fprintf = NULL;
-    fid->fputs   = NULL;
-    fid->fgetc   = NULL;
-    fid->ungetc  = NULL;
-    fid->fflush  = NULL;
-    fid->feof    = NULL;
-    fid->fgets   = NULL;
-    fid->pointer = NULL;
-    fid->segsize = NULL;
+    fid         = SC_make_io_desc(fs);
+    fid->fclose = _SQLITE_db_close;
 
     fp = (FILE *) fid;
 

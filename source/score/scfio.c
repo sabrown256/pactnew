@@ -26,12 +26,22 @@
 #define UNGETC_MSG   "SC_FUNGETC"
 #define EXIT_MSG     "SC_FEXIT"
 
-#define REPLY(msg, val)                                     \
-   {printf("%s:%ld\n", msg, (long) (val));                  \
-    fflush(stdout);                                         \
-    if (_SC_debug)                                          \
-       {fprintf(_SC_diag, "%s:%ld\n", msg, (long) (val));   \
+#define REPLY(msg, val)                                                         \
+   {printf("%s:%ld\n", msg, (long) (val));                                      \
+    fflush(stdout);                                                             \
+    if (_SC_debug)                                                              \
+       {fprintf(_SC_diag, "%s:%ld\n", msg, (long) (val));                       \
         fflush(_SC_diag);};}
+
+#define IO_OPER_START_TIME(_f)                                                  \
+   {double _to;                                                                 \
+    if (fid->gather == TRUE)                                                    \
+       _to = SC_wall_clock_time()
+
+#define IO_OPER_ACCUM_TIME(_f, _o)                                              \
+    if (fid->gather == TRUE)                                                    \
+       (_f)->nsec[_o] += (SC_wall_clock_time() - _to);                          \
+    (_f)->nhits[_o]++;}
 
 typedef struct s_REMOTE_FILE REMOTE_FILE;
 
@@ -73,6 +83,95 @@ PFfopen
  lio_open_hook = SC_lbopen;
 
 #endif
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MAKE_IO_DESC - allocate, initialize, and return a file_io_desc */
+
+file_io_desc *SC_make_io_desc(void *fp)
+   {file_io_desc *fid;
+
+    fid          = FMAKE(file_io_desc, "SC_MAKE_IO_DESC:fid");
+    memset(fid, 0, sizeof(file_io_desc));
+
+    fid->info = fp;
+
+    if (SC_collect_io_info(-1) == TRUE)
+       fid->gather = TRUE;
+
+    return(fid);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_IO_INFO - return the nhits and timing info for FP */
+
+void SC_get_io_info(FILE *fp, int **pnhits, double **pnsec)
+   {int *nh;
+    double *ns;
+    file_io_desc *fid;
+
+    nh = NULL;
+    ns = NULL;
+    if (fp != NULL)
+       {if (!IS_STD_IO(fp))
+	   {fid = (file_io_desc *) fp;
+	    nh  = fid->nhits;
+	    ns  = fid->nsec;};};
+
+    if (pnhits != NULL)
+       *pnhits = nh;
+
+    if (pnsec != NULL)
+       *pnsec = ns;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_COLLECT_IO_INFO - depending on WH collect I/O operation stats
+ *                    - on all files
+ *                    - return the old value
+ *                    - WH  -1 return old value
+ *                    -      0 turn off stats gathering
+ *                    -      1 turn on stats gathering
+ */
+
+int SC_collect_io_info(int wh)
+   {int rv;
+    static int gather = FALSE;
+
+    rv = gather;
+    if (wh >= 0)
+       gather = wh;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GATHER_IO_INFO - depending on WH gather I/O operation stats on FP
+ *                   - return the old value
+ *                   - WH  -1 return old value
+ *                   -      0 turn off stats gathering
+ *                   -      1 turn on stats gathering
+ */
+
+int SC_gather_io_info(FILE *fp, int wh)
+   {int rv;
+    file_io_desc *fid;
+
+    rv = FALSE;
+    if (fp != NULL)
+       {if (!IS_STD_IO(fp))
+	   {fid = (file_io_desc *) fp;
+	    rv  = fid->gather;
+	    if (wh >= 0)
+	       fid->gather = wh;};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -346,17 +445,13 @@ FILE *SC_fopen(char *name, char *mode)
     if (name != NULL)
        {fp = fopen(name, mode);
 	if (fp != NULL)
-	   {fid          = FMAKE(file_io_desc, "SC_FOPEN:fid");
+	   {fid          = SC_make_io_desc(fp);
 	    fid->info    = fp;
 	    fid->fopen   = SC_fopen;
 	    fid->ftell   = ftell;
-	    fid->lftell  = NULL;
 	    fid->fseek   = fseek;
-	    fid->lfseek  = NULL;
 	    fid->fread   = fread;
-	    fid->lfread  = NULL;
 	    fid->fwrite  = _SC_fwrite;
-	    fid->lfwrite = NULL;
 	    fid->setvbuf = _SC_setvbuf;
 	    fid->fclose  = fclose;
 	    fid->fprintf = _SC_fprintf;
@@ -366,8 +461,6 @@ FILE *SC_fopen(char *name, char *mode)
 	    fid->fflush  = _SC_fflush;
 	    fid->feof    = feof;
 	    fid->fgets   = SC_fgets;
-	    fid->pointer = NULL;
-	    fid->segsize = NULL;
 
 	    ret = (FILE *) fid;}
 	else
@@ -1274,7 +1367,7 @@ static FILE *_SC_ropen(char *name, char *mode)
 	    SFREE(fp);};};
 
     if (fp != NULL)
-       {fid          = FMAKE(file_io_desc, "_SC_ROPEN:fid");
+       {fid          = SC_make_io_desc(fp);
 	fid->info    = fp;
 	fid->fopen   = _SC_ropen;
 	fid->ftell   = _SC_rtell;
@@ -1288,10 +1381,7 @@ static FILE *_SC_ropen(char *name, char *mode)
 	fid->fgetc   = _SC_rgetc;
 	fid->ungetc  = _SC_rungetc;
 	fid->fflush  = _SC_rflush;
-	fid->feof    = NULL;
 	fid->fgets   = _SC_rgets;
-	fid->pointer = NULL;
-	fid->segsize = NULL;
 
 	ret = (FILE *) fid;}
     else
@@ -1449,16 +1539,11 @@ FILE *SC_lfopen(char *name, char *mode)
     if (name != NULL)
        {fp = fopen(name, mode);
 	if (fp != NULL)
-	   {fid          = FMAKE(file_io_desc, "SC_LFOPEN:fid");
-	    fid->info    = fp;
+	   {fid          = SC_make_io_desc(fp);
 	    fid->fopen   = SC_lfopen;
-	    fid->ftell   = NULL;
 	    fid->lftell  = _SC_lftell;
-	    fid->fseek   = NULL;
 	    fid->lfseek  = _SC_lfseek;
-	    fid->fread   = NULL;
 	    fid->lfread  = _SC_lfread;
-	    fid->fwrite  = NULL;
 	    fid->lfwrite = _SC_lfwrite;
 	    fid->setvbuf = _SC_setvbuf;
 	    fid->fclose  = fclose;
@@ -1469,8 +1554,6 @@ FILE *SC_lfopen(char *name, char *mode)
 	    fid->fflush  = _SC_fflush;
 	    fid->feof    = feof;
 	    fid->fgets   = SC_fgets;
-	    fid->pointer = NULL;
-	    fid->segsize = NULL;
 
 	    ret = (FILE *) fid;}
 	else
@@ -1500,8 +1583,12 @@ int io_setvbuf(FILE *fp, char *bf, int type, size_t sz)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+            IO_OPER_START_TIME(fid);
+
 	    if (fid->setvbuf != NULL)
-	       rv = (*fid->setvbuf)(fp, bf, type, sz);};};
+	       rv = (*fid->setvbuf)(fp, bf, type, sz);
+
+            IO_OPER_ACCUM_TIME(fid, IO_OPER_SETVBUF);};};
 
     return(rv);}
 
@@ -1524,10 +1611,14 @@ long io_tell(FILE *fp)
 	    fp  = fid->info;
 
 	    if (fid->ftell != NULL)
-	       rv = (*fid->ftell)(fp);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->ftell)(fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FTELL);}
 
 	    else if (fid->lftell != NULL)
-	       rv = (*fid->lftell)(fp);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lftell)(fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFTELL);};};};
 
     return(rv);}
 
@@ -1550,10 +1641,14 @@ int io_seek(FILE *fp, long offs, int whence)
 	    fp  = fid->info;
 
 	    if (fid->fseek != NULL)
-	       rv = (*fid->fseek)(fp, offs, whence);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->fseek)(fp, offs, whence);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FSEEK);}
 
 	    else if (fid->lfseek != NULL)
-	       rv = (*fid->lfseek)(fp, (off_t) offs, whence);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lfseek)(fp, (off_t) offs, whence);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFSEEK);};};};
 
     return(rv);}
 
@@ -1576,10 +1671,14 @@ size_t io_read(void *p, size_t sz, size_t ni, FILE *fp)
 	    fp  = fid->info;
 
 	    if (fid->fread != NULL)
-	       rv = (*fid->fread)(p, sz, ni, fp);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->fread)(p, sz, ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FREAD);}
 
 	    else if (fid->lfread != NULL)
-	       rv = (*fid->lfread)(p, sz, (BIGUINT) ni, fp);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lfread)(p, sz, (BIGUINT) ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFREAD);};};};
 
     return(rv);}
 
@@ -1602,10 +1701,14 @@ size_t io_write(void *p, size_t sz, size_t ni, FILE *fp)
 	    fp  = fid->info;
 
 	    if (fid->fwrite != NULL)
-	       rv = (*fid->fwrite)(p, sz, ni, fp);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->fwrite)(p, sz, ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FWRITE);}
 
 	    else if (fid->lfwrite != NULL)
-	       rv = (*fid->lfwrite)(p, sz, (BIGUINT) ni, fp);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lfwrite)(p, sz, (BIGUINT) ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFWRITE);};};};
 
     return(rv);}
 
@@ -1627,9 +1730,13 @@ int io_close(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fclose != NULL)
 	       {rv = (*fid->fclose)(fp);
 		fid->fclose = NULL;};
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FCLOSE);
 
 	    SFREE(fid);};};
 
@@ -1660,10 +1767,14 @@ int io_printf(FILE *fp, char *fmt, ...)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fprintf != NULL)
 	       {SC_VA_START(fmt);
 		rv = (*fid->fprintf)(fp, fmt, __a__);
-		SC_VA_END;};};};
+		SC_VA_END;};
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FPRINTF);};};
 
     return(rv);}
 
@@ -1688,8 +1799,12 @@ int io_puts(const char *s, FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fputs != NULL)
-	       rv = (*fid->fputs)(s, fp);};};
+	       rv = (*fid->fputs)(s, fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FPUTS);};};
 
     return(rv);}
 
@@ -1711,8 +1826,12 @@ int io_getc(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fgetc != NULL)
-	       rv = (*fid->fgetc)(fp);};};
+	       rv = (*fid->fgetc)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FGETC);};};
 
     return(rv);}
 
@@ -1734,8 +1853,12 @@ int io_ungetc(int c, FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->ungetc != NULL)
-	       rv = (*fid->ungetc)(c, fp);};};
+	       rv = (*fid->ungetc)(c, fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_UNGETC);};};
 
     return(rv);}
 
@@ -1757,8 +1880,12 @@ int io_flush(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fflush != NULL)
-	       rv = (*fid->fflush)(fp);};};
+	       rv = (*fid->fflush)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FFLUSH);};};
 
     return(rv);}
 
@@ -1780,8 +1907,12 @@ char *io_gets(char *s, int n, FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fgets != NULL)
-	       rv = (*fid->fgets)(s, n, fp);};};
+	       rv = (*fid->fgets)(s, n, fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FGETS);};};
 
     return(rv);}
 
@@ -1803,8 +1934,12 @@ int io_eof(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->feof != NULL)
-	       rv = (*fid->feof)(fp);};};
+	       rv = (*fid->feof)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FEOF);};};
 
     return(rv);}
 
@@ -1827,8 +1962,12 @@ char *io_pointer(void *a)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->pointer != NULL)
-	       rv = (*fid->pointer)(fp);};};
+	       rv = (*fid->pointer)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_POINTER);};};
 
     return(rv);}
 
@@ -1849,8 +1988,12 @@ BIGUINT io_segsize(void *a, BIGINT n)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->segsize != NULL)
-	       rv = (*fid->segsize)(fp, n);};};
+	       rv = (*fid->segsize)(fp, n);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_SEGSIZE);};};
 
     return(rv);}
 
@@ -1875,8 +2018,12 @@ int lio_setvbuf(FILE *fp, char *bf, int type, size_t sz)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+            IO_OPER_START_TIME(fid);
+
 	    if (fid->setvbuf != NULL)
-	       rv = (*fid->setvbuf)(fp, bf, type, sz);};};
+	       rv = (*fid->setvbuf)(fp, bf, type, sz);
+
+            IO_OPER_ACCUM_TIME(fid, IO_OPER_SETVBUF);};};
 
     return(rv);}
 
@@ -1899,10 +2046,14 @@ off_t lio_tell(FILE *fp)
 	    fp  = fid->info;
 
 	    if (fid->lftell != NULL)
-	       rv = (*fid->lftell)(fp);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lftell)(fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFTELL);}
 
 	    else if (fid->ftell != NULL)
-	       rv = (*fid->ftell)(fp);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->ftell)(fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FTELL);};};};
 
     return(rv);}
 
@@ -1925,10 +2076,14 @@ int lio_seek(FILE *fp, off_t offs, int whence)
 	    fp  = fid->info;
 
 	    if (fid->lfseek != NULL)
-	       rv = (*fid->lfseek)(fp, offs, whence);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lfseek)(fp, (off_t) offs, whence);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFSEEK);}
 
 	    else if (fid->fseek != NULL)
-	       rv = (*fid->fseek)(fp, (long) offs, whence);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->fseek)(fp, offs, whence);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FSEEK);};};};
 
     return(rv);}
 
@@ -1951,10 +2106,14 @@ BIGUINT lio_read(void *p, size_t sz, BIGUINT ni, FILE *fp)
 	    fp  = fid->info;
 
 	    if (fid->lfread != NULL)
-	       rv = (*fid->lfread)(p, sz, ni, fp);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lfread)(p, sz, ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFREAD);}
 
 	    else if (fid->fread != NULL)
-	       rv = (*fid->fread)(p, sz, (size_t) ni, fp);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->fread)(p, sz, (size_t) ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FREAD);};};};
 
     return(rv);}
 
@@ -1977,10 +2136,14 @@ BIGUINT lio_write(void *p, size_t sz, BIGUINT ni, FILE *fp)
 	    fp  = fid->info;
 
 	    if (fid->lfwrite != NULL)
-	       rv = (*fid->lfwrite)(p, sz, ni, fp);
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->lfwrite)(p, sz, ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFWRITE);}
 
 	    else if (fid->fwrite != NULL)
-	       rv = (*fid->fwrite)(p, sz, (size_t) ni, fp);};};
+	       {IO_OPER_START_TIME(fid);
+		rv = (*fid->fwrite)(p, sz, (size_t) ni, fp);
+		IO_OPER_ACCUM_TIME(fid, IO_OPER_FWRITE);};};};
 
     return(rv);}
 
@@ -2002,9 +2165,13 @@ int lio_close(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fclose != NULL)
 	       {rv = (*fid->fclose)(fp);
 		fid->fclose = NULL;};
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FCLOSE);
 
 	    SFREE(fid);};};
 
@@ -2038,10 +2205,14 @@ int lio_printf(FILE *fp, char *fmt, ...)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fprintf != NULL)
 	       {SC_VA_START(fmt);
 		rv = (*fid->fprintf)(fp, fmt, __a__);
-		SC_VA_END;};};};
+		SC_VA_END;};
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FPRINTF);};};
 
     return(rv);}
 
@@ -2063,8 +2234,12 @@ int lio_puts(const char *s, FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fputs != NULL)
-	       rv = (*fid->fputs)(s, fp);};};
+	       rv = (*fid->fputs)(s, fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FPUTS);};};
 
     return(rv);}
 
@@ -2086,8 +2261,12 @@ int lio_getc(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fgetc != NULL)
-	       rv = (*fid->fgetc)(fp);};};
+	       rv = (*fid->fgetc)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FGETC);};};
 
     return(rv);}
 
@@ -2109,8 +2288,12 @@ int lio_ungetc(int c, FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->ungetc != NULL)
-	       rv = (*fid->ungetc)(c, fp);};};
+	       rv = (*fid->ungetc)(c, fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_UNGETC);};};
 
     return(rv);}
 
@@ -2132,8 +2315,12 @@ int lio_flush(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fflush != NULL)
-	       rv = (*fid->fflush)(fp);};};
+	       rv = (*fid->fflush)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FFLUSH);};};
 
     return(rv);}
 
@@ -2155,8 +2342,12 @@ char *lio_gets(char *s, int n, FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->fgets != NULL)
-	       rv = (*fid->fgets)(s, n, fp);};};
+	       rv = (*fid->fgets)(s, n, fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FGETS);};};
 
     return(rv);}
 
@@ -2178,8 +2369,12 @@ int lio_eof(FILE *fp)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->feof != NULL)
-	       rv = (*fid->feof)(fp);};};
+	       rv = (*fid->feof)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FEOF);};};
 
     return(rv);}
 
@@ -2202,8 +2397,12 @@ char *lio_pointer(void *a)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->pointer != NULL)
-	       rv = (*fid->pointer)(fp);};};
+	       rv = (*fid->pointer)(fp);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_POINTER);};};
 
     return(rv);}
 
@@ -2224,8 +2423,12 @@ BIGUINT lio_segsize(void *a, BIGINT n)
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
 
+	    IO_OPER_START_TIME(fid);
+
 	    if (fid->segsize != NULL)
-	       rv = (*fid->segsize)(fp, n);};};
+	       rv = (*fid->segsize)(fp, n);
+
+	    IO_OPER_ACCUM_TIME(fid, IO_OPER_SEGSIZE);};};
 
     return(rv);}
 
@@ -2241,19 +2444,12 @@ FILE *SC_std_file(void *p)
    {file_io_desc *fid;
     FILE *fp;
 
-    fid          = FMAKE(file_io_desc, "SC_STD_FILE:fid");
-    fid->info    = p;
+    fid          = SC_make_io_desc(p);
     fid->fopen   = SC_fopen;
-
     fid->ftell   = ftell;
-    fid->lftell  = NULL;
     fid->fseek   = fseek;
-    fid->lfseek  = NULL;
     fid->fread   = fread;
-    fid->lfread  = NULL;
     fid->fwrite  = _SC_fwrite;
-    fid->lfwrite = NULL;
-
     fid->setvbuf = _SC_setvbuf;
     fid->fclose  = fclose;
     fid->fprintf = _SC_fprintf;
@@ -2263,8 +2459,6 @@ FILE *SC_std_file(void *p)
     fid->fflush  = _SC_fflush;
     fid->feof    = feof;
     fid->fgets   = SC_fgets;
-    fid->pointer = NULL;
-    fid->segsize = NULL;
 
     fp = (FILE *) fid;
 

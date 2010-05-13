@@ -88,18 +88,13 @@ FILE *SC_mf_bind(void *mf)
 
     ret = NULL;
     if (mf != NULL)
-       {fid          = FMAKE(file_io_desc, "SC_MF_BIND:fid");
-	fid->info    = mf;
+       {fid          = SC_make_io_desc(mf);
 	fid->fopen   = SC_mf_open;
 
 	fid->ftell   = _SC_mf_tell;
-	fid->lftell  = NULL;
 	fid->fseek   = _SC_mf_seek;
-	fid->lfseek  = NULL;
 	fid->fread   = _SC_mf_read;
-	fid->lfread  = NULL;
 	fid->fwrite  = _SC_mf_write;
-	fid->lfwrite = NULL;
 
 	fid->setvbuf = _SC_mf_setvbuf;
 	fid->fclose  = _SC_mf_close;
@@ -111,7 +106,6 @@ FILE *SC_mf_bind(void *mf)
 	fid->feof    = _SC_mf_eof;
 	fid->fgets   = _SC_mf_gets;
 	fid->pointer = _SC_mf_data;
-	fid->segsize = NULL;
 
 	ret = (FILE *) fid;};
 

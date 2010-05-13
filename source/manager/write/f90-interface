@@ -60,7 +60,7 @@ source $ldir/env-csh
        endif
 
 # run getbytes to generate from_c and from_h
-       flog $Log $CFE -v ./getbytes
+       flog $Log $CFE ./getbytes
        if ($status != 0) then
           Note $Log "***> Cannot run getbytes"
        endif
@@ -68,7 +68,7 @@ source $ldir/env-csh
 # run genfiles to generate f90types.h and f90kinds.inc
 # requires from_c and from_h as input
        flog $Log $lCC -I../.. ../genfiles.c -o genfiles
-       flog $Log $CFE -v ./genfiles
+       flog $Log $CFE ./genfiles
        if ($status != 0) then
           Note $Log "***> Cannot run genfiles"
        endif

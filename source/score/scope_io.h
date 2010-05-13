@@ -20,6 +20,8 @@
 
 #define SC_DEFEAT_MPI_BUG  "\f\t\n"
 
+#define SC_N_IO_OPER  20
+
 /* IO Hooks */
 
 /* general file I/O hooks */
@@ -85,6 +87,16 @@
 /*                         TYPEDEFS AND STRUCTS                             */
 
 /*--------------------------------------------------------------------------*/
+
+typedef enum e_io_oper io_oper;
+
+enum e_io_oper
+   {IO_OPER_NONE, IO_OPER_FOPEN, IO_OPER_FCLOSE,
+    IO_OPER_FTELL, IO_OPER_LFTELL, IO_OPER_FSEEK, IO_OPER_LFSEEK,
+    IO_OPER_FREAD, IO_OPER_LFREAD, IO_OPER_FWRITE, IO_OPER_LFWRITE,
+    IO_OPER_FPRINTF, IO_OPER_FPUTS, IO_OPER_FGETS, IO_OPER_FGETC,
+    IO_OPER_UNGETC, IO_OPER_FFLUSH, IO_OPER_FEOF, IO_OPER_SETVBUF,
+    IO_OPER_POINTER, IO_OPER_SEGSIZE};
 
 typedef struct s_SC_filedes SC_filedes;
 typedef struct s_SC_ttydes SC_ttydes;
@@ -161,7 +173,10 @@ struct s_file_io_desc
     int (*feof)(FILE *fp);
     char *(*fgets)(char *s, int n, FILE *fp);
     char *(*pointer)(FILE *fp);
-    BIGUINT (*segsize)(FILE *fp, BIGINT n);};
+    BIGUINT (*segsize)(FILE *fp, BIGINT n);
+    int gather;
+    int nhits[SC_N_IO_OPER];
+    double nsec[SC_N_IO_OPER];};
 
 
 #ifdef HAVE_MMAP
@@ -395,15 +410,21 @@ extern void
 
 /* SCFIO.C declarations */
 
+extern file_io_desc
+ *SC_make_io_desc(void *fp);
+
 extern FILE
  *SC_fopen(char *name, char *mode),
  *SC_lfopen(char *name, char *mode),
  *SC_std_file(void *p);
 
 extern void
+ SC_get_io_info(FILE *fp, int **pnhits, double **pnsec),
  SC_setbuf(FILE *fp, char *bf);
 
 extern int
+ SC_collect_io_info(int wh),
+ SC_gather_io_info(FILE *fp, int wh),
  SC_io_connect(int flag),
  SC_file_access(int log),
  SC_exit_all(void),

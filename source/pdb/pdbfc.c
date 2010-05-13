@@ -298,17 +298,12 @@ FILE *_PD_open_container_file(char *name, char *mode)
 	cf->begin = fe->address;
 	cf->end   = fe->address + fe->size;
 
-	fid          = FMAKE(file_io_desc, "_PD_OPEN_CONTAINTER_FILE:fid");
-	fid->info    = cf;
+	fid          = SC_make_io_desc(cf);
 	fid->fopen   = _PD_open_container_file;
 
-	fid->ftell   = NULL;
 	fid->lftell  = _PD_fctell;
-	fid->fseek   = NULL;
 	fid->lfseek  = _PD_fcseek;
-	fid->fread   = NULL;
 	fid->lfread  = _PD_fcread;
-	fid->fwrite  = NULL;
 	fid->lfwrite = _PD_fcwrite;
 
 	fid->setvbuf = _PD_fcsetvbuf;
@@ -320,8 +315,6 @@ FILE *_PD_open_container_file(char *name, char *mode)
 	fid->fflush  = _PD_fcflush;
 	fid->fgets   = _PD_fcgets;
 	fid->feof    = _PD_fceof;
-	fid->pointer = NULL;
-	fid->segsize = NULL;
 
 	fp = (FILE *) fid;};
 

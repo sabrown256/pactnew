@@ -79,7 +79,7 @@ foreach d ($Dirs)
    NoteD $Log -n "      $Fill "
    Note $Log ""
 
-   flog $Log set Mod = $ZArch/$d-itf.f90
+   flog $Log set Mod = $ZArch/$d-itf.f
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -221,7 +221,7 @@ foreach d ($Dirs)
    flog $Log rm -f $Mod
    flog $Log touch $Mod
 
-   set FName = `echo "$d-itf.f90" | tr "[a-z]" "[A-Z]"`
+   set FName = `echo "$d-itf.f" | tr "[a-z]" "[A-Z]"`
 
    @ CCount = `echo $FName | wc -c`
    @ NDots  = $CCount - 1
