@@ -24,8 +24,9 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = mpxlf
-   Flags   = ${XArch} -qrecur
+   Exe     = mpxlf90
+   Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
+   Flags  += ${XArch} -qrecur
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -q* ]
    Version = -qversion
@@ -60,19 +61,19 @@ Group Cfg {
 }
 
 Group PThread {
-   FC_Exe   = mpxlf
+   FC_Exe   = mpxlf90
    LD_Flags = -qsmp
    LD_Lib   = -lpthread 
 }
 
 Group OpenMP {
-   FC_Exe = mpxlf
+   FC_Exe = mpxlf90
    LD_Lib =
 }
 
 Group MPI {
    CC_Exe = mpxlc
-   FC_Exe = mpxlf
+   FC_Exe = mpxlf90
 }
 
 .c.i:

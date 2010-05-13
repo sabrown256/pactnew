@@ -28,8 +28,9 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = mpixlf77_r
-   Flags   = ${XArch} -qrecur
+   Exe     = mpixlf90_r
+   Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
+   Flags  += ${XArch} -qrecur
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -q* ]
    Flags  += [ _cmd_ = -p ;                  # profiling
@@ -65,20 +66,20 @@ Group Cfg {
 
 Group PThread {
    CC_Exe   = mpixlc_r
-   FC_Exe   = mpixlf77_r
+   FC_Exe   = mpixlf90_r
    LD_Flags = -qsmp -qthreaded
    LD_Lib   = -lpthread 
 }
 
 Group OpenMP {
    CC_Exe = mpixlc_r
-   FC_Exe = mpixlf77_r
+   FC_Exe = mpixlf90_r
    LD_Lib =
 }
 
 Group MPI {
    CC_Exe = mpixlc_r
-   FC_Exe = mpixlf77_r
+   FC_Exe = mpixlf90_r
 }
 
 .c.i:
