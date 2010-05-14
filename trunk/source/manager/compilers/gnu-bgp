@@ -31,7 +31,7 @@ Tool CC {
 
 Tool FC {
    Exe     = mpif90
-   Flags   = -funderscoring
+   Flags   = -funderscoring -ffree-form
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -m* ]
    Flags  += [ _cmd_ = -p ;                  # profiling

@@ -29,6 +29,7 @@ Tool CC {
 
 Tool FC {
    Exe     = ifort
+   Flags   = -free
    Version = -V
 }
 

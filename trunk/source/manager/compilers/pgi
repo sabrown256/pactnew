@@ -28,7 +28,8 @@ Tool CC {
 
 Tool FC {
    Exe     = pgf90
-   Flags   = [ _env_ = Bits ;               # address bit size
+   Flags   = -Mfree
+   Flags  += [ _env_ = Bits ;               # address bit size
                32    = -tp px ;
                64    = -tp k8-64 -fpic ]
    Version = -V

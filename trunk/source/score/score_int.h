@@ -130,6 +130,9 @@ struct s_SC_state
     PFSignal_handler to_lst;
     PFSignal_handler to_err;
 
+/* SCBIO.C */
+    off_t buffer_size;
+
 /* initializes to 0 bytes */
 
 /* SCFIA.C */

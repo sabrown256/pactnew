@@ -465,6 +465,7 @@ extern BIGINT
  SC_file_length(char *name);
 
 extern off_t
+ SC_set_default_buffer_size(off_t sz),
  lio_tell(FILE *fp),
  SC_filelen(FILE *fp);
 

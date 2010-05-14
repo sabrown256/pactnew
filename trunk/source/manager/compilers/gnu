@@ -34,7 +34,7 @@ Tool CC {
 
 Tool FC {
    Exe       = gfortran
-   Flags     = -ffloat-store
+   Flags     = -ffloat-store -ffree-form
    Flags    += [ _env_ = COMPILER_GNU_VERSION ; # compiler version flags
                   4.*   = -fsignaling-nans ]
    Flags    += [ _env_ = Bits ;                 # address bit size

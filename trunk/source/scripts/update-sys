@@ -408,21 +408,24 @@ case daemon:
        set Tmp = ""
     endif
 
-    flog $Log ls-jobs -q /update-sys
-    set Running = `ls-jobs -q /update-sys |& awk 'NF > 0 { print }' | wc -l`
-    if ($Running[1] > 2) then
-       Note $Log "Job Info: $Running"
-       if ($Quiet == FALSE) then
-          NoteD $Log ""
-          NoteD $Log "There is already an update-sys daemon running - exiting"
-          NoteD $Log ""
-       else
-          Note $Log ""
-          Note $Log "There is already an update-sys daemon running - exiting"
-          Note $Log ""
-       endif
-       exit($Err)
-    endif
+# NOTE: this was killing restarts
+# the logic above should be sufficient to prevent multiple
+# running copies of udpate-sys
+#    flog $Log ls-jobs -q /update-sys
+#    set Running = `ls-jobs -q /update-sys |& awk 'NF > 0 { print }' | wc -l`
+#    if ($Running[1] > 2) then
+#       Note $Log "Job Info: $Running"
+#       if ($Quiet == FALSE) then
+#          NoteD $Log ""
+#          NoteD $Log "There is already an update-sys daemon running - exiting"
+#          NoteD $Log ""
+#       else
+#          Note $Log ""
+#          Note $Log "There is already an update-sys daemon running - exiting"
+#          Note $Log ""
+#       endif
+#       exit($Err)
+#    endif
 
     set TStamp = `/bin/date +%y%m%d%H%M%S`
     flog $Log set rUpF = $Tmp.update-sys-db.$LSite.$USER.$TStamp
