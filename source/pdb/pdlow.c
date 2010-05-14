@@ -936,6 +936,8 @@ int PD_set_buffer_size(int v)
     if (pa != NULL)
        pa->buffer_size = v;
 
+    SC_set_default_buffer_size(v);
+
     return(v);}
 
 /*--------------------------------------------------------------------------*/

@@ -24,10 +24,12 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = sunf90
-   Version = -V
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -m* ]
+   Exe      = sunf90
+   Flags   += -free
+   Flags   += [ _env_ = Bits ;                # address bit size
+                *     = -m* ]
+   LD_RPath = -z -rpath,@
+   Version  = -V
 }
 
 Tool LD {

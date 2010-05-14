@@ -30,7 +30,8 @@ Tool CC {
 
 Tool FC {
    Exe     = mpf90
-   Flags   = [ _env_ = Bits ;                # address bit size
+   Flags   = -ffree-form
+   Flags  += [ _env_ = Bits ;                # address bit size
                *     = -m* ]
    Flags  += [ _cmd_ = -p ;                  # profiling
 	       on    = -pg ]
