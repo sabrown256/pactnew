@@ -1357,6 +1357,28 @@ void SC_free_strings(char **sa)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_REMOVE_STRING - remove the Nth string from the array */
+
+void SC_remove_string(char **sa, int n)
+   {int bpi, ns;
+    char *pa;
+
+    if (sa != NULL)
+       {SC_ptr_arr_len(ns, sa);
+	SFREE(sa[n]);
+
+	bpi = sizeof(char *);
+	pa  = (char *) sa;
+	memmove(pa + n*bpi, pa + (n+1)*bpi, (ns - n)*bpi);
+
+	sa[--ns] = NULL;};
+
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_CONCATENATE - concatenate an array of strings A into S
  *                - this is the opposite of SC_tokenize
  */

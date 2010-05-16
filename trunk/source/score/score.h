@@ -1243,6 +1243,7 @@ extern long long
 
 extern void
  SC_free_strings(char **sa),
+ SC_remove_string(char **sa, int n),
  SC_string_sort(char **v, int n),
  SC_text_sort(char *v, int n, int nc);
 
