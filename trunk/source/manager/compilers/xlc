@@ -10,7 +10,8 @@
 run analyze/rpath aix
 
 # NOTE: this should eventually be put in a site specific file
-setenv PATH     ${PATH}:/usr/local/bin
+setenv PATH         ${PATH}:/usr/local/bin
+setenv OBJECT_MODE  ${Bits}
 
 WARN_PATTERN = "WARNING: (E) (W) (I)"
 ERR_PATTERN  = "Error: (S)"

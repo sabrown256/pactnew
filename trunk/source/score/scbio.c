@@ -286,22 +286,22 @@ static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
     no[0] = ov[0] - fs->addr;
     no[1] = ov[0] - fd->addr;
 
-    nb     = ov[1] - ov[0];
-    fsi[1] = no[0] + nb;
-    fsi[1] = max(fsi[1], fsw);
-    fdi[1] = no[1] + nb;
-    fdi[1] = max(fdi[1], fdw);
+    nb = ov[1] - ov[0];
+    if (nb > 0)
+       {fsi[1] = no[0] + nb;
+	fsi[1] = max(fsi[1], fsw);
+	fdi[1] = no[1] + nb;
+	fdi[1] = max(fdi[1], fdw);
 
 /* do copy based on memory address */
-    ps = fs->bf + no[0];
-    pd = fd->bf + no[1];
-    memcpy(pd, ps, nb);
+	ps = fs->bf + no[0];
+	pd = fd->bf + no[1];
+	memcpy(pd, ps, nb);
 
-    fs->nb = fsi[1];
-    fd->nb = fdi[1];
+	fs->nb = fsi[1];
+	fd->nb = fdi[1];
 
-    if (nb > 0)
-       _SC_bfr_mark(fd, BIO_WRITE, FALSE);
+       _SC_bfr_mark(fd, BIO_WRITE, FALSE);};
 
     return(nb);}
 
@@ -396,7 +396,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
  * if the front of a stack frame is covered by the back of the request
  * throw it away
  */
-	     if (ri[0] < fi[0])
+	     if ((ri[0] < fi[0]) && (fi[0] <= ri[1]))
 	        {fl = (fr->rw == BIO_READ);
 		 n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
 		 i--;}
