@@ -177,7 +177,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 
     PG_device_filename(fname, dev->title, ".cgm");
 
-    cgm_fp = io_open(fname, "wb");
+    cgm_fp = _PG_fopen(fname, "wb");
     if (cgm_fp == NULL)
        return(NULL);
 

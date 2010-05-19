@@ -261,7 +261,7 @@ int PG_write_interface(PG_device *dev, char *name)
     PG_interface_object *iob;
     FILE *fp;
 
-    fp = io_open(name, "w");
+    fp = _PG_fopen(name, "w");
     if (fp == NULL)
        return(FALSE);
 
@@ -635,7 +635,7 @@ int PG_read_interface(PG_device *dev, char *name)
     char bf[MAXLINE];
     char *ps;
 
-    fp = io_open(name, "r");
+    fp = _PG_fopen(name, "r");
     if (fp == NULL)
        return(FALSE);
 

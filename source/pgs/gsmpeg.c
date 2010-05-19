@@ -4597,7 +4597,7 @@ GOPStoMPEG(numGOPS, outputFileName, outputFilePtr)
 	    snprintf(fileName, 1024, "%s/%s", currentGOPPath, inputFileName);
 
 	    for (q = 0;   q < READ_ATTEMPTS;  ++q ) {
-	      if ( (inputFile = SC_fopen(fileName, "rb")) != NULL ) break;
+	      if ( (inputFile = _PG_fopen(fileName, "rb")) != NULL ) break;
 	      io_printf(stderr, "ERROR:  Couldn't read (GOPStoMPEG):  %s retry %d\n", 
 		      fileName, q);
 	      io_flush(stderr);
@@ -4619,7 +4619,7 @@ GOPStoMPEG(numGOPS, outputFileName, outputFilePtr)
 	while ( TRUE ) {
 	    snprintf(fileName, 1024, "%s.gop.%d", outputFileName, ind);
 
-	    if ( (inputFile = SC_fopen(fileName, "rb")) == NULL ) {
+	    if ( (inputFile = _PG_fopen(fileName, "rb")) == NULL ) {
 		break;
 	    }
 
@@ -4748,7 +4748,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 	    }
 
 	    for (q = 0;   q < READ_ATTEMPTS;  ++q ) {
-	      if ( (inputFile = SC_fopen(fileName, "rb")) != NULL ) break;
+	      if ( (inputFile = _PG_fopen(fileName, "rb")) != NULL ) break;
 	      io_printf(stderr, "ERROR:  Couldn't read 2:  %s retry %d\n", fileName, q);
 	      io_flush(stderr);
 	      sleep(1);
@@ -4781,7 +4781,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 
 
 		    for (q = 0;   q < READ_ATTEMPTS;  ++q ) {
-		      if ( (inputFile = SC_fopen(fileName, "rb")) != NULL ) break;
+		      if ( (inputFile = _PG_fopen(fileName, "rb")) != NULL ) break;
 		      io_printf(stderr, "ERROR:  Couldn't read (bNum=%d):  %s retry %d\n", 
 			      bNum, fileName, q);
 		      io_flush(stderr);
@@ -4846,7 +4846,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 
 	    snprintf(fileName, 1024, "%s.frame.%d", outputFileName, ind);
 
-	    if ( (inputFile = SC_fopen(fileName, "rb")) == NULL ) {
+	    if ( (inputFile = _PG_fopen(fileName, "rb")) == NULL ) {
 		break;
 	    }
 
@@ -4866,7 +4866,7 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 		    snprintf(fileName, 1024, "%s.frame.%d", outputFileName, bNum);
 
 		    for (q = 0;   q < READ_ATTEMPTS;  ++q ) {
-		      if ( (inputFile = SC_fopen(fileName, "rb")) != NULL ) break;
+		      if ( (inputFile = _PG_fopen(fileName, "rb")) != NULL ) break;
 		      io_printf(stderr, "ERROR:  Couldn't read (FramestoMPEG):  %s retry %d\n", 
 			      fileName, q);
 		      io_flush(stderr);
@@ -7236,7 +7236,7 @@ WriteDecodedFrame(frame)
 	io_flush(stdout);
     }
 
-    fpointer = SC_fopen(fileName, "wb");
+    fpointer = _PG_fopen(fileName, "wb");
 
 	for ( y = 0; y < height; y++ ) {
 	    io_write(frame->decoded_y[y], 1, width, fpointer);
@@ -8817,7 +8817,7 @@ FILE *pm_openr(char* name)
        f = stdin;
 
     else
-       {f = SC_fopen(name, "rb");
+       {f = _PG_fopen(name, "rb");
 	if (f == NULL)
 	   {pm_perror(name);
 	    return(NULL);};};
@@ -8827,7 +8827,7 @@ FILE *pm_openr(char* name)
 FILE *pm_openw(char* name)
    {FILE* f;
 
-    f = SC_fopen(name, "wb");
+    f = _PG_fopen(name, "wb");
     if (f == NULL)
        {pm_perror(name);
 	return(NULL);};
@@ -12552,7 +12552,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 		     userDataSize = statbuf.st_size;
 		     userData     = MAKE_N(char, userDataSize);
 
-		     fp = SC_fopen(userDataFileName,"rb");
+		     fp = _PG_fopen(userDataFileName,"rb");
 		     if (fp == NULL)
 		        {io_printf(stderr,"Could not open userdata file-%s.\n",
 				   userDataFileName);
@@ -12770,7 +12770,7 @@ PrintStartStats(firstFrame, lastFrame)
     if ( statFileName[0] == '\0' ) {
 	statFile = NULL;
     } else {
-	statFile = SC_fopen(statFileName, "a");	/* open for appending */
+	statFile = _PG_fopen(statFileName, "a");	/* open for appending */
 	if ( statFile == NULL ) {
 	    io_printf(stderr, "ERROR:  Could not open stat file:  %s\n", statFileName);
 	    io_printf(stderr, "        Sending statistics to stdout only.\n");
@@ -13188,7 +13188,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	   bb = Bitio_New(NULL);
         else
 	   {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, frame->id);
-	    if ((fpointer = SC_fopen(fileName, "wb")) == NULL)
+	    if ((fpointer = _PG_fopen(fileName, "wb")) == NULL)
 	       {io_printf(stderr, "ERROR:  Could not open output file(1):  %s\n",
 			  fileName);
 		exit(1);};
@@ -13338,7 +13338,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	         else
 		    {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, 
 			      bFrame->id);
-		     if ( (fpointer = SC_fopen(fileName, "wb")) == NULL )
+		     if ( (fpointer = _PG_fopen(fileName, "wb")) == NULL )
 		        {io_printf(stderr, "ERROR:  Could not open output file(2):  %s\n",
 				   fileName);
 			 exit(1);};
@@ -13410,7 +13410,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	         else
 		    {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, 
 			      bFrame->id);
-		     fpointer = SC_fopen(fileName, "wb");
+		     fpointer = _PG_fopen(fileName, "wb");
 		     if (fpointer == NULL)
 		        {io_printf(stderr,
 				   "ERROR:  Could not open output file(2):  %s\n",
@@ -13528,9 +13528,9 @@ ReadDecodedRefFrame(frame, frameNumber)
 	io_flush(stdout);
     }
 
-    if ((fpointer = SC_fopen(fileName, "rb")) == NULL) {
+    if ((fpointer = _PG_fopen(fileName, "rb")) == NULL) {
       sleep(1);
-      if ((fpointer = SC_fopen(fileName, "rb")) == NULL) {
+      if ((fpointer = _PG_fopen(fileName, "rb")) == NULL) {
 	io_printf(stderr, "Cannot open %s\n", fileName);
 	exit(1);
       }}
@@ -13562,7 +13562,7 @@ ReadDecodedRefFrame(frame, frameNumber)
 static void
 OpenBitRateFile()
 {
-    bitRateFile = SC_fopen(bitRateFileName, "w");
+    bitRateFile = _PG_fopen(bitRateFileName, "w");
     if ( bitRateFile == NULL ) {
 	io_printf(stderr, "ERROR:  Could not open bit rate file:  %s\n", bitRateFileName);
 	io_printf(stderr, "\n\n");
@@ -14248,7 +14248,7 @@ char *charPtr;
   SC_strncpy(fname, 256, charPtr, cp-charPtr);
 
   collect_quant = TRUE;
-  if ((collect_quant_fp = SC_fopen(fname,"w")) == NULL) {
+  if ((collect_quant_fp = _PG_fopen(fname,"w")) == NULL) {
     io_printf(stderr, "Error opening %s for quant statistics\n", fname);
     io_printf(stderr, "Using stdout (ick!)\n");
     collect_quant_fp = stdout;
@@ -14493,7 +14493,7 @@ char *charPtr;
   SC_strncpy(fname, 256, charPtr, cp-charPtr);
 
   collect_quant = TRUE;
-  if ((distortion_fp = SC_fopen(fname,"w")) == NULL) {
+  if ((distortion_fp = _PG_fopen(fname,"w")) == NULL) {
     io_printf(stderr, "Error opening %s for quant statistics\n", fname);
     io_printf(stderr, "Using stdout (ick!)\n");
     distortion_fp = stdout;
@@ -14510,9 +14510,9 @@ char *charPtr;
       collect_distortion_detailed = 2;
       for (i = 1;  i < 32;  i++) {
 	snprintf(scratch, 256, "%srate%d", fname, i);
-	fp_table_rate[i-1] = SC_fopen(scratch, "w");
+	fp_table_rate[i-1] = _PG_fopen(scratch, "w");
 	snprintf(scratch, 256, "%sdist%d", fname, i);
-	fp_table_dist[i-1] = SC_fopen(scratch, "w");
+	fp_table_dist[i-1] = _PG_fopen(scratch, "w");
 	}}
       break;
     default:
@@ -14541,7 +14541,7 @@ void
   SetupBlockCounter(fname)
 char *fname;
 {
-  if ((BC_file = SC_fopen(fname,"w")) == NULL) {
+  if ((BC_file = _PG_fopen(fname,"w")) == NULL) {
     io_printf(stderr, "Could not open %s\nTUNE E ignored\n", fname);
   } else {
     BC_on = TRUE;
@@ -14879,7 +14879,7 @@ boolean ReadParamFile(char *fileName, int function)
     register int index;
     register int row, col;
 
-    fpointer = SC_fopen(fileName, "r");
+    fpointer = _PG_fopen(fileName, "r");
     if (fpointer == NULL)
        {io_printf(stderr, "Error:  Cannot open parameter file:  %s\n", fileName);
 	return(FALSE);};
@@ -15742,7 +15742,7 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 		if (!stdinUsed)
 		   {strcat(full_path, "/");
 		    strcat(full_path, input);
-		    jmovie = SC_fopen(input, "rb"); 
+		    jmovie = _PG_fopen(input, "rb"); 
 
 		    if (jmovie == NULL)
 		       {perror(input); 
@@ -16593,7 +16593,7 @@ MpegFrame *prev;
   {
     FILE *filePtr;
 
-    filePtr = SC_fopen("PFRAME.yuv", "wb");
+    filePtr = _PG_fopen("PFRAME.yuv", "wb");
 
     for ( y = 0; y < Fsize_y; y++ )
       {
@@ -18941,7 +18941,7 @@ int initGOPRateControl _ANSI_ARGS_((void));
   DBG_PRINT(("\tInitializing Allocation Data\n"));
   
 #ifdef RC_STATS_FILE
-  RC_FILE = SC_fopen("RC_STATS_FILE", "w");
+  RC_FILE = _PG_fopen("RC_STATS_FILE", "w");
   if ( RC_FILE  == NULL) {
     DBG_PRINT(("\tOpen of RC file failed, using stderr\n"));
     RC_FILE = stderr;
@@ -20005,7 +20005,7 @@ time(&diskStartTime);
     }
     } else if (stdinUsed) {
       ifp = stdin;
-    } else if ( (ifp = SC_fopen(fullFileName, "rb")) == NULL) {
+    } else if ( (ifp = _PG_fopen(fullFileName, "rb")) == NULL) {
       io_printf(stderr, "ERROR:  Couldn't open input file %s\n",
               fullFileName);
       exit(1);
@@ -20229,7 +20229,7 @@ char *fileName;
 
   if (strcmp(ioConversion, "*") == 0) {
     char buff[1024];
-    ifp = SC_fopen(fullFileName, "rb");
+    ifp = _PG_fopen(fullFileName, "rb");
     snprintf(buff, 1024, "fopen \"%s\"",fullFileName);
     ERRCHK(ifp, buff);
     return(ifp);
@@ -21400,7 +21400,7 @@ void Specifics_Init()
 	  CPP_LOC, specificsDefines, specificsFile, specificsFile);
   system(command);
   SC_strcat(specificsFile, 256, ".cpp");
-  if ((specificsFP = SC_fopen(specificsFile, "r")) == NULL) {
+  if ((specificsFP = _PG_fopen(specificsFile, "r")) == NULL) {
     io_printf(stderr, "Error with specifics file, cannot open %s\n", specificsFile);
     exit(1);
   }

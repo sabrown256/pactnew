@@ -157,7 +157,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
     else
        PG_device_filename(fname, "default", ".ps");
 
-    ps_fp = io_open(fname, "w");
+    ps_fp = _PG_fopen(fname, "w");
     if (ps_fp == NULL)
        return(NULL);
 
