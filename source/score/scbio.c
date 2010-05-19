@@ -287,7 +287,9 @@ static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
     no[1] = ov[0] - fd->addr;
 
     nb = ov[1] - ov[0];
-    if (nb > 0)
+    if (nb <= 0)
+       nb = 0;
+    else
        {fsi[1] = no[0] + nb;
 	fsi[1] = max(fsi[1], fsw);
 	fdi[1] = no[1] + nb;
