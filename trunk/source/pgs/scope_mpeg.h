@@ -79,6 +79,9 @@
 #include <time.h>
 #endif
 
+extern FILE
+ *_PG_fopen(char *name, char *mode);
+
 
 /* pnmrw.h - header file for PBM/PGM/PPM read/write library
 **

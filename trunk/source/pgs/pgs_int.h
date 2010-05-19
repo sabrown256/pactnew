@@ -123,6 +123,9 @@ struct s_PG_state
     int view_attr_max_indx;
     PG_view_attributes **view_attr_list;
 
+/* GSDV.C */
+    off_t buffer_size;
+
 /* GSDV_RST.C */
     int **rst_marker_fonts;
     int *rst_current_font;
@@ -342,6 +345,9 @@ extern int
 
 
 /* GSDV.C declarations */
+
+extern FILE
+ *_PG_fopen(char *name, char *mode);
 
 extern void
  _PG_default_viewspace(PG_device *dev, int asp),

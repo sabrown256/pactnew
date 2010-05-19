@@ -1574,10 +1574,15 @@ static int _PD_mp_flush(PDBfile *file)
 
 /* have everybody flush before sending out the tables */
     pf = FILE_IO_INFO(PD_Pfile, file->stream);
-    fp    = file->stream;
+    fp = file->stream;
+
+    lio_flush(fp);
+
+/* we can be doing a flush unrelated to a write or close
+ * and this could go nowhere - e.g. pddpts
     if (lio_flush(fp) != 0)
        PD_error("FLUSH FAILED - _PD_MP_FLUSH", PD_WRITE);
-
+*/
     mcomm = (MPI_Comm) _PD.mp_comm;
     fcomm = (MPI_Comm) pf->comm;
     id    = pf->mp_id;

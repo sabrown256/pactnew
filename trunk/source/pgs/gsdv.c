@@ -524,3 +524,49 @@ void PG_setup_ctrls_glb(char *s)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* _PG_FOPEN - open file with attention to buffering issues */
+
+FILE *_PG_fopen(char *name, char *mode)
+   {FILE *fp;
+
+/*    fp = SC_fopen(name, mode); */
+    fp = io_open(name, mode);
+
+    if (_PG.buffer_size > 0)
+       io_setvbuf(fp, NULL, 0, _PG.buffer_size);
+
+    return(fp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_SET_BUFFER_SIZE - set the default I/O buffer size to SZ
+ *                    - return the old value
+ *                    - -1 turns off default buffering optimization
+ *                    - which happens on file open
+ */
+
+off_t PG_set_buffer_size(off_t sz)
+   {off_t rv;
+    
+    rv = _PG.buffer_size;
+    
+    _PG.buffer_size = sz;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GET_BUFFER_SIZE - get the default I/O buffer size */
+
+off_t PG_get_buffer_size(void)
+   {off_t rv;
+    
+    rv = _PG.buffer_size;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

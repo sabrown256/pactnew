@@ -176,19 +176,31 @@ int SC_gather_io_info(FILE *fp, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SET_DEFAULT_BUFFER_SIZE - set the default I/O buffer size to SZ
- *                            - return the old value
- *                            - -1 turns off default buffering optimization
- *                            - which happens on file open
- *                            - see _SC_bio_read_opt
+/* SC_SET_BUFFER_SIZE - set the default I/O buffer size to SZ
+ *                    - return the old value
+ *                    - -1 turns off default buffering optimization
+ *                    - which happens on file open
+ *                    - see _SC_bio_read_opt
  */
 
-off_t SC_set_default_buffer_size(off_t sz)
+off_t SC_set_buffer_size(off_t sz)
    {off_t rv;
     
     rv = _SC.buffer_size;
     
     _SC.buffer_size = sz;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_BUFFER_SIZE - get the default I/O buffer size */
+
+off_t SC_get_buffer_size(void)
+   {off_t rv;
+    
+    rv = _SC.buffer_size;
 
     return(rv);}
 

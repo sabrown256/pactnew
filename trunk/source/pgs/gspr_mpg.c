@@ -775,7 +775,7 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
 	   {bb = Bitio_New(NULL);}
         else
 	   {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, mfr->id);
-            if ((fpointer = SC_fopen(fileName, "wb")) == NULL)
+            if ((fpointer = _PG_fopen(fileName, "wb")) == NULL)
 	       {fprintf(stderr, 
 			"ERROR:  Could not open output file(1):  %s\n",
 		        fileName);

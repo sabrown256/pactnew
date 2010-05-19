@@ -1861,7 +1861,7 @@ void PG_dump_colormap(char *type, char *file)
     PG_device *dev;
     FILE *fp;
 
-    fp = io_open(file, "w");
+    fp = _PG_fopen(file, "w");
 
     dev = PG_make_device("PS", "COLOR", "dump-tmp");
     if (dev != NULL)
@@ -2123,7 +2123,7 @@ PG_palette *PG_rd_palette(PG_device *dev, char *fname)
     PG_palette *pal;
     FILE *fp;
 
-    fp = io_open(fname, "r");
+    fp = _PG_fopen(fname, "r");
     if (fp == NULL)
        return(NULL);
 
@@ -2182,7 +2182,7 @@ int PG_wr_palette(PG_device *dev, PG_palette *pal, char *fname)
     RGB_color_map *true_cm;
     FILE *fp;
 
-    fp = io_open(fname, "w");
+    fp = _PG_fopen(fname, "w");
     if (fp == NULL)
        return(FALSE);
 

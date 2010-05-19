@@ -1620,6 +1620,10 @@ extern int
  PG_open_console(char *title, char *type, int bckgr,
 		 double xf, double yf, double dxf, double dyf);
 
+extern off_t
+ PG_set_buffer_size(off_t sz),
+ PG_get_buffer_size(void);
+
 
 /* GSEVMN.C declarations */
 

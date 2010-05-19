@@ -107,7 +107,7 @@ static PG_device *_PG_MP_open(PG_device *dev,
        return(NULL);
 
 /* create an MPEG file */
-    fh = SC_fopen(fname, "wb");
+    fh = _PG_fopen(fname, "wb");
     if (fh == NULL)
        return(NULL);
 

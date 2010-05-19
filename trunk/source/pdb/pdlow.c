@@ -906,8 +906,8 @@ char *PD_get_error(void)
 
 /* PD_GET_BUFFER_SIZE - fetch PD_buffer_size */
 
-int PD_get_buffer_size(void)
-   {int rv;
+off_t PD_get_buffer_size(void)
+   {off_t rv;
     PD_smp_state *pa;
 
     _PD_init_state(FALSE);
@@ -926,7 +926,7 @@ int PD_get_buffer_size(void)
 
 /* PD_SET_BUFFER_SIZE - set PD_buffer_size */
 
-int PD_set_buffer_size(int v)
+off_t PD_set_buffer_size(off_t v)
    {PD_smp_state *pa;
     
     _PD_init_state(FALSE);
@@ -936,7 +936,7 @@ int PD_set_buffer_size(int v)
     if (pa != NULL)
        pa->buffer_size = v;
 
-    SC_set_default_buffer_size(v);
+    SC_set_buffer_size(v);
 
     return(v);}
 
