@@ -17,12 +17,17 @@ Note $Log "Analyze: ld"
 NoteD $ALog -n "   Ld: "
 Note $ALog ""
 
-SafeEnv LD_Exe     ""
-SafeEnv LD_Flags   ""
-SafeEnv LD_Shared  ""
-SafeEnv LD_Lib     ""
-SafeEnv MDG_Lib    ""
-SafeEnv DP_Lib     ""
+SafeEnv LD_Exe         ""
+SafeEnv LD_Flags       ""
+SafeEnv LD_Lib         ""
+SafeEnv LD_Shared      ""
+SafeEnv Cfg_LD_Flags   ""
+SafeEnv Cfg_LD_RPath   ""
+SafeEnv Cfe_LD_Flags   ""
+SafeEnv Cfe_LD_Lib     ""
+SafeEnv Cfe_LD_RPath   ""
+SafeEnv MDG_Lib        ""
+SafeEnv DP_Lib         ""
 
 if (!(-x "$LD_Exe")) then
    if (-x `$Which ld`) then
@@ -55,15 +60,45 @@ else
    setenv HaveRPATH FALSE
 endif
 
+flog $ALog $RM $Tmp $Tmp.c $Tmp.o
+
 SafeEnv Shared_LD_Exe "$LD_Exe"
 
-flog $ALog $RM $Tmp $Tmp.c $Tmp.o
+# capture current notion of rpath
+if ($?Cfg_RPATH == 1) then
+   set lrpath = `../analyze/rpath -o rpath`
+   Note $ALog "Set config rpath flags to: $lrpath"
+   flog $ALog setenv LD_RPath      "$lrpath"
+   flog $ALog setenv Cfg_LD_RPath  "$lrpath"
+   Note $ALog ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ($CROSS_COMPILE == "FALSE") then
+   flog $ALog setenv Cfe_LD_Flags  "$Cfg_LD_Flags"
+   flog $ALog setenv Cfe_LD_Lib    "$Cfg_LD_Lib"
+   flog $ALog setenv Cfe_LD_RPath  "$Cfg_LD_RPath"
+else
+   flog $ALog setenv Cfe_LD_Flags  "$LD_Flags"
+   flog $ALog setenv Cfe_LD_Lib    "$LD_Lib"
+   flog $ALog setenv Cfe_LD_RPath  "$LD_RPath"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # export the results
 SetParent LD_Exe
 SetParent LD_Flags
 SetParent LD_Lib
 SetParent LD_Shared
+SetParent Cfg_LD_Flags
+SetParent Cfg_LD_RPath
+SetParent Cfe_LD_Flags
+SetParent Cfe_LD_Lib
+SetParent Cfe_LD_RPath
 SetParent MDG_Lib
 SetParent DP_Lib
 SetParent Shared_LD_Exe

@@ -16,7 +16,7 @@ Note $Log "Analyze: strerror_r"
 
 set str = ""
 
-set CC = ( $Cfe_CC_Exe $Cfe_LD_Flags )
+set CC = ( $Cfe_CC_Exe )
 
 # look for POSIX standard strerror_r
 
@@ -33,7 +33,6 @@ EOF
 
 Note $ALog ""
 Note $ALog " CC           = |$CC|"
-Note $ALog " Cfe_LD_Flags = |$Cfe_LD_Flags|"
 Note $ALog " PATH         = |$PATH|"
 Note $ALog ""
 
@@ -43,8 +42,11 @@ set noglob
 # return exit status of 0 if there are only warnings
 # the only alternative is to insist that there be no output
 
-Note $ALog "Command: $CC $Tmp.c -o $Tmp $Cfe_LD_Lib"
-set t = (`$CC $Tmp.c -o $Tmp $Cfe_LD_Lib |& cat`)
+set opt = ""
+set opt = ( $opt $Cfe_LD_Lib )
+
+Note $ALog "Command: $CC $Tmp.c -o $Tmp $opt"
+set t = ( `$CC $Tmp.c -o $Tmp $opt |& cat` )
 Note $ALog "Result: $t"
 if ("$t" == "") then
    flog $ALog setenv HAVE_POSIX_STRERROR TRUE
@@ -70,8 +72,11 @@ int main(int c, char **v)
     return(st);}
 EOF
 
-Note $ALog "Command: $CC $Tmp.c -o $Tmp $Cfe_LD_Lib"
-set t = (`$CC $Tmp.c -o $Tmp $Cfe_LD_Lib |& cat`)
+set opt = ""
+set opt = ( $opt $Cfe_LD_Lib )
+
+Note $ALog "Command: $CC $Tmp.c -o $Tmp $opt"
+set t = ( `$CC $Tmp.c -o $Tmp $opt |& cat` )
 Note $ALog "Result: $t"
 if ("$t" == "") then
    flog $ALog setenv HAVE_GNU_STRERROR TRUE

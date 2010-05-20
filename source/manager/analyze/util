@@ -25,7 +25,6 @@ rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
 Note $ALog "analyze/util"
 Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
 Note $ALog "Cfe_CC_Flags = |$Cfe_CC_Flags|"
-Note $ALog "Cfe_LD_Flags = |$Cfe_LD_Flags|"
 
 # this script is necessary because some idiot ld writers insist
 # that error messages be printed directly to /dev/tty in addition to
