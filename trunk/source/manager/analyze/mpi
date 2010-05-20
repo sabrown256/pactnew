@@ -111,13 +111,18 @@ EOF
    Note $ALog "Save_CC  = $Save_CC"
    Note $ALog "CC_Flags = $CC_Flags"
    Note $ALog "LD_Flags = $LD_Flags"
+   Note $ALog "LD_RPath = $LD_RPath"
    Note $ALog "DP_Inc   = $DP_Inc"
    Note $ALog "DP_Lib   = $DP_Lib"
    Note $ALog "lLib     = $lLib"
 
    flog $ALog cat $Tmp.c
 
-   flog $ALog $Save_CC $CC_Flags $DP_Inc $Tmp.c -o $Tmp $LD_Flags $lLib
+   set opt = ""
+   set opt = ( $opt $CC_Flags $DP_Inc )
+   set opt = ( $opt $LD_Flags $LD_RPath )
+   set opt = ( $opt $lLib )
+   flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
    if ($status != 0) then
       set lParComm = "no"
       setenv LibMPI    ""

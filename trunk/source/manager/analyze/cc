@@ -136,30 +136,6 @@ if ($?Cfg_CC_Debug == 1) then
    Note $ALog ""
 endif
 
-# temporarily add link flags to compiler flags for config
-if ($?Cfg_LD_Flags == 1) then
-   Note $ALog "Add config link flags to CC_Flags: $Cfg_LD_Flags"
-   flog $ALog setenv CC_Flags "$CC_Flags $Cfg_LD_Flags"
-   flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $Cfg_LD_Flags"
-   Note $ALog ""
-endif
-
-# temporarily add rpath to compiler flags for config
-if ($?Cfg_RPATH == 1) then
-   set lrpath = `../analyze/rpath -o rpath`
-   Note $ALog "Add config rpath flags to CC_Flags: $lrpath"
-   flog $ALog setenv CC_Flags "$CC_Flags $lrpath"
-   flog $ALog setenv Cfg_CC_Flags "$Cfg_CC_Flags $lrpath"
-   Note $ALog ""
-endif
-
-# temporarily add link libraries to compiler flags for config
-if ($?Cfg_LD_Lib == 1) then
-   Note $ALog "Add config link libs to CC_Flags: $Cfg_LD_Lib"
-   flog $ALog setenv CC_Flags "$CC_Flags $Cfg_LD_Lib"
-   Note $ALog ""
-endif
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -167,16 +143,10 @@ if ($CROSS_COMPILE == "FALSE") then
    flog $ALog setenv Cfe_CC_Exe    $Cfg_CC_Exe
    flog $ALog setenv Cfe_CC_Flags  "$Cfg_CC_Flags"
    flog $ALog setenv Cfe_CC_Inc    "$Cfg_CC_Inc"
-   flog $ALog setenv Cfe_LD_Flags  "$Cfg_LD_Flags"
-   flog $ALog setenv Cfe_LD_Lib    "$Cfg_LD_Lib"
-   flog $ALog setenv Cfe_LD_RPath  "$Cfg_LD_RPath"
 else
    flog $ALog setenv Cfe_CC_Exe    $CC_Exe
    flog $ALog setenv Cfe_CC_Flags  "$CC_Flags"
    flog $ALog setenv Cfe_CC_Inc    "$CC_Inc"
-   flog $ALog setenv Cfe_LD_Flags  "$LD_Flags"
-   flog $ALog setenv Cfe_LD_Lib    "$LD_Lib"
-   flog $ALog setenv Cfe_LD_RPath  "$LD_RPath"
 endif
 
 #--------------------------------------------------------------------------
@@ -368,9 +338,6 @@ SetParent Cfg_CC_Inc
 SetParent Cfe_CC_Exe
 SetParent Cfe_CC_Flags
 SetParent Cfe_CC_Inc
-SetParent Cfe_LD_Flags
-SetParent Cfe_LD_Lib
-SetParent Cfe_LD_RPath
 
 SetParent Save_CC
 SetParent Save_CFLAGS

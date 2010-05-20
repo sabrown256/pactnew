@@ -21,7 +21,6 @@ SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 SafeEnv Cfe_CC_Exe       "cc"
 SafeEnv Cfe_CC_Flags     "-g"
-SafeEnv Cfe_LD_Flags     ""
 
 SafeEnv MDG_Inc          ""
 SafeEnv MDG_Lib          ""

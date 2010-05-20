@@ -32,7 +32,6 @@ set UTime = `timer -r`
 if ($HostOS == Darwin) then
    Note $ALog "Finding GL on MAC OS X"
    setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
-   setenv Cfe_LD_Flags  "$MDG_Lib"
 endif
 
 set lLibDirs = ""

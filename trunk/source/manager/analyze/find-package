@@ -63,10 +63,12 @@ endif
 Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
 Note $ALog "Cfe_CC_Flags = |$Cfe_CC_Flags|"
 Note $ALog "Cfe_LD_Flags = |$Cfe_LD_Flags|"
-flog $ALog set Opts = ""
-flog $ALog set Opts = ( $Opts $Cfe_CC_Flags $Cfe_LD_Flags )
-flog $ALog set Opts = ( $Opts $PckInc $lFile.c -o $lFile )
-flog $ALog set Opts = ( $Opts )
+Note $ALog "Cfe_LD_RPath = |$Cfe_LD_RPath|"
+
+flog $ALog set opt = ""
+flog $ALog set opt = ( $opt $lFile.c -o $lFile )
+flog $ALog set opt = ( $opt $Cfe_CC_Flags $PckInc )
+flog $ALog set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
 # check for implicit library reference - does the linker know how to find it
 
@@ -86,7 +88,7 @@ if ($Implicit == TRUE) then
          flog $ALog set lLPath  = ""
       endif
       flog $ALog set PckLib = ( -l$lLib )
-      flog $ALog $Cfe_CC_Exe $Opts $lLPath $PckLib $lALibs $Cfe_LD_Lib
+      flog $ALog $Cfe_CC_Exe $opt $lLPath $PckLib $lALibs $Cfe_LD_Lib
       set xstatus = $status
       if ($xstatus == 0) then
          flog $ALog setenv LD_LIBRARY_PATH $i
@@ -129,7 +131,7 @@ foreach i ($lLibDirs)
             set LDir = "-L$i -l$lLib"
             flog $ALog set PckPath = ( $i )
             flog $ALog set PckLib  = ( -l$lLib )
-            flog $ALog $Cfe_CC_Exe $Opts $LDir $lALibs $Cfe_LD_Lib
+            flog $ALog $Cfe_CC_Exe $opt $LDir $lALibs $Cfe_LD_Lib
             set xstatus = $status
             if ($xstatus == 0) then
                flog $ALog eval $lFile
@@ -153,7 +155,7 @@ foreach i ($lLibDirs)
             if ("$lFile" == "none") then
                flog $ALog set PckOK = TRUE
             else
-               flog $ALog $Cfe_CC_Exe $Opts $PckLib $lALibs $Cfe_LD_Lib
+               flog $ALog $Cfe_CC_Exe $opt $PckLib $lALibs $Cfe_LD_Lib
                set xstatus = $status
                if ($xstatus == 0) then
                   flog $ALog eval $lFile

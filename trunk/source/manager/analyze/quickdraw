@@ -49,9 +49,12 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   setenv LD_Flags     "$LD_Flags -framework Carbon"
+   set opt = ""
+   set opt = ( $opt $LD_Flags $LD_RPath )
+   set opt = ( $opt -framework Carbon )
+   set opt = ( $opt $Cfg_LD_Lib )
 
-   flog $ALog $Cfg_CC_Exe $LD_Flags $Tmp.c -o $Tmp $Cfg_LD_Lib
+   flog $ALog $Cfg_CC_Exe $Tmp.c -o $Tmp $opt
    set xstatus = $status
    if ($xstatus == 0) then
       if ($Std_UseQD == TRUE) then
