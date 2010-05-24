@@ -36,9 +36,13 @@ source $ldir/env-csh
 
     flog $Log pushd $Base/score
 
+    set opt = ""
+    set opt = ( $opt $Cfe_CC_Flags )
+    set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
+
     flog $Log mkdir $CfgDir
     flog $Log cd $CfgDir
-    flog $Log $Cfe_CC_Exe -DMM_CONFIG -I.. -I$IncDir ../scmemi.c -o score-config $Cfe_CC_Flags
+    flog $Log $Cfe_CC_Exe -DMM_CONFIG -I.. -I$IncDir ../scmemi.c -o score-config $opt
     if ($status == 0) then
        flog $Log ( $CFE ./score-config >>& $STDOUT )
        if ($status == 0) then

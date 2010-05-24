@@ -33,7 +33,12 @@ int main(int c, char **v)
 EOF
 
 set FOUND_SELECT = FALSE
-flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+
+set opt = ""
+set opt = ( $opt $Cfe_CC_Flags )
+set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    set IOHandling   = ($IOHandling select)
    set FOUND_SELECT = TRUE
@@ -54,7 +59,7 @@ int main(int c, char **v)
 EOF
 
 set FOUND_POLL = FALSE
-flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    set IOHandling = ($IOHandling poll)
    set FOUND_POLL = TRUE

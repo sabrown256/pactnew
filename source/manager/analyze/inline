@@ -24,7 +24,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
    setenv HaveINLINE TRUE
    NoteD $ALog "      has inline support"

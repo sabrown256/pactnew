@@ -36,7 +36,7 @@ int main(int c, char **v)
     return(i != 2);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags $Tmp.c -o $Tmp
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if (($status == 0) && ($?IBM_BGL == 0)) then
    setenv HaveVACOPY TRUE
    NoteD $ALog "      has va_copy"
@@ -53,7 +53,7 @@ void foo(va_list *lst)
     return;}
 EOF
 
-   flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c $Tmp.c -o $Tmp.o
+   flog $ALog $Cfe_CC_Exe -c $Tmp.c -o $Tmp.o $ccopt
    if ($status == 0) then
       NoteD $ALog "      has complete variable arg list support"
    else

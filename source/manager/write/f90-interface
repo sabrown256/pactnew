@@ -40,9 +40,11 @@ source $ldir/env-csh
        endif
        flog $Log pushd $Tmp
 
-       set lrpath = `../../analyze/rpath -o rpath`
-       flog $Log set lCC = ( $Cfe_CC_Exe $Cfe_CC_Flags $lrpath )
-       flog $Log set lFC = ( $Cfe_FC_Exe $Cfe_FC_Flags $lrpath )
+#       set lrpath = `../../analyze/rpath -o rpath`
+#       flog $Log set lCC = ( $Cfe_CC_Exe $Cfe_CC_Flags $lrpath )
+#       flog $Log set lFC = ( $Cfe_FC_Exe $Cfe_FC_Flags $lrpath )
+       flog $Log set lCC = ( $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
+       flog $Log set lFC = ( $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 
 # run getkinds to generate getbytes.f
        flog $Log $lFC ../getkinds.f -o getkinds
@@ -53,7 +55,7 @@ source $ldir/env-csh
        endif
 
 # compile and link getbytes
-       flog $Log $Cfe_CC_Exe $Cfe_CC_Flags -I../.. -c ../csizer.c -o csizer.o
+       flog $Log $lCC -I../.. -c ../csizer.c -o csizer.o
        flog $Log $lFC getbytes.f csizer.o -o getbytes
        if ($status != 0) then
           NoteD $Log "      Cannot compute Fortran primitive byte sizes"

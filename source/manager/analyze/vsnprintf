@@ -14,8 +14,6 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: vsnprinft"
 
-set CC = ( $Cfe_CC_Exe )
-
 cat << EOF >! $Tmp.c
 #include <stdarg.h>
 int main(int c, char **v)
@@ -26,7 +24,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-flog $ALog $CC $Tmp.c -o $Tmp
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp
 if ($status == 0) then
    setenv HAVE_VSNPRINTF TRUE
    NoteD $ALog "      has vsnprintf "

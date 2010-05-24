@@ -88,8 +88,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef enum e_io_oper io_oper;
-
 enum e_io_oper
    {IO_OPER_NONE, IO_OPER_FOPEN, IO_OPER_FCLOSE,
     IO_OPER_FTELL, IO_OPER_LFTELL, IO_OPER_FSEEK, IO_OPER_LFSEEK,
@@ -97,6 +95,8 @@ enum e_io_oper
     IO_OPER_FPRINTF, IO_OPER_FPUTS, IO_OPER_FGETS, IO_OPER_FGETC,
     IO_OPER_UNGETC, IO_OPER_FFLUSH, IO_OPER_FEOF, IO_OPER_SETVBUF,
     IO_OPER_POINTER, IO_OPER_SEGSIZE};
+
+typedef enum e_io_oper io_oper;
 
 typedef struct s_SC_filedes SC_filedes;
 typedef struct s_SC_ttydes SC_ttydes;
