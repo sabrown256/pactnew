@@ -16,8 +16,6 @@ Note $Log "Analyze: strerror_r"
 
 set str = ""
 
-set CC = ( $Cfe_CC_Exe )
-
 # look for POSIX standard strerror_r
 
 Note $ALog "Check for POSIX strerror_r"
@@ -32,7 +30,7 @@ int main(int c, char **v)
 EOF
 
 Note $ALog ""
-Note $ALog " CC           = |$CC|"
+Note $ALog " CC           = |$Cfe_CC_Exe|"
 Note $ALog " PATH         = |$PATH|"
 Note $ALog ""
 
@@ -45,8 +43,8 @@ set noglob
 set opt = ""
 set opt = ( $opt $Cfe_LD_Lib )
 
-Note $ALog "Command: $CC $Tmp.c -o $Tmp $opt"
-set t = ( `$CC $Tmp.c -o $Tmp $opt |& cat` )
+Note $ALog "Command: $Cfe_CC_Exe $Tmp.c -o $Tmp $opt"
+set t = ( `$Cfe_CC_Exe $Tmp.c -o $Tmp $opt |& cat` )
 Note $ALog "Result: $t"
 if ("$t" == "") then
    flog $ALog setenv HAVE_POSIX_STRERROR TRUE
@@ -75,8 +73,8 @@ EOF
 set opt = ""
 set opt = ( $opt $Cfe_LD_Lib )
 
-Note $ALog "Command: $CC $Tmp.c -o $Tmp $opt"
-set t = ( `$CC $Tmp.c -o $Tmp $opt |& cat` )
+Note $ALog "Command: $Cfe_CC_Exe $Tmp.c -o $Tmp $opt"
+set t = ( `$Cfe_CC_Exe $Tmp.c -o $Tmp $opt |& cat` )
 Note $ALog "Result: $t"
 if ("$t" == "") then
    flog $ALog setenv HAVE_GNU_STRERROR TRUE

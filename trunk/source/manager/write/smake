@@ -91,7 +91,11 @@ EOF
 
     set smkc = ../../psh/smake.c
 
-    flog $Log $Cfg_CC_Exe $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags $smkc -o $BinDir/smake
+    set opt = ""
+    set opt = ( $opt $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags )
+    set opt = ( $opt $Cfg_LD_Flags $Cfg_LD_RPath )
+
+    flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
     flog $Log ls -l $BinDir/smake
     flog $Log $BinDir/smake -f $TMAKEF a
     if ($status == 0) then
@@ -103,7 +107,7 @@ EOF
 
        set RootOpt = ( $RootOpt -DSTUPID_MAKE )
 
-       flog $Log $Cfg_CC_Exe $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags $smkc -o $BinDir/smake
+       flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
        flog $Log ls -l $BinDir/smake
        flog $Log $BinDir/smake -f $TMAKEF a
        if ($status == 0) then
@@ -117,6 +121,8 @@ EOF
           exit(1)
        endif
     endif
+
+    unset opt
 
     flog $Log $RMDir z-*
     flog $Log $RM `ls`

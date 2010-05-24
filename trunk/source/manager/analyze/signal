@@ -33,7 +33,11 @@ int main(int c, char **v)
  return(rv);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+set opt = ""
+set opt = ( $opt $Cfe_CC_Flags )
+set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    setenv HAVE_POSIX_SIGNALS TRUE
    set sig = ( $sig posix )
@@ -55,7 +59,7 @@ int main(int c, char **v)
  return(rv);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    set sig = ( $sig sysv )
 #   NoteD $ALog -n " sysv"
@@ -76,7 +80,7 @@ int main(int c, char **v)
  return(rv);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    set sig = ( $sig bsd )
 #   NoteD $ALog -n " bsd"

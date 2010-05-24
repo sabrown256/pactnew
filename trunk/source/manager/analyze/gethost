@@ -31,7 +31,9 @@ EOF
 
 setenv HAVE_GETHOSTBYNAME FALSE
 
-flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+set opt = ""
+set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
    flog $ALog $CFE $Tmp `uname -n`
    if ($status == 0) then

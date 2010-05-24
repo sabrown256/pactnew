@@ -32,7 +32,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status != 0) then
    setenv NO_LONG_LONG TRUE
 else
@@ -109,7 +109,7 @@ EOF
 
 COMPILE:
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 eval `$Tmp`
 
 Note $ALog ""

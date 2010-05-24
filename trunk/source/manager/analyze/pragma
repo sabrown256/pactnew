@@ -25,10 +25,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-set opt = ""
-set opt = ( $opt $Cfe_CC_Flags $LD_Lib )
-
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
    setenv GOOD_OPENMP_PRAGMAS  TRUE
    NoteD $ALog "      proper pragma handling"

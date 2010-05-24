@@ -152,6 +152,15 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# NOTE: properly this is done in analyze/ld but we need to bootstrap
+# our way through compiler issues before getting to analyze/ld
+# so set this temporary
+set lrpath = `../analyze/rpath -o rpath`
+
+# set compile options for characterizing compiler
+set ccopt = ""
+set ccopt = ( $ccopt $Cfe_CC_Flags $lrpath )
+
 # now lets look at this compiler
 if ($Cfg_CC_Exe != "") then
 
@@ -224,7 +233,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
       set F77IntPtrDiffer = `$CFE ./$Tmp $BE`
    else
@@ -249,7 +258,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
       set LONG64 = `$CFE ./$Tmp $BE`
    else
@@ -276,7 +285,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
-   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $Cfe_CC_Flags
+   flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
       set NEED_ALT_LARGE_FILE = `$CFE ./$Tmp $BE`
    else
@@ -356,6 +365,9 @@ source $AnaDir/complex
 source $AnaDir/headers
 source $AnaDir/glibc
 source $AnaDir/size
+
+unset lrpath
+unset ccopt
 
 exit(0)
 

@@ -29,7 +29,7 @@ int main(int c, char **v)
     }
 EOF
 
-   flog $ALog $Cfe_CC_Exe $Cfe_CC_Flags -c $Tmp.c -o $Tmp.o
+   flog $ALog $Cfe_CC_Exe -c $Tmp.c -o $Tmp.o $ccopt
    if ($status == 0) then
       NoteD $ALog "      has C99 complex support"
    else
