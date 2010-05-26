@@ -1998,24 +1998,27 @@ int _SC_job_print(taskdesc *job, asyncstate *as, char *fmt, ...)
     char *msg;
     parstate *state;
 
-    state = job->context;
+    rv = FALSE;
 
-    SC_START_ACTIVITY(state, STATE_PRINTF);
+    if (job != NULL)
+       {state = job->context;
 
-    rv = TRUE;
+	SC_START_ACTIVITY(state, STATE_PRINTF);
 
-    SC_VDSNPRINTF(TRUE, msg, fmt);
+	rv = TRUE;
 
-    job->tag(job, tag, MAXLINE, NULL);
+	SC_VDSNPRINTF(TRUE, msg, fmt);
 
-    state->print(state, "%s %s", tag, msg);
+	job->tag(job, tag, MAXLINE, NULL);
 
-    if (state->server == TRUE)
-       _SC_exec_printf(as, "%s %s %s", _SC_EXEC_SRV_ID, tag, msg);
+	state->print(state, "%s %s", tag, msg);
 
-    SFREE(msg);
+	if (state->server == TRUE)
+	   _SC_exec_printf(as, "%s %s %s", _SC_EXEC_SRV_ID, tag, msg);
 
-    SC_END_ACTIVITY(state);
+	SFREE(msg);
+
+	SC_END_ACTIVITY(state);};
 
     return(rv);}
 
