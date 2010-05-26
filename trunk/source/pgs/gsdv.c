@@ -535,7 +535,6 @@ void PG_setup_ctrls_glb(char *s)
 FILE *_PG_fopen(char *name, char *mode)
    {FILE *fp;
 
-/*    fp = SC_fopen(name, mode); */
     fp = io_open(name, mode);
 
     if (_PG.buffer_size > 0)
