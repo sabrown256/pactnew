@@ -57,6 +57,9 @@ struct s_bio_desc
 static long
  bio_stats[5] = { 0L, 0L, 0L, 0L, 0L };
 
+static int
+ _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -128,11 +131,25 @@ static int _SC_bfr_free_elem(void *a)
 
 /* _SC_BIO_FREE - free buffering */
 
-static void _SC_bio_free(bio_desc *bid)
+static void _SC_bio_free(bio_desc *bid, int total)
    {
 
     if (bid->stack != NULL)
-       SC_free_array(bid->stack, _SC_bfr_free_elem);
+
+/* free the frames and array - no flush */
+       {if (total == TRUE)
+	   SC_free_array(bid->stack, _SC_bfr_free_elem);
+
+/* free the frames only - flush */
+	else
+	   {int i, n;
+	    bio_frame *fr;
+
+	    n = SC_array_get_n(bid->stack);
+	    for (i = 0; i < n; i++)
+	        {fr = *(bio_frame **) SC_array_get(bid->stack, i);
+		 n  = _SC_bfr_remove(bid, i, fr, TRUE, FALSE);
+		 i--;};};};
 
     return;}
 
@@ -204,9 +221,14 @@ static bio_frame *_SC_bfr_alloc(off_t addr, size_t bfsz)
 static void _SC_bio_buffer(bio_desc *bid, size_t bfsz)
    {
 
-    bid->bfsz = bfsz;
-    if (bid->stack == NULL)
-       bid->stack = SC_MAKE_ARRAY("_SC_BIO_BUFFER", bio_frame *, NULL);
+    if (bfsz < 1)
+       {_SC_bio_free(bid, FALSE);
+	SC_free_array(bid->stack, NULL);}
+
+    else
+       {bid->bfsz = bfsz;
+	if (bid->stack == NULL)
+	   bid->stack = SC_MAKE_ARRAY("_SC_BIO_BUFFER", bio_frame *, NULL);};
 
     bid->nhits[BIO_OPER_SETVBUF]++;
 
@@ -727,15 +749,7 @@ static int _SC_bio_flush(bio_desc *bid)
 
 #else
 
-   {int i, n;
-    bio_frame *fr;
-
-    if (bid->stack != NULL)
-       {n = SC_array_get_n(bid->stack);
-        for (i = 0; i < n; i++)
-	    {fr = *(bio_frame **) SC_array_get(bid->stack, i);
-	     n  = _SC_bfr_remove(bid, i, fr, TRUE, FALSE);
-	     i--;};};};
+   _SC_bio_free(bid, FALSE);
 
 #endif
 
@@ -938,9 +952,14 @@ static int _SC_bsetvbuf(FILE *fp, char *buf, int type, size_t size)
     ret = setvbuf(fp, buf, type, size);
 
 #else
-    ret = 0;
+
+    if (size < 1)
+       ret = setvbuf(fp, buf, type, size);
+    else
+       ret = 0;
 
     _SC_bio_buffer(bid, size);
+
 #endif
 
     return(ret);}
@@ -1081,7 +1100,7 @@ static int _SC_bclose(FILE *fp)
     bio_stats[3] += bid->nhits[BIO_OPER_WRITE];
     bio_stats[4] = max(bio_stats[4], bid->nbfmx);
 
-    _SC_bio_free(bid);
+    _SC_bio_free(bid, TRUE);
 
     SFREE(bid);
 

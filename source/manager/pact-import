@@ -22,6 +22,8 @@ if ($?USER == 0) then
    endif
 endif
 
+unalias grep
+
 set MngDir = $cwd
 set SCSCom = $MngDir/scscom
 set SCSUp  = $MngDir/scsup

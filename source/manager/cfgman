@@ -46,6 +46,7 @@ endif
 
 unalias ls
 unalias rm
+unalias grep
 
 set SGN   = .pc
 set ret   = 0
