@@ -16,6 +16,8 @@ set Which = "$cwd/pwhich"
 source ../dev/$Arch/include/env-pact.csh
 source ../dev/$Arch/include/env-csh
 
+unalias grep
+
 SafeEnv CROSS_COMPILE FALSE
 
 if ($CROSS_COMPILE == FALSE) then

@@ -8,6 +8,9 @@
 # include "cpyright.h"
 #
 
+unalias sed
+unalias grep
+
 set Base     = $cwd
 set DateOnly = "FALSE"
 

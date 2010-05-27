@@ -37,6 +37,7 @@ unalias cd
 unalias cp
 unalias rm
 unalias mv
+unalias grep
 
 set Base       = $cwd
 set KEEP       = FALSE
