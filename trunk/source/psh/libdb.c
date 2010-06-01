@@ -13,15 +13,16 @@ extern char
 
 #include <setjmp.h>
 
-#define SERVER  0
-#define CLIENT  1
-
 #define EOM     "++ok++"
 
-#define WHICH_PROC()       ((ioc->server == CLIENT) ? "CLIENT" : "SERVER")
+#define WHICH_PROC()       ((ioc_server == CLIENT) ? "CLIENT" : "SERVER")
+
+enum e_ckind
+ {SERVER, CLIENT};
+
+typedef enum e_ckind ckind;
 
 typedef struct s_database database;
-typedef struct s_db_comm db_comm;
 
 struct s_database
    {int ne;
@@ -31,26 +32,11 @@ struct s_database
     char *fpid;                 /* name of the pid file */
     char **entries;};
 
-struct s_db_comm
-   {int (*exists_comm)(char *fmt, ...);
-    int (*open_comm)(char *root);                          /* server only */
-    int (*close_comm)(char *root);
-    int (*read_comm)(char *root, int ch, char *s, int nc);
-    int (*write_comm)(char *root, int ch, char *s, int nc);
-    int server;};
-
-extern db_comm
- *ioc;
-
-#include "libsock.c"
-#include "libfifo.c"
-
 static int
+ ioc_server = CLIENT,
  dbg_db = FALSE;
 
-db_comm
- *ioc = &sock;
-/*  *ioc = &fifo; */
+#include "libsock.c"
 
 database
  *db = NULL;
@@ -81,7 +67,7 @@ static void sigtimeout(int sig)
  *           - quit if it hasn't heard anything in TO seconds
  */
 
-int comm_read(char *root, int ch, char *s, int nc, int to)
+int comm_read(client *cl, char *s, int nc, int to)
    {int nb;
 
 #ifdef IO_ALARM
@@ -90,13 +76,13 @@ int comm_read(char *root, int ch, char *s, int nc, int to)
     alarm(to);
 
     if (setjmp(cpu) == 0)
-       nb = ioc->read_comm(root, SERVER, s, nc);
+       nb = read_sock(cl, s, nc);
     else
        nb = -1;
 
     alarm(0);
 #else
-    nb = ioc->read_comm(root, SERVER, s, nc);
+    nb = read_sock(cl, s, nc);
 #endif
 
     return(nb);}
@@ -108,7 +94,7 @@ int comm_read(char *root, int ch, char *s, int nc, int to)
  *            - quit if it hasn't heard anything in TO seconds
  */
 
-int comm_write(char *root, int ch, char *s, int nc, int to)
+int comm_write(client *cl, char *s, int nc, int to)
    {int nb;
 
 #ifdef IO_ALARM
@@ -117,13 +103,13 @@ int comm_write(char *root, int ch, char *s, int nc, int to)
     alarm(to);
 
     if (setjmp(cpu) == 0)
-       nb = ioc->write_comm(root, SERVER, s, nc);
+       nb = write_sock(cl, s, nc);
     else
        nb = -1;
 
     alarm(0);
 #else
-    nb = ioc->write_comm(root, SERVER, s, nc);
+    nb = write_sock(cl, s, nc);
 #endif
 
     return(nb);}
@@ -361,15 +347,21 @@ char *get_db(database *db, char *var)
 
 /* SAVE_DB - save variable VAR to FP */
 
-int save_db(database *db, char *var, FILE *fp)
+int save_db(int fd, database *db, char *var, FILE *fp)
    {int i, rv, nv;
     char s[LRG], t[LRG];
     char *vl, *vr, **vrs;
+    client cl;
 
     rv = FALSE;
 
     if (db != NULL)
-       {vrs = db->entries;
+       {cl.fd     = fd;
+	cl.root   = db->root;
+	cl.server = &srv;
+	cl.type   = CLIENT;
+
+        vrs = db->entries;
 	nv  = db->ne;
 	for (i = 0; i < nv; i++)
 	    {vr = vrs[i];
@@ -382,7 +374,7 @@ int save_db(database *db, char *var, FILE *fp)
 /* write to the communicator if FP is NULL */
 	         if (fp == NULL)
 		    {snprintf(s, LRG, "%s=%s", vr, vl);
-		     comm_write(db->root, CLIENT, s, 0, 10);}
+		     comm_write(&cl, s, 0, 10);}
 		 else
 		    fprintf(fp, "%s=%s\n", vr, vl);};};
 
@@ -490,7 +482,7 @@ database *db_srv_load(char *root)
 /* DB_SRV_OPEN - open the database */
 
 database *db_srv_open(char *root, int init)
-   {int rv;
+   {int rv, pid;
     database *db;
     FILE *fp;
 
@@ -499,18 +491,22 @@ database *db_srv_open(char *root, int init)
     else
        db = db_srv_load(root);
 
+    pid = getpid();
+
 /* if a server is already running there will be a PID file */
     if (file_exists(db->fpid) == FALSE)
-       {ioc->server = SERVER;
-	rv = ioc->open_comm(root);
+       {ioc_server = SERVER;
+	rv = open_sock(root);
 
 	fp = fopen(db->fpid, "w");
-	fprintf(fp, "%d", getpid());
+	fprintf(fp, "%d", pid);
 	fclose(fp);}
 
     else
        {free_db(db);
         db = NULL;};
+
+    srv.pid = pid;
 
     return(db);}
 
@@ -522,7 +518,7 @@ database *db_srv_open(char *root, int init)
 void db_srv_close(database *db)
    {
 
-    ioc->close_comm(db->root);
+    close_sock(db->root);
 
     unlink(db->fpid);
 
@@ -535,7 +531,7 @@ void db_srv_close(database *db)
 
 /* DB_SRV_SAVE - save the DB to disk */
 
-int db_srv_save(database *db)
+int db_srv_save(int fd, database *db)
    {int rv;
     FILE *fp;
 
@@ -546,7 +542,7 @@ int db_srv_save(database *db)
     if (db != NULL)
        {fp = fopen(db->file, "w");
 	if (fp != NULL)
-	   {save_db(db, NULL, fp);
+	   {save_db(fd, db, NULL, fp);
 	    fclose(fp);
 	    rv = TRUE;};};
 
@@ -575,10 +571,7 @@ int db_srv_launch(char *root)
 /* wait until we have a server going */
 	for (i = 0; file_exists(fpid) == FALSE; i++)
 	    {if (i == 1)
-		{if (ioc == &fifo)
-		    snprintf(s, MAXLINE, "perdb -f %s -s -x fifo", root);
-		 else
-		    snprintf(s, MAXLINE, "perdb -f %s -s -x socket", root);
+		{snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
 		 st = system(s);
 		 log_activity(flog, dbg_db, "CLIENT", "launch |%s| (%d)",
 			      s, st);}
@@ -591,6 +584,8 @@ int db_srv_launch(char *root)
 	   pid = atoi(t);
 	else
 	   pid = -1;
+
+	srv.pid = pid;
 
         log_activity(flog, dbg_db, "CLIENT", "server pid %d (%d)",
 		     pid, i);};
@@ -606,13 +601,13 @@ void db_srv_restart(database *db)
    {int rv;
 
     if (db != NULL)
-       {ioc->close_comm(db->root);
-	db_srv_save(db);
+       {close_sock(db->root);
+	db_srv_save(-1, db);
 
 	log_activity(db->flog, dbg_db, "SERVER", "restart");
 
-	ioc->server = SERVER;
-	rv = ioc->open_comm(db->root);};
+	ioc_server = SERVER;
+	rv = open_sock(db->root);};
 
     return;}
 
@@ -626,8 +621,14 @@ void db_srv_restart(database *db)
 
 char **_db_clnt_ex(char *root, char *req)
    {int nb, to;
-    char **p, *flog, *fpid;
+    char **p, *flog;
+    client cl;
     static char s[MAXLINE];
+
+    cl.fd     = -1;
+    cl.root   = root;
+    cl.type   = CLIENT;
+    cl.server = &srv;
 
     p = NULL;
 
@@ -635,19 +636,17 @@ char **_db_clnt_ex(char *root, char *req)
 
     log_activity(flog, dbg_db, "CLIENT", "begin |%s|", req);
 
-    fpid = name_pid(root);
-
 /* make sure that there is a server running */
     db_srv_launch(root);
 
 /* send the request */
-    nb = comm_write(root, SERVER, req, 0, 10);
+    nb = comm_write(&cl, req, 0, 10);
 
 /* get the reply */
     if (nb > 0)
        {to = 4;
 	while (TRUE)
-           {nb = comm_read(root, CLIENT, s, MAXLINE, to);
+	   {nb = comm_read(&cl, s, MAXLINE, to);
 	    if ((nb < 0) || (strcmp(s, EOM) == 0))
 	       break;
 	    else

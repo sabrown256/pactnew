@@ -8,6 +8,8 @@
  *
  */
 
+/* #define NEWWAY */
+
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"
@@ -24,8 +26,8 @@ static void sigdone(int sig)
 
     if (db != NULL)
        {log_activity(db->flog, dbg_db, "SERVER", "signalled %d - done", sig);
-	ioc->close_comm(db->root);
-	db_srv_save(db);
+	close_sock(db->root);
+	db_srv_save(-1, db);
 	unlink(db->fpid);};
 
     exit(sig);
@@ -49,11 +51,15 @@ static void sigrestart(int sig)
 
 /* SRV_SAVE_DB - save the database */
 
-char *srv_save_db(char *fname, char *var)
-   {int ok;
+char *srv_save_db(client *cl, char *fname, char *var)
+   {int fd, ok;
     char s[MAXLINE];
     FILE *fp;
+    database *db;
     static char t[MAXLINE];
+
+    fd = cl->fd;
+    db = cl->db;
 
     if ((fname == NULL) || (strcmp(fname, "stdout") == 0))
        fp = NULL;
@@ -66,7 +72,7 @@ char *srv_save_db(char *fname, char *var)
 	    return(t);};
         fname = path_tail(s);};
 	   
-    ok = save_db(db, var, fp);
+    ok = save_db(fd, db, var, fp);
 
     if (fp != NULL)
        fclose(fp);
@@ -92,15 +98,20 @@ char *srv_save_db(char *fname, char *var)
 
 /* SRV_LOAD_DB - load the database */
 
-char *srv_load_db(char *fname, char *var)
+char *srv_load_db(client *cl, char *fname, char *var)
    {char s[MAXLINE];
+    char *root;
     FILE *fp;
+    database *db;
     static char t[MAXLINE];
+
+    db   = cl->db;
+    root = cl->root;
 
     if (fname == NULL)
        fp = NULL;
     else
-       {snprintf(s, MAXLINE, "%s.%s.db", db->root, fname);
+       {snprintf(s, MAXLINE, "%s.%s.db", root, fname);
 	fp = fopen(s, "r");
         if (fp == NULL)
 	   {snprintf(t, MAXLINE, "could not open %s - load %s",
@@ -130,12 +141,143 @@ char *srv_load_db(char *fname, char *var)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* NEW_CONNECTION - make a new connection on SFD and add it to AFS */
+
+void new_connection(connection *srv)
+   {int fd;
+    socklen_t sz;
+
+    sz = sizeof(srv->sck);
+
+    fd = accept(srv->server, (struct sockaddr *) &srv->sck, &sz);
+    if (fd > 0)
+       {FD_SET(fd, &srv->afs);
+/*
+        printf("Server: connect from host %s, port %hd\n",
+	       inet_ntoa(srv->sck.sin_addr),
+	       srv->sck.sin_port);
+*/
+       };
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PROC_CONNECTION - process input on connection FD
+ *                 - return -1 on error
+ *                 -         0 on end of connection
+ *                 -         1 if otherwise successful
+ */
+
+int proc_connection(client *cl)
+   {int fd, rv, nb, st, to;
+    char s[MAXLINE], t[MAXLINE];
+    char *var, *val, *nvl, *root, *p;
+    connection *srv;
+    database *db;
+
+    fd   = cl->fd;
+    root = cl->root;
+    srv  = cl->server;
+    db   = cl->db;
+
+    to = 60;
+    rv = 1;
+
+    memset(s, 0, MAXLINE);
+
+    nb = comm_read(cl, s, MAXLINE, to);
+
+/* decide on the action to take */
+    if (nb > 0)
+
+/* quit session */
+       {if (strncmp(s, "quit:", 5) == 0)
+	   {rv  = 0;
+	    val = "done";}
+
+/* reset database */
+        else if (strncmp(s, "reset:", 6) == 0)
+	   {reset_db(db);
+	    val = "reset";}
+
+/* save to standard place */
+	else if (strncmp(s, "save:", 5) == 0)
+	   {key_val(NULL, &var, s, ": \t\n");
+	    val = srv_save_db(cl, NULL, var);}
+
+/* save to specified place */
+	else if (strncmp(s, "save ", 5) == 0)
+	   {p = strchr(s+5, ':');
+	    *p++ = '\0';
+	    key_val(NULL, &var, s+5, " \t\n");
+	    val = srv_save_db(cl, s+5, var);}
+
+/* load from standard place */
+	else if (strncmp(s, "load:", 5) == 0)
+	   val = srv_load_db(cl, NULL, NULL);
+
+/* load from specified place */
+	else if (strncmp(s, "load ", 5) == 0)
+	   {p = strchr(s+5, ':');
+	    *p++ = '\0';
+	    val = srv_load_db(cl, s+5, NULL);}
+
+/* variable conditional init */
+	else if (strstr(s, "=\?") != NULL)
+	   {key_val(&var, &nvl, s, "=? \t\n");
+	    val = get_db(db, var);
+	    st  = (val != cnoval());
+	    if (st == FALSE)
+	       val = put_db(db, var, nvl);}
+
+/* variable defined? */
+	else if (strchr(s, '?') != NULL)
+	   {key_val(&var, &nvl, s, "? \t\n");
+	    val = get_db(db, var);
+	    st  = (val != cnoval());
+	    if (nvl[0] == '\0')
+	       {if (st == TRUE)
+		   val = "defined{TRUE}";
+	        else
+		   val = "defined{FALSE}";}
+	    else if (st == FALSE)
+	       val = put_db(db, var, nvl);}
+
+/* variable set/get */
+	else
+	   {key_val(&var, &val, s, "= \t\n");
+	    if (val == NULL)
+	       {val = get_db(db, var);}
+	    else
+	       {val = trim(val, BACK, " \t");
+		val = put_db(db, var, val);};
+	    if ((strchr("'\"(", val[0]) == NULL) && 
+		(strpbrk(val, " \t") != NULL))
+	       {snprintf(t, MAXLINE, "\"%s\"", val);
+		val = t;};};
+
+	nb = comm_write(cl, val, 0, 10);
+	nb = comm_write(cl, EOM, 0, 10);
+
+#ifdef NEWWAY
+	if (rv == 0)
+	   {close(fd);
+	    FD_CLR(fd, &srv->afs);};
+#endif
+        };
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SERVER - run the server side of the database */
 
 int server(char *root, int init, int dmn)
-   {int ok, nb, to, st;
-    char s[MAXLINE], t[MAXLINE];
-    char *var, *val, *nvl, *p;
+   {int ok;
+    client cl;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
        {signal(SIGTERM, sigdone);
@@ -144,100 +286,46 @@ int server(char *root, int init, int dmn)
 
 	log_activity(name_log(root), dbg_db, "SERVER", "begin");
 
-	to = 60;
+	cl.root   = root;
+	cl.type   = SERVER;
+	cl.server = &srv;
 
-	db = db_srv_open(root, init);
-	if (db != NULL)
-	   {for (ok = TRUE; ok == TRUE; )
-	        {ok = ioc->exists_comm(root);
+	cl.db = db_srv_open(root, init);
+	if (cl.db != NULL)
+	   {db = cl.db;
+
+#ifdef NEWWAY
+	    if (listen(srv.server, 5) >= 0)
+	       {int fd, nr;
+		fd_set rfs;
+
+		for (ok = TRUE; ok == TRUE; )
+		    {rfs = srv.afs;
+		     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, NULL);
+		     if (nr > 0)
+		        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
+			     {if (FD_ISSET(fd, &rfs))
+		    
+/* new connection request */
+				 {if (fd == srv.server)
+				     new_connection(&srv);
+
+/* data arriving on an existing connection */
+				  else
+				     {cl.fd = fd;
+				      ok    = proc_connection(&cl);};};};};};};
+#else
+	    for (ok = TRUE; ok == TRUE; )
+	        {ok = sock_exists(root);
 		 if (ok == TRUE)
-		    {memset(s, 0, MAXLINE);
+		    {cl.fd = -1;
+		     ok    = proc_connection(&cl);};};
+#endif
 
-		     nb = comm_read(root, SERVER, s, MAXLINE, to);
-		     if (nb < 0)
-		        {ok = FALSE;
-			 continue;};
+	    db_srv_save(-1, cl.db);
+	    db_srv_close(cl.db);
 
-/* decide on the action to take */
-		     if (nb > 0)
-
-/* quit session */
-		        {if (strncmp(s, "quit:", 5) == 0)
-			    {val = "done";
-			     ok  = FALSE;}
-
-/* reset database */
-		         else if (strncmp(s, "reset:", 6) == 0)
-			    {reset_db(db);
-			     val = "reset";}
-
-/* save to standard place */
-		         else if (strncmp(s, "save:", 5) == 0)
-			    {key_val(NULL, &var, s, ": \t\n");
-			     val = srv_save_db(NULL, var);}
-
-/* save to specified place */
-		         else if (strncmp(s, "save ", 5) == 0)
-			    {p = strchr(s+5, ':');
-			     *p++ = '\0';
-			     key_val(NULL, &var, s+5, " \t\n");
-			     val = srv_save_db(s+5, var);}
-
-/* load from standard place */
-		         else if (strncmp(s, "load:", 5) == 0)
-			    val = srv_load_db(NULL, NULL);
-
-/* load from specified place */
-		         else if (strncmp(s, "load ", 5) == 0)
-			    {p = strchr(s+5, ':');
-			     *p++ = '\0';
-			     val = srv_load_db(s+5, NULL);}
-
-/* variable conditional init */
-			 else if (strstr(s, "=\?") != NULL)
-			    {key_val(&var, &nvl, s, "=? \t\n");
-			     val = get_db(db, var);
-			     st  = (val != cnoval());
-			     if (st == FALSE)
-			        val = put_db(db, var, nvl);}
-
-/* variable defined? */
-			 else if (strchr(s, '?') != NULL)
-			    {key_val(&var, &nvl, s, "? \t\n");
-			     val = get_db(db, var);
-			     st  = (val != cnoval());
-			     if (nvl[0] == '\0')
-			        {if (st == TRUE)
-				    val = "defined{TRUE}";
-				 else
-				    val = "defined{FALSE}";}
-			     else if (st == FALSE)
-			        val = put_db(db, var, nvl);}
-
-/* variable set/get */
-			 else
-			    {key_val(&var, &val, s, "= \t\n");
-                             if (val == NULL)
-			        {val = get_db(db, var);}
-			     else
-			        {val = trim(val, BACK, " \t");
-				 val = put_db(db, var, val);};
-			     if ((strchr("'\"(", val[0]) == NULL) && 
-				 (strpbrk(val, " \t") != NULL))
-			        {snprintf(t, MAXLINE, "\"%s\"", val);
-				 val = t;};};}
-/* error case */
-		     else
-		        val = "error";
-
-/* howto use this in a shell: echo "bar" >> ~/foo.= && cat < ~/foo.= */
-		     nb = comm_write(root, CLIENT, val, 0, 10);
-		     nb = comm_write(root, CLIENT, EOM, 0, 10);};};
-
-	    db_srv_save(db);
-	    db_srv_close(db);};
-
-	log_activity(name_log(root), dbg_db, "SERVER", "end");};
+	    log_activity(name_log(root), dbg_db, "SERVER", "end");};};
 
     return(0);}
 
@@ -276,14 +364,13 @@ int exchange(char *root, char *req)
 void help(void)
    {
     printf("\n");
-    printf("Usage: perdb [-c] [-d] [-f <db>] [-h] [-l] [-s] [-x fifo | socket] [<req>]\n");
+    printf("Usage: perdb [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]\n");
     printf("   c   create the database, removing any existing\n");
     printf("   d   do not run server as daemon\n");
     printf("   f   root path to database\n");
     printf("   h   this help message\n");
     printf("   l   log transactions with the server\n");
     printf("   s   run as server\n");
-    printf("   x   server communication mode\n");
     printf("\n");
 
     return;}
@@ -317,19 +404,11 @@ int main(int c, char **v)
                       help();
                       return(1);
 		 case 'l' :
-                      dbg_fifo = TRUE;
                       dbg_sock = TRUE;
                       dbg_db   = TRUE;
                       break;
 		 case 's' :
                       srv = TRUE;
-                      break;
-		 case 'x' :
-		      i++;
-                      if (strcmp(v[i], "fifo") == 0)
-                         ioc = &fifo;
-		      else if (strcmp(v[i], "socket") == 0)
-			 ioc = &sock;
                       break;};}
 	 else
 	    {nstrcat(req, MAXLINE, v[i]);

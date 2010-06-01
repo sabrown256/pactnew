@@ -53,6 +53,8 @@ unalias sort
 unsetenv BASH_ENV
 umask 007
 
+limit stacksize unlimited
+
 set CfgMan = $MngDir/cfgman
 
 setenv System  `$CfgMan use`

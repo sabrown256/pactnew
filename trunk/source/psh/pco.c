@@ -2207,8 +2207,7 @@ int main(int c, char **v)
                       break;
  
                  case 'l':
-                      append = TRUE;
-                      dbg_fifo = TRUE;
+                      append   = TRUE;
                       dbg_sock = TRUE;
                       dbg_db   = TRUE;
                       break;
