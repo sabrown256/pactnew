@@ -189,7 +189,3 @@ static int write_fifo(char *root, int ch, char *s, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-db_comm
-  fifo = {fifo_exists,
-          open_fifo, close_fifo,
-	  read_fifo, write_fifo, CLIENT};

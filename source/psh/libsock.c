@@ -18,11 +18,21 @@
 #endif
 
 typedef struct s_connection connection;
+typedef struct s_client client;
 
 struct s_connection
    {int server;                  /* server side descriptor */
     int port;
-    struct sockaddr_in *sck;};
+    int pid;
+    struct sockaddr_in sck;
+    fd_set afs;};
+
+struct s_client
+   {int fd;                      /* client side descriptor */
+    char *root;
+    ckind type;
+    connection *server;
+    database *db;};
 
 static connection
  srv;
@@ -122,7 +132,6 @@ static int init_server(char *root)
    {int ip, port, sasz, rv, fd;
     char s[MAXLINE], host[MAXLINE];
     char *hst;
-    struct sockaddr *sa;
 
     sasz = sizeof(struct sockaddr_in);
     port = -1;
@@ -130,18 +139,15 @@ static int init_server(char *root)
 
     srv.server = socket(PF_INET, SOCK_STREAM, 0);
     if (srv.server > 0)
-       {srv.sck = MAKE(struct sockaddr_in);
-	srv.sck->sin_family      = PF_INET;
-	srv.sck->sin_addr.s_addr = htonl(INADDR_ANY);
+       {srv.sck.sin_family      = PF_INET;
+	srv.sck.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	for (ip = 15000; ip < 65000; ip++)
-	    {srv.sck->sin_port = htons(ip);
+	    {srv.sck.sin_port = htons(ip);
 
-	     if (bind(srv.server, (struct sockaddr *) srv.sck, sasz) >= 0)
+	     if (bind(srv.server, (struct sockaddr *) &srv.sck, sasz) >= 0)
 	        {port = ip;
 		 break;};};};
-
-    sa = (struct sockaddr *) srv.sck;
 
     srv.port = port;
     if (srv.port >= 0)
@@ -152,6 +158,10 @@ static int init_server(char *root)
         close(fd);
 
 	rv = TRUE;};
+
+/* initialize the set of active sockets */
+    FD_ZERO(&srv.afs);
+    FD_SET(srv.server, &srv.afs);
 
     return(rv);}
 
@@ -166,8 +176,6 @@ static void fin_server()
     close(srv.server);
     srv.server = -1;
 
-    FREE(srv.sck);
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -175,31 +183,37 @@ static void fin_server()
 
 /* CONNECT_SERVER - make a connection with the server */
 
-static int connect_server(char *root)
+static int connect_server(client *cl)
    {int fd, err, sasz;
+    char *root, *flog;
     socklen_t len;
     struct sockaddr *sa;
+    connection *srv;
+
+    root = cl->root;
+    srv  = cl->server;
+
+    flog = name_log(root);
 
     fd   = -1;
     sasz = sizeof(struct sockaddr_in);
     len  = sasz;
 
-    sa = (struct sockaddr *) srv.sck;
+    sa = (struct sockaddr *) &srv->sck;
 
-    if (srv.port >= 0)
-       {getsockname(srv.server, sa, &len);
+    if (srv->port >= 0)
+       {getsockname(srv->server, sa, &len);
 
-	err = listen(srv.server, 5);
+	err = listen(srv->server, 5);
 	if (err >= 0)
-	   fd = accept(srv.server, sa, &len);
+	   {fd = accept(srv->server, sa, &len);
+	    log_activity(flog, dbg_sock, "SERVER", "connect %d", fd);}
+	else
+	   log_activity(flog, dbg_sock, "SERVER", "connect error %d - %s",
+			errno, strerror(errno));};
 
-#ifdef VERBOSE
-	{char *flog;
-	 flog = name_log(root);
-	 log_activity(flog, dbg_sock,
-		      "SERVER", "connect %d", fd);};
-#endif
-       };
+    cl->fd   = fd;
+    cl->type = SERVER;
 
     return(fd);}
 
@@ -208,12 +222,15 @@ static int connect_server(char *root)
 
 /* CONNECT_CLIENT - client initiates connection with the server */
 
-static int connect_client(char *root)
+static int connect_client(client *cl)
    {int sasz, fd, err, port;
     char s[MAXLINE];
-    char *res, *host, *prt;
-    struct sockaddr_in *srvr;
+    char *res, *host, *prt, *root;
     in_addr_t haddr;
+    connection *srv;
+
+    root = cl->root;
+    srv  = cl->server;
 
     fd = -1;
 
@@ -226,10 +243,10 @@ static int connect_client(char *root)
 
 	if ((host != NULL) && (port > 0))
 	   {sasz = sizeof(struct sockaddr_in);
-	    srvr = MAKE(struct sockaddr_in);
-	    memset(srvr, 0, sasz);
-	    srvr->sin_family = PF_INET;
-	    srvr->sin_port   = htons(port);
+
+	    memset(&srv->sck, 0, sasz);
+	    srv->sck.sin_family = PF_INET;
+	    srv->sck.sin_port   = htons(port);
 
 	    haddr = inet_addr(host);
 
@@ -243,15 +260,16 @@ static int connect_client(char *root)
 		    memcpy(&haddr, hp->h_addr, sz);};};
 
 	    if (haddr != INADDR_NONE)
-	       {memcpy(&srvr->sin_addr, &haddr, sizeof(long));
+	       {memcpy(&srv->sck.sin_addr, &haddr, sizeof(long));
 
 		fd = socket(PF_INET, SOCK_STREAM, 0);
 		if (fd >= 0)
-		   {err = connect(fd, (struct sockaddr *) srvr, sasz);
+		   {err = connect(fd, (struct sockaddr *) &srv->sck, sasz);
 		    if (err < 0)
 		       close(fd);
 
-#ifdef VERBOSE
+/*#ifdef VERBOSE*/
+#if 1
 		    {char *flog;
 		     flog = name_log(root);
 		     log_activity(flog, dbg_sock,
@@ -259,7 +277,14 @@ static int connect_client(char *root)
 				  host, prt, fd,
 				  strerror(errno), errno);};
 #endif
-		   };};};};
+
+#ifdef NEWWAY
+		    srv->server = fd;
+#endif
+		    srv->port   = port;};};};};
+
+    cl->fd   = fd;
+    cl->type = CLIENT;
 
     return(fd);}
 
@@ -318,18 +343,27 @@ static int close_sock(char *root)
 
 /* READ_SOCK - read from the socket ROOT into S */
 
-static int read_sock(char *root, int ch, char *s, int nc)
-   {int fd, nb;
-    char *flog, *wh;
+static int read_sock(client *cl, char *s, int nc)
+   {int nb, fd;
+    char *flog, *wh, *root;
+    connection *srv;
+
+    root = cl->root;
+    fd   = cl->fd;
+    srv  = cl->server;
 
     flog = name_log(root);
 
-    if (srv.server == 0)
-       {fd = connect_client(root);
-	wh = "CLIENT";}
+    if (fd == -1)
+       {if (srv->server == 0)
+	   fd = connect_client(cl);
+        else
+	   fd = connect_server(cl);};
+
+    if (cl->type == CLIENT)
+       wh = "CLIENT";
     else
-       {fd = connect_server(root);
-	wh = "SERVER";};
+       wh = "SERVER";
 
     if (fd < 0)
        {nb = -1;
@@ -337,7 +371,11 @@ static int read_sock(char *root, int ch, char *s, int nc)
 
     else
        {nb = read(fd, s, nc);
+
+#ifndef NEWWAY
 	close(fd);
+	cl->fd = -1;
+#endif
 
 	if (s[nb] != '\0')
 	   s[nb] = '\0';
@@ -345,7 +383,7 @@ static int read_sock(char *root, int ch, char *s, int nc)
 	if (nb < 0)
 	   log_activity(flog, dbg_sock, wh, "read |%s| (%s)",
 			s, strerror(errno));
-	else
+	else if (nb > 0)
 	   log_activity(flog, dbg_sock, wh, "read |%s| (%d)", s, nb);};
 
     return(nb);}
@@ -355,21 +393,30 @@ static int read_sock(char *root, int ch, char *s, int nc)
 
 /* WRITE_SOCK - write to the socket ROOT from S */
 
-static int write_sock(char *root, int ch, char *s, int nc)
-   {int fd, nb;
-    char *flog, *wh;
+static int write_sock(client *cl, char *s, int nc)
+   {int nb, fd;
+    char *flog, *wh, *root;
+    connection *srv;
+
+    root = cl->root;
+    fd   = cl->fd;
+    srv  = cl->server;
 
     if (nc <= 0)
        nc = strlen(s) + 1;
 
     flog = name_log(root);
 
-    if (srv.server == 0)
-       {fd = connect_client(root);
-	wh = "CLIENT";}
+    if (fd == -1)
+       {if (srv->server == 0)
+	   fd = connect_client(cl);
+        else
+	   fd = connect_server(cl);};
+
+    if (cl->type == CLIENT)
+       wh = "CLIENT";
     else
-       {fd = connect_server(root);
-	wh = "SERVER";};
+       wh = "SERVER";
 
     if (fd < 0)
        {nb = -1;
@@ -377,9 +424,13 @@ static int write_sock(char *root, int ch, char *s, int nc)
 
     else
        {nb = write(fd, s, nc);
-	close(fd);
 
-	if (nb < 0)
+#ifndef NEWWAY
+	close(fd);
+	cl->fd = -1;
+#endif
+
+	if ((nb < 0) || (nb != nc))
 	   log_activity(flog, dbg_sock, wh, "write |%s| (%s)",
 			s, strerror(errno));
 	else
@@ -390,7 +441,3 @@ static int write_sock(char *root, int ch, char *s, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-db_comm
-  sock = {sock_exists,
-          open_sock, close_sock,
-	  read_sock, write_sock, CLIENT};
