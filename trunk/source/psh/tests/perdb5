@@ -7,12 +7,7 @@
 #
 
 set opt = "-l"
-if ($#argv > 0) then
-   set opt = ( $opt -x $1 )
-   set db  = ./db5-$1
-else
-   set db  = ./db5-socket
-endif
+set db  = ./db5
 
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
