@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 if ($?lmngdir == 0) then
    set exe = `dirname $0`
    if ("$exe" == ".") then

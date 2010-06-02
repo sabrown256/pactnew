@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set This = `dirname $0`
 pushd $This >& /dev/null
 set Here = $cwd

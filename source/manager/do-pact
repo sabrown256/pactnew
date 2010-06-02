@@ -1,6 +1,6 @@
-#!/bin/csh -f
 #
 # DO-PACT - do the specific local part of the do-net process
+#         - this is only sourced never execd
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942

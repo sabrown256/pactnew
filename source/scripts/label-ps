@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 if ($#argv < 2) then
    echo ""
    echo "Usage: label-ps <file> <message>"

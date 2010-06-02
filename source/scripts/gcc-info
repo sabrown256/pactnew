@@ -3,7 +3,7 @@
 # GCC-INFO - find libraries and other info for a GCC
 #
 
-unalias ls
+unalias *
 
 set Gcc = ""
 while ($#argv > 0)

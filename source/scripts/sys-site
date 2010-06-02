@@ -3,6 +3,8 @@
 # SYS-SITE - define system types and sites
 #
 
+unalias *
+
 set END   = '}'
 set SignF = ""
 

@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set MngDir = `dirname $0`
 
 set args = ""

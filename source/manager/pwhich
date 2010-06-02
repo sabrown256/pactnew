@@ -11,6 +11,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 foreach i ($path)
    if (-e $i/$1) then
       echo $i/$1

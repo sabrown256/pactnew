@@ -9,6 +9,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set path = (/sbin /usr/sbin /usr/xpg4/bin /bin /usr/bin $path)
 
 # add the path to here iff you are able to verify it

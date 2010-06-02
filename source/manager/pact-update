@@ -15,6 +15,11 @@
 # include "cpyright.h"
 #
 
+# don't assume the umask is reasonable
+umask 002
+
+unalias *
+
 alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
 alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 alias Note      'echo \!\!:2-$ >>& \!\!:1'
@@ -29,15 +34,6 @@ if ($?USER == 0) then
       set USER = $LOGNAME
    endif
 endif
-
-# don't assume the umask is reasonable
-umask 002
-
-unalias cd
-unalias cp
-unalias rm
-unalias mv
-unalias grep
 
 set Base       = $cwd
 set KEEP       = FALSE

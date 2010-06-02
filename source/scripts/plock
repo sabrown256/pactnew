@@ -8,14 +8,13 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/plock") then
    set path = ( $Exe $path )
 endif
-
-unalias ls
-unalias cd
 
 set OSType = `uname -s`
 

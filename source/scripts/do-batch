@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Which   = "swhich -1"
 
 set HostOS  = `uname -s`

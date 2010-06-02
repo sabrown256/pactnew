@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set path = ( /usr/bin /bin )
 
 set Host   = `uname -n`

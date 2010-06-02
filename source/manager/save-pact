@@ -6,6 +6,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Public    = `grep InstDir installx | awk  '{print $4}'`
 set VarDir    = /var/tmp
 set SchemeDir = `grep SchemeDir installx | awk  '{print $4}'`

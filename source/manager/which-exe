@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 @ err = 1
 
 if ($#argv != 1) then

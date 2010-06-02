@@ -8,11 +8,9 @@
 # include "cpyright.h"
 #
 
-onintr INTERRUPT
+unalias *
 
-unalias ssh
-unalias ls
-unalias cd
+onintr INTERRUPT
 
 umask 002
 

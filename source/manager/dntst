@@ -10,6 +10,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 source $CSHSubr
 HAVE_SUBROUTINES
 

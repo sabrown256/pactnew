@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Which = "$cwd/pwhich"
 set Exe   = `$Which toby`
 

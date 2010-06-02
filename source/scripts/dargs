@@ -10,6 +10,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 while ($#argv > 0)
    switch ($1)
       case -h:

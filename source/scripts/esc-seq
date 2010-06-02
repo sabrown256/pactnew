@@ -3,6 +3,8 @@
 # ESC-SEQ - demonstrate X escape sequences in a shell script
 #
 
+unalias *
+
 set SUL = "[4m"      # underline
 set SSO = "[7m"      # standout
 set SBo = "[1m"      # bold

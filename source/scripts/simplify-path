@@ -6,6 +6,8 @@
 # Software Release #: LLNL-CODE-422942
 #
 
+unalias *
+
 set Synt = csh
 set Var  = PATH
 

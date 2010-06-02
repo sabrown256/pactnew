@@ -9,6 +9,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Sh = $SHELL
 
 while ($#argv > 0)

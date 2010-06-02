@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-unalias ps
+unalias *
 
 set OSType     = `uname -s`
 set Verbose    = TRUE

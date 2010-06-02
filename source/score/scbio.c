@@ -54,6 +54,9 @@ struct s_bio_desc
     long nbfmx;
     long nhits[SC_N_BIO_OPER];};
 
+static int
+ _SC_bio_debug = 0;
+
 static long
  bio_stats[5] = { 0L, 0L, 0L, 0L, 0L };
 
@@ -263,19 +266,22 @@ static BIGINT _SC_bfr_infill(bio_frame *fd, bio_frame *fs)
     no[0] = ov[0] - fs->addr;
     no[1] = ov[0] - fd->addr;
 
-    nb     = ov[1] - ov[0];
-    fsi[1] = no[0] + nb;
-    fsi[1] = max(fsi[1], fsr);
-    fdi[1] = no[1] + nb;
-    fdi[1] = max(fdi[1], fdr);
+    nb = ov[1] - ov[0];
+    if (nb <= 0)
+       nb = 0;
+    else if (nb > 0)
+       {fsi[1] = no[0] + nb;
+	fsi[1] = max(fsi[1], fsr);
+	fdi[1] = no[1] + nb;
+	fdi[1] = max(fdi[1], fdr);
 
 /* do copy based on memory address */
-    ps = fs->bf + no[0];
-    pd = fd->bf + no[1];
-    memcpy(pd, ps, nb);
+	ps = fs->bf + no[0];
+	pd = fd->bf + no[1];
+	memcpy(pd, ps, nb);
 
-    fs->nb = fsi[1];
-    fd->nb = fdi[1];
+	fs->nb = fsi[1];
+	fd->nb = fdi[1];};
 
     return(nb);}
 
@@ -590,6 +596,63 @@ static off_t _SC_bio_tell(bio_desc *bid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_CHECK_READ - debugging diagnostic to verify buffered reads */
+
+static int _SC_check_read(bio_desc *bid, bio_frame *rq)
+   {int fd, ok;
+    off_t i, cad, oad, nb;
+    unsigned char *rbf, *cbf;
+
+    ok = TRUE;
+
+    if (_SC_bio_debug & 1)
+       {fd  = bid->fd;
+	cad = bid->curr;
+	oad = rq->addr;
+	nb  = rq->sz;
+	rbf = rq->bf;
+
+	cbf = FMAKE_N(unsigned char, nb, "_SC_CHECK_READ:cbf");
+	lseek(fd, oad, SEEK_SET);
+
+/* compare direct read with buffered results */
+	SC_read_sigsafe(fd, cbf, nb);
+	for (i = 0; (i < nb) && (ok == TRUE); i++)
+	    ok = (cbf[i] == rbf[i]);
+
+	lseek(fd, cad, SEEK_SET);
+        SFREE(cbf);};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_CHECK_WRITE - debugging diagnostic to verify buffered writes */
+
+static int _SC_check_write(bio_desc *bid, bio_frame *rq)
+   {int fd, ok;
+    off_t cad, oad, nb;
+    unsigned char *rbf;
+
+    ok = TRUE;
+
+    if (_SC_bio_debug & 2)
+       {fd  = bid->fd;
+	cad = bid->curr;
+	oad = rq->addr;
+	nb  = rq->sz;
+	rbf = rq->bf;
+
+/* GOTCHA: what can we usefully check? */
+
+        };
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BIO_IN - buffer BF in from BID */
 
 static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
@@ -652,7 +715,9 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	while (nbc != 0);
 
 	SC_array_push(bid->stack, &fr);
-	bid->nbfmx = max(bid->nbfmx, bid->stack->n);};};
+	bid->nbfmx = max(bid->nbfmx, bid->stack->n);
+
+	_SC_check_read(bid, &rq);};};
 #endif
 
     _SC_bio_set_addr(bid, bid->curr + na + nr, TRUE, "read");
@@ -723,7 +788,9 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	   {SC_array_push(bid->stack, &fr);
 	    bid->nbfmx = max(bid->nbfmx, bid->stack->n);}
 	else
-	   _SC_bfr_free(fr);};};
+	   _SC_bfr_free(fr);};
+
+        _SC_check_write(bid, &rq);};
 
 #endif
 

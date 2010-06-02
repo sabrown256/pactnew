@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set opts =
 set keep =
 

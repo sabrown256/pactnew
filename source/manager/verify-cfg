@@ -4,6 +4,8 @@
 #            - the configuration specifications
 #
 
+unalias *
+
 set Arch = `./cfgman use`
 set Base = ""
 set Err  = 0

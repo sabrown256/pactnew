@@ -4,6 +4,8 @@
 #             - necessary for successful do-nets
 #
 
+unalias *
+
 set Hosts = ""
 
 while ($#argv > 0)

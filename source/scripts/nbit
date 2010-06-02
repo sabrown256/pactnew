@@ -9,6 +9,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Err = 0
 set Tmp = $cwd/.tmp-nbit.$$
 set OS  = `uname -s`

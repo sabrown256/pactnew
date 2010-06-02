@@ -12,6 +12,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Old      = $1
 set New      = $cwd
 set Pck      = $New:t

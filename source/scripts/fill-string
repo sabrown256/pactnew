@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set c = "."
 @ ln  = 40
 
