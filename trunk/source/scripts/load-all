@@ -8,13 +8,13 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/load-all") then
    set path = ( $Exe $path )
 endif
-
-unalias ps
 
 set Cont = FALSE
 set SSH  = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'

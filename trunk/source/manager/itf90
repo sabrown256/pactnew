@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Err   = 0
 set Arch  = `cfgman use`
 set ZArch = z-$Arch
@@ -15,8 +17,6 @@ set Which = "$cwd/pwhich"
 
 source ../dev/$Arch/include/env-pact.csh
 source ../dev/$Arch/include/env-csh
-
-unalias grep
 
 SafeEnv CROSS_COMPILE FALSE
 

@@ -3,6 +3,8 @@
 # DO-SPLINT - map splint over source code in current directory
 #
 
+unalias *
+
 @ err = 0
 
 set lst = ( $argv )

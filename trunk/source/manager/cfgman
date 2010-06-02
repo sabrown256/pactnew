@@ -44,9 +44,7 @@ if ("$Cmnd" == "") then
    exit(110)
 endif
 
-unalias ls
-unalias rm
-unalias grep
+unalias *
 
 set SGN   = .pc
 set ret   = 0

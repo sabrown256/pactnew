@@ -24,6 +24,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 onintr CLEANUP
 
 source ../scripts/env-csh

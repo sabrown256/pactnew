@@ -10,6 +10,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 if (($#argv > 0) && ("$1" == "-exit")) then
    set st = $argv[2]
 else

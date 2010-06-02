@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set d1 = `expr $1 : '[^0-9]*\([0-9]*\)'`
 set d2 = `expr $2 : '[^0-9]*\([0-9]*\)'`
 set m1 = `expr $1 : '[^0-9]*[0-9]*.\([0-9]*\)'`

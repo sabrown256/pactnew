@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 onintr INTERRUPT
 
 source ../scripts/env-csh
@@ -18,9 +20,6 @@ alias CALLSTACK 'set \!\!:1 = `expr $SUBR_[\!\!:2] : '"'.*_\(.*\)'"' | tr "[A-Z]
 
 # add the directory with do-net to the path
 set path = ( `dirname $0` $path )
-
-unalias mail
-unalias mailx
 
 unset time
 

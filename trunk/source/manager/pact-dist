@@ -10,6 +10,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 if ($?MngDir == 0) then
    set MngDir = $cwd
    set Base   = $MngDir:h

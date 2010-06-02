@@ -3,6 +3,8 @@
 # WHICH-CFG - find a config file for the current host
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/which-cfg") then

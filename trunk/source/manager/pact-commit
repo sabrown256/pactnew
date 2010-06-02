@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set MngDir = $cwd
 set Base   = $MngDir:h
 set ScrDir = $Base/scripts
@@ -15,7 +17,6 @@ set PshDir = $Base/psh
 set SccDir = $Base/scc
 
 source $ScrDir/env-csh
-unalias ssh
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then

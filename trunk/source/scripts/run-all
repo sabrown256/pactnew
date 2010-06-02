@@ -8,9 +8,9 @@
 # include "cpyright.h"
 #
 
-set noglob
+unalias *
 
-unalias ps
+set noglob
 
 set Cmmnd   = ""
 set Verbose = ""

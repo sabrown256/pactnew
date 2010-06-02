@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 # a little mess curtesy of cygwin
 if ($?SHELL == 0) then
    if (-x /bin/csh) then
@@ -39,16 +41,6 @@ endif
 source $ScrDir/env-csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
-
-unalias cp
-unalias rm
-unalias mv
-unalias ls
-unalias cd
-unalias find
-unalias grep
-unalias sed
-unalias sort
 
 unsetenv BASH_ENV
 umask 007

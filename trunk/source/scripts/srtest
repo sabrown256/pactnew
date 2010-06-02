@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Package = scripts
 source ../scripts/test-env
 

@@ -8,16 +8,13 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/descend") then
    set path = ( $Exe $path )
 endif
-
-unalias cd
-unalias rm
-unalias mv
-unalias ps
 
 # for HP-UX
 setenv UNIX95

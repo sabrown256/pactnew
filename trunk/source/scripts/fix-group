@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/fix-group") then

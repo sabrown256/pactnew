@@ -9,6 +9,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 @ Err = 0
 
 set Which = "$cwd/pwhich"

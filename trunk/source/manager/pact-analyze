@@ -23,6 +23,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 if ($?MngDir == 0) then
    if (-f ../scripts/env-csh) then
       setenv MngDir $cwd

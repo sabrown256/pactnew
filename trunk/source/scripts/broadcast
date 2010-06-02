@@ -7,6 +7,8 @@
 # Software Release #: LLNL-CODE-422942
 #
 
+unalias *
+
 set Dir     = ""
 set File    = ""
 set DirLst  = ""

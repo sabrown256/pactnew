@@ -3,6 +3,8 @@
 # PERFD - measure the performance characteristics of dmake
 #
 
+unalias *
+
 source /usr/local/apps/pactnew/include/env-csh
 
 set Host = `uname -n`

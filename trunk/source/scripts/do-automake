@@ -10,14 +10,14 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 source $CSHSubr
 HAVE_SUBROUTINES
 
 setenv Err  0
 
 umask 007
-
-unalias ls
 
 set Which = "swhich -1"
 set argv  = `cat $ArgFile`

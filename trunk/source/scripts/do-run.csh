@@ -17,6 +17,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 onintr INTERRUPT
 
 set HostOS = `uname -s`
@@ -25,9 +27,6 @@ set Host   = `uname -n`
 pushd `dirname $0` >& /dev/null
 set BinDir = $cwd
 popd >& /dev/null
-
-unalias cd
-unalias rm
 
 set Which = "$BinDir/swhich -1"
 

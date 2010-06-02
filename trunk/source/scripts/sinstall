@@ -9,6 +9,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 if ($?SC_EXEC_N_ATTEMPTS) then
    @ na = $SC_EXEC_N_ATTEMPTS
 else

@@ -9,6 +9,8 @@
 #            - invocation and the second does not
 #
 
+unalias *
+
 set Cmd    = ""
 set Stamp  = ""
 set Pact   = ""

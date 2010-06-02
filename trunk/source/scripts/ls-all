@@ -8,13 +8,13 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/ls-all") then
    set path = ( $Exe $path )
 endif
-
-unalias ps
 
 set Which   = "swhich -1"
 set PName   = ""

@@ -3,6 +3,8 @@
 # RUNNING - see who is running a job
 #
 
+unalias *
+
 # add the path to here iff you are able to verify it
 set Exe = `dirname $0`
 if (-x "$Exe/running") then

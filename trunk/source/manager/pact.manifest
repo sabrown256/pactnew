@@ -64,9 +64,9 @@ doc pact.FAQ panacea.FAQ pdb.FAQ pgs.FAQ pml.FAQ ppc.FAQ
 doc scheme.FAQ score.FAQ sx.FAQ ultra.FAQ
 
 mgr clib.fncs code-date compare-date pact-analyze pact-changes
-mgr pact-commit pact-config cpyright.h pact-dist pact-dist-all
-mgr pact-gp.init pact-import pact-scs
-mgr pact-there pact-transfer pact-update pact.c pact.manifest
+mgr pact-commit pact-config cpyright.h pact-dist
+mgr pact-import pact-scs
+mgr pact-update pact.c pact.manifest
 mgr cfgman systems.unix
 mgr scscom scshist scslock scstag scsup
 

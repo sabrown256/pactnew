@@ -3,6 +3,8 @@
 # REMOD - change permissions on files you don't own
 #
 
+unalias *
+
 set PERM  = ""
 set Files = ""
 

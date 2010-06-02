@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set MngDir        = $cwd
 set SCSRepository = ""
 set SRCDate       = ""

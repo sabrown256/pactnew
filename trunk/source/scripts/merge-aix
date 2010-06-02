@@ -10,6 +10,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set AR = /usr/bin/ar
 # assume the temporary files are going to be out in the CWD
 if ($?TMPDIR) then 
