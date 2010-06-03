@@ -1,4 +1,3 @@
-#!/bin/csh -f
 #
 # CFG-FEATURES - common code to generate the feature list of a config
 #
