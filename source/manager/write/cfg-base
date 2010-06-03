@@ -1,4 +1,3 @@
-#!/bin/csh -f
 #
 # CFG-BASE - common code to generate the main part of a config
 #          - from OS, Compiler, and bits

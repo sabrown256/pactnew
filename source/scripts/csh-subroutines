@@ -35,6 +35,24 @@
 # NOTE: 'exit' in a source only stops sourcing the file
 #
 
+# always assert the aliases so that we can safely start shell scripts
+# with 'unalias *'
+
+if ($?PCSH_TMP_ == 1) then
+   alias _terminate_  'if (\!*) exit( { rm -f $PCSH_TMP_ } && $QUIT_ )'
+else
+   alias _terminate_  'if (\!*) exit($QUIT_)'
+endif
+alias _end_source_      'exit(0)'
+
+# the subroutine syntax extensions
+alias call              'set FIRST_ = FALSE ; set SUBR_ = ( \!\!:1 $SUBR_ ) ; setenv ARGL_ "\!\!:2-$" ; if ($Trace == TRUE) echo "Calling $SUBR_[1] with $ARGL_" ; source $SRC_[1] ; _terminate_ ("$QUIT_" != "CSH_SUBR_CONTINUE")'
+alias return            'if ($Trace == TRUE) echo "Returning from $SUBR_[1]" ; shift SUBR_ ; unsetenv ARGL_ ; _end_source_'
+alias quit              'set QUIT_ = \!* ; _terminate_ ("$SUBR_" == "") && _end_source_'
+alias include           'set FIRST_ = TRUE ; set SRC_ = ( \!\!:1 $SRC_ ) ; source $SRC_[1]'
+alias endinclude        'if ($#SRC_ > 0) shift SRC_ ; _end_source_ ; echo \!* >>& /dev/null'
+alias HAVE_SUBROUTINES  'if ($DISP_ != "CSH_SUBR_NO_LABEL") goto $DISP_'
+
 # if a shell script is starting up SUBR_ will not be defined
 if ($?SUBR_ == 0) then
    set Trace  = FALSE
@@ -48,21 +66,6 @@ if ($?SUBR_ == 0) then
    set SUBR_  = ""
    set QUIT_  = "CSH_SUBR_CONTINUE"
    set DISP_  = "CSH_SUBR_NO_LABEL"
-
-   if ($?PCSH_TMP_ == 1) then
-      alias _terminate_  'if (\!*) exit( { rm -f $PCSH_TMP_ } && $QUIT_ )'
-   else
-      alias _terminate_  'if (\!*) exit($QUIT_)'
-   endif
-   alias _end_source_      'exit(0)'
-
-# the subroutine syntax extensions
-   alias call              'set FIRST_ = FALSE ; set SUBR_ = ( \!\!:1 $SUBR_ ) ; setenv ARGL_ "\!\!:2-$" ; if ($Trace == TRUE) echo "Calling $SUBR_[1] with $ARGL_" ; source $SRC_[1] ; _terminate_ ("$QUIT_" != "CSH_SUBR_CONTINUE")'
-   alias return            'if ($Trace == TRUE) echo "Returning from $SUBR_[1]" ; shift SUBR_ ; unsetenv ARGL_ ; _end_source_'
-   alias quit              'set QUIT_ = \!* ; _terminate_ ("$SUBR_" == "") && _end_source_'
-   alias include           'set FIRST_ = TRUE ; set SRC_ = ( \!\!:1 $SRC_ ) ; source $SRC_[1]'
-   alias endinclude        'if ($#SRC_ > 0) shift SRC_ ; _end_source_ ; echo \!* >>& /dev/null'
-   alias HAVE_SUBROUTINES  'if ($DISP_ != "CSH_SUBR_NO_LABEL") goto $DISP_'
 
 # if we are in the process of invoking a subroutine
 else if ($?ARGL_ == 1) then

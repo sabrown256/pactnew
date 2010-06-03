@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 source ../scripts/env-csh
 
 set Which   = "$cwd/pwhich"

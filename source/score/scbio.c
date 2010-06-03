@@ -21,6 +21,8 @@
     bid = (bio_desc *) (_fp);                                                \
     fp  = bid->fp
 
+#define CONTAINS(_a, _x, _b)	(((_a) <= (_x)) && ((_x) < (_b)))
+
 typedef enum e_bio_kind bio_kind;
 typedef enum e_bio_oper bio_oper;
 
@@ -34,9 +36,13 @@ enum e_bio_oper
 typedef struct s_bio_desc bio_desc;
 typedef struct s_bio_frame bio_frame;
 
+/* NOTE: valid bytes of the buffer are BF[I] where
+ *       ADDR <= I < ADDR+SZ
+ */
+
 struct s_bio_frame
    {BIGINT sz;                         /* size of the frame */
-    BIGINT nb;                         /* number of bytes in frame */
+    BIGINT nb;                         /* number of working bytes in frame */
     BIGINT addr;                       /* starting disk address of frame */
     int flushed;
     bio_kind rw;                       /* has read/write bytes */
@@ -391,7 +397,7 @@ static bio_frame *_SC_bfr_contains(bio_desc *bid, off_t addr)
              fi[0] = fr->addr;
 	     fi[1] = fi[0] + fr->nb;
 
-	     if ((fi[0] <= addr) && (addr <= fi[1]))
+	     if (CONTAINS(fi[0], addr, fi[1]))
 	        {rv = fr;
 		 break;};};};
 
@@ -425,6 +431,8 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 /* if a stack frame is completely covered by the request or
  * if the front of a stack frame is covered by the back of the request
  * throw it away
+ * NOTE: do not use CONTAIN here because the interval FI is based on
+ * fa->nb not fa->sz
  */
 	     if ((ri[0] < fi[0]) && (fi[0] <= ri[1]))
 	        {fl = (fr->rw == BIO_READ);
@@ -507,7 +515,7 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, off_t bsz)
 	       {sz = bf.st_size;
 
 /* if the file size is greater than zero and less than the requested size */
-		if ((sz > 0) && (sz <= bsz))
+		if (CONTAINS(0, sz-1, bsz))
 
 /* initialize buffering in the descriptor */
 		   {_SC_bio_buffer(bid, bsz);

@@ -7,6 +7,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Cmd    = $0
 set Exe    = $Cmd:t
 set ExeDir = $Cmd:h

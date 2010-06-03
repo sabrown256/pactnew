@@ -45,7 +45,7 @@ HAVE_SUBROUTINES
 unsetenv BASH_ENV
 umask 007
 
-limit stacksize unlimited
+limit stacksize unlimited >& /dev/null
 
 set CfgMan = $MngDir/cfgman
 
