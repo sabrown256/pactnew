@@ -739,6 +739,13 @@ extern long
 
 /*--------------------------------------------------------------------------*/
 
+
+/* SCBIO.C declarations */
+
+extern int
+ SC_check_file(FILE *fp);
+
+
 /* SCCTL.C declarations */
 
 extern void

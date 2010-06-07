@@ -22,7 +22,7 @@ while ($#argv > 0)
            echo "  h       this help message"
            echo "  <test>  one of: sharp ar mk error mpi array"
            echo "                  lookup lex heap mprf resrc retrc"
-           echo "                  smp mmap io"
+           echo "                  smp mmap io buf"
            echo ""
            exit(1)
       case -*:
@@ -84,7 +84,7 @@ else if (-e $RootDir/score/scstd.h) then
       set Test = ($Test sharp ar mk error mpi)
       set Test = ($Test array lookup lex)
       set Test = ($Test heap mprf resrc retrc)
-      set Test = ($Test smp mmap io)
+      set Test = ($Test smp mmap io buf)
    endif
 
    foreach i ($Test)

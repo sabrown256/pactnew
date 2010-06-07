@@ -433,6 +433,9 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
  * throw it away
  * NOTE: do not use CONTAIN here because the interval FI is based on
  * fa->nb not fa->sz
+ * NOTE: the ri[0] < fi[0] test is there rather than ri[0] <= fi[0]
+ * in case the entire file is in the buffer FA.  This way the file
+ * will not have to be reread in toto
  */
 	     if ((ri[0] < fi[0]) && (fi[0] <= ri[1]))
 	        {fl = (fr->rw == BIO_READ);
@@ -459,7 +462,10 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 /* _SC_SETUP_READ_BFR - make a read buffer for BID */
 
 static bio_frame *_SC_setup_read_bfr(bio_desc *bid, bio_frame *fr)
-   {off_t ad, sz;
+   {int i, n, fl;
+    off_t ad, sz;
+    off_t ri[2], fi[2];
+    bio_frame *fa;
 
 /* allocate the frame */
     if (fr == NULL)
@@ -468,7 +474,24 @@ static bio_frame *_SC_setup_read_bfr(bio_desc *bid, bio_frame *fr)
 	fr = _SC_bfr_alloc(ad, sz);}
     else
        {sz = fr->sz;
-	ad = fr->addr + sz;};
+	ad = fr->addr + sz;
+
+/* eliminate any buffers which overlap the new interval */
+	if (bid->stack != NULL)
+	   {ri[0] = ad;
+	    ri[1] = ad + sz;
+
+	    n = SC_array_get_n(bid->stack);
+	    for (i = 0; i < n; i++)
+	        {fa = *(bio_frame **) SC_array_get(bid->stack, i);
+
+		 fi[0] = fa->addr;
+		 fi[1] = fi[0] + fa->sz;
+
+		 if ((fi[0] <= ri[1]) && (ri[0] <= fi[1]))
+		    {fl = (fr->rw == BIO_READ);
+		     n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
+		     i--;};};};};
 
 /* initialize it */
     _SC_bfr_init(fr, ad, sz);
@@ -661,6 +684,60 @@ static int _SC_check_write(bio_desc *bid, bio_frame *rq)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_CHECK_BUF - check for buffer overlaps
+ *               - return TRUE iff the file is ok
+ */
+
+static int _SC_check_buf(bio_desc *bid)
+   {int i, j, n, ok;
+    off_t ri[2], fi[2];
+    bio_frame *fa;
+
+    ok = TRUE;
+
+/* check for buffer overlaps */
+    if (bid->stack != NULL)
+       {n = SC_array_get_n(bid->stack);
+        for (i = 0; (i < n) && (ok == TRUE); i++)
+	    {fa = *(bio_frame **) SC_array_get(bid->stack, i);
+
+	     ri[0] = fa->addr;
+	     ri[1] = ri[0] + fa->sz;
+
+	     for (j = i+1; (j < n) && (ok == TRUE); j++)
+	         {fa = *(bio_frame **) SC_array_get(bid->stack, j);
+
+		  fi[0] = fa->addr;
+		  fi[1] = fi[0] + fa->sz;
+
+		  ok &= ((ri[1] < fi[0]) || (fi[1] < ri[0]));};};};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CHECK_FILE - verify the file
+ *               - especially wrt buffer overlaps
+ *               - return TRUE iff the file is ok
+ */
+
+int SC_check_file(FILE *fp)
+   {int ok;
+    file_io_desc *fid;
+
+    fid = (file_io_desc *) fp;
+    fp  = fid->info;
+
+    ACCESS(fp);
+
+    ok = _SC_check_buf(bid);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BIO_IN - buffer BF in from BID */
 
 static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
@@ -679,21 +756,30 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 
 #else
 
-   {off_t nbc, ad;
+   {int ok;
+    off_t nbc, ad;
     off_t bsz, olc, nlc;
     bio_frame *fr, rq;
+
+    nba = bid->sz - bid->curr;
 
     if (bid->stack == NULL)
        {nr = SC_read_sigsafe(bid->fd, bf, nb);
 	bid->nhits[BIO_OPER_READ]++;}
+
+/* do not try to read if the file pointer is
+ * positioned past the current end of file - only writes
+ * are permitted there
+ */
+    else if (nba <= 0)
+       return(0);
 
     else
 
 /* encapsulate the requested write as a frame so that all subsequent
  * operations can be posed in terms of frames
  */
-       {nba = bid->sz - bid->curr;
-	rq.sz   = min(nb, nba);
+       {rq.sz   = min(nb, nba);
 	rq.nb   = 0;
 	rq.addr = bid->curr;
 	rq.bf   = bf;
@@ -725,7 +811,10 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	SC_array_push(bid->stack, &fr);
 	bid->nbfmx = max(bid->nbfmx, bid->stack->n);
 
-	_SC_check_read(bid, &rq);};};
+/* check the result and return -1 on error */
+	ok = _SC_check_read(bid, &rq);
+        if (ok == FALSE)
+	   return(-1);};};
 #endif
 
     _SC_bio_set_addr(bid, bid->curr + na + nr, TRUE, "read");
