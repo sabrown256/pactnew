@@ -382,7 +382,10 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
 /* store a null string to terminate list (just a precaution) */
     outlist[nvars] = NULL;
 
-    if (has_dirs)
+/* unconditionally sort to make PDBView ls work properly even
+ * without directories - Yorick files do this
+ */
+/*    if (has_dirs) */
        SC_string_sort(outlist, nvars);
      
     *num = nvars;
