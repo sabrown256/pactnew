@@ -51,7 +51,7 @@ end
 
 # make libpact.a with all the .o files
 echo -n "   Making libpact.a .... "
-$AR $AROpt libpact.a *.o
+$AR $AROpt libpact.a *.o >& /dev/null
 mv libpact.a ..
 echo "done"
 

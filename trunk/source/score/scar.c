@@ -308,15 +308,13 @@ fcdes *SC_scan_archive(char *arf)
 
 		pos        -= nc;
 		ae->size   -= nc;
-		ae->address = pos;
+/*		ae->address = pos; */
 
 		SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
 
 		fseek(fp, pos, SEEK_SET);};};
 
-	fclose(fp);
-
-	fc = _SC_make_archive(arf, NULL, nb, tab);};
+	fc = _SC_make_archive(arf, fp, nb, tab);};
 
     return(fc);}
 

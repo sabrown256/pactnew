@@ -20,7 +20,7 @@
 
 #define SC_DEFEAT_MPI_BUG  "\f\t\n"
 
-#define SC_N_IO_OPER  20
+#define SC_N_IO_OPER  21
 
 /* IO Hooks */
 

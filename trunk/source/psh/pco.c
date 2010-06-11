@@ -157,7 +157,7 @@ static char *echo(int log, char *fmt, ...)
     char *rv;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
 /*
@@ -168,7 +168,7 @@ static char *echo(int log, char *fmt, ...)
 */
 
     if (strpbrk(s, "$*|{}[]\"'") == NULL)
-       rv = trim(s, BOTH, " \t\n");
+       rv = STRSAVE(trim(s, BOTH, " \t\n"));
     else
        rv = run(BOTH, "echo %s", s);
 
@@ -1536,7 +1536,7 @@ static void init_session(char *base, int append)
 
 static void set_var(int rep, char *var, char *oper, char *val)
    {char fvar[MAXLINE], nval[MAXLINE], mval[MAXLINE], lval[MAXLINE];
-    char s[LRG];
+    char s[LRG+1];
     char *prfx, *t;
     gt_entry *ge;
 
@@ -1830,6 +1830,7 @@ static void read_config(char *cfg, int quiet)
 	     val  = s;
 	     s    = val + strcspn(val, ")");
 	     *s++ = '\0';
+
 	     if (strcmp(var, "PATH") == 0)
 	        {push_path(APPEND, epath, val);
 		 s = echo(FALSE, val);

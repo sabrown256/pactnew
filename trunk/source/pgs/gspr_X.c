@@ -560,8 +560,8 @@ void _PG_X_draw_curve(PG_device *dev, PG_curve *crv, int clip)
 
 void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
                                     int flag, PG_coord_sys cs)
-   {int i, j, k, id, nmax, cflag;
-    int lgf[PG_SPACEDM];
+   {int i, j, k, nmax, cflag;
+    int *lgf;
     short ix1[PG_SPACEDM], ix2[PG_SPACEDM];
     double box[PG_BOXSZ], wc[PG_BOXSZ];
     double *px, *py;
@@ -587,10 +587,9 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
     segs = FMAKE_N(XSegment, nmax,
                    "_PG_X_DRAW_DISJOINT_POLYLINE_2:segs");
     wind = PG_X11_DRAWABLE(dev);
-    gc   = dev->gc;
-    
-    for (id = 0; id < PG_SPACEDM; id++)
-        lgf[id] = FALSE;
+
+    gc  = dev->gc;
+    lgf = g->iflog;
 
     PG_trans_points(dev, 2*n, 2, cs, r, WORLDC, r);
 
@@ -601,6 +600,8 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
        PG_get_viewspace(dev, WORLDC, wc);
     else
        PG_get_limit(dev, WORLDC, wc);
+
+    PG_log_space(dev, 2, FALSE, wc);
 
     for (i = 0; i < n; i += nmax)
         {if (i+nmax > n)

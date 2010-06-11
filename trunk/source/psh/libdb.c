@@ -667,7 +667,7 @@ int dbset(char *root, char *var, char *fmt, ...)
     char *t, **ta;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     err = 0;
@@ -704,7 +704,7 @@ char *dbget(char *root, int lit, char *fmt, ...)
     char *t, **ta;
 
     VA_START(fmt);
-    VSPRINTF(var, fmt);
+    VSNPRINTF(var, MAXLINE, fmt);
     VA_END;
 
     ta = _db_clnt_ex(root, var);
@@ -737,7 +737,7 @@ int dbdef(char *root, char *fmt, ...)
     char **ta;
 
     VA_START(fmt);
-    VSPRINTF(var, fmt);
+    VSNPRINTF(var, MAXLINE, fmt);
     VA_END;
 
     ta = _db_clnt_ex(root, var);
@@ -800,7 +800,7 @@ int dbinitv(char *root, char *var, char *fmt, ...)
     char s[LRG];
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     err = 0;

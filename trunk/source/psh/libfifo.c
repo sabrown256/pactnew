@@ -50,7 +50,7 @@ static int fifo_exists(char *fmt, ...)
        {st = "no file";
 
 	VA_START(fmt);
-	VSPRINTF(s, fmt);
+	VSNPRINTF(s, MAXLINE, fmt);
 	VA_END;
 
 	rv = TRUE;

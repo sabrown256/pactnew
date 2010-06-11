@@ -101,7 +101,7 @@ static int sock_exists(char *fmt, ...)
 
     if (fmt != NULL)
        {VA_START(fmt);
-	VSPRINTF(s, fmt);
+	VSNPRINTF(s, MAXLINE, fmt);
 	VA_END;
 
 	sock = name_sock(s, -1);

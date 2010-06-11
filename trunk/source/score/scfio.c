@@ -92,7 +92,8 @@ PFfopen
 file_io_desc *SC_make_io_desc(void *fp)
    {file_io_desc *fid;
 
-    fid          = FMAKE(file_io_desc, "SC_MAKE_IO_DESC:fid");
+    fid = FMAKE(file_io_desc, "SC_MAKE_IO_DESC:fid");
+
     memset(fid, 0, sizeof(file_io_desc));
 
     fid->info = fp;

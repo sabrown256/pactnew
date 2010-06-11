@@ -186,6 +186,7 @@ HAVE_SUBROUTINES
 # NOTE: eventually remove this when Lee says so
        Note $FOUT '  MPI_Compiler = '$CC_Exe
        Note $FOUT '  MPI_Exe      = '$CC_Exe
+
        Note $FOUT '  Flags        = '$Cfe_CC_Flags
        Note $FOUT '  LXFlags      = '$Lex_Flags
        Note $FOUT '  AddressSize  = '$lbits
@@ -204,6 +205,7 @@ HAVE_SUBROUTINES
 # NOTE: eventually remove this when Lee says so
        Note $FOUT '  MPI_Compiler = '$FC_Exe
        Note $FOUT '  MPI_Exe      = '$FC_Exe
+
        Note $FOUT '  Flags        = '$Cfe_FC_Flags
        Note $FOUT '  AddressSize  = '$lbits
        Note $FOUT '  Numa         = '$lnuma
@@ -269,14 +271,14 @@ HAVE_SUBROUTINES
        Note $FOUT "IncMPI = $linc"
 
        if ($CCBin != none) then
-          Note $FOUT 'CGroup : cc_pact_mpi {'
+          Note $FOUT 'Tool : cc_pact_mpi {'
           Note $FOUT '  MPI_Flags = -I'$linc
           Note $FOUT '}'
           Note $FOUT ''
        endif
 
        if ($FCBin != none) then
-          Note $FOUT 'FGroup : fc_pact_mpi {'
+          Note $FOUT 'Tool : fc_pact_mpi {'
           Note $FOUT '  MPI_Flags = -I'$linc
           Note $FOUT '}'
           Note $FOUT ''
