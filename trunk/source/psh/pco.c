@@ -150,6 +150,9 @@ static state
 	FALSE, FALSE, FALSE, PHASE_READ, FALSE,
 	FALSE, FALSE, FALSE, };
 
+static void
+ parse_line(char *s, char *key, char *oper, char *value);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -876,25 +879,45 @@ static void read_line(char *s, int nc)
 /* PARSE_OPT - work with option specifications */
 
 static void parse_opt(char *s)
-   {int i, ok, mt;
+   {int i, l, n, ok, mt;
     exoper oper;
-    char *t, *pt, *vr, *avl, *arg, *opt;
+    char vr[MAXLINE], op[MAXLINE], vl[MAXLINE];
+    char *t, *avl, *arg, *opt, **sa;
 
-    t = STRSAVE(s+1);
+    sa = tokenize(s, "[;]\n\r");
+    for (n = 0; sa[n] != NULL; n++);
 
     ok  = FALSE;
     avl = "off";
-    for (pt = t; TRUE; pt = NULL)
-        {oper = PEQ;
+    for (l = 0; l < n; l++)
+        {vr[0] = '\0';
 
-	 vr = trim(strtok(pt, "=\n"), BOTH, " \t");
-	 if (vr == NULL)
-	    break;
+	 t = sa[l];
+	 parse_line(t, vr, op, vl);
+
+	 if (vr[0] == '\0')
+	    continue;
+
+	 arg = trim(vl, BOTH, " \t");
+
+	 if (strcmp(op, "=") == 0)
+	    oper = PEQ;
+	 else if (strcmp(op, "<") == 0)
+	    oper = PLT;
+	 else if (strcmp(op, "<=") == 0)
+	    oper = PLE;
+	 else if (strcmp(op, ">") == 0)
+	    oper = PGT;
+	 else if (strcmp(op, ">=") == 0)
+	    oper = PGE;
+	 else if (strcmp(op, "!=") == 0)
+	    oper = PNE;
+	 else
+	    oper = PNONE;
 
 /* parse the _cmd_ key */
-	 else if (strcmp(vr, "_cmd_") == 0)
-	    {arg = trim(strtok(NULL, ";"), BOTH, " \t");
-	     opt = strchr(arg, '@');
+	 if (strcmp(vr, "_cmd_") == 0)
+	    {opt = strchr(arg, '@');
 	     if (opt != NULL)
 	        opt[-1] = '\0';
 	     for (i = 0; i < st.na; i++)
@@ -907,23 +930,21 @@ static void parse_opt(char *s)
 
 /* parse the _env_ key */
 	 else if (strcmp(vr, "_env_") == 0)
-	    {arg = trim(strtok(NULL, ";"), BOTH, " \t");
-	     avl = dbget(NULL, TRUE, arg);}
+	    avl = dbget(NULL, TRUE, arg);
 
 /* select the value */
 	 else
-	    {opt = trim(strtok(NULL, ";]"), BOTH, " \t");
 
 /* treat single '*' specially since match will automatically succeed */
-	     if (strcmp(vr, "*") == 0)
+	    {if (strcmp(vr, "*") == 0)
 	        {if (strcmp(avl, "off") != 0)
-		    {strcpy(s, opt);
+		    {strcpy(s, arg);
 		     LAST_CHAR(s) = '\0';
 		     strcat(s, avl);
 		     ok = TRUE;};}
 
 	     else if (strcmp(avl, vr) == 0)
-	        {strcpy(s, opt);
+	        {strcpy(s, arg);
 	         ok = TRUE;}
 
 	     else
@@ -931,32 +952,32 @@ static void parse_opt(char *s)
 		 switch (oper)
 		    {case PEQ :
 		          if (mt == 0)
-			     {strcpy(s, opt);
+			     {strcpy(s, arg);
 			      ok = TRUE;};
 			  break;
 		     case PLT :
 		          if (mt < 0)
-			     {strcpy(s, opt);
+			     {strcpy(s, arg);
 			      ok = TRUE;};
 			  break;
 		     case PLE :
 		          if (mt < 1)
-			     {strcpy(s, opt);
+			     {strcpy(s, arg);
 			      ok = TRUE;};
 			  break;
 		     case PGT :
 		          if (mt > 0)
-			     {strcpy(s, opt);
+			     {strcpy(s, arg);
 			      ok = TRUE;};
 			  break;
 		     case PGE :
-		          if (mt >= -1)
-			     {strcpy(s, opt);
+		          if (mt > -1)
+			     {strcpy(s, arg);
 			      ok = TRUE;};
 			  break;
 		     case PNE :
 		          if (mt != 0)
-			     {strcpy(s, opt);
+			     {strcpy(s, arg);
 			      ok = TRUE;};
 			  break;
 		     default :
@@ -965,7 +986,7 @@ static void parse_opt(char *s)
     if (ok == FALSE)
        s[0] = '\0';
 
-    FREE(t);
+    free_strings(sa);
 
     return;}
 

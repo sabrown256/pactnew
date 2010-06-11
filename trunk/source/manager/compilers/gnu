@@ -19,7 +19,7 @@ Tool CC {
    Flags    += [ _env_ = COMPILER_GNU_VERSION ; # compiler version flags
                  4.*   = -fsignaling-nans ]
    Flags    += [ _env_ = COMPILER_GNU_VERSION ; # stack checking
-                 4.*   = -fstack-protector ]
+                 4.2.* >= -fstack-protector ]
    Flags    += [ _env_ = Bits ;                 # address bit size
                  32    = -m32 ;
                  64    = -m64 -fPIC ]
