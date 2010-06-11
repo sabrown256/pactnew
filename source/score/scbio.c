@@ -23,15 +23,15 @@
 
 #define CONTAINS(_a, _x, _b)	(((_a) <= (_x)) && ((_x) < (_b)))
 
-typedef enum e_bio_kind bio_kind;
-typedef enum e_bio_oper bio_oper;
-
 enum e_bio_kind
    {BIO_READ, BIO_WRITE, BIO_EMPTY};
 
 enum e_bio_oper
    {BIO_OPER_NONE, BIO_OPER_STAT, BIO_OPER_SEEK,
     BIO_OPER_READ, BIO_OPER_WRITE, BIO_OPER_SETVBUF};
+
+typedef enum e_bio_kind bio_kind;
+typedef enum e_bio_oper bio_oper;
 
 typedef struct s_bio_desc bio_desc;
 typedef struct s_bio_frame bio_frame;

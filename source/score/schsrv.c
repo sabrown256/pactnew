@@ -161,8 +161,8 @@ static hrng *_SC_host_server_lookup(char *type, hasharr *tab)
 
     if (strcmp(type, "all") == 0)
        {h = NULL;
-	for (i = 0; SC_hasharr_next(tab, &i, NULL, NULL, (void **) &h); i++)
-	    break;}
+	i = 0;
+	SC_hasharr_next(tab, &i, NULL, NULL, (void **) &h);}
 
     else
        {h = (hrng *) SC_hasharr_def_lookup(tab, type);

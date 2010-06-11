@@ -1580,11 +1580,12 @@ static int _SC_task_retry_p(taskdesc *job, subtask *sub,
 	else
 	   {job->print(job, NULL, "done (%d/%d) '%s'\n", sts, sgn, cmd);
 
-	    pru = job->pp->pru;
-	    job->print(job, NULL,
-		       "used wc(%.2f) usr(%.2f) sys(%.2f) idle(%.2f) tail(%.2f) mem(%.2f)\n",
-		       pru->wct, pru->usrt, pru->syst,
-		       pru->idlet, pru->since, pru->mem);
+	    if (job->pp != NULL)
+	       {pru = job->pp->pru;
+		job->print(job, NULL,
+			   "used wc(%.2f) usr(%.2f) sys(%.2f) idle(%.2f) tail(%.2f) mem(%.2f)\n",
+			   pru->wct, pru->usrt, pru->syst,
+			   pru->idlet, pru->since, pru->mem);};
 
 	    if ((sts != 0) && (state->ignore == FALSE))
 	       {tl->nl        = tl->nt;

@@ -184,7 +184,7 @@ void notet(FILE *fp, char *tag, char *fmt, ...)
     if (state.verbose == TRUE)
        {if (fp != NULL)
 	   {VA_START(fmt);
-	    VSPRINTF(bf, fmt);
+	    VSNPRINTF(bf, LRG, fmt);
 	    VA_END;
 
 	    fprintf(fp, "DO-NET: (%s) %s\n", tag, bf);};};
@@ -204,7 +204,7 @@ void noten(FILE *fp, int vrb, char *fmt, ...)
     if (vrb == TRUE)
        {if (fp != NULL)
 	   {VA_START(fmt);
-	    VSPRINTF(bf, fmt);
+	    VSNPRINTF(bf, LRG, fmt);
 	    VA_END;
 
 	    fprintf(fp, "DO-NET: %s\n", bf);};};
@@ -223,7 +223,7 @@ static void notej(process *pp, char *fmt, ...)
     hfspec *sp;
 
     VA_START(fmt);
-    VSPRINTF(bf, fmt);
+    VSNPRINTF(bf, LRG, fmt);
     VA_END;
 
     if (pp != NULL)
@@ -386,7 +386,7 @@ static char *lrun(FILE *f1, int tag, char *fmt, ...)
     static char bf[100*LRG];
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     if (tag == FLOG)
@@ -679,7 +679,7 @@ static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
     process *pp;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     if ((state.verbose == TRUE) && (Log != NULL))
@@ -723,7 +723,7 @@ static void brun(FILE *fo, char *fmt, ...)
     FILE *fp;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     fprintf(fo, "DO-NET: %s\n", s);

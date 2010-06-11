@@ -570,6 +570,10 @@ typedef char *F77_string;
 
 #endif
 
+#ifdef __GNUC__
+#define _FORTIFY_SOURCE 2
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

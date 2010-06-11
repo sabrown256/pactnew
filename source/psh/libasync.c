@@ -781,7 +781,7 @@ int job_write(process *pp, char *fmt, ...)
     FILE *fo;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     if (LAST_CHAR(s) != '\n')
@@ -842,7 +842,7 @@ int job_response(process *pp, int to, char *fmt, ...)
     VA_START(fmt);
 
     if (fmt != NULL)
-       {VSPRINTF(s, fmt);
+       {VSNPRINTF(s, LRG, fmt);
 	if (LAST_CHAR(s) != '\n')
 	   nstrcat(s, LRG, "\n");}
     else

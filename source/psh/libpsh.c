@@ -277,7 +277,7 @@ void cat(FILE *out, size_t nskip, size_t ncat, char *fmt, ...)
     FILE *in;
 
     VA_START(fmt);
-    VSPRINTF(fname, fmt);
+    VSNPRINTF(fname, MAXLINE, fmt);
     VA_END;
 
     in = fopen(fname, "r");
@@ -300,7 +300,7 @@ void copy(char *out, char *fmt, ...)
     FILE *fp;
 
     VA_START(fmt);
-    VSPRINTF(in, fmt);
+    VSNPRINTF(in, MAXLINE, fmt);
     VA_END;
 
     fp = fopen(out, "w");
@@ -429,7 +429,7 @@ int dir_exists(char *fmt, ...)
     struct stat sb;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
     VA_END;
 
     rv = TRUE;
@@ -453,7 +453,7 @@ int file_exists(char *fmt, ...)
     struct stat sb;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
     VA_END;
 
     rv = FALSE;
@@ -486,7 +486,7 @@ int file_executable(char *fmt, ...)
     struct stat bf;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
     VA_END;
 
     only = FALSE;
@@ -543,7 +543,7 @@ int file_script(char *fmt, ...)
     FILE *fp;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
     VA_END;
 
     rv = file_executable(s);
@@ -565,7 +565,7 @@ int execute(int err, char *fmt, ...)
     char s[LRG], cmd[LRG];
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     if (err == TRUE)
@@ -593,7 +593,7 @@ char *run(int echo, char *fmt, ...)
     static char bf[100*LRG];
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     if ((Log != NULL) && (echo & CMD_LINE))
@@ -639,7 +639,7 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
     r[0] = '\0';
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
     VA_END;
 
     if (fp == NULL)
@@ -680,7 +680,7 @@ char **ls(char *opt, char *fmt, ...)
     static char *lst[LRG];
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
     VA_END;
 
     i = 0;
@@ -746,7 +746,7 @@ void note(FILE *fp, int nl, char *fmt, ...)
 
     if (fp != NULL)
        {VA_START(fmt);
-	VSPRINTF(bf, fmt);
+	VSNPRINTF(bf, MEGA, fmt);
 	VA_END;
 
 	fputs(bf, fp);
@@ -764,7 +764,7 @@ void noted(FILE *fp, char *fmt, ...)
    {char bf[MEGA];
 
     VA_START(fmt);
-    VSPRINTF(bf, fmt);
+    VSNPRINTF(bf, MEGA, fmt);
     VA_END;
 
     if (fp != NULL)
@@ -787,7 +787,7 @@ void print_text(FILE *fp, char *fmt, ...)
    {char bf[LRG];
 
     VA_START(fmt);
-    VSPRINTF(bf, fmt);
+    VSNPRINTF(bf, LRG, fmt);
     VA_END;
 
     fprintf(fp, "%s\n", bf);
@@ -831,7 +831,7 @@ void clean_space(char *s)
 
 char *strip_quote(char *t)
    {int n;
-    char bf[LRG];
+    static char bf[LRG];
 
     n = strspn(t, " \t");
     strncpy(bf, t+n, LRG);
@@ -852,7 +852,7 @@ int csetenv(char *var, char *fmt, ...)
     char *t;
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     err = 0;
@@ -900,7 +900,7 @@ int cunsetenv(char *var)
  */
 
 char *cnoval(void)
-   {static char none[] = "";
+   {static char none[1] = "";
 
     return(none);}
 
@@ -917,7 +917,7 @@ char *cgetenv(int lit, char *fmt, ...)
     char *t;
 
     VA_START(fmt);
-    VSPRINTF(var, fmt);
+    VSNPRINTF(var, MAXLINE, fmt);
     VA_END;
 
     t = getenv(var);
@@ -940,7 +940,7 @@ int cdefenv(char *fmt, ...)
     char *t;
 
     VA_START(fmt);
-    VSPRINTF(var, fmt);
+    VSNPRINTF(var, MAXLINE, fmt);
     VA_END;
 
     t  = getenv(var);
@@ -979,7 +979,7 @@ int cinitenv(char *var, char *fmt, ...)
     char s[LRG];
 
     VA_START(fmt);
-    VSPRINTF(s, fmt);
+    VSNPRINTF(s, LRG, fmt);
     VA_END;
 
     err = 0;
@@ -1000,7 +1000,7 @@ char *cwhich(char *fmt, ...)
     static char exe[MAXLINE];
 
     VA_START(fmt);
-    VSPRINTF(prg, fmt);
+    VSNPRINTF(prg, MAXLINE, fmt);
     VA_END;
 
     if (prg[0] == '/')
@@ -1039,7 +1039,7 @@ FILE *open_file(char *mode, char *fmt, ...)
     FILE *fp;
 
     VA_START(fmt);
-    VSPRINTF(bf, fmt);
+    VSNPRINTF(bf, LRG, fmt);
     VA_END;
 
     fp = fopen(bf, mode);
@@ -1109,7 +1109,7 @@ int push_tok(char *s, int nc, int dlm, char *fmt, ...)
     char t[MAXLINE], delim[2];
 
     VA_START(fmt);
-    VSPRINTF(t, fmt);
+    VSNPRINTF(t, MAXLINE, fmt);
     VA_END;
 
     rv = TRUE;
@@ -1136,7 +1136,7 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
     char *p;
 
     VA_START(fmt);
-    VSPRINTF(t, fmt);
+    VSNPRINTF(t, MAXLINE, fmt);
     VA_END;
 
     if (s != NULL)
@@ -1165,7 +1165,7 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
     char t[MAXLINE], bf[LRG], delim[2];
 
     VA_START(fmt);
-    VSPRINTF(t, fmt);
+    VSNPRINTF(t, MAXLINE, fmt);
     VA_END;
 
     rv = TRUE;
@@ -1211,7 +1211,7 @@ char **lst_push(char **lst, char *fmt, ...)
        ps = NULL;
     else
        {VA_START(fmt);
-        VSPRINTF(s, fmt);
+        VSNPRINTF(s, MAXLINE, fmt);
         VA_END;
 
         ps = STRSAVE(s);};
@@ -1286,7 +1286,7 @@ int push_dir(char *fmt, ...)
     dstck.dir[n] = STRSAVE(d);
 
     VA_START(fmt);
-    VSPRINTF(d, fmt);
+    VSNPRINTF(d, LRG, fmt);
     VA_END;
 
     rv = chdir(d);
@@ -1558,7 +1558,7 @@ int touch(char *fmt, ...)
     char path[LRG];
 
     VA_START(fmt);
-    VSPRINTF(path, fmt);
+    VSNPRINTF(path, LRG, fmt);
     VA_END;
 
     fd = creat(path, 0660);
@@ -1691,7 +1691,7 @@ void log_activity(char *flog, int ilog, char *oper, char *fmt, ...)
     if ((ilog == TRUE) && (flog != NULL))
        {log = fopen(flog, "a");
 	VA_START(fmt);
-	VSPRINTF(msg, fmt);
+	VSNPRINTF(msg, MAXLINE, fmt);
 	VA_END;
 	fprintf(log, "%s\t(%d)\t: %s\n", oper, getpid(), msg);
         fclose(log);};

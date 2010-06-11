@@ -160,7 +160,7 @@ static int send_msg(process *pp, int act, char *fmt, ...)
     if (fmt == NULL)
        p = NULL;
     else
-       {VSPRINTF(msg, fmt);
+       {VSNPRINTF(msg, MAXLINE, fmt);
 	p  = msg;};
 
     VA_END;
