@@ -26,6 +26,11 @@
 #define LOG_ON      {Log = open_file("a", st.logf); setbuf(Log, NULL);}
 #define LOG_OFF     {fclose(Log); Log = NULL;}
 
+enum e_exoper
+   { PNONE, PEQ, PLT, PLE, PGT, PGE, PNE };
+
+typedef enum e_exoper exoper;
+
 typedef struct s_file_stack file_stack;
 typedef struct s_file_entry file_entry;
 typedef struct s_gt_stack gt_stack;
@@ -871,7 +876,8 @@ static void read_line(char *s, int nc)
 /* PARSE_OPT - work with option specifications */
 
 static void parse_opt(char *s)
-   {int i, ok;
+   {int i, ok, mt;
+    exoper oper;
     char *t, *pt, *vr, *avl, *arg, *opt;
 
     t = STRSAVE(s+1);
@@ -879,7 +885,9 @@ static void parse_opt(char *s)
     ok  = FALSE;
     avl = "off";
     for (pt = t; TRUE; pt = NULL)
-        {vr = trim(strtok(pt, "=\n"), BOTH, " \t");
+        {oper = PEQ;
+
+	 vr = trim(strtok(pt, "=\n"), BOTH, " \t");
 	 if (vr == NULL)
 	    break;
 
@@ -914,9 +922,45 @@ static void parse_opt(char *s)
 		     strcat(s, avl);
 		     ok = TRUE;};}
 
-	     else if ((strcmp(avl, vr) == 0) || (match(avl, vr) == TRUE))
+	     else if (strcmp(avl, vr) == 0)
 	        {strcpy(s, opt);
-	         ok = TRUE;};};};
+	         ok = TRUE;}
+
+	     else
+	        {mt = match(avl, vr);
+		 switch (oper)
+		    {case PEQ :
+		          if (mt == 0)
+			     {strcpy(s, opt);
+			      ok = TRUE;};
+			  break;
+		     case PLT :
+		          if (mt < 0)
+			     {strcpy(s, opt);
+			      ok = TRUE;};
+			  break;
+		     case PLE :
+		          if (mt < 1)
+			     {strcpy(s, opt);
+			      ok = TRUE;};
+			  break;
+		     case PGT :
+		          if (mt > 0)
+			     {strcpy(s, opt);
+			      ok = TRUE;};
+			  break;
+		     case PGE :
+		          if (mt >= -1)
+			     {strcpy(s, opt);
+			      ok = TRUE;};
+			  break;
+		     case PNE :
+		          if (mt != 0)
+			     {strcpy(s, opt);
+			      ok = TRUE;};
+			  break;
+		     default :
+			  break;};};};};
 
     if (ok == FALSE)
        s[0] = '\0';

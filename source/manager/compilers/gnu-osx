@@ -89,7 +89,7 @@ Group Python {
 include cpp-rule
 include serial
 
-setenv PATH /sw/bin:/usr/apps/gnu/bin:$PATH
+setenv PATH /sw/bin:/usr/apps/gnu/bin:/usr/local/bin:$PATH
 
 Group PNG {
    Path = /sw
