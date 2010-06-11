@@ -1315,37 +1315,64 @@ int pop_dir(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MATCH - returns TRUE iff the first string arg matched the
+/* MATCH - match the first string arg against the
  *       - regular expression defined by the second string arg
+ *       - return -1 if it is lexically less than the pattern
+ *       - return  0 if it matches the pattern
+ *       - return  1 if it is lexically greater than the pattern
  *       -
  *       - regular expression specifiers (so far)
  *       -
  *       -   '*' matches any number of characters
  *       -   '?' matches any single character
+ *       -
+ *       - examples:
+ *       -    3.2 < 4.*      =>  -1
+ *       -    4.2 = 4.*      =>   0
+ *       -    5.2 > 4.*      =>   1
  */
 
+#define END_CHECK(ps, pp)                                                    \
+   {if ((*ps == '\0') && (*pp != '\0') && (*pp != '*'))                      \
+       return(-1);                                                           \
+    else if ((*ps != '\0') && (*pp == '\0'))                                 \
+       return(1);}
+
 int match(char *s, char *patt)
-   {int c, rv;
+   {int b, c, rv;
     char *ps, *pp;
 
-    if (patt == NULL)
-       rv = TRUE;
-    else if (s == NULL)
-       rv = FALSE;
+    ps = s;
+    pp = patt;
+	
+    if (pp == NULL)
+       rv = 0;
+    else if (ps == NULL)
+       rv = -1;
+    else if ((*ps == '\0') && (*pp == '\0'))
+       rv = 0;
     else
-       {ps = s;
-	pp = patt;
-	while ((c = *pp++) != '\0')
+       {while ((c = *pp++) != '\0')
 	   {switch (c)
 	       {case '*' :
 		     while (*pp == '*')
 		        pp++;
+		     b = 0;
 		     c = *pp;
 		     while ((ps = strchr(ps, c)) != NULL)
-		        {if (match(ps, pp))
-			    return(TRUE);
-			 ps++;};
-		     return(FALSE);
+		        {if (match(ps, pp) == 0)
+			    return(0);
+			 END_CHECK(ps, pp);
+			 if ((*ps == '\0') && (*pp == '\0'))
+			    break;
+			 else
+			    b = *(++ps);};
+		     c = *(++pp);
+		     if (b < c)
+		        rv = -1;
+		     else
+		        rv = 1;
+		     return(rv);
 
 		case '?' :
 		     rv = match(++ps, pp);
@@ -1355,16 +1382,20 @@ int match(char *s, char *patt)
 		     c = *pp++;
 
 		default :
-		     if (*ps++ != c)
-		        return(FALSE);};
+		     b = *ps++;
+		     if (b < c)
+		        return(-1);
+		     else if (b > c)
+		        return(1);};
 
-	    if (((*ps == '\0') && (*pp != '\0') && (*pp != '*')) ||
-		((*ps != '\0') && (*pp == '\0')))
-	       return(FALSE);};
+	    END_CHECK(ps, pp);};
 
-	rv = (*ps == '\0');};
+	if (*ps == '\0')
+	   return(-1);};
 
     return(rv);}
+
+#undef END_CHECK
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -241,6 +241,9 @@ int PD_close(PDBfile *file)
  *          -    symbol table
  *          -    extras table
  *          - the table addresses are also updated
+ *          - NOTE: do not invoke PD_error in here because we do not
+ *          - know whether we came in on a write or a close and therefore
+ *          - do not know which jmpbuf to use
  */
 
 int PD_flush(PDBfile *file)
@@ -248,8 +251,7 @@ int PD_flush(PDBfile *file)
 
     ret = _PD_FLUSH_FILE(file);
 
-    if (_PD_safe_flush(file) == FALSE)
-       PD_error("FFLUSH FAILED AFTER - PD_FLUSH", PD_WRITE);
+    ret = _PD_safe_flush(file);
 
     _PD_MARK_AS_FLUSHED(file, TRUE);
 

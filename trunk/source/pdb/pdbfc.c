@@ -231,6 +231,13 @@ static int _PD_fcflush(FILE *fp)
 
     rv = fflush(fl);
 
+#ifdef MACOSX
+/* on OSX the fflush sometimes fails for the last file in a container
+ * with "Bad file descriptor" errno 9
+ */
+    rv = 0;
+#endif
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
