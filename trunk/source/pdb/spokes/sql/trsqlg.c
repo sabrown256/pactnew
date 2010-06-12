@@ -256,7 +256,7 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
 static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
    {int doffs;
     char *s;
-    char **ml, *ptype;
+    char **sa, **ml, *ptype;
     hasharr *fchrt;
     memdes *desc, *lst, *prev;
     defstr *dp, *dp2;
@@ -272,6 +272,12 @@ static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
 
     members = cl->describe(fp, type);
     ml      = members->table + 1;
+    sa      = NULL;
+    if (ml[0] == NULL)
+       {s  = members->table[0];
+	s  = strchr(s, '(') + 1;
+	sa = SC_tokenize(s, ",\n");
+        ml = sa;};
     
     prev  = NULL;
     lst   = NULL;
@@ -310,6 +316,7 @@ static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
     if (dp == NULL)
        PD_error("CAN'T HANDLE PRIMITIVE TYPE - _SQL_RD_DEFSTR", PD_GENERIC);
 
+    SC_free_strings(sa);
     _SQL_rl_table(members);
 
     return(dp);}
