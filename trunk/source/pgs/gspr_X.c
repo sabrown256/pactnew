@@ -614,12 +614,12 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
               box[1] = *px++;
               box[3] = *py++;
 
+              if (cs == WORLDC)
+		 PG_log_space(dev, 2, FALSE, box);
+
               cflag = PG_clip_box(box, wc, lgf);
               if (cflag == 0)
                  continue;
-
-              if (cs == WORLDC)
-		 PG_log_space(dev, 2, FALSE, box);
 
 	      PG_trans_box(dev, 2, WORLDC, box, PIXELC, box);
 

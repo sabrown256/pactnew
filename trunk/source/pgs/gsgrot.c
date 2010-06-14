@@ -18,10 +18,11 @@
 static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
    {int *maxes, *nt;
     int n_tr, n_s, i, u, l, ndpt, nrpt, clr;
-    double xmin, xmax, ymin, ymax;
+    double tn[2], vw[2];
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     double p[PG_SPACEDM];
+    double wc[PG_BOXSZ];
     double **d, **r, **lvl, extr[4];
     double **lx, **lu, *dx;
     char format[20], **labels;
@@ -36,10 +37,10 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
     d      = PM_convert_vectors(2, ndpt, r, domain->element_type);
 
     PM_array_real(domain->element_type, domain->extrema, 4, extr);
-    xmin = extr[0] - 0.75;
-    xmax = extr[1] + 0.75;
-    ymin = extr[2];
-    ymax = extr[3];
+    wc[0] = extr[0] - 0.75;
+    wc[1] = extr[1] + 0.75;
+    wc[2] = extr[2];
+    wc[3] = extr[3];
 
     maxes = domain->max_index;
     n_s   = maxes[0];
@@ -63,21 +64,24 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
     strcpy(format, "%10.2g");
     PG_set_line_width(dev, 0.0);
 
-    xl[0] = xmin;
-    xl[1] = ymin;
-    xr[0] = xmin;
-    xr[1] = ymax;
-    PG_draw_axis_n(dev, xl, xr,
-		   0.0, 1.0, ymin, ymax, 1.0,
-		   format,
+    xl[0] = wc[0];
+    xl[1] = wc[2];
+    xr[0] = wc[0];
+    xr[1] = wc[3];
+    tn[0] = 0.0;
+    tn[1] = 1.0;
+    vw[0] = wc[2];
+    vw[1] = wc[3];
+
+    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0, format,
 		   AXIS_TICK_LEFT, AXIS_TICK_LEFT, FALSE,
 		   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | AXIS_TICK_LABEL, 0);
 
 /* draw the horizontal labels */
-    ymin -= 0.05*(ymax - ymin);
-    for (x1[0] = xmin + 0.7; x1[0] < xmax; x1[0] += 1.0)
+    wc[2] -= 0.05*(wc[3] - wc[2]);
+    for (x1[0] = wc[0] + 0.7; x1[0] < wc[1]; x1[0] += 1.0)
         {p[0] = x1[0];
-	 p[1] = ymin;
+	 p[1] = wc[2];
 	 PG_write_n(dev, 2, WORLDC, p, "%ld", (int) (x1[0] + 0.5));};
 
 /* draw the states */

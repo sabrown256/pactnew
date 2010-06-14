@@ -954,6 +954,7 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
     unsigned char *bf;
     char format[20];
     double scale, toler;
+    double tn[2], vw[2];
     double pc[PG_BOXSZ], ndc[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_palette *pal;
@@ -1018,9 +1019,11 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
 	xl[1] = dbx[2];
 	xr[0] = dbx[0];
 	xr[1] = dbx[3];
-        PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, rbx[0], rbx[1], scale,
-		       format,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = rbx[0];
+	vw[1] = rbx[1];
+        PG_draw_axis_n(dev, xl, xr, tn, vw, scale, format,
 		       AXIS_TICK_RIGHT, AXIS_TICK_RIGHT, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | AXIS_TICK_LABEL, 0);
 
@@ -1036,9 +1039,11 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
 	xl[1] = dbx[2];
 	xr[0] = dbx[1];
 	xr[1] = dbx[2];
-        PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, rbx[0], rbx[1], scale,
-		       format,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = rbx[0];
+	vw[1] = rbx[1];
+        PG_draw_axis_n(dev, xl, xr, tn, vw, scale, format,
 		       AXIS_TICK_RIGHT, AXIS_TICK_RIGHT, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | AXIS_TICK_LABEL, 0);
 
@@ -1094,6 +1099,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
     unsigned char *bf;
     char format[20], *face, *style;
     double scale, toler;
+    double tn[2], vw[2];
     double pc[PG_BOXSZ], ndc[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_palette *pal;
@@ -1148,7 +1154,6 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
     ncy = shape[1];
 
     if (ndc[0] == ndc[1])
-
 /*
        {ndc[0]  = ndc[1] - wid;
         hvf   = VERTICAL;
@@ -1158,12 +1163,13 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 	xl[1] = frm[2];
 	xr[0] = frm[0];
 	xr[1] = frm[3];
-        PG_draw_axis_n(dev, xl, xr,
-	               0.0, 1.0, zmn, zmx, scale,
-                       format,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = zmn;
+	vw[1] = zmx;
+        PG_draw_axis_n(dev, xl, xr, tn, vw, scale, format,
                        AXIS_TICK_RIGHT, AXIS_TICK_RIGHT, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | AXIS_TICK_LABEL, 0);
-
 */
        {dev->current_palette = pal;
         return;} /* VERTICAL not supported yet */
@@ -1179,9 +1185,11 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 	xl[1] = frm[2];
 	xr[0] = frm[1];
 	xr[1] = frm[2];
-        PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, rex[0], rex[1], scale,
-		       format,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = rex[0];
+	vw[1] = rex[1];
+        PG_draw_axis_n(dev, xl, xr, tn, vw, scale, format,
 		       AXIS_TICK_RIGHT, AXIS_TICK_RIGHT, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | AXIS_TICK_LABEL, 0);
 
@@ -1191,9 +1199,11 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 	xl[1] = frm[2];
 	xr[0] = frm[0];
 	xr[1] = frm[3];
-        PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, rex[2], rex[3], scale,
-		       format,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = rex[2];
+	vw[1] = rex[3];
+        PG_draw_axis_n(dev, xl, xr, tn, vw, scale, format,
 		       AXIS_TICK_LEFT, AXIS_TICK_LEFT, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_NONE | AXIS_TICK_LABEL, 0);
 
