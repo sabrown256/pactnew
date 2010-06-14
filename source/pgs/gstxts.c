@@ -101,7 +101,7 @@ static void test_dev(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 
 int main(int argc, char **argv)
-   {double ndc[PG_BOXSZ], bx[PG_BOXSZ], p[PG_SPACEDM];
+   {double ndc[PG_BOXSZ], bx[PG_BOXSZ];
     PG_device *SCR_dev, *PS_dev, *CGM_dev;
     
 /* connect the I/O functions */

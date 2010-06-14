@@ -527,24 +527,25 @@ static object *_SXI_draw_arc(object *argl)
 
 static object *_SXI_draw_axis(object *argl)
    {int tt, lt, td;
-    double t1, t2, v1, v2, sc;
+    double sc;
+    double tn[2], vw[2];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     char *fmt;
     PG_device *dev;
 
     dev = NULL;
-    xl[0] = xl[1] = t1 = v1 = 0.0;
-    xr[0] = xr[1] = t2 = v2 = 1.0;
+    xl[0] = xl[1] = tn[0] = vw[0] = 0.0;
+    xr[0] = xr[1] = tn[1] = vw[1] = 1.0;
     SS_args(argl,
             G_DEVICE, &dev,
             SC_DOUBLE_I, &xl[0],
             SC_DOUBLE_I, &xl[1],
             SC_DOUBLE_I, &xr[0],
             SC_DOUBLE_I, &xr[1],
-            SC_DOUBLE_I, &t1,
-            SC_DOUBLE_I, &t2,
-            SC_DOUBLE_I, &v1,
-            SC_DOUBLE_I, &v2,
+            SC_DOUBLE_I, &tn[0],
+            SC_DOUBLE_I, &tn[1],
+            SC_DOUBLE_I, &vw[0],
+            SC_DOUBLE_I, &vw[1],
             SC_DOUBLE_I, &sc,
             SC_STRING_I, &fmt,
             SC_INTEGER_I, &tt,
@@ -555,7 +556,7 @@ static object *_SXI_draw_axis(object *argl)
     if (dev == NULL)
        SS_error("BAD DEVICE - _SXI_DRAW_AXIS", SS_null);
 
-    PG_draw_axis_n(dev, xl, xr, t1, t2, v1, v2,
+    PG_draw_axis_n(dev, xl, xr, tn, vw,
 		   sc, fmt, tt, lt, FALSE,
 		   td, 0);
 

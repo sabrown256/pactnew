@@ -23,18 +23,18 @@ static void print_tick_info(char *t, int it, PG_axis_def *ad)
     td = ad->tick + (it >> 1);
 
     if (it == AXIS_TICK_MINOR)
-       td->start = max(SMALL, td->start);
+       td->en[0] = max(SMALL, td->en[0]);
 
     PRINT(STDOUT,
           "%s  %2d %10.2e %10.2e %10.2e",
-          t, td->n, td->start, td->end, td->space);
+          t, td->n, td->en[0], td->en[1], td->space);
 
     if (it == AXIS_TICK_LABEL)
        PRINT(STDOUT,
-	     " %10.2e %10.2e   ", ad->vn, ad->vx);
+	     " %10.2e %10.2e   ", ad->vo[0], ad->vo[1]);
     else
        {PRINT(STDOUT,
-	      " %10.2e %10.2e   ", td->vn, td->vx);
+	      " %10.2e %10.2e   ", td->vo[0], td->vo[1]);
 
 	n  = td->n;
 	dx = td->dx;
@@ -165,6 +165,7 @@ static void test_axis(PG_device *dev, int ticks, int rev,
 		      double xmn, double ymn, double xmx, double ymx,
 		      double amn, double amx)
    {int lr;
+    double tn[2], vw[2];
     double bnd[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_axis_def *ad;
@@ -179,9 +180,12 @@ static void test_axis(PG_device *dev, int ticks, int rev,
 	xl[1] = ymn;
 	xr[0] = xmx;
 	xr[1] = ymx;
-	ad = PG_draw_axis_n(dev, xl, xr,
-			    t1, t2, amn, amx,
-			    1.0, "%10.3e", AXIS_TICK_STRADDLE, lr, TRUE,
+	tn[0] = t1;
+	tn[1] = t2;
+	vw[0] = amn;
+	vw[1] = amx;
+	ad = PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0, "%10.3e",
+			    AXIS_TICK_STRADDLE, lr, TRUE,
 			    ticks, 0);
 /*
        _PG_axis_tick_test(xl, xr, amn, amx);

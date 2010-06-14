@@ -2375,8 +2375,9 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
    {int i, k, l, nc, color, nclr;
     int ncl[PG_SPACEDM];
     double h, s, v, thrs, x0, dx0, dybox;
-    double dx, dy, dxw, dyw;
+    double tn[2], vw[2];
     double wc[PG_BOXSZ], bx[PG_BOXSZ], x[5], y[5];
+    double dx[PG_SPACEDM], dxw[PG_SPACEDM];
     double xl[PG_SPACEDM], xr[PG_SPACEDM], p[PG_SPACEDM];
     RGB_color_map *cm, *pcm, *scm;
     PG_device *dev;
@@ -2433,10 +2434,10 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 	wc[2] = 0.1;
 	wc[3] = 0.85;
 
-	dxw = (wc[1] - wc[0]);
-	dyw = (wc[3] - wc[2]);
-	dx  = 0.03*dxw;
-	dy  = 0.03*dyw;
+	dxw[0] = (wc[1] - wc[0]);
+	dxw[1] = (wc[3] - wc[2]);
+	dx[0]  = 0.03*dxw[0];
+	dx[1]  = 0.03*dxw[1];
 
 	thrs = 1.0/7.0 - 1.0e-6;
 
@@ -2446,46 +2447,52 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 
 /* saturation axis */
 	xl[0] = wc[0];
-	xl[1] = wc[2] + 0.5*dyw;
+	xl[1] = wc[2] + 0.5*dxw[1];
 	xr[0] = wc[0];
 	xr[1] = wc[3];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, -1.0, 1.0, 0.5,
-		       1.0, "%3.1f", AXIS_TICK_LEFT, AXIS_TICK_ENDS,
+	tn[0] = 0.0;
+	tn[1] = -1.0;
+	vw[0] = 1.0;
+	vw[1] = 0.5;
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0, "%3.1f",
+		       AXIS_TICK_LEFT, AXIS_TICK_ENDS,
 		       FALSE, AXIS_TICK_MAJOR | AXIS_TICK_MINOR, 0);
 
-	p[0] = wc[0] - 0.1*dxw;
-	p[1] = wc[3] - 0.5*dyw - 0.02*dyw;
+	p[0] = wc[0] - 0.1*dxw[0];
+	p[1] = wc[3] - 0.5*dxw[1] - 0.02*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "1.0");
 
-	p[0] = wc[0] - 0.1*dxw;
-	p[1] = wc[3] - 0.02*dyw;
+	p[0] = wc[0] - 0.1*dxw[0];
+	p[1] = wc[3] - 0.02*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "0.5");
 
-	p[0] = wc[0] - 0.08*dxw;
-	p[1] = wc[2] + 0.73*dyw;
+	p[0] = wc[0] - 0.08*dxw[0];
+	p[1] = wc[2] + 0.73*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "S");
 
 /* value axis */
 	xl[0] = wc[0];
 	xl[1] = wc[2];
 	xr[0] = wc[0];
-	xr[1] = wc[2] + 0.5*dyw;
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, 0.5, 1.0,
-		       1.0, "%3.1f", AXIS_TICK_LEFT, AXIS_TICK_ENDS,
+	xr[1] = wc[2] + 0.5*dxw[1];
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = 0.5;
+	vw[1] = 1.0;
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0, "%3.1f",
+		       AXIS_TICK_LEFT, AXIS_TICK_ENDS,
 		       FALSE, AXIS_TICK_MAJOR | AXIS_TICK_MINOR, 0);
 
-	p[0] = wc[0] - 0.1*dxw;
-	p[1] = wc[2] + 0.5*dyw - 0.02*dyw;
+	p[0] = wc[0] - 0.1*dxw[0];
+	p[1] = wc[2] + 0.5*dxw[1] - 0.02*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "1.0");
 
-	p[0] = wc[0] - 0.1*dxw;
-	p[1] = wc[2] - 0.02*dyw;
+	p[0] = wc[0] - 0.1*dxw[0];
+	p[1] = wc[2] - 0.02*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "0.5");
 
-	p[0] = wc[0] - 0.08*dxw;
-	p[1] = wc[2] + 0.23*dyw;
+	p[0] = wc[0] - 0.08*dxw[0];
+	p[1] = wc[2] + 0.23*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "V");
 
 /* hue axis */
@@ -2493,26 +2500,29 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 	xl[1] = wc[2];
 	xr[0] = wc[1];
 	xr[1] = wc[2];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.03, 0.97, 0.0, 7.0,
-		       1.0, "%3.1f", AXIS_TICK_RIGHT, AXIS_TICK_RIGHT,
+	tn[0] = 0.03;
+	tn[1] = 0.97;
+	vw[0] = 0.0;
+	vw[1] = 7.0;
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0, "%3.1f",
+		       AXIS_TICK_RIGHT, AXIS_TICK_RIGHT,
 		       FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | AXIS_TICK_LABEL,
 		       0);
 
-	p[0] = wc[0] + 0.49*dxw;
-	p[1] = wc[2] - 0.06*dyw;
+	p[0] = wc[0] + 0.49*dxw[0];
+	p[1] = wc[2] - 0.06*dxw[1];
 	PG_write_n(dev, 2, WORLDC, p, "H");
 
 /* draw the boxes for the new colors */
-	dx0   = 0.45*dxw/((double) ncl[0]);
-	x0    = wc[0] + 0.45*(dxw - ncl[0]*dx0);
-	dybox = (ncl[1] > 4) ? (.98 - (wc[3] + dy))/ncl[1] : dy;
+	dx0   = 0.45*dxw[0]/((double) ncl[0]);
+	x0    = wc[0] + 0.45*(dxw[0] - ncl[0]*dx0);
+	dybox = (ncl[1] > 4) ? (.98 - (wc[3] + dx[1]))/ncl[1] : dx[1];
 	for (k = 0; k < ncl[1]; k++)
 	    for (l = 0; l < ncl[0]; l++)
 	        {bx[0] = x0 + l*dx0;
 		 bx[1] = x[0] + dx0;
-		 bx[2] = wc[3] + 0.03*dyw + k*dybox;
+		 bx[2] = wc[3] + 0.03*dxw[1] + k*dybox;
 		 bx[3] = y[0] + dybox;
 		 PG_draw_box_n(dev, 2, WORLDC, bx);}
 
@@ -2525,21 +2535,21 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 	     s = cm[color].green;
 	     v = cm[color].blue;
 
-	     x[0] = wc[0] + 0.935*dxw*(h + 0.02);
+	     x[0] = wc[0] + 0.935*dxw[0]*(h + 0.02);
 
 	     if (h > thrs)
 	        {if (s < 0.99)
-		    y[0] = wc[3] - 0.5*dyw*s;
+		    y[0] = wc[3] - 0.5*dxw[1]*s;
 		 else
-		    y[0] = wc[2] + dyw*v - 0.39;}
+		    y[0] = wc[2] + dxw[1]*v - 0.39;}
 	     else
-	        y[0] = wc[2] + (dyw - dy - 0.005)*v;
+	        y[0] = wc[2] + (dxw[1] - dx[1] - 0.005)*v;
 
-	     x[1] = x[0] + dx;
+	     x[1] = x[0] + dx[0];
 	     y[1] = y[0];
 	     x[2] = x[1];
-	     y[2] = y[1] + dy;
-	     x[3] = x[2] - dx;
+	     y[2] = y[1] + dx[1];
+	     x[3] = x[2] - dx[0];
 	     y[3] = y[2];
 	     x[4] = x[0];
 	     y[4] = y[0];

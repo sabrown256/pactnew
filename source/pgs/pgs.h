@@ -875,11 +875,9 @@ struct s_PG_axis_tick_def
    {int n;
     int ndiv;        /* number of divisions - size of dx */
     int log_scale;
-    double end;
-    double start;
     double space;
-    double vn;       /* the mimimum label value */
-    double vx;       /* the maxmimum label value */
+    double en[2];
+    double vo[2];    /* the extremal label value */
     double *dx;};    /* DX is ordered from min to max - normalized (0, 1) */
 
 
@@ -896,10 +894,10 @@ struct s_PG_axis_def
     double cosa;            /* axis vector direction cosines */
     double sina;
 
-    double t1;     /* normalized interval along axis vector */
-    double t2;     /* t1 < t2 means outward and t1 > t2 means inward */
-    double vn;     /* minimum label value */
-    double vx;     /* maximum label value */
+    double tn[2];  /* normalized interval along axis vector
+                    * tn[0] < tn[1] means outward and
+                    * tn[0] > tn[1] means inward */
+    double vo[2];  /* extremal label value */
 
     double scale;
     double scale_x[PG_SPACEDM];
@@ -1514,10 +1512,9 @@ extern void
 
 extern PG_axis_def
  *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
-		 double t1, double t2, double v1, double v2,
-		 double sc, char *format, int tick_type, int label_type,
+		 double *tn, double *vw, double sc,
+		 char *format, int tick_type, int label_type,
 		 int flag, ...);
-
 
 /* GSCLR.C declarations */
 

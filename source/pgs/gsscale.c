@@ -40,10 +40,10 @@ static INLINE double _PG_axis_delta(double c, double lwr, double upr,
  */
 
 static void _PG_comp_tick_spacings(PG_axis_def *ad)
-   {double drl, divs, sp, isp, dv, dt;
-    int nt, n5, n2;
+   {int nt, n5, n2;
+    double drl, divs, sp, isp, dv, dt;
 
-    dv = ad->vx - ad->vn;
+    dv = ad->vo[1] - ad->vo[0];
 
 /* find the integral points (10**sp) */
     sp = log10(dv);
@@ -81,7 +81,7 @@ static void _PG_comp_tick_spacings(PG_axis_def *ad)
 
 /* values decreasing along the vector of the axis */
 /*    if (ad->t2 < ad->t1) */
-    if (ad->vx < ad->vn)
+    if (ad->vo[1] < ad->vo[0])
        drl *= -1.0;
 
     ad->tick[AXIS_TICK_MAJOR >> 1].space = drl;
@@ -105,7 +105,8 @@ static void _PG_comp_tick_spacings(PG_axis_def *ad)
 
 double _PG_axis_place(PG_device *dev, double *dx,
 		      PG_axis_def *ad, double sz, int tick)
-   {int idx[PG_SPACEDM], tty;
+   {int tty;
+    int idx[PG_SPACEDM];
     double logsc, tcksc, lmt, csa, sna;
     double tdx[PG_SPACEDM], bnd[PG_BOXSZ];
     PG_dev_geometry *g;
@@ -176,27 +177,27 @@ double _PG_axis_place(PG_device *dev, double *dx,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_TICK_DIV_FIX - remove anybody outside the range (VN, VX)
+/* _PG_TICK_DIV_FIX - remove anybody outside the range VO
  *                  - also any duplications
  */
 
-static void _PG_tick_div_fix(PG_axis_tick_def *td,
-			     double vn, double vx,
+static void _PG_tick_div_fix(PG_axis_tick_def *td, double *vo,
 			     double dv, int tick, int dec)
    {int na, jin, jout;
-    double vnd, vxd, r, s, t;
+    double r, s, t;
+    double vod[2];
     double *dx;
 
     na = td->n;
     dx = td->dx;
 
     if (na > 2)
-       {vnd = max(vn - 0.5*dv, 0.9999*vn);
-	vxd = min(vx + 0.5*dv, 1.0001*vx);
+       {vod[0] = max(vo[0] - 0.5*dv, 0.9999*vo[0]);
+	vod[1] = min(vo[1] + 0.5*dv, 1.0001*vo[1]);
 
 	for (jin = 0, jout = 0; jin < na; jin++)
             {t = dx[jin];
-             if ((vnd <= t) && (t <= vxd))
+             if ((vod[0] <= t) && (t <= vod[1]))
                 {if ((tick == AXIS_TICK_MAJOR) || (tick == AXIS_TICK_LABEL))
                     {s = log10(dv/t);
 		     r = floor(s);
@@ -217,7 +218,7 @@ static void _PG_tick_div_fix(PG_axis_tick_def *td,
 	if (jout == 0)
 	   {for (jin = 0, jout = 0; jin < na; jin++)
 	        {t = dx[jin];
-		 if ((vnd <= t) && (t <= vxd))
+		 if ((vod[0] <= t) && (t <= vod[1]))
 		    dx[jout++] = t;};};
 
 	if (jout > 0)
@@ -235,22 +236,22 @@ static void _PG_tick_div_fix(PG_axis_tick_def *td,
  *                  - a log subdivision of the decades
  */
 
-static void _PG_tick_div_dec(PG_axis_tick_def *td, double vn, double vx,
+static void _PG_tick_div_dec(PG_axis_tick_def *td, double *vo,
 			     double dv, int tick, double dlv)
    {int j, k;
-    int lvn, lvx, dexp, na, step, decade;
-    int da, db;
-    double sub[10];
-    double va, vb, t;
+    int da, db, dexp, na, step, decade;;
+    int lvo[2];
+    double t;
+    double sub[10], va[2];
     double *dx;
 
 /* find the extremal values for major ticks and labels */
-    lvn = log10(vn);
-    lvx = log10(vx);
-    lvn = max(lvn, lvx - _PG_gattrs.axis_n_decades - 1);
+    lvo[0] = log10(vo[0]);
+    lvo[1] = log10(vo[1]);
+    lvo[0] = max(lvo[0], lvo[1] - _PG_gattrs.axis_n_decades - 1);
 
-    va = POW(10.0, lvn);
-    vb = POW(10.0, lvx);
+    va[0] = POW(10.0, lvo[0]);
+    va[1] = POW(10.0, lvo[1]);
 
 /* empirical relation - more decades fewer ticks/steps per decade */
     if (dlv > 9)
@@ -284,7 +285,7 @@ static void _PG_tick_div_dec(PG_axis_tick_def *td, double vn, double vx,
     dx = FMAKE_N(double, step*na, "_PG_TICK_DIV_DEC:dx");
 
 /* fill array of division locations - subdivide decades */
-    for (j = 0, decade = lvn-db; j < na; decade += dexp)
+    for (j = 0, decade = lvo[0]-db; j < na; decade += dexp)
         {t = PM_pow(10.0, decade);
 
 	 dx[j++] = t;
@@ -294,14 +295,14 @@ static void _PG_tick_div_dec(PG_axis_tick_def *td, double vn, double vx,
 
     td->n         = na;
     td->ndiv      = j;
-    td->vn        = va;
-    td->vx        = vb;
+    td->vo[0]     = va[0];
+    td->vo[1]     = va[1];
     td->dx        = dx;
     td->log_scale = 1;
 
-    _PG_tick_div_fix(td, vn, vx, dv, tick, TRUE);
+    _PG_tick_div_fix(td, vo, dv, tick, TRUE);
 
-    td->vn = dx[0];
+    td->vo[0] = dx[0];
 
     return;}
 
@@ -313,40 +314,40 @@ static void _PG_tick_div_dec(PG_axis_tick_def *td, double vn, double vx,
  *                  - a log subdivision of the decades
  */
 
-static void _PG_tick_div_eqr(PG_axis_tick_def *td, double vn, double vx,
+static void _PG_tick_div_eqr(PG_axis_tick_def *td, double *vo,
 			     double dv, int tick)
    {int i, j, k;
     int dexp, na, step;
-    double va, vb, vd, nv, r, t;
+    double va[2], vd, nv, r, t;
     double *dx;
 
 /* find the extremal values for major ticks and labels
  * also the number of divisions NA - corresponds to minor tick spacings
  */
-    va = PM_round(vn/dv);
-    vb = PM_round(vx/dv);
-    nv = PM_round(vb - va) + 1.0;
+    va[0] = PM_round(vo[0]/dv);
+    va[1] = PM_round(vo[1]/dv);
+    nv    = PM_round(va[1] - va[0]) + 1.0;
 
 /* too many divisions - increase DV by factors of 10 */
     while (nv > 10)
        {dv *= 10.0;
-        va = PM_round(vn/dv);
-	vb = PM_round(vx/dv);
-	nv = PM_round(vb - va) + 1.0;};
+        va[0] = PM_round(vo[0]/dv);
+	va[1] = PM_round(vo[1]/dv);
+	nv    = PM_round(va[1] - va[0]) + 1.0;};
 
 /* too few divisions - reduce DV by factors of 10 */
     while (nv <= 2)
        {dv *= 0.1;
-        va = PM_round(vn/dv);
-	vb = PM_round(vx/dv);
-	nv = PM_round(vb - va) + 1.0;};
+        va[0] = PM_round(vo[0]/dv);
+	va[1] = PM_round(vo[1]/dv);
+	nv    = PM_round(va[1] - va[0]) + 1.0;};
     na  = nv;
-    va *= dv;
-    vb *= dv;
+    va[0] *= dv;
+    va[1] *= dv;
 
-/* do not let VA be more than maximum number of decades down from VB */
-    vd = vb*PM_pow(10.0, -_PG_gattrs.axis_n_decades);
-    va = max(va, vd);
+/* do not let VA[0] be more than maximum number of decades down from VA[1] */
+    vd    = va[1]*PM_pow(10.0, -_PG_gattrs.axis_n_decades);
+    va[0] = max(va[0], vd);
 
 /* empirical relation - almost linear anyway so fill it up */
     step = _PG_gattrs.axis_n_minor_ticks;
@@ -364,7 +365,7 @@ static void _PG_tick_div_eqr(PG_axis_tick_def *td, double vn, double vx,
     dx = FMAKE_N(double, step*na, "_PG_TICK_DIV_EQR:dx");
 
 /* fill array of division locations - equal ratio spacing */
-    for (i = 0, j = 0, t = va; i < na; i++)
+    for (i = 0, j = 0, t = va[0]; i < na; i++)
         {dx[j++] = t;
 
 	 r  = POW((t + dv)/t, 0.1);
@@ -375,12 +376,12 @@ static void _PG_tick_div_eqr(PG_axis_tick_def *td, double vn, double vx,
 	         dx[j] = dx[j-1]*r;};};
 
     td->n         = na;
-    td->vn        = va;
-    td->vx        = vb;
+    td->vo[0]     = va[0];
+    td->vo[1]     = va[1];
     td->dx        = dx;
     td->log_scale = -1;
 
-    _PG_tick_div_fix(td, vn, vx, dv, tick, FALSE);
+    _PG_tick_div_fix(td, vo, dv, tick, FALSE);
 
     return;}
 
@@ -391,7 +392,8 @@ static void _PG_tick_div_eqr(PG_axis_tick_def *td, double vn, double vx,
 
 static void _PG_tick_div_nrm(PG_axis_tick_def *td)
    {int j, na;
-    double mx, mn, di, nrm;
+    double di, nrm;
+    double extr[2];
     double *dx;
 
     na = td->n;
@@ -401,19 +403,19 @@ static void _PG_tick_div_nrm(PG_axis_tick_def *td)
        {
 
 #if 0
-        mx = dx[na - 1];
-        mn = dx[0];
+        extr[1] = dx[na - 1];
+        extr[0] = dx[0];
 #else
-        mx = td->vx;
-        mn = td->vn;
+        extr[1] = td->vo[1];
+        extr[0] = td->vo[0];
 #endif
 
 /* shift by the mimimum value */
         for (j = 0; j < na; j++)
-            dx[j] -= mn;
+            dx[j] -= extr[0];
 
 /* normalize the spacings */
-        di = mx - mn;
+        di = extr[1] - extr[0];
         if (di == 0.0)
            nrm = 1.0;
         else
@@ -444,16 +446,16 @@ static void _PG_tick_div_nrm(PG_axis_tick_def *td)
 
 static void _PG_tick_div_log(PG_axis_tick_def *td,
 			     PG_axis_def *ad, int tick)
-   {double va, vn, vx, dlu, dlv, dv;
+   {double va, vo[2], dlu, dlv, dv;
 
-/* get out the limits (VN, VX) */
-    vn = ad->vn;
-    vx = ad->vx;
-    va = vx*POW(10.0, -_PG_gattrs.axis_n_decades);
-    vn = max(vn, va);
+/* get out the limits VO */
+    vo[0] = ad->vo[0];
+    vo[1] = ad->vo[1];
+    va    = vo[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
+    vo[0] = max(vo[0], va);
  
 /* divide the interval into reasonable sized units wrt the scale of the values */
-    dlv = log10(vx/vn);
+    dlv = log10(vo[1]/vo[0]);
     dlu = (dlv > 0.0) ? floor(dlv) : ceil(dlv);
     if (dlu == 0.0)
        dlv = 0.0;
@@ -464,11 +466,11 @@ static void _PG_tick_div_log(PG_axis_tick_def *td,
 
 /* if the interval is greater than one decade the major ticks fall on decades */
     if (dlv > 0.0)
-       _PG_tick_div_dec(td, vn, vx, dv, tick, dlv);
+       _PG_tick_div_dec(td, vo, dv, tick, dlv);
 
 /* if the interval is less than one decade use equal ratio spacing */
     else
-       _PG_tick_div_eqr(td, vn, vx, dv, tick);
+       _PG_tick_div_eqr(td, vo, dv, tick);
 
 /* put the spacings into the range 0 to 1 */
     _PG_tick_div_nrm(td);
@@ -478,7 +480,7 @@ static void _PG_tick_div_log(PG_axis_tick_def *td,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_TICK_DIV_LIN - find the extremal values (VA, VB)
+/* _PG_TICK_DIV_LIN - find the extremal values VA
  *                  - number of divisions N and spacings DX
  *                  - for a linear scale axis
  */
@@ -486,24 +488,25 @@ static void _PG_tick_div_log(PG_axis_tick_def *td,
 static void _PG_tick_div_lin(PG_axis_tick_def *td,
 			     PG_axis_def *ad, double sp)
    {int i, n;
-    double va, vb, vn, vx, dx0;
+    double dx0;
+    double va[2], vo[2];
     double *dx;
 
-    vn = ad->vn;
-    vx = ad->vx;
-    sp = ABS(sp);
+    vo[0] = ad->vo[0];
+    vo[1] = ad->vo[1];
+    sp    = ABS(sp);
 
-    va = sp*PM_fix(vn/sp);
-    vb = sp*PM_fix(vx/sp);
+    va[0] = sp*PM_fix(vo[0]/sp);
+    va[1] = sp*PM_fix(vo[1]/sp);
 
     if (ad->label_type != AXIS_TICK_ENDS)
-       {if (vn < vx)
-	   {if (va < vn)
-	       va += sp;
-	    if (vb > vx)
-	       vb -= sp;};};
+       {if (vo[0] < vo[1])
+	   {if (va[0] < vo[0])
+	       va[0] += sp;
+	    if (va[1] > vo[1])
+	       va[1] -= sp;};};
 
-    n = (vb - va)/sp + 1.0 + EPSILON;
+    n = (va[1] - va[0])/sp + 1.0 + EPSILON;
     n = max(n, 2.0 + EPSILON);
 
 /* fill the tick spacings array */
@@ -513,8 +516,8 @@ static void _PG_tick_div_lin(PG_axis_tick_def *td,
         dx[i] = i*dx0;
 
     td->n         = n;
-    td->vn        = va;
-    td->vx        = vb;
+    td->vo[0]     = va[0];
+    td->vo[1]     = va[1];
     td->dx        = dx;
     td->log_scale = 0;
 
@@ -526,19 +529,20 @@ static void _PG_tick_div_lin(PG_axis_tick_def *td,
 /* _PG_TICK - given a spacing compute the following additional tick
  *          - information:
  *          -
- *          -    st - first tick position
- *          -    en - last tick position
- *          -    n  - number of ticks
+ *          -    en[0] - first tick position
+ *          -    en[1] - last tick position
+ *          -    n     - number of ticks
  */
 
 void _PG_tick(PG_axis_def *ad, int tick)
-   {double vx, vn, wx, wn, t1, t2, a, b, dvi, sp;
+   {double dvi, sp;
+    double w[2], a[2], vo[2], tn[2];
     PG_axis_tick_def *td;
 
     td = ad->tick + (tick >> 1);
     sp = td->space;
 
-/* determine good values for the extremal labels (VN, VX) the
+/* determine good values for the extremal labels VO the
  * number of ticks N and the tick spacings DX
  */
 
@@ -551,21 +555,21 @@ void _PG_tick(PG_axis_def *ad, int tick)
     else
        _PG_tick_div_lin(td, ad, sp);
 
-    vx = ad->vx;
-    vn = ad->vn;
-    t2 = ad->t2;
-    t1 = ad->t1;
+    vo[1] = ad->vo[1];
+    vo[0] = ad->vo[0];
+    tn[1] = ad->tn[1];
+    tn[0] = ad->tn[0];
 
-/* T1 and T2 are only used to compute the scale - not for drawing */
-    dvi = ad->dr/((vx - vn)*ad->scale);
-    a   = (vn*t2 - vx*t1)*dvi;
-    b   = (t2 - t1)*dvi;
+/* TN is only used to compute the scale - not for drawing */
+    dvi  = ad->dr/((vo[1] - vo[0])*ad->scale);
+    a[0] = (vo[0]*tn[1] - vo[1]*tn[0])*dvi;
+    a[1] = (tn[1] - tn[0])*dvi;
 
-    wn = b*(td->vn);
-    wx = b*(td->vx);
+    w[0] = a[1]*(td->vo[0]);
+    w[1] = a[1]*(td->vo[1]);
 
-    td->start = (PM_CLOSETO_REL(wn, a) == TRUE) ? 0.0 : wn - a;
-    td->end   = wx - a;
+    td->en[0] = (PM_CLOSETO_REL(w[0], a[0]) == TRUE) ? 0.0 : w[0] - a[0];
+    td->en[1] = w[1] - a[0];
 
     return;}
 
@@ -578,69 +582,70 @@ void _PG_tick(PG_axis_def *ad, int tick)
 
 PG_axis_def *_PG_mk_axis_def(int atype, int ttype, int ltype,
 			     double *xl, double *xr,
-			     double t1, double t2, double vn, double vx,
+			     double *tn, double *vo,
 			     double as, int *iflg)
    {int i;
-    double dx, dy, dr, idr, cosa, sina, toler;
+    double dr, idr, cosa, sina, toler;
+    double dx[2];
     PG_axis_def *ad;
     PG_axis_tick_def *td;
 
     ad = FMAKE(PG_axis_def, "_PG_MK_AXIS_DEF:ad");
 
 /* compute various quantities needed by the axis routines */
-    dx = xr[0] - xl[0];
-    dy = xr[1] - xl[1];
-    dr = HYPOT(dx, dy);
+    dx[0] = xr[0] - xl[0];
+    dx[1] = xr[1] - xl[1];
+    dr    = HYPOT(dx[0], dx[1]);
 
     idr = 1.0/(dr + SMALL);
 
 /* compute the orientation of the axis */
-    cosa = dx*idr;
-    sina = dy*idr;
+    cosa = dx[0]*idr;
+    sina = dx[1]*idr;
 
-/* vn and vx must be further apart than toler apart */
+/* VO[0] and VO[1] must be further apart than toler apart */
     toler = 1.0e-8;
-    if (ABS(vn - vx) < toler*(ABS(vn) + ABS(vx)))
-       {if (vn == 0.0)
-	   {vn -= 0.1;
-	    vx += 0.1;}
+    if (ABS(vo[0] - vo[1]) < toler*(ABS(vo[0]) + ABS(vo[1])))
+       {if (vo[0] == 0.0)
+	   {vo[0] -= 0.1;
+	    vo[1] += 0.1;}
 	else
-	   {vn -= 0.5*toler*vn;
-	    vx += 0.5*toler*vx;};};
+	   {vo[0] -= 0.5*toler*vo[0];
+	    vo[1] += 0.5*toler*vo[1];};};
 
 /* setup the general axis characteristics */
-    ad->axis_type   = atype;
-    ad->tick_type   = ttype;
-    ad->label_type  = ltype;
+    ad->axis_type    = atype;
+    ad->tick_type    = ttype;
+    ad->label_type   = ltype;
     ad->log_scale[0] = iflg[0];
     ad->log_scale[1] = iflg[1];
-    ad->eps_rel     = 1.0e-4*(vx - vn);
+    ad->eps_rel      = 1.0e-4*(vo[1] - vo[0]);
 
 /* define the axis vector */
-    ad->x0[0]   = xl[0];
-    ad->x0[1]   = xl[1];
-    ad->dr   = dr;
-    ad->cosa = cosa;
-    ad->sina = sina;
+    ad->x0[0] = xl[0];
+    ad->x0[1] = xl[1];
+    ad->dr    = dr;
+    ad->cosa  = cosa;
+    ad->sina  = sina;
 
 /* define axis scale factors */
-    ad->scale   = as;
+    ad->scale      = as;
     ad->scale_x[0] = as;
     ad->scale_x[1] = as;
 
-/* T1 and T2 are only used to compute the scale - not for drawing */
-    ad->t1 = t1;
-    ad->t2 = t2;
-    ad->vn = vn;
-    ad->vx = vx;
+/* TN[0] and TN[1] are only used to compute the scale - not for drawing */
+    ad->tn[0] = tn[0];
+    ad->tn[1] = tn[1];
+    ad->vo[0] = vo[0];
+    ad->vo[1] = vo[1];
 
 /* initialize the tick/label spacings structs */
     for (i = 0; i < 3; i++)
         {td = ad->tick + i;
 
 	 td->n     = 0;
-	 td->end   = 0.0;
-	 td->start = 0.0;
+	 td->en[0] = 0.0;
+	 td->en[1] = 0.0;
 	 td->space = 0.0;
 	 td->dx    = NULL;};
 
@@ -668,16 +673,20 @@ void _PG_rl_axis_def(PG_axis_def *ad)
 
 /* _PG_AXIS_TICK_TEST - test log axis tick computation */
 
-void _PG_axis_tick_test(double *xl, double *xr, double vn, double vx)
+void _PG_axis_tick_test(double *xl, double *xr, double *vo)
    {int id;
     int iflg[PG_SPACEDM];
+    double tn[2];
     PG_axis_def *ad;
     
     for (id = 0; id < PG_SPACEDM; id++)
         iflg[id] = TRUE;
 
+    tn[0] = 0.0;
+    tn[1] = 1.0;
+
     ad = _PG_mk_axis_def(CARTESIAN_2D, AXIS_TICK_STRADDLE, AXIS_TICK_RIGHT,
-			 xl, xr, 0.0, 1.0, vn, vx, 1.0, iflg);
+			 xl, xr, tn, vo, 1.0, iflg);
 
     _PG_tick(ad, AXIS_TICK_MAJOR);
     _PG_tick(ad, AXIS_TICK_MINOR);

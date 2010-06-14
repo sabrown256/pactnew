@@ -45,7 +45,7 @@ static void _PG_draw_grid_lines(PG_device *dev, PG_axis_def *ad,
 static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
                                       double *bx)
    {int i, n, na, nr;
-    double fr, st, en, tpi;
+    double fr, en[2], tpi;
     double dr, rc, r1, r2, r3, r4;
     double a1, a2, amx, aincr;
     double r[PG_SPACEDM];
@@ -54,9 +54,9 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
     tpi = 2.0*PI;
 
     td = ad->tick + (AXIS_TICK_MAJOR >> 1);
-    st = td->start;
-    en = td->end;
     n  = td->n;
+    en[0] = td->en[0];
+    en[1] = td->en[1];
 
     fr    = max(ABS(bx[2]), ABS(bx[3]))/(bx[3] - bx[2]);
     nr    = fr*n;
@@ -82,7 +82,7 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
     PG_set_line_style(dev, _PG_gattrs.axis_grid_style);
     PG_set_clipping(dev, TRUE);
 
-    dr = (en - st)/((double) n - 1.0);
+    dr = (en[1] - en[0])/((double) n - 1.0);
     for (i = 1; i <= nr; i++)
         {rc = i*dr;
 
@@ -112,9 +112,8 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
 /* _PG_DRAW_CARTESIAN_AXIS - do work of drawing a set of Cartesian axes */
 
 static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
-   {int nt, troax, lroax, troay, lroay;
-    double majoren, majorst;
-    double wxextent, wyextent;
+   {int nt, troa[2], lroa[2];
+    double majoren[2], wext[2], tn[2], vw[2];
     double bnd[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
@@ -128,36 +127,36 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 /* get window and viewport limits */
     PG_get_viewspace(dev, BOUNDC, bnd);
 
-    wxextent = bnd[1] - bnd[0];
-    wyextent = bnd[3] - bnd[2];
+    wext[0] = bnd[1] - bnd[0];
+    wext[1] = bnd[3] - bnd[2];
 
 /* if the coordinate system has x increasing to the right */
     if (bnd[1] >= bnd[0])
-       {lroax = AXIS_TICK_RIGHT;
-	troax = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
-	        AXIS_TICK_RIGHT : AXIS_TICK_LEFT;}
+       {lroa[0] = AXIS_TICK_RIGHT;
+	troa[0] = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
+	          AXIS_TICK_RIGHT : AXIS_TICK_LEFT;}
 
 /* otherwise use the left hand rule for ticks */
     else
-       {lroax = AXIS_TICK_LEFT;
-	troax = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
-	        AXIS_TICK_LEFT : AXIS_TICK_RIGHT;};
+       {lroa[0] = AXIS_TICK_LEFT;
+	troa[0] = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
+	          AXIS_TICK_LEFT : AXIS_TICK_RIGHT;};
 
 /* if the coordinate system has y increasing up */
     if (bnd[3] >= bnd[2])
-       {lroay = AXIS_TICK_RIGHT;
-	troay = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
-	        AXIS_TICK_RIGHT : AXIS_TICK_LEFT;}
+       {lroa[1] = AXIS_TICK_RIGHT;
+	troa[1] = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
+	          AXIS_TICK_RIGHT : AXIS_TICK_LEFT;}
 
 /* otherwise use the left hand rule for ticks */
     else
-       {lroay = AXIS_TICK_LEFT;
-	troay = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
-	        AXIS_TICK_LEFT : AXIS_TICK_RIGHT;};
+       {lroa[1] = AXIS_TICK_LEFT;
+	troa[1] = (_PG_gattrs.axis_tick_type == AXIS_TICK_RIGHT) ?
+	          AXIS_TICK_LEFT : AXIS_TICK_RIGHT;};
 
     if (_PG_gattrs.axis_tick_type == AXIS_TICK_STRADDLE)
-       {troax = AXIS_TICK_STRADDLE;
-        troay = AXIS_TICK_STRADDLE;};
+       {troa[0] = AXIS_TICK_STRADDLE;
+        troa[1] = AXIS_TICK_STRADDLE;};
 
     nt = _PG_gattrs.axis_n_minor_ticks;
             
@@ -169,14 +168,18 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 	                                _PG_gattrs.axis_n_minor_x_ticks :
 					nt;
 
+/* lower X axis */
 	xl[0] = bnd[0];
 	xl[1] = bnd[2];
 	xr[0] = bnd[1];
 	xr[1] = bnd[2];
-	ad = PG_draw_axis_n(dev, xl, xr,
-			    0.0, 1.0, bnd[0], bnd[1], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[0];
+	vw[1] = bnd[1];
+	ad = PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			    _PG_gattrs.axis_label_x_format,
-			    troax, lroax, TRUE,
+			    troa[0], lroa[0], TRUE,
 			    AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);
 	if (ad == NULL)
 	   return;
@@ -184,54 +187,66 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 	td = ad->tick + (AXIS_TICK_MAJOR >> 1);
 
 	if (bnd[0] < bnd[1])
-	   {majorst = td->start + bnd[0];
-	    majoren = td->end + bnd[0];}
+	   {majoren[0] = td->en[0] + bnd[0];
+	    majoren[1] = td->en[1] + bnd[0];}
 	else
-	   {majoren = -td->start + bnd[0];
-	    majorst = -td->end + bnd[0];};
+	   {majoren[1] = -td->en[0] + bnd[0];
+	    majoren[0] = -td->en[1] + bnd[0];};
 
-	x1[0] = majorst;
+	x1[0] = majoren[0];
 	x1[1] = bnd[2];
-	x2[0] = majorst;
+	x2[0] = majoren[0];
 	x2[1] = bnd[3];
-	x3[0] = majoren;
+	x3[0] = majoren[1];
 	x3[1] = bnd[2];
-	x4[0] = majoren;
+	x4[0] = majoren[1];
 	x4[1] = bnd[3];
 	_PG_draw_grid_lines(dev, ad, x1, x2, x3, x4, g->iflog[0]);
 
+/* upper X axis */
 	xl[0] = bnd[1];
 	xl[1] = bnd[3];
 	xr[0] = bnd[0];
 	xr[1] = bnd[3];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, bnd[1], bnd[0], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[1];
+	vw[1] = bnd[0];
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		       _PG_gattrs.axis_label_x_format,
-		       troax, AXIS_TICK_NONE, FALSE,
+		       troa[0], AXIS_TICK_NONE, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR, 0);
 
 	_PG_gattrs.axis_n_minor_ticks = (_PG_gattrs.axis_n_minor_y_ticks >= 0) ?
 	                                _PG_gattrs.axis_n_minor_y_ticks :
 	                                nt;
 
+/* left Y axis */
 	xl[0] = bnd[0];
 	xl[1] = bnd[3];
 	xr[0] = bnd[0];
 	xr[1] = bnd[2];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, bnd[3], bnd[2], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[3];
+	vw[1] = bnd[2];
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		       _PG_gattrs.axis_label_y_format,
-		       troay, lroay, FALSE,
+		       troa[1], lroa[1], FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);
 
+/* right Y axis */
 	xl[0] = bnd[1];
 	xl[1] = bnd[2];
 	xr[0] = bnd[1];
 	xr[1] = bnd[3];
-	ad = PG_draw_axis_n(dev, xl, xr,
-			    0.0, 1.0, bnd[2], bnd[3], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[2];
+	vw[1] = bnd[3];
+	ad = PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			    _PG_gattrs.axis_label_y_format,
-			    troay, AXIS_TICK_NONE, TRUE,
+			    troa[1], AXIS_TICK_NONE, TRUE,
 			    AXIS_TICK_MAJOR | AXIS_TICK_MINOR, 0);
 	if (ad == NULL)
 	   return;
@@ -239,20 +254,20 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 	td = ad->tick + (AXIS_TICK_MAJOR >> 1);
 
 	if (bnd[2] < bnd[3])
-	   {majorst = td->start + bnd[2];
-	    majoren = td->end + bnd[2];}
+	   {majoren[0] = td->en[0] + bnd[2];
+	    majoren[1] = td->en[1] + bnd[2];}
 	else
-	   {majoren = -td->start + bnd[2];
-	    majorst = -td->end + bnd[2];};
+	   {majoren[1] = -td->en[0] + bnd[2];
+	    majoren[0] = -td->en[1] + bnd[2];};
 
 	x1[0] = bnd[0];
-	x1[1] = majorst;
+	x1[1] = majoren[0];
 	x2[0] = bnd[1];
-	x2[1] = majorst;
+	x2[1] = majoren[0];
 	x3[0] = bnd[0];
-	x3[1] = majoren;
+	x3[1] = majoren[1];
 	x4[0] = bnd[1];
-	x4[1] = majoren;
+	x4[1] = majoren[1];
 	_PG_draw_grid_lines(dev, ad, x1, x2, x3, x4, g->iflog[1]);}
 
 /* without grid simply draw the axes */
@@ -261,48 +276,64 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 	                                _PG_gattrs.axis_n_minor_x_ticks :
 	                                nt;
 
+/* lower X axis */
 	xl[0] = bnd[0];
 	xl[1] = bnd[2];
 	xr[0] = bnd[1];
 	xr[1] = bnd[2];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, bnd[0], bnd[1], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[0];
+	vw[1] = bnd[1];
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		       _PG_gattrs.axis_label_x_format,
-		       troax, lroax, FALSE,
+		       troa[0], lroa[0], FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);
 
+/* upper X axis */
 	xl[0] = bnd[1];
 	xl[1] = bnd[3];
 	xr[0] = bnd[0];
 	xr[1] = bnd[3];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, bnd[1], bnd[0], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[1];
+	vw[1] = bnd[0];
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		       _PG_gattrs.axis_label_x_format,
-		       troax, AXIS_TICK_NONE, FALSE,
+		       troa[0], AXIS_TICK_NONE, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR, 0);
 
 	_PG_gattrs.axis_n_minor_ticks = (_PG_gattrs.axis_n_minor_y_ticks >= 0) ?
 	                                _PG_gattrs.axis_n_minor_y_ticks :
 	                                nt;
 
+/* left Y axis */
 	xl[0] = bnd[0];
 	xl[1] = bnd[3];
 	xr[0] = bnd[0];
 	xr[1] = bnd[2];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, bnd[3], bnd[2], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[3];
+	vw[1] = bnd[2];
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		       _PG_gattrs.axis_label_y_format,
-		       troay, lroay, FALSE,
+		       troa[1], lroa[1], FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);
 
+/* right Y axis */
 	xl[0] = bnd[1];
 	xl[1] = bnd[2];
 	xr[0] = bnd[1];
 	xr[1] = bnd[3];
-	PG_draw_axis_n(dev, xl, xr,
-		       0.0, 1.0, bnd[2], bnd[3], 1.0,
+	tn[0] = 0.0;
+	tn[1] = 1.0;
+	vw[0] = bnd[2];
+	vw[1] = bnd[3];
+	PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		       _PG_gattrs.axis_label_y_format,
-		       troay, AXIS_TICK_NONE, FALSE,
+		       troa[1], AXIS_TICK_NONE, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_MINOR, 0);};
 
     _PG_gattrs.axis_n_minor_ticks = nt;
@@ -317,29 +348,32 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 static void _PG_draw_insel_axes(PG_device *dev, int labl)
    {int ndim;
     double xsep, xp1, xp2, scale;
-    double wxextent, wyextent;
+    double tn[2], vw[2], wext[2];
     double bnd[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
 
 /* get window and viewport limits */
     PG_get_viewspace(dev, BOUNDC, bnd);
 
-    wxextent = bnd[1] - bnd[0];
-    wyextent = bnd[3] - bnd[2];
+    wext[0] = bnd[1] - bnd[0];
+    wext[1] = bnd[3] - bnd[2];
 
     ndim  = 2;
-    xsep  = wxextent/((double) (++ndim));
+    xsep  = wext[0]/((double) (++ndim));
     xp1   = bnd[0] + xsep;
     xp2   = bnd[0] + 2.0*xsep;
-    scale = wyextent/wxextent;
+    scale = wext[1]/wext[0];
 
 /* draw the axis lines */
     xl[0] = xp1;
     xl[1] = bnd[2];
     xr[0] = xp1;
     xr[1] = bnd[3];
-    PG_draw_axis_n(dev, xl, xr,
-		   0.0, 1.0, bnd[0], bnd[1], scale,
+    tn[0] = 0.0;
+    tn[1] = 1.0;
+    vw[0] = bnd[0];
+    vw[1] = bnd[1];
+    PG_draw_axis_n(dev, xl, xr, tn, vw, scale,
 		   _PG_gattrs.axis_label_x_format,
 		   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 		   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);
@@ -348,8 +382,11 @@ static void _PG_draw_insel_axes(PG_device *dev, int labl)
     xl[1] = bnd[2];
     xr[0] = xp2;
     xr[1] = bnd[3];
-    PG_draw_axis_n(dev, xl, xr,
-		   0.0, 1.0, bnd[2], bnd[3], 1.0,
+    tn[0] = 0.0;
+    tn[1] = 1.0;
+    vw[0] = bnd[2];
+    vw[1] = bnd[3];
+    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 		   _PG_gattrs.axis_label_y_format,
 		   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 		   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);
@@ -362,7 +399,8 @@ static void _PG_draw_insel_axes(PG_device *dev, int labl)
 /* _PG_DRAW_POLAR_AXIS - do work of drawing a set of polar axes */
 
 static void _PG_draw_polar_axes(PG_device *dev, int labl)
-   {double bnd[PG_BOXSZ];
+   {double tn[2], vw[2];
+    double bnd[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_axis_def *ad;
 
@@ -378,8 +416,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = 0.0;
 	    xr[0] = bnd[1];
 	    xr[1] = 0.0;
-	    PG_draw_axis_n(dev, xl, xr,
-			   0.0, 1.0, bnd[0], bnd[1], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[0];
+	    vw[1] = bnd[1];
+	    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			   _PG_gattrs.axis_label_x_format,
 			   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 			   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);}
@@ -390,8 +431,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = bnd[2];
 	    xr[0] = bnd[1];
 	    xr[1] = bnd[2];
-	    PG_draw_axis_n(dev, xl, xr,
-			   0.0, 1.0, bnd[0], bnd[1], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[0];
+	    vw[1] = bnd[1];
+	    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			   _PG_gattrs.axis_label_x_format,
 			   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 			   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);};
@@ -402,8 +446,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = bnd[2];
 	    xr[0] = 0.0;
 	    xr[1] = bnd[3];
-	    ad = PG_draw_axis_n(dev, xl, xr,
-				0.0, 1.0, bnd[2], bnd[3], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[2];
+	    vw[1] = bnd[3];
+	    ad = PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 				_PG_gattrs.axis_label_y_format,
 				AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, TRUE,
 				AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);}
@@ -414,8 +461,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = bnd[2];
 	    xr[0] = bnd[0];
 	    xr[1] = bnd[3];
-	    ad = PG_draw_axis_n(dev, xl, xr,
-				0.0, 1.0, bnd[2], bnd[3], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[2];
+	    vw[1] = bnd[3];
+	    ad = PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 				_PG_gattrs.axis_label_y_format,
 				AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, TRUE,
 				AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);};
@@ -435,8 +485,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = 0.0;
 	    xr[0] = bnd[1];
 	    xr[1] = 0.0;
-	    PG_draw_axis_n(dev, xl, xr,
-			   0.0, 1.0, bnd[0], bnd[1], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[0];
+	    vw[1] = bnd[1];
+	    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			   _PG_gattrs.axis_label_x_format,
 			   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 			   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);}
@@ -447,8 +500,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = bnd[2];
 	    xr[0] = bnd[1];
 	    xr[1] = bnd[2];
-	    PG_draw_axis_n(dev, xl, xr,
-			   0.0, 1.0, bnd[0], bnd[1], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[0];
+	    vw[1] = bnd[1];
+	    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			   _PG_gattrs.axis_label_x_format,
 			   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 			   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);};
@@ -459,8 +515,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = bnd[2];
 	    xr[0] = 0.0;
 	    xr[1] = bnd[3];
-	    PG_draw_axis_n(dev, xl, xr,
-			   0.0, 1.0, bnd[2], bnd[3], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[2];
+	    vw[1] = bnd[3];
+	    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			   _PG_gattrs.axis_label_y_format,
 			   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 			   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);}
@@ -471,8 +530,11 @@ static void _PG_draw_polar_axes(PG_device *dev, int labl)
 	    xl[1] = bnd[2];
 	    xr[0] = bnd[0];
 	    xr[1] = bnd[3];
-	    PG_draw_axis_n(dev, xl, xr,
-			   0.0, 1.0, bnd[2], bnd[3], 1.0,
+	    tn[0] = 0.0;
+	    tn[1] = 1.0;
+	    vw[0] = bnd[2];
+	    vw[1] = bnd[3];
+	    PG_draw_axis_n(dev, xl, xr, tn, vw, 1.0,
 			   _PG_gattrs.axis_label_y_format,
 			   AXIS_TICK_STRADDLE, AXIS_TICK_ENDS, FALSE,
 			   AXIS_TICK_MAJOR | AXIS_TICK_MINOR | labl, 0);};};
@@ -597,7 +659,7 @@ void PG_axis(PG_device *dev, int axis_type)
 
 int PG_set_axis_attributes(PG_device *dev, ...)
    {int type, linecolor, txtcolor, prec;
-    double charspace, chupx, chupy, chpthx, chpthy;
+    double charspace, chup[2], chpth[2];
 
 /* load default values for external variables */
     if (dev != NULL)
@@ -621,11 +683,11 @@ int PG_set_axis_attributes(PG_device *dev, ...)
        _PG_gattrs.axis_type_face = SC_strsavef("helvetica",
 					       "PERM|char*:PG_SET_AXIS_ATTRIBUTES:type_face");
 
-    charspace    = 0.0;
-    chpthx       = 1.0;
-    chpthy       = 0.0;
-    chupx        = 0.0;
-    chupy        = 1.0;
+    charspace = 0.0;
+    chpth[0]  = 1.0;
+    chpth[1]  = 0.0;
+    chup[0]   = 0.0;
+    chup[1]   = 1.0;
 
     _PG_gattrs.axis_grid_on = FALSE;
 
@@ -691,18 +753,18 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 
     SC_VA_END;
 
-    chpthx = cos(_PG_gattrs.axis_char_angle);
-    chpthy = sin(_PG_gattrs.axis_char_angle);
-    chupx  = -chpthy;
-    chupy  =  chpthx;
+    chpth[0] = cos(_PG_gattrs.axis_char_angle);
+    chpth[1] = sin(_PG_gattrs.axis_char_angle);
+    chup[0]  = -chpth[1];
+    chup[1]  =  chpth[0];
 
 /* set attribute values */
     PG_set_clipping(dev, FALSE);
     PG_set_color_text(dev, txtcolor, TRUE);
     PG_set_font(dev, _PG_gattrs.axis_type_face, dev->type_style, dev->type_size);
     PG_set_char_precision(dev, prec);
-    PG_set_char_path(dev, chpthx, chpthy);
-    PG_set_char_up(dev, chupx, chupy);
+    PG_set_char_path(dev, chpth[0], chpth[1]);
+    PG_set_char_up(dev, chup[0], chup[1]);
     PG_set_char_space(dev, charspace);
     PG_set_color_line(dev, linecolor, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
@@ -721,7 +783,7 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 
 static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
    {int n;
-    double st, en, csa, sna, log_scale;
+    double en[2], csa, sna, log_scale;
     double x1[PG_SPACEDM], x2[PG_SPACEDM], x3[PG_SPACEDM], x4[PG_SPACEDM];
     double xa[PG_SPACEDM], xb[PG_SPACEDM], xs[PG_SPACEDM], sx[PG_SPACEDM];
     double fdx[PG_SPACEDM];
@@ -735,11 +797,10 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
     g = &dev->g;
 
     td = ad->tick + (tick >> 1);
-
-    st = td->start;
-    en = td->end;
     n  = td->n;
     dx = td->dx;
+    en[0] = td->en[0];
+    en[1] = td->en[1];
 
     xs[0] = ad->x0[0];
     xs[1] = ad->x0[1];
@@ -749,10 +810,10 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
     sna = ad->sina;
 
 /* compute the actual point on the axis of the first and last tick */
-    xa[0] = xs[0] + st*csa*sx[0];
-    xa[1] = xs[1] + st*sna*sx[1];
-    xb[0] = xs[0] + en*csa*sx[0];
-    xb[1] = xs[1] + en*sna*sx[1];
+    xa[0] = xs[0] + en[0]*csa*sx[0];
+    xa[1] = xs[1] + en[0]*sna*sx[1];
+    xb[0] = xs[0] + en[1]*csa*sx[0];
+    xb[1] = xs[1] + en[1]*sna*sx[1];
 
     log_scale = _PG_axis_place(dev, fdx, ad, sz, tick);
 
@@ -766,7 +827,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 	     x4[0] = xb[0];
 	     x4[1] = xb[1];
 	     if (g->iflog[0])
-	        {if (((ABS(xs[0]) - ABS(en)) == 0.0) && (xb[0] == 0.0))
+	        {if (((ABS(xs[0]) - ABS(en[1])) == 0.0) && (xb[0] == 0.0))
 		    x4[0] = x2[0]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[0] = x2[0]/fdx[0];
 		 x3[0] = x4[0]/fdx[0];}
@@ -776,7 +837,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 		 x3[0] = x4[0] - fdx[0];};
 
 	     if (g->iflog[1])
-	        {if (((ABS(xs[1]) - ABS(en)) == 0.0) && (xb[1] == 0.0))
+	        {if (((ABS(xs[1]) - ABS(en[1])) == 0.0) && (xb[1] == 0.0))
 		    x4[1] = x2[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[1] = x2[1]*fdx[1];
 		 x3[1] = x4[1]*fdx[1];}
@@ -793,7 +854,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 	     x3[0] = xb[0];
 	     x3[1] = xb[1];
 	     if (g->iflog[0])
-	        {if (((ABS(xs[0]) - ABS(en)) == 0.0) && (xb[0] == 0.0))
+	        {if (((ABS(xs[0]) - ABS(en[1])) == 0.0) && (xb[0] == 0.0))
 		    x3[0] = x1[0]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x2[0] = x1[0]*fdx[0];
 		 x4[0] = x3[0]*fdx[0];}
@@ -803,7 +864,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 		 x4[0] = x3[0] + fdx[0];};
 
 	     if (g->iflog[1])
-	        {if (((ABS(xs[1]) - ABS(en)) == 0.0) && (xb[1] == 0.0))
+	        {if (((ABS(xs[1]) - ABS(en[1])) == 0.0) && (xb[1] == 0.0))
 		    x3[1] = x1[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x2[1] = x1[1]/fdx[1];
 		 x4[1] = x3[1]/fdx[1];}
@@ -816,7 +877,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 
         case AXIS_TICK_STRADDLE :
 	     if (g->iflog[0])
-	        {if (((ABS(xs[0]) - ABS(en)) == 0.0) && (xb[0] == 0.0))
+	        {if (((ABS(xs[0]) - ABS(en[1])) == 0.0) && (xb[0] == 0.0))
 		    xb[0] = xa[0]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[0] = xa[0]/fdx[0];
 		 x2[0] = xa[0]*fdx[0];
@@ -830,7 +891,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
 		 x4[0] = xb[0] + fdx[0];}
 
 	     if (g->iflog[1])
-	        {if (((ABS(xs[1]) - ABS(en)) == 0.0) && (xb[1] == 0.0))
+	        {if (((ABS(xs[1]) - ABS(en[1])) == 0.0) && (xb[1] == 0.0))
 		    xb[1] = xa[1]*POW(10.0, -_PG_gattrs.axis_n_decades);
 		 x1[1] = xa[1]*fdx[1];
 		 x2[1] = xa[1]/fdx[1];
@@ -892,9 +953,9 @@ static void _PG_axis_label_fmt(PG_device *dev,
 			       double *ptol, char *fmt,
 			       PG_axis_tick_def *td)
    {int i, n, ti;
-    double vn, vx, tol, yo;
-    double st, en, sp, ls, db, dv;
-    double ldx, ldy, tdx[PG_SPACEDM];
+    double tol, yo, sp, ls, db, dv;
+    double en[2], vo[2];
+    double ld[PG_SPACEDM], tdx[PG_SPACEDM];
     double *dx;
     char s[20], fc;
     PG_dev_geometry *g;
@@ -903,20 +964,20 @@ static void _PG_axis_label_fmt(PG_device *dev,
 
     strcpy(format, fmt);
 
-    st = td->start;
-    en = td->end;
     sp = td->space;
-    vn = td->vn;
-    vx = td->vx;
     dx = td->dx;
     n  = td->n;
+    en[0] = td->en[0];
+    en[1] = td->en[1];
+    vo[0] = td->vo[0];
+    vo[1] = td->vo[1];
     if (g->iflog[0] || g->iflog[1])
        tol = 0.0;
     else
-       tol = 1.0e-6*ABS(vx - vn);
+       tol = 1.0e-6*ABS(vo[1] - vo[0]);
 
 /* determine whether to use 'e' or 'f' format */
-    yo = max(ABS(st), ABS(en));
+    yo = max(ABS(en[0]), ABS(en[1]));
     ti = strlen(format) - 1;
     ti = max(ti, 0);
     fc = format[ti];
@@ -927,19 +988,19 @@ static void _PG_axis_label_fmt(PG_device *dev,
            format[ti] = 'f';};
 
 /* find the maximum label size */
-    ldx = 0.0;
-    ldy = 0.0;
-    dv  = vx - vn;
+    ld[0] = 0.0;
+    ld[1] = 0.0;
+    dv  = vo[1] - vo[0];
     for (i = 0; i < n; i++)
         {db = dx[i];
-         ls = vn + db*dv;
+         ls = vo[0] + db*dv;
 	 _PG_sprintf(s, format, ls, tol);
          PG_get_text_ext_n(dev, 2, WORLDC, s, tdx);
-         ldx = max(ldx, tdx[0]);
-         ldy = max(ldy, tdx[1]);};
+         ld[0] = max(ld[0], tdx[0]);
+         ld[1] = max(ld[1], tdx[1]);};
 
-    *pdx  = ldx;
-    *pdy  = ldy;
+    *pdx  = ld[0];
+    *pdy  = ld[1];
     *ptol = tol;
 
     return;}
@@ -991,8 +1052,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
    {int i, id, l, lt, n, inc, sz;
     int ovlp[PG_SPACEDM];
     double Dr, rmx, idm;
-    double sp, st, en, ls, va, vb, dv, sv, db, tol;
-    double log_scale;
+    double sp, ls, dv, sv, db, tol, log_scale;
+    double en[2], vo[2];
     double ldx[PG_SPACEDM], xs[PG_SPACEDM], sx[PG_SPACEDM];
     double fdx[PG_SPACEDM], fx[PG_SPACEDM], dx0[PG_SPACEDM];
     double xa[PG_SPACEDM], xb[PG_SPACEDM], xp[PG_SPACEDM];
@@ -1011,8 +1072,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
     td = ad->tick + (AXIS_TICK_LABEL >> 1);
 
-    st = td->start;
-    en = td->end;
+    en[0] = td->en[0];
+    en[1] = td->en[1];
     n  = td->n;
     dx = td->dx;
 
@@ -1025,8 +1086,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
 /* compute the actual point on the axis of the first and last tick */
     for (id = 0; id < 2; id++)
-        {xa[id] = xs[id] + ABS(st)*ac[id]*sx[id];
-	 xb[id] = xs[id] + ABS(en)*ac[id]*sx[id];};
+        {xa[id] = xs[id] + ABS(en[0])*ac[id]*sx[id];
+	 xb[id] = xs[id] + ABS(en[1])*ac[id]*sx[id];};
 
     log_scale = _PG_axis_place(dev, fdx, ad, 0.0, AXIS_TICK_LABEL);
 
@@ -1042,7 +1103,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
     switch (lt)
        {case AXIS_TICK_LEFT :
 	     for (id = 0; id < 2; id++)
-	         dx0[id] = (en - st)*ac[id]*sx[id];
+	         dx0[id] = (en[1] - en[0])*ac[id]*sx[id];
 
              if (g->iflog[0])
                 {xa[0] /= fdx[0];
@@ -1064,7 +1125,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
         case AXIS_TICK_RIGHT :
 	     for (id = 0; id < 2; id++)
-	         dx0[id] = (en - st)*ac[id]*sx[id];
+	         dx0[id] = (en[1] - en[0])*ac[id]*sx[id];
 
              if (g->iflog[0])
                 {xa[0] *= fdx[0];
@@ -1085,7 +1146,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
              break;
 
         case AXIS_TICK_ENDS :
-             sp = ad->vx - ad->vn;
+             sp = ad->vo[1] - ad->vo[0];
 
 	     for (id = 0; id < 2; id++)
 	         xa[id] = 0.015*sp*ac[id]*sx[id];
@@ -1116,8 +1177,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
              return(FALSE);};
 
 /* draw the labels (always low to high - for numerics to come out right) */
-    va = td->vn;
-    vb = td->vx;
+    vo[0] = td->vo[0];
+    vo[1] = td->vo[1];
 
 /* set the axis type size now */
     if (_PG_gattrs.axis_char_size >= 8)
@@ -1127,21 +1188,21 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 /* if the labels cannot be distinguished because of the precision
  * try a different tack
  */
-    dv = ABS(vb - va);
-    sv = ABS(va) + ABS(vb);
+    dv = ABS(vo[1] - vo[0]);
+    sv = ABS(vo[0]) + ABS(vo[1]);
 
 /* treat the first label specially because of the possible '~' or '>' */
     db = dx[0];
     for (id = 0; id < 2; id++)
         xp[id] = xa[id] + db*dx0[id];
 
-    ls = va + db*dv;
+    ls = vo[0] + db*dv;
     fc = FALSE;
     if (dv < 0.001*sv)
-       {snprintf(s, 20, format, va);
-        snprintf(t, 20, format, va + dx[1]*dv);
+       {snprintf(s, 20, format, vo[0]);
+        snprintf(t, 20, format, vo[0] + dx[1]*dv);
         fc = (strcmp(s, t) == 0) ? '~' : '>';
-	va = 0.0;};
+	vo[0] = 0.0;};
 
     _PG_write_label(dev, format, xp, ls, tol, fx, fc);
 
@@ -1150,7 +1211,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
         {db = dx[i];
 	 for (id = 0; id < 2; id++)
 	     xs[id] = xa[id] + db*dx0[id];
-         ls = va + db*dv;
+         ls = vo[0] + db*dv;
 
 /* skip over labels that would overlap with the last one printed */
 	 if (g->iflog[0])
@@ -1191,13 +1252,14 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
  *                - this routine will produce labels and
  *                - ticks or just ticks, depending on the arguments.
  *                -
- *                -    XL         - coordinate of beginning end
- *                -    XR         - coordinate of terminating end
- *                -    (t1, t2)   - fractional position of v1 and v2
- *                -    (v1, v2)   - first and last tick or label value
- *                -               - internally (v1, v2) are ordered into
- *                -               - (vn, vx) and the order of (t1, t2)
- *                -               - changed if needed
+ *                -    XL         - world coordinate of beginning end
+ *                -    XR         - world coordinate of terminating end
+ *                -    TN         - fractional position of v1 and v2 along axis
+ *                -               - i.e. normalized coordinates wrt (XL, XR)
+ *                -    VW         - first and last tick or label value
+ *                -               - internally VW are ordered into VO and
+ *                -               - the order of TN changed if needed
+ *                -               - VW are world coordinate values
  *                -    sc         - an additional scale factor which is
  *                -                 used, for example, when doing an
  *                -                 Inselberg axis in which the range may
@@ -1205,40 +1267,40 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
  *                -                 the perpendicular dimension
  *                -    format     - specifies the format in the standard C way
  *                -    tick_type  - types of ticks
- *                -                 AXIS_TICK_RIGHT - ticks on right
- *                -                 AXIS_TICK_LEFT  - ticks on left
+ *                -                 AXIS_TICK_RIGHT    - ticks on right
+ *                -                 AXIS_TICK_LEFT     - ticks on left
  *                -                 AXIS_TICK_STRADDLE - ticks straddle (both)
  *                -    label_type - types of labels
- *                -                 AXIS_TICK_RIGHT   - labels on right
- *                -                 AXIS_TICK_LEFT    - labels on left
- *                -                 AXIS_TICK_NONE - no labels
- *                -                 AXIS_TICK_ENDS            - labels at ends of axis
+ *                -                 AXIS_TICK_RIGHT - labels on right
+ *                -                 AXIS_TICK_LEFT  - labels on left
+ *                -                 AXIS_TICK_NONE  - no labels
+ *                -                 AXIS_TICK_ENDS  - labels at ends of axis
  *                -    tickdef    - specifies the labels and ticks
  *                -                 AXIS_TICK_MAJOR - major ticks
  *                -                 AXIS_TICK_MINOR - minor ticks
  *                -                 AXIS_TICK_LABEL - labels
  *                -
  *                - An axis is a directed line segment (from Xl to Xr) with ticks
- *                - The label values as defined by v1, v2, t1, t2, and ticks
+ *                - The label values as defined by VW, TN, and ticks
  *                - associate with the line segment as follows:
  *                -
- *                -  (xl, yl)                                 (xr, yr)
- *                -     .------------------------------------------>
- *                -       |                                      |
- *                -   st <-> v1 = v(t1)                      en <-> v2 = v(t2)
+ *                -      XL                                       XR
+ *                -      .------------------------------------------>
+ *                -        |                                      |
+ *                - en[0] <-> vw[0] = v(tn[0])             en[1] <-> vw[1] = v(tn[1])
  *                -   
- *                - where st and en are magnitudes only (rotations done by theta)
- *                - st and en cannot be magnitudes because the interval (-1, 1)
- *                - would have st = en
+ *                - (rotations done by theta)
+ *                - EN cannot be magnitudes only because the interval (-1, 1)
+ *                - would have en[0] = en[1]
  *                - This is independent of tick type!
  */
 
 PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
-			    double t1, double t2, double v1, double v2, double sc,
+			    double *tn, double *vw, double sc,
 			    char *format, int tick_type, int label_type,
 			    int flag, ...)
    {int tickdef, fx[PG_SPACEDM];
-    double vn, vx, minorsz, majorsz;
+    double vo[2], minorsz, majorsz;
     double bnd[PG_BOXSZ];
     PG_axis_def *ad;
     PG_dev_geometry *g;
@@ -1255,28 +1317,28 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
  * it would require shifting the log space handling from the coordinate
  * system to the individual drawing operations
  */
-    fx[0] = (((xl[0] < xr[0]) ^ (v1 < v2)) &&
+    fx[0] = (((xl[0] < xr[0]) ^ (vw[0] < vw[1])) &&
 	     (xl[0] != xr[0]) && (g->iflog[0] == TRUE));
-    fx[1] = (((xl[1] < xr[1]) ^ (v1 < v2)) &&
+    fx[1] = (((xl[1] < xr[1]) ^ (vw[0] < vw[1])) &&
 	     (xl[1] != xr[1]) && (g->iflog[1] == TRUE));
     if ((fx[0] == TRUE) || (fx[1] == TRUE))
        return(ad);
 
     if ((dev != NULL) && (_PG_gattrs.axis_on == TRUE))
-       {if (v1 == v2)
-	   {v2 += SMALL;
-	    v1 -= SMALL;};
+       {if (vw[0] == vw[1])
+	   {vw[1] += SMALL;
+	    vw[0] -= SMALL;};
 
-/* internally keep the (V1, V2) ordered as (VN, VX) - min to max
+/* internally keep the VW ordered as (VO[0], VO[1]) - min to max
  * for clarity and to minimize operations
  * then the tick spacing array DX can always be simply increasing
- * have the (T1, T2) interval change to absorb any swap
+ * have the TN interval change to absorb any swap
  */
-	vn = v1;
-	vx = v2;
-	if (vn > vx)
-	   {SC_SWAP_VALUE(double, t1, t2);
-	    SC_SWAP_VALUE(double, vn, vx);};
+	vo[0] = vw[0];
+	vo[1] = vw[1];
+	if (vo[0] > vo[1])
+	   {SC_SWAP_VALUE(double, tn[0], tn[1]);
+	    SC_SWAP_VALUE(double, vo[0], vo[1]);};
 
 	PG_set_color_line(dev, dev->line_color, TRUE);
 	PG_draw_line_n(dev, 2, WORLDC, xl, xr, dev->clipping);
@@ -1284,7 +1346,7 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
 	PG_get_viewspace(dev, BOUNDC, bnd);
 
 	ad = _PG_mk_axis_def(_PG_gattrs.axis_type, tick_type, label_type,
-			     xl, xr, t1, t2, vn, vx, sc, g->iflog);
+			     xl, xr, tn, vo, sc, g->iflog);
 
 	majorsz = _PG_gattrs.axis_major_tick_size*dev->g.phys_width;
 	minorsz = majorsz/2.0;

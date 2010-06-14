@@ -473,8 +473,7 @@ extern void
 
 extern PG_axis_def
  *_PG_mk_axis_def(int atype, int ttype, int ltype, double *xl, double *xr,
-		  double t1, double t2, double vn, double vx,
-		  double as, int *iflg);
+		  double *tn, double *vo, double as, int *iflg);
 
 extern double
  _PG_axis_place(PG_device *dev, double *dx,

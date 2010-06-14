@@ -3432,8 +3432,7 @@ and zmx.<p>
 <p>
 
 <I>C Binding: </I>PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, 
-double *xr, double t1, double t2, double v1, 
-double v2, double sc, char *format, int tick_type, int 
+double *xr, double *tn, double *vw, double sc, char *format, int tick_type, int 
 label_type, int flag, ...)
 <BR><I>F77 Binding: </I>integer pgdrax(integer devid, REAL xl, REAL yl, REAL xr, REAL yr, 
 REAL t1, REAL t2, REAL v1, REAL v2, REAL sc, 

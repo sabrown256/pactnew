@@ -398,15 +398,20 @@ PG_axis_def *PG_draw_axis(PG_device *dev, double x1, double y1,
 			  double sc, char *format,
 			  int tick_type, int label_type,
 			  int flag)
-   {double xl[PG_SPACEDM], xr[PG_SPACEDM];
+   {double tn[2], vw[2];
+    double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_axis_def *ad;
 
     xl[0] = x1;
     xl[1] = y1;
     xr[0] = x2;
     xr[1] = y2;
+    tn[0] = t1;
+    tn[1] = t2;
+    vw[0] = v1;
+    vw[1] = v2;
 
-    ad = PG_draw_axis_n(dev, xl, xr, t1, t2, v1, v2, sc, format,
+    ad = PG_draw_axis_n(dev, xl, xr, tn, vw, sc, format,
 			tick_type, label_type, flag, 0);
 
     return(ad);}

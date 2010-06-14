@@ -406,6 +406,7 @@ FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
                                 FIXNUM *ptd, FIXNUM *ptt, FIXNUM *plt)
    {int td;
     FIXNUM rv;
+    double tn[2], vw[2];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     char lformat[MAXLINE];
     PG_device *dev;
@@ -420,9 +421,12 @@ FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
     xl[1] = *pyl;
     xr[0] = *pxr;
     xr[1] = *pyr;
+    tn[0] = *pt1;
+    tn[1] = *pt2;
+    vw[0] = *pv1;
+    vw[1] = *pv2;
 
-    PG_draw_axis_n(dev, xl, xr,
-		   *pt1, *pt2, *pv1, *pv2, *psc, lformat,
+    PG_draw_axis_n(dev, xl, xr, tn, vw, *psc, lformat,
 		   (int) *ptt, (int) *plt, FALSE,
 		   td, 0);
 
