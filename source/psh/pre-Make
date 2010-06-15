@@ -26,7 +26,7 @@ InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
              ${BinDir}/smake
 
-CcFlags = ${CDebug}
+CcFlags = ${CDebug} ${LDRPath}
 PCC     = ${CCSer}
 #PCC     = cc -g
 

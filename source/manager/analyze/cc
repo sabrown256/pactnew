@@ -164,7 +164,11 @@ set ccopt = ( $ccopt $Cfe_CC_Flags $lrpath )
 # now lets look at this compiler
 if ($Cfg_CC_Exe != "") then
 
-# check the compiler version
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILER VERSION - check the compiler version
+
    Note $ALog ""
    Note $ALog "Check the version of the C compiler"
    Note $ALog "   PATH = $PATH"
@@ -223,7 +227,11 @@ if ($Cfg_CC_Exe != "") then
    endif
    Note $ALog ""
 
-# check the relative size of Fortran integer and pointer
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FORTRAN INTEGER - check the relative size of Fortran integer and pointer
+
    Note $ALog "Determine whether a FORTRAN integer can hold a pointer"
    cat << EOF >! $Tmp.c
 #include <stdio.h>
@@ -248,7 +256,15 @@ EOF
    endif
    Note $ALog ""
 
-# look at size of long
+   if ("$F77IntPtrDiffer" != "") then
+      NoteD $ALog "      pointer size differs from Fortran INTEGER size"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SIZEOF LONG - look at size of long
+
    Note $ALog "Determine whether long is 64 bits"
    cat << EOF >! $Tmp.c
 #include <stdio.h>
@@ -275,7 +291,11 @@ EOF
 
    flog $ALog rm -f $Tmp.c $Tmp $Tmp.o
 
-# look at size of size_t
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SIZEOF SIZE_T - look at size of size_t
+
    Note $ALog "Determine whether size_t is 64 bits"
    cat << EOF >! $Tmp.c
 #include <stdio.h>
@@ -302,9 +322,47 @@ EOF
 
    flog $ALog rm -f $Tmp.c $Tmp $Tmp.o
 
-   if ("$F77IntPtrDiffer" != "") then
-      NoteD $ALog "      pointer size differs from Fortran INTEGER size"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# OSX ARCH - check for -arch flag
+
+   if ("$HostOS" == Darwin) then
+
+      Note $ALog "Determine whether -arch flag is needed on GCC/OSX"
+      cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{int rv;
+#ifdef __GNUC__
+ printf("ok\n");
+ rv = 0;
+#else
+ printf("ng\n");
+ rv = 1;
+#endif
+ return(rv);}
+EOF
+
+      set hw = `uname -m`
+      flog $ALog $Cfe_CC_Exe -arch $hw $Tmp.c -o $Tmp $ccopt
+      if ($status == 0) then
+         flog $ALog $Tmp
+         if ($status == 0) then
+            setenv CC_Flags     "$CC_Flags -arch $hw"               
+            setenv Cfg_CC_Flags "$Cfg_CC_Flags -arch $hw"               
+            setenv Cfe_CC_Flags "$Cfe_CC_Flags -arch $hw"               
+            NoteD $ALog "      adding -arch $hw"
+         endif
+      endif
+      unset hw
+      Note $ALog ""
+
+      flog $ALog rm -f $Tmp.c $Tmp $Tmp.o
    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
    set ETime = `timer -b $UTime`
 

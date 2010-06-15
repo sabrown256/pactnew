@@ -501,6 +501,7 @@ PrintRule:
 
     echo "$Rule" >> $STDOUT
 
+    echo '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }' >> $STDOUT
     printenv $Val |& grep "\\t" >>& /dev/null
     if ($status == 0) then
        set STDAUX = tmp-$System
