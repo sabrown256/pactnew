@@ -21,6 +21,11 @@ source $ldir/env-csh
 
 set LibVers = 1
 
+# GOTCHA: several of the lock tests come too late to prevent certain
+# kinds of damage to public installs
+# the structure of the targets would have to be changed to prevent
+# any damage
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -47,6 +52,7 @@ set LibVers = 1
        Note $STDOUT ''
 
        Note $STDOUT '${TGTShLib} : ${TGTLib}'
+       Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
        Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
        Note $STDOUT '	  ${RM} ${TGTSLib} $@ ; \'
        Note $STDOUT '	  ${AR} ${ARXOpt} ${TGTLib} ; \'
@@ -57,6 +63,7 @@ set LibVers = 1
        Note $STDOUT ''
 
        Note $STDOUT 'shared :'
+       Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
        Note $STDOUT '	pact install'
        Note $STDOUT '	@[ "${LibName}" != "noname" ] && { pact ${TGTShLib} ; } || { exit 0 ; }'
        Note $STDOUT ''
@@ -70,6 +77,7 @@ set LibVers = 1
     Note $STDOUT '# make new library'
     Note $STDOUT '#'
     Note $STDOUT '${TGTLib} : ${LibDep}'
+    Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${LibAction}'
     if ("$BuildStrategy" != "SpaceSaving") then
        Note $STDOUT '	${AR} ${AROpt} ${TGTLib} ${Objs}'
@@ -98,6 +106,7 @@ set LibVers = 1
        else
           Note $STDOUT '${TGTBin} : ${BinDep}'
        endif
+       Note $STDOUT '	@[ ! -f ${BinDir}/.lock ] || { echo "${BinDir} is locked" ; exit 1 ; }'
        Note $STDOUT '	${BinAction}'
        Note $STDOUT '	@[ "${TGTBin}" != "nobin" ] && { echo "${Load} ${BinObj} -o ${TGTBin} ${Libs}" ; ${Load} ${BinObj} -o ${TGTBin} ${Libs} ; } || { exit 0 ; }'
     endif
@@ -111,6 +120,7 @@ set LibVers = 1
     else
        Note $STDOUT 'libinstall : ${TGTLib}'
     endif
+    Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${INSTALL} ${TGTLib} ${TGTLib}'
 
     if ("$UPDATE" != "touch") then
@@ -122,6 +132,7 @@ set LibVers = 1
     Note $STDOUT '# install library archive'
     Note $STDOUT '#'
     Note $STDOUT 'arcinstall : ${TGTLib}'
+    Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${AR} ${ARXOpt} ${TGTLib}'
     Note $STDOUT '	${AR} ${AROpt} ${LibDir}/${TGTArc} *.o'
     Note $STDOUT '	@${RM} *.o'
@@ -137,6 +148,7 @@ set LibVers = 1
     Note $STDOUT '# install includes'
     Note $STDOUT '#'
     Note $STDOUT 'incinstall : ${TGTInc}'
+    Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${IncAction}'
     Note $STDOUT '	@[ "${TGTInc}" != "noinc" ] && { echo "cp ${TGTInc} ${IncDir}" ; cp ${TGTInc} ${IncDir} ; } || { exit 0 ; }'
 #    Note $STDOUT '	cp ${TGTInc} ${IncDir}'
@@ -146,6 +158,7 @@ set LibVers = 1
     Note $STDOUT '# install binaries'
     Note $STDOUT '#'
     Note $STDOUT 'bininstall : ${TGTBin}'
+    Note $STDOUT '	@[ ! -f ${BinDir}/.lock ] || { echo "${BinDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	@[ "${TGTBin}" != "nobin" ] && { echo "cp ${TGTBin} ${BinDir}" ; cp ${TGTBin} ${BinDir} ; } || { exit 0 ; }'
 #    Note $STDOUT '	cp ${TGTBin} ${BinDir}'
     Note $STDOUT ""
@@ -154,6 +167,7 @@ set LibVers = 1
     Note $STDOUT '# install scheme files'
     Note $STDOUT '#'
     Note $STDOUT 'scminstall : ${TGTScm}'
+    Note $STDOUT '	@[ ! -f ${ScmDir}/.lock ] || { echo "${ScmDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	@[ "${TGTScm}" != "noscm" ] && { echo "cp ${TGTScm} ${ScmDir}" ; cp ${TGTScm} ${ScmDir} ; } || { exit 0 ; }'
 #    Note $STDOUT '	cp ${TGTScm} ${ScmDir}'
     Note $STDOUT ""
@@ -162,6 +176,7 @@ set LibVers = 1
     Note $STDOUT '# install (scheme) extensions files'
     Note $STDOUT '#'
     Note $STDOUT 'extinstall :'
+    Note $STDOUT '	@[ ! -f ${ExtDir}/.lock ] || { echo "${ExtDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	@[ "${TGTScmX}" != "noscmx" ] && { echo "cp ${TGTScmX} ${ExtDir}" ; cp ${TGTScmX} ${ExtDir} ; } || { exit 0 ; }'
     Note $STDOUT '	@[ "${TGTScrX}" != "noscrx" ] && { echo "cp ${TGTScrX} ${BinDir}" ; cp ${TGTScrX} ${BinDir} ; } || { exit 0 ; }'
     Note $STDOUT ""
@@ -170,6 +185,7 @@ set LibVers = 1
     Note $STDOUT '# install scripts'
     Note $STDOUT '#'
     Note $STDOUT 'scrinstall : ${TGTScr}'
+    Note $STDOUT '	@[ ! -f ${BinDir}/.lock ] || { echo "${BinDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	@[ "${TGTScr}" != "noscr" ] && { echo "cp ${TGTScr} ${BinDir}" ; cp ${TGTScr} ${BinDir} ; } || { exit 0 ; }'
 #    Note $STDOUT '	cp ${TGTScr} ${BinDir}'
     Note $STDOUT ""

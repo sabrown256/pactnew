@@ -18,8 +18,6 @@ setenv MPIGoodIO   TRUE
 Tool CC {
    Exe       = mpicc
    Flags     = -fsignaling-nans -ffloat-store
-   Flags    += [ _env_ = COMPILER_GNU_VERSION ; # stack checking
-                 4.3.* = -fstack-protector ]
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -m* ]
    Flags    += [ _cmd_ = -p ;                # profiling
