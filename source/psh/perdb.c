@@ -414,11 +414,11 @@ int main(int c, char **v)
 	    {nstrcat(req, MAXLINE, v[i]);
 	     nstrcat(req, MAXLINE, " ");};};
 
-    if (r[0] == '\0')
+    if (IS_NULL(r) == TRUE)
        {if (cdefenv("PERDB_PATH") == TRUE)
            nstrncpy(r, MAXLINE, cgetenv(TRUE, "PERDB_PATH"), -1);};
 
-    if (r[0] == '\0')
+    if (IS_NULL(r) == TRUE)
        snprintf(r, MAXLINE, "%s/.perdb", cgetenv(TRUE, "HOME"));
 
     full_path(root, MAXLINE, NULL, r);
@@ -427,7 +427,7 @@ int main(int c, char **v)
     if (srv == TRUE)
        rv = server(root, init, dmn);
 
-    else if (req[0] != '\0')
+    else if (IS_NULL(req) == FALSE)
       {LAST_CHAR(req) = '\0';
        rv = exchange(root, req);};
 

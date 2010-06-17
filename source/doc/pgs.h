@@ -2101,6 +2101,14 @@ theta equal to 90 degrees.<p>
 
 <p>
 
+<I>C Binding: </I>off_t PG_get_buffer_size(void)
+<BR><I>F77 Binding: </I>integer pgsbsz(integer sz)
+<BR><I>SX Binding: </I>(pg-get-buffer-size)
+<P>
+Get the I/O buffer size for graphics files.<p>
+
+<p>
+
 <I>C Binding: </I>void PG_get_clear_mode(int mode)
 <BR><I>F77 Binding: </I>integer pggclm(integer mode)
 <BR><I>SX Binding: </I>
@@ -2447,6 +2455,14 @@ to be plotted with a log scale if TRUE.<p>
 <BR><I>SX Binding: </I>(pg-set-border-width dev t)
 <P>
 Set the width of the window border in pixels.<p>
+
+<p>
+
+<I>C Binding: </I>void PG_set_buffer_size(off_t sz)
+<BR><I>F77 Binding: </I>integer pgsbsz(integer sz)
+<BR><I>SX Binding: </I>(pg-set-bbuffer-size! sz)
+<P>
+Set the I/O buffer size for graphics files.<p>
 
 <p>
 

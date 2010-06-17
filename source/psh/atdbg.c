@@ -70,7 +70,7 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
     al = MAKE_N(atproc, n);
 
 /* find the candidate process ids */
-    if ((st->exe[0] != '\0') && (st->spid > 0))
+    if ((IS_NULL(st->exe) == FALSE) && (st->spid > 0))
        {al        = MAKE_N(atproc, 2);
 	al[i].pid = st->spid;
 	nstrncpy(al[i].name, MAXLINE, st->exe, -1);
@@ -274,7 +274,7 @@ static int rsp_totalview(process *pp, char *t)
     if (ok == FALSE)
        {switch (gr->action)
 	   {case QTHREAD:
-                 if (t[0] != '\0')
+                 if (IS_NULL(t) == FALSE)
 		    nstrncpy(gr->result, MAXLINE, t, -1);
 	         break;
 
@@ -514,7 +514,7 @@ static int session(atdbgdes *st)
         exit(0);};
 
 /* open the log file if requested */
-    if (st->logname[0] != '\0')
+    if (IS_NULL(st->logname) == FALSE)
        {snprintf(fname, MAXLINE, "%s.%d", st->logname, getpid());
 	log = fopen(fname, "w");
 	if (log != NULL)
@@ -527,8 +527,8 @@ static int session(atdbgdes *st)
     if (st->mode == TRACE)
        snprintf(fname, MAXLINE, "/tmp/dbg.%d", getpid());
 
-    if ((st->pname[0] == '\0') &&
-        ((st->exe[0] != '\0') || (st->spid >= 0)))
+    if ((IS_NULL(st->pname) == TRUE) &&
+        ((IS_NULL(st->exe) == FALSE) || (st->spid >= 0)))
        snprintf(st->pname, MAXLINE, "%d", st->spid);
 
 /* make an array of process names */
@@ -625,7 +625,7 @@ static int init(atdbgdes *st)
            break;};
     ENDFOR;
 
-    if (st->dbg[0] == '\0')
+    if (IS_NULL(st->dbg) == TRUE)
        {printf("There is no recognized debugger - exiting\n");
         rv = FALSE;};
 

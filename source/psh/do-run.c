@@ -27,6 +27,8 @@
 #undef MAXLINE
 #define MAXLINE 512
 
+#define NO_STAT  0xffffff
+
 typedef struct s_rundes rundes;
 
 struct s_rundes
@@ -99,7 +101,7 @@ static void load_target(char *tgt, int nc, char *lst)
 static void init_dbg_target(rundes *st)
    {char clst[MAXLINE];
 
-    if (st->dbgtgt[0] == '\0')
+    if (IS_NULL(st->dbgtgt) == TRUE)
        {if (cdefenv("DO_RUN_DBG") == TRUE)
 	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "DO_RUN_DBG"), -1);
         else if (cdefenv("SC_DEBUGGER") == TRUE)
@@ -135,7 +137,7 @@ static void init_dbg(rundes *st)
 static void init_mpi_target(rundes *st)
    {char clst[MAXLINE];
 
-    if (st->mpitgt[0] == '\0')
+    if (IS_NULL(st->mpitgt) == TRUE)
        {if (cdefenv("DO_RUN_MPI") == TRUE)
 	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "DO_RUN_MPI"), -1);
         else
@@ -232,7 +234,7 @@ static void init_mpi(rundes *st)
 static void init_cross_target(rundes *st)
    {char clst[MAXLINE];
 
-    if (st->crosstgt[0] == '\0')
+    if (IS_NULL(st->crosstgt) == TRUE)
        {if (cdefenv("DO_RUN_CROSS") == TRUE)
 	   nstrncpy(clst, MAXLINE, cgetenv(TRUE, "DO_RUN_CROSS"), -1);
         else
@@ -385,7 +387,7 @@ static int check(rundes *st)
        {printf("No '%s' on your path\n", c);
 	rv = FALSE;};
 
-    if (st->sgn[0] == '\0')
+    if (IS_NULL(st->sgn) == TRUE)
        snprintf(st->sgn, MAXLINE, "%s/include/do-run-db",
                 path_head(st->bindir));
 
@@ -485,7 +487,7 @@ static char *eval_cond(rundes *st, int ok, char *expr, char *cons, char *alt)
    {static char val[MAXLINE];
 
 /* with a conditional expression */
-    if (expr[0] != '\0')
+    if (IS_NULL(expr) == FALSE)
        {if (ok == -1)
 	   {ok = eval_expr(st, expr);
 	    if (st->trace > 2)
@@ -635,10 +637,10 @@ static void parse_assgn(rundes *st, char *sect,
 
 /* handle ':' token */
        else if (tok[0] == ':')
-	  {if (expr[0] == '\0')
+	  {if (IS_NULL(expr) == TRUE)
 	      {synerr = TRUE;
 	       break;}
-	   else if (clause[0] == '\0')
+	   else if (IS_NULL(clause) == TRUE)
 	      {synerr = TRUE;
                break;}
 	   else
@@ -677,7 +679,7 @@ static void parse_assgn(rundes *st, char *sect,
 
 /* accumlate everything else into clause and unev as is */
        else
-	  {if (clause[0] == '\0')
+	  {if (IS_NULL(clause) == TRUE)
 	      {nstrncpy(clause, MAXLINE, tok, -1);
 	       nstrncpy(unev, MAXLINE, tok, -1);}
 	   else
@@ -694,13 +696,13 @@ static void parse_assgn(rundes *st, char *sect,
 	return;};
 
 /* use any left over tokens to fill an empty consequent */
-    if ((unev[0] != '\0') && (cons[0] == '\0'))
+    if ((IS_NULL(unev) == FALSE) && (IS_NULL(cons) == TRUE))
        {nstrncpy(cons, MAXLINE, unev, -1);
 	clause[0] = '\0';
 	unev[0]   = '\0';};
 
 /* use any left over tokens to fill an empty alternate */
-    if ((unev[0] != '\0') && (alt[0] == '\0'))
+    if ((IS_NULL(unev) == FALSE) && (IS_NULL(alt) == TRUE))
        {nstrncpy(alt, MAXLINE, unev, -1);
 	clause[0] = '\0';
 	unev[0]   = '\0';};
@@ -714,7 +716,7 @@ static void parse_assgn(rundes *st, char *sect,
     asgn = TRUE;
     if (strcmp(oper, "?=") == 0)
        {ldef = cgetenv(TRUE, effvar);
-	if (ldef[0] != '\0')
+	if (IS_NULL(ldef) == FALSE)
 	   asgn = FALSE;};
 
 /* carry out the specified action (see tests/run.s3 for possibilities) */
@@ -741,7 +743,7 @@ static int set_target(rundes *st)
  *       they were specified on the command line
  *       and that must win
  */
-    if (st->sgn[0] != '\0')
+    if (IS_NULL(st->sgn) == FALSE)
        {fp = fopen(st->sgn, "r");
 
 	for (i = 0; TRUE; i++)
@@ -759,13 +761,13 @@ static int set_target(rundes *st)
 	        {cat = strtok(NULL, " \t");
 		 lst = strtok(NULL, "\n");
 
-		 if ((strcmp(cat, "DBG") == 0) && (st->dbgtgt[0] == '\0'))
+		 if ((strcmp(cat, "DBG") == 0) && (IS_NULL(st->dbgtgt) == TRUE))
 		    load_target(st->dbgtgt, MAXLINE, lst);
 
-		 else if ((strcmp(cat, "MPI") == 0) && (st->mpitgt[0] == '\0'))
+		 else if ((strcmp(cat, "MPI") == 0) && (IS_NULL(st->mpitgt) == TRUE))
 		    load_target(st->mpitgt, MAXLINE, lst);
 
-		 else if ((strcmp(cat, "CROSS") == 0) && (st->crosstgt[0] == '\0'))
+		 else if ((strcmp(cat, "CROSS") == 0) && (IS_NULL(st->crosstgt) == TRUE))
 		    load_target(st->crosstgt, MAXLINE, lst);};};
 
 	fclose(fp);};
@@ -793,7 +795,7 @@ static void parse_db(rundes *st)
     char *p, *var, *oper, *val, *exe;
     FILE *fp;
 
-    if (st->sgn[0] != '\0')
+    if (IS_NULL(st->sgn) == FALSE)
        {csetenv("DBG_Exe",     "");
 	csetenv("DBG_Flags",   "");
 	csetenv("DBG_Delim",   "");
@@ -953,7 +955,7 @@ static int setup_dbg(rundes *st)
 /* fix up the command line if there is no MPI front end */
     if (rv == TRUE) 
        {mpife = cgetenv(FALSE, "MPI_Exe");
-	if ((mpife == NULL) || (mpife[0] == '\0'))
+	if (IS_NULL(mpife) == TRUE)
 	   csetenv("Cmd", "$Wrap $DBG_Exe $DBG_Flags $Code $DBG_Delim $CArgs");};
 
    return(rv);}
@@ -1074,30 +1076,49 @@ static int run_interactive(rundes *st)
  */
 
 static int finish(rundes *st, int rv)
-   {int rsn, sts;
+   {int rsn, sts, iee, iei;
     char s[MAXLINE];
+    char *see, *sei;
 
 /* this is the right place to remove the AIX MPI hostfile */
     if (strcmp(st->os, "AIX") == 0)
        {snprintf(s, MAXLINE, ".dp-aix.%s.%d", st->host, getpid());
 	unlink(s);};
 
-    rsn = rv >> 8;
-    sts = rv & 0xff;
+    if (WIFEXITED(rv))
+       {sts = WEXITSTATUS(rv);
+	rsn = 0;}
+    else if (WIFSIGNALED(rv))
+       {sts = 0;
+	rsn = WTERMSIG(rv);}
+    else if (WIFSTOPPED(rv))
+       {sts = 0;
+	rsn = WSTOPSIG(rv);};
 
-/* this corresponds to a -1 exit status in a shell script */
-    if ((rsn == 0xff) && (rv == 0x100))
-       rsn = -1;
+    if (((strcmp(st->mpife, "srun") == 0) && (sts != 0)) ||
+	((strcmp(st->mpife, "salloc") == 0) && (sts != 0)))
+       {see = getenv("SLURM_EXIT_ERROR");
+	sei = getenv("SLURM_EXIT_IMMEDIATE");
 
-    else if (((strcmp(st->mpife, "prun") == 0) && (rsn == 126)) ||
-	     ((strcmp(st->mpife, "srun") == 0) && (rsn == 1)) ||
-	     ((strcmp(st->mpife, "salloc") == 0) && (rsn == 1)))
-       rsn = -1;
-/*
-    else if (rsn == 1)
-       rsn = -1;
-*/
-   return(rsn);}
+	if (IS_NULL(see))
+	   iee = NO_STAT;
+	else
+	   iee = atoi(see);
+
+	if (IS_NULL(sei))
+	   iei = NO_STAT;
+	else
+	   iei = atoi(sei);
+
+	if ((iee != NO_STAT) && (sts == iee))
+	   sts = -1;
+	else if ((iei != NO_STAT) && (sts == iei))
+	   sts = -1;}
+
+    else if ((strcmp(st->mpife, "prun") == 0) && (sts == 126))
+       sts = -1;
+
+   return(sts);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

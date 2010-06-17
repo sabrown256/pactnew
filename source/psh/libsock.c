@@ -59,7 +59,7 @@ static char *name_sock(char *root, int ch)
     if (root == NULL)
        root = cgetenv(TRUE, "PERDB_PATH");
 
-    if ((root == NULL) || (root[0] == '\0'))
+    if (IS_NULL(root) == TRUE)
        {hd = ".";
 	tl = "defdb";}
     else

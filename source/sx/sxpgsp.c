@@ -3080,6 +3080,39 @@ static object *_SXI_satst(object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GBFSZ - wrapper for PG_get_buffer_size */
+
+static object *_SXI_gbfsz(void)
+   {object *rv;
+    off_t sz;
+
+    sz = PG_get_buffer_size();
+    rv = SS_mk_integer(sz);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SBFSZ - wrapper for PG_set_buffer_size */
+
+static object *_SXI_sbfsz(object *argl)
+   {object *rv;
+    BIGINT sz;
+
+    sz = -1;
+    SS_args(argl,
+	    SC_BIGINT_I, &sz,
+	    0);
+
+    PG_set_buffer_size(sz);
+    rv = SS_mk_integer(sz);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
@@ -3236,6 +3269,11 @@ void _SX_install_pgs_primitives(void)
                SS_nargs,
                _SXI_gatst, SS_PR_PROC);
 
+    SS_install("pg-get-buffer-size",
+               "Get the I/O buffer size for graphics files",
+               SS_zargs,
+               _SXI_gbfsz, SS_PR_PROC);
+
     SS_install("pg-line-color",
                "Get the line color on the given device",
                SS_nargs,
@@ -3360,6 +3398,11 @@ void _SX_install_pgs_primitives(void)
                "Set the device border width in pixels",
                SS_nargs,
                _SXI_sbwd, SS_PR_PROC);
+
+    SS_install("pg-set-buffer-size!",
+               "Set the I/O buffer size for graphics files",
+               SS_sargs,
+               _SXI_sbfsz, SS_PR_PROC);
 
     SS_install("pg-set-char-path!",
                "Set the character path direction for the given device",

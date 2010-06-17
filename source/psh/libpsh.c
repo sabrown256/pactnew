@@ -1114,7 +1114,7 @@ int push_tok(char *s, int nc, int dlm, char *fmt, ...)
 
     rv = TRUE;
 
-    if (s[0] != '\0')
+    if (IS_NULL(s) == FALSE)
        {delim[0] = dlm;
 	delim[1] = '\0';
 	strncat(s, delim, nc);};
@@ -1171,7 +1171,7 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
     rv = TRUE;
 
     strncpy(bf, t, LRG);
-    if (s[0] != '\0')
+    if (IS_NULL(s) == FALSE)
        {delim[0] = dlm;
 	delim[1] = '\0';
 	strncat(bf, delim, nc);
@@ -1418,7 +1418,7 @@ char *unique(char *lst, int beg, int dlm)
 	for (item = olst; item != NULL; item = p)
 	    {p = strchr(item, dlm);
 	     if (p == NULL)
-	        {if (item[0] == '\0')
+	        {if (IS_NULL(item) == TRUE)
 		    break;}
 	     else
 	        *p++ = '\0';
@@ -1498,7 +1498,7 @@ void push_path(int end, char *dpath, char *path)
     splice_out_path(lpth);
 
 /* add the new item */
-    if (dpath[0] == '\0')
+    if (IS_NULL(dpath) == TRUE)
        strncpy(dpath, lpth, LRG);
 
     else

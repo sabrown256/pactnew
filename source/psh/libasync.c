@@ -860,7 +860,7 @@ int job_response(process *pp, int to, char *fmt, ...)
 	nc = -1;
 
 	ok = TRUE;
-	if ((fo != NULL) && (s[0] != '\0'))
+	if ((fo != NULL) && (IS_NULL(s) == FALSE))
 	   {nc = fwrite_safe(s, 1, ns, fo);
 	    ok = (ns == nc);};
 

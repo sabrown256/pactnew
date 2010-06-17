@@ -365,7 +365,7 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 	nv  = db->ne;
 	for (i = 0; i < nv; i++)
 	    {vr = vrs[i];
-             if ((var == NULL) || (var[0] == '\0') || (strcmp(var, vr) == 0))
+             if ((IS_NULL(var) == TRUE) || (strcmp(var, vr) == 0))
 		{vl = cgetenv(TRUE, vr);
 		 if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
 		    {snprintf(t, MAXLINE, "\"%s\"", vl);
@@ -741,7 +741,7 @@ int dbdef(char *root, char *fmt, ...)
     VA_END;
 
     ta = _db_clnt_ex(root, var);
-    rv = ((ta != NULL) && (ta[0] != NULL) && (ta[0][0] != '\0'));
+    rv = ((ta != NULL) && (IS_NULL(ta[0]) == FALSE));
 
     lst_free(ta);
 
