@@ -3863,7 +3863,7 @@ static object *_SXI_index_to_expr(object *argl)
 void SX_install_pdb_funcs(void)
    {
 
-    SS_install("buffer-size",
+    SS_install("pd-get-buffer-size",
                "Get the default buffer size for I/O files",
                SS_zargs,
                _SXI_get_buffer_size, SS_PR_PROC);
@@ -4208,7 +4208,7 @@ void SX_install_pdb_funcs(void)
                SS_nargs, 
                _SXI_set_switch, SS_PR_PROC);
 
-    SS_install("set-buffer-size!",
+    SS_install("pd-set-buffer-size!",
                "Set the default file buffer size",
                SS_nargs, 
                _SXI_set_buffer_size, SS_PR_PROC);

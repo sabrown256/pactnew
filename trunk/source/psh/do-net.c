@@ -830,7 +830,7 @@ static void print_list(hfspec *sp, int nsp, int rptcfg, int run, int ex)
 	      (IDLE < lsp->running) && (lsp->running < DONE)) ||
 	     (lsp->exit == ex))
 	    {j++;
-             ok = ((rptcfg == TRUE) && (lsp->config[0] != '\0'));
+             ok = ((rptcfg == TRUE) && (IS_NULL(lsp->config) == FALSE));
 	     s  = (ok == TRUE) ? lsp->config : lsp->host;
 	     if (j % 4 == 0)
 	        note(Log, FALSE, "\n   %-16s", s);
@@ -1251,7 +1251,7 @@ static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
 	       {nstrncpy(tss, MAXLINE, skip, -1);
 		nstrncpy(tst, MAXLINE, skip, -1);};
    
-	    if ((tss[0] == '\0') || (strcmp(tss, wrk) == 0))
+	    if ((IS_NULL(tss) == TRUE) || (strcmp(tss, wrk) == 0))
 	       {fns[0] = '\0';
 		fnt[0] = '\0';};};
    
@@ -1454,9 +1454,9 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 	    if (p == NULL)
 	       break;
 	    else
-	       {ps = (shm[0] != '\0') ? strstr(s, shm) : NULL;
-		pe = (ehm[0] != '\0') ? strstr(s, ehm) : NULL;
-		pc = (clr[0] != '\0') ? strstr(s, clr) : NULL;
+	       {ps = (IS_NULL(shm) == FALSE) ? strstr(s, shm) : NULL;
+		pe = (IS_NULL(ehm) == FALSE) ? strstr(s, ehm) : NULL;
+		pc = (IS_NULL(clr) == FALSE) ? strstr(s, clr) : NULL;
 
 		if (ps != NULL)
 		   subst(s, shm, "<b color=\"#0000ff\">", -1);
@@ -1509,7 +1509,7 @@ static int watch(donetdes *st, int c, char **v)
 		 break;};};
 	free_strings(files);
 
-	if (st->stamp[0] == '\0')
+	if (IS_NULL(st->stamp) == TRUE)
 	   {printf("\n");
 	    printf("No update log matching %s and %s - exiting\n",
 		   st->system, lnm);
@@ -1542,7 +1542,7 @@ static int watch(donetdes *st, int c, char **v)
     tr    = st->phases[ip].tlimit;
 
     snprintf(upf, MAXLINE, "update");
-    while (phase[0] != '\0')
+    while (IS_NULL(phase) == FALSE)
 
 /* wait for the update log to appear */
        {for (ok = FALSE; ok == FALSE; )
@@ -1691,7 +1691,7 @@ static int progress(donetdes *st)
 
     get_host_file(host, file, st->hostfile);
 
-    if (host[0] != '\0')
+    if (IS_NULL(host) == FALSE)
        run(FALSE, "%s %s do-net -p %s %s", st->ssh, host, st->stamp, file);
 
     else
@@ -1779,7 +1779,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 
 /* now squeeze out missing hosts */
     for (i = 0; i < nsp; i++)
-	{if ((sp[i].host == NULL) || (sp[i].host[0] == '\0'))
+	{if (IS_NULL(sp[i].host) == TRUE)
 	    {for (j = i+1; j < nsp; j++)
 	         sp[j-1] = sp[j];
              nsp--;
@@ -1907,7 +1907,7 @@ static int testhosts(donetdes *st, int c, char **v)
 
     get_host_file(host, file, hfile);
 
-    if (host[0] != '\0')
+    if (IS_NULL(host) == FALSE)
        run(FALSE, "%s %s do-net -g %s %s", st->ssh, host, file, args);
 
     else
@@ -2034,7 +2034,7 @@ static void process_var(donetdes *st, char *s)
 	    {strcpy(val, s);
 	     pv = strtok(val, " \t");
 	     pv = strtok(NULL, "\n");
-	     if ((pv != NULL) && (*pv != '\0'))
+	     if (IS_NULL(pv) == FALSE)
 	        {csetenv(var, trim(pv, BOTH, " \t\n"));
 		 break;};};};
 
@@ -2119,7 +2119,7 @@ static void readhost(donetdes *st, int log)
 /* NOTE: if set in host file the user is responsible for having
  * it on the path or giving a full path here
  */
-    if (lssh[0] != '\0')
+    if (IS_NULL(lssh) == FALSE)
        snprintf(st->ssh, MAXLINE,
 		"%s -q %s -o BatchMode=yes -o StrictHostKeyChecking=no",
 		lssh, st->usex);
@@ -2135,7 +2135,7 @@ static void readhost(donetdes *st, int log)
       {hlst[0] = '\0';
        FOREACH(s, st->hostonly, " ")
 	  strcpy(t, run(FALSE, "cat %s | awk '$1 == \"host\" && $0 ~ /%s / { print $0 }'", hf, s));
-          if ((t[0] != '\0') && (strstr(t, s) != NULL))
+          if ((IS_NULL(t) == FALSE) && (strstr(t, s) != NULL))
 	     {nstrcat(hlst, MEGA,
 		      run(FALSE, "echo %s | awk '$1 == \"host\" { for (i = 1; i <= NF; i++) print $i }'", t));
 	      nstrcat(hlst, MEGA, " ");};
@@ -2162,11 +2162,11 @@ static void readhost(donetdes *st, int log)
     if (st->phases[PH_CLEAN].tlimit == 0)
        st->phases[PH_CLEAN].tlimit = 60;
 
-    if (st->do_code[0] == '\0')
+    if (IS_NULL(st->do_code) == TRUE)
        nstrncpy(st->do_code, MAXLINE, code, -1);
 
 /* check the script name and the version to be transmitted */
-    if (st->do_code[0] == '\0')
+    if (IS_NULL(st->do_code) == TRUE)
        {printf("\n");
         printf("You must have a script specification in host file %s\n", hf);
         printf("\n");
@@ -2175,13 +2175,13 @@ static void readhost(donetdes *st, int log)
     if (st->system == NULL)
        st->system = STRSAVE("code");
 
-    if (st->handtout[0] == '\0')
+    if (IS_NULL(st->handtout) == TRUE)
        strcpy(st->handtout, "pass");
 
     if (strcmp(linst, "yes") == 0)
        st->localinstall = TRUE;
 
-    if (st->logdir[0] == '\0')
+    if (IS_NULL(st->logdir) == TRUE)
        strcpy(st->logdir, cgetenv(TRUE, "HOME"));
     full_path(st->logdir, MAXLINE, cgetenv(FALSE, "HOME"), st->logdir);
 
@@ -2191,7 +2191,7 @@ static void readhost(donetdes *st, int log)
 	printf("\n");
 	exit(6);};
 
-   if (st->logdir[0] != '\0')
+   if (IS_NULL(st->logdir) == FALSE)
       {st->cargs = append_tok(st->cargs, ' ', "-log");
        st->cargs = append_tok(st->cargs, ' ', st->logdir);};
 
@@ -2251,7 +2251,7 @@ static void init(donetdes *st, int *purepo, double *gti, char *uhost)
 /* determine whether we are working from a distribution or
  * a source repository
  */
-    if (st->dist[0] != '\0')
+    if (IS_NULL(st->dist) == FALSE)
        {*purepo = FALSE;
 	st->cargs = append_tok(st->cargs, ' ', "-dist");
 	st->cargs = append_tok(st->cargs, ' ', path_tail(st->dist));}
@@ -2329,7 +2329,7 @@ static int transmit_script(donetdes *st, char *host, char *csm)
     ns = 0;
     na = 3;
 
-    if ((host == NULL) || (host[0] == '\0'))
+    if (IS_NULL(host) == TRUE)
        {printf("\n");
 	printf("No destination host for scripts - exiting\n");
 	printf("\n");
@@ -2581,7 +2581,7 @@ static void recommend(donetdes *st)
         {nc = strlen(cmd);
 	 snprintf(cmd+nc, MAXLINE-nc, " %s", *v);};
 
-   if (rs[0] != '\0')
+   if (IS_NULL(rs) == FALSE)
       {if (st->silent == FALSE)
 	  {noted(Log, "");
 	   noted(Log, "Some hosts failed to complete their work successfully.");
@@ -2626,7 +2626,7 @@ static int work(donetdes *st, hfspec *sp, int nsp, int ip, int rpt)
 /* launch the jobs */
     for (i = 0, lsp = sp; i < nsp; i++, lsp++)
         {host = lsp->host;
-	 if ((host == NULL) || (host[0] == '\0'))
+	 if (IS_NULL(host) == TRUE)
 	    {printf("\n");
 	     printf("No host for %s (%d/%d) in phase %s - exiting\n",
 		    lsp->rawh, i, nsp, phase);
@@ -2816,7 +2816,7 @@ static int clearout(donetdes *st)
 
     get_host_file(host, file, st->hostfile);
 
-    if (host[0] != '\0')
+    if (IS_NULL(host) == FALSE)
        run(FALSE, "%s %s do-net -c %s %s", st->ssh, host, st->stamp, file);
 
     else
@@ -2960,7 +2960,7 @@ static int debug(donetdes *st)
        {nstrncpy(host, MAXLINE,
 		 run(FALSE, "%s -m %s", cwhich("hserve"), lsp->rawh), -1);
 
-	if ((host == NULL) || (host[0] == '\0'))
+	if (IS_NULL(host) == TRUE)
 	   {printf("\n");
 	    printf("No host for phase %s - exiting\n", phase);
 	    printf("\n");
@@ -3132,7 +3132,7 @@ static void finish(donetdes *st, double gti)
 /* delete the local scripts */
     for (i = 0; i < st->n_nets; i++)
         {host = st->nets[i].host;
-	 if ((host == NULL) || (host[0] == '\0'))
+	 if (IS_NULL(host) == TRUE)
 	    {printf("\n");
 	     printf("No host for finish - exiting\n");
 	     printf("\n");
@@ -3161,7 +3161,7 @@ static void interrupt(int sig)
 /* the watch option process does not have Log defined and
  * does not need to cleanup
  */
-       if ((Log != '\0') && (current_phase != NULL))
+       if ((Log != NULL) && (current_phase != NULL))
 	  {sect = current_phase->name;
 	   sp   = current_phase->sp;
 	   nsp  = current_phase->nsp;
@@ -3423,7 +3423,7 @@ static int process_args(donetdes *st, int c, char **v)
 		      strcpy(st->ssh, "ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no");
 		      break;};}
 
-	 else if (st->hostfile[0] == '\0')
+	 else if (IS_NULL(st->hostfile) == TRUE)
             full_path(st->hostfile, MAXLINE, NULL, v[i]);
 
 	 else
@@ -3569,7 +3569,7 @@ int main(int c, char **v)
     else if (state.clearout == TRUE)
        rv = clearout(&state);
 
-    else if (state.hostfile[0] == '\0')
+    else if (IS_NULL(state.hostfile) == TRUE)
        {printf("\n");
 	printf("Must specify a host file to describe actions\n");
 	printf("\n");

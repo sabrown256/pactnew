@@ -116,7 +116,7 @@
 	    (synonym pdbdata->hash               pdbdata_to_hash)
 	    (synonym pdbfile?                    pdbfilep)
 	    (synonym reset-pointer-list!         reset_pointer_listb)
-	    (synonym set-buffer-size!            set_buffer_sizeb)
+	    (synonym pd-set-buffer-size!         pd_set_buffer_sizeb)
 	    (synonym set-maximum-file-size!      set_maximum_file_sizeb)
 	    (synonym set-track-pointers!         set_track_pointersb)
 	    (synonym syment?                     symentp)

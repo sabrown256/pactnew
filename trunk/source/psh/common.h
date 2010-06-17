@@ -81,6 +81,8 @@
       };};                                                                   \
    FREE(_t);}
 
+#define IS_NULL(_s)  (((_s) == NULL) || ((_s)[0] == '\0'))
+
 extern int
  sched_yield(void);
 

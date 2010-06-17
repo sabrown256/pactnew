@@ -343,7 +343,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
     for (c = cl; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
-            {if (c[0] == '\0')
+            {if (IS_NULL(c) == TRUE)
                 break;}
          else
             *pc++ = '\0';
@@ -371,7 +371,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
 	    {nc = 0;
 	     for (i = 0; i < n; i++)
 	         {entry = sa[i];
-		  if (entry[0] == '\0')
+		  if (IS_NULL(entry) == TRUE)
 		     continue;
 		  if (global == TRUE)
 		     {var = entry;
@@ -457,7 +457,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
     for (c = cl; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
-            {if (c[0] == '\0')
+            {if (IS_NULL(c) == TRUE)
                 break;}
          else
             *pc++ = '\0';
@@ -485,7 +485,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
 	    {nc = 0;
 	     for (i = 0; i < n; i++)
 	         {entry = sa[i];
-		  if (entry[0] == '\0')
+		  if (IS_NULL(entry) == TRUE)
 		     continue;
 		  if (global == TRUE)
 		     {var = entry;
@@ -728,7 +728,7 @@ static void write_envf(int lnotice)
 	 note(fmd, TRUE,  "setenv PYTHONPATH %s;", t);};};
 
 /* emit PATH settings */
-    if (epath[0] != '\0')
+    if (IS_NULL(epath) == FALSE)
        {FOREACH(u, epath, ":\n")
 	   note(fdk, TRUE, "dk_alter PATH %s", u);
 	   note(fmd, TRUE, "prepend-path PATH    %s;", echo(FALSE, u));
@@ -803,7 +803,7 @@ static void check_dir(void)
                     {run(BOTH, "mkdir -p %s/%s", sib, dir);
                      push_tok(Created, LRG, ' ', "%s/%s", sib, dir);};};};
 
-        if (Created[0] != '\0')
+        if (IS_NULL(Created) == FALSE)
            {noted(Log, "");
             noted(Log, "Directories:");
             FOREACH(dir, Created, " ")
@@ -820,7 +820,7 @@ static void check_dir(void)
                  if (dir_exists("%s/%s", sib, dir) == FALSE)
                     {push_tok(Missing, LRG, ' ', "%s/%s", sib, dir);};};};
 
-        if (Missing[0] != '\0')
+        if (IS_NULL(Missing) == FALSE)
            {noted(Log, "");
             noted(Log, "You have asked that PACT be installed in the following");
             noted(Log, "missing directories:");
@@ -895,7 +895,7 @@ static void parse_opt(char *s)
 	 t = sa[l];
 	 parse_line(t, vr, op, vl);
 
-	 if (vr[0] == '\0')
+	 if (IS_NULL(vr) == TRUE)
 	    continue;
 
 	 arg = trim(vl, BOTH, " \t");
@@ -1039,7 +1039,7 @@ static void parse_rule(char *var, int nc)
     while (TRUE)
        {read_line(line, MAXLINE);
 
-        if ((line[0] == '\0') || (strcmp(line, "++end++") == 0))
+        if ((IS_NULL(line) == TRUE) || (strcmp(line, "++end++") == 0))
            break;
 
 	nstrcat(val, MAXLINE, line);
@@ -1065,7 +1065,7 @@ static void dp_define(void)
     while (TRUE)
        {read_line(line, MAXLINE);
 
-	if ((strcmp(line, "end") == 0) || (line[0] == '\0'))
+	if ((strcmp(line, "end") == 0) || (IS_NULL(line) == TRUE))
 	   {note(st.aux.DPF, TRUE, "");
 	    break;};
     
@@ -1319,7 +1319,7 @@ static void default_var(char *base)
     strncpy(st.arch, run(BOTH, cmd), MAXLINE);
 
 /* check variables which may have been initialized from the command line */
-    if (st.system[0] == '\0')
+    if (IS_NULL(st.system) == TRUE)
        strncpy(st.system, run(BOTH, "%s/cfgman use", st.dir.mng), MAXLINE);
 
     dbinitv(NULL, "CfgMan",        "%s/cfgman", run(BOTH, "pwd"));
@@ -1628,7 +1628,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
 /* set variable */
     if (strcmp(oper, "=") == 0)
        {t = echo(FALSE, val);
-        if ((t != NULL) && (*t != '\0'))
+        if (IS_NULL(t) == FALSE)
            {strncpy(nval, t, MAXLINE);
             if (rep == TRUE)
 	       {if (st.aux.MVF == NULL)
@@ -1650,7 +1650,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
  * "$bar" is not defined
  */
        {t = echo(FALSE, val);
-        if ((t != NULL) && (*t != '\0'))
+        if (IS_NULL(t) == FALSE)
            {strncpy(lval, t, MAXLINE);
             strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
             note(Log, TRUE, "Change    |%s|", fvar);
@@ -1673,7 +1673,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
  * "$bar" is not defined
  */
        {t = echo(FALSE, val);
-        if ((t != NULL) && (*t != '\0'))
+        if (IS_NULL(t) == FALSE)
            {strncpy(lval, t, MAXLINE);
             strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
             note(Log, TRUE, "Change    |%s|", fvar);
@@ -1710,7 +1710,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
  * "$bar" is not defined
  */
        {t = echo(FALSE, val);
-        if ((t != NULL) && (*t != '\0'))
+        if (IS_NULL(t) == FALSE)
 	   dbset(NULL, fvar, t);
         else
            note(Log, TRUE, "   =? not changing %s - no value for |%s|", fvar, val);}
@@ -1822,7 +1822,7 @@ static void read_config(char *cfg, int quiet)
 
 	 read_line(line, MAXLINE);
 
-	 if (line[0] == '\0')
+	 if (IS_NULL(line) == TRUE)
             continue;
 	 else if (strcmp(line, "++end++") == 0)
             break;

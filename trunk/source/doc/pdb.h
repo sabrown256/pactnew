@@ -1738,7 +1738,7 @@ be a valid PDB file. This functionality is provided by <tt>PD_flush</tt>.
 <pre>
 <i>C Binding: </i>  int PD_set_buffer_size(int v)
 <i>F77 Binding: </i>integer PFSBFS(integer v)
-<i>SX Binding: </i> (set-buffer-size! v)
+<i>SX Binding: </i> (pd-set-buffer-size! v)
 <i>Python Binding: </i> XXX - missing
 </pre>
 <p>
@@ -1789,7 +1789,7 @@ Return the integer value of the buffer size in bytes.
              .
              .
 
-       (set-buffer-size! 4096)
+       (pd-set-buffer-size! 4096)
              .
              .
              .
@@ -6365,7 +6365,7 @@ See also:
 <pre>
 <i>C Binding: </i>  int PD_get_buffer_size
 <i>F77 Binding: </i>integer PFGBFS()
-<i>SX Binding: </i> (buffer-size)
+<i>SX Binding: </i> (pd-get-buffer-size)
 <i>Python Binding: </i> XXX - missing
 </pre>
 <p>
@@ -6417,7 +6417,7 @@ otherwise, return -1.
              .
              .
 
-       (define sz (buffer-size))
+       (define sz (pd-get-buffer-size))
              .
              .
              .

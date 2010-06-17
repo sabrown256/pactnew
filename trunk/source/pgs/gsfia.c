@@ -221,6 +221,20 @@ FIXNUM F77_FUNC(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PGGBSZ - return the I/O buffer size */
+
+FIXNUM F77_FUNC(pggbsz, PGGBSZ)(FIXNUM *ps)
+   {FIXNUM rv;
+    off_t sz;
+
+    sz = PG_get_buffer_size();
+    rv = sz;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PGCLOS - close the PG_device associated with the integer index */
 
 FIXNUM F77_FUNC(pgclos, PGCLOS)(FIXNUM *devid)
@@ -1495,6 +1509,20 @@ FIXNUM F77_FUNC(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
 
     PG_set_border_width(dev, *pw);
 
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSBSZ - set the I/O buffer size */
+
+FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(void)
+   {FIXNUM rv;
+    off_t sz;
+
+    PG_set_buffer_size(sz);
     rv = TRUE;
 
     return(rv);}
