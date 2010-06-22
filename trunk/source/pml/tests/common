@@ -28,6 +28,12 @@ if ($?LogF == 0) then
    set PFE      = $BinDir/do-run
 endif
 
+if ("$CFE" == "") then
+   set cfe = ""
+else
+   set cfe = ( $CFE -v )
+endif
+
 set RefDir = ../../../pml/tests/ref
 
 if ($?SrcDir == 0) then
@@ -38,6 +44,7 @@ endif
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
+   Note $Log "PATH = $PATH"
 endif
 
 set Err = 0

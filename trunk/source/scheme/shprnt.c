@@ -1042,44 +1042,53 @@ void SS_wr_lst(object *obj, object *strm)
 
 void SS_wr_atm(object *obj, object *strm)
    {int ityp;
+    char t[MAXLINE];
     char *s;
     FILE *str;
 
     str  = SS_OUTSTREAM(strm);
     ityp = SS_OBJECT_TYPE(obj);
 
-    if (ityp == SC_INTEGER_I)
-#ifdef NO_LONG_LONG
-       PRINT(str, "%ld", SS_INTEGER_VALUE(obj));
-#else
-       PRINT(str, "%lld", SS_INTEGER_VALUE(obj));
-#endif
-
-    else if (ityp == SC_FLOAT_I)
-       PRINT(str, "%g", SS_FLOAT_VALUE(obj));
-
-#ifdef LARGE
-    else if (ityp == SS_CHARACTER_I)
-       PRINT(str, "%c", SS_CHARACTER_VALUE(obj));
-#endif
-
-    else if (ityp == SC_STRING_I)
+/* use PUTS for strings to get double quotes right */
+    if (ityp == SC_STRING_I)
        {s = SS_STRING_TEXT(obj);
 	PUTS(s, str);}
 
-    else if (ityp == SS_VARIABLE_I)
-       {s = SS_VARIABLE_NAME(obj);
-	PRINT(str, "%s", s);}
-
-    else if (ityp == SS_NULL_I)
-       PRINT(str, "()");
-
-    else if ((ityp == SS_EOF_I) || (ityp == SS_BOOLEAN_I))
-       {s = SS_BOOLEAN_NAME(obj);
-	PRINT(str, "%s", s);}
-
+/* everyone else can use PRINT
+ * NOTE: use sprintf then PRINT rather than direct PRINT to get
+ * around SUN compiler bug regarding va_args
+ */
     else
-       PRINT(str, "UNKOWN OR NON-ATOMIC OBJECT TYPE");
+       {s = t;
+
+	if (ityp == SC_INTEGER_I)
+#ifdef NO_LONG_LONG
+	   snprintf(t, MAXLINE, "%ld", SS_INTEGER_VALUE(obj));
+#else
+	   snprintf(t, MAXLINE, "%lld", SS_INTEGER_VALUE(obj));
+#endif
+
+	else if (ityp == SC_FLOAT_I)
+	   snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(obj));
+
+#ifdef LARGE
+	else if (ityp == SS_CHARACTER_I)
+	   snprintf(t, MAXLINE, "%c", SS_CHARACTER_VALUE(obj));
+#endif
+
+	else if (ityp == SS_VARIABLE_I)
+	   s = SS_VARIABLE_NAME(obj);
+
+	else if (ityp == SS_NULL_I)
+	   strcpy(t, "()");
+
+	else if ((ityp == SS_EOF_I) || (ityp == SS_BOOLEAN_I))
+	   snprintf(t, MAXLINE, "%s", SS_BOOLEAN_NAME(obj));
+
+	else
+	   snprintf(t, MAXLINE, "UNKOWN OR NON-ATOMIC OBJECT TYPE");
+
+	PRINT(str, "%s", s);};
 
     return;}
 

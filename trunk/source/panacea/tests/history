@@ -32,7 +32,7 @@ else
    NoteD $LogF "                    PANACEA Time History Test ....."
 
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE ${BinDir}/pathts -c 2
+      ftee $LogF $cfe ${BinDir}/pathts -c 2
       set xstatus = $status
    else
       ftee $LogF $Valgrind $BinDir/pathts -c 2   |&  \

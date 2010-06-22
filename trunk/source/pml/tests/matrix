@@ -32,7 +32,7 @@ source ../../tests/common
       set xstatus = $TStatus
    else
       if ("$Valgrind" == "") then
-         flog $LogF $CFE $BinDir/mlmtrt
+         flog $LogF $cfe $BinDir/mlmtrt
          set xstatus = $status
       else
          flog $Log $Valgrind $BinDir/mlmtrt

@@ -28,7 +28,7 @@ source ../../tests/common
 # CYGWIN 1.5 simply will not write output to ulfnc.log
 # the other tests are fine
       if ($OS =~ CYGWIN*) then
-         flog $Log $CFE $Ultra -l $TDir/ulfnc.scm
+         flog $Log $cfe $Ultra -l $TDir/ulfnc.scm
          set xstatus = $status
          set Files = 1
       else

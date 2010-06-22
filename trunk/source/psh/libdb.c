@@ -555,9 +555,8 @@ int db_srv_save(int fd, database *db)
 
 int db_srv_launch(char *root)
    {int i, st, pid, rv;
-    char s[MAXLINE], t[MAXLINE];
-    char *flog, *fpid;
-    FILE *fp;
+    char s[MAXLINE];
+    char *flog, *fpid, **sa;
 
     rv = FALSE;
 
@@ -579,11 +578,14 @@ int db_srv_launch(char *root)
 	        nsleep(100);};
 
 /* check the pid */
-        fp = fopen(fpid, "r");
-	if (fgets(t, MAXLINE, fp) != NULL)
-	   pid = atoi(t);
+        sa = file_text(fpid);
+
+	if ((sa != NULL) && (sa[0] != NULL))
+	   pid = atoi(sa[0]);
 	else
 	   pid = -1;
+
+	free_strings(sa);
 
 	srv.pid = pid;
 

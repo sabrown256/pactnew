@@ -627,12 +627,43 @@ static off_t _SC_bio_tell(bio_desc *bid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_VERIFY_FILE - verify the NB bytes in FD starting at AD match BF */
+
+static int _SC_verify_file(int fd, off_t ad, off_t nb, unsigned char *bf)
+   {int ok;
+    off_t i, rad, st;
+    unsigned char *cbf;
+
+    rad = lseek(fd, 0, SEEK_CUR);
+
+    cbf = FMAKE_N(unsigned char, nb, "_SC_CHECK_READ:cbf");
+    st  = lseek(fd, ad, SEEK_SET);
+
+/* read the file contents */
+    st = SC_read_sigsafe(fd, cbf, nb);
+    if (st < 0)
+       ok = -1;
+
+/* compare direct read with buffered results */
+    else
+       {ok = TRUE;
+	for (i = 0; (i < nb) && (ok == TRUE); i++)
+	    ok = (cbf[i] == bf[i]);};
+
+    st = lseek(fd, rad, SEEK_SET);
+    SFREE(cbf);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_CHECK_READ - debugging diagnostic to verify buffered reads */
 
 static int _SC_check_read(bio_desc *bid, bio_frame *rq)
    {int fd, ok;
-    off_t i, cad, oad, nb;
-    unsigned char *rbf, *cbf;
+    off_t cad, oad, nb;
+    unsigned char *rbf;
 
     ok = TRUE;
 
@@ -643,16 +674,7 @@ static int _SC_check_read(bio_desc *bid, bio_frame *rq)
 	nb  = rq->sz;
 	rbf = rq->bf;
 
-	cbf = FMAKE_N(unsigned char, nb, "_SC_CHECK_READ:cbf");
-	lseek(fd, oad, SEEK_SET);
-
-/* compare direct read with buffered results */
-	SC_read_sigsafe(fd, cbf, nb);
-	for (i = 0; (i < nb) && (ok == TRUE); i++)
-	    ok = (cbf[i] == rbf[i]);
-
-	lseek(fd, cad, SEEK_SET);
-        SFREE(cbf);};
+	ok = _SC_verify_file(fd, oad, nb, rbf);};
 
     return(ok);}
 
@@ -661,23 +683,53 @@ static int _SC_check_read(bio_desc *bid, bio_frame *rq)
 
 /* _SC_CHECK_WRITE - debugging diagnostic to verify buffered writes */
 
-static int _SC_check_write(bio_desc *bid, bio_frame *rq)
+static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
    {int fd, ok;
-    off_t cad, oad, nb;
+    off_t cad, vad, nbv, rad, nbr;
+    char *vfy;
     unsigned char *rbf;
+    static int count = 1;
 
     ok = TRUE;
 
     if (_SC_bio_debug & 2)
        {fd  = bid->fd;
 	cad = bid->curr;
-	oad = rq->addr;
-	nb  = rq->sz;
 	rbf = rq->bf;
 
-/* GOTCHA: what can we usefully check? */
+	if (fr == NULL)
+	   {rad = vad + nbv;
+	    nbr = 0;
+	    vad = rq->addr;
+	    nbv = rq->sz;}
+	else
+	   {rad = fr->addr;
+	    nbr = fr->nb;
+	    vad = rq->addr;
+	    nbv = rq->sz - nbr;};
 
-        };
+	ok = _SC_verify_file(fd, vad, nbv, rbf);
+
+	switch (ok)
+	   {case -1 :
+	         vfy = "wo";
+		 break;
+	    case 0 :
+	         vfy = "ng";
+		 break;
+	    case 1 :
+	         vfy = "ok";
+		 break;};
+
+	if (count == 1)
+	   {printf("                         Verified                              Remainder\n");
+	    printf("   Write        Start      Stop  # bytes    OK       Start       Stop  # bytes\n");};
+
+	printf("%8d  %10ld %10ld %8ld    %2s  %10ld %10ld %8ld\n",
+	       count++,
+	       vad, vad+nbv, nbv,
+	       vfy,
+	       rad, rad+nbr, nbr);};
 
     return(ok);}
 
@@ -887,7 +939,7 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	else
 	   _SC_bfr_free(fr);};
 
-        _SC_check_write(bid, &rq);};
+        _SC_check_write(bid, &rq, fr);};
 
 #endif
 

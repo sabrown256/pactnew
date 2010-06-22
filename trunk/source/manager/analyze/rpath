@@ -167,11 +167,12 @@ switch ($Tgt)
         breaksw
 endsw
 
-call CLEAN_RPATH()
+call CLEAN_PATH(RPATH)
 
 switch ($Out)
    case parent:
         SetParent RPATH
+        call CLEAN_PATH(Cfg_RPATH)
         SetParent Cfg_RPATH
         breaksw
    case echo:
@@ -201,13 +202,16 @@ exit($status)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# CLEAN_RPATH - make sure each entry in RPATH exists and is unique
+# CLEAN_PATH - make sure each entry in LVAR exists and is unique
 
-CLEAN_RPATH:
+CLEAN_PATH:
+
+    set lvar = $args_[1]
+    set lval = ( `printenv $lvar` )
 
     set npath = ""
-    if ("$RPATH" != "") then
-       set lpath = ( `echo $RPATH | sed 's/:/ /g'` )
+    if ("$lval" != "") then
+       set lpath = ( `printenv $lvar | sed 's/:/ /g'` )
        foreach i ($lpath)
           if (-d $i) then
              set ok = TRUE
@@ -223,8 +227,11 @@ CLEAN_RPATH:
           endif
        end
        set lpath = ( `echo "$npath" | sed 's/ /:/g'` )
-       setenv RPATH $lpath
+       setenv $lvar $lpath
     endif
+
+    unset lvar
+    unset lval
 
     return
 

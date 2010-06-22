@@ -29,7 +29,7 @@ source ../../tests/common
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/scheme -e -l $FilesDir/shsint.scm
+      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shsint.scm
       set xstatus = $status
    else
       ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shsint.scm  |& \
@@ -69,7 +69,7 @@ source ../../tests/common
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/scheme -e -l $FilesDir/shnum.scm
+      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shnum.scm
       set xstatus = $status
    else
       ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shnum.scm  |& \

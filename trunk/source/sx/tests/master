@@ -59,7 +59,7 @@ source ../../tests/common
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtest.ps > pdbvtest.ps.tmp
          flog $Log mv pdbvtest.ps.tmp pdbvtest.ps
 
-         flog $Log $CFE $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
+         flog $Log $cfe $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
          set xstatus = $status
    
          if ($xstatus != 0) then

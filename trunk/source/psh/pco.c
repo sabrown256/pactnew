@@ -629,9 +629,8 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
  */
 
 static void write_envf(int lnotice)
-   {int i, n;
-    char s[MAXLINE];
-    char *t, *var, *val;
+   {int i, j, n, nc, ok;
+    char *p, *t, *var, *val, **sa;
     char *site[] = { "SYS_TYPE", "SYS_SITE", "DAS_ROOT", "DAI_ROOT" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
@@ -674,17 +673,31 @@ static void write_envf(int lnotice)
     for (i = 0; i < n; i++)
         env_out(fsh, fcsh, fdk, fmd, site[i], dbget(NULL, TRUE, site[i]));
 
-    fseek(st.aux.SEF, 0, SEEK_SET);
-    while (fgets(s, MAXLINE, st.aux.SEF) != NULL)
-       {LAST_CHAR(s) = '\0';
-	if (strncmp(s, "PATH", 4) != 0)
-	   {var = strtok(s, " ");
-	    val = strtok(NULL, "\n");
-	    env_out(fsh, fcsh, fdk, fmd, var, val);}
+    fflush(st.aux.SEF);
+    sa = file_text("%s/log/file.se", st.dir.root);
+    for (n = 0; sa[n] != NULL; n++);
+
+    for (i = 0; i < n; i++)
+	{p = sa[i];
+
+	 var = strtok(p, " ");
+	 val = strtok(NULL, "\n");
+	 nc  = strlen(var);
 
 /* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
-	else if (strlen(s) > 3)
-	   push_path(APPEND, epath, s+4);};
+	 if (strcmp(var, "PATH") == 0)
+	    push_path(APPEND, epath, val);
+
+/* weed out duplicates - taking only the last setting */
+	 else
+	    {ok = FALSE;
+	     for (j = i+1; (j < n) && (ok == FALSE); j++)
+	         ok = ((strncmp(var, sa[j], nc) == 0) && (sa[j][nc] == ' '));
+		     
+	     if (ok == FALSE)
+	        env_out(fsh, fcsh, fdk, fmd, var, val);};};
+
+    free_strings(sa);
 
     note(fcsh, TRUE, "");
     note(fsh, TRUE, "");

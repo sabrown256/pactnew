@@ -63,7 +63,7 @@ source ../../tests/common
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
          flog $Log mv ultest.ps.tmp ultest.ps
 
-         flog $Log $CFE $PSDIFF ultest.ps $TDir/ref/ultest.ps
+         flog $Log $cfe $PSDIFF ultest.ps $TDir/ref/ultest.ps
          set DiffStat = $status
          set ETime    = `$TIMER -b $UTime`
 
