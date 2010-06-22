@@ -9,6 +9,7 @@
  */
 
 #include "common.h"
+#include "libpsh.c"
 
 #undef MAXLINE
 #define MAXLINE 4096
@@ -34,42 +35,26 @@ void exit(int status);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* NSTRCAT - safe strcat function */
-
-static char *nstrcat(char *d, int nc, char *s)
-   {int n;
-
-    n = nc - 1 - strlen(d);
-    n = min(n, strlen(s));
-
-    strncat(d, s, n);
-
-    return(d);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* REPORT_VAR - report on the variable Q in FILE */
 
 static int report_var(char *file, char *q, char *key,
 		      int compl, int litrl, int newl)
    {int i, ok, doit, tst;
-    char s[MAXLINE];
-    char *tok, *txt, *ps;
-    FILE *fp;
+    char *p, *tok, *txt, *ps, **sa;
 
     ok = FALSE;
 
-    fp = fopen(file, "r");
-    if (fp != NULL)
-       {for (i = 0; fgets(s, MAXLINE, fp) != NULL; i++)
-	    {if (key != NULL)
-	        {tok  = strtok(s, " \t\r");
+    sa = file_text(file);
+    if (sa != NULL)
+       {for (i = 0; sa[i] != NULL; i++)
+	    {p = sa[i];
+	     if (key != NULL)
+	        {tok  = strtok(p, " \t\r");
 		 doit = ((tok != NULL) && (strcmp(tok, key) == 0));
 		 ps   = NULL;}
 	     else
 	        {doit = TRUE;
-		 ps   = s;};
+		 ps   = p;};
 
 	     if (doit)
 	        {tok = strtok(ps, " \t\n");
@@ -96,7 +81,6 @@ static int report_var(char *file, char *q, char *key,
 			 else
 			    printf("%s", txt);
 
-			 memset(s, 0, MAXLINE);
 			 ok = TRUE;};
 
 		     if (newl == TRUE)
@@ -104,7 +88,7 @@ static int report_var(char *file, char *q, char *key,
                      else
 		        printf(" ");};};};
 
-	fclose(fp);};
+	free_strings(sa);};
 
     return(ok);}
 
@@ -447,9 +431,8 @@ static int method_2(int c, char **v, char *mkfile, long tmm)
 
 static int command_makefile(char *fname, int c, char **v, char **a)
    {int i, err;
-    char s[MAXLINE], t[MAXLINE], u[MAXLINE], cmd[MAXLINE];
-    char *tok, *dir;
-    FILE *fp;
+    char s[MAXLINE], u[MAXLINE], cmd[MAXLINE];
+    char *p, *tok, *dir, **sa;
 
     err = 1;
 
@@ -462,20 +445,21 @@ static int command_makefile(char *fname, int c, char **v, char **a)
 	 nstrcat(s, MAXLINE, tok);
 	 nstrcat(s, MAXLINE, " ");};
 
-    fp = fopen(fname, "r");
-    if (fp != NULL)
+    sa = file_text(fname);
+    if (sa != NULL)
        {snprintf(cmd, MAXLINE, "(echo \"go :\"");
 
-	while (fgets(t, MAXLINE, fp) != NULL)
-	   {dir = strtok(t, "\n");
-	    if (dir == NULL)
-	       break;
-	    snprintf(u, MAXLINE,
-		     " ; echo \"\t@(cd %s ; echo \"\" ; echo \"In %s doing %s\" ; %s)\"",
-		     dir, dir, s, s);
-	    nstrcat(cmd, MAXLINE, u);};
+	for (i = 0; sa[i] != NULL; i++)
+	    {p   = sa[i];
+	     dir = strtok(p, "\n");
+	     if (dir == NULL)
+	        break;
+	     snprintf(u, MAXLINE,
+		      " ; echo \"\t@(cd %s ; echo \"\" ; echo \"In %s doing %s\" ; %s)\"",
+		      dir, dir, s, s);
+	     nstrcat(cmd, MAXLINE, u);};
 
-	fclose(fp);
+	free_strings(sa);
 
 	nstrcat(cmd, MAXLINE, ") | ");
 	err = invoke_make(cmd, MAXLINE, "-", c, v);};

@@ -731,10 +731,8 @@ static void parse_assgn(rundes *st, char *sect,
 
 static int set_target(rundes *st)
    {int i, rv;
-    char s[MAXLINE];
-    char *p, *var;
+    char *p, *var, **sa;
     char *cat, *lst;
-    FILE *fp;
 
     rv = TRUE;
 
@@ -744,19 +742,14 @@ static int set_target(rundes *st)
  *       and that must win
  */
     if (IS_NULL(st->sgn) == FALSE)
-       {fp = fopen(st->sgn, "r");
+       {sa = file_text(st->sgn);
+	for (i = 0; sa[i] != NULL; i++)
+	    {p = sa[i];
 
-	for (i = 0; TRUE; i++)
-	    {p = fgets(s, MAXLINE, fp);
-	     if (p == NULL)
-	        break;
-
-	     LAST_CHAR(s) = '\0';
-
-	     if ((strlen(s) == 0) || (blank_line(s) == TRUE))
+	     if ((strlen(p) == 0) || (blank_line(p) == TRUE))
 	        continue;
 
-	     var = strtok(s, " \t");
+	     var = strtok(p, " \t");
 	     if (strcmp(var, "default") == 0)
 	        {cat = strtok(NULL, " \t");
 		 lst = strtok(NULL, "\n");
@@ -770,7 +763,7 @@ static int set_target(rundes *st)
 		 else if ((strcmp(cat, "CROSS") == 0) && (IS_NULL(st->crosstgt) == TRUE))
 		    load_target(st->crosstgt, MAXLINE, lst);};};
 
-	fclose(fp);};
+	free_strings(sa);};
 
 /* check the environment default target specs */
     init_mpi_target(st);
@@ -791,9 +784,8 @@ static int set_target(rundes *st)
 
 static void parse_db(rundes *st)
    {int i;
-    char s[MAXLINE], effvar[MAXLINE], sect[MAXLINE];
-    char *p, *var, *oper, *val, *exe;
-    FILE *fp;
+    char effvar[MAXLINE], sect[MAXLINE];
+    char *p, *var, *oper, *val, *exe, **sa;
 
     if (IS_NULL(st->sgn) == FALSE)
        {csetenv("DBG_Exe",     "");
@@ -809,23 +801,19 @@ static void parse_db(rundes *st)
 	    printf("MPI   = %s\n", cgetenv(TRUE, "MPI"));
 	    printf("DBG   = %s\n", cgetenv(TRUE, "DBG"));};
 
-	fp = fopen(st->sgn, "r");
 	sect[0] = '\0';
 
-	for (i = 0; TRUE; i++)
-	    {p = fgets(s, MAXLINE, fp);
-	     if (p == NULL)
-	        break;
+	sa = file_text(st->sgn);
+	for (i = 0; sa[i] != NULL; i++)
+	    {p = sa[i];
 
-	     LAST_CHAR(s) = '\0';
-
-	     if ((strlen(s) == 0) || (blank_line(s) == TRUE))
+	     if ((strlen(p) == 0) || (blank_line(p) == TRUE))
 	        continue;
 
 	     if (st->trace > 4)
-	        printf("%d> %s\n", i, s);
+	        printf("%d> %s\n", i, p);
 
-	     var = strtok(s, " \t");
+	     var = strtok(p, " \t");
 
 /* check for end of section */
 	     if (var[0] == '}')
@@ -860,7 +848,9 @@ static void parse_db(rundes *st)
 	     else if (oper[strlen(oper)-1] == '=')
 	        parse_assgn(st, sect, var, oper, val, effvar);
 	     else
-	        printf("Unknown operator %s - ignored\n", oper);};};
+	        printf("Unknown operator %s - ignored\n", oper);};
+
+	free_strings(sa);};
 
 /* use full path to MPI front end */
     exe = cwhich(cgetenv(TRUE, "MPI_Exe"));

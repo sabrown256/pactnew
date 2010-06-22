@@ -30,6 +30,12 @@ if ($?LogF == 0) then
    set MPI      = `pact +l -info HAVE_MPI`
 endif
 
+if ("$CFE" == "") then
+   set cfe = ""
+else
+   set cfe = ( $CFE -v )
+endif
+
 if ($?SrcDir == 0) then
    pushd ../.. >& /dev/null
    set SrcDir = $cwd
@@ -38,6 +44,7 @@ endif
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
+   Note $Log "PATH = $PATH"
 endif
 
 set Err = 0

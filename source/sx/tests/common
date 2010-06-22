@@ -35,6 +35,12 @@ set TIMER  = $BinDir/timer
 set CFE    = $BinDir/do-run
 set PFE    = $BinDir/do-run
 
+if ("$CFE" == "") then
+   set cfe = ""
+else
+   set cfe = ( $CFE -v )
+endif
+
 grep '#define THREADING' $Root/include/scconfig.h >& /dev/null
 if ($status == 0) then
    setenv THREADING yes
@@ -71,6 +77,7 @@ endif
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
+   Note $Log "PATH = $PATH"
 endif
 
 set Err = 0

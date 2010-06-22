@@ -86,6 +86,47 @@ int unsetenv(char *var)
 
 /*--------------------------------------------------------------------------*/
 
+/* TOKENIZE - return an array of strings obtained by
+ *          - tokenizing the string S according to the delimiters DELIM
+ *          - the array is terminated by a NULL string
+ *          - it can be released by free_strings
+ */
+
+char **tokenize(char *s, char *delim)
+   {int i, n, c;
+    char *p, *t, *ps, **sa;
+
+    sa = NULL;
+    n  = strlen(s);
+    t  = MAKE_N(char, n+100);
+    if (t != NULL)
+       {strcpy(t, s);
+
+	for (i = 0, ps = t; ps != NULL; )
+	    {if (sa == NULL)
+	        sa = MAKE_N(char *, 1000);
+
+	     p = strpbrk(ps, delim);
+	     if (p != NULL)
+	        {c  = *p;
+		 *p = '\0';
+		 sa[i++] = STRSAVE(ps);
+		 *p = c;
+		 ps = p + 1;}
+	     else
+	        {sa[i++] = STRSAVE(ps);
+		 break;};};
+
+	if (sa != NULL)
+	   sa[i++] = NULL;
+
+	FREE(t);};
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FREE_STRINGS - free the strings in the array lst */
 
 void free_strings(char **lst)
@@ -109,6 +150,26 @@ int last_char(char *s)
     nc = max(0, nc);
 
     return(nc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* VSTRCAT - safe strcat function */
+
+char *vstrcat(char *d, int nc, char *fmt, ...)
+   {int n;
+    char s[LRG];
+
+    VA_START(fmt);
+    VSNPRINTF(s, LRG, fmt);
+    VA_END;
+
+    n = nc - 1 - strlen(d);
+    n = min(n, strlen(s));
+
+    strncat(d, s, n);
+
+    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -415,6 +476,33 @@ char *path_base(char *s)
         {if (*pd == '.')
 	    {*pd = '\0';
 	     break;};};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PATH_SIMPLIFY - remove redundant entries from path type string S */
+
+char *path_simplify(char *s, int delim)
+   {int i, j, ok;
+    char *t, **sa;
+    static char d[LRG];
+
+    sa = tokenize(s, " :");
+    
+    nstrncpy(d, LRG, sa[0], -1);
+    for (i = 1; sa[i] != NULL; i++)
+        {t = sa[i];
+
+	 ok = FALSE;
+	 for (j = i-1; (j >= 0) && (ok == FALSE); j--)
+	     ok = (strcmp(sa[j], t) == 0);
+
+	 if (ok == FALSE)
+	    vstrcat(d, LRG, "%c%s", delim, t);};
+
+    free_strings(sa);
 
     return(d);}
 
@@ -811,8 +899,7 @@ void clean_space(char *s)
         {p = strstr(ps, "+sp+");
 	 if (p != NULL)
 	    {*p = '\0';
-	     nstrcat(t, LRG, ps);
-	     nstrcat(t, LRG, " ");
+	     vstrcat(t, LRG, "%s ", ps);
 	     ps = p + 4;}
 	 else
 	    {nstrcat(t, LRG, ps);
@@ -1061,47 +1148,6 @@ int blank_line(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TOKENIZE - return an array of strings obtained by
- *          - tokenizing the string S according to the delimiters DELIM
- *          - the array is terminated by a NULL string
- *          - it can be released by free_strings
- */
-
-char **tokenize(char *s, char *delim)
-   {int i, n, c;
-    char *p, *t, *ps, **sa;
-
-    sa = NULL;
-    n  = strlen(s);
-    t  = MAKE_N(char, n+100);
-    if (t != NULL)
-       {strcpy(t, s);
-
-	for (i = 0, ps = t; ps != NULL; )
-	    {if (sa == NULL)
-	        sa = MAKE_N(char *, 1000);
-
-	     p = strpbrk(ps, delim);
-	     if (p != NULL)
-	        {c  = *p;
-		 *p = '\0';
-		 sa[i++] = STRSAVE(ps);
-		 *p = c;
-		 ps = p + 1;}
-	     else
-	        {sa[i++] = STRSAVE(ps);
-		 break;};};
-
-	if (sa != NULL)
-	   sa[i++] = NULL;
-
-	FREE(t);};
-
-    return(sa);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PUSH_TOK - push token T onto the end of string S */
 
 int push_tok(char *s, int nc, int dlm, char *fmt, ...)
@@ -1162,7 +1208,7 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
 
 int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
    {int rv;
-    char t[MAXLINE], bf[LRG], delim[2];
+    char t[MAXLINE], bf[LRG];
 
     VA_START(fmt);
     VSNPRINTF(t, MAXLINE, fmt);
@@ -1172,10 +1218,7 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
 
     strncpy(bf, t, LRG);
     if (IS_NULL(s) == FALSE)
-       {delim[0] = dlm;
-	delim[1] = '\0';
-	strncat(bf, delim, nc);
-	strncat(bf, s, nc);};
+       vstrcat(bf, LRG, "%c%s", dlm, s);
 
     strncpy(s, bf, nc);
 
@@ -1489,9 +1532,7 @@ void splice_out_path(char *path)
 /* PUSH_PATH - look thru PATH for things to add to destination DPATH */
 
 void push_path(int end, char *dpath, char *path)
-   {int i, ok;
-    char lpth[MAXLINE], tp[LRG];
-    char **lst;
+   {char lpth[MAXLINE], tp[LRG];
 
     strcpy(lpth, strip_quote(path));
 
@@ -1499,30 +1540,15 @@ void push_path(int end, char *dpath, char *path)
 
 /* add the new item */
     if (IS_NULL(dpath) == TRUE)
-       strncpy(dpath, lpth, LRG);
+       strncpy(tp, lpth, LRG);
 
     else
+       {if (end == APPEND)
+	   snprintf(tp, LRG, "%s:%s", dpath, lpth);
+        else if (end == PREPEND)
+	   snprintf(tp, LRG, "%s:%s", lpth, dpath);};
 
-/* path to list */
-       {lst = tokenize(lpath, ":");
-
-/* check list for match */
-	ok = FALSE;
-	for (i = 0; (lst[i] != NULL) && (ok == FALSE); i++)
-	    {if (strcmp(lst[i], path) == 0)
-	        ok = TRUE;
-	     FREE(lst[i]);};
-        
-	FREE(lst);
-
-	if (ok == FALSE)
-	   {if (end == APPEND)
-	       {snprintf(tp, LRG, "%s:%s", dpath, lpth);
-		strncpy(dpath, tp, LRG);}
-
-	    else if (end == PREPEND)
-	       {snprintf(tp, LRG, "%s:%s", lpth, dpath);
-		strncpy(dpath, tp, LRG);};};};
+    strncpy(dpath, path_simplify(tp, ':'), LRG);
 
     return;}
 
@@ -1815,6 +1841,33 @@ int demonize(void)
 	dup(fd);};                             /* stderr */
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FILE_TEXT - return the text of FNAME as a NULL terminated list of strings */
+
+char **file_text(char *fname, ...)
+   {int i;
+    char s[LRG], file[MAXLINE];
+    char **sa;
+    FILE *in;
+
+    VA_START(fname);
+    VSNPRINTF(file, MAXLINE, fname);
+    VA_END;
+
+    in = fopen(file, "r");
+    if (in != NULL)
+       {sa = NULL;
+	for (i = 0; fgets(s, LRG, in) != NULL; i++)
+	    {LAST_CHAR(s) = '\0';
+	     sa = lst_push(sa, s);};
+	sa = lst_push(sa, NULL);
+
+	fclose(in);};
+
+    return(sa);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
