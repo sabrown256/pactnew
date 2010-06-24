@@ -26,8 +26,11 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log ($PDBView -l $RootDir/sx/tests/sxpdbi.scm > sxpdbi.res)
-         flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
          set xstatus = $status
+         if ($xstatus == 0) then
+            flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
+            set xstatus = $status
+         endif
       else
          ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxpdbi.scm |& \
          grep "ERROR SUMMARY:"                                                   |& \
@@ -38,7 +41,9 @@ source ../../tests/common
 
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          if ("$Valgrind" == "") then
             flog $Log cp sxpdbi.res sxpdbi.res.crash
          endif

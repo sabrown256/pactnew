@@ -44,8 +44,8 @@ set PIncDir  = $PRootDir/$System/include
 set PBinDir  = $PRootDir/$System/bin
 set TstDir   = z-$System
 set Log      = log.test
-set ERROR    = 0
-set ABCError = FALSE
+set err      = 0
+set abcerr   = FALSE
 set FAIL     = "NO"
 set status   = 0
 
@@ -105,11 +105,15 @@ endif
 
    flog $Log rm tsrc1
 
-   if ($xstatus != 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $Log "                       S ..... OMITTED ($xstatus)"
+      set err    = $xstatus
+      set abcerr = TRUE
+   else if ($xstatus != 0) then
       NoteD $Log "                       S ..... FAILED ($xstatus)"
-      set ERROR    = 2
+      set err = 2
       if ("$Valgrind" == "") then
-         set ABCError = "TRUE"
+         set abcerr = TRUE
       endif
    else
       NoteD $Log "                       S ..... PASSED"
@@ -118,7 +122,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   if ($ABCError == "FALSE") then
+   if ($abcerr == FALSE) then
 
       Note $Log "Running generator code A ... "
 
@@ -133,11 +137,15 @@ endif
          flog $Log $RM $Tmp
       endif
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "                       A ..... OMITTED ($xstatus)"
+         set err    = $xstatus
+         set abcerr = TRUE
+      else if ($xstatus != 0) then
          NoteD $Log "                       A ..... FAILED ($xstatus)"
-         set ERROR    = 3
+         set err = 3
          if ("$Valgrind" == "") then
-            set ABCError = "TRUE"
+            set abcerr = TRUE
          endif
       else
          NoteD $Log "                       A ..... PASSED"
@@ -147,7 +155,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   if ($ABCError == "FALSE") then
+   if ($abcerr == FALSE) then
 
       Note $Log "Running simulation code B ... "
       if ("$Valgrind" == "") then
@@ -161,10 +169,14 @@ endif
          flog $Log $RM $Tmp
       endif
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "                       B ..... OMITTED ($xstatus)"
+         set err    = $xstatus
+         set abcerr = TRUE
+      else if ($xstatus != 0) then
          NoteD $Log "                       B ..... FAILED ($xstatus)"
-         set ERROR    = 4
-         set ABCError = "TRUE"
+         set err    = 4
+         set abcerr = TRUE
       else
          NoteD $Log "                       B ..... PASSED"
       endif
@@ -177,9 +189,9 @@ endif
 
 flog $Log $RM $Tmp
 
-if ($ERROR == 0) then
+if ($err == 0) then
    flog $Log rm st.* test.* tsrc1.*
 endif
 
-exit($ERROR)
+exit($err)
 

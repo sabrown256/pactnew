@@ -26,23 +26,25 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log ($SX -l $RootDir/sx/tests/sxhash.scm > sxhash.res.tmp)
-
-         cat sxhash.res.tmp          | \
-         sed -e '/diskaddr =/d'        \
-             -e '/size =/d'            \
-             -e '/alignment =/d'       \
-             -e '/member_offs =/d'     \
-             -e '/cast_offs =/d'       \
-             -e '/number =/d'          \
-             -e '/bpi =/d'             \
-             -e '/order/d'             \
-             -e '/format/d'            \
-             -e 's/ . 5 7 6.98/ d 5 7 6.98/g'   \
-             -e 's/long_long/long/g'   \
-             -e 's/#([^A-Za-z)]*)//g' > sxhash.res
-
-         flog $Log (diff -b sxhash.res $RootDir/sx/tests/ref/sxhash > sxhash.res.diff)
          set xstatus = $status
+         if ($xstatus == 0) then
+            cat sxhash.res.tmp          | \
+            sed -e '/diskaddr =/d'        \
+                -e '/size =/d'            \
+                -e '/alignment =/d'       \
+                -e '/member_offs =/d'     \
+                -e '/cast_offs =/d'       \
+                -e '/number =/d'          \
+                -e '/bpi =/d'             \
+                -e '/order/d'             \
+                -e '/format/d'            \
+                -e 's/ . 5 7 6.98/ d 5 7 6.98/g'   \
+                -e 's/long_long/long/g'   \
+                -e 's/#([^A-Za-z)]*)//g' > sxhash.res
+
+            flog $Log (diff -b sxhash.res $RootDir/sx/tests/ref/sxhash > sxhash.res.diff)
+            set xstatus = $status
+         endif
       else
          ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxhash.scm |& \
          grep "ERROR SUMMARY:"                                                   |& \
@@ -53,7 +55,9 @@ source ../../tests/common
 
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $Log "FAILED ($xstatus/$ETime)"
          set Err = 1
       else

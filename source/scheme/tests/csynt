@@ -39,8 +39,11 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log ( $CFE $BinDir/scheme -e -l shcdcl.c >! shcdcl.res )
-         flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
          set xstatus = $status
+         if ($xstatus == 0) then
+            flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
+            set xstatus = $status
+         endif
       else
          ftee $Log $Valgrind $BinDir/scheme -e -l shcdcl.c    |& \
          grep "ERROR SUMMARY:"                                |& \
@@ -71,7 +74,11 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log ( $CFE $BinDir/scheme -e -l shcppts.c >! shcppts.res )
-         flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
+         set xstatus = $status
+         if ($xstatus == 0) then
+            flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
+            set xstatus = $status
+         endif
       else
          ftee $Log $Valgrind $BinDir/scheme -e -l shcppts.c   |& \
          grep "ERROR SUMMARY:"                                |& \
@@ -102,8 +109,11 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log ( $CFE $BinDir/scheme -e -l shctst.c >! shctst.res )
-         flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
          set xstatus = $status
+         if ($xstatus == 0) then
+            flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
+            set xstatus = $status
+         endif
       else
          ftee $Log $Valgrind $BinDir/scheme -e -l shctst.c    |& \
          grep "ERROR SUMMARY:"                                |& \
@@ -133,22 +143,29 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          Note $Log "Command: $CFE $BinDir"'/scheme -e \(translate-c-file \"shctst.c\"\) >! shctst.scm'
-         Note $Log "Command: $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res"
          $CFE $BinDir/scheme -e \(translate-c-file \"shctst.c\"\) >! shctst.scm
-         $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res
+         set xstatus = $status
+         if ($xstatus == 0) then
+            Note $Log "Command: $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res"
+            $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res
+            set xstatus = $status
+         endif
 
+         if ($xstatus == 0) then
 # GOTCHA: OSF's diff does not allow "-B" option (revert this when they go away)
-#      diff -B shctst-scm.res $FilesDir/ref/shctst >! shctst-scm.res.diff
+#             diff -B shctst-scm.res $FilesDir/ref/shctst >! shctst-scm.res.diff
 
 # begin fix
-         cat shctst-scm.res | sed -e '/^$/d' >! junk
-         flog $Log mv junk shctst-scm.res 
-         cat $FilesDir/ref/shctst | sed -e '/^$/d' >! junk
-         flog $Log mv junk shctst 
+            cat shctst-scm.res | sed -e '/^$/d' >! junk
+            flog $Log mv junk shctst-scm.res 
+            cat $FilesDir/ref/shctst | sed -e '/^$/d' >! junk
+            flog $Log mv junk shctst 
 
-         diff shctst-scm.res shctst >! shctst-scm.res.diff
-         set xstatus = $status
+            diff shctst-scm.res shctst >! shctst-scm.res.diff
+            set xstatus = $status
 # end fix
+         endif
+
       else
          ftee $Log $Valgrind $BinDir/scheme -e \(translate-c-file \"shctst.c\"\)  |& \
          grep "ERROR SUMMARY:"                                                    |& \

@@ -29,7 +29,9 @@ if ("$Valgrind" == "") then
       set fill = `fill-string -n 32 $n`
       flog $LogF $CFE pdbtst -n -b $n
       set xstatus = $status
-      if ($xstatus == 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "                        $fill (omitted)"
+      else if ($xstatus == 0) then
          NoteD $LogF "                        $fill (ok)"
       else
          NoteD $LogF "                        $fill (ng)"

@@ -49,7 +49,9 @@ source ../../tests/common
 	 flog $Log $RM $Tmp
       endif
       set ETime = `$TIMER -b $BTime`
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "omitted ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $Log "ng ($xstatus/$ETime)"
       else
          NoteD $Log "ok ($ETime)"
@@ -68,7 +70,9 @@ source ../../tests/common
 	 flog $Log $RM $Tmp
       endif
       set ETime = `$TIMER -b $BTime`
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "omitted ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $Log "ng ($xstatus/$ETime)"
       else
          NoteD $Log "ok ($ETime)"
@@ -76,7 +80,9 @@ source ../../tests/common
 
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "                    PGS MPEG Test .......... OMITTED ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $Log "                    PGS MPEG Test .......... FAILED ($ETime)"
          set Err = 1
       else

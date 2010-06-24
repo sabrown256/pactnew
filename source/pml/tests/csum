@@ -48,7 +48,7 @@ source ../../tests/common
          set FAIL = ng
       endif
 
-      if ((-f $Ref) && ("$Valgrind" == "")) then
+      if ((-f $Ref) && ("$Valgrind" == "") && ($xstatus == 0)) then
          flog $Log (diff checksum.res $Ref >&! checksum.diff)
          set xstatus = $status
          if ($xstatus != 0) then
@@ -61,9 +61,9 @@ source ../../tests/common
    set ETime = `$TIMER -b $UTime`
 
    if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "OMITTED ($xstatus/$ETime)"
+      NoteD $Log "                    PML Checksum Test ...... OMITTED ($xstatus/$ETime)"
    else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($FAIL/$ETime)"
+      NoteD $Log "                    PML Checksum Test ...... FAILED ($xstatus/$ETime)"
       @ Err = 1
    else
       NoteD $Log "PASSED ($ETime)"

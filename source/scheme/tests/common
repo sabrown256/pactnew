@@ -45,7 +45,6 @@ set do_syntax = 0
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
-   Note $Log "PATH = $PATH"
 endif
 
 set Err = 0
