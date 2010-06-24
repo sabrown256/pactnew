@@ -1449,7 +1449,7 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
     s = _SC_prep_command(cmd, FALSE);
 
 /* tokenize the command to facilitate looking for simple commands */
-    ta = SC_tokenize_literal(s, " \t\n\r", TRUE);
+    ta = SC_tokenize_literal(s, " \t\n\r", TRUE, 3);
     SC_ptr_arr_len(na, ta);
 
     _SC_subst_task_env(na, ta);
