@@ -23,10 +23,10 @@ source ../../tests/common
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE trans
-   set TStatus = $status
+   set xstatus = $status
    flog $Log popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Trans Test Program"
       NoteD $Log "                    PGS Line Plot Test ..... FAILED"
@@ -49,7 +49,9 @@ source ../../tests/common
 
       NoteD $Log ""
 
-      if ($xstatus != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "                    PGS Trans Test ......... OMITTED ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $Log "                    PGS Trans Test ......... FAILED ($xstatus/$ETime)"
          set Err = 1
       else

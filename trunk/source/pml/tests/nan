@@ -48,9 +48,9 @@ source ../../tests/common
       set ETime = `$TIMER -b $UTime`
 
       if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log  "OMITTED ($xstatus/$ETime)"
+         NoteD $Log "                    PML NAN Test ........... OMITTED ($xstatus/$ETime)"
       else if ($xstatus != 0) then
-         NoteD $Log  "FAILED ($xstatus/$ETime)"
+         NoteD $Log "                    PML NAN Test ........... FAILED ($xstatus/$ETime)"
          @ Err = 1
       else
          NoteD $Log "PASSED ($ETime)"

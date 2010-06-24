@@ -727,9 +727,9 @@ static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
 
 	printf("%8d  %10ld %10ld %8ld    %2s  %10ld %10ld %8ld\n",
 	       count++,
-	       vad, vad+nbv, nbv,
+	       (long) vad, (long) (vad+nbv), (long) nbv,
 	       vfy,
-	       rad, rad+nbr, nbr);};
+	       (long) rad, (long) (rad+nbr), (long) nbr);};
 
     return(ok);}
 

@@ -23,8 +23,11 @@ source ../../tests/common
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log ($SX -l $RootDir/sx/tests/sxpdba.scm > sxpdba.res)
-      flog $Log (diff sxpdba.res $RootDir/sx/tests/ref/sxpdba > sxpdba.res.diff)
       set xstatus = $status
+      if ($xstatus == 0) then
+         flog $Log (diff sxpdba.res $RootDir/sx/tests/ref/sxpdba > sxpdba.res.diff)
+         set xstatus = $status
+      endif
    else
       ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxpdba.scm |& \
       grep "ERROR SUMMARY:"                                                   |& \
@@ -35,7 +38,9 @@ source ../../tests/common
 
    set ETime = `$TIMER -b $UTime`
 
-   if ($xstatus != 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
       NoteD $Log "FAILED ($xstatus/$ETime)"
       set Err = 1
    else

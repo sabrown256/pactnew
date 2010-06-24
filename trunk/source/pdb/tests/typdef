@@ -8,6 +8,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 source ../../tests/common
 
 set tst = $1
@@ -28,8 +30,11 @@ else
 endif
 set ETime   = `$TIMER -b $UTime`
 
-unalias grep
-set check = `tail out.pdb | grep Float | sed -e 's|Float.*double.*|pass|'`
+if ($xstatus == 0) then
+   set check = `tail out.pdb | grep Float | sed -e 's|Float.*double.*|pass|'`
+else
+   set check = "fail"
+endif
 
 if (($xstatus == 254) || ($xstatus == 255)) then
    NoteD $LogF "OMITTED ($xstatus/$ETime)"

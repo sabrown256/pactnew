@@ -77,7 +77,6 @@ endif
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
-   Note $Log "PATH = $PATH"
 endif
 
 set Err = 0

@@ -26,11 +26,13 @@ source ../../tests/common
       flog $Log pushd $ExtDir
       set UTime = `$TIMER -r`
       ./do-test >&! ext.res
-      set TStat = $status
-      set ETime = `$TIMER -b $UTime`
+      set xstatus = $status
+      set ETime   = `$TIMER -b $UTime`
       flog $Log popd
 
-      if ($TStat != 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+      else if ($xstatus != 0) then
          NoteD $Log "FAILED ($ETime)"
          set Err = 1
       else

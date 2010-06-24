@@ -30,7 +30,7 @@ endif
 set ETime = `$TIMER -b $UTime`
 
 if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   NoteD $LogF "                    PDB Gather/Scatter Test ............ OMITTED ($xstatus/$ETime)"
 else if ($xstatus != 0) then
    NoteD $LogF "                    PDB Gather/Scatter Test ............ FAILED ($xstatus/$ETime)"
    set Err = 1
