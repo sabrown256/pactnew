@@ -1204,7 +1204,7 @@ extern char
  *SC_lasttok(char *s, char *delim),
  *SC_ntok(char *d, int nc, char *s, int n, char *delim),
  **SC_tokenize(char *s, char *delim),
- **SC_tokenize_literal(char *s, char *delim, int nl),
+ **SC_tokenize_literal(char *s, char *delim, int nl, int qu),
  **SC_file_strings(char *fname),
  *SC_firsttokq(char *s, char *delim, char *qdelim),
  *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add),

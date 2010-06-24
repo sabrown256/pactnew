@@ -698,10 +698,10 @@ static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
 	rbf = rq->bf;
 
 	if (fr == NULL)
-	   {rad = vad + nbv;
-	    nbr = 0;
-	    vad = rq->addr;
-	    nbv = rq->sz;}
+	   {vad = rq->addr;
+	    nbv = rq->sz;
+	    rad = vad + nbv;
+	    nbr = 0;}
 	else
 	   {rad = fr->addr;
 	    nbr = fr->nb;

@@ -1213,11 +1213,14 @@ static int _SC_match_delim(char **ppi, char **ppo, int oc, int cc)
 /*--------------------------------------------------------------------------*/
 
 /* SC_TOKENIZE_LITERAL - like SC_tokenize except
- *                     - that quoted strings (either with " or ')
+ *                     - that quoted strings
+ *                     -   QU = 1 check "
+ *                     -   QU = 2 check '
+ *                     -   QU = 3 check both
  *                     - are preserved with the quotes as a single token
  */
 
-char **SC_tokenize_literal(char *s, char *delim, int nl)
+char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
    {int c, n, front, more;
     char *bf, *pi, *po, *t, *u, *sb, **sa;
     SC_array *arr;
@@ -1270,7 +1273,8 @@ char **SC_tokenize_literal(char *s, char *delim, int nl)
 	         *po++ = c;
 
 /* look for strings with " or ' as the delimiter */
-		 if ((c == '\"') || (c == '\''))
+		 if (((c == '\"') && ((qu & 1) != 0)) ||
+		     ((c == '\'') && ((qu & 2) != 0)))
 		    _SC_match_quote(&pi, &po, c, bf, delim);
 	        
 /* look for strings with {} as the delimiter */
