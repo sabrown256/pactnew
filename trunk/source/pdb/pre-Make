@@ -118,7 +118,10 @@ ${BinDir}/detect : detect.c ${Hdrs}
 
 ${PACTTmpDir}/pdform.h : ${BinDir}/detect
 	${RM} ${PACTTmpDir}/pdform.h
-	${CFE} ${BinDir}/detect -c ${BE} > ${PACTTmpDir}/pdform.h
+	@echo "${CFE} ${BinDir}/detect -c ${BE} -> pdform.h"
+	@( ${CFE} ${BinDir}/detect -c ${BE} > ${PACTTmpDir}/pdform.h ||   \
+           ( echo "***> Failed to generate pdform.h"                 &&   \
+             exit 1 ) )
 
 pdspoke.c : config-spokes pdshar.c
 	config-spokes
