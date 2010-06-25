@@ -72,6 +72,25 @@ static int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_BIO_DEBUG - set buffering debugging level
+ *              - return the old value
+ *              - if LVL < 0 do not change the current value
+ *              - bit 1 activates read checks
+ *              - bit 2 activates write checks
+ */
+
+int SC_bio_debug(int lvl)
+   {int ol;
+
+    ol = _SC_bio_debug;
+    if (lvl >= 0)
+       _SC_bio_debug = lvl;
+
+    return(ol);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BIO_AUDIT - debugging aid */
 
 static INLINE void _SC_bio_audit(bio_desc *bid, char *tag)

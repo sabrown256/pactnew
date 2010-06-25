@@ -950,7 +950,7 @@ FIXNUM F77_FUNC(schlkp, SCHLKP)(void *p, FIXNUM *pnc, F77_string pname,
  *        - return a pointer to the object thru P
  */
 
-FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc,  F77_string pname,
+FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc, F77_string pname,
                                 FIXNUM *haid)
    {FIXNUM rv;
     char name[MAXLINE];

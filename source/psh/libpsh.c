@@ -1276,6 +1276,34 @@ char **lst_push(char **lst, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* LST_ADD - add S to list LST */
+
+char **lst_add(char **lst, char *s)
+   {int n, m;
+    char *ps;
+
+    if (s == NULL)
+       ps = NULL;
+    else
+       ps = STRSAVE(s);
+
+    if (lst == NULL)
+       {lst = MAKE_N(char *, 100);
+        memset(lst, 0, 100*sizeof(char *));};
+
+    n = lst_length(lst);
+    if (n % 100 == 98)
+       {m = n + 102;
+        REMAKE(lst, char *, m);
+        memset(lst+n, 0, 102*sizeof(char *));};
+
+    lst[n] = ps;
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LST_COPY - return a copy of LST */
 
 char **lst_copy(char **lst)
@@ -1862,8 +1890,8 @@ char **file_text(char *fname, ...)
        {sa = NULL;
 	for (i = 0; fgets(s, LRG, in) != NULL; i++)
 	    {LAST_CHAR(s) = '\0';
-	     sa = lst_push(sa, s);};
-	sa = lst_push(sa, NULL);
+	     sa = lst_add(sa, s);};
+	sa = lst_add(sa, NULL);
 
 	fclose(in);};
 

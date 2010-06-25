@@ -1,0 +1,6 @@
+void foo(void)
+   {
+    {do {foo;}
+     while (bar);}
+    bletch();
+    return;}    

@@ -92,12 +92,15 @@ source ../../tests/common
                flog $LogF $CFE $BinDir/scthrt $arg -n $n $mode -d 1 -s
                set xstatus = $status
 
-               if ($xstatus == 123) then
+               if (($xstatus == 254) || ($xstatus == 255)) then
+                  NoteD $LogF -n "o"
+                  Note $LogF ""
+               else if ($xstatus == 123) then
                   NoteD $LogF -n "*"
                   Note $LogF ""
                else if ($xstatus != 0) then
-                  NoteD $LogF -n "x"
                   set lerr = 1
+                  NoteD $LogF -n "x"
                   Note $LogF ""
                else
                   NoteD $LogF -n "."

@@ -62,7 +62,9 @@ source ../../tests/common
          flog $Log $cfe $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
          set xstatus = $status
    
-         if ($xstatus != 0) then
+         if (($xstatus == 254) || ($xstatus == 255)) then
+            NoteD $LogF "OMITTED ($ETime)"
+         else if ($xstatus != 0) then
             NoteD $Log "FAILED ($ETime)"
             NoteD $Log "                         PS files differ"
             set Err = 1

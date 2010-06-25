@@ -1,0 +1,118 @@
+#!/bin/csh -f
+#
+# ELIDE - test elide
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if (-f test-env) then
+   source test-env
+   pushd $TestDir >& /dev/null
+else
+   source ../../../scripts/test-env
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: elide [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+@ Err = 0
+
+set BTime = `$TIMER -r`
+
+NoteD $Log ""
+NoteD $Log "                    ELIDE Test ....................."
+
+set TstDir = $SrcDir/tests
+set RefDir = $TstDir/ref
+
+set List = (1 2 3)
+
+set lErr = 0
+
+flog $Log setenv PATH $RootDir/scripts:$PATH
+
+Note $Log "Path = $PATH"
+
+foreach t (ebasic emlt)
+   Separator $Log
+
+   flog $Log set dat = $TstDir/$t.dat
+
+   foreach i (1 2 3)
+      Separator $Log
+
+      flog $Log set res = ${t}${i}
+      flog $Log set ref = $RefDir/$res
+
+      set f = ( `fill-string -n 28 $res` )
+      NoteD $Log -n "                        $f "
+      Note $Log ""
+
+      switch ($i)
+         case 1:
+              flog $Log ( elide '/*' '*/' $dat >&! $res )
+              set xstatus = $status
+              breaksw
+         case 2:
+              flog $Log ( elide '{' '}' $dat >&! $res )
+              set xstatus = $status
+              breaksw
+         case 3:
+              flog $Log ( elide '#if' '#endif' $dat >&! $res )
+              set xstatus = $status
+              breaksw
+         default:
+              break
+      endsw
+
+      if (-f $ref) then
+         flog $Log ( diff -w -b $res $ref >! $res.diff )
+         set xstatus = $status
+      else
+         flog $Log cp $res $ref
+         set xstatus = $status
+      endif
+
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+         flog $Log rm -f $res $res.diff
+      else
+         if (-d $res.log) then
+            flog $Log cat $res.log
+         endif
+         flog $Log cat $res
+         flog $Log cat $res.diff
+         NoteD $Log "ng"
+         flog $Log set lErr = 1
+      endif
+   end
+end
+
+set ETime = `$TIMER -b $BTime`
+
+if ($lErr != 0) then
+   NoteD $Log "                    ELIDE Test ..................... FAILED ($lErr/$ETime)"
+   @ Err = $Err + 1
+else
+   NoteD $Log "                    ELIDE Test ..................... PASSED ($ETime)"
+   flog $Log rm -f db*
+endif
+Note $Log ""
+
+exit($Err)
+

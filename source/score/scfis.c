@@ -69,7 +69,7 @@ FIXNUM F77_FUNC(scstln, SCSTLN)(F77_string s, FIXNUM *pnx)
  */
 
 void F77_FUNC(scsttk, SCSTTK)(FIXNUM *pnc, F77_string d,  F77_string s,
-			   FIXNUM pnd, F77_string dl)
+			      FIXNUM pnd, F77_string dl)
    {int j, n, nc, flag;
     char *dst, *src, *delim;
     char c;

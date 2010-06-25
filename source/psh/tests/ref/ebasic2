@@ -1,0 +1,19 @@
+
+line 1 /* a b c */ d e f /* g h i */ end 1
+/* a b c */ d e f /* g h i */
+
+int foo(int a)
+   
+
+#if 0
+int bar(int a)
+   
+#else
+int baz(int a)
+   
+#endif
+
+int blat(int a)
+   
+
+
