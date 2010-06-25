@@ -1,0 +1,46 @@
+#  C function         Fortran  Scheme            Python
+
+# SCFIA.C
+SC_arrlen             scalen   none              arrlen
+SC_pause              scpaus   none              pause
+SC_advance_name       scadvn   none              none
+SC_cpu_time           scctim   cpu-time          none
+SC_wall_clock_time    scwtim   wall-clock-time   none
+SC_date               scdate   date              none
+
+# SCFIS.C
+_SC_strlen            scstln   none              none
+
+# SCMEMC.C
+SC_zero_space         sczrsp   set-zero-space!   zero_space
+
+# SCMEMF.C
+_SC_make_f77          scmakz   none              none
+SC_realloc_nz         scremz   none              none
+SC_realloc_na         screma   none              none
+SC_free_z             scfrez   none              none
+SC_free               scfree   none              none
+SC_is_score_ptr       scissp   none              is_score_ptr
+SC_mem_trace          scmemt   memory-trace      mem_trace
+SC_mem_chk            scmemc   memory-check      mem_chk
+SC_mem_stats          scmems   memory-usage      none
+SC_mem_monitor        scmemm   memory-monitor    mem_monitor
+SC_mem_map            scmemp   memory-map        none
+SC_configure_mm       scmmcf   sc-configure-mm   none
+SC_mark               scmark   none              mark
+SC_mem_print          scmpnt   none              mem_print
+
+# SCMEMG.C
+SC_use_guarded_mem    scgmem   none              none
+
+# SCPAR.C
+SC_init_threads       scinth   none              none
+
+# SCTAB.C
+SC_make_hasharrr      scmkht   make-hash-table   none
+SC_free_hasharr       scrlht   none              none
+SC_hasharr_def_lookup schdlu   hash-lookup       def_lookup
+SC_hasharr_clear      schclr   clear-hash-table  none
+SC_hasharr_lookup     schlkp   none              none
+SC_hasharr_remove     schrem   hash-remove       none
+
