@@ -47,8 +47,12 @@ NoteD $Log -n "                       Single package ............. "
 Note $Log " "
 
 flog $Log panache pkg.dict
-flog $Log $PX $CCompiler $CFLAGS $Inc -c pkg.c -o pkg.o
 set xstatus = $status
+if ($xstatus == 0) then
+   flog $Log $PX $CCompiler $CFLAGS $Inc -c pkg.c -o pkg.o
+   set xstatus = $status
+endif
+
 if (($xstatus == 254) || ($xstatus == 255)) then
    NoteD $Log "omitted"
 else if ($xstatus != 0) then
@@ -69,15 +73,18 @@ NoteD $Log -n "                       Whole code ................. "
 Note $Log " "
 
 flog $Log panache code.dict
-foreach i (pkg1 pkg2 pkg3 cgen crun)
-   flog $Log $PX $CCompiler $CFLAGS $Inc -c $i.c -o $i.o
-   set xstatus = $status
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      set LErr = $xstatus
-   else if ($xstatus != 0) then
-      set LErr = 1
-   endif
-end
+set LErr = $status
+if ($LErr == 0) then
+   foreach i (pkg1 pkg2 pkg3 cgen crun)
+      flog $Log $PX $CCompiler $CFLAGS $Inc -c $i.c -o $i.o
+      set xstatus = $status
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         set LErr = $xstatus
+      else if ($xstatus != 0) then
+         set LErr = 1
+      endif
+   end
+endif
 
 if (($LErr == 254) || ($LErr == 255)) then
    NoteD $Log "omitted"

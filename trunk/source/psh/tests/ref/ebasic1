@@ -1,0 +1,27 @@
+
+line 1  d e f  end 1
+ d e f 
+
+int foo(int a)
+   {
+
+    return(a);}
+
+#if 0
+int bar(int a)
+   {
+
+    return(a);}
+#else
+int baz(int a)
+   {
+
+    return(a);}
+#endif
+
+int blat(int a)
+   {
+
+    return(a);}
+
+

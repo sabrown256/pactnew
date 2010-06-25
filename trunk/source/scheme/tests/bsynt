@@ -26,8 +26,11 @@ source ../../tests/common
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $BinDir/scheme -e -l shmtst.m >! shmtst.res
-         diff shmtst.res $FilesDir/ref/shmtst >! shmtst.res.diff
          set xstatus = $status
+         if ($xstatus == 0) then
+            diff shmtst.res $FilesDir/ref/shmtst >! shmtst.res.diff
+            set xstatus = $status
+         endif
       else
          ftee $Log $Valgrind $BinDir/scheme -e -l shmtst.m    |& \
          grep "ERROR SUMMARY:"                                |& \

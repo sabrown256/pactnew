@@ -1,0 +1,17 @@
+
+line 1 /* a b c */ d e f /* g h i */ end 1
+/* a b c */ d e f /* g h i */
+
+int foo(int a)
+   {
+/* foo */
+    return(a);}
+
+
+
+int blat(int a)
+   {
+/* blat */
+    return(a);}
+
+
