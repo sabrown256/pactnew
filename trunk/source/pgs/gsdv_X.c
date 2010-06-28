@@ -1438,9 +1438,6 @@ static void _PG_X_make_device_current(PG_device *dev)
 	ow = PG_window_width(dev);
         oh = PG_window_height(dev);
 
-        g->hwin[3] = g->hwin[2] + height;
-        g->hwin[1] = g->hwin[0] + width;
-
 	if (dev->use_pixmap &&
 	    ((oh != height) || (ow != width)))
            {XFreePixmap(display, dev->pixmap);
@@ -1453,6 +1450,8 @@ static void _PG_X_make_device_current(PG_device *dev)
 
         g->hwin[0] = root_x;
         g->hwin[2] = root_y;
+        g->hwin[3] = g->hwin[2] + height;
+        g->hwin[1] = g->hwin[0] + width;
 
 	SET_PC_FROM_HWIN(g);
 
