@@ -21,6 +21,50 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PRN - print the node key */
+
+static void _prn(SC_tree_node *pn, int depth, int idp)
+   {char c, *ca;
+
+    c = 0;
+
+    switch (pn->balance)
+        {case -1:
+	      c = 'b';
+	      break;
+	 case 0:
+	      c = 'l';
+	      break;
+	 case 1:
+	      c = 'r';
+	      break;};
+
+    ca = (char *) pn->key;
+    io_printf(stdout, "%p: (%d %c %c %d %d) %s\n",
+	      pn, depth, c,
+	      idp ? '>' : '<',
+	      pn->rank[0], pn->rank[1], ca);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRN - print the tree nodes
+ *      - debugging aid
+ */
+
+void dprn(SC_ntree *bt)
+   {
+
+    io_printf(stdout, "\nTree:\n");
+    SC_map_tree(bt, _prn);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_MAKE_TREE_NODE - allocate and initialize a new tree node */
 
 static SC_tree_node *_SC_make_tree_node(void *k, void *v, int nd)

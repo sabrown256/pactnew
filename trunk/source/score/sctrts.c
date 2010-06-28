@@ -25,50 +25,6 @@ static SC_ntree
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRN - print the node key */
-
-static void prn(SC_tree_node *pn, int depth, int idp)
-   {char c, *ca;
-
-    c = 0;
-
-    switch (pn->balance)
-        {case -1:
-	      c = 'b';
-	      break;
-	 case 0:
-	      c = 'l';
-	      break;
-	 case 1:
-	      c = 'r';
-	      break;};
-
-    ca = (char *) pn->key;
-    io_printf(stdout, "%p: (%d %c %c %d %d) %s\n",
-	      pn, depth, c,
-	      idp ? '>' : '<',
-	      pn->rank[0], pn->rank[1], ca);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DPRN - print the tree nodes
- *      - debugging aid
- */
-
-void dprn(void)
-   {
-
-    io_printf(stdout, "\nTree:\n");
-    SC_map_tree(bt, prn);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* CMP - compare string keys 
  *     - returns the index of the child branch
  *     - or -1 for the node itself

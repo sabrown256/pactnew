@@ -106,7 +106,8 @@ char **tokenize(char *s, char *delim)
 	    {if (sa == NULL)
 	        sa = MAKE_N(char *, 1000);
 
-	     p = strpbrk(ps, delim);
+	     ps += strspn(ps, delim);
+	     p   = strpbrk(ps, delim);
 	     if (p != NULL)
 	        {c  = *p;
 		 *p = '\0';
@@ -203,6 +204,34 @@ char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
 	d[nc] = '\0';};
 
     return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* UPCASE - map S to upper case */
+
+char *upcase(char *s)
+   {size_t i, nc;
+        
+    nc = strlen(s);
+    for (i = 0; i < nc; i++)
+        s[i] = toupper(s[i]);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DOWNCASE - map S to lower case */
+
+char *downcase(char *s)
+   {size_t i, nc;
+        
+    nc = strlen(s);
+    for (i = 0; i < nc; i++)
+        s[i] = tolower(s[i]);
+
+    return(s);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
