@@ -375,16 +375,18 @@ FIXNUM F77_FUNC(pfgbfs, PFGBFS)(void)
 
 /* PFSBFS - FORTRAN interface routine to set PD_buffer_size */
 
-FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *v)
+FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *psz)
    {FIXNUM rv;
+    off_t sz;
     PD_smp_state *pa;
 
     _PD_init_state(FALSE);
 
     pa = _PD_get_state(-1);
 
-    rv                 = *v;
-    pa->buffer_size = rv;
+    sz              = *psz;
+    pa->buffer_size = sz;
+    rv              = sz;
 
     return(rv);}
 

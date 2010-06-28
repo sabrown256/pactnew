@@ -71,8 +71,14 @@ which no other PACT routines should do.
 
    void dpterm(void)
 
-/* DPRN - print the tree nod(sctrts.c) es
+/* DPRN - print the tree nodes (sctrts.c) */
 
+   void dprn(SC_tree *bt)
+
+
+/* DPBFSTACK - debugging print the list of buffer frames for BID (scbio.c) */
+
+   void dpbfstack(bio_desc *bid)
 
                                    /* PML */
 

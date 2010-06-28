@@ -223,7 +223,7 @@ FIXNUM F77_FUNC(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
 
 /* PGGBSZ - return the I/O buffer size */
 
-FIXNUM F77_FUNC(pggbsz, PGGBSZ)(FIXNUM *ps)
+FIXNUM F77_FUNC(pggbsz, PGGBSZ)(void)
    {FIXNUM rv;
     off_t sz;
 
@@ -1518,12 +1518,13 @@ FIXNUM F77_FUNC(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
 
 /* PGSBSZ - set the I/O buffer size */
 
-FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(void)
+FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(FIXNUM *psz)
    {FIXNUM rv;
     off_t sz;
 
+    sz = *psz;
     PG_set_buffer_size(sz);
-    rv = TRUE;
+    rv = sz;
 
     return(rv);}
 

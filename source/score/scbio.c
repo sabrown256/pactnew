@@ -91,6 +91,31 @@ int SC_bio_debug(int lvl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DPBFSTACK - debugging print the list of buffer frames for BID */
+
+void dpbfstack(bio_desc *bid)
+   {int i, n;
+    long as, ae, nb;
+    bio_frame *fa;
+
+    n = SC_array_get_n(bid->stack);
+    for (i = 0; i < n; i++)
+        {fa = *(bio_frame **) SC_array_get(bid->stack, i);
+	 
+	 as = fa->addr;
+	 ae = as + fa->sz;
+	 nb = fa->nb;
+
+	 if (i == 0)
+	    printf("  Buffer        Start      Stop  # bytes\n");
+
+	 printf("%8d  %10ld %10ld %8ld\n", i+1, as, ae, nb);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BIO_AUDIT - debugging aid */
 
 static INLINE void _SC_bio_audit(bio_desc *bid, char *tag)
@@ -478,13 +503,54 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 
 /*--------------------------------------------------------------------------*/
 
-/* _SC_SETUP_READ_BFR - make a read buffer for BID */
+/* _SC_BFR_REMOVE_OVERLAP - eliminate any buffers which overlap FR */
 
-static bio_frame *_SC_setup_read_bfr(bio_desc *bid, bio_frame *fr)
+static void _SC_bfr_remove_overlap(bio_desc *bid, bio_frame *fr)
    {int i, n, fl;
-    off_t ad, sz;
     off_t ri[2], fi[2];
     bio_frame *fa;
+
+    if ((bid->stack != NULL) && (fr != NULL))
+       {ri[0] = fr->addr;
+	ri[1] = ri[0] + fr->sz;
+
+	n = SC_array_get_n(bid->stack);
+	for (i = 0; i < n; i++)
+	    {fa = *(bio_frame **) SC_array_get(bid->stack, i);
+
+	     fi[0] = fa->addr;
+	     fi[1] = fi[0] + fa->sz;
+
+	     if ((fi[0] <= ri[1]) && (ri[0] <= fi[1]))
+	        {fl = (fr->rw == BIO_READ);
+		 n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
+		 i--;};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BFR_PUSH - push a read buffer onto the BID stack */
+
+static void _SC_bfr_push(bio_desc *bid, bio_frame *fr, int rm)
+   {
+
+    if ((bid->stack != NULL) && (fr != NULL))
+       {if (rm == TRUE)
+	   _SC_bfr_remove_overlap(bid, fr);
+	SC_array_push(bid->stack, &fr);
+	bid->nbfmx = max(bid->nbfmx, bid->stack->n);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_BFR_READ_SETUP - make a read buffer for BID */
+
+static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
+   {off_t ad, sz;
 
 /* allocate the frame */
     if (fr == NULL)
@@ -493,27 +559,13 @@ static bio_frame *_SC_setup_read_bfr(bio_desc *bid, bio_frame *fr)
 	fr = _SC_bfr_alloc(ad, sz);}
     else
        {sz = fr->sz;
-	ad = fr->addr + sz;
-
-/* eliminate any buffers which overlap the new interval */
-	if (bid->stack != NULL)
-	   {ri[0] = ad;
-	    ri[1] = ad + sz;
-
-	    n = SC_array_get_n(bid->stack);
-	    for (i = 0; i < n; i++)
-	        {fa = *(bio_frame **) SC_array_get(bid->stack, i);
-
-		 fi[0] = fa->addr;
-		 fi[1] = fi[0] + fa->sz;
-
-		 if ((fi[0] <= ri[1]) && (ri[0] <= fi[1]))
-		    {fl = (fr->rw == BIO_READ);
-		     n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
-		     i--;};};};};
+	ad = fr->addr + sz;};
 
 /* initialize it */
     _SC_bfr_init(fr, ad, sz);
+
+/* eliminate any buffers which overlap the new interval */
+    _SC_bfr_remove_overlap(bid, fr);
 
 /* fill it */
     fr->nb = SC_read_sigsafe(bid->fd, fr->bf, sz);
@@ -563,7 +615,7 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, off_t bsz)
 		   {_SC_bio_buffer(bid, bsz);
 
 /* read in the whole file */
-		    fr = _SC_setup_read_bfr(bid, NULL);
+		    fr = _SC_bfr_read_setup(bid, NULL);
 
 /* push the frame onto the stack */
 		    SC_array_push(bid->stack, &fr);
@@ -655,7 +707,7 @@ static int _SC_verify_file(int fd, off_t ad, off_t nb, unsigned char *bf)
 
     rad = lseek(fd, 0, SEEK_CUR);
 
-    cbf = FMAKE_N(unsigned char, nb, "_SC_CHECK_READ:cbf");
+    cbf = FMAKE_N(unsigned char, nb, "_SC_VERIFY_FILE:cbf");
     st  = lseek(fd, ad, SEEK_SET);
 
 /* read the file contents */
@@ -862,7 +914,7 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
  */
 	fr = _SC_bfr_next(bid, &rq);
 	if (fr == NULL)
-	   fr = _SC_setup_read_bfr(bid, NULL);
+	   fr = _SC_bfr_read_setup(bid, NULL);
 
 	do {nbc = _SC_bfr_infill(&rq, fr);
 	    nr += nbc;
@@ -873,14 +925,13 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 		if (olc != bid->curr)
 		   {na += (bid->curr - nlc);
 		    ad  = _SC_bio_seek(bid, nlc, SEEK_SET);};
-		fr = _SC_setup_read_bfr(bid, fr);
+		fr = _SC_bfr_read_setup(bid, fr);
 
 /* signify that something happened and we cannot exit the loop */
 	        nbc = -1;};}
 	while (nbc != 0);
 
-	SC_array_push(bid->stack, &fr);
-	bid->nbfmx = max(bid->nbfmx, bid->stack->n);
+	_SC_bfr_push(bid, fr, TRUE);
 
 /* check the result and return -1 on error */
 	ok = _SC_check_read(bid, &rq);
@@ -953,8 +1004,7 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	while (nbc != 0);
 
         if (fr->nb != 0)
-	   {SC_array_push(bid->stack, &fr);
-	    bid->nbfmx = max(bid->nbfmx, bid->stack->n);}
+	   _SC_bfr_push(bid, fr, FALSE);
 	else
 	   _SC_bfr_free(fr);};
 

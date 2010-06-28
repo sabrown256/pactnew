@@ -24,7 +24,7 @@ targets :
 
 InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
-             ${BinDir}/smake ${BinDir}/elide
+             ${BinDir}/smake ${BinDir}/elide ${BinDir}/blang
 
 CcFlags = ${CDebug} ${LDRPath}
 PCC     = ${CCSer}
@@ -70,6 +70,11 @@ elide : ${BinDir}/elide
 
 ${BinDir}/elide : elide.c ${LibFiles}
 	${PCC} elide.c -o ${BinDir}/elide
+
+blang : ${BinDir}/blang
+
+${BinDir}/blang : blang.c ${LibFiles}
+	${PCC} blang.c -o ${BinDir}/blang
 
 smake : ${BinDir}/smake
 

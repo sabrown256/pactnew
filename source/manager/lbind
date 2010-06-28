@@ -81,7 +81,7 @@ foreach d ($Dirs)
    NoteD $Log -n "      $Fill "
    Note $Log ""
 
-   flog $Log set Mod = $ZArch/$d-itf.f
+   flog $Log set pck = $ZArch/$d
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -130,7 +130,7 @@ foreach d ($Dirs)
    grep -v 'static'                                | \
    grep '('                                        | \
    sort                                            | \
-   cat >&! $Mod.tmp
+   cat >&! $pck.proto
 
 # Fortran binding
 
@@ -141,142 +141,17 @@ foreach d ($Dirs)
 # Document
 
 echo "Result:"
-cat $Mod.tmp
+echo "blang $pck.proto ../$d/$d.bind"
+pwd
+#cat $pck.proto
 exit(1)
 
-   flog $Log cat $Mod.tmp
-   flog $Log @ Length = `cat $Mod.tmp | wc -l`
-   if ($Length < 1) then
-      Note $Log "There are no F90 callable functions in $d"
-      NoteD $Log "none"
-      flog $Log $RM Mod.tmp
-      continue
-   endif
-
-# declare the incomplete ones as external
-   cat $Mod.tmp                                                         | \
-   awk '{if (($0 ~ /\.\.\./) || ($NF != "END"))                           \
-            {if ($1 == "void")                                            \
-                {printf("   external :: %s\n", $2);}                      \
-             else                                                         \
-                {printf("   %s, external :: %s\n", $1, $2);};};}'       | \
-   cat >&! $Mod.ext
-
-   @ LnExt = `cat $Mod.ext | wc -l`
-   Note $Log "Length of $Mod.ext is $LnExt lines"
-   flog $Log cat $Mod.ext
-
-# emit complete declarations
-   cat $Mod.tmp                                                         | \
-   awk '{if ($1 == "void")                                                \
-            {oper = "subroutine";}                                        \
-         else                                                             \
-            {oper = "function";}                                          \
-         if (($0 !~ /\.\.\./) && ($NF == "END"))                          \
-            {printf("      %s %s(", oper, $2);                            \
-             for (i = 4; i < NF; i += 2)                                  \
-                 {if (i == 4)                                             \
-                     {printf("%s", $i);}                                  \
-                  else if ((i - 4) % 16 == 0)                             \
-                     {printf(", &\n                      %s", $i);}       \
-                  else                                                    \
-                     {printf(", %s", $i);};};                             \
-             printf(")\n");                                               \
-             if ($0 ~ /(isizea)/)                                         \
-                {printf("         use XXXtypes\n");};                     \
-             printf("         implicit none\n");                          \
-             if (oper == "function")                                      \
-                {printf("         %-16s :: %s\n", $1, $2);};              \
-             for (i = 3; i < NF; i += 2)                                  \
-                 {printf("         %-16s :: %s\n", $i, $(i+1));};         \
-                  printf("      end %s %s\n", oper, $2);                  \
-                  printf("\n");};}'                                     | \
-   sed 's/XXX/'$d'/'                                                    | \
-   cat >&! $Mod.itf
-
-   @ LnItf = `cat $Mod.itf | wc -l`
-   Note $Log "Length of $Mod.itf is $LnItf lines"
-   flog $Log cat $Mod.itf
-
-   flog $Log rm -f $Mod.tmp
+   flog $Log rm -f $pck.proto
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# WRITE - write the final interface file
-
-   flog $Log rm -f $Mod
-   flog $Log touch $Mod
-
-   set FName = `echo "$d-itf.f" | tr "[a-z]" "[A-Z]"`
-
-   @ CCount = `echo $FName | wc -c`
-   @ NDots  = $CCount - 1
-   set Fill = ""
-   while ($NDots > 0)
-      set Fill = "$Fill "
-      @ NDots = $NDots - 1
-   end
-
-   Note $Mod "\!"
-   Note $Mod "\! $FName - F90 interfaces for $d"
-   Note $Mod "\! $Fill - NOTE: this file was automatically generated"
-   Note $Mod "\! $Fill - any manual changes will not be effective"
-   Note $Mod "\!"
-   Note $Mod ""
-
-# if there are no interfaces there is no need for the types module
-   if ($LnItf > 0) then
-      Note $Mod "module ${d}types"
-      Note $Mod "   integer, parameter :: isizea = $SzAddr"
-      Note $Mod "end module ${d}types"
-      Note $Mod ""
-   endif
-
-   Note $Mod "module $d"
-   Note $Mod ""
-
-# add external declarations
-   if ($LnExt > 0) then
-      cat $Mod.ext >>& $Mod
-      Note $Mod ""
-   endif
-
-# add interfaces
-   if ($LnItf > 0) then
-      Note $Mod "   interface"
-      Note $Mod ""
-
-      cat $Mod.itf >>& $Mod
-
-      Note $Mod "   end interface"
-      Note $Mod ""
-   endif
-
-   Note $Mod "end module $d"
-   Note $Mod ""
-
-   flog $Log rm -f $Mod.ext $Mod.itf
-   flog $Log cat $Mod
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# COMPILE - compile the module file
-
-   flog $Log pushd $ZArch
-   flog $Log set lMod = $Mod:t
-   flog $Log $FC $FCFlags -c $lMod
-   set xstatus = $status
-
-   flog $Log ls $d*
-   flog $Log mv $d*.mod $IncDir
-   flog $Log set TGTLib = $LibDir/lib${d}.a
-   if (-f $TGTLib) then
-      flog $Log $AR $AROpt $TGTLib $d*.o
-   endif
-   flog $Log $RM $d*.o
-   flog $Log popd
+# place generated bindings source
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -288,8 +163,6 @@ exit(1)
    endif
    flog $Log popd
 end
-
-flog $Log ls -l $cwd:h/dev/$Arch/include/*.mod
 
 exit($Err)
 
