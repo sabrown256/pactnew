@@ -165,7 +165,7 @@ void _PD_set_io_buffer(SC_udl *pu)
        {fp = pu->stream;
 	bf = FMAKE_N(char, sz, "_PD_SET_IO_BUFFER:bf");
 
-	if (lio_setvbuf(fp, bf, _IOFBF, sz))
+	if (lio_setvbuf(fp, bf, _IOFBF, sz) != 0)
 	   {SFREE(bf);
 	    PD_error("CANNOT SET FILE BUFFER - _PD_SET_IO_BUFFER", PD_OPEN);}
 	else

@@ -48,17 +48,17 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PN_BSETVBUF - set the pseudo file buffer */
+/* _PN_BSETVBUF - set the pseudo file buffer
+ *              - return 0 on success
+ */
 
 static int _PN_bsetvbuf(FILE *stream, char *bf, int type, size_t size)
-   {BF_FILE *fb;
-    int ret;
+   {int ret;
+    BF_FILE *fb;
 
     fb = _PD_GET_FILE_PTR(stream);
 
-    ret = TRUE;
-    if (fb == NULL)
-       ret = FALSE;
+    ret = 0;
 
     return(ret);}
 
