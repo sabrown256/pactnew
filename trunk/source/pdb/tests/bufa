@@ -19,7 +19,7 @@ source ../../tests/common
    NoteD $LogF "                    PDB Buffer Test A .................. "
    Note $LogF ""
 
-   set Exe = `which pdbfts`
+   set Exe = `swhich -1 pdbfts`
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then

@@ -743,15 +743,21 @@ static int run_tests(char *path, int rank, int numprocs)
 int main(int c, char **v)
    {int i, n, pow2, rank, numprocs, success;
     long bc;
+    off_t bsz;
     char path[MAXLINE], msg[MAXLINE];
 
     strcpy(path, ".");
     debug = FALSE;
 
+    bsz = 1024*1024;
+
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
-                {case 'd' :
+                {case 'b' :
+		      bsz = SC_stoi(v[++i]);
+		      break;
+                 case 'd' :
 		      debug = TRUE;
 		      break;
                  case 'p' :
@@ -764,6 +770,8 @@ int main(int c, char **v)
                       printf("Unknown flag: %c\n", v[i][1]);};}
          else
             break;};
+
+    PD_set_buffer_size(bsz);
 
     if (debug)
        bc = SC_mem_monitor(-1, 2, "dmp", msg);

@@ -505,7 +505,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 
 /* _SC_BFR_REMOVE_OVERLAP - eliminate any buffers which overlap FR */
 
-static void _SC_bfr_remove_overlap(bio_desc *bid, bio_frame *fr)
+static void _SC_bfr_remove_overlap(bio_desc *bid, bio_frame *fr, bio_kind rw)
    {int i, n, fl;
     off_t ri[2], fi[2];
     bio_frame *fa;
@@ -522,7 +522,7 @@ static void _SC_bfr_remove_overlap(bio_desc *bid, bio_frame *fr)
 	     fi[1] = fi[0] + fa->sz;
 
 	     if ((fi[0] <= ri[1]) && (ri[0] <= fi[1]))
-	        {fl = (fr->rw == BIO_READ);
+	        {fl = (rw == BIO_READ);
 		 n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
 		 i--;};};};
 
@@ -538,7 +538,7 @@ static void _SC_bfr_push(bio_desc *bid, bio_frame *fr, int rm)
 
     if ((bid->stack != NULL) && (fr != NULL))
        {if (rm == TRUE)
-	   _SC_bfr_remove_overlap(bid, fr);
+	   _SC_bfr_remove_overlap(bid, fr, fr->rw);
 	SC_array_push(bid->stack, &fr);
 	bid->nbfmx = max(bid->nbfmx, bid->stack->n);};
 
@@ -550,10 +550,14 @@ static void _SC_bfr_push(bio_desc *bid, bio_frame *fr, int rm)
 /* _SC_BFR_READ_SETUP - make a read buffer for BID */
 
 static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
-   {off_t ad, sz;
+   {int ok;
+    off_t ad, sz;
+    bio_kind rw;
+
+    ok = (fr == NULL);
 
 /* allocate the frame */
-    if (fr == NULL)
+    if (ok == TRUE)
        {sz = bid->bfsz;
 	ad = bid->curr;
 	fr = _SC_bfr_alloc(ad, sz);}
@@ -561,11 +565,14 @@ static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
        {sz = fr->sz;
 	ad = fr->addr + sz;};
 
+    rw = fr->rw;
+
 /* initialize it */
     _SC_bfr_init(fr, ad, sz);
 
 /* eliminate any buffers which overlap the new interval */
-    _SC_bfr_remove_overlap(bid, fr);
+    if (ok == FALSE)
+       _SC_bfr_remove_overlap(bid, fr, rw);
 
 /* fill it */
     fr->nb = SC_read_sigsafe(bid->fd, fr->bf, sz);

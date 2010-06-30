@@ -302,6 +302,7 @@ static int _SC_setvbuf(FILE *stream, char *buf, int type, size_t size)
 
 #ifdef IBMMP
 
+    ret = 0;
     SC_ibm_non_ANSI_compliant = TRUE;
 
 #else
@@ -1599,13 +1600,15 @@ FILE *SC_lfopen(char *name, char *mode)
 
 /*--------------------------------------------------------------------------*/
 
-/* IO_SETVBUF - file IO wrapper for SETVBUF method */
+/* IO_SETVBUF - file IO wrapper for SETVBUF method
+ *            - return 0 on success
+ */
 
 int io_setvbuf(FILE *fp, char *bf, int type, size_t sz)
    {int rv;
     file_io_desc *fid;
 
-    rv = -1;
+    rv = 0;
 
     if (fp != NULL)
        {if (IS_STD_IO(fp))
@@ -2035,13 +2038,16 @@ BIGUINT io_segsize(void *a, BIGINT n)
 
 /*--------------------------------------------------------------------------*/
 
-/* LIO_SETVBUF - large file IO wrapper for SETVBUF method */
+/* LIO_SETVBUF - large file IO wrapper for SETVBUF method
+ *             - return 0 on success
+ */
 
 int lio_setvbuf(FILE *fp, char *bf, int type, size_t sz)
    {int rv;
     file_io_desc *fid;
 
-    rv = -1;
+    rv = 0;
+
     if (fp != NULL)
        {if (IS_STD_IO(fp))
 	   rv = _SC_setvbuf(fp, bf, type, sz);

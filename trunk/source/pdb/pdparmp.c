@@ -270,11 +270,12 @@ static int _PD_mpsetvbuf(FILE *stream, char *bf, int type, size_t size)
 
     pf = GET_PFILE(stream);
 
-    if (pf == NULL)
-       rv = FALSE;
+    rv = 0;
 
-    else
-       rv = lio_setvbuf(pf->stream, bf, type, size);
+    if (pf != NULL)
+       {if (pf->stream != NULL)
+	   {if (IS_MPI_IO(pf) == FALSE)
+	       rv = lio_setvbuf(pf->stream, bf, type, size);};};
 
     return(rv);}
 
@@ -295,7 +296,7 @@ static int _PD_mpclose(FILE *stream)
     pf = GET_PFILE(stream);
 
     fail = EOF;
-    rv  = 0;
+    rv   = 0;
 
     if (pf == NULL)
        rv = fail;

@@ -19,7 +19,6 @@ int main(int c, char **v)
     float d[10];
     char **names;
     PDBfile *file;
-    hasharr tab;
 
     if ((file = PD_open("ntest.dat", "w")) == NULL)
        {printf("Error creating ntest.dat\n");
