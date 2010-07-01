@@ -377,8 +377,8 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
     nstrncpy(ufn, MAXLINE, ffn, -1);
     upcase(ufn);
 
-    na = dcl->na;
-    al = dcl->al;
+    na    = dcl->na;
+    al    = dcl->al;
     voidf = (strcmp(dcl->type, "void") == 0);
     voida = no_args(dcl);
 
@@ -497,20 +497,60 @@ void cs_type(char *a, int nc, char *t)
 
     if (strcmp(t, "char *") == 0)
        nstrncpy(a, nc, "SC_STRING_I", -1);
-    else if (strncmp(t, "int", 3) == 0)
+    else if (strcmp(t, "char") == 0)
+       nstrncpy(a, nc, "SC_CHAR_I", -1);
+
+/* integer type */
+    else if (strcmp(t, "int") == 0)
        nstrncpy(a, nc, "SC_INTEGER_I", -1);
-    else if (strncmp(t, "long", 4) == 0)
+    else if (strcmp(t, "int *") == 0)
+       nstrncpy(a, nc, "SC_INTEGER_P_I", -1);
+    else if (strcmp(t, "long") == 0)
        nstrncpy(a, nc, "SC_LONG_I", -1);
-    else if (strncmp(t, "short", 5) == 0)
+    else if (strcmp(t, "long *") == 0)
+       nstrncpy(a, nc, "SC_LONG_P_I", -1);
+    else if (strcmp(t, "short") == 0)
        nstrncpy(a, nc, "SC_SHORT_I", -1);
-    else if (strncmp(t, "SC_BIGINT_I", 6) == 0)
+    else if (strcmp(t, "short *") == 0)
+       nstrncpy(a, nc, "SC_SHORT_P_I", -1);
+
+    else if (strcmp(t, "BIGINT") == 0)
        nstrncpy(a, nc, "SC_BIGINT_I", -1);
-    else if (strncmp(t, "double", 6) == 0)
+    else if (strcmp(t, "BIGINT *") == 0)
+       nstrncpy(a, nc, "SC_BIGINT_P_I", -1);
+    else if (strcmp(t, "off_t") == 0)
+       nstrncpy(a, nc, "SC_OFF_T_I", -1);
+    else if (strcmp(t, "off_t *") == 0)
+       nstrncpy(a, nc, "SC_OFF_T_P_I", -1);
+
+/* floating point types */
+    else if (strcmp(t, "double") == 0)
        nstrncpy(a, nc, "SC_DOUBLE_I", -1);
-    else if (strncmp(t, "float", 6) == 0)
+    else if (strcmp(t, "double *") == 0)
+       nstrncpy(a, nc, "SC_DOUBLE_P_I", -1);
+    else if (strcmp(t, "float") == 0)
        nstrncpy(a, nc, "SC_FLOAT_I", -1);
+    else if (strcmp(t, "float *") == 0)
+       nstrncpy(a, nc, "SC_FLOAT_P_I", -1);
+
+/* structured types */
+    else if (strcmp(t, "pcons") == 0)
+       nstrncpy(a, nc, "SC_PCONS_I", -1);
+    else if (strcmp(t, "pcons *") == 0)
+       nstrncpy(a, nc, "SC_PCONS_P_I", -1);
+    else if (strcmp(t, "FILE *") == 0)
+       nstrncpy(a, nc, "SC_FILE_I", -1);
+    else if (strcmp(t, "PROCESS *") == 0)
+       nstrncpy(a, nc, "SC_PROCESS_I", -1);
+
+/* others */
+    else if (strcmp(t, "void *") == 0)
+       nstrncpy(a, nc, "SC_VOID_I", -1);
+    else if (strchr(t, '*') != NULL)
+       nstrncpy(a, nc, "SC_POINTER_I", -1);
+
     else
-       nstrncpy(a, nc, "unknown", -1);
+       nstrncpy(a, nc, "SC_UNKNOWN_I", -1);
 
     return;}
 
@@ -523,6 +563,7 @@ void cs_type(char *a, int nc, char *t)
 
 void cs_decl_list(char *a, int nc, fdecl *dcl)
    {int i, na;
+    char ty[MAXLINE];
     farg *al;
 
     na = dcl->na;
@@ -530,8 +571,9 @@ void cs_decl_list(char *a, int nc, fdecl *dcl)
 
     a[0] = '\0';
     for (i = 0; i < na; i++)
-        vstrcat(a, MAXLINE, "            %s, &%s,\n",
-		al[i].type, al[i].name);
+        {cs_type(ty, MAXLINE, al[i].type);
+	 vstrcat(a, MAXLINE, "            %s, &_l%s,\n",
+		 ty, al[i].name);};
 
     return;}
 
@@ -582,15 +624,19 @@ FILE *init_scheme(char *pck)
  */
 
 void wrap_scheme(FILE *fp, fdecl *dcl, char *ffn)
-   {int na;
-    char ufn[MAXLINE], a[MAXLINE];
+   {int i, na, nv, voidf, voida;
+    char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE];
+    farg *al;
 
-    na = dcl->na;
+    na    = dcl->na;
+    al    = dcl->al;
+    voidf = (strcmp(dcl->type, "void") == 0);
+    voida = no_args(dcl);
 
     nstrncpy(ufn, MAXLINE, ffn, -1);
     upcase(ufn);
 
-    cs_decl_list(a, MAXLINE, dcl);
+    fc_type(rt, MAXLINE, dcl->type);
 
     csep(fp);
     fprintf(fp, "\n");
@@ -603,22 +649,50 @@ void wrap_scheme(FILE *fp, fdecl *dcl, char *ffn)
        fprintf(fp, "(object *argl)");
     fprintf(fp, "\n");
 
-    fprintf(fp, "   {object *o;\n");
+/* local variable declarations */
+    nv = 0;
+    for (i = 0; i <= na; i++)
+        {if ((voida == TRUE) && (i == 0))
+	    continue;
+
+	 if (nv == 0)
+	    fprintf(fp, "   {");
+	 else
+	    fprintf(fp, "    ");
+
+/* variable for return value */
+	 if (i == na)
+	    {if (voidf == FALSE)
+	        {fprintf(fp, "%s _rv;\n", rt);
+		 fprintf(fp, "    ");};
+
+	     fprintf(fp, "object *_lo;\n");}
+
+/* local vars */
+	 else if (al[i].name[0] != '\0')
+	    {fprintf(fp, "%s _l%s;\n", al[i].type, al[i].name);
+	     nv++;};};
+
     fprintf(fp, "\n");
 
-    if (na != 0)
-       {fprintf(fp, "    SS_args(argl,\n");
+    if (voida == FALSE)
+       {cs_decl_list(a, MAXLINE, dcl);
+        fprintf(fp, "    SS_args(argl,\n");
 	fprintf(fp, "%s", a);
 	fprintf(fp, "            0);\n");
 	fprintf(fp, "\n");};
 
-    fprintf(fp, "    %s();\n", dcl->name);
+/* function call */
+    fc_call_list(a, MAXLINE, dcl);
+    if (voidf == FALSE)
+       fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);
+    else
+       fprintf(fp, "    %s(%s);\n", dcl->name, a);
+
+    fprintf(fp, "    _lo = SS_null;\n");
     fprintf(fp, "\n");
 
-    fprintf(fp, "    o = SS_null;\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "    return(o);}\n");
+    fprintf(fp, "    return(_lo);}\n");
 
     fprintf(fp, "\n");
     csep(fp);
