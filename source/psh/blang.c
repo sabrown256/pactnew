@@ -30,12 +30,25 @@ struct s_fdecl
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* IS_PTR - return true if TYPE is a pointer */
+/* IS_PTR - return TRUE if TYPE is a pointer */
 
 int is_ptr(char *type)
    {int rv;
 
     rv = (strchr(type, '*') != NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NO_ARGS - return TRUE if function takes no args */
+
+int no_args(fdecl *dcl)
+   {int rv;
+
+    rv = ((dcl->na == 1) && (dcl->al[0].name[0] == '\0'));
+/* (strcmp(dcl->al[0].type, "void") == 0) */
 
     return(rv);}
 
@@ -266,7 +279,7 @@ void fc_decl_list(char *a, int nc, fdecl *dcl)
     al = dcl->al;
 
     a[0] = '\0';
-    if (na == 0)
+    if ((na == 0) || (no_args(dcl) == TRUE))
        nstrcat(a, MAXLINE, "void");
     else
        {for (i = 0; i < na; i++)
@@ -286,19 +299,22 @@ void fc_decl_list(char *a, int nc, fdecl *dcl)
  */
 
 void fc_call_list(char *a, int nc, fdecl *dcl)
-   {int i, na;
+   {int i, na, voida;
     char lt[MAXLINE];
     farg *al;
 
     na = dcl->na;
     al = dcl->al;
 
-    a[0] = '\0';
-    for (i = 0; i < na; i++)
-        {fc_type(lt, MAXLINE, al[i].type);
-	 vstrcat(a, MAXLINE, "_l%s, ", al[i].name);};
+    voida = no_args(dcl);
 
-    a[strlen(a) - 2] = '\0';
+    a[0] = '\0';
+    if (voida == FALSE)
+       {for (i = 0; i < na; i++)
+	    {fc_type(lt, MAXLINE, al[i].type);
+	     vstrcat(a, MAXLINE, "_l%s, ", al[i].name);};
+
+	a[strlen(a) - 2] = '\0';};
 
     return;}
 
@@ -336,7 +352,7 @@ void f_proto_list(char *a, int nc, fdecl *dcl)
 FILE *init_fortran(char *pck)
    {FILE *fp;
 
-    fp = open_file("w", "%s.f", pck);
+    fp = open_file("w", "gf-%s.c", pck);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"%s_int.h\"\n", pck);
@@ -354,7 +370,7 @@ FILE *init_fortran(char *pck)
  */
 
 void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
-   {int i, na, voidf;
+   {int i, na, nv, voidf, voida;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE];
     farg *al;
 
@@ -364,6 +380,7 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
     na = dcl->na;
     al = dcl->al;
     voidf = (strcmp(dcl->type, "void") == 0);
+    voida = no_args(dcl);
 
     fc_type(rt, MAXLINE, dcl->type);
     fc_decl_list(a, MAXLINE, dcl);
@@ -373,18 +390,33 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 
     fprintf(fp, "%s FF_ID(%s, %s)(%s)\n", rt, ffn, ufn, a);
 
-/* local vars */
-    for (i = 0; i < na; i++)
-        {if (i == 0)
-	    fprintf(fp, "   {%s _l%s = (%s) *p%s;\n",
-		    al[i].type, al[i].name, al[i].type, al[i].name);
+/* local variable declarations */
+    nv = 0;
+    for (i = 0; i <= na; i++)
+        {if ((voida == TRUE) && (i == 0))
+	    continue;
+
+	 if (nv == 0)
+	    fprintf(fp, "   {");
 	 else
-	    fprintf(fp, "    %s _l%s = (%s) *p%s;\n",
-		    al[i].type, al[i].name, al[i].type, al[i].name);};
+	    fprintf(fp, "    ");
 
 /* variable for return value */
-    if (voidf == FALSE)
-       fprintf(fp, "    %s _rv;\n", rt);
+	 if ((i == na) && (voidf == FALSE))
+	    fprintf(fp, "%s _rv;\n", rt);
+
+/* local vars */
+	 else if (al[i].name[0] != '\0')
+	    {fprintf(fp, "%s _l%s;\n", al[i].type, al[i].name);
+	     nv++;};};
+
+    fprintf(fp, "\n");
+
+/* local variable assignments */
+    for (i = 0; i < na; i++)
+        {if (al[i].name[0] != '\0')
+	    fprintf(fp, "    _l%s = (%s) *p%s;\n",
+		     al[i].name, al[i].type, al[i].name);};
 
     fprintf(fp, "\n");
 
@@ -532,7 +564,7 @@ void s_proto_list(char *a, int nc, fdecl *dcl)
 FILE *init_scheme(char *pck)
    {FILE *fp;
 
-    fp = open_file("w", "sx_%s.c", pck);
+    fp = open_file("w", "gs-%s.c", pck);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
@@ -675,7 +707,7 @@ void p_proto_list(char *a, int nc, fdecl *dcl)
 FILE *init_python(char *pck)
    {FILE *fp;
 
-    fp = open_file("w", "py_%s.c", pck);
+    fp = open_file("w", "gp-%s.c", pck);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
@@ -764,7 +796,7 @@ void fin_python(FILE *fp)
 FILE *init_doc(char *pck)
    {FILE *fp;
 
-    fp = open_file("w", "%s.html", pck);
+    fp = open_file("w", "gh-%s.html", pck);
 
     fprintf(fp, "\n");
 
