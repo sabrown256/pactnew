@@ -340,7 +340,7 @@ void f_proto_list(char *a, int nc, fdecl *dcl)
 	     vstrcat(a, MAXLINE, "%s %s, ", t, al[i].name);};
         a[strlen(a) - 2] = '\0';};
 
-    nstrncpy(a, nc, subst(a, "* ", "*", -1), -1);
+    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
 
     return;}
 
@@ -596,6 +596,8 @@ void s_proto_list(char *a, int nc, fdecl *dcl)
        {for (i = 0; i < na; i++)
 	    vstrcat(a, MAXLINE, " %s", al[i].name);};
 
+    memmove(a, trim(a, BOTH, " "), nc);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -792,7 +794,7 @@ void p_proto_list(char *a, int nc, fdecl *dcl)
 	    vstrcat(a, MAXLINE, "%s %s, ", al[i].type, al[i].name);
         a[strlen(a) - 2] = '\0';};
 
-    nstrncpy(a, nc, subst(a, "* ", "*", -1), -1);
+    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
 
     return;}
 
@@ -942,8 +944,10 @@ void wrap_doc(FILE *fp, fdecl *dcl, char **fn)
 
     if (strcmp(fn[1], "none") == 0)
        fprintf(fp, "<i>SX Binding: </i> none\n");
+    else if (IS_NULL(as) == TRUE)
+       fprintf(fp, "<i>SX Binding: </i> (%s)\n", fn[1]);
     else
-       fprintf(fp, "<i>SX Binding: </i> (%s%s)\n", fn[1], as);
+       fprintf(fp, "<i>SX Binding: </i> (%s %s)\n", fn[1], as);
 
     if (strcmp(fn[2], "none") == 0)
        fprintf(fp, "<i>Python Binding: </i> none\n");
