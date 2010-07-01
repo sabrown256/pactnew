@@ -911,9 +911,12 @@ FILE *init_doc(char *pck)
  */
 
 void wrap_doc(FILE *fp, fdecl *dcl, char **fn)
-   {char ufn[MAXLINE], lfn[MAXLINE];
+   {int voidf;
+    char ufn[MAXLINE], lfn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE];
+
+    voidf = (strcmp(dcl->type, "void") == 0);
 
     nstrncpy(ufn, MAXLINE, fn[0], -1);
     upcase(ufn);
@@ -935,24 +938,26 @@ void wrap_doc(FILE *fp, fdecl *dcl, char **fn)
     fprintf(fp, "<p>\n");
     fprintf(fp, "<pre>\n");
 
-    fprintf(fp, "<i>C Binding: </i> %s\n", dcl->proto);
+    fprintf(fp, "<i>C Binding: </i>       %s\n", dcl->proto);
 
     if (strcmp(fn[0], "none") == 0)
-       fprintf(fp, "<i>Fortran Binding: </i> none\n");
+       fprintf(fp, "<i>Fortran Binding: </i>    none\n");
+    else if (voidf == TRUE)
+       fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n", fn[0], af);
     else
        fprintf(fp, "<i>Fortran Binding: </i> %s %s(%s)\n", fty, fn[0], af);
 
     if (strcmp(fn[1], "none") == 0)
-       fprintf(fp, "<i>SX Binding: </i> none\n");
+       fprintf(fp, "<i>SX Binding: </i>         none\n");
     else if (IS_NULL(as) == TRUE)
-       fprintf(fp, "<i>SX Binding: </i> (%s)\n", fn[1]);
+       fprintf(fp, "<i>SX Binding: </i>      (%s)\n", fn[1]);
     else
-       fprintf(fp, "<i>SX Binding: </i> (%s %s)\n", fn[1], as);
+       fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", fn[1], as);
 
     if (strcmp(fn[2], "none") == 0)
-       fprintf(fp, "<i>Python Binding: </i> none\n");
+       fprintf(fp, "<i>Python Binding: </i>     none\n");
     else
-       fprintf(fp, "<i>Python Binding: </i> pact.%s(%s)\n", fn[2], ap);
+       fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", fn[2], ap);
 
     fprintf(fp, "</pre>\n");
     fprintf(fp, "<p>\n");
