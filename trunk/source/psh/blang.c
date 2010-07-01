@@ -623,7 +623,7 @@ FILE *init_scheme(char *pck)
  *             - using name FFN
  */
 
-void wrap_scheme(FILE *fp, fdecl *dcl, char *ffn)
+char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn)
    {int i, na, nv, voidf, voida;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE];
     farg *al;
@@ -697,7 +697,13 @@ void wrap_scheme(FILE *fp, fdecl *dcl, char *ffn)
     fprintf(fp, "\n");
     csep(fp);
 
-    return;}
+/* add the installation of the function */
+    snprintf(a, MAXLINE, 
+	     "    SS_install(\"%s\",\n               \"-- text --\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+	     ffn, dcl->name);
+    fl = lst_add(fl, a);
+
+    return(fl);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -706,14 +712,15 @@ void wrap_scheme(FILE *fp, fdecl *dcl, char *ffn)
  *             - return TRUE iff successful
  */
 
-int bind_scheme(FILE *fp, char **spr, char **sbi)
-   {int ib, rv;
+int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
+   {int i, ib, rv;
     char t[MAXLINE];
-    char *sb, **ta;
+    char *sb, **ta, **fl;
     char *cfn, *ffn;
     fdecl *dcl;
 
     rv = TRUE;
+    fl = NULL;
 
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
@@ -726,10 +733,26 @@ int bind_scheme(FILE *fp, char **spr, char **sbi)
 	     if (dcl == NULL)
 	        printf("Error: no binding for '%s'\n", cfn);
 	     else
-	        {wrap_scheme(fp, dcl, ffn);
+	        {fl = wrap_scheme(fp, fl, dcl, ffn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
+
+    csep(fp);
+
+    fprintf(fp, "\n");
+    fprintf(fp, "void SX_install_%s_bindings(void)\n", pck);
+    fprintf(fp, "   {\n");
+    fprintf(fp, "\n");
+
+    for (i = 0; fl[i] != NULL; i++)
+        fputs(fl[i], fp);
+
+    free_strings(fl);
+
+    fprintf(fp, "   return;}\n");
+    fprintf(fp, "\n");
+    csep(fp);
 
     return(rv);}
 
@@ -1002,19 +1025,19 @@ int blang(char *pck, char *fpr, char *fbi)
 	spr = file_text(fpr);
 	sbi = file_text(fbi);
 
-	ff = init_fortran(pck);
+	ff  = init_fortran(pck);
 	rv &= bind_fortran(ff, spr, sbi);
 	fin_fortran(ff);
 
-	fs = init_scheme(pck);
-	rv &= bind_scheme(fs, spr, sbi);
+	fs  = init_scheme(pck);
+	rv &= bind_scheme(fs, pck, spr, sbi);
 	fin_scheme(fs);
 
-	fp = init_python(pck);
+	fp  = init_python(pck);
 	rv &= bind_python(fp, spr, sbi);
 	fin_python(fp);
 
-	fd = init_doc(pck);
+	fd  = init_doc(pck);
 	rv &= bind_doc(fd, spr, sbi);
 	fin_doc(fd);
 
