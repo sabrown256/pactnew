@@ -15,7 +15,8 @@ typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
 
 struct s_farg
-   {char *arg;
+   {int fptr;
+    char *arg;
     char type[MAXLINE];
     char name[MAXLINE];};
 
@@ -26,6 +27,22 @@ struct s_fdecl
     int na;
     char **args;
     farg *al;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CONCATENATE - concatenate tokens SA to string S */
+
+char *concatenate(char *s, int nc, char **sa, char *dlm)
+   {int i;
+
+    s[0] = '\0';
+    for (i = 0; sa[i] != NULL; i++)
+        vstrcat(s, nc, "%s%s", sa[i], dlm);
+
+    s[strlen(s) - strlen(dlm)] = '\0';
+
+    return(s);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -58,22 +75,78 @@ int no_args(fdecl *dcl)
 /* SPLIT_DECL - split a declaration S of the form
  *            -    <type> ['*']* <name>
  *            - into proper type and name
+ *            - return TRUE if S is a function pointer
  */
 
-void split_decl(char *type, int nt, char *name, int nn, char *s)
-   {int nb, nc;
-    char *p;
+int split_decl(char *type, int nt, char *name, int nn, char *s)
+   {int nb, nc, rv;
+    char t[MAXLINE];
+    char *p, *pn;
 
-    p  = trim(s, BOTH, " \t");
+    nstrncpy(t, MAXLINE, s, -1);
+
+    p  = trim(strtok(t, "),"), BOTH, " \t");
     nc = strcspn(p, " *\t");
     nb = strspn(p+nc, " *\t");
 
-    nstrncpy(name, nn, p+nc+nb, -1);
-    p[nc+nb] = '\0';
+    pn = p + nc + nb;
 
-    nstrncpy(type, nt, trim(p, BACK, " \t"), -1);
+/* handle function pointer case which would be like '(*f' here */
+    if (*pn == '(')
+       {nstrncpy(name, nn, pn+2, -1);
 
-    return;}
+	*pn = '\0';
+
+	strcpy(type, "PFInt");
+
+	rv = TRUE;}
+
+/* handle other args */
+    else
+       {nstrncpy(name, nn, pn, -1);
+
+	*pn = '\0';
+
+	nstrncpy(type, nt, trim(p, BACK, " \t"), -1);
+
+	rv = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SPLIT_ARGS - split an arg list into individual args */
+
+char **split_args(char *args)
+   {char *cc, *cp, *p, *pa, **al;
+
+    al = NULL;
+    for (pa = args; IS_NULL(pa) == FALSE; )
+        {cc = strchr(pa, ',');
+	 cp = strchr(pa, '(');
+	 if ((cc == NULL) && (cp == NULL))
+	    {al = lst_push(al, pa);
+	     pa = NULL;}
+	 else if (cp == NULL)
+	    {*cc++ = '\0';
+	     al = lst_push(al, pa);
+	     pa = trim(cc, FRONT, " \t");}
+	 else if (cc == NULL)
+	    {al = lst_push(al, pa);
+	     pa = NULL;}
+	 else if ((cc - cp) < 0)
+	    {*cc++ = '\0';
+	     al = lst_push(al, pa);
+	     pa = trim(cc, FRONT, " \t");}
+	 else
+	    {p = strchr(cp, ')') + 1;
+	     p = strchr(p, ')') + 1;
+	     *p++ = '\0';
+	     al = lst_push(al, pa);
+	     pa = trim(p, FRONT, " \t");};};
+
+    return(al);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -91,8 +164,10 @@ farg *proc_args(fdecl *dcl)
     al = MAKE_N(farg, na);
 
     for (i = 0; i < na; i++)
-        {al[i].arg = args[i];
-	 split_decl(al[i].type, MAXLINE, al[i].name, MAXLINE, al[i].arg);};
+        {al[i].arg  = args[i];
+	 al[i].fptr = split_decl(al[i].type, MAXLINE,
+				 al[i].name, MAXLINE,
+				 al[i].arg);};
 
     dcl->al = al;
 
@@ -118,9 +193,10 @@ void free_args(farg *al)
  */
 
 fdecl *find_proto(char **spr, char *f)
-   {int ip, n, na, nt;
-    char *sp, *pro, *cfn;
-    char **sa, **ty, **args;
+   {int ip, na, nt;
+    char pf[MAXLINE];
+    char *p, *pa, *sp, *pro, *cfn;
+    char **ty, **args;
     fdecl *dcl;
 
     pro = NULL;
@@ -141,28 +217,30 @@ fdecl *find_proto(char **spr, char *f)
 	dcl->proto = pro;
 
 /* break up the prototype into the type/function name and args */
-	sa = tokenize(pro, "()");
-	for (n = 0; IS_NULL(sa[n]) == FALSE; n++);
+	nstrncpy(pf, MAXLINE, pro, -1);
+	p = strchr(pf, '(');
+	*p++ = '\0';
+	pa = p;
+	LAST_CHAR(pa) = '\0';
 
 /* get the return type */
-        split_decl(dcl->type, MAXLINE, dcl->name, MAXLINE, sa[0]);
+        split_decl(dcl->type, MAXLINE, dcl->name, MAXLINE, pf);
 	
-	ty = tokenize(sa[0], " \t");
+	ty = tokenize(pf, " \t");
 	for (nt = 0; IS_NULL(ty[nt]) == FALSE; nt++);
 
 /* get the function name */
 	cfn = ty[--nt];
 
 /* get the args */
-	args = tokenize(sa[n-1], ",");
+	args = split_args(pa);
 	for (na = 0; IS_NULL(args[na]) == FALSE; na++);
 	dcl->na   = na;
 	dcl->args = args;
 
 	proc_args(dcl);
 
-	free_strings(ty);
-	free_strings(sa);};
+	free_strings(ty);};
 
     return(dcl);}
 
@@ -243,14 +321,19 @@ void cf_type(char *a, int nc, char *t)
 void fc_type(char *a, int nc, char *t)
    {
 
-    if (strcmp(t, "char *") == 0)
+    if ((strcmp(t, "char *") == 0) ||
+	(strcmp(t, "F77_string") == 0))
        nstrncpy(a, nc, "F77_string", -1);
-    else if (is_ptr(t) == TRUE)
+    else if ((is_ptr(t) == TRUE) || 
+	     (strstr(t, "(*") != NULL))
        nstrncpy(a, nc, "void *", -1);
+    else if (strncmp(t, "PF", 2) == 0)
+       nstrncpy(a, nc, "PFInt", -1);
     else if ((strncmp(t, "int", 3) == 0) ||
 	     (strncmp(t, "long", 4) == 0) || 
 	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "BIGINT", 6) == 0))
+	     (strncmp(t, "BIGINT", 6) == 0) ||
+	     (strncmp(t, "FIXNUM", 6) == 0))
        nstrncpy(a, nc, "FIXNUM", -1);
     else if (strncmp(t, "double", 6) == 0)
        nstrncpy(a, nc, "double", -1);
@@ -284,7 +367,10 @@ void fc_decl_list(char *a, int nc, fdecl *dcl)
     else
        {for (i = 0; i < na; i++)
 	    {fc_type(lt, MAXLINE, al[i].type);
-	     vstrcat(a, MAXLINE, "%s *p%s, ", lt, al[i].name);};
+	     if (al[i].fptr == TRUE)
+	        vstrcat(a, MAXLINE, "%s p%s, ", lt, al[i].name);
+	     else
+	        vstrcat(a, MAXLINE, "%s *p%s, ", lt, al[i].name);};
         a[strlen(a) - 2] = '\0';};
 
     nstrncpy(a, nc, subst(a, "* ", "*", -1), -1);
@@ -300,7 +386,6 @@ void fc_decl_list(char *a, int nc, fdecl *dcl)
 
 void fc_call_list(char *a, int nc, fdecl *dcl)
    {int i, na, voida;
-    char lt[MAXLINE];
     farg *al;
 
     na = dcl->na;
@@ -311,8 +396,7 @@ void fc_call_list(char *a, int nc, fdecl *dcl)
     a[0] = '\0';
     if (voida == FALSE)
        {for (i = 0; i < na; i++)
-	    {fc_type(lt, MAXLINE, al[i].type);
-	     vstrcat(a, MAXLINE, "_l%s, ", al[i].name);};
+	    vstrcat(a, MAXLINE, "_l%s, ", al[i].name);
 
 	a[strlen(a) - 2] = '\0';};
 
@@ -370,8 +454,8 @@ FILE *init_fortran(char *pck)
  */
 
 void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
-   {int i, na, nv, voidf, voida;
-    char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE];
+   {int i, na, nv, voidf, voida, rptr;
+    char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
 
     nstrncpy(ufn, MAXLINE, ffn, -1);
@@ -385,10 +469,16 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
     fc_type(rt, MAXLINE, dcl->type);
     fc_decl_list(a, MAXLINE, dcl);
 
+    rptr = is_ptr(rt);
+
     csep(fp);
     fprintf(fp, "\n");
 
-    fprintf(fp, "%s FF_ID(%s, %s)(%s)\n", rt, ffn, ufn, a);
+    if (rptr == TRUE)
+       snprintf(t, MAXLINE, "FIXNUM FF_ID(%s, %s)(%s)\n", ffn, ufn, a);
+    else
+       snprintf(t, MAXLINE, "%s FF_ID(%s, %s)(%s)\n", rt, ffn, ufn, a);
+    fputs(subst(t, "* ", "*", -1), fp);
 
 /* local variable declarations */
     nv = 0;
@@ -401,29 +491,44 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	 else
 	    fprintf(fp, "    ");
 
+	 t[0] = '\0';
+
 /* variable for return value */
 	 if ((i == na) && (voidf == FALSE))
-	    fprintf(fp, "%s _rv;\n", rt);
+	    {if (rptr == TRUE)
+		snprintf(t, MAXLINE, "FIXNUM _rv;\n");
+	      else
+		snprintf(t, MAXLINE, "%s _rv;\n", rt);}
 
 /* local vars */
 	 else if (al[i].name[0] != '\0')
-	    {fprintf(fp, "%s _l%s;\n", al[i].type, al[i].name);
-	     nv++;};};
+	    {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
+	     nv++;};
+
+	 if (IS_NULL(t) == FALSE)
+	    fputs(subst(t, "* ", "*", -1), fp);};
 
     fprintf(fp, "\n");
 
 /* local variable assignments */
     for (i = 0; i < na; i++)
         {if (al[i].name[0] != '\0')
-	    fprintf(fp, "    _l%s = (%s) *p%s;\n",
-		     al[i].name, al[i].type, al[i].name);};
+	    {if (al[i].fptr == TRUE)
+		fprintf(fp, "    _l%s = (%s) p%s;\n",
+			al[i].name, al[i].type, al[i].name);
+	     else
+		fprintf(fp, "    _l%s = (%s) *p%s;\n",
+			al[i].name, al[i].type, al[i].name);};};
 
     fprintf(fp, "\n");
 
 /* function call */
     fc_call_list(a, MAXLINE, dcl);
     if (voidf == FALSE)
-       fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);
+       {if (rptr == TRUE)
+	   fprintf(fp, "    _rv = SC_ADD_POINTER(%s(%s));\n", dcl->name, a);
+	else
+	   fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);}
     else
        fprintf(fp, "    %s(%s);\n", dcl->name, a);
 
@@ -490,6 +595,39 @@ void fin_fortran(FILE *fp)
 
 /*--------------------------------------------------------------------------*/
 
+/* SC_TYPE - return C type corresponding to SCHEME type T */
+
+void sc_type(char *a, int nc, char *t)
+   {
+
+    if ((strcmp(t, "char *") == 0) ||
+	(strcmp(t, "F77_string") == 0))
+       nstrncpy(a, nc, "F77_string", -1);
+    else if ((is_ptr(t) == TRUE) ||
+	     (strstr(t, "(*") != NULL))
+       nstrncpy(a, nc, "void *", -1);
+    else if (strncmp(t, "PF", 2) == 0)
+       nstrncpy(a, nc, "PFInt", -1);
+    else if ((strncmp(t, "int", 3) == 0) ||
+	     (strncmp(t, "long", 4) == 0) || 
+	     (strncmp(t, "short", 5) == 0) || 
+	     (strncmp(t, "BIGINT", 6) == 0) ||
+	     (strncmp(t, "FIXNUM", 6) == 0))
+       nstrncpy(a, nc, "FIXNUM", -1);
+    else if (strncmp(t, "double", 6) == 0)
+       nstrncpy(a, nc, "double", -1);
+    else if (strncmp(t, "float", 6) == 0)
+       nstrncpy(a, nc, "float", -1);
+    else if (strncmp(t, "void", 4) == 0)
+       nstrncpy(a, nc, "void", -1);
+    else
+       nstrncpy(a, nc, "unknown", -1);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CS_TYPE - return "Scheme" type corresponding to C type T */
 
 void cs_type(char *a, int nc, char *t)
@@ -546,7 +684,9 @@ void cs_type(char *a, int nc, char *t)
 /* others */
     else if (strcmp(t, "void *") == 0)
        nstrncpy(a, nc, "SC_VOID_I", -1);
-    else if (strchr(t, '*') != NULL)
+    else if ((strchr(t, '*') != NULL) ||
+	     (strstr(t, "(*") != NULL) ||
+	     (strstr(t, "PF") != NULL))
        nstrncpy(a, nc, "SC_POINTER_I", -1);
 
     else
@@ -625,9 +765,9 @@ FILE *init_scheme(char *pck)
  *             - using name FFN
  */
 
-char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn)
+char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
    {int i, na, nv, voidf, voida;
-    char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE];
+    char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
 
     na    = dcl->na;
@@ -638,7 +778,7 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn)
     nstrncpy(ufn, MAXLINE, ffn, -1);
     upcase(ufn);
 
-    fc_type(rt, MAXLINE, dcl->type);
+    sc_type(rt, MAXLINE, dcl->type);
 
     csep(fp);
     fprintf(fp, "\n");
@@ -662,18 +802,22 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn)
 	 else
 	    fprintf(fp, "    ");
 
+	 t[0] = '\0';
+
 /* variable for return value */
 	 if (i == na)
 	    {if (voidf == FALSE)
-	        {fprintf(fp, "%s _rv;\n", rt);
-		 fprintf(fp, "    ");};
+		snprintf(t, MAXLINE, "%s _rv;\n    ", rt);
 
-	     fprintf(fp, "object *_lo;\n");}
+	     nstrcat(t, MAXLINE, "object *_lo;\n");}
 
 /* local vars */
 	 else if (al[i].name[0] != '\0')
-	    {fprintf(fp, "%s _l%s;\n", al[i].type, al[i].name);
-	     nv++;};};
+	    {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
+	     nv++;};
+
+	 if (IS_NULL(t) == FALSE)
+	    fputs(subst(t, "* ", "*", -1), fp);};
 
     fprintf(fp, "\n");
 
@@ -700,9 +844,10 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn)
     csep(fp);
 
 /* add the installation of the function */
+    concatenate(t, MAXLINE, com, " ");
     snprintf(a, MAXLINE, 
-	     "    SS_install(\"%s\",\n               \"-- text --\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-	     ffn, dcl->name);
+	     "    SS_install(\"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+	     ffn, t, dcl->name);
     fl = lst_add(fl, a);
 
     return(fl);}
@@ -733,11 +878,12 @@ int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
 	     ffn = ta[2];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {fl = wrap_scheme(fp, fl, dcl, ffn);
+	        {fl = wrap_scheme(fp, fl, dcl, ffn, ta+4);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
 
+/* write the routine to install the bindings */
     if (fl != NULL)
        {csep(fp);
 
@@ -907,11 +1053,11 @@ FILE *init_doc(char *pck)
  *          - using names in FN
  */
 
-void wrap_doc(FILE *fp, fdecl *dcl, char **fn)
+void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
    {int voidf;
     char ufn[MAXLINE], lfn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
-    char fty[MAXLINE];
+    char fty[MAXLINE], t[MAXLINE];
 
     voidf = (strcmp(dcl->type, "void") == 0);
 
@@ -959,6 +1105,11 @@ void wrap_doc(FILE *fp, fdecl *dcl, char **fn)
     fprintf(fp, "</pre>\n");
     fprintf(fp, "<p>\n");
 
+    concatenate(t, MAXLINE, com, " ");
+    fputs(t, fp);
+    fprintf(fp, "\n");
+    fprintf(fp, "<p>\n");
+
     fprintf(fp, "\n");
     hsep(fp);
 
@@ -988,7 +1139,7 @@ int bind_doc(FILE *fp, char **spr, char **sbi)
 	     cfn = ta[0];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {wrap_doc(fp, dcl, ta+1);
+	        {wrap_doc(fp, dcl, ta+1, ta+4);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
