@@ -48,7 +48,7 @@ flog $Log setenv PATH $RootDir/scripts:$PATH
 
 Note $Log "Path = $PATH"
 
-foreach t (ebasic emlt)
+foreach t (ebasic emlt echr)
    Separator $Log
 
    flog $Log set dat = $TstDir/$t.dat

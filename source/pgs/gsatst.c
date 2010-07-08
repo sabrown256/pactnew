@@ -1610,8 +1610,7 @@ static void timeout_finpar(int sig)
 
     if (sig == SIGALRM)
        {PRINT(stdout, "\n        Timed out in parallel termination\n");
-	st = 123;}
-
+	st = 255;}
     else
        st = 1;
 
@@ -1649,15 +1648,8 @@ static void timeout_graphics(int sig)
    {int st;
 
     if (sig == SIGALRM)
-
-#ifdef IBM_BGP
        {PRINT(stdout, "\n        Timed out in renderings\n");
-	st = 0;}
-#else
-       {PRINT(stdout, "\n        Timed out in renderings\n");
-	st = 122;}
-#endif
-
+	st = 255;}
     else
        st = 1;
 

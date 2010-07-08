@@ -29,7 +29,7 @@ source ../../tests/common
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Trans Test Program"
-      NoteD $Log "                    PGS Line Plot Test ..... FAILED"
+      NoteD $Log "                    PGS Trans Test ......... FAILED"
       set Err = 1
    else
 

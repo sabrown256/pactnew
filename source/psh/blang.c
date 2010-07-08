@@ -732,29 +732,28 @@ int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
 	     cfn = ta[0];
 	     ffn = ta[2];
              dcl = find_proto(spr, cfn);
-	     if (dcl == NULL)
-	        printf("Error: no binding for '%s'\n", cfn);
-	     else
+	     if (dcl != NULL)
 	        {fl = wrap_scheme(fp, fl, dcl, ffn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
 
-    csep(fp);
+    if (fl != NULL)
+       {csep(fp);
 
-    fprintf(fp, "\n");
-    fprintf(fp, "void SX_install_%s_bindings(void)\n", pck);
-    fprintf(fp, "   {\n");
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
+	fprintf(fp, "void SX_install_%s_bindings(void)\n", pck);
+	fprintf(fp, "   {\n");
+	fprintf(fp, "\n");
 
-    for (i = 0; fl[i] != NULL; i++)
-        fputs(fl[i], fp);
+	for (i = 0; fl[i] != NULL; i++)
+	    fputs(fl[i], fp);
 
-    free_strings(fl);
+	free_strings(fl);
 
-    fprintf(fp, "   return;}\n");
-    fprintf(fp, "\n");
-    csep(fp);
+	fprintf(fp, "   return;}\n");
+	fprintf(fp, "\n");
+	csep(fp);};
 
     return(rv);}
 
@@ -861,9 +860,7 @@ int bind_python(FILE *fp, char **spr, char **sbi)
 	     cfn = ta[0];
 	     ffn = ta[3];
              dcl = find_proto(spr, cfn);
-	     if (dcl == NULL)
-	        printf("Error: no binding for '%s'\n", cfn);
-	     else
+	     if (dcl != NULL)
 	        {wrap_python(fp, dcl, ffn);
 		 free_decl(dcl);};
 
@@ -990,9 +987,7 @@ int bind_doc(FILE *fp, char **spr, char **sbi)
 	     ta = tokenize(t, " \t");
 	     cfn = ta[0];
              dcl = find_proto(spr, cfn);
-	     if (dcl == NULL)
-	        printf("Error: no binding for '%s'\n", cfn);
-	     else
+	     if (dcl != NULL)
 	        {wrap_doc(fp, dcl, ta+1);
 		 free_decl(dcl);};
 

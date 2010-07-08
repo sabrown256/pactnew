@@ -16,6 +16,24 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DEL_QUOTATION - remove any text between double quotes */
+
+void del_quotation(char *t)
+   {char *pu, *pt;
+
+    for (pt = t; *pt != '\0'; pt++)
+        {if (*pt == '"')
+            {for (pu = pt+1; *pu != '\0'; pu++)
+	         {if (*pu == '"')
+		     break;};
+	     if (*pu == '"')
+	        memmove(pt, pu+1, strlen(pu));};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* ELIDE - remove characters between PA and PB from FNAME
  *       - return TRUE iff successful
  */
@@ -48,15 +66,19 @@ int elide(char *pa, char *pb, char *fname)
 
 	     LAST_CHAR(p) = '\0';
 	     
+/* remove text between quotes */
+             del_quotation(t);
+
 	     s[0] = '\0';
 	     for (ps = p; IS_NULL(ps) == FALSE; )
 	         {ta = strstr(ps, pa);
 		  tb = strstr(ps, pb);
-		  if ((ta != NULL) && (tb != NULL))
+		  if ((ta != NULL) && (ta[nca] != '\'') &&
+		      (tb != NULL) && (tb[ncb] != '\''))
 		     wh = (ta < tb) ? ta : tb;
-		  else if (ta != NULL)
+		  else if ((ta != NULL) && (ta[nca] != '\''))
 		     wh = ta;
-		  else if (tb != NULL)
+		  else if ((tb != NULL) && (tb[ncb] != '\''))
 		     wh = tb;
 		  else
 		     wh = NULL;
