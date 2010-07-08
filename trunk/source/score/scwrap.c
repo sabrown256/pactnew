@@ -21,11 +21,12 @@ static void help(void)
    {
 
     io_printf(stdout, "\n");
-    io_printf(stdout, "Usage: mpi-io-wrap [-c p | s | t] [-h] [-l] [-t]\n");
+    io_printf(stdout, "Usage: mpi-io-wrap [-c p | s | t] [-h] [-l] [-s] [-t]\n");
     io_printf(stdout, "   c    - communicate with child via pipe, socket, or PTY\n");
     io_printf(stdout, "        - p, s, or t respectively (default is p)\n");
     io_printf(stdout, "   h    - this help message\n");
     io_printf(stdout, "   l    - run in line mode (not recommended)\n");
+    io_printf(stdout, "   s    - suppress messages from MPI front end\n");
     io_printf(stdout, "   t    - do not tag all messages\n");
     io_printf(stdout, "\n");
 

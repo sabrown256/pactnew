@@ -89,7 +89,7 @@ if ("$lParComm" =~ *mpi*) then
 #include <mpi.h>
 #define MAXLINE 255
 int main(int c, char **v)
-   {int i, rnk, sz;
+   {int rnk, sz;
     char s[MAXLINE];
     char *p;
     MPI_Init(&c, &v);
