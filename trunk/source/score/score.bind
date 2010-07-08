@@ -1,18 +1,18 @@
 #  C function         Fortran  Scheme            Python
 
 # SCFIA.C
-SC_arrlen             scalen   none              arrlen
-SC_pause              scpaus   none              pause
+SC_arrlen             scalen   none              arrlen			Return the byte length of the specified pointer
+SC_pause              scpaus   none              pause			Stop and await user response
 SC_advance_name       scadvn   none              none
-SC_cpu_time           scctim   cpu-time          none
-SC_wall_clock_time    scwtim   wall-clock-time   none
-SC_date               scdate   date              none
+SC_cpu_time           scctim   cpu-time          none                   Return the CPU time in seconds since the last call
+SC_wall_clock_time    scwtim   wall-clock-time   none			Return the wall clock time in seconds since the last call
+SC_date               scdate   date              none                   Return the date
 
 # SCFIS.C
-_SC_strlen            scstln   none              none
+_SC_strlen            scstln   none              none                   Return the length of the specified string
 
 # SCMEMC.C
-SC_zero_space         sczrsp   set-zero-space!   zero_space
+SC_zero_space         sczrsp   set-zero-space!   zero_space             Set the zero_space flag
 
 # SCMEMF.C
 _SC_make_f77          scmakz   none              none
@@ -37,7 +37,7 @@ SC_use_guarded_mem    scgmem   none              none
 SC_init_threads       scinth   none              none
 
 # SCTAB.C
-SC_make_hasharrr      scmkht   make-hash-table   none
+SC_make_hasharr       scmkht   make-hash-table   none
 SC_free_hasharr       scrlht   none              none
 SC_hasharr_def_lookup schdlu   hash-lookup       def_lookup
 SC_hasharr_clear      schclr   clear-hash-table  none
