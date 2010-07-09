@@ -21,7 +21,8 @@ static void help(void)
    {
 
     io_printf(stdout, "\n");
-    io_printf(stdout, "Usage: mpi-io-wrap [-c p | s | t] [-h] [-l] [-s] [-t]\n");
+    io_printf(stdout, "Usage: mpi-io-wrap [-b] [-c p | s | t] [-h] [-l] [-s] [-t]\n");
+    io_printf(stdout, "   b    - use non-blocking input\n");
     io_printf(stdout, "   c    - communicate with child via pipe, socket, or PTY\n");
     io_printf(stdout, "        - p, s, or t respectively (default is p)\n");
     io_printf(stdout, "   h    - this help message\n");
@@ -41,7 +42,7 @@ static void help(void)
 
 int main(int c, char **v)
    {int i, rv, flags, comm;
-    int use_tag, line_mode, suppress;
+    int use_tag, line_mode, blocking, suppress;
     char mode[10];
     char **argl;
 
@@ -50,14 +51,17 @@ int main(int c, char **v)
     comm      = 'p';
     use_tag   = TRUE;
     line_mode = TRUE;
+    blocking  = TRUE;
     suppress  = FALSE;
 
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-h") == 0)
-	    {help();
-	     return(1);}
+	{if (strcmp(v[i], "-b") == 0)
+	    blocking = FALSE;
 	 else if (strcmp(v[i], "-c") == 0)
 	    comm = v[++i][0];
+	 else if (strcmp(v[i], "-h") == 0)
+	    {help();
+	     return(1);}
 	 else if (strcmp(v[i], "-l") == 0)
 	    line_mode = FALSE;
 	 else if (strcmp(v[i], "-s") == 0)
@@ -77,7 +81,7 @@ int main(int c, char **v)
     if (use_tag == TRUE)
        rv = setenv("SC_MPI_TAG_IO", "+SC_MPI_IO+", TRUE);
 
-    flags = 2;
+    flags = 2*blocking;
 
 #ifdef HAVE_BAD_MPI_IO
     flags |= line_mode;
