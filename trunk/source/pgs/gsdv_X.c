@@ -1210,38 +1210,50 @@ void _PG_X_fill_pixmap(PG_device *dev, unsigned int *ipc, int color)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PG_X_CLEAR_WINDOW - clear the screen */
+/* _PG_X_CLEAR_DRAWABLE - clear the drawable in DEV */
 
-static void _PG_X_clear_window(PG_device *dev)
+static void _PG_X_clear_drawable(PG_device *dev)
   {int color, screen;
    unsigned int ipc[PG_BOXSZ];
    Display *disp;
    PG_dev_geometry *g;
 
+   g    = &dev->g;
+   disp = dev->display;
+
+   if (disp != NULL)
+      {XClearWindow(disp, dev->window);
+
+       XFlush(disp);
+
+       if (dev->use_pixmap)
+	  {ipc[0] = 0;
+	   ipc[1] = 0;
+	   ipc[2] = PG_window_width(dev);
+	   ipc[3] = PG_window_height(dev);
+	   screen = DefaultScreen(disp);
+	   color  = (dev->background_color_white) ?
+	            WhitePixel(disp, screen) :
+	            BlackPixel(disp, screen);
+
+	   _PG_X_fill_pixmap(dev, ipc, color);};};
+
+   PG_clear_raster_device(dev);
+
+   return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PG_X_CLEAR_WINDOW - clear the screen */
+
+static void _PG_X_clear_window(PG_device *dev)
+  {
+
    if (dev != NULL)
       {PG_make_device_current(dev);
 
-       g    = &dev->g;
-       disp = dev->display;
-
-       if (disp != NULL)
-	  {XClearWindow(disp, dev->window);
-
-	   XFlush(disp);
-
-	   if (dev->use_pixmap)
-	      {ipc[0] = 0;
-	       ipc[1] = 0;
-	       ipc[2] = PG_window_width(dev);
-	       ipc[3] = PG_window_height(dev);
-	       screen = DefaultScreen(disp);
-	       color  = (dev->background_color_white) ?
-		        WhitePixel(disp, screen) :
-			BlackPixel(disp, screen);
-
-	       _PG_X_fill_pixmap(dev, ipc, color);};};
-
-       PG_clear_raster_device(dev);
+       _PG_X_clear_drawable(dev);
 
        PG_release_current_device(dev);};
 
@@ -1443,7 +1455,8 @@ static void _PG_X_make_device_current(PG_device *dev)
            {XFreePixmap(display, dev->pixmap);
 	    dev->pixmap = XCreatePixmap(display, window,
 					width, height, depth);
-	    PG_clear_window(dev);};
+
+	    _PG_X_clear_drawable(dev);};
 
 	XTranslateCoordinates(display, window, root,
 			      0, 0, &root_x, &root_y, &child);
