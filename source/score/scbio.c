@@ -453,7 +453,7 @@ static bio_frame *_SC_bfr_contains(bio_desc *bid, off_t addr)
 /* _SC_BFR_NEXT - return the leftmost stack frame which overlaps FR */
 
 static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
-   {int i, n, imn, fl;
+   {int i, n, imn;
     off_t fi[2], ri[2], lmn;
     bio_frame *fa, *frn, *rv;
 
@@ -482,8 +482,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
  * will not have to be reread in toto
  */
 	     if ((ri[0] < fi[0]) && (fi[0] <= ri[1]))
-	        {fl = (fr->rw == BIO_READ);
-		 n  = _SC_bfr_remove(bid, i, fa, fl, TRUE);
+	        {n = _SC_bfr_remove(bid, i, fa, TRUE, TRUE);
 		 i--;}
 
 	     else if ((fi[0] < ri[1]) && (ri[0] <= fi[1]) && (fi[0] < lmn))
@@ -763,9 +762,7 @@ static int _SC_check_read(bio_desc *bid, bio_frame *rq)
 
 static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
    {int fd, ok;
-    off_t cad, vad, nbv, rad, nbr;
-    char *vfy;
-    unsigned char *rbf;
+    off_t cad, rad, nbr, bad, nbb;
     static int count = 1;
 
     ok = TRUE;
@@ -773,41 +770,25 @@ static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
     if (_SC_bio_debug & 2)
        {fd  = bid->fd;
 	cad = bid->curr;
-	rbf = rq->bf;
+
+	rad = rq->addr;
+	nbr = rq->sz;
 
 	if (fr == NULL)
-	   {vad = rq->addr;
-	    nbv = rq->sz;
-	    rad = vad + nbv;
-	    nbr = 0;}
+	   {bad = 0;
+	    nbb = 0;}
 	else
-	   {rad = fr->addr;
-	    nbr = fr->nb;
-	    vad = rq->addr;
-	    nbv = rq->sz - nbr;};
-
-	ok = _SC_verify_file(fd, vad, nbv, rbf);
-
-	switch (ok)
-	   {case -1 :
-	         vfy = "wo";
-		 break;
-	    case 0 :
-	         vfy = "ng";
-		 break;
-	    case 1 :
-	         vfy = "ok";
-		 break;};
+	   {bad = fr->addr;
+	    nbb = fr->nb;};
 
 	if (count == 1)
-	   {printf("                         Verified                              Remainder\n");
-	    printf("   Write        Start      Stop  # bytes    OK       Start       Stop  # bytes\n");};
+	   {printf("                                      Request                              Buffer\n");
+	    printf("   Write         Addr        Start      Stop  # bytes           Start       Stop  # bytes\n");};
 
-	printf("%8d  %10ld %10ld %8ld    %2s  %10ld %10ld %8ld\n",
-	       count++,
-	       (long) vad, (long) (vad+nbv), (long) nbv,
-	       vfy,
-	       (long) rad, (long) (rad+nbr), (long) nbr);};
+	printf("%8d  %10ld   %10ld %10ld %8ld      %10ld %10ld %8ld\n",
+	       count++, (long) cad,
+	       (long) rad, (long) (rad+nbr), (long) nbr,
+	       (long) bad, (long) (bad+nbb), (long) nbb);};
 
     return(ok);}
 
