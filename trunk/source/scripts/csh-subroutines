@@ -39,7 +39,7 @@
 # with 'unalias *'
 
 if ($?PCSH_TMP_ == 1) then
-   alias _terminate_  'if (\!*) exit( { rm -f $PCSH_TMP_ } && $QUIT_ )'
+   alias _terminate_  'if (\!*) eval "rm -f $PCSH_TMP_ ; exit($QUIT_)"'
 else
    alias _terminate_  'if (\!*) exit($QUIT_)'
 endif
