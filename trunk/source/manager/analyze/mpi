@@ -102,6 +102,8 @@ int main(int c, char **v)
     return(0);}
 EOF
 
+   set lrpath = `../analyze/rpath -o rpath`
+
 # NOTE: we have so far gone to extraordinary lengths to avoid using
 # the compiler requested in the config file during configuration
 # this is mainly to avoid MPI complications
@@ -111,7 +113,6 @@ EOF
    Note $ALog "Save_CC  = $Save_CC"
    Note $ALog "CC_Flags = $CC_Flags"
    Note $ALog "LD_Flags = $LD_Flags"
-   Note $ALog "LD_RPath = $LD_RPath"
    Note $ALog "DP_Inc   = $DP_Inc"
    Note $ALog "DP_Lib   = $DP_Lib"
    Note $ALog "lLib     = $lLib"
@@ -120,7 +121,7 @@ EOF
 
    set opt = ""
    set opt = ( $opt $CC_Flags $DP_Inc )
-   set opt = ( $opt $LD_Flags $LD_RPath )
+   set opt = ( $opt $LD_Flags $lrpath )
    set opt = ( $opt $lLib )
    flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
    if ($status != 0) then
