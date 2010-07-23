@@ -333,6 +333,9 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
     else
        pp->ischild = TRUE;
 
+/* application supplied heuristic function to identify lost processes */
+    pp->lost = NULL;
+
     SC_PROCESS_METHODS(pp);
 
     return(pp);}
