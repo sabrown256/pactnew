@@ -553,6 +553,7 @@ struct s_PROCESS
     int (*gets)(char *bf, int len, PROCESS *pp);
     int (*in_ready)(PROCESS *pp);
     int (*setup)(PROCESS *pp, int child);
+    int (*lost)(PROCESS *pp);
 
     int (*recv_formats)(PROCESS *pp);
     int (*send_formats)(void);

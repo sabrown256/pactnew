@@ -1225,6 +1225,49 @@ int _SC_get_command(tasklst *tl, int off)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_PROCESS_LOST - return TRUE if the process has been idle too long */
+
+static int _SC_process_lost(PROCESS *pp)
+   {int idle;
+    double t, ifr, ift;
+    SC_process_rusedes *pru;
+
+    idle = FALSE;
+
+    if (pp != NULL)
+       {pru = pp->pru;
+	if (pru != NULL)
+	   {t   = pru->wct - pru->wcr;
+	    ifr = pru->since / t;
+	    ift = pru->idlet / t;
+
+	    idle = TRUE;
+
+/* do not worry until the job has run more than a minute */
+	    idle &= (t > 60.0);
+
+/* do not kill off servers unless they have greatly exceeded the heartbeat */
+	    idle &= (pru->since > 2.5*DEFAULT_HEARTBEAT);
+
+/* do not kill off shell scripts which are mostly idle
+ * it must have run at least 10% of its lifetime to be considered lost
+ */
+	    idle &= (ift < 0.9);
+
+/* kill off process that has been idle for the last half of its life */
+	    idle &= (ifr > 0.5);};};
+
+#if 0
+    if (idle == TRUE)
+       printf(">>> process %d is idle: %.2e  %.2e  %.2e  %.2f  %.2f\n",
+	      pp->id, t, pru->since, pru->idlet, ifr, ift);
+#endif
+
+    return(idle);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_MANAGE_LAUNCHED_JOB - enter the newly opened PROCESS PP into
  *                         - the taskdesc JOB
  *                         - return TRUE iff succesfully entered
@@ -1366,6 +1409,8 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 
 	if (pp == NULL)
 	   job->print(job, as, "exec failed %d\n", SC_errno);
+	else
+	   pp->lost = _SC_process_lost;
 
 	st = _SC_manage_launched_job(job, as, pp);
 
@@ -1740,10 +1785,18 @@ static void _SC_state_check_process(taskdesc *job, asyncstate *as,
 	nr = *pnr;
 	nc = *pnc;
 
+	if (pp != NULL)
+	   pp->lost = _SC_process_lost;
+
 	if (SC_process_status(pp) != SC_RUNNING)
 	   {if ((sgn != NOT_FINISHED) && ((sgn & SC_EXITED) == 0))
 	       _SC_server_printf(as, state, _SC_EXEC_INFO,
 				 "a task in job %d died abnormally %d/%d\n",
+				 id, sts, sgn);
+
+	    if ((sgn != NOT_FINISHED) && ((sgn & SC_LOST) == 0))
+	       _SC_server_printf(as, state, _SC_EXEC_INFO,
+				 "a task in job %d was lost %d/%d\n",
 				 id, sts, sgn);
 
 	    more = job->exec(job, FALSE);
@@ -1801,6 +1854,8 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
 	       job->print(job, as,
 			  "remote exec on %s failed %d\n",
 			  hs, SC_errno);
+	    else
+	       pp->lost = _SC_process_lost;
 
 	    rv = _SC_manage_launched_job(job, as, pp);
 

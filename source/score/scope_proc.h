@@ -32,6 +32,7 @@
 #define SC_SIGNALED     0x10
 #define SC_KILLED       0x20
 #define SC_DEAD         0x40
+#define SC_LOST         0x80
 
 #define SC_LINE      0x10000000
 
@@ -478,7 +479,6 @@ extern SC_process_rusedes
 extern int
  SC_child_kill(int pid),
  SC_child_status(int pid, int *pcnd, int *psts),
- SC_process_lost(PROCESS *pp),
  SC_process_status(PROCESS *pp),
  SC_check_children(void),
  SC_running_children(void);

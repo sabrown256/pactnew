@@ -201,14 +201,14 @@ static void _SC_record_wait(int pid, int cnd, int sts)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_HASHARR_LOOKUP_EXITED_CHILD - lookup the process PID in the list
+/* _SC_LOOKUP_EXITED_CHILD - lookup the process PID in the list
  *                         - of processes for which a waitpid has succeeded
  *                         - return TRUE iff found
  *                         - if found return the condition, PCND,
  *                         - and status, PSTS
  */
 
-static int _SC_hasharr_lookup_exited_child(int pid, int *pcnd, int *psts)
+static int _SC_lookup_exited_child(int pid, int *pcnd, int *psts)
    {int i, n, rv;
     sigchld_rec *sr;
 
@@ -411,6 +411,7 @@ static void _SC_rl_process(PROCESS *pp)
 	pp->printf   = NULL;
 	pp->gets     = NULL;
 	pp->in_ready = NULL;
+	pp->lost     = NULL;
 	pp->setup    = NULL;};
 
     SFREE(pp);
@@ -606,7 +607,7 @@ int SC_child_kill(int pid)
 /* SC_SAVE_EXITED_CHILDREN - check on the state of child processes
  *                         - each child process which completes is
  *                         - recorded along with condition and status info
- *                         - for later retrieval by _SC_hasharr_lookup_exited_child
+ *                         - for later retrieval by _SC_lookup_exited_child
  */
 
 void SC_save_exited_children(void)
@@ -658,7 +659,7 @@ int SC_child_status(int pid, int *pcnd, int *psts)
     st = _SC_child_check(pid);
 
 /* now lookup the requested process */
-    ok = _SC_hasharr_lookup_exited_child(pid, pcnd, psts);
+    ok = _SC_lookup_exited_child(pid, pcnd, psts);
     if (ok == TRUE)
        st = pid;
 
@@ -706,6 +707,7 @@ void SC_process_free_rusage(SC_process_rusedes *pru)
 /* SC_PROCESS_RUSAGE - update the resource usage of the process PP
  *                   - info include total resource consumption and
  *                   - current rate of consumption
+ *                   - return TRUE if the process is progressing
  */
 
 void SC_process_rusage(PROCESS *pp)
@@ -766,7 +768,7 @@ void SC_process_rusage(PROCESS *pp)
  *                   - return the process status which will be
  *                   -   a) SC_RUNNING if the process is running
  *                   -   b) a combination of SC_EXITED, SC_STOPPED, SC_SIGNALED,
- *                   -      SC_KILLED, SC_DEAD, or SC_CHANGED
+ *                   -      SC_KILLED, SC_DEAD, SC_LOST, or SC_CHANGED
  *                   -      if the process has exited
  *                   -   c) -1 on error or no process
  */
@@ -782,10 +784,18 @@ int SC_process_status(PROCESS *pp)
 
 /* if it was running up til now check for change */
        {if (SC_status(pp) == SC_RUNNING)
-	   {SC_process_rusage(pp);
+	   {pid = pp->id;
 
-	    pid = pp->id;
-	    ex  = SC_child_status(pid, &cnd, &sts);
+	    SC_process_rusage(pp);
+
+/* we lost track of the process or is completely stalled */
+	    if ((pp->lost != NULL) && ((*pp->lost)(pp) == TRUE))
+	       {dstatelog("idle process %d (%d/%d)\n",
+			  pid, SC_LOST, SC_EXIT_TIMEOUT);
+		_SC_set_process_status(pp, SC_EXITED | SC_LOST, SC_EXIT_BAD,
+				       NULL);}
+	    else
+	       ex = SC_child_status(pid, &cnd, &sts);
 
 /* if it just finished record the condition and status */
 	    if (ex == pid)

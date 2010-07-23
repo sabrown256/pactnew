@@ -1649,6 +1649,76 @@ void SC_show_pool_stats(conpool *cp, int n, int full)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_SHOW_POOL_UNF - report the unfinished jobs for all connections
+ *                  - in pool CP
+ *                  - client side routine
+ */
+
+void SC_show_pool_unf(conpool *cp, int n, int full)
+   {int ic, it, nc, nt, nu, st;
+    connectdes *pco;
+    contask *pto;
+    jobinfo *inf;
+    asyncstate *as;
+
+    as = cp->as;
+
+    nc = SC_array_get_n(cp->pool);
+    for (ic = 0; ic < nc; ic++)
+        {if ((n >= 0) && (n != ic))
+	    continue;
+
+	 pco = GET_CONNECTION(cp, ic);
+	 if (pco == NULL)
+	    continue;
+
+	 nt = SC_array_get_n(pco->taska);
+	 nu = 0;
+	 for (it = 0; it < nt; it++)
+	     {pto = GET_TASK(pco->taska, it);
+	      inf = &pto->inf;
+	      st  = inf->status;
+	      nu += ((pto->killed == TRUE) ||
+		     (st == NOT_FINISHED) ||
+		     (st == REISSUED));};
+
+	 if (nu != 0)
+	    {_SC_exec_printf(as, "\n");
+	     _SC_exec_printf(as,
+			     "Connection #%d on %s (clnt %d/%d jobs) (srv %d/%d jobs)\n",
+			     ic, pco->host, pco->n_complete, pco->n_launched,
+			     pco->n_srv_complete, pco->n_srv_running);
+	     _SC_exec_printf(as,
+			     "--------------------------------------------------------\n");
+
+	     _SC_exec_printf(as,
+			     "     ID Grp Ack  Status        Command\n");
+	     for (it = 0; it < nt; it++)
+	         {pto = GET_TASK(pco->taska, it);
+		  inf = &pto->inf;
+		  st  = inf->status;
+		  if (pto->killed == TRUE)
+		     _SC_exec_printf(as,
+				     "   %4d %3d   x   -killed-     %s\n",
+				     inf->id, pto->group, inf->full);
+		  else if (st == NOT_FINISHED)
+		     {_SC_exec_printf(as,
+				      "   %4d %3d  %2d  -not done-    %s\n",
+				      inf->id, pto->group, pto->ack, inf->full);
+		      _SC_exec_printf(as,
+				      "                               %d/%d   %d/%d %f %s\n",
+				      inf->ia, inf->na, inf->signal, inf->status,
+				      inf->tstart, inf->stop_time);}
+		  else if (st == REISSUED)
+		     _SC_exec_printf(as,
+				     "   %4d %3d   x   -reissued-   %s\n",
+				     inf->id, pto->group, inf->full);};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_POOL_CONNECTION_ENV - send the set of environment variables
  *                         - to the connection PC
  *                         - client side routine
@@ -2431,6 +2501,7 @@ int SC_query_connection_pool(conpool *cp)
 	    io_printf(stdout, "   resume   - continue session\n");
 	    io_printf(stdout, "   slog [#] - display the server log(s)\n");
 	    io_printf(stdout, "   stat [#] - show the statistics for all connections\n");
+	    io_printf(stdout, "   unf [#]  - show unfinished jobs for all connections\n");
 	    io_printf(stdout, "\n");}
 
 	else if (strcmp(cmd, "load") == 0)
@@ -2460,7 +2531,10 @@ int SC_query_connection_pool(conpool *cp)
 	   _SC_show_server_logs(cp, n);
 
 	else if (strcmp(cmd, "stat") == 0)
-	   SC_show_pool_stats(cp, n, TRUE);};
+	   SC_show_pool_stats(cp, n, TRUE);
+
+	else if (strcmp(cmd, "unf") == 0)
+	   SC_show_pool_unf(cp, n, TRUE);};
 
     return(st);}
 
