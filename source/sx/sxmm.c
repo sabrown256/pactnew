@@ -281,10 +281,11 @@ g_file *_SX_mk_open_file(char *name, char *type, char *mode)
            SS_error("REQUESTED FILE IS ASCII - _SX_MK_OPEN_FILE",
                      SS_mk_string(name));
 
-/* complain if file exists but could not be opened */
+/* return NULL if file exists but could not be opened
+ * so Scheme spoke can be tried
+ */
         else if (SC_isfile(name))
-           SS_error("BAD FILE TYPE OR MODE - _SX_MK_OPEN_FILE",
-                    SS_mk_string(name));
+	   return(NULL);
 
 /* if file does not exist then create it */
         else

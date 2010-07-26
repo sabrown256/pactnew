@@ -613,7 +613,7 @@ object *SX_get_file(object *argl, g_file **pfile)
 
 object *_SX_open_file(object *arg, char *type, char *mode)
    {char *name;
-    g_file *po;
+    g_file *po, *pn;
     object *o;
 
     name = NULL;
@@ -631,9 +631,16 @@ object *_SX_open_file(object *arg, char *type, char *mode)
              return(o);};};
 
 /* add to file_list */
-    SX_file_list = _SX_mk_open_file(name, type, mode);
+    pn = _SX_mk_open_file(name, type, mode);
 
-    o = SX_file_list->file_object;
+/* if file could not be opened return #f so Scheme spoke has a chance */
+    if (pn == NULL)
+       o = SS_f;
+
+    else
+       {SX_file_list = pn;
+
+	o = SX_file_list->file_object;};
 
     return(o);}
 
