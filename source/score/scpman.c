@@ -11,10 +11,7 @@
 
 #include "scope_proc.h"
 
-/* GOTCHA: because of a thread race we have to make a large growth
- * factor to minimize resizes
- */
-#define N_PROC_MNG  1024
+#define N_PROC_MNG  32
 
 typedef struct s_sigchld_rec sigchld_rec;
 

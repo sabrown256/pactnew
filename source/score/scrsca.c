@@ -563,7 +563,7 @@ int SC_set_resource_limits(BIGINT mem, BIGINT cpu, BIGINT fsz,
 	rv |= setrlimit(RLIMIT_NOFILE, &rl);};
 
 /* set number of processes limit */
-#ifndef AIX
+#if !defined(AIX) && !defined(CYGWIN)
     if (nprc == -1)
        nprc = SC_stoi(getenv("SC_EXEC_RLIMIT_NPROC"));
     if (nprc > 0)
@@ -625,7 +625,7 @@ int SC_get_resource_limits(BIGINT *pmem, BIGINT *pcpu, BIGINT *pfsz,
 	   *pnfd = -1;};
 
 /* get number of processes limit */
-#ifndef AIX
+#if !defined(AIX) && !defined(CYGWIN)
     if (pnprc != NULL)
        {rv |= getrlimit(RLIMIT_NPROC, &rl);
 	if (rv == 0)

@@ -160,7 +160,7 @@
 
 # define SC_ENABLE_SIGNAL(_sig)                                              \
      if ((_sig > 0) && (_sc ## _sig != NULL))                                \
-	SC_signal(SIGCHLD, _sc ## _sig);}
+	SC_signal(_sig, _sc ## _sig);}
 
 
 /* diagnostic aids - we have to help ourselves because some debuggers won't */

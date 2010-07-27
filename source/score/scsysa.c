@@ -865,21 +865,19 @@ int SC_execs(char *out, int nc, char *shell, int to, char *fmt, ...)
 
 /* SC_SYSTEM - wrapper around the system() command
  *           - to complain on systems lacking fork/exec
+ *           - do NOT make this vararg because things like
+ *           -  SC_system("date '+%Y'")
+ *           - are too nasty to deal with given the prototype constraint
  */
 
-int SC_system(char *fmt, ...)
+int SC_system(char *cmd)
    {int rv;
-    char *cmd;
-
-    SC_VDSNPRINTF(TRUE, cmd, fmt);
 
 #ifdef HAVE_FORK_EXEC
     rv = system(cmd);
 #else
     rv = -1;
 #endif    
-
-    SFREE(cmd);
 
     return(rv);}
 

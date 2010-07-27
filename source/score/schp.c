@@ -1610,22 +1610,6 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
     PFProcExit exitf;
     void *exita;
 
-    ONCE_SAFE(TRUE, NULL)
-
-#ifdef HAVE_PROCESS_CONTROL
-       {PFSignal_handler sc;
-
-	sc = SC_which_signal_handler(SIGCHLD);
-	if (sc == SIG_DFL)
-	   SC_signal_action(SIGCHLD, SC_handle_sigchld, 0,
-                            SC_SIGIO, SIGPIPE,
-			    SIGSTOP, SIGTSTP,
-			    SIGTTIN, SIGTTOU,
-			    -1);}
-#endif
-
-    END_SAFE;
-
     SC_errno = 0;
 
     if ((argv == NULL) || (argv[0] == NULL))

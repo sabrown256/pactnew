@@ -1303,7 +1303,7 @@ extern int
 		 int to, char *fname, int na, int show, int ignore),
  SC_exec_server(char *shell, char *fname, int na, int show,
 		int ignore, int debug),
- SC_system(char *fmt, ...);
+ SC_system(char *cmd);
 
 extern char
  **SC_syscmnd(char *fmt, ...);
