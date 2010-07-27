@@ -1,6 +1,6 @@
 /*
  * SCSYSA.C - SCORE system comand equivalent
- *          - and support routines.
+ *          - and support routines
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -243,6 +243,8 @@ static int _SC_process_end(int *prv, void *a)
     as    = &_SC_server_state;
 
     SC_START_ACTIVITY(state, EXEC_END);
+
+    SC_save_exited_children();
 
     n = SC_array_get_n(state->tasks);
     

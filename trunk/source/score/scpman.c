@@ -293,11 +293,11 @@ void _SC_manage_process(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_LOOKUP_PROCESS - given a PID return the managed process
+/* SC_LOOKUP_PROCESS - given a PID return the managed process
  *                   - which contains it or NULL
  */
 
-PROCESS *SC_hasharr_lookup_process(int pid)
+PROCESS *SC_lookup_process(int pid)
    {int i, n;
     PROCESS *pp;
 
@@ -901,12 +901,6 @@ void SC_handle_sigchld(int signo)
     int old_errno;
 
     old_errno = errno;
-
-/* simply save statuses
- * doing an SC_check_children could lead to trying to fork a new process
- * while handling an interrupt while in a fork and so on downhill into chaos
- */
-    SC_save_exited_children();
 
     errno = old_errno;
 

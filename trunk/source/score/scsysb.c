@@ -378,6 +378,8 @@ int _SC_server_heartbeat(int *prv, void *a)
     parstate *state;
     asyncstate *as;
 
+    SC_save_exited_children();
+
     as = &_SC_server_state;
 
 /* if the parent PID changes - for example being orphaned

@@ -1,6 +1,6 @@
 /*
  * SCSYSC.C - SCORE system comand equivalent
- *          - and support routines.
+ *          - and support routines
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
