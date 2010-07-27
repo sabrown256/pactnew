@@ -148,6 +148,8 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
        snprintf(s, MAXLINE, "%s %s", bs, ns);
 
     ms = SC_strsavef(s, "char*:_SQL_MK_DESCRIPTOR:ms");
+    bs = SC_strsavef(bs, "char*:_SQL_MK_DESCRIPTOR:bs");
+    ns = SC_strsavef(ns, "char*:_SQL_MK_DESCRIPTOR:ns");
 	
     desc->member      = ms;
     desc->type        = bs;

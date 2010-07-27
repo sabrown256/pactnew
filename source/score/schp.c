@@ -1615,12 +1615,6 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
 #ifdef HAVE_PROCESS_CONTROL
        {PFSignal_handler sc;
 
-/* NOTE: this forces an initialize that otherwise leads to a thread
- * hazard on some platforms.  The gist is to allocate the memory it needs
- * before it gets into a fork plus SIGCHLD
- */
-	SC_save_exited_children();
-
 	sc = SC_which_signal_handler(SIGCHLD);
 	if (sc == SIG_DFL)
 	   SC_signal_action(SIGCHLD, SC_handle_sigchld, 0,
