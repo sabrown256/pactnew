@@ -346,7 +346,7 @@ int SC_get_ncpu(void)
     char *s, *t, *p, *cmd, **out;
 
     np  = 1;
-    cmd = "(system_profiler SPHardwareDataType | grep 'Number Of CPUs:')";
+    cmd = "(system_profiler SPHardwareDataType | grep 'Number Of Cores:')";
     st  = SC_exec(&out, cmd, NULL, -1);
     if (st == 0)
        {s = out[0];

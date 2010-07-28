@@ -25,7 +25,7 @@ source ../../tests/common
 
       flog $Log pushd $ExtDir
       set UTime = `$TIMER -r`
-      ./do-test >&! ext.res
+      flog $Log ./do-test
       set xstatus = $status
       set ETime   = `$TIMER -b $UTime`
       flog $Log popd
@@ -37,7 +37,6 @@ source ../../tests/common
          set Err = 1
       else
          NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f ext.res
       endif
    endif
 
