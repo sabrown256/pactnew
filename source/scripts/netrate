@@ -50,35 +50,45 @@ if ("$src" == "$dst") then
 
 else if ((-d "$src") && (-d "$dst")) then
    set os = `system-id`
-   set tf = $src/tmp.netrate.$os.$$
+   set sf = $src/tmp.netrate.$os.$$
+   set df = $dst/tmp.netrate.$os.$$
 
-# generate a file to move
-   echo -n "   Generating file ... "
+   @ mb = 1024 * 1024
+   @ nb = 1024
+
+# generate a file at src
+   echo -n "   Generating src file ... "
    set bstat = `iopr -r`
    set btime = `timer -r`
-   echo "abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789" >&! $tf
-   @ i = 0
-   while ($i < 24)
-      @ i = $i + 1
-      cat $tf $tf >&! $tf.new
-      mv $tf.new $tf
-   end
+   dd if=/dev/zero of=$sf bs=$mb count=$nb >& /dev/null
+   set sz = ( `ls -lh $sf` )
    set estat = `iopr -b $bstat`
    set etime = `timer -b $btime`
-   echo "size ($estat[8] $estat[9])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
 
-# move the file and measure the rate
-   echo -n "   Moving the file ... "
+# generate a file at dst
+   echo -n "   Generating dst file ... "
    set bstat = `iopr -r`
    set btime = `timer -r`
-   cp $tf $dst
+   dd if=/dev/zero of=$df bs=$mb count=$nb >& /dev/null
+   set sz = ( `ls -lh $df` )
    set estat = `iopr -b $bstat`
    set etime = `timer -b $btime`
-   echo "time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+   rm -f $df
+
+# copy the file and measure the rate
+   echo -n "   Copying the file ...... "
+   set bstat = `iopr -r`
+   set btime = `timer -r`
+   cp $sf $df.cp >& /dev/null
+   set estat = `iopr -b $bstat`
+   set etime = `timer -b $btime`
+   echo "size ($sz[5])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
   
 # cleanup
-   echo -n "   Cleaning up ... "
-   rm -f $tf $dst/$tf
+   echo -n "   Cleaning up ........... "
+   rm -f $sf $df.cp
    echo "done"
 
 else if (-d "$src") then
