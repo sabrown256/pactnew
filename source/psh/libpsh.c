@@ -1357,6 +1357,30 @@ char **lst_copy(char **lst)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* LST_UNIQ - remove duplicate entries from LST */
+
+char **lst_uniq(char **lst)
+   {int i, j, k, n;
+    char *s;
+
+    if (lst != NULL)
+       {n = lst_length(lst);
+        for (i = 0; i < n; i++)
+	    {s = lst[i];
+	     for (j = i+1; j < n; j++)
+	         {if (strcmp(s, lst[j]) == 0)
+		     {for (k = j+1; k < n; k++)
+			  lst[k-1] = lst[k];
+		      lst[k-1] = NULL;
+		      n--;
+		      i--;
+		      break;};};};};
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LST_FREE - free the list */
 
 void lst_free(char **lst)
