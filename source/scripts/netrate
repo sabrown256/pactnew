@@ -1,0 +1,100 @@
+#!/bin/csh -f
+#
+# NETRATE - measure the network speed by copying a 1G file
+#         - between source and destination
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+# add the path to here iff you are able to verify it
+set Exe = `dirname $0`
+if (-x "$Exe/netrate") then
+   set path = ( $Exe $path )
+endif
+
+@ err = 0
+set src = ""
+set dst = ""
+
+set argl = ""
+while ($#argv)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: netrate [-h] <src> <dst>"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           if ("$src" == "") then
+              set src = $1
+           else if ("$dst" == "") then
+              set dst = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+if ("$src" == "$dst") then
+   echo "Directories '$src' and '$dst' are the same - exiting"
+   @ err = 1
+
+else if ((-d "$src") && (-d "$dst")) then
+   set os = `system-id`
+   set tf = $src/tmp.netrate.$os.$$
+
+# generate a file to move
+   echo -n "   Generating file ... "
+   set bstat = `iopr -r`
+   set btime = `timer -r`
+   echo "abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ/0123456789" >&! $tf
+   @ i = 0
+   while ($i < 24)
+      @ i = $i + 1
+      cat $tf $tf >&! $tf.new
+      mv $tf.new $tf
+   end
+   set estat = `iopr -b $bstat`
+   set etime = `timer -b $btime`
+   echo "size ($estat[8] $estat[9])  time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+
+# move the file and measure the rate
+   echo -n "   Moving the file ... "
+   set bstat = `iopr -r`
+   set btime = `timer -r`
+   cp $tf $dst
+   set estat = `iopr -b $bstat`
+   set etime = `timer -b $btime`
+   echo "time ($etime)  sent ($estat[5] $estat[6])  recv ($estat[11] $estat[12])"
+  
+# cleanup
+   echo -n "   Cleaning up ... "
+   rm -f $tf $dst/$tf
+   echo "done"
+
+else if (-d "$src") then
+   echo "Directory '$dst' does not exist - exiting"
+   @ err = 1
+
+else if (-d "$dst") then
+   echo "Directory '$src' does not exist - exiting"
+   @ err = 1
+
+else
+   echo "No directories specified - exiting"
+   @ err = 1
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
