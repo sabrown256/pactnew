@@ -157,7 +157,7 @@ if (-d CVS) then
               breaksw
          case status:
               if ($?DoingConfig == 0) then
-                 set inf   = `$CVS_RSH $repohost ls $repodir`
+                 set inf   = `$CVS_RSH $repohost ls $repodir |& cat`
                  set elock = FALSE
                  foreach i ($inf)
                     set entry = $i:h

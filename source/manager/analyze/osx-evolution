@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# OSX-EVOLUTION - dynamically handle things that change from OS X rev to rev
+# OSX-EVOLUTION - dynamically handle OSX things that change from rev to rev
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -19,21 +19,30 @@ source $ldir/env-csh
 
 set OS = `uname -r`
 
-# check for 10.3 family
-expr "$OS" '<' "8.0" >& /dev/null
-if ($status == 0) then
-   setenv OSX_SHARED_LIBS "-lcc_dynamic /usr/lib/bundle1.o"
-else
+switch ($OS)
+   case 10.*:
+        setenv OSX_SHARED_LIBS ""
+        setenv OSX_REV         6
+        breaksw
+   case 9.*:
+        setenv OSX_SHARED_LIBS ""
+        setenv OSX_REV         5
+        breaksw
+   case 8.*:
+        setenv OSX_SHARED_LIBS "/usr/lib/bundle1.o -lSystemStubs -lstdc++.6.0.4"
+        setenv OSX_REV         4
+        breaksw
+   case 7.*:
+        setenv OSX_SHARED_LIBS "-lcc_dynamic /usr/lib/bundle1.o"
+        setenv OSX_REV         3
+        breaksw
+   default:
+        setenv OSX_SHARED_LIBS ""
+        setenv OSX_REV         0
+        breaksw
+endsw
 
-# check for 10.4 family
-   expr "$OS" '<' "9.0" >& /dev/null
-   if ($status == 0) then
-      setenv OSX_SHARED_LIBS "/usr/lib/bundle1.o -lSystemStubs -lstdc++.6.0.4"
-   else
-      setenv OSX_SHARED_LIBS ""
-   endif
-endif
-
+SetParent OSX_REV
 SetParent OSX_SHARED_LIBS
 
 exit(0)

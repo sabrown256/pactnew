@@ -15118,8 +15118,7 @@ boolean ReadParamFile(char *fileName, int function)
 
 /* handle spaces after input */
 		 else if (strncmp(input, "INPUT", 5) == 0)
-		    {log(10.0);
-		     charPtr = SkipSpacesTabs(&input[5]);
+		    {charPtr = SkipSpacesTabs(&input[5]);
 		     if ((function == ENCODE_FRAMES) && (*charPtr == 0))
 		        {ReadInputFileNames(fpointer, "END_INPUT");
 			 optionSeen[OPTION_INPUT] = TRUE;};};

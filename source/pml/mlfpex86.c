@@ -54,6 +54,16 @@ void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
 
     features = 0;
     mask     = 0;
+    x        = 0;
+    y        = 0;
+
+#if (MACOSX_VERSION == 6)
+
+/* Opteron result */
+    features = 0x5f;
+    mask     = 0x2ffff;
+
+#else
 
     __asm __volatile ("pushf\n\t pop %%"X86_PREFIX"ax" : "=a" (x));
 
@@ -95,6 +105,7 @@ void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
 	       mask = 0xffbf;
 	    else if (mask & 0x40)
 	       features |= 0x040;};};
+#endif
 
     if (pf != NULL)
        *pf = features;

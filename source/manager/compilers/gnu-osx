@@ -17,6 +17,8 @@ Tool CC {
    Flags     = -fsignaling-nans -ffloat-store
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -m* ]
+   Flags    += [ _env_ = OSX_REV ;           # OSX version flags
+                 6     = -arch x86_64 ]
    Flags    += [ _cmd_ = -p ;                # profiling
 	         on    = -pg ]
    Flags    += [ _cmd_ = -cov ;              # coverage analysis
