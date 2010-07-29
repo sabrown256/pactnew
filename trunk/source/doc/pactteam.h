@@ -1,5 +1,5 @@
 TXT: PACT Development Team
-MOD: 02/03/2010
+MOD: 07/29/2010
 
 <CENTER>
 <P>
@@ -37,7 +37,7 @@ Lawrence Livermore National Laboratory
 
 Current developers on the <strong>PACT</strong> effort are:
 <P>
-Stewart A. Brown (<A HREF="mailto:sabrown@llnl.gov">sabrown@llnl.gov</A>)
+Stewart A. Brown (<A HREF="mailto:brown50@llnl.gov">brown50@llnl.gov</A>)
  -- Programming, debugging and design
 <BR>
 <P>

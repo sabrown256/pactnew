@@ -407,7 +407,7 @@ WRITE_HOST:
     end
     Note $HostFile " "
 
-    Note $HostFile "mail sabrown@llnl.gov"
+    Note $HostFile "mail brown50@llnl.gov"
     Note $HostFile " "
 
     flog $Log cat $HostFile

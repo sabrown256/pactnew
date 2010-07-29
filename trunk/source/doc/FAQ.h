@@ -35,7 +35,7 @@ we would like to hear from you so we can try to make it so. Please
 direct all portability issues to:
 
 <center>
-<a href=mailto:sabrown@llnl.gov>sabrown@llnl.gov</a> -or- <a href=mailto:minner1@llnl.gov>minner1@llnl.gov</a>
+<a href=mailto:brown50@llnl.gov>brown50@llnl.gov</a> -or- <a href=mailto:minner1@llnl.gov>minner1@llnl.gov</a>
 </center>
 
 <hr>
