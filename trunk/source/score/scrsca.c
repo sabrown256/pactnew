@@ -433,7 +433,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 			    SC_vstrcat(pd, nr, "%s ", ps);
 
 		         ps += nc;
-			 while ((ps != pe) && (*ps == '\0'))
+			 while ((ps - pe < 0) && (*ps == '\0'))
 			    ps++;};};
 			     
 		SFREE(pc);};};
