@@ -1,5 +1,5 @@
 TXT: PACT COPYRIGHT
-MOD: 02/03/2010
+MOD: 07/29/2010
 
 <blockquote>
 
@@ -9,7 +9,7 @@ MOD: 02/03/2010
 
  Copyright (c) 2010, Lawrence Livermore National Security, LLC.
  Produced at the Lawrence Livermore National Laboratory
- Written by Stewart Brown (sabrown@llnl.gov).
+ Written by Stewart Brown (brown50@llnl.gov).
  CODE-422942.
  All rights reserved.
 <P>

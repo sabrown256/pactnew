@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2010, Lawrence Livermore National Security, LLC.
  * Produced at the Lawrence Livermore National Laboratory
- * Written by Stewart Brown (sabrown@llnl.gov).
+ * Written by Stewart Brown (brown50@llnl.gov).
  * CODE-422942.
  * All rights reserved.
  *
