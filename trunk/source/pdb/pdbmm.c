@@ -76,7 +76,6 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 
 	file->use_itags      = TRUE;
 	file->track_pointers = TRUE;
-	file->ap             = NULL;
 
 	file->std        = NULL;
 	file->align      = NULL;
@@ -115,6 +114,9 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	SC_mark(file->symtab, 1);
 	SC_mark(file->chart, 1);
 	SC_mark(file->host_chart, 1);
+
+/* initialize the pointer list */
+	_PD_ptr_init_ap(file, 0);
 
 /* register the file with the parallel file manager */
 	if (reg == TRUE)

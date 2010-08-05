@@ -582,8 +582,8 @@ long SC_array_inc_n(SC_array *a, long n, int wh)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ARRAY_DEC_N - decrement the number of items in A by N
- *                - if WH < 0 return the new value (ala ++n)
- *                - otherwise return the old value (ala n++)
+ *                - if WH < 0 return the new value (ala --n)
+ *                - otherwise return the old value (ala n--)
  */
 
 long SC_array_dec_n(SC_array *a, long n, int wh)

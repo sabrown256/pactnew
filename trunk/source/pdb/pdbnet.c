@@ -657,7 +657,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 	file->current_prefix   = NULL;
 	file->symtab           = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 
-	file->ap               = NULL;
+	_PD_ptr_init_ap(file, 0);
 
 /* register the file with the parallel file manager */
 	_PD_ADD_FILE(file, (off_t) 0);

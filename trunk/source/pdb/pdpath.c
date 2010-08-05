@@ -907,7 +907,6 @@ static off_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
     syment *ep;
     parse_frame *fr;
     locator *stck;
-    PD_address *ap;
     PDBfile *file;
 
     file = FILE_S;
@@ -930,10 +929,8 @@ static off_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
 
 	_PD_set_current_address(file, addr, SEEK_SET, PD_TRACE);
 
-	i = _PD_ptr_read(file, addr, TRUE);
-	ap = SC_array_get(file->ap, i);
-	ep = ap->entry;
-
+	i  = _PD_ptr_read(file, addr, TRUE);
+	ep = _PD_ptr_get_entry(file, i);
 	if (ep == NULL)
 	   {addr = 0;
 	    numb = 0;}
