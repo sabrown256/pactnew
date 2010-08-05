@@ -231,8 +231,7 @@ long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
 
 /* save the current ptr lists */
     if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))
-       {ap       = file->ap;
-	file->ap = NULL;};
+       _PD_ptr_save_ap(file, &ap, NULL, NULL);
 
     INIT_STACKS(100L, 1000L);
 
@@ -388,8 +387,7 @@ long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
 
 /* restore the initial ptr lists */
          if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))
-	    {_PD_ptr_free_list(file);
-	     file->ap = ap;};
+	    _PD_ptr_restore_ap(file, ap, NULL);
 
          return(nb);
 

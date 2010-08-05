@@ -1349,6 +1349,13 @@ int PD_remove_entry(PDBfile *file, char *name)
     ep = (syment *) SC_hasharr_def_lookup(tab, name);
     if (ep != NULL)
        {rv = TRUE;
+
+/* NOTE: SC_hasharr_remove will do raw free on ep and miss the contents
+ * _PD_rl_syment_d will do it all properly
+ * since we are doing 2 frees we have to add one to the count
+ * simply switching the order would not respect the real count
+ */
+	SC_mark(ep, 1);
 	SC_hasharr_remove(tab, name);
 	_PD_rl_syment_d(ep);};
 
