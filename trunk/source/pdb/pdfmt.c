@@ -550,19 +550,22 @@ int _PD_read_attrtab_a(PDBfile *file)
    {int ok;
     char *name;
     syment *ep;
+    SC_array *oa;
 
     name = PDB_ATTRIBUTE_TABLE;
 
     ok = FALSE;
     ep = PD_inquire_entry(file, name, TRUE, NULL);
     if (ep != NULL)
-       {if (!PD_read(file, name, &file->attrtab))
+       {_PD_ptr_save_ap(file, &oa, NULL, NULL);
+
+	if (!PD_read(file, name, &file->attrtab))
            {PD_close(file);
             PD_error("FAILED TO READ ATTRIBUTE TABLE - _PD_READ_ATTRTAB_A",
 		     PD_OPEN);};
 
 /* reset the pointer lists after reading the attribute table */
-	_PD_ptr_free_list(file);
+	_PD_ptr_restore_ap(file, oa, NULL);
 	if (file->use_itags == FALSE)
 	   _PD_ptr_open_setup(file);
 

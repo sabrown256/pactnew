@@ -657,7 +657,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 	file->current_prefix   = NULL;
 	file->symtab           = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 
-	_PD_ptr_init_ap(file, 0);
+	_PD_ptr_init_apl(file);
 
 /* register the file with the parallel file manager */
 	_PD_ADD_FILE(file, (off_t) 0);
@@ -688,8 +688,7 @@ int PN_close(PDBfile *file)
 
     _PN_restore_hooks();
 
-/* free the space */
-    _PD_ptr_free_list(file);
+    _PD_ptr_free_apl(file);
 
     _PD_clr_table(file->symtab, _PD_ha_rl_syment);
 

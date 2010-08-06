@@ -244,6 +244,7 @@ hasharr *SC_make_hasharr(int sz, int docflag, char *lm)
             ha->hash     = NULL;
             ha->comp     = NULL;
             ha->key_type = NULL;
+	    ha->a        = NULL;
 
 	    _SC_hasharr_init(ha, lm);}
 
@@ -566,6 +567,12 @@ int SC_hasharr_rekey(hasharr *ha, char *method)
 	   {SFREE(ha->key_type);
 	    ha->key_type = SC_strsavef(method,
 					"char*:SC_HASHARR_REKEY:key_type");};
+
+/* force array to reset access method
+ * needed when hasharr has been read from PDB file
+ */
+	if (ha->a != NULL)
+	   ha->a->access = NULL;
 
 	ret = TRUE;};
 
