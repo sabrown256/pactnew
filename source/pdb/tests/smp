@@ -47,11 +47,7 @@ if ("$Parallel" != "") then
          NoteD $LogF "OMITTED ($xstatus/$ETime)"
       else if ($xstatus != 0) then
          NoteD $LogF "FAILED ($xstatus/$ETime)"
-
-# GOTCHA: temporarily prevent Version III from failing the test suite
-         if ("$tst" == 2) then
-            set Err = 1
-         endif
+         set Err = 1
       else
          NoteD $LogF "PASSED ($ETime)"
       endif

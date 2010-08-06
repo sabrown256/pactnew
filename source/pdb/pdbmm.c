@@ -116,7 +116,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	SC_mark(file->host_chart, 1);
 
 /* initialize the pointer list */
-	_PD_ptr_init_ap(file, 0);
+	_PD_ptr_init_apl(file);
 
 /* register the file with the parallel file manager */
 	if (reg == TRUE)
@@ -140,7 +140,8 @@ void _PD_rl_pdb(PDBfile *file)
     SFREE(file->ptr_base);
 
     _SC_rel_udl(file->udl);
-    _PD_ptr_free_list(file);
+
+    _PD_ptr_free_apl(file);
 
     PD_rel_attr_table(file);
 

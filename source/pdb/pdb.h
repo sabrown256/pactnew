@@ -80,7 +80,7 @@
  * own set of pointers in order to function properly with format version III
  *
  * Version 20 write checksums in hex form not raw character form
-
+ *
  * Version 21 factor out db_layer, sys_layer, and fs_layer in order to
  * access other databases such as SQL, XML/HTML where it isn't feasible
  * to have the PDB engine read and write the actual data but PDB can

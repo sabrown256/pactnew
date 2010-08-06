@@ -588,21 +588,17 @@ extern long
  _PD_ptr_fix(PDBfile *file, long n);
 
 extern void
- _PD_ptr_init_ap(PDBfile *file, long nl),
  _PD_ptr_save_ap(PDBfile *file, SC_array **poa, char **pob, char *base),
  _PD_ptr_restore_ap(PDBfile *file, SC_array *oa, char *ob),
+ _PD_ptr_init_apl(PDBfile *file),
+ _PD_ptr_free_apl(PDBfile *file),
  _PD_index_ptr(char *p, int i),
- _PD_ptr_free_list(PDBfile *file),
  _PD_ptr_rd_install_addr(PDBfile *file, off_t addr, int loc),
  _PD_ptr_wr_syment(PDBfile *file, long n, char *type, long nitems, off_t addr),
  _PD_ptr_open_setup(PDBfile *file);
 
 extern syment
  *_PD_ptr_get_entry(PDBfile *file, long i);
-
-extern SC_array
- *_PD_ptr_get_curr(PDBfile *file),
- *_PD_ptr_set_curr(PDBfile *file, SC_array *nap);
 
 
 /* PDRDWR.C declarations */
