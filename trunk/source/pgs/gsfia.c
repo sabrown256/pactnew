@@ -1029,7 +1029,7 @@ FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 
 /* PGGTEX - get the text extent in CS */
 
-FIXNUM F77_FUNC(pggtes, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
+FIXNUM F77_FUNC(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 				FIXNUM *pnc, F77_string s,
 			        double *pdx, double *pdy)
    {FIXNUM rv;

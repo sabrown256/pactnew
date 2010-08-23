@@ -96,6 +96,10 @@ ObjsY = sxshar.o
 ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
 Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ}
 
+ArBind = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
+         ${TGTLib}(gs-ppc.o) ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
+         ${TGTLib}(gs-scheme.o)
+
 ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxgc.o) ${TGTLib}(sxcmd.o) \
          ${TGTLib}(sxhand.o) ${TGTLib}(sxfunc.o) ${TGTLib}(sxhbo.o) \
@@ -104,8 +108,9 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxpdbl.o) ${TGTLib}(sxpan.o) \
          ${TGTLib}(sxpanw.o) ${TGTLib}(sxpml.o) \
          ${TGTLib}(sxgri.o) ${TGTLib}(sxpgs.o) ${TGTLib}(sxpgsp.o) ${TGTLib}(sxgrot.o) \
-         ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o) \
-         ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o)
+         ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o)  \
+         ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o) \
+         ${ArBind}
 
 sxmain.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}

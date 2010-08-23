@@ -150,6 +150,22 @@ static void init_mpi_target(rundes *st)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MP_HOSTFILE - make the name of the MP_HOSTFILE */
+
+static void mp_hostfile(char *s, int nc, rundes *st)
+   {
+
+    if (cdefenv("DORUN_HOST_DIR") == 0)
+       snprintf(s, nc, ".dp-aix.%s.%d", st->host, getpid());
+    else
+       snprintf(s, nc, "%s/.dp-aix.%s.%d",
+		cgetenv(TRUE, "DORUN_HOST_DIR"), st->host, getpid());
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* INIT_MPI - setup for MPI */
 
 static void init_mpi(rundes *st)
@@ -189,7 +205,9 @@ static void init_mpi(rundes *st)
        csetenv("Wrap", "");
 
     else if (strcmp(st->os, "AIX") == 0)
-       {fp = open_file("w", ".dp-aix.%s.%d", st->host, getpid());
+       {mp_hostfile(t, MAXLINE, st);
+	fp = open_file("w", t);
+
 	fprintf(fp, "%s\n", st->host);
 	fclose(fp);};
 
@@ -1072,7 +1090,7 @@ static int finish(rundes *st, int rv)
 
 /* this is the right place to remove the AIX MPI hostfile */
     if (strcmp(st->os, "AIX") == 0)
-       {snprintf(s, MAXLINE, ".dp-aix.%s.%d", st->host, getpid());
+       {mp_hostfile(s, MAXLINE, st);
 	unlink(s);};
 
     if (WIFEXITED(rv))

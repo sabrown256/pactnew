@@ -227,21 +227,6 @@ FIXNUM F77_FUNC(scvers, SCVERS)(FIXNUM *pn, F77_string name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCALEN - return the length of an array
- *        - this version takes a CRAY pointer (e.g. ipa of pointer (ipa, a))
- *        - WARNING: only for F77 with CRAY pointer extensions
- */
-
-FIXNUM F77_FUNC(scalen, SCALEN)(void **p)
-   {FIXNUM rv;
-
-    rv = SC_arrlen(*p);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SCELEN - return the length of an array
  *        - this version takes a CRAY pointee (e.g. a of pointer (ipa, a))
  *        - WARNING: only for F77 with CRAY pointer extensions

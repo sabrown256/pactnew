@@ -48,6 +48,7 @@ Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for SCHEME"
+	@echo "   bindings  : make the language bindings"
 	@echo "   install   : install SCHEME headers and utilities in dev/arch"
 	@echo "   link      : link SCHEME utilities for public use"
 	@echo "   profiler  : make a profiling version"
@@ -144,13 +145,15 @@ LrObjs = shstrg.o shchr.o shlarg.o shproc.o shsynt.o shvar.o
 
 Objs = ${PSObjs} ${PrObjs} ${EvObjs} ${RdObjs} ${FnObjs} ${LrObjs}
 
+ArBind = ${TGTLib}(gf-${LibName}.o)
+
 ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
          ${TGTLib}(shenvr.o) ${TGTLib}(shread.o) ${TGTLib}(shtlev.o) \
          ${TGTLib}(shprm1.o) ${TGTLib}(shprm2.o) ${TGTLib}(shprm3.o) \
          ${TGTLib}(shtty.o) ${TGTLib}(shint.o) ${TGTLib}(sharr.o) \
          ${TGTLib}(shstrg.o) ${TGTLib}(shchr.o) ${TGTLib}(shlarg.o) \
-         ${TGTLib}(shproc.o) ${TGTLib}(shsynt.o) \
-         ${TGTLib}(shvar.o)
+         ${TGTLib}(shproc.o) ${TGTLib}(shsynt.o) ${TGTLib}(shvar.o) \
+         ${ArBind}
 
 ${LibDep} : ${Hdrs}
 ${TGTLib} : ${SyntaxModes}
@@ -206,4 +209,15 @@ inform :
 #
 test :
 	@./shtest
+
+#
+# Make C prototypes file
+#
+genf  = gf-${LibName}.c
+bindf = ${LibName}.bind
+
+${genf} : ${bindf}
+	../scripts/bproto
+
+bindings : ${genf}
 

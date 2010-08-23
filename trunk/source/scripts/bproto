@@ -1,0 +1,131 @@
+#!/bin/csh -f
+#
+# BPROTO - generate C prototypes for use with BLANG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+pushd ../manager >& /dev/null
+set arch  = `cfgman use`
+popd >& /dev/null
+
+set err = 0
+set d   = $cwd
+set d   = $d:t
+
+source ../dev/$arch/include/env-pact.csh
+source ../scripts/env-csh
+
+InitLog Log $cwd/z-$arch/obj/bproto
+
+Note $Log ""
+Note $Log "Generating C bindings for Fortran, SX, and Python"
+Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GENERATE - generate interfaces for each package
+
+   @ CCount = `echo $d | wc -c`
+   @ NDots  = 20 - $CCount
+   set Fill = "$d "
+   while ($NDots > 0)
+      set Fill = "$Fill."
+      @ NDots = $NDots - 1
+   end
+
+   NoteD $Log -n "      $Fill "
+   Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PARSE - parse the pre-Make file and make a file list
+
+   set Lst = ( `grep '${TGTLib}(' pre-Make | sed 's/TGTLib//g' | sed 's/[=()$\]//g'` )
+   set Files = ""
+   foreach i ($Lst)
+      set j = $i:r.c
+      if (-f $j) then
+         set Files = ( $Files $j )
+      endif
+   end
+
+   Note $Log "Files = $Files"
+   Note $Log ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TRANSFORM - process the C declarations
+#           - the transformations are:
+#   elide '/*' '*/' $Files                         remove C comments
+#   elide '{' '}' -                                remove compound statements
+#   sed 'N;s/\\\n//'                               combine lines ending in \
+#   elide '#if' '#endif' -                         remove conditionals
+#   grep -v '#'                                    remove #include, #define
+#   sed 's/[ \t][ \t]*/ /g'                        compress whitespace
+#   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }    
+#        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' combine lines ending in ,
+#   sed '/^[ \t]*$/d'                              remove blank lines
+#   sed '/;[ \t]*$/d'                              remove lines ending in ;
+#   grep -v '='                                    remove lines with assignments
+#
+
+   elide '/*' '*/' $Files                          | \
+   elide '{' '}' -                                 | \
+   sed 'N;s/\\\n//'                                | \
+   elide '#if' '#endif' -                          | \
+   grep -v '#'                                     | \
+   sed 's/[ \t][ \t]*/ /g'                         | \
+   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }       \
+        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'  | \
+   sed '/^[ \t]*$/d'                               | \
+   sed '/;[ \t]*$/d'                               | \
+   grep -v '='                                     | \
+   grep -v 'FIXNUM'                                | \
+   grep -v 'static'                                | \
+   grep '('                                        | \
+   sort                                            | \
+   cat >&! z-$arch/$d.proto
+
+   NoteD $Log "done"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   flog $Log pushd z-$arch
+
+   flog $Log blang $d.proto ../$d.bind
+   set xstatus = $status
+
+   if (-f gf-$d.c) then
+      flog $Log mv gf-$d.c ..
+   endif
+   if (-f gs-$d.c) then
+      flog $Log mv gs-$d.c ../../sx
+   endif
+   if (-f gp-$d.c) then
+      flog $Log mv gp-$d.c ../../python
+   endif
+   if (-f gh-$d.html) then
+      flog $Log mv gh-$d.html ../../doc
+   endif
+
+   if ($xstatus == 0) then
+      flog $Log $RM $d.proto
+   endif
+
+   flog $Log popd
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
+

@@ -54,6 +54,7 @@ MLibs = ${LSCORE} ${LMM} ${MDLib}
 
 targets :
 	@echo "Targets for SCORE"
+	@echo "   bindings     : make the language bindings"
 	@echo "   compre       : make comprehensive unit test programs"
 	@echo "   disk         : make simple utility to measure available disk space"
 	@echo "   dmake        : make the dmake utility"
@@ -140,6 +141,8 @@ ArTObjs = ${TGTLib}(scpar.o) ${TGTLib}(scthn.o) ${TGTLib}(scthe.o) \
 ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
 ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) ${TGTLib}(scbgl.o)
 
+ArBind = ${TGTLib}(gf-${LibName}.o)
+
 ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} ${ArSObjs} ${ArTObjs} ${OSSupport} \
          ${TGTLib}(scctl.o) ${TGTLib}(scfia.o) ${TGTLib}(scfis.o) \
 	 ${TGTLib}(scfnca.o) ${TGTLib}(scfncb.o) ${TGTLib}(scfnct.o) \
@@ -147,7 +150,8 @@ ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} ${ArSObjs} ${ArTObjs} ${OSSupport} \
          ${TGTLib}(schash.o) ${TGTLib}(sctree.o) ${TGTLib}(sctab.o) \
          ${TGTLib}(scrsca.o) ${TGTLib}(scrscb.o) \
          ${TGTLib}(sctrk.o) ${TGTLib}(sclog.o)   \
-         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o)
+         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o) \
+         ${ArBind}
 
 scf77lr.o : scf77lr.l sclexan.h
 
@@ -516,5 +520,15 @@ inform :
 test :
 	@./sctest
 
+#
+# Make C prototypes file
+#
+genf  = gf-${LibName}.c
+bindf = ${LibName}.bind
+
+${genf} : ${bindf}
+	../scripts/bproto
+
+bindings : ${genf}
 
 

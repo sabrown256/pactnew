@@ -7,9 +7,27 @@ unalias *
 
 @ err = 0
 
-set lst = ( $argv )
+set lst = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: do-splint [-h] <C-files>*"
+           echo "   h   this help message"
+           echo ""
+           exit(0)
+      default:
+           set lst = ( $lst $1 )
+           breaksw
+   endsw
+   shift
+end
+
 if ("$lst" == "") then
-   set lst = ( `ls *.c` )
+   echo ""
+   echo "No C source files specified - exiting"
+   echo ""
+   exit(1)
 endif
 
 set path = ( /usr/gapps/pact/scripts $path )
@@ -27,8 +45,9 @@ foreach i ($lst)
    NoteD $log ""
    NoteD $log "------------------------------------------------------------"
    NoteD $log ""
-   NoteD $log "splint $opt -I../dev/$arch/include $i"
-   splint $opt -I../dev/$arch/include $i |& tee -a $log
+   NoteD $log "File: $i"
+   NoteD $log ""
+   ftee $log splint $opt -I../dev/$arch/include $i
    set xstatus = $status
    @ err = $err + $xstatus
 end

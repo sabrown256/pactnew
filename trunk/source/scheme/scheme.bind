@@ -1,0 +1,13 @@
+#
+# SCHEME.BIND - specifications for language bindings
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#  C function         Fortran  Scheme            Python
+
+# SHINT.C
+#SS_call_scheme       sschem   none              none

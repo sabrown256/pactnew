@@ -60,6 +60,7 @@ DepLib = ${LibDir}/libpml.a \
 
 targets :
 	@echo "Targets for PDB"
+	@echo "   bindings     : make the language bindings"
 	@echo "   Cstd      : make standard tests"
 	@echo "   Apps      : make pdb2hdf   "
 	@echo "   Gst       : make gather test"
@@ -94,18 +95,21 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
        pdcsum.o pdbx.o pdszof.o pdfia.o pdbdir.o pdpar.o pdcomm.o \
        pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
 
-ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)    \
-         ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)  \
-         ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o) \
+ArBind = ${TGTLib}(gf-${LibName}.o)
+
+ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
+         ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)                      \
+         ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o)                     \
          ${TGTLib}(pdcomm.o) ${TGTLib}(pdbmp.o) ${TGTLib}(pdser.o)   \
          ${TGTLib}(pdlow.o) ${TGTLib}(pdrdwr.o) ${TGTLib}(pdptr.o)   \
          ${TGTLib}(pdmemb.o) ${TGTLib}(pdgs.o) ${TGTLib}(pdcsum.o)   \
          ${TGTLib}(pdblk.o) ${TGTLib}(pdbmm.o) ${TGTLib}(pdconv.o)   \
-         ${TGTLib}(pdpath.o) ${TGTLib}(pdbfc.o) ${TGTLib}(pdbnet.o) \
-         ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) \
+         ${TGTLib}(pdpath.o) ${TGTLib}(pdbfc.o) ${TGTLib}(pdbnet.o)  \
+         ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o)                     \
          ${TGTLib}(pdbx.o) ${TGTLib}(pdfia.o)  ${TGTLib}(pdbdir.o)   \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
-         ${TGTLib}(pdspoke.o)
+         ${TGTLib}(pdspoke.o)                                        \
+         ${ArBind}
 
 ${Objs} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
 ${LibDep} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
@@ -315,4 +319,15 @@ inform :
 #
 test :
 	@./pdtest
+
+#
+# Make C prototypes file
+#
+genf  = gf-${LibName}.c
+bindf = ${LibName}.bind
+
+${genf} : ${bindf}
+	../scripts/bproto
+
+bindings : ${genf}
 
