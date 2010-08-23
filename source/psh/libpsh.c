@@ -236,6 +236,24 @@ char *downcase(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* FILL_STRING - fill ragged S name with "." to column N */
+
+char *fill_string(char *s, int n)
+   {int i, nc, nd;
+    static char fill[MAXLINE];
+
+    nc = strlen(s);
+    nd = n - nc;
+    strcpy(fill, s);
+    nstrcat(fill, MAXLINE, " ");
+    for (i = 0; i < nd; i++)
+        nstrcat(fill, MAXLINE, ".");
+
+    return(fill);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* STRCLEAN - make a copy of S which has any non-printing characters
  *          - replaced by sequences of printable characters
  *          - if the line lenght would be exceeded put '...\n'
@@ -1938,10 +1956,11 @@ char **file_text(char *fname, ...)
     VSNPRINTF(file, MAXLINE, fname);
     VA_END;
 
+    sa = NULL;
+	
     in = fopen(file, "r");
     if (in != NULL)
-       {sa = NULL;
-	for (i = 0; fgets(s, LRG, in) != NULL; i++)
+       {for (i = 0; fgets(s, LRG, in) != NULL; i++)
 	    {LAST_CHAR(s) = '\0';
 	     sa = lst_add(sa, s);};
 	sa = lst_add(sa, NULL);

@@ -53,7 +53,7 @@ static void *_SC_array_acc_1(int oper, void *a, int bpi, long n, void *v)
 
      s = (char *) a;
      if (oper == SET)
-        s[n] = (v == NULL) ? 0 : *(char *) v;
+        s[n] = (v == NULL) ? '\0' : *(char *) v;
      else if (oper == GET)
         v = &s[n];
 

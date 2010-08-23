@@ -14,6 +14,9 @@ MPI : poe {
    Exe   = ("$DBG_Exe" == "") ? "" : poe
    Flags = 
 
+   HostDir  = ($?DORUN_HOST_DIR == 0) ? . : $DORUN_HOST_DIR
+   HostFile = $MPI_HostDir/.dp-aix.$Host.$$
+
 # NOTE: do not do this unless we can figure immediate mode for poe
 #   Env Pool = ("$Pool" == pdebug) ? pbatch : -noop-
 
@@ -30,7 +33,7 @@ MPI : poe {
    Env MP_RESD          = ($MPINot == TRUE) ? NO               : -noop-
    Env MP_CPU_USE       = ($MPINot == TRUE) ? multiple         : -noop-
    Env MP_TASK_AFFINITY = ($MPINot == TRUE) ? 0                : -noop-
-   Env MP_HOSTFILE      = ($MPINot == TRUE) ? .dp-aix.$Host.$$ : -noop-
+   Env MP_HOSTFILE      = ($MPINot == TRUE) ? $MPI_HostFile    : -noop-
 
    Env MP_EUIDEVICE      = ($MPINot == TRUE) ? -unsetenv- : -noop-
    Env MP_TASKS_PER_NODE = ($MPINot == TRUE) ? -unsetenv- : -noop-

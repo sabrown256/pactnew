@@ -829,9 +829,13 @@ void PG_contour_plot(PG_device *dev, PG_graph *data, ...)
 
 FIXNUM F77_FUNC(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
 			     double *pfn, double *pfx, double *pr)
-   {return((FIXNUM) PG_contour_levels(lev, (int) *pn,
-				      (double) *pfn, (double) *pfx,
-				      (double) *pr));}
+   {FIXNUM rv;
+    
+    rv = PG_contour_levels(lev, (int) *pn,
+			   (double) *pfn, (double) *pfx,
+			   (double) *pr);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -841,10 +845,11 @@ FIXNUM F77_FUNC(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
 FIXNUM F77_FUNC(pgplcn, PGPLCN)(FIXNUM *devid, double *px, double *py,
 			     double *pa, double *pl, FIXNUM *pkx, FIXNUM *plx,
 			     FIXNUM *pnl, FIXNUM *pli, FIXNUM *pal)
-   {PG_device *dev;
-    int maxes[2];
+   {int maxes[2];
+    FIXNUM rv;
     double *x[2];
     pcons *alst;
+    PG_device *dev;
 
     maxes[0] = *pkx;
     maxes[1] = *plx;
@@ -858,7 +863,9 @@ FIXNUM F77_FUNC(pgplcn, PGPLCN)(FIXNUM *devid, double *px, double *py,
     PG_draw_iso_nc_lr(dev, pa, 2, x, pl,
                       (int) *pnl, (int) *pli, (void *) maxes, alst);
 
-    return((FIXNUM) TRUE);}
+    rv = TRUE;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

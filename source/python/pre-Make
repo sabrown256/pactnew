@@ -92,7 +92,11 @@ ArPPO  = ${TGTLib}(pputil.o) ${TGTLib}(pptypes.o) ${TGTLib}(pparrays.o) \
 ArPGSO = ${TGTLib}(pgsmodule.o) ${TGTLib}(pgsdevice.o) ${TGTLib}(pgsgraph.o) \
          ${TGTLib}(pgsimage.o) ${TGTLib}(pgspalette.o) ${TGTLib}(utilpgs.o)
 
-ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO}
+ArBind = ${TGTLib}(gp-score.o) ${TGTLib}(gp-pml.o) ${TGTLib}(gp-pdb.o)   \
+         ${TGTLib}(gp-ppc.o) ${TGTLib}(gp-pgp.o) ${TGTLib}(gp-panacea.o) \
+         ${TGTLib}(gp-scheme.o)
+
+ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO} ${ArBind}
 
 ${Objs} : ${Hdrs}
 ${ArObjs} : ${Hdrs}

@@ -62,6 +62,7 @@ NGLibs = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib
 
 targets :
 	@echo "Targets for PANACEA"
+	@echo "   bindings  : make the language bindings"
 	@echo "   Cth       : make C time history tests"
 	@echo "   defvar    : make variable definition test"
 	@echo "   Fth       : make Fortran time history tests"
@@ -86,6 +87,8 @@ PPObjs  = papp.o padump.o panth.o
 SorObjs = pasrc.o
 Objs    = ${GenObjs} ${SorObjs} ${PanObjs} ${PPObjs}
 
+ArBind = ${TGTLib}(gf-${LibName}.o)
+
 ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
 	 ${TGTLib}(pagnrd.o) ${TGTLib}(pahand.o) ${TGTLib}(pafi.o)     \
          ${TGTLib}(panacea.o) ${TGTLib}(pashar.o) ${TGTLib}(pashas.o)  \
@@ -93,7 +96,8 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
          ${TGTLib}(pavars.o) ${TGTLib}(papp.o) ${TGTLib}(padump.o)     \
          ${TGTLib}(pasrc.o) ${TGTLib}(pastr.o) ${TGTLib}(pafia.o)      \
          ${TGTLib}(pasmp.o)                                            \
-         ${TGTLib}(panth.o)
+         ${TGTLib}(panth.o)                                            \
+         ${ArBind}
 
 ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
@@ -179,4 +183,15 @@ inform :
 #
 test :
 	@./patest
+
+#
+# Make C prototypes file
+#
+genf  = gf-${LibName}.c
+bindf = ${LibName}.bind
+
+${genf} : ${bindf}
+	../scripts/bproto
+
+bindings : ${genf}
 

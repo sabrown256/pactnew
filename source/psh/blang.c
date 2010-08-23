@@ -1180,24 +1180,25 @@ int blang(char *pck, char *fpr, char *fbi)
 	spr = file_text(fpr);
 	sbi = file_text(fbi);
 
-	ff  = init_fortran(pck);
-	rv &= bind_fortran(ff, spr, sbi);
-	fin_fortran(ff);
+	if (spr != NULL)
+	   {ff = init_fortran(pck);
+	    fs = init_scheme(pck);
+	    fp = init_python(pck);
+	    fd = init_doc(pck);
 
-	fs  = init_scheme(pck);
-	rv &= bind_scheme(fs, pck, spr, sbi);
-	fin_scheme(fs);
+	    if (sbi != NULL)
+	       {rv &= bind_fortran(ff, spr, sbi);
+		rv &= bind_scheme(fs, pck, spr, sbi);
+		rv &= bind_python(fp, spr, sbi);
+		rv &= bind_doc(fd, spr, sbi);};
 
-	fp  = init_python(pck);
-	rv &= bind_python(fp, spr, sbi);
-	fin_python(fp);
+	    fin_fortran(ff);
+	    fin_scheme(fs);
+	    fin_python(fp);
+	    fin_doc(fd);
 
-	fd  = init_doc(pck);
-	rv &= bind_doc(fd, spr, sbi);
-	fin_doc(fd);
-
-	free_strings(spr);
-	free_strings(sbi);};
+	    free_strings(spr);
+	    free_strings(sbi);};};
 
     return(rv);}
 
@@ -1208,7 +1209,7 @@ int blang(char *pck, char *fpr, char *fbi)
 
 int main(int c, char **v)
    {int i, rv;
-    char pck[MAXLINE];
+    char pck[MAXLINE], msg[MAXLINE];
     char *fpr, *fbi;
 
     fpr = "";
@@ -1228,9 +1229,14 @@ int main(int c, char **v)
 	        fbi = v[i];};};
 
     snprintf(pck, MAXLINE, "%s", path_base(path_tail(fbi)));
+    snprintf(msg, MAXLINE, "%s bindings", pck);
+
+    printf("      %s ", fill_string(msg, 25));
 
     rv = blang(pck, fpr, fbi);
     rv = (rv != TRUE);
+
+    printf("done\n");
 
     return(rv);}
 

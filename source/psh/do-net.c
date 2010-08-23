@@ -290,24 +290,6 @@ static void get_host_file(char *host, char *file, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FORMAT - fill ragged S name with "." to column N */
-
-static char *format(char *s, int n)
-   {int i, nc, nd;
-    static char fill[MAXLINE];
-
-    nc = strlen(s);
-    nd = n - nc;
-    strcpy(fill, s);
-    nstrcat(fill, MAXLINE, " ");
-    for (i = 0; i < nd; i++)
-        nstrcat(fill, MAXLINE, ".");
-
-    return(fill);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* GET_FIELDS - assemble the fields to be passed as
  *            - an argument to do-local
  */
@@ -1936,7 +1918,7 @@ static int testhosts(donetdes *st, int c, char **v)
 	        {uhst = hs[i].rawh;
 		 rhst = hs[i].host;
 
-		 fill = format(uhst, 20);
+		 fill = fill_string(uhst, 20);
 
 		 if (downonly == TRUE)
 		    {if (rhst == NULL)

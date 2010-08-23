@@ -48,6 +48,7 @@ Libs = ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PML"
+	@echo "   bindings  : make the language bindings"
 	@echo "   cgsolv    : make sparse linear CG solvers test"
 	@echo "   checksum  : make checksum routines test"
 	@echo "   fpe       : make FPE tests"
@@ -80,6 +81,8 @@ Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
        mlchksm.o mlmesh.o mlmsrch.o mlcmsh.o mlmextr.o            \
        mlfia.o mlvect.o mlsmp.o 
 
+ArBind = ${TGTLib}(gf-${LibName}.o)
+
 ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)  \
          ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)  \
          ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)  ${TGTLib}(mlsfnc.o) \
@@ -90,7 +93,8 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)  \
 	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)   \
          ${TGTLib}(mlmesh.o)  ${TGTLib}(mlmsrch.o) ${TGTLib}(mlcmsh.o) \
          ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o) ${TGTLib}(mlfia.o)  \
-         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)
+         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)                       \
+         ${ArBind}
 
 ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
@@ -240,4 +244,15 @@ inform :
 #
 test :
 	@./mltest
+
+#
+# Make C prototypes file
+#
+genf  = gf-${LibName}.c
+bindf = ${LibName}.bind
+
+${genf} : ${bindf}
+	../scripts/bproto
+
+bindings : ${genf}
 

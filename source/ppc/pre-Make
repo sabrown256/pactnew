@@ -51,6 +51,7 @@ SLibs = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PPC"
+	@echo "   bindings  : make the language bindings"
 	@echo "   Cstd      : make standard tests and pcexec"
 	@echo "   Fstd      : make Fortran tests"
 	@echo "   install   : install PPC headers and utilities in dev/arch"
@@ -80,9 +81,12 @@ OPARC  = pcparc.o pcparmp.o
 
 ONOIPC = pcnil.o
 
-ArObjs = ${MPassDevices} ${IPCDevices} \
+ArBind = ${TGTLib}(gf-${LibName}.o)
+
+ArObjs = ${MPassDevices} ${IPCDevices}       \
          ${TGTLib}(ppc.o) ${TGTLib}(pcbin.o) \
-         ${TGTLib}(pcpio.o)
+         ${TGTLib}(pcpio.o)                  \
+         ${ArBind}
 
 ArMPSC = ${TGTLib}(pcmpsc.o)
 ArLMPS = ${TGTLib}(pclmps.o)
@@ -188,4 +192,15 @@ inform :
 #
 test :
 	@./pctest
+
+#
+# Make C prototypes file
+#
+genf  = gf-${LibName}.c
+bindf = ${LibName}.bind
+
+${genf} : ${bindf}
+	../scripts/bproto
+
+bindings : ${genf}
 
