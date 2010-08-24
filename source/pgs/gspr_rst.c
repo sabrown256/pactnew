@@ -682,6 +682,11 @@ static void _PG_fill_rst_line(PG_device *dev, edgedes **ae,
 			      int nd, int ne, int iy)
    {int i, ix1[PG_SPACEDM], ix2[PG_SPACEDM];
 
+/* force NE to be even - hack for tortured polygons
+ * prevents reference off the end of AE in loop below
+ */
+    ne = (ne >> 1) << 1;
+
     for (i = 0; i < ne; i += 2)
         {_PG_edge_point(ix1, nd, ae[i],   iy);
 	 _PG_edge_point(ix2, nd, ae[i+1], iy);
@@ -706,7 +711,7 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     edgedes **ae, **et;
 
-    if (dev != NULL)
+    if ((dev != NULL) && (n > nd))
 
 /* get the PC y limits for this polygon */
        {PM_maxmin(r[1], &x1[1], &x2[1], n);
