@@ -950,7 +950,7 @@ void PG_fill_polygon_n(PG_device *dev, int color, int mapped,
     PM_polygon *pc, *py;
     static int count = 0;
 
-    if (dev != NULL)
+    if ((dev != NULL) && (n > nd))
        {PG_trans_points(dev, n, nd, cs, r, WORLDC, r);
 
 	py = PM_make_polygon(nd, n, r[0], r[1], r[2]);
