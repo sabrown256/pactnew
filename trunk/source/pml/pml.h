@@ -744,6 +744,13 @@ extern int
  PM_reg_base(PM_part *parts, PM_side *base);
 
 
+/* MLEIGEN.C declarations */
+
+extern PM_matrix
+ *PM_eigenvalue(PM_matrix *a),
+ *PM_eigenvectors(PM_matrix *a);
+
+
 /* MLFFT.C declarations */
 
 extern double
