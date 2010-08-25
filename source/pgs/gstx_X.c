@@ -406,10 +406,9 @@ static int _PG_X_txt_set_font(PG_device *dev, char *face, char *style, int size)
 /* _PG_X_TXT_WRITE_TEXT - write out text to the appropriate device */
  
 static void _PG_X_txt_write_text(PG_device *dev, char *s,
-				 int color, int xpad,
-				 int *pdx, int *pdy)
+				 int color, int xpad, int *dx)
    {int ypad, st;
-    int ix, iy, len, dir, asc, dsc;
+    int len, dir, asc, dsc;
     XCharStruct overall;
     XFontStruct *fnt;
     unsigned long *pi;
@@ -434,11 +433,8 @@ static void _PG_X_txt_write_text(PG_device *dev, char *s,
     fnt = dev->font_info;
     XTextExtents(fnt, s, len, &dir, &asc, &dsc, &overall);
     
-    ix = overall.width;
-    iy = asc + dsc;
-
-    *pdx = ix;
-    *pdy = iy;
+    dx[0] = overall.width;
+    dx[1] = asc + dsc;
 
     ypad = asc;
 
@@ -451,8 +447,8 @@ static void _PG_X_txt_write_text(PG_device *dev, char *s,
 
 /* _PG_X_TXT_PLACE_IMAGE - place the image from the drawable into IMG */
 
-int _PG_X_txt_place_image(PG_device *src, int dx, int dy,
-			  PG_device *dst, int xo, int yo, int bc, int pad)
+int _PG_X_txt_place_image(PG_device *src, int *dx,
+			  PG_device *dst, int *xo, int bc, int pad)
    {int ix, iy, irx, iry, ok;
     int ri, gi, bi;
     int w, h, wow, bob;
@@ -473,23 +469,24 @@ int _PG_X_txt_place_image(PG_device *src, int dx, int dy,
 	w  = img->width;
 	h  = img->height;
 
+	dx[0] += 2*pad;
+
 	msk = AllPlanes;
-	dx += 2*pad;
 	xi  = XGetImage(src->display, src->pixmap,
-			0, 0, dx, dy, msk, ZPixmap);
+			0, 0, dx[0], dx[1], msk, ZPixmap);
 
 	ord  = xi->byte_order;
 	pxss = xi->bits_per_pixel >> 3;
 	bprs = xi->bytes_per_line;
 
-	yo -= (3*dy/4);
+	xo[1] -= (3*dx[1]/4);
 
 	PG_get_char_path(dst, &ca, &sa);
 
-	for (iy = 0; iy < dy; iy++)
+	for (iy = 0; iy < dx[1]; iy++)
 	    {sr = (unsigned char *) (xi->data + bprs*iy);
 	     if (ord)
-	        {for (ix = 0; ix < dx; ix++)
+	        {for (ix = 0; ix < dx[0]; ix++)
 		     {ri  = sr[0];
 		      gi  = sr[1];
 		      bi  = sr[2];
@@ -498,15 +495,15 @@ int _PG_X_txt_place_image(PG_device *src, int dx, int dy,
 		      irx =  ix*ca + iy*sa;
 		      iry = -ix*sa + iy*ca;
 
-		      dr = img->r + w*(yo + iry) + (xo + irx);
-		      dg = img->g + w*(yo + iry) + (xo + irx);
-		      db = img->b + w*(yo + iry) + (xo + irx);
+		      dr = img->r + w*(xo[1] + iry) + (xo[0] + irx);
+		      dg = img->g + w*(xo[1] + iry) + (xo[0] + irx);
+		      db = img->b + w*(xo[1] + iry) + (xo[0] + irx);
 
 		      *dr = ri;
 		      *dg = gi;
 		      *db = bi;};}
 	     else
-	        {for (ix = 0; ix < dx; ix++)
+	        {for (ix = 0; ix < dx[0]; ix++)
 		     {bi  = sr[0];
 		      gi  = sr[1];
 		      ri  = sr[2];
@@ -515,9 +512,9 @@ int _PG_X_txt_place_image(PG_device *src, int dx, int dy,
 		      irx =  ix*ca + iy*sa;
 		      iry = -ix*sa + iy*ca;
 
-		      dr = img->r + w*(yo + iry) + (xo + irx);
-		      dg = img->g + w*(yo + iry) + (xo + irx);
-		      db = img->b + w*(yo + iry) + (xo + irx);
+		      dr = img->r + w*(xo[1] + iry) + (xo[0] + irx);
+		      dg = img->g + w*(xo[1] + iry) + (xo[0] + irx);
+		      db = img->b + w*(xo[1] + iry) + (xo[0] + irx);
 
 /* white on white - in spite of the name */
 		      wow = ((bc == src->BLACK) &&
@@ -544,8 +541,8 @@ int _PG_X_txt_place_image(PG_device *src, int dx, int dy,
 
 /* _PG_X_TXT_PLACE_TEXT - get the image from the drawable */
 
-int _PG_X_txt_place_text(PG_device *src, int dx, int dy,
-			 PG_device *dst, int xo, int yo, int bc, int pad)
+int _PG_X_txt_place_text(PG_device *src, int *dx,
+			 PG_device *dst, int *xo, int bc, int pad)
    {int ok;
     int dir, asc, dsc;
     unsigned long msk;
@@ -559,16 +556,16 @@ int _PG_X_txt_place_text(PG_device *src, int dx, int dy,
        {fnt = dst->font_info;
 	XTextExtents(fnt, "g", 1, &dir, &asc, &dsc, &overall);
 
-	yo -= asc;
-	dx += 2*pad;
+	xo[1] -= asc;
+	dx[0] += 2*pad;
 
 	PG_get_char_path(dst, &ca, &sa);
 	msk = AllPlanes;
 	si  = XGetImage(src->display, src->pixmap,
-			0, 0, dx, dy, msk, ZPixmap);
+			0, 0, dx[0], dx[1], msk, ZPixmap);
 
 	ok = _PG_X_put_ximage(dst, si, bc, src->BLACK, src->WHITE,
-			      xo, yo, dx, dy, ca, sa);
+			      xo, dx, ca, sa, FALSE);
 
 	XDestroyImage(si);};
 
@@ -582,14 +579,17 @@ int _PG_X_txt_place_text(PG_device *src, int dx, int dy,
  *                 - image
  */
 
-int _PG_X_draw_text(PG_device *dev, char *s, int x, int y)
-   {int ok, bc, fc, sz, pad;
+int _PG_X_draw_text(PG_device *dev, char *s, double *x)
+   {int id, nd;
+    int ok, bc, fc, sz, pad;
     int ir[PG_SPACEDM], dx[PG_SPACEDM];
     double ca, sa;
     char *face, *sty;
 
-    ir[0] = x;
-    ir[1] = y;
+    nd = 2;
+
+    for (id = 0; id < nd; id++)
+        ir[id] = x[id];
 
     PG_get_char_path(dev, &ca, &sa);
 
@@ -615,9 +615,8 @@ int _PG_X_draw_text(PG_device *dev, char *s, int x, int y)
 
 	_PG_X_txt_clear_window(_PG.txtd, bc);
 	_PG_X_txt_set_font(_PG.txtd, face, sty, sz);
-	_PG_X_txt_write_text(_PG.txtd, s, fc, pad, &dx[0], &dx[1]);
-	ok = _PG_X_txt_place_text(_PG.txtd, dx[0], dx[1], dev,
-				  ir[0], ir[1], bc, pad);
+	_PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
+	ok = _PG_X_txt_place_text(_PG.txtd, dx, dev, ir, bc, pad);
 
 	SFREE(face);
 	SFREE(sty);};
@@ -638,20 +637,26 @@ int _PG_X_draw_text(PG_device *dev, char *s, int x, int y)
  */
 
 int _PG_rst_draw_text(PG_device *dev, char *s)
-   {int bc, fc, sz;
-    int ok, pad, dx, dy;
+   {int id, nd, bc, fc, sz;
+    int ok, pad;
+    int io[PG_SPACEDM], dx[PG_SPACEDM];
     double o[PG_SPACEDM];
     char *face, *sty;
+
+    nd = 2;
 
     PG_get_font(dev, &face, &sty, &sz);
 
     bc = dev->BLACK;
     PG_get_text_color(dev, &fc);
 
-    o[0] = dev->tcur[0];
-    o[1] = dev->tcur[1];
+    for (id = 0; id < nd; id++)
+        o[id] = dev->tcur[id];
 
     PG_trans_point(dev, 2, WORLDC, o, PIXELC, o);
+
+    for (id = 0; id < nd; id++)
+        io[id] = o[id];
 
     if (_PG.txtd == NULL)
        {_PG.txtd = PG_make_device("SCREEN", "COLOR", "TextBuffer");
@@ -661,8 +666,8 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
 
     _PG_X_txt_clear_window(_PG.txtd, bc);
     _PG_X_txt_set_font(_PG.txtd, "helvetica", sty, sz);
-    _PG_X_txt_write_text(_PG.txtd, s, fc, pad, &dx, &dy);
-    ok = _PG_X_txt_place_image(_PG.txtd, dx, dy, dev, o[0], o[1], bc, pad);
+    _PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
+    ok = _PG_X_txt_place_image(_PG.txtd, dx, dev, io, bc, pad);
 
     SFREE(face);
     SFREE(sty);

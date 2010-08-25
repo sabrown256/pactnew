@@ -458,8 +458,7 @@ extern int
 		  int xo, int yo, int dx, int dy,
 		  double ca, double sa),
  _PG_X_put_ximage(PG_device *dev, void *psi, int bc, int swc, int sbc,
-		  int xo, int yo, int dx, int dy,
-		  double ca, double sa);
+		  int *xo, int *nx, double ca, double sa, int inv);
 
 
 /* GSRWI.C declarations */
