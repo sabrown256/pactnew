@@ -964,33 +964,35 @@ int _PG_X_put_raster(PG_device *dev, int bc,
 
 /* _PG_X_PUT_XIMAGE - put (NX,NY) of the XImage on the screen
  *                  - at (X0,Y0) rotated by (CA,SA)
+ *                  - if INV is TRUE invert the image
+ *                  - images from other X windows (such as text)
+ *                  - do not need to be inverted
+ *                  - image from files generally do need to be inverted
  */
 
 int _PG_X_put_ximage(PG_device *dev, void *psi, int bc, int swc, int sbc,
-		     int xo, int yo, int nx, int ny,
-		     double ca, double sa)
-   {int ix, iy, ok;
-    int w, h, wow, bob;
-    int ri, gi, bi;
+		     int *xo, int *nx, double ca, double sa, int inv)
+   {int id, nd, ix, iy, ok;
+    int wow, bob, ri, gi, bi;
     int pxss, bprs, pxsd, bprd;
-    int ir[PG_SPACEDM];
+    int ir[PG_SPACEDM], ex[PG_SPACEDM];
     unsigned long msk;
     unsigned char *sr, *dr, *sb, *db;
     XImage *di, *si;
 
+    nd = 2;
     si = (XImage *) psi;
 
-    w = PG_window_width(dev);
-    h = PG_window_height(dev);
+    ex[0] = PG_window_width(dev);
+    ex[1] = PG_window_height(dev);
 
-    if (nx < 0)
-       nx = w;
-    if (ny < 0)
-       ny = h;
+    for (id = 0; id < nd; id++)
+        {if (nx[id] < 0)
+	    nx[id] = ex[id];};
 
     msk = AllPlanes;
     di  = XGetImage(dev->display, PG_X11_DRAWABLE(dev),
-		    0, 0, w, h, msk, ZPixmap);
+		    0, 0, ex[0], ex[1], msk, ZPixmap);
 
     pxss = si->bits_per_pixel >> 3;
     bprs = si->bytes_per_line;
@@ -1000,17 +1002,18 @@ int _PG_X_put_ximage(PG_device *dev, void *psi, int bc, int swc, int sbc,
     bprd = di->bytes_per_line;
     db   = (unsigned char *) di->data;
 
-    for (iy = 0; iy < ny; iy++)
+    for (iy = 0; iy < nx[1]; iy++)
         {sr = sb + bprs*iy;
-	 for (ix = 0; ix < nx; ix++)
+	 for (ix = 0; ix < nx[0]; ix++)
 	     {bi = sr[0];
 	      gi = sr[1];
 	      ri = sr[2];
 
-	      ir[0] = xo + ix*ca + iy*sa;
-	      ir[1] = yo - ix*sa + iy*ca;
+	      ir[0] = xo[0] + ix*ca + iy*sa;
+	      ir[1] = xo[1] - ix*sa + iy*ca;
 
-	      PG_QUAD_FOUR_POINT(dev, ir);
+	      if (inv == TRUE)
+		 PG_QUAD_FOUR_POINT(dev, ir);
 
 	      dr = db + bprd*ir[1] + pxsd*ir[0];
 
@@ -1031,7 +1034,7 @@ int _PG_X_put_ximage(PG_device *dev, void *psi, int bc, int swc, int sbc,
 	      sr += pxss;};};
 
     ok = XPutImage(dev->display, PG_X11_DRAWABLE(dev), dev->gc,
-		   di, 0, 0, 0, 0, w, h);
+		   di, 0, 0, 0, 0, ex[0], ex[1]);
 
     XDestroyImage(di);
 

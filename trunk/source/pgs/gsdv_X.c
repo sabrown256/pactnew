@@ -66,7 +66,7 @@ char *X_event_name[] =
 /* from the corresponding TX file */
 
 extern int
- _PG_X_draw_text(PG_device *dev, char *s, int x, int y);
+ _PG_X_draw_text(PG_device *dev, char *s, double *x);
 
 
 /* from the corresponding PR file */
@@ -1488,7 +1488,8 @@ static void _PG_X_release_current_device(PG_device *dev)
 /* _PG_X_WRITE_TEXT - write out text to the appropriate device */
  
 static void _PG_X_write_text(PG_device *dev, FILE *fp, char *s)
-   {double x[PG_SPACEDM];
+   {int id, nd;
+    double x[PG_SPACEDM];
     Display *disp;
 
     if (dev == NULL)
@@ -1499,11 +1500,14 @@ static void _PG_X_write_text(PG_device *dev, FILE *fp, char *s)
         if (disp == NULL)
            return;
 
-	x[0] = dev->tcur[0];
-	x[1] = dev->tcur[1];
+	nd = 2;
+
+	for (id = 0; id < nd; id++)
+	    x[id] = dev->tcur[id];
+
 	PG_trans_point(dev, 2, WORLDC, x, PIXELC, x);
 
-	_PG_X_draw_text(dev, s, x[0], x[1]);}
+	_PG_X_draw_text(dev, s, x);}
 
     else
        io_printf(fp, "%s", s);
