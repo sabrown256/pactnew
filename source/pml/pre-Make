@@ -74,7 +74,7 @@ Hdrs = pml.h pml_int.h scope_complex.h
 # Object Files
 #
 Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
-       mlrfnc.o mlcfnc.o mlsfnc.o mlsolv.o mlsvd.o                \
+       mlrfnc.o mlcfnc.o mlsfnc.o mlsolv.o mlsvd.o mleigen.o      \
        mlcg.o mliccg.o mlicgs.o                                   \
        mlfft.o mlfpe.o mloper.o mlgeom.o mlsort.o mlmm.o          \
        mlintm.o mlintp.o mlints.o                                 \
@@ -83,17 +83,17 @@ Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
 
 ArBind = ${TGTLib}(gf-${LibName}.o)
 
-ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)  \
-         ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)  \
-         ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)  ${TGTLib}(mlsfnc.o) \
-         ${TGTLib}(mlsolv.o)  ${TGTLib}(mlsvd.o)                       \
-         ${TGTLib}(mlcg.o)    ${TGTLib}(mliccg.o)  ${TGTLib}(mlicgs.o) \
-         ${TGTLib}(mlintm.o)  ${TGTLib}(mlintp.o)  ${TGTLib}(mlints.o) \
-         ${TGTLib}(mlfpe.o)   ${TGTLib}(mloper.o)                      \
-	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)   \
-         ${TGTLib}(mlmesh.o)  ${TGTLib}(mlmsrch.o) ${TGTLib}(mlcmsh.o) \
-         ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o) ${TGTLib}(mlfia.o)  \
-         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)                       \
+ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
+         ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)   \
+         ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)  ${TGTLib}(mlsfnc.o)  \
+         ${TGTLib}(mlsolv.o)  ${TGTLib}(mlsvd.o)   ${TGTLib}(mleigen.o) \
+         ${TGTLib}(mlcg.o)    ${TGTLib}(mliccg.o)  ${TGTLib}(mlicgs.o)  \
+         ${TGTLib}(mlintm.o)  ${TGTLib}(mlintp.o)  ${TGTLib}(mlints.o)  \
+         ${TGTLib}(mlfpe.o)   ${TGTLib}(mloper.o)                       \
+	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)    \
+         ${TGTLib}(mlmesh.o)  ${TGTLib}(mlmsrch.o) ${TGTLib}(mlcmsh.o)  \
+         ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o) ${TGTLib}(mlfia.o)   \
+         ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)                        \
          ${ArBind}
 
 ${Objs} : ${Hdrs}
