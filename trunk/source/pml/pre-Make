@@ -51,6 +51,7 @@ targets :
 	@echo "   bindings  : make the language bindings"
 	@echo "   cgsolv    : make sparse linear CG solvers test"
 	@echo "   checksum  : make checksum routines test"
+	@echo "   eigen     : make eigen systems tests"
 	@echo "   fpe       : make FPE tests"
 	@echo "   funcs     : make functions test"
 	@echo "   icsolv    : make matrix ICG solvers test"
@@ -168,6 +169,15 @@ svdsolv : ${BinDir}/mlsvdt
 ${BinDir}/mlsvdt : mlsvdt.c ${TGTLib}
 	${CC} -c mlsvdt.c -o ${PACTTmpDir}/mlsvdt.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/mlsvdt.o -o ${BinDir}/mlsvdt ${Libs}
+
+#
+# test EIGEN systems
+#
+eigen : ${BinDir}/mlevts
+
+${BinDir}/mlevts : mlevts.c ${TGTLib}
+	${CC} -c mlevts.c -o ${PACTTmpDir}/mlevts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlevts.o -o ${BinDir}/mlevts ${Libs}
 
 #
 # test interpolation

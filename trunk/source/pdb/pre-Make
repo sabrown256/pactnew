@@ -71,6 +71,7 @@ targets :
 	@echo "   smp       : make SMP IO test"
 	@echo "   dp        : make DP IO test"
 	@echo "   fdp       : make Fortran DP IO test"
+	@echo "   fd        : make file descriptor test"
 	@echo "   attr      : make attribute tests"
 	@echo "   def       : make typedef and cast tests"
 	@echo "   time      : make timing test"
@@ -264,6 +265,15 @@ ${BinDir}/pdrcts : pdrcts.c ${InstallDep} ${Hdrs}
 ${BinDir}/pdtdeftst : pdtdeftst.c ${InstallDep} ${Hdrs}
 	${CC} -c pdtdeftst.c -o ${PACTTmpDir}/pdtdeftst.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/pdtdeftst.o -o ${BinDir}/pdtdeftst ${Libs}
+
+#
+# test file descriptor usage
+#
+fd : ${BinDir}/pdfdts
+
+${BinDir}/pdfdts : pdfdts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdfdts.c -o ${PACTTmpDir}/pdfdts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdfdts.o -o ${BinDir}/pdfdts ${Libs}
 
 #
 # timing test

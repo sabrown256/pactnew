@@ -418,22 +418,16 @@ int _PD_identify_version(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_IDENTIFY_FILE - identify the format version of the PDBfile FILE
- *                   - set the methods appropriately and
- *                   - return the format version number
- *                   - or -1 iff the file is not a PDB file
+/* _PD_ID_FILE - identify the format version of the FILE FP
+ *             - set the methods appropriately and
+ *             - return the format version number
+ *             - or -1 iff the file is not a PDB file
  */
 
-int _PD_identify_file(PDBfile *file)
-   {int vers, ok, nb;
+static int _PD_id_file(FILE *fp)
+   {int vers, nb;
     char str[MAXLINE];
     char *p;
-    FILE *fp;
-    PD_smp_state *pa;
-
-    pa = _PD_get_state(-1);
-
-    fp = pa->ofp;
 
 /* attempt to read an ASCII header */
     if (lio_seek(fp, (off_t) 0, SEEK_SET))
@@ -463,9 +457,31 @@ int _PD_identify_file(PDBfile *file)
 	    if (p == NULL)
 	       vers = -1;
 	    else
-	       vers = _PD_identify_version(p);};
+	       vers = _PD_identify_version(p);};};
 
-	ok = _PD_format_version(file, vers);};
+    return(vers);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_IDENTIFY_FILE - identify the format version of the PDBfile FILE
+ *                   - set the methods appropriately and
+ *                   - return the format version number
+ *                   - or -1 iff the file is not a PDB file
+ */
+
+int _PD_identify_file(PDBfile *file)
+   {int vers, ok;
+    FILE *fp;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    fp = pa->ofp;
+
+    vers = _PD_id_file(fp);
+    if (vers != -1)
+       ok = _PD_format_version(file, vers);
 
     return(vers);}
 
@@ -494,6 +510,24 @@ int _PD_format_version(PDBfile *file, int vers)
 	     _PD_set_format_iii(file);};
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_ISFILE - return TRUE iff FNAME is a PDB file */
+
+int PD_isfile(char *fname)
+   {int vers, ok;
+    FILE *fp;
+
+    fp = io_open(fname, "r");
+
+    vers = _PD_id_file(fp);
+    ok   = (vers > 0);
+
+    io_close(fp);
+
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 
