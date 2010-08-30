@@ -748,7 +748,10 @@ extern int
 
 extern PM_matrix
  *PM_eigenvalue(PM_matrix *a),
- *PM_eigenvectors(PM_matrix *a);
+ *PM_eigensys(PM_matrix *a);
+
+extern int
+ PM_eigenvectors(PM_matrix *a);
 
 
 /* MLFFT.C declarations */

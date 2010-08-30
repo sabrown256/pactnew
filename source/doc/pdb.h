@@ -66,6 +66,9 @@ indicates functions for optional use
 <a href="#pd_target">PD_TARGET</a>
 
 <dt><dd><font color="#ff0000">o </font>
+<a href="#pd_isfile">PD_ISFILE</a>
+
+<dt><dd><font color="#ff0000">o </font>
 <a href="#pd_open">PD_OPEN</a>
 
 <dt><dd><font color="#009900">o </font>
@@ -2173,6 +2176,52 @@ and
              .
              .
 </pre>
+<hr>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="pd_isfile"><h2>PD_ISFILE</h2></a>
+
+
+<p>
+<pre>
+<i>C Binding: </i>  int PD_isfile(char *fname)
+<i>F77 Binding: </i>none
+<i>SX Binding: </i> none
+<i>Python Binding: </i> none
+</pre>
+<p>
+
+Check whether or not the named file is a PDB file.  This is different
+than the question of whether or not PDBLib can access the data in the
+file.  PDBLib can open and read an SQLITE database file, but that file
+is not a PDB file.
+<p>
+The argument to <tt>PD_isfile()</tt> is:<BR>
+<em>fname</em> - an ASCII string, which is the name of the file to be
+ checked<BR>
+<p>
+The function returns TRUE if the file is a PDBfile and FALSE otherwise.
+<p>
+
+<hr>
+<b>C Example</b>
+<pre>
+ #include "pdb.h"
+ 
+    PDBfile *file;
+           .
+           .
+           .
+
+    if (PD_isfile("filename") == FALSE)
+       printf("'filename' is not a PDB file\n");
+           .
+           .
+           .
+</pre>
+
 <hr>
 
 <!-- -------------------------------------------------------------------- --> 

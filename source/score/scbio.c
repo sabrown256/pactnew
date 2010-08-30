@@ -996,7 +996,7 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 	else
 	   _SC_bfr_free(fr);};
 
-        _SC_check_write(bid, &rq, fr);};
+    _SC_check_write(bid, &rq, fr);};
 
 #endif
 

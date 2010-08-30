@@ -1020,6 +1020,12 @@ extern FIXNUM
 	      FIXNUM *ind);
 
 
+/* PDFMT.C declarations */
+
+extern int
+ PD_isfile(char *fname);
+
+
 /* PDLOW.C declarations */
 
 extern defstr
