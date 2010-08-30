@@ -21,7 +21,7 @@ while ($#argv > 0)
            echo "Usage: mltest [-h] [-vg] [<test>]*"
            echo "  h       this help message"
            echo "  vg      run tests under valgrind"
-           echo "  <test>  one of: matrix func"
+           echo "  <test>  one of: matrix eigen func"
            echo "                  interp fpe nan"
            echo "                  solv svd csum cgsolv"
            echo ""
@@ -72,7 +72,7 @@ else if (-e $RootDir/pml/pml.h) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ( $Test matrix func interp fpe nan solv svd csum cgsolv )
+      set Test = ( $Test matrix eigen func interp fpe nan solv svd csum cgsolv )
    endif
 
    foreach i ($Test)

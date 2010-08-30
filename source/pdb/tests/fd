@@ -1,0 +1,38 @@
+#!/bin/csh -f
+#
+# FD - PDB file descriptor leak test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set STRACE = ( `which strace` )
+if ("$Valgrind" == "") then
+
+   set tst = $1
+
+   NoteD $LogF ""
+   NoteD $LogF -n "                    PDB FD Leak ........................ "
+   Note $LogF ""
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF $CFE pdfdts
+   set xstatus = $status
+   set ETime   = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
+      NoteD $LogF "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)

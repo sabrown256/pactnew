@@ -60,7 +60,7 @@ DepLib = ${LibDir}/libpml.a \
 
 targets :
 	@echo "Targets for PDB"
-	@echo "   bindings     : make the language bindings"
+	@echo "   bindings  : make the language bindings"
 	@echo "   Cstd      : make standard tests"
 	@echo "   Apps      : make pdb2hdf   "
 	@echo "   Gst       : make gather test"
@@ -138,7 +138,7 @@ pdspoke.c : config-spokes pdshar.c
 Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
        ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
        ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
-       ${BinDir}/pdfrts ${BinDir}/pdbfts ${DepLib}
+       ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
 Gst : ${BinDir}/pdgsts
