@@ -47,9 +47,9 @@ else
    set ETime = `$TIMER -b $UTime`
 
    if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                    SCORE Lexical Scan Test ..... OMITTED ($xstatus/$ETime)"
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
    else if (($xstatus != 0) || ($#Files == 0)) then
-      NoteD $LogF "                    SCORE Lexical Scan Test ..... FAILED ($xstatus/$ETime)"
+      NoteD $LogF "FAILED ($xstatus/$ETime)"
       set Err = 1
    else
       NoteD $LogF "PASSED ($ETime)"

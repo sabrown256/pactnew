@@ -32,10 +32,6 @@ if ($xstatus == 0) then
       flog $LogF $RM $Tmp
    endif
 
-   if ($xstatus != 0) then
-      set Err = 1
-   endif
-
 endif
 
 set ETime   = `$TIMER -b $UTime`
@@ -44,6 +40,7 @@ if (($xstatus == 254) || ($xstatus == 255)) then
    NoteD $LogF "                    SCORE Buffered I/O Test ..... OMITTED ($ETime)"
 else if ($xstatus != 0) then
    NoteD $LogF "                    SCORE Buffered I/O Test ..... FAILED ($ETime)"
+   set Err = 1
 else
    NoteD $LogF "                    SCORE Buffered I/O Test ..... PASSED ($ETime)"
 endif

@@ -90,6 +90,7 @@ else if (-e $RootDir/score/scstd.h) then
    foreach i ($Test)
       $SrcDir/tests/$i
       if ($status == 1) then
+echo "-------------->>>>  $i failed"
          set ERROR = TRUE
       endif
    end
