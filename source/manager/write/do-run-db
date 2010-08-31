@@ -48,14 +48,6 @@ if ($?DO_RUN_CROSS == 1) then
    echo "default CROSS $lcross:r" >>& $db
 endif
 
-set lsite     = ""
-set ConfigDir = ""
-if ($?SYS_SITE == 1) then
-   set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
-   set ConfigDir = ( $ConfigDir local/$lsite )
-endif
-set ConfigDir = ( $ConfigDir local std )
-
 foreach d ($ConfigDir)
    if (-f $d/do-run-prolog) then
       call ADD($d/do-run-prolog)

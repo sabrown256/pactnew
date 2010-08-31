@@ -563,13 +563,13 @@ switch ($Cmnd)
         unsetenv COMPILER_PATH_VERSION
         unsetenv COMPILER_PGI_VERSION
 
-        set ConfigDir = ""
+        setenv ConfigDir ""
         if ($?SYS_SITE == 1) then
            set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
-           set ConfigDir = ( $ConfigDir local/$lsite )
+           setenv ConfigDir  "$ConfigDir local/$lsite"
            unset lsite
         endif
-        set ConfigDir = ( $ConfigDir local std )
+        setenv ConfigDir  "$ConfigDir local std"
 
         setenv CCompiler  gnu
 
@@ -623,7 +623,7 @@ switch ($Cmnd)
                    breaksw
               case -f:
                    shift
-                   set ConfigDir = ( $1 $ConfigDir )
+                   setenv ConfigDir   "$1 $ConfigDir"
                    breaksw
               case -F:
                    set PArgs = ( $PArgs "-F" )
@@ -805,44 +805,35 @@ switch ($Cmnd)
 
 # if no configuration is specified - generate from scratch
         if ("$Configuration" == "") then
-           echo "Generating configuration $Configuration"
+           echo "Generating configuration from command line options"
            call GEN_CONFIG()
            set UCfg = $gdir/$Configuration
 	   set dir  = $gdir
 
 # if file exists as is use it
         else if (-f $Configuration) then
-           echo "Using generated configuration $Configuration"
+           echo "Using specified configuration $Configuration"
            set UCfg = $gdir/$Configuration
 	   set dir  = $gdir
 
 # otherwise look in the configs directories
         else
-
-# when doing reconfig we can use the generated configs
-# but we want to regenerate them if doing a config
-           if ($reconfig == TRUE) then
-              set clst = ( $ConfigDir $gdir )
-           else
-              set clst = ( $ConfigDir )
-           endif
-           foreach dir ($clst)
-              set lCfg = $dir/$Configuration
-              if (-f $lCfg) then
-                 set UCfg = $lCfg
-                 break
-              endif
-           end
-           if ("$UCfg" != "") then
+           set inf   = ( `gen-cfg-root $Configuration` )
+           set croot = $inf[1]
+           if ($croot == none) then
               echo "Using configuration $Configuration"
+              set UCfg = $gdir/$Configuration
+              set dir  = $gdir
            endif
-           unset clst
+           unset inf
+           unset croot
         endif
 
 # if there still is no config file - generate from what we know
         if ("$UCfg" == "") then
-           echo "Generating configuration $Configuration from components"
+           echo "Generating configuration $Configuration from name"
            set UCfg = `gen-cfg $Configuration`
+	   set dir  = $gdir
         endif
         unset gdir
 
@@ -2900,6 +2891,9 @@ exit($RStatus)
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# GEN_CONFIG - generate configuration from command line arguments alone
+#            - e.g.   -t -py
 
 GEN_CONFIG:
 

@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# GEN-CFG-ROOT - find the root config file
+#              - which is the existing file matching the
+#              - longest substring of $cfg
+#              - this must be called under 'dsys config'
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set cfg = $1
+
+set features = ( `echo $cfg | sed 's/-/ /g'` )
+
+set croot = "none"
+set ok    = FALSE
+@ i = $#features
+while (($i > 0) && ($ok == FALSE))
+   set lname = `echo $features[1-$i] | sed 's/ /-/g'`
+   foreach d ($ConfigDir)
+      if (-f $d/$lname) then
+         set croot = $d/$lname
+         set ok    = TRUE
+         break
+      endif
+   end
+   @ i = $i - 1
+end
+
+# complete the features list
+@ i = $i + 2
+set features = ( $features[$i-] )
+
+unset i
+unset ok
+unset lname
+
+echo "$croot $features"
+
+exit(0)
+

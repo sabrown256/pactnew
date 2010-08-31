@@ -49,36 +49,12 @@ if ("$cfg" == "") then
    exit(1)
 endif
 
-set lsite     = ""
-set ConfigDir = ""
-if ($?SYS_SITE == 1) then
-   set lsite     = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`
-   set ConfigDir = ( $ConfigDir local/$lsite )
-endif
-set ConfigDir = ( $ConfigDir local std )
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set features = ( `echo $cfg | sed 's/-/ /g'` )
-
-set croot = ""
-set ok    = FALSE
-@ i = $#features
-while (($i > 0) && ($ok == FALSE))
-   set lname = `echo $features[1-$i] | sed 's/ /-/g'`
-   foreach d ($ConfigDir)
-      if (-f $d/$lname) then
-         set croot = $d/$lname
-         set ok    = TRUE
-         break
-      endif
-   end
-   @ i = $i - 1
-end
-
-@ i = $i + 1
-set features = ( $features[$i-] )
+set features = ( `gen-cfg-root $cfg` )
+set croot    = $features[1]
+shift features
 
 if ($vrb == TRUE) then
    echo "Config directories: $ConfigDir"
