@@ -290,7 +290,7 @@ static object *_SXI_add_annot(object *argl)
     if (dev == NULL)
        SS_error("BAD DEVICE - _SXI_ADD_ANNOT", SS_null);
 
-    if (SS_length(argl) < 7)
+    if ((SS_length(argl) < 7) || (ndc[0] == ndc[1]))
        PG_define_region(dev, NORMC, ndc);
 
     iob = SX_add_text_ann(dev, ndc, s, clr, aln, ang*DEG_RAD);

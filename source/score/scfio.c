@@ -184,8 +184,8 @@ int SC_gather_io_info(FILE *fp, int wh)
  *                    - see _SC_bio_read_opt
  */
 
-off_t SC_set_buffer_size(off_t sz)
-   {off_t rv;
+BIGINT SC_set_buffer_size(BIGINT sz)
+   {BIGINT rv;
     
     rv = _SC.buffer_size;
     
@@ -198,8 +198,8 @@ off_t SC_set_buffer_size(off_t sz)
 
 /* SC_GET_BUFFER_SIZE - get the default I/O buffer size */
 
-off_t SC_get_buffer_size(void)
-   {off_t rv;
+BIGINT SC_get_buffer_size(void)
+   {BIGINT rv;
     
     rv = _SC.buffer_size;
 

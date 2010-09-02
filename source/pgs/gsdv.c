@@ -551,8 +551,8 @@ FILE *_PG_fopen(char *name, char *mode)
  *                    - which happens on file open
  */
 
-off_t PG_set_buffer_size(off_t sz)
-   {off_t rv;
+BIGINT PG_set_buffer_size(BIGINT sz)
+   {BIGINT rv;
     
     rv = _PG.buffer_size;
     
@@ -565,8 +565,8 @@ off_t PG_set_buffer_size(off_t sz)
 
 /* PG_GET_BUFFER_SIZE - get the default I/O buffer size */
 
-off_t PG_get_buffer_size(void)
-   {off_t rv;
+BIGINT PG_get_buffer_size(void)
+   {BIGINT rv;
     
     rv = _PG.buffer_size;
 

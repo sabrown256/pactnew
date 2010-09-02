@@ -107,10 +107,8 @@ extern double
 /* MLGEOM.C declarations */
 
 extern int
- _PM_cross(double x1, double y1, double x2, double y2,
-	   double x3, double y3, double x4, double y4,
-	   double *px0, double *py0,
-	   int line1, int line2);
+ _PM_cross(double *x1, double *x2, double *x3, double *x4,
+	   double *x0, int line1, int line2);
 
 
 /* MLMATR.C declarations */

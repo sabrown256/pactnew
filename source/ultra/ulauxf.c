@@ -757,7 +757,7 @@ static void UL_mark_curve_points(double **x, int n, char *indx)
 	    im[1] = ir[1];
 	    PG_trans_point(dev, 2, PIXELC, im, WORLDC, xm);
 
-	    PM_nearest_point(py, xm[0], xm[1], &xc[0], &xc[1], &i);
+	    PM_nearest_point(py, xm, xc, &i);
 
 	    off = (mod & KEY_SHIFT) ? FALSE : TRUE;
 	    switch (btn)

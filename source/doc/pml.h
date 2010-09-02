@@ -1,5 +1,5 @@
 TXT: PML User's Manual
-MOD: 10/29/2009
+MOD: 09/02/2010
 
 <CENTER>
 <P>
@@ -140,7 +140,7 @@ together with two integers which describe the logical shape of the space. <p>
 struct s_PM_matrix
 <P><DD>    {int nrow;
 <P><DD>     int ncol;
-<P><DD>     REAL *array;};
+<P><DD>     double *array;};
 <P>typedef struct s_PM_matrix PM_matrix;
 </BLOCKQUOTE>
 
@@ -181,7 +181,7 @@ char *es_type;<br>
 void *extrema;<br>
 void *scales;<br>
 PM_field *opers;<br>
-REAL *metric;<br>
+double *metric;<br>
 char *symmetry_type;<br>
 void *symmetry;<br>
 char *topology_type;<br>
@@ -240,8 +240,8 @@ SC_arrlen, and SC_strsave as well as the SCORE variable SC_DOUBLE_S.<p>
 
 main()
    {int i, k, l, kmax, lmax, kxl;
-    REAL *x, *y, *u, *v, r, t;
-    REAL xmin, xmax, ymin, ymax, km, lm;
+    double *x, *y, *u, *v, r, t;
+    double xmin, xmax, ymin, ymax, km, lm;
     PM_set *domain, *range;
 
 /* set up data */
@@ -254,10 +254,10 @@ main()
     ymax = 5.0;
 
     kxl  = kmax*lmax;
-    x    = MAKE_N(REAL, kxl);
-    y    = MAKE_N(REAL, kxl);
-    u    = MAKE_N(REAL, kxl);
-    v    = MAKE_N(REAL, kxl);
+    x    = MAKE_N(double, kxl);
+    y    = MAKE_N(double, kxl);
+    u    = MAKE_N(double, kxl);
+    v    = MAKE_N(double, kxl);
 
     km   = 2.0*PI/((double) (kmax - 1));
     lm   = 2.0*PI/((double) (lmax - 1));
@@ -696,7 +696,7 @@ The matrix solvers presented here are for sparse matrices. Sparse matrices
 do not fit very naturally into the matrix structure discussed above. Hence
 the solvers here do not use matrix structures.<p>
 
-<B>int PM_block_tridi(REAL *a, REAL *b, REAL *c, REAL *u, int ns, int nb)
+<B>int PM_block_tridi(double *a, double *b, double *c, double *u, int ns, int nb)
 </B><BR>
 Solve the equation M.x = u where M is block tridiagonal. There are nb blocks
 each ns squared in size. The matrices a, b, and c are the sub-diagonal,
@@ -706,9 +706,9 @@ are one block shorter than the diagonal. The result is returned in u. All
 vectors are passed into the routine which returns TRUE if successful and
 FALSE otherwise.<p>
 
-<B>REAL PM_iccg(int km, int lm, double eps, int ks, int maxit, REAL *a0,         
-REAL *a1, REAL *b0, REAL *b1, REAL *bm1,                       
-REAL *x, REAL *y)
+<B>double PM_iccg(int km, int lm, double eps, int ks, int maxit, double *a0,         
+double *a1, double *b0, double *b1, double *bm1,                       
+double *x, double *y)
 </B><BR>
 Use the ICCG method to solve the system of equations, M.x = y. The array M
 is symmetric and positive definite.   Its components are passed in as the
@@ -768,7 +768,7 @@ The x array contains the solution on return.
 
 <P> 
 
-<B>int PM_tridi(REAL *a, REAL *b, REAL *c, REAL *r, REAL *u, int n)
+<B>int PM_tridi(double *a, double *b, double *c, double *r, double *u, int n)
 </B><BR>
 Solve the equation M.u = r where M is tridiagonal. The matrices a, b, and c
 are the sub-diagonal, diagonal, and super-diagonal respectively and both
@@ -780,12 +780,11 @@ if successful and FALSE otherwise.<p>
 <a name="PMLgeom"></a>
 <h3> Geometry Routines</h3>
 
-<B>REAL PM_dot(REAL *x, REAL *y, int n)
+<B>double PM_dot(double *x, double *y, int n)
 </B><BR>
 <P>Take the inner product of two vectors of length n and return the result.<p>
 
-<B>int PM_cross(double x1, double y1, double x2, double y2, double x3,   double y3, 
-double x4, double y4, double *px0, double *py0)
+<B>int PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0)
 </B><BR>
 <P>Return the intersection point of the line segment defined by
 (X<SUB>1</SUB> - X<SUB>2</SUB>)
@@ -796,51 +795,36 @@ the segment!) FALSE is returned and the vector (HUGE, HUGE) is passed back
 in px0 and py0. If ray does cross TRUE is returned. HUGE is a #define&#146;d
 constant signifying a large floating point number<p>
 <p>
-<B>int PM_cross_seg(double x1, double y1, double x2, double y2, double x3, double 
-y3, double x4, double y4, double *px0, double *py0)
+<B>int PM_cross_seg(double *x1, double *x2, double *x3, double *x4, double *x0)
 </B><BR>
 <P>
 Like PM_cross this function will return the intersection point of the lines
 implied by the two segments given.  However, it returns TRUE if and only if
 the segments cross.<p>
 
-<B>int PM_cross_line_plane(double x1, double y1, double z1, double x2, double y2, 
-double z2, REAL *px, REAL *py, REAL *pz, REAL *px0, REAL 
-*py0, REAL *pz0, int line)
+<B>int PM_cross_line_plane(double *x1, double *x2, double **px, double *x0, int line)
 </B><BR>
 <P>
 This function tests for the intersection of lines and a plane. The value of line
 may be 0, 1, 2 for segment, ray, or line.  The line is defined by the vectors: X1
-and X2 the plane is defined by the vectors: X3, X4, X5.  For rays X1 is the
+and X2 the plane is defined by the vectors: PX.  For rays X1 is the
 terminations of the ray (i.e. tail of vector) and X2 is X1 - dX (dX defines the
 direction of the ray).  Vectors are defined as X = (x, y).  TRUE is returned if
 and only if the segment, ray, or line crosses the plan.<p>
 
-<B>int PM_colinear_2d(REAL *px, REAL *py, int n)
+<B>int PM_colinear_nd(int nd, int n, double **x)
 </B><BR>
 <P>Return TRUE if and only if the n points from the px and py arrays are
-colinear in 2 dimensions.<p>
+colinear in ND dimensions.<p>
 
-<B>int PM_colinear_3d(REAL *px, REAL *py, REAL *pz, int n)
-</B><BR>
-<P>Return TRUE if and only if the n points from the px,  py, and pz arrays
-are colinear in 3 dimensions.<p>
-
-<B>int PM_contains_2d(double x, double y, REAL *px, REAL *py, int n)
-</B><BR>
-<P>Return TRUE if and only if the point (x, y) is contained in the plane bounded
-by the polygon defined by the n points in the px and py arrays.<p>
-
-<B>int PM_contains_3d(double x, double y, double z, REAL *px, REAL *py, REAL 
-*pz, int bnd)
+<B>int PM_contains_nd(double *xc, PM_polygon *py, int bnd)
 </B><BR>
 <P>
-Return TRUE if and only if the point (x, y, z) is contained in the plane bounded
-by the polygon defined by the n points in the px,  py, and pz arrays. If bnd it
-TRUE points on the boundary are included.<p>
+Return TRUE if and only if the point Xc is contained in the plane region bounded
+by the polygon PY. If bnd it TRUE points on the boundary are included.<p>
 
-<B>int PM_intersect_line_polygon(REAL *pxmn, REAL *pymn, REAL *pxmx, 
-REAL *pymx, REAL *ppx, REAL *ppy, int np, int *pic)
+<B>int PM_intersect_line_polygon(double *pxmn, double *pymn, double *pxmx, 
+double *pymx, double *ppx, double *ppy, int np, int *pic)
 </B><BR>
 <P>
 This routine computes the intersection points of the line given by (pxmn, pymn)
@@ -849,15 +833,15 @@ The number of intersection points is returned in pic and the intersection points
 are returned in (pxmn, pymn) and (pxmx, pymx). FALSE is returned if the line segment
 is completely outside the polygon.<p>
 
-<B>void PM_convex_hull(REAL *px, REAL *py, int nh, REAL **ppx, REAL **ppy, 
+<B>void PM_convex_hull(double *px, double *py, int nh, double **ppx, double **ppy, 
 int *pnp)
 </B><BR>
 <P>This routine allocates and returns arrays (ppx, ppy) containing pnp points
 defining the convex polygon which contains the nh points specified in the px
 and py arrays.<p>
 
-<B>void PM_nearest_point(REAL *px, REAL *py, int n, double xs, double ys, REAL 
-*pxt, REAL *pyt, int *pi)
+<B>void PM_nearest_point(double *px, double *py, int n, double xs, double ys, double 
+*pxt, double *pyt, int *pi)
 </B><BR>
 <P>
 This routine finds the point in the curve defined by the n points in the px and
@@ -869,12 +853,12 @@ py arrays which is nearest to the point (xs, ys). The point is returned in
 
 <B>double PM_fix(double value)
 </B><BR>
-Return the integer part of value as a REAL number. Unlike the C library
+Return the integer part of value as a double number. Unlike the C library
 function floor, PM_fix(-2.3) = -2.0;<p>
 
 <B>double PM_frac(double x)
 </B><BR>
-Return the fractional part of x as a REAL number.<p>
+Return the fractional part of x as a double number.<p>
 
 <B>double PM_power(double x, int p)
 </B><BR>
@@ -886,7 +870,7 @@ Return a random number in the range -1.0 to 1.0.<p>
 
 <B>double PM_round(double x)
 </B><BR>
-Round the number x to the nearest integer returned as a REAL number.<p>
+Round the number x to the nearest integer returned as a double number.<p>
 
 <B>double PM_sgn(double value, double sign)
 </B><BR>
@@ -1162,8 +1146,8 @@ the author for further examples.<p>
 
 <PRE>#include "pml.h"
 
-REAL a1[5][3] = {0, 0, 1, 1, 0, 1, 0, 1, 1, 0.5, 0.5, 1, 0.7, 0.9, 1};
-REAL b1[5][1] = {0.5, 1.4, .93589, 1.16795, 1.52230};
+double a1[5][3] = {0, 0, 1, 1, 0, 1, 0, 1, 1, 0.5, 0.5, 1, 0.7, 0.9, 1};
+double b1[5][1] = {0.5, 1.4, .93589, 1.16795, 1.52230};
 
 /* MAIN - a sample program */
 
@@ -1184,8 +1168,8 @@ main()
 
     PM_print(m);
 
-    m->array = (REAL *)a1;
-    b->array = (REAL *)b1;
+    m->array = (double *)a1;
+    b->array = (double *)b1;
         
     PM_print(m);
     PM_print(b);
@@ -1222,8 +1206,8 @@ main()
 
 main()
    {int i, j, k;
-    REAL ret;
-    REAL a0[KXL], a1[KXL], b0[KXL], b1[KXL], bm1[KXL], x[KXL], y[KXL];
+    double ret;
+    double a0[KXL], a1[KXL], b0[KXL], b1[KXL], bm1[KXL], x[KXL], y[KXL];
 
 /* solve a Laplacian in the l direction */
     for (i = 0; i < KXL; i++)
@@ -1245,7 +1229,7 @@ main()
     a1[2*KM-1] = 0.0;
     for (i = 0; i < KM; i++)
         	{k = KM + i;
-        	 y[k] = (REAL) (i+1);};
+        	 y[k] = (double) (i+1);};
 
     printf("\nProblem y :\n");
     for (j = 0; j < LM; j++)
@@ -1286,7 +1270,7 @@ main()
         	 bm1[i] = 0.0;};
 
     for (k = 1, i = 1; i < KXL; i += LM, k++)
-        	y[i] = (REAL) k;
+        	y[i] = (double) k;
 
     printf("\nProblem y :\n");
     for (j = 0; j < KM; j++)

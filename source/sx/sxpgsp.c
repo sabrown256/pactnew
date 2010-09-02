@@ -3085,7 +3085,7 @@ static object *_SXI_satst(object *argl)
 
 static object *_SXI_gbfsz(void)
    {object *rv;
-    off_t sz;
+    BIGINT sz;
 
     sz = PG_get_buffer_size();
     rv = SS_mk_integer(sz);

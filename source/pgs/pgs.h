@@ -43,9 +43,9 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_SPACEDM            3         /* maximum dimension of view space */
-#define PG_BOXSZ              6         /* 2*PG_SPACEDM */
-#define PG_NANGLES            3         /* number of Euler angles */
+#define PG_SPACEDM            PM_SPACEDM /* maximum dimension of view space */
+#define PG_BOXSZ              6          /* 2*PG_SPACEDM */
+#define PG_NANGLES            3          /* number of Euler angles */
 
 #define N_COLORS              16
 #define N_IOB_FLAGS           3
@@ -1617,8 +1617,8 @@ extern int
  PG_open_console(char *title, char *type, int bckgr,
 		 double xf, double yf, double dxf, double dyf);
 
-extern off_t
- PG_set_buffer_size(off_t sz),
+extern BIGINT
+ PG_set_buffer_size(BIGINT sz),
  PG_get_buffer_size(void);
 
 
