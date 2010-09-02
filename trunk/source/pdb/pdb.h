@@ -1038,9 +1038,11 @@ extern char
 extern int
  PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim);
 
-extern off_t
+extern BIGINT
  PD_get_buffer_size(void),
- PD_set_buffer_size(off_t v),
+ PD_set_buffer_size(BIGINT v);
+
+extern off_t
  PD_entry_set_address(syment *ep, off_t a),
  PD_entry_address(syment *ep),
  PD_get_file_length(PDBfile *file);

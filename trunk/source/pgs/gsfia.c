@@ -225,7 +225,7 @@ FIXNUM F77_FUNC(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
 
 FIXNUM F77_FUNC(pggbsz, PGGBSZ)(void)
    {FIXNUM rv;
-    off_t sz;
+    BIGINT sz;
 
     sz = PG_get_buffer_size();
     rv = sz;
@@ -1520,7 +1520,7 @@ FIXNUM F77_FUNC(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
 
 FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(FIXNUM *psz)
    {FIXNUM rv;
-    off_t sz;
+    BIGINT sz;
 
     sz = *psz;
     PG_set_buffer_size(sz);

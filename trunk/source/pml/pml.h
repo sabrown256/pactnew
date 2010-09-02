@@ -30,6 +30,8 @@
 
 #define TOLERANCE 1.0e-10
 
+#define PM_SPACEDM            3         /* maximum spatial dimension */
+
 #ifndef HYPOT
 #define HYPOT hypot
 #endif
@@ -799,31 +801,18 @@ extern PM_polygon
  *PM_convex_hull(double *p1, double *p2, int nh);
 
 extern int
- PM_cross(double x1, double y1, double x2, double y2,
-	  double x3, double y3, double x4, double y4,
-	  double *px0, double *py0),
- PM_cross_seg(double x1, double y1, double x2, double y2,
-	      double x3, double y3, double x4, double y4,
-	      double *px0, double *py0),
- PM_cross_line_plane(double x1, double y1, double z1,
-		     double x2, double y2, double z2,
-		     double *px, double *py, double *pz,
-		     double *px0, double *py0, double *pz0,
-		     int line),
- PM_colinear_2d(double *px, double *py, int n),
- PM_colinear_3d(double *px, double *py, double *pz, int n),
- PM_contains_2d(double xc, double yc, PM_polygon *py),
- PM_contains_3d(double x, double y, double z,
-		double *px, double *py, double *pz, int bnd),
- PM_intersect_line_polygon(double *pxmn, double *pymn,
-			   double *pxmx, double *pymx,
-			   PM_polygon *py, int *pic),
+ PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0),
+ PM_cross_seg(double *x1, double *x2, double *x3, double *x4, double *x0),
+ PM_cross_line_plane(double *x1, double *x2,
+		     double **px, double *x0, int line),
+ PM_colinear_nd(int nd, int n, double **x),
+ PM_contains_nd(double *xc, PM_polygon *py, int bnd),
+ PM_intersect_line_polygon(double *x1, double *x2, PM_polygon *py, int *pic),
  PM_polygon_orient(PM_polygon *p);
 
 extern void
  PM_orient_polygon(PM_polygon *p),
- PM_nearest_point(PM_polygon *py, double xs, double ys,
-		  double *pxt, double *pyt, int *pi),
+ PM_nearest_point(PM_polygon *py, double *xs, double *xt, int *pi),
  PM_compute_quad_rot_volume(double *vol, int nc, int *indx, double **x),
  PM_compute_hex_volume(double *vol, int nc, int *indx, double **x),
  PM_vector_extrema(int nd, int n, double **x, double *extr),

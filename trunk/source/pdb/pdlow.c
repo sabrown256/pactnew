@@ -906,8 +906,8 @@ char *PD_get_error(void)
 
 /* PD_GET_BUFFER_SIZE - fetch PD_buffer_size */
 
-off_t PD_get_buffer_size(void)
-   {off_t rv;
+BIGINT PD_get_buffer_size(void)
+   {BIGINT rv;
     PD_smp_state *pa;
 
     _PD_init_state(FALSE);
@@ -926,7 +926,7 @@ off_t PD_get_buffer_size(void)
 
 /* PD_SET_BUFFER_SIZE - set PD_buffer_size */
 
-off_t PD_set_buffer_size(off_t v)
+BIGINT PD_set_buffer_size(BIGINT v)
    {PD_smp_state *pa;
     
     _PD_init_state(FALSE);

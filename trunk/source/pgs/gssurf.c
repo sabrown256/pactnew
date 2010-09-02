@@ -519,7 +519,7 @@ static void PG_scan_triangle(PG_device *dev, double *zbf,
 /* _PG_DO_SCAN_LINE - do a chunk of scan lines for the picture */
 
 static void *_PG_do_scan_line(void *arg)
-   {int i, l, id, nic;
+   {int i, id, nic;
     int ds, np, iymn, iymx;
     int a[4];
     int *iextr;
@@ -559,19 +559,21 @@ static void *_PG_do_scan_line(void *arg)
 
 /* compute the imposed domain limits on the scan line */
 	{u[0] = iextr[0]*ds;
-	 u[1] = iextr[1]*ds;
-	 u[2] = i*ds;
-	 u[3] = u[2];
+	 u[1] = i*ds;
+	 u[2] = iextr[1]*ds;
+	 u[3] = u[1];
 
-         if (PM_intersect_line_polygon(&u[0], &u[2], &u[1], &u[3], pl, &nic))
+         if (PM_intersect_line_polygon(u, u+2, pl, &nic))
 
 /* ensure the points are left to right */
-	    {if (u[0] > u[1])
-	        {SC_SWAP_VALUE(double, u[0], u[1]);
-		 SC_SWAP_VALUE(double, u[2], u[3]);};
+	    {if (u[0] > u[2])
+	        {SC_SWAP_VALUE(double, u[0], u[2]);
+		 SC_SWAP_VALUE(double, u[1], u[3]);};
 
-             for (l = 0; l < 4; l++)
-	         a[l] = u[l]/ds;
+	     a[0] = u[0]/ds;
+	     a[1] = u[2]/ds;
+	     a[2] = u[1]/ds;
+	     a[3] = u[3]/ds;
 
 	     (*fnc_scan)(dev, par, a, i, 0);};};
 

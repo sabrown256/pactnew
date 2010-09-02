@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 02/03/2010
+MOD: 09/02/2010
 
 <CENTER>
 <P>
@@ -1739,7 +1739,7 @@ be a valid PDB file. This functionality is provided by <tt>PD_flush</tt>.
 
 <p>
 <pre>
-<i>C Binding: </i>  int PD_set_buffer_size(int v)
+<i>C Binding: </i>  BIGINT PD_set_buffer_size(BIGINT v)
 <i>F77 Binding: </i>integer PFSBFS(integer v)
 <i>SX Binding: </i> (pd-set-buffer-size! v)
 <i>Python Binding: </i> XXX - missing
@@ -1759,7 +1759,7 @@ Return the integer value of the buffer size in bytes.
 <hr>
 <b>C Example</b>
 <pre>
-       int v;
+       BIGINT v;
              .
              .
              .
@@ -6412,7 +6412,7 @@ See also:
 
 <p>
 <pre>
-<i>C Binding: </i>  int PD_get_buffer_size
+<i>C Binding: </i>  BIGINT PD_get_buffer_size(void)
 <i>F77 Binding: </i>integer PFGBFS()
 <i>SX Binding: </i> (pd-get-buffer-size)
 <i>Python Binding: </i> XXX - missing
@@ -6431,7 +6431,7 @@ otherwise, return -1.
 <hr>
 <b>C Example</b>
 <pre>
-       int sz;
+       BIGINT sz;
              .
              .
              .

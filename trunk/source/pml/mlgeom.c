@@ -14,8 +14,7 @@ typedef struct s_pt pt;
 
 struct s_pt
    {int i;
-    double x;
-    double y;};
+    double x[PM_SPACEDM];};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -57,10 +56,8 @@ struct s_pt
  *           -     X1 + (X2-X1)t1 = X3   and    X1 + (X2-X1)t2 = X4
  */
 
-int _PM_cross(double x1, double y1, double x2, double y2,
-	      double x3, double y3, double x4, double y4,
-	      double *px0, double *py0,
-	      int line1, int line2)
+int _PM_cross(double *x1, double *x2, double *x3, double *x4,
+	      double *x0, int line1, int line2)
    {int cross;
     double a, b, dx21, dy21, dx43, dy43, dx13, dy13, idx, idy;
     double d, t1, t2;
@@ -72,15 +69,15 @@ int _PM_cross(double x1, double y1, double x2, double y2,
     t2 = -HUGE;
 
 /* start far away */
-    *px0 = HUGE;
-    *py0 = HUGE;
+    x0[0] = HUGE;
+    x0[1] = HUGE;
 
-    dx21 = x2 - x1;
-    dy21 = y2 - y1;
-    dx43 = x4 - x3;
-    dy43 = y4 - y3;
-    dx13 = x1 - x3;
-    dy13 = y1 - y3;
+    dx21 = x2[0] - x1[0];
+    dy21 = x2[1] - x1[1];
+    dx43 = x4[0] - x3[0];
+    dy43 = x4[1] - x3[1];
+    dx13 = x1[0] - x3[0];
+    dy13 = x1[1] - x3[1];
 
 /* if either vector is zero */
     if (((dx21 == 0.0) && (dy21 == 0.0)) ||
@@ -100,21 +97,21 @@ int _PM_cross(double x1, double y1, double x2, double y2,
 	if (PM_CLOSETO_REL(a, b))
 
 /* compute and test t1 and t2 */
-           {if (x2 == x1)
+           {if (x2[0] == x1[0])
                {idy = 1.0/dy43;
 		t1  = dy13*idy;
-                t2  = (y2 - y3)*idy;}
+                t2  = (x2[1] - x3[1])*idy;}
             else if (dx43 != 0.0)
                {idx = 1.0/dx43;
 		t1  = dx13*idx;
-                t2  = (x2 - x3)*idx;}
+                t2  = (x2[0] - x3[0])*idx;}
             else
                {idx = 1.0/dx21;
 		t1  = -dx13*idx;
-                t2  = (x4 - x1)*idx;};
+                t2  = (x4[0] - x1[0])*idx;};
 
-	    *px0 = x3 + dx43*min(t1, t2);
-	    *py0 = y3 + dy43*min(t1, t2);}}
+	    x0[0] = x3[0] + dx43*min(t1, t2);
+	    x0[1] = x3[1] + dy43*min(t1, t2);}}
 
 /* compute the point of intersection of the segment and ray */
     else
@@ -122,8 +119,8 @@ int _PM_cross(double x1, double y1, double x2, double y2,
         t1 = (dy13*dx43 - dx13*dy43)*d;
         t2 = (dy13*dx21 - dx13*dy21)*d;
 
-	*px0 = x1 + dx21*t1;
-	*py0 = y1 + dy21*t1;};
+	x0[0] = x1[0] + dx21*t1;
+	x0[1] = x1[1] + dy21*t1;};
 
     switch (line1)
        {case 0 :
@@ -180,12 +177,10 @@ int _PM_cross(double x1, double y1, double x2, double y2,
 
 /* PM_CROSS - test for the intersection of a line segment and a ray */
 
-int PM_cross(double x1, double y1, double x2, double y2,
-	     double x3, double y3, double x4, double y4,
-	     double *px0, double *py0)
+int PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0)
    {int rv;
 
-    rv = _PM_cross(x1, y1, x2, y2, x3, y3, x4, y4, px0, py0, 0, 1);
+    rv = _PM_cross(x1, x2, x3, x4, x0, 0, 1);
 
     return(rv);}
 
@@ -194,12 +189,10 @@ int PM_cross(double x1, double y1, double x2, double y2,
 
 /* PM_CROSS_SEG - test for the intersection of a two line segments */
 
-int PM_cross_seg(double x1, double y1, double x2, double y2,
-		 double x3, double y3, double x4, double y4,
-		 double *px0, double *py0)
+int PM_cross_seg(double *x1, double *x2, double *x3, double *x4, double *x0)
    {int rv;
 
-    rv = _PM_cross(x1, y1, x2, y2, x3, y3, x4, y4, px0, py0, 0, 0);
+    rv = _PM_cross(x1, x2, x3, x4, x0, 0, 0);
 
     return(rv);}
 
@@ -224,54 +217,50 @@ int PM_cross_seg(double x1, double y1, double x2, double y2,
  *                     -
  */
 
-int PM_cross_line_plane(double x1, double y1, double z1,
-			double x2, double y2, double z2,
-			double *px, double *py, double *pz,
-			double *px0, double *py0, double *pz0,
-			int line)
+int PM_cross_line_plane(double *x1, double *x2,
+			double **px, double *x0, int line)
    {int cross;
     double a, b, t;
-    double nx, ny, nz;
-    double x0, y0, z0;
+    double nx[PM_SPACEDM];
     double dx54, dy54, dz54, dx34, dy34, dz34;
     double dx14, dy14, dz14, dx21, dy21, dz21;
 
 /* assume they don't intersect */
     cross = FALSE;
 
-    dx54 = px[0] - px[1];
-    dy54 = py[0] - py[1];
-    dz54 = pz[0] - pz[1];
+    dx54 = px[0][0] - px[0][1];
+    dy54 = px[1][0] - px[1][1];
+    dz54 = px[2][0] - px[2][1];
 
-    dx34 = px[2] - px[1];
-    dy34 = py[2] - py[1];
-    dz34 = pz[2] - pz[1];
+    dx34 = px[0][2] - px[0][1];
+    dy34 = px[1][2] - px[1][1];
+    dz34 = px[2][2] - px[2][1];
 
-    dx14 = x1 - px[1];
-    dy14 = y1 - py[1];
-    dz14 = z1 - pz[1];
+    dx14 = x1[0] - px[0][1];
+    dy14 = x1[1] - px[1][1];
+    dz14 = x1[2] - px[2][1];
 
-    dx21 = x2 - x1;
-    dy21 = y2 - y1;
-    dz21 = z2 - z1;
+    dx21 = x2[0] - x1[0];
+    dy21 = x2[1] - x1[1];
+    dz21 = x2[2] - x1[2];
 
-    nx = dy54*dz34 - dz54*dy34;
-    ny = dz54*dx34 - dx54*dz34;
-    nz = dx54*dy34 - dy54*dx34;
+    nx[0] = dy54*dz34 - dz54*dy34;
+    nx[1] = dz54*dx34 - dx54*dz34;
+    nx[2] = dx54*dy34 - dy54*dx34;
 
-    a = dx21*nx + dy21*ny + dz21*nz;
-    b = dx14*nx + dy14*ny + dz14*nz;
+    a = dx21*nx[0] + dy21*nx[1] + dz21*nx[2];
+    b = dx14*nx[0] + dy14*nx[1] + dz14*nx[2];
     t = (a == 0.0) ? HUGE : -b/a;
 
     if (t == HUGE)
-       {x0 = HUGE;
-	y0 = HUGE;
-	z0 = HUGE;
+       {x0[0] = HUGE;
+	x0[1] = HUGE;
+	x0[2] = HUGE;
         cross = FALSE;}
     else
-       {x0 = x1 + dx21*t;
-	y0 = y1 + dy21*t;
-	z0 = z1 + dz21*t;
+       {x0[0] = x1[0] + dx21*t;
+	x0[1] = x1[1] + dy21*t;
+	x0[2] = x1[2] + dz21*t;
         cross = TRUE;};
 
     switch (line)
@@ -284,10 +273,6 @@ int PM_cross_line_plane(double x1, double y1, double z1,
         case 2 :
 	     cross &= TRUE;
 	     break;};
-
-    *px0 = x0;
-    *py0 = y0;
-    *pz0 = z0;
 
     return(cross);}
 
@@ -332,11 +317,11 @@ static int _PM_by_angle(void *a, void *b)
     pa = (pt *) a;
     pb = (pt *) b;
 
-    aa = atan2(pa->y, pa->x);
-    ab = atan2(pb->y, pb->x);
+    aa = atan2(pa->x[1], pa->x[0]);
+    ab = atan2(pb->x[1], pb->x[0]);
 
     if ((aa == 0.0) && (ab == 0.0))
-       ok = (pa->x < pb->x);
+       ok = (pa->x[0] < pb->x[0]);
     else
        ok = (aa < ab);
 
@@ -352,8 +337,9 @@ static int _PM_by_angle(void *a, void *b)
 
 PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
    {int i, imn, np;
-    double xc, yc, xmn, ymn, cp;
-    double *x, *y;
+    double cp;
+    double xc[PM_SPACEDM], xmn[PM_SPACEDM];
+    double **x;
     pt *pa;
     SC_array *a;
     PM_polygon *py;
@@ -365,27 +351,27 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
     pa = SC_array_array(a);
 
 /* load the array and find the leftmost minimum y point */
-    xmn = HUGE;
-    ymn = HUGE;
+    xmn[0] = HUGE;
+    xmn[1] = HUGE;
     imn = -1;
     for (i = 0; i < nh; i++)
-        {xc = p1[i];
-	 yc = p2[i];
+        {xc[0] = p1[i];
+	 xc[1] = p2[i];
          pa[i].i = i;
-	 pa[i].x = xc;
-	 pa[i].y = yc;
-         if (yc < ymn)
-	    {xmn = xc;
-	     ymn = yc;
-	     imn = i;}
-	 else if ((yc == ymn) && (xc < xmn))
-	    {xmn = xc;
-	     imn = i;};};
+	 pa[i].x[0] = xc[0];
+	 pa[i].x[1] = xc[1];
+         if (xc[1] < xmn[1])
+	    {xmn[0] = xc[0];
+	     xmn[1] = xc[1];
+	     imn    = i;}
+	 else if ((xc[1] == xmn[1]) && (xc[0] < xmn[0]))
+	    {xmn[0] = xc[0];
+	     imn    = i;};};
 
 /* shift to minimum point */
     for (i = 0; i < nh; i++)
-        {pa[i].x -= xmn;
-	 pa[i].y -= ymn;};
+        {pa[i].x[0] -= xmn[0];
+	 pa[i].x[1] -= xmn[1];};
 
 /* make the first point be the minimum y point */
     SC_SWAP_VALUE(pt, pa[imn], pa[0]);
@@ -398,23 +384,22 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
     np = 1;
     for (i = np+1; i <= nh; i++)
         {for (cp = -1.0; (cp <= 0.0) && (np > 0); np--)
-	     cp = PM_DELTA_CROSS_2D(pa[np-1].x, pa[np-1].y,
-				    pa[np].x, pa[np].y,
-				    pa[i].x, pa[i].y);
+	     cp = PM_DELTA_CROSS_2D(pa[np-1].x[0], pa[np-1].x[1],
+				    pa[np].x[0], pa[np].x[1],
+				    pa[i].x[0], pa[i].x[1]);
 	 np += 2;
 	 SC_SWAP_VALUE(pt, pa[np], pa[i]);};
 
 /* make the return polygon */
     py = PM_init_polygon(2, np+1);
-    x  = py->x[0];
-    y  = py->x[1];
+    x  = py->x;
 
     for (i = 0; i < np; i++)
-        {x[i] = pa[i].x + xmn;
-         y[i] = pa[i].y + ymn;};
+        {x[0][i] = pa[i].x[0] + xmn[0];
+         x[1][i] = pa[i].x[1] + xmn[1];};
 
-    x[np] = x[0];
-    y[np] = y[0];
+    x[0][np] = x[0][0];
+    x[1][np] = x[1][0];
 
     py->nn = py->np;
 
@@ -426,107 +411,103 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_COLINEAR_2D - return TRUE iff the n points are colinear */
+/* _PM_COLINEAR_2D - return TRUE iff the N points X are colinear */
 
-int PM_colinear_2d(double *px, double *py, int n)
-   {int i, col;
-    int ifx0, ify0, ifxi0, ifyi0;
-    double x1, y1, dx, dy, dxi, dyi;
-    double rx, ry;
+static int _PM_colinear_2d(double **x, int n)
+   {int i, id, nd, col;
+    int ifx[PM_SPACEDM], ifxi[PM_SPACEDM];
+    double dx[PM_SPACEDM], dxi[PM_SPACEDM];
+    double rx[PM_SPACEDM], x1[PM_SPACEDM];
 
-    x1 = px[0];
-    y1 = py[0];
+    nd = 2;
 
-    dx = px[1] - x1;
-    dy = py[1] - y1;
-
-    ifx0  = (ABS(dx) < TOLERANCE);
-    ify0  = (ABS(dy) < TOLERANCE);
+    for (id = 0; id < nd; id++)
+        {x1[id]  = x[id][0];
+	 dx[id]  = x[id][1] - x1[id];
+	 ifx[id] = (ABS(dx[id]) < TOLERANCE);};
 
     for (i = 2, col = TRUE; (i < n) && col; i++)
-        {dxi = px[i] - x1;
-         dyi = py[i] - y1;
+        {for (id = 0; id < nd; id++)
+	     {dxi[id]  = x[id][i] - x1[id];
+	      ifxi[id] = (ABS(dxi[id]) < TOLERANCE);};
 
-	 ifxi0 = (ABS(dxi) < TOLERANCE);
-	 ifyi0 = (ABS(dyi) < TOLERANCE);
-
-         if ((ifx0 && ifxi0) || (ify0 && ifyi0))
+         if ((ifx[0] && ifxi[0]) || (ifx[1] && ifxi[1]))
 	    col = TRUE;
          else
-            {rx  = (ifx0 ? HUGE : dxi/dx);
-             ry  = (ify0 ? HUGE : dyi/dy);
-             col = PM_CLOSETO_REL(rx, ry);};};
+	    {for (id = 0; id < nd; id++)
+	         rx[id] = (ifx[id] ? HUGE : dxi[id]/dx[id]);
+             col = PM_CLOSETO_REL(rx[0], rx[1]);};};
 
     return(col);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_COLINEAR_3D - return TRUE iff the n points are colinear */
+/* _PM_COLINEAR_3D - return TRUE iff the N points X are colinear */
 
-int PM_colinear_3d(double *px, double *py, double *pz, int n)
-   {int i, col;
-    int ifx0, ify0, ifz0, ifxi0, ifyi0, ifzi0;
-    double rx, ry, rz;
-    double x1, y1, z1, dx, dy, dz, dxi, dyi, dzi;
+static int _PM_colinear_3d(double **x, int n)
+   {int i, id, nd, col;
+    int ifx[PM_SPACEDM], ifxi[PM_SPACEDM];
+    double rx[PM_SPACEDM], dx[PM_SPACEDM], dxi[PM_SPACEDM];
+    double x1[PM_SPACEDM];
 
-    x1 = px[0];
-    y1 = py[0];
-    z1 = pz[0];
+    nd = 3;
 
-    if (PM_CLOSETO_REL(x1, px[1]))
-       dx = 0.0;
-    else
-       dx = px[1] - x1;
+    for (id = 0; id < nd; id++)
+        {x1[id] = x[id][0];
 
-    if (PM_CLOSETO_REL(y1, py[1]))
-       dy = 0.0;
-    else
-       dy = py[1] - y1;
+         if (PM_CLOSETO_REL(x1[id], x[id][1]))
+	    dx[id] = 0.0;
+	 else
+	    dx[id] = x[id][1] - x1[id];
 
-    if (PM_CLOSETO_REL(z1, pz[1]))
-       dz = 0.0;
-    else
-       dz = pz[1] - z1;
+        ifx[id] = (ABS(dx[0]) < TOLERANCE);};
 
-    ifx0  = (ABS(dx) < TOLERANCE);
-    ify0  = (ABS(dy) < TOLERANCE);
-    ifz0  = (ABS(dz) < TOLERANCE);
+    for (i = 2, col = TRUE; (i < n) && (col == TRUE); i++)
+        {for (id = 0; id < nd; id++)
+	     {ifxi[id] = PM_CLOSETO_REL(x1[id], x[id][i]);
+	      dxi[id]  = ifxi[id] ? 0.0 : x[id][i] - x1[id];
+	      rx[id]   = ifx[id] ? HUGE : dxi[id]/dx[id];};
 
-    for (i = 2, col = TRUE; (i < n) && col; i++)
-        {ifxi0 = PM_CLOSETO_REL(x1, px[i]);
-	 dxi   = ifxi0 ? 0.0 : px[i] - x1;
-	 rx    = ifx0 ? HUGE : dxi/dx;
-
-         ifyi0 = PM_CLOSETO_REL(y1, py[i]);
-         dyi   = ifyi0 ? 0.0 : py[i] - y1;
-	 ry    = ify0 ? HUGE : dyi/dy;
-
-         ifzi0 = PM_CLOSETO_REL(z1, pz[i]);
-         dzi   = ifzi0 ? 0.0 : pz[i] - z1;
-	 rz    = ifz0 ? HUGE : dzi/dz;
-
-         if (ifx0 && ifxi0)
-            {if ((ify0 && ifyi0) || (ifz0 && ifzi0))
+         if (ifx[0] && ifxi[0])
+            {if ((ifx[1] && ifxi[1]) || (ifx[2] && ifxi[2]))
 	        col = TRUE;
              else
-	        col = PM_CLOSETO_REL(ry, rz);}
-         else if (ify0 && ifyi0)
-	    {if (ifz0 && ifzi0)
+	        col = PM_CLOSETO_REL(rx[1], rx[2]);}
+
+         else if (ifx[1] && ifxi[1])
+	    {if (ifx[2] && ifxi[2])
 	        col = TRUE;
              else
-	        col = PM_CLOSETO_REL(rz, rx);}
-         else if (ifz0 && ifzi0)
-	    col = PM_CLOSETO_REL(rx, ry);
+	        col = PM_CLOSETO_REL(rx[2], rx[0]);}
+
+         else if (ifx[2] && ifxi[2])
+	    col = PM_CLOSETO_REL(rx[0], rx[1]);
+
          else
-	    col = PM_CLOSETO_REL(rx, ry) && PM_CLOSETO_REL(ry, rz);};
+	    col = PM_CLOSETO_REL(rx[0], rx[1]) && PM_CLOSETO_REL(rx[1], rx[2]);};
 
     return(col);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CONVEX_CONTAINS_2D - check whether the point (Xc,Yc) is contained
+/* PM_COLINEAR_ND - return TRUE iff the N points X are colinear */
+
+int PM_colinear_nd(int nd, int n, double **x)
+   {int col;
+
+    if (nd == 2)
+       col = _PM_colinear_2d(x, n);
+    else if (nd == 3)
+       col = _PM_colinear_3d(x, n);
+
+    return(col);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CONVEX_CONTAINS_2D - check whether the point XC is contained
  *                       - in the convex polygon Py
  *                       - return values:
  *                       -     2  in the interior
@@ -534,32 +515,33 @@ int PM_colinear_3d(double *px, double *py, double *pz, int n)
  *                       -     0  outside
  */
 
-int PM_convex_contains_2d(double xc, double yc, PM_polygon *py)
+int PM_convex_contains_2d(double *xc, PM_polygon *py)
    {int i, n, ni, rv;
-    double cp, nrm, sx, sy, sc;
-    double *x, *y;
+    double cp, nrm, sc;
+    double sx[PM_SPACEDM];
+    double **x;
 
     if (_PM.tol == -1.0)
        _PM.tol = 10.0*PM_machine_precision();
 
-    x = py->x[0];
-    y = py->x[1];
+    x = py->x;
     n = py->np;
 
 /* determine the length scale hence the absolute tolerance */
     nrm = 1.0/((double) n);
-    sx  = xc*xc;
-    sy  = yc*yc;
+    sx[0] = xc[0]*xc[0];
+    sx[1] = xc[1]*xc[1];
     for (i = 0; i < n; i++)
-        {sx += x[i]*x[i];
-	 sy += y[i]*y[i];};
-    sc = _PM.tol*(sx + sy)*nrm;
+        {sx[0] += x[0][i]*x[0][i];
+	 sx[1] += x[1][i]*x[1][i];};
+    sc = _PM.tol*(sx[0] + sx[1])*nrm;
 
 /* check cross products with all sides */
     rv = 0;
     ni = 0;
     for (i = 1; i < n; i++)
-        {cp = PM_DELTA_CROSS_2D(x[i-1], y[i-1], x[i], y[i], xc, yc);
+        {cp = PM_DELTA_CROSS_2D(x[0][i-1], x[1][i-1], x[0][i], x[1][i],
+				xc[0], xc[1]);
 	 if (cp < -sc)
             break;
          ni += (cp > sc);};
@@ -573,38 +555,36 @@ int PM_convex_contains_2d(double xc, double yc, PM_polygon *py)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CONTAINS_2D - check whether the point (Xc, Yc) is contained
- *                - in the possibly non-convex polygon Py
- *                - return TRUE if the point is in the interior
- *                - return FALSE if on the boundary or in the exterior
- *                - a point is considered inside a non-convex polygon
- *                - iff it is contained in an odd number of the triangles
- *                - which are constructed from an arbitrary point in
- *                - space and the nodes of each edge of the polygon in turn
+/* _PM_CONTAINS_2D - check whether the point XC is contained
+ *                 - in the possibly non-convex polygon Py
+ *                 - return TRUE if the point is in the interior
+ *                 - return FALSE if on the boundary or in the exterior
+ *                 - a point is considered inside a non-convex polygon
+ *                 - iff it is contained in an odd number of the triangles
+ *                 - which are constructed from an arbitrary point in
+ *                 - space and the nodes of each edge of the polygon in turn
  */
 
-int PM_contains_2d(double xc, double yc, PM_polygon *py)
+static int _PM_contains_2d(double *xc, PM_polygon *py, int bnd)
    {int i, n, nm, ic, rv;
-    double *x, *y, *xp, *yp;
+    double **x, **xp;
     PM_polygon *pt;
 
-    x = py->x[0];
-    y = py->x[1];
+    x = py->x;
     n = py->np;
 
 /* initialize a triangle template */
     pt = PM_init_polygon(2, 4);
-    xp = pt->x[0];
-    yp = pt->x[1];
+    xp = pt->x;
 
 /* use the first node as the common point of the test triangle
  * since any point will do and this
  * means we get to loop from 2 to n-1 instead of 1 to n
  */
-    xp[0] = x[0];
-    yp[0] = y[0];
-    xp[3] = x[0];
-    yp[3] = y[0];
+    xp[0][0] = x[0][0];
+    xp[1][0] = x[1][0];
+    xp[0][3] = x[0][0];
+    xp[1][3] = x[1][0];
 
 /* count the number of test triangles containing the point */
     ic = 0;
@@ -612,16 +592,16 @@ int PM_contains_2d(double xc, double yc, PM_polygon *py)
     for (i = 2; i < nm; i++)
 
 /* do not check degenerate side */
-        {if ((x[i-1] != x[i]) || (y[i-1] != y[i]))
+        {if ((x[0][i-1] != x[0][i]) || (x[1][i-1] != x[1][i]))
 
 /* complete the test triangle containing one side of the polygon */
-	    {xp[1] = x[i-1];
-	     yp[1] = y[i-1];
-	     xp[2] = x[i];
-	     yp[2] = y[i];
+	    {xp[0][1] = x[0][i-1];
+	     xp[1][1] = x[1][i-1];
+	     xp[0][2] = x[0][i];
+	     xp[1][2] = x[1][i];
 	     PM_orient_polygon(pt);
 
-	     ic += PM_convex_contains_2d(xc, yc, pt);};};
+	     ic += PM_convex_contains_2d(xc, pt);};};
 
 /* if IC is odd the point is inside of Py */
     ic >>= 1;
@@ -634,60 +614,79 @@ int PM_contains_2d(double xc, double yc, PM_polygon *py)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CONTAINS_3D - check whether the 3D point is contained in (below) the
- *                - triangle defined by the ordered points (PX, PY, PZ)
+/* _PM_CONTAINS_3D - check whether the 3D point is contained in the
+ *                 - polygon PY
+ *                 - if BND is TRUE return TRUE iff the point is in the
+ *                 - interior
+ *                 - otherwise return TRUE iff the point is on the boundary
+ *                 - or in the interior
+ */
+
+static int _PM_contains_3d(double *xc, PM_polygon *py, int bnd)
+   {int i, id, jd, nd, rv;
+    double x1[PM_SPACEDM], x2[PM_SPACEDM];
+    double dx1[PM_SPACEDM], dx2[PM_SPACEDM];
+    double nx[PM_SPACEDM][PM_SPACEDM];
+    double d[PM_SPACEDM];
+
+    nd = 3;
+
+/* pick a point of the polygon */
+    for (id = 0; id < nd; id++)
+        x1[id] = py->x[id][2];
+
+    for (i = 0; i < 3; i++)
+        {for (id = 0; id < nd; id++)
+	     {x2[id]  = py->x[id][i];
+	      dx1[id] = x2[id] - x1[id];
+	      dx2[id] = xc[id] - x1[id];};
+
+         nx[0][i] = dx1[1]*dx2[2] - dx1[2]*dx2[1];
+         nx[1][i] = dx1[2]*dx2[0] - dx1[0]*dx2[2];
+         nx[2][i] = dx1[0]*dx2[1] - dx1[1]*dx2[0];
+
+	 for (id = 0; id < nd; id++)
+	     x1[id] = x2[id];};
+
+    for (id = 0; id < nd; id++)
+        {jd = (id + 1) % nd;
+	 d[id] = nx[0][id]*nx[0][jd] +
+	         nx[1][id]*nx[1][jd] +
+	         nx[2][id]*nx[2][jd];};
+
+    rv = TRUE;
+
+    if (bnd)
+       {for (id = 0; id < nd; id++)
+	    rv &= (d[id] > -TOLERANCE);}
+    else
+       {for (id = 0; id < nd; id++)
+	    rv &= (d[id] > TOLERANCE);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CONTAINS_ND - check whether the ND point is contained in (below) the
+ *                - polygon PY
  *                - if BND is TRUE return TRUE iff the point is in the
  *                - interior
  *                - otherwise return TRUE iff the point is on the boundary
  *                - or in the interior
  */
 
-int PM_contains_3d(double x, double y, double z,
-		   double *px, double *py, double *pz, int bnd)
-   {int i, if1, if2, if3;
-    double x1, y1, z1, x2, y2, z2;
-    double dx1, dy1, dz1, dx2, dy2, dz2;
-    double nx[3], ny[3], nz[3];
-    double d1, d2, d3;
+int PM_contains_nd(double *xc, PM_polygon *py, int bnd)
+   {int nd, rv;
 
-    x1 = px[2];
-    y1 = py[2];
-    z1 = pz[2];
-    for (i = 0; i < 3; i++)
-        {x2 = px[i];
-	 y2 = py[i];
-	 z2 = pz[i];
+    nd = py->nd;
 
-	 dx1 = x2 - x1;
-	 dy1 = y2 - y1;
-	 dz1 = z2 - z1;
+    if (nd == 2)
+       rv = _PM_contains_2d(xc, py, bnd);
+    else if (nd == 3)
+       rv = _PM_contains_3d(xc, py, bnd);
 
-         dx2 = x - x1;
-         dy2 = y - y1;
-         dz2 = z - z1;
-
-         nx[i] = dy1*dz2 - dz1*dy2;
-         ny[i] = dz1*dx2 - dx1*dz2;
-         nz[i] = dx1*dy2 - dy1*dx2;
-
-	 x1 = x2;
-	 y1 = y2;
-	 z1 = z2;};
-
-    d1 = nx[0]*nx[1] + ny[0]*ny[1] + nz[0]*nz[1];
-    d2 = nx[1]*nx[2] + ny[1]*ny[2] + nz[1]*nz[2];
-    d3 = nx[2]*nx[0] + ny[2]*ny[0] + nz[2]*nz[0];
-
-    if (bnd)
-       {if1 = (d1 > -TOLERANCE);
-	if2 = (d2 > -TOLERANCE);
-	if3 = (d3 > -TOLERANCE);}
-    else
-       {if1 = (d1 > TOLERANCE);
-	if2 = (d2 > TOLERANCE);
-	if3 = (d3 > TOLERANCE);};
-
-    return(if1 && if2 && if3);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -696,24 +695,24 @@ int PM_contains_3d(double x, double y, double z,
 
 double PM_polygon_area(PM_polygon *py)
    {int i, np;
-    double x1, x2, x3, y1, y2, y3, ac;
-    double *x, *y;
+    double x1[PM_SPACEDM], x2[PM_SPACEDM], x3[PM_SPACEDM], ac;
+    double **x;
 
-    x  = py->x[0];
-    y  = py->x[1];
+    x  = py->x;
     np = py->np - 1;
 
-    x1 = x[0];
-    y1 = y[0];
+    x1[0] = x[0][0];
+    x1[1] = x[1][0];
 
     ac = 0.0;
     for (i = 1; i < np; i++)
-        {x2 = x[i];
-	 y2 = y[i];
-	 x3 = x[i+1];
-         y3 = y[i+1];
+        {x2[0] = x[0][i];
+	 x2[1] = x[1][i];
+	 x3[0] = x[0][i+1];
+         x3[1] = x[1][i+1];
 
-	 ac += (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);};
+	 ac += (x2[0] - x1[0])*(x3[1] - x1[1]) -
+	       (x3[0] - x1[0])*(x2[1] - x1[1]);};
 
     return(ac);}
 
@@ -721,44 +720,37 @@ double PM_polygon_area(PM_polygon *py)
 /*--------------------------------------------------------------------------*/
 
 /* PM_INTERSECT_LINE_POLYGON - compute the intersection points of the
- *                           - given line (Xmn,Ymn) -> (Xmx,Ymx)
- *                           - with the given polygon (Px,Py) of Np nodes
+ *                           - given line X1 -> X2
+ *                           - with the given polygon PY
  *                           - return the number of intersection points PIC
  *                           - actually does clip to polygon
  *                           - return FALSE if the line segment is completely
  *                           - outside the polygon
  */
 
-int PM_intersect_line_polygon(double *pxmn, double *pymn,
-			      double *pxmx, double *pymx,
+int PM_intersect_line_polygon(double *x1, double *x2,
 			      PM_polygon *py, int *pic)
    {int i, ic, np, p1, p2, rv;
-    double x0, y0, x1, x2, x3, x4, y1, y2, y3, y4;
-    double xr[10], yr[10];
-    double *x, *y;
+    double xr[PM_SPACEDM][10];
+    double x0[PM_SPACEDM], x3[PM_SPACEDM], x4[PM_SPACEDM];
+    double **x;
 
-    x  = py->x[0];
-    y  = py->x[1];
+    x  = py->x;
     np = py->np;
 
-    x1 = *pxmn;
-    y1 = *pymn;
-    x2 = *pxmx;
-    y2 = *pymx;
-
     for (i = 0; i < 10; i++)
-        {xr[i] = 0.0;
-	 yr[i] = 0.0;};
+        {xr[0][i] = 0.0;
+	 xr[1][i] = 0.0;};
 
     ic = 0;
     for (i = 1; i < np; i++)
-        {x3 = x[i];
-         y3 = y[i];
-         x4 = x[i-1];
-         y4 = y[i-1];
-         if (PM_cross_seg(x1, y1, x2, y2, x3, y3, x4, y4, &x0, &y0))
-            {xr[ic] = x0;
-	     yr[ic] = y0;
+        {x3[0] = x[0][i];
+         x3[1] = x[1][i];
+         x4[0] = x[0][i-1];
+         x4[1] = x[1][i-1];
+         if (PM_cross_seg(x1, x2, x3, x4, x0))
+            {xr[0][ic] = x0[0];
+	     xr[1][ic] = x0[1];
 	     ic++;};};
 
     *pic = ic;
@@ -766,26 +758,26 @@ int PM_intersect_line_polygon(double *pxmn, double *pymn,
     p1 = FALSE;
     p2 = FALSE;
     if (ic < 2)
-       {p1 = PM_contains_2d(x1, y1, py);
-        p2 = PM_contains_2d(x2, y2, py);
+       {p1 = PM_contains_nd(x1, py, TRUE);
+        p2 = PM_contains_nd(x2, py, TRUE);
         if (ic == 1)
 	   {if (p1 == TRUE)
-	       {xr[1] = x1;
-                yr[1] = y1;}
+	       {xr[0][1] = x1[0];
+                xr[1][1] = x1[1];}
 	    else
-	       {xr[1] = x2;
-                yr[1] = y2;};}
+	       {xr[0][1] = x2[0];
+                xr[1][1] = x2[1];};}
 
 	else if ((p1 == TRUE) && (p2 == TRUE))
-	   {xr[0] = x1;
-	    yr[0] = y1;
-	    xr[1] = x2;
-	    yr[1] = y2;};};
+	   {xr[0][0] = x1[0];
+	    xr[1][0] = x1[1];
+	    xr[0][1] = x2[0];
+	    xr[1][1] = x2[1];};};
 
-    *pxmn = xr[0];
-    *pymn = yr[0];
-    *pxmx = xr[1];
-    *pymx = yr[1];
+    x1[0] = xr[0][0];
+    x1[1] = xr[1][0];
+    x2[0] = xr[0][1];
+    x2[1] = xr[1][1];
 
     rv = ((ic > 1) || p1 || p2);
 
@@ -818,11 +810,8 @@ static INLINE void _PM_add_node(PM_polygon *pd, double *x)
 static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 			      
    {int i, i1, i2, ic, id, ok, nd, ns, nn, nx;
-    double x1[3], x2[3];
-    double *xn, *yn;
+    double x1[PM_SPACEDM], x2[PM_SPACEDM];
 
-    xn = pn->x[0];
-    yn = pn->x[1];
     nn = pn->np;
     nd = pn->nd;
 
@@ -832,7 +821,7 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
     for (id = 0; id < nd; id++)
         x1[id] = pn->x[id][0];
 
-    i1 = PM_contains_2d(x1[0], x1[1], pp);
+    i1 = PM_contains_nd(x1, pp, TRUE);
     if (i1 == TRUE)
        _PM_add_node(pc, x1);
 
@@ -842,7 +831,7 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 	     {x1[id] = pn->x[id][i-1];
 	      x2[id] = pn->x[id][i];};
 
-	 i2 = PM_contains_2d(x2[0], x2[1], pp);
+	 i2 = PM_contains_nd(x2, pp, TRUE);
 	 if (i2 == TRUE)
 
 /* both points inside P */
@@ -851,8 +840,7 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 
 /* entering P */
 	     else if (i1 == FALSE)
-	        {ok = PM_intersect_line_polygon(&x1[0], &x1[1],
-						&x2[0], &x2[1], pp, &ic);
+	        {ok = PM_intersect_line_polygon(x1, x2, pp, &ic);
 		 if ((ok == TRUE) && (ic > 0))
 		    _PM_add_node(pc, x1);
 
@@ -862,8 +850,7 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 
 /* exiting P */
 	    {if (i1 == TRUE)
-	        {ok = PM_intersect_line_polygon(&x1[0], &x1[1],
-						&x2[0], &x2[1], pp, &ic);
+	        {ok = PM_intersect_line_polygon(x1, x2, pp, &ic);
 		 if (ok == TRUE)
 		    _PM_add_node(pc, x1);};};
 
@@ -922,21 +909,21 @@ PM_polygon *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb)
 void PM_orient_polygon(PM_polygon *p)
    {int i, id, j, n, nd, nh;
     double orient;
-    double *x, *y;
+    double **x;
 
-    x  = p->x[0];
-    y  = p->x[1];
+    x  = p->x;
     n  = p->np;
     nd = p->nd;
 
-    orient = PM_DELTA_CROSS_2D(x[1], y[1], x[2], y[2], x[0], y[0]);
+    orient = PM_DELTA_CROSS_2D(x[0][1], x[1][1], x[0][2], x[1][2],
+			       x[0][0], x[1][0]);
     if (orient < 0.0)
        {nh = n >> 1;
 	for (i = 0; i < nh; i++)
 	    {j  = n - i - 1;
 
 	     for (id = 0; id < nd; id++)
-	         {SC_SWAP_VALUE(double, p->x[id][i], p->x[id][j]);};};};
+	         {SC_SWAP_VALUE(double, x[id][i], x[id][j]);};};};
 
     return;}
 
@@ -953,16 +940,16 @@ void PM_orient_polygon(PM_polygon *p)
 int PM_polygon_orient(PM_polygon *p)
    {int i, n, nm, np, rv;
     double cp;
-    double *x, *y;
+    double **x;
 
-    x = p->x[0];
-    y = p->x[1];
+    x = p->x;
     n = p->np;
 
     nm = 0;
     np = 0;
     for (i = 2; i < n; i++)
-        {cp = PM_DELTA_CROSS_2D(x[i-1], y[i-1], x[i], y[i], x[i-2], y[i-2]);
+        {cp = PM_DELTA_CROSS_2D(x[0][i-1], x[1][i-1], x[0][i], x[1][i],
+				x[0][i-2], x[1][i-2]);
 	 nm += (cp < 0.0);
 	 np += (cp >= 0.0);};
 
@@ -981,33 +968,33 @@ int PM_polygon_orient(PM_polygon *p)
 /*--------------------------------------------------------------------------*/
 
 /* PM_NEAREST_POINT - find the point in an array of points nearest
- *                  - a specified point
+ *                  - a specified point XS
+ *                  - return it in XT
  */
 
-void PM_nearest_point(PM_polygon *py, double xs, double ys,
-		      double *pxt, double *pyt, int *pi)
+void PM_nearest_point(PM_polygon *py, double *xs, double *xt, int *pi)
    {int i, n, indx;
-    double s, smn, dx, dy;
-    double *x, *y;
+    double s, smn;
+    double dx[PM_SPACEDM];
+    double **x;
 
-    x = py->x[0];
-    y = py->x[1];
+    x = py->x;
     n = py->np;
 
     smn  = HUGE;
     indx = -1;
     for (i = 0; i < n; i++)
-        {dx  = x[i] - xs;
-         dy  = y[i] - ys;
-         s   = HYPOT(dx, dy);
+        {dx[0]  = x[0][i] - xs[0];
+         dx[1]  = x[1][i] - xs[1];
+         s   = HYPOT(dx[0], dx[1]);
          smn = min(smn, s);
          if (s == smn)
             indx = i;};
 
     if (indx > -1)
-       {*pi  = indx;
-        *pxt = x[indx];
-        *pyt = y[indx];};
+       {*pi   = indx;
+        xt[0] = x[0][indx];
+        xt[1] = x[1][indx];};
 
     return;}
 
@@ -1291,8 +1278,8 @@ static void _PM_rotate_3d(int n, double **x, double *xo,
    {int i;
     double ct, st, cp, sp, cc, sc;
     double ctcp, stcp, ctsp, stsp;
-    double r[3][3];
-    double rc[3], xc[3], x0[3];
+    double r[PM_SPACEDM][PM_SPACEDM];
+    double rc[PM_SPACEDM], xc[PM_SPACEDM], x0[PM_SPACEDM];
     double theta, phi, chi;
 
     if (xo == NULL)
