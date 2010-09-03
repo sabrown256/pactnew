@@ -17,8 +17,8 @@
 #define N_CHAR  10
 #define N_FLOAT  4
 
-#define FLOAT_EQUAL(d1, d2)  (PD_float_equal(d1, d2, float_tolerance) == 0)
-#define DOUBLE_EQUAL(d1, d2) (PD_float_equal(d1, d2, double_tolerance) == 0)
+#define FLOAT_EQUAL(d1, d2)  (PM_value_compare(d1, d2, float_tolerance) == 0)
+#define DOUBLE_EQUAL(d1, d2) (PM_value_compare(d1, d2, double_tolerance) == 0)
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
@@ -102,27 +102,6 @@ static void test_target(char *tgt, char *base, int n,
         sprintf(datfile, "%s-nat.db%d", base, n);};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PD_FLOAT_EQUAL - compare two floating point numbers
- *                - which have different precision
- */
-
-static int PD_float_equal(double d1, double d2, double tol)
-   {double del;
-
-    if (d1 == d2)
-       return(0);
-
-    del = (d1 - d2)/(ABS(d1) + ABS(d2) + SMALL);
-    if (del < -tol)
-       return(-1);
-    else if (tol < del)
-       return(1);
-    else
-       return(0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

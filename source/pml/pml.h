@@ -87,7 +87,7 @@
 /*--------------------------------------------------------------------------*/
 
 /* PM_LESS_LESS - return TRUE if |x| << |y| as defined by TOLERANCE
- *              - NOTE: this breaks down is |y| ~ SMALL
+ *              - NOTE: this breaks down if |y| ~ SMALL
  */
 
 #define PM_LESS_LESS(x, y) (ABS(x)/(ABS(y) + SMALL) < TOLERANCE)
@@ -807,7 +807,8 @@ extern int
 		     double **px, double *x0, int line),
  PM_colinear_nd(int nd, int n, double **x),
  PM_contains_nd(double *xc, PM_polygon *py, int bnd),
- PM_intersect_line_polygon(double *x1, double *x2, PM_polygon *py, int *pic),
+ PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
+			   double *x1, double *x2, PM_polygon *py),
  PM_polygon_orient(PM_polygon *p);
 
 extern void
@@ -823,6 +824,7 @@ extern void
  PM_rotate_vectors(int nd, int n, double **x, double *x0, double *a);
 
 extern double
+ PM_distance(int nd, double *x1, double *x2, double *g),
  PM_polygon_area(PM_polygon *py),
  **PM_convert_vectors(int nd, int n, void *v, char *typ);
 
@@ -899,22 +901,24 @@ extern double
 extern void
  PM_derivative(int n, double *fncx, double *fncy,
 	       double *derx, double *dery),
- PM_scale_array(double *p, int n, double f),
- PM_shift_array(double *p, int n, double f),
+ PM_array_scale(double *p, int n, double f),
+ PM_array_shift(double *p, int n, double f),
  PM_set_value(double *p, int n, double f),
- PM_copy_array(double *s, double *t, int n),
+ PM_array_copy(double *s, double *t, int n),
  PM_err(char *fmt, ...);
 
 extern int
  PM_del_col(PM_matrix *a, long *col, long ncol),
- PM_equal_array(double *s, double *t, int n, double tol),
+ PM_array_equal(double *s, double *t, int n, double tol),
  PM_set_opers(PM_set *set),
  PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny,
 		double toler),
  PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny,
 		double toler),
  PM_filter_coeff(double *y, int n, double *coef, int nc),
- PM_smooth_int_ave(double *x, double *y, int n, int pts);
+ PM_smooth_int_ave(double *x, double *y, int n, int pts),
+ PM_value_equal(double x1, double x2, double tol),
+ PM_value_compare(double x1, double x2, double tol);
 
 extern double
  PM_romberg(double (*func)(double x), double x0, double x1, double tol),
@@ -1001,11 +1005,13 @@ extern PM_mesh_topology
 extern PM_polygon
  *PM_init_polygon(int nd, int n),
  *PM_make_polygon(int nd, int n, ...),
+ *PM_polygon_box(double *bx),
  *PM_copy_polygon(PM_polygon *py);
 
 extern void
  PM_free_vectors(int nd, double **x),
  PM_free_polygon(PM_polygon *py),
+ PM_polygon_copy_points(PM_polygon *pa, PM_polygon *pb),
  PM_promote_array(C_array *a, char *ntyp, int flag),
  PM_promote_set(PM_set *s, char *ntyp, int flag),
  PM_find_exist_extrema(PM_set *s, char *typ, void *em),

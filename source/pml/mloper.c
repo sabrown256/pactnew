@@ -627,7 +627,7 @@ int PM_set_equal(PM_set *a, PM_set *b, double tol)
 	    {aed = PM_array_real(typ, ae[id], ne, aed);
 	     bed = PM_array_real(typ, be[id], ne, bed);
 
-	     ok = PM_equal_array(aed, bed, ne, tol);};
+	     ok = PM_array_equal(aed, bed, ne, tol);};
 
 	SFREE(aed);
 	SFREE(bed);};

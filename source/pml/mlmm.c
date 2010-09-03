@@ -52,7 +52,7 @@ double **PM_copy_vectors(int nd, int n, double **x)
 
     y = PM_make_vectors(nd, n);
     for (id = 0; id < nd; id++)
-        PM_copy_array(y[id], x[id], n);
+        PM_array_copy(y[id], x[id], n);
 
     return(y);}
 
@@ -185,6 +185,33 @@ PM_polygon *PM_make_polygon(int nd, int n, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_POLYGON_BOX - initialize and return a PM_polygon
+ *                - from a box
+ */
+
+PM_polygon *PM_polygon_box(double *bx)
+   {PM_polygon *py;
+
+    py = PM_init_polygon(2, 5);
+
+    py->x[0][0] = bx[0];
+    py->x[1][0] = bx[2];
+    py->x[0][1] = bx[1];
+    py->x[1][1] = bx[2];
+    py->x[0][2] = bx[1];
+    py->x[1][2] = bx[3];
+    py->x[0][3] = bx[0];
+    py->x[1][3] = bx[3];
+    py->x[0][4] = bx[0];
+    py->x[1][4] = bx[2];
+
+    py->nn = 5;
+
+    return(py);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_COPY_POLYGON - copy and return a PM_polygon PY
  *                 - which encapsulates existing arrays
  */
@@ -203,6 +230,27 @@ PM_polygon *PM_copy_polygon(PM_polygon *py)
     ly->x = x;
 
     return(ly);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_POLYGON_COPY_POINTS - copy the points of PB into PA */
+
+void PM_polygon_copy_points(PM_polygon *pa, PM_polygon *pb)
+   {int id, n, nd;
+    double **x, **y;
+
+    nd = pb->nd;
+    n  = pb->nn;
+    x  = pb->x;
+    y  = pa->x;
+    for (id = 0; id < nd; id++)
+        PM_array_copy(y[id], x[id], n);
+
+    pa->nd = nd;
+    pa->nn = n;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

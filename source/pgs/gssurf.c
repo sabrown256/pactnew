@@ -525,6 +525,7 @@ static void *_PG_do_scan_line(void *arg)
     int *iextr;
     double u[4];
     double vmn;
+    double **xi;
     PM_polygon *py, *pl;
     PG_scan_line_data *par;
     PG_device *dev;
@@ -563,17 +564,18 @@ static void *_PG_do_scan_line(void *arg)
 	 u[2] = iextr[1]*ds;
 	 u[3] = u[1];
 
-         if (PM_intersect_line_polygon(u, u+2, pl, &nic))
+         if (PM_intersect_line_polygon(&nic, &xi, NULL, u, u+2, pl) == TRUE)
+	    {a[0] = xi[0][0]/ds;
+	     a[1] = xi[0][1]/ds;
+	     a[2] = xi[1][0]/ds;
+	     a[3] = xi[1][1]/ds;
+
+	     PM_free_vectors(2, xi);
 
 /* ensure the points are left to right */
-	    {if (u[0] > u[2])
-	        {SC_SWAP_VALUE(double, u[0], u[2]);
-		 SC_SWAP_VALUE(double, u[1], u[3]);};
-
-	     a[0] = u[0]/ds;
-	     a[1] = u[2]/ds;
-	     a[2] = u[1]/ds;
-	     a[3] = u[3]/ds;
+	     if (a[0] > a[1])
+	        {SC_SWAP_VALUE(double, a[0], a[1]);
+		 SC_SWAP_VALUE(double, a[2], a[3]);};
 
 	     (*fnc_scan)(dev, par, a, i, 0);};};
 
