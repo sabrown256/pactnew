@@ -129,7 +129,7 @@ static void show_mesh(double *x, int nd, int *mn, int *mx,
     y = PM_make_vectors(nd, nn);
     for (id = 0; id < nd; id++)
         {y[id] = x + id*nn;
-	 PM_copy_array(y[id], x+id*nn, nn);};
+	 PM_array_copy(y[id], x+id*nn, nn);};
 
 /* build the set */
     snprintf(bf, MAXLINE, "Dir = %d, Side = %d, I = %d", idr, side, ig);

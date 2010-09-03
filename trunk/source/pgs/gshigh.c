@@ -901,7 +901,6 @@ int PG_clip_box(double *bx, double *wc, int *lgf)
 
 PM_polygon *PG_clip_polygon(PG_device *dev, PM_polygon *py)
    {double bnd[PG_BOXSZ];
-    double *xb, *yb;
     PM_polygon *pb, *pi;
 
 /* setup the viewport boundary as a polygon */
@@ -913,22 +912,7 @@ PM_polygon *PG_clip_polygon(PG_device *dev, PM_polygon *py)
     if (bnd[3] < bnd[2])
        {SC_SWAP_VALUE(double, bnd[2], bnd[3]);};
 
-    pb = PM_init_polygon(2, 5);
-    xb = pb->x[0];
-    yb = pb->x[1];
-
-    xb[0] = bnd[0];
-    yb[0] = bnd[2];
-    xb[1] = bnd[1];
-    yb[1] = bnd[2];
-    xb[2] = bnd[1];
-    yb[2] = bnd[3];
-    xb[3] = bnd[0];
-    yb[3] = bnd[3];
-    xb[4] = bnd[0];
-    yb[4] = bnd[2];
-
-    pb->nn = 5;
+    pb = PM_polygon_box(bnd);
 
     pi = PM_intersect_polygons(py, pb);
 

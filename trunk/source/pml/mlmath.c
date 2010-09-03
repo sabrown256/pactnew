@@ -92,11 +92,11 @@ int PM_set_opers(PM_set *set)
 
 /*--------------------------------------------------------------------------*/
 
-/* PM_SCALE_ARRAY - multiply all of the elements of an array
+/* PM_ARRAY_SCALE - multiply all of the elements of an array
  *                - by a conversion factor
  */
 
-void PM_scale_array(double *p, int n, double f)
+void PM_array_scale(double *p, int n, double f)
    {int i;
 
     if (p != NULL)
@@ -108,9 +108,9 @@ void PM_scale_array(double *p, int n, double f)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_SHIFT_ARRAY - add a delta to all of the elements of an array */
+/* PM_ARRAY_SHIFT - add a delta to all of the elements of an array */
 
-void PM_shift_array(double *p, int n, double f)
+void PM_array_shift(double *p, int n, double f)
    {int i;
 
     if (p != NULL)
@@ -184,11 +184,11 @@ long darreq(double *p, int n, double f)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_EQUAL_ARRAY - return TRUE iff all N elements of each array are
+/* PM_ARRAY_EQUAL - return TRUE iff all N elements of each array are
  *                - equal to within tolerance
  */
 
-int PM_equal_array(double *s, double *t, int n, double tol)
+int PM_array_equal(double *s, double *t, int n, double tol)
    {int i, ok;
     double sc, tc, fc;
 
@@ -204,11 +204,11 @@ int PM_equal_array(double *s, double *t, int n, double tol)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_COPY_ARRAY - copy one array to another
+/* PM_ARRAY_COPY - copy one array to another
  *               - that is copy N double values from array T to array S
  */
 
-void PM_copy_array(double *s, double *t, int n)
+void PM_array_copy(double *s, double *t, int n)
    {int i;
 
     if ((s != NULL) && (t != NULL))
@@ -891,6 +891,51 @@ void PM_err(char *fmt, ...)
     SC_VA_END;
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_VALUE_EQUAL - return TRUE iff X1 == X2 to tolerance TOL */
+
+int PM_value_equal(double x1, double x2, double tol)
+   {int rv;
+    double x1a, x2a;
+
+    if (tol < 0.0)
+       tol = TOLERANCE;
+
+    rv  = TRUE;
+    x1a = ABS(x1);
+    x2a = ABS(x2);
+    if ((tol < x1a) || (tol < x2a))
+       rv &= (2.0*ABS(x1 - x2)/(x1a + x2a + SMALL) < tol);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_VALUE_COMPARE - return 1 if X1 > X2 to tolerance TOL
+ *                  -       -1 if X1 < X2 to tolerance
+ *                  -        0 if X1 == X2 to tolerance
+ */
+
+int PM_value_compare(double x1, double x2, double tol)
+   {int rv;
+    double dx;
+
+    if (tol < 0.0)
+       tol = TOLERANCE;
+
+    dx = (x1 - x2)/(ABS(x1) + ABS(x2) + SMALL);
+    if (dx < -tol)
+       rv = -1;
+    else if (tol < dx)
+       rv = 1;
+    else
+       rv = 0;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

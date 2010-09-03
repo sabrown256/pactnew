@@ -16,6 +16,31 @@ struct s_pt
    {int i;
     double x[PM_SPACEDM];};
 
+#define PM_copy_point(_nd, _x1, _x2)                                         \
+    {int _id;                                                                \
+     for (_id = 0; _id < _nd; _id++)                                         \
+         _x1[_id] = _x2[_id];}
+
+#define PM_vector_get_point(_nd, _x, _v, _i)                                 \
+    {int _id;                                                                \
+     for (_id = 0; _id < _nd; _id++)                                         \
+         _x[_id] = _v[_id][_i];}
+
+#define PM_vector_put_point(_nd, _x, _v, _i)                                 \
+    {int _id;                                                                \
+     for (_id = 0; _id < _nd; _id++)                                         \
+         _v[_id][_i] = _x[_id];}
+
+#define PM_polygon_get_point(_x, _py, _i)                                    \
+    {int _id;                                                                \
+     for (_id = 0; _id < _py->nd; _id++)                                     \
+         _x[_id] = _py->x[_id][_i];}
+
+#define PM_polygon_put_point(_x, _py, _i)                                    \
+    {int _id;                                                                \
+     for (_id = 0; _id < _py->nd; _id++)                                     \
+         _py->x[_id][_i] = _x[_id];}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -631,14 +656,14 @@ static int _PM_contains_3d(double *xc, PM_polygon *py, int bnd)
 
     nd = 3;
 
-/* pick a point of the polygon */
-    for (id = 0; id < nd; id++)
-        x1[id] = py->x[id][2];
+/* start with the 3rd node of the polygon */
+    PM_polygon_get_point(x1, py, 2);
 
     for (i = 0; i < 3; i++)
-        {for (id = 0; id < nd; id++)
-	     {x2[id]  = py->x[id][i];
-	      dx1[id] = x2[id] - x1[id];
+        {PM_polygon_get_point(x2, py, i);
+	      
+	 for (id = 0; id < nd; id++)
+	     {dx1[id] = x2[id] - x1[id];
 	      dx2[id] = xc[id] - x1[id];};
 
          nx[0][i] = dx1[1]*dx2[2] - dx1[2]*dx2[1];
@@ -706,10 +731,8 @@ double PM_polygon_area(PM_polygon *py)
 
     ac = 0.0;
     for (i = 1; i < np; i++)
-        {x2[0] = x[0][i];
-	 x2[1] = x[1][i];
-	 x3[0] = x[0][i+1];
-         x3[1] = x[1][i+1];
+        {PM_polygon_get_point(x2, py, i);
+	 PM_polygon_get_point(x3, py, i+1);
 
 	 ac += (x2[0] - x1[0])*(x3[1] - x1[1]) -
 	       (x3[0] - x1[0])*(x2[1] - x1[1]);};
@@ -719,85 +742,160 @@ double PM_polygon_area(PM_polygon *py)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_DISTANCE - return the distance between X1 and X2 according to metric G */
+
+double PM_distance(int nd, double *x1, double *x2, double *g)
+   {int id, jd;
+    double ds, dxs, dxc, dyc, gc;
+
+    dxs = 0.0;
+    if (g == NULL)
+       {for (id = 0; id < nd; id++)
+	    {dxc = x1[id] - x2[id];
+	     dxs += dxc*dxc;};}
+    else
+       {for (id = 0; id < nd; id++)
+	    {dxc = x1[id] - x2[id];
+	     for (jd = 0; jd < nd; jd++)
+	         {gc   = g[jd*nd + id];
+		  dyc  = x1[jd] - x2[jd];
+		  dxs += gc*dxc*dyc;};};};
+
+    ds = sqrt(dxs);
+
+    return(ds);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PM_SORT_POINTS - order the points in XI by increasing distance from X1 */
+
+static void _PM_sort_points(int nd, double *x1, int n,
+			    double **xi, int *sides)
+   {int i, j, id, gap, rv;
+    double sa, sb;
+    double xa[PM_SPACEDM], xb[PM_SPACEDM];
+
+    for (gap = n/2; gap > 0; gap /= 2)
+        for (i = gap; i < n; i++)
+            for (j = i-gap; j >= 0; j -= gap)
+                {PM_vector_get_point(nd, xa, xi, j);
+		 PM_vector_get_point(nd, xb, xi, j+gap);
+		 
+		 sa = PM_distance(nd, xa, x1, NULL);
+		 sb = PM_distance(nd, xb, x1, NULL);
+
+		 if (sa < sb)
+		    rv = -1;
+		 else if (sa > sb)
+		    rv = 1;
+		 else
+		    rv = 0;
+        
+		 if (rv <= 0)
+                    break;
+
+/* swap point and side indeces */
+                 SC_SWAP_VALUE(int, sides[j], sides[j+gap]);
+		 for (id = 0; id < nd; id++)
+		     SC_SWAP_VALUE(double, xi[id][j], xi[id][j+gap]);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_INTERSECT_LINE_POLYGON - compute the intersection points of the
  *                           - given line X1 -> X2
  *                           - with the given polygon PY
- *                           - return the number of intersection points PIC
+ *                           - return the number of intersection points PNI
+ *                           - return the intersection points in PXI
+ *                           - return the sides of PY intersected in PSIDES
  *                           - actually does clip to polygon
  *                           - return FALSE if the line segment is completely
  *                           - outside the polygon
  */
 
-int PM_intersect_line_polygon(double *x1, double *x2,
-			      PM_polygon *py, int *pic)
-   {int i, ic, np, p1, p2, rv;
-    double xr[PM_SPACEDM][10];
+int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
+			      double *x1, double *x2,
+			      PM_polygon *py)
+   {int i, n, ni, nd, np, p1, p2, rv;
+    int *sides;
     double x0[PM_SPACEDM], x3[PM_SPACEDM], x4[PM_SPACEDM];
-    double **x;
+    double **xi;
 
-    x  = py->x;
     np = py->np;
+    nd = py->nd;
 
-    for (i = 0; i < 10; i++)
-        {xr[0][i] = 0.0;
-	 xr[1][i] = 0.0;};
+    n     = 100;
+    xi    = PM_make_vectors(2, n);
+    sides = FMAKE_N(int, n, "PM_INTERSECT_LINE_POLYGON:sides");
 
-    ic = 0;
+    ni = 0;
     for (i = 1; i < np; i++)
-        {x3[0] = x[0][i];
-         x3[1] = x[1][i];
-         x4[0] = x[0][i-1];
-         x4[1] = x[1][i-1];
+        {PM_polygon_get_point(x3, py, i);
+	 PM_polygon_get_point(x4, py, i-1);
+
          if (PM_cross_seg(x1, x2, x3, x4, x0))
-            {xr[0][ic] = x0[0];
-	     xr[1][ic] = x0[1];
-	     ic++;};};
+	    {PM_vector_put_point(nd, x0, xi, ni);
+	     sides[ni] = i-1;
+	     ni++;};};
 
-    *pic = ic;
+/* sort the crossings to increasing distance from X1 */
+    _PM_sort_points(nd, x1, ni, xi, sides);
 
+/* adjust return values */
     p1 = FALSE;
     p2 = FALSE;
-    if (ic < 2)
+    if (ni < 2)
        {p1 = PM_contains_nd(x1, py, TRUE);
         p2 = PM_contains_nd(x2, py, TRUE);
-        if (ic == 1)
+        if (ni == 1)
 	   {if (p1 == TRUE)
-	       {xr[0][1] = x1[0];
-                xr[1][1] = x1[1];}
+	       {PM_vector_put_point(nd, x1, xi, 1);}
 	    else
-	       {xr[0][1] = x2[0];
-                xr[1][1] = x2[1];};}
+	       {PM_vector_put_point(nd, x2, xi, 1);};}
 
 	else if ((p1 == TRUE) && (p2 == TRUE))
-	   {xr[0][0] = x1[0];
-	    xr[1][0] = x1[1];
-	    xr[0][1] = x2[0];
-	    xr[1][1] = x2[1];};};
+	   {PM_vector_put_point(nd, x1, xi, 0);
+	    PM_vector_put_point(nd, x2, xi, 1);};};
 
-    x1[0] = xr[0][0];
-    x1[1] = xr[1][0];
-    x2[0] = xr[0][1];
-    x2[1] = xr[1][1];
+    *pni = ni;
 
-    rv = ((ic > 1) || p1 || p2);
+    if (pxi == NULL)
+       PM_free_vectors(2, xi);
+    else
+       *pxi = xi;
+
+    if (psides == NULL)
+       {SFREE(sides);}
+    else
+       *psides = sides;
+
+    rv = ((ni > 1) || p1 || p2);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_ADD_NODE - helper for PM_intersect_polygons */
+/* _PM_ADD_NODE - helper for PM_intersect_polygons
+ *              - return TRUE iff X closes the polygon PD
+ */
 
-static INLINE void _PM_add_node(PM_polygon *pd, double *x)
-   {int n, id, nd;
+static INLINE int _PM_add_node(PM_polygon *pd, double *x)
+   {int id, nd, n, rv;
 
-    nd = pd->nd;
     n  = pd->nn++;
+    nd = pd->nd;
 
-    for (id = 0; id < nd; id++)
-        pd->x[id][n] = x[id];
+    PM_polygon_put_point(x, pd, n);
 
-    return;}
+    rv = (n > 0);
+    for (id = 0; (id < nd) && (rv == TRUE); id++)
+        rv &= PM_value_equal(pd->x[id][n], pd->x[id][0], -1.0);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -809,8 +907,9 @@ static INLINE void _PM_add_node(PM_polygon *pd, double *x)
 
 static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 			      
-   {int i, i1, i2, ic, id, ok, nd, ns, nn, nx;
+   {int i, i1, i2, ni, ok, nd, ns, nn, nx;
     double x1[PM_SPACEDM], x2[PM_SPACEDM];
+    double **xi;
 
     nn = pn->np;
     nd = pn->nd;
@@ -818,8 +917,7 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
     nx = pc->np;
     ns = pc->nn;
 
-    for (id = 0; id < nd; id++)
-        x1[id] = pn->x[id][0];
+    PM_polygon_get_point(x1, pn, 0);
 
     i1 = PM_contains_nd(x1, pp, TRUE);
     if (i1 == TRUE)
@@ -827,40 +925,189 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 
 /* travserse the perimeter of P looking for entries and exits */
     for (i = 1; (i < nn) && (pp->nn < nx); i++)
-        {for (id = 0; id < nd; id++)
-	     {x1[id] = pn->x[id][i-1];
-	      x2[id] = pn->x[id][i];};
+        {PM_polygon_get_point(x1, pn, i-1);
+	 PM_polygon_get_point(x2, pn, i);
 
 	 i2 = PM_contains_nd(x2, pp, TRUE);
 	 if (i2 == TRUE)
 
 /* both points inside P */
 	    {if (i1 == TRUE)
-	        {_PM_add_node(pc, x2);}
+	        _PM_add_node(pc, x2);
 
 /* entering P */
 	     else if (i1 == FALSE)
-	        {ok = PM_intersect_line_polygon(x1, x2, pp, &ic);
-		 if ((ok == TRUE) && (ic > 0))
-		    _PM_add_node(pc, x1);
+	        {ok = PM_intersect_line_polygon(&ni, &xi, NULL, x1, x2, pp);
 
-		 _PM_add_node(pc, x2);};}
+		 if ((ok == TRUE) && (ni > 0))
+		    {x1[0] = xi[0][0];
+		     x1[1] = xi[1][0];
+		     _PM_add_node(pc, x1);}
+
+		 x2[0] = xi[0][1];
+		 x2[1] = xi[1][1];
+		 _PM_add_node(pc, x2);
+
+		 PM_free_vectors(2, xi);};}
 
 	 else if (i2 == FALSE)
 
 /* exiting P */
 	    {if (i1 == TRUE)
-	        {ok = PM_intersect_line_polygon(x1, x2, pp, &ic);
+	        {ok = PM_intersect_line_polygon(&ni, &xi, NULL, x1, x2, pp);
 		 if (ok == TRUE)
-		    _PM_add_node(pc, x1);};};
+		    {x1[0] = xi[0][0];
+		     x1[1] = xi[1][0];
+		    _PM_add_node(pc, x1);};
+
+		 PM_free_vectors(2, xi);};};
 
 	 i1 = i2;};
 
 /* close the polygon if we end up on the outside */
     if ((i1 == FALSE) && (pc->nn > ns))
-       {for (id = 0; id < nd; id++)
-	    x1[id] = pc->x[id][ns];
+       {PM_polygon_get_point(x1, pc, ns);
         _PM_add_node(pc, x1);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_POLYGON_CONTAINS - return the number of points of PA contained in PB */
+
+int PM_polygon_contains(PM_polygon *pb, PM_polygon *pa)
+   {int na;
+
+    na = 0;
+
+    return(na);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_POLYGON_ENTERING - check ray X1->X2 and polygon PY
+ *                     - return 1 if it is entering
+ *                     -       -1 if it is leaving
+ *                     -        0 if X1 == X2
+ *                     - if midpoint of X1 and X2 is outside it is entering
+ *                     - if inside it is leaving
+ */
+
+static int PM_polygon_entering(double *x1, double *x2, PM_polygon *py)
+   {int id, nd, ok, rv;
+    double x1c, x2c;
+    double xa[PM_SPACEDM];
+
+    ok = TRUE;
+    nd = py->nd;
+    for (id = 0; id < nd; id++)
+        {x1c = x1[id];
+	 x2c = x2[id];
+	 ok &= PM_CLOSETO_REL(x1c, x2c);
+	 xa[id] = 0.5*(x1c + x2c);};
+
+    if (ok == TRUE)
+       rv = 0;
+    else
+       {rv = PM_contains_nd(xa, py, FALSE);
+	rv = (rv == FALSE) ? 1 : -1;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PM_INTERSECT_POLY_B - traversing boundary of polygon PN
+ *                      - accumlate points contained in polygon PP or boundary
+ *                      - intersection points
+ */
+
+static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
+			      
+   {int i, i1, id, ip, na, ni, nd, ns, nx;
+    int closed, nin, nout, ok;
+    int *sides;
+    double x1[PM_SPACEDM], x2[PM_SPACEDM], xa[PM_SPACEDM];
+    double **xi;
+    PM_polygon *pa, *pb;
+
+/* not absolutely necessary but cleaner */
+    for (id = 0; id < PM_SPACEDM; id++)
+        {x1[id] = 0.0;
+	 x2[id] = 0.0;
+	 xa[id] = 0.0;};
+
+    nx = pc->np;
+    ns = pc->nn;
+
+    pa = pn;
+    pb = pp;
+
+    nd = pa->nd;
+
+    PM_polygon_get_point(x1, pa, 0);
+
+    i1 = PM_contains_nd(x1, pb, TRUE);
+    if (i1 == TRUE)
+       _PM_add_node(pc, x1);
+
+/* travserse the perimeter of PA looking for entries and exits from PB */
+    nin    = 0;
+    nout   = 0;
+    closed = FALSE;
+    PM_polygon_get_point(x1, pa, 0);
+    for (i = 1; (pc->nn < nx) && (closed == FALSE); i++)
+        {na = pa->nn;
+	 i %= na;
+	 PM_polygon_get_point(x2, pa, i);
+
+	 ok = PM_intersect_line_polygon(&ni, &xi, &sides, x1, x2, pb);
+
+/* no intersection points for (X1, X2) with PB */
+	 if (ni == 0)
+
+/* (X1, X2) is interior to PB */
+	    {if (ok == TRUE)
+	        {closed = _PM_add_node(pc, x2);
+		 nin++;}
+
+/* (X1, X2) is exterior to PB */
+	     else
+	        nout++;
+
+/* if all the points are outside then PB is the intersection */
+	     if (nout >= na)
+	        {closed = TRUE;
+		 PM_polygon_copy_points(pc, pb);}
+	     else
+	        PM_copy_point(nd, x1, x2);}
+
+/* one or more intersection points for (X1, X2) with PB */
+	 else if (ok == TRUE)
+	    {if (ni == 1)
+	        {PM_vector_get_point(nd, xa, xi, 0);
+		 ok = PM_polygon_entering(x1, xa, pb);
+		 if (ok == -1)
+		    {PM_copy_point(nd, x1, xa);}
+		 else
+		    {PM_vector_get_point(nd, x1, xi, 1);};
+		 closed = _PM_add_node(pc, x1);}
+
+	     else
+	        {for (ip = 0; ip < ni; ip++)
+		     {PM_vector_get_point(nd, xa, xi, ip);
+		      ok = PM_polygon_entering(x1, xa, pb);
+		      if (ok != 0)
+			 {closed = _PM_add_node(pc, xa);
+			  PM_copy_point(nd, x1, xa);};
+		      if (ok == -1)
+			 {i = sides[ip];
+			  SC_SWAP_VALUE(PM_polygon *, pa, pb);
+			  break;};};};};
+
+	 PM_free_vectors(nd, xi);
+	 SFREE(sides);};
 
     return;}
 
@@ -877,6 +1124,7 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 PM_polygon *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb)
    {int nx;
     PM_polygon *pc;
+    static int way = 1;
 
     nx = max(pa->np, pb->np);
     nx = 4*nx;
@@ -886,15 +1134,21 @@ PM_polygon *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb)
     PM_orient_polygon(pa);
     PM_orient_polygon(pb);
 
+    if (way == 0)
+
 /* find the part of A contained in B */
-    _PM_intersect_poly(pc, pa, pb);
+       {_PM_intersect_poly(pc, pa, pb);
 
 /* find the part of B contained in A */
-    _PM_intersect_poly(pc, pb, pa);
+	_PM_intersect_poly(pc, pb, pa);
 
 /* GOTCHA: we really have multiple polygons here in general
  * do we need to merge them?
  */
+	}
+
+    else
+       _PM_intersect_poly_b(pc, pb, pa);
 
     return(pc);}
 

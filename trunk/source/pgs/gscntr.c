@@ -166,7 +166,7 @@ void PG_setup_iso_levels(PG_device *dev, PG_graph *data, PG_picture_desc *pd)
 	PG_contour_levels(lev, nlev, rlmn, rlmx, ratio);}
 
     else
-       PM_copy_array(lev, lv, nlev);
+       PM_array_copy(lev, lv, nlev);
 
     pd->n_levels  = nlev;
     pd->levels    = lev;

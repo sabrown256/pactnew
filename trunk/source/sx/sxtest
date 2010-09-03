@@ -22,7 +22,7 @@ while ($#argv > 0)
            echo "  h       this help message"
            echo "  vg      run tests under valgrind"
            echo "  <test>  one of: oper hash pdb dattr text sqlite xml vif pgs"
-           echo "                  master exa ar shell mesh intrp diff ext"
+           echo "                  master exa iply ar shell mesh intrp diff ext"
            echo ""
            exit(1)
       case -*:
@@ -83,7 +83,7 @@ else if (-e $BinDir/sx) then
    if ("$Test" == "") then
       set Test = ""
       set Test = ( $Test oper hash pdb dattr text sqlite xml vif pgs axis )
-      set Test = ( $Test master exa ar shell mesh intrp diff ext )
+      set Test = ( $Test master exa iply ar shell mesh intrp diff ext )
    endif
 
    foreach i ($Test)

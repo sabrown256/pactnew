@@ -20,7 +20,7 @@
  */
 
 BIGINT SC_dsk_space(char *dir, BIGINT nbx)
-   {int fd, nw, st, ok, same;
+   {int fd, nw, st, ok;
     off_t bsz, nb, no;
     double fb, fl, fu;
     char *t, *cwd;
@@ -35,37 +35,6 @@ BIGINT SC_dsk_space(char *dir, BIGINT nbx)
     t  = SC_dsnprintf(FALSE, "__tmp_XXXXXX");
     fd = mkstemp(t);
 
-#if 0
-    printf("sizeof(BIGINT) = %d\n", sizeof(BIGINT));
-    printf("sizeof(off_t)  = %d\n", sizeof(off_t));
-#endif
-
-#if 0
-/* start at 10 PBy */
-    fl = 1.0;
-    fu = pow(1024.0, 5.0);
-    same = FALSE;
-    for (fb = fu; !same; fb = 0.5*(fl + fu))
-        {nb = fb;
-
-/* make a trial */
-	 ok = FALSE;
-	 no = lseek(fd, nb, SEEK_SET);
-	 if (no == nb)
-	    {nw = write(fd, " ", 1);
-	     if (nw == 1)
-	        ok = TRUE;};
-
-/* if a trial succeeds we have a new lower bound */
-	 if (ok)
-	    fl = fb;
-
-/* if a trial fails we have a new upper bound */
-	 else
-	    fu = fb;
-
-         same = ((2.0*ABS((fu) - (fl))/(ABS(fu) + ABS(fl) + SMALL) < 1.0e-3));};
-#else
     bsz = 4096;
     for (nb = bsz, ok = TRUE; (nb <= nbx) && ok; nb += bsz)
         {ok = FALSE;
@@ -74,7 +43,6 @@ BIGINT SC_dsk_space(char *dir, BIGINT nbx)
 	    {nw = write(fd, " ", 1);
 	     if (nw == 1)
 	        ok = TRUE;};};
-#endif
 
 /* close the temporary file and remove it */
     st = close(fd);

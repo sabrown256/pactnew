@@ -821,32 +821,31 @@ int _PG_PS_put_raster(PG_device *dev,
 /* _PG_PS_SET_DEV_COLOR - */
 
 void _PG_PS_set_dev_color(PG_device *dev, int prim, int check)
-   {int color;
+   {int color, rgb;
     PG_palette *pal;
 
     if (dev == NULL)
        return;
 
-    pal   = dev->current_palette;
     color = -1;
 
     switch (prim)
        {case PG_TEXT :
+	     rgb   = dev->text_color;
              color = (dev->map_text_color) ?
-	             _PG_trans_color(dev, dev->text_color) :
-	             dev->text_color;
+	             _PG_trans_color(dev, rgb) : rgb;
              break;
 
         case PG_LINE :
+	     rgb   = dev->line_color;
              color = (dev->map_line_color) ?
-		     _PG_trans_color(dev, dev->line_color) :
-	             dev->line_color;
+		     _PG_trans_color(dev, rgb) : rgb;
              break;
 
         case PG_FILL :
+	     rgb   = dev->fill_color;
              color = (dev->map_fill_color) ?
-                     _PG_trans_color(dev, dev->fill_color) :
-	             dev->fill_color;
+	             _PG_trans_color(dev, rgb) : rgb;
              break;
 
         case PG_NOPRIM :
@@ -862,6 +861,11 @@ void _PG_PS_set_dev_color(PG_device *dev, int prim, int check)
         _PG.last_prim  = prim;
         _PG.last_color = color;};
  
+    if (PG_is_true_color(rgb) == TRUE)
+       pal = dev->color_table;
+    else
+       pal = dev->current_palette;
+
     if (COLOR_POSTSCRIPT_DEVICE(dev))
        {RGB_color_map *true_cm;
         double r, g, b, scale;

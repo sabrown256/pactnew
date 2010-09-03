@@ -823,14 +823,14 @@ colinear in ND dimensions.<p>
 Return TRUE if and only if the point Xc is contained in the plane region bounded
 by the polygon PY. If bnd it TRUE points on the boundary are included.<p>
 
-<B>int PM_intersect_line_polygon(double *pxmn, double *pymn, double *pxmx, 
-double *pymx, double *ppx, double *ppy, int np, int *pic)
+<B>int PM_intersect_line_polygon(int *pni, double **pxi, double *x1, double *x2,
+ PM_polygon *py)
 </B><BR>
 <P>
-This routine computes the intersection points of the line given by (pxmn, pymn)
-and (pxmx, pymx) and the given polygon as defined by the np points in ppx and ppy.
-The number of intersection points is returned in pic and the intersection points
-are returned in (pxmn, pymn) and (pxmx, pymx). FALSE is returned if the line segment
+This routine computes the intersection points of the line given by X1
+and X2 and the given polygon PY.
+The number of intersection points is returned in PNI and the intersection points
+are returned in PXI. FALSE is returned if the line segment
 is completely outside the polygon.<p>
 
 <B>void PM_convex_hull(double *px, double *py, int nh, double **ppx, double **ppy, 
