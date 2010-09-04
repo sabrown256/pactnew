@@ -16,31 +16,6 @@ struct s_pt
    {int i;
     double x[PM_SPACEDM];};
 
-#define PM_copy_point(_nd, _x1, _x2)                                         \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _x1[_id] = _x2[_id];}
-
-#define PM_vector_get_point(_nd, _x, _v, _i)                                 \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _x[_id] = _v[_id][_i];}
-
-#define PM_vector_put_point(_nd, _x, _v, _i)                                 \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _v[_id][_i] = _x[_id];}
-
-#define PM_polygon_get_point(_x, _py, _i)                                    \
-    {int _id;                                                                \
-     for (_id = 0; _id < _py->nd; _id++)                                     \
-         _x[_id] = _py->x[_id][_i];}
-
-#define PM_polygon_put_point(_x, _py, _i)                                    \
-    {int _id;                                                                \
-     for (_id = 0; _id < _py->nd; _id++)                                     \
-         _py->x[_id][_i] = _x[_id];}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
