@@ -4,14 +4,6 @@ PACT Developer Information
 
 PACT - the Portable Application Code Toolkit
 
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
-
 ==History==
 
 ==Philosophy==
