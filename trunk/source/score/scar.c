@@ -35,8 +35,8 @@ static fcent *_SC_make_ar_entry(FILE *fp, int round,
 				char *name, char *date,
 				char *uid, char *gid,
 				char *size, char *mode,
-				off_t *ppos)
-   {off_t sz, pos, ada;
+				BIGINT *ppos)
+   {BIGINT sz, pos, ada;
     fcent *ae;
 
     sz = SC_stol(size);
@@ -77,7 +77,7 @@ static fcent *_SC_make_ar_entry(FILE *fp, int round,
 fcdes *SC_scan_archive(char *arf)
    {int nr, nb, nc;
     size_t ad;
-    off_t pos;
+    BIGINT pos;
     char s[MAXLINE];
     char *p;
     FILE *fp;
@@ -261,7 +261,7 @@ fcdes *SC_scan_archive(char *arf)
 
 fcdes *SC_scan_archive(char *arf)
    {int nr, nb, nc, ne, na;
-    off_t pos;
+    BIGINT pos;
     char s[MAXLINE], lname[MAXLINE];
     FILE *fp;
     char *p, *name;
@@ -335,7 +335,7 @@ fcdes *SC_scan_archive(char *arf)
 fcdes *SC_scan_archive(char *arf)
    {int nr, nb;
     BIGINT ext, org, off;
-    off_t pos;
+    BIGINT pos;
     char s[MAXLINE], lname[MAXLINE];
     FILE *fp;
     char *p, *name;
@@ -406,7 +406,7 @@ fcdes *SC_scan_archive(char *arf)
 
 int _SC_is_archive(FILE *fp)
    {int rv, nr;
-    off_t oa;
+    BIGINT oa;
     char s[MAXLINE];
 
     rv = FALSE;

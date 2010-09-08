@@ -33,7 +33,7 @@ int
 static char *_PD_get_tok(char *s, int n, FILE *fp, int ch)
    {int i, c, LineSep;
     long nb;
-    off_t loc;
+    BIGINT loc;
     char *ps;
 
 /* this is for old NLTSS generated files - sigh! */
@@ -430,7 +430,7 @@ static int _PD_id_file(FILE *fp)
     char *p;
 
 /* attempt to read an ASCII header */
-    if (lio_seek(fp, (off_t) 0, SEEK_SET))
+    if (lio_seek(fp, (BIGINT) 0, SEEK_SET))
        PD_error("FSEEK FAILED TO FIND ORIGIN - _PD_IDENTIFY_FILE", PD_OPEN);
 
     if (_PD_rfgets(str, MAXLINE, fp) == NULL)
@@ -446,7 +446,7 @@ static int _PD_id_file(FILE *fp)
 	if (vers == 0)
 
 /* attempt to read an ASCII trailer */
-	   {if (lio_seek(fp, (off_t) -32, SEEK_END))
+	   {if (lio_seek(fp, (BIGINT) -32, SEEK_END))
 	       PD_error("FSEEK FAILED TO END - _PD_IDENTIFY_FILE", PD_OPEN);
 
 	    nb = lio_read(str, (size_t) 1, (size_t) 32, fp);

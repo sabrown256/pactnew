@@ -93,7 +93,7 @@ static int test_1(void)
 static int test_2(void)
    {int i, n, st, bpi, ni, bu, cs;
     int *iv;
-    off_t addr;
+    BIGINT addr;
     char msg[MAXLINE];
     FILE *fp;
     static int dbg = 0;

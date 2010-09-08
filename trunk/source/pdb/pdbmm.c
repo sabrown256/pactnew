@@ -34,7 +34,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
     pa = _PD_get_state(-1);
 
     if (_PD.maxfsize == 0)
-       SC_fix_lmt(sizeof(off_t), NULL, &_PD.maxfsize, NULL);
+       SC_fix_lmt(sizeof(BIGINT), NULL, &_PD.maxfsize, NULL);
 
     file = FMAKE(PDBfile, "_PD_MK_PDB:file");
     if (file != NULL)
@@ -120,7 +120,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 
 /* register the file with the parallel file manager */
 	if (reg == TRUE)
-	   _PD_ADD_FILE(file, (off_t) 0);
+	   _PD_ADD_FILE(file, (BIGINT) 0);
 
 	file->host_std->file = file;};
 
@@ -466,7 +466,7 @@ syment *PD_copy_syment(syment *osym)
  *               - for the symbol table
  */
 
-syment *_PD_mk_syment(char *type, long ni, off_t addr, symindir *indr,
+syment *_PD_mk_syment(char *type, long ni, BIGINT addr, symindir *indr,
 		      dimdes *dims)
    {syment *ep;
     char *t;

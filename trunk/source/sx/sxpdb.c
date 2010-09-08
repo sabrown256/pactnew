@@ -186,7 +186,7 @@ static object *_SXI_open_raw_file(object *argl)
 
 static object *_SXI_seek_raw_file(object *argl)
    {int whence, ret;
-    off_t addr;
+    BIGINT addr;
     PDBfile *file;
     FILE *fp;
     g_file *po;
@@ -195,7 +195,7 @@ static object *_SXI_seek_raw_file(object *argl)
     whence = 0;
     SS_args(argl,
             G_FILE, &po,
-            SC_OFF_T_I, &addr,
+            SC_BIGINT_I, &addr,
             SC_INTEGER_I, &whence,
             0);
 
@@ -264,7 +264,7 @@ static object *_SXI_rd_raw(object *argl)
    {int ret;
     char *intype, *outtype;
     long nitems, ni;
-    off_t addr;
+    BIGINT addr;
     void *vr;
     PDBfile *file;
     PD_smp_state *pa;
@@ -280,7 +280,7 @@ static object *_SXI_rd_raw(object *argl)
     if (SS_length(argl) > 4)
        SS_args(argl,
                G_FILE, &po,
-               SC_OFF_T_I, &addr,
+               SC_BIGINT_I, &addr,
                SC_LONG_I, &nitems,
                SC_STRING_I, &intype,
                SC_STRING_I, &outtype,
@@ -288,7 +288,7 @@ static object *_SXI_rd_raw(object *argl)
     else
        {SS_args(argl,
                 G_FILE, &po,
-                SC_OFF_T_I, &addr,
+                SC_BIGINT_I, &addr,
                 SC_LONG_I, &nitems,
                 SC_STRING_I, &intype,
                 0);
@@ -356,7 +356,7 @@ static object *_SXI_rd_raw(object *argl)
 static object *_SXI_wr_raw(object *argl)
    {int ret;
     long nitems;
-    off_t addr;
+    BIGINT addr;
     char *intype, *outtype;
     void *vr;
     PDBfile *file;
@@ -373,7 +373,7 @@ static object *_SXI_wr_raw(object *argl)
        SS_args(argl,
                G_FILE, &po,
                SS_OBJECT_I, &obj,
-               SC_OFF_T_I, &addr,
+               SC_BIGINT_I, &addr,
                SC_LONG_I, &nitems,
                SC_STRING_I, &intype,
                SC_STRING_I, &outtype,
@@ -382,7 +382,7 @@ static object *_SXI_wr_raw(object *argl)
        {SS_args(argl,
                 G_FILE, &po,
                 SS_OBJECT_I, &obj,
-                SC_OFF_T_I, &addr,
+                SC_BIGINT_I, &addr,
                 SC_LONG_I, &nitems,
                 SC_STRING_I, &intype,
                 0);
@@ -916,11 +916,11 @@ static object *_SXI_file_content(object *argl)
  *                -    virtual-internal (int)      - whether file is "internal"
  *                -    system-version (int)        - PDB system version
  *                -    major-order (int)           - major order for indexes
- *                -    header-address (off_t)      - address of header info
- *                -    chart-address (off_t)       - address of structure chart
- *                -    symbol-table-address (off_t)- address of symbol table
+ *                -    header-address (BIGINT)      - address of header info
+ *                -    chart-address (BIGINT)       - address of structure chart
+ *                -    symbol-table-address (BIGINT)- address of symbol table
  *                -    date (char *)               - file creation date
- *                -    maximum_size (off_t)        - threshold for new file
+ *                -    maximum_size (BIGINT)        - threshold for new file
  *                -    previous_file (char *)      - previous file in family
  */
 
@@ -2189,7 +2189,7 @@ static object *_SXI_rd_syment(object *argl)
 
 static SC_array *_SX_make_blocks(object *alst, long numb)
    {int i, n;
-    off_t addr, ni, tot;
+    BIGINT addr, ni, tot;
     SC_array *bl;
 
     bl = NULL;
@@ -2201,7 +2201,7 @@ static SC_array *_SX_make_blocks(object *alst, long numb)
         tot = 0L;
         for (i = 0; i < n; i++)
             {SS_args(alst,
-                     SC_OFF_T_I, &addr,
+                     SC_BIGINT_I, &addr,
                      SC_LONG_I, &ni,
                      0);
 	     _PD_block_set_desc(addr, ni, bl, i);
@@ -2218,7 +2218,7 @@ static SC_array *_SX_make_blocks(object *alst, long numb)
        {bl = _PD_block_make(1);
 
 	SS_args(alst,
-		SC_OFF_T_I, &addr,
+		SC_BIGINT_I, &addr,
 		0);
 
 	_PD_block_set_desc(addr, 1, bl, 0);};

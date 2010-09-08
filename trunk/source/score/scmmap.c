@@ -68,8 +68,8 @@ static long _SC_mf_tell(FILE *stream)
 
 /* _SC_MF_MWRITE - mwrite method for memory mapped files */
 
-static off_t _SC_mf_mwrite(int fd, const void *buf, size_t nb, BIGINT off)
-   {off_t rv;
+static BIGINT _SC_mf_mwrite(int fd, const void *buf, size_t nb, BIGINT off)
+   {BIGINT rv;
 
     lseek(fd, off, SEEK_SET);
 

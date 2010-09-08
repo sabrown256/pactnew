@@ -108,7 +108,7 @@ PDBfile *PD_open(char *name, char *mode)
 
 PDBfile *PD_family(PDBfile *of, int flag)
    {long i;
-    off_t msz, csz;
+    BIGINT msz, csz;
     char name[MAXLINE];
     PDBfile *nf;
     defstr *dp;
@@ -119,7 +119,7 @@ PDBfile *PD_family(PDBfile *of, int flag)
        return(NULL);
 
     if (_PD.maxfsize == 0)
-       SC_fix_lmt(sizeof(off_t), NULL, &_PD.maxfsize, NULL);
+       SC_fix_lmt(sizeof(BIGINT), NULL, &_PD.maxfsize, NULL);
 
 /* if the size is effectively infinite stop ASAP */
     msz = PD_get_max_file_size(of);
@@ -547,7 +547,7 @@ int PD_read_as_alt(PDBfile *file, char *name, char *type,
 syment *_PD_defent(PDBfile *file, char *name, char *outtype,
 		   long number, dimdes *dims)
    {long bpi;
-    off_t addr;
+    BIGINT addr;
     char bf[MAXLINE];
     char *lname;
     defstr *dp;
@@ -687,7 +687,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 		  void *vr, dimdes *dims, int appnd, int *pnew)
    {int c, new, ok;
     long number; 
-    off_t addr;
+    BIGINT addr;
     char bf[MAXLINE];
     char *lname, *fullpath;
     syment *ep;

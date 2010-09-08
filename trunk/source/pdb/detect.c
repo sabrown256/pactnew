@@ -597,9 +597,9 @@ void print_human(int sflag)
 /* print optional non-native types */
      if (sflag)
         {memset(bf, ' ', MAXLINE);
-         strncpy(tptr, "off_t", 5);
+         strncpy(tptr, "BIGINT", 5);
     
-         snprintf(t, MAXLINE, "%12d", (int) sizeof(off_t));
+         snprintf(t, MAXLINE, "%12d", (int) sizeof(BIGINT));
          strcpy(sptr, t);
          puts(bf);
 
@@ -699,7 +699,7 @@ int main(int argc, char **argv)
                     /* the default is to produce human readable */
                     /* output.                                  */
     int sflag = 0;  /* print optional size related types        */
-                    /* like size_t and off_t                    */
+                    /* like size_t and BIGINT                    */
 
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')

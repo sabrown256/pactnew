@@ -112,7 +112,7 @@ static fcent *_SC_make_tar_entry(FILE *fp, int round,
 				 char *name, char *date,
 				 char *uid, char *gid,
 				 char *size, char *mode)
-   {off_t sz, pos;
+   {BIGINT sz, pos;
     char *p;
     fcent *ae;
 
@@ -290,7 +290,7 @@ int _SC_tar_checkname(tarhdr *thdr)
 
 int _SC_is_tarfile(FILE *fp)
    {int ret, nb, nr;
-    off_t addsave;
+    BIGINT addsave;
     tarhdr p;
 
     addsave = ftell(fp);

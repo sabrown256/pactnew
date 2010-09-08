@@ -144,9 +144,9 @@ static void _PD_block_check(SC_array *bl, long n)
 
 /* _PD_BLOCK_GET_ADDRESS - return the address of the Nth block of EP */
 
-off_t _PD_block_get_address(SC_array *bl, long n)
+BIGINT _PD_block_get_address(SC_array *bl, long n)
    {long nb;
-    off_t addr;
+    BIGINT addr;
     symblock *sp;
 
     nb = SC_array_get_n(bl);
@@ -163,7 +163,7 @@ off_t _PD_block_get_address(SC_array *bl, long n)
 
 /* _PD_BLOCK_SET_ADDRESS - set the address of the Nth block of EP */
 
-off_t _PD_block_set_address(SC_array *bl, long n, off_t addr)
+BIGINT _PD_block_set_address(SC_array *bl, long n, BIGINT addr)
    {symblock *sp;
 
     _PD_block_check(bl, n+1);
@@ -213,9 +213,9 @@ long _PD_block_set_number(SC_array *bl, long n, long ni)
  *                    - in the Nth block of BL
  */
 
-void _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n)
+void _PD_block_get_desc(BIGINT *paddr, long *pni, SC_array *bl, long n)
    {long ni, nb;
-    off_t addr;
+    BIGINT addr;
     symblock *sp;
 
     nb = SC_array_get_n(bl);
@@ -243,7 +243,7 @@ void _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n)
  *                    - in the Nth block of BL
  */
 
-void _PD_block_set_desc(off_t addr, long ni, SC_array *bl, long n)
+void _PD_block_set_desc(BIGINT addr, long ni, SC_array *bl, long n)
    {symblock *sp;
 
     _PD_block_check(bl, n+1);
@@ -414,7 +414,7 @@ static int _PD_consistent_dims(PDBfile *file, syment *ep, dimdes *ndims)
  *               - or to _PD_defent
  */
 
-int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, off_t addr)
+int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, BIGINT addr)
    {int n, rv;
     long bpi, ni, nb;
     SC_array *bl;
@@ -454,9 +454,9 @@ int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, off_t addr)
  *                - contains the address ADDR
  */
 
-long _PD_block_find(PDBfile *file, syment *ep, off_t addr)
+long _PD_block_find(PDBfile *file, syment *ep, BIGINT addr)
    {long i, n, bpi;
-    off_t start, stop;
+    BIGINT start, stop;
     SC_array *bl;
     symblock *sp;
 
@@ -586,10 +586,10 @@ void _PD_block_truncate(syment *ep, long ni)
  *                    - block after the effective address
  */
 
-long _PD_effective_addr(off_t *paddr, long *pnitems,
+long _PD_effective_addr(BIGINT *paddr, long *pnitems,
 			int bpi, SC_array *bl)
    {long i, nb, nt; 
-    off_t addr, eaddr;
+    BIGINT addr, eaddr;
     symblock *sp;
 
     eaddr = *paddr;

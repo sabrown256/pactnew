@@ -131,7 +131,7 @@ struct s_SC_state
     PFSignal_handler to_err;
 
 /* SCBIO.C */
-    off_t buffer_size;
+    BIGINT buffer_size;
 
 /* initializes to 0 bytes */
 
@@ -286,7 +286,7 @@ extern void
 extern SC_address
  _SC_set_func_addr(PFInt x),
  _SC_set_mem_addr(void *x),
- _SC_set_disk_addr(off_t x);
+ _SC_set_disk_addr(BIGINT x);
 
 extern PFInt
  _SC_hasharr_lookup_function(hasharr *tab, char *nm),

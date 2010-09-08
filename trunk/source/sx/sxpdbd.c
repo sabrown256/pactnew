@@ -141,8 +141,8 @@ static void _SX_diff_signal(int sig)
 
 static int _SX_check_pointers(PDBfile *pfa, PDBfile *pfb, 
 			      char *nma, char *nmb, char *ta, 
-			      long na, off_t ada, char *tb, 
-			      long nb, off_t adb)
+			      long na, BIGINT ada, char *tb, 
+			      long nb, BIGINT adb)
    {int rv;
 
     rv = FALSE;
@@ -428,7 +428,7 @@ static int _SX_diff_indirection(char *nma, char *nmb,
 			        PDBfile *pfa, PDBfile *pfb)
    {int fla, flb, ret;
     long na, nb;
-    off_t ada, adb, oada, oadb;
+    BIGINT ada, adb, oada, oadb;
     char bfa[MAXLINE], bfb[MAXLINE], bfc[MAXLINE];
     char *ta, *tb, *token, *s;
     FILE *fpa, *fpb;
@@ -533,7 +533,7 @@ static int _SX_diff_indirection(char *nma, char *nmb,
 
 static int _SX_diff_casts(PDBfile *pfa, PDBfile *pfb, 
 			  char *nma, char *nmb, char **pa, char **pb)
-   {off_t oa, ob;
+   {BIGINT oa, ob;
     char *mta, *mtb;
     int samen;
     FILE *fpa, *fpb;
@@ -811,7 +811,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
 			 long ni, long bpi, char *out_type)
    {int convert;
     long i, n, nrd, nib;
-    off_t addr;
+    BIGINT addr;
     char *buf, *vbuf, *svr;
     defstr *dpf;
     FILE *fp;

@@ -156,7 +156,7 @@ SC_address _SC_set_mem_addr(void *x)
 
 /* _SC_SET_DISK_ADDR - convert a disk address to a number via a union */
 
-SC_address _SC_set_disk_addr(off_t x)
+SC_address _SC_set_disk_addr(BIGINT x)
    {SC_address ad;
 
 /* in case memaddr is larger than diskaddr */

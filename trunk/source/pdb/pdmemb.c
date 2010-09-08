@@ -484,8 +484,8 @@ long _PD_lookup_size(char *s, hasharr *tab)
  *                     - don't get rid of this (some applications use it!)
  */
 
-off_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
-   {off_t addr;
+BIGINT _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
+   {BIGINT addr;
     char name[MAXLINE];
     char *token;
     memdes *desc, *nxt;

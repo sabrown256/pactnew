@@ -480,7 +480,7 @@ static void _PG_CGM_update_vs(PG_device *dev)
  */
  
 static void _PG_CGM_finish_plot(PG_device *dev)
-   {off_t addr;
+   {BIGINT addr;
 
     if (dev == NULL)
        return;

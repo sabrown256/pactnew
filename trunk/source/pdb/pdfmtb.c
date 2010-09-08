@@ -44,7 +44,7 @@
  */
 
 static int _PD_wr_itag_ii(PDBfile *file, long n, long nitems, char *type,
-			  off_t addr, int loc)
+			  BIGINT addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
 
@@ -217,7 +217,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
    {char *name, *type, *tmp, *pbf, *s, *local;
     long mini, leng, bsz;
-    off_t addr, numb;
+    BIGINT addr, numb;
     syment *ep;
     hasharr *tab;
     dimdes *dims, *next, *prev;
@@ -270,7 +270,7 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
 int _PD_rd_symt_ii(PDBfile *file)
    {int rv;
     long symt_sz;
-    off_t addr, numb;
+    BIGINT addr, numb;
     char *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -311,7 +311,7 @@ int _PD_rd_symt_ii(PDBfile *file)
 
 static void _PD_rd_blocks_ii(PDBfile *file)
    {long j, n, nt, numb, stride, bsz;
-    off_t addr;
+    BIGINT addr;
     char *local, *name, *s;
     syment *ep;
     dimdes *dim;
@@ -692,10 +692,10 @@ int _PD_rd_ext_ii(PDBfile *file)
  *                - return -1L on error
  */
 
-static off_t _PD_wr_symt_ii(PDBfile *file)
+static BIGINT _PD_wr_symt_ii(PDBfile *file)
    {int n, flag;
     long i, nt, nb, ni, stride;
-    off_t addr, ad;
+    BIGINT addr, ad;
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
@@ -795,10 +795,10 @@ static int _PD_wr_casts_ii(PDBfile *file)
  *                - return -1L on error
  */
 
-static off_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
+static BIGINT _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
    {int n;
     long i;
-    off_t addr;
+    BIGINT addr;
     char *bf, *nm;
     FILE *fp;
     hasharr *ch;
@@ -940,7 +940,7 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 static int _PD_wr_blocks_ii(PDBfile *file)
    {int ok;
     long i, j, n, ni;
-    off_t addr;
+    BIGINT addr;
     char *nm;
     syment *ep;
 
@@ -1380,7 +1380,7 @@ static int _PD_create_ii(PDBfile *file, int mst)
  */
 
 static int _PD_write_meta_ii(PDBfile *file, FILE *out, int fh)
-   {off_t addr;
+   {BIGINT addr;
     FILE *fp;
 
     if (out == NULL)

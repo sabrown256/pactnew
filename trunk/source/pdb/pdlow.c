@@ -564,8 +564,8 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 
 /* _PD_GET_CURRENT_ADDRESS - return the current file address */
 
-off_t _PD_get_current_address(PDBfile *file, PD_major_op tag)
-   {off_t addr;
+BIGINT _PD_get_current_address(PDBfile *file, PD_major_op tag)
+   {BIGINT addr;
     FILE *fp;
 
     fp = file->stream;
@@ -581,7 +581,7 @@ off_t _PD_get_current_address(PDBfile *file, PD_major_op tag)
 
 /* _PD_SET_CURRENT_ADDRESS - set the current file address */
 
-int _PD_set_current_address(PDBfile *file, off_t addr, int wh,
+int _PD_set_current_address(PDBfile *file, BIGINT addr, int wh,
 			    PD_major_op tag)
    {int st;
     FILE *fp;
@@ -607,9 +607,9 @@ int _PD_set_current_address(PDBfile *file, off_t addr, int wh,
  *                      - in MPI mode get collective space iff COLF is TRUE
  */
 
-off_t _PD_get_next_address(PDBfile *file, char *type, long number,
+BIGINT _PD_get_next_address(PDBfile *file, char *type, long number,
 			   void *vr, int seekf, int tellf, int colf)
-   {off_t addr;
+   {BIGINT addr;
 
     if (number == 0)
        addr = -1;
@@ -626,8 +626,8 @@ off_t _PD_get_next_address(PDBfile *file, char *type, long number,
  *         - that is set the chart address to the current file position
  */
 
-off_t _PD_eod(PDBfile *file)
-   {off_t addr;
+BIGINT _PD_eod(PDBfile *file)
+   {BIGINT addr;
 
     addr = _PD_GETSPACE(file, 0, FALSE, 0);
 
@@ -638,7 +638,7 @@ off_t _PD_eod(PDBfile *file)
 
 /* PD_ENTRY_SET_ADDRESS - return the address of the first block of EP */
 
-off_t PD_entry_set_address(syment *ep, off_t addr)
+BIGINT PD_entry_set_address(syment *ep, BIGINT addr)
    {
 
     _PD_entry_set_address(ep, 0, addr);
@@ -650,8 +650,8 @@ off_t PD_entry_set_address(syment *ep, off_t addr)
 
 /* PD_ENTRY_ADDRESS - return the address of the first block of EP */
 
-off_t PD_entry_address(syment *ep)
-   {off_t addr;
+BIGINT PD_entry_address(syment *ep)
+   {BIGINT addr;
 
     addr = _PD_entry_get_address(ep, 0);
 
@@ -945,8 +945,8 @@ BIGINT PD_set_buffer_size(BIGINT v)
 
 /* PD_GET_FILE_LENGTH - return the current file length */
 
-off_t PD_get_file_length(PDBfile *file)
-   {off_t rv;
+BIGINT PD_get_file_length(PDBfile *file)
+   {BIGINT rv;
 
     rv = _PD_GET_FILE_SIZE(file);
 
@@ -1244,7 +1244,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
 /* _PD_ADD_FREE_SPACE - add block to free list in descending size order
  */
 
-void _PD_add_free_space(PDBfile *file, off_t address, off_t size)
+void _PD_add_free_space(PDBfile *file, BIGINT address, BIGINT size)
    {PD_disk_block *block, *free, *prev;
 
     if (size > 0)
@@ -1275,8 +1275,8 @@ void _PD_add_free_space(PDBfile *file, off_t address, off_t size)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-off_t _PD_get_free_space(PDBfile *file, off_t size)
-   {off_t ret = 0;
+BIGINT _PD_get_free_space(PDBfile *file, BIGINT size)
+   {BIGINT ret = 0;
     PD_disk_block *free, *prev, *save;
 
     if ((file->free_list != NULL) && (size > 0))

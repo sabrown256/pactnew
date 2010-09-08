@@ -55,7 +55,7 @@
 #undef GETLN
 #define GETLN (*_SC_getln)
 
-#define SC_HAVE_LARGE_FILES   (sizeof(off_t) == sizeof(long long))
+#define SC_HAVE_LARGE_FILES   (sizeof(BIGINT) == sizeof(long long))
 
 /*--------------------------------------------------------------------------*/
 
@@ -156,9 +156,9 @@ struct s_file_io_desc
    {void *info;
     FILE *(*fopen)(char *name, char *mode);
     long (*ftell)(FILE *fp);
-    off_t (*lftell)(FILE *fp);
+    BIGINT (*lftell)(FILE *fp);
     int (*fseek)(FILE *fp, long offs, int whence);
-    int (*lfseek)(FILE *fp, off_t offs, int whence);
+    int (*lfseek)(FILE *fp, BIGINT offs, int whence);
     size_t (*fread)(void *ptr, size_t sz, size_t ni, FILE *fp);
     BIGUINT (*lfread)(void *ptr, size_t sz, BIGUINT ni, FILE *fp);
     size_t (*fwrite)(void *ptr, size_t sz, size_t ni, FILE *fp);
@@ -245,7 +245,7 @@ struct s_SC_mapped_file
     int (*mopenf)(const char *file, int flag, ...);
     void *(*mmapf)(void *addr, size_t len, int prot,
 		   int flags, int fd, BIGINT offs);
-    off_t (*mwritef)(int fd, const void *buf, size_t nb, BIGINT off);
+    BIGINT (*mwritef)(int fd, const void *buf, size_t nb, BIGINT off);
     void (*setup)(SC_mapped_file *mf);
     
     file_io_desc fid;};
@@ -268,7 +268,7 @@ struct s_SC_udl
     char *target;       /* data_standard for output files */
     char *format;       /* PDB, HDF5, ... */
     char *buffer;       /* I/O buffer for setvbuf */
-    off_t address;      /* file address for remote acceses */
+    BIGINT address;      /* file address for remote acceses */
     pcons *info;};      /* other attributes */
 
 
@@ -300,7 +300,7 @@ struct s_fcdes
 
 struct s_fcent
    {char *name;
-    off_t address;
+    BIGINT address;
     time_t date;
     int uid;
     int gid;
@@ -437,7 +437,7 @@ extern int
  io_ungetc(int c, FILE *fp),
  io_flush(FILE *fp),
  io_eof(FILE *fp),
- lio_seek(FILE *fp, off_t offs, int whence),
+ lio_seek(FILE *fp, BIGINT offs, int whence),
  lio_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  lio_close(FILE *fp),
  lio_printf(FILE *fp, char *fmt, ...),
@@ -466,7 +466,7 @@ extern BIGINT
  SC_file_size(FILE *fp),
  SC_file_length(char *name);
 
-extern off_t
+extern BIGINT
  lio_tell(FILE *fp),
  SC_filelen(FILE *fp);
 

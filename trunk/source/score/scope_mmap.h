@@ -26,7 +26,7 @@
 /*--------------------------------------------------------------------------*/
 
 typedef void *(*PFMMap)(void *addr, size_t len,
-			int prot, int flags, int fd, off_t offs);
+			int prot, int flags, int fd, BIGINT offs);
 
 typedef struct s_SC_io_buffer SC_io_buffer;
 
@@ -73,9 +73,9 @@ extern int
  _SC_mf_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  _SC_mf_eof(FILE *fp),
  _SC_mf_close(FILE *fp),
- _SC_mf_core_seek(FILE *fp, off_t offset, int whence);
+ _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence);
 
-extern off_t
+extern BIGINT
  _SC_mf_core_tell(FILE *fp);
 
 extern BIGUINT

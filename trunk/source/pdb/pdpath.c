@@ -109,7 +109,7 @@ struct s_parse_frame
    {locator *stack;
     long n;
     long nx;
-    off_t diskaddr;
+    BIGINT diskaddr;
     char path[MAXLINE];
     int flag;
     char *lex_bf;
@@ -192,7 +192,7 @@ void dpstack(int tid, int n)
 
 /* DSTCKTR - debugging aid */
 
-static void dstcktr(int cmnd, int i, off_t addr, long numb, int end)
+static void dstcktr(int cmnd, int i, BIGINT addr, long numb, int end)
    {int nf;
     char *cmd;
     parse_frame *fr;
@@ -330,7 +330,7 @@ long _PD_num_indirects(char *type, hasharr *tab)
 
 static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
 				 locator *stck, long n,
-				 off_t addr, long numb)
+				 BIGINT addr, long numb)
    {dimdes *dims;
     SC_array *bl;
 
@@ -365,9 +365,9 @@ static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
 static SC_array *_PD_block_index_deref(locator *stck, long n,
 					       hasharr *tab, char *type,
 					       symindir *iloc,
-					       off_t *paddr, long *pnumb)
+					       BIGINT *paddr, long *pnumb)
    {long i, bpi, nbk, nib, nbb, nit, ni;
-    off_t addr;
+    BIGINT addr;
     defstr *dp;
     SC_array *nbl, *bl;
 
@@ -440,10 +440,10 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
  *               - if noind is TRUE don't pick up the additional indirects
  */
 
-off_t _PD_skip_over(PDBfile *file, long skip, int noind)
+BIGINT _PD_skip_over(PDBfile *file, long skip, int noind)
    {int indir, itags;
     long bpi;
-    off_t addr;
+    BIGINT addr;
     FILE *fp;
     hasharr *tab;
     PD_itag itag;
@@ -507,9 +507,9 @@ off_t _PD_skip_over(PDBfile *file, long skip, int noind)
  *                     - necessary context
  */
 
-static off_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
+static BIGINT _PD_itag_deref_addr(PD_smp_state *pa, int n)
    {long numb, bpi;
-    off_t addr;
+    BIGINT addr;
     char *type;
     hasharr *tab;
     parse_frame *fr;
@@ -566,11 +566,11 @@ static off_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
  *                      - and other pointees
  */
 
-static off_t _PD_itag_index_deref(PD_smp_state *pa, int n,
+static BIGINT _PD_itag_index_deref(PD_smp_state *pa, int n,
 				  dimdes **pdims, long *pnumb)
    {int itags;
     long indx, numb, naitems, bpi, fn;
-    off_t addr;
+    BIGINT addr;
     char *type, *typc, *typp;
     SC_array *nbl;
     symindir iloc;
@@ -710,9 +710,9 @@ static off_t _PD_itag_index_deref(PD_smp_state *pa, int n,
  *                       - and other pointees
  */
 
-static off_t _PD_itag_member_deref(PD_smp_state *pa, int n)
+static BIGINT _PD_itag_member_deref(PD_smp_state *pa, int n)
    {long nsitems;
-    off_t addr;
+    BIGINT addr;
     char *type;
     parse_frame *fr;
     locator *stck;
@@ -790,7 +790,7 @@ static off_t _PD_itag_member_deref(PD_smp_state *pa, int n)
 static long _PD_itag_reduce(PD_smp_state *pa)
    {int i, nmn, nmx, cmnd;
     long numb;
-    off_t addr; 
+    BIGINT addr; 
     long val;
     char *type;
     dimdes *dims;
@@ -899,9 +899,9 @@ static long _PD_itag_reduce(PD_smp_state *pa)
  *                    - necessary context
  */
 
-static off_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
+static BIGINT _PD_ptr_deref_addr(PD_smp_state *pa, int n)
    {long i, numb, bpi;
-    off_t addr;
+    BIGINT addr;
     char *type;
     hasharr *tab;
     syment *ep;
@@ -953,11 +953,11 @@ static off_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
  *                     - and other pointees
  */
 
-static off_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
+static BIGINT _PD_ptr_index_deref(PD_smp_state *pa, int n,
                                  dimdes **pdims, long *pnumb)
    {int itags;
     long fn;
-    off_t addr;
+    BIGINT addr;
     char *type;
     SC_array *nbl;
     symindir iloc;
@@ -1015,8 +1015,8 @@ static off_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
  *                      - and other pointees
  */
 
-static off_t _PD_ptr_member_deref(PD_smp_state *pa, int n)
-   {off_t addr;
+static BIGINT _PD_ptr_member_deref(PD_smp_state *pa, int n)
+   {BIGINT addr;
     parse_frame *fr;
     locator *stck;
     PDBfile *file;
@@ -1055,7 +1055,7 @@ static off_t _PD_ptr_member_deref(PD_smp_state *pa, int n)
 static long _PD_ptr_reduce(PD_smp_state *pa)
    {int i, nmn, nmx, cmnd;
     long numb;
-    off_t addr; 
+    BIGINT addr; 
     long val;
     char *type;
     dimdes *dims;
@@ -1169,7 +1169,7 @@ static long _PD_ptr_reduce(PD_smp_state *pa)
 
 static void _PD_shift(PD_smp_state *pa, char *name, char *type,
 		      dimdes *dims, SC_array *bl, long numb,
-		      off_t addr, int indr, int cmmnd)
+		      BIGINT addr, int indr, int cmmnd)
    {
 
     if (type[0] == '\0')
@@ -1210,7 +1210,7 @@ static void _PD_do_goto(PD_smp_state *pa, char *name)
    {char *type;
     int indr;
     long numb;
-    off_t addr;
+    BIGINT addr;
     dimdes *dims;
     SC_array *bl;
     syment *ep;
@@ -1342,7 +1342,7 @@ static char *_PD_get_type_member(PDBfile *file, PD_smp_state *pa,
 /* _PD_DO_DEREF - carry out a DEREF command */
 
 static void _PD_do_deref(PD_smp_state *pa)
-   {off_t addr;
+   {BIGINT addr;
     char t[MAXLINE];
     PDBfile *file;
 
@@ -1376,7 +1376,7 @@ static void _PD_do_member(PD_smp_state *pa, char *name, int deref_flag)
    {char *type, t[MAXLINE];
     int indr;
     long numb, nsitems;
-    off_t addr;
+    BIGINT addr;
     dimdes *dims;
     defstr *dp;
     memdes *desc, *nxt;
@@ -1465,7 +1465,7 @@ static void _PD_do_member(PD_smp_state *pa, char *name, int deref_flag)
 static void _PD_do_index(PD_smp_state *pa, char *expr)
    {int indr;
     long bpi, start, stop, step, numb, doff; 
-    off_t addr;
+    BIGINT addr;
     char t[MAXLINE], s[MAXLINE];
     char *type, *tok, *pt;
     dimdes *dims;
@@ -1570,7 +1570,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 static void _PD_do_cast(PD_smp_state *pa, char *type)
    {int in;
     long n;
-    off_t da;
+    BIGINT da;
     char t[MAXLINE], s[MAXLINE];
     SC_array *bl;
     dimdes *dm;
@@ -2103,7 +2103,7 @@ syment *_PD_effective_ep(PDBfile *file, char *name, int flag, char *fullname)
     dimdes *dims;
     char *s, *type, *lname, bf[MAXLINE];
     long ni;
-    off_t addr;
+    BIGINT addr;
     symindir indr;
     SC_array *bl;
     syment *ep;

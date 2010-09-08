@@ -52,7 +52,7 @@
  */
 
 static int _PD_wr_itag_iii(PDBfile *file, long n, long nitems, char *type,
-			   off_t addr, int loc)
+			   BIGINT addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
 
@@ -502,7 +502,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
    {long bsz;
     char *name, *type, *var, *adr, *s, *local;
-    off_t addr, numb;
+    BIGINT addr, numb;
     syment *ep;
     hasharr *tab;
     memdes *desc;
@@ -564,7 +564,7 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
 static int _PD_rd_symt_iii(PDBfile *file)
    {int rv;
     long nbs;
-    off_t addr, numb;
+    BIGINT addr, numb;
     char *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -602,7 +602,7 @@ static int _PD_rd_symt_iii(PDBfile *file)
 
 static void _PD_rd_blocks_iii(PDBfile *file)
    {long j, n, nt, numb, stride, bsz;
-    off_t addr;
+    BIGINT addr;
     char *name, *token, *s, *local;
     syment *ep;
     dimdes *dim;
@@ -840,10 +840,10 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
  *                 - return -1L on error
  */
 
-static off_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
+static BIGINT _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
    {int n, nmb, ok;
     long i;
-    off_t addr;
+    BIGINT addr;
     char *bf, *nm;
     FILE *fp;
     hasharr *fc, *hc;
@@ -949,7 +949,7 @@ static off_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
 static int _PD_wr_blocks_iii(PDBfile *file)
    {int ok;
     long i, j, n, ni;
-    off_t addr;
+    BIGINT addr;
     char *nm;
     syment *ep;
     SC_array *bl;
@@ -1012,10 +1012,10 @@ static int _PD_wr_csum_iii(PDBfile *file)
  *                 - return -1L on error
  */
 
-static off_t _PD_wr_symt_iii(PDBfile *file)
+static BIGINT _PD_wr_symt_iii(PDBfile *file)
    {int n, nd, flag, ok;
     long i, nt, nb, ni, stride, mn, mx;
-    off_t addr, ad;
+    BIGINT addr, ad;
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
@@ -1206,7 +1206,7 @@ static int _PD_open_iii(PDBfile *file)
 
 /* read the trailer */
     nb = MAXLINE - 1;
-    if (lio_seek(fp, (off_t) -nb, SEEK_END))
+    if (lio_seek(fp, (BIGINT) -nb, SEEK_END))
        PD_error("FSEEK FAILED TO END - _PD_OPEN_III", PD_OPEN);
 
     nb = lio_read(str, (size_t) 1, (size_t) nb, fp);
@@ -1318,7 +1318,7 @@ static int _PD_create_iii(PDBfile *file, int mst)
  */
 
 static int _PD_write_meta_iii(PDBfile *file, FILE *out, int fh)
-   {off_t addr;
+   {BIGINT addr;
     FILE *fp;
 
     if (out == NULL)

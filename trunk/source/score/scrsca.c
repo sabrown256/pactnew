@@ -80,6 +80,38 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_SHOW_RESOURCE_USAGE - display contents of RU */
+
+void SC_show_resource_usage(SC_rusedes *ru)
+   {
+
+    io_printf(stdout, "   process id                                  = %d\n", ru->pid);
+    io_printf(stdout, "   process parent id                           = %d\n", ru->ppid);
+    io_printf(stdout, "   process user id                             = %d\n", ru->uid);
+    io_printf(stdout, "   process scheduling priority                 = %d\n", ru->priority);
+    io_printf(stdout, "   total user time used                        = %.3e\n", ru->ut);
+    io_printf(stdout, "   total system time used                      = %.3e\n", ru->st);
+    io_printf(stdout, "   maximum resident set size (in kilobytes)    = %.3e\n", ru->maxrss);
+    io_printf(stdout, "   data segment memory used (kilobyte-seconds) = %.3e\n", ru->idrss);
+    io_printf(stdout, "   stack memory used (kilobyte-seconds)        = %.3e\n", ru->isrss);
+    io_printf(stdout, "   soft page faults - reclaims                 = %.0f\n", ru->minflt);
+    io_printf(stdout, "   hard page faults - requiring I/O            = %.0f\n", ru->majflt);
+    io_printf(stdout, "   times a process was swapped out of memory   = %.0f\n", ru->nswap);
+    io_printf(stdout, "   block input operations via the file system  = %.0f\n", ru->inblock);
+    io_printf(stdout, "   block output operations via the file system = %.0f\n", ru->outblock);
+    io_printf(stdout, "   IPC messages sent                           = %.0f\n", ru->msgsnd);
+    io_printf(stdout, "   IPC messages received                       = %.0f\n", ru->msgrcv);
+    io_printf(stdout, "   signals delivered                           = %.0f\n", ru->nsignals);
+    io_printf(stdout, "   voluntary context switches                  = %.0f\n", ru->nvcsw);
+    io_printf(stdout, "   involuntary context switches                = %.0f\n", ru->nivcsw);
+    io_printf(stdout, "   system calls                                = %.0f\n", ru->nsysc);
+    io_printf(stdout, "   command line                                = %s\n", ru->cmd);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_RES_USAGE_SELF - fill RU with current resource usages
  *                    - measured from the first call
  *                    - return TRUE iff useful data was available
@@ -91,71 +123,12 @@
 static int _SC_res_usage_self(SC_rusedes *ru, int whch)
    {int rv;
 
-#ifdef HAVE_RESOURCE_USAGE
-
-    int who;
-    struct rusage r, *pr;
-    static struct rusage rs, rc;
-
-    if (whch == FALSE)
-       {who = RUSAGE_SELF;
-	pr  = &rs;}
-    else
-       {who = RUSAGE_CHILDREN;
-	pr  = &rc;};
-
-    rv = getrusage(RUSAGE_SELF, &r);
-    if (rv == 0)
-       {if (whch == FALSE)
-	   {ONCE_SAFE(TRUE, NULL)
-	       rs = r;
-	    END_SAFE;}
-        else
-	   {ONCE_SAFE(TRUE, NULL)
-	       rc = r;
-	    END_SAFE;};
-
-	ru->ut       = (r.ru_utime.tv_sec  - pr->ru_utime.tv_sec) +
-                       (r.ru_utime.tv_usec - pr->ru_utime.tv_usec)*1.0e-6;
-	ru->st       = (r.ru_stime.tv_sec  - pr->ru_stime.tv_sec) +
-                       (r.ru_stime.tv_usec - pr->ru_stime.tv_usec)*1.0e-6;
-	ru->maxrss   = r.ru_maxrss   - pr->ru_maxrss;
-	ru->idrss    = r.ru_idrss    - pr->ru_idrss;
-	ru->isrss    = r.ru_isrss    - pr->ru_isrss;
-	ru->minflt   = r.ru_minflt   - pr->ru_minflt;
-	ru->majflt   = r.ru_majflt   - pr->ru_majflt;
-	ru->nswap    = r.ru_nswap    - pr->ru_nswap;
-	ru->inblock  = r.ru_inblock  - pr->ru_inblock;
-	ru->outblock = r.ru_oublock  - pr->ru_oublock;
-	ru->msgsnd   = r.ru_msgsnd   - pr->ru_msgsnd;
-	ru->msgrcv   = r.ru_msgrcv   - pr->ru_msgrcv;
-	ru->nsignals = r.ru_nsignals - pr->ru_nsignals;
-	ru->nvcsw    = r.ru_nvcsw    - pr->ru_nvcsw;
-	ru->nivcsw   = r.ru_nivcsw   - pr->ru_nivcsw;}
-
-    else
-       {ru->ut       = 0.0;
-	ru->st       = 0.0;
-	ru->maxrss   = 0.0;
-	ru->idrss    = 0.0;
-	ru->isrss    = 0.0;
-	ru->minflt   = 0.0;
-	ru->majflt   = 0.0;
-	ru->nswap    = 0.0;
-	ru->inblock  = 0.0;
-	ru->outblock = 0.0;
-	ru->msgsnd   = 0.0;
-	ru->msgrcv   = 0.0;
-	ru->nsignals = 0.0;
-	ru->nvcsw    = 0.0;
-	ru->nivcsw   = 0.0;};
-
-    rv = (rv == 0);
-
-#else
-
     rv = FALSE;
 
+    ru->pid      = getpid();
+    ru->ppid     = getppid();
+    ru->uid      = 0;
+    ru->priority = 0;
     ru->ut       = 0.0;
     ru->st       = 0.0;
     ru->maxrss   = 0.0;
@@ -171,6 +144,52 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
     ru->nsignals = 0.0;
     ru->nvcsw    = 0.0;
     ru->nivcsw   = 0.0;
+    ru->nsysc    = 0.0;
+    ru->cmd[0]   = '\0';
+
+#ifdef HAVE_RESOURCE_USAGE
+
+    {int who;
+     struct rusage r, *pr;
+     static struct rusage rs, rc;
+
+     if (whch == FALSE)
+        {who = RUSAGE_SELF;
+	 pr  = &rs;}
+     else
+        {who = RUSAGE_CHILDREN;
+	 pr  = &rc;};
+
+     rv = getrusage(RUSAGE_SELF, &r);
+     if (rv == 0)
+        {if (whch == FALSE)
+	    {ONCE_SAFE(TRUE, NULL)
+	        rs = r;
+	     END_SAFE;}
+         else
+	    {ONCE_SAFE(TRUE, NULL)
+	        rc = r;
+	     END_SAFE;};
+
+	 ru->ut       = (r.ru_utime.tv_sec  - pr->ru_utime.tv_sec) +
+                        (r.ru_utime.tv_usec - pr->ru_utime.tv_usec)*1.0e-6;
+	 ru->st       = (r.ru_stime.tv_sec  - pr->ru_stime.tv_sec) +
+                        (r.ru_stime.tv_usec - pr->ru_stime.tv_usec)*1.0e-6;
+	 ru->maxrss   = r.ru_maxrss   - pr->ru_maxrss;
+	 ru->idrss    = r.ru_idrss    - pr->ru_idrss;
+	 ru->isrss    = r.ru_isrss    - pr->ru_isrss;
+	 ru->minflt   = r.ru_minflt   - pr->ru_minflt;
+	 ru->majflt   = r.ru_majflt   - pr->ru_majflt;
+	 ru->nswap    = r.ru_nswap    - pr->ru_nswap;
+	 ru->inblock  = r.ru_inblock  - pr->ru_inblock;
+	 ru->outblock = r.ru_oublock  - pr->ru_oublock;
+	 ru->msgsnd   = r.ru_msgsnd   - pr->ru_msgsnd;
+	 ru->msgrcv   = r.ru_msgrcv   - pr->ru_msgrcv;
+	 ru->nsignals = r.ru_nsignals - pr->ru_nsignals;
+	 ru->nvcsw    = r.ru_nvcsw    - pr->ru_nvcsw;
+	 ru->nivcsw   = r.ru_nivcsw   - pr->ru_nivcsw;};
+
+     rv = (rv == 0);};
 
 #endif
 

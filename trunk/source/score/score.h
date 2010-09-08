@@ -476,7 +476,7 @@ struct s_SC_ntree
 
 union u_SC_address
    {long mdiskaddr;
-    off_t diskaddr;
+    BIGINT diskaddr;
     PFInt funcaddr;
     char *memaddr;};
 
@@ -1160,6 +1160,9 @@ extern PFTid
 
 
 /* SCRSCA.C declarations */
+
+extern void
+ SC_show_resource_usage(SC_rusedes *ru);
 
 extern int
  SC_resource_usage(SC_rusedes *ru, int pid),
