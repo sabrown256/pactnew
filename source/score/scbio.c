@@ -138,7 +138,7 @@ static INLINE void _SC_bio_audit(bio_desc *bid, char *tag)
 
 /* _SC_BIO_SET_ADDR - update the address and size of BID */
 
-static INLINE off_t _SC_bio_set_addr(bio_desc *bid, off_t addr, int chsz,
+static INLINE BIGINT _SC_bio_set_addr(bio_desc *bid, BIGINT addr, int chsz,
 				     char *tag)
    {
 
@@ -211,7 +211,7 @@ static void _SC_bio_free(bio_desc *bid, int total)
 #ifndef USE_C_BUFFERED_IO
 
 static int
- _SC_bio_seek(bio_desc *bid, off_t offs, int wh);
+ _SC_bio_seek(bio_desc *bid, BIGINT offs, int wh);
 
 /*--------------------------------------------------------------------------*/
 
@@ -231,7 +231,7 @@ static void _SC_bfr_mark(bio_frame *fr, bio_kind rw, int fl)
 
 /* _SC_BFR_INIT - initialize a buffered io frame */
 
-static void _SC_bfr_init(bio_frame *fr, off_t addr, size_t bfsz)
+static void _SC_bfr_init(bio_frame *fr, BIGINT addr, size_t bfsz)
    {
 
     if (fr != NULL)
@@ -256,7 +256,7 @@ static void _SC_bfr_init(bio_frame *fr, off_t addr, size_t bfsz)
 
 /* _SC_BFR_ALLOC - initialize a buffered io frame */
 
-static bio_frame *_SC_bfr_alloc(off_t addr, size_t bfsz)
+static bio_frame *_SC_bfr_alloc(BIGINT addr, size_t bfsz)
    {bio_frame *fr;
 
     fr = FMAKE(bio_frame, "_SC_BFR_ALLOC:fr");
@@ -295,7 +295,7 @@ static void _SC_bio_buffer(bio_desc *bid, size_t bfsz)
  */
 
 static BIGINT _SC_bfr_infill(bio_frame *fd, bio_frame *fs)
-   {off_t fdi[3], fsi[3], fsr, fdr;
+   {BIGINT fdi[3], fsi[3], fsr, fdr;
     BIGINT nb, ov[2], no[2];
     unsigned char *ps, *pd;
 
@@ -343,7 +343,7 @@ static BIGINT _SC_bfr_infill(bio_frame *fd, bio_frame *fs)
  */
 
 static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
-   {off_t fdi[3], fsi[3], fdw, fsw;
+   {BIGINT fdi[3], fsi[3], fdw, fsw;
     BIGINT nb, ov[2], no[2];
     unsigned char *ps, *pd;
 
@@ -394,7 +394,7 @@ static BIGINT _SC_bfr_outfill(bio_frame *fd, bio_frame *fs)
 
 static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
    {int n, ok, nw;
-    off_t fi[2], ad, nb;
+    BIGINT fi[2], ad, nb;
 	
     if ((fr->rw == BIO_WRITE) && (fl == TRUE))
        {nb    = fr->nb;
@@ -428,9 +428,9 @@ static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
 
 /* _SC_BFR_CONTAINS - return a stack frame which contains ADDR */
 
-static bio_frame *_SC_bfr_contains(bio_desc *bid, off_t addr)
+static bio_frame *_SC_bfr_contains(bio_desc *bid, BIGINT addr)
    {int i, n;
-    off_t fi[2];
+    BIGINT fi[2];
     bio_frame *fr, *rv;
 
     rv = NULL;
@@ -454,7 +454,7 @@ static bio_frame *_SC_bfr_contains(bio_desc *bid, off_t addr)
 
 static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
    {int i, n, imn;
-    off_t fi[2], ri[2], lmn;
+    BIGINT fi[2], ri[2], lmn;
     bio_frame *fa, *frn, *rv;
 
     rv = NULL;
@@ -462,7 +462,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
        {ri[0] = fr->addr;
 	ri[1] = ri[0] + fr->sz;
 
-        lmn = 1LL << (8*sizeof(off_t) - 2);
+        lmn = 1LL << (8*sizeof(BIGINT) - 2);
 	imn = -1;
 	frn = NULL;
 
@@ -506,7 +506,7 @@ static bio_frame *_SC_bfr_next(bio_desc *bid, bio_frame *fr)
 
 static void _SC_bfr_remove_overlap(bio_desc *bid, bio_frame *fr, bio_kind rw)
    {int i, n, fl;
-    off_t ri[2], fi[2];
+    BIGINT ri[2], fi[2];
     bio_frame *fa;
 
     if ((bid->stack != NULL) && (fr != NULL))
@@ -550,7 +550,7 @@ static void _SC_bfr_push(bio_desc *bid, bio_frame *fr, int rm)
 
 static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
    {int ok;
-    off_t ad, sz;
+    BIGINT ad, sz;
     bio_kind rw;
 
     ok = (fr == NULL);
@@ -590,7 +590,7 @@ static bio_frame *_SC_bfr_read_setup(bio_desc *bid, bio_frame *fr)
  *                  - of size BSZ
  */
 
-static void _SC_bio_read_opt(bio_desc *bid, char *mode, off_t bsz)
+static void _SC_bio_read_opt(bio_desc *bid, char *mode, BIGINT bsz)
    {
 
 
@@ -602,7 +602,7 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, off_t bsz)
 
 #if 0
     int fd, rv;
-    off_t sz;
+    BIGINT sz;
     struct stat bf;
     bio_frame *fr;
 
@@ -637,9 +637,9 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, off_t bsz)
 
 /* _SC_BIO_SEEK - seek to location in file */
 
-static int _SC_bio_seek(bio_desc *bid, off_t offs, int wh)
+static int _SC_bio_seek(bio_desc *bid, BIGINT offs, int wh)
    {int ret;
-    off_t addr;
+    BIGINT addr;
 
     ret = 0;
 
@@ -692,7 +692,7 @@ static int _SC_bio_seek(bio_desc *bid, off_t offs, int wh)
 
 /* _SC_BIO_TELL - small file method for ftell */
 
-static off_t _SC_bio_tell(bio_desc *bid)
+static BIGINT _SC_bio_tell(bio_desc *bid)
    {long ret;
 
     ret = bid->curr;
@@ -706,9 +706,9 @@ static off_t _SC_bio_tell(bio_desc *bid)
 
 /* _SC_VERIFY_FILE - verify the NB bytes in FD starting at AD match BF */
 
-static int _SC_verify_file(int fd, off_t ad, off_t nb, unsigned char *bf)
+static int _SC_verify_file(int fd, BIGINT ad, BIGINT nb, unsigned char *bf)
    {int ok;
-    off_t i, rad, st;
+    BIGINT i, rad, st;
     unsigned char *cbf;
 
     rad = lseek(fd, 0, SEEK_CUR);
@@ -739,7 +739,7 @@ static int _SC_verify_file(int fd, off_t ad, off_t nb, unsigned char *bf)
 
 static int _SC_check_read(bio_desc *bid, bio_frame *rq)
    {int fd, ok;
-    off_t cad, oad, nb;
+    BIGINT cad, oad, nb;
     unsigned char *rbf;
 
     ok = TRUE;
@@ -762,7 +762,7 @@ static int _SC_check_read(bio_desc *bid, bio_frame *rq)
 
 static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
    {int fd, ok;
-    off_t cad, rad, nbr, bad, nbb;
+    BIGINT cad, rad, nbr, bad, nbb;
     static int count = 1;
 
     ok = TRUE;
@@ -801,7 +801,7 @@ static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
 
 static int _SC_check_buf(bio_desc *bid)
    {int i, j, n, ok;
-    off_t ri[2], fi[2];
+    BIGINT ri[2], fi[2];
     bio_frame *fa;
 
     ok = TRUE;
@@ -852,7 +852,7 @@ int SC_check_file(FILE *fp)
 /* _SC_BIO_IN - buffer BF in from BID */
 
 static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
-   {off_t na, nr, nb, nba;
+   {BIGINT na, nr, nb, nba;
 
     nb = bpi*ni;
     nr = 0;
@@ -868,8 +868,8 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 #else
 
    {int ok;
-    off_t nbc, ad;
-    off_t bsz, olc, nlc;
+    BIGINT nbc, ad;
+    BIGINT bsz, olc, nlc;
     bio_frame *fr, rq;
 
     nba = bid->sz - bid->curr;
@@ -939,7 +939,7 @@ static BIGINT _SC_bio_in(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 /* _SC_BIO_OUT - buffer BF out to BID */
 
 static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
-   {off_t na, nb, nw;
+   {BIGINT na, nb, nw;
 
     nb = bpi*ni;
     nw = 0;
@@ -954,7 +954,7 @@ static BIGINT _SC_bio_out(void *bf, BIGINT bpi, BIGINT ni, bio_desc *bid)
 
 #else
 
-   {off_t nbc, nbw, ad;
+   {BIGINT nbc, nbw, ad;
     bio_frame *fr, rq;
 
     if (bid->stack == NULL)
@@ -1101,7 +1101,7 @@ static size_t _SC_bwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 /* _SC_BLSEEK - large file method for fseek */
 
-static int _SC_blseek(FILE *fp, off_t offs, int wh)
+static int _SC_blseek(FILE *fp, BIGINT offs, int wh)
    {int ret;
 
     ACCESS(fp);
@@ -1115,8 +1115,8 @@ static int _SC_blseek(FILE *fp, off_t offs, int wh)
 
 /* _SC_BLTELL - large file method for ftell */
 
-static off_t _SC_bltell(FILE *fp)
-   {off_t ret;
+static BIGINT _SC_bltell(FILE *fp)
+   {BIGINT ret;
 
     ACCESS(fp);
 
@@ -1323,7 +1323,7 @@ static int _SC_beof(FILE *fp)
 
 static char *_SC_bgets(char *s, int n, FILE *fp)
    {int i, nbr, nb;
-    off_t pos;
+    BIGINT pos;
     char *r;
 
     ACCESS(fp);

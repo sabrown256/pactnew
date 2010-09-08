@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 09/02/2010
+MOD: 09/08/2010
 
 <CENTER>
 <P>
@@ -6553,7 +6553,7 @@ In the FORTRAN binding this function returns 1 if successful, 0 otherwise.
 
 <p>
 <pre>
-<i>C Binding: </i>  off_t PD_get_file_length(PDBfile *file)
+<i>C Binding: </i>  BIGINT PD_get_file_length(PDBfile *file)
 <i>F77 Binding: </i>integer PFGFLN(integer fileid,
                             integer len)
 <i>SX Binding: </i> 
@@ -6576,7 +6576,7 @@ returned and an error message may be retrieved by invoking function <tt>PFGERR</
 <b>C Example</b>
 <pre>
        PDBfile *file;
-       off_t ln;
+       BIGINT ln;
              .
              .
              .

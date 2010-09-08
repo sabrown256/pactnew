@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 10/29/2009
+MOD: 09/08/2010
 
 <CENTER>
 <P>
@@ -2101,7 +2101,7 @@ theta equal to 90 degrees.<p>
 
 <p>
 
-<I>C Binding: </I>off_t PG_get_buffer_size(void)
+<I>C Binding: </I>BIGINT PG_get_buffer_size(void)
 <BR><I>F77 Binding: </I>integer pgsbsz(integer sz)
 <BR><I>SX Binding: </I>(pg-get-buffer-size)
 <P>
@@ -2458,7 +2458,7 @@ Set the width of the window border in pixels.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_buffer_size(off_t sz)
+<I>C Binding: </I>void PG_set_buffer_size(BIGINT sz)
 <BR><I>F77 Binding: </I>integer pgsbsz(integer sz)
 <BR><I>SX Binding: </I>(pg-set-bbuffer-size! sz)
 <P>

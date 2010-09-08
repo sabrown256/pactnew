@@ -743,7 +743,7 @@ static int run_tests(char *path, int rank, int numprocs)
 int main(int c, char **v)
    {int i, n, pow2, rank, numprocs, success;
     long bc;
-    off_t bsz;
+    BIGINT bsz;
     char path[MAXLINE], msg[MAXLINE];
 
     strcpy(path, ".");

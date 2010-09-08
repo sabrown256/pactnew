@@ -108,8 +108,8 @@ typedef struct s_PD_Pfile PD_Pfile;
 
 struct s_PD_address
    {int indx;                  /* indx for /&ptrs - possible future use */
-    off_t addr;                /* disk address of start of data or itag */
-    off_t reta;                /* disk address of end of data */
+    BIGINT addr;                /* disk address of start of data or itag */
+    BIGINT reta;                /* disk address of end of data */
     syment *entry;             /* symbol table entry */
     char *ptr;                 /* memory address of data */
     int written;};             /* flag--1 if data written, 0 if not */
@@ -258,29 +258,29 @@ extern void
  _PD_block_copy(syment *nsym, syment *osym),
  _PD_block_switch(syment *ep, SC_array *bln),
  _PD_block_truncate(syment *ep, long ni),
- _PD_block_get_desc(off_t *paddr, long *pni, SC_array *bl, long n),
- _PD_block_set_desc(off_t addr, long ni, SC_array *bl, long n);
+ _PD_block_get_desc(BIGINT *paddr, long *pni, SC_array *bl, long n),
+ _PD_block_set_desc(BIGINT addr, long ni, SC_array *bl, long n);
 
 extern int
  _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig),
  _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig),
  _PD_block_set_valid(SC_array *bl, long n, PD_block_type vl),
- _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, off_t addr),
+ _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, BIGINT addr),
  _PD_block_define(PDBfile *file),
  _PD_block_csum_write(PDBfile *file, syment *ep, char *name),
  _PD_block_csum_read(PDBfile *file);
 
 extern long
- _PD_effective_addr(off_t *paddr, long *pnitems,
+ _PD_effective_addr(BIGINT *paddr, long *pnitems,
 		    int bpi, SC_array *da),
  _PD_block_get_number(SC_array *bl, long n),
  _PD_block_set_number(SC_array *bl, long n, long ni),
  _PD_n_blocks(syment *ep),
- _PD_block_find(PDBfile *file, syment *ep, off_t addr);
+ _PD_block_find(PDBfile *file, syment *ep, BIGINT addr);
 
-extern off_t
+extern BIGINT
  _PD_block_get_address(SC_array *bl, long n),
- _PD_block_set_address(SC_array *bl, long n, off_t addr);
+ _PD_block_set_address(SC_array *bl, long n, BIGINT addr);
 
 
 /* PDBMM.C declarations */
@@ -302,7 +302,7 @@ extern data_alignment
  *_PD_mk_alignment(char *vals);
 
 extern syment
- *_PD_mk_syment(char *type, long numb, off_t addr, symindir *indr, dimdes *dims);
+ *_PD_mk_syment(char *type, long numb, BIGINT addr, symindir *indr, dimdes *dims);
 
 extern defstr
  *_PD_defstr_copy(defstr *dp),
@@ -372,7 +372,7 @@ extern int
  _PD_csum_reserve(PDBfile *file),
  _PD_csum_file_write(PDBfile *file);
 
-extern off_t
+extern BIGINT
  _PD_locate_checksum(PDBfile* file);
 
 
@@ -472,11 +472,11 @@ extern int
  _PD_safe_flush(PDBfile *file),
  _PD_remove_type(PDBfile *file, char *name),
  _PD_rev_chrt(hasharr *ch),
- _PD_set_current_address(PDBfile *file, off_t addr, int wh, PD_major_op tag),
+ _PD_set_current_address(PDBfile *file, BIGINT addr, int wh, PD_major_op tag),
  _PD_init_s(void),
  _PD_close(PDBfile *file);
 
-extern off_t
+extern BIGINT
  _PD_eod(PDBfile *file),
  _PD_get_next_address(PDBfile *file, char *type, long number, void *vr,
 		      int seekf, int tellf, int colf),
@@ -516,7 +516,7 @@ extern long
  _PD_str_size(memdes *str, hasharr *tab),
  _PD_lookup_size(char *s, hasharr *tab);
 
-extern off_t
+extern BIGINT
  _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc);
 
 extern int
@@ -548,7 +548,7 @@ extern long
  _PD_num_indirects(char *type, hasharr *tab),
  _PD_member_items(char *s);
 
-extern off_t
+extern BIGINT
  _PD_skip_over(PDBfile *file, long skip, int noind);
 
 extern char
@@ -584,7 +584,7 @@ extern int
 extern long
  _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write),
  _PD_ptr_get_index(PDBfile *file, char *bf),
- _PD_ptr_read(PDBfile *file, off_t addr, int force),
+ _PD_ptr_read(PDBfile *file, BIGINT addr, int force),
  _PD_ptr_fix(PDBfile *file, long n);
 
 extern void
@@ -593,8 +593,8 @@ extern void
  _PD_ptr_init_apl(PDBfile *file),
  _PD_ptr_free_apl(PDBfile *file),
  _PD_index_ptr(char *p, int i),
- _PD_ptr_rd_install_addr(PDBfile *file, off_t addr, int loc),
- _PD_ptr_wr_syment(PDBfile *file, long n, char *type, long nitems, off_t addr),
+ _PD_ptr_rd_install_addr(PDBfile *file, BIGINT addr, int loc),
+ _PD_ptr_wr_syment(PDBfile *file, long n, char *type, long nitems, BIGINT addr),
  _PD_ptr_open_setup(PDBfile *file);
 
 extern syment
@@ -624,9 +624,9 @@ extern long
 	       char *outtype),
  _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr);
 
-extern off_t
+extern BIGINT
  _PD_annotate_text(PDBfile *file, syment *ep, char *name,
-		   off_t addr, void *vr);
+		   BIGINT addr, void *vr);
 
 extern dimdes
  *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims);

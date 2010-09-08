@@ -309,8 +309,8 @@ struct s_data_standard
 typedef struct s_PD_disk_block PD_disk_block;  /* move up with other typedefs */
 
 struct s_PD_disk_block
-   {off_t addr;                       /* address of the disk block */
-    off_t size;                       /* size in bytes */
+   {BIGINT addr;                       /* address of the disk block */
+    BIGINT size;                       /* size in bytes */
     struct s_PD_disk_block *prev;
     struct s_PD_disk_block *next;};
 #endif
@@ -371,10 +371,10 @@ struct s_PDBfile
 #endif
     int mpi_file;
     int mpi_mode;                        /* serial (1) parallel (0) */
-    off_t maximum_size;                  /* for file family bookkeeping */
-    off_t headaddr;
-    off_t symtaddr;
-    off_t chrtaddr;
+    BIGINT maximum_size;                  /* for file family bookkeeping */
+    BIGINT headaddr;
+    BIGINT symtaddr;
+    BIGINT chrtaddr;
     PD_checksum_mode use_cksum;          /* session use of checksums */
     PD_checksum_mode file_cksum;         /* file use of checksums */
     int fix_denorm;
@@ -389,7 +389,7 @@ struct s_PDBfile
     int (*open)(PDBfile *file);
     int (*flush)(PDBfile *file);
 
-    off_t (*wr_symt)(PDBfile *file);
+    BIGINT (*wr_symt)(PDBfile *file);
     int (*parse_symt)(PDBfile *file, char *bf, int flag);
 
     int (*wr_meta)(PDBfile *file, FILE *out, int fh);
@@ -397,7 +397,7 @@ struct s_PDBfile
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
     int (*wr_itag)(PDBfile *file, long n, long nitems, char *type,
-		   off_t addr, int flag);
+		   BIGINT addr, int flag);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 
     int (*wr_fmt)(PDBfile *file);};
@@ -519,7 +519,7 @@ struct s_defstr
 struct s_PD_itag
    {long nitems;                              /* number of items pointed to */
     char *type;                                  /* type of item pointed to */
-    off_t addr;                          /* address of the itag owning data */
+    BIGINT addr;                          /* address of the itag owning data */
     int flag;                            /* TRUE if this itag owns the data */
     int length;};          /* byte length of the itag - not written to file */
 
@@ -654,22 +654,22 @@ struct s_PD_pfm_fnc
     int (*flush_file)(PDBfile *file);
     int (*extend_file)(PDBfile *file, long nb);
     int (*serial_flush)(FILE *fp, int _t_index);
-    int (*set_eod)(PDBfile *file, off_t addr, long nb);
+    int (*set_eod)(PDBfile *file, BIGINT addr, long nb);
     int (*is_dp_init)(void);
     int (*is_smp_init)(void);
     int (*is_null_fp)(void *fp);
     int (*is_sequential)(void);
     int (*is_master)(PDBfile *file);
-    off_t (*get_file_size)(PDBfile *fp);
-    off_t (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
-    off_t (*next_address)(PDBfile *file, char *type, long number,
+    BIGINT (*get_file_size)(PDBfile *fp);
+    BIGINT (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
+    BIGINT (*next_address)(PDBfile *file, char *type, long number,
 			  void *vr, int seekf, int tellf, int colf);
     void (*setup_mp_file)(PDBfile *file, SC_communicator comm);
     void (*init)(void);
-    void (*add_file)(PDBfile *file, off_t start_addr);
+    void (*add_file)(PDBfile *file, BIGINT start_addr);
     void (*remove_file)(FILE *file);
     void (*mark_as_flushed)(PDBfile *file, int wh);
-    void (*set_address)(PDBfile *file, off_t addr);};
+    void (*set_address)(PDBfile *file, BIGINT addr);};
 
 #ifdef __cplusplus
 extern "C" {
@@ -1042,8 +1042,8 @@ extern BIGINT
  PD_get_buffer_size(void),
  PD_set_buffer_size(BIGINT v);
 
-extern off_t
- PD_entry_set_address(syment *ep, off_t a),
+extern BIGINT
+ PD_entry_set_address(syment *ep, BIGINT a),
  PD_entry_address(syment *ep),
  PD_get_file_length(PDBfile *file);
 

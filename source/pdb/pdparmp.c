@@ -80,7 +80,7 @@ typedef struct s_PD_MP_request PD_MP_request;
 
 struct s_pfelement
    {int available;   /* is this element available for use */
-    off_t addr;      /* current disk address */
+    BIGINT addr;      /* current disk address */
     char *name;      /* filename */
     int nflushed;    /* num of processes who have flushed this pfile */
     int nprocs;      /* num of processes total */
@@ -193,7 +193,7 @@ static int _PD_is_null_fp_d(void *fp)
 
 /* _PD_MPTELL - do an ftell on the parallel file */
 
-static off_t _PD_mptell(FILE *stream)
+static BIGINT _PD_mptell(FILE *stream)
    {long addr;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -212,7 +212,7 @@ static off_t _PD_mptell(FILE *stream)
 
 /* _PD_MPSEEK - do an fseek on the parallel file */
 
-static int _PD_mpseek(FILE *stream, off_t offset, int whence)
+static int _PD_mpseek(FILE *stream, BIGINT offset, int whence)
    {int rv, fail;
     PD_Pfile *pf;
     MPI_Offset moffset, rmoffset;
@@ -865,7 +865,7 @@ static int _PD_pfm_is_master_d(PDBfile *file)
  *               - return the ID 
  */
 
-static int _PD_pfm_add_d(PDBfile *file, off_t start_addr)
+static int _PD_pfm_add_d(PDBfile *file, BIGINT start_addr)
    {int i, ins;
     PD_Pfile *pf;
     pfelement *fe;
@@ -917,12 +917,12 @@ static int _PD_pfm_add_d(PDBfile *file, off_t start_addr)
  *                    - IGNORES start_addr argument (why?)
  */
 
-static void _PD_pfm_add_file_d(PDBfile *file, off_t start_addr)
+static void _PD_pfm_add_file_d(PDBfile *file, BIGINT start_addr)
    {PD_Pfile *pf;
 
     pf = FILE_IO_INFO(PD_Pfile, file->stream);
 
-    pf->mp_id = _PD_pfm_add_d(file, (off_t) 0);
+    pf->mp_id = _PD_pfm_add_d(file, (BIGINT) 0);
 
     return;}
 
@@ -1017,9 +1017,9 @@ static long _PD_pfm_buffer_mp_req(char *type, void *request, char **buffer)
  *                      - and increment it to reserve space in threaded mode
  */
 
-static off_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
+static BIGINT _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
    {long nbuf;
-    off_t rv;
+    BIGINT rv;
     char *mpbuf;
     PD_MP_GETSPACE_req space_req;
     MPI_Comm comm;
@@ -1051,7 +1051,7 @@ static off_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
 
         MPI_Send(mpbuf, nbuf, MPI_BYTE, _PD.mp_master_proc,
                  PD_MP_GETSPACE, comm);
-        MPI_Recv(&rv, sizeof(off_t), 
+        MPI_Recv(&rv, sizeof(BIGINT), 
                  MPI_BYTE, _PD.mp_master_proc,
                  PD_MP_GETSPACE, comm, &stat);
 
@@ -1071,8 +1071,8 @@ static off_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
  *                      - processes
  */
 
-static off_t _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
-   {off_t rv;
+static BIGINT _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
+   {BIGINT rv;
     PD_Pfile *pf;
     MPI_Comm comm;
     SC_THREAD_ID(tid);
@@ -1086,7 +1086,7 @@ static off_t _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
 
     if (file->mpi_file)
        {comm = (MPI_Comm) _PD.mp_comm;
-	MPI_Bcast(&rv, sizeof(off_t), MPI_BYTE, _PD.mp_master_proc, comm);};
+	MPI_Bcast(&rv, sizeof(BIGINT), MPI_BYTE, _PD.mp_master_proc, comm);};
     
     DISK(tid, pf) = rv;
 
@@ -1101,10 +1101,10 @@ static off_t _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
  *                    - and increment it to reserve space in threaded mode
  */
 
-static off_t _PD_pfm_getspace_d(PDBfile *file, size_t nbytes,
+static BIGINT _PD_pfm_getspace_d(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
    {int id;
-    off_t rv;
+    BIGINT rv;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
 
@@ -1187,8 +1187,8 @@ static int _PD_pfm_remote_shutdown(void)
  *                         - in the input buffer
  */
 
-static off_t _PD_pfm_remote_getspace(char *buf)
-   {off_t rv;
+static BIGINT _PD_pfm_remote_getspace(char *buf)
+   {BIGINT rv;
     PDBfile *inf;
     PD_MP_GETSPACE_req req;
 
@@ -1248,7 +1248,7 @@ static int _PD_pfm_remote_flush(char *buf)
 
 static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
    {int rv, id, done, shutdown;
-    off_t space;
+    BIGINT space;
     MPI_Request request;
 
     done     = 0;
@@ -1261,7 +1261,7 @@ static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
        {case PD_MP_GETSPACE :
              DBG("of type PD_MP_GETSPACE");
              space = _PD_pfm_remote_getspace(req.buf);
-             MPI_Send(&space, sizeof(off_t), MPI_BYTE, req.sender, PD_MP_GETSPACE, comm);
+             MPI_Send(&space, sizeof(BIGINT), MPI_BYTE, req.sender, PD_MP_GETSPACE, comm);
              break; 
              
         case PD_MP_FLUSH :
@@ -1436,10 +1436,10 @@ static void _PD_pfm_setup_mp_file_d(PDBfile *file, SC_communicator comm)
  *                    - this a worker for _PD_get_next_address
  */
 
-static off_t _PD_next_address_d(PDBfile *file, char *type, long number,
+static BIGINT _PD_next_address_d(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int flag;
-    off_t addr;
+    BIGINT addr;
     size_t nb, bpi;
 
     DBG("+ _PD_next_address_d");
@@ -1496,9 +1496,9 @@ static BF_FILE *_PD_get_file_ptr_d(FILE *file)
 
 /* _PD_GET_FILE_SIZE_D - return the file size */
 
-static off_t _PD_get_file_size_d(PDBfile *file)
+static BIGINT _PD_get_file_size_d(PDBfile *file)
    {int status;
-    off_t rv;
+    BIGINT rv;
     MPI_Offset sz;
     PD_Pfile *pf;
     MPI_File *fp;
@@ -1528,7 +1528,7 @@ static int _PD_pfm_extend_file_d(PDBfile *file, long nb)
 
 /* _PD_SET_EOD_D - reset the EOD point in the file */
 
-static int _PD_set_eod_d(PDBfile *file, off_t addr, long nb)
+static int _PD_set_eod_d(PDBfile *file, BIGINT addr, long nb)
    {
 
     file->chrtaddr = addr;
@@ -1668,7 +1668,7 @@ static int _PD_pfm_flush_file_d(PDBfile *file)
 
 /* _PD_PFM_SETADDR_D - set the next available address for writing to ADDR */
 
-static void _PD_pfm_setaddr_d(PDBfile *file, off_t addr)
+static void _PD_pfm_setaddr_d(PDBfile *file, BIGINT addr)
    {int id;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);

@@ -1158,7 +1158,7 @@ BIGUINT _SC_mf_core_write(void *bf, size_t sz, BIGUINT ni, FILE *fp)
  *                  - ala the fseek system call
  */
 
-int _SC_mf_core_seek(FILE *fp, off_t offset, int whence)
+int _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence)
    {int ret;
 
 #ifdef HAVE_MMAP
@@ -1211,12 +1211,12 @@ int _SC_mf_core_seek(FILE *fp, off_t offset, int whence)
 
 /* _SC_MF_CORE_TELL - return the current logical location
  *                  - ala the ftell C library call
- *                  - NOTE: BIGUINT and off_t are the same size
- *                  - when using large files so use standard off_t
+ *                  - NOTE: BIGUINT and BIGINT are the same size
+ *                  - when using large files so use standard BIGINT
  */
 
-off_t _SC_mf_core_tell(FILE *fp)
-   {off_t pos;
+BIGINT _SC_mf_core_tell(FILE *fp)
+   {BIGINT pos;
 
 #ifdef HAVE_MMAP
 

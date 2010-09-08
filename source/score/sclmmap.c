@@ -71,8 +71,8 @@ static BIGUINT _SC_lmf_read(void *bf, size_t sz, BIGUINT ni, FILE *stream)
 
 /* _SC_LMF_MWRITE - mwrite method for memory mapped files */
 
-static off_t _SC_lmf_mwrite(int fd, const void *buf, size_t nb, BIGINT off)
-   {off_t rv;
+static BIGINT _SC_lmf_mwrite(int fd, const void *buf, size_t nb, BIGINT off)
+   {BIGINT rv;
 
     rv = pwrite64(fd, buf, nb, off);
 

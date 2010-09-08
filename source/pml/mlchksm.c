@@ -370,7 +370,7 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
  
 void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
 			   unsigned char *dig)
-   {off_t sz, ln;
+   {BIGINT sz, ln;
     BIGUINT ib, nb;
     unsigned char *p;
     PM_MD5_CTX mc;
@@ -378,7 +378,7 @@ void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
     nb = ni*bpi;
 
 /* read the arr in 1024 byte (1 kB) chunks */
-    sz = (off_t) 1024;
+    sz = (BIGINT) 1024;
     
 #if 0
     {double t0, rate;

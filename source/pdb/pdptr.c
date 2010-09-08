@@ -418,7 +418,7 @@ static long _PD_ptr_find_ptr(PDBfile *file, void *vr)
  *                   - return -1 if there is no list or if ADDR is invalid
  */
 
-static long _PD_ptr_find_addr(PDBfile *file, off_t addr)
+static long _PD_ptr_find_addr(PDBfile *file, BIGINT addr)
    {long i, ni;
     PD_address *ad;
 
@@ -591,7 +591,7 @@ int _PD_ptr_entry_itag(PDBfile *file, int n, PD_itag *pi)
 
 /* _PD_PTR_REMOVE_RD - remove ADDR from the read pointer lists of FILE */
 
-static void _PD_ptr_remove_rd(PDBfile *file, off_t addr)
+static void _PD_ptr_remove_rd(PDBfile *file, BIGINT addr)
    {long i, ni;
     PD_address *ada, *adb;
     SC_array *ap;
@@ -714,7 +714,7 @@ long _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
 int _PD_ptr_wr_itags(PDBfile *file, void *vr, long nitems, char *type)
    {int rv, loc;
     long n;
-    off_t addr;
+    BIGINT addr;
     PD_address *ad;
 
 /* save the address of the itag because
@@ -789,7 +789,7 @@ static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
  *                   - return TRUE in PFRST the first time ADDR is seen
  */
 
-static long _PD_ptr_rd_lookup(PDBfile *file, off_t addr, int *pfrst)
+static long _PD_ptr_rd_lookup(PDBfile *file, BIGINT addr, int *pfrst)
    {int frst;
     long i, ni;
     PD_address *ad;
@@ -828,10 +828,10 @@ static long _PD_ptr_rd_lookup(PDBfile *file, off_t addr, int *pfrst)
  *                         - pointer list for FILE 
  */
 
-void _PD_ptr_rd_install_addr(PDBfile *file, off_t addr, int loc)
+void _PD_ptr_rd_install_addr(PDBfile *file, BIGINT addr, int loc)
    {int frst;
     long i;
-    off_t here;
+    BIGINT here;
     PD_address *ad;
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
@@ -860,7 +860,7 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 			      int *pfrst)
    {int i, loc;
     long rv;
-    off_t addr, naddr;
+    BIGINT addr, naddr;
     PD_address *ad;
 
     if (file->use_itags == FALSE)
@@ -975,7 +975,7 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
  */
 
 void _PD_ptr_wr_syment(PDBfile *file, long n, char *type,
-		       long nitems, off_t addr)
+		       long nitems, BIGINT addr)
    {char name[MAXLINE];
     syment *ep;
     PD_address *ad;
@@ -1056,7 +1056,7 @@ long _PD_ptr_get_index(PDBfile *file, char *bf)
  *              - return -1 on failure
  */
 
-long _PD_ptr_read(PDBfile *file, off_t addr, int force)
+long _PD_ptr_read(PDBfile *file, BIGINT addr, int force)
    {int frst;
     long n;
     size_t bpi, nr;

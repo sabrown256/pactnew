@@ -105,9 +105,9 @@ static int _PN_bflush(FILE *stream)
 
 /* _PN_BTELL - do an ftell on the pseudo file */
 
-static off_t _PN_btell(FILE *stream)
+static BIGINT _PN_btell(FILE *stream)
    {BF_FILE *fb;
-    off_t addr;
+    BIGINT addr;
 
     fb = _PD_GET_FILE_PTR(stream);
 
@@ -125,7 +125,7 @@ static off_t _PN_btell(FILE *stream)
 
 /* _PN_BSEEK - do an fseek on the pseudo file */
 
-static int _PN_bseek(FILE *stream, off_t addr, int offset)
+static int _PN_bseek(FILE *stream, BIGINT addr, int offset)
    {int ret;
     BF_FILE *fb;
 
@@ -660,7 +660,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 	_PD_ptr_init_apl(file);
 
 /* register the file with the parallel file manager */
-	_PD_ADD_FILE(file, (off_t) 0);
+	_PD_ADD_FILE(file, (BIGINT) 0);
 
 /* create a directory to hold the symbol table entries
  * generated for pointees.
@@ -724,7 +724,7 @@ int PN_write(PDBfile *file, char *type, long nitems, void *vr)
 
 int PN_read(PDBfile *file, char *type, long nitems, void *vr)
    {int ret;
-    off_t addr;
+    BIGINT addr;
     char bf[MAXLINE];
     syment *ep;
 

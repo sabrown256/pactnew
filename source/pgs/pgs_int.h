@@ -124,7 +124,7 @@ struct s_PG_state
     PG_view_attributes **view_attr_list;
 
 /* GSDV.C */
-    off_t buffer_size;
+    BIGINT buffer_size;
 
 /* GSDV_RST.C */
     int **rst_marker_fonts;

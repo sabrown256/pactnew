@@ -49,11 +49,11 @@ struct s_REMOTE_FILE
    {PROCESS *pp;
     int type;
     int fid;
-    off_t file_size;
+    BIGINT file_size;
     char *buffer;
     long sb_addr;
     long size;
-    off_t cf_addr;};
+    BIGINT cf_addr;};
 
 int
  SC_verify_writes = FALSE;
@@ -370,7 +370,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
    {int ok, flags, rw, fd;
     BIGINT i, nb;
     size_t nw, nr;
-    off_t addr;
+    BIGINT addr;
     char msg[MAXLINE];
     char *ps, *t;
 
@@ -435,7 +435,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 char *SC_fgets(char *s, int n, FILE *fp)
    {int i, nbr, nb;
-    off_t pos;
+    BIGINT pos;
     char *r;
     static int count = 0;
 
@@ -539,9 +539,9 @@ static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
 
 /* _SC_GET_CMD_RESP - wait for the response from the server */
 
-static off_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
+static BIGINT _SC_get_cmd_resp(PROCESS *pp, char *msg)
    {int lm;
-    off_t rv;
+    BIGINT rv;
     char s[MAXLINE];
 
     lm = strlen(msg);
@@ -619,7 +619,7 @@ int SC_file_access(int log)
            {case SC_FOPEN :
                  {int i, status, ok;
                   char *name, *mode;
-                  off_t len;
+                  BIGINT len;
 
                   ok = TRUE;
 		  ONCE_SAFE(TRUE, NULL)
@@ -720,7 +720,7 @@ int SC_file_access(int log)
                  break;
 
             case SC_FSEEK :
-                 {off_t addr;
+                 {BIGINT addr;
                   int offset, whence;
 
                   addr   = SC_STOADD(SC_strtok(s+2, ",\n", t));
@@ -1306,7 +1306,7 @@ static int _SC_rungetc(int c, FILE *stream)
 static FILE *_SC_ropen(char *name, char *mode)
    {char s[MAXLINE], host[MAXLINE], fname[MAXLINE], *t;
     int rsp, type, get_data_line, log;
-    off_t len;
+    BIGINT len;
     PROCESS *pp;
     REMOTE_FILE *fp;
     file_io_desc *fid;
@@ -1470,8 +1470,8 @@ int SC_exit_all(void)
 
 /* _SC_LFTELL - large file IO wrapper for FTELL method */
 
-static off_t _SC_lftell(FILE *fp)
-   {off_t rv;
+static BIGINT _SC_lftell(FILE *fp)
+   {BIGINT rv;
 
 #ifdef _LARGE_FILES
     extern off_t ftello(FILE *fp);
@@ -1491,7 +1491,7 @@ static off_t _SC_lftell(FILE *fp)
 
 /* _SC_LFSEEK - large file IO wrapper for FSEEK method */
 
-static int _SC_lfseek(FILE *fp, off_t offs, int whence)
+static int _SC_lfseek(FILE *fp, BIGINT offs, int whence)
    {int rv;
 
 #ifdef _LARGE_FILES
@@ -1682,7 +1682,7 @@ int io_seek(FILE *fp, long offs, int whence)
 
 	    else if (fid->lfseek != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfseek)(fp, (off_t) offs, whence);
+		rv = (*fid->lfseek)(fp, (BIGINT) offs, whence);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFSEEK);};};};
 
     return(rv);}
@@ -2070,8 +2070,8 @@ int lio_setvbuf(FILE *fp, char *bf, int type, size_t sz)
 
 /* LIO_TELL - large file IO wrapper for FTELL method */
 
-off_t lio_tell(FILE *fp)
-   {off_t rv;
+BIGINT lio_tell(FILE *fp)
+   {BIGINT rv;
     file_io_desc *fid;
 
     rv = -1;
@@ -2100,7 +2100,7 @@ off_t lio_tell(FILE *fp)
 
 /* LIO_SEEK - large file IO wrapper for FSEEK method */
 
-int lio_seek(FILE *fp, off_t offs, int whence)
+int lio_seek(FILE *fp, BIGINT offs, int whence)
    {int rv;
     file_io_desc *fid;
 
@@ -2115,7 +2115,7 @@ int lio_seek(FILE *fp, off_t offs, int whence)
 
 	    if (fid->lfseek != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfseek)(fp, (off_t) offs, whence);
+		rv = (*fid->lfseek)(fp, (BIGINT) offs, whence);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFSEEK);}
 
 	    else if (fid->fseek != NULL)
@@ -2586,8 +2586,8 @@ BIGINT SC_file_size(FILE *fp)
  *            - compare with SC_file_size
  */
 
-off_t SC_filelen(FILE *fp)
-   {off_t caddr, flen;
+BIGINT SC_filelen(FILE *fp)
+   {BIGINT caddr, flen;
 
     caddr = lio_tell(fp);
     lio_seek(fp, 0, SEEK_END);

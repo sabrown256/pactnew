@@ -21,7 +21,7 @@
 
 BIGINT SC_dsk_space(char *dir, BIGINT nbx)
    {int fd, nw, st, ok;
-    off_t bsz, nb, no;
+    BIGINT bsz, nb, no;
     double fb, fl, fu;
     char *t, *cwd;
 

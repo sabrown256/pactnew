@@ -166,7 +166,7 @@ void PD_write_extras(FILE *f0, PDBfile *file)
     defstr *dp;
 
     if (_PD.maxfsize == 0)
-       SC_fix_lmt(sizeof(off_t), NULL, &_PD.maxfsize, NULL);
+       SC_fix_lmt(sizeof(BIGINT), NULL, &_PD.maxfsize, NULL);
 
     date = file->date;
     date = (date == NULL) ? "none" : date;

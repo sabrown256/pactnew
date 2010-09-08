@@ -952,7 +952,7 @@ static char *_PA_type_mix(PDBfile *file, char *type)
 static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
    {int i, j, n, nc, nv, nptm;
     long ns, na, nrd, nitems, offs, ind[3];
-    off_t addr;
+    BIGINT addr;
     char bf[MAXLINE], rname[MAXLINE], type[MAXLINE], *rtyp, *tmix;
     double **crve;
     syment *ep, *en;
