@@ -17,7 +17,7 @@ source ../../tests/common
 #--------------------------------------------------------------------------
 
    NoteD $Log ""
-   NoteD $Log -n "                    SX AXIS Test ................. "
+   NoteD $Log -n "                    SX PGS Axis Test ............. "
    Note $Log ""
 
    set UTime = `$TIMER -r`

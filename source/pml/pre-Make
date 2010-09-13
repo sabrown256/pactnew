@@ -180,6 +180,15 @@ ${BinDir}/mlevts : mlevts.c ${TGTLib}
 	${CLD} ${LdFlags} ${PACTTmpDir}/mlevts.o -o ${BinDir}/mlevts ${Libs}
 
 #
+# test polygon intersection
+#
+ipoly : ${BinDir}/mlipts
+
+${BinDir}/mlipts : mlipts.c ${TGTLib}
+	${CC} -c mlipts.c -o ${PACTTmpDir}/mlipts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/mlipts.o -o ${BinDir}/mlipts ${Libs}
+
+#
 # test interpolation
 #
 interp : ${BinDir}/mlitst

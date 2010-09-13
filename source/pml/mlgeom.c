@@ -1064,9 +1064,12 @@ static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 	        {PM_vector_get_point(nd, xa, xi, 0);
 		 ok = PM_polygon_entering(x1, xa, pb);
 		 if (ok == -1)
-		    {PM_copy_point(nd, x1, xa);}
+		    {PM_copy_point(nd, x1, xa);
+		     i = sides[0];
+		     SC_SWAP_VALUE(PM_polygon *, pa, pb);}
 		 else
-		    {PM_vector_get_point(nd, x1, xi, 1);};
+		    {closed = _PM_add_node(pc, xa);
+		     PM_vector_get_point(nd, x1, xi, 1);};
 		 closed = _PM_add_node(pc, x1);}
 
 	     else

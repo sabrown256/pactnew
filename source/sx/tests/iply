@@ -17,7 +17,7 @@ source ../../tests/common
 #--------------------------------------------------------------------------
 
    NoteD $Log ""
-   NoteD $Log -n "                    Intersecting Polygon Test .... "
+   NoteD $Log -n "                    SX PML Polygon Test .......... "
    Note $Log ""
 
    flog $Log rm -f iply*.diff iply*.ps
