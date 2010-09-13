@@ -82,8 +82,8 @@ else if (-e $BinDir/sx) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ( $Test oper hash pdb dattr text sqlite xml vif pgs axis )
-      set Test = ( $Test master exa iply ar shell mesh intrp diff ext )
+      set Test = ( $Test oper hash pdb dattr text sqlite xml vif iply pgs axis )
+      set Test = ( $Test master exa ar shell mesh intrp diff ext )
    endif
 
    foreach i ($Test)
