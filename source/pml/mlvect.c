@@ -13,6 +13,20 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_VCT_EQUAL - return TRUE if X == V[I] to tolerance TOL */
+
+int PM_vct_equal(int nd, double *x, double **v, int i, double tol)
+   {int id, ok;
+
+    ok = TRUE;
+    for (id = 0; (id < nd) && (ok == TRUE); id++)
+        ok &= PM_value_equal(x[id], v[id][i], tol);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_LNNORM - calculate the ln norm of a vector */
 
 REAL PM_lnnorm(REAL *v, REAL *x, int n, int order)

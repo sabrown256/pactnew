@@ -519,7 +519,7 @@ static void PG_scan_triangle(PG_device *dev, double *zbf,
 /* _PG_DO_SCAN_LINE - do a chunk of scan lines for the picture */
 
 static void *_PG_do_scan_line(void *arg)
-   {int i, id, nic;
+   {int i, id, nic, ok;
     int ds, np, iymn, iymx;
     int a[4];
     int *iextr;
@@ -564,7 +564,8 @@ static void *_PG_do_scan_line(void *arg)
 	 u[2] = iextr[1]*ds;
 	 u[3] = u[1];
 
-         if (PM_intersect_line_polygon(&nic, &xi, NULL, u, u+2, pl) == TRUE)
+         ok = PM_intersect_line_polygon(&nic, &xi, NULL, u, u+2, pl, 3);
+         if (ok == TRUE)
 	    {a[0] = xi[0][0]/ds;
 	     a[1] = xi[0][1]/ds;
 	     a[2] = xi[1][0]/ds;

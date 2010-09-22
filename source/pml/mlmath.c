@@ -88,6 +88,54 @@ int PM_set_opers(PM_set *set)
 
 /*--------------------------------------------------------------------------*/
 
+/*                             SCALAR FUNCTIONS                             */
+
+/*--------------------------------------------------------------------------*/
+
+/* PM_VALUE_EQUAL - return TRUE iff X1 == X2 to tolerance TOL */
+
+int PM_value_equal(double x1, double x2, double tol)
+   {int ok;
+    double x1a, x2a;
+
+    if (tol < 0.0)
+       tol = TOLERANCE;
+
+    ok  = TRUE;
+    x1a = ABS(x1);
+    x2a = ABS(x2);
+    if ((tol < x1a) || (tol < x2a))
+       ok &= (2.0*ABS(x1 - x2)/(x1a + x2a + SMALL) < tol);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_VALUE_COMPARE - return 1 if X1 > X2 to tolerance TOL
+ *                  -       -1 if X1 < X2 to tolerance
+ *                  -        0 if X1 == X2 to tolerance
+ */
+
+int PM_value_compare(double x1, double x2, double tol)
+   {int rv;
+    double dx;
+
+    if (tol < 0.0)
+       tol = TOLERANCE;
+
+    dx = (x1 - x2)/(ABS(x1) + ABS(x2) + SMALL);
+    if (dx < -tol)
+       rv = -1;
+    else if (tol < dx)
+       rv = 1;
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
 /*                              ARRAY FUNCTIONS                             */
 
 /*--------------------------------------------------------------------------*/
@@ -190,14 +238,10 @@ long darreq(double *p, int n, double f)
 
 int PM_array_equal(double *s, double *t, int n, double tol)
    {int i, ok;
-    double sc, tc, fc;
 
     ok = TRUE;
     for (i = 0; (i < n) && ok; i++)
-        {sc = s[i];
-	 tc = t[i];
-	 fc = 2.0*(sc - tc)/(ABS(sc) + ABS(tc) + SMALL);
-	 ok &= (ABS(fc) < tol);};
+        ok &= PM_value_equal(s[i], t[i], tol);
 
     return(ok);}
 
@@ -891,51 +935,6 @@ void PM_err(char *fmt, ...)
     SC_VA_END;
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_VALUE_EQUAL - return TRUE iff X1 == X2 to tolerance TOL */
-
-int PM_value_equal(double x1, double x2, double tol)
-   {int rv;
-    double x1a, x2a;
-
-    if (tol < 0.0)
-       tol = TOLERANCE;
-
-    rv  = TRUE;
-    x1a = ABS(x1);
-    x2a = ABS(x2);
-    if ((tol < x1a) || (tol < x2a))
-       rv &= (2.0*ABS(x1 - x2)/(x1a + x2a + SMALL) < tol);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_VALUE_COMPARE - return 1 if X1 > X2 to tolerance TOL
- *                  -       -1 if X1 < X2 to tolerance
- *                  -        0 if X1 == X2 to tolerance
- */
-
-int PM_value_compare(double x1, double x2, double tol)
-   {int rv;
-    double dx;
-
-    if (tol < 0.0)
-       tol = TOLERANCE;
-
-    dx = (x1 - x2)/(ABS(x1) + ABS(x2) + SMALL);
-    if (dx < -tol)
-       rv = -1;
-    else if (tol < dx)
-       rv = 1;
-    else
-       rv = 0;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
