@@ -20,7 +20,7 @@
 (define tri     (list 0.0 0.0   0.5  0.5    0.0 1.0   0.0 0.0))
 (define quad    (list 0.0 0.0   0.8 -0.2    0.8 1.0   0.1  0.9   0.0 0.0))
 (define bowtie  (list 0.0 0.0   0.8  1.0    0.1 0.9   0.8 -0.2   0.0 0.0))
-(define chevron (list 0.0 0.0   0.5  0.5    0.0 1.0   0.3  0.48  0.0 0.0))
+(define chevron (list 0.0 0.0   0.5  0.5    0.0 1.0   0.35 0.48  0.0 0.0))
 (define saw     (list 0.0 0.0   0.8 0.0
 		      0.3 0.2   0.8 0.3
 		      0.3 0.4   0.8 0.5
@@ -57,13 +57,17 @@
     (draw ply -0.5 0.4   0.0 2.0)
     (draw ply -0.5 0.4   0.2 2.0)
 
+    (draw ply 0.32 1.0  -1.0 2.0)
+    (draw ply 0.32 1.0   0.0 2.0)
+    (draw ply 0.32 1.0   0.2 2.0)
+
     (draw ply -0.1 0.4   0.0 0.7)
     (draw ply -0.1 0.4   0.2 0.7))
 
 (seq tri)
 (seq quad)
-(seq bowtie)
 (seq chevron)
 (seq saw)
+(seq bowtie)
 
 (end)

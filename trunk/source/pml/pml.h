@@ -835,7 +835,7 @@ extern int
  PM_colinear_nd(int nd, int n, double **x),
  PM_contains_nd(double *xc, PM_polygon *py, int bnd),
  PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
-			   double *x1, double *x2, PM_polygon *py),
+			   double *x1, double *x2, PM_polygon *py, int wh),
  PM_polygon_orient(PM_polygon *p);
 
 extern void
@@ -1312,6 +1312,9 @@ extern int
 
 
 /* MLVECT.c declarations */
+
+extern int
+ PM_vct_equal(int nd, double *x, double **v, int i, double tol);
 
 extern double
  PM_lnnorm(double *v, double *x, int n, int order);
