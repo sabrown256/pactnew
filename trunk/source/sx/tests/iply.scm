@@ -1,5 +1,6 @@
 ; 
 ; IPLY.SCM - intersecting polygon test
+;          - intersections are implicit in clipping
 ; 
 ; Source Version: 3.0
 ; Software Release #: LLNL-CODE-422942

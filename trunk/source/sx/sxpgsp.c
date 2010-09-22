@@ -723,8 +723,10 @@ static object *_SXI_draw_palette(object *argl)
 static object *_SXI_draw_polyline(object *argl)
    {int i, n, nd, clip;
     double *x[PG_SPACEDM];
+    PM_polygon *py;
     PG_coord_sys cs;
     PG_device *dev;
+    object *o;
 
     dev  = NULL;
     nd   = 0;
@@ -741,17 +743,23 @@ static object *_SXI_draw_polyline(object *argl)
        SS_error("BAD DEVICE - _SXI_DRAW_POLYLINE", SS_car(argl));
 
     argl = SS_cddr(SS_cddr(argl));
-    if (nd == 2)
-       _SX_args_arr_2(argl, &n, &x[0], &x[1]);
-    else if (nd == 3)
-       _SX_args_arr_3(argl, &n, &x[0], &x[1], &x[2]);
+    o    = SS_car(argl);
+    if (SX_POLYGONP(o))
+       {py = SS_GET(PM_polygon, o);
+	PG_draw_polyline_n(dev, nd, cs, py->nn, py->x, clip);}
 
-    PG_set_line_color(dev, dev->line_color);
+    else
+       {if (nd == 2)
+	   _SX_args_arr_2(argl, &n, &x[0], &x[1]);
+        else if (nd == 3)
+	   _SX_args_arr_3(argl, &n, &x[0], &x[1], &x[2]);
 
-    PG_draw_polyline_n(dev, nd, cs, n, x, clip);
+	PG_set_line_color(dev, dev->line_color);
 
-    for (i = 0; i < nd; i++)
-        {SFREE(x[i]);};
+	PG_draw_polyline_n(dev, nd, cs, n, x, clip);
+
+	for (i = 0; i < nd; i++)
+	    {SFREE(x[i]);};};
 
     return(SS_f);}
 
@@ -828,27 +836,34 @@ static object *_SXI_draw_text(object *argl)
 /* _SXI_FPLY - fill a polygon */
 
 static object *_SXI_fply(object *argl)
-   {int n, c;
+   {int n, clr;
     double *r[2];
+    PM_polygon *py;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
-    c   = 1;
+    clr = 1;
     SS_args(argl,
             G_DEVICE, &dev,
-            SC_INTEGER_I, &c,
+            SC_INTEGER_I, &clr,
             0);
 
     if (dev == NULL)
        SS_error("BAD DEVICE - _SXI_FPLY", SS_car(argl));
 
     argl = SS_cddr(argl);
-    _SX_args_arr_2(argl, &n, &r[0], &r[1]);
+    o    = SS_car(argl);
+    if (SX_POLYGONP(o))
+       {py = SS_GET(PM_polygon, o);
+	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, py->nn, py->x);}
+    else
+       {_SX_args_arr_2(argl, &n, &r[0], &r[1]);
 
-    PG_fill_polygon_n(dev, c, TRUE, 2, WORLDC, n, r);
+	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, n, r);
 
-    SFREE(r[0]);
-    SFREE(r[1]);
+	SFREE(r[0]);
+	SFREE(r[1]);};
 
     return(SS_f);}
 

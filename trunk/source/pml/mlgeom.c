@@ -933,80 +933,6 @@ static INLINE int _PM_add_node(PM_polygon *pd, double *x)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_INTERSECT_POLY - traversing boundary of polygon PN
- *                    - accumlate points contained in polygon PP or boundary
- *                    - intersection points
- */
-
-static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
-			      
-   {int i, i1, i2, ni, ok, nd, ns, nn, nx;
-    double x1[PM_SPACEDM], x2[PM_SPACEDM];
-    double **xi;
-
-    nn = pn->np;
-    nd = pn->nd;
-
-    nx = pc->np;
-    ns = pc->nn;
-
-    PM_polygon_get_point(x1, pn, 0);
-
-    i1 = PM_contains_nd(x1, pp, TRUE);
-    if (i1 == TRUE)
-       _PM_add_node(pc, x1);
-
-/* travserse the perimeter of P looking for entries and exits */
-    for (i = 1; (i < nn) && (pp->nn < nx); i++)
-        {PM_polygon_get_point(x1, pn, i-1);
-	 PM_polygon_get_point(x2, pn, i);
-
-	 i2 = PM_contains_nd(x2, pp, TRUE);
-	 if (i2 == TRUE)
-
-/* both points inside P */
-	    {if (i1 == TRUE)
-	        _PM_add_node(pc, x2);
-
-/* entering P */
-	     else if (i1 == FALSE)
-	        {ok = PM_intersect_line_polygon(&ni, &xi, NULL, x1, x2, pp, 3);
-
-		 if ((ok == TRUE) && (ni > 0))
-		    {x1[0] = xi[0][0];
-		     x1[1] = xi[1][0];
-		     _PM_add_node(pc, x1);}
-
-		 x2[0] = xi[0][1];
-		 x2[1] = xi[1][1];
-		 _PM_add_node(pc, x2);
-
-		 PM_free_vectors(2, xi);};}
-
-	 else if (i2 == FALSE)
-
-/* exiting P */
-	    {if (i1 == TRUE)
-	        {ok = PM_intersect_line_polygon(&ni, &xi, NULL, x1, x2, pp, 3);
-		 if (ok == TRUE)
-		    {x1[0] = xi[0][0];
-		     x1[1] = xi[1][0];
-		    _PM_add_node(pc, x1);};
-
-		 PM_free_vectors(2, xi);};};
-
-	 i1 = i2;};
-
-/* close the polygon if we end up on the outside */
-    if ((i1 == FALSE) && (pc->nn > ns))
-       {PM_polygon_get_point(x1, pc, ns);
-        _PM_add_node(pc, x1);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PM_POLYGON_ENTERING - point XA is the intersection point between
  *                     - side IA of polygon PA and polygon PB
  *                     - side IA is the segment from X1 = PA[IA]
@@ -1017,7 +943,8 @@ static void _PM_intersect_poly(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
  *                     -       -1 if it is leaving
  */
 
-static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia, PM_polygon *pb)
+static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
+			       PM_polygon *pb)
    {int id, ib, na, nd, ok, rv;
     double x1c, x2c, eps;
     double x0[PM_SPACEDM];
@@ -1025,11 +952,11 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia, PM_polygon *p
     eps = 1.0e-5;
     nd  = pa->nd;
     na  = pa->nn;
+    ib  = (ia + 1 + na - 1) % (na - 1);
 
     ok = TRUE;
     for (id = 0; id < nd; id++)
-        {ib = (ia + 1 + na - 1) % (na - 1);
-	 x1c = pa->x[id][ia];
+        {x1c = pa->x[id][ia];
 	 x2c = pa->x[id][ib];
 	 ok &= PM_CLOSETO_REL(x1c, x2c);
 	 x0[id] = xa[id] + eps*(x1c - x2c);};
@@ -1045,14 +972,16 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia, PM_polygon *p
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_INTERSECT_POLY_B - traversing boundary of polygon PN
- *                      - accumlate points contained in polygon PP or boundary
- *                      - intersection points
+/* _PM_COMBINE_POLYGONS - compute and return either the intersection or union
+ *                      - of the polgons PN and PP depending on
+ *                      - the value of OP
+ *                      - return the result in PC
  */
 
-static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
-			      
-   {int i1, i2, id, ip, na, ni, nd, ns, nx;
+static void _PM_combine_polygons(PM_polygon *pc,
+				 PM_polygon *pn, PM_polygon *pp,
+				 PM_binary_operation op)
+   {int i1, i2, id, ip, na, ni, nd, nx;
     int closed, nin, nout, inc, ok;
     int *sides;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], xa[PM_SPACEDM];
@@ -1066,7 +995,6 @@ static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 	 xa[id] = 0.0;};
 
     nx = pc->np;
-    ns = pc->nn;
 
     pa = pn;
     pb = pp;
@@ -1076,7 +1004,8 @@ static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
     PM_polygon_get_point(x1, pa, 0);
 
     i1 = PM_contains_nd(x1, pb, TRUE);
-    if (i1 == TRUE)
+    if (((i1 == TRUE) && (op == PM_INTERSECT)) ||
+	((i1 == FALSE) && (op == PM_UNION)))
        _PM_add_node(pc, x1);
 
 /* travserse the perimeter of PA looking for entries and exits from PB */
@@ -1086,60 +1015,63 @@ static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
     closed = FALSE;
     PM_polygon_get_point(x1, pa, 0);
     for (i2 = 1; (pc->nn < nx) && (closed == FALSE); i2 += inc)
-        {na = pa->nn;
-	 i2 = (i2 + na - 1) % (na - 1);
+        {na = pa->nn - 1;
+	 i2 = (i2 + na) % na;
 	 PM_polygon_get_point(x2, pa, i2);
 
 	 ok = PM_intersect_line_polygon(&ni, &xi, &sides, x1, x2, pb, 2);
 
 /* no intersection points for (X1, X2) with PB */
 	 if (ni == 0)
+	    {if (op == PM_INTERSECT)
 
 /* (X1, X2) is interior to PB */
-	    {if (ok == TRUE)
-	        {closed = _PM_add_node(pc, x2);
-		 nin++;}
+	        {if (ok == TRUE)
+		    {closed = _PM_add_node(pc, x2);
+		     nin++;}
 
 /* (X1, X2) is exterior to PB */
-	     else
-	        nout++;
+		 else
+		    nout++;
 
 /* if all the points are outside then PB is the intersection */
-	     if (nout >= na)
-	        {closed = TRUE;
-		 PM_polygon_copy_points(pc, pb);}
-	     else
-	        PM_copy_point(nd, x1, x2);}
+		 if (nout > na)
+		    {closed = TRUE;
+		     PM_polygon_copy_points(pc, pb);}
+		 else
+		    PM_copy_point(nd, x1, x2);}
+
+	     else if (op == PM_UNION)
+	        {closed = _PM_add_node(pc, x2);
+		 PM_copy_point(nd, x1, x2);};}
 
 /* one or more intersection points for (X1, X2) with PB */
 	 else
 	    {for (ip = 0; ip < ni; ip++)
 	         {PM_vector_get_point(nd, xa, xi, ip);
+
+/* GOTCHA: if XA is also a node of PB we do not know which way to
+ * go for the PM_UNION case - need more logic here
+ */
 		  ok = PM_polygon_entering(xa, pb, sides[ip], pa);
 
+		  closed = _PM_add_node(pc, xa);
+		  PM_copy_point(nd, x1, xa);
+
 /* entering */
-		  if (ok == 1)
-		     {closed = _PM_add_node(pc, xa);
-		      PM_copy_point(nd, x1, xa);
-		      inc = 1;
-		      i2  = sides[ip];
-		      SC_SWAP_VALUE(PM_polygon *, pa, pb);
-		      break;}
+		  if (((ok == 1) && (op == PM_INTERSECT)) ||
+		      ((ok == -1) && (op == PM_UNION)))
+		     {inc = 1;
+		      i2  = sides[ip];}
 
 /* leaving */
-		  else if (ok == -1)
-		     {closed = _PM_add_node(pc, xa);
-		      PM_copy_point(nd, x1, xa);
-		      inc = -1;
-		      i2  = sides[ip] - inc;
-		      SC_SWAP_VALUE(PM_polygon *, pa, pb);
-		      break;}
+		  else if (((ok == -1) && (op == PM_INTERSECT)) ||
+			   ((ok == 1) && (op == PM_UNION)))
+		     {inc = -1;
+		      i2  = sides[ip] - inc;};
 
-/* not line but point - X1 == XA */
-		  else if (ok == 0)
-		     {if (ip == ni - 1)
-		         {PM_copy_point(nd, x1, x2);
-			  closed = _PM_add_node(pc, x1);};};};};
+		  SC_SWAP_VALUE(PM_polygon *, pa, pb);
+		  break;};};
 
 	 PM_free_vectors(nd, xi);
 	 SFREE(sides);};
@@ -1150,7 +1082,7 @@ static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 /*--------------------------------------------------------------------------*/
 
 /* PM_INTERSECT_POLYGONS - compute the intersection points of
- *                       - polygon Pa and Pb
+ *                       - polygon PA and PB
  *                       - the polygons may be multiply connected,
  *                       - and non-convex but must be closed
  *                       - return the intersection polygon
@@ -1159,31 +1091,33 @@ static void _PM_intersect_poly_b(PM_polygon *pc, PM_polygon *pn, PM_polygon *pp)
 PM_polygon *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb)
    {int nx;
     PM_polygon *pc;
-    static int way = 1;
 
     nx = max(pa->np, pb->np);
     nx = 4*nx;
     pc = PM_init_polygon(pa->nd, nx);
 
-/* force both polygons to have counter-clockwise (right-handed) orientation */
-    PM_orient_polygon(pa);
-    PM_orient_polygon(pb);
+    _PM_combine_polygons(pc, pb, pa, PM_INTERSECT);
 
-    if (way == 0)
+    return(pc);}
 
-/* find the part of A contained in B */
-       {_PM_intersect_poly(pc, pa, pb);
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/* find the part of B contained in A */
-	_PM_intersect_poly(pc, pb, pa);
-
-/* GOTCHA: we really have multiple polygons here in general
- * do we need to merge them?
+/* PM_UNION_POLYGONS - compute the union of polygon PA and PB
+ *                   - the polygons may be multiply connected,
+ *                   - and non-convex but must be closed
+ *                   - return the union polygon
  */
-	}
 
-    else
-       _PM_intersect_poly_b(pc, pb, pa);
+PM_polygon *PM_union_polygons(PM_polygon *pa, PM_polygon *pb)
+   {int nx;
+    PM_polygon *pc;
+
+    nx = max(pa->np, pb->np);
+    nx = 4*nx;
+    pc = PM_init_polygon(pa->nd, nx);
+
+    _PM_combine_polygons(pc, pb, pa, PM_UNION);
 
     return(pc);}
 

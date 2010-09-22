@@ -32,7 +32,11 @@ end
 
 # complete the features list
 @ i = $i + 2
-set features = ( $features[$i-] )
+if ($i > $#features) then
+   set feature = ""
+else
+   set features = ( $features[$i-] )
+endif
 
 unset i
 unset ok
