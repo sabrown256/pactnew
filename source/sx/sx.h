@@ -468,6 +468,7 @@
 /* PML Types */
 
 #define SX_NUMERIC_ARRAYP(obj)    (SS_OBJECT_TYPE(obj) == G_NUM_ARRAY)
+#define SX_POLYGONP(obj)          (SS_OBJECT_TYPE(obj) == G_POLYGON)
 #define SX_MAPPINGP(obj)          (SS_OBJECT_TYPE(obj) == G_MAPPING)
 #define SX_SETP(obj)              (SS_OBJECT_TYPE(obj) == G_SET)
 
@@ -549,6 +550,7 @@ enum e_SX_object_type
     G_DEVICE,
     G_DEV_ATTRIBUTES,
     G_NUM_ARRAY,
+    G_POLYGON,
     G_MAPPING,
     G_SET,
     G_FUNCTION,

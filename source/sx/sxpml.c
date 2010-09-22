@@ -1844,6 +1844,175 @@ static object *_SXI_find_index(object *argl)
     return(rv);}
         
 /*--------------------------------------------------------------------------*/
+
+/*                             POLYGON FUNCTIONS                            */
+
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_POLYGONP - function version of SX_POLYGONP macro */
+
+static object *_SXI_polygonp(object *obj)
+   {object *o;
+
+    o = SX_POLYGONP(obj) ? SS_t : SS_f;
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_WR_GPOLYGON - print a gpolygon */
+
+static void _SX_wr_gpolygon(object *obj, object *strm)
+   {PM_polygon *py;
+
+    py = SS_GET(PM_polygon, obj);
+
+    PRINT(SS_OUTSTREAM(strm), "<POLYGON|%ld>", py->nn);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_RL_GPOLYGON - release g_polygon */
+
+static void _SX_rl_gpolygon(object *obj)
+   {PM_polygon *py;
+
+    py = SS_GET(PM_polygon, obj);
+
+    PM_free_polygon(py);
+    SS_rl_object(obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SX_MK_POLYGON - encapsulate a PM_polygon as an object */
+
+object *SX_mk_polygon(PM_polygon *py)
+   {object *op;
+
+    op = SS_mk_object(py, G_POLYGON, SELF_EV, "pm-polygon",
+		      _SX_wr_gpolygon, _SX_rl_gpolygon);
+
+    SC_mark(py, 1);
+    SC_mark(py->x, 1);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_MK_POLYGON - allocate and return a PM_polygon
+ *                 - form: (pm-make-polygon <nd> <point>*)
+ *                 - where each <point> is an <nd>-tuple
+ *                 - polygons may be open or closed
+ */
+
+static object *_SXI_mk_polygon(object *argl)
+   {long id, ip, nd, ne, np;
+    double v;
+    PM_polygon *py;
+    object *rv;
+
+    rv = SS_null;
+    nd = 0L;
+    SS_args(argl,
+            SC_LONG_I, &nd,
+            0);
+
+    argl = SS_cdr(argl);
+    ne   = SS_length(argl);
+    np   = ne/nd;
+
+    py = PM_init_polygon(nd, np);
+
+    for (id = 0, ip = 0; !SS_nullobjp(argl); argl = SS_cdr(argl))
+	{SS_args(argl,
+		 SC_DOUBLE_I, &v,
+		 0);
+	 py->x[id++][ip] = v;
+	 if (id == nd)
+	    {id = 0;
+	     ip++;};};
+
+    py->nn = ip;
+
+    rv = SX_mk_polygon(py);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_INTERSECT_POLYGON - return the intersection of one or more polygons
+ *                        - form: (pm-intersect-polygon <py>*)
+ */
+
+static object *_SXI_intersect_polygon(object *argl)
+   {long n;
+    PM_polygon *pa, *pb, *pc;
+    object *rv, *o;
+
+    n = SS_length(argl);
+    if (n < 1)
+       rv = SS_null;
+
+    else if (n == 1)
+       rv = SS_car(argl);
+
+    else
+       {o    = SS_car(argl);
+	pa   = SS_GET(PM_polygon, o);
+	argl = SS_cdr(argl);
+	for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
+	    {o  = SS_car(argl);
+	     pb = SS_GET(PM_polygon, o);
+	     pc = PM_intersect_polygons(pa, pb);
+	     pa = pc;};
+	rv = SX_mk_polygon(pa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_UNION_POLYGON - return the unionion of one or more polygons
+ *                    - form: (pm-union-polygon <py>*)
+ */
+
+static object *_SXI_union_polygon(object *argl)
+   {long n;
+    PM_polygon *pa, *pb, *pc;
+    object *rv, *o;
+
+    n = SS_length(argl);
+    if (n < 1)
+       rv = SS_null;
+
+    else if (n == 1)
+       rv = SS_car(argl);
+
+    else
+       {o    = SS_car(argl);
+	pa   = SS_GET(PM_polygon, o);
+	argl = SS_cdr(argl);
+	for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
+	    {o  = SS_car(argl);
+	     pb = SS_GET(PM_polygon, o);
+	     pc = PM_union_polygons(pa, pb);
+	     pa = pc;};
+	rv = SX_mk_polygon(pa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            INSTALL PML FUNCTIONS                         */
+
 /*--------------------------------------------------------------------------*/
  
 /* SX_INSTALL_PML_FUNCS - install the PML extensions to Scheme */
@@ -2005,6 +2174,27 @@ void SX_install_pml_funcs(void)
                "Build an Arbitrarily-Connected domain set from the given connectivity representation",
 	       SS_nargs,
 	       _SXI_rep_ac_domain, SS_PR_PROC);
+
+/* polygon routines */
+    SS_install("pm-polygon?",
+               "Returns #t if the object is a pm-polygon, and #f otherwise",
+               SS_sargs,
+               _SXI_polygonp, SS_PR_PROC);
+
+    SS_install("pm-make-polygon",
+               "Allocate and return a pm-polygon of the specified type and size",
+               SS_nargs,
+               _SXI_mk_polygon, SS_PR_PROC);
+
+    SS_install("pm-intersect-polygon",
+               "Return the intersection of the given pm-polygons",
+               SS_nargs,
+               _SXI_intersect_polygon, SS_PR_PROC);
+
+    SS_install("pm-union-polygon",
+               "Return the union of the given pm-polygons",
+               SS_nargs,
+               _SXI_union_polygon, SS_PR_PROC);
 
     return;}
 

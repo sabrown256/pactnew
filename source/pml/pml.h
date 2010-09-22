@@ -261,6 +261,12 @@ FUNCTION_POINTER(REAL, (*PFREAL));
 FUNCTION_POINTER(PM_set, *(*PFPPM_set));
 FUNCTION_POINTER(PM_mapping, *(*PFPPM_mapping));
 
+enum e_PM_binary_operation
+   {PM_PLUS = 1, PM_MINUS, PM_TIMES, PM_DIVIDE,
+    PM_INTERSECT, PM_UNION};
+
+typedef enum e_PM_binary_operation PM_binary_operation;
+
 enum e_PM_centering
    {Z_CENT = -1,                                      /* zone centered */
     N_CENT = -2,                                      /* node centered */
@@ -825,6 +831,7 @@ extern long
 
 extern PM_polygon
  *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb),
+ *PM_union_polygons(PM_polygon *pa, PM_polygon *pb),
  *PM_convex_hull(double *p1, double *p2, int nh);
 
 extern int
