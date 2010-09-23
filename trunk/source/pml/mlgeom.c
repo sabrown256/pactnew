@@ -901,7 +901,63 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_ADD_NODE - helper for PM_intersect_polygons
+/* PM_POLYGON_ARRAY - initialize an array of polygons */
+
+SC_array *PM_polygon_array(void)
+   {SC_array *a;
+
+    a = SC_MAKE_ARRAY("PM_POLYGON_ARRAY", PM_polygon *, NULL);
+
+    return(a);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_FREE_POLYGONS - free an array of polygons */
+
+void PM_free_polygons(SC_array *a, int rl)
+   {int ip, np;
+    PM_polygon *py;
+
+    if (rl == TRUE)
+       {np = SC_array_get_n(a);
+	for (ip = 0; ip < np; ip++)
+	    {py = PM_polygon_get(a, ip);
+	     PM_free_polygon(py);};};
+
+    SC_free_array(a, NULL);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_POLYGON_PUSH - push PY onto A */
+
+void PM_polygon_push(SC_array *a, PM_polygon *py)
+   {
+
+    SC_array_push(a, &py);
+    SC_mark(py, 1);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_POLYGON_GET - return the Nth polygon from A */
+
+PM_polygon *PM_polygon_get(SC_array *a, int n)
+   {PM_polygon *py;
+
+    py = *(PM_polygon **) SC_array_get(a, n);
+
+    return(py);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PM_ADD_NODE - helper for _PM_combine_polygons
  *              - return TRUE iff X closes the polygon PD
  */
 
@@ -978,15 +1034,21 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
  *                      - return the result in PC
  */
 
-static void _PM_combine_polygons(PM_polygon *pc,
-				 PM_polygon *pn, PM_polygon *pp,
+static void _PM_combine_polygons(SC_array *a,
+				 PM_polygon *pa, PM_polygon *pb,
 				 PM_binary_operation op)
    {int i1, i2, id, ip, na, ni, nd, nx;
     int closed, nin, nout, inc, ok;
     int *sides;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], xa[PM_SPACEDM];
     double **xi;
-    PM_polygon *pa, *pb;
+    PM_polygon *pc;
+
+    nd = pa->nd;
+
+    nx = max(pa->np, pb->np);
+    nx = 4*nx;
+    pc = PM_init_polygon(nd, nx);
 
 /* not absolutely necessary but cleaner */
     for (id = 0; id < PM_SPACEDM; id++)
@@ -995,11 +1057,6 @@ static void _PM_combine_polygons(PM_polygon *pc,
 	 xa[id] = 0.0;};
 
     nx = pc->np;
-
-    pa = pn;
-    pb = pp;
-
-    nd = pa->nd;
 
     PM_polygon_get_point(x1, pa, 0);
 
@@ -1076,50 +1133,49 @@ static void _PM_combine_polygons(PM_polygon *pc,
 	 PM_free_vectors(nd, xi);
 	 SFREE(sides);};
 
+    PM_polygon_push(a, pc);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_INTERSECT_POLYGONS - compute the intersection points of
- *                       - polygon PA and PB
+/* PM_INTERSECT_POLYGONS - compute an array of polygons defining
+ *                       - the intersection polygon PA and PB
  *                       - the polygons may be multiply connected,
  *                       - and non-convex but must be closed
- *                       - return the intersection polygon
+ *                       - return the array of polygons
  */
 
-PM_polygon *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb)
-   {int nx;
-    PM_polygon *pc;
+SC_array *PM_intersect_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb)
+   {
 
-    nx = max(pa->np, pb->np);
-    nx = 4*nx;
-    pc = PM_init_polygon(pa->nd, nx);
+    if (a == NULL)
+       a = PM_polygon_array();
 
-    _PM_combine_polygons(pc, pb, pa, PM_INTERSECT);
+    _PM_combine_polygons(a, pa, pb, PM_INTERSECT);
 
-    return(pc);}
+    return(a);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_UNION_POLYGONS - compute the union of polygon PA and PB
+/* PM_UNION_POLYGONS - compute an array of polygons defining
+ *                   - the union polygon PA and PB
  *                   - the polygons may be multiply connected,
  *                   - and non-convex but must be closed
- *                   - return the union polygon
+ *                   - return the array of polygons
  */
 
-PM_polygon *PM_union_polygons(PM_polygon *pa, PM_polygon *pb)
-   {int nx;
-    PM_polygon *pc;
+SC_array *PM_union_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb)
+   {
 
-    nx = max(pa->np, pb->np);
-    nx = 4*nx;
-    pc = PM_init_polygon(pa->nd, nx);
+    if (a == NULL)
+       a = PM_polygon_array();
 
-    _PM_combine_polygons(pc, pb, pa, PM_UNION);
+    _PM_combine_polygons(a, pa, pb, PM_UNION);
 
-    return(pc);}
+    return(a);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

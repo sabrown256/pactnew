@@ -830,9 +830,13 @@ extern long
 /* MLGEOM.C declarations */
 
 extern PM_polygon
- *PM_intersect_polygons(PM_polygon *pa, PM_polygon *pb),
- *PM_union_polygons(PM_polygon *pa, PM_polygon *pb),
+ *PM_polygon_get(SC_array *a, int n),
  *PM_convex_hull(double *p1, double *p2, int nh);
+
+extern SC_array
+ *PM_polygon_array(void),
+ *PM_intersect_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb),
+ *PM_union_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb);
 
 extern int
  PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0),
@@ -846,6 +850,8 @@ extern int
  PM_polygon_orient(PM_polygon *p);
 
 extern void
+ PM_polygon_push(SC_array *a, PM_polygon *py),
+ PM_free_polygons(SC_array *a, int rl),
  PM_orient_polygon(PM_polygon *p),
  PM_nearest_point(PM_polygon *py, double *xs, double *xt, int *pi),
  PM_compute_quad_rot_volume(double *vol, int nc, int *indx, double **x),

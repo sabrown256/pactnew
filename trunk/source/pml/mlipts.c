@@ -28,7 +28,8 @@ int test_1(void)
     double t0, dt;
     double rb[4], tb[4];
     double **r, **t;
-    PM_polygon **ry, **ty, **py;
+    SC_array **a;
+    PM_polygon **ry, **ty;
 
     rv = TRUE;
 
@@ -61,7 +62,7 @@ int test_1(void)
     ns = nc*nc;
     ry = FMAKE_N(PM_polygon *, nc, "TEST_1:ry");
     ty = FMAKE_N(PM_polygon *, nc, "TEST_1:ty");
-    py = FMAKE_N(PM_polygon *, ns, "TEST_1:py");
+    a  = FMAKE_N(SC_array *, ns, "TEST_1:a");
 
     for (j = 0; j < nc; j++)
         {for (i = 0; i < nc; i++)
@@ -84,7 +85,7 @@ int test_1(void)
     for (j = 0; j < nc; j++)
         {for (i = 0; i < nc; i++)
 	     {l = j*nc + i;
-	      py[l] = PM_intersect_polygons(ry[i], ty[j]);};};
+	      a[l] = PM_intersect_polygons(NULL, ry[i], ty[j]);};};
 
     dt = SC_wall_clock_time() - t0;
 
@@ -93,13 +94,12 @@ int test_1(void)
     for (j = 0; j < nc; j++)
         {for (i = 0; i < nc; i++)
 	     {l = j*nc + i;
-	      PM_free_polygon(py[l]);};
+	      PM_free_polygons(a[l], TRUE);};
 	 PM_free_polygon(ry[j]);
 	 PM_free_polygon(ty[j]);};
 
     SFREE(ry);
     SFREE(ty);
-    SFREE(py);
 
     PM_free_vectors(2, r);
     PM_free_vectors(2, t);

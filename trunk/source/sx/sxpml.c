@@ -1948,32 +1948,93 @@ static object *_SXI_mk_polygon(object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_POLYGON_PASS - take one pass combining polygons in array A with PY
+ *                  - return the resulting array
+ */
+
+static SC_array *_SX_polygon_pass(SC_array *a, PM_polygon *py,
+				  SC_array *(*op)(SC_array *a,
+						  PM_polygon *pa,
+						  PM_polygon *pb))
+   {long ip, np;
+    PM_polygon *pb;
+    SC_array *an;
+
+    an = PM_polygon_array();
+
+    np = SC_array_get_n(a);
+    for (ip = 0; ip < np; ip++)
+        {pb = PM_polygon_get(a, ip);
+	 an = op(an, py, pb);};
+
+    return(an);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_COMBINE_POLYGONS - worker for pm-intersect-polygon and
+ *                      - pm-union-polygon
+ */
+
+static object *_SX_combine_polygons(object *argl,
+				    SC_array *(*op)(SC_array *a,
+						    PM_polygon *pa,
+						    PM_polygon *pb))
+   {long ip, np, n;
+    PM_polygon *pa, *pb;
+    SC_array *a, *an;
+    object *rv, *o;
+
+    rv = SS_null;
+
+    n = SS_length(argl);
+    if (n == 1)
+       rv = SS_car(argl);
+
+    else if (n > 1)
+       {o  = SS_car(argl);
+	pa = SS_GET(PM_polygon, o);
+
+        a = PM_polygon_array();
+	PM_polygon_push(a, pa);
+
+	for (argl = SS_cdr(argl); !SS_nullobjp(argl); argl = SS_cdr(argl))
+	    {o  = SS_car(argl);
+	     pb = SS_GET(PM_polygon, o);
+
+/* combine PB with all polygons in A */
+	     an = _SX_polygon_pass(a, pb, op);
+
+/* free the old array A */
+	     PM_free_polygons(a, TRUE);
+
+/* use the new array AN in the next pass */
+	     a = an;};
+
+/* turn the list into an array */
+	np = SC_array_get_n(a);
+	for (ip = 0; ip < np; ip++)
+	    {pa = PM_polygon_get(a, ip);
+	     o  = SX_mk_polygon(pa);
+	     rv = SS_mk_cons(o, rv);};
+
+	PM_free_polygons(a, FALSE);
+
+	rv = SS_reverse(rv);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_INTERSECT_POLYGON - return the intersection of one or more polygons
  *                        - form: (pm-intersect-polygon <py>*)
  */
 
 static object *_SXI_intersect_polygon(object *argl)
-   {long n;
-    PM_polygon *pa, *pb, *pc;
-    object *rv, *o;
+   {object *rv;
 
-    n = SS_length(argl);
-    if (n < 1)
-       rv = SS_null;
-
-    else if (n == 1)
-       rv = SS_car(argl);
-
-    else
-       {o    = SS_car(argl);
-	pa   = SS_GET(PM_polygon, o);
-	argl = SS_cdr(argl);
-	for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
-	    {o  = SS_car(argl);
-	     pb = SS_GET(PM_polygon, o);
-	     pc = PM_intersect_polygons(pa, pb);
-	     pa = pc;};
-	rv = SX_mk_polygon(pa);};
+    rv = _SX_combine_polygons(argl, PM_intersect_polygons);
 
     return(rv);}
 
@@ -1985,27 +2046,9 @@ static object *_SXI_intersect_polygon(object *argl)
  */
 
 static object *_SXI_union_polygon(object *argl)
-   {long n;
-    PM_polygon *pa, *pb, *pc;
-    object *rv, *o;
+   {object *rv;
 
-    n = SS_length(argl);
-    if (n < 1)
-       rv = SS_null;
-
-    else if (n == 1)
-       rv = SS_car(argl);
-
-    else
-       {o    = SS_car(argl);
-	pa   = SS_GET(PM_polygon, o);
-	argl = SS_cdr(argl);
-	for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
-	    {o  = SS_car(argl);
-	     pb = SS_GET(PM_polygon, o);
-	     pc = PM_union_polygons(pa, pb);
-	     pa = pc;};
-	rv = SX_mk_polygon(pa);};
+    rv = _SX_combine_polygons(argl, PM_union_polygons);
 
     return(rv);}
 

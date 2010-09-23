@@ -1770,7 +1770,7 @@ extern void
 extern pcons
  *PG_set_plot_type(pcons *info, PG_rendering pty, int axs);
 
-extern PM_polygon
+extern SC_array
  *PG_clip_polygon(PG_device *dev, PM_polygon *py);
 
 extern void

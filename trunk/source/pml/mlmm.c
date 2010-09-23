@@ -261,9 +261,10 @@ void PM_free_polygon(PM_polygon *py)
    {int nd;
 
     if (py != NULL)
-       {nd = py->nd;
+       {if (SC_ref_count(py) < 2)
+	   {nd = py->nd;
 
-	PM_free_vectors(nd, py->x);
+	    PM_free_vectors(nd, py->x);};
 
 	SFREE(py);};
 
