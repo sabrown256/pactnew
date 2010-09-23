@@ -43,7 +43,10 @@
 
           (pg-clear-window dev)
 
-	  (apply pg-fill-polygon (list dev gray ip))
+	  (define (do-one x)
+	          (apply pg-fill-polygon (list dev gray x)))
+
+	  (for-each do-one ip)
 
           (pg-set-line-color! dev red)
 	  (apply pg-draw-polyline-n (list dev 2 @world #t ply))

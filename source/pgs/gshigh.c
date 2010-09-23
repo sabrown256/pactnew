@@ -897,11 +897,15 @@ int PG_clip_box(double *bx, double *wc, int *lgf)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_CLIP_POLYGON - clip the data points to the boundary region */
+/* PG_CLIP_POLYGON - clip the data points to the boundary region
+ *                 - in general many polygons can result
+ *                 - return an array of polygons
+ */
 
-PM_polygon *PG_clip_polygon(PG_device *dev, PM_polygon *py)
+SC_array *PG_clip_polygon(PG_device *dev, PM_polygon *py)
    {double bnd[PG_BOXSZ];
-    PM_polygon *pb, *pi;
+    PM_polygon *pb;
+    SC_array *a;
 
 /* setup the viewport boundary as a polygon */
     PG_get_viewspace(dev, BOUNDC, bnd);
@@ -914,11 +918,11 @@ PM_polygon *PG_clip_polygon(PG_device *dev, PM_polygon *py)
 
     pb = PM_polygon_box(bnd);
 
-    pi = PM_intersect_polygons(py, pb);
+    a = PM_intersect_polygons(NULL, py, pb);
 
     PM_free_polygon(pb);
 
-    return(pi);}
+    return(a);}
                       
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

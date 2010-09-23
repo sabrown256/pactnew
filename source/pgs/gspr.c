@@ -946,8 +946,10 @@ void PG_draw_box_n(PG_device *dev, int nd, PG_coord_sys cs, double *box)
 
 void PG_fill_polygon_n(PG_device *dev, int color, int mapped,
 		       int nd, PG_coord_sys cs, long n, double **r)
-   {double **cr;
+   {int ip, np;
+    double **cr;
     PM_polygon *pc, *py;
+    SC_array *a;
     static int count = 0;
 
     if ((dev != NULL) && (n > nd))
@@ -956,17 +958,24 @@ void PG_fill_polygon_n(PG_device *dev, int color, int mapped,
 	py = PM_make_polygon(nd, n, r[0], r[1], r[2]);
 
 	if (dev->clipping)
-	   {pc = PG_clip_polygon(dev, py);
-	    cr = pc->x;
-	    n  = pc->nn;}
-	else
-	   {pc = NULL;
-	    cr = py->x;};
-       
-	PG_set_color_fill(dev, color, mapped);
-	PG_shade_poly_n(dev, nd, n, cr);
+	   {a = PG_clip_polygon(dev, py);
 
-	PM_free_polygon(pc);
+	    np = SC_array_get_n(a);
+	    for (ip = 0; ip < np; ip++)
+	        {pc = PM_polygon_get(a, ip);
+		 cr = pc->x;
+		 n  = pc->nn;
+       
+		 PG_set_color_fill(dev, color, mapped);
+		 PG_shade_poly_n(dev, nd, n, cr);};
+
+	    PM_free_polygons(a, TRUE);}
+
+	else
+	   {cr = py->x;
+	    PG_set_color_fill(dev, color, mapped);
+	    PG_shade_poly_n(dev, nd, n, cr);};
+
 	PM_free_polygon(py);
 
 	count++;};
