@@ -470,6 +470,55 @@ char *path_head(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PATH_BASE - do what ':r' does to S */
+
+char *path_base(char *s)
+   {int nc;
+    char *pd;
+    static char d[LRG];
+
+    strcpy(d, s);
+    nc = strlen(d);
+    if (nc >= LRG)
+       nc = LRG;
+    if (nc < 1)
+       nc = 1;
+
+    for (pd = d + nc-1; pd >= d; pd--)
+        {if (*pd == '.')
+	    {*pd = '\0';
+	     break;};};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PATH_SUFFIX - do what :e does and return the suffix of S */
+
+char *path_suffix(char *s)
+   {int nc;
+    char *pd;
+    static char d[LRG];
+
+    strcpy(d, s);
+    nc = strlen(d);
+    if (nc >= LRG)
+       nc = LRG;
+    if (nc < 1)
+       nc = 1;
+
+    for (pd = d + nc-1; pd >= d; pd--)
+        {if (*pd == '.')
+	    break;};
+
+    pd++;
+
+    return(pd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FULL_PATH - make a full path out of NAME */
 
 int full_path(char *path, int nc, char *dir, char *name)
@@ -501,30 +550,6 @@ int full_path(char *path, int nc, char *dir, char *name)
     path[nc-1] = '\0';
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PATH_BASE - do what ':r' does to S */
-
-char *path_base(char *s)
-   {int nc;
-    char *pd;
-    static char d[LRG];
-
-    strcpy(d, s);
-    nc = strlen(d);
-    if (nc >= LRG)
-       nc = LRG;
-    if (nc < 1)
-       nc = 1;
-
-    for (pd = d + nc-1; pd >= d; pd--)
-        {if (*pd == '.')
-	    {*pd = '\0';
-	     break;};};
-
-    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
