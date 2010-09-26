@@ -1242,6 +1242,7 @@ extern int
  SC_blankp(char *s, char *chr),
  SC_blankl(char *s, char *chr),
  SC_is_print_char(int c, int flag),
+ SC_strings_file(char **sa, char *fname, char *mode),
  SC_print_charsp(char *s, int sp),
  SC_numstrp(char *s),
  SC_intstrp(char *s, int base),
