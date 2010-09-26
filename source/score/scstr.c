@@ -1339,6 +1339,26 @@ char **SC_file_strings(char *fname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_STRINGS_FILE - write the arrray of strings SA to the file FNAME */
+
+int SC_strings_file(char **sa, char *fname, char *mode)
+   {int i, rv;
+    FILE *fp;
+
+    rv = FALSE;
+
+    fp = fopen(fname, mode);
+    if (fp != NULL)
+       {for (i = 0; sa[i] != NULL; i++)
+	    fputs(sa[i], fp);
+	fclose(fp);
+	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_FREE_STRINGS - free the an array of strings SA
  *                 - and each string in the array
  */
