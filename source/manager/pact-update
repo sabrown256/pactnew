@@ -484,7 +484,7 @@ if ($status > 1) then
 endif
 
 set CfgMan    = $cwd/cfgman
-set System    = `$CfgMan use`
+setenv System `$CfgMan use`
 set Base      = $cwd:h
 set Root      = $Base/dev/$System
 set IncDir    = $Root/include

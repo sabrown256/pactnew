@@ -72,13 +72,13 @@ int test_1(void)
 	      rb[1] = r[0][i+1];
 	      rb[2] = r[1][j];
 	      rb[3] = r[1][j+1];
-	      ry[i] = PM_polygon_box(rb);
+	      ry[i] = PM_polygon_box(2, rb);
 
 	      tb[0] = t[0][i];
 	      tb[1] = t[0][i+1];
 	      tb[2] = t[1][j];
 	      tb[3] = t[1][j+1];
-	      ty[i] = PM_polygon_box(tb);};};
+	      ty[i] = PM_polygon_box(2, tb);};};
 
     t0 = SC_wall_clock_time();
 

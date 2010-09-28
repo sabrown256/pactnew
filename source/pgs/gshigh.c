@@ -916,7 +916,7 @@ SC_array *PG_clip_polygon(PG_device *dev, PM_polygon *py)
     if (bnd[3] < bnd[2])
        {SC_SWAP_VALUE(double, bnd[2], bnd[3]);};
 
-    pb = PM_polygon_box(bnd);
+    pb = PM_polygon_box(2, bnd);
 
     a = PM_intersect_polygons(NULL, py, pb);
 

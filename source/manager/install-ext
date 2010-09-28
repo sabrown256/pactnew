@@ -10,7 +10,7 @@
 
 unalias *
 
-set System = $1
+setenv System $1
 shift
 set ScrX   = ( $argv )
 

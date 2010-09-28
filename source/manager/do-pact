@@ -701,7 +701,7 @@ switch ($Phase)
         call QUALIFY()
 
         flog $LogHost pwd
-        flog $LogHost set System = `./cfgman use`
+        flog $LogHost setenv System `./cfgman use`
         flog $LogHost set path = ( . $WrkDir/dev/$System/bin $path )
 
         flog $LogHost setenv Err  2

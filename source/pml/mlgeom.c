@@ -528,7 +528,7 @@ int PM_convex_contains_2d(double *xc, PM_polygon *py)
        _PM.tol = 10.0*PM_machine_precision();
 
     x = py->x;
-    n = py->np;
+    n = py->nn;
 
 /* determine the length scale hence the absolute tolerance */
     nrm = 1.0/((double) n);
@@ -584,7 +584,7 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int bnd)
     PM_polygon *pt;
 
     x = py->x;
-    n = py->np;
+    n = py->nn;
 
 /* initialize a triangle template */
     pt = PM_init_polygon(2, 4);
@@ -739,7 +739,7 @@ double PM_polygon_area(PM_polygon *py)
     double **x;
 
     x  = py->x;
-    np = py->np - 1;
+    np = py->nn - 1;
 
     x1[0] = x[0][0];
     x1[1] = x[1][0];
@@ -835,12 +835,12 @@ static void _PM_sort_points(int nd, double *x1, int n,
 
 int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 			      double *x1, double *x2, PM_polygon *py, int wh)
-   {int i, n, ni, nd, np, p1, p2, rv, rej;
+   {int i, n, ni, nd, nn, p1, p2, rv, rej;
     int *sides;
     double x0[PM_SPACEDM], x3[PM_SPACEDM], x4[PM_SPACEDM];
     double **xi;
 
-    np = py->np;
+    nn = py->nn;
     nd = py->nd;
 
     n     = 100;
@@ -848,7 +848,7 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
     sides = FMAKE_N(int, n, "PM_INTERSECT_LINE_POLYGON:sides");
 
     ni = 0;
-    for (i = 1; i < np; i++)
+    for (i = 1; i < nn; i++)
         {PM_polygon_get_point(x3, py, i);
 	 PM_polygon_get_point(x4, py, i-1);
 
@@ -1191,7 +1191,7 @@ void PM_orient_polygon(PM_polygon *p)
     double **x;
 
     x  = p->x;
-    n  = p->np;
+    n  = p->nn;
     nd = p->nd;
 
     orient = PM_DELTA_CROSS_2D(x[0][1], x[1][1], x[0][2], x[1][2],
@@ -1222,7 +1222,7 @@ int PM_polygon_orient(PM_polygon *p)
     double **x;
 
     x = p->x;
-    n = p->np;
+    n = p->nn;
 
     nm = 0;
     np = 0;
@@ -1258,7 +1258,7 @@ void PM_nearest_point(PM_polygon *py, double *xs, double *xt, int *pi)
     double **x;
 
     x = py->x;
-    n = py->np;
+    n = py->nn;
 
     smn  = HUGE;
     indx = -1;

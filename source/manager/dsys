@@ -47,6 +47,9 @@ umask 007
 
 limit stacksize unlimited >& /dev/null
 
+unset System
+unsetenv System
+
 set CfgMan = $MngDir/cfgman
 
 setenv System  `$CfgMan use`
@@ -748,8 +751,8 @@ switch ($Cmnd)
                    breaksw
               case -os:
                    shift
+                   setenv System  $1
                    set ExplSystem = TRUE
-                   set System     = $1
                    set RootDir    = $Root/dev/$System
                    set IncDir     = $RootDir/include
                    set EnvCsh     = $IncDir/env-pact.csh
@@ -838,7 +841,7 @@ switch ($Cmnd)
         unset gdir
 
 # set the configuration for this system
-        set System = `$CfgMan add $Configuration $Alias`
+        setenv System `$CfgMan add $Configuration $Alias`
 
 # now that we have the system, reset the variables that depend on it
         set Root   = $BaseDev/$System
@@ -942,7 +945,7 @@ switch ($Cmnd)
         $RM $EnvCsh
         touch $EnvCsh
         Note $EnvCsh ""
-        Note $EnvCsh "set System = $System"
+        Note $EnvCsh "setenv System $System"
         Note $EnvCsh "set path   = ( . $BaseDev/"'$System/bin $path )'
         Note $EnvCsh ""
 
@@ -1461,7 +1464,7 @@ CFG_DONE:
                    breaksw
 
               case -x:
-                   set System  = `$CfgMan use`
+                   setenv System  `$CfgMan use`
                    set Root    = $BaseDev/$System
                    set IncDir  = $Root/include
                    set Pck     = `cat $IncDir/package`

@@ -189,23 +189,58 @@ PM_polygon *PM_make_polygon(int nd, int n, ...)
  *                - from a box
  */
 
-PM_polygon *PM_polygon_box(double *bx)
-   {PM_polygon *py;
+PM_polygon *PM_polygon_box(int nd, double *bx)
+   {int i, n;
+    double a;
+    PM_polygon *py;
 
-    py = PM_init_polygon(2, 5);
+    py = PM_init_polygon(nd, 10);
 
-    py->x[0][0] = bx[0];
-    py->x[1][0] = bx[2];
-    py->x[0][1] = bx[1];
-    py->x[1][1] = bx[2];
-    py->x[0][2] = bx[1];
-    py->x[1][2] = bx[3];
-    py->x[0][3] = bx[0];
-    py->x[1][3] = bx[3];
-    py->x[0][4] = bx[0];
-    py->x[1][4] = bx[2];
+    n = 0;
 
-    py->nn = 5;
+    if (nd == 1)
+       {n = 3;
+
+	py->x[0][0] = bx[0];
+	py->x[0][1] = bx[1];
+	py->x[0][2] = bx[0];}
+
+    else if (nd == 2)
+       {n = 5;
+
+	py->x[0][0] = bx[0];
+	py->x[0][1] = bx[1];
+	py->x[0][2] = bx[1];
+	py->x[0][3] = bx[0];
+	py->x[0][4] = bx[0];
+
+	py->x[1][0] = bx[2];
+	py->x[1][1] = bx[2];
+	py->x[1][2] = bx[3];
+	py->x[1][3] = bx[3];
+	py->x[1][4] = bx[2];}
+
+/* project 3D polygon to mid plane - pending further requirements */
+    else if (nd == 3) 
+       {n = 5;
+
+	py->x[0][0] = bx[0];
+	py->x[0][1] = bx[1];
+	py->x[0][2] = bx[1];
+	py->x[0][3] = bx[0];
+	py->x[0][4] = bx[0];
+
+	py->x[1][0] = bx[2];
+	py->x[1][1] = bx[2];
+	py->x[1][2] = bx[3];
+	py->x[1][3] = bx[3];
+	py->x[1][4] = bx[2];
+
+	a = 0.5*(bx[4] + bx[5]);
+	for (i = 0; i < n; i++)
+	    py->x[2][i] = a;};
+
+    py->nn = n;
 
     return(py);}
 

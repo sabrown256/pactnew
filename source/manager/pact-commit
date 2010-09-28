@@ -46,7 +46,9 @@ set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 set VersionID = `code-date`
 set HelpCode  = $MngDir/$0
 set CfgMan    = $MngDir/cfgman
-set System    = `$CfgMan use`
+
+setenv System  `$CfgMan use`
+
 set DevDir    = $Base/dev/$System
 set UpdateLog = $DevDir/log/update
 set Changed   = $MngDir/Changed
