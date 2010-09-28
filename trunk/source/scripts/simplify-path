@@ -37,7 +37,8 @@ while ($#argv > 0)
 end
 
 # get the variable value in list form
-set val = ( `printenv $Var | sed 's/^:/--:/' | sed 's/:$/:--/' | sed 's/:/ /g'` )
+# substitute '+@-@+' for ' ' before converting ':' to ' '
+set val = ( `printenv $Var | sed 's| |+@-@+|g' | sed 's/^:/--:/' | sed 's/:$/:--/' | sed 's/:/ /g'` )
 
 # compute a new val in list form
 set nval = ""
@@ -64,7 +65,8 @@ foreach i ($nval)
    endif
 end
 
-setenv NVAL `echo $NVAL | sed 's/--//g'`
+# substitute ' ' for '+@-@+'
+setenv NVAL `echo $NVAL | sed 's/--//g' | sed 's|+@-@+| |g'`
 
 # print the new val
 if ($Synt == csh) then

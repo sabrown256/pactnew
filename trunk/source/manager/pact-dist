@@ -30,7 +30,7 @@ if ($?USER == 0) then
    endif
 endif
 
-set System        = `./cfgman use`
+setenv System `./cfgman use`
 set Manager       = manager
 set Exe           = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )

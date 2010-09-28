@@ -27,6 +27,7 @@ if ($?DAS_ROOT == 1) then
    set extra = ( $DAS_ROOT/pactnew/bin/pact $DAS_ROOT/pact/bin/pact )
 endif
 
+# GOTCHA: this is very weak logic in a do-net situation
 foreach d ( ../dev/*/bin $extra )
    set path = ( $d /usr/bin /bin . )
    rehash

@@ -214,12 +214,12 @@ Main:
 
           case -s:
                    shift
-                   set System  = $1
-                   set RootDir = $Base/dev/$System
-                   set IncDir  = $RootDir/include
-                   set EnvCsh  = $IncDir/env-pact.csh
-                   set EnvSh   = $IncDir/env-pact.sh
-                   set EnvDk   = $IncDir/env-pact.dk
+                   setenv System   $1
+                   setenv RootDir  $Base/dev/$System
+                   setenv IncDir   $RootDir/include
+                   setenv EnvCsh   $IncDir/env-pact.csh
+                   setenv EnvSh    $IncDir/env-pact.sh
+                   setenv EnvDk    $IncDir/env-pact.dk
                    breaksw
 
           case -t:

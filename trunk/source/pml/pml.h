@@ -1045,7 +1045,7 @@ extern PM_mesh_topology
 extern PM_polygon
  *PM_init_polygon(int nd, int n),
  *PM_make_polygon(int nd, int n, ...),
- *PM_polygon_box(double *bx),
+ *PM_polygon_box(int nd, double *bx),
  *PM_copy_polygon(PM_polygon *py);
 
 extern void
