@@ -1,5 +1,5 @@
 TXT: PML User's Manual
-MOD: 09/02/2010
+MOD: 09/29/2010
 
 <CENTER>
 <P>
@@ -817,11 +817,11 @@ and only if the segment, ray, or line crosses the plan.<p>
 <P>Return TRUE if and only if the n points from the px and py arrays are
 colinear in ND dimensions.<p>
 
-<B>int PM_contains_nd(double *xc, PM_polygon *py, int bnd)
+<B>int PM_contains_nd(double *xc, PM_polygon *py)
 </B><BR>
 <P>
-Return TRUE if and only if the point Xc is contained in the plane region bounded
-by the polygon PY. If bnd it TRUE points on the boundary are included.<p>
+Return 1 if the point Xc is interior to PY, 0 if Xc is on the boundary of PY,
+and -1 if Xc is exterior to PY.<p>
 
 <B>int PM_intersect_line_polygon(int *pni, double **pxi, double *x1, double *x2,
  PM_polygon *py, int wh)
