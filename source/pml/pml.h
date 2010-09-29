@@ -222,6 +222,11 @@
      for (_id = 0; _id < _nd; _id++)                                         \
          _v[_id][_i] = _x[_id];}
 
+#define PM_vector_copy_point(_nd, _xa, _ia, _xb, _ib)                        \
+    {int _id;                                                                \
+     for (_id = 0; _id < _nd; _id++)                                         \
+         _xa[_id][_ia] = _xb[_id][_ib];}
+
 #define PM_polygon_get_point(_x, _py, _i)                                    \
     {int _id;                                                                \
      for (_id = 0; _id < _py->nd; _id++)                                     \
@@ -844,7 +849,7 @@ extern int
  PM_cross_line_plane(double *x1, double *x2,
 		     double **px, double *x0, int line),
  PM_colinear_nd(int nd, int n, double **x),
- PM_contains_nd(double *xc, PM_polygon *py, int bnd),
+ PM_contains_nd(double *xc, PM_polygon *py),
  PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 			   double *x1, double *x2, PM_polygon *py, int wh),
  PM_polygon_orient(PM_polygon *p);

@@ -19,10 +19,17 @@
        _rv = (_cp < 0) ? -1 : 1;}
 
 typedef struct s_pt pt;
+typedef struct s_polywalk polywalk;
 
 struct s_pt
    {int i;
     double x[PM_SPACEDM];};
+
+struct s_polywalk
+   {int nn;                  /* number of nodes */
+    int nt;                  /* number of sides traversed */
+    char *traversed;
+    PM_polygon *py;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -567,73 +574,85 @@ int PM_convex_contains_2d(double *xc, PM_polygon *py)
 /*--------------------------------------------------------------------------*/
 
 /* _PM_CONTAINS_2D - check whether the point XC is contained
- *                 - in the possibly non-convex polygon Py
- *                 - if BND is TRUE return TRUE iff the point is in the
- *                 - interior
- *                 - otherwise return TRUE iff the point is on the boundary
- *                 - or in the interior
+ *                 - in the possibly non-convex polygon PY
+ *                 - return 1 if XC is interior to PY
+ *                 -        0 if XC is on the boundary of PY
+ *                 -       -1 if XC is exterior to PY
  *                 - a point is considered inside a non-convex polygon
  *                 - iff it is contained in an odd number of the triangles
  *                 - which are constructed from an arbitrary point in
  *                 - space and the nodes of each edge of the polygon in turn
  */
 
-static int _PM_contains_2d(double *xc, PM_polygon *py, int bnd)
-   {int i, n, nm, ic, rv;
-    double **x, **xp;
+static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
+   {int i, n, nm, ic, in, rv;
+    double x1[PM_SPACEDM], x2[PM_SPACEDM];
+    double **xi;
     PM_polygon *pt;
 
-    x = py->x;
     n = py->nn;
 
 /* initialize a triangle template */
     pt = PM_init_polygon(2, 4);
     pt->nn = 4;
-    xp = pt->x;
 
     rv = TRUE;
+    if (iy != NULL)
+       *iy = -1;
 
-/* check for XC being a node when interior only is requested
+/* check for XC being a node
  * stop immediately in that case to save flops
  */
-    if (bnd == TRUE)
-       rv = (PM_vct_equal(2, xc, py->x, 0, -1.0) == FALSE);
+    for (i = 0; i < n && (rv == TRUE); i++)
+        {PM_polygon_get_point(x1, py, i);
+	 if (PM_array_equal(xc, x1, 2, -1.0) == TRUE)
+	    {rv = 0;
+	     if (iy != NULL)
+	        *iy = i;};};
+
+/* check for XC being on a side
+ * stop immediately in that case to save flops
+ * NOTE: use the polygon vectors temporarily
+ */
+    xi = pt->x;
+    PM_vector_put_point(2, xc, xi, 2);
+    PM_vector_copy_point(2, xi, 0, py->x, 0);
+    for (i = 1; i < n && (rv == TRUE); i++)
+        {PM_vector_copy_point(2, xi, (i & 1), py->x, i);
+	 if (_PM_colinear_2d(xi, 3) == TRUE)
+	    {rv = 0;
+	     if (iy != NULL)
+	        *iy = i;};};
 
 /* use the first node as the common point of the test triangle
  * since any point will do and this
  * means we get to loop from 2 to n-1 instead of 1 to n
  */
     if (rv == TRUE)
-       {xp[0][0] = x[0][0];
-	xp[1][0] = x[1][0];
-	xp[0][3] = x[0][0];
-	xp[1][3] = x[1][0];
+       {PM_polygon_put_point(x1, pt, 0);
+	PM_polygon_put_point(x1, pt, 3);
 
 /* count the number of test triangles containing the point */
 	ic = 0;
 	nm = n - 1;
 	for (i = 2; (i < nm) && (rv == TRUE); i++)
-	    {if (bnd == TRUE)
-	        rv = (PM_vct_equal(2, xc, py->x, i-1, -1.0) == FALSE);
+	    {PM_polygon_get_point(x1, py, i-1);
+	     PM_polygon_get_point(x2, py, i);
 
 /* do not check degenerate side */
-	     if ((rv == TRUE) &&
-		 ((x[0][i-1] != x[0][i]) || (x[1][i-1] != x[1][i])))
+	     if (PM_array_equal(x1, x2, 2, -1.0) == FALSE)
 
 /* complete the test triangle containing one side of the polygon */
-	        {xp[0][1] = x[0][i-1];
-		 xp[1][1] = x[1][i-1];
-		 xp[0][2] = x[0][i];
-		 xp[1][2] = x[1][i];
+	        {PM_polygon_put_point(x1, pt, 1);
+		 PM_polygon_put_point(x2, pt, 2);
 
-		 ic += PM_convex_contains_2d(xc, pt);};};
+		 in = PM_convex_contains_2d(xc, pt);
+		 ic += in;};};
 
-	if ((rv == TRUE) && (bnd == TRUE))
-	   rv = (PM_vct_equal(2, xc, py->x, nm, -1.0) == FALSE);
+	ic >>= 1;
 
 /* if IC is odd the point is inside of Py */
-	ic >>= 1;
-	rv  &= (ic & 1);};
+	rv = (ic & 1) ? 1 : -1;};
 
     PM_free_polygon(pt);
 
@@ -644,14 +663,13 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int bnd)
 
 /* _PM_CONTAINS_3D - check whether the 3D point is contained in the
  *                 - polygon PY
- *                 - if BND is TRUE return TRUE iff the point is in the
- *                 - interior
- *                 - otherwise return TRUE iff the point is on the boundary
- *                 - or in the interior
+ *                 - return 1 if XC is interior to PY
+ *                 -        0 if XC is on the boundary of PY
+ *                 -       -1 if XC is exterior to PY
  */
 
-static int _PM_contains_3d(double *xc, PM_polygon *py, int bnd)
-   {int i, id, jd, nd, rv;
+static int _PM_contains_3d(double *xc, PM_polygon *py, int *iy)
+   {int i, id, jd, nd, rv, in, out;
     double tol, ds1, ds2, dx1c, dx2c, nrm;
     double x1[PM_SPACEDM], x2[PM_SPACEDM];
     double dx1[PM_SPACEDM], dx2[PM_SPACEDM];
@@ -693,38 +711,68 @@ static int _PM_contains_3d(double *xc, PM_polygon *py, int bnd)
 	         nx[1][id]*nx[1][jd] +
 	         nx[2][id]*nx[2][jd];};
 
-    rv = TRUE;
+    in = TRUE;
+    for (id = 0; id < nd; id++)
+        in &= (d[id] > tol);
 
-    if (bnd == TRUE)
-       {for (id = 0; id < nd; id++)
-	    rv &= (d[id] > -tol);}
+    if (in == FALSE)
+       {out = TRUE;
+	for (id = 0; id < nd; id++)
+	    out &= (d[id] <= -tol);};
+
+    if (in == TRUE)
+       rv = 1;
+    else if (out == TRUE)
+       rv = -1;
     else
-       {for (id = 0; id < nd; id++)
-	    rv &= (d[id] > tol);};
+       rv = 0;
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CONTAINS_ND - check whether the ND point is contained in (below) the
+/* PM_CONTAINS_ND - check whether the point XC is contained in (below) the
  *                - polygon PY
- *                - if BND is TRUE return TRUE iff the point is in the
- *                - interior
- *                - otherwise return TRUE iff the point is on the boundary
- *                - or in the interior
+ *                - return 1 if XC is interior to PY
+ *                -        0 if XC is on the boundary of PY
+ *                -       -1 if XC is exterior to PY
  */
 
-int PM_contains_nd(double *xc, PM_polygon *py, int bnd)
+int PM_contains_nd(double *xc, PM_polygon *py)
    {int nd, rv;
 
     rv = FALSE;
     nd = py->nd;
 
     if (nd == 2)
-       rv = _PM_contains_2d(xc, py, bnd);
+       rv = _PM_contains_2d(xc, py, NULL);
     else if (nd == 3)
-       rv = _PM_contains_3d(xc, py, bnd);
+       rv = _PM_contains_3d(xc, py, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_BOUNDARY_ND - check whether the point XC is contained in (below) the
+ *                - polygon PY
+ *                - return 1 if XC is interior to PY
+ *                -        0 if XC is on the boundary of PY
+ *                -       -1 if XC is exterior to PY
+ *                - if XC is a node of PY return its index in IY
+ */
+
+int PM_boundary_nd(double *xc, PM_polygon *py, int *iy)
+   {int nd, rv;
+
+    rv = FALSE;
+    nd = py->nd;
+
+    if (nd == 2)
+       rv = _PM_contains_2d(xc, py, iy);
+    else if (nd == 3)
+       rv = _PM_contains_3d(xc, py, iy);
 
     return(rv);}
 
@@ -870,15 +918,15 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
     p1 = FALSE;
     p2 = FALSE;
     if (ni < 2)
-       {p1 = PM_contains_nd(x1, py, TRUE);
-        p2 = PM_contains_nd(x2, py, TRUE);
+       {p1 = PM_contains_nd(x1, py);
+        p2 = PM_contains_nd(x2, py);
         if (ni == 1)
-	   {if (p1 == TRUE)
+	   {if (p1 == 1)
 	       {PM_vector_put_point(nd, x1, xi, 1);}
 	    else
 	       {PM_vector_put_point(nd, x2, xi, 1);};}
 
-	else if ((p1 == TRUE) && (p2 == TRUE))
+	else if ((p1 == 1) && (p2 == 1))
 	   {PM_vector_put_point(nd, x1, xi, 0);
 	    PM_vector_put_point(nd, x2, xi, 1);};};
 
@@ -894,7 +942,7 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
     else
        *psides = sides;
 
-    rv = ((ni > 1) || p1 || p2);
+    rv = ((ni > 1) || (p1 == 1) || (p2 == 1));
 
     return(rv);}
 
@@ -1020,31 +1068,32 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
     if (ok == TRUE)
        rv = 0;
     else
-       {rv = PM_contains_nd(x0, pb, FALSE);
-	rv = (rv == FALSE) ? 1 : -1;};
+       {rv = PM_contains_nd(x0, pb);
+	rv = (rv == -1) ? 1 : -1;};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_COMBINE_POLYGONS - compute and return either the intersection or union
- *                      - of the polgons PN and PP depending on
- *                      - the value of OP
- *                      - return the result in PC
+/* _PM_DECOMPOSE_POLYGON - return the polygon constructed from PA by
+ *                       - splitting all sides of PA which cross sides
+ *                       - of PB into multiple line segments
+ *                       - the resulting polygon has all the nodes of
+ *                       - PA and all the intersection points and
+ *                       - has the same orientation and area as PA
  */
 
-static void _PM_combine_polygons(SC_array *a,
-				 PM_polygon *pa, PM_polygon *pb,
-				 PM_binary_operation op)
-   {int i1, i2, id, ip, na, ni, nd, nx;
-    int closed, nin, nout, inc, ok;
-    int *sides;
+static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
+   {int i, id, in, ni, nd, nn, nx;
+    char *t;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], xa[PM_SPACEDM];
     double **xi;
     PM_polygon *pc;
+    polywalk *pw;
 
     nd = pa->nd;
+    nn = pa->nn;
 
     nx = max(pa->np, pb->np);
     nx = 4*nx;
@@ -1056,13 +1105,104 @@ static void _PM_combine_polygons(SC_array *a,
 	 x2[id] = 0.0;
 	 xa[id] = 0.0;};
 
+/* travserse the perimeter of PA looking intersections with PB */
+    PM_polygon_get_point(x1, pa, 0);
+    for (i = 1; i < nn; i++)
+        {PM_polygon_get_point(x2, pa, i);
+
+	 _PM_add_node(pc, x1);
+
+	 PM_intersect_line_polygon(&ni, &xi, NULL, x1, x2, pb, 2);
+
+	 for (in = 0; in < ni; in++)
+	     {PM_vector_get_point(nd, xa, xi, in);
+	      _PM_add_node(pc, xa);};
+
+	 PM_copy_point(nd, x1, x2);
+	 PM_free_vectors(nd, xi);};
+
+    _PM_add_node(pc, x1);
+
+    t = FMAKE_N(char, nn, "_PM_DECOMPOSE_POLYGON:t");
+    memset(t, 0, pc->nn);
+
+    pw = FMAKE(polywalk, "_PM_DECOMPOSE_POLYGON:pw");
+    pw->nn        = pc->nn;
+    pw->nt        = 0;
+    pw->traversed = t;
+    pw->py        = pc;
+
+    return(pw);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PM_DECOMPOSE_POLYGON - return the polygon constructed from PA by
+ *                       - splitting all sides of PA which cross sides
+ *                       - of PB into multiple line segments
+ *                       - the resulting polygon has all the nodes of
+ *                       - PA and all the intersection points and
+ *                       - has the same orientation and area as PA
+ */
+
+static void _PM_free_polywalk(polywalk *pw, int rel)
+   {
+
+    if (rel == TRUE)
+       PM_free_polygon(pw->py);
+
+    SFREE(pw->traversed);
+    SFREE(pw);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PM_COMBINE_POLYGONS - compute and return either the intersection or union
+ *                      - of the polgons P1 and P2 depending on
+ *                      - the value of OP
+ *                      - return the result in PC
+ */
+
+static void _PM_combine_polygons(SC_array *a,
+				 PM_polygon *p1, PM_polygon *p2,
+				 PM_binary_operation op)
+   {int i1, ib, id, na, ni, nd, nx;
+    int closed, nin, nout, inc, ok;
+    int *sides;
+    double x1[PM_SPACEDM], x2[PM_SPACEDM];
+    double **xi;
+    PM_polygon *pa, *pb, *pc;
+    polywalk *wa, *wb;
+
+int ok1, ib1;
+double x11[PM_SPACEDM];
+
+    wa = _PM_decompose_polygon(p1, p2);
+    wb = _PM_decompose_polygon(p2, p1);
+
+    pa = wa->py;
+    pb = wb->py;
+
+    nd = pa->nd;
+
+    nx = max(pa->np, pb->np);
+    nx = 4*nx;
+    pc = PM_init_polygon(nd, nx);
+
+/* not absolutely necessary but cleaner */
+    for (id = 0; id < PM_SPACEDM; id++)
+        {x1[id] = 0.0;
+	 x2[id] = 0.0;};
+
     nx = pc->np;
 
     PM_polygon_get_point(x1, pa, 0);
 
-    i1 = PM_contains_nd(x1, pb, TRUE);
-    if (((i1 == TRUE) && (op == PM_INTERSECT)) ||
-	((i1 == FALSE) && (op == PM_UNION)))
+    i1 = PM_contains_nd(x1, pb);
+    if (((i1 == 1) && (op == PM_INTERSECT)) ||
+	((i1 != 1) && (op == PM_UNION)))
        _PM_add_node(pc, x1);
 
 /* travserse the perimeter of PA looking for entries and exits from PB */
@@ -1071,69 +1211,94 @@ static void _PM_combine_polygons(SC_array *a,
     nout   = 0;
     closed = FALSE;
     PM_polygon_get_point(x1, pa, 0);
-    for (i2 = 1; (pc->nn < nx) && (closed == FALSE); i2 += inc)
-        {na = pa->nn - 1;
-	 i2 = (i2 + na) % na;
-	 PM_polygon_get_point(x2, pa, i2);
+#if 0
+    for (i1 = 1; (pc->nn < pc->np) && (wa->nt < wa->nn-1); i1 += inc)
+#else
+    for (i1 = 1; (pc->nn < nx) && (closed == FALSE); i1 += inc)
+#endif
+        {pa = wa->py;
+	 pb = wb->py;
+	 na = pa->nn - 1;
+	 i1 = (i1 + na) % na;
+#if 0
+         if (wa->traversed[i1] == TRUE)
+	    continue;
+	 else
+#endif
+	    {wa->traversed[i1] = TRUE;
+	     wa->nt++;};
 
+/* right way fails */
+	 PM_polygon_get_point(x11, pa, i1);
+	 ok1 = PM_boundary_nd(x11, pb, &ib1);
+
+/* wrong way succeeds */
+	 PM_polygon_get_point(x2, pa, i1);
 	 ok = PM_intersect_line_polygon(&ni, &xi, &sides, x1, x2, pb, 2);
-
-/* no intersection points for (X1, X2) with PB */
+	 ib = sides[0];
 	 if (ni == 0)
-	    {if (op == PM_INTERSECT)
+	    {ok = (ok == TRUE) ? 1 : -1;
+	     PM_copy_point(nd, x1, x2);}
+	 else
+	    {ok = 0;
+	     PM_vector_get_point(nd, x1, xi, 0);};
+	 SFREE(sides);
+	 PM_free_vectors(nd, xi);
 
-/* (X1, X2) is interior to PB */
-	        {if (ok == TRUE)
-		    {closed = _PM_add_node(pc, x2);
-		     nin++;}
 
-/* (X1, X2) is exterior to PB */
-		 else
-		    nout++;
-
-/* if all the points are outside then PB is the intersection */
-		 if (nout > na)
-		    {closed = TRUE;
-		     PM_polygon_copy_points(pc, pb);}
-		 else
-		    PM_copy_point(nd, x1, x2);}
+/* inside */
+	 if (ok == 1)
+	    {nin++;
+	     if (op == PM_INTERSECT)
+	        closed = _PM_add_node(pc, x1);
 
 	     else if (op == PM_UNION)
-	        {closed = _PM_add_node(pc, x2);
-		 PM_copy_point(nd, x1, x2);};}
+	        {if (nin > na)
+		    {closed = TRUE;
+		     PM_polygon_copy_points(pc, pa);};};}
 
-/* one or more intersection points for (X1, X2) with PB */
+/* outside */
+	 else if (ok == -1)
+	    {nout++;
+	     if (op == PM_INTERSECT)
+	        {if (nout > na)
+		    {closed = TRUE;
+		     PM_polygon_copy_points(pc, pb);};}
+
+	     else if (op == PM_UNION)
+	        closed = _PM_add_node(pc, x1);}
+
+/* on */
 	 else
-	    {for (ip = 0; ip < ni; ip++)
-	         {PM_vector_get_point(nd, xa, xi, ip);
+	    {closed = _PM_add_node(pc, x1);
 
-/* GOTCHA: if XA is also a node of PB we do not know which way to
- * go for the PM_UNION case - need more logic here
- */
-		  ok = PM_polygon_entering(xa, pb, sides[ip], pa);
-
-		  closed = _PM_add_node(pc, xa);
-		  PM_copy_point(nd, x1, xa);
+	     ok = PM_polygon_entering(x1, pb, ib, pa);
 
 /* entering */
-		  if (((ok == 1) && (op == PM_INTERSECT)) ||
-		      ((ok == -1) && (op == PM_UNION)))
-		     {inc = 1;
-		      i2  = sides[ip];}
+	     if (((ok == 1) && (op == PM_INTERSECT)) ||
+		 ((ok == -1) && (op == PM_UNION)))
+	        {inc = 1;
+		 i1  = ib;}
 
 /* leaving */
-		  else if (((ok == -1) && (op == PM_INTERSECT)) ||
-			   ((ok == 1) && (op == PM_UNION)))
-		     {inc = -1;
-		      i2  = sides[ip] - inc;};
+	     else if (((ok == -1) && (op == PM_INTERSECT)) ||
+		      ((ok == 1) && (op == PM_UNION)))
+	        {inc = -1;
+		 i1  = ib - inc;};
 
-		  SC_SWAP_VALUE(PM_polygon *, pa, pb);
-		  break;};};
-
-	 PM_free_vectors(nd, xi);
-	 SFREE(sides);};
+	     SC_SWAP_VALUE(polywalk *, wa, wb);};
+#if 0
+	 if (closed == TRUE)
+	    {PM_polygon_push(a, pc);
+	     pc = PM_init_polygon(nd, nx);
+	     closed = FALSE;};
+#endif
+       };
 
     PM_polygon_push(a, pc);
+
+    _PM_free_polywalk(wa, TRUE);
+    _PM_free_polywalk(wb, TRUE);
 
     return;}
 
