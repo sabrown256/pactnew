@@ -8,7 +8,7 @@
 ; include "cpyright.h"
 ;
 
-(define dev (pg-make-device "PS" "COLOR" "iply 2.0 2.0"))
+(define dev (pg-make-device "PS" "COLOR" "iply2 2.0 2.0"))
 ;(define dev (pg-make-device "SCREEN" "COLOR" "Intersecting Polygon"))
 (ps-dots-inch 100)
 (axis-number-minor-ticks 2)
@@ -46,7 +46,8 @@
 	  (define (do-one x)
 	          (apply pg-fill-polygon (list dev gray x)))
 
-	  (for-each do-one ip)
+	  (if (pair? ip)
+	      (for-each do-one ip))
 
           (pg-set-line-color! dev red)
 	  (apply pg-draw-polyline-n (list dev 2 @world #t ply))

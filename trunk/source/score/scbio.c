@@ -1022,7 +1022,14 @@ static int _SC_bio_flush(bio_desc *bid)
 
 #else
 
+   {BIGINT ad;
+
+/* NOTE: flush should not change file position so save and restore */
+    ad = bid->curr;
+
    _SC_bio_free(bid, FALSE);
+
+    bid->curr = ad;}
 
 #endif
 
