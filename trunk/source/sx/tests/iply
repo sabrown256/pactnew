@@ -24,7 +24,7 @@ source ../../tests/common
 
    foreach t (iply1 iply2)
 
-      NoteD $Log -n "                       $t .......... "
+      NoteD $Log -n "                       $t ..................... "
       Note $Log ""
 
       flog $Log rm -f $t*.diff $t*.ps
