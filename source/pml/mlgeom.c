@@ -28,7 +28,9 @@ struct s_pt
 struct s_polywalk
    {int nn;                  /* number of nodes */
     int nt;                  /* number of sides traversed */
-    char *traversed;
+    char *marked;            /* TRUE if node has been accounted for */
+    char *where;             /* 1 inside, 0 on, -1 outside counterpart */
+    int *boundary;           /* edge index of counterpart when on */
     PM_polygon *py;};
 
 /*--------------------------------------------------------------------------*/
@@ -883,7 +885,7 @@ static void _PM_sort_points(int nd, double *x1, int n,
 
 int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 			      double *x1, double *x2, PM_polygon *py, int wh)
-   {int i, n, ni, nd, nn, p1, p2, rv, rej;
+   {int i, n, ni, nd, nn, p1, p2, rv, acc;
     int *sides;
     double x0[PM_SPACEDM], x3[PM_SPACEDM], x4[PM_SPACEDM];
     double **xi;
@@ -892,7 +894,7 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
     nd = py->nd;
 
     n     = 100;
-    xi    = PM_make_vectors(2, n);
+    xi    = PM_make_vectors(nd, n);
     sides = FMAKE_N(int, n, "PM_INTERSECT_LINE_POLYGON:sides");
 
     ni = 0;
@@ -901,12 +903,12 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 	 PM_polygon_get_point(x4, py, i-1);
 
          if (PM_cross_seg(x1, x2, x3, x4, x0))
-	    {rej  = FALSE;
-	     rej |= (((wh & 1) == 0) &&
-		     (PM_array_equal(x1, x0, nd, -1.0) == TRUE));
-	     rej |= (((wh & 2) == 0) &&
-		     (PM_array_equal(x2, x0, nd, -1.0) == TRUE));
-	     if (rej == FALSE)
+	    {acc = TRUE;
+	     if (PM_array_equal(x1, x0, nd, -1.0) == TRUE)
+	        acc &= ((wh & 1) == 1);
+	     if (PM_array_equal(x2, x0, nd, -1.0) == TRUE)
+		acc &= ((wh & 2) == 2);
+	     if (acc == TRUE)
 	        {PM_vector_put_point(nd, x0, xi, ni);
 		 sides[ni] = i-1;
 		 ni++;};};};
@@ -914,22 +916,16 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 /* sort the crossings to increasing distance from X1 */
     _PM_sort_points(nd, x1, ni, xi, sides);
 
-/* adjust return values */
+/* figure out inside and outside */
     p1 = FALSE;
     p2 = FALSE;
     if (ni < 2)
        {p1 = PM_contains_nd(x1, py);
-        p2 = PM_contains_nd(x2, py);
-        if (ni == 1)
-	   {if (p1 == 1)
-	       {PM_vector_put_point(nd, x1, xi, 1);}
-	    else
-	       {PM_vector_put_point(nd, x2, xi, 1);};}
+        p2 = PM_contains_nd(x2, py);};
 
-	else if ((p1 == 1) && (p2 == 1))
-	   {PM_vector_put_point(nd, x1, xi, 0);
-	    PM_vector_put_point(nd, x2, xi, 1);};};
+    rv = ((ni > 1) || (p1 == 1) || (p2 == 1));
 
+/* return values */
     *pni = ni;
 
     if (pxi == NULL)
@@ -941,8 +937,6 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
        {SFREE(sides);}
     else
        *psides = sides;
-
-    rv = ((ni > 1) || (p1 == 1) || (p2 == 1));
 
     return(rv);}
 
@@ -1009,7 +1003,7 @@ PM_polygon *PM_polygon_get(SC_array *a, int n)
  *              - return TRUE iff X closes the polygon PD
  */
 
-static INLINE int _PM_add_node(PM_polygon *pd, double *x)
+static INLINE int _PM_add_node(PM_polygon *pd, double *x, int *ps)
    {int nd, n, nm, rv, same;
 
     n  = pd->nn;
@@ -1031,6 +1025,9 @@ static INLINE int _PM_add_node(PM_polygon *pd, double *x)
        rv = PM_vct_equal(nd, x, pd->x, 0, -1.0);
     else
        rv = FALSE;
+
+    if (ps != NULL)
+       *ps = same;
 
     return(rv);}
 
@@ -1085,19 +1082,21 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
  */
 
 static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
-   {int i, id, in, ni, nd, nn, nx;
-    char *t;
+   {int i, id, in, nb, nc, ni, nda, ndb, nn, nx;
+    int *bnd, *sides;
+    char *mk, *wh;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], xa[PM_SPACEDM];
     double **xi;
     PM_polygon *pc;
     polywalk *pw;
 
-    nd = pa->nd;
-    nn = pa->nn;
+    ndb = pb->nd;
+    nda = pa->nd;
+    nn  = pa->nn;
 
     nx = max(pa->np, pb->np);
     nx = 4*nx;
-    pc = PM_init_polygon(nd, nx);
+    pc = PM_init_polygon(nda, nx);
 
 /* not absolutely necessary but cleaner */
     for (id = 0; id < PM_SPACEDM; id++)
@@ -1110,26 +1109,39 @@ static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
     for (i = 1; i < nn; i++)
         {PM_polygon_get_point(x2, pa, i);
 
-	 _PM_add_node(pc, x1);
+	 _PM_add_node(pc, x1, NULL);
 
-	 PM_intersect_line_polygon(&ni, &xi, NULL, x1, x2, pb, 2);
+	 PM_intersect_line_polygon(&ni, &xi, &sides, x1, x2, pb, 2);
 
 	 for (in = 0; in < ni; in++)
-	     {PM_vector_get_point(nd, xa, xi, in);
-	      _PM_add_node(pc, xa);};
+	     {PM_vector_get_point(ndb, xa, xi, in);
+	      _PM_add_node(pc, xa, NULL);};
 
-	 PM_copy_point(nd, x1, x2);
-	 PM_free_vectors(nd, xi);};
+	 PM_copy_point(nda, x1, x2);
+	 PM_free_vectors(ndb, xi);
+	 SFREE(sides);};
 
-    _PM_add_node(pc, x1);
+    _PM_add_node(pc, x1, NULL);
 
-    t = FMAKE_N(char, nn, "_PM_DECOMPOSE_POLYGON:t");
-    memset(t, 0, pc->nn);
+/* fill in the where and boundary arrays */
+    nc = pc->nn;
+    nb = nc*sizeof(int);
+
+    mk = FMAKE_N(char, nc, "_PM_DECOMPOSE_POLYGON:mk");
+    memset(mk, 0, nc);
+
+    wh = FMAKE_N(char, nc, "_PM_DECOMPOSE_POLYGON:wh");
+    memset(wh, 0, nc);
+
+    bnd = FMAKE_N(int, nb, "_PM_DECOMPOSE_POLYGON:bnd");
+    memset(bnd, 0, nb);
 
     pw = FMAKE(polywalk, "_PM_DECOMPOSE_POLYGON:pw");
-    pw->nn        = pc->nn;
+    pw->nn        = nc;
     pw->nt        = 0;
-    pw->traversed = t;
+    pw->marked    = mk;
+    pw->where     = wh;
+    pw->boundary  = bnd;
     pw->py        = pc;
 
     return(pw);}
@@ -1137,13 +1149,7 @@ static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_DECOMPOSE_POLYGON - return the polygon constructed from PA by
- *                       - splitting all sides of PA which cross sides
- *                       - of PB into multiple line segments
- *                       - the resulting polygon has all the nodes of
- *                       - PA and all the intersection points and
- *                       - has the same orientation and area as PA
- */
+/* _PM_FREE_POLYWALK - free polywalk PW and if REL is TRUE free its polygon */
 
 static void _PM_free_polywalk(polywalk *pw, int rel)
    {
@@ -1151,7 +1157,9 @@ static void _PM_free_polywalk(polywalk *pw, int rel)
     if (rel == TRUE)
        PM_free_polygon(pw->py);
 
-    SFREE(pw->traversed);
+    SFREE(pw->marked);
+    SFREE(pw->where);
+    SFREE(pw->boundary);
     SFREE(pw);
 
     return;}
@@ -1168,22 +1176,35 @@ static void _PM_free_polywalk(polywalk *pw, int rel)
 static void _PM_combine_polygons(SC_array *a,
 				 PM_polygon *p1, PM_polygon *p2,
 				 PM_binary_operation op)
-   {int i1, ib, id, na, ni, nd, nx;
-    int closed, nin, nout, inc, ok;
-    int *sides;
-    double x1[PM_SPACEDM], x2[PM_SPACEDM];
-    double **xi;
+   {int i, i1, ib, iba, ibb, id, l, na, nd, nx, nra, nrb;
+    int add, same, more, closed, nin, nout, inc, ok;
+    int *bnd;
+    char *wh;
+    double x1[PM_SPACEDM];
     PM_polygon *pa, *pb, *pc;
     polywalk *wa, *wb;
-
-int ok1, ib1;
-double x11[PM_SPACEDM];
 
     wa = _PM_decompose_polygon(p1, p2);
     wb = _PM_decompose_polygon(p2, p1);
 
     pa = wa->py;
     pb = wb->py;
+
+    nx  = pa->nn;
+    wh  = wa->where;
+    bnd = wa->boundary;
+    for (i = 0; i < nx; i++)
+        {PM_polygon_get_point(x1, pa, i);
+	 wh[i]  = PM_boundary_nd(x1, pb, &ib);
+         bnd[i] = (wh[i] == 0) ? ib-1 : 0;};
+
+    nx  = pb->nn;
+    wh  = wb->where;
+    bnd = wb->boundary;
+    for (i = 0; i < nx; i++)
+        {PM_polygon_get_point(x1, pb, i);
+	 wh[i]  = PM_boundary_nd(x1, pa, &ib);
+         bnd[i] = (wh[i] == 0) ? ib-1 : 0;};
 
     nd = pa->nd;
 
@@ -1193,67 +1214,44 @@ double x11[PM_SPACEDM];
 
 /* not absolutely necessary but cleaner */
     for (id = 0; id < PM_SPACEDM; id++)
-        {x1[id] = 0.0;
-	 x2[id] = 0.0;};
+        x1[id] = 0.0;
 
     nx = pc->np;
 
     PM_polygon_get_point(x1, pa, 0);
 
-    i1 = PM_contains_nd(x1, pb);
-    if (((i1 == 1) && (op == PM_INTERSECT)) ||
-	((i1 != 1) && (op == PM_UNION)))
-       _PM_add_node(pc, x1);
-
-/* travserse the perimeter of PA looking for entries and exits from PB */
-    inc    = 1;
     nin    = 0;
     nout   = 0;
     closed = FALSE;
-    PM_polygon_get_point(x1, pa, 0);
-#if 0
-    for (i1 = 1; (pc->nn < pc->np) && (wa->nt < wa->nn-1); i1 += inc)
-#else
-    for (i1 = 1; (pc->nn < nx) && (closed == FALSE); i1 += inc)
-#endif
+    more   = TRUE;
+
+    i1 = PM_contains_nd(x1, pb);
+    if (((i1 == 1) && (op == PM_INTERSECT)) ||
+	((i1 != 1) && (op == PM_UNION)))
+       closed = _PM_add_node(pc, x1, NULL);
+
+/* travserse the perimeter of PA looking for entries and exits from PB */
+    inc = 1;
+    for (i1 = 1; (pc->nn < pc->np) && (more == TRUE); i1 += inc)
         {pa = wa->py;
 	 pb = wb->py;
 	 na = pa->nn - 1;
 	 i1 = (i1 + na) % na;
-#if 0
-         if (wa->traversed[i1] == TRUE)
-	    continue;
-	 else
-#endif
-	    {wa->traversed[i1] = TRUE;
-	     wa->nt++;};
 
-/* right way fails */
-	 PM_polygon_get_point(x11, pa, i1);
-	 ok1 = PM_boundary_nd(x11, pb, &ib1);
+         ok = wa->where[i1];
+	 ib = wa->boundary[i1];
+	 PM_polygon_get_point(x1, pa, i1);
 
-/* wrong way succeeds */
-	 PM_polygon_get_point(x2, pa, i1);
-	 ok = PM_intersect_line_polygon(&ni, &xi, &sides, x1, x2, pb, 2);
-	 ib = sides[0];
-	 if (ni == 0)
-	    {ok = (ok == TRUE) ? 1 : -1;
-	     PM_copy_point(nd, x1, x2);}
-	 else
-	    {ok = 0;
-	     PM_vector_get_point(nd, x1, xi, 0);};
-	 SFREE(sides);
-	 PM_free_vectors(nd, xi);
-
+         add = FALSE;
 
 /* inside */
 	 if (ok == 1)
 	    {nin++;
 	     if (op == PM_INTERSECT)
-	        closed = _PM_add_node(pc, x1);
+	        add = TRUE;
 
 	     else if (op == PM_UNION)
-	        {if (nin > na)
+	        {if (nin >= na)
 		    {closed = TRUE;
 		     PM_polygon_copy_points(pc, pa);};};}
 
@@ -1261,41 +1259,72 @@ double x11[PM_SPACEDM];
 	 else if (ok == -1)
 	    {nout++;
 	     if (op == PM_INTERSECT)
-	        {if (nout > na)
+	        {if (nout >= na)
 		    {closed = TRUE;
 		     PM_polygon_copy_points(pc, pb);};}
 
 	     else if (op == PM_UNION)
-	        closed = _PM_add_node(pc, x1);}
+	        add = TRUE;}
 
 /* on */
 	 else
-	    {closed = _PM_add_node(pc, x1);
-
-	     ok = PM_polygon_entering(x1, pb, ib, pa);
+	    {closed = _PM_add_node(pc, x1, &same);
+	     wa->marked[i1] = TRUE;
+	     if (same == FALSE)
+	        {ok = PM_polygon_entering(x1, pb, ib, pa);
 
 /* entering */
-	     if (((ok == 1) && (op == PM_INTERSECT)) ||
-		 ((ok == -1) && (op == PM_UNION)))
-	        {inc = 1;
-		 i1  = ib;}
+		 if (((ok == 1) && (op == PM_INTERSECT)) ||
+		     ((ok == -1) && (op == PM_UNION)))
+		    {inc = 1;
+		     i1  = ib;}
 
 /* leaving */
-	     else if (((ok == -1) && (op == PM_INTERSECT)) ||
-		      ((ok == 1) && (op == PM_UNION)))
-	        {inc = -1;
-		 i1  = ib - inc;};
+		 else if (((ok == -1) && (op == PM_INTERSECT)) ||
+			  ((ok == 1) && (op == PM_UNION)))
+		    {inc = -1;
+		     i1  = ib - inc;};
 
-	     SC_SWAP_VALUE(polywalk *, wa, wb);};
-#if 0
+		 SC_SWAP_VALUE(polywalk *, wa, wb);};};
+
+	 if (add == TRUE)
+	    {closed = _PM_add_node(pc, x1, NULL);
+	     wa->marked[i1] = TRUE;};
+
 	 if (closed == TRUE)
 	    {PM_polygon_push(a, pc);
 	     pc = PM_init_polygon(nd, nx);
-	     closed = FALSE;};
-#endif
-       };
 
-    PM_polygon_push(a, pc);
+	     closed = FALSE;
+	     more   = FALSE;
+	     nin    = 0;
+	     nout   = 0;
+
+	     if (op == PM_INTERSECT)
+
+/* count points of PA interior to PB */
+	        {nra = 0;
+		 for (l = 0; l < wa->nn-1; l++)
+		     {if ((wa->where[l] > 0) && (wa->marked[l] == FALSE))
+			 {nra++;
+			  iba = l;};};
+
+		 if (nra > 0)
+		    {more = TRUE;
+		     i1   = iba;};
+
+/* count points of PB interior to PA */
+		 if (more == FALSE)
+		    {nrb = 0;
+		     for (l = 0; l < wb->nn-1; l++)
+		         {if ((wb->where[l] > 0) && (wb->marked[l] == FALSE))
+			     {nrb++;
+			      ibb = l;};};
+
+		     if (nrb > 0)
+		        {more = TRUE;
+			 i1   = ibb;
+			 SC_SWAP_VALUE(polywalk *, wa, wb);};};};};};
 
     _PM_free_polywalk(wa, TRUE);
     _PM_free_polywalk(wb, TRUE);
@@ -1828,7 +1857,7 @@ void dprvct(int nd, int n, double **v)
 
     for (i = 0; i < n; i++)
         {for (id = 0; id < nd; id++)
-	     io_printf(stdout, "  %8.3e", v[id][i]);
+	     io_printf(stdout, "  %10.3e", v[id][i]);
 	 io_printf(stdout, "\n");};
 
     return;}
