@@ -1293,7 +1293,6 @@ static void _PM_combine_polygons(SC_array *a,
 
 	 if (closed == TRUE)
 	    {PM_polygon_push(a, pc);
-	     pc = PM_init_polygon(nd, nx);
 
 	     closed = FALSE;
 	     more   = FALSE;
@@ -1324,7 +1323,10 @@ static void _PM_combine_polygons(SC_array *a,
 		     if (nrb > 0)
 		        {more = TRUE;
 			 i1   = ibb;
-			 SC_SWAP_VALUE(polywalk *, wa, wb);};};};};};
+			 SC_SWAP_VALUE(polywalk *, wa, wb);};};};
+
+	     if (more == TRUE)
+	        pc = PM_init_polygon(nd, nx);};};
 
     _PM_free_polywalk(wa, TRUE);
     _PM_free_polywalk(wb, TRUE);

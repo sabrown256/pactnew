@@ -519,7 +519,7 @@ static void PG_scan_triangle(PG_device *dev, double *zbf,
 /* _PG_DO_SCAN_LINE - do a chunk of scan lines for the picture */
 
 static void *_PG_do_scan_line(void *arg)
-   {int i, id, nic, ok;
+   {int i, id, nic, ok, p1, p2;
     int ds, np, iymn, iymx;
     int a[4];
     int *iextr;
@@ -566,10 +566,30 @@ static void *_PG_do_scan_line(void *arg)
 
          ok = PM_intersect_line_polygon(&nic, &xi, NULL, u, u+2, pl, 3);
          if (ok == TRUE)
-	    {a[0] = xi[0][0]/ds;
-	     a[1] = xi[0][1]/ds;
-	     a[2] = xi[1][0]/ds;
-	     a[3] = xi[1][1]/ds;
+	    {if (nic < 2)
+	        {p1 = PM_contains_nd(u, pl);
+		 p2 = PM_contains_nd(u+2, pl);
+		 if (nic == 1)
+		    {a[0] = xi[0][0]/ds;
+		     a[2] = xi[1][0]/ds;
+		     if (p1 == 1)
+		        {a[1] = u[0]/ds;
+			 a[3] = u[1]/ds;}
+		     else
+		        {a[1] = u[2]/ds;
+			 a[3] = u[3]/ds;};}
+
+		 else if ((p1 == 1) && (p2 == 1))
+		    {a[0] = u[0]/ds;
+		     a[1] = u[2]/ds;
+		     a[2] = u[1]/ds;
+		     a[3] = u[3]/ds;};}
+
+	     else
+	        {a[0] = xi[0][0]/ds;
+		 a[1] = xi[0][1]/ds;
+		 a[2] = xi[1][0]/ds;
+		 a[3] = xi[1][1]/ds;};
 
 	     PM_free_vectors(2, xi);
 
