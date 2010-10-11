@@ -28,8 +28,8 @@ struct s_pt
 struct s_polywalk
    {int nn;                  /* number of nodes */
     int nt;                  /* number of sides traversed */
-    char *marked;            /* TRUE if node has been accounted for */
-    char *where;             /* 1 inside, 0 on, -1 outside counterpart */
+    signed char *marked;     /* TRUE if node has been accounted for */
+    signed char *where;      /* 1 inside, 0 on, -1 outside counterpart */
     int *boundary;           /* edge index of counterpart when on */
     PM_polygon *py;};
 
@@ -1127,10 +1127,10 @@ static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
     nc = pc->nn;
     nb = nc*sizeof(int);
 
-    mk = FMAKE_N(char, nc, "_PM_DECOMPOSE_POLYGON:mk");
+    mk = FMAKE_N(signed char, nc, "_PM_DECOMPOSE_POLYGON:mk");
     memset(mk, 0, nc);
 
-    wh = FMAKE_N(char, nc, "_PM_DECOMPOSE_POLYGON:wh");
+    wh = FMAKE_N(signed char, nc, "_PM_DECOMPOSE_POLYGON:wh");
     memset(wh, 0, nc);
 
     bnd = FMAKE_N(int, nb, "_PM_DECOMPOSE_POLYGON:bnd");
@@ -1179,7 +1179,7 @@ static void _PM_combine_polygons(SC_array *a,
    {int i, i1, ib, iba, ibb, id, l, na, nd, nx, nra, nrb;
     int add, same, more, closed, nin, nout, inc, ok;
     int *bnd;
-    char *wh;
+    signed char *wh;
     double x1[PM_SPACEDM];
     PM_polygon *pa, *pb, *pc;
     polywalk *wa, *wb;
@@ -1190,6 +1190,7 @@ static void _PM_combine_polygons(SC_array *a,
     pa = wa->py;
     pb = wb->py;
 
+/* compute WA info wrt WB */
     nx  = pa->nn;
     wh  = wa->where;
     bnd = wa->boundary;
@@ -1198,6 +1199,7 @@ static void _PM_combine_polygons(SC_array *a,
 	 wh[i]  = PM_boundary_nd(x1, pb, &ib);
          bnd[i] = (wh[i] == 0) ? ib-1 : 0;};
 
+/* compute WB info wrt WA */
     nx  = pb->nn;
     wh  = wb->where;
     bnd = wb->boundary;
@@ -1206,8 +1208,8 @@ static void _PM_combine_polygons(SC_array *a,
 	 wh[i]  = PM_boundary_nd(x1, pa, &ib);
          bnd[i] = (wh[i] == 0) ? ib-1 : 0;};
 
+/* setup initial polygon */
     nd = pa->nd;
-
     nx = max(pa->np, pb->np);
     nx = 4*nx;
     pc = PM_init_polygon(nd, nx);
