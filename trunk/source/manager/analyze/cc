@@ -345,6 +345,7 @@ int main(int c, char **v)
 EOF
 
       set hw = `uname -m`
+      flog $ALog which $Cfe_CC_Exe
       flog $ALog $Cfe_CC_Exe -arch $hw $Tmp.c -o $Tmp $ccopt
       if ($status == 0) then
          flog $ALog $Tmp
