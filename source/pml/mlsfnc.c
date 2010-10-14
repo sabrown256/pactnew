@@ -17,6 +17,47 @@
 #include "scope_math.h"
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CF_EVAL - evaluate a continued fraction sequence of N terms
+ *            - to convergence TOL
+ *            - the sequence is:
+ *            -
+ *            -               a[1]  a[2]  a[3]  a[4]
+ *            -    f = b[0] + ----  ----  ----  ----   ...
+ *            -               b[1]+ b[2]+ b[3]+ b[4]+
+ *            -
+ *            - A and B are N long and A[0] is ignored
+ */
+
+double PM_cf_eval(int n, double *a, double *b, double tol)
+   {int it;
+    double a0, a1, an, b0, b1, bn, f, fo, df;
+
+    a0 = 1.0;
+    a1 = b[0];
+    b0 = 0.0;
+    b1 = 1.0;
+
+    fo = 0.0;
+
+    for (it = 1; it < n; it++)
+        {an = b[it]*a1 + a[it]*a0;
+	 bn = b[it]*b1 + a[it]*b0;
+	 if (bn != 0.0)
+	    {f  = an/bn;
+	     df = f - fo;
+	     if (ABS(df) < tol*ABS(f))
+	        break;};
+	 fo = f;
+	 a0 = a1;
+	 b0 = b1;
+	 a1 = an;
+	 b1 = bn;};
+
+    return(f);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                       FACTORIAL AND GAMMA FUNCTIONS                      */
 
@@ -28,9 +69,12 @@ double PM_factorial(int n)
    {int i;
     double fct;
 
-    fct = 1.0;
-    for (i = 1; i <= n; i++)
-        fct *= i;
+    if (n > 20)
+       fct = exp(PM_ln_gamma(n + 1.0));
+    else
+       {fct = 1.0;
+	for (i = 1; i <= n; i++)
+	    fct *= i;};
 
     return(fct);}
 
@@ -58,18 +102,178 @@ double PM_binomial(int n, int k)
 double PM_ln_gamma(double x)
    {int j;
     double xc, tc, sc, rv;
-    static double cf[6] = {76.18009173, -86.50532033,     24.01409822, 
+    static double cf[7] = {2.50662827465,
+			   76.18009173, -86.50532033,     24.01409822, 
 	                   -1.231739516,  0.120858003e-2, -0.536382e-5};
 
     xc  = x - 1.0;
     tc  = xc + 5.5;
     tc -= (xc + 0.5)*log(tc);
     sc  = 1.0;
-    for (j = 0; j <= 5; j++)
+    for (j = 1; j < 7; j++)
         {xc += 1.0;
 	 sc += cf[j]/xc;};
 
-    rv = -tc + log(2.50662827465*sc);
+    rv = -tc + log(sc*cf[0]);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_BETA - compute beta(z, w) */
+
+double PM_beta(double z, double w)
+   {double ls, lw, lz, rv;
+
+    lz = PM_ln_gamma(z);
+    lw = PM_ln_gamma(w);
+    ls = PM_ln_gamma(z + w);
+
+    rv = exp(lz + lw - ls);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                      INCOMPLETE GAMMA FUNCTIONS                          */
+
+/*--------------------------------------------------------------------------*/
+
+/* _PM_IGAMMA_SM - sum approximation to
+ *               - incomplete gamma function
+ */
+
+static double _PM_igamma_sm(double a, double x)
+   {int it, ni;
+    double gs, gl, ap, ds, s;
+
+    gs = 0.0;
+    if (x > 0.0)
+       {ni = 100;
+        gl = exp(-x + a*log(x) - PM_ln_gamma(a));
+
+	ap = a;
+	ds = 1.0/a;
+	s  = ds;
+	for (it = 0; it < ni; it++)
+	    {ap += 1.0;
+	     ds *= x/ap;
+	     s  += ds;
+	     if (ABS(ds) < ABS(s*TOLERANCE))
+	        {gs = s*gl;
+		 break;};};};
+
+    return(gs);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PM_IGAMMA_CF - continued fraction approximation to
+ *               - incomplete gamma function
+ */
+
+static double _PM_igamma_cf(double a, double x)
+   {int it, ni;
+    double gs, gl, a0, a1, b0, b1;
+    double s, so, fac, ana, anf;
+
+    gs = 0.0;
+
+    ni = 100;
+
+    a0 = 1.0;
+    a1 = x;
+    b0 = 0.0;
+    b1 = 1.0;
+    so = 0.0;
+    fac = 1.0;
+    for (it = 1; it <= ni; it++)
+        {ana = it - a;
+	 anf = it*fac;
+	 a0  = (a1 + a0*ana)*fac;
+	 b0  = (b1 + b0*ana)*fac;
+	 a1  = x*a0 + anf*a1;
+	 b1  = x*b0 + anf*b1;
+	 if (a1 != 0.0)
+	    {fac = 1.0/a1;
+	     s   = b1*fac;
+	     if (ABS((s - so)/s) < TOLERANCE)
+	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
+	         gs = s*gl;
+		 break;};
+	 so = s;};};
+
+    return(gs);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_IGAMMA_P - incomplete gamma function P(A, X)
+ *             - using notation from Numerical Recipes in C
+ *             - Note: the reversal of A and X is for ULTRA curve handling
+ */
+
+double PM_igamma_p(double x, double a)
+   {double rv;
+
+    if ((x < 0.0) || (a <= 0.0))
+       rv = -HUGE;
+
+    else if (x < (a + 1.0))
+       rv = _PM_igamma_sm(a, x);
+
+    else
+       rv = 1.0 - _PM_igamma_cf(a, x);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_IGAMMA_Q - Q, the complement of incomplete gamma function P
+ *             - using notation from Numerical Recipes in C
+ *             - Note: the reversal of A and X is for ULTRA curve handling
+ */
+
+double PM_igamma_q(double x, double a)
+   {double rv;
+
+    if ((x < 0.0) || (a <= 0.0))
+       rv = -HUGE;
+
+    else if (x < (a + 1.0))
+       rv = 1.0 - _PM_igamma_sm(a, x);
+
+    else
+       rv = _PM_igamma_cf(a, x);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            ERROR FUNCTIONS                               */
+
+/*--------------------------------------------------------------------------*/
+
+/* PM_ERF - return the error function ERF(X) */
+
+double PM_erf(double x)
+   {double rv;
+
+    rv = (x < 0.0) ? -PM_igamma_p(x*x, 0.5) : PM_igamma_p(x*x, 0.5);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_ERFC - return the complementary error function ERFC(X) */
+
+double PM_erfc(double x)
+   {double rv;
+
+    rv = (x < 0.0) ? 1.0 + PM_igamma_p(x*x, 0.5) : PM_igamma_q(x*x, 0.5);
 
     return(rv);}
 

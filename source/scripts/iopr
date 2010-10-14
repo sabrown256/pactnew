@@ -143,38 +143,49 @@ endif
 
 if ($OS == Darwin) then
    set TraceRoute = ( traceroute -I )
+   set popt       = ( -c 1 -t 10 )
 else
    set TraceRoute = traceroute
+   set popt       = ( -c 1 -w 10 )
 endif
 
 if ("$Srvi" == "") then
-   set tSrv = "$HstN"
+   set inf = "$HstN"
 else
-   set tSrv = "$Srvi"
+   set inf = "$Srvi"
 endif
-set tSrvN = ( `echo "$tSrv" | sed 's/[.:]/ /g'` )
-set SrvN  = $tSrvN[1]
+set inf  = ( `echo "$inf" | sed 's/:/ /g'` )
+set SrvN = $inf[1]
 
-set SrvI = ( `ping $SrvN -c 1 -w 10 |& grep PING | head -n 1 | awk '{print $3}' | sed 's/[()]//g'` )
+set inf = ( `echo $SrvN | sed 's/[.0-9]*//g'` )
+if ("$inf" == "") then
+   set SrvI = $SrvN
+   set inf  = ( `nslookup $SrvI |& tail -n 2` )
+   set SrvN = ( `echo $inf[4] | sed 's/\.$//'` )
+else
+   set inf  = ( `ping $popt $SrvN |& grep PING | head -n 1` )
+   set SrvI = ( `echo $inf[3] | sed 's/[():]//g'` )
+endif
+
 set RTdT = 0
 if ("$SrvI" == "") then
 
 # search using qualified host name - foo.bar.baz
-   set RTLst = ( `$TraceRoute $SrvN |& awk '$2 ~ /'$SrvN'/ {for (i = 4; i < NF; i += 2) {printf("%s\n", $i);};} $2 == "*" && $3 ~ /'$SrvN'/ {for (i = 5; i < NF; i += 2) {printf("%s\n", $i);};}'` )
-   set RTdT  = `echo "$RTLst" | awk '{a = 0.0; n = 0.0; for (i = 0; i < NF; i++) {a += $i; n += 1.0;}; if (n != 0) {printf("%.3f\n", a/n);} else {printf("0\n");};}'`
-   set SrvI  = `$TraceRoute $SrvN |& awk '$2 ~ /'$SrvN'/ {print $3} $2 == "*" && $3 ~ /'$SrvN'/ {print $3}' | sed 's/(//' | sed 's/)//'`
+   set inf  = ( `$TraceRoute $SrvN |& awk '$2 ~ /'$SrvN'/ {for (i = 4; i < NF; i += 2) {printf("%s\n", $i);};} $2 == "*" && $3 ~ /'$SrvN'/ {for (i = 5; i < NF; i += 2) {printf("%s\n", $i);};}'` )
+   set RTdT = `echo "$inf" | awk '{a = 0.0; n = 0.0; for (i = 0; i < NF; i++) {a += $i; n += 1.0;}; if (n != 0) {printf("%.3f\n", a/n);} else {printf("0\n");};}'`
+   set SrvI = `$TraceRoute $SrvN |& awk '$2 ~ /'$SrvN'/ {print $3} $2 == "*" && $3 ~ /'$SrvN'/ {print $3}' | sed 's/(//' | sed 's/)//'`
 endif
 
 if ("$SrvI" == "") then
 
 # find unqualified name
-   set Srvu = ( `echo $SrvN |& sed 's/\./ /g'` )
-   set SrvU = $Srvu[1]
+   set inf  = ( `echo $SrvN |& sed 's/\./ /g'` )
+   set srvu = $inf[1]
 
 # search using unqualified host name - foo
-   set RTLst = ( `$TraceRoute $SrvN |& awk '$2 ~ /'$SrvU'/ {for (i = 4; i < NF; i += 2) {printf("%s\n", $i);};} $2 == "*" && $3 ~ /'$SrvN'/ {for (i = 5; i < NF; i += 2) {printf("%s\n", $i);};}'` )
-   set RTdT  = `echo "$RTLst" | awk '{a = 0.0; n = 0.0; for (i = 0; i < NF; i++) {a += $i; n += 1.0;}; if (n != 0) {printf("%.3f\n", a/n);} else {printf("0\n");};}'`
-   set SrvI  = `$TraceRoute $SrvN |& awk '$2 ~ /'$SrvU'/ {print $3} $2 == "*" && $3 ~ /'$SrvN'/ {print $3}' | sed 's/(//' | sed 's/)//'`
+   set inf  = ( `$TraceRoute $SrvN |& awk '$2 ~ /'$srvu'/ {for (i = 4; i < NF; i += 2) {printf("%s\n", $i);};} $2 == "*" && $3 ~ /'$SrvN'/ {for (i = 5; i < NF; i += 2) {printf("%s\n", $i);};}'` )
+   set RTdT = `echo "$inf" | awk '{a = 0.0; n = 0.0; for (i = 0; i < NF; i++) {a += $i; n += 1.0;}; if (n != 0) {printf("%.3f\n", a/n);} else {printf("0\n");};}'`
+   set SrvI = `$TraceRoute $SrvN |& awk '$2 ~ /'$srvu'/ {print $3} $2 == "*" && $3 ~ /'$SrvN'/ {print $3}' | sed 's/(//' | sed 's/)//'`
 
 # bail right now if we cannot determine the IP address of the NFS server
    if ("$SrvI" == "") then
@@ -184,6 +195,9 @@ if ("$SrvI" == "") then
       exit(11)
    endif
 endif
+
+unset srvu
+unset inf
 
 if ($Verbose == TRUE) then
    echo "NFS Server: $SrvN($SrvI) $RTdT"
@@ -304,7 +318,8 @@ else
 
 # assume anything else is a host name and resolve it to an address
       else
-         set CIp = `nslookup $CIp |& tail -n 2 | awk '{print $2}'`
+         set inf = ( `nslookup $CIp |& tail -n 2` )
+         set CIp = $inf[2]
          if (`expr "$SrvI" : $CIp` > 0) then
             set Intf  = $CItf
             set IPMsk = $CIp

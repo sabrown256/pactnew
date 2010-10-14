@@ -311,6 +311,82 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; Page #12 - incomplete gamma functions
+
+(printf nil "Tests #12  Incomplete Gamma functions\n")
+
+(label (igamma-p (span 1.0e-8 15) 0.5)  "P a=0.5")
+(label (igamma-p (span 1.0e-8 15) 1.0)  "P a=1.0")
+(label (igamma-p (span 1.0e-8 15) 3.0)  "P a=3.0")
+(label (igamma-p (span 1.0e-8 15) 10.0) "P a=10.0")
+
+(color (thru a d) blue)
+
+(label (igamma-q (span 1.0e-8 15) 0.5)  "Q a=0.5")
+(label (igamma-q (span 1.0e-8 15) 1.0)  "Q a=1.0")
+(label (igamma-q (span 1.0e-8 15) 3.0)  "Q a=3.0")
+(label (igamma-q (span 1.0e-8 15) 10.0) "Q a=10.0")
+
+(color (thru e h) red)
+
+(set! page (+ page 1))
+(set! xOff (+ xOff .05))
+(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+
+(replot)
+(hardcopy)
+(ran de)
+(era)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; Page #13 - beta function
+
+(printf nil "Tests #13  Beta function\n")
+
+(y-log-scale on)
+(label (beta (span 1.0e-3 10.0) 0.5)  "beta")
+(label (beta (span 1.0e-3 10.0) 1.0)  "beta")
+(label (beta (span 1.0e-3 10.0) 2.0)  "beta")
+(label (beta (span 1.0e-3 10.0) 4.0)  "beta")
+
+(color (thru a d) blue)
+
+(set! page (+ page 1))
+(set! xOff (+ xOff .05))
+(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+
+(replot)
+(hardcopy)
+(ran de)
+(era)
+(y-log-scale off)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; Page #14 - erf, erfc
+
+(printf nil "Tests #14  Erf and erfc\n")
+
+(label (erf  (span 0.0 3.0))  "erf")
+(label (erfc (span 0.0 3.0))  "erfc")
+
+(color (thru a b) blue)
+
+(set! page (+ page 1))
+(set! xOff (+ xOff .05))
+(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+
+(replot)
+(hardcopy)
+(ran de)
+(era)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 (printf nil "Tests Concluded\n")
 (command-log off)
 (end)
