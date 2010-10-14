@@ -670,10 +670,35 @@ void _SS_install_math(void)
 
 /* special functions */
 
+    SS_install("beta",
+               "Procedure: Returns the beta function\nUsage: (beta z w)",
+               SS_binary_flt, 
+               PM_beta, SS_PR_PROC);
+
     SS_install("lngamma",
                "Procedure: Returns the log of the gamma function\nUsage: (lngamma x)",
                SS_unary_flt, 
                PM_ln_gamma, SS_PR_PROC);
+
+    SS_install("igamma-p",
+               "Procedure: Returns the incomplete gamma function P\nUsage: (igamma-p a x)",
+               SS_binary_flt, 
+               PM_igamma_p, SS_PR_PROC);
+
+    SS_install("igamma-q",
+               "Procedure: Returns the incomplete gamma function Q\nUsage: (igamma-q a x)",
+               SS_binary_flt, 
+               PM_igamma_q, SS_PR_PROC);
+
+    SS_install("erf",
+               "Procedure: Returns the error function ERF\nUsage: (erf x)",
+               SS_unary_flt, 
+               PM_erf, SS_PR_PROC);
+
+    SS_install("erfc",
+               "Procedure: Returns the complementary error function ERFC\nUsage: (erfc x)",
+               SS_unary_flt, 
+               PM_erfc, SS_PR_PROC);
 
     SS_install("lei1",
                "Procedure: Returns the Legendre elliptic integral of the first kind\nUsage: (lei1 x k)",

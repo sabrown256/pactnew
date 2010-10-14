@@ -2278,6 +2278,15 @@ void UL_install_funcs(void)
 /* OPXC, OPYC handled functions */
 
 
+    SS_install_cf("beta",
+                  "Procedure: Take the beta function of y values of curves\n     Usage: beta <curve-list> <k>",
+                  UL_opyc, 
+                  PM_beta);
+    SS_install_cf("betax",
+                  "Procedure: Take the beta function of x values of curves\n     Usage: betax <curve-list> <k>",
+                  UL_opxc, 
+                  PM_beta);
+
     SS_install_cf("cei3",
 		  "Procedure: Take the complete elliptic integral of the third kind of y values of curves\n     Usage: cei3 <curve-list> <k>",
                   UL_opyc, 
@@ -2311,6 +2320,25 @@ void UL_install_funcs(void)
                   "Procedure: Shift y values of curves by a constant\n     Usage: dy <curve-list> <value>",
                   UL_opyc, 
                   PM_fplus);
+
+    SS_install_cf("igamma-p",
+		  "Procedure: Take the incomplete gamma function P of y values of curves\n     Usage: igamma-p <curve-list> <k>",
+                  UL_opyc, 
+		  PM_igamma_p);
+    SS_install_cf("igamma-px",
+		  "Procedure: Take the incomplete gamma function P of x values of curves\n     Usage: igamma-px <curve-list> <k>",
+                  UL_opxc, 
+		  PM_igamma_p);
+
+    SS_install_cf("igamma-q",
+		  "Procedure: Take the incomplete gamma function P of y values of curves\n     Usage: igamma-p <curve-list> <k>",
+                  UL_opyc, 
+		  PM_igamma_q);
+    SS_install_cf("igamma-qx",
+		  "Procedure: Take the incomplete gamma function P of x values of curves\n     Usage: igamma-px <curve-list> <k>",
+                  UL_opxc, 
+		  PM_igamma_q);
+
     SS_install_cf("mx",
                   "Procedure: Scale x values of curves by a constant\n     Usage: mx <curve-list> <value>",
                   UL_opxc, 
@@ -2429,6 +2457,24 @@ void UL_install_funcs(void)
                   UL_uopxc, 
 		  PM_elliptic_integral_c2);
 
+    SS_install_cf("erf",
+                  "Procedure: Take the error function of y values of curves\n     Usage: erf <curve-list>",
+                  UL_uopyc, 
+                  PM_erf);
+    SS_install_cf("erfx",
+                  "Procedure: Take the error function of x values of curves\n     Usage: erfx <curve-list>",
+                  UL_uopxc, 
+                  PM_erf);
+
+    SS_install_cf("erfc",
+                  "Procedure: Take the complementary error function of y values of curves\n     Usage: erfc <curve-list>",
+                  UL_uopyc, 
+                  PM_erfc);
+    SS_install_cf("erfcx",
+                  "Procedure: Take the complementary error function of x values of curves\n     Usage: erfcx <curve-list>",
+                  UL_uopxc, 
+                  PM_erfc);
+
     SS_install_cf("ln",
                   "Procedure: Take natural log of y values of curves\n     Usage: ln <curve-list>",
                   UL_uopyc, 
@@ -2439,11 +2485,11 @@ void UL_install_funcs(void)
                   PM_ln);
 
     SS_install_cf("lngamma",
-                  "Procedure: Take nth order Bessel function of the first kind of y values of curves\n     Usage: lngamma <curve-list>",
+                  "Procedure: Take log of the gamma function of y values of curves\n     Usage: lngamma <curve-list>",
                   UL_uopyc, 
                   PM_ln_gamma);
     SS_install_cf("lngammax",
-                  "Procedure: Take nth order Bessel function of the first kind of x values of curves\n     Usage: lngammax <curve-list>",
+                  "Procedure: Take log of the gamma function of x values of curves\n     Usage: lngammax <curve-list>",
                   UL_uopxc, 
                   PM_ln_gamma);
 

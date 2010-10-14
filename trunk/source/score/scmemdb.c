@@ -267,7 +267,7 @@ static int _SC_list_major_blocks(char *arr, int nc,
 
 static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
    {int n, nr, nbl;
-    long i, nb, nbthr;
+    long i, nb, nbthr, nt, ntc, ntx;
     char *arr, *name;
     SC_heap_des *ph;
     mem_header *space, *nxt;
@@ -285,7 +285,10 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 
 /* add active block count */
     if ((flag & 1) && (SC_LATEST_BLOCK(ph) != NULL))
-       n += SC_MAX_MEM_BLOCKS(ph) + BLOCKS_UNIT_DELTA;
+       {ntx = SC_MAX_MEM_BLOCKS(ph);
+	ntc = SC_N_MEM_BLOCKS(ph);
+	nt  = min(ntx, 10*ntc);
+	n  += nt + BLOCKS_UNIT_DELTA;};
 
 /* add blocks tied up in major blocks - essentially the free blocks
  * this double count some of active blocks
@@ -297,8 +300,10 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
     if ((flag & 4) && (_SC.mem_table != NULL))
        n += _SC.mem_table->size;
 
-/* GOTCHA: either heap could be corrupt so what can we rely on */
-/*    arr = FMAKE_N(char, n*ENTRY_SIZE, "_SC_MEM_LIST:arr"); */
+/* NOTE: do not use the SCORE memory manager to allocate memory when
+ * inspecting the state of the SCORE memory manager
+ * use direct malloc call instead
+ */
     arr = malloc(n*ENTRY_SIZE);
     if (arr != NULL)
 

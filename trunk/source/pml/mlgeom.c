@@ -1084,7 +1084,7 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
 static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
    {int i, id, in, nb, nc, ni, nda, ndb, nn, nx;
     int *bnd, *sides;
-    char *mk, *wh;
+    signed char *mk, *wh;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], xa[PM_SPACEDM];
     double **xi;
     PM_polygon *pc;

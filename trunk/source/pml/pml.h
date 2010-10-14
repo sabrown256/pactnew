@@ -1241,9 +1241,15 @@ extern double
 /* MLSFNC.C declarations */
 
 extern double
+ PM_cf_eval(int n, double *a, double *b, double tol),
  PM_factorial(int n),
  PM_binomial(int n, int k),
  PM_ln_gamma(double x),
+ PM_beta(double z, double w),
+ PM_igamma_p(double x, double a),
+ PM_igamma_q(double x, double a),
+ PM_erf(double x),
+ PM_erfc(double x),
  PM_legendre(double x, int l, int m),
  PM_elliptic_integral_g2(double x, double k, double a, double b),
  PM_elliptic_integral_gc(double k, double p, double a, double b),
