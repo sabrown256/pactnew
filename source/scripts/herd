@@ -30,11 +30,15 @@ set Daemon    = FALSE
 set UrHerd    = FALSE
 set KillHerd  = FALSE
 set Quiet     = FALSE
-set HerdDir   = ~/.herd
-set HerdLog   = ~/.herd.log
 set Command   = ""
 set TStamp    = `/bin/date +%y-%m-%d-%H-%M-%S`
 set Separator = "----------------------------------------------------------------"
+
+if ($?HERD_DB == 1) then
+   set HerdDir = $HERD_DB
+else
+   set HerdDir = ~/.herd
+endif
 
 setenv KRB5CCNAME "FILE:$HerdDir/.ticket"
 
@@ -46,6 +50,10 @@ while ($#argv)
       case -dk:
            set Daemon   = TRUE
            set Kerberos = TRUE
+           breaksw
+      case -f:
+           shift
+           set HerdDir = $1
            breaksw
       case -h:
            goto HELP
@@ -70,6 +78,8 @@ while ($#argv)
    endsw
    shift
 end
+
+set HerdLog = $HerdDir.log
 
 if (!(-d $HerdDir)) then
    mkdir $HerdDir
@@ -236,11 +246,12 @@ exit($status)
 HELP:
 
    NoteT ""
-   NoteT "Usage: herd [-d] [-dk] [-h] [-i <n>] [-k] [-q] [-u]"
+   NoteT "Usage: herd [-d] [-dk] [-f <dir>] [-h] [-i <n>] [-k] [-q] [-u]"
    NoteT "   or  herd [-q] <command>"
    NoteT ""
    NoteT "   d          start the herd daemon"
    NoteT "   dk         start the herd daemon with Kerberos"
+   NoteT "   f          working directory"
    NoteT "   h          this help message"
    NoteT "   i          check for jobs to run every n seconds"
    NoteT "   k          halt the herd daemon"

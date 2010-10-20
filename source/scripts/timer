@@ -16,10 +16,12 @@ set Host   = `uname -n`
 set OS     = `uname -s | tr "[A-Z]" "[a-z]"`
 set Rel    = `uname -r`
 
-if ($?TIMER_FILE) then
+if ($?TIMER_FILE == 1) then
    set TFile = $TIMER_FILE
+else if ($?HOME == 1) then
+   set TFile = $HOME/.timer-$Host
 else
-   set TFile = ~/.timer-$Host
+   set TFile = /tmp/.timer-$Host
 endif
 
 set TTF    = $TFile-tmp
