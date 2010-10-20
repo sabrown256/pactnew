@@ -342,6 +342,9 @@ PDBfile *_PD_open_bin(char *name, char *mode, void *a)
 		    {_PD_def_real(type, file);
 		     break;};};};};
 
+    if ((file == NULL) && (pu != NULL))
+       _SC_rel_udl(pu);
+
     return(file);}
 
 /*--------------------------------------------------------------------------*/
