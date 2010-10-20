@@ -1246,6 +1246,7 @@ extern double
  PM_binomial(int n, int k),
  PM_ln_gamma(double x),
  PM_beta(double z, double w),
+ PM_igamma_tolerance(double tol),
  PM_igamma_p(double x, double a),
  PM_igamma_q(double x, double a),
  PM_erf(double x),

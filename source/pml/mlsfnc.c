@@ -16,6 +16,9 @@
 #include "pml_int.h"
 #include "scope_math.h"
 
+static double
+ _PM_igamma_tolerance = 1.0e-12;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -140,8 +143,28 @@ double PM_beta(double z, double w)
 
 /*--------------------------------------------------------------------------*/
 
+/* PM_IGAMMA_TOLERANCE - set/get tolerance for computation of
+ *                     - incomplete gamma functions
+ *                     - return the old value
+ *                     - if TOL <= 0 query only
+ */
+
+double PM_igamma_tolerance(double tol)
+   {double rv;
+
+    rv = _PM_igamma_tolerance;
+
+    if (tol > 0.0)
+       _PM_igamma_tolerance = tol;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PM_IGAMMA_SM - sum approximation to
  *               - incomplete gamma function
+ *               - following Numerical Recipes algorithm
  */
 
 static double _PM_igamma_sm(double a, double x)
@@ -151,7 +174,6 @@ static double _PM_igamma_sm(double a, double x)
     gs = 0.0;
     if (x > 0.0)
        {ni = 100;
-        gl = exp(-x + a*log(x) - PM_ln_gamma(a));
 
 	ap = a;
 	ds = 1.0/a;
@@ -160,8 +182,9 @@ static double _PM_igamma_sm(double a, double x)
 	    {ap += 1.0;
 	     ds *= x/ap;
 	     s  += ds;
-	     if (ABS(ds) < ABS(s*TOLERANCE))
-	        {gs = s*gl;
+	     if (ABS(ds) < ABS(s*_PM_igamma_tolerance))
+	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
+	         gs = s*gl;
 		 break;};};};
 
     return(gs);}
@@ -171,34 +194,37 @@ static double _PM_igamma_sm(double a, double x)
 
 /* _PM_IGAMMA_CF - continued fraction approximation to
  *               - incomplete gamma function
+ *               - following Numerical Recipes algorithm
  */
 
 static double _PM_igamma_cf(double a, double x)
    {int it, ni;
     double gs, gl, a0, a1, b0, b1;
-    double s, so, fac, ana, anf;
-
-    gs = 0.0;
+    double s, so, ds, ca, cb;
 
     ni = 100;
 
+    gs = 0.0;
+    so = 0.0;
+    ds = 1.0;
+
+/* set starting iteration values */
     a0 = 1.0;
     a1 = x;
     b0 = 0.0;
     b1 = 1.0;
-    so = 0.0;
-    fac = 1.0;
+
     for (it = 1; it <= ni; it++)
-        {ana = it - a;
-	 anf = it*fac;
-	 a0  = (a1 + a0*ana)*fac;
-	 b0  = (b1 + b0*ana)*fac;
-	 a1  = x*a0 + anf*a1;
-	 b1  = x*b0 + anf*b1;
+        {ca = it - a;
+	 cb = it*ds;
+	 a0 = (a1 + a0*ca)*ds;
+	 b0 = (b1 + b0*ca)*ds;
+	 a1 = x*a0 + cb*a1;
+	 b1 = x*b0 + cb*b1;
 	 if (a1 != 0.0)
-	    {fac = 1.0/a1;
-	     s   = b1*fac;
-	     if (ABS((s - so)/s) < TOLERANCE)
+	    {ds = 1.0/a1;
+	     s  = b1*ds;
+	     if (ABS(s - so) < ABS(s*_PM_igamma_tolerance))
 	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
 	         gs = s*gl;
 		 break;};
@@ -256,12 +282,69 @@ double PM_igamma_q(double x, double a)
 
 /*--------------------------------------------------------------------------*/
 
-/* PM_ERF - return the error function ERF(X) */
+/* _PM_ERFC_A - rational polynomial approximation to ERFC(X)
+ *            - accurate to about 1.0e-8 but a factor of ~10 faster
+ */
 
-double PM_erf(double x)
-   {double rv;
+static double _PM_erfc_a(double x)
+   {double a, b, xa, rv;
+    static int wh = 3;
 
-    rv = (x < 0.0) ? -PM_igamma_p(x*x, 0.5) : PM_igamma_p(x*x, 0.5);
+    xa = ABS(x);
+
+    if (xa > 1.2)
+       wh = 4;
+    else
+       wh = 2;
+
+    switch (wh)
+
+/* Abramowitz and Stegun 7.1.25 - good to < 2.5e-5 */
+       {case 1 :
+	     a   = 1.0/(1.0 + 0.47047*xa);
+	     rv  = a*(0.3480242 + a*(-0.0958798 + a*0.7478556));
+	     rv *= exp(-x*x);
+	     break;
+
+/* Abramowitz and Stegun 7.1.26 - good to 1.5e-7 */
+        case 2 :
+	     a   = 1.0/(1.0 + 0.3275911*xa);
+	     rv  = a*(0.254829592 +
+		      a*(-0.284496736 +
+			 a*(1.421413741 +
+			    a*(-1.453152027 + 
+			       a*1.061405429))));
+	     rv *= exp(-x*x);
+	     break;
+
+/* Abramowitz and Stegun 7.1.28 - good to 3.0e-7 */
+        case 3 :
+	     a = 1.0 + xa*(7.05230784e-2 + 
+			   xa*(4.22820123e-2 +
+			       xa*(9.2705272e-3 + 
+				   xa*(1.520143e-4 +
+				       xa*(2.765672e-4 +
+					   xa*4.30638e-5)))));
+	     b = a*a;
+	     a = b*b;
+	     b = a*a;
+	     a = b*b;
+	     rv = 1.0/a;
+	     break;
+
+	case 4 :
+	     a   = 1.0/(1.0 + xa*(2.23798238 +
+				  xa*(2.07647881 + 
+				      xa*(0.97553842 + 
+					  xa*0.21530702))));
+	     rv  = a*(1.0 + xa*(1.10966764 + 
+				xa*(0.55042450 +
+				    xa*0.12147398)));
+	     rv *= exp(-x*x);
+	     break;};
+
+    if (x < 0.0)
+       rv = 2.0 - rv;
 
     return(rv);}
 
@@ -273,7 +356,25 @@ double PM_erf(double x)
 double PM_erfc(double x)
    {double rv;
 
-    rv = (x < 0.0) ? 1.0 + PM_igamma_p(x*x, 0.5) : PM_igamma_q(x*x, 0.5);
+    if (_PM_igamma_tolerance > 1.0e-7)
+       rv = _PM_erfc_a(x);
+    else
+       rv = (x < 0.0) ? 1.0 + PM_igamma_p(x*x, 0.5) : PM_igamma_q(x*x, 0.5);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_ERF - return the error function ERF(X) */
+
+double PM_erf(double x)
+   {double rv;
+
+    if (_PM_igamma_tolerance > 1.0e-8)
+       rv = 1.0 - _PM_erfc_a(x);
+    else
+       rv = (x < 0.0) ? -PM_igamma_p(x*x, 0.5) : PM_igamma_p(x*x, 0.5);
 
     return(rv);}
 
