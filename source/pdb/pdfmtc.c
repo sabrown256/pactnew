@@ -187,6 +187,12 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	std->double_format      = formt;
 	align->double_alignment = al;}
 
+    else if (strcmp(type, "long_double") == 0)
+       {std->quad_bytes       = nb;
+	std->quad_order       = ordr;
+	std->quad_format      = formt;
+	align->quad_alignment = al;}
+
     else if (strcmp(type, "struct") == 0)
        align->struct_alignment = al;
 
@@ -217,7 +223,7 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
        _PD_get_token(bf, local, bsz, '\n');
 
     file->std   = _PD_mk_standard(file);
-    file->align = _PD_copy_alignment(&DEF_ALIGNMENT);
+    file->align = _PD_copy_alignment(&WORD4_ALIGNMENT);
 
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file);

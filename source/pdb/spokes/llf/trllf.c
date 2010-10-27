@@ -167,7 +167,7 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	else
 	   file->mode = PD_OPEN;
 
-	_PD_set_standard(file, &CRAY_STD, &UNICOS_ALIGNMENT);
+	_PD_set_standard(file, &CRAY_STD, &WORD8_ALIGNMENT);
 
 	_PD_init_chrt(file);
 

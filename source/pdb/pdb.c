@@ -1095,32 +1095,6 @@ int PD_append_as_alt(PDBfile *file, char *name, char *intype,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET - setup for the target machine data formats and alignments
- *           - this information is recorded in the PDBfiles to correctly
- *           - handle things when many files are open at once
- *           -
- *           - to correctly handle the situation in which there are
- *           - PD_OPEN'd files around (this may reset previously set
- *           - file->std), remember a standard specifically requested
- *           - with PD_TARGET
- *           - (note that PD_OPEN sets file->std and file->align)
- */
-
-int PD_target(data_standard *data, data_alignment *align)
-   {PD_smp_state *pa;
-
-    pa = _PD_get_state(-1);
-    
-    _PD_init_state(FALSE);
-
-    pa->req_std   = data;
-    pa->req_align = align;
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PD_CAST - tell PDBLib that the type of a particular member (which must
  *         - be a pointer) is specified by another member (which must
  *         - be a character pointer). Put this information into the FILE chart.
@@ -1423,6 +1397,11 @@ int PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr)
        {nb  = std->double_bytes;
 	fmt = std->double_format;
 	ord = std->double_order;}
+
+    else if (strncmp("long_double", type, 7) == 0)
+       {nb  = std->quad_bytes;
+	fmt = std->quad_format;
+	ord = std->quad_order;}
 
     else
        {snprintf(pa->err, MAXLINE,

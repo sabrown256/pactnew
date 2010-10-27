@@ -135,6 +135,35 @@ int PM_value_compare(double x1, double x2, double tol)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_QVALUE_COMPARE - return 1 if X1 > X2 to tolerance TOL
+ *                   -       -1 if X1 < X2 to tolerance
+ *                   -        0 if X1 == X2 to tolerance
+ */
+
+#ifdef HAVE_ANSI_FLOAT16
+
+int PM_qvalue_compare(long double x1, long double x2, long double tol)
+   {int rv;
+    long double dx;
+
+    if (tol < 0.0)
+       tol = TOLERANCE;
+
+    dx = (x1 - x2)/(ABS(x1) + ABS(x2) + SMALL);
+    if (dx < -tol)
+       rv = -1;
+    else if (tol < dx)
+       rv = 1;
+    else
+       rv = 0;
+
+    return(rv);}
+
+#endif
+
+/*--------------------------------------------------------------------------*/
 
 /*                              ARRAY FUNCTIONS                             */
 

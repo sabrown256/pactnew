@@ -181,6 +181,16 @@ static double
  *d8c_r,
  *d8d_r;
 
+#ifdef HAVE_ANSI_FLOAT16
+
+static long double
+ qs_w,
+ qs_r,
+ qa_w[N_FLOAT],
+ qa_r[N_FLOAT];
+
+#endif
+
 static plot
  graph_w,
  graph_r;
@@ -231,29 +241,10 @@ static char
 
 static void test_target(char *tgt, char *base, int n,
 		        char *fname, char *datfile)
-   {
+   {int rv;
 
     if (tgt != NULL)
-       {if (strcmp(tgt, "dos") == 0)
-           PD_target(&INTELA_STD, &INTELA_ALIGNMENT);
-        else if (strcmp(tgt, "rs6000") == 0)
-           PD_target(&IEEEA_STD, &MIPS_ALIGNMENT);
-        else if (strcmp(tgt, "cray") == 0)
-           PD_target(&CRAY_STD, &UNICOS_ALIGNMENT);
-        else if (strcmp(tgt, "vax") == 0)
-           PD_target(&VAX_STD, &DEF_ALIGNMENT);
-        else if (strcmp(tgt, "mips") == 0)
-           PD_target(&IEEEA_STD, &MIPS_ALIGNMENT);
-        else if (strcmp(tgt, "mips64") == 0)
-           PD_target(&IEEED_STD, &MIPS64_ALIGNMENT);
-        else if (strcmp(tgt, "alpha64") == 0)
-           PD_target(&IEEEE_STD, &ALPHA64_ALIGNMENT);
-        else if (strcmp(tgt, "sun3") == 0)
-           PD_target(&IEEEA_STD, &M68000_ALIGNMENT);
-        else if (strcmp(tgt, "sun4") == 0)
-           PD_target(&IEEEA_STD, &SPARC_ALIGNMENT);
-        else if (strcmp(tgt, "mac") == 0)
-           PD_target(&IEEEB_STD, &M68000_ALIGNMENT);
+       {rv = PD_target_platform(tgt);
         sprintf(fname, "%s-%s.rs%d", base, tgt, n);
         sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
 
@@ -335,6 +326,11 @@ static void print_test_0_data(PDBfile *strm, FILE *fp)
     nbp = _PD_lookup_size("double", strm->chart);
     PRINT(fp, "size(double) = %d\n", nbp);
 
+#ifdef HAVE_ANSI_FLOAT16
+    nbp = _PD_lookup_size("long_double", strm->chart);
+    PRINT(fp, "size(long double) = %d\n", nbp);
+#endif
+
     nbp = _PD_lookup_size("*", strm->chart);
     PRINT(fp, "size(char *) = %d\n", nbp);
 
@@ -391,6 +387,12 @@ static int compare_test_0_data(PDBfile *strm, FILE *fp)
     nbc  = sizeof(double);
     err &= (nbp == nbc);
 
+#ifdef HAVE_ANSI_FLOAT16
+    nbp  = _PD_lookup_size("long_double", strm->host_chart);
+    nbc  = sizeof(long double);
+    err &= (nbp == nbc);
+#endif
+
     nbp  = _PD_lookup_size("*", strm->host_chart);
     nbc  = sizeof(char *);
     err &= (nbp == nbc);
@@ -424,9 +426,9 @@ static int compare_test_0_data(PDBfile *strm, FILE *fp)
 /* TEST_0 - test PDB calculation of type and struct sizes */
 
 static int test_0(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -534,7 +536,7 @@ static void prep_test_1_data(void)
     cap_w[0] = SC_strsavef("lev1", "char*:PREP_TEST_1_DATA:lev1");
     cap_w[1] = SC_strsavef("lev2", "char*:PREP_TEST_1_DATA:lev2");
     cap_w[2] = SC_strsavef("tar fu blat",
-                             "char*:PREP_TEST_1_DATA:tarfublat");
+			   "char*:PREP_TEST_1_DATA:tarfublat");
     cap_r[0] = NULL;
     cap_r[1] = NULL;
     cap_r[2] = NULL;
@@ -735,10 +737,10 @@ static void print_test_1_data(FILE *fp)
    {int i, k;
 
 /* print scalars */
-    PRINT(fp, "short scalar:   ss = %d\n", ss_r);
-    PRINT(fp, "integer scalar: is = %d\n", is_r);
-    PRINT(fp, "float scalar:   fs = %14.6e\n", fs_r);
-    PRINT(fp, "double scalar:  ds = %14.6e\n", ds_r);
+    PRINT(fp, "short scalar:        ss = %d\n", ss_r);
+    PRINT(fp, "integer scalar:      is = %d\n", is_r);
+    PRINT(fp, "float scalar:        fs = %14.6e\n", fs_r);
+    PRINT(fp, "double scalar:       ds = %14.6e\n", ds_r);
 
     PRINT(fp, "\n");
 
@@ -955,9 +957,9 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
  */
 
 static int test_1(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -1542,11 +1544,10 @@ static void print_test_2_data(FILE *fp)
 /* COMPARE_TEST_2_DATA - compare the test data */
 
 static int compare_test_2_data(PDBfile *strm, FILE *fp)
-   {int i, *p1w, *p2w, *p1r, *p2r;
-    double *p3w, *p4w, *p3r, *p4r;
-    int err, err_tot;
-    int double_nm;
+   {int i, err, err_tot, double_nm;
+    int *p1w, *p2w, *p1r, *p2r;
     double double_tolerance;
+    double *p3w, *p4w, *p3r, *p4r;
 
     double_nm = min(strm->std->double_format[2],
                     strm->host_std->double_format[2]);
@@ -1707,9 +1708,9 @@ static int compare_test_2_data(PDBfile *strm, FILE *fp)
  */
 
 static int test_2(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file is asked */
@@ -1999,9 +2000,9 @@ static int compare_test_3_data(PDBfile *strm, FILE *fp)
  */
 
 static int test_3(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file is asked */
@@ -2092,12 +2093,12 @@ static int test_3(char *base, char *tgt, int n)
 /* PREP_TEST_4_DATA - prepare the test data */
 
 static void prep_test_4_data(void)
-   {char *pc;
+   {int *pi;
     short *ps;
-    int *pi;
     long *pl;
     float *pf;
     double *pd;
+    char *pc;
     haelem *hp;
 
     tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY);
@@ -2366,9 +2367,9 @@ static int compare_test_4_data(PDBfile *strm, FILE *fp)
  */
 
 static int test_4(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -2580,10 +2581,10 @@ static void print_test_5_data(FILE *fp)
 
 static int compare_test_5_data(PDBfile *strm, FILE *fp)
    {int i, l, *p1w, *p2w, *p1r, *p2r;
-    double *p3w, *p4w, *p3r, *p4r;
     int err, err_tot;
     int double_nm;
     double double_tolerance;
+    double *p3w, *p4w, *p3r, *p4r;
 
     double_nm = min(strm->std->double_format[2],
                     strm->host_std->double_format[2]);
@@ -2637,9 +2638,9 @@ static int compare_test_5_data(PDBfile *strm, FILE *fp)
  */
 
 static int test_5(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -2857,9 +2858,9 @@ static int compare_test_6_data(PDBfile *strm, FILE *fp)
 /* TEST_6 - test the PDBLib function PD_read_as_dwim */
 
 static int test_6(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -3072,9 +3073,9 @@ static int compare_test_7_data(PDBfile *strm, FILE *fp)
 /* TEST_7 - test the PDBLib pointer tracking */
 
 static int test_7(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -3328,9 +3329,9 @@ static int compare_test_8_data(PDBfile *strm, FILE *fp)
 /* TEST_8 - test the PDBLib defent and append logic */
 
 static int test_8(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */
@@ -3491,6 +3492,219 @@ static int test_9(char *base, char *tgt, int n)
 
 /*--------------------------------------------------------------------------*/
 
+/*                            TEST #10 ROUTINES                             */
+
+#ifdef HAVE_ANSI_FLOAT16
+
+#define QUAD_EQUAL(q1, q2) (PM_qvalue_compare(q1, q2, quad_tolerance) == 0)
+
+/*--------------------------------------------------------------------------*/
+
+/* PREP_TEST_10_DATA - prepare the test data */
+
+static void prep_test_10_data(void)
+   {int i;
+
+/* set scalars */
+    qs_r = 0.0L;
+    qs_w = expl(1.0);
+    qs_w = 2.0L;
+
+/* set long double array */
+    for (i = 0; i < N_FLOAT; i++)
+        {qa_w[i] = powl(qs_w, (long double) (i+1));
+         qa_r[i] = 0.0L;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_TEST_10_DATA - write out the data into the PDB file */
+
+static void write_test_10_data(PDBfile *strm)
+   {long ind[6];
+
+/* write scalars into the file */
+    if (PD_write(strm, "qs", "long_double",  &qs_w) == 0)
+       error(1, STDOUT, "QS WRITE FAILED - WRITE_TEST_10_DATA\n");
+
+/* write primitive arrays into the file */
+    ind[0] = 0L;
+    ind[1] = N_FLOAT - 1;
+    ind[2] = 1L;
+    if (PD_write_alt(strm, "qa", "long_double", qa_w, 1, ind) == 0)
+       error(1, STDOUT, "DA WRITE FAILED - WRITE_TEST_10_DATA\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* READ_TEST_10_DATA - read the test data from the file */
+
+static int read_test_10_data(PDBfile *strm)
+   {int err;
+
+/* read the scalar data from the file */
+    err = PD_read(strm, "qs", &qs_r);
+
+/* read the primitive arrays from the file */
+    err = PD_read(strm, "qa",  qa_r);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PRINT_TEST_10_DATA - print it out to STDOUT */
+
+static void print_test_10_data(FILE *fp)
+   {int i;
+
+    PRINT(fp, "long double scalar:  qs = %14.6Le\n", qs_r);
+
+/* print long double array */
+    PRINT(fp, "long double array:\n");
+    for (i = 0; i < N_FLOAT; i++)
+        PRINT(fp, "  qa[%d] = %14.6Le\n", i, qa_r[i]);
+
+    PRINT(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COMPARE_TEST_10_DATA - compare the test data */
+
+static int compare_test_10_data(PDBfile *strm, FILE *fp)
+   {int i, err, err_tot;
+    int quad_nm;
+    long double quad_tolerance;
+
+    quad_nm = min(strm->std->quad_format[2],
+		  strm->host_std->quad_format[2]);
+
+/* pad the absolute tolerance */
+    quad_tolerance = powl(2.0, (long double) -quad_nm);
+    err_tot = TRUE;
+
+#if 0
+
+/* compare scalars */
+    err  = TRUE;
+
+    err &= QUAD_EQUAL(qs_r, qs_w);
+
+    if (err)
+       PRINT(fp, "Scalars compare\n");
+    else
+       PRINT(fp, "Scalars differ\n");
+    err_tot &= err;
+
+/* compare long double array */
+    for (i = 0; i < N_FLOAT; i++)
+        err &= QUAD_EQUAL(qa_r[i], qa_w[i]);
+
+    if (err)
+       PRINT(fp, "Arrays compare\n");
+    else
+       PRINT(fp, "Arrays differ\n");
+    err_tot &= err;
+
+#endif
+
+    return(err_tot);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_10 - test the long double support in PDBLib
+ *         -
+ *         - read and write scalars and arrays of long doubles
+ *         -
+ *         - tests can be targeted
+ */
+
+static int test_10(char *base, char *tgt, int n)
+   {int err;
+    char datfile[MAXLINE], fname[MAXLINE];
+    PDBfile *strm;
+    FILE *fp;
+
+/* target the file as asked */
+    test_target(tgt, base, 100+n, fname, datfile);
+
+    fp = io_open(fname, "w");
+
+    prep_test_10_data();
+
+    if (read_only == FALSE)
+
+/* create the named file */
+       {strm = PD_create(datfile);
+	if (strm == NULL)
+	   error(1, fp, "Test couldn't create file %s\r\n", datfile);
+	PRINT(fp, "File %s created\n", datfile);
+
+/* write the test data */
+	write_test_10_data(strm);
+
+/* close the file */
+	if (PD_close(strm) == FALSE)
+	   error(1, fp, "Test couldn't close file %s\r\n", datfile);
+	PRINT(fp, "File %s closed\n", datfile);};
+
+/* reopen the file */
+    strm = PD_open(datfile, "r");
+    if (strm == NULL)
+       error(1, fp, "Test couldn't open file %s\r\n", datfile);
+    PRINT(fp, "File %s opened\n", datfile);
+
+/* dump the symbol table */
+    dump_test_symbol_table(fp, strm->symtab, 1);
+
+/* read the data from the file */
+    read_test_10_data(strm);
+
+/* compare the original data with that read in */
+    err = compare_test_10_data(strm, fp);
+
+/* close the file */
+    if (PD_close(strm) == FALSE)
+       error(1, fp, "Test couldn't close file %s\r\n", datfile);
+    PRINT(fp, "File %s closed\n", datfile);
+
+/* print it out to STDOUT */
+    print_test_10_data(fp);
+
+    if (debug_mode)
+       SC_mem_map(STDOUT, FALSE);
+
+    io_close(fp);
+    if (err)
+       REMOVE(fname);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_10 - stub for when there is no long double support */
+
+static int test_10(char *base, char *tgt, int n)
+   {
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
 /*                              DRIVER ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
@@ -3601,25 +3815,26 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDBTST - run basic PDB test suite\n\n");
-    PRINT(STDOUT, "Usage: pdbtst [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
+    PRINT(STDOUT, "Usage: pdbtst [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8] [-9] [-10]\n");
     PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "       b - set buffer size (default no buffering)\n");
-    PRINT(STDOUT, "       c - verify low level writes\n");
-    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
-    PRINT(STDOUT, "       h - print this help message and exit\n");
-    PRINT(STDOUT, "       n - run native mode test only\n");
-    PRINT(STDOUT, "       r - read only (assuming files from other run exist)\n");
-    PRINT(STDOUT, "       v - use format version # (default is 2)\n");
-    PRINT(STDOUT, "       0 - do NOT run test #0\n");
-    PRINT(STDOUT, "       1 - do NOT run test #1\n");
-    PRINT(STDOUT, "       2 - do NOT run test #2\n");
-    PRINT(STDOUT, "       3 - do NOT run test #3\n");
-    PRINT(STDOUT, "       4 - do NOT run test #4\n");
-    PRINT(STDOUT, "       5 - do NOT run test #5\n");
-    PRINT(STDOUT, "       6 - do NOT run test #6\n");
-    PRINT(STDOUT, "       7 - do NOT run test #7\n");
-    PRINT(STDOUT, "       8 - do NOT run test #8\n");
-    PRINT(STDOUT, "       9 - do NOT run test #9\n");
+    PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
+    PRINT(STDOUT, "       c  - verify low level writes\n");
+    PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       n  - run native mode test only\n");
+    PRINT(STDOUT, "       r  - read only (assuming files from other run exist)\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "       0  - do NOT run test #0\n");
+    PRINT(STDOUT, "       1  - do NOT run test #1\n");
+    PRINT(STDOUT, "       2  - do NOT run test #2\n");
+    PRINT(STDOUT, "       3  - do NOT run test #3\n");
+    PRINT(STDOUT, "       4  - do NOT run test #4\n");
+    PRINT(STDOUT, "       5  - do NOT run test #5\n");
+    PRINT(STDOUT, "       6  - do NOT run test #6\n");
+    PRINT(STDOUT, "       7  - do NOT run test #7\n");
+    PRINT(STDOUT, "       8  - do NOT run test #8\n");
+    PRINT(STDOUT, "       9  - do NOT run test #9\n");
+    PRINT(STDOUT, "       10 - do NOT run test #10\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -3633,7 +3848,7 @@ int main(int c, char **v)
    {int i, err;
     int test_zero, test_one, test_two, test_three;
     int test_four, test_five, test_six, test_seven;
-    int test_eight, test_nine;
+    int test_eight, test_nine, test_ten;
     int use_mapped_files, check_writes;
     BIGINT bfsz;
 
@@ -3659,6 +3874,7 @@ int main(int c, char **v)
     test_seven       = TRUE;
     test_eight       = TRUE;
     test_nine        = TRUE;
+    test_ten         = TRUE;
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -3691,7 +3907,10 @@ int main(int c, char **v)
 		      test_zero = FALSE;
 		      break;
                  case '1' :
-		      test_one = FALSE;
+		      if (v[i][2] == '0')
+			 test_ten = FALSE;
+		      else
+			 test_one = FALSE;
 		      break;
                  case '2' :
 		      test_two = FALSE;
@@ -3754,6 +3973,8 @@ int main(int c, char **v)
        err += run_test(test_8, 8, DATFILE, native_only);
     if (test_nine)
        err += run_test(test_9, 9, DATFILE, native_only);
+    if (test_ten)
+       err += run_test(test_10, 10, DATFILE, native_only);
 
     PRINT(STDOUT, "\n");
 

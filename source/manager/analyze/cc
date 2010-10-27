@@ -420,6 +420,7 @@ source $AnaDir/line
 source $AnaDir/pragma
 source $AnaDir/inline
 source $AnaDir/valist
+source $AnaDir/float16
 source $AnaDir/complex
 source $AnaDir/headers
 source $AnaDir/glibc

@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 09/08/2010
+MOD: 10/27/2010
 
 <CENTER>
 <P>
@@ -1850,7 +1850,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEA_STD</TD>
+<TD>PPC32_STD</TD>
 <TD ALIGN="CENTER">1</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
@@ -1858,7 +1858,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEB_STD</TD>
+<TD>M68X_STD</TD>
 <TD ALIGN="CENTER">2</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
@@ -1866,15 +1866,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEC_STD</TD>
-<TD ALIGN="CENTER">3</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,4,4</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,12</TD>
-</TR>
-
-<TR>
-<TD>INTELA_STD</TD>
+<TD>I386_STD</TD>
 <TD ALIGN="CENTER">4</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
@@ -1882,7 +1874,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>INTELB_STD</TD>
+<TD>I586_STD</TD>
 <TD ALIGN="CENTER">5</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
@@ -1906,7 +1898,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEED_STD</TD>
+<TD>PPC64_STD</TD>
 <TD ALIGN="CENTER">8</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
@@ -1914,7 +1906,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEE_STD</TD>
+<TD>X86_64_STD</TD>
 <TD ALIGN="CENTER">9</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
@@ -1941,44 +1933,33 @@ Available data alignments are:
 <TD WIDTH="120" ALIGN="CENTER">C/P/S/I/L/LL/F/D/Str</TD>
 </TR>
 <TR>
-<TD>M68000_ALIGNMENT</TD>
+<TD>WORD2_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">1</TD>
-<TD WIDTH="120" ALIGN="CENTER">1,2,2,2,2,2,2,2,0</TD>
+<TD WIDTH="120" ALIGN="CENTER">1, 2, 2, 2, 2, 2, 2, 2,  2, 0</TD>
 </TR>
 <TR>
 <TD>SPARC_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">2</TD>
-<TD WIDTH="120" ALIGN="CENTER">1,4,2,4,4,4,4,8,0</TD>
+<TD WIDTH="120" ALIGN="CENTER">1, 4, 2, 4, 4, 4, 4, 8,  8, 0</TD>
 </TR>
 <TR>
-<TD>MIPS_ALIGNMENT</TD>
+<TD>GNU3_PPC64_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">3</TD>
-<TD WIDTH="120" ALIGN="CENTER">1,4,2,4,4,8,4,8,0</TD>
+<TD WIDTH="120" ALIGN="CENTER">1, 4, 2, 4, 4, 8, 4, 8,  8, 0</TD>
 </TR>
 <TR>
-<TD>INTEL_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">4</TD>
-<TD WIDTH="120" ALIGN="CENTER">1,2,2,2,2,2,2,2,0</TD>
-</TR>
-<TR>
-<TD>DEF_ALIGNMENT</TD>
+<TD>WORD4_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">5</TD>
-<TD WIDTH="120" ALIGN="CENTER">1,4,4,4,4,4,4,4,0</TD>
+<TD WIDTH="120" ALIGN="CENTER">1, 4, 4, 4, 4, 4, 4, 4,  4, 0</TD>
 </TR>
-<TR>
-<TD>CRAY_ALIGNMENT</TD>
-<TD WIDTH="60" ALIGN="CENTER">6</TD>
-<TD WIDTH="120" ALIGN="CENTER">4,8,8,8,8,8,8,8,8</TD>
-</TR>
-<TR>
-<TD>UNICOS_ALIGNMENT</TD>
+<TD>WORD8_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">7</TD>
-<TD WIDTH="120" ALIGN="CENTER">4,8,8,8,8,8,8,8,8</TD>
+<TD WIDTH="120" ALIGN="CENTER">4, 8, 8, 8, 8, 8, 8, 8,  8, 8</TD>
 </TR>
 <TR>
-<TD>RS6000_ALIGNMENT</TD>
+<TD>XLC32_PPC64_ALIGNMENT</TD>
 <TD WIDTH="60" ALIGN="CENTER">8</TD>
-<TD WIDTH="120" ALIGN="CENTER">1,4,2,4,4,8,4,4,0</TD>
+<TD WIDTH="120" ALIGN="CENTER">1, 4, 2, 4, 4, 8, 4, 4,  4, 0</TD>
 </TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -2004,70 +1985,52 @@ Some common configurations are:
 <TD>SX Method</TD>
 </TR>
 <TR>
-<TD>Intel 80x86 UNIX</TD>
-<TD><tt>PD_target(&amp;INTELB_STD, &amp;INTEL_ALIGNMENT)</tt></TD>
+<TD>GCC 4.0 and later X86_64</TD>
+<TD><tt>PD_target(&amp;I586_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(5, 9)</tt></TD>
+<TD><tt>(target 5 9)</tt></TD>
+</TR>
+<TR>
+<TD>Mac OSX 10.5</TD>
+<TD><tt>PD_target(&amp;I586_STD, &amp;OSX_10_5_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(5, 10)</tt></TD>
+<TD><tt>(target 5 10)</tt></TD>
+</TR>
+<TR>
+<TD>Mac OSX 10.6 and later</TD>
+<TD><tt>PD_target(&amp;I586_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(5, 9)</tt></TD>
+<TD><tt>(target 5 9)</tt></TD>
+</TR>
+<TR>
+<TD>Cygwin i686</TD>
+<TD><tt>PD_target(&amp;I586_STD, &amp;CYGWIN_I686_ALIGNMENT)</tt></TD>
 <TD><tt>PFTRGT(5, 4)</tt></TD>
 <TD><tt>(target 5 4)</tt></TD>
 </TR>
 <TR>
-<TD>SPARC</TD>
-<TD><tt>PD_target(&amp;IEEEA_STD, &amp;SPARC_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 2)</tt></TD>
-<TD><tt>(target 1 2)</tt></TD>
+<TD>IBM PPC64 XLC 64 bit</TD>
+<TD><tt>PD_target(&amp;PPC32_STD, &amp;XLC64_PPC64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(1, 7)</tt></TD>
+<TD><tt>(target 1 7)</tt></TD>
 </TR>
 <TR>
-<TD>MIPS, SGI</TD>
-<TD><tt>PD_target(&amp;IEEEA_STD, &amp;MIPS_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 3)</tt></TD>
-<TD><tt>(target 1 3)</tt></TD>
-</TR>
-<TR>
-<TD>IBM RS6000</TD>
-<TD><tt>PD_target(&amp;IEEEA_STD, &amp;RS6000_ALIGNMENT)</tt></TD>
+<TD>IBM PPC64 XLC 32 bit</TD>
+<TD><tt>PD_target(&amp;PPC32_STD, &amp;XLC32_PPC64_ALIGNMENT)</tt></TD>
 <TD><tt>PFTRGT(1, 8)</tt></TD>
 <TD><tt>(target 1 8)</tt></TD>
 </TR>
 <TR>
-<TD>Mac/Think C</TD>
-<TD><tt>PD_target(&amp;IEEEB_STD, &amp;M68000_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(2, 1)</tt></TD>
-<TD><tt>(target 2 1)</tt></TD>
-</TR>
-<TR>
-<TD>DEC 3100</TD>
-<TD><tt>PD_target(&amp;INTELB_STD, &amp;MIPS_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(5, 3)</tt></TD>
-<TD><tt>(target 5 3)</tt></TD>
-</TR>
-<TR>
-<TD>UNICOS Cray</TD>
-<TD><tt>PD_target(&amp;CRAY_STD, &amp;UNICOS_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(7, 7)</tt></TD>
-<TD><tt>(target 7 7)</tt></TD>
-</TR>
-<TR>
-<TD>Motorola</TD>
-<TD><tt>PD_target(&amp;IEEEA_STD, &amp;M68000_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 1)</tt></TD>
-<TD><tt>(target 1 1)</tt></TD>
-</TR>
-<TR>
-<TD>DEC Vax</TD>
-<TD><tt>PD_target(&amp;VAX_STD, &amp;DEF_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(6, 5)</tt></TD>
-<TD><tt>(target 6 5)</tt></TD>
-</TR>
-<TR>
-<TD>Mac/MPW</TD>
-<TD><tt>PD_target(&amp;IEEEC_STD, &amp;M68000_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(3, 1)</tt></TD>
-<TD><tt>(target 3 1)</tt></TD>
+<TD>SPARC</TD>
+<TD><tt>PD_target(&amp;PPC32_STD, &amp;SPARC_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(1, 2)</tt></TD>
+<TD><tt>(target 1 2)</tt></TD>
 </TR>
 <TR>
 <TD>DOS</TD>
-<TD><tt>PD_target(&amp;INTELA_STD, &amp;INTEL_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(4, 4)</tt></TD>
-<TD><tt>(target 4 4)</tt></TD>
+<TD><tt>PD_target(&amp;I386_STD, &amp;WORD2_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(4, 1)</tt></TD>
+<TD><tt>(target 4 1)</tt></TD>
 </TR>
 </TABLE>
 
@@ -2098,40 +2061,12 @@ and
 <pre>
  #include "pdb.h"
  
- void test_target(tgt, base, n, fname, datfile)
-    char *tgt, *base;
-    int n;
-    char *fname, *datfile;
-    {if (tgt != NULL)
- 
- /* for DOS machines */
-        {if (strcmp(tgt, "dos") == 0)
-            PD_target(&amp;INTEL_STD, &amp;INTEL_ALIGNMENT);
- 
- /* for CRAY computers */
-         else if (strcmp(tgt, "cray") == 0)
-            PD_target(&amp;CRAY_STD, &amp;UNICOS_ALIGNMENT);
- 
- /* for DEC VAX machines */
-         else if (strcmp(tgt, "vax") == 0)
-            PD_target(&amp;VAX_STD, &amp;DEF_ALIGNMENT);
- 
- /* for MIPS based machines */
-         else if (strcmp(tgt, "mips") == 0)
-            PD_target(&amp;IEEEA_STD, &amp;MIPS_ALIGNMENT);
- 
- /* for standard M68000 machines */
-         else if (strcmp(tgt, "sun3") == 0)
-            PD_target(&amp;IEEEA_STD, &amp;M68000_ALIGNMENT);
- 
- /* for SPARC machines */
-         else if (strcmp(tgt, "sun4") == 0)
-            PD_target(&amp;IEEEA_STD, &amp;SPARC_ALIGNMENT);
- 
- /* for Macintosh */
-         else if (strcmp(tgt, "mac") == 0)
-            PD_target(&amp;IEEEB_STD, &amp;M68000_ALIGNMENT);
- 
+void test_target(char *tgt, char *base, int n,
+		 char *fname, char *datfile)
+    {int rv;
+
+     if (tgt != NULL)
+        {rv = PD_target_platform(tgt);
          sprintf(fname, "%s-%s.rs%d", base, tgt, n);
          sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
      else
@@ -2150,10 +2085,10 @@ and
              .
              .
 
- c ... set target architecture (MIPS, SGI)
- c ... IEEEA_STD
+ c ... set target architecture
+ c ... PPC32_STD
        is = 1
- c ... MIPS_ALIGNMENT
+ c ... GNU3_PPC64_ALIGNMENT
        ia = 3
        if (pftrgt(is, ia) .eq. 0)
       &amp;   call errproc
@@ -2169,8 +2104,8 @@ and
              .
              .
 
- ; set target architecture (MIPS, SGI)
- ; IEEEA_STD is 1 and MIPS_ALIGNMENT is 3
+ ; set target architecture
+ ; PPC32_STD is 1 and GNU3_PPC64_ALIGNMENT is 3
      (target 1 3)
              .
              .
@@ -2853,7 +2788,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEA_STD</TD>
+<TD>PPC32_STD</TD>
 <TD ALIGN="CENTER">1</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
@@ -2861,7 +2796,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEB_STD</TD>
+<TD>M68X_STD</TD>
 <TD ALIGN="CENTER">2</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
@@ -2869,15 +2804,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEC_STD</TD>
-<TD ALIGN="CENTER">3</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,4,4</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,12</TD>
-</TR>
-
-<TR>
-<TD>INTELA_STD</TD>
+<TD>I386_STD</TD>
 <TD ALIGN="CENTER">4</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
@@ -2885,7 +2812,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>INTELB_STD</TD>
+<TD>I586_STD</TD>
 <TD ALIGN="CENTER">5</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
@@ -2909,7 +2836,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEED_STD</TD>
+<TD>PPC64_STD</TD>
 <TD ALIGN="CENTER">8</TD>
 <TD>NORMAL_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
@@ -2917,7 +2844,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>IEEEE_STD</TD>
+<TD>X86_64_STD</TD>
 <TD ALIGN="CENTER">9</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
@@ -5773,7 +5700,7 @@ known or are the type being defined.
 &#60;;primitive type&gt; | &#60;;derived type&gt;
 <br>
 &nbsp;&nbsp;&nbsp;
-&#60;;member name&gt;
+vvv&#60;;member name&gt;
 &nbsp;&nbsp;
 :=
 an ASCII string representing the name of the member
@@ -10005,38 +9932,34 @@ automatically (applications can add their own as needed):
 <TD>= {1, 4, 2, 4, 4, 4, 8}</TD>
 </TR>
 <TR>
-<TD>MIPS_ALIGNMENT</TD>
+<TD>GNU3_PPC64_ALIGNMENT</TD>
 <TD>= {1, 4, 2, 4, 4, 4, 8}</TD>
 </TR>
 <TR>
-<TD>RS6000_ALIGNMENT</TD>
+<TD>XLC32_PPC64_ALIGNMENT</TD>
 <TD>= {1, 4, 2, 4, 4, 4, 4}</TD>
 </TR>
 <TR>
 <TD>CRAY_ALIGNMENT</TD>
 <TD>= {8, 8, 8, 8, 8, 8, 8}</TD>
 </TR>
-<TD>UNICOS_ALIGNMENT</TD>
+<TD>WORD8_ALIGNMENT</TD>
 <TD>= {1, 8, 8, 8, 8, 8, 8}</TD>
 </TR>
 <TR>
-<TD>M68000_ALIGNMENT</TD>
+<TD>WORD2_ALIGNMENT</TD>
 <TD>= {1, 2, 2, 2, 2, 2, 2}</TD>
 </TR>
 <TR>
-<TD>INTELA_ALIGNMENT</TD>
-<TD>= {1, 2, 2, 2, 2, 2, 2}</TD>
+<TD>WORD4_ALIGNMENT</TD>
+<TD>= {1, 4, 4, 4, 4, 4, 4}</TD>
 </TR>
 <TR>
-<TD>INTELB_ALIGNMENT</TD>
-<TD>= {4, 4, 4, 4, 4, 4, 4}</TD>
+<TD>GNU4_I686_ALIGNMENT</TD>
+<TD>= {1, 4, 2, 4, 4, 4, 4}</TD>
 </TR>
 <TR>
-<TD>INTELC_ALIGNMENT</TD>
-<TD>= {2, 4, 2, 4, 4, 4, 4}</TD>
-</TR>
-<TR>
-<TD>DEF_ALIGNMENT</TD>
+<TD>WORD4_ALIGNMENT</TD>
 <TD>= {1, 4, 4, 4, 4, 4, 4}</TD>
 </TR>
 </TABLE>
@@ -10100,48 +10023,14 @@ used in the data_standard's described in the last section:
 
 <tt>
 <BLOCKQUOTE>
-<TABLE>
-<TR><TD>ieee_float</TD><TD>= {32L, 8L, 23L, 0L, 1L, 9L, 0L, 0x7FL}</TD></TR>
-<TR><TD>ieeea_double</TD><TD>= {64L, 11L, 52L, 0L, 1L, 12L, 0L, 0x3FFL}</TD></TR>
-<TR><TD>ieeeb_double</TD><TD>= {96L, 15L, 64L, 0L, 1L, 32L, 1L, 0x3FFEL}</TD></TR>
-<TR><TD>intel_float</TD><TD>= {32L, 8L, 23L, 0L, 1L, 9L, 0L, 0x7FL}</TD></TR>
-<TR><TD>intel_double</TD><TD>= {64L, 11L, 52L, 0L, 1L, 12L, 0L, 0x3FFL}</TD></TR>
-<TR><TD>cray_float</TD><TD>= {64L, 15L, 48L, 0L, 1L, 16L, 1L, 0x4000L}</TD></TR>
+<TABLE>r
+<TR><TD>float4_ieee</TD><TD>= {32L, 8L, 23L, 0L, 1L, 9L, 0L, 0x7FL}</TD></TR>
+<TR><TD>float8_ieee</TD><TD>= {64L, 11L, 52L, 0L, 1L, 12L, 0L, 0x3FFL}</TD></TR>
+<TR><TD>float12_ieee</TD><TD>= {96L, 15L, 64L, 0L, 1L, 32L, 1L, 0x3FFEL}</TD></TR>
+<TR><TD>float16_ieee</TD><TD>= {128L, 11L, 116L, 0L, 1L, 12L, 0L, 0x3FFFL}</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 </tt>
-
-<p>
-
-Note: There are several variants of floating type format on the VAX. Accordingly
-the user must decide which one to use and PDBLib has the descriptions:
-<p>
-When using GFLOATs
-<p>
-
-<tt>
-<BLOCKQUOTE>
-<TABLE>
-<TR><TD>vax_float</TD><TD>= {32L, 8L, 23L, 0L, 1L, 9L, 0L, 0x81L}</TD></TR>
-<TR><TD>vax_double</TD><TD>= {64L, 11L, 52L, 0L, 1L, 12L, 0L, 0x401L}</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
-</tt>
-
-<p>
-
-otherwise
-<p>
-
-<tt>
-<BLOCKQUOTE>
-<TABLE>
-<TR><TD>vax_float</TD><TD>= {32L, 8L, 23L, 0L, 1L, 9L, 0L, 0x81L}</TD></TR>
-<TR><TD>vax_double</TD><TD>= {64L, 8L, 55L, 0L, 1L, 9L, 0L, 0x81L}</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
-</tt>
-
 <p>
 
 <h4>Byte Ordering</h4>
@@ -10157,21 +10046,20 @@ in memory relative to CPU's such as the Motorola and SPARC families.
 <tt>
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD>ieee_float_order</TD><TD>= {1, 2, 3, 4}</TD></TR>
-<TR><TD>ieeea_double_order</TD><TD>= {1, 2, 3, 4, 5, 6, 7, 8}</TD></TR>
-<TR><TD>ieeeb_double_order</TD><TD>= {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}</TD></TR>
-<TR><TD>intel_float_order</TD><TD>= {4, 3, 2, 1}</TD></TR>
-<TR><TD>intel_double_order</TD><TD>= {8, 7, 6, 5, 4, 3, 2, 1}</TD></TR>
-<TR><TD>vax_float_order</TD><TD>= {2, 1, 4, 3}</TD></TR>
-<TR><TD>vax_double_order</TD><TD>= {2, 1, 4, 3, 6, 5, 8, 7}</TD></TR>
-<TR><TD>cray_float_order</TD><TD>= {1, 2, 3, 4, 5, 6, 7, 8}</TD></TR>
+<TR><TD>float4_nrm_order</TD><TD>= {1, 2, 3, 4}</TD></TR>
+<TR><TD>float8_nrm_order</TD><TD>= {1, 2, 3, 4, 5, 6, 7, 8}</TD></TR>
+<TR><TD>float12_nrm_order</TD><TD>= {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}</TD></TR>
+<TR><TD>float4_rev_order</TD><TD>= {4, 3, 2, 1}</TD></TR>
+<TR><TD>float8_rev_order</TD><TD>= {8, 7, 6, 5, 4, 3, 2, 1}</TD></TR>
+<TR><TD>float4_vax_order</TD><TD>= {2, 1, 4, 3}</TD></TR>
+<TR><TD>float8_vax_order</TD><TD>= {2, 1, 4, 3, 6, 5, 8, 7}</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 </tt>
 
 <p>
 
-The following is a list of the data_standard's which PDBLib provides
+The following is a partial list of the data_standard's which PDBLib provides
 by default. The purpose is twofold: to help users identify target
 formats; and to guide users who wish to create their own data_standard's.
 <p>
@@ -10180,14 +10068,16 @@ The members of the data_standard are indicated in the template:
 
 <dl>
 
-<dt> STAND
+<dt> STANDARD
 
 <dd>{size of pointer,
 <dd>	 size and order of short,
 <dd>	 size and order of int,
 <dd>	 size and order of long,
+<dd>	 size and order of long long,
 <dd>	 size, format, and order of float,
-<dd>	 size, format, and order of double}
+<dd>	 size, format, and order of double,
+<dd>	 size, format, and order of long double}
 </dl>
 
 The various variables indicated are defined by PDBLib.
@@ -10196,70 +10086,37 @@ The various variables indicated are defined by PDBLib.
 
 <tt>
 <dl>
-<dt>DEF_STD
-
-<dd>{4,
-<dd>&nbsp;2, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, def_float, def_float_order,
-<dd>&nbsp;8, def_double, def_double_order}
-
-<p>
-
-<dt> IEEEA_STD
-
-<dd>{4,
-<dd>&nbsp;2, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, ieee_float, ieee_float_order,
-<dd>&nbsp;8, ieeea_double, ieeea_double_order}
-
-<p>
-
-<dt> IEEEB_STD
-
-<dd>{4,
-<dd>&nbsp;2, NORMAL_ORDER,
-<dd>&nbsp;2, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, ieee_float, ieee_float_order,
-<dd>12, ieeeb_double, ieeeb_double_order}
-
-<p>
-
-<dt> IEEEC_STD
-
-<dd>{4,
-<dd>&nbsp;2, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, NORMAL_ORDER,
-<dd>&nbsp;4, ieee_float, ieee_float_order,
-<dd>12, ieeeb_double, ieeeb_double_order}
-
-<p>
-
-<dt> INTELA_STD
-
-<dd>{4,
-<dd>&nbsp;2, REVERSE_ORDER,
+<dt> X86_64_STD
+<dd>{8,
 <dd>&nbsp;2, REVERSE_ORDER,
 <dd>&nbsp;4, REVERSE_ORDER,
-<dd>&nbsp;4, intel_float, intel_float_order,
-<dd>&nbsp;8, intel_double, intel_double_order}
-
+<dd>&nbsp;8, REVERSE_ORDER,
+<dd>&nbsp;8, REVERSE_ORDER,
+<dd>&nbsp;4, float4_ieee, float4_rev_order,
+<dd>&nbsp;8, float8_ieee, float8_rev_order}
+<dd>16, float16_ieee, float16_rev_order}
 <p>
 
-<dt> INTELB_STD
+<dt> PPC64_STD
+<dd>{8,
+<dd>&nbsp;2, NORMAL_ORDER,
+<dd>&nbsp;4, NORMAL_ORDER,
+<dd>&nbsp;8, NORMAL_ORDER,
+<dd>&nbsp;8, NORMAL_ORDER,
+<dd>&nbsp;4, float4_ieee, float4_nrm_order,
+<dd>&nbsp;8, float8_ieee, float8_nrm_order,
+<dd>16, float16_ieee, float16_nrm_order}
+<p>
 
+<dt> M68X_STD
 <dd>{4,
-<dd>&nbsp;2, REVERSE_ORDER,
-<dd>&nbsp;4, REVERSE_ORDER,
-<dd>&nbsp;4, REVERSE_ORDER,
-<dd>&nbsp;4, intel_float, intel_float_order,
-<dd>&nbsp;8, intel_double, intel_double_order},
-
+<dd>&nbsp;2, NORMAL_ORDER,
+<dd>&nbsp;2, NORMAL_ORDER,
+<dd>&nbsp;4, NORMAL_ORDER,
+<dd>&nbsp;4, NORMAL_ORDER,
+<dd>&nbsp;4, float4_ieee, float4_nrm_order,
+<dd>12, float12_ieee, float12_nrm_order,
+<dd>16, float16_ieee, float16_nrm_order}
 <p>
 
 <dt> VAX_STD
@@ -10267,9 +10124,10 @@ The various variables indicated are defined by PDBLib.
 <dd>&nbsp;2, REVERSE_ORDER,
 <dd>&nbsp;4, REVERSE_ORDER,
 <dd>&nbsp;4, REVERSE_ORDER,
-<dd>&nbsp;4, vax_float, vax_float_order,
-<dd>&nbsp;8, vax_double, vax_double_order}
-
+<dd>&nbsp;4, REVERSE_ORDER,
+<dd>&nbsp;4, float4_vax, float4_vax_order,
+<dd>&nbsp;8, float8_vax, float8_vax_order,
+<dd>&nbsp;8, float8_vax, float8_vax_order}
 <p>
 
 <dt> CRAY_STD
@@ -10277,8 +10135,10 @@ The various variables indicated are defined by PDBLib.
 <dd>&nbsp;8, NORMAL_ORDER,
 <dd>&nbsp;8, NORMAL_ORDER,
 <dd>&nbsp;8, NORMAL_ORDER,
-<dd>&nbsp;8, cray_float, cray_float_order,
-<dd>&nbsp;8, cray_float, cray_float_order}
+<dd>&nbsp;8, NORMAL_ORDER,
+<dd>&nbsp;8, float8_cray, float8_nrm_order,
+<dd>&nbsp;8, float8_cray, float8_nrm_order,
+<dd>16, float16_cray, float16_nrm_order}
 
 </dl>
 </tt>

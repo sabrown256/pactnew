@@ -264,6 +264,9 @@ data_standard *_PD_mk_standard(PDBfile *file)
     std->double_bytes   = 0;
     std->double_format  = NULL;
     std->double_order   = NULL;
+    std->quad_bytes     = 0;
+    std->quad_format    = NULL;
+    std->quad_order     = NULL;
 
     std->file = file;
 
@@ -296,6 +299,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     std->longlong_order = src->longlong_order;
     std->float_bytes    = src->float_bytes;
     std->double_bytes   = src->double_bytes;
+    std->quad_bytes     = src->quad_bytes;
 
     n = FORMAT_FIELDS;
     std->float_format  = FMAKE_N(long, n, "_PD_COPY_STANDARD:float_format");
@@ -325,6 +329,20 @@ data_standard *_PD_copy_standard(data_standard *src)
     osrc = src->double_order;
     for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
 
+    n = FORMAT_FIELDS;
+    std->quad_format = FMAKE_N(long, n, "_PD_COPY_STANDARD:quad_format");
+    SC_mark(std->quad_format, 1);
+    fstd = std->quad_format;
+    fsrc = src->quad_format;
+    for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
+
+    n = (std->quad_bytes > 0) ? std->quad_bytes : -(std->quad_bytes / std->bits_byte);
+    std->quad_order  = FMAKE_N(int,  n, "_PD_COPY_STANDARD:quad_order");
+    SC_mark(std->quad_order, 1);
+    ostd = std->quad_order;
+    osrc = src->quad_order;
+    for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
+
     return(std);}
 
 /*--------------------------------------------------------------------------*/
@@ -340,6 +358,8 @@ void _PD_rl_standard(data_standard *std)
         SFREE(std->float_order);
         SFREE(std->double_format);
         SFREE(std->double_order);
+        SFREE(std->quad_format);
+        SFREE(std->quad_order);
 
         SFREE(std);};
 
@@ -366,9 +386,10 @@ data_alignment *_PD_mk_alignment(char *vals)
     align->longlong_alignment = vals[4];  /* default-equal to long alignment*/
     align->float_alignment    = vals[5];
     align->double_alignment   = vals[6];
+    align->quad_alignment     = vals[7];
 
-    if (strlen(vals) > 7)
-       align->struct_alignment = vals[7];
+    if (strlen(vals) > 8)
+       align->struct_alignment = vals[8];
     else
        align->struct_alignment = 0;
 

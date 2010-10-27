@@ -58,6 +58,13 @@
 		     a->double_format,    b->double_format,                  \
 		     c->double_alignment, d->double_alignment)
 
+#define PD_COMPARE_QUD_STD(eq, a, b, c, d)                                   \
+   PD_COMPARE_FP_STD(eq,                                                     \
+		     a->quad_bytes,     b->quad_bytes,                       \
+		     a->quad_order,     b->quad_order,                       \
+		     a->quad_format,    b->quad_format,                      \
+		     c->quad_alignment, d->quad_alignment)
+
 #define PD_COMPARE_FP_STD(eq, na, nb, oa, ob, fa, fb, la, lb)                \
    {int j, *poa, *pob;                                                       \
     long *pfa, *pfb;                                                         \
@@ -133,6 +140,12 @@ int _PD_compare_std(data_standard *a, data_standard *b,
     fb = b->double_format;
     for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
 
+/* check the double format data */
+    n  = FORMAT_FIELDS;
+    fa = a->quad_format;
+    fb = b->quad_format;
+    for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
+
 /* check alignments */
     eq &= ((c->char_alignment       == d->char_alignment) &&
            (c->ptr_alignment        == d->ptr_alignment) &&
@@ -141,7 +154,8 @@ int _PD_compare_std(data_standard *a, data_standard *b,
            (c->long_alignment       == d->long_alignment) &&
            (c->longlong_alignment   == d->longlong_alignment) &&
            (c->float_alignment      == d->float_alignment) &&
-           (c->double_alignment     == d->double_alignment));
+           (c->double_alignment     == d->double_alignment) &&
+           (c->quad_alignment       == d->quad_alignment));
 
     return(eq);}
 
@@ -855,6 +869,16 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
                   falign->double_alignment, NO_ORDER,
 		  conv, fstd->double_order,
 	          fstd->double_format, FALSE, FALSE);
+
+    if (flag)
+       {PD_COMPARE_DBL_STD(conv, fstd, hstd, falign, halign);}
+    else
+       conv = FALSE;
+    _PD_defstr_in(chart, "long_double", FLOAT_KIND,
+		  NULL, (long) fstd->quad_bytes, 
+                  falign->quad_alignment, NO_ORDER,
+		  conv, fstd->quad_order,
+	          fstd->quad_format, FALSE, FALSE);
 
     return;}
 

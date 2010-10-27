@@ -113,11 +113,13 @@ int
  PD_long_long_digits,
  PD_float_digits,
  PD_double_digits,
+ PD_quad_digits,
  PD_tolerance = 1000;
 
 double
  PD_float_tol,
- PD_double_tol;
+ PD_double_tol,
+ PD_quad_tol;
 
 /* print controls
  *  0  -  print prefix: 0 = full path, 1 = space, 2 = tree
@@ -1125,6 +1127,11 @@ void _PD_set_digits(PDBfile *file)
     PD_double_tol    = POW(2.0, -((double) d));
     PD_double_digits = log2*d + 1;
 
+    f = std->quad_format;
+    d = min(f[2], PD_tolerance);
+    PD_quad_tol    = POW(2.0, -((long double) d));
+    PD_quad_digits = log2*d + 1;
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -1203,6 +1210,13 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
     nmb = min(nmb, PD_tolerance);
     PD_double_tol    = POW(2.0, -((double) nmb));
     PD_double_digits = log2*nmb + 1;
+
+    fa  = stda->quad_format;
+    fb  = stdb->quad_format;
+    nmb = max(fa[2], fb[2]);
+    nmb = min(nmb, PD_tolerance);
+    PD_quad_tol    = POW(2.0, -((long double) nmb));
+    PD_quad_digits = log2*nmb + 1;
 
     return;}
 

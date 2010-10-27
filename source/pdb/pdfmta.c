@@ -41,7 +41,7 @@ extern int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_OPEN_I - open an existing PDB II file
+/* _PD_OPEN_I - open an existing PDB I file
  *            - extract the symbol table and structure chart,
  *            - and return a pointer to the PDB file
  *            - if successful else NULL
@@ -70,28 +70,28 @@ static int _PD_open_i(PDBfile *file)
 
     switch (istd)
        {case IEEE_32_64 :
-	     file->std   = _PD_copy_standard(&IEEEA_STD);
-	     file->align = _PD_copy_alignment(&M68000_ALIGNMENT);
+	     file->std   = _PD_copy_standard(&PPC32_STD);
+	     file->align = _PD_copy_alignment(&WORD2_ALIGNMENT);
 	     break;
         case IEEE_32_96 :
-	     file->std   = _PD_copy_standard(&IEEEB_STD);
-	     file->align = _PD_copy_alignment(&M68000_ALIGNMENT);
+	     file->std   = _PD_copy_standard(&M68X_STD);
+	     file->align = _PD_copy_alignment(&WORD2_ALIGNMENT);
 	     break;
         case INTEL_X86 :
-	     file->std   = _PD_copy_standard(&INTELA_STD);
-	     file->align = _PD_copy_alignment(&INTELA_ALIGNMENT);
+	     file->std   = _PD_copy_standard(&I386_STD);
+	     file->align = _PD_copy_alignment(&WORD2_ALIGNMENT);
 	     break;
 	case CRAY_64 :
 	     file->std   = _PD_copy_standard(&CRAY_STD);
-	     file->align = _PD_copy_alignment(&UNICOS_ALIGNMENT);
+	     file->align = _PD_copy_alignment(&WORD8_ALIGNMENT);
 	     break;
         case VAX_11 :
 	     file->std   = _PD_copy_standard(&VAX_STD);
-	     file->align = _PD_copy_alignment(&DEF_ALIGNMENT);
+	     file->align = _PD_copy_alignment(&WORD4_ALIGNMENT);
 	     break;
         default :
-	     file->std   = _PD_copy_standard(&DEF_STD);
-	     file->align = _PD_copy_alignment(&DEF_ALIGNMENT);
+	     file->std   = _PD_copy_standard(&X86_64_STD);
+	     file->align = _PD_copy_alignment(&GNU4_X86_64_ALIGNMENT);
 	     break;};
 
 /* to correctly handle the situation in which many PDBfiles are open

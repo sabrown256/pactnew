@@ -94,7 +94,7 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
        pdrdwr.o pdptr.o pdprnt.o pdmemb.o \
        pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o \
        pdcsum.o pdbx.o pdszof.o pdfia.o pdbdir.o pdpar.o pdcomm.o \
-       pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
+       pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
 
 ArBind = ${TGTLib}(gf-${LibName}.o)
 
@@ -106,7 +106,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdmemb.o) ${TGTLib}(pdgs.o) ${TGTLib}(pdcsum.o)   \
          ${TGTLib}(pdblk.o) ${TGTLib}(pdbmm.o) ${TGTLib}(pdconv.o)   \
          ${TGTLib}(pdpath.o) ${TGTLib}(pdbfc.o) ${TGTLib}(pdbnet.o)  \
-         ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o)                     \
+         ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) ${TGTLib}(pdtgt.o)  \
          ${TGTLib}(pdbx.o) ${TGTLib}(pdfia.o)  ${TGTLib}(pdbdir.o)   \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
          ${TGTLib}(pdspoke.o)                                        \
@@ -120,6 +120,8 @@ ${LibDep} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
 #
 ${BinDir}/detect : detect.c ${Hdrs} 
 	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
+
+detect : ${BinDir}/detect
 
 ${PACTTmpDir}/pdform.h : ${BinDir}/detect
 	${RM} ${PACTTmpDir}/pdform.h
@@ -138,7 +140,8 @@ pdspoke.c : config-spokes pdshar.c
 Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
        ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
        ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
-       ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${DepLib}
+       ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${BinDir}/pdfcts \
+       ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
 Gst : ${BinDir}/pdgsts
@@ -187,6 +190,10 @@ ${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs}
 ${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs}
 	${CC} -c pdbfts.c -o ${PACTTmpDir}/pdbfts.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/pdbfts.o -o ${BinDir}/pdbfts ${Libs}
+        
+${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
+	${CC} -c pdfcts.c -o ${PACTTmpDir}/pdfcts.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdfcts.o -o ${BinDir}/pdfcts ${Libs}
         
 Fstd : ${BinDir}/pdftst ${BinDir}/pdfhyts
 

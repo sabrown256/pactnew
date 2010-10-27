@@ -965,6 +965,13 @@ extern int
  PM_value_equal(double x1, double x2, double tol),
  PM_value_compare(double x1, double x2, double tol);
 
+#ifdef HAVE_ANSI_FLOAT16
+
+extern int
+ PM_qvalue_compare(long double x1, long double x2, long double tol);
+
+#endif
+
 extern double
  PM_romberg(double (*func)(double x), double x0, double x1, double tol),
  PM_integrate_tzr(double xmn, double xmx, int *pn,

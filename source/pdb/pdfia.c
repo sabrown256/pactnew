@@ -22,34 +22,31 @@
 #endif
 
 data_standard
- *PD_std_standards[] = {&IEEEA_STD,
-                        &IEEEB_STD,
-                        &IEEEC_STD,
-                        &INTELA_STD,
-                        &INTELB_STD,
+ *PD_std_standards[] = {&PPC32_STD,
+                        &M68X_STD,
+                        &X86_64_STD,
+                        &I386_STD,
+                        &I586_STD,
                         &VAX_STD,
                         &CRAY_STD,
-                        &IEEED_STD,
-                        &IEEEE_STD,
+                        &PPC64_STD,
+                        &X86_64_STD,
                         NULL};
 
 data_alignment
- *PD_std_alignments[] = {&M68000_ALIGNMENT,
+ *PD_std_alignments[] = {&WORD2_ALIGNMENT,         /* 1 */
                          &SPARC_ALIGNMENT,
-                         &MIPS_ALIGNMENT,
-                         &INTELA_ALIGNMENT,
-                         &DEF_ALIGNMENT,
-
-/* place holder for defunct CRAY ALIGNMENT */
-                         &UNICOS_ALIGNMENT,
-
-                         &UNICOS_ALIGNMENT,
-                         &RS6000_ALIGNMENT,
-                         &MIPS64_ALIGNMENT,
-                         &ALPHA64_ALIGNMENT,
-                         &INTELB_ALIGNMENT,
-                         &INTELC_ALIGNMENT,
-                         &VAX_ALIGNMENT,
+                         &GNU3_PPC64_ALIGNMENT,
+                         &WORD2_ALIGNMENT,
+                         &WORD4_ALIGNMENT,         /* 5 */
+                         &WORD8_ALIGNMENT,
+                         &XLC64_PPC64_ALIGNMENT,
+                         &XLC32_PPC64_ALIGNMENT,
+                         &GNU4_X86_64_ALIGNMENT,
+                         &OSX_10_5_ALIGNMENT,      /* 10 */
+                         &CYGWIN_I686_ALIGNMENT,
+                         &GNU4_I686_ALIGNMENT,
+                         &BYTE_ALIGNMENT,
                          NULL};
 
 /*--------------------------------------------------------------------------*/
@@ -1503,17 +1500,14 @@ FIXNUM F77_FUNC(pffree, PFFREE)(FIXNUM *fileid, FIXNUM *pnchr,
 /* PFTRGT - target the next file to be opened
  *        - given an index from the following list:
  *        -
- *        -   (1,  1)  - Sun3
- *        -   (1,  2)  - Sun4
- *        -   (1,  3)  - Mips, SGI
- *        -   (1,  8)  - IBM R6000
- *        -   (2,  1)  - Macintosh A (Think C)
- *        -   (3,  1)  - Macintosh B (MPW)
- *        -   (4,  4)  - DOS
- *        -   (5,  4)  - Intel 80x86 UNIX
- *        -   (6,  5)  - DEC VAX
- *        -   (5,  3)  - DEC 3100
- *        -   (7,  7)  - UNICOS Cray
+ *        -   (5,  9)  - GCC 4.0 and later X86_64
+ *        -   (5, 10)  - Mac OSX 10.5
+ *        -   (5,  9)  - Mac OSX 10.6 and later
+ *        -   (5,  4)  - Cygwin i686
+ *        -   (1,  7)  - IBM PPC64 XLC 64 bit
+ *        -   (1,  8)  - IBM PPC64 XLC 32 bit
+ *        -   (1,  2)  - SPARC
+ *        -   (4,  1)  - DOS
  *        -
  *        - return TRUE iff successful
  */
@@ -1529,11 +1523,11 @@ FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
     st = *pis;
     rv = (al != 6);
     if (rv)
-       {pa->req_std  = PD_std_standards[st - 1];
+       {pa->req_std   = PD_std_standards[st - 1];
         pa->req_align = PD_std_alignments[al - 1];}
 
     else
-       {pa->req_std  = NULL;
+       {pa->req_std   = NULL;
         pa->req_align = NULL;
 
         PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFTRGT",

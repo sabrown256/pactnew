@@ -283,7 +283,7 @@ double PM_igamma_q(double x, double a)
 /*--------------------------------------------------------------------------*/
 
 /* _PM_ERFC_A - rational polynomial approximation to ERFC(X)
- *            - accurate to about 1.0e-8 but a factor of ~10 faster
+ *            - accurate to about 1.0e-7 but a factor of ~10 faster
  */
 
 static double _PM_erfc_a(double x)
@@ -340,6 +340,23 @@ static double _PM_erfc_a(double x)
 	     rv  = a*(1.0 + xa*(1.10966764 + 
 				xa*(0.55042450 +
 				    xa*0.12147398)));
+	     rv *= exp(-x*x);
+	     break;
+
+/* rational polynomial fit to obtain fractional error < 1.0e-7
+ * due to George Zimmerman
+ */
+	case 5 :
+	     a   = 1.0/(1.0 + xa*(2.4690424246 +
+				  xa*(2.62879275 +
+				      xa*(1.53347072 +
+					  xa*(0.502973642 +
+					      xa*0.07935612593)))));
+
+	     rv  = a*(1.0 + xa*(1.34066148 +
+				xa*(0.842810482 +
+				    xa*(0.293772040 +
+					xa*0.0447719189))));
 	     rv *= exp(-x*x);
 	     break;};
 
