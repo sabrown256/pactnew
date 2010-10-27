@@ -139,6 +139,7 @@ source $ldir/env-csh
     Note $STDOUT ""
 
     set lhave = ""
+    set lhave = ( $lhave HaveFLOAT16         HAVE_ANSI_FLOAT16 )
     set lhave = ( $lhave HaveCOMPLEX         HAVE_ANSI_C9X_COMPLEX )
     set lhave = ( $lhave HaveANSIFenv        HAVE_ANSI_C9X_FENV )
     set lhave = ( $lhave HaveGNUFenv         HAVE_GNU_FENV )

@@ -32,17 +32,17 @@ main()
                          .
 
 /* target the file as asked */
-    chrt = PN_target(&CRAY_STD, &UNICOS_ALIGNMENT);
+    chrt = PN_target(&CRAY_STD, &WORD8_ALIGNMENT);
 
 /* make a few defstructs */
 /*
-    PN_defstr(chrt, "l_frame", &UNICOS_ALIGNMENT, 0,
+    PN_defstr(chrt, "l_frame", &WORD8_ALIGNMENT, 0,
               "float x_min",
               "float x_max",
               "float y_min",
               "float y_max",
               LAST);
-    PN_defstr(strm, "plot", &UNICOS_ALIGNMENT, 0,
+    PN_defstr(strm, "plot", &WORD8_ALIGNMENT, 0,
               "float x_axis(10)",
               "float y_axis(10)",
               "integer npts", 

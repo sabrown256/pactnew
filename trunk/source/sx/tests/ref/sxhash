@@ -307,14 +307,30 @@
 
 /chart
 |__ docp =      0
-|__ ne =       41
+|__ ne =       42
 |__ hash = <function>
 |__ comp = <function>
 |__ key_type = "by-name"
-|__ table(0) = (nil)
+|__ table(0)
+|   |__ iht =        0
+|   |__ iar =       15
+|   |__ name = "long_double"
+|   |__ type = "defstr *"
+|   |__ def
+|   |   |__ type = "long_double"
+|   |   |__ kind =      2
+|   |   |__ size_bits =        0
+|   |   |__ n_indirects =      0
+|   |   |__ is_indirect =      0
+|   |   |__ convert =      0
+|   |   |__ onescmp =      0
+|   |   |__ unsgned =      0
+|   |   |__ member = (nil)
+|   |__ free =      1
+|   |__ next<0> = (nil)
 |   table(1)
 |   |__ iht =        1
-|   |__ iar =       38
+|   |__ iar =       39
 |   |__ name = "memdes"
 |   |__ type = "defstr *"
 |   |__ def
@@ -440,7 +456,7 @@
 |    ___|
 |   |   
 |   |__ iht =        1
-|   |__ iar =       21
+|   |__ iar =       22
 |   |__ name = "hasharr"
 |   |__ type = "defstr *"
 |   |__ def
@@ -589,7 +605,7 @@
 |   |__ next<0> = (nil)
 |   table(4)
 |   |__ iht =        4
-|   |__ iar =       40
+|   |__ iar =       41
 |   |__ name = "syment"
 |   |__ type = "defstr *"
 |   |__ def
@@ -664,7 +680,7 @@
 |   |__ next<0> = (nil)
 |   table(5)
 |   |__ iht =        5
-|   |__ iar =       33
+|   |__ iar =       34
 |   |__ name = "variable"
 |   |__ type = "defstr *"
 |   |__ def
@@ -700,7 +716,7 @@
 |    ___|
 |   |   
 |   |__ iht =        5
-|   |__ iar =       17
+|   |__ iar =       18
 |   |__ name = "REAL"
 |   |__ type = "defstr *"
 |   |__ def
@@ -735,7 +751,7 @@
 |   |__ next<2> = (nil)
 |   table(6)
 |   |__ iht =        6
-|   |__ iar =       24
+|   |__ iar =       25
 |   |__ name = "object"
 |   |__ type = "defstr *"
 |   |__ def
@@ -801,7 +817,7 @@
 |    ___|
 |   |   
 |   |__ iht =        6
-|   |__ iar =       16
+|   |__ iar =       17
 |   |__ name = "function"
 |   |__ type = "defstr *"
 |   |__ def
@@ -853,7 +869,7 @@
 |   |__ next<0> = (nil)
 |   table(8)
 |   |__ iht =        8
-|   |__ iar =       28
+|   |__ iar =       29
 |   |__ name = "PM_set"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1094,7 +1110,7 @@
 |   |__ next<0> = (nil)
 |   table(11)
 |   |__ iht =       11
-|   |__ iar =       18
+|   |__ iar =       19
 |   |__ name = "Directory"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1147,7 +1163,7 @@
 |   |__ next<2> = (nil)
 |   table(12)
 |   |__ iht =       12
-|   |__ iar =       25
+|   |__ iar =       26
 |   |__ name = "SC_dynamic_array"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1239,7 +1255,7 @@
 |   |__ next<0> = (nil)
 |   table(14)
 |   |__ iht =       14
-|   |__ iar =       36
+|   |__ iar =       37
 |   |__ name = "symblock"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1298,7 +1314,7 @@
 |    ___|
 |   |   
 |   |__ iht =       14
-|   |__ iar =       35
+|   |__ iar =       36
 |   |__ name = "vector"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1333,7 +1349,7 @@
 |   |__ next<1> = (nil)
 |   table(15)
 |   |__ iht =       15
-|   |__ iar =       31
+|   |__ iar =       32
 |   |__ name = "string"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1368,7 +1384,7 @@
 |   |__ next<0> = (nil)
 |   table(16)
 |   |__ iht =       16
-|   |__ iar =       23
+|   |__ iar =       24
 |   |__ name = "attribute_value"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1413,7 +1429,7 @@
 |   |__ next<0> = (nil)
 |   table(17)
 |   |__ iht =       17
-|   |__ iar =       39
+|   |__ iar =       40
 |   |__ name = "symindir"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1459,7 +1475,7 @@
 |    ___|
 |   |   
 |   |__ iht =       17
-|   |__ iar =       22
+|   |__ iar =       23
 |   |__ name = "attribute"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1525,7 +1541,7 @@
 |   table(18) = (nil)
 |   table(19)
 |   |__ iht =       19
-|   |__ iar =       20
+|   |__ iar =       21
 |   |__ name = "SC_array"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1630,7 +1646,7 @@
 |   |__ next<0> = (nil)
 |   table(20)
 |   |__ iht =       20
-|   |__ iar =       26
+|   |__ iar =       27
 |   |__ name = "pcons"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1703,7 +1719,7 @@
 |   |__ next<1> = (nil)
 |   table(21)
 |   |__ iht =       21
-|   |__ iar =       37
+|   |__ iar =       38
 |   |__ name = "dimdes"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1759,7 +1775,7 @@
 |    ___|
 |   |   
 |   |__ iht =       21
-|   |__ iar =       29
+|   |__ iar =       30
 |   |__ name = "PM_mesh_topology"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1832,7 +1848,7 @@
 |   table(23) = (nil)
 |   table(24)
 |   |__ iht =       24
-|   |__ iar =       30
+|   |__ iar =       31
 |   |__ name = "PM_mapping"
 |   |__ type = "defstr *"
 |   |__ def
@@ -1966,7 +1982,7 @@
 |   table(25) = (nil)
 |   table(26)
 |   |__ iht =       26
-|   |__ iar =       34
+|   |__ iar =       35
 |   |__ name = "boolean"
 |   |__ type = "defstr *"
 |   |__ def
@@ -2002,7 +2018,7 @@
 |    ___|
 |   |   
 |   |__ iht =       26
-|   |__ iar =       19
+|   |__ iar =       20
 |   |__ name = "haelem"
 |   |__ type = "defstr *"
 |   |__ def
@@ -2105,7 +2121,7 @@
 |   |__ next<2> = (nil)
 |   table(27)
 |   |__ iht =       27
-|   |__ iar =       32
+|   |__ iar =       33
 |   |__ name = "cons"
 |   |__ type = "defstr *"
 |   |__ def
@@ -2140,7 +2156,7 @@
 |   |__ next<0> = (nil)
 |   table(28)
 |   |__ iht =       28
-|   |__ iar =       27
+|   |__ iar =       28
 |   |__ name = "PG_image"
 |   |__ type = "defstr *"
 |   |__ def
@@ -2305,7 +2321,7 @@
 |   |__ next<0> = (nil)
 |   table(29)
 |   |__ iht =       29
-|   |__ iar =       41
+|   |__ iar =       42
 |   |__ name = "defstr"
 |   |__ type = "defstr *"
 |   |__ def
@@ -2456,7 +2472,7 @@
 |__ a
     |__ name = "SC_MAKE_HASHARR"
     |__ type = "haelem * *"
-    |__ n =       42
+    |__ n =       43
     |__ nx =       63
     |__ gf =   6.985e-10
     |__ array(0)
@@ -2750,10 +2766,27 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(15) = (nil)
-    |   array(16)
+    |   array(15)
+    |   |__ iht =        0
+    |   |__ iar =       15
+    |   |__ name = "long_double"
+    |   |__ type = "defstr *"
+    |   |__ def
+    |   |   |__ type = "long_double"
+    |   |   |__ kind =      2
+    |   |   |__ size_bits =        0
+    |   |   |__ n_indirects =      0
+    |   |   |__ is_indirect =      0
+    |   |   |__ convert =      0
+    |   |   |__ onescmp =      0
+    |   |   |__ unsgned =      0
+    |   |   |__ member = (nil)
+    |   |__ free =      1
+    |   |__ next<0> = (nil)
+    |   array(16) = (nil)
+    |   array(17)
     |   |__ iht =        6
-    |   |__ iar =       16
+    |   |__ iar =       17
     |   |__ name = "function"
     |   |__ type = "defstr *"
     |   |__ def
@@ -2786,9 +2819,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(17)
+    |   array(18)
     |   |__ iht =        5
-    |   |__ iar =       17
+    |   |__ iar =       18
     |   |__ name = "REAL"
     |   |__ type = "defstr *"
     |   |__ def
@@ -2821,9 +2854,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(18)
+    |   array(19)
     |   |__ iht =       11
-    |   |__ iar =       18
+    |   |__ iar =       19
     |   |__ name = "Directory"
     |   |__ type = "defstr *"
     |   |__ def
@@ -2874,9 +2907,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<2> = (nil)
-    |   array(19)
+    |   array(20)
     |   |__ iht =       26
-    |   |__ iar =       19
+    |   |__ iar =       20
     |   |__ name = "haelem"
     |   |__ type = "defstr *"
     |   |__ def
@@ -2977,9 +3010,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(20)
+    |   array(21)
     |   |__ iht =       19
-    |   |__ iar =       20
+    |   |__ iar =       21
     |   |__ name = "SC_array"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3082,9 +3115,9 @@
     |   |       |__ next<8> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(21)
+    |   array(22)
     |   |__ iht =        1
-    |   |__ iar =       21
+    |   |__ iar =       22
     |   |__ name = "hasharr"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3213,9 +3246,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<2> = (nil)
-    |   array(22)
+    |   array(23)
     |   |__ iht =       17
-    |   |__ iar =       22
+    |   |__ iar =       23
     |   |__ name = "attribute"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3278,9 +3311,9 @@
     |   |       |__ next<4> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(23)
+    |   array(24)
     |   |__ iht =       16
-    |   |__ iar =       23
+    |   |__ iar =       24
     |   |__ name = "attribute_value"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3323,9 +3356,9 @@
     |   |       |__ next<2> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(24)
+    |   array(25)
     |   |__ iht =        6
-    |   |__ iar =       24
+    |   |__ iar =       25
     |   |__ name = "object"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3391,7 +3424,7 @@
     |    ___|
     |   |   
     |   |__ iht =        6
-    |   |__ iar =       16
+    |   |__ iar =       17
     |   |__ name = "function"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3424,9 +3457,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<2> = (nil)
-    |   array(25)
+    |   array(26)
     |   |__ iht =       12
-    |   |__ iar =       25
+    |   |__ iar =       26
     |   |__ name = "SC_dynamic_array"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3499,9 +3532,9 @@
     |   |       |__ next<5> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(26)
+    |   array(27)
     |   |__ iht =       20
-    |   |__ iar =       26
+    |   |__ iar =       27
     |   |__ name = "pcons"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3572,9 +3605,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(27)
+    |   array(28)
     |   |__ iht =       28
-    |   |__ iar =       27
+    |   |__ iar =       28
     |   |__ name = "PG_image"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3737,9 +3770,9 @@
     |   |       |__ next<14> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(28)
+    |   array(29)
     |   |__ iht =        8
-    |   |__ iar =       28
+    |   |__ iar =       29
     |   |__ name = "PM_set"
     |   |__ type = "defstr *"
     |   |__ def
@@ -3960,9 +3993,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(29)
+    |   array(30)
     |   |__ iht =       21
-    |   |__ iar =       29
+    |   |__ iar =       30
     |   |__ name = "PM_mesh_topology"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4015,9 +4048,9 @@
     |   |       |__ next<3> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(30)
+    |   array(31)
     |   |__ iht =       24
-    |   |__ iar =       30
+    |   |__ iar =       31
     |   |__ name = "PM_mapping"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4148,9 +4181,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(31)
+    |   array(32)
     |   |__ iht =       15
-    |   |__ iar =       31
+    |   |__ iar =       32
     |   |__ name = "string"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4183,9 +4216,9 @@
     |   |       |__ next<1> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(32)
+    |   array(33)
     |   |__ iht =       27
-    |   |__ iar =       32
+    |   |__ iar =       33
     |   |__ name = "cons"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4218,9 +4251,9 @@
     |   |       |__ next<1> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(33)
+    |   array(34)
     |   |__ iht =        5
-    |   |__ iar =       33
+    |   |__ iar =       34
     |   |__ name = "variable"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4256,7 +4289,7 @@
     |    ___|
     |   |   
     |   |__ iht =        5
-    |   |__ iar =       17
+    |   |__ iar =       18
     |   |__ name = "REAL"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4289,9 +4322,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<2> = (nil)
-    |   array(34)
+    |   array(35)
     |   |__ iht =       26
-    |   |__ iar =       34
+    |   |__ iar =       35
     |   |__ name = "boolean"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4327,7 +4360,7 @@
     |    ___|
     |   |   
     |   |__ iht =       26
-    |   |__ iar =       19
+    |   |__ iar =       20
     |   |__ name = "haelem"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4428,9 +4461,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<2> = (nil)
-    |   array(35)
+    |   array(36)
     |   |__ iht =       14
-    |   |__ iar =       35
+    |   |__ iar =       36
     |   |__ name = "vector"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4463,9 +4496,9 @@
     |   |       |__ next<1> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(36)
+    |   array(37)
     |   |__ iht =       14
-    |   |__ iar =       36
+    |   |__ iar =       37
     |   |__ name = "symblock"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4524,7 +4557,7 @@
     |    ___|
     |   |   
     |   |__ iht =       14
-    |   |__ iar =       35
+    |   |__ iar =       36
     |   |__ name = "vector"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4557,9 +4590,9 @@
     |   |       |__ next<1> = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(37)
+    |   array(38)
     |   |__ iht =       21
-    |   |__ iar =       37
+    |   |__ iar =       38
     |   |__ name = "dimdes"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4615,7 +4648,7 @@
     |    ___|
     |   |   
     |   |__ iht =       21
-    |   |__ iar =       29
+    |   |__ iar =       30
     |   |__ name = "PM_mesh_topology"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4668,9 +4701,9 @@
     |   |       |__ next<3> = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(38)
+    |   array(39)
     |   |__ iht =        1
-    |   |__ iar =       38
+    |   |__ iar =       39
     |   |__ name = "memdes"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4796,7 +4829,7 @@
     |    ___|
     |   |   
     |   |__ iht =        1
-    |   |__ iar =       21
+    |   |__ iar =       22
     |   |__ name = "hasharr"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4925,9 +4958,9 @@
     |   |   |__ member = (nil)
     |   |__ free =      1
     |   |__ next<3> = (nil)
-    |   array(39)
+    |   array(40)
     |   |__ iht =       17
-    |   |__ iar =       39
+    |   |__ iar =       40
     |   |__ name = "symindir"
     |   |__ type = "defstr *"
     |   |__ def
@@ -4973,7 +5006,7 @@
     |    ___|
     |   |   
     |   |__ iht =       17
-    |   |__ iar =       22
+    |   |__ iar =       23
     |   |__ name = "attribute"
     |   |__ type = "defstr *"
     |   |__ def
@@ -5036,9 +5069,9 @@
     |   |       |__ next<4> = (nil)
     |   |__ free =      1
     |   |__ next<1> = (nil)
-    |   array(40)
+    |   array(41)
     |   |__ iht =        4
-    |   |__ iar =       40
+    |   |__ iar =       41
     |   |__ name = "syment"
     |   |__ type = "defstr *"
     |   |__ def
@@ -5111,9 +5144,9 @@
     |   |       |__ next<5> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(41)
+    |   array(42)
     |   |__ iht =       29
-    |   |__ iar =       41
+    |   |__ iar =       42
     |   |__ name = "defstr"
     |   |__ type = "defstr *"
     |   |__ def
@@ -5260,7 +5293,6 @@
     |   |       |__ next<13> = (nil)
     |   |__ free =      1
     |   |__ next<0> = (nil)
-    |   array(42) = (nil)
     |   array(43) = (nil)
     |   array(44) = (nil)
     |   array(45) = (nil)

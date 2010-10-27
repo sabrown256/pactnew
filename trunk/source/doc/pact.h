@@ -1,5 +1,5 @@
 TXT: PACT User's Guide
-MOD: 02/03/2010
+MOD: 10/26/2010
 
 <CENTER>
 <h1><FONT color="#ff0000">PACT User's Guide</FONT></h1>
@@ -1566,12 +1566,9 @@ following platforms:<p>
 <pre>
    Linux
    AIX
-   OSF1
    Apple OS X
    Solaris
-   IRIX64
-   HP 700 under HPUX
-   Microsoft Windows (cygwin)
+   Cygwin
 </pre>
 
 The host graphics systems used are:
@@ -1587,8 +1584,12 @@ The host graphics systems used are:
 In the past parts of PACT have been ported to the following platforms:<p>
 
 <pre>
+   OSF1
+   IRIX64
+   HP 700 under HPUX
    DEC VAX under ULTRIX and VMS
    INTEL 80x86 under SCO XENIX
+   INTEL 80x86 under DOS
 </pre>
 
 These ports were not completed due to lack of access to the

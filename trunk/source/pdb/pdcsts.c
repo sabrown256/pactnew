@@ -59,29 +59,10 @@ int
 
 static void test_target(char *tgt, char *base, int n,
 		        char *fname, char *datfile)
-   {
+   {int rv;
 
     if (tgt != NULL)
-       {if (strcmp(tgt, "dos") == 0)
-           PD_target(&INTELA_STD, &INTELA_ALIGNMENT);
-        else if (strcmp(tgt, "rs6000") == 0)
-           PD_target(&IEEEA_STD, &MIPS_ALIGNMENT);
-        else if (strcmp(tgt, "cray") == 0)
-           PD_target(&CRAY_STD, &UNICOS_ALIGNMENT);
-        else if (strcmp(tgt, "vax") == 0)
-           PD_target(&VAX_STD, &DEF_ALIGNMENT);
-        else if (strcmp(tgt, "mips") == 0)
-           PD_target(&IEEEA_STD, &MIPS_ALIGNMENT);
-        else if (strcmp(tgt, "mips64") == 0)
-           PD_target(&IEEED_STD, &MIPS64_ALIGNMENT);
-        else if (strcmp(tgt, "alpha64") == 0)
-           PD_target(&IEEEE_STD, &ALPHA64_ALIGNMENT);
-        else if (strcmp(tgt, "sun3") == 0)
-           PD_target(&IEEEA_STD, &M68000_ALIGNMENT);
-        else if (strcmp(tgt, "sun4") == 0)
-           PD_target(&IEEEA_STD, &SPARC_ALIGNMENT);
-        else if (strcmp(tgt, "mac") == 0)
-           PD_target(&IEEEB_STD, &M68000_ALIGNMENT);
+       {rv = PD_target_platform(tgt);
         sprintf(fname, "%s-%s.rs%d", base, tgt, n);
         sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
 

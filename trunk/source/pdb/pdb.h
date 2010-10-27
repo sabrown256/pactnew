@@ -104,9 +104,11 @@
  * Version 24 convert to use of SC_array and hasharr instead of
  * SC_dynamic_array and HASHTAB. 02/03/2010
  *
+ * Version 25 add support for long double type. 10/25/2010
+ *
  */
 
-#define PDB_SYSTEM_VERSION  24
+#define PDB_SYSTEM_VERSION  25
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -284,6 +286,7 @@ struct s_data_alignment
     int longlong_alignment;
     int float_alignment;
     int double_alignment;
+    int quad_alignment;
     int struct_alignment;};
 
 struct s_data_standard
@@ -303,6 +306,9 @@ struct s_data_standard
     int double_bytes;
     long *double_format;
     int *double_order;
+    int quad_bytes;
+    long *quad_format;
+    int *quad_order;
     PDBfile *file;};
 
 #if 0
@@ -748,32 +754,32 @@ extern PFPDBread
  pdb_rd_hook;
 
 extern data_standard
- DEF_STD,
  TEXT_STD,
- IEEEA_STD,
- IEEEB_STD,
- IEEEC_STD,
- IEEED_STD,
- IEEEE_STD,
- INTELA_STD,
- INTELB_STD,
+ PPC32_STD,
+ PPC64_STD,
+ I386_STD,
+ I586_STD,
+ X86_64_STD,
+ M68X_STD,
  VAX_STD,
  CRAY_STD;
 
 extern data_alignment
- DEF_ALIGNMENT,
  TEXT_ALIGNMENT,
- RS6000_ALIGNMENT,
+ BYTE_ALIGNMENT,
+ WORD2_ALIGNMENT,
+ WORD4_ALIGNMENT,
+ WORD8_ALIGNMENT,
+ GNU4_I686_ALIGNMENT,
+ OSX_10_5_ALIGNMENT,
  SPARC_ALIGNMENT,
- MIPS_ALIGNMENT,
- UNICOS_ALIGNMENT,
- M68000_ALIGNMENT,
- INTELA_ALIGNMENT,
- INTELB_ALIGNMENT,
- INTELC_ALIGNMENT,
- VAX_ALIGNMENT,
- MIPS64_ALIGNMENT,
- ALPHA64_ALIGNMENT;
+ XLC32_PPC64_ALIGNMENT,
+ CYGWIN_I686_ALIGNMENT,
+ GNU3_PPC64_ALIGNMENT,
+ GNU4_PPC64_ALIGNMENT,
+ XLC64_PPC64_ALIGNMENT,
+ GNU4_X86_64_ALIGNMENT,
+ PGI_X86_64_ALIGNMENT;
 
 /*--------------------------------------------------------------------------*/
 
@@ -823,7 +829,6 @@ extern int
  PD_read_alt(PDBfile *file, char *name, void *vr, long *ind),
  PD_read_as_alt(PDBfile *file, char *name, char *type, void *vr,
 		long *ind),
- PD_target(data_standard *data, data_alignment *align),
  PD_cast(PDBfile *file, char *type, char *memb, char *contr),
  PD_free(PDBfile *file, char *type, void *var),
  PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr),
@@ -1127,6 +1132,14 @@ extern long
 
 extern int
  PN_relocate(PDBfile *file, char *type, long n);
+
+
+/* PDTGT.C declarations */
+
+extern int
+ PD_target_platform(char *tgt),
+ PD_target_platform_n(int np),
+ PD_target(data_standard *data, data_alignment *align);
 
 
 #ifdef __cplusplus

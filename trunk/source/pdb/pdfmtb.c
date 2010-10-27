@@ -145,6 +145,14 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     if (lio_read(infor+1, (size_t) 1, (size_t) n, file->stream) != n)
        PD_error("FAILED TO READ FORMAT DATA - _PD_RD_FMT_II", PD_OPEN);
     
+/* if n is 35 then we have a library version before 25 when
+ * long double support went in
+ * until we actually read the system version out of the extras
+ * take the last one that did not have long double support
+ */
+    if (n < 36)
+       file->system_version = 24;
+
 /* decipher the format data */
     p             = infor + 1;
     std           = _PD_mk_standard(file);
@@ -156,6 +164,10 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std->long_bytes   = *(p++);
     std->float_bytes  = *(p++);
     std->double_bytes = *(p++);
+    if (file->system_version < 25)
+       std->quad_bytes = 0;
+    else
+       std->quad_bytes = *(p++);
 
 /* get the integral types byte order in */
     std->short_order = (PD_byte_order) *(p++);
@@ -176,6 +188,16 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     SC_mark(std->double_order, 1);
     for (j = 0; j < n; j++, *(order++) = *(p++));
 
+/* get the quad byte order in */
+    n     = std->quad_bytes;
+    order = std->quad_order = FMAKE_N(int, n,
+                                        "_PD_RD_FMT_II:quad_order");
+    SC_mark(std->quad_order, 1);
+    if (file->system_version < 25)
+       for (j = 0; j < n; j++, *(order++) = 0);
+    else
+       for (j = 0; j < n; j++, *(order++) = *(p++));
+
 /* get the float format data in */
     n = FORMAT_FIELDS;
     format = std->float_format = FMAKE_N(long, n,
@@ -192,6 +214,17 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     n--;
     for (j = 0; j < n; j++, *(format++) = *(p++));
 
+/* get the quad format data in */
+    n = FORMAT_FIELDS;
+    format = std->quad_format = FMAKE_N(long, n,
+					"_PD_RD_FMT_II:quad_format");
+    SC_mark(std->quad_format, 1);
+    n--;
+    if (file->system_version < 25)
+       for (j = 0; j < n; j++, *(format++) = 0);
+    else
+       for (j = 0; j < n; j++, *(format++) = *(p++));
+
 /* read the biases */
     if (_PD_rfgets(infor, MAXLINE, file->stream) == NULL)
        PD_error("CAN'T READ THE BIASES - _PD_RD_FMT_II", PD_OPEN);
@@ -200,6 +233,11 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     format[7] = SC_stol(SC_strtok(infor, "\001", s));
     format    = std->double_format;
     format[7] = SC_stol(SC_strtok(NULL, "\001", s));
+    format    = std->quad_format;
+    if (file->system_version < 25)
+       format[7] = 0;
+    else
+       format[7] = SC_stol(SC_strtok(NULL, "\001", s));
 
     file->std = std;
 
@@ -673,7 +711,7 @@ int _PD_rd_ext_ii(PDBfile *file)
     if (pl != NULL)
        file->align = pl;
     else
-       file->align = _PD_copy_alignment(&DEF_ALIGNMENT);
+       file->align = _PD_copy_alignment(&WORD4_ALIGNMENT);
 
 /* release the buffer which held both the symbol table and the extras */
     SFREE(pa->tbuffer);
@@ -1050,9 +1088,10 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     al[4] = pl->long_alignment;
     al[5] = pl->float_alignment;
     al[6] = pl->double_alignment;
-    al[7] = '\0';
+    al[7] = pl->quad_alignment;
+    al[8] = '\0';
 
-    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6] == 0) 
+    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7] == 0) 
        return(FALSE);
 
     ok &= _PD_put_string(1, "Alignment:%s\n", al);
@@ -1144,7 +1183,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 static int _PD_wr_fmt_ii(PDBfile *file)
    {int j, n, rv, sz, nw;
     int *order;
-    long *format, float_bias, double_bias;
+    long *format, float_bias, double_bias, quad_bias;
     char outfor[MAXLINE];
     char *nht, *p;
     data_standard *std;
@@ -1168,6 +1207,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	*(p++) = std->long_bytes;
 	*(p++) = std->float_bytes;
 	*(p++) = std->double_bytes;
+	*(p++) = std->quad_bytes;
 
 /* get the integral types byte order in */
 	*(p++) = std->short_order;
@@ -1182,6 +1222,11 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 /* get the double byte order in */
 	order = std->double_order;
 	n     = std->double_bytes;
+	for (j = 0; j < n; j++, *(p++) = *(order++));
+
+/* get the quad byte order in */
+	order = std->quad_order;
+	n     = std->quad_bytes;
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the float format data in */
@@ -1200,6 +1245,14 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 /* get the double bias in */
 	double_bias = *format;
 
+/* get the quad format data in */
+	format = std->quad_format;
+	n      = FORMAT_FIELDS - 1;
+	for (j = 0; j < n; j++, *(p++) = *(format++));
+
+/* get the quad bias in */
+	quad_bias = *format;
+
 	n         = (int) (p - outfor);
 	outfor[0] = n;
 
@@ -1208,7 +1261,8 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	   PD_error("FAILED TO WRITE FORMAT DATA - _PD_WR_FMT_II", PD_CREATE);
     
 /* write out the biases */
-	snprintf(outfor, MAXLINE, "%ld\001%ld\001\n", float_bias, double_bias);
+	snprintf(outfor, MAXLINE, "%ld\001%ld\001%ld\001\n",
+		 float_bias, double_bias, quad_bias);
 	n  = strlen(outfor);
 	nw = lio_write(outfor, (size_t) 1, (size_t) n, file->stream);
 	if (nw != n)

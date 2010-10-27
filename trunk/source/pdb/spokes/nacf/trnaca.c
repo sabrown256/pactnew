@@ -524,14 +524,13 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 	file->default_offset = 1;
 	file->major_order    = COLUMN_MAJOR_ORDER;
-	file->type           = SC_strsavef(NACFILE_S,
-					   "char*:_NAC_OPEN:type");
+	file->type           = SC_strsavef(NACFILE_S, "char*:_NAC_OPEN:type");
 	if (*mode == 'a')
 	   file->mode = PD_APPEND;
 	else
 	   file->mode = PD_OPEN;
 
-	_PD_set_standard(file, &CRAY_STD, &UNICOS_ALIGNMENT);
+	_PD_set_standard(file, &CRAY_STD, &WORD8_ALIGNMENT);
 
 	_PD_init_chrt(file);
 

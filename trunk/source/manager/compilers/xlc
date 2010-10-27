@@ -18,7 +18,10 @@ ERR_PATTERN  = "Error: (S)"
 
 Tool CC {
    Exe       = xlc
-   Flags     = -D_ALL_SOURCE -qlanglvl=extc99 -qsuppress=1500-010:1506-1300:1506-1298:1506-273 
+   Flags     = -D_ALL_SOURCE
+   Flags    =+ -qlanglvl=extc99
+   Flags    =+ -qldbl128                     # 16 byte long double
+   Flags    =+ -qsuppress=1500-010:1506-1300:1506-1298:1506-273 
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -q* ]
    Flags    += [ _cmd_ = -p ;                # profiling
