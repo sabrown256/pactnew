@@ -283,82 +283,36 @@ double PM_igamma_q(double x, double a)
 /*--------------------------------------------------------------------------*/
 
 /* _PM_ERFC_A - rational polynomial approximation to ERFC(X)
- *            - accurate to about 1.0e-7 but a factor of ~10 faster
+ *            - about a factor of ~10 faster than iterative method
  */
 
 static double _PM_erfc_a(double x)
-   {double a, b, xa, rv;
-    static int wh = 3;
+   {double a, xa, rv;
 
     xa = ABS(x);
 
-    if (xa > 1.2)
-       wh = 4;
-    else
-       wh = 2;
+/* Abramowitz and Stegun 7.1.25 - fractional error < 2.3e-6 */
+    if (_PM_igamma_tolerance > 2.3e-6)
+       {a   = 1.0/(1.0 + 0.47047*xa);
+	rv  = a*(0.3480242 + a*(-0.0958798 + a*0.7478556));
+	rv *= exp(-x*x);}
 
-    switch (wh)
 
-/* Abramowitz and Stegun 7.1.25 - good to < 2.5e-5 */
-       {case 1 :
-	     a   = 1.0/(1.0 + 0.47047*xa);
-	     rv  = a*(0.3480242 + a*(-0.0958798 + a*0.7478556));
-	     rv *= exp(-x*x);
-	     break;
-
-/* Abramowitz and Stegun 7.1.26 - good to 1.5e-7 */
-        case 2 :
-	     a   = 1.0/(1.0 + 0.3275911*xa);
-	     rv  = a*(0.254829592 +
-		      a*(-0.284496736 +
-			 a*(1.421413741 +
-			    a*(-1.453152027 + 
-			       a*1.061405429))));
-	     rv *= exp(-x*x);
-	     break;
-
-/* Abramowitz and Stegun 7.1.28 - good to 3.0e-7 */
-        case 3 :
-	     a = 1.0 + xa*(7.05230784e-2 + 
-			   xa*(4.22820123e-2 +
-			       xa*(9.2705272e-3 + 
-				   xa*(1.520143e-4 +
-				       xa*(2.765672e-4 +
-					   xa*4.30638e-5)))));
-	     b = a*a;
-	     a = b*b;
-	     b = a*a;
-	     a = b*b;
-	     rv = 1.0/a;
-	     break;
-
-	case 4 :
-	     a   = 1.0/(1.0 + xa*(2.23798238 +
-				  xa*(2.07647881 + 
-				      xa*(0.97553842 + 
-					  xa*0.21530702))));
-	     rv  = a*(1.0 + xa*(1.10966764 + 
-				xa*(0.55042450 +
-				    xa*0.12147398)));
-	     rv *= exp(-x*x);
-	     break;
-
-/* rational polynomial fit to obtain fractional error < 1.0e-7
+/* rational polynomial fit to obtain fractional error < 5.4e-12
  * due to George Zimmerman
  */
-	case 5 :
-	     a   = 1.0/(1.0 + xa*(2.4690424246 +
-				  xa*(2.62879275 +
-				      xa*(1.53347072 +
-					  xa*(0.502973642 +
-					      xa*0.07935612593)))));
+    else if (_PM_igamma_tolerance > 5.4e-12)
+       {a   = 1.0/(1.0 + xa*(2.46904246 +
+			     xa*(2.62879275 +
+				 xa*(1.53347072 +
+				     xa*(0.502973642 +
+					 xa*0.0793561593)))));
 
-	     rv  = a*(1.0 + xa*(1.34066148 +
-				xa*(0.842810482 +
-				    xa*(0.293772040 +
-					xa*0.0447719189))));
-	     rv *= exp(-x*x);
-	     break;};
+	rv  = a*(1.0 + xa*(1.34066148 +
+			   xa*(0.842810482 +
+			       xa*(0.283772040 +
+				   xa*0.0447719189))));
+	rv *= exp(-x*x);};
 
     if (x < 0.0)
        rv = 2.0 - rv;
@@ -373,7 +327,7 @@ static double _PM_erfc_a(double x)
 double PM_erfc(double x)
    {double rv;
 
-    if (_PM_igamma_tolerance > 1.0e-7)
+    if (_PM_igamma_tolerance > 5.4e-12)
        rv = _PM_erfc_a(x);
     else
        rv = (x < 0.0) ? 1.0 + PM_igamma_p(x*x, 0.5) : PM_igamma_q(x*x, 0.5);
@@ -388,7 +342,7 @@ double PM_erfc(double x)
 double PM_erf(double x)
    {double rv;
 
-    if (_PM_igamma_tolerance > 1.0e-8)
+    if (_PM_igamma_tolerance > 5.4e-12)
        rv = 1.0 - _PM_erfc_a(x);
     else
        rv = (x < 0.0) ? -PM_igamma_p(x*x, 0.5) : PM_igamma_p(x*x, 0.5);
