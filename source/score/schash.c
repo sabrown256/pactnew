@@ -763,7 +763,7 @@ void SC_hash_resize(HASHTAB *tab, int buckets)
 
 /* handle the case of an empty table */
        {if (tab->nelements == 0)
-           tab->table = REMAKE_N(tab->table, hashel *, buckets);
+           REMAKE_N(tab->table, hashel *, buckets);
 
         else 
            {temp = SC_hash_alloc();
@@ -784,7 +784,7 @@ void SC_hash_resize(HASHTAB *tab, int buckets)
             SC_hash_clr(tab);
          
 /* resize the table */
-            tab->table = REMAKE_N(tab->table, hashel *, buckets);
+            REMAKE_N(tab->table, hashel *, buckets);
         
 /* reinsert the hashel's from the temp table */
             iter = SC_hashiter_alloc(temp);

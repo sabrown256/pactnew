@@ -44,6 +44,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <float.h>
+#include <assert.h>
 
 #include <scdecls.h>
 

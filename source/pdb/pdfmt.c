@@ -10,6 +10,7 @@
 
 #include "pdb_int.h"
 
+#define NewHeadTok           "!<<PDB:"
 #define OldHeadTok           "!<><PDB><>!"
 #define PDB_ATTRIBUTE_TABLE  "!pdb_att_tab!"
 
@@ -381,10 +382,10 @@ char *_PD_header_token(int which)
        strcpy(_PD.id_token, OldHeadTok);
 
     else if (which == 2)
-       snprintf(_PD.id_token, MAXLINE, "!<<PDB:%s>>!", "II");
+       snprintf(_PD.id_token, MAXLINE, "%s%s>>!", NewHeadTok, "II");
 
     else
-       snprintf(_PD.id_token, MAXLINE, "!<<PDB:%d>>!", which);
+       snprintf(_PD.id_token, MAXLINE, "%s%d>>!", NewHeadTok, which);
 
     return(_PD.id_token);}
 
@@ -393,25 +394,26 @@ char *_PD_header_token(int which)
 
 /* _PD_IDENTIFY_VERSION - return the format version number
  *                      - corresponding to the tag S
+ *                      - or -1 iff the file is not a PDB file
  */
 
 int _PD_identify_version(char *s)
    {int vers;
-    char *token, *r;
+    char *p, *r, *t;
 
-    if (strncmp(s, OldHeadTok, strlen(OldHeadTok)) == 0)
+    vers = -1;
+
+    p = SC_strstr(s, NewHeadTok);
+    if (p != NULL)
+       {t = SC_strtok(p+7, ">", r);
+	if (t != NULL)
+	   {if (strcmp(t, "II") == 0)
+	       vers = 2;
+	    else if (SC_numstrp(t) == TRUE)
+	       vers = SC_stoi(t);};}
+
+    else if (strncmp(s, OldHeadTok, strlen(OldHeadTok)) == 0)
        vers = 1;
-
-    else
-       {token = SC_strtok(s+7, ">", r);
-	if (token == NULL)
-	   vers = 0;
-	else if (strcmp(token, "II") == 0)
-	   vers = 2;
-	else if (SC_numstrp(token) == FALSE)
-	   vers = 0;
-	else
-	   vers = SC_stoi(token);};
 
     return(vers);}
 
@@ -427,7 +429,6 @@ int _PD_identify_version(char *s)
 static int _PD_id_file(FILE *fp)
    {int vers, nb;
     char str[MAXLINE];
-    char *p;
 
 /* attempt to read an ASCII header */
     if (lio_seek(fp, (BIGINT) 0, SEEK_SET))
@@ -443,7 +444,7 @@ static int _PD_id_file(FILE *fp)
 	vers = _PD_identify_version(str);
 
 /* if the header does not give us a version, try the trailer */
-	if (vers == 0)
+	if (vers < 1)
 
 /* attempt to read an ASCII trailer */
 	   {if (lio_seek(fp, (BIGINT) -32, SEEK_END))
@@ -452,12 +453,7 @@ static int _PD_id_file(FILE *fp)
 	    nb = lio_read(str, (size_t) 1, (size_t) 32, fp);
 	    str[32] = '\0';
 
-/* the first token should be the identifying header token */
-	    p = SC_strstr(str, "!<<PDB:");
-	    if (p == NULL)
-	       vers = -1;
-	    else
-	       vers = _PD_identify_version(p);};};
+	    vers = _PD_identify_version(str);};};
 
     return(vers);}
 

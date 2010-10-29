@@ -1,0 +1,56 @@
+#!/bin/csh -f
+#
+# FLOAT16 - analyze long double support for C compiler
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+cat << EOF >! $Tmp.c
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <stdio.h>
+int main(int c, char **v)
+   {double x, y;
+    long double a, b;
+    a = 1.23e34l;
+    b = sqrtl(2.0);
+    x = 1.23e34;
+    y = sqrt(2.0);
+    printf("max = %50.42Le\n", LDBL_MAX);
+    printf("a = %44.34Le\n", a/b);
+    printf("x = %26.16e\n", x/y);
+    printf("b = %44.34Le\n", b);
+    printf("y = %26.16e\n", y);
+    return(0);}
+EOF
+
+flog $ALog setenv HaveFLOAT16 FALSE
+
+flog $ALog cat $Tmp.c
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt -lm
+if ($status == 0) then
+   flog $ALog $CFE $Tmp
+   if ($status == 0) then
+      setenv HaveFLOAT16 TRUE
+      NoteD $ALog "      has long double support"
+   endif
+endif
+
+else
+   NoteD $ALog "      no long double support"
+endif
+
+rm -f $Tmp $Tmp.c $Tmp.o
+
+# export the result
+SetParent HaveFLOAT16
+
+#exit(0)

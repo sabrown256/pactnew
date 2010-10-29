@@ -180,6 +180,8 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
        nb = sizeof(long)*_SC_n_bins;
        _SC_mm_bins = (long *) malloc(nb);
 
+       assert(_SC_mm_bins != NULL);
+
 /* fill the linear region */
        for (n = 1L; _SC_mem_align_size*n <= mxl; n++)
 	   _SC_mm_bins[n-1] = (n << _SC_mem_align_expt);
@@ -322,6 +324,8 @@ void _SC_init_heap(SC_heap_des *ph, int id)
     size_t nb;
     mem_descriptor **lst;
 
+    assert(ph != NULL);
+
     ONCE_SAFE(_SC_init_emu_threads == TRUE, &SC_mm_lock)
        SC_configure_mm(128L, 4096L, 4096L, 1.1);
     END_SAFE;
@@ -330,9 +334,11 @@ void _SC_init_heap(SC_heap_des *ph, int id)
 
     nb  = _SC_n_bins*sizeof(mem_descriptor *);
     lst = (mem_descriptor **) malloc(nb);
-    if (lst != NULL)
-       {for (i = 0; i < _SC_n_bins; i++)
-	    lst[i] = NULL;};
+
+    assert(lst != NULL);
+
+    for (i = 0; i < _SC_n_bins; i++)
+        lst[i] = NULL;
 
     SC_FREE_LIST(ph)        = lst;
     SC_HEAP_TID(ph)         = id;
@@ -392,6 +398,8 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
     ns = nu*us;
     pn = _SC_ALLOC((size_t) ns);
 
+    assert(pn != NULL);
+
 /* setup the new major block */
     mbl.index  = j;
     mbl.nunits = nu;
@@ -405,8 +413,8 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 
 	tnb = mblsz*SC_NX_MAJOR_BLOCKS(ph);
 	pm  = (major_block_des *) malloc(tnb);
-	if (pm == NULL)
-	   return(NULL);
+
+	assert(pm != NULL);
 
 	SC_MAJOR_BLOCK_LIST(ph) = pm;};
 
@@ -421,6 +429,8 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 
 	pm = SC_MAJOR_BLOCK_LIST(ph);
 	pm = (major_block_des *) realloc(pm, tnb);
+
+	assert(pm != NULL);
 
 	SC_MAJOR_BLOCK_LIST(ph) = pm;};
 
@@ -485,14 +495,18 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
     else
        {if (zsp == 5)
            {p = calloc((size_t) 1, (size_t) (nbp + sizeof(double)));
-	    if (p != NULL)
-	       {md = (mem_descriptor *) p;
-		md->initialized = TRUE;};}
+
+	    assert(p != NULL);
+
+	    md = (mem_descriptor *) p;
+	    md->initialized = TRUE;}
         else
            {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
-	    if (p != NULL)
-	       {md = (mem_descriptor *) p;
-		md->initialized = FALSE;};};};
+
+	    assert(p != NULL);
+
+	    md = (mem_descriptor *) p;
+	    md->initialized = FALSE;};};
 
     return(p);}
 

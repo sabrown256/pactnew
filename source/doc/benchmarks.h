@@ -292,7 +292,7 @@ Assume for a moment we are targeting for an Intel cluster from a big endian syst
 <p>
 
 <pre>
-PD_target(&I586_STD, &GNU4_I686_ALIGNMENT);
+PD_target(&I586L_STD, &GNU4_I686_ALIGNMENT);
 
 snprintf( alphaType, BUFFER_SIZE, "double alpha(%d)", SMALL_ARRAY_SIZE );
 snprintf( betaType,  BUFFER_SIZE, "double beta(%d)",  SMALL_ARRAY_SIZE );

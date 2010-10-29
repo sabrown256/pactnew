@@ -21,34 +21,6 @@
 
 #endif
 
-data_standard
- *PD_std_standards[] = {&PPC32_STD,
-                        &M68X_STD,
-                        &X86_64_STD,
-                        &I386_STD,
-                        &I586_STD,
-                        &VAX_STD,
-                        &CRAY_STD,
-                        &PPC64_STD,
-                        &X86_64_STD,
-                        NULL};
-
-data_alignment
- *PD_std_alignments[] = {&WORD2_ALIGNMENT,         /* 1 */
-                         &SPARC_ALIGNMENT,
-                         &GNU3_PPC64_ALIGNMENT,
-                         &WORD2_ALIGNMENT,
-                         &WORD4_ALIGNMENT,         /* 5 */
-                         &WORD8_ALIGNMENT,
-                         &XLC64_PPC64_ALIGNMENT,
-                         &XLC32_PPC64_ALIGNMENT,
-                         &GNU4_X86_64_ALIGNMENT,
-                         &OSX_10_5_ALIGNMENT,      /* 10 */
-                         &CYGWIN_I686_ALIGNMENT,
-                         &GNU4_I686_ALIGNMENT,
-                         &BYTE_ALIGNMENT,
-                         NULL};
-
 /*--------------------------------------------------------------------------*/
 
 #ifdef F77_INT_SIZE_PTR_DIFFER
@@ -1497,47 +1469,6 @@ FIXNUM F77_FUNC(pffree, PFFREE)(FIXNUM *fileid, FIXNUM *pnchr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFTRGT - target the next file to be opened
- *        - given an index from the following list:
- *        -
- *        -   (5,  9)  - GCC 4.0 and later X86_64
- *        -   (5, 10)  - Mac OSX 10.5
- *        -   (5,  9)  - Mac OSX 10.6 and later
- *        -   (5,  4)  - Cygwin i686
- *        -   (1,  7)  - IBM PPC64 XLC 64 bit
- *        -   (1,  8)  - IBM PPC64 XLC 32 bit
- *        -   (1,  2)  - SPARC
- *        -   (4,  1)  - DOS
- *        -
- *        - return TRUE iff successful
- */
-
-FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
-   {int al, st;
-    FIXNUM rv;
-    PD_smp_state *pa;
-
-    pa = _PD_get_state(-1);
-
-    al = *pia;
-    st = *pis;
-    rv = (al != 6);
-    if (rv)
-       {pa->req_std   = PD_std_standards[st - 1];
-        pa->req_align = PD_std_alignments[al - 1];}
-
-    else
-       {pa->req_std   = NULL;
-        pa->req_align = NULL;
-
-        PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFTRGT",
-		 PD_GENERIC);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PFOPEN - open a PDBfile
  *        - save the PDBfile pointer in an internal array
  *        - and return an integer index to the pointer if successful
@@ -2430,31 +2361,6 @@ FIXNUM F77_FUNC(pfncot, PFNCOT)(void *out, void *in,
     chrt = SC_GET_POINTER(hasharr, *chart);
 
     PN_conv_out(out, in, s, *nitems, chrt);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PFNTGT - FORTRAN interface to a routine to allocate, initialize, and
- *          return a structure chart
- */
-
-FIXNUM F77_FUNC(pfntgt, PFNTGT)(FIXNUM *pis, FIXNUM *pia)
-   {int al, st, ret;
-    FIXNUM rv;
-    hasharr *chart;
-
-    al = *pia;
-    st = *pis;
-    ret = (al != 6);
-    if (ret)
-       {chart = PN_target(PD_std_standards[st - 1], PD_std_alignments[al - 1]);
-        rv    = SC_ADD_POINTER(chart);}
-
-    else
-       {PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFNTGT", PD_GENERIC);
-        rv = -1;};
 
     return(rv);}
 

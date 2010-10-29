@@ -758,8 +758,10 @@ extern data_standard
  PPC32_STD,
  PPC64_STD,
  I386_STD,
- I586_STD,
+ I586L_STD,
+ I586O_STD,
  X86_64_STD,
+ X86_64A_STD,
  M68X_STD,
  VAX_STD,
  CRAY_STD;
@@ -1137,9 +1139,13 @@ extern int
 /* PDTGT.C declarations */
 
 extern int
+ PD_target_n_platforms(void),
  PD_target_platform(char *tgt),
  PD_target_platform_n(int np),
  PD_target(data_standard *data, data_alignment *align);
+
+extern char
+ *PD_target_platform_name(int np);
 
 
 #ifdef __cplusplus

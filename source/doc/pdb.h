@@ -1874,7 +1874,7 @@ Available data standards are:
 </TR>
 
 <TR>
-<TD>I586_STD</TD>
+<TD>I586L_STD</TD>
 <TD ALIGN="CENTER">5</TD>
 <TD>REVERSE_ORDER</TD>
 <TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
@@ -1986,51 +1986,57 @@ Some common configurations are:
 </TR>
 <TR>
 <TD>GCC 4.0 and later X86_64</TD>
-<TD><tt>PD_target(&amp;I586_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(5, 9)</tt></TD>
-<TD><tt>(target 5 9)</tt></TD>
+<TD><tt>PD_target(&amp;X86_64_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(1, 5)</tt></TD>
+<TD><tt>(target 1 5)</tt></TD>
 </TR>
 <TR>
-<TD>Mac OSX 10.5</TD>
-<TD><tt>PD_target(&amp;I586_STD, &amp;OSX_10_5_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(5, 10)</tt></TD>
-<TD><tt>(target 5 10)</tt></TD>
+<TD>GCC 4.0 and later Ix86</TD>
+<TD><tt>PD_target(&amp;I586L_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(2, 5)</tt></TD>
+<TD><tt>(target 2 5)</tt></TD>
 </TR>
 <TR>
 <TD>Mac OSX 10.6 and later</TD>
-<TD><tt>PD_target(&amp;I586_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(5, 9)</tt></TD>
-<TD><tt>(target 5 9)</tt></TD>
+<TD><tt>PD_target(&amp;X86_64_STD, &amp;GNU4_X86_64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(1, 5)</tt></TD>
+<TD><tt>(target 1 5)</tt></TD>
+</TR>
+<TR>
+<TD>Mac OSX 10.5</TD>
+<TD><tt>PD_target(&amp;I586O_STD, &amp;OSX_10_5_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(3, 11)</tt></TD>
+<TD><tt>(target 3 11)</tt></TD>
 </TR>
 <TR>
 <TD>Cygwin i686</TD>
-<TD><tt>PD_target(&amp;I586_STD, &amp;CYGWIN_I686_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(5, 4)</tt></TD>
-<TD><tt>(target 5 4)</tt></TD>
+<TD><tt>PD_target(&amp;I586L_STD, &amp;CYGWIN_I686_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(2, 7)</tt></TD>
+<TD><tt>(target 2 7)</tt></TD>
 </TR>
 <TR>
 <TD>IBM PPC64 XLC 64 bit</TD>
-<TD><tt>PD_target(&amp;PPC32_STD, &amp;XLC64_PPC64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 7)</tt></TD>
-<TD><tt>(target 1 7)</tt></TD>
+<TD><tt>PD_target(&amp;PPC64_STD, &amp;XLC64_PPC64_ALIGNMENT)</tt></TD>
+<TD><tt>PFTRGT(5, 9)</tt></TD>
+<TD><tt>(target 5 9)</tt></TD>
 </TR>
 <TR>
 <TD>IBM PPC64 XLC 32 bit</TD>
 <TD><tt>PD_target(&amp;PPC32_STD, &amp;XLC32_PPC64_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 8)</tt></TD>
-<TD><tt>(target 1 8)</tt></TD>
+<TD><tt>PFTRGT(6, 10)</tt></TD>
+<TD><tt>(target 6 10)</tt></TD>
 </TR>
 <TR>
 <TD>SPARC</TD>
 <TD><tt>PD_target(&amp;PPC32_STD, &amp;SPARC_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(1, 2)</tt></TD>
-<TD><tt>(target 1 2)</tt></TD>
+<TD><tt>PFTRGT(6 12)</tt></TD>
+<TD><tt>(target 6 12)</tt></TD>
 </TR>
 <TR>
 <TD>DOS</TD>
 <TD><tt>PD_target(&amp;I386_STD, &amp;WORD2_ALIGNMENT)</tt></TD>
-<TD><tt>PFTRGT(4, 1)</tt></TD>
-<TD><tt>(target 4 1)</tt></TD>
+<TD><tt>PFTRGT(4, 2)</tt></TD>
+<TD><tt>(target 4 2)</tt></TD>
 </TR>
 </TABLE>
 
@@ -2774,85 +2780,7 @@ and
 <em>vr</em>, a pointer to the floating point values.
 
 <p>
-Available data standards are:
-
-<BLOCKQUOTE>
-<TABLE>
-
-<TR>
-<TD ALIGN="CENTER">C</TD>
-<TD ALIGN="CENTER">Fortran</TD>
-<TD ALIGN="CENTER">Byte Order</TD>
-<TD ALIGN="CENTER">S/I/L/LL</TD>
-<TD ALIGN="CENTER">F/D</TD>
-</TR>
-
-<TR>
-<TD>PPC32_STD</TD>
-<TD ALIGN="CENTER">1</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-<TR>
-<TD>M68X_STD</TD>
-<TD ALIGN="CENTER">2</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,12</TD>
-</TR>
-
-<TR>
-<TD>I386_STD</TD>
-<TD ALIGN="CENTER">4</TD>
-<TD>REVERSE_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,2,4,4</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-<TR>
-<TD>I586_STD</TD>
-<TD ALIGN="CENTER">5</TD>
-<TD>REVERSE_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-<TR>
-<TD>VAX_STD</TD>
-<TD ALIGN="CENTER">6</TD>
-<TD>REVERSE_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,4,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-<TR>
-<TD>CRAY_STD</TD>
-<TD ALIGN="CENTER">7</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">8,8,8,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">8,8</TD>
-</TR>
-
-<TR>
-<TD>PPC64_STD</TD>
-<TD ALIGN="CENTER">8</TD>
-<TD>NORMAL_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-<TR>
-<TD>X86_64_STD</TD>
-<TD ALIGN="CENTER">9</TD>
-<TD>REVERSE_ORDER</TD>
-<TD WIDTH="80" ALIGN="CENTER">2,4,8,8</TD>
-<TD WIDTH="40" ALIGN="CENTER">4,8</TD>
-</TR>
-
-</TABLE>
-</BLOCKQUOTE>
+See <a href="#pd_target">PD_TARGET</a> for available data standards.
 
 <pre>
 NOTE: S/I/L/LL - short/int/long/longlong  byte sizes

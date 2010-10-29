@@ -184,19 +184,21 @@ static void _SC_grow_thread_data(int nt, int ne)
     if (grow == TRUE)
        {nbn = (st.ntx * st.nex)*sizeof(void *);
         t   = malloc(nbn);
-        if (t != NULL)
-           {memset(t, 0, nbn);
 
-	    if (st.data != NULL)
-	       {for (it = 0; it < nto; it++)
-		    {for (ie = 0; ie < neo; ie++)
-		         {io = it*neo + ie;
-			  in = it*st.nex + ie;
-			  t[in] = st.data[io];};};
+	assert(t != NULL);
 
-		free(st.data);};
+        memset(t, 0, nbn);
 
-	    st.data = t;};};
+        if (st.data != NULL)
+           {for (it = 0; it < nto; it++)
+	        {for (ie = 0; ie < neo; ie++)
+		     {io = it*neo + ie;
+		      in = it*st.nex + ie;
+		      t[in] = st.data[io];};};
+
+	    free(st.data);};
+
+        st.data = t;};
 
     st.nt = ntn;
     st.ne = nen;
@@ -212,13 +214,15 @@ static void _SC_grow_thread_data(int nt, int ne)
 		      nb  = ni*bpi;
 
 		      d = malloc(nb);
-		      if (d != NULL)
-			 {memset(d, 0, nb);
 
-			  st.data[i] = d;
+		      assert(d != NULL);
 
-			  if (pt->init != NULL)
-			     (*pt->init)(d, it);};};};};};
+		      memset(d, 0, nb);
+
+		      st.data[i] = d;
+
+		      if (pt->init != NULL)
+			 (*pt->init)(d, it);};};};};
 
     return;}
 
