@@ -18,22 +18,67 @@ struct s_target
     data_alignment *algn;};
 
 static target
- _PD_target_platforms[] = { {"dos",     &I386_STD, &WORD2_ALIGNMENT},
-			    {"rs6000",  &PPC32_STD,  &GNU3_PPC64_ALIGNMENT},
-			    {"mips",    &PPC32_STD,  &GNU3_PPC64_ALIGNMENT},
-			    {"mips64",  &PPC64_STD,  &GNU4_X86_64_ALIGNMENT},
-			    {"alpha64", &X86_64_STD,  &GNU4_X86_64_ALIGNMENT},
-			    {"sun3",    &PPC32_STD,  &WORD2_ALIGNMENT},
-			    {"sun4",    &PPC32_STD,  &SPARC_ALIGNMENT},
-			    {"mac",     &M68X_STD,  &WORD2_ALIGNMENT},
-			    {"vax",     &VAX_STD,    &WORD4_ALIGNMENT},
-			    {"cray",    &CRAY_STD,   &WORD8_ALIGNMENT} };
+ _PD_target_platforms[] = { {"sgnu",    &I586L_STD,   &GNU4_X86_64_ALIGNMENT},
+			    {"cyg-1.5", &I586L_STD,   &CYGWIN_I686_ALIGNMENT},
+			    {"osx5",    &I586O_STD,   &GNU3_PPC64_ALIGNMENT},
+			    {"aix32",   &PPC32_STD,   &XLC32_PPC64_ALIGNMENT},
+			    {"bgp",     &PPC32_STD,   &GNU4_PPC64_ALIGNMENT},
+			    {"aix64",   &PPC64_STD,   &XLC64_PPC64_ALIGNMENT},
+			    {"ognu",    &X86_64A_STD, &GNU4_X86_64_ALIGNMENT},
+			    {"dos",     &I386_STD,    &WORD2_ALIGNMENT},
+			    {"mac",     &M68X_STD,    &WORD2_ALIGNMENT},
+			    {"sun3",    &PPC32_STD,   &WORD2_ALIGNMENT},
+			    {"sun4",    &PPC32_STD,   &SPARC_ALIGNMENT},
+			    {"vax",     &VAX_STD,     &WORD4_ALIGNMENT},
+			    {"cray",    &CRAY_STD,    &WORD8_ALIGNMENT} };
+
+data_standard
+ *PD_std_standards[] = {&X86_64_STD,                 /* 1 */
+                        &I586L_STD,
+                        &I586O_STD,
+                        &I386_STD,
+                        &PPC64_STD,                  /* 5 */
+                        &PPC32_STD,
+                        &M68X_STD,
+                        &VAX_STD,
+                        &CRAY_STD,
+                        NULL};
+
+data_alignment
+ *PD_std_alignments[] = {&BYTE_ALIGNMENT,            /* 1 */
+                         &WORD2_ALIGNMENT,
+                         &WORD4_ALIGNMENT,
+                         &WORD8_ALIGNMENT,
+                         &GNU4_X86_64_ALIGNMENT,     /* 5 */
+                         &GNU4_I686_ALIGNMENT,
+                         &CYGWIN_I686_ALIGNMENT,
+                         &GNU3_PPC64_ALIGNMENT,
+                         &XLC64_PPC64_ALIGNMENT,
+                         &XLC32_PPC64_ALIGNMENT,     /* 10 */
+                         &OSX_10_5_ALIGNMENT,
+                         &SPARC_ALIGNMENT,
+                         NULL};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_TARGET_N_PLATFORMS - return the number of pre-defined target platforms
+ *                       - this is mainly support for the test suite
+ */
+
+int PD_target_n_platforms(void)
+   {int n;
+
+    n = sizeof(_PD_target_platforms)/sizeof(target);
+
+    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PD_TARGET_PLATFORM - target the next PDBfile created to platform TGT
  *                    - return TRUE iff platform is known
+ *                    - this is mainly support for the test suite
  */
 
 int PD_target_platform(char *tgt)
@@ -43,7 +88,7 @@ int PD_target_platform(char *tgt)
     rv = FALSE;
 
     if (tgt != NULL)
-       {n = sizeof(_PD_target_platforms)/sizeof(target);
+       {n = PD_target_n_platforms();
 	for (i = 0; i < n; i++)
 	    {pt = _PD_target_platforms + i;
 	     if (strcmp(tgt, pt->name) == 0)
@@ -58,6 +103,7 @@ int PD_target_platform(char *tgt)
 
 /* PD_TARGET_PLATFORM_N - target the next PDBfile created to platform NP
  *                      - return TRUE iff platform is known
+ *                      - this is mainly support for the test suite
  */
 
 int PD_target_platform_n(int np)
@@ -66,11 +112,32 @@ int PD_target_platform_n(int np)
 
     rv = FALSE;
 
-    n = sizeof(_PD_target_platforms)/sizeof(target);
+    n = PD_target_n_platforms();
     if ((0 <= np) && (np < n))
-       {pt = _PD_target_platforms + n;
+       {pt = _PD_target_platforms + np;
 	PD_target(pt->std, pt->algn);
 	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_TARGET_PLATFORM_NAME - return the name of the Nth target platform
+ *                         - this is mainly support for the test suite
+ */
+
+char *PD_target_platform_name(int np)
+   {int n;
+    char *rv;
+    target *pt;
+
+    rv = NULL;
+
+    n = PD_target_n_platforms();
+    if ((0 <= np) && (np < n))
+       {pt = _PD_target_platforms + np;
+	rv = pt->name;};
 
     return(rv);}
 
@@ -103,104 +170,69 @@ int PD_target(data_standard *data, data_alignment *align)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/* RUN_TEST - run a particular test through all targeting modes */
-
-static int run_test(PFTest test, int n, char *host)
-   {int cs, fail;
-    long bytaa, bytfa, bytab, bytfb;
-    char s[MAXLINE], msg[MAXLINE];
-    double time;
-    static int dbg = 0;
-
-/* NOTE: under the debugger set dbg to 1 or 2 for additional
- *       memory leak monitoring
+/* PFTRGT - target the next file to be opened
+ *        - given an index from the following list:
+ *        -
+ *        -   (1,  5)  - GCC 4.0 and later X86_64
+ *        -   (2,  5)  - GCC 4.0 and later Ix86
+ *        -   (1,  5)  - Mac OSX 10.6 and later
+ *        -   (3, 11)  - Mac OSX 10.5
+ *        -   (2,  7)  - Cygwin i686
+ *        -   (5,  9)  - IBM PPC64 XLC 64 bit
+ *        -   (6, 10)  - IBM PPC64 XLC 32 bit
+ *        -   (6, 12)  - SPARC
+ *        -   (4,  2)  - DOS
+ *        -
+ *        - return TRUE iff successful
  */
-    cs = SC_mem_monitor(-1, dbg, "N", msg);
 
-    SC_mem_stats(&bytab, &bytfb, NULL, NULL);
+FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
+   {int al, st;
+    FIXNUM rv;
+    PD_smp_state *pa;
 
-    time = SC_wall_clock_time();
+    pa = _PD_get_state(-1);
 
-    fail = 0;
+    al = *pia;
+    st = *pis;
+    rv = (al != 6);
+    if (rv)
+       {pa->req_std   = PD_std_standards[st - 1];
+        pa->req_align = PD_std_alignments[al - 1];}
 
-    if (!native_only)
+    else
+       {pa->req_std   = NULL;
+        pa->req_align = NULL;
 
-/* Cray target test */
-       {strcpy(s, "cray");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+        PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFTRGT",
+		 PD_GENERIC);};
 
-/* Sun4 target test */
-        strcpy(s, "sun4");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+    return(rv);}
 
-/* Mips target test */
-        strcpy(s, "mips");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/* Mips64 target test */
-        strcpy(s, "mips64");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+/* PFNTGT - FORTRAN interface to a routine to allocate, initialize, and
+ *          return a structure chart
+ */
 
-/* Alpha64 target test */
-        strcpy(s, "alpha64");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+FIXNUM F77_FUNC(pfntgt, PFNTGT)(FIXNUM *pis, FIXNUM *pia)
+   {int al, st, ret;
+    FIXNUM rv;
+    hasharr *chart;
 
-/* Dos target test */
-        strcpy(s, "dos");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+    al = *pia;
+    st = *pis;
+    ret = (al != 6);
+    if (ret)
+       {chart = PN_target(PD_std_standards[st - 1], PD_std_alignments[al - 1]);
+        rv    = SC_ADD_POINTER(chart);}
 
-/* Macintosh target test */
-        strcpy(s, "mac");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
+    else
+       {PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFNTGT", PD_GENERIC);
+        rv = -1;};
 
-/* Sun3 target test */
-        strcpy(s, "sun3");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Vax target test */
-        strcpy(s, "vax");
-        if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};};
-
-/* native test */
-    if (!(*test)(host, NULL, n))
-       {PRINT(STDOUT, "Test #%d native failed\n", n);
-	fail++;};
-
-    SC_mem_stats(&bytaa, &bytfa, NULL, NULL);
-
-    bytaa -= bytab;
-    bytfa -= bytfb;
-    time   = SC_wall_clock_time() - time;
-
-    cs = SC_mem_monitor(cs, dbg, "N", msg);
-
-    PRINT(STDOUT,
-          "\t\t     %3d    %8d  %8d   %7d     %.2g\n",
-          n, bytaa, bytfa, bytaa - bytfa, time);
-
-    return(fail);}
-
-#endif
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

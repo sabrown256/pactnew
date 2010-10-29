@@ -70,50 +70,46 @@ int
 int
  FORMAT_FIELDS = 8,
  text_order[]         = {-1},
-
  float2_nrm_order[]   = {1, 2},
  float4_nrm_order[]   = {1, 2, 3, 4},
  float8_nrm_order[]   = {1, 2, 3, 4, 5, 6, 7, 8},
  float10_nrm_order[]  = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
  float12_nrm_order[]  = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
  float16_nrm_order[]  = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
-
  float2_rev_order[]   = {2, 1},
  float4_rev_order[]   = {4, 3, 2, 1},
  float8_rev_order[]   = {8, 7, 6, 5, 4, 3, 2, 1},
  float10_rev_order[]  = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
  float12_rev_order[]  = {12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
  float16_rev_order[]  = {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
-
  float4_vax_order[]   = {2, 1, 4, 3},
  float8_vax_order[]   = {2, 1, 4, 3, 6, 5, 8, 7};
 
 long
- float4_text[]    = {15L,   2L,   8L, 0L, 0L,  0L, 0L,    0x0L},
- float8_text[]    = {26L,   3L,  16L, 0L, 0L,  0L, 0L,    0x0L},
- float16_text[]   = {44L,   3L,  16L, 0L, 0L,  0L, 0L,    0x0L},
+ float4_text[]    = {15L,   2L,   8L,  0L,  0L,  0L, 0L,    0x0L},
+ float8_text[]    = {26L,   3L,  16L,  0L,  0L,  0L, 0L,    0x0L},
+ float16_text[]   = {44L,   3L,  16L,  0L,  0L,  0L, 0L,    0x0L},
+ float2_ieee[]    = {16L,   5L,  10L,  0L,  1L,  6L, 0L,    0xFL},
+ float4_ieee[]    = {32L,   8L,  23L,  0L,  1L,  9L, 0L,   0x7FL},
+ float8_ieee[]    = {64L,  11L,  52L,  0L,  1L, 12L, 0L,  0x3FFL},
+ float10_ieee[]   = {80L,  15L,  64L,  0L,  1L, 16L, 0L, 0x3FFFL},
+ float10_ix87[]   = {128L, 15L,  64L, 48L, 49L, 64L, 1L, 0x3FFEL},
+ float12_ieee[]   = {96L,  15L,  64L,  0L,  1L, 16L, 1L, 0x3FFEL},
+ float16_ieee[]   = {128L, 15L, 112L,  0L,  1L, 16L, 0L, 0x3FFFL},
+ float16_aix[]    = {128L, 11L, 116L,  0L,  1L, 12L, 0L,  0x3FFL},
 
- float2_ieee[]    = {16L,   5L,  10L, 0L, 1L,  6L, 0L,    0xFL},
- float4_ieee[]    = {32L,   8L,  23L, 0L, 1L,  9L, 0L,   0x7FL},
- float8_ieee[]    = {64L,  11L,  52L, 0L, 1L, 12L, 0L,  0x3FFL},
- float10_ieee[]   = {80L,  15L,  64L, 0L, 1L, 32L, 1L, 0x3FFFL},
- float12_ieee[]   = {96L,  15L,  64L, 0L, 1L, 32L, 1L, 0x3FFEL},
- float16_ieee[]   = {128L, 11L, 116L, 0L, 1L, 12L, 0L, 0x3FFFL},
-
-/* historical formats */
+/* historical formats - kept for testing */
 
 #ifdef GFLOAT
- float4_vax[]     = {32L,   8L,  23L, 0L, 1L,  9L, 0L,   0x81L},
- float8_vax[]     = {64L,  11L,  52L, 0L, 1L, 12L, 0L,  0x401L},
+ float4_vax[]     = {32L,   8L,  23L,  0L,  1L,  9L, 0L,   0x81L},
+ float8_vax[]     = {64L,  11L,  52L,  0L,  1L, 12L, 0L,  0x401L},
 #else
- float4_vax[]     = {32L,   8L,  23L, 0L, 1L,  9L, 0L,   0x81L},
- float8_vax[]     = {64L,   8L,  55L, 0L, 1L,  9L, 0L,   0x81L},
+ float4_vax[]     = {32L,   8L,  23L,  0L,  1L,  9L, 0L,   0x81L},
+ float8_vax[]     = {64L,   8L,  55L,  0L,  1L,  9L, 0L,   0x81L},
 #endif
 
- float8_cray[]    = {64L,  15L,  48L, 0L, 1L, 16L, 1L, 0x4000L},
-
-/* GOTCHA: unsure of this one */
- float16_cray[]   = {128L, 15L, 112L, 0L, 1L, 16L, 1L, 0x4000L};
+ float8_cray[]    = {64L,  15L,  48L,  0L,  1L, 16L, 1L, 0x4000L},
+ float16_cray[]   = {128L, 15L, 112L,  0L,  1L, 16L, 1L, 0x4000L};
 
 /* Data standard for the different architectures
  *
@@ -144,89 +140,108 @@ long
  */
 
 data_standard
- TEXT_STD   = {BITS_DEFAULT,                               /* bits per byte */
-               12,                                       /* size of pointer */
-               7,  TEXT_ORDER,                   /* size and order of short */
-               12, TEXT_ORDER,                     /* size and order of int */
-               22, TEXT_ORDER,                    /* size and order of long */
-               22, TEXT_ORDER,               /* size and order of LONG_LONG */
-               15, float4_text, text_order,             /* float definition */
-               26, float8_text, text_order,            /* double definition */
-               42, float16_text, text_order},            /* quad definition */
- I386_STD   = {BITS_DEFAULT,                               /* bits per byte */
-               4,                                        /* size of pointer */
-               2, REVERSE_ORDER,                 /* size and order of short */
-               2, REVERSE_ORDER,                   /* size and order of int */
-               4, REVERSE_ORDER,                  /* size and order of long */
-               4, REVERSE_ORDER,             /* size and order of LONG_LONG */
-               4, float4_ieee, float4_rev_order,        /* float definition */
-               8, float8_ieee, float8_rev_order,       /* double definition */
-               16, float16_ieee, float16_nrm_order},     /* quad definition */
- I586_STD   = {BITS_DEFAULT,                               /* bits per byte */
-               4,                                        /* size of pointer */
-               2, REVERSE_ORDER,                 /* size and order of short */
-               4, REVERSE_ORDER,                   /* size and order of int */
-               4, REVERSE_ORDER,                  /* size and order of long */
-               8, REVERSE_ORDER,             /* size and order of LONG_LONG */
-               4, float4_ieee, float4_rev_order,        /* float definition */
-               8, float8_ieee, float8_rev_order,       /* double definition */
-               16, float16_ieee, float16_nrm_order},     /* quad definition */
- X86_64_STD = {BITS_DEFAULT,                               /* bits per byte */
-               8,                                        /* size of pointer */
-               2, REVERSE_ORDER,                 /* size and order of short */
-               4, REVERSE_ORDER,                   /* size and order of int */
-               8, REVERSE_ORDER,                  /* size and order of long */
-               8, REVERSE_ORDER,             /* size and order of LONG_LONG */
-               4, float4_ieee, float4_rev_order,        /* float definition */
-               8, float8_ieee, float8_rev_order,       /* double definition */
-               16, float16_ieee, float16_nrm_order},     /* quad definition */
- PPC32_STD  = {BITS_DEFAULT,                               /* bits per byte */
-               4,                                        /* size of pointer */
-               2, NORMAL_ORDER,                  /* size and order of short */
-               4, NORMAL_ORDER,                    /* size and order of int */
-               4, NORMAL_ORDER,                   /* size and order of long */
-               8, NORMAL_ORDER,              /* size and order of LONG_LONG */
-               4, float4_ieee, float4_nrm_order,        /* float definition */
-               8, float8_ieee, float8_nrm_order,       /* double definition */
-               16, float16_ieee, float16_nrm_order},     /* quad definition */
- PPC64_STD  = {BITS_DEFAULT,                               /* bits per byte */
-               8,                                        /* size of pointer */
-               2, NORMAL_ORDER,                  /* size and order of short */
-               4, NORMAL_ORDER,                    /* size and order of int */
-               8, NORMAL_ORDER,                   /* size and order of long */
-               8, NORMAL_ORDER,              /* size and order of LONG_LONG */
-               4, float4_ieee, float4_nrm_order,        /* float definition */
-               8, float8_ieee, float8_nrm_order,       /* double definition */
-               16, float16_ieee, float16_nrm_order},     /* quad definition */
+ TEXT_STD    = {BITS_DEFAULT,                               /* bits per byte */
+                12,                                       /* size of pointer */
+                7,  TEXT_ORDER,                   /* size and order of short */
+                12, TEXT_ORDER,                     /* size and order of int */
+                22, TEXT_ORDER,                    /* size and order of long */
+                22, TEXT_ORDER,               /* size and order of LONG_LONG */
+                15, float4_text, text_order,             /* float definition */
+                26, float8_text, text_order,            /* double definition */
+                42, float16_text, text_order},            /* quad definition */
+ I386_STD    = {BITS_DEFAULT,                               /* bits per byte */
+                4,                                        /* size of pointer */
+                2, REVERSE_ORDER,                 /* size and order of short */
+                2, REVERSE_ORDER,                   /* size and order of int */
+                4, REVERSE_ORDER,                  /* size and order of long */
+                4, REVERSE_ORDER,             /* size and order of LONG_LONG */
+                4, float4_ieee, float4_rev_order,        /* float definition */
+                8, float8_ieee, float8_rev_order,       /* double definition */
+                16, float16_ieee, float16_rev_order},     /* quad definition */
+ I586L_STD   = {BITS_DEFAULT,                               /* bits per byte */
+                4,                                        /* size of pointer */
+                2, REVERSE_ORDER,                 /* size and order of short */
+                4, REVERSE_ORDER,                   /* size and order of int */
+                4, REVERSE_ORDER,                  /* size and order of long */
+                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
+                4, float4_ieee, float4_rev_order,        /* float definition */
+                8, float8_ieee, float8_rev_order,       /* double definition */
+                12, float12_ieee, float12_rev_order},     /* quad definition */
+ I586O_STD   = {BITS_DEFAULT,                               /* bits per byte */
+                4,                                        /* size of pointer */
+                2, REVERSE_ORDER,                 /* size and order of short */
+                4, REVERSE_ORDER,                   /* size and order of int */
+                4, REVERSE_ORDER,                  /* size and order of long */
+                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
+                4, float4_ieee, float4_rev_order,        /* float definition */
+                8, float8_ieee, float8_rev_order,       /* double definition */
+                16, float16_ieee, float16_rev_order},     /* quad definition */
+ PPC32_STD   = {BITS_DEFAULT,                               /* bits per byte */
+                4,                                        /* size of pointer */
+                2, NORMAL_ORDER,                  /* size and order of short */
+                4, NORMAL_ORDER,                    /* size and order of int */
+                4, NORMAL_ORDER,                   /* size and order of long */
+                8, NORMAL_ORDER,              /* size and order of LONG_LONG */
+                4, float4_ieee, float4_nrm_order,        /* float definition */
+                8, float8_ieee, float8_nrm_order,       /* double definition */
+                16, float16_ieee, float16_nrm_order},     /* quad definition */
+ X86_64_STD  = {BITS_DEFAULT,                               /* bits per byte */
+                8,                                        /* size of pointer */
+                2, REVERSE_ORDER,                 /* size and order of short */
+                4, REVERSE_ORDER,                   /* size and order of int */
+                8, REVERSE_ORDER,                  /* size and order of long */
+                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
+                4, float4_ieee, float4_rev_order,        /* float definition */
+                8, float8_ieee, float8_rev_order,       /* double definition */
+                16, float16_ieee, float16_rev_order},     /* quad definition */
+ X86_64A_STD = {BITS_DEFAULT,                               /* bits per byte */
+                8,                                        /* size of pointer */
+                2, REVERSE_ORDER,                 /* size and order of short */
+                4, REVERSE_ORDER,                   /* size and order of int */
+                8, REVERSE_ORDER,                  /* size and order of long */
+                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
+                4, float4_ieee, float4_rev_order,        /* float definition */
+                8, float8_ieee, float8_rev_order,       /* double definition */
+                16, float10_ix87, float16_rev_order},     /* quad definition */
+ PPC64_STD   = {BITS_DEFAULT,                               /* bits per byte */
+                8,                                        /* size of pointer */
+                2, NORMAL_ORDER,                  /* size and order of short */
+                4, NORMAL_ORDER,                    /* size and order of int */
+                8, NORMAL_ORDER,                   /* size and order of long */
+                8, NORMAL_ORDER,              /* size and order of LONG_LONG */
+                4, float4_ieee, float4_nrm_order,        /* float definition */
+                8, float8_ieee, float8_nrm_order,       /* double definition */
+                16, float16_ieee, float16_nrm_order},     /* quad definition */
 
-/* obsolete standards */
- M68X_STD   = {BITS_DEFAULT,                               /* bits per byte */
-               4,                                        /* size of pointer */
-               2, NORMAL_ORDER,                  /* size and order of short */
-               2, NORMAL_ORDER,                    /* size and order of int */
-               4, NORMAL_ORDER,                   /* size and order of long */
-               4, NORMAL_ORDER,              /* size and order of LONG_LONG */
-               4, float4_ieee, float4_nrm_order,        /* float definition */
-               12, float12_ieee, float12_nrm_order,    /* double definition */
-               16, float16_ieee, float16_nrm_order},     /* quad definition */
- VAX_STD    = {BITS_DEFAULT,                               /* bits per byte */
-               4,                                        /* size of pointer */
-               2, REVERSE_ORDER,                 /* size and order of short */
-               4, REVERSE_ORDER,                   /* size and order of int */
-               4, REVERSE_ORDER,                  /* size and order of long */
-               4, REVERSE_ORDER,             /* size and order of LONG_LONG */
-               4, float4_vax, float4_vax_order,         /* float definition */
-               8, float8_vax, float8_vax_order,        /* double definition */
-               8, float8_vax, float8_vax_order},         /* quad definition */
- CRAY_STD   = {BITS_DEFAULT,                               /* bits per byte */
-               8,                                        /* size of pointer */
-               8, NORMAL_ORDER,                  /* size and order of short */
-               8, NORMAL_ORDER,                    /* size and order of int */
-               8, NORMAL_ORDER,                   /* size and order of long */
-               8, NORMAL_ORDER,              /* size and order of LONG_LONG */
-               8, float8_cray, float8_nrm_order,        /* float definition */
-               8, float8_cray, float8_nrm_order,       /* double definition */
-               16, float16_cray, float16_nrm_order};     /* quad definition */
+/* historical formats - kept for testing */
+
+ M68X_STD    = {BITS_DEFAULT,                               /* bits per byte */
+                4,                                        /* size of pointer */
+                2, NORMAL_ORDER,                  /* size and order of short */
+                2, NORMAL_ORDER,                    /* size and order of int */
+                4, NORMAL_ORDER,                   /* size and order of long */
+                4, NORMAL_ORDER,              /* size and order of LONG_LONG */
+                4, float4_ieee, float4_nrm_order,        /* float definition */
+                12, float12_ieee, float12_nrm_order,    /* double definition */
+                16, float16_ieee, float16_nrm_order},     /* quad definition */
+ VAX_STD     = {BITS_DEFAULT,                               /* bits per byte */
+                4,                                        /* size of pointer */
+                2, REVERSE_ORDER,                 /* size and order of short */
+                4, REVERSE_ORDER,                   /* size and order of int */
+                4, REVERSE_ORDER,                  /* size and order of long */
+                4, REVERSE_ORDER,             /* size and order of LONG_LONG */
+                4, float4_vax, float4_vax_order,         /* float definition */
+                8, float8_vax, float8_vax_order,        /* double definition */
+                8, float8_vax, float8_vax_order},         /* quad definition */
+ CRAY_STD    = {BITS_DEFAULT,                               /* bits per byte */
+                8,                                        /* size of pointer */
+                8, NORMAL_ORDER,                  /* size and order of short */
+                8, NORMAL_ORDER,                    /* size and order of int */
+                8, NORMAL_ORDER,                   /* size and order of long */
+                8, NORMAL_ORDER,              /* size and order of LONG_LONG */
+                8, float8_cray, float8_nrm_order,        /* float definition */
+                8, float8_cray, float8_nrm_order,       /* double definition */
+                16, float16_cray, float16_nrm_order};     /* quad definition */
 
 /*--------------------------------------------------------------------------*/
 
@@ -265,8 +280,8 @@ data_alignment
  GNU3_PPC64_ALIGNMENT  = {1, 4, 2, 4, 4, 8, 4, 8,  8, 0},
  GNU4_PPC64_ALIGNMENT  = {1, 4, 2, 4, 4, 8, 4, 8, 16, 0},
  XLC64_PPC64_ALIGNMENT = {1, 8, 2, 4, 8, 8, 4, 4,  4, 0},
- GNU4_X86_64_ALIGNMENT = {1, 8, 2, 4, 8, 8, 4, 8, 16, 0},
- PGI_X86_64_ALIGNMENT  = {1, 8, 2, 4, 8, 8, 4, 8,  8, 0};
+ PGI_X86_64_ALIGNMENT  = {1, 8, 2, 4, 8, 8, 4, 8,  8, 0},
+ GNU4_X86_64_ALIGNMENT = {1, 8, 2, 4, 8, 8, 4, 8, 16, 0};
 
 /*--------------------------------------------------------------------------*/
 
@@ -1349,37 +1364,34 @@ void _PD_iconvert(char **out, char **in, long nitems,
  *              -   format[7] = bias of exponent
  */
 
-void _PD_fconvert(char **out, char **in, long nitems, int boffs,
+void _PD_fconvert(char **out, char **in, long ni, int boffs,
 		  long *infor, int *inord, long *outfor, int *outord,
 		  PD_byte_order l_order, int l_bytes, int onescmp)
-   {long i, j, expn_max, hexpn, DeltaBias, hmbo, hmbi;
-    int nbits, inbytes, outbytes;
-    int indxout, inrem, outrem, dindx;
+   {int nbits, bpii, bpio;
+    int indxout, inrem, outrem;
     int bi_sign, bo_sign, bi_exp, bo_exp, bi_mant, bo_mant;
     int bo_sign_save, bo_exp_save, bo_mant_save;
     int nbi_exp, nbo_exp, nbi_man, nbo_man, nbi, nbo;
-    char *lout, *lin;
-    char *aligned, *insave, *inrsave;
-   
-    unsigned char *rout;
-
-    long start, end, count, sign_byte, exp_byte;
-    long hman_byte, in_man_byte, out_man_byte;
-    int in_man_bit, out_man_bit, nbitsout;
-    int sign_bit, exp_bit, hman_bit, rshift;
+    int mbiti, mbito, nbitsout;
+    int sbit, ebit, hmbit, dhmb, dmbit, rshift;
     int numleft, nb_mant_rem, remainder, k, nleft;
-    unsigned char *out_mbptr, *in_mbptr, *outptr, *inptr;
-    char mask, mask1, mask2, cmask;
-    unsigned char *sbptr, *ebptr, *ebptrsave, *hman_bptr;
+    int ssave[MBLOCKS];
+    long i, j, l, emax, hexpn, dbias, hmbo, hmbi;
+    long ls, le, sbyt, ebyt;
+    long lbpi, lbpo, lbpir;
+    long hmbyt, mbyti, mbyto;
     long loverflow, lunderflow, lreorder, lreformat;
     long out_freorder;
+    long esave[MBLOCKS], tformat[8];
+    char mask, mask1, mask2, cmask;
+    char inreorder[MBLOCKS*MBYTES];
+    char *lout, *lin;
+    char *aligned, *insave, *inrsave;
     char *bufin, *btemp, *ctemp;
     char *freorder;
-
-    long expn_save[MBLOCKS];
-    int sign_save[MBLOCKS];
-    char inreorder[MBLOCKS*MBYTES];
-    long tformat[8];
+    unsigned char *rout;
+    unsigned char *pmbo, *pmbi, *pout, *pin;
+    unsigned char *psb, *peb, *pebsave, *phmb;
 
     aligned      = NULL;
     freorder     = NULL;
@@ -1387,17 +1399,16 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
     insave       = NULL;
     inrsave      = NULL;
 
-    nbi      = infor[0];
-    nbo      = outfor[0];
-    inbytes  = (nbi + 7) >> 3;
-    outbytes = (nbo + 7) >> 3;
+    nbi  = infor[0];
+    nbo  = outfor[0];
+    bpii = (nbi + 7) >> 3;
+    bpio = (nbo + 7) >> 3;
 
     if ((nbi % 8 != 0) || boffs)
-       {aligned = SC_alloc_nzt(inbytes*nitems, 1L,
-			       "_PD_FCONVERT:aligned", NULL);
-        _PD_byte_align(aligned, *in, nitems, infor, inord, boffs);
+       {aligned = SC_alloc_nzt(bpii*ni, 1L, "_PD_FCONVERT:aligned", NULL);
+        _PD_byte_align(aligned, *in, ni, infor, inord, boffs);
         insave = *in;
-        *in = aligned;};
+        *in    = aligned;};
 
 /* check for cases where only difference between formats is in byte order */
     lreformat = FALSE;
@@ -1410,7 +1421,7 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
 
 /* check to see if input byte order is different than output byte order */
        {lreorder = FALSE;
-        for (i = 0; i < inbytes; i++)
+        for (i = 0; i < bpii; i++)
             {if (inord[i] != outord[i])
                 {lreorder = TRUE;
                  break;};}
@@ -1421,28 +1432,28 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
             lout = *out;
 
 /* allow for compiler to do loop unrolling */
-            switch (inbytes)
+            switch (bpii)
 	       {case 1:
 		     break;
 		case 2:
-		     XFER2(lout, nitems, lin, inord, outord, inbytes);
+		     XFER2(lout, ni, lin, inord, outord, bpii);
 		     break;
 		case 4:
-		     XFER4(lout, nitems, lin, inord, outord, inbytes);
+		     XFER4(lout, ni, lin, inord, outord, bpii);
 		     break;
 		case 8:
-		     XFER8(lout, nitems, lin, inord, outord, inbytes);
+		     XFER8(lout, ni, lin, inord, outord, bpii);
 		     break;
 		case 16:
-		     XFER16(lout, nitems, lin, inord, outord, inbytes);
+		     XFER16(lout, ni, lin, inord, outord, bpii);
 		     break;
 		default:
-		     for (j = 0; j < nitems; j++, lin += inbytes, lout += inbytes)
-		         {for (i = 0; i < inbytes; i++)
+		     for (j = 0; j < ni; j++, lin += bpii, lout += bpii)
+		         {for (i = 0; i < bpii; i++)
 			      {lout[outord[i] - 1] = lin[inord[i] - 1];};};};
 
-            *in  += nitems*inbytes;
-            *out += nitems*outbytes;
+            *in  += ni*bpii;
+            *out += ni*bpio;
 
             return;};}   /* RETURN */
 
@@ -1457,14 +1468,13 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
     bi_mant = infor[5];
     bo_mant = outfor[5];
 
-    hman_byte = 0;
+    hmbyt = 0;
+    hmbo  = (outfor[6] & 1L);
+    hmbi  = (infor[6] & 1L);
 
-    hmbo    = (outfor[6] & 1L);
-    hmbi    = (infor[6] & 1L);
-
-    DeltaBias = outfor[7] + hmbo - infor[7] - hmbi;
-    hexpn     = 1L << (outfor[1] - 1L);
-    expn_max  = (1L << outfor[1]) - 1L;
+    dbias = outfor[7] + hmbo - infor[7] - hmbi;
+    hexpn = 1L << (outfor[1] - 1L);
+    emax  = (1L << outfor[1]) - 1L;
 
 /* the floating point conversion algorithm assumes that the sign bit 
  * comes before the exponent field, which comes before the mantissa.
@@ -1475,20 +1485,18 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
  * reordered into the desired order after going through the conversion
  * logic
  */
-
     if (!((infor[3] < infor[4]) && (infor[4] < infor[5])))
-       {freorder   = SC_alloc_nzt(inbytes*nitems, 1L,
-				  "_PD_FCONVERT:freorder", NULL);
-        tformat[0]    = infor[0];
-        tformat[1]    = infor[1];
-        tformat[2]    = infor[2];
-        tformat[3]    = bi_sign = 0L;
-        tformat[4]    = bi_exp  = 1L;
-        tformat[5]    = bi_mant = tformat[4] + tformat[1];
+       {freorder = SC_alloc_nzt(bpii*ni, 1L, "_PD_FCONVERT:freorder", NULL);
+        tformat[0] = infor[0];
+        tformat[1] = infor[1];
+        tformat[2] = infor[2];
+        tformat[3] = bi_sign = 0L;
+        tformat[4] = bi_exp  = 1L;
+        tformat[5] = bi_mant = tformat[4] + tformat[1];
         _PD_field_reorder(*in, freorder, infor, tformat, inord,
-                          l_order, l_bytes, nitems);
-        inrsave       = *in;
-        *in           = freorder;}
+                          l_order, l_bytes, ni);
+        inrsave = *in;
+        *in     = freorder;}
 
     if (!((outfor[3] < outfor[4]) && (outfor[4] < outfor[5])))
        {out_freorder = TRUE;
@@ -1498,7 +1506,7 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
 
 /* check to see if input needs reordering */
     lreorder = FALSE;
-    for (i = 0; i < inbytes; i++)
+    for (i = 0; i < bpii; i++)
         {if (inord[i] != (i+1))
             {lreorder = 1;
              break;};}
@@ -1511,367 +1519,372 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
        lin = *in;
 
 /* zero out the output buffer */
-    memset(*out, 0, nitems*outbytes);
-
-    start = 0;
-    end   = min(nitems, MBLOCKS);
-    count = 0;  /* count of items processed */
+    memset(*out, 0, ni*bpio);
 
 /* set up sign bit byte index and bit index */
-    sign_byte = bi_sign >> 3;
-    sign_bit  = bi_sign % 8;
+    sbyt = bi_sign >> 3;
+    sbit = bi_sign % 8;
 
 /* set up exponent location variables */
-    exp_byte = bi_exp >> 3;
-    exp_bit  = bi_exp % 8;
+    ebyt = bi_exp >> 3;
+    ebit = bi_exp % 8;
 
 /* set up mantissa location variables */
-    in_man_byte = bi_mant >> 3;
-    in_man_bit  = bi_mant % 8;
+    mbyti = bi_mant >> 3;
+    mbiti = bi_mant % 8;
 
-    out_man_byte = bo_mant >> 3;
-    out_man_bit  = bo_mant % 8;
+    mbyto = bo_mant >> 3;
+    mbito = bo_mant % 8;
 
-    dindx = hmbo - hmbi;
+    dhmb  = hmbo - hmbi;
 
 /* if input high mantissa bit (HMB) is assumed 1 and not written (e.g. IEEE)
  * but output HMB is assumed 0 (e.g. CRAY) write the input starting at
  * the output HMB+1 and set the HMB
  */
-    if (dindx > 0)
-       {hman_bit    = out_man_bit;
-        hman_byte   = out_man_byte;
-        out_man_bit = (out_man_bit + dindx) % 8;
-        if (out_man_bit == 0)
-	   out_man_byte++;} 
+    if (dhmb > 0)
+       {hmbit = mbito;
+        hmbyt = mbyto;
+        mbito = (mbito + dhmb) % 8;
+        if (mbito == 0)
+	   mbyto++;} 
 
 /* if input HMB is assumed 0 (e.g. CRAY) 
  * but output HMB is assumed 1 and not written (e.g. IEEE) take the input
  * from HMB+1 and write it to output HMB
  */
-    else if (dindx < 0)
-       {in_man_bit = (in_man_bit - dindx) % 8;
-        if (in_man_bit == 0)
-	   in_man_byte++;}
+    else if (dhmb < 0)
+       {mbiti = (mbiti - dhmb) % 8;
+        if (mbiti == 0)
+	   mbyti++;}
 
-   while (count < nitems)
+    dmbit = mbiti - mbito;
+
+    ls = 0;
+    le = min(ni, MBLOCKS);
+    for (l = 0; l < ni; )
+        {lbpi  = l*bpii;
+	 lbpo  = l*bpio;
+	 lbpir = (lreorder == FALSE)*lbpi;
 
 /* reorder the input into a buffer */
-      {if (lreorder)
-	  {bufin = *in + (count * inbytes) - 1;
-	   for (i = 0; i < inbytes; i++)
-	       {btemp = &bufin[inord[i]];
-		ctemp = lin + i;
-		for (j = start; j < end; j++, btemp += inbytes, ctemp += inbytes)
-		    *ctemp = *btemp;};};
+	 if (lreorder == TRUE)
+	    {bufin = *in + lbpi - 1;
+	     for (i = 0; i < bpii; i++)
+	         {btemp = &bufin[inord[i]];
+		  ctemp = lin + i;
+		  for (j = ls; j < le; j++, btemp += bpii, ctemp += bpii)
+		      *ctemp = *btemp;};};
      
-       ebptr     = (unsigned char *) lin + exp_byte + (!lreorder)*(count*inbytes);
-       sbptr     = (unsigned char *) lin + sign_byte + (!lreorder)*(count*inbytes);
-       in_mbptr  = (unsigned char *) lin + in_man_byte + (!lreorder)*(count*inbytes);
-       out_mbptr = (unsigned char *) lout + out_man_byte + (count*outbytes);
-       hman_bptr = (unsigned char *) lout + hman_byte + (count*outbytes);
+	 peb  = (unsigned char *) lin  + ebyt  + lbpir;
+	 psb  = (unsigned char *) lin  + sbyt  + lbpir;
+	 pmbi = (unsigned char *) lin  + mbyti + lbpir;
+	 pmbo = (unsigned char *) lout + mbyto + lbpo;
+	 phmb = (unsigned char *) lout + hmbyt + lbpo;
 
-/* get the sign bit, saving it in sign_save */       
-       mask = 1 << (7 - sign_bit);
-       for (i = start; i < end; i++, sbptr += inbytes)
-	   sign_save[i] = *sbptr & mask;
+/* get the sign bit, saving it in ssave */       
+	 mask = 1 << (7 - sbit);
+	 for (i = ls; i < le; i++, psb += bpii)
+	     ssave[i] = *psb & mask;
 
-       inrem  = nbi_exp;
-       nbits  = 8 - exp_bit;
-       mask   = (1 << nbits) - 1;
-       rshift = 0;
-       if (inrem < 7)
-	  {mask = ((unsigned char)mask >> (7 - inrem));
-	   rshift = 7 - inrem;}
+	 inrem  = nbi_exp;
+	 nbits  = 8 - ebit;
+	 mask   = (1 << nbits) - 1;
+	 rshift = 0;
+	 if (inrem < 7)
+	    {mask   = ((unsigned char)mask >> (7 - inrem));
+	     rshift = 7 - inrem;}
 
-       memset(expn_save, 0, (end-start)*sizeof(long));
+	 memset(esave, 0, (le-ls)*sizeof(long));
 
-       ebptrsave = ebptr;
+	 pebsave = peb;
 
-       while (inrem > 0)
+	 while (inrem > 0)
 
 /* get the exponent */ 
-	  {for (i = start; i < end; i++, ebptr += inbytes )
-	       {expn_save[i] = (expn_save[i] << nbits) |
-		               ((*ebptr >> rshift) & mask);};
+	    {for (i = ls; i < le; i++, peb += bpii )
+	         {esave[i] = (esave[i] << nbits) |
+		                 ((*peb >> rshift) & mask);};
 
-	   inrem    -= nbits;
-	   nbits     = min(8, inrem);
-	   rshift    = 8 - nbits;
-	   mask      = (1 << nbits) - 1;
-	   ebptr     = ebptrsave + 1;
-	   ebptrsave = ebptr;};
+	     inrem  -= nbits;
+	     nbits   = min(8, inrem);
+	     rshift  = 8 - nbits;
+	     mask    = (1 << nbits) - 1;
+	     peb     = pebsave + 1;
+	     pebsave = peb;};
 
-       if (onescmp)
-	  {for (i = start; i < end; i++)
-	       {if (sign_save[i])
-		   {ONES_COMP_NEG(expn_save[i], nbi_exp, 1L);}
-	        else
-		   expn_save[i] += (expn_save[i] < hexpn);};};
+	 if (onescmp)
+	    {for (i = ls; i < le; i++)
+	         {if (ssave[i])
+		     {ONES_COMP_NEG(esave[i], nbi_exp, 1L);}
+		  else
+		     esave[i] += (esave[i] < hexpn);};};
 
 /* add the bias and store the exponent */
-       loverflow  = FALSE;
-       lunderflow = FALSE;
-       for (i = start; i < end; i++, bo_exp  += nbo, bo_sign += nbo)
-	   {if (expn_save[i] != 0)
-	       expn_save[i] += DeltaBias;
+	 loverflow  = FALSE;
+	 lunderflow = FALSE;
+	 for (i = ls; i < le; i++, bo_exp  += nbo, bo_sign += nbo)
+	     {if (esave[i] != 0)
+		 esave[i] += dbias;
 
-	    if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-	       {_PD_insert_field(expn_save[i], nbo_exp, lout, bo_exp,
-                                    l_order, l_bytes);
-		if (sign_save[i]) 
-		   _PD_set_bit(lout, bo_sign);}
+	      if ((0 < esave[i]) && (esave[i] < emax))
+		 {_PD_insert_field(esave[i], nbo_exp, lout, bo_exp,
+				   l_order, l_bytes);
+		  if (ssave[i]) 
+		     _PD_set_bit(lout, bo_sign);}
 
-	    else if (expn_max <= expn_save[i])
-	       {loverflow = TRUE;
-		_PD_insert_field(expn_max, nbo_exp, lout, bo_exp,
-                                    l_order, l_bytes);
-		if (sign_save[i])
-		   _PD_set_bit(lout, bo_sign);}
+	      else if (emax <= esave[i])
+		 {loverflow = TRUE;
+		  _PD_insert_field(emax, nbo_exp, lout, bo_exp,
+				   l_order, l_bytes);
+		  if (ssave[i])
+		     _PD_set_bit(lout, bo_sign);}
 
-	    else
-	       lunderflow = TRUE;};
+	      else
+		 lunderflow = TRUE;};
 
 /* if input high mantissa bit (HMB) is assumed 1 and not written (e.g. IEEE)
  * but output HMB is assumed 0 (e.g. CRAY) write the input starting at
  * the output HMB+1 and set the HMB
  */
-       if (dindx > 0)
-	  {mask   = 1 << (7 - hman_bit);
-	   outptr = hman_bptr;
+	 if (dhmb > 0)
+	    {mask = 1 << (7 - hmbit);
+	     pout = phmb;
 
-	   if (loverflow || lunderflow)
-	      {for (i = start; i < end; i++, outptr += outbytes)
-		   {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-		       *outptr |= mask;};}
-	   else
-	      {for (i = start; i < end; i++, outptr += outbytes)
-		   *outptr |= mask;};};
+	     if (loverflow || lunderflow)
+	        {for (i = ls; i < le; i++, pout += bpio)
+		     {if ((0 < esave[i]) && (esave[i] < emax))
+			 *pout |= mask;};}
+	     else
+	        {for (i = ls; i < le; i++, pout += bpio)
+		     *pout |= mask;};};
 
-       nbitsout = 8 - out_man_bit;
-       mask     = (1 << nbitsout) - 1;
-       outptr   = out_mbptr;
-       inptr    = in_mbptr;
-       inrem    = nbi_man;
-       outrem   = nbo_man;
-       if (dindx > 0)
-	  outrem -= dindx;
-       else if (dindx < 0)
-	  inrem += dindx;
+	 nbitsout = 8 - mbito;
+	 mask     = (1 << nbitsout) - 1;
+	 pout     = pmbo;
+	 pin      = pmbi;
+	 inrem    = nbi_man;
+	 outrem   = nbo_man;
+	 if (dhmb > 0)
+	    outrem -= dhmb;
+	 else if (dhmb < 0)
+	    inrem += dhmb;
 
-/* will the chunk of in mantissa in first byte fit in the first byte
- * of out mantissa?
+/* will the chunk of IN mantissa in first byte fit in the first byte
+ * of OUT mantissa?
  */ 
-       if (in_man_bit >= out_man_bit)
+	 if (mbiti >= mbito)
 
 /* it will fit - store it */
-	  {if (loverflow || lunderflow)
-	      {if (onescmp)
-		  {cmask = (1 << (8 - in_man_bit)) - 1;
-		   for (i = start; i < end; i++, outptr += outbytes, inptr += inbytes)
-		       {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			   {if (sign_save[i])
-			       *outptr |=  (~(*inptr & cmask) << (in_man_bit - out_man_bit))  & mask;
-			    else
-			       *outptr |=  (*inptr << (in_man_bit - out_man_bit))  & mask;};};}
-	       else
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr += inbytes)
-		       {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			   *outptr |= (*inptr << (in_man_bit - out_man_bit))  & mask;};};}
+	    {if (loverflow || lunderflow)
+	        {if (onescmp)
+		    {cmask = (1 << (8 - mbiti)) - 1;
+		     for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if ((0 < esave[i]) && (esave[i] < emax))
+			     {if (ssave[i])
+				 *pout |= (~(pin[0] & cmask) << dmbit) & mask;
+			      else
+				 *pout |= (pin[0] << dmbit) & mask;};};}
+		 else
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if ((0 < esave[i]) && (esave[i] < emax))
+			     *pout |= (pin[0] << dmbit)  & mask;};};}
 
 /* no overflow */
-	  else
-	     {if (onescmp)
-		 {cmask = (1 << (8 - in_man_bit)) - 1;
-		  for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		      {if (sign_save[i])
-			  *outptr |=  (~(*inptr & cmask) << (in_man_bit - out_man_bit))  & mask;
-		       else
-			  *outptr |=  (*inptr << (in_man_bit - out_man_bit))  & mask;};}
-	      else
-		 {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		      *outptr |= (*inptr << (in_man_bit - out_man_bit))  & mask;};};
+	     else
+	        {if (onescmp)
+		    {cmask = (1 << (8 - mbiti)) - 1;
+		     for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if (ssave[i])
+			     *pout |= (~(pin[0] & cmask) << dmbit) & mask;
+			  else
+			     *pout |= (pin[0] << dmbit) & mask;};}
+		 else
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         *pout |= (pin[0] << dmbit)  & mask;};};
  
 /* fill in the rest of the first output byte with the first
  * part of the second input byte
  */
-	   numleft   = in_man_bit - out_man_bit;
-	   remainder = 0;
-	   if (numleft > 0)
-	      {mask      = (1 << numleft) - 1;
-	       inptr     = ++in_mbptr;
-	       outptr    = out_mbptr;
-	       remainder = 8 - numleft;
-	       if (loverflow || lunderflow)
-		  {if (onescmp)
-		      {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-			   {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			       {if (sign_save[i])
-				   *outptr |= ~(*inptr >> remainder) & mask;
-			        else
-				   *outptr |=  (*inptr >> remainder) & mask;};};}
-		   else
-		      {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-			   {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			       *outptr |= (*inptr >> remainder) & mask;};};}
-	       else 
-		  {if (onescmp)
-		      {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-			   {if (sign_save[i])
-			       *outptr |= ~(*inptr >> remainder) & mask;
-			    else
-			       *outptr |=  (*inptr >> remainder) & mask;};}
-		   else
-		      {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-			   *outptr |= (*inptr >> remainder) & mask;};};};}
+	     numleft   = dmbit;
+	     remainder = 0;
+	     if (numleft > 0)
+	        {mask      = (1 << numleft) - 1;
+		 pin       = ++pmbi;
+		 pout      = pmbo;
+		 remainder = 8 - numleft;
+		 if (loverflow || lunderflow)
+		    {if (onescmp)
+		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+			     {if ((0 < esave[i]) && (esave[i] < emax))
+				 {if (ssave[i])
+				     *pout |= ~(pin[0] >> remainder) & mask;
+				  else
+				     *pout |=  (pin[0] >> remainder) & mask;};};}
+		     else
+		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+			     {if ((0 < esave[i]) && (esave[i] < emax))
+				 *pout |= (pin[0] >> remainder) & mask;};};}
+		 else 
+		    {if (onescmp)
+		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+			     {if (ssave[i])
+				 *pout |= ~(pin[0] >> remainder) & mask;
+			      else
+				 *pout |=  (pin[0] >> remainder) & mask;};}
+		     else
+		        {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+			     *pout |= (pin[0] >> remainder) & mask;};};};}
 
-/* in_man_bit < out_man_bit */
-       else
+/* mbiti < mbito */
+	 else
 
 /* no it won't fit */
-	  {remainder = out_man_bit - in_man_bit; 
-	   if (loverflow || lunderflow)
-	      {if (onescmp)
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			   {if (sign_save[i])
-			       *outptr |= ~(*inptr >> remainder)  & mask;
-			    else
-			       *outptr |=  (*inptr >> remainder)  & mask;};};}
-	       else
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			   *outptr |= (*inptr >> remainder)  & mask;};};}       
-	   else
-	      {if (onescmp)
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       {if (sign_save[i])
-			   *outptr |= ~(*inptr >> remainder)  & mask;
-		        else
-			   *outptr |=  (*inptr >> remainder)  & mask;};}
-	       else
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       *outptr |= (*inptr >> remainder)  & mask;};};};
+	    {remainder = mbito - mbiti; 
+	     if (loverflow || lunderflow)
+	        {if (onescmp)
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if ((0 < esave[i]) && (esave[i] < emax))
+			     {if (ssave[i])
+				 *pout |= ~(pin[0] >> remainder) & mask;
+			      else
+				 *pout |=  (pin[0] >> remainder) & mask;};};}
+		 else
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if ((0 < esave[i]) && (esave[i] < emax))
+			     *pout |= (pin[0] >> remainder) & mask;};};}
+	     else
+	        {if (onescmp)
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if (ssave[i])
+			     *pout |= ~(pin[0] >> remainder) & mask;
+			  else
+			     *pout |=  (pin[0] >> remainder) & mask;};}
+		 else
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         *pout |= (pin[0] >> remainder) & mask;};};};
 
-       inrem  -= nbitsout;
-       outrem -= nbitsout;          
-       outptr  = ++out_mbptr; /* begin storing to the beginning of the next */
-                              /* sink byte.                                 */
-       inptr   = in_mbptr;    /* from the byte with the remainder. */
+	 inrem  -= nbitsout;
+	 outrem -= nbitsout;          
+
+/* begin storing to the beginning of the next sink byte
+ * from the byte with the remainder
+ */
+	 pout = ++pmbo;
+	 pin  = pmbi;
 
 /* how many full bytes of mantissa left? */
-       nb_mant_rem = inrem >> 3;
-       nb_mant_rem = min(nb_mant_rem, outrem >> 3);
-       mask1 = (1 << remainder) -1;
-       mask2 = (1 << (8 - remainder)) -1;
+	 nb_mant_rem = inrem >> 3;
+	 nb_mant_rem = min(nb_mant_rem, outrem >> 3);
+	 mask1 = (1 << remainder) -1;
+	 mask2 = (1 << (8 - remainder)) -1;
        
-       for (k = 0; k < nb_mant_rem; k++)
-	   {outptr = out_mbptr + k;
-	    inptr  = in_mbptr  + k;
-	    if (loverflow || lunderflow)
-	       {if (onescmp)
+	 for (k = 0; k < nb_mant_rem; k++)
+	     {pout = pmbo + k;
+	      pin  = pmbi  + k;
+	      if (loverflow || lunderflow)
+		 {if (onescmp)
 
 /* move the mantissa over bytewise */
-		   {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		        {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			    {if (sign_save[i])
-			        *outptr = ((~(*inptr) & mask1) << (8 - remainder)) |
-				          (~(*(inptr + 1) >> remainder) & mask2);
-			     else
-			        *outptr = ((*inptr & mask1) << (8 - remainder)) |
-				          ((*(inptr + 1) >> remainder) & mask2);};};}
+		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		          {if ((0 < esave[i]) && (esave[i] < emax))
+			      {if (ssave[i])
+				  *pout = ((~pin[0] & mask1) << (8 - remainder)) |
+				            (~(pin[1] >> remainder) & mask2);
+			       else
+				  *pout = ((pin[0] & mask1) << (8 - remainder)) |
+				            ((pin[1] >> remainder) & mask2);};};}
 
 /* move the mantissa over bytewise */
-	        else
-		   {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		        {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			    *outptr = ((*inptr & mask1) << (8 - remainder)) |
-			              ((*(inptr + 1) >> remainder) & mask2);};};}
-	    else
-	       {if (onescmp)
+		  else
+		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		          {if ((0 < esave[i]) && (esave[i] < emax))
+			      *pout = ((pin[0] & mask1) << (8 - remainder)) |
+				        ((pin[1] >> remainder) & mask2);};};}
+	      else
+		 {if (onescmp)
 
 /* move the mantissa over bytewise */
-		   {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		        {if (sign_save[i])
-			    *outptr = ((~(*inptr) & mask1) << (8 - remainder)) |
-			              (~(*(inptr + 1) >> remainder) & mask2);
-			 else
-			    *outptr = (((*inptr) & mask1) << (8 - remainder)) |
-			              ((*(inptr + 1) >> remainder) & mask2);};}
-	        else
+		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		          {if (ssave[i])
+			      *pout = ((~pin[0] & mask1) << (8 - remainder)) |
+			                (~(pin[1] >> remainder) & mask2);
+			   else
+			      *pout = ((pin[0] & mask1) << (8 - remainder)) |
+			                ((pin[1] >> remainder) & mask2);};}
+		  else
 
 /* move the mantissa over bytewise */
-		   {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		        {*outptr = ((*inptr & mask1) << (8 - remainder)) |
-			           ((*(inptr + 1) >> remainder) & mask2);};};};}
+		     {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		          {*pout = ((pin[0] & mask1) << (8 - remainder)) |
+			             ((pin[1] >> remainder) & mask2);};};};}
 
-       out_mbptr += nb_mant_rem;
-       in_mbptr  += nb_mant_rem;
-       nbitsout   = (nb_mant_rem << 3);
-       inrem     -= nbitsout;
-       outrem    -= nbitsout;
+	 pmbo    += nb_mant_rem;
+	 pmbi    += nb_mant_rem;
+	 nbitsout = (nb_mant_rem << 3);
+	 inrem   -= nbitsout;
+	 outrem  -= nbitsout;
 
 /* store the last bits */
-       nleft = min(inrem, outrem);
-       if (nleft)
-	  {mask   = ((1 << nleft) - 1) << (8 - nleft);
-	   outptr = out_mbptr;
-	   inptr  = in_mbptr;
-	   if (loverflow || lunderflow)
-	      {if (onescmp)
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			   {if (sign_save[i])
-			       *outptr = ~(*inptr << (8 - remainder)) & mask;
-			    else
-			       *outptr =  (*inptr << (8 - remainder)) & mask;};};}
-	       else
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       {if ((0 < expn_save[i]) && (expn_save[i] < expn_max))
-			   *outptr = (*inptr << (8 - remainder)) & mask;};};}
-	   else
-	      {if (onescmp)
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       {if (sign_save[i])
-			   *outptr = ~(*inptr << (8 - remainder)) & mask;
-		        else
-			   *outptr = (*inptr << (8 - remainder)) & mask;};}
-	       else
-		  {for (i = start; i < end; i++, outptr += outbytes, inptr  += inbytes)
-		       *outptr = (*inptr << (8 - remainder)) & mask;};};};
+	 nleft = min(inrem, outrem);
+	 if (nleft)
+	    {mask = ((1 << nleft) - 1) << (8 - nleft);
+	     pout = pmbo;
+	     pin  = pmbi;
+	     if (loverflow || lunderflow)
+	        {if (onescmp)
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if ((0 < esave[i]) && (esave[i] < emax))
+			     {if (ssave[i])
+				 *pout = ~(pin[0] << (8 - remainder)) & mask;
+			      else
+				 *pout =  (pin[0] << (8 - remainder)) & mask;};};}
+		 else
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if ((0 < esave[i]) && (esave[i] < emax))
+			     *pout = (pin[0] << (8 - remainder)) & mask;};};}
+	     else
+	        {if (onescmp)
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         {if (ssave[i])
+			     *pout = ~(pin[0] << (8 - remainder)) & mask;
+			  else
+			     *pout = (pin[0] << (8 - remainder)) & mask;};}
+		 else
+		    {for (i = ls; i < le; i++, pout += bpio, pin += bpii)
+		         *pout = (pin[0] << (8 - remainder)) & mask;};};};
 
-       count += end - start;
-       end    = min(nitems-count, MBLOCKS);}; /* end while (count < nitems) */
+	 l += le - ls;
+	 le = min(ni-l, MBLOCKS);};
 
 /* handle CRAY inconsistency which has zero as the only floating point
  * number with a 0 in the HMB
  * also problem for IEEE 96 bit float - fixed by Dave Munro
  */
-    if (hmbo)
+    if (hmbo != 0)
        {int j, mask;
 
 	mask = (1 << (7 - bo_mant % 8));
 
         indxout = outfor[5]/8;
         rout    = (unsigned char *) *out;
-        for (i = 0L; i < nitems; i++, rout += outbytes)
-            {for (j = 0; j < outbytes; j++)
+        for (i = 0L; i < ni; i++, rout += bpio)
+            {for (j = 0; j < bpio; j++)
                  if ((j == indxout) ? (rout[j] != mask) : rout[j])
                     break;
-             if (j == outbytes)
+             if (j == bpio)
                 rout[indxout] = 0;};};
 
     if (*in == freorder)
        {SFREE(freorder);
-        *in = inrsave;}
+        *in = inrsave;};
 
     if (*in == aligned)
        {SFREE(aligned);
-        *in = insave;}
+        *in = insave;};
 
-    if (out_freorder)
-       {freorder = SC_alloc_nzt(outbytes*nitems, 1L,
-				"_PD_FCONVERT:freorder", NULL);
+    if (out_freorder == TRUE)
+       {freorder = SC_alloc_nzt(bpio*ni, 1L, "_PD_FCONVERT:freorder", NULL);
         tformat[0] = outfor[0];
         tformat[1] = outfor[1];
         tformat[2] = outfor[2];
@@ -1879,16 +1892,16 @@ void _PD_fconvert(char **out, char **in, long nitems, int boffs,
         tformat[4] = bo_exp_save;
         tformat[5] = bo_mant_save;
         _PD_field_reorder(*out, freorder, tformat, outfor, outord,
-                          l_order, l_bytes, nitems);
-        memcpy(*out, freorder, nitems*outbytes);
+                          l_order, l_bytes, ni);
+        memcpy(*out, freorder, ni*bpio);
         SFREE(freorder);};
 
 
 /* put the output bytes into the specified order */
-    _PD_reorder(*out, nitems, outbytes, outord);
+    _PD_reorder(*out, ni, bpio, outord);
 
-    *in  += nitems*inbytes;
-    *out += nitems*outbytes;
+    *in  += ni*bpii;
+    *out += ni*bpio;
 
     return;}
 

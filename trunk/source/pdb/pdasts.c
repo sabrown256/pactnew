@@ -599,8 +599,9 @@ static int test_2(char *base, char *tgt, int n)
 /* RUN_TEST - run a particular test through all targeting modes */
 
 static int run_test(PFTest test, int n, char *host)
-   {int cs, debug, fail;
-    char s[MAXLINE], msg[MAXLINE];
+   {int i, m, rv, cs, debug, fail;
+    char msg[MAXLINE];
+    char *nm;
     long bytaa, bytfa, bytab, bytfb;
     double time;
     
@@ -618,65 +619,18 @@ static int run_test(PFTest test, int n, char *host)
     fail = 0;
 
 /* native test */
-    if (!(*test)(host, NULL, n))
+    if ((*test)(host, NULL, n) == FALSE)
        {PRINT(STDOUT, "Test #%d native failed\n", n);
 	fail++;};
 
-    if (!native_only)
-
-/* Sun4 target test */
-       {strcpy(s, "sun4");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Mips target test */
-	strcpy(s, "mips");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Mips64 target test */
-	strcpy(s, "mips64");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Alpha64 target test */
-	strcpy(s, "alpha64");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Dos target test */
-	strcpy(s, "dos");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Macintosh target test */
-	strcpy(s, "mac");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Sun3 target test */
-	strcpy(s, "sun3");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Vax target test */
-	strcpy(s, "vax");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};
-
-/* Cray target test */
-	strcpy(s, "cray");
-	if (!(*test)(host, s, n))
-	   {PRINT(STDOUT, "Test #%d %s failed\n", n, s);
-	    fail++;};};
+    if (native_only == FALSE)
+       {m = PD_target_n_platforms();
+	for (i = 0; i < m; i++)
+	    {rv = PD_target_platform_n(m);
+	     nm = PD_target_platform_name(m);
+	     if ((*test)(host, nm, n) == FALSE)
+	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+		 fail++;};};};
 
     SC_mem_stats(&bytaa, &bytfa, NULL, NULL);
 

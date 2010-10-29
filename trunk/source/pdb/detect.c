@@ -267,8 +267,8 @@ int derive_fp_format(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
     szd = sizeof(double);
     szl = sizeof(long double);
 
-    ff[0] = szf*8;
-    df[0] = szd*8;
+    ff[0]  = szf*8;
+    df[0]  = szd*8;
     ldf[0] = szl*8;
 
 /* get the byte ordering from the double mantissa bytes */
@@ -377,19 +377,19 @@ int derive_fp_format(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
     ldf[5] -= ldf[6];
 
 /* #exponent_bits = loc(mantissa) - loc(exponent) */
-    ff[1]  = ff[5] - ff[4];
-    df[1]  = df[5] - df[4];
+    ff[1]  = ff[5]  - ff[4];
+    df[1]  = df[5]  - df[4];
     ldf[1] = ldf[5] - ldf[4];
 
-/* #mantissa_bits = #bits - #exponent_bits - 1 */
-    ff[2]  = ff[0] - ff[1] - 1;
-    df[2]  = df[0] - df[1] - 1;
-    ldf[2] = ldf[0] - ldf[1] - 1;
+/* #mantissa_bits = #bits - #exponent_bits - loc(sign) - 1 */
+    ff[2]  = ff[0]  - ff[1]  - ff[3] - 1;
+    df[2]  = df[0]  - df[1]  - df[3] - 1;
+    ldf[2] = ldf[0] - ldf[1] - ldf[3] - 1;
 
 /* find exponent bias */
-    find_exp(fb, ff, bofb.c);
-    find_exp(db, df, bodb.c);
-    find_exp(ldb, ldf, bodb.c);
+    find_exp(fb,  ff,  bofb.c);
+    find_exp(db,  df,  bodb.c);
+    find_exp(ldb, ldf, bolb.c);
 
 /* adjust exponent bias */
     ff[7]  -= ff[6];

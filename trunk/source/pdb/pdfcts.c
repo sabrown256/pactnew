@@ -17,7 +17,8 @@ typedef int (*PFtfc)(PDBfile *vif);
 
 /* FCNV - do floating point conversions */
 
-static void fcnv(char *out, char *in, long ni, PDBfile *vif, char *type)
+static void fcnv(char *out, char *in, long ni,
+		 int dir, PDBfile *vif, char *type)
    {int rv;
     int lnby, onescmp;
     int *iaord, *oaord;
@@ -32,12 +33,20 @@ static void fcnv(char *out, char *in, long ni, PDBfile *vif, char *type)
     idp  = PD_inquire_table_type(vif->host_chart, type);
     hstd = vif->host_std;
 
-    ifmt    = idp->format;
-    iaord   = idp->order;
-    onescmp = idp->onescmp;
+    if (dir == 0)
+       {ifmt    = idp->format;
+	iaord   = idp->order;
+	onescmp = idp->onescmp;
 
-    ofmt    = odp->format;
-    oaord   = odp->order;
+	ofmt    = odp->format;
+	oaord   = odp->order;}
+    else
+       {ifmt    = odp->format;
+	iaord   = odp->order;
+	onescmp = odp->onescmp;
+
+	ofmt    = idp->format;
+	oaord   = idp->order;};
 
     lsord   = hstd->long_order;
     lnby    = hstd->long_bytes;
@@ -56,7 +65,7 @@ static int fcmp(char *bfa, char *bfb, int nb)
    {int i, rv;
 
     rv = TRUE;
-    for (i = 0; i < nb; i++)
+    for (i = 0; (i < nb) && (rv == TRUE); i++)
         rv &= (bfa[i] == bfb[i]);
 
     return(rv);}
@@ -67,7 +76,8 @@ static int fcmp(char *bfa, char *bfb, int nb)
 /* T8 - test float8 conversions */
 
 static int t8(PDBfile *vif)
-   {int rv;
+   {int rv, err;
+    long ni;
     double s, a[4];
     char out[MAXLINE], res[MAXLINE];
     char *in;
@@ -80,17 +90,34 @@ static int t8(PDBfile *vif)
 
     rv = TRUE;
 
-    in = (char *) &s;
+    io_printf(stdout, "\t\t%12s %3d ...", vif->name, sizeof(double));
 
-    fcnv(out, in, 1L, vif, "double");
-    fcnv(res, out, 1L, vif, "double");
-    rv &= fcmp(in, res, sizeof(double));
+    in = (char *) &s;
+    ni = 1L;
+    fcnv(out, in, ni, 0, vif, "double");
+    fcnv(res, out, ni, 1, vif, "double");
+    err = fcmp(in, res, ni*sizeof(double));
+    rv &= err;
+    if (err == TRUE)
+       io_printf(stdout, ".");
+    else
+       io_printf(stdout, "x");
 
     in = (char *) a;
+    ni = 4L;
+    fcnv(out, in, ni, 0, vif, "double");
+    fcnv(res, out, ni, 1, vif, "double");
+    err = fcmp(in, res, ni*sizeof(double));
+    rv &= err;
+    if (err == TRUE)
+       io_printf(stdout, ".");
+    else
+       io_printf(stdout, "x");
 
-    fcnv(out, in, 4L, vif, "double");
-    fcnv(res, out, 4L, vif, "double");
-    rv &= fcmp(in, res, 4*sizeof(double));
+    if (rv == TRUE)
+       io_printf(stdout, " ok\n");
+    else
+       io_printf(stdout, " ng\n");
 
     return(rv);}
 
@@ -100,7 +127,8 @@ static int t8(PDBfile *vif)
 /* T16 - test float16 conversions */
 
 static int t16(PDBfile *vif)
-   {int rv;
+   {int rv, err;
+    long ni;
     long double s, a[4];
     char out[MAXLINE], res[MAXLINE];
     char *in;
@@ -113,17 +141,34 @@ static int t16(PDBfile *vif)
 
     rv = TRUE;
 
-    in = (char *) &s;
+    io_printf(stdout, "\t\t%12s %3d ...", vif->name, sizeof(long double));
 
-    fcnv(out, in, 1L, vif, "long_double");
-    fcnv(res, out, 1L, vif, "long_double");
-    rv &= fcmp(in, res, sizeof(long double));
+    in = (char *) &s;
+    ni = 1L;
+    fcnv(out, in, ni, 0, vif, "long_double");
+    fcnv(res, out, ni, 1, vif, "long_double");
+    err = fcmp(in, res, ni*sizeof(long double));
+    rv &= err;
+    if (err == TRUE)
+       io_printf(stdout, ".");
+    else
+       io_printf(stdout, "x");
 
     in = (char *) a;
+    ni = 4L;
+    fcnv(out, in, ni, 0, vif, "long_double");
+    fcnv(res, out, ni, 1, vif, "long_double");
+    err = fcmp(in, res, ni*sizeof(long double));
+    rv &= err;
+    if (err == TRUE)
+       io_printf(stdout, ".");
+    else
+       io_printf(stdout, "x");
 
-    fcnv(out, in, 4L, vif, "long_double");
-    fcnv(res, out, 4L, vif, "long_double");
-    rv &= fcmp(in, res, 4*sizeof(long double));
+    if (rv == TRUE)
+       io_printf(stdout, " ok\n");
+    else
+       io_printf(stdout, " ng\n");
 
     return(rv);}
 
@@ -134,11 +179,13 @@ static int t16(PDBfile *vif)
 
 static PDBfile *test_target(int n)
    {int rv;
+    char *nm;
     PDBfile *vif;
 
     rv = PD_target_platform_n(n);
+    nm = PD_target_platform_name(n);
 
-    vif = PD_open_vif("internal");
+    vif = PD_open_vif(nm);
 
     return(vif);}
 
@@ -184,7 +231,7 @@ static void print_help(void)
 /* MAIN - test the PDB Library system */
 
 int main(int c, char **v)
-   {int i, err;
+   {int i, err, rv;
 
     PD_init_threads(0, NULL);
 
@@ -206,9 +253,11 @@ int main(int c, char **v)
     err += run_test(t8, TRUE);
     err += run_test(t16, TRUE);
 
+    rv = (err != 2);
+
     PRINT(STDOUT, "\n");
 
-    return(err);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
