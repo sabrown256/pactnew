@@ -16,9 +16,6 @@
 #include "pml_int.h"
 #include "scope_math.h"
 
-static double
- _PM_igamma_tolerance = 1.0e-12;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -152,10 +149,10 @@ double PM_beta(double z, double w)
 double PM_igamma_tolerance(double tol)
    {double rv;
 
-    rv = _PM_igamma_tolerance;
+    rv = _PM.igamma_tol;
 
     if (tol > 0.0)
-       _PM_igamma_tolerance = tol;
+       _PM.igamma_tol = tol;
 
     return(rv);}
 
@@ -182,7 +179,7 @@ static double _PM_igamma_sm(double a, double x)
 	    {ap += 1.0;
 	     ds *= x/ap;
 	     s  += ds;
-	     if (ABS(ds) < ABS(s*_PM_igamma_tolerance))
+	     if (ABS(ds) < ABS(s*_PM.igamma_tol))
 	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
 	         gs = s*gl;
 		 break;};};};
@@ -224,7 +221,7 @@ static double _PM_igamma_cf(double a, double x)
 	 if (a1 != 0.0)
 	    {ds = 1.0/a1;
 	     s  = b1*ds;
-	     if (ABS(s - so) < ABS(s*_PM_igamma_tolerance))
+	     if (ABS(s - so) < ABS(s*_PM.igamma_tol))
 	        {gl = exp(-x + a*log(x) - PM_ln_gamma(a));
 	         gs = s*gl;
 		 break;};
@@ -291,17 +288,17 @@ static double _PM_erfc_a(double x)
 
     xa = ABS(x);
 
-/* Abramowitz and Stegun 7.1.25 - fractional error < 2.3e-6 */
-    if (_PM_igamma_tolerance > 2.3e-6)
+/* Abramowitz and Stegun 7.1.25 - fractional error < 9.25e-3 */
+    if (_PM.igamma_tol > 9.25e-3)
        {a   = 1.0/(1.0 + 0.47047*xa);
 	rv  = a*(0.3480242 + a*(-0.0958798 + a*0.7478556));
 	rv *= exp(-x*x);}
 
 
-/* rational polynomial fit to obtain fractional error < 5.4e-12
+/* rational polynomial fit to obtain fractional error < 3.0e-8
  * due to George Zimmerman
  */
-    else if (_PM_igamma_tolerance > 5.4e-12)
+    else if (_PM.igamma_tol > 3.0e-8)
        {a   = 1.0/(1.0 + xa*(2.46904246 +
 			     xa*(2.62879275 +
 				 xa*(1.53347072 +
@@ -327,7 +324,7 @@ static double _PM_erfc_a(double x)
 double PM_erfc(double x)
    {double rv;
 
-    if (_PM_igamma_tolerance > 5.4e-12)
+    if (_PM.igamma_tol > 3.0e-8)
        rv = _PM_erfc_a(x);
     else
        rv = (x < 0.0) ? 1.0 + PM_igamma_p(x*x, 0.5) : PM_igamma_q(x*x, 0.5);
@@ -342,7 +339,7 @@ double PM_erfc(double x)
 double PM_erf(double x)
    {double rv;
 
-    if (_PM_igamma_tolerance > 5.4e-12)
+    if (_PM.igamma_tol > 3.0e-8)
        rv = 1.0 - _PM_erfc_a(x);
     else
        rv = (x < 0.0) ? -PM_igamma_p(x*x, 0.5) : PM_igamma_p(x*x, 0.5);
