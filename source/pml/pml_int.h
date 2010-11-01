@@ -43,6 +43,9 @@ struct s_PM_state
 /* MLGEOM.C */
     double tol;
 
+/* MLSFNC.C */
+    double igamma_tol;
+
 /* initializes to 0 bytes */
 
 /* MLRAND.C */
