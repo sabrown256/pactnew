@@ -306,9 +306,14 @@ extern syment
 
 extern defstr
  *_PD_defstr_copy(defstr *dp),
- *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind, memdes *lst,
+ *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
+		memdes *lst, multides *tuple,
 		long sz, int align, PD_byte_order ord, int conv,
 		int *ordr, long *formt, int unsgned, int onescmp);
+
+extern multides
+ *_PD_make_tuple(char *type, int ni, int *ord),
+ *_PD_copy_tuple(multides *tuple);
 
 extern memdes
  *_PD_mk_descriptor(char *member, int defoff);
@@ -318,6 +323,7 @@ extern dimdes
 
 extern void
  _PD_clr_table(hasharr *tab, int (*rel)(haelem *p, void *a)),
+ _PD_free_tuple(multides *tuple),
  _PD_rl_defstr(defstr *dp),
  _PD_rl_pdb(PDBfile *file),
  _PD_rl_standard(data_standard *std),
@@ -484,7 +490,8 @@ extern BIGINT
 
 extern defstr
  *_PD_defstr(PDBfile *file, int host, char *name, PD_type_kind kind,
-	     memdes *desc, long sz, int align, PD_byte_order ord,
+	     memdes *desc, multides *tuple,
+	     long sz, int align, PD_byte_order ord,
 	     int conv, int *ordr, long *formt, int unsgned, int onescmp),
  *_PD_defstr_inst(PDBfile* file, char *name, PD_type_kind kind,
 		  memdes *desc, PD_byte_order ord, int *ordr,

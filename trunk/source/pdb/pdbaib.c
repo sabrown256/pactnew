@@ -114,12 +114,12 @@ defstr *PD_defncv(PDBfile *file, char *name, long bpi, int align)
 
 /* install in the file chart */
     dp = _PD_defstr(file, FALSE, name, NON_CONVERT_KIND,
-		    NULL, bpi, align,
+		    NULL, NULL, bpi, align,
 		    NO_ORDER, FALSE, NULL, NULL, FALSE, FALSE);
 
 /* install an independent copy in the host chart - garbage collection! */
     dp = _PD_defstr(file, TRUE, name, NON_CONVERT_KIND,
-		    NULL, bpi, align,
+		    NULL, NULL, bpi, align,
 		    NO_ORDER, FALSE, NULL, NULL, FALSE, FALSE);
 
     return(dp);}
@@ -138,12 +138,12 @@ defstr *PD_defchr(PDBfile *file, char *name, long bpi, int align,
 
 /* file chart */
     dp = _PD_defstr(file, FALSE, name, CHAR_KIND,
-		    NULL, bpi, align, ord, FALSE,
+		    NULL, NULL, bpi, align, ord, FALSE,
 		    NULL, NULL, unsgned, FALSE);
 
 /* host chart */
     dp = _PD_defstr(file, TRUE, name, CHAR_KIND,
-		    NULL, bpi, align, ord, FALSE,
+		    NULL, NULL, bpi, align, ord, FALSE,
 		    NULL, NULL, unsgned, FALSE);
 
     return(dp);}
@@ -159,12 +159,12 @@ defstr *PD_defixnum(PDBfile *file, char *name, long bpi,
 
 /* file chart */
     dp = _PD_defstr(file, FALSE, name, INT_KIND,
-		    NULL, bpi, align, ord, TRUE, 
+		    NULL, NULL, bpi, align, ord, TRUE, 
                     NULL, NULL, unsgned, onescmp);
 
 /* host chart */
     dp = _PD_defstr(file, TRUE, name, INT_KIND,
-		    NULL, bpi, align, ord, TRUE, 
+		    NULL, NULL, bpi, align, ord, TRUE, 
                     NULL, NULL, unsgned, onescmp);
 
     return(dp);}
@@ -212,12 +212,12 @@ defstr *PD_defloat(PDBfile *file, char *name, long bpi,
 
 /* file chart */
     dp = _PD_defstr(file, FALSE, name, FLOAT_KIND,
-		    NULL, bpi, align,
+		    NULL, NULL, bpi, align,
 		    NO_ORDER, TRUE, order, formt, FALSE, FALSE);
 
 /* host chart */
     dp = _PD_defstr(file, TRUE, name, FLOAT_KIND,
-		    NULL, bpi, align,
+		    NULL, NULL, bpi, align,
 		    NO_ORDER, TRUE, order, formt, FALSE, FALSE);
 
     return(dp);}

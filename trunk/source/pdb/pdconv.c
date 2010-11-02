@@ -142,6 +142,7 @@ long
 data_standard
  TEXT_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 12,                                       /* size of pointer */
+                1,                                           /* size of bool */
                 7,  TEXT_ORDER,                   /* size and order of short */
                 12, TEXT_ORDER,                     /* size and order of int */
                 22, TEXT_ORDER,                    /* size and order of long */
@@ -151,6 +152,7 @@ data_standard
                 42, float16_text, text_order},            /* quad definition */
  I386_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, REVERSE_ORDER,                 /* size and order of short */
                 2, REVERSE_ORDER,                   /* size and order of int */
                 4, REVERSE_ORDER,                  /* size and order of long */
@@ -160,6 +162,7 @@ data_standard
                 16, float16_ieee, float16_rev_order},     /* quad definition */
  I586L_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, REVERSE_ORDER,                 /* size and order of short */
                 4, REVERSE_ORDER,                   /* size and order of int */
                 4, REVERSE_ORDER,                  /* size and order of long */
@@ -169,6 +172,7 @@ data_standard
                 12, float12_ieee, float12_rev_order},     /* quad definition */
  I586O_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, REVERSE_ORDER,                 /* size and order of short */
                 4, REVERSE_ORDER,                   /* size and order of int */
                 4, REVERSE_ORDER,                  /* size and order of long */
@@ -178,6 +182,7 @@ data_standard
                 16, float16_ieee, float16_rev_order},     /* quad definition */
  PPC32_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, NORMAL_ORDER,                  /* size and order of short */
                 4, NORMAL_ORDER,                    /* size and order of int */
                 4, NORMAL_ORDER,                   /* size and order of long */
@@ -187,6 +192,7 @@ data_standard
                 16, float16_ieee, float16_nrm_order},     /* quad definition */
  X86_64_STD  = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, REVERSE_ORDER,                 /* size and order of short */
                 4, REVERSE_ORDER,                   /* size and order of int */
                 8, REVERSE_ORDER,                  /* size and order of long */
@@ -196,6 +202,7 @@ data_standard
                 16, float16_ieee, float16_rev_order},     /* quad definition */
  X86_64A_STD = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, REVERSE_ORDER,                 /* size and order of short */
                 4, REVERSE_ORDER,                   /* size and order of int */
                 8, REVERSE_ORDER,                  /* size and order of long */
@@ -205,6 +212,7 @@ data_standard
                 16, float10_ix87, float16_rev_order},     /* quad definition */
  PPC64_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, NORMAL_ORDER,                  /* size and order of short */
                 4, NORMAL_ORDER,                    /* size and order of int */
                 8, NORMAL_ORDER,                   /* size and order of long */
@@ -217,6 +225,7 @@ data_standard
 
  M68X_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, NORMAL_ORDER,                  /* size and order of short */
                 2, NORMAL_ORDER,                    /* size and order of int */
                 4, NORMAL_ORDER,                   /* size and order of long */
@@ -226,6 +235,7 @@ data_standard
                 16, float16_ieee, float16_nrm_order},     /* quad definition */
  VAX_STD     = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
+                1,                                           /* size of bool */
                 2, REVERSE_ORDER,                 /* size and order of short */
                 4, REVERSE_ORDER,                   /* size and order of int */
                 4, REVERSE_ORDER,                  /* size and order of long */
@@ -235,6 +245,7 @@ data_standard
                 8, float8_vax, float8_vax_order},         /* quad definition */
  CRAY_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
+                8,                                           /* size of bool */
                 8, NORMAL_ORDER,                  /* size and order of short */
                 8, NORMAL_ORDER,                    /* size and order of int */
                 8, NORMAL_ORDER,                   /* size and order of long */
@@ -267,21 +278,21 @@ data_standard
  */
 
 data_alignment
- TEXT_ALIGNMENT        = {0, 0, 0, 0, 0, 0, 0, 0,  0, 0},
- BYTE_ALIGNMENT        = {1, 1, 1, 1, 1, 1, 1, 1,  1, 0},
- WORD2_ALIGNMENT       = {1, 2, 2, 2, 2, 2, 2, 2,  2, 0},
- WORD4_ALIGNMENT       = {1, 4, 4, 4, 4, 4, 4, 4,  4, 0},
- WORD8_ALIGNMENT       = {4, 8, 8, 8, 8, 8, 8, 8,  8, 8},
- GNU4_I686_ALIGNMENT   = {1, 4, 2, 4, 4, 4, 4, 4,  4, 0},
- OSX_10_5_ALIGNMENT    = {1, 4, 2, 4, 4, 4, 4, 4, 16, 0},
- SPARC_ALIGNMENT       = {1, 4, 2, 4, 4, 4, 4, 8,  8, 0},
- XLC32_PPC64_ALIGNMENT = {1, 4, 2, 4, 4, 8, 4, 4,  4, 0},
- CYGWIN_I686_ALIGNMENT = {1, 4, 2, 4, 4, 8, 4, 8,  4, 0},
- GNU3_PPC64_ALIGNMENT  = {1, 4, 2, 4, 4, 8, 4, 8,  8, 0},
- GNU4_PPC64_ALIGNMENT  = {1, 4, 2, 4, 4, 8, 4, 8, 16, 0},
- XLC64_PPC64_ALIGNMENT = {1, 8, 2, 4, 8, 8, 4, 4,  4, 0},
- PGI_X86_64_ALIGNMENT  = {1, 8, 2, 4, 8, 8, 4, 8,  8, 0},
- GNU4_X86_64_ALIGNMENT = {1, 8, 2, 4, 8, 8, 4, 8, 16, 0};
+ TEXT_ALIGNMENT        = {0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0},
+ BYTE_ALIGNMENT        = {1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 0},
+ WORD2_ALIGNMENT       = {1, 2, 1, 2, 2, 2, 2, 2, 2,  2, 0},
+ WORD4_ALIGNMENT       = {1, 4, 1, 4, 4, 4, 4, 4, 4,  4, 0},
+ WORD8_ALIGNMENT       = {4, 8, 1, 8, 8, 8, 8, 8, 8,  8, 8},
+ GNU4_I686_ALIGNMENT   = {1, 4, 1, 2, 4, 4, 4, 4, 4,  4, 0},
+ OSX_10_5_ALIGNMENT    = {1, 4, 1, 2, 4, 4, 4, 4, 4, 16, 0},
+ SPARC_ALIGNMENT       = {1, 4, 1, 2, 4, 4, 4, 4, 8,  8, 0},
+ XLC32_PPC64_ALIGNMENT = {1, 4, 1, 2, 4, 4, 8, 4, 4,  4, 0},
+ CYGWIN_I686_ALIGNMENT = {1, 4, 1, 2, 4, 4, 8, 4, 8,  4, 0},
+ GNU3_PPC64_ALIGNMENT  = {1, 4, 1, 2, 4, 4, 8, 4, 8,  8, 0},
+ GNU4_PPC64_ALIGNMENT  = {1, 4, 1, 2, 4, 4, 8, 4, 8, 16, 0},
+ XLC64_PPC64_ALIGNMENT = {1, 8, 1, 2, 4, 8, 8, 4, 4,  4, 0},
+ PGI_X86_64_ALIGNMENT  = {1, 8, 1, 2, 4, 8, 8, 4, 8,  8, 0},
+ GNU4_X86_64_ALIGNMENT = {1, 8, 1, 2, 4, 8, 8, 4, 8, 16, 0};
 
 /*--------------------------------------------------------------------------*/
 

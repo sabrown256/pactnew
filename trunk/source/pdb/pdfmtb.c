@@ -117,6 +117,8 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
 
 /* _PD_RD_FMT_II - read the primitive data format information from 
  *               - the file header block
+ *               - this is largely ignored in favor of the primitive
+ *               - types in the extras section
  *               -
  *               - Floating Point Format Descriptor
  *               -   format[0] = # of bits per number
@@ -145,17 +147,9 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     if (lio_read(infor+1, (size_t) 1, (size_t) n, file->stream) != n)
        PD_error("FAILED TO READ FORMAT DATA - _PD_RD_FMT_II", PD_OPEN);
     
-/* if n is 35 then we have a library version before 25 when
- * long double support went in
- * until we actually read the system version out of the extras
- * take the last one that did not have long double support
- */
-    if (n < 36)
-       file->system_version = 24;
-
 /* decipher the format data */
-    p             = infor + 1;
-    std           = _PD_mk_standard(file);
+    p   = infor + 1;
+    std = _PD_copy_standard(file->host_std);
 
 /* get the byte lengths in */
     std->ptr_bytes    = *(p++);
@@ -164,10 +158,6 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std->long_bytes   = *(p++);
     std->float_bytes  = *(p++);
     std->double_bytes = *(p++);
-    if (file->system_version < 25)
-       std->quad_bytes = 0;
-    else
-       std->quad_bytes = *(p++);
 
 /* get the integral types byte order in */
     std->short_order = (PD_byte_order) *(p++);
@@ -175,55 +165,26 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std->long_order  = (PD_byte_order) *(p++);
 
 /* get the float byte order in */
-    n     = std->float_bytes;
-    order = std->float_order = FMAKE_N(int, n,
-                                       "_PD_RD_FMT_II:float_order");
-    SC_mark(std->float_order, 1);
+    n = std->float_bytes;
+    REMAKE_N(std->float_order, int, n);
+    order = std->float_order;
     for (j = 0; j < n; j++, *(order++) = *(p++));
 
 /* get the double byte order in */
-    n     = std->double_bytes;
-    order = std->double_order = FMAKE_N(int, n,
-                                        "_PD_RD_FMT_II:double_order");
-    SC_mark(std->double_order, 1);
+    n = std->double_bytes;
+    REMAKE_N(std->double_order, int, n);
+    order = std->double_order;
     for (j = 0; j < n; j++, *(order++) = *(p++));
 
-/* get the quad byte order in */
-    n     = std->quad_bytes;
-    order = std->quad_order = FMAKE_N(int, n,
-                                        "_PD_RD_FMT_II:quad_order");
-    SC_mark(std->quad_order, 1);
-    if (file->system_version < 25)
-       for (j = 0; j < n; j++, *(order++) = 0);
-    else
-       for (j = 0; j < n; j++, *(order++) = *(p++));
-
 /* get the float format data in */
-    n = FORMAT_FIELDS;
-    format = std->float_format = FMAKE_N(long, n,
-                                         "_PD_RD_FMT_II:float_format");
-    SC_mark(std->float_format, 1);
-    n--;
+    n = FORMAT_FIELDS - 1;
+    format = std->float_format;
     for (j = 0; j < n; j++, *(format++) = *(p++));
 
 /* get the double format data in */
-    n = FORMAT_FIELDS;
-    format = std->double_format = FMAKE_N(long, n,
-                                          "_PD_RD_FMT_II:double_format");
-    SC_mark(std->double_format, 1);
-    n--;
+    n = FORMAT_FIELDS - 1;
+    format = std->double_format;
     for (j = 0; j < n; j++, *(format++) = *(p++));
-
-/* get the quad format data in */
-    n = FORMAT_FIELDS;
-    format = std->quad_format = FMAKE_N(long, n,
-					"_PD_RD_FMT_II:quad_format");
-    SC_mark(std->quad_format, 1);
-    n--;
-    if (file->system_version < 25)
-       for (j = 0; j < n; j++, *(format++) = 0);
-    else
-       for (j = 0; j < n; j++, *(format++) = *(p++));
 
 /* read the biases */
     if (_PD_rfgets(infor, MAXLINE, file->stream) == NULL)
@@ -233,11 +194,6 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     format[7] = SC_stol(SC_strtok(infor, "\001", s));
     format    = std->double_format;
     format[7] = SC_stol(SC_strtok(NULL, "\001", s));
-    format    = std->quad_format;
-    if (file->system_version < 25)
-       format[7] = 0;
-    else
-       format[7] = SC_stol(SC_strtok(NULL, "\001", s));
 
     file->std = std;
 
@@ -566,11 +522,11 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
         else 
            {if (conv == FALSE)
                _PD_defstr(file, TRUE, type, kind,
-			  NULL, size, align, ord, FALSE,
+			  NULL, NULL, size, align, ord, FALSE,
                           ordr, formt, unsgned, onescmp);
 
             _PD_defstr(file, FALSE, type, kind,
-		       NULL, size, align, ord, TRUE,
+		       NULL, NULL, size, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}
 
         SFREE(type);};
@@ -587,7 +543,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 int _PD_rd_ext_ii(PDBfile *file)
    {long bsz;
     char *token, *s, *p, *local;
-    data_alignment *pl;
+    data_alignment *palgn;
     data_standard *ps;
     PD_smp_state *pa;
 
@@ -599,7 +555,7 @@ int _PD_rd_ext_ii(PDBfile *file)
     file->system_version = 0;
     SFREE(file->date);
 
-    pl = NULL;
+    palgn = NULL;
 
     local = pa->local;
     bsz   = sizeof(pa->local);
@@ -619,14 +575,14 @@ int _PD_rd_ext_ii(PDBfile *file)
         else if (strcmp(token, "Alignment") == 0)
            {token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
-               pl = _PD_mk_alignment(token);
+               palgn = _PD_mk_alignment(token);
 	    else
 	       return(FALSE);}
 
         else if (strcmp(token, "Struct-Alignment") == 0)
            {token = SC_strtok(NULL, "\n", p);
-            if ((token != NULL) && (pl != NULL))
-	       pl->struct_alignment = atoi(token);}
+            if ((token != NULL) && (palgn != NULL))
+	       palgn->struct_alignment = atoi(token);}
 
         else if (strcmp(token, "Longlong-Format-Alignment") == 0)
            {token = SC_strtok(NULL, "\n", p);
@@ -635,29 +591,29 @@ int _PD_rd_ext_ii(PDBfile *file)
 		if (ps != NULL)
 		   {ps->longlong_bytes = token[0];
 		    ps->longlong_order = (PD_byte_order) token[1];};
-		if (pl != NULL)
-		   pl->longlong_alignment = token[2];};}
+		if (palgn != NULL)
+		   palgn->longlong_alignment = token[2];};}
 
         else if (strcmp(token, "Casts") == 0)
            {long n_casts, i;
-            char **pl;
+            char **sa;
 
             n_casts = N_CASTS_INCR;
-            pl      = FMAKE_N(char *, N_CASTS_INCR, "_PD_RD_EXT_II:cast-list");
+            sa      = FMAKE_N(char *, N_CASTS_INCR, "_PD_RD_EXT_II:cast-list");
             i       = 0L;
             while (_PD_get_token(NULL, local, bsz, '\n'))
                {if (*local == '\002')
                    break;
-                pl[i++] = SC_strsavef(SC_strtok(local, "\001\n", s),
+                sa[i++] = SC_strsavef(SC_strtok(local, "\001\n", s),
                                       "char*:_PD_RD_EXT_II:local1");
-                pl[i++] = SC_strsavef(SC_strtok(NULL, "\001\n", s),
+                sa[i++] = SC_strsavef(SC_strtok(NULL, "\001\n", s),
                                       "char*:_PD_RD_EXT_II:local2");
-                pl[i++] = SC_strsavef(SC_strtok(NULL, "\001\n", s),
+                sa[i++] = SC_strsavef(SC_strtok(NULL, "\001\n", s),
                                       "char*:_PD_RD_EXT_II:local3");
                 if (i >= n_casts)
                    {n_casts += N_CASTS_INCR;
-                    REMAKE_N(pl, char *, n_casts);};};
-            pa->cast_lst = pl;
+                    REMAKE_N(sa, char *, n_casts);};};
+            pa->cast_lst = sa;
             pa->n_casts  = i;}
 
         else if (strcmp(token, "Blocks") == 0)
@@ -708,8 +664,8 @@ int _PD_rd_ext_ii(PDBfile *file)
 /* set the file->align (if pre-PDB_SYSTEM_VERSION 3 use the default
  * alignment)
  */
-    if (pl != NULL)
-       file->align = pl;
+    if (palgn != NULL)
+       file->align = palgn;
     else
        file->align = _PD_copy_alignment(&WORD4_ALIGNMENT);
 
@@ -1083,15 +1039,16 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     pl    = file->align;
     al[0] = pl->char_alignment;
     al[1] = pl->ptr_alignment;
-    al[2] = pl->short_alignment;
-    al[3] = pl->int_alignment;
-    al[4] = pl->long_alignment;
-    al[5] = pl->float_alignment;
-    al[6] = pl->double_alignment;
-    al[7] = pl->quad_alignment;
-    al[8] = '\0';
+    al[2] = pl->bool_alignment;
+    al[3] = pl->short_alignment;
+    al[4] = pl->int_alignment;
+    al[5] = pl->long_alignment;
+    al[6] = pl->float_alignment;
+    al[7] = pl->double_alignment;
+    al[8] = pl->quad_alignment;
+    al[9] = '\0';
 
-    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7] == 0) 
+    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7]*al[8] == 0) 
        return(FALSE);
 
     ok &= _PD_put_string(1, "Alignment:%s\n", al);
@@ -1168,6 +1125,8 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 
 /* _PD_WR_FMT_II - write the primitive data format information to
  *               - the file header block
+ *               - this is largely ignored in favor of the primitive
+ *               - types in the extras section
  *               -
  *               - Floating Point Format Descriptor
  *               -   format[0] = # of bits per number
@@ -1183,7 +1142,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 static int _PD_wr_fmt_ii(PDBfile *file)
    {int j, n, rv, sz, nw;
     int *order;
-    long *format, float_bias, double_bias, quad_bias;
+    long *format, float_bias, double_bias;
     char outfor[MAXLINE];
     char *nht, *p;
     data_standard *std;
@@ -1207,7 +1166,6 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	*(p++) = std->long_bytes;
 	*(p++) = std->float_bytes;
 	*(p++) = std->double_bytes;
-	*(p++) = std->quad_bytes;
 
 /* get the integral types byte order in */
 	*(p++) = std->short_order;
@@ -1222,11 +1180,6 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 /* get the double byte order in */
 	order = std->double_order;
 	n     = std->double_bytes;
-	for (j = 0; j < n; j++, *(p++) = *(order++));
-
-/* get the quad byte order in */
-	order = std->quad_order;
-	n     = std->quad_bytes;
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the float format data in */
@@ -1245,14 +1198,6 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 /* get the double bias in */
 	double_bias = *format;
 
-/* get the quad format data in */
-	format = std->quad_format;
-	n      = FORMAT_FIELDS - 1;
-	for (j = 0; j < n; j++, *(p++) = *(format++));
-
-/* get the quad bias in */
-	quad_bias = *format;
-
 	n         = (int) (p - outfor);
 	outfor[0] = n;
 
@@ -1261,8 +1206,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	   PD_error("FAILED TO WRITE FORMAT DATA - _PD_WR_FMT_II", PD_CREATE);
     
 /* write out the biases */
-	snprintf(outfor, MAXLINE, "%ld\001%ld\001%ld\001\n",
-		 float_bias, double_bias, quad_bias);
+	snprintf(outfor, MAXLINE, "%ld\001%ld\001\n", float_bias, double_bias);
 	n  = strlen(outfor);
 	nw = lio_write(outfor, (size_t) 1, (size_t) n, file->stream);
 	if (nw != n)

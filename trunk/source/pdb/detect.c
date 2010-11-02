@@ -14,6 +14,8 @@
 #undef LONGLONG_MAX
 
 #include "scstd.h"
+#include <complex.h>
+#include <stdbool.h>
 
 #ifdef NO_LONG_LONG
 
@@ -31,7 +33,7 @@
 
 #endif
 
-#define NTYPES 10
+#define NTYPES 14
 
 #define BITS_DEFAULT 8
 
@@ -63,6 +65,18 @@ struct cfloat8
 struct cfloat16
    {char c;
     long double x;} cld;
+struct cbool
+   {char c;
+    bool b;} cb;
+struct ccomplex4
+   {char c;
+    float complex x;} cfc;
+struct ccomplex8
+   {char c;
+    double complex x;} cdc;
+struct ccomplex16
+   {char c;
+    long double complex x;} clc;
 
 /* some machines have an additional alignment for structs
  * this struct will test for such a "feature"
@@ -84,16 +98,8 @@ union ucsil
     long l[2];} bo;
 
 static int 
- fb[40],
- db[40],
- ldb[40],
  size[NTYPES],
  align[NTYPES];
-
-static long 
- ff[8],
- df[8],
- ldf[8];
 
 static char
  int_order[80];
@@ -252,64 +258,16 @@ int find_exp(int *fb, long *ff, unsigned char *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DERIVE_FP_FORMAT - figure out the floating point format */
+/* DERIVE_FLOAT - figure out the float format */
 
-int derive_fp_format(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
-   {int j, szf, szd, szl, first, last;
+int derive_float(int *fb, long *ff)
+   {int j, szf, first, last;
     union ucf {unsigned char c[32]; float f[2];} bofa, bofb, bofc;
-    union ucd {unsigned char c[32]; double d[2];} boda, bodb, bodc;
-    union ucl {unsigned char c[32]; long double l[2];} bola, bolb, bolc;
     float fval, dfv;
-    double dval, ddv;
-    long double lval, ldv;
 
     szf = sizeof(float);
-    szd = sizeof(double);
-    szl = sizeof(long double);
 
     ff[0]  = szf*8;
-    df[0]  = szd*8;
-    ldf[0] = szl*8;
-
-/* get the byte ordering from the double mantissa bytes */
-    dval  = 0.0;
-    ddv   = 1.0;
-    first = -1;
-    last  = -1;
-    for (j = 1; j < szd; j++)
-        {bodb.d[0] = dval;
-
-         dval += ddv;
-         ddv  /= 256.0;
-         boda.d[0] = dval;
-
-         if (j > 1)
-            {if (differ_byte(szd, j, db, bodb.c, boda.c) < szd)
-                last = j;
-             if (first == -1)
-                first = last;};};
-
-    fix_order(szd, db, first, last);
-
-/* get the byte ordering from the long double mantissa bytes */
-    lval  = 0.0;
-    ldv   = 1.0;
-    first = -1;
-    last  = -1;
-    for (j = 1; j < szl; j++)
-        {bolb.l[0] = lval;
-
-         lval += ldv;
-         ldv  /= 256.0;
-         bola.l[0] = lval;
-
-         if (j > 1)
-            {if (differ_byte(szl, j, ldb, bolb.c, bola.c) < szl)
-                last = j;
-             if (first == -1)
-                first = last;};};
-
-    fix_order(szl, ldb, first, last);
 
 /* get the byte ordering from the float mantissa bytes */
     fval  = 0.0;
@@ -335,66 +293,310 @@ int derive_fp_format(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
     bofb.f[0] = 1.0;
     guard_bit(szf, 6, fb, ff, bofa.c, bofb.c);
 
-    boda.d[0] = 0.5;
-    bodb.d[0] = 1.0;
-    guard_bit(szd, 6, db, df, boda.c, bodb.c);
-
-    bola.l[0] = 0.5;
-    bolb.l[0] = 1.0;
-    guard_bit(szl, 6, ldb, ldf, bola.c, bolb.c);
-
 /* find the sign bit */
     bofa.f[0] = -1.0;
     bofb.f[0] = 1.0;
     differ_bit(szf, 3, fb, ff, bofa.c, bofb.c);
 
-    boda.d[0] = -1.0;
-    bodb.d[0] = 1.0;
-    differ_bit(szd, 3, db, df, boda.c, bodb.c);
-
-    bola.l[0] = -1.0;
-    bolb.l[0] = 1.0;
-    differ_bit(szl, 3, ldb, ldf, bola.c, bolb.c);
-
 /* find loc(exponent) */
     ff[4]  = ff[3] + 1;
-    df[4]  = df[3] + 1;
-    ldf[4] = ldf[3] + 1;
 
 /* find loc(mantissa) */
     bofc.f[0] = 1.5;
     differ_bit(szf, 5, fb, ff, bofc.c, bofb.c);
 
+/* adjust loc(mantissa) */
+    ff[5]  -= ff[6];
+
+/* #exponent_bits = loc(mantissa) - loc(exponent) */
+    ff[1]  = ff[5]  - ff[4];
+
+/* #mantissa_bits = #bits - #exponent_bits - loc(sign) - 1 */
+    ff[2]  = ff[0]  - ff[1]  - ff[3] - 1;
+
+/* find exponent bias */
+    find_exp(fb,  ff,  bofb.c);
+
+/* adjust exponent bias */
+    ff[7]  -= ff[6];
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_DOUBLE - figure out the double format */
+
+int derive_double(int *db, long *df)
+   {int j, szd, first, last;
+    union ucd {unsigned char c[32]; double d[2];} boda, bodb, bodc;
+    double dval, ddv;
+
+    szd = sizeof(double);
+
+    df[0]  = szd*8;
+
+/* get the byte ordering from the double mantissa bytes */
+    dval  = 0.0;
+    ddv   = 1.0;
+    first = -1;
+    last  = -1;
+    for (j = 1; j < szd; j++)
+        {bodb.d[0] = dval;
+
+         dval += ddv;
+         ddv  /= 256.0;
+         boda.d[0] = dval;
+
+         if (j > 1)
+            {if (differ_byte(szd, j, db, bodb.c, boda.c) < szd)
+                last = j;
+             if (first == -1)
+                first = last;};};
+
+    fix_order(szd, db, first, last);
+
+/* find the mantissa guard bit for existence */
+    boda.d[0] = 0.5;
+    bodb.d[0] = 1.0;
+    guard_bit(szd, 6, db, df, boda.c, bodb.c);
+
+/* find the sign bit */
+    boda.d[0] = -1.0;
+    bodb.d[0] = 1.0;
+    differ_bit(szd, 3, db, df, boda.c, bodb.c);
+
+/* find loc(exponent) */
+    df[4]  = df[3] + 1;
+
+/* find loc(mantissa) */
     bodc.d[0] = 1.5;
     differ_bit(szd, 5, db, df, bodc.c, bodb.c);
 
+/* adjust loc(mantissa) */
+    df[5]  -= df[6];
+
+/* #exponent_bits = loc(mantissa) - loc(exponent) */
+    df[1]  = df[5]  - df[4];
+
+/* #mantissa_bits = #bits - #exponent_bits - loc(sign) - 1 */
+    df[2]  = df[0]  - df[1]  - df[3] - 1;
+
+/* find exponent bias */
+    find_exp(db,  df,  bodb.c);
+
+/* adjust exponent bias */
+    df[7]  -= df[6];
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_QUAD - figure out the long double format */
+
+int derive_quad(int *ldb, long *ldf)
+   {int j, szl, first, last;
+    union ucl {unsigned char c[32]; long double l[2];} bola, bolb, bolc;
+    long double lval, ldv;
+
+    szl = sizeof(long double);
+
+    ldf[0] = szl*8;
+
+/* get the byte ordering from the long double mantissa bytes */
+    lval  = 0.0;
+    ldv   = 1.0;
+    first = -1;
+    last  = -1;
+    for (j = 1; j < szl; j++)
+        {bolb.l[0] = lval;
+
+         lval += ldv;
+         ldv  /= 256.0;
+         bola.l[0] = lval;
+
+         if (j > 1)
+            {if (differ_byte(szl, j, ldb, bolb.c, bola.c) < szl)
+                last = j;
+             if (first == -1)
+                first = last;};};
+
+    fix_order(szl, ldb, first, last);
+
+/* find the mantissa guard bit for existence */
+    bola.l[0] = 0.5;
+    bolb.l[0] = 1.0;
+    guard_bit(szl, 6, ldb, ldf, bola.c, bolb.c);
+
+/* find the sign bit */
+    bola.l[0] = -1.0;
+    bolb.l[0] = 1.0;
+    differ_bit(szl, 3, ldb, ldf, bola.c, bolb.c);
+
+/* find loc(exponent) */
+    ldf[4] = ldf[3] + 1;
+
+/* find loc(mantissa) */
     bolc.l[0] = 1.5;
     differ_bit(szl, 5, ldb, ldf, bolc.c, bolb.c);
 
 /* adjust loc(mantissa) */
-    ff[5]  -= ff[6];
-    df[5]  -= df[6];
     ldf[5] -= ldf[6];
 
 /* #exponent_bits = loc(mantissa) - loc(exponent) */
-    ff[1]  = ff[5]  - ff[4];
-    df[1]  = df[5]  - df[4];
     ldf[1] = ldf[5] - ldf[4];
 
 /* #mantissa_bits = #bits - #exponent_bits - loc(sign) - 1 */
-    ff[2]  = ff[0]  - ff[1]  - ff[3] - 1;
-    df[2]  = df[0]  - df[1]  - df[3] - 1;
     ldf[2] = ldf[0] - ldf[1] - ldf[3] - 1;
 
 /* find exponent bias */
-    find_exp(fb,  ff,  bofb.c);
-    find_exp(db,  df,  bodb.c);
     find_exp(ldb, ldf, bolb.c);
 
 /* adjust exponent bias */
-    ff[7]  -= ff[6];
-    df[7]  -= df[6];
     ldf[7] -= ldf[6];
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_FP_FORMAT - figure out the floating point format */
+
+int derive_fp_format(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
+   {
+
+    derive_double(db, df);
+    derive_quad(ldb, ldf);
+    derive_float(fb, ff);
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_COMPLEX_FLOAT - figure out the float format */
+
+int derive_complex_float(int *fc)
+   {int i, szc, szf, iprt, rprt;
+    union ucf {unsigned char c[32]; float f[2];} bofa;
+
+    szc = sizeof(float _Complex);
+    szf = sizeof(float);
+
+    fc[0] = szc;
+    fc[1] = szf;
+
+/* get the part ordering from the float complex */
+    bofa.f[0] = 1.0;
+    bofa.f[1] = I;
+
+/* treated as an index into an array of 2 floats find
+ * the real part
+ */
+    for (i = 0; i < szf; i++)
+        {if (bofa.c[i] != 0)
+	    break;};
+    rprt = (i >= szf);
+
+/* the imaginary part */
+    for (i = 0; i < szf; i++)
+        {if (bofa.c[i+szc] != 0)
+	    break;};
+    iprt = (i >= szf);
+
+    fc[2] = rprt;
+    fc[3] = iprt;
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_COMPLEX_DOUBLE - figure out the double format */
+
+int derive_complex_double(int *dc)
+   {int i, szd, szc, iprt, rprt;
+    union ucd {unsigned char c[32]; double _Complex d[2];} boda;
+
+    szc = sizeof(double _Complex);
+    szd = sizeof(double);
+
+    dc[0] = szc;
+    dc[1] = szd;
+
+/* get the part ordering from the double complex */
+    boda.d[0] = 1.0;
+    boda.d[1] = I;
+
+/* treated as an index into an array of 2 doubles find
+ * the real part
+ */
+    for (i = 0; i < szd; i++)
+        {if (boda.c[i] != 0)
+	    break;};
+    rprt = (i >= szd);
+
+/* the imaginary part */
+    for (i = 0; i < szd; i++)
+        {if (boda.c[i+szc] != 0)
+	    break;};
+    iprt = (i >= szd);
+
+    dc[2] = rprt;
+    dc[3] = iprt;
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_COMPLEX_QUAD - figure out the long double format */
+
+int derive_complex_quad(int *lc)
+   {int i, szl, szc, iprt, rprt;
+    union ucd {unsigned char c[32]; long double _Complex l[2];} bola;
+
+    szc = sizeof(long double _Complex);
+    szl = sizeof(long double);
+
+    lc[0] = szc;
+    lc[1] = szl;
+
+/* get the part ordering from the long double complex */
+    bola.l[0] = 1.0;
+    bola.l[1] = I;
+
+/* treated as an index into an array of 2 doubles find
+ * the real part
+ */
+    for (i = 0; i < szl; i++)
+        {if (bola.c[i] != 0)
+	    break;};
+    rprt = (i >= szl);
+
+/* the imaginary part */
+    for (i = 0; i < szl; i++)
+        {if (bola.c[i+szc] != 0)
+	    break;};
+    iprt = (i >= szl);
+
+    lc[2] = rprt;
+    lc[3] = iprt;
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DERIVE_COMPLEX_FORMAT - figure out the complex floating point format */
+
+int derive_complex_format(int *fc, int *dc, int *lc)
+   {
+
+    derive_complex_double(dc);
+    derive_complex_quad(lc);
+    derive_complex_float(fc);
 
     return(0);}
 
@@ -544,8 +746,8 @@ static void print_flt_type(char *type, int sz, int aln,
     char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
-    tfield = 12;
-    sfield = 14;
+    tfield = 20;
+    sfield = 6;
     afield = 11;
 
     tptr  = bf;
@@ -558,7 +760,7 @@ static void print_flt_type(char *type, int sz, int aln,
 
     strncpy(tptr, type, strlen(type));
 
-    snprintf(t, MAXLINE, "%12d", sz);
+    snprintf(t, MAXLINE, "%4d", sz);
     strncpy(sptr, t, strlen(t));
 
     snprintf(t, MAXLINE, "%9d", aln);
@@ -639,6 +841,9 @@ void print_human(int sflag)
 /* print char info */
      print_fix_type("Char", 1, align[0], mfields, CHAR_MIN, CHAR_MAX);
 
+/* print char info */
+     print_fix_type("Bool", size[10], align[10], mfields, false, true);
+
 /* print short info */
      print_fix_type("Short", size[2], align[2], mfields, SHRT_MIN, SHRT_MAX);
 
@@ -660,6 +865,15 @@ void print_human(int sflag)
 
 /* print long double info */
      print_flt_type("Long double", size[8], align[8], mfields, LDBL_MIN, LDBL_MAX);
+
+/* print float complex info */
+     print_flt_type("Float complex", size[11], align[11], mfields, FLT_MIN, FLT_MAX);
+
+/* print double complex info */
+     print_flt_type("Double complex", size[12], align[12], mfields, DBL_MIN, DBL_MAX);
+
+/* print long double complex info */
+     print_flt_type("Long double complex", size[13], align[13], mfields, LDBL_MIN, LDBL_MAX);
 
 /* print optional non-native types */
      if (sflag)
@@ -684,7 +898,7 @@ void print_human(int sflag)
 
 /* PRINT_HEADER - organize the detect output in the form of a c header file */
 
-void print_header(void)
+void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
     {int i;
 
 /* print the floating point ordering info */
@@ -729,6 +943,8 @@ void print_header(void)
            (int)BITS_DEFAULT);
     printf("            %d,                             /* size of pointer */\n", 
            size[1]);
+    printf("            %d,                                /* size of bool */\n", 
+           size[10]);
     printf("            %d, %s,       /* size and order of short */\n", 
            size[2], int_order);
     printf("            %d, %s,         /* size and order of int */\n", 
@@ -747,8 +963,8 @@ void print_header(void)
 
     printf("\n/* Internal DATA_ALIGNMENT */\n");
     printf("data_alignment\n");
-    printf(" INT_ALG = {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d},\n", 
-           align[0], align[1], align[2], align[3], 
+    printf(" INT_ALG = {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d},\n", 
+           align[0], align[1], align[10], align[2], align[3], 
            align[4], align[5], align[6], align[7], align[8],
 	   align[9]);
     printf(" *INT_ALIGNMENT = &INT_ALG;\n");
@@ -777,13 +993,22 @@ static void help(void)
 /* MAIN - start here */
 
 int main(int argc, char **argv)
-   {int ssize[NTYPES], i;
-    int cflag = 0;  /* produce c header style output            */
-    int wflag = 0;  /* produce HTML output suitable for cgi     */
-                    /* the default is to produce human readable */
-                    /* output.                                  */
-    int sflag = 0;  /* print optional size related types        */
-                    /* like size_t and BIGINT                    */
+   {int i, ssize[NTYPES];
+    int cflag, wflag, sflag;
+    int fb[40], db[40], ldb[40];
+    int fc[4], dc[4], lc[4];
+    long ff[8], df[8], ldf[8];
+
+/* produce c header style output */
+    cflag = 0;
+
+/* produce HTML output suitable for cgi
+ * the default is to produce human readable output
+ */
+    wflag = 0;
+
+/* print optional size related types like size_t and BIGINT */
+    sflag = 0;
 
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')
@@ -807,27 +1032,35 @@ int main(int argc, char **argv)
             break;};
 
 /* data type sizes are straightforward */
-    size[0] = sizeof(char);
-    size[1] = sizeof(char *);
-    size[2] = sizeof(short);
-    size[3] = sizeof(int);
-    size[4] = sizeof(long);
-    size[5] = sizeof(BIGINT);
-    size[6] = sizeof(float);
-    size[7] = sizeof(double);
-    size[8] = sizeof(long double);
-    size[9] = 2*sizeof(char);
+    size[0]  = sizeof(char);
+    size[1]  = sizeof(char *);
+    size[2]  = sizeof(short);
+    size[3]  = sizeof(int);
+    size[4]  = sizeof(long);
+    size[5]  = sizeof(BIGINT);
+    size[6]  = sizeof(float);
+    size[7]  = sizeof(double);
+    size[8]  = sizeof(long double);
+    size[9]  = 2*sizeof(char);
+    size[10] = sizeof(bool);
+    size[11] = sizeof(float complex);
+    size[12] = sizeof(double complex);
+    size[13] = sizeof(long double complex);
 
-    ssize[0] = sizeof(cc);
-    ssize[1] = sizeof(cp);
-    ssize[2] = sizeof(cs);
-    ssize[3] = sizeof(ci);
-    ssize[4] = sizeof(cl);
-    ssize[5] = sizeof(cll);
-    ssize[6] = sizeof(cf);
-    ssize[7] = sizeof(cd);
-    ssize[8] = sizeof(cld);
-    ssize[9] = sizeof(ct);
+    ssize[0]  = sizeof(cc);
+    ssize[1]  = sizeof(cp);
+    ssize[2]  = sizeof(cs);
+    ssize[3]  = sizeof(ci);
+    ssize[4]  = sizeof(cl);
+    ssize[5]  = sizeof(cll);
+    ssize[6]  = sizeof(cf);
+    ssize[7]  = sizeof(cd);
+    ssize[8]  = sizeof(cld);
+    ssize[9]  = sizeof(ct);
+    ssize[10] = sizeof(cb);
+    ssize[11] = sizeof(cfc);
+    ssize[12] = sizeof(cdc);
+    ssize[13] = sizeof(clc);
 
 /* first possibility: align <= size (usual case)
  * alignment is difference between struct length and member size:
@@ -849,9 +1082,10 @@ int main(int argc, char **argv)
        strcpy(int_order, "NORMAL_ORDER");
 
     derive_fp_format(fb, db, ldb, ff, df, ldf);
+    derive_complex_format(fc, dc, lc);
 
     if (cflag)
-        print_header();
+        print_header(fb, db, ldb, ff, df, ldf);
     else if (wflag)
         print_html();
     else

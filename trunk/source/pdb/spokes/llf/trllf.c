@@ -174,10 +174,12 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* define to both file and host charts a 64-bit signed integer type */
 	dp = _PD_defstr(file, FALSE, "int64_t", INT_KIND,
-			NULL, 8, 8, file->std->int_order, TRUE,
+			NULL, NULL,
+			8, 8, file->std->int_order, TRUE,
 			NULL, NULL, FALSE, FALSE);
 	dp = _PD_defstr(file, TRUE, "int64_t", INT_KIND,
-			NULL, 8, 8, file->host_std->int_order, TRUE,
+			NULL, NULL,
+			8, 8, file->host_std->int_order, TRUE,
 			NULL, NULL, FALSE, FALSE);
 
 /* define the structs from the LLF header */

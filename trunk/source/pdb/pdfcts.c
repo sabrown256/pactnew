@@ -133,6 +133,10 @@ static int t16(PDBfile *vif)
     char out[MAXLINE], res[MAXLINE];
     char *in;
 
+    memset(a, 0, sizeof(a));
+    memset(out, 0, sizeof(out));
+    memset(res, 0, sizeof(res));
+
     s = expl(1.0L);
     a[0] = s;
     a[1] = 1.0L;

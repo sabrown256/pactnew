@@ -289,6 +289,7 @@ data_standard *_PD_copy_standard(data_standard *src)
 
     std->bits_byte      = src->bits_byte;
     std->ptr_bytes      = src->ptr_bytes;
+    std->bool_bytes     = src->bool_bytes;
     std->short_bytes    = src->short_bytes;
     std->short_order    = src->short_order;
     std->int_bytes      = src->int_bytes;
@@ -380,16 +381,17 @@ data_alignment *_PD_mk_alignment(char *vals)
 
     align->char_alignment     = vals[0];
     align->ptr_alignment      = vals[1];
-    align->short_alignment    = vals[2];
-    align->int_alignment      = vals[3];
-    align->long_alignment     = vals[4];
-    align->longlong_alignment = vals[4];  /* default-equal to long alignment*/
-    align->float_alignment    = vals[5];
-    align->double_alignment   = vals[6];
-    align->quad_alignment     = vals[7];
+    align->bool_alignment     = vals[2];
+    align->short_alignment    = vals[3];
+    align->int_alignment      = vals[4];
+    align->long_alignment     = vals[5];
+    align->longlong_alignment = vals[5];  /* default-equal to long alignment*/
+    align->float_alignment    = vals[6];
+    align->double_alignment   = vals[7];
+    align->quad_alignment     = vals[8];
 
-    if (strlen(vals) > 8)
-       align->struct_alignment = vals[8];
+    if (strlen(vals) > 9)
+       align->struct_alignment = vals[9];
     else
        align->struct_alignment = 0;
 
@@ -583,7 +585,7 @@ void _PD_rl_syment(syment *ep)
 /* _PD_MK_DEFSTR - make a defstr entry for the structure chart */
 
 defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
-		      memdes *lst, long sz, int align,
+		      memdes *lst, multides *tuple, long sz, int align,
 		      PD_byte_order ord, int conv,
 		      int *ordr, long *formt, int unsgned, int onescmp)
    {defstr *dp;
@@ -603,6 +605,7 @@ defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
     dp->order       = ordr;
     dp->format      = formt;
     dp->members     = lst;
+    dp->tuple       = tuple;
 
     if (sz >= 0)
        {dp->size_bits = 0L;
@@ -643,10 +646,16 @@ defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
 /* _PD_DEFSTR_COPY - make a deep copy of a defstr */
 
 defstr* _PD_defstr_copy(defstr *dp)
-   {defstr *copy;
-    memdes *members;
-    int *order;
+   {int *order;
     long *format;
+    defstr *copy;
+    memdes *members;
+    multides *tuple;
+
+    if (dp->tuple != NULL)
+       tuple = _PD_copy_tuple(dp->tuple);
+    else
+       tuple = NULL;
 
     if (dp->members != NULL)
        members = PD_copy_members(dp->members);
@@ -664,7 +673,7 @@ defstr* _PD_defstr_copy(defstr *dp)
        format = NULL;
 
     copy = _PD_mk_defstr(NULL, dp->type, dp->kind,
-			 members, dp->size, 
+			 members, tuple, dp->size, 
 			 dp->alignment, dp->order_flag, dp->convert, 
                          order, format, dp->unsgned, dp->onescmp);
 
@@ -719,6 +728,35 @@ int _PD_ha_rl_defstr(haelem *hp, void *a)
     _PD_rl_defstr(dp);
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_COPY_TUPLE - copy a multides */
+
+multides *_PD_copy_tuple(multides *tuple)
+   {multides *ntuple;
+
+    ntuple = FMAKE(multides, "_PD_COPY_TUPLE:ntuple");
+
+    *ntuple = *tuple;
+
+    ntuple->order = SC_copy_item(tuple->order);
+
+    return(ntuple);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_FREE_TUPLE - free a multides */
+
+void _PD_free_tuple(multides *tuple)
+   {
+
+    SFREE(tuple->order);
+    SFREE(tuple);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

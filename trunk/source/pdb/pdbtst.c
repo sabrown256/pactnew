@@ -863,7 +863,7 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
     err_tot &= err;
 
 /* compare char array */
-    err  = TRUE;
+    err = TRUE;
     for (i = 0; i < N_CHAR; i++)
         err &= (ca_r[i] == ca_w[i]);
 
@@ -892,8 +892,7 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
     err_tot &= err;
 
 /* compare strings */
-    err  = TRUE;
-
+    err = TRUE;
     for (i = 0; i < N_DOUBLE; i++)
         err &= (strcmp(cap_r[i], cap_w[i]) == 0);
 
@@ -904,7 +903,7 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
     err_tot &= err;
 
 /* compare structures */
-    err  = TRUE;
+    err = TRUE;
     for (i = 0; i < N_CHAR; i++)
         {err &= FLOAT_EQUAL(graph_r.x_axis[i], graph_w.x_axis[i]);
          err &= FLOAT_EQUAL(graph_r.y_axis[i], graph_w.y_axis[i]);};
