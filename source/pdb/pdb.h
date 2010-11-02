@@ -104,7 +104,8 @@
  * Version 24 convert to use of SC_array and hasharr instead of
  * SC_dynamic_array and HASHTAB. 02/03/2010
  *
- * Version 25 add support for long double type. 10/25/2010
+ * Version 25 add support for C99 types: long double, boolean,
+ * float complex, double complex, long double complex. 10/25/2010
  *
  */
 
@@ -192,6 +193,7 @@ typedef struct s_data_alignment data_alignment;
 typedef struct s_data_standard data_standard;
 typedef struct s_PD_smp_state PD_smp_state;
 typedef struct s_PDBfile PDBfile;
+typedef struct s_multides multides;
 typedef struct s_dimdes dimdes;
 typedef struct s_memdes memdes;
 typedef struct s_symindir symindir;
@@ -280,6 +282,7 @@ struct BF_FILE_s
 struct s_data_alignment
    {int char_alignment;
     int ptr_alignment;
+    int bool_alignment;
     int short_alignment;
     int int_alignment;
     int long_alignment;
@@ -292,6 +295,7 @@ struct s_data_alignment
 struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
+    int bool_bytes;
     int short_bytes;
     PD_byte_order short_order;
     int int_bytes;
@@ -408,6 +412,22 @@ struct s_PDBfile
 
     int (*wr_fmt)(PDBfile *file);};
 
+/* tuple descriptor - describe a simple compounding of primitive types
+ * enables C99 complex primitives for example
+ * item ordering gives flexibility to possibly support some C++ mendacity
+ */
+struct s_multides
+   {char *type;
+    int ni;
+    int *order;};
+
+#define PD_DEFINE_MULTIDES(_f)      \
+    PD_defstr(_f, "multides",       \
+              "char *type",         \
+              "int ni",             \
+              "int *order",         \
+              LAST)
+
 /* dimension descriptor - describe an array dimension range */
 struct s_dimdes
    {long index_min;
@@ -501,7 +521,8 @@ struct s_defstr
     PD_byte_order order_flag;
     int *order;
     long *format;
-    memdes *members;};
+    memdes *members;
+    multides *tuple;};
 
 #define PD_DEFINE_DEFSTR(_f)       \
     PD_defstr(_f, "defstr",        \
@@ -519,6 +540,7 @@ struct s_defstr
               "int *order",        \
               "long *format",      \
               "memdes *member",    \
+              "multides *tuple",   \
               LAST)
 
 /* indirect reference tag */

@@ -842,9 +842,10 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
 			NO_ORDER, NULL, NULL, FALSE);
 
 #if 0
-        struct_entry = _PD_mk_defstr(NULL, typename, member_entry, 
-                           H5Tget_size(dtid), 0, -1, FALSE, 
-                           NULL, NULL, FALSE, FALSE);
+        struct_entry = _PD_mk_defstr(NULL, typename,
+				     member_entry, NULL,
+				     H5Tget_size(dtid), 0, -1, FALSE, 
+				     NULL, NULL, FALSE, FALSE);
 
         DEBUG1("      type name %s\n", typename);
         DEBUG1("      size %ld\n", (long) H5Tget_size(dtid));

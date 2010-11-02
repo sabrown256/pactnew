@@ -17,6 +17,10 @@
 #define PD_COMPARE_CHAR_STD(eq, a, b, c, d)                                  \
     eq = (c->char_alignment != d->char_alignment)
 
+#define PD_COMPARE_BOOL_STD(eq, a, b, c, d)                                  \
+    eq = ((a->bool_bytes != b->bool_bytes) ||                                \
+	  (c->bool_alignment != d->bool_alignment))
+
 #define PD_COMPARE_SHORT_STD(eq, a, b, c, d)                                 \
    PD_COMPARE_FIX_STD(eq,                                                    \
 		      a->short_bytes,     b->short_bytes,                    \
@@ -378,15 +382,18 @@ void _PD_d_install(PDBfile *file, char *name, defstr *def, int host)
  */
 
 static defstr *_PD_defstr_in(hasharr *chart, char *name, PD_type_kind kind,
-			     memdes *desc, long sz, int align,
+			     memdes *desc, multides *tuple,
+                             long sz, int align,
 			     PD_byte_order ord, int conv,
 			     int *ordr, long *formt, int unsgned, int onescmp)
    {defstr *dp;
 
-    dp = _PD_mk_defstr(chart, name, kind, desc, sz, align, ord, conv,
+    dp = _PD_mk_defstr(chart, name, kind,
+		       desc, tuple,
+		       sz, align, ord, conv,
 		       ordr, formt, unsgned, onescmp);
     if (dp == NULL)
-       PD_error("DEFINITION FAILED - _PD_DEFSTR", PD_GENERIC);
+       PD_error("DEFINITION FAILED - _PD_DEFSTR_IN", PD_GENERIC);
     else
        _PD_d_install_in(name, dp, chart);
 
@@ -400,17 +407,18 @@ static defstr *_PD_defstr_in(hasharr *chart, char *name, PD_type_kind kind,
  */
 
 defstr *_PD_defstr(PDBfile *file, int host, char *name, PD_type_kind kind,
-		   memdes *desc, long sz, int align, PD_byte_order ord,
+		   memdes *desc, multides *tuple,
+		   long sz, int align, PD_byte_order ord,
 		   int conv, int *ordr, long *formt, int unsgned, int onescmp)
    {defstr *dp;
 
     if (host)
        dp = _PD_defstr_in(file->host_chart, name, kind,
-			  desc, sz, align, ord, conv,
+			  desc, tuple, sz, align, ord, conv,
 			  ordr, formt, unsgned, onescmp);
     else
        dp = _PD_defstr_in(file->chart, name, kind,
-			  desc, sz, align, ord, conv,
+			  desc, tuple, sz, align, ord, conv,
 			  ordr, formt, unsgned, onescmp);
 
     return(dp);}
@@ -428,7 +436,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 			int *ordr, long *formt, int flag)
    {int algn, conv;
     long sz;
-    defstr *rv, *dp, *Sdp;
+    defstr *rv, *dp, *sdp;
     memdes *pd, *memb;
     hasharr *chart, *host_chart;
     data_alignment *align, *host_align;
@@ -468,7 +476,9 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 						dp,
 						&memb);};
 
-    dp = _PD_defstr(file, FALSE, name, kind, desc, sz, algn, ord,
+    dp = _PD_defstr(file, FALSE, name, kind,
+		    desc, NULL,
+		    sz, algn, ord,
 	            conv, ordr, formt, FALSE, FALSE);
 
 /* install the type in the host_chart */
@@ -497,10 +507,12 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
  *       these are for non-default primitive types which
  *       have no host representation
  */
-    Sdp = _PD_defstr(file, TRUE, name, kind, desc, sz, algn, NO_ORDER,
+    sdp = _PD_defstr(file, TRUE, name, kind,
+		     desc, NULL,
+		     sz, algn, NO_ORDER,
 		     FALSE, NULL, NULL, FALSE, FALSE);
 
-    rv = flag ? dp : Sdp;
+    rv = flag ? dp : sdp;
 
     return(rv);}
 
@@ -732,7 +744,8 @@ void _PD_init_chrt(PDBfile *file)
     ret = PD_inquire_type(file, "function");
     if (ret == NULL)
        {ret = PD_inquire_type(file, "*");
-	dp  = _PD_mk_defstr(fchrt, "function", NON_CONVERT_KIND, NULL,
+	dp  = _PD_mk_defstr(fchrt, "function", NON_CONVERT_KIND,
+			    NULL, NULL,
 			    ret->size, ret->alignment, ret->order_flag,
 			    ret->convert, NULL, NULL, FALSE, FALSE);
 	if (dp == NULL)
@@ -742,7 +755,8 @@ void _PD_init_chrt(PDBfile *file)
 	_PD_d_install(file, "function", dp, FALSE);};
 
     ret = PD_inquire_host_type(file, "*");
-    dp  = _PD_mk_defstr(hchrt, "function", NON_CONVERT_KIND, NULL,
+    dp  = _PD_mk_defstr(hchrt, "function", NON_CONVERT_KIND,
+			NULL, NULL,
 			ret->size, ret->alignment, ret->order_flag,
 			ret->convert, NULL, NULL, FALSE, FALSE);
     if (dp == NULL)
@@ -765,7 +779,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     int flag)
    {int conv;
 
-    _PD_defstr_in(chart, "*", INT_KIND, NULL, (long) fstd->ptr_bytes, 
+    _PD_defstr_in(chart, "*", INT_KIND, NULL, NULL, (long) fstd->ptr_bytes, 
                   falign->ptr_alignment, fstd->int_order,
 		  TRUE, NULL, NULL, 0, 0);
 
@@ -774,23 +788,32 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "char", CHAR_KIND,
-		  NULL, 1L, falign->char_alignment, 
+		  NULL, NULL, 1L, falign->char_alignment, 
                   NO_ORDER, conv, NULL, NULL, FALSE, FALSE);
     _PD_defstr_in(chart, "u_char", CHAR_KIND,
-		  NULL, 1L, falign->char_alignment, 
+		  NULL, NULL, 1L, falign->char_alignment, 
                   NO_ORDER, conv, NULL, NULL, TRUE, FALSE);
+
+    if (flag)
+       {PD_COMPARE_BOOL_STD(conv, fstd, hstd, falign, halign);}
+    else
+       conv = FALSE;
+    _PD_defstr_in(chart, "bool", INT_KIND,
+		  NULL, NULL, (long) fstd->bool_bytes,
+		  falign->bool_alignment, NO_ORDER,
+		  conv, NULL, NULL, FALSE, FALSE);
 
     if (flag)
        {PD_COMPARE_SHORT_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "short", INT_KIND,
-		  NULL, (long) fstd->short_bytes, 
+		  NULL, NULL, (long) fstd->short_bytes, 
                   falign->short_alignment, fstd->short_order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_short", INT_KIND,
-		  NULL, (long) fstd->short_bytes, 
+		  NULL, NULL, (long) fstd->short_bytes, 
                   falign->short_alignment, fstd->short_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
@@ -799,12 +822,12 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "int", INT_KIND,
-		  NULL, (long) fstd->int_bytes, 
+		  NULL, NULL, (long) fstd->int_bytes, 
                   falign->int_alignment, fstd->int_order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_int", INT_KIND,
-		  NULL, (long) fstd->int_bytes, 
+		  NULL, NULL, (long) fstd->int_bytes, 
                   falign->int_alignment, fstd->int_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
@@ -813,12 +836,12 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "integer", INT_KIND,
-		  NULL, (long) fstd->int_bytes, 
+		  NULL, NULL, (long) fstd->int_bytes, 
                   falign->int_alignment, fstd->int_order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_integer", INT_KIND,
-		  NULL, (long) fstd->int_bytes, 
+		  NULL, NULL, (long) fstd->int_bytes, 
                   falign->int_alignment, fstd->int_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
@@ -827,12 +850,12 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "long", INT_KIND,
-		  NULL, (long) fstd->long_bytes, 
+		  NULL, NULL, (long) fstd->long_bytes, 
                   falign->long_alignment, fstd->long_order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_long", INT_KIND,
-		  NULL, (long) fstd->long_bytes, 
+		  NULL, NULL, (long) fstd->long_bytes, 
                   falign->long_alignment, fstd->long_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
@@ -841,21 +864,22 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "long_long", INT_KIND,
-		  NULL, (long) fstd->longlong_bytes, 
+		  NULL, NULL, (long) fstd->longlong_bytes, 
                   falign->longlong_alignment, fstd->longlong_order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_long_long", INT_KIND,
-		  NULL, (long) fstd->longlong_bytes, 
+		  NULL, NULL, (long) fstd->longlong_bytes, 
                   falign->longlong_alignment, fstd->longlong_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
+/* floating point types */
     if (flag)
        {PD_COMPARE_FLT_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "float", FLOAT_KIND,
-		  NULL, (long) fstd->float_bytes, 
+		  NULL, NULL, (long) fstd->float_bytes, 
                   falign->float_alignment, NO_ORDER,
 		  conv, fstd->float_order,
 	          fstd->float_format, FALSE, FALSE);
@@ -865,7 +889,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "double", FLOAT_KIND,
-		  NULL, (long) fstd->double_bytes, 
+		  NULL, NULL, (long) fstd->double_bytes, 
                   falign->double_alignment, NO_ORDER,
 		  conv, fstd->double_order,
 	          fstd->double_format, FALSE, FALSE);
@@ -875,7 +899,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        conv = FALSE;
     _PD_defstr_in(chart, "long_double", FLOAT_KIND,
-		  NULL, (long) fstd->quad_bytes, 
+		  NULL, NULL, (long) fstd->quad_bytes, 
                   falign->quad_alignment, NO_ORDER,
 		  conv, fstd->quad_order,
 	          fstd->quad_format, FALSE, FALSE);
@@ -1299,9 +1323,13 @@ void _PD_add_free_space(PDBfile *file, BIGINT address, BIGINT size)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_GET_FREE_SPACE - compute size of free space in FILE */
+
 BIGINT _PD_get_free_space(PDBfile *file, BIGINT size)
-   {BIGINT ret = 0;
+   {BIGINT ret;
     PD_disk_block *free, *prev, *save;
+
+    ret = 0;
 
     if ((file->free_list != NULL) && (size > 0))
        if (size <= file->free_list->length)
@@ -1332,7 +1360,6 @@ BIGINT _PD_get_free_space(PDBfile *file, BIGINT size)
                    SFREE(prev);};};} 
 
     return(ret);} 
-                
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

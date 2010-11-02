@@ -1878,13 +1878,15 @@ static object *_SXI_write_defstr(object *argl)
     if (desc == NULL)
        {if (PD_inquire_table_type(file->chart, dp->type) == NULL)
            _PD_defstr(file, FALSE, dp->type, dp->kind,
-		      desc, dp->size, dp->alignment,
+		      desc, NULL,
+		      dp->size, dp->alignment,
 		      dp->order_flag, dp->convert, dp->order, dp->format, 
 		      dp->unsgned, dp->onescmp);
 
         if (PD_inquire_table_type(file->host_chart, dp->type) == NULL)
            _PD_defstr(file, TRUE, dp->type, dp->kind,
-		      desc, dp->size, dp->alignment,
+		      desc, NULL,
+		      dp->size, dp->alignment,
 		      dp->order_flag, dp->convert, dp->order, dp->format, 
 		      dp->unsgned, dp->onescmp);}
 

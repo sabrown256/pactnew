@@ -242,8 +242,8 @@ static int run_test(PFTest test, int n, char *host)
     if (native_only == FALSE)
        {m = PD_target_n_platforms();
 	for (i = 0; i < m; i++)
-	    {rv = PD_target_platform_n(m);
-	     nm = PD_target_platform_name(m);
+	    {rv = PD_target_platform_n(i);
+	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
 	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};

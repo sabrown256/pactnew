@@ -35,7 +35,7 @@ SaveFiles = *.c *.h *.f
 CleanFiles  = *~ core ${IncDir}/pdform.h ${PACTTmpDir}/pdform.h
 RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
-              ${BinDir}/pdfrts \
+              ${BinDir}/pdfrts ${BinDir}/pdctst \
               ${BinDir}/pdlsts ${BinDir}/pdnormtst ${BinDir}/pdcsts \
               ${BinDir}/pdftst ${BinDir}/pdfhyts ${BinDir}/pdntst   \
               ${BinDir}/pdb2hdf ${BinDir}/pdsmp ${BinDir}/pddpts    \
@@ -141,6 +141,7 @@ Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
        ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
        ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
        ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${BinDir}/pdfcts \
+       ${BinDir}/pdctst \
        ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
@@ -150,6 +151,10 @@ Lst : ${BinDir}/pdlsts
 ${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs}
 	${CC} -c pdbtst.c -o ${PACTTmpDir}/pdbtst.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/pdbtst.o -o ${BinDir}/pdbtst ${Libs}
+
+${BinDir}/pdctst : pdctst.c ${InstallDep} ${Hdrs}
+	${CC} -c pdctst.c -o ${PACTTmpDir}/pdctst.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/pdctst.o -o ${BinDir}/pdctst ${Libs}
 
 ${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs}
 	${CC} -c pdatst.c -o ${PACTTmpDir}/pdatst.o

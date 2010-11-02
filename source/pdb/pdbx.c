@@ -376,6 +376,11 @@ int PD_def_pdb_types(PDBfile *file)
     if (_PD_block_define(file) == FALSE)
        return(FALSE);
 
+    dp = PD_DEFINE_MULTIDES(file);
+    if (dp == NULL)
+       {PD_error("COULDN'T MAXLINE MULTIDES - PD_DEF_PDB_TYPES", PD_GENERIC);
+        return(FALSE);};
+
     dp = PD_DEFINE_DIMDES(file);
     if (dp == NULL)
        {PD_error("COULDN'T MAXLINE DIMDES - PD_DEF_PDB_TYPES", PD_GENERIC);

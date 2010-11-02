@@ -25,9 +25,14 @@ if ("$Valgrind" == "") then
 
 # scan prime number buffer sizes
    @ lerr = 0
-   foreach n ( 3 13 127 4093 32749 )
+
+#   foreach n ( 3 13 127 4093 32749 )
+#      set fill = `fill-string -n 32 $n`
+#      flog $LogF $CFE pdbtst -n -b $n
+
+   foreach n ( 13 127 4093 32749 )
       set fill = `fill-string -n 32 $n`
-      flog $LogF $CFE pdbtst -n -b $n
+      flog $LogF $CFE pdbtst -n -b $n -v $tst
       set xstatus = $status
       if (($xstatus == 254) || ($xstatus == 255)) then
          NoteD $LogF "                        $fill (omitted)"
