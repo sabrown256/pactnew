@@ -245,7 +245,7 @@ data_standard
                 8, float8_vax, float8_vax_order},         /* quad definition */
  CRAY_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
-                8,                                           /* size of bool */
+                1,                                           /* size of bool */
                 8, NORMAL_ORDER,                  /* size and order of short */
                 8, NORMAL_ORDER,                    /* size and order of int */
                 8, NORMAL_ORDER,                   /* size and order of long */
@@ -509,27 +509,92 @@ void _PD_insert_field(long inl, int nb, char *out,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_REORDER - given a pointer to an array ARR with NITEMS of NBYTES each
+/* _PD_REQUIRE_CONV - return TRUE iff conversion between file type DPF and
+ *                  - host type DPH is required
+ */
+
+int _PD_require_conv(defstr *dpf, defstr *dph)
+   {int i, ni, lreorder, lreformat, ltuple, cnv;
+    int bpif, bpih;
+    int *ordf, *ordh;
+    long *fmtf, *fmth;
+    multides *tupf, *tuph;
+
+    cnv = dpf->convert;
+
+    if (cnv == -1)
+       {ordf = dpf->order;
+	fmtf = dpf->format;
+	bpif = dpf->size;
+	tupf = dpf->tuple;
+
+	ordh = dph->order;
+	fmth = dph->format;
+	bpih = dph->size;
+	tuph = dph->tuple;
+
+	lreorder = (bpif != bpih);
+	if ((ordf != NULL) && (ordh != NULL))
+	   {for (i = 0; (i < bpif) && (lreorder == FALSE); i++)
+	        lreorder = (ordf[i] != ordh[i]);};
+
+	lreformat = FALSE;
+	if ((fmtf != NULL) && (fmth != NULL))
+	   {for (i = 0; (i < 8) && (lreformat == FALSE); i++)
+	        lreformat = (fmtf[i] != fmth[i]);};
+
+	ltuple = FALSE;
+	if ((tupf != NULL) && (tuph != NULL))
+	   {ltuple = (tupf->ni != tuph->ni);
+	    ni     = tupf->ni;
+	    if ((tupf->order != NULL) && (tuph->order != NULL))
+	       {for (i = 0; (i < ni) && (ltuple == FALSE); i++)
+		    ltuple = (tupf->order[i] != tuph->order[i]);};};
+
+	cnv = FALSE;
+
+	cnv |= (dpf->kind        != dph->kind);
+	cnv |= (dpf->size_bits   != dph->size_bits);
+	cnv |= (dpf->size        != dph->size);
+	cnv |= (dpf->alignment   != dph->alignment);
+	cnv |= (dpf->n_indirects != dph->n_indirects);
+	cnv |= (dpf->is_indirect != dph->is_indirect);
+	cnv |= (dpf->onescmp     != dph->onescmp);
+	cnv |= (dpf->unsgned     != dph->unsgned);
+	cnv |= (dpf->order_flag  != dph->order_flag);
+
+	cnv |= lreorder;
+	cnv |= lreformat;
+	cnv |= ltuple;
+
+	dpf->convert = cnv;};
+
+    return(cnv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_REORDER - given a pointer to an array ARR with NI items of BPI each
  *             - put them in the order defined by ORD
  */
 
-static void _PD_reorder(char *arr, long nitems, int nbytes, int *ord)
-   {char local[MAXLINE];
-    int j, lreorder;
+static void _PD_reorder(char *arr, long ni, int bpi, int *ord)
+   {int i, lreorder;
+    char local[MAXLINE];
 
     lreorder = FALSE;
 
-    for (j = 0; j < nbytes; j++)
-        if (ord[j] != (j+1))
+    for (i = 0; i < bpi; i++)
+        if (ord[i] != (i+1))
            {lreorder = TRUE;
              break;}
 
-    if (lreorder)
-       {for (; nitems > 0; nitems--)
-           {arr--;
-            for (j = 0; j < nbytes; local[j] = arr[ord[j]], j++);
-            arr++;
-            for (j = 0; j < nbytes; *(arr++) = local[j++]);};}
+    if (lreorder == TRUE)
+       {for (; ni > 0; ni--)
+	    {arr--;
+	     for (i = 0; i < bpi; local[i] = arr[ord[i]], i++);
+	     arr++;
+	     for (i = 0; i < bpi; *(arr++) = local[i++]);};};
 
     return;}
 
@@ -543,8 +608,8 @@ static void _PD_reorder(char *arr, long nitems, int nbytes, int *ord)
 
 static void _PD_byte_align(char *out, char *in, long nitems,
 			   long *infor, int *inord, int boffs)
-   {long nbitsin, inrem;
-    int chunk1, chunk2, outbytes, remainder, i;
+   {int chunk1, chunk2, outbytes, remainder, i;
+    long nbitsin, inrem;
     unsigned char *inptr, *outptr;
     unsigned char mask1, mask2;
  
@@ -1426,7 +1491,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
     for (i = 0; i < 8; i++)
         {if (infor[i] != outfor[i])
             {lreformat = TRUE;
-             break;};}
+             break;};};
 
     if (lreformat == FALSE)
 
@@ -1435,7 +1500,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
         for (i = 0; i < bpii; i++)
             {if (inord[i] != outord[i])
                 {lreorder = TRUE;
-                 break;};}
+                 break;};};
 
 /* reorder bytes and return if only difference is in byte order */
         if (lreorder == TRUE)
@@ -1943,22 +2008,26 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     char *inty, *outty, *delim;
     PD_type_kind iknd, oknd;
     PD_byte_order isord, osord, lsord, inord, outord;
+    multides *itup, *otup;
 
     inty    = idp->type;
-    outty   = odp->type;
-    inbts   = idp->size_bits;
     iknd    = idp->kind;
-    oknd    = odp->kind;
     inb     = idp->size;
-    onb     = odp->size;
     iaord   = idp->order;
-    oaord   = odp->order;
     isord   = idp->order_flag;
-    osord   = odp->order_flag;
     ifmt    = idp->format;
-    ofmt    = odp->format;
-    onescmp = idp->onescmp;
+    itup    = idp->tuple;
     iusg    = idp->unsgned;
+    inbts   = idp->size_bits;
+    onescmp = idp->onescmp;
+
+    outty   = odp->type;
+    oknd    = odp->kind;
+    onb     = odp->size;
+    oaord   = odp->order;
+    osord   = odp->order_flag;
+    ofmt    = odp->format;
+    otup    = odp->tuple;
     ousg    = odp->unsgned;
 
     if ((strchr(inty, '*') != NULL) || (strchr(outty, '*') != NULL))
@@ -2010,8 +2079,8 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* if direct types are the same and non-converting just copy them over */
     else if ((strcmp(odp->type, idp->type) == 0) &&
-	(odp->convert == 0) && (idp->convert == 0) &&
-	(nbi == nbo))
+	     (odp->convert == 0) && (idp->convert == 0) &&
+	     (nbi == nbo))
        {_PD_ncopy(out, in, nitems, inb);
 
         *pin_offs  += nbi;

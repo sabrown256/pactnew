@@ -93,7 +93,7 @@ static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
     _PD_set_standard(file, &TEXT_STD, &TEXT_ALIGNMENT);
 
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
     fp = NULL;
 
@@ -162,7 +162,7 @@ static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
     _PD_set_standard(file, &TEXT_STD, &TEXT_ALIGNMENT);
 
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
     fp = NULL;
 

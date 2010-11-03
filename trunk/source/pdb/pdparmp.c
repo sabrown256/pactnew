@@ -1438,25 +1438,30 @@ static void _PD_pfm_setup_mp_file_d(PDBfile *file, SC_communicator comm)
 
 static BIGINT _PD_next_address_d(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
-   {int flag;
-    BIGINT addr;
+   {int flag, ipt;
     size_t nb, bpi;
+    BIGINT addr;
+    defstr *dpf;
 
     DBG("+ _PD_next_address_d");
 
     flag = ((file->mpi_mode == TRUE)  ||
             (!file->mpi_file)) ? FALSE : TRUE;
 
+    dpf = _PD_lookup_type(type, file->chart);
+    ipt = _PD_items_per_tuple(dpf);
+
     if (vr == NULL)
        {bpi  = _PD_lookup_size(type, file->chart);
-	nb   = number*bpi;
+	nb   = number*ipt*bpi;
 	addr = _PD_GETSPACE(file, nb, flag, colf);
 
 	if (seekf)
-	   _PD_set_current_address(file, addr+nb, SEEK_SET, -1);}
+	   _PD_set_current_address(file, addr+nb, SEEK_SET, PD_GENERIC);}
 
     else
        {nb   = PD_sizeof(file, type, number, vr);
+	nb  *= ipt;
 	addr = _PD_GETSPACE(file, nb, flag, colf);};
 
     DBG("- _PD_next_address_d");

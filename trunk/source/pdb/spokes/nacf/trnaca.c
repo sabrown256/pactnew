@@ -532,7 +532,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 	_PD_set_standard(file, &CRAY_STD, &WORD8_ALIGNMENT);
 
-	_PD_init_chrt(file);
+	_PD_init_chrt(file, TRUE);
 
 	_PD_conv_in(file, SS_params, &str[16], "long", 8L);
 

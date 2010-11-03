@@ -184,7 +184,7 @@ PDBfile *PD_open_vif(char *name)
 
     _PD_set_standard(file, NULL, NULL);
 
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
 /* initialize the starting address for writing */
     _PD_SET_ADDRESS(file, file->chrtaddr);

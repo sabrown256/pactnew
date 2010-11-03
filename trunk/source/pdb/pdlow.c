@@ -571,7 +571,9 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
        {if (size <= sizeof(float))
 	   ndp = PD_inquire_host_type(file, "float");
         else if (size <= sizeof(double))
-	   ndp = PD_inquire_host_type(file, "double");}
+	   ndp = PD_inquire_host_type(file, "double");
+        else if (size <= sizeof(long double))
+	   ndp = PD_inquire_host_type(file, "long_double");}
 
     else if ((dp->format == NULL) && (dp->order_flag != NO_ORDER))
        {if (size <= sizeof(char))
@@ -584,6 +586,24 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 	   ndp = PD_inquire_host_type(file, "long");};
 
     return(ndp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_ITEMS_PER_TUPLE - return the number of items in a tuple */
+
+int _PD_items_per_tuple(defstr *dp)
+   {int ipt;
+    multides *tuple;
+
+    ipt = 1;
+
+    if (dp != NULL)
+       {tuple = dp->tuple;
+	if (tuple != NULL)
+	   ipt = tuple->ni;};
+
+    return(ipt);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -709,9 +729,11 @@ void _PD_init_consts(void)
 
 /* _PD_INIT_CHRT - initialize the charts with the primitives
  *               - NOTE: define both int and integer!!!!!!!!!!!!!!!!!!!!
+ *               - if file types are unknown (FTK) then we cannot determine
+ *               - whether or not file types need conversion
  */
 
-void _PD_init_chrt(PDBfile *file)
+void _PD_init_chrt(PDBfile *file, int ftk)
    {hasharr *fchrt, *hchrt;
     defstr *ret, *dp;
     data_standard *fstd, *hstd;
@@ -728,8 +750,8 @@ void _PD_init_chrt(PDBfile *file)
     hstd   = file->host_std;
     halign = file->host_align;
 
-    _PD_setup_chart(fchrt, fstd, hstd, falign, halign, TRUE);
-    _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, FALSE);
+    _PD_setup_chart(fchrt, fstd, hstd, falign, halign, TRUE, ftk);
+    _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, FALSE, ftk);
 
     if (sizeof(REAL) == sizeof(double))
        PD_typedef(file, "double", "REAL");
@@ -776,15 +798,21 @@ void _PD_init_chrt(PDBfile *file)
 
 void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     data_alignment *falign, data_alignment *halign,
-		     int flag)
-   {int conv;
+		     int flag, int ftk)
+   {int conv, fcnv, dcnv, qcnv;
+    multides *tup;
+
+    flag = (hstd != NULL);
 
     _PD_defstr_in(chart, "*", INT_KIND, NULL, NULL, (long) fstd->ptr_bytes, 
                   falign->ptr_alignment, fstd->int_order,
 		  TRUE, NULL, NULL, 0, 0);
 
-    if (flag)
-       {PD_COMPARE_CHAR_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_CHAR_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "char", CHAR_KIND,
@@ -794,8 +822,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  NULL, NULL, 1L, falign->char_alignment, 
                   NO_ORDER, conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_BOOL_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_BOOL_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "bool", INT_KIND,
@@ -803,8 +834,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  falign->bool_alignment, NO_ORDER,
 		  conv, NULL, NULL, FALSE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_SHORT_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_SHORT_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "short", INT_KIND,
@@ -817,8 +851,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
                   falign->short_alignment, fstd->short_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_INT_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_INT_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "int", INT_KIND,
@@ -831,8 +868,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
                   falign->int_alignment, fstd->int_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_INT_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_INT_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "integer", INT_KIND,
@@ -845,8 +885,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
                   falign->int_alignment, fstd->int_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_LONG_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_LONG_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "long", INT_KIND,
@@ -859,8 +902,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
                   falign->long_alignment, fstd->long_order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_LONGLONG_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_LONGLONG_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
     _PD_defstr_in(chart, "long_long", INT_KIND,
@@ -874,34 +920,65 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 	          conv, NULL, NULL, TRUE, FALSE);
 
 /* floating point types */
-    if (flag)
-       {PD_COMPARE_FLT_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_FLT_STD(fcnv, fstd, hstd, falign, halign);}
     else
-       conv = FALSE;
+       fcnv = FALSE;
     _PD_defstr_in(chart, "float", FLOAT_KIND,
 		  NULL, NULL, (long) fstd->float_bytes, 
                   falign->float_alignment, NO_ORDER,
-		  conv, fstd->float_order,
+		  fcnv, fstd->float_order,
 	          fstd->float_format, FALSE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_DBL_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_DBL_STD(dcnv, fstd, hstd, falign, halign);}
     else
-       conv = FALSE;
+       dcnv = FALSE;
     _PD_defstr_in(chart, "double", FLOAT_KIND,
 		  NULL, NULL, (long) fstd->double_bytes, 
                   falign->double_alignment, NO_ORDER,
-		  conv, fstd->double_order,
+		  dcnv, fstd->double_order,
 	          fstd->double_format, FALSE, FALSE);
 
-    if (flag)
-       {PD_COMPARE_DBL_STD(conv, fstd, hstd, falign, halign);}
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   conv = -1;
+        else
+	   PD_COMPARE_QUD_STD(qcnv, fstd, hstd, falign, halign);}
     else
-       conv = FALSE;
+       qcnv = FALSE;
     _PD_defstr_in(chart, "long_double", FLOAT_KIND,
 		  NULL, NULL, (long) fstd->quad_bytes, 
                   falign->quad_alignment, NO_ORDER,
-		  conv, fstd->quad_order,
+		  qcnv, fstd->quad_order,
+	          fstd->quad_format, FALSE, FALSE);
+
+/* complex types */
+    tup = _PD_make_tuple("float", 2, NULL);
+    _PD_defstr_in(chart, "float_complex", FLOAT_KIND,
+		  NULL, tup, (long) fstd->float_bytes, 
+                  falign->float_alignment, NO_ORDER,
+		  fcnv, fstd->float_order,
+	          fstd->float_format, FALSE, FALSE);
+
+    tup = _PD_make_tuple("double", 2, NULL);
+    _PD_defstr_in(chart, "double_complex", FLOAT_KIND,
+		  NULL, tup, (long) fstd->double_bytes, 
+                  falign->double_alignment, NO_ORDER,
+		  dcnv, fstd->double_order,
+	          fstd->double_format, FALSE, FALSE);
+
+    tup = _PD_make_tuple("long_double", 2, NULL);
+    _PD_defstr_in(chart, "long_double_complex", FLOAT_KIND,
+		  NULL, tup, (long) fstd->quad_bytes, 
+                  falign->quad_alignment, NO_ORDER,
+		  qcnv, fstd->quad_order,
 	          fstd->quad_format, FALSE, FALSE);
 
     return;}

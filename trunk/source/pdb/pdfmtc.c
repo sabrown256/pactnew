@@ -204,12 +204,14 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 /* _PD_RD_PRIM_TYP_III - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
-   {int align, host_empty;
-    int *ordr, unsgned, onescmp;
+   {int ni, align, host_empty;
+    int unsgned, onescmp;
+    int *ordr, *aord;
     long i, size, conv, bsz;
     long *formt;
-    char *token, *type, *origtype, *s, *local;
+    char *token, *type, *origtype, *atype, *s, *local;
     defstr *dp;
+    multides *tuple;
     PD_type_kind kind;
     PD_byte_order ord, ordo;
     PD_smp_state *pa;
@@ -226,7 +228,7 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
     file->align = _PD_copy_alignment(&WORD4_ALIGNMENT);
 
 /* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, FALSE);
 
     while (_PD_get_token(NULL, local, bsz, '\n'))
        {if (*local == '\0')
@@ -246,6 +248,7 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
         conv     = TRUE;
 	kind     = NON_CONVERT_KIND;
 	origtype = NULL;
+	tuple    = NULL;
 
         while ((token = SC_strtok(NULL, "(|;\n", s)) != NULL)
 	   {token = SC_trim_left(token, " \n");
@@ -285,6 +288,16 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
 		for (i = 0L; i < 8; i++)
 		    formt[i] = SC_stol(SC_strtok(NULL, ",)|", s));
 		kind = FLOAT_KIND;}
+
+	    else if (strncmp(token, "TUPLE", 5) == 0)
+	       {atype = SC_strtok(NULL, ",)|", s);
+	        ni    = SC_stol(SC_strtok(NULL, ",)|", s));
+		aord  = FMAKE_N(int, ni, "_PD_RD_PRIM_TYP_III:aord");
+		for (i = 0L; i < ni; i++)
+		    aord[i] = SC_stol(SC_strtok(NULL, ",)|", s));
+		if (aord[0] == -1)
+		   {SFREE(aord);};
+		tuple = _PD_make_tuple(atype, ni, aord);}
 
 	    else if (strncmp(token, "CHAR", 4) == 0)
 	       kind = CHAR_KIND;
@@ -330,12 +343,12 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
 	   {dp = PD_inquire_host_type(file, type);
 	    if ((conv == FALSE) && (dp == NULL))
                _PD_defstr(file, TRUE, type, kind,
-			  NULL, NULL,
+			  NULL, tuple,
 			  size, align, ord, FALSE,
                           ordr, formt, unsgned, onescmp);
 
             _PD_defstr(file, FALSE, type, kind,
-		       NULL, NULL,
+		       NULL, tuple,
 		       size, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}
 
@@ -741,12 +754,13 @@ static int _PD_rd_ext_iii(PDBfile *file)
  */
 
 static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
-   {int ok, l, nofl, rofl;
+   {int ni, ok, l, nofl, rofl;
     int *ordr;
     long i, j, n;
     long *formt;
     char *nm;
     defstr *dp;
+    multides *tuple;
 
     ok = TRUE;
     l  = 0;
@@ -758,7 +772,7 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
 	    continue;
 
 /* NOTE: use nm instead of dp->type or PD_typedef's won't work */
-	 ok &= _PD_put_string(l++, "   %-14s %6ld %3d  ",
+	 ok &= _PD_put_string(l++, "   %-20s %6ld %3d  ",
 			      nm,
 			      dp->size,
 			      dp->alignment);
@@ -818,6 +832,23 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
 		  break;
 	     default :
 		  break;};
+
+/* write the tuple info */
+	 tuple = dp->tuple;
+	 if (tuple != NULL)
+	    {ni   = tuple->ni;
+	     ordr = tuple->order;
+	     ok  &= _PD_put_string(l++, "|TUPLE(");
+	     ok  &= _PD_put_string(l++, "%s,%d,", tuple->type, ni);
+	     if (ordr == NULL)
+	        ok &= _PD_put_string(l++, "-1");
+	     else
+	        {for (j = 0L; j < ni; j++)
+		     {if (j == 0)
+			 ok &= _PD_put_string(l++, "%d", ordr[j]);
+		      else
+			 ok &= _PD_put_string(l++, ",%d", ordr[j]);};};
+	     ok &= _PD_put_string(l++, ")");};
 
 /* write the unsgned flag */
 	 if (dp->unsgned == TRUE)
@@ -1300,7 +1331,7 @@ static int _PD_create_iii(PDBfile *file, int mst)
 	file->chrtaddr = 0L;};
 
 /* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
     file->use_itags = ITAGS;
 
