@@ -352,6 +352,9 @@ extern int
 
 /* PDCONV.C declarations */
 
+extern int
+ _PD_require_conv(defstr *dpf, defstr *dph);
+
 extern void
  _PD_convert_ascii(char *out, char *in, long nitems, int bpci, int offs),
  _PD_iconvert(char **out, char **in, long nitems,
@@ -464,10 +467,10 @@ extern void
  _PD_set_io_buffer(SC_udl *pu),
  _PD_set_standard(PDBfile *file, data_standard *std, data_alignment *algn),
  _PD_init_consts(void),
- _PD_init_chrt(PDBfile *file),
+ _PD_init_chrt(PDBfile *file, int ftk),
  _PD_setup_chart(hasharr *chart, data_standard *fstd,
 		 data_standard *hstd, data_alignment *falign,
-		 data_alignment *halign, int flag),
+		 data_alignment *halign, int flag, int ftk),
  _PD_def_real(char *type, PDBfile *file),
  _PD_d_install(PDBfile *file, char *name, defstr *def, int host),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup);
@@ -478,6 +481,7 @@ extern int
  _PD_safe_flush(PDBfile *file),
  _PD_remove_type(PDBfile *file, char *name),
  _PD_rev_chrt(hasharr *ch),
+ _PD_items_per_tuple(defstr *dp),
  _PD_set_current_address(PDBfile *file, BIGINT addr, int wh, PD_major_op tag),
  _PD_init_s(void),
  _PD_close(PDBfile *file);

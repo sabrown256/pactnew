@@ -453,7 +453,7 @@ PDBfile *_XML_parse_xml(SC_udl *pu, char *mode)
 
     _PD_set_standard(file, &TEXT_STD, &TEXT_ALIGNMENT);
 
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
     file->current_prefix = SC_strsavef("/", "char*:_XML_PARSE_XML:dir");
 

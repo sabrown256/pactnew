@@ -20,7 +20,7 @@
 
 #define FLOAT_EQUAL(d1, d2)  (PM_value_compare(d1, d2, float_tolerance) == 0)
 #define DOUBLE_EQUAL(d1, d2) (PM_value_compare(d1, d2, double_tolerance) == 0)
-#define QUAD_EQUAL(d1, d2)   (PM_value_compare(d1, d2, quad_tolerance) == 0)
+#define QUAD_EQUAL(d1, d2)   (PM_qvalue_compare(d1, d2, quad_tolerance) == 0)
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
@@ -289,6 +289,12 @@ static void write_test_1_data(PDBfile *strm)
        error(1, STDOUT, "QS WRITE FAILED - WRITE_TEST_1_DATA\n");
 
 /* write primitive arrays into the file */
+    ind[0] = 0L;
+    ind[1] = N_BOOL - 1;
+    ind[2] = 1L;
+    if (PD_write_alt(strm, "ba", "bool", ba_w, 1, ind) == 0)
+       error(1, STDOUT, "BA WRITE FAILED - WRITE_TEST_1_DATA\n");
+
     ind[0] = 0L;
     ind[1] = N_FLOAT - 1;
     ind[2] = 1L;

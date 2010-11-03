@@ -556,22 +556,29 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 
 static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype, 
                                 long nitems, void *vr)
-   {int cnv;
+   {int cnv, ipt;
     long bpi;
     size_t ni, nb;
     char *in, *out, *bf;
     FILE *fp;
-    defstr *dpf;
+    defstr *dpf, *dph;
 
     fp  = file->stream;
     bpi = -1;
     ni  = 0;
 
     dpf = _PD_lookup_type(outtype, file->chart);
+    ipt = _PD_items_per_tuple(dpf);
 
-    cnv = ((dpf->convert > 0) ||
-	   (_PD_TEXT_OUT(file) == TRUE) ||
-	   (strcmp(intype, outtype) != 0));
+    nitems *= ipt;
+       
+    if (dpf->convert == -1)
+       {dph = _PD_lookup_type(intype, file->host_chart);
+	cnv = _PD_require_conv(dpf, dph);}
+    else
+       cnv = ((dpf->convert > 0) ||
+	      (_PD_TEXT_OUT(file) == TRUE) ||
+	      (strcmp(intype, outtype) != 0));
 
     if (dpf == NULL)
        PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_WR_LEAF_MEMBERS", PD_WRITE);
@@ -1317,26 +1324,38 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
 
 static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems, 
                                 char *intype, char *outtype, int boffs)
-   {FILE *fp;
+   {int ipt, nbt, cnv;
     long bpi, nir, nia, nb;
     char *bf, *in, *out;
-    defstr *dpf;
+    defstr *dpf, *dph;
+    FILE *fp;
 
     bpi = -1;
     fp  = file->stream;
 
     dpf = _PD_lookup_type(intype, file->chart);
+    ipt = _PD_items_per_tuple(dpf);
+
     if (dpf == NULL)
        PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_RD_LEAF_MEMBERS", PD_READ);
     else
        bpi = dpf->size;
 
+    if (dpf->convert == -1)
+       {dph = _PD_lookup_type(outtype, file->host_chart);
+	cnv = _PD_require_conv(dpf, dph);}
+    else
+       cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
+
+    nitems *= ipt;
+
     if (bpi == -1)
        PD_error("CAN'T FIND NUMBER OF BYTES - _PD_RD_LEAF_MEMBERS", PD_READ);
 
-    else if ((dpf->convert > 0) || (strcmp(intype, outtype) != 0))
-       {if (dpf->size_bits)
-           nia = (((nitems*dpf->size_bits + boffs + SC_BITS_BYTE - 1) / 
+    else if (cnv == TRUE)
+       {nbt = dpf->size_bits;
+	if (nbt != 0)
+           nia = (((nitems*nbt + boffs + SC_BITS_BYTE - 1) / 
 		   SC_BITS_BYTE) + bpi - 1)/bpi;
 	else
 	   nia = nitems;

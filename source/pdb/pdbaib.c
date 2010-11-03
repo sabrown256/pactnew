@@ -425,13 +425,13 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
 		 "UNKNOWN TYPE %d - PD_CHANGE_PRIMITIVE", ityp);
 	err = 1;};
 
-    _PD_setup_chart(file->host_chart,        hstd, NULL, halign, NULL, FALSE);
+    _PD_setup_chart(file->host_chart, hstd, NULL, halign, NULL, FALSE, TRUE);
 
 /* NOTE: we must change the file chart unconditionally but this only
  * ends up changing the dp->convert flag for this type and this is
  * essential
  */
-    _PD_setup_chart(file->chart, fstd, hstd, falign, halign, TRUE);
+    _PD_setup_chart(file->chart, fstd, hstd, falign, halign, TRUE, TRUE);
 
 /* if we opened the file in write mode we need to change the formats */
     if (file->mode == PD_CREATE)

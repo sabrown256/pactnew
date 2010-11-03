@@ -146,7 +146,7 @@ static int _PD_open_i(PDBfile *file)
        PD_error("CAN'T READ MISCELLANEOUS DATA - PD_OPEN", PD_OPEN);
 
 /* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
 /* read the structure chart */
     if (lio_seek(fp, file->chrtaddr, SEEK_SET))

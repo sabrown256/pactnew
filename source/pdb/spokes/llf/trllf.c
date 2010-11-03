@@ -169,7 +169,7 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 	_PD_set_standard(file, &CRAY_STD, &WORD8_ALIGNMENT);
 
-	_PD_init_chrt(file);
+	_PD_init_chrt(file, TRUE);
 
 
 /* define to both file and host charts a 64-bit signed integer type */

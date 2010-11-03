@@ -173,7 +173,7 @@ static object *_SXI_open_raw_file(object *argl)
 
     _PD_set_standard(file, NULL, NULL);
 
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
     o  = SX_mk_gfile(_SX_mk_file(name, PDBFILE_S, file));
 

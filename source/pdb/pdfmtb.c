@@ -424,13 +424,16 @@ int _PD_rd_chrt_ii(PDBfile *file)
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
-   {int align, host_empty;
+   {int ni, align, host_empty;
     int dc, rec;
-    int *ordr, unsgned, onescmp;
+    int unsgned, onescmp;
+    int *ordr, *aord;
     long i, size, conv, bsz;
     long *formt;
-    char *token, *type, *origtype, delim[10], *s, *local;
+    char *token, *type, *origtype, *atype, delim[10], *s, *local;
     defstr *dp;
+    multides *tuple;
+    data_standard *std;
     PD_type_kind kind;
     PD_byte_order ord;
     PD_smp_state *pa;
@@ -463,6 +466,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
         onescmp = FALSE;
         conv    = TRUE;
 	kind    = INT_KIND;
+	tuple   = NULL;
 
         token = SC_strtok(NULL, delim, s);
         if ((token != NULL) && (strcmp(token, "ORDER") == 0))
@@ -475,11 +479,35 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
            {formt = FMAKE_N(long, 8, "_PD_RD_PRIM_TYP_II:format");
             for (i = 0L; i < 8; i++)
                 formt[i] = SC_stol(SC_strtok(NULL, delim, s));
+
+/* NOTE: long double does not come in _PD_rd_fmt_ii the way the others do */
+	    if (strcmp(type, "long_double") == 0)
+	       {std = file->std;
+		REMAKE_N(std->quad_order, int, size);
+		for (i = 0L; i < size; i++)
+		    std->quad_order[i] = ordr[i];
+		for (i = 0L; i < 8; i++)
+		    std->quad_format[i] = formt[i];
+		std->quad_bytes = size;};
+	       
 	    kind = FLOAT_KIND;}
 
         else if ((token != NULL) && (strcmp(token, "NO-CONV") == 0))
 	   {conv = FALSE;
 	    kind = NON_CONVERT_KIND;};
+
+        token = SC_strtok(NULL, delim, s);
+        if ((token != NULL) && (strcmp(token, "TUPLE") == 0))
+	   {atype = SC_strtok(NULL, delim, s);
+	    ni    = SC_stol(SC_strtok(NULL, delim, s));
+	    aord  = FMAKE_N(int, ni, "_PD_RD_PRIM_TYP_II:aord");
+	    for (i = 0L; i < ni; i++)
+	        {aord[i] = SC_stol(SC_strtok(NULL, delim, s));
+		 if (aord[i] == -1)
+		    break;};
+	    if (aord[0] == -1)
+	       {SFREE(aord);};
+	    tuple = _PD_make_tuple(atype, ni, aord);};
 
         token = SC_strtok(NULL, delim, s);
         if (token != NULL)
@@ -522,11 +550,11 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
         else 
            {if (conv == FALSE)
                _PD_defstr(file, TRUE, type, kind,
-			  NULL, NULL, size, align, ord, FALSE,
+			  NULL, tuple, size, align, ord, FALSE,
                           ordr, formt, unsgned, onescmp);
 
             _PD_defstr(file, FALSE, type, kind,
-		       NULL, NULL, size, align, ord, TRUE,
+		       NULL, tuple, size, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}
 
         SFREE(type);};
@@ -858,12 +886,13 @@ static BIGINT _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
  */
 
 static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
-   {int ok, dc, rec;
+   {int ni, ok, dc, rec;
     int *ordr;
     long i, j, n;
     long *formt;
     char *nm;
     defstr *dp;
+    multides *tuple;
 
     ok  = TRUE;
     dc  = '\001';
@@ -904,6 +933,19 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 
 	 else
 	    ok &= _PD_put_string(1, "FIX%c", dc);
+
+/* write the tuple info */
+	 tuple = dp->tuple;
+	 if (tuple != NULL)
+	    {ni   = tuple->ni;
+	     ordr = tuple->order;
+	     ok  &= _PD_put_string(1, "TUPLE%c", dc);
+	     ok  &= _PD_put_string(1, "%s%c%d%c", tuple->type, dc, ni, dc);
+	     if (ordr == NULL)
+	        ok &= _PD_put_string(1, "-1%c", dc);
+	     else
+	        {for (j = 0L; j < ni; j++)
+		     ok &= _PD_put_string(1, "%d%c", ordr[j], dc);};};
 
 /* write the unsgned flag */
 	 ok &= _PD_put_string(1, "UNSGNED%c", dc);
@@ -1278,7 +1320,7 @@ static int _PD_open_ii(PDBfile *file)
        PD_error("CAN'T READ MISCELLANEOUS DATA - PD_OPEN", PD_OPEN);
 
 /* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
 /* read the structure chart */
     if (lio_seek(fp, file->chrtaddr, SEEK_SET))
@@ -1352,7 +1394,7 @@ static int _PD_create_ii(PDBfile *file, int mst)
        PD_error("FFLUSH FAILED AFTER HEADER - _PD_CREATE_II", PD_CREATE);
 
 /* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file);
+    _PD_init_chrt(file, TRUE);
 
     file->use_itags = TRUE;
 

@@ -687,9 +687,10 @@ defstr* _PD_defstr_copy(defstr *dp)
  */
 
 void _PD_rl_defstr(defstr *dp)
-   {memdes *desc, *next;
-    int *ord;
+   {int *ord;
     long *frm;
+    memdes *desc, *next;
+    multides *tuple;
 
     if (dp == NULL)
        return;
@@ -698,6 +699,10 @@ void _PD_rl_defstr(defstr *dp)
        {for (desc = dp->members; desc != NULL; desc = next)
 	    {next = desc->next;
 	     _PD_rl_descriptor(desc);};
+
+	tuple = dp->tuple;
+	if (tuple != NULL)
+	   _PD_free_tuple(tuple);
 
 	ord = dp->order;
 	if ((ord != NULL) && (SC_arrlen(ord) > -1))
@@ -732,6 +737,24 @@ int _PD_ha_rl_defstr(haelem *hp, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_MAKE_TUPLE - instantiate a multides */
+
+multides *_PD_make_tuple(char *type, int ni, int *ord)
+   {multides *tuple;
+
+    tuple = FMAKE(multides, "_PD_MAKE_TUPLE:tuple");
+
+    tuple->type  = SC_strsavef(type, "char*:_PD_MAKE_TUPLE:type");
+    tuple->ni    = ni;
+    tuple->order = ord;
+
+    SC_mark(ord, 1);
+
+    return(tuple);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_COPY_TUPLE - copy a multides */
 
 multides *_PD_copy_tuple(multides *tuple)
@@ -741,6 +764,7 @@ multides *_PD_copy_tuple(multides *tuple)
 
     *ntuple = *tuple;
 
+    ntuple->type  = SC_strsavef(tuple->type, "char*:_PD_COPY_TUPLE:type");
     ntuple->order = SC_copy_item(tuple->order);
 
     return(ntuple);}
@@ -753,6 +777,7 @@ multides *_PD_copy_tuple(multides *tuple)
 void _PD_free_tuple(multides *tuple)
    {
 
+    SFREE(tuple->type);
     SFREE(tuple->order);
     SFREE(tuple);
 

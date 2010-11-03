@@ -98,7 +98,7 @@ else if (-e $RootDir/pdb/pdb.h) then
 
       if ("$TestL" == "") then
          set TestL = ""
-         set TestL = ($TestL master bufa bufb appdef gatsca checksum)
+         set TestL = ($TestL master c99 bufa bufb appdef gatsca checksum)
          set TestL = ($TestL usrtyp net fd hyper fixdnrm attr)
          set TestL = ($TestL cast typdef browse free fortran)
          set TestL = ($TestL smp dp)
