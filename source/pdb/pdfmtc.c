@@ -176,21 +176,21 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	align->longlong_alignment = al;}
 
     else if (strcmp(type, "float") == 0)
-       {std->float_bytes       = nb;
-	std->float_order       = ordr;
-	std->float_format      = formt;
+       {STD_FP4(std, bytes)    = nb;
+	STD_FP4(std, order)    = ordr;
+	STD_FP4(std, format)   = formt;
 	align->float_alignment = al;}
 
     else if (strcmp(type, "double") == 0)
-       {std->double_bytes       = nb;
-	std->double_order       = ordr;
-	std->double_format      = formt;
+       {STD_FP8(std, bytes)     = nb;
+	STD_FP8(std, order)     = ordr;
+	STD_FP8(std, format)    = formt;
 	align->double_alignment = al;}
 
     else if (strcmp(type, "long_double") == 0)
-       {std->quad_bytes       = nb;
-	std->quad_order       = ordr;
-	std->quad_format      = formt;
+       {STD_FP16(std, bytes)  = nb;
+	STD_FP16(std, order)  = ordr;
+	STD_FP16(std, format) = formt;
 	align->quad_alignment = al;}
 
     else if (strcmp(type, "struct") == 0)

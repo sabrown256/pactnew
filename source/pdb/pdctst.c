@@ -37,20 +37,20 @@ static bool
  ba_w[N_BOOL],
  ba_r[N_BOOL];
 
-static float complex
+static float _Complex
  fs_w,
  fs_r,
  fa_w[N_FLOAT],
  fa_r[N_FLOAT],
  fa2_r[N_FLOAT];
 
-static double complex
+static double _Complex
  ds_w,
  ds_r,
  da_w[N_FLOAT],
  da_r[N_FLOAT];
 
-static long double complex
+static long double _Complex
  qs_w,
  qs_r,
  qa_w[N_FLOAT],
@@ -163,15 +163,15 @@ static int compare_test_0_data(PDBfile *strm, FILE *fp)
     err &= (nbp == nbc);
 
     nbp  = _PD_lookup_size("float_complex", strm->host_chart);
-    nbc  = sizeof(float complex);
+    nbc  = sizeof(float _Complex);
     err &= (nbp == nbc);
 
     nbp  = _PD_lookup_size("double_complex", strm->host_chart);
-    nbc  = sizeof(double complex);
+    nbc  = sizeof(double _Complex);
     err &= (nbp == nbc);
 
     nbp  = _PD_lookup_size("long_double_complex", strm->host_chart);
-    nbc  = sizeof(long double complex);
+    nbc  = sizeof(long double _Complex);
     err &= (nbp == nbc);
 
     err_tot &= err;
@@ -401,12 +401,12 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
     int float_nm, double_nm, quad_nm;
     double float_tolerance, double_tolerance, quad_tolerance;
 
-    float_nm  = min(strm->std->float_format[2],
-                    strm->host_std->float_format[2]);
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
-    quad_nm   = min(strm->std->quad_format[2],
-                    strm->host_std->quad_format[2]);
+    float_nm  = min(STD_FP4(strm->std,       format)[2],
+                    STD_FP4(strm->host_std,  format)[2]);
+    double_nm = min(STD_FP8(strm->std,       format)[2],
+                    STD_FP8(strm->host_std,  format)[2]);
+    quad_nm   = min(STD_FP16(strm->std,      format)[2],
+                    STD_FP16(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance  = POW(2.0, -((double) float_nm));

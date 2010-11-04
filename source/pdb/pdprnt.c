@@ -1117,17 +1117,17 @@ void _PD_set_digits(PDBfile *file)
        d = 8*std->longlong_bytes;
     PD_long_long_digits  = log2*d + 1; 
 
-    f = std->float_format;
+    f = STD_FP4(std, format);
     d = min(f[2], PD_tolerance);
     PD_float_tol    = POW(2.0, -((double) d));
     PD_float_digits = log2*d + 1;
 
-    f = std->double_format;
+    f = STD_FP8(std, format);
     d = min(f[2], PD_tolerance);
     PD_double_tol    = POW(2.0, -((double) d));
     PD_double_digits = log2*d + 1;
 
-    f = std->quad_format;
+    f = STD_FP16(std, format);
     d = min(f[2], PD_tolerance);
     PD_quad_tol    = POW(2.0, -((long double) d));
     PD_quad_digits = log2*d + 1;
@@ -1197,22 +1197,22 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
     nmb = max(da, db);
     PD_long_long_digits  = log2*nmb + 1; 
 
-    fa  = stda->float_format;
-    fb  = stdb->float_format;
+    fa  = STD_FP4(stda, format);
+    fb  = STD_FP4(stdb, format);
     nmb = max(fa[2], fb[2]);
     nmb = min(nmb, PD_tolerance);
     PD_float_tol    = POW(2.0, -((double) nmb));
     PD_float_digits = log2*nmb + 1;
 
-    fa  = stda->double_format;
-    fb  = stdb->double_format;
+    fa  = STD_FP8(stda, format);
+    fb  = STD_FP8(stdb, format);
     nmb = max(fa[2], fb[2]);
     nmb = min(nmb, PD_tolerance);
     PD_double_tol    = POW(2.0, -((double) nmb));
     PD_double_digits = log2*nmb + 1;
 
-    fa  = stda->quad_format;
-    fb  = stdb->quad_format;
+    fa  = STD_FP16(stda, format);
+    fb  = STD_FP16(stdb, format);
     nmb = max(fa[2], fb[2]);
     nmb = min(nmb, PD_tolerance);
     PD_quad_tol    = POW(2.0, -((long double) nmb));

@@ -152,12 +152,12 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std = _PD_copy_standard(file->host_std);
 
 /* get the byte lengths in */
-    std->ptr_bytes    = *(p++);
-    std->short_bytes  = *(p++);
-    std->int_bytes    = *(p++);
-    std->long_bytes   = *(p++);
-    std->float_bytes  = *(p++);
-    std->double_bytes = *(p++);
+    std->ptr_bytes      = *(p++);
+    std->short_bytes    = *(p++);
+    std->int_bytes      = *(p++);
+    std->long_bytes     = *(p++);
+    STD_FP4(std, bytes) = *(p++);
+    STD_FP8(std, bytes) = *(p++);
 
 /* get the integral types byte order in */
     std->short_order = (PD_byte_order) *(p++);
@@ -165,34 +165,36 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std->long_order  = (PD_byte_order) *(p++);
 
 /* get the float byte order in */
-    n = std->float_bytes;
-    REMAKE_N(std->float_order, int, n);
-    order = std->float_order;
+    n     = STD_FP4(std, bytes);
+    order = STD_FP4(std, order);
+    REMAKE_N(order, int, n);
+    STD_FP4(std, order) = order;
     for (j = 0; j < n; j++, *(order++) = *(p++));
 
 /* get the double byte order in */
-    n = std->double_bytes;
-    REMAKE_N(std->double_order, int, n);
-    order = std->double_order;
+    n     = STD_FP8(std, bytes);
+    order = STD_FP8(std, order);
+    REMAKE_N(order, int, n);
+    STD_FP8(std, order) = order;
     for (j = 0; j < n; j++, *(order++) = *(p++));
 
 /* get the float format data in */
-    n = FORMAT_FIELDS - 1;
-    format = std->float_format;
+    n      = FORMAT_FIELDS - 1;
+    format = STD_FP4(std, format);
     for (j = 0; j < n; j++, *(format++) = *(p++));
 
 /* get the double format data in */
-    n = FORMAT_FIELDS - 1;
-    format = std->double_format;
+    n      = FORMAT_FIELDS - 1;
+    format = STD_FP8(std, format);
     for (j = 0; j < n; j++, *(format++) = *(p++));
 
 /* read the biases */
     if (_PD_rfgets(infor, MAXLINE, file->stream) == NULL)
        PD_error("CAN'T READ THE BIASES - _PD_RD_FMT_II", PD_OPEN);
 
-    format    = std->float_format;
+    format    = STD_FP4(std, format);
     format[7] = SC_stol(SC_strtok(infor, "\001", s));
-    format    = std->double_format;
+    format    = STD_FP8(std, format);
     format[7] = SC_stol(SC_strtok(NULL, "\001", s));
 
     file->std = std;
@@ -427,9 +429,9 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
    {int ni, align, host_empty;
     int dc, rec;
     int unsgned, onescmp;
-    int *ordr, *aord;
+    int *ordr, *aord, *tord;
     long i, size, conv, bsz;
-    long *formt;
+    long *formt, *tfmt;
     char *token, *type, *origtype, *atype, delim[10], *s, *local;
     defstr *dp;
     multides *tuple;
@@ -482,13 +484,16 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 
 /* NOTE: long double does not come in _PD_rd_fmt_ii the way the others do */
 	    if (strcmp(type, "long_double") == 0)
-	       {std = file->std;
-		REMAKE_N(std->quad_order, int, size);
+	       {std  = file->std;
+		tord = STD_FP16(std, order);
+		tfmt = STD_FP16(std, format);
+		REMAKE_N(tord, int, size);
+		STD_FP16(std, order) = tord;
 		for (i = 0L; i < size; i++)
-		    std->quad_order[i] = ordr[i];
+		    tord[i] = ordr[i];
 		for (i = 0L; i < 8; i++)
-		    std->quad_format[i] = formt[i];
-		std->quad_bytes = size;};
+		    tfmt[i] = formt[i];
+		STD_FP16(std, bytes) = size;};
 	       
 	    kind = FLOAT_KIND;}
 
@@ -1206,8 +1211,8 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	*(p++) = std->short_bytes;
 	*(p++) = std->int_bytes;
 	*(p++) = std->long_bytes;
-	*(p++) = std->float_bytes;
-	*(p++) = std->double_bytes;
+	*(p++) = STD_FP4(std, bytes);
+	*(p++) = STD_FP8(std, bytes);
 
 /* get the integral types byte order in */
 	*(p++) = std->short_order;
@@ -1215,17 +1220,17 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	*(p++) = std->long_order;
 
 /* get the float byte order in */
-	order = std->float_order;
-	n     = std->float_bytes;
+	order = STD_FP4(std, order);
+	n     = STD_FP4(std, bytes);
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the double byte order in */
-	order = std->double_order;
-	n     = std->double_bytes;
+	order = STD_FP8(std, order);
+	n     = STD_FP8(std, bytes);
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the float format data in */
-	format = std->float_format;
+	format = STD_FP4(std, format);
 	n = FORMAT_FIELDS - 1;
 	for (j = 0; j < n; j++, *(p++) = *(format++));
 
@@ -1233,7 +1238,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	float_bias = *format;
 
 /* get the double format data in */
-	format = std->double_format;
+	format = STD_FP8(std, format);
 	n      = FORMAT_FIELDS - 1;
 	for (j = 0; j < n; j++, *(p++) = *(format++));
 

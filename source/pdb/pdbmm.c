@@ -248,25 +248,28 @@ data_standard *_PD_mk_standard(PDBfile *file)
 
     std = FMAKE(data_standard, "_PD_MK_STANDARD:std");
 
-    std->bits_byte      = BITS_DEFAULT;
-    std->ptr_bytes      = 0;
-    std->short_bytes    = 0;
-    std->short_order    = NO_ORDER;
-    std->int_bytes      = 0;
-    std->int_order      = NO_ORDER;
-    std->long_bytes     = 0;
-    std->long_order     = NO_ORDER;
-    std->longlong_bytes = 0;
-    std->longlong_order = NO_ORDER;
-    std->float_bytes    = 0;
-    std->float_format   = NULL;
-    std->float_order    = NULL;
-    std->double_bytes   = 0;
-    std->double_format  = NULL;
-    std->double_order   = NULL;
-    std->quad_bytes     = 0;
-    std->quad_format    = NULL;
-    std->quad_order     = NULL;
+    std->bits_byte         = BITS_DEFAULT;
+    std->ptr_bytes         = 0;
+    std->bool_bytes        = 0;
+
+    STD_FIX_S(std, bytes)  = 0;
+    STD_FIX_S(std, order)  = NO_ORDER;
+    STD_FIX_I(std, bytes)  = 0;
+    STD_FIX_I(std, order)  = NO_ORDER;
+    STD_FIX_L(std, bytes)  = 0;
+    STD_FIX_L(std, order)  = NO_ORDER;
+    STD_FIX_E(std, bytes)  = 0;
+    STD_FIX_E(std, order)  = NO_ORDER;
+
+    STD_FP4(std, bytes)    = 0;
+    STD_FP4(std, format)   = NULL;
+    STD_FP4(std, order)    = NULL;
+    STD_FP8(std, bytes)    = 0;
+    STD_FP8(std, format)   = NULL;
+    STD_FP8(std, order)    = NULL;
+    STD_FP16(std, bytes)   = 0;
+    STD_FP16(std, format)  = NULL;
+    STD_FP16(std, order)   = NULL;
 
     std->file = file;
 
@@ -287,61 +290,64 @@ data_standard *_PD_copy_standard(data_standard *src)
 
     std = FMAKE(data_standard, "_PD_COPY_STANDARD:std");
 
-    std->bits_byte      = src->bits_byte;
-    std->ptr_bytes      = src->ptr_bytes;
-    std->bool_bytes     = src->bool_bytes;
-    std->short_bytes    = src->short_bytes;
-    std->short_order    = src->short_order;
-    std->int_bytes      = src->int_bytes;
-    std->int_order      = src->int_order;
-    std->long_bytes     = src->long_bytes;
-    std->long_order     = src->long_order;
-    std->longlong_bytes = src->longlong_bytes;
-    std->longlong_order = src->longlong_order;
-    std->float_bytes    = src->float_bytes;
-    std->double_bytes   = src->double_bytes;
-    std->quad_bytes     = src->quad_bytes;
+    std->bits_byte        = src->bits_byte;
+    std->ptr_bytes        = src->ptr_bytes;
+    std->bool_bytes       = src->bool_bytes;
+    STD_FIX_S(std, bytes) = STD_FIX_S(src, bytes);
+    STD_FIX_S(std, order) = STD_FIX_S(src, order);
+    STD_FIX_I(std, bytes) = STD_FIX_I(src, bytes);
+    STD_FIX_I(std, order) = STD_FIX_I(src, order);
+    STD_FIX_L(std, bytes) = STD_FIX_L(src, bytes);
+    STD_FIX_L(std, order) = STD_FIX_L(src, order);
+    STD_FIX_E(std, bytes) = STD_FIX_E(src, bytes);
+    STD_FIX_E(std, order) = STD_FIX_E(src, order);
+    STD_FP4(std, bytes)   = STD_FP4(src, bytes);
+    STD_FP8(std, bytes)   = STD_FP8(src, bytes);
+    STD_FP16(std, bytes)  = STD_FP16(src, bytes);
 
-    n = FORMAT_FIELDS;
-    std->float_format  = FMAKE_N(long, n, "_PD_COPY_STANDARD:float_format");
-    SC_mark(std->float_format, 1);
-    fstd = std->float_format;
-    fsrc = src->float_format;
+    n    = FORMAT_FIELDS;
+    fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp4_format");
+    SC_mark(fstd, 1);
+    STD_FP4(std, format) = fstd;
+    fsrc = STD_FP4(src, format);
     for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = (std->float_bytes > 0) ? std->float_bytes : -(std->float_bytes / std->bits_byte);
-    std->float_order   = FMAKE_N(int,  n, "_PD_COPY_STANDARD:float_order");
-    SC_mark(std->float_order, 1);
-    ostd = std->float_order;
-    osrc = src->float_order;
+    n = STD_FP4(std, bytes);
+    n = (n > 0) ? n : -(n / std->bits_byte);
+    ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp4_order");
+    SC_mark(ostd, 1);
+    STD_FP4(std, order) = ostd;
+    osrc = STD_FP4(src, order);
     for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
 
-    n = FORMAT_FIELDS;
-    std->double_format = FMAKE_N(long, n, "_PD_COPY_STANDARD:double_format");
-    SC_mark(std->double_format, 1);
-    fstd = std->double_format;
-    fsrc = src->double_format;
+    n    = FORMAT_FIELDS;
+    fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp8_format");
+    SC_mark(fstd, 1);
+    STD_FP8(std, format) = fstd;
+    fsrc = STD_FP8(src, format);
     for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = (std->double_bytes > 0) ? std->double_bytes : -(std->double_bytes / std->bits_byte);
-    std->double_order  = FMAKE_N(int,  n, "_PD_COPY_STANDARD:double_order");
-    SC_mark(std->double_order, 1);
-    ostd = std->double_order;
-    osrc = src->double_order;
+    n = STD_FP8(std, bytes);
+    n = (n > 0) ? n : -(n / std->bits_byte);
+    ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp8_order");
+    SC_mark(ostd, 1);
+    STD_FP8(std, order) = ostd;
+    osrc = STD_FP8(src, order);
     for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
 
-    n = FORMAT_FIELDS;
-    std->quad_format = FMAKE_N(long, n, "_PD_COPY_STANDARD:quad_format");
-    SC_mark(std->quad_format, 1);
-    fstd = std->quad_format;
-    fsrc = src->quad_format;
+    n    = FORMAT_FIELDS;
+    fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp16_format");
+    SC_mark(fstd, 1);
+    STD_FP16(std, format) = fstd;
+    fsrc = STD_FP16(src, format);
     for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = (std->quad_bytes > 0) ? std->quad_bytes : -(std->quad_bytes / std->bits_byte);
-    std->quad_order  = FMAKE_N(int,  n, "_PD_COPY_STANDARD:quad_order");
-    SC_mark(std->quad_order, 1);
-    ostd = std->quad_order;
-    osrc = src->quad_order;
+    n = STD_FP16(std, bytes);
+    n = (n > 0) ? n : -(n / std->bits_byte);
+    ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp16_order");
+    SC_mark(ostd, 1);
+    STD_FP16(std, order) = ostd;
+    osrc = STD_FP16(src, order);
     for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
 
     return(std);}
@@ -355,12 +361,12 @@ data_standard *_PD_copy_standard(data_standard *src)
 
 void _PD_rl_standard(data_standard *std)
    {if (std != NULL)
-       {SFREE(std->float_format);
-        SFREE(std->float_order);
-        SFREE(std->double_format);
-        SFREE(std->double_order);
-        SFREE(std->quad_format);
-        SFREE(std->quad_order);
+       {SFREE(STD_FP4(std, format));
+        SFREE(STD_FP4(std, order));
+        SFREE(STD_FP8(std, format));
+        SFREE(STD_FP8(std, order));
+        SFREE(STD_FP16(std, format));
+        SFREE(STD_FP16(std, order));
 
         SFREE(std);};
 
