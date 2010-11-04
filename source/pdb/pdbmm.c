@@ -274,72 +274,38 @@ data_standard *_PD_mk_standard(PDBfile *file)
  */
 
 data_standard *_PD_copy_standard(data_standard *src)
-   {data_standard *std;
-    int j, n;
+   {int i, j, n;
     int *ostd, *osrc;
     long *fstd, *fsrc;
+    data_standard *std;
 
     std = FMAKE(data_standard, "_PD_COPY_STANDARD:std");
 
-    std->bits_byte        = src->bits_byte;
-    std->ptr_bytes        = src->ptr_bytes;
-    std->bool_bytes       = src->bool_bytes;
-    STD_FIX_S(std, bpi) = STD_FIX_S(src, bpi);
-    STD_FIX_S(std, order) = STD_FIX_S(src, order);
-    STD_FIX_I(std, bpi) = STD_FIX_I(src, bpi);
-    STD_FIX_I(std, order) = STD_FIX_I(src, order);
-    STD_FIX_L(std, bpi) = STD_FIX_L(src, bpi);
-    STD_FIX_L(std, order) = STD_FIX_L(src, order);
-    STD_FIX_E(std, bpi) = STD_FIX_E(src, bpi);
-    STD_FIX_E(std, order) = STD_FIX_E(src, order);
-    STD_FP4(std, bpi)   = STD_FP4(src, bpi);
-    STD_FP8(std, bpi)   = STD_FP8(src, bpi);
-    STD_FP16(std, bpi)  = STD_FP16(src, bpi);
+    std->bits_byte  = src->bits_byte;
+    std->ptr_bytes  = src->ptr_bytes;
+    std->bool_bytes = src->bool_bytes;
 
-    n    = FORMAT_FIELDS;
-    fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp4_format");
-    SC_mark(fstd, 1);
-    STD_FP4(std, format) = fstd;
-    fsrc = STD_FP4(src, format);
-    for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
+    for (i = 0; i < 4; i++)
+        {std->fx[i].bpi   = src->fx[i].bpi;
+	 std->fx[i].order = src->fx[i].order;};
 
-    n = STD_FP4(std, bpi);
-    n = (n > 0) ? n : -(n / std->bits_byte);
-    ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp4_order");
-    SC_mark(ostd, 1);
-    STD_FP4(std, order) = ostd;
-    osrc = STD_FP4(src, order);
-    for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
+    for (i = 0; i < 3; i++)
+        {std->fp[i].bpi = src->fp[i].bpi;
 
-    n    = FORMAT_FIELDS;
-    fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp8_format");
-    SC_mark(fstd, 1);
-    STD_FP8(std, format) = fstd;
-    fsrc = STD_FP8(src, format);
-    for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
+	 n    = FORMAT_FIELDS;
+         fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp_format");
+	 SC_mark(fstd, 1);
+	 std->fp[i].format = fstd;
+	 fsrc = src->fp[i].format;
+	 for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = STD_FP8(std, bpi);
-    n = (n > 0) ? n : -(n / std->bits_byte);
-    ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp8_order");
-    SC_mark(ostd, 1);
-    STD_FP8(std, order) = ostd;
-    osrc = STD_FP8(src, order);
-    for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
-
-    n    = FORMAT_FIELDS;
-    fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp16_format");
-    SC_mark(fstd, 1);
-    STD_FP16(std, format) = fstd;
-    fsrc = STD_FP16(src, format);
-    for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
-
-    n = STD_FP16(std, bpi);
-    n = (n > 0) ? n : -(n / std->bits_byte);
-    ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp16_order");
-    SC_mark(ostd, 1);
-    STD_FP16(std, order) = ostd;
-    osrc = STD_FP16(src, order);
-    for (j = 0; j < n; j++, *(ostd++) = *(osrc++));
+	 n = std->fp[i].bpi;
+	 n = (n > 0) ? n : -(n / std->bits_byte);
+	 ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp_order");
+	 SC_mark(ostd, 1);
+	 std->fp[i].order = ostd;
+	 osrc = src->fp[i].order;
+	 for (j = 0; j < n; j++, *(ostd++) = *(osrc++));};
 
     return(std);}
 
@@ -352,12 +318,12 @@ data_standard *_PD_copy_standard(data_standard *src)
 
 void _PD_rl_standard(data_standard *std)
    {if (std != NULL)
-       {SFREE(STD_FP4(std, format));
-        SFREE(STD_FP4(std, order));
-        SFREE(STD_FP8(std, format));
-        SFREE(STD_FP8(std, order));
-        SFREE(STD_FP16(std, format));
-        SFREE(STD_FP16(std, order));
+       {SFREE(std->fp[0].format);
+        SFREE(std->fp[0].order);
+        SFREE(std->fp[1].format);
+        SFREE(std->fp[1].order);
+        SFREE(std->fp[2].format);
+        SFREE(std->fp[2].order);
 
         SFREE(std);};
 

@@ -118,25 +118,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/*
-#define STD_FIX_S(_std, _field)  ((_std)->short_##_field)
-#define STD_FIX_I(_std, _field)  ((_std)->int_##_field)
-#define STD_FIX_L(_std, _field)  ((_std)->long_##_field)
-#define STD_FIX_E(_std, _field)  ((_std)->longlong_##_field)
-
-#define STD_FP4(_std, _field)    ((_std)->float_##_field)
-#define STD_FP8(_std, _field)    ((_std)->double_##_field)
-#define STD_FP16(_std, _field)   ((_std)->quad_##_field)
-*/
-#define STD_FIX_S(_std, _field)  ((_std)->fx[0]._field)
-#define STD_FIX_I(_std, _field)  ((_std)->fx[1]._field)
-#define STD_FIX_L(_std, _field)  ((_std)->fx[2]._field)
-#define STD_FIX_E(_std, _field)  ((_std)->fx[3]._field)
-
-#define STD_FP4(_std, _field)    ((_std)->fp[0]._field)
-#define STD_FP8(_std, _field)    ((_std)->fp[1]._field)
-#define STD_FP16(_std, _field)   ((_std)->fp[2]._field)
-
 #define PN_sizeof(type, tab)  _PD_lookup_size(type, tab)
 
 #define PD_get_file_type(file)                                               \
@@ -896,7 +877,8 @@ extern int
 		     long *fpfmt, int *fpord);
 
 extern void
- PD_contents(PDBfile *file, FILE *out, int fh, int vers);
+ PD_contents(PDBfile *file, FILE *out, int fh, int vers),
+ PD_fp_toler(PDBfile *file, long double *fptol);
 
 
 /* PDBMM.C declarations */

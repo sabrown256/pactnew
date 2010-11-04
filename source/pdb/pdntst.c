@@ -17,8 +17,8 @@
 #define N_CHAR  10
 #define N_FLOAT  4
 
-#define FLOAT_EQUAL(d1, d2)  (PM_value_compare(d1, d2, float_tolerance) == 0)
-#define DOUBLE_EQUAL(d1, d2) (PM_value_compare(d1, d2, double_tolerance) == 0)
+#define FLOAT_EQUAL(d1, d2)  (PM_value_compare(d1, d2, fptol[0]) == 0)
+#define DOUBLE_EQUAL(d1, d2) (PM_value_compare(d1, d2, fptol[1]) == 0)
 
 struct s_l_frame
    {float x_min;
@@ -534,17 +534,10 @@ static void print_test_1_data(FILE *fp)
 
 static int compare_test_1_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
-    int float_nm, double_nm;
-    double float_tolerance, double_tolerance;
+    long double fptol[3];
 
-    float_nm  = min(STD_FP4(strm->std,      format)[2],
-                    STD_FP4(strm->host_std, format)[2]);
-    double_nm = min(STD_FP8(strm->std,      format)[2],
-                    STD_FP8(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    float_tolerance  = POW(2.0, -((double) float_nm));
-    double_tolerance = POW(2.0, -((double) double_nm));
     err_tot = TRUE;
 
 /* compare scalars */
@@ -912,14 +905,10 @@ static int compare_test_2_data(PDBfile *strm, FILE *fp)
    {int i, *p1w, *p2w, *p1r, *p2r;
     double *p3w, *p4w, *p3r, *p4r;
     int err, err_tot;
-    int double_nm;
-    double double_tolerance;
+    long double fptol[3];
 
-    double_nm = min(STD_FP8(strm->std,      format)[2],
-                    STD_FP8(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    double_tolerance = POW(2.0, -((double) double_nm));
     err_tot = TRUE;
 
 /* compare offset and array */
@@ -1193,17 +1182,10 @@ void print_test_3_data(FILE *fp)
 
 static int compare_test_3_data(PDBfile *strm, FILE *fp)
    {int err, err_tot;
-    int float_nm, double_nm;
-    double float_tolerance, double_tolerance;
+    long double fptol[3];
 
-    float_nm  = min(STD_FP4(strm->std,      format)[2],
-                    STD_FP4(strm->host_std, format)[2]);
-    double_nm = min(STD_FP8(strm->std,      format)[2],
-                    STD_FP8(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    float_tolerance  = POW(2.0, -((double) float_nm));
-    double_tolerance = POW(2.0, -((double) double_nm));
     err_tot = TRUE;
 
 /* compare offset and array */
@@ -1490,8 +1472,7 @@ void print_test_4_data(FILE *fp)
 
 static int compare_test_4_data(PDBfile *strm, FILE *fp)
    {int err, err_tot;
-    int float_nm, double_nm;
-    double float_tolerance, double_tolerance;
+    long double fptol[3];
     char *pc_w, *pc_r;
     short *ps_w, *ps_r;
     int *pi_w, *pi_r;
@@ -1500,14 +1481,8 @@ static int compare_test_4_data(PDBfile *strm, FILE *fp)
     double *pd_w, *pd_r;
     haelem *ph_w, *ph_r;
 
-    float_nm  = min(STD_FP4(strm->std,      format)[2],
-                    STD_FP4(strm->host_std, format)[2]);
-    double_nm = min(STD_FP8(strm->std,      format)[2],
-                    STD_FP8(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    float_tolerance  = POW(2.0, -((double) float_nm));
-    double_tolerance = POW(2.0, -((double) double_nm));
     err_tot = TRUE;
 
     pc_r = (char *) SC_hasharr_def_lookup(tab4_r, "pc");

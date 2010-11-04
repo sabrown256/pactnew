@@ -18,9 +18,9 @@
 #define N_BOOL   2
 #define N_FLOAT  4
 
-#define FLOAT_EQUAL(d1, d2)  (PM_value_compare(d1, d2, float_tolerance) == 0)
-#define DOUBLE_EQUAL(d1, d2) (PM_value_compare(d1, d2, double_tolerance) == 0)
-#define QUAD_EQUAL(d1, d2)   (PM_qvalue_compare(d1, d2, quad_tolerance) == 0)
+#define FLOAT_EQUAL(d1, d2)  (PM_value_compare(d1, d2, fptol[0]) == 0)
+#define DOUBLE_EQUAL(d1, d2) (PM_value_compare(d1, d2, fptol[1]) == 0)
+#define QUAD_EQUAL(d1, d2)   (PM_qvalue_compare(d1, d2, fptol[2]) == 0)
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
@@ -398,20 +398,10 @@ static void print_test_1_data(FILE *fp)
 
 static int compare_test_1_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
-    int float_nm, double_nm, quad_nm;
-    double float_tolerance, double_tolerance, quad_tolerance;
+    long double fptol[3];
 
-    float_nm  = min(STD_FP4(strm->std,       format)[2],
-                    STD_FP4(strm->host_std,  format)[2]);
-    double_nm = min(STD_FP8(strm->std,       format)[2],
-                    STD_FP8(strm->host_std,  format)[2]);
-    quad_nm   = min(STD_FP16(strm->std,      format)[2],
-                    STD_FP16(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    float_tolerance  = POW(2.0, -((double) float_nm));
-    double_tolerance = POW(2.0, -((double) double_nm));
-    quad_tolerance   = POW(2.0, -((double) quad_nm));
     err_tot = TRUE;
 
 /* compare scalars */

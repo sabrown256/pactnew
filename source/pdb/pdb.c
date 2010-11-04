@@ -1389,19 +1389,19 @@ int PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr)
 
 /* determine what fmt standard to handle */
     else if (strncmp("float", type, 6) == 0)
-       {nb  = STD_FP4(std, bpi);
-	fmt = STD_FP4(std, format);
-	ord = STD_FP4(std, order);}
+       {nb  = std->fp[0].bpi;
+	fmt = std->fp[0].format;
+	ord = std->fp[0].order;}
 
     else if (strncmp("double", type, 7) == 0)
-       {nb  = STD_FP8(std, bpi);
-	fmt = STD_FP8(std, format);
-	ord = STD_FP8(std, order);}
+       {nb  = std->fp[1].bpi;
+	fmt = std->fp[1].format;
+	ord = std->fp[1].order;}
 
     else if (strncmp("long_double", type, 7) == 0)
-       {nb  = STD_FP16(std, bpi);
-	fmt = STD_FP16(std, format);
-	ord = STD_FP16(std, order);}
+       {nb  = std->fp[2].bpi;
+	fmt = std->fp[2].format;
+	ord = std->fp[2].order;}
 
     else
        {snprintf(pa->err, MAXLINE,

@@ -472,15 +472,15 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 /* NOTE: long double does not come in _PD_rd_fmt_ii the way the others do */
 	    if (strcmp(type, "long_double") == 0)
 	       {std  = file->std;
-		tord = STD_FP16(std, order);
-		tfmt = STD_FP16(std, format);
+		tord = std->fp[2].order;
+		tfmt = std->fp[2].format;
 		REMAKE_N(tord, int, size);
-		STD_FP16(std, order) = tord;
+		std->fp[2].order = tord;
 		for (i = 0L; i < size; i++)
 		    tord[i] = ordr[i];
 		for (i = 0L; i < 8; i++)
 		    tfmt[i] = formt[i];
-		STD_FP16(std, bpi) = size;};
+		std->fp[2].bpi = size;};
 	       
 	    kind = FLOAT_KIND;}
 
@@ -1198,8 +1198,8 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	*(p++) = std->fx[0].bpi;
 	*(p++) = std->fx[1].bpi;
 	*(p++) = std->fx[2].bpi;
-	*(p++) = STD_FP4(std, bpi);
-	*(p++) = STD_FP8(std, bpi);
+	*(p++) = std->fp[0].bpi;
+	*(p++) = std->fp[1].bpi;
 
 /* get the integral types byte order in */
 	*(p++) = std->fx[0].order;
@@ -1207,17 +1207,17 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	*(p++) = std->fx[2].order;
 
 /* get the float byte order in */
-	order = STD_FP4(std, order);
-	n     = STD_FP4(std, bpi);
+	order = std->fp[0].order;
+	n     = std->fp[0].bpi;
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the double byte order in */
-	order = STD_FP8(std, order);
-	n     = STD_FP8(std, bpi);
+	order = std->fp[1].order;
+	n     = std->fp[1].bpi;
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the float format data in */
-	format = STD_FP4(std, format);
+	format = std->fp[0].format;
 	n = FORMAT_FIELDS - 1;
 	for (j = 0; j < n; j++, *(p++) = *(format++));
 
@@ -1225,7 +1225,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	float_bias = *format;
 
 /* get the double format data in */
-	format = STD_FP8(std, format);
+	format = std->fp[1].format;
 	n      = FORMAT_FIELDS - 1;
 	for (j = 0; j < n; j++, *(p++) = *(format++));
 
