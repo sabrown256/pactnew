@@ -834,7 +834,7 @@ static void print_test_1_data(FILE *fp)
 
 static int compare_test_1_data(PDBfile *strm, FILE *fp)
    {int i, k, err, err_tot;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -1539,7 +1539,7 @@ static int compare_test_2_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
     int *p1w, *p2w, *p1r, *p2r;
     double *p3w, *p4w, *p3r, *p4r;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -1928,7 +1928,7 @@ static void print_test_3_data(FILE *fp)
 
 static int compare_test_3_data(PDBfile *strm, FILE *fp)
    {int err, err_tot;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -2260,7 +2260,7 @@ static void print_test_4_data(FILE *fp)
 
 static int compare_test_4_data(PDBfile *strm, FILE *fp)
    {int err, err_tot;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
     char *pc_w, *pc_r;
     short *ps_w, *ps_r;
     int *pi_w, *pi_r;
@@ -2558,7 +2558,7 @@ static int compare_test_5_data(PDBfile *strm, FILE *fp)
    {int i, l, *p1w, *p2w, *p1r, *p2r;
     int err, err_tot;
     double *p3w, *p4w, *p3r, *p4r;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -2788,7 +2788,7 @@ static int compare_test_6_data(PDBfile *strm, FILE *fp)
     int err, err_tot;
     float fc1, fc2;
     double *p1w, *p2w;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -3006,7 +3006,7 @@ static int compare_test_7_data(PDBfile *strm, FILE *fp)
     int err, err_tot;
     float fc1, fc2;
     double *p1w, *p2w;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -3248,7 +3248,7 @@ static int compare_test_8_data(PDBfile *strm, FILE *fp)
    {int i, n;
     int err, err_tot;
     double wc, arc, brc, crc, drc;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 
@@ -3539,7 +3539,7 @@ static void print_test_10_data(FILE *fp)
 
 static int compare_test_10_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 

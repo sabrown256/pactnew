@@ -152,9 +152,10 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std = _PD_copy_standard(file->host_std);
 
 /* get the byte lengths in */
-    std->ptr_bytes    = *(p++);
+    std->ptr_bytes = *(p++);
     for (i = 0; i < 3; i++)
         std->fx[i].bpi = *(p++);
+
     for (i = 0; i < 2; i++)
         std->fp[i].bpi = *(p++);
 
@@ -1174,9 +1175,9 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
  */
 
 static int _PD_wr_fmt_ii(PDBfile *file)
-   {int j, n, rv, sz, nw;
+   {int i, j, n, rv, sz, nw;
     int *order;
-    long *format, float_bias, double_bias;
+    long *format, fp_bias[2];
     char outfor[MAXLINE];
     char *nht, *p;
     data_standard *std;
@@ -1195,42 +1196,30 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 
 /* get the byte lengths in */
        {*(p++) = std->ptr_bytes;
-	*(p++) = std->fx[0].bpi;
-	*(p++) = std->fx[1].bpi;
-	*(p++) = std->fx[2].bpi;
-	*(p++) = std->fp[0].bpi;
-	*(p++) = std->fp[1].bpi;
+
+	for (i = 0; i < 3; i++)
+	    *(p++) = std->fx[i].bpi;
+
+	for (i = 0; i < 2; i++)
+	    *(p++) = std->fp[i].bpi;
 
 /* get the integral types byte order in */
-	*(p++) = std->fx[0].order;
-	*(p++) = std->fx[1].order;
-	*(p++) = std->fx[2].order;
+	for (i = 0; i < 3; i++)
+	    *(p++) = std->fx[i].order;
 
-/* get the float byte order in */
-	order = std->fp[0].order;
-	n     = std->fp[0].bpi;
-	for (j = 0; j < n; j++, *(p++) = *(order++));
+/* get the floating point format byte orders in */
+	for (i = 0; i < 2; i++)
+	    {order = std->fp[i].order;
+	     n     = std->fp[i].bpi;
+	     for (j = 0; j < n; j++, *(p++) = *(order++));};
 
-/* get the double byte order in */
-	order = std->fp[1].order;
-	n     = std->fp[1].bpi;
-	for (j = 0; j < n; j++, *(p++) = *(order++));
+/* get the floating point formats in */
+	for (i = 0; i < 2; i++)
+	    {format = std->fp[i].format;
+	     n = FORMAT_FIELDS - 1;
+	     for (j = 0; j < n; j++, *(p++) = *(format++));
 
-/* get the float format data in */
-	format = std->fp[0].format;
-	n = FORMAT_FIELDS - 1;
-	for (j = 0; j < n; j++, *(p++) = *(format++));
-
-/* get the float bias in */
-	float_bias = *format;
-
-/* get the double format data in */
-	format = std->fp[1].format;
-	n      = FORMAT_FIELDS - 1;
-	for (j = 0; j < n; j++, *(p++) = *(format++));
-
-/* get the double bias in */
-	double_bias = *format;
+	     fp_bias[i] = *format;};
 
 	n         = (int) (p - outfor);
 	outfor[0] = n;
@@ -1240,7 +1229,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	   PD_error("FAILED TO WRITE FORMAT DATA - _PD_WR_FMT_II", PD_CREATE);
     
 /* write out the biases */
-	snprintf(outfor, MAXLINE, "%ld\001%ld\001\n", float_bias, double_bias);
+	snprintf(outfor, MAXLINE, "%ld\001%ld\001\n", fp_bias[0], fp_bias[1]);
 	n  = strlen(outfor);
 	nw = lio_write(outfor, (size_t) 1, (size_t) n, file->stream);
 	if (nw != n)

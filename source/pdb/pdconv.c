@@ -232,22 +232,7 @@ data_standard
 
 /*--------------------------------------------------------------------------*/
 
-/* Word Alignment for the different architectures
- *
- *   struct s_data_alignment
- *      {int char_alignment;
- *       int ptr_alignment;
- *       int short_alignment;
- *       int int_alignment;
- *       int long_alignment;
- *       int longlong_alignment;
- *       int float_alignment;
- *       int double_alignment;
- *       int quad_alignment;
- *       int struct_alignment;};
- *   
- *   typedef struct s_data_alignment data_alignment;
- */
+/* Word Alignment for the different architectures */
 
 data_alignment
  TEXT_ALIGNMENT        = {0, 0, 0, {0, 0, 0, 0}, {0, 0,  0}, 0},

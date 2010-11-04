@@ -200,7 +200,7 @@ static void print_test_gather_data(FILE *fp)
 static int compare_test_gather_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
     int ia, ib, mo, rmj;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     if (strm == NULL)
        return(FALSE);

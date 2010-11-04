@@ -253,11 +253,11 @@ data_standard *_PD_mk_standard(PDBfile *file)
     std->ptr_bytes         = 0;
     std->bool_bytes        = 0;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
         {std->fx[i].bpi   = 0;
 	 std->fx[i].order = NO_ORDER;};
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {std->fp[i].bpi    = 0;
 	 std->fp[i].order  = NULL;
 	 std->fp[i].format = NULL;};
@@ -289,7 +289,7 @@ data_standard *_PD_copy_standard(data_standard *src)
         {std->fx[i].bpi   = src->fx[i].bpi;
 	 std->fx[i].order = src->fx[i].order;};
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {std->fp[i].bpi = src->fp[i].bpi;
 
 	 n    = FORMAT_FIELDS;
@@ -353,7 +353,7 @@ data_alignment *_PD_mk_alignment(char *vals)
 /* default-equal to long alignment*/
     align->fx[3] = vals[5];
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         align->fp[i] = vals[i + 6];
 
     if (strlen(vals) > 9)

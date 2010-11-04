@@ -447,13 +447,13 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
  */
 
 void PD_fp_toler(PDBfile *file, long double *fptol)
-   {int i, fpmn[3];
+   {int i, fpmn[PD_N_PRIMITIVE_FP];
     data_standard *fstd, *hstd;
 
     fstd = file->std;
     hstd = file->host_std;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {fpmn[i]  = min(fstd->fp[i].format[2], hstd->fp[i].format[2]);
 	 fptol[i] = powl(2.0, -((long double) fpmn[i]));};
 

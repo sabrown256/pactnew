@@ -102,10 +102,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-double
- SX_float_tol, 
- SX_double_tol;
-
 int
  SX_disp_individ_diff = FALSE, 
  SX_promote_flag      = 0, 
@@ -713,21 +709,21 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
        {if (sizeof(REAL) == sizeof(double))
            {dpa = (double *) bfa;
             dpb = (double *) bfb;
-            DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_double_tol);}
+            DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_fp_precision[1].tolerance);}
         else if (sizeof(REAL) == sizeof(float))
            {fpa = (float *) bfa;
             fpb = (float *) bfb;
-            DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_float_tol);};}
+            DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_fp_precision[0].tolerance);};}
 
     else if (strcmp(type, "float") == 0)
        {fpa = (float *) bfa;
         fpb = (float *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_float_tol);}
+        DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_fp_precision[0].tolerance);}
 
     else if (strcmp(type, "double") == 0)
        {dpa = (double *) bfa;
         dpb = (double *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_double_tol);};
+        DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_fp_precision[1].tolerance);};
 
     if (!ret)
        _SX_display_diff(pf, nma, nmb, bfa, bfb, indx, ni, type, dims);
