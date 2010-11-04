@@ -945,25 +945,25 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
            size[1]);
     printf("            %d,                                /* size of bool */\n", 
            size[10]);
-    printf("            %d, %s,       /* size and order of short */\n", 
+    printf("            {{%d, %s},       /* size and order of short */\n", 
            size[2], int_order);
-    printf("            %d, %s,         /* size and order of int */\n", 
+    printf("             {%d, %s},         /* size and order of int */\n", 
            size[3], int_order);
-    printf("            %d, %s,        /* size and order of long */\n", 
+    printf("             {%d, %s},        /* size and order of long */\n", 
            size[4], int_order);
-    printf("            %d, %s,   /* size and order of long long */\n", 
+    printf("             {%d, %s}},   /* size and order of long long */\n", 
            size[5], int_order);
-    printf("            %d, int_frm_f, int_ord_f,     /* float definition */\n", 
+    printf("            {{%d, int_frm_f, int_ord_f},     /* float definition */\n", 
            size[6]);
-    printf("            %d, int_frm_d, int_ord_d,     /* double definition */\n", 
+    printf("             {%d, int_frm_d, int_ord_d},     /* double definition */\n", 
            size[7]);
-    printf("            %d, int_frm_ld, int_ord_ld},  /* long double definition */\n", 
+    printf("             {%d, int_frm_ld, int_ord_ld}}},  /* long double definition */\n", 
            size[8]);
     printf(" *INT_STANDARD = &INT_STD;\n");
 
     printf("\n/* Internal DATA_ALIGNMENT */\n");
     printf("data_alignment\n");
-    printf(" INT_ALG = {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d},\n", 
+    printf(" INT_ALG = {%d, %d, %d, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
            align[0], align[1], align[10], align[2], align[3], 
            align[4], align[5], align[6], align[7], align[8],
 	   align[9]);

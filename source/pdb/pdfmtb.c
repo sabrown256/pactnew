@@ -132,9 +132,9 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
  */
 
 static int _PD_rd_fmt_ii(PDBfile *file)
-   {int j, n, *order;
+   {int i, j, n, *order;
     long *format;
-    char infor[MAXLINE], *p, *s;
+    char infor[MAXLINE], *p, *s, *pi;
     data_standard *std;
     
 /* read the number of bytes worth of format data */
@@ -152,50 +152,37 @@ static int _PD_rd_fmt_ii(PDBfile *file)
     std = _PD_copy_standard(file->host_std);
 
 /* get the byte lengths in */
-    std->ptr_bytes      = *(p++);
-    std->short_bytes    = *(p++);
-    std->int_bytes      = *(p++);
-    std->long_bytes     = *(p++);
-    STD_FP4(std, bytes) = *(p++);
-    STD_FP8(std, bytes) = *(p++);
+    std->ptr_bytes    = *(p++);
+    for (i = 0; i < 3; i++)
+        std->fx[i].bpi = *(p++);
+    for (i = 0; i < 2; i++)
+        std->fp[i].bpi = *(p++);
 
-/* get the integral types byte order in */
-    std->short_order = (PD_byte_order) *(p++);
-    std->int_order   = (PD_byte_order) *(p++);
-    std->long_order  = (PD_byte_order) *(p++);
+/* get the fix point byte orders in */
+    for (i = 0; i < 3; i++)
+        std->fx[i].order = (PD_byte_order) *(p++);
 
-/* get the float byte order in */
-    n     = STD_FP4(std, bytes);
-    order = STD_FP4(std, order);
-    REMAKE_N(order, int, n);
-    STD_FP4(std, order) = order;
-    for (j = 0; j < n; j++, *(order++) = *(p++));
+/* get the floating point byte orders in */
+    for (i = 0; i < 2; i++)
+        {n     = std->fp[i].bpi;
+	 order = std->fp[i].order;
+	 REMAKE_N(order, int, n);
+	 std->fp[i].order = order;
+	 for (j = 0; j < n; j++, *(order++) = *(p++));};
 
-/* get the double byte order in */
-    n     = STD_FP8(std, bytes);
-    order = STD_FP8(std, order);
-    REMAKE_N(order, int, n);
-    STD_FP8(std, order) = order;
-    for (j = 0; j < n; j++, *(order++) = *(p++));
-
-/* get the float format data in */
+/* get the floating point format data in */
     n      = FORMAT_FIELDS - 1;
-    format = STD_FP4(std, format);
-    for (j = 0; j < n; j++, *(format++) = *(p++));
-
-/* get the double format data in */
-    n      = FORMAT_FIELDS - 1;
-    format = STD_FP8(std, format);
-    for (j = 0; j < n; j++, *(format++) = *(p++));
+    for (i = 0; i < 2; i++)
+        {format = std->fp[i].format;
+	 for (j = 0; j < n; j++, *(format++) = *(p++));};
 
 /* read the biases */
     if (_PD_rfgets(infor, MAXLINE, file->stream) == NULL)
        PD_error("CAN'T READ THE BIASES - _PD_RD_FMT_II", PD_OPEN);
-
-    format    = STD_FP4(std, format);
-    format[7] = SC_stol(SC_strtok(infor, "\001", s));
-    format    = STD_FP8(std, format);
-    format[7] = SC_stol(SC_strtok(NULL, "\001", s));
+    
+    for (i = 0, pi = infor; i < 2; i++, pi = NULL)
+        {format    = std->fp[i].format;
+	 format[7] = SC_stol(SC_strtok(pi, "\001", s));};
 
     file->std = std;
 
@@ -493,7 +480,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 		    tord[i] = ordr[i];
 		for (i = 0L; i < 8; i++)
 		    tfmt[i] = formt[i];
-		STD_FP16(std, bytes) = size;};
+		STD_FP16(std, bpi) = size;};
 	       
 	    kind = FLOAT_KIND;}
 
@@ -622,10 +609,10 @@ int _PD_rd_ext_ii(PDBfile *file)
             if (token != NULL)
                {ps = file->std;
 		if (ps != NULL)
-		   {ps->longlong_bytes = token[0];
-		    ps->longlong_order = (PD_byte_order) token[1];};
+		   {ps->fx[3].bpi   = token[0];
+		    ps->fx[3].order = (PD_byte_order) token[1];};
 		if (palgn != NULL)
-		   palgn->longlong_alignment = token[2];};}
+		   palgn->fx[3] = token[2];};}
 
         else if (strcmp(token, "Casts") == 0)
            {long n_casts, i;
@@ -1087,12 +1074,12 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     al[0] = pl->char_alignment;
     al[1] = pl->ptr_alignment;
     al[2] = pl->bool_alignment;
-    al[3] = pl->short_alignment;
-    al[4] = pl->int_alignment;
-    al[5] = pl->long_alignment;
-    al[6] = pl->float_alignment;
-    al[7] = pl->double_alignment;
-    al[8] = pl->quad_alignment;
+    al[3] = pl->fx[0];
+    al[4] = pl->fx[1];
+    al[5] = pl->fx[2];
+    al[6] = pl->fp[0];
+    al[7] = pl->fp[1];
+    al[8] = pl->fp[2];
     al[9] = '\0';
 
     if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7]*al[8] == 0) 
@@ -1104,9 +1091,9 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 
 /* write out the long long standard and alignment */
     ps = file->std;
-    al[0] = ps->longlong_bytes;
-    al[1] = ps->longlong_order;
-    al[2] = pl->longlong_alignment;
+    al[0] = ps->fx[3].bpi;
+    al[1] = ps->fx[3].order;
+    al[2] = pl->fx[3];
     al[3] = '\0';
 
     ok &= _PD_put_string(1, "Longlong-Format-Alignment:%s\n", al);
@@ -1208,25 +1195,25 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 
 /* get the byte lengths in */
        {*(p++) = std->ptr_bytes;
-	*(p++) = std->short_bytes;
-	*(p++) = std->int_bytes;
-	*(p++) = std->long_bytes;
-	*(p++) = STD_FP4(std, bytes);
-	*(p++) = STD_FP8(std, bytes);
+	*(p++) = std->fx[0].bpi;
+	*(p++) = std->fx[1].bpi;
+	*(p++) = std->fx[2].bpi;
+	*(p++) = STD_FP4(std, bpi);
+	*(p++) = STD_FP8(std, bpi);
 
 /* get the integral types byte order in */
-	*(p++) = std->short_order;
-	*(p++) = std->int_order;
-	*(p++) = std->long_order;
+	*(p++) = std->fx[0].order;
+	*(p++) = std->fx[1].order;
+	*(p++) = std->fx[2].order;
 
 /* get the float byte order in */
 	order = STD_FP4(std, order);
-	n     = STD_FP4(std, bytes);
+	n     = STD_FP4(std, bpi);
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the double byte order in */
 	order = STD_FP8(std, order);
-	n     = STD_FP8(std, bytes);
+	n     = STD_FP8(std, bpi);
 	for (j = 0; j < n; j++, *(p++) = *(order++));
 
 /* get the float format data in */

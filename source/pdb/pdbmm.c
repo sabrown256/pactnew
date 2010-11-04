@@ -244,7 +244,8 @@ void _PD_clr_table(hasharr *tab, int (*rel)(haelem *p, void *a))
  */
 
 data_standard *_PD_mk_standard(PDBfile *file)
-   {data_standard *std;
+   {int i;
+    data_standard *std;
 
     std = FMAKE(data_standard, "_PD_MK_STANDARD:std");
 
@@ -252,24 +253,14 @@ data_standard *_PD_mk_standard(PDBfile *file)
     std->ptr_bytes         = 0;
     std->bool_bytes        = 0;
 
-    STD_FIX_S(std, bytes)  = 0;
-    STD_FIX_S(std, order)  = NO_ORDER;
-    STD_FIX_I(std, bytes)  = 0;
-    STD_FIX_I(std, order)  = NO_ORDER;
-    STD_FIX_L(std, bytes)  = 0;
-    STD_FIX_L(std, order)  = NO_ORDER;
-    STD_FIX_E(std, bytes)  = 0;
-    STD_FIX_E(std, order)  = NO_ORDER;
+    for (i = 0; i < 4; i++)
+        {std->fx[i].bpi   = 0;
+	 std->fx[i].order = NO_ORDER;};
 
-    STD_FP4(std, bytes)    = 0;
-    STD_FP4(std, format)   = NULL;
-    STD_FP4(std, order)    = NULL;
-    STD_FP8(std, bytes)    = 0;
-    STD_FP8(std, format)   = NULL;
-    STD_FP8(std, order)    = NULL;
-    STD_FP16(std, bytes)   = 0;
-    STD_FP16(std, format)  = NULL;
-    STD_FP16(std, order)   = NULL;
+    for (i = 0; i < 3; i++)
+        {std->fp[i].bpi    = 0;
+	 std->fp[i].order  = NULL;
+	 std->fp[i].format = NULL;};
 
     std->file = file;
 
@@ -293,17 +284,17 @@ data_standard *_PD_copy_standard(data_standard *src)
     std->bits_byte        = src->bits_byte;
     std->ptr_bytes        = src->ptr_bytes;
     std->bool_bytes       = src->bool_bytes;
-    STD_FIX_S(std, bytes) = STD_FIX_S(src, bytes);
+    STD_FIX_S(std, bpi) = STD_FIX_S(src, bpi);
     STD_FIX_S(std, order) = STD_FIX_S(src, order);
-    STD_FIX_I(std, bytes) = STD_FIX_I(src, bytes);
+    STD_FIX_I(std, bpi) = STD_FIX_I(src, bpi);
     STD_FIX_I(std, order) = STD_FIX_I(src, order);
-    STD_FIX_L(std, bytes) = STD_FIX_L(src, bytes);
+    STD_FIX_L(std, bpi) = STD_FIX_L(src, bpi);
     STD_FIX_L(std, order) = STD_FIX_L(src, order);
-    STD_FIX_E(std, bytes) = STD_FIX_E(src, bytes);
+    STD_FIX_E(std, bpi) = STD_FIX_E(src, bpi);
     STD_FIX_E(std, order) = STD_FIX_E(src, order);
-    STD_FP4(std, bytes)   = STD_FP4(src, bytes);
-    STD_FP8(std, bytes)   = STD_FP8(src, bytes);
-    STD_FP16(std, bytes)  = STD_FP16(src, bytes);
+    STD_FP4(std, bpi)   = STD_FP4(src, bpi);
+    STD_FP8(std, bpi)   = STD_FP8(src, bpi);
+    STD_FP16(std, bpi)  = STD_FP16(src, bpi);
 
     n    = FORMAT_FIELDS;
     fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp4_format");
@@ -312,7 +303,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     fsrc = STD_FP4(src, format);
     for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = STD_FP4(std, bytes);
+    n = STD_FP4(std, bpi);
     n = (n > 0) ? n : -(n / std->bits_byte);
     ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp4_order");
     SC_mark(ostd, 1);
@@ -327,7 +318,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     fsrc = STD_FP8(src, format);
     for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = STD_FP8(std, bytes);
+    n = STD_FP8(std, bpi);
     n = (n > 0) ? n : -(n / std->bits_byte);
     ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp8_order");
     SC_mark(ostd, 1);
@@ -342,7 +333,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     fsrc = STD_FP16(src, format);
     for (j = 0; j < n; j++, *(fstd++) = *(fsrc++));
 
-    n = STD_FP16(std, bytes);
+    n = STD_FP16(std, bpi);
     n = (n > 0) ? n : -(n / std->bits_byte);
     ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp16_order");
     SC_mark(ostd, 1);
@@ -381,20 +372,23 @@ void _PD_rl_standard(data_standard *std)
  */
 
 data_alignment *_PD_mk_alignment(char *vals)
-   {data_alignment *align;
+   {int i;
+    data_alignment *align;
 
     align = FMAKE(data_alignment, "_PD_MK_ALIGNMENT:align");
 
-    align->char_alignment     = vals[0];
-    align->ptr_alignment      = vals[1];
-    align->bool_alignment     = vals[2];
-    align->short_alignment    = vals[3];
-    align->int_alignment      = vals[4];
-    align->long_alignment     = vals[5];
-    align->longlong_alignment = vals[5];  /* default-equal to long alignment*/
-    align->float_alignment    = vals[6];
-    align->double_alignment   = vals[7];
-    align->quad_alignment     = vals[8];
+    align->char_alignment = vals[0];
+    align->ptr_alignment  = vals[1];
+    align->bool_alignment = vals[2];
+
+    for (i = 0; i < 3; i++)
+        align->fx[i] = vals[i + 3];
+
+/* default-equal to long alignment*/
+    align->fx[3] = vals[5];
+
+    for (i = 0; i < 3; i++)
+        align->fp[i] = vals[i + 6];
 
     if (strlen(vals) > 9)
        align->struct_alignment = vals[9];

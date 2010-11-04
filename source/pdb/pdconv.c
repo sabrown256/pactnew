@@ -115,116 +115,116 @@ data_standard
  TEXT_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 12,                                       /* size of pointer */
                 1,                                           /* size of bool */
-                7,  TEXT_ORDER,                   /* size and order of short */
-                12, TEXT_ORDER,                     /* size and order of int */
-                22, TEXT_ORDER,                    /* size and order of long */
-                22, TEXT_ORDER,               /* size and order of LONG_LONG */
-                15, float4_text, text_order,             /* float definition */
-                26, float8_text, text_order,            /* double definition */
-                42, float16_text, text_order},            /* quad definition */
+                {{7,  TEXT_ORDER},                /* size and order of short */
+                 {12, TEXT_ORDER},                  /* size and order of int */
+                 {22, TEXT_ORDER},                 /* size and order of long */
+                 {22, TEXT_ORDER}},           /* size and order of long long */
+                {{15, float4_text, text_order},          /* float definition */
+                 {26, float8_text, text_order},         /* double definition */
+                 {42, float16_text, text_order}}},        /* quad definition */
  I386_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, REVERSE_ORDER,                 /* size and order of short */
-                2, REVERSE_ORDER,                   /* size and order of int */
-                4, REVERSE_ORDER,                  /* size and order of long */
-                4, REVERSE_ORDER,             /* size and order of LONG_LONG */
-                4, float4_ieee, float4_rev_order,        /* float definition */
-                8, float8_ieee, float8_rev_order,       /* double definition */
-                16, float16_ieee, float16_rev_order},     /* quad definition */
+                {{2, REVERSE_ORDER},              /* size and order of short */
+                 {2, REVERSE_ORDER},                /* size and order of int */
+                 {4, REVERSE_ORDER},               /* size and order of long */
+                 {4, REVERSE_ORDER}},         /* size and order of long long */
+                {{4, float4_ieee, float4_rev_order},     /* float definition */
+                 {8, float8_ieee, float8_rev_order},    /* double definition */
+                 {16, float16_ieee, float16_rev_order}}}, /* quad definition */
  I586L_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, REVERSE_ORDER,                 /* size and order of short */
-                4, REVERSE_ORDER,                   /* size and order of int */
-                4, REVERSE_ORDER,                  /* size and order of long */
-                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
-                4, float4_ieee, float4_rev_order,        /* float definition */
-                8, float8_ieee, float8_rev_order,       /* double definition */
-                12, float12_ieee, float12_rev_order},     /* quad definition */
+                {{2, REVERSE_ORDER},              /* size and order of short */
+                 {4, REVERSE_ORDER},                /* size and order of int */
+                 {4, REVERSE_ORDER},               /* size and order of long */
+                 {8, REVERSE_ORDER}},         /* size and order of long long */
+		{{4, float4_ieee, float4_rev_order},     /* float definition */
+                 {8, float8_ieee, float8_rev_order},    /* double definition */
+                 {12, float12_ieee, float12_rev_order}}}, /* quad definition */
  I586O_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, REVERSE_ORDER,                 /* size and order of short */
-                4, REVERSE_ORDER,                   /* size and order of int */
-                4, REVERSE_ORDER,                  /* size and order of long */
-                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
-                4, float4_ieee, float4_rev_order,        /* float definition */
-                8, float8_ieee, float8_rev_order,       /* double definition */
-                16, float16_ieee, float16_rev_order},     /* quad definition */
+                {{2, REVERSE_ORDER},              /* size and order of short */
+                 {4, REVERSE_ORDER},                /* size and order of int */
+                 {4, REVERSE_ORDER},               /* size and order of long */
+                 {8, REVERSE_ORDER}},         /* size and order of long long */
+                {{4, float4_ieee, float4_rev_order},     /* float definition */
+                 {8, float8_ieee, float8_rev_order},    /* double definition */
+                 {16, float16_ieee, float16_rev_order}}}, /* quad definition */
  PPC32_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, NORMAL_ORDER,                  /* size and order of short */
-                4, NORMAL_ORDER,                    /* size and order of int */
-                4, NORMAL_ORDER,                   /* size and order of long */
-                8, NORMAL_ORDER,              /* size and order of LONG_LONG */
-                4, float4_ieee, float4_nrm_order,        /* float definition */
-                8, float8_ieee, float8_nrm_order,       /* double definition */
-                16, float16_ieee, float16_nrm_order},     /* quad definition */
+                {{2, NORMAL_ORDER},               /* size and order of short */
+                 {4, NORMAL_ORDER},                 /* size and order of int */
+                 {4, NORMAL_ORDER},                /* size and order of long */
+                 {8, NORMAL_ORDER}},          /* size and order of long long */
+                {{4, float4_ieee, float4_nrm_order},     /* float definition */
+                 {8, float8_ieee, float8_nrm_order},    /* double definition */
+                 {16, float16_ieee, float16_nrm_order}}}, /* quad definition */
  X86_64_STD  = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, REVERSE_ORDER,                 /* size and order of short */
-                4, REVERSE_ORDER,                   /* size and order of int */
-                8, REVERSE_ORDER,                  /* size and order of long */
-                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
-                4, float4_ieee, float4_rev_order,        /* float definition */
-                8, float8_ieee, float8_rev_order,       /* double definition */
-                16, float16_ieee, float16_rev_order},     /* quad definition */
+                {{2, REVERSE_ORDER},              /* size and order of short */
+                 {4, REVERSE_ORDER},                /* size and order of int */
+                 {8, REVERSE_ORDER},               /* size and order of long */
+                 {8, REVERSE_ORDER}},         /* size and order of long long */
+                {{4, float4_ieee, float4_rev_order},     /* float definition */
+                 {8, float8_ieee, float8_rev_order},    /* double definition */
+                 {16, float16_ieee, float16_rev_order}}}, /* quad definition */
  X86_64A_STD = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, REVERSE_ORDER,                 /* size and order of short */
-                4, REVERSE_ORDER,                   /* size and order of int */
-                8, REVERSE_ORDER,                  /* size and order of long */
-                8, REVERSE_ORDER,             /* size and order of LONG_LONG */
-                4, float4_ieee, float4_rev_order,        /* float definition */
-                8, float8_ieee, float8_rev_order,       /* double definition */
-                16, float10_ix87, float16_rev_order},     /* quad definition */
+                {{2, REVERSE_ORDER},              /* size and order of short */
+                 {4, REVERSE_ORDER},                /* size and order of int */
+                 {8, REVERSE_ORDER},               /* size and order of long */
+                 {8, REVERSE_ORDER}},         /* size and order of long long */
+                {{4, float4_ieee, float4_rev_order},     /* float definition */
+                 {8, float8_ieee, float8_rev_order},    /* double definition */
+                 {16, float10_ix87, float16_rev_order}}}, /* quad definition */
  PPC64_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, NORMAL_ORDER,                  /* size and order of short */
-                4, NORMAL_ORDER,                    /* size and order of int */
-                8, NORMAL_ORDER,                   /* size and order of long */
-                8, NORMAL_ORDER,              /* size and order of LONG_LONG */
-                4, float4_ieee, float4_nrm_order,        /* float definition */
-                8, float8_ieee, float8_nrm_order,       /* double definition */
-                16, float16_ieee, float16_nrm_order},     /* quad definition */
+                {{2, NORMAL_ORDER},               /* size and order of short */
+                 {4, NORMAL_ORDER},                 /* size and order of int */
+                 {8, NORMAL_ORDER},                /* size and order of long */
+                 {8, NORMAL_ORDER}},          /* size and order of long long */
+                {{4, float4_ieee, float4_nrm_order},     /* float definition */
+                 {8, float8_ieee, float8_nrm_order},    /* double definition */
+                 {16, float16_ieee, float16_nrm_order}}}, /* quad definition */
 
 /* historical formats - kept for testing */
 
  M68X_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, NORMAL_ORDER,                  /* size and order of short */
-                2, NORMAL_ORDER,                    /* size and order of int */
-                4, NORMAL_ORDER,                   /* size and order of long */
-                4, NORMAL_ORDER,              /* size and order of LONG_LONG */
-                4, float4_ieee, float4_nrm_order,        /* float definition */
-                12, float12_ieee, float12_nrm_order,    /* double definition */
-                16, float16_ieee, float16_nrm_order},     /* quad definition */
+                {{2, NORMAL_ORDER},               /* size and order of short */
+                 {2, NORMAL_ORDER},                 /* size and order of int */
+                 {4, NORMAL_ORDER},                /* size and order of long */
+                 {4, NORMAL_ORDER}},          /* size and order of long long */
+                {{4, float4_ieee, float4_nrm_order},     /* float definition */
+                 {12, float12_ieee, float12_nrm_order}, /* double definition */
+                 {16, float16_ieee, float16_nrm_order}}}, /* quad definition */
  VAX_STD     = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                2, REVERSE_ORDER,                 /* size and order of short */
-                4, REVERSE_ORDER,                   /* size and order of int */
-                4, REVERSE_ORDER,                  /* size and order of long */
-                4, REVERSE_ORDER,             /* size and order of LONG_LONG */
-                4, float4_vax, float4_vax_order,         /* float definition */
-                8, float8_vax, float8_vax_order,        /* double definition */
-                8, float8_vax, float8_vax_order},         /* quad definition */
+                {{2, REVERSE_ORDER},              /* size and order of short */
+                 {4, REVERSE_ORDER},                /* size and order of int */
+                 {4, REVERSE_ORDER},               /* size and order of long */
+                 {4, REVERSE_ORDER}},         /* size and order of long long */
+                {{4, float4_vax, float4_vax_order},      /* float definition */
+                 {8, float8_vax, float8_vax_order},     /* double definition */
+                 {8, float8_vax, float8_vax_order}}},     /* quad definition */
  CRAY_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
-                8, NORMAL_ORDER,                  /* size and order of short */
-                8, NORMAL_ORDER,                    /* size and order of int */
-                8, NORMAL_ORDER,                   /* size and order of long */
-                8, NORMAL_ORDER,              /* size and order of LONG_LONG */
-                8, float8_cray, float8_nrm_order,        /* float definition */
-                8, float8_cray, float8_nrm_order,       /* double definition */
-                16, float16_cray, float16_nrm_order};     /* quad definition */
+		{{8, NORMAL_ORDER},               /* size and order of short */
+                 {8, NORMAL_ORDER},                 /* size and order of int */
+                 {8, NORMAL_ORDER},                /* size and order of long */
+                 {8, NORMAL_ORDER}},          /* size and order of long long */
+                {{8, float8_cray, float8_nrm_order},     /* float definition */
+                 {8, float8_cray, float8_nrm_order},    /* double definition */
+                 {16, float16_cray, float16_nrm_order}}}; /* quad definition */
 
 /*--------------------------------------------------------------------------*/
 
@@ -250,21 +250,21 @@ data_standard
  */
 
 data_alignment
- TEXT_ALIGNMENT        = {0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0},
- BYTE_ALIGNMENT        = {1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 0},
- WORD2_ALIGNMENT       = {1, 2, 1, 2, 2, 2, 2, 2, 2,  2, 0},
- WORD4_ALIGNMENT       = {1, 4, 1, 4, 4, 4, 4, 4, 4,  4, 0},
- WORD8_ALIGNMENT       = {4, 8, 1, 8, 8, 8, 8, 8, 8,  8, 8},
- GNU4_I686_ALIGNMENT   = {1, 4, 1, 2, 4, 4, 4, 4, 4,  4, 0},
- OSX_10_5_ALIGNMENT    = {1, 4, 1, 2, 4, 4, 4, 4, 4, 16, 0},
- SPARC_ALIGNMENT       = {1, 4, 1, 2, 4, 4, 4, 4, 8,  8, 0},
- XLC32_PPC64_ALIGNMENT = {1, 4, 1, 2, 4, 4, 8, 4, 4,  4, 0},
- CYGWIN_I686_ALIGNMENT = {1, 4, 1, 2, 4, 4, 8, 4, 8,  4, 0},
- GNU3_PPC64_ALIGNMENT  = {1, 4, 1, 2, 4, 4, 8, 4, 8,  8, 0},
- GNU4_PPC64_ALIGNMENT  = {1, 4, 1, 2, 4, 4, 8, 4, 8, 16, 0},
- XLC64_PPC64_ALIGNMENT = {1, 8, 1, 2, 4, 8, 8, 4, 4,  4, 0},
- PGI_X86_64_ALIGNMENT  = {1, 8, 1, 2, 4, 8, 8, 4, 8,  8, 0},
- GNU4_X86_64_ALIGNMENT = {1, 8, 1, 2, 4, 8, 8, 4, 8, 16, 0};
+ TEXT_ALIGNMENT        = {0, 0, 0, {0, 0, 0, 0}, {0, 0,  0}, 0},
+ BYTE_ALIGNMENT        = {1, 1, 1, {1, 1, 1, 1}, {1, 1,  1}, 0},
+ WORD2_ALIGNMENT       = {1, 2, 1, {2, 2, 2, 2}, {2, 2,  2}, 0},
+ WORD4_ALIGNMENT       = {1, 4, 1, {4, 4, 4, 4}, {4, 4,  4}, 0},
+ WORD8_ALIGNMENT       = {4, 8, 1, {8, 8, 8, 8}, {8, 8,  8}, 8},
+ GNU4_I686_ALIGNMENT   = {1, 4, 1, {2, 4, 4, 4}, {4, 4,  4}, 0},
+ OSX_10_5_ALIGNMENT    = {1, 4, 1, {2, 4, 4, 4}, {4, 4, 16}, 0},
+ SPARC_ALIGNMENT       = {1, 4, 1, {2, 4, 4, 4}, {4, 8,  8}, 0},
+ XLC32_PPC64_ALIGNMENT = {1, 4, 1, {2, 4, 4, 8}, {4, 4,  4}, 0},
+ CYGWIN_I686_ALIGNMENT = {1, 4, 1, {2, 4, 4, 8}, {4, 8,  4}, 0},
+ GNU3_PPC64_ALIGNMENT  = {1, 4, 1, {2, 4, 4, 8}, {4, 8,  8}, 0},
+ GNU4_PPC64_ALIGNMENT  = {1, 4, 1, {2, 4, 4, 8}, {4, 8, 16}, 0},
+ XLC64_PPC64_ALIGNMENT = {1, 8, 1, {2, 4, 8, 8}, {4, 4,  4}, 0},
+ PGI_X86_64_ALIGNMENT  = {1, 8, 1, {2, 4, 8, 8}, {4, 8,  8}, 0},
+ GNU4_X86_64_ALIGNMENT = {1, 8, 1, {2, 4, 8, 8}, {4, 8, 16}, 0};
 
 /*--------------------------------------------------------------------------*/
 
@@ -781,8 +781,8 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
 /* GOTCHA: should this now be quad_format? */
     hfmt = STD_FP8(hstd, format);
     hord = STD_FP8(hstd, order);
-    ordl = hstd->long_order;
-    nbl  = hstd->long_bytes;
+    ordl = hstd->fx[2].order;
+    nbl  = hstd->fx[2].bpi;
 
 /* convert char types */
     if (kndi == CHAR_KIND)
@@ -887,8 +887,8 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
 /* GOTCHA: should this now be quad_format? */
     hfmt = STD_FP8(hstd, format);
     hord = STD_FP8(hstd, order);
-    ordl = hstd->long_order;
-    nbl  = hstd->long_bytes;
+    ordl = hstd->fx[2].order;
+    nbl  = hstd->fx[2].bpi;
 
     if (delim == NULL)
        delim = "\n";
@@ -1000,10 +1000,10 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 	    {file = hstd->file;
 	     hs   = file->host_std;
 	     fs   = file->std;
-	     ford = fs->long_order;
+	     ford = fs->fx[2].order;
 	     fbpi = fs->ptr_bytes;
-	     hord = hs->long_order;
-	     hbpi = hs->long_bytes;
+	     hord = hs->fx[2].order;
+	     hbpi = hs->fx[2].bpi;
        
 /* convert pointer when writing to file */
 	     if (stdi == hstd)
@@ -2007,10 +2007,10 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
     usg = (!iusg && !ousg) ? FALSE : TRUE;
 
-    inord  = istd->long_order;
-    outord = ostd->long_order;
-    lsord  = hstd->long_order;
-    lnby   = hstd->long_bytes;
+    inord  = istd->fx[2].order;
+    outord = ostd->fx[2].order;
+    lsord  = hstd->fx[2].order;
+    lnby   = hstd->fx[2].bpi;
 
     ret = TRUE;
 
