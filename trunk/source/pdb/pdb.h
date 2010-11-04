@@ -118,6 +118,25 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#define STD_FIX_S(_std, _field)   ((_std)->short_##_field)
+#define STD_FIX_I(_std, _field)   ((_std)->int_##_field)
+#define STD_FIX_L(_std, _field)   ((_std)->long_##_field)
+#define STD_FIX_E(_std, _field)   ((_std)->longlong_##_field)
+
+#define STD_FP4(_std, _field)   ((_std)->float_##_field)
+#define STD_FP8(_std, _field)   ((_std)->double_##_field)
+#define STD_FP16(_std, _field)   ((_std)->quad_##_field)
+/*
+#define STD_FIX_S(_std, _field)   ((_std)->fx[0].##_field)
+#define STD_FIX_I(_std, _field)   ((_std)->fx[1].##_field)
+#define STD_FIX_L(_std, _field)   ((_std)->fx[2].##_field)
+#define STD_FIX_E(_std, _field)   ((_std)->fx[3].##_field)
+
+#define STD_FP4(_std, _field)   ((_std)->fp[0].##_field)
+#define STD_FP8(_std, _field)   ((_std)->fp[1].##_field)
+#define STD_FP16(_std, _field)   ((_std)->fp[2].##_field)
+*/
+
 #define PN_sizeof(type, tab)  _PD_lookup_size(type, tab)
 
 #define PD_get_file_type(file)                                               \
@@ -296,23 +315,31 @@ struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
     int bool_bytes;
+
     int short_bytes;
     PD_byte_order short_order;
+
     int int_bytes;
     PD_byte_order int_order;
+
     int long_bytes;
     PD_byte_order long_order;
+
     int longlong_bytes;
     PD_byte_order longlong_order;
+
     int float_bytes;
     long *float_format;
     int *float_order;
+
     int double_bytes;
     long *double_format;
     int *double_order;
+
     int quad_bytes;
     long *quad_format;
     int *quad_order;
+
     PDBfile *file;};
 
 #if 0

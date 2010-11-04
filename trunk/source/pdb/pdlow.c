@@ -50,23 +50,23 @@
 
 #define PD_COMPARE_FLT_STD(eq, a, b, c, d)                                   \
    PD_COMPARE_FP_STD(eq,                                                     \
-		     a->float_bytes,     b->float_bytes,                     \
-		     a->float_order,     b->float_order,                     \
-		     a->float_format,    b->float_format,                    \
+		     STD_FP4(a, bytes),  STD_FP4(b, bytes),                  \
+		     STD_FP4(a, order),  STD_FP4(b, order),                  \
+		     STD_FP4(a, format), STD_FP4(b, format),                 \
 		     c->float_alignment, d->float_alignment)
 
 #define PD_COMPARE_DBL_STD(eq, a, b, c, d)                                   \
    PD_COMPARE_FP_STD(eq,                                                     \
-		     a->double_bytes,     b->double_bytes,                   \
-		     a->double_order,     b->double_order,                   \
-		     a->double_format,    b->double_format,                  \
+		     STD_FP8(a, bytes),   STD_FP8(b, bytes),                 \
+		     STD_FP8(a, order),   STD_FP8(b, order),                 \
+		     STD_FP8(a, format),  STD_FP8(b, format),                \
 		     c->double_alignment, d->double_alignment)
 
 #define PD_COMPARE_QUD_STD(eq, a, b, c, d)                                   \
    PD_COMPARE_FP_STD(eq,                                                     \
-		     a->quad_bytes,     b->quad_bytes,                       \
-		     a->quad_order,     b->quad_order,                       \
-		     a->quad_format,    b->quad_format,                      \
+		     STD_FP16(a, bytes),  STD_FP16(b, bytes),                \
+		     STD_FP16(a, order),  STD_FP16(b, order),                \
+		     STD_FP16(a, format), STD_FP16(b, format),               \
 		     c->quad_alignment, d->quad_alignment)
 
 #define PD_COMPARE_FP_STD(eq, na, nb, oa, ob, fa, fb, la, lb)                \
@@ -110,8 +110,8 @@ int _PD_compare_std(data_standard *a, data_standard *b,
          (a->int_bytes        == b->int_bytes) &&
          (a->long_bytes       == b->long_bytes) &&
          (a->longlong_bytes   == b->longlong_bytes) &&
-         (a->float_bytes      == b->float_bytes) &&
-         (a->double_bytes     == b->double_bytes) &&
+         (STD_FP4(a, bytes)   == STD_FP4(b, bytes)) &&
+         (STD_FP8(a, bytes)   == STD_FP8(b, bytes)) &&
          (a->short_order      == b->short_order) &&
          (a->int_order        == b->int_order) &&
          (a->long_order       == b->long_order) &&
@@ -121,33 +121,33 @@ int _PD_compare_std(data_standard *a, data_standard *b,
        return(FALSE);
 
 /* check the float byte order */
-    n  = a->float_bytes;
-    oa = a->float_order;
-    ob = b->float_order;
+    n  = STD_FP4(a, bytes);
+    oa = STD_FP4(a, order);
+    ob = STD_FP4(b, order);
     for (j = 0; j < n; j++, eq &= (*(oa++) == *(ob++)));
 
 /* check the double byte order */
-    n  = a->double_bytes;
-    oa = a->double_order;
-    ob = b->double_order;
+    n  = STD_FP8(a, bytes);
+    oa = STD_FP8(a, order);
+    ob = STD_FP8(b, order);
     for (j = 0; j < n; j++, eq &= (*(oa++) == *(ob++)));
 
 /* check the float format data */
     n  = FORMAT_FIELDS;
-    fa = a->float_format;
-    fb = b->float_format;
+    fa = STD_FP4(a, format);
+    fb = STD_FP4(b, format);
     for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
 
 /* check the double format data */
     n  = FORMAT_FIELDS;
-    fa = a->double_format;
-    fb = b->double_format;
+    fa = STD_FP8(a, format);
+    fb = STD_FP8(b, format);
     for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
 
 /* check the double format data */
     n  = FORMAT_FIELDS;
-    fa = a->quad_format;
-    fb = b->quad_format;
+    fa = STD_FP16(a, format);
+    fb = STD_FP16(b, format);
     for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
 
 /* check alignments */
@@ -928,10 +928,10 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        fcnv = FALSE;
     _PD_defstr_in(chart, "float", FLOAT_KIND,
-		  NULL, NULL, (long) fstd->float_bytes, 
+		  NULL, NULL, STD_FP4(fstd, bytes), 
                   falign->float_alignment, NO_ORDER,
-		  fcnv, fstd->float_order,
-	          fstd->float_format, FALSE, FALSE);
+		  fcnv, STD_FP4(fstd, order),
+	          STD_FP4(fstd, format), FALSE, FALSE);
 
     if (flag == TRUE)
        {if (ftk == FALSE)
@@ -941,10 +941,10 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        dcnv = FALSE;
     _PD_defstr_in(chart, "double", FLOAT_KIND,
-		  NULL, NULL, (long) fstd->double_bytes, 
+		  NULL, NULL, STD_FP8(fstd, bytes), 
                   falign->double_alignment, NO_ORDER,
-		  dcnv, fstd->double_order,
-	          fstd->double_format, FALSE, FALSE);
+		  dcnv, STD_FP8(fstd, order),
+	          STD_FP8(fstd, format), FALSE, FALSE);
 
     if (flag == TRUE)
        {if (ftk == FALSE)
@@ -954,32 +954,32 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     else
        qcnv = FALSE;
     _PD_defstr_in(chart, "long_double", FLOAT_KIND,
-		  NULL, NULL, (long) fstd->quad_bytes, 
+		  NULL, NULL, STD_FP16(fstd, bytes), 
                   falign->quad_alignment, NO_ORDER,
-		  qcnv, fstd->quad_order,
-	          fstd->quad_format, FALSE, FALSE);
+		  qcnv, STD_FP16(fstd, order),
+	          STD_FP16(fstd, format), FALSE, FALSE);
 
 /* complex types */
     tup = _PD_make_tuple("float", 2, NULL);
     _PD_defstr_in(chart, "float_complex", FLOAT_KIND,
-		  NULL, tup, (long) fstd->float_bytes, 
+		  NULL, tup, STD_FP4(fstd, bytes), 
                   falign->float_alignment, NO_ORDER,
-		  fcnv, fstd->float_order,
-	          fstd->float_format, FALSE, FALSE);
+		  fcnv, STD_FP4(fstd, order),
+	          STD_FP4(fstd, format), FALSE, FALSE);
 
     tup = _PD_make_tuple("double", 2, NULL);
     _PD_defstr_in(chart, "double_complex", FLOAT_KIND,
-		  NULL, tup, (long) fstd->double_bytes, 
+		  NULL, tup, STD_FP8(fstd, bytes), 
                   falign->double_alignment, NO_ORDER,
-		  dcnv, fstd->double_order,
-	          fstd->double_format, FALSE, FALSE);
+		  dcnv, STD_FP8(fstd, order),
+	          STD_FP8(fstd, format), FALSE, FALSE);
 
     tup = _PD_make_tuple("long_double", 2, NULL);
     _PD_defstr_in(chart, "long_double_complex", FLOAT_KIND,
-		  NULL, tup, (long) fstd->quad_bytes, 
+		  NULL, tup, STD_FP16(fstd, bytes), 
                   falign->quad_alignment, NO_ORDER,
-		  qcnv, fstd->quad_order,
-	          fstd->quad_format, FALSE, FALSE);
+		  qcnv, STD_FP16(fstd, order),
+	          STD_FP16(fstd, format), FALSE, FALSE);
 
     return;}
 

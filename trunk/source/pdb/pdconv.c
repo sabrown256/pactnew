@@ -111,34 +111,6 @@ long
  float8_cray[]    = {64L,  15L,  48L,  0L,  1L, 16L, 1L, 0x4000L},
  float16_cray[]   = {128L, 15L, 112L,  0L,  1L, 16L, 1L, 0x4000L};
 
-/* Data standard for the different architectures
- *
- *   struct s_data_standard
- *      {int bits_byte;
- *       int ptr_bytes;
- *       int short_bytes;
- *       int short_order;
- *       int int_bytes;
- *       int int_order;
- *       int long_bytes;
- *       int long_order;
- *       int longlong_bytes;
- *       int longlong_order;
- *       int float_bytes;
- *       long *float_format;
- *       int *float_order;
- *       int double_bytes;
- *       long *double_format;
- *       int *double_order;
- *       int quad_bytes;
- *       long *quad_format;
- *       int *quad_order;};
- *   
- *   typedef struct s_data_standard data_standard;
- *
- *   NOTE: NORMAL_ORDER is big-endian and REVERSE_ORDER is little-endian
- */
-
 data_standard
  TEXT_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 12,                                       /* size of pointer */
@@ -807,8 +779,8 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
     lout = *out;
 
 /* GOTCHA: should this now be quad_format? */
-    hfmt = hstd->double_format;
-    hord = hstd->double_order;
+    hfmt = STD_FP8(hstd, format);
+    hord = STD_FP8(hstd, order);
     ordl = hstd->long_order;
     nbl  = hstd->long_bytes;
 
@@ -913,8 +885,8 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
     lout = *out;
 
 /* GOTCHA: should this now be quad_format? */
-    hfmt = hstd->double_format;
-    hord = hstd->double_order;
+    hfmt = STD_FP8(hstd, format);
+    hord = STD_FP8(hstd, order);
     ordl = hstd->long_order;
     nbl  = hstd->long_bytes;
 

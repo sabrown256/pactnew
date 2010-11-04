@@ -837,10 +837,10 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
     int float_nm, double_nm;
     double float_tolerance, double_tolerance;
 
-    float_nm  = min(strm->std->float_format[2],
-                    strm->host_std->float_format[2]);
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    float_nm  = min(STD_FP4(strm->std,      format)[2],
+                    STD_FP4(strm->host_std, format)[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance  = POW(2.0, -((double) float_nm));
@@ -1548,8 +1548,8 @@ static int compare_test_2_data(PDBfile *strm, FILE *fp)
     double double_tolerance;
     double *p3w, *p4w, *p3r, *p4r;
 
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     double_tolerance = POW(2.0, -((double) double_nm));
@@ -1941,10 +1941,10 @@ static int compare_test_3_data(PDBfile *strm, FILE *fp)
     int float_nm, double_nm;
     double float_tolerance, double_tolerance;
 
-    float_nm  = min(strm->std->float_format[2],
-                    strm->host_std->float_format[2]);
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    float_nm  = min(STD_FP4(strm->std,      format)[2],
+                    STD_FP4(strm->host_std, format)[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance  = POW(2.0, -((double) float_nm));
@@ -2287,10 +2287,10 @@ static int compare_test_4_data(PDBfile *strm, FILE *fp)
     double *pd_w, *pd_r;
     haelem *ph_w, *ph_r;
 
-    float_nm  = min(strm->std->float_format[2],
-                    strm->host_std->float_format[2]);
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    float_nm  = min(STD_FP4(strm->std,      format)[2],
+                    STD_FP4(strm->host_std, format)[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance  = POW(2.0, -((double) float_nm));
@@ -2585,8 +2585,8 @@ static int compare_test_5_data(PDBfile *strm, FILE *fp)
     double double_tolerance;
     double *p3w, *p4w, *p3r, *p4r;
 
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     double_tolerance = POW(2.0, -((double) double_nm));
@@ -2819,8 +2819,8 @@ static int compare_test_6_data(PDBfile *strm, FILE *fp)
     double *p1w, *p2w;
     double float_tolerance;
 
-    float_nm = min(strm->std->float_format[2],
-		   strm->host_std->float_format[2]);
+    float_nm = min(STD_FP4(strm->std,      format)[2],
+		   STD_FP4(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance = POW(2.0, -((double) float_nm));
@@ -3041,8 +3041,8 @@ static int compare_test_7_data(PDBfile *strm, FILE *fp)
     double *p1w, *p2w;
     double float_tolerance;
 
-    float_nm = min(strm->std->float_format[2],
-		   strm->host_std->float_format[2]);
+    float_nm = min(STD_FP4(strm->std,      format)[2],
+		   STD_FP4(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance = POW(2.0, -((double) float_nm));
@@ -3287,8 +3287,8 @@ static int compare_test_8_data(PDBfile *strm, FILE *fp)
     double wc, arc, brc, crc, drc;
     double double_tolerance;
 
-    double_nm = min(strm->std->double_format[2],
-		    strm->host_std->double_format[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+		    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     double_tolerance = POW(2.0, -((double) double_nm));
@@ -3582,8 +3582,8 @@ static int compare_test_10_data(PDBfile *strm, FILE *fp)
     int quad_nm;
     long double quad_tolerance;
 
-    quad_nm = min(strm->std->quad_format[2],
-		  strm->host_std->quad_format[2]);
+    quad_nm = min(STD_FP16(strm->std,      format)[2],
+		  STD_FP16(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     quad_tolerance = powl(2.0, (long double) -quad_nm);

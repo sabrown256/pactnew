@@ -206,10 +206,10 @@ static int compare_test_gather_data(PDBfile *strm, FILE *fp)
     if (strm == NULL)
        return(FALSE);
 
-    float_nm  = min(strm->std->float_format[2],
-                    strm->host_std->float_format[2]);
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    float_nm  = min(STD_FP4(strm->std,      format)[2],
+                    STD_FP4(strm->host_std, format)[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance  = POW(2.0, -((double) float_nm));
@@ -554,10 +554,10 @@ static int compare_test_scatter_data(PDBfile *strm, FILE *fp)
     if (strm == NULL)
        return(FALSE);
 
-    float_nm  = min(strm->std->float_format[2],
-                    strm->host_std->float_format[2]);
-    double_nm = min(strm->std->double_format[2],
-                    strm->host_std->double_format[2]);
+    float_nm  = min(STD_FP4(strm->std,      format)[2],
+                    STD_FP4(strm->host_std, format)[2]);
+    double_nm = min(STD_FP8(strm->std,      format)[2],
+                    STD_FP8(strm->host_std, format)[2]);
 
 /* pad the absolute tolerance */
     float_tolerance  = POW(2.0, -((double) float_nm));
