@@ -11,22 +11,6 @@
 #include "pdb_int.h"
 #include "scope_mem.h"
 
-#define SET_PRIM_INT(_hs, _fs, _ha, _fa, _t, _n, _a)                         \
-   {_hs->_t##_bytes     = _n;                                                \
-    _ha->_t##_alignment = _a;                                                \
-    if (file->mode == PD_CREATE)                                             \
-       {_fs->_t##_bytes     = _n;                                            \
-	_fa->_t##_alignment = _a;};}
-
-#define SET_PRIM_FLT(_hs, _fs, _ha, _fa, _t, _o, _f, _a)                     \
-   {_hs->_t##_order     = _o;                                                \
-    _hs->_t##_format    = _f;                                                \
-    _ha->_t##_alignment = _a;                                                \
-    if (file->mode == PD_CREATE)                                             \
-       {_fs->_t##_order     = _o;                                            \
-        _fs->_t##_format    = _f;                                            \
-	_fa->_t##_alignment = _a;};}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -385,7 +369,7 @@ defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
 
 int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
 			long *fpfmt, int *fpord)
-   {int err;
+   {int err, ifx, ifp;
     data_standard *fstd, *hstd;
     data_alignment *falign, *halign;
     PD_smp_state *pa;
@@ -402,28 +386,43 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
     hstd   = file->host_std;
     halign = file->host_align;
 
+    ifx = -1;
+    ifp = -1;
+
     if (ityp == SC_SHORT_I)
-       {SET_PRIM_INT(hstd, fstd, halign, falign, short, nb, algn);}
-
+       ifx = 0;
     else if (ityp == SC_INTEGER_I)
-       {SET_PRIM_INT(hstd, fstd, halign, falign, int, nb, algn);}
-
+       ifx = 1;
     else if (ityp == SC_LONG_I)
-       {SET_PRIM_INT(hstd, fstd, halign, falign, long, nb, algn);}
-
+       ifx = 2;
     else if (ityp == SC_BIGINT_I)
-       {SET_PRIM_INT(hstd, fstd, halign, falign, longlong, nb, algn);}
+       ifx = 3;
 
     else if (ityp == SC_FLOAT_I)
-       {SET_PRIM_FLT(hstd, fstd, halign, falign, float, fpord, fpfmt, algn);}
-
+       ifp = 0;
     else if (ityp == SC_DOUBLE_I)
-       {SET_PRIM_FLT(hstd, fstd, halign, falign, double, fpord, fpfmt, algn);}
+       ifp = 1;
 
     else
        {snprintf(pa->err, MAXLINE,
 		 "UNKNOWN TYPE %d - PD_CHANGE_PRIMITIVE", ityp);
 	err = 1;};
+
+    if (ifx != -1)
+       {hstd->fx[ifx].bpi = nb;
+	halign->fx[ifx]   = algn;
+	if (file->mode == PD_CREATE)
+	   {fstd->fx[ifx].bpi = nb;
+	    falign->fx[ifx]   = algn;};};
+
+    if (ifp != -1)
+       {hstd->fp[ifp].order  = fpord;
+	hstd->fp[ifp].format = fpfmt;
+	halign->fp[ifp]      = algn;
+	if (file->mode == PD_CREATE)
+	   {fstd->fp[ifp].order  = fpord;
+	    fstd->fp[ifp].format = fpfmt;
+	    falign->fp[ifp]      = algn;};};
 
     _PD_setup_chart(file->host_chart, hstd, NULL, halign, NULL, FALSE, TRUE);
 

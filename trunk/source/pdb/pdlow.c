@@ -23,63 +23,30 @@
 
 #define PD_COMPARE_SHORT_STD(eq, a, b, c, d)                                 \
    PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->short_bytes,     b->short_bytes,                    \
-		      a->short_order,     b->short_order,                    \
-		      c->short_alignment, d->short_alignment)
+		      a->fx[0].bpi,       b->fx[0].bpi,                      \
+		      a->fx[0].order,     b->fx[0].order,                    \
+		      c->fx[0], d->fx[0])
 
 #define PD_COMPARE_INT_STD(eq, a, b, c, d)                                   \
    PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->int_bytes,     b->int_bytes,                        \
-		      a->int_order,     b->int_order,                        \
-		      c->int_alignment, d->int_alignment)
+		      a->fx[1].bpi,       b->fx[1].bpi,                      \
+		      a->fx[1].order,     b->fx[1].order,                    \
+		      c->fx[1], d->fx[1])
 
 #define PD_COMPARE_LONG_STD(eq, a, b, c, d)                                  \
    PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->long_bytes,     b->long_bytes,                      \
-		      a->long_order,     b->long_order,                      \
-		      c->long_alignment, d->long_alignment)
+		      a->fx[2].bpi,       b->fx[2].bpi,                      \
+		      a->fx[2].order,     b->fx[2].order,                    \
+		      c->fx[2], d->fx[2])
 
 #define PD_COMPARE_LONGLONG_STD(eq, a, b, c, d)                              \
    PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->longlong_bytes,     b->longlong_bytes,              \
-		      a->longlong_order,     b->longlong_order,              \
-		      c->longlong_alignment, d->longlong_alignment)
+		      a->fx[3].bpi,       b->fx[3].bpi,                      \
+		      a->fx[3].order,     b->fx[3].order,                    \
+		      c->fx[3], d->fx[3])
 
 #define PD_COMPARE_FIX_STD(eq, na, nb, oa, ob, la, lb)                       \
     eq = (na != nb) || (oa != ob) || (la != lb)
-
-#define PD_COMPARE_FLT_STD(eq, a, b, c, d)                                   \
-   PD_COMPARE_FP_STD(eq,                                                     \
-		     STD_FP4(a, bytes),  STD_FP4(b, bytes),                  \
-		     STD_FP4(a, order),  STD_FP4(b, order),                  \
-		     STD_FP4(a, format), STD_FP4(b, format),                 \
-		     c->float_alignment, d->float_alignment)
-
-#define PD_COMPARE_DBL_STD(eq, a, b, c, d)                                   \
-   PD_COMPARE_FP_STD(eq,                                                     \
-		     STD_FP8(a, bytes),   STD_FP8(b, bytes),                 \
-		     STD_FP8(a, order),   STD_FP8(b, order),                 \
-		     STD_FP8(a, format),  STD_FP8(b, format),                \
-		     c->double_alignment, d->double_alignment)
-
-#define PD_COMPARE_QUD_STD(eq, a, b, c, d)                                   \
-   PD_COMPARE_FP_STD(eq,                                                     \
-		     STD_FP16(a, bytes),  STD_FP16(b, bytes),                \
-		     STD_FP16(a, order),  STD_FP16(b, order),                \
-		     STD_FP16(a, format), STD_FP16(b, format),               \
-		     c->quad_alignment, d->quad_alignment)
-
-#define PD_COMPARE_FP_STD(eq, na, nb, oa, ob, fa, fb, la, lb)                \
-   {int j, *poa, *pob;                                                       \
-    long *pfa, *pfb;                                                         \
-    poa = oa;                                                                \
-    pob = ob;                                                                \
-    pfa = fa;                                                                \
-    pfb = fb;                                                                \
-    eq  = (na != nb) || (la != lb);                                          \
-    if (!eq)                                                                 \
-       {for (j = 0; j < na; j++, eq |= (*(poa++) != *(pob++)));              \
-        for (j = 0; j < FORMAT_FIELDS; j++, eq |= (*(pfa++) != *(pfb++)));};}
 
 char
  *PD_ALIGNMENT_S = NULL,
@@ -87,6 +54,82 @@ char
  *PD_STANDARD_S  = NULL,
  *SYMENT_P_S     = NULL,
  *SYMENT_S       = NULL;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_COMPARE_FIX_STD - compare fixed point type N from
+ *                     - data_standard SA and SB and
+ *                     - data_alignments AA and AB
+ *                     - return TRUE iff conversion is needed
+ *                     - if FTK is TRUE defer decision and return -1
+ */
+
+static int _PD_compare_fix_std(int n, data_standard *sa, data_standard *sb,
+			       data_alignment *aa, data_alignment *ab,
+			       int flag, int ftk)
+   {int eq, na, nb, la, lb;
+    PD_byte_order oa, ob;
+
+    eq = FALSE;
+
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   eq = -1;
+        else
+	   {na = sa->fx[n].bpi;
+	    oa = sa->fx[n].order;
+	    la = aa->fx[n];
+
+	    nb = sb->fx[n].bpi;
+	    ob = sb->fx[n].order;
+	    lb = ab->fx[n];
+
+	    eq = (na != nb) || (oa != ob) || (la != lb);};};
+
+    return(eq);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_COMPARE_FP_STD - compare floating point type N from
+ *                    - data_standard SA and SB and
+ *                    - data_alignments AA and AB
+ *                    - return TRUE iff conversion is needed
+ *                    - if FTK is TRUE defer decision and return -1
+ */
+
+static int _PD_compare_fp_std(int n, data_standard *sa, data_standard *sb,
+			      data_alignment *aa, data_alignment *ab,
+			      int flag, int ftk)
+   {int j, la, lb, na, nb, eq;
+    int *poa, *pob;
+    long *pfa, *pfb;
+
+    eq = FALSE;
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   eq = -1;
+
+        else
+	   {na  = sa->fp[n].bpi;
+	    poa = sa->fp[n].order;
+	    pfa = sa->fp[n].format;
+	    la  = aa->fp[n];
+
+	    nb  = sb->fp[n].bpi;
+	    pob = sb->fp[n].order;
+	    pfb = sb->fp[n].format;
+	    lb  = ab->fp[n];
+
+	    eq = (na != nb) || (la != lb);
+	    if (eq == FALSE)
+	       {for (j = 0; j < na; j++)
+		    eq |= (*(poa++) != *(pob++));
+		for (j = 0; j < FORMAT_FIELDS; j++)
+		    eq |= (*(pfa++) != *(pfb++));};};};
+
+    return(eq);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -101,65 +144,49 @@ char
 
 int _PD_compare_std(data_standard *a, data_standard *b,
 		    data_alignment *c, data_alignment *d)
-   {int j, n, *oa, *ob;
+   {int i, j, n, *oa, *ob;
     long *fa, *fb;
     int eq;
 
-    eq = (a->ptr_bytes        == b->ptr_bytes) &&
-         (a->short_bytes      == b->short_bytes) &&
-         (a->int_bytes        == b->int_bytes) &&
-         (a->long_bytes       == b->long_bytes) &&
-         (a->longlong_bytes   == b->longlong_bytes) &&
-         (STD_FP4(a, bytes)   == STD_FP4(b, bytes)) &&
-         (STD_FP8(a, bytes)   == STD_FP8(b, bytes)) &&
-         (a->short_order      == b->short_order) &&
-         (a->int_order        == b->int_order) &&
-         (a->long_order       == b->long_order) &&
-         (a->longlong_order   == b->longlong_order);
+    eq = (a->ptr_bytes   == b->ptr_bytes) &&
+         (a->fx[0].bpi   == b->fx[0].bpi) &&
+         (a->fx[1].bpi   == b->fx[1].bpi) &&
+         (a->fx[2].bpi   == b->fx[2].bpi) &&
+         (a->fx[3].bpi   == b->fx[3].bpi) &&
+         (a->fp[0].bpi   == b->fp[0].bpi) &&
+         (a->fp[1].bpi   == b->fp[1].bpi) &&
+         (a->fx[0].order == b->fx[0].order) &&
+         (a->fx[1].order == b->fx[1].order) &&
+         (a->fx[2].order == b->fx[2].order) &&
+         (a->fx[3].order == b->fx[3].order);
 
     if (!eq)
        return(FALSE);
 
-/* check the float byte order */
-    n  = STD_FP4(a, bytes);
-    oa = STD_FP4(a, order);
-    ob = STD_FP4(b, order);
-    for (j = 0; j < n; j++, eq &= (*(oa++) == *(ob++)));
+/* check the floating point byte orders */
+    for (i = 0; i < 3; i++)
+        {n  = a->fp[i].bpi;
+	 oa = a->fp[i].order;
+	 ob = b->fp[i].order;
+	 for (j = 0; j < n; j++, eq &= (*(oa++) == *(ob++)));};
 
-/* check the double byte order */
-    n  = STD_FP8(a, bytes);
-    oa = STD_FP8(a, order);
-    ob = STD_FP8(b, order);
-    for (j = 0; j < n; j++, eq &= (*(oa++) == *(ob++)));
-
-/* check the float format data */
+/* check the floating point format data */
     n  = FORMAT_FIELDS;
-    fa = STD_FP4(a, format);
-    fb = STD_FP4(b, format);
-    for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
-
-/* check the double format data */
-    n  = FORMAT_FIELDS;
-    fa = STD_FP8(a, format);
-    fb = STD_FP8(b, format);
-    for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
-
-/* check the double format data */
-    n  = FORMAT_FIELDS;
-    fa = STD_FP16(a, format);
-    fb = STD_FP16(b, format);
-    for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));
+    for (i = 0; i < 3; i++)
+        {fa = a->fp[i].format;
+	 fb = b->fp[i].format;
+	 for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));};
 
 /* check alignments */
-    eq &= ((c->char_alignment       == d->char_alignment) &&
-           (c->ptr_alignment        == d->ptr_alignment) &&
-           (c->short_alignment      == d->short_alignment) &&
-           (c->int_alignment        == d->int_alignment) &&
-           (c->long_alignment       == d->long_alignment) &&
-           (c->longlong_alignment   == d->longlong_alignment) &&
-           (c->float_alignment      == d->float_alignment) &&
-           (c->double_alignment     == d->double_alignment) &&
-           (c->quad_alignment       == d->quad_alignment));
+    eq &= ((c->char_alignment == d->char_alignment) &&
+           (c->ptr_alignment  == d->ptr_alignment) &&
+           (c->bool_alignment  == d->bool_alignment));
+
+    for (i = 0; i < 3; i++)
+        eq &= (c->fx[i] == d->fx[i]);
+
+    for (i = 0; i < 3; i++)
+        eq &= (c->fp[i] == d->fp[i]);
 
     return(eq);}
 
@@ -805,7 +832,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     flag = (hstd != NULL);
 
     _PD_defstr_in(chart, "*", INT_KIND, NULL, NULL, (long) fstd->ptr_bytes, 
-                  falign->ptr_alignment, fstd->int_order,
+                  falign->ptr_alignment, fstd->fx[1].order,
 		  TRUE, NULL, NULL, 0, 0);
 
     if (flag == TRUE)
@@ -834,152 +861,104 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  falign->bool_alignment, NO_ORDER,
 		  conv, NULL, NULL, FALSE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_SHORT_STD(conv, fstd, hstd, falign, halign);}
-    else
-       conv = FALSE;
+    conv = _PD_compare_fix_std(0, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "short", INT_KIND,
-		  NULL, NULL, (long) fstd->short_bytes, 
-                  falign->short_alignment, fstd->short_order,
+		  NULL, NULL, (long) fstd->fx[0].bpi, 
+                  falign->fx[0], fstd->fx[0].order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_short", INT_KIND,
-		  NULL, NULL, (long) fstd->short_bytes, 
-                  falign->short_alignment, fstd->short_order,
+		  NULL, NULL, (long) fstd->fx[0].bpi, 
+                  falign->fx[0], fstd->fx[0].order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_INT_STD(conv, fstd, hstd, falign, halign);}
-    else
-       conv = FALSE;
+    conv = _PD_compare_fix_std(1, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "int", INT_KIND,
-		  NULL, NULL, (long) fstd->int_bytes, 
-                  falign->int_alignment, fstd->int_order,
+		  NULL, NULL, (long) fstd->fx[1].bpi, 
+                  falign->fx[1], fstd->fx[1].order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_int", INT_KIND,
-		  NULL, NULL, (long) fstd->int_bytes, 
-                  falign->int_alignment, fstd->int_order,
+		  NULL, NULL, (long) fstd->fx[1].bpi, 
+                  falign->fx[1], fstd->fx[1].order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_INT_STD(conv, fstd, hstd, falign, halign);}
-    else
-       conv = FALSE;
+    conv = _PD_compare_fix_std(1, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "integer", INT_KIND,
-		  NULL, NULL, (long) fstd->int_bytes, 
-                  falign->int_alignment, fstd->int_order,
+		  NULL, NULL, (long) fstd->fx[1].bpi, 
+                  falign->fx[1], fstd->fx[1].order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_integer", INT_KIND,
-		  NULL, NULL, (long) fstd->int_bytes, 
-                  falign->int_alignment, fstd->int_order,
+		  NULL, NULL, (long) fstd->fx[1].bpi, 
+                  falign->fx[1], fstd->fx[1].order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_LONG_STD(conv, fstd, hstd, falign, halign);}
-    else
-       conv = FALSE;
+    conv = _PD_compare_fix_std(2, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "long", INT_KIND,
-		  NULL, NULL, (long) fstd->long_bytes, 
-                  falign->long_alignment, fstd->long_order,
+		  NULL, NULL, (long) fstd->fx[2].bpi, 
+                  falign->fx[2], fstd->fx[2].order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_long", INT_KIND,
-		  NULL, NULL, (long) fstd->long_bytes, 
-                  falign->long_alignment, fstd->long_order,
+		  NULL, NULL, (long) fstd->fx[2].bpi, 
+                  falign->fx[2], fstd->fx[2].order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_LONGLONG_STD(conv, fstd, hstd, falign, halign);}
-    else
-       conv = FALSE;
+    conv = _PD_compare_fix_std(3, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "long_long", INT_KIND,
-		  NULL, NULL, (long) fstd->longlong_bytes, 
-                  falign->longlong_alignment, fstd->longlong_order,
+		  NULL, NULL, (long) fstd->fx[3].bpi, 
+                  falign->fx[3], fstd->fx[3].order,
 	          conv, NULL, NULL, FALSE, FALSE);
 
     _PD_defstr_in(chart, "u_long_long", INT_KIND,
-		  NULL, NULL, (long) fstd->longlong_bytes, 
-                  falign->longlong_alignment, fstd->longlong_order,
+		  NULL, NULL, (long) fstd->fx[3].bpi, 
+                  falign->fx[3], fstd->fx[3].order,
 	          conv, NULL, NULL, TRUE, FALSE);
 
 /* floating point types */
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_FLT_STD(fcnv, fstd, hstd, falign, halign);}
-    else
-       fcnv = FALSE;
+    fcnv = _PD_compare_fp_std(0, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "float", FLOAT_KIND,
-		  NULL, NULL, STD_FP4(fstd, bytes), 
-                  falign->float_alignment, NO_ORDER,
-		  fcnv, STD_FP4(fstd, order),
-	          STD_FP4(fstd, format), FALSE, FALSE);
+		  NULL, NULL, fstd->fp[0].bpi, 
+                  falign->fp[0], NO_ORDER,
+		  fcnv, fstd->fp[0].order,
+	          fstd->fp[0].format, FALSE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_DBL_STD(dcnv, fstd, hstd, falign, halign);}
-    else
-       dcnv = FALSE;
+    dcnv = _PD_compare_fp_std(1, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "double", FLOAT_KIND,
-		  NULL, NULL, STD_FP8(fstd, bytes), 
-                  falign->double_alignment, NO_ORDER,
-		  dcnv, STD_FP8(fstd, order),
-	          STD_FP8(fstd, format), FALSE, FALSE);
+		  NULL, NULL, fstd->fp[1].bpi, 
+                  falign->fp[1], NO_ORDER,
+		  dcnv, fstd->fp[1].order,
+	          fstd->fp[1].format, FALSE, FALSE);
 
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
-	   PD_COMPARE_QUD_STD(qcnv, fstd, hstd, falign, halign);}
-    else
-       qcnv = FALSE;
+    qcnv = _PD_compare_fp_std(2, fstd, hstd, falign, halign, flag, ftk);
     _PD_defstr_in(chart, "long_double", FLOAT_KIND,
-		  NULL, NULL, STD_FP16(fstd, bytes), 
-                  falign->quad_alignment, NO_ORDER,
-		  qcnv, STD_FP16(fstd, order),
-	          STD_FP16(fstd, format), FALSE, FALSE);
+		  NULL, NULL, fstd->fp[2].bpi, 
+                  falign->fp[2], NO_ORDER,
+		  qcnv, fstd->fp[2].order,
+	          fstd->fp[2].format, FALSE, FALSE);
 
 /* complex types */
     tup = _PD_make_tuple("float", 2, NULL);
     _PD_defstr_in(chart, "float_complex", FLOAT_KIND,
-		  NULL, tup, STD_FP4(fstd, bytes), 
-                  falign->float_alignment, NO_ORDER,
-		  fcnv, STD_FP4(fstd, order),
-	          STD_FP4(fstd, format), FALSE, FALSE);
+		  NULL, tup, fstd->fp[0].bpi, 
+                  falign->fp[0], NO_ORDER,
+		  fcnv, fstd->fp[0].order,
+	          fstd->fp[0].format, FALSE, FALSE);
 
     tup = _PD_make_tuple("double", 2, NULL);
     _PD_defstr_in(chart, "double_complex", FLOAT_KIND,
-		  NULL, tup, STD_FP8(fstd, bytes), 
-                  falign->double_alignment, NO_ORDER,
-		  dcnv, STD_FP8(fstd, order),
-	          STD_FP8(fstd, format), FALSE, FALSE);
+		  NULL, tup, fstd->fp[1].bpi, 
+                  falign->fp[1], NO_ORDER,
+		  dcnv, fstd->fp[1].order,
+	          fstd->fp[1].format, FALSE, FALSE);
 
     tup = _PD_make_tuple("long_double", 2, NULL);
     _PD_defstr_in(chart, "long_double_complex", FLOAT_KIND,
-		  NULL, tup, STD_FP16(fstd, bytes), 
-                  falign->quad_alignment, NO_ORDER,
-		  qcnv, STD_FP16(fstd, order),
-	          STD_FP16(fstd, format), FALSE, FALSE);
+		  NULL, tup, fstd->fp[2].bpi, 
+                  falign->fp[2], NO_ORDER,
+		  qcnv, fstd->fp[2].order,
+	          fstd->fp[2].format, FALSE, FALSE);
 
     return;}
 

@@ -1032,10 +1032,10 @@ long _PD_ptr_get_index(PDBfile *file, char *bf)
     hs = file->host_std;
     fs = file->std;
 
-    ford = fs->long_order;
     fbpi = fs->ptr_bytes;
-    hord = hs->long_order;
-    hbpi = hs->long_bytes;
+    ford = fs->fx[2].order;
+    hbpi = hs->fx[2].bpi;
+    hord = hs->fx[2].order;
        
     in  = bf;
     out = (char *) &n;

@@ -74,7 +74,7 @@
 #define _PD_NEXT_ADDRESS(f, t, n, v, sf, tf, cf) (*PD_par_fnc.next_address)(f, t, n, v, sf, tf, cf)
 
 #define GET_PFILE(_f)       ((PD_Pfile *) (_f))
-#define _PD_TEXT_OUT(_f)    ((_f)->std->long_order == TEXT_ORDER)
+#define _PD_TEXT_OUT(_f)    ((_f)->std->fx[2].order == TEXT_ORDER)
 
 #define IS_PDBFILE(_f)                                                       \
     (((_f)->type == NULL) || (strcmp((_f)->type, "PDBfile") == 0))

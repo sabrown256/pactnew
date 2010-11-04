@@ -1093,28 +1093,28 @@ void _PD_set_digits(PDBfile *file)
 
     std = file->std;
 
-    if (std->short_bytes < 0)
-       d = -std->short_bytes;
+    if (std->fx[0].bpi < 0)
+       d = -std->fx[0].bpi;
     else
-       d = 8*std->short_bytes;
+       d = 8*std->fx[0].bpi;
     PD_short_digits = log2*d + 1; 
 
-    if (std->int_bytes < 0)
-       d = -std->int_bytes;
+    if (std->fx[1].bpi < 0)
+       d = -std->fx[1].bpi;
     else
-       d = 8*std->int_bytes;
+       d = 8*std->fx[1].bpi;
     PD_int_digits   = log2*d + 1; 
 
-    if (std->long_bytes < 0)
-       d = -std->long_bytes;
+    if (std->fx[2].bpi < 0)
+       d = -std->fx[2].bpi;
     else
-       d = 8*std->long_bytes;
+       d = 8*std->fx[2].bpi;
     PD_long_digits  = log2*d + 1; 
 
-    if (std->longlong_bytes < 0)
-       d = -std->longlong_bytes;
+    if (std->fx[3].bpi < 0)
+       d = -std->fx[3].bpi;
     else
-       d = 8*std->longlong_bytes;
+       d = 8*std->fx[3].bpi;
     PD_long_long_digits  = log2*d + 1; 
 
     f = STD_FP4(std, format);
@@ -1153,47 +1153,47 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
     stda = file_a->std;
     stdb = file_b->std;
 
-    if (stda->short_bytes < 0)
-       da = -stda->short_bytes;
+    if (stda->fx[0].bpi < 0)
+       da = -stda->fx[0].bpi;
     else
-       da = 8*stda->short_bytes;
-    if (stdb->short_bytes < 0)
-       db = -stdb->short_bytes;
+       da = 8*stda->fx[0].bpi;
+    if (stdb->fx[0].bpi < 0)
+       db = -stdb->fx[0].bpi;
     else
-       db = 8*stdb->short_bytes;
+       db = 8*stdb->fx[0].bpi;
     nmb = max(da, db);
     PD_short_digits = log2*nmb + 1; 
 
-    if (stda->int_bytes < 0)
-       da = -stda->int_bytes;
+    if (stda->fx[1].bpi < 0)
+       da = -stda->fx[1].bpi;
     else
-       da = 8*stda->int_bytes;
-    if (stdb->int_bytes < 0)
-       db = -stdb->int_bytes;
+       da = 8*stda->fx[1].bpi;
+    if (stdb->fx[1].bpi < 0)
+       db = -stdb->fx[1].bpi;
     else
-       db = 8*stdb->int_bytes;
+       db = 8*stdb->fx[1].bpi;
     nmb = max(da, db);
     PD_int_digits   = log2*nmb + 1; 
 
-    if (stda->long_bytes < 0)
-       da = -stda->long_bytes;
+    if (stda->fx[2].bpi < 0)
+       da = -stda->fx[2].bpi;
     else
-       da = 8*stda->long_bytes;
-    if (stdb->long_bytes < 0)
-       db = -stdb->long_bytes;
+       da = 8*stda->fx[2].bpi;
+    if (stdb->fx[2].bpi < 0)
+       db = -stdb->fx[2].bpi;
     else
-       db = 8*stdb->long_bytes;
+       db = 8*stdb->fx[2].bpi;
     nmb = max(da, db);
     PD_long_digits  = log2*nmb + 1; 
 
-    if (stda->longlong_bytes < 0)
-       da = -stda->longlong_bytes;
+    if (stda->fx[3].bpi < 0)
+       da = -stda->fx[3].bpi;
     else
-       da = 8*stda->longlong_bytes;
-    if (stdb->longlong_bytes < 0)
-       db = -stdb->longlong_bytes;
+       da = 8*stda->fx[3].bpi;
+    if (stdb->fx[3].bpi < 0)
+       db = -stdb->fx[3].bpi;
     else
-       db = 8*stdb->longlong_bytes;
+       db = 8*stdb->fx[3].bpi;
     nmb = max(da, db);
     PD_long_long_digits  = log2*nmb + 1; 
 

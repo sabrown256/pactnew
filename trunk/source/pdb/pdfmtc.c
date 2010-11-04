@@ -142,11 +142,15 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 
 static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 			      int flg, int *ordr, long *formt)
-   {data_standard *std;
+   {int ifx, ifp;
+    data_standard *std;
     data_alignment *align;
 
     std   = file->std;
     align = file->align;
+
+    ifx = -1;
+    ifp = -1;
 
     if (strcmp(type, "char") == 0)
        align->char_alignment = al;
@@ -156,45 +160,34 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	align->ptr_alignment = al;}
 
     else if (strcmp(type, "short") == 0)
-       {std->short_bytes       = nb;
-	std->short_order       = (PD_byte_order) flg;
-	align->short_alignment = al;}
-
+       ifx = 0;
     else if (strcmp(type, "int") == 0)
-       {std->int_bytes       = nb;
-	std->int_order       = (PD_byte_order) flg;
-	align->int_alignment = al;}
-
+       ifx = 1;
     else if (strcmp(type, "long") == 0)
-       {std->long_bytes       = nb;
-	std->long_order       = (PD_byte_order) flg;
-	align->long_alignment = al;}
-
+       ifx = 2;
     else if (strcmp(type, "long_long") == 0)
-       {std->longlong_bytes       = nb;
-	std->longlong_order       = (PD_byte_order) flg;
-	align->longlong_alignment = al;}
+       ifx = 3;
 
     else if (strcmp(type, "float") == 0)
-       {STD_FP4(std, bytes)    = nb;
-	STD_FP4(std, order)    = ordr;
-	STD_FP4(std, format)   = formt;
-	align->float_alignment = al;}
-
+       ifp = 0;
     else if (strcmp(type, "double") == 0)
-       {STD_FP8(std, bytes)     = nb;
-	STD_FP8(std, order)     = ordr;
-	STD_FP8(std, format)    = formt;
-	align->double_alignment = al;}
-
+       ifp = 1;
     else if (strcmp(type, "long_double") == 0)
-       {STD_FP16(std, bytes)  = nb;
-	STD_FP16(std, order)  = ordr;
-	STD_FP16(std, format) = formt;
-	align->quad_alignment = al;}
+       ifp = 2;
 
     else if (strcmp(type, "struct") == 0)
        align->struct_alignment = al;
+
+    if (ifx != -1)
+       {std->fx[ifx].bpi   = nb;
+	std->fx[ifx].order = (PD_byte_order) flg;
+	align->fx[ifx]     = al;};
+
+    if (ifp != -1)
+       {std->fp[ifp].bpi    = nb;
+	std->fp[ifp].order  = ordr;
+	std->fp[ifp].format = formt;
+	align->fp[ifp]      = al;};
 
     return;}
 

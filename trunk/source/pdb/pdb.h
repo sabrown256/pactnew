@@ -118,24 +118,24 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#define STD_FIX_S(_std, _field)   ((_std)->short_##_field)
-#define STD_FIX_I(_std, _field)   ((_std)->int_##_field)
-#define STD_FIX_L(_std, _field)   ((_std)->long_##_field)
-#define STD_FIX_E(_std, _field)   ((_std)->longlong_##_field)
-
-#define STD_FP4(_std, _field)   ((_std)->float_##_field)
-#define STD_FP8(_std, _field)   ((_std)->double_##_field)
-#define STD_FP16(_std, _field)   ((_std)->quad_##_field)
 /*
-#define STD_FIX_S(_std, _field)   ((_std)->fx[0].##_field)
-#define STD_FIX_I(_std, _field)   ((_std)->fx[1].##_field)
-#define STD_FIX_L(_std, _field)   ((_std)->fx[2].##_field)
-#define STD_FIX_E(_std, _field)   ((_std)->fx[3].##_field)
+#define STD_FIX_S(_std, _field)  ((_std)->short_##_field)
+#define STD_FIX_I(_std, _field)  ((_std)->int_##_field)
+#define STD_FIX_L(_std, _field)  ((_std)->long_##_field)
+#define STD_FIX_E(_std, _field)  ((_std)->longlong_##_field)
 
-#define STD_FP4(_std, _field)   ((_std)->fp[0].##_field)
-#define STD_FP8(_std, _field)   ((_std)->fp[1].##_field)
-#define STD_FP16(_std, _field)   ((_std)->fp[2].##_field)
+#define STD_FP4(_std, _field)    ((_std)->float_##_field)
+#define STD_FP8(_std, _field)    ((_std)->double_##_field)
+#define STD_FP16(_std, _field)   ((_std)->quad_##_field)
 */
+#define STD_FIX_S(_std, _field)  ((_std)->fx[0]._field)
+#define STD_FIX_I(_std, _field)  ((_std)->fx[1]._field)
+#define STD_FIX_L(_std, _field)  ((_std)->fx[2]._field)
+#define STD_FIX_E(_std, _field)  ((_std)->fx[3]._field)
+
+#define STD_FP4(_std, _field)    ((_std)->fp[0]._field)
+#define STD_FP8(_std, _field)    ((_std)->fp[1]._field)
+#define STD_FP16(_std, _field)   ((_std)->fp[2]._field)
 
 #define PN_sizeof(type, tab)  _PD_lookup_size(type, tab)
 
@@ -208,6 +208,8 @@
 typedef int (*PFDefDel)(void *a);
 
 typedef struct BF_FILE_s BF_FILE;
+typedef struct s_fixdes fixdes;
+typedef struct s_fpdes fpdes;
 typedef struct s_data_alignment data_alignment;
 typedef struct s_data_standard data_standard;
 typedef struct s_PD_smp_state PD_smp_state;
@@ -302,44 +304,25 @@ struct s_data_alignment
    {int char_alignment;
     int ptr_alignment;
     int bool_alignment;
-    int short_alignment;
-    int int_alignment;
-    int long_alignment;
-    int longlong_alignment;
-    int float_alignment;
-    int double_alignment;
-    int quad_alignment;
+    int fx[4];              /* fixed point types */
+    int fp[3];              /* floating point types */
     int struct_alignment;};
+
+struct s_fixdes
+   {int bpi;
+    PD_byte_order order;};
+
+struct s_fpdes
+   {int bpi;
+    long *format;
+    int *order;};
 
 struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
     int bool_bytes;
-
-    int short_bytes;
-    PD_byte_order short_order;
-
-    int int_bytes;
-    PD_byte_order int_order;
-
-    int long_bytes;
-    PD_byte_order long_order;
-
-    int longlong_bytes;
-    PD_byte_order longlong_order;
-
-    int float_bytes;
-    long *float_format;
-    int *float_order;
-
-    int double_bytes;
-    long *double_format;
-    int *double_order;
-
-    int quad_bytes;
-    long *quad_format;
-    int *quad_order;
-
+    fixdes fx[4];
+    fpdes  fp[3];
     PDBfile *file;};
 
 #if 0
@@ -519,7 +502,7 @@ struct s_syment
    {char *type;
     dimdes *dimensions;
     long number;
-    long foreign;               /* means nothing to PDB only spokes if needed */
+    long foreign;             /* means nothing to PDB only spokes if needed */
     symindir indirects;
     SC_array *blocks;};
 
