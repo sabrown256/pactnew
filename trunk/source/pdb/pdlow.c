@@ -164,7 +164,7 @@ int _PD_compare_std(data_standard *a, data_standard *b,
        return(FALSE);
 
 /* check the floating point byte orders */
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {n  = a->fp[i].bpi;
 	 oa = a->fp[i].order;
 	 ob = b->fp[i].order;
@@ -172,7 +172,7 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 
 /* check the floating point format data */
     n  = FORMAT_FIELDS;
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {fa = a->fp[i].format;
 	 fb = b->fp[i].format;
 	 for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));};
@@ -180,12 +180,12 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 /* check alignments */
     eq &= ((c->char_alignment == d->char_alignment) &&
            (c->ptr_alignment  == d->ptr_alignment) &&
-           (c->bool_alignment  == d->bool_alignment));
+           (c->bool_alignment == d->bool_alignment));
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
         eq &= (c->fx[i] == d->fx[i]);
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         eq &= (c->fp[i] == d->fp[i]);
 
     return(eq);}

@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 10/27/2010
+MOD: 11/04/2010
 
 <CENTER>
 <P>
@@ -9828,11 +9828,10 @@ data_alignment. Its actual definition is:
  struct s_data_alignment
     {int char_alignment;
      int ptr_alignment;
-     int short_alignment;
-     int int_alignment;
-     int long_alignment;
-     int float_alignment;
-     int double_alignment;};
+     int bool_alignment;
+     int fx[PD_N_PRIMITIVE_FIX];
+     int fp[PD_N_PRIMITIVE_FP];};
+     int struct_alignment;};
  
  typedef struct s_data_alignment data_alignment;
 </pre>
@@ -9848,50 +9847,6 @@ that must know data alignments precisely. It employs a structure called
 a data_alignment to record the alignments of the default primitive data
 types which PDBLib supports. See the discussion of the data_alignment
 structure in the section on data structures.
-<p>
-The following is the list of data_alignment's which PDBLib provides
-automatically (applications can add their own as needed):
-<p>
-
-<BLOCKQUOTE>
-<TABLE>
-<TR>
-<TD>SPARC_ALIGNMENT</TD>
-<TD>= {1, 4, 2, 4, 4, 4, 8}</TD>
-</TR>
-<TR>
-<TD>GNU3_PPC64_ALIGNMENT</TD>
-<TD>= {1, 4, 2, 4, 4, 4, 8}</TD>
-</TR>
-<TR>
-<TD>XLC32_PPC64_ALIGNMENT</TD>
-<TD>= {1, 4, 2, 4, 4, 4, 4}</TD>
-</TR>
-<TR>
-<TD>CRAY_ALIGNMENT</TD>
-<TD>= {8, 8, 8, 8, 8, 8, 8}</TD>
-</TR>
-<TD>WORD8_ALIGNMENT</TD>
-<TD>= {1, 8, 8, 8, 8, 8, 8}</TD>
-</TR>
-<TR>
-<TD>WORD2_ALIGNMENT</TD>
-<TD>= {1, 2, 2, 2, 2, 2, 2}</TD>
-</TR>
-<TR>
-<TD>WORD4_ALIGNMENT</TD>
-<TD>= {1, 4, 4, 4, 4, 4, 4}</TD>
-</TR>
-<TR>
-<TD>GNU4_I686_ALIGNMENT</TD>
-<TD>= {1, 4, 2, 4, 4, 4, 4}</TD>
-</TR>
-<TR>
-<TD>WORD4_ALIGNMENT</TD>
-<TD>= {1, 4, 4, 4, 4, 4, 4}</TD>
-</TR>
-</TABLE>
-</BLOCKQUOTE>
 <p>
 
 <!-- -------------------------------------------------------------------- --> 
@@ -9909,22 +9864,25 @@ Its actual definition is:
 <p>
 
 <pre>
- struct s_data_standard
-    {int ptr_bytes;
-     int short_bytes;
-     int short_order;
-     int int_bytes;
-     int int_order;
-     int long_bytes;
-     int long_order;
-     int float_bytes;
-     long *float_format;
-     int *float_order;
-     int double_bytes;
-     long *double_format;
-     int *double_order;};
+
+struct s_fixdes
+   {int bpi;
+    PD_byte_order order;};
+
+struct s_fpdes
+   {int bpi;
+    long *format;
+    int *order;};
+
+struct s_data_standard
+   {int bits_byte;
+    int ptr_bytes;
+    int bool_bytes;
+    fixdes fx[PD_N_PRIMITIVE_FIX];
+    fpdes  fp[PD_N_PRIMITIVE_FP];
+    PDBfile *file;};
  
- typedef struct s_data_standard data_standard;
+typedef struct s_data_standard data_standard;
 </pre>
 
 <h4>Floating Point Format Descriptor</h4>
@@ -9944,22 +9902,6 @@ the mantissa. These are given as an array of 8 long integers as follows:
 <dd>format[6] = high order mantissa bit
 <dd>format[7] = bias of exponent
 
-
-The following floating point format descriptors are defined in PDBLib and
-used in the data_standard's described in the last section:
-<p>
-
-<tt>
-<BLOCKQUOTE>
-<TABLE>r
-<TR><TD>float4_ieee</TD><TD>= {32L, 8L, 23L, 0L, 1L, 9L, 0L, 0x7FL}</TD></TR>
-<TR><TD>float8_ieee</TD><TD>= {64L, 11L, 52L, 0L, 1L, 12L, 0L, 0x3FFL}</TD></TR>
-<TR><TD>float12_ieee</TD><TD>= {96L, 15L, 64L, 0L, 1L, 32L, 1L, 0x3FFEL}</TD></TR>
-<TR><TD>float16_ieee</TD><TD>= {128L, 11L, 116L, 0L, 1L, 12L, 0L, 0x3FFFL}</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
-</tt>
-<p>
 
 <h4>Byte Ordering</h4>
 

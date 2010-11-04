@@ -398,7 +398,7 @@ static void print_test_1_data(FILE *fp)
 
 static int compare_test_1_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
-    long double fptol[3];
+    long double fptol[PD_N_PRIMITIVE_FP];
 
     PD_fp_toler(strm, fptol);
 

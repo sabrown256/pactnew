@@ -115,6 +115,9 @@
 #define NSTD         6     /* number of standards currently in the system 
                             * should be same as last standard */
 
+#define PD_N_PRIMITIVE_FIX  4   /* short, int, long, and long long */
+#define PD_N_PRIMITIVE_FP   3   /* float, double, and long double */
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -207,6 +210,7 @@ typedef struct s_PD_itag PD_itag;
 typedef struct s_dimind dimind;
 typedef struct s_attribute attribute;
 typedef struct s_attribute_value attribute_value;
+typedef struct s_precisionfp precisionfp;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
@@ -285,9 +289,13 @@ struct s_data_alignment
    {int char_alignment;
     int ptr_alignment;
     int bool_alignment;
-    int fx[4];              /* fixed point types */
-    int fp[3];              /* floating point types */
+    int fx[PD_N_PRIMITIVE_FIX];              /* fixed point types */
+    int fp[PD_N_PRIMITIVE_FP];               /* floating point types */
     int struct_alignment;};
+
+struct s_precisionfp
+   {int digits;
+    long double tolerance;};
 
 struct s_fixdes
    {int bpi;
@@ -302,8 +310,8 @@ struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
     int bool_bytes;
-    fixdes fx[4];
-    fpdes  fp[3];
+    fixdes fx[PD_N_PRIMITIVE_FIX];
+    fpdes  fp[PD_N_PRIMITIVE_FP];
     PDBfile *file;};
 
 #if 0
@@ -707,24 +715,20 @@ extern int
  _PD_nthreads;
 
 extern long
- PD_print_controls[10];
+ PD_print_controls[];
+
+extern int
+ PD_fix_precision[];
+
+extern precisionfp
+ PD_fp_precision[];
 
 extern int
  FORMAT_FIELDS,
  PD_default_format_version,
  PD_buffer_size,
  PD_DIM,
- PD_short_digits,
- PD_int_digits,
- PD_long_digits,
- PD_long_long_digits,
- PD_float_digits,
- PD_double_digits,
  PD_tolerance;
-
-extern double
- PD_float_tol,
- PD_double_tol;
 
 extern data_standard
  *INT_STANDARD,

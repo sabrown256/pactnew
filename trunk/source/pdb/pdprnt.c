@@ -107,19 +107,13 @@
 /*--------------------------------------------------------------------------*/
 
 int
- PD_short_digits,
- PD_int_digits,
- PD_long_digits,
- PD_long_long_digits,
- PD_float_digits,
- PD_double_digits,
- PD_quad_digits,
  PD_tolerance = 1000;
 
-double
- PD_float_tol,
- PD_double_tol,
- PD_quad_tol;
+int
+ PD_fix_precision[PD_N_PRIMITIVE_FIX];
+
+precisionfp
+ PD_fp_precision[PD_N_PRIMITIVE_FP];
 
 /* print controls
  *  0  -  print prefix: 0 = full path, 1 = space, 2 = tree
@@ -1006,31 +1000,31 @@ void _PD_set_format_defaults(void)
 /* used for scalars */
     if (PD_print_formats1[0] != NULL)
        SFREE(PD_print_formats1[0]);
-    snprintf(tmp, MAXLINE, "%%%dd", PD_int_digits);
+    snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[1]);
     t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(0)");
     PD_print_formats1[0] = t;
 
     if (PD_print_formats1[1] != NULL)
        SFREE(PD_print_formats1[1]);
-    snprintf(tmp, MAXLINE, "%%%dld", PD_long_digits);
+    snprintf(tmp, MAXLINE, "%%%dld", PD_fix_precision[2]);
     t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(1)");
     PD_print_formats1[1] = t;
 
     if (PD_print_formats1[2] != NULL)
        SFREE(PD_print_formats1[2]);
-    snprintf(tmp, MAXLINE, "%%# .%de", PD_float_digits);
+    snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[0].digits);
     t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(2)");
     PD_print_formats1[2] = t;
 
     if (PD_print_formats1[3] != NULL)
        SFREE(PD_print_formats1[3]);
-    snprintf(tmp, MAXLINE, "%%# .%de", PD_double_digits);
+    snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[1].digits);
     t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(3)");
     PD_print_formats1[3] = t;
 
     if (PD_print_formats1[4] != NULL)
        SFREE(PD_print_formats1[4]);
-    snprintf(tmp, MAXLINE, "%%%dd", PD_short_digits);
+    snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[0]);
     t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(4)");
     PD_print_formats1[4] = t;
 
@@ -1049,13 +1043,13 @@ void _PD_set_format_defaults(void)
  * field width will be twice what is specified - emperically verified on
  * all current platforms with long long
  */
-    snprintf(tmp, MAXLINE, "%%%dld", 2*PD_long_long_digits);
+    snprintf(tmp, MAXLINE, "%%%dld", 2*PD_fix_precision[3]);
 # else
-    snprintf(tmp, MAXLINE, "%%%dld", PD_long_long_digits);
+    snprintf(tmp, MAXLINE, "%%%dld", PD_fix_precision[3]);
 # endif
 
 #else
-    snprintf(tmp, MAXLINE, "%%%dlld", PD_long_long_digits);
+    snprintf(tmp, MAXLINE, "%%%dlld", PD_fix_precision[3]);
 #endif
 
     t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(6)");
@@ -1083,140 +1077,67 @@ void _PD_set_format_defaults(void)
 /* _PD_SET_DIGITS - set the decimal printing precision parameters */
 
 void _PD_set_digits(PDBfile *file)
-   {int d;
+   {int i, d;
     long *f;
     double log2;
     data_standard *std;
-    
 
     log2 = log10(2.0);
 
     std = file->std;
 
-    if (std->fx[0].bpi < 0)
-       d = -std->fx[0].bpi;
-    else
-       d = 8*std->fx[0].bpi;
-    PD_short_digits = log2*d + 1; 
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+        {if (std->fx[i].bpi < 0)
+	    d = -std->fx[i].bpi;
+	 else
+	    d = 8*std->fx[i].bpi;
+	 PD_fix_precision[i] = log2*d + 1;};
 
-    if (std->fx[1].bpi < 0)
-       d = -std->fx[1].bpi;
-    else
-       d = 8*std->fx[1].bpi;
-    PD_int_digits   = log2*d + 1; 
-
-    if (std->fx[2].bpi < 0)
-       d = -std->fx[2].bpi;
-    else
-       d = 8*std->fx[2].bpi;
-    PD_long_digits  = log2*d + 1; 
-
-    if (std->fx[3].bpi < 0)
-       d = -std->fx[3].bpi;
-    else
-       d = 8*std->fx[3].bpi;
-    PD_long_long_digits  = log2*d + 1; 
-
-    f = std->fp[0].format;
-    d = min(f[2], PD_tolerance);
-    PD_float_tol    = POW(2.0, -((double) d));
-    PD_float_digits = log2*d + 1;
-
-    f = std->fp[1].format;
-    d = min(f[2], PD_tolerance);
-    PD_double_tol    = POW(2.0, -((double) d));
-    PD_double_digits = log2*d + 1;
-
-    f = std->fp[2].format;
-    d = min(f[2], PD_tolerance);
-    PD_quad_tol    = POW(2.0, -((long double) d));
-    PD_quad_digits = log2*d + 1;
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+        {f = std->fp[i].format;
+	 d = min(f[2], PD_tolerance);
+	 PD_fp_precision[i].tolerance = powl(2.0L, -((long double) d));
+	 PD_fp_precision[i].digits    = log2*d + 1;};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DIGITS_TOL - compute the number of decimal digits for printing and
- *               - the comparison tolerances for floating point numbers
+/* _PD_DIGITS_TOL - compute the number of decimal digits for printing and
+ *                - the comparison tolerances for floating point numbers
  */
 
 void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
-   {int nmb, da, db;
+   {int i, nmb, da, db;
     long *fa, *fb;
     double log2;
     data_standard *stda, *stdb;
-    
 
     log2 = log10(2.0);
 
     stda = file_a->std;
     stdb = file_b->std;
 
-    if (stda->fx[0].bpi < 0)
-       da = -stda->fx[0].bpi;
-    else
-       da = 8*stda->fx[0].bpi;
-    if (stdb->fx[0].bpi < 0)
-       db = -stdb->fx[0].bpi;
-    else
-       db = 8*stdb->fx[0].bpi;
-    nmb = max(da, db);
-    PD_short_digits = log2*nmb + 1; 
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+        {if (stda->fx[i].bpi < 0)
+	    da = -stda->fx[i].bpi;
+	 else
+	    da = 8*stda->fx[i].bpi;
+	 if (stdb->fx[i].bpi < 0)
+	    db = -stdb->fx[i].bpi;
+	 else
+	    db = 8*stdb->fx[i].bpi;
+	 nmb = max(da, db);
+	 PD_fix_precision[i] = log2*nmb + 1;};
 
-    if (stda->fx[1].bpi < 0)
-       da = -stda->fx[1].bpi;
-    else
-       da = 8*stda->fx[1].bpi;
-    if (stdb->fx[1].bpi < 0)
-       db = -stdb->fx[1].bpi;
-    else
-       db = 8*stdb->fx[1].bpi;
-    nmb = max(da, db);
-    PD_int_digits   = log2*nmb + 1; 
-
-    if (stda->fx[2].bpi < 0)
-       da = -stda->fx[2].bpi;
-    else
-       da = 8*stda->fx[2].bpi;
-    if (stdb->fx[2].bpi < 0)
-       db = -stdb->fx[2].bpi;
-    else
-       db = 8*stdb->fx[2].bpi;
-    nmb = max(da, db);
-    PD_long_digits  = log2*nmb + 1; 
-
-    if (stda->fx[3].bpi < 0)
-       da = -stda->fx[3].bpi;
-    else
-       da = 8*stda->fx[3].bpi;
-    if (stdb->fx[3].bpi < 0)
-       db = -stdb->fx[3].bpi;
-    else
-       db = 8*stdb->fx[3].bpi;
-    nmb = max(da, db);
-    PD_long_long_digits  = log2*nmb + 1; 
-
-    fa  = stda->fp[0].format;
-    fb  = stdb->fp[0].format;
-    nmb = max(fa[2], fb[2]);
-    nmb = min(nmb, PD_tolerance);
-    PD_float_tol    = POW(2.0, -((double) nmb));
-    PD_float_digits = log2*nmb + 1;
-
-    fa  = stda->fp[1].format;
-    fb  = stdb->fp[1].format;
-    nmb = max(fa[2], fb[2]);
-    nmb = min(nmb, PD_tolerance);
-    PD_double_tol    = POW(2.0, -((double) nmb));
-    PD_double_digits = log2*nmb + 1;
-
-    fa  = stda->fp[2].format;
-    fb  = stdb->fp[2].format;
-    nmb = max(fa[2], fb[2]);
-    nmb = min(nmb, PD_tolerance);
-    PD_quad_tol    = POW(2.0, -((long double) nmb));
-    PD_quad_digits = log2*nmb + 1;
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+        {fa  = stda->fp[i].format;
+	 fb  = stdb->fp[i].format;
+	 nmb = max(fa[2], fb[2]);
+	 nmb = min(nmb, PD_tolerance);
+	 PD_fp_precision[i].tolerance = powl(2.0L, -((long double) nmb));
+	 PD_fp_precision[i].digits    = log2*nmb + 1;};
 
     return;}
 
