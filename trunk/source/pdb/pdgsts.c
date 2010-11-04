@@ -200,20 +200,13 @@ static void print_test_gather_data(FILE *fp)
 static int compare_test_gather_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
     int ia, ib, mo, rmj;
-    int float_nm, double_nm;
-    double float_tolerance, double_tolerance;
+    long double fptol[3];
 
     if (strm == NULL)
        return(FALSE);
 
-    float_nm  = min(STD_FP4(strm->std,      format)[2],
-                    STD_FP4(strm->host_std, format)[2]);
-    double_nm = min(STD_FP8(strm->std,      format)[2],
-                    STD_FP8(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    float_tolerance  = POW(2.0, -((double) float_nm));
-    double_tolerance = POW(2.0, -((double) double_nm));
     err_tot = TRUE;
 
     mo  = PD_get_major_order(strm);
@@ -548,20 +541,13 @@ static void print_test_scatter_data(FILE *fp)
 static int compare_test_scatter_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
     int ia, ib, mo, rmj;
-    int float_nm, double_nm;
-    double float_tolerance, double_tolerance;
+    long double fptol[3];
 
     if (strm == NULL)
        return(FALSE);
 
-    float_nm  = min(STD_FP4(strm->std,      format)[2],
-                    STD_FP4(strm->host_std, format)[2]);
-    double_nm = min(STD_FP8(strm->std,      format)[2],
-                    STD_FP8(strm->host_std, format)[2]);
+    PD_fp_toler(strm, fptol);
 
-/* pad the absolute tolerance */
-    float_tolerance  = POW(2.0, -((double) float_nm));
-    double_tolerance = POW(2.0, -((double) double_nm));
     err_tot = TRUE;
 
     mo  = PD_get_major_order(strm);

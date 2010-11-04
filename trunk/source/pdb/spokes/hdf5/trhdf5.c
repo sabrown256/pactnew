@@ -361,13 +361,13 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
 
     struct_entry = FMAKE(defstr, "_H5_HANDLE_FLOAT_PT:struct_entry");
 
-    bpif                = sizeof(float);
-    STD_FP4(fstd, bytes) = bpif;
-    STD_FP4(fstd, order) = MAKE_N(int, bpif);
+    bpif              = sizeof(float);
+    fstd->fp[0].bpi   = bpif;
+    fstd->fp[0].order = MAKE_N(int, bpif);
 
-    bpid                = sizeof(double);
-    STD_FP8(fstd, bytes) = bpid;
-    STD_FP8(fstd, order) = MAKE_N(int, bpid);
+    bpid              = sizeof(double);
+    fstd->fp[1].bpi   = bpid;
+    fstd->fp[1].order = MAKE_N(int, bpid);
 
 /* handle bit field
  * you never know who might use file->std in the future: fill it in
@@ -376,19 +376,19 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
        {DEBUG1("%s", "      big endian float\n");
 
         for (i = 0 ; i < bpif; i++)
-            STD_FP4(fstd, order[i]) = i + 1;
+            fstd->fp[0].order[i] = i + 1;
 
         for (i = 0 ; i < bpid; i++)
-            STD_FP8(fstd, order[i]) = i + 1;}
+            fstd->fp[1].order[i] = i + 1;}
 
     else 
        {DEBUG1("%s", "      little endian float\n");
 
         for (i = 0 ; i < bpif; i++)
-	    STD_FP4(fstd, order[i]) = bpif - i;
+	    fstd->fp[0].order[i] = bpif - i;
 
         for (i = 0 ; i < bpid; i++)
-            STD_FP8(fstd, order[i]) = bpid - i;};
+            fstd->fp[1].order[i] = bpid - i;};
 
 /* grab the precision of this float pt value */
     precision = (short) H5Tget_precision(dtid);
@@ -401,21 +401,21 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
  * this is required because HDF5 does not maintain type names
  */
     if (precision <= 32) 
-       {format   = STD_FP4(fstd, format);
+       {format   = fstd->fp[0].format;
         typename = SC_strsavef("float", "_H5_HANDLE_FLOAT_PT:typename");
         struct_entry->order = FMAKE_N(int, bpif, "_H5_HANDLE_FLOAT_PT:order");
 
         for (i = 0; i < bpif; i++) 
-            struct_entry->order[i] = STD_FP4(fstd, order[i]);}
+            struct_entry->order[i] = fstd->fp[0].order[i];}
 
     else 
-       {format   = STD_FP8(fstd, format);
+       {format   = fstd->fp[1].format;
         typename = SC_strsavef("double", "_H5_HANDLE_FLOAT_PT:typename");
         struct_entry->order = FMAKE_N(int, bpid,
                                       "_H5_HANDLE_FLOAT_PT:order");
 
         for (i = 0; i < bpid; i++) 
-            struct_entry->order[i] = STD_FP8(fstd, order[i]);};
+            struct_entry->order[i] = fstd->fp[1].order[i];};
 
 /* pdbconv.c contains information on how this is laid out
  *
@@ -454,7 +454,7 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
     struct_entry->format = FMAKE_N(long, 8, "_H5_HANDLE_FLOAT_PT:format");
 
     for (i = 0; i < 8; i++)
-        {struct_entry->format[i] = format[i];};
+        struct_entry->format[i] = format[i];
 
 #if DEBUG
     DEBUG1("%s", "      format is {");
@@ -465,12 +465,12 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
     DEBUG1("%s", "}\n      float_order {");
 
     for (i = 0; i < bpif; i++)
-        {DEBUG1("%d, ", STD_FP4(fstd, order[i]));};
+        {DEBUG1("%d, ", fstd->fp[0].order[i]);};
 
     DEBUG1("%s", "}\n      double_order {");
 
     for (i = 0; i < bpid; i++)
-        {DEBUG1("%d, ", STD_FP8(fstd, order[i]));};
+        {DEBUG1("%d, ", fstd->fp[1].order[i]);};
 
     DEBUG1("%s", "}\n");
 #endif
@@ -479,23 +479,23 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
  * hard-coded mapping of precision to C type name
  * this is required because HDF5 does not maintain type names
  */
-    bpif = STD_FP4(hstd, bytes);
-    bpid = STD_FP8(hstd, bytes);
+    bpif = hstd->fp[0].bpi;
+    bpid = hstd->fp[1].bpi;
     if (precision <= 32) 
        {for (i = 0; i < 8; i++)
-            {if (struct_entry->format[i] != STD_FP4(hstd, format)[i])
+            {if (struct_entry->format[i] != hstd->fp[0].format[i])
                 struct_entry->convert = TRUE;};
 
         for (i = 0; i < bpif; i++)
-            {if (struct_entry->order[i] != STD_FP4(hstd, order)[i])
+            {if (struct_entry->order[i] != hstd->fp[0].order[i])
                 struct_entry->convert = TRUE;};}
     else 
        {for (i = 0; i < 8; i++)
-            {if (struct_entry->format[i] != STD_FP8(hstd, format)[i])
+            {if (struct_entry->format[i] != hstd->fp[1].format[i])
                 struct_entry->convert = TRUE;};
 
         for (i = 0; i < bpid; i++)
-            {if (struct_entry->order[i] != STD_FP8(hstd, order)[i])
+            {if (struct_entry->order[i] != hstd->fp[1].order[i])
                 struct_entry->convert = TRUE;};};
 
 /* NOTE: as far as we know -- HDF5 does not support 1's comp */

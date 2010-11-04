@@ -779,8 +779,8 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
     lout = *out;
 
 /* GOTCHA: should this now be quad_format? */
-    hfmt = STD_FP8(hstd, format);
-    hord = STD_FP8(hstd, order);
+    hfmt = hstd->fp[1].format;
+    hord = hstd->fp[1].order;
     ordl = hstd->fx[2].order;
     nbl  = hstd->fx[2].bpi;
 
@@ -885,8 +885,8 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
     lout = *out;
 
 /* GOTCHA: should this now be quad_format? */
-    hfmt = STD_FP8(hstd, format);
-    hord = STD_FP8(hstd, order);
+    hfmt = hstd->fp[1].format;
+    hord = hstd->fp[1].order;
     ordl = hstd->fx[2].order;
     nbl  = hstd->fx[2].bpi;
 

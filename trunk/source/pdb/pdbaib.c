@@ -440,3 +440,24 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_FP_TOLER - fill array of tolerances for
+ *             - floating point type comparisons
+ *             - this is mainly test support
+ */
+
+void PD_fp_toler(PDBfile *file, long double *fptol)
+   {int i, fpmn[3];
+    data_standard *fstd, *hstd;
+
+    fstd = file->std;
+    hstd = file->host_std;
+
+    for (i = 0; i < 3; i++)
+        {fpmn[i]  = min(fstd->fp[i].format[2], hstd->fp[i].format[2]);
+	 fptol[i] = powl(2.0, -((long double) fpmn[i]));};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
