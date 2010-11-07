@@ -594,7 +594,7 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 	   return(ndp);
 
     size = dp->size;
-    if (dp->format != NULL)
+    if (dp->fp.format != NULL)
        {if (size <= sizeof(float))
 	   ndp = PD_inquire_host_type(file, "float");
         else if (size <= sizeof(double))
@@ -602,7 +602,7 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
         else if (size <= sizeof(long double))
 	   ndp = PD_inquire_host_type(file, "long_double");}
 
-    else if ((dp->format == NULL) && (dp->order_flag != NO_ORDER))
+    else if ((dp->fp.format == NULL) && (dp->fix.order != NO_ORDER))
        {if (size <= sizeof(char))
 	   ndp = PD_inquire_host_type(file, "char");
         else if (size <= sizeof(short))
@@ -795,7 +795,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
        {ret = PD_inquire_type(file, "*");
 	dp  = _PD_mk_defstr(fchrt, "function", NON_CONVERT_KIND,
 			    NULL, NULL,
-			    ret->size, ret->alignment, ret->order_flag,
+			    ret->size, ret->alignment, ret->fix.order,
 			    ret->convert, NULL, NULL, FALSE, FALSE);
 	if (dp == NULL)
 	   PD_error("FILE FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
@@ -806,7 +806,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     ret = PD_inquire_host_type(file, "*");
     dp  = _PD_mk_defstr(hchrt, "function", NON_CONVERT_KIND,
 			NULL, NULL,
-			ret->size, ret->alignment, ret->order_flag,
+			ret->size, ret->alignment, ret->fix.order,
 			ret->convert, NULL, NULL, FALSE, FALSE);
     if (dp == NULL)
        PD_error("HOST FUNCTION DEFINITION FAILED - _PD_INIT_CHART",

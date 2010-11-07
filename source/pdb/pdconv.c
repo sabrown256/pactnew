@@ -480,13 +480,13 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
     cnv = dpf->convert;
 
     if (cnv == -1)
-       {ordf = dpf->order;
-	fmtf = dpf->format;
+       {ordf = dpf->fp.order;
+	fmtf = dpf->fp.format;
 	bpif = dpf->size;
 	tupf = dpf->tuple;
 
-	ordh = dph->order;
-	fmth = dph->format;
+	ordh = dph->fp.order;
+	fmth = dph->fp.format;
 	bpih = dph->size;
 	tuph = dph->tuple;
 
@@ -518,7 +518,7 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
 	cnv |= (dpf->is_indirect != dph->is_indirect);
 	cnv |= (dpf->onescmp     != dph->onescmp);
 	cnv |= (dpf->unsgned     != dph->unsgned);
-	cnv |= (dpf->order_flag  != dph->order_flag);
+	cnv |= (dpf->fix.order  != dph->fix.order);
 
 	cnv |= lreorder;
 	cnv |= lreformat;
@@ -1970,9 +1970,9 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     inty    = idp->type;
     iknd    = idp->kind;
     inb     = idp->size;
-    iaord   = idp->order;
-    isord   = idp->order_flag;
-    ifmt    = idp->format;
+    iaord   = idp->fp.order;
+    isord   = idp->fix.order;
+    ifmt    = idp->fp.format;
     itup    = idp->tuple;
     iusg    = idp->unsgned;
     inbts   = idp->size_bits;
@@ -1981,9 +1981,9 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     outty   = odp->type;
     oknd    = odp->kind;
     onb     = odp->size;
-    oaord   = odp->order;
-    osord   = odp->order_flag;
-    ofmt    = odp->format;
+    oaord   = odp->fp.order;
+    osord   = odp->fix.order;
+    ofmt    = odp->fp.format;
     otup    = odp->tuple;
     ousg    = odp->unsgned;
 

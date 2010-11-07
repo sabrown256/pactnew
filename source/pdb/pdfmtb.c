@@ -902,10 +902,10 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 			      nm, dc,
 			      dp->size, dc,
 			      dp->alignment, dc,
-			      dp->order_flag, dc);
+			      dp->fix.order, dc);
 
 /* write the byte order */
-	 ordr = dp->order;
+	 ordr = dp->fp.order;
 	 if (ordr !=  NULL)
 	    {ok &= _PD_put_string(1, "ORDER%c", dc);
 	     n   = dp->size;
@@ -915,13 +915,13 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 	    ok &= _PD_put_string(1, "DEFORDER%c", dc);
 
 /* write the floating point format */
-	 formt = dp->format;
+	 formt = dp->fp.format;
 	 if (formt != NULL)
 	    {ok &= _PD_put_string(1, "FLOAT%c", dc);
 	     for (j = 0L; j < 8; j++)
 	         ok &= _PD_put_string(1, "%ld%c", formt[j], dc);}
 
-	 else if (dp->order_flag == NO_ORDER)
+	 else if (dp->fix.order == NO_ORDER)
 	    ok &= _PD_put_string(1, "NO-CONV%c", dc);
 
 	 else

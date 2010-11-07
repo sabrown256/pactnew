@@ -301,10 +301,22 @@ struct s_fixdes
    {int bpi;
     PD_byte_order order;};
 
+#define PD_DEFINE_FIXDES(_f)               \
+    PD_defstr(_f, "fixdes",                \
+              "int bpi",                   \
+              "int order",                 \
+              LAST)
 struct s_fpdes
    {int bpi;
     long *format;
     int *order;};
+
+#define PD_DEFINE_FPDES(_f)                \
+    PD_defstr(_f, "fpdes",                 \
+              "int bpi",                   \
+              "long *format",              \
+              "int *order",                \
+              LAST)
 
 struct s_data_standard
    {int bits_byte;
@@ -517,9 +529,8 @@ struct s_defstr
     int convert;
     int onescmp;      /* TRUE iff ones complement arithmetic - old machines */
     int unsgned;                  /* TRUE iff the integral type is unsigned */
-    PD_byte_order order_flag;
-    int *order;
-    long *format;
+    fixdes fix;
+    fpdes fp;
     memdes *members;
     multides *tuple;};
 
@@ -535,9 +546,8 @@ struct s_defstr
               "int convert",       \
               "int onescmp",       \
               "int unsgned",       \
-              "int order_flag",    \
-              "int *order",        \
-              "long *format",      \
+              "fixdes fix",        \
+              "fpdes fp",          \
               "memdes *member",    \
               "multides *tuple",   \
               LAST)

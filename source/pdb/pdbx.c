@@ -401,11 +401,20 @@ int PD_def_pdb_types(PDBfile *file)
        {PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
 
+    dp = PD_DEFINE_FIXDES(file);
+    if (dp == NULL)
+       {PD_error("COULDN'T DEFINE FIXDES - PD_DEF_PDB_TYPES", PD_GENERIC);
+        return(FALSE);};
+
+    dp = PD_DEFINE_FPDES(file);
+    if (dp == NULL)
+       {PD_error("COULDN'T DEFINE FPDES - PD_DEF_PDB_TYPES", PD_GENERIC);
+        return(FALSE);};
+
     dp = PD_DEFINE_DEFSTR(file);
     if (dp == NULL)
        {PD_error("COULDN'T DEFINE DEFSTR - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
-
 
     return(TRUE);}
 

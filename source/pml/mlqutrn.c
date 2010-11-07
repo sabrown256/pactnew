@@ -102,7 +102,7 @@ double PM_norm_q(quaternion a)
 /*--------------------------------------------------------------------------*/
 
 /* PM_RECIP_Q - return the reciprocal of quaternion A
- *            - defined to be A*/|A|^2
+ *            - defined to be (A*)/|A|^2
  *            - as opposed to the versor
  */
 

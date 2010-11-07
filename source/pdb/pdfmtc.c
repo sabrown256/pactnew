@@ -771,7 +771,7 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
 			      dp->alignment);
 
 /* write the byte order */
-	 ordr = dp->order;
+	 ordr = dp->fp.order;
 	 if (ordr != NULL)
 	    {n    = dp->size;
 	     nofl = TRUE;
@@ -792,20 +792,20 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
 			 ok &= _PD_put_string(l++, ",%d", ordr[j]);};
 		 ok &= _PD_put_string(l++, ")");};}
 
-	 else if (dp->order_flag == TEXT_ORDER)
+	 else if (dp->fix.order == TEXT_ORDER)
 	    ok &= _PD_put_string(l++, "ORDER(text)");
 
-	 else if (dp->order_flag == NORMAL_ORDER)
+	 else if (dp->fix.order == NORMAL_ORDER)
 	    ok &= _PD_put_string(l++, "ORDER(big)");
 
-	 else if (dp->order_flag == REVERSE_ORDER)
+	 else if (dp->fix.order == REVERSE_ORDER)
 	    ok &= _PD_put_string(l++, "ORDER(little)");
 
-	 else if (dp->order_flag == NO_ORDER)
+	 else if (dp->fix.order == NO_ORDER)
 	    ok &= _PD_put_string(l++, "NO-CONV");
 
 /* write the floating point format */
-	 formt = dp->format;
+	 formt = dp->fp.format;
 	 switch (dp->kind)
 	    {case CHAR_KIND :
 	          ok &= _PD_put_string(l++, "|CHAR");
