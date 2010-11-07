@@ -1880,14 +1880,14 @@ static object *_SXI_write_defstr(object *argl)
            _PD_defstr(file, FALSE, dp->type, dp->kind,
 		      desc, NULL,
 		      dp->size, dp->alignment,
-		      dp->order_flag, dp->convert, dp->order, dp->format, 
+		      dp->fix.order, dp->convert, dp->fp.order, dp->fp.format, 
 		      dp->unsgned, dp->onescmp);
 
         if (PD_inquire_table_type(file->host_chart, dp->type) == NULL)
            _PD_defstr(file, TRUE, dp->type, dp->kind,
 		      desc, NULL,
 		      dp->size, dp->alignment,
-		      dp->order_flag, dp->convert, dp->order, dp->format, 
+		      dp->fix.order, dp->convert, dp->fp.order, dp->fp.format, 
 		      dp->unsgned, dp->onescmp);}
 
     else
@@ -3727,8 +3727,8 @@ int SX_convert(char *dtype, void **pd, char *stype, void *s,
 	nbi  = dp->size;
 	conv = TRUE;
 
-	fls = (sp->format != NULL);
-	fld = (dp->format != NULL);
+	fls = (sp->fp.format != NULL);
+	fld = (dp->fp.format != NULL);
 
 /* if the source is floating point but not the destination */
 	if (fls && !fld)

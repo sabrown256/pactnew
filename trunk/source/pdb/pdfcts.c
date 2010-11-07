@@ -34,19 +34,19 @@ static void fcnv(char *out, char *in, long ni,
     hstd = vif->host_std;
 
     if (dir == 0)
-       {ifmt    = idp->format;
-	iaord   = idp->order;
+       {ifmt    = idp->fp.format;
+	iaord   = idp->fp.order;
 	onescmp = idp->onescmp;
 
-	ofmt    = odp->format;
-	oaord   = odp->order;}
+	ofmt    = odp->fp.format;
+	oaord   = odp->fp.order;}
     else
-       {ifmt    = odp->format;
-	iaord   = odp->order;
+       {ifmt    = odp->fp.format;
+	iaord   = odp->fp.order;
 	onescmp = odp->onescmp;
 
-	ofmt    = idp->format;
-	oaord   = idp->order;};
+	ofmt    = idp->fp.format;
+	oaord   = idp->fp.order;};
 
     lsord = hstd->fx[2].order;
     lnby  = hstd->fx[2].bpi;

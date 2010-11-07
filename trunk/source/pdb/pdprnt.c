@@ -455,7 +455,7 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
     isz = pd->size;
 
 /* check for floating point types */
-    if (pd->format != NULL)
+    if (pd->fp.format != NULL)
        {if (strcmp(type, "float") == 0)
 	   {fp = (float *) vr;
 	    DISP_DATA(f0, fp, nitems, 2, n, ind);}

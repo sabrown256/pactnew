@@ -567,9 +567,9 @@ defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
     dp->convert     = conv;
     dp->onescmp     = onescmp;
     dp->unsgned     = unsgned;
-    dp->order_flag  = ord;
-    dp->order       = ordr;
-    dp->format      = formt;
+    dp->fix.order   = ord;
+    dp->fp.order    = ordr;
+    dp->fp.format   = formt;
     dp->members     = lst;
     dp->tuple       = tuple;
 
@@ -628,19 +628,19 @@ defstr* _PD_defstr_copy(defstr *dp)
     else
        members = NULL;
 
-    if (dp->order != NULL)
-       order = dp->order;       /* GOTCHA: not a deep copy */
+    if (dp->fp.order != NULL)
+       order = dp->fp.order;       /* GOTCHA: not a deep copy */
     else 
        order = NULL;
 
-    if (dp->format != NULL)
-       format = dp->format;      /* GOTCHA: not a deep copy */
+    if (dp->fp.format != NULL)
+       format = dp->fp.format;      /* GOTCHA: not a deep copy */
     else
        format = NULL;
 
     copy = _PD_mk_defstr(NULL, dp->type, dp->kind,
 			 members, tuple, dp->size, 
-			 dp->alignment, dp->order_flag, dp->convert, 
+			 dp->alignment, dp->fix.order, dp->convert, 
                          order, format, dp->unsgned, dp->onescmp);
 
     return(copy);}
@@ -670,13 +670,13 @@ void _PD_rl_defstr(defstr *dp)
 	if (tuple != NULL)
 	   _PD_free_tuple(tuple);
 
-	ord = dp->order;
+	ord = dp->fp.order;
 	if ((ord != NULL) && (SC_arrlen(ord) > -1))
-	   SFREE(dp->order);
+	   SFREE(dp->fp.order);
 
-	frm = dp->format;
+	frm = dp->fp.format;
 	if ((frm != NULL) && (SC_arrlen(frm) > -1))
-	   SFREE(dp->format);
+	   SFREE(dp->fp.format);
 
 	SFREE(dp->type);};
 

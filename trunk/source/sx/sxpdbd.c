@@ -215,12 +215,12 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
 
 /* type promotion SHORT-CIRCUITS */
        {if (SX_promote_flag)
-           {if (SX_promote_float && (dpa->format != NULL) && (dpb->format != NULL))
+           {if (SX_promote_float && (dpa->fp.format != NULL) && (dpb->fp.format != NULL))
                return(TRUE);
 
             if (SX_promote_fixed &&
-		(dpa->format == NULL) && (dpb->format == NULL) &&
-                (dpa->order_flag != NO_ORDER) && (dpb->order_flag != NO_ORDER))
+		(dpa->fp.format == NULL) && (dpb->fp.format == NULL) &&
+                (dpa->fix.order != NO_ORDER) && (dpb->fix.order != NO_ORDER))
                return(TRUE);};}
 
 /* STRUCTS */

@@ -1620,7 +1620,7 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
     if (dp2 == NULL)
        return(FALSE);
 
-    out_flag = dp2->order_flag;
+    out_flag = dp2->fix.order;
 
     ebyte = _PD_lookup_size(etype, file->chart);
     enumb = nitemsin * ebyte;
