@@ -17,7 +17,7 @@
 
 (printf nil "Creating file foofoo\n")
 (define file1 (open-pdbfile "foofoo,tgt=txt" "w"))
-(pdb-data-write vars set file1)
+(pdb-data-write vars set file1 #t)
 (io-stats file1)
 (close-pdbfile file1)
 

@@ -325,9 +325,9 @@ static char PP_defstr_dp_order_flag__doc__[] =
 static PyObject *
 PP_defstr_dp_order_flag_get(PP_defstrObject *self, void *context)
 {
-/* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.order_flag_get) UNMODIFIED */
-    return PyInt_FromLong((long) self->dp->order_flag);
-/* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.order_flag_get) */
+/* DO-NOT-DELETE splicer.begin(pdb.defstr.descriptor.dp.fix.order_get) UNMODIFIED */
+    return PyInt_FromLong((long) self->dp->fix.order);
+/* DO-NOT-DELETE splicer.end(pdb.defstr.descriptor.dp.fix.order_get) */
 }
 
 /*--------------------------------------------------------------------------*/

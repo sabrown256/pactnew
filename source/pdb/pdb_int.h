@@ -105,6 +105,19 @@ typedef int (*PFBinRead)(PDBfile *file, char *path, char *ty,
 typedef struct s_PD_state PD_state;
 typedef struct s_PD_address PD_address;
 typedef struct s_PD_Pfile PD_Pfile;
+typedef struct s_PD_printdes PD_printdes;
+
+struct s_PD_printdes
+   {int nn;
+    int mjr;
+    int def_off;
+    long offset;
+    char *prefix;
+    char *before;
+    char *after;
+    char *nodename;
+    dimdes *dims;
+    FILE *fp;};
 
 struct s_PD_address
    {int indx;                  /* indx for /&ptrs - possible future use */
@@ -569,12 +582,8 @@ extern char
 /* PDPRNT.C declarations */
 
 extern int
- _PD_print_leaf(FILE *f0,
-		char *prefix, char *before, char *after,
-		char *nodename, PDBfile *file, char *vr,
-		long nitems, char *type, dimdes *dims,
-		int mjr, int def_off, int irecursion,
-		int n, long *ind);
+ _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long nitems,
+		char *type, int irecursion, int n, long *ind);
 
 extern void
  _PD_set_user_formats(void),

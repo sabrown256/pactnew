@@ -10,7 +10,6 @@
 
 #include "pdb.h"
 #include <complex.h>
-#include <stdbool.h>
 
 #define DATFILE "nat"
 

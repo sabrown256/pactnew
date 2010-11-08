@@ -656,10 +656,6 @@ void cs_type(char *a, int nc, char *t)
        nstrncpy(a, nc, "SC_BIGINT_I", -1);
     else if (strcmp(t, "BIGINT *") == 0)
        nstrncpy(a, nc, "SC_BIGINT_P_I", -1);
-    else if (strcmp(t, "off_t") == 0)
-       nstrncpy(a, nc, "SC_OFF_T_I", -1);
-    else if (strcmp(t, "off_t *") == 0)
-       nstrncpy(a, nc, "SC_OFF_T_P_I", -1);
 
 /* floating point types */
     else if (strcmp(t, "double") == 0)
