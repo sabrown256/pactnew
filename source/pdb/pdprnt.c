@@ -10,6 +10,8 @@
 
 #include "pdb_int.h"
 
+#define PD_N_FORMATS 12
+
 #define LINE_SIZE 90
 
 /*--------------------------------------------------------------------------*/
@@ -34,7 +36,7 @@
                    prefix, after, nodename,                                  \
                    PD_index_to_expr(bf, j, dims, mjr, def_off));}            \
          else                                                                \
-	    {PRINT(f0, "\na> %s", prefix);};                                    \
+	    {PRINT(f0, "\na> %s", prefix);};                                 \
          PRINT(f0, PD_print_formats1[tid], x[j]);                            \
          PRINT(f0, "\n");}
 
@@ -129,10 +131,17 @@ long
 
 char
  *PD_no_print_member = NULL,
- *PD_print_formats1[8],
- *PD_print_formats2[8],
- *PD_user_formats1[8],
- *PD_user_formats2[8];
+ *PD_print_formats1[PD_N_FORMATS],
+ *PD_print_formats2[PD_N_FORMATS],
+ *PD_user_formats1[PD_N_FORMATS],
+ *PD_user_formats2[PD_N_FORMATS];
+
+static char
+ *_PD_type_names[] = { "char", "bit",
+		       "short", "int", "long", "long_long",
+		       "float", "double", "long_double",
+		       "float_complex", "double_complex",
+		       "long_double_complex" };
 
 static int
  _PD_print_data(FILE *f0,
@@ -434,6 +443,10 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
     BIGINT *llp;
     float *fp;
     double *dp;
+    long double *qp;
+    float _Complex *fc;
+    double _Complex *dc;
+    long double _Complex *qc;
     defstr *pd;
 
     status = 0;
@@ -451,26 +464,42 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 
     memset(s, ' ', LINE_SIZE);
 
-    pd   = PD_inquire_host_type(file, type);
+    pd  = PD_inquire_host_type(file, type);
     isz = pd->size;
 
 /* check for floating point types */
     if (pd->fp.format != NULL)
        {if (strcmp(type, "float") == 0)
 	   {fp = (float *) vr;
-	    DISP_DATA(f0, fp, nitems, 2, n, ind);}
+	    DISP_DATA(f0, fp, nitems, 6, n, ind);}
 
        else if (strcmp(type, "double") == 0)
 	  {dp = (double *) vr;
-	   DISP_DATA(f0, dp, nitems, 3, n, ind);}
+	   DISP_DATA(f0, dp, nitems, 7, n, ind);}
+
+       else if (strcmp(type, "long_double") == 0)
+	  {qp = (long double *) vr;
+	   DISP_DATA(f0, qp, nitems, 8, n, ind);}
+
+       else if (strcmp(type, "float_complex") == 0)
+	   {fc = (float _Complex *) vr;
+	    DISP_DATA(f0, fc, nitems, 9, n, ind);}
+
+       else if (strcmp(type, "double_complex") == 0)
+	  {dc = (double _Complex *) vr;
+	   DISP_DATA(f0, dc, nitems, 10, n, ind);}
+
+       else if (strcmp(type, "long_double_complex") == 0)
+	  {qc = (long double _Complex *) vr;
+	   DISP_DATA(f0, qc, nitems, 11, n, ind);}
 
        else if (strcmp(type, "REAL") == 0)
 	  {if (sizeof(REAL) == sizeof(double))
 	      {dp = (double *) vr;
-	       DISP_DATA(f0, dp, nitems, 3, n, ind);}
+	       DISP_DATA(f0, dp, nitems, 7, n, ind);}
 	   else
 	      {fp = (float *) vr;
-	       DISP_DATA(f0, fp, nitems, 2, n, ind);};};}
+	       DISP_DATA(f0, fp, nitems, 6, n, ind);};};}
 
 /* only non-floating point types remain
  * user defined integral primitive types
@@ -479,29 +508,25 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
     else if (pd->convert >= 0)
        {if (strcmp(type, "short") == 0)
 	   {sp = (short *) vr;
-	    DISP_DATA(f0, sp, nitems, 4, n, ind);}
+	    DISP_DATA(f0, sp, nitems, 2, n, ind);}
 
-	else if (strcmp(type, "int") == 0)
+	else if ((strcmp(type, "int") == 0) || (strcmp(type, "integer") == 0))
 	   {ip = (int *) vr;
-	    DISP_DATA(f0, ip, nitems, 0, n, ind);}
-
-	else if (strcmp(type, "integer") == 0)
-	   {ip = (int *) vr;
-	    DISP_DATA(f0, ip, nitems, 0, n, ind);}
+	    DISP_DATA(f0, ip, nitems, 3, n, ind);}
 
 	else if (strcmp(type, "long") == 0)
 	   {lp = (long *) vr;
-	    DISP_DATA(f0, lp, nitems, 1, n, ind);}
+	    DISP_DATA(f0, lp, nitems, 4, n, ind);}
 
 	else if (strcmp(type, "long_long") == 0)
 	   {llp = (BIGINT *) vr;
-	    DISP_DATA(f0, llp, nitems, 6, n, ind);}
+	    DISP_DATA(f0, llp, nitems, 5, n, ind);}
 
 /* GOTCHA: This is a feeble first step toward a generalized
  *         print capability for user defined types
  */
 	else if (strcmp(type, "char_8") == 0)
-	   {if (SC_strstr(PD_print_formats1[5], "%s") != NULL)
+	   {if (SC_strstr(PD_print_formats1[3], "%s") != NULL)
 	       {cp = (char *) vr;
 		t  = FMAKE_N(char *, nitems, "_PD_IO_PRINT:t");
 		for (i = 0; i < nitems; i++, cp += isz)
@@ -509,13 +534,13 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
                                           "_PD_IO_PRINT:t[]");
 		     memcpy(t[i], cp, isz);
 		     t[i][isz] = '\0';};
-		DISP_DATA(f0, t, nitems, 5, n, ind);
+		DISP_DATA(f0, t, nitems, 0, n, ind);
 		for (i = 0; i < nitems; i++)
 		    SFREE(t[i]);
 		SFREE(t);}
 	    else
 	       {cp = (char *) vr;
-		DISP_DATA(f0, cp, isz*nitems, 5, n, ind);};}
+		DISP_DATA(f0, cp, isz*nitems, 0, n, ind);};}
 
 	else if (strcmp(type, "function") == 0)
 	   {if (PD_print_controls[5] == 0)
@@ -527,15 +552,15 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 
 	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
 	   {if (strcmp(type, "char") == 0)
-	       {idx = 5;
+	       {idx = 0;
 		ni  = nitems;
 	        quo = TRUE;}
 	    else if (pd->kind == CHAR_KIND)
-	       {idx = 5;
+	       {idx = 0;
 		ni  = isz;
 	        quo = FALSE;}
 	    else
-	       {idx = 7;
+	       {idx = 1;
 		ni  = nitems;
 	        quo = FALSE;};
 
@@ -545,15 +570,15 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 
         else if (isz == sizeof(short))
 	   {sp = (short *) vr;
-	    DISP_DATA(f0, sp, nitems, 7, n, ind);}
+	    DISP_DATA(f0, sp, nitems, 1, n, ind);}
 
 	else if (isz == sizeof(int))
 	   {ip = (int *) vr;
-	    DISP_DATA(f0, ip, nitems, 7, n, ind);}
+	    DISP_DATA(f0, ip, nitems, 1, n, ind);}
 
 	else if (isz == sizeof(long))
 	   {lp = (long *) vr;
-	    DISP_DATA(f0, lp, nitems, 7, n, ind);}
+	    DISP_DATA(f0, lp, nitems, 1, n, ind);}
 
 	else
 	   {PRINT(f0, "%s%s%s = ", prefix, before, nodename);
@@ -906,83 +931,27 @@ int _PD_print_leaf(FILE *f0, char *prefix, char *before, char *after,
 /* _PD_SET_USER_FORMATS - replace edit formats with user specified formats  */
 
 void _PD_set_user_formats(void)
-   {
+   {int i;
 
-    if (PD_user_formats1[0] != NULL)
-       {SFREE(PD_print_formats1[0]);
-        PD_print_formats1[0] = SC_strsavef(PD_user_formats1[0],
-                               "char*:_PD_SET_USER_FORMATS:format1(0)");};
+    for (i = 0; i < PD_N_FORMATS; i++)
+        {if (PD_user_formats1[i] != NULL)
+	    {SFREE(PD_print_formats1[i]);
+	     PD_print_formats1[i] = SC_strsavef(PD_user_formats1[i],
+						"char*:_PD_SET_USER_FORMATS:format1(i)");};
 
-    if (PD_user_formats2[0] != NULL)
-       {SFREE(PD_print_formats2[0]);
-        PD_print_formats2[0] = SC_strsavef(PD_user_formats2[0],
-                               "char*:_PD_SET_USER_FORMATS:format2(0)");};
+	 if (PD_user_formats2[i] != NULL)
+	    {SFREE(PD_print_formats2[i]);
+	     PD_print_formats2[i] = SC_strsavef(PD_user_formats2[i],
+						"char*:_PD_SET_USER_FORMATS:format2(i)");};};
 
-    if (PD_user_formats1[1] != NULL)
-       {SFREE(PD_print_formats1[1]);
-        PD_print_formats1[1] = SC_strsavef(PD_user_formats1[1],
-                               "char*:_PD_SET_USER_FORMATS:format1(1)");};
-
-    if (PD_user_formats2[1] != NULL)
-       {SFREE(PD_print_formats2[1]);
-        PD_print_formats2[1] = SC_strsavef(PD_user_formats2[1],
-                               "char*:_PD_SET_USER_FORMATS:format2(1)");};
-
-    if (PD_user_formats1[2] != NULL)
-       {SFREE(PD_print_formats1[2]);
-        PD_print_formats1[2] = SC_strsavef(PD_user_formats1[2],
-                               "char*:_PD_SET_USER_FORMATS:format1(2)");};
-
-    if (PD_user_formats2[2] != NULL)
-       {SFREE(PD_print_formats2[2]);
-        PD_print_formats2[2] = SC_strsavef(PD_user_formats2[2],
-                               "char*:_PD_SET_USER_FORMATS:format2(2)");};
-
-    if (PD_user_formats1[3] != NULL)
-       {SFREE(PD_print_formats1[3]);
-        PD_print_formats1[3] = SC_strsavef(PD_user_formats1[3],
-                               "char*:_PD_SET_USER_FORMATS:format1(3)");};
-
-    if (PD_user_formats2[3] != NULL)
-       {SFREE(PD_print_formats2[3]);
-        PD_print_formats2[3] = SC_strsavef(PD_user_formats2[3],
-                               "char*:_PD_SET_USER_FORMATS:format2(3)");};
-
-    if (PD_user_formats1[4] != NULL)
-       {SFREE(PD_print_formats1[4]);
-        PD_print_formats1[4] = SC_strsavef(PD_user_formats1[4],
-                               "char*:_PD_SET_USER_FORMATS:format1(4)");};
-
-    if (PD_user_formats2[4] != NULL)
-       {SFREE(PD_print_formats2[4]);
-        PD_print_formats2[4] = SC_strsavef(PD_user_formats2[4],
-                               "char*:_PD_SET_USER_FORMATS:format2(4)");};
-
-    if (PD_user_formats1[5] != NULL)
-       {SFREE(PD_print_formats1[5]);
-        PD_print_formats1[5] = SC_strsavef(PD_user_formats1[5],
-                               "char*:_PD_SET_USER_FORMATS:format1(5)");};
-
-    if (PD_user_formats2[5] != NULL)
-       {SFREE(PD_print_formats2[5]);
-        PD_print_formats2[5] = SC_strsavef(PD_user_formats2[5],
-                               "char*:_PD_SET_USER_FORMATS:format2(5)");};
-
-    if (PD_user_formats1[7] != NULL)
-       {SFREE(PD_print_formats1[7]);
-        PD_print_formats1[7] = SC_strsavef(PD_user_formats1[7],
-                               "char*:_PD_SET_USER_FORMATS:format1(7)");};
-
-    if (PD_user_formats2[7] != NULL)
-       {SFREE(PD_print_formats2[7]);
-        PD_print_formats2[7] = SC_strsavef(PD_user_formats2[7],
-                               "char*:_PD_SET_USER_FORMATS:format2(7)");};
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_SET_FORMAT_DEFAULTS - set the defaults for the edit formats 
+ *
+ * old
  *                         -   0 = int
  *                         -   1 = long
  *                         -   2 = float
@@ -991,6 +960,19 @@ void _PD_set_user_formats(void)
  *                         -   5 = char
  *                         -   6 = long long
  *                         -   7 = bit
+ * new
+ *                         -   0 = char
+ *                         -   1 = bit
+ *                         -   2 = short
+ *                         -   3 = int
+ *                         -   4 = long
+ *                         -   5 = long long
+ *                         -   6 = float
+ *                         -   7 = double
+ *                         -   8 = long double
+ *                         -   9 = float complex
+ *                         -  10 = double complex
+ *                         -  11 = long double complex
  */
 
 void _PD_set_format_defaults(void)
@@ -1000,41 +982,27 @@ void _PD_set_format_defaults(void)
 /* used for scalars */
     if (PD_print_formats1[0] != NULL)
        SFREE(PD_print_formats1[0]);
-    snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[1]);
-    t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(0)");
+    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(0)");
     PD_print_formats1[0] = t;
 
     if (PD_print_formats1[1] != NULL)
        SFREE(PD_print_formats1[1]);
-    snprintf(tmp, MAXLINE, "%%%dld", PD_fix_precision[2]);
-    t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(1)");
+    t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(1)");
     PD_print_formats1[1] = t;
 
-    if (PD_print_formats1[2] != NULL)
-       SFREE(PD_print_formats1[2]);
-    snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[0].digits);
-    t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(2)");
-    PD_print_formats1[2] = t;
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+        {if (PD_print_formats1[i+2] != NULL)
+	    SFREE(PD_print_formats1[i+2]);
+	 snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[i]);
+	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(i)");
+	 PD_print_formats1[i+2] = t;};
 
-    if (PD_print_formats1[3] != NULL)
-       SFREE(PD_print_formats1[3]);
-    snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[1].digits);
-    t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(3)");
-    PD_print_formats1[3] = t;
-
-    if (PD_print_formats1[4] != NULL)
-       SFREE(PD_print_formats1[4]);
-    snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[0]);
-    t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(4)");
-    PD_print_formats1[4] = t;
-
-    if (PD_print_formats1[5] != NULL)
-       SFREE(PD_print_formats1[5]);
-    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(5)");
-    PD_print_formats1[5] = t;
-
-    if (PD_print_formats1[6] != NULL)
-       SFREE(PD_print_formats1[6]);
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+        {if (PD_print_formats1[i+6] != NULL)
+	    SFREE(PD_print_formats1[i+6]);
+	 snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[i].digits);
+	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(i)");
+	 PD_print_formats1[i+6] = t;};
 
 #ifdef NO_LONG_LONG
 
@@ -1052,16 +1020,8 @@ void _PD_set_format_defaults(void)
     snprintf(tmp, MAXLINE, "%%%dlld", PD_fix_precision[3]);
 #endif
 
-    t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(6)");
-    PD_print_formats1[6] = t;
-
-    if (PD_print_formats1[7] != NULL)
-       SFREE(PD_print_formats1[7]);
-    t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(7)");
-    PD_print_formats1[7] = t;
-
 /* used for arrays */
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < PD_N_FORMATS; i++)
         {if (PD_print_formats2[i] != NULL)
             SFREE(PD_print_formats2[i]);
 
