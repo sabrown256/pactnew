@@ -1658,9 +1658,13 @@
               command for more about the array-length variable.
               This command overrides the settings of the decimal-
               precision and bits-precision control parameters.
-     Usage: format integer[1 | 2] | long[1 | 2] | float[1 | 2] |
-                   double[1 | 2] | short[1 | 2] | char[1 | 2] |
-                   longlong[1 | 2] | bit[1 | 2] | suppress-member <format>
+     Usage: format char[1 | 2] | bit[1 | 2] |
+                   short[1 | 2] | int[1 | 2] | long[1 | 2] |
+                   long_long[1 | 2] |
+                   float[1 | 2] | double[1 | 2] | long_double[1 | 2] |
+                   float_complex[1 | 2] | double_complex[1 | 2] |
+                   long_double_complex[1 | 2] |
+                   suppress-member <format>
      Usage: format default
      Usage: format all
      Examples: format double %12.5e

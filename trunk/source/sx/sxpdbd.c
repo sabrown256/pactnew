@@ -332,29 +332,19 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
        {spa = (short *) pva;
         spb = (short *) pvb;
 
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[4]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
         SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[4]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
 
         DISP_ARRAY(fmt, indx, spa, spb);}
 
-    else if (strcmp(type, "int") == 0)
+    else if ((strcmp(type, "int") == 0) || (strcmp(type, "integer") == 0))
        {ipa = (int *) pva;
         ipb = (int *) pvb;
 
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[0]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
         SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[0]);
-
-        DISP_ARRAY(fmt, indx, ipa, ipb);}
-
-    else if (strcmp(type, "integer") == 0)
-       {ipa = (int *) pva;
-        ipb = (int *) pvb;
-
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[0]);
-        SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[0]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
 
         DISP_ARRAY(fmt, indx, ipa, ipb);}
 
@@ -362,9 +352,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
        {lpa = (long *) pva;
         lpb = (long *) pvb;
 
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[1]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[4]);
         SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[1]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[4]);
 
         DISP_ARRAY(fmt, indx, lpa, lpb);}
 
@@ -373,9 +363,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
            {dpa = (double *) pva;
             dpb = (double *) pvb;
 
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
 	    SC_strcat(fmt, LINE_SIZE, "   ");
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
 
             DISP_ARRAY(fmt, indx, dpa, dpb);}
 
@@ -383,9 +373,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
            {fpa = (float *) pva;
             fpb = (float *) pvb;
 
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
 	    SC_strcat(fmt, LINE_SIZE, "   ");
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
 
             DISP_ARRAY(fmt, indx, fpa, fpb);};}
 
@@ -393,9 +383,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
        {fpa = (float *) pva;
         fpb = (float *) pvb;
 
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
 	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
 
         DISP_ARRAY(fmt, indx, fpa, fpb);}
 
@@ -403,9 +393,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
        {dpa = (double *) pva;
         dpb = (double *) pvb;
 
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
 	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
 
         DISP_ARRAY(fmt, indx, dpa, dpb);};
 

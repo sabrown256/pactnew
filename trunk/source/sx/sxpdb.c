@@ -3455,7 +3455,8 @@ static object *_SX_set_user_format(int i, char *format, int whch)
 /* _SXI_SET_FORMAT - set a format */
 
 static object *_SXI_set_format(object *argl)
-   {char *field, *format;
+   {int i;
+    char *field, *format;
     object *rv;
 
     field  = NULL;
@@ -3468,61 +3469,61 @@ static object *_SXI_set_format(object *argl)
     rv = SS_t;
 
     if (strcmp(field, "integer") == 0)
-       rv = _SX_set_user_format(0, format, 3);
-
-    else if (strcmp(field, "integer1") == 0)
-       rv = _SX_set_user_format(0, format, 1);
-
-    else if (strcmp(field, "integer2") == 0)
-       rv = _SX_set_user_format(0, format, 2);
-
-    else if (strcmp(field, "long") == 0)
-       rv = _SX_set_user_format(1, format, 3);
-
-    else if (strcmp(field, "long1") == 0)
-       rv = _SX_set_user_format(1, format, 1);
-
-    else if (strcmp(field, "long2") == 0)
-       rv = _SX_set_user_format(1, format, 2);
-
-    else if (strcmp(field, "float") == 0)
-       rv = _SX_set_user_format(2, format, 3);
-
-    else if (strcmp(field, "float1") == 0)
-       rv = _SX_set_user_format(2, format, 1);
-
-    else if (strcmp(field, "float2") == 0)
-       rv = _SX_set_user_format(2, format, 2);
-
-    else if (strcmp(field, "double") == 0)
        rv = _SX_set_user_format(3, format, 3);
 
-    else if (strcmp(field, "double1") == 0)
+    else if (strcmp(field, "integer1") == 0)
        rv = _SX_set_user_format(3, format, 1);
 
-    else if (strcmp(field, "double2") == 0)
+    else if (strcmp(field, "integer2") == 0)
        rv = _SX_set_user_format(3, format, 2);
 
-    else if (strcmp(field, "short") == 0)
+    else if (strcmp(field, "long") == 0)
        rv = _SX_set_user_format(4, format, 3);
 
-    else if (strcmp(field, "short1") == 0)
+    else if (strcmp(field, "long1") == 0)
        rv = _SX_set_user_format(4, format, 1);
 
-    else if (strcmp(field, "short2") == 0)
+    else if (strcmp(field, "long2") == 0)
        rv = _SX_set_user_format(4, format, 2);
 
+    else if (strcmp(field, "float") == 0)
+       rv = _SX_set_user_format(6, format, 3);
+
+    else if (strcmp(field, "float1") == 0)
+       rv = _SX_set_user_format(6, format, 1);
+
+    else if (strcmp(field, "float2") == 0)
+       rv = _SX_set_user_format(6, format, 2);
+
+    else if (strcmp(field, "double") == 0)
+       rv = _SX_set_user_format(7, format, 3);
+
+    else if (strcmp(field, "double1") == 0)
+       rv = _SX_set_user_format(7, format, 1);
+
+    else if (strcmp(field, "double2") == 0)
+       rv = _SX_set_user_format(7, format, 2);
+
+    else if (strcmp(field, "short") == 0)
+       rv = _SX_set_user_format(2, format, 3);
+
+    else if (strcmp(field, "short1") == 0)
+       rv = _SX_set_user_format(2, format, 1);
+
+    else if (strcmp(field, "short2") == 0)
+       rv = _SX_set_user_format(2, format, 2);
+
     else if (strcmp(field, "char") == 0)
-       rv = _SX_set_user_format(5, format, 3);
+       rv = _SX_set_user_format(0, format, 3);
 
     else if (strcmp(field, "char1") == 0)
-       rv = _SX_set_user_format(5, format, 1);
+       rv = _SX_set_user_format(0, format, 1);
 
     else if (strcmp(field, "char2") == 0)
-       rv = _SX_set_user_format(5, format, 2);
+       rv = _SX_set_user_format(0, format, 2);
 
     else if (strcmp(field, "user-int") == 0)
-       rv = _SX_set_user_format(7, format, 3);
+       rv = _SX_set_user_format(1, format, 3);
 
     else if (strcmp(field, "suppress-member") == 0)
        {if (PD_no_print_member != NULL)
@@ -3531,31 +3532,11 @@ static object *_SXI_set_format(object *argl)
 					 "char*:_SXI_SET_FORMAT:npm");}
 
     else if (strcmp(field, "default") == 0)
-       {if (PD_user_formats1[0] != NULL)
-           {SFREE(PD_user_formats1[0]);};
-        if (PD_user_formats1[1] != NULL)
-           {SFREE(PD_user_formats1[1]);};
-        if (PD_user_formats1[2] != NULL)
-           {SFREE(PD_user_formats1[2]);};
-        if (PD_user_formats1[3] != NULL)
-           {SFREE(PD_user_formats1[3]);};
-        if (PD_user_formats1[4] != NULL)
-           {SFREE(PD_user_formats1[4]);};
-        if (PD_user_formats1[5] != NULL)
-           {SFREE(PD_user_formats1[5]);};
-
-        if (PD_user_formats2[0] != NULL)
-           {SFREE(PD_user_formats2[0]);};
-        if (PD_user_formats2[1] != NULL)
-           {SFREE(PD_user_formats2[1]);};
-        if (PD_user_formats2[2] != NULL)
-           {SFREE(PD_user_formats2[2]);};
-        if (PD_user_formats2[3] != NULL)
-           {SFREE(PD_user_formats2[3]);};
-        if (PD_user_formats2[4] != NULL)
-           {SFREE(PD_user_formats2[4]);};
-        if (PD_user_formats2[5] != NULL)
-           {SFREE(PD_user_formats2[5]);};
+       {for (i = 0; i < 6; i++)
+	    {if (PD_user_formats1[i] != NULL)
+	        {SFREE(PD_user_formats1[i]);};
+	     if (PD_user_formats2[i] != NULL)
+	        {SFREE(PD_user_formats2[i]);};};
 
         if (PD_no_print_member != NULL)
            {SFREE(PD_no_print_member);};}
