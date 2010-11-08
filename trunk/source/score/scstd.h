@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <limits.h>
 #include <errno.h>
 #include <float.h>

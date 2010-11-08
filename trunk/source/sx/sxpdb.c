@@ -3455,9 +3455,13 @@ static object *_SX_set_user_format(int i, char *format, int whch)
 /* _SXI_SET_FORMAT - set a format */
 
 static object *_SXI_set_format(object *argl)
-   {int i;
-    char *field, *format;
+   {int i, ok;
+    char s1[MAXLINE], s2[MAXLINE];
+    char *field, *format, *typ;
     object *rv;
+    static char *fxtypes[] = { "short", "integer", "long", "long_long" };
+    static char *fptypes[] = { "float", "double", "long_double" };
+    static char *cmtypes[] = { "float_complex", "double_complex", "long_double_complex" };
 
     field  = NULL;
     format = NULL;
@@ -3468,81 +3472,87 @@ static object *_SXI_set_format(object *argl)
 
     rv = SS_t;
 
-    if (strcmp(field, "integer") == 0)
-       rv = _SX_set_user_format(3, format, 3);
+    ok = FALSE;
 
-    else if (strcmp(field, "integer1") == 0)
-       rv = _SX_set_user_format(3, format, 1);
+    for (i = 0; (i < PD_N_PRIMITIVE_FIX) && (ok == FALSE); i++)
+        {typ = fxtypes[i];
+	 snprintf(s1, MAXLINE, "%s1", typ);
+	 snprintf(s2, MAXLINE, "%s2", typ);
+	 if (strcmp(field, typ) == 0)
+	    {rv = _SX_set_user_format(i+2, format, 3);
+	     ok = TRUE;}
 
-    else if (strcmp(field, "integer2") == 0)
-       rv = _SX_set_user_format(3, format, 2);
+	 else if (strcmp(field, s1) == 0)
+	    {rv = _SX_set_user_format(i+2, format, 1);
+	     ok = TRUE;}
 
-    else if (strcmp(field, "long") == 0)
-       rv = _SX_set_user_format(4, format, 3);
+	 else if (strcmp(field, s2) == 0)
+	    {rv = _SX_set_user_format(i+2, format, 2);
+	     ok = TRUE;};};
 
-    else if (strcmp(field, "long1") == 0)
-       rv = _SX_set_user_format(4, format, 1);
+    for (i = 0; (i < PD_N_PRIMITIVE_FP) && (ok == FALSE); i++)
+        {typ = fptypes[i];
+	 snprintf(s1, MAXLINE, "%s1", typ);
+	 snprintf(s2, MAXLINE, "%s2", typ);
+	 if (strcmp(field, typ) == 0)
+	    {rv = _SX_set_user_format(i+6, format, 3);
+	     ok = TRUE;}
 
-    else if (strcmp(field, "long2") == 0)
-       rv = _SX_set_user_format(4, format, 2);
+	 else if (strcmp(field, s1) == 0)
+	    {rv = _SX_set_user_format(i+6, format, 1);
+	     ok = TRUE;}
 
-    else if (strcmp(field, "float") == 0)
-       rv = _SX_set_user_format(6, format, 3);
+	 else if (strcmp(field, s2) == 0)
+	    {rv = _SX_set_user_format(i+6, format, 2);
+	     ok = TRUE;};};
 
-    else if (strcmp(field, "float1") == 0)
-       rv = _SX_set_user_format(6, format, 1);
+    for (i = 0; (i < PD_N_PRIMITIVE_FP) && (ok == FALSE); i++)
+        {typ = cmtypes[i];
+	 snprintf(s1, MAXLINE, "%s1", typ);
+	 snprintf(s2, MAXLINE, "%s2", typ);
+	 if (strcmp(field, typ) == 0)
+	    {rv = _SX_set_user_format(i+9, format, 3);
+	     ok = TRUE;}
 
-    else if (strcmp(field, "float2") == 0)
-       rv = _SX_set_user_format(6, format, 2);
+	 else if (strcmp(field, s1) == 0)
+	    {rv = _SX_set_user_format(i+9, format, 1);
+	     ok = TRUE;}
 
-    else if (strcmp(field, "double") == 0)
-       rv = _SX_set_user_format(7, format, 3);
+	 else if (strcmp(field, s2) == 0)
+	    {rv = _SX_set_user_format(i+9, format, 2);
+	     ok = TRUE;};};
 
-    else if (strcmp(field, "double1") == 0)
-       rv = _SX_set_user_format(7, format, 1);
+    if (ok == FALSE)
+       {if (strcmp(field, "char") == 0)
+	   rv = _SX_set_user_format(0, format, 3);
 
-    else if (strcmp(field, "double2") == 0)
-       rv = _SX_set_user_format(7, format, 2);
+        else if (strcmp(field, "char1") == 0)
+	   rv = _SX_set_user_format(0, format, 1);
 
-    else if (strcmp(field, "short") == 0)
-       rv = _SX_set_user_format(2, format, 3);
+	else if (strcmp(field, "char2") == 0)
+	   rv = _SX_set_user_format(0, format, 2);
 
-    else if (strcmp(field, "short1") == 0)
-       rv = _SX_set_user_format(2, format, 1);
+	else if (strcmp(field, "user-int") == 0)
+	   rv = _SX_set_user_format(1, format, 3);
 
-    else if (strcmp(field, "short2") == 0)
-       rv = _SX_set_user_format(2, format, 2);
+	else if (strcmp(field, "suppress-member") == 0)
+	   {if (PD_no_print_member != NULL)
+	       {SFREE(PD_no_print_member);};
+	    PD_no_print_member = SC_strsavef(format,
+					     "char*:_SXI_SET_FORMAT:npm");}
 
-    else if (strcmp(field, "char") == 0)
-       rv = _SX_set_user_format(0, format, 3);
+	else if (strcmp(field, "default") == 0)
+	   {for (i = 0; i < 6; i++)
+	        {if (PD_user_formats1[i] != NULL)
+		    {SFREE(PD_user_formats1[i]);};
+		 if (PD_user_formats2[i] != NULL)
+		    {SFREE(PD_user_formats2[i]);};};
 
-    else if (strcmp(field, "char1") == 0)
-       rv = _SX_set_user_format(0, format, 1);
+	    if (PD_no_print_member != NULL)
+	       {SFREE(PD_no_print_member);};}
 
-    else if (strcmp(field, "char2") == 0)
-       rv = _SX_set_user_format(0, format, 2);
-
-    else if (strcmp(field, "user-int") == 0)
-       rv = _SX_set_user_format(1, format, 3);
-
-    else if (strcmp(field, "suppress-member") == 0)
-       {if (PD_no_print_member != NULL)
-           {SFREE(PD_no_print_member);};
-        PD_no_print_member = SC_strsavef(format,
-					 "char*:_SXI_SET_FORMAT:npm");}
-
-    else if (strcmp(field, "default") == 0)
-       {for (i = 0; i < 6; i++)
-	    {if (PD_user_formats1[i] != NULL)
-	        {SFREE(PD_user_formats1[i]);};
-	     if (PD_user_formats2[i] != NULL)
-	        {SFREE(PD_user_formats2[i]);};};
-
-        if (PD_no_print_member != NULL)
-           {SFREE(PD_no_print_member);};}
-
-    else
-       SS_error("UNKNOWN TYPE - _SXI_SET_FORMAT", argl);
+	else
+	   SS_error("UNKNOWN TYPE - _SXI_SET_FORMAT", argl);};
 
     SFREE(field);
     SFREE(format);

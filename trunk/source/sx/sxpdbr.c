@@ -178,11 +178,6 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
 
 static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
    {int i, ityp;
-    short *sp;
-    int *pi;
-    long *pl;
-    float *pf;
-    double *pd;
     char *msg, *type;
     object *obj1,  **va;
 
@@ -210,24 +205,59 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
         SS_error(msg, obj);};
 
     if (strcmp(type, "short") == 0)
-       {sp = (short *) vr;
-        READ_IO(sp, short)}
+       {short *pv;
+        pv = (short *) vr;
+        READ_IO(pv, short)}
 
     else if ((strcmp(type, "integer") == 0) || (strcmp(type, "int") == 0))
-       {pi = (int *) vr;
-        READ_IO(pi, int)}
+       {int *pv;
+        pv = (int *) vr;
+        READ_IO(pv, int)}
 
     else if (strcmp(type, "long") == 0)
-       {pl = (long *) vr;
-        READ_IO(pl, long)}
+       {long *pv;
+        pv = (long *) vr;
+        READ_IO(pv, long)}
+
+    else if (strcmp(type, "long_long") == 0)
+       {long long *pv;
+	pv = (long long *) vr;
+        READ_IO(pv, long long)}
 
     else if (strcmp(type, "float") == 0)
-       {pf = (float *) vr;
-        READ_IO(pf, float)}
-
+       {float *pv;
+        pv = (float *) vr;
+        READ_IO(pv, float)}
+ 
     else if (strcmp(type, "double") == 0)
-       {pd = (double *) vr;
-        READ_IO(pd, double)}
+       {double *pv;
+        pv = (double *) vr;
+        READ_IO(pv, double)}
+
+    else if (strcmp(type, "long_double") == 0)
+       {long double *pv;
+	pv = (long double *) vr;
+        READ_IO(pv, long double)}
+
+    else if (strcmp(type, "float_complex") == 0)
+       {float _Complex *pv;
+	pv = (float _Complex *) vr;
+        READ_IO(pv, float _Complex)}
+
+    else if (strcmp(type, "double_complex") == 0)
+       {double _Complex *pv;
+        pv = (double _Complex *) vr;
+        READ_IO(pv, double _Complex)}
+
+    else if (strcmp(type, "long_double_complex") == 0)
+       {long double _Complex *pv;
+	pv = (long double _Complex *) vr;
+        READ_IO(pv, long double _Complex)}
+
+    else if (strcmp(type, "bool") == 0)
+       {bool *pb;
+	pb = (bool *) vr;
+        READ_IO(pb, bool)}
 
     else
 #if 1
@@ -235,12 +265,14 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 
         ityp = SC_arrtype(obj, -1);
 	if (ityp == SC_INTEGER_I)
-           {pi  = (int *) vr;
-	    *pi = (int) SS_INTEGER_VALUE(obj);}
+	   {int *pv;
+	    pv  = (int *) vr;
+	    *pv = (int) SS_INTEGER_VALUE(obj);}
 
 	else if (ityp == SC_FLOAT_I)
-	   {pf  = (float *) vr;
-	    *pf = (float) SS_FLOAT_VALUE(obj);}
+	   {float *pv;
+	    pv  = (float *) vr;
+	    *pv = (float) SS_FLOAT_VALUE(obj);}
 
 	else if (ityp == SS_CONS_I)
 	   {if (SS_consp(SS_car(obj)))
@@ -250,11 +282,13 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 	        {obj1  = SS_car(obj);
 		 jtyp = SC_arrtype(obj1, -1);
 		 if (jtyp == SC_INTEGER_I)
-		    {pi    = (int *) vr;
-		     pi[i] = (int) SS_INTEGER_VALUE(obj1);}
+		    {int *pv;
+		     pv    = (int *) vr;
+		     pv[i] = (int) SS_INTEGER_VALUE(obj1);}
 		 else if (jtyp == SC_FLOAT_I)
-		    {pf    = (float *) vr;
-		     pf[i] = (char) SS_FLOAT_VALUE(obj1);}
+		    {float *pv;
+		     pv    = (float *) vr;
+		     pv[i] = (char) SS_FLOAT_VALUE(obj1);}
 		 else
 		    SS_error("EXPECTED A NUMBER", obj1);
 		 obj1 = SS_cdr(obj);
@@ -266,11 +300,13 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 	    for (i = 0; i < nitems; i++)
 	        {jtyp = SC_arrtype(va[i], -1);
 		 if (jtyp == SC_INTEGER_I)
-		    {pi    = (int *) vr;
-		     pi[i] = (int) SS_INTEGER_VALUE(va[i]);}
+		    {int *pv;
+		     pv    = (int *) vr;
+		     pv[i] = (int) SS_INTEGER_VALUE(va[i]);}
 		 else if (jtyp == SC_FLOAT_I)
-		    {pf    = (float *) vr;
-		     pf[i] = (float) SS_FLOAT_VALUE(va[i]);}
+		    {float *pv;
+		     pv    = (float *) vr;
+		     pv[i] = (float) SS_FLOAT_VALUE(va[i]);}
 		 else
 		    SS_error("EXPECTED A NUMBER", va[i]);};}
 	else

@@ -1,11 +1,6 @@
 ; 
 ; SXPDB.SCM - test all PDB functions in SX
 ;
-;  4-may-89
-;  Lee Taylor
-;  updated 15-sep-92
-;  Stewart Brown and Dennis Braddy
-; 
 ; Source Version: 3.0
 ; Software Release #: LLNL-CODE-422942
 ;
@@ -21,7 +16,7 @@
 (define file1 (open-pdbfile "foofoo" "w"))
 (display (list-file))
 (newline)
-(pdb-data-write vars set file1)
+(pdb-data-write vars set file1 #t)
 (io-stats file1)
 (close-pdbfile file1)
 

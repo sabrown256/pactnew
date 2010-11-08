@@ -190,16 +190,17 @@ void *PD_alloc_entry(PDBfile *file, char *name)
 
 /* _PD_ALLOC_ENTRY - allocate memory for the variable type */
 
-void *_PD_alloc_entry(PDBfile *file, char *type, long nitems)
-   {void *vr;
+void *_PD_alloc_entry(PDBfile *file, char *type, long ni)
+   {int ipt;
     long len, bpi;
+    void *vr;
     defstr *dp;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
 
     if (_PD_indirection(type))
-       {vr = (char *) FMAKE_N(char *, nitems, "_PD_ALLOC_ENTRY:char *");}
+       {vr = (char *) FMAKE_N(char *, ni, "_PD_ALLOC_ENTRY:char *");}
     else
        {dp = PD_inquire_host_type(file, type);
         if (dp == NULL)
@@ -211,10 +212,11 @@ void *_PD_alloc_entry(PDBfile *file, char *type, long nitems)
  * is applied to this string
  */
         if (strcmp(type, SC_CHAR_S) == 0)
-           nitems += 2;
+           ni += 2;
 
+	ipt = _PD_items_per_tuple(dp);
         bpi = dp->size;
-        len = nitems * bpi;
+        len = ni*ipt*bpi;
         vr  = SC_alloc_nzt(len, 1L, "_PD_ALLOC_ENTRY:vr", NULL);};
 
     return(vr);}

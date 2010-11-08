@@ -9,104 +9,13 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
+#include <complex.h>
 
-#define PD_N_FORMATS 12
+#define PD_N_FORMATS 14
 
 #define LINE_SIZE 90
 
-/*--------------------------------------------------------------------------*/
-
-#define DISP_DATA(f0, x, nitems, tid, n, ind)                                \
-    if ((n > 0L) && (ind != NULL))                                           \
-       {DISP_MODE_I(f0, x, tid, n, ind);}                                    \
-    else if (nitems == 1L)                                                   \
-       {DISP_MODE_1(f0, x, nitems, tid);}                                    \
-    else if (nitems < PD_print_controls[3])                                  \
-       {DISP_MODE_2(f0, x, nitems, tid);}                                    \
-    else                                                                     \
-       {DISP_MODE_3(f0, x, nitems, tid);}
-
-/*--------------------------------------------------------------------------*/
-
-#define DISP_MODE_I(f0, x, tid, n, ind)                                      \
-    for (i = 0L; i < n; i++)                                                 \
-        {j = ind[i];                                                         \
-         if (PD_print_controls[5] == 0)                                      \
-	    {PRINT(f0, "%s%s%s(%s) = ",                                      \
-                   prefix, after, nodename,                                  \
-                   PD_index_to_expr(bf, j, dims, mjr, def_off));}            \
-         else                                                                \
-	    {PRINT(f0, "\na> %s", prefix);};                                 \
-         PRINT(f0, PD_print_formats1[tid], x[j]);                            \
-         PRINT(f0, "\n");}
-
-/*--------------------------------------------------------------------------*/
-
-#define DISP_MODE_1(f0, x, nitems, tid)                                      \
-    if (PD_print_controls[5] == 0)                                           \
-       {PRINT(f0, "%s%s%s = ", prefix, before, nodename);}                   \
-    else if (PD_print_controls[5] == 1)                                      \
-       {PRINT(f0, "%s%s", before, nodename);}                                \
-    else                                                                     \
-       {PRINT(f0, "        ");};                                             \
-    PRINT(f0, PD_print_formats1[tid], *x);                                   \
-    PRINT(f0, "\n");
-
-/*--------------------------------------------------------------------------*/
-
-#define DISP_MODE_2(f0, x, nitems, tid)                                      \
-    i = 0L;                                                                  \
-    j = 0L;                                                                  \
-    if (PD_print_controls[5] == 0)                                           \
-       {PRINT(f0, "%s%s%s(%s) = ",                                           \
-              prefix, before, nodename,                                      \
-              PD_index_to_expr(bf, j, dims, mjr, def_off));}                 \
-    else if (PD_print_controls[5] == 1)                                      \
-       {PRINT(f0, "%s%s ", before, nodename);}                               \
-    else                                                                     \
-       {PRINT(f0, "        ");};                                             \
-    PRINT(f0, PD_print_formats1[tid], x[i]);                                 \
-    PRINT(f0, "\n");                                                         \
-    j += offset;                                                             \
-    for (i = 1L; i < nitems; i++, j += offset)                               \
-        {if (PD_print_controls[5] == 0)                                      \
-            {PRINT(f0, "%s%s%s(%s) = ",                                      \
-                   prefix, after, nodename,                                  \
-                   PD_index_to_expr(bf, j, dims, mjr, def_off));}            \
-         else if (PD_print_controls[5] == 1)                                 \
-           {PRINT(f0, "%s%s ", before, nodename);}                           \
-        else                                                                 \
-           {PRINT(f0, "        ");};                                         \
-         PRINT(f0, PD_print_formats1[tid], x[i]);                            \
-         PRINT(f0, "\n");}
-
-/*--------------------------------------------------------------------------*/
-
-#define DISP_MODE_3(f0, x, nitems, tid)                                      \
-    i = 0L;                                                                  \
-    j = 0L;                                                                  \
-    if (PD_print_controls[5] == 0)                                           \
-       {PRINT(f0, "%s%s%s\n", prefix, before, nodename);                     \
-        sprintf(s, "  (%s)                              ",                   \
-		PD_index_to_expr(bf, j, dims, mjr, def_off));                \
-	s[nn] = '\0';                                                        \
-        PRINT(f0, "%s", s);}                                                 \
-    else                                                                     \
-       {PRINT(f0, "        ");};                                             \
-    for (k = 0; i < nitems; i++, j += offset, k++)                           \
-        {if (k >= PD_print_controls[4])                                      \
-            {if (PD_print_controls[5] == 0)                                  \
-                {sprintf(s, "  (%s)                              ",          \
-                         PD_index_to_expr(bf, j, dims, mjr, def_off));       \
-		 s[nn] = '\0';                                               \
-                 PRINT(f0, "\n%s", s);}                                      \
-	     else                                                            \
-	        {PRINT(f0, "\n        ");};                                  \
-	     k = 0;};                                                        \
-         PRINT(f0, PD_print_formats2[tid], x[i]);};                          \
-    PRINT(f0, "\n")
-
-/*--------------------------------------------------------------------------*/
+typedef int (*PFPrnt)(FILE *fp, void *p, int i, int mode);
 
 int
  PD_tolerance = 1000;
@@ -147,18 +56,413 @@ static int
  _PD_print_data(FILE *f0,
 		char *prefix, char *before, char *after,
 		char *nodename, PDBfile *file, void *vr,
-		long nitems, char *type, dimdes *dims,
+		long ni, char *type, dimdes *dims,
 		int mjr, int def_off, int irecursion,
 		int n, long *ind),
- _PD_print_indirection(FILE *f0,
-		       char *prefix, char *before, char *after,
-		       char *nodename, PDBfile *file, char **vr,
-		       long nitems, char *type, dimdes *dims,
-		       int mjr, int def_off, int irecursion,
+ _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
+		       long ni, char *type, int irecursion,
 		       int n, long *ind);
 
 static int
  _PD_test_recursion(char *type, char *mtype);
+
+/*--------------------------------------------------------------------------*/
+
+/*                     PRIMITIVE TYPE PRINT ROUTINES                        */
+
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_char(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    char pv;
+
+    pv = ((char *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[0], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[0], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_bit(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    int pv;
+
+    pv = ((int *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[1], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[1], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_short(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    short pv;
+
+    pv = ((short *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[2], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[2], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_int(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    int pv;
+
+    pv = ((int *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[3], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[3], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_long(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    long pv;
+
+    pv = ((long *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[4], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[4], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_long_long(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    long long pv;
+
+    pv = ((long long *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[5], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[5], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_float(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    float pv;
+
+    pv = ((float *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[6], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[6], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_double(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    double pv;
+
+    pv = ((double *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[7], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[7], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_long_double(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    long double pv;
+
+    pv = ((long double *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[8], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[8], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_float_complex(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    float _Complex pv;
+
+    pv = ((float _Complex *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[9], crealf(pv), cimagf(pv));
+    else
+       rv = PRINT(fp, PD_print_formats2[9], crealf(pv), cimagf(pv));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_double_complex(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    double _Complex pv;
+
+    pv = ((double _Complex *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[10], creal(pv), cimag(pv));
+    else
+       rv = PRINT(fp, PD_print_formats2[10], creal(pv), cimag(pv));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_long_double_complex(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    long double _Complex pv;
+
+    pv = ((long double _Complex *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[11], creall(pv), cimagl(pv));
+    else
+       rv = PRINT(fp, PD_print_formats2[11], creall(pv), cimagl(pv));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static int _PD_print_bool(FILE *fp, void *p, int i, int mode)
+   {int rv;
+    bool pv;
+
+    pv = ((bool *) p)[i];
+
+    if (mode == 1)
+       rv = PRINT(fp, PD_print_formats1[12], pv);
+    else
+       rv = PRINT(fp, PD_print_formats2[12], pv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+static PFPrnt
+ printer[] = {_PD_print_char,
+	      _PD_print_bit,
+	      _PD_print_short,
+	      _PD_print_int,
+	      _PD_print_long,
+	      _PD_print_long_long,
+	      _PD_print_float,
+	      _PD_print_double,
+	      _PD_print_long_double,
+	      _PD_print_float_complex,
+	      _PD_print_double_complex,
+	      _PD_print_long_double_complex,
+	      _PD_print_bool};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DISP_MODE_I - print a single item from array X */
+
+static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
+			    long n, long *ind)
+   {long i, j;
+    char bf[MAXLINE];
+    FILE *fp;
+
+    fp = prnt->fp;
+
+    for (i = 0L; i < n; i++)
+        {j = ind[i];
+         if (PD_print_controls[5] == 0)
+	    {PRINT(fp, "%s%s%s(%s) = ",
+                   prnt->prefix, prnt->after, prnt->nodename,
+                   PD_index_to_expr(bf, j,
+				    prnt->dims, prnt->mjr, prnt->def_off));}
+         else
+	    {PRINT(fp, "\na> %s", prnt->prefix);};
+
+         printer[tid](fp, x, j, 1);
+
+         PRINT(fp, "\n");}
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DISP_MODE_1 - print a single item from scalar X according to formats1 */
+
+static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
+   {
+    FILE *fp;
+
+    fp = prnt->fp;
+
+
+    if (PD_print_controls[5] == 0)
+       {PRINT(fp, "%s%s%s = ", prnt->prefix, prnt->before, prnt->nodename);}
+    else if (PD_print_controls[5] == 1)
+       {PRINT(fp, "%s%s", prnt->before, prnt->nodename);}
+    else
+       {PRINT(fp, "        ");};
+
+    printer[tid](fp, x, 0, 1);
+    PRINT(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DISP_MODE_2 - print a NI items from array X according to formats1
+ *                 - where NI is less than the number of items per line
+ */
+
+static void _PD_disp_mode_2(PD_printdes *prnt, void *x, long ni, int tid)
+   {long i, j;
+    char bf[MAXLINE];
+    FILE *fp;
+
+    fp = prnt->fp;
+
+
+    i = 0L;
+    j = 0L;
+    if (PD_print_controls[5] == 0)
+       {PRINT(fp, "%s%s%s(%s) = ",
+              prnt->prefix, prnt->before, prnt->nodename,
+              PD_index_to_expr(bf, j,
+			       prnt->dims, prnt->mjr, prnt->def_off));}
+    else if (PD_print_controls[5] == 1)
+       {PRINT(fp, "%s%s ", prnt->before, prnt->nodename);}
+    else
+       {PRINT(fp, "        ");};
+
+    printer[tid](fp, x, i, 1);
+    PRINT(fp, "\n");
+
+    j += prnt->offset;
+    for (i = 1L; i < ni; i++, j += prnt->offset)
+        {if (PD_print_controls[5] == 0)
+            {PRINT(fp, "%s%s%s(%s) = ",
+                   prnt->prefix, prnt->after, prnt->nodename,
+                   PD_index_to_expr(bf, j,
+				    prnt->dims, prnt->mjr, prnt->def_off));}
+         else if (PD_print_controls[5] == 1)
+           {PRINT(fp, "%s%s ", prnt->before, prnt->nodename);}
+	 else
+           {PRINT(fp, "        ");};
+
+         printer[tid](fp, x, i, 1);
+         PRINT(fp, "\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DISP_MODE_3 - print a NI items from array X according to formats1
+ *                 - where NI is greater than or equal to
+ *                 - the number of items per line
+ */
+
+static void _PD_disp_mode_3(PD_printdes *prnt, void *x, long ni, int tid)
+   {int nn;
+    long i, j, k;
+    char bf[MAXLINE], s[MAXLINE];
+    FILE *fp;
+
+    fp = prnt->fp;
+    nn = prnt->nn;
+
+    i = 0L;
+    j = 0L;
+    if (PD_print_controls[5] == 0)
+       {PRINT(fp, "%s%s%s\n", prnt->prefix, prnt->before, prnt->nodename);
+        sprintf(s, "  (%s)                              ",
+		PD_index_to_expr(bf, j,
+				 prnt->dims, prnt->mjr, prnt->def_off));
+	s[nn] = '\0';
+        PRINT(fp, "%s", s);}
+    else
+       {PRINT(fp, "        ");};
+
+    for (k = 0; i < ni; i++, j += prnt->offset, k++)
+        {if (k >= PD_print_controls[4])
+            {if (PD_print_controls[5] == 0)
+                {sprintf(s, "  (%s)                              ",
+                         PD_index_to_expr(bf, j,
+					  prnt->dims, prnt->mjr, prnt->def_off));
+		 s[nn] = '\0';
+                 PRINT(fp, "\n%s", s);}
+	     else
+	        {PRINT(fp, "\n        ");};
+	     k = 0;};
+
+         printer[tid](fp, x, i, 2);};
+
+    PRINT(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DISP_DATA - print NI values from X of type indexed by TID */
+
+static void _PD_disp_data(PD_printdes *prnt, void *x,
+			  long ni, int tid, long n, long *ind)
+   {
+
+    if ((n > 0L) && (ind != NULL))
+       _PD_disp_mode_i(prnt, x, tid, n, ind);
+
+    else if (ni == 1L)
+       _PD_disp_mode_1(prnt, x, tid);
+
+    else if (ni < PD_print_controls[3])
+       _PD_disp_mode_2(prnt, x, ni, tid);
+
+    else
+       _PD_disp_mode_3(prnt, x, ni, tid);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -339,23 +643,32 @@ static int _PD_test_recursion(char *type, char *mtype)
 
 /* _PD_PRINT_CHAR_KIND - print an entry of CHAR_KIND */
 
-static void _PD_print_char_kind(FILE *f0, char *prefix,
-				char *before, char *after, char *nodename,
-				char *vr, long nitems,
-				char *type, dimdes *dims, int mjr,
-				int quo, int idx, int nn,
-				long offset, int def_off, int n, 
-				long *ind)
+static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
+				char *type, int quo, int idx,
+				int n, long *ind)
+   {int max1, max2;
+    int mjr, nn, def_off;
+    long i, offset;
+    char bf[MAXLINE];
+    char *cp, *prefix, *before, *after, *nodename;
+    dimdes *dims;
+    FILE *f0;
 
-   {int k, max1, max2;
-    long i, j;
-    char bf[MAXLINE], s[MAXLINE];
-    char *cp;
+    mjr      = prnt->mjr;
+    nn       = prnt->nn;
+    def_off  = prnt->def_off;
+    offset   = prnt->offset;
+    prefix   = prnt->prefix;
+    before   = prnt->before;
+    after    = prnt->after;
+    nodename = prnt->nodename;
+    dims     = prnt->dims;
+    f0       = prnt->fp;
 
     cp = (char *) vr;
 
     if (SC_strstr(PD_print_formats1[idx], "%s") != NULL)
-       {if ((nitems == 1L) && (offset == 0L))
+       {if ((ni == 1L) && (offset == 0L))
 	   {if (PD_print_controls[5] == 0)
 	       {PRINT(f0, "%s%s%s = %c\n",
 		      prefix, before, nodename, *cp);}
@@ -370,8 +683,8 @@ static void _PD_print_char_kind(FILE *f0, char *prefix,
 	           strlen(before) - strlen(nodename);
 	    max2 = max1 + strlen(before) - strlen(after);
 
-	    i = min(nitems, max1);
-	    nitems -= i;
+	    i = min(ni, max1);
+	    ni -= i;
 	    SC_strncpy(bf, MAXLINE, cp, i);
 
 	    cp += i;
@@ -387,9 +700,9 @@ static void _PD_print_char_kind(FILE *f0, char *prefix,
 		else
 		   {PRINT(f0, "        \"%s\"\n", bf);};
 
-		while (nitems > 0L)
-		   {i = min(nitems, max2);
-		    nitems -= i;
+		while (ni > 0L)
+		   {i = min(ni, max2);
+		    ni -= i;
 		    SC_strncpy(bf, MAXLINE, cp, i);
 
 		    cp += i;
@@ -407,9 +720,9 @@ static void _PD_print_char_kind(FILE *f0, char *prefix,
 		else
 		   {PRINT(f0, "        %s\n", bf);};
 
-		while (nitems > 0L)
-		   {i = min(nitems, max2);
-		    nitems -= i;
+		while (ni > 0L)
+		   {i = min(ni, max2);
+		    ni -= i;
 		    SC_strncpy(bf, MAXLINE, cp, i);
 
 		    cp += i;
@@ -417,7 +730,7 @@ static void _PD_print_char_kind(FILE *f0, char *prefix,
 			  nodename, bf);};};};}
 
     else
-       {DISP_DATA(f0, cp, nitems, idx, n, ind);};
+       _PD_disp_data(prnt, vr, ni, idx, n, ind);
 
     return;}
 
@@ -429,25 +742,21 @@ static void _PD_print_char_kind(FILE *f0, char *prefix,
  *              - indices
  */
 
-static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after, 
-                        char *nodename, PDBfile *file, char *vr, long nitems,
-                        char *type, dimdes *dims, int mjr, int def_off, int n, 
-                        long *ind)
+static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
+			long ni, char *type, int n, long *ind)
    {int k, m, idx, nn, isz, status, quo;
-    int *ip;
-    long offset, i, j, ni;
-    long *lp;
+    long offset, i, j;
     char bf[MAXLINE], s[MAXLINE];
     char *cp, **t;
-    short *sp;
-    BIGINT *llp;
-    float *fp;
-    double *dp;
-    long double *qp;
-    float _Complex *fc;
-    double _Complex *dc;
-    long double _Complex *qc;
     defstr *pd;
+    FILE *f0;
+    char *prefix, *before, *after, *nodename;
+
+    prefix   = prnt->prefix;
+    before   = prnt->before;
+    after    = prnt->after;
+    nodename = prnt->nodename;
+    f0       = prnt->fp;
 
     status = 0;
     offset = 1L;
@@ -455,9 +764,10 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
     nn = 0;
     j  = 0L;
     k  = 0;
-    for (i = 0L; i < nitems; i++, j += offset, k++)
+    for (i = 0L; i < ni; i++, j += offset, k++)
         {if (k > PD_print_controls[4])
-            {m  = strlen(PD_index_to_expr(bf, j, dims, mjr, def_off));
+            {m  = strlen(PD_index_to_expr(bf, j,
+					  prnt->dims, prnt->mjr, prnt->def_off));
              nn = max(nn, m);
              k  = 0;};};
     nn += 7;
@@ -467,39 +777,34 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
     pd  = PD_inquire_host_type(file, type);
     isz = pd->size;
 
+    prnt->nn     = nn;
+    prnt->offset = offset;
+
 /* check for floating point types */
     if (pd->fp.format != NULL)
        {if (strcmp(type, "float") == 0)
-	   {fp = (float *) vr;
-	    DISP_DATA(f0, fp, nitems, 6, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 6, n, ind);
 
        else if (strcmp(type, "double") == 0)
-	  {dp = (double *) vr;
-	   DISP_DATA(f0, dp, nitems, 7, n, ind);}
+	  _PD_disp_data(prnt, vr, ni, 7, n, ind);
 
        else if (strcmp(type, "long_double") == 0)
-	  {qp = (long double *) vr;
-	   DISP_DATA(f0, qp, nitems, 8, n, ind);}
+	  _PD_disp_data(prnt, vr, ni, 8, n, ind);
 
        else if (strcmp(type, "float_complex") == 0)
-	   {fc = (float _Complex *) vr;
-	    DISP_DATA(f0, fc, nitems, 9, n, ind);}
+	  _PD_disp_data(prnt, vr, ni, 9, n, ind);
 
        else if (strcmp(type, "double_complex") == 0)
-	  {dc = (double _Complex *) vr;
-	   DISP_DATA(f0, dc, nitems, 10, n, ind);}
+	  _PD_disp_data(prnt, vr, ni, 10, n, ind);
 
        else if (strcmp(type, "long_double_complex") == 0)
-	  {qc = (long double _Complex *) vr;
-	   DISP_DATA(f0, qc, nitems, 11, n, ind);}
+	  _PD_disp_data(prnt, vr, ni, 11, n, ind);
 
        else if (strcmp(type, "REAL") == 0)
 	  {if (sizeof(REAL) == sizeof(double))
-	      {dp = (double *) vr;
-	       DISP_DATA(f0, dp, nitems, 7, n, ind);}
+	      _PD_disp_data(prnt, vr, ni, 7, n, ind);
 	   else
-	      {fp = (float *) vr;
-	       DISP_DATA(f0, fp, nitems, 6, n, ind);};};}
+	      _PD_disp_data(prnt, vr, ni, 6, n, ind);};}
 
 /* only non-floating point types remain
  * user defined integral primitive types
@@ -507,20 +812,16 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
  */
     else if (pd->convert >= 0)
        {if (strcmp(type, "short") == 0)
-	   {sp = (short *) vr;
-	    DISP_DATA(f0, sp, nitems, 2, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 2, n, ind);
 
 	else if ((strcmp(type, "int") == 0) || (strcmp(type, "integer") == 0))
-	   {ip = (int *) vr;
-	    DISP_DATA(f0, ip, nitems, 3, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 3, n, ind);
 
 	else if (strcmp(type, "long") == 0)
-	   {lp = (long *) vr;
-	    DISP_DATA(f0, lp, nitems, 4, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 4, n, ind);
 
 	else if (strcmp(type, "long_long") == 0)
-	   {llp = (BIGINT *) vr;
-	    DISP_DATA(f0, llp, nitems, 5, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 5, n, ind);
 
 /* GOTCHA: This is a feeble first step toward a generalized
  *         print capability for user defined types
@@ -528,19 +829,18 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 	else if (strcmp(type, "char_8") == 0)
 	   {if (SC_strstr(PD_print_formats1[3], "%s") != NULL)
 	       {cp = (char *) vr;
-		t  = FMAKE_N(char *, nitems, "_PD_IO_PRINT:t");
-		for (i = 0; i < nitems; i++, cp += isz)
+		t  = FMAKE_N(char *, ni, "_PD_IO_PRINT:t");
+		for (i = 0; i < ni; i++, cp += isz)
 		    {t[i] = FMAKE_N(char, isz + 1,
                                           "_PD_IO_PRINT:t[]");
 		     memcpy(t[i], cp, isz);
 		     t[i][isz] = '\0';};
-		DISP_DATA(f0, t, nitems, 0, n, ind);
-		for (i = 0; i < nitems; i++)
+		_PD_disp_data(prnt, t, ni, 0, n, ind);
+		for (i = 0; i < ni; i++)
 		    SFREE(t[i]);
 		SFREE(t);}
 	    else
-	       {cp = (char *) vr;
-		DISP_DATA(f0, cp, isz*nitems, 0, n, ind);};}
+	       _PD_disp_data(prnt, vr, isz*ni, 0, n, ind);}
 
 	else if (strcmp(type, "function") == 0)
 	   {if (PD_print_controls[5] == 0)
@@ -553,7 +853,7 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
 	   {if (strcmp(type, "char") == 0)
 	       {idx = 0;
-		ni  = nitems;
+		ni  = ni;
 	        quo = TRUE;}
 	    else if (pd->kind == CHAR_KIND)
 	       {idx = 0;
@@ -561,24 +861,19 @@ static int _PD_io_print(FILE *f0, char *prefix, char *before, char *after,
 	        quo = FALSE;}
 	    else
 	       {idx = 1;
-		ni  = nitems;
+		ni  = ni;
 	        quo = FALSE;};
 
-	    _PD_print_char_kind(f0, prefix, before, after, nodename,
-				vr, ni, type, dims, mjr,
-				quo, idx, nn, offset, def_off, n, ind);}
+	    _PD_print_char_kind(prnt, vr, ni, type, quo, idx, n, ind);}
 
         else if (isz == sizeof(short))
-	   {sp = (short *) vr;
-	    DISP_DATA(f0, sp, nitems, 1, n, ind);}
+	  _PD_disp_data(prnt, vr, ni, 1, n, ind);
 
 	else if (isz == sizeof(int))
-	   {ip = (int *) vr;
-	    DISP_DATA(f0, ip, nitems, 1, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 1, n, ind);
 
 	else if (isz == sizeof(long))
-	   {lp = (long *) vr;
-	    DISP_DATA(f0, lp, nitems, 1, n, ind);}
+	   _PD_disp_data(prnt, vr, ni, 1, n, ind);
 
 	else
 	   {PRINT(f0, "%s%s%s = ", prefix, before, nodename);
@@ -653,24 +948,32 @@ int PD_print_entry(PDBfile *file, char *name, void *vr, syment *ep)
 /* _PD_PRINT_DATA - print out variables in a nicely formatted way  */
 
 static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after, 
-                          char *nodename, PDBfile *file, void *vr, long nitems,
+                          char *nodename, PDBfile *file, void *vr, long ni,
                           char *type, dimdes *dims, int mjr, int def_off, 
                           int irecursion, int n, long *ind)
    {int status;
+    PD_printdes prnt;
+
+    prnt.mjr      = mjr;
+    prnt.def_off  = def_off;
+    prnt.prefix   = prefix;
+    prnt.before   = before;
+    prnt.after    = after;
+    prnt.nodename = nodename;
+    prnt.dims     = dims;
+    prnt.fp       = f0;
+    prnt.nn       = 0;
+    prnt.offset   = 0;
 
     status = 0;
 
 /* if the type is an indirection, follow the pointer */
     if (_PD_indirection(type))
-       status = _PD_print_indirection(f0, prefix, before, after, nodename,
-				      file, (char **) vr, nitems, type, 
-				      dims, mjr, def_off, irecursion,
-				      n, ind);
+       status = _PD_print_indirection(&prnt, file, (char **) vr, ni, type, 
+				      irecursion, n, ind);
     else
-       status = _PD_print_leaf(f0, prefix, before, after, nodename,
-			       file,  vr, nitems, type,
-			       dims, mjr, def_off, irecursion,
-			       n, ind);
+       status = _PD_print_leaf(&prnt, file, vr, ni, type,
+			       irecursion, n, ind);
 
     return(status);}
 
@@ -679,21 +982,31 @@ static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after,
 
 /* _PD_PRINT_INDIRECTION - handle the indirects for the print process */
 
-static int _PD_print_indirection(FILE *f0, char *prefix,
-				 char *before, char *after, char *nodename,
-				 PDBfile *file, char **vr, long nitems, 
-                                 char *type, dimdes *dims,
-				 int mjr, int def_off,
+static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
+				 long ni, char *type,
                                  int irecursion, int n, long *ind)
-   {long i, ditems;
-    int min_index, status;
-    char *dtype, *s;
+   {int min_index, status;
+    int mjr, def_off;
+    long i, ditems;
     char field[80], bf[MAXLINE];
+    char *dtype, *s;
+    char *prefix, *before, *after, *nodename;
+    dimdes *dims;
+    FILE *f0;
+
+    prefix   = prnt->prefix;
+    before   = prnt->before;
+    after    = prnt->after;
+    nodename = prnt->nodename;
+    mjr      = prnt->mjr;
+    def_off  = prnt->def_off;
+    dims     = prnt->dims;
+    f0       = prnt->fp;
 
     status = 0;
 
     dtype = PD_dereference(SC_strsavef(type,
-                           "char*:_PD_PRINT_INDIRECTION:dtype"));
+				       "char*:_PD_PRINT_INDIRECTION:dtype"));
 
     strcpy(field, nodename);
     s = field + strlen(field);
@@ -703,8 +1016,8 @@ static int _PD_print_indirection(FILE *f0, char *prefix,
     else
        min_index = def_off;
 
-    for (i = 0L; i < nitems; i++, vr++)
-        {if (nitems > 1)
+    for (i = 0L; i < ni; i++, vr++)
+        {if (ni > 1)
             sprintf(s, "(%ld)", i + min_index);
 
          ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
@@ -718,27 +1031,21 @@ static int _PD_print_indirection(FILE *f0, char *prefix,
 
 /* if the type is an indirection, follow the pointer */
          if (ditems > 0)
-            {if (_PD_indirection(dtype))
-                status &= _PD_print_indirection(f0, prefix,
-						before, after, field, file,
+	    {prnt->nodename = field;
+	     prnt->before   = before;
+	     if (_PD_indirection(dtype))
+	        status &= _PD_print_indirection(prnt, file,
 						(char **) DEREF(vr),
 						ditems, dtype, 
-						dims, mjr, def_off,
 						irecursion, n, ind);
              else
-                status &= _PD_print_leaf(f0, prefix,
-					 before, after, field, file,
-					 DEREF(vr),
-					 ditems, dtype,
-					 dims, mjr, def_off,
-					 irecursion, n, ind);}
+                status &= _PD_print_leaf(prnt, file, DEREF(vr),
+					 ditems, dtype, irecursion, n, ind);}
          else
 	    {if (PD_print_controls[5] == 0)
-	        {PRINT(f0, "%s%s%s = (nil)\n",
-		       prefix, before, field);}
+	        {PRINT(f0, "%s%s%s = (nil)\n", prefix, before, field);}
 	     else if (PD_print_controls[5] == 1)
-	        {PRINT(f0, "%s%s = (nil)\n",
-		       before, field);}
+	        {PRINT(f0, "%s%s = (nil)\n", before, field);}
 	     else
 	        {PRINT(f0, "        (nil)\n");};};
 
@@ -814,21 +1121,32 @@ static int _PD_print_member(FILE *f0, char *prefix,
  *                - otherwise, lookup the type, and display each member.
  */
 
-int _PD_print_leaf(FILE *f0, char *prefix, char *before, char *after,  
-		   char *nodename, PDBfile *file, char *vr, long nitems,
-		   char *type, dimdes *dims, int mjr, int def_off, 
-		   int irecursion, int n, long *ind)
-   {long ii;
-    char *s, *s2, *svr;
-    defstr *defp;
-    memdes *desc, *mem_lst, *next;
-    char field[80], mfield[80];
+int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
+		   char *type, int irecursion, int n, long *ind)
+   {int mjr, def_off;
     int size, min_index, nchars, status;
+    long ii;
+    char field[80], mfield[80];
+    char *prefix, *before, *after, *nodename;
+    char *s, *s2, *svr;
     char *mbefore, *mafter;
+    defstr *defp;
+    dimdes *dims;
+    memdes *desc, *mem_lst, *next;
+    FILE *f0;
     static char before_2[5] = "|__ ";
     static char after_2[5]  = "|   ";
     static char spaces[5]   = "    ";
-   
+
+    prefix   = prnt->prefix;
+    before   = prnt->before;
+    after    = prnt->after;
+    nodename = prnt->nodename;
+    mjr      = prnt->mjr;
+    def_off  = prnt->def_off;
+    dims     = prnt->dims;
+    f0       = prnt->fp;
+
     status  = 0;
     mem_lst = NULL;
  
@@ -842,10 +1160,7 @@ int _PD_print_leaf(FILE *f0, char *prefix, char *before, char *after,
        mem_lst = defp->members;
 
     if (mem_lst == NULL)
-       status &= _PD_io_print(f0, prefix,
-			      before, after, nodename, file, vr, nitems,
-			      type, dims, mjr, file->default_offset,
-			      n, ind);
+       status &= _PD_io_print(prnt, file, vr, ni, type, n, ind);
     else
        {s2     = SC_strsavef(prefix, "char*:_PD_PRINT_LEAF:s2");
         nchars = strlen(prefix) + strlen(before) + 1;
@@ -862,8 +1177,8 @@ int _PD_print_leaf(FILE *f0, char *prefix, char *before, char *after,
 
         size = defp->size;
 
-        for (svr = vr, ii = 0L; ii < nitems; ii++)
-            {if ((nitems > 1) || (dims != NULL))
+        for (svr = vr, ii = 0L; ii < ni; ii++)
+            {if ((ni > 1) || (dims != NULL))
                 {if (dims != NULL)
                     min_index = dims->index_min;
                  else
@@ -973,6 +1288,7 @@ void _PD_set_user_formats(void)
  *                         -   9 = float complex
  *                         -  10 = double complex
  *                         -  11 = long double complex
+ *                         -  12 = bool
  */
 
 void _PD_set_format_defaults(void)

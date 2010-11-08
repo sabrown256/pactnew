@@ -1,0 +1,56 @@
+#!/bin/csh -f
+#
+# C99 - C99 primitive data types PDB test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           PDB TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SX PDB C99 Test .............. "
+   Note $Log ""
+
+   flog $Log cp $TDir/sxpdbg.scm .
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log ($SX -l $RootDir/sx/tests/sxc99.scm > sxc99.res)
+      set xstatus = $status
+      if ($xstatus == 0) then
+         flog $Log (diff sxc99.res $RootDir/sx/tests/ref/sxc99 > sxc99.res.diff)
+         set xstatus = $status
+      endif
+   else
+      ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxc99.scm |& \
+      grep "ERROR SUMMARY:"                                                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "PASSED ($ETime)"
+      flog $Log rm -f sxc99.res sxc99.res.diff
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)

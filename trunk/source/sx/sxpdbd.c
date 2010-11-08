@@ -620,25 +620,34 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
 			    char *pva, char *pvb, char *indx, 
 			    long length, char *type, dimdes *dims)
    {int mjr, def_off;
+    PD_printdes prnt;
 
     mjr     = pf->major_order;
     def_off = pf->default_offset;
+
+    memset(&prnt, 0, sizeof(PD_printdes));
+    prnt.prefix   = "";
+    prnt.before   = "";
+    prnt.after    = "";
+    prnt.mjr      = mjr;
+    prnt.def_off  = def_off;
+    prnt.dims     = dims;
+    prnt.fp       = stdout;
+
     if (!SX_disp_individ_diff)
        {PRINT(stdout, "\nValues from the first file:\n");
 
         if (pva != NULL)
-           _PD_print_leaf(stdout, 
-                          "", "", "", nma, pf, pva, length, 
-                          type, dims, mjr, def_off, FALSE, 
-			  0, NULL);
+	   {prnt.nodename = nma;
+	     _PD_print_leaf(&prnt, pf, pva, length, 
+			    type, FALSE, 0, NULL);};
 
         PRINT(stdout, "\nValues from the second file:\n");
 
         if (pvb != NULL)
-           _PD_print_leaf(stdout, 
-                          "", "", "", nmb, pf, pvb, length, 
-                          type, dims, mjr, def_off, FALSE, 
-			  0, NULL);}
+	   {prnt.nodename = nmb;
+	    _PD_print_leaf(&prnt, pf, pvb, length, 
+                          type, FALSE, 0, NULL);};}
 
     else if ((pva != NULL) && (pvb != NULL) && (indx != NULL))
        _SX_print_individ_diff(pf, nma, nmb, pva, pvb, indx, length, type, 

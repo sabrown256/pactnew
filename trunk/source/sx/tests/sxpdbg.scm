@@ -216,7 +216,7 @@
 
 ; PDB-DATA-WRITE - write to a file
 
-(define (pdb-data-write vars set out)
+(define (pdb-data-write vars set out struct)
 
     (define (do-next i n)
         (if (< i n)
@@ -226,10 +226,11 @@
 		  (do-next (+ i 1) n))))
 
 ;  copy over defstrs
-    (write-defstr* out (read-defstr* nil "cat"))
-    (write-defstr* out (read-defstr* nil "dog"))
-    (write-defstr* out (read-defstr* nil "bird"))
-    (write-defstr* out (read-defstr* nil "rabbit"))
+    (if struct
+	(begin (write-defstr* out (read-defstr* nil "cat"))
+	       (write-defstr* out (read-defstr* nil "dog"))
+	       (write-defstr* out (read-defstr* nil "bird"))
+	       (write-defstr* out (read-defstr* nil "rabbit"))))
 
     (do-next 0 (length vars)))
 
