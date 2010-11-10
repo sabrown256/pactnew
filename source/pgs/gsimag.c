@@ -80,7 +80,7 @@ static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
        {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
 		       long, LONG_MIN, LONG_MAX);}
 
-    else if (strcmp(type, SC_INTEGER_P_S) == 0)
+    else if (strcmp(type, SC_INT_P_S) == 0)
        {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
 		       int, INT_MIN, INT_MAX);}
 
@@ -182,9 +182,9 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 	    name = h->name;
 	 else
 	    alst = PG_set_attrs_alist(alst,
-				      "DRAW-AXIS",    SC_INTEGER_I, FALSE, FALSE,
-				      "DRAW-LABEL",   SC_INTEGER_I, FALSE, FALSE,
-				      "DRAW-PALETTE", SC_INTEGER_I, FALSE, FALSE,
+				      "DRAW-AXIS",    SC_INT_I, FALSE, FALSE,
+				      "DRAW-LABEL",   SC_INT_I, FALSE, FALSE,
+				      "DRAW-PALETTE", SC_INT_I, FALSE, FALSE,
 				      NULL);
 
 	 wc[4] = fmin;

@@ -147,7 +147,7 @@ static object *_SXI_set_attr_val(object *argl)
 
          data = (void *) cv;}
 
-    else if ((strcmp(attr_type, SC_INTEGER_S) == 0) && (SS_numbp(obj)))
+    else if ((strcmp(attr_type, "integer") == 0) && (SS_numbp(obj)))
         {int *iv;
 
          iv = FMAKE(int, "_SXI_SET_ATTR_VAL:iv");

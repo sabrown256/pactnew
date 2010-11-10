@@ -195,7 +195,7 @@ static object *_SSI_make_hasharr(object *arg)
 
     sz  = 0;
     typ = SC_arrtype(arg, -1);
-    if (typ == SC_INTEGER_I)
+    if (typ == SC_INT_I)
        sz = (int) SS_INTEGER_VALUE(arg);
     else if (typ == SC_FLOAT_I)
        sz = (int) SS_FLOAT_VALUE(arg);

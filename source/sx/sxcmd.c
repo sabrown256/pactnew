@@ -201,7 +201,7 @@ static object *SXI_mapping_ref(object *argl)
     SS_args(argl,
             SC_STRING_I, &fname,
             SC_STRING_I, &dtype,
-            SC_INTEGER_I, &indx,
+            SC_INT_I, &indx,
             0);
 
     o = _SX_mapping_ref(fname, dtype, indx);
@@ -358,8 +358,8 @@ static object *_SXI_thru(object *argl)
 	first = 0;
 	last  = 0;
         SS_args(argl,
-                SC_INTEGER_I, &first,
-                SC_INTEGER_I, &last,
+                SC_INT_I, &first,
+                SC_INT_I, &last,
                 0);
 
         if (first < 1)

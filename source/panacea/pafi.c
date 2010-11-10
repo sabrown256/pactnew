@@ -78,7 +78,7 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 	 if (PA_VARIABLE_N_DIMS(pp) == 0)
 	    {if (strcmp(pt, SC_DOUBLE_S) == 0)
 	        n_doubles++;
-	     else if (strcmp(pt, SC_INTEGER_S) == 0)
+	     else if (strcmp(pt, SC_INT_S) == 0)
 	        n_integers++;
 	     else if (strcmp(pt, SC_STRING_S) == 0)
 	        n_strings++;};};
@@ -130,7 +130,7 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
             continue;
 
          type = PA_VARIABLE_TYPE_S(pp);
-         if (strcmp(type, SC_INTEGER_S) == 0)
+         if (strcmp(type, SC_INT_S) == 0)
             {PA_VARIABLE_DATA(pp) = (void *) &SWTCH[isw++];
              continue;};
 
@@ -222,7 +222,7 @@ static void _PA_get_alist_dims(PA_package *pck, PA_variable *pp, hasharr *tab)
  *               - the possible requests are:
  *                     PA_INFO_TYPE
  *                         - ASCII string naming the type of the variable
- *                         - valid values are: SC_INTEGER_S, SC_DOUBLE_S
+ *                         - valid values are: SC_INT_S, SC_DOUBLE_S
  *                         - SC_STRING_S, SC_LONG_S, SC_SHORT_S, SC_FLOAT_S,
  *                         - SC_CHAR_S, and any derived type
  *                     PA_INFO_N_DIMS

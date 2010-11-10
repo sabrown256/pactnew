@@ -28,7 +28,7 @@ object *_SX_make_list_syment(PDBfile *file, void *vr, long nitems,
     if (_PD_indirection(type))
        obj = _SX_make_list_indirection(file, (char **) vr, nitems, type);
     else
-       {if ((strcmp(type, "char") == 0) && (nitems == 1))
+       {if ((strcmp(type, SC_CHAR_S) == 0) && (nitems == 1))
 	   {char *s;
 
 	    s = SC_strsavef("a", "char*:_SX_MAKE_LIST_SYMENT:s");
@@ -142,159 +142,175 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
 
 /* print out the type */
 
-    if (strcmp(type, "char") == 0)
+    if (strcmp(type, SC_CHAR_S) == 0)
        {if (vr == NULL)
            obj = SS_null;
         else
            obj = SS_mk_string(vr);}
 
-    else if (strcmp(type, "short") == 0)
-       {short *sp;
+/* fixed point types */
+    else if (strcmp(type, SC_SHORT_S) == 0)
+       {short *pv;
+        pv = (short *) vr;
 
-        sp = (short *) vr;
         if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer((BIGINT) *sp);
+           obj = SS_mk_integer(*pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) sp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
     else if (strcmp(type, "u_short") == 0)
-       {unsigned short *sp;
+       {unsigned short *pv;
+        pv = (unsigned short *) vr;
 
-        sp = (unsigned short *) vr;
         if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer((BIGINT) *sp);
+           obj = SS_mk_integer((long long) *pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) sp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if ((strcmp(type, "integer") == 0) ||
-	     (strcmp(type, "int") == 0))
-       {int *ip;
+    else if ((strcmp(type, SC_INT_S) == 0) ||
+	     (strcmp(type, SC_INTEGER_S) == 0))
+       {int *pv;
+        pv = (int *) vr;
 
-        ip = (int *) vr;
         if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer((BIGINT) *ip);
+           obj = SS_mk_integer(*pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) ip[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
     else if ((strcmp(type, "u_integer") == 0) ||
 	     (strcmp(type, "u_int") == 0))
-       {unsigned int *ip;
+       {unsigned int *pv;
+        pv = (unsigned int *) vr;
 
-        ip = (unsigned int *) vr;
         if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer((BIGINT) *ip);
+           obj = SS_mk_integer((long long) *pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) ip[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, "long") == 0)
-       {long *lp;
+    else if (strcmp(type, SC_LONG_S) == 0)
+       {long *pv;
+        pv = (long *) vr;
 
-        lp = (long *) vr;
         if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer((BIGINT) *lp);
+            obj = SS_mk_integer(*pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) lp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
     else if (strcmp(type, "u_long") == 0)
-       {unsigned long *lp;
+       {unsigned long *pv;
+        pv = (unsigned long *) vr;
 
-        lp = (unsigned long *) vr;
         if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer((BIGINT) *lp);
+            obj = SS_mk_integer((long long) *pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) lp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, "long_long") == 0)
-       {BIGINT *bp;
+    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+       {long long *pv;
+        pv = (long long *) vr;
 
-        bp = (BIGINT *) vr;
         if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer(*bp);
+            obj = SS_mk_integer(*pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer(bp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
     else if (strcmp(type, "u_long_long") == 0)
-       {BIGUINT *bp;
+       {unsigned long long *pv;
+        pv = (unsigned long long *) vr;
 
-        bp = (BIGUINT *) vr;
         if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer((BIGINT) *bp);
+            obj = SS_mk_integer((long long) *pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) bp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, "float") == 0)
-       {float *fp;
+/* floating point types */
+    else if (strcmp(type, SC_FLOAT_S) == 0)
+       {float *pv;
+        pv = (float *) vr;
 
-        fp = (float *) vr;
         if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_float(*fp);
+           obj = SS_mk_float(*pv);
 
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_float((double) fp[i]), obj);
+                obj = SS_mk_cons(SS_mk_float(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, "double") == 0)
-       {double *dp;
+    else if (strcmp(type, SC_DOUBLE_S) == 0)
+       {double *pv;
+        pv = (double *) vr;
 
-        dp = (double *) vr;
         if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_float(*dp);
+           obj = SS_mk_float(*pv);
         else
            {obj = SS_null;
             for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_float(dp[i]), obj);
+                obj = SS_mk_cons(SS_mk_float(pv[i]), obj);
+
+            if (obj != SS_null)
+               obj = SS_lstvct(SS_reverse(obj));};}
+
+    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+       {long double *pv;
+        pv = (long double *) vr;
+
+        if ((nitems == 1) && (offset == 0))
+           obj = SS_mk_float(*pv);
+        else
+           {obj = SS_null;
+            for (i = 0; i < nitems; i++)
+                obj = SS_mk_cons(SS_mk_float(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
@@ -305,19 +321,19 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
  * type size make a vector of that type
  */
     else
-       {long bytespitem, nb;
-        char *cp;
+       {long bpi, nb;
+        char *pv;
+        pv = (char *) vr;
 
-        bytespitem = _PD_lookup_size(type, file->chart);
-        nb         = bytespitem*nitems;
+        bpi = _PD_lookup_size(type, file->chart);
+        nb  = bpi*nitems;
 
-        cp = (char *) vr;
         if ((nb == 1) && (offset == 0))
-           obj = SS_mk_integer((BIGINT) *cp);
+           obj = SS_mk_integer(*pv);
         else
            {obj = SS_null;
             for (i = 0; i < nb; i++)
-                obj = SS_mk_cons(SS_mk_integer((BIGINT) cp[i]), obj);
+                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
 
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};};

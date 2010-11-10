@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 10/29/2009
+MOD: 11/10/2010
 
 <CENTER>
 <P>
@@ -5687,7 +5687,7 @@ the swtch array for the package for efficiency in handling the state file.<p>
 
        /* RESTART VARIABLES */
 
-           PA_def_var("foo_var_1", SC_INTEGER_S, NULL, NULL,
+           PA_def_var("foo_var_1", SC_INT_S, NULL, NULL,
                       SCOPE, RESTART, CLASS, OPTL, ATTRIBUTE,
                       P_dim_1, DIMENSION, UNITS);
 
@@ -5699,7 +5699,7 @@ the swtch array for the package for efficiency in handling the state file.<p>
 
        /* EDIT VARIABLES */
 
-           PA_def_var("foo_var_3", SC_INTEGER_S, NULL, NULL,
+           PA_def_var("foo_var_3", SC_INT_S, NULL, NULL,
                       SCOPE, EDIT, CLASS, PSEUDO, ATTRIBUTE,
                       P_dim_4, DIMENSION, UNITS);
 

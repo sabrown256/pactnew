@@ -300,7 +300,7 @@ void cf_type(char *a, int nc, char *t)
     else if ((strncmp(t, "int", 3) == 0) ||
 	     (strncmp(t, "long", 4) == 0) || 
 	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "BIGINT", 6) == 0))
+	     (strncmp(t, "long long", 9) == 0))
        nstrncpy(a, nc, "integer", -1);
     else if (strncmp(t, "double", 6) == 0)
        nstrncpy(a, nc, "real*8", -1);
@@ -332,7 +332,7 @@ void fc_type(char *a, int nc, char *t)
     else if ((strncmp(t, "int", 3) == 0) ||
 	     (strncmp(t, "long", 4) == 0) || 
 	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "BIGINT", 6) == 0) ||
+	     (strncmp(t, "long long", 9) == 0) ||
 	     (strncmp(t, "FIXNUM", 6) == 0))
        nstrncpy(a, nc, "FIXNUM", -1);
     else if (strncmp(t, "double", 6) == 0)
@@ -611,7 +611,7 @@ void sc_type(char *a, int nc, char *t)
     else if ((strncmp(t, "int", 3) == 0) ||
 	     (strncmp(t, "long", 4) == 0) || 
 	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "BIGINT", 6) == 0) ||
+	     (strncmp(t, "long long", 9) == 0) ||
 	     (strncmp(t, "FIXNUM", 6) == 0))
        nstrncpy(a, nc, "FIXNUM", -1);
     else if (strncmp(t, "double", 6) == 0)
@@ -640,9 +640,9 @@ void cs_type(char *a, int nc, char *t)
 
 /* integer type */
     else if (strcmp(t, "int") == 0)
-       nstrncpy(a, nc, "SC_INTEGER_I", -1);
+       nstrncpy(a, nc, "SC_INT_I", -1);
     else if (strcmp(t, "int *") == 0)
-       nstrncpy(a, nc, "SC_INTEGER_P_I", -1);
+       nstrncpy(a, nc, "SC_INT_P_I", -1);
     else if (strcmp(t, "long") == 0)
        nstrncpy(a, nc, "SC_LONG_I", -1);
     else if (strcmp(t, "long *") == 0)
@@ -652,10 +652,10 @@ void cs_type(char *a, int nc, char *t)
     else if (strcmp(t, "short *") == 0)
        nstrncpy(a, nc, "SC_SHORT_P_I", -1);
 
-    else if (strcmp(t, "BIGINT") == 0)
-       nstrncpy(a, nc, "SC_BIGINT_I", -1);
-    else if (strcmp(t, "BIGINT *") == 0)
-       nstrncpy(a, nc, "SC_BIGINT_P_I", -1);
+    else if (strcmp(t, "long long") == 0)
+       nstrncpy(a, nc, "SC_LONG_LONG_I", -1);
+    else if (strcmp(t, "long long *") == 0)
+       nstrncpy(a, nc, "SC_LONG_LONG_P_I", -1);
 
 /* floating point types */
     else if (strcmp(t, "double") == 0)

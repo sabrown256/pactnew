@@ -471,7 +471,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
                 formt[i] = SC_stol(SC_strtok(NULL, delim, s));
 
 /* NOTE: long double does not come in _PD_rd_fmt_ii the way the others do */
-	    if (strcmp(type, "long_double") == 0)
+	    if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
 	       {std  = file->std;
 		tord = std->fp[2].order;
 		tfmt = std->fp[2].format;

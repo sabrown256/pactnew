@@ -237,7 +237,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
        {snprintf(bf, MAXLINE, "%s-swtchs", s);
         pn_s  = FMAKE(int, "PA_MK_CONTROL:pn_s");
         *pn_s = n_s;
-        PA_inst_var(bf, SC_INTEGER_S, NULL, NULL,
+        PA_inst_var(bf, SC_INT_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
                     pn_s, DIMENSION, UNITS);
         pck->iswtch = (int *) PA_intern(NULL, bf);

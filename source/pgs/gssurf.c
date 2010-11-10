@@ -792,9 +792,9 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
 		       "THETA",      SC_DOUBLE_I,  &va[0], 0.0,
 		       "PHI",        SC_DOUBLE_I,  &va[1], 0.0,
 		       "CHI",        SC_DOUBLE_I,  &va[2], 0.0,
-		       "DRAW-MESH",  SC_INTEGER_I, &mesh,  _PG_gattrs.ref_mesh,
-		       "LINE-COLOR", SC_INTEGER_I, &color, dev->BLUE,
-		       "LINE-STYLE", SC_INTEGER_I, &style, LINE_SOLID,
+		       "DRAW-MESH",  SC_INT_I, &mesh,  _PG_gattrs.ref_mesh,
+		       "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
+		       "LINE-STYLE", SC_INT_I, &style, LINE_SOLID,
 		       "LINE-WIDTH", SC_DOUBLE_I,  &width, 0.0,
 		       NULL);
 
@@ -1395,8 +1395,8 @@ void PG_draw_surface_n(PG_device *dev, double *a1, double *a2, double *extr,
 
 /* add the attributes */
     PG_set_attrs_graph(g,
-		       "LINE-COLOR", SC_INTEGER_I, FALSE, color,
-		       "LINE-STYLE", SC_INTEGER_I, FALSE, style,
+		       "LINE-COLOR", SC_INT_I, FALSE, color,
+		       "LINE-STYLE", SC_INT_I, FALSE, style,
 		       "LINE-WIDTH", SC_DOUBLE_I,  FALSE, width,
 		       "THETA",      SC_DOUBLE_I,  FALSE, va[0],
 		       "PHI",        SC_DOUBLE_I,  FALSE, va[1],

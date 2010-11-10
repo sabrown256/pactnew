@@ -1,5 +1,5 @@
 /*
- * PDPDBW.C - PDB write functionality in PD
+ * PDPRNT.C - PDB write functionality in PD
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -75,13 +75,16 @@ static int
 static int _PD_print_char(FILE *fp, void *p, int i, int mode)
    {int rv;
     char pv;
+    char *fmt;
 
     pv = ((char *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[0], pv);
+       fmt = PD_print_formats1[SC_CHAR_I];
     else
-       rv = PRINT(fp, PD_print_formats2[0], pv);
+       fmt = PD_print_formats2[SC_CHAR_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -91,13 +94,16 @@ static int _PD_print_char(FILE *fp, void *p, int i, int mode)
 static int _PD_print_bit(FILE *fp, void *p, int i, int mode)
    {int rv;
     int pv;
+    char *fmt;
 
     pv = ((int *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[1], pv);
+       fmt = PD_print_formats1[SC_BIT_I];
     else
-       rv = PRINT(fp, PD_print_formats2[1], pv);
+       fmt = PD_print_formats2[SC_BIT_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -107,13 +113,16 @@ static int _PD_print_bit(FILE *fp, void *p, int i, int mode)
 static int _PD_print_short(FILE *fp, void *p, int i, int mode)
    {int rv;
     short pv;
+    char *fmt;
 
     pv = ((short *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[2], pv);
+       fmt = PD_print_formats1[SC_SHORT_I];
     else
-       rv = PRINT(fp, PD_print_formats2[2], pv);
+       fmt = PD_print_formats2[SC_SHORT_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -123,13 +132,16 @@ static int _PD_print_short(FILE *fp, void *p, int i, int mode)
 static int _PD_print_int(FILE *fp, void *p, int i, int mode)
    {int rv;
     int pv;
+    char *fmt;
 
     pv = ((int *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[3], pv);
+       fmt = PD_print_formats1[SC_INT_I];
     else
-       rv = PRINT(fp, PD_print_formats2[3], pv);
+       fmt = PD_print_formats2[SC_INT_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -139,13 +151,16 @@ static int _PD_print_int(FILE *fp, void *p, int i, int mode)
 static int _PD_print_long(FILE *fp, void *p, int i, int mode)
    {int rv;
     long pv;
+    char *fmt;
 
     pv = ((long *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[4], pv);
+       fmt = PD_print_formats1[SC_LONG_I];
     else
-       rv = PRINT(fp, PD_print_formats2[4], pv);
+       fmt = PD_print_formats2[SC_LONG_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -155,13 +170,16 @@ static int _PD_print_long(FILE *fp, void *p, int i, int mode)
 static int _PD_print_long_long(FILE *fp, void *p, int i, int mode)
    {int rv;
     long long pv;
+    char *fmt;
 
     pv = ((long long *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[5], pv);
+       fmt = PD_print_formats1[SC_LONG_LONG_I];
     else
-       rv = PRINT(fp, PD_print_formats2[5], pv);
+       fmt = PD_print_formats2[SC_LONG_LONG_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -171,13 +189,16 @@ static int _PD_print_long_long(FILE *fp, void *p, int i, int mode)
 static int _PD_print_float(FILE *fp, void *p, int i, int mode)
    {int rv;
     float pv;
+    char *fmt;
 
     pv = ((float *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[6], pv);
+       fmt = PD_print_formats1[SC_FLOAT_I];
     else
-       rv = PRINT(fp, PD_print_formats2[6], pv);
+       fmt = PD_print_formats2[SC_FLOAT_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -187,13 +208,16 @@ static int _PD_print_float(FILE *fp, void *p, int i, int mode)
 static int _PD_print_double(FILE *fp, void *p, int i, int mode)
    {int rv;
     double pv;
+    char *fmt;
 
     pv = ((double *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[7], pv);
+       fmt = PD_print_formats1[SC_DOUBLE_I];
     else
-       rv = PRINT(fp, PD_print_formats2[7], pv);
+       fmt = PD_print_formats2[SC_DOUBLE_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -203,13 +227,16 @@ static int _PD_print_double(FILE *fp, void *p, int i, int mode)
 static int _PD_print_long_double(FILE *fp, void *p, int i, int mode)
    {int rv;
     long double pv;
+    char *fmt;
 
     pv = ((long double *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[8], pv);
+       fmt = PD_print_formats1[SC_LONG_DOUBLE_I];
     else
-       rv = PRINT(fp, PD_print_formats2[8], pv);
+       fmt = PD_print_formats2[SC_LONG_DOUBLE_I];
+
+    rv = PRINT(fp, fmt, pv);
 
     return(rv);}
 
@@ -219,13 +246,16 @@ static int _PD_print_long_double(FILE *fp, void *p, int i, int mode)
 static int _PD_print_float_complex(FILE *fp, void *p, int i, int mode)
    {int rv;
     float _Complex pv;
+    char *fmt;
 
     pv = ((float _Complex *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[9], crealf(pv), cimagf(pv));
+       fmt = PD_print_formats1[SC_FLOAT_COMPLEX_I];
     else
-       rv = PRINT(fp, PD_print_formats2[9], crealf(pv), cimagf(pv));
+       fmt = PD_print_formats2[SC_FLOAT_COMPLEX_I];
+
+    rv = PRINT(fp, fmt, crealf(pv), cimagf(pv));
 
     return(rv);}
 
@@ -235,13 +265,16 @@ static int _PD_print_float_complex(FILE *fp, void *p, int i, int mode)
 static int _PD_print_double_complex(FILE *fp, void *p, int i, int mode)
    {int rv;
     double _Complex pv;
+    char *fmt;
 
     pv = ((double _Complex *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[10], creal(pv), cimag(pv));
+       fmt = PD_print_formats1[SC_DOUBLE_COMPLEX_I];
     else
-       rv = PRINT(fp, PD_print_formats2[10], creal(pv), cimag(pv));
+       fmt = PD_print_formats2[SC_DOUBLE_COMPLEX_I];
+
+    rv = PRINT(fp, fmt, creal(pv), cimag(pv));
 
     return(rv);}
 
@@ -251,13 +284,20 @@ static int _PD_print_double_complex(FILE *fp, void *p, int i, int mode)
 static int _PD_print_long_double_complex(FILE *fp, void *p, int i, int mode)
    {int rv;
     long double _Complex pv;
+    char *fmt;
 
     pv = ((long double _Complex *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[11], creall(pv), cimagl(pv));
+       fmt = PD_print_formats1[SC_LONG_DOUBLE_COMPLEX_I];
     else
-       rv = PRINT(fp, PD_print_formats2[11], creall(pv), cimagl(pv));
+       fmt = PD_print_formats2[SC_LONG_DOUBLE_COMPLEX_I];
+
+#ifdef AIX
+    rv = PRINT(fp, fmt, creal(pv), cimag(pv));
+#else
+    rv = PRINT(fp, fmt, creall(pv), cimagl(pv));
+#endif
 
     return(rv);}
 
@@ -267,21 +307,29 @@ static int _PD_print_long_double_complex(FILE *fp, void *p, int i, int mode)
 static int _PD_print_bool(FILE *fp, void *p, int i, int mode)
    {int rv;
     bool pv;
+    char *fmt;
 
     pv = ((bool *) p)[i];
 
     if (mode == 1)
-       rv = PRINT(fp, PD_print_formats1[12], pv);
+       fmt = PD_print_formats1[SC_BOOL_I];
     else
-       rv = PRINT(fp, PD_print_formats2[12], pv);
+       fmt = PD_print_formats2[SC_BOOL_I];
+
+    if (strchr(fmt, 's') != NULL)
+       rv = PRINT(fp, fmt, pv ? "T" : "F");
+    else if (strchr(fmt, 'd') != NULL)
+       rv = PRINT(fp, fmt, (int) pv);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
 static PFPrnt
- printer[] = {_PD_print_char,
+ printer[] = {NULL,
 	      _PD_print_bit,
+	      _PD_print_bool,
+	      _PD_print_char,
 	      _PD_print_short,
 	      _PD_print_int,
 	      _PD_print_long,
@@ -291,8 +339,7 @@ static PFPrnt
 	      _PD_print_long_double,
 	      _PD_print_float_complex,
 	      _PD_print_double_complex,
-	      _PD_print_long_double_complex,
-	      _PD_print_bool};
+	      _PD_print_long_double_complex};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -329,11 +376,9 @@ static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
 /* _PD_DISP_MODE_1 - print a single item from scalar X according to formats1 */
 
 static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
-   {
-    FILE *fp;
+   {FILE *fp;
 
     fp = prnt->fp;
-
 
     if (PD_print_controls[5] == 0)
        {PRINT(fp, "%s%s%s = ", prnt->prefix, prnt->before, prnt->nodename);}
@@ -360,7 +405,6 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, long ni, int tid)
     FILE *fp;
 
     fp = prnt->fp;
-
 
     i = 0L;
     j = 0L;
@@ -745,6 +789,7 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
 static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 			long ni, char *type, int n, long *ind)
    {int k, m, idx, nn, isz, status, quo;
+    int ifx, ifp, icx;
     long offset, i, j;
     char bf[MAXLINE], s[MAXLINE];
     char *cp, **t;
@@ -780,54 +825,35 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     prnt->nn     = nn;
     prnt->offset = offset;
 
-/* check for floating point types */
     if (pd->fp.format != NULL)
-       {if (strcmp(type, "float") == 0)
-	   _PD_disp_data(prnt, vr, ni, 6, n, ind);
+       {if ((ifp = SC_fp_type_id(type)) != -1)
+	   _PD_disp_data(prnt, vr, ni, ifp, n, ind);
 
-       else if (strcmp(type, "double") == 0)
-	  _PD_disp_data(prnt, vr, ni, 7, n, ind);
-
-       else if (strcmp(type, "long_double") == 0)
-	  _PD_disp_data(prnt, vr, ni, 8, n, ind);
-
-       else if (strcmp(type, "float_complex") == 0)
-	  _PD_disp_data(prnt, vr, ni, 9, n, ind);
-
-       else if (strcmp(type, "double_complex") == 0)
-	  _PD_disp_data(prnt, vr, ni, 10, n, ind);
-
-       else if (strcmp(type, "long_double_complex") == 0)
-	  _PD_disp_data(prnt, vr, ni, 11, n, ind);
+	else if ((icx = SC_cx_type_id(type)) != -1)
+	   _PD_disp_data(prnt, vr, ni, icx, n, ind);
 
        else if (strcmp(type, "REAL") == 0)
 	  {if (sizeof(REAL) == sizeof(double))
-	      _PD_disp_data(prnt, vr, ni, 7, n, ind);
+	      _PD_disp_data(prnt, vr, ni, SC_DOUBLE_I, n, ind);
 	   else
-	      _PD_disp_data(prnt, vr, ni, 6, n, ind);};}
+	      _PD_disp_data(prnt, vr, ni, SC_FLOAT_I, n, ind);};}
 
 /* only non-floating point types remain
  * user defined integral primitive types
  * can go off the byte size
  */
     else if (pd->convert >= 0)
-       {if (strcmp(type, "short") == 0)
-	   _PD_disp_data(prnt, vr, ni, 2, n, ind);
+       {if ((ifx = SC_fix_type_id(type, FALSE)) != -1)
+	   _PD_disp_data(prnt, vr, ni, ifx, n, ind);
 
-	else if ((strcmp(type, "int") == 0) || (strcmp(type, "integer") == 0))
-	   _PD_disp_data(prnt, vr, ni, 3, n, ind);
-
-	else if (strcmp(type, "long") == 0)
-	   _PD_disp_data(prnt, vr, ni, 4, n, ind);
-
-	else if (strcmp(type, "long_long") == 0)
-	   _PD_disp_data(prnt, vr, ni, 5, n, ind);
+	else if (strcmp(type, SC_INTEGER_S) == 0)
+	   _PD_disp_data(prnt, vr, ni, SC_INTEGER_I, n, ind);
 
 /* GOTCHA: This is a feeble first step toward a generalized
  *         print capability for user defined types
  */
-	else if (strcmp(type, "char_8") == 0)
-	   {if (SC_strstr(PD_print_formats1[3], "%s") != NULL)
+	else if (strcmp(type, SC_CHAR_8_S) == 0)
+	   {if (SC_strstr(PD_print_formats1[SC_INT_I], "%s") != NULL)
 	       {cp = (char *) vr;
 		t  = FMAKE_N(char *, ni, "_PD_IO_PRINT:t");
 		for (i = 0; i < ni; i++, cp += isz)
@@ -835,7 +861,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
                                           "_PD_IO_PRINT:t[]");
 		     memcpy(t[i], cp, isz);
 		     t[i][isz] = '\0';};
-		_PD_disp_data(prnt, t, ni, 0, n, ind);
+		_PD_disp_data(prnt, t, ni, SC_BIT_I, n, ind);
 		for (i = 0; i < ni; i++)
 		    SFREE(t[i]);
 		SFREE(t);}
@@ -850,30 +876,33 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    else
 	       {PRINT(f0, "        <function>\n");};}
 
+	else if (strcmp(type, SC_BOOL_S) == 0)
+	  _PD_disp_data(prnt, vr, ni, SC_BOOL_I, n, ind);
+
 	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
-	   {if (strcmp(type, "char") == 0)
-	       {idx = 0;
+	   {if (strcmp(type, SC_CHAR_S) == 0)
+	       {idx = SC_CHAR_I;
 		ni  = ni;
 	        quo = TRUE;}
 	    else if (pd->kind == CHAR_KIND)
-	       {idx = 0;
+	       {idx = SC_CHAR_I;
 		ni  = isz;
 	        quo = FALSE;}
 	    else
-	       {idx = 1;
+	       {idx = SC_INT_I;
 		ni  = ni;
 	        quo = FALSE;};
 
 	    _PD_print_char_kind(prnt, vr, ni, type, quo, idx, n, ind);}
 
         else if (isz == sizeof(short))
-	  _PD_disp_data(prnt, vr, ni, 1, n, ind);
+	  _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
 
 	else if (isz == sizeof(int))
-	   _PD_disp_data(prnt, vr, ni, 1, n, ind);
+	   _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
 
 	else if (isz == sizeof(long))
-	   _PD_disp_data(prnt, vr, ni, 1, n, ind);
+	   _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
 
 	else
 	   {PRINT(f0, "%s%s%s = ", prefix, before, nodename);
@@ -1243,6 +1272,26 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_SET_USER_DEFAULTS - default user specified formats to NULL */
+
+void _PD_set_user_defaults(void)
+   {int i;
+
+    for (i = 0; i < PD_N_FORMATS; i++)
+        {if (PD_user_formats1[i] != NULL)
+	    {SFREE(PD_user_formats1[i]);};
+
+	 if (PD_user_formats2[i] != NULL)
+	    {SFREE(PD_user_formats2[i]);};};
+
+    if (PD_no_print_member != NULL)
+       {SFREE(PD_no_print_member);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_SET_USER_FORMATS - replace edit formats with user specified formats  */
 
 void _PD_set_user_formats(void)
@@ -1265,84 +1314,91 @@ void _PD_set_user_formats(void)
 /*--------------------------------------------------------------------------*/
 
 /* _PD_SET_FORMAT_DEFAULTS - set the defaults for the edit formats 
- *
- * old
- *                         -   0 = int
- *                         -   1 = long
- *                         -   2 = float
- *                         -   3 = double
- *                         -   4 = short
- *                         -   5 = char
- *                         -   6 = long long
- *                         -   7 = bit
- * new
- *                         -   0 = char
  *                         -   1 = bit
- *                         -   2 = short
- *                         -   3 = int
- *                         -   4 = long
- *                         -   5 = long long
- *                         -   6 = float
- *                         -   7 = double
- *                         -   8 = long double
- *                         -   9 = float complex
- *                         -  10 = double complex
- *                         -  11 = long double complex
- *                         -  12 = bool
+ *                         -   2 = bool
+ *                         -   3 = char
+ *                         -   4 = short
+ *                         -   5 = int
+ *                         -   6 = long
+ *                         -   7 = long long
+ *                         -   8 = float
+ *                         -   9 = double
+ *                         -  10 = long double
+ *                         -  11 = float complex
+ *                         -  12 = double complex
+ *                         -  13 = long double complex
  */
 
 void _PD_set_format_defaults(void)
    {int i;
     char tmp[MAXLINE], *t;
     
-/* used for scalars */
-    if (PD_print_formats1[0] != NULL)
-       SFREE(PD_print_formats1[0]);
-    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(0)");
-    PD_print_formats1[0] = t;
+/* PD_print_formats1 is used for scalars */
 
-    if (PD_print_formats1[1] != NULL)
-       SFREE(PD_print_formats1[1]);
-    t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(1)");
-    PD_print_formats1[1] = t;
-
+/* fixed point types */
     for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
-        {if (PD_print_formats1[i+2] != NULL)
-	    SFREE(PD_print_formats1[i+2]);
+        {if (PD_print_formats1[i+SC_SHORT_I] != NULL)
+	    SFREE(PD_print_formats1[i+SC_SHORT_I]);
+
 	 snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[i]);
-	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(i)");
-	 PD_print_formats1[i+2] = t;};
 
+	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fix)");
+
+	 PD_print_formats1[i+SC_SHORT_I] = t;};
+
+/* real floating point types */
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
-        {if (PD_print_formats1[i+6] != NULL)
-	    SFREE(PD_print_formats1[i+6]);
+        {if (PD_print_formats1[i+SC_FLOAT_I] != NULL)
+	    SFREE(PD_print_formats1[i+SC_FLOAT_I]);
+
 	 snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[i].digits);
-	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(i)");
-	 PD_print_formats1[i+6] = t;};
 
-#ifdef NO_LONG_LONG
+	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
 
-# ifdef SOLARIS
-/* NOTE: the factor of 2 appears to be necesary because the actual long long
- * field width will be twice what is specified - emperically verified on
- * all current platforms with long long
- */
-    snprintf(tmp, MAXLINE, "%%%dld", 2*PD_fix_precision[3]);
-# else
-    snprintf(tmp, MAXLINE, "%%%dld", PD_fix_precision[3]);
-# endif
+	 PD_print_formats1[i+SC_FLOAT_I] = t;};
 
-#else
-    snprintf(tmp, MAXLINE, "%%%dlld", PD_fix_precision[3]);
-#endif
+/* complex floating point types */
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+        {if (PD_print_formats1[i+SC_FLOAT_COMPLEX_I] != NULL)
+	    SFREE(PD_print_formats1[i+SC_FLOAT_COMPLEX_I]);
 
-/* used for arrays */
+	 snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
+		  PD_fp_precision[i].digits, PD_fp_precision[i].digits);
+
+	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
+
+	 PD_print_formats1[i+SC_FLOAT_COMPLEX_I] = t;};
+
+/* other primitive types */
+    if (PD_print_formats1[SC_CHAR_I] != NULL)
+       SFREE(PD_print_formats1[SC_CHAR_I]);
+
+    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(char)");
+
+    PD_print_formats1[SC_CHAR_I] = t;
+
+    if (PD_print_formats1[SC_BIT_I] != NULL)
+       SFREE(PD_print_formats1[SC_BIT_I]);
+
+    t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bit)");
+
+    PD_print_formats1[SC_BIT_I] = t;
+
+    if (PD_print_formats1[SC_BOOL_I] != NULL)
+       SFREE(PD_print_formats1[SC_BOOL_I]);
+
+    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bool)");
+
+    PD_print_formats1[SC_BOOL_I] = t;
+
+/* PD_print_formats2 is used for arrays */
     for (i = 0; i < PD_N_FORMATS; i++)
         {if (PD_print_formats2[i] != NULL)
             SFREE(PD_print_formats2[i]);
 
          t = SC_strsavef(PD_print_formats1[i],
 			 "char*:_PD_SET_FORMAT_DEFAULTS:formats2");
+
          PD_print_formats2[i] = t;};
 
     return;}

@@ -44,8 +44,8 @@ static char *_SS_load_bf(char *s)
  */
 
 static void _SS_fix_arg(object *obj, void *v, int type)
-   {BIGINT l;
-    BIGINT *llp;
+   {long long l;
+    long long *llp;
     long *lp;
     int *ip;
     short *sp;
@@ -106,7 +106,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
        {sp  = (short *) v;
 	*sp = (short) l;}
 
-    else if ((type == SC_INTEGER_I) || (type == SC_ENUM_I))
+    else if ((type == SC_INT_I) || (type == SC_ENUM_I))
        {ip  = (int *) v;
 	*ip = (int) l;}
 
@@ -114,8 +114,8 @@ static void _SS_fix_arg(object *obj, void *v, int type)
        {lp  = (long *) v;
 	*lp = (long) l;}
 
-    else if (type == SC_BIGINT_I)
-       {llp  = (BIGINT *) v;
+    else if (type == SC_LONG_LONG_I)
+       {llp  = (long long *) v;
 	*llp =  l;};
 
     return;}
@@ -211,9 +211,9 @@ static void _SS_args(object *obj, void *v, int type)
 
     if ((type == SC_CHAR_I) ||
 	(type == SC_SHORT_I) ||
-	(type == SC_INTEGER_I) ||
+	(type == SC_INT_I) ||
 	(type == SC_ENUM_I) ||
-	(type == SC_BIGINT_I) ||
+	(type == SC_LONG_LONG_I) ||
 	(type == SC_LONG_I))
        _SS_fix_arg(obj, v, type);
 
@@ -327,7 +327,7 @@ int SS_args(object *s, ...)
 
 object *SS_define_constant(int n, ...)
    {int type;
-    BIGINT il;
+    long long il;
     double dc;
     char *name, *s;
     object *vr, *val;
@@ -342,7 +342,7 @@ object *SS_define_constant(int n, ...)
       {type = SC_VA_ARG(int);
        if ((type == SC_CHAR_I) ||
 	   (type == SC_SHORT_I) ||
-	   (type == SC_INTEGER_I) ||
+	   (type == SC_INT_I) ||
 	   (type == SC_ENUM_I))
 	  {il  = SC_VA_ARG(int);
 	   val = SS_mk_integer(il);}
@@ -351,8 +351,8 @@ object *SS_define_constant(int n, ...)
 	  {il  = SC_VA_ARG(long);
 	   val = SS_mk_integer(il);}
 
-       else if (type == SC_BIGINT_I)
-	  {il  = SC_VA_ARG(BIGINT);
+       else if (type == SC_LONG_LONG_I)
+	  {il  = SC_VA_ARG(long long);
 	   val = SS_mk_integer(il);}
 
        else if ((type == SC_FLOAT_I) ||
@@ -462,7 +462,7 @@ void *SS_var_reference(char *s)
 static object *_SS_make_list(int n, int *type, void **ptr)
    {int i, j, c, ityp;
     long l;
-    BIGINT ll;
+    long long ll;
     double d;
     char *s;
     object *o, *lst;
@@ -471,17 +471,17 @@ static object *_SS_make_list(int n, int *type, void **ptr)
     for (i = 0; i < n; i++)
         {ityp = type[i];
 	 if ((ityp == SC_SHORT_I) ||
-	     (ityp == SC_INTEGER_I) ||
+	     (ityp == SC_INT_I) ||
 	     (ityp == SC_ENUM_I))
 	    {j   = *(int *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_integer((BIGINT) j), lst);}
+	     lst = SS_mk_cons(SS_mk_integer((long long) j), lst);}
  
 	 else if (ityp == SC_LONG_I)
 	    {l   = *(long *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_integer((BIGINT) l), lst);}
+	     lst = SS_mk_cons(SS_mk_integer((long long) l), lst);}
 
-	 else if (ityp == SC_BIGINT_I)
-	    {ll   = *(BIGINT *) ptr[i];
+	 else if (ityp == SC_LONG_LONG_I)
+	    {ll   = *(long long *) ptr[i];
 	     lst = SS_mk_cons(SS_mk_integer(ll), lst);}
 
 	 else if (ityp == SC_FLOAT_I)
@@ -734,7 +734,7 @@ static int _SS_run(void)
     iret = FALSE;
     if (SS_numbp(ret))
        SS_args(ret,
-	       SC_INTEGER_I, &iret,
+	       SC_INT_I, &iret,
 	       0);
 
     else

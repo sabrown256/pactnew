@@ -70,7 +70,7 @@ static int test_1(PG_device *dev)
     g = PG_make_graph_from_mapping(f, NULL, NULL, 'A', NULL);
 
     PG_set_attrs_set(f->domain,
-		     "LINE-COLOR", SC_INTEGER_I, FALSE, dev->BLUE,
+		     "LINE-COLOR", SC_INT_I, FALSE, dev->BLUE,
 		     NULL);
 
     PG_grotrian_plot(dev, g);

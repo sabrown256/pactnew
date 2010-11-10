@@ -281,7 +281,7 @@ static object *_SSI_strref(object *argl)
     n = 0;
     SS_args(argl,
             SC_STRING_I, &s,
-            SC_INTEGER_I, &n,
+            SC_INT_I, &n,
             0);
 
     if (n > strlen(s))
@@ -328,7 +328,7 @@ static object *_SSI_strfil(object *argl)
     c = ' ';
     SS_args(argl,
             SS_OBJECT_I, &str,
-            SC_INTEGER_I, &c,
+            SC_INT_I, &c,
             0);
 
     s = SS_STRING_TEXT(str);
@@ -351,8 +351,8 @@ static object *_SSI_strset(object *argl)
     c = ' ';
     SS_args(argl,
             SS_OBJECT_I, &str,
-            SC_INTEGER_I, &n,
-            SC_INTEGER_I, &c,
+            SC_INT_I, &n,
+            SC_INT_I, &c,
             0);
 
     s = SS_STRING_TEXT(str);
@@ -375,8 +375,8 @@ static object *_SSI_strsub(object *argl)
     n2 = 0;
     SS_args(argl,
             SC_STRING_I, &s,
-            SC_INTEGER_I, &n1,
-            SC_INTEGER_I, &n2,
+            SC_INT_I, &n1,
+            SC_INT_I, &n2,
             0);
 
     n = strlen(s);
@@ -577,8 +577,8 @@ static object *_SSI_mk_str(object *argl)
     n = 0;
     c = ' ';
     SS_args(argl,
-            SC_INTEGER_I, &n,
-            SC_INTEGER_I, &c,
+            SC_INT_I, &n,
+            SC_INT_I, &c,
             0);
 
     s = FMAKE_N(char, n+2, "char*:_SSI_MK_STR:s");
@@ -799,7 +799,7 @@ static object *_SSI_trim(object *argl)
     SS_args(argl,
             SC_STRING_I, &s,
             SC_STRING_I, &d,
-            SC_INTEGER_I, &dir,
+            SC_INT_I, &dir,
             0);
 
     if (dir < 0)

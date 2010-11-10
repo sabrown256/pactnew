@@ -1,3 +1,16 @@
+/bs =    T 
+/ba(0) =    T 
+/ba(1) =    F 
+/bm(0) =    T 
+/bm(1) =    T 
+/bm(2) =    F 
+/bm(3) =    F 
+/bm(4) =    T 
+/bm(5) =    T 
+/bm(6) =    T 
+/bm(7) =    F 
+/bm(8) =    F 
+/bm(9) =    T 
 /cs = "a"
 /ca = "ab"
 /cm = "abcdefghi"
@@ -123,6 +136,19 @@ writing file foofoo
 (<PDBfile|PDBfile|foofoo>)
 
 reading file foofoo
+/bs =    T 
+/ba(0) =    T 
+/ba(1) =    F 
+/bm(0) =    T 
+/bm(1) =    T 
+/bm(2) =    F 
+/bm(3) =    F 
+/bm(4) =    T 
+/bm(5) =    T 
+/bm(6) =    T 
+/bm(7) =    F 
+/bm(8) =    F 
+/bm(9) =    T 
 /cs = "a"
 /ca = "ab"
 /cm = "abcdefghi"

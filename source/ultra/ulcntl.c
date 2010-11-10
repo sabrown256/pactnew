@@ -227,7 +227,7 @@ static void _UL_print_curve_labels(PG_device *dev, int *mark)
 		 tc = dev->WHITE;
 		 if (labcf == TRUE)
 		    PG_get_attrs_alist(data[i].info,
-				       "LINE-COLOR", SC_INTEGER_I, &tc, dev->WHITE,
+				       "LINE-COLOR", SC_INT_I, &tc, dev->WHITE,
 				       NULL);
 
 		 PG_get_attrs_glb(TRUE,
@@ -304,8 +304,8 @@ static void _UL_draw_plot(PG_device *dev)
         {if (data[i].id != ' ')
             {info = data[i].info;
 	     PG_get_attrs_alist(info,
-				"PLOT-TYPE",  SC_INTEGER_I, &ptyp,  PLOT_CARTESIAN,
-				"LINE-COLOR", SC_INTEGER_I, &color, dev->BLUE,
+				"PLOT-TYPE",  SC_INT_I, &ptyp,  PLOT_CARTESIAN,
+				"LINE-COLOR", SC_INT_I, &color, dev->BLUE,
 				NULL);
              if (color >= 0)
                 {if ((pty != PLOT_CARTESIAN) ||
@@ -445,7 +445,7 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
         {if (data[i].id != ' ')
 	    {info = (pcons *) data[i].info;
 	     PG_get_attrs_alist(info,
-				"LINE-COLOR", SC_INTEGER_I, &color, 1,
+				"LINE-COLOR", SC_INT_I, &color, 1,
 				NULL);
              if ((color >= 0) || (hider != TRUE))
                 {PG_box_copy(2, wc, data[i].wc);

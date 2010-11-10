@@ -15,7 +15,6 @@
 
 #include "scstd.h"
 #include <complex.h>
-#include <stdbool.h>
 
 #ifdef NO_LONG_LONG
 
@@ -791,7 +790,7 @@ static void print_flt_type(char *type, int sz, int aln,
 
 /* PRINT_HUMAN - organize the detect output for human consumption */
 
-void print_human(int sflag)
+void print_human(int sflag, int *fc, int *dc, int *lc)
     {char bf[MAXLINE], t[MAXLINE];
      char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
@@ -875,6 +874,13 @@ void print_human(int sflag)
 /* print long double complex info */
      print_flt_type("Long double complex", size[13], align[13], mfields, LDBL_MIN, LDBL_MAX);
 
+     printf("\n");
+     printf("Complex part order:   real  imaginary\n");
+     printf("Float complex           %d       %d\n", fc[2]+1, fc[3]+1);
+     printf("Double complex          %d       %d\n", dc[2]+1, dc[3]+1);
+     printf("Long double complex     %d       %d\n", lc[2]+1, lc[3]+1);
+     printf("\n");
+
 /* print optional non-native types */
      if (sflag)
         {memset(bf, ' ', MAXLINE);
@@ -898,8 +904,9 @@ void print_human(int sflag)
 
 /* PRINT_HEADER - organize the detect output in the form of a c header file */
 
-void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
-    {int i;
+void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
+		  int *fc, int *dc, int *lc)
+    {int i, j;
 
 /* print the floating point ordering info */
     printf("\nint\n");
@@ -937,37 +944,66 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
         printf("%2ldL, ", ldf[i]);
     printf("0x%lXL};\n", ldf[7]);
 
-    printf("\n/* Internal DATA_STANDARD */\n");
+    printf("\n/* Internal DATA_STANDARD */\n\n");
     printf("data_standard\n");
-    printf(" INT_STD = {%d,                               /* bits per byte */\n",
+    printf(" INT_STD = {%d,                                         /* bits per byte */\n",
            (int)BITS_DEFAULT);
-    printf("            %d,                             /* size of pointer */\n", 
+    printf("            %d,                                       /* size of pointer */\n", 
            size[1]);
-    printf("            %d,                                /* size of bool */\n", 
+    printf("            %d,                                          /* size of bool */\n", 
            size[10]);
-    printf("            {{%d, %s},       /* size and order of short */\n", 
+    printf("            {{%d, %s},             /* size and order of short */\n", 
            size[2], int_order);
-    printf("             {%d, %s},         /* size and order of int */\n", 
+    printf("             {%d, %s},               /* size and order of int */\n", 
            size[3], int_order);
-    printf("             {%d, %s},        /* size and order of long */\n", 
+    printf("             {%d, %s},              /* size and order of long */\n", 
            size[4], int_order);
-    printf("             {%d, %s}},   /* size and order of long long */\n", 
+    printf("             {%d, %s}},        /* size and order of long long */\n", 
            size[5], int_order);
-    printf("            {{%d, int_frm_f, int_ord_f},     /* float definition */\n", 
+    printf("            {{%d, int_frm_f, int_ord_f},             /* float definition */\n", 
            size[6]);
-    printf("             {%d, int_frm_d, int_ord_d},     /* double definition */\n", 
+    printf("             {%d, int_frm_d, int_ord_d},            /* double definition */\n", 
            size[7]);
     printf("             {%d, int_frm_ld, int_ord_ld}}},  /* long double definition */\n", 
            size[8]);
     printf(" *INT_STANDARD = &INT_STD;\n");
 
-    printf("\n/* Internal DATA_ALIGNMENT */\n");
+    printf("\n/* Internal DATA_ALIGNMENT */\n\n");
     printf("data_alignment\n");
     printf(" INT_ALG = {%d, %d, %d, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
            align[0], align[1], align[10], align[2], align[3], 
            align[4], align[5], align[6], align[7], align[8],
 	   align[9]);
     printf(" *INT_ALIGNMENT = &INT_ALG;\n");
+
+    printf("\n/* complex tuple info */\n\n");
+    printf("int\n");
+    printf(" floatc_ord[] = {");
+    for (j = 0; j < 2; j++)
+        {if (j == 0)
+	    printf("%d", fc[j+2]);
+	 else
+	    printf(", %d", fc[j+2]);};
+    printf("},\n");
+    printf(" doublec_ord[] = {");
+    for (j = 0; j < 2; j++)
+        {if (j == 0)
+	    printf("%d", dc[j+2]);
+	 else
+	    printf(", %d", dc[j+2]);};
+    printf("},\n");
+    printf(" long_doublec_ord[] = {");
+    for (j = 0; j < 2; j++)
+        {if (j == 0)
+	    printf("%d", lc[j+2]);
+	 else
+	    printf(", %d", lc[j+2]);};
+    printf("};\n\n");
+    
+    printf("multides\n");
+    printf(" floatc_tuple = { \"float_complex\", 2, floatc_ord },\n");
+    printf(" doublec_tuple = { \"double_complex\", 2, doublec_ord },\n");
+    printf(" long_doublec_tuple = { \"long_double_complex\", 2, long_doublec_ord };\n");
 
     printf("\n\n");}
 
@@ -1085,11 +1121,11 @@ int main(int argc, char **argv)
     derive_complex_format(fc, dc, lc);
 
     if (cflag)
-        print_header(fb, db, ldb, ff, df, ldf);
+        print_header(fb, db, ldb, ff, df, ldf, fc, dc, lc);
     else if (wflag)
         print_html();
     else
-        print_human(sflag);
+        print_human(sflag, fc, dc, lc);
 
     return(0);}
 

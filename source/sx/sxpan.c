@@ -259,7 +259,7 @@ static object *_SXI_run_package(object *argl)
             G_PACKAGE, &pck,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
-            SC_INTEGER_I, &cycle,
+            SC_INT_I, &cycle,
             0);
 
     pck_entry = (PFPkgMain) pck->main;
@@ -569,7 +569,7 @@ static object *_SXI_def_var(object *argl)
            break;
         pv  = FMAKE(int, "_SXI_DEF_VAR:pv");
         *pv = dm;
-        nxt = SC_mk_pcons("integer *", pv, SC_PCONS_P_S, NULL);
+        nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
         if (nu == NULL)
            nu = nxt;
         else
@@ -586,7 +586,7 @@ static object *_SXI_def_var(object *argl)
 
            pv  = FMAKE(int, "_SXI_DEF_VAR:pv");
            *pv = dm;
-           nxt = SC_mk_pcons("integer *", pv, SC_PCONS_P_S, NULL);
+           nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
            if (du == NULL)
               du = nxt;
            else
@@ -607,8 +607,8 @@ static object *_SXI_def_var(object *argl)
         int itype;
 
 	itype = 0;
-        if (strcmp(vtype, SC_INTEGER_S) == 0)
-           itype = SC_INTEGER_I;
+        if (strcmp(vtype, SC_INT_S) == 0)
+           itype = SC_INT_I;
         else if (strcmp(vtype, SC_DOUBLE_S) == 0)
            itype = SC_DOUBLE_I;
         else if (strcmp(vtype, SC_CHAR_S) == 0)
@@ -639,7 +639,7 @@ static object *_SXI_rd_restart(object *argl)
     convs = NONE;
     SS_args(argl,
             SC_STRING_I, &name,
-            SC_INTEGER_I, &convs,
+            SC_INT_I, &convs,
             0);
 
     if (name == NULL)
@@ -742,7 +742,7 @@ static object *_SXI_init_problem(object *argl)
     SS_args(argl,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
-            SC_INTEGER_I, &nc,
+            SC_INT_I, &nc,
             SC_STRING_I, &edname,
             SC_STRING_I, &ppname,
             SC_STRING_I, &gfname,
@@ -824,8 +824,8 @@ static object *_SXI_fin_system(object *argl)
     nz = 0;
     cy = 0;
     SS_args(argl,
-            SC_INTEGER_I, &nz,
-            SC_INTEGER_I, &cy,
+            SC_INT_I, &nz,
+            SC_INT_I, &cy,
             0);
 
     PA_fin_system(nz, cy, FALSE);
@@ -851,7 +851,7 @@ static object *_SXI_dump_pp(object *argl)
     SS_args(argl,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
-            SC_INTEGER_I, &cy,
+            SC_INT_I, &cy,
             SC_STRING_I, &ed,
             SC_STRING_I, &pp,
             SC_STRING_I, &gf,
@@ -872,12 +872,9 @@ static object *_SXI_dump_pp(object *argl)
  */
 
 static object *_SXI_db_numeric_data(object *obj)
-   {int *ip, i, n;
-    long *lp;
-    short *sp;
-    char *cp, *name, *type;
+   {int i, n;
+    char *name, *type;
     double *dp;
-    float *fp;
     C_array *arr;
     PA_variable *pp;
     void *pd;
@@ -900,32 +897,51 @@ static object *_SXI_db_numeric_data(object *obj)
 	type = PD_entry_type(pp->desc);
 
 /* all arrays will be REALS */
-	if (strcmp(type, "double") == 0)
+	if (strcmp(type, SC_DOUBLE_S) == 0)
 	   arr = PM_make_array(SC_DOUBLE_S, n, pd);
 	else
 	   {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	    dp  = (double *) arr->data;
 
-	    if (strcmp(type, "float") == 0)
-	       {fp = (float *) pd;
+/* fixed point types */
+	    if (strcmp(type, SC_SHORT_S) == 0)
+	       {short *pv;
+	        pv = (short *) pd;
 		for (i = 0; i < n; i++)
-		    *dp++ = *fp++;}
-	    else if (strcmp(type, "integer") == 0)
-	       {ip = (int *) pd;
+		    *dp++ = *pv++;}
+	    else if (strcmp(type, SC_INT_S) == 0)
+	       {int *pv;
+		pv = (int *) pd;
 		for (i = 0; i < n; i++)
-		    *dp++ = *ip++;}
-	    else if (strcmp(type, "short") == 0)
-	       {sp = (short *) pd;
+		    *dp++ = *pv++;}
+	    else if (strcmp(type, SC_LONG_S) == 0)
+	       {long *pv;
+		pv = (long *) pd;
 		for (i = 0; i < n; i++)
-		    *dp++ = *sp++;}
-	    else if (strcmp(type, "long") == 0)
-	       {lp = (long *) pd;
+		    *dp++ = *pv++;}
+	    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+	       {long long *pv;
+		pv = (long long *) pd;
 		for (i = 0; i < n; i++)
-		    *dp++ = *lp++;}
-	    else if (strcmp(type, "char") == 0)
-	       {cp = (char *) pd;
+		    *dp++ = *pv++;}
+
+/* floating point types */
+	    else if (strcmp(type, SC_FLOAT_S) == 0)
+	       {float *pv;
+		pv = (float *) pd;
 		for (i = 0; i < n; i++)
-		    *dp++ = *cp++;}
+		    *dp++ = *pv++;}
+	    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+	       {long double *pv;
+		pv = (long double *) pd;
+		for (i = 0; i < n; i++)
+		    *dp++ = *pv++;}
+
+	    else if (strcmp(type, SC_CHAR_S) == 0)
+	       {char *pv;
+		pv = (char *) pd;
+		for (i = 0; i < n; i++)
+		    *dp++ = *pv++;}
 	    else
 	       SS_error("BAD DATA TYPE - _SXI_DB_NUMERIC_DATA", obj);};
 
@@ -1080,61 +1096,61 @@ void SX_install_panacea_funcs(void)
                        "dimension",     SC_STRING_I, "dimension",
                        "upper-lower",   SC_STRING_I, "upper-lower",
                        "offset-number", SC_STRING_I, "offset-number",
-                       "units",         SC_INTEGER_I, -1,
-                       "per",           SC_INTEGER_I, -2,
-                       "attribute",     SC_INTEGER_I, 102,
+                       "units",         SC_INT_I, -1,
+                       "per",           SC_INT_I, -2,
+                       "attribute",     SC_INT_I, 102,
                        NULL);
 
     SS_define_constant(0,
-                       "scope",         SC_INTEGER_I, 97,
-                       "defn",          SC_INTEGER_I, -1,
-                       "restart",       SC_INTEGER_I, -2,
-                       "demand",        SC_INTEGER_I, -3,
-                       "runtime",       SC_INTEGER_I, -4,
-                       "edit",          SC_INTEGER_I, -5,
-                       "scratch",       SC_INTEGER_I, -6,
+                       "scope",         SC_INT_I, 97,
+                       "defn",          SC_INT_I, -1,
+                       "restart",       SC_INT_I, -2,
+                       "demand",        SC_INT_I, -3,
+                       "runtime",       SC_INT_I, -4,
+                       "edit",          SC_INT_I, -5,
+                       "scratch",       SC_INT_I, -6,
                        NULL);
 
     SS_define_constant(0,
-                       "class",         SC_INTEGER_I, 98,
-                       "required",      SC_INTEGER_I, 1,
-                       "optional",      SC_INTEGER_I, 2,
-                       "pseudo",        SC_INTEGER_I, 3,
+                       "class",         SC_INT_I, 98,
+                       "required",      SC_INT_I, 1,
+                       "optional",      SC_INT_I, 2,
+                       "pseudo",        SC_INT_I, 3,
                        NULL);
 
     SS_define_constant(0,
-                       "persist",       SC_INTEGER_I, 99,
-                       "release",       SC_INTEGER_I, -10,
-                       "keep",          SC_INTEGER_I, -11,
-                       "cache",         SC_INTEGER_I, -12,
+                       "persist",       SC_INT_I, 99,
+                       "release",       SC_INT_I, -10,
+                       "keep",          SC_INT_I, -11,
+                       "cache",         SC_INT_I, -12,
                        NULL);
 
     SS_define_constant(0,
-                       "center",        SC_INTEGER_I, 100,
-                       "zone-centered", SC_INTEGER_I, -1,
-                       "node-centered", SC_INTEGER_I, -2,
-                       "face-centered", SC_INTEGER_I, -3,
-                       "edge-centered", SC_INTEGER_I, -4,
-                       "uncentered",    SC_INTEGER_I, -5,
+                       "center",        SC_INT_I, 100,
+                       "zone-centered", SC_INT_I, -1,
+                       "node-centered", SC_INT_I, -2,
+                       "face-centered", SC_INT_I, -3,
+                       "edge-centered", SC_INT_I, -4,
+                       "uncentered",    SC_INT_I, -5,
                        NULL);
 
     SS_define_constant(0,
-                       "allocation",    SC_INTEGER_I, 101,
-                       "static",        SC_INTEGER_I, -100,
-                       "dynamic",       SC_INTEGER_I, -101,
+                       "allocation",    SC_INT_I, 101,
+                       "static",        SC_INT_I, -100,
+                       "dynamic",       SC_INT_I, -101,
                        NULL);
 
-    SS_install_cv("radian",    &PA_radian,          SC_INTEGER_I);
-    SS_install_cv("steradian", &PA_steradian,       SC_INTEGER_I);
-    SS_install_cv("mole",      &PA_mole,            SC_INTEGER_I);
-    SS_install_cv("Q",         &PA_electric_charge, SC_INTEGER_I);
-    SS_install_cv("cm",        &PA_cm,              SC_INTEGER_I);
-    SS_install_cv("sec",       &PA_sec,             SC_INTEGER_I);
-    SS_install_cv("g",         &PA_gram,            SC_INTEGER_I);
-    SS_install_cv("eV",        &PA_eV,              SC_INTEGER_I);
-    SS_install_cv("K",         &PA_kelvin,          SC_INTEGER_I);
-    SS_install_cv("erg",       &PA_erg,             SC_INTEGER_I);
-    SS_install_cv("cc",        &PA_cc,              SC_INTEGER_I);
+    SS_install_cv("radian",    &PA_radian,          SC_INT_I);
+    SS_install_cv("steradian", &PA_steradian,       SC_INT_I);
+    SS_install_cv("mole",      &PA_mole,            SC_INT_I);
+    SS_install_cv("Q",         &PA_electric_charge, SC_INT_I);
+    SS_install_cv("cm",        &PA_cm,              SC_INT_I);
+    SS_install_cv("sec",       &PA_sec,             SC_INT_I);
+    SS_install_cv("g",         &PA_gram,            SC_INT_I);
+    SS_install_cv("eV",        &PA_eV,              SC_INT_I);
+    SS_install_cv("K",         &PA_kelvin,          SC_INT_I);
+    SS_install_cv("erg",       &PA_erg,             SC_INT_I);
+    SS_install_cv("cc",        &PA_cc,              SC_INT_I);
 
     return;}
 

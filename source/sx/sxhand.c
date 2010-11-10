@@ -461,7 +461,7 @@ object *_SX_mij_b_mrs(PFVoid oper, object *argl)
     i = -1;
     a = HUGE;
     SS_args(argl,
-	    SC_INTEGER_I, &i,
+	    SC_INT_I, &i,
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
@@ -509,7 +509,7 @@ object *_SX_mij_b_mds(PFVoid oper, object *argl)
     i = -1;
     a = HUGE;
     SS_args(argl,
-	    SC_INTEGER_I, &i,
+	    SC_INT_I, &i,
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)

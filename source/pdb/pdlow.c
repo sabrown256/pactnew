@@ -21,33 +21,6 @@
     eq = ((a->bool_bytes != b->bool_bytes) ||                                \
 	  (c->bool_alignment != d->bool_alignment))
 
-#define PD_COMPARE_SHORT_STD(eq, a, b, c, d)                                 \
-   PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->fx[0].bpi,       b->fx[0].bpi,                      \
-		      a->fx[0].order,     b->fx[0].order,                    \
-		      c->fx[0], d->fx[0])
-
-#define PD_COMPARE_INT_STD(eq, a, b, c, d)                                   \
-   PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->fx[1].bpi,       b->fx[1].bpi,                      \
-		      a->fx[1].order,     b->fx[1].order,                    \
-		      c->fx[1], d->fx[1])
-
-#define PD_COMPARE_LONG_STD(eq, a, b, c, d)                                  \
-   PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->fx[2].bpi,       b->fx[2].bpi,                      \
-		      a->fx[2].order,     b->fx[2].order,                    \
-		      c->fx[2], d->fx[2])
-
-#define PD_COMPARE_LONGLONG_STD(eq, a, b, c, d)                              \
-   PD_COMPARE_FIX_STD(eq,                                                    \
-		      a->fx[3].bpi,       b->fx[3].bpi,                      \
-		      a->fx[3].order,     b->fx[3].order,                    \
-		      c->fx[3], d->fx[3])
-
-#define PD_COMPARE_FIX_STD(eq, na, nb, oa, ob, la, lb)                       \
-    eq = (na != nb) || (oa != ob) || (la != lb)
-
 char
  *PD_ALIGNMENT_S = NULL,
  *PD_DEFSTR_S    = NULL,
@@ -148,17 +121,14 @@ int _PD_compare_std(data_standard *a, data_standard *b,
     long *fa, *fb;
     int eq;
 
-    eq = (a->ptr_bytes   == b->ptr_bytes) &&
-         (a->fx[0].bpi   == b->fx[0].bpi) &&
-         (a->fx[1].bpi   == b->fx[1].bpi) &&
-         (a->fx[2].bpi   == b->fx[2].bpi) &&
-         (a->fx[3].bpi   == b->fx[3].bpi) &&
-         (a->fp[0].bpi   == b->fp[0].bpi) &&
-         (a->fp[1].bpi   == b->fp[1].bpi) &&
-         (a->fx[0].order == b->fx[0].order) &&
-         (a->fx[1].order == b->fx[1].order) &&
-         (a->fx[2].order == b->fx[2].order) &&
-         (a->fx[3].order == b->fx[3].order);
+    eq = (a->ptr_bytes == b->ptr_bytes);
+
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+        eq &= ((a->fx[i].bpi   == b->fx[i].bpi) &&
+	       (a->fx[i].order == b->fx[i].order));
+
+    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+        eq &= (a->fp[i].bpi == b->fp[i].bpi);
 
     if (!eq)
        return(FALSE);
@@ -578,8 +548,9 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
     defstr *ndp;
     int i, n;
     long size;
-    static char *std_types[] = { "REAL", "*", "char", "short", "int",
-				 "integer", "long", "float", "double",
+    static char *std_types[] = { "REAL", "*", "bool", "char",
+				 "short", "int", "integer", "long", "long_long",
+				 "float", "double", "long_double",
 				 "function", "Directory" };
 
     ndp  = NULL;
@@ -594,23 +565,31 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 	   return(ndp);
 
     size = dp->size;
+
+/* floating point types */
     if (dp->fp.format != NULL)
        {if (size <= sizeof(float))
-	   ndp = PD_inquire_host_type(file, "float");
+	   ndp = PD_inquire_host_type(file, SC_FLOAT_S);
         else if (size <= sizeof(double))
-	   ndp = PD_inquire_host_type(file, "double");
+	   ndp = PD_inquire_host_type(file, SC_DOUBLE_S);
         else if (size <= sizeof(long double))
-	   ndp = PD_inquire_host_type(file, "long_double");}
+	   ndp = PD_inquire_host_type(file, SC_LONG_DOUBLE_S);}
 
     else if ((dp->fp.format == NULL) && (dp->fix.order != NO_ORDER))
        {if (size <= sizeof(char))
-	   ndp = PD_inquire_host_type(file, "char");
+	   ndp = PD_inquire_host_type(file, SC_CHAR_S);
+	else if (size <= sizeof(bool))
+	   ndp = PD_inquire_host_type(file, SC_BOOL_S);
+
+/* fixed point types */
         else if (size <= sizeof(short))
-	   ndp = PD_inquire_host_type(file, "short");
+	   ndp = PD_inquire_host_type(file, SC_SHORT_S);
         else if (size <= sizeof(int))
-	   ndp = PD_inquire_host_type(file, "int");
+	   ndp = PD_inquire_host_type(file, SC_INT_S);
         else if (size <= sizeof(long))
-	   ndp = PD_inquire_host_type(file, "long");};
+	   ndp = PD_inquire_host_type(file, SC_LONG_S);
+        else if (size <= sizeof(long long))
+	   ndp = PD_inquire_host_type(file, SC_LONG_LONG_S);};
 
     return(ndp);}
 
@@ -781,9 +760,9 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, FALSE, ftk);
 
     if (sizeof(REAL) == sizeof(double))
-       PD_typedef(file, "double", "REAL");
+       PD_typedef(file, SC_DOUBLE_S, "REAL");
     else
-       PD_typedef(file, "float", "REAL");
+       PD_typedef(file, SC_FLOAT_S, "REAL");
 
 /* NOTE: function MUST be handled this way - PD_DEFNCV does NOT
  *       sequence the two charts properly and death can result
@@ -826,12 +805,15 @@ void _PD_init_chrt(PDBfile *file, int ftk)
 void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     data_alignment *falign, data_alignment *halign,
 		     int flag, int ftk)
-   {int conv, fcnv, dcnv, qcnv;
+   {int ifx, ifp, conv;
+    int fcnv[PD_N_PRIMITIVE_FP];
+    char utyp[MAXLINE];
+    char *styp, *btyp;
     multides *tup;
 
     flag = (hstd != NULL);
 
-    _PD_defstr_in(chart, "*", INT_KIND, NULL, NULL, (long) fstd->ptr_bytes, 
+    _PD_defstr_in(chart, "*", INT_KIND, NULL, NULL, fstd->ptr_bytes, 
                   falign->ptr_alignment, fstd->fx[1].order,
 		  TRUE, NULL, NULL, 0, 0);
 
@@ -842,7 +824,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 	   PD_COMPARE_CHAR_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
-    _PD_defstr_in(chart, "char", CHAR_KIND,
+    _PD_defstr_in(chart, SC_CHAR_S, CHAR_KIND,
 		  NULL, NULL, 1L, falign->char_alignment, 
                   NO_ORDER, conv, NULL, NULL, FALSE, FALSE);
     _PD_defstr_in(chart, "u_char", CHAR_KIND,
@@ -856,109 +838,64 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 	   PD_COMPARE_BOOL_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
-    _PD_defstr_in(chart, "bool", INT_KIND,
-		  NULL, NULL, (long) fstd->bool_bytes,
+    _PD_defstr_in(chart, SC_BOOL_S, INT_KIND,
+		  NULL, NULL, fstd->bool_bytes,
 		  falign->bool_alignment, NO_ORDER,
 		  conv, NULL, NULL, FALSE, FALSE);
 
-    conv = _PD_compare_fix_std(0, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "short", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[0].bpi, 
-                  falign->fx[0], fstd->fx[0].order,
-	          conv, NULL, NULL, FALSE, FALSE);
+/* fixed point types */
+    for (ifx = 0; ifx < PD_N_PRIMITIVE_FIX; ifx++)
+        {styp = SC_type_name(ifx + SC_SHORT_I);
+	 snprintf(utyp, MAXLINE, "u_%s", styp);
 
-    _PD_defstr_in(chart, "u_short", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[0].bpi, 
-                  falign->fx[0], fstd->fx[0].order,
-	          conv, NULL, NULL, TRUE, FALSE);
+	 conv = _PD_compare_fix_std(ifx, fstd, hstd, falign, halign, flag, ftk);
+	 _PD_defstr_in(chart, styp, INT_KIND,
+		       NULL, NULL, fstd->fx[ifx].bpi, 
+		       falign->fx[ifx], fstd->fx[ifx].order,
+		       conv, NULL, NULL, FALSE, FALSE);
 
-    conv = _PD_compare_fix_std(1, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "int", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[1].bpi, 
-                  falign->fx[1], fstd->fx[1].order,
-	          conv, NULL, NULL, FALSE, FALSE);
+	 _PD_defstr_in(chart, utyp, INT_KIND,
+		       NULL, NULL, fstd->fx[ifx].bpi, 
+		       falign->fx[ifx], fstd->fx[ifx].order,
+		       conv, NULL, NULL, TRUE, FALSE);};
 
-    _PD_defstr_in(chart, "u_int", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[1].bpi, 
-                  falign->fx[1], fstd->fx[1].order,
-	          conv, NULL, NULL, TRUE, FALSE);
+    ifx  = 1;
+    styp = SC_INTEGER_S;
+    snprintf(utyp, MAXLINE, "u_%s", styp);
 
-    conv = _PD_compare_fix_std(1, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "integer", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[1].bpi, 
-                  falign->fx[1], fstd->fx[1].order,
-	          conv, NULL, NULL, FALSE, FALSE);
+    conv = _PD_compare_fix_std(ifx, fstd, hstd, falign, halign, flag, ftk);
+    _PD_defstr_in(chart, styp, INT_KIND,
+		  NULL, NULL, fstd->fx[ifx].bpi, 
+		  falign->fx[ifx], fstd->fx[ifx].order,
+		  conv, NULL, NULL, FALSE, FALSE);
 
-    _PD_defstr_in(chart, "u_integer", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[1].bpi, 
-                  falign->fx[1], fstd->fx[1].order,
-	          conv, NULL, NULL, TRUE, FALSE);
-
-    conv = _PD_compare_fix_std(2, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "long", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[2].bpi, 
-                  falign->fx[2], fstd->fx[2].order,
-	          conv, NULL, NULL, FALSE, FALSE);
-
-    _PD_defstr_in(chart, "u_long", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[2].bpi, 
-                  falign->fx[2], fstd->fx[2].order,
-	          conv, NULL, NULL, TRUE, FALSE);
-
-    conv = _PD_compare_fix_std(3, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "long_long", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[3].bpi, 
-                  falign->fx[3], fstd->fx[3].order,
-	          conv, NULL, NULL, FALSE, FALSE);
-
-    _PD_defstr_in(chart, "u_long_long", INT_KIND,
-		  NULL, NULL, (long) fstd->fx[3].bpi, 
-                  falign->fx[3], fstd->fx[3].order,
-	          conv, NULL, NULL, TRUE, FALSE);
+    _PD_defstr_in(chart, utyp, INT_KIND,
+		  NULL, NULL, fstd->fx[ifx].bpi, 
+		  falign->fx[ifx], fstd->fx[ifx].order,
+		  conv, NULL, NULL, TRUE, FALSE);
 
 /* floating point types */
-    fcnv = _PD_compare_fp_std(0, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "float", FLOAT_KIND,
-		  NULL, NULL, fstd->fp[0].bpi, 
-                  falign->fp[0], NO_ORDER,
-		  fcnv, fstd->fp[0].order,
-	          fstd->fp[0].format, FALSE, FALSE);
+    for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
+        {styp = SC_type_name(ifp + SC_FLOAT_I);
 
-    dcnv = _PD_compare_fp_std(1, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "double", FLOAT_KIND,
-		  NULL, NULL, fstd->fp[1].bpi, 
-                  falign->fp[1], NO_ORDER,
-		  dcnv, fstd->fp[1].order,
-	          fstd->fp[1].format, FALSE, FALSE);
-
-    qcnv = _PD_compare_fp_std(2, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, "long_double", FLOAT_KIND,
-		  NULL, NULL, fstd->fp[2].bpi, 
-                  falign->fp[2], NO_ORDER,
-		  qcnv, fstd->fp[2].order,
-	          fstd->fp[2].format, FALSE, FALSE);
+	 fcnv[ifp] = _PD_compare_fp_std(ifp, fstd, hstd, falign, halign, flag, ftk);
+	 _PD_defstr_in(chart, styp, FLOAT_KIND,
+		       NULL, NULL, fstd->fp[ifp].bpi, 
+		       falign->fp[ifp], NO_ORDER,
+		       fcnv[ifp], fstd->fp[ifp].order,
+		       fstd->fp[ifp].format, FALSE, FALSE);};
 
 /* complex types */
-    tup = _PD_make_tuple("float", 2, NULL);
-    _PD_defstr_in(chart, "float_complex", FLOAT_KIND,
-		  NULL, tup, fstd->fp[0].bpi, 
-                  falign->fp[0], NO_ORDER,
-		  fcnv, fstd->fp[0].order,
-	          fstd->fp[0].format, FALSE, FALSE);
+    for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
+        {btyp = SC_type_name(ifp + SC_FLOAT_I);
+         styp = SC_type_name(ifp + SC_FLOAT_COMPLEX_I);
 
-    tup = _PD_make_tuple("double", 2, NULL);
-    _PD_defstr_in(chart, "double_complex", FLOAT_KIND,
-		  NULL, tup, fstd->fp[1].bpi, 
-                  falign->fp[1], NO_ORDER,
-		  dcnv, fstd->fp[1].order,
-	          fstd->fp[1].format, FALSE, FALSE);
-
-    tup = _PD_make_tuple("long_double", 2, NULL);
-    _PD_defstr_in(chart, "long_double_complex", FLOAT_KIND,
-		  NULL, tup, fstd->fp[2].bpi, 
-                  falign->fp[2], NO_ORDER,
-		  qcnv, fstd->fp[2].order,
-	          fstd->fp[2].format, FALSE, FALSE);
+	 tup = _PD_make_tuple(btyp, 2, NULL);
+	 _PD_defstr_in(chart, styp, FLOAT_KIND,
+		       NULL, tup, fstd->fp[ifp].bpi, 
+		       falign->fp[ifp], NO_ORDER,
+		       fcnv[ifp], fstd->fp[ifp].order,
+		       fstd->fp[ifp].format, FALSE, FALSE);};
 
     return;}
 
@@ -973,9 +910,9 @@ void _PD_def_real(char *type, PDBfile *file)
     if (strcmp(type, PDBFILE_S) == 0)
        {PD_typedef_primitive_types(file);
 	if (sizeof(REAL) == sizeof(double))
-	   PD_typedef(file, "double", "REAL");
+	   PD_typedef(file, SC_DOUBLE_S, "REAL");
         else
-	   PD_typedef(file, "float", "REAL");};
+	   PD_typedef(file, SC_FLOAT_S, "REAL");};
 
     return;}
 

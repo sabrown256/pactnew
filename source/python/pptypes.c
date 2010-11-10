@@ -1127,7 +1127,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     
     descr = PP_make_descr(
         PP_INT_I,                       /* typecode */
-        SC_INTEGER_S,                   /* type */
+        SC_INT_S,                   /* type */
         sizeof(int)                     /* bpi */
         );
 
@@ -1145,7 +1145,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
 
 #if 0
 -    entry =
--        PP_make_type_entry(SC_INTEGER_S, SC_INTEGER_P_S, sizeof(int),
+-        PP_make_type_entry(SC_INT_S, SC_INT_P_S, sizeof(int),
 -                               &PyInt_Type,
 -                               NULL, NULL, PP_INT_I, FALSE,
 -                               new_int_object,

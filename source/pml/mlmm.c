@@ -473,7 +473,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
     if (inftype == NULL)
        inftype = SC_PCONS_P_S;
 
-    SC_CHANGE_VALUE_ALIST(info, int, SC_INTEGER_P_S, "COPY-MEMORY", cp);
+    SC_CHANGE_VALUE_ALIST(info, int, SC_INT_P_S, "COPY-MEMORY", cp);
 
     inf = (void *) info;
 
@@ -1615,18 +1615,20 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
                 if (SC_LAST_CHAR(bf) == '*')
                    SC_LAST_CHAR(bf) = '\0';
 
-                if (strncmp(SC_INTEGER_S, bf, 3) == 0)
+                if (strncmp(SC_INT_S, bf, 3) == 0)
 	           {pi  = SC_VA_ARG(int *);
                     *pi = *(int *) asc->cdr;}
-                else if (strcmp(SC_STRING_S, bf) == 0)
-	           {ps  = SC_VA_ARG(char **);
-                    *ps = (char *) asc->cdr;}
+
                 else if (strcmp(SC_DOUBLE_S, bf) == 0)
 	           {pd  = SC_VA_ARG(double *);
                     *pd = *(double *) asc->cdr;}
                 else if (strcmp(SC_FLOAT_S, bf) == 0)
 	           {pf  = SC_VA_ARG(float *);
                     *pf = *(float *) asc->cdr;}
+
+                else if (strcmp(SC_STRING_S, bf) == 0)
+	           {ps  = SC_VA_ARG(char **);
+                    *ps = (char *) asc->cdr;}
                 else if (strcmp(SC_CHAR_S, bf) == 0)
 	           {pc  = SC_VA_ARG(char *);
                     *pc = *(char *) asc->cdr;};};}
@@ -1724,7 +1726,7 @@ pcons *PM_map_info_alist(PM_map_info *ti)
 
     pi  = FMAKE(int, "PM_MAP_INFO_ALIST:pi");
     *pi = ti->centering;
-    inf = SC_add_alist(inf, "CENTERING", "int *", (void *) pi);
+    inf = SC_add_alist(inf, "CENTERING", SC_INT_P_S, (void *) pi);
 
     return(inf);}
 

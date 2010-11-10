@@ -75,7 +75,7 @@ static object *_SXI_quit(object *arg)
    {int rv;
 
     SS_args(arg,
-            SC_INTEGER_I, &rv,
+            SC_INT_I, &rv,
             0);
 
     SX_quit(rv);
@@ -636,7 +636,7 @@ object *SX_plane(object *argl)
 		 SC_DOUBLE_I, pc++,
 		 SC_DOUBLE_I, &xmn,
 		 SC_DOUBLE_I, &xmx,
-		 SC_INTEGER_I, pm++,
+		 SC_INT_I, pm++,
 		 SC_DOUBLE_I, &ratio[i],
 		 0);
 	 *px++ = xmn;
@@ -761,7 +761,7 @@ static PM_mapping *_SXI_filter_coef(PM_mapping *h, object *argl)
     ntimes = 1;
     SS_args(argl,
             G_NUM_ARRAY, &arr,
-	    SC_INTEGER_I, &ntimes,
+	    SC_INT_I, &ntimes,
 	    0);
 
     SX_filter_coeff(x[1], n, arr, ntimes);
@@ -784,8 +784,8 @@ static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
     pts    = 3;
     ntimes = 1;
     SS_args(argl,
-	    SC_INTEGER_I, &pts,
-	    SC_INTEGER_I, &ntimes,
+	    SC_INT_I, &pts,
+	    SC_INT_I, &ntimes,
 	    0);
 
     if (SC_str_icmp(SX_smooth_method, "fft") == 0)

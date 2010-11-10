@@ -75,11 +75,11 @@ int PM_set_opers(PM_set *set)
 
 	if (token == NULL)
 	   ret = FALSE;
-	else if (strcmp(token, "double") == 0)
+	else if (strcmp(token, SC_DOUBLE_S) == 0)
 	   set->opers = PM_REAL_Opers;
-	else if (strncmp(token, "int", 3) == 0)
+	else if (strncmp(token, SC_INT_S, 3) == 0)
 	   set->opers = PM_Int_Opers;
-	else if (strcmp(token, "long") == 0)
+	else if (strcmp(token, SC_LONG_S) == 0)
 	   set->opers = PM_Long_Opers;
 	else
 	   ret = FALSE;};

@@ -729,7 +729,7 @@ static object *_SSI_check_objects(object *obj)
 
     kind = -1;
     SS_args(obj,
-	    SC_INTEGER_I, &kind,
+	    SC_INT_I, &kind,
 	    0);
 
     nm = 0L;
@@ -994,12 +994,12 @@ static object *_SSI_time(void)
 /* make the month right */
     loct->tm_mon++;
 
-    o = SS_make_list(SC_INTEGER_I, &loct->tm_year,
-		     SC_INTEGER_I, &loct->tm_mon,
-		     SC_INTEGER_I, &loct->tm_mday,
-		     SC_INTEGER_I, &loct->tm_hour,
-		     SC_INTEGER_I, &loct->tm_min,
-		     SC_INTEGER_I, &loct->tm_sec,
+    o = SS_make_list(SC_INT_I, &loct->tm_year,
+		     SC_INT_I, &loct->tm_mon,
+		     SC_INT_I, &loct->tm_mday,
+		     SC_INT_I, &loct->tm_hour,
+		     SC_INT_I, &loct->tm_min,
+		     SC_INT_I, &loct->tm_sec,
 		     0);
 
     return(o);}
@@ -1038,12 +1038,12 @@ static object *_SSI_etime(object *argl)
 	    0);
 
     SS_args(obj,
-	    SC_INTEGER_I, &ref.tm_year,
-	    SC_INTEGER_I, &ref.tm_mon,
-	    SC_INTEGER_I, &ref.tm_mday,
-	    SC_INTEGER_I, &ref.tm_hour,
-	    SC_INTEGER_I, &ref.tm_min,
-	    SC_INTEGER_I, &ref.tm_sec,
+	    SC_INT_I, &ref.tm_year,
+	    SC_INT_I, &ref.tm_mon,
+	    SC_INT_I, &ref.tm_mday,
+	    SC_INT_I, &ref.tm_hour,
+	    SC_INT_I, &ref.tm_min,
+	    SC_INT_I, &ref.tm_sec,
 	    0);
 
 /* make the month right */
@@ -1062,11 +1062,11 @@ static object *_SSI_etime(object *argl)
 	    {dt[i] = r / secsper[i];
 	     r    %= secsper[i];};
 
-	rv = SS_make_list(SC_INTEGER_I, &dt[0],
-			  SC_INTEGER_I, &dt[1],
-			  SC_INTEGER_I, &dt[2],
-			  SC_INTEGER_I, &dt[3],
-			  SC_INTEGER_I, &dt[4],
+	rv = SS_make_list(SC_INT_I, &dt[0],
+			  SC_INT_I, &dt[1],
+			  SC_INT_I, &dt[2],
+			  SC_INT_I, &dt[3],
+			  SC_INT_I, &dt[4],
 			  0);};
     return(rv);}
 

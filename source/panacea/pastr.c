@@ -110,7 +110,7 @@ void PA_set_member(char *name, void *data, char *member)
        {pd  = (double *) addr.memaddr;
         *pd = *(double *) data;}
 
-    else if (strcmp(type, SC_INTEGER_S) == 0)
+    else if (strcmp(type, SC_INT_S) == 0)
        {pi  = (int *) addr.memaddr;
         *pi = *(int *) data;}
 

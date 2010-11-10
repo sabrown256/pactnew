@@ -1180,24 +1180,29 @@ void daprint(pcons *alst)
             io_printf(stdout, "\t%s", ths->cdr);
 
 /* print the first value only */
-         else if (strncmp(ths->cdr_type, "int", 3) == 0)
+
+/* fixed point types */
+         else if (strncmp(ths->cdr_type, SC_INT_S, 3) == 0)
             io_printf(stdout, "\t%d", *(int *) ths->cdr);
 
-/* print the first value only */
-         else if (strncmp(ths->cdr_type, "short", 5) == 0)
+         else if (strncmp(ths->cdr_type, SC_SHORT_S, 5) == 0)
             io_printf(stdout, "\t%d", *(short *) ths->cdr);
 
-/* print the first value only */
-         else if (strncmp(ths->cdr_type, "long", 4) == 0)
+         else if (strncmp(ths->cdr_type, SC_LONG_S, 4) == 0)
             io_printf(stdout, "\t%ld", *(long *) ths->cdr);
 
-/* print the first value only */
-         else if (strncmp(ths->cdr_type, "double", 6) == 0)
+         else if (strncmp(ths->cdr_type, SC_LONG_LONG_S, 9) == 0)
+            io_printf(stdout, "\t%ld", *(long long *) ths->cdr);
+
+/* floating point types */
+         else if (strncmp(ths->cdr_type, SC_FLOAT_S, 5) == 0)
+            io_printf(stdout, "\t%g", *(float *) ths->cdr);
+
+         else if (strncmp(ths->cdr_type, SC_DOUBLE_S, 6) == 0)
             io_printf(stdout, "\t%g", *(double *) ths->cdr);
 
-/* print the first value only */
-         else if (strncmp(ths->cdr_type, "float", 5) == 0)
-            io_printf(stdout, "\t%g", *(float *) ths->cdr);
+         else if (strncmp(ths->cdr_type, SC_LONG_DOUBLE_S, 11) == 0)
+            io_printf(stdout, "\t%g", *(long double *) ths->cdr);
 
          io_printf(stdout, "\n");}
 

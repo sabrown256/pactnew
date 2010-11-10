@@ -713,14 +713,16 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 
 /* DHASH - debugging printout of names in hash array */
 
-void dhash(hasharr *ha, char *patt)
+void dhash(hasharr *ha, char *patt, int sort)
    {int i, n;
     char **lines;
 
     lines = SC_hasharr_dump(ha, patt, NULL, FALSE);
     if (lines != NULL)
        {SC_ptr_arr_len(n, lines);
-        SC_string_sort(lines, n);
+
+	if (sort == TRUE)
+	   SC_string_sort(lines, n);
 
         for (i = 0; i < n; i++)
             {if (lines[i] != NULL)

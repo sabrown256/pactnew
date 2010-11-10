@@ -389,19 +389,14 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
     ifx = -1;
     ifp = -1;
 
-    if (ityp == SC_SHORT_I)
-       ifx = 0;
-    else if (ityp == SC_INTEGER_I)
-       ifx = 1;
-    else if (ityp == SC_LONG_I)
-       ifx = 2;
-    else if (ityp == SC_BIGINT_I)
-       ifx = 3;
+    if ((SC_SHORT_I <= ityp) && (ityp <= SC_LONG_LONG_I))
+       ifx = ityp - SC_SHORT_I;
 
-    else if (ityp == SC_FLOAT_I)
-       ifp = 0;
-    else if (ityp == SC_DOUBLE_I)
-       ifp = 1;
+    else if ((SC_FLOAT_I <= ityp) && (ityp <= SC_LONG_DOUBLE_I))
+       ifp = ityp - SC_FLOAT_I;
+
+    else if ((SC_FLOAT_COMPLEX_I <= ityp) && (ityp <= SC_LONG_DOUBLE_COMPLEX_I))
+       ifp = ityp - SC_FLOAT_COMPLEX_I;
 
     else
        {snprintf(pa->err, MAXLINE,

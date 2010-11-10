@@ -228,8 +228,8 @@ void PA_def_var(char *vname, char *vtype, void *viv,
         int itype;
 
 	itype = 0;
-        if (strncmp(vtype, SC_INTEGER_S, 3) == 0)
-           itype = SC_INTEGER_I;
+        if (strncmp(vtype, SC_INT_S, 3) == 0)
+           itype = SC_INT_I;
         else if (strcmp(vtype, SC_DOUBLE_S) == 0)
            itype = SC_DOUBLE_I;
         else if (strcmp(vtype, "REAL") == 0)
@@ -474,8 +474,8 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
     _PA_install_var(vname, pp);
 
     itype = 0;
-    if (strcmp(vtype, SC_INTEGER_S) == 0)
-       itype = SC_INTEGER_I;
+    if (strcmp(vtype, SC_INT_S) == 0)
+       itype = SC_INT_I;
     else if (strcmp(vtype, SC_DOUBLE_S) == 0)
        itype = SC_DOUBLE_I;
     else if (strcmp(vtype, SC_CHAR_S) == 0)

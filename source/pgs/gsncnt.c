@@ -1194,8 +1194,8 @@ static PM_set *_PG_make_surface_set(itf_array *ifs, int no, int it)
 
     surface->info = SC_append_alist(surface->info, SC_copy_alist(iri->alist));
     PG_set_attrs_set(surface,
-/*		     "DRAW-AXIS",  SC_INTEGER_I, FALSE, FALSE, */
-		     "LINE-COLOR", SC_INTEGER_I, FALSE, no+4,
+/*		     "DRAW-AXIS",  SC_INT_I, FALSE, FALSE, */
+		     "LINE-COLOR", SC_INT_I, FALSE, no+4,
 		     "PALETTE",    SC_CHAR_I,    TRUE,  pclr,
 		     NULL);
 
@@ -2005,7 +2005,7 @@ void _PG_iso_nc_lr_3d(PG_device *dev, double *a,
 
 /* extract some needed info */
     PG_get_attrs_alist(alist,
-		       "PLOT-TYPE", SC_INTEGER_I, &pty, PLOT_WIRE_MESH,
+		       "PLOT-TYPE", SC_INT_I, &pty, PLOT_WIRE_MESH,
 		       NULL);
 
 /* parallel controls */

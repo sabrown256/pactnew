@@ -296,8 +296,8 @@ _PA_print_alist_node(char *type, void *data)
     printf("NULL\t(%s)", type);
   } else {
     switch (itype) {
-    case SC_INTEGER_I:
-    case SC_INTEGER_P_I:
+    case SC_INT_I:
+    case SC_INT_P_I:
       i = *(int *) data;
       printf("%d\t(%s)", i, type);
       break;

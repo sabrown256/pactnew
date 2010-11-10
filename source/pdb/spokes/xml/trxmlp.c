@@ -250,7 +250,7 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 	     l = SC_strtol(pb, &pe, 10);
 	     if (pe == pb)
 	        ok = FALSE;};
-        type = "long";};
+        type = SC_LONG_S;};
 
 /* check for doubles */
     if (ok == FALSE)
@@ -263,11 +263,11 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 	     d = SC_strtod(pb, &pe);
 	     if (pe == pb)
 	        ok = FALSE;};
-        type = "double";};
+        type = SC_DOUBLE_S;};
 
 /* otherwise it is char */
     if (ok == FALSE)
-       {type = "char";
+       {type = SC_CHAR_S;
 	ni   = strlen(s);};
 
     type = SC_strsavef(type, "char*:_XML_ENTRY_INFO:type");

@@ -58,25 +58,25 @@ void _SQL_init_types(PDBfile *file)
    {
 
 /* character types */
-    PD_typedef(file, "char", "character");
-    PD_typedef(file, "char", "character varying");
-    PD_typedef(file, "char", "varchar");
-    PD_typedef(file, "char", "national character");
-    PD_typedef(file, "char", "nchar");
-    PD_typedef(file, "char", "national character varying");
-    PD_typedef(file, "char", "nvarchar");
+    PD_typedef(file, SC_CHAR_S, "character");
+    PD_typedef(file, SC_CHAR_S, "character varying");
+    PD_typedef(file, SC_CHAR_S, "varchar");
+    PD_typedef(file, SC_CHAR_S, "national character");
+    PD_typedef(file, SC_CHAR_S, "nchar");
+    PD_typedef(file, SC_CHAR_S, "national character varying");
+    PD_typedef(file, SC_CHAR_S, "nvarchar");
 
 /* integer types */
-    PD_typedef(file, "short",  "smallint");
-    PD_typedef(file, "BIGINT", "bigint");
-    PD_typedef(file, "int",    "serial");
-    PD_typedef(file, "BIGINT", "bigserial");
+    PD_typedef(file, SC_SHORT_S,     "smallint");
+    PD_typedef(file, SC_INT_S,       "serial");
+    PD_typedef(file, SC_LONG_LONG_S, "bigint");
+    PD_typedef(file, SC_LONG_LONG_S, "bigserial");
 
 /* floating point types */
-    PD_typedef(file, "float",  "real");
-    PD_typedef(file, "double", "double precision");
-    PD_typedef(file, "double", "numeric");
-    PD_typedef(file, "double", "decimal");
+    PD_typedef(file, SC_FLOAT_S,  "real");
+    PD_typedef(file, SC_DOUBLE_S, "double precision");
+    PD_typedef(file, SC_DOUBLE_S, "numeric");
+    PD_typedef(file, SC_DOUBLE_S, "decimal");
 
 /* time/date types */
 #if 1
@@ -135,7 +135,7 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
 /* get size for character types */
     dp = PD_inquire_type(file, bs);
     nb = SC_stoi(p);
-    if (strcmp(dp->type, "char") != 0)
+    if (strcmp(dp->type, SC_CHAR_S) != 0)
        nb = 1;
 
     nd = _PD_mk_dimensions(defoff, nb);
@@ -199,19 +199,19 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
 	snprintf(qu, MAX_BFSZ, "create table %s\n(", type);
 
 	for (desc = dp->members; desc != NULL; desc = desc->next)
-            {if (strncmp(desc->type, "int", 3) == 0)
+            {if (strncmp(desc->type, SC_INT_S, 3) == 0)
 		snprintf(mbr, MAXLINE, "%s integer,\n", desc->name);
 
-	      else if (strcmp(desc->type, "short") == 0)
+	      else if (strcmp(desc->type, SC_SHORT_S) == 0)
 		snprintf(mbr, MAXLINE, "%s smallint,\n", desc->name);
 
-	      else if (strcmp(desc->type, "BIGINT") == 0)
+	      else if (strcmp(desc->type, SC_LONG_LONG_S) == 0)
 		snprintf(mbr, MAXLINE, "%s bigint,\n", desc->name);
 
-	      else if (strcmp(desc->type, "float") == 0)
+	      else if (strcmp(desc->type, SC_FLOAT_S) == 0)
 		snprintf(mbr, MAXLINE, "%s real,\n", desc->name);
 
-	      else if (strcmp(desc->type, "double") == 0)
+	      else if (strcmp(desc->type, SC_DOUBLE_S) == 0)
 		snprintf(mbr, MAXLINE, "%s double precision,\n", desc->name);
 
 	      else if (strcmp(desc->type, "date") == 0)
@@ -229,7 +229,7 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
 	      else if (strcmp(desc->type, "interval") == 0)
 		snprintf(mbr, MAXLINE, "%s interval,\n", desc->name);
 
-	      else if (strncmp(desc->type, "char", 4) == 0)
+	      else if (strncmp(desc->type, SC_CHAR_S, 4) == 0)
 		snprintf(mbr, MAXLINE, "%s varchar(%ld),\n",
 			 desc->name, desc->number);
 

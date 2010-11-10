@@ -88,7 +88,7 @@ static object *_SSI_vctref(object *argl)
     i   = -1;
     SS_args(argl,
 	    SS_VECTOR_I,  &vct,
-	    SC_INTEGER_I, &i,
+	    SC_INT_I, &i,
 	    0);
 
     n  = vct->length;
@@ -116,7 +116,7 @@ static object *_SSI_vctset(object *argl)
     val = SS_null;
     SS_args(argl,
 	    SS_VECTOR_I,  &vct,
-	    SC_INTEGER_I, &i,
+	    SC_INT_I, &i,
 	    SS_OBJECT_I,  &val,
 	    0);
 
@@ -239,7 +239,7 @@ static object *_SSI_sleep(object *obj)
 
     n = 0;
     SS_args(obj,
-            SC_INTEGER_I, &n,
+            SC_INT_I, &n,
             0);
 
     SC_sleep(n);
@@ -407,7 +407,7 @@ static object *_SSI_print_env(object *obj)
 
     n = 0;
     SS_args(obj,
-            SC_INTEGER_I, &n,
+            SC_INT_I, &n,
             0);
 
     penv = SS_Env;
@@ -430,7 +430,7 @@ static object *_SSI_get_pname(object *obj)
 
     id = -1;
     SS_args(obj,
-            SC_INTEGER_I, &id,
+            SC_INT_I, &id,
             0);
 
     rv = SC_get_pname(path, PATH_MAX, id);
@@ -575,9 +575,9 @@ static object *_SSI_mem_usg(void)
 
     SC_mem_stats(&a, &f, &d, NULL);
 
-    ret = SS_make_list(SC_INTEGER_I, &a,
-		       SC_INTEGER_I, &f,
-		       SC_INTEGER_I, &d,
+    ret = SS_make_list(SC_INT_I, &a,
+		       SC_INT_I, &f,
+		       SC_INT_I, &d,
 		       0);
 
     return(ret);}
@@ -617,8 +617,8 @@ static object *_SSI_mem_monitor(object *arg)
     lev = 0;
     s   = "scheme";
     SS_args(arg,
-            SC_INTEGER_I, &old,
-            SC_INTEGER_I, &lev,
+            SC_INT_I, &old,
+            SC_INT_I, &lev,
             SC_STRING_I, &s,
             0);
 
@@ -661,9 +661,9 @@ static object *_SSI_mem_chk(void)
     na = SC_mem_chk(1);
     nf = SC_mem_chk(2);
     nr = SC_mem_chk(4);
-    o  = SS_make_list(SC_INTEGER_I, &na,
-		      SC_INTEGER_I, &nf,
-		      SC_INTEGER_I, &nr,
+    o  = SS_make_list(SC_INT_I, &na,
+		      SC_INT_I, &nf,
+		      SC_INT_I, &nr,
 		      0);
 
     return(o);}
@@ -703,7 +703,7 @@ static object *_SSI_attach(object *arg)
 
     pid = -1;
     SS_args(arg,
-	    SC_INTEGER_I, &pid,
+	    SC_INT_I, &pid,
 	    0);
 
     rv = SC_attach_dbg(pid);
@@ -725,8 +725,8 @@ static object *_SSI_retrace(object *arg)
     pid = -1;
     to  = -1;
     SS_args(arg,
-	    SC_INTEGER_I, &pid,
-	    SC_INTEGER_I, &to,
+	    SC_INT_I, &pid,
+	    SC_INT_I, &to,
 	    0);
 
     rv = SC_retrace_exe(NULL, pid, to);

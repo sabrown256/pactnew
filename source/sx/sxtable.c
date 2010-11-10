@@ -275,9 +275,9 @@ static object *_SXI_read_text_table(object *argl)
     nlabel = 0;
     SS_args(argl,
             SC_STRING_I, &name,
-            SC_INTEGER_I, &n,
-            SC_INTEGER_I, &nlabel,
-            SC_INTEGER_I, &nl,
+            SC_INT_I, &n,
+            SC_INT_I, &nlabel,
+            SC_INT_I, &nl,
             0);
 
     SX_table_name = SC_strsavef(name, "char*:_SXI_READ_TEXT_TABLE:tablename");
@@ -354,8 +354,8 @@ static object *_SXI_read_text_table(object *argl)
     _SX_table_n = n;
     _SX_table_ln = nl;
 
-    rv = SS_make_list(SC_INTEGER_I, &nr,
-		      SC_INTEGER_I, &nc,
+    rv = SS_make_list(SC_INT_I, &nr,
+		      SC_INT_I, &nc,
 		      0);
 
     return(rv);}
@@ -509,7 +509,7 @@ static PM_set *_SX_table_set(object *specs)
 	maxes = FMAKE_N(int, nd, "_SX_TABLE_SET:maxes");
 	for (i = 0; dims != SS_null; dims = SS_cdr(dims), i++)
 	    {SS_args(dims,
-		     SC_INTEGER_I, &dv,
+		     SC_INT_I, &dv,
 		     0);
 	     maxes[i] = dv;};
 
@@ -588,7 +588,7 @@ static object *_SXI_table_map(object *argl)
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &dmlst,
 	    SS_OBJECT_I, &rnlst,
-            SC_INTEGER_I, &centering,
+            SC_INT_I, &centering,
             0);
 
     domain = _SX_table_set(dmlst);
@@ -767,7 +767,7 @@ static object *SX_print_column(object *argl)
                  "\n Column %ld : %ld values\n\n",
                  col, nr);
 
-	rv = SS_make_list(SC_INTEGER_I, &nr,
+	rv = SS_make_list(SC_INT_I, &nr,
 			  0);};
 
     return(rv);}
@@ -855,8 +855,8 @@ static object *SX_delete_column(object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(SC_INTEGER_I, &nr,
-			  SC_INTEGER_I, &nc,
+	rv = SS_make_list(SC_INT_I, &nr,
+			  SC_INT_I, &nc,
 			  0);};
 
     return(rv);}
@@ -877,7 +877,7 @@ static object *SX_sort_on_column(object *argl)
 
     else
        {SS_args(argl,
-		SC_INTEGER_I, &col,
+		SC_INT_I, &col,
 		0);
 
 	PM_sort_on_col(SX_current_table, col);
@@ -890,8 +890,8 @@ static object *SX_sort_on_column(object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(SC_INTEGER_I, &nr,
-			  SC_INTEGER_I, &nc,
+	rv = SS_make_list(SC_INT_I, &nr,
+			  SC_INT_I, &nc,
 			  0);};
 
     return(rv);}
@@ -921,8 +921,8 @@ static object *SX_cnormalize_table(object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(SC_INTEGER_I, &nr,
-			  SC_INTEGER_I, &nc,
+	rv = SS_make_list(SC_INT_I, &nr,
+			  SC_INT_I, &nc,
 			  0);};
 
     return(rv);}

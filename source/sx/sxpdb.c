@@ -42,7 +42,7 @@ static void _SX_target(int data, int align)
        {while (PD_std_standards[data_max++]);
         if ((data < 1) || (data >= data_max))
            SS_error("UNKNOWN DATA STANDARD - _SX_TARGET",
-                    SS_mk_integer((BIGINT) data));};
+                    SS_mk_integer((long long) data));};
         
     if (align == 0)
        {if (REQ_ALIGNMENT != NULL)
@@ -51,7 +51,7 @@ static void _SX_target(int data, int align)
        {while (PD_std_alignments[align_max++]);
        if ((align < 1) || (align >= align_max))
           SS_error("UNKNOWN DATA ALIGNMENT - _SX_TARGET",
-                   SS_mk_integer((BIGINT) align));};
+                   SS_mk_integer((long long) align));};
 
     if (data != 0)
        REQ_STANDARD  = PD_std_standards[data - 1];
@@ -80,14 +80,14 @@ static object *_SXI_target(object *arg)
     align = 0;
 
     SS_args(arg,
-            SC_INTEGER_I, &data,
-            SC_INTEGER_I, &align,
+            SC_INT_I, &data,
+            SC_INT_I, &align,
             0);
 
     _SX_target(data, align);
 
-    o = SS_mk_cons(SS_mk_integer((BIGINT) data),
-		   SS_mk_integer((BIGINT) align));
+    o = SS_mk_cons(SS_mk_integer((long long) data),
+		   SS_mk_integer((long long) align));
 
     return(o);}
 
@@ -118,8 +118,8 @@ static object *_SXI_open_raw_file(object *argl)
             SC_STRING_I, &name,
             SC_STRING_I, &mode,
             SC_STRING_I, &type,
-            SC_INTEGER_I, &data,
-            SC_INTEGER_I, &align,
+            SC_INT_I, &data,
+            SC_INT_I, &align,
             0);
 
 /* if it is a UDL */
@@ -186,7 +186,7 @@ static object *_SXI_open_raw_file(object *argl)
 
 static object *_SXI_seek_raw_file(object *argl)
    {int whence, ret;
-    BIGINT addr;
+    long long addr;
     PDBfile *file;
     FILE *fp;
     g_file *po;
@@ -195,8 +195,8 @@ static object *_SXI_seek_raw_file(object *argl)
     whence = 0;
     SS_args(argl,
             G_FILE, &po,
-            SC_BIGINT_I, &addr,
-            SC_INTEGER_I, &whence,
+            SC_LONG_LONG_I, &addr,
+            SC_INT_I, &whence,
             0);
 
     if (po == NULL)
@@ -264,7 +264,7 @@ static object *_SXI_rd_raw(object *argl)
    {int ret;
     char *intype, *outtype;
     long nitems, ni;
-    BIGINT addr;
+    long long addr;
     void *vr;
     PDBfile *file;
     PD_smp_state *pa;
@@ -280,7 +280,7 @@ static object *_SXI_rd_raw(object *argl)
     if (SS_length(argl) > 4)
        SS_args(argl,
                G_FILE, &po,
-               SC_BIGINT_I, &addr,
+               SC_LONG_LONG_I, &addr,
                SC_LONG_I, &nitems,
                SC_STRING_I, &intype,
                SC_STRING_I, &outtype,
@@ -288,7 +288,7 @@ static object *_SXI_rd_raw(object *argl)
     else
        {SS_args(argl,
                 G_FILE, &po,
-                SC_BIGINT_I, &addr,
+                SC_LONG_LONG_I, &addr,
                 SC_LONG_I, &nitems,
                 SC_STRING_I, &intype,
                 0);
@@ -324,7 +324,7 @@ static object *_SXI_rd_raw(object *argl)
 		    argl);
 
 /* pad char arrays with 2 null characters - for printing and SC_firsttok */
-	if (strcmp(outtype, "char") == 0)
+	if (strcmp(outtype, SC_CHAR_S) == 0)
 	   vr = _PD_alloc_entry(file, outtype, nitems + 2L);
 	else
 	   vr = _PD_alloc_entry(file, outtype, nitems);
@@ -356,7 +356,7 @@ static object *_SXI_rd_raw(object *argl)
 static object *_SXI_wr_raw(object *argl)
    {int ret;
     long nitems;
-    BIGINT addr;
+    long long addr;
     char *intype, *outtype;
     void *vr;
     PDBfile *file;
@@ -373,7 +373,7 @@ static object *_SXI_wr_raw(object *argl)
        SS_args(argl,
                G_FILE, &po,
                SS_OBJECT_I, &obj,
-               SC_BIGINT_I, &addr,
+               SC_LONG_LONG_I, &addr,
                SC_LONG_I, &nitems,
                SC_STRING_I, &intype,
                SC_STRING_I, &outtype,
@@ -382,7 +382,7 @@ static object *_SXI_wr_raw(object *argl)
        {SS_args(argl,
                 G_FILE, &po,
                 SS_OBJECT_I, &obj,
-                SC_BIGINT_I, &addr,
+                SC_LONG_LONG_I, &addr,
                 SC_LONG_I, &nitems,
                 SC_STRING_I, &intype,
                 0);
@@ -655,7 +655,7 @@ static object *_SXI_collect_io_info(object *arg)
 
     wh = FALSE;
     SS_args(arg,
-            SC_INTEGER_I, &wh,
+            SC_INT_I, &wh,
             0);
 
     wh = SC_collect_io_info(wh);
@@ -806,7 +806,7 @@ static object *_SXI_entry_number(object *argl)
     if (name != NULL)
        {ep = _PD_effective_ep(file, name, TRUE, NULL);
         if (ep != NULL)
-	   obj = SS_mk_integer((BIGINT) PD_entry_number(ep));};
+	   obj = SS_mk_integer((long long) PD_entry_number(ep));};
 
     return(obj);}
 
@@ -885,8 +885,8 @@ static object *_SXI_file_content(object *argl)
     SS_args(argl,
             G_FILE, &po,
             SS_OBJECT_I, &fout,
-	    SC_INTEGER_I, &vers,
-	    SC_INTEGER_I, &chrt,
+	    SC_INT_I, &vers,
+	    SC_INT_I, &chrt,
             0);
 
     if (po == NULL)
@@ -916,11 +916,11 @@ static object *_SXI_file_content(object *argl)
  *                -    virtual-internal (int)      - whether file is "internal"
  *                -    system-version (int)        - PDB system version
  *                -    major-order (int)           - major order for indexes
- *                -    header-address (BIGINT)      - address of header info
- *                -    chart-address (BIGINT)       - address of structure chart
- *                -    symbol-table-address (BIGINT)- address of symbol table
+ *                -    header-address (long long)      - address of header info
+ *                -    chart-address (long long)       - address of structure chart
+ *                -    symbol-table-address (long long)- address of symbol table
  *                -    date (char *)               - file creation date
- *                -    maximum_size (BIGINT)        - threshold for new file
+ *                -    maximum_size (long long)        - threshold for new file
  *                -    previous_file (char *)      - previous file in family
  */
 
@@ -952,42 +952,42 @@ static object *_SXI_file_info(object *argl)
 	fp = file->stream;
 
         if (fp != NULL)
-           obj = SS_mk_integer((BIGINT) lio_tell(fp));
+           obj = SS_mk_integer((long long) lio_tell(fp));
         else
-           obj = SS_mk_integer((BIGINT) -1);}
+           obj = SS_mk_integer((long long) -1);}
 
     else if (strcmp(name, "name") == 0)
        obj = SS_mk_string(file->name);
 
     else if (strcmp(name, "mode") == 0)
-       obj = SS_mk_integer((BIGINT) file->mode);    
+       obj = SS_mk_integer((long long) file->mode);    
 
     else if (strcmp(name, "default-offset") == 0)
-       obj = SS_mk_integer((BIGINT) file->default_offset);    
+       obj = SS_mk_integer((long long) file->default_offset);    
 
     else if (strcmp(name, "flushed") == 0)
-       obj = SS_mk_integer((BIGINT) file->flushed);    
+       obj = SS_mk_integer((long long) file->flushed);    
 
     else if (strcmp(name, "virtual-internal") == 0)
-       obj = SS_mk_integer((BIGINT) file->virtual_internal);    
+       obj = SS_mk_integer((long long) file->virtual_internal);    
 
     else if (strcmp(name, "system-version") == 0)
-       obj = SS_mk_integer((BIGINT) file->system_version);    
+       obj = SS_mk_integer((long long) file->system_version);    
 
     else if (strcmp(name, "major-order") == 0)
-       obj = SS_mk_integer((BIGINT) file->major_order);    
+       obj = SS_mk_integer((long long) file->major_order);    
 
     else if (strcmp(name, "maximum-size") == 0)
-       obj = SS_mk_integer((BIGINT) file->maximum_size);    
+       obj = SS_mk_integer((long long) file->maximum_size);    
 
     else if (strcmp(name, "header-address") == 0)
-       obj = SS_mk_integer((BIGINT) file->headaddr);
+       obj = SS_mk_integer((long long) file->headaddr);
 
     else if (strcmp(name, "chart-address") == 0)
-       obj = SS_mk_integer((BIGINT) file->chrtaddr);    
+       obj = SS_mk_integer((long long) file->chrtaddr);    
 
     else if (strcmp(name, "symbol-table-address") == 0)
-       obj = SS_mk_integer((BIGINT) file->symtaddr);    
+       obj = SS_mk_integer((long long) file->symtaddr);    
 
     else if (strcmp(name, "date") == 0)
        obj = SS_mk_string(file->date);    
@@ -996,7 +996,7 @@ static object *_SXI_file_info(object *argl)
        obj = SS_mk_string(file->previous_file);    
 
     else if (strcmp(name, "track-pointers") == 0)
-       obj = SS_mk_integer((BIGINT) file->track_pointers);    
+       obj = SS_mk_integer((long long) file->track_pointers);    
 
     else
        obj = SS_null;
@@ -1017,7 +1017,7 @@ static object *_SXI_default_offset(object *arg)
     po = NULL;
     nargs = SS_args(arg,
                     G_FILE, &po,
-                    SC_INTEGER_I, &offset,
+                    SC_INT_I, &offset,
                     0);
 
     if (po == NULL)
@@ -1028,7 +1028,7 @@ static object *_SXI_default_offset(object *arg)
     if (nargs >= 2)
        file->default_offset = offset;
 
-    o = SS_mk_integer((BIGINT) file->default_offset);
+    o = SS_mk_integer((long long) file->default_offset);
 
     return(o);}
 
@@ -1061,7 +1061,7 @@ static object *_SXI_major_order(object *arg)
         else
            file->major_order = COLUMN_MAJOR_ORDER;};
 
-    o = SS_mk_integer((BIGINT) file->major_order);
+    o = SS_mk_integer((long long) file->major_order);
 
     return(o);}
 
@@ -1096,7 +1096,7 @@ static object *_SXI_file_mode(object *arg)
         else
            file->mode = PD_APPEND;}
 
-    o = SS_mk_integer((BIGINT) file->mode);
+    o = SS_mk_integer((long long) file->mode);
 
     return(o);}
 
@@ -1114,9 +1114,9 @@ object *_SX_pdbfile_to_list(PDBfile *file)
    {object *obj, *obj1;
 
     obj = SS_null;
-    obj = SS_mk_cons(SS_mk_integer((BIGINT) file->chrtaddr), obj);
-    obj = SS_mk_cons(SS_mk_integer((BIGINT) file->symtaddr), obj);
-    obj = SS_mk_cons(SS_mk_integer((BIGINT) file->headaddr), obj);
+    obj = SS_mk_cons(SS_mk_integer((long long) file->chrtaddr), obj);
+    obj = SS_mk_cons(SS_mk_integer((long long) file->symtaddr), obj);
+    obj = SS_mk_cons(SS_mk_integer((long long) file->headaddr), obj);
 
     obj1 = SS_mk_hasharr(file->chart);
     SS_UNCOLLECT(obj1);
@@ -1143,7 +1143,7 @@ object *_SX_syment_to_list(syment *ep)
    {object *obj;
 
     obj = _SX_make_dims_obj(PD_entry_dimensions(ep));
-    obj = SS_mk_cons(SS_mk_integer((BIGINT) PD_entry_address(ep)), obj);
+    obj = SS_mk_cons(SS_mk_integer((long long) PD_entry_address(ep)), obj);
     obj = SS_mk_cons(SS_mk_string(PD_entry_type(ep)), obj);
 
     return(obj);}
@@ -1190,7 +1190,7 @@ static object *_SX_memdes_to_list(memdes *mp)
 
     obj = SS_make_list(SC_STRING_I, mp->type,
                        SC_STRING_I, mp->name,
-                       SC_INTEGER_I, &mp->number,
+                       SC_INT_I, &mp->number,
                        SS_OBJECT_I, _SX_make_dims_obj(mp->dimensions),
                        0);
 
@@ -1698,7 +1698,7 @@ static object *_SXI_def_prim(object *argl)
                 SC_STRING_I, &name,
                 SC_STRING_I, &type,
                 SC_LONG_I, &bytespitem,
-                SC_INTEGER_I, &align,
+                SC_INT_I, &align,
                 0);
 
     if ((po == NULL) || (po == SX_gvif))
@@ -1779,9 +1779,9 @@ static object *_SXI_chg_prim(object *argl)
 
     n = SS_args(argl,
                 G_FILE, &po,
-                SC_INTEGER_I, &ityp,
-                SC_INTEGER_I, &nb,
-                SC_INTEGER_I, &align,
+                SC_INT_I, &ityp,
+                SC_INT_I, &nb,
+                SC_INT_I, &align,
                 SS_OBJECT_I, &ord,
                 SC_LONG_I, fmt + 0,
                 SC_LONG_I, fmt + 1,
@@ -2191,7 +2191,7 @@ static object *_SXI_rd_syment(object *argl)
 
 static SC_array *_SX_make_blocks(object *alst, long numb)
    {int i, n;
-    BIGINT addr, ni, tot;
+    long long addr, ni, tot;
     SC_array *bl;
 
     bl = NULL;
@@ -2203,7 +2203,7 @@ static SC_array *_SX_make_blocks(object *alst, long numb)
         tot = 0L;
         for (i = 0; i < n; i++)
             {SS_args(alst,
-                     SC_BIGINT_I, &addr,
+                     SC_LONG_LONG_I, &addr,
                      SC_LONG_I, &ni,
                      0);
 	     _PD_block_set_desc(addr, ni, bl, i);
@@ -2220,7 +2220,7 @@ static SC_array *_SX_make_blocks(object *alst, long numb)
        {bl = _PD_block_make(1);
 
 	SS_args(alst,
-		SC_BIGINT_I, &addr,
+		SC_LONG_LONG_I, &addr,
 		0);
 
 	_PD_block_set_desc(addr, 1, bl, 0);};
@@ -2871,7 +2871,7 @@ static object *_SXI_wrt_ultra_curve(object *argl)
             G_NUM_ARRAY, &xarr,
             G_NUM_ARRAY, &yarr,
             SC_STRING_I, &labl,
-            SC_INTEGER_I, &npts,
+            SC_INT_I, &npts,
             0);
 
     if (po == NULL)
@@ -2905,7 +2905,7 @@ static object *_SXI_sizeof(object *argl)
     SS_args(argl,
             SC_STRING_I, &type,
             G_FILE, &po,
-            SC_INTEGER_I, &flg,
+            SC_INT_I, &flg,
             0);
 
     if (po == NULL)
@@ -2918,7 +2918,7 @@ static object *_SXI_sizeof(object *argl)
     else
        bytespitem = _PD_lookup_size(type, file->chart);
 
-    o = SS_mk_integer((BIGINT) bytespitem);
+    o = SS_mk_integer((long long) bytespitem);
 
     return(o);}
 
@@ -2964,7 +2964,7 @@ static object *_SX_write_pdb(FILE *f0, object *argl)
              pp   = SS_GET(g_pdbdata, obj);
 	     iarr = NULL;
 	     SS_args(argl,
-		     SC_INTEGER_I, &PD_tolerance,
+		     SC_INT_I, &PD_tolerance,
 		     G_NUM_ARRAY, &iarr,
 		     0);
 
@@ -3126,8 +3126,8 @@ object *_SX_make_dims_obj(dimdes *dims)
 
     else
        {for (obj = SS_null; dims != NULL; dims = dims->next)
-	    obj = SS_mk_cons(SS_mk_cons(SS_mk_integer((BIGINT) dims->index_min), 
-					SS_mk_integer((BIGINT) dims->index_max)),
+	    obj = SS_mk_cons(SS_mk_cons(SS_mk_integer((long long) dims->index_min), 
+					SS_mk_integer((long long) dims->index_max)),
 			     obj);
 
 	o = SS_reverse(obj);};
@@ -3264,8 +3264,8 @@ static object *_SXI_set_switch(object *argl)
     indx = -1;
     val  = -1;
     SS_args(argl,
-            SC_INTEGER_I, &indx,
-            SC_INTEGER_I, &val,
+            SC_INT_I, &indx,
+            SC_INT_I, &val,
             0);
 
     if (indx < 0)
@@ -3288,7 +3288,7 @@ static object *_SXI_set_buffer_size(object *argl)
 
     v = -1;
     SS_args(argl,
-            SC_INTEGER_I, &v,
+            SC_INT_I, &v,
             0);
 
     PD_set_buffer_size(v);
@@ -3301,7 +3301,7 @@ static object *_SXI_set_buffer_size(object *argl)
 /* _SXI_GET_BUFFER_SIZE - get the buffer_size */
 
 static object *_SXI_get_buffer_size(void)
-   {BIGINT v;
+   {long long v;
     object *o;
 
     v = PD_get_buffer_size();
@@ -3337,7 +3337,7 @@ static object *_SXI_set_max_size(object *argl)
     v  = -1;
     SS_args(argl,
             G_FILE, &po,
-            SC_INTEGER_I, &v,
+            SC_INT_I, &v,
             0);
 
     if (po == NULL)
@@ -3363,7 +3363,7 @@ static object *_SXI_set_track_pointers(object *argl)
     v  = -1;
     SS_args(argl,
             G_FILE, &po,
-            SC_INTEGER_I, &v,
+            SC_INT_I, &v,
             0);
 
     if (po == NULL)
@@ -3401,7 +3401,7 @@ static object *_SXI_set_activate_checksum(object *argl)
 
     rv = PD_activate_cksum(file, v);
 
-    ov = SS_mk_integer((BIGINT) rv);
+    ov = SS_mk_integer((long long) rv);
 
     return(ov);}
 
@@ -3479,61 +3479,72 @@ static object *_SXI_set_format(object *argl)
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(i+2, format, 3);
+	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(i+2, format, 1);
+	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(i+2, format, 2);
+	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 2);
 	     ok = TRUE;};};
 
+/* real floating point types */
     for (i = 0; (i < PD_N_PRIMITIVE_FP) && (ok == FALSE); i++)
         {typ = fptypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(i+6, format, 3);
+	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(i+6, format, 1);
+	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(i+6, format, 2);
+	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 2);
 	     ok = TRUE;};};
 
+/* complex floating point types */
     for (i = 0; (i < PD_N_PRIMITIVE_FP) && (ok == FALSE); i++)
         {typ = cmtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(i+9, format, 3);
+	    {rv = _SX_set_user_format(i+SC_FLOAT_COMPLEX_I, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(i+9, format, 1);
+	    {rv = _SX_set_user_format(i+SC_FLOAT_COMPLEX_I, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(i+9, format, 2);
+	    {rv = _SX_set_user_format(i+SC_FLOAT_COMPLEX_I, format, 2);
 	     ok = TRUE;};};
 
     if (ok == FALSE)
-       {if (strcmp(field, "char") == 0)
-	   rv = _SX_set_user_format(0, format, 3);
+       {if (strcmp(field, SC_CHAR_S) == 0)
+	   rv = _SX_set_user_format(SC_CHAR_I, format, 3);
 
         else if (strcmp(field, "char1") == 0)
-	   rv = _SX_set_user_format(0, format, 1);
+	   rv = _SX_set_user_format(SC_CHAR_I, format, 1);
 
 	else if (strcmp(field, "char2") == 0)
-	   rv = _SX_set_user_format(0, format, 2);
+	   rv = _SX_set_user_format(SC_CHAR_I, format, 2);
+
+	else if (strcmp(field, SC_BOOL_S) == 0)
+	   rv = _SX_set_user_format(SC_BOOL_I, format, 3);
+
+        else if (strcmp(field, "bool1") == 0)
+	   rv = _SX_set_user_format(SC_BOOL_I, format, 1);
+
+	else if (strcmp(field, "bool2") == 0)
+	   rv = _SX_set_user_format(SC_BOOL_I, format, 2);
 
 	else if (strcmp(field, "user-int") == 0)
-	   rv = _SX_set_user_format(1, format, 3);
+	   rv = _SX_set_user_format(SC_BIT_I, format, 3);
 
 	else if (strcmp(field, "suppress-member") == 0)
 	   {if (PD_no_print_member != NULL)
@@ -3542,14 +3553,7 @@ static object *_SXI_set_format(object *argl)
 					     "char*:_SXI_SET_FORMAT:npm");}
 
 	else if (strcmp(field, "default") == 0)
-	   {for (i = 0; i < 6; i++)
-	        {if (PD_user_formats1[i] != NULL)
-		    {SFREE(PD_user_formats1[i]);};
-		 if (PD_user_formats2[i] != NULL)
-		    {SFREE(PD_user_formats2[i]);};};
-
-	    if (PD_no_print_member != NULL)
-	       {SFREE(PD_no_print_member);};}
+	   _PD_set_user_defaults();
 
 	else
 	   SS_error("UNKNOWN TYPE - _SXI_SET_FORMAT", argl);};
@@ -3610,9 +3614,9 @@ static object *_SXI_unp_bitstrm(object *argl)
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SC_LONG_I, &nitems,
-            SC_INTEGER_I, &nbits,
-            SC_INTEGER_I, &padsz,
-            SC_INTEGER_I, &fpp,
+            SC_INT_I, &nbits,
+            SC_INT_I, &padsz,
+            SC_INT_I, &fpp,
             SC_LONG_I, &offs,
             0);
 

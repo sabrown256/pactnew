@@ -29,7 +29,7 @@ static object *_SS_exa_var(void *vr, int type)
 	   PRINT(stdout, "    %c", cv);
 	ret = SS_mk_integer((BIGINT) cv);}
 
-    else if (type == SC_INTEGER_I)
+    else if (type == SC_INT_I)
        {iv = *(int *) vr;
 	if (SS_interactive)
 	   PRINT(stdout, "    %d", iv);
@@ -109,7 +109,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	else
 	   SS_error("OBJECT NOT CHAR - SS_ACC_VAR", vl);}
 
-    else if (type == SC_INTEGER_I)
+    else if (type == SC_INT_I)
        {if (lv != -HUGE_INT)
 	   *((int *) vr) = (int) lv;
 
@@ -247,21 +247,23 @@ object *SS_install_cv(char *name, void *pval, int type)
 	SS_def_var(var, SS_mk_string(sval), SS_Global_Env);
 	typ = SC_STRING_S;}
 
+/* fixed point types */
     else if (type == SC_SHORT_I)
        {lval = *(short *) pval;
 	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
 	typ = SC_SHORT_S;}
 
-    else if (type == SC_INTEGER_I)
+    else if (type == SC_INT_I)
        {lval = *(int *) pval;
 	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
-	typ = SC_INTEGER_S;}
+	typ = SC_INT_S;}
 
     else if (type == SC_LONG_I)
        {lval = *(long *) pval;
 	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
 	typ = SC_LONG_S;}
 
+/* floating point types */
     else if (type == SC_FLOAT_I)
        {dval = *(float *) pval;
 	SS_def_var(var, SS_mk_float(dval), SS_Global_Env);
@@ -312,7 +314,7 @@ object *SS_acc_REAL(void *vr, object *argl)
 object *SS_acc_int(void *vr, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_INTEGER_I);
+    ret = SS_acc_var(vr, argl, SC_INT_I);
 
     return(ret);}
 

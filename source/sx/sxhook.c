@@ -27,7 +27,7 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 
     if (strcmp(type, "object") == 0)
        {c = SC_arrtype(vr, 0);
-        if (c == SC_INTEGER_I)
+        if (c == SC_INT_I)
 	   strcpy(new_mem, "long_long *val");
 
 	else if (c == SC_FLOAT_I)

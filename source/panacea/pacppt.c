@@ -22,20 +22,20 @@ main()
 
 /* arrays used to automate some of the testing */
   char *type_slist[] = {
-        "SC_CHAR_S",       "SC_SHORT_S",       "SC_INTEGER_S",     "SC_LONG_S",
+        "SC_CHAR_S",       "SC_SHORT_S",       "SC_INT_S",     "SC_LONG_S",
         "SC_FLOAT_S",      "SC_DOUBLE_S",      "SC_REAL_S",        "SC_STRING_S",
         "SC_POINTER_S",    "SC_PCONS_P_S",     "SC_VOID_S",	   "SC_SHORT_P_S",
-	"SC_INTEGER_P_S",  "SC_LONG_P_S",      "SC_FLOAT_P_S",	   "SC_DOUBLE_P_S",
+	"SC_INT_P_S",  "SC_LONG_P_S",      "SC_FLOAT_P_S",	   "SC_DOUBLE_P_S",
         "SC_PCONS_S",      "SC_STRUCT_S",      "SC_UNKNOWN_S",
         NULL
   };
 
   int type_ilist[] = {
 /*      12345678901234567890123456789012345678901234567890123456789012345678901234567890*/
-        SC_CHAR_I,         SC_SHORT_I,         SC_INTEGER_I,       SC_LONG_I,
+        SC_CHAR_I,         SC_SHORT_I,         SC_INT_I,       SC_LONG_I,
         SC_FLOAT_I,        SC_DOUBLE_I,	       SC_REAL_I,          SC_STRING_I,
         SC_POINTER_I,      SC_PCONS_P_I,       SC_VOID_I,	   SC_SHORT_P_I,
-	SC_INTEGER_P_I,	   SC_LONG_P_I,	       SC_FLOAT_P_I,	   SC_DOUBLE_P_I,
+	SC_INT_P_I,	   SC_LONG_P_I,	       SC_FLOAT_P_I,	   SC_DOUBLE_P_I,
         SC_PCONS_I,        SC_STRUCT_I,        SC_UNKNOWN_I,
         -100
   };
@@ -60,13 +60,13 @@ main()
   itype = *(int *) PA_cpp_name_to_value("SC_STRING_I");
   printf(" SC_STRING_I  - %d\n", itype);
 
-  itype = *(int *) PA_cpp_name_to_value("double");
+  itype = *(int *) PA_cpp_name_to_value(SC_DOUBLE_S);
   itype1 = *(int *) PA_cpp_name_to_value("SC_DOUBLE_I");
   type  = (char *) PA_cpp_name_to_value("SC_DOUBLE_S");
   type1 = (char *) PA_cpp_value_to_name(PA_CPP_TYPE, 1);
   printf("PA_cpp_name_to_value - %d %d %s %s\n", itype, itype1, type, type1);
 
-  itype = convert_type_s_i("double");
+  itype = convert_type_s_i(SC_DOUBLE_S);
   printf("double is %d\n", itype);
   type = convert_type_i_s(6);
   printf("6 is %s\n", type);

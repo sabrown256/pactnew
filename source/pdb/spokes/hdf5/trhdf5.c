@@ -207,20 +207,32 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
 static int _H5_get_alignment(PDBfile *file, char *type)
    {int result;
 
-    if (strcmp(type, "char") == 0 || strcmp(type, "u_char") == 0)
+    if ((strcmp(type, SC_CHAR_S) == 0) ||
+	(strcmp(type, "u_char") == 0))
        result = 1;
-    else if (strcmp(type, "short") == 0 || strcmp(type, "u_short") == 0)
+
+/* fix point types */
+    else if ((strcmp(type, SC_SHORT_S) == 0) ||
+	     (strcmp(type, "u_short") == 0))
        result = 2;
-    else if (strcmp(type, "int") == 0 || strcmp(type, "u_int") == 0)
+    else if ((strcmp(type, SC_INT_S) == 0) ||
+	     (strcmp(type, "u_int") == 0))
        result = 4;
-    else if (strcmp(type, "long") == 0 || strcmp(type, "u_long") == 0)
+    else if ((strcmp(type, SC_LONG_S) == 0) ||
+	     (strcmp(type, "u_long") == 0))
        result = 4;
-    else if (strcmp(type, "long_long") == 0 || strcmp(type, "u_long_long") == 0)
+    else if ((strcmp(type, SC_LONG_LONG_S) == 0) ||
+	     (strcmp(type, "u_long_long") == 0))
        result = 4;
-    else if (strcmp(type, "float") == 0)
+
+/* floating point types */
+    else if ((strcmp(type, SC_FLOAT_S) == 0))
        result = 4;
-    else if (strcmp(type, "double") == 0)
+    else if ((strcmp(type, SC_DOUBLE_S) == 0))
        result = 4;
+    else if ((strcmp(type, SC_LONG_DOUBLE_S) == 0))
+       result = 4;
+
     else
        result = 0;  /* DEFAULTS TO: no alignment */
 
@@ -258,17 +270,17 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
  */
     if (H5Tget_sign(dtid)) 
        {if (precision == 8)
-           {typename = SC_strsavef("char",        "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = SC_strsavef(SC_CHAR_S,      "_H5_HANDLE_FIXED_PT:typename");}
         else if (precision == 16)
-           {typename = SC_strsavef("short",       "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = SC_strsavef(SC_SHORT_S,     "_H5_HANDLE_FIXED_PT:typename");}
         else if (precision == 32)
-           {typename = SC_strsavef("int",         "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = SC_strsavef(SC_INT_S,       "_H5_HANDLE_FIXED_PT:typename");}
         else if (precision == 64)
-           {typename = SC_strsavef("long",        "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = SC_strsavef(SC_LONG_S,      "_H5_HANDLE_FIXED_PT:typename");}
         else if (precision >  64)
-           {typename = SC_strsavef("long_long",   "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = SC_strsavef(SC_LONG_LONG_S, "_H5_HANDLE_FIXED_PT:typename");}
         else
-           {typename = SC_strsavef("UNKNOWN",     "_H5_HANDLE_FIXED_PT:typename");};}
+           {typename = SC_strsavef("UNKNOWN",      "_H5_HANDLE_FIXED_PT:typename");};}
     else
        {if (precision == 8)
            {typename = SC_strsavef("u_char",      "_H5_HANDLE_FIXED_PT:typename");}
@@ -401,7 +413,7 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
  */
     if (precision <= 32) 
        {format   = fstd->fp[0].format;
-        typename = SC_strsavef("float", "_H5_HANDLE_FLOAT_PT:typename");
+        typename = SC_strsavef(SC_FLOAT_S, "_H5_HANDLE_FLOAT_PT:typename");
         dp->fp.order = FMAKE_N(int, bpif, "_H5_HANDLE_FLOAT_PT:order");
 
         for (i = 0; i < bpif; i++) 
@@ -409,7 +421,7 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
 
     else 
        {format   = fstd->fp[1].format;
-        typename = SC_strsavef("double", "_H5_HANDLE_FLOAT_PT:typename");
+        typename = SC_strsavef(SC_DOUBLE_S, "_H5_HANDLE_FLOAT_PT:typename");
         dp->fp.order = FMAKE_N(int, bpid, "_H5_HANDLE_FLOAT_PT:order");
 
         for (i = 0; i < bpid; i++) 

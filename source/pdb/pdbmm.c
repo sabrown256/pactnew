@@ -287,7 +287,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     std->ptr_bytes  = src->ptr_bytes;
     std->bool_bytes = src->bool_bytes;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
         {std->fx[i].bpi   = src->fx[i].bpi;
 	 std->fx[i].order = src->fx[i].order;};
 

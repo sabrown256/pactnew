@@ -730,7 +730,7 @@ object *SS_banner(object *obj)
 
     SS_args(obj,
 	    SC_STRING_I, &s,
-	    SC_INTEGER_I, &_SS.override,
+	    SC_INT_I, &_SS.override,
 	    0);
 
     if (_SS.override)
@@ -1061,7 +1061,7 @@ void SS_wr_atm(object *obj, object *strm)
     else
        {s = t;
 
-	if (ityp == SC_INTEGER_I)
+	if (ityp == SC_INT_I)
 #ifdef NO_LONG_LONG
 	   snprintf(t, MAXLINE, "%ld", SS_INTEGER_VALUE(obj));
 #else

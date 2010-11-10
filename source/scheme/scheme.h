@@ -423,7 +423,7 @@ typedef struct s_SS_vect vector;
  *             - return FALSE otherwise
  */
 
-#define SS_integerp(obj) (SC_arrtype(obj, -1) == SC_INTEGER_I)
+#define SS_integerp(obj) (SC_arrtype(obj, -1) == SC_INT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
