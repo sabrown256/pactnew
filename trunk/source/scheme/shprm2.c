@@ -25,7 +25,7 @@ typedef object *(*PFBINOBJ)(object *argl);
      _num  = SS_car(_arg);                                                   \
      _arg  = SS_cdr(_arg);                                                   \
      _ityp = SC_arrtype(_num, -1);                                           \
-     if (_ityp == SC_INTEGER_I)                                              \
+     if (_ityp == SC_INT_I)                                              \
         _oper = SS_INTEGER_VALUE(_num);                                      \
      else if (_ityp == SC_FLOAT_I)                                           \
         {_oper = SS_FLOAT_VALUE(_num);                                       \
@@ -175,7 +175,7 @@ object *SS_binary_flt(PFVoid proc, object *argl)
 
     fnc   = (PFDoubledd) proc;
     ident = 1;
-    type  = SC_INTEGER_I;
+    type  = SC_INT_I;
     if ((fnc == PM_fplus) || (fnc == PM_fminus))
        ident = 0;
 
@@ -202,7 +202,7 @@ object *SS_binary_flt(PFVoid proc, object *argl)
 	   break;};
 
     rv = SS_null;
-    if (type == SC_INTEGER_I)
+    if (type == SC_INT_I)
        rv = SS_mk_integer((BIGINT) acc);
     else if (type == SC_FLOAT_I)
        rv = SS_mk_float(acc);

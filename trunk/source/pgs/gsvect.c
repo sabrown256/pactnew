@@ -130,8 +130,8 @@ static void PG_vct_hand(PG_device *dev, PG_graph *g,
 
 /* set the default plotting attributes for vectors */
     PG_get_attrs_graph(g, FALSE,
-		       "LINE-COLOR", SC_INTEGER_I, &color, dev->BLUE,
-		       "LINE-STYLE", SC_INTEGER_I, &style, LINE_SOLID,
+		       "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
+		       "LINE-STYLE", SC_INT_I, &style, LINE_SOLID,
 		       "LINE-WIDTH", SC_DOUBLE_I,    &width, 0.0,
 		       NULL);
 

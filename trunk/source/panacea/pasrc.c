@@ -569,7 +569,7 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
     else if (strcmp(type, SC_LONG_S) == 0)
        {PA_INTERP_TYPE(v, long, svp, t, t0, t1, t2, t3);}
 
-    else if (strcmp(type, SC_INTEGER_S) == 0)
+    else if (strcmp(type, SC_INT_S) == 0)
        {PA_INTERP_TYPE(v, int, svp, t, t0, t1, t2, t3);}
 
     else if (strcmp(type, SC_SHORT_S) == 0)

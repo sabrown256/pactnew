@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 10/31/2009
+MOD: 11/10/2010
 
 <CENTER>
 <P>
@@ -2861,7 +2861,7 @@ object *SS_make_list(int first, ...)
 Given a list of type index, variable pointer pairs create and return a
 SCHEME list. A pair with a type index of 0 terminates the list. The pointers
 in the pairs must be pointers to the types indicated by the type index.
-Thus SC_INTEGER_I would be accompanied by and int *.<p>
+Thus SC_INT_I would be accompanied by and int *.<p>
 
 <B></B>
 <BLOCKQUOTE>
@@ -4008,7 +4008,7 @@ call such as:<p>
 
 <B>
 <UL>
-SS_install_cv(&#147;foo-unit&#148;,&amp;foo_unit, SC_INTEGER_I);
+SS_install_cv(&#147;foo-unit&#148;,&amp;foo_unit, SC_INT_I);
 </UL>
 </B>
 
@@ -4770,8 +4770,8 @@ Here is an example continuing the array example of the last section:<p>
     bpi  = sizeof(float);
     rv = SS_call_scheme("create-array",
                         SC_STRING_I, type,
-                        SC_INTEGER_I, &n,
-                        SC_INTEGER_I, &bpi,
+                        SC_INT_I, &n,
+                        SC_INT_I, &bpi,
                         0);
                         .
                         .

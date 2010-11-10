@@ -370,13 +370,16 @@ void SS_init_c_syntax_mode(void)
 	_SS_c_catvars   = SS_lookup_variable("c/cat-vars", TRUE);
 	_SS_c_strvar    = SS_lookup_variable("c/str-var", TRUE);
 
-	SS_add_type_synt("char");
-	SS_add_type_synt("short");
-	SS_add_type_synt("int");
-	SS_add_type_synt("long");
-	SS_add_type_synt("float");
-	SS_add_type_synt("double");
-	SS_add_type_synt("void");
+/* GOTHCA: work out adding C99 types
+ * the space in types like "long double" will have to be sorted out
+ */
+	SS_add_type_synt(SC_CHAR_S);
+	SS_add_type_synt(SC_SHORT_S);
+	SS_add_type_synt(SC_INT_S);
+	SS_add_type_synt(SC_LONG_S);
+	SS_add_type_synt(SC_FLOAT_S);
+	SS_add_type_synt(SC_DOUBLE_S);
+	SS_add_type_synt(SC_VOID_S);
 
 	SS_add_parser(".c", (PFPObject) SS_c_mode);
 	SS_add_parser(".h", (PFPObject) SS_c_mode);

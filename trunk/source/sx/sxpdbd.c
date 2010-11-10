@@ -274,15 +274,9 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 				   long length, char *type, dimdes *dims, 
 				   int mjr)
    {int nn, def_off, samen, lna, lnb;
-    int *ipa, *ipb;
     long i, isz, msz;
-    long *lpa, *lpb;
-    short *spa, *spb;
     char bf[LINE_SIZE+1], bfa[LINE_SIZE], bfb[LINE_SIZ2+1];
     char tmp[LINE_SIZE], fmt[LINE_SIZE];
-    char *cpa, *cpb;
-    double *dpa, *dpb;
-    float *fpa, *fpb;
 
     samen = (strcmp(nma, nmb) == 0);
 
@@ -318,86 +312,118 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
     strcpy(fmt, ":   ");
 
 /* find the type and compare */
-    if (strcmp(type, "char") == 0)
-       {cpa = (char *) pva;
-        cpb = (char *) pvb;
+    if (strcmp(type, SC_CHAR_S) == 0)
+       {char *va, *vb;
+	va = (char *) pva;
+        vb = (char *) pvb;
 
         SC_strcat(fmt, LINE_SIZE, "        %c");
         SC_strcat(fmt, LINE_SIZE, "                         ");
         SC_strcat(fmt, LINE_SIZE, "%c");
 
-        DISP_ARRAY(fmt, indx, cpa, cpb);}
+        DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, "short") == 0)
-       {spa = (short *) pva;
-        spb = (short *) pvb;
+/* fixed point types */
+    else if (strcmp(type, SC_SHORT_S) == 0)
+       {short *va, *vb;
+	va = (short *) pva;
+        vb = (short *) pvb;
 
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_SHORT_I]);
         SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[2]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_SHORT_I]);
 
-        DISP_ARRAY(fmt, indx, spa, spb);}
+        DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if ((strcmp(type, "int") == 0) || (strcmp(type, "integer") == 0))
-       {ipa = (int *) pva;
-        ipb = (int *) pvb;
+    else if ((strcmp(type, SC_INT_S) == 0) || (strcmp(type, SC_INTEGER_S) == 0))
+       {int *va, *vb;
+        va = (int *) pva;
+        vb = (int *) pvb;
 
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_INT_I]);
         SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[3]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_INT_I]);
 
-        DISP_ARRAY(fmt, indx, ipa, ipb);}
+        DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, "long") == 0)
-       {lpa = (long *) pva;
-        lpb = (long *) pvb;
+    else if (strcmp(type, SC_LONG_S) == 0)
+       {long *va, *vb;
+	va = (long *) pva;
+        vb = (long *) pvb;
 
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[4]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_I]);
         SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[4]);
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_I]);
 
-        DISP_ARRAY(fmt, indx, lpa, lpb);}
+        DISP_ARRAY(fmt, indx, va, vb);}
+
+    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+       {long long *va, *vb;
+	va = (long long *) pva;
+        vb = (long long *) pvb;
+
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_LONG_I]);
+        SC_strcat(fmt, LINE_SIZE, "   ");
+        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_LONG_I]);
+
+        DISP_ARRAY(fmt, indx, va, vb);}
+
+/* floating point types */
+    else if (strcmp(type, SC_FLOAT_S) == 0)
+       {float *va, *vb;
+        va = (float *) pva;
+        vb = (float *) pvb;
+
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
+	SC_strcat(fmt, LINE_SIZE, "   ");
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
+
+        DISP_ARRAY(fmt, indx, va, vb);}
+
+    else if (strcmp(type, SC_DOUBLE_S) == 0)
+       {double *va, *vb;
+        va = (double *) pva;
+        vb = (double *) pvb;
+
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
+	SC_strcat(fmt, LINE_SIZE, "   ");
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
+
+        DISP_ARRAY(fmt, indx, va, vb);}
+
+    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+       {long double *va, *vb;
+        va = (long double *) pva;
+        vb = (long double *) pvb;
+
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_DOUBLE_I]);
+	SC_strcat(fmt, LINE_SIZE, "   ");
+	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_DOUBLE_I]);
+
+        DISP_ARRAY(fmt, indx, va, vb);}
 
     else if (strcmp(type, "REAL") == 0)
        {if (sizeof(REAL) == sizeof(double))
-           {dpa = (double *) pva;
-            dpb = (double *) pvb;
+	   {double *va, *vb;
+            va = (double *) pva;
+            vb = (double *) pvb;
 
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
 	    SC_strcat(fmt, LINE_SIZE, "   ");
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
 
-            DISP_ARRAY(fmt, indx, dpa, dpb);}
+            DISP_ARRAY(fmt, indx, va, vb);}
 
         else if (sizeof(REAL) == sizeof(float))
-           {fpa = (float *) pva;
-            fpb = (float *) pvb;
+	   {float *va, *vb;
+            va = (float *) pva;
+            vb = (float *) pvb;
 
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
 	    SC_strcat(fmt, LINE_SIZE, "   ");
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
+	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
 
-            DISP_ARRAY(fmt, indx, fpa, fpb);};}
-
-    else if (strcmp(type, "float") == 0)
-       {fpa = (float *) pva;
-        fpb = (float *) pvb;
-
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
-	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[6]);
-
-        DISP_ARRAY(fmt, indx, fpa, fpb);}
-
-    else if (strcmp(type, "double") == 0)
-       {dpa = (double *) pva;
-        dpb = (double *) pvb;
-
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
-	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[7]);
-
-        DISP_ARRAY(fmt, indx, dpa, dpb);};
+            DISP_ARRAY(fmt, indx, va, vb);};};
 
     return;}
 
@@ -506,73 +532,6 @@ static int _SX_diff_indirection(char *nma, char *nmb,
     return(ret);}
 
 /*--------------------------------------------------------------------------*/
-#if 0
-/*--------------------------------------------------------------------------*/
-
-/* _SX_DIFF_CASTS - read the casts from two files
- *                - compare them and return TRUE iff they are OK
- *                - SUBTLE POINT: PDBLib will allocate space for mta and mtb
- *                - It will also remember that it has read those pointers
- *                - Don't SFREE them or they will be lost
- *                - (PD_reset_pointer_list would have to be invoked)
- */
-
-static int _SX_diff_casts(PDBfile *pfa, PDBfile *pfb, 
-			  char *nma, char *nmb, char **pa, char **pb)
-   {BIGINT oa, ob;
-    char *mta, *mtb;
-    int samen;
-    FILE *fpa, *fpb;
-
-    fpa = pfa->stream;
-    fpb = pfb->stream;
-
-    oa = lio_tell(fpa);
-    ob = lio_tell(fpb);
-
-    if (!PD_read(pfa, nma, pa))
-       SS_error("CAN'T READ CAST A - _SX_DIFF_CASTS", 
-                SS_null);
-    if (!PD_read(pfb, nmb, pb))
-       SS_error("CAN'T READ CAST B - _SX_DIFF_CASTS", 
-                SS_null);
-
-    lio_seek(fpa, oa, SEEK_SET);
-    lio_seek(fpb, ob, SEEK_SET);
-
-    mta = *pa;
-    mtb = *pb;
-
-    samen = (strcmp (nma, nmb) == 0);
-    if ((mta != NULL) && (mtb != NULL))
-       {if (!_SX_type_equal(pfa, pfb, mta, mtb))
-           {if (samen == TRUE)
-               PRINT(stdout, "\nInconsistent casts on %s: ", nma);
-            else
-               PRINT(stdout, "\nInconsistent casts on %s and %s: ", nma, nmb);
-            PRINT(stdout, "%s in first file and %s in second file\n", 
-                  mta, mtb);
-            LONGJMP(_SX.diff_err, ABORT);};}
-
-    else if ((mta == NULL) && (mtb == NULL))
-       {if (samen == TRUE)
-           PRINT(stdout, "\nNull casts from %s in both files\n", nma);
-        else
-           PRINT(stdout, "\nNull casts from %s in File 1 and %s in File 2\n", nma, nmb);
-        LONGJMP(_SX.diff_err, ABORT);}
-
-    else if (mta == NULL)
-       {PRINT(stdout, "\nNo cast from %s in first file\n", nma);
-        LONGJMP(_SX.diff_err, ABORT);}
-
-    else if (mtb == NULL)
-       {PRINT(stdout, "\nNo cast from %s in second file\n", nmb);
-        LONGJMP(_SX.diff_err, ABORT);};
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-#endif
 /*--------------------------------------------------------------------------*/
 
 /* _SX_DIFF_LEAF_INDIRECTS - compare the indirects in structs
@@ -679,27 +638,22 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
 
 /* find the type and compare */
     ret = TRUE;
-    if (strcmp(type, "char") == 0)
+    if (strcmp(type, SC_CHAR_S) == 0)
        {cpa = (char *) bfa;
         cpb = (char *) bfb;
         DIFF_FIX_ARRAY(ret, indx, cpa, cpb);}
 
-    else if (strcmp(type, "short") == 0)
+    else if (strcmp(type, SC_SHORT_S) == 0)
        {spa = (short *) bfa;
         spb = (short *) bfb;
         DIFF_FIX_ARRAY(ret, indx, spa, spb);}
 
-    else if (strcmp(type, "int") == 0)
+    else if ((strcmp(type, "integer") == 0) || (strcmp(type, SC_INT_S) == 0))
        {ipa = (int *) bfa;
         ipb = (int *) bfb;
         DIFF_FIX_ARRAY(ret, indx, ipa, ipb);}
 
-    else if (strcmp(type, "integer") == 0)
-       {ipa = (int *) bfa;
-        ipb = (int *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, ipa, ipb);}
-
-    else if (strcmp(type, "long") == 0)
+    else if (strcmp(type, SC_LONG_S) == 0)
        {lpa = (long *) bfa;
         lpb = (long *) bfb;
         DIFF_FIX_ARRAY(ret, indx, lpa, lpb);}
@@ -714,12 +668,12 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
             fpb = (float *) bfb;
             DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_fp_precision[0].tolerance);};}
 
-    else if (strcmp(type, "float") == 0)
+    else if (strcmp(type, SC_FLOAT_S) == 0)
        {fpa = (float *) bfa;
         fpb = (float *) bfb;
         DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_fp_precision[0].tolerance);}
 
-    else if (strcmp(type, "double") == 0)
+    else if (strcmp(type, SC_DOUBLE_S) == 0)
        {dpa = (double *) bfa;
         dpb = (double *) bfb;
         DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_fp_precision[1].tolerance);};

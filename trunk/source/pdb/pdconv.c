@@ -2065,7 +2065,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 	   ityp = SC_SHORT_I;
 
 	else if (onb == sizeof(int))
-	   ityp = SC_INTEGER_I;
+	   ityp = SC_INT_I;
 
 	else
 	   return(FALSE);

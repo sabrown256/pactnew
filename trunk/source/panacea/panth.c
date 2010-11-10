@@ -124,7 +124,7 @@ PDBfile *PA_th_family(PDBfile *file)
 
         count = 0;
         PD_read(file, "n_types", &count);
-        PD_write(nf, "n_types", SC_INTEGER_S, &count);
+        PD_write(nf, "n_types", SC_INT_S, &count);
 
         PD_close(file);};
 
@@ -233,7 +233,7 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
     dp = PD_defstr_alt(file, type, nmemb, mbrs);
 
 /* update the counter */
-    PD_write(file, "n_types", SC_INTEGER_S, &count);
+    PD_write(file, "n_types", SC_INT_S, &count);
 
 /* reset the pointer lists */
     PD_reset_ptr_list(file);
@@ -716,9 +716,9 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
        return(FALSE);
 
     if (sizeof(REAL) == sizeof(double))
-       strcpy(type, "double");
+       strcpy(type, SC_DOUBLE_S);
     else
-       strcpy(type, "float");
+       strcpy(type, SC_FLOAT_S);
 
     n_max       = 10;
     _PA.thd  = FMAKE_N(th_record, n_max, "_PA_SETUP_UF_FAMILY:thd");
@@ -1002,9 +1002,9 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 /* allocate the curve arrays */
     crve = FMAKE_N(double *, nv, "_PA_PROC_REC:crve");
     if (sizeof(REAL) == sizeof(double))
-       strcpy(type, "double");
+       strcpy(type, SC_DOUBLE_S);
     else
-       strcpy(type, "float");
+       strcpy(type, SC_FLOAT_S);
 
     nptm = _PA.ndpt[recn].number;
     for (i = 0; i < nv; i++)
@@ -1106,9 +1106,9 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
 
 /* find the extrema */
     if (sizeof(REAL) == sizeof(double))
-       strcpy(type, "double");
+       strcpy(type, SC_DOUBLE_S);
     else
-       strcpy(type, "float");
+       strcpy(type, SC_FLOAT_S);
 
     for (i = 0; i < _PA.ndom; i++)
 	{PD_read(_PA.uf[i], "npts0", &n);

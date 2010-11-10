@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
     PG_set_default_event_handler(SCR_dev, unspecified_event_handler);
     PG_set_mouse_down_event_handler(SCR_dev, mouse_event_handler);
 
-    PG_register_variable("PS-Flag", SC_INTEGER_S, &ps_flag, NULL, NULL);
+    PG_register_variable("PS-Flag", SC_INT_S, &ps_flag, NULL, NULL);
     PG_register_variable("Direction", SC_STRING_S, &direction, NULL, NULL);
     phimn = -180.0;
     phimx =  180.0;

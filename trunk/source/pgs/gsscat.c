@@ -410,8 +410,8 @@ void PG_draw_scatter(PG_device *dev, double *a1, double *a2,
 
 /* add the attributes */
     PG_set_attrs_graph(g,
-		       "LINE-COLOR", SC_INTEGER_I, FALSE, color,
-		       "LINE-STYLE", SC_INTEGER_I, FALSE, style,
+		       "LINE-COLOR", SC_INT_I, FALSE, color,
+		       "LINE-STYLE", SC_INT_I, FALSE, style,
 		       "LINE-WIDTH", SC_DOUBLE_I,  FALSE, width,
 		       "THETA",      SC_DOUBLE_I,  FALSE, theta,
 		       "PHI",        SC_DOUBLE_I,  FALSE, phi,

@@ -828,7 +828,7 @@ static PM_set *SX_build_lr_domain(PM_set *hd, object *argl)
     snprintf(name, MAXLINE, "LR (");
     for (i = 0; i < nd; i++)
         {SS_args(argl,
-		 SC_INTEGER_I, &maxes[i],
+		 SC_INT_I, &maxes[i],
 		 0);
 
 	 nc = strlen(name);

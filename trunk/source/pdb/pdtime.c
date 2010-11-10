@@ -94,7 +94,7 @@ int main(argc, argv)
 
 #ifdef PDB_TIME
     for (i = 0; i < n; i++)
-	PD_write(pdbf, names[i], "double", f);
+	PD_write(pdbf, names[i], SC_DOUBLE_S, f);
 #else
     for (i = 0; i < n; i++)
         io_write(f, (size_t) size, (size_t) len, binf);

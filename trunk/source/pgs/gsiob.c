@@ -190,12 +190,15 @@ static int _PG_get_val(haelem *hp, int xo, int dx)
    {char *type;
 
     type = hp->type;
-    if (strcmp(type, SC_INTEGER_S) == 0)
+
+/* fixed point types */
+    if (strcmp(type, SC_INT_S) == 0)
        {GET_VAL(int, hp, xo, dx);}
 
     else if (strcmp(type, SC_LONG_S) == 0)
        {GET_VAL(long, hp, xo, dx);}
 
+/* floating point types */
     else if (strcmp(type, SC_DOUBLE_S) == 0)
        {GET_VAL(double, hp, xo, dx);}
 
@@ -218,12 +221,15 @@ static void _PG_set_val(haelem *hp, int dxn, int dxd)
     f = ((double) dxn) / ((double) dxd);
 
     type = hp->type;
-    if (strcmp(type, SC_INTEGER_S) == 0)
+
+/* fixed point types */
+    if (strcmp(type, SC_INT_S) == 0)
        {RESET_VAL(int, hp);}
 
     else if (strcmp(type, SC_LONG_S) == 0)
        {RESET_VAL(long, hp);}
 
+/* floating point types */
     else if (strcmp(type, SC_DOUBLE_S) == 0)
        {RESET_VAL(double, hp);}
 
@@ -244,12 +250,15 @@ static int _PG_value_match(int ityp, haelem *hp, char *val)
     char *ps;
 
     match = FALSE;
-    if (ityp == SC_INTEGER_I)
+
+/* fixed point types */
+    if (ityp == SC_INT_I)
        match = (**(int **) hp->def == SC_stoi(val));
 
     else if (ityp == SC_LONG_I)
        match = (**(long **) hp->def == SC_stoi(val));
 
+/* floating point types */
     else if (ityp == SC_DOUBLE_I)
        match = (**(double **) hp->def == SC_stof(val));
 
@@ -274,12 +283,15 @@ static int _PG_value_string(int ityp, haelem *hp, char *s)
    {int match;
 
     match = TRUE;
-    if (ityp == SC_INTEGER_I)
+
+/* fixed point types */
+    if (ityp == SC_INT_I)
        sprintf(s, "%d", **(int **) hp->def);
 
     else if (ityp == SC_LONG_I)
        sprintf(s, "%ld", **(long **) hp->def);
 
+/* floating point types */
     else if (ityp == SC_DOUBLE_I)
        sprintf(s, "%.1f", **(double **) hp->def);
 
@@ -311,12 +323,15 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
 	if (hp != NULL)
 	   {type = hp->type;
 	    ityp = -1;
-	    if (strcmp(type, SC_INTEGER_S) == 0)
-	       ityp = SC_INTEGER_I;
+
+/* fixed point types */
+	    if (strcmp(type, SC_INT_S) == 0)
+	       ityp = SC_INT_I;
 
 	    else if (strcmp(type, SC_LONG_S) == 0)
 	       ityp = SC_LONG_I;
 
+/* floating point types */
 	    else if (strcmp(type, SC_DOUBLE_S) == 0)
 	       ityp = SC_DOUBLE_I;
 
@@ -1281,12 +1296,15 @@ static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
 	    if (hp != NULL)
 	       {type = hp->type;
 		val  = iob->action_name;
-		if (strcmp(type, SC_INTEGER_S) == 0)
+
+/* fixed point types */
+		if (strcmp(type, SC_INT_S) == 0)
 		   {SET_VAL(int, SC_stoi);}
 
 		else if (strcmp(type, SC_LONG_S) == 0)
 		   {SET_VAL(long, SC_stoi);}
 
+/* floating point types */
 		else if (strcmp(type, SC_DOUBLE_S) == 0)
 		   {SET_VAL(double, SC_stof);}
 
@@ -1366,12 +1384,15 @@ static int _PG_string_value(int ityp, haelem *hp, char *s)
     char *ps;
 
     match = TRUE;
-    if (ityp == SC_INTEGER_I)
+
+/* fixed point types */
+    if (ityp == SC_INT_I)
        **(int **) hp->def = SC_stoi(s);
 
     else if (ityp == SC_LONG_I)
        **(long **) hp->def = SC_stoi(s);
 
+/* floating point types */
     else if (ityp == SC_DOUBLE_I)
        **(double **) hp->def = SC_stof(s);
 

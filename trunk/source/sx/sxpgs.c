@@ -436,7 +436,7 @@ static object *_SXI_menu_item_type(object *argl)
     indx = -1;
     SS_args(argl,
             G_FILE, &po,
-            SC_INTEGER_I, &indx,
+            SC_INT_I, &indx,
             0);
 
     _SX_get_menu(po);
@@ -915,7 +915,7 @@ object *SX_get_ref_map(g_file *po, int indx, char *dtype)
 	switch (type)
 	   {case 'i' :
 	         argl = SS_make_list(G_FILE, po,
-				     SC_INTEGER_I, &indx,
+				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_image(argl);
 		 SS_GC(argl);
@@ -924,7 +924,7 @@ object *SX_get_ref_map(g_file *po, int indx, char *dtype)
 	    case 'm' :
             default  :
 	         argl = SS_make_list(G_FILE, po,
-				     SC_INTEGER_I, &indx,
+				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_graph(argl);
 		 SS_GC(argl);
@@ -1025,10 +1025,10 @@ void SX_mouse_event_handler(PG_device *dev, PG_event *ev)
 	fnc = _SS_lk_var_valc("handle-mouse-event", SS_Env);
         if (SS_procedurep(fnc))
 	   SS_call_scheme("handle-mouse-event",
-                          SC_INTEGER_I, &type,
+                          SC_INT_I, &type,
 			  SS_OBJECT_I, loc,
 			  SC_ENUM_I, &button,
-			  SC_INTEGER_I, &qual,
+			  SC_INT_I, &qual,
 			  0);};
 
     return;}
@@ -1188,9 +1188,9 @@ static object *_SXI_make_pgs_graph(object *argl)
             G_SET, &range,
             SC_STRING_I, &name,
             SC_ENUM_I, &centering,
-            SC_INTEGER_I, &color,
+            SC_INT_I, &color,
             SC_DOUBLE_I, &width,
-            SC_INTEGER_I, &style,
+            SC_INT_I, &style,
 	    G_NUM_ARRAY, &arr,
             0);
 
@@ -1416,12 +1416,12 @@ static void _SX_attach_rendering_1d(PG_graph *data, PG_rendering pty,
 
          if (pty == PLOT_SCATTER)
 	    PG_set_attrs_graph(g,
-			       "SCATTER", SC_INTEGER_I, FALSE, 1,
+			       "SCATTER", SC_INT_I, FALSE, 1,
 			       NULL);
 
          else if (pty == PLOT_HISTOGRAM)
 	    PG_set_attrs_graph(g,
-			       "HIST-START", SC_INTEGER_I, FALSE, start,
+			       "HIST-START", SC_INT_I, FALSE, start,
 			       NULL);
 
          g->render = PG_curve_plot;};
@@ -1642,7 +1642,7 @@ static object *_SXI_draw_plot(object *argl)
 
 	if (pty == PLOT_SURFACE)
 	   PG_set_attrs_mapping(data->f,
-				"DRAW-MESH", SC_INTEGER_I, FALSE, refm,
+				"DRAW-MESH", SC_INT_I, FALSE, refm,
 				NULL);
 
 	PG_draw_picture(dev, data->f, pty,
@@ -1699,8 +1699,8 @@ static object *_SXI_make_image(object *argl)
     arr = NULL;
     SS_args(argl,
             G_NUM_ARRAY, &arr,
-            SC_INTEGER_I, &w,
-            SC_INTEGER_I, &h,
+            SC_INT_I, &w,
+            SC_INT_I, &h,
             SC_STRING_I, &name,
             SC_DOUBLE_I, &dbx[0],
             SC_DOUBLE_I, &dbx[1],
@@ -1757,8 +1757,8 @@ static object *_SXI_build_image(object *argl)
     SS_args(argl,
             G_DEVICE, &dev,
             G_NUM_ARRAY, &arr,
-            SC_INTEGER_I, &w,
-            SC_INTEGER_I, &h,
+            SC_INT_I, &w,
+            SC_INT_I, &h,
             SC_STRING_I, &name,
             SC_DOUBLE_I, &dbx[0],
             SC_DOUBLE_I, &dbx[1],
@@ -1878,11 +1878,11 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
 	SS_GC(obj);
 	SC_mark(v, -1);}
 
-    else if ((strcmp(type, "int *") == 0) ||
+    else if ((strcmp(type, SC_INT_P_S) == 0) ||
 	     (strcmp(type, "integer *") == 0))
        {v = SC_alloc_nzt(1L, sizeof(int), NULL, NULL);
         SS_args(val,
-		SC_INTEGER_I, v,
+		SC_INT_I, v,
 		0);}
 
     else if (strcmp(type, SC_DOUBLE_P_S) == 0)
@@ -2450,7 +2450,7 @@ static object *_SX_set_info(object *obj, char *name, object *val)
     else if (strcmp(name, "dimension") == 0)
        {v = s->dimension;
 	if (val != NULL)
-           {SS_args(val, SC_INTEGER_I, &v);
+           {SS_args(val, SC_INT_I, &v);
 	    s->dimension = v;};
 
 	ret = SS_mk_integer(v);}
@@ -2458,7 +2458,7 @@ static object *_SX_set_info(object *obj, char *name, object *val)
     else if (strcmp(name, "dimension-elem") == 0)
        {v = s->dimension_elem;
 	if (val != NULL)
-           {SS_args(val, SC_INTEGER_I, &v);
+           {SS_args(val, SC_INT_I, &v);
 	    s->dimension_elem = v;};
 
 	ret = SS_mk_integer(v);}
@@ -2466,7 +2466,7 @@ static object *_SX_set_info(object *obj, char *name, object *val)
     else if (strcmp(name, "n-elements") == 0)
        {v = s->n_elements;
 	if (val != NULL)
-           {SS_args(val, SC_INTEGER_I, &v);
+           {SS_args(val, SC_INT_I, &v);
 	    s->n_elements = v;};
 
 	ret = SS_mk_integer(v);}
@@ -2539,7 +2539,7 @@ static object *_SX_map_info(object *obj, char *name, object *val)
     else if (strcmp(name, "file-type") == 0)
        {v = f->file_type;
 	if (val != NULL)
-           {SS_args(val, SC_INTEGER_I, &v);
+           {SS_args(val, SC_INT_I, &v);
 	    f->file_type = v;};
 
 	ret = SS_mk_integer(v);}

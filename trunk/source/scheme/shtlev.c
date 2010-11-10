@@ -344,7 +344,7 @@ static object *_SSI_quit(object *arg)
 
     _SS.exit_val = 0;
     SS_args(arg,
-            SC_INTEGER_I, &_SS.exit_val,
+            SC_INT_I, &_SS.exit_val,
             0);
 
     LONGJMP(SC_top_lev, ERR_FREE);
@@ -1064,11 +1064,11 @@ char *SS_object_type_name(object *o, char *atype)
     itype = SC_arrtype(o, -1);
     p     = atype;
 
-    if (itype == SC_INTEGER_I)
-       strcpy(atype, "integer");
+    if (itype == SC_INT_I)
+       strcpy(atype, SC_INT_S);
 
     else if (itype == SC_FLOAT_I)
-       strcpy(atype, "float");
+       strcpy(atype, SC_FLOAT_S);
 
     else if (itype == SC_STRING_I)
        strcpy(atype, "string");
@@ -1138,7 +1138,7 @@ static object *_SSI_system(object *argl)
     to  = -1;
     SS_args(argl,
 	    SC_STRING_I,  &cmd,
-	    SC_INTEGER_I, &to,
+	    SC_INT_I, &to,
 	    0);
 
     if (to > 0)
@@ -1174,7 +1174,7 @@ static object *_SSI_syscmnd(object *argl)
     to     = -1;
     SS_args(argl,
 	    SC_STRING_I,  &cmd,
-	    SC_INTEGER_I, &to,
+	    SC_INT_I, &to,
 	    0);
 
     if (to > 0)

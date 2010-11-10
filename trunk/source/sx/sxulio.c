@@ -108,7 +108,7 @@ static int SX_termdata(int *aryptr, double *xbuff, double *ybuff)
     PG_box_copy(2, SX_dataset[j].wc, wc);
 
     SC_CHANGE_VALUE_ALIST(SX_dataset[j].info,
-			  int, SC_INTEGER_P_S,
+			  int, SC_INT_P_S,
 			  "LINE-COLOR", 0);
 
 /* put this curve's data in a cache somewhere (let us defer the question
@@ -866,8 +866,8 @@ object *SX_read_text_table(object *argl)
     nlabel = 0;
     SS_args(argl,
             SC_STRING_I, &name,
-            SC_INTEGER_I, &n,
-            SC_INTEGER_I, &nlabel,
+            SC_INT_I, &n,
+            SC_INT_I, &nlabel,
             SC_LONG_I, &nl,
             0);
 
@@ -934,8 +934,8 @@ object *SX_read_text_table(object *argl)
     _SX.table_n  = n;
     _SX.table_ln = nl;
 
-    o = SS_make_list(SC_INTEGER_I, &nr,
-		     SC_INTEGER_I, &nc,
+    o = SS_make_list(SC_INT_I, &nr,
+		     SC_INT_I, &nc,
 		     0);
 
     return(o);}
@@ -977,11 +977,11 @@ object *SX_table_curve(object *argl)
     xs = 1;
     xo = -1;
     SS_args(argl,
-            SC_INTEGER_I, &na,
-            SC_INTEGER_I, &yo,
-            SC_INTEGER_I, &ys,
-            SC_INTEGER_I, &xo,
-            SC_INTEGER_I, &xs,
+            SC_INT_I, &na,
+            SC_INT_I, &yo,
+            SC_INT_I, &ys,
+            SC_INT_I, &xo,
+            SC_INT_I, &xs,
             0);
 
     ya = SX_extract_vector(_SX.current_table, yo, ys, na);
@@ -1028,9 +1028,9 @@ object *SX_table_attr(void)
            PRINT(stdout, "\n Table %d : %d rows and %d columns\n\n",
                  table_n, nrows, ncols);
 
-        ret = SS_make_list(SC_INTEGER_I, &nrows,
-                           SC_INTEGER_I, &ncols,
-                           SC_INTEGER_I, &table_n,
+        ret = SS_make_list(SC_INT_I, &nrows,
+                           SC_INT_I, &ncols,
+                           SC_INT_I, &table_n,
                            0);};
 
     return(ret);}

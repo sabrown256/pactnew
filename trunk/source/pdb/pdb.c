@@ -273,16 +273,18 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
              int nd, long *ind)
    {int rv, nf;
     char *typ;
-            
+    defstr *dp;
+
 /* figure out information needed to call PD_fix_denorm later if needed */
     nf  = 0;
     typ = (type == NULL) ? PD_entry_type(ep) : type;
-    if (file->fix_denorm &&  (typ != NULL) &&
-        ((strncmp("float", typ, 5) == 0) || (strncmp("double", typ, 6) == 0)))
-       {if (ind == NULL)
-	   nf = _PD_comp_num(ep->dimensions);
-	else
-	   nf = _PD_comp_nind(nd, ind, 3);};
+    if (file->fix_denorm &&  (typ != NULL))
+       {dp = PD_inquire_type(file, typ);
+	if ((dp != NULL) && (dp->kind == FLOAT_KIND))
+	   {if (ind == NULL)
+	       nf = _PD_comp_num(ep->dimensions);
+	    else
+	       nf = _PD_comp_nind(nd, ind, 3);};};
 
     if ((nd == -1) && (ind == NULL))
        rv = _PD_hyper_read(file, fullpath, type, ep, vr);
@@ -1121,7 +1123,7 @@ int PD_cast(PDBfile *file, char *type, char *memb, char *contr)
 		 continue;
 
 /* do this once, don't repeat in other chart */
-	      if ((strcmp(desc->base_type, "char") != 0) ||
+	      if ((strcmp(desc->base_type, SC_CHAR_S) != 0) ||
 		  !_PD_indirection(desc->type))
 		 {PD_error("BAD CAST CONTROLLER - PD_CAST", PD_GENERIC);
 		  return(FALSE);};
@@ -1345,12 +1347,13 @@ int PD_remove_entry(PDBfile *file, char *name)
  */
 
 int PD_autofix_denorm(PDBfile *file, int flag) 
-    {int old_value;
+    {int ov;
 
-     old_value = file->fix_denorm;
+     ov = file->fix_denorm;
+
      file->fix_denorm = flag;
    
-     return(old_value);}
+     return(ov);}
      
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1387,18 +1390,18 @@ int PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr)
 		 type);
 	st = FALSE;}
 
-/* determine what fmt standard to handle */
-    else if (strncmp("float", type, 6) == 0)
+/* determine what fmt standard to handle - this gets real and complex types */
+    else if (strncmp(SC_FLOAT_S, type, strlen(SC_FLOAT_S)) == 0)
        {nb  = std->fp[0].bpi;
 	fmt = std->fp[0].format;
 	ord = std->fp[0].order;}
 
-    else if (strncmp("double", type, 7) == 0)
+    else if (strncmp(SC_DOUBLE_S, type, strlen(SC_DOUBLE_S)) == 0)
        {nb  = std->fp[1].bpi;
 	fmt = std->fp[1].format;
 	ord = std->fp[1].order;}
 
-    else if (strncmp("long_double", type, 7) == 0)
+    else if (strncmp(SC_LONG_DOUBLE_S, type, strlen(SC_LONG_DOUBLE_S)) == 0)
        {nb  = std->fp[2].bpi;
 	fmt = std->fp[2].format;
 	ord = std->fp[2].order;}

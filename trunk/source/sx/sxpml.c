@@ -268,18 +268,24 @@ static object *_SXI_array_ref(object *argl)
             if (dp != NULL)
                strcpy(type, dp->type);};
 
-        if (strcmp(type, SC_DOUBLE_S) == 0)
-	   {GET_ARRAY_FP_VALUE(double, arr, n);}
-        else if (strcmp(type, SC_FLOAT_S) == 0)
+/* floating point types */
+	if (strcmp(type, SC_FLOAT_S) == 0)
 	   {GET_ARRAY_FP_VALUE(float, arr, n);}
         else if (strcmp(type, SC_DOUBLE_S) == 0)
 	   {GET_ARRAY_FP_VALUE(double, arr, n);}
+        else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+	   {GET_ARRAY_FP_VALUE(long double, arr, n);}
+
+/* fixed point types */
         else if (strcmp(type, SC_SHORT_S) == 0)
 	   {GET_ARRAY_FIX_VALUE(short, arr, n);}
-        else if (strncmp(type, SC_INTEGER_S, 3) == 0)
+        else if (strncmp(type, SC_INT_S, 3) == 0)
 	   {GET_ARRAY_FIX_VALUE(int, arr, n);}
         else if (strcmp(type, SC_LONG_S) == 0)
 	   {GET_ARRAY_FIX_VALUE(long, arr, n);}
+        else if (strcmp(type, SC_LONG_LONG_S) == 0)
+	   {GET_ARRAY_FIX_VALUE(long long, arr, n);}
+
         else if (strcmp(type, SC_CHAR_S) == 0)
 	   {GET_ARRAY_FIX_VALUE(char, arr, n);};}
 
@@ -319,18 +325,24 @@ static object *_SXI_array_set(object *argl)
 	while (_PD_indirection(type))
 	   PD_dereference(type);
 
-        if (strcmp(type, SC_DOUBLE_S) == 0)
-	   {SET_ARRAY_FP_VALUE(double, arr, n, val);}
-        else if (strcmp(type, SC_FLOAT_S) == 0)
+/* floating point types */
+        if (strcmp(type, SC_FLOAT_S) == 0)
 	   {SET_ARRAY_FP_VALUE(float, arr, n, val);}
         else if (strcmp(type, SC_DOUBLE_S) == 0)
 	   {SET_ARRAY_FP_VALUE(double, arr, n, val);}
+        else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+	   {SET_ARRAY_FP_VALUE(long double, arr, n, val);}
+
+/* fixed point types */
         else if (strcmp(type, SC_SHORT_S) == 0)
 	   {SET_ARRAY_FIX_VALUE(short, arr, n, val);}
-        else if (strncmp(type, SC_INTEGER_S, 3) == 0)
+        else if (strncmp(type, SC_INT_S, 3) == 0)
 	   {SET_ARRAY_FIX_VALUE(int, arr, n, val);}
         else if (strcmp(type, SC_LONG_S) == 0)
 	   {SET_ARRAY_FIX_VALUE(long, arr, n, val);}
+        else if (strcmp(type, SC_LONG_LONG_S) == 0)
+	   {SET_ARRAY_FIX_VALUE(long long, arr, n, val);}
+
         else if (strcmp(type, SC_CHAR_S) == 0)
 	   {SET_ARRAY_FIX_VALUE(char, arr, n, val);};}
 
@@ -391,12 +403,6 @@ static object *_SXI_array_list(object *argl)
     C_array *arr;
     long i, n;
     char type[MAXLINE];
-    char *cp;
-    short *sp;
-    int *ip;
-    long *lp;
-    float *fp;
-    double *dp;
     void *data;
 
     arr = NULL;
@@ -410,41 +416,64 @@ static object *_SXI_array_list(object *argl)
     PM_ARRAY_CONTENTS(arr, void, n, type, data);
 
     lst = SS_null;
-    if (strcmp(type, SC_DOUBLE_S) == 0)
-       {dp = (double *) data;
+
+/* floating point types */
+    if (strcmp(type, SC_FLOAT_S) == 0)
+       {float *pv;
+	pv = (float *) data;
         for (i = 0L; i < n; i++)
-            {obj = SS_mk_float((double) *dp++);
+            {obj = SS_mk_float((double) *pv++);
              lst = SS_mk_cons(obj, lst);};}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
-       {fp = (float *) data;
+    else if (strcmp(type, SC_DOUBLE_S) == 0)
+       {double *pv;
+	pv = (double *) data;
         for (i = 0L; i < n; i++)
-            {obj = SS_mk_float((double) *fp++);
+            {obj = SS_mk_float((double) *pv++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+       {long double *pv;
+	pv = (long double *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_float((double) *pv++);
+             lst = SS_mk_cons(obj, lst);};}
+
+/* fixed point types */
+    else if (strcmp(type, SC_SHORT_S) == 0)
+       {short *pv;
+	pv = (short *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_integer((BIGINT) *pv++);
+             lst = SS_mk_cons(obj, lst);};}
+
+    else if ((strcmp(type, SC_INT_S) == 0) ||
+	     (strcmp(type, "integer") == 0))
+       {int *pv;
+	pv = (int *) data;
+        for (i = 0L; i < n; i++)
+            {obj = SS_mk_integer((BIGINT) *pv++);
              lst = SS_mk_cons(obj, lst);};}
 
     else if (strcmp(type, SC_LONG_S) == 0)
-       {lp = (long *) data;
+       {long *pv;
+        pv = (long *) data;
         for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *lp++);
+            {obj = SS_mk_integer((BIGINT) *pv++);
              lst = SS_mk_cons(obj, lst);};}
 
-    else if ((strcmp(type, SC_INTEGER_S) == 0) ||
-	     (strcmp(type, "int") == 0))
-       {ip = (int *) data;
+    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+       {long long *pv;
+	pv = (long long *) data;
         for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *ip++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (strcmp(type, SC_SHORT_S) == 0)
-       {sp = (short *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *sp++);
+            {obj = SS_mk_integer((BIGINT) *pv++);
              lst = SS_mk_cons(obj, lst);};}
 
     else if (strcmp(type, SC_CHAR_S) == 0)
-       {cp = (char *) data;
+       {char *pv;
+	pv = (char *) data;
         for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *cp++);
+            {obj = SS_mk_integer((BIGINT) *pv++);
              lst = SS_mk_cons(obj, lst);};}
 
     else
@@ -1188,7 +1217,7 @@ static object *_SXI_arrays_set(object *argl)
     tflag = FALSE;
     SS_args(argl,
             SC_STRING_I, &name,
-            SC_INTEGER_I, &tflag,
+            SC_INT_I, &tflag,
             SS_OBJECT_I, &shape,
             0);
 
@@ -1284,7 +1313,7 @@ static object *_SXI_lr_ac(object *argl)
     ord = BND_CELL_MAX;
     SS_args(argl,
             G_MAPPING, &f,
-            SC_INTEGER_I, &ord,
+            SC_INT_I, &ord,
             0);
 
     if (f == NULL)
@@ -1837,7 +1866,7 @@ static object *_SXI_find_index(object *argl)
 
 	_PM_find_value(&no, &out, nx, nt, na, fnc, val, ni, in);
 
-	iarr = PM_make_array(SC_INTEGER_S, no, out);
+	iarr = PM_make_array(SC_INT_S, no, out);
 
 	rv = SX_mk_C_array(iarr);};
 

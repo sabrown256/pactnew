@@ -405,7 +405,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
             {special = (nitems[i] > 0);
              break;}
 
-         else if (strcmp(type[i], SC_INTEGER_S) == 0)
+         else if (strcmp(type[i], SC_INT_S) == 0)
             {lbytes = nitems[i] << 1;
              if (nitems[i] == 1)
                 iv[i] = SC_VA_ARG(int);
@@ -465,7 +465,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
          if (type[i] == NULL)
             abytes -= PG_CGM_special(dev, nitems[i]);
 
-         else if (strcmp(type[i], SC_INTEGER_S) == 0)
+         else if (strcmp(type[i], SC_INT_S) == 0)
             {if (nitems[i] == 1)
                 abytes -= PG_CGM_word(dev, &iv[i], 1L,
                                       nbytes, morec);

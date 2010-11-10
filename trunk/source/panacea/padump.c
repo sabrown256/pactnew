@@ -205,8 +205,8 @@ static int _PA_init_time_plot(PA_plot_request *pr,
 	   pr->data_type = SC_DOUBLE_I;
 	else if (strcmp(dtype, SC_FLOAT_S) == 0)
 	   pr->data_type = SC_FLOAT_I;
-	else if (strcmp(dtype, SC_INTEGER_S) == 0)
-	   pr->data_type = SC_INTEGER_I;
+	else if (strcmp(dtype, SC_INT_S) == 0)
+	   pr->data_type = SC_INT_I;
 	else if (strcmp(dtype, SC_LONG_S) == 0)
 	   pr->data_type = SC_LONG_I;
 
@@ -331,7 +331,7 @@ static void _PA_init_time_plots(char *ppname)
 static double _PA_array_ref_i(void *vr, long indx, int type)
    {int *pi;
     long *pl;
-    BIGINT *pb;
+    long long *pb;
     float *pf;
     double d, *pd;
 
@@ -344,15 +344,15 @@ static double _PA_array_ref_i(void *vr, long indx, int type)
        {pf = (float *) vr;
 	d  = (double) pf[indx];}
 
-    else if (type == SC_BIGINT_I)
-       {pb = (BIGINT *) vr;
+    else if (type == SC_LONG_LONG_I)
+       {pb = (long long *) vr;
 	d  = (double) pb[indx];}
 
     else if (type == SC_LONG_I)
        {pl = (long *) vr;
 	d  = (double) pl[indx];}
 
-    else if (type == SC_INTEGER_I)
+    else if (type == SC_INT_I)
        {pi = (int *) vr;
 	d  = (double) pi[indx];}
 
@@ -964,7 +964,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
     else if (strcmp(type, SC_FLOAT_S) == 0)
        {COPY_CONVERT(data, float);}
 
-    else if (strcmp(type, SC_INTEGER_S) == 0)
+    else if (strcmp(type, SC_INT_S) == 0)
        {COPY_CONVERT(data, int);}
 
     else if (strcmp(type, SC_CHAR_S) == 0)
@@ -1010,7 +1010,7 @@ int _PA_get_data(double *d, char *vr, long nitems, long offset, long stride)
     else if (strcmp(type, SC_FLOAT_S) == 0)
        {COPY_CONVERT(d, float);}
 
-    else if (strcmp(type, SC_INTEGER_S) == 0)
+    else if (strcmp(type, SC_INT_S) == 0)
        {COPY_CONVERT(d, int);}
 
     else if (strcmp(type, SC_CHAR_S) == 0)
@@ -1019,8 +1019,8 @@ int _PA_get_data(double *d, char *vr, long nitems, long offset, long stride)
     else if (strcmp(type, SC_LONG_S) == 0)
        {COPY_CONVERT(d, long);}
 
-    else if (strcmp(type, SC_BIGINT_S) == 0)
-       {COPY_CONVERT(d, BIGINT);}
+    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+       {COPY_CONVERT(d, long long);}
 
     else if (strcmp(type, SC_SHORT_S) == 0)
        {COPY_CONVERT(d, short);}

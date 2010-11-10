@@ -15,7 +15,7 @@
 #define READ_IO(pp, ptype)                                                   \
    {int _ityp, _jtyp;                                                        \
     _ityp = SC_arrtype(obj, -1);                                             \
-    if (_ityp == SC_INTEGER_I)                                               \
+    if (_ityp == SC_INT_I)                                                   \
        *pp = (ptype) SS_INTEGER_VALUE(obj);                                  \
     else if (_ityp == SC_FLOAT_I)                                            \
        *pp = (ptype) SS_FLOAT_VALUE(obj);                                    \
@@ -25,10 +25,12 @@
         for (i = 0; i < nitems; i++)                                         \
             {obj1  = SS_car(obj);                                            \
              _jtyp = SC_arrtype(obj1, -1);                                   \
-             if (_jtyp == SC_INTEGER_I)                                      \
+             if (_jtyp == SC_INT_I)                                          \
                 pp[i] = (ptype) SS_INTEGER_VALUE(obj1);                      \
              else if (_jtyp == SC_FLOAT_I)                                   \
                 pp[i] = (ptype) SS_FLOAT_VALUE(obj1);                        \
+             else if (_jtyp == SS_BOOLEAN_I)                                 \
+                pp[i] = (ptype) SS_BOOLEAN_VALUE(obj1);                      \
              else                                                            \
                 SS_error("EXPECTED A NUMBER", obj1);                         \
 	     obj1 = SS_cdr(obj);                                             \
@@ -38,10 +40,12 @@
        {va = SS_VECTOR_ARRAY(obj);                                           \
         for (i = 0; i < nitems; i++)                                         \
             {_jtyp = SC_arrtype(va[i], -1);                                  \
-             if (_jtyp == SC_INTEGER_I)                                      \
+             if (_jtyp == SC_INT_I)                                          \
                 pp[i] = (ptype) SS_INTEGER_VALUE(va[i]);                     \
              else if (_jtyp == SC_FLOAT_I)                                   \
                 pp[i] = (ptype) SS_FLOAT_VALUE(va[i]);                       \
+             else if (_jtyp == SS_BOOLEAN_I)                                 \
+                pp[i] = (ptype) SS_BOOLEAN_VALUE(va[i]);                     \
              else                                                            \
                 SS_error("EXPECTED A NUMBER", va[i]);};}                     \
     else                                                                     \
@@ -184,7 +188,7 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
     type = dp->type;
 
 /* print out the type */
-    if (strcmp(type, "char") == 0)
+    if (strcmp(type, SC_CHAR_S) == 0)
        {ityp = SC_arrtype(obj, -1);
 	if (ityp == SC_STRING_I)
 	   strncpy(vr, SS_STRING_TEXT(obj), nitems);
@@ -204,67 +208,70 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 			   type);
         SS_error(msg, obj);};
 
-    if (strcmp(type, "short") == 0)
+/* fixed point types */
+    if (strcmp(type, SC_SHORT_S) == 0)
        {short *pv;
         pv = (short *) vr;
-        READ_IO(pv, short)}
+        READ_IO(pv, short);}
 
-    else if ((strcmp(type, "integer") == 0) || (strcmp(type, "int") == 0))
+    else if ((strcmp(type, SC_INT_S) == 0) || (strcmp(type, SC_INTEGER_S) == 0))
        {int *pv;
         pv = (int *) vr;
-        READ_IO(pv, int)}
+        READ_IO(pv, int);}
 
-    else if (strcmp(type, "long") == 0)
+    else if (strcmp(type, SC_LONG_S) == 0)
        {long *pv;
         pv = (long *) vr;
-        READ_IO(pv, long)}
+        READ_IO(pv, long);}
 
-    else if (strcmp(type, "long_long") == 0)
+    else if (strcmp(type, SC_LONG_LONG_S) == 0)
        {long long *pv;
 	pv = (long long *) vr;
-        READ_IO(pv, long long)}
+        READ_IO(pv, long long);}
 
-    else if (strcmp(type, "float") == 0)
+/* floating point types */
+    else if (strcmp(type, SC_FLOAT_S) == 0)
        {float *pv;
         pv = (float *) vr;
-        READ_IO(pv, float)}
+        READ_IO(pv, float);}
  
-    else if (strcmp(type, "double") == 0)
+    else if (strcmp(type, SC_DOUBLE_S) == 0)
        {double *pv;
         pv = (double *) vr;
-        READ_IO(pv, double)}
+        READ_IO(pv, double);}
 
-    else if (strcmp(type, "long_double") == 0)
+    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
        {long double *pv;
 	pv = (long double *) vr;
-        READ_IO(pv, long double)}
+        READ_IO(pv, long double);}
 
-    else if (strcmp(type, "float_complex") == 0)
+/* complex floating point types */
+    else if (strcmp(type, SC_FLOAT_COMPLEX_S) == 0)
        {float _Complex *pv;
 	pv = (float _Complex *) vr;
-        READ_IO(pv, float _Complex)}
+        READ_IO(pv, float _Complex);}
 
-    else if (strcmp(type, "double_complex") == 0)
+    else if (strcmp(type, SC_DOUBLE_COMPLEX_S) == 0)
        {double _Complex *pv;
         pv = (double _Complex *) vr;
-        READ_IO(pv, double _Complex)}
+        READ_IO(pv, double _Complex);}
 
-    else if (strcmp(type, "long_double_complex") == 0)
+    else if (strcmp(type, SC_LONG_DOUBLE_COMPLEX_S) == 0)
        {long double _Complex *pv;
 	pv = (long double _Complex *) vr;
-        READ_IO(pv, long double _Complex)}
+        READ_IO(pv, long double _Complex);}
 
-    else if (strcmp(type, "bool") == 0)
+    else if (strcmp(type, SC_BOOL_S) == 0)
        {bool *pb;
 	pb = (bool *) vr;
-        READ_IO(pb, bool)}
+        READ_IO(pb, bool);}
 
     else
 #if 1
        {int jtyp;
 
         ityp = SC_arrtype(obj, -1);
-	if (ityp == SC_INTEGER_I)
+	if (ityp == SC_INT_I)
 	   {int *pv;
 	    pv  = (int *) vr;
 	    *pv = (int) SS_INTEGER_VALUE(obj);}
@@ -281,7 +288,7 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 	    for (i = 0; i < nitems; i++)
 	        {obj1  = SS_car(obj);
 		 jtyp = SC_arrtype(obj1, -1);
-		 if (jtyp == SC_INTEGER_I)
+		 if (jtyp == SC_INT_I)
 		    {int *pv;
 		     pv    = (int *) vr;
 		     pv[i] = (int) SS_INTEGER_VALUE(obj1);}
@@ -299,7 +306,7 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 	   {va = SS_VECTOR_ARRAY(obj);
 	    for (i = 0; i < nitems; i++)
 	        {jtyp = SC_arrtype(va[i], -1);
-		 if (jtyp == SC_INTEGER_I)
+		 if (jtyp == SC_INT_I)
 		    {int *pv;
 		     pv    = (int *) vr;
 		     pv[i] = (int) SS_INTEGER_VALUE(va[i]);}

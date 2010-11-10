@@ -612,8 +612,8 @@ object *_ULI_thru(object *argl)
        {int first = 0, last = 0, id;
         
         SS_args(argl,
-                SC_INTEGER_I, &first,
-                SC_INTEGER_I, &last,
+                SC_INT_I, &first,
+                SC_INT_I, &last,
                 0);
 
         if (first < 1)
@@ -911,7 +911,7 @@ static void UL_init_env(void)
 
     plot_type = PG_ptr_attr_glb("plot-type");
 
-    PG_register_variable("Plot Type", SC_INTEGER_S,
+    PG_register_variable("Plot Type", SC_INT_S,
 			 plot_type, NULL, NULL);
 
 /* add the SX annotation stuff */

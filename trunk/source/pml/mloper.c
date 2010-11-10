@@ -531,7 +531,7 @@ static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
 		   {_ACC_OPER(da, fnc, double, sa);}
 		else if (strcmp(styp, "int *") == 0)
 		   {_ACC_OPER(da, fnc, int, sa);}
-		else if (strcmp(styp, SC_INTEGER_P_S) == 0)
+		else if (strcmp(styp, SC_INT_P_S) == 0)
 		   {_ACC_OPER(da, fnc, int, sa);}
 		else if (strcmp(styp, SC_LONG_P_S) == 0)
 		   {_ACC_OPER(da, fnc, long, sa);}

@@ -116,8 +116,8 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 
 /* extract attributes from the graph */
     PG_get_attrs_graph(g, FALSE,
-		       "LINE-COLOR", SC_INTEGER_I, &color, dev->BLUE,
-		       "LINE-STYLE", SC_INTEGER_I, &style, LINE_SOLID,
+		       "LINE-COLOR", SC_INT_I, &color, dev->BLUE,
+		       "LINE-STYLE", SC_INT_I, &style, LINE_SOLID,
 		       "LINE-WIDTH", SC_DOUBLE_I,    &width, 0.0,
 		       NULL);
 
@@ -142,19 +142,19 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 	 mtype = SC_strtok(bf, " *", s);
 	 npts  = range->n_elements;
 
-	 same = ((mtype != NULL) && (strcmp(mtype, SC_INTEGER_S) == 0));
+	 same = ((mtype != NULL) && (strcmp(mtype, SC_INT_S) == 0));
 	 if (same)
 	    afd = *((int **) range->elements);
 	 else
 	    {afs = *((double **) range->elements);
 	     afd = NULL;
-	     CONVERT(SC_INTEGER_S, (void **) &afd, mtype, afs, npts, FALSE);};
+	     CONVERT(SC_INT_S, (void **) &afd, mtype, afs, npts, FALSE);};
 
 /* find the range limits if any */
 	 rextr = PM_get_limits(range);
 	 aextr = ((rextr != NULL) && !dev->autorange) ? rextr : fextr;
 	 aext  = NULL;
-	 CONVERT(SC_INTEGER_S, (void **) &aext, mtype, aextr, 2, FALSE);
+	 CONVERT(SC_INT_S, (void **) &aext, mtype, aextr, 2, FALSE);
 
 /* find the additional mapping information */
 	 centering = N_CENT;
@@ -257,7 +257,7 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     LR_MAPPING_INFO(alist, nmap);
 
     PG_get_attrs_alist(alist,
-		       "CENTERING", SC_INTEGER_I, &cnt, N_CENT,
+		       "CENTERING", SC_INT_I, &cnt, N_CENT,
 		       NULL);
 
     PM_CHECK_EMAP(alist, nmap, eflag, emap);
@@ -381,12 +381,12 @@ static void PG_dv_bnd_nc_lr(PG_device *dev, int nd, int *a,
     double *ra, *ap;
 
     ra = NULL;
-    CONVERT(SC_DOUBLE_S, (void **) &ra, SC_INTEGER_S, a, npts, FALSE);
+    CONVERT(SC_DOUBLE_S, (void **) &ra, SC_INT_S, a, npts, FALSE);
 
     ap = PM_node_zone_lr_2d(ra, cnnct, alist);
 
     ia = NULL;
-    CONVERT(SC_INTEGER_S, (void **) &ia, SC_DOUBLE_S, ap, npts, FALSE);
+    CONVERT(SC_INT_S, (void **) &ia, SC_DOUBLE_S, ap, npts, FALSE);
 
     PG_dv_bnd_zc_lr(dev, nd, ia, x, y, npts, aext, cnnct, alist);
 
@@ -512,12 +512,12 @@ static void PG_dv_bnd_nc_ac(PG_device *dev, int nd, int *a,
     double *ra, *ap;
 
     ra = NULL;
-    CONVERT(SC_DOUBLE_S, (void **) &ra, SC_INTEGER_S, a, npts, FALSE);
+    CONVERT(SC_DOUBLE_S, (void **) &ra, SC_INT_S, a, npts, FALSE);
 
     ap = PM_node_zone_ac_2d(ra, cnnct, alist);
 
     ia = NULL;
-    CONVERT(SC_INTEGER_S, (void **) &ia, SC_DOUBLE_S, ap, npts, FALSE);
+    CONVERT(SC_INT_S, (void **) &ia, SC_DOUBLE_S, ap, npts, FALSE);
 
     PG_dv_bnd_zc_ac(dev, nd, ia, x, y, npts, aext, cnnct, alist);
 

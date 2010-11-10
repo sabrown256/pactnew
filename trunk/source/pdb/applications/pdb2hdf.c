@@ -65,10 +65,10 @@ static hsize_t *PDB_to_HDF_dims(dm, rank)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*
-   PDB_TO_HDF_PTYPE - return the hdf equivalent of a pdb
-                               primitive type
-*/
+
+/* PDB_TO_HDF_PTYPE - return the hdf equivalent of a pdb
+ *                  - primitive type
+ */
 
 static int PDB_to_HDF_ptype(dp, datatype)
    defstr *dp;
@@ -78,58 +78,51 @@ static int PDB_to_HDF_ptype(dp, datatype)
     strcpy(s, dp->type);
  
     if (_PD_indirection(s))
-       {return (CONTAINS_INDIRECTION);}
+       {return(CONTAINS_INDIRECTION);}
 
 /* check for floating point types */
     if (dp->format != NULL)
-       {if (strcmp(s, "float") == 0)
+       {if (strcmp(s, SC_FLOAT_S) == 0)
            {*datatype = H5T_NATIVE_FLOAT;
-            return (TRUE);}
+            return(TRUE);}
 
-        else if (strcmp(s, "double") == 0)
+        else if (strcmp(s, SC_DOUBLE_S) == 0)
 	   {*datatype = H5T_NATIVE_DOUBLE;
-            return (TRUE);}
+            return(TRUE);}
  
         else if (strcmp(s, "REAL") == 0)
 	   {if (sizeof(REAL) == sizeof(double))
 	       {*datatype = H5T_NATIVE_DOUBLE;
-                return (TRUE);}
+                return(TRUE);}
 
 	    else
 	       {*datatype = H5T_NATIVE_FLOAT;
-	        return (TRUE);};};}
+	        return(TRUE);};};}
 
 /* check for integral types */
     else if (dp->convert >= 0)
-       {if (strcmp(s, "short") == 0)
+       {if (strcmp(s, SC_SHORT_S) == 0)
 	   {*datatype = H5T_NATIVE_SHORT;
-            return (TRUE);}
+            return(TRUE);}
 
-	else if (strcmp(s, "int") == 0)
+	else if ((strcmp(s, SC_INTEGER_S) == 0) || (strcmp(s, "int") == 0))
 	   {*datatype = H5T_NATIVE_INT;
-            return (TRUE);}
+            return(TRUE);}
 
-	else if (strcmp(s, "char") == 0)
+	else if (strcmp(s, SC_CHAR_S) == 0)
 	   {*datatype = H5T_NATIVE_CHAR;
-            return (TRUE);}
+            return(TRUE);}
 
-	else if (strcmp(s, "integer") == 0)
-	   {*datatype = H5T_NATIVE_INT;
-            return (TRUE);}
+	else if (strcmp(s, SC_LONG_LONG_S) == 0)
+	   {*datatype = H5T_NATIVE_LONG;
+            return(TRUE);}
 
-#ifdef ANSI
-#ifndef NO_LONG_LONG
-	else if (strcmp(s, "long_long") == 0)
+	else if (strcmp(s, SC_LONG_S) == 0)
 	   {*datatype = H5T_NATIVE_LONG;
-            return (TRUE);}
-#endif
-#endif
-	else if (strcmp(s, "long") == 0)
-	   {*datatype = H5T_NATIVE_LONG;
-            return (TRUE);};}
+            return(TRUE);};}
 
     else
-       {return (UNKNOWN_TYPE);};}
+       {return(UNKNOWN_TYPE);};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -153,7 +146,7 @@ static int PDB_to_HDF_ctype(pdb_file, dp, datatype)
     dimdes *dm;
 
     if (dp->n_indirects > 0)
-       return (CONTAINS_INDIRECTION);
+       return(CONTAINS_INDIRECTION);
 
 /* make the static compound types hash table */
     if (HDF_ctypes == NULL)
@@ -164,7 +157,7 @@ static int PDB_to_HDF_ctype(pdb_file, dp, datatype)
     if ((stype = (hid_t *) SC_def_lookup(dp->type, HDF_ctypes))
                   != NULL)
        {*datatype = H5Tcopy(*stype);
-        return (TRUE);}
+        return(TRUE);}
        
     dtype = H5Tcreate(H5T_COMPOUND, dp->size);
 
@@ -179,9 +172,9 @@ static int PDB_to_HDF_ctype(pdb_file, dp, datatype)
 
          if (err < 0)
             {if (err == CONTAINS_INDIRECTION)
-                    {return (CONTAINS_INDIRECTION);}
+                    {return(CONTAINS_INDIRECTION);}
                  else
-                    {return (UNKNOWN_TYPE);};}
+                    {return(UNKNOWN_TYPE);};}
          
          if ((dm = lst->dimensions) == NULL)
             {H5Tinsert(dtype, lst->name, lst->member_offs, nested_dtype);}
@@ -202,11 +195,11 @@ static int PDB_to_HDF_ctype(pdb_file, dp, datatype)
     *stype = H5Tcopy(dtype);
     if (SC_install(dp->type, stype, HID_T_S, HDF_ctypes)
                   == NULL)
-       {return (HASH_ERROR);}
+       {return(HASH_ERROR);}
 
     *datatype = dtype;
 
-    return (TRUE);}
+    return(TRUE);}
                               
 
 /*--------------------------------------------------------------------------*/
@@ -221,9 +214,9 @@ static int PDB_to_HDF_type(pdb_file, dp, datatype)
    hid_t  *datatype;
    {
     if (dp->members == NULL)
-       return (PDB_to_HDF_ptype(dp, datatype));
+       return(PDB_to_HDF_ptype(dp, datatype));
     else
-       return (PDB_to_HDF_ctype(pdb_file, dp, datatype));}
+       return(PDB_to_HDF_ctype(pdb_file, dp, datatype));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -249,18 +242,18 @@ static int translate_entry(pdb_file, hdf_file, var)
     ep = PD_inquire_entry(pdb_file, var, TRUE, path);
     if (ep == NULL)
        {printf("couldn't get syment for %s -- translate_entry\n", var);
-        return (FALSE);}
+        return(FALSE);}
 
     type = PD_entry_type(ep);
     if (_PD_indirection(type))
        {printf("Skipping variable %s, type: %s, contains indirections\n",
                    path, type);
-        return (FALSE);}
+        return(FALSE);}
 
     if ((dp = PD_inquire_host_type(pdb_file, type)) == NULL)
        {printf("Skipping variable %s, type: %s, type look up failed\n",
                path, type);
-        return (FALSE);}
+        return(FALSE);}
 
     if ((err = PDB_to_HDF_type(pdb_file, dp, &datatype)) < 0)
        {if (err == CONTAINS_INDIRECTION)
@@ -269,7 +262,7 @@ static int translate_entry(pdb_file, hdf_file, var)
         else
            {printf("Skipping variable %s, type: %s, unknown type\n",
                    path, type);}
-        return (FALSE);}
+        return(FALSE);}
 
     if ((dm = PD_entry_dimensions(ep)) == NULL)
        {dataspace = H5Screate(H5S_SCALAR);}
@@ -293,7 +286,7 @@ static int translate_entry(pdb_file, hdf_file, var)
        {printf("Skipping variable %s, error reading\n", path);
         H5Sclose(dataspace);
         H5Dclose(dataset);
-        return (FALSE);}   
+        return(FALSE);}   
 
     status    = H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL,
 		          H5P_DEFAULT, pdb_data);
@@ -305,7 +298,7 @@ static int translate_entry(pdb_file, hdf_file, var)
     H5Dclose(dataset);
     SFREE(pdb_data);
 
-    return ((status < 0) ? FALSE : TRUE);}
+    return((status < 0) ? FALSE : TRUE);}
     
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -323,7 +316,7 @@ static char *new_suffix(in, insuffix, outsuffix)
     int len_in, len_insuffix, len_out;
 
     if (in == NULL)
-       return (char *)NULL;
+       return(char *)NULL;
 
 /* look for insuffix at the end of in */
     SC_strrev(strcpy(in_rev, in));
@@ -389,7 +382,7 @@ static int translate_dir(pdb_file, hdf_file, directory)
             translate_entry(pdb_file, hdf_file, names[i]);}
               
     PD_cd(pdb_file, "..");
-    return (TRUE);}
+    return(TRUE);}
     
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

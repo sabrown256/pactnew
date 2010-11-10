@@ -234,7 +234,7 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
              break;};};
 
     if (i >= n)
-       i = SC_register_event_loop_callback(pe, SC_INTEGER_I, &fd,
+       i = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
 					   acc, NULL, -1);
 
     return(i);}
@@ -270,7 +270,7 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
              break;};};
 
     if (i >= n)
-       i = SC_register_event_loop_callback(pe, SC_INTEGER_I, &fd,
+       i = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
 					   NULL, rej, -1);
 
     return(i);}

@@ -57,7 +57,7 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
 
     PG_get_attrs_set(domain,
 		     "GROTRIAN-LABELS", SC_POINTER_I, &labels, NULL,
-		     "LINE-COLOR",      SC_INTEGER_I, &clr, dev->WHITE,
+		     "LINE-COLOR",      SC_INT_I, &clr, dev->WHITE,
 		     NULL);
 
 /* draw the vertical axis */

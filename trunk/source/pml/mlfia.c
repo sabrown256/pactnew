@@ -150,7 +150,7 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
         ne    = top->n_cells[0];};
 
     info = NULL;
-    SC_CHANGE_VALUE_ALIST(info, int, SC_INTEGER_P_S, "COPY-MEMORY", cp);
+    SC_CHANGE_VALUE_ALIST(info, int, SC_INT_P_S, "COPY-MEMORY", cp);
 
     elem = FMAKE_N(void *, nde, "PMBSET:elem");
 
@@ -181,16 +181,36 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
 	   {set->extrema = NULL;
 	    set->scales  = NULL;}
 
+/* floating point types */
+	else if (strcmp(bf, SC_FLOAT_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(float, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(float, nde,
+					    "PMBSET:scales");}
+
 	else if (strcmp(bf, SC_DOUBLE_S) == 0)
 	   {set->extrema = (void *) FMAKE_N(double, 2*nde,
 					    "PMBSET:extrema");
 	    set->scales  = (void *) FMAKE_N(double, nde,
 					    "PMBSET:scales");}
 
-	else if (strcmp(bf, SC_FLOAT_S) == 0)
-	   {set->extrema = (void *) FMAKE_N(float, 2*nde,
+	else if (strcmp(bf, SC_LONG_DOUBLE_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(long double, 2*nde,
 					    "PMBSET:extrema");
-	    set->scales  = (void *) FMAKE_N(float, nde,
+	    set->scales  = (void *) FMAKE_N(long double, nde,
+					    "PMBSET:scales");}
+
+/* fixed point types */
+	else if (strcmp(bf, SC_SHORT_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(short, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(short, nde,
+					    "PMBSET:scales");}
+	
+	else if (strcmp(bf, SC_INT_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(int, 2*nde,
+					    "PMBSET:extrema");
+	    set->scales  = (void *) FMAKE_N(int, nde,
 					    "PMBSET:scales");}
 
 	else if (strcmp(bf, SC_LONG_S) == 0)
@@ -199,18 +219,12 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
 	    set->scales  = (void *) FMAKE_N(long, nde,
 					    "PMBSET:scales");}
 
-	else if (strcmp(bf, SC_INTEGER_S) == 0)
-	   {set->extrema = (void *) FMAKE_N(int, 2*nde,
+	else if (strcmp(bf, SC_LONG_LONG_S) == 0)
+	   {set->extrema = (void *) FMAKE_N(long long, 2*nde,
 					    "PMBSET:extrema");
-	    set->scales  = (void *) FMAKE_N(int, nde,
+	    set->scales  = (void *) FMAKE_N(long long, nde,
 					    "PMBSET:scales");}
 
-	else if (strcmp(bf, SC_SHORT_S) == 0)
-	   {set->extrema = (void *) FMAKE_N(short, 2*nde,
-					    "PMBSET:extrema");
-	    set->scales  = (void *) FMAKE_N(short, nde,
-					    "PMBSET:scales");}
-	
 	else if (strcmp(bf, SC_CHAR_S) == 0)
 	   {set->extrema = (void *) FMAKE_N(char, 2*nde,
 					    "PMBSET:extrema");

@@ -34,7 +34,7 @@ static object *UL_select(object *s)
 
     j = -1;
     SS_args(s,
-            SC_INTEGER_I, &j,
+            SC_INT_I, &j,
             0);
 
     if ((j < 1) || (j > SX_n_curves_read))
@@ -142,7 +142,7 @@ static object *_ULI_menui(object *s)
 
     j = -1;
     SS_args(s,
-            SC_INTEGER_I, &j,
+            SC_INT_I, &j,
             0);
 
     if ((0 < j) && (j <= SX_n_curves_read))
@@ -248,7 +248,7 @@ static object *_ULI_expunge_macro(object *argl)
              s = SS_cdr(s))
 	    {t = SS_car(s);
              SS_args(t,
-		     SC_INTEGER_I, &j,
+		     SC_INT_I, &j,
 		     0);
 	     if ((0 <= j) && (j <= limit))
 	        {if (!UL_expunge(j))
@@ -308,7 +308,7 @@ static object *UL_color(object *obj, object *color)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "LINE-COLOR", SS_INTEGER_VALUE(color));
 
     return(obj);}
@@ -323,7 +323,7 @@ static object *UL_scatter(object *obj, object *flag)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "SCATTER", SS_INTEGER_VALUE(flag));
 
     return(obj);}
@@ -338,7 +338,7 @@ static object *UL_fill(object *obj, object *flag)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "FILL", SS_INTEGER_VALUE(flag));
 
     return(obj);}
@@ -391,7 +391,7 @@ static object *UL_marker(object *obj, object *flag)
     if ((mrk < 0) || (mrk >= mi))
        SS_error("BAD MARKER VALUE - UL_MARKER", flag);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "MARKER-INDEX", mrk);
 
     return(obj);}
@@ -428,7 +428,7 @@ static object *UL_hist(object *obj, object *flag)
     info = SX_dataset[i].info;
     info = PG_set_plot_type(info, pty, pty);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "HIST-START", side);
 
     SX_dataset[i].info = info;
@@ -466,7 +466,7 @@ static object *UL_lnstyle(object *obj, object *style)
 
     i = SX_get_crv_index_i(obj);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "LINE-STYLE", SS_INTEGER_VALUE(style));
 
     return(obj);}
@@ -753,7 +753,7 @@ static object *_ULI_quit(object *arg)
 
     exit_val = 0;
     SS_args(arg,
-            SC_INTEGER_I, &exit_val,
+            SC_INT_I, &exit_val,
             0);
 
     _UL_quit(exit_val);
@@ -1086,7 +1086,7 @@ static object *UL_thin(int j, object *argl)
     UL_buf1y = FMAKE_N(double, n, "UL_THIN:buf1y");
     toler = (toler < n) ? toler : n;
 
-    if (strncmp(type, "int", 3) == 0)
+    if (strncmp(type, SC_INT_S, 3) == 0)
        m = PM_thin_1d_int(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
     else
        m = PM_thin_1d_der(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
@@ -1452,7 +1452,7 @@ static object *UL_filter_coef(int l, object *argl)
     ntimes = 1;
     SS_args(argl,
             G_NUM_ARRAY, &arr,
-	    SC_INTEGER_I, &ntimes,
+	    SC_INT_I, &ntimes,
 	    0);
 
     SX_filter_coeff(SX_dataset[l].x[1], SX_dataset[l].n, arr, ntimes);
@@ -1478,7 +1478,7 @@ static object *_ULI_lnnorm(object *argl)
     order = 1;
     SS_args(argl,
             UL_CURVE_INDEX_I, &j,
-	    SC_INTEGER_I, &order,
+	    SC_INT_I, &order,
 	    0);
 
     n = SX_dataset[j].n;
@@ -1502,8 +1502,8 @@ static object *UL_smooth(int l, object *argl)
     ntimes = 1;
 
     SS_args(argl,
-	    SC_INTEGER_I, &pts,
-	    SC_INTEGER_I, &ntimes,
+	    SC_INT_I, &pts,
+	    SC_INT_I, &ntimes,
 	    0);
 
     n = SX_dataset[l].n;
@@ -1798,7 +1798,7 @@ static object *_ULI_append(object *argl)
 static object *UL_hide(int j)
    {object *o;
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INT_P_S,
 			  "LINE-COLOR", -1);
 
     o = (object *) SX_dataset[j].obj;
@@ -1813,7 +1813,7 @@ static object *UL_hide(int j)
 static object *UL_show(int j)
    {object *o;
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INTEGER_P_S,
+    SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INT_P_S,
 			  "LINE-COLOR",
 			  SX_next_color(SX_graphics_device));
 
@@ -1876,7 +1876,7 @@ static object *_ULI_make_ln(object *argl)
             SC_DOUBLE_I, &interc,
             SC_DOUBLE_I, &first,
             SC_DOUBLE_I, &last,
-            SC_INTEGER_I, &n,
+            SC_INT_I, &n,
             0);
 
     o = _UL_make_ln(slope, interc, first, last, n);

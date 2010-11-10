@@ -28,11 +28,11 @@
             {SC_TRANS_TYPE(_d, double, _s, _n);}                             \
          else if (strcmp(_styp, SC_FLOAT_S) == 0)                            \
             {SC_TRANS_TYPE(_d, float, _s, _n);}                              \
-         else if ((strcmp(_styp, SC_INTEGER_S) == 0) ||                      \
-                     (strcmp(_styp, "int") == 0))                            \
+	 else if ((strcmp(_styp, SC_INT_S) == 0) ||                          \
+		  (strcmp(_styp, SC_INTEGER_S) == 0))                        \
             {SC_TRANS_TYPE(_d, int, _s, _n);}                                \
-         else if (strcmp(_styp, SC_BIGINT_S) == 0)                           \
-            {SC_TRANS_TYPE(_d, BIGINT, _s, _n);}                             \
+         else if (strcmp(_styp, SC_LONG_LONG_S) == 0)                        \
+            {SC_TRANS_TYPE(_d, long long, _s, _n);}                          \
          else if (strcmp(_styp, SC_LONG_S) == 0)                             \
             {SC_TRANS_TYPE(_d, long, _s, _n);}                               \
          else if (strcmp(_styp, SC_SHORT_S) == 0)                            \
@@ -93,7 +93,7 @@ void
  */
 
 BIGINT _SC_to_number(void *a)
-   {BIGINT rv;
+   {long long rv;
     SC_address ad;
 
 /* in case diskaddr is larger than memaddr */
@@ -245,16 +245,16 @@ char *SC_dereference(char *s)
 /* SC_FIX_LMT - return the signed minimum and maximum values as well as
  *            - the unsigned maximum value for an integer type
  *            - of NB bytes
- *            - return TRUE iff NB is smaller than sizeof(BIGINT)
+ *            - return TRUE iff NB is smaller than sizeof(long long)
  */
 
 int SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx)
    {int i, rv;
-    BIGINT imn, imx, uimx;
+    long long imn, imx, uimx;
 
     rv = FALSE;
 
-    if (nb <= sizeof(BIGINT))
+    if (nb <= sizeof(long long))
 
 /* do the min limits */
        {for (imn = 0x80, i = 1; i < nb; i++)
@@ -268,7 +268,7 @@ int SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx)
 	for (uimx = 0xff, i = 1; i < nb; i++)
 	    uimx = (uimx << 8) + 0xff;
 
-	if (nb < sizeof(BIGINT))
+	if (nb < sizeof(long long))
 	   imn = -imn;
 
 	if (pmn != NULL)
@@ -302,7 +302,7 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
    {int i, ret;
 
     if (_SC.bmx == 0)
-       SC_fix_lmt(sizeof(BIGINT), &_SC.bmn, &_SC.bmx, NULL);
+       SC_fix_lmt(sizeof(long long), &_SC.bmn, &_SC.bmx, NULL);
 
     ret = FALSE;
 
@@ -310,24 +310,30 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
 
 /* fast but with simple truncation - FPE's are possible */
 
-    if (strcmp(dtype, SC_DOUBLE_S) == 0)
-       {SC_TRANS_DATA(double, pd, stype, s, n);}
-
-    else if (strcmp(dtype, SC_FLOAT_S) == 0)
+/* floating point types */
+    if (strcmp(dtype, SC_FLOAT_S) == 0)
        {SC_TRANS_DATA(float, pd, stype, s, n);}
 
-    else if ((strcmp(dtype, SC_INTEGER_S) == 0) ||
-             (strcmp(dtype, "int") == 0))
-       {SC_TRANS_DATA(int, pd, stype, s, n);}
+    else if (strcmp(dtype, SC_DOUBLE_S) == 0)
+       {SC_TRANS_DATA(double, pd, stype, s, n);}
 
-    else if (strcmp(dtype, SC_BIGINT_S) == 0)
-       {SC_TRANS_DATA(BIGINT, pd, stype, s, n);}
+    else if (strcmp(dtype, SC_LONG_DOUBLE_S) == 0)
+       {SC_TRANS_DATA(long double, pd, stype, s, n);}
+
+
+/* fixed point types */
+    else if (strcmp(dtype, SC_SHORT_S) == 0)
+       {SC_TRANS_DATA(short, pd, stype, s, n);}
+
+    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+	     (strcmp(dtype, SC_INTEGER_S) == 0))
+       {SC_TRANS_DATA(int, pd, stype, s, n);}
 
     else if (strcmp(dtype, SC_LONG_S) == 0)
        {SC_TRANS_DATA(long, pd, stype, s, n);}
 
-    else if (strcmp(dtype, SC_SHORT_S) == 0)
-       {SC_TRANS_DATA(short, pd, stype, s, n);}
+    else if (strcmp(dtype, SC_LONG_LONG_S) == 0)
+       {SC_TRANS_DATA(long long, pd, stype, s, n);}
 
     else if (strcmp(dtype, SC_CHAR_S) == 0)
        {SC_TRANS_DATA(char, pd, stype, s, n);};
@@ -336,46 +342,114 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
 
 /* slower with clipping - FPE's are NOT possible */
 
-    if (strcmp(dtype, SC_DOUBLE_S) == 0)
-       {SC_TRANS_DATA(double, pd, stype, s, n);}
-
-    else if (strcmp(dtype, SC_FLOAT_S) == 0)
+    if (strcmp(dtype, SC_FLOAT_S) == 0)
        {SC_TRANS_SPACE(_d, float, pd, n);
         if (_d != NULL)
-           {if (strcmp(stype, SC_DOUBLE_S) == 0)
-               {SC_TRANS_TYPE_L(_d, double, s, n, FLT_MIN, FLT_MAX);}
-            else if (strcmp(stype, SC_FLOAT_S) == 0)
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
                {SC_TRANS_TYPE(_d, float, s, n);}
-            else if ((strcmp(stype, SC_INTEGER_S) == 0) ||
-                     (strcmp(stype, "int") == 0))
-               {SC_TRANS_TYPE(_d, int, s, n);}
-            else if (strcmp(stype, SC_BIGINT_S) == 0)
-               {SC_TRANS_TYPE(_d, BIGINT, s, n);}
-            else if (strcmp(stype, SC_LONG_S) == 0)
-               {SC_TRANS_TYPE(_d, long, s, n);}
+	    else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, FLT_MIN, FLT_MAX);}
+	    else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, FLT_MIN, FLT_MAX);}
+
+/* fixed point types */
             else if (strcmp(stype, SC_SHORT_S) == 0)
                {SC_TRANS_TYPE(_d, short, s, n);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
+               {SC_TRANS_TYPE(_d, int, s, n);}
+            else if (strcmp(stype, SC_LONG_S) == 0)
+               {SC_TRANS_TYPE(_d, long, s, n);}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE(_d, long long, s, n);}
+
             else if (strcmp(stype, SC_CHAR_S) == 0)
                {SC_TRANS_TYPE(_d, char, s, n);};
             ret = TRUE;};}
 
-    else if ((strcmp(dtype, SC_INTEGER_S) == 0) ||
-             (strcmp(dtype, "int") == 0))
-       {SC_TRANS_SPACE(_d, int, pd, n);
+    else if (strcmp(dtype, SC_DOUBLE_S) == 0)
+       {SC_TRANS_DATA(double, pd, stype, s, n);}
+
+    else if (strcmp(dtype, SC_LONG_DOUBLE_S) == 0)
+       {SC_TRANS_SPACE(_d, long double, pd, n);
         if (_d != NULL)
-           {if (strcmp(stype, SC_DOUBLE_S) == 0)
-               {SC_TRANS_TYPE_L(_d, double, s, n, INT_MIN, INT_MAX);}
-            else if (strcmp(stype, SC_FLOAT_S) == 0)
-               {SC_TRANS_TYPE_L(_d, float, s, n, INT_MIN, INT_MAX);}
-            else if ((strcmp(stype, SC_INTEGER_S) == 0) ||
-                        (strcmp(stype, "int") == 0))
-               {SC_TRANS_TYPE(_d, int, s, n);}
-            else if (strcmp(stype, SC_BIGINT_S) == 0)
-               {SC_TRANS_TYPE_L(_d, BIGINT, s, n, INT_MIN, INT_MAX);}
-            else if (strcmp(stype, SC_LONG_S) == 0)
-               {SC_TRANS_TYPE_L(_d, long, s, n, INT_MIN, INT_MAX);}
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
+               {SC_TRANS_TYPE(_d, float, s, n);}
+	    else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, FLT_MIN, FLT_MAX);}
+	    else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, FLT_MIN, FLT_MAX);}
+
+/* fixed point types */
             else if (strcmp(stype, SC_SHORT_S) == 0)
                {SC_TRANS_TYPE(_d, short, s, n);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
+               {SC_TRANS_TYPE(_d, int, s, n);}
+            else if (strcmp(stype, SC_LONG_S) == 0)
+               {SC_TRANS_TYPE(_d, long, s, n);}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE(_d, long long, s, n);}
+
+            else if (strcmp(stype, SC_CHAR_S) == 0)
+               {SC_TRANS_TYPE(_d, char, s, n);};
+            ret = TRUE;};}
+
+    else if (strcmp(dtype, SC_SHORT_S) == 0)
+       {SC_TRANS_SPACE(_d, short, pd, n);
+        if (_d != NULL)
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
+               {SC_TRANS_TYPE_L(_d, float, s, n, SHRT_MIN, SHRT_MAX);}
+            else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, SHRT_MIN, SHRT_MAX);}
+            else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, SHRT_MIN, SHRT_MAX);}
+
+/* fixed point types */
+            else if (strcmp(stype, SC_SHORT_S) == 0)
+               {SC_TRANS_TYPE(_d, short, s, n);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
+               {SC_TRANS_TYPE_L(_d, int, s, n, SHRT_MIN, SHRT_MAX);}
+            else if (strcmp(stype, SC_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long, s, n, SHRT_MIN, SHRT_MAX);}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long long, s, n, SHRT_MIN, SHRT_MAX);}
+
+            else if (strcmp(stype, SC_CHAR_S) == 0)
+               {SC_TRANS_TYPE(_d, char, s, n);};
+        ret = TRUE;};}
+
+    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+	     (strcmp(dtype, SC_INTEGER_S) == 0))
+       {SC_TRANS_SPACE(_d, int, pd, n);
+        if (_d != NULL)
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
+               {SC_TRANS_TYPE_L(_d, float, s, n, INT_MIN, INT_MAX);}
+	    else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, INT_MIN, INT_MAX);}
+	    else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, INT_MIN, INT_MAX);}
+
+/* fixed point types */
+            else if (strcmp(stype, SC_SHORT_S) == 0)
+               {SC_TRANS_TYPE(_d, short, s, n);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
+               {SC_TRANS_TYPE(_d, int, s, n);}
+            else if (strcmp(stype, SC_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long, s, n, INT_MIN, INT_MAX);}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long long, s, n, INT_MIN, INT_MAX);}
+
             else if (strcmp(stype, SC_CHAR_S) == 0)
                {SC_TRANS_TYPE(_d, char, s, n);};
         ret = TRUE;};}
@@ -383,57 +457,53 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
     else if (strcmp(dtype, SC_LONG_S) == 0)
        {SC_TRANS_SPACE(_d, long, pd, n);
         if (_d != NULL)
-           {if (strcmp(stype, SC_DOUBLE_S) == 0)
-               {SC_TRANS_TYPE_L(_d, double, s, n, LONG_MIN, LONG_MAX);}
-            else if (strcmp(stype, SC_FLOAT_S) == 0)
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
                {SC_TRANS_TYPE_L(_d, float, s, n, LONG_MIN, LONG_MAX);}
-            else if ((strcmp(stype, SC_INTEGER_S) == 0) ||
-                        (strcmp(stype, "int") == 0))
-               {SC_TRANS_TYPE(_d, int, s, n);}
-            else if (strcmp(stype, SC_BIGINT_S) == 0)
-               {SC_TRANS_TYPE_L(_d, BIGINT, s, n, LONG_MIN, LONG_MAX);}
-            else if (strcmp(stype, SC_LONG_S) == 0)
-               {SC_TRANS_TYPE(_d, long, s, n);}
+            else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, LONG_MIN, LONG_MAX);}
+            else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, LONG_MIN, LONG_MAX);}
+
+/* fixed point types */
             else if (strcmp(stype, SC_SHORT_S) == 0)
                {SC_TRANS_TYPE(_d, short, s, n);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
+               {SC_TRANS_TYPE(_d, int, s, n);}
+            else if (strcmp(stype, SC_LONG_S) == 0)
+               {SC_TRANS_TYPE(_d, long, s, n);}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long long, s, n, LONG_MIN, LONG_MAX);}
+
             else if (strcmp(stype, SC_CHAR_S) == 0)
                {SC_TRANS_TYPE(_d, char, s, n);};
         ret = TRUE;};}
 
-    else if (strcmp(dtype, SC_BIGINT_S) == 0)
-       {SC_TRANS_SPACE(_d, BIGINT, pd, n);
+    else if (strcmp(dtype, SC_LONG_LONG_S) == 0)
+       {SC_TRANS_SPACE(_d, long long, pd, n);
         if (_d != NULL)
-           {if (strcmp(stype, SC_DOUBLE_S) == 0)
-               {SC_TRANS_TYPE_L(_d, double, s, n, _SC.bmn, _SC.bmx);}
-            else if (strcmp(stype, SC_FLOAT_S) == 0)
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
                {SC_TRANS_TYPE(_d, float, s, n);}
-            else if ((strcmp(stype, SC_INTEGER_S) == 0) ||
-                        (strcmp(stype, "int") == 0))
+	    else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, _SC.bmn, _SC.bmx);}
+	    else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, _SC.bmn, _SC.bmx);}
+
+/* fixed point types */
+            else if (strcmp(stype, SC_SHORT_S) == 0)
+               {SC_TRANS_TYPE(_d, short, s, n);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
                {SC_TRANS_TYPE(_d, int, s, n);}
             else if (strcmp(stype, SC_LONG_S) == 0)
                {SC_TRANS_TYPE(_d, long, s, n);}
-            else if (strcmp(stype, SC_SHORT_S) == 0)
-               {SC_TRANS_TYPE(_d, short, s, n);}
-            else if (strcmp(stype, SC_CHAR_S) == 0)
-               {SC_TRANS_TYPE(_d, char, s, n);};
-        ret = TRUE;};}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE(_d, long long, s, n);}
 
-    else if (strcmp(dtype, SC_SHORT_S) == 0)
-       {SC_TRANS_SPACE(_d, short, pd, n);
-        if (_d != NULL)
-           {if (strcmp(stype, SC_DOUBLE_S) == 0)
-               {SC_TRANS_TYPE_L(_d, double, s, n, SHRT_MIN, SHRT_MAX);}
-            else if (strcmp(stype, SC_FLOAT_S) == 0)
-               {SC_TRANS_TYPE_L(_d, float, s, n, SHRT_MIN, SHRT_MAX);}
-            else if ((strcmp(stype, SC_INTEGER_S) == 0) ||
-                        (strcmp(stype, "int") == 0))
-               {SC_TRANS_TYPE_L(_d, int, s, n, SHRT_MIN, SHRT_MAX);}
-            else if (strcmp(stype, SC_LONG_S) == 0)
-               {SC_TRANS_TYPE_L(_d, long, s, n, SHRT_MIN, SHRT_MAX);}
-            else if (strcmp(stype, SC_BIGINT_S) == 0)
-               {SC_TRANS_TYPE_L(_d, BIGINT, s, n, SHRT_MIN, SHRT_MAX);}
-            else if (strcmp(stype, SC_SHORT_S) == 0)
-               {SC_TRANS_TYPE(_d, short, s, n);}
             else if (strcmp(stype, SC_CHAR_S) == 0)
                {SC_TRANS_TYPE(_d, char, s, n);};
         ret = TRUE;};}
@@ -441,21 +511,29 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
     else if (strcmp(dtype, SC_CHAR_S) == 0)
        {SC_TRANS_SPACE(_d, char, pd, n);
         if (_d != NULL)
-           {if (strcmp(stype, SC_DOUBLE_S) == 0)
-               {SC_TRANS_TYPE_L(_d, double, s, n, CHAR_MIN, CHAR_MAX);}
-            else if (strcmp(stype, SC_FLOAT_S) == 0)
+
+/* floating point types */
+	   {if (strcmp(stype, SC_FLOAT_S) == 0)
                {SC_TRANS_TYPE_L(_d, float, s, n, CHAR_MIN, CHAR_MAX);}
-            else if ((strcmp(stype, SC_INTEGER_S) == 0) ||
-                        (strcmp(stype, "int") == 0))
-               {SC_TRANS_TYPE_L(_d, int, s, n, CHAR_MIN, CHAR_MAX);}
-            else if (strcmp(stype, SC_BIGINT_S) == 0)
-               {SC_TRANS_TYPE_L(_d, BIGINT, s, n, CHAR_MIN, CHAR_MAX);}
-            else if (strcmp(stype, SC_LONG_S) == 0)
-               {SC_TRANS_TYPE_L(_d, long, s, n, CHAR_MIN, CHAR_MAX);}
+	    else if (strcmp(stype, SC_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, double, s, n, CHAR_MIN, CHAR_MAX);}
+	    else if (strcmp(stype, SC_LONG_DOUBLE_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long double, s, n, CHAR_MIN, CHAR_MAX);}
+
+/* fixed point types */
             else if (strcmp(stype, SC_SHORT_S) == 0)
                {SC_TRANS_TYPE_L(_d, short, s, n, CHAR_MIN, CHAR_MAX);}
+	    else if ((strcmp(dtype, SC_INT_S) == 0) ||
+		     (strcmp(dtype, SC_INTEGER_S) == 0))
+               {SC_TRANS_TYPE_L(_d, int, s, n, CHAR_MIN, CHAR_MAX);}
+            else if (strcmp(stype, SC_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long, s, n, CHAR_MIN, CHAR_MAX);}
+            else if (strcmp(stype, SC_LONG_LONG_S) == 0)
+               {SC_TRANS_TYPE_L(_d, long long, s, n, CHAR_MIN, CHAR_MAX);}
+
             else if (strcmp(stype, SC_CHAR_S) == 0)
                {SC_TRANS_TYPE(_d, char, s, n);};
+
         ret = TRUE;};}
 
 #endif
@@ -566,7 +644,7 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	    {ps    = (short *) out;
 	     ps[i] = (short) fld;}
 
-	 else if (ityp == SC_INTEGER_I)
+	 else if (ityp == SC_INT_I)
 	    {pi    = (int *) out;
 	     pi[i] = (int) fld;}
 
@@ -582,39 +660,14 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 /* SC_SIZEOF - a string driven sizeof operator if you can't do any better */
 
 int SC_sizeof(char *s)
-   {int nb;
+   {int bpi;
 
-    if (strcmp(s, SC_DOUBLE_S) == 0)
-       nb = sizeof(double);
+    bpi = SC_type_size_a(s);
 
-    else if (strcmp(s, SC_FLOAT_S) == 0)
-       nb = sizeof(float);
+    if (bpi == -1)
+       bpi = 0;
 
-    else if (strcmp(s, SC_INTEGER_S) == 0)
-       nb = sizeof(int);
-
-    else if (strcmp(s, "int") == 0)
-       nb = sizeof(int);
-
-    else if (strcmp(s, SC_BIGINT_S) == 0)
-       nb = sizeof(BIGINT);
-
-    else if (strcmp(s, SC_LONG_S) == 0)
-       nb = sizeof(long);
-
-    else if (strcmp(s, SC_SHORT_S) == 0)
-       nb = sizeof(short);
-
-    else if (strcmp(s, SC_CHAR_S) == 0)
-       nb = sizeof(char);
-
-    else if (strchr(s, '*') != NULL)
-       nb = sizeof(char *);
-
-    else
-       nb = 0;
-
-    return(nb);}
+    return(bpi);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

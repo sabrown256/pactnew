@@ -240,7 +240,7 @@ static object *_SXI_copy_iob(object *argl)
     SS_args(argl,
             G_DEVICE, &dvd,
             G_DEVICE, &dvs,
-	    SC_INTEGER_I, &rm,
+	    SC_INT_I, &rm,
             0);
 
     if ((dvd == NULL) || (dvs == NULL))
@@ -275,7 +275,7 @@ static object *_SXI_add_annot(object *argl)
     SS_args(argl,
             G_DEVICE,     &dev,
             SC_STRING_I,  &s,
-	    SC_INTEGER_I, &clr,
+	    SC_INT_I, &clr,
 	    SC_DOUBLE_I,  &ndc[0],
 	    SC_DOUBLE_I,  &ndc[1],
 	    SC_DOUBLE_I,  &ndc[2],
@@ -421,7 +421,7 @@ static object *_SXI_toggle_gri(object *toggle)
        return(SS_f);
 
     SS_args(toggle,
-	    SC_INTEGER_I, &flag,
+	    SC_INT_I, &flag,
 	    0);
 
     if (flag)
@@ -506,13 +506,13 @@ static object *_SXI_toggle_gri(object *toggle)
 	PG_register_callback("ReDraw", _SX_clear_window);
 
 /* axis controls */
-	PG_register_variable("Axis", SC_INTEGER_S,
+	PG_register_variable("Axis", SC_INT_S,
 			     axson, NULL, NULL);
-	PG_register_variable("Grid", SC_INTEGER_S,
+	PG_register_variable("Grid", SC_INT_S,
 			     &SX_grid, NULL, NULL);
-	PG_register_variable("Max Major Ticks", SC_INTEGER_S,
+	PG_register_variable("Max Major Ticks", SC_INT_S,
 			     axsmjt, NULL, NULL);
-	PG_register_variable("# Minor Ticks", SC_INTEGER_S,
+	PG_register_variable("# Minor Ticks", SC_INT_S,
 			     axsmnt, NULL, NULL);
 	PG_register_variable("# Decades", SC_DOUBLE_S,
 			     axndec, NULL, NULL);
@@ -539,23 +539,23 @@ static object *_SXI_toggle_gri(object *toggle)
 /* font controls */
 	PG_register_variable("Type Face", SC_STRING_S,
 			     axstf, NULL, NULL);
-	PG_register_variable("Type Size", SC_INTEGER_S,
+	PG_register_variable("Type Size", SC_INT_S,
 			     &SX_plot_type_size, NULL, NULL);
 	PG_register_variable("Type Style", SC_STRING_S,
 			     &SX_plot_type_style, NULL, NULL);
 
 /* label controls */
-	PG_register_variable("Label Color Flag", SC_INTEGER_S,
+	PG_register_variable("Label Color Flag", SC_INT_S,
 			     labcf, NULL, NULL);
-	PG_register_variable("Label Length", SC_INTEGER_S,
+	PG_register_variable("Label Length", SC_INT_S,
 			     labln, NULL, NULL);
-	PG_register_variable("Label Type Size", SC_INTEGER_S,
+	PG_register_variable("Label Type Size", SC_INT_S,
 			     labts, NULL, NULL);
 	PG_register_variable("Label Space", SC_DOUBLE_S,
 			     labsp, NULL, NULL);
 
 /* marker controls */
-	PG_register_variable("Marker Index", SC_INTEGER_S,
+	PG_register_variable("Marker Index", SC_INT_S,
 			     mrki, NULL, NULL);
 	PG_register_variable("Orientation", SC_DOUBLE_S,
 			     &SX_marker_orientation, NULL, NULL);
@@ -567,7 +567,7 @@ static object *_SXI_toggle_gri(object *toggle)
 			     &SX_smooth_method, NULL, NULL);
 
 /* mouse location controls */
-	PG_register_variable("Mouse", SC_INTEGER_S, 
+	PG_register_variable("Mouse", SC_INT_S, 
 			     &SX_show_mouse_location, NULL, NULL);
 	PG_register_variable("X Location", SC_DOUBLE_S,
 			     &SX_show_mouse_location_x, NULL, NULL);
@@ -579,7 +579,7 @@ static object *_SXI_toggle_gri(object *toggle)
 	    {out = SX_get_device(i);
 
 	     s = SC_dsnprintf(FALSE, "%s Flag", out->dupp);
-	     PG_register_variable(s, SC_INTEGER_S,
+	     PG_register_variable(s, SC_INT_S,
 				  &out->active, NULL, NULL);
 	     s = SC_dsnprintf(FALSE, "%s Name", out->dupp);
 	     PG_register_variable(s, SC_STRING_S,
@@ -589,13 +589,13 @@ static object *_SXI_toggle_gri(object *toggle)
 				  &out->type, NULL, NULL);};
 
 /* rendering controls */
-	PG_register_variable("1D->1D", SC_INTEGER_S,
+	PG_register_variable("1D->1D", SC_INT_S,
 			     &SX_render_1d_1d, NULL, NULL);
-	PG_register_variable("2D->1D", SC_INTEGER_S,
+	PG_register_variable("2D->1D", SC_INT_S,
 			     &SX_render_2d_1d, NULL, NULL);
-	PG_register_variable("2D->2D", SC_INTEGER_S,
+	PG_register_variable("2D->2D", SC_INT_S,
 			     &SX_render_2d_2d, NULL, NULL);
-	PG_register_variable("# Contour Levels", SC_INTEGER_S,
+	PG_register_variable("# Contour Levels", SC_INT_S,
 			     nlev, NULL, NULL);
 	PG_register_variable("Contour Ratio", SC_DOUBLE_S,
 			     cntrat, NULL, NULL);
@@ -605,13 +605,13 @@ static object *_SXI_toggle_gri(object *toggle)
 			     &SX_phi, &_SX.phi_mn, &_SX.phi_mx);
 	PG_register_variable("Theta", SC_DOUBLE_S,
 			     &SX_theta, &_SX.th_mn, &_SX.th_mx);
-	PG_register_variable("Default Color", SC_INTEGER_S,
+	PG_register_variable("Default Color", SC_INT_S,
 			     &SX_default_color, NULL, NULL);
 
 /* window controls */
-	PG_register_variable("Border Width", SC_INTEGER_S,
+	PG_register_variable("Border Width", SC_INT_S,
 			     &SX_border_width, NULL, NULL);
-	PG_register_variable("Clear Mode", SC_INTEGER_S,
+	PG_register_variable("Clear Mode", SC_INT_S,
 			     clrmd, NULL, NULL);
 
 /* tty output controls */

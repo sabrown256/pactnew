@@ -1721,7 +1721,7 @@ FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
 		 zmin  = min(zmin, z);
 		 *pd++ = z;}
 
-	im = PD_make_image(s, "double *", d, kx, lx, 8, xmin, xmax,
+	im = PD_make_image(s, SC_DOUBLE_P_S, d, kx, lx, 8, xmin, xmax,
 			   ymin, ymax, zmin, zmax);
 
 	if (!PD_put_image(file, im, *image))
@@ -2393,13 +2393,13 @@ FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
     rv = PD_read_bits(file, s, t, *nitems, *sgned, *nbits, *padsz,
 		       *fpp, *offs, (long *) pan, &dataout);
     if (rv != 0)
-       {if (strcmp(t, "long") == 0)
+       {if (strcmp(t, SC_LONG_S) == 0)
            memcpy(pdata, dataout, numitems * sizeof(long));
         else if ((strcmp(t, "int") == 0) || (strcmp(t, "integer") == 0))
            memcpy(pdata, dataout, numitems * sizeof(int));
-        else if (strcmp(t, "short") == 0)
+        else if (strcmp(t, SC_SHORT_S) == 0)
            memcpy(pdata, dataout, numitems * sizeof(short));
-        else if (strcmp(t, "char")  == 0)
+        else if (strcmp(t, SC_CHAR_S)  == 0)
            memcpy(pdata, dataout, numitems);
         else
            rv = FALSE;}

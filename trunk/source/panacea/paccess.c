@@ -697,7 +697,7 @@ void PA_init_scalar(char *s)
     if (strcmp(ptype, SC_DOUBLE_S) == 0)
        {PA_SET_UP_SCALAR(pname, double, pdata, pval, pfun);}
 
-    else if (strcmp(ptype, SC_INTEGER_S) == 0)
+    else if (strcmp(ptype, SC_INT_S) == 0)
        {PA_SET_UP_SCALAR(pname, int, pdata, pval, pfun);}
 
     else if (strcmp(ptype, SC_LONG_S) == 0)

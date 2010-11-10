@@ -149,7 +149,7 @@ static void test_2d_new(int method)
 
 /* setup the mapping data */
     PG_set_attrs_mapping(data->f,
-			 "CONTOUR-METHOD", SC_INTEGER_I, FALSE, method,
+			 "CONTOUR-METHOD", SC_INT_I, FALSE, method,
 			 NULL);
 
 /* setup the global graph data */
@@ -158,9 +158,9 @@ static void test_2d_new(int method)
 				 lnwidth, 0.0, 0.0, 0.0, HUGE);
 
     PG_set_attrs_graph(data,
-		       "DRAW-MESH", SC_INTEGER_I, FALSE, mshp,
+		       "DRAW-MESH", SC_INT_I, FALSE, mshp,
 /*
-		       "N-LEVELS",  SC_INTEGER_I, FALSE, nlev,
+		       "N-LEVELS",  SC_INT_I, FALSE, nlev,
 		       "LEVELS",    SC_DOUBLE_I, TRUE,  levels,
 */
 		       NULL);
@@ -280,13 +280,13 @@ static void test_3d_new(void)
 				 theta, phi, 0.0, HUGE);
 
     PG_set_attrs_graph(data,
-		       "N-LEVELS",  SC_INTEGER_I, FALSE, nlev,
-		       "LEVELS",    SC_INTEGER_I, TRUE,  levels,
+		       "N-LEVELS",  SC_INT_I, FALSE, nlev,
+		       "LEVELS",    SC_INT_I, TRUE,  levels,
 		       NULL);
 
 /* setup the mapping data */
     PG_set_attrs_mapping(data->f,
-			 "PLOT-TYPE", SC_INTEGER_I, FALSE, pty,
+			 "PLOT-TYPE", SC_INT_I, FALSE, pty,
 			 "THETA",     SC_DOUBLE_I,  FALSE, theta,
 			 "PHI",       SC_DOUBLE_I,  FALSE, phi,
 			 "CHI",       SC_DOUBLE_I,  FALSE, 0.0,
@@ -342,13 +342,13 @@ static void test_3d_new(void)
 
 /* setup the global graph data */
 	 PG_set_attrs_graph(data,
-			    "N-LEVELS",  SC_INTEGER_I, FALSE, nlev,
-			    "LEVELS",    SC_INTEGER_I, TRUE,  levels,
+			    "N-LEVELS",  SC_INT_I, FALSE, nlev,
+			    "LEVELS",    SC_INT_I, TRUE,  levels,
 			    NULL);
 
 /* setup the mapping data */
 	 PG_set_attrs_mapping(data->f,
-			      "PLOT-TYPE",   SC_INTEGER_I, FALSE, pty,
+			      "PLOT-TYPE",   SC_INT_I, FALSE, pty,
 			      "THETA",       SC_DOUBLE_I,  FALSE, theta,
 			      "PHI",         SC_DOUBLE_I,  FALSE, phi,
 			      "CHI",         SC_DOUBLE_I,  FALSE, 0.0,

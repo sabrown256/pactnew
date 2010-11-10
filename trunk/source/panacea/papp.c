@@ -151,9 +151,9 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
     crve     = FMAKE_N(double *, n_arrays, "_PA_T_WR_DATA:crve");
     stripe   = FMAKE_N(double, n_arrays, "_PA_T_WR_DATA:stripe");
     if (sizeof(REAL) == sizeof(double))
-       strcpy(type, "double");
+       strcpy(type, SC_DOUBLE_S);
     else
-       strcpy(type, "float");
+       strcpy(type, SC_FLOAT_S);
 
 /* find the maximum possible curve length */
     nptm = last_cycle - first_cycle + 1;

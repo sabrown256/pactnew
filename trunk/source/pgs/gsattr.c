@@ -11,9 +11,9 @@
 
 #include "pgs_int.h"
 
-#define ATTR_STR(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_STRING_S,  TRUE, TRUE)
-#define ATTR_INT(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_INTEGER_S, TRUE, TRUE)
-#define ATTR_DBL(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_DOUBLE_S,  TRUE, TRUE)
+#define ATTR_STR(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_STRING_S, TRUE, TRUE)
+#define ATTR_INT(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_INT_S,    TRUE, TRUE)
+#define ATTR_DBL(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_DOUBLE_S, TRUE, TRUE)
 
 gattrdes
  _PG_gattrs;
@@ -97,7 +97,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	     else if (dflt == TRUE)
 	        *pl = lv;}
 
-	 else if (typ == SC_INTEGER_I)
+	 else if (typ == SC_INT_I)
 	    {pi = SC_VA_ARG(int *);
 	     iv = SC_VA_ARG(int);
 	     if (pv != NULL)
@@ -291,13 +291,13 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
 		 SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_P_S,
 				       name, lv);};}
 
-	 else if (typ == SC_INTEGER_I)
+	 else if (typ == SC_INT_I)
 	    {if (ptr)
 	        {pv = SC_VA_ARG(int *);
-		 alst = SC_change_alist(alst, name, SC_INTEGER_P_S, pv);}
+		 alst = SC_change_alist(alst, name, SC_INT_P_S, pv);}
 	     else
 	        {iv = SC_VA_ARG(int);
-		 SC_CHANGE_VALUE_ALIST(alst, int, SC_INTEGER_P_S,
+		 SC_CHANGE_VALUE_ALIST(alst, int, SC_INT_P_S,
 				       name, iv);};}
 
 	 else if (typ == SC_SHORT_I)
@@ -727,7 +727,7 @@ void *PG_ptr_attr_glb(char *name)
 void _PG_ptr_attr_set(char *typ, void *pvo, void *pvi)
    {
 
-    if (typ == SC_INTEGER_S)
+    if (typ == SC_INT_S)
        {int *iv;
 
 	iv  = (int *) pvo;
@@ -805,7 +805,7 @@ int PG_set_attrs_glb(int dflt, ...)
 	 else
 	    {typ = hp->type;
 	     pvo = hp->def;
-	     if (typ == SC_INTEGER_S)
+	     if (typ == SC_INT_S)
 	        {iv  = SC_VA_ARG(int);
 		 pvi = &iv;}
 	     else if (typ == SC_DOUBLE_S)

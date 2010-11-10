@@ -173,10 +173,10 @@ void PA_def_alias(char *name, char *type, void *pv)
         *sp = *(short *) pv;
         SC_hasharr_install(PA_alias_tab, name, sp, SC_SHORT_S, TRUE, TRUE);}
 
-    else if (strncmp(type, SC_INTEGER_S, 3) == 0)
+    else if (strncmp(type, SC_INT_S, 3) == 0)
        {ip  = FMAKE(int, "PA_DEF_ALIAS:ip");
         *ip = *(int *) pv;
-        SC_hasharr_install(PA_alias_tab, name, ip, SC_INTEGER_S, TRUE, TRUE);}
+        SC_hasharr_install(PA_alias_tab, name, ip, SC_INT_S, TRUE, TRUE);}
 
     else if (strcmp(type, SC_LONG_S) == 0)
        {lp  = FMAKE(long, "PA_DEF_ALIAS:lp");
@@ -228,7 +228,7 @@ double PA_alias_value(char *s)
 	else if (strcmp(hp->type, SC_LONG_S) == 0)
 	   d = *(long *) hp->def;
 
-	else if (strncmp(hp->type, SC_INTEGER_S, 3) == 0)
+	else if (strncmp(hp->type, SC_INT_S, 3) == 0)
 	   d = *(int *) hp->def;
 
 	else if (strcmp(hp->type, SC_SHORT_S) == 0)
@@ -350,7 +350,7 @@ void PA_specifyh(void)
 
             nxtp = FMAKE(double, "PA_SPECIFYH:nxtp");
             *nxtp = nxt;
-            _PA.ivlst = SC_mk_pcons("double *", nxtp, SC_PCONS_P_S, NULL);
+            _PA.ivlst = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
             if (first == NULL)
                first = _PA.ivlst;
             else
@@ -377,7 +377,7 @@ void PA_sh(void)
        {nxt = PA_alias_value(s);
         nxtp = FMAKE(double, "PA_SH:nxtp");
         *nxtp = nxt;
-        next = SC_mk_pcons("double *", nxtp, SC_PCONS_P_S, NULL);
+        next = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
         if (_PA.ivlst == NULL)
            iv_spec_lst->spec = next;
         else
@@ -711,7 +711,7 @@ void PA_pshand(PA_command *cp)
         sval = PA_get_field("VALUE", cp->name, REQU);
 	d    = PA_alias_value(sval);
 
-        if (cp->type == SC_INTEGER_I)
+        if (cp->type == SC_INT_I)
            (cp->vr)[i] = (int) d;
 
         else if (cp->type == SC_DOUBLE_I)

@@ -114,20 +114,28 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
 
     type = SC_arrtype(p, -1);
 
-    if (type == SC_DOUBLE_I)
-       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);}
-
-    else if (type == SC_FLOAT_I)
+/* floating point types */
+    if (type == SC_FLOAT_I)
        {MIN_MAX(float, p, n, pn, px, imin, imax, FLT_MAX);}
 
-    else if (type == SC_INTEGER_I)
+    else if (type == SC_DOUBLE_I)
+       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);}
+
+    else if (type == SC_LONG_DOUBLE_I)
+       {MIN_MAX(long double, p, n, pn, px, imin, imax, LDBL_MAX);}
+
+/* fixed point types */
+    else if (type == SC_SHORT_I)
+       {MIN_MAX(short, p, n, pn, px, imin, imax, SHRT_MAX);}
+
+    else if (type == SC_INT_I)
        {MIN_MAX(int, p, n, pn, px, imin, imax, INT_MAX);}
 
     else if (type == SC_LONG_I)
        {MIN_MAX(long, p, n, pn, px, imin, imax, LONG_MAX);}
 
-    else if (type == SC_SHORT_I)
-       {MIN_MAX(short, p, n, pn, px, imin, imax, SHRT_MAX);}
+    else if (type == SC_LONG_LONG_I)
+       {MIN_MAX(long long, p, n, pn, px, imin, imax, LONG_MAX);}
 
     else if (type == SC_CHAR_I)
        {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
@@ -226,7 +234,7 @@ int PM_find_index(void *p, double f, int n)
     else if (type == SC_FLOAT_I)
        {FIND_INDEX(float, p, f, n, indx);}
 
-    else if (type == SC_INTEGER_I)
+    else if (type == SC_INT_I)
        {FIND_INDEX(int, p, f, n, indx);}
 
     else if (type == SC_LONG_I)
@@ -496,7 +504,7 @@ int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
     if (strcmp(type, SC_DOUBLE_S) == 0)
        {FIND_VALUE(double, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (strcmp(type, SC_INTEGER_S) == 0)
+    else if (strcmp(type, SC_INT_S) == 0)
        {FIND_VALUE(int, nx, x, prd, val, nout, out, nin, in);}
 
     else if (strcmp(type, SC_LONG_S) == 0)

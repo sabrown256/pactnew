@@ -672,8 +672,8 @@ static object *_ULI_mk_palette(object *argl)
     wbck = TRUE;
     SS_args(argl,
             SC_STRING_I, &name,
-            SC_INTEGER_I, &nc,
-            SC_INTEGER_I, &wbck,
+            SC_INT_I, &nc,
+            SC_INT_I, &wbck,
             0);
 
     dev = SX_graphics_device;
@@ -809,18 +809,18 @@ static object *_ULI_edit(int ie)
 
 /* remember the original curve's color */
     PG_get_attrs_alist(ocv->info,
-		       "LINE-COLOR", SC_INTEGER_I, &oldc, dev->WHITE,
+		       "LINE-COLOR", SC_INT_I, &oldc, dev->WHITE,
 		       NULL);
 
 /* redraw original curve in gray */
     ocv->info = PG_set_attrs_alist(ocv->info,
-				   "LINE-COLOR", SC_INTEGER_I, FALSE, dev->GRAY,
+				   "LINE-COLOR", SC_INT_I, FALSE, dev->GRAY,
 				   NULL);
 
 /* draw scatter version of curve in green */
     crv->info = PG_set_attrs_alist(crv->info,
-				   "SCATTER",    SC_INTEGER_I, FALSE, TRUE,
-				   "LINE-COLOR", SC_INTEGER_I, FALSE, dev->GREEN,
+				   "SCATTER",    SC_INT_I, FALSE, TRUE,
+				   "LINE-COLOR", SC_INT_I, FALSE, dev->GREEN,
 				   NULL);
     UL_plot();
 
@@ -1138,8 +1138,8 @@ static object *_ULI_crv_attr(object *obj)
 	dfcol = (SX_graphics_device == NULL) ? 4 : SX_graphics_device->BLUE;
 	   
 	PG_get_attrs_alist(info,
-			   "LINE-COLOR", SC_INTEGER_I, &lncol, dfcol,
-			   "LINE-STYLE", SC_INTEGER_I, &lnsty, LINE_SOLID,
+			   "LINE-COLOR", SC_INT_I, &lncol, dfcol,
+			   "LINE-STYLE", SC_INT_I, &lnsty, LINE_SOLID,
 			   "LINE-WIDTH", SC_DOUBLE_I,    &lnwid, 0.0,
 			   NULL);
 
@@ -1148,9 +1148,9 @@ static object *_ULI_crv_attr(object *obj)
             PRINT(stdout, SX_text_output_format, lnwid);
             PRINT(stdout, " %ld)\n\n", lnsty);};
 
-        o = SS_make_list(SC_INTEGER_I, &lncol,
+        o = SS_make_list(SC_INT_I, &lncol,
 			 SC_DOUBLE_I,  &lnwid,
-			 SC_INTEGER_I, &lnsty,
+			 SC_INT_I, &lnsty,
 			 0);};
 
     return(o);}

@@ -194,7 +194,7 @@ int _SX_get_object_length(object *obj)
     else if (ityp == SC_STRING_I)
        ni = SS_STRING_LENGTH(obj) + 1;
 
-    else if ((ityp == SC_INTEGER_I) ||
+    else if ((ityp == SC_INT_I) ||
 	     (ityp == SC_FLOAT_I))
        ni = 1;
 

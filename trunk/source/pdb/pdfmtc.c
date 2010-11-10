@@ -142,52 +142,48 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 
 static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 			      int flg, int *ordr, long *formt)
-   {int ifx, ifp;
+   {int ifx, ifp, icx;
     data_standard *std;
     data_alignment *align;
 
     std   = file->std;
     align = file->align;
 
-    ifx = -1;
-    ifp = -1;
+/* check for fixed point types */
+    if ((ifx = SC_fix_type_id(type, TRUE)) != -1)
+       {ifx -= SC_SHORT_I;
+	std->fx[ifx].bpi   = nb;
+	std->fx[ifx].order = (PD_byte_order) flg;
+	align->fx[ifx]     = al;}
 
-    if (strcmp(type, "char") == 0)
+/* check for floating point types */
+    else if ((ifp = SC_fp_type_id(type)) != -1)
+       {ifp -= SC_FLOAT_I;
+	std->fp[ifp].bpi    = nb;
+	std->fp[ifp].order  = ordr;
+	std->fp[ifp].format = formt;
+	align->fp[ifp]      = al;}
+
+/* check for complex types */
+    else if ((icx = SC_cx_type_id(type)) != -1)
+       {icx -= SC_FLOAT_COMPLEX_I;
+/*
+	std->fp[icx].bpi    = nb;
+	std->fp[icx].order  = ordr;
+	std->fp[icx].format = formt;
+	align->fp[icx]      = al;
+ */
+	}
+
+    else if (strcmp(type, SC_CHAR_S) == 0)
        align->char_alignment = al;
 
     else if (strcmp(type, "*") == 0)
        {std->ptr_bytes       = nb;
 	align->ptr_alignment = al;}
 
-    else if (strcmp(type, "short") == 0)
-       ifx = 0;
-    else if (strcmp(type, "int") == 0)
-       ifx = 1;
-    else if (strcmp(type, "long") == 0)
-       ifx = 2;
-    else if (strcmp(type, "long_long") == 0)
-       ifx = 3;
-
-    else if (strcmp(type, "float") == 0)
-       ifp = 0;
-    else if (strcmp(type, "double") == 0)
-       ifp = 1;
-    else if (strcmp(type, "long_double") == 0)
-       ifp = 2;
-
-    else if (strcmp(type, "struct") == 0)
+    else if (strcmp(type, SC_STRUCT_S) == 0)
        align->struct_alignment = al;
-
-    if (ifx != -1)
-       {std->fx[ifx].bpi   = nb;
-	std->fx[ifx].order = (PD_byte_order) flg;
-	align->fx[ifx]     = al;};
-
-    if (ifp != -1)
-       {std->fp[ifp].bpi    = nb;
-	std->fp[ifp].order  = ordr;
-	std->fp[ifp].format = formt;
-	align->fp[ifp]      = al;};
 
     return;}
 

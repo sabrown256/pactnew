@@ -1643,16 +1643,8 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
     if (strcmp(type, SC_CHAR_S) == 0)
        ityp = SC_CHAR_I;
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
-       ityp = SC_SHORT_I;
-
-    else if (strncmp(type, SC_INTEGER_S, 3) == 0)
-       ityp = SC_INTEGER_I;
-
-    else if (strcmp(type, SC_LONG_S) == 0)
-       ityp = SC_LONG_I;
-
-    else
+/* fixed point types */
+    else if ((ityp == SC_fix_type_id(type, FALSE)) == -1)
        return(FALSE);
 
     SC_unpack_bits(out, in, ityp, nbits, padsz, fpp, nitems, offs);

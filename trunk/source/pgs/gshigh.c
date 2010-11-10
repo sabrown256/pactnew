@@ -370,7 +370,7 @@ void _PG_print_labels(PG_device *dev, PG_graph *data)
 		      tc = dev->WHITE;
 		      if (_PG_gattrs.label_color_flag == TRUE)
 			 PG_get_attrs_alist(info,
-					    "LINE-COLOR", SC_INTEGER_I, &tc, dev->WHITE,
+					    "LINE-COLOR", SC_INT_I, &tc, dev->WHITE,
 					    NULL);
 
 		      dataid[nlabs]   = g->identifier;
@@ -511,8 +511,8 @@ pcons *PG_set_plot_type(pcons *info, PG_rendering pty, int axs)
        axs = pty;
 
     info = PG_set_attrs_alist(info,
-			      "PLOT-TYPE", SC_INTEGER_I, FALSE, pty,
-			      "AXIS-TYPE", SC_INTEGER_I, FALSE, axs,
+			      "PLOT-TYPE", SC_INT_I, FALSE, pty,
+			      "AXIS-TYPE", SC_INT_I, FALSE, axs,
 			      NULL);
 
     return(info);}

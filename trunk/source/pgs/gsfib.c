@@ -576,12 +576,12 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
     SC_FORTRAN_STR_C(lname, name, *pn);
     SC_FORTRAN_STR_C(ltype, type, *pt);
 
-    if (strcmp(ltype, "integer") == 0)
-       {strcpy(ltype, "int *");
+    if (strcmp(ltype, SC_INTEGER_S) == 0)
+       {strcpy(ltype, SC_INT_P_S);
         n = sizeof(int);}
     else if (strcmp(ltype, "real") == 0)
-       {strcpy(ltype, "REAL *");
-        n = sizeof(REAL);}
+       {strcpy(ltype, SC_DOUBLE_P_S);
+        n = sizeof(double);}
     else if (strcmp(ltype, "string") == 0)
        {strcpy(ltype, "char **");
         n = sizeof(char *);}

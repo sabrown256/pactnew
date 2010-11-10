@@ -875,12 +875,12 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
 
 /* use len to effect the cast from size_t to int */
     snprintf(name, MAXLINE, "curve%04d(%d)", icurve, (int) strlen(dp) + 1);
-    if (!PD_write(fp, name, "char", dp))
+    if (!PD_write(fp, name, SC_CHAR_S, dp))
        return(FALSE);
 
 /* save the curve label */
     snprintf(name, MAXLINE, "labl%d(%d)", icurve, (int) strlen(labl) + 1);
-    if (!PD_write(fp, name, "char", lp))
+    if (!PD_write(fp, name, SC_CHAR_S, lp))
        return(FALSE);
 
 /* save the number of points */
@@ -891,36 +891,36 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
 /* save the x and y arrays and the extrema */
     if (sizeof(REAL) == sizeof(double))
        {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, "double", yext))
+        if (!PD_write(fp, name, SC_DOUBLE_S, yext))
            return(FALSE);
 
         snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, "double", x[1]))
+        if (!PD_write(fp, name, SC_DOUBLE_S, x[1]))
            return(FALSE);
 
         snprintf(name, MAXLINE, "xext%d(2)", icurve);
-        if (!PD_write(fp, name, "double", xext))
+        if (!PD_write(fp, name, SC_DOUBLE_S, xext))
            return(FALSE);
 
         snprintf(name, MAXLINE, "xval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, "double", x[0]))
+        if (!PD_write(fp, name, SC_DOUBLE_S, x[0]))
            return(FALSE);}
 
     else
        {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, "float", yext))
+        if (!PD_write(fp, name, SC_FLOAT_S, yext))
            return(FALSE);
 
         snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, "float", x[1]))
+        if (!PD_write(fp, name, SC_FLOAT_S, x[1]))
            return(FALSE);
 
         snprintf(name, MAXLINE, "xext%d(2)", icurve);
-        if (!PD_write(fp, name, "float", xext))
+        if (!PD_write(fp, name, SC_FLOAT_S, xext))
            return(FALSE);
 
         snprintf(name, MAXLINE, "xval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, "float", x[0]))
+        if (!PD_write(fp, name, SC_FLOAT_S, x[0]))
            return(FALSE);};
 
     if (!fp->virtual_internal)
@@ -980,12 +980,12 @@ int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
 /* use len to effect the cast from size_t to int */
     len = strlen(desc) + 1;
     snprintf(name, MAXLINE, "curve%04d(%d)", icurve, len);
-    if (!PD_write(fp, name, "char", desc))
+    if (!PD_write(fp, name, SC_CHAR_S, desc))
        return(FALSE);
 
 /* save the curve label */
     snprintf(name, MAXLINE, "labl%d(%d)", icurve, i);
-    if (!PD_write(fp, name, "char", labl))
+    if (!PD_write(fp, name, SC_CHAR_S, labl))
        return(FALSE);
 
 /* save the number of points */
@@ -998,20 +998,20 @@ int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
 /* save the y array and the extrema */
     if (sizeof(REAL) == sizeof(double))
        {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, "double", extr))
+        if (!PD_write(fp, name, SC_DOUBLE_S, extr))
            return(FALSE);
 
         snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, "double", py))
+        if (!PD_write(fp, name, SC_DOUBLE_S, py))
            return(FALSE);}
 
     else
        {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, "float", extr))
+        if (!PD_write(fp, name, SC_FLOAT_S, extr))
            return(FALSE);
 
         snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, "float", py))
+        if (!PD_write(fp, name, SC_FLOAT_S, py))
            return(FALSE);};
 
     return(TRUE);}

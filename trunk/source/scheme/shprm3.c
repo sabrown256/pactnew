@@ -326,7 +326,7 @@ static object *_SSI_lst_tail(object *argl)
 
     SS_args(argl,
 	    SS_OBJECT_I, &lst,
-	    SC_INTEGER_I, &n,
+	    SC_INT_I, &n,
             0);
 
     o = SS_list_tail(lst, n);
@@ -344,7 +344,7 @@ static object *_SSI_lst_ref(object *argl)
 
     SS_args(argl,
 	    SS_OBJECT_I, &lst,
-	    SC_INTEGER_I, &n,
+	    SC_INT_I, &n,
             0);
 
     o = SS_null;
@@ -732,7 +732,7 @@ static int _SS_eqv(object *o1, object *o2)
     if (ityp != SC_arrtype(o2, -1))
        rv = FALSE;
 
-    else if (ityp == SC_INTEGER_I)
+    else if (ityp == SC_INT_I)
        rv = (SS_INTEGER_VALUE(o1) == SS_INTEGER_VALUE(o2));
 
     else if (ityp == SC_FLOAT_I)

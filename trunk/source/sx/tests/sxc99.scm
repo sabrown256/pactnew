@@ -9,6 +9,7 @@
 
 (ld sxpdbg.scm)
 
+(set-format "bool"                 "%4s ")
 (set-format "short"                "%4d ")
 (set-format "integer"              "%6d ")
 (set-format "long"                 "%8ld ")
@@ -20,7 +21,8 @@
 (set-format "double_complex"       "%11.3e + %11.3e*I ")
 (set-format "long_double_complex"  "%11.3Le + %11.3Le*I ")
 
-(define vars (list "cs" "ca" "cm" "is" "ia" "im" "ls" "la" "lm" "gs" "ga" "gm"
+(define vars (list "bs" "ba" "bm"
+		   "cs" "ca" "cm" "is" "ia" "im" "ls" "la" "lm" "gs" "ga" "gm"
 		   "fs" "fa" "fm" "ds" "da" "dm" "qs" "qa" "qm"
 		   "fcs" "fca" "fcm" "dcs" "dca" "dcm" "qcs" "qca" "qcm"))
 
@@ -31,6 +33,11 @@
 ;              - to the internal file
 
 (define (pdb-data-gen)
+
+; variations on bool
+    (define bs (write-pdbdata nil "bs" (type "bool" 1) #t))
+    (define ba (write-pdbdata nil "ba" (type "bool" 2) #t #f))
+    (define bm (write-pdbdata nil "bm" (type "bool" 10) #t #t #f #f #t #t #t #f #f #t))
 
 ; variations on char
     (define cs (write-pdbdata nil "cs" (type "char" 1) "a"))
@@ -87,7 +94,8 @@
     (define qca (write-pdbdata nil "qca" (type "long_double_complex" 2) 1 2))
     (define qcm (write-pdbdata nil "qcm" (type "long_double_complex" 10) 1 2 3 4 5 6 7 8 9 10))
 
-    (list cs ca cm is ia im ls la lm gs ga gm
+    (list bs ba bm
+          cs ca cm is ia im ls la lm gs ga gm
 	  fs fa fm ds da dm qs qa qm
 	  fcs fca fcm dcs dca dcm qcs qca qcm))
 

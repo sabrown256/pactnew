@@ -337,7 +337,7 @@ PG_rendering PG_est_rendering(PG_graph *data)
 	     break;};
 
     PG_get_attrs_graph(data, FALSE,
-		       "RENDERING-TYPE", SC_INTEGER_I, &pty, pty,
+		       "RENDERING-TYPE", SC_INT_I, &pty, pty,
 		       NULL);
 
     return(pty);}
@@ -376,19 +376,19 @@ PG_picture_desc *PG_get_rendering_properties(PG_device *dev, PG_graph *data)
        labl = NULL;
 
     PG_get_attrs_graph(data, TRUE,
-		       "AXIS-TYPE",      SC_INTEGER_I, &pd->ax_type,    CARTESIAN_2D,
-		       "PLOT-TYPE",      SC_INTEGER_I, &pd->pl_type,    _PG_gattrs.plot_type,
+		       "AXIS-TYPE",      SC_INT_I, &pd->ax_type,    CARTESIAN_2D,
+		       "PLOT-TYPE",      SC_INT_I, &pd->pl_type,    _PG_gattrs.plot_type,
 		       "THETA",          SC_DOUBLE_I,  &pd->va[0],      0.0,
 		       "PHI",            SC_DOUBLE_I,  &pd->va[1],      0.0,
 		       "CHI",            SC_DOUBLE_I,  &pd->va[2],      0.0,
-		       "DRAW-AXIS",      SC_INTEGER_I, &pd->axis_fl,    TRUE,
-		       "DRAW-MESH",      SC_INTEGER_I, &pd->mesh_fl,    meshfl,
+		       "DRAW-AXIS",      SC_INT_I, &pd->axis_fl,    TRUE,
+		       "DRAW-MESH",      SC_INT_I, &pd->mesh_fl,    meshfl,
 		       "PALETTE",        SC_POINTER_I, &ppal,           NULL,
-		       "CONTOUR-METHOD", SC_INTEGER_I, &pd->lev_method, TRUE,
+		       "CONTOUR-METHOD", SC_INT_I, &pd->lev_method, TRUE,
 		       "VIEW-PORT",      SC_POINTER_I, &vwprt,          NULL,
-		       "DRAW-LABEL",     SC_INTEGER_I, &pd->legend_label_fl,   TRUE,
-		       "DRAW-LEGEND",    SC_INTEGER_I, &pd->legend_contour_fl, TRUE,
-		       "DRAW-PALETTE",   SC_INTEGER_I, &pd->legend_palette_fl, TRUE,
+		       "DRAW-LABEL",     SC_INT_I, &pd->legend_label_fl,   TRUE,
+		       "DRAW-LEGEND",    SC_INT_I, &pd->legend_contour_fl, TRUE,
+		       "DRAW-PALETTE",   SC_INT_I, &pd->legend_palette_fl, TRUE,
                        "LEGEND-PLACE",   SC_POINTER_I, &pd->legend_place,      NULL,
 		       NULL);
 
@@ -1007,7 +1007,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
     data.identifier = id;
 
     PG_set_attrs_graph(g,
-		       "DRAW-MESH", SC_INTEGER_I, FALSE, mshp,
+		       "DRAW-MESH", SC_INT_I, FALSE, mshp,
 		       NULL);
 
     fin = dev->finished;
@@ -1043,18 +1043,18 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
 	 if (bndp)
 	    PG_set_attrs_set(pf->domain,
 			     "DOMAIN-BORDER-WIDTH", SC_DOUBLE_I,  FALSE, wbnd,
-			     "DOMAIN-BORDER-COLOR", SC_INTEGER_I, FALSE, cbnd,
-			     "DOMAIN-BORDER-STYLE", SC_INTEGER_I, FALSE, sbnd,
+			     "DOMAIN-BORDER-COLOR", SC_INT_I, FALSE, cbnd,
+			     "DOMAIN-BORDER-STYLE", SC_INT_I, FALSE, sbnd,
 			     NULL);
 
 /* handle the mesh plotting attribute */
 	 PG_set_attrs_graph(g,
-			    "DRAW-MESH", SC_INTEGER_I, FALSE, mshp,
+			    "DRAW-MESH", SC_INT_I, FALSE, mshp,
 			    NULL);
 
 /* if the mapping states its rendering then do it! */
 	 PG_get_attrs_set(pf->domain,
-			  "PLOT-TYPE", SC_INTEGER_I, &pty, ptyp,
+			  "PLOT-TYPE", SC_INT_I, &pty, ptyp,
 			  NULL);
 
 	 if (pf->range == NULL)
@@ -1271,7 +1271,7 @@ void PG_draw_graph(PG_device *dev, PG_graph *data)
 					    "PERM|char*:PG_DRAW_GRAPH :format");
 
     PG_get_attrs_graph(data, FALSE,
-		       "RENDERING-TYPE", SC_INTEGER_I, &data->rendering, data->rendering,
+		       "RENDERING-TYPE", SC_INT_I, &data->rendering, data->rendering,
 		       NULL);
 
     f = data->f;

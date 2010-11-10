@@ -656,7 +656,7 @@ object *SS_mk_integer(BIGINT i)
     lp = FMAKE(BIGINT, "SS_MK_INTEGER:lp");
     *lp = i;
 
-    op = SS_mk_object(lp, SC_INTEGER_I, SELF_EV, NULL,
+    op = SS_mk_object(lp, SC_INT_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_integer);
 
     return(op);}
