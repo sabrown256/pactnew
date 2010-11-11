@@ -51,6 +51,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
     long *lp;
     char *cp;
     double _Complex z;
+    quaternion q;
 
     l = 0;
 
@@ -63,6 +64,10 @@ static void _SS_fix_arg(object *obj, void *v, int type)
     else if (SS_complexp(obj))
        {z = SS_COMPLEX_VALUE(obj);
 	l = PM_fix(creal(z));}
+
+    else if (SS_quaterionp(obj))
+       {q = SS_QUATERNION_VALUE(obj);
+	l = PM_fix(q.s);}
 
     else if (SS_charobjp(obj))
        l = SS_CHARACTER_VALUE(obj);
@@ -135,6 +140,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
 static void _SS_float_arg(object *obj, void *v, int type)
    {double d, *dp;
     double _Complex z;
+    quaternion q;
     float *fp;
 
      d = 0.0;
@@ -148,6 +154,10 @@ static void _SS_float_arg(object *obj, void *v, int type)
     else if (SS_complexp(obj))
        {z = SS_COMPLEX_VALUE(obj);
 	d = creal(z);}
+
+    else if (SS_quaterionp(obj))
+       {q = SS_QUATERNION_VALUE(obj);
+	d = q.s;}
 
     else if (SS_charobjp(obj))
        d = SS_CHARACTER_VALUE(obj);
@@ -257,6 +267,74 @@ static void _SS_complex_arg(object *obj, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_QUATERNION_ARG - get a C level quaternion data item from
+ *                    - a single Scheme object
+ */
+
+static void _SS_quaternion_arg(object *obj, void *v)
+   {quaternion q, *qp;
+    double _Complex z;
+
+    q.s = 0.0;
+    q.i = 0.0;
+    q.j = 0.0;
+    q.k = 0.0;
+
+    if (SS_quaterionp(obj))
+       q = SS_QUATERNION_VALUE(obj);
+
+    else if (SS_complexp(obj))
+       {z   = SS_COMPLEX_VALUE(obj);
+	q.s = creal(z);
+	q.i = cimag(z);}
+
+    else if (SS_integerp(obj))
+       q.s = SS_INTEGER_VALUE(obj);
+
+    else if (SS_floatp(obj))
+       q.s = SS_FLOAT_VALUE(obj);
+
+    else if (SS_charobjp(obj))
+       q.s = SS_CHARACTER_VALUE(obj);
+
+    else if (SS_procedurep(obj))
+       {PFVoid hand;
+        SC_address u;
+
+        switch (SS_PROCEDURE_TYPE(obj))
+           {case SS_MACRO : 
+            case SS_PROC  :
+                 SS_error("CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+                 break;
+
+            default :
+                 hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
+                 u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
+                 if (hand == (PFVoid) SS_acc_char)
+                    q.s = *(char *) u.memaddr;
+                 else if (hand == (PFVoid) SS_acc_int)
+                    q.s = *(int *) u.memaddr;
+                 else if (hand == (PFVoid) SS_acc_long)
+                    q.s = *(long *) u.memaddr;
+                 else if (hand == (PFVoid) SS_acc_REAL)
+                    q.s = *(double *) u.memaddr;
+                 else
+                    SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+
+    else if (SS_nullobjp(obj))
+       q.s = 0.0;
+
+    else
+       SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
+
+    qp  = (quaternion *) v;
+    *qp = q;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_ARGS - get a C level data item from a single SCHEME object */
 
 static void _SS_args(object *obj, void *v, int type)
@@ -281,6 +359,9 @@ static void _SS_args(object *obj, void *v, int type)
     else if ((SC_FLOAT_COMPLEX_I <= type) &&
 	     (type <= SC_LONG_DOUBLE_COMPLEX_I))
        _SS_complex_arg(obj, v);
+
+    else if (type == SC_QUATERNION_I)
+       _SS_quaternion_arg(obj, v);
 
     else if (type == SC_STRING_I)
        {s = _SS_get_print_name(obj);

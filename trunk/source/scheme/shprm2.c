@@ -221,28 +221,6 @@ object *SS_binary_flt(PFVoid proc, object *argl)
 
 /*--------------------------------------------------------------------------*/
 
-/* _SSI_COMPLEX - complex for Scheme */
-
-static object *_SSI_complex(object *argl)
-   {double r, i;
-    double _Complex cv;
-    object *o;
-
-    r = 0.0;
-    i = 0.0;
-    SS_args(argl,
-	    SC_DOUBLE_I, &r,
-	    SC_DOUBLE_I, &i,
-	    0);
-
-    cv = r + i*I;
-
-    o = SS_mk_complex(cv);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-
 /*                         PREDICATE HANDLERS                               */
 
 /*--------------------------------------------------------------------------*/
@@ -509,11 +487,6 @@ void _SS_install_math(void)
                "Procedure: Returns the smallest integer greater than the argument",
                SS_unary_fix, 
                ceil, SS_PR_PROC);
-
-    SS_install("complex",
-               "Procedure: make a complex number from a real and imaginary part",
-               SS_nargs,
-               _SSI_complex, SS_PR_PROC);
 
     SS_install("cos",
                "Procedure: Returns the cosine of the argument",

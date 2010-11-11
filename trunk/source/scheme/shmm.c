@@ -210,6 +210,19 @@ static void _SS_rl_complex(object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_RL_QUATERNION - release a quaternion object */
+
+static void _SS_rl_quaternion(object *obj)
+   {
+
+    SFREE(SS_OBJECT(obj));
+    SS_rl_object(obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_RL_STRING - release a string object */
 
 static void _SS_rl_string(object *obj)
@@ -705,6 +718,23 @@ object *SS_mk_complex(double _Complex d)
 
     op = SS_mk_object(dp, SC_DOUBLE_COMPLEX_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_complex);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_MK_QUATERNION - make an quaternion object */
+
+object *SS_mk_quaternion(quaternion q)
+   {quaternion *qp;
+    object *op;
+
+    qp  = FMAKE(quaternion, "SS_MK_QUATERNION:qp");
+    *qp = q;
+
+    op = SS_mk_object(qp, SC_QUATERNION_I, SELF_EV, NULL,
+		      SS_wr_atm, _SS_rl_quaternion);
 
     return(op);}
 

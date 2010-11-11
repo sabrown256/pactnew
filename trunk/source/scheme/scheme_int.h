@@ -259,6 +259,12 @@ extern void
  _SS_install_complex(void);
 
 
+/* SHPRM5.C declarations */
+
+extern void
+ _SS_install_quaternion(void);
+
+
 /* SHPRNT.C declarations */
 
 extern void

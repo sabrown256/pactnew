@@ -1072,10 +1072,16 @@ void SS_wr_atm(object *obj, object *strm)
 	   snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(obj));
 
 	else if (ityp == SC_DOUBLE_COMPLEX_I)
-          {double _Complex cv;
+          {double _Complex z;
 
-	   cv = SS_COMPLEX_VALUE(obj);
-	   snprintf(t, MAXLINE, "%g + %gI", creal(cv), cimag(cv));}
+	   z = SS_COMPLEX_VALUE(obj);
+	   snprintf(t, MAXLINE, "%g+%gi", creal(z), cimag(z));}
+
+	else if (ityp == SC_QUATERNION_I)
+          {quaternion q;
+
+	   q = SS_QUATERNION_VALUE(obj);
+	   snprintf(t, MAXLINE, "%g+%gi+%gj+%gk", q.s, q.i, q.j, q.k);}
 
 #ifdef LARGE
 	else if (ityp == SS_CHARACTER_I)
