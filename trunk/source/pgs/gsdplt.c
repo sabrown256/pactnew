@@ -823,7 +823,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
     SC_strtok(ltype, " *", s);
     if (ltype != NULL)
 
-/* fixed point types */
+/* fixed point types (proper) */
        {if ((ifx = SC_fix_type_id(ltype, FALSE)) != -1)
 	   {int *fi;
 
@@ -837,7 +837,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 
 	    SFREE(fi);}
 
-/* floating point types */
+/* floating point types (proper) */
        else if ((ifp = SC_fp_type_id(ltype)) != -1)
 	  {double *fi;
 

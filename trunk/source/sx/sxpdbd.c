@@ -311,7 +311,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 
     strcpy(fmt, ":   ");
 
-    id = SC_type_id(type);
+    id = SC_type_id(type, FALSE);
 
     SC_strcat(fmt, LINE_SIZE, PD_print_formats1[id]);
     SC_strcat(fmt, LINE_SIZE, "   ");
