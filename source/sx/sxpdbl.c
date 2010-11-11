@@ -132,24 +132,25 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_MAKE_LIST_IO - Convert a primitive type into a list. */
+/* _SX_MAKE_LIST_IO - convert a primitive type into a list */
 
 object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
-   {int i, offset;
+   {int i, id, offset;
     object *obj;
 
     offset = 0;
 
 /* print out the type */
+    id = SC_type_id(type);
 
-    if (strcmp(type, SC_CHAR_S) == 0)
+    if (id == SC_CHAR_I)
        {if (vr == NULL)
            obj = SS_null;
         else
            obj = SS_mk_string(vr);}
 
 /* fixed point types */
-    else if (strcmp(type, SC_SHORT_S) == 0)
+    else if (id == SC_SHORT_I)
        {short *pv;
         pv = (short *) vr;
 
@@ -179,8 +180,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if ((strcmp(type, SC_INT_S) == 0) ||
-	     (strcmp(type, SC_INTEGER_S) == 0))
+    else if (id == SC_INT_I)
        {int *pv;
         pv = (int *) vr;
 
@@ -211,7 +211,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {long *pv;
         pv = (long *) vr;
 
@@ -241,7 +241,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+    else if (id == SC_LONG_LONG_I)
        {long long *pv;
         pv = (long long *) vr;
 
@@ -272,7 +272,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
                obj = SS_lstvct(SS_reverse(obj));};}
 
 /* floating point types */
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {float *pv;
         pv = (float *) vr;
 
@@ -287,7 +287,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+    else if (id == SC_DOUBLE_I)
        {double *pv;
         pv = (double *) vr;
 
@@ -301,7 +301,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
             if (obj != SS_null)
                obj = SS_lstvct(SS_reverse(obj));};}
 
-    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+    else if (id == SC_LONG_DOUBLE_I)
        {long double *pv;
         pv = (long double *) vr;
 

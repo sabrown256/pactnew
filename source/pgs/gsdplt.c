@@ -798,10 +798,11 @@ static void _PG_dom_0d_3d(PG_device *dev, long npts,
 
 static void PG_label_nodes_3(PG_device *dev, double **x,
 			     long n, void *f, char *type)
-   {int i;
+   {int i, ifx, ifp;
     double box[PG_BOXSZ], p[PG_SPACEDM];
     double **r;
-    char ltype[MAXLINE], *s;
+    char lbl[MAXLINE], ltype[MAXLINE];
+    char *s;
     PG_dev_geometry *g;
 
     if (dev == NULL)
@@ -820,56 +821,49 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 
     strcpy(ltype, type);
     SC_strtok(ltype, " *", s);
-    if (ltype == NULL)
-       return;
+    if (ltype != NULL)
 
 /* fixed point types */
-    if ((strcmp(ltype, SC_INT_S) == 0) ||
-	(strcmp(ltype, SC_LONG_S) == 0) ||
-	(strcmp(ltype, SC_SHORT_S) == 0))
-       {int *fi;
-	char s[MAXLINE];
+       {if ((ifx = SC_fix_type_id(ltype, FALSE)) != -1)
+	   {int *fi;
 
-	fi = NULL;
-	CONVERT(SC_INT_S, (void **) &fi, ltype, f, n, FALSE);
-	for (i = 0; i < n; i++)
-	    {snprintf(s, MAXLINE, "%d", fi[i]);
-	     p[0] = r[0][i];
-	     p[1] = r[1][i];
-	     PG_write_n(dev, 2, WORLDC, p, s);};
+	    fi = NULL;
+	    CONVERT(SC_INT_S, (void **) &fi, ltype, f, n, FALSE);
+	    for (i = 0; i < n; i++)
+	        {snprintf(lbl, MAXLINE, "%d", fi[i]);
+		 p[0] = r[0][i];
+		 p[1] = r[1][i];
+		 PG_write_n(dev, 2, WORLDC, p, lbl);};
 
-	SFREE(fi);}
+	    SFREE(fi);}
 
 /* floating point types */
-    else if ((strcmp(ltype, SC_DOUBLE_S) == 0) ||
-	     (strcmp(ltype, SC_FLOAT_S) == 0) ||
-	     (strcmp(ltype, SC_DOUBLE_S) == 0))
-       {double *fi;
-	char s[MAXLINE];
+       else if ((ifp = SC_fp_type_id(ltype)) != -1)
+	  {double *fi;
 
-	fi = PM_array_real(type, f, n, NULL);
-	for (i = 0; i < n; i++)
-	    {snprintf(s, MAXLINE, _PG_gattrs.text_format, fi[i]);
-	     p[0] = r[0][i];
-	     p[1] = r[1][i];
-	     PG_write_n(dev, 2, WORLDC, p, s);};
+	   fi = PM_array_real(type, f, n, NULL);
+	   for (i = 0; i < n; i++)
+	       {snprintf(lbl, MAXLINE, _PG_gattrs.text_format, fi[i]);
+		p[0] = r[0][i];
+		p[1] = r[1][i];
+		PG_write_n(dev, 2, WORLDC, p, lbl);};
 
-	SFREE(fi);}
+	   SFREE(fi);}
 
-    else if (strcmp(ltype, SC_CHAR_S) == 0)
-       {char t[2], *fi;
+       else if (strcmp(ltype, SC_CHAR_S) == 0)
+	  {char t[2], *fi;
 
-	t[1] = '\0';
-	fi   = f;
-	for (i = 0; i < n; i++)
-	    {t[0] = fi[i];
-	     p[0] = r[0][i];
-	     p[1] = r[1][i];
-	     PG_write_n(dev, 2, WORLDC, p, t);};
+	   t[1] = '\0';
+	   fi   = f;
+	   for (i = 0; i < n; i++)
+	       {t[0] = fi[i];
+		p[0] = r[0][i];
+		p[1] = r[1][i];
+		PG_write_n(dev, 2, WORLDC, p, t);};
 
-	SFREE(fi);};
+	   SFREE(fi);};
 
-    PM_free_vectors(3, r);
+	PM_free_vectors(3, r);};
 
     return;}
 

@@ -181,14 +181,15 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
  */
 
 static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
-   {int i, ityp;
+   {int i, id, ityp;
     char *msg, *type;
     object *obj1,  **va;
 
     type = dp->type;
+    id   = SC_type_id(type);
 
 /* print out the type */
-    if (strcmp(type, SC_CHAR_S) == 0)
+    if (id == SC_CHAR_I)
        {ityp = SC_arrtype(obj, -1);
 	if (ityp == SC_STRING_I)
 	   strncpy(vr, SS_STRING_TEXT(obj), nitems);
@@ -209,59 +210,59 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
         SS_error(msg, obj);};
 
 /* fixed point types */
-    if (strcmp(type, SC_SHORT_S) == 0)
+    if (id == SC_SHORT_I)
        {short *pv;
         pv = (short *) vr;
         READ_IO(pv, short);}
 
-    else if ((strcmp(type, SC_INT_S) == 0) || (strcmp(type, SC_INTEGER_S) == 0))
+    else if (id == SC_INT_I)
        {int *pv;
         pv = (int *) vr;
         READ_IO(pv, int);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {long *pv;
         pv = (long *) vr;
         READ_IO(pv, long);}
 
-    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+    else if (id == SC_LONG_LONG_I)
        {long long *pv;
 	pv = (long long *) vr;
         READ_IO(pv, long long);}
 
 /* floating point types */
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {float *pv;
         pv = (float *) vr;
         READ_IO(pv, float);}
  
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+    else if (id == SC_DOUBLE_I)
        {double *pv;
         pv = (double *) vr;
         READ_IO(pv, double);}
 
-    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+    else if (id == SC_LONG_DOUBLE_I)
        {long double *pv;
 	pv = (long double *) vr;
         READ_IO(pv, long double);}
 
 /* complex floating point types */
-    else if (strcmp(type, SC_FLOAT_COMPLEX_S) == 0)
+    else if (id == SC_FLOAT_COMPLEX_I)
        {float _Complex *pv;
 	pv = (float _Complex *) vr;
         READ_IO(pv, float _Complex);}
 
-    else if (strcmp(type, SC_DOUBLE_COMPLEX_S) == 0)
+    else if (id == SC_DOUBLE_COMPLEX_I)
        {double _Complex *pv;
         pv = (double _Complex *) vr;
         READ_IO(pv, double _Complex);}
 
-    else if (strcmp(type, SC_LONG_DOUBLE_COMPLEX_S) == 0)
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
        {long double _Complex *pv;
 	pv = (long double _Complex *) vr;
         READ_IO(pv, long double _Complex);}
 
-    else if (strcmp(type, SC_BOOL_S) == 0)
+    else if (id == SC_BOOL_I)
        {bool *pb;
 	pb = (bool *) vr;
         READ_IO(pb, bool);}

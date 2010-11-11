@@ -3474,6 +3474,7 @@ static object *_SXI_set_format(object *argl)
 
     ok = FALSE;
 
+/* fixed point types */
     for (i = 0; (i < PD_N_PRIMITIVE_FIX) && (ok == FALSE); i++)
         {typ = fxtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);

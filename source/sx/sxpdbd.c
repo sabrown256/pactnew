@@ -94,7 +94,7 @@
              else                                                            \
                 snprintf(tmp, LINE_SIZE, "%s(%s)", nma,                      \
                         PD_index_to_expr(bfa, i, dims, mjr, def_off));       \
-             memcpy(bf, tmp, min(LINE_SIZE, strlen(tmp)));                    \
+             memcpy(bf, tmp, min(LINE_SIZE, strlen(tmp)));                   \
              snprintf(tmp, LINE_SIZE, fmt, a[i], b[i]);                      \
              memcpy(&bf[nn], tmp, min(LINE_SIZE - nn, strlen(tmp) + 1));     \
              PRINT(stdout, "%s\n", bf);                                      \
@@ -273,7 +273,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 				   char *pva, char *pvb, char *indx, 
 				   long length, char *type, dimdes *dims, 
 				   int mjr)
-   {int nn, def_off, samen, lna, lnb;
+   {int id, nn, def_off, samen, lna, lnb;
     long i, isz, msz;
     char bf[LINE_SIZE+1], bfa[LINE_SIZE], bfb[LINE_SIZ2+1];
     char tmp[LINE_SIZE], fmt[LINE_SIZE];
@@ -311,119 +311,81 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 
     strcpy(fmt, ":   ");
 
+    id = SC_type_id(type);
+
+    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[id]);
+    SC_strcat(fmt, LINE_SIZE, "   ");
+    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[id]);
+
 /* find the type and compare */
-    if (strcmp(type, SC_CHAR_S) == 0)
+    if (id == SC_CHAR_I)
        {char *va, *vb;
 	va = (char *) pva;
         vb = (char *) pvb;
-
-        SC_strcat(fmt, LINE_SIZE, "        %c");
-        SC_strcat(fmt, LINE_SIZE, "                         ");
-        SC_strcat(fmt, LINE_SIZE, "%c");
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
 /* fixed point types */
-    else if (strcmp(type, SC_SHORT_S) == 0)
+    else if (id == SC_SHORT_I)
        {short *va, *vb;
 	va = (short *) pva;
         vb = (short *) pvb;
-
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_SHORT_I]);
-        SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_SHORT_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if ((strcmp(type, SC_INT_S) == 0) || (strcmp(type, SC_INTEGER_S) == 0))
+    else if (id == SC_INT_I)
        {int *va, *vb;
         va = (int *) pva;
         vb = (int *) pvb;
-
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_INT_I]);
-        SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_INT_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {long *va, *vb;
 	va = (long *) pva;
         vb = (long *) pvb;
-
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_I]);
-        SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+    else if (id == SC_LONG_LONG_I)
        {long long *va, *vb;
 	va = (long long *) pva;
         vb = (long long *) pvb;
-
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_LONG_I]);
-        SC_strcat(fmt, LINE_SIZE, "   ");
-        SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_LONG_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-/* floating point types */
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+/* real floating point types */
+    else if (id == SC_FLOAT_I)
        {float *va, *vb;
         va = (float *) pva;
         vb = (float *) pvb;
-
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
-	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+    else if (id == SC_DOUBLE_I)
        {double *va, *vb;
         va = (double *) pva;
         vb = (double *) pvb;
-
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
-	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+    else if (id == SC_LONG_DOUBLE_I)
        {long double *va, *vb;
         va = (long double *) pva;
         vb = (long double *) pvb;
-
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_DOUBLE_I]);
-	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_LONG_DOUBLE_I]);
-
         DISP_ARRAY(fmt, indx, va, vb);}
 
-    else if (strcmp(type, "REAL") == 0)
-       {if (sizeof(REAL) == sizeof(double))
-	   {double *va, *vb;
-            va = (double *) pva;
-            vb = (double *) pvb;
+/* complex floating point types */
+    else if (id == SC_FLOAT_COMPLEX_I)
+       {float _Complex *va, *vb;
+        va = (float _Complex *) pva;
+        vb = (float _Complex *) pvb;
+        DISP_ARRAY(fmt, indx, va, vb);}
 
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
-	    SC_strcat(fmt, LINE_SIZE, "   ");
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_DOUBLE_I]);
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {double _Complex *va, *vb;
+        va = (double _Complex *) pva;
+        vb = (double _Complex *) pvb;
+        DISP_ARRAY(fmt, indx, va, vb);}
 
-            DISP_ARRAY(fmt, indx, va, vb);}
-
-        else if (sizeof(REAL) == sizeof(float))
-	   {float *va, *vb;
-            va = (float *) pva;
-            vb = (float *) pvb;
-
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
-	    SC_strcat(fmt, LINE_SIZE, "   ");
-	    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[SC_FLOAT_I]);
-
-            DISP_ARRAY(fmt, indx, va, vb);};};
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+       {long double _Complex *va, *vb;
+        va = (long double _Complex *) pva;
+        vb = (long double _Complex *) pvb;
+        DISP_ARRAY(fmt, indx, va, vb);};
 
     return;}
 
