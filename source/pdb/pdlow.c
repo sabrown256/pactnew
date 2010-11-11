@@ -843,7 +843,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  falign->bool_alignment, NO_ORDER,
 		  conv, NULL, NULL, FALSE, FALSE);
 
-/* fixed point types */
+/* fixed point types (proper) */
     for (ifx = 0; ifx < PD_N_PRIMITIVE_FIX; ifx++)
         {styp = SC_type_name(ifx + SC_SHORT_I);
 	 snprintf(utyp, MAXLINE, "u_%s", styp);
@@ -874,7 +874,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  falign->fx[ifx], fstd->fx[ifx].order,
 		  conv, NULL, NULL, TRUE, FALSE);
 
-/* floating point types */
+/* floating point types (proper) */
     for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
         {styp = SC_type_name(ifp + SC_FLOAT_I);
 

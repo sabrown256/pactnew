@@ -207,19 +207,19 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
 static int _H5_get_alignment(PDBfile *file, char *type)
    {int id, result;
 
-    id = SC_type_id(type);
+    id = SC_type_id(type, TRUE);
 
-    if ((id == SC_CHAR_I) || (strcmp(type, "u_char") == 0))
+    if (id == SC_CHAR_I)
        result = 1;
 
 /* fix point types */
-    else if ((id == SC_SHORT_I) || (strcmp(type, "u_short") == 0))
+    else if (id == SC_SHORT_I)
        result = 2;
-    else if ((id == SC_INT_I) || (strcmp(type, "u_int") == 0))
+    else if (id == SC_INT_I)
        result = 4;
-    else if ((id == SC_LONG_I) || (strcmp(type, "u_long") == 0))
+    else if (id == SC_LONG_I)
        result = 4;
-    else if ((id == SC_LONG_LONG_I) || (strcmp(type, "u_long_long") == 0))
+    else if (id == SC_LONG_LONG_I)
        result = 4;
 
 /* floating point types */

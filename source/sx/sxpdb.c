@@ -3474,7 +3474,7 @@ static object *_SXI_set_format(object *argl)
 
     ok = FALSE;
 
-/* fixed point types */
+/* fixed point types (proper) */
     for (i = 0; (i < PD_N_PRIMITIVE_FIX) && (ok == FALSE); i++)
         {typ = fxtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
@@ -3491,7 +3491,7 @@ static object *_SXI_set_format(object *argl)
 	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 2);
 	     ok = TRUE;};};
 
-/* real floating point types */
+/* real floating point types (proper) */
     for (i = 0; (i < PD_N_PRIMITIVE_FP) && (ok == FALSE); i++)
         {typ = fptypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
@@ -3508,7 +3508,7 @@ static object *_SXI_set_format(object *argl)
 	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 2);
 	     ok = TRUE;};};
 
-/* complex floating point types */
+/* complex floating point types (proper) */
     for (i = 0; (i < PD_N_PRIMITIVE_FP) && (ok == FALSE); i++)
         {typ = cmtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);

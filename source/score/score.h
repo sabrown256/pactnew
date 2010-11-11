@@ -1353,22 +1353,6 @@ extern int
  SC_send_tracker(char *code, char *version, int status, char *dst);
 
 
-/* SCTYP.C declarations */
-
-extern int
- SC_register_type(char *name, int bpi, ...),
- SC_type_id(char *name),
- SC_type_size_i(int id),
- SC_type_size_a(char *name);
-
-extern char
- *SC_type_name(int id);
-
-extern void
- SC_type_free_i(int id, void *x),
- SC_type_free_a(char *name, void *x),
- SC_init_base_types(void);
-
 #ifdef __cplusplus
 }
 #endif

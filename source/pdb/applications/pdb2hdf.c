@@ -70,59 +70,55 @@ static hsize_t *PDB_to_HDF_dims(dm, rank)
  *                  - primitive type
  */
 
-static int PDB_to_HDF_ptype(dp, datatype)
-   defstr *dp;
-   hid_t  *datatype;
-   {char s[MAXLINE];
+static int PDB_to_HDF_ptype(defstr *dp, hid_t *datatype)
+   {int id, rv;
+    char s[MAXLINE];
 
     strcpy(s, dp->type);
- 
+    id = SC_type_id(s, FALSE);
+
+    rv = UNKNOWN_TYPE;
+
     if (_PD_indirection(s))
-       {return(CONTAINS_INDIRECTION);}
+       rv = CONTAINS_INDIRECTION;
 
 /* check for floating point types */
-    if (dp->format != NULL)
-       {if (strcmp(s, SC_FLOAT_S) == 0)
+    else if (dp->format != NULL)
+       {if (id == SC_FLOAT_I)
            {*datatype = H5T_NATIVE_FLOAT;
-            return(TRUE);}
+	    rv = TRUE;}
 
-        else if (strcmp(s, SC_DOUBLE_S) == 0)
+        else if (id == SC_DOUBLE_I)
 	   {*datatype = H5T_NATIVE_DOUBLE;
-            return(TRUE);}
- 
-        else if (strcmp(s, "REAL") == 0)
-	   {if (sizeof(REAL) == sizeof(double))
-	       {*datatype = H5T_NATIVE_DOUBLE;
-                return(TRUE);}
+	    rv = TRUE;}
 
-	    else
-	       {*datatype = H5T_NATIVE_FLOAT;
-	        return(TRUE);};};}
+        else if (id == SC_LONG_DOUBLE_I)
+	   {*datatype = H5T_NATIVE_DOUBLE;
+	    rv = TRUE;};}
 
-/* check for integral types */
+/* check for fixed point types */
     else if (dp->convert >= 0)
-       {if (strcmp(s, SC_SHORT_S) == 0)
+       {if (id == SC_SHORT_I)
 	   {*datatype = H5T_NATIVE_SHORT;
-            return(TRUE);}
+	    rv = TRUE;}
 
-	else if ((strcmp(s, SC_INTEGER_S) == 0) || (strcmp(s, "int") == 0))
+	else if (id == SC_INT_I)
 	   {*datatype = H5T_NATIVE_INT;
-            return(TRUE);}
+	    rv = TRUE;}
 
-	else if (strcmp(s, SC_CHAR_S) == 0)
+	else if (id == SC_LONG_I)
+	   {*datatype = H5T_NATIVE_LONG;
+	    rv = TRUE;}
+
+	else if (id == SC_LONG_LONG_I)
+	   {*datatype = H5T_NATIVE_LONG;
+	    rv = TRUE;}
+
+	else if (id == SC_CHAR_I)
 	   {*datatype = H5T_NATIVE_CHAR;
-            return(TRUE);}
+	    rv = TRUE;};};
 
-	else if (strcmp(s, SC_LONG_LONG_S) == 0)
-	   {*datatype = H5T_NATIVE_LONG;
-            return(TRUE);}
-
-	else if (strcmp(s, SC_LONG_S) == 0)
-	   {*datatype = H5T_NATIVE_LONG;
-            return(TRUE);};}
-
-    else
-       {return(UNKNOWN_TYPE);};}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

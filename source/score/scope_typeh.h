@@ -177,7 +177,7 @@ extern long
 extern int
  SC_register_type(char *name, int bpi, ...),
  SC_type_alias(char *name, int id),
- SC_type_id(char *name),
+ SC_type_id(char *name, int unsg),
  SC_fix_type_id(char *name, int unsg),
  SC_fp_type_id(char *name),
  SC_cx_type_id(char *name),

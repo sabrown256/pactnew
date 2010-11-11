@@ -141,7 +141,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
     offset = 0;
 
 /* print out the type */
-    id = SC_type_id(type);
+    id = SC_type_id(type, FALSE);
 
     if (id == SC_CHAR_I)
        {if (vr == NULL)

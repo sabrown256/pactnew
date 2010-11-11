@@ -1335,7 +1335,7 @@ void _PD_set_format_defaults(void)
     
 /* PD_print_formats1 is used for scalars */
 
-/* fixed point types */
+/* fixed point types (proper) */
     for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
         {if (PD_print_formats1[i+SC_SHORT_I] != NULL)
 	    SFREE(PD_print_formats1[i+SC_SHORT_I]);
@@ -1346,7 +1346,7 @@ void _PD_set_format_defaults(void)
 
 	 PD_print_formats1[i+SC_SHORT_I] = t;};
 
-/* real floating point types */
+/* real floating point types (proper) */
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {if (PD_print_formats1[i+SC_FLOAT_I] != NULL)
 	    SFREE(PD_print_formats1[i+SC_FLOAT_I]);
@@ -1357,7 +1357,7 @@ void _PD_set_format_defaults(void)
 
 	 PD_print_formats1[i+SC_FLOAT_I] = t;};
 
-/* complex floating point types */
+/* complex floating point types (proper) */
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {if (PD_print_formats1[i+SC_FLOAT_COMPLEX_I] != NULL)
 	    SFREE(PD_print_formats1[i+SC_FLOAT_COMPLEX_I]);

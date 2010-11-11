@@ -322,7 +322,7 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
 	hp   = SC_hasharr_lookup(_PG.callback_tab, name);
 	if (hp != NULL)
 	   {type = hp->type;
-	    ityp = SC_type_id(type);};}
+	    ityp = SC_type_id(type, FALSE);};}
     else
        {hp   = NULL;
 	ityp = 0;};

@@ -1177,7 +1177,7 @@ void daprint(pcons *alst)
 		   s, SC_ref_count(ths->car),
 		   ths->cdr_type, ths->cdr, SC_ref_count(ths->cdr));
 
-	 id = SC_type_id(ths->cdr_type);
+	 id = SC_type_id(ths->cdr_type, FALSE);
 
          if (id == SC_STRING_I)
             io_printf(stdout, "\t%s", ths->cdr);

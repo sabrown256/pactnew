@@ -186,7 +186,7 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
     object *obj1,  **va;
 
     type = dp->type;
-    id   = SC_type_id(type);
+    id   = SC_type_id(type, FALSE);
 
 /* print out the type */
     if (id == SC_CHAR_I)

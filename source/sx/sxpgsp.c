@@ -2765,7 +2765,7 @@ static object *_SX_get_attrs_alist(pcons *alst, object *argl)
 	    continue;
 
 	 typ = pc->cdr_type;
-	 id  = SC_type_id(typ);
+	 id  = SC_type_id(typ, FALSE);
 
 /* floating point types */
 	 if (id == SC_FLOAT_I)

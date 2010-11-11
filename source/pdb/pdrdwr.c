@@ -1643,7 +1643,7 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
     if (strcmp(type, SC_CHAR_S) == 0)
        ityp = SC_CHAR_I;
 
-/* fixed point types */
+/* fixed point types (proper) */
     else if ((ityp == SC_fix_type_id(type, FALSE)) == -1)
        return(FALSE);
 

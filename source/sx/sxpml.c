@@ -269,7 +269,7 @@ static object *_SXI_array_ref(object *argl)
             if (dp != NULL)
                strcpy(type, dp->type);};
 
-	id = SC_type_id(type);
+	id = SC_type_id(type, FALSE);
 
 /* floating point types */
 	if (id == SC_FLOAT_I)
@@ -329,7 +329,7 @@ static object *_SXI_array_set(object *argl)
 	while (_PD_indirection(type))
 	   PD_dereference(type);
 
-	id = SC_type_id(type);
+	id = SC_type_id(type, FALSE);
 
 /* floating point types */
         if (id == SC_FLOAT_I)
@@ -424,7 +424,7 @@ static object *_SXI_array_list(object *argl)
 
     lst = SS_null;
 
-    id = SC_type_id(type);
+    id = SC_type_id(type, FALSE);
 
 /* floating point types */
     if (id == SC_FLOAT_I)

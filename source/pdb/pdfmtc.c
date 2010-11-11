@@ -149,14 +149,14 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
     std   = file->std;
     align = file->align;
 
-/* check for fixed point types */
+/* check for fixed point types (proper) */
     if ((ifx = SC_fix_type_id(type, TRUE)) != -1)
        {ifx -= SC_SHORT_I;
 	std->fx[ifx].bpi   = nb;
 	std->fx[ifx].order = (PD_byte_order) flg;
 	align->fx[ifx]     = al;}
 
-/* check for floating point types */
+/* check for floating point types (proper) */
     else if ((ifp = SC_fp_type_id(type)) != -1)
        {ifp -= SC_FLOAT_I;
 	std->fp[ifp].bpi    = nb;
@@ -164,7 +164,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	std->fp[ifp].format = formt;
 	align->fp[ifp]      = al;}
 
-/* check for complex types */
+/* check for complex types (proper) */
     else if ((icx = SC_cx_type_id(type)) != -1)
        {icx -= SC_FLOAT_COMPLEX_I;
 /*

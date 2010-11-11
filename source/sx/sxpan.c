@@ -872,7 +872,7 @@ static object *_SXI_dump_pp(object *argl)
  */
 
 static object *_SXI_db_numeric_data(object *obj)
-   {int i, n, id;
+   {long n;
     char *name, *type;
     double *dp;
     C_array *arr;
@@ -896,56 +896,14 @@ static object *_SXI_db_numeric_data(object *obj)
 	n    = PD_entry_number(pp->desc);
 	type = PD_entry_type(pp->desc);
 
-/* all arrays will be REALS */
+/* all arrays will be doubles */
 	if (strcmp(type, SC_DOUBLE_S) == 0)
 	   arr = PM_make_array(SC_DOUBLE_S, n, pd);
 	else
 	   {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	    dp  = (double *) arr->data;
 
-	    id  = SC_type_id(type);
-
-/* fixed point types */
-	    if (id == SC_SHORT_I)
-	       {short *pv;
-	        pv = (short *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-	    else if (id == SC_INT_I)
-	       {int *pv;
-		pv = (int *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-	    else if (id == SC_LONG_I)
-	       {long *pv;
-		pv = (long *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-	    else if (id == SC_LONG_LONG_I)
-	       {long long *pv;
-		pv = (long long *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-
-/* floating point types */
-	    else if (id == SC_FLOAT_I)
-	       {float *pv;
-		pv = (float *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-	    else if (id == SC_LONG_DOUBLE_I)
-	       {long double *pv;
-		pv = (long double *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-
-	    else if (id == SC_CHAR_I)
-	       {char *pv;
-		pv = (char *) pd;
-		for (i = 0; i < n; i++)
-		    *dp++ = *pv++;}
-	    else
-	       SS_error("BAD DATA TYPE - _SXI_DB_NUMERIC_DATA", obj);};
+	    SC_convert(SC_DOUBLE_S, (void **) &dp, type, pd, n, FALSE);};
 
 	rv = SX_mk_C_array(arr);};
 
