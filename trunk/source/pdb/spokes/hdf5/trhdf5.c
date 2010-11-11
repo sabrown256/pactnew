@@ -205,32 +205,29 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
 /* _H5_GET_ALIGNMENT - return the alignment for type TYPE */
 
 static int _H5_get_alignment(PDBfile *file, char *type)
-   {int result;
+   {int id, result;
 
-    if ((strcmp(type, SC_CHAR_S) == 0) ||
-	(strcmp(type, "u_char") == 0))
+    id = SC_type_id(type);
+
+    if ((id == SC_CHAR_I) || (strcmp(type, "u_char") == 0))
        result = 1;
 
 /* fix point types */
-    else if ((strcmp(type, SC_SHORT_S) == 0) ||
-	     (strcmp(type, "u_short") == 0))
+    else if ((id == SC_SHORT_I) || (strcmp(type, "u_short") == 0))
        result = 2;
-    else if ((strcmp(type, SC_INT_S) == 0) ||
-	     (strcmp(type, "u_int") == 0))
+    else if ((id == SC_INT_I) || (strcmp(type, "u_int") == 0))
        result = 4;
-    else if ((strcmp(type, SC_LONG_S) == 0) ||
-	     (strcmp(type, "u_long") == 0))
+    else if ((id == SC_LONG_I) || (strcmp(type, "u_long") == 0))
        result = 4;
-    else if ((strcmp(type, SC_LONG_LONG_S) == 0) ||
-	     (strcmp(type, "u_long_long") == 0))
+    else if ((id == SC_LONG_LONG_I) || (strcmp(type, "u_long_long") == 0))
        result = 4;
 
 /* floating point types */
-    else if ((strcmp(type, SC_FLOAT_S) == 0))
+    else if (id == SC_FLOAT_I)
        result = 4;
-    else if ((strcmp(type, SC_DOUBLE_S) == 0))
+    else if (id == SC_DOUBLE_I)
        result = 4;
-    else if ((strcmp(type, SC_LONG_DOUBLE_S) == 0))
+    else if (id == SC_LONG_DOUBLE_I)
        result = 4;
 
     else

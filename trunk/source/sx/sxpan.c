@@ -872,7 +872,7 @@ static object *_SXI_dump_pp(object *argl)
  */
 
 static object *_SXI_db_numeric_data(object *obj)
-   {int i, n;
+   {int i, n, id;
     char *name, *type;
     double *dp;
     C_array *arr;
@@ -903,41 +903,43 @@ static object *_SXI_db_numeric_data(object *obj)
 	   {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	    dp  = (double *) arr->data;
 
+	    id  = SC_type_id(type);
+
 /* fixed point types */
-	    if (strcmp(type, SC_SHORT_S) == 0)
+	    if (id == SC_SHORT_I)
 	       {short *pv;
 	        pv = (short *) pd;
 		for (i = 0; i < n; i++)
 		    *dp++ = *pv++;}
-	    else if (strcmp(type, SC_INT_S) == 0)
+	    else if (id == SC_INT_I)
 	       {int *pv;
 		pv = (int *) pd;
 		for (i = 0; i < n; i++)
 		    *dp++ = *pv++;}
-	    else if (strcmp(type, SC_LONG_S) == 0)
+	    else if (id == SC_LONG_I)
 	       {long *pv;
 		pv = (long *) pd;
 		for (i = 0; i < n; i++)
 		    *dp++ = *pv++;}
-	    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+	    else if (id == SC_LONG_LONG_I)
 	       {long long *pv;
 		pv = (long long *) pd;
 		for (i = 0; i < n; i++)
 		    *dp++ = *pv++;}
 
 /* floating point types */
-	    else if (strcmp(type, SC_FLOAT_S) == 0)
+	    else if (id == SC_FLOAT_I)
 	       {float *pv;
 		pv = (float *) pd;
 		for (i = 0; i < n; i++)
 		    *dp++ = *pv++;}
-	    else if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
+	    else if (id == SC_LONG_DOUBLE_I)
 	       {long double *pv;
 		pv = (long double *) pd;
 		for (i = 0; i < n; i++)
 		    *dp++ = *pv++;}
 
-	    else if (strcmp(type, SC_CHAR_S) == 0)
+	    else if (id == SC_CHAR_I)
 	       {char *pv;
 		pv = (char *) pd;
 		for (i = 0; i < n; i++)

@@ -176,12 +176,17 @@ extern long
 
 extern int
  SC_register_type(char *name, int bpi, ...),
+ SC_type_alias(char *name, int id),
  SC_type_id(char *name),
  SC_fix_type_id(char *name, int unsg),
  SC_fp_type_id(char *name),
  SC_cx_type_id(char *name),
  SC_type_size_i(int id),
- SC_type_size_a(char *name);
+ SC_type_size_a(char *name),
+ SC_convert(char *dtype, void **d, char *stype, void *s, int n, int flag);
+
+extern size_t
+ SC_copy_primitive(void *d, void *s, long n, int id);
 
 extern char
  *SC_type_name(int id);

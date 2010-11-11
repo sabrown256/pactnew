@@ -848,7 +848,6 @@ extern void
 
 extern int
  SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx),
- SC_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag),
  SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 			     int padsz, int fpp, long nitems, long offs),
  SC_sizeof(char *s),

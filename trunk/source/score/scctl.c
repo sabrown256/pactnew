@@ -1160,7 +1160,8 @@ pcons *SC_append_alist(pcons *alist1, pcons *alist2)
 /* DAPRINT - print an alist for debug purposes */
 
 void daprint(pcons *alst)
-   {char s[MAXLINE];
+   {int id;
+    char s[MAXLINE];
     pcons *pc, *ths;
 
     io_printf(stdout, "Name\t\t\t    Type\t  Address\t\tValue\n");
@@ -1176,33 +1177,35 @@ void daprint(pcons *alst)
 		   s, SC_ref_count(ths->car),
 		   ths->cdr_type, ths->cdr, SC_ref_count(ths->cdr));
 
-         if (strcmp(ths->cdr_type, SC_STRING_S) == 0)
+	 id = SC_type_id(ths->cdr_type);
+
+         if (id == SC_STRING_I)
             io_printf(stdout, "\t%s", ths->cdr);
 
 /* print the first value only */
 
 /* fixed point types */
-         else if (strncmp(ths->cdr_type, SC_INT_S, 3) == 0)
-            io_printf(stdout, "\t%d", *(int *) ths->cdr);
-
-         else if (strncmp(ths->cdr_type, SC_SHORT_S, 5) == 0)
+         else if (id == SC_SHORT_I)
             io_printf(stdout, "\t%d", *(short *) ths->cdr);
 
-         else if (strncmp(ths->cdr_type, SC_LONG_S, 4) == 0)
+         else if (id == SC_INT_I)
+            io_printf(stdout, "\t%d", *(int *) ths->cdr);
+
+         else if (id == SC_LONG_I)
             io_printf(stdout, "\t%ld", *(long *) ths->cdr);
 
-         else if (strncmp(ths->cdr_type, SC_LONG_LONG_S, 9) == 0)
+         else if (id == SC_LONG_LONG_I)
             io_printf(stdout, "\t%ld", *(long long *) ths->cdr);
 
 /* floating point types */
-         else if (strncmp(ths->cdr_type, SC_FLOAT_S, 5) == 0)
+         else if (id == SC_FLOAT_I)
             io_printf(stdout, "\t%g", *(float *) ths->cdr);
 
-         else if (strncmp(ths->cdr_type, SC_DOUBLE_S, 6) == 0)
+         else if (id == SC_DOUBLE_I)
             io_printf(stdout, "\t%g", *(double *) ths->cdr);
 
-         else if (strncmp(ths->cdr_type, SC_LONG_DOUBLE_S, 11) == 0)
-            io_printf(stdout, "\t%g", *(long double *) ths->cdr);
+         else if (id == SC_LONG_DOUBLE_I)
+            io_printf(stdout, "\t%lg", *(long double *) ths->cdr);
 
          io_printf(stdout, "\n");}
 

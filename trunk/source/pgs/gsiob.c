@@ -322,24 +322,7 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
 	hp   = SC_hasharr_lookup(_PG.callback_tab, name);
 	if (hp != NULL)
 	   {type = hp->type;
-	    ityp = -1;
-
-/* fixed point types */
-	    if (strcmp(type, SC_INT_S) == 0)
-	       ityp = SC_INT_I;
-
-	    else if (strcmp(type, SC_LONG_S) == 0)
-	       ityp = SC_LONG_I;
-
-/* floating point types */
-	    else if (strcmp(type, SC_DOUBLE_S) == 0)
-	       ityp = SC_DOUBLE_I;
-
-	    else if (strcmp(type, SC_FLOAT_S) == 0)
-	       ityp = SC_FLOAT_I;
-
-	    else if (strcmp(type, SC_STRING_S) == 0)
-	       ityp = SC_STRING_I;};}
+	    ityp = SC_type_id(type);};}
     else
        {hp   = NULL;
 	ityp = 0;};
