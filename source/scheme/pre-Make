@@ -140,7 +140,7 @@ PSObjs = shmm.o
 PrObjs = shprnt.o
 EvObjs = sheval.o shenvr.o sharr.o
 RdObjs = shread.o
-FnObjs = shtlev.o shint.o shprm1.o shprm2.o shprm3.o shtty.o
+FnObjs = shtlev.o shint.o shprm1.o shprm2.o shprm3.o shprm4.o shtty.o
 LrObjs = shstrg.o shchr.o shlarg.o shproc.o shsynt.o shvar.o
 
 Objs = ${PSObjs} ${PrObjs} ${EvObjs} ${RdObjs} ${FnObjs} ${LrObjs}
@@ -150,6 +150,7 @@ ArBind = ${TGTLib}(gf-${LibName}.o)
 ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
          ${TGTLib}(shenvr.o) ${TGTLib}(shread.o) ${TGTLib}(shtlev.o) \
          ${TGTLib}(shprm1.o) ${TGTLib}(shprm2.o) ${TGTLib}(shprm3.o) \
+         ${TGTLib}(shprm4.o) \
          ${TGTLib}(shtty.o) ${TGTLib}(shint.o) ${TGTLib}(sharr.o) \
          ${TGTLib}(shstrg.o) ${TGTLib}(shchr.o) ${TGTLib}(shlarg.o) \
          ${TGTLib}(shproc.o) ${TGTLib}(shsynt.o) ${TGTLib}(shvar.o) \

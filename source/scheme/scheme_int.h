@@ -253,6 +253,12 @@ extern void
  _SS_inst_prm3(void);
 
 
+/* SHPRM4.C declarations */
+
+extern void
+ _SS_install_complex(void);
+
+
 /* SHPRNT.C declarations */
 
 extern void

@@ -12,6 +12,7 @@ list SCM files
 -> (../../shprm1.c
  ../../shprm2.c
  ../../shprm3.c
+ ../../shprm4.c
  ../../shprnt.c
  ../../shproc.c
 )

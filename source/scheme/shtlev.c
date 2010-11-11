@@ -1275,6 +1275,7 @@ void SS_inst_prm(void)
     _SS_inst_print();
     _SS_inst_prm1();
     _SS_install_math();
+    _SS_install_complex();
     _SS_inst_prm3();
 
     return;}

@@ -197,6 +197,19 @@ static void _SS_rl_float(object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_RL_COMPLEX - release a complex object */
+
+static void _SS_rl_complex(object *obj)
+   {
+
+    SFREE(SS_OBJECT(obj));
+    SS_rl_object(obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_RL_STRING - release a string object */
 
 static void _SS_rl_string(object *obj)
@@ -653,7 +666,7 @@ object *SS_mk_integer(BIGINT i)
    {BIGINT *lp;
     object *op;
 
-    lp = FMAKE(BIGINT, "SS_MK_INTEGER:lp");
+    lp  = FMAKE(BIGINT, "SS_MK_INTEGER:lp");
     *lp = i;
 
     op = SS_mk_object(lp, SC_INT_I, SELF_EV, NULL,
@@ -670,11 +683,28 @@ object *SS_mk_float(double d)
    {double *dp;
     object *op;
 
-    dp = FMAKE(double, "SS_MK_FLOAT:dp");
+    dp  = FMAKE(double, "SS_MK_FLOAT:dp");
     *dp = d;
 
     op = SS_mk_object(dp, SC_FLOAT_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_float);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_MK_COMPLEX - make an complex object */
+
+object *SS_mk_complex(double _Complex d)
+   {double _Complex *dp;
+    object *op;
+
+    dp  = FMAKE(double _Complex, "SS_MK_COMPLEX:dp");
+    *dp = d;
+
+    op = SS_mk_object(dp, SC_DOUBLE_COMPLEX_I, SELF_EV, NULL,
+		      SS_wr_atm, _SS_rl_complex);
 
     return(op);}
 

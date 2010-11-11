@@ -18,16 +18,21 @@
 /*--------------------------------------------------------------------------*/
 
 #define SC_TRANS_TYPE_L(_d, _styp, _s, _n, _mn, _mx)                         \
-    {_styp *_ps;                                                             \
+    {long _i;                                                                \
+     _styp *_ps;                                                             \
      _styp _sm, _smn, _smx;                                                  \
-     _smn = (_styp) _mn;                                                     \
-     _smx = (_styp) _mx;                                                     \
      _ps  = (_styp *) _s;                                                    \
-     for (i = 0; i < _n; i++)                                                \
-         {_sm = *_ps++;                                                      \
-          _sm = min(_sm, _smx);                                              \
-          _sm = max(_sm, _smn);                                              \
-          *_d++ = _sm;};}
+     if (sizeof(_sm) < sizeof(_mx))                                          \
+        {for (_i = 0; _i < _n; _i++)                                         \
+             *_d++ = *_ps++;}                                                \
+     else                                                                    \
+        {_smn = (_styp) _mn;                                                 \
+         _smx = (_styp) _mx;                                                 \
+         for (_i = 0; _i < _n; _i++)                                         \
+             {_sm = *_ps++;                                                  \
+              _sm = min(_sm, _smx);                                          \
+              _sm = max(_sm, _smn);                                          \
+              *_d++ = _sm;};};}
 
 /*--------------------------------------------------------------------------*/
 
@@ -51,7 +56,7 @@
             {SC_TRANS_TYPE(_d, long double, _s, _n);}                        \
          else if (_sid == SC_SHORT_I)                                        \
             {SC_TRANS_TYPE(_d, short, _s, _n);}                              \
-	 else if (_sid == SC_INT_I)                                          \
+         else if (_sid == SC_INT_I)                                          \
             {SC_TRANS_TYPE(_d, int, _s, _n);}                                \
          else if (_sid == SC_LONG_I)                                         \
             {SC_TRANS_TYPE(_d, long, _s, _n);}                               \
@@ -59,30 +64,30 @@
             {SC_TRANS_TYPE(_d, long long, _s, _n);}                          \
          else if (_sid == SC_CHAR_I)                                         \
             {SC_TRANS_TYPE(_d, char, _s, _n);};                              \
-	 rv = TRUE;};}
+         rv = TRUE;};}
 
 /*--------------------------------------------------------------------------*/
 
 #define SC_TRANS_DATA_L(_dtyp, _pd, _sid, _s, _n, _mn, _mx)                  \
        {SC_TRANS_SPACE(_d, _dtyp, _pd, _n);                                  \
         if (_d != NULL)                                                      \
-	   {if (_sid == SC_FLOAT_I)                                          \
+           {if (_sid == SC_FLOAT_I)                                          \
                {SC_TRANS_TYPE_L(_d, float, _s, _n, _mn, _mx);}               \
-	    else if (_sid == SC_DOUBLE_I)                                    \
+            else if (_sid == SC_DOUBLE_I)                                    \
                {SC_TRANS_TYPE_L(_d, double, _s, _n, _mn, _mx);}              \
-	    else if (_sid == SC_LONG_DOUBLE_I)                               \
+            else if (_sid == SC_LONG_DOUBLE_I)                               \
                {SC_TRANS_TYPE_L(_d, long double, _s, _n, _mn, _mx);}         \
             else if (_sid == SC_SHORT_I)                                     \
                {SC_TRANS_TYPE_L(_d, short, _s, _n, _mn, _mx);}               \
-	    else if (_sid == SC_INT_I)                                       \
+            else if (_sid == SC_INT_I)                                       \
                {SC_TRANS_TYPE_L(_d, int, _s, _n, _mn, _mx);}                 \
             else if (_sid == SC_LONG_I)                                      \
                {SC_TRANS_TYPE_L(_d, long, _s, _n, _mn, _mx);}                \
             else if (_sid == SC_LONG_LONG_I)                                 \
                {SC_TRANS_TYPE_L(_d, long long, _s, _n, _mn, _mx);}           \
             else if (_sid == SC_CHAR_I)                                      \
-               {SC_TRANS_TYPE(_d, char, _s, n);};                            \
-	    rv = TRUE;};}
+               {SC_TRANS_TYPE(_d, char, _s, _n);};                           \
+            rv = TRUE;};}
 
 /*--------------------------------------------------------------------------*/
 
@@ -500,7 +505,7 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  */
 
 int SC_convert(char *dtype, void **pd, char *stype, void *s,
-	       int n, int flag)
+               int n, int flag)
    {int i, rv, sid, did, bpi;
 
     if (_SC.bmx == 0)
@@ -513,13 +518,13 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
     if (strcmp(dtype, stype) == 0)
        {char *d;
 
-	d = (char *) *pd;
-	if (d == NULL)
-	   {bpi = SC_type_size_i(sid);
-	    d   = FMAKE_N(char, n*bpi, "SC_CONVERT:d");
-	    *pd = (void *) d;};
+        d = (char *) *pd;
+        if (d == NULL)
+           {bpi = SC_type_size_i(sid);
+            d   = FMAKE_N(char, n*bpi, "SC_CONVERT:d");
+            *pd = (void *) d;};
 
-	SC_copy_primitive(d, s, n, sid);
+        SC_copy_primitive(d, s, n, sid);
         rv = TRUE;}
 
     else
@@ -529,56 +534,56 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
 
 /* floating point types */
        {if (did == SC_FLOAT_I)
-	   {SC_TRANS_DATA(float, pd, sid, s, n);}
+           {SC_TRANS_DATA(float, pd, sid, s, n);}
 
-	else if (did == SC_DOUBLE_I)
-	   {SC_TRANS_DATA(double, pd, sid, s, n);}
+        else if (did == SC_DOUBLE_I)
+           {SC_TRANS_DATA(double, pd, sid, s, n);}
 
-	else if (did == SC_LONG_DOUBLE_I)
-	   {SC_TRANS_DATA(long double, pd, sid, s, n);}
+        else if (did == SC_LONG_DOUBLE_I)
+           {SC_TRANS_DATA(long double, pd, sid, s, n);}
 
 /* fixed point types */
-	else if (did == SC_SHORT_I)
-	   {SC_TRANS_DATA(short, pd, sid, s, n);}
+        else if (did == SC_SHORT_I)
+           {SC_TRANS_DATA(short, pd, sid, s, n);}
 
-	else if (did == SC_INT_I)
-	   {SC_TRANS_DATA(int, pd, sid, s, n);}
+        else if (did == SC_INT_I)
+           {SC_TRANS_DATA(int, pd, sid, s, n);}
 
-	else if (did == SC_LONG_I)
-	   {SC_TRANS_DATA(long, pd, sid, s, n);}
+        else if (did == SC_LONG_I)
+           {SC_TRANS_DATA(long, pd, sid, s, n);}
 
-	else if (did == SC_LONG_LONG_I)
-	   {SC_TRANS_DATA(long long, pd, sid, s, n);}
+        else if (did == SC_LONG_LONG_I)
+           {SC_TRANS_DATA(long long, pd, sid, s, n);}
 
-	else if (did == SC_CHAR_I)
-	   {SC_TRANS_DATA(char, pd, sid, s, n);};};
+        else if (did == SC_CHAR_I)
+           {SC_TRANS_DATA(char, pd, sid, s, n);};};
 
 /* slower with clipping - FPE's are NOT possible */
 #else
 
        {if (did == SC_FLOAT_I)
-	   {SC_TRANS_DATA_L(float, pd, sid, s, n, FLT_MIN, FLT_MAX);}
+           {SC_TRANS_DATA_L(float, pd, sid, s, n, FLT_MIN, FLT_MAX);}
 
-	else if (did == SC_DOUBLE_I)
-	   {SC_TRANS_DATA_L(double, pd, sid, s, n, DBL_MIN, DBL_MAX);}
+        else if (did == SC_DOUBLE_I)
+           {SC_TRANS_DATA_L(double, pd, sid, s, n, DBL_MIN, DBL_MAX);}
 
-	else if (did == SC_LONG_DOUBLE_I)
-	   {SC_TRANS_DATA_L(long double, pd, sid, s, n, LDBL_MIN, LDBL_MAX);}
+        else if (did == SC_LONG_DOUBLE_I)
+           {SC_TRANS_DATA_L(long double, pd, sid, s, n, LDBL_MIN, LDBL_MAX);}
 
-	else if (did == SC_SHORT_I)
-	   {SC_TRANS_DATA_L(short, pd, sid, s, n, SHRT_MIN, SHRT_MAX);}
+        else if (did == SC_SHORT_I)
+           {SC_TRANS_DATA_L(short, pd, sid, s, n, SHRT_MIN, SHRT_MAX);}
 
-	else if (did == SC_INT_I)
-	   {SC_TRANS_DATA_L(int, pd, sid, s, n, INT_MIN, INT_MAX);}
+        else if (did == SC_INT_I)
+           {SC_TRANS_DATA_L(int, pd, sid, s, n, INT_MIN, INT_MAX);}
 
-	else if (did == SC_LONG_I)
-	   {SC_TRANS_DATA_L(long, pd, sid, s, n, LONG_MIN, LONG_MAX);}
+        else if (did == SC_LONG_I)
+           {SC_TRANS_DATA_L(long, pd, sid, s, n, LONG_MIN, LONG_MAX);}
 
-	else if (did == SC_LONG_LONG_I)
+        else if (did == SC_LONG_LONG_I)
 	   {SC_TRANS_DATA_L(long long, pd, sid, s, n, _SC.bmn, _SC.bmx);}
 
-	else if (did == SC_CHAR_I)
-	   {SC_TRANS_DATA_L(char, pd, sid, s, n, CHAR_MIN, CHAR_MAX);};};
+        else if (did == SC_CHAR_I)
+           {SC_TRANS_DATA_L(char, pd, sid, s, n, CHAR_MIN, CHAR_MAX);};};
 
 #endif
 

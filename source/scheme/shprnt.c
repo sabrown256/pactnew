@@ -1071,6 +1071,12 @@ void SS_wr_atm(object *obj, object *strm)
 	else if (ityp == SC_FLOAT_I)
 	   snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(obj));
 
+	else if (ityp == SC_DOUBLE_COMPLEX_I)
+          {double _Complex cv;
+
+	   cv = SS_COMPLEX_VALUE(obj);
+	   snprintf(t, MAXLINE, "%g + %gI", creal(cv), cimag(cv));}
+
 #ifdef LARGE
 	else if (ityp == SS_CHARACTER_I)
 	   snprintf(t, MAXLINE, "%c", SS_CHARACTER_VALUE(obj));
