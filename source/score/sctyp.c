@@ -106,31 +106,33 @@ int
  SC_FLOAT_COMPLEX_I         = 11,
  SC_DOUBLE_COMPLEX_I        = 12,
  SC_LONG_DOUBLE_COMPLEX_I   = 13,
- SC_STRING_I                = 14,
- SC_POINTER_I               = 15,
- SC_BOOL_P_I                = 16,
- SC_SHORT_P_I               = 17,
- SC_INT_P_I                 = 18,
- SC_LONG_P_I                = 19,
- SC_LONG_LONG_P_I           = 20,
- SC_FLOAT_P_I               = 21,
- SC_DOUBLE_P_I              = 22,
- SC_LONG_DOUBLE_P_I         = 23,
- SC_FLOAT_COMPLEX_P_I       = 24,
- SC_DOUBLE_COMPLEX_P_I      = 25,
- SC_LONG_DOUBLE_COMPLEX_P_I = 26,
- SC_VOID_I                  = 27,
- SC_CHAR_8_I                = 28,
- SC_ENUM_I                  = 29,
- SC_STRUCT_I                = 30,
- SC_PCONS_I                 = 31,
- SC_PROCESS_I               = 32,
- SC_FILE_I                  = 33,
- SC_PCONS_P_I               = 34,
+ SC_QUATERNION_I            = 14,
+ SC_STRING_I                = 15,
+ SC_POINTER_I               = 16,
+ SC_BOOL_P_I                = 17,
+ SC_SHORT_P_I               = 18,
+ SC_INT_P_I                 = 19,
+ SC_LONG_P_I                = 20,
+ SC_LONG_LONG_P_I           = 21,
+ SC_FLOAT_P_I               = 22,
+ SC_DOUBLE_P_I              = 23,
+ SC_LONG_DOUBLE_P_I         = 24,
+ SC_FLOAT_COMPLEX_P_I       = 25,
+ SC_DOUBLE_COMPLEX_P_I      = 26,
+ SC_LONG_DOUBLE_COMPLEX_P_I = 27,
+ SC_QUATERNION_P_I          = 28,
+ SC_VOID_I                  = 29,
+ SC_CHAR_8_I                = 30,
+ SC_ENUM_I                  = 31,
+ SC_STRUCT_I                = 32,
+ SC_PCONS_I                 = 33,
+ SC_PROCESS_I               = 34,
+ SC_FILE_I                  = 35,
+ SC_PCONS_P_I               = 36,
 
  SC_INTEGER_I               = 5,
  SC_REAL_I                  = 9,
- SC_REAL_P_I                = 22;
+ SC_REAL_P_I                = 23;
 
 char
  *SC_UNKNOWN_S               = "unknown",
@@ -147,6 +149,7 @@ char
  *SC_FLOAT_COMPLEX_S         = "float_complex",
  *SC_DOUBLE_COMPLEX_S        = "double_complex",
  *SC_LONG_DOUBLE_COMPLEX_S   = "long_double_complex",
+ *SC_QUATERNION_S            = "quaternion",
  *SC_STRING_S                = "char *",
  *SC_POINTER_S               = "void *",
  *SC_BOOL_P_S                = "bool *",
@@ -160,6 +163,7 @@ char
  *SC_FLOAT_COMPLEX_P_S       = "float_complex *",
  *SC_DOUBLE_COMPLEX_P_S      = "double_complex *",
  *SC_LONG_DOUBLE_COMPLEX_P_S = "long_double_complex *",
+ *SC_QUATERNION_P_S          = "quaternion *",
  *SC_VOID_S                  = "void",
  *SC_CHAR_8_S                = "char_8",
  *SC_ENUM_S                  = "enum",
@@ -441,6 +445,7 @@ void SC_init_base_types(void)
        SC_FLOAT_COMPLEX_I         = SC_register_type(SC_FLOAT_COMPLEX_S,       sizeof(float _Complex),       NULL);
        SC_DOUBLE_COMPLEX_I        = SC_register_type(SC_DOUBLE_COMPLEX_S,      sizeof(double _Complex),      NULL);
        SC_LONG_DOUBLE_COMPLEX_I   = SC_register_type(SC_LONG_DOUBLE_COMPLEX_S, sizeof(long double _Complex), NULL);
+       SC_QUATERNION_I            = SC_register_type(SC_QUATERNION_S,          4*sizeof(double),             NULL);
 
 /*       SC_STRING_I                = SC_register_type("string",                   szptr, NULL); */
        SC_STRING_I                = SC_register_type(SC_STRING_S,                szptr, NULL);
@@ -456,6 +461,7 @@ void SC_init_base_types(void)
        SC_FLOAT_COMPLEX_P_I       = SC_register_type(SC_FLOAT_COMPLEX_P_S,       szptr, NULL);
        SC_DOUBLE_COMPLEX_P_I      = SC_register_type(SC_DOUBLE_COMPLEX_P_S,      szptr, NULL);
        SC_LONG_DOUBLE_COMPLEX_P_I = SC_register_type(SC_LONG_DOUBLE_COMPLEX_P_S, szptr, NULL);
+       SC_QUATERNION_P_I          = SC_register_type(SC_QUATERNION_P_S,          szptr, NULL);
 
        SC_VOID_I                  = SC_register_type(SC_VOID_S,     0,               NULL);
        SC_CHAR_8_I                = SC_register_type(SC_CHAR_8_S,   sizeof(char),                 NULL);
