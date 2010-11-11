@@ -830,13 +830,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	   _PD_disp_data(prnt, vr, ni, ifp, n, ind);
 
 	else if ((icx = SC_cx_type_id(type)) != -1)
-	   _PD_disp_data(prnt, vr, ni, icx, n, ind);
-
-       else if (strcmp(type, "REAL") == 0)
-	  {if (sizeof(REAL) == sizeof(double))
-	      _PD_disp_data(prnt, vr, ni, SC_DOUBLE_I, n, ind);
-	   else
-	      _PD_disp_data(prnt, vr, ni, SC_FLOAT_I, n, ind);};}
+	   _PD_disp_data(prnt, vr, ni, icx, n, ind);}
 
 /* only non-floating point types remain
  * user defined integral primitive types
@@ -845,9 +839,6 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     else if (pd->convert >= 0)
        {if ((ifx = SC_fix_type_id(type, FALSE)) != -1)
 	   _PD_disp_data(prnt, vr, ni, ifx, n, ind);
-
-	else if (strcmp(type, SC_INTEGER_S) == 0)
-	   _PD_disp_data(prnt, vr, ni, SC_INTEGER_I, n, ind);
 
 /* GOTCHA: This is a feeble first step toward a generalized
  *         print capability for user defined types
@@ -868,14 +859,6 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    else
 	       _PD_disp_data(prnt, vr, isz*ni, 0, n, ind);}
 
-	else if (strcmp(type, "function") == 0)
-	   {if (PD_print_controls[5] == 0)
-	       {PRINT(f0, "%s%s%s = <function>\n", prefix, before, nodename);}
-	    else if (PD_print_controls[5] == 1)
-	       {PRINT(f0, "%s%s = <function>\n", before, nodename);}
-	    else
-	       {PRINT(f0, "        <function>\n");};}
-
 	else if (strcmp(type, SC_BOOL_S) == 0)
 	  _PD_disp_data(prnt, vr, ni, SC_BOOL_I, n, ind);
 
@@ -894,6 +877,14 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	        quo = FALSE;};
 
 	    _PD_print_char_kind(prnt, vr, ni, type, quo, idx, n, ind);}
+
+	else if (strcmp(type, "function") == 0)
+	   {if (PD_print_controls[5] == 0)
+	       {PRINT(f0, "%s%s%s = <function>\n", prefix, before, nodename);}
+	    else if (PD_print_controls[5] == 1)
+	       {PRINT(f0, "%s%s = <function>\n", before, nodename);}
+	    else
+	       {PRINT(f0, "        <function>\n");};}
 
         else if (isz == sizeof(short))
 	  _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);

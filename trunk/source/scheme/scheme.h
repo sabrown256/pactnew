@@ -321,8 +321,9 @@ typedef struct s_SS_vect vector;
 
 /* NUMBER ACCESSORS */
 
-#define SS_INTEGER_VALUE(x)    *((BIGINT *) ((x)->val))
+#define SS_INTEGER_VALUE(x)    *((long long *) ((x)->val))
 #define SS_FLOAT_VALUE(x)      *((double *) ((x)->val))
+#define SS_COMPLEX_VALUE(x)    *((double _Complex *) ((x)->val))
 
 /* INPUT_PORT/OUTPUT_PORT ACCESSORS */
 
@@ -433,6 +434,15 @@ typedef struct s_SS_vect vector;
  */
 
 #define SS_floatp(obj) (SC_arrtype(obj, -1) == SC_FLOAT_I)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_COMPLEXP - return TRUE if the object is of type COMPLEX
+ *             - return FALSE otherwise
+ */
+
+#define SS_complexp(obj) (SC_arrtype(obj, -1) == SC_DOUBLE_COMPLEX_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1005,6 +1015,7 @@ extern object
  *SS_mk_outport(FILE *str, char *name),
  *SS_mk_integer(BIGINT i),
  *SS_mk_float(double d),
+ *SS_mk_complex(double _Complex d),
  *SS_mk_boolean(char *s, int v),
  *SS_mk_cons(object *ca, object *cd),
  *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,

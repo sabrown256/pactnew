@@ -10,6 +10,17 @@
  
 #include "sx_int.h"
 
+#define	ARRAY_VECTOR(_o, _d, _fnc, _n, _off)                                 \
+   {long _i;                                                                 \
+    if ((_n == 1) && (_off == 0))                                            \
+       _o = _fnc(*_d);                                                       \
+    else                                                                     \
+       {_o = SS_null;                                                        \
+	for (_i = 0; _i < _n; _i++)                                          \
+	    _o = SS_mk_cons(_fnc(_d[_i]), _o);                               \
+	if (_o != SS_null)                                                   \
+	   _o = SS_lstvct(SS_reverse(_o));};}
+
 object
  *_SX_make_list_indirection(PDBfile *file, char **vr, long nitems, char *type),
  *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type),
@@ -132,211 +143,93 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_MK_BOOLEAN - wrapper to make Scheme boolean from C bool */
+
+static object *_SX_mk_boolean(bool b)
+   {object *o;
+
+    o = (b == true) ? SS_t : SS_f;
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_MAKE_LIST_IO - convert a primitive type into a list */
 
 object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
-   {int i, id, offset;
+   {int id, offset;
     object *obj;
 
+/* print out the type */
     offset = 0;
 
-/* print out the type */
-    id = SC_type_id(type, FALSE);
+/* fixed point types (proper) */
+    if (SC_fix_type_id(type, TRUE) != -1)
+       {long long *d;
 
-    if (id == SC_CHAR_I)
-       {if (vr == NULL)
-           obj = SS_null;
-        else
-           obj = SS_mk_string(vr);}
+	d = NULL;
+	SC_convert(SC_LONG_LONG_S, (void **) &d, type, vr, nitems, FALSE);
 
-/* fixed point types */
-    else if (id == SC_SHORT_I)
-       {short *pv;
-        pv = (short *) vr;
+	ARRAY_VECTOR(obj, d, SS_mk_integer, nitems, offset);
 
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer(*pv);
+	SFREE(d);}
 
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
+/* floating point types (proper) */
+    else if (SC_fp_type_id(type) != -1)
+       {double *d;
 
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
+	d = NULL;
+	SC_convert(SC_DOUBLE_S, (void **) &d, type, vr, nitems, FALSE);
 
-    else if (strcmp(type, "u_short") == 0)
-       {unsigned short *pv;
-        pv = (unsigned short *) vr;
+	ARRAY_VECTOR(obj, d, SS_mk_float, nitems, offset);
 
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer((long long) *pv);
+	SFREE(d);}
 
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
+/* complex floating point types (proper) */
+    else if (SC_cx_type_id(type) != -1)
+       {double _Complex *d;
 
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
+	d = NULL;
+	SC_convert(SC_DOUBLE_COMPLEX_S, (void **) &d, type, vr, nitems, FALSE);
 
-    else if (id == SC_INT_I)
-       {int *pv;
-        pv = (int *) vr;
+	ARRAY_VECTOR(obj, d, SS_mk_complex, nitems, offset);
 
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer(*pv);
+	SFREE(d);}
 
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
+    else
+       {id = SC_type_id(type, FALSE);
 
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
+	if (id == SC_BOOL_I)
+	   {int *d;
 
-    else if ((strcmp(type, "u_integer") == 0) ||
-	     (strcmp(type, "u_int") == 0))
-       {unsigned int *pv;
-        pv = (unsigned int *) vr;
+	    d = NULL;
+	    SC_convert(SC_INT_S, (void **) &d, type, vr, nitems, FALSE);
 
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_integer((long long) *pv);
+	    ARRAY_VECTOR(obj, d, _SX_mk_boolean, nitems, offset);
 
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
+	    SFREE(d);}
 
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-    else if (id == SC_LONG_I)
-       {long *pv;
-        pv = (long *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer(*pv);
-
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-    else if (strcmp(type, "u_long") == 0)
-       {unsigned long *pv;
-        pv = (unsigned long *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer((long long) *pv);
-
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-    else if (id == SC_LONG_LONG_I)
-       {long long *pv;
-        pv = (long long *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer(*pv);
-
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-    else if (strcmp(type, "u_long_long") == 0)
-       {unsigned long long *pv;
-        pv = (unsigned long long *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-            obj = SS_mk_integer((long long) *pv);
-
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_integer((long long) pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {float *pv;
-        pv = (float *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_float(*pv);
-
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_float(pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-    else if (id == SC_DOUBLE_I)
-       {double *pv;
-        pv = (double *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_float(*pv);
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_float(pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {long double *pv;
-        pv = (long double *) vr;
-
-        if ((nitems == 1) && (offset == 0))
-           obj = SS_mk_float(*pv);
-        else
-           {obj = SS_null;
-            for (i = 0; i < nitems; i++)
-                obj = SS_mk_cons(SS_mk_float(pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};}
+	else if (id == SC_CHAR_I)
+	   {if (vr == NULL)
+	       obj = SS_null;
+	    else
+	       obj = SS_mk_string(vr);}
 
 /* handle user defined primitive types by turning them into vectors of
  * integers containing the byte values
  * GOTCHA: if the byte size of an item matches a standard machine
  * type size make a vector of that type
  */
-    else
-       {long bpi, nb;
-        char *pv;
-        pv = (char *) vr;
+	else
+	   {long bpi, nb;
+	    char *d;
 
-        bpi = _PD_lookup_size(type, file->chart);
-        nb  = bpi*nitems;
+	    d   = (char *) vr;
+	    bpi = _PD_lookup_size(type, file->chart);
+	    nb  = bpi*nitems;
 
-        if ((nb == 1) && (offset == 0))
-           obj = SS_mk_integer(*pv);
-        else
-           {obj = SS_null;
-            for (i = 0; i < nb; i++)
-                obj = SS_mk_cons(SS_mk_integer(pv[i]), obj);
-
-            if (obj != SS_null)
-               obj = SS_lstvct(SS_reverse(obj));};};
+	    ARRAY_VECTOR(obj, d, SS_mk_integer, nb, offset);};};
 
     return(obj);}
 

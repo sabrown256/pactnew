@@ -885,7 +885,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		       fcnv[ifp], fstd->fp[ifp].order,
 		       fstd->fp[ifp].format, FALSE, FALSE);};
 
-/* complex types */
+/* complex floating point types (proper) */
     for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
         {btyp = SC_type_name(ifp + SC_FLOAT_I);
          styp = SC_type_name(ifp + SC_FLOAT_COMPLEX_I);

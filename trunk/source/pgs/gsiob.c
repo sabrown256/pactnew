@@ -187,22 +187,24 @@ void PG_print_pointer_location(PG_device *dev, double cx, double cy, int coord)
  */
 
 static int _PG_get_val(haelem *hp, int xo, int dx)
-   {char *type;
+   {int id;
+    char *type;
 
     type = hp->type;
+    id   = SC_type_id(type, FALSE);
 
 /* fixed point types */
-    if (strcmp(type, SC_INT_S) == 0)
+    if (id == SC_INT_I)
        {GET_VAL(int, hp, xo, dx);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {GET_VAL(long, hp, xo, dx);}
 
 /* floating point types */
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+    else if (id == SC_DOUBLE_I)
        {GET_VAL(double, hp, xo, dx);}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {GET_VAL(float, hp, xo, dx);};
 
     return(xo);}
@@ -215,25 +217,27 @@ static int _PG_get_val(haelem *hp, int xo, int dx)
  */
 
 static void _PG_set_val(haelem *hp, int dxn, int dxd)
-   {char *type;
+   {int id;
+    char *type;
     double f;
+
+    type = hp->type;
+    id   = SC_type_id(type, FALSE);
 
     f = ((double) dxn) / ((double) dxd);
 
-    type = hp->type;
-
 /* fixed point types */
-    if (strcmp(type, SC_INT_S) == 0)
+    if (id == SC_INT_I)
        {RESET_VAL(int, hp);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {RESET_VAL(long, hp);}
 
 /* floating point types */
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+    else if (id == SC_DOUBLE_I)
        {RESET_VAL(double, hp);}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {RESET_VAL(float, hp);};
 
     return;}
@@ -1255,7 +1259,8 @@ static void PG_toggle(PG_interface_object *iob, PG_event *ev)
  */
 
 static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
-   {char *name, *type, *val;
+   {int id;
+    char *name, *type, *val;
     haelem *hp;
     PG_interface_object *piob;
 
@@ -1278,23 +1283,24 @@ static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
 	    hp   = PG_lookup_variable(name);
 	    if (hp != NULL)
 	       {type = hp->type;
+		id   = SC_type_id(type, FALSE);
 		val  = iob->action_name;
 
 /* fixed point types */
-		if (strcmp(type, SC_INT_S) == 0)
+		if (id == SC_INT_I)
 		   {SET_VAL(int, SC_stoi);}
 
-		else if (strcmp(type, SC_LONG_S) == 0)
+		else if (id == SC_LONG_I)
 		   {SET_VAL(long, SC_stoi);}
 
 /* floating point types */
-		else if (strcmp(type, SC_DOUBLE_S) == 0)
+		else if (id == SC_DOUBLE_I)
 		   {SET_VAL(double, SC_stof);}
 
-		else if (strcmp(type, SC_FLOAT_S) == 0)
+		else if (id == SC_FLOAT_I)
 		   {SET_VAL(float, SC_stof);}
 
-		else if (strcmp(type, SC_STRING_S) == 0)
+		else if (id == SC_STRING_I)
 		   {SFREE((**(char ***) hp->def));
 		    SET_VAL(char *, SC_strsave);};};
 

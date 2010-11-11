@@ -44,12 +44,13 @@ static char *_SS_load_bf(char *s)
  */
 
 static void _SS_fix_arg(object *obj, void *v, int type)
-   {long long l;
+   {int *ip;
+    short *sp;
+    long long l;
     long long *llp;
     long *lp;
-    int *ip;
-    short *sp;
     char *cp;
+    double _Complex z;
 
     l = 0;
 
@@ -58,6 +59,10 @@ static void _SS_fix_arg(object *obj, void *v, int type)
 
     else if (SS_floatp(obj))
        l = PM_fix(SS_FLOAT_VALUE(obj));
+
+    else if (SS_complexp(obj))
+       {z = SS_COMPLEX_VALUE(obj);
+	l = PM_fix(creal(z));}
 
     else if (SS_charobjp(obj))
        l = SS_CHARACTER_VALUE(obj);
@@ -128,8 +133,8 @@ static void _SS_fix_arg(object *obj, void *v, int type)
  */
 
 static void _SS_float_arg(object *obj, void *v, int type)
-   {int which;
-    double d, *dp;
+   {double d, *dp;
+    double _Complex z;
     float *fp;
 
      d = 0.0;
@@ -139,6 +144,10 @@ static void _SS_float_arg(object *obj, void *v, int type)
 
     else if (SS_floatp(obj))
        d = SS_FLOAT_VALUE(obj);
+
+    else if (SS_complexp(obj))
+       {z = SS_COMPLEX_VALUE(obj);
+	d = creal(z);}
 
     else if (SS_charobjp(obj))
        d = SS_CHARACTER_VALUE(obj);
@@ -173,22 +182,75 @@ static void _SS_float_arg(object *obj, void *v, int type)
     else
        SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
 
-    which = (sizeof(REAL) == sizeof(double));
-    if (which)
-       {if (type == SC_FLOAT_I)
-	   {fp  = (float *) v;
-	    *fp = (float) d;}
-	else if ((type == SC_REAL_I) || (type == SC_DOUBLE_I))
-	   {dp  = (double *) v;
-	    *dp = d;};}
+    if (type == SC_FLOAT_I)
+       {fp  = (float *) v;
+	*fp = (float) d;}
+    else if (type == SC_DOUBLE_I)
+       {dp  = (double *) v;
+	*dp = d;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_COMPLEX_ARG - get a C level complex floating point data item from
+ *                 - a single Scheme object
+ */
+
+static void _SS_complex_arg(object *obj, void *v)
+   {double r, i;
+    double _Complex z, *zp;
+
+    r = 0.0;
+    i = 0.0;
+
+    if (SS_complexp(obj))
+       {z = SS_COMPLEX_VALUE(obj);
+	r = creal(z);
+	i = cimag(z);}
+
+    else if (SS_integerp(obj))
+       r = SS_INTEGER_VALUE(obj);
+
+    else if (SS_floatp(obj))
+       r = SS_FLOAT_VALUE(obj);
+
+    else if (SS_charobjp(obj))
+       r = SS_CHARACTER_VALUE(obj);
+
+    else if (SS_procedurep(obj))
+       {PFVoid hand;
+        SC_address u;
+
+        switch (SS_PROCEDURE_TYPE(obj))
+           {case SS_MACRO : 
+            case SS_PROC  :
+                 SS_error("CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+                 break;
+
+            default :
+                 hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
+                 u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
+                 if (hand == (PFVoid) SS_acc_char)
+                    r = *(char *) u.memaddr;
+                 else if (hand == (PFVoid) SS_acc_int)
+                    r = *(int *) u.memaddr;
+                 else if (hand == (PFVoid) SS_acc_long)
+                    r = *(long *) u.memaddr;
+                 else if (hand == (PFVoid) SS_acc_REAL)
+                    r = *(double *) u.memaddr;
+                 else
+                    SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+
+    else if (SS_nullobjp(obj))
+       r = 0.0;
 
     else
-       {if ((type == SC_FLOAT_I) || (type == SC_REAL_I))
-	   {fp  = (float *) v;
-	    *fp = (float) d;}
-	else if (type == SC_DOUBLE_I)
-	   {dp  = (double *) v;
-	    *dp = d;};};
+       SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
+
+    zp  = (double _Complex *) v;
+    *zp = r + i*I;
 
     return;}
 
@@ -209,18 +271,16 @@ static void _SS_args(object *obj, void *v, int type)
        {DEREF(v) = NULL;
         return;};
 
-    if ((type == SC_CHAR_I) ||
-	(type == SC_SHORT_I) ||
-	(type == SC_INT_I) ||
-	(type == SC_ENUM_I) ||
-	(type == SC_LONG_LONG_I) ||
-	(type == SC_LONG_I))
+    if ((type == SC_ENUM_I) ||
+	((SC_CHAR_I <= type) && (type <= SC_LONG_LONG_I)))
        _SS_fix_arg(obj, v, type);
 
-    else if ((type == SC_FLOAT_I) ||
-	     (type == SC_REAL_I) ||
-	     (type == SC_DOUBLE_I))
+    else if ((SC_FLOAT_I <= type) && (type <= SC_LONG_DOUBLE_I))
        _SS_float_arg(obj, v, type);
+
+    else if ((SC_FLOAT_COMPLEX_I <= type) &&
+	     (type <= SC_LONG_DOUBLE_COMPLEX_I))
+       _SS_complex_arg(obj, v);
 
     else if (type == SC_STRING_I)
        {s = _SS_get_print_name(obj);
