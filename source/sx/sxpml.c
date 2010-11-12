@@ -1862,7 +1862,7 @@ static object *_SXI_find_index(object *argl)
        SS_error("NO ARRAY SPECIFIED - _SXI_FIND_INDEX", argl);
 
     else
-       {fnc = (PF_int_dd) pred->proc;
+       {fnc = _SS_GET_C_PROCEDURE_N(PF_int_dd, pred, 0);
 
 	if (indx == NULL)
 	   {ni = 0; 

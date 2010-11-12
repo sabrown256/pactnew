@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "pdb.h"
-#include <complex.h>
 
 #define DATFILE "nat"
 

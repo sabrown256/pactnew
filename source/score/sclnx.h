@@ -28,8 +28,10 @@
 # define _LARGE_FILES
 #endif
 
-#ifndef _FILE_OFFSET_BITS
-# define _FILE_OFFSET_BITS 64
+#ifndef IBM_BGL
+# ifndef _FILE_OFFSET_BITS
+#  define _FILE_OFFSET_BITS 64
+# endif
 #endif
 
 #ifndef _LARGEFILE64_SOURCE

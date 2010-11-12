@@ -107,7 +107,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	   *((char *) vr) = (char) dv;
 
 	else
-	   SS_error("OBJECT NOT CHAR - SS_ACC_VAR", vl);}
+	   SS_error("OBJECT NOT CHAR - _SS_SET_VAR", vl);}
 
     else if (type == SC_INT_I)
        {if (lv != -HUGE_INT)
@@ -117,7 +117,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	   *((int *) vr) = (int) dv;
 
 	else
-	   SS_error("OBJECT NOT INTEGER - SS_ACC_VAR", vl);}
+	   SS_error("OBJECT NOT INTEGER - _SS_SET_VAR", vl);}
 
     else if (type == SC_LONG_I)
        {if (lv != -HUGE_INT)
@@ -127,7 +127,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	   *((long *) vr) = (long) dv;
 
 	else
-	   SS_error("OBJECT NOT LONG INT - SS_ACC_VAR", vl);}
+	   SS_error("OBJECT NOT LONG INT - _SS_SET_VAR", vl);}
 
     else if (type == SC_DOUBLE_I)
        {if (dv != -HUGE)
@@ -137,7 +137,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	   *((double *) vr) = (double) lv;
 
 	else
-	   SS_error("OBJECT NOT REAL NUMBER - SS_ACC_VAR", vl);}
+	   SS_error("OBJECT NOT REAL NUMBER - _SS_SET_VAR", vl);}
 
     else if (type == SC_STRING_I)
        {if (sv != NULL)
@@ -162,7 +162,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	    *((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");};}
 
     else
-       SS_error("OBJECT HAS INCORRECT TYPE - SS_ACC_VAR", vl);
+       SS_error("OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);
 
     return(vl);}
 
@@ -175,7 +175,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
  *               -   char   :  SS_acc_char
  *               -   int    :  SS_acc_int
  *               -   long   :  SS_acc_long
- *               -   double :  SS_acc_REAL
+ *               -   double :  SS_acc_double
  *               -   char * :  SS_acc_string
  *               -   void * :  SS_acc_ptr
  *               -
@@ -194,19 +194,11 @@ object *SS_install_cf(char *name, char *doc, ...)
 
     SC_VA_START(doc);
     handler = SC_VA_ARG(PFPHand);
-    fnc = SC_VA_ARG(PFVoid);
+    fnc     = SC_VA_ARG(PFVoid);
     SC_VA_END;
 
-    cp = FMAKE(C_procedure, "SS_INSTALL_CF:cp");
-    cp->proc    = fnc;
-    cp->handler = handler;
-
-    pp = FMAKE(procedure, "SS_INSTALL_CF:pp");
-    pp->type  = SS_PR_PROC;
-    pp->trace = FALSE;
-    pp->proc  = (object *) cp;
-    pp->doc   = doc;
-    pp->name  = SC_strsavef(name, "char*:SS_INSTALL_CF:name");
+    cp = _SS_mk_C_proc_va(handler, 1, fnc);
+    pp = _SS_mk_scheme_proc(name, doc, SS_PR_PROC, cp);
 
     op = SS_mk_proc_object(pp);
     SS_UNCOLLECT(op);
@@ -297,12 +289,29 @@ object *SS_install_cv(char *name, void *pval, int type)
 
 /*--------------------------------------------------------------------------*/
 
-/* SS_ACC_REAL - the handler for accessing REAL variables */
+/* _SS_ACC_VAR - the handler for accessing variables */
 
-object *SS_acc_REAL(void *vr, object *argl)
+static object *_SS_acc_var(C_procedure *cp, object *argl, int type)
+   {object *vl, *ret;
+
+    if (SS_nullobjp(argl))
+       ret = _SS_exa_var(cp->proc[0], type);
+
+    else
+       {vl = SS_car(argl);
+        ret = _SS_set_var(cp->proc[0], vl, type);};
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_ACC_DOUBLE - the handler for accessing double variables */
+
+object *SS_acc_double(C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_DOUBLE_I);
+    ret = _SS_acc_var(cp, argl, SC_DOUBLE_I);
 
     return(ret);}
 
@@ -311,10 +320,10 @@ object *SS_acc_REAL(void *vr, object *argl)
 
 /* SS_ACC_INT - the handler for accessing int variables */
 
-object *SS_acc_int(void *vr, object *argl)
+object *SS_acc_int(C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_INT_I);
+    ret = _SS_acc_var(cp, argl, SC_INT_I);
 
     return(ret);}
 
@@ -323,10 +332,10 @@ object *SS_acc_int(void *vr, object *argl)
 
 /* SS_ACC_LONG - the handler for accessing LONG variables */
 
-object *SS_acc_long(void *vr, object *argl)
+object *SS_acc_long(C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_LONG_I);
+    ret = _SS_acc_var(cp, argl, SC_LONG_I);
 
     return(ret);}
 
@@ -335,10 +344,10 @@ object *SS_acc_long(void *vr, object *argl)
 
 /* SS_ACC_CHAR - the handler for accessing char variables */
 
-object *SS_acc_char(void *vr, object *argl)
+object *SS_acc_char(C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_CHAR_I);
+    ret = _SS_acc_var(cp, argl, SC_CHAR_I);
 
     return(ret);}
 
@@ -347,10 +356,10 @@ object *SS_acc_char(void *vr, object *argl)
 
 /* SS_ACC_STRING - the handler for accessing char * variables */
 
-object *SS_acc_string(void *vr, object *argl)
+object *SS_acc_string(C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_STRING_I);
+    ret = _SS_acc_var(cp, argl, SC_STRING_I);
 
     return(ret);}
 
@@ -359,27 +368,10 @@ object *SS_acc_string(void *vr, object *argl)
 
 /* SS_ACC_PTR - the handler for accessing pointer variables */
 
-object *SS_acc_ptr(void *vr, object *argl)
+object *SS_acc_ptr(C_procedure *cp, object *argl)
    {object *ret;
 
-    ret = SS_acc_var(vr, argl, SC_POINTER_I);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SS_ACC_VAR - the handler for accessing variables */
-
-object *SS_acc_var(void *vr, object *argl, int type)
-   {object *vl, *ret;
-
-    if (SS_nullobjp(argl))
-       ret = _SS_exa_var(vr, type);
-
-    else
-       {vl = SS_car(argl);
-        ret = _SS_set_var(vr, vl, type);};
+    ret = _SS_acc_var(cp, argl, SC_POINTER_I);
 
     return(ret);}
 

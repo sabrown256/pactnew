@@ -45,28 +45,140 @@ int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_MK_C_PROC - instantiate a C_procedure */
+
+C_procedure *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr)
+   {C_procedure *cp;
+
+    cp = FMAKE(C_procedure, "_SS_MK_C_PROC:cp");
+    if (cp != NULL)
+       {cp->handler = phand;
+	cp->n       = n;
+	cp->proc    = pr;};
+
+    return(cp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_RL_C_PROC - release a C_procedure */
+
+void _SS_rl_C_proc(C_procedure *cp)
+   {
+
+    SFREE(cp->proc);
+    SFREE(cp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_MK_C_PROC_VA - instantiate a C_procedure */
+
+C_procedure *_SS_mk_C_proc_va(PFPHand phand, int n, ...)
+   {int i;
+    C_procedure *cp;
+    PFVoid *pr;
+
+    pr = FMAKE_N(PFVoid, n, "_SS_MK_C_PROC_VA:pr");
+
+    SC_VA_START(n);
+    for (i = 0; i < n; i++)
+        pr[i] = SC_VA_ARG(PFVoid);
+    SC_VA_END;
+
+    cp = _SS_mk_C_proc(phand, n, pr);
+
+    return(cp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_MK_SCHEME_PROC - instantiate a scheme procedure */
+
+procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
+			      C_procedure *cp)
+   {char *ds, *ns;
+    procedure *pp;
+
+    pp = FMAKE(procedure, "_SS_MK_SCHEME_PROC:pp");
+    if (pp != NULL)
+       {ds = NULL;
+	if (pdoc != NULL)
+	   ds = SC_strsavef(pdoc, "char*:_SS_MK_SCHEME_PROC:doc");
+
+	ns = NULL;
+	if (pname != NULL)
+	   ns = SC_strsavef(pname, "char*:_SS_MK_SCHEME_PROC:name");
+
+	pp->doc   = ds;
+	pp->name  = ns;
+	pp->trace = FALSE;
+	pp->type  = ptype;
+	pp->proc  = (object *) cp;};
+
+    return(pp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INSTALL - install procedure objects in the symbol table
+ *             - a procedure object is a struct
+ *             -      struct s_SS_proc
+ *             -         {char type;
+ *             -          char *doc;
+ *             -          char *name;
+ *             -          short int trace;
+ *             -          object *proc;};
+ *             -
+ *             -      typedef struct s_SS_proc procedure;
+ *             -
+ *             - and the proc member points off to a C_procedure for
+ *             - the purposes of _SS_install
+ *             -
+ *             -      typedef object *(*PFPHand)(PFVoid pr, object *argl);
+ *             - 
+ *             -      struct s_SS_C_proc
+ *             -         {object *(*handler)();
+ *             -          PFVOid proc;}
+ *             -
+ *             -      typedef struct s_SS_C_proc C_procedure;
+ */
+
+void _SS_install(char* pname, char *pdoc, PFPHand phand,
+		 int n, PFVoid *pr, SS_form ptype)
+   {object *op, *vp;
+    procedure *pp;
+    C_procedure *cp;
+
+/* create the C level procedure */
+    cp = _SS_mk_C_proc(phand, n, pr);
+    if (cp == NULL)
+       {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
+        LONGJMP(SC_top_lev, ABORT);};
+
+/* create the Scheme level procedure */
+    pp = _SS_mk_scheme_proc(pname, pdoc, ptype, cp);
+    if (pp == NULL)
+       {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
+        LONGJMP(SC_top_lev, ABORT);};
+
+    op = SS_mk_proc_object(pp);
+    SS_UNCOLLECT(op);
+
+/* create the variable which puts it all together */
+    vp = SS_mk_variable(pname, op);
+    SS_UNCOLLECT(vp);
+
+    SC_hasharr_install(SS_symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_INSTALL - install procedure objects in the symbol table
- *            - a procedure object is a struct
- *            -      struct s_SS_proc
- *            -         {char type;
- *            -          char *doc;
- *            -          char *name;
- *            -          short int trace;
- *            -          object *proc;};
- *            -
- *            -      typedef struct s_SS_proc procedure;
- *            -
- *            - and the proc member points off to a C_procedure for
- *            - the purposes of SS_install
- *            -
- *            -      typedef object *(*PFPHand)(PFVoid pr, object *argl);
- *            - 
- *            -      struct s_SS_C_proc
- *            -         {object *(*handler)();
- *            -          PFVOid proc;}
- *            -
- *            -      typedef struct s_SS_C_proc C_procedure;
- *            -
  *            - NOTE: this is not a vararg function, we are using
  *            - varargs to defeat type checking on the function
  *            - pointers which is inappropriate for this general
@@ -75,52 +187,17 @@ int
 
 void SS_install(char* pname, char *pdoc, PFPHand phand, ...)
 /*                PFVoid pproc, SS_form ptype */
-   {object *op, *vp;
-    procedure *pp;
-    C_procedure *Cp;
-    SS_form ptype;
-    PFVoid pproc;
+   {SS_form ptype;
+    PFVoid *pr;
+
+    pr = FMAKE(PFVoid, "SS_INSTALL:pr");
 
     SC_VA_START(phand);
-    pproc = SC_VA_ARG(PFVoid);
+    pr[0] = SC_VA_ARG(PFVoid);
     ptype = SC_VA_ARG(SS_form);
     SC_VA_END;
 
-    pp = FMAKE(procedure, "SS_INSTALL:pp");
-    if (pp == NULL)
-       {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
-        LONGJMP(SC_top_lev, ABORT);};
-
-    Cp = FMAKE(C_procedure, "SS_INSTALL:Cp");
-    if (Cp == NULL)
-       {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
-        LONGJMP(SC_top_lev, ABORT);};
-
-    pp->doc = SC_strsavef(pdoc, "char*:SS_INSTALL:doc");
-    if (pp->doc == NULL)
-       {PRINT(ERRDEV, "\nError installing procedure documentation - %s\n",
-                      pname);
-        LONGJMP(SC_top_lev, ABORT);};
-
-    pp->name = SC_strsavef(pname, "char*:SS_INSTALL:name");
-    if (pp->name == NULL)
-       {PRINT(ERRDEV, "\nError installing procedure name - %s\n", pname);
-        LONGJMP(SC_top_lev, ABORT);};
-        
-    pp->trace = FALSE;
-    pp->type  = ptype;
-    pp->proc  = (object *) Cp;
-
-    Cp->handler = phand;
-    Cp->proc    = pproc;
-
-    op     = SS_mk_proc_object(pp);
-    SS_UNCOLLECT(op);
-
-    vp     = SS_mk_variable(pname, op);
-    SS_UNCOLLECT(vp);
-
-    SC_hasharr_install(SS_symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
+    _SS_install(pname, pdoc, phand, 1, pr, ptype);
 
     return;}
 

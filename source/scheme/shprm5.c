@@ -176,7 +176,7 @@ static object *_SSI_magnitudeq(object *argl)
 	    SC_QUATERNION_I, &q,
 	    0);
 
-    m = PM_norm_q(q);
+    m = PM_qnorm(q);
     o = SS_mk_float(m);
 
     return(o);}

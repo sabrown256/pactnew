@@ -97,7 +97,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
                     l = *(int *) u.memaddr;
                  else if (hand == (PFVoid) SS_acc_long)
                     l = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_REAL)
+                 else if (hand == (PFVoid) SS_acc_double)
                     l = *(double *) u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - _SS_FIX_ARG", obj);};}
@@ -181,7 +181,7 @@ static void _SS_float_arg(object *obj, void *v, int type)
                     d = *(int *) u.memaddr;
                  else if (hand == (PFVoid) SS_acc_long)
                     d = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_REAL)
+                 else if (hand == (PFVoid) SS_acc_double)
                     d = *(double *) u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
@@ -248,7 +248,7 @@ static void _SS_complex_arg(object *obj, void *v)
                     r = *(int *) u.memaddr;
                  else if (hand == (PFVoid) SS_acc_long)
                     r = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_REAL)
+                 else if (hand == (PFVoid) SS_acc_double)
                     r = *(double *) u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
@@ -316,7 +316,7 @@ static void _SS_quaternion_arg(object *obj, void *v)
                     q.s = *(int *) u.memaddr;
                  else if (hand == (PFVoid) SS_acc_long)
                     q.s = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_REAL)
+                 else if (hand == (PFVoid) SS_acc_double)
                     q.s = *(double *) u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
@@ -586,7 +586,7 @@ void *SS_var_reference(char *s)
                  if ((hand == (PFVoid) SS_acc_char) ||
                      (hand == (PFVoid) SS_acc_int) ||
                      (hand == (PFVoid) SS_acc_long) ||
-                     (hand == (PFVoid) SS_acc_REAL))
+                     (hand == (PFVoid) SS_acc_double))
                     vr = u.memaddr;
                  else
                     SS_error("BAD VARIABLE TYPE - SS_VAR_REFERENCE", obj);};}

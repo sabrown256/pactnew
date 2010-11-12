@@ -2973,7 +2973,7 @@ void SX_install_pgs_funcs(void)
 
     SS_install_cf("label-y-position",
                   "Internal variable for displaying mapping labels - do NOT set",
-                  SS_acc_REAL,
+                  SS_acc_double,
 		  labpy);
 
 /* low level PGS functions */

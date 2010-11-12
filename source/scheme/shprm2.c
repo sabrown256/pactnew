@@ -10,13 +10,17 @@
 
 #include "scheme_int.h"
 
-typedef double (*PFDoubled)(double);
-typedef double (*PFDoubledd)(double, double);
-typedef int    (*PFIntd)(double);
-typedef int    (*PFIntdd)(double, double);
-typedef BIGINT (*PFBIGINTB)(BIGINT);
-typedef BIGINT (*PFBIGINTBB)(BIGINT, BIGINT);
-typedef object *(*PFBINOBJ)(object *argl);
+typedef double          (*PFDoubled)(double);
+typedef double          (*PFDoubledd)(double, double);
+typedef double _Complex (*PFComplexc)(double _Complex);
+typedef double _Complex (*PFComplexcc)(double _Complex, double _Complex);
+typedef quaternion      (*PFQuaternionq)(quaternion);
+typedef quaternion      (*PFQuaternionqq)(quaternion, quaternion);
+typedef int             (*PFIntd)(double);
+typedef int             (*PFIntdd)(double, double);
+typedef BIGINT          (*PFBIGINTB)(BIGINT);
+typedef BIGINT          (*PFBIGINTBB)(BIGINT, BIGINT);
+typedef object         *(*PFBINOBJ)(object *argl);
 
 #define SS_GET_OPERAND(_oper, _arg, _typ)                                    \
     {int _ityp;                                                              \
@@ -25,7 +29,7 @@ typedef object *(*PFBINOBJ)(object *argl);
      _num  = SS_car(_arg);                                                   \
      _arg  = SS_cdr(_arg);                                                   \
      _ityp = SC_arrtype(_num, -1);                                           \
-     if (_ityp == SC_INT_I)                                              \
+     if (_ityp == SC_INT_I)                                                  \
         _oper = SS_INTEGER_VALUE(_num);                                      \
      else if (_ityp == SC_FLOAT_I)                                           \
         {_oper = SS_FLOAT_VALUE(_num);                                       \
@@ -37,6 +41,39 @@ int
  SS_strict_c = FALSE;
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_INSTALL_MF - install math functions
+ *               - NOTE: this is not a vararg function, we are using
+ *               - varargs to defeat type checking on the function
+ *               - pointers which is inappropriate for this general
+ *               - purpose mechanism
+ *               - Example: SS_install_mf("exp", "..", SS_unary_flt,
+ *               -                        exp, PM_cexp, PM_qexp, SS_PR_PROC)
+ */
+
+void SS_install_mf(char* pname, char *pdoc, PFPHand phand, ...)
+   {int i, n;
+    SS_form ptype;
+    PFVoid *pr;
+
+    n  = 3;
+    pr = FMAKE_N(PFVoid, n, "SS_INSTALL_MF:pr");
+
+    SC_VA_START(phand);
+
+    for (i = 0; i < n; i++)
+        pr[i] = SC_VA_ARG(PFVoid);
+
+    ptype = SC_VA_ARG(SS_form);
+
+    SC_VA_END;
+
+    _SS_install(pname, pdoc, phand, n, pr, ptype);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                          MATHEMATICS HANDLERS                            */
 
@@ -44,22 +81,48 @@ int
 
 /* SS_UNARY_FLT - the unary operator handler returning floats */
 
-object *SS_unary_flt(PFVoid proc, object *argl)
-   {int type;
-    double operand, val;
-    PFDoubled fnc;
-    object *rv;
-
-    operand = 0.0;
+object *SS_unary_flt(C_procedure *cp, object *argl)
+   {int id;
+    PFVoid *pr;
+    object *x, *rv;
 
     if (SS_nullobjp(argl))
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_FLT", argl);
 
-    fnc = (PFDoubled) proc;
-    SS_GET_OPERAND(operand, argl, type);
+    x  = SS_car(argl);
+    id = SC_arrtype(x, -1);
+    pr = cp->proc;
 
-    val = (*fnc)(operand);
-    rv  = SS_mk_float(val);
+    if (id == SC_INT_I)
+       {double y;
+	PFDoubled f;
+	f = (PFDoubled) pr[0];
+	y = f(SS_INTEGER_VALUE(x));
+	rv  = SS_mk_float(y);}
+
+    else if (id == SC_FLOAT_I)
+       {double y;
+	PFDoubled f;
+	f = (PFDoubled) pr[0];
+	y = f(SS_FLOAT_VALUE(x));
+	rv  = SS_mk_float(y);}
+
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {double _Complex y;
+	PFComplexc f;
+	f = (PFComplexc) pr[1];
+	y = f(SS_COMPLEX_VALUE(x));
+	rv  = SS_mk_complex(y);}
+
+    else if (id == SC_QUATERNION_I)
+       {quaternion y;
+	PFQuaternionq f;
+	f = (PFQuaternionq) pr[2];
+	y = f(SS_QUATERNION_VALUE(x));
+	rv  = SS_mk_quaternion(y);}
+
+    else
+       SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);
 
     return(rv);}
 
@@ -68,7 +131,7 @@ object *SS_unary_flt(PFVoid proc, object *argl)
 
 /* SS_UNARY_FIX - the unary operator handler returning fixed point numbers */
 
-object *SS_unary_fix(PFVoid proc, object *argl)
+object *SS_unary_fix(C_procedure *cp, object *argl)
    {int type;
     BIGINT iv;
     double operand;
@@ -80,7 +143,7 @@ object *SS_unary_fix(PFVoid proc, object *argl)
     if (SS_nullobjp(argl))
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_FIX", argl);
 
-    fnc = (PFDoubled) proc;
+    fnc = (PFDoubled) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
 
     iv = (*fnc)(operand);
@@ -93,7 +156,7 @@ object *SS_unary_fix(PFVoid proc, object *argl)
 
 /* SS_UNARY_BIT - the unary operator handler for bit operations */
 
-static object *SS_unary_bit(PFVoid proc, object *argl)
+static object *SS_unary_bit(C_procedure *cp, object *argl)
    {int type;
     BIGINT iv, operand;
     PFBIGINTB fnc;
@@ -104,7 +167,7 @@ static object *SS_unary_bit(PFVoid proc, object *argl)
     if (SS_nullobjp(argl))
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_BIT", argl);
 
-    fnc = (PFBIGINTB) proc;
+    fnc = (PFBIGINTB) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
 
     iv = (*fnc)(operand);
@@ -117,14 +180,14 @@ static object *SS_unary_bit(PFVoid proc, object *argl)
 
 /* SS_BINARY_OPR - the binary arithmetic operator handler */
 
-static object *SS_binary_opr(PFVoid proc, object *argl)
+static object *SS_binary_opr(C_procedure *cp, object *argl)
    {PFBINOBJ fnc;
     object *rv;
 
     if (SS_length(argl) != 2)
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_BINARY_OPR", argl);
 
-    fnc = (PFBINOBJ) proc;
+    fnc = (PFBINOBJ) cp->proc[0];
 
     rv = (*fnc)(argl);
 
@@ -135,7 +198,7 @@ static object *SS_binary_opr(PFVoid proc, object *argl)
 
 /* SS_BINARY_FIX - the binary fixed point arithmetic operator handler */
 
-object *SS_binary_fix(PFVoid proc, object *argl)
+object *SS_binary_fix(C_procedure *cp, object *argl)
    {BIGINT i1, i2, iv;
     PFBIGINTBB fnc;
     object *x1, *x2, *rv;
@@ -143,7 +206,7 @@ object *SS_binary_fix(PFVoid proc, object *argl)
     if (SS_length(argl) != 2)
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_BINARY_FIX", argl);
 
-    fnc = (PFBIGINTBB) proc;
+    fnc = (PFBIGINTBB) cp->proc[0];
     x1  = SS_car(argl);
     x2  = SS_cadr(argl);
 
@@ -164,7 +227,7 @@ object *SS_binary_fix(PFVoid proc, object *argl)
 
 /* SS_BINARY_FLT - the binary floating point arithmetic operator handler */
 
-object *SS_binary_flt(PFVoid proc, object *argl)
+object *SS_binary_flt(C_procedure *cp, object *argl)
    {int type, ident;
     double acc, operand;
     PFDoubledd fnc;
@@ -173,7 +236,7 @@ object *SS_binary_flt(PFVoid proc, object *argl)
     acc     = 0.0;
     operand = 0.0;
 
-    fnc   = (PFDoubledd) proc;
+    fnc   = (PFDoubledd) cp->proc[0];
     ident = 1;
     type  = SC_INT_I;
     if ((fnc == PM_fplus) || (fnc == PM_fminus))
@@ -227,7 +290,7 @@ object *SS_binary_flt(PFVoid proc, object *argl)
 
 /* SS_UN_COMP - the unary comparison handler */
 
-object *SS_un_comp(PFVoid proc, object *argl)
+object *SS_un_comp(C_procedure *cp, object *argl)
    {int type, lv;
     double operand;
     PFIntd fnc;
@@ -238,7 +301,7 @@ object *SS_un_comp(PFVoid proc, object *argl)
     if (SS_nullobjp(argl))
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_UN_COMP", argl);
 
-    fnc = (PFIntd) proc;
+    fnc = (PFIntd) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
 
     lv = (*fnc)(operand);
@@ -251,7 +314,7 @@ object *SS_un_comp(PFVoid proc, object *argl)
 
 /* SS_BIN_COMP - the binary comparison handler */
 
-object *SS_bin_comp(PFVoid proc, object *argl)
+object *SS_bin_comp(C_procedure *cp, object *argl)
    {int type, lv;
     double c1, c2;
     PFIntdd fnc;
@@ -263,7 +326,7 @@ object *SS_bin_comp(PFVoid proc, object *argl)
     if (SS_length(argl) != 2)
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_BIN_COMP", argl);
 
-    fnc = (PFIntdd) proc;
+    fnc = (PFIntdd) cp->proc[0];
     SS_GET_OPERAND(c1, argl, type);
     SS_GET_OPERAND(c2, argl, type);
 
@@ -463,11 +526,6 @@ void _SS_install_math(void)
                SS_bin_comp,
                PM_fge, SS_PR_PROC);
 
-    SS_install("abs",
-               "Procedure: Returns the absolute value of a numeric object",
-               SS_unary_flt,
-               ABS, SS_PR_PROC);
-
     SS_install("acos",
                "Procedure: Returns the arc cosine of the argument",
                SS_unary_flt, 
@@ -563,11 +621,6 @@ void _SS_install_math(void)
                SS_un_comp,
                _SS_even, SS_PR_PROC);
 
-    SS_install("exp",
-               "Procedure: Returns the exponential of the argument",
-               SS_unary_flt, 
-               exp, SS_PR_PROC);
-
     SS_install("floor",
                "Procedure: Returns the greatest integer less than the argument",
                SS_unary_fix, 
@@ -577,11 +630,6 @@ void _SS_install_math(void)
                "Procedure: Returns the sqrt of the sum of the squares of the arguments",
                SS_binary_flt,
                HYPOT, SS_PR_PROC);
-
-    SS_install("ln",
-               "Procedure: Returns the natural logarithm of the argument",
-               SS_unary_flt, 
-               PM_ln, SS_PR_PROC);
 
     SS_install("log",
                "Procedure: Returns the logarithm base 10 of the argument",
@@ -739,6 +787,23 @@ void _SS_install_math(void)
                "Procedure: Returns the Jacobian elliptic function dn\nUsage: (dn x k)",
                SS_binary_flt, 
                PM_dn, SS_PR_PROC);
+
+/* multi type functions */
+    SS_install_mf("abs",
+		  "Procedure: Returns the absolute value of a numeric object",
+		  SS_unary_flt,
+		  ABS, PM_cabs, PM_qnorm, SS_PR_PROC);
+
+    SS_install_mf("exp",
+		  "Procedure: Returns the exponential of the argument",
+		  SS_unary_flt, 
+		  exp, PM_cexp, PM_qexp, SS_PR_PROC);
+
+    SS_install_mf("ln",
+		  "Procedure: Returns the natural logarithm of the argument",
+		  SS_unary_flt, 
+		  PM_ln, PM_cln, PM_qln, SS_PR_PROC);
+
 
 /* special syntax context */
 

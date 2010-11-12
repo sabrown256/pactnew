@@ -90,11 +90,11 @@ void UL_check_order(double *p, int n, int i)
  *       - expects Scheme objects back from them
  */
 
-object *UL_us(PFVoid basicf, object *argl)
+object *UL_us(C_procedure *cp, object *argl)
    {object *ret, *val, *t;
     PFSargs fun;
 
-    fun = (PFSargs) basicf;
+    fun = (PFSargs) cp->proc[0];
     SX_prep_arg(argl);
 
 /* set plot flag on so that for example (select (menu)) causes replot */
@@ -119,7 +119,7 @@ object *UL_us(PFVoid basicf, object *argl)
  *       - return a valid Scheme object
  */
 
-object *UL_uc(PFVoid basicf, object *argl)
+object *UL_uc(C_procedure *cp, object *argl)
    {int i;
     object *ret, *t;
 
@@ -132,7 +132,7 @@ object *UL_uc(PFVoid basicf, object *argl)
     for (t = argl ; !SS_nullobjp(t); t = SS_cdr(t))
         {i = SX_get_crv_index_i(SS_car(t));
          if (i >= 0)
-            {SS_Assign(ret, SS_mk_cons((*(PFSargsI) basicf)(i), ret));};};
+            {SS_Assign(ret, SS_mk_cons((*(PFSargsI) cp->proc[0])(i), ret));};};
          
     SS_Assign(argl, SS_null);
 
@@ -147,7 +147,7 @@ object *UL_uc(PFVoid basicf, object *argl)
  *         - using a single scalar
  */
     
-object *UL_opxc(PFVoid basicf, object *argl)
+object *UL_opxc(C_procedure *cp, object *argl)
    {object *tok, *ret, *t;
     double a;
     int i, l, n;
@@ -174,7 +174,7 @@ object *UL_opxc(PFVoid basicf, object *argl)
          if (i != -1)
             {n = SX_dataset[i].n;
              for (xp = SX_dataset[i].x[0], l = 0; l < n; xp++, l++)
-                 *xp = (double) (*(PFDoubleRR) basicf)(*xp, a);
+                 *xp = (double) (*(PFDoubleRR) cp->proc[0])(*xp, a);
              SX_dataset[i].modified = TRUE;
 
              SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));
@@ -195,7 +195,7 @@ object *UL_opxc(PFVoid basicf, object *argl)
  *         - using a single scalar
  */
 
-object *UL_opyc(PFVoid basicf, object *argl)
+object *UL_opyc(C_procedure *cp, object *argl)
    {object *tok, *ret, *t;
     double a;
     int i, l, n;
@@ -222,7 +222,7 @@ object *UL_opyc(PFVoid basicf, object *argl)
          if (i != -1)
             {n = SX_dataset[i].n;
              for (yp = SX_dataset[i].x[1], l = 0; l < n; yp++, l++)
-                 *yp = (double) (*(PFDoubleRR) basicf)(*yp, a);
+                 *yp = (double) (*(PFDoubleRR) cp->proc[0])(*yp, a);
              SX_dataset[i].modified = TRUE;
 
              SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));
@@ -241,10 +241,10 @@ object *UL_opyc(PFVoid basicf, object *argl)
 
 /* UL_UL2TOC - unary applies last 2 args to curve */
 
-object *UL_ul2toc(PFVoid basicf, object *argl)
+object *UL_ul2toc(C_procedure *cp, object *argl)
    {object *o;
 
-    o = _UL_ul2toc(basicf, argl, TRUE);
+    o = _UL_ul2toc(cp, argl, TRUE);
    
     return(o);}
    
@@ -255,10 +255,10 @@ object *UL_ul2toc(PFVoid basicf, object *argl)
  *             - and does not replot
  */
 
-object *UL_ul2tocnp(PFVoid basicf, object *argl)
+object *UL_ul2tocnp(C_procedure *cp, object *argl)
    {object *o;
 
-    o = _UL_ul2toc(basicf, argl, FALSE);
+    o = _UL_ul2toc(cp, argl, FALSE);
 
     return(o);}
 
@@ -267,7 +267,7 @@ object *UL_ul2tocnp(PFVoid basicf, object *argl)
 
 /* _UL_UL2TOC - worker routine for UL_UL2TOC and UL_UL2TOCNP */
 
-object *_UL_ul2toc(PFVoid basicf, object *argl, int replot_flag)
+object *_UL_ul2toc(C_procedure *cp, object *argl, int replot_flag)
    {int i;
     double d1, d2;
     object *s, *t, *tok1, *tok2, *ret;
@@ -313,7 +313,7 @@ object *_UL_ul2toc(PFVoid basicf, object *argl, int replot_flag)
 	     else
 	        d2 = SX_dataset[i].wc[1];
              SS_Assign(ret,
-                       SS_mk_cons((*(PFPObjectidd) basicf)(i, d1, d2), ret));};};
+                       SS_mk_cons((*(PFPObjectidd) cp->proc[0])(i, d1, d2), ret));};};
 
     SX_plot_flag = replot_flag;
 
@@ -328,7 +328,7 @@ object *_UL_ul2toc(PFVoid basicf, object *argl, int replot_flag)
 
 /* UL_ULNTOC - unary applies last n args to curve */
 
-object *UL_ulntoc(PFVoid basicf, object *argl)
+object *UL_ulntoc(C_procedure *cp, object *argl)
    {int i;
     object *tok, *crvs, *ret, *t, *u;
 
@@ -349,7 +349,7 @@ object *UL_ulntoc(PFVoid basicf, object *argl)
          if (SX_curvep_a(tok))
             {i = SX_get_crv_index_i(tok);
              SS_Assign(ret,
-                       SS_mk_cons((*(PFPObjectio) basicf)(i, t), ret));};};
+                       SS_mk_cons((*(PFPObjectio) cp->proc[0])(i, t), ret));};};
 
     SS_Assign(crvs, SS_null);
     SS_Assign(argl, SS_null);
@@ -364,7 +364,7 @@ object *UL_ulntoc(PFVoid basicf, object *argl)
 
 /* UL_UOPXC - math handler applies the given unary function to the x values */
     
-object *UL_uopxc(PFVoid basicf, object *argl)
+object *UL_uopxc(C_procedure *cp, object *argl)
    {int i, l, n;
     double *xp;
     object *ret, *t;
@@ -380,7 +380,7 @@ object *UL_uopxc(PFVoid basicf, object *argl)
          if (i != -1)
             {n = SX_dataset[i].n;
              for (xp = SX_dataset[i].x[0], l = 0; l < n; xp++, l++)
-                 *xp = (double) (*(PFDoubleR) basicf)(*xp);
+                 *xp = (double) (*(PFDoubleR) cp->proc[0])(*xp);
              SX_dataset[i].modified = TRUE;
 
              SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));
@@ -399,7 +399,7 @@ object *UL_uopxc(PFVoid basicf, object *argl)
 
 /* UL_UOPYC - math handler applies the given unary function to the y values */
 
-object *UL_uopyc(PFVoid basicf, object *argl)
+object *UL_uopyc(C_procedure *cp, object *argl)
    {int i, l, n;
     double *yp, f;
     object *s, *ret, *tmp, *t;
@@ -417,7 +417,7 @@ object *UL_uopyc(PFVoid basicf, object *argl)
          if (i != -1)
             {n = SX_dataset[i].n;
              for (yp = SX_dataset[i].x[1], l = 0; l < n; yp++, l++)
-                 *yp = (double) (*(PFDoubleR) basicf)(*yp);
+                 *yp = (double) (*(PFDoubleR) cp->proc[0])(*yp);
              SX_dataset[i].modified = TRUE;
 
              tmp = SS_mk_cons(SX_dataset[i].obj, ret);
@@ -426,11 +426,11 @@ object *UL_uopyc(PFVoid basicf, object *argl)
 
          else if (SS_integerp(s))
             {f   = (double) SS_INTEGER_VALUE(s);
-             tmp = SS_mk_cons(SS_mk_float((*(PFDoubleR) basicf)(f)), ret);}
+             tmp = SS_mk_cons(SS_mk_float((*(PFDoubleR) cp->proc[0])(f)), ret);}
 
          else if (SS_floatp(s))
             {f   = SS_FLOAT_VALUE(s);
-             tmp = SS_mk_cons(SS_mk_float((*(PFDoubleR) basicf)(f)), ret);};
+             tmp = SS_mk_cons(SS_mk_float((*(PFDoubleR) cp->proc[0])(f)), ret);};
 
          SS_Assign(ret, tmp);};
 
@@ -447,7 +447,7 @@ object *UL_uopyc(PFVoid basicf, object *argl)
  *          - a parameter
  */
 
-object *UL_bftoc(PFVoid basicf, object *argl)
+object *UL_bftoc(C_procedure *cp, object *argl)
    {int i;
     char *s1;
     object *s, *tok, *t;
@@ -468,7 +468,7 @@ object *UL_bftoc(PFVoid basicf, object *argl)
 
          if (SX_curvep_a(s))
             {i = SX_get_crv_index_i(s);
-             (*(PFVoidis) basicf)(i, s1);};};
+             (*(PFVoidis) cp->proc[0])(i, s1);};};
 
     SFREE(s1);
 
@@ -483,7 +483,7 @@ object *UL_bftoc(PFVoid basicf, object *argl)
  *          - as a parameter
  */
 
-object *UL_bltoc(PFVoid basicf, object *argl)
+object *UL_bltoc(C_procedure *cp, object *argl)
    {object *s, *ret, *tok, *t;
 
     SX_last_arg(tok, argl);
@@ -500,7 +500,7 @@ object *UL_bltoc(PFVoid basicf, object *argl)
         {s = SS_car(t);
 
          if (SX_curvep_a(s))
-            SS_Assign(ret, SS_mk_cons((*(PFPObjectoo) basicf)(s, tok), ret));};
+            SS_Assign(ret, SS_mk_cons((*(PFPObjectoo) cp->proc[0])(s, tok), ret));};
 
     SS_Assign(tok, SS_null);
     SS_Assign(argl, SS_null);
@@ -518,7 +518,7 @@ object *UL_bltoc(PFVoid basicf, object *argl)
  *            - surpresses plotting
  */
 
-object *UL_bltocnp(PFVoid basicf, object *argl)
+object *UL_bltocnp(C_procedure *cp, object *argl)
    {object *s, *tok, *ret, *t;
     char *r;
 
@@ -538,7 +538,7 @@ object *UL_bltocnp(PFVoid basicf, object *argl)
         {s = SS_car(t);
 
          if (SX_curvep_a(s))
-            SS_Assign(ret, SS_mk_cons((*(PFPObjectoo) basicf)(s, tok), ret));};
+            SS_Assign(ret, SS_mk_cons((*(PFPObjectoo) cp->proc[0])(s, tok), ret));};
          
     UL_pause(FALSE);
 
@@ -628,7 +628,7 @@ static int _UL_bc_operate(PFVoid basicf, double *xa, double *ya,
  *       - accumulates the result
  */
 
-object *UL_bc(PFVoid basicf, object *argl)
+object *UL_bc(C_procedure *cp, object *argl)
    {int i, j;
     int ic;
     int n1, n2, na;     /* number of elements in each array and accumulator */
@@ -686,8 +686,7 @@ object *UL_bc(PFVoid basicf, object *argl)
 /* the first non-number in the arg list */
             else
                {if (!SS_nullobjp(ch))
-                   {s = SS_binary_flt((PFVoid) basicf,
-                                      SS_reverse(ch));
+                   {s = SS_binary_flt(cp, SS_reverse(ch));
                     if (SS_integerp(s))
                        value = (double) SS_INTEGER_VALUE(s);
                     else if (SS_floatp(s))
@@ -728,7 +727,7 @@ object *UL_bc(PFVoid basicf, object *argl)
                {if (SS_nullobjp(ch))
                    ch = SS_null;
                 else
-		   ch = SS_binary_flt((PFVoid) basicf, SS_reverse(ch));
+		   ch = SS_binary_flt(cp, SS_reverse(ch));
 
 		return(ch);};};
 
@@ -770,7 +769,7 @@ object *UL_bc(PFVoid basicf, object *argl)
              else if (SS_floatp(s))
                 value = (double) SS_FLOAT_VALUE(s);
              for (yp1 = ya, ic = 0; ic < na; yp1++, ic++)
-                 *yp1 = (double) (*(PFDoubleRR) basicf)(*yp1, value);
+                 *yp1 = (double) (*(PFDoubleRR) cp->proc[0])(*yp1, value);
              lbl = SC_dsnprintf(FALSE, "%s %g", pbf2, value);
              strcpy(pbf2, lbl);}
 
@@ -808,7 +807,7 @@ object *UL_bc(PFVoid basicf, object *argl)
                  xa = af = UL_buf2x;
                  ya = UL_buf2y;};
 
-             na = _UL_bc_operate(basicf, xa, ya, xp1, xp2, yp1, yp2, n1, n2);
+             na = _UL_bc_operate(cp->proc[0], xa, ya, xp1, xp2, yp1, yp2, n1, n2);
              if (na == -1)
                 return(SS_f);};};
 
@@ -838,7 +837,7 @@ object *UL_bc(PFVoid basicf, object *argl)
  *         - applications.  cfm 2/18/87
  */
 
-object *UL_bcxl(PFVoid basicf, object *argl)
+object *UL_bcxl(C_procedure *cp, object *argl)
    {int i, j, n;
     double *x[PG_SPACEDM];
     char local[MAXLINE], local2[MAXLINE];
@@ -891,7 +890,7 @@ object *UL_bcxl(PFVoid basicf, object *argl)
          strcpy(local2, local);
 
          for (j = 0; j < n; j++)
-             {x[1][j] = (double) (*(PFDoubleRi) basicf)(x[1][j], i);};};
+             {x[1][j] = (double) (*(PFDoubleRi) cp->proc[0])(x[1][j], i);};};
 
     lbl = SC_dsnprintf(FALSE, "%s %s",
 		       SS_get_string(SS_Fun), SC_strrev(local));

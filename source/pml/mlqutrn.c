@@ -73,9 +73,9 @@ quaternion PM_times_rq(double r, quaternion a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CONJUGATE_Q - return the conjugate A* of quaternion A */
+/* PM_QCONJUGATE - return the conjugate A* of quaternion A */
 
-quaternion PM_conjugate_q(quaternion a)
+quaternion PM_qconjugate(quaternion a)
    {quaternion x;
 
     x.s = a.s;
@@ -88,9 +88,9 @@ quaternion PM_conjugate_q(quaternion a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_NORM_Q - return the norm of quaternion A */
+/* PM_QNORM - return the norm of quaternion A */
 
-double PM_norm_q(quaternion a)
+double PM_qnorm(quaternion a)
    {double d;
 
     d = a.s*a.s + a.i*a.i + a.j*a.j + a.k*a.k;
@@ -101,33 +101,33 @@ double PM_norm_q(quaternion a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_RECIP_Q - return the reciprocal of quaternion A
- *            - defined to be (A*)/|A|^2
- *            - as opposed to the versor
+/* PM_QRECIP - return the reciprocal of quaternion A
+ *           - defined to be (A*)/|A|^2
+ *           - as opposed to the versor
  */
 
-quaternion PM_recip_q(quaternion a)
+quaternion PM_qrecip(quaternion a)
    {double d;
     quaternion x;
 
     d = 1.0/(a.s*a.s + a.i*a.i + a.j*a.j + a.k*a.k);
-    x = PM_times_rq(d, PM_conjugate_q(a));
+    x = PM_times_rq(d, PM_qconjugate(a));
 
     return(x);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_VERSOR_Q - return the versor of quaternion A
- *             - defined to be A/|A|
- *             - as opposed to the reciprocal
+/* PM_QVERSOR - return the versor of quaternion A
+ *            - defined to be A/|A|
+ *            - as opposed to the reciprocal
  */
 
-quaternion PM_versor_q(quaternion a)
+quaternion PM_qversor(quaternion a)
    {double d;
     quaternion x;
 
-    d = 1.0/PM_norm_q(a);
+    d = 1.0/PM_qnorm(a);
     x = PM_times_rq(d, a);
 
     return(x);}
@@ -140,7 +140,7 @@ quaternion PM_versor_q(quaternion a)
 double PM_distance_qq(quaternion a, quaternion b)
    {double d;
 
-    d = sqrt(PM_norm_q(PM_minus_qq(a, b)));
+    d = sqrt(PM_qnorm(PM_minus_qq(a, b)));
 
     return(d);}
 
@@ -152,7 +152,7 @@ double PM_distance_qq(quaternion a, quaternion b)
 quaternion PM_lquotient_qq(quaternion a, quaternion b)
    {quaternion x;
 
-    x = PM_times_qq(PM_recip_q(b), a);
+    x = PM_times_qq(PM_qrecip(b), a);
 
     return(x);}
 
@@ -164,16 +164,16 @@ quaternion PM_lquotient_qq(quaternion a, quaternion b)
 quaternion PM_rquotient_qq(quaternion a, quaternion b)
    {quaternion x;
 
-    x = PM_times_qq(a, PM_recip_q(b));
+    x = PM_times_qq(a, PM_qrecip(b));
 
     return(x);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_EXP_Q - return the exp(A) */
+/* PM_QEXP - return the exp(A) */
 
-quaternion PM_exp_q(quaternion a)
+quaternion PM_qexp(quaternion a)
    {double ea, cv, sv, vf, v;
     quaternion x;
 
@@ -194,14 +194,14 @@ quaternion PM_exp_q(quaternion a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_LN_Q - return the ln(A) */
+/* PM_QLN - return the ln(A) */
 
-quaternion PM_ln_q(quaternion a)
+quaternion PM_qln(quaternion a)
    {double ac, as, vf, v, d;
     quaternion x;
 
     v = sqrt(a.i*a.i + a.j*a.j + a.k*a.k);
-    d = PM_norm_q(a);
+    d = PM_qnorm(a);
 
     as = log(d);
     ac = acos(a.i/d);
@@ -217,12 +217,12 @@ quaternion PM_ln_q(quaternion a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_POW_Q - return the A^R */
+/* PM_QPOW - return the A^R */
 
-quaternion PM_pow_q(quaternion a, double r)
+quaternion PM_qpow(quaternion a, double r)
    {quaternion x;
 
-    x = PM_exp_q(PM_times_rq(r, PM_ln_q(a)));
+    x = PM_qexp(PM_times_rq(r, PM_qln(a)));
 
     return(x);}
 
@@ -282,7 +282,7 @@ void PM_rotate_q(double *v, double *u, double th)
     rq.j = st*u[1];
     rq.k = st*u[2];
 
-    vp = PM_times_qq(rq, PM_times_qq(vq, PM_recip_q(rq)));
+    vp = PM_times_qq(rq, PM_times_qq(vq, PM_qrecip(rq)));
 
     v[0] = vp.i;
     v[1] = vp.j;

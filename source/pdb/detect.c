@@ -14,7 +14,6 @@
 #undef LONGLONG_MAX
 
 #include "scstd.h"
-#include <complex.h>
 
 #ifdef NO_LONG_LONG
 

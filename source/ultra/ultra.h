@@ -130,22 +130,21 @@ extern int
  UL_curve_strp(object *obj);
 
 extern object
-/*  *UL_bltov(PFInt basicf, object *argl),*/
- *UL_us(PFVoid basicf, object *argl),
- *UL_uc(PFVoid basicf, object *argl),
- *UL_opxc(PFVoid basicf, object *argl),
- *UL_opyc(PFVoid basicf, object *argl),
- *UL_ul2toc(PFVoid basicf, object *argl),
- *UL_ul2tocnp(PFVoid basicf, object *argl),
- *_UL_ul2toc(PFVoid basicf, object *argl, int flag),
- *UL_ulntoc(PFVoid basicf, object *argl),
- *UL_uopxc(PFVoid basicf, object *argl),
- *UL_uopyc(PFVoid basicf, object *argl),
- *UL_bftoc(PFVoid basicf, object *argl),
- *UL_bltoc(PFVoid basicf, object *argl),
- *UL_bltocnp(PFVoid basicf, object *argl),
- *UL_bc(PFVoid basicf, object *argl),
- *UL_bcxl(PFVoid basicf, object *argl);
+ *UL_us(C_procedure *cp, object *argl),
+ *UL_uc(C_procedure *cp, object *argl),
+ *UL_opxc(C_procedure *cp, object *argl),
+ *UL_opyc(C_procedure *cp, object *argl),
+ *UL_ul2toc(C_procedure *cp, object *argl),
+ *UL_ul2tocnp(C_procedure *cp, object *argl),
+ *_UL_ul2toc(C_procedure *cp, object *argl, int flag),
+ *UL_ulntoc(C_procedure *cp, object *argl),
+ *UL_uopxc(C_procedure *cp, object *argl),
+ *UL_uopyc(C_procedure *cp, object *argl),
+ *UL_bftoc(C_procedure *cp, object *argl),
+ *UL_bltoc(C_procedure *cp, object *argl),
+ *UL_bltocnp(C_procedure *cp, object *argl),
+ *UL_bc(C_procedure *cp, object *argl),
+ *UL_bcxl(C_procedure *cp, object *argl);
 
 
 /* ULTRA.C declarations */

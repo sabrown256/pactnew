@@ -667,7 +667,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PF_double_dd fnc)
  *            - of the range set of the given list of mappings
  */
 
-object *_SX_mh_b_s(PFVoid fn, object *argl)
+object *_SX_mh_b_s(C_procedure *cp, object *argl)
    {int plf;
     char label[MAXLINE+1];
     PF_double_dd fnc;
@@ -676,13 +676,13 @@ object *_SX_mh_b_s(PFVoid fn, object *argl)
 
     first = SS_car(argl);
     if (SS_floatp(first))
-       mo = SS_binary_flt(fn, argl);
+       mo = SS_binary_flt(cp, argl);
 
     else if (SX_NUMERIC_ARRAYP(first))
-       mo = SX_binary_arr(fn, argl);
+       mo = SX_binary_arr(cp->proc[0], argl);
 
     else
-       {fnc = (PF_double_dd) fn;
+       {fnc = (PF_double_dd) cp->proc[0];
 	plf = SX_have_display_list();
 
 	_SX_map_list_label(label, argl);

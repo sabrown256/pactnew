@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 11/10/2010
+MOD: 11/12/2010
 
 <CENTER>
 <P>
@@ -2716,13 +2716,17 @@ with SS_install_cf.<p>
 
 <B></B>
 <BLOCKQUOTE>
-object *SS_acc_REAL(byte *vr, object *argl)
-<P>object *SS_acc_int(byte *vr, object *argl)
-<P>object *SS_acc_long(byte *vr, object *argl)
-<P>object *SS_acc_char(byte *vr, object *argl)
-<P>object *SS_acc_string(byte *vr, object *argl)
-<P>object *SS_acc_ptr(byte *vr, object *argl)
-<P>object *SS_acc_var(byte *vr, object *argl, int otype)
+object *SS_acc_double(C_procedure *cp, object *argl)
+<P>
+object *SS_acc_int(C_procedure *cp, object *argl)
+<P>
+object *SS_acc_long(C_procedure *cp, object *argl)
+<P>
+object *SS_acc_char(C_procedure *cp, object *argl)
+<P>
+object *SS_acc_string(C_procedure *cp, object *argl)
+<P>
+object *SS_acc_ptr(C_procedure *cp, object *argl)
 </BLOCKQUOTE>
 </B>
 
