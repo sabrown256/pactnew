@@ -58,8 +58,6 @@
      d     = 1.0/(br*brovu + bi*biovu);                                     \
      _rc   = PM_COMPLEX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
 
-#ifdef HAVE_ANSI_C9X_COMPLEX
-
 complex
  CPHUGE = HUGE,
  CMHUGE = -HUGE,
@@ -70,15 +68,6 @@ complex
  * to continue to use these
 # define USE_C99_FUNCTIONS
  */
-
-#else
-
-complex
- CPHUGE = {HUGE, 0.0},
- CMHUGE = {-HUGE, 0.0},
- Czero  = {0.0, 0.0};
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

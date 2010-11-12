@@ -555,12 +555,12 @@ void UL_install_global_vars(void)
 
     SS_install_cf("derivative-tolerance",
                   "Variable: Threshold for first derivative change.\n     Usage: derivative-tolerance <double>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &UL_derivative_tolerance);
 
     SS_install_cf("igamma-tolerance",
 		  "Procedure: Set the tolerance to which incomplete gamma functions are computed\n     Usage: igamma-tolerance <tol>",
-                  SS_acc_REAL, 
+                  SS_acc_double, 
 		  &_PM.igamma_tol);
 
 /* KLMN */

@@ -20,9 +20,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef HAVE_ANSI_C9X_COMPLEX
-
-#include <complex.h>
 #undef complex
 #define complex      double _Complex 
 
@@ -53,162 +50,15 @@ extern double complex
 
 /*--------------------------------------------------------------------------*/
 
-#else
-
-/*--------------------------------------------------------------------------*/
-
 /*                               TYPEDEFS                                   */
 
 /*--------------------------------------------------------------------------*/
-
-#ifdef __cplusplus
-
-typedef double complex[2];
-
-# define PM_REAL_C(_z)       ((_z)[0])
-# define PM_IMAGINARY_C(_z)  ((_z)[1])
-
-#else
-
-struct s_complex
-   {double real;
-    double imag;};
-
-typedef struct s_complex complex;
-
-#  define PM_REAL_C(_z)       (_z).real
-#  define PM_IMAGINARY_C(_z)  (_z).imag
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-
-/*                       STANDARD PROCEDURAL MACROS                         */
-
-/*--------------------------------------------------------------------------*/
-
-/* PM_COMPLEX - set the parts of a complex number */
-
-#define PM_COMPLEX(_b, _c)                                                   \
-   (PM_REAL_C(cx_reg) = (double) (_b),                                       \
-    PM_IMAGINARY_C(cx_reg) = (double) (_c),                                  \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_COMPLEX_CONJUGATE - return the complex conjugate of c */
-
-#define PM_COMPLEX_CONJUGATE(_c)                                             \
-   (PM_REAL_C(cx_reg)      =  PM_REAL_C(_c),                                 \
-    PM_IMAGINARY_C(cx_reg) = -PM_IMAGINARY_C(_c),                            \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_PLUS_CC - binary complex addition, b + c */
-
-#define PM_PLUS_CC(b, c)                                                     \
-   (PM_REAL_C(cx_reg)      = PM_REAL_C(b) + PM_REAL_C(c),                    \
-    PM_IMAGINARY_C(cx_reg) = PM_IMAGINARY_C(b) + PM_IMAGINARY_C(c),          \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_PLUS_RC - b + c where b is real and c is complex */
-
-#define PM_PLUS_RC(b, c)                                                     \
-   (PM_REAL_C(cx_reg)      = b + PM_REAL_C(c),                               \
-    PM_IMAGINARY_C(cx_reg) = PM_IMAGINARY_C(c),                              \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_MINUS_CC - binary complex subtraction, b - c */
-
-#define PM_MINUS_CC(b, c)                                                    \
-   (PM_REAL_C(cx_reg)      = PM_REAL_C(b) - PM_REAL_C(c),                    \
-    PM_IMAGINARY_C(cx_reg) = PM_IMAGINARY_C(b) - PM_IMAGINARY_C(c),          \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_TIMES_CC - binary complex multiplication, b * c */
-
-#define PM_TIMES_CC(b, c)                                                    \
-   (cx_ttac = (PM_REAL_C(b)*PM_REAL_C(c)),                                   \
-    cx_ttbd = (PM_IMAGINARY_C(b)*PM_IMAGINARY_C(c)),                         \
-    cx_ttr  = (cx_ttac - cx_ttbd),                                           \
-    cx_tti  = ((PM_REAL_C(b) + PM_IMAGINARY_C(b))*                           \
-               (PM_REAL_C(c) + PM_IMAGINARY_C(c)) - cx_ttac - cx_ttbd),      \
-    PM_REAL_C(cx_reg)      = cx_ttr,                                         \
-    PM_IMAGINARY_C(cx_reg) = cx_tti,                                         \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_TIMES_RC - b * c where b is real and c is complex */
-
-#define PM_TIMES_RC(b, c)                                                    \
-   (PM_REAL_C(cx_reg)      = b*PM_REAL_C(c),                                 \
-    PM_IMAGINARY_C(cx_reg) = b*PM_IMAGINARY_C(c),                            \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_TIMES_IC - b * c where b is the magnitude of a pure imaginary number
- *             - and c is complex */
-
-#define PM_TIMES_IC(b, c)                                                    \
-   (PM_REAL_C(cx_reg)      = -b*PM_IMAGINARY_C(c),                           \
-    PM_IMAGINARY_C(cx_reg) =  b*PM_REAL_C(c),                                \
-    cx_reg)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_DIVIDE_CC - binary complex division, b / c */
-
-#define PM_DIVIDE_CC(b, c) (PM_cdiv(b,c))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PM_MODULUS_C - compute the complex modulus */
-
-#define PM_MODULUS_C(x) (PM_cabs(x))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-#define PM_COMPLEX_SWAP(a, b)                                                \
-    {SC_SWAP_VALUE(complex, a, b);}
 
 /*--------------------------------------------------------------------------*/
 
 /*                    STANDARD VARIABLE DECLARATIONS                        */
 
 /*--------------------------------------------------------------------------*/
-
-extern double
- cx_ttr,
- cx_tti,
- cx_ttm,
- cx_ttac,
- cx_ttbd;
-
-extern complex
- cx_reg;
-
-/*--------------------------------------------------------------------------*/
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 

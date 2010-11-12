@@ -57,17 +57,17 @@ extern quaternion
  PM_minus_qq(quaternion a, quaternion b),
  PM_times_qq(quaternion a, quaternion b),
  PM_times_rq(double r, quaternion a),
- PM_conjugate_q(quaternion a),
- PM_recip_q(quaternion a),
- PM_versor_q(quaternion a),
+ PM_qconjugate(quaternion a),
+ PM_qrecip(quaternion a),
+ PM_qversor(quaternion a),
  PM_lquotient_qq(quaternion a, quaternion b),
  PM_rquotient_qq(quaternion a, quaternion b),
- PM_exp_q(quaternion a),
- PM_ln_q(quaternion a),
- PM_pow_q(quaternion a, double r);
+ PM_qexp(quaternion a),
+ PM_qln(quaternion a),
+ PM_qpow(quaternion a, double r);
 
 extern double
- PM_norm_q(quaternion a),
+ PM_qnorm(quaternion a),
  PM_distance_qq(quaternion a, quaternion b);
 
 extern void

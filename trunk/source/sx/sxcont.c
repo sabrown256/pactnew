@@ -531,7 +531,7 @@ static int _SX_no_argsp(object *obj)
 		    (hand == (PFPHand) SS_acc_char)   ||
 		    (hand == (PFPHand) SS_acc_int)    ||
 		    (hand == (PFPHand) SS_acc_long)   ||
-		    (hand == (PFPHand) SS_acc_REAL)   ||
+		    (hand == (PFPHand) SS_acc_double)   ||
 		    (hand == (PFPHand) SS_acc_string) ||
 		    (hand == (PFPHand) SS_acc_ptr);
 	     break;};
@@ -870,22 +870,22 @@ static void SX_install_device_vars(void)
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s window height in fraction of screen width\n     Usage: window-height-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-height-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_REAL, &out->height);
+	     SS_install_cf(name, doc, SS_acc_double, &out->height);
 
 	     doc  = SC_dsnprintf(TRUE,  "Variable: %s X comp of window origin (frac of screen width)\n     Usage: window-origin-x-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-origin-x-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_REAL, &out->x0);
+	     SS_install_cf(name, doc, SS_acc_double, &out->x0);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s Y comp of window origin (frac of screen width)\n     Usage: window-origin-y-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-origin-y-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_REAL, &out->y0);
+	     SS_install_cf(name, doc, SS_acc_double, &out->y0);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s window width in fraction of screen width\n     Usage: window-width-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-width-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_REAL, &out->width);}
+	     SS_install_cf(name, doc, SS_acc_double, &out->width);}
 
 	 else
 	    {doc  = SC_dsnprintf(TRUE,  "%s-flag is not supported as configured",
@@ -1216,7 +1216,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("axis-n-decades",
                   "Variable: Controls maximum number of log axis decades\nUsage: axis-n-decades <real> ",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   axndec);
 
     SS_install_cf("axis-tick-type",
@@ -1231,7 +1231,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("axis-char-angle",
                   "Variable: Controls angle at which characters are drawn\n     Usage: axis-char-angle <real> ",
-                  SS_acc_REAL,
+                  SS_acc_double,
 		  axsca);
 
     SS_install_cf("axis-grid-style",
@@ -1251,12 +1251,12 @@ void SX_install_global_vars(void)
 
     SS_install_cf("axis-line-width",
                   "Variable: Controls line width for the axes\n     Usage: axis-line-width [<real>] ",
-                   SS_acc_REAL,
+                   SS_acc_double,
                    axslw);
 
     SS_install_cf("axis-tick-size",
                   "Variable: Controls major tick size for the axes\n     Usage: axis-tick-size <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
 		  axsmts);
 
     SS_install_cf("axis-type",
@@ -1288,7 +1288,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("botspace",
                   "Variable: Fractional space at bottom of screen\n     Usage: botspace <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_gpad[2]);
 
     SS_install_cf("bracket-flag",
@@ -1298,7 +1298,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("chi",
                   "Variable: Default chi view angle\n     Usage: chi <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_chi);
 
     SS_install_cf("console-type",
@@ -1308,22 +1308,22 @@ void SX_install_global_vars(void)
 
     SS_install_cf("console-origin-x",
                   "Variable: X comp of console origin (frac of screen width)\n     Usage: console-origin-x <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_console_x);
 
     SS_install_cf("console-origin-y",
                   "Variable: Y comp of console origin (frac of screen width)\n     Usage: console-origin-y <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_console_y);
 
     SS_install_cf("console-width",
                   "Variable: Console width in fraction of screen width\n     Usage: console-width <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_console_width);
 
     SS_install_cf("console-height",
                   "Variable: Console height in fraction of screen width\n     Usage: console-height <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_console_height);
 
     SS_install_cf("contour-n-levels",
@@ -1333,7 +1333,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("contour-ratio",
                   "Variable: Default ratio for conntour levels spacing\n     Usage: contour-ratio <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   cntrat);
 
     SS_install_cf("data-directory",
@@ -1375,7 +1375,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("error-bar-cap-size",
                   "Variable: Fractional size of error bar caps\n     Usage: error-bar-cap-size <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   errcsz);
 
     SS_install_cf("file-exist-action",
@@ -1410,22 +1410,22 @@ void SX_install_global_vars(void)
 
     SS_install_cf("gri-x",
                   "Variable: Graphical interface window x origin\n     Usage: gri-x <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_GRI_x);
 
     SS_install_cf("gri-y",
                   "Variable: Graphical interface window y origin\n     Usage: gri-y <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_GRI_y);
 
     SS_install_cf("gri-width",
                   "Variable: Graphical interface window width\n     Usage: gri-width <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_GRI_dx);
 
     SS_install_cf("gri-height",
                   "Variable: Graphical interface window height\n     Usage: gri-height <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_GRI_dy);
 
     SS_install_cf("grid",
@@ -1450,17 +1450,17 @@ void SX_install_global_vars(void)
 
     SS_install_cf("interpolation-power",
                   "Variable: exponent which defines distance measure used in interpolation\n     Usage: interpolation-power #",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_interp_power);
 
     SS_install_cf("interpolation-scale",
                   "Variable: multiplier on scale ratio used in interpolation\n     Usage: interpolation-scale #",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_interp_scale);
 
     SS_install_cf("interpolation-strength",
                   "Variable: power of distance used in interpolation\n     Usage: interpolation-strength #",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_interp_strength);
 
 /* KLMN */
@@ -1481,7 +1481,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("label-space",
                   "Variable: Fractional space for curve labels\n     Usage: label-space <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   labsp);
 
     SS_install_cf("label-type-size",
@@ -1491,12 +1491,12 @@ void SX_install_global_vars(void)
 
     SS_install_cf("label-yoffset",
                   "Variable: Fractional offset to start of curve labels\n     Usage: label-yoffset <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
 		  labyo);
 
     SS_install_cf("leftspace",
                   "Variable: Fractional space at left of screen\n     Usage: leftspace <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_gpad[0]);
 
     SS_install_cf("line-color",
@@ -1511,7 +1511,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("line-width",
                   "Variable: Default line width for new curves\n     Usage: line-width [<real>] ",
-                   SS_acc_REAL,
+                   SS_acc_double,
                    lnwid);
 
     SS_install_cf("logical-plot",
@@ -1531,12 +1531,12 @@ void SX_install_global_vars(void)
 
     SS_install_cf("marker-scale",
                   "Variable: The marker scale factor\n     Usage: marker-scale <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   mrks);
 
     SS_install_cf("marker-orientation",
                   "Variable: The marker orientation angle\n     Usage: marker-orientation <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_marker_orientation);
 
     SS_install_cf("n-curves",
@@ -1564,7 +1564,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("phi",
                   "Variable: Default phi view angle\n     Usage: phi <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_phi);
 
     SS_install_cf("plot-date",
@@ -1614,7 +1614,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("ps-dots-inch",
                   "Variable: PostScript dots/inch for 8.5 x 11 page\n     Usage: ps-dots-inch <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   psdpi);
 
     SS_install_cf("ref-mesh",
@@ -1654,7 +1654,7 @@ void SX_install_global_vars(void)
 
     SS_install_cf("rightspace",
                   "Variable: Fractional space at right of screen\n     Usage: rightspace <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_gpad[1]);
 
 
@@ -1672,12 +1672,12 @@ void SX_install_global_vars(void)
 
     SS_install_cf("show-mouse-location-x",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-x <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_show_mouse_location_x);
 
     SS_install_cf("show-mouse-location-y",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-y <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_show_mouse_location_y);
 
     SS_install_cf("smooth-method",
@@ -1702,12 +1702,12 @@ void SX_install_global_vars(void)
 
     SS_install_cf("theta",
                   "Variable: Default theta view angle\n     Usage: theta <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_theta);
 
     SS_install_cf("topspace",
                   "Variable: Fractional space at top of screen\n     Usage: topspace <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_gpad[3]);
 
     SS_install_cf("type-face",
@@ -1727,27 +1727,27 @@ void SX_install_global_vars(void)
 
     SS_install_cf("view-aspect",
                   "Variable: Viewport aspect ratio\n     Usage: view-aspect <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_view_aspect);
 
     SS_install_cf("view-height",
                   "Variable: Viewport height in fraction of screen height\n     Usage: view-height <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_view_height);
 
     SS_install_cf("view-origin-x",
                   "Variable: X comp of viewport origin (frac of window width)\n     Usage: view-origin-x <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_view_x[0]);
 
     SS_install_cf("view-origin-y",
                   "Variable: Y comp of viewport origin (frac of window width)\n     Usage: view-origin-y <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_view_x[2]);
 
     SS_install_cf("view-width",
                   "Variable: Viewport width in fraction of screen width\n     Usage: view-width <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_view_width);
 
 
@@ -1755,22 +1755,22 @@ void SX_install_global_vars(void)
 
     SS_install_cf("window-height",
                   "Variable: Window height in fraction of screen width\n     Usage: window-height <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_window_height);
 
     SS_install_cf("window-origin-x",
                   "Variable: X comp of window origin (frac of screen width)\n     Usage: window-origin-x <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_window_x[0]);
 
     SS_install_cf("window-origin-y",
                   "Variable: Y comp of window origin (frac of screen width)\n     Usage: window-origin-y <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_window_x[1]);
 
     SS_install_cf("window-width",
                   "Variable: Window width in fraction of screen width\n     Usage: window-width <real>",
-                  SS_acc_REAL,
+                  SS_acc_double,
                   &SX_window_width);
 
     SS_install_cf("x-log-scale",

@@ -87,8 +87,22 @@ struct s_object
 FUNCTION_POINTER(object, (*PFObject));
 FUNCTION_POINTER(object, *(*PFPObject));
 
+typedef enum e_SS_io_logging SS_io_logging;
+typedef struct s_SS_input_port input_port;
+typedef struct s_SS_output_port output_port;
+typedef struct s_SS_cons cons;
+typedef struct s_SS_variable variable;
+typedef struct s_SS_boolean SS_boolean;
+typedef struct s_SS_string string;
+typedef struct s_SS_continuation continuation;
+typedef struct s_SS_err_continuation err_continuation;
+typedef struct s_SS_esc_proc Esc_procedure;
+typedef struct s_SS_C_proc C_procedure;
+typedef struct s_SS_S_proc S_procedure;
+typedef struct s_SS_proc procedure;
+typedef struct s_SS_vect vector;
 
-typedef object *(*PFPHand)(PFVoid pr, object *argl);
+typedef object *(*PFPHand)(C_procedure *cp, object *argl);
 typedef void (*PFNameReproc)(char *s, char *name);
 typedef void (*PFPostRead)(object *strm);
 typedef void (*PFPostEval)(object *strm);
@@ -119,8 +133,6 @@ enum e_SS_io_logging
     ALL,
     NO_LOG};
 
-typedef enum e_SS_io_logging SS_io_logging;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -132,8 +144,6 @@ struct s_SS_input_port
     char buffer[MAX_BFSZ];
     char *ptr;};
 
-typedef struct s_SS_input_port input_port;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -141,16 +151,12 @@ struct s_SS_output_port
    {char *name;
     FILE *str;};
 
-typedef struct s_SS_output_port output_port;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 struct s_SS_cons
    {object *car;
     object *cdr;};
-
-typedef struct s_SS_cons cons;
 
 #define SS_DEFINE_CONS \
     PD_defstr(file, "cons", \
@@ -165,8 +171,6 @@ struct s_SS_variable
    {char *name;
     object *value;};
 
-typedef struct s_SS_variable variable;
-
 #define SS_DEFINE_VARIABLE \
     PD_defstr(file, "variable", \
               "char *name", \
@@ -179,8 +183,6 @@ typedef struct s_SS_variable variable;
 struct s_SS_boolean
    {char *name;
     int value;};
-
-typedef struct s_SS_boolean SS_boolean;
 
 #define SS_DEFINE_BOOLEAN \
     PD_defstr(file, "boolean", \
@@ -195,8 +197,6 @@ struct s_SS_string
    {int length;
     char *string;};
 
-typedef struct s_SS_string string;
-
 #define SS_DEFINE_STRING \
     PD_defstr(file, "string", \
               "integer length", \
@@ -210,8 +210,6 @@ struct s_SS_continuation
    {object *signal;
     JMP_BUF cont;};
 
-typedef struct s_SS_continuation continuation;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -220,8 +218,6 @@ struct s_SS_err_continuation
     int cont_ptr;
     object *signal;
     JMP_BUF cont;};
-
-typedef struct s_SS_err_continuation err_continuation;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -234,18 +230,15 @@ struct s_SS_esc_proc
     int err;
     int type;};
 
-typedef struct s_SS_esc_proc Esc_procedure;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /*  C PROCEDURE - primitive procedure or special form (written in C) */
 
 struct s_SS_C_proc
-   {PFPHand handler;
-    PFVoid proc;};
-
-typedef struct s_SS_C_proc C_procedure;
+   {int n;
+    PFVoid *proc;
+    PFPHand handler;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -258,8 +251,6 @@ struct s_SS_S_proc
     object *lambda;
     object *env;};
 
-typedef struct s_SS_S_proc S_procedure;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -269,8 +260,6 @@ struct s_SS_proc
     char *doc;
     short int trace;
     object *proc;};
-
-typedef struct s_SS_proc procedure;
 
 /*--------------------------------------------------------------------------*/
 
@@ -282,8 +271,6 @@ typedef struct s_SS_proc procedure;
 struct s_SS_vect
    {int length;
     object **vect;};
-
-typedef struct s_SS_vect vector;
 
 #define SS_DEFINE_VECTOR \
     PD_defstr(file, "vector", \
@@ -378,7 +365,7 @@ typedef struct s_SS_vect vector;
 #define SS_C_PROCEDURE_HANDLER(x)                                            \
    (*SS_C_PROCEDURE_HANDLER_PTR(x))
 #define SS_C_PROCEDURE_FUNCTION_PTR(x)                                       \
-   (((C_procedure *) SS_PROCEDURE_PROC(x))->proc)
+   (((C_procedure *) SS_PROCEDURE_PROC(x))->proc[0])
 #define SS_C_PROCEDURE_FUNCTION(x)                                           \
    (*SS_C_PROCEDURE_FUNCTION_PTR(x))
 
@@ -933,6 +920,10 @@ extern int
 /* SHENVR.C declarations */
 
 extern object
+ *SS_zargs(C_procedure *cp, object *argl),
+ *SS_sargs(C_procedure *cp, object *argl),
+ *SS_nargs(C_procedure *cp, object *argl),
+ *SS_znargs(C_procedure *cp, object *argl),
  *SS_bound_name(char *name),
  *SS_mk_new_frame(object *name, hasharr *tab),
  *SS_defp(object *vr),
@@ -955,10 +946,6 @@ extern void
 extern object
  *SS_exp_eval(object *obj),
  *SS_eval(object *obj),
- *SS_zargs(PFVoid pr, object *argl),
- *SS_sargs(PFVoid pr, object *argl),
- *SS_nargs(PFVoid pr, object *argl),
- *SS_znargs(PFVoid pr, object *argl),
  *SS_params(object *fun),
  *SS_proc_body(object *fun),
  *SS_proc_env(object *fun),
@@ -1057,12 +1044,12 @@ extern void
 /* SHPRM2.C declarations */
 
 extern object
- *SS_unary_flt(PFVoid pr, object *argl),
- *SS_unary_fix(PFVoid pr, object *argl),
- *SS_binary_fix(PFVoid pr, object *argl),
- *SS_binary_flt(PFVoid pr, object *argl),
- *SS_un_comp(PFVoid pr, object *argl),
- *SS_bin_comp(PFVoid pr, object *argl);
+ *SS_unary_flt(C_procedure *cp, object *argl),
+ *SS_unary_fix(C_procedure *cp, object *argl),
+ *SS_binary_fix(C_procedure *cp, object *argl),
+ *SS_binary_flt(C_procedure *cp, object *argl),
+ *SS_un_comp(C_procedure *cp, object *argl),
+ *SS_bin_comp(C_procedure *cp, object *argl);
 
 
 /* SHPRM3.C declarations */
@@ -1197,13 +1184,12 @@ extern char
 extern object
  *SS_install_cf(char *name, char *document, ...),
  *SS_install_cv(char *name, void *pval, int type),
- *SS_acc_REAL(void *vr, object *argl),
- *SS_acc_int(void *vr, object *argl),
- *SS_acc_long(void *vr, object *argl),
- *SS_acc_char(void *vr, object *argl),
- *SS_acc_string(void *vr, object *argl),
- *SS_acc_ptr(void *vr, object *argl),
- *SS_acc_var(void *vr, object *argl, int otype);
+ *SS_acc_double(C_procedure *cp, object *argl),
+ *SS_acc_int(C_procedure *cp, object *argl),
+ *SS_acc_long(C_procedure *cp, object *argl),
+ *SS_acc_char(C_procedure *cp, object *argl),
+ *SS_acc_string(C_procedure *cp, object *argl),
+ *SS_acc_ptr(C_procedure *cp, object *argl);
 
 #ifdef __cplusplus
 }

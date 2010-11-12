@@ -62,7 +62,6 @@ void _SS_eval(void)
     procedure *pf, *pg;
     SS_form pty;
     PFPHand ph;
-    PFVoid  pp;
     
     SS_set_cont(eval_disp, ret_val);
 
@@ -256,9 +255,8 @@ ev_def:
 pr_apply:
     cp = SS_GET_C_PROCEDURE(SS_Fun);
     ph = cp->handler;
-    pp = cp->proc;
 
-    SS_Assign(SS_Val, (*ph)(pp, SS_Argl));
+    SS_Assign(SS_Val, (*ph)(cp, SS_Argl));
 
     SS_go_cont;
 
@@ -272,10 +270,9 @@ pr_apply:
 macro_ur:
     cp = SS_GET_C_PROCEDURE(SS_Fun);
     ph = cp->handler;
-    pp = cp->proc;
 
     SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Assign(SS_Val, (*ph)(pp, SS_Unev));
+    SS_Assign(SS_Val, (*ph)(cp, SS_Unev));
 
     SS_go_cont;
 
@@ -289,10 +286,9 @@ macro_ur:
 macro_ue:
     cp = SS_GET_C_PROCEDURE(SS_Fun);
     ph = cp->handler;
-    pp = cp->proc;
 
     SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Assign(SS_Exn, (*ph)(pp, SS_Unev));
+    SS_Assign(SS_Exn, (*ph)(cp, SS_Unev));
 
     SS_jump(eval_disp);
 

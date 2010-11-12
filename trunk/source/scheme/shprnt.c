@@ -1072,16 +1072,41 @@ void SS_wr_atm(object *obj, object *strm)
 	   snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(obj));
 
 	else if (ityp == SC_DOUBLE_COMPLEX_I)
-          {double _Complex z;
+          {double r, i;
+	   double _Complex z;
 
 	   z = SS_COMPLEX_VALUE(obj);
-	   snprintf(t, MAXLINE, "%g+%gi", creal(z), cimag(z));}
+	   r = creal(z);
+	   i = cimag(z);
+	   if (i < 0.0)
+	      snprintf(t, MAXLINE, "%g%gi", r, i);
+	   else if (i == 0.0)
+	      snprintf(t, MAXLINE, "%g", r);
+	   else
+	      snprintf(t, MAXLINE, "%g+%gi", r, i);}
 
 	else if (ityp == SC_QUATERNION_I)
-          {quaternion q;
+          {double s, i, j, k;
+	   quaternion q;
 
 	   q = SS_QUATERNION_VALUE(obj);
-	   snprintf(t, MAXLINE, "%g+%gi+%gj+%gk", q.s, q.i, q.j, q.k);}
+	   s = q.s;
+	   i = q.i;
+	   j = q.j;
+	   k = q.k;
+	   snprintf(t, MAXLINE, "%g", s);
+	   if (i < 0.0)
+	      SC_vstrcat(t, MAXLINE, "%gi", i);
+	   else
+	      SC_vstrcat(t, MAXLINE, "+%gi", i);
+	   if (j < 0.0)
+	      SC_vstrcat(t, MAXLINE, "%gj", i);
+	   else
+	      SC_vstrcat(t, MAXLINE, "+%gj", i);
+	   if (k < 0.0)
+	      SC_vstrcat(t, MAXLINE, "%gk", i);
+	   else
+	      SC_vstrcat(t, MAXLINE, "+%gk", i);}
 
 #ifdef LARGE
 	else if (ityp == SS_CHARACTER_I)

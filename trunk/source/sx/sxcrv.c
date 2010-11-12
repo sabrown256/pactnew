@@ -115,9 +115,7 @@ void SX_enlarge_dataset(PFVoid eval)
     nc = SX_N_Curves;
 
     if (_SX.cproc == NULL)
-       {_SX.cproc          = FMAKE(C_procedure, "UL_INIT_CURVES:_SX.cproc");
-	_SX.cproc->proc    = eval;
-	_SX.cproc->handler = SS_sargs;};
+       _SX.cproc = _SS_mk_C_proc_va(SS_sargs, 1, eval);
 
     if (nc == 0)
        {SX_dataset    = FMAKE_N(curve, NCURVE,
@@ -126,11 +124,11 @@ void SX_enlarge_dataset(PFVoid eval)
 				"SX_ENLARGE_DATASET:number");
         SX_data_index = FMAKE_N(int, NCURVE,
 				"SX_ENLARGE_DATASET:data_index");
-	_SX.crv_obj    = FMAKE_N(object *, NCURVE,
-                                "SX_ENLARGE_DATASET:crv_obj");
-	_SX.crv_proc   = FMAKE_N(object *, NCURVE,
-                                "SX_ENLARGE_DATASET:crv_proc");
-	_SX.crv_varbl  = FMAKE_N(object *, NCURVE,
+	_SX.crv_obj   = FMAKE_N(object *, NCURVE,
+				"SX_ENLARGE_DATASET:crv_obj");
+	_SX.crv_proc  = FMAKE_N(object *, NCURVE,
+				"SX_ENLARGE_DATASET:crv_proc");
+	_SX.crv_varbl = FMAKE_N(object *, NCURVE,
                                 "SX_ENLARGE_DATASET:crv_varbl");
 
         SX_N_Curves += NCURVE;}
@@ -172,12 +170,7 @@ void SX_enlarge_dataset(PFVoid eval)
          o = SS_mk_variable(s, SS_null);
          SS_UNCOLLECT(o);
 
-         pp        = FMAKE(procedure, "UL_INIT_CURVES:pp");
-         pp->type  = SS_PR_PROC;
-         pp->doc   = NULL;
-         pp->name  = SC_strsavef(t, "char*:UL_INIT_CURVES:name");
-         pp->trace = FALSE;
-         pp->proc  = (object *) _SX.cproc;
+	 pp = _SS_mk_scheme_proc(t, NULL, SS_PR_PROC, _SX.cproc);
 
          p = SS_mk_proc_object(pp);
          SS_UNCOLLECT(p);

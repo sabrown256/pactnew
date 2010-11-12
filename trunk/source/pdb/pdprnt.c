@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
-#include <complex.h>
 
 #define PD_N_FORMATS 14
 
@@ -711,7 +710,7 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
 
     cp = (char *) vr;
 
-    if (SC_strstr(PD_print_formats1[idx], "%s") != NULL)
+    if (idx == SC_STRING_I)
        {if ((ni == 1L) && (offset == 0L))
 	   {if (PD_print_controls[5] == 0)
 	       {PRINT(f0, "%s%s%s = %c\n",
@@ -864,16 +863,14 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 
 	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
 	   {if (strcmp(type, SC_CHAR_S) == 0)
-	       {idx = SC_CHAR_I;
-		ni  = ni;
+	       {idx = SC_STRING_I;
 	        quo = TRUE;}
 	    else if (pd->kind == CHAR_KIND)
-	       {idx = SC_CHAR_I;
+	       {idx = SC_STRING_I;
 		ni  = isz;
 	        quo = FALSE;}
 	    else
 	       {idx = SC_INT_I;
-		ni  = ni;
 	        quo = FALSE;};
 
 	    _PD_print_char_kind(prnt, vr, ni, type, quo, idx, n, ind);}
@@ -1334,7 +1331,6 @@ void _PD_set_format_defaults(void)
 	 snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[i]);
 
 	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fix)");
-
 	 PD_print_formats1[i+SC_SHORT_I] = t;};
 
 /* real floating point types (proper) */
@@ -1345,7 +1341,6 @@ void _PD_set_format_defaults(void)
 	 snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[i].digits);
 
 	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
-
 	 PD_print_formats1[i+SC_FLOAT_I] = t;};
 
 /* complex floating point types (proper) */
@@ -1357,29 +1352,25 @@ void _PD_set_format_defaults(void)
 		  PD_fp_precision[i].digits, PD_fp_precision[i].digits);
 
 	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
-
 	 PD_print_formats1[i+SC_FLOAT_COMPLEX_I] = t;};
 
 /* other primitive types */
     if (PD_print_formats1[SC_CHAR_I] != NULL)
        SFREE(PD_print_formats1[SC_CHAR_I]);
 
-    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(char)");
-
+    t = SC_strsavef("%c", "char*:_PD_SET_FORMAT_DEFAULTS:format1(char)");
     PD_print_formats1[SC_CHAR_I] = t;
 
     if (PD_print_formats1[SC_BIT_I] != NULL)
        SFREE(PD_print_formats1[SC_BIT_I]);
 
     t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bit)");
-
     PD_print_formats1[SC_BIT_I] = t;
 
     if (PD_print_formats1[SC_BOOL_I] != NULL)
        SFREE(PD_print_formats1[SC_BOOL_I]);
 
     t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bool)");
-
     PD_print_formats1[SC_BOOL_I] = t;
 
 /* PD_print_formats2 is used for arrays */
@@ -1389,7 +1380,6 @@ void _PD_set_format_defaults(void)
 
          t = SC_strsavef(PD_print_formats1[i],
 			 "char*:_PD_SET_FORMAT_DEFAULTS:formats2");
-
          PD_print_formats2[i] = t;};
 
     return;}

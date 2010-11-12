@@ -210,10 +210,10 @@ int SS_true(object *obj)
 
 /* SS_ZARGS - zero argument macro/procedure handler */
 
-object *SS_zargs(PFVoid pr, object *argl)
+object *SS_zargs(C_procedure *cp, object *argl)
    {object *o;
 
-    o = (*(PFZargs) pr)();
+    o = (*(PFZargs) cp->proc[0])();
 
     return(o);}
 
@@ -222,10 +222,10 @@ object *SS_zargs(PFVoid pr, object *argl)
 
 /* SS_SARGS - single argument macro/procedure handler */
 
-object *SS_sargs(PFVoid pr, object *argl)
+object *SS_sargs(C_procedure *cp, object *argl)
    {object *o;
 
-    o = (*(PFSargs) pr)(SS_car(argl));
+    o = (*(PFSargs) cp->proc[0])(SS_car(argl));
 
     return(o);}
 
@@ -234,10 +234,10 @@ object *SS_sargs(PFVoid pr, object *argl)
 
 /* SS_NARGS - n argument macro/procedure handler */
 
-object *SS_nargs(PFVoid pr, object *argl)
+object *SS_nargs(C_procedure *cp, object *argl)
    {object *o;
 
-    o = (*(PFSargs) pr)(argl);
+    o = (*(PFSargs) cp->proc[0])(argl);
 
     return(o);}
 
@@ -246,10 +246,10 @@ object *SS_nargs(PFVoid pr, object *argl)
 
 /* SS_ZNARGS - zero or more arguments macro/procedure handler */
 
-object *SS_znargs(PFVoid pr, object *argl)
+object *SS_znargs(C_procedure *cp, object *argl)
    {object *o;
 
-    o = (*(PFSargs) pr)(argl);
+    o = (*(PFSargs) cp->proc[0])(argl);
 
     return(o);}
 

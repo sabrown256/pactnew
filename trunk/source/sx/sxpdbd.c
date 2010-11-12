@@ -61,7 +61,7 @@
 /*--------------------------------------------------------------------------*/
 
 #define DIFF_FIX_ARRAY(ret, indx, a, b)                                      \
-    if (SX_disp_individ_diff)                                                \
+    if (SX_disp_individ_diff == TRUE)                                        \
        {for (i = 0L; i < ni; i++)                                            \
             {if (a[i] != b[i])                                               \
                 {ret    &= FALSE;                                            \
@@ -73,7 +73,7 @@
 /*--------------------------------------------------------------------------*/
 
 #define DIFF_FLOAT_ARRAY(ret, indx, a, b, tol)                               \
-    if (SX_disp_individ_diff)                                                \
+    if (SX_disp_individ_diff == TRUE)                                        \
        {for (i = 0L; i < ni; i++)                                            \
             {del  = 2.0*(a[i] - b[i])/(ABS(a[i]) + ABS(b[i]) + SMALL);       \
              if ((del < -tol) || (tol < del))                                \
@@ -83,6 +83,25 @@
        {for (i = 0L; i < ni; i++)                                            \
             {del  = 2.0*(a[i] - b[i])/(ABS(a[i]) + ABS(b[i]) + SMALL);       \
              ret &= ((-tol < del) && (del < tol));};}
+
+/*--------------------------------------------------------------------------*/
+
+#define DIFF_COMPLEX_ARRAY(ret, indx, a, b, tol)                             \
+    {long ipt, ne;                                                           \
+     defstr *dp;                                                             \
+     dp  = PD_inquire_type(pf, type);                                        \
+     ipt = _PD_items_per_tuple(dp);                                          \
+     ne  = 2*ni;                                                             \
+     if (SX_disp_individ_diff == TRUE)                                       \
+        {for (i = 0L; i < ne; i++)                                           \
+             {del  = 2.0*(a[i] - b[i])/(ABS(a[i]) + ABS(b[i]) + SMALL);      \
+              if ((del < -tol) || (tol < del))                               \
+                 {ret    &= FALSE;                                           \
+                  indx[i] = TRUE;};};}                                       \
+     else                                                                    \
+        {for (i = 0L; i < ni; i++)                                           \
+             {del  = 2.0*(a[i] - b[i])/(ABS(a[i]) + ABS(b[i]) + SMALL);      \
+              ret &= ((-tol < del) && (del < tol));};};}
 
 /*--------------------------------------------------------------------------*/
 
@@ -584,66 +603,95 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
 static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb, 
 			       char *bfa, char *bfb, char *type, 
 			       long ni, dimdes *dims)
-   {int ret;
-    long i, *lpa, *lpb;
-    int *ipa, *ipb;
-    short *spa, *spb;
-    char *cpa, *cpb, *indx;
+   {int id, ret;
+    long i;
+    char *indx;
     double del;
-    double *dpa, *dpb;
-    float *fpa, *fpb;
 
-    if (SX_disp_individ_diff)
+    if (SX_disp_individ_diff == TRUE)
        indx = FMAKE_N(char, ni, "_SX_DIFF_PRIMITIVES:indx");
     else
        indx = NULL;
 
+    id = SC_type_id(type, TRUE);
+
 /* find the type and compare */
     ret = TRUE;
-    if (strcmp(type, SC_CHAR_S) == 0)
-       {cpa = (char *) bfa;
-        cpb = (char *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, cpa, cpb);}
+    if (id == SC_CHAR_I)
+       {char *va, *vb;
+	va = (char *) bfa;
+        vb = (char *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb);}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
-       {spa = (short *) bfa;
-        spb = (short *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, spa, spb);}
+/* fixed point types */
+    else if (id == SC_SHORT_I)
+       {short *va, *vb;
+	va = (short *) bfa;
+        vb = (short *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb);}
 
-    else if ((strcmp(type, "integer") == 0) || (strcmp(type, SC_INT_S) == 0))
-       {ipa = (int *) bfa;
-        ipb = (int *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, ipa, ipb);}
+    else if (id == SC_INT_I)
+       {int *va, *vb;
+	va = (int *) bfa;
+        vb = (int *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
-       {lpa = (long *) bfa;
-        lpb = (long *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, lpa, lpb);}
+    else if (id == SC_LONG_I)
+       {long *va, *vb;
+	va = (long *) bfa;
+        vb = (long *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb);}
 
-    else if (strcmp(type, "REAL") == 0)
-       {if (sizeof(REAL) == sizeof(double))
-           {dpa = (double *) bfa;
-            dpb = (double *) bfb;
-            DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_fp_precision[1].tolerance);}
-        else if (sizeof(REAL) == sizeof(float))
-           {fpa = (float *) bfa;
-            fpb = (float *) bfb;
-            DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_fp_precision[0].tolerance);};}
+    else if (id == SC_LONG_LONG_I)
+       {long long *va, *vb;
+	va = (long long *) bfa;
+        vb = (long long *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb);}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
-       {fpa = (float *) bfa;
-        fpb = (float *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, fpa, fpb, PD_fp_precision[0].tolerance);}
+/* floating point types */
+    else if (id == SC_FLOAT_I)
+       {float *va, *vb;
+	va = (float *) bfa;
+        vb = (float *) bfb;
+        DIFF_FLOAT_ARRAY(ret, indx, va, vb, PD_fp_precision[0].tolerance);}
 
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
-       {dpa = (double *) bfa;
-        dpb = (double *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, dpa, dpb, PD_fp_precision[1].tolerance);};
+    else if (id == SC_DOUBLE_I)
+       {double *va, *vb;
+	va = (double *) bfa;
+        vb = (double *) bfb;
+        DIFF_FLOAT_ARRAY(ret, indx, va, vb, PD_fp_precision[1].tolerance);}
 
-    if (!ret)
+    else if (id == SC_LONG_DOUBLE_I)
+       {long double *va, *vb;
+	va = (long double *) bfa;
+        vb = (long double *) bfb;
+        DIFF_FLOAT_ARRAY(ret, indx, va, vb, PD_fp_precision[2].tolerance);}
+
+/* complex floating point types
+ * NOTE: comparing tuples of floating point primitives
+ */
+    else if (id == SC_FLOAT_COMPLEX_I)
+       {float *va, *vb;
+	va = (float *) bfa;
+        vb = (float *) bfb;
+        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, PD_fp_precision[0].tolerance);}
+
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {double *va, *vb;
+	va = (double *) bfa;
+        vb = (double *) bfb;
+        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, PD_fp_precision[1].tolerance);}
+
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+       {long double *va, *vb;
+	va = (long double *) bfa;
+        vb = (long double *) bfb;
+        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, PD_fp_precision[2].tolerance);};
+
+    if (ret == FALSE)
        _SX_display_diff(pf, nma, nmb, bfa, bfb, indx, ni, type, dims);
 
-    if (SX_disp_individ_diff)
+    if (SX_disp_individ_diff == TRUE)
        SFREE(indx);
 
     return(ret);}

@@ -16,6 +16,7 @@
 
 #include "ppc_int.h"
 #include "scheme.h"
+#include "scope_quaternion.h"
 
 /*--------------------------------------------------------------------------*/
 
@@ -23,6 +24,7 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define _SS_GET_C_PROCEDURE_N(_t, _cp, _n)  ((_t) (_cp)->proc[_n])
 
 /*--------------------------------------------------------------------------*/
 
@@ -228,8 +230,21 @@ extern void
 
 /* SHMM.C declarations */
 
+extern C_procedure
+ *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr),
+ *_SS_mk_C_proc_va(PFPHand phand, int n, ...);
+
+extern procedure
+ *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
+		     C_procedure *cp);
+
 extern int
  _SS_object_map(FILE *fp, int flag);
+
+extern void
+ _SS_rl_C_proc(C_procedure *cp),
+ _SS_install(char* pname, char *pdoc, PFPHand phand,
+	     int n, PFVoid *pr, SS_form ptype);
 
 
 /* SHPRM1.C declarations */

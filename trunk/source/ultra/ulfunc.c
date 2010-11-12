@@ -1286,6 +1286,7 @@ static object *_ULI_average(object *s)
    {int i;
     char *t, *lbl;
     object *c, *numtoks, *rv;
+    C_procedure *cpp, *cpd;
 
     SX_prep_arg(s);
     UL_plot_off();
@@ -1293,12 +1294,14 @@ static object *_ULI_average(object *s)
     rv      = SS_null;
     numtoks = SS_mk_integer((BIGINT) SS_length(s));
 
-    c = UL_bc((PFVoid) PM_fplus, s);
+    cpp = _SS_mk_C_proc_va(UL_bc, 1, PM_fplus);
+    c   = UL_bc(cpp, s);
     if (SS_true(c))
-       {c = UL_opyc((PFVoid) PM_fdivide,
-                    SS_make_list(SS_OBJECT_I, c,
-                                 SS_OBJECT_I, numtoks,
-                                 0));
+       {cpd = _SS_mk_C_proc_va(UL_opyc, 1, PM_fdivide);
+        c   = UL_opyc(cpd,
+		      SS_make_list(SS_OBJECT_I, c,
+				   SS_OBJECT_I, numtoks,
+				   0));
         i = SX_get_crv_index_i(c);
 
         SC_strtok(SX_dataset[i].text, " ", t);
@@ -1308,7 +1311,11 @@ static object *_ULI_average(object *s)
         SX_dataset[i].text = SC_strsavef(lbl, "char*:_ULI_AVERAGE:lbl");
         UL_restore_plot();
 
+	_SS_rl_C_proc(cpd);
+
         rv = c;};
+
+    _SS_rl_C_proc(cpp);
 
     return(rv);}
 

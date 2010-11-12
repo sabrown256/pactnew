@@ -199,7 +199,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
  *            - or elements of C_array
  */
 
-object *_SX_mh_u_s(PFVoid f, object *argl)
+object *_SX_mh_u_s(C_procedure *cp, object *argl)
    {object *ret, *first, *obj;
     int id, ne, nde;
     char *type;
@@ -212,10 +212,10 @@ object *_SX_mh_u_s(PFVoid f, object *argl)
     ret   = SS_null;
     first = _SX_resolve_mapping(argl);
     if (SS_numbp(first))
-       ret = SS_unary_flt(f, argl);
+       ret = SS_unary_flt(cp, argl);
 
     else
-       {fn = (PFDoubleR) f;
+       {fn = (PFDoubleR) cp->proc[0];
 	SS_Assign(ret, argl);
 
 	while (SS_consp(argl))
@@ -265,7 +265,7 @@ object *_SX_mh_u_s(PFVoid f, object *argl)
  *           - this was UL_uopxc in ULTRA II
  */
 
-object *_SX_m11_x(PFVoid oper, object *argl)
+object *_SX_m11_x(C_procedure *cp, object *argl)
    {int i, n;
     double *xp;
     PFDoubleR fn;
@@ -283,7 +283,7 @@ object *_SX_m11_x(PFVoid oper, object *argl)
            {set = f->domain;
             xp = *(double **) set->elements;
             n  = set->n_elements;
-            fn = (PFDoubleR) oper;
+            fn = (PFDoubleR) cp->proc[0];
             for (i = 0; i < n; xp++, i++)
                 *xp = (double) (*fn)(*xp);
 
@@ -305,14 +305,14 @@ object *_SX_m11_x(PFVoid oper, object *argl)
  *               - using a single object
  */
 
-object *_SX_m11_b_mro(PFVoid oper, object *argl)
+object *_SX_m11_b_mro(C_procedure *cp, object *argl)
    {PM_mapping *f;
     PF_PPM_mapping_1 op;
     object *al, *obj, *ret;
         
     SX_plot_flag = TRUE;
 
-    op   = (PF_PPM_mapping_1) oper;
+    op   = (PF_PPM_mapping_1) cp->proc[0];
     al   = SS_car(argl);
     argl = SS_cdr(argl);
 
@@ -366,7 +366,7 @@ void _SX_cmp_b_set(PFVoid oper, PM_set *set, double a, int cmp)
  *               - using a single scalar
  */
 
-object *_SX_m11_b_mrs(PFVoid oper, object *argl)
+object *_SX_m11_b_mrs(C_procedure *cp, object *argl)
    {double a;
     PM_set *set;
     PM_mapping *f;
@@ -388,7 +388,7 @@ object *_SX_m11_b_mrs(PFVoid oper, object *argl)
         SX_determine_mapping(&f, &argl);
         if (f != NULL)
            {set = f->range;
-	    _SX_cmp_b_set(oper, set, a, -1);
+	    _SX_cmp_b_set(cp->proc[0], set, a, -1);
 
 /* for later
             SX_dataset[j].modified = TRUE;
@@ -407,7 +407,7 @@ object *_SX_m11_b_mrs(PFVoid oper, object *argl)
  *               - using a single scalar
  */
 
-object *_SX_m11_b_mds(PFVoid oper, object *argl)
+object *_SX_m11_b_mds(C_procedure *cp, object *argl)
    {double a;
     object *obj, *ret;
     PM_set *set;
@@ -429,7 +429,7 @@ object *_SX_m11_b_mds(PFVoid oper, object *argl)
         SX_determine_mapping(&f, &argl);
         if (f != NULL)
            {set = f->domain;
-	    _SX_cmp_b_set(oper, set, a, -1);
+	    _SX_cmp_b_set(cp->proc[0], set, a, -1);
 
 /* for later
             SX_dataset[j].modified = TRUE;
@@ -449,7 +449,7 @@ object *_SX_m11_b_mds(PFVoid oper, object *argl)
  *               - the component(s) is specified
  */
 
-object *_SX_mij_b_mrs(PFVoid oper, object *argl)
+object *_SX_mij_b_mrs(C_procedure *cp, object *argl)
    {int i;
     double a;
     PM_set *set;
@@ -477,7 +477,7 @@ object *_SX_mij_b_mrs(PFVoid oper, object *argl)
         SX_determine_mapping(&f, &argl);
         if (f != NULL)
            {set = f->range;
-	    _SX_cmp_b_set(oper, set, a, i);
+	    _SX_cmp_b_set(cp->proc[0], set, a, i);
 
 /* for later
             SX_dataset[j].modified = TRUE;
@@ -497,7 +497,7 @@ object *_SX_mij_b_mrs(PFVoid oper, object *argl)
  *               - the component(s) is specified
  */
 
-object *_SX_mij_b_mds(PFVoid oper, object *argl)
+object *_SX_mij_b_mds(C_procedure *cp, object *argl)
    {int i;
     double a;
     object *obj, *ret;
@@ -525,7 +525,7 @@ object *_SX_mij_b_mds(PFVoid oper, object *argl)
         SX_determine_mapping(&f, &argl);
         if (f != NULL)
            {set = f->domain;
-	    _SX_cmp_b_set(oper, set, a, i);
+	    _SX_cmp_b_set(cp->proc[0], set, a, i);
 
 /* for later
             SX_dataset[j].modified = TRUE;
@@ -542,7 +542,7 @@ object *_SX_mij_b_mds(PFVoid oper, object *argl)
 
 /* _SX_MH_U_M - handler for unary operation acting on a set of mappings */
 
-object *_SX_mh_u_m(PFVoid oper, object *argl)
+object *_SX_mh_u_m(C_procedure *cp, object *argl)
    {int plf;
     PM_mapping *f, *h;
     PF_PPM_mapping_2 op;
@@ -550,7 +550,7 @@ object *_SX_mh_u_m(PFVoid oper, object *argl)
 
     SX_plot_flag = TRUE;
 
-    op  = (PF_PPM_mapping_2) oper;
+    op  = (PF_PPM_mapping_2) cp->proc[0];
     plf = SX_have_display_list();
     ret = SS_null;
     while (SS_consp(argl))
