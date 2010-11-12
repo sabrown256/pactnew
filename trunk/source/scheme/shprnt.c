@@ -1078,12 +1078,18 @@ void SS_wr_atm(object *obj, object *strm)
 	   z = SS_COMPLEX_VALUE(obj);
 	   r = creal(z);
 	   i = cimag(z);
-	   if (i < 0.0)
-	      snprintf(t, MAXLINE, "%g%gi", r, i);
-	   else if (i == 0.0)
+
+	   t[0] = '\0';
+	   if ((r == 0.0) && (i == 0.0))
+	      snprintf(t, MAXLINE, "0.0");
+	   if (r != 0.0)
 	      snprintf(t, MAXLINE, "%g", r);
+	   if (i < 0.0)
+	      SC_vstrcat(t, MAXLINE, "%gi", i);
+	   else if (r == 0.0)
+	      SC_vstrcat(t, MAXLINE, "%gi", i);
 	   else
-	      snprintf(t, MAXLINE, "%g+%gi", r, i);}
+	      SC_vstrcat(t, MAXLINE, "+%gi", i);}
 
 	else if (ityp == SC_QUATERNION_I)
           {double s, i, j, k;
@@ -1094,19 +1100,24 @@ void SS_wr_atm(object *obj, object *strm)
 	   i = q.i;
 	   j = q.j;
 	   k = q.k;
-	   snprintf(t, MAXLINE, "%g", s);
+
+	   t[0] = '\0';
+	   if ((s == 0.0) && (i == 0.0) && (j == 0.0) && (k == 0.0))
+	      snprintf(t, MAXLINE, "0.0");
+	   if (s != 0.0)
+	      snprintf(t, MAXLINE, "%g", s);
 	   if (i < 0.0)
 	      SC_vstrcat(t, MAXLINE, "%gi", i);
-	   else
+	   else if (i > 0.0)
 	      SC_vstrcat(t, MAXLINE, "+%gi", i);
 	   if (j < 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gj", i);
-	   else
-	      SC_vstrcat(t, MAXLINE, "+%gj", i);
+	      SC_vstrcat(t, MAXLINE, "%gj", j);
+	   else if (j > 0.0)
+	      SC_vstrcat(t, MAXLINE, "+%gj", j);
 	   if (k < 0.0)
-	      SC_vstrcat(t, MAXLINE, "%gk", i);
-	   else
-	      SC_vstrcat(t, MAXLINE, "+%gk", i);}
+	      SC_vstrcat(t, MAXLINE, "%gk", k);
+	   else if (k > 0.0)
+	      SC_vstrcat(t, MAXLINE, "+%gk", k);}
 
 #ifdef LARGE
 	else if (ityp == SS_CHARACTER_I)

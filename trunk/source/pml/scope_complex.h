@@ -85,6 +85,10 @@ extern int
 /* MLCFNC.C declarations */
 
 extern complex
+ PM_plus_cc(complex b, complex c),
+ PM_minus_cc(complex b, complex c),
+ PM_times_cc(complex b, complex c),
+ PM_divide_cc(complex b, complex c),
  PM_csqr(complex c),
  PM_csqrt(complex c),
  PM_cln(complex c),

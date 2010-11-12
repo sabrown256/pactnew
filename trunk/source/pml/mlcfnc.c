@@ -72,6 +72,54 @@ complex
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_PLUS_CC - add complex A and B */
+
+complex PM_plus_cc(complex b, complex c)
+   {complex rv;
+
+    rv = PM_PLUS_CC(b, c);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_MINUS_CC - subtract complex B from A */
+
+complex PM_minus_cc(complex b, complex c)
+   {complex rv;
+
+    rv = PM_MINUS_CC(b, c);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_TIMES_CC - multiply add complex A and B */
+
+complex PM_times_cc(complex b, complex c)
+   {complex rv;
+
+    rv = PM_TIMES_CC(b, c);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_DIVIDE_CC - divide complex A by B */
+
+complex PM_divide_cc(complex b, complex c)
+   {complex rv;
+
+    rv = PM_DIVIDE_CC(b, c);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_CHORNER - evaluate polynomial using Horner's rule
  *           -   y = Sum(Ci*X^i, mn <= i <= mx)
  */

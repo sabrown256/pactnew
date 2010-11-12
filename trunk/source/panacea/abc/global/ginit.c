@@ -429,12 +429,12 @@ static object *B_variables(void)
 
     SS_install_cf("current-time",
 		  "Current problem time",
-		  SS_acc_REAL,
+		  SS_acc_double,
                   &t);
 
     SS_install_cf("current-timestep",
 		  "Current problem time step",
-		  SS_acc_REAL,
+		  SS_acc_double,
                   &dt);
 
     SS_install_cf("state-file-name",
@@ -460,22 +460,22 @@ static object *B_variables(void)
 /* these are not required */
     SS_install_cf("initial-dtf",
 		  "Initial time step fraction",
-		  SS_acc_REAL,
+		  SS_acc_double,
                   &global_param[4]);
 
     SS_install_cf("minimum-dtf",
 		  "Minimum time step fraction",
-		  SS_acc_REAL,
+		  SS_acc_double,
                   &global_param[5]);
 
     SS_install_cf("maximum-dtf",
 		  "Maximum time step fraction",
-		  SS_acc_REAL,
+		  SS_acc_double,
                   &global_param[6]);
 
     SS_install_cf("increment-dtf",
 		  "Maximum time step increment factor",
-		  SS_acc_REAL,
+		  SS_acc_double,
                   &global_param[7]);
 
     return(SS_f);}
