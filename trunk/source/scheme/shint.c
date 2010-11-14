@@ -112,6 +112,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
        {cp  = (char *) v;
 	*cp = (char) l;}
 
+/* fixed point types */
     else if (type == SC_SHORT_I)
        {sp  = (short *) v;
 	*sp = (short) l;}
@@ -148,6 +149,7 @@ static void _SS_float_arg(object *obj, void *v, int type)
     if (SS_integerp(obj))
        d = SS_INTEGER_VALUE(obj);
 
+/* floating point types */
     else if (SS_floatp(obj))
        d = SS_FLOAT_VALUE(obj);
 
@@ -215,6 +217,7 @@ static void _SS_complex_arg(object *obj, void *v)
     r = 0.0;
     i = 0.0;
 
+/* complex floating point types */
     if (SS_complexp(obj))
        {z = SS_COMPLEX_VALUE(obj);
 	r = creal(z);
