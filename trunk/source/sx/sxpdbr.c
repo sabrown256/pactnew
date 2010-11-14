@@ -12,44 +12,45 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define READ_IO(pp, ptype)                                                   \
+#define READ_NUM(_type, _vr, _i, _ityp, _o)                                  \
+    {_type *_pv;                                                             \
+     _pv = (_type *) _vr;                                                    \
+     if (_ityp == SC_INT_I)                                                  \
+        _pv[_i] = (_type) SS_INTEGER_VALUE(_o);                              \
+     else if (_ityp == SC_FLOAT_I)                                           \
+        _pv[_i] = (_type) SS_FLOAT_VALUE(_o);                                \
+     else if (_ityp == SC_DOUBLE_COMPLEX_I)                                  \
+        _pv[_i] = (_type) SS_COMPLEX_VALUE(_o);                              \
+     else if (_ityp == SC_QUATERNION_I)                                      \
+        _pv[_i] = (_type) (SS_QUATERNION_VALUE(_o)).s;                       \
+     else if ((_ityp == SC_BOOL_I) || (_ityp == SS_BOOLEAN_I))               \
+        _pv[_i] = (_type) SS_BOOLEAN_VALUE(_o);                              \
+     else                                                                    \
+        SS_error("EXPECTED A NUMBER", _o);}
+
+/*--------------------------------------------------------------------------*/
+
+#define READ_IO(_type, _vr, _n, _o)                                          \
    {int _ityp, _jtyp;                                                        \
-    _ityp = SC_arrtype(obj, -1);                                             \
-    if (_ityp == SC_INT_I)                                                   \
-       *pp = (ptype) SS_INTEGER_VALUE(obj);                                  \
-    else if (_ityp == SC_FLOAT_I)                                            \
-       *pp = (ptype) SS_FLOAT_VALUE(obj);                                    \
-    else if (_ityp == SS_CONS_I)                                             \
-       {if (SS_consp(SS_car(obj)))                                           \
-	   obj = SS_car(obj);                                                \
-        for (i = 0; i < nitems; i++)                                         \
-            {obj1  = SS_car(obj);                                            \
+    long _i;                                                                 \
+    _ityp = SC_arrtype(_o, -1);                                              \
+    if (_ityp == SS_CONS_I)                                                  \
+       {if (SS_consp(SS_car(_o)))                                            \
+	   _o = SS_car(_o);                                                  \
+        for (_i = 0; _i < _n; _i++)                                          \
+            {obj1  = SS_car(_o);                                             \
              _jtyp = SC_arrtype(obj1, -1);                                   \
-             if (_jtyp == SC_INT_I)                                          \
-                pp[i] = (ptype) SS_INTEGER_VALUE(obj1);                      \
-             else if (_jtyp == SC_FLOAT_I)                                   \
-                pp[i] = (ptype) SS_FLOAT_VALUE(obj1);                        \
-             else if (_jtyp == SS_BOOLEAN_I)                                 \
-                pp[i] = (ptype) SS_BOOLEAN_VALUE(obj1);                      \
-             else                                                            \
-                SS_error("EXPECTED A NUMBER", obj1);                         \
-	     obj1 = SS_cdr(obj);                                             \
+	     READ_NUM(_type, _vr, _i, _jtyp, obj1);                          \
+	     obj1 = SS_cdr(_o);                                              \
 	     if (obj1 != SS_null)                                            \
-		obj = obj1;};}                                               \
+		_o = obj1;};}                                                \
     else if (_ityp == SS_VECTOR_I)                                           \
-       {va = SS_VECTOR_ARRAY(obj);                                           \
-        for (i = 0; i < nitems; i++)                                         \
-            {_jtyp = SC_arrtype(va[i], -1);                                  \
-             if (_jtyp == SC_INT_I)                                          \
-                pp[i] = (ptype) SS_INTEGER_VALUE(va[i]);                     \
-             else if (_jtyp == SC_FLOAT_I)                                   \
-                pp[i] = (ptype) SS_FLOAT_VALUE(va[i]);                       \
-             else if (_jtyp == SS_BOOLEAN_I)                                 \
-                pp[i] = (ptype) SS_BOOLEAN_VALUE(va[i]);                     \
-             else                                                            \
-                SS_error("EXPECTED A NUMBER", va[i]);};}                     \
+       {va = SS_VECTOR_ARRAY(_o);                                            \
+        for (_i = 0; _i < _n; _i++)                                          \
+            {_jtyp = SC_arrtype(va[_i], -1);                                 \
+	     READ_NUM(_type, _vr, _i, _jtyp, va[_i]);};}                     \
     else                                                                     \
-       SS_error("EXPECTED A NUMBER", obj);}
+       READ_NUM(_type, _vr, 0, _ityp, _o);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -176,8 +177,8 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_RD_IO_LIST - if 'type' is a primitive type, display the data,
- *                - otherwise, lookup the type, and display each member.
+/* _SX_RD_IO_LIST - if TYPE in DP is a primitive type, display the data,
+ *                - otherwise, lookup the type, and display each member
  */
 
 static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
@@ -211,61 +212,38 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
 
 /* fixed point types */
     if (id == SC_SHORT_I)
-       {short *pv;
-        pv = (short *) vr;
-        READ_IO(pv, short);}
-
+       {READ_IO(short, vr, nitems, obj);}
     else if (id == SC_INT_I)
-       {int *pv;
-        pv = (int *) vr;
-        READ_IO(pv, int);}
+       {READ_IO(int, vr, nitems, obj);}
 
     else if (id == SC_LONG_I)
-       {long *pv;
-        pv = (long *) vr;
-        READ_IO(pv, long);}
+       {READ_IO(long, vr, nitems, obj);}
 
     else if (id == SC_LONG_LONG_I)
-       {long long *pv;
-	pv = (long long *) vr;
-        READ_IO(pv, long long);}
+       {READ_IO(long long, vr, nitems, obj);}
 
 /* floating point types */
     else if (id == SC_FLOAT_I)
-       {float *pv;
-        pv = (float *) vr;
-        READ_IO(pv, float);}
+       {READ_IO(float, vr, nitems, obj);}
  
     else if (id == SC_DOUBLE_I)
-       {double *pv;
-        pv = (double *) vr;
-        READ_IO(pv, double);}
+       {READ_IO(double, vr, nitems, obj);}
 
     else if (id == SC_LONG_DOUBLE_I)
-       {long double *pv;
-	pv = (long double *) vr;
-        READ_IO(pv, long double);}
+       {READ_IO(long double, vr, nitems, obj);}
 
 /* complex floating point types */
     else if (id == SC_FLOAT_COMPLEX_I)
-       {float _Complex *pv;
-	pv = (float _Complex *) vr;
-        READ_IO(pv, float _Complex);}
+       {READ_IO(float _Complex, vr, nitems, obj);}
 
     else if (id == SC_DOUBLE_COMPLEX_I)
-       {double _Complex *pv;
-        pv = (double _Complex *) vr;
-        READ_IO(pv, double _Complex);}
+       {READ_IO(double _Complex, vr, nitems, obj);}
 
     else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {long double _Complex *pv;
-	pv = (long double _Complex *) vr;
-        READ_IO(pv, long double _Complex);}
+       {READ_IO(long double _Complex, vr, nitems, obj);}
 
     else if (id == SC_BOOL_I)
-       {bool *pb;
-	pb = (bool *) vr;
-        READ_IO(pb, bool);}
+       {READ_IO(bool, vr, nitems, obj);}
 
     else
 #if 1
