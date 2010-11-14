@@ -115,6 +115,11 @@
 #define NSTD         6     /* number of standards currently in the system 
                             * should be same as last standard */
 
+#define PD_N_PRIMITIVES     14  /* unknown, bit, bool, char,
+                                 * primitive fixed point,
+                                 * primitive floating point,
+                                 * primitive complex floating point 
+                                 */
 #define PD_N_PRIMITIVE_FIX  4   /* short, int, long, and long long */
 #define PD_N_PRIMITIVE_FP   3   /* float, double, and long double */
 

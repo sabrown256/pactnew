@@ -66,13 +66,13 @@ void _SQL_init_types(PDBfile *file)
     PD_typedef(file, SC_CHAR_S, "national character varying");
     PD_typedef(file, SC_CHAR_S, "nvarchar");
 
-/* integer types */
+/* fixed point types (ok) */
     PD_typedef(file, SC_SHORT_S,     "smallint");
     PD_typedef(file, SC_INT_S,       "serial");
     PD_typedef(file, SC_LONG_LONG_S, "bigint");
     PD_typedef(file, SC_LONG_LONG_S, "bigserial");
 
-/* floating point types */
+/* floating point types (ok) */
     PD_typedef(file, SC_FLOAT_S,  "real");
     PD_typedef(file, SC_DOUBLE_S, "double precision");
     PD_typedef(file, SC_DOUBLE_S, "numeric");
