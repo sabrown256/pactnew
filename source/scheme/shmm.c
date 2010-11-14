@@ -1064,3 +1064,182 @@ void SS_register_types(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_NUMTYPE_TO_OBJECT - convert the Nth element of numeric array P
+ *                       - and type TYPE to an object
+ */
+
+object *_SS_numtype_to_object(char *type, void *p, long n)
+   {int id;
+    object *o;
+
+    id = SC_type_id(type, FALSE);
+
+    if (id == SC_CHAR_I)
+/*       {_SS_NUMTYPE_TO_OBJ(SC_LONG_LONG_I, o, char, p, n);} */
+
+    {char *_p;
+     _p = (char *) p;
+      if (SC_LONG_LONG_I == SC_CHAR_I)
+        o = SS_mk_integer(_p[n]);
+     else if (SC_LONG_LONG_I == SC_BOOL_I)
+        o = SS_mk_boolean("#boolean", _p[n]);
+     else if ((SC_SHORT_I <= SC_LONG_LONG_I) && (SC_LONG_LONG_I <= SC_LONG_LONG_I))
+        o = SS_mk_integer(_p[n]);
+     else if ((SC_FLOAT_I <= SC_LONG_LONG_I) && (SC_LONG_LONG_I <= SC_LONG_DOUBLE_I))
+        o = SS_mk_float(_p[n]);
+     else if ((SC_FLOAT_COMPLEX_I <= SC_LONG_LONG_I) &&
+	      (SC_LONG_LONG_I <= SC_LONG_DOUBLE_COMPLEX_I))
+        o = SS_mk_complex(_p[n]);
+     else if (SC_LONG_LONG_I == SC_QUATERNION_I)
+        o = SS_mk_quaternion(((quaternion *) _p)[n]);}
+
+
+    else if (id == SC_BOOL_I)
+       {_SS_NUMTYPE_TO_OBJ(SC_BOOL_I, o, bool, p, n);}
+
+/* fixed point types */
+    else if (id == SC_SHORT_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, short, p, n);}
+    else if (id == SC_INT_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, int, p, n);}
+    else if (id == SC_LONG_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, long, p, n);}
+    else if (id == SC_LONG_LONG_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, long long, p, n);}
+
+/* floating point types */
+    else if (id == SC_FLOAT_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, float, p, n);}
+    else if (id == SC_DOUBLE_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, double, p, n);}
+    else if (id == SC_LONG_DOUBLE_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, long double, p, n);}
+
+/* complex floating point types */
+    else if (id == SC_FLOAT_COMPLEX_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, float _Complex, p, n);}
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, double _Complex, p, n);}
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, long double _Complex, p, n);}
+/*
+    else if (id == SC_QUATERNION_I)
+       {_SS_NUMTYPE_TO_OBJ(id, o, quaternion, p, n);};
+*/
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_OBJECT_TO_NUMTYPE - set the Nth element of array P which
+ *                       - has type TYPE to the value of object VAL
+ */
+
+void _SS_object_to_numtype(char *type, void *p, long n, object *val)
+   {int id;
+
+    id = SC_type_id(type, FALSE);
+
+    if (id == SC_CHAR_I)
+       {_SS_OBJ_TO_NUMTYPE(char, p, n, id, val);}
+    else if (id == SC_BOOL_I)
+       {_SS_OBJ_TO_NUMTYPE(bool, p, n, id, val);}
+
+/* fixed point types */
+    else if (id == SC_SHORT_I)
+       {_SS_OBJ_TO_NUMTYPE(short, p, n, id, val);}
+    else if (id == SC_INT_I)
+       {_SS_OBJ_TO_NUMTYPE(int, p, n, id, val);}
+    else if (id == SC_LONG_I)
+       {_SS_OBJ_TO_NUMTYPE(long, p, n, id, val);}
+    else if (id == SC_LONG_LONG_I)
+       {_SS_OBJ_TO_NUMTYPE(long long, p, n, id, val);}
+
+/* floating point types */
+    else if (id == SC_FLOAT_I)
+       {_SS_OBJ_TO_NUMTYPE(float, p, n, id, val);}
+    else if (id == SC_DOUBLE_I)
+       {_SS_OBJ_TO_NUMTYPE(double, p, n, id, val);}
+    else if (id == SC_LONG_DOUBLE_I)
+       {_SS_OBJ_TO_NUMTYPE(long double, p, n, id, val);}
+
+/* complex floating point types */
+    else if (id == SC_FLOAT_COMPLEX_I)
+       {_SS_OBJ_TO_NUMTYPE(float _Complex, p, n, id, val);}
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {_SS_OBJ_TO_NUMTYPE(double _Complex, p, n, id, val);}
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+       {_SS_OBJ_TO_NUMTYPE(long double _Complex, p, n, id, val);}
+/*
+    else if (id == SC_QUATERNION_I)
+       {_SS_OBJ_TO_NUMTYPE(quaternion, p, n, id, val);};
+*/
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_NUMTYPE_TO_LIST - convert an array of N numerical elements P
+ *                     - which has type TYPE into a list
+ */
+
+object *_SS_numtype_to_list(char *type, void *p, long n)
+   {int id;
+    object *lst;
+
+    lst = SS_null;
+    id  = SC_type_id(type, FALSE);
+
+    if (id == SC_CHAR_I)
+       {_SS_NUMTYPE_TO_LIST(SC_LONG_LONG_I, lst, char, p, n);}
+
+    else if (id == SC_BOOL_I)
+       {_SS_NUMTYPE_TO_LIST(SC_BOOL_I, lst, bool, p, n);}
+
+/* fixed point types */
+    else if (id == SC_SHORT_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, short, p, n);}
+
+    else if (id == SC_INT_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, int, p, n);}
+
+    else if (id == SC_LONG_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, long, p, n);}
+
+    else if (id == SC_LONG_LONG_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, long long, p, n);}
+
+/* floating point types */
+    else if (id == SC_FLOAT_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, float, p, n);}
+
+    else if (id == SC_DOUBLE_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, double, p, n);}
+
+    else if (id == SC_LONG_DOUBLE_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, long double, p, n);}
+
+/* complex floating point types */
+    else if (id == SC_FLOAT_COMPLEX_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, float _Complex, p, n);}
+
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, double _Complex, p, n);}
+
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, long double _Complex, p, n);}
+/*
+    else if (id == SC_QUATERNION_I)
+       {_SS_NUMTYPE_TO_LIST(id, lst, quaternion, p, n);}
+*/
+    else
+       SS_error("DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
+
+    if (lst != SS_null)
+       lst = SS_reverse(lst);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

@@ -12,34 +12,6 @@
 
 typedef int (*PF_int_dd)(double, double);
 
-#define GET_ARRAY_FP_VALUE(type, arr, n)                                      \
-    {type *p;                                                                 \
-     p = (type *) arr->data;                                                  \
-     ret = SS_mk_float((double) p[n]);}
-
-#define GET_ARRAY_FIX_VALUE(type, arr, n)                                     \
-    {type *p;                                                                 \
-     p = (type *) arr->data;                                                  \
-     ret = SS_mk_integer((BIGINT) p[n]);}
-
-#define SET_ARRAY_FP_VALUE(type, arr, n, val)                                 \
-    {type *p;                                                                 \
-     double v;                                                                \
-     p = (type *) arr->data;                                                  \
-     SS_args(val,                                                             \
-	     SC_DOUBLE_I, &v,                                                 \
-	     0);                                                              \
-     p[n] = (type) v;}
-
-#define SET_ARRAY_FIX_VALUE(type, arr, n, val)                                \
-    {type *p;                                                                 \
-     long v;                                                                  \
-     p = (type *) arr->data;                                                  \
-     SS_args(val,                                                             \
-	     SC_LONG_I, &v,                                                   \
-	     0);                                                              \
-     p[n] = (type) v;}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -240,10 +212,9 @@ static object *_SXI_sub_array(object *argl)
  */
 
 static object *_SXI_array_ref(object *argl)
-   {int id;
-    long n;
+   {long n;
     C_array *arr;
-    object *ret;
+    object *o;
 
     arr = NULL;
     n   = 0L;
@@ -252,7 +223,7 @@ static object *_SXI_array_ref(object *argl)
             SC_LONG_I, &n,
             0);
 
-    ret = SS_null;
+    o = SS_null;
     if (arr != NULL)
        {char type[MAXLINE];
 
@@ -269,30 +240,9 @@ static object *_SXI_array_ref(object *argl)
             if (dp != NULL)
                strcpy(type, dp->type);};
 
-	id = SC_type_id(type, FALSE);
+	o = _SS_numtype_to_object(type, arr->data, n);};
 
-/* floating point types */
-	if (id == SC_FLOAT_I)
-	   {GET_ARRAY_FP_VALUE(float, arr, n);}
-        else if (id == SC_DOUBLE_I)
-	   {GET_ARRAY_FP_VALUE(double, arr, n);}
-        else if (id == SC_LONG_DOUBLE_I)
-	   {GET_ARRAY_FP_VALUE(long double, arr, n);}
-
-/* fixed point types */
-        else if (id == SC_SHORT_I)
-	   {GET_ARRAY_FIX_VALUE(short, arr, n);}
-        else if (id == SC_INT_I)
-	   {GET_ARRAY_FIX_VALUE(int, arr, n);}
-        else if (id == SC_LONG_I)
-	   {GET_ARRAY_FIX_VALUE(long, arr, n);}
-        else if (id == SC_LONG_LONG_I)
-	   {GET_ARRAY_FIX_VALUE(long long, arr, n);}
-
-        else if (id == SC_CHAR_I)
-	   {GET_ARRAY_FIX_VALUE(char, arr, n);};}
-
-    return(ret);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -302,8 +252,7 @@ static object *_SXI_array_ref(object *argl)
  */
 
 static object *_SXI_array_set(object *argl)
-   {int id;
-    long n;
+   {long n;
     C_array *arr;
     object *val;
 
@@ -329,28 +278,7 @@ static object *_SXI_array_set(object *argl)
 	while (_PD_indirection(type))
 	   PD_dereference(type);
 
-	id = SC_type_id(type, FALSE);
-
-/* floating point types */
-        if (id == SC_FLOAT_I)
-	   {SET_ARRAY_FP_VALUE(float, arr, n, val);}
-        else if (id == SC_DOUBLE_I)
-	   {SET_ARRAY_FP_VALUE(double, arr, n, val);}
-        else if (id == SC_LONG_DOUBLE_I)
-	   {SET_ARRAY_FP_VALUE(long double, arr, n, val);}
-
-/* fixed point types */
-        else if (id == SC_SHORT_I)
-	   {SET_ARRAY_FIX_VALUE(short, arr, n, val);}
-        else if (id == SC_INT_I)
-	   {SET_ARRAY_FIX_VALUE(int, arr, n, val);}
-        else if (id == SC_LONG_I)
-	   {SET_ARRAY_FIX_VALUE(long, arr, n, val);}
-        else if (id == SC_LONG_LONG_I)
-	   {SET_ARRAY_FIX_VALUE(long long, arr, n, val);}
-
-        else if (id == SC_CHAR_I)
-	   {SET_ARRAY_FIX_VALUE(char, arr, n, val);};}
+	_SS_object_to_numtype(type, arr->data, n, val);};
 
     return(val);}
 
@@ -405,10 +333,9 @@ object *SX_list_array(object *argl)
 /* _SXI_ARRAY_LIST - turn a numeric array into a list of numbers */
 
 static object *_SXI_array_list(object *argl)
-   {int id;
-    long i, n;
+   {long n;
     char type[MAXLINE];
-    object *obj, *lst;
+    object *lst;
     C_array *arr;
     void *data;
 
@@ -422,73 +349,7 @@ static object *_SXI_array_list(object *argl)
 
     PM_ARRAY_CONTENTS(arr, void, n, type, data);
 
-    lst = SS_null;
-
-    id = SC_type_id(type, FALSE);
-
-/* floating point types */
-    if (id == SC_FLOAT_I)
-       {float *pv;
-	pv = (float *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_float((double) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (id == SC_DOUBLE_I)
-       {double *pv;
-	pv = (double *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_float((double) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {long double *pv;
-	pv = (long double *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_float((double) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-/* fixed point types */
-    else if (id == SC_SHORT_I)
-       {short *pv;
-	pv = (short *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (id == SC_INT_I)
-       {int *pv;
-	pv = (int *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (id == SC_LONG_I)
-       {long *pv;
-        pv = (long *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (id == SC_LONG_LONG_I)
-       {long long *pv;
-	pv = (long long *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else if (id == SC_CHAR_I)
-       {char *pv;
-	pv = (char *) data;
-        for (i = 0L; i < n; i++)
-            {obj = SS_mk_integer((BIGINT) *pv++);
-             lst = SS_mk_cons(obj, lst);};}
-
-    else
-       SS_error("DATA TYPE NOT SUPPORTED - _SXI_ARRAY_LIST", SS_null);
-
-    if (lst != SS_null)
-       lst = SS_reverse(lst);
+    lst = _SS_numtype_to_list(type, data, n);
 
     return(lst);}
 

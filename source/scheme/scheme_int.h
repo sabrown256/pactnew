@@ -26,6 +26,55 @@
 
 #define _SS_GET_C_PROCEDURE_N(_t, _cp, _n)  ((_t) (_cp)->proc[_n])
 
+/* convert an object to a numerical primitive type */
+
+#define _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, _i, _otyp, _o)                        \
+    {_vtyp *_pv;                                                             \
+     _pv = (_vtyp *) _vr;                                                    \
+     if (_otyp == SC_CHAR_I)                                                 \
+        _pv[_i] = (_vtyp) SS_CHARACTER_VALUE(_o);                            \
+     else if (_otyp == SC_BOOL_I)                                            \
+        _pv[_i] = (_vtyp) SS_BOOLEAN_VALUE(_o);                              \
+     else if (_otyp == SC_INT_I)                                             \
+        _pv[_i] = (_vtyp) SS_INTEGER_VALUE(_o);                              \
+     else if (_otyp == SC_FLOAT_I)                                           \
+        _pv[_i] = (_vtyp) SS_FLOAT_VALUE(_o);                                \
+     else if (_otyp == SC_DOUBLE_COMPLEX_I)                                  \
+        _pv[_i] = (_vtyp) SS_COMPLEX_VALUE(_o);                              \
+     else if (_otyp == SC_QUATERNION_I)                                      \
+        _pv[_i] = (_vtyp) (SS_QUATERNION_VALUE(_o)).s;                       \
+     else                                                                    \
+        SS_error("EXPECTED A NUMBER", _o);}
+
+/* convert a numerical primitive type to an object */
+
+#define _SS_NUMTYPE_TO_OBJ(_otyp, _o, _vtyp, _vr, _n)                        \
+    {_vtyp *_p;                                                              \
+     _p = (_vtyp *) _vr;                                                     \
+      if (_otyp == SC_CHAR_I)                                                \
+        _o = SS_mk_integer(_p[_n]);                                          \
+     else if (_otyp == SC_BOOL_I)                                            \
+        _o = SS_mk_boolean("#boolean", _p[_n]);                              \
+     else if ((SC_SHORT_I <= _otyp) && (_otyp <= SC_LONG_LONG_I))            \
+        _o = SS_mk_integer(_p[_n]);                                          \
+     else if ((SC_FLOAT_I <= _otyp) && (_otyp <= SC_LONG_DOUBLE_I))          \
+        _o = SS_mk_float(_p[_n]);                                            \
+     else if ((SC_FLOAT_COMPLEX_I <= _otyp) &&                               \
+	      (_otyp <= SC_LONG_DOUBLE_COMPLEX_I))                           \
+        _o = SS_mk_complex(_p[_n]);                                          \
+     else if (_otyp == SC_QUATERNION_I)                                      \
+        _o = SS_mk_quaternion(((quaternion *) _p)[_n]);}
+
+/* convert a numerical primitive array to a list */
+
+#define _SS_NUMTYPE_TO_LIST(_otyp, _lst, _vtyp, _vr, _n)                     \
+    {long _i;                                                                \
+     object *_o;                                                             \
+     _lst = SS_null;                                                         \
+     for (_i = 0L; _i < _n; _i++)                                            \
+         {_SS_NUMTYPE_TO_OBJ(_otyp, _o, _vtyp, _vr, _i);                     \
+	  _lst = SS_mk_cons(_o, _lst);};}
+
 /*--------------------------------------------------------------------------*/
 
 /*                           STRUCTs and TYPEDEFs                           */
@@ -244,7 +293,12 @@ extern int
 extern void
  _SS_rl_C_proc(C_procedure *cp),
  _SS_install(char* pname, char *pdoc, PFPHand phand,
-	     int n, PFVoid *pr, SS_form ptype);
+	     int n, PFVoid *pr, SS_form ptype),
+ _SS_object_to_numtype(char *type, void *p, long n, object *val);
+
+extern object
+ *_SS_numtype_to_object(char *type, void *p, long n),
+ *_SS_numtype_to_list(char *type, void *p, long n);
 
 
 /* SHPRM1.C declarations */

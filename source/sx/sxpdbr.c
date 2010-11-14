@@ -26,24 +26,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define READ_NUM(_vtyp, _vr, _i, _otyp, _o)                                  \
-    {_vtyp *_pv;                                                             \
-     _pv = (_vtyp *) _vr;                                                    \
-     if (_otyp == SC_INT_I)                                                  \
-        _pv[_i] = (_vtyp) SS_INTEGER_VALUE(_o);                              \
-     else if (_otyp == SC_FLOAT_I)                                           \
-        _pv[_i] = (_vtyp) SS_FLOAT_VALUE(_o);                                \
-     else if (_otyp == SC_DOUBLE_COMPLEX_I)                                  \
-        _pv[_i] = (_vtyp) SS_COMPLEX_VALUE(_o);                              \
-     else if (_otyp == SC_QUATERNION_I)                                      \
-        _pv[_i] = (_vtyp) (SS_QUATERNION_VALUE(_o)).s;                       \
-     else if (_otyp == SC_BOOL_I)                                            \
-        _pv[_i] = (_vtyp) SS_BOOLEAN_VALUE(_o);                              \
-     else                                                                    \
-        SS_error("EXPECTED A NUMBER", _o);}
-
-/*--------------------------------------------------------------------------*/
-
 #define READ_IO(_vtyp, _vr, _n, _o)                                          \
    {int _otyp, _jtyp;                                                        \
     long _i;                                                                 \
@@ -55,7 +37,7 @@
         for (_i = 0; _i < _n; _i++)                                          \
             {_to   = SS_car(_o);                                             \
              _jtyp = SC_arrtype(_to, -1);                                    \
-	     READ_NUM(_vtyp, _vr, _i, _jtyp, _to);                           \
+	     _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, _i, _jtyp, _to);                 \
 	     _to = SS_cdr(_o);                                               \
 	     if (_to != SS_null)                                             \
 		_o = _to;};}                                                 \
@@ -64,9 +46,9 @@
         _ao = SS_VECTOR_ARRAY(_o);                                           \
         for (_i = 0; _i < _n; _i++)                                          \
             {_jtyp = SC_arrtype(_ao[_i], -1);                                \
-	     READ_NUM(_vtyp, _vr, _i, _jtyp, _ao[_i]);};}                    \
+	     _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, _i, _jtyp, _ao[_i]);};}          \
     else                                                                     \
-       READ_NUM(_vtyp, _vr, 0, _otyp, _o);}
+       _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, 0, _otyp, _o);}
 
 /*--------------------------------------------------------------------------*/
 

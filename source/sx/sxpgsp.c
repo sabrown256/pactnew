@@ -2744,10 +2744,9 @@ static object *_SXI_gatgl(object *argl)
  */
 
 static object *_SX_get_attrs_alist(pcons *alst, object *argl)
-   {int i, id, ptr;
+   {int i, ptr;
+    char t[MAXLINE];
     char *name, *typ;
-    long lv;
-    double dv;
     pcons *pc;
     object *o, *rv;
 
@@ -2764,50 +2763,10 @@ static object *_SX_get_attrs_alist(pcons *alst, object *argl)
 	 if (pc == NULL)
 	    continue;
 
-	 typ = pc->cdr_type;
-	 id  = SC_type_id(typ, FALSE);
-
-/* floating point types */
-	 if (id == SC_FLOAT_I)
-	    {dv = *(float *) pc->cdr;
-	     o  = SS_mk_float(dv);
-	     rv = SS_mk_cons(o, rv);}
-
-	 else if (id == SC_DOUBLE_I)
-	    {dv = *(double *) pc->cdr;
-	     o  = SS_mk_float(dv);
-	     rv = SS_mk_cons(o, rv);}
-
-	 else if (id == SC_LONG_DOUBLE_I)
-	    {dv = *(long double *) pc->cdr;
-	     o  = SS_mk_float(dv);
-	     rv = SS_mk_cons(o, rv);}
-
-
-/* fixed point types */
-	 else if (id == SC_SHORT_I)
-	    {lv = *(short *) pc->cdr;
-	     o  = SS_mk_integer(lv);
-	     rv = SS_mk_cons(o, rv);}
-
-	 else if (id == SC_INT_I)
-	    {lv = *(int *) pc->cdr;
-	     o  = SS_mk_integer(lv);
-	     rv = SS_mk_cons(o, rv);}
-
-	 else if (id == SC_LONG_I)
-	    {lv = *(long *) pc->cdr;
-	     o  = SS_mk_integer(lv);
-	     rv = SS_mk_cons(o, rv);}
-
-	 else if (id == SC_LONG_LONG_I)
-	    {lv = *(long long *) pc->cdr;
-	     o  = SS_mk_integer(lv);
-	     rv = SS_mk_cons(o, rv);}
-
-	 else if (id == SC_CHAR_I)
-	    {o  = SS_mk_string((char *) pc->cdr);
-	     rv = SS_mk_cons(o, rv);};
+	 SC_strncpy(t, MAXLINE, pc->cdr_type, -1);
+	 typ = PD_dereference(t);
+	 o   = _SS_numtype_to_object(typ, pc->cdr, 1);
+	 rv  = SS_mk_cons(o, rv);
 
 	 SFREE(name);};
 
