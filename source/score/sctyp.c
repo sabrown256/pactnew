@@ -498,30 +498,27 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CONVERT - convert data from one binary format to another
- *            - if destination pointer is NULL, space is allocated
- *            - if types are the same do nothing but return -1
- *            - arguments:
- *            -     dtype - type of destination data
- *            -     d     - pointer to converted data destination
- *            -     stype - type of source data
- *            -     s     - pointer to data to be converted
- *            -     n     - number of data items
- *            -     flag  - free source data flag
+/* SC_CONVERT_ID - convert data from one binary format to another
+ *               - if destination pointer is NULL, space is allocated
+ *               - if types are the same do nothing but return -1
+ *               - arguments:
+ *               -     did  - type of destination data
+ *               -     d    - pointer to converted data destination
+ *               -     sid  - type of source data
+ *               -     s    - pointer to data to be converted
+ *               -     n    - number of data items
+ *               -     flag - free source data flag
  */
 
-int SC_convert(char *dtype, void **pd, char *stype, void *s,
-               int n, int flag)
-   {int i, rv, sid, did, bpi;
+int SC_convert_id(int did, void **pd, int sid, void *s, int n, int flag)
+   {int i, rv, bpi;
 
     if (_SC.bmx == 0)
        SC_fix_lmt(sizeof(long long), &_SC.bmn, &_SC.bmx, NULL);
 
-    rv  = FALSE;
-    sid = SC_type_id(stype, FALSE);
-    did = SC_type_id(dtype, FALSE);
+    rv = FALSE;
 
-    if (strcmp(dtype, stype) == 0)
+    if (sid == did)
        {char *d;
 
         d = (char *) *pd;
@@ -595,6 +592,31 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s,
 
     if (flag && (rv == TRUE))
        SFREE(s);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CONVERT - convert data from one binary format to another
+ *            - if destination pointer is NULL, space is allocated
+ *            - if types are the same do nothing but return -1
+ *            - arguments:
+ *            -     dtype - type of destination data
+ *            -     d     - pointer to converted data destination
+ *            -     stype - type of source data
+ *            -     s     - pointer to data to be converted
+ *            -     n     - number of data items
+ *            -     flag  - free source data flag
+ */
+
+int SC_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag)
+   {int rv, sid, did;
+
+    sid = SC_type_id(stype, FALSE);
+    did = SC_type_id(dtype, FALSE);
+
+    rv = SC_convert_id(did, pd, sid, s, n, flag);
 
     return(rv);}
 

@@ -220,53 +220,47 @@ object *SS_install_cf(char *name, char *doc, ...)
  *               -   foo           - evaluates to value of foo
  */
 
-object *SS_install_cv(char *name, void *pval, int type)
-   {object *var;
-    char *sval, *typ = NULL;
-    long lval;
-    double dval;
+object *SS_install_cv(char *name, void *pval, int ityp)
+   {char *typ;
+    object *var;
 
+    typ = SC_type_name(ityp);
     var = SS_mk_variable(name, SS_null);
     SS_UNCOLLECT(var);
 
-    if (type == SC_CHAR_I)
-       {lval = *(char *) pval;
-	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
-	typ = SC_CHAR_S;}
+    if (ityp == SC_CHAR_I)
+       {long long v;
+	v = *(char *) pval;
+	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
 
-    else if (type == SC_STRING_I)
-       {sval = (char *) pval;
-	SS_def_var(var, SS_mk_string(sval), SS_Global_Env);
-	typ = SC_STRING_S;}
+    else if (ityp == SC_STRING_I)
+       {char *v;
+	v = (char *) pval;
+	SS_def_var(var, SS_mk_string(v), SS_Global_Env);}
 
-/* fixed point types */
-    else if (type == SC_SHORT_I)
-       {lval = *(short *) pval;
-	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
-	typ = SC_SHORT_S;}
+/* fixed point types (proper) */
+    else if ((SC_SHORT_I <= ityp) && (ityp <= SC_LONG_LONG_I))
+       {long long *pv, v;
+	pv = &v;
+	SC_convert_id(SC_LONG_LONG_I, &pv, ityp, pval, 1, FALSE);
+	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
 
-    else if (type == SC_INT_I)
-       {lval = *(int *) pval;
-	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
-	typ = SC_INT_S;}
+/* floating point types (proper) */
+    else if ((SC_FLOAT_I <= ityp) && (ityp <= SC_LONG_DOUBLE_I))
+       {long double *pv, v;
+	pv = &v;
+	SC_convert_id(SC_LONG_DOUBLE_I, &pv, ityp, pval, 1, FALSE);
+	SS_def_var(var, SS_mk_float(v), SS_Global_Env);}
 
-    else if (type == SC_LONG_I)
-       {lval = *(long *) pval;
-	SS_def_var(var, SS_mk_integer((BIGINT) lval), SS_Global_Env);
-	typ = SC_LONG_S;}
+/* complex floating point types (proper) */
+    else if ((SC_FLOAT_COMPLEX_I <= ityp) &&
+	     (ityp <= SC_LONG_DOUBLE_COMPLEX_I))
+       {long double _Complex *pv, v;
+	pv = &v;
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &pv, ityp, pval, 1, FALSE);
+	SS_def_var(var, SS_mk_complex(v), SS_Global_Env);}
 
-/* floating point types */
-    else if (type == SC_FLOAT_I)
-       {dval = *(float *) pval;
-	SS_def_var(var, SS_mk_float(dval), SS_Global_Env);
-	typ = SC_FLOAT_S;}
-
-    else if (type == SC_DOUBLE_I)
-       {dval = *(double *) pval;
-	SS_def_var(var, SS_mk_float(dval), SS_Global_Env);
-	typ = SC_DOUBLE_S;}
-
-    else if (type == SS_OBJECT_I)
+    else if (ityp == SS_OBJECT_I)
        {SS_def_var(var, (object *) pval, SS_Global_Env);
 	typ = SS_POBJECT_S;}
 
