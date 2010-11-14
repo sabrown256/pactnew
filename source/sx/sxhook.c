@@ -42,7 +42,7 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 	else if (c == SS_VARIABLE_I)
 	   strcpy(new_mem, "variable *val");
 
-	else if ((c == SS_BOOLEAN_I) ||
+	else if ((c == SC_BOOL_I) ||
 		 (c == SS_EOF_I) ||
 		 (c == SS_NULL_I))
 	   strcpy(new_mem, "boolean *val");

@@ -1082,7 +1082,7 @@ char *SS_object_type_name(object *o, char *atype)
     else if (itype == SS_PROCEDURE_I)
        strcpy(atype, "procedure");
 
-    else if (itype == SS_BOOLEAN_I)
+    else if (itype == SC_BOOL_I)
        strcpy(atype, "boolean");
 
     else if (itype == SS_INPUT_PORT_I)

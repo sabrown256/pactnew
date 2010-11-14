@@ -23,7 +23,7 @@
         _pv[_i] = (_type) SS_COMPLEX_VALUE(_o);                              \
      else if (_ityp == SC_QUATERNION_I)                                      \
         _pv[_i] = (_type) (SS_QUATERNION_VALUE(_o)).s;                       \
-     else if ((_ityp == SC_BOOL_I) || (_ityp == SS_BOOLEAN_I))               \
+     else if (_ityp == SC_BOOL_I)                                            \
         _pv[_i] = (_type) SS_BOOLEAN_VALUE(_o);                              \
      else                                                                    \
         SS_error("EXPECTED A NUMBER", _o);}
