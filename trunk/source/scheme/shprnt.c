@@ -1130,7 +1130,7 @@ void SS_wr_atm(object *obj, object *strm)
 	else if (ityp == SS_NULL_I)
 	   strcpy(t, "()");
 
-	else if ((ityp == SS_EOF_I) || (ityp == SS_BOOLEAN_I))
+	else if ((ityp == SS_EOF_I) || (ityp == SC_BOOL_I))
 	   snprintf(t, MAXLINE, "%s", SS_BOOLEAN_NAME(obj));
 
 	else

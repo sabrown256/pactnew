@@ -521,7 +521,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_booleanp(obj) (SC_arrtype(obj, -1) == SS_BOOLEAN_I)
+#define SS_booleanp(obj) (SC_arrtype(obj, -1) == SC_BOOL_I)
 
 /*--------------------------------------------------------------------------*/
 
@@ -892,7 +892,6 @@ extern int
  SS_PROCEDURE_I,
  SS_CONS_I,
  SS_VARIABLE_I,
- SS_BOOLEAN_I,
  SS_INPUT_PORT_I,
  SS_OUTPUT_PORT_I,
  SS_EOF_I,

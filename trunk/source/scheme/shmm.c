@@ -24,7 +24,6 @@ int
  SS_PROCEDURE_I   = 124,
  SS_CONS_I        = 124,
  SS_VARIABLE_I    = 125,
- SS_BOOLEAN_I     = 127,
  SS_INPUT_PORT_I  = 128,
  SS_OUTPUT_PORT_I = 129,
  SS_EOF_I         = 130,
@@ -828,7 +827,7 @@ object *SS_mk_boolean(char *s, int v)
     bp->name  = SC_strsavef(s, "char*:SS_MK_BOOLEAN:name");
     bp->value = v;
 
-    op = SS_mk_object(bp, SS_BOOLEAN_I, SELF_EV, bp->name,
+    op = SS_mk_object(bp, SC_BOOL_I, SELF_EV, bp->name,
 		      SS_wr_atm, _SS_rl_boolean);
 
     return(op);}
@@ -1034,8 +1033,6 @@ void SS_register_types(void)
 					_SS_rl_cons);
     SS_VARIABLE_I    = SC_register_type("variable",    sizeof(variable),
 					_SS_rl_variable);
-    SS_BOOLEAN_I     = SC_register_type("boolean",     sizeof(SS_boolean),
-					_SS_rl_boolean);
     SS_INPUT_PORT_I  = SC_register_type("input port",  sizeof(input_port),
 					_SS_rl_inport);
     SS_OUTPUT_PORT_I = SC_register_type("output port", sizeof(output_port),

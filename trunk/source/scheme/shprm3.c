@@ -747,7 +747,7 @@ static int _SS_eqv(object *o1, object *o2)
     else if (ityp == SS_VARIABLE_I)
        rv = (strcmp(SS_VARIABLE_NAME(o1), SS_VARIABLE_NAME(o2)) == 0);
 
-    else if (ityp == SS_BOOLEAN_I)
+    else if (ityp == SC_BOOL_I)
        rv = (SS_BOOLEAN_VALUE(o1) == SS_BOOLEAN_VALUE(o2));
 
     else if (ityp == SS_PROCEDURE_I)
