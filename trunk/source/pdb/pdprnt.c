@@ -10,8 +10,6 @@
 
 #include "pdb_int.h"
 
-#define PD_N_FORMATS 14
-
 #define LINE_SIZE 90
 
 typedef int (*PFPrnt)(FILE *fp, void *p, int i, int mode);
@@ -39,10 +37,10 @@ long
 
 char
  *PD_no_print_member = NULL,
- *PD_print_formats1[PD_N_FORMATS],
- *PD_print_formats2[PD_N_FORMATS],
- *PD_user_formats1[PD_N_FORMATS],
- *PD_user_formats2[PD_N_FORMATS];
+ *PD_print_formats1[PD_N_PRIMITIVES],
+ *PD_print_formats2[PD_N_PRIMITIVES],
+ *PD_user_formats1[PD_N_PRIMITIVES],
+ *PD_user_formats2[PD_N_PRIMITIVES];
 
 static char
  *_PD_type_names[] = { "char", "bit",
@@ -1265,7 +1263,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
 void _PD_set_user_defaults(void)
    {int i;
 
-    for (i = 0; i < PD_N_FORMATS; i++)
+    for (i = 0; i < PD_N_PRIMITIVES; i++)
         {if (PD_user_formats1[i] != NULL)
 	    {SFREE(PD_user_formats1[i]);};
 
@@ -1285,7 +1283,7 @@ void _PD_set_user_defaults(void)
 void _PD_set_user_formats(void)
    {int i;
 
-    for (i = 0; i < PD_N_FORMATS; i++)
+    for (i = 0; i < PD_N_PRIMITIVES; i++)
         {if (PD_user_formats1[i] != NULL)
 	    {SFREE(PD_print_formats1[i]);
 	     PD_print_formats1[i] = SC_strsavef(PD_user_formats1[i],
@@ -1374,7 +1372,7 @@ void _PD_set_format_defaults(void)
     PD_print_formats1[SC_BOOL_I] = t;
 
 /* PD_print_formats2 is used for arrays */
-    for (i = 0; i < PD_N_FORMATS; i++)
+    for (i = 0; i < PD_N_PRIMITIVES; i++)
         {if (PD_print_formats2[i] != NULL)
             SFREE(PD_print_formats2[i]);
 

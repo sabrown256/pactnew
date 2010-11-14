@@ -205,33 +205,14 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
 /* _H5_GET_ALIGNMENT - return the alignment for type TYPE */
 
 static int _H5_get_alignment(PDBfile *file, char *type)
-   {int id, result;
+   {int id, resut;
+    static algn[PN_N_PRIMITIVES] = { 0, 0, 0, 0,
+                                     2, 4, 4, 4,  /* fixed point types */
+                                     4, 4, 4,     /* floating point types */
+                                     0, 0, 0 };   /* complex floating point types */
 
     id = SC_type_id(type, TRUE);
-
-    if (id == SC_CHAR_I)
-       result = 1;
-
-/* fix point types */
-    else if (id == SC_SHORT_I)
-       result = 2;
-    else if (id == SC_INT_I)
-       result = 4;
-    else if (id == SC_LONG_I)
-       result = 4;
-    else if (id == SC_LONG_LONG_I)
-       result = 4;
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       result = 4;
-    else if (id == SC_DOUBLE_I)
-       result = 4;
-    else if (id == SC_LONG_DOUBLE_I)
-       result = 4;
-
-    else
-       result = 0;  /* DEFAULTS TO: no alignment */
+    result = algn[id];
 
     return(result);}
 

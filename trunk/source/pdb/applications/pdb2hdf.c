@@ -73,6 +73,10 @@ static hsize_t *PDB_to_HDF_dims(dm, rank)
 static int PDB_to_HDF_ptype(defstr *dp, hid_t *datatype)
    {int id, rv;
     char s[MAXLINE];
+    static hid_t hfx[] = { H5T_NATIVE_SHORT, H5T_NATIVE_INT,
+			   H5T_NATIVE_LONG,  H5T_NATIVE_LONG_LONG };
+    static hid_t hfp[] = { H5T_NATIVE_FLOAT, H5T_NATIVE_DOUBLE,
+			   H5T_NATIVE_LONG_DOUBLE };
 
     strcpy(s, dp->type);
     id = SC_type_id(s, FALSE);
@@ -82,41 +86,21 @@ static int PDB_to_HDF_ptype(defstr *dp, hid_t *datatype)
     if (_PD_indirection(s))
        rv = CONTAINS_INDIRECTION;
 
-/* check for floating point types */
+/* check for floating point types (proper) */
     else if (dp->format != NULL)
-       {if (id == SC_FLOAT_I)
-           {*datatype = H5T_NATIVE_FLOAT;
-	    rv = TRUE;}
+       {if ((SC_FLOAT_I <= id) && (id <= SC_LONG_DOUBLE_I))
+           {*datatype = hfp[id-SC_FLOAT_I];
+	    rv        = TRUE;};}
 
-        else if (id == SC_DOUBLE_I)
-	   {*datatype = H5T_NATIVE_DOUBLE;
-	    rv = TRUE;}
-
-        else if (id == SC_LONG_DOUBLE_I)
-	   {*datatype = H5T_NATIVE_DOUBLE;
-	    rv = TRUE;};}
-
-/* check for fixed point types */
+/* check for fixed point types (proper) */
     else if (dp->convert >= 0)
-       {if (id == SC_SHORT_I)
-	   {*datatype = H5T_NATIVE_SHORT;
-	    rv = TRUE;}
-
-	else if (id == SC_INT_I)
-	   {*datatype = H5T_NATIVE_INT;
-	    rv = TRUE;}
-
-	else if (id == SC_LONG_I)
-	   {*datatype = H5T_NATIVE_LONG;
-	    rv = TRUE;}
-
-	else if (id == SC_LONG_LONG_I)
-	   {*datatype = H5T_NATIVE_LONG;
-	    rv = TRUE;}
+       {if ((SC_SHORT_I <= id) && (id <= SC_LONG_LONG_I))
+           {*datatype = hfx[id-SC_SHORT_I];
+	    rv        = TRUE;}
 
 	else if (id == SC_CHAR_I)
 	   {*datatype = H5T_NATIVE_CHAR;
-	    rv = TRUE;};};
+	    rv        = TRUE;};};
 
     return(rv);}
 

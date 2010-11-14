@@ -242,14 +242,14 @@ object *SS_install_cv(char *name, void *pval, int ityp)
     else if ((SC_SHORT_I <= ityp) && (ityp <= SC_LONG_LONG_I))
        {long long *pv, v;
 	pv = &v;
-	SC_convert_id(SC_LONG_LONG_I, &pv, ityp, pval, 1, FALSE);
+	SC_convert_id(SC_LONG_LONG_I, (void **) &pv, ityp, pval, 1, FALSE);
 	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
 
 /* floating point types (proper) */
     else if ((SC_FLOAT_I <= ityp) && (ityp <= SC_LONG_DOUBLE_I))
        {long double *pv, v;
 	pv = &v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &pv, ityp, pval, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, ityp, pval, 1, FALSE);
 	SS_def_var(var, SS_mk_float(v), SS_Global_Env);}
 
 /* complex floating point types (proper) */
@@ -257,7 +257,7 @@ object *SS_install_cv(char *name, void *pval, int ityp)
 	     (ityp <= SC_LONG_DOUBLE_COMPLEX_I))
        {long double _Complex *pv, v;
 	pv = &v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &pv, ityp, pval, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, ityp, pval, 1, FALSE);
 	SS_def_var(var, SS_mk_complex(v), SS_Global_Env);}
 
     else if (ityp == SS_OBJECT_I)
