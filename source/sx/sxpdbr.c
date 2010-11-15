@@ -10,48 +10,6 @@
  
 #include "sx_int.h"
 
-/*--------------------------------------------------------------------------*/
-
-#define READ_OBJ(_vr, _i, _otyp, _o)                                         \
-    {if (_otyp == SC_INT_I)                                                  \
-        {int *pv;                                                            \
-	 pv     = (int *) _vr;                                               \
-	 pv[_i] = (int) SS_INTEGER_VALUE(_o);}                               \
-    else if (_otyp == SC_FLOAT_I)                                            \
-       {float *pv;                                                           \
-	pv     = (float *) _vr;                                              \
-	pv[_i] = (char) SS_FLOAT_VALUE(_o);}                                 \
-    else                                                                     \
-       SS_error("EXPECTED A NUMBER", _o);}
-
-/*--------------------------------------------------------------------------*/
-
-#define READ_IO(_vtyp, _vr, _n, _o)                                          \
-   {int _otyp, _jtyp;                                                        \
-    long _i;                                                                 \
-    _otyp = SC_arrtype(_o, -1);                                              \
-    if (_otyp == SS_CONS_I)                                                  \
-       {object *_to;                                                         \
-        if (SS_consp(SS_car(_o)))                                            \
-	   _o = SS_car(_o);                                                  \
-        for (_i = 0; _i < _n; _i++)                                          \
-            {_to   = SS_car(_o);                                             \
-             _jtyp = SC_arrtype(_to, -1);                                    \
-	     _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, _i, _jtyp, _to);                 \
-	     _to = SS_cdr(_o);                                               \
-	     if (_to != SS_null)                                             \
-		_o = _to;};}                                                 \
-    else if (_otyp == SS_VECTOR_I)                                           \
-       {object **_ao;                                                        \
-        _ao = SS_VECTOR_ARRAY(_o);                                           \
-        for (_i = 0; _i < _n; _i++)                                          \
-            {_jtyp = SC_arrtype(_ao[_i], -1);                                \
-	     _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, _i, _jtyp, _ao[_i]);};}          \
-    else                                                                     \
-       _SS_OBJ_TO_NUMTYPE(_vtyp, _vr, 0, _otyp, _o);}
-
-/*--------------------------------------------------------------------------*/
-
 static void
  _SX_rd_indirection_list(object *obj, PDBfile *file, char **vr, char *type), 
  _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp),
@@ -101,7 +59,7 @@ static void _SX_rd_indirection_list(object *obj, PDBfile *file,
    {long bpi, nitems;
     char *pv;
 
-    nitems = (long) _SX_get_object_length(obj);
+    nitems = _SS_get_object_length(obj);
 
     if (nitems == 0L)
        *vr = NULL;
@@ -180,99 +138,11 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
  */
 
 static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
-   {int id, ityp;
-    char *msg, *type;
+   {char *type;
 
     type = dp->type;
-    id   = SC_type_id(type, FALSE);
 
-/* print out the type */
-    if (id == SC_CHAR_I)
-       {ityp = SC_arrtype(obj, -1);
-	if (ityp == SC_STRING_I)
-	   strncpy(vr, SS_STRING_TEXT(obj), nitems);
-	else if (ityp == SS_CONS_I)
-	   strncpy(vr, SS_STRING_TEXT(SS_car(obj)), nitems);
-        else
-	   SS_error("EXPECTED A STRING - _SX_RD_IO_LIST", obj);
-
-        return;};
-
-/* only need to check non-char types 
- * NOTE: the '\0' terminator on char strings cause the following
- *       test to fail unnecessarily (DRS.SCM for example)
- */
-    if (nitems < (long) _SX_get_object_length(obj))
-       {msg = SC_dsnprintf(FALSE, "DATA TOO LONG FOR TYPE %s - _SX_RD_IO_LIST",
-			   type);
-        SS_error(msg, obj);};
-
-/* fixed point types */
-    if (id == SC_SHORT_I)
-       {READ_IO(short, vr, nitems, obj);}
-
-    else if (id == SC_INT_I)
-       {READ_IO(int, vr, nitems, obj);}
-
-    else if (id == SC_LONG_I)
-       {READ_IO(long, vr, nitems, obj);}
-
-    else if (id == SC_LONG_LONG_I)
-       {READ_IO(long long, vr, nitems, obj);}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {READ_IO(float, vr, nitems, obj);}
- 
-    else if (id == SC_DOUBLE_I)
-       {READ_IO(double, vr, nitems, obj);}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {READ_IO(long double, vr, nitems, obj);}
-
-/* complex floating point types */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {READ_IO(float _Complex, vr, nitems, obj);}
-
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {READ_IO(double _Complex, vr, nitems, obj);}
-
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {READ_IO(long double _Complex, vr, nitems, obj);}
-
-    else if (id == SC_BOOL_I)
-       {READ_IO(bool, vr, nitems, obj);}
-
-    else
-#if 0
-       {int jtyp;
-
-        ityp = SC_arrtype(obj, -1);
-	if (ityp == SS_CONS_I)
-	   {object *to;
-
-	    if (SS_consp(SS_car(obj)))
-	       obj = SS_car(obj);
-
-	    for (i = 0; i < nitems; i++)
-	        {to   = SS_car(obj);
-		 jtyp = SC_arrtype(to, -1);
-                 READ_OBJ(vr, i, jtyp, to)
-		 to = SS_cdr(obj);
-		 if (to != SS_null)
-		    obj = to;};}
-
-	else if (ityp == SS_VECTOR_I)
-	   {object **ao;
-	    ao = SS_VECTOR_ARRAY(obj);
-	    for (i = 0; i < nitems; i++)
-	        {jtyp = SC_arrtype(ao[i], -1);
-                 READ_OBJ(vr, i, jtyp, ao[i]);};}
-	else
-	   READ_OBJ(vr, 0, ityp, obj);}
-#else
-       SS_error("ILLEGAL TYPE - _SX_RD_IO_LIST", SS_mk_string(type));
-#endif
+    _SS_list_to_numtype(type, vr, nitems, obj);
 
     return;}
 

@@ -23,12 +23,14 @@ static object *_SS_exa_var(void *vr, int type)
     object *ret;
 
     ret = SS_f;
+
     if (type == SC_CHAR_I)
        {cv = *(char *) vr;
 	if (SS_interactive)
 	   PRINT(stdout, "    %c", cv);
 	ret = SS_mk_integer((BIGINT) cv);}
 
+/* fixed point types */
     else if (type == SC_INT_I)
        {iv = *(int *) vr;
 	if (SS_interactive)
@@ -41,6 +43,7 @@ static object *_SS_exa_var(void *vr, int type)
 	   PRINT(stdout, "    %ld", lv);
 	ret = SS_mk_integer((BIGINT) lv);}
 
+/* floating point types */
     else if (type == SC_DOUBLE_I)
        {rv = *(double *) vr;
 	if (SS_interactive)
@@ -109,6 +112,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	else
 	   SS_error("OBJECT NOT CHAR - _SS_SET_VAR", vl);}
 
+/* fixed point types */
     else if (type == SC_INT_I)
        {if (lv != -HUGE_INT)
 	   *((int *) vr) = (int) lv;
@@ -129,6 +133,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 	else
 	   SS_error("OBJECT NOT LONG INT - _SS_SET_VAR", vl);}
 
+/* floating point types */
     else if (type == SC_DOUBLE_I)
        {if (dv != -HUGE)
 	   *((double *) vr) = dv;

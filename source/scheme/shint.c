@@ -484,6 +484,8 @@ object *SS_define_constant(int n, ...)
 
     while ((name = SC_VA_ARG(char *)) != NULL)
       {type = SC_VA_ARG(int);
+
+/* fixed point types */
        if ((type == SC_CHAR_I) ||
 	   (type == SC_SHORT_I) ||
 	   (type == SC_INT_I) ||
@@ -499,6 +501,7 @@ object *SS_define_constant(int n, ...)
 	  {il  = SC_VA_ARG(long long);
 	   val = SS_mk_integer(il);}
 
+/* floating point types */
        else if ((type == SC_FLOAT_I) ||
 		(type == SC_DOUBLE_I))
 	  {dc  = SC_VA_ARG(double);
@@ -614,6 +617,8 @@ static object *_SS_make_list(int n, int *type, void **ptr)
     lst = SS_null;
     for (i = 0; i < n; i++)
         {ityp = type[i];
+
+/* fixed point types */
 	 if ((ityp == SC_SHORT_I) ||
 	     (ityp == SC_INT_I) ||
 	     (ityp == SC_ENUM_I))
@@ -628,6 +633,7 @@ static object *_SS_make_list(int n, int *type, void **ptr)
 	    {ll   = *(long long *) ptr[i];
 	     lst = SS_mk_cons(SS_mk_integer(ll), lst);}
 
+/* floating point types */
 	 else if (ityp == SC_FLOAT_I)
 	    {d   = *(float *) ptr[i];
 	     lst = SS_mk_cons(SS_mk_float(d), lst);}

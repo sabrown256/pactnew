@@ -227,17 +227,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
        {void *vaddr;
         int itype;
 
-	itype = 0;
-        if (strncmp(vtype, SC_INT_S, 3) == 0)
-           itype = SC_INT_I;
-        else if (strcmp(vtype, SC_DOUBLE_S) == 0)
-           itype = SC_DOUBLE_I;
-        else if (strcmp(vtype, "REAL") == 0)
-           itype = SC_REAL_I;
-        else if (strcmp(vtype, SC_CHAR_S) == 0)
-           itype = SC_CHAR_I;
-        else if (strcmp(vtype, SC_STRING_S) == 0)
-           itype = SC_STRING_I;
+	itype = SC_type_id(vtype, FALSE);
 
         PA_CONNECT(vaddr, vname, FALSE);
 
@@ -473,14 +463,9 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
 
     _PA_install_var(vname, pp);
 
-    itype = 0;
-    if (strcmp(vtype, SC_INT_S) == 0)
-       itype = SC_INT_I;
-    else if (strcmp(vtype, SC_DOUBLE_S) == 0)
-       itype = SC_DOUBLE_I;
-    else if (strcmp(vtype, SC_CHAR_S) == 0)
-       itype = SC_CHAR_I;
-    else
+    itype = SC_type_id(vtype, FALSE);
+
+    if ((itype < 0) || (SC_LONG_DOUBLE_COMPLEX_I < itype))
        PA_ERR(TRUE,
               "TYPE %s UNSUPPORTED FOR SCALARS - PA_INST_SCALAR");
 

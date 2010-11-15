@@ -1064,6 +1064,33 @@ void SS_register_types(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_GET_OBJECT_LENGTH - compute the number of items in a object */
+
+int _SS_get_object_length(object *obj)
+   {int ni, ityp;
+
+    ityp = SC_arrtype(obj, -1);
+    if (ityp == SS_CONS_I)
+       ni = SS_length(obj);
+
+    else if (ityp == SS_VECTOR_I)
+       ni = SS_VECTOR_LENGTH(obj);
+
+    else if (ityp == SC_STRING_I)
+       ni = SS_STRING_LENGTH(obj) + 1;
+
+    else if ((ityp == SC_INT_I) ||
+	     (ityp == SC_FLOAT_I))
+       ni = 1;
+
+    else
+       ni = 0;
+
+    return(ni);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_NUMTYPE_TO_OBJECT - convert the Nth element of numeric array P
  *                       - and type TYPE to an object
  */
@@ -1075,25 +1102,7 @@ object *_SS_numtype_to_object(char *type, void *p, long n)
     id = SC_type_id(type, FALSE);
 
     if (id == SC_CHAR_I)
-/*       {_SS_NUMTYPE_TO_OBJ(SC_LONG_LONG_I, o, char, p, n);} */
-
-    {char *_p;
-     _p = (char *) p;
-      if (SC_LONG_LONG_I == SC_CHAR_I)
-        o = SS_mk_integer(_p[n]);
-     else if (SC_LONG_LONG_I == SC_BOOL_I)
-        o = SS_mk_boolean("#boolean", _p[n]);
-     else if ((SC_SHORT_I <= SC_LONG_LONG_I) && (SC_LONG_LONG_I <= SC_LONG_LONG_I))
-        o = SS_mk_integer(_p[n]);
-     else if ((SC_FLOAT_I <= SC_LONG_LONG_I) && (SC_LONG_LONG_I <= SC_LONG_DOUBLE_I))
-        o = SS_mk_float(_p[n]);
-     else if ((SC_FLOAT_COMPLEX_I <= SC_LONG_LONG_I) &&
-	      (SC_LONG_LONG_I <= SC_LONG_DOUBLE_COMPLEX_I))
-        o = SS_mk_complex(_p[n]);
-     else if (SC_LONG_LONG_I == SC_QUATERNION_I)
-        o = SS_mk_quaternion(((quaternion *) _p)[n]);}
-
-
+       {_SS_NUMTYPE_TO_OBJ(SC_LONG_LONG_I, o, char, p, n);}
     else if (id == SC_BOOL_I)
        {_SS_NUMTYPE_TO_OBJ(SC_BOOL_I, o, bool, p, n);}
 
@@ -1127,54 +1136,6 @@ object *_SS_numtype_to_object(char *type, void *p, long n)
        {_SS_NUMTYPE_TO_OBJ(id, o, quaternion, p, n);};
 */
     return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SS_OBJECT_TO_NUMTYPE - set the Nth element of array P which
- *                       - has type TYPE to the value of object VAL
- */
-
-void _SS_object_to_numtype(char *type, void *p, long n, object *val)
-   {int id;
-
-    id = SC_type_id(type, FALSE);
-
-    if (id == SC_CHAR_I)
-       {_SS_OBJ_TO_NUMTYPE(char, p, n, id, val);}
-    else if (id == SC_BOOL_I)
-       {_SS_OBJ_TO_NUMTYPE(bool, p, n, id, val);}
-
-/* fixed point types */
-    else if (id == SC_SHORT_I)
-       {_SS_OBJ_TO_NUMTYPE(short, p, n, id, val);}
-    else if (id == SC_INT_I)
-       {_SS_OBJ_TO_NUMTYPE(int, p, n, id, val);}
-    else if (id == SC_LONG_I)
-       {_SS_OBJ_TO_NUMTYPE(long, p, n, id, val);}
-    else if (id == SC_LONG_LONG_I)
-       {_SS_OBJ_TO_NUMTYPE(long long, p, n, id, val);}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {_SS_OBJ_TO_NUMTYPE(float, p, n, id, val);}
-    else if (id == SC_DOUBLE_I)
-       {_SS_OBJ_TO_NUMTYPE(double, p, n, id, val);}
-    else if (id == SC_LONG_DOUBLE_I)
-       {_SS_OBJ_TO_NUMTYPE(long double, p, n, id, val);}
-
-/* complex floating point types */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {_SS_OBJ_TO_NUMTYPE(float _Complex, p, n, id, val);}
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {_SS_OBJ_TO_NUMTYPE(double _Complex, p, n, id, val);}
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {_SS_OBJ_TO_NUMTYPE(long double _Complex, p, n, id, val);}
-/*
-    else if (id == SC_QUATERNION_I)
-       {_SS_OBJ_TO_NUMTYPE(quaternion, p, n, id, val);};
-*/
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1239,6 +1200,130 @@ object *_SS_numtype_to_list(char *type, void *p, long n)
        lst = SS_reverse(lst);
 
     return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_OBJECT_TO_NUMTYPE - set the Nth element of array P which
+ *                       - has type TYPE to the value of object VAL
+ */
+
+void _SS_object_to_numtype(char *type, void *p, long n, object *val)
+   {int vid, oid;
+
+    vid = SC_type_id(type, FALSE);
+    oid = SC_arrtype(val, -1);
+
+    if (vid == SC_CHAR_I)
+       {_SS_OBJ_TO_NUMTYPE(char, vid, p, n, oid, val);}
+    else if (vid == SC_BOOL_I)
+       {_SS_OBJ_TO_NUMTYPE(bool, vid, p, n, oid, val);}
+
+/* fixed point types */
+    else if (vid == SC_SHORT_I)
+       {_SS_OBJ_TO_NUMTYPE(short, vid, p, n, oid, val);}
+    else if (vid == SC_INT_I)
+       {_SS_OBJ_TO_NUMTYPE(int, vid, p, n, oid, val);}
+    else if (vid == SC_LONG_I)
+       {_SS_OBJ_TO_NUMTYPE(long, vid, p, n, oid, val);}
+    else if (vid == SC_LONG_LONG_I)
+       {_SS_OBJ_TO_NUMTYPE(long long, vid, p, n, oid, val);}
+
+/* floating point types */
+    else if (vid == SC_FLOAT_I)
+       {_SS_OBJ_TO_NUMTYPE(float, vid, p, n, oid, val);}
+    else if (vid == SC_DOUBLE_I)
+       {_SS_OBJ_TO_NUMTYPE(double, vid, p, n, oid, val);}
+    else if (vid == SC_LONG_DOUBLE_I)
+       {_SS_OBJ_TO_NUMTYPE(long double, vid, p, n, oid, val);}
+
+/* complex floating point types */
+    else if (vid == SC_FLOAT_COMPLEX_I)
+       {_SS_OBJ_TO_NUMTYPE(float _Complex, vid, p, n, oid, val);}
+    else if (vid == SC_DOUBLE_COMPLEX_I)
+       {_SS_OBJ_TO_NUMTYPE(double _Complex, vid, p, n, oid, val);}
+    else if (vid == SC_LONG_DOUBLE_COMPLEX_I)
+       {_SS_OBJ_TO_NUMTYPE(long double _Complex, vid, p, n, oid, val);}
+/*
+    else if (vid == SC_QUATERNION_I)
+       {_SS_OBJ_TO_NUMTYPE(quaternion, vid, p, n, oid, val);};
+*/
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_LIST_TO_NUMTYPE - convert multiple objects to an array P which
+ *                     - has type TYPE to the value of object VAL
+ */
+
+void _SS_list_to_numtype(char *type, void *p, long n, object *o)
+   {int vid, ityp;
+    char *msg;
+
+    vid = SC_type_id(type, FALSE);
+
+/* print out the type */
+    if (vid == SC_CHAR_I)
+       {ityp = SC_arrtype(o, -1);
+	if (ityp == SC_STRING_I)
+	   strncpy(p, SS_STRING_TEXT(o), n);
+	else if (ityp == SS_CONS_I)
+	   strncpy(p, SS_STRING_TEXT(SS_car(o)), n);
+        else
+	   SS_error("EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
+
+        return;};
+
+/* only need to check non-char types 
+ * NOTE: the '\0' terminator on char strings cause the following
+ *       test to fail unnecessarily (DRS.SCM for example)
+ */
+    if (n < (long) _SS_get_object_length(o))
+       {msg = SC_dsnprintf(FALSE, "DATA TOO LONG FOR TYPE %s - _SS_LIST_TO_NUMTYPE",
+			   type);
+        SS_error(msg, o);};
+
+/* fixed point types */
+    if (vid == SC_SHORT_I)
+       {_SS_LIST_TO_NUMTYPE(short, vid, p, n, o);}
+
+    else if (vid == SC_INT_I)
+       {_SS_LIST_TO_NUMTYPE(int, vid, p, n, o);}
+
+    else if (vid == SC_LONG_I)
+       {_SS_LIST_TO_NUMTYPE(long, vid, p, n, o);}
+
+    else if (vid == SC_LONG_LONG_I)
+       {_SS_LIST_TO_NUMTYPE(long long, vid, p, n, o);}
+
+/* floating point types */
+    else if (vid == SC_FLOAT_I)
+       {_SS_LIST_TO_NUMTYPE(float, vid, p, n, o);}
+ 
+    else if (vid == SC_DOUBLE_I)
+       {_SS_LIST_TO_NUMTYPE(double, vid, p, n, o);}
+
+    else if (vid == SC_LONG_DOUBLE_I)
+       {_SS_LIST_TO_NUMTYPE(long double, vid, p, n, o);}
+
+/* complex floating point types */
+    else if (vid == SC_FLOAT_COMPLEX_I)
+       {_SS_LIST_TO_NUMTYPE(float _Complex, vid, p, n, o);}
+
+    else if (vid == SC_DOUBLE_COMPLEX_I)
+       {_SS_LIST_TO_NUMTYPE(double _Complex, vid, p, n, o);}
+
+    else if (vid == SC_LONG_DOUBLE_COMPLEX_I)
+       {_SS_LIST_TO_NUMTYPE(long double _Complex, vid, p, n, o);}
+
+    else if (vid == SC_BOOL_I)
+       {_SS_LIST_TO_NUMTYPE(bool, vid, p, n, o);}
+
+    else
+       SS_error("ILLEGAL TYPE - _SS_LIST_TO_NUMTYPE", SS_mk_string(type));
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

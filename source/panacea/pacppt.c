@@ -22,17 +22,17 @@ main()
 
 /* arrays used to automate some of the testing */
   char *type_slist[] = {
-        "SC_CHAR_S",       "SC_SHORT_S",       "SC_INT_S",     "SC_LONG_S",
+        "SC_CHAR_S",       "SC_SHORT_S",       "SC_INT_S",         "SC_LONG_S",
         "SC_FLOAT_S",      "SC_DOUBLE_S",      "SC_REAL_S",        "SC_STRING_S",
         "SC_POINTER_S",    "SC_PCONS_P_S",     "SC_VOID_S",	   "SC_SHORT_P_S",
-	"SC_INT_P_S",  "SC_LONG_P_S",      "SC_FLOAT_P_S",	   "SC_DOUBLE_P_S",
+	"SC_INT_P_S",      "SC_LONG_P_S",      "SC_FLOAT_P_S",	   "SC_DOUBLE_P_S",
         "SC_PCONS_S",      "SC_STRUCT_S",      "SC_UNKNOWN_S",
         NULL
   };
 
   int type_ilist[] = {
 /*      12345678901234567890123456789012345678901234567890123456789012345678901234567890*/
-        SC_CHAR_I,         SC_SHORT_I,         SC_INT_I,       SC_LONG_I,
+        SC_CHAR_I,         SC_SHORT_I,         SC_INT_I,           SC_LONG_I,
         SC_FLOAT_I,        SC_DOUBLE_I,	       SC_REAL_I,          SC_STRING_I,
         SC_POINTER_I,      SC_PCONS_P_I,       SC_VOID_I,	   SC_SHORT_P_I,
 	SC_INT_P_I,	   SC_LONG_P_I,	       SC_FLOAT_P_I,	   SC_DOUBLE_P_I,

@@ -401,7 +401,8 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
         {nitems[i] = SC_VA_ARG(int);
          type[i]   = SC_VA_ARG(char *);
 	 lbytes    = 0;
-         if (type[i] == NULL)
+
+         if (type[i] == '\0')
             {special = (nitems[i] > 0);
              break;}
 

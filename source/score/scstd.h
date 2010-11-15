@@ -146,6 +146,14 @@
 # define POW pow
 #endif
 
+#ifndef POWL
+# ifdef COMPILER_PGI
+#  define POWL pow
+# else
+#  define POWL powl
+# endif
+#endif
+
 /* get the ticks per second for clock straight */
 
 #ifndef TICKS_SECOND

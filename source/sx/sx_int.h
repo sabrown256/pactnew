@@ -402,12 +402,6 @@ extern SX_menu_item
  *_SX_get_menu_item(g_file *po, int i);
 
 
-/* SXSET.C declarations */
-
-extern int
- _SX_get_object_length(object *obj);
-
-
 /* SXSHAR.C declarations */
 
 extern void

@@ -1575,7 +1575,8 @@ PM_mesh_topology *PM_lr_ac_mesh_2d(double **px, double **py,
  */
 
 pcons *PM_mapping_info(PM_mapping *h, ...)
-   {int *pi;
+   {int id;
+    int *pi;
     double *pd;
     float *pf;
     char *pc, **ps, *name, bf[MAXLINE];
@@ -1615,21 +1616,25 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
                 if (SC_LAST_CHAR(bf) == '*')
                    SC_LAST_CHAR(bf) = '\0';
 
-                if (strncmp(SC_INT_S, bf, 3) == 0)
+		id = SC_type_id(bf, FALSE);
+
+/* fixed point types */
+                if (id == SC_INT_I)
 	           {pi  = SC_VA_ARG(int *);
                     *pi = *(int *) asc->cdr;}
 
-                else if (strcmp(SC_DOUBLE_S, bf) == 0)
+/* floating point types */
+                else if (id == SC_DOUBLE_I)
 	           {pd  = SC_VA_ARG(double *);
                     *pd = *(double *) asc->cdr;}
-                else if (strcmp(SC_FLOAT_S, bf) == 0)
+                else if (id == SC_FLOAT_I)
 	           {pf  = SC_VA_ARG(float *);
                     *pf = *(float *) asc->cdr;}
 
-                else if (strcmp(SC_STRING_S, bf) == 0)
+                else if (id == SC_STRING_I)
 	           {ps  = SC_VA_ARG(char **);
                     *ps = (char *) asc->cdr;}
-                else if (strcmp(SC_CHAR_S, bf) == 0)
+                else if (id == SC_CHAR_I)
 	           {pc  = SC_VA_ARG(char *);
                     *pc = *(char *) asc->cdr;};};}
 

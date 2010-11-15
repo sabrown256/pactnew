@@ -290,7 +290,7 @@ static int _PD_print_long_double_complex(FILE *fp, void *p, int i, int mode)
     else
        fmt = PD_print_formats2[SC_LONG_DOUBLE_COMPLEX_I];
 
-#ifdef AIX
+#if defined(AIX)
     rv = PRINT(fp, fmt, creal(pv), cimag(pv));
 #else
     rv = PRINT(fp, fmt, creall(pv), cimagl(pv));
@@ -1407,7 +1407,7 @@ void _PD_set_digits(PDBfile *file)
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {f = std->fp[i].format;
 	 d = min(f[2], PD_tolerance);
-	 PD_fp_precision[i].tolerance = powl(2.0L, -((long double) d));
+	 PD_fp_precision[i].tolerance = POWL(2.0L, -((long double) d));
 	 PD_fp_precision[i].digits    = log2*d + 1;};
 
     return;}
@@ -1447,7 +1447,7 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
 	 fb  = stdb->fp[i].format;
 	 nmb = max(fa[2], fb[2]);
 	 nmb = min(nmb, PD_tolerance);
-	 PD_fp_precision[i].tolerance = powl(2.0L, -((long double) nmb));
+	 PD_fp_precision[i].tolerance = POWL(2.0L, -((long double) nmb));
 	 PD_fp_precision[i].digits    = log2*nmb + 1;};
 
     return;}

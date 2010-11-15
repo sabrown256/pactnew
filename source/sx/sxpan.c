@@ -606,14 +606,9 @@ static object *_SXI_def_var(object *argl)
        {void *vaddr;
         int itype;
 
-	itype = 0;
-        if (strcmp(vtype, SC_INT_S) == 0)
-           itype = SC_INT_I;
-        else if (strcmp(vtype, SC_DOUBLE_S) == 0)
-           itype = SC_DOUBLE_I;
-        else if (strcmp(vtype, SC_CHAR_S) == 0)
-           itype = SC_CHAR_I;
-        else
+	itype = SC_type_id(vtype, FALSE);
+
+	if ((itype < 0) || (SC_LONG_DOUBLE_COMPLEX_I < itype))
            PA_WARN(TRUE,
                    "TYPE %s UNSUPPORTED AS IMPLICIT COMMAND - _SXI_DEF_VAR",
                    vtype);
