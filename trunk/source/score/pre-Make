@@ -172,6 +172,21 @@ ${LibDep} : ${Hdrs}
 ${MMDep}  : ${Hdrs}
 
 #
+# convert
+#
+${BinDir}/convert : convert.c ${Hdrs} 
+	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score convert.c -o ${BinDir}/convert ${Cfe_LD_Lib}
+
+convert : ${BinDir}/convert
+
+${PACTTmpDir}/scconv.c : ${BinDir}/convert
+	${RM} ${PACTTmpDir}/scconv.c
+	@echo "${CFE} ${BinDir}/convert -> scconv.c"
+	@( ${CFE} ${BinDir}/convert > ${PACTTmpDir}/scconv.c ||   \
+           ( echo "***> Failed to generate scconv.c"         &&   \
+             exit 1 ) )
+
+#
 # MMLib 
 #
 ${MMLib} : scmemr.c

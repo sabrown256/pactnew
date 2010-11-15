@@ -179,33 +179,6 @@ void SX_init(char *code, char *vers)
 /*---------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_GET_OBJECT_LENGTH - compute the number of items in a object */
-
-int _SX_get_object_length(object *obj)
-   {int ni, ityp;
-
-    ityp = SC_arrtype(obj, -1);
-    if (ityp == SS_CONS_I)
-       ni = SS_length(obj);
-
-    else if (ityp == SS_VECTOR_I)
-       ni = SS_VECTOR_LENGTH(obj);
-
-    else if (ityp == SC_STRING_I)
-       ni = SS_STRING_LENGTH(obj) + 1;
-
-    else if ((ityp == SC_INT_I) ||
-	     (ityp == SC_FLOAT_I))
-       ni = 1;
-
-    else
-       ni = 0;
-
-    return(ni);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_ARG_PREP - prepare the arg list by merging lists and
  *             - delistifying one element lists
  */

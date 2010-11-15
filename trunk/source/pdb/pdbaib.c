@@ -450,7 +450,7 @@ void PD_fp_toler(PDBfile *file, long double *fptol)
 
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {fpmn[i]  = min(fstd->fp[i].format[2], hstd->fp[i].format[2]);
-	 fptol[i] = powl(2.0, -((long double) fpmn[i]));};
+	 fptol[i] = POWL(2.0, -((long double) fpmn[i]));};
 
     return;}
 

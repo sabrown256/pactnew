@@ -2926,6 +2926,8 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 /* GOTCHA: none of the PTR cases will work because the variables
  * are static - have to dynamicall allocate them eventually
  */
+
+/* floating point types */
 	 if (typ == SC_DOUBLE_I)
 	    {SS_args(argl,
 		     SC_DOUBLE_I, &dv,
@@ -2950,6 +2952,7 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 	        {SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_P_S,
 				       name, dv);};}
 
+/* fixed point types */
 	 else if (typ == SC_LONG_I)
 	    {SS_args(argl,
 		     SC_INT_I, &lv,

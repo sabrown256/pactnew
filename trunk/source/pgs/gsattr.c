@@ -65,6 +65,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 pv  = NULL;
 	 SC_assoc_info(alst, name, &pv, NULL);
 
+/* floating point types */
 	 if (typ == SC_DOUBLE_I)
 	    {pd = SC_VA_ARG(double *);
 	     dv = SC_VA_ARG(double);
@@ -89,6 +90,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	     else if (dflt == TRUE)
 	        *pr = dv;}
 
+/* fixed point types */
 	 else if (typ == SC_LONG_I)
 	    {pl = SC_VA_ARG(long *);
 	     lv = SC_VA_ARG(long);
@@ -255,6 +257,7 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
 	 typ = SC_VA_ARG(int);
 	 ptr = SC_VA_ARG(int);
 
+/* floating point types */
 	 if (typ == SC_DOUBLE_I)
 	    {if (ptr)
 	        {pv = SC_VA_ARG(double *);
@@ -282,6 +285,7 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
 		SC_CHANGE_VALUE_ALIST(alst, REAL, SC_REAL_P_S,
 				      name, dv);};}
 
+/* fixed point types */
 	 else if (typ == SC_LONG_I)
 	    {if (ptr)
 	        {pv = SC_VA_ARG(long *);

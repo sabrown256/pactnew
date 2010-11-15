@@ -83,7 +83,6 @@ void SS_install_mf(char* pname, char *pdoc, PFPHand phand, ...)
 
 object *SS_unary_flt(C_procedure *cp, object *argl)
    {int id;
-    PFVoid *pr;
     object *x, *rv;
 
     if (SS_nullobjp(argl))
@@ -91,35 +90,34 @@ object *SS_unary_flt(C_procedure *cp, object *argl)
 
     x  = SS_car(argl);
     id = SC_arrtype(x, -1);
-    pr = cp->proc;
 
     if (id == SC_INT_I)
        {double y;
 	PFDoubled f;
-	f = (PFDoubled) pr[0];
-	y = f(SS_INTEGER_VALUE(x));
-	rv  = SS_mk_float(y);}
+	f  = (PFDoubled) cp->proc[0];
+	y  = f(SS_INTEGER_VALUE(x));
+	rv = SS_mk_float(y);}
 
     else if (id == SC_FLOAT_I)
        {double y;
 	PFDoubled f;
-	f = (PFDoubled) pr[0];
-	y = f(SS_FLOAT_VALUE(x));
-	rv  = SS_mk_float(y);}
+	f  = (PFDoubled) cp->proc[0];
+	y  = f(SS_FLOAT_VALUE(x));
+	rv = SS_mk_float(y);}
 
     else if (id == SC_DOUBLE_COMPLEX_I)
        {double _Complex y;
 	PFComplexc f;
-	f = (PFComplexc) pr[1];
-	y = f(SS_COMPLEX_VALUE(x));
-	rv  = SS_mk_complex(y);}
+	f  = (PFComplexc) cp->proc[1];
+	y  = f(SS_COMPLEX_VALUE(x));
+	rv = SS_mk_complex(y);}
 
     else if (id == SC_QUATERNION_I)
        {quaternion y;
 	PFQuaternionq f;
-	f = (PFQuaternionq) pr[2];
-	y = f(SS_QUATERNION_VALUE(x));
-	rv  = SS_mk_quaternion(y);}
+	f  = (PFQuaternionq) cp->proc[2];
+	y  = f(SS_QUATERNION_VALUE(x));
+	rv = SS_mk_quaternion(y);}
 
     else
        SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);
@@ -228,51 +226,124 @@ object *SS_binary_fix(C_procedure *cp, object *argl)
 /* SS_BINARY_FLT - the binary floating point arithmetic operator handler */
 
 object *SS_binary_flt(C_procedure *cp, object *argl)
-   {int type, ident;
-    double acc, operand;
+   {int idf, ident;
     PFDoubledd fnc;
-    object *rv;
+    object *acc;
 
-    acc     = 0.0;
-    operand = 0.0;
+    fnc = (PFDoubledd) cp->proc[0];
 
-    fnc   = (PFDoubledd) cp->proc[0];
+/* determine the identity for the operator */
     ident = 1;
-    type  = SC_INT_I;
     if ((fnc == PM_fplus) || (fnc == PM_fminus))
        ident = 0;
 
-    if ((fnc == PM_fdivide) || (fnc == HYPOT))
-       type = SC_FLOAT_I;
+    idf = ((fnc == PM_fdivide) || (fnc == HYPOT)) ? SC_FLOAT_I : SC_INT_I;
 
-    if (SS_nullobjp(argl))
-       {rv = SS_mk_integer((BIGINT) ident);
-	return(rv);}
+#if 1
+    {double accd, operand;
 
-    else if (SS_nullobjp(SS_cdr(argl)))
-       acc = ident;
+     accd     = 0.0;
+     operand = 0.0;
 
-    else
-       SS_GET_OPERAND(acc, argl, type);
+     if (SS_nullobjp(argl))
+        {acc = SS_mk_integer((BIGINT) ident);
+	 return(acc);}
 
-    while (TRUE)
-       {SS_GET_OPERAND(operand, argl, type);
-        acc = (*fnc)(acc, operand);
-        if (acc > LONG_MAX)
-           type = SC_FLOAT_I;
+     else if (SS_nullobjp(SS_cdr(argl)))
+        accd = ident;
 
-        if (SS_nullobjp(argl))
-	   break;};
+     else
+        SS_GET_OPERAND(accd, argl, idf);
 
-    rv = SS_null;
-    if (type == SC_INT_I)
-       rv = SS_mk_integer((BIGINT) acc);
-    else if (type == SC_FLOAT_I)
-       rv = SS_mk_float(acc);
-    else
-       SS_error("BAD ARITHMETIC RESULT - SS_BINARY_FLT", SS_null);
+     while (TRUE)
+        {SS_GET_OPERAND(operand, argl, idf);
+	 accd = (*fnc)(accd, operand);
+	 if (accd > LONG_MAX)
+            idf = SC_FLOAT_I;
 
-    return(rv);}
+	 if (SS_nullobjp(argl))
+	    break;};
+
+     acc = SS_null;
+     if (idf == SC_INT_I)
+        acc = SS_mk_integer((BIGINT) accd);
+     else if (idf == SC_FLOAT_I)
+        acc = SS_mk_float(accd);
+     else
+        SS_error("BAD ARITHMETIC RESULT - SS_BINARY_FLT", SS_null);}
+
+#else
+    {int id, ido;
+     object *x;
+
+     acc = SS_mk_float(ident);
+
+     if (!SS_nullobjp(argl))
+        {ido = idf;
+
+/* initialize the accumulator */
+	 if (!SS_nullobjp(SS_cdr(argl)))
+	    {acc  = SS_car(argl);
+	     argl = SS_cdr(argl);
+	     ido  = SC_arrtype(acc, -1);
+	     if (ido == SC_INT_I)
+	        acc = SS_mk_float(SS_INTEGER_VALUE(acc));};
+
+/* operate successively on the remaining operands */
+	 for (x = SS_car(argl); !SS_nullobjp(argl); argl = SS_cdr(argl))
+	     {id = SC_arrtype(x, -1);
+
+	      if (id == SC_INT_I)
+	         {double y, av;
+		  PFDoubledd f;
+		  f   = (PFDoubledd) cp->proc[0];
+		  av  = SS_FLOAT_VALUE(acc);
+		  y   = f(av, SS_INTEGER_VALUE(x));
+		  acc = SS_mk_float(y);
+		  if (y > LONG_MAX)
+		     ido = SC_FLOAT_I;
+		  else
+		     ido = idf;}
+
+	      else if (id == SC_FLOAT_I) 
+	         {double y, av;
+		  PFDoubledd f;
+		  f   = (PFDoubledd) cp->proc[0];
+		  av  = SS_FLOAT_VALUE(acc);
+		  y   = f(av, SS_FLOAT_VALUE(x));
+		  acc = SS_mk_float(y);
+		  if (ido < id)
+		     ido = id;}
+
+	      else if (id == SC_DOUBLE_COMPLEX_I)
+	         {double _Complex y, av;
+		  PFComplexcc f;
+		  f   = (PFComplexcc) cp->proc[1];
+		  av  = SS_COMPLEX_VALUE(acc);
+		  y   = f(av, SS_COMPLEX_VALUE(x));
+		  acc = SS_mk_complex(y);
+		  if (ido < id)
+		     ido = id;}
+
+	      else if (id == SC_QUATERNION_I)
+	         {quaternion y, av;
+		  PFQuaternionqq f;
+		  f   = (PFQuaternionqq) cp->proc[2];
+		  av  = SS_QUATERNION_VALUE(acc);
+		  y   = f(av, SS_QUATERNION_VALUE(x));
+		  acc = SS_mk_quaternion(y);
+		  if (ido < id)
+		     ido = id;}
+
+	      else
+	         SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);};};
+
+     if (ido == SC_INT_I)
+        acc = SS_mk_integer(SS_FLOAT_VALUE(acc));}
+
+#endif
+
+    return(acc);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -450,26 +521,6 @@ static object *_SS_xor_pow(object *argl)
 
 void _SS_install_math(void)
    {
-
-    SS_install("*",
-               "Procedure: Returns product of args or 1 if no args are supplied",
-               SS_binary_flt,
-               PM_ftimes, SS_PR_PROC);
-
-    SS_install("+",
-               "Procedure: Returns sum of args or 0 if no args are supplied",
-               SS_binary_flt,
-               PM_fplus, SS_PR_PROC);
-
-    SS_install("-",
-               "Procedure: Returns difference of args",
-               SS_binary_flt,
-               PM_fminus, SS_PR_PROC);
-
-    SS_install("/",
-               "Procedure: Returns quotient of args (left associative)",
-               SS_binary_flt,
-               PM_fdivide, SS_PR_PROC);
 
     SS_install("&",
                "Procedure: Returns bitwise and of args (left associative)",
@@ -789,6 +840,26 @@ void _SS_install_math(void)
                PM_dn, SS_PR_PROC);
 
 /* multi type functions */
+    SS_install_mf("*",
+		  "Procedure: Returns product of args or 1 if no args are supplied",
+		  SS_binary_flt,
+		  PM_ftimes, PM_times_cc, PM_times_qq, SS_PR_PROC);
+
+    SS_install_mf("+",
+		  "Procedure: Returns sum of args or 0 if no args are supplied",
+		  SS_binary_flt,
+		  PM_fplus, PM_plus_cc, PM_plus_qq, SS_PR_PROC);
+
+    SS_install_mf("-",
+		  "Procedure: Returns difference of args",
+		  SS_binary_flt,
+		  PM_fminus, PM_minus_cc, PM_minus_qq, SS_PR_PROC);
+
+    SS_install_mf("/",
+		  "Procedure: Returns quotient of args (left associative)",
+		  SS_binary_flt,
+		  PM_fdivide, PM_divide_cc, PM_rquotient_qq, SS_PR_PROC);
+
     SS_install_mf("abs",
 		  "Procedure: Returns the absolute value of a numeric object",
 		  SS_unary_flt,

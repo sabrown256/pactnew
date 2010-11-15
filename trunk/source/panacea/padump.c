@@ -201,20 +201,12 @@ static int _PA_init_time_plot(PA_plot_request *pr,
 /* this is a way of handling the unit problem in the post-processor */
     if (pp != NULL)
        {dtype = pp->desc->type;
-	if (strcmp(dtype, SC_DOUBLE_S) == 0)
-	   pr->data_type = SC_DOUBLE_I;
-	else if (strcmp(dtype, SC_FLOAT_S) == 0)
-	   pr->data_type = SC_FLOAT_I;
-	else if (strcmp(dtype, SC_INT_S) == 0)
-	   pr->data_type = SC_INT_I;
-	else if (strcmp(dtype, SC_LONG_S) == 0)
-	   pr->data_type = SC_LONG_I;
-
-	pr->conv = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
+        pr->data_type = SC_type_id(dtype, FALSE);
+	pr->conv      = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
 	if (PA_VARIABLE_CLASS(pp) == PSEUDO)
 	   pr->status = PSEUDO;};
 
-    labels[itu-1]  = pr->text;
+    labels[itu-1] = pr->text;
     snprintf(bf, MAXLINE, "y%d", itu);
     members[itu] = SC_strsavef(bf, "char*:_PA_INIT_TIME_PLOT:bf");
 
@@ -336,6 +328,8 @@ static double _PA_array_ref_i(void *vr, long indx, int type)
     double d, *pd;
 
     d = 0.0;
+
+/* floating point types */
     if (type == SC_DOUBLE_I)
        {pd = (double *) vr;
 	d  = (double) pd[indx];}
@@ -344,6 +338,7 @@ static double _PA_array_ref_i(void *vr, long indx, int type)
        {pf = (float *) vr;
 	d  = (double) pf[indx];}
 
+/* fixed point types */
     else if (type == SC_LONG_LONG_I)
        {pb = (long long *) vr;
 	d  = (double) pb[indx];}

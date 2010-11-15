@@ -78,7 +78,7 @@ static void write_decl(FILE *fp)
    {int i, j;
 
     fprintf(fp, "static PFConv\n");
-    fprintf(fp, " _SC_convf[][] = {\n");
+    fprintf(fp, " _SC_convf[][%d] = {\n", N_PRIMITIVES);
     for (i = 0; i < N_PRIMITIVES; i++)
         {if (types[i] != NULL)
 	    {for (j = 0; j < N_PRIMITIVES; j++)

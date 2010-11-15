@@ -228,12 +228,14 @@ int PM_find_index(void *p, double f, int n)
 
     type = SC_arrtype(p, -1);
 
+/* floating point types */
     if (type == SC_DOUBLE_I)
        {FIND_INDEX(double, p, f, n, indx);}
 
     else if (type == SC_FLOAT_I)
        {FIND_INDEX(float, p, f, n, indx);}
 
+/* fixed point types */
     else if (type == SC_INT_I)
        {FIND_INDEX(int, p, f, n, indx);}
 

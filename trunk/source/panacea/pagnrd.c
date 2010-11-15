@@ -711,19 +711,18 @@ void PA_pshand(PA_command *cp)
         sval = PA_get_field("VALUE", cp->name, REQU);
 	d    = PA_alias_value(sval);
 
-        if (cp->type == SC_INT_I)
-           (cp->vr)[i] = (int) d;
-
-        else if (cp->type == SC_DOUBLE_I)
+/* floating point types */
+        if (cp->type == SC_DOUBLE_I)
            ((double *) cp->vr)[i] = d;
 
         else if (cp->type == SC_REAL_I)
            ((double *) cp->vr)[i] = d;
 
-        else if ((cp->type == SC_CHAR_I) ||
-                 (cp->type == SC_STRING_I))
-           ((char **) cp->vr)[i] = SC_strsavef(sval,
-                                    "char*:PA_PSHAND:s");
+        else if (cp->type == SC_INT_I)
+           (cp->vr)[i] = (int) d;
+
+        else if ((cp->type == SC_CHAR_I) || (cp->type == SC_STRING_I))
+           ((char **) cp->vr)[i] = SC_strsavef(sval, "char*:PA_PSHAND:s");
 
 /* since char_8 is a FORTRAN disease treat it as static */
         else if (cp->type == SC_CHAR_8_I)
