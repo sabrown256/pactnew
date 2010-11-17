@@ -223,125 +223,173 @@ object *SS_binary_fix(C_procedure *cp, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_BIN_FIX - apply binary operator OP to list
+ *             - with fixed point maximal type 
+ */
+
+static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
+   {int idf, ident;
+    long i, off;
+    double accv, *v;
+    object *acc;
+
+    idf = ((op == PM_fdivide) || (op == HYPOT)) ? SC_FLOAT_I : SC_INT_I;
+
+    v = FMAKE_N(double, ni, "_SS_BIN_FIX:double");
+    _SS_list_to_numtype_id(SC_DOUBLE_I, v, ni, argl);
+
+    if (ni < 2)
+       {ident = ((op != PM_fplus) && (op != PM_fminus));
+	accv  = ident;
+        off   = 0;}
+    else
+       {accv = v[0];
+        off  = 1;};
+
+    for (i = off; i < ni; i++)
+        accv = op(accv, v[i]);
+
+    if ((idf < SC_FLOAT_I) && (accv < LONG_MAX))
+       acc = SS_mk_integer((long long) accv);
+    else
+       acc = SS_mk_float(accv);
+
+    SFREE(v);
+
+    return(acc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_BIN_FLOAT - apply binary operator OP to list
+ *               - with floating point maximal type 
+ */
+
+static object *_SS_bin_float(long ni, object *argl, PFDoubledd op)
+   {int ident;
+    long i, off;
+    double accv, *v;
+    object *acc;
+
+    v = FMAKE_N(double, ni, "_SS_BIN_FLOAT:double");
+    _SS_list_to_numtype_id(SC_DOUBLE_I, v, ni, argl);
+
+    if (ni < 2)
+       {ident = ((op != PM_fplus) && (op != PM_fminus));
+	accv  = ident;
+	off   = 0;}
+    else
+       {accv = v[0];
+	off  = 1;};
+
+    for (i = off; i < ni; i++)
+        accv = op(accv, v[i]);
+
+    acc = SS_mk_float(accv);
+
+    SFREE(v);
+
+    return(acc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_BIN_COMPLEX - apply binary operator OP to list
+ *                 - with complex floating point maximal type 
+ */
+
+static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
+   {int ident;
+    long i, off;
+    double _Complex accv, *v;
+    object *acc;
+
+    v = FMAKE_N(double _Complex, ni, "SS_BINARY_FLT:complex");
+    _SS_list_to_numtype_id(SC_DOUBLE_COMPLEX_I, v, ni, argl);
+
+    if (ni < 2)
+       {ident = ((op != PM_plus_cc) && (op != PM_minus_cc));
+	accv  = ident;
+	off   = 0;}
+    else
+       {accv = v[0];
+        off  = 1;};
+
+    for (i = off; i < ni; i++)
+        accv = op(accv, v[i]);
+
+    acc = SS_mk_complex(accv);
+
+    SFREE(v);
+
+    return(acc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_BIN_QUATERNION - apply binary operator OP to list
+ *                    - with quaternion floating point maximal type 
+ */
+
+static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
+   {int ident;
+    long i, off;
+    quaternion accv, *v;
+    object *acc;
+
+    v = FMAKE_N(quaternion, ni, "SS_BINARY_FLT:quaternion");
+    _SS_list_to_numtype_id(SC_QUATERNION_I, v, ni, argl);
+
+    accv.i = 0;
+    accv.j = 0;
+    accv.k = 0;
+
+    if (ni < 2)
+       {ident  = ((op != PM_plus_qq) && (op != PM_minus_qq));
+	accv.s = ident;
+        off    = 0;}
+    else
+       {accv = v[0];
+        off  = 1;};
+
+    for (i = off; i < ni; i++)
+        accv = op(accv, v[i]);
+
+    acc = SS_mk_quaternion(accv);
+
+    SFREE(v);
+
+    return(acc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_BINARY_FLT - the binary floating point arithmetic operator handler */
 
 object *SS_binary_flt(C_procedure *cp, object *argl)
-   {int idf, ident;
-    PFDoubledd fnc;
+   {int ido;
+    long ni;
     object *acc;
 
-    fnc = (PFDoubledd) cp->proc[0];
+    ido = _SS_max_numeric_type(argl, &ni);
+    if (ido == -1)
+       SS_error("NON-NUMERIC OPERAND - SS_BINARY_FLT", argl);
 
-/* determine the identity for the operator */
-    ident = 1;
-    if ((fnc == PM_fplus) || (fnc == PM_fminus))
-       ident = 0;
+/* fixed point operands */
+    else if (ido < SC_FLOAT_I)
+       acc = _SS_bin_fix(ni, argl, (PFDoubledd) cp->proc[0]);
 
-    idf = ((fnc == PM_fdivide) || (fnc == HYPOT)) ? SC_FLOAT_I : SC_INT_I;
+/* floating point operands */
+    else if (ido < SC_FLOAT_COMPLEX_I)
+       acc = _SS_bin_float(ni, argl, (PFDoubledd) cp->proc[0]);
 
-#if 1
-    {double accd, operand;
+/* complex floating point operands */
+    else if (ido < SC_QUATERNION_I)
+       acc = _SS_bin_complex(ni, argl, (PFComplexcc) cp->proc[1]);
 
-     accd     = 0.0;
-     operand = 0.0;
-
-     if (SS_nullobjp(argl))
-        {acc = SS_mk_integer((BIGINT) ident);
-	 return(acc);}
-
-     else if (SS_nullobjp(SS_cdr(argl)))
-        accd = ident;
-
-     else
-        SS_GET_OPERAND(accd, argl, idf);
-
-     while (TRUE)
-        {SS_GET_OPERAND(operand, argl, idf);
-	 accd = (*fnc)(accd, operand);
-	 if (accd > LONG_MAX)
-            idf = SC_FLOAT_I;
-
-	 if (SS_nullobjp(argl))
-	    break;};
-
-     acc = SS_null;
-     if (idf == SC_INT_I)
-        acc = SS_mk_integer((BIGINT) accd);
-     else if (idf == SC_FLOAT_I)
-        acc = SS_mk_float(accd);
-     else
-        SS_error("BAD ARITHMETIC RESULT - SS_BINARY_FLT", SS_null);}
-
-#else
-    {int id, ido;
-     object *x;
-
-     acc = SS_mk_float(ident);
-
-     if (!SS_nullobjp(argl))
-        {ido = idf;
-
-/* initialize the accumulator */
-	 if (!SS_nullobjp(SS_cdr(argl)))
-	    {acc  = SS_car(argl);
-	     argl = SS_cdr(argl);
-	     ido  = SC_arrtype(acc, -1);
-	     if (ido == SC_INT_I)
-	        acc = SS_mk_float(SS_INTEGER_VALUE(acc));};
-
-/* operate successively on the remaining operands */
-	 for (x = SS_car(argl); !SS_nullobjp(argl); argl = SS_cdr(argl))
-	     {id = SC_arrtype(x, -1);
-
-	      if (id == SC_INT_I)
-	         {double y, av;
-		  PFDoubledd f;
-		  f   = (PFDoubledd) cp->proc[0];
-		  av  = SS_FLOAT_VALUE(acc);
-		  y   = f(av, SS_INTEGER_VALUE(x));
-		  acc = SS_mk_float(y);
-		  if (y > LONG_MAX)
-		     ido = SC_FLOAT_I;
-		  else
-		     ido = idf;}
-
-	      else if (id == SC_FLOAT_I) 
-	         {double y, av;
-		  PFDoubledd f;
-		  f   = (PFDoubledd) cp->proc[0];
-		  av  = SS_FLOAT_VALUE(acc);
-		  y   = f(av, SS_FLOAT_VALUE(x));
-		  acc = SS_mk_float(y);
-		  if (ido < id)
-		     ido = id;}
-
-	      else if (id == SC_DOUBLE_COMPLEX_I)
-	         {double _Complex y, av;
-		  PFComplexcc f;
-		  f   = (PFComplexcc) cp->proc[1];
-		  av  = SS_COMPLEX_VALUE(acc);
-		  y   = f(av, SS_COMPLEX_VALUE(x));
-		  acc = SS_mk_complex(y);
-		  if (ido < id)
-		     ido = id;}
-
-	      else if (id == SC_QUATERNION_I)
-	         {quaternion y, av;
-		  PFQuaternionqq f;
-		  f   = (PFQuaternionqq) cp->proc[2];
-		  av  = SS_QUATERNION_VALUE(acc);
-		  y   = f(av, SS_QUATERNION_VALUE(x));
-		  acc = SS_mk_quaternion(y);
-		  if (ido < id)
-		     ido = id;}
-
-	      else
-	         SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);};};
-
-     if (ido == SC_INT_I)
-        acc = SS_mk_integer(SS_FLOAT_VALUE(acc));}
-
-#endif
+/* quaternion operands */
+    else
+       acc = _SS_bin_quaternion(ni, argl, (PFQuaternionqq) cp->proc[2]);
 
     return(acc);}
 

@@ -88,13 +88,13 @@ static int PDB_to_HDF_ptype(defstr *dp, hid_t *datatype)
 
 /* check for floating point types (proper) */
     else if (dp->format != NULL)
-       {if ((SC_FLOAT_I <= id) && (id <= SC_LONG_DOUBLE_I))
+       {if (SC_is_type_fp(id) == TRUE)
            {*datatype = hfp[id-SC_FLOAT_I];
 	    rv        = TRUE;};}
 
 /* check for fixed point types (proper) */
     else if (dp->convert >= 0)
-       {if ((SC_SHORT_I <= id) && (id <= SC_LONG_LONG_I))
+       {if (SC_is_type_fix(id) == TRUE)
            {*datatype = hfx[id-SC_SHORT_I];
 	    rv        = TRUE;}
 

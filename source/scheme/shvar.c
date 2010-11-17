@@ -17,9 +17,6 @@
 
 static object *_SS_exa_var(void *vr, int type)
    {char cv, *sv, **pv;
-    int iv;
-    long lv;
-    double rv;
     object *ret;
 
     ret = SS_f;
@@ -30,25 +27,32 @@ static object *_SS_exa_var(void *vr, int type)
 	   PRINT(stdout, "    %c", cv);
 	ret = SS_mk_integer((BIGINT) cv);}
 
-/* fixed point types */
-    else if (type == SC_INT_I)
-       {iv = *(int *) vr;
+/* fixed point types (proper) */
+    else if (SC_is_type_fix(type) == TRUE)
+       {long long v, *pv;
+	pv = &v;
+	SC_convert_id(SC_LONG_LONG_I, (void **) &pv, type, vr, 1, FALSE);
 	if (SS_interactive)
-	   PRINT(stdout, "    %d", iv);
-	ret = SS_mk_integer((BIGINT) iv);}
+	   PRINT(stdout, "    %lld", v);
+	ret = SS_mk_integer(v);}
 
-    else if (type == SC_LONG_I)
-       {lv = *(long *) vr;
+/* floating point types (proper) */
+    else if (SC_is_type_fp(type) == TRUE)
+       {long double v, *pv;
+	pv = &v;
+	SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, type, vr, 1, FALSE);
 	if (SS_interactive)
-	   PRINT(stdout, "    %ld", lv);
-	ret = SS_mk_integer((BIGINT) lv);}
+	   PRINT(stdout, "    %lg", v);
+	ret = SS_mk_float(v);}
 
-/* floating point types */
-    else if (type == SC_DOUBLE_I)
-       {rv = *(double *) vr;
+/* complex floating point types (proper) */
+    else if (SC_is_type_cx(type) == TRUE)
+       {long double _Complex v, *pv;
+	pv = &v;
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, type, vr, 1, FALSE);
 	if (SS_interactive)
-	   PRINT(stdout, "    %g", rv);
-	ret = SS_mk_float((double) rv);}
+	   PRINT(stdout, "    %lg + %lg*I", creall(v), cimagl(v));
+	ret = SS_mk_complex(v);}
 
     else if (type == SC_STRING_I)
        {sv = (char *) vr;
@@ -71,9 +75,6 @@ static object *_SS_exa_var(void *vr, int type)
        {if (SS_interactive)
 	   PRINT(stdout, "    Unknown type ...");};
 
-/* NOTE: when this routine was in ULTRA this line was:
- *    UL_pause(FALSE);
- */
     if (SS_interactive)
        PRINT(stdout, "\n");
 
@@ -82,92 +83,54 @@ static object *_SS_exa_var(void *vr, int type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_SET_VAR - set the value of the given variable */
+/* _SS_SET_VAR - set the value of VR to the value of VL */
 
 static object *_SS_set_var(void *vr, object *vl, int type)
-   {char *sv, bf[MAXLINE];
-    long lv;
-    double dv;
+   {int ok;
 
-    lv = -HUGE_INT;
-    dv = -HUGE;
-    sv = NULL;
+    ok = _SS_object_to_numtype_id(type, vr, 0, vl);
+    if (ok == FALSE)
+       {char *sv, bf[MAXLINE];
+	long lv;
+	double dv;
 
-    if (SS_integerp(vl))
-       lv = SS_INTEGER_VALUE(vl);
+	lv = -HUGE_INT;
+	dv = -HUGE;
+	sv = NULL;
 
-    else if (SS_floatp(vl))
-       dv = SS_FLOAT_VALUE(vl);
+	if (SS_integerp(vl))
+	   lv = SS_INTEGER_VALUE(vl);
 
-    else
-       sv = SS_get_string(vl);
-
-    if (type == SC_CHAR_I)
-       {if (lv != -HUGE_INT)
-	   *((char *) vr) = (char) lv;
-
-        else if (dv != -HUGE)
-	   *((char *) vr) = (char) dv;
+        else if (SS_floatp(vl))
+	   dv = SS_FLOAT_VALUE(vl);
 
 	else
-	   SS_error("OBJECT NOT CHAR - _SS_SET_VAR", vl);}
+	   sv = SS_get_string(vl);
 
-/* fixed point types */
-    else if (type == SC_INT_I)
-       {if (lv != -HUGE_INT)
-	   *((int *) vr) = (int) lv;
+	if (type == SC_STRING_I)
+	   {if (sv != NULL)
+	       strcpy((char *) vr, sv);
 
-        else if (dv != -HUGE)
-	   *((int *) vr) = (int) dv;
+	    else if (lv != -HUGE_INT)
+	       sprintf((char *) vr, "%ld", lv);
 
-	else
-	   SS_error("OBJECT NOT INTEGER - _SS_SET_VAR", vl);}
+	    else if (dv != -HUGE)
+	       sprintf((char *) vr, "%g", dv);}
 
-    else if (type == SC_LONG_I)
-       {if (lv != -HUGE_INT)
-	   *((long *) vr) = lv;
+	else if (type == SC_POINTER_I)
+	   {if (sv != NULL)
+	       *((char **) vr) = SC_strsavef(sv, "char*:_SS_SET_VAR:sv");
 
-        else if (dv != -HUGE)
-	   *((long *) vr) = (long) dv;
+	    else if (lv != -HUGE_INT)
+	       {snprintf(bf, MAXLINE, "%ld", lv);
+		*((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");}
 
-	else
-	   SS_error("OBJECT NOT LONG INT - _SS_SET_VAR", vl);}
-
-/* floating point types */
-    else if (type == SC_DOUBLE_I)
-       {if (dv != -HUGE)
-	   *((double *) vr) = dv;
-
-        else if (lv != -HUGE_INT)
-	   *((double *) vr) = (double) lv;
+	    else if (dv != -HUGE)
+	       {snprintf(bf, MAXLINE, "%g", dv);
+		*((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");};}
 
 	else
-	   SS_error("OBJECT NOT REAL NUMBER - _SS_SET_VAR", vl);}
-
-    else if (type == SC_STRING_I)
-       {if (sv != NULL)
-	   strcpy((char *) vr, sv);
-
-        else if (lv != -HUGE_INT)
-	   sprintf((char *) vr, "%ld", lv);
-
-	else if (dv != -HUGE)
-	   sprintf((char *) vr, "%g", dv);}
-
-    else if (type == SC_POINTER_I)
-       {if (sv != NULL)
-	   *((char **) vr) = SC_strsavef(sv, "char*:_SS_SET_VAR:sv");
-
-        else if (lv != -HUGE_INT)
-	   {snprintf(bf, MAXLINE, "%ld", lv);
-	    *((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");}
-
-	else if (dv != -HUGE)
-	   {snprintf(bf, MAXLINE, "%g", dv);
-	    *((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");};}
-
-    else
-       SS_error("OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);
+	   SS_error("OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};
 
     return(vl);}
 
@@ -244,22 +207,21 @@ object *SS_install_cv(char *name, void *pval, int ityp)
 	SS_def_var(var, SS_mk_string(v), SS_Global_Env);}
 
 /* fixed point types (proper) */
-    else if ((SC_SHORT_I <= ityp) && (ityp <= SC_LONG_LONG_I))
+    else if (SC_is_type_fix(ityp) == TRUE)
        {long long *pv, v;
 	pv = &v;
 	SC_convert_id(SC_LONG_LONG_I, (void **) &pv, ityp, pval, 1, FALSE);
 	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
 
 /* floating point types (proper) */
-    else if ((SC_FLOAT_I <= ityp) && (ityp <= SC_LONG_DOUBLE_I))
+    else if (SC_is_type_fp(ityp) == TRUE)
        {long double *pv, v;
 	pv = &v;
 	SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, ityp, pval, 1, FALSE);
 	SS_def_var(var, SS_mk_float(v), SS_Global_Env);}
 
 /* complex floating point types (proper) */
-    else if ((SC_FLOAT_COMPLEX_I <= ityp) &&
-	     (ityp <= SC_LONG_DOUBLE_COMPLEX_I))
+    else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex *pv, v;
 	pv = &v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, ityp, pval, 1, FALSE);

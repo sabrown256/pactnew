@@ -1,5 +1,10 @@
 /*
  * SCTYP.C - type management functions for PACT
+ *         - situations that would be nice to manage:
+ *         -   type to type conversion (SC_convert and SC_convert_id)
+ *         -   printing (see pdprnt.c)
+ *         -   variable arg (see gsattrs.c)
+ *         -   type to object and object to type (see shmm.c)
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -123,13 +128,13 @@ int
  SC_QUATERNION_P_I          = 28,
  SC_VOID_I                  = 29,
  SC_CHAR_8_I                = 30,
- SC_ENUM_I                  = 31,
- SC_STRUCT_I                = 32,
- SC_PCONS_I                 = 33,
- SC_PROCESS_I               = 34,
- SC_FILE_I                  = 35,
- SC_PCONS_P_I               = 36,
+ SC_STRUCT_I                = 31,
+ SC_PCONS_I                 = 32,
+ SC_PROCESS_I               = 33,
+ SC_FILE_I                  = 34,
+ SC_PCONS_P_I               = 35,
 
+ SC_ENUM_I                  = 5,
  SC_INTEGER_I               = 5,
  SC_REAL_I                  = 9,
  SC_REAL_P_I                = 23;
@@ -166,13 +171,13 @@ char
  *SC_QUATERNION_P_S          = "quaternion *",
  *SC_VOID_S                  = "void",
  *SC_CHAR_8_S                = "char_8",
- *SC_ENUM_S                  = "enum",
  *SC_STRUCT_S                = "struct",
  *SC_PCONS_S                 = "pcons",
  *SC_PROCESS_S               = "PROCESS",
  *SC_FILE_S                  = "FILE",
  *SC_PCONS_P_S               = "pcons *",
 
+ *SC_ENUM_S                  = "enum",
  *SC_INTEGER_S               = "integer",
  *SC_REAL_S                  = "double",
  *SC_REAL_P_S                = "double *";
@@ -296,7 +301,7 @@ int SC_fix_type_id(char *name, int unsg)
     t = _SC_get_type_name(name);
     n = (t != NULL) ? t->id : -1;
 
-    if ((n < SC_SHORT_I) || (SC_LONG_LONG_I < n))
+    if (SC_is_type_fix(n) == FALSE)
        n = -1;
 
     return(n);}
@@ -315,7 +320,7 @@ int SC_fp_type_id(char *name)
     t = _SC_get_type_name(name);
     n = (t != NULL) ? t->id : -1;
 
-    if ((n < SC_FLOAT_I) || (SC_LONG_DOUBLE_I < n))
+    if (SC_is_type_fp(n) == FALSE)
        n = -1;
 
     return(n);}
@@ -334,10 +339,46 @@ int SC_cx_type_id(char *name)
     t = _SC_get_type_name(name);
     n = (t != NULL) ? t->id : -1;
 
-    if ((n < SC_FLOAT_COMPLEX_I) || (SC_LONG_DOUBLE_COMPLEX_I < n))
+    if (SC_is_type_cx(n) == FALSE)
        n = -1;
 
     return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_TYPE_FIX - return TRUE if ID is a fixed point type */
+
+int SC_is_type_fix(int id)
+   {int rv;
+
+    rv = ((SC_SHORT_I <= id) && (id <= SC_LONG_LONG_I));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_TYPE_FP - return TRUE if ID is a floating point type */
+
+int SC_is_type_fp(int id)
+   {int rv;
+
+    rv = ((SC_FLOAT_I <= id) && (id <= SC_LONG_DOUBLE_I));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_TYPE_CX - return TRUE if ID is a complex floating point type */
+
+int SC_is_type_cx(int id)
+   {int rv;
+
+    rv = ((SC_FLOAT_COMPLEX_I <= id) && (id <= SC_LONG_DOUBLE_COMPLEX_I));
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -465,7 +506,6 @@ void SC_init_base_types(void)
 
        SC_VOID_I                  = SC_register_type(SC_VOID_S,     0,               NULL);
        SC_CHAR_8_I                = SC_register_type(SC_CHAR_8_S,   sizeof(char),                 NULL);
-       SC_ENUM_I                  = SC_register_type(SC_ENUM_S,     0,               NULL);
        SC_STRUCT_I                = SC_register_type(SC_STRUCT_S,   0,               NULL);
        SC_PCONS_I                 = SC_register_type(SC_PCONS_S,    sizeof(pcons),   NULL);
        SC_PROCESS_I               = SC_register_type(SC_PROCESS_S,  sizeof(PROCESS), NULL);
@@ -473,6 +513,7 @@ void SC_init_base_types(void)
 
        SC_PCONS_P_I               = SC_register_type(SC_PCONS_P_S,  szptr, NULL);
 
+    SC_ENUM_I    = SC_type_alias(SC_ENUM_S, SC_INT_I);
     SC_INTEGER_I = SC_type_alias(SC_INTEGER_S, SC_INT_I);
     SC_REAL_I    = SC_type_alias(SC_DOUBLE_S, SC_DOUBLE_I);
     SC_REAL_P_I  = SC_type_alias(SC_DOUBLE_P_S, SC_DOUBLE_P_I);

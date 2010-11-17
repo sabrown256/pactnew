@@ -690,7 +690,8 @@ static object *_ULI_close_device(object *arg)
 		 SFREE(out->fname);   
 		 if (out->dev != NULL)
 		    {PG_close_device(out->dev);
-		     out->dev = NULL;
+		     out->dev    = NULL;
+		     out->active = FALSE;
 		     break;};};};};
 
     if ((strcmp(name, "WINDOW") == 0) || (strcmp(name, "SCREEN") == 0))

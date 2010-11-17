@@ -1184,28 +1184,26 @@ void daprint(pcons *alst)
 
 /* print the first value only */
 
-/* fixed point types */
-         else if (id == SC_SHORT_I)
-            io_printf(stdout, "\t%d", *(short *) ths->cdr);
+/* fixed point types (proper) */
+         else if (SC_is_type_fix(id) == TRUE)
+	    {long long v, *pv;
+	     pv = &v;
+	     SC_convert_id(SC_LONG_LONG_I, (void **) &pv, id, ths->cdr, 1, FALSE);
+	     io_printf(stdout, "\t%ld", v);}
 
-         else if (id == SC_INT_I)
-            io_printf(stdout, "\t%d", *(int *) ths->cdr);
+/* floating point types (proper) */
+         else if (SC_is_type_fp(id) == TRUE)
+	    {long double v, *pv;
+	     pv = &v;
+	     SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, id, ths->cdr, 1, FALSE);
+	     io_printf(stdout, "\t%lg", v);}
 
-         else if (id == SC_LONG_I)
-            io_printf(stdout, "\t%ld", *(long *) ths->cdr);
-
-         else if (id == SC_LONG_LONG_I)
-            io_printf(stdout, "\t%ld", *(long long *) ths->cdr);
-
-/* floating point types */
-         else if (id == SC_FLOAT_I)
-            io_printf(stdout, "\t%g", *(float *) ths->cdr);
-
-         else if (id == SC_DOUBLE_I)
-            io_printf(stdout, "\t%g", *(double *) ths->cdr);
-
-         else if (id == SC_LONG_DOUBLE_I)
-            io_printf(stdout, "\t%lg", *(long double *) ths->cdr);
+/* complex floating point types (proper) */
+         else if (SC_is_type_cx(id) == TRUE)
+	    {long double _Complex v, *pv;
+	     pv = &v;
+	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, id, ths->cdr, 1, FALSE);
+	     io_printf(stdout, "\t%lg + %lg*I", creall(v), cimagl(v));};
 
          io_printf(stdout, "\n");}
 

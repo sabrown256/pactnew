@@ -218,7 +218,7 @@ int PM_index_min(double *p, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_FIND_INDEX - return the index into array P such that 
+/* PM_FIND_INDEX - return the index into ordered array P such that 
  *               - P[i-1] < F <= P[i]
  *               - return 0 if F <= P[0] and N if P[N-1] < F
  */
@@ -228,22 +228,28 @@ int PM_find_index(void *p, double f, int n)
 
     type = SC_arrtype(p, -1);
 
-/* floating point types */
-    if (type == SC_DOUBLE_I)
-       {FIND_INDEX(double, p, f, n, indx);}
-
-    else if (type == SC_FLOAT_I)
-       {FIND_INDEX(float, p, f, n, indx);}
-
 /* fixed point types */
+    if (type == SC_SHORT_I)
+       {FIND_INDEX(short, p, f, n, indx);}
+
     else if (type == SC_INT_I)
        {FIND_INDEX(int, p, f, n, indx);}
 
     else if (type == SC_LONG_I)
        {FIND_INDEX(long, p, f, n, indx);}
 
-    else if (type == SC_SHORT_I)
-       {FIND_INDEX(short, p, f, n, indx);}
+    else if (type == SC_LONG_LONG_I)
+       {FIND_INDEX(long long, p, f, n, indx);}
+
+/* floating point types */
+    else if (type == SC_FLOAT_I)
+       {FIND_INDEX(float, p, f, n, indx);}
+
+    else if (type == SC_DOUBLE_I)
+       {FIND_INDEX(double, p, f, n, indx);}
+
+    else if (type == SC_LONG_DOUBLE_I)
+       {FIND_INDEX(long double, p, f, n, indx);}
 
     else if (type == SC_CHAR_I)
        {FIND_INDEX(char, p, f, n, indx);}

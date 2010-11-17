@@ -735,7 +735,7 @@ static object *_SXI_draw_polyline(object *argl)
     SS_args(argl,
             G_DEVICE, &dev,
             SC_INT_I, &nd,
-            SC_ENUM_I,    &cs,
+            SC_ENUM_I, &cs,
             SC_INT_I, &clip,
             0);
 
@@ -2924,38 +2924,26 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 	 argl = SS_cdddr(argl);
 
 /* GOTCHA: none of the PTR cases will work because the variables
- * are static - have to dynamicall allocate them eventually
+ * are static - have to dynamically allocate them eventually
  */
 
-/* floating point types */
-	 if (typ == SC_DOUBLE_I)
+/* floating point types (proper) */
+	 if (SC_is_type_fp(typ) == TRUE)
 	    {SS_args(argl,
 		     SC_DOUBLE_I, &dv,
 		     0);
 	     argl = SS_cdr(argl);
 	     if (ptr)
-	        {pv = &dv;
+	        {pv   = &dv;
 		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
 	     else
 	        {SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_P_S,
 				       name, dv);};}
 
-	 else if (typ == SC_FLOAT_I)
+/* fixed point types (proper) */
+	 else if (SC_is_type_fix(typ) == TRUE)
 	    {SS_args(argl,
-		     SC_DOUBLE_I, &dv,
-		     0);
-	     argl = SS_cdr(argl);
-	     if (ptr)
-	        {pv = &dv;
-		 alst = SC_change_alist(alst, name, SC_FLOAT_P_S, pv);}
-	     else
-	        {SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_P_S,
-				       name, dv);};}
-
-/* fixed point types */
-	 else if (typ == SC_LONG_I)
-	    {SS_args(argl,
-		     SC_INT_I, &lv,
+		     SC_LONG_I, &lv,
 		     0);
 	     argl = SS_cdr(argl);
 	     if (ptr)
@@ -2965,39 +2953,13 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 	        {SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_P_S,
 				       name, lv);};}
 
-	 else if (typ == SC_INT_I)
-	    {SS_args(argl,
-		     SC_INT_I, &lv,
-		     0);
-	     argl = SS_cdr(argl);
-	     if (ptr)
-	        {pv = &lv;
-		 alst = SC_change_alist(alst, name, SC_INT_P_S, pv);}
-	     else
-	        {iv = lv;
-		 SC_CHANGE_VALUE_ALIST(alst, int, SC_INT_P_S,
-				       name, iv);};}
-
-	 else if (typ == SC_SHORT_I)
-	    {SS_args(argl,
-		     SC_INT_I, &lv,
-		     0);
-	     argl = SS_cdr(argl);
-	     if (ptr)
-	        {pv = &lv;
-		 alst = SC_change_alist(alst, name, SC_SHORT_P_S, pv);}
-	     else
-	        {iv = lv;
-		 SC_CHANGE_VALUE_ALIST(alst, short, SC_SHORT_P_S,
-				       name, iv);};}
-
 	 else if (typ == SC_CHAR_I)
 	    {SS_args(argl,
 		     SC_INT_I, &lv,
 		     0);
 	     argl = SS_cdr(argl);
 	     if (ptr)
-	        {pv = &lv;
+	        {pv   = &lv;
 		 alst = SC_change_alist(alst, name, SC_STRING_S, pv);}
 	     else
 	        {iv = lv;
@@ -3010,7 +2972,7 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 		     0);
 	     argl = SS_cdr(argl);
 	     if (ptr)
-	        {pv = &lv;
+	        {pv   = &lv;
 		 alst = SC_change_alist(alst, name, SC_POINTER_S, pv);}
 	     else
 	        {pv = &lv;

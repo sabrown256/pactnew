@@ -164,7 +164,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	std->fp[ifp].format = formt;
 	align->fp[ifp]      = al;}
 
-/* check for complex types (proper) */
+/* check for complex floating point types (proper) */
     else if ((icx = SC_cx_type_id(type)) != -1)
        {icx -= SC_FLOAT_COMPLEX_I;
 /*
