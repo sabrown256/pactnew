@@ -1088,7 +1088,7 @@ void SS_wr_atm(object *obj, object *strm)
 	      SC_vstrcat(t, MAXLINE, "%gi", i);
 	   else if (r == 0.0)
 	      SC_vstrcat(t, MAXLINE, "%gi", i);
-	   else
+	   else if (i > 0.0)
 	      SC_vstrcat(t, MAXLINE, "+%gi", i);}
 
 	else if (ityp == SC_QUATERNION_I)

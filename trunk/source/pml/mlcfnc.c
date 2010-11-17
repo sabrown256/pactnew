@@ -61,6 +61,7 @@
 complex
  CPHUGE = HUGE,
  CMHUGE = -HUGE,
+ Cone   = 1.0,
  Czero  = 0.0;
 
 /* the implementation here has superior accuracy to
@@ -120,8 +121,20 @@ complex PM_divide_cc(complex b, complex c)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_DISTANCE_CC - return the distance between complex A and B */
+
+double PM_distance_cc(complex a, complex b)
+   {double d;
+
+    d = sqrt(PM_cabs(PM_minus_cc(a, b)));
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_CHORNER - evaluate polynomial using Horner's rule
- *           -   y = Sum(Ci*X^i, mn <= i <= mx)
+ *            -   y = Sum(Ci*X^i, mn <= i <= mx)
  */
 
 complex PM_chorner(complex x, double *c, int mn, int mx)
@@ -164,7 +177,7 @@ complex PM_chorner(complex x, double *c, int mn, int mx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CRANDOM - complex random function */
+/* PM_CRANDOM - return unit random complex */
 
 complex PM_crandom(complex c)
    {double tp, x, y, cx, sx;
@@ -780,7 +793,7 @@ complex PM_casinh(complex c)
 /*--------------------------------------------------------------------------*/
 
 /* PM_CACOSH - complex acosh function
- *           - acosh(z)	= ln(z + sqrt(z - 1)*sqrt(z + 1))	
+ *           - acosh(z)	= ln(z + sqrt(z*z - 1))
  */
 
 complex PM_cacosh(complex c)
@@ -792,15 +805,9 @@ complex PM_cacosh(complex c)
 
 #else
 
-    complex z1, z2;
-
-    z1 = PM_PLUS_RC(1.0, c);
-    z2 = PM_PLUS_RC(-1.0, c);
-
-    z1 = PM_csqrt(z1);
-    z2 = PM_csqrt(z2);
-
-    r = PM_TIMES_CC(z1, z2);
+    r = PM_TIMES_CC(c, c);
+    r = PM_PLUS_RC(-1.0, r);
+    r = PM_csqrt(r);
     r = PM_PLUS_CC(c, r);
     r = PM_cln(r);
 
@@ -812,7 +819,7 @@ complex PM_cacosh(complex c)
 /*--------------------------------------------------------------------------*/
 
 /* PM_CATANH - complex atanh function
- *           - atanh(z)	= (ln(1 + z) - ln(1 - z))/2
+ *           - atanh(z)	= ln((1 + z)/(1 - z))/2
  */
 
 complex PM_catanh(complex c)
@@ -828,13 +835,9 @@ complex PM_catanh(complex c)
 
     z1 = PM_PLUS_RC(1.0, c);
     z2 = PM_PLUS_RC(-1.0, c);
-    z2 = PM_TIMES_RC(-1.0, z2);
-
-    z1 = PM_cln(z1);
-    z2 = PM_cln(z2);
-
-    r = PM_MINUS_CC(z1, z2);
-    r = PM_TIMES_RC(0.5, r);
+    r  = PM_DIVIDE_CC(z1, z2);
+    r  = PM_cln(r);
+    r  = PM_TIMES_RC(0.5, r);
 
 #endif
 
@@ -977,7 +980,7 @@ complex PM_cjn(complex x, double nd)
             bjp  = Czero;
             ret  = Czero;
             tot  = Czero;
-            bj   = Czero;
+            bj   = Cone;
             for (j = m; j > 0; j--)
                 {bjm = PM_TIMES_CC(tox, bj);
 		 bjm = PM_TIMES_RC(j, bjm);
@@ -1008,9 +1011,11 @@ complex PM_cjn(complex x, double nd)
 /* PM_CJ0 - complex j0 */
 
 complex PM_cj0(complex x)
-   {
+   {complex r;
 
-    return(PM_cjn(x, 0.0));}
+    r = PM_cjn(x, 0.0);
+
+    return(r);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1018,9 +1023,11 @@ complex PM_cj0(complex x)
 /* PM_CJ1 - complex j1 */
 
 complex PM_cj1(complex x)
-   {
+   {complex r;
 
-    return(PM_cjn(x, 1.0));}
+    r = PM_cjn(x, 1.0);
+
+    return(r);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1199,7 +1206,7 @@ complex PM_cin(complex x, double nd)
     else
        {tox = PM_crecip(x);
 	tox = PM_TIMES_RC(2.0, tox);
-        bi  = PM_COMPLEX(1.0, 0.0);
+        bi  = Cone;
 	bip = Czero;
         ret = Czero;
 	ns  = 2*(n + (int) sqrt(BESS_ACC*n));

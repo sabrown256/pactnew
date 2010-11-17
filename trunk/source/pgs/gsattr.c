@@ -45,16 +45,8 @@ gattrdes
 
 static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
    {int i, typ;
-    int *pi, iv;
-    long *pl, lv;
-    short *ps;
-    double *pd, dv;
-    REAL *pr;
-    float *pf;
-    char *pc;
-    char **pt, *tv;
     char *name;
-    void *pv;
+    void *pa;
 
     for (i = 0; TRUE; i++)
         {name = SC_VA_ARG(char *);
@@ -62,107 +54,119 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	    break;
 
 	 typ = SC_VA_ARG(int);
-	 pv  = NULL;
-	 SC_assoc_info(alst, name, &pv, NULL);
+	 pa  = NULL;
+	 SC_assoc_info(alst, name, &pa, NULL);
 
 /* fixed point types */
 	 if (typ == SC_SHORT_I)
-	    {ps = SC_VA_ARG(short *);
-	     iv = SC_VA_ARG(int);
-	     if (pv != NULL)
-	        *ps = *(short *) pv;
+	    {short *pv, v;
+	     pv = SC_VA_ARG(short *);
+	     v  = SC_VA_ARG(int);
+	     if (pa != NULL)
+	        *pv = *(short *) pa;
 	     else if (dflt == TRUE)
-	        *ps = iv;}
+	        *pv = v;}
 
 	 else if (typ == SC_INT_I)
-	    {pi = SC_VA_ARG(int *);
-	     iv = SC_VA_ARG(int);
-	     if (pv != NULL)
-	        *pi = *(int *) pv;
+	    {int *pv, v;
+	     pv = SC_VA_ARG(int *);
+	     v  = SC_VA_ARG(int);
+	     if (pa != NULL)
+	        *pv = *(int *) pa;
 	     else if (dflt == TRUE)
-	        *pi = iv;}
+	        *pv = v;}
 
 	 else if (typ == SC_LONG_I)
-	    {pl = SC_VA_ARG(long *);
-	     lv = SC_VA_ARG(long);
-	     if (pv != NULL)
-	        *pl = *(long *) pv;
+	    {long *pv, v;
+	     pv = SC_VA_ARG(long *);
+	     v  = SC_VA_ARG(long);
+	     if (pa != NULL)
+	        *pv = *(long *) pa;
 	     else if (dflt == TRUE)
-	        *pl = lv;}
+	        *pv = v;}
 
 	 else if (typ == SC_LONG_LONG_I)
-	    {pl = SC_VA_ARG(long long *);
-	     lv = SC_VA_ARG(long long);
-	     if (pv != NULL)
-	        *pl = *(long long *) pv;
+	    {long long *pv, v;
+	     pv = SC_VA_ARG(long long *);
+	     v  = SC_VA_ARG(long long);
+	     if (pa != NULL)
+	        *pv = *(long long *) pa;
 	     else if (dflt == TRUE)
-	        *pl = lv;}
+	        *pv = v;}
 
 /* floating point types */
 	 else if (typ == SC_FLOAT_I)
-	    {pf = SC_VA_ARG(float *);
-	     dv = SC_VA_ARG(double);
-	     if (pv != NULL)
-	        *pf = *(float *) pv;
+	    {float *pv, v;
+	     pv = SC_VA_ARG(float *);
+	     v  = SC_VA_ARG(double);
+	     if (pa != NULL)
+	        *pv = *(float *) pa;
 	     else if (dflt == TRUE)
-	        *pf = dv;}
+	        *pv = v;}
 
 	 else if (typ == SC_DOUBLE_I)
-	    {pd = SC_VA_ARG(double *);
-	     dv = SC_VA_ARG(double);
-	     if (pv != NULL)
-	        *pd = *(double *) pv;
+	    {double *pv, v;
+	     pv = SC_VA_ARG(double *);
+	     v  = SC_VA_ARG(double);
+	     if (pa != NULL)
+	        *pv = *(double *) pa;
 	     else if (dflt == TRUE)
-	        *pd = dv;}
+	        *pv = v;}
 
 	 else if (typ == SC_LONG_DOUBLE_I)
-	    {pd = SC_VA_ARG(long double *);
-	     dv = SC_VA_ARG(long double);
-	     if (pv != NULL)
-	        *pd = *(long double *) pv;
+	    {long double *pv, v;
+	     pv = SC_VA_ARG(long double *);
+	     v  = SC_VA_ARG(long double);
+	     if (pa != NULL)
+	        *pv = *(long double *) pa;
 	     else if (dflt == TRUE)
-	        *pd = dv;}
+	        *pv = v;}
 
 /* complex floating point types */
 	 else if (typ == SC_FLOAT_COMPLEX_I)
-	    {pf = SC_VA_ARG(float _Complex *);
-	     dv = SC_VA_ARG(float _Complex);
-	     if (pv != NULL)
-	        *pf = *(float *) pv;
+	    {float _Complex *pv, v;
+	     pv = SC_VA_ARG(float _Complex *);
+	     v  = SC_VA_ARG(float _Complex);
+	     if (pa != NULL)
+	        *pv = *(float *) pa;
 	     else if (dflt == TRUE)
-	        *pf = dv;}
+	        *pv = v;}
 
 	 else if (typ == SC_DOUBLE_COMPLEX_I)
-	    {pd = SC_VA_ARG(double _Complex *);
-	     dv = SC_VA_ARG(double _Complex);
-	     if (pv != NULL)
-	        *pd = *(double *) pv;
+	    {double _Complex *pv, v;
+	     pv = SC_VA_ARG(double _Complex *);
+	     v  = SC_VA_ARG(double _Complex);
+	     if (pa != NULL)
+	        *pv = *(double *) pa;
 	     else if (dflt == TRUE)
-	        *pd = dv;}
+	        *pv = v;}
 
 	 else if (typ == SC_LONG_DOUBLE_COMPLEX_I)
-	    {pd = SC_VA_ARG(long double _Complex *);
-	     dv = SC_VA_ARG(long double _Complex);
-	     if (pv != NULL)
-	        *pd = *(long double *) pv;
+	    {long double _Complex *pv, v;
+	     pv = SC_VA_ARG(long double _Complex *);
+	     v  = SC_VA_ARG(long double _Complex);
+	     if (pa != NULL)
+	        *pv = *(long double *) pa;
 	     else if (dflt == TRUE)
-	        *pd = dv;}
+	        *pv = v;}
 
 	 else if (typ == SC_CHAR_I)
-	    {pc = SC_VA_ARG(char *);
-	     iv = SC_VA_ARG(int);
-	     if (pv != NULL)
-	        *pc = *(char *) pv;
+	    {char *pv, v;
+	     pv = SC_VA_ARG(char *);
+	     v  = SC_VA_ARG(int);
+	     if (pa != NULL)
+	        *pv = *(char *) pa;
 	     else if (dflt == TRUE)
-	        *pc = iv;}
+	        *pv = v;}
 
 	 else if (typ == SC_POINTER_I)
-	    {pt = SC_VA_ARG(char **);
-	     tv = SC_VA_ARG(char *);
-	     if (pv != NULL)
-	        *pt = pv;
+	    {char **pv, *v;
+	     pv = SC_VA_ARG(char **);
+	     v  = SC_VA_ARG(char *);
+	     if (pa != NULL)
+	        *pv = pa;
 	     else if (dflt == TRUE)
-	        *pt = tv;};};
+	        *pv = v;};};
 
     return(i);}
 
@@ -276,10 +280,8 @@ int PG_get_attrs_alist(pcons *alst, ...)
  */
 
 static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
-   {int i, typ, ptr, iv;
+   {int i, typ, ptr;
     char *name;
-    long lv;
-    double dv;
     void *pv;
 
     for (i = 0; TRUE; i++)
@@ -292,114 +294,126 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
 
 /* fixed point types */
 	 if (typ == SC_SHORT_I)
-	    {if (ptr)
+	    {short v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(short *);
 		 alst = SC_change_alist(alst, name, SC_SHORT_P_S, pv);}
 	     else
-	        {iv = SC_VA_ARG(int);
+	        {v = SC_VA_ARG(int);
 		 SC_CHANGE_VALUE_ALIST(alst, short, SC_SHORT_P_S,
-				       name, iv);};}
+				       name, v);};}
 
 	 else if (typ == SC_INT_I)
-	    {if (ptr)
+	    {int v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(int *);
 		 alst = SC_change_alist(alst, name, SC_INT_P_S, pv);}
 	     else
-	        {iv = SC_VA_ARG(int);
+	        {v = SC_VA_ARG(int);
 		 SC_CHANGE_VALUE_ALIST(alst, int, SC_INT_P_S,
-				       name, iv);};}
+				       name, v);};}
 
 	 else if (typ == SC_LONG_I)
-	    {if (ptr)
+	    {long v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(long *);
 		 alst = SC_change_alist(alst, name, SC_LONG_P_S, pv);}
 	     else
-	        {lv = SC_VA_ARG(long);
+	        {v = SC_VA_ARG(long);
 		 SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_P_S,
-				       name, lv);};}
+				       name, v);};}
 
 	 else if (typ == SC_LONG_LONG_I)
-	    {if (ptr)
+	    {long long v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(long long *);
 		 alst = SC_change_alist(alst, name, SC_LONG_LONG_P_S, pv);}
 	     else
-	        {lv = SC_VA_ARG(long long);
+	        {v = SC_VA_ARG(long long);
 		 SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_LONG_P_S,
-				       name, lv);};}
+				       name, v);};}
 
 /* floating point types */
 	 else if (typ == SC_FLOAT_I)
-	    {if (ptr)
+	    {float v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(float *);
 		 alst = SC_change_alist(alst, name, SC_FLOAT_P_S, pv);}
 	     else
-	        {dv = SC_VA_ARG(double);
+	        {v = SC_VA_ARG(double);
 		 SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_P_S,
-				       name, dv);};}
+				       name, v);};}
 
 	 else if (typ == SC_DOUBLE_I)
-	    {if (ptr)
+	    {double v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(double *);
 		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
 	     else
-	        {dv = SC_VA_ARG(double);
+	        {v = SC_VA_ARG(double);
 		 SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_P_S,
-				       name, dv);};}
+				       name, v);};}
 
 	 else if (typ == SC_LONG_DOUBLE_I)
-	    {if (ptr)
+	    {long double v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(long double *);
 		 alst = SC_change_alist(alst, name, SC_LONG_DOUBLE_P_S, pv);}
 	     else
-	        {dv = SC_VA_ARG(long double);
+	        {v = SC_VA_ARG(long double);
 		 SC_CHANGE_VALUE_ALIST(alst, double, SC_LONG_DOUBLE_P_S,
-				       name, dv);};}
+				       name, v);};}
 
 /* complex floating point types */
 	 else if (typ == SC_FLOAT_COMPLEX_I)
-	    {if (ptr)
+	    {float _Complex v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(float _Complex *);
 		 alst = SC_change_alist(alst, name, SC_FLOAT_COMPLEX_P_S, pv);}
 	     else
-	        {dv = SC_VA_ARG(float _Complex);
+	        {v = SC_VA_ARG(float _Complex);
 		 SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_COMPLEX_P_S,
-				       name, dv);};}
+				       name, v);};}
 
 	 else if (typ == SC_DOUBLE_COMPLEX_I)
-	    {if (ptr)
+	    {double _Complex v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(double _Complex *);
 		 alst = SC_change_alist(alst, name, SC_DOUBLE_COMPLEX_P_S, pv);}
 	     else
-	        {dv = SC_VA_ARG(double _Complex);
+	        {v = SC_VA_ARG(double _Complex);
 		 SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_COMPLEX_P_S,
-				       name, dv);};}
+				       name, v);};}
 
 	 else if (typ == SC_LONG_DOUBLE_COMPLEX_I)
-	    {if (ptr)
+	    {long double _Complex v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(long double _Complex *);
 		 alst = SC_change_alist(alst, name, SC_LONG_DOUBLE_COMPLEX_P_S, pv);}
 	     else
-	        {dv = SC_VA_ARG(long double _Complex);
+	        {v = SC_VA_ARG(long double _Complex);
 		 SC_CHANGE_VALUE_ALIST(alst, double, SC_LONG_DOUBLE_COMPLEX_P_S,
-				       name, dv);};}
+				       name, v);};}
 
 	 else if (typ == SC_CHAR_I)
-	    {if (ptr)
+	    {char v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(char *);
 		 alst = SC_change_alist(alst, name, SC_STRING_S, pv);}
 	     else
-	        {iv = SC_VA_ARG(int);
+	        {v = SC_VA_ARG(int);
 		 SC_CHANGE_VALUE_ALIST(alst, char, SC_STRING_S,
-				       name, iv);};}
+				       name, v);};}
 
 	 else if (typ == SC_POINTER_I)
-	    {if (ptr)
+	    {void *v;
+	     if (ptr)
 	        {pv = SC_VA_ARG(void **);
 		 alst = SC_change_alist(alst, name, SC_POINTER_S, pv);}
 	     else
-	        {pv = SC_VA_ARG(void *);
+	        {v = SC_VA_ARG(void *);
 		 SC_CHANGE_VALUE_ALIST(alst, void *, SC_POINTER_S,
-				       name, pv);};};};
+				       name, v);};};};
 
     return(alst);}
 

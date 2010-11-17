@@ -364,7 +364,9 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_BINARY_FLT - the binary floating point arithmetic operator handler */
+/* SS_BINARY_FLT - the binary floating point, complex, and quaternion
+ *               - arithmetic operator handler
+ */
 
 object *SS_binary_flt(C_procedure *cp, object *argl)
    {int ido;
@@ -625,95 +627,10 @@ void _SS_install_math(void)
                SS_bin_comp,
                PM_fge, SS_PR_PROC);
 
-    SS_install("acos",
-               "Procedure: Returns the arc cosine of the argument",
-               SS_unary_flt, 
-               acos, SS_PR_PROC);
-
-    SS_install("asin",
-               "Procedure: Returns the arc sine of the argument",
-               SS_unary_flt, 
-               asin, SS_PR_PROC);
-
-    SS_install("atan",
-               "Procedure: Returns the arc tangent of the argument",
-               SS_unary_flt, 
-               atan, SS_PR_PROC);
-
     SS_install("ceiling",
                "Procedure: Returns the smallest integer greater than the argument",
                SS_unary_fix, 
                ceil, SS_PR_PROC);
-
-    SS_install("cos",
-               "Procedure: Returns the cosine of the argument",
-               SS_unary_flt, 
-               cos, SS_PR_PROC);
-
-    SS_install("cosh",
-               "Procedure: Returns the hyperbolic cosine of the argument",
-               SS_unary_flt, 
-               cosh, SS_PR_PROC);
-
-    SS_install("i0",
-	       "Procedure: Take zeroth order modified Bessel function of the first kind",
-               SS_unary_flt, 
-               PM_i0, SS_PR_PROC);
-
-    SS_install("i1",
-	       "Procedure: Take first order modified Bessel function of the first kind",
-               SS_unary_flt, 
-               PM_i1, SS_PR_PROC);
-
-    SS_install("in",
-	       "Procedure: Take nth order modified Bessel function of the first kind",
-               SS_binary_flt, 
-               PM_in, SS_PR_PROC);
-
-    SS_install("j0",
-	       "Procedure: Take zeroth order Bessel function of the first kind",
-               SS_unary_flt, 
-               PM_j0, SS_PR_PROC);
-
-    SS_install("j1",
-	       "Procedure: Take first order Bessel function of the first kind",
-               SS_unary_flt, 
-               PM_j1, SS_PR_PROC);
-
-    SS_install("jn",
-	       "Procedure: Take nth order Bessel function of the first kind",
-               SS_binary_flt, 
-               PM_jn, SS_PR_PROC);
-
-    SS_install("k0",
-	       "Procedure: Take zeroth order modified Bessel function of the first kind",
-               SS_unary_flt, 
-               PM_k0, SS_PR_PROC);
-
-    SS_install("k1",
-	       "Procedure: Take first order modified Bessel function of the first kind",
-               SS_unary_flt, 
-               PM_k1, SS_PR_PROC);
-
-    SS_install("kn",
-	       "Procedure: Take nth order modified Bessel function of the first kind",
-               SS_binary_flt, 
-               PM_kn, SS_PR_PROC);
-
-    SS_install("y0",
-	       "Procedure: Take zeroth order Bessel function of the second kind",
-               SS_unary_flt, 
-               PM_y0, SS_PR_PROC);
-
-    SS_install("y1",
-	       "Procedure: Take first order Bessel function of the second kind",
-               SS_unary_flt, 
-               PM_y1, SS_PR_PROC);
-
-    SS_install("yn",
-	       "Procedure: Take nth order Bessel function of the second kind",
-               SS_binary_flt, 
-               PM_yn, SS_PR_PROC);
 
     SS_install("even?",
                "Procedure: Returns #t iff the argument is a number divisible exactly by 2",
@@ -729,11 +646,6 @@ void _SS_install_math(void)
                "Procedure: Returns the sqrt of the sum of the squares of the arguments",
                SS_binary_flt,
                HYPOT, SS_PR_PROC);
-
-    SS_install("log",
-               "Procedure: Returns the logarithm base 10 of the argument",
-               SS_unary_flt, 
-               PM_log, SS_PR_PROC);
 
     SS_install("machine-precision",
                "Procedure: Returns a floating point machine precision value",
@@ -775,31 +687,6 @@ void _SS_install_math(void)
                SS_binary_fix,
                PM_lmodulo, SS_PR_PROC);
 
-    SS_install("sin",
-               "Procedure: Returns the sine of the argument",
-               SS_unary_flt, 
-               sin, SS_PR_PROC);
-
-    SS_install("sinh",
-               "Procedure: Returns the hyperbolic sine of the argument",
-               SS_unary_flt, 
-               sinh, SS_PR_PROC);
-
-    SS_install("sqrt",
-               "Procedure: Returns the principal square root of the argument",
-               SS_unary_flt, 
-               sqrt, SS_PR_PROC);
-
-    SS_install("tan",
-               "Procedure: Returns the tangent of the argument",
-               SS_unary_flt, 
-               tan, SS_PR_PROC);
-
-    SS_install("tanh",
-               "Procedure: Returns the hyperbolic tangent of the argument",
-               SS_unary_flt, 
-               tanh, SS_PR_PROC);
-
     SS_install("truncate",
                "Procedure: Returns the integer resulting from the truncation of the argument",
                SS_unary_fix, 
@@ -809,11 +696,6 @@ void _SS_install_math(void)
                "Procedure: Returns #t iff the argument is a number equal to 0",
                SS_un_comp,
                _SS_zero, SS_PR_PROC);
-
-    SS_install("random",
-               "Procedure: Returns a random number between -1.0 and 1.0 using <seed>\nUsage: (random <seed>)",
-               SS_unary_flt, 
-               PM_random_s, SS_PR_PROC);
 
 /* special functions */
 
@@ -913,23 +795,187 @@ void _SS_install_math(void)
 		  SS_unary_flt,
 		  ABS, PM_cabs, PM_qnorm, SS_PR_PROC);
 
+    SS_install_mf("acos",
+		  "Procedure: Returns the arc cosine of the argument",
+		  SS_unary_flt, 
+		  acos, PM_cacos, PM_qacos, SS_PR_PROC);
+
+    SS_install_mf("acosh",
+		  "Procedure: Returns the arc hyperbolic cosine of the argument",
+		  SS_unary_flt, 
+		  acosh, PM_cacosh, PM_qacosh, SS_PR_PROC);
+
+    SS_install_mf("asin",
+		  "Procedure: Returns the arc sine of the argument",
+		  SS_unary_flt, 
+		  asin, PM_casin, PM_qasin, SS_PR_PROC);
+
+    SS_install_mf("asinh",
+		  "Procedure: Returns the arc hyperbolic sine of the argument",
+		  SS_unary_flt, 
+		  asinh, PM_casinh, PM_qasinh, SS_PR_PROC);
+
+    SS_install_mf("atan",
+		  "Procedure: Returns the arc tangent of the argument",
+		  SS_unary_flt, 
+		  atan, PM_catan, PM_qatan, SS_PR_PROC);
+
+    SS_install_mf("atanh",
+		  "Procedure: Returns the arc hyperbolic tangent of the argument",
+		  SS_unary_flt, 
+		  atanh, PM_catanh, PM_qatanh, SS_PR_PROC);
+
+    SS_install_mf("conjugate",
+		  "Procedure: Returns the conjugate of the argument",
+		  SS_unary_flt, 
+		  PM_fplus, PM_cconjugate, PM_qconjugate, SS_PR_PROC);
+
+    SS_install_mf("cos",
+		  "Procedure: Returns the cosine of the argument",
+		  SS_unary_flt, 
+		  cos, PM_ccos, PM_qcos, SS_PR_PROC);
+
+    SS_install_mf("cosh",
+		  "Procedure: Returns the hyperbolic cosine of the argument",
+		  SS_unary_flt, 
+		  cosh, PM_ccosh, PM_qcosh, SS_PR_PROC);
+
+    SS_install_mf("cot",
+		  "Procedure: Returns the cotangent of the argument",
+		  SS_unary_flt, 
+		  PM_cot, PM_ccot, PM_qcot, SS_PR_PROC);
+
+    SS_install_mf("coth",
+		  "Procedure: Returns the hyperbolic cotangent of the argument",
+		  SS_unary_flt, 
+		  PM_coth, PM_ccoth, PM_qcoth, SS_PR_PROC);
+
     SS_install_mf("exp",
 		  "Procedure: Returns the exponential of the argument",
 		  SS_unary_flt, 
 		  exp, PM_cexp, PM_qexp, SS_PR_PROC);
+
+    SS_install_mf("expt",
+		  "Procedure: Returns the first argument raised to the power of the second",
+		  SS_binary_flt,
+		  POW, PM_cpow, PM_qpow, SS_PR_PROC);
+
+    SS_install_mf("i0",
+		  "Procedure: Take zeroth order modified Bessel function of the first kind",
+		  SS_unary_flt, 
+		  PM_i0, PM_ci0, PM_qi0, SS_PR_PROC);
+
+    SS_install_mf("i1",
+		  "Procedure: Take first order modified Bessel function of the first kind",
+		  SS_unary_flt, 
+		  PM_i1, PM_ci1, PM_qi1, SS_PR_PROC);
+
+    SS_install_mf("in",
+		  "Procedure: Take nth order modified Bessel function of the first kind",
+		  SS_binary_flt, 
+		  PM_in, PM_cin, PM_qin, SS_PR_PROC);
+
+    SS_install_mf("j1",
+		  "Procedure: Take first order Bessel function of the first kind",
+		  SS_unary_flt, 
+		  PM_j1, PM_cj1, PM_qj1, SS_PR_PROC);
+
+    SS_install_mf("jn",
+		  "Procedure: Take nth order Bessel function of the first kind",
+		  SS_binary_flt, 
+		  PM_jn, PM_cjn, PM_qjn, SS_PR_PROC);
+
+    SS_install_mf("k0",
+		  "Procedure: Take zeroth order modified Bessel function of the first kind",
+		  SS_unary_flt, 
+		  PM_k0, PM_ck0, PM_qk0, SS_PR_PROC);
+
+    SS_install_mf("k1",
+		  "Procedure: Take first order modified Bessel function of the first kind",
+		  SS_unary_flt, 
+		  PM_k1, PM_ck1, PM_qk1, SS_PR_PROC);
+
+    SS_install_mf("kn",
+		  "Procedure: Take nth order modified Bessel function of the first kind",
+		  SS_binary_flt, 
+		  PM_kn, PM_ckn, PM_qkn, SS_PR_PROC);
+
+    SS_install_mf("y0",
+		  "Procedure: Take zeroth order Bessel function of the second kind",
+		  SS_unary_flt, 
+		  PM_y0, PM_cy0, PM_qy0, SS_PR_PROC);
+
+    SS_install_mf("y1",
+		  "Procedure: Take first order Bessel function of the second kind",
+		  SS_unary_flt, 
+		  PM_y1, PM_cy1, PM_qy1, SS_PR_PROC);
+
+    SS_install_mf("yn",
+		  "Procedure: Take nth order Bessel function of the second kind",
+		  SS_binary_flt, 
+		  PM_yn, PM_cyn, PM_qyn, SS_PR_PROC);
+
+    SS_install_mf("j0",
+		  "Procedure: Take zeroth order Bessel function of the first kind",
+		  SS_unary_flt, 
+		  PM_j0, PM_cj0, PM_qj0, SS_PR_PROC);
 
     SS_install_mf("ln",
 		  "Procedure: Returns the natural logarithm of the argument",
 		  SS_unary_flt, 
 		  PM_ln, PM_cln, PM_qln, SS_PR_PROC);
 
+    SS_install_mf("log",
+		  "Procedure: Returns the logarithm base 10 of the argument",
+		  SS_unary_flt, 
+		  PM_log, PM_clog, PM_qlog, SS_PR_PROC);
+
+    SS_install_mf("random",
+		  "Procedure: Returns a random number between -1.0 and 1.0 using <seed>\nUsage: (random <seed>)",
+		  SS_unary_flt, 
+		  PM_random_s, PM_crandom, PM_qrandom, SS_PR_PROC);
+
+    SS_install_mf("recip",
+		  "Procedure: Returns the reciprocal of the argument",
+		  SS_unary_flt, 
+		  PM_fdivide, PM_crecip, PM_qrecip, SS_PR_PROC);
+
+    SS_install_mf("square",
+		  "Procedure: Returns the argument squared",
+		  SS_unary_flt, 
+		  PM_sqr, PM_csqr, PM_qsqr, SS_PR_PROC);
+
+    SS_install_mf("sqrt",
+		  "Procedure: Returns the principal square root of the argument",
+		  SS_unary_flt, 
+		  sqrt, PM_csqrt, PM_qsqrt, SS_PR_PROC);
+
+    SS_install_mf("sin",
+		  "Procedure: Returns the sine of the argument",
+		  SS_unary_flt, 
+		  sin, PM_csin, PM_qsin, SS_PR_PROC);
+
+    SS_install_mf("sinh",
+		  "Procedure: Returns the hyperbolic sine of the argument",
+		  SS_unary_flt, 
+		  sinh, PM_csinh, PM_qsinh, SS_PR_PROC);
+
+    SS_install_mf("tan",
+		  "Procedure: Returns the tangent of the argument",
+		  SS_unary_flt, 
+		  tan, PM_ctan, PM_qtan, SS_PR_PROC);
+
+    SS_install_mf("tanh",
+		  "Procedure: Returns the hyperbolic tangent of the argument",
+		  SS_unary_flt, 
+		  tanh, PM_ctanh, PM_qtanh, SS_PR_PROC);
+
+    SS_install_mf("tchn",
+		  "Procedure: Take nth order Tchebyshev polynomial function",
+		  SS_binary_flt, 
+		  PM_tchn, PM_ctchn, PM_qtchn, SS_PR_PROC);
 
 /* special syntax context */
-
-    SS_install("expt",
-               "Procedure: Returns the first argument raised to the power of the second",
-               SS_binary_flt,
-               POW, SS_PR_PROC);
 
     SS_install("xor",
                "Procedure: Returns bitwise exclusive or of args (left associative)",

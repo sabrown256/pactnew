@@ -24,18 +24,6 @@
 #define BAD_NUMBERS      -90
 #define CONTENTS_DIFFER -100
 
-#define SX_CLOSETO_FIX(_ok, _x, _y)     (_ok = ((_x) != (_y)))
-
-#define SX_CLOSETO_FLOAT(_ok, _x, _y, _tol)                                  \
-   {long double _del;                                                        \
-    _del = (2.0*(_x - _y)/(ABS(_x) + ABS(_y) + SMALL));                      \
-    _ok  = ((_del < -_tol) || (_tol < _del));}
-
-#define SX_CLOSETO_COMPLEX(_ok, _x, _y, _tol)                                \
-   {long double _del;                                                        \
-    _del = (2.0*(_x - _y)/(ABS(_x) + ABS(_y) + SMALL));                      \
-    _ok  = ((_del < -_tol) || (_tol < _del));}
-
 /*--------------------------------------------------------------------------*/
 
 #define SX_SKIP_ITAG(fpa)                                                    \
@@ -77,13 +65,13 @@
      long _i;                                                                \
      if (SX_disp_individ_diff == TRUE)                                       \
         {for (_i = 0L; _i < _n; _i++)                                        \
-             {SX_CLOSETO_FIX(_ok, _a[_i], _b[_i]);                           \
+             {PM_CLOSETO_FIX(_ok, _a[_i], _b[_i]);                           \
               if (_ok == TRUE)                                               \
                  {_ret     &= FALSE;                                         \
                   _indx[_i] = TRUE;};};}                                     \
      else                                                                    \
         {for (_i = 0L; _i < _n; _i++)                                        \
-             {SX_CLOSETO_FIX(_ok, _a[_i], _b[_i]);                           \
+             {PM_CLOSETO_FIX(_ok, _a[_i], _b[_i]);                           \
               _ret &= _ok;};};}
 
 /*--------------------------------------------------------------------------*/
@@ -93,13 +81,13 @@
      long _i;                                                                \
      if (SX_disp_individ_diff == TRUE)                                       \
         {for (_i = 0L; _i < _n; _i++)                                        \
-             {SX_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
+             {PM_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
               if (_ok == TRUE)                                               \
                  {_ret     &= FALSE;                                         \
                   _indx[_i] = TRUE;};};}                                     \
      else                                                                    \
         {for (_i = 0L; _i < _n; _i++)                                        \
-             {SX_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
+             {PM_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
               ret &= _ok;};};}
 
 /*--------------------------------------------------------------------------*/
@@ -113,13 +101,13 @@
      _ne  = _ipt*_n;                                                         \
      if (SX_disp_individ_diff == TRUE)                                       \
         {for (_i = 0L; _i < _ne; _i++)                                       \
-             {SX_CLOSETO_COMPLEX(_ok, _a[_i], _b[_i], _tol);                 \
+             {PM_CLOSETO_COMPLEX(_ok, _a[_i], _b[_i], _tol);                 \
               if (_ok == TRUE)                                               \
                  {_ret     &= FALSE;                                         \
                   _indx[_i] = TRUE;};};}                                     \
      else                                                                    \
         {for (_i = 0L; _i < _ne; _i++)                                       \
-             {SX_CLOSETO_COMPLEX(_ok, _a[_i], _b[_i], _tol);                 \
+             {PM_CLOSETO_COMPLEX(_ok, _a[_i], _b[_i], _tol);                 \
               ret &= _ok;};};}
 
 /*--------------------------------------------------------------------------*/

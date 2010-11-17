@@ -43,10 +43,13 @@
 #define PM_MODULUS_C(_c)              cabs(_c)
 #define PM_COMPLEX_SWAP(_b, _c)       SC_SWAP_VALUE(complex, _b, _c)
 
-#if 0
-extern double complex
- cproj(double complex); 	/* complex projection[A] */
-#endif
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#define PM_CLOSETO_COMPLEX(_ok, _x, _y, _tol)                                \
+   {long double _del;                                                        \
+    _del = (2.0*(_x - _y)/(ABS(_x) + ABS(_y) + SMALL));                      \
+    _ok  = ((_del < -_tol) || (_tol < _del));}
 
 /*--------------------------------------------------------------------------*/
 
@@ -65,6 +68,12 @@ extern double complex
 /*                    STANDARD FUNCTION DECLARATIONS                        */
 
 /*--------------------------------------------------------------------------*/
+
+
+#if 0
+extern double complex
+ cproj(double complex); 	/* complex projection[A] */
+#endif
 
 
 /* MLFFT.C declarations */
@@ -135,7 +144,8 @@ extern double
  PM_cabs(complex c),
  PM_carg(complex c),
  PM_cfloor(complex c),
- PM_cround(complex c);
+ PM_cround(complex c),
+ PM_distance_cc(complex a, complex b);
 
 extern int
  PM_cequal(complex x, complex y),
