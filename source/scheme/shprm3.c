@@ -732,11 +732,17 @@ static int _SS_eqv(object *o1, object *o2)
     if (ityp != SC_arrtype(o2, -1))
        rv = FALSE;
 
-    else if (ityp == SC_INT_I)
+    else if (SC_is_type_fix(ityp) == TRUE)
        rv = (SS_INTEGER_VALUE(o1) == SS_INTEGER_VALUE(o2));
 
-    else if (ityp == SC_FLOAT_I)
+    else if (SC_is_type_fp(ityp) == TRUE)
        rv = (SS_FLOAT_VALUE(o1) == SS_FLOAT_VALUE(o2));
+
+    else if (SC_is_type_cx(ityp) == TRUE)
+       rv = PM_cequal(SS_COMPLEX_VALUE(o1), SS_COMPLEX_VALUE(o2));
+
+    else if (ityp == SC_QUATERNION_I)
+       rv = PM_qequal(SS_QUATERNION_VALUE(o1), SS_QUATERNION_VALUE(o2));
 
     else if (ityp == SC_STRING_I)
        rv = (strcmp(SS_STRING_TEXT(o1), SS_STRING_TEXT(o2)) == 0);

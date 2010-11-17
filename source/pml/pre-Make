@@ -75,7 +75,7 @@ Hdrs = pml.h pml_int.h scope_complex.h scope_quaternion.h
 # Object Files
 #
 Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
-       mlrfnc.o mlcfnc.o mlsfnc.o mlqutrn.o                       \
+       mlrfnc.o mlcfnc.o mlsfnc.o mlqfnc.o                        \
        mlsolv.o mlsvd.o mleigen.o                                 \
        mlcg.o mliccg.o mlicgs.o                                   \
        mlfft.o mlfpe.o mloper.o mlgeom.o mlsort.o mlmm.o          \
@@ -88,7 +88,7 @@ ArBind = ${TGTLib}(gf-${LibName}.o)
 ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)   \
          ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)  ${TGTLib}(mlsfnc.o)  \
-         ${TGTLib}(mlqutrn.o)                                           \
+         ${TGTLib}(mlqfnc.o)                                            \
          ${TGTLib}(mlsolv.o)  ${TGTLib}(mlsvd.o)   ${TGTLib}(mleigen.o) \
          ${TGTLib}(mlcg.o)    ${TGTLib}(mliccg.o)  ${TGTLib}(mlicgs.o)  \
          ${TGTLib}(mlintm.o)  ${TGTLib}(mlintp.o)  ${TGTLib}(mlints.o)  \

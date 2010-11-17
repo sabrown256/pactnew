@@ -262,6 +262,28 @@ static object *_SSI_longq(object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_VERSORQ - versor operator for Scheme */
+
+static object *_SSI_versorq(object *argl)
+   {quaternion a, q;
+    object *o;
+
+    q.s = 0.0;
+    q.i = 0.0;
+    q.j = 0.0;
+    q.k = 0.0;
+    SS_args(argl,
+	    SC_QUATERNION_I, &q,
+	    0);
+
+    a = PM_qversor(q);
+    o = SS_mk_quaternion(a);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_INSTALL_QUATERNION - install the SCHEME primitives for quaternion math */
 
 void _SS_install_quaternion(void)
@@ -316,6 +338,11 @@ void _SS_install_quaternion(void)
                "Procedure: return the longitude of a quaternion",
                SS_sargs,
                _SSI_longq, SS_PR_PROC);
+
+    SS_install("versor",
+               "Procedure: return the versor of a quaternion",
+               SS_sargs,
+               _SSI_versorq, SS_PR_PROC);
 
     return;}
 
