@@ -91,6 +91,46 @@ source ../../tests/common
    endif
 
 #--------------------------------------------------------------------------
+
+#                           COMPLEX NUMERIC TESTS
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    SCHEME Complex Test .......... "
+   Note $Log ""
+
+   flog $Log pwd
+   if ( $?autotool ) then
+     if ( !(-e ../shcpx.scm) ) then 
+       flog $Log cp $FilesDir/shcpx.scm ..
+     endif
+   endif 
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shcpx.scm
+      set xstatus = $status
+   else
+      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shcpx.scm  |& \
+      grep "ERROR SUMMARY:"                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $Log $RM $Tmp
+   endif
+   set ETime   = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      flog $Log rm -f '#tmp#'
+      NoteD $Log "PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 exit($Err)

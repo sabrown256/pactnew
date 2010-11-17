@@ -28,6 +28,8 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 
 /*--------------------------------------------------------------------------*/
 
+#define SC_TYPEOF(_t)     SC_type_id(#_t, FALSE)
+
 /*--------------------------------------------------------------------------*/
 
 /*                         TYPEDEFS AND STRUCTS                             */
@@ -94,12 +96,12 @@ extern int
  SC_QUATERNION_P_I,
  SC_VOID_I,
  SC_CHAR_8_I,
- SC_ENUM_I,
  SC_STRUCT_I,
  SC_PCONS_I,
  SC_PROCESS_I,
  SC_FILE_I,
  SC_PCONS_P_I,
+ SC_ENUM_I,
  SC_INTEGER_I,
  SC_REAL_I,
  SC_REAL_P_I;
@@ -136,12 +138,12 @@ extern char
  *SC_QUATERNION_P_S,
  *SC_VOID_S,
  *SC_CHAR_8_S,
- *SC_ENUM_S,
  *SC_STRUCT_S,
  *SC_PCONS_S,
  *SC_PROCESS_S,
  *SC_FILE_S,
  *SC_PCONS_P_S,
+ *SC_ENUM_S,
  *SC_INTEGER_S,
  *SC_REAL_S,
  *SC_REAL_P_S;
@@ -186,6 +188,9 @@ extern int
  SC_fix_type_id(char *name, int unsg),
  SC_fp_type_id(char *name),
  SC_cx_type_id(char *name),
+ SC_is_type_fix(int id),
+ SC_is_type_fp(int id),
+ SC_is_type_cx(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
  SC_convert(char *dtype, void **d, char *stype, void *s, int n, int flag);

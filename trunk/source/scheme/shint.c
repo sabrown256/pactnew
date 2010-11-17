@@ -44,90 +44,51 @@ static char *_SS_load_bf(char *s)
  */
 
 static void _SS_fix_arg(object *obj, void *v, int type)
-   {int *ip;
-    short *sp;
-    long long l;
-    long long *llp;
-    long *lp;
-    char *cp;
-    double _Complex z;
-    quaternion q;
+   {int ok;
 
-    l = 0;
+    ok = _SS_object_to_numtype_id(type, v, 0, obj);
+    if (ok == FALSE)
+       {long long l;
 
-    if (SS_integerp(obj))
-       l = SS_INTEGER_VALUE(obj);
+	l = 0L;
 
-    else if (SS_floatp(obj))
-       l = PM_fix(SS_FLOAT_VALUE(obj));
+	if (SS_nullobjp(obj))
+	   l = 0;
 
-    else if (SS_complexp(obj))
-       {z = SS_COMPLEX_VALUE(obj);
-	l = PM_fix(creal(z));}
+	else if (obj == SS_t)
+	   l = TRUE;
 
-    else if (SS_quaterionp(obj))
-       {q = SS_QUATERNION_VALUE(obj);
-	l = PM_fix(q.s);}
+        else if (obj == SS_f)
+	   l = FALSE;
 
-    else if (SS_charobjp(obj))
-       l = SS_CHARACTER_VALUE(obj);
+	else if (SS_procedurep(obj))
+	   {PFVoid hand;
+	    SC_address u;
 
-    else if (obj == SS_t)
-       l = TRUE;
+	    switch (SS_PROCEDURE_TYPE(obj))
+	       {case SS_MACRO : 
+                case SS_PROC  :
+		     SS_error("CAN'T MAKE VALUE - _SS_FIX_ARG", obj);
+		     break;
 
-    else if (obj == SS_f)
-       l = FALSE;
+		default :
+		     hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
+		     u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
+		     if (hand == (PFVoid) SS_acc_char)
+		        l = *(char *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_int)
+		        l = *(int *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_long)
+		        l = *(long *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_double)
+		        l = *(double *) u.memaddr;
+		     else
+		        SS_error("BAD VARIABLE TYPE - _SS_FIX_ARG", obj);};}
 
-    else if (SS_procedurep(obj))
-       {PFVoid hand;
-        SC_address u;
+	else
+	   SS_error("BAD OBJECT - _SS_FIX_ARG", obj);
 
-        switch (SS_PROCEDURE_TYPE(obj))
-           {case SS_MACRO : 
-            case SS_PROC  :
-                 SS_error("CAN'T MAKE VALUE - _SS_FIX_ARG", obj);
-                 break;
-
-            default       :
-                 hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
-                 u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
-                 if (hand == (PFVoid) SS_acc_char)
-                    l = *(char *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_int)
-                    l = *(int *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_long)
-                    l = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_double)
-                    l = *(double *) u.memaddr;
-                 else
-                    SS_error("BAD VARIABLE TYPE - _SS_FIX_ARG", obj);};}
-
-    else if (SS_nullobjp(obj))
-       l = 0;
-
-    else
-       SS_error("BAD OBJECT - _SS_FIX_ARG", obj);
-
-    if (type == SC_CHAR_I)
-       {cp  = (char *) v;
-	*cp = (char) l;}
-
-/* fixed point types */
-    else if (type == SC_SHORT_I)
-       {sp  = (short *) v;
-	*sp = (short) l;}
-
-    else if ((type == SC_INT_I) || (type == SC_ENUM_I))
-       {ip  = (int *) v;
-	*ip = (int) l;}
-
-    else if (type == SC_LONG_I)
-       {lp  = (long *) v;
-	*lp = (long) l;}
-
-    else if (type == SC_LONG_LONG_I)
-       {llp  = (long long *) v;
-	*llp =  l;};
+	SC_convert_id(type, (void **) &v, SC_LONG_LONG_I, &l, 1, FALSE);};
 
     return;}
 
@@ -139,67 +100,45 @@ static void _SS_fix_arg(object *obj, void *v, int type)
  */
 
 static void _SS_float_arg(object *obj, void *v, int type)
-   {double d, *dp;
-    double _Complex z;
-    quaternion q;
-    float *fp;
+   {int ok;
 
-     d = 0.0;
+    ok = _SS_object_to_numtype_id(type, v, 0, obj);
+    if (ok == FALSE)
+       {long double d;
 
-    if (SS_integerp(obj))
-       d = SS_INTEGER_VALUE(obj);
+	d = 0.0L;
 
-/* floating point types */
-    else if (SS_floatp(obj))
-       d = SS_FLOAT_VALUE(obj);
+	if (SS_nullobjp(obj))
+	   d = 0.0L;
 
-    else if (SS_complexp(obj))
-       {z = SS_COMPLEX_VALUE(obj);
-	d = creal(z);}
+	else if (SS_procedurep(obj))
+	   {PFVoid hand;
+	    SC_address u;
 
-    else if (SS_quaterionp(obj))
-       {q = SS_QUATERNION_VALUE(obj);
-	d = q.s;}
+	    switch (SS_PROCEDURE_TYPE(obj))
+	       {case SS_MACRO : 
+		case SS_PROC  :
+		     SS_error("CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+		     break;
 
-    else if (SS_charobjp(obj))
-       d = SS_CHARACTER_VALUE(obj);
+		default :
+		     hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
+		     u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
+		     if (hand == (PFVoid) SS_acc_char)
+		        d = *(char *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_int)
+		        d = *(int *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_long)
+		        d = *(long *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_double)
+		        d = *(double *) u.memaddr;
+		     else
+		        SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
 
-    else if (SS_procedurep(obj))
-       {PFVoid hand;
-        SC_address u;
+	else
+	   SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
 
-        switch (SS_PROCEDURE_TYPE(obj))
-           {case SS_MACRO : 
-            case SS_PROC  :
-                 SS_error("CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
-                 break;
-
-            default :
-                 hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
-                 u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
-                 if (hand == (PFVoid) SS_acc_char)
-                    d = *(char *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_int)
-                    d = *(int *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_long)
-                    d = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_double)
-                    d = *(double *) u.memaddr;
-                 else
-                    SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
-
-    else if (SS_nullobjp(obj))
-       d = 0.0;
-
-    else
-       SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
-
-    if (type == SC_FLOAT_I)
-       {fp  = (float *) v;
-	*fp = (float) d;}
-    else if (type == SC_DOUBLE_I)
-       {dp  = (double *) v;
-	*dp = d;};
+	SC_convert_id(type, (void **) &v, SC_LONG_DOUBLE_I, &d, 1, FALSE);};
 
     return;}
 
@@ -211,59 +150,46 @@ static void _SS_float_arg(object *obj, void *v, int type)
  */
 
 static void _SS_complex_arg(object *obj, void *v)
-   {double r, i;
-    double _Complex z, *zp;
+   {int ok;
 
-    r = 0.0;
-    i = 0.0;
+    ok = _SS_object_to_numtype_id(SC_DOUBLE_COMPLEX_I, v, 0, obj);
+    if (ok == FALSE)
+       {double _Complex z, *zp;
 
-/* complex floating point types */
-    if (SS_complexp(obj))
-       {z = SS_COMPLEX_VALUE(obj);
-	r = creal(z);
-	i = cimag(z);}
+	z = 0.0;
 
-    else if (SS_integerp(obj))
-       r = SS_INTEGER_VALUE(obj);
+	if (SS_nullobjp(obj))
+	   z = 0.0;
 
-    else if (SS_floatp(obj))
-       r = SS_FLOAT_VALUE(obj);
+	else if (SS_procedurep(obj))
+	   {PFVoid hand;
+	    SC_address u;
 
-    else if (SS_charobjp(obj))
-       r = SS_CHARACTER_VALUE(obj);
+	    switch (SS_PROCEDURE_TYPE(obj))
+	       {case SS_MACRO : 
+		case SS_PROC  :
+		     SS_error("CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+		     break;
 
-    else if (SS_procedurep(obj))
-       {PFVoid hand;
-        SC_address u;
+		default :
+		     hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
+		     u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
+		     if (hand == (PFVoid) SS_acc_char)
+		        z = *(char *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_int)
+		        z = *(int *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_long)
+		        z = *(long *) u.memaddr;
+		     else if (hand == (PFVoid) SS_acc_double)
+		        z = *(double *) u.memaddr;
+		     else
+		        SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
 
-        switch (SS_PROCEDURE_TYPE(obj))
-           {case SS_MACRO : 
-            case SS_PROC  :
-                 SS_error("CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
-                 break;
+	else
+	   SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
 
-            default :
-                 hand       = (PFVoid) SS_C_PROCEDURE_HANDLER_PTR(obj);
-                 u.funcaddr = (PFInt) SS_C_PROCEDURE_FUNCTION_PTR(obj);
-                 if (hand == (PFVoid) SS_acc_char)
-                    r = *(char *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_int)
-                    r = *(int *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_long)
-                    r = *(long *) u.memaddr;
-                 else if (hand == (PFVoid) SS_acc_double)
-                    r = *(double *) u.memaddr;
-                 else
-                    SS_error("BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
-
-    else if (SS_nullobjp(obj))
-       r = 0.0;
-
-    else
-       SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
-
-    zp  = (double _Complex *) v;
-    *zp = r + i*I;
+	zp  = (double _Complex *) v;
+	*zp = z;};
 
     return;}
 
@@ -352,15 +278,13 @@ static void _SS_args(object *obj, void *v, int type)
        {DEREF(v) = NULL;
         return;};
 
-    if ((type == SC_ENUM_I) ||
-	((SC_CHAR_I <= type) && (type <= SC_LONG_LONG_I)))
+    if ((SC_CHAR_I == type) || (SC_is_type_fix(type) == TRUE))
        _SS_fix_arg(obj, v, type);
 
-    else if ((SC_FLOAT_I <= type) && (type <= SC_LONG_DOUBLE_I))
+    else if (SC_is_type_fp(type) == TRUE)
        _SS_float_arg(obj, v, type);
 
-    else if ((SC_FLOAT_COMPLEX_I <= type) &&
-	     (type <= SC_LONG_DOUBLE_COMPLEX_I))
+    else if (SC_is_type_cx(type) == TRUE)
        _SS_complex_arg(obj, v);
 
     else if (type == SC_QUATERNION_I)
@@ -471,9 +395,7 @@ int SS_args(object *s, ...)
 
 object *SS_define_constant(int n, ...)
    {int type;
-    long long il;
-    double dc;
-    char *name, *s;
+    char *name;
     object *vr, *val;
 
     vr  = SS_null;
@@ -488,28 +410,36 @@ object *SS_define_constant(int n, ...)
 /* fixed point types */
        if ((type == SC_CHAR_I) ||
 	   (type == SC_SHORT_I) ||
-	   (type == SC_INT_I) ||
-	   (type == SC_ENUM_I))
-	  {il  = SC_VA_ARG(int);
-	   val = SS_mk_integer(il);}
+	   (type == SC_INT_I))
+	  {long long v;
+	   v   = SC_VA_ARG(int);
+	   val = SS_mk_integer(v);}
 
        else if (type == SC_LONG_I)
-	  {il  = SC_VA_ARG(long);
-	   val = SS_mk_integer(il);}
+	  {long long v;
+	   v   = SC_VA_ARG(long);
+	   val = SS_mk_integer(v);}
 
        else if (type == SC_LONG_LONG_I)
-	  {il  = SC_VA_ARG(long long);
-	   val = SS_mk_integer(il);}
+	  {long long v;
+	   v   = SC_VA_ARG(long long);
+	   val = SS_mk_integer(v);}
 
 /* floating point types */
-       else if ((type == SC_FLOAT_I) ||
-		(type == SC_DOUBLE_I))
-	  {dc  = SC_VA_ARG(double);
-	   val = SS_mk_float(dc);}
+       else if ((type == SC_FLOAT_I) ||	(type == SC_DOUBLE_I))
+	  {double v;
+	   v   = SC_VA_ARG(double);
+	   val = SS_mk_float(v);}
+
+       else if (type == SC_LONG_DOUBLE_I)
+	  {long double v;
+	   v  = SC_VA_ARG(long double);
+	   val = SS_mk_float(v);}
 
        else if (type == SC_STRING_I)
-	  {s   = SC_VA_ARG(char *);
-	   val = SS_mk_string(s);}
+	  {char *v;
+	   v   = SC_VA_ARG(char *);
+	   val = SS_mk_string(v);}
 
        else if (type == SS_OBJECT_I)
 	  val = SC_VA_ARG(object *);
@@ -619,9 +549,7 @@ static object *_SS_make_list(int n, int *type, void **ptr)
         {ityp = type[i];
 
 /* fixed point types */
-	 if ((ityp == SC_SHORT_I) ||
-	     (ityp == SC_INT_I) ||
-	     (ityp == SC_ENUM_I))
+	 if ((ityp == SC_SHORT_I) || (ityp == SC_INT_I))
 	    {j   = *(int *) ptr[i];
 	     lst = SS_mk_cons(SS_mk_integer((long long) j), lst);}
  

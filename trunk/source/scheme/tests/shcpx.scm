@@ -1,5 +1,5 @@
 ;
-; SHTYP.SCM - test complex and quaternion types
+; SHCPX.SCM - test complex and quaternion types
 ;
 ; Source Version: 3.0
 ; Software Release #: LLNL-CODE-422942
