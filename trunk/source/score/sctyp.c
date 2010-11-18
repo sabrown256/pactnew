@@ -12,89 +12,7 @@
  */
 
 #include "score_int.h"
-
-/*--------------------------------------------------------------------------*/
-
-#define SC_TRANS_TYPE(_d, _styp, _s, _n)                                     \
-    {_styp *_ps;                                                             \
-     _ps = (_styp *) _s;                                                     \
-     for (i = 0; i < _n; i++, *_d++ = *_ps++);}
-
-/*--------------------------------------------------------------------------*/
-
-#define SC_TRANS_TYPE_L(_d, _styp, _s, _n, _mn, _mx)                         \
-    {long _i;                                                                \
-     _styp *_ps;                                                             \
-     _styp _sm, _smn, _smx;                                                  \
-     _ps  = (_styp *) _s;                                                    \
-     if (sizeof(_sm) < sizeof(_mx))                                          \
-        {for (_i = 0; _i < _n; _i++)                                         \
-             *_d++ = *_ps++;}                                                \
-     else                                                                    \
-        {_smn = (_styp) _mn;                                                 \
-         _smx = (_styp) _mx;                                                 \
-         for (_i = 0; _i < _n; _i++)                                         \
-             {_sm = *_ps++;                                                  \
-              _sm = min(_sm, _smx);                                          \
-              _sm = max(_sm, _smn);                                          \
-              *_d++ = _sm;};};}
-
-/*--------------------------------------------------------------------------*/
-
-#define SC_TRANS_SPACE(_d, _dtyp, _pd, _n)                                   \
-    _dtyp *_d;                                                               \
-    _d = (_dtyp *) *_pd;                                                     \
-    if (_d == NULL)                                                          \
-       {_d   = FMAKE_N(_dtyp, _n, "SC_TRANS_SPACE:_d");                      \
-        *_pd = (void *) _d;};                                                \
-
-/*--------------------------------------------------------------------------*/
-
-#define SC_TRANS_DATA(_dtyp, _pd, _sid, _s, _n)                              \
-    {SC_TRANS_SPACE(_d, _dtyp, _pd, _n);                                     \
-     if (_d != NULL)                                                         \
-        {if (_sid == SC_FLOAT_I)                                             \
-            {SC_TRANS_TYPE(_d, float, _s, _n);}                              \
-         else if (_sid == SC_DOUBLE_I)                                       \
-            {SC_TRANS_TYPE(_d, double, _s, _n);}                             \
-         else if (_sid == SC_LONG_DOUBLE_I)                                  \
-            {SC_TRANS_TYPE(_d, long double, _s, _n);}                        \
-         else if (_sid == SC_SHORT_I)                                        \
-            {SC_TRANS_TYPE(_d, short, _s, _n);}                              \
-         else if (_sid == SC_INT_I)                                          \
-            {SC_TRANS_TYPE(_d, int, _s, _n);}                                \
-         else if (_sid == SC_LONG_I)                                         \
-            {SC_TRANS_TYPE(_d, long, _s, _n);}                               \
-         else if (_sid == SC_LONG_LONG_I)                                    \
-            {SC_TRANS_TYPE(_d, long long, _s, _n);}                          \
-         else if (_sid == SC_CHAR_I)                                         \
-            {SC_TRANS_TYPE(_d, char, _s, _n);};                              \
-         rv = TRUE;};}
-
-/*--------------------------------------------------------------------------*/
-
-#define SC_TRANS_DATA_L(_dtyp, _pd, _sid, _s, _n, _mn, _mx)                  \
-       {SC_TRANS_SPACE(_d, _dtyp, _pd, _n);                                  \
-        if (_d != NULL)                                                      \
-           {if (_sid == SC_FLOAT_I)                                          \
-               {SC_TRANS_TYPE_L(_d, float, _s, _n, _mn, _mx);}               \
-            else if (_sid == SC_DOUBLE_I)                                    \
-               {SC_TRANS_TYPE_L(_d, double, _s, _n, _mn, _mx);}              \
-            else if (_sid == SC_LONG_DOUBLE_I)                               \
-               {SC_TRANS_TYPE_L(_d, long double, _s, _n, _mn, _mx);}         \
-            else if (_sid == SC_SHORT_I)                                     \
-               {SC_TRANS_TYPE_L(_d, short, _s, _n, _mn, _mx);}               \
-            else if (_sid == SC_INT_I)                                       \
-               {SC_TRANS_TYPE_L(_d, int, _s, _n, _mn, _mx);}                 \
-            else if (_sid == SC_LONG_I)                                      \
-               {SC_TRANS_TYPE_L(_d, long, _s, _n, _mn, _mx);}                \
-            else if (_sid == SC_LONG_LONG_I)                                 \
-               {SC_TRANS_TYPE_L(_d, long long, _s, _n, _mn, _mx);}           \
-            else if (_sid == SC_CHAR_I)                                      \
-               {SC_TRANS_TYPE(_d, char, _s, _n);};                           \
-            rv = TRUE;};}
-
-/*--------------------------------------------------------------------------*/
+#include <sctypeg.h>
 
 int
  SC_UNKNOWN_I               = 0,
@@ -181,6 +99,9 @@ char
  *SC_INTEGER_S               = "integer",
  *SC_REAL_S                  = "double",
  *SC_REAL_P_S                = "double *";
+
+char
+ *SC_print_format[N_PRIMITIVES];
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -552,84 +473,21 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  */
 
 int SC_convert_id(int did, void **pd, int sid, void *s, int n, int flag)
-   {int i, rv, bpi;
+   {int rv, bpi;
+    long nc;
+    void *d;
 
-    if (_SC.bmx == 0)
-       SC_fix_lmt(sizeof(long long), &_SC.bmn, &_SC.bmx, NULL);
+/* allocate the space if need be */
+    d = *pd;
+    if (d == NULL)
+       {bpi = SC_type_size_i(did);
+	d   = FMAKE_N(char, n*bpi, "SC_CONVERT_ID:d");
+	*pd = (void *) d;};
 
-    rv = FALSE;
-
-    if (sid == did)
-       {char *d;
-
-        d = (char *) *pd;
-        if (d == NULL)
-           {bpi = SC_type_size_i(sid);
-            d   = FMAKE_N(char, n*bpi, "SC_CONVERT:d");
-            *pd = (void *) d;};
-
-        SC_copy_primitive(d, s, n, sid);
-        rv = TRUE;}
-
-    else
-
-/* fast but with simple truncation - FPE's are possible */
-#ifdef SC_FAST_TRUNC
-
-/* floating point types */
-       {if (did == SC_FLOAT_I)
-           {SC_TRANS_DATA(float, pd, sid, s, n);}
-
-        else if (did == SC_DOUBLE_I)
-           {SC_TRANS_DATA(double, pd, sid, s, n);}
-
-        else if (did == SC_LONG_DOUBLE_I)
-           {SC_TRANS_DATA(long double, pd, sid, s, n);}
-
-/* fixed point types */
-        else if (did == SC_SHORT_I)
-           {SC_TRANS_DATA(short, pd, sid, s, n);}
-
-        else if (did == SC_INT_I)
-           {SC_TRANS_DATA(int, pd, sid, s, n);}
-
-        else if (did == SC_LONG_I)
-           {SC_TRANS_DATA(long, pd, sid, s, n);}
-
-        else if (did == SC_LONG_LONG_I)
-           {SC_TRANS_DATA(long long, pd, sid, s, n);}
-
-        else if (did == SC_CHAR_I)
-           {SC_TRANS_DATA(char, pd, sid, s, n);};};
-
-/* slower with clipping - FPE's are NOT possible */
-#else
-
-       {if (did == SC_FLOAT_I)
-           {SC_TRANS_DATA_L(float, pd, sid, s, n, FLT_MIN, FLT_MAX);}
-
-        else if (did == SC_DOUBLE_I)
-           {SC_TRANS_DATA_L(double, pd, sid, s, n, DBL_MIN, DBL_MAX);}
-
-        else if (did == SC_LONG_DOUBLE_I)
-           {SC_TRANS_DATA_L(long double, pd, sid, s, n, LDBL_MIN, LDBL_MAX);}
-
-        else if (did == SC_SHORT_I)
-           {SC_TRANS_DATA_L(short, pd, sid, s, n, SHRT_MIN, SHRT_MAX);}
-
-        else if (did == SC_INT_I)
-           {SC_TRANS_DATA_L(int, pd, sid, s, n, INT_MIN, INT_MAX);}
-
-        else if (did == SC_LONG_I)
-           {SC_TRANS_DATA_L(long, pd, sid, s, n, LONG_MIN, LONG_MAX);}
-
-        else if (did == SC_LONG_LONG_I)
-	   {SC_TRANS_DATA_L(long long, pd, sid, s, n, _SC.bmn, _SC.bmx);}
-
-        else if (did == SC_CHAR_I)
-           {SC_TRANS_DATA_L(char, pd, sid, s, n, CHAR_MIN, CHAR_MAX);};};
-
-#endif
+    if (_SC_convf[did][sid] != NULL)
+       nc = _SC_convf[did][sid](d, s, n);
+    
+    rv = (nc == n);
 
     if (flag && (rv == TRUE))
        SFREE(s);
@@ -660,6 +518,40 @@ int SC_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag)
     rv = SC_convert_id(did, pd, sid, s, n, flag);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+    
+/* SC_VA_GET_ARG - set the Nth element of D which is of type ID
+ *               - from the variable arg list A
+ */
+
+int SC_va_get_arg(va_list a, int id, void *d, long n)
+    {int ok;
+    
+     ok = FALSE;
+
+     if (_SC_argf[id] != NULL)
+        ok = _SC_argf[id](a, d, n);
+    
+     return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+    
+/* SC_NTOS - render the Nth element of S which is of type ID
+ *         - as a string in T
+ */
+
+int SC_ntos(char *t, int nc, int id, void *s, long n)
+    {int ok;
+    
+     ok = FALSE;
+
+     if (_SC_strf[id] != NULL)
+        ok = _SC_strf[id](t, nc, s, n);
+    
+     return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

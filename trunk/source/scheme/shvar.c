@@ -254,13 +254,16 @@ object *SS_install_cv(char *name, void *pval, int ityp)
 
 static object *_SS_acc_var(C_procedure *cp, object *argl, int type)
    {object *vl, *ret;
+    SC_address ad;
+
+    ad.funcaddr = (PFInt) cp->proc[0];
 
     if (SS_nullobjp(argl))
-       ret = _SS_exa_var(cp->proc[0], type);
+       ret = _SS_exa_var(ad.memaddr, type);
 
     else
        {vl = SS_car(argl);
-        ret = _SS_set_var(cp->proc[0], vl, type);};
+        ret = _SS_set_var(ad.memaddr, vl, type);};
 
     return(ret);}
 

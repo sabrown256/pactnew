@@ -285,6 +285,7 @@ switch ($Cmnd)
            flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
            flog $Log setenv  SC_EXEC_TIME_FACTOR     80
            flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
+
            Note $Log "pact -log $Log -f $IncDir/Makefile $Args build"
            pact -log $Log -f $IncDir/Makefile $Args build
            set RStatus = $status

@@ -1,22 +1,51 @@
 /*
  * CONVERT.C - generate primitive type converters
  *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
  */
 
 #include "scstd.h"
+#include "scope_typeh.h"
 
-#define N_PRIMITIVES 14
+#define I_NON          3
+#define I_FIX          7
+#define I_FLOAT       10
+#define I_COMPLEX     13
+#define I_QUATERNION  14
+#define N_PRIMITIVES  15
+
+#define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
 
 static char
- *names[N_PRIMITIVES] = { NULL, NULL, "bool", "char",
-			  "shrt", "int", "lng", "ll",
-			  "flt", "dbl", "ldbl",
-			  "fcx", "dcx", "ldcx" },
- *types[N_PRIMITIVES] = { NULL, NULL, "bool", "char",
-			  "short", "int", "long", "long long",
-			  "float", "double", "long double",
-			  "float complex", "double complex",
-			  "long double complex" };
+ *names[] = { NULL, NULL, "bool", "char",
+	      "shrt", "int", "lng", "ll",
+	      "flt", "dbl", "ldbl",
+	      "fcx", "dcx", "ldcx",
+	      "qut" },
+ *types[] = { NULL, NULL, "bool", "char",
+	      "short", "int", "long", "long long",
+	      "float", "double", "long double",
+	      "float complex", "double complex",
+	      "long double complex",
+	      "quaternion" },
+ *promo[] = { NULL, NULL, "int", "int",
+	      "int", "int", "long", "long long",
+	      "double", "double", "long double",
+	      "float complex", "double complex",
+	      "long double complex",
+	      "quaternion" },
+ *mn[]    = { NULL, NULL, "BOOL_MIN", "CHAR_MIN",
+	      "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
+	      "FLT_MIN", "DBL_MIN", "LDBL_MIN",
+	      "FLT_MIN", "DBL_MIN", "LDBL_MIN",
+	      "DBL_MIN" },
+ *mx[]    = { NULL, NULL, "BOOL_MAX", "CHAR_MAX",
+	      "SHRT_MAX", "INT_MAX", "LONG_MAX", "LLONG_MAX",
+	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
+	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
+	      "DBL_MAX" };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -27,26 +56,183 @@ static void write_header(FILE *fp)
    {
 
     fprintf(fp, "/*\n");
-    fprintf(fp, " * SCCONV.C - generated conversion routine matrix\n");
+    fprintf(fp, " * SCTYPEG.H - generated type handling routines\n");
+    fprintf(fp, " *\n");
+    fprintf(fp, " * Source Version: 3.0\n");
+    fprintf(fp, " * Software Release #: LLNL-CODE-422942\n");
     fprintf(fp, " *\n");
     fprintf(fp, " */\n");
     fprintf(fp, " \n");
+
     fprintf(fp, "#include <cpyright.h>\n");
     fprintf(fp, "#include <score.h>\n");
     fprintf(fp, " \n");
+
+    fprintf(fp, "#define N_PRIMITIVES  %d\n", N_PRIMITIVES);
+    fprintf(fp, " \n");
+
+    Separator;
+    fprintf(fp, "/*                           TYPE CONVERSION                                */\n\n");
+    Separator;
+
     fprintf(fp, "#undef CONVERT\n");
     fprintf(fp, " \n");
 
-    fprintf(fp, "#define CONVERT(_otyp, _out, _ityp, _in)                   \\\n");
-    fprintf(fp, "void _SC_ ## _out ## _ ## _in(void *out, void *in, long n) \\\n");
+    fprintf(fp, "#define BOOL_MIN    0\n");
+    fprintf(fp, "#define BOOL_MAX    1\n");
+    fprintf(fp, " \n");
+
+    fprintf(fp, "#define DIRECT(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
     fprintf(fp, "   {long i;                                                \\\n");
-    fprintf(fp, "    _otyp *po = (_otyp *) out;                             \\\n");
-    fprintf(fp, "    _ityp *pi = (_ityp *) in;                              \\\n");
-    fprintf(fp, "    for (i = 0; i < n; i++, *po++ = *pi++);                \\\n");
-    fprintf(fp, "    return;}\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, *pd++ = *ps++);                \\\n");
+    fprintf(fp, "    return(i);}\n");
+
+    fprintf(fp, "#ifdef SC_FAST_TRUNC\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define CONVERT  DIRECT\n");
+    fprintf(fp, "#define C_TO_C   DIRECT\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#else\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define CONVERT(_dtyp, _d, _styp, _s, _dmn, _dmx)          \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    _styp sm, smn, smx;                                    \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    if (sizeof(sm) < sizeof(_dmx))                         \\\n");
+    fprintf(fp, "       {for (i = 0; i < n; i++, *pd++ = *ps++);}           \\\n");
+    fprintf(fp, "    else                                                   \\\n");
+    fprintf(fp, "       {smn = (_styp) _dmn;                                \\\n");
+    fprintf(fp, "        smx = (_styp) _dmx;                                \\\n");
+    fprintf(fp, "        for (i = 0; i < n; i++)                            \\\n");
+    fprintf(fp, "            {sm = *ps++;                                   \\\n");
+    fprintf(fp, "             sm = min(sm, smx);                            \\\n");
+    fprintf(fp, "             sm = max(sm, smn);                            \\\n");
+    fprintf(fp, "             *pd++ = sm;};};                               \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#define C_TO_C(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    long double sr, si, smn, smx;                          \\\n");
+    fprintf(fp, "    long double _Complex zs;                               \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    smn = (_styp) _dmn;                                    \\\n");
+    fprintf(fp, "    smx = (_styp) _dmx;                                    \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++)                                \\\n");
+    fprintf(fp, "        {zs = *ps++;                                       \\\n");
+    fprintf(fp, "         sr = creall(zs);                                  \\\n");
+    fprintf(fp, "         si = cimagl(zs);                                  \\\n");
+    fprintf(fp, "         sr = min(sr, smx);                                \\\n");
+    fprintf(fp, "         sr = max(sr, smn);                                \\\n");
+    fprintf(fp, "         si = min(si, smx);                                \\\n");
+    fprintf(fp, "         si = max(si, smn);                                \\\n");
+    fprintf(fp, "         *pd++ = sr + si*I;};                              \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "#endif\n");
     fprintf(fp, "\n");
 
-    fprintf(fp, "typedef void (*PFConv)(void *d, void *s, long n);\n");
+/* complex to real conversions */
+    fprintf(fp, "#define C_TO_R(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+/* this crashes GCC 4.5.1 - internal compiler error
+    fprintf(fp, "    for (i = 0; i < n; i++, *pd++ = *ps++);                \\\n");
+*/
+    fprintf(fp, "    for (i = 0; i < n; i++)                                \\\n");
+    fprintf(fp, "        pd[i] = creall(ps[i]);                             \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* quaternion to real conversions */
+    fprintf(fp, "#define Q_TO_R(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, *pd++ = (*ps++).s);            \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* quaternion to complex conversions */
+    fprintf(fp, "#define Q_TO_C(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    _dtyp z;                                               \\\n");
+    fprintf(fp, "    quaternion q;                                          \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {q     = *ps++;                                    \\\n");
+    fprintf(fp, "         z     = q.s + q.i*I;                              \\\n");
+    fprintf(fp, "         *pd++ = z;};                                      \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* real to quaternion conversions */
+    fprintf(fp, "#define R_TO_Q(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    quaternion q = {0.0, 0.0, 0.0, 0.0};                   \\\n");
+    fprintf(fp, "    quaternion *pd = d;                                    \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {q.s   = *ps++;                                    \\\n");
+    fprintf(fp, "         *pd++ = q;};                                      \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* complex to quaternion conversions */
+    fprintf(fp, "#define C_TO_Q(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    long double _Complex z;                                \\\n");
+    fprintf(fp, "    quaternion q = {0.0, 0.0, 0.0, 0.0};                   \\\n");
+    fprintf(fp, "    quaternion *pd = d;                                    \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {z     = *ps++;                                    \\\n");
+    fprintf(fp, "         q.s   = creall(z);                                \\\n");
+    fprintf(fp, "         q.i   = cimagl(z);                                \\\n");
+    fprintf(fp, "         *pd++ = q;};                                      \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+    Separator;
+    fprintf(fp, "/*                         VA ARG EXTRACTION                                */\n\n");
+    Separator;
+
+    fprintf(fp, "#define GETARG(_ntyp, _dtyp, _ptyp)                        \\\n");
+    fprintf(fp, "int _SC_arg_ ## _ntyp(va_list __a__, void *d, long n)      \\\n");
+    fprintf(fp, "   {_dtyp *pv = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    pv[n] = SC_VA_ARG(_ptyp);                              \\\n");
+    fprintf(fp, "    return(TRUE);}\n");
+    fprintf(fp, "\n");
+
+    Separator;
+    fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
+    Separator;
+
+    fprintf(fp, "#define NTOS(_ntyp, _styp, _i)                             \\\n");
+    fprintf(fp, "int _SC_str_ ## _ntyp(char *t, int nc, void *s, long n)    \\\n");
+    fprintf(fp, "   {int nb;                                                \\\n");
+    fprintf(fp, "    _styp *pv = (_styp *) s;                               \\\n");
+    fprintf(fp, "    nb = snprintf(t, nc, SC_print_format[_i], pv[n]);      \\\n");
+    fprintf(fp, "    return(nb);}\n");
+    fprintf(fp, "\n");
+
+    Separator;
+    fprintf(fp, "typedef long (*PFConv)(void *d, void *s, long n);\n");
+    fprintf(fp, "typedef int (*PFArgv)(va_list a, void *d, long n);\n");
+    fprintf(fp, "typedef int (*PFStrv)(char *t, int nc, void *s, long n);\n");
     fprintf(fp, "\n");
 
     return;}
@@ -54,16 +240,65 @@ static void write_header(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_ROUTINES - write the conversion routines */
+/* WRITE_CONVERTERS - write the conversion routines */
 
-static void write_routines(FILE *fp)
+static void write_converters(FILE *fp)
    {int i, j;
+    char *ti, *tj;
 
     for (i = 0; i < N_PRIMITIVES; i++)
-        for (j = 0; j < N_PRIMITIVES; j++)
-	    {if ((types[i] != NULL) && (types[j] != NULL))
-	        fprintf(fp, "CONVERT(%s, %s, %s, %s)\n\n",
-			types[i], names[i], types[j], names[j]);};
+        {ti = types[i];
+	 for (j = 0; j < N_PRIMITIVES; j++)
+	     {tj = types[j];
+	      if ((ti != NULL) && (tj != NULL))
+
+/* direct copy */
+		 {if (i == j)
+		     fprintf(fp, "DIRECT(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* complex to real conversions */
+		  else if ((i <= I_FLOAT) && (I_FLOAT < j) && (j <= I_COMPLEX))
+		     fprintf(fp, "C_TO_R(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* complex to complex conversions */
+		  else if ((I_FLOAT < i) && (i <= I_COMPLEX) &&
+			   (I_FLOAT < j) && (j <= I_COMPLEX))
+		     fprintf(fp, "C_TO_C(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* quaternion to real conversions */
+		  else if ((i <= I_FLOAT) && (j == I_QUATERNION))
+		     fprintf(fp, "Q_TO_R(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* quaternion to complex conversions */
+		  else if ((I_FLOAT < i) && (i <= I_COMPLEX) && (j == I_QUATERNION))
+		     fprintf(fp, "Q_TO_C(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* real to quaternion conversions */
+		  else if ((I_QUATERNION == i) && (j <= I_FLOAT))
+		     fprintf(fp, "R_TO_Q(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* complex to quaternion conversions */
+		  else if ((I_QUATERNION == i) && (I_FLOAT < j) && (j <= I_COMPLEX))
+		     fprintf(fp, "C_TO_Q(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+		  else
+		     fprintf(fp, "CONVERT(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);};};};
 
     fprintf(fp, "\n");
 
@@ -72,9 +307,9 @@ static void write_routines(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_DECL - write the declaration of the conversion array */
+/* WRITE_CONV_DECL - write the declaration of the conversion array */
 
-static void write_decl(FILE *fp)
+static void write_conv_decl(FILE *fp)
    {int i, j;
 
     fprintf(fp, "static PFConv\n");
@@ -120,28 +355,102 @@ static void write_decl(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_CONV - write the master conversion routine */
+/* WRITE_ARGS - write the va arg routines */
 
-static void write_conv(FILE *fp)
-   {
+static void write_args(FILE *fp)
+   {int i, n;
 
-    fprintf(fp, "void SC_convert_primitive(int did, void *d, int sid, void *s, long n)\n");
-    fprintf(fp, "   {\n");
-    fprintf(fp, "    \n");
-    fprintf(fp, "    if (_SC_convf[did][sid] != NULL)\n");
-    fprintf(fp, "       _SC_convf[did][sid](d, s, n);\n");
-    fprintf(fp, "    \n");
-    fprintf(fp, "    return;}\n");
+/* PATHSCALE 2.5 does not support complex types in va_arg */
+#if defined(COMPILER_PATHSCALE)
+    n = 10;
+#else
+    n = N_PRIMITIVES;
+#endif
+
+    for (i = 0; i < n; i++)
+        {if (types[i] != NULL)
+	    fprintf(fp, "GETARG(%s, %s, %s)\n\n",
+		    names[i], types[i], promo[i]);};
+
+    fprintf(fp, "\n");
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_TRAILER - write the end of the file */
+/* WRITE_ARG_DECL - write the declaration of the conversion array */
 
-static void write_trailer(FILE *fp)
-   {
+static void write_arg_decl(FILE *fp)
+   {int i, n;
+
+/* PATHSCALE 2.5 does not support complex types in va_arg */
+#if defined(COMPILER_PATHSCALE)
+    n = 10;
+#else
+    n = N_PRIMITIVES;
+#endif
+
+    fprintf(fp, "static PFArgv\n");
+    fprintf(fp, " _SC_argf[] = {\n");
+    for (i = 0; i < n; i++)
+        {if (types[i] != NULL)
+	    {if (i == N_PRIMITIVES-1)
+	        fprintf(fp, "_SC_arg_%s\n", names[i]);
+	     else
+	        fprintf(fp, "_SC_arg_%s,\n", names[i]);}
+	 else
+	    {if (i == N_PRIMITIVES-1)
+	        fprintf(fp, "NULL ");
+	     else
+	        fprintf(fp, "NULL,\n");};};
+
+    fprintf(fp, "};\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_STR - write the va arg routines */
+
+static void write_str(FILE *fp)
+   {int i;
+
+    for (i = 0; i < N_PRIMITIVES; i++)
+        {if (types[i] != NULL)
+	    fprintf(fp, "NTOS(%s, %s, %d)\n\n",
+		    names[i], types[i], i);};
+
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_STR_DECL - write the declaration of the conversion array */
+
+static void write_str_decl(FILE *fp)
+   {int i;
+
+    fprintf(fp, "static PFStrv\n");
+    fprintf(fp, " _SC_strf[] = {\n");
+    for (i = 0; i < N_PRIMITIVES; i++)
+        {if (types[i] != NULL)
+	    {if (i == N_PRIMITIVES-1)
+	        fprintf(fp, "_SC_str_%s\n", names[i]);
+	     else
+	        fprintf(fp, "_SC_str_%s,\n", names[i]);}
+	 else
+	    {if (i == N_PRIMITIVES-1)
+	        fprintf(fp, "NULL ");
+	     else
+	        fprintf(fp, "NULL,\n");};};
+
+    fprintf(fp, "};\n");
+    fprintf(fp, "\n");
 
     return;}
 
@@ -152,23 +461,44 @@ static void write_trailer(FILE *fp)
 
 int main(int c, char **v)
    {int rv;
+    char *name;
     FILE *fp;
 
     rv = 0;
 
-    fp = fopen("scconv.c", "w");
+/*    name = "scconv.c"; */
+    name = NULL;
+
+    if (name != NULL)
+       fp = fopen(name, "w");
+    else
+       fp = stdout;
 
     write_header(fp);
 
-    write_routines(fp);
+/* emit type conversion code */
+    Separator;
 
-    write_decl(fp);
+    write_converters(fp);
 
-    write_conv(fp);
+    write_conv_decl(fp);
 
-    write_trailer(fp);
+/* emit var arg code */
+    Separator;
 
-    fclose(fp);
+    write_args(fp);
+
+    write_arg_decl(fp);
+
+/* emit number to string code */
+    Separator;
+
+    write_str(fp);
+
+    write_str_decl(fp);
+
+    if (name != NULL)
+       fclose(fp);
 
     return(rv);}
 

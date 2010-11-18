@@ -79,6 +79,14 @@
 # define volatile
 #endif
 
+#ifndef LLONG_MAX
+# define LLONG_MAX    9223372036854775807LL
+#endif
+
+#ifndef LLONG_MIN
+# define LLONG_MIN    (-LLONG_MAX - 1LL)
+#endif
+
 #ifndef TRUE
 # define TRUE 1
 #endif
@@ -264,6 +272,16 @@ struct s_pcons
     void *car;
     char *cdr_type;
     void *cdr;};
+
+/* QUATERNION - defined here so that it participates in type system */
+
+typedef struct s_quaternion quaternion;
+
+struct s_quaternion
+   {double s;
+    double i;
+    double j;
+    double k;};
 
 /*--------------------------------------------------------------------------*/
 
