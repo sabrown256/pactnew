@@ -14,7 +14,8 @@ LibName=score
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
          scope_term.h scope_mpi.h scope_make.h \
-         scope_lex.h scope_thread.h
+         scope_lex.h scope_thread.h \
+         ${PACTTmpDir}/sctypeg.h
 
 MMLib = ${LibDir}/libpsmm.a
 
@@ -37,12 +38,13 @@ SaveFiles = *.c *.h *.r
 #
 CleanFiles = scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
              ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
-             ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan
+             ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan \
+             ${IncDir}/sctypeg.h ${PACTTmpDir}/sctypeg.h
 
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${MMLib}
+InstallDep = ${TGTLib} ${MMLib} ${PACTTmpDir}/sctypeg.h
 BinDep =
 BinObj =
 
@@ -143,7 +145,8 @@ ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) ${TGTLib}(scbgl.o)
 
 ArBind = ${TGTLib}(gf-${LibName}.o)
 
-ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} ${ArSObjs} ${ArTObjs} ${OSSupport} \
+ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} \
+         ${ArSObjs} ${ArTObjs} ${OSSupport} \
          ${TGTLib}(scctl.o) ${TGTLib}(scfia.o) ${TGTLib}(scfis.o) \
 	 ${TGTLib}(scfnca.o) ${TGTLib}(scfncb.o) ${TGTLib}(scfnct.o) \
          ${TGTLib}(scarrd.o) ${TGTLib}(scarrs.o) ${TGTLib}(scstr.o) \
@@ -166,9 +169,9 @@ ${DObjs} : scope_make.h scope_proc.h
 ${MObjs} : scope_mem.h
 ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
-${Objs}  : ${Hdrs}
+${Objs}  : ${Hdrs} ${PACTTmpDir}/sctypeg.h
 
-${LibDep} : ${Hdrs}
+${LibDep} : ${Hdrs} ${PACTTmpDir}/sctypeg.h
 ${MMDep}  : ${Hdrs}
 
 #
@@ -179,11 +182,11 @@ ${BinDir}/convert : convert.c ${Hdrs}
 
 convert : ${BinDir}/convert
 
-${PACTTmpDir}/scconv.c : ${BinDir}/convert
-	${RM} ${PACTTmpDir}/scconv.c
-	@echo "${CFE} ${BinDir}/convert -> scconv.c"
-	@( ${CFE} ${BinDir}/convert > ${PACTTmpDir}/scconv.c ||   \
-           ( echo "***> Failed to generate scconv.c"         &&   \
+${PACTTmpDir}/sctypeg.h : ${BinDir}/convert
+	${RM} ${PACTTmpDir}/sctypeg.h
+	@echo "${CFE} ${BinDir}/convert -> sctypeg.h"
+	@( ${CFE} ${BinDir}/convert > ${PACTTmpDir}/sctypeg.h ||   \
+           ( echo "***> Failed to generate sctypeg.h"         &&   \
              exit 1 ) )
 
 #

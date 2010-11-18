@@ -148,6 +148,9 @@ extern char
  *SC_REAL_S,
  *SC_REAL_P_S;
 
+extern char
+ *SC_print_format[];
+
 extern int
  (*SC_sizeof_hook)(char *s);                     /* string driven size hook */
 
@@ -193,7 +196,8 @@ extern int
  SC_is_type_cx(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
- SC_convert(char *dtype, void **d, char *stype, void *s, int n, int flag);
+ SC_convert(char *dtype, void **d, char *stype, void *s, int n, int flag),
+ SC_va_get_arg(va_list a, int id, void *d, long n);
 
 extern size_t
  SC_copy_primitive(void *d, void *s, long n, int id);

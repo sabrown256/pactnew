@@ -26,6 +26,7 @@ static INLINE void _SC_array_err(SC_array *a, char *fmt, ...)
     {
 
 #ifdef DEBUG
+
      int nr;
      char s[MAXLINE];
 
@@ -37,6 +38,12 @@ static INLINE void _SC_array_err(SC_array *a, char *fmt, ...)
 
      if (nr > 1)
         io_printf(stdout, "\nERROR: %s (%ld references)\n\n", s, nr);
+
+#else
+
+     SC_VA_START(fmt);
+     SC_VA_END;
+
 #endif
 
      return;}

@@ -37,14 +37,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef struct s_quaternion quaternion;
-
-struct s_quaternion
-   {double s;
-    double i;
-    double j;
-    double k;};
-
 /*--------------------------------------------------------------------------*/
 
 /*                         VARIABLE DECLARATIONS                            */
