@@ -547,6 +547,8 @@ typedef char *F77_string;
 
 /*--------------------------------------------------------------------------*/
 
+#define SC_VA_GET_ARG(_id, _d, _n)   SC_va_get_arg(__a__, _id, _d, _n)
+
 #ifdef ANSI
 
 #define SC_VA_START(x)                                                       \
