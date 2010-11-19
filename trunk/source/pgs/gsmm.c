@@ -180,12 +180,12 @@ pcons *PG_set_line_info(pcons *info, PG_rendering pty, int axis_type, int style,
     info = PG_set_plot_type(info, pty, axis_type);
 
     info = PG_set_attrs_alist(info,
-			      "HIST-START",   SC_INT_I, FALSE, start,
-			      "SCATTER",      SC_INT_I, FALSE, scatter,
-			      "MARKER-INDEX", SC_INT_I, FALSE, marker,
-			      "LINE-COLOR",   SC_INT_I, FALSE, color,
-			      "LINE-STYLE",   SC_INT_I, FALSE, style,
-			      "LINE-WIDTH",   SC_DOUBLE_I,  FALSE, width,
+			      "HIST-START",   SC_INT_I,    FALSE, start,
+			      "SCATTER",      SC_INT_I,    FALSE, scatter,
+			      "MARKER-INDEX", SC_INT_I,    FALSE, marker,
+			      "LINE-COLOR",   SC_INT_I,    FALSE, color,
+			      "LINE-STYLE",   SC_INT_I,    FALSE, style,
+			      "LINE-WIDTH",   SC_DOUBLE_I, FALSE, width,
 			      NULL);
     return(info);}
 
@@ -204,15 +204,15 @@ pcons *PG_set_tds_info(pcons *info, PG_rendering pty, int axis_type, int style,
     info = PG_set_plot_type(info, pty, axis_type);
 
     info = PG_set_attrs_alist(info,
-			      "N-LEVELS",   SC_INT_I, FALSE, nlev,
-			      "LINE-COLOR", SC_INT_I, FALSE, color,
-			      "LINE-STYLE", SC_INT_I, FALSE, style,
-			      "LINE-WIDTH", SC_DOUBLE_I,  FALSE, width,
-			      "RATIO",      SC_DOUBLE_I,  FALSE, ratio,
-			      "THETA",      SC_DOUBLE_I,  FALSE, theta,
-			      "PHI",        SC_DOUBLE_I,  FALSE, phi,
-			      "CHI",        SC_DOUBLE_I,  FALSE, chi,
-			      "DISTANCE",   SC_DOUBLE_I,  FALSE, d,
+			      "N-LEVELS",   SC_INT_I,    FALSE, nlev,
+			      "LINE-COLOR", SC_INT_I,    FALSE, color,
+			      "LINE-STYLE", SC_INT_I,    FALSE, style,
+			      "LINE-WIDTH", SC_DOUBLE_I, FALSE, width,
+			      "RATIO",      SC_DOUBLE_I, FALSE, ratio,
+			      "THETA",      SC_DOUBLE_I, FALSE, theta,
+			      "PHI",        SC_DOUBLE_I, FALSE, phi,
+			      "CHI",        SC_DOUBLE_I, FALSE, chi,
+			      "DISTANCE",   SC_DOUBLE_I, FALSE, d,
 			      NULL);
 
     return(info);}
@@ -231,9 +231,9 @@ pcons *PG_set_tdv_info(pcons *info, PG_rendering pty, int axis_type,
     info = PG_set_plot_type(info, pty, axis_type);
 
     info = PG_set_attrs_alist(info,
-			      "LINE-COLOR",   SC_INT_I, FALSE, color,
-			      "LINE-STYLE",   SC_INT_I, FALSE, style,
-			      "LINE-WIDTH",   SC_DOUBLE_I,  FALSE, width,
+			      "LINE-COLOR",   SC_INT_I,    FALSE, color,
+			      "LINE-STYLE",   SC_INT_I,    FALSE, style,
+			      "LINE-WIDTH",   SC_DOUBLE_I, FALSE, width,
 			      NULL);
     return(info);}
 
@@ -246,8 +246,8 @@ pcons *PG_set_tdv_info(pcons *info, PG_rendering pty, int axis_type,
  */
 
 PG_graph *PG_make_graph_from_sets(char *name, PM_set *domain, PM_set *range,
-				  PM_centering centering, char *info_type, void *info,
-				  int id, PG_graph *next)
+				  PM_centering centering, char *info_type,
+				  void *info, int id, PG_graph *next)
    {PM_mapping *f;
     PG_graph *g;
 

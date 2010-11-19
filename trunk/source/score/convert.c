@@ -360,7 +360,10 @@ static void write_conv_decl(FILE *fp)
 static void write_args(FILE *fp)
    {int i, n;
 
-/* PATHSCALE 2.5 does not support complex types in va_arg */
+/* PATHSCALE 2.5 does not support complex types in va_arg
+ * GOTCHA: this is the wrong way to do this because we MUST
+ * have all the types that are supported in the proper order
+ */
 #if defined(COMPILER_PATHSCALE)
     n = 10;
 #else
@@ -371,6 +374,8 @@ static void write_args(FILE *fp)
         {if (types[i] != NULL)
 	    fprintf(fp, "GETARG(%s, %s, %s)\n\n",
 		    names[i], types[i], promo[i]);};
+
+    fprintf(fp, "GETARG(ptr, void *, void *)\n\n");
 
     fprintf(fp, "\n");
 
@@ -395,15 +400,11 @@ static void write_arg_decl(FILE *fp)
     fprintf(fp, " _SC_argf[] = {\n");
     for (i = 0; i < n; i++)
         {if (types[i] != NULL)
-	    {if (i == N_PRIMITIVES-1)
-	        fprintf(fp, "_SC_arg_%s\n", names[i]);
-	     else
-	        fprintf(fp, "_SC_arg_%s,\n", names[i]);}
+	    fprintf(fp, "                _SC_arg_%s,\n", names[i]);
 	 else
-	    {if (i == N_PRIMITIVES-1)
-	        fprintf(fp, "NULL ");
-	     else
-	        fprintf(fp, "NULL,\n");};};
+	    fprintf(fp, "                NULL,\n");};
+
+    fprintf(fp, "                _SC_arg_ptr\n");
 
     fprintf(fp, "};\n");
     fprintf(fp, "\n");
@@ -440,14 +441,14 @@ static void write_str_decl(FILE *fp)
     for (i = 0; i < N_PRIMITIVES; i++)
         {if (types[i] != NULL)
 	    {if (i == N_PRIMITIVES-1)
-	        fprintf(fp, "_SC_str_%s\n", names[i]);
+	        fprintf(fp, "                _SC_str_%s\n", names[i]);
 	     else
-	        fprintf(fp, "_SC_str_%s,\n", names[i]);}
+	        fprintf(fp, "                _SC_str_%s,\n", names[i]);}
 	 else
 	    {if (i == N_PRIMITIVES-1)
-	        fprintf(fp, "NULL ");
+	        fprintf(fp, "                NULL\n");
 	     else
-	        fprintf(fp, "NULL,\n");};};
+	        fprintf(fp, "                NULL,\n");};};
 
     fprintf(fp, "};\n");
     fprintf(fp, "\n");

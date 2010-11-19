@@ -61,7 +61,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 if (typ == SC_SHORT_I)
 	    {short *pv, v;
 	     pv = SC_VA_ARG(short *);
-	     v  = SC_VA_ARG(int);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(short *) pa;
 	     else if (dflt == TRUE)
@@ -70,7 +70,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_INT_I)
 	    {int *pv, v;
 	     pv = SC_VA_ARG(int *);
-	     v  = SC_VA_ARG(int);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(int *) pa;
 	     else if (dflt == TRUE)
@@ -79,7 +79,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_LONG_I)
 	    {long *pv, v;
 	     pv = SC_VA_ARG(long *);
-	     v  = SC_VA_ARG(long);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(long *) pa;
 	     else if (dflt == TRUE)
@@ -88,7 +88,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_LONG_LONG_I)
 	    {long long *pv, v;
 	     pv = SC_VA_ARG(long long *);
-	     v  = SC_VA_ARG(long long);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(long long *) pa;
 	     else if (dflt == TRUE)
@@ -98,7 +98,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_FLOAT_I)
 	    {float *pv, v;
 	     pv = SC_VA_ARG(float *);
-	     v  = SC_VA_ARG(double);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(float *) pa;
 	     else if (dflt == TRUE)
@@ -107,7 +107,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_DOUBLE_I)
 	    {double *pv, v;
 	     pv = SC_VA_ARG(double *);
-	     v  = SC_VA_ARG(double);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(double *) pa;
 	     else if (dflt == TRUE)
@@ -116,7 +116,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_LONG_DOUBLE_I)
 	    {long double *pv, v;
 	     pv = SC_VA_ARG(long double *);
-	     v  = SC_VA_ARG(long double);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(long double *) pa;
 	     else if (dflt == TRUE)
@@ -126,7 +126,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_FLOAT_COMPLEX_I)
 	    {float _Complex *pv, v;
 	     pv = SC_VA_ARG(float _Complex *);
-	     v  = SC_VA_ARG(float _Complex);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(float *) pa;
 	     else if (dflt == TRUE)
@@ -135,7 +135,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_DOUBLE_COMPLEX_I)
 	    {double _Complex *pv, v;
 	     pv = SC_VA_ARG(double _Complex *);
-	     v  = SC_VA_ARG(double _Complex);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(double *) pa;
 	     else if (dflt == TRUE)
@@ -144,7 +144,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_LONG_DOUBLE_COMPLEX_I)
 	    {long double _Complex *pv, v;
 	     pv = SC_VA_ARG(long double _Complex *);
-	     v  = SC_VA_ARG(long double _Complex);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(long double *) pa;
 	     else if (dflt == TRUE)
@@ -153,7 +153,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 else if (typ == SC_CHAR_I)
 	    {char *pv, v;
 	     pv = SC_VA_ARG(char *);
-	     v  = SC_VA_ARG(int);
+	     SC_VA_GET_ARG(typ, &v, 0);
 	     if (pa != NULL)
 	        *pv = *(char *) pa;
 	     else if (dflt == TRUE)
@@ -280,8 +280,8 @@ int PG_get_attrs_alist(pcons *alst, ...)
  */
 
 static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
-   {int i, typ, ptr;
-    char *name;
+   {int i, ityp, ptr, bpi;
+    char *name, *typn;
     void *pv;
 
     for (i = 0; TRUE; i++)
@@ -289,131 +289,27 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
 	 if (name == NULL)
 	    break;
 
-	 typ = SC_VA_ARG(int);
-	 ptr = SC_VA_ARG(int);
+	 ityp = SC_VA_ARG(int);
+	 ptr  = SC_VA_ARG(int);
+	 bpi  = SC_type_size_i(ityp);
+	 typn = SC_type_name(ityp - SC_BOOL_I + SC_POINTER_I);
 
-/* fixed point types */
-	 if (typ == SC_SHORT_I)
-	    {short v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(short *);
-		 alst = SC_change_alist(alst, name, SC_SHORT_P_S, pv);}
+	 if ((SC_BIT_I < ityp) && (ityp < SC_POINTER_I))
+	    {if (ptr)
+	        SC_VA_GET_ARG(SC_POINTER_I, &pv, 0);
 	     else
-	        {v = SC_VA_ARG(int);
-		 SC_CHANGE_VALUE_ALIST(alst, short, SC_SHORT_P_S,
-				       name, v);};}
+	        {pv = FMAKE_N(char, bpi, "_PG_SET_ATTRS_ALIST:pv");
+	         SC_VA_GET_ARG(ityp, pv, 0);};
+	     alst = SC_change_alist(alst, name, typn, pv);}
 
-	 else if (typ == SC_INT_I)
-	    {int v;
+	 else if (ityp == SC_POINTER_I)
+	    {void **pv;
 	     if (ptr)
-	        {pv = SC_VA_ARG(int *);
-		 alst = SC_change_alist(alst, name, SC_INT_P_S, pv);}
+	        pv = SC_VA_ARG(void **);
 	     else
-	        {v = SC_VA_ARG(int);
-		 SC_CHANGE_VALUE_ALIST(alst, int, SC_INT_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_LONG_I)
-	    {long v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(long *);
-		 alst = SC_change_alist(alst, name, SC_LONG_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(long);
-		 SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_LONG_LONG_I)
-	    {long long v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(long long *);
-		 alst = SC_change_alist(alst, name, SC_LONG_LONG_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(long long);
-		 SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_LONG_P_S,
-				       name, v);};}
-
-/* floating point types */
-	 else if (typ == SC_FLOAT_I)
-	    {float v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(float *);
-		 alst = SC_change_alist(alst, name, SC_FLOAT_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(double);
-		 SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_DOUBLE_I)
-	    {double v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(double *);
-		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(double);
-		 SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_LONG_DOUBLE_I)
-	    {long double v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(long double *);
-		 alst = SC_change_alist(alst, name, SC_LONG_DOUBLE_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(long double);
-		 SC_CHANGE_VALUE_ALIST(alst, double, SC_LONG_DOUBLE_P_S,
-				       name, v);};}
-
-/* complex floating point types */
-	 else if (typ == SC_FLOAT_COMPLEX_I)
-	    {float _Complex v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(float _Complex *);
-		 alst = SC_change_alist(alst, name, SC_FLOAT_COMPLEX_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(float _Complex);
-		 SC_CHANGE_VALUE_ALIST(alst, float, SC_FLOAT_COMPLEX_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_DOUBLE_COMPLEX_I)
-	    {double _Complex v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(double _Complex *);
-		 alst = SC_change_alist(alst, name, SC_DOUBLE_COMPLEX_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(double _Complex);
-		 SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_COMPLEX_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_LONG_DOUBLE_COMPLEX_I)
-	    {long double _Complex v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(long double _Complex *);
-		 alst = SC_change_alist(alst, name, SC_LONG_DOUBLE_COMPLEX_P_S, pv);}
-	     else
-	        {v = SC_VA_ARG(long double _Complex);
-		 SC_CHANGE_VALUE_ALIST(alst, double, SC_LONG_DOUBLE_COMPLEX_P_S,
-				       name, v);};}
-
-	 else if (typ == SC_CHAR_I)
-	    {char v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(char *);
-		 alst = SC_change_alist(alst, name, SC_STRING_S, pv);}
-	     else
-	        {v = SC_VA_ARG(int);
-		 SC_CHANGE_VALUE_ALIST(alst, char, SC_STRING_S,
-				       name, v);};}
-
-	 else if (typ == SC_POINTER_I)
-	    {void *v;
-	     if (ptr)
-	        {pv = SC_VA_ARG(void **);
-		 alst = SC_change_alist(alst, name, SC_POINTER_S, pv);}
-	     else
-	        {v = SC_VA_ARG(void *);
-		 SC_CHANGE_VALUE_ALIST(alst, void *, SC_POINTER_S,
-				       name, v);};};};
+	        {pv  = (void **) FMAKE_N(char, bpi, "_PG_SET_ATTRS_ALIST:pv");
+		 *pv = SC_VA_ARG(void *);};
+	     alst = SC_change_alist(alst, name, SC_POINTER_S, pv);};};
 
     return(alst);}
 

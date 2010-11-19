@@ -14,8 +14,14 @@
 #include "score_int.h"
 #include <sctypeg.h>
 
+/* these must have the same sequence/values as the dynamic values
+ * assigned in SC_init_base_types
+ * changes here MUST be reflected there
+ */
+
 int
  SC_UNKNOWN_I               = 0,
+
  SC_BIT_I                   = 1,
  SC_BOOL_I                  = 2,
  SC_CHAR_I                  = 3,
@@ -30,9 +36,13 @@ int
  SC_DOUBLE_COMPLEX_I        = 12,
  SC_LONG_DOUBLE_COMPLEX_I   = 13,
  SC_QUATERNION_I            = 14,
- SC_STRING_I                = 15,
- SC_POINTER_I               = 16,
- SC_BOOL_P_I                = 17,
+
+/* these must shadow SC_BIT_I thru SC_QUATERNION_I
+ * so that SC_xxx_P_I = SC_xxx_I - SC_BIT_I + SC_POINTER_I
+ */
+ SC_POINTER_I               = 15,
+ SC_BOOL_P_I                = 16,
+ SC_STRING_I                = 17,
  SC_SHORT_P_I               = 18,
  SC_INT_P_I                 = 19,
  SC_LONG_P_I                = 20,
@@ -44,6 +54,7 @@ int
  SC_DOUBLE_COMPLEX_P_I      = 26,
  SC_LONG_DOUBLE_COMPLEX_P_I = 27,
  SC_QUATERNION_P_I          = 28,
+
  SC_VOID_I                  = 29,
  SC_CHAR_8_I                = 30,
  SC_STRUCT_I                = 31,
@@ -52,6 +63,7 @@ int
  SC_FILE_I                  = 34,
  SC_PCONS_P_I               = 35,
 
+/* aliases */
  SC_ENUM_I                  = 5,
  SC_INTEGER_I               = 5,
  SC_REAL_I                  = 9,
@@ -73,9 +85,11 @@ char
  *SC_DOUBLE_COMPLEX_S        = "double_complex",
  *SC_LONG_DOUBLE_COMPLEX_S   = "long_double_complex",
  *SC_QUATERNION_S            = "quaternion",
- *SC_STRING_S                = "char *",
+
+/* these must shadow SC_BIT_S thru SC_QUATERNION_S */
  *SC_POINTER_S               = "void *",
  *SC_BOOL_P_S                = "bool *",
+ *SC_STRING_S                = "char *",
  *SC_SHORT_P_S               = "short *",
  *SC_INT_P_S                 = "int *",
  *SC_LONG_P_S                = "long *",
@@ -87,6 +101,7 @@ char
  *SC_DOUBLE_COMPLEX_P_S      = "double_complex *",
  *SC_LONG_DOUBLE_COMPLEX_P_S = "long_double_complex *",
  *SC_QUATERNION_P_S          = "quaternion *",
+
  *SC_VOID_S                  = "void",
  *SC_CHAR_8_S                = "char_8",
  *SC_STRUCT_S                = "struct",
@@ -95,6 +110,7 @@ char
  *SC_FILE_S                  = "FILE",
  *SC_PCONS_P_S               = "pcons *",
 
+/* aliases */
  *SC_ENUM_S                  = "enum",
  *SC_INTEGER_S               = "integer",
  *SC_REAL_S                  = "double",
@@ -393,7 +409,13 @@ void SC_init_base_types(void)
     ONCE_SAFE(FALSE, NULL)
        szptr = sizeof(char *);
 
+/* these must have the same sequence/values as the static values
+ * in the definition at the top of the file
+ * changes here MUST be reflected there
+ */
+
        SC_UNKNOWN_I               = SC_register_type(SC_UNKNOWN_S,             0,                            NULL);
+
        SC_BIT_I                   = SC_register_type(SC_BIT_S,                 0,                 NULL);
        SC_BOOL_I                  = SC_register_type(SC_BOOL_S,                sizeof(bool),                 NULL);
        SC_CHAR_I                  = SC_register_type(SC_CHAR_S,                sizeof(char),                 NULL);
@@ -409,10 +431,12 @@ void SC_init_base_types(void)
        SC_LONG_DOUBLE_COMPLEX_I   = SC_register_type(SC_LONG_DOUBLE_COMPLEX_S, sizeof(long double _Complex), NULL);
        SC_QUATERNION_I            = SC_register_type(SC_QUATERNION_S,          4*sizeof(double),             NULL);
 
-/*       SC_STRING_I                = SC_register_type("string",                   szptr, NULL); */
-       SC_STRING_I                = SC_register_type(SC_STRING_S,                szptr, NULL);
+/* these must shadow SC_BIT_I thru SC_QUATERNION_I
+ * so that SC_xxx_P_I = SC_xxx_I - SC_BIT_I + SC_POINTER_I
+ */
        SC_POINTER_I               = SC_register_type(SC_POINTER_S,               szptr, NULL);
        SC_BOOL_P_I                = SC_register_type(SC_BOOL_P_S,                szptr, NULL);
+       SC_STRING_I                = SC_register_type(SC_STRING_S,                szptr, NULL);
        SC_SHORT_P_I               = SC_register_type(SC_SHORT_P_S,               szptr, NULL);
        SC_INT_P_I                 = SC_register_type(SC_INT_P_S,                 szptr, NULL);
        SC_LONG_P_I                = SC_register_type(SC_LONG_P_S,                szptr, NULL);
@@ -434,6 +458,7 @@ void SC_init_base_types(void)
 
        SC_PCONS_P_I               = SC_register_type(SC_PCONS_P_S,  szptr, NULL);
 
+/* aliases */
     SC_ENUM_I    = SC_type_alias(SC_ENUM_S, SC_INT_I);
     SC_INTEGER_I = SC_type_alias(SC_INTEGER_S, SC_INT_I);
     SC_REAL_I    = SC_type_alias(SC_DOUBLE_S, SC_DOUBLE_I);
