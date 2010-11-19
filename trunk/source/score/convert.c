@@ -14,7 +14,8 @@
 #define I_FLOAT       10
 #define I_COMPLEX     13
 #define I_QUATERNION  14
-#define N_PRIMITIVES  15
+#define I_POINTER     15
+#define N_PRIMITIVES  16
 
 #define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
 
@@ -23,29 +24,29 @@ static char
 	      "shrt", "int", "lng", "ll",
 	      "flt", "dbl", "ldbl",
 	      "fcx", "dcx", "ldcx",
-	      "qut" },
+	      "qut", "ptr" },
  *types[] = { NULL, NULL, "bool", "char",
 	      "short", "int", "long", "long long",
 	      "float", "double", "long double",
 	      "float complex", "double complex",
 	      "long double complex",
-	      "quaternion" },
+	      "quaternion", "void *" },
  *promo[] = { NULL, NULL, "int", "int",
 	      "int", "int", "long", "long long",
 	      "double", "double", "long double",
 	      "float complex", "double complex",
 	      "long double complex",
-	      "quaternion" },
+	      "quaternion", "void *" },
  *mn[]    = { NULL, NULL, "BOOL_MIN", "CHAR_MIN",
 	      "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
 	      "FLT_MIN", "DBL_MIN", "LDBL_MIN",
 	      "FLT_MIN", "DBL_MIN", "LDBL_MIN",
-	      "DBL_MIN" },
+	      "DBL_MIN", "LLONG_MIN" },
  *mx[]    = { NULL, NULL, "BOOL_MAX", "CHAR_MAX",
 	      "SHRT_MAX", "INT_MAX", "LONG_MAX", "LLONG_MAX",
 	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
 	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
-	      "DBL_MAX" };
+	      "DBL_MAX", "LLONG_MAX" };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -115,6 +116,7 @@ static void write_header(FILE *fp)
     fprintf(fp, "             *pd++ = sm;};};                               \\\n");
     fprintf(fp, "    return(i);}\n");
     fprintf(fp, "\n");
+
     fprintf(fp, "#define C_TO_C(_dtyp, _d, _styp, _s, _dmn, _dmx)           \\\n");
     fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
     fprintf(fp, "   {long i;                                                \\\n");
@@ -206,6 +208,62 @@ static void write_header(FILE *fp)
     fprintf(fp, "    return(i);}\n");
     fprintf(fp, "\n");
 
+/* pointer to number conversions */
+    fprintf(fp, "#define PTR_TO_N(_dtyp, _d, _styp, _s, _dmn, _dmx)         \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    SC_address ad;                                         \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {ad.memaddr = *ps++;                               \\\n");
+    fprintf(fp, "         *pd++      = ad.diskaddr;};                       \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* pointer to quaternion conversions */
+    fprintf(fp, "#define PTR_TO_Q(_dtyp, _d, _styp, _s, _dmn, _dmx)         \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    SC_address ad;                                         \\\n");
+    fprintf(fp, "    quaternion q = {0.0, 0.0, 0.0, 0.0};                   \\\n");
+    fprintf(fp, "    quaternion *pd = d;                                    \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {ad.memaddr = *ps++;                               \\\n");
+    fprintf(fp, "         q.s        = ad.diskaddr;                         \\\n");
+    fprintf(fp, "         *pd++      = q;};                                 \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* number to pointer conversions */
+    fprintf(fp, "#define N_TO_PTR(_dtyp, _d, _styp, _s, _dmn, _dmx)         \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    SC_address ad;                                         \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {ad.diskaddr = *ps++;                              \\\n");
+    fprintf(fp, "         *pd++       = ad.memaddr;};                       \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
+/* quaternion to pointer conversions */
+    fprintf(fp, "#define Q_TO_PTR(_dtyp, _d, _styp, _s, _dmn, _dmx)         \\\n");
+    fprintf(fp, "long _SC_ ## _d ## _ ## _s(void *d, void *s, long n)       \\\n");
+    fprintf(fp, "   {long i;                                                \\\n");
+    fprintf(fp, "    quaternion q = {0.0, 0.0, 0.0, 0.0};                   \\\n");
+    fprintf(fp, "    SC_address ad;                                         \\\n");
+    fprintf(fp, "    _styp *ps = (_styp *) s;                               \\\n");
+    fprintf(fp, "    _dtyp *pd = (_dtyp *) d;                               \\\n");
+    fprintf(fp, "    for (i = 0; i < n; i++);                               \\\n");
+    fprintf(fp, "        {q           = ps[i];                              \\\n");
+    fprintf(fp, "         ad.diskaddr = q.s;                                \\\n");
+    fprintf(fp, "         *pd++       = ad.memaddr;};                       \\\n");
+    fprintf(fp, "    return(i);}\n");
+    fprintf(fp, "\n");
+
     Separator;
     fprintf(fp, "/*                         VA ARG EXTRACTION                                */\n\n");
     Separator;
@@ -283,15 +341,37 @@ static void write_converters(FILE *fp)
 			     ti, names[i], types[j], names[j],
 			     mn[i], mx[i]);
 
+/* quaternion to pointer conversions */
+		  else if ((i == I_POINTER) && (j == I_QUATERNION))
+		     fprintf(fp, "Q_TO_PTR(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
 /* real to quaternion conversions */
-		  else if ((I_QUATERNION == i) && (j <= I_FLOAT))
+		  else if ((i == I_QUATERNION) && (j <= I_FLOAT))
 		     fprintf(fp, "R_TO_Q(%s, %s, %s, %s, %s, %s)\n\n",
 			     ti, names[i], types[j], names[j],
 			     mn[i], mx[i]);
 
 /* complex to quaternion conversions */
-		  else if ((I_QUATERNION == i) && (I_FLOAT < j) && (j <= I_COMPLEX))
+		  else if ((i == I_QUATERNION) && (I_FLOAT < j) && (j <= I_COMPLEX))
 		     fprintf(fp, "C_TO_Q(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+/* pointer to quaternion conversions */
+		  else if ((i == I_QUATERNION) && (j == I_POINTER))
+		     fprintf(fp, "PTR_TO_Q(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+		  else if (j == I_POINTER)
+		     fprintf(fp, "PTR_TO_N(%s, %s, %s, %s, %s, %s)\n\n",
+			     ti, names[i], types[j], names[j],
+			     mn[i], mx[i]);
+
+		  else if (i == I_POINTER)
+		     fprintf(fp, "N_TO_PTR(%s, %s, %s, %s, %s, %s)\n\n",
 			     ti, names[i], types[j], names[j],
 			     mn[i], mx[i]);
 
@@ -375,8 +455,6 @@ static void write_args(FILE *fp)
 	    fprintf(fp, "GETARG(%s, %s, %s)\n\n",
 		    names[i], types[i], promo[i]);};
 
-    fprintf(fp, "GETARG(ptr, void *, void *)\n\n");
-
     fprintf(fp, "\n");
 
     return;}
@@ -400,11 +478,15 @@ static void write_arg_decl(FILE *fp)
     fprintf(fp, " _SC_argf[] = {\n");
     for (i = 0; i < n; i++)
         {if (types[i] != NULL)
-	    fprintf(fp, "                _SC_arg_%s,\n", names[i]);
+	    {if (i == n - 1)
+	        fprintf(fp, "                _SC_arg_%s\n", names[i]);
+	     else
+	        fprintf(fp, "                _SC_arg_%s,\n", names[i]);}
 	 else
-	    fprintf(fp, "                NULL,\n");};
-
-    fprintf(fp, "                _SC_arg_ptr\n");
+	    {if (i == n - 1)
+		fprintf(fp, "                NULL\n");
+	     else
+		fprintf(fp, "                NULL,\n");};};
 
     fprintf(fp, "};\n");
     fprintf(fp, "\n");
