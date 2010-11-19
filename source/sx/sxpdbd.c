@@ -197,9 +197,9 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
     memdes *dea, *deb;
     char suffixa[MAXLINE], suffixb[MAXLINE], bf[MAXLINE];
 
-/* SHORT-CIRCUIT directory type (directories are always the same type) */
+/* short-circuit directory type (directories are always the same type) */
     if ((strcmp(typa, "Directory") == 0) && (strcmp(typa, typb) == 0))
-       {return(TRUE);}
+       return(TRUE);
  
     strcpy(bf, typa);
     token = SC_firsttok(bf, " *");
@@ -211,12 +211,14 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
 
 /* sanity check: we must be able to lookup both base types */
     if ((dpa == NULL) || (dpb == NULL))
-       {return(FALSE);}
+       return(FALSE);
 
 /* assume they are the same base type, until we find out otherwise */
     ret = TRUE;
 
-/* ONLY do typename checking if both types are not input spoke placeholder typenames */
+/* only do typename checking if both types are not input spoke
+ * placeholder typenames
+ */
     ln = strlen(PD_TYPE_PLACEHOLDER);
     if ((strncmp(typa, PD_TYPE_PLACEHOLDER, ln) != 0) && 
         (strncmp(typb, PD_TYPE_PLACEHOLDER, ln) != 0))
@@ -242,7 +244,8 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
 
 /* type promotion SHORT-CIRCUITS */
        {if (SX_promote_flag)
-           {if (SX_promote_float && (dpa->fp.format != NULL) && (dpb->fp.format != NULL))
+           {if (SX_promote_float && (dpa->fp.format != NULL) &&
+		(dpb->fp.format != NULL))
                return(TRUE);
 
             if (SX_promote_fixed &&
@@ -265,10 +268,11 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
  * do not recursive if member type is the same
  * as struct type (infinite recursion)
  */
-             if ((strcmp(dea->base_type, typa) != 0) && (strcmp(dea->type, typa) != 0))
+             if ((strcmp(dea->base_type, typa) != 0) &&
+		 (strcmp(dea->type, typa) != 0))
                 ret &= _SX_type_equal(pfa, pfb, dea->type, deb->type);
    
-/* SHORT-CIRCUIT the check if return value becomes FALSE */
+/* short-circuit the check if return value becomes FALSE */
              if (!ret)
                 return(ret);};
     
