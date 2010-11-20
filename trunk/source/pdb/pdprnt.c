@@ -14,15 +14,6 @@
 
 typedef int (*PFPrnt)(FILE *fp, void *p, int i, int mode);
 
-int
- PD_tolerance = 1000;
-
-int
- PD_fix_precision[PD_N_PRIMITIVE_FIX];
-
-precisionfp
- PD_fp_precision[PD_N_PRIMITIVE_FP];
-
 /* print controls
  *  0  -  print prefix: 0 = full path, 1 = space, 2 = tree
  *  1  -  0 = print name, 1 = print type and name
@@ -34,18 +25,6 @@ precisionfp
 
 long
  PD_print_controls[10] = {0L, 0L, 0L, 20L, 2L, 0L, 0L, 0L, 0L, 0L};
-
-char
- *PD_no_print_member = NULL,
- *PD_user_formats1[PD_N_PRIMITIVES],
- *PD_user_formats2[PD_N_PRIMITIVES];
-
-static char
- *_PD_type_names[] = { "char", "bit",
-		       "short", "int", "long", "long_long",
-		       "float", "double", "long_double",
-		       "float_complex", "double_complex",
-		       "long_double_complex" };
 
 static int
  _PD_print_data(FILE *f0,
@@ -568,7 +547,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
  *         print capability for user defined types
  */
 	else if (strcmp(type, SC_CHAR_8_S) == 0)
-	   {if (SC_strstr(SC_print_formats[SC_INT_I], "%s") != NULL)
+	   {if (SC_strstr(_SC.types.formats[SC_INT_I], "%s") != NULL)
 	       {cp = (char *) vr;
 		t  = FMAKE_N(char *, ni, "_PD_IO_PRINT:t");
 		for (i = 0; i < ni; i++, cp += isz)
@@ -655,8 +634,8 @@ int PD_write_entry(FILE *f0, PDBfile *file, char *name, void *vr,
        ep = PD_inquire_entry(file, name, FALSE, NULL);
 
     _PD_set_digits(file);
-    _PD_set_format_defaults();
-    _PD_set_user_formats();
+    _SC_set_format_defaults();
+    _SC_set_user_formats();
 
     strcpy(pathname, name);
     *prefix = '\0';
@@ -962,9 +941,9 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
                   else
                      strcpy(mfield, desc->member);
 
-		  if ((PD_no_print_member == NULL) ||
-		      ((PD_no_print_member != NULL) &&
-		       (SC_regx_match(mfield, PD_no_print_member) == FALSE)))
+		  if ((_SC.types.suppress_member == NULL) ||
+		      ((_SC.types.suppress_member != NULL) &&
+		       (SC_regx_match(mfield, _SC.types.suppress_member) == FALSE)))
 		     status &= _PD_print_member(f0, prefix, mbefore, mafter,
 						file, svr, type, desc, mfield,
 						mjr, def_off,
@@ -985,142 +964,21 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_SET_USER_DEFAULTS - default user specified formats to NULL */
-
-void _PD_set_user_defaults(void)
-   {int i;
-
-    for (i = 0; i < PD_N_PRIMITIVES; i++)
-        {if (PD_user_formats1[i] != NULL)
-	    {SFREE(PD_user_formats1[i]);};
-
-	 if (PD_user_formats2[i] != NULL)
-	    {SFREE(PD_user_formats2[i]);};};
-
-    if (PD_no_print_member != NULL)
-       {SFREE(PD_no_print_member);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_SET_USER_FORMATS - replace edit formats with user specified formats  */
-
-void _PD_set_user_formats(void)
-   {int i;
-
-    for (i = 0; i < PD_N_PRIMITIVES; i++)
-        {if (PD_user_formats1[i] != NULL)
-	    {SFREE(SC_print_formats[i]);
-	     SC_print_formats[i] = SC_strsavef(PD_user_formats1[i],
-						"char*:_PD_SET_USER_FORMATS:format1(i)");};
-
-	 if (PD_user_formats2[i] != NULL)
-	    {SFREE(SC_print_formata[i]);
-	     SC_print_formata[i] = SC_strsavef(PD_user_formats2[i],
-						"char*:_PD_SET_USER_FORMATS:format2(i)");};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_SET_FORMAT_DEFAULTS - set the defaults for the edit formats 
- *                         -   1 = bit
- *                         -   2 = bool
- *                         -   3 = char
- *                         -   4 = short
- *                         -   5 = int
- *                         -   6 = long
- *                         -   7 = long long
- *                         -   8 = float
- *                         -   9 = double
- *                         -  10 = long double
- *                         -  11 = float complex
- *                         -  12 = double complex
- *                         -  13 = long double complex
- */
-
-void _PD_set_format_defaults(void)
-   {int i;
-    char tmp[MAXLINE], *t;
-    
-/* SC_print_formats is used for scalars */
-
-/* fixed point types (proper) */
-    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
-        {if (SC_print_formats[i+SC_SHORT_I] != NULL)
-	    SFREE(SC_print_formats[i+SC_SHORT_I]);
-
-	 snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[i]);
-
-	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fix)");
-	 SC_print_formats[i+SC_SHORT_I] = t;};
-
-/* real floating point types (proper) */
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
-        {if (SC_print_formats[i+SC_FLOAT_I] != NULL)
-	    SFREE(SC_print_formats[i+SC_FLOAT_I]);
-
-	 snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[i].digits);
-
-	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
-	 SC_print_formats[i+SC_FLOAT_I] = t;};
-
-/* complex floating point types (proper) */
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
-        {if (SC_print_formats[i+SC_FLOAT_COMPLEX_I] != NULL)
-	    SFREE(SC_print_formats[i+SC_FLOAT_COMPLEX_I]);
-
-	 snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
-		  PD_fp_precision[i].digits, PD_fp_precision[i].digits);
-
-	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
-	 SC_print_formats[i+SC_FLOAT_COMPLEX_I] = t;};
-
-/* other primitive types */
-    if (SC_print_formats[SC_CHAR_I] != NULL)
-       SFREE(SC_print_formats[SC_CHAR_I]);
-
-    t = SC_strsavef("%c", "char*:_PD_SET_FORMAT_DEFAULTS:format1(char)");
-    SC_print_formats[SC_CHAR_I] = t;
-
-    if (SC_print_formats[SC_BIT_I] != NULL)
-       SFREE(SC_print_formats[SC_BIT_I]);
-
-    t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bit)");
-    SC_print_formats[SC_BIT_I] = t;
-
-    if (SC_print_formats[SC_BOOL_I] != NULL)
-       SFREE(SC_print_formats[SC_BOOL_I]);
-
-    t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bool)");
-    SC_print_formats[SC_BOOL_I] = t;
-
-/* SC_print_formata is used for arrays */
-    for (i = 0; i < PD_N_PRIMITIVES; i++)
-        {if (SC_print_formata[i] != NULL)
-            SFREE(SC_print_formata[i]);
-
-         t = SC_strsavef(SC_print_formats[i],
-			 "char*:_PD_SET_FORMAT_DEFAULTS:formats2");
-         SC_print_formata[i] = t;};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PD_SET_DIGITS - set the decimal printing precision parameters */
 
 void _PD_set_digits(PDBfile *file)
-   {int i, d;
+   {int i, d, dig;
+    int *fix_pre;
     long *f;
     double log2;
     data_standard *std;
+    precisionfp *fp_pre;
 
     log2 = log10(2.0);
+
+    fix_pre = _SC.types.fix_precision;
+    fp_pre  = _SC.types.fp_precision;
+    dig     = _SC.types.max_digits;
 
     std = file->std;
 
@@ -1129,13 +987,13 @@ void _PD_set_digits(PDBfile *file)
 	    d = -std->fx[i].bpi;
 	 else
 	    d = 8*std->fx[i].bpi;
-	 PD_fix_precision[i] = log2*d + 1;};
+	 fix_pre[i] = log2*d + 1;};
 
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {f = std->fp[i].format;
-	 d = min(f[2], PD_tolerance);
-	 PD_fp_precision[i].tolerance = POWL(2.0L, -((long double) d));
-	 PD_fp_precision[i].digits    = log2*d + 1;};
+	 d = min(f[2], dig);
+	 fp_pre[i].tolerance = POWL(2.0L, -((long double) d));
+	 fp_pre[i].digits    = log2*d + 1;};
 
     return;}
 
@@ -1147,12 +1005,18 @@ void _PD_set_digits(PDBfile *file)
  */
 
 void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
-   {int i, nmb, da, db;
+   {int i, nmb, da, db, dig;
+    int *fix_pre;
     long *fa, *fb;
     double log2;
     data_standard *stda, *stdb;
+    precisionfp *fp_pre;
 
     log2 = log10(2.0);
+
+    fix_pre = _SC.types.fix_precision;
+    fp_pre  = _SC.types.fp_precision;
+    dig     = _SC.types.max_digits;
 
     stda = file_a->std;
     stdb = file_b->std;
@@ -1167,15 +1031,15 @@ void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
 	 else
 	    db = 8*stdb->fx[i].bpi;
 	 nmb = max(da, db);
-	 PD_fix_precision[i] = log2*nmb + 1;};
+	 fix_pre[i] = log2*nmb + 1;};
 
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
         {fa  = stda->fp[i].format;
 	 fb  = stdb->fp[i].format;
 	 nmb = max(fa[2], fb[2]);
-	 nmb = min(nmb, PD_tolerance);
-	 PD_fp_precision[i].tolerance = POWL(2.0L, -((long double) nmb));
-	 PD_fp_precision[i].digits    = log2*nmb + 1;};
+	 nmb = min(nmb, dig);
+	 fp_pre[i].tolerance = POWL(2.0L, -((long double) nmb));
+	 fp_pre[i].digits    = log2*nmb + 1;};
 
     return;}
 

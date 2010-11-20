@@ -133,7 +133,7 @@ void SX_init(char *code, char *vers)
 
 /* default formats */
     _PD_set_digits(SX_vif);
-    _PD_set_format_defaults();
+    _SC_set_format_defaults();
 
 #ifndef SPDBX_ONLY
 

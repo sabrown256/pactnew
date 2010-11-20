@@ -2964,7 +2964,7 @@ static object *_SX_write_pdb(FILE *f0, object *argl)
              pp   = SS_GET(g_pdbdata, obj);
 	     iarr = NULL;
 	     SS_args(argl,
-		     SC_INT_I, &PD_tolerance,
+		     SC_INT_I, &_SC.types.max_digits,
 		     G_NUM_ARRAY, &iarr,
 		     0);
 
@@ -3408,7 +3408,7 @@ static object *_SXI_set_activate_checksum(object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_SET_USER_FORMAT - set the PD_user_formats{1,2} entry I to FORMAT
+/* _SX_SET_USER_FORMAT - set the SCORE user formats entries I to FORMAT
  *                     - return a string object naming the format
  *                     - for that type
  */
@@ -3416,33 +3416,38 @@ static object *_SXI_set_activate_checksum(object *argl)
 static object *_SX_set_user_format(int i, char *format, int whch)
    {int h1, h2;
     object *rv;
+    char **fmts, **fmta;
+    char **ufmts, **ufmta;
+
+    fmts  = _SC.types.formats;
+    fmta  = _SC.types.formata;
+    ufmts = _SC.types.user_formats;
+    ufmta = _SC.types.user_formata;
 
     h1 = ((whch & 1) != 0);
     h2 = ((whch & 2) != 0);
 
     if (format != NULL)
        {if (h1 == TRUE)
-	   {if (PD_user_formats1[i] != NULL)
-	       {SFREE(PD_user_formats1[i]);};
-	    PD_user_formats1[i] = SC_strsavef(format,
-					      "char*:_SX_SET_USER_FORMAT:fmt1");}
+	   {if (ufmts[i] != NULL)
+	       {SFREE(ufmts[i]);};
+	    ufmts[i] = SC_strsavef(format, "char*:_SX_SET_USER_FORMAT:ufmts");}
 	if (h2 == TRUE)
-	   {if (PD_user_formats2[i] != NULL)
-	       {SFREE(PD_user_formats2[i]);};
-	    PD_user_formats2[i] = SC_strsavef(format,
-					      "char*:_SX_SET_USER_FORMAT:fmt2");};};
+	   {if (ufmta[i] != NULL)
+	       {SFREE(ufmta[i]);};
+	    ufmta[i] = SC_strsavef(format, "char*:_SX_SET_USER_FORMAT:ufmta");};};
 
     if (h1 == TRUE)
-       {if (PD_user_formats1[i] != NULL)
-	   rv = SS_mk_string(PD_user_formats1[i]);
+       {if (ufmts[i] != NULL)
+	   rv = SS_mk_string(ufmts[i]);
         else
-	   rv = SS_mk_string(SC_print_formats[i]);}
+	   rv = SS_mk_string(fmts[i]);}
 
     else if (h2 == TRUE)
-       {if (PD_user_formats2[i] != NULL)
-	   rv = SS_mk_string(PD_user_formats2[i]);
+       {if (ufmta[i] != NULL)
+	   rv = SS_mk_string(ufmta[i]);
         else
-	   rv = SS_mk_string(SC_print_formata[i]);}
+	   rv = SS_mk_string(fmta[i]);}
 
     else
        rv = SS_null;
@@ -3458,10 +3463,12 @@ static object *_SXI_set_format(object *argl)
    {int i, ok;
     char s1[MAXLINE], s2[MAXLINE];
     char *field, *format, *typ;
+    char **fxtypes, **fptypes, **cmtypes;
     object *rv;
-    static char *fxtypes[] = { "short", "integer", "long", "long_long" };
-    static char *fptypes[] = { "float", "double", "long_double" };
-    static char *cmtypes[] = { "float_complex", "double_complex", "long_double_complex" };
+
+    fxtypes = _SC.types.fixtyp;
+    fptypes = _SC.types.fptyp;
+    cmtypes = _SC.types.cpxtyp;
 
     field  = NULL;
     format = NULL;
@@ -3548,13 +3555,13 @@ static object *_SXI_set_format(object *argl)
 	   rv = _SX_set_user_format(SC_BIT_I, format, 3);
 
 	else if (strcmp(field, "suppress-member") == 0)
-	   {if (PD_no_print_member != NULL)
-	       {SFREE(PD_no_print_member);};
-	    PD_no_print_member = SC_strsavef(format,
-					     "char*:_SXI_SET_FORMAT:npm");}
+	   {if (_SC.types.suppress_member != NULL)
+	       {SFREE(_SC.types.suppress_member);};
+	    _SC.types.suppress_member = SC_strsavef(format,
+						    "char*:_SXI_SET_FORMAT:npm");}
 
 	else if (strcmp(field, "default") == 0)
-	   _PD_set_user_defaults();
+	   _SC_set_user_defaults();
 
 	else
 	   SS_error("UNKNOWN TYPE - _SXI_SET_FORMAT", argl);};
@@ -4315,7 +4322,7 @@ void SX_install_pdb_funcs(void)
     SS_install_cf("comparison-precision",
 		  "Variable: Comparison precision for floats",
 		  SS_acc_int,
-		  &PD_tolerance);
+		  &_SC.types.max_digits);
 
     SS_install_cf("display-individual-differences",
 		  "Variable: Difference display mode flag",

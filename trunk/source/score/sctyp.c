@@ -116,10 +116,6 @@ char
  *SC_REAL_S                  = "double",
  *SC_REAL_P_S                = "double *";
 
-char
- *SC_print_formats[N_PRIMITIVES],
- *SC_print_formata[N_PRIMITIVES];
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -127,13 +123,15 @@ char
 
 static SC_type *_SC_get_type_id(int id)
    {haelem *hp;
+    hasharr *ha;
     SC_type *t;
 
     SC_init_base_types();
 
-    t = NULL;
+    t  = NULL;
+    ha = (hasharr *) _SC.types.typ;
 
-    hp = *(haelem **) SC_hasharr_get(_SC.typ, id);
+    hp = *(haelem **) SC_hasharr_get(ha, id);
     if (hp != NULL)
        t = (SC_type *) hp->def;
 
@@ -145,11 +143,13 @@ static SC_type *_SC_get_type_id(int id)
 /* _SC_GET_TYPE_NAME - given the type NAME */
 
 static SC_type *_SC_get_type_name(char *name)
-   {SC_type *t;
+   {hasharr *ha;
+    SC_type *t;
 
     SC_init_base_types();
 
-    t = (SC_type *) SC_hasharr_def_lookup(_SC.typ, name);
+    ha = (hasharr *) _SC.types.typ;
+    t  = (SC_type *) SC_hasharr_def_lookup(ha, name);
 
     return(t);}
 
@@ -160,14 +160,17 @@ static SC_type *_SC_get_type_name(char *name)
 
 int SC_register_type(char *name, int bpi, ...)
    {int n;
+    hasharr *ha;
     SC_type *t;
 
-    if (_SC.typ == NULL)
-       _SC.typ = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    ha = (hasharr *) _SC.types.typ;
+    if (ha == NULL)
+       {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+	_SC.types.typ = ha;};
 
     SC_VA_START(bpi);
 
-    n = SC_hasharr_get_n(_SC.typ);
+    n = SC_hasharr_get_n(ha);
 
     t = FMAKE(SC_type, "PERM|SC_REGISTER_TYPE:t");
     t->id   = n;
@@ -177,7 +180,7 @@ int SC_register_type(char *name, int bpi, ...)
 
     SC_VA_END;
 
-    SC_hasharr_install(_SC.typ, name, t, "SC_TYPE", TRUE, TRUE);
+    SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);
 
     return(n);}
 
@@ -187,10 +190,14 @@ int SC_register_type(char *name, int bpi, ...)
 /* SC_TYPE_ALIAS - register an alias for a known data type */
 
 int SC_type_alias(char *name, int id)
-   {SC_type *t, *ot;
+   {hasharr *ha;
+    SC_type *t, *ot;
 
-    if (_SC.typ == NULL)
-       _SC.typ = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    ha = (hasharr *) _SC.types.typ;
+
+    if (ha == NULL)
+       {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+	_SC.types.typ = ha;};
 
     ot = _SC_get_type_id(id);
 
@@ -199,7 +206,7 @@ int SC_type_alias(char *name, int id)
 
     t->type = SC_strsavef(name, "PERM|char*:SC_REGISTER_TYPE:type");
 
-    SC_hasharr_install(_SC.typ, name, t, "SC_TYPE", TRUE, TRUE);
+    SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);
 
     return(id);}
 
@@ -582,6 +589,152 @@ char *SC_ntos(char *t, int nc, int id, void *s, long n, int mode)
         rv = _SC_strf[id](t, nc, s, n, mode);
     
      return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_USER_DEFAULTS - default user specified formats to NULL */
+
+void _SC_set_user_defaults(void)
+   {int i;
+    char **ufmts, **ufmta;
+
+    ufmts = _SC.types.user_formats;
+    ufmta = _SC.types.user_formata;
+
+    for (i = 0; i < N_PRIMITIVES; i++)
+        {if (ufmts[i] != NULL)
+	    {SFREE(ufmts[i]);};
+
+	 if (ufmta[i] != NULL)
+	    {SFREE(ufmta[i]);};};
+
+    if (_SC.types.suppress_member != NULL)
+       {SFREE(_SC.types.suppress_member);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_USER_FORMATS - replace edit formats with user specified formats  */
+
+void _SC_set_user_formats(void)
+   {int i;
+    char **fmts, **fmta;
+    char **ufmts, **ufmta;
+
+    fmts  = _SC.types.formats;
+    fmta  = _SC.types.formata;
+    ufmts = _SC.types.user_formats;
+    ufmta = _SC.types.user_formata;
+
+    for (i = 0; i < N_PRIMITIVES; i++)
+        {if (ufmts[i] != NULL)
+	    {SFREE(fmts[i]);
+	     fmts[i] = SC_strsavef(ufmts[i],
+				   "char*:_SC_SET_USER_FORMATS:fmts(i)");};
+
+	 if (ufmta[i] != NULL)
+	    {SFREE(fmta[i]);
+	     fmta[i] = SC_strsavef(ufmta[i],
+				   "char*:_SC_SET_USER_FORMATS:fmta(i)");};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_FORMAT_DEFAULTS - set the defaults for the edit formats 
+ *                         -   1 = bit
+ *                         -   2 = bool
+ *                         -   3 = char
+ *                         -   4 = short
+ *                         -   5 = int
+ *                         -   6 = long
+ *                         -   7 = long long
+ *                         -   8 = float
+ *                         -   9 = double
+ *                         -  10 = long double
+ *                         -  11 = float complex
+ *                         -  12 = double complex
+ *                         -  13 = long double complex
+ */
+
+void _SC_set_format_defaults(void)
+   {int i;
+    int *fix_pre;
+    precisionfp *fp_pre;
+    char tmp[MAXLINE], *t;
+    char **fmts, **fmta;
+    
+    fix_pre = _SC.types.fix_precision;
+    fp_pre  = _SC.types.fp_precision;
+    fmts    = _SC.types.formats;
+    fmta    = _SC.types.formata;
+
+/* fmts is used for scalars */
+
+/* fixed point types (proper) */
+    for (i = 0; i < N_PRIMITIVE_FIX; i++)
+        {if (fmts[i+SC_SHORT_I] != NULL)
+	    SFREE(fmts[i+SC_SHORT_I]);
+
+	 snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
+
+	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fix)");
+	 fmts[i+SC_SHORT_I] = t;};
+
+/* real floating point types (proper) */
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
+        {if (fmts[i+SC_FLOAT_I] != NULL)
+	    SFREE(fmts[i+SC_FLOAT_I]);
+
+	 snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
+
+	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
+	 fmts[i+SC_FLOAT_I] = t;};
+
+/* complex floating point types (proper) */
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
+        {if (fmts[i+SC_FLOAT_COMPLEX_I] != NULL)
+	    SFREE(fmts[i+SC_FLOAT_COMPLEX_I]);
+
+	 snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
+		  fp_pre[i].digits, fp_pre[i].digits);
+
+	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
+	 fmts[i+SC_FLOAT_COMPLEX_I] = t;};
+
+/* other primitive types */
+    if (fmts[SC_CHAR_I] != NULL)
+       SFREE(fmts[SC_CHAR_I]);
+
+    t = SC_strsavef("%c", "char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
+    fmts[SC_CHAR_I] = t;
+
+    if (fmts[SC_BIT_I] != NULL)
+       SFREE(fmts[SC_BIT_I]);
+
+    t = SC_strsavef("%x", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
+    fmts[SC_BIT_I] = t;
+
+    if (fmts[SC_BOOL_I] != NULL)
+       SFREE(fmts[SC_BOOL_I]);
+
+    t = SC_strsavef("%s", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
+    fmts[SC_BOOL_I] = t;
+
+/* fmta is used for arrays */
+    for (i = 0; i < N_PRIMITIVES; i++)
+        {if (fmta[i] != NULL)
+            SFREE(fmta[i]);
+
+         t = SC_strsavef(fmts[i],
+			 "char*:_SC_SET_FORMAT_DEFAULTS:formats2");
+         fmta[i] = t;};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

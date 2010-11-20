@@ -586,9 +586,6 @@ extern int
 		char *type, int irecursion, int n, long *ind);
 
 extern void
- _PD_set_user_defaults(void),
- _PD_set_user_formats(void),
- _PD_set_format_defaults(void),
  _PD_set_digits(PDBfile *file),
  _PD_digits_tol(PDBfile *file_a, PDBfile *file_b);
 

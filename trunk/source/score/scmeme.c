@@ -21,7 +21,7 @@ void SC_end_session(void)
    {
 
 /* free hash tables */
-    SC_free_hasharr(_SC.typ, NULL, NULL);
+    SC_free_hasharr(_SC.types.typ, NULL, NULL);
     SC_free_hasharr(_SC.mem_table, NULL, NULL);
 
 /* free arrays */

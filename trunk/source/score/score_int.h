@@ -133,6 +133,9 @@ struct s_SC_state
 /* SCBIO.C */
     BIGINT buffer_size;
 
+/* SCTYP.C */
+   SC_type_manager types;
+
 /* initializes to 0 bytes */
 
 /* SCFIA.C */
@@ -208,9 +211,6 @@ struct s_SC_state
    SC_array *eth_locks;
    SC_array *eth_conds;
    SC_array *eth_keys;
-
-/* SCTYP.C */
-   hasharr *typ;
 
 /* SCCTL.C */
    SC_array *path;
