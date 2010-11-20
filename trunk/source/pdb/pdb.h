@@ -765,8 +765,6 @@ extern char
  *PD_STANDARD_S,
  PD_err[],
  *PD_no_print_member,
- *PD_print_formats1[],
- *PD_print_formats2[],
  *PD_user_formats1[],
  *PD_user_formats2[];
 

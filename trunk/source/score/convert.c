@@ -9,10 +9,11 @@
 #include "scstd.h"
 #include "scope_typeh.h"
 
+#define I_BOOL         2
 #define I_NON          3
-#define I_FIX          7
-#define I_FLOAT       10
-#define I_COMPLEX     13
+#define I_FIX          7    /* index of last fixed point type */
+#define I_FLOAT       10    /* index of last floating point type */
+#define I_COMPLEX     13    /* index of last complex floating point type */
 #define I_QUATERNION  14
 #define I_POINTER     15
 #define N_PRIMITIVES  16
@@ -28,14 +29,14 @@ static char
  *types[] = { NULL, NULL, "bool", "char",
 	      "short", "int", "long", "long long",
 	      "float", "double", "long double",
-	      "float complex", "double complex",
-	      "long double complex",
+	      "float _Complex", "double _Complex",
+	      "long double _Complex",
 	      "quaternion", "void *" },
  *promo[] = { NULL, NULL, "int", "int",
 	      "int", "int", "long", "long long",
 	      "double", "double", "long double",
-	      "float complex", "double complex",
-	      "long double complex",
+	      "float _Complex", "double _Complex",
+	      "long double _Complex",
 	      "quaternion", "void *" },
  *mn[]    = { NULL, NULL, "BOOL_MIN", "CHAR_MIN",
 	      "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
@@ -71,10 +72,6 @@ static void write_header(FILE *fp)
 
     fprintf(fp, "#define N_PRIMITIVES  %d\n", N_PRIMITIVES);
     fprintf(fp, " \n");
-
-    Separator;
-    fprintf(fp, "/*                           TYPE CONVERSION                                */\n\n");
-    Separator;
 
     fprintf(fp, "#undef CONVERT\n");
     fprintf(fp, " \n");
@@ -264,33 +261,55 @@ static void write_header(FILE *fp)
     fprintf(fp, "    return(i);}\n");
     fprintf(fp, "\n");
 
-    Separator;
-    fprintf(fp, "/*                         VA ARG EXTRACTION                                */\n\n");
-    Separator;
+    return;}
 
-    fprintf(fp, "#define GETARG(_ntyp, _dtyp, _ptyp)                        \\\n");
-    fprintf(fp, "int _SC_arg_ ## _ntyp(va_list __a__, void *d, long n)      \\\n");
-    fprintf(fp, "   {_dtyp *pv = (_dtyp *) d;                               \\\n");
-    fprintf(fp, "    pv[n] = SC_VA_ARG(_ptyp);                              \\\n");
-    fprintf(fp, "    return(TRUE);}\n");
-    fprintf(fp, "\n");
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-    Separator;
-    fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
-    Separator;
+/* WRITE_CONV_DECL - write the declaration of the conversion array */
 
-    fprintf(fp, "#define NTOS(_ntyp, _styp, _i)                             \\\n");
-    fprintf(fp, "int _SC_str_ ## _ntyp(char *t, int nc, void *s, long n)    \\\n");
-    fprintf(fp, "   {int nb;                                                \\\n");
-    fprintf(fp, "    _styp *pv = (_styp *) s;                               \\\n");
-    fprintf(fp, "    nb = snprintf(t, nc, SC_print_format[_i], pv[n]);      \\\n");
-    fprintf(fp, "    return(nb);}\n");
-    fprintf(fp, "\n");
+static void write_conv_decl(FILE *fp)
+   {int i, j;
 
-    Separator;
     fprintf(fp, "typedef long (*PFConv)(void *d, void *s, long n);\n");
-    fprintf(fp, "typedef int (*PFArgv)(va_list a, void *d, long n);\n");
-    fprintf(fp, "typedef int (*PFStrv)(char *t, int nc, void *s, long n);\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "static PFConv\n");
+    fprintf(fp, " _SC_convf[][%d] = {\n", N_PRIMITIVES);
+    for (i = 0; i < N_PRIMITIVES; i++)
+        {if (types[i] != NULL)
+	    {for (j = 0; j < N_PRIMITIVES; j++)
+	         {if (j == 0)
+		     fprintf(fp, "      { ");
+		  else
+		     fprintf(fp, "        ");
+	          if (j == N_PRIMITIVES-1)
+		     {if ((names[i] != NULL) && (names[j] != NULL))
+			 fprintf(fp, "_SC_%s_%s ", names[i], names[j]);
+		      else
+			 fprintf(fp, "NULL ");}
+		  else
+		     {if ((names[i] != NULL) && (names[j] != NULL))
+			 fprintf(fp, "_SC_%s_%s,\n", names[i], names[j]);
+		      else
+			 fprintf(fp, "NULL,\n");};};}
+	 else
+	    {for (j = 0; j < N_PRIMITIVES; j++)
+	         {if (j == 0)
+		     fprintf(fp, "      { ");
+		  else
+		     fprintf(fp, "        ");
+		  if (j == N_PRIMITIVES-1)
+		     fprintf(fp, "NULL ");
+		  else
+		     fprintf(fp, "NULL,\n");};};
+
+	 if (i == N_PRIMITIVES-1)
+	    fprintf(fp, "}\n");
+	 else
+	    fprintf(fp, "},\n");};
+
+    fprintf(fp, "};\n");
     fprintf(fp, "\n");
 
     return;}
@@ -303,6 +322,10 @@ static void write_header(FILE *fp)
 static void write_converters(FILE *fp)
    {int i, j;
     char *ti, *tj;
+
+    Separator;
+    fprintf(fp, "/*                           TYPE CONVERSION                                */\n\n");
+    Separator;
 
     for (i = 0; i < N_PRIMITIVES; i++)
         {ti = types[i];
@@ -382,50 +405,65 @@ static void write_converters(FILE *fp)
 
     fprintf(fp, "\n");
 
+    write_conv_decl(fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                           VARIABLE ARG HANDLING                          */
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_WRITE_ARGH - write the variable arg handler for type ID */
+
+static void _SC_write_argh(FILE *fp, int id)
+   {
+
+    fprintf(fp, "int _SC_arg_%s(va_list __a__, void *d, long n)\n",
+	    names[id]);
+    fprintf(fp, "   {%s *pv = (%s *) d;\n",
+	    types[id], types[id]);
+    fprintf(fp, "    pv[n] = SC_VA_ARG(%s);\n",
+	    promo[id]);
+    fprintf(fp, "    return(TRUE);}\n");
+    fprintf(fp, "\n");
+
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_CONV_DECL - write the declaration of the conversion array */
+/* WRITE_ARG_DECL - write the declaration of the conversion array */
 
-static void write_conv_decl(FILE *fp)
-   {int i, j;
+static void write_arg_decl(FILE *fp)
+   {int i, ng, no_complex;
 
-    fprintf(fp, "static PFConv\n");
-    fprintf(fp, " _SC_convf[][%d] = {\n", N_PRIMITIVES);
+/* PATHSCALE 2.5 does not support complex types in va_arg */
+#if defined(COMPILER_PATHSCALE)
+    no_complex = TRUE;
+#else
+    no_complex = FALSE;
+#endif
+
+    fprintf(fp, "typedef int (*PFArgv)(va_list a, void *d, long n);\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "static PFArgv\n");
+    fprintf(fp, " _SC_argf[] = {\n");
     for (i = 0; i < N_PRIMITIVES; i++)
-        {if (types[i] != NULL)
-	    {for (j = 0; j < N_PRIMITIVES; j++)
-	         {if (j == 0)
-		     fprintf(fp, "      { ");
-		  else
-		     fprintf(fp, "        ");
-	          if (j == N_PRIMITIVES-1)
-		     {if ((names[i] != NULL) && (names[j] != NULL))
-			 fprintf(fp, "_SC_%s_%s ", names[i], names[j]);
-		      else
-			 fprintf(fp, "NULL ");}
-		  else
-		     {if ((names[i] != NULL) && (names[j] != NULL))
-			 fprintf(fp, "_SC_%s_%s,\n", names[i], names[j]);
-		      else
-			 fprintf(fp, "NULL,\n");};};}
+        {ng = ((types[i] == NULL) ||
+	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
+	 if (ng == TRUE)
+	    {if (i == N_PRIMITIVES - 1)
+		fprintf(fp, "                NULL\n");
+	     else
+		fprintf(fp, "                NULL,\n");}
 	 else
-	    {for (j = 0; j < N_PRIMITIVES; j++)
-	         {if (j == 0)
-		     fprintf(fp, "      { ");
-		  else
-		     fprintf(fp, "        ");
-		  if (j == N_PRIMITIVES-1)
-		     fprintf(fp, "NULL ");
-		  else
-		     fprintf(fp, "NULL,\n");};};
-
-	 if (i == N_PRIMITIVES-1)
-	    fprintf(fp, "}\n");
-	 else
-	    fprintf(fp, "},\n");};
+	    {if (i == N_PRIMITIVES - 1)
+	        fprintf(fp, "                _SC_arg_%s\n", names[i]);
+	     else
+	        fprintf(fp, "                _SC_arg_%s,\n", names[i]);};};
 
     fprintf(fp, "};\n");
     fprintf(fp, "\n");
@@ -438,74 +476,58 @@ static void write_conv_decl(FILE *fp)
 /* WRITE_ARGS - write the va arg routines */
 
 static void write_args(FILE *fp)
-   {int i, n;
-
-/* PATHSCALE 2.5 does not support complex types in va_arg
- * GOTCHA: this is the wrong way to do this because we MUST
- * have all the types that are supported in the proper order
- */
-#if defined(COMPILER_PATHSCALE)
-    n = 10;
-#else
-    n = N_PRIMITIVES;
-#endif
-
-    for (i = 0; i < n; i++)
-        {if (types[i] != NULL)
-	    fprintf(fp, "GETARG(%s, %s, %s)\n\n",
-		    names[i], types[i], promo[i]);};
-
-    fprintf(fp, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_ARG_DECL - write the declaration of the conversion array */
-
-static void write_arg_decl(FILE *fp)
-   {int i, n;
+   {int i, ng, no_complex;
 
 /* PATHSCALE 2.5 does not support complex types in va_arg */
 #if defined(COMPILER_PATHSCALE)
-    n = 10;
+    no_complex = TRUE;
 #else
-    n = N_PRIMITIVES;
+    no_complex = FALSE;
 #endif
 
-    fprintf(fp, "static PFArgv\n");
-    fprintf(fp, " _SC_argf[] = {\n");
-    for (i = 0; i < n; i++)
-        {if (types[i] != NULL)
-	    {if (i == n - 1)
-	        fprintf(fp, "                _SC_arg_%s\n", names[i]);
-	     else
-	        fprintf(fp, "                _SC_arg_%s,\n", names[i]);}
-	 else
-	    {if (i == n - 1)
-		fprintf(fp, "                NULL\n");
-	     else
-		fprintf(fp, "                NULL,\n");};};
-
-    fprintf(fp, "};\n");
-    fprintf(fp, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_STR - write the va arg routines */
-
-static void write_str(FILE *fp)
-   {int i;
+    Separator;
+    fprintf(fp, "/*                         VA ARG EXTRACTION                                */\n\n");
+    Separator;
 
     for (i = 0; i < N_PRIMITIVES; i++)
-        {if (types[i] != NULL)
-	    fprintf(fp, "NTOS(%s, %s, %d)\n\n",
-		    names[i], types[i], i);};
+        {ng = ((types[i] == NULL) ||
+	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
+	 if (ng == FALSE)
+            _SC_write_argh(fp, i);};
 
+    write_arg_decl(fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                               NUMBER RENDERING                           */
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_WRITE_BOOL - write the rendering function for type SC_BOOL_I */
+
+static void _SC_write_bool(FILE *fp, int id)
+   {
+
+    fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
+	    names[id]);
+
+    fprintf(fp, "   {int nb;\n");
+    fprintf(fp, "    char *fmt;\n");
+    fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
+
+    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+	    id, id);
+
+    fprintf(fp, "    if (strchr(fmt, 's') != NULL)\n");
+    fprintf(fp, "       nb = snprintf(t, nc, fmt, pv[n] ? \"T\" : \"F\");\n");
+    fprintf(fp, "    else if (strchr(fmt, 'd') != NULL)\n");
+    fprintf(fp, "       nb = snprintf(t, nc, fmt, (int) pv[n]);\n");
+
+    fprintf(fp, "    if (nb < 0)\n");
+    fprintf(fp, "       t = NULL;\n");
+    fprintf(fp, "    return(t);}\n");
     fprintf(fp, "\n");
 
     return;}
@@ -513,10 +535,111 @@ static void write_str(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_STR_DECL - write the declaration of the conversion array */
+/* _SC_WRITE_COMPLEX - write the rendering function for complex type ID */
+
+static void _SC_write_complex(FILE *fp, int id)
+   {int eid;
+#if defined(AIX)
+    static char *realp[] = { "crealf", "creal", "creal" };
+    static char *imagp[] = { "cimagf", "cimag", "cimag" };
+#else
+    static char *realp[] = { "crealf", "creal", "creall" };
+    static char *imagp[] = { "cimagf", "cimag", "cimagl" };
+#endif
+    static char *kind[]  = { "float", "double", "long double" };
+
+    eid = id - I_FLOAT - 1;
+
+    fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
+	    names[id]);
+    fprintf(fp, "   {int nb;\n");
+    fprintf(fp, "    char *fmt;\n");
+    fprintf(fp, "    %s _Complex z;\n", kind[eid]);
+    fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
+
+    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+	    id, id);
+
+    fprintf(fp, "    z  = pv[n];\n");
+    fprintf(fp, "    nb = snprintf(t, nc, fmt, %s(z), %s(z));\n",
+	    realp[eid], imagp[eid]);
+
+    fprintf(fp, "    if (nb < 0)\n");
+    fprintf(fp, "       t = NULL;\n");
+
+    fprintf(fp, "    return(t);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_WRITE_QUATERNION - write the rendering function
+ *                      - for quaternion type ID
+ */
+
+static void _SC_write_quaternion(FILE *fp, int id)
+   {
+
+    fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
+	    names[id]);
+    fprintf(fp, "   {int nb;\n");
+    fprintf(fp, "    char *fmt;\n");
+    fprintf(fp, "    quaternion q;\n");
+    fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
+
+    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+	    id, id);
+
+    fprintf(fp, "    q  = pv[n];\n");
+    fprintf(fp, "    nb = snprintf(t, nc, fmt, q.s, q.i, q.j, q.k);\n");
+
+    fprintf(fp, "    if (nb < 0)\n");
+    fprintf(fp, "       t = NULL;\n");
+
+    fprintf(fp, "    return(t);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_WRITE_NTOS - write the rendering function for type ID */
+
+static void _SC_write_ntos(FILE *fp, int id)
+   {
+
+    fprintf(fp, "char *_SC_str_%s(char *t, int nc, void *s, long n, int mode)\n",
+	    names[id]);
+    fprintf(fp, "   {int nb;\n");
+    fprintf(fp, "    char *fmt;\n");
+    fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
+
+    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+	    id, id);
+
+    fprintf(fp, "    nb  = snprintf(t, nc, fmt, pv[n]);\n");
+
+    fprintf(fp, "    if (nb < 0)\n");
+    fprintf(fp, "       t = NULL;\n");
+
+    fprintf(fp, "    return(t);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_STR_DECL - write the declaration of the rendering array */
 
 static void write_str_decl(FILE *fp)
    {int i;
+
+    fprintf(fp, "typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);\n");
+    fprintf(fp, "\n");
 
     fprintf(fp, "static PFStrv\n");
     fprintf(fp, " _SC_strf[] = {\n");
@@ -534,6 +657,33 @@ static void write_str_decl(FILE *fp)
 
     fprintf(fp, "};\n");
     fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_STR - write the rendering routines */
+
+static void write_str(FILE *fp)
+   {int i;
+
+    Separator;
+    fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
+    Separator;
+
+    for (i = 0; i < N_PRIMITIVES; i++)
+	{if (types[i] != NULL)
+	    {if (i == I_BOOL)
+	        _SC_write_bool(fp, i);
+	     else if ((I_FLOAT < i) && (i <= I_COMPLEX))
+	        _SC_write_complex(fp, i);
+	     else if (i == I_QUATERNION)
+	        _SC_write_quaternion(fp, i);
+	     else
+	        _SC_write_ntos(fp, i);};};
+
+    write_str_decl(fp);
 
     return;}
 
@@ -560,25 +710,15 @@ int main(int c, char **v)
     write_header(fp);
 
 /* emit type conversion code */
-    Separator;
-
     write_converters(fp);
 
-    write_conv_decl(fp);
-
 /* emit var arg code */
-    Separator;
-
     write_args(fp);
 
-    write_arg_decl(fp);
-
 /* emit number to string code */
-    Separator;
-
     write_str(fp);
 
-    write_str_decl(fp);
+    Separator;
 
     if (name != NULL)
        fclose(fp);

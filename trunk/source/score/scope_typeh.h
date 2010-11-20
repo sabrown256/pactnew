@@ -149,7 +149,8 @@ extern char
  *SC_REAL_P_S;
 
 extern char
- *SC_print_format[];
+ *SC_print_formats[],
+ *SC_print_formata[];
 
 extern int
  (*SC_sizeof_hook)(char *s);                     /* string driven size hook */
@@ -203,7 +204,8 @@ extern size_t
  SC_copy_primitive(void *d, void *s, long n, int id);
 
 extern char
- *SC_type_name(int id);
+ *SC_type_name(int id),
+ *SC_ntos(char *t, int nc, int id, void *s, long n, int mode);
 
 extern void
  SC_type_free_i(int id, void *x),
