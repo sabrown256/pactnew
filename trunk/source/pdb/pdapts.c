@@ -153,7 +153,7 @@ static void write_test_1_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_write(strm, "ia(1,5)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(1,5)", "int", ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_1_DATA\n");
         exit(1);};
 
@@ -252,7 +252,7 @@ static void write_test_2_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_write(strm, "ia(5,1)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(5,1)", "int", ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_2_DATA\n");
         exit(1);};
 
@@ -353,11 +353,11 @@ static void write_test_3_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(1,5)", "integer"))
+    if (!PD_defent(strm, "ia(1,5)", "int"))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:0,0:4)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(0:0,0:4)", "int", ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
         exit(1);};
 
@@ -456,11 +456,11 @@ static void write_test_4_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(5,1)", "integer"))
+    if (!PD_defent(strm, "ia(5,1)", "int"))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:4,0:0)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(0:4,0:0)", "int", ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
         exit(1);};
 
@@ -561,23 +561,23 @@ static void write_test_5_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(1,5)", "integer"))
+    if (!PD_defent(strm, "ia(1,5)", "int"))
        {PRINT(STDOUT, "IA DEFENT 1 FAILED - WRITE_TEST_5_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:0,0:4)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(0:0,0:4)", "int", ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
         exit(1);};
 
-    if (!PD_defent(strm, "ia(1:2,0:4)", "integer"))
+    if (!PD_defent(strm, "ia(1:2,0:4)", "int"))
        {PRINT(STDOUT, "IA DEFENT 2 FAILED - WRITE_TEST_5_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(1:1,0:4)", "integer", ia_w1))
+    if (!PD_write(strm, "ia(1:1,0:4)", "int", ia_w1))
        {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(2:2,0:4)", "integer", ia_w2))
+    if (!PD_write(strm, "ia(2:2,0:4)", "int", ia_w2))
        {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
         exit(1);};
 
@@ -668,23 +668,23 @@ static void write_test_6_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(5,1)", "integer"))
+    if (!PD_defent(strm, "ia(5,1)", "int"))
        {PRINT(STDOUT, "IA DEFENT 1 FAILED - WRITE_TEST_6_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:4,0:0)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(0:4,0:0)", "int", ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_6_DATA\n");
         exit(1);};
 
-    if (!PD_defent(strm, "ia(0:4,1:2)", "integer"))
+    if (!PD_defent(strm, "ia(0:4,1:2)", "int"))
        {PRINT(STDOUT, "IA DEFENT 2 FAILED - WRITE_TEST_6_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:4,1:1)", "integer", ia_w1))
+    if (!PD_write(strm, "ia(0:4,1:1)", "int", ia_w1))
        {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_6_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:4,2:2)", "integer", ia_w2))
+    if (!PD_write(strm, "ia(0:4,2:2)", "int", ia_w2))
        {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_6_DATA\n");
         exit(1);};
 

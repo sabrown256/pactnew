@@ -517,7 +517,7 @@ int main(int c, char **v)
     PD_defstr(file, "myplot",
               "float x_axis(10)",
               "float y_axis(10)",
-              "integer npts", 
+              "int npts", 
               "char * label",
               "l_frame * view",
                LAST);

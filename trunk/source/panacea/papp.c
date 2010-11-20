@@ -83,9 +83,9 @@ void PA_transpose_pp(ppname, ntp, nuv)
 
 /* close the pp file */
     if (PA_pp_file != NULL)
-       {PD_write(PA_pp_file, "n-time-plots", "integer", &ntp);
-        PD_write(PA_pp_file, "n-time-arrays", "integer", &nuv);
-        PD_write(PA_pp_file, "last-cycle", "integer", &PA_current_pp_cycle);
+       {PD_write(PA_pp_file, "n-time-plots",  SC_INT_S, &ntp);
+        PD_write(PA_pp_file, "n-time-arrays", SC_INT_S, &nuv);
+        PD_write(PA_pp_file, "last-cycle",    SC_INT_S, &PA_current_pp_cycle);
 
         PA_ERR(!PD_close(PA_pp_file),
                "TROUBLE CLOSING POST PROCESSOR FILE %s - PA_TRANSPOSE_PP",
@@ -202,7 +202,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
          ind[1] = nptm;
 
          snprintf(_PA.pp_title, MAXLINE, "tn%d", i);
-         PD_write(pduf, _PA.pp_title, "integer", &nptm);
+         PD_write(pduf, _PA.pp_title, SC_INT_S, &nptm);
 
          snprintf(_PA.pp_title, MAXLINE, "td%d", i + n_dom);
          PD_write_alt(pduf, _PA.pp_title, type, crve[j], 1, ind);

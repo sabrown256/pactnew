@@ -84,10 +84,11 @@ static object *_SXI_rem_attr(object *argl)
  */
 
 static object *_SXI_set_attr_val(object *argl)
-   {PDBfile *file;
-    g_file *po;
+   {int id;
     char *at, *vr, *data_type, attr_type[MAXLINE];
     void *data;
+    PDBfile *file;
+    g_file *po;
     g_pdbdata *pv;
     attribute *atr;
     object *obj;
@@ -118,6 +119,8 @@ static object *_SXI_set_attr_val(object *argl)
 
     data = NULL;
 
+    id = SC_type_id(attr_type, FALSE);
+
     if (SX_PDBDATAP(obj))
        {pv = SS_GET(g_pdbdata, obj);
 
@@ -128,7 +131,7 @@ static object *_SXI_set_attr_val(object *argl)
 
         data = pv->data;}
 
-    else if ((strcmp(attr_type, SC_STRING_S) == 0) && (SS_stringp(obj)))
+    else if ((id == SC_STRING_I) && (SS_stringp(obj)))
         {char **cv;
 
          cv   = FMAKE(char *, "_SXI_SET_ATTR_VAL:cv");
@@ -136,7 +139,7 @@ static object *_SXI_set_attr_val(object *argl)
                 "char*:_SXI_SET_ATTR_VAL:cv");
          data = (void *) cv;}
 
-    else if (strcmp(attr_type, SC_CHAR_S) == 0)
+    else if (id == SC_CHAR_I)
         {char *cv;
 
          cv   = FMAKE(char, "_SXI_SET_ATTR_VAL:cv");
@@ -147,7 +150,7 @@ static object *_SXI_set_attr_val(object *argl)
 
          data = (void *) cv;}
 
-    else if ((strcmp(attr_type, "integer") == 0) && (SS_numbp(obj)))
+    else if ((id == SC_INT_I) && (SS_numbp(obj)))
         {int *iv;
 
          iv = FMAKE(int, "_SXI_SET_ATTR_VAL:iv");
@@ -158,7 +161,7 @@ static object *_SXI_set_attr_val(object *argl)
 
          data = (void *) iv;}
 
-    else if ((strcmp(attr_type, SC_DOUBLE_S) == 0) && (SS_numbp(obj)))
+    else if ((id == SC_DOUBLE_I) && (SS_numbp(obj)))
         {double *dv;
 
          dv = FMAKE(double, "_SXI_SET_ATTR_VAL:dv");

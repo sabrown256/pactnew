@@ -374,7 +374,7 @@ static void _PA_dump_time_plots(double tc, double dtc, int cycle)
        return;
 
     if (PA_current_pp_cycle == -1)
-       PD_write(PA_pp_file, "first-cycle", "integer", &cycle);
+       PD_write(PA_pp_file, "first-cycle", SC_INT_S, &cycle);
 
     PA_current_pp_cycle = cycle;
 

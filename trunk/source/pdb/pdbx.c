@@ -440,7 +440,7 @@ int PD_def_hash_types(PDBfile *file, int flag)
 		       "char *name", 
 		       "char *type", 
 		       "char *def", 
-		       "integer free", 
+		       "int free", 
 		       "haelem *next", 
 		       LAST);
 	if (dp == NULL)
@@ -453,8 +453,8 @@ int PD_def_hash_types(PDBfile *file, int flag)
        {PD_DEFINE_SMART_ARRAY(file);
 
         dp = PD_defstr(file, "hasharr",
-		       "integer size", 
-		       "integer docp", 
+		       "int size", 
+		       "int docp", 
 		       "long ne", 
 		       "function hash",
 		       "function comp",
@@ -588,7 +588,7 @@ static void _PD_check_old_hashel(PDBfile *file)
     if (dp != NULL)
        {cnv = TRUE;
 	for (desc = dp->members; desc != 0; desc = desc->next)
-	    {if (strcmp(desc->member, "integer free") == 0)
+	    {if (strcmp(desc->member, "int free") == 0)
 		{cnv = FALSE;
 		 break;};};
 
@@ -885,7 +885,7 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
 
 /* save the number of points */
     snprintf(name, MAXLINE, "npts%d", icurve);
-    if (!PD_write(fp, name, "integer", np))
+    if (!PD_write(fp, name, "int", np))
        return(FALSE);
 
 /* save the x and y arrays and the extrema */
@@ -991,7 +991,7 @@ int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
 /* save the number of points */
 /*
     snprintf(name, MAXLINE, "npts%d", icurve);
-    if (!PD_write(fp, name, "integer", &n))
+    if (!PD_write(fp, name, "int", &n))
        return(FALSE);
 */
 
@@ -1313,7 +1313,7 @@ int PD_def_mapping(PDBfile *fp)
 
 /* define the PG_image */
     ret = PD_defstr(fp, "PG_image",
-                    "integer version_id",
+                    "int version_id",
                     "char *label",
                     "double xmin",
                     "double xmax",
@@ -1323,10 +1323,10 @@ int PD_def_mapping(PDBfile *fp)
                     "double zmax",
                     "char *element_type",
                     "char *buffer",
-                    "integer kmax",
-                    "integer lmax",
+                    "int kmax",
+                    "int lmax",
                     "long size",
-                    "integer bits_pixel",
+                    "int bits_pixel",
                     "char *palette",
                     LAST);
 
@@ -1337,9 +1337,9 @@ int PD_def_mapping(PDBfile *fp)
        {ret = PD_defstr(fp, "PM_set",
                         "char *name",
                         "char *element_type",
-                        "integer dimension",
-                        "integer *max_index",
-                        "integer dimension_elem",
+                        "int dimension",
+                        "int *max_index",
+                        "int dimension_elem",
                         "long n_elements",
                         "char *elements",
                         "char *es_type",
@@ -1362,9 +1362,9 @@ int PD_def_mapping(PDBfile *fp)
        {ret = PD_defstr(fp, "PM_set",
                         "char *name",
                         "char *element_type",
-                        "integer dimension",
-                        "integer *max_index",
-                        "integer dimension_elem",
+                        "int dimension",
+                        "int *max_index",
+                        "int dimension_elem",
                         "long n_elements",
                         "char *elements",
                         "char *es_type",
@@ -1385,9 +1385,9 @@ int PD_def_mapping(PDBfile *fp)
 
 /* define the PM_mesh_topology */
     ret = PD_defstr(fp, "PM_mesh_topology",
-		    "integer n_dimensions",
-		    "integer *n_bound_params",
-		    "integer *n_cells",
+		    "int n_dimensions",
+		    "int *n_bound_params",
+		    "int *n_cells",
 		    "long **boundaries",
                     LAST);
 
@@ -1399,7 +1399,7 @@ int PD_def_mapping(PDBfile *fp)
 		    "PM_set *range",
 		    "char *map_type",
 		    "char *map",
-		    "integer file_type",
+		    "int file_type",
 		    "char *file_info",
 		    "char *file",
 		    "PM_mapping *next",

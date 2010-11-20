@@ -660,7 +660,7 @@ static int test_1(char *base, char *tgt, int n)
     PD_defstr(strm, "plot",
               "float x_axis(10)",
               "float y_axis(10)",
-              "integer npts", 
+              "int npts", 
               "char * label",
               "l_frame view",
                LAST);
@@ -826,7 +826,7 @@ static void send_test_2_data(PDBfile *strm)
     do_r = strm->default_offset;
 
     in_out(strm, "lev1 *",  1, &tar_w, &tar_r);
-    in_out(strm, "integer", N_INT, p_w, p_r);
+    in_out(strm, "int", N_INT, p_w, p_r);
 
     return;}
 
@@ -1013,11 +1013,11 @@ static int test_2(char *base, char *tgt, int n)
 /* make a few defstructs */
     PD_defstr(strm, "lev2",
               "char **s",
-	      "integer type",
+	      "int type",
               LAST);
 
     PD_defstr(strm, "lev1",
-              "integer *a",
+              "int *a",
 	      "double *b",
 	      "lev2 *c",
               LAST);
@@ -1262,7 +1262,7 @@ static int test_3(char *base, char *tgt, int n)
               "char a",
               "short b",
               "char c[2]",
-              "integer d",
+              "int d",
               "char e[3]",
               "float f",
               "char g[4]",
@@ -1315,7 +1315,7 @@ void prep_test_4_data(void)
 
     CHAR_S   = SC_strsavef("char *", "char*:PREP_TEST_4_DATA:char");
     SHORT_S  = SC_strsavef("short *", "char*:PREP_TEST_4_DATA:short");
-    INT_S    = SC_strsavef("integer *", "char*:PREP_TEST_4_DATA:integer");
+    INT_S    = SC_strsavef("int *", "char*:PREP_TEST_4_DATA:integer");
     LONG_S   = SC_strsavef("long *", "char*:PREP_TEST_4_DATA:long");
     FLOAT_S  = SC_strsavef("float *", "char*:PREP_TEST_4_DATA:float");
     DOUBLE_S = SC_strsavef("double *", "char*:PREP_TEST_4_DATA:double");

@@ -411,7 +411,7 @@ static void test_rates(pp)
 	     tstart = SC_wall_clock_time();
              filt[4] = 1;
 	     for (j = 0 ; j < reps; j++)
-                 PC_in(buf1, "int", bytes[i] >> 2, pp, filt);
+                 PC_in(buf1, SC_INT_S, bytes[i] >> 2, pp, filt);
 
 	     tend = SC_wall_clock_time();
 	     secs = tend - tstart;

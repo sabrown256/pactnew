@@ -2377,7 +2377,8 @@ FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
 				FIXNUM *sgned, FIXNUM *nbits, FIXNUM *padsz,
 				FIXNUM *fpp, FIXNUM *offs, FIXNUM *pan,
 				void *pdata)
-   {long numitems;
+   {int id, bpi;
+    long ni, nb;
     FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     char *dataout;
@@ -2388,21 +2389,18 @@ FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
 
     file = SC_GET_POINTER(PDBfile, *fileid);
 
-    numitems = *nitems;
+    id  = SC_type_id(t, FALSE);
+    bpi = SC_type_size_i(id);
+    ni  = *nitems;
+    nb  = bpi*ni;
 
     rv = PD_read_bits(file, s, t, *nitems, *sgned, *nbits, *padsz,
 		       *fpp, *offs, (long *) pan, &dataout);
     if (rv != 0)
-       {if (strcmp(t, SC_LONG_S) == 0)
-           memcpy(pdata, dataout, numitems * sizeof(long));
-        else if ((strcmp(t, "int") == 0) || (strcmp(t, "integer") == 0))
-           memcpy(pdata, dataout, numitems * sizeof(int));
-        else if (strcmp(t, SC_SHORT_S) == 0)
-           memcpy(pdata, dataout, numitems * sizeof(short));
-        else if (strcmp(t, SC_CHAR_S)  == 0)
-           memcpy(pdata, dataout, numitems);
+       {if ((SC_CHAR_I <= id) && (id <= SC_LONG_LONG_I))
+           memcpy(pdata, dataout, nb);
         else
-           rv = FALSE;}
+           rv = FALSE;};
 
     if (rv)
        SFREE(dataout);

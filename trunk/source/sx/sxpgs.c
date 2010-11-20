@@ -1845,7 +1845,8 @@ static object *_SXI_draw_image(object *argl)
 /* SX_SET_ATTR_ALIST - set an attribute on an alist */
 
 pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
-   {void *v;
+   {int id;
+    void *v;
     object *obj;
     C_array *arr;
 
@@ -1853,6 +1854,8 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
        {if (inf != NULL)
 	   inf = SC_rem_alist(inf, name);
 	return(inf);};
+
+    id = SC_type_id(type, FALSE);
 
     v = NULL;
 
@@ -1878,20 +1881,19 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
 	SS_GC(obj);
 	SC_mark(v, -1);}
 
-    else if ((strcmp(type, SC_INT_P_S) == 0) ||
-	     (strcmp(type, "integer *") == 0))
+    else if (id == SC_INT_P_I)
        {v = SC_alloc_nzt(1L, sizeof(int), NULL, NULL);
         SS_args(val,
 		SC_INT_I, v,
 		0);}
 
-    else if (strcmp(type, SC_DOUBLE_P_S) == 0)
+    else if (id == SC_DOUBLE_P_I)
        {v = SC_alloc_nzt(1L, sizeof(double), NULL, NULL);
         SS_args(val,
 		SC_DOUBLE_I, v,
 		0);}
 
-    else if (strcmp(type, SC_STRING_S) == 0)
+    else if (id == SC_STRING_I)
        {SS_args(val,
 		SC_STRING_I, &v,
 		0);}
