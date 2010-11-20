@@ -385,7 +385,10 @@ unsigned char *PG_c_str_pascal(unsigned char *bf, char *s, long n, int pad)
 /* PD_CGM_COMMAND - format and write out a CGM command */
 
 int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
-   {int i, j, nitems[20], iv[20], *piv[20], offs, special, morec, nitms;
+   {int i, j, ityp;
+    int offs, special, morec, nitms;
+    int nitems[20], iv[20];
+    int *piv[20];
     long abytes, nbytes, lbytes, nb;
     char *type[20], cv[20], *pcv[20], **ppcv[20];
     double dv[20], *pdv[20];
@@ -406,44 +409,49 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
             {special = (nitems[i] > 0);
              break;}
 
-         else if (strcmp(type[i], SC_INT_S) == 0)
-            {lbytes = nitems[i] << 1;
-             if (nitems[i] == 1)
-                iv[i] = SC_VA_ARG(int);
-             else
-                piv[i] = SC_VA_ARG(int *);}
+         else
+	    {ityp = SC_type_id(type[i], FALSE);
 
-         else if (strcmp(type[i], SC_DOUBLE_S) == 0)
-            {lbytes = nitems[i] << 2;
-             if (nitems[i] == 1)
-                dv[i] = SC_VA_ARG(double);
-             else
-                pdv[i] = SC_VA_ARG(double *);}
+/* fixed point types */
+	     if (ityp == SC_INT_I)
+	        {lbytes = nitems[i] << 1;
+		 if (nitems[i] == 1)
+		    iv[i] = SC_VA_ARG(int);
+		 else
+		    piv[i] = SC_VA_ARG(int *);}
 
-         else if (strcmp(type[i], SC_CHAR_S) == 0)
-            {lbytes = nitems[i];
-             if (nitems[i] == 1)
-                cv[i] = SC_VA_ARG(int);
-             else
-                pcv[i] = SC_VA_ARG(char *);}
+/* floating point types */
+	     else if (ityp == SC_DOUBLE_I)
+	        {lbytes = nitems[i] << 2;
+		 if (nitems[i] == 1)
+		    dv[i] = SC_VA_ARG(double);
+		 else
+		    pdv[i] = SC_VA_ARG(double *);}
 
-         else if (strcmp(type[i], SC_STRING_S) == 0)
-            {if (nitems[i] == 1)
-                {pcv[i] = SC_VA_ARG(char *);
-                 if (pcv[i] != NULL)
-                    lbytes = strlen(pcv[i]) + 1;}
-             else
-                {ppcv[i] = SC_VA_ARG(char **);
-                 lbytes  = 0L;
-                 for (j = 0; j < nitems[i]; j++)
-                     {if (ppcv[i][j] != NULL)
-                         lbytes += strlen(ppcv[i][j]) + 1L;};};}
+	     else if (ityp == SC_CHAR_I)
+	        {lbytes = nitems[i];
+		 if (nitems[i] == 1)
+		    cv[i] = SC_VA_ARG(int);
+		 else
+		    pcv[i] = SC_VA_ARG(char *);}
 
-         else if (strcmp(type[i], "PG_palette") == 0)
-            {cp     = SC_VA_ARG(PG_palette *);
-             offs   = SC_VA_ARG(int);
-             lbytes = 3*(cp->n_pal_colors + 2) + 1;
-             lbytes = ((lbytes + 1L) >> 1) << 1;};
+	     else if (ityp == SC_STRING_I)
+	        {if (nitems[i] == 1)
+		    {pcv[i] = SC_VA_ARG(char *);
+		     if (pcv[i] != NULL)
+		        lbytes = strlen(pcv[i]) + 1;}
+		 else
+		    {ppcv[i] = SC_VA_ARG(char **);
+		     lbytes  = 0L;
+		     for (j = 0; j < nitems[i]; j++)
+		        {if (ppcv[i][j] != NULL)
+			    lbytes += strlen(ppcv[i][j]) + 1L;};};}
+
+	     else if (strcmp(type[i], "PG_palette") == 0)
+	        {cp     = SC_VA_ARG(PG_palette *);
+		 offs   = SC_VA_ARG(int);
+		 lbytes = 3*(cp->n_pal_colors + 2) + 1;
+		 lbytes = ((lbytes + 1L) >> 1) << 1;};};
 
          nbytes += lbytes;};
 
@@ -466,46 +474,51 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
          if (type[i] == NULL)
             abytes -= PG_CGM_special(dev, nitems[i]);
 
-         else if (strcmp(type[i], SC_INT_S) == 0)
-            {if (nitems[i] == 1)
-                abytes -= PG_CGM_word(dev, &iv[i], 1L,
-                                      nbytes, morec);
-             else
-                abytes -= PG_CGM_word(dev, piv[i], (long) nitems[i],
-                                      nbytes, morec);}
+         else
+	    {ityp = SC_type_id(type[i], FALSE);
 
-         else if (strcmp(type[i], SC_DOUBLE_S) == 0)
-            {if (nitems[i] == 1)
-                abytes -= PG_CGM_double(dev, &dv[i], 1L,
-                                      nbytes, morec);
-             else
-                abytes -= PG_CGM_double(dev, pdv[i], (long) nitems[i],
-                                      nbytes, morec);}
+/* fixed point types */
+	     if (ityp == SC_INT_I)
+	        {if (nitems[i] == 1)
+		    abytes -= PG_CGM_word(dev, &iv[i], 1L,
+					  nbytes, morec);
+		 else
+		    abytes -= PG_CGM_word(dev, piv[i], (long) nitems[i],
+					  nbytes, morec);}
 
-         else if (strcmp(type[i], SC_CHAR_S) == 0)
-            {if (nitems[i] == 1)
-                abytes -= PG_CGM_byte(dev, &cv[i], 1L,
-                                      nbytes, morec);
-             else
-                abytes -= PG_CGM_byte(dev, pcv[i], (long) nitems[i],
-                                      nbytes, morec);}
+/* floating point types */
+	     else if (ityp == SC_DOUBLE_I)
+	        {if (nitems[i] == 1)
+		    abytes -= PG_CGM_double(dev, &dv[i], 1L,
+					    nbytes, morec);
+		 else
+		    abytes -= PG_CGM_double(dev, pdv[i], (long) nitems[i],
+					    nbytes, morec);}
 
-         else if (strcmp(type[i], SC_STRING_S) == 0)
-            {if (nitems[i] == 1)
-	        {nb =  PG_CGM_string(dev, &pcv[i], 1L,
-				     nbytes, morec, TRUE);
-		 if (nb == CGM_ERR)
-		    return(FALSE);
-		 abytes -= nb;}
-             else
-	        {nb = PG_CGM_string(dev, ppcv[i], (long) nitems[i],
-				    nbytes, morec, TRUE);
-		 if (nb == CGM_ERR)
-		    return(FALSE);
-		 abytes -= nb;};}
+	     else if (ityp == SC_CHAR_I)
+	        {if (nitems[i] == 1)
+		    abytes -= PG_CGM_byte(dev, &cv[i], 1L,
+					  nbytes, morec);
+		 else
+		    abytes -= PG_CGM_byte(dev, pcv[i], (long) nitems[i],
+					  nbytes, morec);}
 
-         else if (strcmp(type[i], "PG_palette") == 0)
-            abytes -= PG_CGM_color(dev, cp, offs);};
+	     else if (ityp == SC_STRING_I)
+	        {if (nitems[i] == 1)
+		    {nb =  PG_CGM_string(dev, &pcv[i], 1L,
+					 nbytes, morec, TRUE);
+		     if (nb == CGM_ERR)
+		        return(FALSE);
+		     abytes -= nb;}
+		 else
+		    {nb = PG_CGM_string(dev, ppcv[i], (long) nitems[i],
+					nbytes, morec, TRUE);
+		     if (nb == CGM_ERR)
+		        return(FALSE);
+		     abytes -= nb;};}
+
+	     else if (strcmp(type[i], "PG_palette") == 0)
+	        abytes -= PG_CGM_color(dev, cp, offs);};};
 
 /* pad out the element */
     if (abytes == 1)

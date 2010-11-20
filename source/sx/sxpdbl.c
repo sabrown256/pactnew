@@ -31,22 +31,22 @@ object
 
 /* _SX_MAKE_LIST_SYMENT - convert a syment into a list */
 
-object *_SX_make_list_syment(PDBfile *file, void *vr, long nitems,
-			     char *type)
+object *_SX_make_list_syment(PDBfile *file, void *vr, long ni, char *type)
    {object *obj;
 
 /* if the type is an indirection, follow the pointer */
     if (_PD_indirection(type))
-       obj = _SX_make_list_indirection(file, (char **) vr, nitems, type);
+       obj = _SX_make_list_indirection(file, (char **) vr, ni, type);
+
     else
-       {if ((strcmp(type, SC_CHAR_S) == 0) && (nitems == 1))
+       {if ((strcmp(type, SC_CHAR_S) == 0) && (ni == 1))
 	   {char *s;
 
 	    s = SC_strsavef("a", "char*:_SX_MAKE_LIST_SYMENT:s");
 	    s[0] = *(char *) vr;
-	    obj  = _SX_make_list_leaf(file, s, nitems, type);}
+	    obj  = _SX_make_list_leaf(file, s, ni, type);}
 	else
-	   obj = _SX_make_list_leaf(file, vr, nitems, type);};
+	   obj = _SX_make_list_leaf(file, vr, ni, type);};
 
     return(obj);}
 
@@ -58,7 +58,7 @@ object *_SX_make_list_syment(PDBfile *file, void *vr, long nitems,
  */
 
 object *_SX_make_list_indirection(PDBfile *file, char **vr,
-				  long nitems, char *type)
+				  long ni, char *type)
    {long i, ditems;
     char *dtype;
     object *obj, *obj1, *o;
@@ -68,7 +68,7 @@ object *_SX_make_list_indirection(PDBfile *file, char **vr,
 
     obj = SS_null;
 
-    for (i = 0L; i < nitems; i++, vr++)
+    for (i = 0L; i < ni; i++, vr++)
         {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
 
          if (ditems < 0L)
@@ -96,7 +96,7 @@ object *_SX_make_list_indirection(PDBfile *file, char **vr,
  *                    - otherwise, lookup the type, and display each member.
  */
 
-object *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type)
+object *_SX_make_list_leaf(PDBfile *file, char *vr, long ni, char *type)
    {long ii, sz, member_offs;
     defstr *defp;
     memdes *desc, *mem_lst;
@@ -113,13 +113,13 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type)
        mem_lst = defp->members;
 
     if (mem_lst == NULL)
-       obj = _SX_make_list_io(file, vr, nitems, type);
+       obj = _SX_make_list_io(file, vr, ni, type);
 
     else
        {obj = SS_null;                              /* cons of array elements */
 	sz  = defp->size;
 	svr = vr;
-        for (ii = 0L; ii < nitems; ii++, svr += sz)
+        for (ii = 0L; ii < ni; ii++, svr += sz)
             {if (pdb_wr_hook != NULL)
                 mem_lst = (*pdb_wr_hook)(file, svr, defp);
              obj1 = SS_null;
@@ -135,7 +135,7 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type)
              obj1 = SS_reverse(obj1);
 	     obj = SS_mk_cons(obj1, obj);};
 
-        if (nitems > 1L)
+        if (ni > 1L)
            obj = SS_reverse(obj);};
 
     return(obj);}
@@ -157,7 +157,7 @@ static object *_SX_mk_boolean(bool b)
 
 /* _SX_MAKE_LIST_IO - convert a primitive type into a list */
 
-object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
+object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
    {int id, offset;
     object *obj;
 
@@ -169,9 +169,9 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
        {long long *d;
 
 	d = NULL;
-	SC_convert(SC_LONG_LONG_S, (void **) &d, type, vr, nitems, FALSE);
+	SC_convert(SC_LONG_LONG_S, (void **) &d, type, vr, ni, FALSE);
 
-	ARRAY_VECTOR(obj, d, SS_mk_integer, nitems, offset);
+	ARRAY_VECTOR(obj, d, SS_mk_integer, ni, offset);
 
 	SFREE(d);}
 
@@ -180,9 +180,9 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
        {double *d;
 
 	d = NULL;
-	SC_convert(SC_DOUBLE_S, (void **) &d, type, vr, nitems, FALSE);
+	SC_convert(SC_DOUBLE_S, (void **) &d, type, vr, ni, FALSE);
 
-	ARRAY_VECTOR(obj, d, SS_mk_float, nitems, offset);
+	ARRAY_VECTOR(obj, d, SS_mk_float, ni, offset);
 
 	SFREE(d);}
 
@@ -191,9 +191,9 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
        {double _Complex *d;
 
 	d = NULL;
-	SC_convert(SC_DOUBLE_COMPLEX_S, (void **) &d, type, vr, nitems, FALSE);
+	SC_convert(SC_DOUBLE_COMPLEX_S, (void **) &d, type, vr, ni, FALSE);
 
-	ARRAY_VECTOR(obj, d, SS_mk_complex, nitems, offset);
+	ARRAY_VECTOR(obj, d, SS_mk_complex, ni, offset);
 
 	SFREE(d);}
 
@@ -204,9 +204,9 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
 	   {int *d;
 
 	    d = NULL;
-	    SC_convert(SC_INT_S, (void **) &d, type, vr, nitems, FALSE);
+	    SC_convert(SC_INT_S, (void **) &d, type, vr, ni, FALSE);
 
-	    ARRAY_VECTOR(obj, d, _SX_mk_boolean, nitems, offset);
+	    ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
 
 	    SFREE(d);}
 
@@ -227,7 +227,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type)
 
 	    d   = (char *) vr;
 	    bpi = _PD_lookup_size(type, file->chart);
-	    nb  = bpi*nitems;
+	    nb  = bpi*ni;
 
 	    ARRAY_VECTOR(obj, d, SS_mk_integer, nb, offset);};};
 

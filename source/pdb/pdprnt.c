@@ -492,7 +492,7 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
 static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 			long ni, char *type, int n, long *ind)
    {int k, m, idx, nn, isz, status, quo;
-    int ifx, ifp, icx;
+    int id, ifx, ifp, icx;
     long offset, i, j;
     char bf[MAXLINE], s[MAXLINE];
     char *cp, **t;
@@ -524,6 +524,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 
     pd  = PD_inquire_host_type(file, type);
     isz = pd->size;
+    id  = SC_type_id(type, FALSE);
 
     prnt->nn     = nn;
     prnt->offset = offset;
@@ -562,11 +563,11 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    else
 	       _PD_disp_data(prnt, vr, isz*ni, 0, n, ind);}
 
-	else if (strcmp(type, SC_BOOL_S) == 0)
+	else if (id == SC_BOOL_I)
 	  _PD_disp_data(prnt, vr, ni, SC_BOOL_I, n, ind);
 
 	else if ((pd->kind == CHAR_KIND) || (isz == sizeof(char)))
-	   {if (strcmp(type, SC_CHAR_S) == 0)
+	   {if (id == SC_CHAR_I)
 	       {idx = SC_STRING_I;
 	        quo = TRUE;}
 	    else if (pd->kind == CHAR_KIND)

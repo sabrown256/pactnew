@@ -798,7 +798,7 @@ static void _PG_dom_0d_3d(PG_device *dev, long npts,
 
 static void PG_label_nodes_3(PG_device *dev, double **x,
 			     long n, void *f, char *type)
-   {int i, ifx, ifp;
+   {int i, id;
     double box[PG_BOXSZ], p[PG_SPACEDM];
     double **r;
     char lbl[MAXLINE], ltype[MAXLINE];
@@ -822,9 +822,10 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
     strcpy(ltype, type);
     SC_strtok(ltype, " *", s);
     if (ltype != NULL)
+       {id = SC_type_id(ltype, FALSE);
 
 /* fixed point types (proper) */
-       {if ((ifx = SC_fix_type_id(ltype, FALSE)) != -1)
+	if (SC_is_type_fix(id) == TRUE)
 	   {int *fi;
 
 	    fi = NULL;
@@ -838,7 +839,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 	    SFREE(fi);}
 
 /* floating point types (proper) */
-       else if ((ifp = SC_fp_type_id(ltype)) != -1)
+       else if (SC_is_type_fp(id) == TRUE)
 	  {double *fi;
 
 	   fi = PM_array_real(type, f, n, NULL);
@@ -850,7 +851,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 
 	   SFREE(fi);}
 
-       else if (strcmp(ltype, SC_CHAR_S) == 0)
+       else if (id == SC_CHAR_I)
 	  {char t[2], *fi;
 
 	   t[1] = '\0';

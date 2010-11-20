@@ -1597,7 +1597,7 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
 		int sgned, int nbits, int padsz, int fpp,
 		long offs, long *pan, char **pdata)
    {int i, ityp, out_flag, onescmp;
-    int *intorder;
+    int *ord;
     long nitemsin, enumb, ebyte, obyte, ni;
     char *etype, *in, *out;
     syment *ep;
@@ -1639,37 +1639,29 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
 
     obyte = _PD_lookup_size(type, file->host_chart);
     out   = _PD_alloc_entry(file, type, nitems);
+    ityp  = SC_type_id(type, FALSE);
 
-    if (strcmp(type, SC_CHAR_S) == 0)
-       ityp = SC_CHAR_I;
-
-/* fixed point types (proper) */
-    else if ((ityp == SC_fix_type_id(type, FALSE)) == -1)
+    if ((ityp != SC_CHAR_I) && (SC_is_type_fix(ityp) == FALSE))
        return(FALSE);
 
     SC_unpack_bits(out, in, ityp, nbits, padsz, fpp, nitems, offs);
 
 /* convert integers */
-    if (strcmp(type, SC_CHAR_S) != 0)
-       {intorder = FMAKE_N(int, obyte, "_PD_RD_BITS:intorder");
+    if (ityp != SC_CHAR_I)
+       {ord = FMAKE_N(int, obyte, "_PD_RD_BITS:ord");
 
-#if 0
-	intorder = (int *) SC_alloc_nzt(obyte, sizeof(int),
-					"_PD_RD_BITS:intorder", NULL);
-#endif
         if (out_flag == NORMAL_ORDER)
-           for (i = 0; i < obyte; intorder[i] = i + 1, i++);
+           for (i = 0; i < obyte; ord[i] = i + 1, i++);
         else                         
-           for (i = 0; i < obyte; intorder[i] = obyte - i, i++);
+           for (i = 0; i < obyte; ord[i] = obyte - i, i++);
 
         if (sgned)
-           _PD_sign_extend(out, nitems, obyte,
-			        nbits, intorder);
+           _PD_sign_extend(out, nitems, obyte, nbits, ord);
 
         if (onescmp)
-           _PD_ones_complement(out, nitems, obyte, intorder);
+           _PD_ones_complement(out, nitems, obyte, ord);
 
-        SFREE(intorder);};
+        SFREE(ord);};
 
     *pan   = nitems;
     *pdata = out;

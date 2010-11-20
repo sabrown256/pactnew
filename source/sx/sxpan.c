@@ -867,7 +867,8 @@ static object *_SXI_dump_pp(object *argl)
  */
 
 static object *_SXI_db_numeric_data(object *obj)
-   {long n;
+   {int id;
+    long n;
     char *name, *type;
     double *dp;
     C_array *arr;
@@ -890,10 +891,11 @@ static object *_SXI_db_numeric_data(object *obj)
        {PA_CONNECT(pd, name, FALSE);
 	n    = PD_entry_number(pp->desc);
 	type = PD_entry_type(pp->desc);
+	id   = SC_type_id(type, FALSE);
 
 /* all arrays will be doubles */
-	if (strcmp(type, SC_DOUBLE_S) == 0)
-	   arr = PM_make_array(SC_DOUBLE_S, n, pd);
+	if (id == SC_DOUBLE_I)
+	   arr = PM_make_array(type, n, pd);
 	else
 	   {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	    dp  = (double *) arr->data;

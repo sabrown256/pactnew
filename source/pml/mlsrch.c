@@ -507,25 +507,29 @@ void PM_sub_array(void *in, void *out, long *dims, long *reg, long bpi)
 
 int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
 		   int (*prd)(double u, double v), double val, int nin, int *in)
-   {
+   {int id;
 
-    if (strcmp(type, SC_DOUBLE_S) == 0)
+    id = SC_type_id(type, FALSE);
+
+/* floating point types */
+    if (id == SC_DOUBLE_I)
        {FIND_VALUE(double, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (strcmp(type, SC_INT_S) == 0)
+    else if (id == SC_FLOAT_I)
+       {FIND_VALUE(float, nx, x, prd, val, nout, out, nin, in);}
+
+/* fixed point types */
+    else if (id == SC_INT_I)
        {FIND_VALUE(int, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {FIND_VALUE(long, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
+    else if (id == SC_SHORT_I)
        {FIND_VALUE(short, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (strcmp(type, SC_CHAR_S) == 0)
+    else if (id == SC_CHAR_I)
        {FIND_VALUE(char, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (strcmp(type, SC_FLOAT_S) == 0)
-       {FIND_VALUE(float, nx, x, prd, val, nout, out, nin, in);}
 
     else
        {*nout = -1;

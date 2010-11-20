@@ -16,8 +16,8 @@
 /* _SXI_DISPLAY_PAN_OBJECT - display a PANACEA object */
 
 object *_SXI_display_pan_object(object *obj)
-   {char *name;
-    int nitems;
+   {int id, ni;
+    char *name;
     syment *ep;
     PA_variable *pp;
     PA_package *pck;
@@ -36,14 +36,15 @@ object *_SXI_display_pan_object(object *obj)
        {pp = SS_GET(PA_variable, obj);
         if (pp->data != NULL)
            {ep = pp->desc;
-            if (strcmp(PD_entry_type(ep), SC_DOUBLE_S) == 0)
-               {nitems = PD_entry_number(ep);
-                conv   = pp->conv/pp->unit;
-                PA_scale_array(pp->data, nitems, conv);
+	    id = SC_type_id(PD_entry_type(ep), FALSE);
+            if (id == SC_DOUBLE_I)
+               {ni   = PD_entry_number(ep);
+                conv = pp->conv/pp->unit;
+                PA_scale_array(pp->data, ni, conv);
                 PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			       0, NULL);
-                conv   = 1.0/conv;
-                PA_scale_array(pp->data, nitems, conv);}
+                conv = 1.0/conv;
+                PA_scale_array(pp->data, ni, conv);}
             else
                PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			      0, NULL);}
@@ -59,14 +60,15 @@ object *_SXI_display_pan_object(object *obj)
 
         else if (pp->data != NULL)
            {ep = pp->desc;
-            if (strcmp(PD_entry_type(ep), SC_DOUBLE_S) == 0)
-               {nitems = PD_entry_number(ep);
-                conv   = pp->conv/pp->unit;
-                PA_scale_array(pp->data, nitems, conv);
+	    id = SC_type_id(PD_entry_type(ep), FALSE);
+            if (id == SC_DOUBLE_I)
+               {ni   = PD_entry_number(ep);
+                conv = pp->conv/pp->unit;
+                PA_scale_array(pp->data, ni, conv);
                 PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			       0, NULL);
                 conv   = 1.0/conv;
-                PA_scale_array(pp->data, nitems, conv);}
+                PA_scale_array(pp->data, ni, conv);}
             else
                PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			      0, NULL);}

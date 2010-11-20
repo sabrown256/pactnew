@@ -673,11 +673,11 @@ void PA_rel_access(void **vp, char *s, long offs, long ne)
  */
 
 void PA_init_scalar(char *s)
-   {PA_variable *pp;
-    int pclass;
+   {int id, pclass;
     char *pname, *ptype;
     void *pdata, *pval;
     void (*pfun)(void *p, long sz, char *s);
+    PA_variable *pp;
 
     pp = PA_inquire_variable(s);
     PA_ERR((pp == NULL),
@@ -694,22 +694,26 @@ void PA_init_scalar(char *s)
     pfun  = PA_VARIABLE_INIT_FUNC(pp);
     pval  = PA_VARIABLE_INIT_VAL(pp);
 
-    if (strcmp(ptype, SC_DOUBLE_S) == 0)
+    id = SC_type_id(ptype, FALSE);
+
+/* floating point types */
+    if (id == SC_DOUBLE_I)
        {PA_SET_UP_SCALAR(pname, double, pdata, pval, pfun);}
 
-    else if (strcmp(ptype, SC_INT_S) == 0)
-       {PA_SET_UP_SCALAR(pname, int, pdata, pval, pfun);}
-
-    else if (strcmp(ptype, SC_LONG_S) == 0)
-       {PA_SET_UP_SCALAR(pname, long, pdata, pval, pfun);}
-
-    else if (strcmp(ptype, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {PA_SET_UP_SCALAR(pname, float, pdata, pval, pfun);}
 
-    else if (strcmp(ptype, SC_SHORT_S) == 0)
+/* fixed point types */
+    else if (id == SC_INT_I)
+       {PA_SET_UP_SCALAR(pname, int, pdata, pval, pfun);}
+
+    else if (id == SC_LONG_I)
+       {PA_SET_UP_SCALAR(pname, long, pdata, pval, pfun);}
+
+    else if (id == SC_SHORT_I)
        {PA_SET_UP_SCALAR(pname, short, pdata, pval, pfun);}
 
-    else if (strcmp(ptype, SC_CHAR_S) == 0)
+    else if (id == SC_CHAR_I)
        {PA_SET_UP_SCALAR(pname, char, pdata, pval, pfun);};
 
     return;}

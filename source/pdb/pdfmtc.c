@@ -142,12 +142,13 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 
 static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 			      int flg, int *ordr, long *formt)
-   {int ifx, ifp, icx;
+   {int id, ifx, ifp, icx;
     data_standard *std;
     data_alignment *align;
 
     std   = file->std;
     align = file->align;
+    id    = SC_type_id(type, FALSE);
 
 /* check for fixed point types (proper) */
     if ((ifx = SC_fix_type_id(type, TRUE)) != -1)
@@ -175,14 +176,14 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
  */
 	}
 
-    else if (strcmp(type, SC_CHAR_S) == 0)
+    else if (id == SC_CHAR_I)
        align->char_alignment = al;
 
     else if (strcmp(type, "*") == 0)
        {std->ptr_bytes       = nb;
 	align->ptr_alignment = al;}
 
-    else if (strcmp(type, SC_STRUCT_S) == 0)
+    else if (id == SC_STRUCT_I)
        align->struct_alignment = al;
 
     return;}

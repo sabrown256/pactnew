@@ -1087,7 +1087,7 @@ static object *UL_thin(int j, object *argl)
     UL_buf1y = FMAKE_N(double, n, "UL_THIN:buf1y");
     toler = (toler < n) ? toler : n;
 
-    if (strncmp(type, SC_INT_S, 3) == 0)
+    if (strncmp(type, "int", 3) == 0)
        m = PM_thin_1d_int(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
     else
        m = PM_thin_1d_der(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);

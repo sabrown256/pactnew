@@ -497,7 +497,8 @@ void PA_source_variables(double t, double dt)
 
 void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
 		   double t, double dt)
-   {char *type;
+   {int id;
+    char *type;
     double *times;
     double t0, t1, t2, t3;
 
@@ -511,68 +512,23 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
     t3    = times[3];
 
     type = svp->pp->desc->type;
+    id   = SC_type_id(type, FALSE);
 
-    if (strcmp(type, SC_DOUBLE_S) == 0)
+/* floating point types */
+    if (id == SC_DOUBLE_I)
        {PA_INTERP_TYPE(v, double, svp, t, t0, t1, t2, t3);}
-/*
-    {int i;
-     double *pv;
-     double *d0, *d1, *d2, *d3, **pd;
-     double s1, s2;
-     double dt10, dt21, dt32, xd1, xd2;
-     double xm1, xm2, xm3;
-     double xf0, xf1, xf2, xf3;
-     pv = (double *) v;
-     pd = (double **) svp->queue;
-     d0 = pd[0];
-     d1 = pd[1];
-     d2 = pd[2];
-     d3 = pd[3];
-     if (svp->interpolate)
-        {dt10 = t1 - t0;
-         dt21 = t2 - t1;
-         dt32 = t3 - t2;
-         s1 = (t - t1)/dt21;
-         s2 = 1.0 - s1;
-         for (i = ni; i < nf; i++)
-             {xd1 = 0.0;
-              xd2 = 0.0;
-              xf0 = (double) d0[i];
-              xf1 = (double) d1[i];
-              xf2 = (double) d2[i];
-              xf3 = (double) d3[i];
-              xm1 = (xf1 - xf0)/dt10;
-              xm2 = (xf2 - xf1)/dt21;
-              xm3 = (xf3 - xf2)/dt32;
-              if (xm1*xm2 > 0.0)
-                 {xd1 = (dt21*xm1 + dt10*xm2)/(dt10 + dt21);
-                  if (xd1/xm1 > 3.0)
-                     xd1 = 3.0*xm1;
-                  if (xd1/xm2 > 3.0)
-                     xd1 = 3.0*xm2;};
-              if (xm2*xm3 > 0.0)
-                 {xd2 = (dt32*xm2 + dt21*xm3)/(dt21 + dt32);
-                  if (xd2/xm2 > 3.0)
-                     xd2 = 3.0*xm2;
-                  if (xd2/xm3 > 3.0)
-                     xd2 = 3.0*xm3;};
-              pv[i] = (double) ((xf1 + (2.0*xf1 + dt21*xd1)*s1)*s2*s2 +
-                              (xf2 + (2.0*xf2 - dt21*xd2)*s2)*s1*s1);};}
-     else if ((t <= t2) && (t2 < t+dt))
-        {for (i = ni; i < nf; i++)
-             pv[i] = (double) d2[i];};}
-*/
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {PA_INTERP_TYPE(v, float, svp, t, t0, t1, t2, t3);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+/* fixed point types */
+    else if (id == SC_LONG_I)
        {PA_INTERP_TYPE(v, long, svp, t, t0, t1, t2, t3);}
 
-    else if (strcmp(type, SC_INT_S) == 0)
+    else if (id == SC_INT_I)
        {PA_INTERP_TYPE(v, int, svp, t, t0, t1, t2, t3);}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
+    else if (id == SC_SHORT_I)
        {PA_INTERP_TYPE(v, short, svp, t, t0, t1, t2, t3);};
 
     return;}

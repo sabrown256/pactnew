@@ -930,7 +930,7 @@ static unsigned long _PA_copy_sub_select(double *tgt, double *src,
  */
 
 double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
-   {int i, nd;
+   {int i, nd, id;
     unsigned long nitems, dims, offset, stride;
     unsigned long strides[50], maxes[50];
     char *type;
@@ -951,24 +951,28 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
 
     stride = strides[0];
     type   = PA_VARIABLE_TYPE_S(pp);
-    if (strcmp(type, SC_DOUBLE_S) == 0)
+    id     = SC_type_id(type, FALSE);
+
+/* floating point types */
+    if (id == SC_DOUBLE_I)
        {nd = dims - 1;
         dp = (double *) PA_VARIABLE_DATA(pp);
         _PA_copy_sub_select(data, dp + offset, maxes, strides, nd);}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {COPY_CONVERT(data, float);}
 
-    else if (strcmp(type, SC_INT_S) == 0)
+/* fixed point types */
+    else if (id == SC_INT_I)
        {COPY_CONVERT(data, int);}
 
-    else if (strcmp(type, SC_CHAR_S) == 0)
+    else if (id == SC_CHAR_I)
        {COPY_CONVERT(data, char);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {COPY_CONVERT(data, long);}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
+    else if (id == SC_SHORT_I)
        {COPY_CONVERT(data, short);};
 
     conv = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
@@ -989,9 +993,10 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
  */
 
 int _PA_get_data(double *d, char *vr, long nitems, long offset, long stride)
-   {char *type;
-    double conv_fac;
+   {int id;
     long i;
+    char *type;
+    double conv_fac;
     PA_variable *pp;
 
     pp = PA_inquire_variable(vr);
@@ -999,25 +1004,29 @@ int _PA_get_data(double *d, char *vr, long nitems, long offset, long stride)
        return(FALSE);
 
     type = PA_VARIABLE_TYPE_S(pp);
-    if (strcmp(type, SC_DOUBLE_S) == 0)
+    id     = SC_type_id(type, FALSE);
+
+/* floating point types */
+    if (id == SC_DOUBLE_I)
        {COPY_CONVERT(d, double);}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {COPY_CONVERT(d, float);}
 
-    else if (strcmp(type, SC_INT_S) == 0)
+/* fixed point types */
+    else if (id == SC_INT_I)
        {COPY_CONVERT(d, int);}
 
-    else if (strcmp(type, SC_CHAR_S) == 0)
+    else if (id == SC_CHAR_I)
        {COPY_CONVERT(d, char);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {COPY_CONVERT(d, long);}
 
-    else if (strcmp(type, SC_LONG_LONG_S) == 0)
+    else if (id == SC_LONG_LONG_I)
        {COPY_CONVERT(d, long long);}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
+    else if (id == SC_SHORT_I)
        {COPY_CONVERT(d, short);}
 
     else
