@@ -1000,7 +1000,7 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 		 out = *pout;
 		 if (_PD_TEXT_OUT(file) == TRUE)
 		    {memset(out, ' ', fbpi);
-		     _PD_bin_text(&out, &in, "integer", 1L, 0,
+		     _PD_bin_text(&out, &in, SC_INT_S, 1L, 0,
 				  INT_KIND, NULL, hbpi, hord, NULL,
 				  INT_KIND, NULL, fbpi, ford, NULL,
 				  hs, FALSE, FALSE, 10, NULL);}
@@ -1014,7 +1014,7 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 	        {if (ford == TEXT_ORDER)
 		    {in  = *pin;
 		     out = (char *) &n;
-		     _PD_text_bin(&out, &in, "integer", 1L, 0,
+		     _PD_text_bin(&out, &in, SC_INT_S, 1L, 0,
 				  INT_KIND, NULL, fbpi, ford, NULL,
 				  INT_KIND, NULL, hbpi, hord, NULL,
 				  hs, FALSE, FALSE, 10, NULL);

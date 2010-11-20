@@ -45,7 +45,7 @@ main()
     PN_defstr(strm, "plot", &WORD8_ALIGNMENT, 0,
               "float x_axis(10)",
               "float y_axis(10)",
-              "integer npts", 
+              "int npts", 
               "char *label",
               "l_frame view",
               LAST);

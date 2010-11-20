@@ -544,16 +544,16 @@ void PD_typedef_primitive_types(PDBfile *file)
  */
 
 defstr *_PD_type_container(PDBfile *file, defstr *dp)
-   {char *type;
-    defstr *ndp;
-    int i, n;
+   {int i, n, id, bpi;
     long size;
+    char *type;
+    defstr *ndp;
     static char *std_types[] = { "REAL", "*", "bool", "char",
 				 "short", "int", "integer", "long", "long_long",
 				 "float", "double", "long_double",
 				 "function", "Directory" };
 
-    ndp  = NULL;
+    ndp = NULL;
 
     if ((dp == NULL) || (dp->members != NULL))
        return(ndp);
@@ -566,14 +566,16 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 
     size = dp->size;
 
-/* floating point types */
+/* floating point types (proper) */
     if (dp->fp.format != NULL)
-       {if (size <= sizeof(float))
-	   ndp = PD_inquire_host_type(file, SC_FLOAT_S);
-        else if (size <= sizeof(double))
-	   ndp = PD_inquire_host_type(file, SC_DOUBLE_S);
-        else if (size <= sizeof(long double))
-	   ndp = PD_inquire_host_type(file, SC_LONG_DOUBLE_S);}
+       {for (i = 0; i < N_PRIMITIVE_FP; i++)
+	    {id   = i + SC_FLOAT_I;
+	     bpi  = SC_type_size_i(id);
+	     type = SC_type_name(id);
+
+	     if (size <= bpi)
+	        {ndp = PD_inquire_host_type(file, type);
+		 break;};};}
 
     else if ((dp->fp.format == NULL) && (dp->fix.order != NO_ORDER))
        {if (size <= sizeof(char))
@@ -581,15 +583,16 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 	else if (size <= sizeof(bool))
 	   ndp = PD_inquire_host_type(file, SC_BOOL_S);
 
-/* fixed point types */
-        else if (size <= sizeof(short))
-	   ndp = PD_inquire_host_type(file, SC_SHORT_S);
-        else if (size <= sizeof(int))
-	   ndp = PD_inquire_host_type(file, SC_INT_S);
-        else if (size <= sizeof(long))
-	   ndp = PD_inquire_host_type(file, SC_LONG_S);
-        else if (size <= sizeof(long long))
-	   ndp = PD_inquire_host_type(file, SC_LONG_LONG_S);};
+/* fixed point types (proper) */
+	else
+	   {for (i = 0; i < N_PRIMITIVE_FIX; i++)
+	        {id   = i + SC_SHORT_I;
+		 bpi  = SC_type_size_i(id);
+		 type = SC_type_name(id);
+
+		 if (size <= bpi)
+		    {ndp = PD_inquire_host_type(file, type);
+		     break;};};};};
 
     return(ndp);}
 

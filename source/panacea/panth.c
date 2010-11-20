@@ -209,7 +209,7 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
     dp = PD_inquire_type(file, "th_record");
     if (dp == NULL)
        {PD_defstr(file, "th_record",
-                  "integer n_members",
+                  "int n_members",
                   "char **members",
                   "char **labels",
                   "char *type",
@@ -804,7 +804,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
          np = _PA.ndpt[i].number;
 
 /* write the curve n_points */
-         PD_write(puf, "npts0", "integer", &np);
+         PD_write(puf, "npts0", SC_INT_S, &np);
 
 /* intialize extrema to dummy values */
 	 ext[0] =  HUGE;

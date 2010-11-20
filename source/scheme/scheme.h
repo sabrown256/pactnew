@@ -171,10 +171,10 @@ struct s_SS_variable
    {char *name;
     object *value;};
 
-#define SS_DEFINE_VARIABLE \
-    PD_defstr(file, "variable", \
-              "char *name", \
-              "object *value", \
+#define SS_DEFINE_VARIABLE        \
+    PD_defstr(file, "variable",   \
+              "char *name",       \
+              "object *value",    \
               LAST)
 
 /*--------------------------------------------------------------------------*/
@@ -184,10 +184,10 @@ struct s_SS_boolean
    {char *name;
     int value;};
 
-#define SS_DEFINE_BOOLEAN \
-    PD_defstr(file, "boolean", \
-              "char *name", \
-              "integer value", \
+#define SS_DEFINE_BOOLEAN         \
+    PD_defstr(file, "boolean",    \
+              "char *name",       \
+              "int value",        \
               LAST)
 
 /*--------------------------------------------------------------------------*/
@@ -197,10 +197,10 @@ struct s_SS_string
    {int length;
     char *string;};
 
-#define SS_DEFINE_STRING \
-    PD_defstr(file, "string", \
-              "integer length", \
-              "char *string", \
+#define SS_DEFINE_STRING          \
+    PD_defstr(file, "string",     \
+              "int length",       \
+              "char *string",     \
               LAST)
 
 /*--------------------------------------------------------------------------*/
@@ -272,10 +272,10 @@ struct s_SS_vect
    {int length;
     object **vect;};
 
-#define SS_DEFINE_VECTOR \
-    PD_defstr(file, "vector", \
-              "integer length", \
-              "object **vect", \
+#define SS_DEFINE_VECTOR         \
+    PD_defstr(file, "vector",    \
+              "int length",      \
+              "object **vect",   \
               LAST)
 
 /*--------------------------------------------------------------------------*/

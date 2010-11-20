@@ -1261,7 +1261,7 @@ PM_mapping *PM_make_mapping(char *name, char *cat,
 /* build the map information */
     pi  = FMAKE(int, "PM_MAKE_MAPPING:pi");
     *pi = centering;
-    inf = SC_add_alist(NULL, "CENTERING", "integer *", (void *) pi);
+    inf = SC_add_alist(NULL, "CENTERING", SC_INT_P_S, (void *) pi);
 
 /* build the mapping */
     f             = FMAKE(PM_mapping, "PM_MAKE_MAPPING:f");

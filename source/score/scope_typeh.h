@@ -262,6 +262,7 @@ extern void
  SC_type_free_i(int id, void *x),
  SC_type_free_a(char *name, void *x),
  SC_init_base_types(void),
+ _SC_set_user_defaults(void),
  _SC_set_user_formats(void),
  _SC_set_format_defaults(void);
 
