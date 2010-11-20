@@ -41,7 +41,8 @@ JMP_BUF
 
 SC_state
  _SC = {-1, TRUE, -1, {-1.0, -1.0}, -1, -1,
-	(PFSignal_handler) -1, SIG_DFL, -1, };
+	(PFSignal_handler) -1, SIG_DFL, -1,
+        TYPE_STATE_INIT};
 
 /*--------------------------------------------------------------------------*/
 

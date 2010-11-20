@@ -517,7 +517,7 @@ static void _SC_write_bool(FILE *fp, int id)
     fprintf(fp, "    char *fmt;\n");
     fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
 
-    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+    fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
     fprintf(fp, "    if (strchr(fmt, 's') != NULL)\n");
@@ -557,7 +557,7 @@ static void _SC_write_complex(FILE *fp, int id)
     fprintf(fp, "    %s _Complex z;\n", kind[eid]);
     fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
 
-    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+    fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
     fprintf(fp, "    z  = pv[n];\n");
@@ -589,7 +589,7 @@ static void _SC_write_quaternion(FILE *fp, int id)
     fprintf(fp, "    quaternion q;\n");
     fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
 
-    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+    fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
     fprintf(fp, "    q  = pv[n];\n");
@@ -617,7 +617,7 @@ static void _SC_write_ntos(FILE *fp, int id)
     fprintf(fp, "    char *fmt;\n");
     fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
 
-    fprintf(fp, "    fmt = (mode == 1) ? SC_print_formats[%d] : SC_print_formata[%d];\n",
+    fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
 
     fprintf(fp, "    nb  = snprintf(t, nc, fmt, pv[n]);\n");

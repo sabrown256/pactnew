@@ -215,7 +215,6 @@ typedef struct s_PD_itag PD_itag;
 typedef struct s_dimind dimind;
 typedef struct s_attribute attribute;
 typedef struct s_attribute_value attribute_value;
-typedef struct s_precisionfp precisionfp;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
@@ -297,10 +296,6 @@ struct s_data_alignment
     int fx[PD_N_PRIMITIVE_FIX];              /* fixed point types */
     int fp[PD_N_PRIMITIVE_FP];               /* floating point types */
     int struct_alignment;};
-
-struct s_precisionfp
-   {int digits;
-    long double tolerance;};
 
 struct s_fixdes
    {int bpi;
@@ -733,17 +728,10 @@ extern long
  PD_print_controls[];
 
 extern int
- PD_fix_precision[];
-
-extern precisionfp
- PD_fp_precision[];
-
-extern int
  FORMAT_FIELDS,
  PD_default_format_version,
  PD_buffer_size,
- PD_DIM,
- PD_tolerance;
+ PD_DIM;
 
 extern data_standard
  *INT_STANDARD,
@@ -763,10 +751,7 @@ extern char
  *PD_ALIGNMENT_S,
  *PD_DEFSTR_S,
  *PD_STANDARD_S,
- PD_err[],
- *PD_no_print_member,
- *PD_user_formats1[],
- *PD_user_formats2[];
+ PD_err[];
 
 extern JMP_BUF
  _PD_read_err,

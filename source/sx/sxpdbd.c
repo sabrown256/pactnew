@@ -308,7 +308,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
     long i, isz, msz;
     char sa[MAXLINE], sb[MAXLINE];
     char bf[LINE_SIZE+1], bfa[LINE_SIZE], bfb[LINE_SIZ2+1];
-    char tmp[LINE_SIZE], fmt[LINE_SIZE];
+    char tmp[LINE_SIZE];
 
     samen = (strcmp(nma, nmb) == 0);
 
@@ -359,83 +359,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 
 		 memcpy(&bf[nn], tmp, min(LINE_SIZE - nn, strlen(tmp) + 1));
 		 PRINT(stdout, "%s\n", bf);
-		 memset(bf, ' ', LINE_SIZE);};};}
-
-    else
-       {strcpy(fmt, ":   ");
-	SC_strcat(fmt, LINE_SIZE, SC_print_formats[id]);
-	SC_strcat(fmt, LINE_SIZE, "   ");
-	SC_strcat(fmt, LINE_SIZE, SC_print_formats[id]);
-
-/* find the type and compare */
-	if (id == SC_CHAR_I)
-	   {char *va, *vb;
-	    va = (char *) pva;
-	    vb = (char *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-/* fixed point types */
-	else if (id == SC_SHORT_I)
-	   {short *va, *vb;
-	    va = (short *) pva;
-	    vb = (short *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_INT_I)
-	   {int *va, *vb;
-	    va = (int *) pva;
-	    vb = (int *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_LONG_I)
-	   {long *va, *vb;
-	    va = (long *) pva;
-	    vb = (long *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_LONG_LONG_I)
-	   {long long *va, *vb;
-	    va = (long long *) pva;
-	    vb = (long long *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-/* real floating point types */
-	else if (id == SC_FLOAT_I)
-	   {float *va, *vb;
-	    va = (float *) pva;
-	    vb = (float *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_DOUBLE_I)
-	   {double *va, *vb;
-	    va = (double *) pva;
-	    vb = (double *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_LONG_DOUBLE_I)
-	   {long double *va, *vb;
-	    va = (long double *) pva;
-	    vb = (long double *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-/* complex floating point types */
-	else if (id == SC_FLOAT_COMPLEX_I)
-	   {float _Complex *va, *vb;
-	    va = (float _Complex *) pva;
-	    vb = (float _Complex *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_DOUBLE_COMPLEX_I)
-	   {double _Complex *va, *vb;
-	    va = (double _Complex *) pva;
-	    vb = (double _Complex *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);}
-
-	else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-	   {long double _Complex *va, *vb;
-	    va = (long double _Complex *) pva;
-	    vb = (long double _Complex *) pvb;
-	    DISP_ARRAY(fmt, indx, va, vb, ni);};};
+		 memset(bf, ' ', LINE_SIZE);};};};
 
     return;}
 
@@ -636,6 +560,9 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
 			       long ni, dimdes *dims)
    {int id, ret;
     char *indx;
+    precisionfp *fp_pre;
+
+    fp_pre = _SC.types.fp_precision;
 
     if (SX_disp_individ_diff == TRUE)
        indx = FMAKE_N(char, ni, "_SX_DIFF_PRIMITIVES:indx");
@@ -682,19 +609,19 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
        {float *va, *vb;
 	va = (float *) bfa;
         vb = (float *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, va, vb, ni, PD_fp_precision[0].tolerance);}
+        DIFF_FLOAT_ARRAY(ret, indx, va, vb, ni, fp_pre[0].tolerance);}
 
     else if (id == SC_DOUBLE_I)
        {double *va, *vb;
 	va = (double *) bfa;
         vb = (double *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, va, vb, ni, PD_fp_precision[1].tolerance);}
+        DIFF_FLOAT_ARRAY(ret, indx, va, vb, ni, fp_pre[1].tolerance);}
 
     else if (id == SC_LONG_DOUBLE_I)
        {long double *va, *vb;
 	va = (long double *) bfa;
         vb = (long double *) bfb;
-        DIFF_FLOAT_ARRAY(ret, indx, va, vb, ni, PD_fp_precision[2].tolerance);}
+        DIFF_FLOAT_ARRAY(ret, indx, va, vb, ni, fp_pre[2].tolerance);}
 
 /* complex floating point types
  * NOTE: comparing tuples of floating point primitives
@@ -703,19 +630,19 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
        {float *va, *vb;
 	va = (float *) bfa;
         vb = (float *) bfb;
-        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, ni, PD_fp_precision[0].tolerance);}
+        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, ni, fp_pre[0].tolerance);}
 
     else if (id == SC_DOUBLE_COMPLEX_I)
        {double *va, *vb;
 	va = (double *) bfa;
         vb = (double *) bfb;
-        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, ni, PD_fp_precision[1].tolerance);}
+        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, ni, fp_pre[1].tolerance);}
 
     else if (id == SC_LONG_DOUBLE_COMPLEX_I)
        {long double *va, *vb;
 	va = (long double *) bfa;
         vb = (long double *) bfb;
-        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, ni, PD_fp_precision[2].tolerance);};
+        DIFF_COMPLEX_ARRAY(ret, indx, va, vb, ni, fp_pre[2].tolerance);};
 
     if (ret == FALSE)
        _SX_display_diff(pf, nma, nmb, bfa, bfb, indx, ni, type, dims);
@@ -1098,8 +1025,8 @@ static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb,
         return(NOT_SAME_SIZE);};
 
     _PD_digits_tol(pfa, pfb);
-    _PD_set_format_defaults();
-    _PD_set_user_formats();
+    _SC_set_format_defaults();
+    _SC_set_user_formats();
 
     ret = _SX_diff_tree(fullpatha, fullpathb, pfa, pfb, epa, epb, FALSE);
     _PD_rl_syment_d(epa);
@@ -1154,7 +1081,7 @@ object *_SXI_diff_var(object *argl)
        SS_error("BAD FOURTH ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
-       {SX_GET_INTEGER_FROM_LIST(PD_tolerance, argl, 
+       {SX_GET_INTEGER_FROM_LIST(_SC.types.max_digits, argl, 
                                  "FIFTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
 
     if (SS_consp(argl))

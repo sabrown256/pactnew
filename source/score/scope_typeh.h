@@ -22,6 +22,12 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 
 /*--------------------------------------------------------------------------*/
 
+#define N_PRIMITIVE_FIX   4
+#define N_PRIMITIVE_FP    3
+#define N_PRIMITIVE_CPX   3
+#define N_PRIMITIVE_QUT   1
+#define N_PRIMITIVES     16
+
 /*--------------------------------------------------------------------------*/
 
 /*                           PROCEDURAL MACROS                              */
@@ -37,6 +43,8 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 /*--------------------------------------------------------------------------*/
 
 typedef struct s_SC_type SC_type;
+typedef struct s_precisionfp precisionfp;
+typedef struct s_SC_type_manager SC_type_manager;
 
 /* SC_type
  *    - make a struct to encapsulate basic type information
@@ -53,6 +61,53 @@ struct s_SC_type
     char *type;                /* type name */
     int bpi;                   /* bytes per item */
     void (*free)(void *x);};   /* function to free instance */
+
+struct s_precisionfp
+   {int digits;
+    long double tolerance;};
+
+struct s_SC_type_manager
+   {int nprimitive;
+    int fix[3];                  /* fixed point type info    [n, first, last] */
+    int fp[3];                   /* floating point type info [n, first, last] */
+    int cpx[3];                  /* complex type info        [n, first, last] */
+    int qut[3];                  /* quaternion type info     [n, first, last] */
+
+    int max_digits;
+    int fix_precision[N_PRIMITIVE_FIX];
+    precisionfp fp_precision[N_PRIMITIVE_FP];
+
+    char *fixtyp[N_PRIMITIVE_FIX];
+    char *fptyp[N_PRIMITIVE_FP];
+    char *cpxtyp[N_PRIMITIVE_FP];
+    char *quttyp[N_PRIMITIVE_FP];
+
+    char *formats[N_PRIMITIVES];
+    char *formata[N_PRIMITIVES];
+
+    char *user_formats[N_PRIMITIVES];
+    char *user_formata[N_PRIMITIVES];
+
+    char *suppress_member;
+
+    void *typ;};
+
+/* initialization of type manager */
+
+#define TYPE_STATE_INIT                                                       \
+   { N_PRIMITIVES,                                                            \
+     {N_PRIMITIVE_FIX,  4,  4+N_PRIMITIVE_FIX-1},                             \
+     {N_PRIMITIVE_FP,   8,  8+N_PRIMITIVE_FP-1},                              \
+     {N_PRIMITIVE_CPX, 11, 13+N_PRIMITIVE_CPX-1},                             \
+     {N_PRIMITIVE_QUT, 14, 14+N_PRIMITIVE_QUT-1},                             \
+     1000,                                                                    \
+     {0, 0, 0, 0},                                                            \
+     {{0, 0.0}, {0, 0.0}, {0, 0.0}},                                          \
+     { "short", "integer", "long", "long_long" },                             \
+     { "float", "double", "long_double" },                                    \
+     { "float_complex", "double_complex", "long_double_complex" },            \
+     { "float_quaternion", "double_quaternion", "long_double_quaternion" },   \
+   }
 
 #ifdef __cplusplus
 extern "C" {
@@ -148,10 +203,6 @@ extern char
  *SC_REAL_S,
  *SC_REAL_P_S;
 
-extern char
- *SC_print_formats[],
- *SC_print_formata[];
-
 extern int
  (*SC_sizeof_hook)(char *s);                     /* string driven size hook */
 
@@ -210,7 +261,9 @@ extern char
 extern void
  SC_type_free_i(int id, void *x),
  SC_type_free_a(char *name, void *x),
- SC_init_base_types(void);
+ SC_init_base_types(void),
+ _SC_set_user_formats(void),
+ _SC_set_format_defaults(void);
 
 #ifdef __cplusplus
 }
