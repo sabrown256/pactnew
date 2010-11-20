@@ -37,8 +37,6 @@ long
 
 char
  *PD_no_print_member = NULL,
- *PD_print_formats1[PD_N_PRIMITIVES],
- *PD_print_formats2[PD_N_PRIMITIVES],
  *PD_user_formats1[PD_N_PRIMITIVES],
  *PD_user_formats2[PD_N_PRIMITIVES];
 
@@ -64,281 +62,6 @@ static int
  _PD_test_recursion(char *type, char *mtype);
 
 /*--------------------------------------------------------------------------*/
-
-/*                     PRIMITIVE TYPE PRINT ROUTINES                        */
-
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_char(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    char pv;
-    char *fmt;
-
-    pv = ((char *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_CHAR_I];
-    else
-       fmt = PD_print_formats2[SC_CHAR_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_bit(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    int pv;
-    char *fmt;
-
-    pv = ((int *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_BIT_I];
-    else
-       fmt = PD_print_formats2[SC_BIT_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_short(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    short pv;
-    char *fmt;
-
-    pv = ((short *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_SHORT_I];
-    else
-       fmt = PD_print_formats2[SC_SHORT_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_int(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    int pv;
-    char *fmt;
-
-    pv = ((int *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_INT_I];
-    else
-       fmt = PD_print_formats2[SC_INT_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_long(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    long pv;
-    char *fmt;
-
-    pv = ((long *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_LONG_I];
-    else
-       fmt = PD_print_formats2[SC_LONG_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_long_long(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    long long pv;
-    char *fmt;
-
-    pv = ((long long *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_LONG_LONG_I];
-    else
-       fmt = PD_print_formats2[SC_LONG_LONG_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_float(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    float pv;
-    char *fmt;
-
-    pv = ((float *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_FLOAT_I];
-    else
-       fmt = PD_print_formats2[SC_FLOAT_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_double(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    double pv;
-    char *fmt;
-
-    pv = ((double *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_DOUBLE_I];
-    else
-       fmt = PD_print_formats2[SC_DOUBLE_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_long_double(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    long double pv;
-    char *fmt;
-
-    pv = ((long double *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_LONG_DOUBLE_I];
-    else
-       fmt = PD_print_formats2[SC_LONG_DOUBLE_I];
-
-    rv = PRINT(fp, fmt, pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_float_complex(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    float _Complex pv;
-    char *fmt;
-
-    pv = ((float _Complex *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_FLOAT_COMPLEX_I];
-    else
-       fmt = PD_print_formats2[SC_FLOAT_COMPLEX_I];
-
-    rv = PRINT(fp, fmt, crealf(pv), cimagf(pv));
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_double_complex(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    double _Complex pv;
-    char *fmt;
-
-    pv = ((double _Complex *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_DOUBLE_COMPLEX_I];
-    else
-       fmt = PD_print_formats2[SC_DOUBLE_COMPLEX_I];
-
-    rv = PRINT(fp, fmt, creal(pv), cimag(pv));
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_long_double_complex(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    long double _Complex pv;
-    char *fmt;
-
-    pv = ((long double _Complex *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_LONG_DOUBLE_COMPLEX_I];
-    else
-       fmt = PD_print_formats2[SC_LONG_DOUBLE_COMPLEX_I];
-
-#if defined(AIX)
-    rv = PRINT(fp, fmt, creal(pv), cimag(pv));
-#else
-    rv = PRINT(fp, fmt, creall(pv), cimagl(pv));
-#endif
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-static int _PD_print_bool(FILE *fp, void *p, int i, int mode)
-   {int rv;
-    bool pv;
-    char *fmt;
-
-    pv = ((bool *) p)[i];
-
-    if (mode == 1)
-       fmt = PD_print_formats1[SC_BOOL_I];
-    else
-       fmt = PD_print_formats2[SC_BOOL_I];
-
-    if (strchr(fmt, 's') != NULL)
-       rv = PRINT(fp, fmt, pv ? "T" : "F");
-    else if (strchr(fmt, 'd') != NULL)
-       rv = PRINT(fp, fmt, (int) pv);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
-static PFPrnt
- printer[] = {NULL,
-	      _PD_print_bit,
-	      _PD_print_bool,
-	      _PD_print_char,
-	      _PD_print_short,
-	      _PD_print_int,
-	      _PD_print_long,
-	      _PD_print_long_long,
-	      _PD_print_float,
-	      _PD_print_double,
-	      _PD_print_long_double,
-	      _PD_print_float_complex,
-	      _PD_print_double_complex,
-	      _PD_print_long_double_complex};
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_DISP_MODE_I - print a single item from array X */
@@ -361,7 +84,7 @@ static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
          else
 	    {PRINT(fp, "\na> %s", prnt->prefix);};
 
-         printer[tid](fp, x, j, 1);
+	 io_puts(SC_ntos(bf, MAXLINE, tid, x, j, 1), fp);
 
          PRINT(fp, "\n");}
 
@@ -373,7 +96,8 @@ static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
 /* _PD_DISP_MODE_1 - print a single item from scalar X according to formats1 */
 
 static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
-   {FILE *fp;
+   {char bf[MAXLINE];
+    FILE *fp;
 
     fp = prnt->fp;
 
@@ -384,7 +108,8 @@ static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
     else
        {PRINT(fp, "        ");};
 
-    printer[tid](fp, x, 0, 1);
+    io_puts(SC_ntos(bf, MAXLINE, tid, x, 0, 1), fp);
+
     PRINT(fp, "\n");
 
     return;}
@@ -415,7 +140,8 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, long ni, int tid)
     else
        {PRINT(fp, "        ");};
 
-    printer[tid](fp, x, i, 1);
+    io_puts(SC_ntos(bf, MAXLINE, tid, x, i, 1), fp);
+
     PRINT(fp, "\n");
 
     j += prnt->offset;
@@ -430,7 +156,8 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, long ni, int tid)
 	 else
            {PRINT(fp, "        ");};
 
-         printer[tid](fp, x, i, 1);
+	 io_puts(SC_ntos(bf, MAXLINE, tid, x, i, 1), fp);
+
          PRINT(fp, "\n");};
 
     return;}
@@ -476,7 +203,7 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, long ni, int tid)
 	        {PRINT(fp, "\n        ");};
 	     k = 0;};
 
-         printer[tid](fp, x, i, 2);};
+	 io_puts(SC_ntos(bf, MAXLINE, tid, x, i, 2), fp);};
 
     PRINT(fp, "\n");
 
@@ -841,7 +568,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
  *         print capability for user defined types
  */
 	else if (strcmp(type, SC_CHAR_8_S) == 0)
-	   {if (SC_strstr(PD_print_formats1[SC_INT_I], "%s") != NULL)
+	   {if (SC_strstr(SC_print_formats[SC_INT_I], "%s") != NULL)
 	       {cp = (char *) vr;
 		t  = FMAKE_N(char *, ni, "_PD_IO_PRINT:t");
 		for (i = 0; i < ni; i++, cp += isz)
@@ -1285,13 +1012,13 @@ void _PD_set_user_formats(void)
 
     for (i = 0; i < PD_N_PRIMITIVES; i++)
         {if (PD_user_formats1[i] != NULL)
-	    {SFREE(PD_print_formats1[i]);
-	     PD_print_formats1[i] = SC_strsavef(PD_user_formats1[i],
+	    {SFREE(SC_print_formats[i]);
+	     SC_print_formats[i] = SC_strsavef(PD_user_formats1[i],
 						"char*:_PD_SET_USER_FORMATS:format1(i)");};
 
 	 if (PD_user_formats2[i] != NULL)
-	    {SFREE(PD_print_formats2[i]);
-	     PD_print_formats2[i] = SC_strsavef(PD_user_formats2[i],
+	    {SFREE(SC_print_formata[i]);
+	     SC_print_formata[i] = SC_strsavef(PD_user_formats2[i],
 						"char*:_PD_SET_USER_FORMATS:format2(i)");};};
 
     return;}
@@ -1319,66 +1046,66 @@ void _PD_set_format_defaults(void)
    {int i;
     char tmp[MAXLINE], *t;
     
-/* PD_print_formats1 is used for scalars */
+/* SC_print_formats is used for scalars */
 
 /* fixed point types (proper) */
     for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
-        {if (PD_print_formats1[i+SC_SHORT_I] != NULL)
-	    SFREE(PD_print_formats1[i+SC_SHORT_I]);
+        {if (SC_print_formats[i+SC_SHORT_I] != NULL)
+	    SFREE(SC_print_formats[i+SC_SHORT_I]);
 
 	 snprintf(tmp, MAXLINE, "%%%dd", PD_fix_precision[i]);
 
 	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fix)");
-	 PD_print_formats1[i+SC_SHORT_I] = t;};
+	 SC_print_formats[i+SC_SHORT_I] = t;};
 
 /* real floating point types (proper) */
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
-        {if (PD_print_formats1[i+SC_FLOAT_I] != NULL)
-	    SFREE(PD_print_formats1[i+SC_FLOAT_I]);
+        {if (SC_print_formats[i+SC_FLOAT_I] != NULL)
+	    SFREE(SC_print_formats[i+SC_FLOAT_I]);
 
 	 snprintf(tmp, MAXLINE, "%%# .%de", PD_fp_precision[i].digits);
 
 	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
-	 PD_print_formats1[i+SC_FLOAT_I] = t;};
+	 SC_print_formats[i+SC_FLOAT_I] = t;};
 
 /* complex floating point types (proper) */
     for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
-        {if (PD_print_formats1[i+SC_FLOAT_COMPLEX_I] != NULL)
-	    SFREE(PD_print_formats1[i+SC_FLOAT_COMPLEX_I]);
+        {if (SC_print_formats[i+SC_FLOAT_COMPLEX_I] != NULL)
+	    SFREE(SC_print_formats[i+SC_FLOAT_COMPLEX_I]);
 
 	 snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
 		  PD_fp_precision[i].digits, PD_fp_precision[i].digits);
 
 	 t = SC_strsavef(tmp, "char*:_PD_SET_FORMAT_DEFAULTS:format1(fp)");
-	 PD_print_formats1[i+SC_FLOAT_COMPLEX_I] = t;};
+	 SC_print_formats[i+SC_FLOAT_COMPLEX_I] = t;};
 
 /* other primitive types */
-    if (PD_print_formats1[SC_CHAR_I] != NULL)
-       SFREE(PD_print_formats1[SC_CHAR_I]);
+    if (SC_print_formats[SC_CHAR_I] != NULL)
+       SFREE(SC_print_formats[SC_CHAR_I]);
 
     t = SC_strsavef("%c", "char*:_PD_SET_FORMAT_DEFAULTS:format1(char)");
-    PD_print_formats1[SC_CHAR_I] = t;
+    SC_print_formats[SC_CHAR_I] = t;
 
-    if (PD_print_formats1[SC_BIT_I] != NULL)
-       SFREE(PD_print_formats1[SC_BIT_I]);
+    if (SC_print_formats[SC_BIT_I] != NULL)
+       SFREE(SC_print_formats[SC_BIT_I]);
 
     t = SC_strsavef("%x", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bit)");
-    PD_print_formats1[SC_BIT_I] = t;
+    SC_print_formats[SC_BIT_I] = t;
 
-    if (PD_print_formats1[SC_BOOL_I] != NULL)
-       SFREE(PD_print_formats1[SC_BOOL_I]);
+    if (SC_print_formats[SC_BOOL_I] != NULL)
+       SFREE(SC_print_formats[SC_BOOL_I]);
 
     t = SC_strsavef("%s", "char*:_PD_SET_FORMAT_DEFAULTS:format1(bool)");
-    PD_print_formats1[SC_BOOL_I] = t;
+    SC_print_formats[SC_BOOL_I] = t;
 
-/* PD_print_formats2 is used for arrays */
+/* SC_print_formata is used for arrays */
     for (i = 0; i < PD_N_PRIMITIVES; i++)
-        {if (PD_print_formats2[i] != NULL)
-            SFREE(PD_print_formats2[i]);
+        {if (SC_print_formata[i] != NULL)
+            SFREE(SC_print_formata[i]);
 
-         t = SC_strsavef(PD_print_formats1[i],
+         t = SC_strsavef(SC_print_formats[i],
 			 "char*:_PD_SET_FORMAT_DEFAULTS:formats2");
-         PD_print_formats2[i] = t;};
+         SC_print_formata[i] = t;};
 
     return;}
 

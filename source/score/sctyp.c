@@ -117,7 +117,8 @@ char
  *SC_REAL_P_S                = "double *";
 
 char
- *SC_print_format[N_PRIMITIVES];
+ *SC_print_formats[N_PRIMITIVES],
+ *SC_print_formata[N_PRIMITIVES];
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -566,17 +567,21 @@ int SC_va_get_arg(va_list a, int id, void *d, long n)
     
 /* SC_NTOS - render the Nth element of S which is of type ID
  *         - as a string in T
+ *         - if MODE is 1 render as scalar
+ *         - otherwiser render as element of array
+ *         - Note: one might want to get many array elements in a line
+ *         - and hence print fewer digits
  */
 
-int SC_ntos(char *t, int nc, int id, void *s, long n)
-    {int ok;
+char *SC_ntos(char *t, int nc, int id, void *s, long n, int mode)
+    {char *rv;
     
-     ok = FALSE;
+     rv = NULL;
 
      if (_SC_strf[id] != NULL)
-        ok = _SC_strf[id](t, nc, s, n);
+        rv = _SC_strf[id](t, nc, s, n, mode);
     
-     return(ok);}
+     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -3436,13 +3436,13 @@ static object *_SX_set_user_format(int i, char *format, int whch)
        {if (PD_user_formats1[i] != NULL)
 	   rv = SS_mk_string(PD_user_formats1[i]);
         else
-	   rv = SS_mk_string(PD_print_formats1[i]);}
+	   rv = SS_mk_string(SC_print_formats[i]);}
 
     else if (h2 == TRUE)
        {if (PD_user_formats2[i] != NULL)
 	   rv = SS_mk_string(PD_user_formats2[i]);
         else
-	   rv = SS_mk_string(PD_print_formats2[i]);}
+	   rv = SS_mk_string(SC_print_formata[i]);}
 
     else
        rv = SS_null;

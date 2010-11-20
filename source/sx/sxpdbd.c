@@ -306,6 +306,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 				   int mjr)
    {int id, nn, def_off, samen, lna, lnb;
     long i, isz, msz;
+    char sa[MAXLINE], sb[MAXLINE];
     char bf[LINE_SIZE+1], bfa[LINE_SIZE], bfb[LINE_SIZ2+1];
     char tmp[LINE_SIZE], fmt[LINE_SIZE];
 
@@ -340,83 +341,101 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
         PRINT(stdout, "%s%s", bfb, "\n\n");};
     memset(bf, ' ', LINE_SIZE);
 
-    strcpy(fmt, ":   ");
-
     id = SC_type_id(type, FALSE);
 
-    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[id]);
-    SC_strcat(fmt, LINE_SIZE, "   ");
-    SC_strcat(fmt, LINE_SIZE, PD_print_formats1[id]);
+    if ((SC_BIT_I < id) && (id <= SC_POINTER_I))
+       {for (i = 0L; i < ni; i++)
+	    {if (indx[i])
+	        {if ((dims == NULL) && (ni == 1))
+		    snprintf(tmp, LINE_SIZE, "%s", nma);
+		 else
+		    snprintf(tmp, LINE_SIZE, "%s(%s)", nma,
+			     PD_index_to_expr(bfa, i, dims, mjr, def_off));
+		 memcpy(bf, tmp, min(LINE_SIZE, strlen(tmp)));
+
+		 SC_ntos(sa, MAXLINE, id, pva, i, 1);
+		 SC_ntos(sb, MAXLINE, id, pvb, i, 1);
+		 snprintf(tmp, LINE_SIZE, ":   %s   %s", sa, sb);
+
+		 memcpy(&bf[nn], tmp, min(LINE_SIZE - nn, strlen(tmp) + 1));
+		 PRINT(stdout, "%s\n", bf);
+		 memset(bf, ' ', LINE_SIZE);};};}
+
+    else
+       {strcpy(fmt, ":   ");
+	SC_strcat(fmt, LINE_SIZE, SC_print_formats[id]);
+	SC_strcat(fmt, LINE_SIZE, "   ");
+	SC_strcat(fmt, LINE_SIZE, SC_print_formats[id]);
 
 /* find the type and compare */
-    if (id == SC_CHAR_I)
-       {char *va, *vb;
-	va = (char *) pva;
-        vb = (char *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	if (id == SC_CHAR_I)
+	   {char *va, *vb;
+	    va = (char *) pva;
+	    vb = (char *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
 /* fixed point types */
-    else if (id == SC_SHORT_I)
-       {short *va, *vb;
-	va = (short *) pva;
-        vb = (short *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_SHORT_I)
+	   {short *va, *vb;
+	    va = (short *) pva;
+	    vb = (short *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_INT_I)
-       {int *va, *vb;
-        va = (int *) pva;
-        vb = (int *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_INT_I)
+	   {int *va, *vb;
+	    va = (int *) pva;
+	    vb = (int *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_LONG_I)
-       {long *va, *vb;
-	va = (long *) pva;
-        vb = (long *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_LONG_I)
+	   {long *va, *vb;
+	    va = (long *) pva;
+	    vb = (long *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_LONG_LONG_I)
-       {long long *va, *vb;
-	va = (long long *) pva;
-        vb = (long long *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_LONG_LONG_I)
+	   {long long *va, *vb;
+	    va = (long long *) pva;
+	    vb = (long long *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
 /* real floating point types */
-    else if (id == SC_FLOAT_I)
-       {float *va, *vb;
-        va = (float *) pva;
-        vb = (float *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_FLOAT_I)
+	   {float *va, *vb;
+	    va = (float *) pva;
+	    vb = (float *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_DOUBLE_I)
-       {double *va, *vb;
-        va = (double *) pva;
-        vb = (double *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_DOUBLE_I)
+	   {double *va, *vb;
+	    va = (double *) pva;
+	    vb = (double *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_LONG_DOUBLE_I)
-       {long double *va, *vb;
-        va = (long double *) pva;
-        vb = (long double *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_LONG_DOUBLE_I)
+	   {long double *va, *vb;
+	    va = (long double *) pva;
+	    vb = (long double *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
 /* complex floating point types */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {float _Complex *va, *vb;
-        va = (float _Complex *) pva;
-        vb = (float _Complex *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_FLOAT_COMPLEX_I)
+	   {float _Complex *va, *vb;
+	    va = (float _Complex *) pva;
+	    vb = (float _Complex *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {double _Complex *va, *vb;
-        va = (double _Complex *) pva;
-        vb = (double _Complex *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);}
+	else if (id == SC_DOUBLE_COMPLEX_I)
+	   {double _Complex *va, *vb;
+	    va = (double _Complex *) pva;
+	    vb = (double _Complex *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);}
 
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {long double _Complex *va, *vb;
-        va = (long double _Complex *) pva;
-        vb = (long double _Complex *) pvb;
-        DISP_ARRAY(fmt, indx, va, vb, ni);};
+	else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+	   {long double _Complex *va, *vb;
+	    va = (long double _Complex *) pva;
+	    vb = (long double _Complex *) pvb;
+	    DISP_ARRAY(fmt, indx, va, vb, ni);};};
 
     return;}
 
