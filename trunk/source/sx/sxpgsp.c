@@ -2691,7 +2691,7 @@ static object *_SXI_set_color_type(object *argl)
 /* _SXI_GATGL - wrapper for PG_get_attrs_glb */
 
 static object *_SXI_gatgl(object *argl)
-   {int n;
+   {int n, id;
     char *typ, *name;
     void *pvo;
     haelem *hp;
@@ -2716,13 +2716,14 @@ static object *_SXI_gatgl(object *argl)
 	 else
 	    {typ = hp->type;
 	     pvo = hp->def;
-	     if (strcmp(typ, SC_INT_S) == 0)
+	     id  = SC_type_id(typ, FALSE);
+	     if (id == SC_INT_I)
 	        {o = SS_mk_integer(*(int *) pvo);
 		 rv = SS_mk_cons(o, rv);}
-	     else if (strcmp(typ, SC_DOUBLE_S) == 0)
+	     else if (id == SC_DOUBLE_I)
 	        {o  = SS_mk_float(*(double *) pvo);
 		 rv = SS_mk_cons(o, rv);}
-	     else if (strcmp(typ, SC_STRING_S) == 0)
+	     else if (id == SC_STRING_I)
 	        {o  = SS_mk_string((char *) pvo);
 		 rv = SS_mk_cons(o, rv);};};
 
@@ -2838,7 +2839,7 @@ static object *_SXI_gatst(object *argl)
 /* _SXI_SATGL - wrapper for PG_set_attrs_glb */
 
 static object *_SXI_satgl(object *argl)
-   {int n, iv;
+   {int n, iv, id;
     double dv;
     char *typ, *name, *sv;
     void *pvi, *pvo;
@@ -2862,21 +2863,22 @@ static object *_SXI_satgl(object *argl)
 	 else
 	    {typ = hp->type;
 	     pvo = hp->def;
-	     if (strcmp(typ, SC_INT_S) == 0)
+	     id  = SC_type_id(typ, FALSE);
+	     if (id == SC_INT_I)
 	        {iv = 0;
 		 SS_args(argl,
 			 SC_INT_I, &iv,
 			 0);
 		 argl = SS_cdr(argl);
 		 pvi  = &iv;}
-	     else if (strcmp(typ, SC_DOUBLE_S) == 0)
+	     else if (id == SC_DOUBLE_I)
 	        {dv = 0.0;
 		 SS_args(argl,
 			 SC_DOUBLE_I, &dv,
 			 0);
 		 argl = SS_cdr(argl);
 		 pvi  = &dv;}
-	     else if (strcmp(typ, SC_STRING_S) == 0)
+	     else if (id == SC_STRING_I)
 	        {sv = NULL;
 		 SS_args(argl,
 			 SC_STRING_I, &sv,

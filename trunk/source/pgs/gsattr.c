@@ -609,21 +609,23 @@ void *PG_ptr_attr_glb(char *name)
  */
 
 void _PG_ptr_attr_set(char *typ, void *pvo, void *pvi)
-   {
+   {int id;
 
-    if (typ == SC_INT_S)
+    id = SC_type_id(typ, FALSE);
+
+    if (id == SC_INT_I)
        {int *iv;
 
 	iv  = (int *) pvo;
 	*iv = *(int *) pvi;}
 
-    else if (typ == SC_DOUBLE_S)
+    else if (id == SC_DOUBLE_I)
        {double *dv;
 
 	dv  = (double *) pvo;
 	*dv = *(double *) pvi;}
 
-    else if (typ == SC_STRING_S)
+    else if (id == SC_STRING_I)
        {char **sv;
 
 	sv  = (char **) pvo;
@@ -668,7 +670,7 @@ int PG_get_attrs_glb(int dflt, ...)
 /* PG_SET_ATTRS_GLB - set global PGS attributes */
 
 int PG_set_attrs_glb(int dflt, ...)
-   {int n, iv;
+   {int n, id, iv;
     double dv;
     char *typ, *name, *sv;
     void *pvi, *pvo;
@@ -689,13 +691,15 @@ int PG_set_attrs_glb(int dflt, ...)
 	 else
 	    {typ = hp->type;
 	     pvo = hp->def;
-	     if (typ == SC_INT_S)
+	     id  = SC_type_id(typ, FALSE);
+
+	     if (id == SC_INT_I)
 	        {iv  = SC_VA_ARG(int);
 		 pvi = &iv;}
-	     else if (typ == SC_DOUBLE_S)
+	     else if (id == SC_DOUBLE_I)
 	        {dv  = SC_VA_ARG(double);
 		 pvi = &dv;}
-	     else if (typ == SC_STRING_S)
+	     else if (id == SC_STRING_I)
 	        {sv  = SC_VA_ARG(char *);
 		 pvi = &sv;};
 

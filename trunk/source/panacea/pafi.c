@@ -58,7 +58,7 @@ int PA_connect_ptrs_p(char *name, char **pvn, void **pp, int *pn)
 
 static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
    {int j, k, n, n_max;
-    int isw, ipr, inm;
+    int id, isw, ipr, inm;
     int n_doubles, n_integers, n_strings;
     long i;
     char **nl, *t, *type, *pt;
@@ -76,11 +76,13 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 
 	 pt = PA_VARIABLE_TYPE_S(pp);
 	 if (PA_VARIABLE_N_DIMS(pp) == 0)
-	    {if (strcmp(pt, SC_DOUBLE_S) == 0)
+	    {id = SC_type_id(pt, FALSE);
+
+	     if (id == SC_DOUBLE_I)
 	        n_doubles++;
-	     else if (strcmp(pt, SC_INT_S) == 0)
+	     else if (id == SC_INT_I)
 	        n_integers++;
-	     else if (strcmp(pt, SC_STRING_S) == 0)
+	     else if (id == SC_STRING_I)
 	        n_strings++;};};
 
     PA_mk_control(pck, pck->name, n_strings, n_doubles, n_integers+1);
@@ -130,15 +132,16 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
             continue;
 
          type = PA_VARIABLE_TYPE_S(pp);
-         if (strcmp(type, SC_INT_S) == 0)
+	 id   = SC_type_id(type, FALSE);
+         if (id == SC_INT_I)
             {PA_VARIABLE_DATA(pp) = (void *) &SWTCH[isw++];
              continue;};
 
-         if (strcmp(type, SC_DOUBLE_S) == 0)
+         if (id == SC_DOUBLE_I)
             {PA_VARIABLE_DATA(pp) = (void *) &PARAM[ipr++];
              continue;};
 
-         if (strcmp(type, SC_STRING_S) == 0)
+         if (id == SC_STRING_I)
             {PA_VARIABLE_DATA(pp) = (void *) &NAME[inm++];
              continue;};};
 

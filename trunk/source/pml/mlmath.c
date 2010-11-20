@@ -63,7 +63,7 @@ double
  */
 
 int PM_set_opers(PM_set *set)
-   {int ret;
+   {int id, ret;
     char type[MAXLINE], *token, *s = NULL;
 
     ret = FALSE;
@@ -75,14 +75,16 @@ int PM_set_opers(PM_set *set)
 
 	if (token == NULL)
 	   ret = FALSE;
-	else if (strcmp(token, SC_DOUBLE_S) == 0)
-	   set->opers = PM_REAL_Opers;
-	else if (strncmp(token, SC_INT_S, 3) == 0)
-	   set->opers = PM_Int_Opers;
-	else if (strcmp(token, SC_LONG_S) == 0)
-	   set->opers = PM_Long_Opers;
 	else
-	   ret = FALSE;};
+	   {id = SC_type_id(token, FALSE);
+	    if (id == SC_DOUBLE_I)
+	       set->opers = PM_REAL_Opers;
+	    else if (id == SC_INT_I)
+	       set->opers = PM_Int_Opers;
+	    else if (id == SC_LONG_I)
+	       set->opers = PM_Long_Opers;
+	    else
+	       ret = FALSE;};};
 
     return(ret);}
 

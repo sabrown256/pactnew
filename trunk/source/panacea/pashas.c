@@ -300,73 +300,9 @@ void PA_init_strings(void)
        PA_SET_INDEX_S   = SC_strsavef("PA_set_index",
 				      "char*:PA_INIT_STRINGS:index"),
 
-       SC_CHAR_S      = SC_strsavef(SC_CHAR_S,
-				    "char*:PA_INIT_STRINGS:char");
-       SC_SHORT_S     = SC_strsavef(SC_SHORT_S,
-				    "char*:PA_INIT_STRINGS:short");
-       SC_INT_S   = SC_strsavef(SC_INT_S,
-				    "char*:PA_INIT_STRINGS:integer");
-       SC_LONG_S      = SC_strsavef(SC_LONG_S,
-				    "char*:PA_INIT_STRINGS:long");
-       SC_FLOAT_S     = SC_strsavef(SC_FLOAT_S,
-				    "char*:PA_INIT_STRINGS:float");
-       SC_DOUBLE_S    = SC_strsavef(SC_DOUBLE_S,
-				    "char*:PA_INIT_STRINGS:double");
-       SC_REAL_S      = SC_strsavef(SC_REAL_S,
-				    "char*:PA_INIT_STRINGS:real");
-       SC_STRING_S    = SC_strsavef("char *",
-				    "char*:PA_INIT_STRINGS:char_s");
-       SC_POINTER_S   = SC_strsavef("void *",
-				    "char*:PA_INIT_STRINGS:void");
-
-       SC_VOID_S      = SC_strsavef(SC_VOID_S,
-				    "char*:PA_INIT_STRINGS:void_s");
-       SC_SHORT_P_S   = SC_strsavef(SC_SHORT_P_S,
-				    "char*:PA_INIT_STRINGS:short_p");
-       SC_INT_P_S = SC_strsavef(SC_INT_P_S,
-				    "char*:PA_INIT_STRINGS:integer_p");
-       SC_LONG_P_S    = SC_strsavef(SC_LONG_P_S,
-				    "char*:PA_INIT_STRINGS:long_p");
-       SC_FLOAT_P_S   = SC_strsavef(SC_FLOAT_P_S,
-				    "char*:PA_INIT_STRINGS:float_p");
-       SC_DOUBLE_P_S  = SC_strsavef(SC_DOUBLE_P_S,
-				    "char*:PA_INIT_STRINGS:double_p");
-       SC_REAL_P_S    = SC_strsavef(SC_REAL_P_S,
-				    "char*:PA_INIT_STRINGS:real_p");
-       SC_PCONS_S     = SC_strsavef(SC_PCONS_S,
-				    "char*:PA_INIT_STRINGS:pcons");
-       SC_PCONS_P_S   = SC_strsavef(SC_PCONS_P_S,
-				    "char*:PA_INIT_STRINGS:pcons_p");
-       SC_STRUCT_S    = SC_strsavef(SC_STRUCT_S,
-				    "char*:PA_INIT_STRINGS:struct_s");
-       SC_UNKNOWN_S   = SC_strsavef(SC_UNKNOWN_S,
-				    "char*:PA_INIT_STRINGS:struct_s");
-
 /* do not delete any of these strings */
        SC_permanent(PA_SET_INDEX_P_S);
        SC_permanent(PA_SET_INDEX_S);
-
-       SC_permanent(SC_CHAR_S);
-       SC_permanent(SC_SHORT_S);
-       SC_permanent(SC_INT_S);
-       SC_permanent(SC_LONG_S);
-       SC_permanent(SC_FLOAT_S);
-       SC_permanent(SC_DOUBLE_S);
-       SC_permanent(SC_REAL_S);
-       SC_permanent(SC_STRING_S);
-       SC_permanent(SC_POINTER_S);
-       SC_permanent(SC_PCONS_P_S);
-
-       SC_permanent(SC_VOID_S);
-       SC_permanent(SC_SHORT_P_S);
-       SC_permanent(SC_INT_P_S);
-       SC_permanent(SC_LONG_P_S);
-       SC_permanent(SC_FLOAT_P_S);
-       SC_permanent(SC_DOUBLE_P_S);
-       SC_permanent(SC_REAL_P_S);
-       SC_permanent(SC_PCONS_S);
-       SC_permanent(SC_STRUCT_S);
-       SC_permanent(SC_UNKNOWN_S);
     END_SAFE;
 
     return;}

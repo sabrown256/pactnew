@@ -156,44 +156,49 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
 /* PA_DEF_ALIAS - define an alias for a constant value */
 
 void PA_def_alias(char *name, char *type, void *pv)
-   {char *cp, **tp;
-    short *sp;
+   {int id;
     int *ip;
+    short *sp;
     long *lp;
+    char *cp, **tp;
     float *fp;
     double *dp;
 
-    if (strcmp(type, SC_CHAR_S) == 0)
+    id = SC_type_id(type, FALSE);
+
+    if (id == SC_CHAR_I)
        {cp  = FMAKE(char, "PA_DEF_ALIAS:cp");
         *cp = *(char *) pv;
         SC_hasharr_install(PA_alias_tab, name, cp, SC_CHAR_S, TRUE, TRUE);}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
+/* fixed point types */
+    else if (id == SC_SHORT_I)
        {sp  = FMAKE(short, "PA_DEF_ALIAS:sp");
         *sp = *(short *) pv;
         SC_hasharr_install(PA_alias_tab, name, sp, SC_SHORT_S, TRUE, TRUE);}
 
-    else if (strncmp(type, SC_INT_S, 3) == 0)
+    else if (id == SC_INT_I)
        {ip  = FMAKE(int, "PA_DEF_ALIAS:ip");
         *ip = *(int *) pv;
         SC_hasharr_install(PA_alias_tab, name, ip, SC_INT_S, TRUE, TRUE);}
 
-    else if (strcmp(type, SC_LONG_S) == 0)
+    else if (id == SC_LONG_I)
        {lp  = FMAKE(long, "PA_DEF_ALIAS:lp");
         *lp = *(long *) pv;
         SC_hasharr_install(PA_alias_tab, name, lp, SC_LONG_S, TRUE, TRUE);}
 
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+/* floating point types */
+    else if (id == SC_FLOAT_I)
        {fp  = FMAKE(float, "PA_DEF_ALIAS:fp");
         *fp = *(float *) pv;
         SC_hasharr_install(PA_alias_tab, name, fp, SC_FLOAT_S, TRUE, TRUE);}
 
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+    else if (id == SC_DOUBLE_I)
        {dp  = FMAKE(double, "PA_DEF_ALIAS:dp");
         *dp = *(double *) pv;
         SC_hasharr_install(PA_alias_tab, name, dp, SC_DOUBLE_S, TRUE, TRUE);}
 
-    else if (strcmp(type, SC_STRING_S) == 0)
+    else if (id == SC_STRING_I)
        {tp  = FMAKE(char *, "PA_DEF_ALIAS:tp");
         *tp = *(char **) pv;
         SC_hasharr_install(PA_alias_tab, name, tp, SC_STRING_S, TRUE, TRUE);};
@@ -208,8 +213,9 @@ void PA_def_alias(char *name, char *type, void *pv)
  */
 
 double PA_alias_value(char *s)
-   {haelem *hp;
+   {int id;
     double d;
+    haelem *hp;
 
     d = -2.0*HUGE;
 
@@ -219,29 +225,34 @@ double PA_alias_value(char *s)
 	   {if (SC_numstrp(s))
 	       d = SC_stof(s);}
 
-	else if (strcmp(hp->type, SC_DOUBLE_S) == 0)
-	   d = *(double *) hp->def;
-
-	else if (strcmp(hp->type, SC_FLOAT_S) == 0)
-	   d = *(float *) hp->def;
-
-	else if (strcmp(hp->type, SC_LONG_S) == 0)
-	   d = *(long *) hp->def;
-
-	else if (strncmp(hp->type, SC_INT_S, 3) == 0)
-	   d = *(int *) hp->def;
-
-	else if (strcmp(hp->type, SC_SHORT_S) == 0)
-	   d = *(short *) hp->def;
-
-	else if (strcmp(hp->type, SC_CHAR_S) == 0)
-	   d = *(char *) hp->def;
-
-	else if (strcmp(hp->type, SC_STRING_S) == 0)
-	   d = -2.0*HUGE;
-
 	else
-	   PA_ERR(TRUE, "BAD ALIAS - PA_ALIAS_VALUE");};
+	   {id = SC_type_id(hp->type, FALSE);
+
+/* floating point types */
+	    if (id == SC_DOUBLE_I)
+	       d = *(double *) hp->def;
+
+	    else if (id == SC_FLOAT_I)
+	       d = *(float *) hp->def;
+
+/* fixed point types */
+	    else if (id == SC_LONG_I)
+	       d = *(long *) hp->def;
+
+	    else if (id == SC_INT_I)
+	       d = *(int *) hp->def;
+
+	    else if (id == SC_SHORT_I)
+	       d = *(short *) hp->def;
+
+	    else if (id == SC_CHAR_I)
+	       d = *(char *) hp->def;
+
+	    else if (id == SC_STRING_I)
+	       d = -2.0*HUGE;
+
+	    else
+	       PA_ERR(TRUE, "BAD ALIAS - PA_ALIAS_VALUE");};};
 
     return(d);}
 

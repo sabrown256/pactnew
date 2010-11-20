@@ -87,14 +87,15 @@ void PA_rl_instance(char *name)
  */
 
 void PA_set_member(char *name, void *data, char *member)
-   {syment *ep;
-    SC_address addr;
-    char s[MAXLINE], **ppc, *pc, *type;
+   {int id;
     int *pi;
     short *ps;
     long *pl;
     float *pf;
     double *pd;
+    char s[MAXLINE], **ppc, *pc, *type;
+    syment *ep;
+    SC_address addr;
 
     snprintf(s, MAXLINE, "%s.%s", name, member);
     ep = _PD_effective_ep(PA_vif, s, FALSE, NULL);
@@ -102,33 +103,37 @@ void PA_set_member(char *name, void *data, char *member)
     addr.diskaddr = PD_entry_address(ep);
 
     type = PD_entry_type(ep);
+    id   = SC_type_id(type, FALSE);
+
     if (_PD_indirection(type))
        {ppc  = (char **) addr.memaddr;
         *ppc = (char *) data;}
 
-    else if (strcmp(type, SC_DOUBLE_S) == 0)
+/* floating point types */
+    else if (id == SC_DOUBLE_I)
        {pd  = (double *) addr.memaddr;
         *pd = *(double *) data;}
 
-    else if (strcmp(type, SC_INT_S) == 0)
-       {pi  = (int *) addr.memaddr;
-        *pi = *(int *) data;}
-
-    else if (strcmp(type, SC_CHAR_S) == 0)
-       {pc  = (char *) addr.memaddr;
-        *pc = *(char *) data;}
-
-    else if (strcmp(type, SC_LONG_S) == 0)
-       {pl  = (long *) addr.memaddr;
-        *pl = *(long *) data;}
-
-    else if (strcmp(type, SC_FLOAT_S) == 0)
+    else if (id == SC_FLOAT_I)
        {pf  = (float *) addr.memaddr;
         *pf = *(float *) data;}
 
-    else if (strcmp(type, SC_SHORT_S) == 0)
+/* fixed point types */
+    else if (id == SC_INT_I)
+       {pi  = (int *) addr.memaddr;
+        *pi = *(int *) data;}
+
+    else if (id == SC_LONG_I)
+       {pl  = (long *) addr.memaddr;
+        *pl = *(long *) data;}
+
+    else if (id == SC_SHORT_I)
        {ps  = (short *) addr.memaddr;
-        *ps = *(short *) data;};
+        *ps = *(short *) data;}
+
+    else if (id == SC_CHAR_I)
+       {pc  = (char *) addr.memaddr;
+        *pc = *(char *) data;};
 
     return;}
 
