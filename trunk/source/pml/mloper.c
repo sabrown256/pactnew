@@ -490,7 +490,7 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
 	
     ret = -1;
     if ((did != -1) && (sid != -1))
-       {da  = SC_convert_id(did, da, 0, sid, sa, 0, n, rel);
+       {da  = SC_convert_id(did, da, 0, sid, sa, 0, 1, n, rel);
 	ret = (da != NULL);};
 
     return(ret);}
@@ -504,7 +504,8 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
 
 static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
 			C_array *operand, double val)
-   {int i, n, ret;
+   {int i, n, ret, sid;
+    char bf[MAXLINE];
     char *styp, *dtyp;
     void *sa;
     double *da;
@@ -522,21 +523,28 @@ static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
 	       {styp = operand->type;
 		sa   = operand->data;
 
+		SC_strncpy(bf, MAXLINE, styp, -1);
+		sid = SC_type_id(strtok(bf, " *"), FALSE);
+
 /* floating point types */
-		if (strcmp(styp, SC_DOUBLE_P_S) == 0)
-		   {_ACC_OPER(da, fnc, double, sa);}
-		else if (strcmp(styp, SC_FLOAT_P_S) == 0)
+		if (sid == SC_FLOAT_I)
 		   {_ACC_OPER(da, fnc, float, sa);}
+		else if (sid == SC_DOUBLE_I)
+		   {_ACC_OPER(da, fnc, double, sa);}
+		else if (sid == SC_LONG_DOUBLE_I)
+		   {_ACC_OPER(da, fnc, long double, sa);}
 
 /* fixed point types */
-		else if (strcmp(styp, SC_INT_P_S) == 0)
-		   {_ACC_OPER(da, fnc, int, sa);}
-		else if (strcmp(styp, SC_LONG_P_S) == 0)
-		   {_ACC_OPER(da, fnc, long, sa);}
-		else if (strcmp(styp, SC_SHORT_P_S) == 0)
+		else if (sid == SC_SHORT_I)
 		   {_ACC_OPER(da, fnc, short, sa);}
+		else if (sid == SC_INT_I)
+		   {_ACC_OPER(da, fnc, int, sa);}
+		else if (sid == SC_LONG_I)
+		   {_ACC_OPER(da, fnc, long, sa);}
+		else if (sid == SC_LONG_LONG_I)
+		   {_ACC_OPER(da, fnc, long long, sa);}
 
-		else if (strcmp(styp, SC_STRING_S) == 0)
+		else if (sid == SC_CHAR_I)
 		   {_ACC_OPER(da, fnc, char, sa);};}
 	    								    
 	    else if ((operand->data == NULL) && (val != -HUGE))

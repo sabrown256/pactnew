@@ -900,7 +900,7 @@ static object *_SXI_db_numeric_data(object *obj)
 	   {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	    dp  = (double *) arr->data;
 
-	    SC_convert_id(SC_DOUBLE_I, dp, 0, id, pd, 0, n, FALSE);};
+	    SC_convert_id(SC_DOUBLE_I, dp, 0, id, pd, 0, 1, n, FALSE);};
 
 	rv = SX_mk_C_array(arr);};
 

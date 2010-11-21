@@ -321,35 +321,12 @@ static void _PA_init_time_plots(char *ppname)
  */
 
 static double _PA_array_ref_i(void *vr, long indx, int type)
-   {int *pi;
-    long *pl;
-    long long *pb;
-    float *pf;
-    double d, *pd;
+   {double d;
 
     d = 0.0;
 
-/* floating point types */
-    if (type == SC_DOUBLE_I)
-       {pd = (double *) vr;
-	d  = (double) pd[indx];}
-
-    else if (type == SC_FLOAT_I)
-       {pf = (float *) vr;
-	d  = (double) pf[indx];}
-
-/* fixed point types */
-    else if (type == SC_LONG_LONG_I)
-       {pb = (long long *) vr;
-	d  = (double) pb[indx];}
-
-    else if (type == SC_LONG_I)
-       {pl = (long *) vr;
-	d  = (double) pl[indx];}
-
-    else if (type == SC_INT_I)
-       {pi = (int *) vr;
-	d  = (double) pi[indx];}
+    if ((SC_BIT_I < type) && (type < SC_POINTER_I))
+       SC_convert_id(SC_DOUBLE_I, &d, 0, type, vr, indx, 1, 1, FALSE);
 
     else
        PA_ERR(TRUE,

@@ -718,7 +718,7 @@ static object *_SXI_make_pml_mapping(object *argl)
 	PM_ARRAY_CONTENTS(arr, void, n, type, data);
 
 	sid  = SC_type_id(type, FALSE);
-        emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, data, 0, n, FALSE);
+        emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, data, 0, 1, n, FALSE);
 
 	PG_set_attrs_mapping(f,
 			     "EXISTENCE", SC_CHAR_I, TRUE, emap,
@@ -1142,7 +1142,7 @@ static object *_SXI_arrays_set(object *argl)
              {SX_GET_ARRAY_FROM_LIST(data, lst,
                                      "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
 
-              SC_convert_id(SC_DOUBLE_I, pe, 0, sid, data, 0, nep, FALSE);
+              SC_convert_id(SC_DOUBLE_I, pe, 0, sid, data, 0, 1, nep, FALSE);
 
               pe += nep;};};
 

@@ -1221,7 +1221,7 @@ static object *_SXI_make_pgs_graph(object *argl)
     else
        {PM_ARRAY_CONTENTS(arr, void, n, type, d);
 	sid  = SC_type_id(type, FALSE);
-        emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, d, 0, n, FALSE);};
+        emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, d, 0, 1, n, FALSE);};
 
     PG_set_attrs_mapping(g->f,
 			 "EXISTENCE", SC_CHAR_I, TRUE, emap,
@@ -1873,7 +1873,7 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
 	did = SC_type_id(dtype, FALSE);
 	sid = SC_type_id(stype, FALSE);
 
-	v = SC_convert_id(sid, NULL, 0, sid, arr->data, 0, arr->length, TRUE);
+	v = SC_convert_id(sid, NULL, 0, sid, arr->data, 0, 1, arr->length, TRUE);
 
 	PM_rel_array(arr);
 

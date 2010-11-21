@@ -30,7 +30,7 @@ static object *_SS_exa_var(void *vr, int type)
 /* fixed point types (proper) */
     else if (SC_is_type_fix(type) == TRUE)
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, type, vr, 0, 1, FALSE);
+	SC_convert_id(SC_LONG_LONG_I, &v, 0, type, vr, 0, 1, 1, FALSE);
 	if (SS_interactive)
 	   PRINT(stdout, "    %lld", v);
 	ret = SS_mk_integer(v);}
@@ -38,7 +38,7 @@ static object *_SS_exa_var(void *vr, int type)
 /* floating point types (proper) */
     else if (SC_is_type_fp(type) == TRUE)
        {long double v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, type, vr, 0, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, type, vr, 0, 1, 1, FALSE);
 	if (SS_interactive)
 	   PRINT(stdout, "    %lg", v);
 	ret = SS_mk_float(v);}
@@ -46,7 +46,7 @@ static object *_SS_exa_var(void *vr, int type)
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(type) == TRUE)
        {long double _Complex v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, type, vr, 0, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, type, vr, 0, 1, 1, FALSE);
 	if (SS_interactive)
 	   PRINT(stdout, "    %lg + %lg*I", creall(v), cimagl(v));
 	ret = SS_mk_complex(v);}
@@ -206,19 +206,19 @@ object *SS_install_cv(char *name, void *pval, int ityp)
 /* fixed point types (proper) */
     else if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, ityp, pval, 0, 1, FALSE);
+	SC_convert_id(SC_LONG_LONG_I, &v, 0, ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, ityp, pval, 0, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(var, SS_mk_float(v), SS_Global_Env);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, ityp, pval, 0, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(var, SS_mk_complex(v), SS_Global_Env);}
 
     else if (ityp == SS_OBJECT_I)

@@ -2973,7 +2973,7 @@ static object *_SX_write_pdb(FILE *f0, object *argl)
 	     if (iarr != NULL)
 	        {PM_ARRAY_CONTENTS(iarr, void, n, typ, d);
 		 sid = SC_type_id(typ, FALSE);
-		 ind = SC_convert_id(SC_LONG_I, NULL, 0, sid, d, 0, n, FALSE);};
+		 ind = SC_convert_id(SC_LONG_I, NULL, 0, sid, d, 0, 1, n, FALSE);};
 
              PD_write_entry(f0,
                             pp->file, pp->name,

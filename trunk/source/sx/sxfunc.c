@@ -725,7 +725,7 @@ void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
     if (arr != NULL)
        {PM_ARRAY_CONTENTS(arr, void, ne, type, d);
 	sid   = SC_type_id(type, FALSE);
-	coeff = SC_convert_id(SC_DOUBLE_I, NULL, 0, sid, d, 0, ne, FALSE);
+	coeff = SC_convert_id(SC_DOUBLE_I, NULL, 0, sid, d, 0, 1, ne, FALSE);
         ne--;
 
         nc  = coeff[0];

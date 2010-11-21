@@ -251,9 +251,11 @@ extern char
  *SC_ntos(char *t, int nc, int id, void *s, long n, int mode);
 
 extern void
- *SC_convert_id(int did, void *d, long od, int sid, void *s, long os,
+ *SC_convert_id(int did, void *d, long od,
+		int sid, void *s, long os, long ss,
 		long n, int flag),
- *SC_convert(char *dtype, void *d, long od, char *stype, void *s, long os,
+ *SC_convert(char *dtype, void *d, long od,
+	     char *stype, void *s, long os, long ss,
 	     long n, int flag);
 
 extern void

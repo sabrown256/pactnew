@@ -11,6 +11,217 @@
 #include "scheme_int.h"
 #include "scope_mem.h"
 
+/*--------------------------------------------------------------------------*/
+
+/* convert a numerical primitive type to an object */
+
+#define _SS_NUMTYPE_TO_OBJ(_oid, _o, _vtyp, _vr, _n)                         \
+    {_vtyp *_p;                                                              \
+     _p = (_vtyp *) _vr;                                                     \
+      if (_oid == SC_CHAR_I)                                                 \
+        _o = SS_mk_integer(_p[_n]);                                          \
+     else if (_oid == SC_BOOL_I)                                             \
+        _o = SS_mk_boolean("#boolean", _p[_n]);                              \
+     else if (SC_is_type_fix(_oid) == TRUE)                                  \
+        _o = SS_mk_integer(_p[_n]);                                          \
+     else if (SC_is_type_fp(_oid) == TRUE)                                   \
+        _o = SS_mk_float(_p[_n]);                                            \
+     else if (SC_is_type_cx(_oid) == TRUE)                                   \
+        _o = SS_mk_complex(_p[_n]);                                          \
+     else if (_oid == SC_QUATERNION_I)                                       \
+        _o = SS_mk_quaternion(((quaternion *) _p)[_n]);}
+
+#define _SS_QUATERNION_TO_OBJ(_oid, _o, _vr, _n)                             \
+    {quaternion *_p;                                                         \
+     _p = (quaternion *) _vr;                                                \
+      if (_oid == SC_CHAR_I)                                                 \
+        _o = SS_mk_integer(_p[_n].s);                                        \
+     else if (_oid == SC_BOOL_I)                                             \
+        _o = SS_mk_boolean("#boolean", _p[_n].s);                            \
+     else if (SC_is_type_fix(_oid) == TRUE)                                  \
+        _o = SS_mk_integer(_p[_n].s);                                        \
+     else if (SC_is_type_fp(_oid) == TRUE)                                   \
+        _o = SS_mk_float(_p[_n].s);                                          \
+     else if (SC_is_type_cx(_oid) == TRUE)                                   \
+        _o = SS_mk_complex(_p[_n].s);                                        \
+     else if (_oid == SC_QUATERNION_I)                                       \
+        _o = SS_mk_quaternion(_p[_n]);}
+
+/* convert a numerical primitive array to a list */
+
+#define _SS_NUMTYPE_TO_LIST(_oid, _lst, _vtyp, _vr, _n)                      \
+    {long _i;                                                                \
+     object *_o;                                                             \
+     _lst = SS_null;                                                         \
+     for (_i = 0L; _i < _n; _i++)                                            \
+         {_SS_NUMTYPE_TO_OBJ(_oid, _o, _vtyp, _vr, _i);                      \
+          _lst = SS_mk_cons(_o, _lst);};}
+
+#define _SS_QUATERNION_TO_LIST(_oid, _lst, _vr, _n)                          \
+    {long _i;                                                                \
+     object *_o;                                                             \
+     _lst = SS_null;                                                         \
+     for (_i = 0L; _i < _n; _i++)                                            \
+         {_SS_QUATERNION_TO_OBJ(_oid, _o, _vr, _i);                          \
+          _lst = SS_mk_cons(_o, _lst);};}
+
+/*--------------------------------------------------------------------------*/
+
+/* convert an object to a numerical primitive type */
+
+#define _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, _i, _oid, _o)                   \
+    {_vtyp *_pv;                                                             \
+     _pv = (_vtyp *) _vr;                                                    \
+     if (_vid == SC_QUATERNION_I)                                            \
+        {quaternion _q;                                                      \
+         _q.i = 0.0;                                                         \
+         _q.j = 0.0;                                                         \
+         _q.k = 0.0;                                                         \
+         if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
+            _q.s = SS_CHARACTER_VALUE(_o);                                   \
+         else if (_oid == SC_BOOL_I)                                         \
+            _q.s = SS_BOOLEAN_VALUE(_o);                                     \
+         else if (_oid == SC_INT_I)                                          \
+            _q.s = SS_INTEGER_VALUE(_o);                                     \
+         else if (_oid == SC_FLOAT_I)                                        \
+            _q.s = SS_FLOAT_VALUE(_o);                                       \
+         else if (_oid == SC_DOUBLE_COMPLEX_I)                               \
+            {double _Complex _z;                                             \
+             _z   = SS_COMPLEX_VALUE(_o);                                    \
+             _q.s = creal(_z);                                               \
+             _q.i = cimag(_z);}                                              \
+         else if (_oid == SC_QUATERNION_I)                                   \
+            _q = SS_QUATERNION_VALUE(_o);                                    \
+         else                                                                \
+            rv = FALSE;                                                      \
+         if (rv == TRUE)                                                     \
+            _pv[_i] = *(_vtyp *) &_q;}                                       \
+     else if (SC_is_type_cx(_vid) == TRUE)                                   \
+        {double _re, _im;                                                    \
+         double _Complex _z;                                                 \
+         _re = 0.0;                                                          \
+         _im = 0.0;                                                          \
+         if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
+            _re = SS_CHARACTER_VALUE(_o);                                    \
+         else if (_oid == SC_BOOL_I)                                         \
+            _re = SS_BOOLEAN_VALUE(_o);                                      \
+         else if (_oid == SC_INT_I)                                          \
+            _re = SS_INTEGER_VALUE(_o);                                      \
+         else if (_oid == SC_FLOAT_I)                                        \
+            _re = SS_FLOAT_VALUE(_o);                                        \
+         else if (_oid == SC_DOUBLE_COMPLEX_I)                               \
+            {_z = SS_COMPLEX_VALUE(_o);                                      \
+             _re = creal(_z);                                                \
+             _im = cimag(_z);}                                               \
+         else if (_oid == SC_QUATERNION_I)                                   \
+            {quaternion _q;                                                  \
+             _q = SS_QUATERNION_VALUE(_o);                                   \
+             _re = _q.s;                                                     \
+             _im = _q.i;}                                                    \
+         else                                                                \
+            rv = FALSE;                                                      \
+         if (rv == TRUE)                                                     \
+            _pv[_i] = _re + _im*I;}                                          \
+     else if ((SC_BIT_I <= _vid) && (_vid <= SC_LONG_DOUBLE_I))              \
+        {if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
+            _pv[_i] = (_vtyp) SS_CHARACTER_VALUE(_o);                        \
+         else if (_oid == SC_BOOL_I)                                         \
+            _pv[_i] = (_vtyp) SS_BOOLEAN_VALUE(_o);                          \
+         else if (_oid == SC_INT_I)                                          \
+            _pv[_i] = (_vtyp) SS_INTEGER_VALUE(_o);                          \
+         else if (_oid == SC_FLOAT_I)                                        \
+            _pv[_i] = (_vtyp) SS_FLOAT_VALUE(_o);                            \
+         else if (_oid == SC_DOUBLE_COMPLEX_I)                               \
+            {double _Complex _z;                                             \
+             _z = SS_COMPLEX_VALUE(_o);                                      \
+             _pv[_i] = (_vtyp) creal(_z);}                                   \
+         else if (_oid == SC_QUATERNION_I)                                   \
+            {quaternion _q;                                                  \
+             _q = SS_QUATERNION_VALUE(_o);                                   \
+            _pv[_i] = (_vtyp) _q.s;}                                         \
+         else                                                                \
+            rv = FALSE;};}
+
+
+#define _SS_OBJ_TO_QUATERNION(_vr, _i, _oid, _o)                             \
+    {quaternion _q, *_pv;                                                    \
+     _q.i = 0.0;                                                             \
+     _q.j = 0.0;                                                             \
+     _q.k = 0.0;                                                             \
+     _pv = (quaternion *) _vr;                                               \
+     if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                    \
+        _q.s = SS_CHARACTER_VALUE(_o);                                       \
+     else if (_oid == SC_BOOL_I)                                             \
+        _q.s = SS_BOOLEAN_VALUE(_o);                                         \
+     else if (_oid == SC_INT_I)                                              \
+        _q.s = SS_INTEGER_VALUE(_o);                                         \
+     else if (_oid == SC_FLOAT_I)                                            \
+        _q.s = SS_FLOAT_VALUE(_o);                                           \
+     else if (_oid == SC_DOUBLE_COMPLEX_I)                                   \
+        {double _Complex _z;                                                 \
+         _z   = SS_COMPLEX_VALUE(_o);                                        \
+         _q.s = creal(_z);                                                   \
+         _q.i = cimag(_z);}                                                  \
+     else if (_oid == SC_QUATERNION_I)                                       \
+        _q = SS_QUATERNION_VALUE(_o);                                        \
+     else                                                                    \
+        rv = FALSE;                                                          \
+     if (rv == TRUE)                                                         \
+        _pv[_i] = _q;}
+
+
+/* convert an object, list or array to a numerical primitive array */
+
+#define _SS_LIST_TO_NUMTYPE(_vtyp, _vid, _vr, _n, _o)                        \
+   {int _oid, _jtyp;                                                         \
+    long _i;                                                                 \
+    _oid = SC_arrtype(_o, -1);                                               \
+    if (_oid == SS_CONS_I)                                                   \
+       {object *_to;                                                         \
+        if (SS_consp(SS_car(_o)))                                            \
+           _o = SS_car(_o);                                                  \
+        for (_i = 0; _i < _n; _i++)                                          \
+            {_to   = SS_car(_o);                                             \
+             _jtyp = SC_arrtype(_to, -1);                                    \
+             _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, _i, _jtyp, _to);           \
+             _to = SS_cdr(_o);                                               \
+             if (_to != SS_null)                                             \
+                _o = _to;};}                                                 \
+    else if (_oid == SS_VECTOR_I)                                            \
+       {object **_ao;                                                        \
+        _ao = SS_VECTOR_ARRAY(_o);                                           \
+        for (_i = 0; _i < _n; _i++)                                          \
+            {_jtyp = SC_arrtype(_ao[_i], -1);                                \
+             _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, _i, _jtyp, _ao[_i]);};}    \
+    else                                                                     \
+       _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, 0, _oid, _o);}
+
+#define _SS_LIST_TO_QUATERNION(_vr, _n, _o)                                  \
+   {int _oid, _jtyp;                                                         \
+    long _i;                                                                 \
+    _oid = SC_arrtype(_o, -1);                                               \
+    if (_oid == SS_CONS_I)                                                   \
+       {object *_to;                                                         \
+        if (SS_consp(SS_car(_o)))                                            \
+           _o = SS_car(_o);                                                  \
+        for (_i = 0; _i < _n; _i++)                                          \
+            {_to   = SS_car(_o);                                             \
+             _jtyp = SC_arrtype(_to, -1);                                    \
+             _SS_OBJ_TO_QUATERNION(_vr, _i, _jtyp, _to);                     \
+             _to = SS_cdr(_o);                                               \
+             if (_to != SS_null)                                             \
+                _o = _to;};}                                                 \
+    else if (_oid == SS_VECTOR_I)                                            \
+       {object **_ao;                                                        \
+        _ao = SS_VECTOR_ARRAY(_o);                                           \
+        for (_i = 0; _i < _n; _i++)                                          \
+            {_jtyp = SC_arrtype(_ao[_i], -1);                                \
+             _SS_OBJ_TO_QUATERNION(_vr, _i, _jtyp, _ao[_i]);};}              \
+    else                                                                     \
+       _SS_OBJ_TO_QUATERNION(_vr, 0, _oid, _o);}
+
+/*--------------------------------------------------------------------------*/
+
 typedef struct s_obj_map obj_map;
 
 struct s_obj_map

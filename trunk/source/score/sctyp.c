@@ -503,6 +503,7 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  *               -     SID  - type of source data
  *               -     S    - pointer to data to be converted
  *               -     OS   - offset from source pointer
+ *               -     SS    - stride through source
  *               -     N    - number of data items
  *               -     FLAG - free source data flag
  *               - the offsets permit conversions like
@@ -510,7 +511,8 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  *               - return the destination pointer
  */
 
-void *SC_convert_id(int did, void *d, long od, int sid, void *s, long os,
+void *SC_convert_id(int did, void *d, long od,
+		    int sid, void *s, long os, long ss,
 		    long n, int flag)
    {int rv, bpi;
     long nc;
@@ -521,7 +523,7 @@ void *SC_convert_id(int did, void *d, long od, int sid, void *s, long os,
 	d   = FMAKE_N(char, n*bpi, "SC_CONVERT_ID:d");};
 
     if (_SC_convf[did][sid] != NULL)
-       nc = _SC_convf[did][sid](d, od, s, od, n);
+       nc = _SC_convf[did][sid](d, od, s, os, ss, n);
     
     rv = (nc == n);
 
@@ -543,19 +545,21 @@ void *SC_convert_id(int did, void *d, long od, int sid, void *s, long os,
  *            -     STYPE - type of source data
  *            -     S     - pointer to data to be converted
  *            -     OS    - offset from source pointer
+ *            -     SS    - stride through source
  *            -     N     - number of data items
  *            -     FLAG  - free source data flag
  *            - return the destination pointer
  */
 
-void *SC_convert(char *dtype, void *d, long od, char *stype, void *s, long os,
+void *SC_convert(char *dtype, void *d, long od, char *stype,
+		 void *s, long os, long ss,
 		 long n, int flag)
    {int sid, did;
 
     sid = SC_type_id(stype, FALSE);
     did = SC_type_id(dtype, FALSE);
 
-    d = SC_convert_id(did, d, od, sid, s, os, n, flag);
+    d = SC_convert_id(did, d, od, sid, s, os, ss, n, flag);
 
     return(d);}
 
