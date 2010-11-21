@@ -239,6 +239,7 @@ extern int
  SC_is_type_fix(int id),
  SC_is_type_fp(int id),
  SC_is_type_cx(int id),
+ SC_is_type_num(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
  SC_va_get_arg(va_list a, int id, void *d, long n);

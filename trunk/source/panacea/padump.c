@@ -10,14 +10,6 @@
 
 #include "panacea_int.h"
 
-#define COPY_CONVERT(data, type)                                             \
-    {type *p;                                                                \
-     p = (type *) PA_VARIABLE_DATA(pp);                                      \
-     p += offset;                                                            \
-     for (i = 0; i < nitems; i++)                                            \
-         {data[i] = *p;                                                      \
-          p      += stride;};}
-
 struct s_PA_domain_spec
    {char *name;
     C_array *map;
@@ -325,7 +317,7 @@ static double _PA_array_ref_i(void *vr, long indx, int type)
 
     d = 0.0;
 
-    if ((SC_BIT_I < type) && (type < SC_POINTER_I))
+    if (SC_is_type_num(type) == TRUE)
        SC_convert_id(SC_DOUBLE_I, &d, 0, type, vr, indx, 1, 1, FALSE);
 
     else
@@ -871,28 +863,27 @@ PM_mapping *PA_build_mapping(PA_plot_request *pr, PM_set *(*build_ran)(PA_plot_r
  *                     - target array
  */
 
-static unsigned long _PA_copy_sub_select(double *tgt, double *src,
-					 unsigned long *maxes,
-					 unsigned long *strides,
-					 int d)
-   {unsigned long i, n, s, ret, m;
+static long _PA_copy_sub_select(int did, void *d, long od,
+				int sid, void *s, long os,
+				unsigned long *sshp, unsigned long *sstr,
+				int dm)
+   {long i, n, ss, ni, m;
 
-    s = strides[0];
-    n = maxes[0];
+    ss = sstr[0];
+    n  = sshp[0];
 
-    if (d == 0)
-       {for (i = 0L; i < n; i++, src += s)
-            *tgt++ = *src;
+    if (dm == 0)
+       {SC_convert_id(did, d, od, sid, s, os, ss, n, FALSE);
+        ni = n;}
 
-        ret = n;}
     else
-       {ret = 0L;
-        for (i = 0L; i < n; i++, src += s)
-            {m = _PA_copy_sub_select(tgt, src, maxes+1, strides+1, d-1);
-             ret += m;
-             tgt += m;};};
+       {ni = 0L;
+        for (i = 0L; i < n; i++, s += ss)
+            {m   = _PA_copy_sub_select(did, d, ni, sid, s, os,
+				       sshp+1, sstr+1, dm-1);
+             ni += m;};};
 
-    return(ret);}
+    return(ni);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -907,12 +898,13 @@ static unsigned long _PA_copy_sub_select(double *tgt, double *src,
  */
 
 double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
-   {int i, nd, id;
+   {int nd, id;
     unsigned long nitems, dims, offset, stride;
     unsigned long strides[50], maxes[50];
     char *type;
     double conv;
-    double *data, *dp;
+    double *data;
+    void *ps;
     PA_variable *pp;
 
     pp = PA_inquire_variable(name);
@@ -930,27 +922,12 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
     type   = PA_VARIABLE_TYPE_S(pp);
     id     = SC_type_id(type, FALSE);
 
-/* floating point types */
-    if (id == SC_DOUBLE_I)
-       {nd = dims - 1;
-        dp = (double *) PA_VARIABLE_DATA(pp);
-        _PA_copy_sub_select(data, dp + offset, maxes, strides, nd);}
-
-    else if (id == SC_FLOAT_I)
-       {COPY_CONVERT(data, float);}
-
-/* fixed point types */
-    else if (id == SC_INT_I)
-       {COPY_CONVERT(data, int);}
-
-    else if (id == SC_CHAR_I)
-       {COPY_CONVERT(data, char);}
-
-    else if (id == SC_LONG_I)
-       {COPY_CONVERT(data, long);}
-
-    else if (id == SC_SHORT_I)
-       {COPY_CONVERT(data, short);};
+    nd = dims - 1;
+        
+    if (SC_is_type_num(id) == TRUE)
+       {ps = PA_VARIABLE_DATA(pp);
+        _PA_copy_sub_select(SC_DOUBLE_I, data, 0,
+			    id, ps, offset, maxes, strides, nd);};
 
     conv = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
     PA_scale_array(data, nitems, conv);
@@ -969,10 +946,10 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
  *              - return TRUE iff successful
  */
 
-int _PA_get_data(double *d, char *vr, long nitems, long offset, long stride)
+int _PA_get_data(double *d, char *vr, long ni, long offset, long stride)
    {int id;
-    long i;
     char *type;
+    void *pv;
     double conv_fac;
     PA_variable *pp;
 
@@ -981,37 +958,18 @@ int _PA_get_data(double *d, char *vr, long nitems, long offset, long stride)
        return(FALSE);
 
     type = PA_VARIABLE_TYPE_S(pp);
-    id     = SC_type_id(type, FALSE);
+    id   = SC_type_id(type, FALSE);
 
-/* floating point types */
-    if (id == SC_DOUBLE_I)
-       {COPY_CONVERT(d, double);}
-
-    else if (id == SC_FLOAT_I)
-       {COPY_CONVERT(d, float);}
-
-/* fixed point types */
-    else if (id == SC_INT_I)
-       {COPY_CONVERT(d, int);}
-
-    else if (id == SC_CHAR_I)
-       {COPY_CONVERT(d, char);}
-
-    else if (id == SC_LONG_I)
-       {COPY_CONVERT(d, long);}
-
-    else if (id == SC_LONG_LONG_I)
-       {COPY_CONVERT(d, long long);}
-
-    else if (id == SC_SHORT_I)
-       {COPY_CONVERT(d, short);}
+    if (SC_is_type_num(id) == TRUE)
+       {pv = PA_VARIABLE_DATA(pp);
+	SC_convert_id(SC_DOUBLE_I, d, 0, id, pv, offset, stride, ni, FALSE);}
 
     else
        PA_ERR(TRUE,
               "CAN'T HANDLE TYPE %s - _PA_GET_DATA", type);
 
     conv_fac = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
-    PA_scale_array(d, nitems, conv_fac);
+    PA_scale_array(d, ni, conv_fac);
 
     return(TRUE);}
 

@@ -328,6 +328,18 @@ int SC_is_type_cx(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_IS_TYPE_NUM - return TRUE if ID is a numeric type */
+
+int SC_is_type_num(int id)
+   {int rv;
+
+    rv = ((SC_BIT_I < id) && (id < SC_POINTER_I));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_TYPE_NAME - given the type ID return the type name
  *              - the return value should never be freed
  *              - return NULL if type ID is unknown
