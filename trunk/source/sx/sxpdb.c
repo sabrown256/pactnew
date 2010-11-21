@@ -2928,7 +2928,7 @@ static object *_SXI_sizeof(object *argl)
 /* _SX_WRITE_PDB - display/write content of a pdb object */
 
 static object *_SX_write_pdb(FILE *f0, object *argl)
-   {int n;
+   {int n, sid;
     char typ[MAXLINE];
     long *ind;
     void *d;
@@ -2972,8 +2972,8 @@ static object *_SX_write_pdb(FILE *f0, object *argl)
 	     ind = NULL;
 	     if (iarr != NULL)
 	        {PM_ARRAY_CONTENTS(iarr, void, n, typ, d);
-
-		 CONVERT(SC_LONG_S, (void **) &ind, typ, d, n, FALSE);};
+		 sid = SC_type_id(typ, FALSE);
+		 ind = SC_convert_id(SC_LONG_I, NULL, 0, sid, d, 0, n, FALSE);};
 
              PD_write_entry(f0,
                             pp->file, pp->name,
@@ -3681,134 +3681,6 @@ void SX_type_container(char *dtype, char *stype)
 	   strcpy(dtype, stype);};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_CONVERT - function to hang on SC_convert_hook */
-
-int SX_convert(char *dtype, void **pd, char *stype, void *s,
-	       int n, int flag)
-   {int conv, ret, nb, nbi, fls, fld;
-    long *lt;
-    char *d, *ps;
-    double *dt;
-    defstr *sp, *dp;
-    hasharr *fc, *hc;
-    data_standard *fs, *hs;
-    PDBfile *file;
-    PD_smp_state *pa;
-    g_file *po;
-
-    pa = _PD_get_state(-1);
-
-    ret = FALSE;
-
-    if (strcmp(stype, dtype) == 0)
-       {nbi  = SIZEOF(stype);
-	conv = FALSE;}
-
-    else
-       {po = NULL;
-	SS_args(SS_lk_var_val(SX_curfile, SS_Env),
-		G_FILE, &po,
-		0);
-
-	if (po == NULL)
-	   file = SX_vif;
-	else
-	   file = FILE_FILE(PDBfile, po);
-
-	sp = PD_inquire_type(file, stype);
-	if (sp == NULL)
-	   return(ret);
-
-	dp = _PD_type_container(file, sp);
-	if (dp == NULL)
-	   dp = PD_inquire_type(file, dtype);
-
-	nbi  = dp->size;
-	conv = TRUE;
-
-	fls = (sp->fp.format != NULL);
-	fld = (dp->fp.format != NULL);
-
-/* if the source is floating point but not the destination */
-	if (fls && !fld)
-	   {lt = NULL;
-	    SC_convert(SC_LONG_S, (void **) &lt, stype, s, n, flag);
-
-	    s     = (void *) lt;
-	    sp    = PD_inquire_type(file, SC_LONG_S);
-	    stype = sp->type;
-
-	    flag = TRUE;
-	    conv = strcmp(dtype, SC_LONG_S);}
-
-/* if the source is integral but not the destination */
-	else if (fld && !fls)
-	   {dt = NULL;
-	    SC_convert(SC_DOUBLE_S, (void **) &dt, stype, s, n, flag);
-
-	    s     = (void *) dt;
-	    sp    = PD_inquire_type(file, SC_DOUBLE_S);
-	    stype = sp->type;
-
-	    flag = TRUE;
-	    conv = strcmp(dtype, SC_DOUBLE_S);};};
-
-/* the number of bytes we are dealing with */
-    nb = n*nbi;
-
-/* get the destination data setup */
-    d = (char *) *pd;
-    if (d == NULL)
-       {d   = FMAKE_N(char, nb, "SX_CONVERT-B:d");
-	*pd = (void *) d;};
-
-/* decide what to do with the data now that the types
- * have been sorted out
- */
-    if (conv)
-
-/* GOTCHA: PDB considers a char a NO_CONV type so we have to 
- *         treat character destinations specially for now
- *         we should probably just add a DEFIX type such as int1
- */
-       {if (strcmp(dtype, SC_CHAR_S) == 0)
-	   SC_convert(SC_CHAR_S, pd, stype, s, n, flag);
-
-	else
-	   {switch (SETJMP(pa->trace_err))
-	       {case ABORT :
-		     return(ret);
-		case ERR_FREE :
-		     return(ret);
-		default :
-		     memset(PD_err, 0, MAXLINE);
-		     break;};
-
-	    hc = file->host_chart;
-	    hs = file->host_std;
-
-	    fc = hc;
-	    fs = hs;
-
-	    ps = s;
-	    PD_convert(&d, &ps, stype, dtype, n, fs, hs, hs,
-		       fc, hc, 0, PD_TRACE);
-
-	    ret = TRUE;};}
-
-    else
-       {memcpy(d, s, nb);
-
-        ret = TRUE;};
-
-    if (flag && (ret == 1))
-       {SFREE(s);};
-
-    return(ret);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

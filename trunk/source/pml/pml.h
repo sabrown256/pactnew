@@ -144,7 +144,8 @@
 /*--------------------------------------------------------------------------*/
 
 #define PM_CHECK_EMAP(alist, n, eflag, emap)                                 \
-   {pcons *_i;                                                               \
+   {int _sid;                                                                \
+    pcons *_i;                                                               \
     char  *_c, *_t;                                                          \
     if (eflag == FALSE)                                                      \
        {_i = SC_assoc_entry(alist, "EXISTENCE");                             \
@@ -153,8 +154,9 @@
             if (_t != NULL)                                                  \
 	       {SC_dereference(_t);                                          \
 		if (strcmp(_t, SC_STRING_S) != 0)                            \
-		   {_c = NULL;                                               \
-		    CONVERT(SC_CHAR_S, (void **) &_c, _t, emap, n, FALSE);   \
+		   {_sid = SC_type_id(_t, FALSE);                            \
+                    _c   = SC_convert_id(SC_CHAR_I, NULL, 0, _sid, emap, 0,  \
+                                         n, FALSE);                          \
 		    eflag = TRUE;                                            \
 		    emap = _c;}                                              \
 		SFREE(_t);};};};}

@@ -1187,23 +1187,21 @@ void daprint(pcons *alst)
 
 /* fixed point types (proper) */
          else if (SC_is_type_fix(id) == TRUE)
-	    {long long v, *pv;
-	     pv = &v;
-	     SC_convert_id(SC_LONG_LONG_I, (void **) &pv, id, ths->cdr, 1, FALSE);
+	    {long long v;
+	     SC_convert_id(SC_LONG_LONG_I, &v, 0, id, ths->cdr, 0, 1, FALSE);
 	     io_printf(stdout, "\t%ld", v);}
 
 /* floating point types (proper) */
          else if (SC_is_type_fp(id) == TRUE)
-	    {long double v, *pv;
-	     pv = &v;
-	     SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, id, ths->cdr, 1, FALSE);
+	    {long double v;
+	     SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, id, ths->cdr, 0, 1, FALSE);
 	     io_printf(stdout, "\t%lg", v);}
 
 /* complex floating point types (proper) */
          else if (SC_is_type_cx(id) == TRUE)
-	    {long double _Complex v, *pv;
-	     pv = &v;
-	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, id, ths->cdr, 1, FALSE);
+	    {long double _Complex v;
+	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, id, ths->cdr, 0,
+			   1, FALSE);
 	     io_printf(stdout, "\t%lg + %lg*I", creall(v), cimagl(v));};
 
          io_printf(stdout, "\n");}

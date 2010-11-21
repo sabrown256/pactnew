@@ -855,7 +855,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
 
 static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
 			        char *type, char *mix, int na, int nrd)
-   {int j, k, nv, ns, rv;
+   {int j, k, nv, ns, rv, sid;
     defstr *dp;
     memdes *desc;
     double *data, *pd;
@@ -889,22 +889,23 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
                   mtype  = desc->type;
                   bpm    = mitems*_PD_lookup_size(mtype, tab);
                   incr   = _PD_align(offs, mtype, desc->is_indirect, tab, &tmp);
+		  sid    = SC_type_id(mtype, FALSE);
 
 /* increment the offsets to the alignments */
                   offs += incr;
                   ps   += incr;
 
                   pd = &crve[j][k];
-                  CONVERT(SC_DOUBLE_S, (void **) &pd, mtype, ps, 1, FALSE);
+                  SC_convert_id(SC_DOUBLE_I, pd, 0, sid, ps, 0, 1, FALSE);
 
 /* increment to the next member */
                   offs += bpm;
                   ps   += bpm;};};}
 
     else
-       {data = NULL;
+       {sid  = SC_type_id(mix, FALSE);
         ns   = (nrd - na)*nv;
-        CONVERT(SC_DOUBLE_S, (void **) &data, mix, stripe, ns, FALSE);
+        data = SC_convert_id(SC_DOUBLE_I, NULL, 0, sid, stripe, 0, ns, FALSE);
 
         pd = data;
         for (k = na; k < nrd; k++)

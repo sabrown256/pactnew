@@ -717,16 +717,15 @@ static PM_mapping *_SXI_derivative(PM_mapping *h)
 /* SX_FILTER_COEFF - worker for coefficient based filters */
 
 void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
-   {int i, ne, nc, nh, ne0;
+   {int i, ne, nc, nh, ne0, sid;
     char type[MAXLINE];
     double *coeff;
     void *d;
 
     if (arr != NULL)
        {PM_ARRAY_CONTENTS(arr, void, ne, type, d);
-
-	coeff = NULL;
-	CONVERT(SC_DOUBLE_S, (void **) &coeff, type, d, ne, FALSE);
+	sid   = SC_type_id(type, FALSE);
+	coeff = SC_convert_id(SC_DOUBLE_I, NULL, 0, sid, d, 0, ne, FALSE);
         ne--;
 
         nc  = coeff[0];

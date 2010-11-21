@@ -120,7 +120,7 @@ PG_picture_desc *PG_setup_picture_fill_poly(PG_device *dev, PG_graph *data,
 
 static void PG_fill_hand(PG_device *dev, PG_graph *g,
 			 PFPolfZC fnc_zc, PFPolfNC fnc_nc)
-   {int i, npts, clip, prec, nd, same;
+   {int i, npts, clip, prec, nd, same, sid;
     char bf[MAXLINE], *mtype, *s;
     double charspace, chupx, chupy;
     double chpthx, chpthy;
@@ -147,20 +147,21 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	 PM_array_real(domain->element_type, domain->extrema, 4, dextr);
 
 	 range = h->range;
-	 strcpy(bf, range->element_type);
-	 mtype = SC_strtok(bf, " *", s);
 	 npts  = range->n_elements;
 	 nd    = range->dimension_elem;
+	 strcpy(bf, range->element_type);
+	 mtype = SC_strtok(bf, " *", s);
+	 sid   = SC_type_id(mtype, FALSE);
 
-	 same = ((mtype != NULL) && (strcmp(mtype, SC_DOUBLE_S) == 0));
-	 if (same)
+	 same = (sid == SC_DOUBLE_I);
+	 if (same == TRUE)
 	    afd  = (double **) range->elements;
 	 else
 	    {afs = (double **) range->elements;
 	     afd = FMAKE_N(double *, nd, "PG_FILL_HAND:afd");
 	     for (i = 0; i < nd; i++)
-	         CONVERT(SC_DOUBLE_S, (void **) &afd[i],
-			 mtype, afs[i], npts, FALSE);};
+	         afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0,
+					sid, afs[i], 0, npts, FALSE);};
 
 /* find the range limits if any */
 	 rextr = PM_get_limits(range);
@@ -223,7 +224,7 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 
 	 PM_free_vectors(2, d);
 
-	 if (!same)
+	 if (same == FALSE)
 	    {for (i = 0; i < nd; i++)
 	         SFREE(afd[i]);
 	     SFREE(afd);};};

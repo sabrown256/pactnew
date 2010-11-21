@@ -475,28 +475,23 @@ int PM_flt(double x, double y)
  */
 
 int PM_conv_array(C_array *dst, C_array *src, int rel)
-   {int n, ret;
-    char dt[MAXLINE], st[MAXLINE];
-    char *dtyp, *styp;
+   {int n, sid, did, ret;
+    char t[MAXLINE];
     void *da, *sa;
 
-    ret  = -1;
-    dtyp = NULL;
-    styp = NULL;
+    n  = dst->length;
+    da = dst->data;
+    strcpy(t, dst->type);
+    did = SC_type_id(strtok(t, " *"), FALSE);
 
-    if (dst != NULL)
-       {n    = dst->length;
-	da   = dst->data;
-	strcpy(dt, dst->type);
-	dtyp = strtok(dt, " *");};
-
-    if (src != NULL)
-       {sa   = src->data;
-	strcpy(st, src->type);
-	styp = strtok(st, " *");};
-
-    if ((dtyp != NULL) && (styp != NULL))
-       ret = CONVERT(dtyp, &da, styp, sa, n, rel);
+    sa = src->data;
+    strcpy(t, src->type);
+    sid = SC_type_id(strtok(t, " *"), FALSE);
+	
+    ret = -1;
+    if ((did != -1) && (sid != -1))
+       {da  = SC_convert_id(did, da, 0, sid, sa, 0, n, rel);
+	ret = (da != NULL);};
 
     return(ret);}
 
@@ -527,16 +522,20 @@ static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
 	       {styp = operand->type;
 		sa   = operand->data;
 
+/* floating point types */
 		if (strcmp(styp, SC_DOUBLE_P_S) == 0)
 		   {_ACC_OPER(da, fnc, double, sa);}
+		else if (strcmp(styp, SC_FLOAT_P_S) == 0)
+		   {_ACC_OPER(da, fnc, float, sa);}
+
+/* fixed point types */
 		else if (strcmp(styp, SC_INT_P_S) == 0)
 		   {_ACC_OPER(da, fnc, int, sa);}
 		else if (strcmp(styp, SC_LONG_P_S) == 0)
 		   {_ACC_OPER(da, fnc, long, sa);}
-		else if (strcmp(styp, SC_FLOAT_P_S) == 0)
-		   {_ACC_OPER(da, fnc, float, sa);}
 		else if (strcmp(styp, SC_SHORT_P_S) == 0)
 		   {_ACC_OPER(da, fnc, short, sa);}
+
 		else if (strcmp(styp, SC_STRING_S) == 0)
 		   {_ACC_OPER(da, fnc, char, sa);};}
 	    								    

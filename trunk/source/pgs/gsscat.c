@@ -154,7 +154,7 @@ static void _PG_draw_scatter(PG_device *dev, int nd, double **f,
 /* PG_SCATTER_HAND - draw a scatter plot */
 
 static void PG_scatter_hand(PG_device *dev, PG_graph *g)
-   {int i, n_nodes, npts, nd, same, rexfl;
+   {int i, n_nodes, npts, nd, same, rexfl, sid;
     char bf[MAXLINE], *mtype, *s, *pn;
     double theta, phi, chi, dl[4];
     double *pm;
@@ -209,10 +209,11 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
        return;
 
     strcpy(bf, range->element_type);
-    mtype = SC_strtok(bf, " *", s);
-    same  = ((mtype != NULL) && (strcmp(mtype, SC_DOUBLE_S) == 0));
     npts  = range->n_elements;
     nd    = range->dimension_elem;
+    mtype = SC_strtok(bf, " *", s);
+    sid   = SC_type_id(mtype, FALSE);
+    same  = (sid == SC_DOUBLE_I);
 
     afd   = FMAKE_N(double *, nd, "PG_SCATTER_HAND:afd");
     afs   = (void **) range->elements;
@@ -222,20 +223,19 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
 
 /* setup the range limits */
     rexfl = (rextr == NULL);
-    if (same)
+    if (same == TRUE)
        {if (rexfl)
            rextr = (double *) range->extrema;
         for (i = 0; i < nd; i++)
             afd[i] = (double *) afs[i];}
     else
        {for (i = 0; i < nd; i++)
-            CONVERT(SC_DOUBLE_S, (void **) &afd[i],
-		    mtype, afs[i], npts, FALSE);
+            afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0,
+				   sid, afs[i], 0, npts, FALSE);
 
-        if (rexfl)
-           {rextr = NULL;
-	    CONVERT(SC_DOUBLE_S, (void **) &rextr,
-		    mtype, range->extrema, 2*nd, FALSE);};};
+        if (rexfl == TRUE)
+           rextr = SC_convert_id(SC_DOUBLE_I, NULL, 0,
+				 sid, range->extrema, 0, 2*nd, FALSE);};
 
     PG_register_range_extrema(dev, nd, rextr);
 
@@ -251,7 +251,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
 
     PM_free_vectors(2, d);
 
-    if (!same)
+    if (same == FALSE)
        {for (i = 0; i < nd; i++)
             SFREE(afd[i]);
 

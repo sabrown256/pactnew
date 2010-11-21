@@ -160,12 +160,13 @@ void SX_determine_mapping(PM_mapping **pf, object **pargl)
 
 static void _SX_unop(PFDoubleR fn, char *t, void *d,
                      int n, double *w)
-   {int i, rel;
+   {int i, rel, did;
     char type[MAXLINE];
     char *s;
 
     strcpy(type, t);
     SC_strtok(type, " *", s);
+    did = SC_type_id(type, FALSE);
 
 /* make sure that we have a working array */
     if (w == NULL)
@@ -182,7 +183,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
         w[i] = (*fn)(w[i]);
 
 /* convert the data back to the correct type in D */
-    CONVERT(type, &d, SC_DOUBLE_S, w, n, FALSE);
+    SC_convert_id(did, d, 0, SC_DOUBLE_I, w, 0, n, FALSE);
 
     if (rel)
        SFREE(w);

@@ -105,7 +105,7 @@ void PA_set_member(char *name, void *data, char *member)
         *ppc = (char *) data;}
 
     else if ((SC_BIT_I < id) && (id < SC_POINTER_I))
-       SC_convert_id(id, (void **) &addr.memaddr, id, data, 1, FALSE);
+       SC_convert_id(id, addr.memaddr, 0, id, data, 0, 1, FALSE);
 
     return;}
 

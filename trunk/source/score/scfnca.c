@@ -23,11 +23,6 @@ int
 int
  (*SC_sizeof_hook)(char *s) = SC_sizeof;
 
-int
- (*SC_convert_hook)(char *dtype, void **pd,
-                    char *stype, void *s,
-                    int n, int flag) = SC_convert;
-
 void
  (*SC_type_container_hook)(char *dtype, char *stype) = SC_type_container;
 

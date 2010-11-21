@@ -35,9 +35,6 @@
 
 #define SC_NSIG 65
 
-#undef CONVERT
-#define CONVERT (*SC_convert_hook)
-
 #undef SIZEOF
 #define SIZEOF (*SC_sizeof_hook)
 

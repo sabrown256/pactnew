@@ -84,7 +84,7 @@ hasharr
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_CPP_INIT - Initialize hash table and strings used by the cpp package */
+/* PA_CPP_INIT - initialize hash table and strings used by the cpp package */
 
 void PA_cpp_init(void)
    {
@@ -102,7 +102,7 @@ void PA_cpp_init(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_CPP_ADD_GROUP - add a group heading.
+/* PA_CPP_ADD_GROUP - add a group heading
  *    name  - name of group
  *    itype - integer type of group
  *    type  - ascii name of type, can be NULL if itype is a known type.
@@ -126,8 +126,8 @@ void PA_cpp_add_group(char *name, int itype, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PA_CPP_DATA - return a pointer to the data for name.
- *              - Allocate memory if requested.
+/* _PA_CPP_DATA - return a pointer to the data for name
+ *              - allocate memory if requested
  *
  *   alloc   - if true return a pointer to the data.  Will allocate memory
  *             for non-pointer types.
@@ -213,7 +213,7 @@ void PA_cpp_add_name(char *name, char *group, ...)
 /* install into hash table */
     SC_hasharr_install(PA_cpp_name_tab, name, node, PAN_CPP_NODE, TRUE, TRUE);
 
-/* Build cross reference from value to name */
+/* build cross reference from value to name */
     SC_hasharr_install(PA_cpp_value_tab, name0, node, PAN_CPP_NODE, TRUE, TRUE);
 
     return;}
@@ -234,7 +234,7 @@ void *PA_cpp_name_to_value(char *name)
     else
        data = NULL;
 
-  return(data);}
+    return(data);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -287,8 +287,8 @@ char *PA_cpp_value_to_name(char *group, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_CPP_DEFAULT - Install panacea cpp names into tables.
- *                - Must be called after PA_defun (defines units) and
+/* PA_CPP_DEFAULT - install panacea cpp names into tables
+ *                - must be called after PA_defun (defines units) and
  *                - PA_init_strings (defines units)
  */
 
@@ -418,8 +418,7 @@ void PA_cpp_default(void)
     PA_cpp_add_group(PA_CPP_TYPE_SC,     SC_INT_I, NULL);
     PA_cpp_add_group(PA_CPP_TYPE_S,      SC_STRING_I,  NULL);
 
-/*
- * Install types in several ways so that the following will work:
+/* install types in several ways so that the following will work:
  *   #define SC_DOUBLE_I   6
  *   char SC_DOUBLE_S = "double";
  *
@@ -431,7 +430,7 @@ void PA_cpp_default(void)
 /* install the actual types */
     PA_cpp_add_name(SC_CHAR_S,      PA_CPP_TYPE_SC, SC_CHAR_I);
     PA_cpp_add_name(SC_SHORT_S,     PA_CPP_TYPE_SC, SC_SHORT_I);
-    PA_cpp_add_name(SC_INT_S,   PA_CPP_TYPE_SC, SC_INT_I);
+    PA_cpp_add_name(SC_INT_S,       PA_CPP_TYPE_SC, SC_INT_I);
     PA_cpp_add_name(SC_LONG_S,      PA_CPP_TYPE_SC, SC_LONG_I);
     PA_cpp_add_name(SC_FLOAT_S,     PA_CPP_TYPE_SC, SC_FLOAT_I);
     PA_cpp_add_name(SC_DOUBLE_S,    PA_CPP_TYPE_SC, SC_DOUBLE_I);
@@ -440,7 +439,7 @@ void PA_cpp_default(void)
     PA_cpp_add_name(SC_PCONS_P_S,   PA_CPP_TYPE_SC, SC_PCONS_P_I);
     PA_cpp_add_name(SC_VOID_S,      PA_CPP_TYPE_SC, SC_VOID_I);
     PA_cpp_add_name(SC_SHORT_P_S,   PA_CPP_TYPE_SC, SC_SHORT_I);
-    PA_cpp_add_name(SC_INT_P_S, PA_CPP_TYPE_SC, SC_INT_P_I);
+    PA_cpp_add_name(SC_INT_P_S,     PA_CPP_TYPE_SC, SC_INT_P_I);
     PA_cpp_add_name(SC_LONG_P_S,    PA_CPP_TYPE_SC, SC_LONG_P_I);
     PA_cpp_add_name(SC_FLOAT_P_S,   PA_CPP_TYPE_SC, SC_FLOAT_P_I);
     PA_cpp_add_name(SC_DOUBLE_P_S,  PA_CPP_TYPE_SC, SC_DOUBLE_P_I);
@@ -450,7 +449,7 @@ void PA_cpp_default(void)
 
     PA_cpp_add_name("SC_CHAR_I",      PA_CPP_TYPE, SC_CHAR_I);
     PA_cpp_add_name("SC_SHORT_I",     PA_CPP_TYPE, SC_SHORT_I);
-    PA_cpp_add_name("SC_INT_I",   PA_CPP_TYPE, SC_INT_I);
+    PA_cpp_add_name("SC_INT_I",       PA_CPP_TYPE, SC_INT_I);
     PA_cpp_add_name("SC_LONG_I",      PA_CPP_TYPE, SC_LONG_I);
     PA_cpp_add_name("SC_FLOAT_I",     PA_CPP_TYPE, SC_FLOAT_I);
     PA_cpp_add_name("SC_DOUBLE_I",    PA_CPP_TYPE, SC_DOUBLE_I);
@@ -460,7 +459,7 @@ void PA_cpp_default(void)
     PA_cpp_add_name("SC_PCONS_P_I",   PA_CPP_TYPE, SC_PCONS_P_I);
     PA_cpp_add_name("SC_VOID_I",      PA_CPP_TYPE, SC_VOID_I);
     PA_cpp_add_name("SC_SHORT_P_I",   PA_CPP_TYPE, SC_SHORT_P_I);
-    PA_cpp_add_name("SC_INT_P_I", PA_CPP_TYPE, SC_INT_P_I);
+    PA_cpp_add_name("SC_INT_P_I",     PA_CPP_TYPE, SC_INT_P_I);
     PA_cpp_add_name("SC_LONG_P_I",    PA_CPP_TYPE, SC_LONG_P_I);
     PA_cpp_add_name("SC_FLOAT_P_I",   PA_CPP_TYPE, SC_FLOAT_P_I);
     PA_cpp_add_name("SC_REAL_P_I",    PA_CPP_TYPE, SC_REAL_P_I);
@@ -472,7 +471,7 @@ void PA_cpp_default(void)
 /* install the types as strings */
     PA_cpp_add_name("SC_CHAR_S",      PA_CPP_TYPE_S, SC_CHAR_S);
     PA_cpp_add_name("SC_SHORT_S",     PA_CPP_TYPE_S, SC_SHORT_S);
-    PA_cpp_add_name("SC_INT_S",   PA_CPP_TYPE_S, SC_INT_S);
+    PA_cpp_add_name("SC_INT_S",       PA_CPP_TYPE_S, SC_INT_S);
     PA_cpp_add_name("SC_LONG_S",      PA_CPP_TYPE_S, SC_LONG_S);
     PA_cpp_add_name("SC_FLOAT_S",     PA_CPP_TYPE_S, SC_FLOAT_S);
     PA_cpp_add_name("SC_DOUBLE_S",    PA_CPP_TYPE_S, SC_DOUBLE_S);
@@ -482,7 +481,7 @@ void PA_cpp_default(void)
     PA_cpp_add_name("SC_PCONS_P_S",   PA_CPP_TYPE_S, SC_PCONS_P_S);
     PA_cpp_add_name("SC_VOID_S",      PA_CPP_TYPE_S, SC_VOID_S);
     PA_cpp_add_name("SC_SHORT_P_S",   PA_CPP_TYPE_S, SC_SHORT_S);
-    PA_cpp_add_name("SC_INT_P_S", PA_CPP_TYPE_S, SC_INT_P_S);
+    PA_cpp_add_name("SC_INT_P_S",     PA_CPP_TYPE_S, SC_INT_P_S);
     PA_cpp_add_name("SC_LONG_P_S",    PA_CPP_TYPE_S, SC_LONG_P_S);
     PA_cpp_add_name("SC_FLOAT_P_S",   PA_CPP_TYPE_S, SC_FLOAT_P_S);
     PA_cpp_add_name("SC_REAL_P_S",    PA_CPP_TYPE_S, SC_REAL_P_S);

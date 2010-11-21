@@ -692,12 +692,13 @@ void PM_rel_topology(PM_mesh_topology *mt)
  */
 
 double *PM_array_real(char *type, void *p, int n, double *x)
-   {char bf[MAXLINE], *mtype;
+   {int sid;
+    char bf[MAXLINE];
 
     strcpy(bf, type);
-    mtype = strtok(bf, " *");
+    sid = SC_type_id(strtok(bf, " *"), FALSE);
 
-    CONVERT(SC_DOUBLE_S, (void **) &x, mtype, p, n, FALSE);
+    x = SC_convert_id(SC_DOUBLE_I, x, 0, sid, p, 0, n, FALSE);
 
     return(x);}
 
@@ -764,33 +765,34 @@ void PM_rel_real_set_elements(double **r)
  */
 
 void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
-   {int i, nd, nde, ne, *maxes;
+   {int i, nd, nde, ne, sid;
+    int *maxes;
     void **elem;
     double dx, ds, xmn, xmx;
     double **x, *extr, *pe, *scales;
-    char bf[MAXLINE], *mtype, *emap;
+    char bf[MAXLINE], *emap;
 
     ne = s->n_elements;
     if (ne == 0)
        return;
 
-    strcpy(bf, s->element_type);
-    mtype = strtok(bf, " *");
-
     nde = s->dimension_elem;
     nd  = s->dimension;
        
-    emap = NULL;
-    CONVERT(SC_CHAR_S, (void **) &emap, typ, em, ne, FALSE);
+    sid  = SC_type_id(typ, FALSE);
+    emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, em, 0, ne, FALSE);
 
     extr   = FMAKE_N(double, 2*nde, "PM_FIND_EXIST_EXTREMA:extr");
     scales = FMAKE_N(double, nde, "PM_FIND_EXIST_EXTREMA:scales");
+
+    strcpy(bf, s->element_type);
+    sid = SC_type_id(strtok(bf, " *"), FALSE);
 
 /* compute the extrema in each dimension */
     elem = (void **) s->elements;
     x    = PM_make_vectors(nde, ne);
     for (i = 0; i < nde; i++)
-        {CONVERT(SC_DOUBLE_S, (void **) &x[i], mtype, elem[i], ne, FALSE);};
+        x[i] = SC_convert_id(SC_DOUBLE_I, x[i], 0, sid, elem[i], 0, ne, FALSE);
 
     PM_vector_select_extrema(nde, ne, x, emap, extr);
 
@@ -819,8 +821,8 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
 	     ds  = max(ds, 1.0);
 	     scales[i] = dx/ds;};};
 
-    CONVERT(mtype, &s->extrema, SC_DOUBLE_S, extr, 2*nde, FALSE);
-    CONVERT(mtype, &s->scales, SC_DOUBLE_S, scales, nde, FALSE);
+    s->extrema = SC_convert_id(sid, NULL, 0, SC_DOUBLE_I, extr, 0, 2*nde, FALSE);
+    s->scales  = SC_convert_id(sid, NULL, 0, SC_DOUBLE_I, scales, 0, nde, FALSE);
 
     SFREE(extr);
     SFREE(scales);
@@ -1092,7 +1094,7 @@ double **PM_generate_lr_index(int nd, int *maxes,
 
 PM_set *PM_make_lr_index_domain(char *name, char *type, int nd, int nde,
 				int *maxes, double *extrema, double *ratio)
-   {int i;
+   {int i, did;
     long ne;
     double **x;
     void **elem;
@@ -1109,10 +1111,10 @@ PM_set *PM_make_lr_index_domain(char *name, char *type, int nd, int nde,
     _PM_gen_index(nd-1, ne, 0, x, maxes, extrema, ratio);
 
 /* convert the components to the desired type */
+    did  = SC_type_id(type, FALSE);
     elem = FMAKE_N(void *, nde, "PM_MAKE_LR_INDEX_DOMAIN:elem");
     for (i = 0; i < nde; i++)
-        {elem[i] = NULL;
-         CONVERT(type, &elem[i], SC_DOUBLE_S, x[i], ne, FALSE);};
+        elem[i] = SC_convert_id(did, NULL, 0, SC_DOUBLE_I, x[i], 0, ne, FALSE);
 
     PM_free_vectors(nde, x);
 
@@ -1160,14 +1162,16 @@ int PM_resolve_type(char *ltyp, char *ntyp, char *btyp)
  */
 
 void PM_promote_set(PM_set *s, char *ntyp, int flag)
-   {int id, nde;
+   {int id, nde, did, sid;
     long ne;
     char otyp[MAXLINE], ltyp[MAXLINE], nelt[MAXLINE], nest[MAXLINE];
     char *elt, *est, *ot;
-    void **elem, *e;
+    void **elem;
 
     if (!PM_resolve_type(ltyp, ntyp, s->element_type))
        return;
+
+    did = SC_type_id(ltyp, FALSE);
 
     elt = s->element_type;
     est = s->es_type;
@@ -1176,6 +1180,7 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
        ot = otyp;
     else
        ot = SC_firsttok(otyp, " *\t\f\n\r");
+    sid = SC_type_id(ot, FALSE);
 
     snprintf(nelt, MAXLINE, "%s **", ltyp);
     snprintf(nest, MAXLINE, "%s *", ltyp);
@@ -1192,19 +1197,11 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
     nde  = s->dimension_elem;
     elem = (void **) s->elements;
     for (id = 0; id < nde; id++)
-        {e        = elem[id];
-	 elem[id] = NULL;
-
-	 CONVERT(ltyp, &elem[id], ot, e, ne, flag);};
+        elem[id] = SC_convert_id(did, NULL, 0, sid, elem[id], 0, ne, flag);
 
 /* change the extrema/scale data */
-    e          = s->extrema;
-    s->extrema = NULL;
-    CONVERT(ltyp, &s->extrema, ot, e, 2*nde, TRUE);
-
-    e         = s->scales;
-    s->scales = NULL;
-    CONVERT(ltyp, &s->scales, ot, e, nde, TRUE);
+    s->extrema = SC_convert_id(did, NULL, 0, sid, s->extrema, 0, 2*nde, TRUE);
+    s->scales  = SC_convert_id(did, NULL, 0, sid, s->scales, 0, nde, TRUE);
 
     return;}
 
@@ -1216,18 +1213,17 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
  */
 
 void PM_promote_array(C_array *a, char *ntyp, int flag)
-   {long ne;
-    char otyp[MAXLINE], ltyp[MAXLINE];
+   {int sid, did;
+    long ne;
+    char ltyp[MAXLINE];
     char *elt;
-    void *data;
 
     elt = a->type;
 
-    if (!PM_resolve_type(ltyp, ntyp, elt))
-       return;
-
-    if (strcmp(ltyp, elt) != 0)
-       {strcpy(otyp, elt);
+    if ((PM_resolve_type(ltyp, ntyp, elt) == TRUE) &&
+	(strcmp(ltyp, elt) != 0))
+       {sid = SC_type_id(elt, FALSE);
+	did = SC_type_id(ltyp, FALSE);
 
 /* change the type name */
 	SFREE(elt);
@@ -1236,10 +1232,7 @@ void PM_promote_array(C_array *a, char *ntyp, int flag)
 
 /* change the element data */
 	ne      = a->length;
-	data    = a->data;
-	a->data = NULL;
-
-	CONVERT(ltyp, &a->data, otyp, data, ne, flag);};
+	a->data = SC_convert_id(did, NULL, 0, sid, a->data, 0, ne, flag);};
 
     return;}
 
@@ -1619,7 +1612,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 		id = SC_type_id(bf, FALSE);
 		if ((SC_CHAR_I <= id) && (id <= SC_QUATERNION_I))
 	           {SC_VA_GET_ARG(SC_POINTER_I, &v, 0);
-		    SC_convert_id(id, &v, id, asc->cdr, 1, FALSE);}
+		    SC_convert_id(id, &v, 0, id, asc->cdr, 0, 1, FALSE);}
 
                 else if (id == SC_STRING_I)
 	           {ps  = SC_VA_ARG(char **);
@@ -1627,7 +1620,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 
         else if ((hmap != NULL) && (strncmp(name, "CENTERING", 11) == 0))
 	   {SC_VA_GET_ARG(SC_POINTER_I, &v, 0);
-	    SC_convert_id(id, &v, id, &hmap->centering, 1, FALSE);};};
+	    SC_convert_id(id, &v, 0, id, &hmap->centering, 0, 1, FALSE);};};
 
     SC_VA_END;
 

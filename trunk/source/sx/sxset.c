@@ -167,7 +167,6 @@ void SX_init(char *code, char *vers)
     SS_call_arg_hook       = _SX_call_args;
     SC_atof_hook           = SC_atof;
     SC_strtod_hook         = SC_strtod;
-    SC_convert_hook        = SX_convert;
     SC_type_container_hook = SX_type_container;
 
     SS_interactive = TRUE;
