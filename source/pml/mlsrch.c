@@ -43,8 +43,8 @@
     last = ++indx;}
 
 #define MIN_MAX(type, p, n, pn, px, imn, imx, lim)                           \
-   {type *d, *pvn, *pvx, vn, vx, v;                                          \
-    int i, in, ix;                                                           \
+   {int i, in, ix;                                                           \
+    type *d, *pvn, *pvx, vn, vx, v;                                          \
     d   = (type *) p;                                                        \
     pvn = (type *) pn;                                                       \
     pvx = (type *) px;                                                       \
@@ -70,35 +70,35 @@
        *pvx = vx;}
 
 #define FIND_VALUE(type, nx, x, prd, val, _no, _o, _ni, _in)                 \
-   {type *_f;                                                                \
-    SC_array *temp;                                                          \
-    int initted = FALSE;                                                     \
-    int _i;                                                                  \
+   {int _i, _init;                                                           \
+    type *_f;                                                                \
+    SC_array *_ta;                                                           \
     double _u, _v;                                                           \
-    _f   = (type *) (x);                                                     \
-    _v   = (val);                                                            \
-    *_no = 0;                                                                \
+    _init = FALSE;                                                           \
+    _f    = (type *) (x);                                                    \
+    _v    = (val);                                                           \
+    *_no  = 0;                                                               \
     if ((_ni > 0) && (_in != NULL))                                          \
        {for (_i = 0; _i < _ni; _i++)                                         \
             {_u = (double) (_f[_in[_i]]);                                    \
              if ((*prd)(_u, _v))                                             \
-                {if (!initted)                                               \
-                    {temp = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);          \
-                     initted = TRUE;}                                        \
-                 SC_array_push(temp, (_in)+(_i));};};}                       \
+                {if (!_init)                                                 \
+                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);         \
+                     _init = TRUE;}                                          \
+                 SC_array_push(_ta, (_in)+(_i));};};}                        \
     else                                                                     \
        {for (_i = 0; _i < nx; _i++)                                          \
             {_u = (double) (_f[_i]);                                         \
              if ((*prd)(_u, _v))                                             \
-                {if (!initted)                                               \
-                    {temp = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);          \
-                     initted = TRUE;}                                        \
-                 SC_array_push(temp, &(_i));};};}                            \
-    if (initted)                                                             \
-       {*(_no) = SC_array_get_n(temp);                                       \
+                {if (_init == FALSE)                                         \
+                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);         \
+                     _init = TRUE;}                                          \
+                 SC_array_push(_ta, &(_i));};};}                             \
+    if (_init == TRUE)                                                       \
+       {*(_no) = SC_array_get_n(_ta);                                        \
         *(_o)  = FMAKE_N(int, *_no, "FIND_VALUE:_o");                        \
-        memcpy(*(_o), temp->array, (*(_no))*sizeof(int));                    \
-        SC_free_array(temp, NULL);};}
+        memcpy(*(_o), _ta->array, (*(_no))*sizeof(int));                     \
+        SC_free_array(_ta, NULL);};}
 
 SC_THREAD_LOCK(PM_search_lock); /* Lock around initialization */
 

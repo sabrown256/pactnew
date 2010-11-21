@@ -407,34 +407,38 @@ object *SS_define_constant(int n, ...)
     while ((name = SC_VA_ARG(char *)) != NULL)
       {type = SC_VA_ARG(int);
 
-/* fixed point types */
-       if ((type == SC_CHAR_I) ||
-	   (type == SC_SHORT_I) ||
-	   (type == SC_INT_I))
-	  {long long v;
-	   v   = SC_VA_ARG(int);
+/* fixed point types (proper) */
+       if ((type == SC_CHAR_I) || (SC_is_type_fix(type) == TRUE))
+	  {long long v, *pv;
+	   char vl[MAXLINE];
+
+	   pv = &v;
+
+	   SC_VA_GET_ARG(type, vl, 0);
+	   SC_convert_id(SC_LONG_LONG_I, (void **) &pv, type, vl, 1, FALSE);
 	   val = SS_mk_integer(v);}
 
-       else if (type == SC_LONG_I)
-	  {long long v;
-	   v   = SC_VA_ARG(long);
-	   val = SS_mk_integer(v);}
+/* floating point types (proper) */
+       else if (SC_is_type_fp(type) == TRUE)
+	  {long double v, *pv;
+	   char vl[MAXLINE];
 
-       else if (type == SC_LONG_LONG_I)
-	  {long long v;
-	   v   = SC_VA_ARG(long long);
-	   val = SS_mk_integer(v);}
+	   pv = &v;
 
-/* floating point types */
-       else if ((type == SC_FLOAT_I) ||	(type == SC_DOUBLE_I))
-	  {double v;
-	   v   = SC_VA_ARG(double);
+	   SC_VA_GET_ARG(type, vl, 0);
+	   SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, type, vl, 1, FALSE);
 	   val = SS_mk_float(v);}
 
-       else if (type == SC_LONG_DOUBLE_I)
-	  {long double v;
-	   v  = SC_VA_ARG(long double);
-	   val = SS_mk_float(v);}
+/* complex floating point types (proper) */
+       else if (SC_is_type_cx(type) == TRUE)
+	  {long double _Complex v, *pv;
+	   char vl[MAXLINE];
+
+	   pv = &v;
+
+	   SC_VA_GET_ARG(type, vl, 0);
+	   SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, type, vl, 1, FALSE);
+	   val = SS_mk_complex(v);}
 
        else if (type == SC_STRING_I)
 	  {char *v;
@@ -537,72 +541,72 @@ void *SS_var_reference(char *s)
 /* _SS_MAKE_LIST - make a SCHEME list from a C arg list */
 
 static object *_SS_make_list(int n, int *type, void **ptr)
-   {int i, j, c, ityp;
-    long l;
-    long long ll;
-    double d;
+   {int i, c, ityp;
     char *s;
+    void *vl;
     object *o, *lst;
 
     lst = SS_null;
     for (i = 0; i < n; i++)
         {ityp = type[i];
+	 vl   = ptr[i];
 
-/* fixed point types */
-	 if ((ityp == SC_SHORT_I) || (ityp == SC_INT_I))
-	    {j   = *(int *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_integer((long long) j), lst);}
- 
-	 else if (ityp == SC_LONG_I)
-	    {l   = *(long *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_integer((long long) l), lst);}
+/* fixed point types (proper) */
+	 if (SC_is_type_fix(ityp) == TRUE)
+	    {long long v, *pv;
 
-	 else if (ityp == SC_LONG_LONG_I)
-	    {ll   = *(long long *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_integer(ll), lst);}
+	     pv = &v;
 
-/* floating point types */
-	 else if (ityp == SC_FLOAT_I)
-	    {d   = *(float *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_float(d), lst);}
+	     SC_convert_id(SC_LONG_LONG_I, (void **) &pv, ityp, vl, 1, FALSE);
+	     lst = SS_mk_cons(SS_mk_integer(v), lst);}
 
-	 else if (ityp == SC_REAL_I)
-	    {d   = *(double *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_float(d), lst);}
+/* floating point types (proper) */
+	 else if (SC_is_type_fp(ityp) == TRUE)
+	    {long double v, *pv;
 
-	 else if (ityp == SC_DOUBLE_I)
-	    {d   = *(double *) ptr[i];
-	     lst = SS_mk_cons(SS_mk_float(d), lst);}
+	     pv = &v;
+
+	     SC_convert_id(SC_LONG_DOUBLE_I, (void **) &pv, ityp, vl, 1, FALSE);
+	     lst = SS_mk_cons(SS_mk_float(v), lst);}
+
+/* complex floating point types (proper) */
+	 else if (SC_is_type_cx(ityp) == TRUE)
+	    {long double _Complex v, *pv;
+
+	     pv = &v;
+
+	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, (void **) &pv, ityp, vl, 1, FALSE);
+	     lst = SS_mk_cons(SS_mk_complex(v), lst);}
  
 	 else if (ityp == SC_STRING_I)
-	    {s   = (char *) ptr[i];
+	    {s   = (char *) vl;
 	     lst = SS_mk_cons(SS_mk_string(s), lst);}
  
 	 else if (ityp == SS_OBJECT_I)
-	    {o   = (object *) ptr[i];
+	    {o   = (object *) vl;
 	     lst = SS_mk_cons(o, lst);}
  
 #ifdef LARGE
  
 	 else if (ityp == SC_CHAR_I)
-	    {c   = *(int *) ptr[i];
+	    {c   = *(int *) vl;
 	     lst = SS_mk_cons(SS_mk_char(c), lst);}
  
 	 else if (ityp == SS_HAELEM_I)
 	    {haelem *hp;
-	     hp  = (haelem *) ptr[i];
+	     hp  = (haelem *) vl;
 	     lst = SS_mk_cons(SS_mk_haelem(hp), lst);}
  
 	 else if (ityp == SS_HASHARR_I)
 	    {hasharr *ht;
-	     ht  = (hasharr *) ptr[i];
+	     ht  = (hasharr *) vl;
 	     lst = SS_mk_cons(SS_mk_hasharr(ht), lst);}
 
 #endif
  
 	 else
 	    {if (SS_call_arg_hook != NULL)
-	        {o   = (*SS_call_arg_hook)(type[i], ptr[i]);
+	        {o   = (*SS_call_arg_hook)(type[i], vl);
 		 lst = SS_mk_cons(o, lst);}
 	     else
 	        lst = SS_mk_cons(SS_null, lst);};};

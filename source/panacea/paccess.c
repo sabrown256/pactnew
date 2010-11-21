@@ -10,28 +10,6 @@
  
 #include "panacea_int.h"
 
-/* PA_SET_UP_SCALAR - initialize a database scalar
- *                  - the order in which to attempt initialization is
- *                  -   (1) iv/source variable
- *                  -   (2) application supplied function
- *                  -   (3) application supplied constant
- */
-
-#define PA_SET_UP_SCALAR(name, type, d, val, fun)                            \
-    {PA_iv_specification *sp;                                                \
-     if (d != NULL)                                                          \
-        {sp = PA_get_iv_source(name);                                        \
-         if (sp != NULL)                                                     \
-            {double *sd;                                                     \
-             sd = sp->data;                                                  \
-             PA_ERR((sp->num != 1),                                          \
-                    "SOURCE VARIABLE NOT SCALAR - PA_SET_UP_SCALAR");        \
-             *(type *) d = *(type *) sd;}                                    \
-         else if (fun != NULL)                                               \
-            (*fun)(d, 1L, name);                                             \
-         else if (val != NULL)                                               \
-            *(type *) d = *(type *) val;};}
-
 SC_thread_lock
  PA_access_lock = SC_LOCK_INIT_STATE,
  PA_track_lock  = SC_LOCK_INIT_STATE;
@@ -696,25 +674,20 @@ void PA_init_scalar(char *s)
 
     id = SC_type_id(ptype, FALSE);
 
-/* floating point types */
-    if (id == SC_DOUBLE_I)
-       {PA_SET_UP_SCALAR(pname, double, pdata, pval, pfun);}
-
-    else if (id == SC_FLOAT_I)
-       {PA_SET_UP_SCALAR(pname, float, pdata, pval, pfun);}
-
-/* fixed point types */
-    else if (id == SC_INT_I)
-       {PA_SET_UP_SCALAR(pname, int, pdata, pval, pfun);}
-
-    else if (id == SC_LONG_I)
-       {PA_SET_UP_SCALAR(pname, long, pdata, pval, pfun);}
-
-    else if (id == SC_SHORT_I)
-       {PA_SET_UP_SCALAR(pname, short, pdata, pval, pfun);}
-
-    else if (id == SC_CHAR_I)
-       {PA_SET_UP_SCALAR(pname, char, pdata, pval, pfun);};
+    if ((SC_BIT_I < id) && (id < SC_POINTER_I))
+       {PA_iv_specification *sp;
+	if (pdata != NULL)
+	   {sp = PA_get_iv_source(pname);
+	    if (sp != NULL)
+	       {void *sd;
+		sd = sp->data;
+		PA_ERR((sp->num != 1),
+		       "SOURCE VARIABLE NOT SCALAR - PA_INIT_SCALAR");
+		SC_convert_id(id, &pdata, id, sd, 1, FALSE);}
+	    else if (pfun != NULL)
+	       (*pfun)(pdata, 1L, pname);
+	    else if (pval != NULL)
+	       SC_convert_id(id, &pdata, id, pval, 1, FALSE);};};
 
     return;}
 
