@@ -674,7 +674,7 @@ void PA_init_scalar(char *s)
 
     id = SC_type_id(ptype, FALSE);
 
-    if ((SC_BIT_I < id) && (id < SC_POINTER_I))
+    if (SC_is_type_num(id) == TRUE)
        {PA_iv_specification *sp;
 	if (pdata != NULL)
 	   {sp = PA_get_iv_source(pname);

@@ -187,7 +187,7 @@ double PA_alias_value(char *s)
 
 	else
 	   {id = SC_type_id(hp->type, FALSE);
-	    if ((SC_BIT_I < id) && (id < SC_POINTER_I))
+	    if (SC_is_type_num(id) == TRUE)
 	       SC_convert_id(SC_DOUBLE_I, &d, 0, id, hp->def, 0, 1, 1, FALSE);
 
 	    else if (id == SC_STRING_I)
@@ -666,7 +666,7 @@ void PA_pshand(PA_command *cp)
 	d    = PA_alias_value(sval);
 	did  = cp->type;
 
-	if ((SC_BIT_I < did) && (did < SC_POINTER_I))
+	if (SC_is_type_num(did) == TRUE)
 	   SC_convert_id(did, cp->vr, i, SC_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
         else if ((cp->type == SC_CHAR_I) || (cp->type == SC_STRING_I))

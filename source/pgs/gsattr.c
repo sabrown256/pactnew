@@ -65,7 +65,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
  * notice the &pa versus pa for everything else
  */
 	 if (pa != NULL)
-	    {if ((SC_BIT_I < ityp) && (ityp <= SC_LONG_DOUBLE_COMPLEX_I))
+	    {if (SC_is_type_num(ityp) == TRUE)
 		SC_convert_id(ityp, pv, 0, ityp, pa, 0, 1, 1, FALSE);
 	     else if (ityp == SC_POINTER_I)
 	        SC_convert_id(ityp, pv, 0, ityp, &pa, 0, 1, 1, FALSE);}
@@ -203,7 +203,7 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
  */
 	 typn = SC_type_name(ityp - SC_BOOL_I + SC_POINTER_I);
 
-	 if ((SC_BIT_I < ityp) && (ityp <= SC_POINTER_I))
+	 if ((SC_is_type_num(ityp) == TRUE) || (ityp == SC_POINTER_I))
 	    {if (ptr == FALSE)
 	        {pv = FMAKE_N(char, bpi, "_PG_SET_ATTRS_ALIST:pv");
 	         SC_VA_GET_ARG(ityp, pv, 0);}

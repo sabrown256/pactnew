@@ -326,7 +326,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
 
     id = SC_type_id(type, FALSE);
 
-    if ((SC_BIT_I < id) && (id <= SC_POINTER_I))
+    if ((SC_is_type_num(id) == TRUE) || (id == SC_POINTER_I))
        {for (i = 0L; i < ni; i++)
 	    {if (indx[i])
 	        {if ((dims == NULL) && (ni == 1))

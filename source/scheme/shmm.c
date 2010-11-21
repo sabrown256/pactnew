@@ -122,7 +122,7 @@
             rv = FALSE;                                                      \
          if (rv == TRUE)                                                     \
             _pv[_i] = _re + _im*I;}                                          \
-     else if ((SC_BIT_I <= _vid) && (_vid <= SC_LONG_DOUBLE_I))              \
+     else if (SC_is_type_num(_vid) == TRUE)                                  \
         {if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
             _pv[_i] = (_vtyp) SS_CHARACTER_VALUE(_o);                        \
          else if (_oid == SC_BOOL_I)                                         \
