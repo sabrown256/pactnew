@@ -156,7 +156,7 @@
 		if (strcmp(_t, SC_STRING_S) != 0)                            \
 		   {_sid = SC_type_id(_t, FALSE);                            \
                     _c   = SC_convert_id(SC_CHAR_I, NULL, 0, _sid, emap, 0,  \
-                                         n, FALSE);                          \
+                                         1, n, FALSE);                       \
 		    eflag = TRUE;                                            \
 		    emap = _c;}                                              \
 		SFREE(_t);};};};}

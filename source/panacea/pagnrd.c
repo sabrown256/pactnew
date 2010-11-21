@@ -160,7 +160,7 @@ void PA_def_alias(char *name, char *type, void *pv)
     void *v;
 
     id = SC_type_id(type, FALSE);
-    v  = SC_convert_id(id, NULL, 0, id, pv, 0, 1, FALSE);
+    v  = SC_convert_id(id, NULL, 0, id, pv, 0, 1, 1, FALSE);
     SC_hasharr_install(PA_alias_tab, name, v, type, TRUE, TRUE);
 
     return;}
@@ -188,7 +188,7 @@ double PA_alias_value(char *s)
 	else
 	   {id = SC_type_id(hp->type, FALSE);
 	    if ((SC_BIT_I < id) && (id < SC_POINTER_I))
-	       SC_convert_id(SC_DOUBLE_I, &d, 0, id, hp->def, 0, 1, FALSE);
+	       SC_convert_id(SC_DOUBLE_I, &d, 0, id, hp->def, 0, 1, 1, FALSE);
 
 	    else if (id == SC_STRING_I)
 	       d = -2.0*HUGE;
@@ -658,21 +658,16 @@ void PA_pshand(PA_command *cp)
         convrsn[i] = fval;}
 
     else
-       {double d;
+       {int did;
+	double d;
 
 	i    = cp->num;
         sval = PA_get_field("VALUE", cp->name, REQU);
 	d    = PA_alias_value(sval);
+	did  = cp->type;
 
-/* floating point types */
-        if (cp->type == SC_DOUBLE_I)
-           ((double *) cp->vr)[i] = d;
-
-        else if (cp->type == SC_REAL_I)
-           ((double *) cp->vr)[i] = d;
-
-        else if (cp->type == SC_INT_I)
-           (cp->vr)[i] = (int) d;
+	if ((SC_BIT_I < did) && (did < SC_POINTER_I))
+	   SC_convert_id(did, cp->vr, i, SC_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
         else if ((cp->type == SC_CHAR_I) || (cp->type == SC_STRING_I))
            ((char **) cp->vr)[i] = SC_strsavef(sval, "char*:PA_PSHAND:s");

@@ -170,7 +170,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
     if (SC_fix_type_id(type, TRUE) != -1)
        {long long *d;
 
-	d = SC_convert_id(SC_LONG_LONG_I, NULL, 0, id, vr, 0, ni, FALSE);
+	d = SC_convert_id(SC_LONG_LONG_I, NULL, 0, id, vr, 0, 1, ni, FALSE);
 
 	ARRAY_VECTOR(obj, d, SS_mk_integer, ni, offset);
 
@@ -180,7 +180,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
     else if (SC_fp_type_id(type) != -1)
        {double *d;
 
-	d = SC_convert_id(SC_DOUBLE_I, NULL, 0, id, vr, 0, ni, FALSE);
+	d = SC_convert_id(SC_DOUBLE_I, NULL, 0, id, vr, 0, 1, ni, FALSE);
 
 	ARRAY_VECTOR(obj, d, SS_mk_float, ni, offset);
 
@@ -190,7 +190,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
     else if (SC_cx_type_id(type) != -1)
        {double _Complex *d;
 
-	d = SC_convert_id(SC_DOUBLE_COMPLEX_I, NULL, 0, id, vr, 0, ni, FALSE);
+	d = SC_convert_id(SC_DOUBLE_COMPLEX_I, NULL, 0, id, vr, 0, 1, ni, FALSE);
 
 	ARRAY_VECTOR(obj, d, SS_mk_complex, ni, offset);
 
@@ -202,7 +202,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 	if (id == SC_BOOL_I)
 	   {int *d;
 
-	    d = SC_convert_id(SC_INT_I, NULL, 0, id, vr, 0, ni, FALSE);
+	    d = SC_convert_id(SC_INT_I, NULL, 0, id, vr, 0, 1, ni, FALSE);
 
 	    ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
 

@@ -66,12 +66,12 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
  */
 	 if (pa != NULL)
 	    {if ((SC_BIT_I < ityp) && (ityp <= SC_LONG_DOUBLE_COMPLEX_I))
-		SC_convert_id(ityp, pv, 0, ityp, pa, 0, 1, FALSE);
+		SC_convert_id(ityp, pv, 0, ityp, pa, 0, 1, 1, FALSE);
 	     else if (ityp == SC_POINTER_I)
-	        SC_convert_id(ityp, pv, 0, ityp, &pa, 0, 1, FALSE);}
+	        SC_convert_id(ityp, pv, 0, ityp, &pa, 0, 1, 1, FALSE);}
 
 	 else if (dflt == TRUE)
-	    SC_convert_id(ityp, pv, 0, ityp, v, 0, 1, FALSE);};
+	    SC_convert_id(ityp, pv, 0, ityp, v, 0, 1, 1, FALSE);};
 
     return(i);}
 
