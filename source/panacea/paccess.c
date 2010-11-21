@@ -679,15 +679,13 @@ void PA_init_scalar(char *s)
 	if (pdata != NULL)
 	   {sp = PA_get_iv_source(pname);
 	    if (sp != NULL)
-	       {void *sd;
-		sd = sp->data;
-		PA_ERR((sp->num != 1),
+	       {PA_ERR((sp->num != 1),
 		       "SOURCE VARIABLE NOT SCALAR - PA_INIT_SCALAR");
-		SC_convert_id(id, &pdata, id, sd, 1, FALSE);}
+		SC_convert_id(id, pdata, 0, id, &sp->num, 0, 1, FALSE);}
 	    else if (pfun != NULL)
 	       (*pfun)(pdata, 1L, pname);
 	    else if (pval != NULL)
-	       SC_convert_id(id, &pdata, id, pval, 1, FALSE);};};
+	       SC_convert_id(id, pdata, 0, id, pval, 0, 1, FALSE);};};
 
     return;}
 

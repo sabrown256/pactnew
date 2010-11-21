@@ -96,7 +96,7 @@ PG_picture_desc *PG_setup_picture_dv_bnd(PG_device *dev, PG_graph *data,
 
 static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 			PFDvbNC fnc_nc)
-   {int npts, clip, prec, same;
+   {int npts, clip, prec, same, sid;
     int color, style;
     int *afd, *aext;
     char bf[MAXLINE], *mtype, *s;
@@ -138,9 +138,10 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 	 PM_array_real(domain->element_type, domain->extrema, 4, dextr);
 
 	 range = h->range;
+	 npts  = range->n_elements;
 	 strcpy(bf, range->element_type);
 	 mtype = SC_strtok(bf, " *", s);
-	 npts  = range->n_elements;
+	 sid   = SC_type_id(mtype, FALSE);
 
 	 same = ((mtype != NULL) && (strcmp(mtype, SC_INT_S) == 0));
 	 if (same)
@@ -148,13 +149,12 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 	 else
 	    {afs = *((double **) range->elements);
 	     afd = NULL;
-	     CONVERT(SC_INT_S, (void **) &afd, mtype, afs, npts, FALSE);};
+	     afd = SC_convert_id(SC_INT_I, NULL, 0, sid, afs, 0, npts, FALSE);};
 
 /* find the range limits if any */
 	 rextr = PM_get_limits(range);
 	 aextr = ((rextr != NULL) && !dev->autorange) ? rextr : fextr;
-	 aext  = NULL;
-	 CONVERT(SC_INT_S, (void **) &aext, mtype, aextr, 2, FALSE);
+	 aext  = SC_convert_id(SC_INT_I, NULL, 0, sid, aextr, 0, 2, FALSE);
 
 /* find the additional mapping information */
 	 centering = N_CENT;
@@ -380,13 +380,11 @@ static void PG_dv_bnd_nc_lr(PG_device *dev, int nd, int *a,
    {int *ia;
     double *ra, *ap;
 
-    ra = NULL;
-    CONVERT(SC_DOUBLE_S, (void **) &ra, SC_INT_S, a, npts, FALSE);
+    ra = SC_convert_id(SC_DOUBLE_I, NULL, 0, SC_INT_I, a, 0, npts, FALSE);
 
     ap = PM_node_zone_lr_2d(ra, cnnct, alist);
 
-    ia = NULL;
-    CONVERT(SC_INT_S, (void **) &ia, SC_DOUBLE_S, ap, npts, FALSE);
+    ia = SC_convert_id(SC_INT_I, NULL, 0, SC_DOUBLE_I, ap, 0, npts, FALSE);
 
     PG_dv_bnd_zc_lr(dev, nd, ia, x, y, npts, aext, cnnct, alist);
 
@@ -511,13 +509,11 @@ static void PG_dv_bnd_nc_ac(PG_device *dev, int nd, int *a,
    {int *ia;
     double *ra, *ap;
 
-    ra = NULL;
-    CONVERT(SC_DOUBLE_S, (void **) &ra, SC_INT_S, a, npts, FALSE);
+    ra = SC_convert_id(SC_DOUBLE_I, NULL, 0, SC_INT_I, a, 0, npts, FALSE);
 
     ap = PM_node_zone_ac_2d(ra, cnnct, alist);
 
-    ia = NULL;
-    CONVERT(SC_INT_S, (void **) &ia, SC_DOUBLE_S, ap, npts, FALSE);
+    ia = SC_convert_id(SC_INT_I, NULL, 0, SC_DOUBLE_I, ap, 0, npts, FALSE);
 
     PG_dv_bnd_zc_ac(dev, nd, ia, x, y, npts, aext, cnnct, alist);
 

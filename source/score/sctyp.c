@@ -497,35 +497,38 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  *               - if destination pointer is NULL, space is allocated
  *               - if types are the same do nothing but return -1
  *               - arguments:
- *               -     did  - type of destination data
- *               -     d    - pointer to converted data destination
- *               -     sid  - type of source data
- *               -     s    - pointer to data to be converted
- *               -     n    - number of data items
- *               -     flag - free source data flag
+ *               -     DID  - type of destination data
+ *               -     D    - pointer to converted data destination
+ *               -     OD   - offset from destination pointer
+ *               -     SID  - type of source data
+ *               -     S    - pointer to data to be converted
+ *               -     OS   - offset from source pointer
+ *               -     N    - number of data items
+ *               -     FLAG - free source data flag
+ *               - the offsets permit conversions like
+ *               -     d[n] = s[m]
+ *               - return the destination pointer
  */
 
-int SC_convert_id(int did, void **pd, int sid, void *s, int n, int flag)
+void *SC_convert_id(int did, void *d, long od, int sid, void *s, long os,
+		    long n, int flag)
    {int rv, bpi;
     long nc;
-    void *d;
 
 /* allocate the space if need be */
-    d = *pd;
     if (d == NULL)
        {bpi = SC_type_size_i(did);
-	d   = FMAKE_N(char, n*bpi, "SC_CONVERT_ID:d");
-	*pd = (void *) d;};
+	d   = FMAKE_N(char, n*bpi, "SC_CONVERT_ID:d");};
 
     if (_SC_convf[did][sid] != NULL)
-       nc = _SC_convf[did][sid](d, s, n);
+       nc = _SC_convf[did][sid](d, od, s, od, n);
     
     rv = (nc == n);
 
     if (flag && (rv == TRUE))
        SFREE(s);
 
-    return(rv);}
+    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -534,23 +537,27 @@ int SC_convert_id(int did, void **pd, int sid, void *s, int n, int flag)
  *            - if destination pointer is NULL, space is allocated
  *            - if types are the same do nothing but return -1
  *            - arguments:
- *            -     dtype - type of destination data
- *            -     d     - pointer to converted data destination
- *            -     stype - type of source data
- *            -     s     - pointer to data to be converted
- *            -     n     - number of data items
- *            -     flag  - free source data flag
+ *            -     DTYPE - type of destination data
+ *            -     D     - pointer to converted data destination
+ *            -     OD    - offset from destination pointer
+ *            -     STYPE - type of source data
+ *            -     S     - pointer to data to be converted
+ *            -     OS    - offset from source pointer
+ *            -     N     - number of data items
+ *            -     FLAG  - free source data flag
+ *            - return the destination pointer
  */
 
-int SC_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag)
-   {int rv, sid, did;
+void *SC_convert(char *dtype, void *d, long od, char *stype, void *s, long os,
+		 long n, int flag)
+   {int sid, did;
 
     sid = SC_type_id(stype, FALSE);
     did = SC_type_id(dtype, FALSE);
 
-    rv = SC_convert_id(did, pd, sid, s, n, flag);
+    d = SC_convert_id(did, d, od, sid, s, os, n, flag);
 
-    return(rv);}
+    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

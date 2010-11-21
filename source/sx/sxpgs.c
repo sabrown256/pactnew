@@ -1162,7 +1162,7 @@ int SX_next_color(PG_device *dev)
  */
 
 static object *_SXI_make_pgs_graph(object *argl)
-   {int n, color, style, clr;
+   {int n, sid, color, style, clr;
     double width;
     char type[MAXLINE];
     char *lbl, *name, *emap;
@@ -1219,11 +1219,9 @@ static object *_SXI_make_pgs_graph(object *argl)
                        "_SXI_MAKE_PGS_GRAPH:emap");
         memset(emap, 1, domain->n_elements);}
     else
-       {emap = NULL;
-
-	PM_ARRAY_CONTENTS(arr, void, n, type, d);
-
-        CONVERT(SC_CHAR_S, (void **) &emap, type, d, n, FALSE);};
+       {PM_ARRAY_CONTENTS(arr, void, n, type, d);
+	sid  = SC_type_id(type, FALSE);
+        emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, d, 0, n, FALSE);};
 
     PG_set_attrs_mapping(g->f,
 			 "EXISTENCE", SC_CHAR_I, TRUE, emap,
@@ -1845,7 +1843,7 @@ static object *_SXI_draw_image(object *argl)
 /* SX_SET_ATTR_ALIST - set an attribute on an alist */
 
 pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
-   {int id;
+   {int id, sid, did;
     void *v;
     object *obj;
     C_array *arr;
@@ -1872,8 +1870,10 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
 	strcpy(stype, arr->type);
 	SC_dereference(dtype);
 	SC_dereference(stype);
-	v = NULL;
-	SC_convert(dtype, &v, stype, arr->data, arr->length, TRUE);
+	did = SC_type_id(dtype, FALSE);
+	sid = SC_type_id(stype, FALSE);
+
+	v = SC_convert_id(sid, NULL, 0, sid, arr->data, 0, arr->length, TRUE);
 
 	PM_rel_array(arr);
 

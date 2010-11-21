@@ -17,7 +17,8 @@
 /* SEND_BINARY - do some binary data exchanges */
 
 static void send_binary(long nitems, char *type)
-   {long i;
+   {int did;
+    long i;
     PDBfile *file;
     void *space;
     double *src;
@@ -42,13 +43,13 @@ static void send_binary(long nitems, char *type)
     pp = tty;
     if (pp != NULL)
        {file = pp->vif;
+	did  = SC_type_id(type, FALSE);
 
 	src = (double *) _PD_alloc_entry(file, SC_DOUBLE_S, nitems);
 	for (i = 0L; i < nitems; i++)
 	    src[i] = (double) i;
 
-	space = _PD_alloc_entry(file, type, nitems);
-	CONVERT(type, &space, SC_DOUBLE_S, src, (int) nitems, TRUE);
+	space = SC_convert_id(did, NULL, 0, SC_DOUBLE_I, src, 0, nitems, TRUE);
 
 	if (PC_write(space, type, nitems, pp))
 	   printf("Binary data sent: %s %ld\n",

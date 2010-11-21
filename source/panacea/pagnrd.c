@@ -156,14 +156,11 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
 /* PA_DEF_ALIAS - define an alias for a constant value */
 
 void PA_def_alias(char *name, char *type, void *pv)
-   {int id, bpi;
+   {int id;
     void *v;
 
-    id  = SC_type_id(type, FALSE);
-    bpi = SC_type_size_i(id);
-
-    v = FMAKE_N(char, bpi, "PA_DEF_ALIAS:v");
-    SC_convert_id(id, &v, id, pv, 1, FALSE);
+    id = SC_type_id(type, FALSE);
+    v  = SC_convert_id(id, NULL, 0, id, pv, 0, 1, FALSE);
     SC_hasharr_install(PA_alias_tab, name, v, type, TRUE, TRUE);
 
     return;}
@@ -178,7 +175,6 @@ void PA_def_alias(char *name, char *type, void *pv)
 double PA_alias_value(char *s)
    {int id;
     double d;
-    void *pv;
     haelem *hp;
 
     d = -2.0*HUGE;
@@ -192,8 +188,7 @@ double PA_alias_value(char *s)
 	else
 	   {id = SC_type_id(hp->type, FALSE);
 	    if ((SC_BIT_I < id) && (id < SC_POINTER_I))
-	       {pv = &d;
-		SC_convert_id(SC_DOUBLE_I, &pv, id, hp->def, 1, FALSE);}
+	       SC_convert_id(SC_DOUBLE_I, &d, 0, id, hp->def, 0, 1, FALSE);
 
 	    else if (id == SC_STRING_I)
 	       d = -2.0*HUGE;

@@ -828,8 +828,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 	if (SC_is_type_fix(id) == TRUE)
 	   {int *fi;
 
-	    fi = NULL;
-	    CONVERT(SC_INT_S, (void **) &fi, ltype, f, n, FALSE);
+	    fi = SC_convert_id(SC_INT_I, NULL, 0, id, f, 0, n, FALSE);
 	    for (i = 0; i < n; i++)
 	        {snprintf(lbl, MAXLINE, "%d", fi[i]);
 		 p[0] = r[0][i];

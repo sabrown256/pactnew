@@ -206,11 +206,6 @@ extern char
 extern int
  (*SC_sizeof_hook)(char *s);                     /* string driven size hook */
 
-extern int
- (*SC_convert_hook)(char *dtype, void **pd,
-                    char *stype, void *s,
-                    int n, int flag);     /* data type conversion in memory */
-
 /*--------------------------------------------------------------------------*/
 
 /*                          FUNCTION DECLARATIONS                           */
@@ -224,8 +219,6 @@ extern char
 
 extern int
  SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx),
- SC_convert_id(int did, void **pd, int sid, void *s, int n, int flag),
- SC_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag),
  SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 		int padsz, int fpp, long nitems, long offs),
  SC_sizeof(char *s);
@@ -248,7 +241,6 @@ extern int
  SC_is_type_cx(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
- SC_convert(char *dtype, void **d, char *stype, void *s, int n, int flag),
  SC_va_get_arg(va_list a, int id, void *d, long n);
 
 extern size_t
@@ -257,6 +249,12 @@ extern size_t
 extern char
  *SC_type_name(int id),
  *SC_ntos(char *t, int nc, int id, void *s, long n, int mode);
+
+extern void
+ *SC_convert_id(int did, void *d, long od, int sid, void *s, long os,
+		long n, int flag),
+ *SC_convert(char *dtype, void *d, long od, char *stype, void *s, long os,
+	     long n, int flag);
 
 extern void
  SC_type_free_i(int id, void *x),

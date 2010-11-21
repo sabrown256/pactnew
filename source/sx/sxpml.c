@@ -709,15 +709,16 @@ static object *_SXI_make_pml_mapping(object *argl)
 
 /* if an existence map was supplied add it to the mapping's attribute list */
     if (arr != NULL)
-       {long n;
+       {int sid;
+	long n;
 	char type[MAXLINE];
 	char *emap;
 	void *data;
 
 	PM_ARRAY_CONTENTS(arr, void, n, type, data);
 
-        emap = NULL;
-        CONVERT(SC_CHAR_S, (void **) &emap, type, data, n, FALSE);
+	sid  = SC_type_id(type, FALSE);
+        emap = SC_convert_id(SC_CHAR_I, NULL, 0, sid, data, 0, n, FALSE);
 
 	PG_set_attrs_mapping(f,
 			     "EXISTENCE", SC_CHAR_I, TRUE, emap,
@@ -1071,7 +1072,9 @@ object *SX_mk_mapping(PM_mapping *f)
  */
 
 static object *_SXI_arrays_set(object *argl)
-   {int i, j, n, *maxes, *pm, nd, ne, nde, nep, tflag;
+   {int i, j, n, sid;
+    int nd, ne, nde, nep, tflag;
+    int *maxes, *pm;
     char type[MAXLINE];
     char *name;
     double **elem, *pe;
@@ -1125,6 +1128,7 @@ static object *_SXI_arrays_set(object *argl)
 
     strcpy(type, NUMERIC_ARRAY_TYPE(lst));
     PD_dereference(type);
+    sid = SC_type_id(type, FALSE);
 
     data = NUMERIC_ARRAY_DATA(lst);
     nep  = NUMERIC_ARRAY_LENGTH(lst);
@@ -1138,7 +1142,7 @@ static object *_SXI_arrays_set(object *argl)
              {SX_GET_ARRAY_FROM_LIST(data, lst,
                                      "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
 
-              CONVERT(SC_DOUBLE_S, (void **) &pe, type, data, nep, FALSE);
+              SC_convert_id(SC_DOUBLE_I, pe, 0, sid, data, 0, nep, FALSE);
 
               pe += nep;};};
 
