@@ -112,23 +112,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define DISP_ARRAY(_fmt, _indx, _a, _b, _n)                                  \
-    {long _i;                                                                \
-     for (_i = 0L; _i < _n; _i++)                                            \
-         {if (_indx[_i])                                                     \
-             {if ((dims == NULL) && (_n == 1))                               \
-                 snprintf(tmp, LINE_SIZE, "%s", nma);                        \
-              else                                                           \
-                 snprintf(tmp, LINE_SIZE, "%s(%s)", nma,                     \
-                         PD_index_to_expr(bfa, _i, dims, mjr, def_off));     \
-              memcpy(bf, tmp, min(LINE_SIZE, strlen(tmp)));                  \
-              snprintf(tmp, LINE_SIZE, _fmt, _a[_i], _b[_i]);                \
-              memcpy(&bf[nn], tmp, min(LINE_SIZE - nn, strlen(tmp) + 1));    \
-              PRINT(stdout, "%s\n", bf);                                     \
-              memset(bf, ' ', LINE_SIZE);};};}
-
-/*--------------------------------------------------------------------------*/
-
 int
  SX_disp_individ_diff = FALSE, 
  SX_promote_flag      = 0, 

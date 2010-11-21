@@ -1576,10 +1576,8 @@ PM_mesh_topology *PM_lr_ac_mesh_2d(double **px, double **py,
 
 pcons *PM_mapping_info(PM_mapping *h, ...)
    {int id;
-    int *pi;
-    double *pd;
-    float *pf;
-    char *pc, **ps, *name, bf[MAXLINE];
+    char **ps, *name, bf[MAXLINE];
+    void *v;
     pcons *map_alist, *asc;
     PM_map_info *hmap;
 
@@ -1616,31 +1614,20 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
                 if (SC_LAST_CHAR(bf) == '*')
                    SC_LAST_CHAR(bf) = '\0';
 
+		SC_trim_right(bf, " \t");
+
 		id = SC_type_id(bf, FALSE);
-
-/* fixed point types */
-                if (id == SC_INT_I)
-	           {pi  = SC_VA_ARG(int *);
-                    *pi = *(int *) asc->cdr;}
-
-/* floating point types */
-                else if (id == SC_DOUBLE_I)
-	           {pd  = SC_VA_ARG(double *);
-                    *pd = *(double *) asc->cdr;}
-                else if (id == SC_FLOAT_I)
-	           {pf  = SC_VA_ARG(float *);
-                    *pf = *(float *) asc->cdr;}
+		if ((SC_CHAR_I <= id) && (id <= SC_QUATERNION_I))
+	           {SC_VA_GET_ARG(SC_POINTER_I, &v, 0);
+		    SC_convert_id(id, &v, id, asc->cdr, 1, FALSE);}
 
                 else if (id == SC_STRING_I)
 	           {ps  = SC_VA_ARG(char **);
-                    *ps = (char *) asc->cdr;}
-                else if (id == SC_CHAR_I)
-	           {pc  = SC_VA_ARG(char *);
-                    *pc = *(char *) asc->cdr;};};}
+                    *ps = (char *) asc->cdr;};};}
 
         else if ((hmap != NULL) && (strncmp(name, "CENTERING", 11) == 0))
-	   {pi  = SC_VA_ARG(int *);
-	    *pi = hmap->centering;};};
+	   {SC_VA_GET_ARG(SC_POINTER_I, &v, 0);
+	    SC_convert_id(id, &v, id, &hmap->centering, 1, FALSE);};};
 
     SC_VA_END;
 

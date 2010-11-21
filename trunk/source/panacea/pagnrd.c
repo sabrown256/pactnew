@@ -156,52 +156,15 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
 /* PA_DEF_ALIAS - define an alias for a constant value */
 
 void PA_def_alias(char *name, char *type, void *pv)
-   {int id;
-    int *ip;
-    short *sp;
-    long *lp;
-    char *cp, **tp;
-    float *fp;
-    double *dp;
+   {int id, bpi;
+    void *v;
 
-    id = SC_type_id(type, FALSE);
+    id  = SC_type_id(type, FALSE);
+    bpi = SC_type_size_i(id);
 
-    if (id == SC_CHAR_I)
-       {cp  = FMAKE(char, "PA_DEF_ALIAS:cp");
-        *cp = *(char *) pv;
-        SC_hasharr_install(PA_alias_tab, name, cp, SC_CHAR_S, TRUE, TRUE);}
-
-/* fixed point types */
-    else if (id == SC_SHORT_I)
-       {sp  = FMAKE(short, "PA_DEF_ALIAS:sp");
-        *sp = *(short *) pv;
-        SC_hasharr_install(PA_alias_tab, name, sp, SC_SHORT_S, TRUE, TRUE);}
-
-    else if (id == SC_INT_I)
-       {ip  = FMAKE(int, "PA_DEF_ALIAS:ip");
-        *ip = *(int *) pv;
-        SC_hasharr_install(PA_alias_tab, name, ip, SC_INT_S, TRUE, TRUE);}
-
-    else if (id == SC_LONG_I)
-       {lp  = FMAKE(long, "PA_DEF_ALIAS:lp");
-        *lp = *(long *) pv;
-        SC_hasharr_install(PA_alias_tab, name, lp, SC_LONG_S, TRUE, TRUE);}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {fp  = FMAKE(float, "PA_DEF_ALIAS:fp");
-        *fp = *(float *) pv;
-        SC_hasharr_install(PA_alias_tab, name, fp, SC_FLOAT_S, TRUE, TRUE);}
-
-    else if (id == SC_DOUBLE_I)
-       {dp  = FMAKE(double, "PA_DEF_ALIAS:dp");
-        *dp = *(double *) pv;
-        SC_hasharr_install(PA_alias_tab, name, dp, SC_DOUBLE_S, TRUE, TRUE);}
-
-    else if (id == SC_STRING_I)
-       {tp  = FMAKE(char *, "PA_DEF_ALIAS:tp");
-        *tp = *(char **) pv;
-        SC_hasharr_install(PA_alias_tab, name, tp, SC_STRING_S, TRUE, TRUE);};
+    v = FMAKE_N(char, bpi, "PA_DEF_ALIAS:v");
+    SC_convert_id(id, &v, id, pv, 1, FALSE);
+    SC_hasharr_install(PA_alias_tab, name, v, type, TRUE, TRUE);
 
     return;}
 
@@ -215,6 +178,7 @@ void PA_def_alias(char *name, char *type, void *pv)
 double PA_alias_value(char *s)
    {int id;
     double d;
+    void *pv;
     haelem *hp;
 
     d = -2.0*HUGE;
@@ -227,26 +191,9 @@ double PA_alias_value(char *s)
 
 	else
 	   {id = SC_type_id(hp->type, FALSE);
-
-/* floating point types */
-	    if (id == SC_DOUBLE_I)
-	       d = *(double *) hp->def;
-
-	    else if (id == SC_FLOAT_I)
-	       d = *(float *) hp->def;
-
-/* fixed point types */
-	    else if (id == SC_LONG_I)
-	       d = *(long *) hp->def;
-
-	    else if (id == SC_INT_I)
-	       d = *(int *) hp->def;
-
-	    else if (id == SC_SHORT_I)
-	       d = *(short *) hp->def;
-
-	    else if (id == SC_CHAR_I)
-	       d = *(char *) hp->def;
+	    if ((SC_BIT_I < id) && (id < SC_POINTER_I))
+	       {pv = &d;
+		SC_convert_id(SC_DOUBLE_I, &pv, id, hp->def, 1, FALSE);}
 
 	    else if (id == SC_STRING_I)
 	       d = -2.0*HUGE;

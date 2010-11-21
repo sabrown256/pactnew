@@ -548,10 +548,7 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
     long size;
     char *type;
     defstr *ndp;
-    static char *std_types[] = { "REAL", "*", "bool", "char",
-				 "short", "int", "integer", "long", "long_long",
-				 "float", "double", "long_double",
-				 "function", "Directory" };
+    static char *pdb_types[] = { "*", "function", "Directory" };
 
     ndp = NULL;
 
@@ -559,9 +556,13 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
        return(ndp);
 
     type = dp->type;
-    n    = sizeof(std_types)/sizeof(char *);
+    id   = SC_type_id(type, FALSE);
+    if (id != -1)
+       return(ndp);
+
+    n = sizeof(pdb_types)/sizeof(char *);
     for (i = 0; i < n; i++)
-        if (strncmp(type, std_types[i], strlen(std_types[i])) == 0)
+        if (strncmp(type, pdb_types[i], strlen(pdb_types[i])) == 0)
 	   return(ndp);
 
     size = dp->size;
