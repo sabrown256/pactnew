@@ -255,7 +255,7 @@ static object *_SSI_cistrlt(object *argl)
 /* _SSI_STRLEN - string-length in Scheme */
 
 static object *_SSI_strlen(object *str)
-   {BIGINT ln;
+   {long long ln;
     object *rv;
 
     if (!SS_stringp(str))
@@ -596,7 +596,7 @@ static object *_SSI_mk_str(object *argl)
 /* _SSI_STRNUM - return the number represented in the given string */
 
 static object *_SSI_strnum(object *argl)
-   {BIGINT l;
+   {long long l;
     double r;
     char *text, *pt;
     object *rv;
@@ -703,7 +703,7 @@ static object *_SSI_strcasestr(object *argl)
  */
 
 static object *_SSI_istrchr(object *argl)
-   {BIGINT ind;
+   {long long ind;
     char *text, *delim, *s;
     object *rv;
 
@@ -733,7 +733,7 @@ static object *_SSI_istrchr(object *argl)
 /* _SSI_ISTRSTR - do what the C standard library function strstr does */
 
 static object *_SSI_istrstr(object *argl)
-   {BIGINT ind;
+   {long long ind;
     char *cs, *ct, *s;
     object *rv;
 

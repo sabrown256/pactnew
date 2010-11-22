@@ -25,7 +25,7 @@ static object *_SS_exa_var(void *vr, int type)
        {cv = *(char *) vr;
 	if (SS_interactive)
 	   PRINT(stdout, "    %c", cv);
-	ret = SS_mk_integer((BIGINT) cv);}
+	ret = SS_mk_integer(cv);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(type) == TRUE)

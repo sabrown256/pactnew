@@ -832,7 +832,7 @@ SC_array *SC_strings_array(int n, char **sa)
     a = FMAKE(SC_array, "SC_STRINGS_ARRAY:a");
 
     a->name  = "SC_STRINGS_ARRAY";
-    a->type  = "char *";
+    a->type  = SC_STRING_S;
     a->bpi   = sizeof(char *);
     a->nx    = n;
     a->n     = n;

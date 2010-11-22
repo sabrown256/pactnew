@@ -41,12 +41,13 @@
 #undef CONTAINER
 #define CONTAINER (*SC_type_container_hook)
 
-#define OTOL   (*SC_otol_hook)
-#define HTOL   (*SC_htol_hook)
-#define ATOL   (*SC_atol_hook)
-#define ATOF   (*SC_atof_hook)
-#define STRTOD (*SC_strtod_hook)
-#define STRTOL (*SC_strtol_hook)
+#define OTOL    (*SC_otol_hook)
+#define HTOL    (*SC_htol_hook)
+#define ATOL    (*SC_atol_hook)
+#define ATOF    (*SC_atof_hook)
+#define STRTOD  (*SC_strtod_hook)
+#define STRTOL  (*SC_strtol_hook)
+#define STRTOLL strtoll
 
 #ifndef SYSTEM
 # define SYSTEM SC_system
@@ -837,9 +838,6 @@ extern void
 
 /* SCFNCA.C declarations */
 
-extern char
- *SC_dereference(char *s);
-
 extern void
  SC_type_container(char *dtype, char *stype);
 
@@ -1223,6 +1221,9 @@ extern long
 extern BIGINT
  SC_stol(char *s),
  SC_stoi(char *s);
+
+extern long double _Complex
+ SC_stoc(char *s);
 
 extern unsigned int
  SC_char_index(char *s, int n);

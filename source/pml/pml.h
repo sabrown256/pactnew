@@ -146,20 +146,14 @@
 #define PM_CHECK_EMAP(alist, n, eflag, emap)                                 \
    {int _sid;                                                                \
     pcons *_i;                                                               \
-    char  *_c, *_t;                                                          \
     if (eflag == FALSE)                                                      \
        {_i = SC_assoc_entry(alist, "EXISTENCE");                             \
         if (_i != NULL)                                                      \
-           {_t = SC_strsavef(_i->cdr_type, "PM_CHECK_EMAP:_t");              \
-            if (_t != NULL)                                                  \
-	       {SC_dereference(_t);                                          \
-		if (strcmp(_t, SC_STRING_S) != 0)                            \
-		   {_sid = SC_type_id(_t, FALSE);                            \
-                    _c   = SC_convert_id(SC_CHAR_I, NULL, 0, _sid, emap, 0,  \
-                                         1, n, FALSE);                       \
-		    eflag = TRUE;                                            \
-		    emap = _c;}                                              \
-		SFREE(_t);};};};}
+           {_sid = SC_deref_id(_i->cdr_type, FALSE);                         \
+	    if (_sid == SC_STRING_I)                                         \
+	       {emap  = SC_convert_id(SC_CHAR_I, NULL, 0, _sid, emap, 0,     \
+                                      1, n, FALSE);                          \
+		eflag = TRUE;};};};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -274,7 +274,7 @@ static int _SC_host_server_rel(haelem *hp, void *a)
 	SFREE(hst);
 	SFREE(rng);}
 
-    else if (strcmp(type, "char *") == 0)
+    else if (strcmp(type, SC_STRING_S) == 0)
        {type = (char *) v;
 	SFREE(type);};
 
@@ -322,7 +322,7 @@ static void _SC_read_host_server_db(char *file)
          
         if (net != NULL)
 	   {net = SC_strsavef(net, "SC_HOST_SERVER_INIT:net");
-	    SC_hasharr_install(_SC.hsst, ".net", net, "char *", TRUE, TRUE);};
+	    SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);};
 
 	while (TRUE)
 	   {p = io_gets(s, MAX_BFSZ, fp);
@@ -335,7 +335,7 @@ static void _SC_read_host_server_db(char *file)
 	    else if ((strncmp(s, ".net ", 5) == 0) && (net == NULL))
 	       {net = SC_strtok(s+5, " \t\n", u);
 	        net = SC_strsavef(net, "SC_HOST_SERVER_INIT:net");
-		SC_hasharr_install(_SC.hsst, ".net", net, "char *", TRUE, TRUE);}
+		SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);}
 
 	    else if (strncmp(s, ".noping ", 8) == 0)
 	       {pnglst = SC_strtok(s+8, " \t\n", u);

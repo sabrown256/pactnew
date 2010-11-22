@@ -137,17 +137,17 @@ static void _SC_write_n_to_n_safe(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    if (sid <= did)
-       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
-	fprintf(fp, "        *pd = *ps;\n");}
-    else
+    if (did < sid)
        {fprintf(fp, "    smn = (%s) %s;\n", types[sid], mn[did]);
 	fprintf(fp, "    smx = (%s) %s;\n", types[sid], mx[did]);
 	fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
 	fprintf(fp, "        {sm = *ps;\n");
 	fprintf(fp, "         sm = min(sm, smx);\n");
 	fprintf(fp, "         sm = max(sm, smn);\n");
-	fprintf(fp, "         *pd = sm;};\n");};
+	fprintf(fp, "         *pd = sm;};\n");}
+    else
+       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+	fprintf(fp, "        *pd = *ps;\n");};
 
     fprintf(fp, "    return(i);}\n");
 
@@ -167,26 +167,31 @@ static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
-    fprintf(fp, "    long double sr, si, smn, smx;\n");
-    fprintf(fp, "    long double _Complex zs;\n");
     fprintf(fp, "    %s *ps = (%s *) s;\n", types[sid], types[sid]);
     fprintf(fp, "    %s *pd = (%s *) d;\n", types[did], types[did]);
 
-    fprintf(fp, "    smn = (%s) %s;\n", types[sid], mn[did]);
-    fprintf(fp, "    smx = (%s) %s;\n", types[sid], mx[did]);
+    if (did < sid)
+       {fprintf(fp, "    long double sr, si, smn, smx;\n");
+	fprintf(fp, "    long double _Complex zs;\n");
+	fprintf(fp, "    smn = %s;\n", mn[did]);
+	fprintf(fp, "    smx = %s;\n", mx[did]);};
 
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
-    fprintf(fp, "        {zs = *ps;\n");
-    fprintf(fp, "         sr = creall(zs);\n");
-    fprintf(fp, "         si = cimagl(zs);\n");
-    fprintf(fp, "         sr = min(sr, smx);\n");
-    fprintf(fp, "         sr = max(sr, smn);\n");
-    fprintf(fp, "         si = min(si, smx);\n");
-    fprintf(fp, "         si = max(si, smn);\n");
-    fprintf(fp, "         *pd = sr + si*I;};\n");
+    if (did < sid)
+       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+	fprintf(fp, "        {zs = *ps;\n");
+	fprintf(fp, "         sr = creall(zs);\n");
+	fprintf(fp, "         si = cimagl(zs);\n");
+	fprintf(fp, "         sr = min(sr, smx);\n");
+	fprintf(fp, "         sr = max(sr, smn);\n");
+	fprintf(fp, "         si = min(si, smx);\n");
+	fprintf(fp, "         si = max(si, smn);\n");
+	fprintf(fp, "         *pd = sr + si*I;};\n");}
+    else
+       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+	fprintf(fp, "        *pd = *ps;\n");};
 
     fprintf(fp, "    return(i);}\n");
 

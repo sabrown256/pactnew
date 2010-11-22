@@ -11,30 +11,10 @@
 
 #include "pgs_int.h"
 
-#define SET_VAL(t, fnc)                                                     \
-    {t **p;                                                                 \
-     p     = (t **) (hp)->def;                                              \
-     *p[0] = fnc(val);}
-
-#define RESET_VAL(t, hp)                                                    \
-    {t **p;                                                                 \
-     p     = (t **) (hp)->def;                                              \
-     *p[0] = (1.0 - f)*(*p[1]) + f*(*p[2]);}
-
-#define GET_VAL(t, hp, xo, dx)                                              \
-    {t **p;                                                                 \
-     double f, p1, p2, p3;                                                  \
-     p   = (t **) (hp)->def;                                                \
-     p1  = *p[0];                                                           \
-     p2  = *p[1];                                                           \
-     p3  = *p[2];                                                           \
-     f   = (p1 - p2)/(p3 - p2);                                             \
-     xo += f*dx;}
-
 char
- *PG_TEXT_OBJECT_S = "Text",
- *PG_VARIABLE_OBJECT_S = "Variable",
- *PG_BUTTON_OBJECT_S = "Button",
+ *PG_TEXT_OBJECT_S      = "Text",
+ *PG_VARIABLE_OBJECT_S  = "Variable",
+ *PG_BUTTON_OBJECT_S    = "Button",
  *PG_CONTAINER_OBJECT_S = "Container";
 
 SC_THREAD_LOCK(PG_iob_lock);
@@ -189,23 +169,19 @@ void PG_print_pointer_location(PG_device *dev, double cx, double cy, int coord)
 static int _PG_get_val(haelem *hp, int xo, int dx)
    {int id;
     char *type;
+    void **pv;
+    double p0, p1, p2, f;
 
     type = hp->type;
+    pv   = (void **) hp->def;
     id   = SC_type_id(type, FALSE);
 
-/* fixed point types */
-    if (id == SC_INT_I)
-       {GET_VAL(int, hp, xo, dx);}
-
-    else if (id == SC_LONG_I)
-       {GET_VAL(long, hp, xo, dx);}
-
-/* floating point types */
-    else if (id == SC_DOUBLE_I)
-       {GET_VAL(double, hp, xo, dx);}
-
-    else if (id == SC_FLOAT_I)
-       {GET_VAL(float, hp, xo, dx);};
+    if (SC_is_type_num(id) == TRUE)
+       {SC_convert_id(SC_DOUBLE_I, &p0, 0, id, pv[0], 0, 1, 1, FALSE);
+	SC_convert_id(SC_DOUBLE_I, &p1, 0, id, pv[1], 0, 1, 1, FALSE);
+        SC_convert_id(SC_DOUBLE_I, &p2, 0, id, pv[2], 0, 1, 1, FALSE);
+	f   = (p0 - p1)/(p2 - p1);
+	xo += f*dx;};
 
     return(xo);}
 
@@ -219,26 +195,20 @@ static int _PG_get_val(haelem *hp, int xo, int dx)
 static void _PG_set_val(haelem *hp, int dxn, int dxd)
    {int id;
     char *type;
-    double f;
+    void **pv;
+    double f, p0, p1, p2;
 
     type = hp->type;
+    pv   = (void **) hp->def;
     id   = SC_type_id(type, FALSE);
 
     f = ((double) dxn) / ((double) dxd);
 
-/* fixed point types */
-    if (id == SC_INT_I)
-       {RESET_VAL(int, hp);}
-
-    else if (id == SC_LONG_I)
-       {RESET_VAL(long, hp);}
-
-/* floating point types */
-    else if (id == SC_DOUBLE_I)
-       {RESET_VAL(double, hp);}
-
-    else if (id == SC_FLOAT_I)
-       {RESET_VAL(float, hp);};
+    if (SC_is_type_num(id) == TRUE)
+       {SC_convert_id(SC_DOUBLE_I, &p1, 0, id, pv[1], 0, 1, 1, FALSE);
+        SC_convert_id(SC_DOUBLE_I, &p2, 0, id, pv[2], 0, 1, 1, FALSE);
+        p0 = (1.0 - f)*p1 + f*p2;
+        SC_convert_id(id, pv[0], 0, SC_DOUBLE_I, &p0, 0, 1, 1, FALSE);};
 
     return;}
 
@@ -252,22 +222,32 @@ static void _PG_set_val(haelem *hp, int dxn, int dxd)
 static int _PG_value_match(int ityp, haelem *hp, char *val)
    {int match;
     char *ps;
+    void *pv;
+
+    pv = *(void **) hp->def;
 
     match = FALSE;
 
-/* fixed point types */
-    if (ityp == SC_INT_I)
-       match = (**(int **) hp->def == SC_stoi(val));
+/* fixed point types (proper) */
+    if (SC_is_type_fix(ityp) == TRUE)
+       {long long a, b;
+	SC_convert_id(SC_LONG_LONG_I, &a, 0, ityp, pv, 0, 1, 1, FALSE);
+	b = SC_stoi(val);
+	match = (a == b);}
 
-    else if (ityp == SC_LONG_I)
-       match = (**(long **) hp->def == SC_stoi(val));
+/* floating point types (proper) */
+    else if (SC_is_type_fp(ityp) == TRUE)
+       {long double a, b;
+	SC_convert_id(SC_LONG_DOUBLE_I, &a, 0, ityp, pv, 0, 1, 1, FALSE);
+	b = SC_stof(val);
+	match = (a == b);}
 
-/* floating point types */
-    else if (ityp == SC_DOUBLE_I)
-       match = (**(double **) hp->def == SC_stof(val));
-
-    else if (ityp == SC_FLOAT_I)
-       match = (**(float **) hp->def == SC_stof(val));
+/* complex floating point types (proper) */
+    else if (SC_is_type_cx(ityp) == TRUE)
+       {long double _Complex a, b;
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &a, 0, ityp, pv, 0, 1, 1, FALSE);
+	b = SC_stoc(val);
+	match = (a == b);}
 
     else if (ityp == SC_STRING_I)
        {ps = **(char ***) hp->def;
@@ -283,24 +263,16 @@ static int _PG_value_match(int ityp, haelem *hp, char *val)
 
 /* _PG_VALUE_STRING - return an ASCII representation of the given value */
 
-static int _PG_value_string(int ityp, haelem *hp, char *s)
+static int _PG_value_string(int ityp, haelem *hp, char *s, int nc)
    {int match;
+    void *pv;
+
+    pv = *(void **) hp->def;
 
     match = TRUE;
 
-/* fixed point types */
-    if (ityp == SC_INT_I)
-       sprintf(s, "%d", **(int **) hp->def);
-
-    else if (ityp == SC_LONG_I)
-       sprintf(s, "%ld", **(long **) hp->def);
-
-/* floating point types */
-    else if (ityp == SC_DOUBLE_I)
-       sprintf(s, "%.1f", **(double **) hp->def);
-
-    else if (ityp == SC_FLOAT_I)
-       sprintf(s, "%.1f", **(float **) hp->def);
+    if (SC_is_type_num(ityp) == TRUE)
+       SC_ntos(s, nc, ityp, pv, 0, 1);
 
     else if (ityp == SC_STRING_I)
        sprintf(s, "%s", **(char ***) hp->def);
@@ -937,7 +909,7 @@ static void _PG_draw_variable_object(PG_interface_object *iob)
 	         else if (strcmp(ch->type, PG_TEXT_OBJECT_S) == 0)
                     {b = (PG_text_box *) ch->obj;
 		     strcpy(s, b->text_buffer[0]);
-		     if (_PG_value_string(ityp, hp, s))
+		     if (_PG_value_string(ityp, hp, s, MAXLINE))
 		        strcpy(b->text_buffer[0], s);};};};};
 
     _PG_draw_text_object(iob);
@@ -1261,6 +1233,7 @@ static void PG_toggle(PG_interface_object *iob, PG_event *ev)
 static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
    {int id;
     char *name, *type, *val;
+    void *pv;
     haelem *hp;
     PG_interface_object *piob;
 
@@ -1285,24 +1258,28 @@ static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
 	       {type = hp->type;
 		id   = SC_type_id(type, FALSE);
 		val  = iob->action_name;
+		pv   = *(void **) hp->def;
 
-/* fixed point types */
-		if (id == SC_INT_I)
-		   {SET_VAL(int, SC_stoi);}
+		if (SC_is_type_fix(id) == TRUE)
+		   {long long v;
+		    v = SC_stoi(val);
+		    SC_convert_id(id, pv, 0, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
 
-		else if (id == SC_LONG_I)
-		   {SET_VAL(long, SC_stoi);}
+		else if (SC_is_type_fp(id) == TRUE)
+		   {long double v;
+		    v = SC_stof(val);
+		    SC_convert_id(id, pv, 0, SC_LONG_DOUBLE_I, &v, 0, 1, 1, FALSE);}
 
-/* floating point types */
-		else if (id == SC_DOUBLE_I)
-		   {SET_VAL(double, SC_stof);}
-
-		else if (id == SC_FLOAT_I)
-		   {SET_VAL(float, SC_stof);}
+		else if (SC_is_type_cx(id) == TRUE)
+		   {long double _Complex v;
+		    v = SC_stoc(val);
+		    SC_convert_id(id, pv, 0, SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1, 1, FALSE);}
 
 		else if (id == SC_STRING_I)
-		   {SFREE((**(char ***) hp->def));
-		    SET_VAL(char *, SC_strsave);};};
+		   {char **p;
+		    p = *(char ***) hp->def;
+		    SFREE(*p);
+		    *p = SC_strsave(val);};};
 
 	    if (piob->action != NULL)
 	       (*piob->action)(piob, ev);
@@ -1370,26 +1347,33 @@ PG_device *PG_handle_button_press(void *d, PG_event *ev)
 
 static int _PG_string_value(int ityp, haelem *hp, char *s)
    {int match;
-    char *ps;
+    void *pv;
+
+    pv = *(void **) hp->def;
 
     match = TRUE;
 
-/* fixed point types */
-    if (ityp == SC_INT_I)
-       **(int **) hp->def = SC_stoi(s);
+/* fixed point types (proper) */
+    if (SC_is_type_fix(ityp) == TRUE)
+       {long long v;
+	v = SC_stoi(s);
+	SC_convert_id(ityp, pv, 0, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
 
-    else if (ityp == SC_LONG_I)
-       **(long **) hp->def = SC_stoi(s);
+/* floating point types (proper) */
+    else if (SC_is_type_fp(ityp) == TRUE)
+       {long double v;
+	v = SC_stof(s);
+	SC_convert_id(ityp, pv, 0, SC_LONG_DOUBLE_I, &v, 0, 1, 1, FALSE);}
 
-/* floating point types */
-    else if (ityp == SC_DOUBLE_I)
-       **(double **) hp->def = SC_stof(s);
-
-    else if (ityp == SC_FLOAT_I)
-       **(float **) hp->def = SC_stof(s);
+/* complex floating point types (proper) */
+    else if (SC_is_type_cx(ityp) == TRUE)
+       {long double _Complex v;
+	v = SC_stoc(s);
+	SC_convert_id(ityp, pv, 0, SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1, 1, FALSE);}
 
     else if (ityp == SC_STRING_I)
-       {ps = **(char ***) hp->def;
+       {char *ps;
+	ps = **(char ***) hp->def;
 	SFREE(ps);
 	**(char ***) hp->def = SC_strsavef(s, "char*:_PG_STRING_VALUE:string");}
 

@@ -135,7 +135,7 @@ int PD_ln(PDBfile *file, char *oldname, char *newname)
 
     if (_PD_link_attribute)
        {if (!PD_inquire_attribute(file, "LINK", NULL))
-	   if (!PD_def_attribute(file, "LINK", "char *"))
+	   if (!PD_def_attribute(file, "LINK", SC_STRING_S))
 	      {PD_error("CANNOT CREATE LINK ATTRIBUTE - PD_LN", PD_GENERIC);
 	       return(FALSE);};
 

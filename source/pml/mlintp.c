@@ -480,10 +480,10 @@ double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
 
 double *PM_z_n_ac_2d(double *f, double *x, double *y, int mode, void *cnnct,
 		     pcons *alist)
-   {PM_mesh_topology *mt;
-    double *fp;
+   {int *nc, nz, *np, nzp, nsp, nn;
     long **cells, *zones, *sides;
-    int *nc, nz, *np, nzp, nsp, nn;
+    double *fp;
+    PM_mesh_topology *mt;
 
     mt = (PM_mesh_topology *) cnnct;
 
@@ -532,11 +532,11 @@ double *PM_zone_node_ac_2d(double *f, void *cnnct, pcons *alist)
  */
 
 double *PM_node_zone_ac_2d(double *f, void *cnnct, pcons *alist)
-   {PM_mesh_topology *mt;
-    double *fp, fv;
-    long **cells, *zones, *sides;
+   {int in, iz, is, is1, is2, os, oz;
     int *nc, nz, *np, nzp, nsp;
-    int in, iz, is, is1, is2, os, oz;
+    long **cells, *zones, *sides;
+    double *fp, fv;
+    PM_mesh_topology *mt;
 
     mt = (PM_mesh_topology *) cnnct;
 

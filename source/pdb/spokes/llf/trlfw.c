@@ -269,10 +269,10 @@ void LB_mcd(char *orgname, char *stdname, char *orgunits,
 
 /* set up the packed word attribute */
     itype = 2;
-    if (type == "integer")
+    if (strcmp(type, "integer") == 0)
        itype = 1;
 
-    if (type == "flt pt")
+    if (strcmp(type, "flt pt") == 0)
        itype = 0;
 
     val.i[0] = ((itype << 10) | (ipoint << 4) | (nmcd >> 5));

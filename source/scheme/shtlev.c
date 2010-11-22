@@ -956,7 +956,7 @@ void SS_interrupt_handler(int sig)
         case 'u' :
 	     nl = SC_stoi(arg);
 	     PRINT(stdout, "\nReturning %d frames\n\n", 2*nl);
-	     argl = SS_mk_cons(SS_mk_integer((BIGINT) nl),
+	     argl = SS_mk_cons(SS_mk_integer(nl),
 			       SS_mk_cons(SS_t, SS_null));
 	     _SSI_retlev(argl);
 	     break;
@@ -1101,7 +1101,7 @@ char *SS_object_type_name(object *o, char *atype)
        strcpy(atype, "vector");
 
     else if (itype == SS_CHARACTER_I)
-       strcpy(atype, "char");
+       strcpy(atype, SC_CHAR_S);
 
     else if (itype == SS_HAELEM_I)
        strcpy(atype, "hash element");
