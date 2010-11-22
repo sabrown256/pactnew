@@ -401,7 +401,7 @@ void _SX_get_menu(g_file *po)
         _SX_push_menu_item(po, names[i], SX_IMAGE_S);
     SFREE(names);
 
-    names = PD_ls(file, dir, "char", &n);
+    names = PD_ls(file, dir, SC_CHAR_S, &n);
     for (i = 0; i < n; i++)
         if (SC_regx_match(names[i], "curve????"))
 	   _SX_push_menu_item(po, names[i], SX_CURVE_S);

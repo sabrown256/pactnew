@@ -131,7 +131,7 @@ object *SS_unary_flt(C_procedure *cp, object *argl)
 
 object *SS_unary_fix(C_procedure *cp, object *argl)
    {int type;
-    BIGINT iv;
+    long long iv;
     double operand;
     PFDoubled fnc;
     object *rv;
@@ -156,7 +156,7 @@ object *SS_unary_fix(C_procedure *cp, object *argl)
 
 static object *SS_unary_bit(C_procedure *cp, object *argl)
    {int type;
-    BIGINT iv, operand;
+    long long iv, operand;
     PFBIGINTB fnc;
     object *rv;
 
@@ -197,7 +197,7 @@ static object *SS_binary_opr(C_procedure *cp, object *argl)
 /* SS_BINARY_FIX - the binary fixed point arithmetic operator handler */
 
 object *SS_binary_fix(C_procedure *cp, object *argl)
-   {BIGINT i1, i2, iv;
+   {long long i1, i2, iv;
     PFBIGINTBB fnc;
     object *x1, *x2, *rv;
 
@@ -544,7 +544,7 @@ static object *_SS_machine_prec(void)
 
 static object *_SS_xor_pow(object *argl)
    {int type;
-    BIGINT i1, i2, iv;
+    long long i1, i2, iv;
     double d1, d2, dv;
     object *rv;
 

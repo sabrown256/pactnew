@@ -482,7 +482,7 @@ static object *_SSI_length(object *obj)
     if (!SS_consp(obj))
        SS_error("OBJECT NOT A LIST - LENGTH", obj);
 
-    o = SS_mk_integer((BIGINT) SS_length(obj));
+    o = SS_mk_integer(SS_length(obj));
 
     return(o);}
 

@@ -885,7 +885,7 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
 
 /* save the number of points */
     snprintf(name, MAXLINE, "npts%d", icurve);
-    if (!PD_write(fp, name, "int", np))
+    if (!PD_write(fp, name, SC_INT_S, np))
        return(FALSE);
 
 /* save the x and y arrays and the extrema */
@@ -991,7 +991,7 @@ int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
 /* save the number of points */
 /*
     snprintf(name, MAXLINE, "npts%d", icurve);
-    if (!PD_write(fp, name, "int", &n))
+    if (!PD_write(fp, name, SC_INT_S, &n))
        return(FALSE);
 */
 

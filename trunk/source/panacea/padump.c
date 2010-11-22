@@ -867,7 +867,9 @@ static long _PA_copy_sub_select(int did, void *d, long od,
 				int sid, void *s, long os,
 				unsigned long *sshp, unsigned long *sstr,
 				int dm)
-   {long i, n, ss, ni, m;
+   {int bpi;
+    long i, n, ss, ni, nb, m;
+    char *ps;
 
     ss = sstr[0];
     n  = sshp[0];
@@ -877,8 +879,11 @@ static long _PA_copy_sub_select(int did, void *d, long od,
         ni = n;}
 
     else
-       {ni = 0L;
-        for (i = 0L; i < n; i++, s += ss)
+       {ni  = 0L;
+	bpi = SC_type_size_i(sid);
+	nb  = bpi*ss;
+	ps  = (char *) s;
+        for (i = 0L; i < n; i++, ps += nb)
             {m   = _PA_copy_sub_select(did, d, ni, sid, s, os,
 				       sshp+1, sstr+1, dm-1);
              ni += m;};};

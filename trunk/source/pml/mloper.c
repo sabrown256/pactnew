@@ -504,15 +504,15 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
 
 static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
 			C_array *operand, double val)
-   {int i, n, ret, sid;
-    char bf[MAXLINE];
+   {int i, n, ret, sid, did;
     char *styp, *dtyp;
     void *sa;
     double *da;
 
     dtyp = acc->type;
     da   = (double *) acc->data;
-    if (strcmp(dtyp, SC_DOUBLE_P_S) != 0)
+    did  = SC_deref_id(dtyp, TRUE);
+    if (did != SC_DOUBLE_I)
        ret = FALSE;
 
     else
@@ -522,9 +522,7 @@ static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
 	   {if ((operand->data != NULL) && (val == -HUGE))
 	       {styp = operand->type;
 		sa   = operand->data;
-
-		SC_strncpy(bf, MAXLINE, styp, -1);
-		sid = SC_type_id(strtok(bf, " *"), FALSE);
+		sid  = SC_deref_id(styp, TRUE);
 
 /* floating point types */
 		if (sid == SC_FLOAT_I)

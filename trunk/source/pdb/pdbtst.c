@@ -3471,7 +3471,7 @@ static void prep_test_10_data(void)
 
 /* set long double array */
     for (i = 0; i < N_FLOAT; i++)
-        {qa_w[i] = powl(qs_w, (long double) (i+1));
+        {qa_w[i] = POWL(qs_w, (long double) (i+1));
          qa_r[i] = 0.0L;};
 
     return;}

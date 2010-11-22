@@ -169,7 +169,7 @@ static object *_SSI_rd_chr(object *arg)
 
 static int _SS_intstrp(char *s, BIGINT *piv)
    {int rv, sgn, rdx, ext, c;
-    BIGINT iv;
+    long long iv;
     char *pt;
 
     iv = 0;
@@ -241,7 +241,7 @@ static int _SS_intstrp(char *s, BIGINT *piv)
 	   rv = FALSE;
 
 	else
-	   {iv = sgn*STRTOL(pt, &pt, rdx);
+	   {iv = sgn*STRTOLL(pt, &pt, rdx);
 	    rv = (pt == (s + strlen(s)));};};
 
     *piv = iv;
@@ -255,7 +255,7 @@ static int _SS_intstrp(char *s, BIGINT *piv)
 
 static object *SS_rd_atm(object *str)
    {int c, inbrackets;
-    BIGINT iv;
+    long long iv;
     char token[MAXLINE], *pt;
     object *o;
 

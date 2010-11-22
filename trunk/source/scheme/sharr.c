@@ -165,7 +165,7 @@ object *SS_hash_dump(object *argl)
 /* _SSI_HASH_INFO - hash-info at the Scheme level */
 
 static object *_SSI_hash_info(object *arg)
-   {BIGINT ne;
+   {long long ne;
     object *obj, *flg;
     hasharr *tab;
 
@@ -177,7 +177,7 @@ static object *_SSI_hash_info(object *arg)
     flg = (tab->docp) ? SS_t : SS_f;
     ne  = SC_hasharr_get_n(tab);
 
-    obj = SS_mk_cons(SS_mk_integer((BIGINT) tab->size), 
+    obj = SS_mk_cons(SS_mk_integer(tab->size), 
                      SS_mk_cons(SS_mk_integer(ne),
                                 SS_mk_cons(flg, SS_null)));
 

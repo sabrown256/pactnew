@@ -1682,6 +1682,51 @@ int SC_chrstrp(char *s)
 
 /*--------------------------------------------------------------------------*/
 
+/* SC_STOC - string to double _Complex
+ *         - returns 0.0 if string is NULL
+ */
+
+long double _Complex SC_stoc(char *s)
+   {int c, num;
+    long double re, im, p1;
+    long double _Complex rv;
+    char *ps;
+
+    rv = 0.0;
+    if (s != NULL)
+       {p1 = STRTOD(s, &ps);
+	re = 0.0;
+	im = 0.0;
+
+	num = 0;
+	while ((c = *ps++) != 0)
+	   {if ((c == ' ') || (c == '\t') || (c == '*'))
+	       continue;
+	    else if ((isdigit(c) != FALSE) || (c == '+') || (c == '-'))
+               {re  = p1;
+                num = 1;
+		break;}
+	    else if (c == 'I')
+	       {im  = p1;
+                num = -1;
+		break;}
+	    else
+	       break;};
+
+	if (num == 1)
+	   {num = 2;
+	    im  = STRTOD(ps, &ps);}
+	else if (num == -1)
+	   {num = -2;
+	    re  = STRTOD(ps, &ps);};
+
+	rv = re + im*I;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_STOF - string to double
  *         - returns 0.0 if string is NULL
  */

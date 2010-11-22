@@ -261,7 +261,7 @@ void _PA_proc_time(ufname)
 /* enter the ultra tag */
          snprintf(_PA.pp_title, MAXLINE, "curve%04d", n_curve++);
          ind[1] = strlen(_PA.pp_bf) + 1;
-         PD_write_alt(pduf, _PA.pp_title, "char", _PA.pp_bf, 1, ind);
+         PD_write_alt(pduf, _PA.pp_title, SC_CHAR_S, _PA.pp_bf, 1, ind);
 
 /* extract the names of the label, x array, y array and number of points */
          labl = SC_strtok(_PA.pp_bf, "|", s);
@@ -275,7 +275,7 @@ void _PA_proc_time(ufname)
          PA_ERR(!PD_read(PA_pp_file, labl, _PA.pp_ubf),
                 "BAD LABEL - PROC-TIME");
          ind[1] = strlen(_PA.pp_ubf) + 1;
-         PD_write_alt(pduf, labl, "char", _PA.pp_ubf, 1, ind);
+         PD_write_alt(pduf, labl, SC_CHAR_S, _PA.pp_ubf, 1, ind);
 
 /* if the maximum number of curves is reached
  * write out the curves and start a new file

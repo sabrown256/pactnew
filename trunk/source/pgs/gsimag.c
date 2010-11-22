@@ -58,35 +58,47 @@ static char
 static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
 			       int kmax, int lmax, int n, int nc,
 			       void *z, double zmin, double zmax)
-   {
+   {int id;
 
 /* scale the data into the buffer */
     if (type == NULL)
        memcpy(bf, z, n);
 
-    else if (strcmp(type, SC_STRING_S) == 0)
-       {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-		       unsigned char, 0, 255);}
+    else
+       {id = SC_deref_id(type, TRUE);
+	if (id == SC_CHAR_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   unsigned char, 0, 255);}
 
-    else if (strcmp(type, SC_DOUBLE_P_S) == 0)
-       {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-		       double, -DBL_MAX, DBL_MAX);}
+/* floating point types */
+	else if (id == SC_FLOAT_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   float, -FLT_MAX, FLT_MAX);}
 
-    else if (strcmp(type, SC_FLOAT_P_S) == 0)
-       {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-		       float, -FLT_MAX, FLT_MAX);}
+	else if (id == SC_DOUBLE_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   double, -DBL_MAX, DBL_MAX);}
 
-    else if (strcmp(type, SC_LONG_P_S) == 0)
-       {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-		       long, LONG_MIN, LONG_MAX);}
+	else if (id == SC_LONG_DOUBLE_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   long double, -LDBL_MAX, LDBL_MAX);}
 
-    else if (strcmp(type, SC_INT_P_S) == 0)
-       {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-		       int, INT_MIN, INT_MAX);}
+/* fixed point types */
+	else if (id == SC_SHORT_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   short, SHRT_MIN, SHRT_MAX);}
 
-    else if (strcmp(type, SC_SHORT_P_S) == 0)
-       {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-		       short, SHRT_MIN, SHRT_MAX);};
+	else if (id == SC_INT_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   int, INT_MIN, INT_MAX);}
+
+	else if (id == SC_LONG_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   long, LONG_MIN, LONG_MAX);}
+
+	else if (id == SC_LONG_LONG_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   long long, LONG_MIN, LONG_MAX);};};
 
     return;}
 

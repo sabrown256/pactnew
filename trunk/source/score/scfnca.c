@@ -151,38 +151,6 @@ void SC_type_container(char *dtype, char *stype)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_DEREFERENCE - THREADSAFE
- *                - starting at the end of the string work backwards to
- *                - the first non-blank character and if it is a '*'
- *                - insert '\0' in its place
- *                - return a pointer to the beginning of the string
- */
-
-char *SC_dereference(char *s)
-   {char *t;
-
-/* starting at the end of the string, working backwards */
-    t = s + (strlen(s) - 1);
-
-/* skip over any whitespace */
-    while ((t >= s) && (*t == ' '))
-       {t--;};
-
-/* remove any terminating '*' char */
-    if ((t >= s) && (*t == '*'))
-       {*t = '\0';
-        t--;};
-
-/* remove any trailing whitespace -- e.g. "char *" -> "char " -> "char" */
-    while ((t >= s) && (strchr(" \t", *t) != NULL))
-       {*t = '\0';
-        t--;};
-
-    return(s);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_FIX_LMT - return the signed minimum and maximum values as well as
  *            - the unsigned maximum value for an integer type
  *            - of NB bytes

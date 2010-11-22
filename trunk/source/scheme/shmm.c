@@ -11,217 +11,6 @@
 #include "scheme_int.h"
 #include "scope_mem.h"
 
-/*--------------------------------------------------------------------------*/
-
-/* convert a numerical primitive type to an object */
-
-#define _SS_NUMTYPE_TO_OBJ(_oid, _o, _vtyp, _vr, _n)                         \
-    {_vtyp *_p;                                                              \
-     _p = (_vtyp *) _vr;                                                     \
-      if (_oid == SC_CHAR_I)                                                 \
-        _o = SS_mk_integer(_p[_n]);                                          \
-     else if (_oid == SC_BOOL_I)                                             \
-        _o = SS_mk_boolean("#boolean", _p[_n]);                              \
-     else if (SC_is_type_fix(_oid) == TRUE)                                  \
-        _o = SS_mk_integer(_p[_n]);                                          \
-     else if (SC_is_type_fp(_oid) == TRUE)                                   \
-        _o = SS_mk_float(_p[_n]);                                            \
-     else if (SC_is_type_cx(_oid) == TRUE)                                   \
-        _o = SS_mk_complex(_p[_n]);                                          \
-     else if (_oid == SC_QUATERNION_I)                                       \
-        _o = SS_mk_quaternion(((quaternion *) _p)[_n]);}
-
-#define _SS_QUATERNION_TO_OBJ(_oid, _o, _vr, _n)                             \
-    {quaternion *_p;                                                         \
-     _p = (quaternion *) _vr;                                                \
-      if (_oid == SC_CHAR_I)                                                 \
-        _o = SS_mk_integer(_p[_n].s);                                        \
-     else if (_oid == SC_BOOL_I)                                             \
-        _o = SS_mk_boolean("#boolean", _p[_n].s);                            \
-     else if (SC_is_type_fix(_oid) == TRUE)                                  \
-        _o = SS_mk_integer(_p[_n].s);                                        \
-     else if (SC_is_type_fp(_oid) == TRUE)                                   \
-        _o = SS_mk_float(_p[_n].s);                                          \
-     else if (SC_is_type_cx(_oid) == TRUE)                                   \
-        _o = SS_mk_complex(_p[_n].s);                                        \
-     else if (_oid == SC_QUATERNION_I)                                       \
-        _o = SS_mk_quaternion(_p[_n]);}
-
-/* convert a numerical primitive array to a list */
-
-#define _SS_NUMTYPE_TO_LIST(_oid, _lst, _vtyp, _vr, _n)                      \
-    {long _i;                                                                \
-     object *_o;                                                             \
-     _lst = SS_null;                                                         \
-     for (_i = 0L; _i < _n; _i++)                                            \
-         {_SS_NUMTYPE_TO_OBJ(_oid, _o, _vtyp, _vr, _i);                      \
-          _lst = SS_mk_cons(_o, _lst);};}
-
-#define _SS_QUATERNION_TO_LIST(_oid, _lst, _vr, _n)                          \
-    {long _i;                                                                \
-     object *_o;                                                             \
-     _lst = SS_null;                                                         \
-     for (_i = 0L; _i < _n; _i++)                                            \
-         {_SS_QUATERNION_TO_OBJ(_oid, _o, _vr, _i);                          \
-          _lst = SS_mk_cons(_o, _lst);};}
-
-/*--------------------------------------------------------------------------*/
-
-/* convert an object to a numerical primitive type */
-
-#define _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, _i, _oid, _o)                   \
-    {_vtyp *_pv;                                                             \
-     _pv = (_vtyp *) _vr;                                                    \
-     if (_vid == SC_QUATERNION_I)                                            \
-        {quaternion _q;                                                      \
-         _q.i = 0.0;                                                         \
-         _q.j = 0.0;                                                         \
-         _q.k = 0.0;                                                         \
-         if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
-            _q.s = SS_CHARACTER_VALUE(_o);                                   \
-         else if (_oid == SC_BOOL_I)                                         \
-            _q.s = SS_BOOLEAN_VALUE(_o);                                     \
-         else if (_oid == SC_INT_I)                                          \
-            _q.s = SS_INTEGER_VALUE(_o);                                     \
-         else if (_oid == SC_FLOAT_I)                                        \
-            _q.s = SS_FLOAT_VALUE(_o);                                       \
-         else if (_oid == SC_DOUBLE_COMPLEX_I)                               \
-            {double _Complex _z;                                             \
-             _z   = SS_COMPLEX_VALUE(_o);                                    \
-             _q.s = creal(_z);                                               \
-             _q.i = cimag(_z);}                                              \
-         else if (_oid == SC_QUATERNION_I)                                   \
-            _q = SS_QUATERNION_VALUE(_o);                                    \
-         else                                                                \
-            rv = FALSE;                                                      \
-         if (rv == TRUE)                                                     \
-            _pv[_i] = *(_vtyp *) &_q;}                                       \
-     else if (SC_is_type_cx(_vid) == TRUE)                                   \
-        {double _re, _im;                                                    \
-         double _Complex _z;                                                 \
-         _re = 0.0;                                                          \
-         _im = 0.0;                                                          \
-         if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
-            _re = SS_CHARACTER_VALUE(_o);                                    \
-         else if (_oid == SC_BOOL_I)                                         \
-            _re = SS_BOOLEAN_VALUE(_o);                                      \
-         else if (_oid == SC_INT_I)                                          \
-            _re = SS_INTEGER_VALUE(_o);                                      \
-         else if (_oid == SC_FLOAT_I)                                        \
-            _re = SS_FLOAT_VALUE(_o);                                        \
-         else if (_oid == SC_DOUBLE_COMPLEX_I)                               \
-            {_z = SS_COMPLEX_VALUE(_o);                                      \
-             _re = creal(_z);                                                \
-             _im = cimag(_z);}                                               \
-         else if (_oid == SC_QUATERNION_I)                                   \
-            {quaternion _q;                                                  \
-             _q = SS_QUATERNION_VALUE(_o);                                   \
-             _re = _q.s;                                                     \
-             _im = _q.i;}                                                    \
-         else                                                                \
-            rv = FALSE;                                                      \
-         if (rv == TRUE)                                                     \
-            _pv[_i] = _re + _im*I;}                                          \
-     else if (SC_is_type_num(_vid) == TRUE)                                  \
-        {if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                \
-            _pv[_i] = (_vtyp) SS_CHARACTER_VALUE(_o);                        \
-         else if (_oid == SC_BOOL_I)                                         \
-            _pv[_i] = (_vtyp) SS_BOOLEAN_VALUE(_o);                          \
-         else if (_oid == SC_INT_I)                                          \
-            _pv[_i] = (_vtyp) SS_INTEGER_VALUE(_o);                          \
-         else if (_oid == SC_FLOAT_I)                                        \
-            _pv[_i] = (_vtyp) SS_FLOAT_VALUE(_o);                            \
-         else if (_oid == SC_DOUBLE_COMPLEX_I)                               \
-            {double _Complex _z;                                             \
-             _z = SS_COMPLEX_VALUE(_o);                                      \
-             _pv[_i] = (_vtyp) creal(_z);}                                   \
-         else if (_oid == SC_QUATERNION_I)                                   \
-            {quaternion _q;                                                  \
-             _q = SS_QUATERNION_VALUE(_o);                                   \
-            _pv[_i] = (_vtyp) _q.s;}                                         \
-         else                                                                \
-            rv = FALSE;};}
-
-
-#define _SS_OBJ_TO_QUATERNION(_vr, _i, _oid, _o)                             \
-    {quaternion _q, *_pv;                                                    \
-     _q.i = 0.0;                                                             \
-     _q.j = 0.0;                                                             \
-     _q.k = 0.0;                                                             \
-     _pv = (quaternion *) _vr;                                               \
-     if ((_oid == SC_CHAR_I) || (_oid == SS_CHARACTER_I))                    \
-        _q.s = SS_CHARACTER_VALUE(_o);                                       \
-     else if (_oid == SC_BOOL_I)                                             \
-        _q.s = SS_BOOLEAN_VALUE(_o);                                         \
-     else if (_oid == SC_INT_I)                                              \
-        _q.s = SS_INTEGER_VALUE(_o);                                         \
-     else if (_oid == SC_FLOAT_I)                                            \
-        _q.s = SS_FLOAT_VALUE(_o);                                           \
-     else if (_oid == SC_DOUBLE_COMPLEX_I)                                   \
-        {double _Complex _z;                                                 \
-         _z   = SS_COMPLEX_VALUE(_o);                                        \
-         _q.s = creal(_z);                                                   \
-         _q.i = cimag(_z);}                                                  \
-     else if (_oid == SC_QUATERNION_I)                                       \
-        _q = SS_QUATERNION_VALUE(_o);                                        \
-     else                                                                    \
-        rv = FALSE;                                                          \
-     if (rv == TRUE)                                                         \
-        _pv[_i] = _q;}
-
-
-/* convert an object, list or array to a numerical primitive array */
-
-#define _SS_LIST_TO_NUMTYPE(_vtyp, _vid, _vr, _n, _o)                        \
-   {int _oid, _jtyp;                                                         \
-    long _i;                                                                 \
-    _oid = SC_arrtype(_o, -1);                                               \
-    if (_oid == SS_CONS_I)                                                   \
-       {object *_to;                                                         \
-        if (SS_consp(SS_car(_o)))                                            \
-           _o = SS_car(_o);                                                  \
-        for (_i = 0; _i < _n; _i++)                                          \
-            {_to   = SS_car(_o);                                             \
-             _jtyp = SC_arrtype(_to, -1);                                    \
-             _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, _i, _jtyp, _to);           \
-             _to = SS_cdr(_o);                                               \
-             if (_to != SS_null)                                             \
-                _o = _to;};}                                                 \
-    else if (_oid == SS_VECTOR_I)                                            \
-       {object **_ao;                                                        \
-        _ao = SS_VECTOR_ARRAY(_o);                                           \
-        for (_i = 0; _i < _n; _i++)                                          \
-            {_jtyp = SC_arrtype(_ao[_i], -1);                                \
-             _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, _i, _jtyp, _ao[_i]);};}    \
-    else                                                                     \
-       _SS_OBJ_TO_NUMTYPE(_vtyp, _vid, _vr, 0, _oid, _o);}
-
-#define _SS_LIST_TO_QUATERNION(_vr, _n, _o)                                  \
-   {int _oid, _jtyp;                                                         \
-    long _i;                                                                 \
-    _oid = SC_arrtype(_o, -1);                                               \
-    if (_oid == SS_CONS_I)                                                   \
-       {object *_to;                                                         \
-        if (SS_consp(SS_car(_o)))                                            \
-           _o = SS_car(_o);                                                  \
-        for (_i = 0; _i < _n; _i++)                                          \
-            {_to   = SS_car(_o);                                             \
-             _jtyp = SC_arrtype(_to, -1);                                    \
-             _SS_OBJ_TO_QUATERNION(_vr, _i, _jtyp, _to);                     \
-             _to = SS_cdr(_o);                                               \
-             if (_to != SS_null)                                             \
-                _o = _to;};}                                                 \
-    else if (_oid == SS_VECTOR_I)                                            \
-       {object **_ao;                                                        \
-        _ao = SS_VECTOR_ARRAY(_o);                                           \
-        for (_i = 0; _i < _n; _i++)                                          \
-            {_jtyp = SC_arrtype(_ao[_i], -1);                                \
-             _SS_OBJ_TO_QUATERNION(_vr, _i, _jtyp, _ao[_i]);};}              \
-    else                                                                     \
-       _SS_OBJ_TO_QUATERNION(_vr, 0, _oid, _o);}
-
-/*--------------------------------------------------------------------------*/
-
 typedef struct s_obj_map obj_map;
 
 struct s_obj_map
@@ -1302,6 +1091,46 @@ int _SS_get_object_length(object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_NUMTYPE_TO_OBJECT_ID - convert the Nth element of numeric array P
+ *                          - and type TYPE to an object
+ */
+
+object *_SS_numtype_to_object_id(int id, void *p, long n)
+   {object *o;
+
+/* fixed point types (proper) */
+    if ((SC_is_type_fix(id) == TRUE) || (id == SC_CHAR_I))
+       {long long v;
+	SC_convert_id(SC_LONG_LONG_I, &v, 0, id, p, n, 1, 1, FALSE);
+	o = SS_mk_integer(v);}
+
+/* floating point types (proper) */
+    else if (SC_is_type_fp(id) == TRUE)
+       {long double v;
+	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, id, p, n, 1, 1, FALSE);
+	o = SS_mk_float(v);}
+
+/* complex floating point types (proper) */
+    else if (SC_is_type_cx(id) == TRUE)
+       {long double _Complex v;
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, id, p, n, 1, 1, FALSE);
+	o = SS_mk_complex(v);}
+
+    else if (id == SC_BOOL_I)
+       {bool *v;
+	v = (bool *) p;
+	o = SS_mk_boolean("#boolean", v[n]);}
+
+    else if (id == SC_QUATERNION_I)
+       {quaternion *v;
+	v = (quaternion *) p;
+	o = SS_mk_quaternion(v[n]);};
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_NUMTYPE_TO_OBJECT - convert the Nth element of numeric array P
  *                       - and type TYPE to an object
  */
@@ -1311,98 +1140,27 @@ object *_SS_numtype_to_object(char *type, void *p, long n)
     object *o;
 
     id = SC_type_id(type, FALSE);
-
-    if (id == SC_CHAR_I)
-       {_SS_NUMTYPE_TO_OBJ(SC_LONG_LONG_I, o, char, p, n);}
-    else if (id == SC_BOOL_I)
-       {_SS_NUMTYPE_TO_OBJ(SC_BOOL_I, o, bool, p, n);}
-
-/* fixed point types */
-    else if (id == SC_SHORT_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, short, p, n);}
-    else if (id == SC_INT_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, int, p, n);}
-    else if (id == SC_LONG_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, long, p, n);}
-    else if (id == SC_LONG_LONG_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, long long, p, n);}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, float, p, n);}
-    else if (id == SC_DOUBLE_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, double, p, n);}
-    else if (id == SC_LONG_DOUBLE_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, long double, p, n);}
-
-/* complex floating point types */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, float _Complex, p, n);}
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, double _Complex, p, n);}
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {_SS_NUMTYPE_TO_OBJ(id, o, long double _Complex, p, n);}
-
-    else if (id == SC_QUATERNION_I)
-       {_SS_QUATERNION_TO_OBJ(id, o, p, n);};
+    o  = _SS_numtype_to_object_id(id, p, n);
 
     return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_NUMTYPE_TO_LIST - convert an array of N numerical elements P
- *                     - which has type TYPE into a list
+/* _SS_NUMTYPE_TO_LIST_ID - convert an array of N numerical elements P
+ *                        - which has type TYPE into a list
  */
 
-object *_SS_numtype_to_list(char *type, void *p, long n)
-   {int id;
-    object *lst;
+object *_SS_numtype_to_list_id(int id, void *p, long n)
+   {long i;
+    object *o, *lst;
 
     lst = SS_null;
-    id  = SC_type_id(type, FALSE);
 
-    if (id == SC_CHAR_I)
-       {_SS_NUMTYPE_TO_LIST(SC_LONG_LONG_I, lst, char, p, n);}
-
-    else if (id == SC_BOOL_I)
-       {_SS_NUMTYPE_TO_LIST(SC_BOOL_I, lst, bool, p, n);}
-
-/* fixed point types */
-    else if (id == SC_SHORT_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, short, p, n);}
-
-    else if (id == SC_INT_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, int, p, n);}
-
-    else if (id == SC_LONG_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, long, p, n);}
-
-    else if (id == SC_LONG_LONG_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, long long, p, n);}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, float, p, n);}
-
-    else if (id == SC_DOUBLE_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, double, p, n);}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, long double, p, n);}
-
-/* complex floating point types */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, float _Complex, p, n);}
-
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, double _Complex, p, n);}
-
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {_SS_NUMTYPE_TO_LIST(id, lst, long double _Complex, p, n);}
-
-    else if (id == SC_QUATERNION_I)
-       {_SS_QUATERNION_TO_LIST(id, lst, p, n);}
+    if (SC_is_type_num(id) == TRUE)
+       {for (i = 0L; i < n; i++)
+	    {o   = _SS_numtype_to_object_id(id, p, i);
+	     lst = SS_mk_cons(o, lst);};}
 
     else
        SS_error("DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
@@ -1415,50 +1173,100 @@ object *_SS_numtype_to_list(char *type, void *p, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_NUMTYPE_TO_LIST - convert an array of N numerical elements P
+ *                     - which has type TYPE into a list
+ */
+
+object *_SS_numtype_to_list(char *type, void *p, long n)
+   {int id;
+    object *lst;
+
+    id  = SC_type_id(type, FALSE);
+    lst = _SS_numtype_to_list_id(id, p, n);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_OBJECT_TO_NUMTYPE_ID - set the Nth element of array P which
  *                          - has type ID to the value of object VAL
  *                          - return TRUE iff successful
  */
 
 int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
-   {int oid, rv;
+   {int oid, num, rv;
+    long double d;
 
     rv  = TRUE;
     oid = SC_arrtype(val, -1);
 
-    if (vid == SC_CHAR_I)
-       {_SS_OBJ_TO_NUMTYPE(char, vid, p, n, oid, val);}
-    else if (vid == SC_BOOL_I)
-       {_SS_OBJ_TO_NUMTYPE(bool, vid, p, n, oid, val);}
+    num = ((SC_BIT_I < oid) && (oid < SC_FLOAT_COMPLEX_I));
 
-/* fixed point types */
-    else if (vid == SC_SHORT_I)
-       {_SS_OBJ_TO_NUMTYPE(short, vid, p, n, oid, val);}
-    else if (vid == SC_INT_I)
-       {_SS_OBJ_TO_NUMTYPE(int, vid, p, n, oid, val);}
-    else if (vid == SC_LONG_I)
-       {_SS_OBJ_TO_NUMTYPE(long, vid, p, n, oid, val);}
-    else if (vid == SC_LONG_LONG_I)
-       {_SS_OBJ_TO_NUMTYPE(long long, vid, p, n, oid, val);}
+    if ((oid == SC_CHAR_I) || (oid == SS_CHARACTER_I))
+       d = SS_CHARACTER_VALUE(val);
+    else if (oid == SC_BOOL_I)
+       d = SS_BOOLEAN_VALUE(val);
+    else if (oid == SC_INT_I)
+       d = SS_INTEGER_VALUE(val);
+    else if (oid == SC_FLOAT_I)
+       d = SS_FLOAT_VALUE(val);
+    else
+       d = 0.0;
 
-/* floating point types */
-    else if (vid == SC_FLOAT_I)
-       {_SS_OBJ_TO_NUMTYPE(float, vid, p, n, oid, val);}
-    else if (vid == SC_DOUBLE_I)
-       {_SS_OBJ_TO_NUMTYPE(double, vid, p, n, oid, val);}
-    else if (vid == SC_LONG_DOUBLE_I)
-       {_SS_OBJ_TO_NUMTYPE(long double, vid, p, n, oid, val);}
+    if (vid == SC_QUATERNION_I)
+       {quaternion q, *pv;
+	pv  = (quaternion *) p;
+        q.i = 0.0;
+        q.j = 0.0;
+        q.k = 0.0;
+	if (num == TRUE)
+	   q.s = d;
+        else if (oid == SC_DOUBLE_COMPLEX_I)
+           {double _Complex z;
+            z   = SS_COMPLEX_VALUE(val);
+            q.s = creal(z);
+            q.i = cimag(z);}
+        else if (oid == SC_QUATERNION_I)
+           q = SS_QUATERNION_VALUE(val);
+        else
+           rv = FALSE;
+        if (rv == TRUE)
+           pv[n] = q;}
 
-/* complex floating point types */
-    else if (vid == SC_FLOAT_COMPLEX_I)
-       {_SS_OBJ_TO_NUMTYPE(float _Complex, vid, p, n, oid, val);}
-    else if (vid == SC_DOUBLE_COMPLEX_I)
-       {_SS_OBJ_TO_NUMTYPE(double _Complex, vid, p, n, oid, val);}
-    else if (vid == SC_LONG_DOUBLE_COMPLEX_I)
-       {_SS_OBJ_TO_NUMTYPE(long double _Complex, vid, p, n, oid, val);}
+    else if (SC_is_type_cx(vid) == TRUE)
+       {double _Complex z;
+	if (num == TRUE)
+	   z = d;
+        else if (oid == SC_DOUBLE_COMPLEX_I)
+           z = SS_COMPLEX_VALUE(val);
+        else if (oid == SC_QUATERNION_I)
+           {quaternion q;
+            q = SS_QUATERNION_VALUE(val);
+            z = q.s + q.i*I;}
+        else
+           rv = FALSE;
+        if (rv == TRUE)
+	   SC_convert_id(vid, p, n, SC_DOUBLE_COMPLEX_I, &z, 0, 1, 1, FALSE);}
 
-    else if (vid == SC_QUATERNION_I)
-       {_SS_OBJ_TO_QUATERNION(p, n, oid, val);}
+    else if (SC_is_type_num(vid) == TRUE)
+       {if ((num == TRUE) || (oid == SS_CHARACTER_I))
+	   SC_convert_id(vid, p, n, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);
+
+        else if (oid == SC_DOUBLE_COMPLEX_I)
+           {double _Complex z;
+            z = SS_COMPLEX_VALUE(val);
+	    d = creal(z);
+	    SC_convert_id(vid, p, n, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
+
+        else if (oid == SC_QUATERNION_I)
+           {quaternion q;
+            q = SS_QUATERNION_VALUE(val);
+	    d = q.s;
+	    SC_convert_id(vid, p, n, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
+
+        else
+           rv = FALSE;}
 
     else
        rv = FALSE;
@@ -1518,44 +1326,29 @@ int _SS_list_to_numtype_id(int vid, void *p, long n, object *o)
 			   no, n);
         SS_error(msg, o);};
 
-/* fixed point types */
-    if (vid == SC_SHORT_I)
-       {_SS_LIST_TO_NUMTYPE(short, vid, p, n, o);}
+    if (SC_is_type_num(vid) == TRUE)
+       {int oid;
+	long i;
+	object *to, **ao;
 
-    else if (vid == SC_INT_I)
-       {_SS_LIST_TO_NUMTYPE(int, vid, p, n, o);}
+	oid = SC_arrtype(o, -1);
+	if (oid == SS_CONS_I)
+	   {if (SS_consp(SS_car(o)))
+	       o = SS_car(o);
+	    for (i = 0; i < n; i++)
+	        {to = SS_car(o);
+		 _SS_object_to_numtype_id(vid, p, i, to);
+		 to = SS_cdr(o);
+		 if (to != SS_null)
+		    o = to;};}
 
-    else if (vid == SC_LONG_I)
-       {_SS_LIST_TO_NUMTYPE(long, vid, p, n, o);}
+	else if (oid == SS_VECTOR_I)
+	   {ao = SS_VECTOR_ARRAY(o);
+	    for (i = 0; i < n; i++)
+	        _SS_object_to_numtype_id(vid, p, i, ao[i]);}
 
-    else if (vid == SC_LONG_LONG_I)
-       {_SS_LIST_TO_NUMTYPE(long long, vid, p, n, o);}
-
-/* floating point types */
-    else if (vid == SC_FLOAT_I)
-       {_SS_LIST_TO_NUMTYPE(float, vid, p, n, o);}
- 
-    else if (vid == SC_DOUBLE_I)
-       {_SS_LIST_TO_NUMTYPE(double, vid, p, n, o);}
-
-    else if (vid == SC_LONG_DOUBLE_I)
-       {_SS_LIST_TO_NUMTYPE(long double, vid, p, n, o);}
-
-/* complex floating point types */
-    else if (vid == SC_FLOAT_COMPLEX_I)
-       {_SS_LIST_TO_NUMTYPE(float _Complex, vid, p, n, o);}
-
-    else if (vid == SC_DOUBLE_COMPLEX_I)
-       {_SS_LIST_TO_NUMTYPE(double _Complex, vid, p, n, o);}
-
-    else if (vid == SC_LONG_DOUBLE_COMPLEX_I)
-       {_SS_LIST_TO_NUMTYPE(long double _Complex, vid, p, n, o);}
-
-    else if (vid == SC_QUATERNION_I)
-       {_SS_LIST_TO_QUATERNION(p, n, o);}
-
-    else if (vid == SC_BOOL_I)
-       {_SS_LIST_TO_NUMTYPE(bool, vid, p, n, o);}
+	else
+	   _SS_object_to_numtype_id(vid, p, 0, o);}
 
     else
        rv = FALSE;

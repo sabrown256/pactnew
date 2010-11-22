@@ -177,7 +177,7 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
 /* _SQL_WR_DEFSTR - make the defstr from TYPE for FILE */
 
 static int _SQL_wr_defstr(PDBfile *file, char *type)
-   {int ok, rv;
+   {int ok, rv, id;
     char mbr[MAXLINE], qu[MAX_BFSZ];
     memdes *desc;
     defstr *dp;
@@ -199,20 +199,25 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
 	snprintf(qu, MAX_BFSZ, "create table %s\n(", type);
 
 	for (desc = dp->members; desc != NULL; desc = desc->next)
-            {if (strncmp(desc->type, SC_INT_S, 3) == 0)
+            {id = SC_type_id(desc->type, FALSE);
+	     if (id == SC_INT_I)
 		snprintf(mbr, MAXLINE, "%s integer,\n", desc->name);
 
-	      else if (strcmp(desc->type, SC_SHORT_S) == 0)
+	      else if (id == SC_SHORT_I)
 		snprintf(mbr, MAXLINE, "%s smallint,\n", desc->name);
 
-	      else if (strcmp(desc->type, SC_LONG_LONG_S) == 0)
+	      else if (id == SC_LONG_LONG_I)
 		snprintf(mbr, MAXLINE, "%s bigint,\n", desc->name);
 
-	      else if (strcmp(desc->type, SC_FLOAT_S) == 0)
+	      else if (id == SC_FLOAT_I)
 		snprintf(mbr, MAXLINE, "%s real,\n", desc->name);
 
-	      else if (strcmp(desc->type, SC_DOUBLE_S) == 0)
+	      else if (id == SC_DOUBLE_I)
 		snprintf(mbr, MAXLINE, "%s double precision,\n", desc->name);
+
+	      else if (id == SC_CHAR_I)
+		snprintf(mbr, MAXLINE, "%s varchar(%ld),\n",
+			 desc->name, desc->number);
 
 	      else if (strcmp(desc->type, "date") == 0)
 		snprintf(mbr, MAXLINE, "%s date,\n", desc->name);
@@ -228,10 +233,6 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
 
 	      else if (strcmp(desc->type, "interval") == 0)
 		snprintf(mbr, MAXLINE, "%s interval,\n", desc->name);
-
-	      else if (strncmp(desc->type, SC_CHAR_S, 4) == 0)
-		snprintf(mbr, MAXLINE, "%s varchar(%ld),\n",
-			 desc->name, desc->number);
 
               else
 		 PD_error("UNKNOWN TYPE - _SQL_WR_DEFSTR", PD_GENERIC);
