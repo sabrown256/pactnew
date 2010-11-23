@@ -15,7 +15,7 @@ TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
          scope_term.h scope_mpi.h scope_make.h \
          scope_lex.h scope_thread.h \
-         ${PACTTmpDir}/sctypeg.h
+         ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
 
 MMLib = ${LibDir}/libpsmm.a
 
@@ -39,12 +39,13 @@ SaveFiles = *.c *.h *.r
 CleanFiles = scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
              ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
              ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan \
-             ${IncDir}/sctypeg.h ${PACTTmpDir}/sctypeg.h
+             ${IncDir}/sctypeg.h ${PACTTmpDir}/sctypeg.h  \
+             ${IncDir}/scarg.h ${PACTTmpDir}/scarg.h
 
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${MMLib} ${PACTTmpDir}/sctypeg.h
+InstallDep = ${TGTLib} ${MMLib} ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
 BinDep =
 BinObj =
 
@@ -110,7 +111,7 @@ PObjs = scerr.o schp.o scpman.o schttp.o \
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 
 OW32Objs = sclpwin32.o scwin32.o
-OUnxObjs = sclppsx.o scunix.o scbgl.o
+OUnxObjs = sclppsx.o scunix.o scbgl.o scaix.o
 
 Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scctl.o scfia.o scfis.o scfnca.o scfncb.o scfnct.o \
@@ -141,7 +142,8 @@ ArTObjs = ${TGTLib}(scpar.o) ${TGTLib}(scthn.o) ${TGTLib}(scthe.o) \
           ${TGTLib}(scthp.o) ${TGTLib}(sctho.o) ${TGTLib}(scths.o)
 
 ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
-ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) ${TGTLib}(scbgl.o)
+ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
+            ${TGTLib}(scbgl.o) ${TGTLib}(scaix.o)
 
 ArBind = ${TGTLib}(gf-${LibName}.o)
 
@@ -169,9 +171,9 @@ ${DObjs} : scope_make.h scope_proc.h
 ${MObjs} : scope_mem.h
 ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
-${Objs}  : ${Hdrs} ${PACTTmpDir}/sctypeg.h
+${Objs}  : ${Hdrs} ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
 
-${LibDep} : ${Hdrs} ${PACTTmpDir}/sctypeg.h
+${LibDep} : ${Hdrs} ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
 ${MMDep}  : ${Hdrs}
 
 #
@@ -187,6 +189,21 @@ ${PACTTmpDir}/sctypeg.h : ${BinDir}/convert
 	@echo "${CFE} ${BinDir}/convert -> sctypeg.h"
 	@( ${CFE} ${BinDir}/convert > ${PACTTmpDir}/sctypeg.h ||   \
            ( echo "***> Failed to generate sctypeg.h"         &&   \
+             exit 1 ) )
+
+#
+# varg
+#
+${BinDir}/varg : varg.c ${Hdrs} 
+	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score varg.c -o ${BinDir}/varg ${Cfe_LD_Lib}
+
+varg : ${BinDir}/varg
+
+${PACTTmpDir}/scarg.h : ${BinDir}/varg
+	${RM} ${PACTTmpDir}/scarg.h
+	@echo "${CFE} ${BinDir}/varg -> scarg.h"
+	@( ${CFE} ${BinDir}/varg > ${PACTTmpDir}/scarg.h ||   \
+           ( echo "***> Failed to generate scarg.h"         &&   \
              exit 1 ) )
 
 #

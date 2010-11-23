@@ -412,7 +412,7 @@ object *SS_define_constant(int n, ...)
 	  {long long v;
 	   char vl[MAXLINE];
 
-	   SC_VA_GET_ARG(type, vl, 0);
+	   SC_VA_ARG_ID(type, vl, 0);
 	   SC_convert_id(SC_LONG_LONG_I, &v, 0, type, vl, 0, 1, 1, FALSE);
 	   val = SS_mk_integer(v);}
 
@@ -421,7 +421,7 @@ object *SS_define_constant(int n, ...)
 	  {long double v;
 	   char vl[MAXLINE];
 
-	   SC_VA_GET_ARG(type, vl, 0);
+	   SC_VA_ARG_ID(type, vl, 0);
 	   SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, type, vl, 0, 1, 1, FALSE);
 	   val = SS_mk_float(v);}
 
@@ -430,7 +430,7 @@ object *SS_define_constant(int n, ...)
 	  {long double _Complex v;
 	   char vl[MAXLINE];
 
-	   SC_VA_GET_ARG(type, vl, 0);
+	   SC_VA_ARG_ID(type, vl, 0);
 	   SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, type, vl, 0, 1, 1, FALSE);
 	   val = SS_mk_complex(v);}
 

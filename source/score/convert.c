@@ -6,6 +6,8 @@
  *
  */
 
+#define NO_VA_ARG_ID
+
 #include "scstd.h"
 #include "scope_typeh.h"
 
@@ -37,12 +39,6 @@ static char
  *types[] = { NULL, NULL, "bool", "char",
 	      "short", "int", "long", "long long",
 	      "float", "double", "long double",
-	      "float _Complex", "double _Complex",
-	      "long double _Complex",
-	      "quaternion", "void *" },
- *promo[] = { NULL, NULL, "int", "int",
-	      "int", "int", "long", "long long",
-	      "double", "double", "long double",
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
 	      "quaternion", "void *" },
@@ -596,96 +592,6 @@ static void write_converters(FILE *fp)
 
 /*--------------------------------------------------------------------------*/
 
-/*                           VARIABLE ARG HANDLING                          */
-
-/*--------------------------------------------------------------------------*/
-
-/* _SC_WRITE_ARGH - write the variable arg handler for type ID */
-
-static void _SC_write_argh(FILE *fp, int id)
-   {
-
-    fprintf(fp, "int _SC_arg_%s(va_list __a__, void *d, long n)\n",
-	    names[id]);
-    fprintf(fp, "   {%s *pv = (%s *) d;\n",
-	    types[id], types[id]);
-    fprintf(fp, "    pv[n] = SC_VA_ARG(%s);\n",
-	    promo[id]);
-    fprintf(fp, "    return(TRUE);}\n");
-    fprintf(fp, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_ARG_DECL - write the declaration of the conversion array */
-
-static void write_arg_decl(FILE *fp)
-   {int i, ng, no_complex;
-
-/* PATHSCALE 2.5 does not support complex types in va_arg */
-#if defined(COMPILER_PATHSCALE)
-    no_complex = TRUE;
-#else
-    no_complex = FALSE;
-#endif
-
-    fprintf(fp, "typedef int (*PFArgv)(va_list a, void *d, long n);\n");
-    fprintf(fp, "\n");
-
-    fprintf(fp, "static PFArgv\n");
-    fprintf(fp, " _SC_argf[] = {\n");
-    for (i = 0; i < N_PRIMITIVES; i++)
-        {ng = ((types[i] == NULL) ||
-	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
-	 if (ng == TRUE)
-	    {if (i == N_PRIMITIVES - 1)
-		fprintf(fp, "                NULL\n");
-	     else
-		fprintf(fp, "                NULL,\n");}
-	 else
-	    {if (i == N_PRIMITIVES - 1)
-	        fprintf(fp, "                _SC_arg_%s\n", names[i]);
-	     else
-	        fprintf(fp, "                _SC_arg_%s,\n", names[i]);};};
-
-    fprintf(fp, "};\n");
-    fprintf(fp, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_ARGS - write the va arg routines */
-
-static void write_args(FILE *fp)
-   {int i, ng, no_complex;
-
-/* PATHSCALE 2.5 does not support complex types in va_arg */
-#if defined(COMPILER_PATHSCALE)
-    no_complex = TRUE;
-#else
-    no_complex = FALSE;
-#endif
-
-    Separator;
-    fprintf(fp, "/*                         VA ARG EXTRACTION                                */\n\n");
-    Separator;
-
-    for (i = 0; i < N_PRIMITIVES; i++)
-        {ng = ((types[i] == NULL) ||
-	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
-	 if (ng == FALSE)
-            _SC_write_argh(fp, i);};
-
-    write_arg_decl(fp);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
 /*                               NUMBER RENDERING                           */
 
 /*--------------------------------------------------------------------------*/
@@ -896,9 +802,6 @@ int main(int c, char **v)
 
 /* emit type conversion code */
     write_converters(fp);
-
-/* emit var arg code */
-    write_args(fp);
 
 /* emit number to string code */
     write_str(fp);
