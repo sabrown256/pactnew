@@ -143,14 +143,29 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
                           int itype, va_list *input)
    {int i, *pi;
     char c, *s;
+    char v[MAXLINE], bf[MAXLINE];
     void *data;
 
     data = NULL;
 
     SC_VA_SAVE(input);
 
+#if 0
+
+    SC_VA_ARG_ID(itype, v, 0);
+    SC_ntos(bf, MAXLINE, itype, v, 0, 1);
+    sprintf(name0, "%s-%s", group, bf);
+
+    if (alloc == TRUE)
+       {if (SC_is_type_ptr(itype) == TRUE)
+	   data = *(void **) v;
+	else
+	   data = SC_convert_id(itype, NULL, 0, itype, v, 0, 1, 1, FALSE);};
+
+#else
+
     if (itype == SC_INT_I)
-       {i = SC_VA_ARG(int);
+       {SC_VA_ARG_ID(itype, &i, 0);
 	sprintf(name0, "%s-%d", group, i);
 	if (alloc)
 	   {pi = FMAKE(int, "_PA_CPP_DATA:pi");
@@ -158,13 +173,13 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
 	    data = (void *) pi;};}
   
     else if (itype == SC_INT_P_I)
-       {pi = SC_VA_ARG(int *);
+       {SC_VA_ARG_ID(itype, &pi, 0);
 	sprintf(name0, "%s-%d", group, *pi);
 	if (alloc)
 	   data = (void *) pi;}
   
     else if (itype == SC_CHAR_I)
-       {c = SC_VA_ARG(int);
+       {SC_VA_ARG_ID(itype, &c, 0);
 	sprintf(name0, "%s-%c", group, c);
 	if (alloc)
 	   {s = FMAKE(char, "_PA_CPP_DATA:s");
@@ -172,10 +187,11 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
 	    data = s;};}
   
     else if (itype == SC_STRING_I)
-       {s = SC_VA_ARG(char *);
+       {SC_VA_ARG_ID(itype, &s, 0);
 	sprintf(name0, "%s-%s", group, s);
 	if (alloc)
 	   data = s;};
+#endif
   
     SC_VA_RESTORE(input);
 

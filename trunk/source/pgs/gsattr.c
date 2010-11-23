@@ -58,8 +58,8 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 pa   = NULL;
 	 SC_assoc_info(alst, name, &pa, NULL);
 
-	 SC_VA_GET_ARG(SC_POINTER_I, &pv, 0);
-	 SC_VA_GET_ARG(ityp, v, 0);
+	 SC_VA_ARG_ID(SC_POINTER_I, &pv, 0);
+	 SC_VA_ARG_ID(ityp, v, 0);
 	     
 /* GOTCHA: there is something wrong in the SC_POINTER_I conversion case
  * notice the &pa versus pa for everything else
@@ -184,7 +184,7 @@ int PG_get_attrs_alist(pcons *alst, ...)
  *                     - return the resulting alist
  */
 
-static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
+static pcons *_PG_set_attrs_alist(pcons *alst, va_list __a__)
    {int i, ityp, ptr, bpi;
     char *name, *typn;
     void *pv;
@@ -201,15 +201,16 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list SC_VA_VAR)
 /* get the name of the pointer version
  * if ityp = SC_xxx_I then typn == SC_xxx_P_S
  */
-	 typn = SC_type_name(ityp - SC_BOOL_I + SC_POINTER_I);
+	 typn = SC_type_name(ityp - SC_BIT_I + SC_POINTER_I);
 
-	 if ((SC_is_type_num(ityp) == TRUE) || (ityp == SC_POINTER_I))
-	    {if (ptr == FALSE)
-	        {pv = FMAKE_N(char, bpi, "_PG_SET_ATTRS_ALIST:pv");
-	         SC_VA_GET_ARG(ityp, pv, 0);}
-	     else
-	        SC_VA_GET_ARG(SC_POINTER_I, &pv, 0);
-	     alst = SC_change_alist(alst, name, typn, pv);};};
+	 if ((ptr == FALSE) &&
+	     ((SC_is_type_num(ityp) == TRUE) || (ityp == SC_POINTER_I)))
+	    {pv = FMAKE_N(char, bpi, "_PG_SET_ATTRS_ALIST:pv");
+	     SC_VA_ARG_ID(ityp, pv, 0);}
+	 else
+	    pv = SC_VA_ARG(void *);
+
+	 alst = SC_change_alist(alst, name, typn, pv);};
 
     return(alst);}
 

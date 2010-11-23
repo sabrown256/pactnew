@@ -1611,7 +1611,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 
 		id = SC_type_id(bf, FALSE);
 		if ((SC_CHAR_I <= id) && (id <= SC_QUATERNION_I))
-	           {SC_VA_GET_ARG(SC_POINTER_I, &v, 0);
+	           {SC_VA_ARG_ID(SC_POINTER_I, &v, 0);
 		    SC_convert_id(id, &v, 0, id, asc->cdr, 0, 1, 1, FALSE);}
 
                 else if (id == SC_STRING_I)
@@ -1619,7 +1619,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
                     *ps = (char *) asc->cdr;};};}
 
         else if ((hmap != NULL) && (strncmp(name, "CENTERING", 11) == 0))
-	   {SC_VA_GET_ARG(SC_POINTER_I, &v, 0);
+	   {SC_VA_ARG_ID(SC_POINTER_I, &v, 0);
 	    SC_convert_id(id, &v, 0, id, &hmap->centering, 0, 1, 1, FALSE);};};
 
     SC_VA_END;

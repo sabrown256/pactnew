@@ -340,6 +340,25 @@ int SC_is_type_num(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_IS_TYPE_PTR - return TRUE if ID is a pointer type */
+
+int SC_is_type_ptr(int id)
+   {int rv;
+    char *typn;
+
+    rv = FALSE;
+
+    if ((SC_POINTER_I <= id) && (id < SC_VOID_I))
+       rv = TRUE;
+    else
+       {typn = SC_type_name(id);
+	rv   = ((typn != NULL) && (strchr(typn, '*') != NULL));};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_TYPE_NAME - given the type ID return the type name
  *              - the return value should never be freed
  *              - return NULL if type ID is unknown
@@ -629,23 +648,6 @@ void *SC_convert(char *dtype, void *d, long od, char *stype,
     d = SC_convert_id(did, d, od, sid, s, os, ss, n, flag);
 
     return(d);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-    
-/* SC_VA_GET_ARG - set the Nth element of D which is of type ID
- *               - from the variable arg list A
- */
-
-int SC_va_get_arg(va_list a, int id, void *d, long n)
-    {int ok;
-    
-     ok = FALSE;
-
-     if (_SC_argf[id] != NULL)
-        ok = _SC_argf[id](a, d, n);
-    
-     return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -240,10 +240,10 @@ extern int
  SC_is_type_fp(int id),
  SC_is_type_cx(int id),
  SC_is_type_num(int id),
+ SC_is_type_ptr(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
- SC_deref_id(char *name, int base),
- SC_va_get_arg(va_list a, int id, void *d, long n);
+ SC_deref_id(char *name, int base);
 
 extern size_t
  SC_copy_primitive(void *d, void *s, long n, int id);
