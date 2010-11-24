@@ -676,7 +676,7 @@ object *_SX_mh_b_s(C_procedure *cp, object *argl)
 
     first = SS_car(argl);
     if (SS_floatp(first))
-       mo = SS_binary_flt(cp, argl);
+       mo = SS_binary_homogeneous(cp, argl);
 
     else if (SX_NUMERIC_ARRAYP(first))
        mo = SX_binary_arr(cp->proc[0], argl);
