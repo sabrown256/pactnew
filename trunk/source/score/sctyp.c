@@ -742,7 +742,7 @@ void _SC_set_user_formats(void)
  */
 
 void _SC_set_format_defaults(void)
-   {int i;
+   {int i, id;
     int *fix_pre;
     precisionfp *fp_pre;
     char tmp[MAXLINE], *t;
@@ -757,34 +757,49 @@ void _SC_set_format_defaults(void)
 
 /* fixed point types (proper) */
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
-        {if (fmts[i+SC_SHORT_I] != NULL)
-	    SFREE(fmts[i+SC_SHORT_I]);
+        {id = i + SC_SHORT_I;
+	 if (fmts[id] != NULL)
+	    SFREE(fmts[id]);
 
-	 snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
+	 if (id == SC_LONG_LONG_I)
+	    snprintf(tmp, MAXLINE, "%%%dlld", fix_pre[i]);
+	 else if (id == SC_LONG_I)
+	    snprintf(tmp, MAXLINE, "%%%dld", fix_pre[i]);
+	 else
+	    snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
 
 	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fix)");
-	 fmts[i+SC_SHORT_I] = t;};
+	 fmts[id] = t;};
 
 /* real floating point types (proper) */
     for (i = 0; i < N_PRIMITIVE_FP; i++)
-        {if (fmts[i+SC_FLOAT_I] != NULL)
-	    SFREE(fmts[i+SC_FLOAT_I]);
+        {id = i + SC_FLOAT_I;
+	 if (fmts[id] != NULL)
+	    SFREE(fmts[id]);
 
-	 snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
+	 if (id == SC_LONG_DOUBLE_I)
+	    snprintf(tmp, MAXLINE, "%%# .%dle", fp_pre[i].digits);
+	 else
+	    snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
 
 	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
-	 fmts[i+SC_FLOAT_I] = t;};
+	 fmts[id] = t;};
 
 /* complex floating point types (proper) */
     for (i = 0; i < N_PRIMITIVE_FP; i++)
-        {if (fmts[i+SC_FLOAT_COMPLEX_I] != NULL)
-	    SFREE(fmts[i+SC_FLOAT_COMPLEX_I]);
+        {id = i + SC_FLOAT_COMPLEX_I;
+	 if (fmts[id] != NULL)
+	    SFREE(fmts[id]);
 
-	 snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
-		  fp_pre[i].digits, fp_pre[i].digits);
+	 if (id == SC_LONG_DOUBLE_COMPLEX_I)
+	    snprintf(tmp, MAXLINE, "%%# .%dle + %%# .%dle*I",
+		     fp_pre[i].digits, fp_pre[i].digits);
+	 else
+	    snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
+		     fp_pre[i].digits, fp_pre[i].digits);
 
 	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
-	 fmts[i+SC_FLOAT_COMPLEX_I] = t;};
+	 fmts[id] = t;};
 
 /* other primitive types */
     if (fmts[SC_CHAR_I] != NULL)

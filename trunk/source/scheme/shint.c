@@ -410,28 +410,19 @@ object *SS_define_constant(int n, ...)
 /* fixed point types (proper) */
        if ((type == SC_CHAR_I) || (SC_is_type_fix(type) == TRUE))
 	  {long long v;
-	   char vl[MAXLINE];
-
-	   SC_VA_ARG_ID(type, vl, 0);
-	   SC_convert_id(SC_LONG_LONG_I, &v, 0, type, vl, 0, 1, 1, FALSE);
+	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
 	   val = SS_mk_integer(v);}
 
 /* floating point types (proper) */
        else if (SC_is_type_fp(type) == TRUE)
 	  {long double v;
-	   char vl[MAXLINE];
-
-	   SC_VA_ARG_ID(type, vl, 0);
-	   SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, type, vl, 0, 1, 1, FALSE);
+	   SC_VA_ARG_FETCH(SC_LONG_DOUBLE_I, &v, type);
 	   val = SS_mk_float(v);}
 
 /* complex floating point types (proper) */
        else if (SC_is_type_cx(type) == TRUE)
 	  {long double _Complex v;
-	   char vl[MAXLINE];
-
-	   SC_VA_ARG_ID(type, vl, 0);
-	   SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, type, vl, 0, 1, 1, FALSE);
+	   SC_VA_ARG_FETCH(SC_LONG_DOUBLE_COMPLEX_I, &v, type);
 	   val = SS_mk_complex(v);}
 
        else if (type == SC_STRING_I)

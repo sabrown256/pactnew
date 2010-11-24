@@ -1184,25 +1184,9 @@ void daprint(pcons *alst)
             io_printf(stdout, "\t%s", ths->cdr);
 
 /* print the first value only */
-
-/* fixed point types (proper) */
-         else if (SC_is_type_fix(id) == TRUE)
-	    {long long v;
-	     SC_convert_id(SC_LONG_LONG_I, &v, 0, id, ths->cdr, 0, 1, 1, FALSE);
-	     io_printf(stdout, "\t%ld", v);}
-
-/* floating point types (proper) */
-         else if (SC_is_type_fp(id) == TRUE)
-	    {long double v;
-	     SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, id, ths->cdr, 0, 1, 1, FALSE);
-	     io_printf(stdout, "\t%lg", v);}
-
-/* complex floating point types (proper) */
-         else if (SC_is_type_cx(id) == TRUE)
-	    {long double _Complex v;
-	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, id, ths->cdr, 0,
-			   1, 1, FALSE);
-	     io_printf(stdout, "\t%lg + %lg*I", creall(v), cimagl(v));};
+	 else
+	    {SC_ntos(s, MAXLINE, id, ths->cdr, 0, 1);
+	     io_printf(stdout, "\t%s", s);};
 
          io_printf(stdout, "\n");}
 

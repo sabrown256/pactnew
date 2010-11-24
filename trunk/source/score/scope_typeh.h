@@ -12,6 +12,10 @@
 
 #include "cpyright.h"
 
+#ifndef NO_VA_ARG_ID
+# include <scarg.h>
+#endif
+
 # define REAL double
 # define HUGE_REAL 1.0e100
 FUNCTION_POINTER(double, *(*PFPREAL));
@@ -35,6 +39,40 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 /*--------------------------------------------------------------------------*/
 
 #define SC_TYPEOF(_t)     SC_type_id(#_t, FALSE)
+
+/* SC_VA_ARG_FETCH - convert a variable arg item to an item of type index _DID
+ *                 - NOTE: the variable arg item is read into a char array
+ *                 - which is merely a buffer to temporarily hold 
+ *                 - the contents of the char array which are fetched
+ *                 - by the SC_VA_ARG_ID macro 
+ */
+
+#define SC_VA_ARG_FETCH(_did, _d, _sid)                                      \
+    {char _v[MAXLINE];                                                       \
+     SC_VA_ARG_ID(_sid, _v, 0);                                              \
+     SC_convert_id(_did, _d, 0, _sid, _v, 0, 1, 1, FALSE);}
+
+/* SC_VA_ARG_STORE - store a value _S of type _ID to a the space pointed
+ *                 - to by a pointer grabbed from SC_VA_ARG_ID
+ */
+
+#define SC_VA_ARG_STORE(_id, _s)                                             \
+    {void *_v;                                                               \
+     _v = SC_VA_ARG(void *);                                                 \
+     SC_convert_id(_id, _v, 0, _id, _s, 0, 1, 1, FALSE);}
+
+/* SC_VA_ARG_NTOS - convert a variable arg item to a string
+ *                - NOTE: the variable arg item is read into a char array
+ *                - which is merely a buffer to temporarily hold 
+ *                - the contents of the char array which are fetched
+ *                - by the SC_VA_ARG_ID macro 
+ */
+
+#define SC_VA_ARG_NTOS(_s, _nc, _id)                                         \
+    {char _v[MAXLINE];                                                       \
+     SC_VA_ARG_ID(_id, _v, 0);                                               \
+     SC_ntos(_s, _nc, _id, _v, 0, 1);}
+
 
 /*--------------------------------------------------------------------------*/
 

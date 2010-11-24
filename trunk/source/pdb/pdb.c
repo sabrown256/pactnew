@@ -1503,3 +1503,20 @@ int PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#if 0
+
+Infinities          32 bit                        64 bit
+Positive Inf:     7f80 0000                7ff0 0000 0000 0000
+Negative Inf:     ff80 0000                fff0 0000 0000 0000
+
+NaNs                      32 bit                             64 bit
+Signalling Nan:   7f80 0001 - 7fbf ffff    7ff0 0000 0000 0001 - 7ff7 ffff ffff ffff
+    or            ff80 0001 - ffbf ffff    fff0 0000 0000 0001 - fff7 ffff ffff ffff
+Quiet Nan:        7fc0 0000 - 7fff ffff    7ff8 0000 0000 0000 - 7fff ffff ffff ffff
+    or            ffc0 0000 - ffff ffff    fff8 0000 0000 0000 - ffff ffff ffff ffff
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

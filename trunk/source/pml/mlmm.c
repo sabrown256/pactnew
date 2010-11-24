@@ -1570,7 +1570,6 @@ PM_mesh_topology *PM_lr_ac_mesh_2d(double **px, double **py,
 pcons *PM_mapping_info(PM_mapping *h, ...)
    {int id;
     char **ps, *name, bf[MAXLINE];
-    void *v;
     pcons *map_alist, *asc;
     PM_map_info *hmap;
 
@@ -1604,23 +1603,18 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 
             if (asc != NULL)
                {strcpy(bf, asc->cdr_type);
-                if (SC_LAST_CHAR(bf) == '*')
-                   SC_LAST_CHAR(bf) = '\0';
-
-		SC_trim_right(bf, " \t");
+		SC_dereference(bf);
 
 		id = SC_type_id(bf, FALSE);
 		if ((SC_CHAR_I <= id) && (id <= SC_QUATERNION_I))
-	           {SC_VA_ARG_ID(SC_POINTER_I, &v, 0);
-		    SC_convert_id(id, &v, 0, id, asc->cdr, 0, 1, 1, FALSE);}
+		   {SC_VA_ARG_STORE(id, asc->cdr);}
 
                 else if (id == SC_STRING_I)
 	           {ps  = SC_VA_ARG(char **);
                     *ps = (char *) asc->cdr;};};}
 
         else if ((hmap != NULL) && (strncmp(name, "CENTERING", 11) == 0))
-	   {SC_VA_ARG_ID(SC_POINTER_I, &v, 0);
-	    SC_convert_id(id, &v, 0, id, &hmap->centering, 0, 1, 1, FALSE);};};
+	   {SC_VA_ARG_STORE(id, &hmap->centering);};};
 
     SC_VA_END;
 

@@ -70,6 +70,22 @@ int test_1(int nir, int nim)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SIGH_2 - handle signals for test #2 */
+
+static void sigh_2(int sig)
+   {
+
+    SC_signal(SIGSEGV, sigh_2);
+
+    golp = FALSE;
+
+    LONGJMP(cpu, TRUE);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* TEST_2 - simple test of memory manager
  *        - allocate some space and over index some of it
  *        - checking detection of bad blocks
@@ -81,35 +97,38 @@ int test_2(int nir, int nim)
 
     err = FALSE;
 
-    io_printf(stdout, "\n-----------------------------\n");
-    io_printf(stdout, "\nSimple memory allocation test\n\n");
+    SC_signal(SIGSEGV, sigh_2);
 
-    a = FMAKE_N(double *, nir, "TEST_2:a");
+    if (SETJMP(cpu) == 0)
+       {io_printf(stdout, "\n-----------------------------\n");
+	io_printf(stdout, "\nSimple memory allocation test\n\n");
 
-    for (i = 0; i < nir; i++)
-        {jmx = (i == 3) ? nim+10 : nim;
+	a = FMAKE_N(double *, nir, "TEST_2:a");
 
-	 a[i] = FMAKE_N(double, nim, "TEST_2:a[i]");
-	 for (j = 0; j < jmx; j++)
-	     a[i][j] = (j + 1.0)*(i + 1.0);
+	for (i = 0; i < nir; i++)
+	    {jmx = (i == 3) ? nim+10 : nim;
 
-	 ok = SC_mem_chk(3);
-	 if (ok < 0)
-	    io_printf(STDOUT, "   Detected bad block on pass %d : %d\n",
-		      i, ok);
-	 else
-	    io_printf(STDOUT, "   Number of memory blocks on pass %d : %d\n",
-		      i, ok);};
+	     a[i] = FMAKE_N(double, nim, "TEST_2:a[i]");
+	     for (j = 0; j < jmx; j++)
+	         a[i][j] = (j + 1.0)*(i + 1.0);
 
-    for (i = 0; i < nir; i++)
-        SFREE(a[i]);
+	     ok = SC_mem_chk(3);
+	     if (ok < 0)
+	        io_printf(STDOUT, "   Detected bad block on pass %d : %d\n",
+			  i, ok);
+	     else
+	        io_printf(STDOUT, "   Number of memory blocks on pass %d : %d\n",
+			  i, ok);};
 
-    SFREE(a);
+	for (i = 0; i < nir; i++)
+	   SFREE(a[i]);
 
-    if (err == FALSE)
-       io_printf(stdout, "\nSimple memory allocation test passed\n");
-    else
-       io_printf(stdout, "\nSimple memory allocation test failed\n");
+	SFREE(a);
+
+	if (err == FALSE)
+	   io_printf(stdout, "\nSimple memory allocation test passed\n");
+	else
+	   io_printf(stdout, "\nSimple memory allocation test failed\n");};
 
     return(err);}
 
