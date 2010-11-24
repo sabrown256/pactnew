@@ -12,10 +12,15 @@
 
 typedef double          (*PFDoubled)(double);
 typedef double          (*PFDoubledd)(double, double);
+
 typedef double _Complex (*PFComplexc)(double _Complex);
 typedef double _Complex (*PFComplexcc)(double _Complex, double _Complex);
+typedef double _Complex (*PFComplexcd)(double _Complex, double);
+
 typedef quaternion      (*PFQuaternionq)(quaternion);
 typedef quaternion      (*PFQuaternionqq)(quaternion, quaternion);
+typedef quaternion      (*PFQuaternionqd)(quaternion, double);
+
 typedef int             (*PFIntd)(double);
 typedef int             (*PFIntdd)(double, double);
 typedef BIGINT          (*PFBIGINTB)(BIGINT);
@@ -304,7 +309,7 @@ static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
     double _Complex accv, *v;
     object *acc;
 
-    v = FMAKE_N(double _Complex, ni, "SS_BINARY_FLT:complex");
+    v = FMAKE_N(double _Complex, ni, "_SS_BIN_COMPLEX:v");
     _SS_list_to_numtype_id(SC_DOUBLE_COMPLEX_I, v, ni, argl);
 
     if (ni < 2)
@@ -337,7 +342,7 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
     quaternion accv, *v;
     object *acc;
 
-    v = FMAKE_N(quaternion, ni, "SS_BINARY_FLT:quaternion");
+    v = FMAKE_N(quaternion, ni, "_SS_BIN_QUATERNION:v");
     _SS_list_to_numtype_id(SC_QUATERNION_I, v, ni, argl);
 
     accv.i = 0;
@@ -364,18 +369,19 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_BINARY_FLT - the binary floating point, complex, and quaternion
- *               - arithmetic operator handler
+/* SS_BINARY_HOMOGENEOUS - the binary floating point, complex, and quaternion
+ *                       - arithmetic operator handler
+ *                       - when both arguments have the same type
  */
 
-object *SS_binary_flt(C_procedure *cp, object *argl)
+object *SS_binary_homogeneous(C_procedure *cp, object *argl)
    {int ido;
     long ni;
     object *acc;
 
     ido = _SS_max_numeric_type(argl, &ni);
     if (ido == -1)
-       SS_error("NON-NUMERIC OPERAND - SS_BINARY_FLT", argl);
+       SS_error("NON-NUMERIC OPERAND - SS_BINARY_HOMOGENEOUS", argl);
 
 /* fixed point operands */
     else if (ido < SC_FLOAT_I)
@@ -392,6 +398,69 @@ object *SS_binary_flt(C_procedure *cp, object *argl)
 /* quaternion operands */
     else
        acc = _SS_bin_quaternion(ni, argl, (PFQuaternionqq) cp->proc[2]);
+
+    return(acc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_BINARY_HETEROGENEOUS - the binary floating point, complex, and
+ *                         - quaternion arithmetic operator handler
+ *                         - when both arguments have the different type
+ *                         - for Bessel functions and Legendre polynomials
+ */
+
+object *SS_binary_heterogeneous(C_procedure *cp, object *argl)
+   {int ido;
+    long ni;
+    double n;
+    object *acc;
+
+    ido = _SS_max_numeric_type(argl, &ni);
+    if (ido == -1)
+       SS_error("NON-NUMERIC OPERAND - SS_BINARY_HETEROGENEOUS", argl);
+
+/* fixed point and floating point operands */
+    else if (ido < SC_FLOAT_COMPLEX_I)
+       {double x, accv;
+	PFDoubledd op;
+
+	SS_args(argl,
+		SC_DOUBLE_I, &x,
+		SC_DOUBLE_I, &n,
+		0);
+
+	op   = (PFDoubledd) cp->proc[0];
+	accv = op(x, n);
+	acc  = SS_mk_float(accv);}
+
+/* complex floating point operands */
+    else if (ido < SC_QUATERNION_I)
+       {double _Complex z, accv;
+	PFComplexcd op;
+
+	SS_args(argl,
+		SC_DOUBLE_COMPLEX_I, &z,
+		SC_DOUBLE_I, &n,
+		0);
+
+	op   = (PFComplexcd) cp->proc[1];
+	accv = op(z, n);
+	acc  = SS_mk_complex(accv);}
+
+/* quaternion operands */
+    else
+       {quaternion q, accv;
+	PFQuaternionqd op;
+
+	SS_args(argl,
+		SC_QUATERNION_I, &q,
+		SC_DOUBLE_I, &n,
+		0);
+
+	op   = (PFQuaternionqd) cp->proc[2];
+	accv = op(q, n);
+	acc  = SS_mk_quaternion(accv);};
 
     return(acc);}
 
@@ -567,6 +636,137 @@ static object *_SS_xor_pow(object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_INSTALL_HETEROGENEOUS - binary heterogeneous functions */
+
+static void _SS_install_heterogeneous(void)
+   {
+
+    SS_install_mf("in",
+		  "Procedure: Take nth order modified Bessel function of the first kind",
+		  SS_binary_heterogeneous, 
+		  PM_in, PM_cin, PM_qin, SS_PR_PROC);
+
+    SS_install_mf("jn",
+		  "Procedure: Take nth order Bessel function of the first kind",
+		  SS_binary_heterogeneous, 
+		  PM_jn, PM_cjn, PM_qjn, SS_PR_PROC);
+
+    SS_install_mf("kn",
+		  "Procedure: Take nth order modified Bessel function of the first kind",
+		  SS_binary_heterogeneous, 
+		  PM_kn, PM_ckn, PM_qkn, SS_PR_PROC);
+
+    SS_install_mf("yn",
+		  "Procedure: Take nth order Bessel function of the second kind",
+		  SS_binary_heterogeneous, 
+		  PM_yn, PM_cyn, PM_qyn, SS_PR_PROC);
+
+    SS_install_mf("tchn",
+		  "Procedure: Take nth order Tchebyshev polynomial function",
+		  SS_binary_heterogeneous, 
+		  PM_tchn, PM_ctchn, PM_qtchn, SS_PR_PROC);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INSTALL_HOMOGENEOUS - binary homogeneous functions */
+
+static void _SS_install_homogeneous(void)
+   {
+
+    SS_install("hypot",
+               "Procedure: Returns the sqrt of the sum of the squares of the arguments",
+               SS_binary_homogeneous,
+               HYPOT, SS_PR_PROC);
+
+    SS_install("max",
+               "Procedure: Returns the greater of args",
+               SS_binary_homogeneous,
+               PM_fmax, SS_PR_PROC);
+
+    SS_install("min",
+               "Procedure: Returns the smaller of args",
+               SS_binary_homogeneous,
+               PM_fmin, SS_PR_PROC);
+
+    SS_install("beta",
+               "Procedure: Returns the beta function\nUsage: (beta z w)",
+               SS_binary_homogeneous, 
+               PM_beta, SS_PR_PROC);
+
+    SS_install("igamma-p",
+               "Procedure: Returns the incomplete gamma function P\nUsage: (igamma-p a x)",
+               SS_binary_homogeneous, 
+               PM_igamma_p, SS_PR_PROC);
+
+    SS_install("igamma-q",
+               "Procedure: Returns the incomplete gamma function Q\nUsage: (igamma-q a x)",
+               SS_binary_homogeneous, 
+               PM_igamma_q, SS_PR_PROC);
+
+    SS_install("lei1",
+               "Procedure: Returns the Legendre elliptic integral of the first kind\nUsage: (lei1 x k)",
+               SS_binary_homogeneous, 
+               PM_elliptic_integral_l1, SS_PR_PROC);
+
+    SS_install("lei2",
+               "Procedure: Returns the Legendre elliptic integral of the second kind\nUsage: (lei2 x k)",
+               SS_binary_homogeneous, 
+               PM_elliptic_integral_l2, SS_PR_PROC);
+
+    SS_install("cei3",
+               "Procedure: Returns the complete elliptic integral of the third kind\nUsage: (cei3 n k)",
+               SS_binary_homogeneous, 
+               PM_elliptic_integral_c3, SS_PR_PROC);
+
+    SS_install("sn",
+               "Procedure: Returns the Jacobian elliptic function sn\nUsage: (sn x k)",
+               SS_binary_homogeneous, 
+               PM_sn, SS_PR_PROC);
+
+    SS_install("cn",
+               "Procedure: Returns the Jacobian elliptic function cn\nUsage: (cn x k)",
+               SS_binary_homogeneous, 
+               PM_cn, SS_PR_PROC);
+
+    SS_install("dn",
+               "Procedure: Returns the Jacobian elliptic function dn\nUsage: (dn x k)",
+               SS_binary_homogeneous, 
+               PM_dn, SS_PR_PROC);
+
+    SS_install_mf("*",
+		  "Procedure: Returns product of args or 1 if no args are supplied",
+		  SS_binary_homogeneous,
+		  PM_ftimes, PM_times_cc, PM_times_qq, SS_PR_PROC);
+
+    SS_install_mf("+",
+		  "Procedure: Returns sum of args or 0 if no args are supplied",
+		  SS_binary_homogeneous,
+		  PM_fplus, PM_plus_cc, PM_plus_qq, SS_PR_PROC);
+
+    SS_install_mf("-",
+		  "Procedure: Returns difference of args",
+		  SS_binary_homogeneous,
+		  PM_fminus, PM_minus_cc, PM_minus_qq, SS_PR_PROC);
+
+    SS_install_mf("/",
+		  "Procedure: Returns quotient of args (left associative)",
+		  SS_binary_homogeneous,
+		  PM_fdivide, PM_divide_cc, PM_rquotient_qq, SS_PR_PROC);
+
+    SS_install_mf("expt",
+		  "Procedure: Returns the first argument raised to the power of the second",
+		  SS_binary_homogeneous,
+		  POW, PM_cpow, PM_qpow, SS_PR_PROC);
+
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_INSTALL_MATH - install the SCHEME primitives for math */
 
 void _SS_install_math(void)
@@ -642,25 +842,10 @@ void _SS_install_math(void)
                SS_unary_fix, 
                floor, SS_PR_PROC);
 
-    SS_install("hypot",
-               "Procedure: Returns the sqrt of the sum of the squares of the arguments",
-               SS_binary_flt,
-               HYPOT, SS_PR_PROC);
-
     SS_install("machine-precision",
                "Procedure: Returns a floating point machine precision value",
                SS_zargs,
                _SS_machine_prec, SS_PR_PROC);
-
-    SS_install("max",
-               "Procedure: Returns the greater of args",
-               SS_binary_flt,
-               PM_fmax, SS_PR_PROC);
-
-    SS_install("min",
-               "Procedure: Returns the smaller of args",
-               SS_binary_flt,
-               PM_fmin, SS_PR_PROC);
 
     SS_install("negative?",
                "Procedure: Returns #t iff the argument is a number less than 0",
@@ -699,25 +884,10 @@ void _SS_install_math(void)
 
 /* special functions */
 
-    SS_install("beta",
-               "Procedure: Returns the beta function\nUsage: (beta z w)",
-               SS_binary_flt, 
-               PM_beta, SS_PR_PROC);
-
     SS_install("lngamma",
                "Procedure: Returns the log of the gamma function\nUsage: (lngamma x)",
                SS_unary_flt, 
                PM_ln_gamma, SS_PR_PROC);
-
-    SS_install("igamma-p",
-               "Procedure: Returns the incomplete gamma function P\nUsage: (igamma-p a x)",
-               SS_binary_flt, 
-               PM_igamma_p, SS_PR_PROC);
-
-    SS_install("igamma-q",
-               "Procedure: Returns the incomplete gamma function Q\nUsage: (igamma-q a x)",
-               SS_binary_flt, 
-               PM_igamma_q, SS_PR_PROC);
 
     SS_install("erf",
                "Procedure: Returns the error function ERF\nUsage: (erf x)",
@@ -729,16 +899,6 @@ void _SS_install_math(void)
                SS_unary_flt, 
                PM_erfc, SS_PR_PROC);
 
-    SS_install("lei1",
-               "Procedure: Returns the Legendre elliptic integral of the first kind\nUsage: (lei1 x k)",
-               SS_binary_flt, 
-               PM_elliptic_integral_l1, SS_PR_PROC);
-
-    SS_install("lei2",
-               "Procedure: Returns the Legendre elliptic integral of the second kind\nUsage: (lei2 x k)",
-               SS_binary_flt, 
-               PM_elliptic_integral_l2, SS_PR_PROC);
-
     SS_install("cei1",
                "Procedure: Returns the complete elliptic integral of the first kind\nUsage: (cei1 k)",
                SS_unary_flt, 
@@ -749,47 +909,7 @@ void _SS_install_math(void)
                SS_unary_flt, 
                PM_elliptic_integral_c2, SS_PR_PROC);
 
-    SS_install("cei3",
-               "Procedure: Returns the complete elliptic integral of the third kind\nUsage: (cei3 n k)",
-               SS_binary_flt, 
-               PM_elliptic_integral_c3, SS_PR_PROC);
-
-    SS_install("sn",
-               "Procedure: Returns the Jacobian elliptic function sn\nUsage: (sn x k)",
-               SS_binary_flt, 
-               PM_sn, SS_PR_PROC);
-
-    SS_install("cn",
-               "Procedure: Returns the Jacobian elliptic function cn\nUsage: (cn x k)",
-               SS_binary_flt, 
-               PM_cn, SS_PR_PROC);
-
-    SS_install("dn",
-               "Procedure: Returns the Jacobian elliptic function dn\nUsage: (dn x k)",
-               SS_binary_flt, 
-               PM_dn, SS_PR_PROC);
-
 /* multi type functions */
-    SS_install_mf("*",
-		  "Procedure: Returns product of args or 1 if no args are supplied",
-		  SS_binary_flt,
-		  PM_ftimes, PM_times_cc, PM_times_qq, SS_PR_PROC);
-
-    SS_install_mf("+",
-		  "Procedure: Returns sum of args or 0 if no args are supplied",
-		  SS_binary_flt,
-		  PM_fplus, PM_plus_cc, PM_plus_qq, SS_PR_PROC);
-
-    SS_install_mf("-",
-		  "Procedure: Returns difference of args",
-		  SS_binary_flt,
-		  PM_fminus, PM_minus_cc, PM_minus_qq, SS_PR_PROC);
-
-    SS_install_mf("/",
-		  "Procedure: Returns quotient of args (left associative)",
-		  SS_binary_flt,
-		  PM_fdivide, PM_divide_cc, PM_rquotient_qq, SS_PR_PROC);
-
     SS_install_mf("abs",
 		  "Procedure: Returns the absolute value of a numeric object",
 		  SS_unary_flt,
@@ -855,11 +975,6 @@ void _SS_install_math(void)
 		  SS_unary_flt, 
 		  exp, PM_cexp, PM_qexp, SS_PR_PROC);
 
-    SS_install_mf("expt",
-		  "Procedure: Returns the first argument raised to the power of the second",
-		  SS_binary_flt,
-		  POW, PM_cpow, PM_qpow, SS_PR_PROC);
-
     SS_install_mf("i0",
 		  "Procedure: Take zeroth order modified Bessel function of the first kind",
 		  SS_unary_flt, 
@@ -870,20 +985,10 @@ void _SS_install_math(void)
 		  SS_unary_flt, 
 		  PM_i1, PM_ci1, PM_qi1, SS_PR_PROC);
 
-    SS_install_mf("in",
-		  "Procedure: Take nth order modified Bessel function of the first kind",
-		  SS_binary_flt, 
-		  PM_in, PM_cin, PM_qin, SS_PR_PROC);
-
     SS_install_mf("j1",
 		  "Procedure: Take first order Bessel function of the first kind",
 		  SS_unary_flt, 
 		  PM_j1, PM_cj1, PM_qj1, SS_PR_PROC);
-
-    SS_install_mf("jn",
-		  "Procedure: Take nth order Bessel function of the first kind",
-		  SS_binary_flt, 
-		  PM_jn, PM_cjn, PM_qjn, SS_PR_PROC);
 
     SS_install_mf("k0",
 		  "Procedure: Take zeroth order modified Bessel function of the first kind",
@@ -895,11 +1000,6 @@ void _SS_install_math(void)
 		  SS_unary_flt, 
 		  PM_k1, PM_ck1, PM_qk1, SS_PR_PROC);
 
-    SS_install_mf("kn",
-		  "Procedure: Take nth order modified Bessel function of the first kind",
-		  SS_binary_flt, 
-		  PM_kn, PM_ckn, PM_qkn, SS_PR_PROC);
-
     SS_install_mf("y0",
 		  "Procedure: Take zeroth order Bessel function of the second kind",
 		  SS_unary_flt, 
@@ -909,11 +1009,6 @@ void _SS_install_math(void)
 		  "Procedure: Take first order Bessel function of the second kind",
 		  SS_unary_flt, 
 		  PM_y1, PM_cy1, PM_qy1, SS_PR_PROC);
-
-    SS_install_mf("yn",
-		  "Procedure: Take nth order Bessel function of the second kind",
-		  SS_binary_flt, 
-		  PM_yn, PM_cyn, PM_qyn, SS_PR_PROC);
 
     SS_install_mf("j0",
 		  "Procedure: Take zeroth order Bessel function of the first kind",
@@ -970,11 +1065,6 @@ void _SS_install_math(void)
 		  SS_unary_flt, 
 		  tanh, PM_ctanh, PM_qtanh, SS_PR_PROC);
 
-    SS_install_mf("tchn",
-		  "Procedure: Take nth order Tchebyshev polynomial function",
-		  SS_binary_flt, 
-		  PM_tchn, PM_ctchn, PM_qtchn, SS_PR_PROC);
-
 /* special syntax context */
 
     SS_install("xor",
@@ -991,6 +1081,10 @@ void _SS_install_math(void)
 		  "Variable: Strict C compliance for operators if 1\n     Usage: strict-c [0|1]",
 		  SS_acc_int,
 		  &SS_strict_c);
+
+
+    _SS_install_heterogeneous();
+    _SS_install_homogeneous();
 
     return;}
 

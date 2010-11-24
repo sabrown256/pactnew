@@ -1611,7 +1611,7 @@ curve which is a linear combination of all of the given curves but the first.
 <CENTER><img width="141" height="56" src="ultra7.gif"></CENTER><p>
 
 in the range x<sub>min</sub> to x<sub>max</sub> where a and b are given by
-curve-a and curve-b respectively. The homogenous and particular solutions
+curve-a and curve-b respectively. The homogeneous and particular solutions
 to the equation are plotted and returned.<p>
 
 <I>Usage: </I>fode curve-a curve-b x<sub>min</sub> x<sub>max</sub>

@@ -686,7 +686,7 @@ object *UL_bc(C_procedure *cp, object *argl)
 /* the first non-number in the arg list */
             else
                {if (!SS_nullobjp(ch))
-                   {s = SS_binary_flt(cp, SS_reverse(ch));
+                   {s = SS_binary_homogeneous(cp, SS_reverse(ch));
                     if (SS_integerp(s))
                        value = (double) SS_INTEGER_VALUE(s);
                     else if (SS_floatp(s))
@@ -727,7 +727,7 @@ object *UL_bc(C_procedure *cp, object *argl)
                {if (SS_nullobjp(ch))
                    ch = SS_null;
                 else
-		   ch = SS_binary_flt(cp, SS_reverse(ch));
+		   ch = SS_binary_homogeneous(cp, SS_reverse(ch));
 
 		return(ch);};};
 

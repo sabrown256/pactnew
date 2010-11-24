@@ -1046,7 +1046,7 @@ extern object
  *SS_unary_flt(C_procedure *cp, object *argl),
  *SS_unary_fix(C_procedure *cp, object *argl),
  *SS_binary_fix(C_procedure *cp, object *argl),
- *SS_binary_flt(C_procedure *cp, object *argl),
+ *SS_binary_homogeneous(C_procedure *cp, object *argl),
  *SS_un_comp(C_procedure *cp, object *argl),
  *SS_bin_comp(C_procedure *cp, object *argl);
 
