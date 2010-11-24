@@ -13,7 +13,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_EXA_VAR - examine and print the contents of the variable */
+/* _SS_EXA_VAR - examine and print the contents of the variable VR */
 
 static object *_SS_exa_var(void *vr, int type)
    {char cv, *sv, **pv;
@@ -21,52 +21,44 @@ static object *_SS_exa_var(void *vr, int type)
 
     ret = SS_f;
 
+    if (SS_interactive == TRUE)
+       {char bf[MAXLINE];
+
+	SC_ntos(bf, MAXLINE, type, vr, 0, 1);
+	PRINT(stdout, "    %s", bf);};
+
     if (type == SC_CHAR_I)
        {cv = *(char *) vr;
-	if (SS_interactive)
-	   PRINT(stdout, "    %c", cv);
 	ret = SS_mk_integer(cv);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(type) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, type, vr, 0, 1, 1, FALSE);
-	if (SS_interactive)
-	   PRINT(stdout, "    %lld", v);
 	ret = SS_mk_integer(v);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(type) == TRUE)
        {long double v;
 	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, type, vr, 0, 1, 1, FALSE);
-	if (SS_interactive)
-	   PRINT(stdout, "    %lg", v);
 	ret = SS_mk_float(v);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(type) == TRUE)
        {long double _Complex v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, type, vr, 0, 1, 1, FALSE);
-	if (SS_interactive)
-	   PRINT(stdout, "    %lg + %lg*I", creall(v), cimagl(v));
 	ret = SS_mk_complex(v);}
 
     else if (type == SC_STRING_I)
-       {sv = (char *) vr;
-	if (SS_interactive)
-	   PRINT(stdout, "    %s", sv);
+       {sv  = (char *) vr;
 	ret = SS_mk_string(sv);}
 
     else if (type == SC_POINTER_I)
        {pv = (char **) vr;
 	if (*pv != NULL)
-	   {if (SS_interactive)
-	       PRINT(stdout, "    %s", *pv);
-	    ret = SS_mk_string(*pv);}
+	   ret = SS_mk_string(*pv);
 	else
-	   {if (SS_interactive)
-	       PRINT(stdout, "    \"\"");
-	    ret = SS_f;};}
+	   ret = SS_f;}
 
     else
        {if (SS_interactive)

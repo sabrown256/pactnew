@@ -143,7 +143,7 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
                           int itype, va_list *input)
    {int i, *pi;
     char c, *s;
-    char v[MAXLINE], bf[MAXLINE];
+    char bf[MAXLINE];
     void *data;
 
     data = NULL;
@@ -152,8 +152,7 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
 
 #if 0
 
-    SC_VA_ARG_ID(itype, v, 0);
-    SC_ntos(bf, MAXLINE, itype, v, 0, 1);
+    SC_VA_ARG_NTOS(bf, MAXLINE, itype);
     sprintf(name0, "%s-%s", group, bf);
 
     if (alloc == TRUE)

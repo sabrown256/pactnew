@@ -53,6 +53,20 @@ static char
 	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
 	      "DBL_MAX", "LLONG_MAX" };
 
+#if defined(AIX) || defined(COMPILER_PGI)
+
+static char
+ *realp[] = { "crealf", "creal", "creal" },
+ *imagp[] = { "cimagf", "cimag", "cimag" };
+
+#else
+
+static char
+ *realp[] = { "crealf", "creal", "creall" },
+ *imagp[] = { "cimagf", "cimag", "cimagl" };
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -157,7 +171,9 @@ static void _SC_write_n_to_n_safe(FILE *fp, int did, int sid)
 /* _SC_WRITE_C_TO_C_SAFE - complex to complex conversions */
 
 static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
-   {
+   {int eid;
+
+    eid = 2;
 
     fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
@@ -178,8 +194,8 @@ static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
     if (did < sid)
        {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
 	fprintf(fp, "        {zs = *ps;\n");
-	fprintf(fp, "         sr = creall(zs);\n");
-	fprintf(fp, "         si = cimagl(zs);\n");
+	fprintf(fp, "         sr = %s(zs);\n", realp[eid]);
+	fprintf(fp, "         si = %s(zs);\n", imagp[eid]);
 	fprintf(fp, "         sr = min(sr, smx);\n");
 	fprintf(fp, "         sr = max(sr, smn);\n");
 	fprintf(fp, "         si = min(si, smx);\n");
@@ -201,7 +217,9 @@ static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
 /* _SC_WRITE_C_TO_R - complex to real conversions */
 
 static void _SC_write_c_to_r(FILE *fp, int did, int sid)
-   {
+   {int eid;
+
+    eid = 2;
 
     fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
@@ -217,7 +235,7 @@ static void _SC_write_c_to_r(FILE *fp, int did, int sid)
     fprintf(fp, "    for (i = 0; i < n; i++, *pd++ = *ps++);\n");
 */
     fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
-    fprintf(fp, "        *pd = creall(*ps);\n");
+    fprintf(fp, "        *pd = %s(*ps);\n", realp[eid]);
 
     fprintf(fp, "    return(i);}\n");
 
@@ -318,7 +336,9 @@ static void _SC_write_r_to_q(FILE *fp, int did, int sid)
 /* _SC_WRITE_C_TO_Q - complex to quaternion conversions */
 
 static void _SC_write_c_to_q(FILE *fp, int did, int sid)
-   {
+   {int eid;
+
+    eid = 2;
 
     fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
@@ -334,8 +354,8 @@ static void _SC_write_c_to_q(FILE *fp, int did, int sid)
 
     fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
     fprintf(fp, "        {z   = *ps;\n");
-    fprintf(fp, "         q.s = creall(z);\n");
-    fprintf(fp, "         q.i = cimagl(z);\n");
+    fprintf(fp, "         q.s = %s(z);\n", realp[eid]);
+    fprintf(fp, "         q.i = %s(z);\n", imagp[eid]);
     fprintf(fp, "         *pd = q;};\n");
 
     fprintf(fp, "    return(i);}\n");
@@ -630,13 +650,6 @@ static void _SC_write_bool(FILE *fp, int id)
 
 static void _SC_write_complex(FILE *fp, int id)
    {int eid;
-#if defined(AIX)
-    static char *realp[] = { "crealf", "creal", "creal" };
-    static char *imagp[] = { "cimagf", "cimag", "cimag" };
-#else
-    static char *realp[] = { "crealf", "creal", "creall" };
-    static char *imagp[] = { "cimagf", "cimag", "cimagl" };
-#endif
     static char *kind[]  = { "float", "double", "long double" };
 
     eid = id - I_FLOAT - 1;
@@ -650,6 +663,15 @@ static void _SC_write_complex(FILE *fp, int id)
 
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
+
+#if defined(COMPILER_PGI)
+    fprintf(fp, "\n");
+    fprintf(fp, "    {char *p;\n");
+    fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
+    fprintf(fp, "         if (*p == \'L\')\n");
+    fprintf(fp, "            *p++ = \'l\';};\n");
+    fprintf(fp, "\n");
+#endif
 
     fprintf(fp, "    z  = pv[n];\n");
     fprintf(fp, "    nb = snprintf(t, nc, fmt, %s(z), %s(z));\n",
@@ -710,6 +732,15 @@ static void _SC_write_ntos(FILE *fp, int id)
 
     fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
 	    id, id);
+
+#if defined(COMPILER_PGI)
+    fprintf(fp, "\n");
+    fprintf(fp, "    {char *p;\n");
+    fprintf(fp, "     for (p = fmt; *p != \'\\0\'; p++)\n");
+    fprintf(fp, "         if (*p == \'L\')\n");
+    fprintf(fp, "            *p++ = \'l\';};\n");
+    fprintf(fp, "\n");
+#endif
 
     fprintf(fp, "    nb  = snprintf(t, nc, fmt, pv[n]);\n");
 

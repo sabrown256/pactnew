@@ -547,10 +547,6 @@ typedef char *F77_string;
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef NO_VA_ARG_ID
-# include <scarg.h>
-#endif
-
 #ifdef ANSI
 
 #define SC_VA_START(x)                                                       \

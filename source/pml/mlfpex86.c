@@ -8,6 +8,42 @@
  *
  */
 
+/* FPU Status Register
+ *
+ * Useful when debugging.  Using the GDB 'info reg fstat' command
+ * you can see the 16 bit status word.  The bits are:
+ * 
+ *     0   Invalid operation
+ *     1   Denormalized
+ *     2   Zero Divide
+ *     3   Overflow
+ *     4   Underflow
+ *     5   Precision
+ *     6   Stack Fault
+ *     7   Exception Flag
+ *     8   C0
+ *     9   C1
+ *    10   C2
+ *    11   
+ *    12
+ *    13
+ *    14  C3
+ *    15  Busy
+ * 
+ * 0-5 - exception flags
+ * they appear in the same order as the exception masks in the control register
+ * if the corresponding condition exists the bit is set
+ * they do not depend on the exception masks in the control register
+ * 
+ *  6  - stack fault
+ * a stack fault occurs when there is a stack overflow or underflow
+ * if this bit is set the C1 condition code bit indicates a
+ * stack overflow (C1=1) or stack underflow (C1=0)
+ * 
+ *  7 - the logical OR of bits 0-5
+ * 
+ */
+
 #ifdef __GNUC__
 
 /* too many codes define this - so get rid of it in this context */

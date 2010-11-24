@@ -485,6 +485,7 @@ static PM_mapping *_SXI_norm_mapping(PM_mapping *h)
 
 static PM_mapping *_SXI_copy_mapping(PM_mapping *h)
    {char *name, *cat;
+    PM_centering centering;
     PM_set *domain, *range;
     PM_mapping *f;
 
@@ -493,7 +494,13 @@ static PM_mapping *_SXI_copy_mapping(PM_mapping *h)
     cat    = h->category;
     name   = SC_dsnprintf(FALSE, "copy %s", h->name);
 
-    f = PM_make_mapping(name, cat, domain, range, N_CENT, NULL);
+/* find the additional mapping information */
+    centering = N_CENT;
+    PM_mapping_info(h,
+		    "CENTERING", &centering,
+		    NULL);
+
+    f = PM_make_mapping(name, cat, domain, range, centering, NULL);
 
     if (strcmp(f->map_type, SC_PCONS_P_S) == 0)
        {SC_free_alist(f->map, 0);
