@@ -18,7 +18,8 @@
 #define I_COMPLEX     13    /* index of last complex floating point type */
 #define I_QUATERNION  14
 #define I_POINTER     15
-#define N_PRIMITIVES  16
+#define N_PRIMITIVES  16    /* up through SC_POINTER_I */
+#define N_TYPES       18    /* up through SC_STRING_I */
 
 #ifdef SC_FAST_TRUNC
 #define CONVERT  _SC_write_n_to_n_fast
@@ -35,13 +36,13 @@ static char
 	      "shrt", "int", "lng", "ll",
 	      "flt", "dbl", "ldbl",
 	      "fcx", "dcx", "ldcx",
-	      "qut", "ptr" },
+	      "qut", "ptr", NULL, "str" },
  *types[] = { NULL, NULL, "bool", "char",
 	      "short", "int", "long", "long long",
 	      "float", "double", "long double",
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
-	      "quaternion", "void *" },
+	      "quaternion", "void *", NULL, "char *" },
  *mn[]    = { NULL, NULL, "BOOL_MIN", "CHAR_MIN",
 	      "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
 	      "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
@@ -765,14 +766,14 @@ static void write_str_decl(FILE *fp)
 
     fprintf(fp, "static PFStrv\n");
     fprintf(fp, " _SC_strf[] = {\n");
-    for (i = 0; i < N_PRIMITIVES; i++)
+    for (i = 0; i < N_TYPES; i++)
         {if (types[i] != NULL)
-	    {if (i == N_PRIMITIVES-1)
+	    {if (i == N_TYPES-1)
 	        fprintf(fp, "                _SC_str_%s\n", names[i]);
 	     else
 	        fprintf(fp, "                _SC_str_%s,\n", names[i]);}
 	 else
-	    {if (i == N_PRIMITIVES-1)
+	    {if (i == N_TYPES-1)
 	        fprintf(fp, "                NULL\n");
 	     else
 	        fprintf(fp, "                NULL,\n");};};
@@ -794,7 +795,7 @@ static void write_str(FILE *fp)
     fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
     Separator;
 
-    for (i = 0; i < N_PRIMITIVES; i++)
+    for (i = 0; i < N_TYPES; i++)
 	{if (types[i] != NULL)
 	    {if (i == I_BOOL)
 	        _SC_write_bool(fp, i);

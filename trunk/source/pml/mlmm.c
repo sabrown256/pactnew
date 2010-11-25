@@ -1606,7 +1606,7 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
 		SC_dereference(bf);
 
 		id = SC_type_id(bf, FALSE);
-		if ((SC_CHAR_I <= id) && (id <= SC_QUATERNION_I))
+		if (SC_is_type_num(id) == TRUE)
 		   {SC_VA_ARG_STORE(id, asc->cdr);}
 
                 else if (id == SC_STRING_I)

@@ -553,10 +553,12 @@ void SC_init_base_types(void)
        SC_PCONS_P_I               = SC_register_type(SC_PCONS_P_S,  szptr, NULL);
 
 /* aliases */
-    SC_ENUM_I    = SC_type_alias(SC_ENUM_S, SC_INT_I);
-    SC_INTEGER_I = SC_type_alias(SC_INTEGER_S, SC_INT_I);
-    SC_REAL_I    = SC_type_alias(SC_DOUBLE_S, SC_DOUBLE_I);
-    SC_REAL_P_I  = SC_type_alias(SC_DOUBLE_P_S, SC_DOUBLE_P_I);
+       SC_ENUM_I    = SC_type_alias(SC_ENUM_S, SC_INT_I);
+       SC_INTEGER_I = SC_type_alias(SC_INTEGER_S, SC_INT_I);
+       SC_REAL_I    = SC_type_alias(SC_DOUBLE_S, SC_DOUBLE_I);
+       SC_REAL_P_I  = SC_type_alias(SC_DOUBLE_P_S, SC_DOUBLE_P_I);
+
+       _SC_set_format_defaults();
 
     END_SAFE;
 
@@ -755,6 +757,24 @@ void _SC_set_format_defaults(void)
 
 /* fmts is used for scalars */
 
+    if (fmts[SC_BIT_I] != NULL)
+       SFREE(fmts[SC_BIT_I]);
+
+    t = SC_strsavef("%x", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
+    fmts[SC_BIT_I] = t;
+
+    if (fmts[SC_BOOL_I] != NULL)
+       SFREE(fmts[SC_BOOL_I]);
+
+    t = SC_strsavef("%s", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
+    fmts[SC_BOOL_I] = t;
+
+    if (fmts[SC_CHAR_I] != NULL)
+       SFREE(fmts[SC_CHAR_I]);
+
+    t = SC_strsavef("%c", "char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
+    fmts[SC_CHAR_I] = t;
+
 /* fixed point types (proper) */
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         {id = i + SC_SHORT_I;
@@ -802,26 +822,14 @@ void _SC_set_format_defaults(void)
 	 fmts[id] = t;};
 
 /* other primitive types */
-    if (fmts[SC_CHAR_I] != NULL)
-       SFREE(fmts[SC_CHAR_I]);
+    if (fmts[SC_STRING_I] != NULL)
+       SFREE(fmts[SC_STRING_I]);
 
-    t = SC_strsavef("%c", "char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
-    fmts[SC_CHAR_I] = t;
-
-    if (fmts[SC_BIT_I] != NULL)
-       SFREE(fmts[SC_BIT_I]);
-
-    t = SC_strsavef("%x", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
-    fmts[SC_BIT_I] = t;
-
-    if (fmts[SC_BOOL_I] != NULL)
-       SFREE(fmts[SC_BOOL_I]);
-
-    t = SC_strsavef("%s", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
-    fmts[SC_BOOL_I] = t;
+    t = SC_strsavef("%s", "char*:_SC_SET_FORMAT_DEFAULTS:format1(string)");
+    fmts[SC_STRING_I] = t;
 
 /* fmta is used for arrays */
-    for (i = 0; i < N_PRIMITIVES; i++)
+    for (i = 0; i < N_TYPES; i++)
         {if (fmta[i] != NULL)
             SFREE(fmta[i]);
 

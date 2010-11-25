@@ -705,9 +705,9 @@ void PG_rl_device(PG_device *dev)
 
 PG_font_family *PG_make_font_family(PG_device *dev, char *name,
                                     PG_font_family *next, int n, ...)
-   {PG_font_family *f;
-    int i;
-    char **fs;
+   {int i;
+    char *ft, **fs;
+    PG_font_family *f;
 
     f  = FMAKE(PG_font_family, "PG_MAKE_FONT_FAMILY:f");
     fs = FMAKE_N(char *, n, "PG_MAKE_FONT_FAMILY:fs");
@@ -715,13 +715,12 @@ PG_font_family *PG_make_font_family(PG_device *dev, char *name,
     SC_VA_START(n);
 
     for (i = 0; i < n; i++)
-        fs[i] = SC_strsavef(SC_VA_ARG(char *),
-                "char*:PG_MAKE_FONT_FAMILY:fs");
+        {ft    = SC_VA_ARG(char *);
+	 fs[i] = SC_strsavef(ft, "char*:PG_MAKE_FONT_FAMILY:fs");};
 
     SC_VA_END;
 
-    f->type_face   = SC_strsavef(name,
-                     "char*:PG_MAKE_FONT_FAMILY:name");
+    f->type_face   = SC_strsavef(name, "char*:PG_MAKE_FONT_FAMILY:name");
     f->n_styles    = n;
     f->type_styles = fs;
     f->next        = next;

@@ -30,7 +30,8 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 #define N_PRIMITIVE_FP    3
 #define N_PRIMITIVE_CPX   3
 #define N_PRIMITIVE_QUT   1
-#define N_PRIMITIVES     16
+#define N_PRIMITIVES     16   /* up through SC_POINTER_I */
+#define N_TYPES          18   /* up through SC_STRING_I */
 
 /*--------------------------------------------------------------------------*/
 
@@ -48,7 +49,7 @@ FUNCTION_POINTER(double, *(*PFPREAL));
  */
 
 #define SC_VA_ARG_FETCH(_did, _d, _sid)                                      \
-    {char _v[MAXLINE];                                                       \
+    {char _v[MAX_PRSZ];                                                      \
      SC_VA_ARG_ID(_sid, _v, 0);                                              \
      SC_convert_id(_did, _d, 0, _sid, _v, 0, 1, 1, FALSE);}
 
@@ -120,11 +121,11 @@ struct s_SC_type_manager
     char *cpxtyp[N_PRIMITIVE_FP];
     char *quttyp[N_PRIMITIVE_FP];
 
-    char *formats[N_PRIMITIVES];
-    char *formata[N_PRIMITIVES];
+    char *formats[N_TYPES];
+    char *formata[N_TYPES];
 
-    char *user_formats[N_PRIMITIVES];
-    char *user_formata[N_PRIMITIVES];
+    char *user_formats[N_TYPES];
+    char *user_formata[N_TYPES];
 
     char *suppress_member;
 
