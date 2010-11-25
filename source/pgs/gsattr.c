@@ -671,10 +671,10 @@ int PG_get_attrs_glb(int dflt, ...)
 /* PG_SET_ATTRS_GLB - set global PGS attributes */
 
 int PG_set_attrs_glb(int dflt, ...)
-   {int n, id, iv;
-    double dv;
-    char *typ, *name, *sv;
-    void *pvi, *pvo;
+   {int n, id;
+    char pvi[MAX_PRSZ];
+    char *typ, *name;
+    void *pvo;
     haelem *hp;
 
     PG_setup_attrs_glb();
@@ -694,15 +694,7 @@ int PG_set_attrs_glb(int dflt, ...)
 	     pvo = hp->def;
 	     id  = SC_type_id(typ, FALSE);
 
-	     if (id == SC_INT_I)
-	        {iv  = SC_VA_ARG(int);
-		 pvi = &iv;}
-	     else if (id == SC_DOUBLE_I)
-	        {dv  = SC_VA_ARG(double);
-		 pvi = &dv;}
-	     else if (id == SC_STRING_I)
-	        {sv  = SC_VA_ARG(char *);
-		 pvi = &sv;};
+	     SC_VA_ARG_ID(id, pvi, 0);
 
 	     _PG_ptr_attr_set(typ, pvo, pvi);};};
 

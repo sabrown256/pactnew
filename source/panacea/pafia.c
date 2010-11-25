@@ -109,7 +109,7 @@ FIXNUM F77_FUNC(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
     n    = *pn;
     size = 1L;
     for (i = 0L; i < n; i++)
-        {dim = SC_VA_ARG(FIXNUM *);
+        {dim   = SC_VA_ARG(FIXNUM *);
          size *= *dim;};
 
     SC_VA_END;

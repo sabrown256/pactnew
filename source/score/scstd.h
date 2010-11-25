@@ -142,6 +142,9 @@
 # define SEEK_END 2
 #endif
 
+#undef MAX_PRSZ
+#define MAX_PRSZ    4*sizeof(long double)
+
 #undef MAXLINE
 #define MAXLINE 255
 

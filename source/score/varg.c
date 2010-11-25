@@ -13,7 +13,8 @@
 
 #define I_FLOAT       10    /* index of last floating point type */
 #define I_COMPLEX     13    /* index of last complex floating point type */
-#define N_PRIMITIVES  16
+#define N_PRIMITIVES  16    /* up through SC_POINTER_I */
+#define N_TYPES       18    /* up through SC_STRING_I */
 
 #define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
 
@@ -23,13 +24,13 @@ static char
 	      "float", "double", "long double",
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
-	      "quaternion", "void *" },
+	      "quaternion", "void *", NULL, "char *"},
  *promo[] = { NULL, NULL, "int", "int",
 	      "int", "int", "long", "long long",
 	      "double", "double", "long double",
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
-	      "quaternion", "void *" };
+	      "quaternion", "void *", NULL, "char *"};
 
 /*--------------------------------------------------------------------------*/
 
@@ -86,13 +87,15 @@ static void write_args(FILE *fp)
 
     fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
     fprintf(fp, "   {int _lid;                                        \\\n");
-    fprintf(fp, "    if (SC_is_type_ptr(_id) == TRUE)                 \\\n");
+    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
+    fprintf(fp, "       _lid = _id;                                   \\\n");
+    fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
     fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
     fprintf(fp, "    else                                             \\\n");
     fprintf(fp, "       _lid = _id;                                   \\\n");
     fprintf(fp, "    switch (_lid) {                                  \\\n");
 
-    for (i = 0; i < N_PRIMITIVES; i++)
+    for (i = 0; i < N_TYPES; i++)
         {ng = ((types[i] == NULL) ||
 	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
 	 if (ng == FALSE)
