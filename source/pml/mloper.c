@@ -562,9 +562,12 @@ static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
  *                    - this is used to initialize a cycle
  */
 
-C_array *PM_accumulate_oper(double (*fnc)(double x, double y), C_array *acc,
+C_array *PM_accumulate_oper(PFVoid *proc, C_array *acc,
 			    C_array *operand, double val)
    {int n;
+    PFDoubledd fnc;
+
+    fnc = (PFDoubledd) proc[0];
 
     if (acc == NULL)
        {if (operand != NULL)

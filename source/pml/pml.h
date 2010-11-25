@@ -1196,7 +1196,7 @@ extern int
  PM_set_equal(PM_set *a, PM_set *b, double tol);
 
 extern C_array
- *PM_accumulate_oper(double (*fnc)(double x, double y), C_array *acc,
+ *PM_accumulate_oper(PFVoid *proc, C_array *acc,
 		     C_array *operand, double val);
 
 

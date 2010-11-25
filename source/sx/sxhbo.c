@@ -10,8 +10,6 @@
  
 #include "sx_int.h"
 
-typedef double (*PF_double_dd)(double, double);
-
 double
  SX_interp_scale    = 1.1,
  SX_interp_strength = 0.0,
@@ -20,20 +18,22 @@ double
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_BINARY_ARR - the binary array operator handler
- *               - all arrays required to be same size
- *               - first cut all arrays required to be same type
+/* _SX_BINARY_ARR - the binary array operator handler
+ *                - all arrays required to be same size
+ *                - first cut all arrays required to be same type
  */
 
-object *SX_binary_arr(PFVoid proc, object *argl)
+static object *_SX_binary_arr(C_procedure *cp, object *argl)
    {int n, ident;
     double val;
     char *otyp;
-    PF_double_dd fnc;
+    PFVoid *proc;
+    PFDoubledd fnc;
     C_array *reta, *operand, *acc;
     object *obj, *al, *rv;
 
-    fnc   = (PF_double_dd) proc;
+    proc  = (PFVoid *) cp->proc;
+    fnc   = (PFDoubledd) proc[0];
     ident = 1;
     reta  = NULL;
 
@@ -58,7 +58,7 @@ object *SX_binary_arr(PFVoid proc, object *argl)
 	     break;};};
 
     if (otyp == NULL)
-       SS_error("NO ARRAY - SX_BINARY_ARR", argl);
+       SS_error("NO ARRAY - _SX_BINARY_ARR", argl);
 
 /* accumulate the results */
     acc = NULL;
@@ -76,9 +76,9 @@ object *SX_binary_arr(PFVoid proc, object *argl)
 	 else if (SS_integerp(obj))
 	    val = SS_INTEGER_VALUE(obj);
 
-	 acc = PM_accumulate_oper(fnc, acc, operand, val);
+	 acc = PM_accumulate_oper(proc, acc, operand, val);
 	 if (acc == NULL)
-	    SS_error("OBJECT DRIVEN FAILURE - SX_BINARY_ARR", obj);};
+	    SS_error("OBJECT DRIVEN FAILURE - _SX_BINARY_ARR", obj);};
 
     PM_conv_array(reta, acc, TRUE);
 
@@ -580,7 +580,7 @@ PM_mapping *SX_build_return_mapping(PM_mapping *h, char *label,
  *                      - using the specified function
  */
 
-static void _SX_accumulate_range(PM_mapping *d, object *argl, PF_double_dd fnc)
+static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
    {int i, dnde, ne;
     char *dty;
     double **tre;
@@ -632,7 +632,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PF_double_dd fnc)
 	      else
 		 operand.data = NULL;
 
-	      acc[i] = PM_accumulate_oper(fnc, acc[i], &operand, val);
+	      acc[i] = PM_accumulate_oper(proc, acc[i], &operand, val);
 	      if (acc[i] == NULL)
 	         SS_error("OBJECT DRIVEN FAILURE - _SX_ACCUMULATE_RANGE",
 			  obj);};
@@ -670,7 +670,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PF_double_dd fnc)
 object *_SX_mh_b_s(C_procedure *cp, object *argl)
    {int plf;
     char label[MAXLINE+1];
-    PF_double_dd fnc;
+    PFVoid *proc;
     PM_mapping *f, *h;
     object *first, *mo;
 
@@ -679,11 +679,11 @@ object *_SX_mh_b_s(C_procedure *cp, object *argl)
        mo = SS_binary_homogeneous(cp, argl);
 
     else if (SX_NUMERIC_ARRAYP(first))
-       mo = SX_binary_arr(cp->proc[0], argl);
+       mo = _SX_binary_arr(cp, argl);
 
     else
-       {fnc = (PF_double_dd) cp->proc[0];
-	plf = SX_have_display_list();
+       {proc = cp->proc;
+	plf  = SX_have_display_list();
 
 	_SX_map_list_label(label, argl);
 
@@ -692,7 +692,7 @@ object *_SX_mh_b_s(C_procedure *cp, object *argl)
 	f = SX_build_return_mapping(h, label, NULL, FALSE, FALSE);
 	_SX_unlink_mappings(h);
 
-	_SX_accumulate_range(f, argl, fnc);
+	_SX_accumulate_range(f, argl, proc);
 
 	SX_plot_flag = TRUE;
 
