@@ -25,6 +25,22 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
+typedef double          (*PFDoubled)(double);
+typedef double          (*PFDoubledd)(double, double);
+
+typedef double _Complex (*PFComplexc)(double _Complex);
+typedef double _Complex (*PFComplexcc)(double _Complex, double _Complex);
+typedef double _Complex (*PFComplexcd)(double _Complex, double);
+
+typedef quaternion      (*PFQuaternionq)(quaternion);
+typedef quaternion      (*PFQuaternionqq)(quaternion, quaternion);
+typedef quaternion      (*PFQuaternionqd)(quaternion, double);
+
+typedef int             (*PFIntd)(double);
+typedef int             (*PFIntdd)(double, double);
+typedef BIGINT          (*PFBIGINTB)(BIGINT);
+typedef BIGINT          (*PFBIGINTBB)(BIGINT, BIGINT);
+
 typedef struct s_PM_state PM_state;
 typedef struct s_PM_smp_state PM_smp_state;
 

@@ -100,6 +100,40 @@
         memcpy(*(_o), _ta->array, (*(_no))*sizeof(int));                     \
         SC_free_array(_ta, NULL);};}
 
+#define FIND_VALUE_TUPLE(type, _ipt, nx, x, prd, val, _no, _o, _ni, _in)     \
+   {int _i, _init;                                                           \
+    long _ne;                                                                \
+    type *_f;                                                                \
+    SC_array *_ta;                                                           \
+    double _u, _v;                                                           \
+    _init = FALSE;                                                           \
+    _f    = (type *) (x);                                                    \
+    _v    = (val);                                                           \
+    *_no  = 0;                                                               \
+    if ((_ni > 0) && (_in != NULL))                                          \
+       {_ne = (_ipt)*(_ni);                                                  \
+        for (_i = 0; _i < _ne; _i++)                                         \
+            {_u = (double) (_f[_in[_i]]);                                    \
+             if ((*prd)(_u, _v))                                             \
+                {if (!_init)                                                 \
+                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE_TUPLE", int, NULL);   \
+                     _init = TRUE;}                                          \
+                 SC_array_push(_ta, (_in)+(_i));};};}                        \
+    else                                                                     \
+       {_ne = (_ipt)*(nx);                                                   \
+        for (_i = 0; _i < _ne; _i++)                                         \
+            {_u = (double) (_f[_i]);                                         \
+             if ((*prd)(_u, _v))                                             \
+                {if (_init == FALSE)                                         \
+                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE_TUPLE", int, NULL);   \
+                     _init = TRUE;}                                          \
+                 SC_array_push(_ta, &(_i));};};}                             \
+    if (_init == TRUE)                                                       \
+       {*(_no) = SC_array_get_n(_ta);                                        \
+        *(_o)  = FMAKE_N(int, *_no, "FIND_VALUE_TUPLE:_o");                  \
+        memcpy(*(_o), _ta->array, (*(_no))*sizeof(int));                     \
+        SC_free_array(_ta, NULL);};}
+
 SC_THREAD_LOCK(PM_search_lock); /* Lock around initialization */
 
 /*--------------------------------------------------------------------------*/
@@ -114,17 +148,10 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
 
     type = SC_arrtype(p, -1);
 
-/* floating point types */
-    if (type == SC_FLOAT_I)
-       {MIN_MAX(float, p, n, pn, px, imin, imax, FLT_MAX);}
+    if (type == SC_CHAR_I)
+       {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
 
-    else if (type == SC_DOUBLE_I)
-       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);}
-
-    else if (type == SC_LONG_DOUBLE_I)
-       {MIN_MAX(long double, p, n, pn, px, imin, imax, LDBL_MAX);}
-
-/* fixed point types */
+/* fixed point types (ok) */
     else if (type == SC_SHORT_I)
        {MIN_MAX(short, p, n, pn, px, imin, imax, SHRT_MAX);}
 
@@ -137,8 +164,15 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
     else if (type == SC_LONG_LONG_I)
        {MIN_MAX(long long, p, n, pn, px, imin, imax, LONG_MAX);}
 
-    else if (type == SC_CHAR_I)
-       {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
+/* floating point types (ok) */
+    else if (type == SC_FLOAT_I)
+       {MIN_MAX(float, p, n, pn, px, imin, imax, FLT_MAX);}
+
+    else if (type == SC_DOUBLE_I)
+       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);}
+
+    else if (type == SC_LONG_DOUBLE_I)
+       {MIN_MAX(long double, p, n, pn, px, imin, imax, LDBL_MAX);}
 
     else
        {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);};
@@ -228,8 +262,11 @@ int PM_find_index(void *p, double f, int n)
 
     type = SC_arrtype(p, -1);
 
-/* fixed point types */
-    if (type == SC_SHORT_I)
+    if (type == SC_CHAR_I)
+       {FIND_INDEX(char, p, f, n, indx);}
+
+/* fixed point types (ok) */
+    else if (type == SC_SHORT_I)
        {FIND_INDEX(short, p, f, n, indx);}
 
     else if (type == SC_INT_I)
@@ -241,7 +278,7 @@ int PM_find_index(void *p, double f, int n)
     else if (type == SC_LONG_LONG_I)
        {FIND_INDEX(long long, p, f, n, indx);}
 
-/* floating point types */
+/* floating point types (ok) */
     else if (type == SC_FLOAT_I)
        {FIND_INDEX(float, p, f, n, indx);}
 
@@ -250,9 +287,6 @@ int PM_find_index(void *p, double f, int n)
 
     else if (type == SC_LONG_DOUBLE_I)
        {FIND_INDEX(long double, p, f, n, indx);}
-
-    else if (type == SC_CHAR_I)
-       {FIND_INDEX(char, p, f, n, indx);}
 
     else
        {FIND_INDEX(double, p, f, n, indx);};
@@ -511,25 +545,45 @@ int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
 
     id = SC_type_id(type, FALSE);
 
-/* floating point types */
-    if (id == SC_DOUBLE_I)
-       {FIND_VALUE(double, nx, x, prd, val, nout, out, nin, in);}
+    if (id == SC_CHAR_I)
+       {FIND_VALUE(char, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (id == SC_FLOAT_I)
-       {FIND_VALUE(float, nx, x, prd, val, nout, out, nin, in);}
+/* fixed point types (ok) */
+    else if (id == SC_SHORT_I)
+       {FIND_VALUE(short, nx, x, prd, val, nout, out, nin, in);}
 
-/* fixed point types */
     else if (id == SC_INT_I)
        {FIND_VALUE(int, nx, x, prd, val, nout, out, nin, in);}
 
     else if (id == SC_LONG_I)
        {FIND_VALUE(long, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (id == SC_SHORT_I)
-       {FIND_VALUE(short, nx, x, prd, val, nout, out, nin, in);}
+    else if (id == SC_LONG_LONG_I)
+       {FIND_VALUE(long long, nx, x, prd, val, nout, out, nin, in);}
 
-    else if (id == SC_CHAR_I)
-       {FIND_VALUE(char, nx, x, prd, val, nout, out, nin, in);}
+/* floating point types (ok) */
+    else if (id == SC_FLOAT_I)
+       {FIND_VALUE(float, nx, x, prd, val, nout, out, nin, in);}
+
+    else if (id == SC_DOUBLE_I)
+       {FIND_VALUE(double, nx, x, prd, val, nout, out, nin, in);}
+
+    else if (id == SC_LONG_DOUBLE_I)
+       {FIND_VALUE(long double, nx, x, prd, val, nout, out, nin, in);}
+
+/* complex floating point types (ok) */
+    else if (id == SC_FLOAT_COMPLEX_I)
+       {FIND_VALUE_TUPLE(float, 2, nx, x, prd, val, nout, out, nin, in);}
+
+    else if (id == SC_DOUBLE_COMPLEX_I)
+       {FIND_VALUE_TUPLE(double, 2, nx, x, prd, val, nout, out, nin, in);}
+
+    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
+       {FIND_VALUE_TUPLE(long double, 2, nx, x, prd, val, nout, out, nin, in);}
+
+/* quaternion floating point types (ok) */
+    else if (id == SC_QUATERNION_I)
+       {FIND_VALUE_TUPLE(double, 4, nx, x, prd, val, nout, out, nin, in);}
 
     else
        {*nout = -1;
