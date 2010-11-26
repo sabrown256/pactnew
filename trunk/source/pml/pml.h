@@ -1197,7 +1197,7 @@ extern int
 
 extern C_array
  *PM_accumulate_oper(PFVoid *proc, C_array *acc,
-		     C_array *operand, double val);
+		     C_array *operand, int id, void *val);
 
 
 /* MLRAND.C declarations */

@@ -502,55 +502,141 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
  *              - NOTE: ACC must be type double
  */
 
-static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
-			C_array *operand, double val)
+static int _PM_acc_oper(PFVoid *proc, C_array *acc,
+			C_array *operand, int id, void *val)
    {int i, n, ret, sid, did;
     char *styp, *dtyp;
     void *sa;
-    double *da;
 
     dtyp = acc->type;
-    da   = (double *) acc->data;
     did  = SC_deref_id(dtyp, TRUE);
-    if (did != SC_DOUBLE_I)
-       ret = FALSE;
 
-    else
-       {n   = acc->length;
-	ret = TRUE;
-	if (operand != NULL)
-	   {if ((operand->data != NULL) && (val == -HUGE))
-	       {styp = operand->type;
-		sa   = operand->data;
-		sid  = SC_deref_id(styp, TRUE);
+    ret = FALSE;
+    n   = acc->length;
+    if ((operand != NULL) && (operand->data != NULL) && (id == -1))
+       {styp = operand->type;
+	sa   = operand->data;
+	sid  = SC_deref_id(styp, TRUE);
 
-/* floating point types */
-		if (sid == SC_FLOAT_I)
-		   {_ACC_OPER(da, fnc, float, sa);}
-		else if (sid == SC_DOUBLE_I)
-		   {_ACC_OPER(da, fnc, double, sa);}
-		else if (sid == SC_LONG_DOUBLE_I)
-		   {_ACC_OPER(da, fnc, long double, sa);}
+/* fixed and floating point types (ok) */
+	if ((sid == SC_BOOL_I) ||
+	    (sid == SC_CHAR_I) ||
+	    (SC_is_type_fix(sid) == TRUE) ||
+	    (SC_is_type_fp(sid) == TRUE))
+	   {double *s, *da;
+	    PFDoubledd fnc;
 
-/* fixed point types */
-		else if (sid == SC_SHORT_I)
-		   {_ACC_OPER(da, fnc, short, sa);}
-		else if (sid == SC_INT_I)
-		   {_ACC_OPER(da, fnc, int, sa);}
-		else if (sid == SC_LONG_I)
-		   {_ACC_OPER(da, fnc, long, sa);}
-		else if (sid == SC_LONG_LONG_I)
-		   {_ACC_OPER(da, fnc, long long, sa);}
+	    da  = (double *) acc->data;
+	    fnc = (PFDoubledd) proc[0];
 
-		else if (sid == SC_CHAR_I)
-		   {_ACC_OPER(da, fnc, char, sa);};}
-	    								    
-	    else if ((operand->data == NULL) && (val != -HUGE))
-	       {for (i = 0; i < n; i++)
-		    da[i] = (*fnc)(da[i], val);};}
+	    s = SC_convert_id(did, NULL, 0, sid, sa, 0, 1, n, FALSE);
 
-	else
-	   ret = FALSE;};
+	    for (i = 0; i < n; i++)
+	        da[i] = fnc(da[i], s[i]);
+
+	    SFREE(s);
+
+	    ret = TRUE;}
+
+/* complex floating point types (ok) */
+	else if (SC_is_type_cx(sid) == TRUE)
+	   {double _Complex *s, *da;
+	    PFComplexcc fnc;
+
+	    da  = (double _Complex *) acc->data;
+	    fnc = (PFComplexcc) proc[1];
+
+	    s = SC_convert_id(did, NULL, 0, sid, sa, 0, 1, n, FALSE);
+
+	    for (i = 0; i < n; i++)
+	        da[i] = fnc(da[i], s[i]);
+
+	    SFREE(s);
+
+	    ret = TRUE;}
+
+	else if (sid == SC_QUATERNION_I)
+	   {quaternion *s, *da;
+	    PFQuaternionqq fnc;
+
+	    da  = (quaternion *) acc->data;
+	    fnc = (PFQuaternionqq) proc[2];
+
+	    s = SC_convert_id(did, NULL, 0, sid, sa, 0, 1, n, FALSE);
+
+	    for (i = 0; i < n; i++)
+	        da[i] = fnc(da[i], s[i]);
+
+	    SFREE(s);
+
+	    ret = TRUE;};}
+
+    else if (id != -1)
+       {styp = operand->type;
+	sa   = operand->data;
+	sid  = SC_deref_id(styp, TRUE);
+
+/* fixed and floating point types (ok) */
+	if ((sid == SC_BOOL_I) ||
+	    (sid == SC_CHAR_I) ||
+	    (SC_is_type_fix(sid) == TRUE) ||
+	    (SC_is_type_fp(sid) == TRUE))
+	   {double s, *da;
+	    PFDoubledd fnc;
+
+	    da  = (double *) acc->data;
+	    fnc = (PFDoubledd) proc[0];
+
+	    SC_convert_id(did, &s, 0, id, val, 0, 1, n, FALSE);
+
+	    for (i = 0; i < n; i++)
+	        da[i] = fnc(da[i], s);
+
+	    ret = TRUE;}
+
+/* complex floating point types (ok) */
+	else if (SC_is_type_cx(sid) == TRUE)
+	   {double _Complex s, *da;
+	    PFComplexcc fnc;
+
+	    da  = (double _Complex *) acc->data;
+	    fnc = (PFComplexcc) proc[1];
+
+	    SC_convert_id(did, &s, 0, id, val, 0, 1, 1, FALSE);
+
+	    for (i = 0; i < n; i++)
+	        da[i] = fnc(da[i], s);
+
+	    ret = TRUE;}
+
+	else if (sid == SC_QUATERNION_I)
+	   {quaternion s, *da;
+	    PFQuaternionqq fnc;
+
+	    da  = (quaternion *) acc->data;
+	    fnc = (PFQuaternionqq) proc[2];
+
+	    SC_convert_id(did, &s, 0, id, val, 0, 1, 1, FALSE);
+
+	    for (i = 0; i < n; i++)
+	        da[i] = fnc(da[i], s);
+
+	    ret = TRUE;};};
+#if 0
+
+       {double *da;
+	PFDoubledd fnc;
+
+	da  = (double *) acc->data;
+	fnc = (PFDoubledd) proc[0];
+
+	SC_convert_id(SC_DOUBLE_I, &d, 0, id, val, 0, 1, 1, FALSE);
+
+	for (i = 0; i < n; i++)
+	    da[i] = fnc(da[i], d);
+
+        ret = TRUE;};
+#endif
 
     return(ret);}
 
@@ -563,11 +649,8 @@ static int _PM_acc_oper(double (*fnc)(double x, double y), C_array *acc,
  */
 
 C_array *PM_accumulate_oper(PFVoid *proc, C_array *acc,
-			    C_array *operand, double val)
+			    C_array *operand, int id, void *val)
    {int n;
-    PFDoubledd fnc;
-
-    fnc = (PFDoubledd) proc[0];
 
     if (acc == NULL)
        {if (operand != NULL)
@@ -577,7 +660,7 @@ C_array *PM_accumulate_oper(PFVoid *proc, C_array *acc,
 	    PM_conv_array(acc, operand, FALSE);};}
 
     else
-       _PM_acc_oper(fnc, acc, operand, val);
+       _PM_acc_oper(proc, acc, operand, id, val);
 
     return(acc);}
 
