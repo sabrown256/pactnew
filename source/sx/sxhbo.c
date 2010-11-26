@@ -24,8 +24,8 @@ double
  */
 
 static object *_SX_binary_arr(C_procedure *cp, object *argl)
-   {int n, ident;
-    double val;
+   {int n, id, ident;
+    char v[MAX_PRSZ];
     char *otyp;
     PFVoid *proc;
     PFDoubledd fnc;
@@ -65,18 +65,16 @@ static object *_SX_binary_arr(C_procedure *cp, object *argl)
     for (al = argl; SS_consp(al); al = SS_cdr(al))
         {obj = SS_car(al);
 
-	 val     = -HUGE;
+	 id      = -1;
 	 operand = NULL;
 	 if (SX_NUMERIC_ARRAYP(obj))
 	    operand = NUMERIC_ARRAY(obj);
 
-	 else if (SS_floatp(obj))
-	    val = SS_FLOAT_VALUE(obj);
+	 else
+	    {id = SC_arrtype(obj, -1);
+	     _SS_object_to_numtype_id(id, v, 0, obj);};
 
-	 else if (SS_integerp(obj))
-	    val = SS_INTEGER_VALUE(obj);
-
-	 acc = PM_accumulate_oper(proc, acc, operand, val);
+	 acc = PM_accumulate_oper(proc, acc, operand, id, v);
 	 if (acc == NULL)
 	    SS_error("OBJECT DRIVEN FAILURE - _SX_BINARY_ARR", obj);};
 
@@ -581,10 +579,10 @@ PM_mapping *SX_build_return_mapping(PM_mapping *h, char *label,
  */
 
 static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
-   {int i, dnde, ne;
+   {int i, id, dnde, ne;
+    char v[MAX_PRSZ];
     char *dty;
     double **tre;
-    double val;
     void **dre;
     C_array operand, **acc;
     PM_set *dr, *dd, *sr;
@@ -610,7 +608,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
 /* accumulate the results */
     for (al = argl; SS_consp(al); )
         {tre = NULL;
-	 val = -HUGE;
+	 id  = -1;
 
 	 ps  = NULL;
 	 obj = NULL;
@@ -620,11 +618,9 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
 	    {sr  = ps->range;
 	     tre = _SX_accumulate_mapping(d, ps, FALSE);}
 
-	 else if (SS_floatp(obj))
-	    val = SS_FLOAT_VALUE(obj);
-
-	 else if (SS_integerp(obj))
-	    val = SS_INTEGER_VALUE(obj);
+	 else
+	    {id = SC_arrtype(obj, -1);
+	     _SS_object_to_numtype_id(id, v, 0, obj);};
 
 	 for (i = 0; i < dnde; i++)
 	     {if (tre != NULL)
@@ -632,7 +628,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
 	      else
 		 operand.data = NULL;
 
-	      acc[i] = PM_accumulate_oper(proc, acc[i], &operand, val);
+	      acc[i] = PM_accumulate_oper(proc, acc[i], &operand, id, v);
 	      if (acc[i] == NULL)
 	         SS_error("OBJECT DRIVEN FAILURE - _SX_ACCUMULATE_RANGE",
 			  obj);};
