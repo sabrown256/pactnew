@@ -51,7 +51,7 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 #define SC_VA_ARG_FETCH(_did, _d, _sid)                                      \
     {char _v[MAX_PRSZ];                                                      \
      SC_VA_ARG_ID(_sid, _v, 0);                                              \
-     SC_convert_id(_did, _d, 0, _sid, _v, 0, 1, 1, FALSE);}
+     SC_convert_id(_did, _d, 0, 1, _sid, _v, 0, 1, 1, FALSE);}
 
 /* SC_VA_ARG_STORE - store a value _S of type _ID to a the space pointed
  *                 - to by a pointer grabbed from SC_VA_ARG_ID
@@ -60,7 +60,7 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 #define SC_VA_ARG_STORE(_id, _s)                                             \
     {void *_v;                                                               \
      _v = SC_VA_ARG(void *);                                                 \
-     SC_convert_id(_id, _v, 0, _id, _s, 0, 1, 1, FALSE);}
+     SC_convert_id(_id, _v, 0, 1, _id, _s, 0, 1, 1, FALSE);}
 
 /* SC_VA_ARG_NTOS - convert a variable arg item to a string
  *                - NOTE: the variable arg item is read into a char array
@@ -293,10 +293,10 @@ extern char
  *SC_ntos(char *t, int nc, int id, void *s, long n, int mode);
 
 extern void
- *SC_convert_id(int did, void *d, long od,
+ *SC_convert_id(int did, void *d, long od, long sd,
 		int sid, void *s, long os, long ss,
 		long n, int flag),
- *SC_convert(char *dtype, void *d, long od,
+ *SC_convert(char *dtype, void *d, long od, long sd,
 	     char *stype, void *s, long os, long ss,
 	     long n, int flag);
 

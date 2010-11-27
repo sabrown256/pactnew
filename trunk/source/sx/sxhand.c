@@ -183,7 +183,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
         w[i] = (*fn)(w[i]);
 
 /* convert the data back to the correct type in D */
-    SC_convert_id(did, d, 0, SC_DOUBLE_I, w, 0, 1, n, FALSE);
+    SC_convert_id(did, d, 0, 1, SC_DOUBLE_I, w, 0, 1, n, FALSE);
 
     if (rel)
        SFREE(w);

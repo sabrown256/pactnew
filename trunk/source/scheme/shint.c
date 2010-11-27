@@ -88,7 +88,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
 	else
 	   SS_error("BAD OBJECT - _SS_FIX_ARG", obj);
 
-	SC_convert_id(type, v, 0, SC_LONG_LONG_I, &l, 0, 1, 1, FALSE);};
+	SC_convert_id(type, v, 0, 1, SC_LONG_LONG_I, &l, 0, 1, 1, FALSE);};
 
     return;}
 
@@ -138,7 +138,7 @@ static void _SS_float_arg(object *obj, void *v, int type)
 	else
 	   SS_error("BAD OBJECT - _SS_FLOAT_ARG", obj);
 
-	SC_convert_id(type, v, 0, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);};
+	SC_convert_id(type, v, 0, 1, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);};
 
     return;}
 
@@ -540,21 +540,24 @@ static object *_SS_make_list(int n, int *type, void **ptr)
 	 if (SC_is_type_fix(ityp) == TRUE)
 	    {long long v;
 
-	     SC_convert_id(SC_LONG_LONG_I, &v, 0, ityp, vl, 0, 1, 1, FALSE);
+	     SC_convert_id(SC_LONG_LONG_I, &v, 0, 1,
+			   ityp, vl, 0, 1, 1, FALSE);
 	     lst = SS_mk_cons(SS_mk_integer(v), lst);}
 
 /* floating point types (proper) */
 	 else if (SC_is_type_fp(ityp) == TRUE)
 	    {long double v;
 
-	     SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, ityp, vl, 0, 1, 1, FALSE);
+	     SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1,
+			   ityp, vl, 0, 1, 1, FALSE);
 	     lst = SS_mk_cons(SS_mk_float(v), lst);}
 
 /* complex floating point types (proper) */
 	 else if (SC_is_type_cx(ityp) == TRUE)
 	    {long double _Complex v;
 
-	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, ityp, vl, 0, 1, 1, FALSE);
+	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
+			   ityp, vl, 0, 1, 1, FALSE);
 	     lst = SS_mk_cons(SS_mk_complex(v), lst);}
  
 	 else if (ityp == SC_STRING_I)

@@ -230,11 +230,11 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
             afd[i] = (double *) afs[i];}
     else
        {for (i = 0; i < nd; i++)
-            afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0,
+            afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
 				   sid, afs[i], 0, 1, npts, FALSE);
 
         if (rexfl == TRUE)
-           rextr = SC_convert_id(SC_DOUBLE_I, NULL, 0,
+           rextr = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
 				 sid, range->extrema, 0, 1, 2*nd, FALSE);};
 
     PG_register_range_extrema(dev, nd, rextr);

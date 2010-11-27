@@ -1101,19 +1101,20 @@ object *_SS_numtype_to_object_id(int id, void *p, long n)
 /* fixed point types (proper) */
     if ((SC_is_type_fix(id) == TRUE) || (id == SC_CHAR_I))
        {long long v;
-	SC_convert_id(SC_LONG_LONG_I, &v, 0, id, p, n, 1, 1, FALSE);
+	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
 	o = SS_mk_integer(v);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(id) == TRUE)
        {long double v;
-	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, id, p, n, 1, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
 	o = SS_mk_float(v);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(id) == TRUE)
        {long double _Complex v;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, id, p, n, 1, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
+		      id, p, n, 1, 1, FALSE);
 	o = SS_mk_complex(v);}
 
     else if (id == SC_BOOL_I)
@@ -1247,23 +1248,27 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
         else
            rv = FALSE;
         if (rv == TRUE)
-	   SC_convert_id(vid, p, n, SC_DOUBLE_COMPLEX_I, &z, 0, 1, 1, FALSE);}
+	   SC_convert_id(vid, p, n, 1,
+			 SC_DOUBLE_COMPLEX_I, &z, 0, 1, 1, FALSE);}
 
     else if (SC_is_type_num(vid) == TRUE)
        {if ((num == TRUE) || (oid == SS_CHARACTER_I))
-	   SC_convert_id(vid, p, n, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);
+	   SC_convert_id(vid, p, n, 1,
+			 SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
         else if (oid == SC_DOUBLE_COMPLEX_I)
            {double _Complex z;
             z = SS_COMPLEX_VALUE(val);
 	    d = creal(z);
-	    SC_convert_id(vid, p, n, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
+	    SC_convert_id(vid, p, n, 1,
+			  SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
 
         else if (oid == SC_QUATERNION_I)
            {quaternion q;
             q = SS_QUATERNION_VALUE(val);
 	    d = q.s;
-	    SC_convert_id(vid, p, n, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
+	    SC_convert_id(vid, p, n, 1,
+			  SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);}
 
         else
            rv = FALSE;}

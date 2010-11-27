@@ -105,7 +105,7 @@ void PA_set_member(char *name, void *data, char *member)
         *ppc = (char *) data;}
 
     else if (SC_is_type_num(id) == TRUE)
-       SC_convert_id(id, addr.memaddr, 0, id, data, 0, 1, 1, FALSE);
+       SC_convert_id(id, addr.memaddr, 0, 1, id, data, 0, 1, 1, FALSE);
 
     return;}
 

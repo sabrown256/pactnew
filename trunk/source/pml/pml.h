@@ -151,7 +151,7 @@
         if (_i != NULL)                                                      \
            {_sid = SC_deref_id(_i->cdr_type, FALSE);                         \
 	    if (_sid == SC_STRING_I)                                         \
-	       {emap  = SC_convert_id(SC_CHAR_I, NULL, 0, _sid, emap, 0,     \
+	       {emap  = SC_convert_id(SC_CHAR_I, NULL, 0, 1, _sid, emap, 0,  \
                                       1, n, FALSE);                          \
 		eflag = TRUE;};};};}
 

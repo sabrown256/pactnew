@@ -31,6 +31,7 @@ MOD: 02/03/2010
 <li><a href="#score.toke">Tokenizers</a>
 <li><a href="#score.other">Other String Operations</a> 
 </ul>
+<li><a href="#score.type">Type Handling</a>
 <li><a href="#score.time">Time and Date Handling</a>
 <li><a href="#score.mem">Memory Management</a>
 <ul>
@@ -845,6 +846,308 @@ Count the occurrences of a specified character in a string.
 Replace contiguous blanks in a stirng with a single blank and remove
 leading and trailing blanks.
 <p>
+
+<!-------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------->
+
+<a name="score.type">
+<h3>Type Handling</h3>
+</a>
+
+Data types are not first class objects in C.  That means that you
+cannot pass a type specifier to a function.  This in turn precludes
+certain idioms and necessitates stamping out macro templates in order
+to operate on different data types.
+<p>
+In order to help out with this, SCORE maintains a type registry which
+is a hash array of data types and information describing them.  In the
+registry each data type that is registered is assigned in an integer
+identity.  With this in hand then, one can look up data types by name
+or by the index.
+<p>
+The standard C99 types are automatically registered. Specifically:
+<pre>
+    bool                 char
+    short                int                 long                    long long
+    float                double              long double
+    float _Complex       double _Complex     long double _Complex
+</pre>
+Many others are automatically registered as well.  SCORE provided
+variables containing the index and the names.  They are:
+<pre>
+       Integer ID                  String Name
+     SC_BOOL_I                   SC_BOOL_S
+     SC_CHAR_I                   SC_CHAR_S
+     SC_SHORT_I                  SC_SHORT_S
+     SC_INT_I                    SC_INT_S
+     SC_LONG_I                   SC_LONG_S
+     SC_LONG_LONG_I              SC_LONG_LONG_S
+     SC_FLOAT_I                  SC_FLOAT_S
+     SC_DOUBLE_I                 SC_DOUBLE_S
+     SC_LONG_DOUBLE_I            SC_LONG_DOUBLE_S
+     SC_FLOAT_COMPLEX_I          SC_FLOAT_COMPLEX_S
+     SC_DOUBLE_COMPLEX_I         SC_DOUBLE_COMPLEX_S
+     SC_LONG_DOUBLE_COMPLEX_I    SC_LONG_DOUBLE_COMPLEX_S
+     SC_POINTER_I                SC_POINTER_S
+     SC_STRING_I                 SC_STRING_S
+     SC_VOID_I                   SC_VOID_S
+</pre>
+
+With the identification of types with C objects which can be passed
+to functions it is possible to handle certain common situations with
+one function call rather than a decision tree and a collection of
+macros.
+<p>
+The type manager functions provided are:
+
+<pre>
+<I>C Binding: </I>int SC_register_type(char *name, int bpi, ...)
+</pre>
+
+Registers the type specified by NAME.  The size of the type in bytes
+is BPI.  No other arguments are processed at present, in future,
+key/value pairs may be provided to add other descriptive information
+of the type.  The integer id for the newly registered type is returned
+if successful. Otherwise -1 is returned.
+<p>
+
+<pre>
+<I>C Binding: </I>int SC_type_alias(char *name, int id)
+</pre>
+
+Sometimes you want to refer to a type by more than one name.  For
+example, SC_ENUM_I is an alias for SC_INT_I (since C enums are
+implemented as ints).  The name of the new type is given in NAME and
+the id of the existing type is given in ID.
+<p>
+
+<pre>
+<I>C Binding: </I>int SC_type_id(char *name, int unsg)
+</pre>
+<pre>
+<I>C Binding: </I>char *SC_type_name(int id)
+</pre>
+
+These two functions are the way to lookup types.  The first returns
+the integer id given the name.  The second returns the name given the
+id.  The UNSG argument looks for the "unsigned" qualifier if TRUE.
+Unsigned types do not differ from signed types as far as the type
+manager is concerned.
+<p>
+
+<pre>
+<I>C Binding: </I>int SC_fix_type_id(char *name, int unsg)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_fp_type_id(char *name)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_cx_type_id(char *name)
+</pre>
+
+These functions are provided with specific knowledge of just the
+standard C99 types.  SC_fix_type returns the id of the type specified
+by NAME only if it is a fixed point type: short, int, long, or long long.
+SC_fp_type_id returns the id of the type speicified by NAME only if
+it is a floating point type: float, double, or long double. Finally,
+SC_cx_type_id returns the id the the type specified by NAME only if
+it is a complex type: float _Complex, double _Complex, long double _Complex.
+These all return -1 if the type is not of the requested kind.
+<p>
+
+<pre>
+<I>C Binding: </I>int SC_is_type_fix(int id)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_is_type_fp(int id)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_is_type_cx(int id)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_is_type_num(int id)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_is_type_ptr(int id)
+</pre>
+
+These functions are provided with specific knowledge of just the
+standard C99 types.  SC_is_type_fix returns TRUE if the type ID is
+a fixed point type: short, int, long, or long long.
+SC_is_type_fp returns TRUE if type ID is a floating point
+type: float, double, or long double.
+SC_is_type_cx returns TRUE if type ID is a complex
+type: float _Complex, double _Complex, long double _Complex.
+SC_is_type_num returns TRUE if type ID is a any of the above mention
+numeric types.
+SC_is_type_ptr returns TRUE if type ID is a any pointer type.
+These all return FALSE if the type is not of the requested kind.
+<p>
+
+<pre>
+<I>C Binding: </I>int SC_type_size_i(int id)
+</pre>
+<pre>
+<I>C Binding: </I>int SC_type_size_a(char *name)
+</pre>
+
+These return the size in bytes of the specified type.  They are
+analogous to the sizeof operator.
+<p>
+
+<pre>
+<I>C Binding: </I>int SC_deref_id(char *name, int base)
+</pre>
+<pre>
+<I>C Binding: </I>char *SC_dereference(char *name)
+</pre>
+
+These functions "dereference" the type specified in NAME by removing
+the last '*' in the string if it exists.  If BASE is TRUE all
+'*' are removed and the id of the base type is returned.
+<p>
+
+<pre>
+<I>C Binding: </I>void *SC_convert_id(int did, void *d, long od, long sd,
+		    int sid, void *s, long os, long ss,
+		    long n, int flag)
+</pre>
+<pre>
+<I>C Binding: </I>void *SC_convert(char *dtype, void *d, long od, long sd,
+		 char *stype, void *s, long os, long ss,
+		 long n, int flag)
+</pre>
+
+These functions convert arrays of data from one type to another. They
+differ in that SC_convert specifies the types by name and SC_convert_id
+specifies the types by id.  The arguments are:
+<pre>
+   DID/DTYPE  the destination type    
+   D          a pointer to the destination data
+   OD         an offset from the start of D
+   SD         a stride thru D
+   SID        the source type
+   S          a pointer to the source data
+   OS         an offset from the start of S
+   SS         a stride thru S
+   N          the number of elements to convert
+   FLAG       if TRUE the source array is freed with SFREE
+</pre>
+If D is NULL a new space of the apropriate size will be allocated
+and returned.
+The return if the space D.
+<p>
+
+<pre>
+<I>C Binding: </I>char *SC_ntos(char *t, int nc, int id, void *s, long n, int mode)
+</pre>
+
+This function renders the Nth data item of type ID in S as a string.  The
+result goes into the buffer T which is NC characters long.  The format
+specifications can be set by the application.  The values of MODE can be
+1 or 2.  Mode 1 is for single values per line, mode 2 is used when printing
+multiple values per line.
+<p>
+
+<pre>
+<I>C Macro: </I>SC_TYPEOF(type)
+</pre>
+
+This returns the type id associated with the type TYPE.
+<p>
+
+<pre>
+<I>C Macro: </I>SC_VA_ARG_FETCH(did, d, sid)
+</pre>
+
+This converts a variable arg item of type SID to an item of type index DID
+and places the results in D.
+<p>
+Example:
+<pre>
+   int *get(int n, ...)
+      {int id;
+       int *a;
+       char *name;
+
+       SC_VA_START(n);
+
+       a = MAKE_N(int, n);
+
+       while ((id = SC_VA_ARG(int)) != -1)
+          {if (SC_is_type_num(id) == TRUE)
+	      {SC_VA_ARG_FETCH(SC_INT_I, a+i, id);};};
+
+       SC_VA_END;
+
+       return(a);}
+
+   int *a;
+
+   a = get(0, SC_INT_I, 3, SC_LONG_I, 4, SC_DOUBLE_I, 5.0, -1);
+
+</pre>
+
+<pre>
+<I>C Macro: </I>SC_VA_ARG_STORE(id, s)
+</pre>
+
+This stores a value S of type ID to a the space pointed to by the pointer
+obtained from the variable arg list.
+<p>
+Example:
+<pre>
+
+   void set(int n, ...)
+      {int id;
+       char *name;
+       void *v;
+
+       SC_VA_START(n);
+
+       while ((id = SC_VA_ARG(int)) != -1)
+         {v = SC_VA_ARG(void *);
+          if (SC_is_type_num(id) == TRUE)
+	     {SC_VA_ARG_STORE(id, v);};};
+
+       SC_VA_END;
+
+       return;}
+
+   int a;
+   long b;
+   double c;
+
+   set(0, SC_INT_I, &a, 3, SC_LONG_I, &b, 4, SC_DOUBLE_I, &c, 5.0, -1);
+
+</pre>
+
+
+<pre>
+<I>C Macro: </I>SC_VA_ARG_NTOS(s, nc, id)
+</pre>
+
+This renders a variable arg item of type ID to a string S
+of NC characters length.
+<p>
+
+Example:
+<pre>
+   void show(int n, ...)
+      {int id;
+       char bf[100];
+
+       SC_VA_START(n);
+
+       while ((id = SC_VA_ARG(int)) != -1)
+         {if (SC_is_type_num(id) == TRUE)
+	     {SC_VA_ARG_NTOS(bf, 100, id);
+	      fputs(bf, stdout);};};
+
+       SC_VA_END;
+
+       return;}
+</pre>
 
 <!-------------------------------------------------------------------------->
 <!-------------------------------------------------------------------------->

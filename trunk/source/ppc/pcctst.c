@@ -49,7 +49,8 @@ static void send_binary(long nitems, char *type)
 	for (i = 0L; i < nitems; i++)
 	    src[i] = (double) i;
 
-	space = SC_convert_id(did, NULL, 0, SC_DOUBLE_I, src, 0, 1, nitems, TRUE);
+	space = SC_convert_id(did, NULL, 0, 1,
+			      SC_DOUBLE_I, src, 0, 1, nitems, TRUE);
 
 	if (PC_write(space, type, nitems, pp))
 	   printf("Binary data sent: %s %ld\n",

@@ -896,7 +896,7 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
                   ps   += incr;
 
                   pd = &crve[j][k];
-                  SC_convert_id(SC_DOUBLE_I, pd, 0, sid, ps, 0, 1, 1, FALSE);
+                  SC_convert_id(SC_DOUBLE_I, pd, 0, 1, sid, ps, 0, 1, 1, FALSE);
 
 /* increment to the next member */
                   offs += bpm;
@@ -905,7 +905,8 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
     else
        {sid  = SC_type_id(mix, FALSE);
         ns   = (nrd - na)*nv;
-        data = SC_convert_id(SC_DOUBLE_I, NULL, 0, sid, stripe, 0, 1, ns, FALSE);
+        data = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1,
+			     sid, stripe, 0, 1, ns, FALSE);
 
         pd = data;
         for (k = na; k < nrd; k++)

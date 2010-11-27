@@ -157,7 +157,7 @@ static void *_PA_cpp_data(int alloc, char *name0, char *group,
        {if (SC_is_type_ptr(itype) == TRUE)
 	   data = *(void **) v;
 	else
-	   data = SC_convert_id(itype, NULL, 0, itype, v, 0, 1, 1, FALSE);};
+	   data = SC_convert_id(itype, NULL, 0, 1, itype, v, 0, 1, 1, FALSE);};
   
     SC_VA_RESTORE(input);
 
