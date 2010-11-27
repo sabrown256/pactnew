@@ -33,7 +33,7 @@ void
  *               - a number via a union
  */
 
-BIGINT _SC_to_number(void *a)
+int64_t _SC_to_number(void *a)
    {int64_t rv;
     SC_address ad;
 
@@ -52,7 +52,7 @@ BIGINT _SC_to_number(void *a)
  *                - an address via a union
  */
 
-void *_SC_to_address(BIGINT a)
+void *_SC_to_address(int64_t a)
    {void *rv;
     SC_address ad;
 
@@ -97,7 +97,7 @@ SC_address _SC_set_mem_addr(void *x)
 
 /* _SC_SET_DISK_ADDR - convert a disk address to a number via a union */
 
-SC_address _SC_set_disk_addr(BIGINT x)
+SC_address _SC_set_disk_addr(int64_t x)
    {SC_address ad;
 
 /* in case memaddr is larger than diskaddr */
@@ -157,7 +157,7 @@ void SC_type_container(char *dtype, char *stype)
  *            - return TRUE iff NB is smaller than sizeof(int64_t)
  */
 
-int SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx)
+int SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx)
    {int i, rv;
     int64_t imn, imx, uimx;
 

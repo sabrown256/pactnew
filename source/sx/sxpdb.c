@@ -42,7 +42,7 @@ static void _SX_target(int data, int align)
        {while (PD_std_standards[data_max++]);
         if ((data < 1) || (data >= data_max))
            SS_error("UNKNOWN DATA STANDARD - _SX_TARGET",
-                    SS_mk_integer((long long) data));};
+                    SS_mk_integer(data));};
         
     if (align == 0)
        {if (REQ_ALIGNMENT != NULL)
@@ -51,7 +51,7 @@ static void _SX_target(int data, int align)
        {while (PD_std_alignments[align_max++]);
        if ((align < 1) || (align >= align_max))
           SS_error("UNKNOWN DATA ALIGNMENT - _SX_TARGET",
-                   SS_mk_integer((long long) align));};
+                   SS_mk_integer(align));};
 
     if (data != 0)
        REQ_STANDARD  = PD_std_standards[data - 1];
@@ -86,8 +86,8 @@ static object *_SXI_target(object *arg)
 
     _SX_target(data, align);
 
-    o = SS_mk_cons(SS_mk_integer((long long) data),
-		   SS_mk_integer((long long) align));
+    o = SS_mk_cons(SS_mk_integer(data),
+		   SS_mk_integer(align));
 
     return(o);}
 
@@ -186,7 +186,7 @@ static object *_SXI_open_raw_file(object *argl)
 
 static object *_SXI_seek_raw_file(object *argl)
    {int whence, ret;
-    long long addr;
+    int64_t addr;
     PDBfile *file;
     FILE *fp;
     g_file *po;
@@ -806,7 +806,7 @@ static object *_SXI_entry_number(object *argl)
     if (name != NULL)
        {ep = _PD_effective_ep(file, name, TRUE, NULL);
         if (ep != NULL)
-	   obj = SS_mk_integer((long long) PD_entry_number(ep));};
+	   obj = SS_mk_integer(PD_entry_number(ep));};
 
     return(obj);}
 
@@ -908,20 +908,20 @@ static object *_SXI_file_content(object *argl)
 
 /* _SXI_FILE_INFO - return the named info about the file
  *                - available info is:
- *                -    name (char *)               - file name
- *                -    mode (int)                  - file mode
- *                -    default-offset (int)        - index default offset
- *                -    conversions (int)           - whether conversions will be done
- *                -    flushed (int)               - whether file has been flushed
- *                -    virtual-internal (int)      - whether file is "internal"
- *                -    system-version (int)        - PDB system version
- *                -    major-order (int)           - major order for indexes
- *                -    header-address (long long)      - address of header info
- *                -    chart-address (long long)       - address of structure chart
- *                -    symbol-table-address (long long)- address of symbol table
- *                -    date (char *)               - file creation date
- *                -    maximum_size (long long)        - threshold for new file
- *                -    previous_file (char *)      - previous file in family
+ *                -    name (char *)                  - file name
+ *                -    mode (int)                     - file mode
+ *                -    default-offset (int)           - index default offset
+ *                -    conversions (int)              - whether conversions will be done
+ *                -    flushed (int)                  - whether file has been flushed
+ *                -    virtual-internal (int)         - whether file is "internal"
+ *                -    system-version (int)           - PDB system version
+ *                -    major-order (int)              - major order for indexes
+ *                -    header-address (int64_t)       - address of header info
+ *                -    chart-address (int64_t)        - address of structure chart
+ *                -    symbol-table-address (int64_t) - address of symbol table
+ *                -    date (char *)                  - file creation date
+ *                -    maximum_size (int64_t)         - threshold for new file
+ *                -    previous_file (char *)         - previous file in family
  */
 
 static object *_SXI_file_info(object *argl)
@@ -952,42 +952,42 @@ static object *_SXI_file_info(object *argl)
 	fp = file->stream;
 
         if (fp != NULL)
-           obj = SS_mk_integer((long long) lio_tell(fp));
+           obj = SS_mk_integer(lio_tell(fp));
         else
-           obj = SS_mk_integer((long long) -1);}
+           obj = SS_mk_integer(-1);}
 
     else if (strcmp(name, "name") == 0)
        obj = SS_mk_string(file->name);
 
     else if (strcmp(name, "mode") == 0)
-       obj = SS_mk_integer((long long) file->mode);    
+       obj = SS_mk_integer(file->mode);    
 
     else if (strcmp(name, "default-offset") == 0)
-       obj = SS_mk_integer((long long) file->default_offset);    
+       obj = SS_mk_integer(file->default_offset);    
 
     else if (strcmp(name, "flushed") == 0)
-       obj = SS_mk_integer((long long) file->flushed);    
+       obj = SS_mk_integer(file->flushed);    
 
     else if (strcmp(name, "virtual-internal") == 0)
-       obj = SS_mk_integer((long long) file->virtual_internal);    
+       obj = SS_mk_integer(file->virtual_internal);    
 
     else if (strcmp(name, "system-version") == 0)
-       obj = SS_mk_integer((long long) file->system_version);    
+       obj = SS_mk_integer(file->system_version);    
 
     else if (strcmp(name, "major-order") == 0)
-       obj = SS_mk_integer((long long) file->major_order);    
+       obj = SS_mk_integer(file->major_order);    
 
     else if (strcmp(name, "maximum-size") == 0)
-       obj = SS_mk_integer((long long) file->maximum_size);    
+       obj = SS_mk_integer(file->maximum_size);    
 
     else if (strcmp(name, "header-address") == 0)
-       obj = SS_mk_integer((long long) file->headaddr);
+       obj = SS_mk_integer(file->headaddr);
 
     else if (strcmp(name, "chart-address") == 0)
-       obj = SS_mk_integer((long long) file->chrtaddr);    
+       obj = SS_mk_integer(file->chrtaddr);    
 
     else if (strcmp(name, "symbol-table-address") == 0)
-       obj = SS_mk_integer((long long) file->symtaddr);    
+       obj = SS_mk_integer(file->symtaddr);    
 
     else if (strcmp(name, "date") == 0)
        obj = SS_mk_string(file->date);    
@@ -996,7 +996,7 @@ static object *_SXI_file_info(object *argl)
        obj = SS_mk_string(file->previous_file);    
 
     else if (strcmp(name, "track-pointers") == 0)
-       obj = SS_mk_integer((long long) file->track_pointers);    
+       obj = SS_mk_integer(file->track_pointers);    
 
     else
        obj = SS_null;
@@ -1028,7 +1028,7 @@ static object *_SXI_default_offset(object *arg)
     if (nargs >= 2)
        file->default_offset = offset;
 
-    o = SS_mk_integer((long long) file->default_offset);
+    o = SS_mk_integer(file->default_offset);
 
     return(o);}
 
@@ -1061,7 +1061,7 @@ static object *_SXI_major_order(object *arg)
         else
            file->major_order = COLUMN_MAJOR_ORDER;};
 
-    o = SS_mk_integer((long long) file->major_order);
+    o = SS_mk_integer(file->major_order);
 
     return(o);}
 
@@ -1096,7 +1096,7 @@ static object *_SXI_file_mode(object *arg)
         else
            file->mode = PD_APPEND;}
 
-    o = SS_mk_integer((long long) file->mode);
+    o = SS_mk_integer(file->mode);
 
     return(o);}
 
@@ -1114,9 +1114,9 @@ object *_SX_pdbfile_to_list(PDBfile *file)
    {object *obj, *obj1;
 
     obj = SS_null;
-    obj = SS_mk_cons(SS_mk_integer((long long) file->chrtaddr), obj);
-    obj = SS_mk_cons(SS_mk_integer((long long) file->symtaddr), obj);
-    obj = SS_mk_cons(SS_mk_integer((long long) file->headaddr), obj);
+    obj = SS_mk_cons(SS_mk_integer(file->chrtaddr), obj);
+    obj = SS_mk_cons(SS_mk_integer(file->symtaddr), obj);
+    obj = SS_mk_cons(SS_mk_integer(file->headaddr), obj);
 
     obj1 = SS_mk_hasharr(file->chart);
     SS_UNCOLLECT(obj1);
@@ -1143,7 +1143,7 @@ object *_SX_syment_to_list(syment *ep)
    {object *obj;
 
     obj = _SX_make_dims_obj(PD_entry_dimensions(ep));
-    obj = SS_mk_cons(SS_mk_integer((long long) PD_entry_address(ep)), obj);
+    obj = SS_mk_cons(SS_mk_integer(PD_entry_address(ep)), obj);
     obj = SS_mk_cons(SS_mk_string(PD_entry_type(ep)), obj);
 
     return(obj);}
@@ -2918,7 +2918,7 @@ static object *_SXI_sizeof(object *argl)
     else
        bytespitem = _PD_lookup_size(type, file->chart);
 
-    o = SS_mk_integer((long long) bytespitem);
+    o = SS_mk_integer(bytespitem);
 
     return(o);}
 
@@ -3126,8 +3126,8 @@ object *_SX_make_dims_obj(dimdes *dims)
 
     else
        {for (obj = SS_null; dims != NULL; dims = dims->next)
-	    obj = SS_mk_cons(SS_mk_cons(SS_mk_integer((long long) dims->index_min), 
-					SS_mk_integer((long long) dims->index_max)),
+	    obj = SS_mk_cons(SS_mk_cons(SS_mk_integer(dims->index_min), 
+					SS_mk_integer(dims->index_max)),
 			     obj);
 
 	o = SS_reverse(obj);};
@@ -3401,7 +3401,7 @@ static object *_SXI_set_activate_checksum(object *argl)
 
     rv = PD_activate_cksum(file, v);
 
-    ov = SS_mk_integer((long long) rv);
+    ov = SS_mk_integer(rv);
 
     return(ov);}
 

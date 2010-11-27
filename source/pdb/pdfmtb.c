@@ -44,7 +44,7 @@
  */
 
 static int _PD_wr_itag_ii(PDBfile *file, long n, long nitems, char *type,
-			  BIGINT addr, int loc)
+			  int64_t addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
 
@@ -95,7 +95,7 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
        {pi->addr = -1;
         pi->flag = TRUE;}
     else
-       {pi->addr  = SC_ATOADD(token);
+       {pi->addr  = SC_stol(token);
         token = SC_strtok(NULL, "\001\n", s);
         if (token == NULL)
            pi->flag = TRUE;
@@ -222,7 +222,7 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
            break;
         type = SC_strtok(NULL, "\001", s);
         numb = SC_stol(SC_strtok(NULL, "\001", s));
-        addr = SC_STOADD(SC_strtok(NULL, "\001", s));
+        addr = SC_stol(SC_strtok(NULL, "\001", s));
         dims = NULL;
         while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
            {mini = SC_stol(tmp);
@@ -707,7 +707,7 @@ int _PD_rd_ext_ii(PDBfile *file)
  *                - return -1L on error
  */
 
-static BIGINT _PD_wr_symt_ii(PDBfile *file)
+static int64_t _PD_wr_symt_ii(PDBfile *file)
    {int n, flag;
     long i, nt, nb, ni, stride;
     int64_t addr, ad;
@@ -810,7 +810,7 @@ static int _PD_wr_casts_ii(PDBfile *file)
  *                - return -1L on error
  */
 
-static BIGINT _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
+static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
    {int n;
     long i;
     int64_t addr;
@@ -1277,12 +1277,12 @@ static int _PD_open_ii(PDBfile *file)
     token = SC_strtok(str, "\001", s);
     if (token == NULL)
        PD_error("BAD STRUCTURE CHART ADDRESS - PD_OPEN", PD_OPEN);
-    file->chrtaddr = SC_ATOADD(token);
+    file->chrtaddr = SC_stol(token);
 
     token = SC_strtok(NULL, "\001", s);
     if (token == NULL)
        PD_error("BAD SYMBOL TABLE ADDRESS - PD_OPEN", PD_OPEN);
-    file->symtaddr = SC_ATOADD(token);
+    file->symtaddr = SC_stol(token);
 
 /* read the symbol table first so that the file pointer is positioned
  * to the "extra" information, then read the "extra's" to get the

@@ -196,25 +196,10 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef _LARGE_FILES
+#ifndef _LARGE_FILES
 
-# define SC_ATOADD SC_stoll
-# define SC_STOADD SC_stoll
-
-#else
-
-# define SC_ATOADD atol
-# define SC_STOADD SC_stol
 # define OFF_T_MAX LONG_MAX
 
-#endif
-
-#ifdef NO_LONG_LONG
-typedef long BIGINT;
-typedef unsigned long BIGUINT;
-#else
-typedef long long BIGINT;
-typedef unsigned long long BIGUINT;
 #endif
 
 FUNCTION_POINTER(void, (*PFVoid));
@@ -222,7 +207,7 @@ FUNCTION_POINTER(void, (*PFVoid));
 FUNCTION_POINTER(char, (*PFChar));
 FUNCTION_POINTER(int, (*PFInt));
 FUNCTION_POINTER(long, (*PFLong));
-FUNCTION_POINTER(BIGINT, (*PFBIGINT));
+FUNCTION_POINTER(int64_t, (*PFInt64));
 FUNCTION_POINTER(float, (*PFFloat));
 FUNCTION_POINTER(double, (*PFDouble));
 FUNCTION_POINTER(void, (*PFByte));
@@ -230,7 +215,7 @@ FUNCTION_POINTER(void, (*PFByte));
 FUNCTION_POINTER(char, *(*PFPChar));
 FUNCTION_POINTER(int, *(*PFPInt));
 FUNCTION_POINTER(long, *(*PFPLong));
-FUNCTION_POINTER(BIGINT, *(*PFPBIGINT));
+FUNCTION_POINTER(int64_t, *(*PFPInt64));
 FUNCTION_POINTER(float, *(*PFPFloat));
 FUNCTION_POINTER(double, *(*PFPDouble));
 FUNCTION_POINTER(void, *(*PFPByte));

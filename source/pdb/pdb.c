@@ -119,7 +119,7 @@ PDBfile *PD_family(PDBfile *of, int flag)
        return(NULL);
 
     if (_PD.maxfsize == 0)
-       SC_fix_lmt(sizeof(BIGINT), NULL, &_PD.maxfsize, NULL);
+       SC_fix_lmt(sizeof(int64_t), NULL, &_PD.maxfsize, NULL);
 
 /* if the size is effectively infinite stop ASAP */
     msz = PD_get_max_file_size(of);
@@ -1365,7 +1365,7 @@ int PD_autofix_denorm(PDBfile *file, int flag)
  *               - return FALSE if not a floating point type
  */
 
-int PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr)
+int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
    {int st, reord, mask, rshift, nbits, nrem;
     int n_exp, n_mant, exp_sum, mant_sum, mant_bit, exp_bit;
     int *ord;

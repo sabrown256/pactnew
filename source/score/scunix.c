@@ -29,7 +29,7 @@ static void _SC_path_delimiter_unix(char *delim)
 
 /* _SC_FILE_LENGTH_UNIX - return the length of the file PATH */
 
-static BIGINT _SC_file_length_unix(char *path)
+static int64_t _SC_file_length_unix(char *path)
    {int st;
     int64_t ln;
     struct stat sb;

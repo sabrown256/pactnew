@@ -86,7 +86,7 @@ void SC_mem_stats(long *al, long *fr, long *df, long *mx)
 
 /* SC_MEM_STATB - return memory usage statistics */
 
-void SC_mem_statb(BIGUINT *al, BIGUINT *fr, BIGUINT *df, BIGUINT *mx)
+void SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx)
    {SC_heap_des *ph;
 
     ph = _SC_tid_mm();

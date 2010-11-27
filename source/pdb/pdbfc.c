@@ -30,7 +30,7 @@ struct s_containerf
 
 /* _PD_FCTELL - do an ftell on the pseudo file */
 
-static BIGINT _PD_fctell(FILE *fp)
+static int64_t _PD_fctell(FILE *fp)
    {int64_t addr, ada;
     containerf *cf;
     FILE *fl;
@@ -51,7 +51,7 @@ static BIGINT _PD_fctell(FILE *fp)
 
 /* _PD_FCSEEK - do an fseek on the pseudo file */
 
-static int _PD_fcseek(FILE *fp, BIGINT addr, int offset)
+static int _PD_fcseek(FILE *fp, int64_t addr, int offset)
    {int ret;
     int64_t ada;
     containerf *cf;
@@ -99,8 +99,8 @@ static int _PD_fcsetvbuf(FILE *fp, char *bf, int type, size_t sz)
 
 /* _PD_FCREAD - fread method for containerf */
 
-static BIGUINT _PD_fcread(void *p, size_t sz, BIGUINT ni, FILE *fp)
-   {BIGUINT rv;
+static uint64_t _PD_fcread(void *p, size_t sz, uint64_t ni, FILE *fp)
+   {uint64_t rv;
     containerf *cf;
     FILE *fl;
 
@@ -119,7 +119,7 @@ ada = ftell(fl);
 
 /* _PD_FCWRITE - fwrite method for containerf */
 
-static BIGUINT _PD_fcwrite(void *p, size_t sz, BIGUINT ni, FILE *fp)
+static uint64_t _PD_fcwrite(void *p, size_t sz, uint64_t ni, FILE *fp)
    {int rv;
     containerf *cf;
     FILE *fl;

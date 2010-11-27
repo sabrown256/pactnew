@@ -121,7 +121,7 @@ object *SS_unary_flt(C_procedure *cp, object *argl)
 
 object *SS_unary_fix(C_procedure *cp, object *argl)
    {int type;
-    long long iv;
+    int64_t iv;
     double operand;
     PFDoubled fnc;
     object *rv;
@@ -146,8 +146,8 @@ object *SS_unary_fix(C_procedure *cp, object *argl)
 
 static object *SS_unary_bit(C_procedure *cp, object *argl)
    {int type;
-    long long iv, operand;
-    PFBIGINTB fnc;
+    int64_t iv, operand;
+    PFInt64I fnc;
     object *rv;
 
     operand = 0.0;
@@ -155,7 +155,7 @@ static object *SS_unary_bit(C_procedure *cp, object *argl)
     if (SS_nullobjp(argl))
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_BIT", argl);
 
-    fnc = (PFBIGINTB) cp->proc[0];
+    fnc = (PFInt64I) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
 
     iv = (*fnc)(operand);
@@ -187,14 +187,14 @@ static object *SS_binary_opr(C_procedure *cp, object *argl)
 /* SS_BINARY_FIX - the binary fixed point arithmetic operator handler */
 
 object *SS_binary_fix(C_procedure *cp, object *argl)
-   {long long i1, i2, iv;
-    PFBIGINTBB fnc;
+   {int64_t i1, i2, iv;
+    PFInt64II fnc;
     object *x1, *x2, *rv;
 
     if (SS_length(argl) != 2)
        SS_error("WRONG NUMBER OF ARGUMENTS - SS_BINARY_FIX", argl);
 
-    fnc = (PFBIGINTBB) cp->proc[0];
+    fnc = (PFInt64II) cp->proc[0];
     x1  = SS_car(argl);
     x2  = SS_cadr(argl);
 
@@ -240,7 +240,7 @@ static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
         accv = op(accv, v[i]);
 
     if ((idf < SC_FLOAT_I) && (accv < LONG_MAX))
-       acc = SS_mk_integer((long long) accv);
+       acc = SS_mk_integer(accv);
     else
        acc = SS_mk_float(accv);
 
@@ -598,7 +598,7 @@ static object *_SS_machine_prec(void)
 
 static object *_SS_xor_pow(object *argl)
    {int type;
-    long long i1, i2, iv;
+    int64_t i1, i2, iv;
     double d1, d2, dv;
     object *rv;
 

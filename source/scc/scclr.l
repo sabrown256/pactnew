@@ -161,13 +161,13 @@ union          {DIAG_RETURN(UNION);}
 enum           {DIAG_RETURN(ENUM);}
 \.\.\.         {DIAG_RETURN(DOTDOT);}
 
-{OCT_INTEGER}  {yylval = CC_mk_integer((BIGINT) STRTOL(yytext, NULL, 8));
+{OCT_INTEGER}  {yylval = CC_mk_integer(STRTOL(yytext, NULL, 8));
                 DIAG_RETURN(INTEGER);}
 
-{DEC_INTEGER}  {yylval = CC_mk_integer((BIGINT) STRTOL(yytext, NULL, 10));
+{DEC_INTEGER}  {yylval = CC_mk_integer(STRTOL(yytext, NULL, 10));
                 DIAG_RETURN(INTEGER);}
 
-{HEX_INTEGER}  {yylval = CC_mk_integer((BIGINT) STRTOL(yytext, NULL, 10));
+{HEX_INTEGER}  {yylval = CC_mk_integer(STRTOL(yytext, NULL, 10));
                 DIAG_RETURN(INTEGER);}
 
 {CHR_CONST}    {yylval = CC_mk_char(yytext);

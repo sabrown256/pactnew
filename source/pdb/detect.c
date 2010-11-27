@@ -15,22 +15,6 @@
 
 #include "scstd.h"
 
-#ifdef NO_LONG_LONG
-
-#define MAXLONG     LONG_MAX
-#define MINLONG     LONG_MIN
-#define LONGFORMAT  "%ld"
-#define VLONGFORMAT "%*ld"
-
-#else
-
-#define MAXLONG     ((BIGUINT) (1LL << (8LL*sizeof(BIGINT) - 1LL)) - 1LL)
-#define MINLONG     (-1LL << (8LL*sizeof(BIGINT) - 1LL))
-#define LONGFORMAT  "%lld"
-#define VLONGFORMAT "%*lld"
-
-#endif
-
 #define NTYPES 18
 
 #define BITS_DEFAULT 8
@@ -53,7 +37,7 @@ struct clong
     long x;} cl;
 struct clonglong
    {char c;
-    BIGINT x;} cll;
+    int64_t x;} cll;
 struct cfloat4
    {char c;
     float x;} cf;
@@ -621,7 +605,7 @@ void print_html(void)
      char temp[MAXLINE];
 
 /* determine the size of the min and max fields */     
-     snprintf(temp, MAXLINE, LONGFORMAT, MAXLONG);
+     snprintf(temp, MAXLINE, "%lld", LLONG_MAX);
      mfields = strlen(temp);
 
      snprintf(temp, MAXLINE, "%3.8g", DBL_MAX);
@@ -681,7 +665,7 @@ void print_html(void)
 
 /* long long */
      printf("<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%lld</TD><TD>%lld</TD></TR>\n",
-            size[5], align[5], MINLONG, MAXLONG);
+            size[5], align[5], LLONG_MIN, LLONG_MAX);
 
 /* float */
      printf("<TR ALIGN=RIGHT><TD>Float</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
@@ -709,7 +693,7 @@ void print_html(void)
 /* PRINT_FIX_TYPE - print info about a fixed point type */
 
 static void print_fix_type(char *type, int sz, int aln,
-			   int mfields, BIGINT mn, BIGINT mx)
+			   int mfields, int64_t mn, int64_t mx)
    {int tfield, sfield, afield;
     char bf[MAXLINE], t[MAXLINE];
     char *tptr, *sptr, *aptr, *mnptr, *mxptr;
@@ -735,10 +719,10 @@ static void print_fix_type(char *type, int sz, int aln,
     snprintf(t, MAXLINE, "%9d", aln);
     strncpy(aptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, VLONGFORMAT, mfields, mn);
+    snprintf(t, MAXLINE, "%*lld", mfields, (long long) mn);
     strncpy(mnptr, t, strlen(t));
 
-    snprintf(t, MAXLINE, VLONGFORMAT, mfields, mx);
+    snprintf(t, MAXLINE, "%*lld", mfields, (long long) mx);
     strcpy(mxptr, t);
 
     puts(bf);
@@ -813,7 +797,7 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
      int afield = 11;
 
 /* determine the size of the min and max fields */     
-     snprintf(t, MAXLINE, LONGFORMAT, MAXLONG);
+     snprintf(t, MAXLINE, "%lld", LLONG_MAX);
      mfields = strlen(t);
 
      snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
@@ -866,7 +850,7 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 
 /* print long long info */
      print_fix_type("Long long", size[5], align[5],
-		    mfields, MINLONG, MAXLONG);
+		    mfields, LLONG_MIN, LLONG_MAX);
 
 /* print C99 fixed width integer types info */
      print_fix_type("int8_t", size[14], align[14],
@@ -906,9 +890,9 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 /* print optional non-native types */
      if (sflag)
         {memset(bf, ' ', MAXLINE);
-         strncpy(tptr, "BIGINT", 6);
+         strncpy(tptr, "int64_t", 6);
     
-         snprintf(t, MAXLINE, "%12d", (int) sizeof(BIGINT));
+         snprintf(t, MAXLINE, "%12d", (int) sizeof(int64_t));
          strcpy(sptr, t);
          puts(bf);
 
@@ -1065,7 +1049,7 @@ int main(int argc, char **argv)
  */
     wflag = 0;
 
-/* print optional size related types like size_t and BIGINT */
+/* print optional size related types like size_t and int64_t */
     sflag = 0;
 
     for (i = 1; i < argc; i++)
@@ -1095,7 +1079,7 @@ int main(int argc, char **argv)
     size[2]  = sizeof(short);
     size[3]  = sizeof(int);
     size[4]  = sizeof(long);
-    size[5]  = sizeof(BIGINT);
+    size[5]  = sizeof(int64_t);
     size[6]  = sizeof(float);
     size[7]  = sizeof(double);
     size[8]  = sizeof(long double);

@@ -376,7 +376,7 @@ static int compare_test_0_data(PDBfile *strm, FILE *fp)
     err &= (nbp == nbc);
 
     nbp  = _PD_lookup_size("long_long", strm->host_chart);
-    nbc  = sizeof(BIGINT);
+    nbc  = sizeof(int64_t);
     err &= (nbp == nbc);
 
     nbp  = _PD_lookup_size("float", strm->host_chart);

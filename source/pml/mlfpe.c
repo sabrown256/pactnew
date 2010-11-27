@@ -546,13 +546,13 @@ long PM_count_nanf(long n, float *f, int mask)
 
 int PM_fp_typed(double d)
    {int rv, le, sg;
-    BIGUINT ba, bm, bs, b1, l1, l2, l3;
+    uint64_t ba, bm, bs, b1, l1, l2, l3;
     char *ca;
 
     rv = 1;
     ca = (char *) &rv;
     le = (ca[0] == 1);
-    ba = *(BIGUINT *) &d;
+    ba = *(uint64_t *) &d;
 
     l1 = 0xf0;
     l2 = 0xf8;

@@ -165,7 +165,7 @@ object *SS_hash_dump(object *argl)
 /* _SSI_HASH_INFO - hash-info at the Scheme level */
 
 static object *_SSI_hash_info(object *arg)
-   {long long ne;
+   {int64_t ne;
     object *obj, *flg;
     hasharr *tab;
 

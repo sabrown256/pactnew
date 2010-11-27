@@ -551,8 +551,8 @@ FILE *_PG_fopen(char *name, char *mode)
  *                    - which happens on file open
  */
 
-BIGINT PG_set_buffer_size(BIGINT sz)
-   {BIGINT rv;
+int64_t PG_set_buffer_size(int64_t sz)
+   {int64_t rv;
     
     rv = _PG.buffer_size;
     
@@ -565,8 +565,8 @@ BIGINT PG_set_buffer_size(BIGINT sz)
 
 /* PG_GET_BUFFER_SIZE - get the default I/O buffer size */
 
-BIGINT PG_get_buffer_size(void)
-   {BIGINT rv;
+int64_t PG_get_buffer_size(void)
+   {int64_t rv;
     
     rv = _PG.buffer_size;
 

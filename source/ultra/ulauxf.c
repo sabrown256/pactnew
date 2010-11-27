@@ -306,7 +306,7 @@ object *UL_curve_eval(object *arg)
        SS_error("CURVE DELETED, NO PROCEDURE - CURVE-EVAL", SS_Fun);
 
     if (SS_integerp(arg))
-       value = (double) *SS_GET(BIGINT, arg);
+       value = (double) *SS_GET(int64_t, arg);
     else
        value = (double) *SS_GET(double, arg);
 
@@ -335,7 +335,7 @@ object *UL_getx(object *obj, object *tok)
 
     i = SX_get_crv_index_i(obj);
     if (SS_integerp(tok))
-       value = (double) *SS_GET(BIGINT, tok);
+       value = (double) *SS_GET(int64_t, tok);
     else
        value = (double) *SS_GET(double, tok);
 
@@ -361,7 +361,7 @@ object *UL_gety(object *obj, object *tok)
 
     i = SX_get_crv_index_i(obj);
     if (SS_integerp(tok))
-       value = (double) *SS_GET(BIGINT, tok);
+       value = (double) *SS_GET(int64_t, tok);
     else
        value = (double) *SS_GET(double, tok);
 

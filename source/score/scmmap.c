@@ -68,7 +68,7 @@ static long _SC_mf_tell(FILE *stream)
 
 /* _SC_MF_MWRITE - mwrite method for memory mapped files */
 
-static BIGINT _SC_mf_mwrite(int fd, const void *buf, size_t nb, BIGINT off)
+static int64_t _SC_mf_mwrite(int fd, const void *buf, size_t nb, int64_t off)
    {int64_t rv;
 
     lseek(fd, off, SEEK_SET);
@@ -130,7 +130,7 @@ FILE *SC_mf_open(char *name, char *mode)
 /* _SC_MF_MMAP - mmap method for memory mapped files */
 
 static void *_SC_mf_mmap(void *addr, size_t len, int prot,
-			 int flags, int fd, BIGINT offs)
+			 int flags, int fd, int64_t offs)
    {void *rv;
 
     rv = mmap(addr, len, prot, flags, fd, offs);

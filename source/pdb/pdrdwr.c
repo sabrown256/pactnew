@@ -632,7 +632,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 
 static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype, 
 				 syment *ep, int hbyt, int fbyt,
-				 BIGINT addr, BIGINT stop, long step)
+				 int64_t addr, int64_t stop, long step)
    {long nitems;
     char *outtype;
 
@@ -669,9 +669,9 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype,
 
 static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype, 
 				   syment *ep, int hbyt, int fbyt,
-				   BIGINT addr, BIGINT stop, long step)
+				   int64_t addr, int64_t stop, long step)
    {long n, nb, niw, nitems;
-    BIGINT eaddr;
+    int64_t eaddr;
     char *outtype;
     SC_array *bl;
 
@@ -741,7 +741,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
  */
 
 static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi, 
-                                char *intype, BIGINT addr,
+                                char *intype, int64_t addr,
 				syment *ep, int hbyt, int fbyt)
    {long stride, step;
     int64_t offset, start, stop;
@@ -816,8 +816,8 @@ static void INLINE _PD_init_stacks(long t, long d)
 
 /* _PD_ANNOTATE_TEXT - for text files annotate the output */
 
-BIGINT _PD_annotate_text(PDBfile *file, syment *ep, char *name,
-			BIGINT addr, void *vr)
+int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
+			int64_t addr, void *vr)
    {long ni, nc;
     int64_t na, pa;
     char s[MAXLINE];
@@ -1148,10 +1148,10 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 				char *out, syment *epo, char *outtype,
 				int hbyt, int fbyt, 
-                                BIGINT addr, BIGINT stop, long step)
+                                int64_t addr, int64_t stop, long step)
    {int nrd, nr;
     long n, nb, nitems;
-    BIGINT eaddr; 
+    int64_t eaddr; 
     char *intype;
     SC_array *bl, *blo;
 
@@ -1264,7 +1264,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 static int _PD_rd_hyper_index(PDBfile *file, char *name,
 			      syment *ep, char *out,
 			      dimind *pi, syment *epo, char *outtype,
-			      BIGINT addr, int hbyt, int fbyt)
+			      int64_t addr, int hbyt, int fbyt)
    {int nrd, nir;
     long stride, step;
     int64_t offset, start, stop;
@@ -1689,7 +1689,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
    {int dst, vif, size, boffs, count, itags;
     long i, n, nitems, bpi, nrd;
     long loc;
-    BIGINT addr, eaddr;
+    int64_t addr, eaddr;
     char bf[MAXLINE];
     char *pv, *litype, *lotype, *svr, **lvr;
     symindir iloc;

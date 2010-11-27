@@ -12,14 +12,6 @@
 
 #define N_DOUBLES_MD 3
 
-#ifdef NO_LONG_LONG
-typedef long BIGINT;
-typedef unsigned long BIGUINT;
-#else
-typedef long long BIGINT;
-typedef unsigned long long BIGUINT;
-#endif
-
 #include "scope_mem.h"
 
 /*---------------------------------------------------------------------------*/

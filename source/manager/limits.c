@@ -8,18 +8,14 @@
  *
  */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #undef TRUE
 #undef FALSE
 #define TRUE  1
 #define FALSE 0
-
-#ifdef USE_LONG_LONG
-typedef long long BIGINT;
-#else
-typedef long BIGINT;
-#endif
 
 typedef union u_ucsil ucsil;
 typedef union u_ucl ucl;
@@ -31,7 +27,7 @@ union u_ucsil
     int i;
     unsigned int ui;
     long l;
-    BIGINT ll;
+    int64_t ll;
     float f;
     double d;};
 
@@ -41,17 +37,17 @@ union u_ucsil
 /* PM_FIX_LMT - return the signed minimum and maximum values as well as
  *            - the unsigned maximum value for an integer type
  *            - of NB bytes
- *            - return TRUE iff NB is smaller than sizeof(BIGINT)
+ *            - return TRUE iff NB is smaller than sizeof(int64_t)
  */
 
 int PM_fix_lmt(char *name, char *sfx, int nb,
-	       BIGINT *pmn, BIGINT *pmx, BIGINT *pumx)
+	       int64_t *pmn, int64_t *pmx, int64_t *pumx)
    {int i, rv;
-    BIGINT imn, imx, uimx;
+    int64_t imn, imx, uimx;
 
     rv = FALSE;
 
-    if (nb <= sizeof(BIGINT))
+    if (nb <= sizeof(int64_t))
 
 /* do the min limits */
        {for (imn = 0x80, i = 1; i < nb; i++)
@@ -65,7 +61,7 @@ int PM_fix_lmt(char *name, char *sfx, int nb,
 	for (uimx = 0xff, i = 1; i < nb; i++)
 	    uimx = (uimx << 8) + 0xff;
 
-	if (nb < sizeof(BIGINT))
+	if (nb < sizeof(int64_t))
 	   imn = -imn;
 
 	printf("#define %s_MIN \t%lld%s\n", name, imn, sfx);
@@ -92,7 +88,7 @@ int PM_fix_lmt(char *name, char *sfx, int nb,
 main()
    {int i, nfp, fw;
     char format[40];
-    BIGINT imn, imx, uimx;
+    int64_t imn, imx, uimx;
     float fmn, fmx;
     double dmn, dmx, conf;
     ucsil bo, bp;

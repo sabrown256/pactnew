@@ -751,11 +751,11 @@ object *SS_mk_outport(FILE *str, char *name)
 
 /* SS_MK_INTEGER - make an integer object */
 
-object *SS_mk_integer(BIGINT i)
-   {BIGINT *lp;
+object *SS_mk_integer(int64_t i)
+   {int64_t *lp;
     object *op;
 
-    lp  = FMAKE(BIGINT, "SS_MK_INTEGER:lp");
+    lp  = FMAKE(int64_t, "SS_MK_INTEGER:lp");
     *lp = i;
 
     op = SS_mk_object(lp, SC_INT_I, SELF_EV, NULL,

@@ -368,10 +368,10 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
  *                       - trailing termination byte
  */
  
-void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
+void PM_md5_checksum_array(void *arr, uint64_t ni, uint64_t bpi,
 			   unsigned char *dig)
    {int64_t sz, ln;
-    BIGUINT ib, nb;
+    uint64_t ib, nb;
     unsigned char *p;
     PM_MD5_CTX mc;
     
@@ -414,7 +414,7 @@ void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
  *                      - trailing termination byte
  */
 
-void PM_md5_checksum_file(FILE *file, BIGINT start, BIGINT stop,
+void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
 			  unsigned char *dig) 
    {int len, seg, sz;
     int64_t here, nb, ib;
@@ -560,7 +560,7 @@ long PM_checksum_array(void *arr, int ni, int bpi, int nbts)
  *                  - 29 is a good choice for NBTS
  */
 
-long PM_checksum_file(FILE* file, BIGINT start, BIGINT stop, int nbts)
+long PM_checksum_file(FILE* file, int64_t start, int64_t stop, int nbts)
    {int len, seg, sz, rmdr;
     long sum;
     int64_t here, nb;

@@ -156,7 +156,7 @@ static object *_SXI_set_clr_mode(object *argl)
 
     PG_set_clear_mode(mode);
 
-    rv = SS_mk_integer((long long) mode);
+    rv = SS_mk_integer(mode);
 
     return(rv);}
 
@@ -180,7 +180,7 @@ static object *_SXI_clr_mode(object *argl)
 
     PG_get_clear_mode(mode);
 
-    o = SS_mk_integer((long long) mode);
+    o = SS_mk_integer(mode);
 
     return(o);}
 
@@ -287,7 +287,7 @@ static object *_SXI_def_mrk(object *argl)
     SFREE(x2);
     SFREE(y2);
 
-    obj = SS_mk_integer((long long) indx);
+    obj = SS_mk_integer(indx);
 
     return(obj);}
 
@@ -338,7 +338,7 @@ static object *_SXI_drw_mrk(object *argl)
 
     PM_free_vectors(nd, r);
 
-    obj = SS_mk_integer((long long) ns);
+    obj = SS_mk_integer(ns);
 
     return(obj);}
 
@@ -1009,7 +1009,7 @@ static object *_SXI_gfin(object *argl)
 
     PG_get_finish_state(dev, fl);
 
-    o = SS_mk_integer((long long) fl);
+    o = SS_mk_integer(fl);
 
     return(o);}
 
@@ -1033,7 +1033,7 @@ static object *_SXI_glnc(object *argl)
 
     PG_get_line_color(dev, &c);
 
-    o = SS_mk_integer((long long) c);
+    o = SS_mk_integer(c);
 
     return(o);}
 
@@ -1057,7 +1057,7 @@ static object *_SXI_glop(object *argl)
 
     PG_get_logical_op(dev, &lop);
 
-    o = SS_mk_integer((long long) lop);
+    o = SS_mk_integer(lop);
 
     return(o);}
 
@@ -1081,7 +1081,7 @@ static object *_SXI_glns(object *argl)
 
     PG_get_line_style(dev, &s);
 
-    o = SS_mk_integer((long long) s);
+    o = SS_mk_integer(s);
 
     return(o);}
 
@@ -1197,7 +1197,7 @@ static object *_SXI_gtxc(object *argl)
 
     PG_get_text_color(dev, &c);
 
-    o = SS_mk_integer((long long) c);
+    o = SS_mk_integer(c);
 
     return(o);}
 
@@ -3046,7 +3046,7 @@ static object *_SXI_satst(object *argl)
 
 static object *_SXI_gbfsz(void)
    {object *rv;
-    long long sz;
+    int64_t sz;
 
     sz = PG_get_buffer_size();
     rv = SS_mk_integer(sz);
@@ -3060,7 +3060,7 @@ static object *_SXI_gbfsz(void)
 
 static object *_SXI_sbfsz(object *argl)
    {object *rv;
-    long long sz;
+    int64_t sz;
 
     sz = -1;
     SS_args(argl,

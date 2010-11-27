@@ -32,11 +32,11 @@ extern int
 
 #if !defined(SOLARIS) && !defined(LINUX)
 extern void
- *mmap64(void *addr, size_t len, int prot, int flags, int fd, BIGINT offs);
+ *mmap64(void *addr, size_t len, int prot, int flags, int fd, int64_t offs);
 #endif
 
 extern ssize_t
- pwrite64(int fd, const void *buf, size_t nb, BIGINT off);
+ pwrite64(int fd, const void *buf, size_t nb, int64_t off);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -45,8 +45,8 @@ extern ssize_t
  *               - this wraps the LMF version to be call compatible
  */
 
-static BIGUINT _SC_lmf_write(void *bf, size_t sz, BIGUINT ni, FILE *stream)
-   {BIGUINT rv;
+static uint64_t _SC_lmf_write(void *bf, size_t sz, uint64_t ni, FILE *stream)
+   {uint64_t rv;
 
     rv = _SC_mf_core_write(bf, sz, ni, stream);
 
@@ -59,8 +59,8 @@ static BIGUINT _SC_lmf_write(void *bf, size_t sz, BIGUINT ni, FILE *stream)
  *              - this wraps the LMF version to be call compatible
  */
 
-static BIGUINT _SC_lmf_read(void *bf, size_t sz, BIGUINT ni, FILE *stream)
-   {BIGUINT rv;
+static uint64_t _SC_lmf_read(void *bf, size_t sz, uint64_t ni, FILE *stream)
+   {uint64_t rv;
 
     rv = _SC_mf_core_read(bf, sz, ni, stream);
 

@@ -230,7 +230,7 @@ extern expr
  *CC_mk_string(char *s),
  *CC_mk_type(char *t),
  *CC_mk_variable(char *type, char *name, qtype declared),
- *CC_mk_integer(BIGINT l),
+ *CC_mk_integer(int64_t l),
  *CC_mk_float(double d);
 
 

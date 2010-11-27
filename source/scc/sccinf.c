@@ -291,11 +291,11 @@ expr *CC_mk_string(char *s)
 
 /* CC_MK_INTEGER - make a integer from L */
 
-expr *CC_mk_integer(BIGINT l)
-   {BIGINT *v;
+expr *CC_mk_integer(int64_t l)
+   {int64_t *v;
     expr *e;
 
-    v = FMAKE(BIGINT, "CC_MK_INTEGER:v");
+    v = FMAKE(int64_t, "CC_MK_INTEGER:v");
     e = FMAKE(expr, "CC_MK_INTEGER:e");
 
     *v = l;
@@ -1063,7 +1063,7 @@ void CC_expr_str(char *s, int nc, expr *e)
     if (e != NULL)
        {switch (e->cat)
            {case CC_INT :
-	         snprintf(s, nc, "int(%lld)", *(BIGINT *) e->ptr);
+	         snprintf(s, nc, "int(%lld)", (long long) *(int64_t *) e->ptr);
 		 break;
 	    case CC_FLOAT :
 	         snprintf(s, nc, "float(%g)", *(double *) e->ptr);

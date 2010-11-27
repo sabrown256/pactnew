@@ -167,9 +167,9 @@ static object *_SSI_rd_chr(object *arg)
  *             - NOTE: we parse, but do not use, exactness specifications
  */
 
-static int _SS_intstrp(char *s, BIGINT *piv)
+static int _SS_intstrp(char *s, int64_t *piv)
    {int rv, sgn, rdx, ext, c;
-    long long iv;
+    int64_t iv;
     char *pt;
 
     iv = 0;
@@ -255,7 +255,7 @@ static int _SS_intstrp(char *s, BIGINT *piv)
 
 static object *SS_rd_atm(object *str)
    {int c, inbrackets;
-    long long iv;
+    int64_t iv;
     char token[MAXLINE], *pt;
     object *o;
 

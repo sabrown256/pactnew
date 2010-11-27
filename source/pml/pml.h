@@ -748,13 +748,13 @@ extern int
 
 extern long
  PM_checksum_array(void *arr, int ni, int bpi, int nbts),
- PM_checksum_file(FILE* file, BIGINT start, BIGINT stop, int nbts);
+ PM_checksum_file(FILE* file, int64_t start, int64_t stop, int nbts);
 
 extern void
  PM_checksum(long *psum, int *prmdr, void *parr, int boff,
 	     int ni, int bpi, int nbts),
- PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi, unsigned char *dig),
- PM_md5_checksum_file(FILE* file, BIGINT start, BIGINT stop, 
+ PM_md5_checksum_array(void *arr, uint64_t ni, uint64_t bpi, unsigned char *dig),
+ PM_md5_checksum_file(FILE* file, int64_t start, int64_t stop, 
                       unsigned char *dig);
 
 
@@ -1157,25 +1157,25 @@ extern int
  PM_fgt(double x, double y),
  PM_fle(double x, double y),
  PM_flt(double x, double y),
- PM_leq(BIGINT x, BIGINT y),
- PM_lneq(BIGINT x, BIGINT y),
- PM_lge(BIGINT x, BIGINT y),
- PM_lgt(BIGINT x, BIGINT y),
- PM_lle(BIGINT x, BIGINT y),
- PM_llt(BIGINT x, BIGINT y);
+ PM_leq(int64_t x, int64_t y),
+ PM_lneq(int64_t x, int64_t y),
+ PM_lge(int64_t x, int64_t y),
+ PM_lgt(int64_t x, int64_t y),
+ PM_lle(int64_t x, int64_t y),
+ PM_llt(int64_t x, int64_t y);
 
-extern BIGINT
- PM_lplus(BIGINT x, BIGINT y),
- PM_lminus(BIGINT x, BIGINT y),
- PM_ltimes(BIGINT x, BIGINT y),
- PM_ldivide(BIGINT x, BIGINT y),
- PM_lmodulo(BIGINT x, BIGINT y),
- PM_land(BIGINT x, BIGINT y),
- PM_lor(BIGINT x, BIGINT y),
- PM_lxor(BIGINT x, BIGINT y),
- PM_llshft(BIGINT x, BIGINT y),
- PM_lrshft(BIGINT x, BIGINT y),
- PM_lcmp(BIGINT x);
+extern int64_t
+ PM_lplus(int64_t x, int64_t y),
+ PM_lminus(int64_t x, int64_t y),
+ PM_ltimes(int64_t x, int64_t y),
+ PM_ldivide(int64_t x, int64_t y),
+ PM_lmodulo(int64_t x, int64_t y),
+ PM_land(int64_t x, int64_t y),
+ PM_lor(int64_t x, int64_t y),
+ PM_lxor(int64_t x, int64_t y),
+ PM_llshft(int64_t x, int64_t y),
+ PM_lrshft(int64_t x, int64_t y),
+ PM_lcmp(int64_t x);
 
 extern double
  PM_fplus(double x, double y),

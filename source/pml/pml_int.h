@@ -38,8 +38,8 @@ typedef quaternion      (*PFQuaternionqd)(quaternion, double);
 
 typedef int             (*PFIntd)(double);
 typedef int             (*PFIntdd)(double, double);
-typedef BIGINT          (*PFBIGINTB)(BIGINT);
-typedef BIGINT          (*PFBIGINTBB)(BIGINT, BIGINT);
+typedef int64_t         (*PFInt64I)(int64_t);
+typedef int64_t         (*PFInt64II)(int64_t, int64_t);
 
 typedef struct s_PM_state PM_state;
 typedef struct s_PM_smp_state PM_smp_state;
@@ -69,7 +69,7 @@ struct s_PM_state
     double rn;
 
 /* MLOPER.C */
-    BIGINT bmx;
+    int64_t bmx;
 
 /* MLFPE.C */
     int fpe_enabled;

@@ -620,7 +620,7 @@ int _PD_items_per_tuple(defstr *dp)
 
 /* _PD_GET_CURRENT_ADDRESS - return the current file address */
 
-BIGINT _PD_get_current_address(PDBfile *file, PD_major_op tag)
+int64_t _PD_get_current_address(PDBfile *file, PD_major_op tag)
    {int64_t addr;
     FILE *fp;
 
@@ -637,7 +637,7 @@ BIGINT _PD_get_current_address(PDBfile *file, PD_major_op tag)
 
 /* _PD_SET_CURRENT_ADDRESS - set the current file address */
 
-int _PD_set_current_address(PDBfile *file, BIGINT addr, int wh,
+int _PD_set_current_address(PDBfile *file, int64_t addr, int wh,
 			    PD_major_op tag)
    {int st;
     FILE *fp;
@@ -663,7 +663,7 @@ int _PD_set_current_address(PDBfile *file, BIGINT addr, int wh,
  *                      - in MPI mode get collective space iff COLF is TRUE
  */
 
-BIGINT _PD_get_next_address(PDBfile *file, char *type, long number,
+int64_t _PD_get_next_address(PDBfile *file, char *type, long number,
 			   void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
 
@@ -682,7 +682,7 @@ BIGINT _PD_get_next_address(PDBfile *file, char *type, long number,
  *         - that is set the chart address to the current file position
  */
 
-BIGINT _PD_eod(PDBfile *file)
+int64_t _PD_eod(PDBfile *file)
    {int64_t addr;
 
     addr = _PD_GETSPACE(file, 0, FALSE, 0);
@@ -694,7 +694,7 @@ BIGINT _PD_eod(PDBfile *file)
 
 /* PD_ENTRY_SET_ADDRESS - return the address of the first block of EP */
 
-BIGINT PD_entry_set_address(syment *ep, BIGINT addr)
+int64_t PD_entry_set_address(syment *ep, int64_t addr)
    {
 
     _PD_entry_set_address(ep, 0, addr);
@@ -706,7 +706,7 @@ BIGINT PD_entry_set_address(syment *ep, BIGINT addr)
 
 /* PD_ENTRY_ADDRESS - return the address of the first block of EP */
 
-BIGINT PD_entry_address(syment *ep)
+int64_t PD_entry_address(syment *ep)
    {int64_t addr;
 
     addr = _PD_entry_get_address(ep, 0);
@@ -951,7 +951,7 @@ char *PD_get_error(void)
 
 /* PD_GET_BUFFER_SIZE - fetch PD_buffer_size */
 
-BIGINT PD_get_buffer_size(void)
+int64_t PD_get_buffer_size(void)
    {int64_t rv;
     PD_smp_state *pa;
 
@@ -971,7 +971,7 @@ BIGINT PD_get_buffer_size(void)
 
 /* PD_SET_BUFFER_SIZE - set PD_buffer_size */
 
-BIGINT PD_set_buffer_size(BIGINT v)
+int64_t PD_set_buffer_size(int64_t v)
    {PD_smp_state *pa;
     
     _PD_init_state(FALSE);
@@ -990,7 +990,7 @@ BIGINT PD_set_buffer_size(BIGINT v)
 
 /* PD_GET_FILE_LENGTH - return the current file length */
 
-BIGINT PD_get_file_length(PDBfile *file)
+int64_t PD_get_file_length(PDBfile *file)
    {int64_t rv;
 
     rv = _PD_GET_FILE_SIZE(file);
@@ -1289,7 +1289,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
 /* _PD_ADD_FREE_SPACE - add block to free list in descending size order
  */
 
-void _PD_add_free_space(PDBfile *file, BIGINT address, BIGINT size)
+void _PD_add_free_space(PDBfile *file, int64_t address, int64_t size)
    {PD_disk_block *block, *free, *prev;
 
     if (size > 0)
@@ -1322,7 +1322,7 @@ void _PD_add_free_space(PDBfile *file, BIGINT address, BIGINT size)
 
 /* _PD_GET_FREE_SPACE - compute size of free space in FILE */
 
-BIGINT _PD_get_free_space(PDBfile *file, BIGINT size)
+int64_t _PD_get_free_space(PDBfile *file, int64_t size)
    {int64_t ret;
     PD_disk_block *free, *prev, *save;
 

@@ -48,7 +48,7 @@ static void _SS_fix_arg(object *obj, void *v, int type)
 
     ok = _SS_object_to_numtype_id(type, v, 0, obj);
     if (ok == FALSE)
-       {long long l;
+       {int64_t l;
 
 	l = 0L;
 

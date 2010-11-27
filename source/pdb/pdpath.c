@@ -192,7 +192,7 @@ void dpstack(int tid, int n)
 
 /* DSTCKTR - debugging aid */
 
-static void dstcktr(int cmnd, int i, BIGINT addr, long numb, int end)
+static void dstcktr(int cmnd, int i, int64_t addr, long numb, int end)
    {int nf;
     char *cmd;
     parse_frame *fr;
@@ -330,7 +330,7 @@ long _PD_num_indirects(char *type, hasharr *tab)
 
 static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
 				 locator *stck, long n,
-				 BIGINT addr, long numb)
+				 int64_t addr, long numb)
    {dimdes *dims;
     SC_array *bl;
 
@@ -367,7 +367,7 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
 					       symindir *iloc,
 					       int64_t *paddr, long *pnumb)
    {long i, bpi, nbk, nib, nbb, nit, ni;
-    BIGINT addr;
+    int64_t addr;
     defstr *dp;
     SC_array *nbl, *bl;
 
@@ -440,7 +440,7 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
  *               - if noind is TRUE don't pick up the additional indirects
  */
 
-BIGINT _PD_skip_over(PDBfile *file, long skip, int noind)
+int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
    {int indir, itags;
     long bpi;
     int64_t addr;
@@ -507,7 +507,7 @@ BIGINT _PD_skip_over(PDBfile *file, long skip, int noind)
  *                     - necessary context
  */
 
-static BIGINT _PD_itag_deref_addr(PD_smp_state *pa, int n)
+static int64_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
    {long numb, bpi;
     int64_t addr;
     char *type;
@@ -566,7 +566,7 @@ static BIGINT _PD_itag_deref_addr(PD_smp_state *pa, int n)
  *                      - and other pointees
  */
 
-static BIGINT _PD_itag_index_deref(PD_smp_state *pa, int n,
+static int64_t _PD_itag_index_deref(PD_smp_state *pa, int n,
 				  dimdes **pdims, long *pnumb)
    {int itags;
     long indx, numb, naitems, bpi, fn;
@@ -710,7 +710,7 @@ static BIGINT _PD_itag_index_deref(PD_smp_state *pa, int n,
  *                       - and other pointees
  */
 
-static BIGINT _PD_itag_member_deref(PD_smp_state *pa, int n)
+static int64_t _PD_itag_member_deref(PD_smp_state *pa, int n)
    {long nsitems;
     int64_t addr;
     char *type;
@@ -899,7 +899,7 @@ static long _PD_itag_reduce(PD_smp_state *pa)
  *                    - necessary context
  */
 
-static BIGINT _PD_ptr_deref_addr(PD_smp_state *pa, int n)
+static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
    {long i, numb, bpi;
     int64_t addr;
     char *type;
@@ -953,7 +953,7 @@ static BIGINT _PD_ptr_deref_addr(PD_smp_state *pa, int n)
  *                     - and other pointees
  */
 
-static BIGINT _PD_ptr_index_deref(PD_smp_state *pa, int n,
+static int64_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
                                  dimdes **pdims, long *pnumb)
    {int itags;
     long fn;
@@ -1015,7 +1015,7 @@ static BIGINT _PD_ptr_index_deref(PD_smp_state *pa, int n,
  *                      - and other pointees
  */
 
-static BIGINT _PD_ptr_member_deref(PD_smp_state *pa, int n)
+static int64_t _PD_ptr_member_deref(PD_smp_state *pa, int n)
    {int64_t addr;
     parse_frame *fr;
     locator *stck;
@@ -1169,7 +1169,7 @@ static long _PD_ptr_reduce(PD_smp_state *pa)
 
 static void _PD_shift(PD_smp_state *pa, char *name, char *type,
 		      dimdes *dims, SC_array *bl, long numb,
-		      BIGINT addr, int indr, int cmmnd)
+		      int64_t addr, int indr, int cmmnd)
    {
 
     if (type[0] == '\0')

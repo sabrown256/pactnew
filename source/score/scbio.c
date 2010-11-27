@@ -211,7 +211,7 @@ static void _SC_bio_free(bio_desc *bid, int total)
 #ifndef USE_C_BUFFERED_IO
 
 static int
- _SC_bio_seek(bio_desc *bid, BIGINT offs, int wh);
+ _SC_bio_seek(bio_desc *bid, int64_t offs, int wh);
 
 /*--------------------------------------------------------------------------*/
 
@@ -637,7 +637,7 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, int64_t bsz)
 
 /* _SC_BIO_SEEK - seek to location in file */
 
-static int _SC_bio_seek(bio_desc *bid, BIGINT offs, int wh)
+static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
    {int ret;
     int64_t addr;
 
@@ -692,7 +692,7 @@ static int _SC_bio_seek(bio_desc *bid, BIGINT offs, int wh)
 
 /* _SC_BIO_TELL - small file method for ftell */
 
-static BIGINT _SC_bio_tell(bio_desc *bid)
+static int64_t _SC_bio_tell(bio_desc *bid)
    {long ret;
 
     ret = bid->curr;
@@ -1108,7 +1108,7 @@ static size_t _SC_bwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 /* _SC_BLSEEK - large file method for fseek */
 
-static int _SC_blseek(FILE *fp, BIGINT offs, int wh)
+static int _SC_blseek(FILE *fp, int64_t offs, int wh)
    {int ret;
 
     ACCESS(fp);
@@ -1122,7 +1122,7 @@ static int _SC_blseek(FILE *fp, BIGINT offs, int wh)
 
 /* _SC_BLTELL - large file method for ftell */
 
-static BIGINT _SC_bltell(FILE *fp)
+static int64_t _SC_bltell(FILE *fp)
    {int64_t ret;
 
     ACCESS(fp);
@@ -1136,7 +1136,7 @@ static BIGINT _SC_bltell(FILE *fp)
 
 /* _SC_BLREAD - large file method for fread */
 
-static BIGUINT _SC_blread(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
+static uint64_t _SC_blread(void *s, size_t bpi, uint64_t nitems, FILE *fp)
    {size_t nr;
 
     ACCESS(fp);
@@ -1150,7 +1150,7 @@ static BIGUINT _SC_blread(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
 
 /* _SC_BLWRITE - large file method for fwrite */
 
-static BIGUINT _SC_blwrite(void *s, size_t bpi, BIGUINT nitems, FILE *fp)
+static uint64_t _SC_blwrite(void *s, size_t bpi, uint64_t nitems, FILE *fp)
    {size_t nw;
 
     ACCESS(fp);

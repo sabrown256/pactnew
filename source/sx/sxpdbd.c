@@ -43,7 +43,7 @@
        {ada = -1;                                                            \
         fla = TRUE;}                                                         \
     else                                                                     \
-       {ada   = SC_ATOADD(token);                                            \
+       {ada   = SC_stol(token);                                              \
         token = SC_strtok(NULL, "\001\n", s);                                \
         if (token == NULL)                                                   \
            fla = TRUE;                                                       \
@@ -150,8 +150,8 @@ static void _SX_diff_signal(int sig)
 
 static int _SX_check_pointers(PDBfile *pfa, PDBfile *pfb, 
 			      char *nma, char *nmb, char *ta, 
-			      long na, BIGINT ada, char *tb, 
-			      long nb, BIGINT adb)
+			      long na, int64_t ada, char *tb, 
+			      long nb, int64_t adb)
    {int rv;
 
     rv = FALSE;

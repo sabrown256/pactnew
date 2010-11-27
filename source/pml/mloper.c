@@ -85,13 +85,13 @@ int PM_imodulo(int x, int y)
 
 /*--------------------------------------------------------------------------*/
 
-/*                           BIGINT OPERATORS                               */
+/*                           int64_t OPERATORS                               */
 
 /*--------------------------------------------------------------------------*/
 
-/* PM_LPLUS - BIGINT integer addition in C */
+/* PM_LPLUS - int64_t integer addition in C */
 
-BIGINT PM_lplus(BIGINT x, BIGINT y)
+int64_t PM_lplus(int64_t x, int64_t y)
    {
 
     return(x + y);}
@@ -99,9 +99,9 @@ BIGINT PM_lplus(BIGINT x, BIGINT y)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_LMINUS - BIGINT integer subtraction in C */
+/* PM_LMINUS - int64_t integer subtraction in C */
 
-BIGINT PM_lminus(BIGINT x, BIGINT y)
+int64_t PM_lminus(int64_t x, int64_t y)
    {
 
     return(x-y);}
@@ -109,9 +109,9 @@ BIGINT PM_lminus(BIGINT x, BIGINT y)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_LTIMES - BIGINT integer multiplication in C */
+/* PM_LTIMES - int64_t integer multiplication in C */
 
-BIGINT PM_ltimes(BIGINT x, BIGINT y)
+int64_t PM_ltimes(int64_t x, int64_t y)
    {
 
     return(x*y);}
@@ -119,9 +119,9 @@ BIGINT PM_ltimes(BIGINT x, BIGINT y)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_LDIVIDE - BIGINT integer division in C */
+/* PM_LDIVIDE - int64_t integer division in C */
 
-BIGINT PM_ldivide(BIGINT x, BIGINT y)
+int64_t PM_ldivide(int64_t x, int64_t y)
    {int64_t rv;
 
     if (_PM.bmx == 0)
@@ -139,7 +139,7 @@ BIGINT PM_ldivide(BIGINT x, BIGINT y)
 
 /* PM_LMODULO - return the remainder after int64_t integer division in C */
 
-BIGINT PM_lmodulo(BIGINT x, BIGINT y)
+int64_t PM_lmodulo(int64_t x, int64_t y)
    {int64_t rv;
 
     if (y != 0)
@@ -154,7 +154,7 @@ BIGINT PM_lmodulo(BIGINT x, BIGINT y)
 
 /* PM_LAND - bitwise & (and) in C */
 
-BIGINT PM_land(BIGINT x, BIGINT y)
+int64_t PM_land(int64_t x, int64_t y)
    {
 
     return(x & y);}
@@ -164,7 +164,7 @@ BIGINT PM_land(BIGINT x, BIGINT y)
 
 /* PM_LOR - bitwise | (or) in C */
 
-BIGINT PM_lor(BIGINT x, BIGINT y)
+int64_t PM_lor(int64_t x, int64_t y)
    {
 
     return(x | y);}
@@ -174,7 +174,7 @@ BIGINT PM_lor(BIGINT x, BIGINT y)
 
 /* PM_LXOR - bitwise ^ (exclusive or) in C */
 
-BIGINT PM_lxor(BIGINT x, BIGINT y)
+int64_t PM_lxor(int64_t x, int64_t y)
    {
 
     return(x ^ y);}
@@ -184,7 +184,7 @@ BIGINT PM_lxor(BIGINT x, BIGINT y)
 
 /* PM_LLSHFT - bitwise << in C */
 
-BIGINT PM_llshft(BIGINT x, BIGINT y)
+int64_t PM_llshft(int64_t x, int64_t y)
    {
 
     return(x << y);}
@@ -194,7 +194,7 @@ BIGINT PM_llshft(BIGINT x, BIGINT y)
 
 /* PM_LRSHFT - bitwise >> in C */
 
-BIGINT PM_lrshft(BIGINT x, BIGINT y)
+int64_t PM_lrshft(int64_t x, int64_t y)
    {
 
     return(x >> y);}
@@ -204,7 +204,7 @@ BIGINT PM_lrshft(BIGINT x, BIGINT y)
 
 /* PM_LCMP - bitwise ~ in C */
 
-BIGINT PM_lcmp(BIGINT x)
+int64_t PM_lcmp(int64_t x)
    {
 
     return(~x);}
@@ -214,7 +214,7 @@ BIGINT PM_lcmp(BIGINT x)
 
 /* PM_LEQ - integer == in C */
 
-int PM_leq(BIGINT x, BIGINT y)
+int PM_leq(int64_t x, int64_t y)
    {
 
     return(x == y);}
@@ -224,7 +224,7 @@ int PM_leq(BIGINT x, BIGINT y)
 
 /* PM_LNEQ - integer != in C */
 
-int PM_lneq(BIGINT x, BIGINT y)
+int PM_lneq(int64_t x, int64_t y)
    {
 
     return(x != y);}
@@ -234,7 +234,7 @@ int PM_lneq(BIGINT x, BIGINT y)
 
 /* PM_LGE - integer >= in C */
 
-int PM_lge(BIGINT x, BIGINT y)
+int PM_lge(int64_t x, int64_t y)
    {
 
     return(x >= y);}
@@ -244,7 +244,7 @@ int PM_lge(BIGINT x, BIGINT y)
 
 /* PM_LGT - integer > in C */
 
-int PM_lgt(BIGINT x, BIGINT y)
+int PM_lgt(int64_t x, int64_t y)
    {
 
     return(x > y);}
@@ -254,7 +254,7 @@ int PM_lgt(BIGINT x, BIGINT y)
 
 /* PM_LLE - integer <= in C */
 
-int PM_lle(BIGINT x, BIGINT y)
+int PM_lle(int64_t x, int64_t y)
    {
 
     return(x <= y);}
@@ -264,7 +264,7 @@ int PM_lle(BIGINT x, BIGINT y)
 
 /* PM_LLT - integer < in C */
 
-int PM_llt(BIGINT x, BIGINT y)
+int PM_llt(int64_t x, int64_t y)
    {
 
     return(x < y);}
