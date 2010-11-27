@@ -526,7 +526,7 @@ int main(int c, char **v, char **env)
    {int i, dryrun, ignore, litrl, show, st, na, nt, rv;
     int async, nconn, recur, dmp, mem, cs;
     int rnfd, rnprc;
-    BIGINT rmem, rcpu, rfsz;
+    int64_t rmem, rcpu, rfsz;
     char mkfile[MAXLINE], s[MAXLINE], server[MAXLINE], srvna[MAXLINE];
     char msg[MAXLINE];
     char **cmnds, *mkname, *log, *flt, *tgt, *shell, *dpdir, *dpsys;

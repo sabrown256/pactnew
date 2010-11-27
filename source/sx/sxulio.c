@@ -18,7 +18,7 @@ typedef struct s_pdb_info pdb_info;
 
 struct s_bin_info
   {FILE *stream;                            /* file pointer for binary file */
-   BIGINT fileaddr;};                                /* disk address of data */
+   int64_t fileaddr;};                                /* disk address of data */
 
 struct s_pdb_info
   {PDBfile *file;                           /* file pointer for binary file */
@@ -191,7 +191,7 @@ static void SX_wrt_pdb_curve(PDBfile *fp, curve *crv, int icurve)
 static int _SX_ultra_text_filep(FILE *fp, int cmnt)
    {char bf[MAXLINE];
     int i, n;
-    BIGINT addr;
+    int64_t addr;
 
     while (TRUE)
        {addr = io_tell(fp);
@@ -848,7 +848,7 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
 
 object *SX_read_text_table(object *argl)
    {int i, j, n, nc, nr, fn, nlabel, ok;
-    BIGINT addrt, addrl; 
+    int64_t addrt, addrl; 
     long nl;
     char *name, *token, label[MAXLINE];
     FILE *fp;

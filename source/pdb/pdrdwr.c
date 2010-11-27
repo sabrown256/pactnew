@@ -671,7 +671,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
 				   syment *ep, int hbyt, int fbyt,
 				   BIGINT addr, BIGINT stop, long step)
    {long n, nb, niw, nitems;
-    int64_t eaddr;
+    BIGINT eaddr;
     char *outtype;
     SC_array *bl;
 
@@ -1151,7 +1151,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
                                 BIGINT addr, BIGINT stop, long step)
    {int nrd, nr;
     long n, nb, nitems;
-    int64_t eaddr; 
+    BIGINT eaddr; 
     char *intype;
     SC_array *bl, *blo;
 
@@ -1689,7 +1689,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
    {int dst, vif, size, boffs, count, itags;
     long i, n, nitems, bpi, nrd;
     long loc;
-    int64_t addr, eaddr;
+    BIGINT addr, eaddr;
     char bf[MAXLINE];
     char *pv, *litype, *lotype, *svr, **lvr;
     symindir iloc;

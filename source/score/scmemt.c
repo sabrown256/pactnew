@@ -594,7 +594,7 @@ void dprthrst(void)
 
 void dprthrnm(void)
    {int i, it, nt, ide;
-    BIGINT idt;
+    int64_t idt;
     emu_thread_info *ti;
 
     nt = SC_get_n_thread();
@@ -605,9 +605,9 @@ void dprthrnm(void)
 	 ti = (emu_thread_info *) st.data[i]; 
 	 if (ti != NULL)
             {ide = ti->ide;
-	     idt = (BIGINT) ti->tid;
+	     idt = (int64_t) ti->tid;
 	     fprintf(stdout, " %4d: %4d -> %lld\n",
-		     it, ide, idt);};};
+		     it, ide, (long long) idt);};};
 
     return;}
 

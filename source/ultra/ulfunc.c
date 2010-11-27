@@ -812,7 +812,7 @@ static object *UL_print_labels(int *indx, int nc,
                     continue;};
 
              if (id_flag == 1)
-                {SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) j), ret));}
+                {SS_Assign(ret, SS_mk_cons(SS_mk_integer(j), ret));}
              else if (id_flag == 2)
                 {SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));}
 
@@ -924,7 +924,7 @@ static object *_ULI_prefix(object *argl)
 
         {SS_Assign(ret,
                    SS_mk_cons(arg1,
-                              SS_mk_cons(SS_mk_integer((BIGINT) mindex),
+                              SS_mk_cons(SS_mk_integer(mindex),
                                          SS_mk_cons(SS_mk_string(fname),
                                                     ret))));};}
     else
@@ -940,7 +940,7 @@ static object *_ULI_prefix(object *argl)
                 {SS_Assign(ret,
                            SS_mk_cons(
                                       SS_mk_cons(arg1,
-                                                 SS_mk_cons(SS_mk_integer((BIGINT) mindex),
+                                                 SS_mk_cons(SS_mk_integer(mindex),
                                                             SS_mk_cons(SS_mk_string(fname),
                                                                        SS_null))),
                                       ret));};}
@@ -1293,7 +1293,7 @@ static object *_ULI_average(object *s)
     UL_plot_off();
 
     rv      = SS_null;
-    numtoks = SS_mk_integer((BIGINT) SS_length(s));
+    numtoks = SS_mk_integer(SS_length(s));
 
     cpp = _SS_mk_C_proc_va(UL_bc, 1, PM_fplus);
     c   = UL_bc(cpp, s);

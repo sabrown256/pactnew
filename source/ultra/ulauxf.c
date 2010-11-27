@@ -1109,7 +1109,7 @@ static object *_ULI_crv_npts(object *obj)
        {if (SS_interactive == ON)
            PRINT(stdout, "\n Number of points: %ld\n\n", SX_dataset[j].n);
 
-        o = SS_mk_integer((BIGINT) SX_dataset[j].n);};
+        o = SS_mk_integer(SX_dataset[j].n);};
 
     return(o);}
 

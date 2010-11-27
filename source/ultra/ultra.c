@@ -624,10 +624,10 @@ object *_ULI_thru(object *argl)
 
         if (first <= last)
            {for (id = first; id <= last; id++)
-                SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) id), ret));}
+                SS_Assign(ret, SS_mk_cons(SS_mk_integer(id), ret));}
         else
            {for (id = first; id >= last; id--)
-                SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) id), ret));};}
+                SS_Assign(ret, SS_mk_cons(SS_mk_integer(id), ret));};}
 
     else
        {char first[MAXLINE], last[MAXLINE];

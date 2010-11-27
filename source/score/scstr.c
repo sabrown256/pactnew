@@ -1748,7 +1748,7 @@ double SC_stof(char *s)
  */
 
 BIGINT SC_stoi(char *s)
-   {BIGINT rv;
+   {int64_t rv;
 
     rv = 0;
     if (s != NULL)
@@ -1764,7 +1764,7 @@ BIGINT SC_stoi(char *s)
  */
 
 BIGINT SC_stol(char *s)
-   {BIGINT rv;
+   {int64_t rv;
 
     rv = 0L;
     if (s != NULL)
@@ -2099,7 +2099,7 @@ int SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list __a__)
     void *p;
     int iv;
     long lv;
-    BIGINT bv;
+    int64_t bv;
     double dv;
 
     dst[0] = '\0';

@@ -21,17 +21,17 @@
 
 static int test_1(void)
    {int i, j, k, n, m, nj, st, lst;
-    BIGINT mnsz, extsz;
+    int64_t mnsz, extsz;
     size_t ni, nw, nis, nws;
     char *bf;
     FILE *fp;
-    BIGINT msa[] = {10, 100, 4096};
-    BIGINT esz[] = {10, 100, 4096};
+    int64_t msa[] = {10, 100, 4096};
+    int64_t esz[] = {10, 100, 4096};
     double mlt[] = {0.5, 0.89, 1.0, 1.31, 1.5};
 
     SC_mf_set_hooks();
 
-    n  = sizeof(msa)/sizeof(BIGINT);
+    n  = sizeof(msa)/sizeof(int64_t);
     nj = sizeof(mlt)/sizeof(double);
 
     m  = 3*msa[n-1]/2;
@@ -99,17 +99,17 @@ static int test_2(void)
 #ifdef HAVE_ALT_LARGE_FILE
 
     int i, j, k, n, m, nj, lst;
-    BIGINT mnsz, extsz;
+    int64_t mnsz, extsz;
     size_t ni, nw, nis, nws;
     char *bf;
     FILE *fp;
-    BIGINT msa[] = {10, 100, 4096};
-    BIGINT esz[] = {10, 100, 4096};
+    int64_t msa[] = {10, 100, 4096};
+    int64_t esz[] = {10, 100, 4096};
     double mlt[] = {0.5, 0.89, 1.0, 1.31, 1.5};
 
     SC_lmf_set_hooks();
 
-    n  = sizeof(msa)/sizeof(BIGINT);
+    n  = sizeof(msa)/sizeof(int64_t);
     nj = sizeof(mlt)/sizeof(double);
 
     m  = 3*msa[n-1]/2;
@@ -180,7 +180,7 @@ static int test_2(void)
 static int test_3(void)
    {int i, m, st;
     size_t nr, nw;
-    BIGINT od, oi, ln;
+    int64_t od, oi, ln;
     char *src, *dst, *ps, *pd;
     FILE *fp;
     SC_file_block *bl;
@@ -243,7 +243,7 @@ static int test_4(void)
 
     int i, m;
     size_t nr, nw;
-    BIGINT od, oi, ln;
+    int64_t od, oi, ln;
     char *src, *dst, *ps, *pd;
     FILE *fp;
     SC_file_block *bl;
@@ -351,7 +351,7 @@ int main(int c, char **v)
     io_printf(stdout, "                          long      = %d\n", sizeof(long));
     io_printf(stdout, "                          long long = %d\n", sizeof(long long));
     io_printf(stdout, "                          size_t    = %d\n", sizeof(size_t));
-    io_printf(stdout, "                          BIGINT     = %d\n", sizeof(BIGINT));
+    io_printf(stdout, "                          int64_t     = %d\n", sizeof(int64_t));
     io_printf(stdout, "\n");
 
 #if defined(NEED_ALT_LARGE_FILE) && !defined(HAVE_ALT_LARGE_FILE)    

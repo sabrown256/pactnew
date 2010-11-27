@@ -145,8 +145,7 @@ static object *_SXI_get_dimension(object *obj)
 	set = f->range;
 	ndr = (set == NULL) ? 0 : set->dimension_elem;
 
-	rv = SS_mk_cons(SS_mk_integer((BIGINT) ndd),
-			SS_mk_integer((BIGINT) ndr));}
+	rv = SS_mk_cons(SS_mk_integer(ndd), SS_mk_integer(ndr));}
     else
        rv = SS_null;
 

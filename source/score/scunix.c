@@ -31,7 +31,7 @@ static void _SC_path_delimiter_unix(char *delim)
 
 static BIGINT _SC_file_length_unix(char *path)
    {int st;
-    BIGINT ln;
+    int64_t ln;
     struct stat sb;
 
     ln = 0;

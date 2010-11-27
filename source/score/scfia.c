@@ -38,7 +38,7 @@ extern int
  */
 
 BIGINT SC_stash_pointer(void *p)
-   {BIGINT i;
+   {int64_t i;
 
     i = -1;
 
@@ -114,7 +114,7 @@ void *SC_get_pointer(BIGINT n)
  */
 
 BIGINT SC_pointer_index(void *p)
-   {BIGINT i;
+   {int64_t i;
 
 #ifdef F77_INT_SIZE_PTR_DIFFER
     int np;

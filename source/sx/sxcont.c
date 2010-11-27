@@ -304,8 +304,7 @@ static object *_SX_list_vobjects(char *patt, g_file *po, int type)
 	     t = mitem->type[3];
 	     if (((type == 0) || (t == type)) && SC_regx_match(s, patt))
 	        {PRINT(stdout, " %ld  %c  %s\n", i+1, t, s);
-		 SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) (i+1)),
-					   ret));}};
+		 SS_Assign(ret, SS_mk_cons(SS_mk_integer(i+1), ret));}};
 
 	SS_Assign(ret, SS_reverse(ret));};
 

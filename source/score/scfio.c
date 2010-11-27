@@ -49,11 +49,11 @@ struct s_REMOTE_FILE
    {PROCESS *pp;
     int type;
     int fid;
-    BIGINT file_size;
+    int64_t file_size;
     char *buffer;
     long sb_addr;
     long size;
-    BIGINT cf_addr;};
+    int64_t cf_addr;};
 
 int
  SC_verify_writes = FALSE;
@@ -185,7 +185,7 @@ int SC_gather_io_info(FILE *fp, int wh)
  */
 
 BIGINT SC_set_buffer_size(BIGINT sz)
-   {BIGINT rv;
+   {int64_t rv;
     
     rv = _SC.buffer_size;
     
@@ -199,7 +199,7 @@ BIGINT SC_set_buffer_size(BIGINT sz)
 /* SC_GET_BUFFER_SIZE - get the default I/O buffer size */
 
 BIGINT SC_get_buffer_size(void)
-   {BIGINT rv;
+   {int64_t rv;
     
     rv = _SC.buffer_size;
 
@@ -368,9 +368,9 @@ static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
    {int ok, flags, rw, fd;
-    BIGINT i, nb;
+    int64_t i, nb;
     size_t nw, nr;
-    BIGINT addr;
+    int64_t addr;
     char msg[MAXLINE];
     char *ps, *t;
 
@@ -435,7 +435,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 char *SC_fgets(char *s, int n, FILE *fp)
    {int i, nbr, nb;
-    BIGINT pos;
+    int64_t pos;
     char *r;
     static int count = 0;
 
@@ -539,9 +539,9 @@ static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
 
 /* _SC_GET_CMD_RESP - wait for the response from the server */
 
-static BIGINT _SC_get_cmd_resp(PROCESS *pp, char *msg)
+static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
    {int lm;
-    BIGINT rv;
+    int64_t rv;
     char s[MAXLINE];
 
     lm = strlen(msg);
@@ -619,7 +619,7 @@ int SC_file_access(int log)
            {case SC_FOPEN :
                  {int i, status, ok;
                   char *name, *mode;
-                  BIGINT len;
+                  int64_t len;
 
                   ok = TRUE;
 		  ONCE_SAFE(TRUE, NULL)
@@ -720,7 +720,7 @@ int SC_file_access(int log)
                  break;
 
             case SC_FSEEK :
-                 {BIGINT addr;
+                 {int64_t addr;
                   int offset, whence;
 
                   addr   = SC_STOADD(SC_strtok(s+2, ",\n", t));
@@ -1306,7 +1306,7 @@ static int _SC_rungetc(int c, FILE *stream)
 static FILE *_SC_ropen(char *name, char *mode)
    {char s[MAXLINE], host[MAXLINE], fname[MAXLINE], *t;
     int rsp, type, get_data_line, log;
-    BIGINT len;
+    int64_t len;
     PROCESS *pp;
     REMOTE_FILE *fp;
     file_io_desc *fid;
@@ -1471,7 +1471,7 @@ int SC_exit_all(void)
 /* _SC_LFTELL - large file IO wrapper for FTELL method */
 
 static BIGINT _SC_lftell(FILE *fp)
-   {BIGINT rv;
+   {int64_t rv;
 
 #ifdef _LARGE_FILES
     extern off_t ftello(FILE *fp);
@@ -1682,7 +1682,7 @@ int io_seek(FILE *fp, long offs, int whence)
 
 	    else if (fid->lfseek != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfseek)(fp, (BIGINT) offs, whence);
+		rv = (*fid->lfseek)(fp, (int64_t) offs, whence);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFSEEK);};};};
 
     return(rv);}
@@ -2071,7 +2071,7 @@ int lio_setvbuf(FILE *fp, char *bf, int type, size_t sz)
 /* LIO_TELL - large file IO wrapper for FTELL method */
 
 BIGINT lio_tell(FILE *fp)
-   {BIGINT rv;
+   {int64_t rv;
     file_io_desc *fid;
 
     rv = -1;
@@ -2544,7 +2544,7 @@ int SC_io_connect(int flag)
  */
 
 BIGINT SC_file_length(char *name)
-   {BIGINT ln;
+   {int64_t ln;
     char path[PATH_MAX];
 
     ln = -1L;
@@ -2564,7 +2564,7 @@ BIGINT SC_file_length(char *name)
  */
 
 BIGINT SC_file_size(FILE *fp)
-   {BIGINT ad, ln;
+   {int64_t ad, ln;
 
 /* remember where we are */
     ad = ftell(fp);
@@ -2587,7 +2587,7 @@ BIGINT SC_file_size(FILE *fp)
  */
 
 BIGINT SC_filelen(FILE *fp)
-   {BIGINT caddr, flen;
+   {int64_t caddr, flen;
 
     caddr = lio_tell(fp);
     lio_seek(fp, 0, SEEK_END);

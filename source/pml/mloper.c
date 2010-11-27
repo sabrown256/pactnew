@@ -122,10 +122,10 @@ BIGINT PM_ltimes(BIGINT x, BIGINT y)
 /* PM_LDIVIDE - BIGINT integer division in C */
 
 BIGINT PM_ldivide(BIGINT x, BIGINT y)
-   {BIGINT rv;
+   {int64_t rv;
 
     if (_PM.bmx == 0)
-       SC_fix_lmt(sizeof(BIGINT), NULL, &_PM.bmx, NULL);
+       SC_fix_lmt(sizeof(int64_t), NULL, &_PM.bmx, NULL);
 
     if (y != 0)
        rv = x/y;
@@ -137,15 +137,15 @@ BIGINT PM_ldivide(BIGINT x, BIGINT y)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_LMODULO - return the remainder after BIGINT integer division in C */
+/* PM_LMODULO - return the remainder after int64_t integer division in C */
 
 BIGINT PM_lmodulo(BIGINT x, BIGINT y)
-   {BIGINT rv;
+   {int64_t rv;
 
     if (y != 0)
        rv = x % y;
     else
-       rv = (BIGINT) 0;
+       rv = (int64_t) 0;
 
     return(rv);}
 

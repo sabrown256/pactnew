@@ -367,7 +367,7 @@ static object *_SXI_num_arr_len(object *obj)
 
     n = NUMERIC_ARRAY_LENGTH(obj);
 
-    o = SS_mk_integer((BIGINT) n);
+    o = SS_mk_integer(n);
 
     return(o);}
 
@@ -398,9 +398,9 @@ static object *_SXI_num_arr_extr(object *arg)
     SFREE(d);
 
     lst = SS_null;
-    obj = SS_mk_integer((BIGINT) imax);
+    obj = SS_mk_integer(imax);
     lst = SS_mk_cons(obj, lst);
-    obj = SS_mk_integer((BIGINT) imin);
+    obj = SS_mk_integer(imin);
     lst = SS_mk_cons(obj, lst);
     obj = SS_mk_float(fmax);
     lst = SS_mk_cons(obj, lst);
