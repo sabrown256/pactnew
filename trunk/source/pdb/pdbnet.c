@@ -107,7 +107,7 @@ static int _PN_bflush(FILE *stream)
 
 static BIGINT _PN_btell(FILE *stream)
    {BF_FILE *fb;
-    BIGINT addr;
+    int64_t addr;
 
     fb = _PD_GET_FILE_PTR(stream);
 
@@ -660,7 +660,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 	_PD_ptr_init_apl(file);
 
 /* register the file with the parallel file manager */
-	_PD_ADD_FILE(file, (BIGINT) 0);
+	_PD_ADD_FILE(file, (int64_t) 0);
 
 /* create a directory to hold the symbol table entries
  * generated for pointees.
@@ -724,7 +724,7 @@ int PN_write(PDBfile *file, char *type, long nitems, void *vr)
 
 int PN_read(PDBfile *file, char *type, long nitems, void *vr)
    {int ret;
-    BIGINT addr;
+    int64_t addr;
     char bf[MAXLINE];
     syment *ep;
 

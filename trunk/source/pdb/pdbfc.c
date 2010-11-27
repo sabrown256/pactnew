@@ -22,8 +22,8 @@ typedef struct s_containerf containerf;
  
 struct s_containerf
    {fcontainer *fc;
-    BIGINT begin;
-    BIGINT end;};
+    int64_t begin;
+    int64_t end;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -31,7 +31,7 @@ struct s_containerf
 /* _PD_FCTELL - do an ftell on the pseudo file */
 
 static BIGINT _PD_fctell(FILE *fp)
-   {BIGINT addr, ada;
+   {int64_t addr, ada;
     containerf *cf;
     FILE *fl;
 
@@ -53,7 +53,7 @@ static BIGINT _PD_fctell(FILE *fp)
 
 static int _PD_fcseek(FILE *fp, BIGINT addr, int offset)
    {int ret;
-    BIGINT ada;
+    int64_t ada;
     containerf *cf;
     FILE *fl;
 
@@ -107,7 +107,7 @@ static BIGUINT _PD_fcread(void *p, size_t sz, BIGUINT ni, FILE *fp)
     cf = GET_CONTAINERF(fp);
     fl = GET_FILE(cf);
 
-{BIGINT ada;
+{int64_t ada;
 ada = ftell(fl);
 
     rv = fread(p, sz, ni, fl);

@@ -755,7 +755,7 @@ int main(int c, char **v)
    {int i, err;
     int test_zero, test_one, test_two;
     int use_mapped_files, check_writes;
-    BIGINT bfsz;
+    int64_t bfsz;
 
     PD_init_threads(0, NULL);
 

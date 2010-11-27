@@ -19,7 +19,7 @@ typedef struct pfmanager_s pfmanager;
 
 struct pfmanager_s
    {int available;
-    BIGINT addr;};
+    int64_t addr;};
 
 #define DISK(t, x)  ((x)->f_addr[t].diskaddr)
 
@@ -240,7 +240,7 @@ static int _PD_pflush(FILE *stream)
 /* _PD_PTELL - do an ftell on the parallel file */
 
 static BIGINT _PD_ptell(FILE *stream)
-   {BIGINT addr;
+   {int64_t addr;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
 
@@ -302,7 +302,7 @@ static int _PD_pseek(FILE *stream, BIGINT offset, int whence)
 static BIGUINT _PD_pread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
    {int status;
     size_t nbw, fail;
-    BIGINT offs;
+    int64_t offs;
     FILE *strm;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -340,7 +340,7 @@ static BIGUINT _PD_pread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
 static BIGUINT _PD_pwrite(void *s, size_t nbi, BIGUINT ni, FILE *stream)
    {int rv;
     long nbw;
-    BIGINT ad;
+    int64_t ad;
     size_t fail;
     FILE *fs;
     PD_Pfile *pf;
@@ -399,7 +399,7 @@ static int _PD_pprintf(FILE *stream, char *fmt, va_list a)
 static int _PD_pputs(const char *s, FILE *stream)
    {int status, fail;
     long nbw;
-    BIGINT ad;
+    int64_t ad;
     FILE *fs;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -435,7 +435,7 @@ static int _PD_pputs(const char *s, FILE *stream)
 
 static char *_PD_pgets(char *s, int nc, FILE *stream)
    {int status;
-    BIGINT ad;
+    int64_t ad;
     char *ps, *fail;
     FILE *fs;
     PD_Pfile *pf;
@@ -475,7 +475,7 @@ static char *_PD_pgets(char *s, int nc, FILE *stream)
 
 static int _PD_pgetc(FILE *stream)
    {int c, status, fail;
-    BIGINT ad;
+    int64_t ad;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
 
@@ -509,7 +509,7 @@ static int _PD_pgetc(FILE *stream)
 
 static int _PD_pungetc(int c, FILE *stream)
    {int status, fail;
-    BIGINT ad;
+    int64_t ad;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
 
@@ -634,7 +634,7 @@ static void _PD_pfm_setup_mp_file_t(PDBfile *file, SC_communicator comm)
 static BIGINT _PD_pfm_getspace_t(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
    {int id;
-    BIGINT rv;
+    int64_t rv;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
 
@@ -684,7 +684,7 @@ static void _PD_pfm_setaddr_t(PDBfile *file, BIGINT addr)
 /* _PD_PFM_EXTEND_FILE_T - extend the file by the given number of bytes */
 
 static int _PD_pfm_extend_file_t(PDBfile *file, long nb)
-   {BIGINT addr;
+   {int64_t addr;
     char bf[1];
     FILE *fp;
 
@@ -715,7 +715,7 @@ static BIGINT _PD_next_address_t(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int flag, ipt;
     size_t nb, bpi;
-    BIGINT addr;
+    int64_t addr;
     defstr *dpf;
 
     flag = ((file->mpi_mode == TRUE)  ||
@@ -773,7 +773,7 @@ static BF_FILE *_PD_get_file_ptr_t(FILE *file)
 /* _PD_GET_FILE_SIZE_T - return the file size */
 
 static BIGINT _PD_get_file_size_t(PDBfile *file)
-   {BIGINT ln;
+   {int64_t ln;
     FILE *fp;
     PD_Pfile *pf;
 

@@ -65,7 +65,7 @@ static int _PD_wr_itag_iii(PDBfile *file, long n, long nitems, char *type,
  * in order to support relocation
  */
 	   {snprintf(s, MAXLINE, "\n%s(%ld) %32lld %d;\n",
-		     type, nitems, (BIGINT) addr, loc);
+		     type, nitems, (long long) addr, loc);
 
 	    lio_printf(fp, s);};
 
@@ -118,7 +118,7 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 	       pi->flag = atoi(token);};
 
 	snprintf(t, MAXLINE, "\n%ld %s %32lld %d;\n",
-		 pi->nitems, pi->type, (BIGINT) pi->addr, pi->flag);
+		 pi->nitems, pi->type, (long long) pi->addr, pi->flag);
 
 	pi->length = strlen(t);}
 
@@ -513,7 +513,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
    {long bsz;
     char *name, *type, *var, *adr, *s, *local;
-    BIGINT addr, numb;
+    int64_t addr, numb;
     syment *ep;
     hasharr *tab;
     memdes *desc;
@@ -575,7 +575,7 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
 static int _PD_rd_symt_iii(PDBfile *file)
    {int rv;
     long nbs;
-    BIGINT addr, numb;
+    int64_t addr, numb;
     char *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -613,7 +613,7 @@ static int _PD_rd_symt_iii(PDBfile *file)
 
 static void _PD_rd_blocks_iii(PDBfile *file)
    {long j, n, nt, numb, stride, bsz;
-    BIGINT addr;
+    int64_t addr;
     char *name, *token, *s, *local;
     syment *ep;
     dimdes *dim;
@@ -872,7 +872,7 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
 static BIGINT _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
    {int n, nmb, ok;
     long i;
-    BIGINT addr;
+    int64_t addr;
     char *bf, *nm;
     FILE *fp;
     hasharr *fc, *hc;
@@ -999,7 +999,7 @@ static int _PD_wr_blocks_iii(PDBfile *file)
 
 		  _PD_block_get_desc(&addr, &ni, bl, j);
 
-		  ok &= _PD_put_string(1, " %lld %ld", (BIGINT) addr, ni);};
+		  ok &= _PD_put_string(1, " %lld %ld", (int64_t) addr, ni);};
 
 	     ok &= _PD_put_string(1, "\n");};};
 
@@ -1044,7 +1044,7 @@ static int _PD_wr_csum_iii(PDBfile *file)
 static BIGINT _PD_wr_symt_iii(PDBfile *file)
    {int n, nd, flag, ok;
     long i, nt, nb, ni, stride, mn, mx;
-    BIGINT addr, ad;
+    int64_t addr, ad;
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
@@ -1086,7 +1086,7 @@ static BIGINT _PD_wr_symt_iii(PDBfile *file)
 
 	 _PD_put_string(n++, 
 			"   %s %s",
-			ty, nm, nb, (BIGINT) ad);
+			ty, nm, nb, (int64_t) ad);
 
 /* adjust the slowest varying dimension to reflect only the first block */
 	 flag = PD_get_major_order(file);
@@ -1114,7 +1114,7 @@ static BIGINT _PD_wr_symt_iii(PDBfile *file)
 
 	 _PD_put_string(n++, 
 			" @ %lld (%ld);\n",
-			(BIGINT) ad, nb);};
+			(int64_t) ad, nb);};
 
 /* pad an extra newline to mark the end of the symbol table for _PD_rd_symt */
     _PD_put_string(n++, "\n");
@@ -1235,7 +1235,7 @@ static int _PD_open_iii(PDBfile *file)
 
 /* read the trailer */
     nb = MAXLINE - 1;
-    if (lio_seek(fp, (BIGINT) -nb, SEEK_END))
+    if (lio_seek(fp, (int64_t) -nb, SEEK_END))
        PD_error("FSEEK FAILED TO END - _PD_OPEN_III", PD_OPEN);
 
     nb = lio_read(str, (size_t) 1, (size_t) nb, fp);
@@ -1347,7 +1347,7 @@ static int _PD_create_iii(PDBfile *file, int mst)
  */
 
 static int _PD_write_meta_iii(PDBfile *file, FILE *out, int fh)
-   {BIGINT addr;
+   {int64_t addr;
     FILE *fp;
 
     if (out == NULL)
@@ -1435,8 +1435,8 @@ static int _PD_flush_iii(PDBfile *file)
 	ok = _PD_csum_file_write(file);
 
 /* write out the chart, symtab addresses, and format version */
-	lio_printf(fp, "StructureChartAddress: %lld\n", (BIGINT) file->chrtaddr);
-	lio_printf(fp, "SymbolTableAddress: %lld\n", (BIGINT) file->symtaddr);
+	lio_printf(fp, "StructureChartAddress: %lld\n", (int64_t) file->chrtaddr);
+	lio_printf(fp, "SymbolTableAddress: %lld\n", (int64_t) file->symtaddr);
 	lio_printf(fp, "%s\n", nht);};
 
     return(TRUE);}

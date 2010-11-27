@@ -61,8 +61,8 @@ static void _PD_pfm_remove_file_s(FILE *file)
 
 static BIGINT _PD_pfm_getspace_s(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
-   {BIGINT addr;
-    BIGINT old, new;
+   {int64_t addr;
+    int64_t old, new;
 
     old = file->chrtaddr;
     new = _PD_get_current_address(file, PD_GENERIC);
@@ -78,7 +78,7 @@ static BIGINT _PD_pfm_getspace_s(PDBfile *file, size_t nbytes,
 
 static int _PD_pfm_extend_file_s(PDBfile *file, long nb)
    {FILE *fp;
-    BIGINT addr;
+    int64_t addr;
     char bf[1];
 
     if (nb > 0)
@@ -147,7 +147,7 @@ static int _PD_set_eod_s(PDBfile *file, BIGINT addr, long nb)
 
 static BIGINT _PD_next_address_s(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
-   {BIGINT addr;
+   {int64_t addr;
     FILE *fp;
 
     fp = file->stream;
@@ -189,7 +189,7 @@ static BF_FILE *_PD_get_file_ptr_s(FILE *file)
 /* _PD_GET_FILE_SIZE_S - return the file size */
 
 static BIGINT _PD_get_file_size_s(PDBfile *file)
-   {BIGINT rv;
+   {int64_t rv;
     FILE *fp;
 
     fp = (file != NULL) ? file->stream : NULL;
@@ -313,7 +313,7 @@ static int _PD_is_null_fp_s(void *fp)
 /* _PD_STELL - FTELL method for STREAM */
 
 static BIGINT _PD_stell(FILE *stream)
-   {BIGINT rv;
+   {int64_t rv;
 
     rv = lio_tell(stream);
 

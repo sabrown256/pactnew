@@ -999,7 +999,7 @@ static int test_5(char *base, char *tgt, int n)
 
 static void change_test_6_data(char *name)
    {size_t nw;
-    BIGINT addr;
+    int64_t addr;
     syment *ep;
     PDBfile *strm;
     FILE *fp;

@@ -80,7 +80,7 @@ typedef struct s_PD_MP_request PD_MP_request;
 
 struct s_pfelement
    {int available;   /* is this element available for use */
-    BIGINT addr;      /* current disk address */
+    int64_t addr;      /* current disk address */
     char *name;      /* filename */
     int nflushed;    /* num of processes who have flushed this pfile */
     int nprocs;      /* num of processes total */
@@ -92,7 +92,7 @@ struct s_pflist
  
 struct s_PD_MP_ADD_req
    {char *fname;
-    BIGINT start_addr;};
+    int64_t start_addr;};
 
 struct s_PD_MP_GETSPACE_req
    {int id;
@@ -922,7 +922,7 @@ static void _PD_pfm_add_file_d(PDBfile *file, BIGINT start_addr)
 
     pf = FILE_IO_INFO(PD_Pfile, file->stream);
 
-    pf->mp_id = _PD_pfm_add_d(file, (BIGINT) 0);
+    pf->mp_id = _PD_pfm_add_d(file, (int64_t) 0);
 
     return;}
 
@@ -1019,7 +1019,7 @@ static long _PD_pfm_buffer_mp_req(char *type, void *request, char **buffer)
 
 static BIGINT _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
    {long nbuf;
-    BIGINT rv;
+    int64_t rv;
     char *mpbuf;
     PD_MP_GETSPACE_req space_req;
     MPI_Comm comm;
@@ -1051,7 +1051,7 @@ static BIGINT _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
 
         MPI_Send(mpbuf, nbuf, MPI_BYTE, _PD.mp_master_proc,
                  PD_MP_GETSPACE, comm);
-        MPI_Recv(&rv, sizeof(BIGINT), 
+        MPI_Recv(&rv, sizeof(int64_t), 
                  MPI_BYTE, _PD.mp_master_proc,
                  PD_MP_GETSPACE, comm, &stat);
 
@@ -1072,7 +1072,7 @@ static BIGINT _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
  */
 
 static BIGINT _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
-   {BIGINT rv;
+   {int64_t rv;
     PD_Pfile *pf;
     MPI_Comm comm;
     SC_THREAD_ID(tid);
@@ -1086,7 +1086,7 @@ static BIGINT _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
 
     if (file->mpi_file)
        {comm = (MPI_Comm) _PD.mp_comm;
-	MPI_Bcast(&rv, sizeof(BIGINT), MPI_BYTE, _PD.mp_master_proc, comm);};
+	MPI_Bcast(&rv, sizeof(int64_t), MPI_BYTE, _PD.mp_master_proc, comm);};
     
     DISK(tid, pf) = rv;
 
@@ -1104,7 +1104,7 @@ static BIGINT _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
 static BIGINT _PD_pfm_getspace_d(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
    {int id;
-    BIGINT rv;
+    int64_t rv;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
 
@@ -1188,7 +1188,7 @@ static int _PD_pfm_remote_shutdown(void)
  */
 
 static BIGINT _PD_pfm_remote_getspace(char *buf)
-   {BIGINT rv;
+   {int64_t rv;
     PDBfile *inf;
     PD_MP_GETSPACE_req req;
 
@@ -1248,7 +1248,7 @@ static int _PD_pfm_remote_flush(char *buf)
 
 static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
    {int rv, id, done, shutdown;
-    BIGINT space;
+    int64_t space;
     MPI_Request request;
 
     done     = 0;
@@ -1261,7 +1261,7 @@ static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
        {case PD_MP_GETSPACE :
              DBG("of type PD_MP_GETSPACE");
              space = _PD_pfm_remote_getspace(req.buf);
-             MPI_Send(&space, sizeof(BIGINT), MPI_BYTE, req.sender, PD_MP_GETSPACE, comm);
+             MPI_Send(&space, sizeof(int64_t), MPI_BYTE, req.sender, PD_MP_GETSPACE, comm);
              break; 
              
         case PD_MP_FLUSH :
@@ -1440,7 +1440,7 @@ static BIGINT _PD_next_address_d(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int flag, ipt;
     size_t nb, bpi;
-    BIGINT addr;
+    int64_t addr;
     defstr *dpf;
 
     DBG("+ _PD_next_address_d");
@@ -1503,7 +1503,7 @@ static BF_FILE *_PD_get_file_ptr_d(FILE *file)
 
 static BIGINT _PD_get_file_size_d(PDBfile *file)
    {int status;
-    BIGINT rv;
+    int64_t rv;
     MPI_Offset sz;
     PD_Pfile *pf;
     MPI_File *fp;

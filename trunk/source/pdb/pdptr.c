@@ -714,7 +714,7 @@ long _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
 int _PD_ptr_wr_itags(PDBfile *file, void *vr, long nitems, char *type)
    {int rv, loc;
     long n;
-    BIGINT addr;
+    int64_t addr;
     PD_address *ad;
 
 /* save the address of the itag because
@@ -831,7 +831,7 @@ static long _PD_ptr_rd_lookup(PDBfile *file, BIGINT addr, int *pfrst)
 void _PD_ptr_rd_install_addr(PDBfile *file, BIGINT addr, int loc)
    {int frst;
     long i;
-    BIGINT here;
+    int64_t here;
     PD_address *ad;
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
@@ -860,7 +860,7 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 			      int *pfrst)
    {int i, loc;
     long rv;
-    BIGINT addr, naddr;
+    int64_t addr, naddr;
     PD_address *ad;
 
     if (file->use_itags == FALSE)

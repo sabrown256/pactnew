@@ -489,7 +489,7 @@ long _PD_lookup_size(char *s, hasharr *tab)
  */
 
 BIGINT _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
-   {BIGINT addr;
+   {int64_t addr;
     char name[MAXLINE];
     char *token;
     memdes *desc, *nxt;

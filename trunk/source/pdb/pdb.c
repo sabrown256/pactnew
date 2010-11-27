@@ -108,7 +108,7 @@ PDBfile *PD_open(char *name, char *mode)
 
 PDBfile *PD_family(PDBfile *of, int flag)
    {long i;
-    BIGINT msz, csz;
+    int64_t msz, csz;
     char name[MAXLINE];
     PDBfile *nf;
     defstr *dp;
@@ -549,7 +549,7 @@ int PD_read_as_alt(PDBfile *file, char *name, char *type,
 syment *_PD_defent(PDBfile *file, char *name, char *outtype,
 		   long number, dimdes *dims)
    {long bpi;
-    BIGINT addr;
+    int64_t addr;
     char bf[MAXLINE];
     char *lname;
     defstr *dp;
@@ -689,7 +689,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 		  void *vr, dimdes *dims, int appnd, int *pnew)
    {int c, new, ok;
     long number; 
-    BIGINT addr;
+    int64_t addr;
     char bf[MAXLINE];
     char *lname, *fullpath;
     syment *ep;
@@ -1369,7 +1369,7 @@ int PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr)
    {int st, reord, mask, rshift, nbits, nrem;
     int n_exp, n_mant, exp_sum, mant_sum, mant_bit, exp_bit;
     int *ord;
-    BIGINT i, j, in, nb;
+    int64_t i, j, in, nb;
     long *fmt;
     char *buf, *vtemp, *btemp, *var;
     PD_smp_state *pa;

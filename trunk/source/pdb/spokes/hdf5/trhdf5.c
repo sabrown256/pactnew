@@ -868,10 +868,9 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
  *                    - parsing data as we go 
  */
 
-static herr_t H5_read_group_node(hid_t group_id, const char *mname,
-				 void *a)
+static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
    {int nc;
-    BIGINT addr;
+    int64_t addr;
     char *typename, *prev_group, *temp_prefix, *fullname;
     herr_t status;
     hid_t  dt_id;

@@ -130,7 +130,7 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
    {int rv, bpi;
     long i, nb, n, ni;
-    BIGINT addr;
+    int64_t addr;
     char bf[MAXLINE];
     char *s;
     syment *ep;
@@ -183,8 +183,8 @@ int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
 int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
    {int rv, st, bpi;
     long i, mn, mx, ni, nb;
-    BIGINT start, stop;
-    BIGINT addr;
+    int64_t start, stop;
+    int64_t addr;
     unsigned char cdig[PD_CKSUM_LEN], rdig[PD_CKSUM_LEN];
     char bf[MAXLINE];
     char *lname, *type;
@@ -253,8 +253,8 @@ int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
 int _PD_csum_block_write(PDBfile *file, syment *ep, long n)
    {int rv, bpi;
     long ni;
-    BIGINT start, stop;
-    BIGINT addr;
+    int64_t start, stop;
+    int64_t addr;
     char *type;
     unsigned char cdig[PD_CKSUM_LEN];
     SC_array *bl;
@@ -311,7 +311,7 @@ int _PD_csum_reserve(PDBfile *file)
 
 int _PD_csum_file_write(PDBfile *file)
    {int rv;
-    BIGINT addr;
+    int64_t addr;
     unsigned char dig[PD_CKSUM_LEN];
     FILE *fp;
 
@@ -354,7 +354,7 @@ int _PD_csum_file_write(PDBfile *file)
 
 int PD_verify(PDBfile *file)
    {int i, ok;
-    BIGINT prev, addr;
+    int64_t prev, addr;
     unsigned char cso[PD_CKSUM_LEN], csn[PD_CKSUM_LEN];
     char bf[PD_CKSUM_LEN];
     char *p;
@@ -422,7 +422,7 @@ int PD_activate_cksum(PDBfile *file, PD_checksum_mode flag)
 
 BIGINT _PD_locate_checksum(PDBfile* file)
    {int nb;
-    BIGINT addr, offs;
+    int64_t addr, offs;
     char sgn[PD_CKSUM_SIG_LEN+1], bf[MAXLINE+1];
     char *pcs;
     FILE *fp;
@@ -467,7 +467,7 @@ BIGINT _PD_locate_checksum(PDBfile* file)
  */
 
 void _PD_md5_checksum(PDBfile* file, unsigned char digest[PD_CKSUM_LEN]) 
-   {BIGINT start, stop, here;
+   {int64_t start, stop, here;
     FILE *fp, *fr;
     
     if (file != NULL)
