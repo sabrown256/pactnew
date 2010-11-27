@@ -318,7 +318,7 @@ static double _PA_array_ref_i(void *vr, long indx, int type)
     d = 0.0;
 
     if (SC_is_type_num(type) == TRUE)
-       SC_convert_id(SC_DOUBLE_I, &d, 0, type, vr, indx, 1, 1, FALSE);
+       SC_convert_id(SC_DOUBLE_I, &d, 0, 1, type, vr, indx, 1, 1, FALSE);
 
     else
        PA_ERR(TRUE,
@@ -875,7 +875,7 @@ static long _PA_copy_sub_select(int did, void *d, long od,
     n  = sshp[0];
 
     if (dm == 0)
-       {SC_convert_id(did, d, od, sid, s, os, ss, n, FALSE);
+       {SC_convert_id(did, d, od, 1, sid, s, os, ss, n, FALSE);
         ni = n;}
 
     else
@@ -967,7 +967,7 @@ int _PA_get_data(double *d, char *vr, long ni, long offset, long stride)
 
     if (SC_is_type_num(id) == TRUE)
        {pv = PA_VARIABLE_DATA(pp);
-	SC_convert_id(SC_DOUBLE_I, d, 0, id, pv, offset, stride, ni, FALSE);}
+	SC_convert_id(SC_DOUBLE_I, d, 0, 1, id, pv, offset, stride, ni, FALSE);}
 
     else
        PA_ERR(TRUE,

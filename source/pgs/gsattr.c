@@ -66,12 +66,12 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
  */
 	 if (pa != NULL)
 	    {if (SC_is_type_num(ityp) == TRUE)
-		SC_convert_id(ityp, pv, 0, ityp, pa, 0, 1, 1, FALSE);
+		SC_convert_id(ityp, pv, 0, 1, ityp, pa, 0, 1, 1, FALSE);
 	     else if (ityp == SC_POINTER_I)
-	        SC_convert_id(ityp, pv, 0, ityp, &pa, 0, 1, 1, FALSE);}
+	        SC_convert_id(ityp, pv, 0, 1, ityp, &pa, 0, 1, 1, FALSE);}
 
 	 else if (dflt == TRUE)
-	    SC_convert_id(ityp, pv, 0, ityp, v, 0, 1, 1, FALSE);};
+	    SC_convert_id(ityp, pv, 0, 1, ityp, v, 0, 1, 1, FALSE);};
 
     return(i);}
 

@@ -109,7 +109,7 @@ static void write_header(FILE *fp)
 static void _SC_write_n_to_n_fast(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -119,7 +119,7 @@ static void _SC_write_n_to_n_fast(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        *pd = *ps;\n");
 
     fprintf(fp, "    return(i);}\n");
@@ -136,7 +136,7 @@ static void _SC_write_n_to_n_fast(FILE *fp, int did, int sid)
 static void _SC_write_n_to_n_safe(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -151,13 +151,13 @@ static void _SC_write_n_to_n_safe(FILE *fp, int did, int sid)
     if (did < sid)
        {fprintf(fp, "    smn = (%s) %s;\n", types[sid], mn[did]);
 	fprintf(fp, "    smx = (%s) %s;\n", types[sid], mx[did]);
-	fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+	fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
 	fprintf(fp, "        {sm = *ps;\n");
 	fprintf(fp, "         sm = min(sm, smx);\n");
 	fprintf(fp, "         sm = max(sm, smn);\n");
 	fprintf(fp, "         *pd = sm;};\n");}
     else
-       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+       {fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
 	fprintf(fp, "        *pd = *ps;\n");};
 
     fprintf(fp, "    return(i);}\n");
@@ -176,7 +176,7 @@ static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
 
     eid = 2;
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -193,7 +193,7 @@ static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
     fprintf(fp, "    pd += od;\n");
 
     if (did < sid)
-       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+       {fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
 	fprintf(fp, "        {zs = *ps;\n");
 	fprintf(fp, "         sr = %s(zs);\n", realp[eid]);
 	fprintf(fp, "         si = %s(zs);\n", imagp[eid]);
@@ -203,7 +203,7 @@ static void _SC_write_c_to_c_safe(FILE *fp, int did, int sid)
 	fprintf(fp, "         si = max(si, smn);\n");
 	fprintf(fp, "         *pd = sr + si*I;};\n");}
     else
-       {fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+       {fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
 	fprintf(fp, "        *pd = *ps;\n");};
 
     fprintf(fp, "    return(i);}\n");
@@ -222,7 +222,7 @@ static void _SC_write_c_to_r(FILE *fp, int did, int sid)
 
     eid = 2;
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -233,9 +233,9 @@ static void _SC_write_c_to_r(FILE *fp, int did, int sid)
     fprintf(fp, "    pd += od;\n");
 
 /* this crashes GCC 4.5.1 - internal compiler error
-    fprintf(fp, "    for (i = 0; i < n; i++, *pd++ = *ps++);\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, *pd += ds = *ps++);\n");
 */
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        *pd = %s(*ps);\n", realp[eid]);
 
     fprintf(fp, "    return(i);}\n");
@@ -252,7 +252,7 @@ static void _SC_write_c_to_r(FILE *fp, int did, int sid)
 static void _SC_write_q_to_r(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -262,7 +262,7 @@ static void _SC_write_q_to_r(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        *pd = ps->s;\n");
 
     fprintf(fp, "    return(i);}\n");
@@ -279,7 +279,7 @@ static void _SC_write_q_to_r(FILE *fp, int did, int sid)
 static void _SC_write_q_to_c(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -291,7 +291,7 @@ static void _SC_write_q_to_c(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {q   = *ps;\n");
     fprintf(fp, "         z   = q.s + q.i*I;\n");
     fprintf(fp, "         *pd = z;};\n");
@@ -310,7 +310,7 @@ static void _SC_write_q_to_c(FILE *fp, int did, int sid)
 static void _SC_write_r_to_q(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -321,7 +321,7 @@ static void _SC_write_r_to_q(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {q.s = *ps;\n");
     fprintf(fp, "         *pd = q;};\n");
 
@@ -341,7 +341,7 @@ static void _SC_write_c_to_q(FILE *fp, int did, int sid)
 
     eid = 2;
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -353,7 +353,7 @@ static void _SC_write_c_to_q(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {z   = *ps;\n");
     fprintf(fp, "         q.s = %s(z);\n", realp[eid]);
     fprintf(fp, "         q.i = %s(z);\n", imagp[eid]);
@@ -373,7 +373,7 @@ static void _SC_write_c_to_q(FILE *fp, int did, int sid)
 static void _SC_write_p_to_n(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -384,7 +384,7 @@ static void _SC_write_p_to_n(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {ad.memaddr = *ps;\n");
     fprintf(fp, "         *pd        = ad.diskaddr;};\n");
 
@@ -402,7 +402,7 @@ static void _SC_write_p_to_n(FILE *fp, int did, int sid)
 static void _SC_write_p_to_q(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -414,7 +414,7 @@ static void _SC_write_p_to_q(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {ad.memaddr = *ps;\n");
     fprintf(fp, "         q.s        = ad.diskaddr;\n");
     fprintf(fp, "         *pd        = q;};\n");
@@ -433,7 +433,7 @@ static void _SC_write_p_to_q(FILE *fp, int did, int sid)
 static void _SC_write_n_to_p(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -444,7 +444,7 @@ static void _SC_write_n_to_p(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {ad.diskaddr = *ps;\n");
     fprintf(fp, "         *pd         = ad.memaddr;};\n");
 
@@ -462,7 +462,7 @@ static void _SC_write_n_to_p(FILE *fp, int did, int sid)
 static void _SC_write_q_to_p(FILE *fp, int did, int sid)
    {
 
-    fprintf(fp, "long _SC_%s_%s(void *d, long od, void *s, long os, long ss, long n)\n",
+    fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
@@ -474,7 +474,7 @@ static void _SC_write_q_to_p(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    fprintf(fp, "    for (i = 0; i < n; i++, pd++, ps += ss)\n");
+    fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
     fprintf(fp, "        {q           = *ps;\n");
     fprintf(fp, "         ad.diskaddr = q.s;\n");
     fprintf(fp, "         *pd         = ad.memaddr;};\n");
@@ -493,7 +493,7 @@ static void _SC_write_q_to_p(FILE *fp, int did, int sid)
 static void write_conv_decl(FILE *fp)
    {int i, j;
 
-    fprintf(fp, "typedef long (*PFConv)(void *d, long od, void *s, long os, long ss, long n);\n");
+    fprintf(fp, "typedef long (*PFConv)(void *d, long od, long ds, void *s, long os, long ss, long n);\n");
     fprintf(fp, "\n");
 
     fprintf(fp, "static PFConv\n");

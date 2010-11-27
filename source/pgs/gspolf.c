@@ -160,7 +160,7 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	    {afs = (double **) range->elements;
 	     afd = FMAKE_N(double *, nd, "PG_FILL_HAND:afd");
 	     for (i = 0; i < nd; i++)
-	         afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0,
+	         afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1, 
 					sid, afs[i], 0, 1, npts, FALSE);};
 
 /* find the range limits if any */

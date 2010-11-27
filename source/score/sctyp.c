@@ -588,10 +588,11 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  *               -     DID  - type of destination data
  *               -     D    - pointer to converted data destination
  *               -     OD   - offset from destination pointer
+ *               -     SD   - stride through destination
  *               -     SID  - type of source data
  *               -     S    - pointer to data to be converted
  *               -     OS   - offset from source pointer
- *               -     SS    - stride through source
+ *               -     SS   - stride through source
  *               -     N    - number of data items
  *               -     FLAG - free source data flag
  *               - the offsets permit conversions like
@@ -599,7 +600,7 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
  *               - return the destination pointer
  */
 
-void *SC_convert_id(int did, void *d, long od,
+void *SC_convert_id(int did, void *d, long od, long ds,
 		    int sid, void *s, long os, long ss,
 		    long n, int flag)
    {int rv, bpi;
@@ -611,7 +612,7 @@ void *SC_convert_id(int did, void *d, long od,
 	d   = FMAKE_N(char, n*bpi, "SC_CONVERT_ID:d");};
 
     if (_SC_convf[did][sid] != NULL)
-       nc = _SC_convf[did][sid](d, od, s, os, ss, n);
+       nc = _SC_convf[did][sid](d, od, ds, s, os, ss, n);
     
     rv = (nc == n);
 
@@ -630,6 +631,7 @@ void *SC_convert_id(int did, void *d, long od,
  *            -     DTYPE - type of destination data
  *            -     D     - pointer to converted data destination
  *            -     OD    - offset from destination pointer
+ *            -     SD    - stride through destination
  *            -     STYPE - type of source data
  *            -     S     - pointer to data to be converted
  *            -     OS    - offset from source pointer
@@ -639,15 +641,15 @@ void *SC_convert_id(int did, void *d, long od,
  *            - return the destination pointer
  */
 
-void *SC_convert(char *dtype, void *d, long od, char *stype,
-		 void *s, long os, long ss,
+void *SC_convert(char *dtype, void *d, long od, long sd,
+		 char *stype, void *s, long os, long ss,
 		 long n, int flag)
    {int sid, did;
 
     sid = SC_type_id(stype, FALSE);
     did = SC_type_id(dtype, FALSE);
 
-    d = SC_convert_id(did, d, od, sid, s, os, ss, n, flag);
+    d = SC_convert_id(did, d, od, sd, sid, s, os, ss, n, flag);
 
     return(d);}
 

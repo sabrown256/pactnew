@@ -365,7 +365,8 @@ void _PD_d_install(PDBfile *file, char *name, defstr *def, int host)
    {
 
     if (host)
-       _PD_d_install_in(name, def, file->host_chart);
+       {_PD_d_install_in(name, def, file->host_chart);
+	SC_register_type(name, def->size, NULL);}
     else
        _PD_d_install_in(name, def, file->chart);
 

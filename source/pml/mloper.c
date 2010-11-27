@@ -490,7 +490,7 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
 	
     ret = -1;
     if ((did != -1) && (sid != -1))
-       {da  = SC_convert_id(did, da, 0, sid, sa, 0, 1, n, rel);
+       {da  = SC_convert_id(did, da, 0, 1, sid, sa, 0, 1, n, rel);
 	ret = (da != NULL);};
 
     return(ret);}
@@ -529,7 +529,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (double *) acc->data;
 	    fnc = (PFDoubledd) proc[0];
 
-	    s = SC_convert_id(did, NULL, 0, sid, sa, 0, 1, n, FALSE);
+	    s = SC_convert_id(did, NULL, 0, 1, sid, sa, 0, 1, n, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s[i]);
@@ -546,7 +546,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (double _Complex *) acc->data;
 	    fnc = (PFComplexcc) proc[1];
 
-	    s = SC_convert_id(did, NULL, 0, sid, sa, 0, 1, n, FALSE);
+	    s = SC_convert_id(did, NULL, 0, 1, sid, sa, 0, 1, n, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s[i]);
@@ -562,7 +562,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (quaternion *) acc->data;
 	    fnc = (PFQuaternionqq) proc[2];
 
-	    s = SC_convert_id(did, NULL, 0, sid, sa, 0, 1, n, FALSE);
+	    s = SC_convert_id(did, NULL, 0, 1, sid, sa, 0, 1, n, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s[i]);
@@ -587,7 +587,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (double *) acc->data;
 	    fnc = (PFDoubledd) proc[0];
 
-	    SC_convert_id(did, &s, 0, id, val, 0, 1, n, FALSE);
+	    SC_convert_id(did, &s, 0, 1, id, val, 0, 1, n, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s);
@@ -602,7 +602,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (double _Complex *) acc->data;
 	    fnc = (PFComplexcc) proc[1];
 
-	    SC_convert_id(did, &s, 0, id, val, 0, 1, 1, FALSE);
+	    SC_convert_id(did, &s, 0, 1, id, val, 0, 1, 1, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s);
@@ -616,27 +616,12 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (quaternion *) acc->data;
 	    fnc = (PFQuaternionqq) proc[2];
 
-	    SC_convert_id(did, &s, 0, id, val, 0, 1, 1, FALSE);
+	    SC_convert_id(did, &s, 0, 1, id, val, 0, 1, 1, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s);
 
 	    ret = TRUE;};};
-#if 0
-
-       {double *da;
-	PFDoubledd fnc;
-
-	da  = (double *) acc->data;
-	fnc = (PFDoubledd) proc[0];
-
-	SC_convert_id(SC_DOUBLE_I, &d, 0, id, val, 0, 1, 1, FALSE);
-
-	for (i = 0; i < n; i++)
-	    da[i] = fnc(da[i], d);
-
-        ret = TRUE;};
-#endif
 
     return(ret);}
 

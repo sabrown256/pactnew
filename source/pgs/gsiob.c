@@ -177,9 +177,9 @@ static int _PG_get_val(haelem *hp, int xo, int dx)
     id   = SC_type_id(type, FALSE);
 
     if (SC_is_type_num(id) == TRUE)
-       {SC_convert_id(SC_DOUBLE_I, &p0, 0, id, pv[0], 0, 1, 1, FALSE);
-	SC_convert_id(SC_DOUBLE_I, &p1, 0, id, pv[1], 0, 1, 1, FALSE);
-        SC_convert_id(SC_DOUBLE_I, &p2, 0, id, pv[2], 0, 1, 1, FALSE);
+       {SC_convert_id(SC_DOUBLE_I, &p0, 0, 1, id, pv[0], 0, 1, 1, FALSE);
+	SC_convert_id(SC_DOUBLE_I, &p1, 0, 1, id, pv[1], 0, 1, 1, FALSE);
+        SC_convert_id(SC_DOUBLE_I, &p2, 0, 1, id, pv[2], 0, 1, 1, FALSE);
 	f   = (p0 - p1)/(p2 - p1);
 	xo += f*dx;};
 
@@ -205,10 +205,10 @@ static void _PG_set_val(haelem *hp, int dxn, int dxd)
     f = ((double) dxn) / ((double) dxd);
 
     if (SC_is_type_num(id) == TRUE)
-       {SC_convert_id(SC_DOUBLE_I, &p1, 0, id, pv[1], 0, 1, 1, FALSE);
-        SC_convert_id(SC_DOUBLE_I, &p2, 0, id, pv[2], 0, 1, 1, FALSE);
+       {SC_convert_id(SC_DOUBLE_I, &p1, 0, 1, id, pv[1], 0, 1, 1, FALSE);
+        SC_convert_id(SC_DOUBLE_I, &p2, 0, 1, id, pv[2], 0, 1, 1, FALSE);
         p0 = (1.0 - f)*p1 + f*p2;
-        SC_convert_id(id, pv[0], 0, SC_DOUBLE_I, &p0, 0, 1, 1, FALSE);};
+        SC_convert_id(id, pv[0], 0, 1, SC_DOUBLE_I, &p0, 0, 1, 1, FALSE);};
 
     return;}
 
@@ -231,21 +231,22 @@ static int _PG_value_match(int ityp, haelem *hp, char *val)
 /* fixed point types (proper) */
     if (SC_is_type_fix(ityp) == TRUE)
        {long long a, b;
-	SC_convert_id(SC_LONG_LONG_I, &a, 0, ityp, pv, 0, 1, 1, FALSE);
+	SC_convert_id(SC_LONG_LONG_I, &a, 0, 1, ityp, pv, 0, 1, 1, FALSE);
 	b = SC_stoi(val);
 	match = (a == b);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double a, b;
-	SC_convert_id(SC_LONG_DOUBLE_I, &a, 0, ityp, pv, 0, 1, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_I, &a, 0, 1, ityp, pv, 0, 1, 1, FALSE);
 	b = SC_stof(val);
 	match = (a == b);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex a, b;
-	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &a, 0, ityp, pv, 0, 1, 1, FALSE);
+	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &a, 0, 1,
+		      ityp, pv, 0, 1, 1, FALSE);
 	b = SC_stoc(val);
 	match = (a == b);}
 
@@ -1263,17 +1264,20 @@ static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
 		if (SC_is_type_fix(id) == TRUE)
 		   {long long v;
 		    v = SC_stol(val);
-		    SC_convert_id(id, pv, 0, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
+		    SC_convert_id(id, pv, 0, 1,
+				  SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
 
 		else if (SC_is_type_fp(id) == TRUE)
 		   {long double v;
 		    v = SC_stof(val);
-		    SC_convert_id(id, pv, 0, SC_LONG_DOUBLE_I, &v, 0, 1, 1, FALSE);}
+		    SC_convert_id(id, pv, 0, 1,
+				  SC_LONG_DOUBLE_I, &v, 0, 1, 1, FALSE);}
 
 		else if (SC_is_type_cx(id) == TRUE)
 		   {long double _Complex v;
 		    v = SC_stoc(val);
-		    SC_convert_id(id, pv, 0, SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1, 1, FALSE);}
+		    SC_convert_id(id, pv, 0, 1,
+				  SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1, 1, FALSE);}
 
 		else if (id == SC_STRING_I)
 		   {char **p;
@@ -1357,19 +1361,20 @@ static int _PG_string_value(int ityp, haelem *hp, char *s)
     if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
 	v = SC_stol(s);
-	SC_convert_id(ityp, pv, 0, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
+	SC_convert_id(ityp, pv, 0, 1, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double v;
 	v = SC_stof(s);
-	SC_convert_id(ityp, pv, 0, SC_LONG_DOUBLE_I, &v, 0, 1, 1, FALSE);}
+	SC_convert_id(ityp, pv, 0, 1, SC_LONG_DOUBLE_I, &v, 0, 1, 1, FALSE);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex v;
 	v = SC_stoc(s);
-	SC_convert_id(ityp, pv, 0, SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1, 1, FALSE);}
+	SC_convert_id(ityp, pv, 0, 1,
+		      SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1, 1, FALSE);}
 
     else if (ityp == SC_STRING_I)
        {char *ps;
