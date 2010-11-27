@@ -169,7 +169,7 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 /* _PD_SET_IO_BUFFER - set the I/O buffer */
 
 void _PD_set_io_buffer(SC_udl *pu)
-   {BIGINT sz;
+   {int64_t sz;
     char *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -621,7 +621,7 @@ int _PD_items_per_tuple(defstr *dp)
 /* _PD_GET_CURRENT_ADDRESS - return the current file address */
 
 BIGINT _PD_get_current_address(PDBfile *file, PD_major_op tag)
-   {BIGINT addr;
+   {int64_t addr;
     FILE *fp;
 
     fp = file->stream;
@@ -665,7 +665,7 @@ int _PD_set_current_address(PDBfile *file, BIGINT addr, int wh,
 
 BIGINT _PD_get_next_address(PDBfile *file, char *type, long number,
 			   void *vr, int seekf, int tellf, int colf)
-   {BIGINT addr;
+   {int64_t addr;
 
     if (number == 0)
        addr = -1;
@@ -683,7 +683,7 @@ BIGINT _PD_get_next_address(PDBfile *file, char *type, long number,
  */
 
 BIGINT _PD_eod(PDBfile *file)
-   {BIGINT addr;
+   {int64_t addr;
 
     addr = _PD_GETSPACE(file, 0, FALSE, 0);
 
@@ -707,7 +707,7 @@ BIGINT PD_entry_set_address(syment *ep, BIGINT addr)
 /* PD_ENTRY_ADDRESS - return the address of the first block of EP */
 
 BIGINT PD_entry_address(syment *ep)
-   {BIGINT addr;
+   {int64_t addr;
 
     addr = _PD_entry_get_address(ep, 0);
 
@@ -952,7 +952,7 @@ char *PD_get_error(void)
 /* PD_GET_BUFFER_SIZE - fetch PD_buffer_size */
 
 BIGINT PD_get_buffer_size(void)
-   {BIGINT rv;
+   {int64_t rv;
     PD_smp_state *pa;
 
     _PD_init_state(FALSE);
@@ -991,7 +991,7 @@ BIGINT PD_set_buffer_size(BIGINT v)
 /* PD_GET_FILE_LENGTH - return the current file length */
 
 BIGINT PD_get_file_length(PDBfile *file)
-   {BIGINT rv;
+   {int64_t rv;
 
     rv = _PD_GET_FILE_SIZE(file);
 
@@ -1323,7 +1323,7 @@ void _PD_add_free_space(PDBfile *file, BIGINT address, BIGINT size)
 /* _PD_GET_FREE_SPACE - compute size of free space in FILE */
 
 BIGINT _PD_get_free_space(PDBfile *file, BIGINT size)
-   {BIGINT ret;
+   {int64_t ret;
     PD_disk_block *free, *prev, *save;
 
     ret = 0;

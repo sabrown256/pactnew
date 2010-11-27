@@ -222,7 +222,7 @@ void PD_write_extras(FILE *f0, PDBfile *file)
     defstr *dp;
 
     if (_PD.maxfsize == 0)
-       SC_fix_lmt(sizeof(BIGINT), NULL, &_PD.maxfsize, NULL);
+       SC_fix_lmt(sizeof(int64_t), NULL, &_PD.maxfsize, NULL);
 
     date = file->date;
     date = (date == NULL) ? "none" : date;
@@ -262,9 +262,9 @@ void PD_write_extras(FILE *f0, PDBfile *file)
        {PRINT(f0, "Symbol Table Address: 0x%lx\n", file->symtab);
 	PRINT(f0, "Structure Chart Address: 0x%lx\n", file->chart);}
     else
-       {PRINT(f0, "Header Address: %lld\n", (BIGINT) file->headaddr);
-	PRINT(f0, "Symbol Table Address: %lld\n", (BIGINT) file->symtaddr);
-	PRINT(f0, "Structure Chart Address: %lld\n", (BIGINT) file->chrtaddr);};
+       {PRINT(f0, "Header Address: %lld\n", (int64_t) file->headaddr);
+	PRINT(f0, "Symbol Table Address: %lld\n", (int64_t) file->symtaddr);
+	PRINT(f0, "Structure Chart Address: %lld\n", (int64_t) file->chrtaddr);};
 
     return;}
 
@@ -300,7 +300,7 @@ void PD_write_syment(FILE *f0, syment *ep)
 	PRINT(f0, ")\n");};
 
     PRINT(f0, "Length: %ld\n", PD_entry_number(ep));
-    PRINT(f0, "Address: %lld\n", (BIGINT) PD_entry_address(ep));
+    PRINT(f0, "Address: %lld\n", (int64_t) PD_entry_address(ep));
 
     return;}
 

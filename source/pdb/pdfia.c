@@ -346,7 +346,7 @@ FIXNUM F77_FUNC(pfgbfs, PFGBFS)(void)
 
 FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *psz)
    {FIXNUM rv;
-    BIGINT sz;
+    int64_t sz;
     PD_smp_state *pa;
 
     _PD_init_state(FALSE);

@@ -36,7 +36,7 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
      s = RW_STR_STACK[--RW_STR_PTR];}
 
 #define SAVE_I(val)                                                          \
-    (RW_LVAL_STACK[RW_LVAL_PTR++].diskaddr = (BIGINT) val)
+    (RW_LVAL_STACK[RW_LVAL_PTR++].diskaddr = (int64_t) val)
 
 #define RESTORE_I(val)                                                       \
     (val = RW_LVAL_STACK[--RW_LVAL_PTR].diskaddr)
@@ -671,7 +671,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
 				   syment *ep, int hbyt, int fbyt,
 				   BIGINT addr, BIGINT stop, long step)
    {long n, nb, niw, nitems;
-    BIGINT eaddr;
+    int64_t eaddr;
     char *outtype;
     SC_array *bl;
 
@@ -744,7 +744,7 @@ static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi,
                                 char *intype, BIGINT addr,
 				syment *ep, int hbyt, int fbyt)
    {long stride, step;
-    BIGINT offset, start, stop;
+    int64_t offset, start, stop;
     char *outtype;
 
     outtype = PD_entry_type(ep);
@@ -819,7 +819,7 @@ static void INLINE _PD_init_stacks(long t, long d)
 BIGINT _PD_annotate_text(PDBfile *file, syment *ep, char *name,
 			BIGINT addr, void *vr)
    {long ni, nc;
-    BIGINT na, pa;
+    int64_t na, pa;
     char s[MAXLINE];
     char *typ;
 
@@ -1151,7 +1151,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
                                 BIGINT addr, BIGINT stop, long step)
    {int nrd, nr;
     long n, nb, nitems;
-    BIGINT eaddr; 
+    int64_t eaddr; 
     char *intype;
     SC_array *bl, *blo;
 
@@ -1267,7 +1267,7 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
 			      BIGINT addr, int hbyt, int fbyt)
    {int nrd, nir;
     long stride, step;
-    BIGINT offset, start, stop;
+    int64_t offset, start, stop;
     char *intype;
 
     intype = PD_entry_type(epo);
@@ -1689,7 +1689,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
    {int dst, vif, size, boffs, count, itags;
     long i, n, nitems, bpi, nrd;
     long loc;
-    BIGINT addr, eaddr;
+    int64_t addr, eaddr;
     char bf[MAXLINE];
     char *pv, *litype, *lotype, *svr, **lvr;
     symindir iloc;

@@ -44,6 +44,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include <limits.h>
 #include <errno.h>

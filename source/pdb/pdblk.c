@@ -14,7 +14,7 @@ typedef struct s_symblock symblock;
 
 struct s_symblock
    {long number;
-    BIGINT diskaddr;
+    int64_t diskaddr;
     PD_block_type valid;
     unsigned char checksum[PD_CKSUM_LEN];};
 
@@ -146,7 +146,7 @@ static void _PD_block_check(SC_array *bl, long n)
 
 BIGINT _PD_block_get_address(SC_array *bl, long n)
    {long nb;
-    BIGINT addr;
+    int64_t addr;
     symblock *sp;
 
     nb = SC_array_get_n(bl);
@@ -215,7 +215,7 @@ long _PD_block_set_number(SC_array *bl, long n, long ni)
 
 void _PD_block_get_desc(BIGINT *paddr, long *pni, SC_array *bl, long n)
    {long ni, nb;
-    BIGINT addr;
+    int64_t addr;
     symblock *sp;
 
     nb = SC_array_get_n(bl);
@@ -456,7 +456,7 @@ int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, BIGINT addr)
 
 long _PD_block_find(PDBfile *file, syment *ep, BIGINT addr)
    {long i, n, bpi;
-    BIGINT start, stop;
+    int64_t start, stop;
     SC_array *bl;
     symblock *sp;
 
@@ -589,7 +589,7 @@ void _PD_block_truncate(syment *ep, long ni)
 long _PD_effective_addr(BIGINT *paddr, long *pnitems,
 			int bpi, SC_array *bl)
    {long i, nb, nt; 
-    BIGINT addr, eaddr;
+    int64_t addr, eaddr;
     symblock *sp;
 
     eaddr = *paddr;

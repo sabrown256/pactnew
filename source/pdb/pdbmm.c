@@ -120,7 +120,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 
 /* register the file with the parallel file manager */
 	if (reg == TRUE)
-	   _PD_ADD_FILE(file, (BIGINT) 0);
+	   _PD_ADD_FILE(file, (int64_t) 0);
 
 	file->host_std->file = file;};
 

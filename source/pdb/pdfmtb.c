@@ -55,7 +55,7 @@ static int _PD_wr_itag_ii(PDBfile *file, long n, long nitems, char *type,
  * in order to support relocation
  */
 	snprintf(s, MAXLINE, "%ld\001%s\001%32lld\001%d\001\n",
-		 nitems, type, (BIGINT) addr, loc);
+		 nitems, type, (long long) addr, loc);
 
 	lio_printf(fp, s);
 
@@ -103,7 +103,7 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
            pi->flag = atoi(token);};
 
     snprintf(t, MAXLINE, "%ld\001%s\001%32lld\001%d\001\n",
-	     pi->nitems, pi->type, (BIGINT) pi->addr, pi->flag);
+	     pi->nitems, pi->type, (long long) pi->addr, pi->flag);
 
     pi->length = strlen(t);
 
@@ -201,7 +201,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
    {char *name, *type, *tmp, *pbf, *s, *local;
     long mini, leng, bsz;
-    BIGINT addr, numb;
+    int64_t addr, numb;
     syment *ep;
     hasharr *tab;
     dimdes *dims, *next, *prev;
@@ -254,7 +254,7 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
 int _PD_rd_symt_ii(PDBfile *file)
    {int rv;
     long symt_sz;
-    BIGINT addr, numb;
+    int64_t addr, numb;
     char *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -295,7 +295,7 @@ int _PD_rd_symt_ii(PDBfile *file)
 
 static void _PD_rd_blocks_ii(PDBfile *file)
    {long j, n, nt, numb, stride, bsz;
-    BIGINT addr;
+    int64_t addr;
     char *local, *name, *s;
     syment *ep;
     dimdes *dim;
@@ -710,7 +710,7 @@ int _PD_rd_ext_ii(PDBfile *file)
 static BIGINT _PD_wr_symt_ii(PDBfile *file)
    {int n, flag;
     long i, nt, nb, ni, stride;
-    BIGINT addr, ad;
+    int64_t addr, ad;
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
@@ -748,7 +748,7 @@ static BIGINT _PD_wr_symt_ii(PDBfile *file)
 
 	 _PD_put_string(n++, 
 			"%s\001%s\001%ld\001%lld\001",
-			nm, ty, nb, (BIGINT) ad);
+			nm, ty, nb, (int64_t) ad);
 
 /* adjust the slowest varying dimension to reflect only the first block */
 	 flag = PD_get_major_order(file);
@@ -813,7 +813,7 @@ static int _PD_wr_casts_ii(PDBfile *file)
 static BIGINT _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
    {int n;
     long i;
-    BIGINT addr;
+    int64_t addr;
     char *bf, *nm;
     FILE *fp;
     hasharr *ch;
@@ -969,7 +969,7 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 static int _PD_wr_blocks_ii(PDBfile *file)
    {int ok;
     long i, j, n, ni;
-    BIGINT addr;
+    int64_t addr;
     char *nm;
     syment *ep;
 
@@ -989,7 +989,7 @@ static int _PD_wr_blocks_ii(PDBfile *file)
 		  addr = _PD_entry_get_address(ep, j);
 		  ni   = _PD_entry_get_number(ep, j);
 
-		  ok &= _PD_put_string(1, " %lld %ld", (BIGINT) addr, ni);};
+		  ok &= _PD_put_string(1, " %lld %ld", (int64_t) addr, ni);};
 
 	     ok &= _PD_put_string(1, "\n");};};
 
@@ -1401,7 +1401,7 @@ static int _PD_create_ii(PDBfile *file, int mst)
  */
 
 static int _PD_write_meta_ii(PDBfile *file, FILE *out, int fh)
-   {BIGINT addr;
+   {int64_t addr;
     FILE *fp;
 
     if (out == NULL)
@@ -1491,7 +1491,7 @@ static int _PD_flush_ii(PDBfile *file)
 	   PD_error("FSEEK FAILED TO FIND HEADER - _PD_FLUSH_II", PD_WRITE);
 
 	lio_printf(fp, "%22lld\001%22lld\001\n",
-		   (BIGINT) file->chrtaddr, (BIGINT) file->symtaddr);
+		   (int64_t) file->chrtaddr, (int64_t) file->symtaddr);
 
 /* WARNING: no more writes to the file before the space
  * reserved for the checksum from here on out

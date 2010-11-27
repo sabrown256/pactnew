@@ -31,7 +31,7 @@
 
 #endif
 
-#define NTYPES 14
+#define NTYPES 18
 
 #define BITS_DEFAULT 8
 
@@ -75,6 +75,19 @@ struct ccomplex8
 struct ccomplex16
    {char c;
     long double complex x;} clc;
+
+struct cint8
+   {char c;
+    int8_t x;} ci8;
+struct cint16
+   {char c;
+    int16_t x;} ci16;
+struct cint32
+   {char c;
+    int32_t x;} ci32;
+struct cint64
+   {char c;
+    int64_t x;} ci64;
 
 /* some machines have an additional alignment for structs
  * this struct will test for such a "feature"
@@ -855,6 +868,16 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
      print_fix_type("Long long", size[5], align[5],
 		    mfields, MINLONG, MAXLONG);
 
+/* print C99 fixed width integer types info */
+     print_fix_type("int8_t", size[14], align[14],
+		    mfields, INT8_MIN, INT8_MAX);
+     print_fix_type("int16_t", size[15], align[15],
+		    mfields, INT16_MIN, INT16_MAX);
+     print_fix_type("int32_t", size[16], align[16],
+		    mfields, INT32_MIN, INT32_MAX);
+     print_fix_type("int64_t", size[17], align[17],
+		    mfields, INT64_MIN, INT64_MAX);
+
 /* print float info */
      print_flt_type("Float", size[6], align[6], mfields, FLT_MIN, FLT_MAX);
 
@@ -1078,9 +1101,14 @@ int main(int argc, char **argv)
     size[8]  = sizeof(long double);
     size[9]  = 2*sizeof(char);
     size[10] = sizeof(bool);
-    size[11] = sizeof(float complex);
-    size[12] = sizeof(double complex);
-    size[13] = sizeof(long double complex);
+    size[11] = sizeof(float _Complex);
+    size[12] = sizeof(double _Complex);
+    size[13] = sizeof(long double _Complex);
+
+    size[14] = sizeof(int8_t);
+    size[15] = sizeof(int16_t);
+    size[16] = sizeof(int32_t);
+    size[17] = sizeof(int64_t);
 
     ssize[0]  = sizeof(cc);
     ssize[1]  = sizeof(cp);
@@ -1096,6 +1124,11 @@ int main(int argc, char **argv)
     ssize[11] = sizeof(cfc);
     ssize[12] = sizeof(cdc);
     ssize[13] = sizeof(clc);
+
+    ssize[14] = sizeof(ci8);
+    ssize[15] = sizeof(ci16);
+    ssize[16] = sizeof(ci32);
+    ssize[17] = sizeof(ci64);
 
 /* first possibility: align <= size (usual case)
  * alignment is difference between struct length and member size:

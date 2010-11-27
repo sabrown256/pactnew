@@ -3755,7 +3755,7 @@ int main(int c, char **v)
     int test_four, test_five, test_six, test_seven;
     int test_eight, test_nine, test_ten;
     int use_mapped_files, check_writes;
-    BIGINT bfsz;
+    int64_t bfsz;
 
     PD_init_threads(0, NULL);
 
