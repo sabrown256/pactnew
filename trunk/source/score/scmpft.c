@@ -270,7 +270,7 @@ int sm_free(double *ptf, double *pnif, int nir)
 
 static void lr_rand_alloc(int *pl, int *pni, char **p, int n)
    {int l, nb, ni, full;
-    BIGINT nt;
+    int64_t nt;
     static int sz = sizeof(double);
 
     full = TRUE;

@@ -148,8 +148,8 @@ char **SC_fcontainer_list(fcontainer *cf, int full)
 		 pt = tm + 4;
 		 SC_LAST_CHAR(pt) = '\0';
 		 snprintf(s, MAXLINE, "%s %d/%d %8lld %s %8lld %s",
-			  te->perm, te->uid, te->gid, (BIGINT) te->size,
-			  pt, (BIGINT) te->address, te->name);}
+			  te->perm, te->uid, te->gid, (long long) te->size,
+			  pt, (long long) te->address, te->name);}
 	     else
 	        SC_strncpy(s, MAXLINE, te->name, -1);
 

@@ -40,8 +40,8 @@ BIGINT
 
 /* _SC_MAKE_FILE_BLOCK - initialize a block segment of a mapped file */
 
-static SC_file_block *_SC_make_file_block(SC_mapped_file *file, BIGINT off,
-					  BIGINT start, BIGINT end,
+static SC_file_block *_SC_make_file_block(SC_mapped_file *file, int64_t off,
+					  int64_t start, int64_t end,
 					  SC_file_block *nxt)
    {SC_file_block *bl;
 
@@ -100,9 +100,9 @@ static SC_file_block *_SC_add_block(SC_file_block *lst, SC_file_block *bl)
  */
 
 static SC_file_block *_SC_split_block(SC_file_block *bl, int p)
-   {BIGINT as, ae, ao;
-    BIGINT bs, be, bo;
-    BIGINT cs, ce, co;
+   {int64_t as, ae, ao;
+    int64_t bs, be, bo;
+    int64_t cs, ce, co;
     SC_file_block *nbl;
 
     if (bl != NULL)
@@ -136,8 +136,8 @@ static SC_file_block *_SC_split_block(SC_file_block *bl, int p)
  *                    - split it iff A is properly contained
  */
 
-static SC_file_block *_SC_find_and_split(SC_file_block *bl, BIGINT a)
-   {BIGINT sb, se;
+static SC_file_block *_SC_find_and_split(SC_file_block *bl, int64_t a)
+   {int64_t sb, se;
     SC_file_block *pb;
 
     for (pb = bl; pb != NULL; pb = pb->next)
@@ -155,7 +155,7 @@ static SC_file_block *_SC_find_and_split(SC_file_block *bl, BIGINT a)
 /* _SC_RESET_BLOCKS - reset the starts and ends of the given block list */
 
 static void _SC_reset_blocks(SC_file_block *bl)
-   {BIGINT ob, oe, nb, ne;
+   {int64_t ob, oe, nb, ne;
     SC_file_block *pb, *nxt;
 
 /* shift the start and ends of the remaining blocks */
@@ -184,7 +184,7 @@ static void _SC_reset_blocks(SC_file_block *bl)
 
 void dpmfblock(SC_mapped_file *mf)
    {int i;
-    BIGINT ln, bo, db, bs, be;
+    int64_t ln, bo, db, bs, be;
     SC_file_block *bl, *pb;
 
     bl = mf->map;
@@ -252,7 +252,7 @@ SC_mapped_file *SC_mf_make(char *name, int prot, int shar, int perm,
 
 void SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, BIGINT len)
    {int ns, pgsz;
-    BIGINT ssz, szmx;
+    int64_t ssz, szmx;
     SC_file_block *bl;
 
     bl = _SC_make_file_block(mf, 0L, 0L, len, NULL);
@@ -280,7 +280,7 @@ void SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, BIGINT len)
 /* _SC_MF_EXT_FILE - physically extend the file FD to length LEN */
 
 static void *_SC_mf_ext_file(SC_mapped_file *mf, int fd,
-			     BIGINT len, BIGINT off, BIGINT sz)
+			     int64_t len, int64_t off, int64_t sz)
    {int err, prot, shar;
     char c;
     void *p;
@@ -304,10 +304,10 @@ static void *_SC_mf_ext_file(SC_mapped_file *mf, int fd,
 
 /* _SC_MF_CREATE_FILE - create a file with mmap */
 
-static SC_mapped_file *_SC_mf_create_file(char *name, BIGINT len, int extend,
+static SC_mapped_file *_SC_mf_create_file(char *name, int64_t len, int extend,
 					  void (*setup)(SC_mapped_file *mf))
    {int fd, action, prot, shar;
-    BIGINT nbp;
+    int64_t nbp;
     void *p;
     SC_mapped_file *mf;
 
@@ -337,7 +337,7 @@ static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
 				       void (*setup)(SC_mapped_file *mf))
    {int fd, prot, shar, create, flags;
     int rw, ro, wo, cr;
-    BIGINT len, off;
+    int64_t len, off;
     size_t ssz;
     void *p;
     struct stat s;
@@ -497,7 +497,7 @@ void SC_mf_free(SC_mapped_file *mf)
 /* _SC_MF_PTR - return the pointer to the mapped file data */
 
 static char *_SC_mf_ptr(void *fp)
-   {BIGINT ln, off;
+   {int64_t ln, off;
     char *base, *data;
     SC_mapped_file *mf;
     file_io_desc *fid;
@@ -523,10 +523,10 @@ static char *_SC_mf_ptr(void *fp)
  *              - segment then remap to a new segment containing AD
  */
 
-static void _SC_mf_remap(SC_mapped_file *mf, BIGINT ad, int seta)
+static void _SC_mf_remap(SC_mapped_file *mf, int64_t ad, int seta)
    {int rv;
-    BIGINT pos, sts, stn, len;
-    BIGINT nbc, nbn, nbp;
+    int64_t pos, sts, stn, len;
+    int64_t nbc, nbn, nbp;
     unsigned char *p;
 
     p   = mf->scp;
@@ -577,7 +577,7 @@ static void _SC_mf_remap(SC_mapped_file *mf, BIGINT ad, int seta)
 
 static void _SC_mf_unmap(SC_mapped_file *mf)
    {int action, err, st;
-    BIGINT len, sz;
+    int64_t len, sz;
     char *p;
     FILE *fp;
     file_io_desc *fid;
@@ -607,9 +607,9 @@ static void _SC_mf_unmap(SC_mapped_file *mf)
 
 /* _SC_MF_EXTEND - extend a file with mmap */
 
-static void _SC_mf_extend(SC_mapped_file *mf, BIGINT nb)
+static void _SC_mf_extend(SC_mapped_file *mf, int64_t nb)
    {int fd, action, extend;
-    BIGINT pos, ne, ns, np, ln, sz, nsz, pgsz;
+    int64_t pos, ne, ns, np, ln, sz, nsz, pgsz;
     char *name, *p;
     FILE *fp;
     SC_file_block *pb;
@@ -665,10 +665,10 @@ static void _SC_mf_extend(SC_mapped_file *mf, BIGINT nb)
  *                 - and -1 on failure
  */
 
-static BIGINT _SC_mf_seek_abs(SC_mapped_file *mf, BIGINT n)
+static int64_t _SC_mf_seek_abs(SC_mapped_file *mf, int64_t n)
    {int rv;
-    BIGINT sts, stn, len;
-    BIGINT nbc;
+    int64_t sts, stn, len;
+    int64_t nbc;
 
 /* find out where we need to be in logical terms */
     len = mf->lclen;
@@ -707,8 +707,8 @@ static BIGINT _SC_mf_seek_abs(SC_mapped_file *mf, BIGINT n)
  *                    - remap if necessary
  */
 
-static char *_SC_mf_tell_offset(SC_mapped_file *mf, BIGINT lp)
-   {BIGINT mo, sz, na;
+static char *_SC_mf_tell_offset(SC_mapped_file *mf, int64_t lp)
+   {int64_t mo, sz, na;
     char *p;
 
     mo = mf->lcoff;
@@ -738,7 +738,7 @@ static char *_SC_mf_tell_offset(SC_mapped_file *mf, BIGINT lp)
  */
 
 static char *_SC_mf_tell_physical(SC_mapped_file *mf)
-   {BIGINT ll, lp, so, sb, se;
+   {int64_t ll, lp, so, sb, se;
     SC_file_block *pb;
     SC_mapped_file *md;
     FILE *fp;
@@ -775,7 +775,7 @@ static char *_SC_mf_tell_physical(SC_mapped_file *mf)
 
 static void _SC_mf_wrt(SC_mapped_file *mf, char *dst, void *a, BIGINT ni)
    {long nb;
-    BIGINT pos, nba, len, off, sz, awr;
+    int64_t pos, nba, len, off, sz, awr;
     char *src;
     FILE *fp;
     SC_io_buffer *bf;
@@ -827,7 +827,7 @@ static void _SC_mf_wrt(SC_mapped_file *mf, char *dst, void *a, BIGINT ni)
 
 static void _SC_mf_rd(SC_mapped_file *mf, char *src, void *a, BIGINT ni)
    {long nb;
-    BIGINT pos, nba, len, off, sz, ard;
+    int64_t pos, nba, len, off, sz, ard;
     char *dst;
     FILE *fp;
     SC_io_buffer *bf;
@@ -881,8 +881,8 @@ static void _SC_mf_rd(SC_mapped_file *mf, char *src, void *a, BIGINT ni)
  *               - to the block list
  */
 
-static BIGINT _SC_mf_length(SC_mapped_file *mf)
-   {BIGINT ln;
+static int64_t _SC_mf_length(SC_mapped_file *mf)
+   {int64_t ln;
     SC_file_block *bl, *pb;
 
     ln = 0L;
@@ -902,7 +902,7 @@ static BIGINT _SC_mf_length(SC_mapped_file *mf)
  */
 
 BIGINT SC_mf_length(FILE *fp)
-   {BIGINT ln;
+   {int64_t ln;
     SC_mapped_file *mf;
 
     mf = FILE_IO_INFO(SC_mapped_file, fp);
@@ -923,8 +923,8 @@ BIGINT SC_mf_length(FILE *fp)
 
 static BIGINT _SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb,
 			      SC_mapped_file *mf)
-   {BIGINT nbo, ln;
-    BIGINT ab, ae, so, sb, se, nbs;
+   {int64_t nbo, ln;
+    int64_t ab, ae, so, sb, se, nbs;
     char *s;
     SC_file_block *pb;
     FILE *fp;
@@ -993,7 +993,7 @@ static BIGINT _SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb,
  */
 
 BIGINT SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb, FILE *fp)
-   {BIGINT nbo;
+   {int64_t nbo;
     SC_mapped_file *mf;
 
     mf  = FILE_IO_INFO(SC_mapped_file, fp);
@@ -1089,7 +1089,7 @@ BIGUINT _SC_mf_core_read(void *bf, size_t sz, BIGUINT ni, FILE *fp)
 
 #ifdef HAVE_MMAP
 
-    BIGINT nb, nbr;
+    int64_t nb, nbr;
     SC_io_buffer iobf;
     SC_mapped_file *mf;
 
@@ -1126,7 +1126,7 @@ BIGUINT _SC_mf_core_write(void *bf, size_t sz, BIGUINT ni, FILE *fp)
 
 #ifdef HAVE_MMAP
 
-    BIGINT nb, nbw;
+    int64_t nb, nbw;
     SC_io_buffer iobf;
     SC_mapped_file *mf;
 
@@ -1164,7 +1164,7 @@ int _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence)
 #ifdef HAVE_MMAP
 
     int err;
-    BIGINT naddr, ln, pos;
+    int64_t naddr, ln, pos;
     SC_mapped_file *mf;
 
     mf = (SC_mapped_file *) fp;
@@ -1211,12 +1211,12 @@ int _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence)
 
 /* _SC_MF_CORE_TELL - return the current logical location
  *                  - ala the ftell C library call
- *                  - NOTE: BIGUINT and BIGINT are the same size
- *                  - when using large files so use standard BIGINT
+ *                  - NOTE: BIGUINT and int64_t are the same size
+ *                  - when using large files so use standard int64_t
  */
 
 BIGINT _SC_mf_core_tell(FILE *fp)
-   {BIGINT pos;
+   {int64_t pos;
 
 #ifdef HAVE_MMAP
 
@@ -1259,7 +1259,7 @@ void SC_mf_set_size(BIGINT mnsz, BIGINT extsz)
  */
 
 BIGUINT _SC_mf_segment_size(FILE *fp, BIGINT nsz)
-   {BIGINT osz, len, nbp;
+   {int64_t osz, len, nbp;
     BIGUINT rv;
     SC_mapped_file *mf;
 
@@ -1307,7 +1307,7 @@ char *SC_mf_name(FILE *fp)
  */
 
 SC_file_block *SC_mf_insert(FILE *fp, SC_file_block *nbl, BIGINT off)
-   {BIGINT sb;
+   {int64_t sb;
     SC_file_block *pb, *bl, *bls, *nxt;
     SC_mapped_file *mf;
     file_io_desc *fid;
@@ -1347,7 +1347,7 @@ SC_file_block *SC_mf_insert(FILE *fp, SC_file_block *nbl, BIGINT off)
  */
 
 SC_file_block *SC_mf_delete(FILE *fp, BIGINT off, BIGINT nb)
-   {BIGINT so, sb, se, ab, ae;
+   {int64_t so, sb, se, ab, ae;
     SC_file_block *pb, *bl, *bld, *bls, *nxt;
     SC_mapped_file *mf;
     file_io_desc *fid;
@@ -1402,7 +1402,7 @@ SC_file_block *SC_mf_delete(FILE *fp, BIGINT off, BIGINT nb)
 BIGINT SC_mf_read_striped(FILE *fp, BIGINT off, char *type,
 			  int ni, int stride, int nv, void **vrs)
    {int bpu, bpi, nb, nbr;
-    BIGINT rv;
+    int64_t rv;
     SC_io_buffer iobf;
     SC_mapped_file *mf;
     file_io_desc *fid;
@@ -1601,7 +1601,7 @@ int _SC_mf_puts(const char *s, FILE *fp)
 
 #ifdef HAVE_MMAP
 
-    BIGINT nbw, ln;
+    int64_t nbw, ln;
     SC_mapped_file *mf;
     file_io_desc *fid;
 
@@ -1656,7 +1656,7 @@ int _SC_mf_flush(FILE *fp)
 #ifdef HAVE_MMAP
 
     int nbp;
-    BIGINT len;
+    int64_t len;
     char *p;
     SC_mapped_file *mf;
 
@@ -1699,7 +1699,7 @@ int _SC_mf_flush(FILE *fp)
 
 int _SC_mf_eof(FILE *fp)
    {int rv;
-    BIGINT sb, se;
+    int64_t sb, se;
     SC_mapped_file *mf;
     SC_file_block *pb;
 
@@ -1754,7 +1754,7 @@ int _SC_mf_close(FILE *fp)
 
 FILE *SC_mf_copy(char *name, FILE *fp, int bckup)
    {int st;
-    BIGINT ln, so, sb, se, nb, pos;
+    int64_t ln, so, sb, se, nb, pos;
     char *pi, *nnm, *onm;
     SC_mapped_file *nmf, *md, *mf;
     SC_file_block *pb;

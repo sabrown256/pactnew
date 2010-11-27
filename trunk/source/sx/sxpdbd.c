@@ -362,7 +362,7 @@ static int _SX_diff_indirection(char *nma, char *nmb,
 			        PDBfile *pfa, PDBfile *pfb)
    {int fla, flb, ret;
     long na, nb;
-    BIGINT ada, adb, oada, oadb;
+    int64_t ada, adb, oada, oadb;
     char bfa[MAXLINE], bfb[MAXLINE], bfc[MAXLINE];
     char *ta, *tb, *token, *s;
     FILE *fpa, *fpb;
@@ -705,7 +705,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
 			 long ni, long bpi, char *out_type)
    {int convert;
     long i, n, nrd, nib;
-    BIGINT addr;
+    int64_t addr;
     char *buf, *vbuf, *svr;
     defstr *dpf;
     FILE *fp;

@@ -370,7 +370,7 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
  
 void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
 			   unsigned char *dig)
-   {BIGINT sz, ln;
+   {int64_t sz, ln;
     BIGUINT ib, nb;
     unsigned char *p;
     PM_MD5_CTX mc;
@@ -378,7 +378,7 @@ void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
     nb = ni*bpi;
 
 /* read the arr in 1024 byte (1 kB) chunks */
-    sz = (BIGINT) 1024;
+    sz = (int64_t) 1024;
     
 #if 0
     {double t0, rate;
@@ -417,7 +417,7 @@ void PM_md5_checksum_array(void *arr, BIGUINT ni, BIGUINT bpi,
 void PM_md5_checksum_file(FILE *file, BIGINT start, BIGINT stop,
 			  unsigned char *dig) 
    {int len, seg, sz;
-    BIGINT here, nb, ib;
+    int64_t here, nb, ib;
     unsigned char bf[1024];
     PM_MD5_CTX mc;
 
@@ -563,7 +563,7 @@ long PM_checksum_array(void *arr, int ni, int bpi, int nbts)
 long PM_checksum_file(FILE* file, BIGINT start, BIGINT stop, int nbts)
    {int len, seg, sz, rmdr;
     long sum;
-    BIGINT here, nb;
+    int64_t here, nb;
     unsigned char bf[1024];
 
 /* Sanity checks */

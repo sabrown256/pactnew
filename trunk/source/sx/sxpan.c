@@ -282,7 +282,7 @@ static object *_SXI_run_package(object *argl)
     PA_control_set("global");
 
     numdt = SS_mk_float(pck->dt);
-    zondt = SS_mk_integer((BIGINT) pck->dt_zone);
+    zondt = SS_mk_integer(pck->dt_zone);
 
     o = SS_mk_cons(numdt, zondt);
 

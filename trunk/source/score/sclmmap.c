@@ -71,8 +71,8 @@ static BIGUINT _SC_lmf_read(void *bf, size_t sz, BIGUINT ni, FILE *stream)
 
 /* _SC_LMF_MWRITE - mwrite method for memory mapped files */
 
-static BIGINT _SC_lmf_mwrite(int fd, const void *buf, size_t nb, BIGINT off)
-   {BIGINT rv;
+static int64_t _SC_lmf_mwrite(int fd, const void *buf, size_t nb, int64_t off)
+   {int64_t rv;
 
     rv = pwrite64(fd, buf, nb, off);
 
@@ -149,7 +149,7 @@ FILE *SC_lmf_open(char *name, char *mode)
 /* _SC_LMF_MMAP - mmap method for memory mapped files */
 
 static void *_SC_lmf_mmap(void *addr, size_t len, int prot,
-			  int flags, int fd, BIGINT offs)
+			  int flags, int fd, int64_t offs)
    {void *rv;
 
     rv = mmap64(addr, len, prot, flags, fd, offs);

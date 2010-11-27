@@ -34,7 +34,7 @@ void
  */
 
 BIGINT _SC_to_number(void *a)
-   {long long rv;
+   {int64_t rv;
     SC_address ad;
 
 /* in case diskaddr is larger than memaddr */
@@ -154,16 +154,16 @@ void SC_type_container(char *dtype, char *stype)
 /* SC_FIX_LMT - return the signed minimum and maximum values as well as
  *            - the unsigned maximum value for an integer type
  *            - of NB bytes
- *            - return TRUE iff NB is smaller than sizeof(long long)
+ *            - return TRUE iff NB is smaller than sizeof(int64_t)
  */
 
 int SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx)
    {int i, rv;
-    long long imn, imx, uimx;
+    int64_t imn, imx, uimx;
 
     rv = FALSE;
 
-    if (nb <= sizeof(long long))
+    if (nb <= sizeof(int64_t))
 
 /* do the min limits */
        {for (imn = 0x80, i = 1; i < nb; i++)
@@ -177,7 +177,7 @@ int SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx)
 	for (uimx = 0xff, i = 1; i < nb; i++)
 	    uimx = (uimx << 8) + 0xff;
 
-	if (nb < sizeof(long long))
+	if (nb < sizeof(int64_t))
 	   imn = -imn;
 
 	if (pmn != NULL)

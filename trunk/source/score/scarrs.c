@@ -105,16 +105,16 @@ static void *_SC_array_acc_4(int oper, void *a, int bpi, long n, void *v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_ARRAY_ACC_8 - set/get a BIGINT size element of A
+/* _SC_ARRAY_ACC_8 - set/get a int64_t size element of A
  *                 - A is guaranteed to be non-NULL
  */
 
 static void *_SC_array_acc_8(int oper, void *a, int bpi, long n, void *v)
-    {BIGINT *s;
+    {int64_t *s;
 
-     s = (BIGINT *) a;
+     s = (int64_t *) a;
      if (oper == SET)
-        s[n] = (v == NULL) ? 0 : *(BIGINT *) v;
+        s[n] = (v == NULL) ? 0 : *(int64_t *) v;
      else if (oper == GET)
         v = &s[n];
 
@@ -157,7 +157,7 @@ static void _SC_array_acc_method(SC_array *a)
        a->access = _SC_array_acc_2;
     else if (bpi == sizeof(int))
        a->access = _SC_array_acc_4;
-    else if (bpi == sizeof(BIGINT))
+    else if (bpi == sizeof(int64_t))
        a->access = _SC_array_acc_8;
     else
        a->access = _SC_array_acc_n;

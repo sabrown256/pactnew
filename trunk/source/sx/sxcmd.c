@@ -383,11 +383,11 @@ static object *_SXI_thru(object *argl)
         if (first <= last)
            {last = min(last, n);
             for (id = first; id <= last; id++)
-                SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) id), ret));}
+                SS_Assign(ret, SS_mk_cons(SS_mk_integer(id), ret));}
         else
            {first = min(first, n);
             for (id = first; id >= last; id--)
-                SS_Assign(ret, SS_mk_cons(SS_mk_integer((BIGINT) id), ret));};}
+                SS_Assign(ret, SS_mk_cons(SS_mk_integer(id), ret));};}
 #if 0
     else
        {char first = '\0', last = '\0', id;

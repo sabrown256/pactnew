@@ -32,7 +32,7 @@ int main(int c, char **v)
     io_printf(stdout, "   longlong = %d\n", sizeof(long long));
     io_printf(stdout, "   size_t   = %d\n", sizeof(size_t));
     io_printf(stdout, "   off_t    = %d\n", sizeof(off_t));
-    io_printf(stdout, "   BIGINT   = %d\n", sizeof(BIGINT));
+    io_printf(stdout, "   int64_t  = %d\n", sizeof(int64_t));
     io_printf(stdout, "\n");
 
     rv = TRUE;

@@ -24,11 +24,11 @@ struct s_REMOTE_FILE
    {PROCESS *pp;
     int type;
     int fid;
-    BIGINT file_size;
+    int64_t file_size;
     char *buffer;
     long sb_addr;
     long size;
-    BIGINT cf_addr;};
+    int64_t cf_addr;};
 
 typedef struct s_REMOTE_FILE REMOTE_FILE;
 

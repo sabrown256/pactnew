@@ -365,9 +365,9 @@ static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
 static SC_array *_PD_block_index_deref(locator *stck, long n,
 					       hasharr *tab, char *type,
 					       symindir *iloc,
-					       BIGINT *paddr, long *pnumb)
+					       int64_t *paddr, long *pnumb)
    {long i, bpi, nbk, nib, nbb, nit, ni;
-    int64_t addr;
+    BIGINT addr;
     defstr *dp;
     SC_array *nbl, *bl;
 

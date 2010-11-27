@@ -19,9 +19,9 @@
  *              - file in directory DIR
  */
 
-BIGINT SC_dsk_space(char *dir, BIGINT nbx)
+int64_t SC_dsk_space(char *dir, int64_t nbx)
    {int fd, nw, st, ok;
-    BIGINT bsz, nb, no;
+    int64_t bsz, nb, no;
     double fb, fl, fu;
     char *t, *cwd;
 
@@ -90,7 +90,7 @@ int SC_bytes_string(double nb, int nc, char *s, char *fmt)
 
 int main(int c, char **v)
    {int i;
-    BIGINT nb;
+    int64_t nb;
     double fb, dt, rc;
     char s[MAXLINE];
 
