@@ -105,7 +105,7 @@ static int _PN_bflush(FILE *stream)
 
 /* _PN_BTELL - do an ftell on the pseudo file */
 
-static BIGINT _PN_btell(FILE *stream)
+static int64_t _PN_btell(FILE *stream)
    {BF_FILE *fb;
     int64_t addr;
 
@@ -125,7 +125,7 @@ static BIGINT _PN_btell(FILE *stream)
 
 /* _PN_BSEEK - do an fseek on the pseudo file */
 
-static int _PN_bseek(FILE *stream, BIGINT addr, int offset)
+static int _PN_bseek(FILE *stream, int64_t addr, int offset)
    {int ret;
     BF_FILE *fb;
 
@@ -160,7 +160,7 @@ static int _PN_bseek(FILE *stream, BIGINT addr, int offset)
 
 /* _PN_BREAD - do an fread on the pseudo file */
 
-static BIGUINT _PN_bread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PN_bread(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {BF_FILE *fb;
     size_t nbw;
 
@@ -183,7 +183,7 @@ static BIGUINT _PN_bread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
 
 /* _PN_BWRITE - do an fwrite on the pseudo file */
 
-static BIGUINT _PN_bwrite(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PN_bwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {long nbw;
     BF_FILE *fb;
 

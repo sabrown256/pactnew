@@ -55,7 +55,7 @@
 #undef GETLN
 #define GETLN (*_SC_getln)
 
-#define SC_HAVE_LARGE_FILES   (sizeof(BIGINT) == sizeof(long long))
+#define SC_HAVE_LARGE_FILES   (sizeof(int64_t) == sizeof(long long))
 
 /*--------------------------------------------------------------------------*/
 
@@ -139,9 +139,9 @@ typedef char *(*PFfgets)(char *s, int n, FILE *stream);
 
 /* large file I/O function types */
 
-typedef BIGUINT (*PFSegSize)(void *fp, BIGINT nsz);
-typedef BIGUINT (*PFlread)(void *ptr, size_t sz, BIGUINT ni, FILE *stream);
-typedef BIGUINT (*PFlwrite)(void *ptr, size_t sz, BIGUINT ni, FILE *stream);
+typedef uint64_t (*PFSegSize)(void *fp, int64_t nsz);
+typedef uint64_t (*PFlread)(void *ptr, size_t sz, uint64_t ni, FILE *stream);
+typedef uint64_t (*PFlwrite)(void *ptr, size_t sz, uint64_t ni, FILE *stream);
 
 typedef struct s_file_io_desc file_io_desc;
 
@@ -156,13 +156,13 @@ struct s_file_io_desc
    {void *info;
     FILE *(*fopen)(char *name, char *mode);
     long (*ftell)(FILE *fp);
-    BIGINT (*lftell)(FILE *fp);
+    int64_t (*lftell)(FILE *fp);
     int (*fseek)(FILE *fp, long offs, int whence);
-    int (*lfseek)(FILE *fp, BIGINT offs, int whence);
+    int (*lfseek)(FILE *fp, int64_t offs, int whence);
     size_t (*fread)(void *ptr, size_t sz, size_t ni, FILE *fp);
-    BIGUINT (*lfread)(void *ptr, size_t sz, BIGUINT ni, FILE *fp);
+    uint64_t (*lfread)(void *ptr, size_t sz, uint64_t ni, FILE *fp);
     size_t (*fwrite)(void *ptr, size_t sz, size_t ni, FILE *fp);
-    BIGUINT (*lfwrite)(void *ptr, size_t sz, BIGUINT ni, FILE *fp);
+    uint64_t (*lfwrite)(void *ptr, size_t sz, uint64_t ni, FILE *fp);
     int (*setvbuf)(FILE *fp, char *bf, int type, size_t sz);
     int (*fclose)(FILE *fp);
     int (*fprintf)(FILE *fp, char *fmt, va_list a);
@@ -173,7 +173,7 @@ struct s_file_io_desc
     int (*feof)(FILE *fp);
     char *(*fgets)(char *s, int n, FILE *fp);
     char *(*pointer)(FILE *fp);
-    BIGUINT (*segsize)(FILE *fp, BIGINT n);
+    uint64_t (*segsize)(FILE *fp, int64_t n);
     int gather;
     int nhits[SC_N_IO_OPER];
     double nsec[SC_N_IO_OPER];};
@@ -183,12 +183,12 @@ struct s_file_io_desc
 
 typedef struct s_SC_file_block SC_file_block;
 typedef struct s_SC_mapped_file SC_mapped_file;
-typedef void (*PFMMTrav)(SC_mapped_file *mf, char *s, void *a, BIGINT nb);
+typedef void (*PFMMTrav)(SC_mapped_file *mf, char *s, void *a, int64_t nb);
 
 struct s_SC_file_block
-   {BIGINT off;                  /* physical offset from the beginning of the file */
-    BIGINT start;                /* logical start of block */
-    BIGINT end;                  /* logical end of block */
+   {int64_t off;                  /* physical offset from the beginning of the file */
+    int64_t start;                /* logical start of block */
+    int64_t end;                  /* logical end of block */
     SC_mapped_file *file;
     SC_file_block *next;};
 
@@ -230,10 +230,10 @@ struct s_SC_mapped_file
     int extend;
     int page;                     /* pagesize */
                                   /* logical file description members */
-    BIGINT lcpos;                 /* current file position (LC) */
-    BIGINT lclen;                 /* total file length (LC) */
-    BIGINT lcposx;                /* truncate to this length (LC) */
-    BIGINT lcoff;                 /* offset of the current stripe (LC) */
+    int64_t lcpos;                 /* current file position (LC) */
+    int64_t lclen;                 /* total file length (LC) */
+    int64_t lcposx;                /* truncate to this length (LC) */
+    int64_t lcoff;                 /* offset of the current stripe (LC) */
 
                                   /* physical stripe description members */
     size_t scsize;                /* size of the current stripe (SC) */
@@ -244,8 +244,8 @@ struct s_SC_mapped_file
 /* low level system call interfaces */
     int (*mopenf)(const char *file, int flag, ...);
     void *(*mmapf)(void *addr, size_t len, int prot,
-		   int flags, int fd, BIGINT offs);
-    BIGINT (*mwritef)(int fd, const void *buf, size_t nb, BIGINT off);
+		   int flags, int fd, int64_t offs);
+    int64_t (*mwritef)(int fd, const void *buf, size_t nb, int64_t off);
     void (*setup)(SC_mapped_file *mf);
     
     file_io_desc fid;};
@@ -268,7 +268,7 @@ struct s_SC_udl
     char *target;       /* data_standard for output files */
     char *format;       /* PDB, HDF5, ... */
     char *buffer;       /* I/O buffer for setvbuf */
-    BIGINT address;      /* file address for remote acceses */
+    int64_t address;      /* file address for remote acceses */
     pcons *info;};      /* other attributes */
 
 
@@ -300,7 +300,7 @@ struct s_fcdes
 
 struct s_fcent
    {char *name;
-    BIGINT address;
+    int64_t address;
     time_t date;
     int uid;
     int gid;
@@ -437,7 +437,7 @@ extern int
  io_ungetc(int c, FILE *fp),
  io_flush(FILE *fp),
  io_eof(FILE *fp),
- lio_seek(FILE *fp, BIGINT offs, int whence),
+ lio_seek(FILE *fp, int64_t offs, int whence),
  lio_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  lio_close(FILE *fp),
  lio_printf(FILE *fp, char *fmt, ...),
@@ -454,19 +454,19 @@ extern size_t
  io_read(void *ptr, size_t sz, size_t ni, FILE *fp),
  io_write(void *ptr, size_t sz, size_t ni, FILE *fp);
 
-extern BIGUINT
- io_segsize(void *fp, BIGINT n),
- lio_read(void *ptr, size_t sz, BIGUINT ni, FILE *fp),
- lio_write(void *ptr, size_t sz, BIGUINT ni, FILE *fp),
- lio_segsize(void *fp, BIGINT n);
+extern uint64_t
+ io_segsize(void *fp, int64_t n),
+ lio_read(void *ptr, size_t sz, uint64_t ni, FILE *fp),
+ lio_write(void *ptr, size_t sz, uint64_t ni, FILE *fp),
+ lio_segsize(void *fp, int64_t n);
 
-extern BIGINT
- SC_set_buffer_size(BIGINT sz),
+extern int64_t
+ SC_set_buffer_size(int64_t sz),
  SC_get_buffer_size(void),
  SC_file_size(FILE *fp),
  SC_file_length(char *name);
 
-extern BIGINT
+extern int64_t
  lio_tell(FILE *fp),
  SC_filelen(FILE *fp);
 
@@ -509,13 +509,13 @@ extern SC_mapped_file
 	     void (*setup)(SC_mapped_file *mf));
 
 extern void
- SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, BIGINT len),
+ SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, int64_t len),
  SC_mf_free(SC_mapped_file *mf),
- SC_mf_set_size(BIGINT mnsz, BIGINT extsz);
+ SC_mf_set_size(int64_t mnsz, int64_t extsz);
 
-extern BIGINT
- SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb, FILE *fp),
- SC_mf_read_striped(FILE *fp, BIGINT off, char *type,
+extern int64_t
+ SC_mf_traverse(PFMMTrav fnc, void *a, int ext, int64_t nb, FILE *fp),
+ SC_mf_read_striped(FILE *fp, int64_t off, char *type,
 		    int ni, int stride, int nv, void **vrs),
  SC_mf_length(FILE *fp);
 
@@ -523,8 +523,8 @@ extern char
  *SC_mf_name(FILE *fp);
 
 extern SC_file_block
- *SC_mf_insert(FILE *fp, SC_file_block *nbl, BIGINT off),
- *SC_mf_delete(FILE *fp, BIGINT off, BIGINT nb);
+ *SC_mf_insert(FILE *fp, SC_file_block *nbl, int64_t off),
+ *SC_mf_delete(FILE *fp, int64_t off, int64_t nb);
 
 extern FILE
  *SC_mf_copy(char *name, FILE *fp, int bckup);

@@ -46,7 +46,7 @@ static void _SC_path_delimiter_win32(char *delim)
 
 /* _SC_FILE_LENGTH_WIN32 - return the length of the file PATH */
 
-static BIGINT _SC_file_length_win32(char *path)
+static int64_t _SC_file_length_win32(char *path)
    {int64_t ln;
     FILE *fp;
 

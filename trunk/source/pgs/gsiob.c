@@ -1262,7 +1262,7 @@ static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
 
 		if (SC_is_type_fix(id) == TRUE)
 		   {long long v;
-		    v = SC_stoi(val);
+		    v = SC_stol(val);
 		    SC_convert_id(id, pv, 0, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
 
 		else if (SC_is_type_fp(id) == TRUE)
@@ -1356,7 +1356,7 @@ static int _PG_string_value(int ityp, haelem *hp, char *s)
 /* fixed point types (proper) */
     if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
-	v = SC_stoi(s);
+	v = SC_stol(s);
 	SC_convert_id(ityp, pv, 0, SC_LONG_LONG_I, &v, 0, 1, 1, FALSE);}
 
 /* floating point types (proper) */

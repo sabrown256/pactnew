@@ -122,12 +122,12 @@ static int _PD_open_i(PDBfile *file)
     token = SC_strtok(str, "\001", s);
     if (token == NULL)
        PD_error("BAD STRUCTURE CHART ADDRESS - PD_OPEN", PD_OPEN);
-    file->chrtaddr = SC_ATOADD(token);
+    file->chrtaddr = SC_stol(token);
 
     token = SC_strtok(NULL, "\001", s);
     if (token == NULL)
        PD_error("BAD SYMBOL TABLE ADDRESS - PD_OPEN", PD_OPEN);
-    file->symtaddr = SC_ATOADD(token);
+    file->symtaddr = SC_stol(token);
 
 /* read the symbol table first so that the file pointer is positioned
  * to the "extra" information, then read the "extra's" to get the

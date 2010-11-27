@@ -104,7 +104,7 @@ static void _PD_pfm_init_t(void)
 
 /* _PD_PFM_ADD_FILE_T - add a file to the list of managed files */
 
-static void _PD_pfm_add_file_t(PDBfile *file, BIGINT start_addr)
+static void _PD_pfm_add_file_t(PDBfile *file, int64_t start_addr)
    {int i, id, ins;
     pfmanager *pm;
     PD_Pfile *pf;
@@ -239,7 +239,7 @@ static int _PD_pflush(FILE *stream)
 
 /* _PD_PTELL - do an ftell on the parallel file */
 
-static BIGINT _PD_ptell(FILE *stream)
+static int64_t _PD_ptell(FILE *stream)
    {int64_t addr;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -258,7 +258,7 @@ static BIGINT _PD_ptell(FILE *stream)
 
 /* _PD_PSEEK - do an fseek on the parallel file */
 
-static int _PD_pseek(FILE *stream, BIGINT offset, int whence)
+static int _PD_pseek(FILE *stream, int64_t offset, int whence)
    {int rv, fail;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -299,7 +299,7 @@ static int _PD_pseek(FILE *stream, BIGINT offset, int whence)
 
 /* _PD_PREAD - do an fread on the parallel file */
 
-static BIGUINT _PD_pread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PD_pread(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {int status;
     size_t nbw, fail;
     int64_t offs;
@@ -337,7 +337,7 @@ static BIGUINT _PD_pread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
 
 /* _PD_PWRITE - do an fwrite on the parallel file */
 
-static BIGUINT _PD_pwrite(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PD_pwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {int rv;
     long nbw;
     int64_t ad;
@@ -631,7 +631,7 @@ static void _PD_pfm_setup_mp_file_t(PDBfile *file, SC_communicator comm)
  *                    - and increment it to reserve space in threaded mode
  */
 
-static BIGINT _PD_pfm_getspace_t(PDBfile *file, size_t nbytes,
+static int64_t _PD_pfm_getspace_t(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
    {int id;
     int64_t rv;
@@ -661,7 +661,7 @@ static BIGINT _PD_pfm_getspace_t(PDBfile *file, size_t nbytes,
 
 /* _PD_PFM_SETADDR_T - set the next available address for writing to ADDR */
 
-static void _PD_pfm_setaddr_t(PDBfile *file, BIGINT addr)
+static void _PD_pfm_setaddr_t(PDBfile *file, int64_t addr)
    {int id;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -711,7 +711,7 @@ static int _PD_pfm_extend_file_t(PDBfile *file, long nb)
  *                    - this a worker for _PD_get_next_address
  */
 
-static BIGINT _PD_next_address_t(PDBfile *file, char *type, long number,
+static int64_t _PD_next_address_t(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int flag, ipt;
     size_t nb, bpi;
@@ -772,7 +772,7 @@ static BF_FILE *_PD_get_file_ptr_t(FILE *file)
 
 /* _PD_GET_FILE_SIZE_T - return the file size */
 
-static BIGINT _PD_get_file_size_t(PDBfile *file)
+static int64_t _PD_get_file_size_t(PDBfile *file)
    {int64_t ln;
     FILE *fp;
     PD_Pfile *pf;
@@ -840,7 +840,7 @@ static int _PD_pfm_is_master_t(PDBfile *file)
 
 /* _PD_SET_EOD_T - reset the EOD point in the file */
 
-static int _PD_set_eod_t(PDBfile *file, BIGINT addr, long nb)
+static int _PD_set_eod_t(PDBfile *file, int64_t addr, long nb)
    {
 
     file->chrtaddr = addr;

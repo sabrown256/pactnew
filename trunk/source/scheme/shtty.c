@@ -210,11 +210,7 @@ char *SS_get_string(object *obj)
        strcpy(_SS.str, obj->print_name);
       
     else if (SS_integerp(obj))
-#ifdef NO_LONG_LONG
-       snprintf(_SS.str, MAXLINE, "%ld", SS_INTEGER_VALUE(obj));
-#else
-       snprintf(_SS.str, MAXLINE, "%lld", SS_INTEGER_VALUE(obj));
-#endif
+       snprintf(_SS.str, MAXLINE, "%lld", (long long) SS_INTEGER_VALUE(obj));
 
     else if (SS_floatp(obj))
        snprintf(_SS.str, MAXLINE, "%g", SS_FLOAT_VALUE(obj));

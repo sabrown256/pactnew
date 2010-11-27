@@ -309,10 +309,10 @@ struct s_SS_vect
 
 /* NUMBER ACCESSORS */
 
-#define SS_INTEGER_VALUE(x)    *((long long *) ((x)->val))
-#define SS_FLOAT_VALUE(x)      *((double *) ((x)->val))
-#define SS_COMPLEX_VALUE(x)    *((double _Complex *) ((x)->val))
-#define SS_QUATERNION_VALUE(x) *((quaternion *) ((x)->val))
+#define SS_INTEGER_VALUE(x)       *((int64_t *) ((x)->val))
+#define SS_FLOAT_VALUE(x)         *((double *) ((x)->val))
+#define SS_COMPLEX_VALUE(x)       *((double _Complex *) ((x)->val))
+#define SS_QUATERNION_VALUE(x)    *((quaternion *) ((x)->val))
 
 /* INPUT_PORT/OUTPUT_PORT ACCESSORS */
 
@@ -1010,7 +1010,7 @@ extern object
  *SS_mk_string(char *s),
  *SS_mk_inport(FILE *str, char *name),
  *SS_mk_outport(FILE *str, char *name),
- *SS_mk_integer(BIGINT i),
+ *SS_mk_integer(int64_t i),
  *SS_mk_float(double d),
  *SS_mk_complex(double _Complex d),
  *SS_mk_quaternion(quaternion d),

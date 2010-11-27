@@ -405,8 +405,8 @@ int lr_free(double *ptf, double *pnif, int nir)
 
 int core(int nir, PFTest tst, char *s, double *pdt)
    {int err;
-    BIGUINT ab, fb, db, mb;
-    BIGUINT aa, fa, da, ma;
+    uint64_t ab, fb, db, mb;
+    uint64_t aa, fa, da, ma;
     double tf, nif, nmby, dt;
     char *r;
 

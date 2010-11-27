@@ -1747,7 +1747,7 @@ double SC_stof(char *s)
  *         - returns 0 if string is NULL
  */
 
-BIGINT SC_stoi(char *s)
+int64_t SC_stoi(char *s)
    {int64_t rv;
 
     rv = 0;
@@ -1763,38 +1763,16 @@ BIGINT SC_stoi(char *s)
  *         - returns 0 if string is NULL
  */
 
-BIGINT SC_stol(char *s)
+int64_t SC_stol(char *s)
    {int64_t rv;
 
     rv = 0L;
     if (s != NULL)
-       rv = ATOL(s);
+       rv = atoll(s);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#ifndef NO_LONG_LONG
-
-/*--------------------------------------------------------------------------*/
-
-/* SC_STOLL - string to long long integer
- *          - returns 0 if string is NULL
- */
-
-long long SC_stoll(char *s)
-   {long long rv;
-
-    rv = 0;
-    if (s != NULL)
-       rv = (long long) STRTOLL_FUNCTION(s, NULL, 0);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
         
 /* SC_ATOF - a fast, working version of ATOF */

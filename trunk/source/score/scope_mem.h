@@ -191,10 +191,10 @@ struct s_SC_heap_des
     long n_mem_blocks;
     unsigned long size_max;
     unsigned long size;
-    BIGUINT sp_alloc;
-    BIGUINT sp_free;
-    BIGUINT sp_diff;
-    BIGUINT sp_max;
+    uint64_t sp_alloc;
+    uint64_t sp_free;
+    uint64_t sp_diff;
+    uint64_t sp_max;
     long ih;                /* current history index */
     long nh;                /* number of history entries */
     SC_mem_hst *ring;       /* ring of history entries */

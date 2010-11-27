@@ -193,7 +193,7 @@ static int _PD_is_null_fp_d(void *fp)
 
 /* _PD_MPTELL - do an ftell on the parallel file */
 
-static BIGINT _PD_mptell(FILE *stream)
+static int64_t _PD_mptell(FILE *stream)
    {long addr;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);
@@ -212,7 +212,7 @@ static BIGINT _PD_mptell(FILE *stream)
 
 /* _PD_MPSEEK - do an fseek on the parallel file */
 
-static int _PD_mpseek(FILE *stream, BIGINT offset, int whence)
+static int _PD_mpseek(FILE *stream, int64_t offset, int whence)
    {int rv, fail;
     PD_Pfile *pf;
     MPI_Offset moffset, rmoffset;
@@ -354,7 +354,7 @@ static int _PD_mpflush(FILE *stream)
 
 /* _PD_MPREAD - do an fread on the parallel file */
 
-static BIGUINT _PD_mpread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PD_mpread(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {int nread, fstatus;
     size_t nbr, fail;
     PD_Pfile *pf;
@@ -412,7 +412,7 @@ static BIGUINT _PD_mpread(void *s, size_t nbi, BIGUINT ni, FILE *stream)
 
 /* _PD_MPWRITE - do an fwrite on the parallel file */
 
-static BIGUINT _PD_mpwrite(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PD_mpwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {int nwritten, fstatus;
     long nbw;
     size_t fail;
@@ -468,7 +468,7 @@ static BIGUINT _PD_mpwrite(void *s, size_t nbi, BIGUINT ni, FILE *stream)
  *              - this used the collective MPI-IO call
  */
 
-static BIGUINT _PD_mpwritec(void *s, size_t nbi, BIGUINT ni, FILE *stream)
+static uint64_t _PD_mpwritec(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {int nwritten, fstatus;
     long nbw;
     size_t fail;
@@ -865,7 +865,7 @@ static int _PD_pfm_is_master_d(PDBfile *file)
  *               - return the ID 
  */
 
-static int _PD_pfm_add_d(PDBfile *file, BIGINT start_addr)
+static int _PD_pfm_add_d(PDBfile *file, int64_t start_addr)
    {int i, ins;
     PD_Pfile *pf;
     pfelement *fe;
@@ -917,7 +917,7 @@ static int _PD_pfm_add_d(PDBfile *file, BIGINT start_addr)
  *                    - IGNORES start_addr argument (why?)
  */
 
-static void _PD_pfm_add_file_d(PDBfile *file, BIGINT start_addr)
+static void _PD_pfm_add_file_d(PDBfile *file, int64_t start_addr)
    {PD_Pfile *pf;
 
     pf = FILE_IO_INFO(PD_Pfile, file->stream);
@@ -1017,7 +1017,7 @@ static long _PD_pfm_buffer_mp_req(char *type, void *request, char **buffer)
  *                      - and increment it to reserve space in threaded mode
  */
 
-static BIGINT _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
+static int64_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
    {long nbuf;
     int64_t rv;
     char *mpbuf;
@@ -1071,7 +1071,7 @@ static BIGINT _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
  *                      - processes
  */
 
-static BIGINT _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
+static int64_t _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
    {int64_t rv;
     PD_Pfile *pf;
     MPI_Comm comm;
@@ -1101,7 +1101,7 @@ static BIGINT _PD_pfm_getspace_col(PDBfile *file, size_t nbytes)
  *                    - and increment it to reserve space in threaded mode
  */
 
-static BIGINT _PD_pfm_getspace_d(PDBfile *file, size_t nbytes,
+static int64_t _PD_pfm_getspace_d(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
    {int id;
     int64_t rv;
@@ -1187,7 +1187,7 @@ static int _PD_pfm_remote_shutdown(void)
  *                         - in the input buffer
  */
 
-static BIGINT _PD_pfm_remote_getspace(char *buf)
+static int64_t _PD_pfm_remote_getspace(char *buf)
    {int64_t rv;
     PDBfile *inf;
     PD_MP_GETSPACE_req req;
@@ -1436,7 +1436,7 @@ static void _PD_pfm_setup_mp_file_d(PDBfile *file, SC_communicator comm)
  *                    - this a worker for _PD_get_next_address
  */
 
-static BIGINT _PD_next_address_d(PDBfile *file, char *type, long number,
+static int64_t _PD_next_address_d(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int flag, ipt;
     size_t nb, bpi;
@@ -1501,7 +1501,7 @@ static BF_FILE *_PD_get_file_ptr_d(FILE *file)
 
 /* _PD_GET_FILE_SIZE_D - return the file size */
 
-static BIGINT _PD_get_file_size_d(PDBfile *file)
+static int64_t _PD_get_file_size_d(PDBfile *file)
    {int status;
     int64_t rv;
     MPI_Offset sz;
@@ -1533,7 +1533,7 @@ static int _PD_pfm_extend_file_d(PDBfile *file, long nb)
 
 /* _PD_SET_EOD_D - reset the EOD point in the file */
 
-static int _PD_set_eod_d(PDBfile *file, BIGINT addr, long nb)
+static int _PD_set_eod_d(PDBfile *file, int64_t addr, long nb)
    {
 
     file->chrtaddr = addr;
@@ -1673,7 +1673,7 @@ static int _PD_pfm_flush_file_d(PDBfile *file)
 
 /* _PD_PFM_SETADDR_D - set the next available address for writing to ADDR */
 
-static void _PD_pfm_setaddr_d(PDBfile *file, BIGINT addr)
+static void _PD_pfm_setaddr_d(PDBfile *file, int64_t addr)
    {int id;
     PD_Pfile *pf;
     SC_THREAD_ID(tid);

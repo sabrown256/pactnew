@@ -148,7 +148,7 @@ void PA_interrupt_handler(int sig)
 /* PA_FILE_MON - monitor the auxilliary files */
 
 void PA_file_mon(char *edname, char *ppname, char *gfname)
-   {BIGINT curpos;
+   {int64_t curpos;
     
 /* check on the edit file */
     if (PA_edit_file != NULL)

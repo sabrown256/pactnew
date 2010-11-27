@@ -474,7 +474,7 @@ struct s_SC_ntree
 
 union u_SC_address
    {long mdiskaddr;
-    BIGINT diskaddr;
+    int64_t diskaddr;
     PFInt funcaddr;
     char *memaddr;};
 
@@ -827,12 +827,12 @@ extern int
 extern int
  SC_free_stash(void);
 
-extern BIGINT
+extern int64_t
  SC_stash_pointer(void *p),
  SC_pointer_index(void *p);
 
 extern void
- *SC_get_pointer(BIGINT n),
+ *SC_get_pointer(int64_t n),
  *SC_del_pointer(int n);
 
 
@@ -842,7 +842,7 @@ extern void
  SC_type_container(char *dtype, char *stype);
 
 extern int
- SC_fix_lmt(int nb, BIGINT *pmn, BIGINT *pmx, BIGINT *pumx),
+ SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
  SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 			     int padsz, int fpp, long nitems, long offs),
  SC_sizeof(char *s),
@@ -1034,7 +1034,7 @@ extern int
 
 extern void
  SC_configure_mm(long mxl, long mxm, long bsz, double r),
- SC_mem_statb(BIGUINT *al, BIGUINT *fr, BIGUINT *df, BIGUINT *mx),
+ SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx),
  SC_mem_stats(long *al, long *fr, long *df, long *mx),
  SC_mem_stats_acc(long a, long f),
  SC_mem_stats_set(long a, long f),
@@ -1160,9 +1160,9 @@ extern void
 
 extern int
  SC_resource_usage(SC_rusedes *ru, int pid),
- SC_set_resource_limits(BIGINT mem, BIGINT cpu, BIGINT fsz,
+ SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 			int nfd, int nprc),
- SC_get_resource_limits(BIGINT *pmem, BIGINT *pcpu, BIGINT *pfsz,
+ SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
 			int *pnfd, int *pnprc);
 
 
@@ -1218,7 +1218,7 @@ extern double
 extern long
  SC_strtol(char *str, char **ptr, int base);
 
-extern BIGINT
+extern int64_t
  SC_stol(char *s),
  SC_stoi(char *s);
 
@@ -1247,11 +1247,6 @@ extern int
  SC_chrstrp(char *s),
  SC_str_icmp(char *s, char *t),
  SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list a);
-
-#ifndef NO_LONG_LONG
-extern long long
- SC_stoll(char *s);
-#endif
 
 extern void
  SC_free_strings(char **sa),

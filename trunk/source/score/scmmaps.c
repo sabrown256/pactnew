@@ -28,7 +28,7 @@
 #include "scope_mmap.h"
 #include <sys/mman.h>
 
-BIGINT
+int64_t
  _SC_mf_initial_length = 1048576,      /* 1 << 20 ~ 1 MB */
  _SC_mf_max_extend     = 134217728;    /* 1 << 27 ~ 100 MB */
 
@@ -250,7 +250,7 @@ SC_mapped_file *SC_mf_make(char *name, int prot, int shar, int perm,
 
 /* SC_MF_SET_PROP - set various file members before working with the file */
 
-void SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, BIGINT len)
+void SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, int64_t len)
    {int ns, pgsz;
     int64_t ssz, szmx;
     SC_file_block *bl;
@@ -773,7 +773,7 @@ static char *_SC_mf_tell_physical(SC_mapped_file *mf)
 
 /* _SC_MF_WRT - do the memory copies for a write operation */
 
-static void _SC_mf_wrt(SC_mapped_file *mf, char *dst, void *a, BIGINT ni)
+static void _SC_mf_wrt(SC_mapped_file *mf, char *dst, void *a, int64_t ni)
    {long nb;
     int64_t pos, nba, len, off, sz, awr;
     char *src;
@@ -825,7 +825,7 @@ static void _SC_mf_wrt(SC_mapped_file *mf, char *dst, void *a, BIGINT ni)
 
 /* _SC_MF_RD - do the memory copies for a read operation */
 
-static void _SC_mf_rd(SC_mapped_file *mf, char *src, void *a, BIGINT ni)
+static void _SC_mf_rd(SC_mapped_file *mf, char *src, void *a, int64_t ni)
    {long nb;
     int64_t pos, nba, len, off, sz, ard;
     char *dst;
@@ -901,7 +901,7 @@ static int64_t _SC_mf_length(SC_mapped_file *mf)
  *              - to the block list
  */
 
-BIGINT SC_mf_length(FILE *fp)
+int64_t SC_mf_length(FILE *fp)
    {int64_t ln;
     SC_mapped_file *mf;
 
@@ -921,7 +921,7 @@ BIGINT SC_mf_length(FILE *fp)
  *                 - return the number of bytes operated on
  */
 
-static BIGINT _SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb,
+static int64_t _SC_mf_traverse(PFMMTrav fnc, void *a, int ext, int64_t nb,
 			      SC_mapped_file *mf)
    {int64_t nbo, ln;
     int64_t ab, ae, so, sb, se, nbs;
@@ -992,7 +992,7 @@ static BIGINT _SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb,
  *                - return the number of bytes operated on
  */
 
-BIGINT SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb, FILE *fp)
+int64_t SC_mf_traverse(PFMMTrav fnc, void *a, int ext, int64_t nb, FILE *fp)
    {int64_t nbo;
     SC_mapped_file *mf;
 
@@ -1009,7 +1009,7 @@ BIGINT SC_mf_traverse(PFMMTrav fnc, void *a, int ext, BIGINT nb, FILE *fp)
  *                  - return the number of items read
  */
 
-static void _SC_mf_rd_stripe(SC_mapped_file *mf, char *s, void *a, BIGINT nb)
+static void _SC_mf_rd_stripe(SC_mapped_file *mf, char *s, void *a, int64_t nb)
    {int i, iv, nv, nir, ni, nra;
     int nbr, bpi, bpu, stride;
     long l;
@@ -1084,8 +1084,8 @@ static void _SC_mf_rd_stripe(SC_mapped_file *mf, char *s, void *a, BIGINT nb)
  *                  - ala the read system call
  */
 
-BIGUINT _SC_mf_core_read(void *bf, size_t sz, BIGUINT ni, FILE *fp)
-   {BIGUINT nir;
+uint64_t _SC_mf_core_read(void *bf, size_t sz, uint64_t ni, FILE *fp)
+   {uint64_t nir;
 
 #ifdef HAVE_MMAP
 
@@ -1121,8 +1121,8 @@ BIGUINT _SC_mf_core_read(void *bf, size_t sz, BIGUINT ni, FILE *fp)
  *                   - ala the write system call
  */
 
-BIGUINT _SC_mf_core_write(void *bf, size_t sz, BIGUINT ni, FILE *fp)
-   {BIGUINT niw;
+uint64_t _SC_mf_core_write(void *bf, size_t sz, uint64_t ni, FILE *fp)
+   {uint64_t niw;
 
 #ifdef HAVE_MMAP
 
@@ -1158,7 +1158,7 @@ BIGUINT _SC_mf_core_write(void *bf, size_t sz, BIGUINT ni, FILE *fp)
  *                  - ala the fseek system call
  */
 
-int _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence)
+int _SC_mf_core_seek(FILE *fp, int64_t offset, int whence)
    {int ret;
 
 #ifdef HAVE_MMAP
@@ -1211,11 +1211,11 @@ int _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence)
 
 /* _SC_MF_CORE_TELL - return the current logical location
  *                  - ala the ftell C library call
- *                  - NOTE: BIGUINT and int64_t are the same size
+ *                  - NOTE: uint64_t and int64_t are the same size
  *                  - when using large files so use standard int64_t
  */
 
-BIGINT _SC_mf_core_tell(FILE *fp)
+int64_t _SC_mf_core_tell(FILE *fp)
    {int64_t pos;
 
 #ifdef HAVE_MMAP
@@ -1241,7 +1241,7 @@ BIGINT _SC_mf_core_tell(FILE *fp)
 
 /* SC_MF_SET_SIZE - set the default byte size for creating mapped files */
 
-void SC_mf_set_size(BIGINT mnsz, BIGINT extsz)
+void SC_mf_set_size(int64_t mnsz, int64_t extsz)
    {
 
     _SC_mf_initial_length = mnsz;
@@ -1258,9 +1258,9 @@ void SC_mf_set_size(BIGINT mnsz, BIGINT extsz)
  *                     - return the actual segment size used
  */
 
-BIGUINT _SC_mf_segment_size(FILE *fp, BIGINT nsz)
+uint64_t _SC_mf_segment_size(FILE *fp, int64_t nsz)
    {int64_t osz, len, nbp;
-    BIGUINT rv;
+    uint64_t rv;
     SC_mapped_file *mf;
 
     mf = (SC_mapped_file *) fp;
@@ -1277,7 +1277,7 @@ BIGUINT _SC_mf_segment_size(FILE *fp, BIGINT nsz)
     mf->scsize  = nsz;
     mf->scsizex = nsz;
 
-    rv = (BIGUINT) nsz;
+    rv = (uint64_t) nsz;
 
     return(rv);}
 
@@ -1306,7 +1306,7 @@ char *SC_mf_name(FILE *fp)
  *              - return the new block
  */
 
-SC_file_block *SC_mf_insert(FILE *fp, SC_file_block *nbl, BIGINT off)
+SC_file_block *SC_mf_insert(FILE *fp, SC_file_block *nbl, int64_t off)
    {int64_t sb;
     SC_file_block *pb, *bl, *bls, *nxt;
     SC_mapped_file *mf;
@@ -1346,7 +1346,7 @@ SC_file_block *SC_mf_insert(FILE *fp, SC_file_block *nbl, BIGINT off)
  *              - return the deleted block
  */
 
-SC_file_block *SC_mf_delete(FILE *fp, BIGINT off, BIGINT nb)
+SC_file_block *SC_mf_delete(FILE *fp, int64_t off, int64_t nb)
    {int64_t so, sb, se, ab, ae;
     SC_file_block *pb, *bl, *bld, *bls, *nxt;
     SC_mapped_file *mf;
@@ -1399,7 +1399,7 @@ SC_file_block *SC_mf_delete(FILE *fp, BIGINT off, BIGINT nb)
  *                    -   NV      number of things to read from each stripe
  */
 
-BIGINT SC_mf_read_striped(FILE *fp, BIGINT off, char *type,
+int64_t SC_mf_read_striped(FILE *fp, int64_t off, char *type,
 			  int ni, int stride, int nv, void **vrs)
    {int bpu, bpi, nb, nbr;
     int64_t rv;

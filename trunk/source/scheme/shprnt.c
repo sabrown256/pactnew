@@ -1062,11 +1062,7 @@ void SS_wr_atm(object *obj, object *strm)
        {s = t;
 
 	if (ityp == SC_INT_I)
-#ifdef NO_LONG_LONG
-	   snprintf(t, MAXLINE, "%ld", SS_INTEGER_VALUE(obj));
-#else
-	   snprintf(t, MAXLINE, "%lld", SS_INTEGER_VALUE(obj));
-#endif
+	   snprintf(t, MAXLINE, "%lld", (long long) SS_INTEGER_VALUE(obj));
 
 	else if (ityp == SC_FLOAT_I)
 	   snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(obj));

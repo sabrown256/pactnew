@@ -74,8 +74,8 @@ struct s_PA_state
     int input_flag;
     int ndom;
 
-    BIGINT edstr;
-    BIGINT ppstr;
+    int64_t edstr;
+    int64_t ppstr;
 
     char *delim;
     char *dict;

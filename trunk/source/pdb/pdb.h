@@ -330,8 +330,8 @@ struct s_data_standard
 typedef struct s_PD_disk_block PD_disk_block;  /* move up with other typedefs */
 
 struct s_PD_disk_block
-   {BIGINT addr;                       /* address of the disk block */
-    BIGINT size;                       /* size in bytes */
+   {int64_t addr;                       /* address of the disk block */
+    int64_t size;                       /* size in bytes */
     struct s_PD_disk_block *prev;
     struct s_PD_disk_block *next;};
 #endif
@@ -392,10 +392,10 @@ struct s_PDBfile
 #endif
     int mpi_file;
     int mpi_mode;                        /* serial (1) parallel (0) */
-    BIGINT maximum_size;                  /* for file family bookkeeping */
-    BIGINT headaddr;
-    BIGINT symtaddr;
-    BIGINT chrtaddr;
+    int64_t maximum_size;                  /* for file family bookkeeping */
+    int64_t headaddr;
+    int64_t symtaddr;
+    int64_t chrtaddr;
     PD_checksum_mode use_cksum;          /* session use of checksums */
     PD_checksum_mode file_cksum;         /* file use of checksums */
     int fix_denorm;
@@ -410,7 +410,7 @@ struct s_PDBfile
     int (*open)(PDBfile *file);
     int (*flush)(PDBfile *file);
 
-    BIGINT (*wr_symt)(PDBfile *file);
+    int64_t (*wr_symt)(PDBfile *file);
     int (*parse_symt)(PDBfile *file, char *bf, int flag);
 
     int (*wr_meta)(PDBfile *file, FILE *out, int fh);
@@ -418,7 +418,7 @@ struct s_PDBfile
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
     int (*wr_itag)(PDBfile *file, long n, long nitems, char *type,
-		   BIGINT addr, int flag);
+		   int64_t addr, int flag);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 
     int (*wr_fmt)(PDBfile *file);};
@@ -457,7 +457,7 @@ struct s_dimdes
 /* member descriptor - describe a member efficiently */
 struct s_memdes
    {char *member;
-    BIGINT member_offs;
+    int64_t member_offs;
     char *cast_memb;
     long cast_offs;
     int is_indirect;
@@ -487,7 +487,7 @@ FUNCTION_POINTER(memdes, *(*PFPmemdes));
 
 /* symbol table entry indirects */
 struct s_symindir
-   {BIGINT addr;
+   {int64_t addr;
     long n_ind_type;
     long arr_offs;};
 
@@ -556,7 +556,7 @@ struct s_defstr
 struct s_PD_itag
    {long nitems;                              /* number of items pointed to */
     char *type;                                  /* type of item pointed to */
-    BIGINT addr;                          /* address of the itag owning data */
+    int64_t addr;                          /* address of the itag owning data */
     int flag;                            /* TRUE if this itag owns the data */
     int length;};          /* byte length of the itag - not written to file */
 
@@ -691,22 +691,22 @@ struct s_PD_pfm_fnc
     int (*flush_file)(PDBfile *file);
     int (*extend_file)(PDBfile *file, long nb);
     int (*serial_flush)(FILE *fp, int _t_index);
-    int (*set_eod)(PDBfile *file, BIGINT addr, long nb);
+    int (*set_eod)(PDBfile *file, int64_t addr, long nb);
     int (*is_dp_init)(void);
     int (*is_smp_init)(void);
     int (*is_null_fp)(void *fp);
     int (*is_sequential)(void);
     int (*is_master)(PDBfile *file);
-    BIGINT (*get_file_size)(PDBfile *fp);
-    BIGINT (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
-    BIGINT (*next_address)(PDBfile *file, char *type, long number,
+    int64_t (*get_file_size)(PDBfile *fp);
+    int64_t (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
+    int64_t (*next_address)(PDBfile *file, char *type, long number,
 			  void *vr, int seekf, int tellf, int colf);
     void (*setup_mp_file)(PDBfile *file, SC_communicator comm);
     void (*init)(void);
-    void (*add_file)(PDBfile *file, BIGINT start_addr);
+    void (*add_file)(PDBfile *file, int64_t start_addr);
     void (*remove_file)(FILE *file);
     void (*mark_as_flushed)(PDBfile *file, int wh);
-    void (*set_address)(PDBfile *file, BIGINT addr);};
+    void (*set_address)(PDBfile *file, int64_t addr);};
 
 #ifdef __cplusplus
 extern "C" {
@@ -848,7 +848,7 @@ extern int
 		long *ind),
  PD_cast(PDBfile *file, char *type, char *memb, char *contr),
  PD_free(PDBfile *file, char *type, void *var),
- PD_fix_denorm(data_standard* std, char *type, BIGINT ni, void *vr),
+ PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr),
  PD_autofix_denorm(PDBfile *file, int flag);
  
 extern void
@@ -1061,12 +1061,12 @@ extern char
 extern int
  PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim);
 
-extern BIGINT
+extern int64_t
  PD_get_buffer_size(void),
- PD_set_buffer_size(BIGINT v);
+ PD_set_buffer_size(int64_t v);
 
-extern BIGINT
- PD_entry_set_address(syment *ep, BIGINT a),
+extern int64_t
+ PD_entry_set_address(syment *ep, int64_t a),
  PD_entry_address(syment *ep),
  PD_get_file_length(PDBfile *file);
 

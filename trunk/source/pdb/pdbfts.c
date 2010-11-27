@@ -15,7 +15,7 @@
 
 /* BYTE_SIZE_HR - print out human readable byte size */
 
-static void byte_size_hr(char *ns, int nc, BIGINT n)
+static void byte_size_hr(char *ns, int nc, int64_t n)
    {
 
     if (n >= 1000000000)

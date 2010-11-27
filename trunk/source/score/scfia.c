@@ -37,7 +37,7 @@ extern int
  *                  - its index
  */
 
-BIGINT SC_stash_pointer(void *p)
+int64_t SC_stash_pointer(void *p)
    {int64_t i;
 
     i = -1;
@@ -79,7 +79,7 @@ BIGINT SC_stash_pointer(void *p)
 
 /* SC_GET_POINTER - return a pointer from the managed array */
 
-void *SC_get_pointer(BIGINT n)
+void *SC_get_pointer(int64_t n)
    {void *p;
 
 
@@ -113,7 +113,7 @@ void *SC_get_pointer(BIGINT n)
  *
  */
 
-BIGINT SC_pointer_index(void *p)
+int64_t SC_pointer_index(void *p)
    {int64_t i;
 
 #ifdef F77_INT_SIZE_PTR_DIFFER

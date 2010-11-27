@@ -538,7 +538,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
  *                        - return TRUE iff successful
  */
 
-int SC_set_resource_limits(BIGINT mem, BIGINT cpu, BIGINT fsz,
+int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 			   int nfd, int nprc)
    {int rv;
     struct rlimit rl;
@@ -604,7 +604,7 @@ int SC_set_resource_limits(BIGINT mem, BIGINT cpu, BIGINT fsz,
  *                        - return TRUE iff successful
  */
 
-int SC_get_resource_limits(BIGINT *pmem, BIGINT *pcpu, BIGINT *pfsz,
+int SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
 			   int *pnfd, int *pnprc)
    {int rv;
     struct rlimit rl;

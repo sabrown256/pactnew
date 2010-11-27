@@ -239,7 +239,7 @@ static int SX_ultra_binary_filep(FILE *fp)
     if (strncmp(bf, Ultra_Hdr, hdr_sz) == 0)
 
 /* set the file pointer back to the beginning of the data */
-       {io_seek(fp, (BIGINT) hdr_sz, SEEK_SET);
+       {io_seek(fp, (int64_t) hdr_sz, SEEK_SET);
         return(TRUE);};
 
     return(FALSE);}
@@ -719,10 +719,10 @@ object *SX_crv_file_info(object *obj)
  */
 
 static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
-			      long nl, BIGINT *paddrt, int nlab,
-			      BIGINT *paddrl)
+			      long nl, int64_t *paddrt, int nlab,
+			      int64_t *paddrl)
    {int i, j, nc, nr, nt, rv, firstnum, nbefore, nafter, nlb;
-    BIGINT *addr, addrt, naddr, addrl;
+    int64_t *addr, addrt, naddr, addrl;
     char *token;
 
     addrl   = -1;
@@ -733,7 +733,7 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
     else
        nafter = -nlab;
 
-    addr = FMAKE_N(BIGINT, nbefore+1, "SX_FIND_TEXT_TABLE:addr");
+    addr = FMAKE_N(int64_t, nbefore+1, "SX_FIND_TEXT_TABLE:addr");
 
     nr  = 0;
     nc  = 0;
@@ -1099,7 +1099,7 @@ static void SX_wrt_bin(FILE *fp, object *argl)
          j = -1;
 
          if (SS_numbp(obj))
-            {i = (int) *SS_GET(BIGINT, obj);
+            {i = (int) *SS_GET(int64_t, obj);
              if ((i >= 1) && (i <= SX_n_curves_read))
                 j = SX_number[i];
              if ((j != -1) && (SX_dataset[j].x[0] == NULL))
@@ -1145,7 +1145,7 @@ static void SX_wrt_text(FILE *fp, object *argl)
          j = -1;
 
          if (SS_numbp(obj))
-            {i = (int) *SS_GET(BIGINT, obj);
+            {i = (int) *SS_GET(int64_t, obj);
              if ((i >= 1) && (i <= SX_n_curves_read))
                 j = SX_number[i];
              if ((j != -1) && (SX_dataset[j].x[0] == NULL))

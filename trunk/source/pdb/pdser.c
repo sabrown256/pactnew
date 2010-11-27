@@ -35,7 +35,7 @@ static void _PD_pfm_init_s(void)
 
 /* _PD_PFM_ADD_FILE_S - add a file to the list of managed files */
 
-static void _PD_pfm_add_file_s(PDBfile *file, BIGINT start_addr)
+static void _PD_pfm_add_file_s(PDBfile *file, int64_t start_addr)
    {
 
     return;}
@@ -59,7 +59,7 @@ static void _PD_pfm_remove_file_s(FILE *file)
  *                    - and increment it to reserve space
  */
 
-static BIGINT _PD_pfm_getspace_s(PDBfile *file, size_t nbytes,
+static int64_t _PD_pfm_getspace_s(PDBfile *file, size_t nbytes,
 				int rflag, int colf)
    {int64_t addr;
     int64_t old, new;
@@ -133,7 +133,7 @@ static int _PD_pfm_is_master_s(PDBfile *file)
 
 /* _PD_SET_EOD_S - reset the EOD point in the file */
 
-static int _PD_set_eod_s(PDBfile *file, BIGINT addr, long nb)
+static int _PD_set_eod_s(PDBfile *file, int64_t addr, long nb)
    {
 
     return(TRUE);}
@@ -145,7 +145,7 @@ static int _PD_set_eod_s(PDBfile *file, BIGINT addr, long nb)
  *                    - this a worker for _PD_get_next_address
  */
 
-static BIGINT _PD_next_address_s(PDBfile *file, char *type, long number,
+static int64_t _PD_next_address_s(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
     FILE *fp;
@@ -188,7 +188,7 @@ static BF_FILE *_PD_get_file_ptr_s(FILE *file)
 
 /* _PD_GET_FILE_SIZE_S - return the file size */
 
-static BIGINT _PD_get_file_size_s(PDBfile *file)
+static int64_t _PD_get_file_size_s(PDBfile *file)
    {int64_t rv;
     FILE *fp;
 
@@ -251,7 +251,7 @@ static void _PD_pfm_setup_mp_file_s(PDBfile *file, SC_communicator comm)
 
 /* _PD_PFM_SETADDR_S - set the next available address for writing to ADDR */
 
-static void _PD_pfm_setaddr_s(PDBfile *file, BIGINT addr)
+static void _PD_pfm_setaddr_s(PDBfile *file, int64_t addr)
    {
 
     return;}
@@ -312,7 +312,7 @@ static int _PD_is_null_fp_s(void *fp)
 
 /* _PD_STELL - FTELL method for STREAM */
 
-static BIGINT _PD_stell(FILE *stream)
+static int64_t _PD_stell(FILE *stream)
    {int64_t rv;
 
     rv = lio_tell(stream);
@@ -324,7 +324,7 @@ static BIGINT _PD_stell(FILE *stream)
 
 /* _PD_SSEEK - FSEEK method for STREAM */
 
-static int _PD_sseek(FILE *stream, BIGINT addr, int offset)
+static int _PD_sseek(FILE *stream, int64_t addr, int offset)
    {int rv;
 
     rv = lio_seek(stream, addr, offset);

@@ -52,7 +52,7 @@
  */
 
 static int _PD_wr_itag_iii(PDBfile *file, long n, long nitems, char *type,
-			   BIGINT addr, int loc)
+			   int64_t addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
 
@@ -110,7 +110,7 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 	   {pi->addr = -1;
 	    pi->flag = TRUE;}
 	else
-	   {pi->addr  = SC_ATOADD(token);
+	   {pi->addr  = SC_stol(token);
 	    token = SC_strtok(NULL, " \n", s);
 	    if (token == NULL)
 	       pi->flag = TRUE;
@@ -550,7 +550,7 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
         name = SC_strtok(desc->name, " \t", s);
 	dims = desc->dimensions;
 
-        addr = SC_STOADD(SC_strtok(adr, " \t", s));
+        addr = SC_stol(SC_strtok(adr, " \t", s));
         numb = SC_stol(SC_strtok(NULL, " \t()", s));
 
 /* end of expression */
@@ -869,7 +869,7 @@ static int _PD_wr_prim_typ_iii(FILE *fp, hasharr *tab)
  *                 - return -1L on error
  */
 
-static BIGINT _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
+static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
    {int n, nmb, ok;
     long i;
     int64_t addr;
@@ -978,7 +978,7 @@ static BIGINT _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
 static int _PD_wr_blocks_iii(PDBfile *file)
    {int ok;
     long i, j, n, ni;
-    BIGINT addr;
+    int64_t addr;
     char *nm;
     syment *ep;
     SC_array *bl;
@@ -1041,7 +1041,7 @@ static int _PD_wr_csum_iii(PDBfile *file)
  *                 - return -1L on error
  */
 
-static BIGINT _PD_wr_symt_iii(PDBfile *file)
+static int64_t _PD_wr_symt_iii(PDBfile *file)
    {int n, nd, flag, ok;
     long i, nt, nb, ni, stride, mn, mx;
     int64_t addr, ad;
@@ -1251,13 +1251,13 @@ static int _PD_open_iii(PDBfile *file)
     s = SC_strstr(ps, key);
     if (s == NULL)
        PD_error("FAILED TO MATCH STRUCTURE CHART - _PD_OPEN_III", PD_OPEN);
-    file->chrtaddr = SC_ATOADD(s + strlen(key));
+    file->chrtaddr = SC_stol(s + strlen(key));
 
     strcpy(key, "SymbolTableAddress:");
     s = SC_strstr(ps, key);
     if (s == NULL)
        PD_error("FAILED TO MATCH SYMBOL TABLE - _PD_OPEN_III", PD_OPEN);
-    file->symtaddr = SC_ATOADD(s + strlen(key));
+    file->symtaddr = SC_stol(s + strlen(key));
 
 /* read the symbol table first so that the file pointer is positioned
  * to the "extra" information, then read the "extra's" to get the

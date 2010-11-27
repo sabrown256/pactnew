@@ -184,7 +184,7 @@ int SC_gather_io_info(FILE *fp, int wh)
  *                    - see _SC_bio_read_opt
  */
 
-BIGINT SC_set_buffer_size(BIGINT sz)
+int64_t SC_set_buffer_size(int64_t sz)
    {int64_t rv;
     
     rv = _SC.buffer_size;
@@ -198,7 +198,7 @@ BIGINT SC_set_buffer_size(BIGINT sz)
 
 /* SC_GET_BUFFER_SIZE - get the default I/O buffer size */
 
-BIGINT SC_get_buffer_size(void)
+int64_t SC_get_buffer_size(void)
    {int64_t rv;
     
     rv = _SC.buffer_size;
@@ -550,7 +550,7 @@ static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
 
     while (SC_gets(s, MAXLINE, pp) != NULL)
        {if (strncmp(s, msg, lm) == 0)
-           {rv = SC_STOADD(s+lm+1);
+           {rv = SC_stol(s+lm+1);
 	    break;};};
 
     return(rv);}
@@ -723,7 +723,7 @@ int SC_file_access(int log)
                  {int64_t addr;
                   int offset, whence;
 
-                  addr   = SC_STOADD(SC_strtok(s+2, ",\n", t));
+                  addr   = SC_stol(SC_strtok(s+2, ",\n", t));
                   offset = SC_stol(SC_strtok(NULL, ",\n", t));
 
 		  switch (offset)
@@ -1470,7 +1470,7 @@ int SC_exit_all(void)
 
 /* _SC_LFTELL - large file IO wrapper for FTELL method */
 
-static BIGINT _SC_lftell(FILE *fp)
+static int64_t _SC_lftell(FILE *fp)
    {int64_t rv;
 
 #ifdef _LARGE_FILES
@@ -1491,7 +1491,7 @@ static BIGINT _SC_lftell(FILE *fp)
 
 /* _SC_LFSEEK - large file IO wrapper for FSEEK method */
 
-static int _SC_lfseek(FILE *fp, BIGINT offs, int whence)
+static int _SC_lfseek(FILE *fp, int64_t offs, int whence)
    {int rv;
 
 #ifdef _LARGE_FILES
@@ -1512,8 +1512,8 @@ static int _SC_lfseek(FILE *fp, BIGINT offs, int whence)
 
 /* _SC_LFREAD - large file IO wrapper for FREAD method */
 
-static BIGUINT _SC_lfread(void *s, size_t bpi, BIGUINT ni, FILE *fp)
-   {BIGUINT zc, n, ns, nr;
+static uint64_t _SC_lfread(void *s, size_t bpi, uint64_t ni, FILE *fp)
+   {uint64_t zc, n, ns, nr;
     char *ps;
 
     zc = 0;
@@ -1536,8 +1536,8 @@ static BIGUINT _SC_lfread(void *s, size_t bpi, BIGUINT ni, FILE *fp)
 
 /* _SC_LFWRITE - large file IO wrapper for FWRITE method */
 
-static BIGUINT _SC_lfwrite(void *s, size_t bpi, BIGUINT ni, FILE *fp)
-   {BIGUINT zc, n, ns, nw;
+static uint64_t _SC_lfwrite(void *s, size_t bpi, uint64_t ni, FILE *fp)
+   {uint64_t zc, n, ns, nw;
     char *ps;
 
     zc = 0;
@@ -1712,7 +1712,7 @@ size_t io_read(void *p, size_t sz, size_t ni, FILE *fp)
 
 	    else if (fid->lfread != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfread)(p, sz, (BIGUINT) ni, fp);
+		rv = (*fid->lfread)(p, sz, (uint64_t) ni, fp);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFREAD);};};};
 
     return(rv);}
@@ -1742,7 +1742,7 @@ size_t io_write(void *p, size_t sz, size_t ni, FILE *fp)
 
 	    else if (fid->lfwrite != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfwrite)(p, sz, (BIGUINT) ni, fp);
+		rv = (*fid->lfwrite)(p, sz, (uint64_t) ni, fp);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFWRITE);};};};
 
     return(rv);}
@@ -2011,8 +2011,8 @@ char *io_pointer(void *a)
 
 /* IO_SEGSIZE - file IO wrapper for SEGSIZE method */
 
-BIGUINT io_segsize(void *a, BIGINT n)
-   {BIGUINT rv;
+uint64_t io_segsize(void *a, int64_t n)
+   {uint64_t rv;
     file_io_desc *fid;
     FILE *fp;
 
@@ -2070,7 +2070,7 @@ int lio_setvbuf(FILE *fp, char *bf, int type, size_t sz)
 
 /* LIO_TELL - large file IO wrapper for FTELL method */
 
-BIGINT lio_tell(FILE *fp)
+int64_t lio_tell(FILE *fp)
    {int64_t rv;
     file_io_desc *fid;
 
@@ -2100,7 +2100,7 @@ BIGINT lio_tell(FILE *fp)
 
 /* LIO_SEEK - large file IO wrapper for FSEEK method */
 
-int lio_seek(FILE *fp, BIGINT offs, int whence)
+int lio_seek(FILE *fp, int64_t offs, int whence)
    {int rv;
     file_io_desc *fid;
 
@@ -2115,7 +2115,7 @@ int lio_seek(FILE *fp, BIGINT offs, int whence)
 
 	    if (fid->lfseek != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfseek)(fp, (BIGINT) offs, whence);
+		rv = (*fid->lfseek)(fp, (int64_t) offs, whence);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFSEEK);}
 
 	    else if (fid->fseek != NULL)
@@ -2130,8 +2130,8 @@ int lio_seek(FILE *fp, BIGINT offs, int whence)
 
 /* LIO_READ - large file IO wrapper for FREAD method */
 
-BIGUINT lio_read(void *p, size_t sz, BIGUINT ni, FILE *fp)
-   {BIGUINT rv;
+uint64_t lio_read(void *p, size_t sz, uint64_t ni, FILE *fp)
+   {uint64_t rv;
     file_io_desc *fid;
 
     rv = -1;
@@ -2160,8 +2160,8 @@ BIGUINT lio_read(void *p, size_t sz, BIGUINT ni, FILE *fp)
 
 /* LIO_WRITE - large file IO wrapper for FWRITE method */
 
-BIGUINT lio_write(void *p, size_t sz, BIGUINT ni, FILE *fp)
-   {BIGUINT rv;
+uint64_t lio_write(void *p, size_t sz, uint64_t ni, FILE *fp)
+   {uint64_t rv;
     file_io_desc *fid;
 
     rv = -1;
@@ -2449,8 +2449,8 @@ char *lio_pointer(void *a)
 
 /* LIO_SEGSIZE - large file IO wrapper for SEGSIZE method */
 
-BIGUINT lio_segsize(void *a, BIGINT n)
-   {BIGUINT rv;
+uint64_t lio_segsize(void *a, int64_t n)
+   {uint64_t rv;
     file_io_desc *fid;
     FILE *fp;
 
@@ -2543,7 +2543,7 @@ int SC_io_connect(int flag)
  *                - return -1 if the file does not exist
  */
 
-BIGINT SC_file_length(char *name)
+int64_t SC_file_length(char *name)
    {int64_t ln;
     char path[PATH_MAX];
 
@@ -2563,7 +2563,7 @@ BIGINT SC_file_length(char *name)
  *              - compare with SC_filelen
  */
 
-BIGINT SC_file_size(FILE *fp)
+int64_t SC_file_size(FILE *fp)
    {int64_t ad, ln;
 
 /* remember where we are */
@@ -2586,7 +2586,7 @@ BIGINT SC_file_size(FILE *fp)
  *            - compare with SC_file_size
  */
 
-BIGINT SC_filelen(FILE *fp)
+int64_t SC_filelen(FILE *fp)
    {int64_t caddr, flen;
 
     caddr = lio_tell(fp);

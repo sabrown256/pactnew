@@ -1617,8 +1617,8 @@ extern int
  PG_open_console(char *title, char *type, int bckgr,
 		 double xf, double yf, double dxf, double dyf);
 
-extern BIGINT
- PG_set_buffer_size(BIGINT sz),
+extern int64_t
+ PG_set_buffer_size(int64_t sz),
  PG_get_buffer_size(void);
 
 

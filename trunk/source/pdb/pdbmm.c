@@ -34,7 +34,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
     pa = _PD_get_state(-1);
 
     if (_PD.maxfsize == 0)
-       SC_fix_lmt(sizeof(BIGINT), NULL, &_PD.maxfsize, NULL);
+       SC_fix_lmt(sizeof(int64_t), NULL, &_PD.maxfsize, NULL);
 
     file = FMAKE(PDBfile, "_PD_MK_PDB:file");
     if (file != NULL)
@@ -457,7 +457,7 @@ syment *PD_copy_syment(syment *osym)
  *               - for the symbol table
  */
 
-syment *_PD_mk_syment(char *type, long ni, BIGINT addr, symindir *indr,
+syment *_PD_mk_syment(char *type, long ni, int64_t addr, symindir *indr,
 		      dimdes *dims)
    {syment *ep;
     char *t;

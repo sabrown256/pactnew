@@ -641,7 +641,7 @@ static object *_SSI_mem_monitor(object *arg)
 /* _SSI_MEM_TRACE - wrapper around SC_mem_check */
 
 static object *_SSI_mem_trace(void)
-   {long long nb;
+   {int64_t nb;
     object *o;
 
     nb = SC_mem_chk(3);
@@ -655,7 +655,7 @@ static object *_SSI_mem_trace(void)
 /* _SSI_MEM_CHK - wrapper around SC_mem_check */
 
 static object *_SSI_mem_chk(void)
-   {long long na, nf, nr;
+   {int64_t na, nf, nr;
     object *o;
 
     na = SC_mem_chk(1);
@@ -674,7 +674,7 @@ static object *_SSI_mem_chk(void)
 /* _SSI_SIZEOF - wrapper around SIZEOF */
 
 static object *_SSI_sizeof(object *arg)
-   {long long nb;
+   {int64_t nb;
     char *type;
     object *o;
 
@@ -698,7 +698,7 @@ static object *_SSI_sizeof(object *arg)
 
 static object *_SSI_attach(object *arg)
    {int pid;
-    long long rv;
+    int64_t rv;
     object *o;
 
     pid = -1;
@@ -719,7 +719,7 @@ static object *_SSI_attach(object *arg)
 
 static object *_SSI_retrace(object *arg)
    {int pid, to;
-    long long rv;
+    int64_t rv;
     object *o;
 
     pid = -1;

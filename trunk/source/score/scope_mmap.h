@@ -26,7 +26,7 @@
 /*--------------------------------------------------------------------------*/
 
 typedef void *(*PFMMap)(void *addr, size_t len,
-			int prot, int flags, int fd, BIGINT offs);
+			int prot, int flags, int fd, int64_t offs);
 
 typedef struct s_SC_io_buffer SC_io_buffer;
 
@@ -44,7 +44,7 @@ struct s_SC_io_buffer
 
 /*--------------------------------------------------------------------------*/
 
-extern BIGINT
+extern int64_t
  _SC_mf_initial_length,
  _SC_mf_max_extend;
 
@@ -73,15 +73,15 @@ extern int
  _SC_mf_setvbuf(FILE *fp, char *bf, int type, size_t sz),
  _SC_mf_eof(FILE *fp),
  _SC_mf_close(FILE *fp),
- _SC_mf_core_seek(FILE *fp, BIGINT offset, int whence);
+ _SC_mf_core_seek(FILE *fp, int64_t offset, int whence);
 
-extern BIGINT
+extern int64_t
  _SC_mf_core_tell(FILE *fp);
 
-extern BIGUINT
- _SC_mf_core_read(void *bf, size_t sz, BIGUINT ni, FILE *fp),
- _SC_mf_core_write(void *bf, size_t sz, BIGUINT ni, FILE *fp),
- _SC_mf_segment_size(FILE *fp, BIGINT nsz);
+extern uint64_t
+ _SC_mf_core_read(void *bf, size_t sz, uint64_t ni, FILE *fp),
+ _SC_mf_core_write(void *bf, size_t sz, uint64_t ni, FILE *fp),
+ _SC_mf_segment_size(FILE *fp, int64_t nsz);
 
 
 /* SCMMAP.C declarations */

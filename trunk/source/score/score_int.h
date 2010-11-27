@@ -93,7 +93,7 @@ typedef struct s_SC_state SC_state;
 
 struct s_SC_oscapdes
    {void (*path_delimiter)(char *delim);
-    BIGINT (*file_length)(char *path);
+    int64_t (*file_length)(char *path);
     int (*query_mode)(char *name, char *mode);
     int (*query_exec)(char *path);
     void (*process_methods)(PROCESS *pp);};
@@ -131,7 +131,7 @@ struct s_SC_state
     PFSignal_handler to_err;
 
 /* SCBIO.C */
-    BIGINT buffer_size;
+    int64_t buffer_size;
 
 /* SCTYP.C */
    SC_type_manager types;
@@ -154,8 +154,8 @@ struct s_SC_state
 
 /* SCFNCA.C */
    JMP_BUF ok_ptr;
-   BIGINT bmn;
-   BIGINT bmx;
+   int64_t bmn;
+   int64_t bmx;
 
 /* SCHP.C */
    int nfd;
@@ -277,16 +277,16 @@ extern int
 
 /* SCFNCA.C declarations */
 
-extern BIGINT
+extern int64_t
  _SC_to_number(void *a);
 
 extern void
- *_SC_to_address(BIGINT a);
+ *_SC_to_address(int64_t a);
 
 extern SC_address
  _SC_set_func_addr(PFInt x),
  _SC_set_mem_addr(void *x),
- _SC_set_disk_addr(BIGINT x);
+ _SC_set_disk_addr(int64_t x);
 
 extern PFInt
  _SC_hasharr_lookup_function(hasharr *tab, char *nm),

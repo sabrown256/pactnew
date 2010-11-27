@@ -222,7 +222,7 @@ static object *_SSI_pr_rd_tries(object *argl)
                SC_INT_I, &_SS.n_tries,
                0);
 
-    o = SS_mk_integer((BIGINT) _SS.n_tries);
+    o = SS_mk_integer((int64_t) _SS.n_tries);
 
     return(o);}
 
