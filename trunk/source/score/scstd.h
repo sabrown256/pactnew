@@ -166,6 +166,14 @@
 # endif
 #endif
 
+#ifdef COMPILER_PGI
+# define CREALL creal
+# define CIMAGL cimag
+#else
+# define CREALL creall
+# define CIMAGL cimagl
+#endif
+
 /* get the ticks per second for clock straight */
 
 #ifndef TICKS_SECOND

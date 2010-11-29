@@ -357,7 +357,7 @@ static void print_test_1_data(FILE *fp)
     PRINT(fp, "double complex scalar:      ds = %14.6e + %14.6e*I\n",
 	  creal(ds_r), cimag(ds_r));
     PRINT(fp, "long double complex scalar: qs = %14.6e + %14.6e*I\n",
-	  creall(qs_r), cimagl(qs_r));
+	  CREALL(qs_r), CIMAGL(qs_r));
 
     PRINT(fp, "\n");
 
@@ -382,7 +382,7 @@ static void print_test_1_data(FILE *fp)
     PRINT(fp, "long double complex array:\n");
     for (i = 0; i < N_FLOAT; i++)
         PRINT(fp, "  qa[%d] = %14.6le + %14.6le*I\n",
-	      i, creall(qa_r[i]), cimagl(qa_r[i]));
+	      i, CREALL(qa_r[i]), CIMAGL(qa_r[i]));
 
     PRINT(fp, "\n");
 

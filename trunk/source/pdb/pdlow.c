@@ -879,6 +879,17 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  falign->fx[ifx], fstd->fx[ifx].order,
 		  conv, NULL, NULL, TRUE, FALSE);
 
+#if 0
+    * int8_t: signed 8-bit
+    * uint8_t: unsigned 8-bit
+    * int16_t: signed 16-bit
+    * uint16_t: unsigned 16-bit
+    * int32_t: signed 32-bit
+    * uint32_t: unsigned 32-bit
+    * int64_t: signed 64-bit
+    * uint64_t: unsigned 64-bit
+#endif
+
 /* floating point types (proper) */
     for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
         {styp = SC_type_name(ifp + SC_FLOAT_I);
