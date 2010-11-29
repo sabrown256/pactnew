@@ -474,7 +474,7 @@ int derive_fp_format(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf)
 
 int derive_complex_float(int *fc)
    {int i, szc, szf, iprt, rprt;
-    union ucf {unsigned char c[32]; float f[2];} bofa;
+    union ucf {unsigned char c[32]; float _Complex f[2];} bofa;
 
     szc = sizeof(float _Complex);
     szf = sizeof(float);

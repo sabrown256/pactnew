@@ -352,9 +352,12 @@ static void print_test_1_data(FILE *fp)
 
 /* print scalars */
     PRINT(fp, "bool scalar:                bs = %d\n", bs_r);
-    PRINT(fp, "float complex scalar:       fs = %14.6e\n", fs_r);
-    PRINT(fp, "double complex scalar:      ds = %14.6e\n", ds_r);
-    PRINT(fp, "long double complex scalar: qs = %14.6e\n", qs_r);
+    PRINT(fp, "float complex scalar:       fs = %14.6e + %14.6e*I\n",
+	  crealf(fs_r), cimagf(fs_r));
+    PRINT(fp, "double complex scalar:      ds = %14.6e + %14.6e*I\n",
+	  creal(ds_r), cimag(ds_r));
+    PRINT(fp, "long double complex scalar: qs = %14.6e + %14.6e*I\n",
+	  creall(qs_r), cimagl(qs_r));
 
     PRINT(fp, "\n");
 
@@ -366,24 +369,28 @@ static void print_test_1_data(FILE *fp)
 /* print float complex array */
     PRINT(fp, "float complex array:\n");
     for (i = 0; i < N_FLOAT; i++)
-        PRINT(fp, "  fa[%d] = %14.6e\n", i, fa_r[i]);
+        PRINT(fp, "  fa[%d] = %14.6e + %14.6e*I\n",
+	      i, crealf(fa_r[i]), cimagf(fa_r[i]));
 
 /* print double complex array */
     PRINT(fp, "double complex array:\n");
     for (i = 0; i < N_FLOAT; i++)
-        PRINT(fp, "  da[%d] = %14.6e\n", i, da_r[i]);
+        PRINT(fp, "  da[%d] = %14.6e + %14.6e*I\n",
+	      i, creal(da_r[i]), cimag(da_r[i]));
 
 /* print long double complex array */
     PRINT(fp, "long double complex array:\n");
     for (i = 0; i < N_FLOAT; i++)
-        PRINT(fp, "  qa[%d] = %14.6e\n", i, qa_r[i]);
+        PRINT(fp, "  qa[%d] = %14.6le + %14.6le*I\n",
+	      i, creall(qa_r[i]), cimagl(qa_r[i]));
 
     PRINT(fp, "\n");
 
 /* partial read arrays */
     PRINT(fp, "partial read float complex array:\n");
     for (i = 0; i < N_FLOAT; i++)
-        PRINT(fp, "  fa_p[%d] = %14.6e\n", i, fa2_r[i]);
+        PRINT(fp, "  fa_p[%d] = %14.6e + %14.6e*I\n",
+	      i, crealf(fa2_r[i]), cimagf(fa2_r[i]));
 
     PRINT(fp, "\n");
 
