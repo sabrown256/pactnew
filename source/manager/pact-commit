@@ -501,7 +501,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
          ar x $lib
          rm -f $lib >& /dev/null
          touch *.o
-         ar rc $lib *.o
+         ar rc $lib *.o |& grep -v 'has no symbols'
          mv $lib ..
          touch ../$lib
          rm -f *.o _* >& /dev/null
@@ -518,7 +518,7 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
       flog $Log ar x libpdb.a
       flog $Log rm -f libpdb.a
       flog $Log touch *.o
-      flog $Log ar rc libpdb.a *.o
+      flog $Log ( ar rc libpdb.a *.o |& grep -v 'has no symbols' )
       flog $Log rm -f *.o _*
    endif
    NoteD $Log "Time stamps reset"

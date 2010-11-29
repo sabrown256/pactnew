@@ -29,6 +29,10 @@ int
  SC_INT_I                   = 5,
  SC_LONG_I                  = 6,
  SC_LONG_LONG_I             = 7,
+ SC_INT8_I                  = -1,
+ SC_INT16_I                 = -1, 
+ SC_INT32_I                 = -1,
+ SC_INT64_I                 = -1,
  SC_FLOAT_I                 = 8,
  SC_DOUBLE_I                = 9,
  SC_LONG_DOUBLE_I           = 10,
@@ -47,6 +51,10 @@ int
  SC_INT_P_I                 = 19,
  SC_LONG_P_I                = 20,
  SC_LONG_LONG_P_I           = 21,
+ SC_INT8_P_I                = -1,
+ SC_INT16_P_I               = -1, 
+ SC_INT32_P_I               = -1,
+ SC_INT64_P_I               = -1,
  SC_FLOAT_P_I               = 22,
  SC_DOUBLE_P_I              = 23,
  SC_LONG_DOUBLE_P_I         = 24,
@@ -78,6 +86,10 @@ char
  *SC_INT_S                   = "int",
  *SC_LONG_S                  = "long",
  *SC_LONG_LONG_S             = "long_long",
+ *SC_INT8_S                  = "int8_t",
+ *SC_INT16_S                 = "int16_t", 
+ *SC_INT32_S                 = "int32_t",
+ *SC_INT64_S                 = "int64_t",
  *SC_FLOAT_S                 = "float",
  *SC_DOUBLE_S                = "double",
  *SC_LONG_DOUBLE_S           = "long_double",
@@ -94,6 +106,10 @@ char
  *SC_INT_P_S                 = "int *",
  *SC_LONG_P_S                = "long *",
  *SC_LONG_LONG_P_S           = "long_long *",
+ *SC_INT8_P_S                = "int8_t *",
+ *SC_INT16_P_S               = "int16_t *", 
+ *SC_INT32_P_S               = "int32_t *",
+ *SC_INT64_P_S               = "int64_t *",
  *SC_FLOAT_P_S               = "float *",
  *SC_DOUBLE_P_S              = "double *",
  *SC_LONG_DOUBLE_P_S         = "long_double *",
@@ -492,6 +508,33 @@ int SC_deref_id(char *name, int base)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_FIN_TYPE_MANAGER - free up the space of the type manager
+ *                     - this had better be pretty near the last
+ *                     - PACT action taken in an application
+ */
+
+void SC_fin_type_manager(void)
+   {int i;
+    char **fmts, **fmta;
+    hasharr *ha;
+
+    ha   = (hasharr *) _SC.types.typ;
+    fmts = _SC.types.formats;
+    fmta = _SC.types.formata;
+
+    for (i = 0; i < N_TYPES; i++)
+        {SFREE(fmts[i]);
+	 SFREE(fmta[i]);};
+
+    SC_free_hasharr(ha, NULL, NULL);
+
+    _SC.types.typ = NULL;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_INIT_BASE_TYPES - register the common C types
  *                    - and some types used often in PACT
  *                    - NOTE: this must be kept consistent with
@@ -518,6 +561,12 @@ void SC_init_base_types(void)
        SC_INT_I                   = SC_register_type(SC_INT_S,                 sizeof(int),                  NULL);
        SC_LONG_I                  = SC_register_type(SC_LONG_S,                sizeof(long),                 NULL);
        SC_LONG_LONG_I             = SC_register_type(SC_LONG_LONG_S,           sizeof(long long),            NULL);
+#if 0
+       SC_INT8_I                  = SC_register_type(SC_INT8_S,                sizeof(int8_t),               NULL);
+       SC_INT16_I                 = SC_register_type(SC_INT16_S,               sizeof(int16_t),              NULL);
+       SC_INT32_I                 = SC_register_type(SC_INT32_S,               sizeof(int32_t),              NULL);
+       SC_INT64_I                 = SC_register_type(SC_INT64_S,               sizeof(int64_t),              NULL);
+#endif
        SC_FLOAT_I                 = SC_register_type(SC_FLOAT_S,               sizeof(float),                NULL);
        SC_DOUBLE_I                = SC_register_type(SC_DOUBLE_S,              sizeof(double),               NULL);
        SC_LONG_DOUBLE_I           = SC_register_type(SC_LONG_DOUBLE_S,         sizeof(long double),          NULL);
@@ -536,6 +585,12 @@ void SC_init_base_types(void)
        SC_INT_P_I                 = SC_register_type(SC_INT_P_S,                 szptr, NULL);
        SC_LONG_P_I                = SC_register_type(SC_LONG_P_S,                szptr, NULL);
        SC_LONG_LONG_P_I           = SC_register_type(SC_LONG_LONG_P_S,           szptr, NULL);
+#if 0
+       SC_INT8_P_I                = SC_register_type(SC_INT8_P_S,                szptr, NULL);
+       SC_INT16_P_I               = SC_register_type(SC_INT16_P_S,               szptr, NULL);
+       SC_INT32_P_I               = SC_register_type(SC_INT32_P_S,               szptr, NULL);
+       SC_INT64_P_I               = SC_register_type(SC_INT64_P_S,               szptr, NULL);
+#endif
        SC_FLOAT_P_I               = SC_register_type(SC_FLOAT_P_S,               szptr, NULL);
        SC_DOUBLE_P_I              = SC_register_type(SC_DOUBLE_P_S,              szptr, NULL);
        SC_LONG_DOUBLE_P_I         = SC_register_type(SC_LONG_DOUBLE_P_S,         szptr, NULL);
@@ -763,19 +818,19 @@ void _SC_set_format_defaults(void)
     if (fmts[SC_BIT_I] != NULL)
        SFREE(fmts[SC_BIT_I]);
 
-    t = SC_strsavef("%x", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
+    t = SC_strsavef("%x", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
     fmts[SC_BIT_I] = t;
 
     if (fmts[SC_BOOL_I] != NULL)
        SFREE(fmts[SC_BOOL_I]);
 
-    t = SC_strsavef("%s", "char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
+    t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
     fmts[SC_BOOL_I] = t;
 
     if (fmts[SC_CHAR_I] != NULL)
        SFREE(fmts[SC_CHAR_I]);
 
-    t = SC_strsavef("%c", "char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
+    t = SC_strsavef("%c", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
     fmts[SC_CHAR_I] = t;
 
 /* fixed point types (proper) */
@@ -791,7 +846,7 @@ void _SC_set_format_defaults(void)
 	 else
 	    snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
 
-	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fix)");
+	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(fix)");
 	 fmts[id] = t;};
 
 /* real floating point types (proper) */
@@ -805,7 +860,7 @@ void _SC_set_format_defaults(void)
 	 else
 	    snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
 
-	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
+	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
 	 fmts[id] = t;};
 
 /* complex floating point types (proper) */
@@ -821,14 +876,14 @@ void _SC_set_format_defaults(void)
 	    snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
 		     fp_pre[i].digits, fp_pre[i].digits);
 
-	 t = SC_strsavef(tmp, "char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
+	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
 	 fmts[id] = t;};
 
 /* other primitive types */
     if (fmts[SC_STRING_I] != NULL)
        SFREE(fmts[SC_STRING_I]);
 
-    t = SC_strsavef("%s", "char*:_SC_SET_FORMAT_DEFAULTS:format1(string)");
+    t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(string)");
     fmts[SC_STRING_I] = t;
 
 /* fmta is used for arrays */
@@ -837,7 +892,7 @@ void _SC_set_format_defaults(void)
             SFREE(fmta[i]);
 
          t = SC_strsavef(fmts[i],
-			 "char*:_SC_SET_FORMAT_DEFAULTS:formats2");
+			 "PERM|char*:_SC_SET_FORMAT_DEFAULTS:formats2");
          fmta[i] = t;};
 
     return;}

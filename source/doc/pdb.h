@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 11/27/2010
+MOD: 11/29/2010
 
 <CENTER>
 <P>
@@ -23,6 +23,8 @@ MOD: 11/27/2010
 <a href="#pdb_major"><dt><dd>PDBLib and Index Ordering</a>
 
 <a href="#pdb_offset"><dt><dd>PDBLib and Index Offsets</a>
+
+<a href="#pdb_types"><dt><dd>PDBLib and Data Types</a>
 
 <a href="#pdb_compile"><dt><dd>Compiling and Loading</a>
 
@@ -727,6 +729,48 @@ and
 <p>
 Using PDBView you can check the default offset of a given file using the
 <tt>file</tt> command.
+<p>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="pdb_types"><h2>PDBLib and Data Types</h2></a>
+
+PDBLib supports the full set of C99 primitive data types:
+<pre>
+   C Type                      PDB Name
+
+   bool                        bool
+   char                        char
+   unsigned char               u_char
+   short                       short
+   unsigned short              u_short
+   int                         int
+   unsigned int                u_int
+   long                        long
+   unsigned long               u_long
+   long long                   long_long
+   unsigned long long          u_long_long
+   float                       float
+   double                      double
+   long double                 long_double
+   float _Complex              float_complex
+   double _Complex             double_complex
+   long double _Complex        long_double_complex
+   <any data pointer>          *
+   <function pointer>          function
+</pre>
+
+The following types are defined as aliases to C99 types:
+<pre>
+   C Type                      PDB Alias
+
+   int                         integer
+   double                      REAL
+</pre>
+
+All of these data types are automatically defined by PDBLib and
+applications may simply refer to them without any special setup.
 <p>
 
 <!-- -------------------------------------------------------------------- --> 
