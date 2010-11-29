@@ -166,7 +166,8 @@ int SC_register_type(char *name, int bpi, ...)
     ha = (hasharr *) _SC.types.typ;
     if (ha == NULL)
        {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
-	_SC.types.typ = ha;};
+	_SC.types.typ = ha;
+	SC_init_base_types();};
 
     SC_VA_START(bpi);
 
