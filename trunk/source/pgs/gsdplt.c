@@ -143,9 +143,7 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
     nmap = km*lm;
 
     refl = 1;
-    LR_MAPPING_INFO(alist, nmap);
-
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PG_get_attrs_alist(alist,
 		       "MESH-SUBSELECT", SC_POINTER_I, &str, NULL,
@@ -417,16 +415,10 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
     t = PM_make_vectors(3, np);
 
     PG_get_attrs_alist(alist,
-		       "EXISTENCE", SC_POINTER_I, &emap, NULL,
 		       "MESH-SUBSELECT", SC_POINTER_I, &str, NULL,
 		       NULL);
 
-    eflag = (emap == NULL);
-    if (eflag)
-       {emap = FMAKE_N(char, n, "_PG_DOM_LR_3D:emap");
-	memset(emap, 1, n);}
-    else
-       PM_CHECK_EMAP(alist, n, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, n);
 
     if (str == NULL)
        {imn = 0;
@@ -1306,7 +1298,7 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
 	PG_set_line_style(dev, dbsty);
 	PG_set_line_width(dev, dbwid);
 
-	LR_MAPPING_INFO(f->map, f->range->n_elements);
+	emap = PM_check_emap(&eflag, f->map, f->range->n_elements);
 
 	PM_array_real(domain->element_type, domain->extrema, 2*nd, extr);
 

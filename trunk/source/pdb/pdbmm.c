@@ -334,40 +334,6 @@ void _PD_rl_standard(data_standard *std)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_MK_ALIGNMENT - THREADSAFE
- *                  - allocate, initialize and return a pointer to a
- *                  - data_alignment
- */
-
-data_alignment *_PD_mk_alignment(char *vals)
-   {int i;
-    data_alignment *align;
-
-    align = FMAKE(data_alignment, "_PD_MK_ALIGNMENT:align");
-
-    align->char_alignment = vals[0];
-    align->ptr_alignment  = vals[1];
-    align->bool_alignment = vals[2];
-
-    for (i = 0; i < 3; i++)
-        align->fx[i] = vals[i + 3];
-
-/* default-equal to long alignment*/
-    align->fx[3] = vals[5];
-
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
-        align->fp[i] = vals[i + 6];
-
-    if (strlen(vals) > 9)
-       align->struct_alignment = vals[9];
-    else
-       align->struct_alignment = 0;
-
-    return(align);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PD_COPY_ALIGNMENT - THREADSAFE
  *                    - return a copy of a data_alignment
  */

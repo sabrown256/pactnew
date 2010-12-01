@@ -1025,37 +1025,24 @@ void SS_register_types(void)
 
     SC_init_base_types();
 
-    SS_OBJECT_I      = SC_register_type("object",      sizeof(object),
-					SS_rl_object);
-    SS_PROCEDURE_I   = SC_register_type("procedure",   sizeof(procedure),
-					_SS_rl_procedure);
-    SS_CONS_I        = SC_register_type("pair",        sizeof(cons),
-					_SS_rl_cons);
-    SS_VARIABLE_I    = SC_register_type("variable",    sizeof(variable),
-					_SS_rl_variable);
-    SS_INPUT_PORT_I  = SC_register_type("input port",  sizeof(input_port),
-					_SS_rl_inport);
-    SS_OUTPUT_PORT_I = SC_register_type("output port", sizeof(output_port),
-					_SS_rl_outport);
-    SS_EOF_I         = SC_register_type("eof",         sizeof(SS_boolean),
-					_SS_rl_boolean);
-    SS_NULL_I        = SC_register_type("nil",         sizeof(SS_boolean),
-					_SS_rl_boolean);
-    SS_ERROR_I       = SC_register_type("error",       0, NULL);
+    SS_OBJECT_I      = SC_register_type("object",      KIND_STRUCT, sizeof(object),      SS_rl_object);
+    SS_PROCEDURE_I   = SC_register_type("procedure",   KIND_STRUCT, sizeof(procedure),   _SS_rl_procedure);
+    SS_CONS_I        = SC_register_type("pair",        KIND_STRUCT, sizeof(cons),        _SS_rl_cons);
+    SS_VARIABLE_I    = SC_register_type("variable",    KIND_STRUCT, sizeof(variable),    _SS_rl_variable);
+    SS_INPUT_PORT_I  = SC_register_type("input port",  KIND_STRUCT, sizeof(input_port),  _SS_rl_inport);
+    SS_OUTPUT_PORT_I = SC_register_type("output port", KIND_STRUCT, sizeof(output_port), _SS_rl_outport);
+    SS_EOF_I         = SC_register_type("eof",         KIND_STRUCT, sizeof(SS_boolean),  _SS_rl_boolean);
+    SS_NULL_I        = SC_register_type("nil",         KIND_STRUCT, sizeof(SS_boolean),  _SS_rl_boolean);
+    SS_ERROR_I       = SC_register_type("error",       KIND_OTHER,  0,                   NULL);
 
 #ifdef LARGE
 
-    SS_VECTOR_I      = SC_register_type("vector",       sizeof(vector),
-					_SS_rl_vector);
-    SS_CHARACTER_I   = SC_register_type("character",    sizeof(int),
-					_SS_rl_char);
-    SS_PROCESS_I     = SC_register_type("process",      sizeof(PROCESS),
-					_SS_rl_process);
+    SS_VECTOR_I      = SC_register_type("vector",       KIND_STRUCT, sizeof(vector),   _SS_rl_vector);
+    SS_CHARACTER_I   = SC_register_type("character",    KIND_OTHER,  sizeof(int),      _SS_rl_char);
+    SS_PROCESS_I     = SC_register_type("process",      KIND_STRUCT, sizeof(PROCESS),  _SS_rl_process);
 
-    SS_HASHARR_I     = SC_register_type("hash array",   sizeof(hasharr),
-					NULL);
-    SS_HAELEM_I      = SC_register_type("hash element", sizeof(haelem),
-					NULL);
+    SS_HASHARR_I     = SC_register_type("hash array",   KIND_STRUCT, sizeof(hasharr),  NULL);
+    SS_HAELEM_I      = SC_register_type("hash element", KIND_STRUCT, sizeof(haelem),   NULL);
 
 #endif
 

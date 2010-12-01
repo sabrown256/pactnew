@@ -1035,6 +1035,7 @@ extern int
 extern void
  SC_configure_mm(long mxl, long mxm, long bsz, double r),
  SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx),
+ SC_mem_statb_set(uint64_t a, uint64_t f),
  SC_mem_stats(long *al, long *fr, long *df, long *mx),
  SC_mem_stats_acc(long a, long f),
  SC_mem_stats_set(long a, long f),

@@ -25,6 +25,68 @@
  */
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_MK_ALIGNMENT - THREADSAFE
+ *                  - allocate, initialize and return a pointer to a
+ *                  - data_alignment
+ */
+
+static data_alignment *_PD_mk_alignment(char *vals)
+   {int i, nc;
+    data_alignment *align;
+
+    nc = strlen(vals);
+
+    align = FMAKE(data_alignment, "_PD_MK_ALIGNMENT:align");
+
+/* versions before 25 have 7 alignments for C types */
+    if (nc == 7)
+       {align->char_alignment = vals[0];
+	align->ptr_alignment  = vals[1];
+	align->bool_alignment = vals[0];
+
+/* fixed point alignments */
+	for (i = 0; i < 3; i++)
+	    align->fx[i] = vals[i + 2];
+
+/* default long long alignment equal to long alignment*/
+	align->fx[3] = vals[4];
+
+/* floating point alignments */
+	for (i = 0; i < 2; i++)
+	    align->fp[i] = vals[i + 5];
+
+/* default long double alignment equal to twice double alignment*/
+	align->fp[2] = 2*vals[6];
+
+	align->struct_alignment = 0;}
+
+/* versions 25 and after have 9 alignments for C99 types */
+    else if (nc >= 9)
+       {align->char_alignment = vals[0];
+	align->ptr_alignment  = vals[1];
+	align->bool_alignment = vals[2];
+
+/* fixed point alignments */
+	for (i = 0; i < 3; i++)
+	    align->fx[i] = vals[i + 3];
+
+/* default long long alignment equal to long alignment*/
+	align->fx[3] = vals[5];
+
+/* floating point alignments */
+	for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+	    align->fp[i] = vals[i + 6];
+
+	if (nc > 9)
+	   align->struct_alignment = vals[9];
+	else
+	   align->struct_alignment = 0;};
+
+    return(align);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                               ITAG ROUTINES                              */
 

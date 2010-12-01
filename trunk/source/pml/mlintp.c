@@ -350,11 +350,6 @@ double *PM_z_n_lr_2d(double *f, double *x, double *y, int mode, void *cnnct,
     kmax  = maxes[0];
     lmax  = maxes[1];
 
-    emap  = NULL;
-    SC_assoc_info(alist,
-		  "EXISTENCE", &emap,
-		  NULL);
-
     n = SC_arrlen(f)/sizeof(double);
     if (n == (kmax - 1)*(lmax - 1))
        {km = kmax - 1;
@@ -363,9 +358,7 @@ double *PM_z_n_lr_2d(double *f, double *x, double *y, int mode, void *cnnct,
     else
        return(f);
 
-    eflag = FALSE;
-    if (emap != NULL)
-       PM_CHECK_EMAP(alist, n, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, n);
 
     if ((x != NULL) && (y != NULL) && mode)
        ret = _PM_interp_nodes_lr(f, x, y,
@@ -413,21 +406,14 @@ double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
     kmax  = maxes[0];
     lmax  = maxes[1];
 
-    emap  = NULL;
     SC_assoc_info(alist,
-		  "EXISTENCE", &emap,
 		  "CORNER", &pc,
 		  NULL);
 
     corner = (pc == NULL) ? 2 : *pc;
 
-    npts  = kmax*lmax;
-    eflag = (emap == NULL);
-    if (eflag)
-       {emap = FMAKE_N(char, npts, "PM_NODE_ZONE_LR_2D:emap");
-	memset(emap, 1, npts);}
-    else
-       PM_CHECK_EMAP(alist, npts, eflag, emap);
+    npts = kmax*lmax;
+    emap = PM_check_emap(&eflag, alist, npts);
 
     switch (corner)
        {case 1 :

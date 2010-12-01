@@ -179,21 +179,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* LR_MAPPING_INFO - extract info for Logical-Rectangular mappings */
-
-#define LR_MAPPING_INFO(alst, npts)                                          \
-   {emap   = NULL;                                                           \
-    SC_assoc_info(alst,                                                      \
-		  "EXISTENCE", &emap,                                        \
-		  NULL);                                                     \
-    eflag  = (emap == NULL);                                                 \
-    if (eflag)                                                               \
-       {emap = FMAKE_N(char, npts, "LR_MAPPING_INFO:emap");                  \
-	memset(emap, 1, npts);};}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PG_PUSH_CHILD_IOB - add a child interface object to a parent's list */
 
 #define PG_PUSH_CHILD_IOB(par, chld)                                         \

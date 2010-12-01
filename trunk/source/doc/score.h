@@ -901,11 +901,22 @@ macros.
 The type manager functions provided are:
 
 <pre>
-<I>C Binding: </I>int SC_register_type(char *name, int bpi, ...)
+<I>C Binding: </I>int SC_register_type(char *name, SC_kind kind, int bpi, ...)
 </pre>
 
-Registers the type specified by NAME.  The size of the type in bytes
-is BPI.  No other arguments are processed at present, in future,
+Registers the type specified by NAME.  The KIND of the type is one of:
+<pre>
+    KIND_CHAR
+    KIND_INT
+    KIND_FLOAT
+    KIND_COMPLEX
+    KIND_POINTER
+    KIND_STRUCT
+    KIND_OTHER
+</pre>
+The size of the type in bytes is BPI.  A function that frees an
+instance of the type may optionally be supplied.
+No other arguments are processed at present, in future,
 key/value pairs may be provided to add other descriptive information
 of the type.  The integer id for the newly registered type is returned
 if successful. Otherwise -1 is returned.

@@ -1063,9 +1063,7 @@ static void PG_scan_convert_lr(PG_device *dev, PG_scan_line_data *par,
     n     = imax*jmax;
     nmap  = (imax - 1)*(jmax - 1);
 
-    LR_MAPPING_INFO(alist, nmap);
-
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     amn = fextr[0];
     amx = fextr[1];

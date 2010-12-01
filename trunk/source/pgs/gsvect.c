@@ -194,9 +194,7 @@ static void _PG_draw_vct_zc_lr(PG_device *dev, double **u, double **r,
     nn    = kmax*lmax;
     nmap  = (kmax - 1) * (lmax - 1);
 
-    LR_MAPPING_INFO(alst, nmap);
-
-    PM_CHECK_EMAP(alst, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alst, nmap);
 
     v = PM_make_vectors(2, nn);
 

@@ -497,7 +497,7 @@ ${BinDir}/scvsts : ${TGTLib} scvsts.c
 	${CLD} ${LdFlags} ${PACTTmpDir}/scvsts.o -o ${BinDir}/scvsts ${Libs}
 
 ${BinDir}/dmake : ${TGTLib} scmkut.c
-	${CC} -c scmkut.c -o ${PACTTmpDir}/scmkut.o
+	${CC} -I${PACTTmpDir} -c scmkut.c -o ${PACTTmpDir}/scmkut.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/scmkut.o -o ${BinDir}/dmake ${Libs}
 
 ${BinDir}/scarts : ${TGTLib} scarts.c

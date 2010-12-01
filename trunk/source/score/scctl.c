@@ -1185,7 +1185,8 @@ void daprint(pcons *alst)
 
 /* print the first value only */
 	 else
-	    {SC_ntos(s, MAXLINE, id, ths->cdr, 0, 1);
+	    {id = SC_deref_id(ths->cdr_type, FALSE);
+	     SC_ntos(s, MAXLINE, id, ths->cdr, 0, 1);
 	     io_printf(stdout, "\t%s", s);};
 
          io_printf(stdout, "\n");}

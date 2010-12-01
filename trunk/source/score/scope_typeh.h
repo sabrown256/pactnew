@@ -81,6 +81,18 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 
 /*--------------------------------------------------------------------------*/
 
+enum e_SC_kind
+   {KIND_CHAR = 0,
+    KIND_INT,
+    KIND_FLOAT,
+    KIND_COMPLEX,
+    KIND_QUATERNION,
+    KIND_POINTER,
+    KIND_STRUCT,
+    KIND_OTHER};
+
+typedef enum e_SC_kind SC_kind;
+
 typedef struct s_SC_type SC_type;
 typedef struct s_precisionfp precisionfp;
 typedef struct s_SC_type_manager SC_type_manager;
@@ -98,6 +110,7 @@ typedef struct s_SC_type_manager SC_type_manager;
 struct s_SC_type
    {int id;                    /* integer type id */
     char *type;                /* type name */
+    SC_kind kind;              /* type kind */
     int bpi;                   /* bytes per item */
     void (*free)(void *x);};   /* function to free instance */
 
@@ -285,7 +298,7 @@ extern long
 /* SCTYP.C declarations */
 
 extern int
- SC_register_type(char *name, int bpi, ...),
+ SC_register_type(char *name, SC_kind kind, int bpi, ...),
  SC_type_alias(char *name, int id),
  SC_type_id(char *name, int unsg),
  SC_fix_type_id(char *name, int unsg),
