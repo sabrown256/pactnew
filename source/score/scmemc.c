@@ -60,9 +60,9 @@ void SC_mem_stats_acc(long a, long f)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_STATS - return memory usage statistics */
+/* SC_MEM_STATB - return memory usage statistics */
 
-void SC_mem_stats(long *al, long *fr, long *df, long *mx)
+void SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx)
    {SC_heap_des *ph;
 
     ph = _SC_tid_mm();
@@ -84,9 +84,28 @@ void SC_mem_stats(long *al, long *fr, long *df, long *mx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_STATB - return memory usage statistics */
+/* SC_MEM_STATB_SET - set the memory usage to A and F */
 
-void SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx)
+void SC_mem_statb_set(uint64_t a, uint64_t f)
+   {SC_heap_des *ph;
+
+    ph = _SC_tid_mm();
+
+    SC_SP_ALLOC(ph) = a;
+    SC_SP_FREE(ph)  = f;
+
+    SC_SP_DIFF(ph) = SC_SP_ALLOC(ph) - SC_SP_FREE(ph);
+    SC_SP_MAX(ph)  = (SC_SP_MAX(ph) > SC_SP_DIFF(ph)) ?
+                     SC_SP_MAX(ph) : SC_SP_DIFF(ph);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_STATS - return memory usage statistics */
+
+void SC_mem_stats(long *al, long *fr, long *df, long *mx)
    {SC_heap_des *ph;
 
     ph = _SC_tid_mm();
@@ -609,7 +628,8 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
 
 void *SC_alloc_nzt(long nitems, long bpi, char *name, void *arg)
    {int na, zsp, typ;
-    long nb, nbp, a, f;
+    long nb, nbp;
+    uint64_t a, f;
     SC_mem_opt *opt;
     SC_heap_des *ph;
     mem_header *space;
@@ -634,8 +654,8 @@ void *SC_alloc_nzt(long nitems, long bpi, char *name, void *arg)
 
     SC_LOCKON(SC_mm_lock);
 
-    if (na)
-       SC_mem_stats(&a, &f, NULL, NULL);
+    if (na == TRUE)
+       SC_mem_statb(&a, &f, NULL, NULL);
 
     if (SC_mm_debug == TRUE)
        space = (mem_header *) _SC_ALLOC((size_t) nbp);
@@ -668,8 +688,8 @@ void *SC_alloc_nzt(long nitems, long bpi, char *name, void *arg)
 	if (_SC_mem_hst_hook != NULL)
 	   (*_SC_mem_hst_hook)(SC_MEM_ALLOC, desc);};
 
-    if (na)
-       SC_mem_stats_set(a, f);
+    if (na == TRUE)
+       SC_mem_statb_set(a, f);
 
     SC_LOCKOFF(SC_mm_lock);
 

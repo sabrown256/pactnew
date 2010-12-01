@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 
 #define N_DOUBLES_MD 3
 

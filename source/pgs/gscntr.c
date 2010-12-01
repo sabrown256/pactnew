@@ -457,13 +457,11 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
     n     = imx*jmx;
     nmap  = (imx - 1)*(jmx - 1);
 
-    LR_MAPPING_INFO(alist, nmap);
-
     PG_get_attrs_alist(alist,
 		       "CONTOUR-METHOD", SC_INT_I, &method, 0,
 		       NULL);
 
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PM_LOGICAL_ZONE(x[0], x1, x2, x3, x4, imx);
     PM_LOGICAL_ZONE(x[1], y1, y2, y3, y4, imx);

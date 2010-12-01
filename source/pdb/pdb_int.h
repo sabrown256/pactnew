@@ -311,9 +311,6 @@ extern data_alignment
 extern data_standard
  *_PD_mk_standard(PDBfile *file);
 
-extern data_alignment
- *_PD_mk_alignment(char *vals);
-
 extern syment
  *_PD_mk_syment(char *type, long numb, int64_t addr, symindir *indr, dimdes *dims);
 
@@ -483,7 +480,7 @@ extern void
  _PD_init_chrt(PDBfile *file, int ftk),
  _PD_setup_chart(hasharr *chart, data_standard *fstd,
 		 data_standard *hstd, data_alignment *falign,
-		 data_alignment *halign, int flag, int ftk),
+		 data_alignment *halign, int ishc, int ftk),
  _PD_def_real(char *type, PDBfile *file),
  _PD_d_install(PDBfile *file, char *name, defstr *def, int host),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup);

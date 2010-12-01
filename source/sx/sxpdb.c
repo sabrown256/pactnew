@@ -2098,11 +2098,15 @@ int _SX_file_varp(PDBfile *file, char *name, int flag)
            _PD_rl_syment_d(ep);}
 
     else
-       {token = SC_firsttok(name, ".([ ");
 
-	_SC_udl_container(token, TRUE);
+/* check the literal name first - e.g. {t=1!000e-01,x(3:7)} */
+       {ep = PD_inquire_entry(file, name, TRUE, NULL);
+	if (ep == NULL)
+	   {token = SC_firsttok(name, ".([ ");
 
-        ep = PD_inquire_entry(file, token, TRUE, NULL);};
+	    _SC_udl_container(token, TRUE);
+
+	    ep = PD_inquire_entry(file, token, TRUE, NULL);};};
 
     rv = (ep == NULL) ? FALSE : TRUE;
 

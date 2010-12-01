@@ -377,9 +377,7 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
 
     glyph = SC_assoc(alist, "GLYPH");
 
-    LR_MAPPING_INFO(alist, nmap);
-
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
@@ -473,9 +471,7 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
     kz = kmax - 1;
     lz = lmax - 1;
 
-    LR_MAPPING_INFO(alist, nmap);
-
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
@@ -573,9 +569,7 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
     lm   = lmax - 1;
     nmap = km*lm;
 
-    LR_MAPPING_INFO(alist, nmap);
-
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);
@@ -660,9 +654,7 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
     lm   = lmax - 1;
     nmap = km*lm;
 
-    LR_MAPPING_INFO(alist, nmap);
-
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);

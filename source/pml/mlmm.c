@@ -770,7 +770,7 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
     void **elem;
     double dx, ds, xmn, xmx;
     double **x, *extr, *pe, *scales;
-    char bf[MAXLINE], *emap;
+    char *emap;
 
     ne = s->n_elements;
     if (ne == 0)
@@ -785,8 +785,7 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
     extr   = FMAKE_N(double, 2*nde, "PM_FIND_EXIST_EXTREMA:extr");
     scales = FMAKE_N(double, nde, "PM_FIND_EXIST_EXTREMA:scales");
 
-    strcpy(bf, s->element_type);
-    sid = SC_type_id(strtok(bf, " *"), FALSE);
+    sid = SC_deref_id(s->element_type, TRUE);
 
 /* compute the extrema in each dimension */
     elem = (void **) s->elements;
@@ -822,13 +821,10 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
 	     ds  = max(ds, 1.0);
 	     scales[i] = dx/ds;};};
 
-    s->extrema = SC_convert_id(sid, NULL, 0, 1,
-			       SC_DOUBLE_I, extr, 0, 1, 2*nde, FALSE);
-    s->scales  = SC_convert_id(sid, NULL, 0, 1,
-			       SC_DOUBLE_I, scales, 0, 1, nde, FALSE);
-
-    SFREE(extr);
-    SFREE(scales);
+    s->extrema = SC_convert_id(sid, s->extrema, 0, 1,
+			       SC_DOUBLE_I, extr, 0, 1, 2*nde, TRUE);
+    s->scales  = SC_convert_id(sid, s->scales, 0, 1,
+			       SC_DOUBLE_I, scales, 0, 1, nde, TRUE);
 
     return;}
 
@@ -1716,6 +1712,43 @@ pcons *PM_map_info_alist(PM_map_info *ti)
     inf = SC_add_alist(inf, "CENTERING", SC_INT_P_S, (void *) pi);
 
     return(inf);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_CHECK_EMAP - return the existence map in the form of a byte array
+ *               - check ALST for a map or allocate one that is N long
+ *               - set EFLAG to TRUE if a new space was allocated
+ */
+
+char *PM_check_emap(int *peflag, pcons *alst, long n)
+   {int sid, eflg;
+    pcons *pc;
+    char *emap;
+
+    if (alst != NULL)
+       pc = SC_assoc_entry(alst, "EXISTENCE");
+    else
+       pc = NULL;
+
+    eflg = (pc == NULL);
+    if (eflg == TRUE)
+       {emap = FMAKE_N(char, n, "PM_CHECK_EMAP:emap");
+	memset(emap, 1, n);}
+
+    else
+       {sid  = SC_deref_id(pc->cdr_type, FALSE);
+	if (sid == SC_CHAR_I)
+	   emap = pc->cdr;
+	else
+	   {emap = SC_convert_id(SC_CHAR_I, NULL, 0, 1,
+				 sid, pc->cdr, 0, 1,
+				 n, FALSE);
+	    eflg = TRUE;};};
+
+    *peflag = eflg;
+
+    return(emap);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

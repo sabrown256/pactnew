@@ -1112,7 +1112,7 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
 /* insert entries in the host charts (both) since those stds are now known */
     _PD_setup_chart(file->host_chart, file->host_std, NULL, 
-                    file->host_align, NULL, FALSE, TRUE);
+                    file->host_align, NULL, TRUE, TRUE);
 
 /* assume the file and host standards are the same until
  * we find out otherwise (and mutate it at some later point)
@@ -1214,7 +1214,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* insert entries in the host charts (both) since those stds are now known */
     _PD_setup_chart(file->host_chart, file->host_std, NULL, 
-                    file->host_align, NULL, FALSE, TRUE);
+                    file->host_align, NULL, TRUE, TRUE);
 
 /* assume the file and host standards are the same until
  * we find out otherwise (and mutate it at some later point)

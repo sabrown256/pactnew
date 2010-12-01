@@ -488,7 +488,7 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
     chart  = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY);
 
     _PD_setup_chart(chart, std,
-		    pa->host_std, align, pa->host_align, TRUE, TRUE);
+		    pa->host_std, align, pa->host_align, FALSE, TRUE);
 
 /* special hack for jollies and to save typing */
     SC_hasharr_install(chart, "standard", std, PD_STANDARD_S, TRUE, TRUE);

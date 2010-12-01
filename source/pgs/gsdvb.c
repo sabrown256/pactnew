@@ -256,13 +256,11 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     nmap  = (kmax - 1) * (lmax - 1);
     nz    = SC_arrlen(a)/sizeof(int);
 
-    LR_MAPPING_INFO(alist, nmap);
-
     PG_get_attrs_alist(alist,
 		       "CENTERING", SC_INT_I, &cnt, N_CENT,
 		       NULL);
 
-    PM_CHECK_EMAP(alist, nmap, eflag, emap);
+    emap = PM_check_emap(&eflag, alist, nmap);
 
     PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(y, y1, y2, y3, y4, kmax);

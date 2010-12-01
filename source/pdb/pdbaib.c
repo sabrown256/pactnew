@@ -419,13 +419,13 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
 	    fstd->fp[ifp].format = fpfmt;
 	    falign->fp[ifp]      = algn;};};
 
-    _PD_setup_chart(file->host_chart, hstd, NULL, halign, NULL, FALSE, TRUE);
+    _PD_setup_chart(file->host_chart, hstd, NULL, halign, NULL, TRUE, TRUE);
 
 /* NOTE: we must change the file chart unconditionally but this only
  * ends up changing the dp->convert flag for this type and this is
  * essential
  */
-    _PD_setup_chart(file->chart, fstd, hstd, falign, halign, TRUE, TRUE);
+    _PD_setup_chart(file->chart, fstd, hstd, falign, halign, FALSE, TRUE);
 
 /* if we opened the file in write mode we need to change the formats */
     if (file->mode == PD_CREATE)
