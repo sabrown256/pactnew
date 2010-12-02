@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 02/03/2010
+MOD: 12/02/2010
 
 <CENTER>
 <P>
@@ -901,7 +901,7 @@ macros.
 The type manager functions provided are:
 
 <pre>
-<I>C Binding: </I>int SC_register_type(char *name, SC_kind kind, int bpi, ...)
+<I>C Binding: </I>int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 </pre>
 
 Registers the type specified by NAME.  The KIND of the type is one of:
@@ -916,10 +916,16 @@ Registers the type specified by NAME.  The KIND of the type is one of:
 </pre>
 The size of the type in bytes is BPI.  A function that frees an
 instance of the type may optionally be supplied.
-No other arguments are processed at present, in future,
-key/value pairs may be provided to add other descriptive information
-of the type.  The integer id for the newly registered type is returned
+The arguments are processed as key/value pairs.  The options are:
+<pre>
+     SC_TYPE_INIT    value is a function to initialize an instance
+     SC_TYPE_FREE    value is a function to free an instance
+</pre>
+The integer id for the newly registered type is returned
 if successful. Otherwise -1 is returned.
+<p>
+If a type name is registered more than once, it is ignored in
+favor of the first definition.
 <p>
 
 <pre>

@@ -8,7 +8,7 @@
 ; include "cpyright.h"
 ;
 
-(define dev (pg-make-device "PS" "COLOR" "iply 2.0 2.0"))
+(define dev (pg-make-device "PS" "COLOR" "iply1 2.0 2.0"))
 ;(define dev (pg-make-device "SCREEN" "COLOR" "Intersecting Polygon"))
 (ps-dots-inch 100)
 (axis-number-minor-ticks 2)

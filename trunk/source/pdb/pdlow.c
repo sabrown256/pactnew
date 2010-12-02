@@ -385,7 +385,7 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab, int ishc)
 		default :
 		     kind = KIND_OTHER;
 		     break;};};
-	SC_register_type(name, kind, def->size, NULL);}
+	SC_type_register(name, kind, def->size, 0);}
 
     return;}
 

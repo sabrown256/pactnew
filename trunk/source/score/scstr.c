@@ -1783,60 +1783,62 @@ double SC_atof(const char *ps)
     double accum, rv;
     char *s, *p;
 
-    sign  = 1;
-    s     = (char *) ps;
-    accum = 0;
+    rv = 0.0;
+    if (ps != NULL)
+       {sign  = 1;
+	s     = (char *) ps;
+	accum = 0;
 
 /* get past white space */
-    for (p = s; (*p == ' ') || (*p == '\n') || (*p == '\t'); p++);
+	for (p = s; (*p == ' ') || (*p == '\n') || (*p == '\t'); p++);
         
-    if ((*p == '+') || (*p == '-'))
-       sign = (*(p++) == '+') ? 1 : -1;
+	if ((*p == '+') || (*p == '-'))
+	   sign = (*(p++) == '+') ? 1 : -1;
 
-    for (val = 0, i = 0; (*p >= '0') && (*p <= '9'); p++, i++)
-        {if (i < 4)
-            val = 10*val + *p - '0';
-         else
-            {accum = accum*1.0e4 + val;
-             val   = *p - '0';
-             i     = 0;};};
+	for (val = 0, i = 0; (*p >= '0') && (*p <= '9'); p++, i++)
+	    {if (i < 4)
+	        val = 10*val + *p - '0';
+	     else
+	        {accum = accum*1.0e4 + val;
+		 val   = *p - '0';
+		 i     = 0;};};
 
-    if (*p == '.')
-       p++;
+	if (*p == '.')
+	   p++;
 
-    for (pwr = 0; (*p >= '0') && (*p <= '9'); p++, i++)
-        {if (i < 4)
-            {val = 10*val + *p - '0';
-             pwr--;}
-         else
-            {accum = accum*1.0e4 + val;
-             val   = *p - '0';
-             pwr--;
-             i = 0;};};
+	for (pwr = 0; (*p >= '0') && (*p <= '9'); p++, i++)
+	    {if (i < 4)
+	        {val = 10*val + *p - '0';
+		 pwr--;}
+	     else
+	        {accum = accum*1.0e4 + val;
+		 val   = *p - '0';
+		 pwr--;
+		 i = 0;};};
 
-    if (i != 0)
-       {for (; i < 4; i++, pwr--)
-            val *= 10;
-        accum = accum*1.0e4 + val;};
+	if (i != 0)
+	   {for (; i < 4; i++, pwr--)
+	        val *= 10;
+	    accum = accum*1.0e4 + val;};
 
-    accum *= sign;
+	accum *= sign;
         
-    if ((*p == 'D') || (*p == 'E') ||
-        (*p == 'd') || (*p == 'e'))
-       p++;
+	if ((*p == 'D') || (*p == 'E') ||
+	    (*p == 'd') || (*p == 'e'))
+	   p++;
 
-    sign = 1;
-    if ((*p == '+') || (*p == '-'))
-       sign = (*(p++) == '+') ? 1 : -1;
+	sign = 1;
+	if ((*p == '+') || (*p == '-'))
+	   sign = (*(p++) == '+') ? 1 : -1;
 
-    for (exponent = 0; (*p >= '0') && (*p <= '9'); p++)
-        exponent = 10*exponent + *p - '0';
+	for (exponent = 0; (*p >= '0') && (*p <= '9'); p++)
+	    exponent = 10*exponent + *p - '0';
 
-    exponent *= sign;
-    pwr      += exponent;
+	exponent *= sign;
+	pwr      += exponent;
 
-    rv = accum*pow(10.0, (double) pwr);
-    ps = p;
+	rv = accum*pow(10.0, (double) pwr);
+	ps = p;};
 
     return(rv);}
 

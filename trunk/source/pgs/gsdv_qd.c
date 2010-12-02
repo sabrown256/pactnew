@@ -643,6 +643,7 @@ void _PG_qd_next_line(PG_device *dev)
  
 static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
    {int type, oldval, newval, lineHght, Hght;
+    char *p;
     PG_device *dev, *devC;
     PG_interface_object *iob;
     PG_text_box *b;
@@ -655,7 +656,8 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
     PG_expose_device(PG_console_device);
 
     if (fp != stdin)
-       return(io_gets(str, maxlen, fp));
+       {p = io_gets(str, maxlen, fp);
+	return(p);};
 
     PG_setup_input(str, maxlen);
 

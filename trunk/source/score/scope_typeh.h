@@ -81,6 +81,13 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 
 /*--------------------------------------------------------------------------*/
 
+enum e_SC_type_method
+   {SC_TYPE_NONE = 0,
+    SC_TYPE_INIT,
+    SC_TYPE_FREE};
+
+typedef enum e_SC_type_method SC_type_method;
+
 enum e_SC_kind
    {KIND_CHAR = 0,
     KIND_INT,
@@ -112,6 +119,7 @@ struct s_SC_type
     char *type;                /* type name */
     SC_kind kind;              /* type kind */
     int bpi;                   /* bytes per item */
+    void (*init)(void *x);     /* function to initialize instance */
     void (*free)(void *x);};   /* function to free instance */
 
 struct s_precisionfp
@@ -298,7 +306,7 @@ extern long
 /* SCTYP.C declarations */
 
 extern int
- SC_register_type(char *name, SC_kind kind, int bpi, ...),
+ SC_type_register(char *name, SC_kind kind, int bpi, ...),
  SC_type_alias(char *name, int id),
  SC_type_id(char *name, int unsg),
  SC_fix_type_id(char *name, int unsg),
