@@ -454,7 +454,7 @@ void PM_restore_fpu(void *a)
 /*--------------------------------------------------------------------------*/
 
 /* PM_FIX_NAND - replace all NaNs in D with the value V
- *            - return the number of NaNs found
+ *             - return the number of NaNs found
  */
 
 long PM_fix_nand(long n, double *d, int mask, double v)

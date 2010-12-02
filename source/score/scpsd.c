@@ -609,9 +609,6 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
     static int n = BFSZ;
     static char *s = NULL;
 
-    if (s == NULL)
-       s = FMAKE_N(char, n, "char*:PS_DIFF_A:s");
-
     cmnd = SC_dsnprintf(FALSE, "diff %s %s > __tmp__", f1, f2);
     st   = system(cmnd);
 
@@ -629,7 +626,8 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
     bfb  = NULL;
 
     while (TRUE)
-       {if (io_gets(s, n, fd) == NULL)
+       {s = SC_dgets(s, &n, fd);
+	if (s == NULL)
            {io_close(fd);
 	    unlink("__tmp__");
 	    break;};
@@ -692,10 +690,6 @@ static int ps_diff_b(char *f1, char *f2, pixdes *pd, int verbose)
     static int na = BFSZ, nb = BFSZ;
     static char *sa = NULL, *sb = NULL;
 
-    if (sa == NULL)
-       {sa = FMAKE_N(char, na, "char*:PS_DIFF_A:sa");
-	sb = FMAKE_N(char, nb, "char*:PS_DIFF_A:sb");};
-
     fda = io_open(f1, "r");
     fdb = io_open(f2, "r");
 
@@ -705,8 +699,10 @@ static int ps_diff_b(char *f1, char *f2, pixdes *pd, int verbose)
     err = 0;
 
     for (i = 0; TRUE; i++)
-        {if ((io_gets(sa, na, fda) == NULL) ||
-	     (io_gets(sb, nb, fdb) == NULL))
+        {sa = SC_dgets(sa, &na, fda);
+	 sb = SC_dgets(sb, &nb, fdb);
+
+	 if ((sa == NULL) || (sb == NULL))
             {io_close(fda);
 	     io_close(fdb);
 	     break;};
@@ -907,10 +903,6 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
     static int na = BFSZ, nb = BFSZ;
     static char *sa = NULL, *sb = NULL;
 
-    if (sa == NULL)
-       {sa = FMAKE_N(char, na, "char*:PS_DIFF_A:sa");
-	sb = FMAKE_N(char, nb, "char*:PS_DIFF_A:sb");};
-
     memset(&ds, 0, sizeof(diff_stat));
 
     fda = io_open(f1, "r");
@@ -924,8 +916,9 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
     err  = 0;
 
     for (i = 0; TRUE; i++)
-        {if ((io_gets(sa, na, fda) == NULL) ||
-	     (io_gets(sb, nb, fdb) == NULL))
+        {sa = SC_dgets(sa, &na, fda);
+	 sb = SC_dgets(sb, &nb, fdb);
+	 if ((sa == NULL) || (sb == NULL))
             {io_close(fda);
 	     io_close(fdb);
 	     break;};

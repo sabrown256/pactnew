@@ -843,9 +843,8 @@ void SC_free_state(anadep *state)
  */
 
 int SC_parse_makefile(char *fname, anadep *state)
-   {int i, rv, ok;
-    char s[MAX_BFSZ];
-    char *peq, *pcl, *t, *pt;
+   {int i, nb, rv, ok;
+    char *s, *peq, *pcl, *t, *pt;
     FILE *fp;
     ruledef a;
     vardef v;
@@ -867,8 +866,15 @@ int SC_parse_makefile(char *fname, anadep *state)
 	    a.text = NULL;
 	    a.nc   = 0;
 
-	    for (i = 1; io_gets(s, MAX_BFSZ, fp) != NULL; i++)
-	        {if (SC_blankl(s, "#") == TRUE)
+	    s  = NULL;
+	    nb = 0;
+
+	    for (i = 1; TRUE; i++)
+	        {s = SC_dgets(s, &nb, fp);
+		 if (s == NULL)
+		    break;
+
+		 if (SC_blankl(s, "#") == TRUE)
 		    {_SC_end_rule(&a, state);
 		     _SC_end_var(&v, state);}
 

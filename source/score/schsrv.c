@@ -304,9 +304,8 @@ int SC_host_server_fin(void)
 /* _SC_READ_HOST_SERVER_DB - parse the host server database */
 
 static void _SC_read_host_server_db(char *file)
-   {int mn, mx;
-    char s[MAX_BFSZ];
-    char *p, *u, *type, *spec, *base;
+   {int mn, mx, nb;
+    char *s, *u, *type, *spec, *base;
     char *pnglst, *net;
     FILE *fp;
     hrng *rng;
@@ -324,9 +323,12 @@ static void _SC_read_host_server_db(char *file)
 	   {net = SC_strsavef(net, "SC_HOST_SERVER_INIT:net");
 	    SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);};
 
+	s  = NULL;
+	nb = 0;
+
 	while (TRUE)
-	   {p = io_gets(s, MAX_BFSZ, fp);
-	    if (p == NULL)
+	   {s = SC_dgets(s, &nb, fp);
+	    if (s == NULL)
 	       break;
 
 	    if ((*s == '#') || SC_blankp(s, "#"))

@@ -862,25 +862,30 @@ int SS_load_scm(char *name)
  */
 
 int SS_text_data_filep(char *fname, int cmnt)
-   {int ok;
-    char bf[MAXLINE];
-    char *s, *p, *token;
+   {int ok, nb;
+    char *bf, *s, *p, *token;
     FILE *fp;
 
-    ok = TRUE;
     fp = io_open(fname, "r");
 
-    while ((io_gets(bf, MAXLINE, fp) != NULL) && (ok == TRUE))
-       {if (bf[0] == cmnt)
-           continue;
+    bf = NULL;
+    nb = 0;
 
-	for (s = bf; TRUE; s = NULL)
-	    {token = SC_strtok(s, " \t\f\n\r", p);
-	     if (token == NULL)
-	        break;
-	     else if (SC_numstrp(token) == FALSE)
-	        {ok = FALSE;
-		 break;};};};
+    for (ok = TRUE; ok == TRUE; )
+        {bf = SC_dgets(bf, &nb, fp);
+	 if (bf == NULL)
+	    break;
+
+	 if (bf[0] == cmnt)
+            continue;
+
+	 for (s = bf; TRUE; s = NULL)
+	     {token = SC_strtok(s, " \t\f\n\r", p);
+	      if (token == NULL)
+	         break;
+	      else if (SC_numstrp(token) == FALSE)
+	         {ok = FALSE;
+		  break;};};};
 
     io_close(fp);
 

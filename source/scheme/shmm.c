@@ -1025,24 +1025,46 @@ void SS_register_types(void)
 
     SC_init_base_types();
 
-    SS_OBJECT_I      = SC_register_type("object",      KIND_STRUCT, sizeof(object),      SS_rl_object);
-    SS_PROCEDURE_I   = SC_register_type("procedure",   KIND_STRUCT, sizeof(procedure),   _SS_rl_procedure);
-    SS_CONS_I        = SC_register_type("pair",        KIND_STRUCT, sizeof(cons),        _SS_rl_cons);
-    SS_VARIABLE_I    = SC_register_type("variable",    KIND_STRUCT, sizeof(variable),    _SS_rl_variable);
-    SS_INPUT_PORT_I  = SC_register_type("input port",  KIND_STRUCT, sizeof(input_port),  _SS_rl_inport);
-    SS_OUTPUT_PORT_I = SC_register_type("output port", KIND_STRUCT, sizeof(output_port), _SS_rl_outport);
-    SS_EOF_I         = SC_register_type("eof",         KIND_STRUCT, sizeof(SS_boolean),  _SS_rl_boolean);
-    SS_NULL_I        = SC_register_type("nil",         KIND_STRUCT, sizeof(SS_boolean),  _SS_rl_boolean);
-    SS_ERROR_I       = SC_register_type("error",       KIND_OTHER,  0,                   NULL);
+    SS_OBJECT_I      = SC_type_register("object",      KIND_STRUCT, sizeof(object),
+					SC_TYPE_FREE,  SS_rl_object,
+					0);
+    SS_PROCEDURE_I   = SC_type_register("procedure",   KIND_STRUCT, sizeof(procedure),
+					SC_TYPE_FREE,  _SS_rl_procedure,
+					0);
+    SS_CONS_I        = SC_type_register("pair",        KIND_STRUCT, sizeof(cons),
+					SC_TYPE_FREE,  _SS_rl_cons,
+					0);
+    SS_VARIABLE_I    = SC_type_register("variable",    KIND_STRUCT, sizeof(variable),
+					SC_TYPE_FREE,  _SS_rl_variable,
+					0);
+    SS_INPUT_PORT_I  = SC_type_register("input port",  KIND_STRUCT, sizeof(input_port),
+					SC_TYPE_FREE,  _SS_rl_inport,
+					0);
+    SS_OUTPUT_PORT_I = SC_type_register("output port", KIND_STRUCT, sizeof(output_port),
+					SC_TYPE_FREE,  _SS_rl_outport,
+					0);
+    SS_EOF_I         = SC_type_register("eof",         KIND_STRUCT, sizeof(SS_boolean),
+					SC_TYPE_FREE,  _SS_rl_boolean,
+					0);
+    SS_NULL_I        = SC_type_register("nil",         KIND_STRUCT, sizeof(SS_boolean),
+					SC_TYPE_FREE,  _SS_rl_boolean,
+					0);
+    SS_ERROR_I       = SC_type_register("error",       KIND_OTHER,  0, 0);
 
 #ifdef LARGE
 
-    SS_VECTOR_I      = SC_register_type("vector",       KIND_STRUCT, sizeof(vector),   _SS_rl_vector);
-    SS_CHARACTER_I   = SC_register_type("character",    KIND_OTHER,  sizeof(int),      _SS_rl_char);
-    SS_PROCESS_I     = SC_register_type("process",      KIND_STRUCT, sizeof(PROCESS),  _SS_rl_process);
+    SS_VECTOR_I      = SC_type_register("vector",       KIND_STRUCT, sizeof(vector),
+					SC_TYPE_FREE,   _SS_rl_vector,
+					0);
+    SS_CHARACTER_I   = SC_type_register("character",    KIND_OTHER,  sizeof(int),
+					SC_TYPE_FREE,   _SS_rl_char,
+					0);
+    SS_PROCESS_I     = SC_type_register("process",      KIND_STRUCT, sizeof(PROCESS),
+					SC_TYPE_FREE,   _SS_rl_process,
+					0);
 
-    SS_HASHARR_I     = SC_register_type("hash array",   KIND_STRUCT, sizeof(hasharr),  NULL);
-    SS_HAELEM_I      = SC_register_type("hash element", KIND_STRUCT, sizeof(haelem),   NULL);
+    SS_HASHARR_I     = SC_type_register("hash array",   KIND_STRUCT, sizeof(hasharr), 0);
+    SS_HAELEM_I      = SC_type_register("hash element", KIND_STRUCT, sizeof(haelem),  0);
 
 #endif
 

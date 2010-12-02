@@ -189,29 +189,37 @@ static void SX_wrt_pdb_curve(PDBfile *fp, curve *crv, int icurve)
  */
 
 static int _SX_ultra_text_filep(FILE *fp, int cmnt)
-   {char bf[MAXLINE];
-    int i, n;
+   {int i, n, nb, rv;
     int64_t addr;
+    char *bf;
 
-    while (TRUE)
-       {addr = io_tell(fp);
+    rv = FALSE;
 
-        if (io_gets(bf, MAXLINE, fp) == NULL)
-           break;
+    bf = NULL;
+    nb = 0;
 
-        if (bf[0] != cmnt)
-           continue;
+    for (rv = FALSE ; rv == FALSE; )
+        {addr = io_tell(fp);
 
-        n = strlen(bf) - 1;
-        for (i = 1; i < n; i++)
-            if (!SC_is_print_char(bf[i], 0))
-               return(FALSE);
+	 bf = SC_dgets(bf, &nb, fp);
+	 if (bf == NULL)
+            break;
 
-        io_seek(fp, addr, SEEK_SET);
+	 if (bf[0] != cmnt)
+            continue;
 
-        return(TRUE);};
+	 n = strlen(bf) - 1;
+	 for (i = 1; i < n; i++)
+             if (!SC_is_print_char(bf[i], 0))
+                return(FALSE);
 
-    return(FALSE);}
+	 io_seek(fp, addr, SEEK_SET);
+
+	 rv = TRUE;};
+
+    SFREE(bf);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -409,11 +417,10 @@ static void SX_read_bin(FILE *fp, char *fname)
 /* SX_READ_TEXT - read an ASCII input file */
 
 static void SX_read_text(FILE *fp, char *fname)
-   {char instring[MAXLINE];
-    int j, c, icurve;
-    char *pin, *text, *s;
-    unsigned current_size;                        /* current size of buffer */
-    double *xbuff, *ybuff, *x[PG_SPACEDM], xval, yval;
+   {int j, c, nb, icurve;
+    unsigned int csz;                        /* current size of buffer */
+    char *pin, *text, *s, *bf;
+    double *xb[PG_SPACEDM], *x[PG_SPACEDM], xv[PG_SPACEDM];
 
     j           = SX_next_space();
     _SX.dataptr = 0;
@@ -421,78 +428,88 @@ static void SX_read_text(FILE *fp, char *fname)
 
     x[0] = NULL;
     x[1] = NULL;
-    while ((io_gets(instring, MAXLINE, fp) != NULL) && (j >= 0))
-       {pin = instring;
-        c   = *pin;
 
-        if (c == EOF)
-           break;
+    bf = NULL;
+    nb = 0;
 
-        if (c == '#')
+    for ( ; j >= 0; )
+	{bf = SC_dgets(bf, &nb, fp);
+	 if (bf == NULL)
+	    break;
+
+	 pin = bf;
+	 c   = *pin;
+
+	 if (c == EOF)
+            break;
+
+	 if (c == '#')
 
 /* don't terminate the first one */
-           {if (_SX.dataptr != 0)
-               {if (SX_termdata(&j, xbuff, ybuff))
-                   icurve++;};
+            {if (_SX.dataptr != 0)
+                {if (SX_termdata(&j, xb[0], xb[1]))
+                    icurve++;};
 
 /* strip off leading whitespace from label */
-            pin += strspn(pin, "# \t");
+	     pin += strspn(pin, "# \t");
 
 /* GOTCHA - if there are multiple consecutive lines beginning with '#'
  *          (i.e. comments), the following code allocates, but never
- *          releases space for text, fname, xbuff, and ybuff.
+ *          releases space for text, fname, xb[0], and xb[1].
  */
 
 /* get rid of \n */
-            text = SC_strtok(pin, "\n\r", s);
-            if (text == NULL)
-	       SX_dataset[j].text = SC_strsavef("",
-						"char*:SX_READ_TEXT:NULL");
-	    else
-	       SX_dataset[j].text = SC_strsavef(text,
-						"char*:SX_READ_TEXT:text");
-            SX_dataset[j].file = SC_strsavef(fname,
-					     "char*:SX_READ_TEXT:fname");
+	     text = SC_strtok(pin, "\n\r", s);
+	     if (text == NULL)
+	        SX_dataset[j].text = SC_strsavef("",
+						 "char*:SX_READ_TEXT:NULL");
+	     else
+	        SX_dataset[j].text = SC_strsavef(text,
+						 "char*:SX_READ_TEXT:text");
+	     SX_dataset[j].file = SC_strsavef(fname,
+					      "char*:SX_READ_TEXT:fname");
 
 /* allocate space for buffer */
-            current_size = MAXPTS;
-            x[0] = xbuff = FMAKE_N(double, current_size, "SX_READ_TEXT:x[0]");
-            x[1] = ybuff = FMAKE_N(double, current_size, "SX_READ_TEXT:x[1]");}
-        else
-           {if ((x[0] == NULL) || (x[1] == NULL))
-               continue;
+	     csz = MAXPTS;
+	     x[0] = xb[0] = FMAKE_N(double, csz, "SX_READ_TEXT:x[0]");
+	     x[1] = xb[1] = FMAKE_N(double, csz, "SX_READ_TEXT:x[1]");}
+	 else
+            {if ((x[0] == NULL) || (x[1] == NULL))
+                continue;
 
-            for (text = SC_strtok(instring, " \t\n\r", s);
-                 text != NULL;
-                 text = SC_strtok(NULL, " \t\n\r", s))
-                {if (SC_fltstrp(text))
-                    xval = ATOF(text);
-                 else
-                    break;
+	     for (text = SC_strtok(bf, " \t\n\r", s);
+		  text != NULL;
+		  text = SC_strtok(NULL, " \t\n\r", s))
+                 {if (SC_fltstrp(text))
+                     xv[0] = ATOF(text);
+                  else
+                     break;
 
-                 text = SC_strtok(NULL, " \t\n\r", s);
-                 if (text == NULL)
-                    break;
-                 else if (SC_fltstrp(text))
-                    yval = ATOF(text);
-                 else
-                    break;
+		  text = SC_strtok(NULL, " \t\n\r", s);
+		  if (text == NULL)
+                     break;
+		  else if (SC_fltstrp(text))
+                     xv[1] = ATOF(text);
+		  else
+                     break;
 
-                 *x[0]++ = xval;
-                 *x[1]++ = yval;
-                 _SX.dataptr++;
+		  *x[0]++ = xv[0];
+		  *x[1]++ = xv[1];
+		  _SX.dataptr++;
 
 /* get more space if needed */
-                 if (_SX.dataptr >= current_size)
-                    {current_size += MAXPTS;
-                     REMAKE_N(xbuff, double, current_size);
-                     REMAKE_N(ybuff, double, current_size);
-                     x[0] = xbuff + _SX.dataptr;
-                     x[1] = ybuff + _SX.dataptr;};};};};
+		  if (_SX.dataptr >= csz)
+                     {csz += MAXPTS;
+		      REMAKE_N(xb[0], double, csz);
+		      REMAKE_N(xb[1], double, csz);
+		      x[0] = xb[0] + _SX.dataptr;
+		      x[1] = xb[1] + _SX.dataptr;};};};};
 
-    if (SX_termdata(&j, xbuff, ybuff))
+    if (SX_termdata(&j, xb[0], xb[1]))
        icurve++;
     io_close(fp);
+
+    SFREE(bf);
 
     if (icurve == 0)
        PRINT(stdout, "%s FILE HAS NO LEGAL CURVES - SX_READ_TEXT: %s\n\n",
@@ -721,9 +738,9 @@ object *SX_crv_file_info(object *obj)
 static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
 			      long nl, int64_t *paddrt, int nlab,
 			      int64_t *paddrl)
-   {int i, j, nc, nr, nt, rv, firstnum, nbefore, nafter, nlb;
+   {int i, j, nb, nc, nr, nt, rv, firstnum, nbefore, nafter, nlb;
     int64_t *addr, addrt, naddr, addrl;
-    char *token;
+    char *token, *bf, *pbf;
 
     addrl   = -1;
     nbefore = 0;
@@ -739,12 +756,16 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
     nc  = 0;
     nlb = 0;
 
+    bf = NULL;
+    nb = 0;
+
 /* skip to specified line */
     for (i = 1; i < nl; i++)
 	{addr[nlb++] = io_tell(fp);
 	 if (nlb > nbefore)
 	    nlb = 0;
-	 if (io_gets(_SX.line, MAX_BFSZ, fp) == NULL)
+	 bf = SC_dgets(bf, &nb, fp);
+	 if (bf == NULL)
             return(FALSE);};
 
 /* loop over tables */
@@ -760,12 +781,13 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
              if (nlb > nbefore)
                 nlb = 0;
 
-             if (io_gets(_SX.line, MAX_BFSZ, fp) == NULL)
+             bf = SC_dgets(bf, &nb, fp);
+             if (bf == NULL)
                 break;
 
 /* loop over tokens */
-             for (nt = 0; TRUE; nt++)
-                 {token = SC_firsttok(_SX.line, " \t\n\r");
+             for (pbf = bf, nt = 0; TRUE; nt++, pbf = NULL)
+                 {token = strtok(pbf, " \t\n\r");
                   if (token == NULL)
                      break;
                   if (nt == 0)
@@ -782,11 +804,13 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
 /* loop over lines of table */
          for (nr = 1; TRUE; nr++)
              {naddr = io_tell(fp);
-              if (io_gets(_SX.line, MAX_BFSZ, fp) == NULL)
+
+	      bf = SC_dgets(bf, &nb, fp);
+	      if (bf == NULL)
                  break;
 
-              for (nt = 0; TRUE; nt++)
-                  {token = SC_firsttok(_SX.line, " \t\n\r");
+              for (pbf = bf, nt = 0; TRUE; nt++, pbf = NULL)
+                  {token = strtok(pbf, " \t\n\r");
                    if (token == NULL)
                        break;
                    if (nt == 0)
@@ -825,9 +849,12 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
        {addrt = addr[0];
         for (i = 0; i < nafter; i++)
             {addrl = io_tell(fp);
-             if (io_gets(_SX.line, MAX_BFSZ, fp) == NULL)
+
+             bf = SC_dgets(bf, &nb, fp);
+             if (bf == NULL)
                 return(FALSE);};};
 
+    SFREE(bf);
     SFREE(addr);
 
     rv = FALSE;
@@ -847,10 +874,11 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
 /* SX_READ_TEXT_TABLE - read a table of numbers from an  ASCII input file */
 
 object *SX_read_text_table(object *argl)
-   {int i, j, n, nc, nr, fn, nlabel, ok;
-    int64_t addrt, addrl; 
+   {int i, j, n, nb, nc, nr, fn, nlabel, ok;
     long nl;
-    char *name, *token, label[MAXLINE];
+    int64_t addrt, addrl; 
+    char label[MAXLINE];
+    char *bf, *pbf, *name, *token;
     FILE *fp;
     object *o;
 
@@ -909,15 +937,20 @@ object *SX_read_text_table(object *argl)
     if (io_seek(fp, addrt, SEEK_SET))
        return(NULL);
 
-    for (i = 1; i <= nr; i++)
-        {io_gets(_SX.line, MAX_BFSZ, fp);
+    bf = NULL;
+    nb = 0;
 
-         for (j = 1; j <= nc; j++)
-             {token = SC_firsttok(_SX.line, " \t\n\r");
+    for (i = 1; i <= nr; i++)
+        {bf = SC_dgets(bf, &nb, fp);
+
+         for (pbf = bf, j = 1; j <= nc; j++, pbf = NULL)
+             {token = strtok(pbf, " \t\n\r");
               if ((j == 1) && !fn)
-                 token = SC_firsttok(_SX.line, " \t\n\r");
+                 token = strtok(NULL, " \t\n\r");
 
               PM_element(_SX.current_table, i, j) = ATOF(token);};};
+
+    SFREE(bf);
 
     io_close(fp);
 

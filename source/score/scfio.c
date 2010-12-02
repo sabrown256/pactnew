@@ -2792,3 +2792,65 @@ size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_DGETS - read arbitrarily long lines */
+
+char *SC_dgets(char *bf, int *pnc, FILE *fp)
+   {int ok, zsp;
+    long i, no, nn, nbr, nb;
+    off_t ad;
+    char *pbf;
+
+    if (fp == NULL)
+       {nn = 0;
+	bf = NULL;}
+
+    else
+       {no = *pnc;
+
+	zsp = SC_zero_space(2);
+
+	if (bf == NULL)
+	   {if (no == 0)
+	       no = MAX_BFSZ;
+
+	    bf = FMAKE_N(char, no, "char*:SC_DGETS:bf");};
+
+	ad  = io_tell(fp);
+	nb  = 0;
+	nbr = 0;
+	for (pbf = bf, nn = no, ok = TRUE; ok == TRUE; )
+	    {nbr += io_read(pbf, 1, no, fp);
+	     if (nbr < nn)
+	        bf[nbr] = '\0';
+
+	     if (nbr == 0)
+	        ok = FALSE;
+
+/* check for newlines */
+	     else if (nbr > 0)
+	        {for (i = 0; (i < no) && (pbf[i] != '\n') && (pbf[i] != '\r'); i++);
+		 nb = nn - no + i + 1;
+		 if (nb < nn)
+		    {bf[nb] = '\0';
+		     ok     = FALSE;}
+		 else
+		    {no  = nn;
+		     nn  = (no << 1);
+		     REMAKE_N(bf, char, nn);
+		     pbf = bf + no;};};};
+
+	if (nbr == 0)
+	   {SFREE(bf);
+	    nn = 0;};
+
+	io_seek(fp, ad + nb, SEEK_SET);
+
+	zsp = SC_zero_space(zsp);};
+
+    *pnc = nn;
+
+    return(bf);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
