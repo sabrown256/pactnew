@@ -1641,13 +1641,13 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
     out   = _PD_alloc_entry(file, type, nitems);
     ityp  = SC_type_id(type, FALSE);
 
-    if ((ityp != SC_CHAR_I) && (SC_is_type_fix(ityp) == FALSE))
+    if ((SC_is_type_char(ityp) == FALSE) && (SC_is_type_fix(ityp) == FALSE))
        return(FALSE);
 
     SC_unpack_bits(out, in, ityp, nbits, padsz, fpp, nitems, offs);
 
 /* convert integers */
-    if (ityp != SC_CHAR_I)
+    if (SC_is_type_char(ityp) == FALSE)
        {ord = FMAKE_N(int, obyte, "_PD_RD_BITS:ord");
 
         if (out_flag == NORMAL_ORDER)

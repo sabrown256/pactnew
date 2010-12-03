@@ -182,7 +182,7 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
 	SC_strtok(bf, " *", s);
 	if (bf != NULL)
 	   {id = SC_type_id(bf, FALSE);
-	    if ((SC_BOOL_I <= id) && (id <= SC_LONG_DOUBLE_COMPLEX_I))
+	    if ((id == SC_BOOL_I) && (SC_is_type_num(id) == TRUE))
 	       bpi = SC_type_size_a(bf);
 
 	    if (bpi > 0)

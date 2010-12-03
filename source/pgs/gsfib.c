@@ -565,7 +565,8 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
                                 FIXNUM *pn, F77_string name,
                                 FIXNUM *pt, F77_string type,
                                 F77_string val)
-   {FIXNUM rv;
+   {int id;
+    FIXNUM rv;
     long n;
     char lname[MAXLINE], ltype[MAXLINE], *pv;
     pcons *info;
@@ -576,7 +577,9 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
     SC_FORTRAN_STR_C(lname, name, *pn);
     SC_FORTRAN_STR_C(ltype, type, *pt);
 
-    if (strcmp(ltype, SC_INTEGER_S) == 0)
+    id = SC_type_id(ltype, FALSE);
+
+    if (id == SC_INT_I)
        {strcpy(ltype, SC_INT_P_S);
         n = sizeof(int);}
     else if (strcmp(ltype, "real") == 0)

@@ -328,11 +328,13 @@ extern int
  SC_fix_type_id(char *name, int unsg),
  SC_fp_type_id(char *name),
  SC_cx_type_id(char *name),
+ SC_is_type_char(int id),
  SC_is_type_fix(int id),
  SC_is_type_fp(int id),
  SC_is_type_cx(int id),
  SC_is_type_num(int id),
  SC_is_type_ptr(int id),
+ SC_is_type_struct(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
  SC_deref_id(char *name, int base);
