@@ -76,7 +76,7 @@ static data_alignment *_PD_mk_alignment(char *vals)
 	align->fx[3] = vals[5];
 
 /* floating point alignments */
-	for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+	for (i = 0; i < N_PRIMITIVE_FP; i++)
 	    align->fp[i] = vals[i + 6];
 
 	if (nc > 9)

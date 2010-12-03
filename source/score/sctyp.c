@@ -175,7 +175,7 @@ static SC_type *_SC_get_type_name(char *name)
 /* SC_TYPE_REGISTER - register a data type with the type manager */
 
 int SC_type_register(char *name, SC_kind kind, int bpi, ...)
-   {int id;
+   {int id, ok;
     uint64_t al, fr;
     void *pf;
     SC_type_method attr;
@@ -212,19 +212,23 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 	t->init = NULL;
 	t->free = NULL;
 
-        while (TRUE)
-	   {attr = SC_VA_ARG(SC_type_method);
-	    if (attr == SC_TYPE_NONE)
-	       break;
-
-	    pf = SC_VA_ARG(void *);
-	    switch (attr)
-	       {case SC_TYPE_FREE :
-		     t->free = (PFVoidAPV) pf;
-		     break;
-	        case SC_TYPE_INIT :
-		     t->init = (PFVoidAPV) pf;
-		     break;};};
+        for (ok = TRUE; ok == TRUE; )
+	    {attr = SC_VA_ARG(SC_type_method);
+	     if (attr == SC_TYPE_NONE)
+	        ok = FALSE;
+	     else
+	        {pf = SC_VA_ARG(void *);
+		 switch (attr)
+		    {case SC_TYPE_FREE :
+		          t->free = (PFVoidAPV) pf;
+			  break;
+		     case SC_TYPE_INIT :
+			  t->init = (PFVoidAPV) pf;
+			  break;
+	             case SC_TYPE_NONE :
+		     default :
+			  ok = FALSE;
+			  break;};};};
 
 	SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);};
 

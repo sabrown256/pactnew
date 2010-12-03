@@ -115,14 +115,6 @@
 #define NSTD         6     /* number of standards currently in the system 
                             * should be same as last standard */
 
-#define PD_N_PRIMITIVES     14  /* unknown, bit, bool, char,
-                                 * primitive fixed point,
-                                 * primitive floating point,
-                                 * primitive complex floating point 
-                                 */
-#define PD_N_PRIMITIVE_FIX  4   /* short, int, long, and long long */
-#define PD_N_PRIMITIVE_FP   3   /* float, double, and long double */
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -293,8 +285,8 @@ struct s_data_alignment
    {int char_alignment;
     int ptr_alignment;
     int bool_alignment;
-    int fx[PD_N_PRIMITIVE_FIX];              /* fixed point types */
-    int fp[PD_N_PRIMITIVE_FP];               /* floating point types */
+    int fx[N_PRIMITIVE_FIX];              /* fixed point types */
+    int fp[N_PRIMITIVE_FP];               /* floating point types */
     int struct_alignment;};
 
 struct s_fixdes
@@ -322,19 +314,9 @@ struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
     int bool_bytes;
-    fixdes fx[PD_N_PRIMITIVE_FIX];
-    fpdes  fp[PD_N_PRIMITIVE_FP];
+    fixdes fx[N_PRIMITIVE_FIX];
+    fpdes  fp[N_PRIMITIVE_FP];
     PDBfile *file;};
-
-#if 0
-typedef struct s_PD_disk_block PD_disk_block;  /* move up with other typedefs */
-
-struct s_PD_disk_block
-   {int64_t addr;                       /* address of the disk block */
-    int64_t size;                       /* size in bytes */
-    struct s_PD_disk_block *prev;
-    struct s_PD_disk_block *next;};
-#endif
 
 struct s_tr_layer
    {char *type;                       /* file type - e.g. PDBfile*/
@@ -387,9 +369,6 @@ struct s_PDBfile
     char *date;
     SC_array *ap;                    /* address/pointer list */
     long n_dyn_spaces;
-#if 0
-    PD_disk_block *free_list;
-#endif
     int mpi_file;
     int mpi_mode;                        /* serial (1) parallel (0) */
     int64_t maximum_size;                  /* for file family bookkeeping */

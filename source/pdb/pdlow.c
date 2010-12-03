@@ -123,18 +123,18 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 
     eq = (a->ptr_bytes == b->ptr_bytes);
 
-    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+    for (i = 0; i < N_PRIMITIVE_FIX; i++)
         eq &= ((a->fx[i].bpi   == b->fx[i].bpi) &&
 	       (a->fx[i].order == b->fx[i].order));
 
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
         eq &= (a->fp[i].bpi == b->fp[i].bpi);
 
     if (!eq)
        return(FALSE);
 
 /* check the floating point byte orders */
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
         {n  = a->fp[i].bpi;
 	 oa = a->fp[i].order;
 	 ob = b->fp[i].order;
@@ -142,7 +142,7 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 
 /* check the floating point format data */
     n  = FORMAT_FIELDS;
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
         {fa = a->fp[i].format;
 	 fb = b->fp[i].format;
 	 for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));};
@@ -152,10 +152,10 @@ int _PD_compare_std(data_standard *a, data_standard *b,
            (c->ptr_alignment  == d->ptr_alignment) &&
            (c->bool_alignment == d->bool_alignment));
 
-    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+    for (i = 0; i < N_PRIMITIVE_FIX; i++)
         eq &= (c->fx[i] == d->fx[i]);
 
-    for (i = 0; i < PD_N_PRIMITIVE_FP; i++)
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
         eq &= (c->fp[i] == d->fp[i]);
 
     return(eq);}
@@ -841,7 +841,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     data_alignment *falign, data_alignment *halign,
 		     int ishc, int ftk)
    {int ifx, ifp, conv, flag;
-    int fcnv[PD_N_PRIMITIVE_FP];
+    int fcnv[N_PRIMITIVE_FP];
     char utyp[MAXLINE];
     char *styp, *btyp;
     multides *tup;
@@ -879,7 +879,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  conv, NULL, NULL, FALSE, FALSE, ishc);
 
 /* fixed point types (proper) */
-    for (ifx = 0; ifx < PD_N_PRIMITIVE_FIX; ifx++)
+    for (ifx = 0; ifx < N_PRIMITIVE_FIX; ifx++)
         {styp = SC_type_name(ifx + SC_SHORT_I);
 	 snprintf(utyp, MAXLINE, "u_%s", styp);
 
@@ -921,7 +921,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 #endif
 
 /* floating point types (proper) */
-    for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
+    for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
         {styp = SC_type_name(ifp + SC_FLOAT_I);
 
 	 fcnv[ifp] = _PD_compare_fp_std(ifp, fstd, hstd, falign, halign, flag, ftk);
@@ -932,7 +932,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		       fstd->fp[ifp].format, FALSE, FALSE, ishc);};
 
 /* complex floating point types (proper) */
-    for (ifp = 0; ifp < PD_N_PRIMITIVE_FP; ifp++)
+    for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
         {btyp = SC_type_name(ifp + SC_FLOAT_I);
          styp = SC_type_name(ifp + SC_FLOAT_COMPLEX_I);
 

@@ -9873,8 +9873,8 @@ data_alignment. Its actual definition is:
     {int char_alignment;
      int ptr_alignment;
      int bool_alignment;
-     int fx[PD_N_PRIMITIVE_FIX];
-     int fp[PD_N_PRIMITIVE_FP];};
+     int fx[N_PRIMITIVE_FIX];
+     int fp[N_PRIMITIVE_FP];};
      int struct_alignment;};
  
  typedef struct s_data_alignment data_alignment;
@@ -9922,8 +9922,8 @@ struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
     int bool_bytes;
-    fixdes fx[PD_N_PRIMITIVE_FIX];
-    fpdes  fp[PD_N_PRIMITIVE_FP];
+    fixdes fx[N_PRIMITIVE_FIX];
+    fpdes  fp[N_PRIMITIVE_FP];
     PDBfile *file;};
  
 typedef struct s_data_standard data_standard;
