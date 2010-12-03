@@ -347,6 +347,20 @@ int SC_cx_type_id(char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_IS_TYPE_CHAR - return TRUE if ID is a character type */
+
+int SC_is_type_char(int id)
+   {int rv;
+    SC_type *t;
+
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_CHAR));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_IS_TYPE_FIX - return TRUE if ID is a fixed point type */
 
 int SC_is_type_fix(int id)
@@ -400,14 +414,27 @@ int SC_is_type_num(int id)
 int SC_is_type_ptr(int id)
    {int rv;
     char *typn;
+    SC_type *t;
 
-    rv = FALSE;
-
-    if ((SC_POINTER_I <= id) && (id < SC_VOID_I))
-       rv = TRUE;
-    else
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_POINTER));
+    if (rv == FALSE)
        {typn = SC_type_name(id);
 	rv   = ((typn != NULL) && (strchr(typn, '*') != NULL));};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_TYPE_STRUCT - return TRUE if ID is a derived type */
+
+int SC_is_type_struct(int id)
+   {int rv;
+    SC_type *t;
+
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_STRUCT));
 
     return(rv);}
 

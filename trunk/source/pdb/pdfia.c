@@ -2397,7 +2397,7 @@ FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
     rv = PD_read_bits(file, s, t, *nitems, *sgned, *nbits, *padsz,
 		       *fpp, *offs, (long *) pan, &dataout);
     if (rv != 0)
-       {if ((SC_CHAR_I <= id) && (id <= SC_LONG_LONG_I))
+       {if ((SC_is_type_char(id) == TRUE) || (SC_is_type_fix(id) == TRUE))
            memcpy(pdata, dataout, nb);
         else
            rv = FALSE;};

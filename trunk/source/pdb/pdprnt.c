@@ -547,7 +547,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 /* GOTCHA: This is a feeble first step toward a generalized
  *         print capability for user defined types
  */
-	else if (strcmp(type, SC_CHAR_8_S) == 0)
+	else if (id == SC_CHAR_8_I)
 	   {if (SC_strstr(_SC.types.formats[SC_INT_I], "%s") != NULL)
 	       {cp = (char *) vr;
 		t  = FMAKE_N(char *, ni, "_PD_IO_PRINT:t");
@@ -588,13 +588,9 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    else
 	       {PRINT(f0, "        <function>\n");};}
 
-        else if (isz == sizeof(short))
-	  _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
-
-	else if (isz == sizeof(int))
-	   _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
-
-	else if (isz == sizeof(long))
+        else if ((isz == sizeof(short)) ||
+		 (isz == sizeof(int)) ||
+		 (isz == sizeof(long)))
 	   _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
 
 	else

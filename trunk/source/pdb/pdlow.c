@@ -794,10 +794,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     _PD_setup_chart(fchrt, fstd, hstd, falign, halign, FALSE, ftk);
     _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, TRUE, ftk);
 
-    if (sizeof(REAL) == sizeof(double))
-       PD_typedef(file, SC_DOUBLE_S, "REAL");
-    else
-       PD_typedef(file, SC_FLOAT_S, "REAL");
+    PD_typedef(file, SC_DOUBLE_S, "REAL");
 
 /* NOTE: function MUST be handled this way - PD_DEFNCV does NOT
  *       sequence the two charts properly and death can result
@@ -955,10 +952,7 @@ void _PD_def_real(char *type, PDBfile *file)
 
     if (strcmp(type, PDBFILE_S) == 0)
        {PD_typedef_primitive_types(file);
-	if (sizeof(REAL) == sizeof(double))
-	   PD_typedef(file, SC_DOUBLE_S, "REAL");
-        else
-	   PD_typedef(file, SC_FLOAT_S, "REAL");};
+	PD_typedef(file, SC_DOUBLE_S, "REAL");};
 
     return;}
 
