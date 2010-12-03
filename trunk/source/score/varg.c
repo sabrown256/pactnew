@@ -11,10 +11,12 @@
 #include "scstd.h"
 #include "scope_typeh.h"
 
-#define I_FLOAT       10    /* index of last floating point type */
-#define I_COMPLEX     13    /* index of last complex floating point type */
-#define N_PRIMITIVES  16    /* up through SC_POINTER_I */
-#define N_TYPES       18    /* up through SC_STRING_I */
+#define I_NON         3
+#define I_FIX         I_NON+N_PRIMITIVE_FIX    /* last fixed point type */
+#define I_FLOAT       I_FIX+N_PRIMITIVE_FP     /* last floating point type */
+#define I_COMPLEX     I_FLOAT+N_PRIMITIVE_CPX  /* last complex type */
+#define I_QUATERNION  I_COMPLEX+1
+#define I_POINTER     I_QUATERNION+1
 
 #define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
 

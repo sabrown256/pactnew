@@ -206,10 +206,11 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
 
 static int _H5_get_alignment(PDBfile *file, char *type)
    {int id, result;
-    static int algn[PD_N_PRIMITIVES] = { 0, 0, 0, 0,
-                                         2, 4, 4, 4,  /* fixed point types (ok) */
-                                         4, 4, 4,     /* floating point types (ok) */
-                                         0, 0, 0 };   /* complex floating point types (ok) */
+    static int algn[N_PRIMITIVES] = { 0, 0, 0, 0,
+                                      2, 4, 4, 4,  /* fixed point types (ok) */
+                                      4, 4, 4,     /* floating point types (ok) */
+                                      0, 0, 0,     /* complex floating point types (ok) */
+                                      0, 0 };
 
     id     = SC_type_id(type, TRUE);
     result = algn[id];
@@ -282,7 +283,7 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
         DEBUG1("%s", "      little endian integers\n");};
 
 /* you never know who might use file->std in the future: fill it in */
-    for (i = 0; i < PD_N_PRIMITIVE_FIX; i++)
+    for (i = 0; i < N_PRIMITIVE_FIX; i++)
         hst->pf->std->fx[i].order = order; 
 
 /* create a defstr with this information

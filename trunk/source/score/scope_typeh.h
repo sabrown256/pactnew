@@ -26,6 +26,7 @@ FUNCTION_POINTER(double, *(*PFPREAL));
 
 /*--------------------------------------------------------------------------*/
 
+#define N_PRIMITIVE_CHAR  1
 #define N_PRIMITIVE_FIX   4
 #define N_PRIMITIVE_FP    3
 #define N_PRIMITIVE_CPX   3
@@ -128,6 +129,7 @@ struct s_precisionfp
 
 struct s_SC_type_manager
    {int nprimitive;
+    int chr[3];                  /* fixed point type info    [n, first, last] */
     int fix[3];                  /* fixed point type info    [n, first, last] */
     int fp[3];                   /* floating point type info [n, first, last] */
     int cpx[3];                  /* complex type info        [n, first, last] */
@@ -137,10 +139,11 @@ struct s_SC_type_manager
     int fix_precision[N_PRIMITIVE_FIX];
     precisionfp fp_precision[N_PRIMITIVE_FP];
 
+    char *chrtyp[N_PRIMITIVE_CHAR];
     char *fixtyp[N_PRIMITIVE_FIX];
     char *fptyp[N_PRIMITIVE_FP];
-    char *cpxtyp[N_PRIMITIVE_FP];
-    char *quttyp[N_PRIMITIVE_FP];
+    char *cpxtyp[N_PRIMITIVE_CPX];
+    char *quttyp[N_PRIMITIVE_QUT];
 
     char *formats[N_TYPES];
     char *formata[N_TYPES];
@@ -154,19 +157,32 @@ struct s_SC_type_manager
 
 /* initialization of type manager */
 
+#define _SC_CHAR_1        3
+#define _SC_CHAR_N        (_SC_CHAR_1 + N_PRIMITIVE_CHAR)
+#define _SC_FIX_1         (_SC_CHAR_N + 1)
+#define _SC_FIX_N         (_SC_FIX_1 + N_PRIMITIVE_FIX)
+#define _SC_FP_1          (_SC_FIX_N + 1)
+#define _SC_FP_N          (_SC_FP_1 + N_PRIMITIVE_FP)
+#define _SC_CPX_1         (_SC_FP_N + 1)
+#define _SC_CPX_N         (_SC_CPX_1 + N_PRIMITIVE_CPX)
+#define _SC_QUT_1         (_SC_CPX_N + 1)
+#define _SC_QUT_N         (_SC_QUT_1 + N_PRIMITIVE_QUT)
+
 #define TYPE_STATE_INIT                                                       \
    { N_PRIMITIVES,                                                            \
-     {N_PRIMITIVE_FIX,  4,  4+N_PRIMITIVE_FIX-1},                             \
-     {N_PRIMITIVE_FP,   8,  8+N_PRIMITIVE_FP-1},                              \
-     {N_PRIMITIVE_CPX, 11, 13+N_PRIMITIVE_CPX-1},                             \
-     {N_PRIMITIVE_QUT, 14, 14+N_PRIMITIVE_QUT-1},                             \
+     {N_PRIMITIVE_CHAR, _SC_CHAR_1, _SC_CHAR_N},                              \
+     {N_PRIMITIVE_FIX,  _SC_FIX_1,  _SC_FIX_N},                               \
+     {N_PRIMITIVE_FP,   _SC_FP_1,   _SC_FP_N},                                \
+     {N_PRIMITIVE_CPX,  _SC_CPX_1,  _SC_CPX_N},                               \
+     {N_PRIMITIVE_QUT,  _SC_QUT_1,  _SC_QUT_N},                               \
      1000,                                                                    \
      {0, 0, 0, 0},                                                            \
      {{0, 0.0}, {0, 0.0}, {0, 0.0}},                                          \
+     { "char" },                                                              \
      { "short", "integer", "long", "long_long" },                             \
      { "float", "double", "long_double" },                                    \
      { "float_complex", "double_complex", "long_double_complex" },            \
-     { "float_quaternion", "double_quaternion", "long_double_quaternion" },   \
+     { "quaternion" },                                                        \
    }
 
 #ifdef __cplusplus

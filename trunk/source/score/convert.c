@@ -11,15 +11,13 @@
 #include "scstd.h"
 #include "scope_typeh.h"
 
-#define I_BOOL         2
-#define I_NON          3
-#define I_FIX          7    /* index of last fixed point type */
-#define I_FLOAT       10    /* index of last floating point type */
-#define I_COMPLEX     13    /* index of last complex floating point type */
-#define I_QUATERNION  14
-#define I_POINTER     15
-#define N_PRIMITIVES  16    /* up through SC_POINTER_I */
-#define N_TYPES       18    /* up through SC_STRING_I */
+#define I_BOOL        2
+#define I_CHAR        (I_BOOL+N_PRIMITIVE_CHAR)
+#define I_FIX         (I_CHAR+N_PRIMITIVE_FIX)   /* last fixed point type */
+#define I_FLOAT       (I_FIX+N_PRIMITIVE_FP)     /* last floating point type */
+#define I_COMPLEX     (I_FLOAT+N_PRIMITIVE_CPX)  /* last complex floating point type */
+#define I_QUATERNION  (I_COMPLEX+1)
+#define I_POINTER     (I_QUATERNION+1)
 
 #ifdef SC_FAST_TRUNC
 #define CONVERT  _SC_write_n_to_n_fast
