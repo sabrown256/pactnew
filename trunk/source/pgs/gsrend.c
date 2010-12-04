@@ -998,7 +998,8 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
     pty = ptyp;
 
     g = &data;
-    memset(g, 0, sizeof(PG_graph));
+    SC_MEM_INIT(PG_graph, g);
+
     data.info_type  = SC_PCONS_P_S;
     data.info       = (void *) inf;
     data.f          = f;

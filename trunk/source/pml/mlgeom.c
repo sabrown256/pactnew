@@ -1857,7 +1857,7 @@ void dprvct(int nd, int n, double **v)
    {int i, id;
 
     if (n < 0)
-       n = SC_arrlen(v[0])/sizeof(double);
+       n = SC_MEM_GET_N(double, v[0]);
 
     for (i = 0; i < n; i++)
         {for (id = 0; id < nd; id++)

@@ -550,7 +550,7 @@ static edgedes **_PG_make_edge_table(PG_device *dev, int nd,
        {narr  = iymx - iymn;
 	et    = FMAKE_N(edgedes *, narr, "_PG_MAKE_EDGE_TABLE:et");
 	flags = FMAKE_N(int, n-1, "_PG_MAKE_EDGE_TABLE:flags");
-	memset(flags, 0, sizeof(int)*(n-1));
+	SC_MEM_INIT_N(int, flags, n-1);
 
 /* transform to PC for efficiency */
 	ir = PM_make_vectors(nd, n);

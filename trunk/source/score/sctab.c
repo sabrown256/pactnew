@@ -752,10 +752,11 @@ int SC_set_hash_dump(hasharr *ha, int (*fun)(haelem **v, int n))
 /* if no function is supplied dump and sort by name alphabetically */
     if (fun == NULL)
        {_SC.hash_entries = SC_hasharr_dump(ha, NULL, NULL, FALSE);
-        _SC.ne = SC_arrlen(_SC.hash_entries)/sizeof(char *) - 1;
+        _SC.ne = SC_MEM_GET_N(char *, _SC.hash_entries) - 1;
+
         for (i = 0; i < _SC.ne; i++)
             _SC.hash_entries[i] = SC_strsavef(_SC.hash_entries[i],
-                                 "char*:SC_SET_HASH_DUMP:hash_entries");}
+					      "char*:SC_SET_HASH_DUMP:hash_entries");}
 
     else
        {entries = FMAKE_N(haelem *, ha->ne,

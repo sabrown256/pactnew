@@ -260,7 +260,8 @@ static bio_frame *_SC_bfr_alloc(int64_t addr, size_t bfsz)
    {bio_frame *fr;
 
     fr = FMAKE(bio_frame, "_SC_BFR_ALLOC:fr");
-    memset(fr, 0, sizeof(bio_frame));
+
+    SC_MEM_INIT(bio_frame, fr);
     
     _SC_bfr_init(fr, addr, bfsz);
 

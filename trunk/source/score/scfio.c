@@ -94,7 +94,7 @@ file_io_desc *SC_make_io_desc(void *fp)
 
     fid = FMAKE(file_io_desc, "SC_MAKE_IO_DESC:fid");
 
-    memset(fid, 0, sizeof(file_io_desc));
+    SC_MEM_INIT(file_io_desc, fid);
 
     fid->info = fp;
 

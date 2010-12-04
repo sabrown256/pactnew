@@ -77,8 +77,9 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
    {PA_package *pck;
 
     N_Packages++;
+
     pck = FMAKE(PA_package, "PA_GEN_PACKAGE:pck");
-    memset(pck, 0, sizeof(PA_package));
+    SC_MEM_INIT(PA_package, pck);
 
 /* make the variable hash table if it doesn't exist yet */
     if (PA_variable_tab == NULL)

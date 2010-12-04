@@ -1628,7 +1628,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
 	    {mask   = ((unsigned char)mask >> (7 - inrem));
 	     rshift = 7 - inrem;}
 
-	 memset(esave, 0, (le-ls)*sizeof(long));
+	 SC_MEM_INIT_N(long, esave, le-ls);
 
 	 pebsave = peb;
 
@@ -2055,19 +2055,8 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     else if (inbts > 0)
        {int ityp;
 
-	if (onb == sizeof(char))
-	   ityp = SC_CHAR_I;
-
-	else if (onb == sizeof(long))
-	   ityp = SC_LONG_I;
-
-	else if (onb == sizeof(short))
-	   ityp = SC_SHORT_I;
-
-	else if (onb == sizeof(int))
-	   ityp = SC_INT_I;
-
-	else
+	ityp = SC_type_container_size(KIND_INT, onb);
+	if (ityp == SC_UNKNOWN_I)
 	   return(FALSE);
 
 /* unpack the bitstream into a bytestream */

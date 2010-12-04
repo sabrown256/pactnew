@@ -65,6 +65,12 @@
 #define SC_GET_MEM_ADDR(_t, a)          ((_t) a.memaddr)
 #define SC_GET_DISK_ADDR(_t, a)         ((_t) a.diskaddr)
 
+#define SC_MEM_INIT(_t, _v)             memset(_v, 0, sizeof(_t))
+#define SC_MEM_INIT_N(_t, _v, _n)       memset(_v, 0, (_n)*sizeof(_t))
+#define SC_MEM_INIT_V(_v)               memset(_v, 0, sizeof(_v))
+
+#define SC_MEM_GET_N(_t, _v)            (SC_arrlen(_v)/sizeof(_t))
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#include "score_int.h"
 
 typedef struct s_state state;
 
@@ -51,7 +51,7 @@ void mm_test(void *x)
            {arr = FMAKE_N(double, i, "MM_TEST:arr");  
             if (p)
                printf("(%d,%d) ",
-		      (int) (SC_arrlen(arr)/sizeof(double)),
+		      (int) SC_MEM_GET_N(double, arr),
 		      id);
             SFREE(arr);};
 

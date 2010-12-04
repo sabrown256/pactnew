@@ -1062,12 +1062,14 @@ void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
     if (dev == NULL)
        return;
 
-    memset(&f, 0, sizeof(PM_mapping));
+    SC_MEM_INIT(PM_mapping, &f);
+
     f.domain = dom;
     f.name   = dom->name;
 
     data = &g;
-    memset(data, 0, sizeof(PG_graph));
+    SC_MEM_INIT(PG_graph, data);
+
     g.f         = &f;
     g.rendering = PLOT_MESH;
     g.info_type = SC_PCONS_P_S;

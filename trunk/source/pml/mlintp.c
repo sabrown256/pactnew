@@ -116,7 +116,7 @@ static double *_PM_redist_nodes_ac(double *f, int nz, int nn,
 
     np = FMAKE_N(int, nn, "_PM_REDIST_NODES_AC:np");
     if (SC_zero_on_alloc() == FALSE)
-       memset(np, 0, nn*sizeof(int));
+       SC_MEM_INIT_N(int, np, nn);
 
 /* accumulate nodal values from the zones */
     for (iz = 0; iz < nz; iz++)
@@ -350,7 +350,7 @@ double *PM_z_n_lr_2d(double *f, double *x, double *y, int mode, void *cnnct,
     kmax  = maxes[0];
     lmax  = maxes[1];
 
-    n = SC_arrlen(f)/sizeof(double);
+    n = SC_MEM_GET_N(double, f);
     if (n == (kmax - 1)*(lmax - 1))
        {km = kmax - 1;
 	lm = lmax - 1;}

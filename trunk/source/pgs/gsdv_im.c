@@ -378,7 +378,7 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
            {pim = FMAKE_N(PG_image, np, "_PG_TRANSMIT_IMAGES:pim");
 
 	    if (SC_zero_on_alloc() == FALSE)
-               memset(pim, 0, np*sizeof(PG_image));
+	       SC_MEM_INIT_N(PG_image, pim, np);
 
             for (i = 0; i < np; i++)
                 {if ((i != dp) && (map[i] == TRUE))

@@ -351,7 +351,7 @@ int main(int c, char **v)
     io_printf(stdout, "                          long      = %d\n", sizeof(long));
     io_printf(stdout, "                          long long = %d\n", sizeof(long long));
     io_printf(stdout, "                          size_t    = %d\n", sizeof(size_t));
-    io_printf(stdout, "                          int64_t     = %d\n", sizeof(int64_t));
+    io_printf(stdout, "                          int64_t   = %d\n", sizeof(int64_t));
     io_printf(stdout, "\n");
 
 #if defined(NEED_ALT_LARGE_FILE) && !defined(HAVE_ALT_LARGE_FILE)    

@@ -44,7 +44,8 @@ PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
 	na.sa_handler = fnc;
 	sigemptyset(&na.sa_mask);
 
-	memset(&oa, 0, sizeof(struct sigaction));
+	SC_MEM_INIT(struct sigaction, &oa);
+
 	if (sigaction(sig, NULL, &oa) == 0)
 	   rv = oa.sa_handler;
 
@@ -84,7 +85,8 @@ PFSignal_handler SC_signal_action(int sig, PFSignal_handler fnc,
 
     if ((0 < sig) && (sig < SC_NSIG) &&
 	(sig != SIGKILL) && (sig != SIGSTOP))
-       {memset(&oa, 0, sizeof(struct sigaction));
+       {SC_MEM_INIT(struct sigaction, &oa);
+
 	if (sigaction(sig, NULL, &oa) == 0)
 	   rv = oa.sa_handler;
 

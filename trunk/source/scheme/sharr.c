@@ -134,9 +134,9 @@ object *SS_hash_dump(object *argl)
 
 /* get the names from hasharr */
     if (SS_hasharrp(to) == TRUE)
-       {tab = SS_GET(hasharr, to);
+       {tab    = SS_GET(hasharr, to);
 	names  = SC_hasharr_dump(tab, patt, NULL, SS_true(sort));
-	nnames = SC_arrlen(names)/sizeof(char *) - 1;}
+	nnames = SC_MEM_GET_N(char *, names) - 1;}
 
 /* get the names from hasharr */
     else

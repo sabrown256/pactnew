@@ -363,7 +363,7 @@ void _PA_rl_spec(PA_iv_specification *lst)
 void _PA_rl_domain_map(PA_set_index *dmap)
   {int i, nmax;
 
-   nmax = SC_arrlen(dmap)/sizeof(PA_set_index);
+   nmax = SC_MEM_GET_N(PA_set_index, dmap);
 
     for (i = 0; i < nmax; i++)
         if (dmap[i].name != NULL)

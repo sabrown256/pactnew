@@ -71,13 +71,13 @@ static void _PA_rl_th(th_record *thd, int nthd)
     for (i = 0; i < nthd; i++)
         {if (thd[i].n_members != 0)
 	    {str = thd[i].members;
-	     n   = SC_arrlen(str)/sizeof(char *);
+	     n   = SC_MEM_GET_N(char *, str);
 	     for (j = 0; j < n; j++)
 	         SFREE(str[j]);
 	     SFREE(thd[i].members);
 
 	     str = thd[i].labels;
-	     n   = SC_arrlen(str)/sizeof(char *);
+	     n   = SC_MEM_GET_N(char *, str);
 	     for (j = 0; j < n; j++)
 	         SFREE(str[j]);
 	     SFREE(thd[i].labels);
@@ -754,7 +754,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
               _PA.ndpt[i].index_min = min(_PA.ndpt[i].index_min, dp->index_min);
               _PA.ndpt[i].index_max = max(_PA.ndpt[i].index_max, dp->index_max);
 
-              _PA.ncrv[i] = SC_arrlen(_PA.thd[i].labels)/sizeof(char *);
+              _PA.ncrv[i] = SC_MEM_GET_N(char *, _PA.thd[i].labels);
 
               if (i >= (n_max - 1))
                  {n_max += 10;

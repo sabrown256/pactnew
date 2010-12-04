@@ -261,7 +261,7 @@ static frame *_PG_make_frame(PG_device *dev, int w, int h)
 
     fr = FMAKE(frame, "_PG_MAKE_FRAME:fr");
     if (fr != NULL)
-       {memset(fr, 0, sizeof(frame));
+       {SC_MEM_INIT(frame, fr);
 
 	np = w*h;
 

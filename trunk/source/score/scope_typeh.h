@@ -370,6 +370,8 @@ extern int
  SC_is_type_struct(int id),
  SC_type_size_i(int id),
  SC_type_size_a(char *name),
+ SC_type_container_size(SC_kind kind, int nb),
+ SC_type_match_size(SC_kind kind, int nb),
  SC_deref_id(char *name, int base);
 
 extern size_t

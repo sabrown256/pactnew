@@ -575,7 +575,7 @@ void PD_typedef_primitive_types(PDBfile *file)
  */
 
 defstr *_PD_type_container(PDBfile *file, defstr *dp)
-   {int i, n, id, bpi;
+   {int i, n, id, bpi, ipt;
     long size;
     char *type;
     defstr *ndp;
@@ -598,33 +598,21 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
 
     size = dp->size;
 
-/* floating point types (proper) */
     if (dp->fp.format != NULL)
-       {for (i = 0; i < N_PRIMITIVE_FP; i++)
-	    {id   = i + SC_FLOAT_I;
-	     bpi  = SC_type_size_i(id);
-	     type = SC_type_name(id);
-
-	     if (size <= bpi)
-	        {ndp = PD_inquire_host_type(file, type);
-		 break;};};}
+       {ipt = _PD_items_per_tuple(dp);
+	if (ipt == 1)
+	   id = SC_type_container_size(KIND_FLOAT, size);
+	else if (ipt == 2)
+	   id = SC_type_container_size(KIND_COMPLEX, size);
+	else
+	   return(NULL);}
 
     else if ((dp->fp.format == NULL) && (dp->fix.order != NO_ORDER))
-       {if (size <= sizeof(char))
-	   ndp = PD_inquire_host_type(file, SC_CHAR_S);
-	else if (size <= sizeof(bool))
-	   ndp = PD_inquire_host_type(file, SC_BOOL_S);
+       id = SC_type_container_size(KIND_INT, size);
 
-/* fixed point types (proper) */
-	else
-	   {for (i = 0; i < N_PRIMITIVE_FIX; i++)
-	        {id   = i + SC_SHORT_I;
-		 bpi  = SC_type_size_i(id);
-		 type = SC_type_name(id);
-
-		 if (size <= bpi)
-		    {ndp = PD_inquire_host_type(file, type);
-		     break;};};};};
+    bpi  = SC_type_size_i(id);
+    type = SC_type_name(id);
+    ndp  = PD_inquire_host_type(file, type);
 
     return(ndp);}
 

@@ -769,6 +769,170 @@ size_t SC_copy_primitive(void *d, void *s, long n, int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_TYPE_CONTAINER_SIZE - return the type id of a type of KIND which
+ *                        - is at least NB bytes long
+ */
+
+int SC_type_container_size(SC_kind kind, int nb)
+   {int i, id;
+    hasharr *ha;
+    haelem *hp;
+    SC_type *t;
+
+    ha = (hasharr *) _SC.types.typ;
+
+    switch (kind)
+       {case KIND_CHAR :
+             for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+		 {id = i + SC_CHAR_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb <= t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_CHAR)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_INT :
+             for (i = 0; i < N_PRIMITIVE_FIX; i++)
+		 {id = i + SC_SHORT_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb <= t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_FIX)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_FLOAT :
+             for (i = 0; i < N_PRIMITIVE_FP; i++)
+		 {id = i + SC_FLOAT_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb <= t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_FP)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_COMPLEX :
+             for (i = 0; i < N_PRIMITIVE_CPX; i++)
+		 {id = i + SC_FLOAT_COMPLEX_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb <= t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_CPX)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_QUATERNION :
+             for (i = 0; i < N_PRIMITIVE_QUT; i++)
+		 {id = i + SC_QUATERNION_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb <= t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_QUT)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        default :
+	     id = SC_UNKNOWN_I;
+             break;}
+
+    return(id);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_TYPE_MATCH_SIZE - return the type id of a type of KIND which
+ *                    - matches byte length NB
+ */
+
+int SC_type_match_size(SC_kind kind, int nb)
+   {int i, id;
+    hasharr *ha;
+    haelem *hp;
+    SC_type *t;
+
+    ha = (hasharr *) _SC.types.typ;
+
+    switch (kind)
+       {case KIND_CHAR :
+             for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+		 {id = i + SC_CHAR_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb == t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_CHAR)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_INT :
+             for (i = 0; i < N_PRIMITIVE_FIX; i++)
+		 {id = i + SC_SHORT_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb == t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_FIX)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_FLOAT :
+             for (i = 0; i < N_PRIMITIVE_FP; i++)
+		 {id = i + SC_FLOAT_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb == t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_FP)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_COMPLEX :
+             for (i = 0; i < N_PRIMITIVE_CPX; i++)
+		 {id = i + SC_FLOAT_COMPLEX_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb == t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_CPX)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        case KIND_QUATERNION :
+             for (i = 0; i < N_PRIMITIVE_QUT; i++)
+		 {id = i + SC_QUATERNION_I;
+		  hp = *(haelem **) SC_hasharr_get(ha, id);
+		  if (hp != NULL)
+		     {t = (SC_type *) hp->def;
+		      if (nb == t->bpi)
+			 break;};};
+	     if (i >= N_PRIMITIVE_QUT)
+	        id = SC_UNKNOWN_I;
+             break;
+
+        default :
+	     id = SC_UNKNOWN_I;
+             break;}
+
+    return(id);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_CONVERT_ID - convert data from one binary format to another
  *               - if destination pointer is NULL, space is allocated
  *               - if types are the same do nothing but return -1

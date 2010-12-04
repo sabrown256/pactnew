@@ -427,7 +427,8 @@ static void _PG_X_txt_write_text(PG_device *dev, char *s,
     dir = 0;
     asc = 0;
     dsc = 0;
-    memset(&overall, 0, sizeof(XCharStruct));
+
+    SC_MEM_INIT(XCharStruct, &overall);
 
     len = strlen(s);
     fnt = dev->font_info;

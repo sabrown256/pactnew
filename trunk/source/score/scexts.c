@@ -133,7 +133,7 @@ static int test_chld(char **ca, char *mode, int dt)
 /* MAIN - test SC_exec_server */
 
 int main(int argc, char **argv, char **envp)
-   {int i, st, to, pi, opt;
+   {int i, st, to, opt;
     char mode[5];
 
     SC_setbuf(stdout, NULL);

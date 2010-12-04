@@ -352,7 +352,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
     PFSignal_handler hnd;
 
     as = FMAKE(asyncstate, "SC_EXEC_ASYNC:as");
-    memset(as, 0, sizeof(asyncstate));
+    SC_MEM_INIT(asyncstate, as);
 
     _SC_setup_async_state(as,
 			  SC_get_host_length_max(NULL, TRUE, FALSE));

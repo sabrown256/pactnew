@@ -1883,7 +1883,7 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     base->l = 0;
 
     mesh = FMAKE(PM_mesh, "_PM_FILL_MESH:mesh");
-    memset(mesh, 0, sizeof(PM_mesh));
+    SC_MEM_INIT(PM_mesh, mesh);
 
     _PM_fill_tree(base, mesh);
 

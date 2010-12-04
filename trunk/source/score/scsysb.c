@@ -836,7 +836,7 @@ int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
 
 /* do this here so that the error handler is in play */
             {if (ia == 0)
-	        {memset(&state, 0, sizeof(parstate));
+	        {SC_MEM_INIT(parstate, &state);
 		 filter = _SC_read_filter(fname);};
 
 	     st = _SC_exec_srv_core(shell, fname, na, show, ignore, debug,

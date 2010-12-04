@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pml.h"
+#include "pml_int.h"
 
 #define KM	4
 #define LM	3

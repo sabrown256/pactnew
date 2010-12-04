@@ -319,7 +319,8 @@ void PG_draw_vector_n(PG_device *dev, int nd, PG_coord_sys cs, long n,
     ca    = cos(angle);
     sa    = sin(angle);
 
-    memset(rw, 0, sizeof(rw));
+    SC_MEM_INIT_V(rw);
+
     rw[0][0][0] = ca;
     rw[0][0][1] = sa;
     rw[0][1][0] = -sa;

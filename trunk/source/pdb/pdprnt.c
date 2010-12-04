@@ -588,9 +588,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    else
 	       {PRINT(f0, "        <function>\n");};}
 
-        else if ((isz == sizeof(short)) ||
-		 (isz == sizeof(int)) ||
-		 (isz == sizeof(long)))
+        else if (SC_type_match_size(KIND_INT, isz) != SC_UNKNOWN_I)
 	   _PD_disp_data(prnt, vr, ni, SC_BIT_I, n, ind);
 
 	else

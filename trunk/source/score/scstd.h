@@ -34,6 +34,7 @@
 #include <complex.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <wctype.h>
 #include <float.h>
 
 #ifndef S_SPLINT_S
