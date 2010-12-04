@@ -816,8 +816,22 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
     if (ltype != NULL)
        {id = SC_type_id(ltype, FALSE);
 
+/* character types (proper) */
+       if (SC_is_type_char(id) == TRUE)
+	  {char t[2], *fi;
+
+	   t[1] = '\0';
+	   fi   = f;
+	   for (i = 0; i < n; i++)
+	       {t[0] = fi[i];
+		p[0] = r[0][i];
+		p[1] = r[1][i];
+		PG_write_n(dev, 2, WORLDC, p, t);};
+
+	   SFREE(fi);}
+
 /* fixed point types (proper) */
-	if (SC_is_type_fix(id) == TRUE)
+	else if (SC_is_type_fix(id) == TRUE)
 	   {int *fi;
 
 	    fi = SC_convert_id(SC_INT_I, NULL, 0, 1, id, f, 0, 1, n, FALSE);
@@ -839,19 +853,6 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 		p[0] = r[0][i];
 		p[1] = r[1][i];
 		PG_write_n(dev, 2, WORLDC, p, lbl);};
-
-	   SFREE(fi);}
-
-       else if (id == SC_CHAR_I)
-	  {char t[2], *fi;
-
-	   t[1] = '\0';
-	   fi   = f;
-	   for (i = 0; i < n; i++)
-	       {t[0] = fi[i];
-		p[0] = r[0][i];
-		p[1] = r[1][i];
-		PG_write_n(dev, 2, WORLDC, p, t);};
 
 	   SFREE(fi);};
 

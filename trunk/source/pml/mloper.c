@@ -520,7 +520,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 
 /* fixed and floating point types (ok) */
 	if ((sid == SC_BOOL_I) ||
-	    (sid == SC_CHAR_I) ||
+	    (SC_is_type_char(sid) == TRUE) ||
 	    (SC_is_type_fix(sid) == TRUE) ||
 	    (SC_is_type_fp(sid) == TRUE))
 	   {double *s, *da;
@@ -578,7 +578,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 
 /* fixed and floating point types (ok) */
 	if ((sid == SC_BOOL_I) ||
-	    (sid == SC_CHAR_I) ||
+	    (SC_is_type_char(sid) == TRUE) ||
 	    (SC_is_type_fix(sid) == TRUE) ||
 	    (SC_is_type_fp(sid) == TRUE))
 	   {double s, *da;

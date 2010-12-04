@@ -278,7 +278,10 @@ static void _SS_args(object *obj, void *v, int type)
        {DEREF(v) = NULL;
         return;};
 
-    if ((SC_CHAR_I == type) || (SC_is_type_fix(type) == TRUE))
+    if (SC_is_type_char(type) == TRUE)
+       _SS_fix_arg(obj, v, type);
+
+    else if (SC_is_type_fix(type) == TRUE)
        _SS_fix_arg(obj, v, type);
 
     else if (SC_is_type_fp(type) == TRUE)
@@ -407,8 +410,14 @@ object *SS_define_constant(int n, ...)
     while ((name = SC_VA_ARG(char *)) != NULL)
       {type = SC_VA_ARG(int);
 
+/* character types (proper) */
+       if (SC_is_type_char(type) == TRUE)
+	  {long long v;
+	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
+	   val = SS_mk_integer(v);}
+
 /* fixed point types (proper) */
-       if ((type == SC_CHAR_I) || (SC_is_type_fix(type) == TRUE))
+       else if (SC_is_type_fix(type) == TRUE)
 	  {long long v;
 	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
 	   val = SS_mk_integer(v);}
@@ -570,7 +579,8 @@ static object *_SS_make_list(int n, int *type, void **ptr)
  
 #ifdef LARGE
  
-	 else if (ityp == SC_CHAR_I)
+/* character types (proper) */
+	 else if (SC_is_type_char(ityp) == TRUE)
 	    {c   = *(int *) vl;
 	     lst = SS_mk_cons(SS_mk_char(c), lst);}
  

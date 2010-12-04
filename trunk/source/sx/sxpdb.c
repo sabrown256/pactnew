@@ -3465,12 +3465,13 @@ static object *_SX_set_user_format(int i, char *format, int whch)
 /* _SXI_SET_FORMAT - set a format */
 
 static object *_SXI_set_format(object *argl)
-   {int i, ok;
+   {int i, id, ok;
     char s1[MAXLINE], s2[MAXLINE];
     char *field, *format, *typ;
-    char **fxtypes, **fptypes, **cmtypes;
+    char **chtypes, **fxtypes, **fptypes, **cmtypes;
     object *rv;
 
+    chtypes = _SC.types.chrtyp;
     fxtypes = _SC.types.fixtyp;
     fptypes = _SC.types.fptyp;
     cmtypes = _SC.types.cpxtyp;
@@ -3486,68 +3487,80 @@ static object *_SXI_set_format(object *argl)
 
     ok = FALSE;
 
-/* fixed point types (proper) */
-    for (i = 0; (i < N_PRIMITIVE_FIX) && (ok == FALSE); i++)
-        {typ = fxtypes[i];
+/* character types (proper) */
+    for (i = 0; (i < N_PRIMITIVE_CHAR) && (ok == FALSE); i++)
+        {id  = i + SC_CHAR_I;
+	 typ = chtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 3);
+	    {rv = _SX_set_user_format(id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 1);
+	    {rv = _SX_set_user_format(id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(i+SC_SHORT_I, format, 2);
+	    {rv = _SX_set_user_format(id, format, 2);
+	     ok = TRUE;};};
+
+/* fixed point types (proper) */
+    for (i = 0; (i < N_PRIMITIVE_FIX) && (ok == FALSE); i++)
+        {id  = i + SC_SHORT_I;
+	 typ = fxtypes[i];
+	 snprintf(s1, MAXLINE, "%s1", typ);
+	 snprintf(s2, MAXLINE, "%s2", typ);
+	 if (strcmp(field, typ) == 0)
+	    {rv = _SX_set_user_format(id, format, 3);
+	     ok = TRUE;}
+
+	 else if (strcmp(field, s1) == 0)
+	    {rv = _SX_set_user_format(id, format, 1);
+	     ok = TRUE;}
+
+	 else if (strcmp(field, s2) == 0)
+	    {rv = _SX_set_user_format(id, format, 2);
 	     ok = TRUE;};};
 
 /* real floating point types (proper) */
     for (i = 0; (i < N_PRIMITIVE_FP) && (ok == FALSE); i++)
-        {typ = fptypes[i];
+        {id  = i + SC_FLOAT_I;
+	 typ = fptypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 3);
+	    {rv = _SX_set_user_format(id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 1);
+	    {rv = _SX_set_user_format(id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(i+SC_FLOAT_I, format, 2);
+	    {rv = _SX_set_user_format(id, format, 2);
 	     ok = TRUE;};};
 
 /* complex floating point types (proper) */
     for (i = 0; (i < N_PRIMITIVE_FP) && (ok == FALSE); i++)
-        {typ = cmtypes[i];
+        {id  = i + SC_FLOAT_COMPLEX_I;
+	 typ = cmtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(i+SC_FLOAT_COMPLEX_I, format, 3);
+	    {rv = _SX_set_user_format(id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(i+SC_FLOAT_COMPLEX_I, format, 1);
+	    {rv = _SX_set_user_format(id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(i+SC_FLOAT_COMPLEX_I, format, 2);
+	    {rv = _SX_set_user_format(id, format, 2);
 	     ok = TRUE;};};
 
     if (ok == FALSE)
-       {if (strcmp(field, SC_CHAR_S) == 0)
-	   rv = _SX_set_user_format(SC_CHAR_I, format, 3);
-
-        else if (strcmp(field, "char1") == 0)
-	   rv = _SX_set_user_format(SC_CHAR_I, format, 1);
-
-	else if (strcmp(field, "char2") == 0)
-	   rv = _SX_set_user_format(SC_CHAR_I, format, 2);
-
-	else if (strcmp(field, SC_BOOL_S) == 0)
+       {if (strcmp(field, SC_BOOL_S) == 0)
 	   rv = _SX_set_user_format(SC_BOOL_I, format, 3);
 
         else if (strcmp(field, "bool1") == 0)

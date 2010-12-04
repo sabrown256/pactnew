@@ -27,7 +27,8 @@ static object *_SS_exa_var(void *vr, int type)
 	SC_ntos(bf, MAXLINE, type, vr, 0, 1);
 	PRINT(stdout, "    %s", bf);};
 
-    if (type == SC_CHAR_I)
+/* character types (proper) */
+    if (SC_is_type_char(type) == TRUE)
        {cv = *(char *) vr;
 	ret = SS_mk_integer(cv);}
 
@@ -186,15 +187,11 @@ object *SS_install_cv(char *name, void *pval, int ityp)
     var = SS_mk_variable(name, SS_null);
     SS_UNCOLLECT(var);
 
-    if (ityp == SC_CHAR_I)
+/* character types (proper) */
+    if (SC_is_type_char(ityp) == TRUE)
        {long long v;
 	v = *(char *) pval;
 	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
-
-    else if (ityp == SC_STRING_I)
-       {char *v;
-	v = (char *) pval;
-	SS_def_var(var, SS_mk_string(v), SS_Global_Env);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(ityp) == TRUE)
@@ -214,6 +211,11 @@ object *SS_install_cv(char *name, void *pval, int ityp)
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      ityp, pval, 0, 1, 1, FALSE);
 	SS_def_var(var, SS_mk_complex(v), SS_Global_Env);}
+
+    else if (ityp == SC_STRING_I)
+       {char *v;
+	v = (char *) pval;
+	SS_def_var(var, SS_mk_string(v), SS_Global_Env);}
 
     else if (ityp == SS_OBJECT_I)
        {SS_def_var(var, (object *) pval, SS_Global_Env);

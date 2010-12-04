@@ -1737,7 +1737,7 @@ char *PM_check_emap(int *peflag, pcons *alst, long n)
 	memset(emap, 1, n);}
 
     else
-       {sid  = SC_deref_id(pc->cdr_type, FALSE);
+       {sid = SC_deref_id(pc->cdr_type, FALSE);
 	if (sid == SC_CHAR_I)
 	   emap = pc->cdr;
 	else

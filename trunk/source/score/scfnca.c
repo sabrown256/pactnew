@@ -298,7 +298,11 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 
 	 else if (ityp == SC_LONG_I)
 	    {pl    = (long *) out;
-	     pl[i] = (long) fld;};};
+	     pl[i] = (long) fld;}
+
+	 else if (ityp == SC_LONG_LONG_I)
+	    {pl    = (long long *) out;
+	     pl[i] = (long long) fld;};};
 
     return(TRUE);}
 
