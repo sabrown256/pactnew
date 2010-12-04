@@ -2929,18 +2929,19 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
  * are static - have to dynamically allocate them eventually
  */
 
-/* floating point types (proper) */
-	 if (SC_is_type_fp(typ) == TRUE)
+/* character types (proper) */
+	 if (SC_is_type_char(typ) == TRUE)
 	    {SS_args(argl,
-		     SC_DOUBLE_I, &dv,
+		     SC_INT_I, &lv,
 		     0);
 	     argl = SS_cdr(argl);
 	     if (ptr)
-	        {pv   = &dv;
-		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
+	        {pv   = &lv;
+		 alst = SC_change_alist(alst, name, SC_STRING_S, pv);}
 	     else
-	        {SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_P_S,
-				       name, dv);};}
+	        {iv = lv;
+		 SC_CHANGE_VALUE_ALIST(alst, char, SC_STRING_S,
+				       name, iv);};}
 
 /* fixed point types (proper) */
 	 else if (SC_is_type_fix(typ) == TRUE)
@@ -2955,18 +2956,18 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 	        {SC_CHANGE_VALUE_ALIST(alst, long, SC_LONG_P_S,
 				       name, lv);};}
 
-	 else if (typ == SC_CHAR_I)
+/* floating point types (proper) */
+	 else if (SC_is_type_fp(typ) == TRUE)
 	    {SS_args(argl,
-		     SC_INT_I, &lv,
+		     SC_DOUBLE_I, &dv,
 		     0);
 	     argl = SS_cdr(argl);
 	     if (ptr)
-	        {pv   = &lv;
-		 alst = SC_change_alist(alst, name, SC_STRING_S, pv);}
+	        {pv   = &dv;
+		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
 	     else
-	        {iv = lv;
-		 SC_CHANGE_VALUE_ALIST(alst, char, SC_STRING_S,
-				       name, iv);};}
+	        {SC_CHANGE_VALUE_ALIST(alst, double, SC_DOUBLE_P_S,
+				       name, dv);};}
 
 	 else if (typ == SC_POINTER_I)
 	    {SS_args(argl,

@@ -142,7 +142,7 @@ static object *_SXI_set_attr_val(object *argl)
     else if (id == SC_CHAR_I)
         {char *cv;
 
-         cv   = FMAKE(char, "_SXI_SET_ATTR_VAL:cv");
+         cv = FMAKE(char, "_SXI_SET_ATTR_VAL:cv");
          if (SS_charobjp(obj))
             *cv = SS_CHARACTER_VALUE(obj);
          else

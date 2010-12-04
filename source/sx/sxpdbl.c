@@ -166,8 +166,15 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
     id = SC_type_id(type, FALSE);
 
+/* character types (proper) */
+    if (SC_is_type_char(id) == TRUE)
+       {if (vr == NULL)
+	   obj = SS_null;
+        else
+	   obj = SS_mk_string(vr);}
+
 /* fixed point types (proper) */
-    if (SC_fix_type_id(type, TRUE) != -1)
+    else if (SC_fix_type_id(type, TRUE) != -1)
        {long long *d;
 
 	d = SC_convert_id(SC_LONG_LONG_I, NULL, 0, 1,
@@ -199,39 +206,30 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
 	SFREE(d);}
 
-    else
-       {id = SC_type_id(type, FALSE);
+    else if (id == SC_BOOL_I)
+       {int *d;
 
-	if (id == SC_BOOL_I)
-	   {int *d;
+	d = SC_convert_id(SC_INT_I, NULL, 0, 1,
+			  id, vr, 0, 1, ni, FALSE);
 
-	    d = SC_convert_id(SC_INT_I, NULL, 0, 1,
-			      id, vr, 0, 1, ni, FALSE);
+	ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
 
-	    ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
-
-	    SFREE(d);}
-
-	else if (id == SC_CHAR_I)
-	   {if (vr == NULL)
-	       obj = SS_null;
-	    else
-	       obj = SS_mk_string(vr);}
+	SFREE(d);}
 
 /* handle user defined primitive types by turning them into vectors of
  * integers containing the byte values
  * GOTCHA: if the byte size of an item matches a standard machine
  * type size make a vector of that type
  */
-	else
-	   {long bpi, nb;
-	    char *d;
+    else
+       {long bpi, nb;
+	char *d;
 
-	    d   = (char *) vr;
-	    bpi = _PD_lookup_size(type, file->chart);
-	    nb  = bpi*ni;
+	d   = (char *) vr;
+	bpi = _PD_lookup_size(type, file->chart);
+	nb  = bpi*ni;
 
-	    ARRAY_VECTOR(obj, d, SS_mk_integer, nb, offset);};};
+	ARRAY_VECTOR(obj, d, SS_mk_integer, nb, offset);};
 
     return(obj);}
 

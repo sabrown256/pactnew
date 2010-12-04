@@ -1107,8 +1107,14 @@ int _SS_get_object_length(object *obj)
 object *_SS_numtype_to_object_id(int id, void *p, long n)
    {object *o;
 
+/* character types (proper) */
+    if (SC_is_type_char(id) == TRUE)
+       {long long v;
+	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
+	o = SS_mk_integer(v);}
+
 /* fixed point types (proper) */
-    if ((SC_is_type_fix(id) == TRUE) || (id == SC_CHAR_I))
+    else if (SC_is_type_fix(id) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
 	o = SS_mk_integer(v);}
@@ -1319,7 +1325,7 @@ int _SS_list_to_numtype_id(int vid, void *p, long n, object *o)
     rv = TRUE;
 
 /* print out the type */
-    if (vid == SC_CHAR_I)
+    if (SC_is_type_char(vid) == TRUE)
        {ityp = SC_arrtype(o, -1);
 	if (ityp == SC_STRING_I)
 	   strncpy(p, SS_STRING_TEXT(o), n);
