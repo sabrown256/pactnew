@@ -1211,7 +1211,7 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
     rv  = TRUE;
     oid = SC_arrtype(val, -1);
 
-    num = ((SC_BIT_I < oid) && (oid < SC_FLOAT_COMPLEX_I));
+    num = ((SC_BOOL_I <= oid) && (oid <= SC_LONG_DOUBLE_I));
 
     if ((oid == SC_CHAR_I) || (oid == SS_CHARACTER_I))
        d = SS_CHARACTER_VALUE(val);

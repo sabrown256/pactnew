@@ -185,7 +185,7 @@ int PG_get_attrs_alist(pcons *alst, ...)
  */
 
 static pcons *_PG_set_attrs_alist(pcons *alst, va_list __a__)
-   {int i, ityp, ptr, bpi;
+   {int i, ityp, pid, ptr, bpi;
     char *name, *typn;
     void *pv;
 
@@ -198,10 +198,9 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list __a__)
 	 ptr  = SC_VA_ARG(int);
 	 bpi  = SC_type_size_i(ityp);
 
-/* get the name of the pointer version
- * if ityp = SC_xxx_I then typn == SC_xxx_P_S
- */
-	 typn = SC_type_name(ityp - SC_BIT_I + SC_POINTER_I);
+/* get the name of the pointer version of ityp */
+	 pid  = SC_type_ptr_id(ityp);
+	 typn = SC_type_name(pid);
 
 	 if ((ptr == FALSE) &&
 	     ((SC_is_type_num(ityp) == TRUE) || (ityp == SC_POINTER_I)))
