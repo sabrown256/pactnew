@@ -274,10 +274,7 @@ long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
 
 int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 		   int padsz, int fpp, long nitems, long offs)
-   {long i, bita, fld, np, *pl;
-    char *pc;
-    int *pi;
-    short *ps;
+   {long i, bita, fld, np;
 
     for (i = 0L; i < nitems; i++)
         {np   = 1 + i/fpp;
@@ -285,24 +282,29 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	 fld  = SC_extract_field(in, bita, nbits, INT_MAX, NULL);
 
 	 if (ityp == SC_CHAR_I)
-	    {pc = (char *) out;
-	     pc[i] = (char) fld;}
+	    {char *pv;
+	     pv = (char *) out;
+	     pv[i] = (char) fld;}
 
 	 else if (ityp == SC_SHORT_I)
-	    {ps    = (short *) out;
-	     ps[i] = (short) fld;}
+	    {short *pv;
+	     pv    = (short *) out;
+	     pv[i] = (short) fld;}
 
 	 else if (ityp == SC_INT_I)
-	    {pi    = (int *) out;
-	     pi[i] = (int) fld;}
+	    {int *pv;
+	     pv    = (int *) out;
+	     pv[i] = (int) fld;}
 
 	 else if (ityp == SC_LONG_I)
-	    {pl    = (long *) out;
-	     pl[i] = (long) fld;}
+	    {long *pv;
+	     pv    = (long *) out;
+	     pv[i] = (long) fld;}
 
 	 else if (ityp == SC_LONG_LONG_I)
-	    {pl    = (long long *) out;
-	     pl[i] = (long long) fld;};};
+	    {long long *pv;
+	     pv    = (long long *) out;
+	     pv[i] = (long long) fld;};};
 
     return(TRUE);}
 

@@ -188,7 +188,7 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
 					   "_LR_GET_N_SET:extrema");
     set->scales         = (byte *) FMAKE_N(double, nde,
 					   "_LR_GET_N_SET:scales");
-    set->opers          = PM_REAL_Opers;
+    set->opers          = PM_fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
     set->symmetry       = NULL;
@@ -452,7 +452,7 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
                                            "LR_BUILD_DOMAIN:extrema");
     set->scales         = (byte *) FMAKE_N(double, nde,
                                            "LR_BUILD_DOMAIN:scales");
-    set->opers          = PM_REAL_Opers;
+    set->opers          = PM_fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
     set->symmetry       = NULL;

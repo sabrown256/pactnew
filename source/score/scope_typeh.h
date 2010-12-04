@@ -16,9 +16,14 @@
 # include <scarg.h>
 #endif
 
-# define REAL double
-# define HUGE_REAL 1.0e100
-FUNCTION_POINTER(double, *(*PFPREAL));
+#define REAL double
+#define HUGE_REAL 1.0e100
+
+#ifndef HAVE_FIXED_WIDTH_FLOAT
+typedef float       float32_t;
+typedef double      float64_t;
+typedef long double float128_t;
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -219,6 +224,9 @@ extern int
  SC_FLOAT_COMPLEX_I,
  SC_DOUBLE_COMPLEX_I,
  SC_LONG_DOUBLE_COMPLEX_I,
+ SC_COMPLEX32_I,
+ SC_COMPLEX64_I,
+ SC_COMPLEX128_I,
  SC_QUATERNION_I,
  SC_STRING_I,
  SC_POINTER_I,
@@ -240,6 +248,9 @@ extern int
  SC_FLOAT_COMPLEX_P_I,
  SC_DOUBLE_COMPLEX_P_I,
  SC_LONG_DOUBLE_COMPLEX_P_I,
+ SC_COMPLEX32_P_I,
+ SC_COMPLEX64_P_I,
+ SC_COMPLEX128_P_I,
  SC_QUATERNION_P_I,
  SC_VOID_I,
  SC_CHAR_8_I,
@@ -276,6 +287,9 @@ extern char
  *SC_FLOAT_COMPLEX_S,
  *SC_DOUBLE_COMPLEX_S,
  *SC_LONG_DOUBLE_COMPLEX_S,
+ *SC_COMPLEX32_S,
+ *SC_COMPLEX64_S,
+ *SC_COMPLEX128_S,
  *SC_QUATERNION_S,
  *SC_STRING_S,
  *SC_POINTER_S,
@@ -297,6 +311,9 @@ extern char
  *SC_FLOAT_COMPLEX_P_S,
  *SC_DOUBLE_COMPLEX_P_S,
  *SC_LONG_DOUBLE_COMPLEX_P_S,
+ *SC_COMPLEX32_P_S,
+ *SC_COMPLEX64_P_S,
+ *SC_COMPLEX128_P_S,
  *SC_QUATERNION_P_S,
  *SC_VOID_S,
  *SC_CHAR_8_S,

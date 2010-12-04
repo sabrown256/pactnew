@@ -307,7 +307,7 @@
 
 /chart
 |__ docp =      0
-|__ ne =       48
+|__ ne =       54
 |__ hash = <function>
 |__ comp = <function>
 |__ key_type = "by-name"

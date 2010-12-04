@@ -89,9 +89,9 @@ struct s_PG_RAST_device
     frame *raster;};
 
 struct s_PG_CS_info
-   {REAL old_wc[4];
-    REAL old_nc[4];
-    REAL new_nc[4];};
+   {double old_wc[4];
+    double old_nc[4];
+    double new_nc[4];};
 
 /*--------------------------------------------------------------------------*/
 
