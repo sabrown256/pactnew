@@ -742,7 +742,8 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 
 	if (_PG.im_temp == NULL)
 	   {data = &g;
-	    memset(data, 0, sizeof(PG_graph));
+	    SC_MEM_INIT(PG_graph, data);
+
 	    g.f         = (PM_mapping *) im;
 	    g.use       = PG_IMAGE_S;
 	    g.rendering = PLOT_IMAGE;
@@ -869,7 +870,8 @@ void PG_render_parallel(PG_device *dd, PG_image *nim, int np, PG_image *pim)
        return;
 
     data = &g;
-    memset(data, 0, sizeof(PG_graph));
+    SC_MEM_INIT(PG_graph, data);
+
     g.f         = (PM_mapping *) nim;
     g.use       = PG_IMAGE_S;
     g.info_type = SC_PCONS_P_S;

@@ -373,7 +373,7 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
     lmax  = maxes[1];
     nn    = kmax*lmax;
     nmap  = (kmax - 1) * (lmax - 1);
-    nz    = SC_arrlen(a[0])/sizeof(double);
+    nz    = SC_MEM_GET_N(double, a[0]);
 
     glyph = SC_assoc(alist, "GLYPH");
 
@@ -466,7 +466,7 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
     lmax  = maxes[1];
     nn    = kmax*lmax;
     nmap  = (kmax - 1) * (lmax - 1);
-    nz    = SC_arrlen(a[0])/sizeof(double);
+    nz    = SC_MEM_GET_N(double, a[0]);
 
     kz = kmax - 1;
     lz = lmax - 1;

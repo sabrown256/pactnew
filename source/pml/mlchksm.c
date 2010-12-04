@@ -250,7 +250,7 @@ static void _PM_md5_transform(SC_UINT4 state[4], unsigned char block[64])
     state[3] += d;
   
 /* zero out sensitive information */
-    memset(x, 0, sizeof(x));
+    SC_MEM_INIT_V(x);
 
     return;}
 

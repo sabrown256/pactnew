@@ -343,7 +343,7 @@ static void mm_trace(int *pn, long *pm)
 
 static void test_mm(void *(*am)(), void (*fm)(), int n, FILE *fp,
 		    double *pt, double *pm, int *pnf)
-   {int i, j, sz, nbl, nb, nfree, rn;
+   {int i, j, sz, nbl, nb, nfree;
     long mb;
     char **p;
     double t;

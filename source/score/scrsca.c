@@ -9,7 +9,7 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#include "score_int.h"
 
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>
@@ -211,7 +211,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
     if (ru == NULL)
        return(rv);
 
-    memset(ru, 0, sizeof(SC_rusedes));
+    SC_MEM_INIT(SC_rusedes, ru);
 
     if (pid == -1)
        rv = _SC_res_usage_self(ru, FALSE);

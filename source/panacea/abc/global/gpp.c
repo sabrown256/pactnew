@@ -107,7 +107,7 @@ PM_set *_LR_get_pseudo_set(PA_plot_request *pr, char *name)
         {data = elem[nde];
 
 /* resize the data array to the correct length - don't lie to others */
-         sz = SC_arrlen(data)/8;
+	 sz = SC_MEM_GET_N(double, data);
          if (sz != ne)
             REMAKE_N(data, double, ne);
 
@@ -117,7 +117,7 @@ PM_set *_LR_get_pseudo_set(PA_plot_request *pr, char *name)
          else
             elem[nde] = data;};
 
-    ne = SC_arrlen(elem[0])/sizeof(double);
+    ne = SC_MEM_GET_N(double, elem[0]);
 
     maxes     = set->max_index;
     maxes[0]  = ne;
@@ -165,7 +165,7 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
          else
             elem[nde] = data;};
 
-    ne = SC_arrlen(elem[0])/sizeof(double);
+    ne = SC_MEM_GET_N(double, elem[0]);
 
     nd       = 1;
     maxes    = FMAKE_N(int, nd, "_LR_GET_N_SET:maxes");
@@ -229,12 +229,13 @@ void LR_set_set_limits(int *maxes, int centering)
 /* LR_MAP_CENTERS - map the range data to the apropriate centering */
 
 double *LR_map_centers(double *data, int centering)
-   {int i, j, k, l, n, nt, nz, ns;
+   {int i, j, k, l, n, nt, nz, ns, sz;
     double *dp, *pd, *fp, *fp1, *fp2, *fp3, *fp4;
     double val;
 
     dp = pd = data;
-    nt = SC_arrlen(data)/(8*N_zones);
+    sz = SC_MEM_GET_N(double, data);
+    nt = sz/N_zones;
     ns = nt*kmax*lmax;
 
     switch (centering)
@@ -349,7 +350,7 @@ void LR_expand_plot_data(PA_plot_request *pr, int ni)
     nde  = 0;
     for (rp = pr->range; rp != NULL; rp = rp->next)
         {data = elem[nde];
-         osz  = SC_arrlen(data)/8;
+	 osz  = SC_MEM_GET_N(double, data);
          nsz  = ni*nz;
          if (osz <= nsz)
             {elem[nde] = REMAKE_N(data, double, nsz);
@@ -604,7 +605,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
         default :
 	     break;};
 
-    ne = SC_arrlen(elem[0])/sizeof(double);
+    ne = SC_MEM_GET_N(double, elem[0]);
 
 /* build the set */
     range                 = FMAKE(PM_set, "LR_INT_PLOT:range");
@@ -878,7 +879,7 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
  * NOTE: when multidimensional sub-spaces are allowed this will change
  */
     else
-       {nitems = SC_arrlen(data)/sizeof(double);
+       {nitems = SC_MEM_GET_N(double, data);
         set = PM_make_set(name, SC_DOUBLE_S, FALSE,
 			  1, nitems, 1, data);};
 

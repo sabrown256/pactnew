@@ -254,7 +254,7 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     lmax  = maxes[1];
     nn    = kmax*lmax;
     nmap  = (kmax - 1) * (lmax - 1);
-    nz    = SC_arrlen(a)/sizeof(int);
+    nz    = SC_MEM_GET_N(int, a);
 
     PG_get_attrs_alist(alist,
 		       "CENTERING", SC_INT_I, &cnt, N_CENT,

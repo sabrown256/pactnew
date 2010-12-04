@@ -37,7 +37,7 @@ void _PG_X_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double
     dir = 0;
     asc = 0;
     dsc = 0;
-    memset(&overall, 0, sizeof(XCharStruct));
+    SC_MEM_INIT(XCharStruct, &overall);
 /*
     overall.lbearing   = 0;
     overall.rbearing   = 0;
@@ -580,8 +580,8 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
     if ((disp == NULL) || (n == 0))
        return;
 
-    memset(box, 0, sizeof(box));
-    memset(wc, 0, sizeof(wc));
+    SC_MEM_INIT_V(box);
+    SC_MEM_INIT_V(wc);
 
     nmax = (XMaxRequestSize(disp) - 3L) >> 1L;
     segs = FMAKE_N(XSegment, nmax,
@@ -607,7 +607,8 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
         {if (i+nmax > n)
             nmax = n - i;
        
-         memset(segs, 0, nmax*sizeof(XSegment));
+	 SC_MEM_INIT_N(XSegment, segs, nmax);
+
          for (k = 0, j = 0; j < nmax; j++)
              {box[0] = *px++;
               box[2] = *py++;
@@ -793,24 +794,25 @@ void _PG_X_put_image(PG_device *dev, unsigned char *bf,
 			   (unsigned int) nx, (unsigned int) ny,
 			   8, 0);}
     else
-       {int pd, bw;
+       {int id, pd, bw, bpi;
+	long nb;
         
-	pd = XDefaultDepth(dev->display, DefaultScreen(dev->display));
-	bw = pd/8;
-        
+	pd  = XDefaultDepth(dev->display, DefaultScreen(dev->display));
+	bw  = pd/8;
+	id  = SC_type_container_size(KIND_INT, bw);
+        bpi = SC_type_size_i(id);
+
         PG_invert_image_data(bf, nx, ny, 1);
 
 /* map the pixel values to the colors */
         n = nx*ny;
 
         if (bw == 1)
-           ibf = FMAKE_N(unsigned char, n, "_PG_X_PUT_IMAGE:ibf");
-        else if (bw <= sizeof(short))
-	   ibf = FMAKE_N(unsigned char, sizeof(short)*n, "_PG_X_PUT_IMAGE:ibf");
-        else if (bw <= sizeof(int))
-           ibf = FMAKE_N(unsigned char, sizeof(int)*n, "_PG_X_PUT_IMAGE:ibf");
+           nb = n;
         else
-           ibf = FMAKE_N(unsigned char, sizeof(long)*n, "_PG_X_PUT_IMAGE:ibf");
+	   nb = n*bpi;
+
+	ibf = FMAKE_N(unsigned char, nb, "_PG_X_PUT_IMAGE:ibf");
 
 	xim = XCreateImage(disp, DefaultVisual(disp, XDefaultScreen(disp)),
 			   pd,

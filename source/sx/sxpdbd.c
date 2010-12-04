@@ -506,7 +506,8 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
     mjr     = pf->major_order;
     def_off = pf->default_offset;
 
-    memset(&prnt, 0, sizeof(PD_printdes));
+    SC_MEM_INIT(PD_printdes, &prnt);
+
     prnt.prefix   = "";
     prnt.before   = "";
     prnt.after    = "";

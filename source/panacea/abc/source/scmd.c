@@ -140,7 +140,7 @@ static int write_var(PDBfile *pdsf, char *name, double *tp, double **dp,
 
 /* write out the data arrays one at a time */
 
-    szd = SC_arrlen(*dp)/sizeof(double);
+    szd = SC_MEM_GET_N(double, *dp);
     for (i = 0; i < sz; i++)
         {snprintf(svname, MAXLINE, "%s:%d", title, i);
          vdata  = dp[i];

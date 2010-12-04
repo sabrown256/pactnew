@@ -737,7 +737,7 @@ double **PM_make_real_set_elements(PM_set *s)
 void PM_rel_real_set_elements(double **r)
    {int i, n;
 
-    n = SC_arrlen(r)/sizeof(double *);
+    n = SC_MEM_GET_N(double *, r);
 
     for (i = 0; i < n; i++)
         SFREE(r[i]);

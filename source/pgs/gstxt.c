@@ -200,7 +200,7 @@ static void _PG_clear_text_box(PG_text_box *b, int i)
 
 /* clear the text buffers */
     for (j = 0; j < ln; j++)
-        {memset(bf[j], 0, cn);};
+        memset(bf[j], 0, cn);
 
     b->col  = 0;
     b->line = i;
@@ -1011,7 +1011,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
 				     "PG_OPEN_TEXT_RECT:std_keymap");
 
 	    if (SC_zero_on_alloc() == FALSE)
-	       memset(_PG.std_keymap, 0, ni*sizeof(PFByte));
+	       SC_MEM_INIT_N(PFByte, _PG.std_keymap, ni);
 
 	    _PG.std_keymap[CTL_A] = _PG_goto_bol;
 	    _PG.std_keymap[CTL_B] = _PG_backward_char;

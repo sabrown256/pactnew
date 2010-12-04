@@ -903,7 +903,7 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
     static int na = BFSZ, nb = BFSZ;
     static char *sa = NULL, *sb = NULL;
 
-    memset(&ds, 0, sizeof(diff_stat));
+    SC_MEM_INIT_V(&ds);
 
     fda = io_open(f1, "r");
     fdb = io_open(f2, "r");

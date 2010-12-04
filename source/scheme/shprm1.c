@@ -1024,7 +1024,7 @@ static object *_SSI_etime(object *argl)
     object *obj, *rv, *fl;
     static long secsper[5] = {7*24*3600, 24*3600, 3600, 60, 1};
 
-    memset(&ref, 0, sizeof(struct tm));
+    SC_MEM_INIT(struct tm, &ref);
 
     ref.tm_mday  = 1;        /* day of the month */
     ref.tm_year  = 100;      /* year */

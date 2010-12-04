@@ -314,7 +314,7 @@ PG_triangle *_PG_hls_remove(PG_device *dev, char *type,
     if (trial == NULL)
        return(NULL);
 
-    memset(inter, 0, 9*sizeof(PG_node));
+    SC_MEM_INIT_N(PG_node, inter, 9);
 
 /* reference dprnodes to make some warnings go away */
     if (debug)

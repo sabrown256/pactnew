@@ -276,7 +276,7 @@ static void _PD_save_stack(PD_smp_state *pa)
        {FRAME_NX += 2;
         REMAKE_N(FRAME_FRAME, parse_frame, FRAME_NX);};
 
-    memset(&FRAME_OBJ[FRAME_N], 0, sizeof(parse_frame));
+    SC_MEM_INIT(parse_frame, &FRAME_OBJ[FRAME_N]);
 
     return;}
 
@@ -1185,7 +1185,7 @@ static void _PD_shift(PD_smp_state *pa, char *name, char *type,
        {FRAME(nx) += 10;
         REMAKE_N(FRAME(stack), locator, FRAME(nx));};
 
-    memset(FRAME(stack)+FRAME(n), 0, sizeof(locator));
+    SC_MEM_INIT(locator, FRAME(stack)+FRAME(n));
 
     strcpy(CURRENT(intype), type);
 

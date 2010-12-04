@@ -752,9 +752,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
              DEBUG1("      memb name %s\n", mname);
     
 /* grab the member's offset */
-             memset(&moffs, 0, sizeof(off_t)); 
              moffs = (off_t) H5Tget_member_offset(dtid, i); 
-    
              if (moffs < 0)
                 {fprintf(stderr, "_H5_HANDLE_COMPOUND: error retrieving member offset\n");
                  return(NULL);};

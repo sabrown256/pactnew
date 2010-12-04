@@ -89,7 +89,7 @@ int plotw(dev, new, name)
              v = FMAKE_N(double, PA_VARIABLE_SIZE(pp), "PLOTW:v");
              PA_copy_array(v, PA_VARIABLE_DATA(pp), PA_VARIABLE_SIZE(pp));
              v      = LR_map_centers(v, PA_VARIABLE_CENTERING(pp));
-             nitems = SC_arrlen(v)/sizeof(double);
+	     nitems = SC_MEM_GET_N(double, v);
 
              conv = PA_VARIABLE_INT_UNIT(pp)/PA_VARIABLE_EXT_UNIT(pp);
              PA_scale_array(v, nitems, conv);

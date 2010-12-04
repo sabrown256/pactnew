@@ -151,11 +151,11 @@ static void _SC_array_acc_method(SC_array *a)
 
     bpi = a->bpi;
 
-    if (bpi == sizeof(char))
+    if (bpi == sizeof(int8_t))
        a->access = _SC_array_acc_1;
-    else if (bpi == sizeof(short))
+    else if (bpi == sizeof(int16_t))
        a->access = _SC_array_acc_2;
-    else if (bpi == sizeof(int))
+    else if (bpi == sizeof(int32_t))
        a->access = _SC_array_acc_4;
     else if (bpi == sizeof(int64_t))
        a->access = _SC_array_acc_8;

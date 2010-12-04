@@ -154,7 +154,7 @@ int *SC_process_ids(void)
 	cmd = SC_dsnprintf(TRUE, "ps -eo pid");
 	st  = SC_exec(&res, cmd, NULL, -1);
 	if (st == 0)
-	   {ns  = SC_arrlen(res)/sizeof(int);
+	   {ns  = SC_MEM_GET_N(int, res);
 	    ids = FMAKE_N(int, ns, "SC_PROCESS_IDS:ids");
 
 	    nid = 0;

@@ -22,7 +22,6 @@
 int64_t SC_dsk_space(char *dir, int64_t nbx)
    {int fd, nw, st, ok;
     int64_t bsz, nb, no;
-    double fb, fl, fu;
     char *t, *cwd;
 
 /* remember where we are */

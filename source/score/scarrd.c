@@ -328,7 +328,7 @@ void SC_da_reset(SC_dynamic_array *daa, int elem)
     if (elem)
        nda = 1;
     else
-       nda = SC_arrlen(daa)/(long)sizeof(SC_dynamic_array);
+       nda = SC_MEM_GET_N(SC_dynamic_array, daa);
 
     for (ida = 0; ida < nda; ida++)
         {da = daa + ida;
@@ -357,7 +357,7 @@ void SC_da_clean(SC_dynamic_array *daa, int elem)
     if (elem)
        nda = 1;
     else
-       nda = SC_arrlen(daa)/(long)sizeof(SC_dynamic_array);
+       nda = SC_MEM_GET_N(SC_dynamic_array, daa);
 
     for (ida = 0; ida < nda; ida++)
         {da = daa + ida;
@@ -405,9 +405,9 @@ void SC_da_release_pointees(SC_dynamic_array *daa, int elem)
     SC_dynamic_array *da;
 
     if (elem)
-        nda = 1;
+       nda = 1;
     else
-        nda = SC_arrlen(daa)/(long)sizeof(SC_dynamic_array);
+       nda = SC_MEM_GET_N(SC_dynamic_array, daa);
 
     for (ida = 0; ida < nda; ida++)
         {da  = daa + ida;
@@ -458,7 +458,7 @@ void SC_dada_clean(SC_dynamic_array *dadaa, int elem)
     if (elem)
        ndada = 1;
     else
-       ndada = SC_arrlen(dadaa)/(long)sizeof(SC_dynamic_array);
+       ndada = SC_MEM_GET_N(SC_dynamic_array, dadaa);
 
     for (idada = 0; idada < ndada; idada++) 
         {pd   = dadaa + idada;
@@ -492,7 +492,7 @@ void SC_dada_reset(SC_dynamic_array *dadaa, int elem)
     if (elem)
        ndada = 1;
     else
-       ndada = SC_arrlen(dadaa)/(long)sizeof(SC_dynamic_array);
+       ndada = SC_MEM_GET_N(SC_dynamic_array, dadaa);
 
     for (idada = 0; idada < ndada; idada++) 
         {pd   = dadaa + idada;
@@ -521,7 +521,8 @@ void SC_dada_release(SC_dynamic_array *dadaa)
    {int ndada, idada, nda, ida;
     SC_dynamic_array  **dapa, *pd;
 
-    ndada = SC_arrlen(dadaa)/(long)sizeof(SC_dynamic_array);
+    ndada = SC_MEM_GET_N(SC_dynamic_array, dadaa);
+
     for (idada = 0; idada < ndada; idada++)
         {pd   = dadaa + idada;
 	 nda  = SC_N_DYNAMIC((*pd));
