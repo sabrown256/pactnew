@@ -25,6 +25,7 @@ int
  SC_BIT_I                   = 1,
  SC_BOOL_I                  = 2,
  SC_CHAR_I                  = 3,
+ SC_WCHAR_I                 = -1,
  SC_SHORT_I                 = 4,
  SC_INT_I                   = 5,
  SC_LONG_I                  = 6,
@@ -36,6 +37,9 @@ int
  SC_FLOAT_I                 = 8,
  SC_DOUBLE_I                = 9,
  SC_LONG_DOUBLE_I           = 10,
+ SC_FLOAT32_I               = -1,
+ SC_FLOAT64_I               = -1,
+ SC_FLOAT128_I              = -1,
  SC_FLOAT_COMPLEX_I         = 11,
  SC_DOUBLE_COMPLEX_I        = 12,
  SC_LONG_DOUBLE_COMPLEX_I   = 13,
@@ -47,6 +51,7 @@ int
  SC_POINTER_I               = 15,
  SC_BOOL_P_I                = 16,
  SC_STRING_I                = 17,
+ SC_WCHAR_P_I               = -1,
  SC_SHORT_P_I               = 18,
  SC_INT_P_I                 = 19,
  SC_LONG_P_I                = 20,
@@ -59,6 +64,9 @@ int
  SC_DOUBLE_P_I              = 23,
  SC_LONG_DOUBLE_P_I         = 24,
  SC_FLOAT_COMPLEX_P_I       = 25,
+ SC_FLOAT32_P_I             = -1,
+ SC_FLOAT64_P_I             = -1,
+ SC_FLOAT128_P_I            = -1,
  SC_DOUBLE_COMPLEX_P_I      = 26,
  SC_LONG_DOUBLE_COMPLEX_P_I = 27,
  SC_QUATERNION_P_I          = 28,
@@ -82,6 +90,7 @@ char
  *SC_BIT_S                   = "bit",
  *SC_BOOL_S                  = "bool",
  *SC_CHAR_S                  = "char",
+ *SC_WCHAR_S                 = "wchar",
  *SC_SHORT_S                 = "short",
  *SC_INT_S                   = "int",
  *SC_LONG_S                  = "long",
@@ -94,6 +103,9 @@ char
  *SC_DOUBLE_S                = "double",
  *SC_LONG_DOUBLE_S           = "long_double",
  *SC_FLOAT_COMPLEX_S         = "float_complex",
+ *SC_FLOAT32_S               = "float32_t",
+ *SC_FLOAT64_S               = "float64_t",
+ *SC_FLOAT128_S              = "float128_t",
  *SC_DOUBLE_COMPLEX_S        = "double_complex",
  *SC_LONG_DOUBLE_COMPLEX_S   = "long_double_complex",
  *SC_QUATERNION_S            = "quaternion",
@@ -102,6 +114,7 @@ char
  *SC_POINTER_S               = "void *",
  *SC_BOOL_P_S                = "bool *",
  *SC_STRING_S                = "char *",
+ *SC_WCHAR_P_S               = "wchar *",
  *SC_SHORT_P_S               = "short *",
  *SC_INT_P_S                 = "int *",
  *SC_LONG_P_S                = "long *",
@@ -113,6 +126,9 @@ char
  *SC_FLOAT_P_S               = "float *",
  *SC_DOUBLE_P_S              = "double *",
  *SC_LONG_DOUBLE_P_S         = "long_double *",
+ *SC_FLOAT32_P_S             = "float32_t *",
+ *SC_FLOAT64_P_S             = "float64_t *",
+ *SC_FLOAT128_P_S            = "float128_t *",
  *SC_FLOAT_COMPLEX_P_S       = "float_complex *",
  *SC_DOUBLE_COMPLEX_P_S      = "double_complex *",
  *SC_LONG_DOUBLE_COMPLEX_P_S = "long_double_complex *",
@@ -285,6 +301,21 @@ int SC_type_id(char *name, int unsg)
     n = (t != NULL) ? t->id : -1;
 
     return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_TYPE_PTR_ID - given the ID of a primitive type
+ *                - return the ID of the pointer to the type
+ *                - return -1 if type NAME is unknown
+ */
+
+int SC_type_ptr_id(int id)
+   {int pid;
+
+    pid = id - SC_BIT_I + SC_POINTER_I;
+
+    return(pid);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
