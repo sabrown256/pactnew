@@ -1598,7 +1598,7 @@ static PM_set *_PD_build_set(FIXNUM *si, double *sd, char *sname)
 
     set = PM_mk_set(sname, SC_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
-		    PM_REAL_Opers, NULL,
+		    PM_fp_opers, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL,
 		    NULL);
 

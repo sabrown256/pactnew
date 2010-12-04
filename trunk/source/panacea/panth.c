@@ -715,10 +715,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
     if (nthf <= 0)
        return(FALSE);
 
-    if (sizeof(REAL) == sizeof(double))
-       strcpy(type, SC_DOUBLE_S);
-    else
-       strcpy(type, SC_FLOAT_S);
+    strcpy(type, SC_DOUBLE_S);
 
     n_max       = 10;
     _PA.thd  = FMAKE_N(th_record, n_max, "_PA_SETUP_UF_FAMILY:thd");
@@ -1003,10 +1000,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 
 /* allocate the curve arrays */
     crve = FMAKE_N(double *, nv, "_PA_PROC_REC:crve");
-    if (sizeof(REAL) == sizeof(double))
-       strcpy(type, SC_DOUBLE_S);
-    else
-       strcpy(type, SC_FLOAT_S);
+    strcpy(type, SC_DOUBLE_S);
 
     nptm = _PA.ndpt[recn].number;
     for (i = 0; i < nv; i++)
@@ -1107,10 +1101,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
              return(FALSE);};};
 
 /* find the extrema */
-    if (sizeof(REAL) == sizeof(double))
-       strcpy(type, SC_DOUBLE_S);
-    else
-       strcpy(type, SC_FLOAT_S);
+    strcpy(type, SC_DOUBLE_S);
 
     for (i = 0; i < _PA.ndom; i++)
 	{PD_read(_PA.uf[i], "npts0", &n);

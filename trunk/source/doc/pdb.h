@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 11/29/2010
+MOD: 12/04/2010
 
 <CENTER>
 <P>
@@ -761,6 +761,19 @@ PDBLib supports the full set of C99 primitive data types:
    <function pointer>          function
 </pre>
 
+The following additional fixed width types are defined in
+analogy with the C99 standard fixed width integer types:
+<pre>
+   C Type                      PDB Alias
+
+   float32_t                   float32_t
+   float64_t                   float64_t
+   float128_t                  float128_t
+   complex32_t                 complex32_t
+   complex64_t                 complex64_t
+   complex128_t                complex128_t
+</pre>
+
 The following types are defined as aliases to C99 types:
 <pre>
    C Type                      PDB Alias
@@ -1273,7 +1286,6 @@ A) PrimitiveTypes
          int        4   4  ORDER(little)|FIX;
          u_int      4   4  ORDER(little)|FIX|UNSGNED;
          double     8   8  ORDER(little)|FLOAT(64,11,52,0,1,12,0,1023);
-         REAL       8   8  ORDER(little)|FLOAT(64,11,52,0,1,12,0,1023)|TYPEDEF(double);
          function   4   4  ORDER(little)|FIX;
          Directory  1   0  NO-CONV|FIX;
 
@@ -3231,12 +3243,10 @@ memory is converted (only if the target machine type is different
 from the current machine type) and then written out to disk starting
 at the current disk address.
 <p>
-The primitive data types which the PDBLib system knows about by
-default are: "short", "integer", "long", "float", "double", and
-"char" for short integer, integer, long integer, floating point
-or real number, double precision floating point number, and
-character or single byte respectively. Additional types may be
-added using <tt>PD_defstr()</tt>.
+See the section
+<a href="#pdb_types">PDBLib and Data Types</a>
+for legal primitive data types to use here.
+Additional types may be added using <tt>PD_defstr()</tt>.
 <p>
 PDBLib supports arbitrary levels of indirections. This means that all
 types of pointers (except function pointers) can be traced down to
@@ -3476,12 +3486,10 @@ installed in the symbol table the data from memory is converted
 machine type) and then written out to disk starting at the current
 disk address.
 <p>
-The primitive data types which the PDBLib system knows about by
-default are: "short", "integer", "long", "float", "double", and
-"char" for short integer, integer, long integer, floating point
-or real number, double precision floating point number, and
-character or single byte respectively. Additional types may be
-added using <tt>PD_defstr</tt>.
+See the section
+<a href="#pdb_types">PDBLib and Data Types</a>
+for legal primitive data types to use here.
+Additional types may be added using <tt>PD_defstr()</tt>.
 <p>
 PDBLib supports arbitrary levels of indirections. This means that,
 subject to the restrictions spelled out in the section on rules,

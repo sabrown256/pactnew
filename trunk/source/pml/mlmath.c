@@ -78,11 +78,11 @@ int PM_set_opers(PM_set *set)
 	else
 	   {id = SC_type_id(token, FALSE);
 	    if (id == SC_DOUBLE_I)
-	       set->opers = PM_REAL_Opers;
+	       set->opers = PM_fp_opers;
 	    else if (id == SC_INT_I)
-	       set->opers = PM_Int_Opers;
+	       set->opers = PM_int_opers;
 	    else if (id == SC_LONG_I)
-	       set->opers = PM_Long_Opers;
+	       set->opers = PM_long_opers;
 	    else
 	       ret = FALSE;};};
 

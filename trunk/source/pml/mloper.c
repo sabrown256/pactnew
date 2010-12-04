@@ -16,16 +16,17 @@
     for (i = 0; i < n; i++)                                                  \
    	_a[i] = (*(_f))((double) _a[i], (double) _sp[i]);}
 	    								    
+/* GOTCHA: handle all primitive types as for SCHEME and SX */
 PM_field
- REAL_Opers     = {(PFByte) PM_fplus,  (PFByte) PM_fminus,   NULL,
+ _fp_opers      = {(PFByte) PM_fplus,  (PFByte) PM_fminus,   NULL,
 		   (PFByte) PM_ftimes, (PFByte) PM_fdivide},
- Int_Opers      = {(PFByte) PM_iplus,  (PFByte) PM_iminus,   NULL, 
-		   (PFByte) PM_itimes, (PFByte) PM_idivide},
- Long_Opers     = {(PFByte) PM_lplus,  (PFByte) PM_lminus,   NULL, 
+ _int_opers     = {(PFByte) PM_iplus,  (PFByte) PM_iminus,   NULL, 
+	 	   (PFByte) PM_itimes, (PFByte) PM_idivide},
+ _long_opers    = {(PFByte) PM_lplus,  (PFByte) PM_lminus,   NULL, 
                    (PFByte) PM_ltimes, (PFByte) PM_ldivide},
- *PM_REAL_Opers = &REAL_Opers,
- *PM_Int_Opers  = &Int_Opers,
- *PM_Long_Opers = &Long_Opers;
+ *PM_fp_opers   = &_fp_opers,
+ *PM_int_opers  = &_int_opers,
+ *PM_long_opers = &_long_opers;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -256,7 +256,6 @@ typedef struct s_PM_map_info PM_map_info;
 typedef struct s_PM_mapping PM_mapping;
 typedef struct s_sort_link sort_link;
 
-FUNCTION_POINTER(REAL, (*PFREAL));
 FUNCTION_POINTER(PM_set, *(*PFPPM_set));
 FUNCTION_POINTER(PM_mapping, *(*PFPPM_mapping));
 
@@ -696,9 +695,9 @@ extern char
  PM_error[];
 
 extern PM_field
- *PM_REAL_Opers,
- *PM_Int_Opers,
- *PM_Long_Opers;
+ *PM_fp_opers,
+ *PM_int_opers,
+ *PM_long_opers;
 
 /*--------------------------------------------------------------------------*/
 

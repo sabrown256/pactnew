@@ -125,11 +125,7 @@ int REAL_array_extractor(PyObject *obj, void *arg)
     PyArrayObject *arr;
     char t;
 
-    if (sizeof(REAL) == sizeof(float)) {
-        t = 'f';
-    } else if (sizeof(REAL) == sizeof(double)) {
-        t = 'd';
-    }
+    t = 'd';
     
     /* create an array object */
     arr = (PyArrayObject *) PyArray_ContiguousFromObject(obj, t, 0, 0);

@@ -794,7 +794,13 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     _PD_setup_chart(fchrt, fstd, hstd, falign, halign, FALSE, ftk);
     _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, TRUE, ftk);
 
-    PD_typedef(file, SC_DOUBLE_S, "REAL");
+    PD_typedef(file, SC_DOUBLE_S,              "REAL");
+    PD_typedef(file, SC_FLOAT_S,               SC_FLOAT32_S);
+    PD_typedef(file, SC_DOUBLE_S,              SC_FLOAT64_S);
+    PD_typedef(file, SC_LONG_DOUBLE_S,         SC_FLOAT128_S);
+    PD_typedef(file, SC_FLOAT_COMPLEX_S,       SC_COMPLEX32_S);
+    PD_typedef(file, SC_DOUBLE_COMPLEX_S,      SC_COMPLEX64_S);
+    PD_typedef(file, SC_LONG_DOUBLE_COMPLEX_S, SC_COMPLEX128_S);
 
 /* NOTE: function MUST be handled this way - PD_DEFNCV does NOT
  *       sequence the two charts properly and death can result
@@ -952,7 +958,13 @@ void _PD_def_real(char *type, PDBfile *file)
 
     if (strcmp(type, PDBFILE_S) == 0)
        {PD_typedef_primitive_types(file);
-	PD_typedef(file, SC_DOUBLE_S, "REAL");};
+	PD_typedef(file, SC_DOUBLE_S,              "REAL");
+	PD_typedef(file, SC_FLOAT_S,               SC_FLOAT32_S);
+	PD_typedef(file, SC_DOUBLE_S,              SC_FLOAT64_S);
+	PD_typedef(file, SC_LONG_DOUBLE_S,         SC_FLOAT128_S);
+	PD_typedef(file, SC_FLOAT_COMPLEX_S,       SC_COMPLEX32_S);
+	PD_typedef(file, SC_DOUBLE_COMPLEX_S,      SC_COMPLEX64_S);
+	PD_typedef(file, SC_LONG_DOUBLE_COMPLEX_S, SC_COMPLEX128_S);};
 
     return;}
 

@@ -29,8 +29,8 @@ int PM_vct_equal(int nd, double *x, double **v, int i, double tol)
 
 /* PM_LNNORM - calculate the ln norm of a vector */
 
-REAL PM_lnnorm(REAL *v, REAL *x, int n, int order)
-   {REAL norm;
+double PM_lnnorm(double *v, double *x, int n, int order)
+   {double norm;
     int i;
 
     norm = 0.0;

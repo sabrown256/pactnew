@@ -780,20 +780,9 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
 
         *pxp = x[0];
 
-        if (sizeof(REAL) == sizeof(double))
-	   {if (!PD_read_as(fp, xval, SC_DOUBLE_S, x[0]))
-               {PD_error("BAD X ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
-                return(FALSE);};}
-
-	else if (sizeof(REAL) == sizeof(float))
-	   {if (!PD_read_as(fp, xval, SC_FLOAT_S, x[0]))
-	       {PD_error("BAD X ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
-		return(FALSE);};}
-
-	else
-	   {PD_error("BAD DATA TYPE - PD_READ_PDB_CURVE", PD_GENERIC);
+	if (!PD_read_as(fp, xval, SC_DOUBLE_S, x[0]))
+	   {PD_error("BAD X ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
 	    return(FALSE);};}
-
     else
        *pxp = NULL;
 
@@ -807,20 +796,9 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
 	else
 	   {*pyp = x[1];
 
-	    if (sizeof(REAL) == sizeof(double))
-	       {if (!PD_read_as(fp, yval, SC_DOUBLE_S, x[1]))
-		   {PD_error("BAD Y ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
-		    rv = FALSE;};}
-
-	    else if (sizeof(REAL) == sizeof(float))
-	       {if (!PD_read_as(fp, yval, SC_FLOAT_S, x[1]))
-		   {PD_error("BAD Y ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
-		    rv = FALSE;};}
-
-	    else
-	       {PD_error("BAD DATA TYPE - PD_READ_PDB_CURVE", PD_GENERIC);
+	    if (!PD_read_as(fp, yval, SC_DOUBLE_S, x[1]))
+	       {PD_error("BAD Y ARRAY - PD_READ_PDB_CURVE", PD_GENERIC);
 		rv = FALSE;};};}
-
     else
        *pyp = NULL;
 
@@ -889,39 +867,21 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
        return(FALSE);
 
 /* save the x and y arrays and the extrema */
-    if (sizeof(REAL) == sizeof(double))
-       {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, SC_DOUBLE_S, yext))
-           return(FALSE);
+    snprintf(name, MAXLINE, "yext%d(2)", icurve);
+    if (!PD_write(fp, name, SC_DOUBLE_S, yext))
+       return(FALSE);
 
-        snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, SC_DOUBLE_S, x[1]))
-           return(FALSE);
+    snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
+    if (!PD_write(fp, name, SC_DOUBLE_S, x[1]))
+       return(FALSE);
 
-        snprintf(name, MAXLINE, "xext%d(2)", icurve);
-        if (!PD_write(fp, name, SC_DOUBLE_S, xext))
-           return(FALSE);
+    snprintf(name, MAXLINE, "xext%d(2)", icurve);
+    if (!PD_write(fp, name, SC_DOUBLE_S, xext))
+       return(FALSE);
 
-        snprintf(name, MAXLINE, "xval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, SC_DOUBLE_S, x[0]))
-           return(FALSE);}
-
-    else
-       {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, SC_FLOAT_S, yext))
-           return(FALSE);
-
-        snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, SC_FLOAT_S, x[1]))
-           return(FALSE);
-
-        snprintf(name, MAXLINE, "xext%d(2)", icurve);
-        if (!PD_write(fp, name, SC_FLOAT_S, xext))
-           return(FALSE);
-
-        snprintf(name, MAXLINE, "xval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, SC_FLOAT_S, x[0]))
-           return(FALSE);};
+    snprintf(name, MAXLINE, "xval%d(%d)", icurve, n);
+    if (!PD_write(fp, name, SC_DOUBLE_S, x[0]))
+       return(FALSE);
 
     if (!fp->virtual_internal)
        {SFREE(dp);
@@ -996,23 +956,13 @@ int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
 */
 
 /* save the y array and the extrema */
-    if (sizeof(REAL) == sizeof(double))
-       {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, SC_DOUBLE_S, extr))
-           return(FALSE);
+    snprintf(name, MAXLINE, "yext%d(2)", icurve);
+    if (!PD_write(fp, name, SC_DOUBLE_S, extr))
+       return(FALSE);
 
-        snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, SC_DOUBLE_S, py))
-           return(FALSE);}
-
-    else
-       {snprintf(name, MAXLINE, "yext%d(2)", icurve);
-        if (!PD_write(fp, name, SC_FLOAT_S, extr))
-           return(FALSE);
-
-        snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
-        if (!PD_write(fp, name, SC_FLOAT_S, py))
-           return(FALSE);};
+    snprintf(name, MAXLINE, "yval%d(%d)", icurve, n);
+    if (!PD_write(fp, name, SC_DOUBLE_S, py))
+       return(FALSE);
 
     return(TRUE);}
 
@@ -1107,163 +1057,83 @@ int PD_mesh_struct(PDBfile *file)
 
     err = TRUE;
 
-    if (sizeof(REAL) == sizeof(double))
-       {ret = PD_defstr(file, "PM_conic_curve",
-			"char *type",
-			"double xx",
-			"double xy",
-			"double yy",
-			"double x",
-			"double y",
-			"double c",
-			LAST);
+    ret = PD_defstr(file, "PM_conic_curve",
+		    "char *type",
+		    "double xx",
+		    "double xy",
+		    "double yy",
+		    "double x",
+		    "double y",
+		    "double c",
+		    LAST);
 
-        err &= (ret != NULL);
+    err &= (ret != NULL);
 
-	ret = PD_defstr(file, "PM_end_point",
-			"double rn",
-			"double rx",
-			"int k",
-			"int dk",
-			"double rat",
-			"double drn",
-			"double drx",
-			"PM_end_point *next",
-			LAST);
+    ret = PD_defstr(file, "PM_end_point",
+		    "double rn",
+		    "double rx",
+		    "int k",
+		    "int dk",
+		    "double rat",
+		    "double drn",
+		    "double drx",
+		    "PM_end_point *next",
+		    LAST);
 
-        err &= (ret != NULL);
+    err &= (ret != NULL);
 
-	PD_defstr(file, "PM_side",
-		  "double x",
-		  "double y",
-		  "double ratio",
-		  "int dk",
-		  "int dl",
-		  "int k",
-		  "int l",
-		  "double side_rat",
-		  "double min_dr_f",
-		  "double max_dr_f",
-		  "double mag_start",
-		  "double exp_start",
-		  "double mag_end",
-		  "double exp_end",
-		  "int fill",
-		  "double scale",
-		  "double cosine",
-		  "double sine",
-		  "double c0",
-		  "double c1",
-		  "double c2",
-		  "double c3",
-		  "int dir",
-		  "PM_conic_curve *crve",
-		  "PM_side *match",
-		  "PM_side *next",
-		  LAST);
+    PD_defstr(file, "PM_side",
+	      "double x",
+	      "double y",
+	      "double ratio",
+	      "int dk",
+	      "int dl",
+	      "int k",
+	      "int l",
+	      "double side_rat",
+	      "double min_dr_f",
+	      "double max_dr_f",
+	      "double mag_start",
+	      "double exp_start",
+	      "double mag_end",
+	      "double exp_end",
+	      "int fill",
+	      "double scale",
+	      "double cosine",
+	      "double sine",
+	      "double c0",
+	      "double c1",
+	      "double c2",
+	      "double c3",
+	      "int dir",
+	      "PM_conic_curve *crve",
+	      "PM_side *match",
+	      "PM_side *next",
+	      LAST);
 	
-        err &= (ret != NULL);
+    err &= (ret != NULL);
 
-	PD_defstr(file, "PM_part",
-		  "int n_sides",
-		  "PM_side *leg",
-		  "PM_end_point *ends",
-		  "char *comp",
-		  "char *name",
-		  "int reg",
-		  "double k_ratio",
-		  "double k_mag_start",
-		  "double k_exp_start",
-		  "double k_mag_end",
-		  "double k_exp_end",
-		  "double l_ratio",
-		  "double l_mag_start",
-		  "double l_exp_start",
-		  "double l_mag_end",
-		  "double l_exp_end",
-		  "PM_part *next",
-		  LAST);
+    PD_defstr(file, "PM_part",
+	      "int n_sides",
+	      "PM_side *leg",
+	      "PM_end_point *ends",
+	      "char *comp",
+	      "char *name",
+	      "int reg",
+	      "double k_ratio",
+	      "double k_mag_start",
+	      "double k_exp_start",
+	      "double k_mag_end",
+	      "double k_exp_end",
+	      "double l_ratio",
+	      "double l_mag_start",
+	      "double l_exp_start",
+	      "double l_mag_end",
+	      "double l_exp_end",
+	      "PM_part *next",
+	      LAST);
 
-        err &= (ret != NULL);}
-
-    else
-       {ret = PD_defstr(file, "PM_conic_curve",
-			"char *type",
-			"float xx",
-			"float xy",
-			"float yy",
-			"float x",
-			"float y",
-			"float c",
-			LAST);
-
-        err &= (ret != NULL);
-
-	ret = PD_defstr(file, "PM_end_point",
-			"float rn",
-			"float rx",
-			"int k",
-			"int dk",
-			"float rat",
-			"float drn",
-			"float drx",
-			"PM_end_point *next",
-			LAST);
-
-        err &= (ret != NULL);
-
-	PD_defstr(file, "PM_side",
-		  "float x",
-		  "float y",
-		  "float ratio",
-		  "int dk",
-		  "int dl",
-		  "int k",
-		  "int l",
-		  "float side_rat",
-		  "float min_dr_f",
-		  "float max_dr_f",
-		  "float mag_start",
-		  "float exp_start",
-		  "float mag_end",
-		  "float exp_end",
-		  "int fill",
-		  "float scale",
-		  "float cosine",
-		  "float sine",
-		  "float c0",
-		  "float c1",
-		  "float c2",
-		  "float c3",
-		  "int dir",
-		  "PM_conic_curve *crve",
-		  "PM_side *match",
-		  "PM_side *next",
-		  LAST);
-	
-        err &= (ret != NULL);
-
-	PD_defstr(file, "PM_part",
-		  "int n_sides",
-		  "PM_side *leg",
-		  "PM_end_point *ends",
-		  "char *comp",
-		  "char *name",
-		  "int reg",
-		  "float k_ratio",
-		  "float k_mag_start",
-		  "float k_exp_start",
-		  "float k_mag_end",
-		  "float k_exp_end",
-		  "float l_ratio",
-		  "float l_mag_start",
-		  "float l_exp_start",
-		  "float l_mag_end",
-		  "float l_exp_end",
-		  "PM_part *next",
-		  LAST);
-
-        err &= (ret != NULL);};
+    err &= (ret != NULL);
 
     return(TRUE);}
 
@@ -1333,55 +1203,29 @@ int PD_def_mapping(PDBfile *fp)
     err &= (ret != NULL);
 
 /* define the PM_set and PM_mapping */
-    if (sizeof(REAL) == sizeof(double))
-       {ret = PD_defstr(fp, "PM_set",
-                        "char *name",
-                        "char *element_type",
-                        "int dimension",
-                        "int *max_index",
-                        "int dimension_elem",
-                        "long n_elements",
-                        "char *elements",
-                        "char *es_type",
-                        "char *extrema",
-                        "char *scales",
-                        "function opers",
-                        "double *metric",
-                        "char *symmetry_type",
-                        "char *symmetry",
-                        "char *topology_type",
-                        "char *topology",
-                        "char *info_type",
-                        "char *info",
-                        "PM_set *next",
-                        LAST);
+    ret = PD_defstr(fp, "PM_set",
+		    "char *name",
+		    "char *element_type",
+		    "int dimension",
+		    "int *max_index",
+		    "int dimension_elem",
+		    "long n_elements",
+		    "char *elements",
+		    "char *es_type",
+		    "char *extrema",
+		    "char *scales",
+		    "function opers",
+		    "double *metric",
+		    "char *symmetry_type",
+		    "char *symmetry",
+		    "char *topology_type",
+		    "char *topology",
+		    "char *info_type",
+		    "char *info",
+		    "PM_set *next",
+		    LAST);
 
-        err &= (ret != NULL);}
-
-    else    
-       {ret = PD_defstr(fp, "PM_set",
-                        "char *name",
-                        "char *element_type",
-                        "int dimension",
-                        "int *max_index",
-                        "int dimension_elem",
-                        "long n_elements",
-                        "char *elements",
-                        "char *es_type",
-                        "char *extrema",
-                        "char *scales",
-                        "function opers",
-                        "float *metric",
-                        "char *symmetry_type",
-                        "char *symmetry",
-                        "char *topology_type",
-                        "char *topology",
-                        "char *info_type",
-                        "char *info",
-                        "PM_set *next",
-                        LAST);
-
-        err &= (ret != NULL);};
+    err &= (ret != NULL);
 
 /* define the PM_mesh_topology */
     ret = PD_defstr(fp, "PM_mesh_topology",
