@@ -153,28 +153,32 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 /* check for fixed point types (proper) */
     if ((ifx = SC_fix_type_id(type, TRUE)) != -1)
        {ifx -= SC_SHORT_I;
-	std->fx[ifx].bpi   = nb;
-	std->fx[ifx].order = (PD_byte_order) flg;
-	align->fx[ifx]     = al;}
+	if (ifx < N_PRIMITIVE_FIX)
+	   {std->fx[ifx].bpi   = nb;
+	    std->fx[ifx].order = (PD_byte_order) flg;
+	    align->fx[ifx]     = al;};}
 
 /* check for floating point types (proper) */
     else if ((ifp = SC_fp_type_id(type)) != -1)
        {ifp -= SC_FLOAT_I;
-	std->fp[ifp].bpi    = nb;
-	std->fp[ifp].order  = ordr;
-	std->fp[ifp].format = formt;
-	align->fp[ifp]      = al;}
+	if (ifp < N_PRIMITIVE_FP)
+	   {std->fp[ifp].bpi    = nb;
+	    std->fp[ifp].order  = ordr;
+	    std->fp[ifp].format = formt;
+	    align->fp[ifp]      = al;};}
 
 /* check for complex floating point types (proper) */
     else if ((icx = SC_cx_type_id(type)) != -1)
        {icx -= SC_FLOAT_COMPLEX_I;
+	if (icx < N_PRIMITIVE_CPX)
+	   {
 /*
-	std->fp[icx].bpi    = nb;
-	std->fp[icx].order  = ordr;
-	std->fp[icx].format = formt;
-	align->fp[icx]      = al;
+            std->fp[icx].bpi    = nb;
+	    std->fp[icx].order  = ordr;
+	    std->fp[icx].format = formt;
+	    align->fp[icx]      = al;
  */
-	}
+	    };}
 
     else if (id == SC_CHAR_I)
        align->char_alignment = al;

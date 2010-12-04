@@ -138,7 +138,8 @@ char
 /* _SC_GET_TYPE_ID - return type ID */
 
 static SC_type *_SC_get_type_id(int id)
-   {haelem *hp;
+   {int nt;
+    haelem *hp;
     hasharr *ha;
     SC_type *t;
 
@@ -146,10 +147,11 @@ static SC_type *_SC_get_type_id(int id)
 
     t  = NULL;
     ha = (hasharr *) _SC.types.typ;
-
-    hp = *(haelem **) SC_hasharr_get(ha, id);
-    if (hp != NULL)
-       t = (SC_type *) hp->def;
+    nt = SC_hasharr_get_n(ha);
+    if ((0 <= id) && (id < nt))
+       {hp = *(haelem **) SC_hasharr_get(ha, id);
+	if (hp != NULL)
+	   t = (SC_type *) hp->def;};
 
     return(t);}
 
@@ -365,8 +367,10 @@ int SC_is_type_char(int id)
 
 int SC_is_type_fix(int id)
    {int rv;
+    SC_type *t;
 
-    rv = ((SC_SHORT_I <= id) && (id <= SC_LONG_LONG_I));
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_INT));
 
     return(rv);}
 
@@ -377,8 +381,10 @@ int SC_is_type_fix(int id)
 
 int SC_is_type_fp(int id)
    {int rv;
+    SC_type *t;
 
-    rv = ((SC_FLOAT_I <= id) && (id <= SC_LONG_DOUBLE_I));
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_FLOAT));
 
     return(rv);}
 
@@ -389,8 +395,10 @@ int SC_is_type_fp(int id)
 
 int SC_is_type_cx(int id)
    {int rv;
+    SC_type *t;
 
-    rv = ((SC_FLOAT_COMPLEX_I <= id) && (id <= SC_LONG_DOUBLE_COMPLEX_I));
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_COMPLEX));
 
     return(rv);}
 
@@ -401,8 +409,16 @@ int SC_is_type_cx(int id)
 
 int SC_is_type_num(int id)
    {int rv;
+    SC_type *t;
 
-    rv = ((SC_BIT_I < id) && (id < SC_POINTER_I));
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) &&
+	  ((t->kind == KIND_BOOL)    ||
+	   (t->kind == KIND_CHAR)    ||
+	   (t->kind == KIND_INT)     ||
+	   (t->kind == KIND_FLOAT)   ||
+	   (t->kind == KIND_COMPLEX) ||
+	   (t->kind == KIND_QUATERNION)));
 
     return(rv);}
 
@@ -620,7 +636,7 @@ void SC_init_base_types(void)
        SC_UNKNOWN_I               = SC_type_register(SC_UNKNOWN_S,             KIND_OTHER,      0,                            0);
 
        SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      0,                            0);
-       SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_OTHER,      sizeof(bool),                 0);
+       SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       sizeof(bool),                 0);
        SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       sizeof(char),                 0);
        SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        sizeof(short),                0);
        SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        sizeof(int),                  0);
@@ -676,7 +692,7 @@ void SC_init_base_types(void)
 /* aliases */
        SC_ENUM_I    = SC_type_alias(SC_ENUM_S, SC_INT_I);
        SC_INTEGER_I = SC_type_alias(SC_INTEGER_S, SC_INT_I);
-       SC_REAL_I    = SC_type_alias(SC_DOUBLE_S, SC_DOUBLE_I);
+       SC_REAL_I    = SC_type_alias(SC_REAL_S, SC_DOUBLE_I);
        SC_REAL_P_I  = SC_type_alias(SC_DOUBLE_P_S, SC_DOUBLE_P_I);
 
        _SC_set_format_defaults();
