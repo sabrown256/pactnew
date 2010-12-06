@@ -42,9 +42,12 @@ static data_alignment *_PD_mk_alignment(char *vals)
 
 /* versions before 25 have 7 alignments for C types */
     if (nc == 7)
-       {align->char_alignment = vals[0];
-	align->ptr_alignment  = vals[1];
+       {align->ptr_alignment  = vals[1];
 	align->bool_alignment = vals[0];
+
+/* character alignments */
+	for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+	    align->chr[i] = vals[0];
 
 /* fixed point alignments */
 	for (i = 0; i < 3; i++)
@@ -64,9 +67,12 @@ static data_alignment *_PD_mk_alignment(char *vals)
 
 /* versions 25 and after have 9 alignments for C99 types */
     else if (nc >= 9)
-       {align->char_alignment = vals[0];
-	align->ptr_alignment  = vals[1];
-	align->bool_alignment = vals[2];
+       {align->ptr_alignment  = vals[0];
+	align->bool_alignment = vals[1];
+
+/* character alignments */
+	for (i = 0; i < 1; i++)
+	    align->chr[i] = vals[i + 2];
 
 /* fixed point alignments */
 	for (i = 0; i < 3; i++)
@@ -1133,17 +1139,17 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     ok &= _PD_put_string(1, "Offset:%d\n", file->default_offset);
 
 /* write the alignment data */
-    pl    = file->align;
-    al[0] = pl->char_alignment;
-    al[1] = pl->ptr_alignment;
-    al[2] = pl->bool_alignment;
-    al[3] = pl->fx[0];
-    al[4] = pl->fx[1];
-    al[5] = pl->fx[2];
-    al[6] = pl->fp[0];
-    al[7] = pl->fp[1];
-    al[8] = pl->fp[2];
-    al[9] = '\0';
+    pl     = file->align;
+    al[0]  = pl->ptr_alignment;
+    al[1]  = pl->bool_alignment;
+    al[2]  = pl->chr[0];
+    al[3]  = pl->fx[0];
+    al[4]  = pl->fx[1];
+    al[5]  = pl->fx[2];
+    al[6]  = pl->fp[0];
+    al[7]  = pl->fp[1];
+    al[8]  = pl->fp[2];
+    al[9]  = '\0';
 
     if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7]*al[8] == 0) 
        return(FALSE);

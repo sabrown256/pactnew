@@ -291,9 +291,9 @@ struct BF_FILE_s
     long length;};
 
 struct s_data_alignment
-   {int char_alignment;
-    int ptr_alignment;
+   {int ptr_alignment;
     int bool_alignment;
+    int chr[N_PRIMITIVE_CHAR];            /* character types */
     int fx[N_PRIMITIVE_FIX];              /* fixed point types */
     int fp[N_PRIMITIVE_FP];               /* floating point types */
     int struct_alignment;};

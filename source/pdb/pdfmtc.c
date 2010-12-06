@@ -142,7 +142,8 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 
 static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 			      int flg, int *ordr, long *formt)
-   {int id, ifx, ifp, icx;
+   {int id, ic, ifx, ifp, icx;
+    PD_text_kind ut;
     data_standard *std;
     data_alignment *align;
 
@@ -150,17 +151,38 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
     align = file->align;
     id    = SC_type_id(type, FALSE);
 
+/* check for character types (proper) */
+    if (SC_is_type_char(id) == TRUE)
+       {ic = id - SC_CHAR_I;
+	if (ic < N_PRIMITIVE_CHAR)
+	   {switch (nb)
+	       {case 1 :
+		     ut = UTF_8;
+		     break;
+		case 2 :
+		     ut = UTF_16;
+		     break;
+		case 4 :
+		     ut = UTF_32;
+		     break;
+		default :
+		     ut = UTF_NONE;
+		     break;};
+	    std->chr[ic].bpi = nb;
+	    std->chr[ic].utf = ut;
+	    align->chr[ic]   = al;};}
+
 /* check for fixed point types (proper) */
-    if ((ifx = SC_fix_type_id(type, TRUE)) != -1)
-       {ifx -= SC_SHORT_I;
+    else if (SC_is_type_fix(id) == TRUE)
+       {ifx = id - SC_SHORT_I;
 	if (ifx < N_PRIMITIVE_FIX)
 	   {std->fx[ifx].bpi   = nb;
 	    std->fx[ifx].order = (PD_byte_order) flg;
 	    align->fx[ifx]     = al;};}
 
 /* check for floating point types (proper) */
-    else if ((ifp = SC_fp_type_id(type)) != -1)
-       {ifp -= SC_FLOAT_I;
+    else if (SC_is_type_fp(id) == TRUE)
+       {ifp = id - SC_FLOAT_I;
 	if (ifp < N_PRIMITIVE_FP)
 	   {std->fp[ifp].bpi    = nb;
 	    std->fp[ifp].order  = ordr;
@@ -168,8 +190,8 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	    align->fp[ifp]      = al;};}
 
 /* check for complex floating point types (proper) */
-    else if ((icx = SC_cx_type_id(type)) != -1)
-       {icx -= SC_FLOAT_COMPLEX_I;
+    else if (SC_is_type_cx(id) == TRUE)
+       {icx = id - SC_FLOAT_COMPLEX_I;
 	if (icx < N_PRIMITIVE_CPX)
 	   {
 /*
@@ -179,9 +201,6 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	    align->fp[icx]      = al;
  */
 	    };}
-
-    else if (id == SC_CHAR_I)
-       align->char_alignment = al;
 
     else if (strcmp(type, "*") == 0)
        {std->ptr_bytes       = nb;
