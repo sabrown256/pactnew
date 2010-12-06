@@ -1033,9 +1033,9 @@ long _PD_ptr_get_index(PDBfile *file, char *bf)
     fs = file->std;
 
     fbpi = fs->ptr_bytes;
-    ford = fs->fx[2].order;
-    hbpi = hs->fx[2].bpi;
-    hord = hs->fx[2].order;
+    ford = fs->fx[PD_LONG_I].order;
+    hbpi = hs->fx[PD_LONG_I].bpi;
+    hord = hs->fx[PD_LONG_I].order;
        
     in  = bf;
     out = (char *) &n;

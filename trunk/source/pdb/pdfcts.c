@@ -48,8 +48,8 @@ static void fcnv(char *out, char *in, long ni,
 	ofmt    = idp->fp.format;
 	oaord   = idp->fp.order;};
 
-    lsord = hstd->fx[2].order;
-    lnby  = hstd->fx[2].bpi;
+    lsord = hstd->fx[PD_LONG_I].order;
+    lnby  = hstd->fx[PD_LONG_I].bpi;
 
     _PD_fconvert(&out, &in, ni, 0, ifmt, iaord, ofmt, oaord,
 		 lsord, lnby, onescmp);
