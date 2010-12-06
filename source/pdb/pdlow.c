@@ -31,6 +31,34 @@ char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_COMPARE_CHAR_STD - compare character type N from
+ *                      - data_standard SA and SB and
+ *                      - data_alignments AA and AB
+ *                      - return TRUE iff conversion is needed
+ *                      - if FTK is TRUE defer decision and return -1
+ */
+
+static int _PD_compare_char_std(int n, data_standard *sa, data_standard *sb,
+				data_alignment *aa, data_alignment *ab,
+				int flag, int ftk)
+   {int eq;
+
+    eq = FALSE;
+#if 0
+    if (flag == TRUE)
+       {if (ftk == FALSE)
+	   eq = -1;
+        else
+	   {eq |= (sa->chr[n].bpi != sb->chr[n].bpi);
+	    eq |= (sa->chr[n].utf != sb->chr[n].utf);
+	    eq |= (aa->chr[n] != ab->chr[n]);};};
+#endif
+
+    return(eq);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_COMPARE_FIX_STD - compare fixed point type N from
  *                     - data_standard SA and SB and
  *                     - data_alignments AA and AB
@@ -741,15 +769,15 @@ void _PD_init_consts(void)
    {
 
     if (PD_DEFSTR_S == NULL)
-       {LAST        = NMAKE(int, "PERM|_PD_INIT_CHART:LAST");
+       {LAST        = NMAKE(int, "PERM|_PD_INIT_CONSTS:LAST");
         *LAST       = 0;
 
         PD_DEFSTR_S = SC_strsaven("defstr *",
-				  "PERM|char*:_PD_INIT_CHRT:defstr");
+				  "PERM|char*:_PD_INIT_CONTST:defstr");
         SYMENT_P_S  = SC_strsaven("syment *",
-				  "PERM|char*:_PD_INIT_CHRT:syment*");
+				  "PERM|char*:_PD_INIT_CONTST:syment*");
         SYMENT_S    = SC_strsaven("syment",
-				  "PERM|char*:_PD_INIT_CHRT:syment");};
+				  "PERM|char*:_PD_INIT_CONTST:syment");};
 
     return;}
 
@@ -782,10 +810,19 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     _PD_setup_chart(fchrt, fstd, hstd, falign, halign, FALSE, ftk);
     _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, TRUE, ftk);
 
+    PD_typedef(file, SC_INT_S,                 SC_ENUM_S);
+
+    PD_typedef(file, SC_INT_S,                 SC_INTEGER_S);
+    PD_typedef(file, "u_int",                  "u_integer");
+    PD_typedef(file, SC_SHORT_S,               SC_INT16_S);
+    PD_typedef(file, SC_INT_S,                 SC_INT32_S);
+    PD_typedef(file, SC_LONG_LONG_S,           SC_INT64_S);
+
     PD_typedef(file, SC_DOUBLE_S,              "REAL");
     PD_typedef(file, SC_FLOAT_S,               SC_FLOAT32_S);
     PD_typedef(file, SC_DOUBLE_S,              SC_FLOAT64_S);
     PD_typedef(file, SC_LONG_DOUBLE_S,         SC_FLOAT128_S);
+
     PD_typedef(file, SC_FLOAT_COMPLEX_S,       SC_COMPLEX32_S);
     PD_typedef(file, SC_DOUBLE_COMPLEX_S,      SC_COMPLEX64_S);
     PD_typedef(file, SC_LONG_DOUBLE_COMPLEX_S, SC_COMPLEX128_S);
@@ -885,32 +922,6 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		       falign->fx[ifx], fstd->fx[ifx].order,
 		       conv, NULL, NULL, TRUE, FALSE, ishc);};
 
-    ifx  = 1;
-    styp = SC_INTEGER_S;
-    snprintf(utyp, MAXLINE, "u_%s", styp);
-
-    conv = _PD_compare_fix_std(ifx, fstd, hstd, falign, halign, flag, ftk);
-    _PD_defstr_in(chart, styp, INT_KIND,
-		  NULL, NULL, fstd->fx[ifx].bpi, 
-		  falign->fx[ifx], fstd->fx[ifx].order,
-		  conv, NULL, NULL, FALSE, FALSE, ishc);
-
-    _PD_defstr_in(chart, utyp, INT_KIND,
-		  NULL, NULL, fstd->fx[ifx].bpi, 
-		  falign->fx[ifx], fstd->fx[ifx].order,
-		  conv, NULL, NULL, TRUE, FALSE, ishc);
-
-#if 0
-    * int8_t: signed 8-bit
-    * uint8_t: unsigned 8-bit
-    * int16_t: signed 16-bit
-    * uint16_t: unsigned 16-bit
-    * int32_t: signed 32-bit
-    * uint32_t: unsigned 32-bit
-    * int64_t: signed 64-bit
-    * uint64_t: unsigned 64-bit
-#endif
-
 /* floating point types (proper) */
     for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
         {styp = SC_type_name(ifp + SC_FLOAT_I);
@@ -946,10 +957,20 @@ void _PD_def_real(char *type, PDBfile *file)
 
     if (strcmp(type, PDBFILE_S) == 0)
        {PD_typedef_primitive_types(file);
+
+	PD_typedef(file, SC_INT_S,                 SC_ENUM_S);
+
+	PD_typedef(file, SC_INT_S,                 SC_INTEGER_S);
+	PD_typedef(file, "u_int",                  "u_integer");
+	PD_typedef(file, SC_SHORT_S,               SC_INT16_S);
+	PD_typedef(file, SC_INT_S,                 SC_INT32_S);
+	PD_typedef(file, SC_LONG_LONG_S,           SC_INT64_S);
+
 	PD_typedef(file, SC_DOUBLE_S,              "REAL");
 	PD_typedef(file, SC_FLOAT_S,               SC_FLOAT32_S);
 	PD_typedef(file, SC_DOUBLE_S,              SC_FLOAT64_S);
 	PD_typedef(file, SC_LONG_DOUBLE_S,         SC_FLOAT128_S);
+
 	PD_typedef(file, SC_FLOAT_COMPLEX_S,       SC_COMPLEX32_S);
 	PD_typedef(file, SC_DOUBLE_COMPLEX_S,      SC_COMPLEX64_S);
 	PD_typedef(file, SC_LONG_DOUBLE_COMPLEX_S, SC_COMPLEX128_S);};

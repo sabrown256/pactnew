@@ -685,12 +685,6 @@ void SC_init_base_types(void)
        SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        sizeof(int),                  0);
        SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        sizeof(long),                 0);
        SC_LONG_LONG_I             = SC_type_register(SC_LONG_LONG_S,           KIND_INT,        sizeof(long long),            0);
-#if 0
-       SC_INT8_I                  = SC_type_register(SC_INT8_S,                KIND_INT,        sizeof(int8_t),               0);
-       SC_INT16_I                 = SC_type_register(SC_INT16_S,               KIND_INT,        sizeof(int16_t),              0);
-       SC_INT32_I                 = SC_type_register(SC_INT32_S,               KIND_INT,        sizeof(int32_t),              0);
-       SC_INT64_I                 = SC_type_register(SC_INT64_S,               KIND_INT,        sizeof(int64_t),              0);
-#endif
        SC_FLOAT_I                 = SC_type_register(SC_FLOAT_S,               KIND_FLOAT,      sizeof(float),                0);
        SC_DOUBLE_I                = SC_type_register(SC_DOUBLE_S,              KIND_FLOAT,      sizeof(double),               0);
        SC_LONG_DOUBLE_I           = SC_type_register(SC_LONG_DOUBLE_S,         KIND_FLOAT,      sizeof(long double),          0);
@@ -709,12 +703,6 @@ void SC_init_base_types(void)
        SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, szptr, 0);
        SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, szptr, 0);
        SC_LONG_LONG_P_I           = SC_type_register(SC_LONG_LONG_P_S,           KIND_POINTER, szptr, 0);
-#if 0
-       SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, szptr, 0);
-       SC_INT16_P_I               = SC_type_register(SC_INT16_P_S,               KIND_POINTER, szptr, 0);
-       SC_INT32_P_I               = SC_type_register(SC_INT32_P_S,               KIND_POINTER, szptr, 0);
-       SC_INT64_P_I               = SC_type_register(SC_INT64_P_S,               KIND_POINTER, szptr, 0);
-#endif
        SC_FLOAT_P_I               = SC_type_register(SC_FLOAT_P_S,               KIND_POINTER, szptr, 0);
        SC_DOUBLE_P_I              = SC_type_register(SC_DOUBLE_P_S,              KIND_POINTER, szptr, 0);
        SC_LONG_DOUBLE_P_I         = SC_type_register(SC_LONG_DOUBLE_P_S,         KIND_POINTER, szptr, 0);
@@ -733,18 +721,34 @@ void SC_init_base_types(void)
        SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, szptr,           0);
 
 /* aliases */
-       SC_ENUM_I       = SC_type_alias(SC_ENUM_S,    SC_INT_I);
-       SC_INTEGER_I    = SC_type_alias(SC_INTEGER_S, SC_INT_I);
-       SC_REAL_I       = SC_type_alias(SC_REAL_S,    SC_DOUBLE_I);
-       SC_REAL_P_I     = SC_type_alias(SC_REAL_P_S,  SC_DOUBLE_P_I);
+       SC_ENUM_I         = SC_type_alias(SC_ENUM_S,    SC_INT_I);
 
-       SC_FLOAT32_I    = SC_type_alias(SC_FLOAT32_S,  SC_FLOAT_I);
-       SC_FLOAT64_I    = SC_type_alias(SC_FLOAT64_S,  SC_DOUBLE_I);
-       SC_FLOAT128_I   = SC_type_alias(SC_FLOAT128_S, SC_LONG_DOUBLE_I);
+       SC_INTEGER_I      = SC_type_alias(SC_INTEGER_S, SC_INT_I);
+       SC_INT16_I        = SC_type_alias(SC_INT16_S,   SC_SHORT_I);
+       SC_INT32_I        = SC_type_alias(SC_INT32_S,   SC_INT_I);
+       SC_INT64_I        = SC_type_alias(SC_INT64_S,   SC_LONG_LONG_I);
 
-       SC_COMPLEX32_I  = SC_type_alias(SC_COMPLEX32_S,  SC_FLOAT_COMPLEX_I);
-       SC_COMPLEX64_I  = SC_type_alias(SC_COMPLEX64_S,  SC_DOUBLE_COMPLEX_I);
-       SC_COMPLEX128_I = SC_type_alias(SC_COMPLEX128_S, SC_LONG_DOUBLE_COMPLEX_I);
+       SC_REAL_I         = SC_type_alias(SC_REAL_S,    SC_DOUBLE_I);
+       SC_FLOAT32_I      = SC_type_alias(SC_FLOAT32_S,  SC_FLOAT_I);
+       SC_FLOAT64_I      = SC_type_alias(SC_FLOAT64_S,  SC_DOUBLE_I);
+       SC_FLOAT128_I     = SC_type_alias(SC_FLOAT128_S, SC_LONG_DOUBLE_I);
+
+       SC_COMPLEX32_I    = SC_type_alias(SC_COMPLEX32_S,  SC_FLOAT_COMPLEX_I);
+       SC_COMPLEX64_I    = SC_type_alias(SC_COMPLEX64_S,  SC_DOUBLE_COMPLEX_I);
+       SC_COMPLEX128_I   = SC_type_alias(SC_COMPLEX128_S, SC_LONG_DOUBLE_COMPLEX_I);
+
+       SC_INT16_P_I      = SC_type_alias(SC_INT16_P_S,   SC_SHORT_P_I);
+       SC_INT32_P_I      = SC_type_alias(SC_INT32_P_S,   SC_INT_P_I);
+       SC_INT64_P_I      = SC_type_alias(SC_INT64_P_S,   SC_LONG_LONG_P_I);
+
+       SC_REAL_P_I       = SC_type_alias(SC_REAL_P_S,  SC_DOUBLE_P_I);
+       SC_FLOAT32_P_I    = SC_type_alias(SC_FLOAT32_P_S,  SC_FLOAT_P_I);
+       SC_FLOAT64_P_I    = SC_type_alias(SC_FLOAT64_P_S,  SC_DOUBLE_P_I);
+       SC_FLOAT128_P_I   = SC_type_alias(SC_FLOAT128_P_S, SC_LONG_DOUBLE_P_I);
+
+       SC_COMPLEX32_P_I  = SC_type_alias(SC_COMPLEX32_P_S,  SC_FLOAT_COMPLEX_P_I);
+       SC_COMPLEX64_P_I  = SC_type_alias(SC_COMPLEX64_P_S,  SC_DOUBLE_COMPLEX_P_I);
+       SC_COMPLEX128_P_I = SC_type_alias(SC_COMPLEX128_P_S, SC_LONG_DOUBLE_COMPLEX_P_I);
 
        _SC_set_format_defaults();
 

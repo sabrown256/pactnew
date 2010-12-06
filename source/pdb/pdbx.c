@@ -401,6 +401,11 @@ int PD_def_pdb_types(PDBfile *file)
        {PD_error("COULDN'T DEFINE SYMENT - PD_DEF_PDB_TYPES", PD_GENERIC);
         return(FALSE);};
 
+    dp = PD_DEFINE_CHARDES(file);
+    if (dp == NULL)
+       {PD_error("COULDN'T DEFINE CHARDES - PD_DEF_PDB_TYPES", PD_GENERIC);
+        return(FALSE);};
+
     dp = PD_DEFINE_FIXDES(file);
     if (dp == NULL)
        {PD_error("COULDN'T DEFINE FIXDES - PD_DEF_PDB_TYPES", PD_GENERIC);
