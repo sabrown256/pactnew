@@ -117,7 +117,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{7,  TEXT_ORDER},                /* size and order of short */
+                {{4,  TEXT_ORDER},               /* size and order of int8_t */
+                 {7,  TEXT_ORDER},                /* size and order of short */
                  {12, TEXT_ORDER},                  /* size and order of int */
                  {22, TEXT_ORDER},                 /* size and order of long */
                  {22, TEXT_ORDER}},           /* size and order of long long */
@@ -129,7 +130,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, REVERSE_ORDER},              /* size and order of short */
+                {{1, REVERSE_ORDER},             /* size and order of int8_t */
+                 {2, REVERSE_ORDER},              /* size and order of short */
                  {2, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
                  {4, REVERSE_ORDER}},         /* size and order of long long */
@@ -141,7 +143,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, REVERSE_ORDER},              /* size and order of short */
+                {{1, REVERSE_ORDER},             /* size and order of int8_t */
+                 {2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
                  {8, REVERSE_ORDER}},         /* size and order of long long */
@@ -153,7 +156,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, REVERSE_ORDER},              /* size and order of short */
+                {{1, REVERSE_ORDER},             /* size and order of int8_t */
+                 {2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
                  {8, REVERSE_ORDER}},         /* size and order of long long */
@@ -165,7 +169,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, NORMAL_ORDER},               /* size and order of short */
+                {{1, NORMAL_ORDER},              /* size and order of int8_t */
+                 {2, NORMAL_ORDER},               /* size and order of short */
                  {4, NORMAL_ORDER},                 /* size and order of int */
                  {4, NORMAL_ORDER},                /* size and order of long */
                  {8, NORMAL_ORDER}},          /* size and order of long long */
@@ -177,7 +182,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, REVERSE_ORDER},              /* size and order of short */
+                {{1, REVERSE_ORDER},             /* size and order of int8_t */
+                 {2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {8, REVERSE_ORDER},               /* size and order of long */
                  {8, REVERSE_ORDER}},         /* size and order of long long */
@@ -189,7 +195,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, REVERSE_ORDER},              /* size and order of short */
+                {{1, REVERSE_ORDER},             /* size and order of int8_t */
+                 {2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {8, REVERSE_ORDER},               /* size and order of long */
                  {8, REVERSE_ORDER}},         /* size and order of long long */
@@ -201,7 +208,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {4, UTF_32}},                                 /* wchar info */
-                {{2, NORMAL_ORDER},               /* size and order of short */
+                {{1, NORMAL_ORDER},              /* size and order of int8_t */
+                 {2, NORMAL_ORDER},               /* size and order of short */
                  {4, NORMAL_ORDER},                 /* size and order of int */
                  {8, NORMAL_ORDER},                /* size and order of long */
                  {8, NORMAL_ORDER}},          /* size and order of long long */
@@ -216,7 +224,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {2, UTF_16}},                                 /* wchar info */
-                {{2, NORMAL_ORDER},               /* size and order of short */
+                {{1, NORMAL_ORDER},              /* size and order of int8_t */
+                 {2, NORMAL_ORDER},               /* size and order of short */
                  {2, NORMAL_ORDER},                 /* size and order of int */
                  {4, NORMAL_ORDER},                /* size and order of long */
                  {4, NORMAL_ORDER}},          /* size and order of long long */
@@ -228,7 +237,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {2, UTF_16}},                                 /* wchar info */
-                {{2, REVERSE_ORDER},              /* size and order of short */
+                {{1, REVERSE_ORDER},             /* size and order of int8_t */
+                 {2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
                  {4, REVERSE_ORDER}},         /* size and order of long long */
@@ -240,7 +250,8 @@ data_standard
                 1,                                           /* size of bool */
                 {{1, UTF_8},                                    /* char info */
 		 {2, UTF_16}},                                 /* wchar info */
-		{{8, NORMAL_ORDER},               /* size and order of short */
+                {{8, NORMAL_ORDER},              /* size and order of int8_t */
+		 {8, NORMAL_ORDER},               /* size and order of short */
                  {8, NORMAL_ORDER},                 /* size and order of int */
                  {8, NORMAL_ORDER},                /* size and order of long */
                  {8, NORMAL_ORDER}},          /* size and order of long long */
@@ -257,21 +268,21 @@ data_standard
 /* Word Alignment for the different architectures */
 
 data_alignment
- TEXT_ALIGNMENT        = {0, 0, {0, 0}, {0, 0, 0, 0}, {0, 0,  0}, 0},
- BYTE_ALIGNMENT        = {1, 1, {1, 1}, {1, 1, 1, 1}, {1, 1,  1}, 0},
- WORD2_ALIGNMENT       = {2, 1, {1, 2}, {2, 2, 2, 2}, {2, 2,  2}, 0},
- WORD4_ALIGNMENT       = {4, 1, {1, 4}, {4, 4, 4, 4}, {4, 4,  4}, 0},
- WORD8_ALIGNMENT       = {8, 1, {4, 8}, {8, 8, 8, 8}, {8, 8,  8}, 8},
- GNU4_I686_ALIGNMENT   = {4, 1, {1, 4}, {2, 4, 4, 4}, {4, 4,  4}, 0},
- OSX_10_5_ALIGNMENT    = {4, 1, {1, 4}, {2, 4, 4, 4}, {4, 4, 16}, 0},
- SPARC_ALIGNMENT       = {4, 1, {1, 4}, {2, 4, 4, 4}, {4, 8,  8}, 0},
- XLC32_PPC64_ALIGNMENT = {4, 1, {1, 4}, {2, 4, 4, 8}, {4, 4,  4}, 0},
- CYGWIN_I686_ALIGNMENT = {4, 1, {1, 4}, {2, 4, 4, 8}, {4, 8,  4}, 0},
- GNU3_PPC64_ALIGNMENT  = {4, 1, {1, 4}, {2, 4, 4, 8}, {4, 8,  8}, 0},
- GNU4_PPC64_ALIGNMENT  = {4, 1, {1, 4}, {2, 4, 4, 8}, {4, 8, 16}, 0},
- XLC64_PPC64_ALIGNMENT = {8, 1, {1, 4}, {2, 4, 8, 8}, {4, 4,  4}, 0},
- PGI_X86_64_ALIGNMENT  = {8, 1, {1, 4}, {2, 4, 8, 8}, {4, 8,  8}, 0},
- GNU4_X86_64_ALIGNMENT = {8, 1, {1, 4}, {2, 4, 8, 8}, {4, 8, 16}, 0};
+ TEXT_ALIGNMENT        = {0, 0, {0, 0}, {0, 0, 0, 0, 0}, {0, 0,  0}, 0},
+ BYTE_ALIGNMENT        = {1, 1, {1, 1}, {1, 1, 1, 1, 1}, {1, 1,  1}, 0},
+ WORD2_ALIGNMENT       = {2, 1, {1, 2}, {1, 2, 2, 2, 2}, {2, 2,  2}, 0},
+ WORD4_ALIGNMENT       = {4, 1, {1, 4}, {1, 4, 4, 4, 4}, {4, 4,  4}, 0},
+ WORD8_ALIGNMENT       = {8, 1, {4, 8}, {4, 8, 8, 8, 8}, {8, 8,  8}, 8},
+ GNU4_I686_ALIGNMENT   = {4, 1, {1, 4}, {1, 2, 4, 4, 4}, {4, 4,  4}, 0},
+ OSX_10_5_ALIGNMENT    = {4, 1, {1, 4}, {1, 2, 4, 4, 4}, {4, 4, 16}, 0},
+ SPARC_ALIGNMENT       = {4, 1, {1, 4}, {1, 2, 4, 4, 4}, {4, 8,  8}, 0},
+ XLC32_PPC64_ALIGNMENT = {4, 1, {1, 4}, {1, 2, 4, 4, 8}, {4, 4,  4}, 0},
+ CYGWIN_I686_ALIGNMENT = {4, 1, {1, 4}, {1, 2, 4, 4, 8}, {4, 8,  4}, 0},
+ GNU3_PPC64_ALIGNMENT  = {4, 1, {1, 4}, {1, 2, 4, 4, 8}, {4, 8,  8}, 0},
+ GNU4_PPC64_ALIGNMENT  = {4, 1, {1, 4}, {1, 2, 4, 4, 8}, {4, 8, 16}, 0},
+ XLC64_PPC64_ALIGNMENT = {8, 1, {1, 4}, {1, 2, 4, 8, 8}, {4, 4,  4}, 0},
+ PGI_X86_64_ALIGNMENT  = {8, 1, {1, 4}, {1, 2, 4, 8, 8}, {4, 8,  8}, 0},
+ GNU4_X86_64_ALIGNMENT = {8, 1, {1, 4}, {1, 2, 4, 8, 8}, {4, 8, 16}, 0};
 
 /*--------------------------------------------------------------------------*/
 

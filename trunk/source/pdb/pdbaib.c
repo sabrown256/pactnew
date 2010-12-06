@@ -392,7 +392,7 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
     ifp = -1;
 
     if (SC_is_type_fix(ityp) == TRUE)
-       ifx = ityp - SC_SHORT_I;
+       ifx = ityp - SC_INT8_I;
 
     else if (SC_is_type_fp(ityp) == TRUE)
        ifp = ityp - SC_FLOAT_I;

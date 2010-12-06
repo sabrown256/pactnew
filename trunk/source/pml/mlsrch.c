@@ -152,6 +152,9 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
        {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
 
 /* fixed point types (ok) */
+    else if (type == SC_INT8_I)
+       {MIN_MAX(int8_t, p, n, pn, px, imin, imax, INT8_MAX);}
+
     else if (type == SC_SHORT_I)
        {MIN_MAX(short, p, n, pn, px, imin, imax, SHRT_MAX);}
 
@@ -266,6 +269,9 @@ int PM_find_index(void *p, double f, int n)
        {FIND_INDEX(char, p, f, n, indx);}
 
 /* fixed point types (ok) */
+    else if (type == SC_INT8_I)
+       {FIND_INDEX(int8_t, p, f, n, indx);}
+
     else if (type == SC_SHORT_I)
        {FIND_INDEX(short, p, f, n, indx);}
 
@@ -549,6 +555,9 @@ int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
        {FIND_VALUE(char, nx, x, prd, val, nout, out, nin, in);}
 
 /* fixed point types (ok) */
+    else if (id == SC_INT8_I)
+       {FIND_VALUE(int8_t, nx, x, prd, val, nout, out, nin, in);}
+
     else if (id == SC_SHORT_I)
        {FIND_VALUE(short, nx, x, prd, val, nout, out, nin, in);}
 

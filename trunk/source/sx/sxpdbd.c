@@ -575,6 +575,12 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
         DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
 
 /* fixed point types (ok) */
+    else if (id == SC_INT8_I)
+       {int8_t *va, *vb;
+	va = (int8_t *) bfa;
+        vb = (int8_t *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+
     else if (id == SC_SHORT_I)
        {short *va, *vb;
 	va = (short *) bfa;

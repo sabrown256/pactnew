@@ -14,6 +14,35 @@
 #include "score_int.h"
 #include <sctypeg.h>
 
+/* to add a new primitive type you need to check at least the
+ * following places:
+ *   in score/sctyp.c check:
+ *      add the type definition and register it
+ *          for example:  SC_INT8_I, SC_INT8_P_I, SC_INT8_S, SC_INT8_P_S
+ *   in score/scope_typeh.h check:
+ *      add the type declaration
+ *          for example:  SC_INT8_I, SC_INT8_P_I, SC_INT8_S, SC_INT8_P_S
+ *      check the N_PRIMITIVE_ and N_TYPE count macros
+ *   in score/convert.c check:
+ *      variables: names, types, mn, and mx
+ *      add any special conversion coding
+ *      add any special printing coding
+ *   in score/varg.c check:
+ *      variables: types and promo
+ *      add any special va_arg coding
+ *   in pdb/detect.c check:
+ *      add the type definition
+ *      add any coding to compute the types characterization
+ *   in pdb/pdconv.c check:
+ *      add the type to the initializers for data_standard and data_alignment
+ *      add any special conversion coding
+ *   in pdb/pdlow.c check:
+ *      verify the registration of the PDB representation of the type
+ *   elsewhere check:
+ *      look for changes to the minimum type of a family
+ *         for example:  id - SC_SHORT_I  ->  id - SC_INT8_I
+ */
+
 /* these must have the same sequence/values as the dynamic values
  * assigned in SC_init_base_types
  * changes here MUST be reflected there
@@ -26,72 +55,72 @@ int
  SC_BOOL_I                  = 2,
  SC_CHAR_I                  = 3,
  SC_WCHAR_I                 = 4,
- SC_INT8_I                  = -1,
- SC_SHORT_I                 = 5,
- SC_INT_I                   = 6,
- SC_LONG_I                  = 7,
- SC_LONG_LONG_I             = 8,
- SC_FLOAT_I                 = 9,
- SC_DOUBLE_I                = 10,
- SC_LONG_DOUBLE_I           = 11,
- SC_FLOAT_COMPLEX_I         = 12,
- SC_DOUBLE_COMPLEX_I        = 13,
- SC_LONG_DOUBLE_COMPLEX_I   = 14,
- SC_QUATERNION_I            = 15,
+ SC_INT8_I                  = 5,
+ SC_SHORT_I                 = 6,
+ SC_INT_I                   = 7,
+ SC_LONG_I                  = 8,
+ SC_LONG_LONG_I             = 9,
+ SC_FLOAT_I                 = 10,
+ SC_DOUBLE_I                = 11,
+ SC_LONG_DOUBLE_I           = 12,
+ SC_FLOAT_COMPLEX_I         = 13,
+ SC_DOUBLE_COMPLEX_I        = 14,
+ SC_LONG_DOUBLE_COMPLEX_I   = 15,
+ SC_QUATERNION_I            = 16,
 
- SC_INT16_I                 = 5, 
- SC_INT32_I                 = 6,
- SC_INT64_I                 = 8,
- SC_FLOAT32_I               = 9,
- SC_FLOAT64_I               = 10,
- SC_FLOAT128_I              = 11,
- SC_COMPLEX32_I             = 12,
- SC_COMPLEX64_I             = 13,
- SC_COMPLEX128_I            = 14,
+ SC_INT16_I                 = 6, 
+ SC_INT32_I                 = 7,
+ SC_INT64_I                 = 9,
+ SC_FLOAT32_I               = 10,
+ SC_FLOAT64_I               = 11,
+ SC_FLOAT128_I              = 12,
+ SC_COMPLEX32_I             = 13,
+ SC_COMPLEX64_I             = 14,
+ SC_COMPLEX128_I            = 15,
 
 /* these must shadow SC_BIT_I thru SC_QUATERNION_I
  * so that SC_xxx_P_I = SC_xxx_I - SC_BIT_I + SC_POINTER_I
  */
- SC_POINTER_I               = 15,
- SC_BOOL_P_I                = 16,
- SC_STRING_I                = 17,
- SC_WCHAR_P_I               = 18,
- SC_INT8_P_I                = -1,
- SC_SHORT_P_I               = 19,
- SC_INT_P_I                 = 20,
- SC_LONG_P_I                = 21,
- SC_LONG_LONG_P_I           = 22,
- SC_FLOAT_P_I               = 23,
- SC_DOUBLE_P_I              = 24,
- SC_LONG_DOUBLE_P_I         = 25,
- SC_FLOAT_COMPLEX_P_I       = 26,
- SC_DOUBLE_COMPLEX_P_I      = 27,
- SC_LONG_DOUBLE_COMPLEX_P_I = 28,
- SC_QUATERNION_P_I          = 29,
+ SC_POINTER_I               = 17,
+ SC_BOOL_P_I                = 18,
+ SC_STRING_I                = 19,
+ SC_WCHAR_P_I               = 20,
+ SC_INT8_P_I                = 21,
+ SC_SHORT_P_I               = 22,
+ SC_INT_P_I                 = 23,
+ SC_LONG_P_I                = 24,
+ SC_LONG_LONG_P_I           = 25,
+ SC_FLOAT_P_I               = 26,
+ SC_DOUBLE_P_I              = 27,
+ SC_LONG_DOUBLE_P_I         = 28,
+ SC_FLOAT_COMPLEX_P_I       = 29,
+ SC_DOUBLE_COMPLEX_P_I      = 30,
+ SC_LONG_DOUBLE_COMPLEX_P_I = 31,
+ SC_QUATERNION_P_I          = 32,
 
- SC_INT16_P_I               = 19, 
- SC_INT32_P_I               = 20,
- SC_INT64_P_I               = 22,
- SC_FLOAT32_P_I             = 23,
- SC_FLOAT64_P_I             = 24,
- SC_FLOAT128_P_I            = 25,
- SC_COMPLEX32_P_I           = 26,
- SC_COMPLEX64_P_I           = 27,
- SC_COMPLEX128_P_I          = 28,
+ SC_INT16_P_I               = 22, 
+ SC_INT32_P_I               = 23,
+ SC_INT64_P_I               = 25,
+ SC_FLOAT32_P_I             = 26,
+ SC_FLOAT64_P_I             = 27,
+ SC_FLOAT128_P_I            = 28,
+ SC_COMPLEX32_P_I           = 29,
+ SC_COMPLEX64_P_I           = 30,
+ SC_COMPLEX128_P_I          = 31,
 
- SC_VOID_I                  = 30,
- SC_CHAR_8_I                = 31,
- SC_STRUCT_I                = 32,
- SC_PCONS_I                 = 33,
- SC_PROCESS_I               = 34,
- SC_FILE_I                  = 35,
- SC_PCONS_P_I               = 36,
+ SC_VOID_I                  = 33,
+ SC_CHAR_8_I                = 34,
+ SC_STRUCT_I                = 35,
+ SC_PCONS_I                 = 36,
+ SC_PROCESS_I               = 37,
+ SC_FILE_I                  = 38,
+ SC_PCONS_P_I               = 39,
 
 /* aliases */
- SC_ENUM_I                  = 6,
- SC_INTEGER_I               = 6,
- SC_REAL_I                  = 10,
- SC_REAL_P_I                = 24;
+ SC_ENUM_I                  = 7,
+ SC_INTEGER_I               = 7,
+ SC_REAL_I                  = 11,
+ SC_REAL_P_I                = 27;
 
 char
  *SC_UNKNOWN_S               = "unknown",
@@ -686,6 +715,7 @@ void SC_init_base_types(void)
        SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       sizeof(bool),                 0);
        SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       sizeof(char),                 0);
        SC_WCHAR_I                 = SC_type_register(SC_WCHAR_S,               KIND_CHAR,       sizeof(wchar_t),              0);
+       SC_INT8_I                  = SC_type_register(SC_INT8_S,                KIND_INT,        sizeof(int8_t),               0);
        SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        sizeof(short),                0);
        SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        sizeof(int),                  0);
        SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        sizeof(long),                 0);
@@ -705,6 +735,7 @@ void SC_init_base_types(void)
        SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, szptr, 0);
        SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, szptr, 0);
        SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, szptr, 0);
+       SC_INT8_P_I                = SC_type_register(SC_INT8_P_S,                KIND_POINTER, szptr, 0);
        SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, szptr, 0);
        SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, szptr, 0);
        SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, szptr, 0);
@@ -806,7 +837,7 @@ int SC_type_container_size(SC_kind kind, int nb)
 
         case KIND_INT :
              for (i = 0; i < N_PRIMITIVE_FIX; i++)
-		 {id = i + SC_SHORT_I;
+		 {id = i + SC_INT8_I;
 		  hp = *(haelem **) SC_hasharr_get(ha, id);
 		  if (hp != NULL)
 		     {t = (SC_type *) hp->def;
@@ -888,7 +919,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 
         case KIND_INT :
              for (i = 0; i < N_PRIMITIVE_FIX; i++)
-		 {id = i + SC_SHORT_I;
+		 {id = i + SC_INT8_I;
 		  hp = *(haelem **) SC_hasharr_get(ha, id);
 		  if (hp != NULL)
 		     {t = (SC_type *) hp->def;
@@ -1156,7 +1187,7 @@ void _SC_set_format_defaults(void)
 
 /* fixed point types (proper) */
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
-        {id = i + SC_SHORT_I;
+        {id = i + SC_INT8_I;
 	 if (fmts[id] != NULL)
 	    SFREE(fmts[id]);
 

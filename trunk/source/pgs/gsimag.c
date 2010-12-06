@@ -70,20 +70,11 @@ static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
 	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
 			   unsigned char, 0, 255);}
 
-/* floating point types */
-	else if (id == SC_FLOAT_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   float, -FLT_MAX, FLT_MAX);}
-
-	else if (id == SC_DOUBLE_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   double, -DBL_MAX, DBL_MAX);}
-
-	else if (id == SC_LONG_DOUBLE_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   long double, -LDBL_MAX, LDBL_MAX);}
-
 /* fixed point types */
+	else if (id == SC_INT8_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   int8_t, INT8_MIN, INT8_MAX);}
+
 	else if (id == SC_SHORT_I)
 	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
 			   short, SHRT_MIN, SHRT_MAX);}
@@ -98,7 +89,20 @@ static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
 
 	else if (id == SC_LONG_LONG_I)
 	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   long long, LONG_MIN, LONG_MAX);};};
+			   long long, LONG_MIN, LONG_MAX);}
+
+/* floating point types */
+	else if (id == SC_FLOAT_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   float, -FLT_MAX, FLT_MAX);}
+
+	else if (id == SC_DOUBLE_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   double, -DBL_MAX, DBL_MAX);}
+
+	else if (id == SC_LONG_DOUBLE_I)
+	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
+			   long double, -LDBL_MAX, LDBL_MAX);};};
 
     return;}
 

@@ -32,12 +32,12 @@ typedef long double float128_t;
 /*--------------------------------------------------------------------------*/
 
 #define N_PRIMITIVE_CHAR  2
-#define N_PRIMITIVE_FIX   4
+#define N_PRIMITIVE_FIX   5
 #define N_PRIMITIVE_FP    3
 #define N_PRIMITIVE_CPX   3
 #define N_PRIMITIVE_QUT   1
-#define N_PRIMITIVES     17   /* up through SC_POINTER_I */
-#define N_TYPES          19   /* up through SC_STRING_I */
+#define N_PRIMITIVES     18   /* up through SC_POINTER_I */
+#define N_TYPES          20   /* up through SC_STRING_I */
 
 /*--------------------------------------------------------------------------*/
 
@@ -185,7 +185,7 @@ struct s_SC_type_manager
      {0, 0, 0, 0},                                                            \
      {{0, 0.0}, {0, 0.0}, {0, 0.0}},                                          \
      { "char", "wchar" },                                                     \
-     { "short", "integer", "long", "long_long" },                             \
+     { "int8_t", "short", "integer", "long", "long_long" },                   \
      { "float", "double", "long_double" },                                    \
      { "float_complex", "double_complex", "long_double_complex" },            \
      { "quaternion" },                                                        \

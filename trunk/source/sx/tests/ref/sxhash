@@ -307,13 +307,13 @@
 
 /chart
 |__ docp =      0
-|__ ne =       61
+|__ ne =       63
 |__ hash = <function>
 |__ comp = <function>
 |__ key_type = "by-name"
 |__ table(0)
 |   |__ iht =        0
-|   |__ iar =       16
+|   |__ iar =       18
 |   |__ name = "long_double"
 |   |__ type = "defstr *"
 

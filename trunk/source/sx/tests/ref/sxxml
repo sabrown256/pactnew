@@ -1,6 +1,6 @@
 ------------------------------
 Test #0
-Types: (* REAL bool char complex128_t complex32_t complex64_t double double_complex enum float float128_t float32_t float64_t float_complex function int int16_t int32_t int64_t integer long long_double long_double_complex long_long short u_char u_int u_integer u_long u_long_long u_short u_wchar wchar)
+Types: (* REAL bool char complex128_t complex32_t complex64_t double double_complex enum float float128_t float32_t float64_t float_complex function int int16_t int32_t int64_t int8_t integer long long_double long_double_complex long_long short u_char u_int u_int8_t u_integer u_long u_long_long u_short u_wchar wchar)
 Vars: (tst/ tst/doc-1/ tst/doc-1/cn-1/ tst/doc-1/cn-1/ed-1/ tst/doc-1/cn-1/ed-1/d-1/ tst/doc-1/cn-1/ed-1/d-1/dn-1 tst/doc-1/cn-1/ed-1/d-1/dn-2 tst/doc-1/cn-1/ed-1/d-1/dn-3 tst/doc-1/cn-1/ed-1/d-1/dn-4 tst/doc-1/cn-1/ed-1/d-1/val-1 tst/doc-1/cn-1/ed-1/d-1/val-2 tst/doc-1/cn-1/ed-1/d-1/val-3 tst/doc-1/cn-1/ed-1/d-1/val-4 tst/doc-1/cn-1/gr-1/ tst/doc-1/cn-1/gr-1/pg-1/ tst/doc-1/cn-1/gr-1/pg-1/x-1 tst/doc-1/cn-1/gr-1/pg-1/x-2 tst/doc-1/cn-1/gr-1/pt-1/ tst/doc-1/cn-1/gr-1/pt-1/x-1 tst/doc-1/cn-1/gr-1/pt-1/x-2 tst/doc-1/cn-1/su-1 tst/doc-1/cn-1/su-2 tst/doc-1/desc-1 tst/doc-1/name-1 tst/doc-1/sm-1/ tst/doc-1/sm-1/pr-1/ tst/doc-1/sm-1/pr-1/key-1 tst/doc-1/sm-1/pr-1/key-2 tst/doc-1/sm-1/pr-1/su-1 tst/doc-1/sm-1/pr-1/su-2 tst/doc-1/st-1/ tst/doc-1/st-1/bs-1/ tst/doc-1/st-1/bs-1/bg-1 tst/doc-1/st-1/bs-1/bg-2 tst/doc-1/st-1/is-1/ tst/doc-1/st-1/is-1/ic-1/ tst/doc-1/st-1/is-1/ic-1/href-1 tst/doc-1/st-1/is-1/ic-1/href-2 tst/doc-1/st-1/is-1/sc-1 tst/doc-1/st-1/is-1/sc-2 tst/doc-1/st-1/lns-1/ tst/doc-1/st-1/lns-1/fg-1 tst/doc-1/st-1/lns-1/fg-2 tst/doc-1/st-1/lns-1/w-1 tst/doc-1/st-1/lns-1/w-2 tst/doc-1/ts-1)
 Doubles: (tst/doc-1/cn-1/gr-1/pg-1/x-1 tst/doc-1/cn-1/gr-1/pg-1/x-2 tst/doc-1/cn-1/gr-1/pt-1/x-1 tst/doc-1/cn-1/gr-1/pt-1/x-2)
 /tst/doc-1/ts-1 = "2001-01-01 12:00:00"
@@ -19,13 +19,13 @@ Test #0 complete
 
 ------------------------------
 Test #1
-Types: (* REAL bool char complex128_t complex32_t complex64_t double double_complex enum float float128_t float32_t float64_t float_complex function int int16_t int32_t int64_t integer long long_double long_double_complex long_long short u_char u_int u_integer u_long u_long_long u_short u_wchar wchar)
+Types: (* REAL bool char complex128_t complex32_t complex64_t double double_complex enum float float128_t float32_t float64_t float_complex function int int16_t int32_t int64_t int8_t integer long long_double long_double_complex long_long short u_char u_int u_int8_t u_integer u_long u_long_long u_short u_wchar wchar)
 Vars: (!--/)
 Test #1 complete
 
 ------------------------------
 Test #2
-Types: (* REAL bool char complex128_t complex32_t complex64_t double double_complex enum float float128_t float32_t float64_t float_complex function int int16_t int32_t int64_t integer long long_double long_double_complex long_long short u_char u_int u_integer u_long u_long_long u_short u_wchar wchar)
+Types: (* REAL bool char complex128_t complex32_t complex64_t double double_complex enum float float128_t float32_t float64_t float_complex function int int16_t int32_t int64_t int8_t integer long long_double long_double_complex long_long short u_char u_int u_int8_t u_integer u_long u_long_long u_short u_wchar wchar)
 Vars: (!DOCTYPE/)
 Test #2 complete
 
