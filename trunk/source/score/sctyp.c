@@ -25,29 +25,29 @@ int
  SC_BIT_I                   = 1,
  SC_BOOL_I                  = 2,
  SC_CHAR_I                  = 3,
- SC_WCHAR_I                 = -1,
+ SC_WCHAR_I                 = 4,
  SC_INT8_I                  = -1,
- SC_SHORT_I                 = 4,
- SC_INT_I                   = 5,
- SC_LONG_I                  = 6,
- SC_LONG_LONG_I             = 7,
- SC_DOUBLE_I                = 9,
- SC_LONG_DOUBLE_I           = 10,
- SC_FLOAT_COMPLEX_I         = 11,
- SC_DOUBLE_COMPLEX_I        = 12,
- SC_LONG_DOUBLE_COMPLEX_I   = 13,
- SC_QUATERNION_I            = 14,
+ SC_SHORT_I                 = 5,
+ SC_INT_I                   = 6,
+ SC_LONG_I                  = 7,
+ SC_LONG_LONG_I             = 8,
+ SC_FLOAT_I                 = 9,
+ SC_DOUBLE_I                = 10,
+ SC_LONG_DOUBLE_I           = 11,
+ SC_FLOAT_COMPLEX_I         = 12,
+ SC_DOUBLE_COMPLEX_I        = 13,
+ SC_LONG_DOUBLE_COMPLEX_I   = 14,
+ SC_QUATERNION_I            = 15,
 
- SC_INT16_I                 = 4, 
- SC_INT32_I                 = 5,
- SC_INT64_I                 = 7,
- SC_FLOAT_I                 = 8,
- SC_FLOAT32_I               = 8,
- SC_FLOAT64_I               = 9,
- SC_FLOAT128_I              = 10,
- SC_COMPLEX32_I             = 11,
- SC_COMPLEX64_I             = 12,
- SC_COMPLEX128_I            = 13,
+ SC_INT16_I                 = 5, 
+ SC_INT32_I                 = 6,
+ SC_INT64_I                 = 8,
+ SC_FLOAT32_I               = 9,
+ SC_FLOAT64_I               = 10,
+ SC_FLOAT128_I              = 11,
+ SC_COMPLEX32_I             = 12,
+ SC_COMPLEX64_I             = 13,
+ SC_COMPLEX128_I            = 14,
 
 /* these must shadow SC_BIT_I thru SC_QUATERNION_I
  * so that SC_xxx_P_I = SC_xxx_I - SC_BIT_I + SC_POINTER_I
@@ -55,43 +55,43 @@ int
  SC_POINTER_I               = 15,
  SC_BOOL_P_I                = 16,
  SC_STRING_I                = 17,
- SC_WCHAR_P_I               = -1,
+ SC_WCHAR_P_I               = 18,
  SC_INT8_P_I                = -1,
- SC_SHORT_P_I               = 18,
- SC_INT_P_I                 = 19,
- SC_LONG_P_I                = 20,
- SC_LONG_LONG_P_I           = 21,
- SC_FLOAT_P_I               = 22,
- SC_DOUBLE_P_I              = 23,
- SC_LONG_DOUBLE_P_I         = 24,
- SC_FLOAT_COMPLEX_P_I       = 25,
- SC_DOUBLE_COMPLEX_P_I      = 26,
- SC_LONG_DOUBLE_COMPLEX_P_I = 27,
- SC_QUATERNION_P_I          = 28,
+ SC_SHORT_P_I               = 19,
+ SC_INT_P_I                 = 20,
+ SC_LONG_P_I                = 21,
+ SC_LONG_LONG_P_I           = 22,
+ SC_FLOAT_P_I               = 23,
+ SC_DOUBLE_P_I              = 24,
+ SC_LONG_DOUBLE_P_I         = 25,
+ SC_FLOAT_COMPLEX_P_I       = 26,
+ SC_DOUBLE_COMPLEX_P_I      = 27,
+ SC_LONG_DOUBLE_COMPLEX_P_I = 28,
+ SC_QUATERNION_P_I          = 29,
 
- SC_INT16_P_I               = 18, 
- SC_INT32_P_I               = 19,
- SC_INT64_P_I               = 21,
- SC_FLOAT32_P_I             = 22,
- SC_FLOAT64_P_I             = 23,
- SC_FLOAT128_P_I            = 24,
- SC_COMPLEX32_P_I           = 25,
- SC_COMPLEX64_P_I           = 26,
- SC_COMPLEX128_P_I          = 27,
+ SC_INT16_P_I               = 19, 
+ SC_INT32_P_I               = 20,
+ SC_INT64_P_I               = 22,
+ SC_FLOAT32_P_I             = 23,
+ SC_FLOAT64_P_I             = 24,
+ SC_FLOAT128_P_I            = 25,
+ SC_COMPLEX32_P_I           = 26,
+ SC_COMPLEX64_P_I           = 27,
+ SC_COMPLEX128_P_I          = 28,
 
- SC_VOID_I                  = 29,
- SC_CHAR_8_I                = 30,
- SC_STRUCT_I                = 31,
- SC_PCONS_I                 = 32,
- SC_PROCESS_I               = 33,
- SC_FILE_I                  = 34,
- SC_PCONS_P_I               = 35,
+ SC_VOID_I                  = 30,
+ SC_CHAR_8_I                = 31,
+ SC_STRUCT_I                = 32,
+ SC_PCONS_I                 = 33,
+ SC_PROCESS_I               = 34,
+ SC_FILE_I                  = 35,
+ SC_PCONS_P_I               = 36,
 
 /* aliases */
- SC_ENUM_I                  = 5,
- SC_INTEGER_I               = 5,
- SC_REAL_I                  = 9,
- SC_REAL_P_I                = 23;
+ SC_ENUM_I                  = 6,
+ SC_INTEGER_I               = 6,
+ SC_REAL_I                  = 10,
+ SC_REAL_P_I                = 24;
 
 char
  *SC_UNKNOWN_S               = "unknown",
@@ -685,6 +685,7 @@ void SC_init_base_types(void)
        SC_BIT_I                   = SC_type_register(SC_BIT_S,                 KIND_OTHER,      0,                            0);
        SC_BOOL_I                  = SC_type_register(SC_BOOL_S,                KIND_BOOL,       sizeof(bool),                 0);
        SC_CHAR_I                  = SC_type_register(SC_CHAR_S,                KIND_CHAR,       sizeof(char),                 0);
+       SC_WCHAR_I                 = SC_type_register(SC_WCHAR_S,               KIND_CHAR,       sizeof(wchar_t),              0);
        SC_SHORT_I                 = SC_type_register(SC_SHORT_S,               KIND_INT,        sizeof(short),                0);
        SC_INT_I                   = SC_type_register(SC_INT_S,                 KIND_INT,        sizeof(int),                  0);
        SC_LONG_I                  = SC_type_register(SC_LONG_S,                KIND_INT,        sizeof(long),                 0);
@@ -703,6 +704,7 @@ void SC_init_base_types(void)
        SC_POINTER_I               = SC_type_register(SC_POINTER_S,               KIND_POINTER, szptr, 0);
        SC_BOOL_P_I                = SC_type_register(SC_BOOL_P_S,                KIND_POINTER, szptr, 0);
        SC_STRING_I                = SC_type_register(SC_STRING_S,                KIND_POINTER, szptr, 0);
+       SC_WCHAR_P_I               = SC_type_register(SC_WCHAR_P_S,               KIND_POINTER, szptr, 0);
        SC_SHORT_P_I               = SC_type_register(SC_SHORT_P_S,               KIND_POINTER, szptr, 0);
        SC_INT_P_I                 = SC_type_register(SC_INT_P_S,                 KIND_POINTER, szptr, 0);
        SC_LONG_P_I                = SC_type_register(SC_LONG_P_S,                KIND_POINTER, szptr, 0);
@@ -1138,11 +1140,19 @@ void _SC_set_format_defaults(void)
     t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
     fmts[SC_BOOL_I] = t;
 
-    if (fmts[SC_CHAR_I] != NULL)
-       SFREE(fmts[SC_CHAR_I]);
+/* character types (proper) */
+    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+        {id = i + SC_CHAR_I;
+	 if (fmts[id] != NULL)
+	    SFREE(fmts[id]);
 
-    t = SC_strsavef("%c", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
-    fmts[SC_CHAR_I] = t;
+	 if (id == SC_CHAR_I)
+	    snprintf(tmp, MAXLINE, "%%c");
+	 else if (id == SC_WCHAR_I)
+	    snprintf(tmp, MAXLINE, "%%Lc");
+
+	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
+	 fmts[id] = t;};
 
 /* fixed point types (proper) */
     for (i = 0; i < N_PRIMITIVE_FIX; i++)

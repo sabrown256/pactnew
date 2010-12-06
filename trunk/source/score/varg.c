@@ -21,13 +21,15 @@
 #define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
 
 static char
- *types[] = { NULL, NULL, "bool", "char",
+ *types[] = { NULL, NULL, "bool",
+	      "char", "wchar_t",
 	      "short", "int", "long", "long long",
 	      "float", "double", "long double",
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
 	      "quaternion", "void *", NULL, "char *"},
- *promo[] = { NULL, NULL, "int", "int",
+ *promo[] = { NULL, NULL, "int",
+              "int", "int",
 	      "int", "int", "long", "long long",
 	      "double", "double", "long double",
 	      "float _Complex", "double _Complex",

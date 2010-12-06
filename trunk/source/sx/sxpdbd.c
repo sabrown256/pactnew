@@ -560,10 +560,18 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
 
 /* find the type and compare */
     ret = TRUE;
+
+/* character types (ok) */
     if (id == SC_CHAR_I)
        {char *va, *vb;
 	va = (char *) bfa;
         vb = (char *) bfb;
+        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+
+    else if (id == SC_WCHAR_I)
+       {wchar_t *va, *vb;
+	va = (wchar_t *) bfa;
+        vb = (wchar_t *) bfb;
         DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
 
 /* fixed point types (ok) */

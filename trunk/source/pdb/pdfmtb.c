@@ -65,28 +65,28 @@ static data_alignment *_PD_mk_alignment(char *vals)
 
 	align->struct_alignment = 0;}
 
-/* versions 25 and after have 9 alignments for C99 types */
-    else if (nc >= 9)
+/* versions 25 and after have 10 alignments for C99 types */
+    else if (nc >= 10)
        {align->ptr_alignment  = vals[0];
 	align->bool_alignment = vals[1];
 
 /* character alignments */
-	for (i = 0; i < 1; i++)
+	for (i = 0; i < 2; i++)
 	    align->chr[i] = vals[i + 2];
 
 /* fixed point alignments */
 	for (i = 0; i < 3; i++)
-	    align->fx[i] = vals[i + 3];
+	    align->fx[i] = vals[i + 4];
 
 /* default long long alignment equal to long alignment*/
-	align->fx[3] = vals[5];
+	align->fx[3] = vals[6];
 
 /* floating point alignments */
 	for (i = 0; i < N_PRIMITIVE_FP; i++)
-	    align->fp[i] = vals[i + 6];
+	    align->fp[i] = vals[i + 7];
 
-	if (nc > 9)
-	   align->struct_alignment = vals[9];
+	if (nc > 10)
+	   align->struct_alignment = vals[10];
 	else
 	   align->struct_alignment = 0;};
 
@@ -1143,15 +1143,16 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     al[0]  = pl->ptr_alignment;
     al[1]  = pl->bool_alignment;
     al[2]  = pl->chr[0];
-    al[3]  = pl->fx[0];
-    al[4]  = pl->fx[1];
-    al[5]  = pl->fx[2];
-    al[6]  = pl->fp[0];
-    al[7]  = pl->fp[1];
-    al[8]  = pl->fp[2];
-    al[9]  = '\0';
+    al[3]  = pl->chr[1];
+    al[4]  = pl->fx[0];
+    al[5]  = pl->fx[1];
+    al[6]  = pl->fx[2];
+    al[7]  = pl->fp[0];
+    al[8]  = pl->fp[1];
+    al[9]  = pl->fp[2];
+    al[10] = '\0';
 
-    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7]*al[8] == 0) 
+    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7]*al[8]*al[9] == 0) 
        return(FALSE);
 
     ok &= _PD_put_string(1, "Alignment:%s\n", al);
