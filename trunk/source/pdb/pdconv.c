@@ -115,6 +115,7 @@ data_standard
  TEXT_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 12,                                       /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{7,  TEXT_ORDER},                /* size and order of short */
                  {12, TEXT_ORDER},                  /* size and order of int */
                  {22, TEXT_ORDER},                 /* size and order of long */
@@ -125,6 +126,7 @@ data_standard
  I386_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, REVERSE_ORDER},              /* size and order of short */
                  {2, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
@@ -135,6 +137,7 @@ data_standard
  I586L_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
@@ -145,6 +148,7 @@ data_standard
  I586O_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
@@ -155,6 +159,7 @@ data_standard
  PPC32_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, NORMAL_ORDER},               /* size and order of short */
                  {4, NORMAL_ORDER},                 /* size and order of int */
                  {4, NORMAL_ORDER},                /* size and order of long */
@@ -165,6 +170,7 @@ data_standard
  X86_64_STD  = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {8, REVERSE_ORDER},               /* size and order of long */
@@ -175,6 +181,7 @@ data_standard
  X86_64A_STD = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {8, REVERSE_ORDER},               /* size and order of long */
@@ -185,6 +192,7 @@ data_standard
  PPC64_STD   = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, NORMAL_ORDER},               /* size and order of short */
                  {4, NORMAL_ORDER},                 /* size and order of int */
                  {8, NORMAL_ORDER},                /* size and order of long */
@@ -198,6 +206,7 @@ data_standard
  M68X_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, NORMAL_ORDER},               /* size and order of short */
                  {2, NORMAL_ORDER},                 /* size and order of int */
                  {4, NORMAL_ORDER},                /* size and order of long */
@@ -208,6 +217,7 @@ data_standard
  VAX_STD     = {BITS_DEFAULT,                               /* bits per byte */
                 4,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
                 {{2, REVERSE_ORDER},              /* size and order of short */
                  {4, REVERSE_ORDER},                /* size and order of int */
                  {4, REVERSE_ORDER},               /* size and order of long */
@@ -218,6 +228,7 @@ data_standard
  CRAY_STD    = {BITS_DEFAULT,                               /* bits per byte */
                 8,                                        /* size of pointer */
                 1,                                           /* size of bool */
+                {{1, UTF_8}},                                   /* char info */
 		{{8, NORMAL_ORDER},               /* size and order of short */
                  {8, NORMAL_ORDER},                 /* size and order of int */
                  {8, NORMAL_ORDER},                /* size and order of long */

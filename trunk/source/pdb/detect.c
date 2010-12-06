@@ -14,19 +14,45 @@
 #undef LONGLONG_MAX
 
 #include "scstd.h"
+#include "scope_typeh.h"
 
-#define NTYPES 18
+#define BITS_DEFAULT             8
 
-#define BITS_DEFAULT 8
+#define I_CHAR                   0
+#define I_POINTER                1
+#define I_INT8                  14
+#define I_SHORT                  2
+#define I_INT                    3
+#define I_LONG                   4
+#define I_LONG_LONG              5
+#define I_FLOAT                  6
+#define I_DOUBLE                 7
+#define I_LONG_DOUBLE            8
+#define I_STRUCT                 9
+#define I_BOOL                  10
+#define I_FLOAT_COMPLEX         11
+#define I_DOUBLE_COMPLEX        12
+#define I_LONG_DOUBLE_COMPLEX   13
+
+
+#define TYPE_SET(_i, _t, _v)     type_set(_i, sizeof(_t), sizeof(_v))
 
 /* these structs will help determine alignment of the primitive types */
+struct cbool
+   {char c;
+    bool b;} cb;
+
 struct cchar
    {char c;
     char x;} cc;
-struct cptr
+struct cwchar
    {char c;
-    char *x;} cp;
-struct cfix2
+    wchar_t x;} cw;
+
+struct cint8
+   {char c;
+    int8_t x;} ci8;
+struct cshort
    {char c;
     short x;} cs;
 struct cint
@@ -38,6 +64,7 @@ struct clong
 struct clonglong
    {char c;
     int64_t x;} cll;
+
 struct cfloat4
    {char c;
     float x;} cf;
@@ -47,9 +74,7 @@ struct cfloat8
 struct cfloat16
    {char c;
     long double x;} cld;
-struct cbool
-   {char c;
-    bool b;} cb;
+
 struct ccomplex4
    {char c;
     float complex x;} cfc;
@@ -60,9 +85,10 @@ struct ccomplex16
    {char c;
     long double complex x;} clc;
 
-struct cint8
+struct cptr
    {char c;
-    int8_t x;} ci8;
+    void *x;} cp;
+
 struct cint16
    {char c;
     int16_t x;} ci16;
@@ -93,12 +119,37 @@ union ucsil
     long l[2];} bo;
 
 static int 
- size[NTYPES],
- align[NTYPES];
+ size[N_TYPES],
+ ssize[N_TYPES],
+ align[N_TYPES];
 
 static char
  int_order[80];
  
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TYPE_SET - set some type characteristics */
+
+static void type_set(int i, int nbt, int nbv)
+   {
+
+    size[i]  = nbt;
+    ssize[i] = nbv;
+
+/* first possibility: align <= size (usual case)
+ * alignment is difference between struct length and member size:
+ */
+    align[i] = ssize[i] - size[i];
+
+/* second possibility: align > size (e.g. Cray char)
+ * alignment is half of structure size:
+ */
+    if (align[i] > (ssize[i] >> 1))
+       align[i] = ssize[i] >> 1;
+
+    return;}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -635,7 +686,7 @@ void print_html(void)
         printf("Machine byte order is normal order (big endian),\n");
 
      printf("</TD></TR>\n");
-     printf("<TR><TD>A pointer is %d bytes long.</TD></TR></TABLE></CENTER>\n\n", size[1]);
+     printf("<TR><TD>A pointer is %d bytes long.</TD></TR></TABLE></CENTER>\n\n", size[I_POINTER]);
      printf("<P>");
 
 /* table of type info */
@@ -649,35 +700,35 @@ void print_html(void)
 /* table rows */
 /* char */
      printf("<TR ALIGN=RIGHT><TD>Char</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
-            align[0], CHAR_MIN, CHAR_MAX);
+            align[I_CHAR], CHAR_MIN, CHAR_MAX);
 
 /* short */
      printf("<TR ALIGN=RIGHT><TD>Short</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
-            size[2], align[2], SHRT_MIN, SHRT_MAX);
+            size[I_SHORT], align[I_SHORT], SHRT_MIN, SHRT_MAX);
 
 /* int */
      printf("<TR ALIGN=RIGHT><TD>Int</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
-            size[3], align[3], INT_MIN, INT_MAX);
+            size[I_INT], align[I_INT], INT_MIN, INT_MAX);
 
 /* long */
      printf("<TR ALIGN=RIGHT><TD>Long</TD><TD>%d</TD><TD>%d</TD><TD>%ld</TD><TD>%ld</TD></TR>\n",
-            size[4], align[4], LONG_MIN, LONG_MAX);
+            size[I_LONG], align[I_LONG], LONG_MIN, LONG_MAX);
 
 /* long long */
      printf("<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%lld</TD><TD>%lld</TD></TR>\n",
-            size[5], align[5], LLONG_MIN, LLONG_MAX);
+            size[I_LONG_LONG], align[I_LONG_LONG], LLONG_MIN, LLONG_MAX);
 
 /* float */
      printf("<TR ALIGN=RIGHT><TD>Float</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
-            size[6], align[6], FLT_MIN, FLT_MAX);
+            size[I_FLOAT], align[I_FLOAT], FLT_MIN, FLT_MAX);
 
 /* double */
      printf("<TR ALIGN=RIGHT><TD>Double</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
-            size[7], align[7], DBL_MIN, DBL_MAX);
+            size[I_DOUBLE], align[I_DOUBLE], DBL_MIN, DBL_MAX);
 
 /* long double */
      printf("<TR ALIGN=RIGHT><TD>Long double</TD><TD>%d</TD><TD>%d</TD><TD>%.8Le</TD><TD>%.8Le</TD></TR>\n",
-            size[8], align[8], LDBL_MIN, LDBL_MAX);
+            size[I_LONG_DOUBLE], align[I_LONG_DOUBLE], LDBL_MIN, LDBL_MAX);
 
      printf("</TABLE></CENTER>\n");
 
@@ -822,7 +873,7 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
      else
         printf("Machine byte order is normal order (big endian)\n");
 
-     printf("A pointer is %d bytes long.\n\n", size[1]);
+     printf("A pointer is %d bytes long.\n\n", size[I_POINTER]);
 
 /* print a table header */
      strncpy(tptr, "Type", 4);
@@ -834,22 +885,22 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
      puts(bf);
 
 /* print char info */
-     print_fix_type("Char", 1, align[0], mfields, CHAR_MIN, CHAR_MAX);
+     print_fix_type("Char", 1, align[I_CHAR], mfields, CHAR_MIN, CHAR_MAX);
 
 /* print char info */
-     print_fix_type("Bool", size[10], align[10], mfields, false, true);
+     print_fix_type("Bool", size[I_BOOL], align[I_BOOL], mfields, false, true);
 
 /* print short info */
-     print_fix_type("Short", size[2], align[2], mfields, SHRT_MIN, SHRT_MAX);
+     print_fix_type("Short", size[I_SHORT], align[I_SHORT], mfields, SHRT_MIN, SHRT_MAX);
 
 /* print int info */
-     print_fix_type("Int", size[3], align[3], mfields, INT_MIN, INT_MAX);
+     print_fix_type("Int", size[I_INT], align[I_INT], mfields, INT_MIN, INT_MAX);
 
 /* print long info */
-     print_fix_type("Long", size[4], align[4], mfields, LONG_MIN, LONG_MAX);
+     print_fix_type("Long", size[I_LONG], align[I_LONG], mfields, LONG_MIN, LONG_MAX);
 
 /* print long long info */
-     print_fix_type("Long long", size[5], align[5],
+     print_fix_type("Long long", size[I_LONG_LONG], align[I_LONG_LONG],
 		    mfields, LLONG_MIN, LLONG_MAX);
 
 /* print C99 fixed width integer types info */
@@ -863,22 +914,22 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 		    mfields, INT64_MIN, INT64_MAX);
 
 /* print float info */
-     print_flt_type("Float", size[6], align[6], mfields, FLT_MIN, FLT_MAX);
+     print_flt_type("Float", size[I_FLOAT], align[I_FLOAT], mfields, FLT_MIN, FLT_MAX);
 
 /* print double info */
-     print_flt_type("Double", size[7], align[7], mfields, DBL_MIN, DBL_MAX);
+     print_flt_type("Double", size[I_DOUBLE], align[I_DOUBLE], mfields, DBL_MIN, DBL_MAX);
 
 /* print long double info */
-     print_flt_type("Long double", size[8], align[8], mfields, LDBL_MIN, LDBL_MAX);
+     print_flt_type("Long double", size[I_LONG_DOUBLE], align[I_LONG_DOUBLE], mfields, LDBL_MIN, LDBL_MAX);
 
 /* print float complex info */
-     print_flt_type("Float complex", size[11], align[11], mfields, FLT_MIN, FLT_MAX);
+     print_flt_type("Float complex", size[I_FLOAT_COMPLEX], align[I_FLOAT_COMPLEX], mfields, FLT_MIN, FLT_MAX);
 
 /* print double complex info */
-     print_flt_type("Double complex", size[12], align[12], mfields, DBL_MIN, DBL_MAX);
+     print_flt_type("Double complex", size[I_DOUBLE_COMPLEX], align[I_DOUBLE_COMPLEX], mfields, DBL_MIN, DBL_MAX);
 
 /* print long double complex info */
-     print_flt_type("Long double complex", size[13], align[13], mfields, LDBL_MIN, LDBL_MAX);
+     print_flt_type("Long double complex", size[I_LONG_DOUBLE_COMPLEX], align[I_LONG_DOUBLE_COMPLEX], mfields, LDBL_MIN, LDBL_MAX);
 
      printf("\n");
      printf("Complex part order:   real  imaginary\n");
@@ -918,17 +969,17 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
     printf("\nint\n");
 
     printf(" int_ord_f[] = {%d", fb[0]);
-    for (i = 1; i < size[6]; i++)
+    for (i = 1; i < size[I_FLOAT]; i++)
         printf(", %d", fb[i]);
     printf("}, \n");
 
     printf(" int_ord_d[] = {%d", db[0]);
-    for (i = 1; i < size[7]; i++)
+    for (i = 1; i < size[I_DOUBLE]; i++)
         printf(", %d", db[i]);
     printf("},\n");
 
     printf(" int_ord_ld[] = {%d", ldb[0]);
-    for (i = 1; i < size[8]; i++)
+    for (i = 1; i < size[I_LONG_DOUBLE]; i++)
         printf(", %d", ldb[i]);
     printf("};\n");
 
@@ -953,33 +1004,44 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
     printf("\n/* Internal DATA_STANDARD */\n\n");
     printf("data_standard\n");
     printf(" INT_STD = {%d,                                         /* bits per byte */\n",
-           (int)BITS_DEFAULT);
+           (int) BITS_DEFAULT);
     printf("            %d,                                       /* size of pointer */\n", 
-           size[1]);
+           size[I_POINTER]);
     printf("            %d,                                          /* size of bool */\n", 
-           size[10]);
+           size[I_BOOL]);
+
+/* character types */
+    printf("            {{%d, UTF_%d}},                     /* size and order of char */\n", 
+           size[I_CHAR], 8*size[I_CHAR]);
+
+/* fixed point types */
     printf("            {{%d, %s},             /* size and order of short */\n", 
-           size[2], int_order);
+           size[I_SHORT], int_order);
     printf("             {%d, %s},               /* size and order of int */\n", 
-           size[3], int_order);
+           size[I_INT], int_order);
     printf("             {%d, %s},              /* size and order of long */\n", 
-           size[4], int_order);
+           size[I_LONG], int_order);
     printf("             {%d, %s}},        /* size and order of long long */\n", 
-           size[5], int_order);
+           size[I_LONG_LONG], int_order);
+
+/* floating point types */
     printf("            {{%d, int_frm_f, int_ord_f},             /* float definition */\n", 
-           size[6]);
+           size[I_FLOAT]);
     printf("             {%d, int_frm_d, int_ord_d},            /* double definition */\n", 
-           size[7]);
+           size[I_DOUBLE]);
     printf("             {%d, int_frm_ld, int_ord_ld}}},  /* long double definition */\n", 
-           size[8]);
+           size[I_LONG_DOUBLE]);
+
     printf(" *INT_STANDARD = &INT_STD;\n");
 
     printf("\n/* Internal DATA_ALIGNMENT */\n\n");
     printf("data_alignment\n");
     printf(" INT_ALG = {%d, %d, %d, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
-           align[0], align[1], align[10], align[2], align[3], 
-           align[4], align[5], align[6], align[7], align[8],
-	   align[9]);
+           align[I_CHAR], align[I_POINTER], align[I_BOOL],
+	   align[I_SHORT], align[I_INT], 
+           align[I_LONG], align[I_LONG_LONG],
+	   align[I_FLOAT], align[I_DOUBLE], align[I_LONG_DOUBLE],
+	   align[I_STRUCT]);
     printf(" *INT_ALIGNMENT = &INT_ALG;\n");
 
     printf("\n/* complex tuple info */\n\n");
@@ -1035,7 +1097,7 @@ static void help(void)
 /* MAIN - start here */
 
 int main(int argc, char **argv)
-   {int i, ssize[NTYPES];
+   {int i;
     int cflag, wflag, sflag;
     int fb[40], db[40], ldb[40];
     int fc[4], dc[4], lc[4];
@@ -1074,58 +1136,26 @@ int main(int argc, char **argv)
             break;};
 
 /* data type sizes are straightforward */
-    size[0]  = sizeof(char);
-    size[1]  = sizeof(char *);
-    size[2]  = sizeof(short);
-    size[3]  = sizeof(int);
-    size[4]  = sizeof(long);
-    size[5]  = sizeof(int64_t);
-    size[6]  = sizeof(float);
-    size[7]  = sizeof(double);
-    size[8]  = sizeof(long double);
-    size[9]  = 2*sizeof(char);
-    size[10] = sizeof(bool);
-    size[11] = sizeof(float _Complex);
-    size[12] = sizeof(double _Complex);
-    size[13] = sizeof(long double _Complex);
+    TYPE_SET(I_BOOL,                bool,                 cb);
+    TYPE_SET(I_CHAR,                char,                 cc);
+    TYPE_SET(I_INT8,                int8_t,               ci8);
+    TYPE_SET(I_SHORT,               short,                cs);
+    TYPE_SET(I_INT,                 int,                  ci);
+    TYPE_SET(I_LONG,                long,                 cl);
+    TYPE_SET(I_LONG_LONG,           long long,            cll);
+    TYPE_SET(I_FLOAT,               float,                cf);
+    TYPE_SET(I_DOUBLE,              double,               cd);
+    TYPE_SET(I_LONG_DOUBLE,         long double,          cld);
+    TYPE_SET(I_FLOAT_COMPLEX,       float _Complex,       cfc);
+    TYPE_SET(I_DOUBLE_COMPLEX,      double _Complex,      cdc);
+    TYPE_SET(I_LONG_DOUBLE_COMPLEX, long double _Complex, clc);
 
-    size[14] = sizeof(int8_t);
-    size[15] = sizeof(int16_t);
-    size[16] = sizeof(int32_t);
-    size[17] = sizeof(int64_t);
+    TYPE_SET(I_POINTER,             void *,               cp);
+    type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
 
-    ssize[0]  = sizeof(cc);
-    ssize[1]  = sizeof(cp);
-    ssize[2]  = sizeof(cs);
-    ssize[3]  = sizeof(ci);
-    ssize[4]  = sizeof(cl);
-    ssize[5]  = sizeof(cll);
-    ssize[6]  = sizeof(cf);
-    ssize[7]  = sizeof(cd);
-    ssize[8]  = sizeof(cld);
-    ssize[9]  = sizeof(ct);
-    ssize[10] = sizeof(cb);
-    ssize[11] = sizeof(cfc);
-    ssize[12] = sizeof(cdc);
-    ssize[13] = sizeof(clc);
-
-    ssize[14] = sizeof(ci8);
-    ssize[15] = sizeof(ci16);
-    ssize[16] = sizeof(ci32);
-    ssize[17] = sizeof(ci64);
-
-/* first possibility: align <= size (usual case)
- * alignment is difference between struct length and member size:
- */
-    for (i = 0; i < NTYPES; i++)
-        align[i] = ssize[i] - size[i];
-
-/* second possibility: align > size (e.g. Cray char)
- * alignment is half of structure size:
- */
-    for (i = 0; i < NTYPES; i++)
-        if (align[i] > (ssize[i] >> 1))
-           align[i] = ssize[i] >> 1;
+    TYPE_SET(15,               int16_t,              ci16);
+    TYPE_SET(16,               int32_t,              ci32);
+    TYPE_SET(17,               int64_t,              ci64);
 
     bo.i[0] = 1;
     if (bo.c[0] == 1)

@@ -189,6 +189,7 @@
 typedef int (*PFDefDel)(void *a);
 
 typedef struct BF_FILE_s BF_FILE;
+typedef struct s_chardes chardes;
 typedef struct s_fixdes fixdes;
 typedef struct s_fpdes fpdes;
 typedef struct s_data_alignment data_alignment;
@@ -244,6 +245,14 @@ enum e_PD_type_kind
 
 typedef enum e_PD_type_kind PD_type_kind;
 
+enum e_PD_text_kind
+   {UTF_8 = 0,
+    UTF_16,
+    UTF_32,
+    UTF_NONE};
+
+typedef enum e_PD_text_kind PD_text_kind;
+
 enum e_PD_major_order
    {NO_MAJOR_ORDER = 0,
     ROW_MAJOR_ORDER = 101,
@@ -288,6 +297,16 @@ struct s_data_alignment
     int fx[N_PRIMITIVE_FIX];              /* fixed point types */
     int fp[N_PRIMITIVE_FP];               /* floating point types */
     int struct_alignment;};
+ 
+struct s_chardes
+  {int bpi;
+   PD_text_kind utf;};
+
+#define PD_DEFINE_CHARDES(_f)              \
+    PD_defstr(_f, "chardes",               \
+              "int bpi",                   \
+              "enum utf",                  \
+              LAST)
 
 struct s_fixdes
    {int bpi;
@@ -296,7 +315,7 @@ struct s_fixdes
 #define PD_DEFINE_FIXDES(_f)               \
     PD_defstr(_f, "fixdes",                \
               "int bpi",                   \
-              "int order",                 \
+              "enum order",                \
               LAST)
 struct s_fpdes
    {int bpi;
@@ -314,6 +333,7 @@ struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
     int bool_bytes;
+    chardes chr[N_PRIMITIVE_CHAR];
     fixdes fx[N_PRIMITIVE_FIX];
     fpdes  fp[N_PRIMITIVE_FP];
     PDBfile *file;};
@@ -452,7 +472,7 @@ FUNCTION_POINTER(memdes, *(*PFPmemdes));
 #define PD_DEFINE_MEMDES(_f)              \
     PD_defstr(_f, "memdes",               \
               "char *member",             \
-              "long_long member_offs",    \
+              "int64_t member_offs",      \
               "char *cast_memb",          \
               "long cast_offs",           \
               "int is_indirect",          \
@@ -472,7 +492,7 @@ struct s_symindir
 
 #define PD_DEFINE_SYMINDIR(_f)            \
   PD_defstr(_f, "symindir",               \
-	    "long_long addr",             \
+	    "int64_t addr",               \
 	    "long n_ind_type",            \
 	    "long arr_offs",              \
             LAST)
@@ -516,7 +536,7 @@ struct s_defstr
 #define PD_DEFINE_DEFSTR(_f)       \
     PD_defstr(_f, "defstr",        \
               "char *type",        \
-              "int kind",          \
+              "enum kind",         \
               "long size_bits",    \
               "long size",         \
               "int alignment",     \
