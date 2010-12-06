@@ -281,10 +281,10 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	 bita = np*padsz + i*nbits + offs;
 	 fld  = SC_extract_field(in, bita, nbits, INT_MAX, NULL);
 
-	 if (ityp == SC_CHAR_I)
-	    {char *pv;
-	     pv = (char *) out;
-	     pv[i] = (char) fld;}
+	 if (ityp == SC_INT8_I)
+	    {int8_t *pv;
+	     pv = (int8_t *) out;
+	     pv[i] = (int8_t) fld;}
 
 	 else if (ityp == SC_SHORT_I)
 	    {short *pv;

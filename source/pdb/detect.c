@@ -21,19 +21,19 @@
 #define I_BOOL                   0
 #define I_CHAR                   1
 #define I_WCHAR                  2
-#define I_INT8                  15
-#define I_SHORT                  3
-#define I_INT                    4
-#define I_LONG                   5
-#define I_LONG_LONG              6
-#define I_FLOAT                  7
-#define I_DOUBLE                 8
-#define I_LONG_DOUBLE            9
-#define I_FLOAT_COMPLEX         10
-#define I_DOUBLE_COMPLEX        11
-#define I_LONG_DOUBLE_COMPLEX   12
-#define I_POINTER               13
-#define I_STRUCT                14
+#define I_INT8                   3
+#define I_SHORT                  4
+#define I_INT                    5
+#define I_LONG                   6
+#define I_LONG_LONG              7
+#define I_FLOAT                  8
+#define I_DOUBLE                 9
+#define I_LONG_DOUBLE           10
+#define I_FLOAT_COMPLEX         11
+#define I_DOUBLE_COMPLEX        12
+#define I_LONG_DOUBLE_COMPLEX   13
+#define I_POINTER               14
+#define I_STRUCT                15
 
 
 #define TYPE_SET(_i, _t, _v)     type_set(_i, sizeof(_t), sizeof(_v))
@@ -707,6 +707,10 @@ void print_html(void)
      printf("<TR ALIGN=RIGHT><TD>Wchar</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             align[I_WCHAR], WCHAR_MIN, WCHAR_MAX);
 
+/* int8_t */
+     printf("<TR ALIGN=RIGHT><TD>Int8_t</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+            size[I_INT8], align[I_INT8], INT8_MIN, INT8_MAX);
+
 /* short */
      printf("<TR ALIGN=RIGHT><TD>Short</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             size[I_SHORT], align[I_SHORT], SHRT_MIN, SHRT_MAX);
@@ -898,6 +902,9 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 /* print wchar info */
      print_fix_type("Wchar", 1, align[I_WCHAR], mfields, WCHAR_MIN, WCHAR_MAX);
 
+/* print int8 info */
+     print_fix_type("Int8_t", size[I_INT8], align[I_INT8], mfields, INT8_MIN, INT8_MAX);
+
 /* print short info */
      print_fix_type("Short", size[I_SHORT], align[I_SHORT], mfields, SHRT_MIN, SHRT_MAX);
 
@@ -1026,7 +1033,9 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
            size[I_WCHAR], 8*size[I_WCHAR]);
 
 /* fixed point types */
-    printf("            {{%d, %s},             /* size and order of short */\n", 
+    printf("            {{%d, %s},            /* size and order of int8_t */\n", 
+           size[I_INT8], int_order);
+    printf("             {%d, %s},             /* size and order of short */\n", 
            size[I_SHORT], int_order);
     printf("             {%d, %s},               /* size and order of int */\n", 
            size[I_INT], int_order);
@@ -1048,10 +1057,10 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
 /* emit data_alignment definition */
     printf("\n/* Internal DATA_ALIGNMENT */\n\n");
     printf("data_alignment\n");
-    printf(" INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
-           align[I_POINTER], align[I_BOOL],
+    printf(" INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
+	   align[I_POINTER], align[I_BOOL],
            align[I_CHAR], align[I_WCHAR],
-	   align[I_SHORT], align[I_INT], 
+           align[I_INT8], align[I_SHORT], align[I_INT], 
            align[I_LONG], align[I_LONG_LONG],
 	   align[I_FLOAT], align[I_DOUBLE], align[I_LONG_DOUBLE],
 	   align[I_STRUCT]);
@@ -1167,9 +1176,9 @@ int main(int argc, char **argv)
     TYPE_SET(I_POINTER,             void *,               cp);
     type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
 
-    TYPE_SET(16,               int16_t,              ci16);
-    TYPE_SET(17,               int32_t,              ci32);
-    TYPE_SET(18,               int64_t,              ci64);
+    TYPE_SET(17, int16_t,              ci16);
+    TYPE_SET(18, int32_t,              ci32);
+    TYPE_SET(19, int64_t,              ci64);
 
     bo.i[0] = 1;
     if (bo.c[0] == 1)

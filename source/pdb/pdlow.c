@@ -916,7 +916,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* fixed point types (proper) */
     for (ifx = 0; ifx < N_PRIMITIVE_FIX; ifx++)
-        {styp = SC_type_name(ifx + SC_SHORT_I);
+        {styp = SC_type_name(ifx + SC_INT8_I);
 	 snprintf(utyp, MAXLINE, "u_%s", styp);
 
 	 conv = _PD_compare_fix_std(ifx, fstd, hstd, falign, halign, flag, ftk);

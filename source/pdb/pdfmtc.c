@@ -174,7 +174,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 
 /* check for fixed point types (proper) */
     else if (SC_is_type_fix(id) == TRUE)
-       {ifx = id - SC_SHORT_I;
+       {ifx = id - SC_INT8_I;
 	if (ifx < N_PRIMITIVE_FIX)
 	   {std->fx[ifx].bpi   = nb;
 	    std->fx[ifx].order = (PD_byte_order) flg;
