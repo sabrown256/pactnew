@@ -44,7 +44,7 @@ static int _PD_compare_char_std(int n, data_standard *sa, data_standard *sb,
    {int eq;
 
     eq = FALSE;
-#if 0
+
     if (flag == TRUE)
        {if (ftk == FALSE)
 	   eq = -1;
@@ -52,7 +52,6 @@ static int _PD_compare_char_std(int n, data_standard *sa, data_standard *sb,
 	   {eq |= (sa->chr[n].bpi != sb->chr[n].bpi);
 	    eq |= (sa->chr[n].utf != sb->chr[n].utf);
 	    eq |= (aa->chr[n] != ab->chr[n]);};};
-#endif
 
     return(eq);}
 
@@ -151,6 +150,10 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 
     eq = (a->ptr_bytes == b->ptr_bytes);
 
+    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+        eq &= ((a->chr[i].bpi == b->chr[i].bpi) &&
+	       (a->chr[i].utf == b->chr[i].utf));
+
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         eq &= ((a->fx[i].bpi   == b->fx[i].bpi) &&
 	       (a->fx[i].order == b->fx[i].order));
@@ -176,9 +179,11 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 	 for (j = 0; j < n; j++, eq &= (*(fa++) == *(fb++)));};
 
 /* check alignments */
-    eq &= ((c->char_alignment == d->char_alignment) &&
-           (c->ptr_alignment  == d->ptr_alignment) &&
+    eq &= ((c->ptr_alignment  == d->ptr_alignment) &&
            (c->bool_alignment == d->bool_alignment));
+
+    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+        eq &= (c->chr[i] == d->chr[i]);
 
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         eq &= (c->fx[i] == d->fx[i]);
@@ -711,7 +716,7 @@ int _PD_set_current_address(PDBfile *file, int64_t addr, int wh,
  */
 
 int64_t _PD_get_next_address(PDBfile *file, char *type, long number,
-			   void *vr, int seekf, int tellf, int colf)
+			     void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
 
     if (number == 0)
@@ -868,7 +873,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
 void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     data_alignment *falign, data_alignment *halign,
 		     int ishc, int ftk)
-   {int ifx, ifp, conv, flag;
+   {int ic, ifx, ifp, conv, flag;
     int fcnv[N_PRIMITIVE_FP];
     char utyp[MAXLINE];
     char *styp, *btyp;
@@ -884,20 +889,6 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
        {if (ftk == FALSE)
 	   conv = -1;
         else
-	   PD_COMPARE_CHAR_STD(conv, fstd, hstd, falign, halign);}
-    else
-       conv = FALSE;
-    _PD_defstr_in(chart, SC_CHAR_S, CHAR_KIND,
-		  NULL, NULL, 1L, falign->char_alignment, 
-                  NO_ORDER, conv, NULL, NULL, FALSE, FALSE, ishc);
-    _PD_defstr_in(chart, "u_char", CHAR_KIND,
-		  NULL, NULL, 1L, falign->char_alignment, 
-                  NO_ORDER, conv, NULL, NULL, TRUE, FALSE, ishc);
-
-    if (flag == TRUE)
-       {if (ftk == FALSE)
-	   conv = -1;
-        else
 	   PD_COMPARE_BOOL_STD(conv, fstd, hstd, falign, halign);}
     else
        conv = FALSE;
@@ -905,6 +896,23 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		  NULL, NULL, fstd->bool_bytes,
 		  falign->bool_alignment, NO_ORDER,
 		  conv, NULL, NULL, FALSE, FALSE, ishc);
+
+/* character types (proper) */
+    for (ic = 0; ic < N_PRIMITIVE_CHAR; ic++)
+        {styp = SC_type_name(ic + SC_CHAR_I);
+	 snprintf(utyp, MAXLINE, "u_%s", styp);
+
+	 conv = _PD_compare_char_std(ic, fstd, hstd, falign, halign, flag, ftk);
+
+	 _PD_defstr_in(chart, styp, CHAR_KIND,
+		       NULL, NULL, fstd->chr[ic].bpi, 
+		       falign->chr[ic], NO_ORDER,
+		       conv, NULL, NULL, FALSE, FALSE, ishc);
+
+	 _PD_defstr_in(chart, utyp, CHAR_KIND,
+		       NULL, NULL, fstd->chr[ic].bpi, 
+		       falign->chr[ic], NO_ORDER,
+		       conv, NULL, NULL, TRUE, FALSE, ishc);};
 
 /* fixed point types (proper) */
     for (ifx = 0; ifx < N_PRIMITIVE_FIX; ifx++)

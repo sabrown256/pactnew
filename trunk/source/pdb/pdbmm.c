@@ -255,6 +255,10 @@ data_standard *_PD_mk_standard(PDBfile *file)
     std->ptr_bytes         = 0;
     std->bool_bytes        = 0;
 
+    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+        {std->chr[i].bpi = 0;
+	 std->chr[i].utf = UTF_NONE;};
+
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         {std->fx[i].bpi   = 0;
 	 std->fx[i].order = NO_ORDER;};
@@ -286,6 +290,10 @@ data_standard *_PD_copy_standard(data_standard *src)
     std->bits_byte  = src->bits_byte;
     std->ptr_bytes  = src->ptr_bytes;
     std->bool_bytes = src->bool_bytes;
+
+    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+        {std->chr[i].bpi = src->chr[i].bpi;
+	 std->chr[i].utf = src->chr[i].utf;};
 
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         {std->fx[i].bpi   = src->fx[i].bpi;

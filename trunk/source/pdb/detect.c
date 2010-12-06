@@ -884,11 +884,11 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
      strcpy(mxptr+ offset, "Maximum Value\n");
      puts(bf);
 
-/* print char info */
-     print_fix_type("Char", 1, align[I_CHAR], mfields, CHAR_MIN, CHAR_MAX);
+/* print bool info */
+     print_fix_type("Bool", size[I_BOOL], align[I_BOOL], mfields, false, true);
 
 /* print char info */
-     print_fix_type("Bool", size[I_BOOL], align[I_BOOL], mfields, false, true);
+     print_fix_type("Char", 1, align[I_CHAR], mfields, CHAR_MIN, CHAR_MAX);
 
 /* print short info */
      print_fix_type("Short", size[I_SHORT], align[I_SHORT], mfields, SHRT_MIN, SHRT_MAX);
@@ -1001,6 +1001,7 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
         printf("%2ldL, ", ldf[i]);
     printf("0x%lXL};\n", ldf[7]);
 
+/* emit data_standard definition */
     printf("\n/* Internal DATA_STANDARD */\n\n");
     printf("data_standard\n");
     printf(" INT_STD = {%d,                                         /* bits per byte */\n",
@@ -1034,10 +1035,12 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
 
     printf(" *INT_STANDARD = &INT_STD;\n");
 
+/* emit data_alignment definition */
     printf("\n/* Internal DATA_ALIGNMENT */\n\n");
     printf("data_alignment\n");
-    printf(" INT_ALG = {%d, %d, %d, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
-           align[I_CHAR], align[I_POINTER], align[I_BOOL],
+    printf(" INT_ALG = {%d, %d, {%d}, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
+           align[I_POINTER], align[I_BOOL],
+	   align[I_CHAR],
 	   align[I_SHORT], align[I_INT], 
            align[I_LONG], align[I_LONG_LONG],
 	   align[I_FLOAT], align[I_DOUBLE], align[I_LONG_DOUBLE],

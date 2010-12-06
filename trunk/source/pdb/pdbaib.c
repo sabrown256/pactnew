@@ -68,6 +68,7 @@ defstr *PD_typedef(PDBfile *file, char *oname, char *tname)
 
     pa = _PD_get_state(-1);
 
+/* setup for host chart */
     dp = PD_inquire_host_type(file, oname);
     if (dp == NULL)
        snprintf(pa->err, MAXLINE,
@@ -76,6 +77,7 @@ defstr *PD_typedef(PDBfile *file, char *oname, char *tname)
        {if (PD_inquire_host_type(file, tname) == NULL)
            _PD_d_install(file, tname, dp, TRUE);};
 
+/* setup for file chart */
     dp = PD_inquire_type(file, oname);
     if (dp == NULL)
        snprintf(pa->err, MAXLINE,
