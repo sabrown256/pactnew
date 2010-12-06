@@ -24,6 +24,10 @@
 
 #define N_CASTS_INCR 30
 
+/* type indeces for long and double */
+#define PD_LONG_I         (SC_LONG_I - SC_SHORT_I)
+#define PD_DOUBLE_I       (SC_DOUBLE_I - SC_FLOAT_I)
+
 #define PD_CKSUM_LEN     33
 
 #define CRAY_BYTES_WORD   8

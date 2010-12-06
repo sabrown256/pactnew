@@ -1,5 +1,5 @@
 /*
- * PDNORMTST.C - Test floating pt denormalized value fix
+ * PDNORMTST.C - test floating point denormalized value fix
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdb_int.h"
 
 #define DENORM_FILE "pdnormtst.pdb"
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     fvalue = MAKE_N(float, 3);
     dvalue = MAKE_N(double, 2);
 
-    if (file->std->fx[0].order == REVERSE_ORDER)
+    if (file->std->fx[PD_LONG_I].order == REVERSE_ORDER)
 
 /* create some denormalized float values */
        {*((char *) fvalue)     = 0x01;  /* fvalue[0] */

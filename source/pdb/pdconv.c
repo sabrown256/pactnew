@@ -775,10 +775,10 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
     lout = *out;
 
 /* GOTCHA: should this now be quad_format? */
-    hfmt = hstd->fp[1].format;
-    hord = hstd->fp[1].order;
-    ordl = hstd->fx[2].order;
-    nbl  = hstd->fx[2].bpi;
+    hfmt = hstd->fp[PD_DOUBLE_I].format;
+    hord = hstd->fp[PD_DOUBLE_I].order;
+    ordl = hstd->fx[PD_LONG_I].order;
+    nbl  = hstd->fx[PD_LONG_I].bpi;
 
 /* convert char types */
     if (kndi == CHAR_KIND)
@@ -881,10 +881,10 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
     lout = *out;
 
 /* GOTCHA: should this now be quad_format? */
-    hfmt = hstd->fp[1].format;
-    hord = hstd->fp[1].order;
-    ordl = hstd->fx[2].order;
-    nbl  = hstd->fx[2].bpi;
+    hfmt = hstd->fp[PD_DOUBLE_I].format;
+    hord = hstd->fp[PD_DOUBLE_I].order;
+    ordl = hstd->fx[PD_LONG_I].order;
+    nbl  = hstd->fx[PD_LONG_I].bpi;
 
     if (delim == NULL)
        delim = "\n";
@@ -996,10 +996,10 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 	    {file = hstd->file;
 	     hs   = file->host_std;
 	     fs   = file->std;
-	     ford = fs->fx[2].order;
 	     fbpi = fs->ptr_bytes;
-	     hord = hs->fx[2].order;
-	     hbpi = hs->fx[2].bpi;
+	     ford = fs->fx[PD_LONG_I].order;
+	     hbpi = hs->fx[PD_LONG_I].bpi;
+	     hord = hs->fx[PD_LONG_I].order;
        
 /* convert pointer when writing to file */
 	     if (stdi == hstd)
@@ -2003,10 +2003,10 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
     usg = (!iusg && !ousg) ? FALSE : TRUE;
 
-    inord  = istd->fx[2].order;
-    outord = ostd->fx[2].order;
-    lsord  = hstd->fx[2].order;
-    lnby   = hstd->fx[2].bpi;
+    inord  = istd->fx[PD_LONG_I].order;
+    outord = ostd->fx[PD_LONG_I].order;
+    lsord  = hstd->fx[PD_LONG_I].order;
+    lnby   = hstd->fx[PD_LONG_I].bpi;
 
     ret = TRUE;
 
