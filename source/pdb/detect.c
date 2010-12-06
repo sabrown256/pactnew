@@ -18,21 +18,22 @@
 
 #define BITS_DEFAULT             8
 
-#define I_CHAR                   0
-#define I_POINTER                1
-#define I_INT8                  14
-#define I_SHORT                  2
-#define I_INT                    3
-#define I_LONG                   4
-#define I_LONG_LONG              5
-#define I_FLOAT                  6
-#define I_DOUBLE                 7
-#define I_LONG_DOUBLE            8
-#define I_STRUCT                 9
-#define I_BOOL                  10
-#define I_FLOAT_COMPLEX         11
-#define I_DOUBLE_COMPLEX        12
-#define I_LONG_DOUBLE_COMPLEX   13
+#define I_BOOL                   0
+#define I_CHAR                   1
+#define I_WCHAR                  2
+#define I_INT8                  15
+#define I_SHORT                  3
+#define I_INT                    4
+#define I_LONG                   5
+#define I_LONG_LONG              6
+#define I_FLOAT                  7
+#define I_DOUBLE                 8
+#define I_LONG_DOUBLE            9
+#define I_FLOAT_COMPLEX         10
+#define I_DOUBLE_COMPLEX        11
+#define I_LONG_DOUBLE_COMPLEX   12
+#define I_POINTER               13
+#define I_STRUCT                14
 
 
 #define TYPE_SET(_i, _t, _v)     type_set(_i, sizeof(_t), sizeof(_v))
@@ -702,6 +703,10 @@ void print_html(void)
      printf("<TR ALIGN=RIGHT><TD>Char</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             align[I_CHAR], CHAR_MIN, CHAR_MAX);
 
+/* wchar */
+     printf("<TR ALIGN=RIGHT><TD>Wchar</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+            align[I_WCHAR], WCHAR_MIN, WCHAR_MAX);
+
 /* short */
      printf("<TR ALIGN=RIGHT><TD>Short</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             size[I_SHORT], align[I_SHORT], SHRT_MIN, SHRT_MAX);
@@ -890,6 +895,9 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 /* print char info */
      print_fix_type("Char", 1, align[I_CHAR], mfields, CHAR_MIN, CHAR_MAX);
 
+/* print wchar info */
+     print_fix_type("Wchar", 1, align[I_WCHAR], mfields, WCHAR_MIN, WCHAR_MAX);
+
 /* print short info */
      print_fix_type("Short", size[I_SHORT], align[I_SHORT], mfields, SHRT_MIN, SHRT_MAX);
 
@@ -1012,8 +1020,10 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
            size[I_BOOL]);
 
 /* character types */
-    printf("            {{%d, UTF_%d}},                     /* size and order of char */\n", 
+    printf("            {{%d, UTF_%d},                      /* size and order of char */\n", 
            size[I_CHAR], 8*size[I_CHAR]);
+    printf("             {%d, UTF_%d}},                 /* size and order of wchar_t */\n", 
+           size[I_WCHAR], 8*size[I_WCHAR]);
 
 /* fixed point types */
     printf("            {{%d, %s},             /* size and order of short */\n", 
@@ -1038,9 +1048,9 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
 /* emit data_alignment definition */
     printf("\n/* Internal DATA_ALIGNMENT */\n\n");
     printf("data_alignment\n");
-    printf(" INT_ALG = {%d, %d, {%d}, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
+    printf(" INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
            align[I_POINTER], align[I_BOOL],
-	   align[I_CHAR],
+           align[I_CHAR], align[I_WCHAR],
 	   align[I_SHORT], align[I_INT], 
            align[I_LONG], align[I_LONG_LONG],
 	   align[I_FLOAT], align[I_DOUBLE], align[I_LONG_DOUBLE],
@@ -1141,6 +1151,7 @@ int main(int argc, char **argv)
 /* data type sizes are straightforward */
     TYPE_SET(I_BOOL,                bool,                 cb);
     TYPE_SET(I_CHAR,                char,                 cc);
+    TYPE_SET(I_WCHAR,               wchar_t,              cw);
     TYPE_SET(I_INT8,                int8_t,               ci8);
     TYPE_SET(I_SHORT,               short,                cs);
     TYPE_SET(I_INT,                 int,                  ci);
@@ -1156,9 +1167,9 @@ int main(int argc, char **argv)
     TYPE_SET(I_POINTER,             void *,               cp);
     type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
 
-    TYPE_SET(15,               int16_t,              ci16);
-    TYPE_SET(16,               int32_t,              ci32);
-    TYPE_SET(17,               int64_t,              ci64);
+    TYPE_SET(16,               int16_t,              ci16);
+    TYPE_SET(17,               int32_t,              ci32);
+    TYPE_SET(18,               int64_t,              ci64);
 
     bo.i[0] = 1;
     if (bo.c[0] == 1)
