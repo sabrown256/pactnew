@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 12/04/2010
+MOD: 12/06/2010
 
 <CENTER>
 <P>
@@ -743,6 +743,8 @@ PDBLib supports the full set of C99 primitive data types:
    bool                        bool
    char                        char
    unsigned char               u_char
+   wchar_t                     wchar
+   unsigned wchar_t            u_wchar
    short                       short
    unsigned short              u_short
    int                         int
@@ -751,6 +753,14 @@ PDBLib supports the full set of C99 primitive data types:
    unsigned long               u_long
    long long                   long_long
    unsigned long long          u_long_long
+   int8_t                      int8_t
+   unsigned int8_t             u_int8_t
+   int16_t                     int16_t
+   unsigned int16_t            u_int16_t
+   int32_t                     int32_t
+   unsigned int32_t            u_int32_t
+   int64_t                     int64_t
+   unsigned int64_t            u_int64_t
    float                       float
    double                      double
    long double                 long_double
