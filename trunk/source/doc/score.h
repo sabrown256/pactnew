@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 12/02/2010
+MOD: 12/06/2010
 
 <CENTER>
 <P>
@@ -867,17 +867,27 @@ or by the index.
 <p>
 The standard C99 types are automatically registered. Specifically:
 <pre>
-    bool                 char
+    bool
+    char                 wchar_t
     short                int                 long                    long long
+    int8_t               int16_t             int32_t                 int64_t
     float                double              long double
     float _Complex       double _Complex     long double _Complex
 </pre>
+In analogy with the fixed width integer types, the following
+fixed width floating point types are provided:
+<pre>
+    float32_t            float64_t           float128_t
+    complex32_t          complex64_t         complex128_t
+</pre>
+
 Many others are automatically registered as well.  SCORE provided
 variables containing the index and the names.  They are:
 <pre>
        Integer ID                  String Name
      SC_BOOL_I                   SC_BOOL_S
      SC_CHAR_I                   SC_CHAR_S
+     SC_WCHAR_I                  SC_WCHAR_S
      SC_SHORT_I                  SC_SHORT_S
      SC_INT_I                    SC_INT_S
      SC_LONG_I                   SC_LONG_S
@@ -891,6 +901,16 @@ variables containing the index and the names.  They are:
      SC_POINTER_I                SC_POINTER_S
      SC_STRING_I                 SC_STRING_S
      SC_VOID_I                   SC_VOID_S
+     SC_INT8_I                   SC_INT8_S
+     SC_INT16_I                  SC_INT16_S
+     SC_INT32_I                  SC_INT32_S
+     SC_INT64_I                  SC_INT64_S
+     SC_FLOAT32_I                SC_FLOAT32_S
+     SC_FLOAT64_I                SC_FLOAT64_S
+     SC_FLOAT128_I               SC_FLOAT128_S
+     SC_COMPLEX32_I              SC_COMPLEX32_S
+     SC_COMPLEX64_I              SC_COMPLEX64_S
+     SC_COMPLEX128_I             SC_COMPLEX128_S
 </pre>
 
 With the identification of types with C objects which can be passed

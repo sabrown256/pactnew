@@ -525,6 +525,9 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
        {PA_INTERP_TYPE(v, long double, svp, t, t0, t1, t2, t3);}
 
 /* fixed point types */
+    else if (id == SC_INT8_I)
+       {PA_INTERP_TYPE(v, int8_t, svp, t, t0, t1, t2, t3);}
+
     else if (id == SC_SHORT_I)
        {PA_INTERP_TYPE(v, short, svp, t, t0, t1, t2, t3);}
 
