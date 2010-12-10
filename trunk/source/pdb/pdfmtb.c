@@ -521,12 +521,12 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
         size    = SC_stol(SC_strtok(NULL, delim, s));
         align   = SC_stol(SC_strtok(NULL, delim, s));
         ord     = (PD_byte_order) SC_stol(SC_strtok(NULL, delim, s));
-        ordr    = NULL;
-        formt   = NULL;
         unsgned = FALSE;
         onescmp = FALSE;
         conv    = TRUE;
 	kind    = INT_KIND;
+        ordr    = NULL;
+        formt   = NULL;
 	tuple   = NULL;
 
         token = SC_strtok(NULL, delim, s);
@@ -609,7 +609,11 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 
 /* only the file chart has it - look in there */
             if ((dp != NULL) && host_empty)
-               _PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);}
+               _PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
+
+	    SFREE(ordr);
+	    SFREE(formt);
+	    _PD_free_tuple(tuple);}
 
         else 
            {if (conv == FALSE)

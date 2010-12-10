@@ -156,7 +156,9 @@ SC_udl *_SC_parse_udl(char *s)
 	pu->target   = NULL;
 	pu->format   = NULL;
 	pu->address  = SC_stoi(addr);
-	pu->info     = info;};
+	pu->info     = info;
+
+	SC_mark(path, 1);};
 
     return(pu);}
 

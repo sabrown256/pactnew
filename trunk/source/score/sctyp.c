@@ -260,7 +260,7 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 
     SC_VA_START(bpi);
 
-    t = (SC_type *) SC_hasharr_lookup(ha, name);
+    t = (SC_type *) SC_hasharr_def_lookup(ha, name);
     if (t != NULL)
        id = t->id;
     else

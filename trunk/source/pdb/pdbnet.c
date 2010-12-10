@@ -70,6 +70,8 @@ static int _PN_bsetvbuf(FILE *stream, char *bf, int type, size_t size)
 static int _PN_bclose(FILE *stream)
    {int ret;
     BF_FILE *fb;
+static int count=0;
+count++;
 
     fb = _PD_GET_FILE_PTR(stream);
 
@@ -322,6 +324,8 @@ static FILE *_PN_bopen(char *name, char *mode)
     fb->length       = SC_arrlen(name);
     fb->bf.memaddr   = name;
     fb->addr.memaddr = name;
+
+    SC_mark(name, 1);
 
     rf = _PD_SETUP_PSEUDO_FILE(fb);
 
@@ -642,7 +646,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
        {*file = *fm;
 
         pu->stream = NULL;
-        pu->path   = NULL;
+/*        pu->path   = NULL; */
 
 	_SC_rel_udl(pu);
 
