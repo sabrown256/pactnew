@@ -239,7 +239,7 @@ static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
     for (i = off; i < ni; i++)
         accv = op(accv, v[i]);
 
-    if ((idf < SC_FLOAT_I) && (accv < LONG_MAX))
+    if ((SC_is_type_fix(idf) == TRUE) && (accv < LONG_MAX))
        acc = SS_mk_integer(accv);
     else
        acc = SS_mk_float(accv);
@@ -369,15 +369,15 @@ object *SS_binary_homogeneous(C_procedure *cp, object *argl)
        SS_error("NON-NUMERIC OPERAND - SS_BINARY_HOMOGENEOUS", argl);
 
 /* fixed point operands */
-    else if (ido < SC_FLOAT_I)
+    else if (SC_is_type_fix(ido) == TRUE)
        acc = _SS_bin_fix(ni, argl, (PFDoubledd) cp->proc[0]);
 
 /* floating point operands */
-    else if (ido < SC_FLOAT_COMPLEX_I)
+    else if (SC_is_type_fp(ido) == TRUE)
        acc = _SS_bin_float(ni, argl, (PFDoubledd) cp->proc[0]);
 
 /* complex floating point operands */
-    else if (ido < SC_QUATERNION_I)
+    else if (SC_is_type_cx(ido) == TRUE)
        acc = _SS_bin_complex(ni, argl, (PFComplexcc) cp->proc[1]);
 
 /* quaternion operands */
@@ -406,7 +406,7 @@ object *SS_binary_heterogeneous(C_procedure *cp, object *argl)
        SS_error("NON-NUMERIC OPERAND - SS_BINARY_HETEROGENEOUS", argl);
 
 /* fixed point and floating point operands */
-    else if (ido < SC_FLOAT_COMPLEX_I)
+    else if ((SC_is_type_fix(ido) == TRUE) || (SC_is_type_fp(ido) == TRUE))
        {double x, accv;
 	PFDoubledd op;
 
@@ -420,7 +420,7 @@ object *SS_binary_heterogeneous(C_procedure *cp, object *argl)
 	acc  = SS_mk_float(accv);}
 
 /* complex floating point operands */
-    else if (ido < SC_QUATERNION_I)
+    else if (SC_is_type_cx(ido) == TRUE)
        {double _Complex z, accv;
 	PFComplexcd op;
 

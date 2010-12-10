@@ -153,7 +153,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 
 /* check for character types (proper) */
     if (SC_is_type_char(id) == TRUE)
-       {ic = id - SC_CHAR_I;
+       {ic = SC_TYPE_CHAR(id);
 	if (ic < N_PRIMITIVE_CHAR)
 	   {switch (nb)
 	       {case 1 :
@@ -174,7 +174,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 
 /* check for fixed point types (proper) */
     else if (SC_is_type_fix(id) == TRUE)
-       {ifx = id - SC_INT8_I;
+       {ifx = SC_TYPE_FIX(id);
 	if (ifx < N_PRIMITIVE_FIX)
 	   {std->fx[ifx].bpi   = nb;
 	    std->fx[ifx].order = (PD_byte_order) flg;
@@ -182,7 +182,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 
 /* check for floating point types (proper) */
     else if (SC_is_type_fp(id) == TRUE)
-       {ifp = id - SC_FLOAT_I;
+       {ifp = SC_TYPE_FP(id);
 	if (ifp < N_PRIMITIVE_FP)
 	   {std->fp[ifp].bpi    = nb;
 	    std->fp[ifp].order  = ordr;
@@ -191,7 +191,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 
 /* check for complex floating point types (proper) */
     else if (SC_is_type_cx(id) == TRUE)
-       {icx = id - SC_FLOAT_COMPLEX_I;
+       {icx = SC_TYPE_CPX(id);
 	if (icx < N_PRIMITIVE_CPX)
 	   {
 /*

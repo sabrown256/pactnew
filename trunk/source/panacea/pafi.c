@@ -78,10 +78,10 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 	 if (PA_VARIABLE_N_DIMS(pp) == 0)
 	    {id = SC_type_id(pt, FALSE);
 
-	     if (id == SC_DOUBLE_I)
-	        n_doubles++;
-	     else if (id == SC_INT_I)
+	     if (id == SC_INT_I)
 	        n_integers++;
+	     else if (id == SC_DOUBLE_I)
+	        n_doubles++;
 	     else if (id == SC_STRING_I)
 	        n_strings++;};};
 
@@ -134,16 +134,13 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
          type = PA_VARIABLE_TYPE_S(pp);
 	 id   = SC_type_id(type, FALSE);
          if (id == SC_INT_I)
-            {PA_VARIABLE_DATA(pp) = (void *) &SWTCH[isw++];
-             continue;};
+            {PA_VARIABLE_DATA(pp) = (void *) &SWTCH[isw++];}
 
-         if (id == SC_DOUBLE_I)
-            {PA_VARIABLE_DATA(pp) = (void *) &PARAM[ipr++];
-             continue;};
+         else if (id == SC_DOUBLE_I)
+            {PA_VARIABLE_DATA(pp) = (void *) &PARAM[ipr++];}
 
-         if (id == SC_STRING_I)
-            {PA_VARIABLE_DATA(pp) = (void *) &NAME[inm++];
-             continue;};};
+         else if (id == SC_STRING_I)
+            {PA_VARIABLE_DATA(pp) = (void *) &NAME[inm++];};};
 
     return;}
 

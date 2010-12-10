@@ -1366,7 +1366,7 @@ int PD_autofix_denorm(PDBfile *file, int flag)
  */
 
 int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
-   {int st, reord, mask, rshift, nbits, nrem;
+   {int id, ifp, st, reord, mask, rshift, nbits, nrem;
     int n_exp, n_mant, exp_sum, mant_sum, mant_bit, exp_bit;
     int *ord;
     int64_t i, j, in, nb;
@@ -1384,27 +1384,29 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
     if (std == NULL)
        std = INT_STANDARD;
 
+    id = SC_type_id(type, FALSE);
+
     if (_PD_indirection(type) == TRUE)
        {snprintf(pa->err, MAXLINE,
 		 "ERROR: TYPE %s IS INDIRECT - PD_FIX_DENORM\n",
 		 type);
 	st = FALSE;}
 
-/* determine what fmt standard to handle - this gets real and complex types */
-    else if (strncmp(SC_FLOAT_S, type, strlen(SC_FLOAT_S)) == 0)
-       {nb  = std->fp[0].bpi;
-	fmt = std->fp[0].format;
-	ord = std->fp[0].order;}
+/* floating point type fmt */
+    else if (SC_is_type_fp(id) == TRUE)
+       {ifp = SC_TYPE_FP(id);
+	if (ifp < N_PRIMITIVE_FP)
+	   {nb  = std->fp[ifp].bpi;
+	    fmt = std->fp[ifp].format;
+	    ord = std->fp[ifp].order;};}
 
-    else if (strncmp(SC_DOUBLE_S, type, strlen(SC_DOUBLE_S)) == 0)
-       {nb  = std->fp[1].bpi;
-	fmt = std->fp[1].format;
-	ord = std->fp[1].order;}
-
-    else if (strncmp(SC_LONG_DOUBLE_S, type, strlen(SC_LONG_DOUBLE_S)) == 0)
-       {nb  = std->fp[2].bpi;
-	fmt = std->fp[2].format;
-	ord = std->fp[2].order;}
+/* complex floating point type fmt */
+    else if (SC_is_type_cx(id) == TRUE)
+       {ifp = SC_TYPE_CPX(id);
+	if (ifp < N_PRIMITIVE_FP)
+	   {nb  = std->fp[ifp].bpi;
+	    fmt = std->fp[ifp].format;
+	    ord = std->fp[ifp].order;};}
 
     else
        {snprintf(pa->err, MAXLINE,

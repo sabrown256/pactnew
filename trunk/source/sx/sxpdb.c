@@ -3489,7 +3489,7 @@ static object *_SXI_set_format(object *argl)
 
 /* character types (proper) */
     for (i = 0; (i < N_PRIMITIVE_CHAR) && (ok == FALSE); i++)
-        {id  = i + SC_CHAR_I;
+        {id  = SC_TYPE_CHAR(i);
 	 typ = chtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
@@ -3507,7 +3507,7 @@ static object *_SXI_set_format(object *argl)
 
 /* fixed point types (proper) */
     for (i = 0; (i < N_PRIMITIVE_FIX) && (ok == FALSE); i++)
-        {id  = i + SC_INT8_I;
+        {id  = SC_TYPE_FIX_ID(i);
 	 typ = fxtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
@@ -3525,7 +3525,7 @@ static object *_SXI_set_format(object *argl)
 
 /* real floating point types (proper) */
     for (i = 0; (i < N_PRIMITIVE_FP) && (ok == FALSE); i++)
-        {id  = i + SC_FLOAT_I;
+        {id  = SC_TYPE_FP_ID(i);
 	 typ = fptypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
@@ -3543,7 +3543,7 @@ static object *_SXI_set_format(object *argl)
 
 /* complex floating point types (proper) */
     for (i = 0; (i < N_PRIMITIVE_FP) && (ok == FALSE); i++)
-        {id  = i + SC_FLOAT_COMPLEX_I;
+        {id  = SC_TYPE_CPX_ID(i);
 	 typ = cmtypes[i];
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);

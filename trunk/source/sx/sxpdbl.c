@@ -166,8 +166,18 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
     id = SC_type_id(type, FALSE);
 
+    if (id == SC_BOOL_I)
+       {int *d;
+
+	d = SC_convert_id(SC_INT_I, NULL, 0, 1,
+			  id, vr, 0, 1, ni, FALSE);
+
+	ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
+
+	SFREE(d);}
+
 /* character types (proper) */
-    if (SC_is_type_char(id) == TRUE)
+    else if (SC_is_type_char(id) == TRUE)
        {if (vr == NULL)
 	   obj = SS_null;
         else
@@ -203,16 +213,6 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 			  id, vr, 0, 1, ni, FALSE);
 
 	ARRAY_VECTOR(obj, d, SS_mk_complex, ni, offset);
-
-	SFREE(d);}
-
-    else if (id == SC_BOOL_I)
-       {int *d;
-
-	d = SC_convert_id(SC_INT_I, NULL, 0, 1,
-			  id, vr, 0, 1, ni, FALSE);
-
-	ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
 
 	SFREE(d);}
 
