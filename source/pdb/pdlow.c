@@ -873,7 +873,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
 void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     data_alignment *falign, data_alignment *halign,
 		     int ishc, int ftk)
-   {int ic, ifx, ifp, conv, flag;
+   {int ic, id, ifx, ifp, conv, flag;
     int fcnv[N_PRIMITIVE_FP];
     char utyp[MAXLINE];
     char *styp, *btyp;
@@ -899,7 +899,8 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* character types (proper) */
     for (ic = 0; ic < N_PRIMITIVE_CHAR; ic++)
-        {styp = SC_type_name(ic + SC_CHAR_I);
+        {id   = SC_TYPE_CHAR_ID(ic);
+	 styp = SC_type_name(id);
 	 snprintf(utyp, MAXLINE, "u_%s", styp);
 
 	 conv = _PD_compare_char_std(ic, fstd, hstd, falign, halign, flag, ftk);
@@ -916,7 +917,8 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* fixed point types (proper) */
     for (ifx = 0; ifx < N_PRIMITIVE_FIX; ifx++)
-        {styp = SC_type_name(ifx + SC_INT8_I);
+        {id   = SC_TYPE_FIX_ID(ifx);
+	 styp = SC_type_name(id);
 	 snprintf(utyp, MAXLINE, "u_%s", styp);
 
 	 conv = _PD_compare_fix_std(ifx, fstd, hstd, falign, halign, flag, ftk);
@@ -932,7 +934,8 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* floating point types (proper) */
     for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
-        {styp = SC_type_name(ifp + SC_FLOAT_I);
+        {id   = SC_TYPE_FP_ID(ifp);
+	 styp = SC_type_name(id);
 
 	 fcnv[ifp] = _PD_compare_fp_std(ifp, fstd, hstd, falign, halign, flag, ftk);
 	 _PD_defstr_in(chart, styp, FLOAT_KIND,
@@ -943,8 +946,11 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* complex floating point types (proper) */
     for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
-        {btyp = SC_type_name(ifp + SC_FLOAT_I);
-         styp = SC_type_name(ifp + SC_FLOAT_COMPLEX_I);
+        {id   = SC_TYPE_FP_ID(ifp);
+	 btyp = SC_type_name(id);
+
+	 id   = SC_TYPE_CPX_ID(ifp);
+         styp = SC_type_name(id);
 
 	 tup = _PD_make_tuple(btyp, 2, NULL);
 	 _PD_defstr_in(chart, styp, FLOAT_KIND,

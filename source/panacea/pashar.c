@@ -465,7 +465,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
 
     itype = SC_type_id(vtype, FALSE);
 
-    if ((itype < 0) || (SC_LONG_DOUBLE_COMPLEX_I < itype))
+    if (SC_is_type_num(itype) == FALSE)
        PA_ERR(TRUE,
               "TYPE %s UNSUPPORTED FOR SCALARS - PA_INST_SCALAR");
 

@@ -148,8 +148,12 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
 
     type = SC_arrtype(p, -1);
 
+/* character types (ok) */
     if (type == SC_CHAR_I)
        {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
+
+    else if (type == SC_WCHAR_I)
+       {MIN_MAX(wchar_t, p, n, pn, px, imin, imax, WCHAR_MAX);}
 
 /* fixed point types (ok) */
     else if (type == SC_INT8_I)
@@ -265,8 +269,12 @@ int PM_find_index(void *p, double f, int n)
 
     type = SC_arrtype(p, -1);
 
+/* character types (ok) */
     if (type == SC_CHAR_I)
        {FIND_INDEX(char, p, f, n, indx);}
+
+    else if (type == SC_WCHAR_I)
+       {FIND_INDEX(wchar_t, p, f, n, indx);}
 
 /* fixed point types (ok) */
     else if (type == SC_INT8_I)
@@ -546,13 +554,18 @@ void PM_sub_array(void *in, void *out, long *dims, long *reg, long bpi)
  */
 
 int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
-		   int (*prd)(double u, double v), double val, int nin, int *in)
+		   int (*prd)(double u, double v), double val,
+		   int nin, int *in)
    {int id;
 
     id = SC_type_id(type, FALSE);
 
+/* character types (ok) */
     if (id == SC_CHAR_I)
        {FIND_VALUE(char, nx, x, prd, val, nout, out, nin, in);}
+
+    else if (id == SC_WCHAR_I)
+       {FIND_VALUE(wchar_t, nx, x, prd, val, nout, out, nin, in);}
 
 /* fixed point types (ok) */
     else if (id == SC_INT8_I)

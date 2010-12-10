@@ -670,11 +670,11 @@ void PA_pshand(PA_command *cp)
 	if (SC_is_type_num(did) == TRUE)
 	   SC_convert_id(did, cp->vr, i, 1, SC_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
-        else if ((cp->type == SC_CHAR_I) || (cp->type == SC_STRING_I))
+        else if ((did == SC_CHAR_I) || (did == SC_STRING_I))
            ((char **) cp->vr)[i] = SC_strsavef(sval, "char*:PA_PSHAND:s");
 
 /* since char_8 is a FORTRAN disease treat it as static */
-        else if (cp->type == SC_CHAR_8_I)
+        else if (did == SC_CHAR_8_I)
            {int nb;
             char *s;
 

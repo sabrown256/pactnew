@@ -514,18 +514,8 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
     type = svp->pp->desc->type;
     id   = SC_type_id(type, FALSE);
 
-/* floating point types */
-    if (id == SC_FLOAT_I)
-       {PA_INTERP_TYPE(v, float, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_DOUBLE_I)
-       {PA_INTERP_TYPE(v, double, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {PA_INTERP_TYPE(v, long double, svp, t, t0, t1, t2, t3);}
-
 /* fixed point types */
-    else if (id == SC_INT8_I)
+    if (id == SC_INT8_I)
        {PA_INTERP_TYPE(v, int8_t, svp, t, t0, t1, t2, t3);}
 
     else if (id == SC_SHORT_I)
@@ -538,7 +528,17 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
        {PA_INTERP_TYPE(v, long, svp, t, t0, t1, t2, t3);}
 
     else if (id == SC_LONG_LONG_I)
-       {PA_INTERP_TYPE(v, long long, svp, t, t0, t1, t2, t3);};
+       {PA_INTERP_TYPE(v, long long, svp, t, t0, t1, t2, t3);}
+
+/* floating point types */
+    else if (id == SC_FLOAT_I)
+       {PA_INTERP_TYPE(v, float, svp, t, t0, t1, t2, t3);}
+
+    else if (id == SC_DOUBLE_I)
+       {PA_INTERP_TYPE(v, double, svp, t, t0, t1, t2, t3);}
+
+    else if (id == SC_LONG_DOUBLE_I)
+       {PA_INTERP_TYPE(v, long double, svp, t, t0, t1, t2, t3);};
 
     return;}
 

@@ -392,13 +392,13 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
     ifp = -1;
 
     if (SC_is_type_fix(ityp) == TRUE)
-       ifx = ityp - SC_INT8_I;
+       ifx = SC_TYPE_FIX(ityp);
 
     else if (SC_is_type_fp(ityp) == TRUE)
-       ifp = ityp - SC_FLOAT_I;
+       ifp = SC_TYPE_FP(ityp);
 
     else if (SC_is_type_cx(ityp) == TRUE)
-       ifp = ityp - SC_FLOAT_COMPLEX_I;
+       ifp = SC_TYPE_CPX(ityp);
 
     else
        {snprintf(pa->err, MAXLINE,

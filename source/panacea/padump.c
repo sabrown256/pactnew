@@ -551,7 +551,7 @@ void _PA_dump_package_mappings(PA_package *pck, double t, double dt,
 
 C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
    {int i, n;
-    char *pname, **ps;
+    char *nm, *pname, **ps;
     long size, indx, ndx;
     double *v, start;
     C_array *arr;
@@ -605,8 +605,8 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
  * domain_list
  */
     if (!pr->time_plot)
-       {domain_list[i].name = PD_process_set_name(SC_strsavef(dname,
-							      "char*:PA_GET_DOMAIN_INFO:name"));
+       {nm = SC_strsavef(dname, "char*:PA_GET_DOMAIN_INFO:name");
+	domain_list[i].name = PD_process_set_name(nm);
         domain_list[i].map  = arr;
         domain_list[i].time = pr->domain;
         n_domains++;
@@ -624,8 +624,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 	 pname = pi->var_name;
          pp    = PA_inquire_variable(pname);
 
-         dmap[i].name = SC_strsavef(pname,
-                         "char*:PA_GET_DOMAIN_INFO:name");
+         dmap[i].name = SC_strsavef(pname, "char*:PA_GET_DOMAIN_INFO:name");
          if (pi->text != NULL)
             {ps  = (char **) PA_VARIABLE_DATA(pp);
              ndx = PA_VARIABLE_SIZE(pp);

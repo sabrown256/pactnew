@@ -608,7 +608,7 @@ static object *_SXI_def_var(object *argl)
 
 	itype = SC_type_id(vtype, FALSE);
 
-	if ((itype < 0) || (SC_LONG_DOUBLE_COMPLEX_I < itype))
+	if (SC_is_type_num(itype) == FALSE)
            PA_WARN(TRUE,
                    "TYPE %s UNSUPPORTED AS IMPLICIT COMMAND - _SXI_DEF_VAR",
                    vtype);
