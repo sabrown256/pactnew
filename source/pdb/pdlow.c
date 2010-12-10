@@ -946,7 +946,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* complex floating point types (proper) */
     for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
-        {id   = SC_TYPE_FP_ID(ifp);
+        {id   = SC_TYPE_CPX_ID(ifp);
 	 btyp = SC_type_name(id);
 
 	 id   = SC_TYPE_CPX_ID(ifp);

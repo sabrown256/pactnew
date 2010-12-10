@@ -1032,9 +1032,6 @@ static int test_1(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_1();
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -1766,9 +1763,6 @@ static int test_2(char *base, char *tgt, int n)
 /* cleanup test data memory */
     cleanup_test_2();
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -2056,9 +2050,6 @@ static int test_3(char *base, char *tgt, int n)
 
 /* clean up test data memory */
     cleanup_test_3();
-
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
     if (err)
@@ -2406,9 +2397,6 @@ static int test_4(char *base, char *tgt, int n)
 /* clean up test data memory */
     cleanup_test_4();
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -2669,9 +2657,6 @@ static int test_5(char *base, char *tgt, int n)
 /* clean up test data memory */
     cleanup_test_5();
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -2887,9 +2872,6 @@ static int test_6(char *base, char *tgt, int n)
 /* clean up test data memory */
     cleanup_test_6();
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -3095,9 +3077,6 @@ static int test_7(char *base, char *tgt, int n)
 
 /* clean up test data memory */
     cleanup_test_7();
-
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
     if (err)
@@ -3341,9 +3320,6 @@ static int test_8(char *base, char *tgt, int n)
 
 /* clean up test data memory */
     cleanup_test_8();
-
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
     if (err)
@@ -3630,9 +3606,6 @@ static int test_10(char *base, char *tgt, int n)
 /* print it out to STDOUT */
     print_test_10_data(fp);
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -3671,6 +3644,9 @@ static int run_test(PFTest test, int n, char *host, int native)
     char *nm;
     double time;
     static int dbg = 0;
+
+    if (debug_mode)
+       dbg = 2;
 
 /* NOTE: under the debugger set dbg to 1 or 2 for additional
  *       memory leak monitoring
@@ -3791,7 +3767,7 @@ int main(int c, char **v)
 		      break;
 		 case 'd' :
 		      debug_mode  = TRUE;
-		      SC_mm_debug = TRUE;
+/*		      SC_mm_debug = TRUE; */
 		      break;
                  case 'h' :
 		      print_help();

@@ -87,7 +87,7 @@ static void _PD_pfm_init_t(void)
        {_PD.nfilesx = N_PFM_FILES;
 
         _PD_pfman = NMAKE_N(pfmanager, _PD.nfilesx,
-				"PERM|_PD_PFM_INIT_T:_PD_pfman");
+			    "PERM|_PD_PFM_INIT_T:_PD_pfman");
 
 	pm = _PD_pfman;
 

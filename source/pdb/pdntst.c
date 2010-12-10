@@ -159,7 +159,7 @@ void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDNTST - run PDB net test suite\n\n");
-    PRINT(STDOUT, "Usage: pdntst [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4] [-5]\n");
+    PRINT(STDOUT, "Usage: pdntst [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
@@ -169,7 +169,6 @@ void print_help(void)
     PRINT(STDOUT, "       2 - do NOT run test #2\n");
     PRINT(STDOUT, "       3 - do NOT run test #3\n");
     PRINT(STDOUT, "       4 - do NOT run test #4\n");
-    PRINT(STDOUT, "       5 - do NOT run test #5\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -227,6 +226,9 @@ static int run_test(PFTest test, int n, char *host)
     char *nm;
     double time;
     static int dbg = 0;
+
+    if (debug_mode)
+       dbg = 2;
 
 /* NOTE: under the debugger set dbg to 1 or 2 for additional
  *       memory leak monitoring
@@ -678,9 +680,6 @@ static int test_1(char *base, char *tgt, int n)
 
     PD_close(strm);
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -1035,9 +1034,6 @@ static int test_2(char *base, char *tgt, int n)
 
     PD_close(strm);
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -1284,9 +1280,6 @@ static int test_3(char *base, char *tgt, int n)
     cleanup_test_3();
 
     PD_close(strm);
-
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
     if (err)
@@ -1600,9 +1593,6 @@ static int test_4(char *base, char *tgt, int n)
 
     PD_close(strm);
 
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
     io_close(fp);
     if (err)
        REMOVE(fname);
@@ -1633,8 +1623,7 @@ int main(int c, char **v)
         {if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'd' :
-		      debug_mode  = TRUE;
-		      SC_mm_debug = TRUE;
+		      debug_mode = TRUE;
 		      break;
                  case 'h' :
 		      print_help();

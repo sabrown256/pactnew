@@ -252,8 +252,7 @@ static void INLINE _SC_assign_block(SC_heap_des *ph, mem_header *space,
 				    long nb, char *name)
    {mem_descriptor *desc;
     mem_header *prev, *next, *lb;
-static int count = 0;
-count++;
+
     desc = &space->block;
 
     ASSIGN_ID(desc);

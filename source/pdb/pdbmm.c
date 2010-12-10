@@ -719,9 +719,10 @@ multides *_PD_copy_tuple(multides *tuple)
 void _PD_free_tuple(multides *tuple)
    {
 
-    SFREE(tuple->type);
-    SFREE(tuple->order);
-    SFREE(tuple);
+    if (tuple != NULL)
+       {SFREE(tuple->type);
+	SFREE(tuple->order);
+	SFREE(tuple);};
 
     return;}
 
