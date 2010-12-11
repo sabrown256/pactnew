@@ -25,6 +25,10 @@ typedef struct s_template template;
 struct s_template
    {int tmn;
     int tmx;
+    int nl;
+    char *rtype;
+    char *fname;
+    char *args;
     char **body;};
 
 static char
@@ -59,19 +63,51 @@ static char
 
 /* MAKE_TEMPLATE - instantiate a template */
 
-template *make_template(char **body, char *tmn, char *tmx)
-   {int i;
+template *make_template(char *proto, int nl, char **body,
+			char *tmn, char *tmx)
+   {int i, n;
+    char rtype[MAXLINE];
+    char *p, *args, *fname, **sa;
     template *t;
 
     t = MAKE(template);
 
+/* reduce the type range names to indeces */
     for (i = 0; i < N_TYPES; i++)
-        {if (strcmp(tmn, types[i]) == 0)
-	    t->tmn = i;
-	 else if (strcmp(tmx, types[i]) == 0)
-	    t->tmx = i;};
+        {if (types[i] != NULL)
+	    {if (strcmp(tmn, types[i]) == 0)
+	        t->tmn = i;
+	     else if (strcmp(tmx, types[i]) == 0)
+	        t->tmx = i;};};
 
-    t->body = body;
+/* parse out the prototype */
+    p = strtok(proto, "(\n\r");
+
+/* get the arg list */
+    args = strtok(NULL, "\n\r");
+    LAST_CHAR(args) = '\0';
+
+/* get the function name */
+    sa = tokenize(p, " \t\n\r");
+    for (n = 0; sa[n] != NULL; n++);
+    fname = sa[--n];
+
+/* get the qualifiers */
+    memset(rtype, 0, MAXLINE);
+    for (i = 0; i < n; i++)
+        {nstrcat(rtype, MAXLINE, sa[i]);
+	 nstrcat(rtype, MAXLINE, " ");};
+    LAST_CHAR(rtype) = '\0';
+        
+    t->rtype = STRSAVE(rtype);
+    t->fname = STRSAVE(fname);
+    t->args  = STRSAVE(args);
+    t->nl    = nl;
+    t->body  = body;
+
+    free_strings(sa);
+    FREE(tmn);
+    FREE(tmx);
 
     return(t);}
 
@@ -94,11 +130,15 @@ void free_template(template *t)
 
 /* WRITE_HEADER - write the beginning of the file */
 
-static void write_header(FILE *fp)
-   {
+static void write_header(FILE *fp, char *inf)
+   {char s[MAXLINE];
+    char *p;
+
+    nstrncpy(s, MAXLINE, inf, -1);
+    p = path_tail(upcase(strtok(s, ".\n")));
 
     fprintf(fp, "/*\n");
-    fprintf(fp, " * SCTYPEG.H - generated type handling routines\n");
+    fprintf(fp, " * %s.H - generated type handling routines\n", p);
     fprintf(fp, " *\n");
     fprintf(fp, " * Source Version: 3.0\n");
     fprintf(fp, " * Software Release #: LLNL-CODE-422942\n");
@@ -107,17 +147,6 @@ static void write_header(FILE *fp)
     fprintf(fp, " \n");
 
     fprintf(fp, "#include <cpyright.h>\n");
-    fprintf(fp, "#include <score.h>\n");
-    fprintf(fp, " \n");
-
-    fprintf(fp, "#define N_PRIMITIVES  %d\n", N_PRIMITIVES);
-    fprintf(fp, " \n");
-
-    fprintf(fp, "#undef CONVERT\n");
-    fprintf(fp, " \n");
-
-    fprintf(fp, "#define BOOL_MIN    0\n");
-    fprintf(fp, "#define BOOL_MAX    1\n");
     fprintf(fp, " \n");
 
     return;}
@@ -128,24 +157,27 @@ static void write_header(FILE *fp)
 /* WRITE_FNC - write the function for type ID */
 
 static void write_fnc(FILE *fp, int id, template *t)
-   {
+   {int i, nl;
+    char s[MAXLINE];
+    char **body, *rtype, *fname, *args, *p;
 
-    fprintf(fp, "char *tmpl_%s(char *t, int nc, void *s, long n, int mode)\n",
-	    names[id]);
-    fprintf(fp, "   {int nb;\n");
-    fprintf(fp, "    char *fmt;\n");
-    fprintf(fp, "    %s *pv = (%s *) s;\n", types[id], types[id]);
+    nl    = t->nl;
+    body  = t->body;
+    rtype = t->rtype;
+    fname = t->fname;
+    args  = t->args;
 
-    fprintf(fp, "    fmt = (mode == 1) ? _SC.types.formats[%d] : _SC.types.formata[%d];\n",
-	    id, id);
+    fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname, names[id], args);
+    for (i = 1; i < nl; i++)
+        {nstrncpy(s, MAXLINE, body[i], -1);
+	 p = subst(s, "<TYPE>", types[id], -1);
+	 p = subst(p, "<MIN>", mn[id], -1);
+	 p = subst(p, "<MAX>", mx[id], -1);
+	 fputs(p, fp);};
 
-    fprintf(fp, "    nb  = snprintf(t, nc, fmt, pv[n]);\n");
-
-    fprintf(fp, "    if (nb < 0)\n");
-    fprintf(fp, "       t = NULL;\n");
-
-    fprintf(fp, "    return(t);}\n");
     fprintf(fp, "\n");
+
+    Separator(fp);
 
     return;}
 
@@ -154,20 +186,29 @@ static void write_fnc(FILE *fp, int id, template *t)
 
 /* WRITE_TMPL_DECL - write the declaration of the template array */
 
-static void write_tmpl_decl(FILE *fp)
-   {int i;
+static void write_tmpl_decl(FILE *fp, template *t)
+   {int i, nl, tmn, tmx;
+    char **body, *rtype, *fname, *args;
 
-    fprintf(fp, "typedef char *(*PFStrv)(char *t, int nc, void *s, long n, int mode);\n");
+    nl    = t->nl;
+    body  = t->body;
+    rtype = t->rtype;
+    fname = t->fname;
+    args  = t->args;
+    tmn   = t->tmn;
+    tmx   = t->tmx;
+
+    fprintf(fp, "typedef %s (*PF%s)(%s);\n", rtype, fname, args);
     fprintf(fp, "\n");
 
-    fprintf(fp, "static PFStrv\n");
-    fprintf(fp, " tmplf[] = {\n");
+    fprintf(fp, "static PF%s\n", fname);
+    fprintf(fp, " %s_fnc[] = {\n", fname);
     for (i = 0; i < N_TYPES; i++)
-        {if (types[i] != NULL)
+        {if ((types[i] != NULL) && (tmn <= i) && (i <= tmx))
 	    {if (i == N_TYPES-1)
-	        fprintf(fp, "                tmpl_%s\n", names[i]);
+	        fprintf(fp, "                %s_%s\n", fname, names[i]);
 	     else
-	        fprintf(fp, "                tmpl_%s,\n", names[i]);}
+	        fprintf(fp, "                %s_%s,\n", fname, names[i]);}
 	 else
 	    {if (i == N_TYPES-1)
 	        fprintf(fp, "                NULL\n");
@@ -185,17 +226,18 @@ static void write_tmpl_decl(FILE *fp)
 /* WRITE_TMPL - write the routines from the template */
 
 static void write_tmpl(FILE *fp, template *t)
-   {int i;
+   {int i, tmn, tmx;
 
     Separator(fp);
 
-    for (i = 0; i < N_TYPES; i++)
+    tmn = t->tmn;
+    tmx = t->tmx;
+
+    for (i = tmn; i <= tmx; i++)
 	{if (types[i] != NULL)
 	    write_fnc(fp, i, t);};
 
-    write_tmpl_decl(fp);
-
-    Separator(fp);
+    write_tmpl_decl(fp, t);
 
     return;}
 
@@ -205,14 +247,17 @@ static void write_tmpl(FILE *fp, template *t)
 /* PARSE_TMPL - read and parse the next template from FP */
 
 static template *parse_tmpl(FILE *fp)
-   {int i, nt, nl;
+   {int i, nt, nl, npo, npc, fpr;
     off_t ad;
-    char s[MAXLINE];
+    char s[MAXLINE], proto[MAXLINE];
     char *tmn, *tmx, *p, **sa;
     template *t;
 
-    nt = 0;
-    sa = NULL;
+    fpr = FALSE;
+    npo = 0;
+    npc = 0;
+    nt  = 0;
+    sa  = NULL;
     for (i = 0; TRUE; i++)
         {ad = ftell(fp);
 
@@ -222,20 +267,32 @@ static template *parse_tmpl(FILE *fp)
 	 if (blank_line(p) == TRUE)
 	    continue;
 	 else if (strncmp(p, "template<", 9) == 0)
-	    {nl = 0;
-	     nt++;
+	    {nt++;
 	     if (nt == 1)
 	        {strtok(p, "<|>");
-		 tmn = strtok(NULL, "<|>");
-		 tmx = strtok(NULL, "<|>");}
+		 tmn = STRSAVE(strtok(NULL, "<|>"));
+		 tmx = STRSAVE(strtok(NULL, "<|>"));
+	         memset(proto, 0, MAXLINE);}
 	     else
 	        {fseek(fp, SEEK_SET, ad);
-		 break;};}
+		 break;};
+	     nl  = 0;
+	     fpr = FALSE;}
 	 else if (nt == 1)
- 	    {nl++;
-	     sa = lst_push(sa, "%s", p);};};
+	    {if (fpr == FALSE)
+	        {npo += nchar(s, '(');
+	         npc += nchar(s, ')');
+		 nstrcat(proto, MAXLINE, s);
+		 if ((npo == npc) && (npo > 0))
+		    fpr = TRUE;}
+	     else
+	        {nl++;
+		 sa = lst_push(sa, "%s", p);};};};
 
-    t = make_template(sa, tmn, tmx);
+    if ((nt > 0) && (sa != NULL))
+       t = make_template(proto, nl, sa, tmn, tmx);
+    else
+       t = NULL;
 
     return(t);}
 
@@ -261,7 +318,7 @@ int main(int c, char **v)
 	    inf = v[i];};
 
     if (inf != NULL)
-       fi = fopen(inf, "r");
+       fi = fopen(inf, "r+");
 
     if ((inf == NULL) || (fi == NULL))
        {printf("No input file specified - exiting\n");
@@ -272,10 +329,12 @@ int main(int c, char **v)
     else
        fo = stdout;
 
-    write_header(fo);
+    write_header(fo, inf);
 
     while (TRUE)
        {t = parse_tmpl(fi);
+	if (t == NULL)
+	   break;
 
 	write_tmpl(fo, t);
 
