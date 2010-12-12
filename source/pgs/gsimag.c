@@ -10,40 +10,13 @@
  
 #include "pgs_int.h"
 
+#include "gsimag.h"
+
 typedef void (*PFImgZC)(PG_device *dev, char *name, char *type, void *f,
                         double *frm, void *cnnct, pcons *alist);
 
 typedef void (*PFImgNC)(PG_device *dev, char *name, char *type, void *f,
                         double *frm, void *cnnct, pcons *alist);
-
-/*--------------------------------------------------------------------------*/
-
-/* Note that if z is within range the scaled pixel value is shifted up by
- * two colors accounting for the black and white mandatory in each palette
- */
-#define PG_TRANS_IMAGE(_d, _bf, _km, _lm, _n, _nc, _z, _zmn, _zmx, _t, _vn, _vx) \
-    {_t *_lz, _lzt, _lzmn, _lzmx;                                            \
-     int _i, _cmid;                                                          \
-     double _sc;                                                             \
-     _lz = (_t *) _z;                                                        \
-     if (_zmx <= _zmn)                                                       \
-        {_lzmn = _vx;                                                        \
-         _lzmx = _vn;                                                        \
-         for (_i = 0; _i < _n; _i++)                                         \
-             {_lzt = _lz[_i];                                                \
-              _lzmn = min(_lzmn, _lzt);                                      \
-              _lzmx = max(_lzmx, _lzt);};                                    \
-         _zmn = _lzmn;                                                       \
-         _zmx = _lzmx;};                                                     \
-     _sc = (_zmn == _zmx) ? HUGE : 0.9999*_nc/(_zmx - _zmn);                 \
-     _cmid  = 0.5*_nc + 2;                                                   \
-     for (_i = 0; _i < _n; _i++, _lz++)                                      \
-         {if (_sc == HUGE)                                                   \
-             _bf[_i] = _cmid;                                                \
-          else                                                               \
-             _bf[_i] = _sc*(*_lz - _zmn) + 2;};}
-
-/*--------------------------------------------------------------------------*/
 
 static char
  *PG_IMAGE_S = "PG_image";
@@ -66,43 +39,10 @@ static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
 
     else
        {id = SC_deref_id(type, TRUE);
-	if (id == SC_CHAR_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   unsigned char, 0, 255);}
-
-/* fixed point types */
-	else if (id == SC_INT8_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   int8_t, INT8_MIN, INT8_MAX);}
-
-	else if (id == SC_SHORT_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   short, SHRT_MIN, SHRT_MAX);}
-
-	else if (id == SC_INT_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   int, INT_MIN, INT_MAX);}
-
-	else if (id == SC_LONG_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   long, LONG_MIN, LONG_MAX);}
-
-	else if (id == SC_LONG_LONG_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   long long, LONG_MIN, LONG_MAX);}
-
-/* floating point types */
-	else if (id == SC_FLOAT_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   float, -FLT_MAX, FLT_MAX);}
-
-	else if (id == SC_DOUBLE_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   double, -DBL_MAX, DBL_MAX);}
-
-	else if (id == SC_LONG_DOUBLE_I)
-	   {PG_TRANS_IMAGE(dev, bf, kmax, lmax, n, nc, z, zmin, zmax,
-			   long double, -LDBL_MAX, LDBL_MAX);};};
+	if (SC_is_type_prim(id) == TRUE)
+	   {if (_PG_map_type_image_fnc[id] != NULL)
+	       _PG_map_type_image_fnc[id](dev, bf, kmax, lmax, n, nc,
+					  z, zmin, zmax);};};
 
     return;}
 
