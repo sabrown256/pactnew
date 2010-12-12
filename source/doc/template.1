@@ -63,6 +63,22 @@ values:
   <MIN>     the minimum value for data of the type
   <MAX>     the maximum value for data of the type
 
+You can write different templates for different types and
+use them under a single name so long as the prototype is
+the same for all functions.  A partial example is:
+
+template<char|long long>
+void exa(void *x)
+   {...}
+
+template<float|long double>
+void exa(void *x)
+   {...}
+
+The resulting array of function pointers for exa would
+have non-NULL entries for types char through long double
+and the appropriate coding would be called for each type.
+
 .SH EXAMPLES
 
 Given the template file example.t:
