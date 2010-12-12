@@ -20,7 +20,7 @@ setenv MPILib   /usr/lib
 setenv IncMPI   ""
 setenv LibMPI   ""
 
-setenv SUFFIXES  '.i'
+setenv SUFFIXES  '.i .t'
 
 BuildSharedLibs = FALSE
 FilterDir       =

@@ -46,7 +46,7 @@ SaveFiles = *.c *.h *.scm
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core
+CleanFiles = *~ core ${IncDir}/sxpdbd.h
 
 #
 # Things upon which install depends (pact install)
@@ -82,7 +82,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = ${TGTInc}
+Hdrs = ${TGTInc} ${IncDir}/sxpdbd.h
 
 #
 # Object Files
@@ -116,6 +116,10 @@ sxmain.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}
 ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
+
+${IncDir}/sxpdbd.h : sxpdbd.t
+	@(echo "template sxpdbd.t -o ${IncDir}/sxpdbd.h" ;  \
+	  ${BinDir}/template sxpdbd.t -o ${IncDir}/sxpdbd.h)
 
 #
 # make the executable
