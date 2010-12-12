@@ -15,59 +15,7 @@
  
 #include "panacea_int.h"
 
-/*--------------------------------------------------------------------------*/
-
-/* PA_INTERP_TYPE - interpolate values of a certain type */
-
-#define PA_INTERP_TYPE(v, type, svp, t, t0, t1, t2, t3)                      \
-    {int i;                                                                  \
-     type *pv;                                                               \
-     type *d0, *d1, *d2, *d3, **pd;                                          \
-     double s1, s2;                                                          \
-     double dt10, dt21, dt32, xd1, xd2;                                      \
-     double xm1, xm2, xm3;                                                   \
-     double xf0, xf1, xf2, xf3;                                              \
-     pv = (type *) v;                                                        \
-     pd = (type **) svp->queue;                                              \
-     d0 = pd[0];                                                             \
-     d1 = pd[1];                                                             \
-     d2 = pd[2];                                                             \
-     d3 = pd[3];                                                             \
-     if (svp->interpolate)                                                   \
-        {dt10 = t1 - t0;                                                     \
-         dt21 = t2 - t1;                                                     \
-         dt32 = t3 - t2;                                                     \
-         s1 = (t - t1)/dt21;                                                 \
-         s2 = 1.0 - s1;                                                      \
-         for (i = ni; i < nf; i++)                                           \
-             {xd1 = 0.0;                                                     \
-              xd2 = 0.0;                                                     \
-              xf0 = (double) d0[i];                                          \
-              xf1 = (double) d1[i];                                          \
-              xf2 = (double) d2[i];                                          \
-              xf3 = (double) d3[i];                                          \
-              xm1 = (xf1 - xf0)/dt10;                                        \
-              xm2 = (xf2 - xf1)/dt21;                                        \
-              xm3 = (xf3 - xf2)/dt32;                                        \
-              if (xm1*xm2 > 0.0)                                             \
-                 {xd1 = (dt21*xm1 + dt10*xm2)/(dt10 + dt21);                 \
-                  if (xd1/xm1 > 3.0)                                         \
-                     xd1 = 3.0*xm1;                                          \
-                  if (xd1/xm2 > 3.0)                                         \
-                     xd1 = 3.0*xm2;};                                        \
-              if (xm2*xm3 > 0.0)                                             \
-                 {xd2 = (dt32*xm2 + dt21*xm3)/(dt21 + dt32);                 \
-                  if (xd2/xm2 > 3.0)                                         \
-                     xd2 = 3.0*xm2;                                          \
-                  if (xd2/xm3 > 3.0)                                         \
-                     xd2 = 3.0*xm3;};                                        \
-              pv[i] = (type) ((xf1 + (2.0*xf1 + dt21*xd1)*s1)*s2*s2 +        \
-                              (xf2 + (2.0*xf2 - dt21*xd2)*s2)*s1*s1);};}     \
-     else if ((t <= t2) && (t2 < t+dt))                                      \
-        {for (i = ni; i < nf; i++)                                           \
-             pv[i] = (type) d2[i];};}
-
-/*--------------------------------------------------------------------------*/
+#include "pasrc.h"
 
 PA_src_variable
  **SV_List;
@@ -514,31 +462,9 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
     type = svp->pp->desc->type;
     id   = SC_type_id(type, FALSE);
 
-/* fixed point types */
-    if (id == SC_INT8_I)
-       {PA_INTERP_TYPE(v, int8_t, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_SHORT_I)
-       {PA_INTERP_TYPE(v, short, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_INT_I)
-       {PA_INTERP_TYPE(v, int, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_LONG_I)
-       {PA_INTERP_TYPE(v, long, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_LONG_LONG_I)
-       {PA_INTERP_TYPE(v, long long, svp, t, t0, t1, t2, t3);}
-
-/* floating point types */
-    else if (id == SC_FLOAT_I)
-       {PA_INTERP_TYPE(v, float, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_DOUBLE_I)
-       {PA_INTERP_TYPE(v, double, svp, t, t0, t1, t2, t3);}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {PA_INTERP_TYPE(v, long double, svp, t, t0, t1, t2, t3);};
+    if (SC_is_type_prim(id) == TRUE)
+       {if (PA_interp_src_fnc[id] != NULL)
+	   PA_interp_src_fnc[id](v, svp, ni, nf, t, dt, t0, t1, t2, t3);};
 
     return;}
 
