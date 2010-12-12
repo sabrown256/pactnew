@@ -36,7 +36,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core
+CleanFiles = *~ core ${IncDir}/pasrc.h
 
 #
 # Things upon which install depends (pact install)
@@ -75,7 +75,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = ${TGTInc}
+Hdrs = ${TGTInc} ${IncDir}/pasrc.h
 
 #
 # Object Files
@@ -101,6 +101,10 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
 
 ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
+
+${IncDir}/pasrc.h : pasrc.t
+	@(echo "template pasrc.t -o ${IncDir}/pasrc.h" ;  \
+	  ${BinDir}/template pasrc.t -o ${IncDir}/pasrc.h)
 
 #
 # time history tests
