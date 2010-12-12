@@ -10,129 +10,7 @@
 
 #include "pml_int.h"
 
-#define FIND_INDEX(type, p, f, n, indx)                                      \
-   {type *d, v;                                                              \
-    long i, j;                                                               \
-    d    = (type *) p;                                                       \
-    v    = (type) f;                                                         \
-    indx = 0L;                                                               \
-    if (v > d[0])                                                            \
-       {indx = n - 1;                                                        \
-	if (v < d[indx])                                                     \
-	   {i = 0L;                                                          \
-	    j = indx;                                                        \
-	    for (indx = (i+j) >> 1L; indx > i; indx = (i+j) >> 1L)           \
-	        {if (v < d[indx])                                            \
-		    j = indx;                                                \
-		 else                                                        \
-		    i = indx;};};};                                          \
-    indx++;}
-
-#define FIND_INDEX_FAST(type, p, f, n, indx, last)                           \
-   {type *d, v;                                                              \
-    long imn, imx;                                                           \
-    d   = (type *) p;                                                        \
-    v   = (type) f;                                                          \
-    imn = 0L;                                                                \
-    imx = n - 1L;                                                            \
-    for (indx = last; indx > imn; indx = (imn + imx) >> 1L)                  \
-        {if (v < d[indx])                                                    \
-	    imx = indx;                                                      \
-	 else                                                                \
-	    imn = indx;};                                                    \
-    last = ++indx;}
-
-#define MIN_MAX(type, p, n, pn, px, imn, imx, lim)                           \
-   {int i, in, ix;                                                           \
-    type *d, *pvn, *pvx, vn, vx, v;                                          \
-    d   = (type *) p;                                                        \
-    pvn = (type *) pn;                                                       \
-    pvx = (type *) px;                                                       \
-    vn  =  lim;                                                              \
-    vx  = -lim;                                                              \
-    in  = -1;                                                                \
-    ix  = n;                                                                 \
-    for (i = 0; i < n; i++)                                                  \
-        {v = *d++;                                                           \
-	 if (v < vn)                                                         \
-            {vn = v;                                                         \
-             in = i;};                                                       \
-	 if (v > vx)                                                         \
-            {vx = v;                                                         \
-             ix = i;};};                                                     \
-    if (imn != NULL)                                                         \
-       *imn = in;                                                            \
-    if (imx != NULL)                                                         \
-       *imx = ix;                                                            \
-    if (pvn != NULL)                                                         \
-       *pvn = vn;                                                            \
-    if (pvx != NULL)                                                         \
-       *pvx = vx;}
-
-#define FIND_VALUE(type, nx, x, prd, val, _no, _o, _ni, _in)                 \
-   {int _i, _init;                                                           \
-    type *_f;                                                                \
-    SC_array *_ta;                                                           \
-    double _u, _v;                                                           \
-    _init = FALSE;                                                           \
-    _f    = (type *) (x);                                                    \
-    _v    = (val);                                                           \
-    *_no  = 0;                                                               \
-    if ((_ni > 0) && (_in != NULL))                                          \
-       {for (_i = 0; _i < _ni; _i++)                                         \
-            {_u = (double) (_f[_in[_i]]);                                    \
-             if ((*prd)(_u, _v))                                             \
-                {if (!_init)                                                 \
-                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);         \
-                     _init = TRUE;}                                          \
-                 SC_array_push(_ta, (_in)+(_i));};};}                        \
-    else                                                                     \
-       {for (_i = 0; _i < nx; _i++)                                          \
-            {_u = (double) (_f[_i]);                                         \
-             if ((*prd)(_u, _v))                                             \
-                {if (_init == FALSE)                                         \
-                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);         \
-                     _init = TRUE;}                                          \
-                 SC_array_push(_ta, &(_i));};};}                             \
-    if (_init == TRUE)                                                       \
-       {*(_no) = SC_array_get_n(_ta);                                        \
-        *(_o)  = FMAKE_N(int, *_no, "FIND_VALUE:_o");                        \
-        memcpy(*(_o), _ta->array, (*(_no))*sizeof(int));                     \
-        SC_free_array(_ta, NULL);};}
-
-#define FIND_VALUE_TUPLE(type, _ipt, nx, x, prd, val, _no, _o, _ni, _in)     \
-   {int _i, _init;                                                           \
-    long _ne;                                                                \
-    type *_f;                                                                \
-    SC_array *_ta;                                                           \
-    double _u, _v;                                                           \
-    _init = FALSE;                                                           \
-    _f    = (type *) (x);                                                    \
-    _v    = (val);                                                           \
-    *_no  = 0;                                                               \
-    if ((_ni > 0) && (_in != NULL))                                          \
-       {_ne = (_ipt)*(_ni);                                                  \
-        for (_i = 0; _i < _ne; _i++)                                         \
-            {_u = (double) (_f[_in[_i]]);                                    \
-             if ((*prd)(_u, _v))                                             \
-                {if (!_init)                                                 \
-                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE_TUPLE", int, NULL);   \
-                     _init = TRUE;}                                          \
-                 SC_array_push(_ta, (_in)+(_i));};};}                        \
-    else                                                                     \
-       {_ne = (_ipt)*(nx);                                                   \
-        for (_i = 0; _i < _ne; _i++)                                         \
-            {_u = (double) (_f[_i]);                                         \
-             if ((*prd)(_u, _v))                                             \
-                {if (_init == FALSE)                                         \
-                    {_ta   = SC_MAKE_ARRAY("FIND_VALUE_TUPLE", int, NULL);   \
-                     _init = TRUE;}                                          \
-                 SC_array_push(_ta, &(_i));};};}                             \
-    if (_init == TRUE)                                                       \
-       {*(_no) = SC_array_get_n(_ta);                                        \
-        *(_o)  = FMAKE_N(int, *_no, "FIND_VALUE_TUPLE:_o");                  \
-        memcpy(*(_o), _ta->array, (*(_no))*sizeof(int));                     \
-        SC_free_array(_ta, NULL);};}
+#include "mlsrch.h"
 
 SC_THREAD_LOCK(PM_search_lock); /* Lock around initialization */
 
@@ -144,45 +22,14 @@ SC_THREAD_LOCK(PM_search_lock); /* Lock around initialization */
  */
 
 void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
-   {int type;
+   {int id;
 
-    type = SC_arrtype(p, -1);
+    id = SC_arrtype(p, -1);
+    if (SC_is_type_prim(id) == FALSE)
+       id = SC_DOUBLE_I;
 
-/* character types (ok) */
-    if (type == SC_CHAR_I)
-       {MIN_MAX(SIGNED char, p, n, pn, px, imin, imax, 127);}
-
-    else if (type == SC_WCHAR_I)
-       {MIN_MAX(wchar_t, p, n, pn, px, imin, imax, WCHAR_MAX);}
-
-/* fixed point types (ok) */
-    else if (type == SC_INT8_I)
-       {MIN_MAX(int8_t, p, n, pn, px, imin, imax, INT8_MAX);}
-
-    else if (type == SC_SHORT_I)
-       {MIN_MAX(short, p, n, pn, px, imin, imax, SHRT_MAX);}
-
-    else if (type == SC_INT_I)
-       {MIN_MAX(int, p, n, pn, px, imin, imax, INT_MAX);}
-
-    else if (type == SC_LONG_I)
-       {MIN_MAX(long, p, n, pn, px, imin, imax, LONG_MAX);}
-
-    else if (type == SC_LONG_LONG_I)
-       {MIN_MAX(long long, p, n, pn, px, imin, imax, LONG_MAX);}
-
-/* floating point types (ok) */
-    else if (type == SC_FLOAT_I)
-       {MIN_MAX(float, p, n, pn, px, imin, imax, FLT_MAX);}
-
-    else if (type == SC_DOUBLE_I)
-       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);}
-
-    else if (type == SC_LONG_DOUBLE_I)
-       {MIN_MAX(long double, p, n, pn, px, imin, imax, LDBL_MAX);}
-
-    else
-       {MIN_MAX(double, p, n, pn, px, imin, imax, DBL_MAX);};
+    if (PM_min_max_fnc[id] != NULL)
+       PM_min_max_fnc[id](p, n, pn, px, imin, imax);
 
     return;}
 
@@ -265,94 +112,18 @@ int PM_index_min(double *p, int n)
  */
 
 int PM_find_index(void *p, double f, int n)
-   {int indx, type;
+   {int id, indx;
 
-    type = SC_arrtype(p, -1);
+    id = SC_arrtype(p, -1);
+    if (SC_is_type_prim(id) == FALSE)
+       id = SC_DOUBLE_I;
 
-/* character types (ok) */
-    if (type == SC_CHAR_I)
-       {FIND_INDEX(char, p, f, n, indx);}
-
-    else if (type == SC_WCHAR_I)
-       {FIND_INDEX(wchar_t, p, f, n, indx);}
-
-/* fixed point types (ok) */
-    else if (type == SC_INT8_I)
-       {FIND_INDEX(int8_t, p, f, n, indx);}
-
-    else if (type == SC_SHORT_I)
-       {FIND_INDEX(short, p, f, n, indx);}
-
-    else if (type == SC_INT_I)
-       {FIND_INDEX(int, p, f, n, indx);}
-
-    else if (type == SC_LONG_I)
-       {FIND_INDEX(long, p, f, n, indx);}
-
-    else if (type == SC_LONG_LONG_I)
-       {FIND_INDEX(long long, p, f, n, indx);}
-
-/* floating point types (ok) */
-    else if (type == SC_FLOAT_I)
-       {FIND_INDEX(float, p, f, n, indx);}
-
-    else if (type == SC_DOUBLE_I)
-       {FIND_INDEX(double, p, f, n, indx);}
-
-    else if (type == SC_LONG_DOUBLE_I)
-       {FIND_INDEX(long double, p, f, n, indx);}
-
-    else
-       {FIND_INDEX(double, p, f, n, indx);};
+    if (PM_find_index_fnc[id] != NULL)
+       indx = PM_find_index_fnc[id](p, f, n);
 
     return(indx);}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* PM_SEARCH - this routine computes an array of index locations INDX of the
- *           - array XV in the table Y such that
- *           -             Y[INDX[I]-1] < X[I] <= Y[INDX[I]]
- *           - Given an increasing table Y[0] < Y[1] < ... < Y[NY-1],
- *           - interval indices 0, 1, ..., NY-1 correspond to (Y[0],Y[1]],
- *           - (Y[1],Y[2]], ..., (Y[NY-2],Y[NY-1]]
- *           -   
- *           - It is the user's responsibility to ensure that the values
- *           - of X gathered are all interior to the table of Y's; that is,
- *           - Y[0] < X[I] <= Y[NY-1], 0 <= I < NY
- *           -
- *           - Input:
- *           -    NX   = the number of elements in the array X
- *           -    X    = an array of length NX whose locations in the
- *           -           Y table are to be determined
- *           -    NY   = the number of elements in the table Y
- *           -    Y    = a table of increasing elements to be searched
- *           -    OFFS = an offset that facilitates searching part of Y
- *           -
- *           - Output:
- *           -    INDX = an array of length NX of integers locating the position
- *           -           of each element of X in the Y table
- */
-
-void PM_search_slow(int nx double *x, int ny, double *y, int offs, int *indx)
-   {long ix, iy;
-
-    y += offs;
-
-    for (ix = 0; ix < nx; ix++)
-        {FIND_INDEX(double, y, x[ix], ny, iy);
-
-	 indx[ix] = iy + offs;};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* PM_SEARCH - this routine computes an array of index locations INDX of the
@@ -392,7 +163,7 @@ void PM_search(int nx, double *x, int ny, double *y, int offs, int *indx)
     ma->last = max(0L, ma->last);
 
     for (ix = 0; ix < nx; ix++)
-        {FIND_INDEX_FAST(double, y, x[ix], ny, iy, ma->last);
+        {iy = _PM_find_index_fast_fnc[SC_DOUBLE_I](y, x[ix], ny, &(ma->last));
 
 	 indx[ix] = iy + offs;};
 
@@ -556,56 +327,19 @@ void PM_sub_array(void *in, void *out, long *dims, long *reg, long bpi)
 int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
 		   int (*prd)(double u, double v), double val,
 		   int nin, int *in)
-   {int id;
+   {int id, ipt;
 
     id = SC_type_id(type, FALSE);
 
-/* character types (ok) */
-    if (id == SC_CHAR_I)
-       {FIND_VALUE(char, nx, x, prd, val, nout, out, nin, in);}
+    if (SC_is_type_qut(id) == TRUE)
+       ipt = 4;
+    else if (SC_is_type_cx(id) == TRUE)
+       ipt = 2;
+    else
+       ipt = 1;
 
-    else if (id == SC_WCHAR_I)
-       {FIND_VALUE(wchar_t, nx, x, prd, val, nout, out, nin, in);}
-
-/* fixed point types (ok) */
-    else if (id == SC_INT8_I)
-       {FIND_VALUE(int8_t, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_SHORT_I)
-       {FIND_VALUE(short, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_INT_I)
-       {FIND_VALUE(int, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_LONG_I)
-       {FIND_VALUE(long, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_LONG_LONG_I)
-       {FIND_VALUE(long long, nx, x, prd, val, nout, out, nin, in);}
-
-/* floating point types (ok) */
-    else if (id == SC_FLOAT_I)
-       {FIND_VALUE(float, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_DOUBLE_I)
-       {FIND_VALUE(double, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {FIND_VALUE(long double, nx, x, prd, val, nout, out, nin, in);}
-
-/* complex floating point types (ok) */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {FIND_VALUE_TUPLE(float, 2, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {FIND_VALUE_TUPLE(double, 2, nx, x, prd, val, nout, out, nin, in);}
-
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {FIND_VALUE_TUPLE(long double, 2, nx, x, prd, val, nout, out, nin, in);}
-
-/* quaternion floating point types (ok) */
-    else if (id == SC_QUATERNION_I)
-       {FIND_VALUE_TUPLE(double, 4, nx, x, prd, val, nout, out, nin, in);}
+    if (_PM_find_value_fnc[id] != NULL)
+       _PM_find_value_fnc[id](nx, x, prd, val, nout, out, nin, in, ipt);
 
     else
        {*nout = -1;
