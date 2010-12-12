@@ -1,3 +1,11 @@
+#
+# MLSRCH.T - value search templates
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
 
 template<char|long double>
 int PM_find_index(void *p, double f, int n)

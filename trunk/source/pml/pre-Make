@@ -12,7 +12,7 @@
 LibName=pml
 
 TGTLib = ${LibDir}/lib${LibName}.a
-TGTInc = ${Hdrs} ${PACTTmpDir}/mlsrch.h
+TGTInc = ${Hdrs}
 
 #
 # Compiler/Loader Options
@@ -32,7 +32,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core ${PACTTmpDir}/mlsrch.h
+CleanFiles = *~ core ${IncDir}/mlsrch.h
 
 #
 # Things upon which install depends (pact install)
@@ -69,7 +69,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = pml.h pml_int.h scope_complex.h scope_quaternion.h
+Hdrs = pml.h pml_int.h scope_complex.h scope_quaternion.h ${IncDir}/mlsrch.h
 
 #
 # Object Files
@@ -99,15 +99,12 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)                        \
          ${ArBind}
 
-${Objs} : ${Hdrs} ${PACTTmpDir}/mlsrch.h
-${LibDep} : ${Hdrs} ${PACTTmpDir}/mlsrch.h
+${Objs} : ${Hdrs}
+${LibDep} : ${Hdrs}
 
-${PACTTmpDir}/mlsrch.h : mlsrch.t
-	${RM} ${PACTTmpDir}/mlsrch.h
-	@echo "${CFE} ${BinDir}/template -> mlsrch.h"
-	@( ${CFE} ${BinDir}/template mlsrch.t > ${PACTTmpDir}/mlsrch.h ||  \
-           ( echo "***> Failed to generate mlsrch.h"         &&            \
-             exit 1 ) )
+${IncDir}/mlsrch.h : mlsrch.t
+	@(echo "template mlsrch.t -o ${IncDir}/mlsrch.h" ;  \
+	  ${BinDir}/template mlsrch.t -o ${IncDir}/mlsrch.h)
 
 # extra commands needed when building TGTLib
 LibAction = pact patch-fpe

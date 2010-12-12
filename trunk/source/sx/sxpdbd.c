@@ -10,6 +10,8 @@
  
 #include "sx_int.h"
 
+#include "sxpdbd.h"
+
 #define LINE_SIZE      MAXLINE
 #define LINE_SIZ2      LINE_SIZE + 30
 
@@ -23,13 +25,6 @@
 #define BAD_UNIT_SIZE    -80
 #define BAD_NUMBERS      -90
 #define CONTENTS_DIFFER -100
-
-/*--------------------------------------------------------------------------*/
-
-#define SX_SKIP_ITAG(fpa)                                                    \
-    {FILE *fp;                                                               \
-     fp = fpa->stream;                                                       \
-     _PD_rfgets(bf, MAXLINE, fp);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -57,61 +52,6 @@
      fp = pfa->stream;                                                       \
      lio_seek(fp, ada, SEEK_SET);                                            \
      _PD_skip_over(pfa, skip, FALSE);}
-
-/*--------------------------------------------------------------------------*/
-
-#define DIFF_FIX_ARRAY(_ret, _indx, _a, _b, _n)                              \
-    {int _ok;                                                                \
-     long _i;                                                                \
-     if (SX_disp_individ_diff == TRUE)                                       \
-        {for (_i = 0L; _i < _n; _i++)                                        \
-             {PM_CLOSETO_FIX(_ok, _a[_i], _b[_i]);                           \
-              if (_ok == TRUE)                                               \
-                 {_ret     &= FALSE;                                         \
-                  _indx[_i] = TRUE;};};}                                     \
-     else                                                                    \
-        {for (_i = 0L; _i < _n; _i++)                                        \
-             {PM_CLOSETO_FIX(_ok, _a[_i], _b[_i]);                           \
-              _ret &= _ok;};};}
-
-/*--------------------------------------------------------------------------*/
-
-#define DIFF_FP_ARRAY(_ret, _indx, _a, _b, _n, _tol)                         \
-    {int _ok;                                                                \
-     long _i;                                                                \
-     if (SX_disp_individ_diff == TRUE)                                       \
-        {for (_i = 0L; _i < _n; _i++)                                        \
-             {PM_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
-              if (_ok == TRUE)                                               \
-                 {_ret     &= FALSE;                                         \
-                  _indx[_i] = TRUE;};};}                                     \
-     else                                                                    \
-        {for (_i = 0L; _i < _n; _i++)                                        \
-             {PM_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
-              ret &= _ok;};};}
-
-/*--------------------------------------------------------------------------*/
-
-#define DIFF_TUPLE_ARRAY(_ret, _typ, _indx, _n, _tol)                        \
-    {int _ok;                                                                \
-     long _i, _ipt, _ne;                                                     \
-     defstr *_dp;                                                            \
-     _typ *_a, *_b;                                                          \
-     _a = (_typ *) bfa;                                                      \
-     _b = (_typ *) bfb;                                                      \
-     _dp  = PD_inquire_type(pf, type);                                       \
-     _ipt = _PD_items_per_tuple(_dp);                                        \
-     _ne  = _ipt*_n;                                                         \
-     if (SX_disp_individ_diff == TRUE)                                       \
-        {for (_i = 0L; _i < _ne; _i++)                                       \
-             {PM_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
-              if (_ok == TRUE)                                               \
-                 {_ret     &= FALSE;                                         \
-                  _indx[_i] = TRUE;};};}                                     \
-     else                                                                    \
-        {for (_i = 0L; _i < _ne; _i++)                                       \
-             {PM_CLOSETO_FLOAT(_ok, _a[_i], _b[_i], _tol);                   \
-              ret &= _ok;};};}
 
 /*--------------------------------------------------------------------------*/
 
@@ -556,87 +496,34 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
     else
        indx = NULL;
 
-    id = SC_type_id(type, TRUE);
-
-/* find the type and compare */
     ret = TRUE;
 
-/* character types (ok) */
-    if (id == SC_CHAR_I)
-       {char *va, *vb;
-	va = (char *) bfa;
-        vb = (char *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+/* find the type and compare */
+    id = SC_type_id(type, TRUE);
+    if (SC_is_type_prim(id) == TRUE)
+       {int ipt;
+	long double tol;
 
-    else if (id == SC_WCHAR_I)
-       {wchar_t *va, *vb;
-	va = (wchar_t *) bfa;
-        vb = (wchar_t *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+/* get items per tuple */
+	if (SC_is_type_qut(id) == TRUE)
+	   ipt = 4;
+        else if (SC_is_type_cx(id) == TRUE)
+	   ipt = 2;
+	else
+	   ipt = 1;
 
-/* fixed point types (ok) */
-    else if (id == SC_INT8_I)
-       {int8_t *va, *vb;
-	va = (int8_t *) bfa;
-        vb = (int8_t *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+/* get tolerance */
+	if (SC_is_type_fp(id) == TRUE)
+	   tol = fp_pre[SC_TYPE_FP(id)].tolerance;
 
-    else if (id == SC_SHORT_I)
-       {short *va, *vb;
-	va = (short *) bfa;
-        vb = (short *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+	else if (SC_is_type_cx(id) == TRUE)
+	   tol = fp_pre[SC_TYPE_CPX(id)].tolerance;
 
-    else if (id == SC_INT_I)
-       {int *va, *vb;
-	va = (int *) bfa;
-        vb = (int *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
+	else
+	   tol = fp_pre[1].tolerance;
 
-    else if (id == SC_LONG_I)
-       {long *va, *vb;
-	va = (long *) bfa;
-        vb = (long *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
-
-    else if (id == SC_LONG_LONG_I)
-       {long long *va, *vb;
-	va = (long long *) bfa;
-        vb = (long long *) bfb;
-        DIFF_FIX_ARRAY(ret, indx, va, vb, ni);}
-
-/* floating point types (ok) */
-    else if (id == SC_FLOAT_I)
-       {float *va, *vb;
-	va = (float *) bfa;
-        vb = (float *) bfb;
-        DIFF_FP_ARRAY(ret, indx, va, vb, ni, fp_pre[0].tolerance);}
-
-    else if (id == SC_DOUBLE_I)
-       {double *va, *vb;
-	va = (double *) bfa;
-        vb = (double *) bfb;
-        DIFF_FP_ARRAY(ret, indx, va, vb, ni, fp_pre[1].tolerance);}
-
-    else if (id == SC_LONG_DOUBLE_I)
-       {long double *va, *vb;
-	va = (long double *) bfa;
-        vb = (long double *) bfb;
-        DIFF_FP_ARRAY(ret, indx, va, vb, ni, fp_pre[2].tolerance);}
-
-/* complex floating point types (ok) */
-    else if (id == SC_FLOAT_COMPLEX_I)
-       {DIFF_TUPLE_ARRAY(ret, float, indx, ni, fp_pre[0].tolerance);}
-
-    else if (id == SC_DOUBLE_COMPLEX_I)
-       {DIFF_TUPLE_ARRAY(ret, double, indx, ni, fp_pre[1].tolerance);}
-
-    else if (id == SC_LONG_DOUBLE_COMPLEX_I)
-       {DIFF_TUPLE_ARRAY(ret, long double, indx, ni, fp_pre[2].tolerance);}
-
-/* quaternion floating point types (ok) */
-    else if (id == SC_QUATERNION_I)
-       {DIFF_TUPLE_ARRAY(ret, double, indx, ni, fp_pre[1].tolerance);};
+	if (_SX_diff_primitives_fnc[id] != NULL)
+	   ret = _SX_diff_primitives_fnc[id](indx, bfa, bfb, ni, tol, ipt);}
 
     if (ret == FALSE)
        _SX_display_diff(pf, nma, nmb, bfa, bfb, indx, ni, type, dims);

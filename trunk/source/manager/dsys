@@ -1995,7 +1995,7 @@ CFG_DONE:
 
         NoteD $Log "Removing PACT"
 
-        set BinFiles = ( smake dmake pact timer px do-run )
+        set BinFiles = ( smake dmake pact template timer px do-run )
         set BinFiles = ( $BinFiles make-syntax )
         set BinFiles = ( $BinFiles install-pact install-ext )
 

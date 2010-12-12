@@ -81,6 +81,7 @@ struct s_ruledes
     char yo[LRG];             /* .y -> .o */
     char ya[LRG];             /* .y -> .a */
     char yc[LRG];             /* .y -> .c */
+    char th[LRG];             /* .t -> .h */
     char co_bp[LRG];          /* bad pragma versions */
     char ca_bp[LRG];
     char lo_bp[LRG];
@@ -1258,6 +1259,7 @@ static void setup_output_env(char *base)
     dbset(NULL, "YaccC",   st.rules.yc);
     dbset(NULL, "FCObj",   st.rules.fo);
     dbset(NULL, "FCArc",   st.rules.fa);
+    dbset(NULL, "TemplH",  st.rules.th);
 
     dbset(NULL, "CCObj_BP",   st.rules.co_bp);
     dbset(NULL, "CCArc_BP",   st.rules.ca_bp);
@@ -1498,6 +1500,12 @@ static void default_rules(void)
 	     "${FC} -c ${PACTSrcDir}/$< -o $*.o",
 	     ar,
 	     "${RM} $*.o 2>> errlog");
+
+/* template rules */
+    snprintf(st.rules.th, LRG,
+	     "\t@(%s ; \\\n          %s)\n",
+	     "echo \"${Template} $< -o ${IncDir}/$*.h\"",
+	     "${BinDir}/${Template} $< -o ${IncDir}/$*.h");
 
     return;}
 

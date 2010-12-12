@@ -50,6 +50,13 @@ static char
 	      "float _Complex", "double _Complex",
 	      "long double _Complex",
 	      "quaternion", "void *", NULL, "char *" },
+ *comp[]  = { NULL, NULL, "bool",
+	      "char", "wchar_t",
+	      "int8_t", "short", "int", "long", "long long",
+	      "float", "double", "long double",
+	      "float", "double",
+	      "long double",
+	      "double", "void *", NULL, "char *" },
  *mn[]    = { NULL, NULL, "BOOL_MIN",
 	      "CHAR_MIN", "WCHAR_MIN",
 	      "INT8_MIN", "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
@@ -168,6 +175,8 @@ static void write_fnc(FILE *fp, int id, template *t)
     char s[MAXLINE];
     char **body, *rtype, *fname, *args, *p;
 
+    Separator(fp);
+
     nl    = t->nl;
     body  = t->body;
     rtype = t->rtype;
@@ -178,13 +187,12 @@ static void write_fnc(FILE *fp, int id, template *t)
     for (i = 0; i < nl; i++)
         {nstrncpy(s, MAXLINE, body[i], -1);
 	 p = subst(s, "<TYPE>", types[id], -1);
+	 p = subst(p, "<CTYPE>", comp[id], -1);
 	 p = subst(p, "<MIN>", mn[id], -1);
 	 p = subst(p, "<MAX>", mx[id], -1);
 	 fputs(p, fp);};
 
     fprintf(fp, "\n");
-
-    Separator(fp);
 
     return;}
 
@@ -193,9 +201,14 @@ static void write_fnc(FILE *fp, int id, template *t)
 
 /* WRITE_TMPL_DECL - write the declaration of the template array */
 
-static void write_tmpl_decl(FILE *fp, template *t)
-   {int i, nl, tmn, tmx;
+static void write_tmpl_decl(FILE *fp, template **tl, int it, int nt)
+   {int i, lt, nl, ok, tmn, tmx;
     char **body, *rtype, *fname, *args;
+    template *t;
+
+    t = tl[it];
+    if (t == NULL)
+       return;
 
     nl    = t->nl;
     body  = t->body;
@@ -211,12 +224,26 @@ static void write_tmpl_decl(FILE *fp, template *t)
     fprintf(fp, "static PF%s\n", fname);
     fprintf(fp, " %s_fnc[] = {\n", fname);
     for (i = 0; i < N_TYPES; i++)
-        {if ((types[i] != NULL) && (tmn <= i) && (i <= tmx))
-	    {if (i == N_TYPES-1)
-	        fprintf(fp, "                %s_%s\n", fname, names[i]);
-	     else
-	        fprintf(fp, "                %s_%s,\n", fname, names[i]);}
-	 else
+        {ok = FALSE;
+
+/* scan templates for this type */
+	 for (lt = it; lt < nt; lt++)
+	     {t = tl[lt];
+	      if ((t == NULL) || (strcmp(t->fname, fname) != 0))
+		 continue;
+
+	      body = t->body;
+	      tmn  = t->tmn;
+	      tmx  = t->tmx;
+	      if ((types[i] != NULL) && (tmn <= i) && (i <= tmx))
+		 {if (i == N_TYPES-1)
+		     fprintf(fp, "                %s_%s\n", fname, names[i]);
+		  else
+		     fprintf(fp, "                %s_%s,\n", fname, names[i]);
+		  ok = TRUE;
+		  break;};};
+
+	 if (ok == FALSE)
 	    {if (i == N_TYPES-1)
 	        fprintf(fp, "                NULL\n");
 	     else
@@ -225,6 +252,13 @@ static void write_tmpl_decl(FILE *fp, template *t)
     fprintf(fp, "};\n");
     fprintf(fp, "\n");
 
+/* free all templates with the current function name */
+    for (lt = it; lt < nt; lt++)
+        {t = tl[lt];
+	 if (strcmp(t->fname, fname) == 0)
+	    {free_template(tl[i]);
+	     tl[lt] = NULL;};};
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -232,11 +266,11 @@ static void write_tmpl_decl(FILE *fp, template *t)
 
 /* WRITE_TMPL - write the routines from the template */
 
-static void write_tmpl(FILE *fp, template *t)
+static void write_tmpl(FILE *fp, template **tl, int it, int nt)
    {int i, tmn, tmx;
+    template *t;
 
-    Separator(fp);
-
+    t   = tl[it];
     tmn = t->tmn;
     tmx = t->tmx;
 
@@ -244,7 +278,19 @@ static void write_tmpl(FILE *fp, template *t)
 	{if (types[i] != NULL)
 	    write_fnc(fp, i, t);};
 
-    write_tmpl_decl(fp, t);
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_DECLS - write the function array declaration */
+
+static void write_decls(FILE *fp, template **tl, int it, int nt)
+   {
+
+    Separator(fp);
+
+    write_tmpl_decl(fp, tl, it, nt);
 
     return;}
 
@@ -330,10 +376,7 @@ int main(int c, char **v)
 
     if (inf != NULL)
        fi = fopen(inf, "r+");
-/*
-	if (fi != NULL)
-	   fseek(fi, 0, SEEK_SET);
-*/
+
     if ((inf == NULL) || (fi == NULL))
        {printf("No input file specified - exiting\n");
 	return(1);};
@@ -356,7 +399,10 @@ int main(int c, char **v)
          tl[nt] = t;};
 
     for (i = 0; i < nt; i++)
-        write_tmpl(fo, tl[i]);
+        write_tmpl(fo, tl, i, nt);
+
+    for (i = 0; i < nt; i++)
+        write_decls(fo, tl, i, nt);
 
     for (i = 0; i < nt; i++)
 	free_template(tl[i]);
