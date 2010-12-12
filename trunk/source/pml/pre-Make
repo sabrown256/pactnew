@@ -12,7 +12,7 @@
 LibName=pml
 
 TGTLib = ${LibDir}/lib${LibName}.a
-TGTInc = ${Hdrs}
+TGTInc = ${Hdrs} ${PACTTmpDir}/mlsrch.h
 
 #
 # Compiler/Loader Options
@@ -32,7 +32,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core
+CleanFiles = *~ core ${PACTTmpDir}/mlsrch.h
 
 #
 # Things upon which install depends (pact install)
@@ -99,8 +99,15 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)                        \
          ${ArBind}
 
-${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs}
+${Objs} : ${Hdrs} ${PACTTmpDir}/mlsrch.h
+${LibDep} : ${Hdrs} ${PACTTmpDir}/mlsrch.h
+
+${PACTTmpDir}/mlsrch.h : mlsrch.t
+	${RM} ${PACTTmpDir}/mlsrch.h
+	@echo "${CFE} ${BinDir}/template -> mlsrch.h"
+	@( ${CFE} ${BinDir}/template mlsrch.t > ${PACTTmpDir}/mlsrch.h ||  \
+           ( echo "***> Failed to generate mlsrch.h"         &&            \
+             exit 1 ) )
 
 # extra commands needed when building TGTLib
 LibAction = pact patch-fpe

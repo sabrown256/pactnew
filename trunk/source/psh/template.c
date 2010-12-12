@@ -6,9 +6,13 @@
  *
  */
 
+#define NO_VA_ARG_ID
+
 #include "common.h"
 #include "libpsh.c"
 #include <scope_typeh.h>
+
+#define NMAX 100
 
 #define I_BOOL        2
 #define I_CHAR        (I_BOOL+N_PRIMITIVE_CHAR)
@@ -25,7 +29,8 @@ typedef struct s_template template;
 struct s_template
    {int tmn;
     int tmx;
-    int nl;
+    int nl;                   /* number of lines of body */
+    int lo;                   /* starting line number in file */
     char *rtype;
     char *fname;
     char *args;
@@ -64,7 +69,7 @@ static char
 /* MAKE_TEMPLATE - instantiate a template */
 
 template *make_template(char *proto, int nl, char **body,
-			char *tmn, char *tmx)
+			char *tmn, char *tmx, int ln)
    {int i, n;
     char rtype[MAXLINE];
     char *p, *args, *fname, **sa;
@@ -84,7 +89,8 @@ template *make_template(char *proto, int nl, char **body,
     p = strtok(proto, "(\n\r");
 
 /* get the arg list */
-    args = strtok(NULL, "\n\r");
+    args = strtok(NULL, "");
+    LAST_CHAR(args) = '\0';
     LAST_CHAR(args) = '\0';
 
 /* get the function name */
@@ -103,6 +109,7 @@ template *make_template(char *proto, int nl, char **body,
     t->fname = STRSAVE(fname);
     t->args  = STRSAVE(args);
     t->nl    = nl;
+    t->lo    = ln;
     t->body  = body;
 
     free_strings(sa);
@@ -168,7 +175,7 @@ static void write_fnc(FILE *fp, int id, template *t)
     args  = t->args;
 
     fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname, names[id], args);
-    for (i = 1; i < nl; i++)
+    for (i = 0; i < nl; i++)
         {nstrncpy(s, MAXLINE, body[i], -1);
 	 p = subst(s, "<TYPE>", types[id], -1);
 	 p = subst(p, "<MIN>", mn[id], -1);
@@ -246,24 +253,30 @@ static void write_tmpl(FILE *fp, template *t)
 
 /* PARSE_TMPL - read and parse the next template from FP */
 
-static template *parse_tmpl(FILE *fp)
-   {int i, nt, nl, npo, npc, fpr;
+static template *parse_tmpl(FILE *fp, int *flo)
+   {int i, lo, nt, nl, npo, npc, fpr, st;
     off_t ad;
     char s[MAXLINE], proto[MAXLINE];
     char *tmn, *tmx, *p, **sa;
     template *t;
 
+    memset(proto, 0, MAXLINE);
+
     fpr = FALSE;
+    nl  = 0;
     npo = 0;
     npc = 0;
     nt  = 0;
     sa  = NULL;
+    lo  = *flo;
     for (i = 0; TRUE; i++)
         {ad = ftell(fp);
 
 	 p = fgets(s, MAXLINE, fp);
 	 if (p == NULL)
 	    break;
+
+	 (*flo)++;
 	 if (blank_line(p) == TRUE)
 	    continue;
 	 else if (strncmp(p, "template<", 9) == 0)
@@ -271,12 +284,10 @@ static template *parse_tmpl(FILE *fp)
 	     if (nt == 1)
 	        {strtok(p, "<|>");
 		 tmn = STRSAVE(strtok(NULL, "<|>"));
-		 tmx = STRSAVE(strtok(NULL, "<|>"));
-	         memset(proto, 0, MAXLINE);}
+		 tmx = STRSAVE(strtok(NULL, "<|>"));}
 	     else
-	        {fseek(fp, SEEK_SET, ad);
+	        {st = fseek(fp, ad, SEEK_SET);
 		 break;};
-	     nl  = 0;
 	     fpr = FALSE;}
 	 else if (nt == 1)
 	    {if (fpr == FALSE)
@@ -290,7 +301,7 @@ static template *parse_tmpl(FILE *fp)
 		 sa = lst_push(sa, "%s", p);};};};
 
     if ((nt > 0) && (sa != NULL))
-       t = make_template(proto, nl, sa, tmn, tmx);
+       t = make_template(proto, nl, sa, tmn, tmx, lo);
     else
        t = NULL;
 
@@ -302,10 +313,10 @@ static template *parse_tmpl(FILE *fp)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, rv;
+   {int i, ln, nt, rv;
     char *inf, *outf;
     FILE *fi, *fo;
-    template *t;
+    template *t, *tl[NMAX];
 
     rv = 0;
 
@@ -319,7 +330,10 @@ int main(int c, char **v)
 
     if (inf != NULL)
        fi = fopen(inf, "r+");
-
+/*
+	if (fi != NULL)
+	   fseek(fi, 0, SEEK_SET);
+*/
     if ((inf == NULL) || (fi == NULL))
        {printf("No input file specified - exiting\n");
 	return(1);};
@@ -331,14 +345,21 @@ int main(int c, char **v)
 
     write_header(fo, inf);
 
-    while (TRUE)
-       {t = parse_tmpl(fi);
-	if (t == NULL)
-	   break;
+    memset(tl, 0, sizeof(tl));
 
-	write_tmpl(fo, t);
+    ln = 1;
 
-	free_template(t);};
+    for (nt = 0; nt < NMAX; nt++)
+        {t = parse_tmpl(fi, &ln);
+	 if (t == NULL)
+	    break;
+         tl[nt] = t;};
+
+    for (i = 0; i < nt; i++)
+        write_tmpl(fo, tl[i]);
+
+    for (i = 0; i < nt; i++)
+	free_template(tl[i]);
 
     if (outf != NULL)
        fclose(fo);

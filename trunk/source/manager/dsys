@@ -924,6 +924,7 @@ switch ($Cmnd)
         if ($status == 0) then
            flog $Log ./ccw -g do-run.c -o $BinDir/do-run
            flog $Log ./ccw -g perdb.c -o $BinDir/perdb
+           flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
         endif
         flog $Log popd
 

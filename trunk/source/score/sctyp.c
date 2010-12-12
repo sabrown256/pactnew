@@ -481,6 +481,20 @@ int SC_is_type_cx(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_IS_TYPE_QUT - return TRUE if ID is a quaternion type */
+
+int SC_is_type_qut(int id)
+   {int rv;
+    SC_type *t;
+
+    t  = _SC_get_type_id(id);
+    rv = ((t != NULL) && (t->kind == KIND_QUATERNION));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_IS_TYPE_NUM - return TRUE if ID is a numeric type */
 
 int SC_is_type_num(int id)
@@ -513,6 +527,18 @@ int SC_is_type_ptr(int id)
     if (rv == FALSE)
        {typn = SC_type_name(id);
 	rv   = ((typn != NULL) && (strchr(typn, '*') != NULL));};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_TYPE_PRIM - return TRUE if ID is a primitive type */
+
+int SC_is_type_prim(int id)
+   {int rv;
+
+    rv = ((SC_UNKNOWN_I < id) && (id < N_TYPES));
 
     return(rv);}
 
