@@ -18,8 +18,6 @@
 #define I_QUATERNION  I_COMPLEX+1
 #define I_POINTER     I_QUATERNION+1
 
-#define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
-
 static char
  *types[] = { NULL, NULL, "bool",
 	      "char", "wchar_t",
@@ -120,24 +118,27 @@ static void write_args(FILE *fp)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int rv;
-    char *name;
-    FILE *fp;
+   {int i, rv;
+    char *outf;
+    FILE *fo;
 
     rv = 0;
 
-    name = NULL;
+    outf = NULL;
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-o") == 0)
+	    outf = v[++i];};
 
-    if (name != NULL)
-       fp = fopen(name, "w");
+    if (outf != NULL)
+       fo = fopen(outf, "w");
     else
-       fp = stdout;
+       fo = stdout;
 
 /* emit var arg code */
-    write_args(fp);
+    write_args(fo);
 
-    if (name != NULL)
-       fclose(fp);
+    if (outf != NULL)
+       fclose(fo);
 
     return(rv);}
 

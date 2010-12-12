@@ -77,7 +77,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs   = pgs.h pgs_int.h scope_cgm.h scope_raster.h ${IncDir}/gsimag.h
+Hdrs   = pgs.h pgs_int.h scope_cgm.h scope_raster.h
 MpgHdr = scope_mpeg.h
 XHdr   = scope_x11.h
 
@@ -145,6 +145,8 @@ ${ArOGL} : ${XHdr}
 ${IncDir}/gsimag.h : gsimag.t
 	@(echo "template gsimag.t -o ${IncDir}/gsimag.h" ;  \
 	  ${BinDir}/template gsimag.t -o ${IncDir}/gsimag.h)
+
+IncAction = pact ${IncDir}/gsimag.h
 
 #
 # link 

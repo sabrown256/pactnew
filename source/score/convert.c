@@ -27,7 +27,7 @@
 #define C_TO_C   _SC_write_c_to_c_safe
 #endif
 
-#define Separator  fprintf(fp, "/*--------------------------------------------------------------------------*/\n\n")
+#define Separator(_f)  fprintf(_f, "/*--------------------------------------------------------------------------*/\n\n")
 
 static char
  *names[] = { NULL, NULL, "bool",
@@ -547,9 +547,9 @@ static void write_converters(FILE *fp)
    {int i, j;
     char *ti, *tj;
 
-    Separator;
+    Separator(fp);
     fprintf(fp, "/*                           TYPE CONVERSION                                */\n\n");
-    Separator;
+    Separator(fp);
 
     for (i = 0; i < N_PRIMITIVES; i++)
         {ti = types[i];
@@ -793,9 +793,9 @@ static void write_str_decl(FILE *fp)
 static void write_str(FILE *fp)
    {int i;
 
-    Separator;
+    Separator(fp);
     fprintf(fp, "/*                          NUMBER RENDERING                                */\n\n");
-    Separator;
+    Separator(fp);
 
     for (i = 0; i < N_TYPES; i++)
 	{if (types[i] != NULL)
@@ -818,32 +818,34 @@ static void write_str(FILE *fp)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int rv;
-    char *name;
-    FILE *fp;
+   {int i, rv;
+    char *outf;
+    FILE *fo;
 
     rv = 0;
 
-/*    name = "scconv.c"; */
-    name = NULL;
+    outf = NULL;
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-o") == 0)
+	    outf = v[++i];};
 
-    if (name != NULL)
-       fp = fopen(name, "w");
+    if (outf != NULL)
+       fo = fopen(outf, "w");
     else
-       fp = stdout;
+       fo = stdout;
 
-    write_header(fp);
+    write_header(fo);
 
 /* emit type conversion code */
-    write_converters(fp);
+    write_converters(fo);
 
 /* emit number to string code */
-    write_str(fp);
+    write_str(fo);
 
-    Separator;
+    Separator(fo);
 
-    if (name != NULL)
-       fclose(fp);
+    if (outf != NULL)
+       fclose(fo);
 
     return(rv);}
 

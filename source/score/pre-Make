@@ -14,8 +14,7 @@ LibName=score
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
          scope_term.h scope_mpi.h scope_make.h \
-         scope_lex.h scope_thread.h \
-         ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
+         scope_lex.h scope_thread.h
 
 MMLib = ${LibDir}/libpsmm.a
 
@@ -39,13 +38,12 @@ SaveFiles = *.c *.h *.r
 CleanFiles = scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
              ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
              ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan \
-             ${IncDir}/sctypeg.h ${PACTTmpDir}/sctypeg.h  \
-             ${IncDir}/scarg.h ${PACTTmpDir}/scarg.h
+             ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${MMLib} ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
+InstallDep = ${TGTLib} ${MMLib} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 BinDep =
 BinObj =
 
@@ -171,9 +169,9 @@ ${DObjs} : scope_make.h scope_proc.h
 ${MObjs} : scope_mem.h
 ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
-${Objs}  : ${Hdrs} ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
+${Objs}  : ${Hdrs} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 
-${LibDep} : ${Hdrs} ${PACTTmpDir}/sctypeg.h ${PACTTmpDir}/scarg.h
+${LibDep} : ${Hdrs} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 ${MMDep}  : ${Hdrs}
 
 #
@@ -184,12 +182,9 @@ ${BinDir}/convert : convert.c ${Hdrs}
 
 convert : ${BinDir}/convert
 
-${PACTTmpDir}/sctypeg.h : ${BinDir}/convert
-	${RM} ${PACTTmpDir}/sctypeg.h
-	@echo "${CFE} ${BinDir}/convert -> sctypeg.h"
-	@( ${CFE} ${BinDir}/convert > ${PACTTmpDir}/sctypeg.h ||   \
-           ( echo "***> Failed to generate sctypeg.h"         &&   \
-             exit 1 ) )
+${IncDir}/sctypeg.h : ${BinDir}/convert
+	@(echo "convert -o ${IncDir}/sctypeg.h" ; \
+	  ${CFE} ${BinDir}/convert -o ${IncDir}/sctypeg.h)
 
 #
 # varg
@@ -199,12 +194,15 @@ ${BinDir}/varg : varg.c ${Hdrs}
 
 varg : ${BinDir}/varg
 
-${PACTTmpDir}/scarg.h : ${BinDir}/varg
-	${RM} ${PACTTmpDir}/scarg.h
-	@echo "${CFE} ${BinDir}/varg -> scarg.h"
-	@( ${CFE} ${BinDir}/varg > ${PACTTmpDir}/scarg.h ||   \
-           ( echo "***> Failed to generate scarg.h"         &&   \
-             exit 1 ) )
+${IncDir}/scarg.h : ${BinDir}/varg
+	@(echo "varg -o scarg.h" ; \
+	  ${CFE} ${BinDir}/varg -o ${IncDir}/scarg.h)
+
+${IncDir}/scfnca.h : scfnca.t
+	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
+	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
+
+IncAction = pact ${IncDir}/scarg.h
 
 #
 # MMLib 
