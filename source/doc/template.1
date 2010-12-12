@@ -1,0 +1,204 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH TEMPLATE 1 "12 December 2010"
+.SH NAME
+template \- generate an array of functions, one per primitive data type,
+to be used in C source in lieu of a similar set of macros.
+.SH SYNOPSIS
+.B template
+.SH DESCRIPTION
+Since types are not first class objects in C, it is a common idiom
+to use macros to stamp out a template for code that differs only by
+the type of the variables used.  One big problem with this is that
+the resulting code is difficult to debug.  It is also the case that
+a standardized method is desirable to work with the SCORE type
+manager and its way of handling C data types in a more first class
+fashion.
+
+The template utility processes a function template and generates
+a set of functions with the desired types.  It also generates an
+array of pointers to the functions indexed by the SCORE type id.
+
+Many templates can be put in a template file (with the suffix .t).
+The template utilty reads a template file and writes the corresponding
+C code out to standard out or to a file (if the -o option is used).
+
+.SH SYNTAX
+A template file has a few simple pieces of syntax above and beyond
+C syntax.  First, since C style comments are passed through to the
+output, comments for the template utility are lines beginning with '#'.
+Second, the functions to be generated from a template are specified
+by the following syntax:
+
+template<type-min|type-max>
+
+Where type-min is the starting type and type-max is the ending type.
+The primitive types are kept in an ordered hierarchy in SCORE.  The
+hierarchy is:
+
+  char, wchar_t,
+  int8_t, short, int, long, long long,
+  float, double, long double,
+  float _Complex, double _Complex, and long double _Complex
+
+So one could generate a set of functions for the integer types
+by specifying
+
+template<int8_t|long long>
+
+or for all primitive type with
+
+template<char|long double _Complex>
+
+Finally, the following elements are replaced by the appropriate
+values:
+
+  <TYPE>    the actual data type
+  <CTYPE>   the component type
+  <MIN>     the minimum value for data of the type
+  <MAX>     the maximum value for data of the type
+
+.SH EXAMPLES
+
+Given the template file example.t:
+
+# write complex value limit 
+
+template<float _Complex|long double _Complex>
+void limit(void *v)
+   {<TYPE> *lv;
+    <CTYPE> vr;
+    lv = (<TYPE> *) v;
+
+/* limit the real part */
+    vr = <CTYPE> lv;
+    vr = max(vr, 0.5*<MIN>);
+    vr = min(vr, 0.5*<MAX>);
+
+/* make the return value */
+    *lv = vr + 3.0*I;
+
+    return;}
+
+This template will produce functions that take a complex value,
+limit the real part to be half the range of the type and replace
+the imaginary part with 3.  This is mainly nonsense but demonstrates
+all the syntax of the template utility.
+
+To generate C code:
+
+   template example.t -o example.h
+
+The contents of example.h is:
+
+/*
+ * EXAMPLE.H - generated type handling routines
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+ 
+#include <cpyright.h>
+ 
+/*--------------------------------------------------------------------------*/
+
+static void limit_fcx(void *v)
+   {float _Complex *lv;
+    float vr;
+    lv = (float _Complex *) v;
+/* limit the real part */
+    vr = float lv;
+    vr = max(vr, 0.5*-FLT_MAX);
+    vr = min(vr, 0.5*FLT_MAX);
+/* make the return value */
+    *lv = vr + 3.0*I;
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+static void limit_dcx(void *v)
+   {double _Complex *lv;
+    double vr;
+    lv = (double _Complex *) v;
+/* limit the real part */
+    vr = double lv;
+    vr = max(vr, 0.5*-DBL_MAX);
+    vr = min(vr, 0.5*DBL_MAX);
+/* make the return value */
+    *lv = vr + 3.0*I;
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+static void limit_ldcx(void *v)
+   {long double _Complex *lv;
+    long double vr;
+    lv = (long double _Complex *) v;
+/* limit the real part */
+    vr = long double lv;
+    vr = max(vr, 0.5*-LDBL_MAX);
+    vr = min(vr, 0.5*LDBL_MAX);
+/* make the return value */
+    *lv = vr + 3.0*I;
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+typedef void (*PFlimit)(void *v);
+
+static PFlimit
+ limit_fnc[] = {
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                limit_fcx,
+                limit_dcx,
+                limit_ldcx,
+                NULL,
+                NULL,
+                NULL,
+                NULL
+};
+
+You might use this in the following C code:
+
+#include "example.h"
+
+void limit(int id, void *v)
+   {
+
+    if (SC_is_type_prim(id) == TRUE)
+       {if (limit_fnc[id] != NULL)
+	   limit_fnc[id](v);};
+
+    return;}
+
+The variable ID is the SCORE type id for the variable V.
+SC_is_type_prim checks that ID is in the correct range of
+known primitive types.  Note that if ID indicates an integer
+type, nothing will be done with V.
+
+.SH FILES
+
+None.
+
+.SH BUGS
+.TP 
+.B None known.
+
