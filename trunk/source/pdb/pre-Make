@@ -12,7 +12,7 @@
 LibName=pdb
 
 TGTLib = ${LibDir}/lib${LibName}.a
-TGTInc = ${Hdrs} ${PACTTmpDir}/pdform.h
+TGTInc = ${Hdrs}
 
 #
 # Compiler/Loader Options
@@ -32,7 +32,7 @@ SaveFiles = *.c *.h *.f
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles  = *~ core ${IncDir}/pdform.h ${PACTTmpDir}/pdform.h
+CleanFiles  = *~ core ${IncDir}/pdform.h
 RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
               ${BinDir}/pdfrts ${BinDir}/pdctst \
@@ -46,7 +46,7 @@ RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${PACTTmpDir}/pdform.h
+InstallDep = ${TGTLib}
 BinDep =
 BinObj =
 
@@ -112,8 +112,8 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdspoke.o)                                        \
          ${ArBind}
 
-${Objs} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
-${LibDep} : ${Hdrs} ${PACTTmpDir}/pdform.h pdspoke.c
+${Objs} : ${Hdrs} ${IncDir}/pdform.h pdspoke.c
+${LibDep} : ${Hdrs} ${IncDir}/pdform.h pdspoke.c
 
 #
 # detect
@@ -123,12 +123,11 @@ ${BinDir}/detect : detect.c ${Hdrs}
 
 detect : ${BinDir}/detect
 
-${PACTTmpDir}/pdform.h : ${BinDir}/detect
-	${RM} ${PACTTmpDir}/pdform.h
-	@echo "${CFE} ${BinDir}/detect -c ${BE} -> pdform.h"
-	@( ${CFE} ${BinDir}/detect -c ${BE} > ${PACTTmpDir}/pdform.h ||   \
-           ( echo "***> Failed to generate pdform.h"                 &&   \
-             exit 1 ) )
+${IncDir}/pdform.h : ${BinDir}/detect
+	@(echo "detect -c ${BE} -o pdform.h" ; \
+	  ${CFE} ${BinDir}/detect -c ${BE} -o ${IncDir}/pdform.h)
+
+IncAction = pact ${IncDir}/pdform.h
 
 pdspoke.c : config-spokes pdshar.c
 	config-spokes

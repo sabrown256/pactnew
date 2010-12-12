@@ -69,7 +69,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = pml.h pml_int.h scope_complex.h scope_quaternion.h ${IncDir}/mlsrch.h
+Hdrs = pml.h pml_int.h scope_complex.h scope_quaternion.h
 
 #
 # Object Files
@@ -105,6 +105,8 @@ ${LibDep} : ${Hdrs}
 ${IncDir}/mlsrch.h : mlsrch.t
 	@(echo "template mlsrch.t -o ${IncDir}/mlsrch.h" ;  \
 	  ${BinDir}/template mlsrch.t -o ${IncDir}/mlsrch.h)
+
+IncAction = pact ${IncDir}/mlsrch.h
 
 # extra commands needed when building TGTLib
 LibAction = pact patch-fpe

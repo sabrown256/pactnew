@@ -652,7 +652,7 @@ int derive_complex_format(int *fc, int *dc, int *lc)
 
 /* PRINT_HTML - organize the detect output in the form of a web page */
 
-void print_html(void)
+void print_html(FILE *fp)
     {int mfields;
      char temp[MAXLINE];
 
@@ -665,85 +665,85 @@ void print_html(void)
      mfields += 2;
 
 /* dump the output page */
-     printf("Content-type: text/html\n\n");
+     fprintf(fp, "Content-type: text/html\n\n");
 
-     printf("<HTML>\n");
+     fprintf(fp, "<HTML>\n");
 
-     printf("<HEAD>\n");
-     printf("<TITLE>Native Type Information</TITLE>\n");
-     printf("</HEAD>\n");
+     fprintf(fp, "<HEAD>\n");
+     fprintf(fp, "<TITLE>Native Type Information</TITLE>\n");
+     fprintf(fp, "</HEAD>\n");
 
-     printf("<BODY>\n");
-     printf("<CENTER><H2>NATIVE TYPE INFORMATION</H2></CENTER>\n");
+     fprintf(fp, "<BODY>\n");
+     fprintf(fp, "<CENTER><H2>NATIVE TYPE INFORMATION</H2></CENTER>\n");
 
-     printf("<CENTER>\n");
-     printf("<TABLE BORDER=0>\n");
-     printf("<TR><TD>");
+     fprintf(fp, "<CENTER>\n");
+     fprintf(fp, "<TABLE BORDER=0>\n");
+     fprintf(fp, "<TR><TD>");
 
 /* byte order */
      if (int_order[0] == 'R')     
-        printf("Machine byte order is reverse order (little endian),\n");
+        fprintf(fp, "Machine byte order is reverse order (little endian),\n");
      else
-        printf("Machine byte order is normal order (big endian),\n");
+        fprintf(fp, "Machine byte order is normal order (big endian),\n");
 
-     printf("</TD></TR>\n");
-     printf("<TR><TD>A pointer is %d bytes long.</TD></TR></TABLE></CENTER>\n\n", size[I_POINTER]);
-     printf("<P>");
+     fprintf(fp, "</TD></TR>\n");
+     fprintf(fp, "<TR><TD>A pointer is %d bytes long.</TD></TR></TABLE></CENTER>\n\n", size[I_POINTER]);
+     fprintf(fp, "<P>");
 
 /* table of type info */
-     printf("<CENTER>\n");
-     printf("<TABLE BORDER=1>\n");
+     fprintf(fp, "<CENTER>\n");
+     fprintf(fp, "<TABLE BORDER=1>\n");
 
 /* table headings */
-     printf("<TR><TH>Type</TH> <TH>Size (bytes)</TH> <TH>Alignment</TH>");
-     printf("<TH>Minimum Value</TH> <TH>Maximum Value</TH></TR>\n");
+     fprintf(fp, "<TR><TH>Type</TH> <TH>Size (bytes)</TH> <TH>Alignment</TH>");
+     fprintf(fp, "<TH>Minimum Value</TH> <TH>Maximum Value</TH></TR>\n");
 
 /* table rows */
 /* char */
-     printf("<TR ALIGN=RIGHT><TD>Char</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Char</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             align[I_CHAR], CHAR_MIN, CHAR_MAX);
 
 /* wchar */
-     printf("<TR ALIGN=RIGHT><TD>Wchar</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Wchar</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             align[I_WCHAR], WCHAR_MIN, WCHAR_MAX);
 
 /* int8_t */
-     printf("<TR ALIGN=RIGHT><TD>Int8_t</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Int8_t</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             size[I_INT8], align[I_INT8], INT8_MIN, INT8_MAX);
 
 /* short */
-     printf("<TR ALIGN=RIGHT><TD>Short</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Short</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             size[I_SHORT], align[I_SHORT], SHRT_MIN, SHRT_MAX);
 
 /* int */
-     printf("<TR ALIGN=RIGHT><TD>Int</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Int</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
             size[I_INT], align[I_INT], INT_MIN, INT_MAX);
 
 /* long */
-     printf("<TR ALIGN=RIGHT><TD>Long</TD><TD>%d</TD><TD>%d</TD><TD>%ld</TD><TD>%ld</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long</TD><TD>%d</TD><TD>%d</TD><TD>%ld</TD><TD>%ld</TD></TR>\n",
             size[I_LONG], align[I_LONG], LONG_MIN, LONG_MAX);
 
 /* long long */
-     printf("<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%lld</TD><TD>%lld</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%lld</TD><TD>%lld</TD></TR>\n",
             size[I_LONG_LONG], align[I_LONG_LONG], LLONG_MIN, LLONG_MAX);
 
 /* float */
-     printf("<TR ALIGN=RIGHT><TD>Float</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Float</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
             size[I_FLOAT], align[I_FLOAT], FLT_MIN, FLT_MAX);
 
 /* double */
-     printf("<TR ALIGN=RIGHT><TD>Double</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Double</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
             size[I_DOUBLE], align[I_DOUBLE], DBL_MIN, DBL_MAX);
 
 /* long double */
-     printf("<TR ALIGN=RIGHT><TD>Long double</TD><TD>%d</TD><TD>%d</TD><TD>%.8Le</TD><TD>%.8Le</TD></TR>\n",
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Long double</TD><TD>%d</TD><TD>%d</TD><TD>%.8Le</TD><TD>%.8Le</TD></TR>\n",
             size[I_LONG_DOUBLE], align[I_LONG_DOUBLE], LDBL_MIN, LDBL_MAX);
 
-     printf("</TABLE></CENTER>\n");
+     fprintf(fp, "</TABLE></CENTER>\n");
 
-     printf("</BODY>\n");
+     fprintf(fp, "</BODY>\n");
 
-     printf("</HTML>\n");
+     fprintf(fp, "</HTML>\n");
           
      return;}
 
@@ -846,7 +846,7 @@ static void print_flt_type(char *type, int sz, int aln,
 
 /* PRINT_HUMAN - organize the detect output for human consumption */
 
-void print_human(int sflag, int *fc, int *dc, int *lc)
+void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
     {char bf[MAXLINE], t[MAXLINE];
      char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
@@ -874,15 +874,15 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
      memset(bf, ' ', MAXLINE);
 
 /* title */
-     printf("\n              NATIVE TYPE INFORMATION\n\n");
+     fprintf(fp, "\n              NATIVE TYPE INFORMATION\n\n");
 
 /* byte order */
      if (int_order[0] == 'R')
-        printf("Machine byte order is reverse order (little endian).\n");
+        fprintf(fp, "Machine byte order is reverse order (little endian).\n");
      else
-        printf("Machine byte order is normal order (big endian)\n");
+        fprintf(fp, "Machine byte order is normal order (big endian)\n");
 
-     printf("A pointer is %d bytes long.\n\n", size[I_POINTER]);
+     fprintf(fp, "A pointer is %d bytes long.\n\n", size[I_POINTER]);
 
 /* print a table header */
      strncpy(tptr, "Type", 4);
@@ -946,12 +946,12 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 /* print long double complex info */
      print_flt_type("Long double complex", size[I_LONG_DOUBLE_COMPLEX], align[I_LONG_DOUBLE_COMPLEX], mfields, LDBL_MIN, LDBL_MAX);
 
-     printf("\n");
-     printf("Complex part order:   real  imaginary\n");
-     printf("Float complex           %d       %d\n", fc[2]+1, fc[3]+1);
-     printf("Double complex          %d       %d\n", dc[2]+1, dc[3]+1);
-     printf("Long double complex     %d       %d\n", lc[2]+1, lc[3]+1);
-     printf("\n");
+     fprintf(fp, "\n");
+     fprintf(fp, "Complex part order:   real  imaginary\n");
+     fprintf(fp, "Float complex           %d       %d\n", fc[2]+1, fc[3]+1);
+     fprintf(fp, "Double complex          %d       %d\n", dc[2]+1, dc[3]+1);
+     fprintf(fp, "Long double complex     %d       %d\n", lc[2]+1, lc[3]+1);
+     fprintf(fp, "\n");
 
 /* print optional non-native types */
      if (sflag)
@@ -976,126 +976,127 @@ void print_human(int sflag, int *fc, int *dc, int *lc)
 
 /* PRINT_HEADER - organize the detect output in the form of a c header file */
 
-void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
+void print_header(FILE *fp,
+		  int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
 		  int *fc, int *dc, int *lc)
     {int i, j;
 
 /* print the floating point ordering info */
-    printf("\nint\n");
+    fprintf(fp, "\nint\n");
 
-    printf(" int_ord_f[] = {%d", fb[0]);
+    fprintf(fp, " int_ord_f[] = {%d", fb[0]);
     for (i = 1; i < size[I_FLOAT]; i++)
-        printf(", %d", fb[i]);
-    printf("}, \n");
+        fprintf(fp, ", %d", fb[i]);
+    fprintf(fp, "}, \n");
 
-    printf(" int_ord_d[] = {%d", db[0]);
+    fprintf(fp, " int_ord_d[] = {%d", db[0]);
     for (i = 1; i < size[I_DOUBLE]; i++)
-        printf(", %d", db[i]);
-    printf("},\n");
+        fprintf(fp, ", %d", db[i]);
+    fprintf(fp, "},\n");
 
-    printf(" int_ord_ld[] = {%d", ldb[0]);
+    fprintf(fp, " int_ord_ld[] = {%d", ldb[0]);
     for (i = 1; i < size[I_LONG_DOUBLE]; i++)
-        printf(", %d", ldb[i]);
-    printf("};\n");
+        fprintf(fp, ", %d", ldb[i]);
+    fprintf(fp, "};\n");
 
 /* print the floating point format info */
-    printf("\nlong\n");
+    fprintf(fp, "\nlong\n");
 
-    printf(" int_frm_f[] = {");
+    fprintf(fp, " int_frm_f[] = {");
     for (i = 0; i < 7; i++)
-        printf("%2ldL, ", ff[i]);
-    printf("0x%lXL}, \n", ff[7]);
+        fprintf(fp, "%2ldL, ", ff[i]);
+    fprintf(fp, "0x%lXL}, \n", ff[7]);
 
-    printf(" int_frm_d[] = {");
+    fprintf(fp, " int_frm_d[] = {");
     for (i = 0; i < 7; i++)
-        printf("%2ldL, ", df[i]);
-    printf("0x%lXL},\n", df[7]);
+        fprintf(fp, "%2ldL, ", df[i]);
+    fprintf(fp, "0x%lXL},\n", df[7]);
 
-    printf(" int_frm_ld[] = {");
+    fprintf(fp, " int_frm_ld[] = {");
     for (i = 0; i < 7; i++)
-        printf("%2ldL, ", ldf[i]);
-    printf("0x%lXL};\n", ldf[7]);
+        fprintf(fp, "%2ldL, ", ldf[i]);
+    fprintf(fp, "0x%lXL};\n", ldf[7]);
 
 /* emit data_standard definition */
-    printf("\n/* Internal DATA_STANDARD */\n\n");
-    printf("data_standard\n");
-    printf(" INT_STD = {%d,                                         /* bits per byte */\n",
+    fprintf(fp, "\n/* Internal DATA_STANDARD */\n\n");
+    fprintf(fp, "data_standard\n");
+    fprintf(fp, " INT_STD = {%d,                                         /* bits per byte */\n",
            (int) BITS_DEFAULT);
-    printf("            %d,                                       /* size of pointer */\n", 
+    fprintf(fp, "            %d,                                       /* size of pointer */\n", 
            size[I_POINTER]);
-    printf("            %d,                                          /* size of bool */\n", 
+    fprintf(fp, "            %d,                                          /* size of bool */\n", 
            size[I_BOOL]);
 
 /* character types */
-    printf("            {{%d, UTF_%d},                      /* size and order of char */\n", 
+    fprintf(fp, "            {{%d, UTF_%d},                      /* size and order of char */\n", 
            size[I_CHAR], 8*size[I_CHAR]);
-    printf("             {%d, UTF_%d}},                 /* size and order of wchar_t */\n", 
+    fprintf(fp, "             {%d, UTF_%d}},                 /* size and order of wchar_t */\n", 
            size[I_WCHAR], 8*size[I_WCHAR]);
 
 /* fixed point types */
-    printf("            {{%d, %s},            /* size and order of int8_t */\n", 
+    fprintf(fp, "            {{%d, %s},            /* size and order of int8_t */\n", 
            size[I_INT8], int_order);
-    printf("             {%d, %s},             /* size and order of short */\n", 
+    fprintf(fp, "             {%d, %s},             /* size and order of short */\n", 
            size[I_SHORT], int_order);
-    printf("             {%d, %s},               /* size and order of int */\n", 
+    fprintf(fp, "             {%d, %s},               /* size and order of int */\n", 
            size[I_INT], int_order);
-    printf("             {%d, %s},              /* size and order of long */\n", 
+    fprintf(fp, "             {%d, %s},              /* size and order of long */\n", 
            size[I_LONG], int_order);
-    printf("             {%d, %s}},        /* size and order of long long */\n", 
+    fprintf(fp, "             {%d, %s}},        /* size and order of long long */\n", 
            size[I_LONG_LONG], int_order);
 
 /* floating point types */
-    printf("            {{%d, int_frm_f, int_ord_f},             /* float definition */\n", 
+    fprintf(fp, "            {{%d, int_frm_f, int_ord_f},             /* float definition */\n", 
            size[I_FLOAT]);
-    printf("             {%d, int_frm_d, int_ord_d},            /* double definition */\n", 
+    fprintf(fp, "             {%d, int_frm_d, int_ord_d},            /* double definition */\n", 
            size[I_DOUBLE]);
-    printf("             {%d, int_frm_ld, int_ord_ld}}},  /* long double definition */\n", 
+    fprintf(fp, "             {%d, int_frm_ld, int_ord_ld}}},  /* long double definition */\n", 
            size[I_LONG_DOUBLE]);
 
-    printf(" *INT_STANDARD = &INT_STD;\n");
+    fprintf(fp, " *INT_STANDARD = &INT_STD;\n");
 
 /* emit data_alignment definition */
-    printf("\n/* Internal DATA_ALIGNMENT */\n\n");
-    printf("data_alignment\n");
-    printf(" INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
+    fprintf(fp, "\n/* Internal DATA_ALIGNMENT */\n\n");
+    fprintf(fp, "data_alignment\n");
+    fprintf(fp, " INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
 	   align[I_POINTER], align[I_BOOL],
            align[I_CHAR], align[I_WCHAR],
            align[I_INT8], align[I_SHORT], align[I_INT], 
            align[I_LONG], align[I_LONG_LONG],
 	   align[I_FLOAT], align[I_DOUBLE], align[I_LONG_DOUBLE],
 	   align[I_STRUCT]);
-    printf(" *INT_ALIGNMENT = &INT_ALG;\n");
+    fprintf(fp, " *INT_ALIGNMENT = &INT_ALG;\n");
 
-    printf("\n/* complex tuple info */\n\n");
-    printf("int\n");
-    printf(" floatc_ord[] = {");
+    fprintf(fp, "\n/* complex tuple info */\n\n");
+    fprintf(fp, "int\n");
+    fprintf(fp, " floatc_ord[] = {");
     for (j = 0; j < 2; j++)
         {if (j == 0)
-	    printf("%d", fc[j+2]);
+	    fprintf(fp, "%d", fc[j+2]);
 	 else
-	    printf(", %d", fc[j+2]);};
-    printf("},\n");
-    printf(" doublec_ord[] = {");
+	    fprintf(fp, ", %d", fc[j+2]);};
+    fprintf(fp, "},\n");
+    fprintf(fp, " doublec_ord[] = {");
     for (j = 0; j < 2; j++)
         {if (j == 0)
-	    printf("%d", dc[j+2]);
+	    fprintf(fp, "%d", dc[j+2]);
 	 else
-	    printf(", %d", dc[j+2]);};
-    printf("},\n");
-    printf(" long_doublec_ord[] = {");
+	    fprintf(fp, ", %d", dc[j+2]);};
+    fprintf(fp, "},\n");
+    fprintf(fp, " long_doublec_ord[] = {");
     for (j = 0; j < 2; j++)
         {if (j == 0)
-	    printf("%d", lc[j+2]);
+	    fprintf(fp, "%d", lc[j+2]);
 	 else
-	    printf(", %d", lc[j+2]);};
-    printf("};\n\n");
+	    fprintf(fp, ", %d", lc[j+2]);};
+    fprintf(fp, "};\n\n");
     
-    printf("multides\n");
-    printf(" floatc_tuple = { \"float_complex\", 2, floatc_ord },\n");
-    printf(" doublec_tuple = { \"double_complex\", 2, doublec_ord },\n");
-    printf(" long_doublec_tuple = { \"long_double_complex\", 2, long_doublec_ord };\n");
+    fprintf(fp, "multides\n");
+    fprintf(fp, " floatc_tuple = { \"float_complex\", 2, floatc_ord },\n");
+    fprintf(fp, " doublec_tuple = { \"double_complex\", 2, doublec_ord },\n");
+    fprintf(fp, " long_doublec_tuple = { \"long_double_complex\", 2, long_doublec_ord };\n");
 
-    printf("\n\n");}
+    fprintf(fp, "\n\n");}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1105,9 +1106,10 @@ void print_header(int *fb, int *db, int *ldb, long *ff, long *df, long *ldf,
 static void help(void)
    {
 
-    printf("Usage: detect [-c] [-h] [-s] [-w]\n");
+    printf("Usage: detect [-c] [-h] [-o <file>] [-s] [-w]\n");
     printf("   c  produce C header style output\n");
     printf("   h  this help message\n");
+    printf("   o  output file name (default stdout)\n");
     printf("   s  print optional size related types\n");
     printf("   w  produce HTML output\n");
 
@@ -1118,12 +1120,14 @@ static void help(void)
 
 /* MAIN - start here */
 
-int main(int argc, char **argv)
+int main(int c, char **v)
    {int i;
     int cflag, wflag, sflag;
     int fb[40], db[40], ldb[40];
     int fc[4], dc[4], lc[4];
     long ff[8], df[8], ldf[8];
+    char *outf;
+    FILE *fo;
 
 /* produce c header style output */
     cflag = 0;
@@ -1136,15 +1140,19 @@ int main(int argc, char **argv)
 /* print optional size related types like size_t and int64_t */
     sflag = 0;
 
-    for (i = 1; i < argc; i++)
-        {if (argv[i][0] == '-')
-            {switch (argv[i][1])
+    outf = NULL;
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
                 {case 'c' : 
                       cflag = 1;
                       break;
                  case 'h' :
                       help();
 		      return(1);
+                      break;
+                 case 'o' :
+                      outf = v[++i];
                       break;
                  case 's' :
                       sflag = 1;
@@ -1156,6 +1164,11 @@ int main(int argc, char **argv)
                       break;};}
          else
             break;};
+
+    if (outf != NULL)
+       fo = fopen(outf, "w");
+    else
+       fo = stdout;
 
 /* data type sizes are straightforward */
     TYPE_SET(I_BOOL,                bool,                 cb);
@@ -1190,11 +1203,14 @@ int main(int argc, char **argv)
     derive_complex_format(fc, dc, lc);
 
     if (cflag)
-        print_header(fb, db, ldb, ff, df, ldf, fc, dc, lc);
+        print_header(fo, fb, db, ldb, ff, df, ldf, fc, dc, lc);
     else if (wflag)
-        print_html();
+        print_html(fo);
     else
-        print_human(sflag, fc, dc, lc);
+        print_human(fo, sflag, fc, dc, lc);
+
+    if (outf != NULL)
+       fclose(fo);
 
     return(0);}
 

@@ -10,6 +10,8 @@
 
 #include "score_int.h"
 
+#include "scfnca.h"
+
 #ifdef IBMMP
 
 # undef STDOUT
@@ -281,6 +283,11 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	 bita = np*padsz + i*nbits + offs;
 	 fld  = SC_extract_field(in, bita, nbits, INT_MAX, NULL);
 
+#if 1
+	 if (SC_is_type_fix(ityp) == TRUE)
+	    {if (SC_unpack_bits_fnc[ityp] != NULL)
+	        SC_unpack_bits_fnc[ityp](out, i, fld);};};
+#else
 	 if (ityp == SC_INT8_I)
 	    {int8_t *pv;
 	     pv = (int8_t *) out;
@@ -305,6 +312,8 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	    {long long *pv;
 	     pv    = (long long *) out;
 	     pv[i] = (long long) fld;};};
+
+#endif
 
     return(TRUE);}
 
