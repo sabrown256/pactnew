@@ -105,7 +105,7 @@
 ;(write-pdbdata file3 "symtab" symsym)
 
 ; NOTE: writing out the chart will fail currently because the primitive
-; types refer to statically allocated names such as SC_INTEGER_S
+; types refer to statically allocated names such as SC_INT_S
 ; this will die in _PD_wr_indirection since SC_arrlen will return
 ; -1 for these strings
 ;(write-pdbdata file3 "chart" chrtchrt)

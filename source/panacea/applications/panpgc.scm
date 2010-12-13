@@ -360,7 +360,7 @@
 			    hname))
 		  (let* ((stype (declaration-type func))
 			 (type (cond ((or (strcmp? stype "int") (strcmp? stype "integer"))
-				      "SC_INTEGER_I")
+				      "SC_INT_I")
 				     ((or (strcmp? stype "real") (strcmp? stype "double"))
 				      "SC_DOUBLE_I")
 				     ((or (strcmp? stype "char *") (strcmp? stype "string"))
