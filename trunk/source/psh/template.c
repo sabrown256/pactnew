@@ -15,6 +15,7 @@
 #define NMAX 100
 
 #define I_BOOL        2
+#define I_NON         3
 #define I_CHAR        (I_BOOL+N_PRIMITIVE_CHAR)
 #define I_FIX         (I_CHAR+N_PRIMITIVE_FIX)   /* last fixed point type */
 #define I_FLOAT       (I_FIX+N_PRIMITIVE_FP)     /* last floating point type */
@@ -57,6 +58,13 @@ static char
 	      "float", "double",
 	      "long double",
 	      "double", "void *", NULL, "char *" },
+ *promo[] = { NULL, NULL, "int",
+              "int", "int",
+	      "int", "int", "int", "long", "long long",
+	      "double", "double", "long double",
+	      "float _Complex", "double _Complex",
+	      "long double _Complex",
+	      "quaternion", "void *", NULL, "char *" },
  *mn[]    = { NULL, NULL, "BOOL_MIN",
 	      "CHAR_MIN", "WCHAR_MIN",
 	      "INT8_MIN", "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
@@ -152,25 +160,48 @@ static void write_header(FILE *fp, char *inf)
     p = path_tail(upcase(strtok(s, ".\n")));
 
     fprintf(fp, "/*\n");
-    fprintf(fp, " * %s.H - generated type handling routines\n", p);
+    fprintf(fp, " * %s.H - generated type handling routines - do not edit\n",
+	    p);
     fprintf(fp, " *\n");
     fprintf(fp, " * Source Version: 3.0\n");
     fprintf(fp, " * Software Release #: LLNL-CODE-422942\n");
     fprintf(fp, " *\n");
     fprintf(fp, " */\n");
-    fprintf(fp, " \n");
+    fprintf(fp, "\n");
 
-    fprintf(fp, "#include <cpyright.h>\n");
-    fprintf(fp, " \n");
+    fprintf(fp, "#ifndef PCK_%s\n", p);
+    fprintf(fp, "\n");
+    fprintf(fp, "#define PCK_%s\n", p);
+    fprintf(fp, "\n");
+
+    fprintf(fp, "#include \"cpyright.h\"\n");
+    fprintf(fp, "\n");
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_FNC - write the function for type ID */
+/* WRITE_TRAILER - write the end of the file */
 
-static void write_fnc(FILE *fp, int id, template *t)
+static void write_trailer(FILE *fp, char *inf)
+   {
+
+    fprintf(fp, "\n");
+    fprintf(fp, "#endif\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                          FUNCTION TEMPLATES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_FNC_INSTANCE - write the function for type ID */
+
+static void write_fnc_instance(FILE *fp, int id, template *t)
    {int i, nl;
     char s[MAXLINE];
     char **body, *rtype, *fname, *args, *p;
@@ -199,9 +230,9 @@ static void write_fnc(FILE *fp, int id, template *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_TMPL_DECL - write the declaration of the template array */
+/* WRITE_FNC_DECL - write the declaration of the template array */
 
-static void write_tmpl_decl(FILE *fp, template **tl, int it, int nt)
+static void write_fnc_decl(FILE *fp, template **tl, int it, int nt)
    {int i, lt, nl, ok, tmn, tmx;
     char **body, *rtype, *fname, *args;
     template *t;
@@ -264,9 +295,9 @@ static void write_tmpl_decl(FILE *fp, template **tl, int it, int nt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_TMPL - write the routines from the template */
+/* WRITE_FNC - write the routines from the template */
 
-static void write_tmpl(FILE *fp, template **tl, int it, int nt)
+static void write_fnc(FILE *fp, template **tl, int it, int nt)
    {int i, tmn, tmx;
     template *t;
 
@@ -276,25 +307,163 @@ static void write_tmpl(FILE *fp, template **tl, int it, int nt)
 
     for (i = tmn; i <= tmx; i++)
 	{if (types[i] != NULL)
-	    write_fnc(fp, i, t);};
+	    write_fnc_instance(fp, i, t);};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_DECLS - write the function array declaration */
+/* WRITE_FNC_DECLS - write the function array declaration */
 
-static void write_decls(FILE *fp, template **tl, int it, int nt)
+static void write_fnc_decls(FILE *fp, template **tl, int it, int nt)
    {
 
     Separator(fp);
 
-    write_tmpl_decl(fp, tl, it, nt);
+    write_fnc_decl(fp, tl, it, nt);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+/*                            SWITCH TEMPLATES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_SWITCH_CLAUSE - write the switch clause for type ID */
+
+static void write_switch_clause(FILE *fp, int id, template *t)
+   {int i, nl;
+    char s[MAXLINE], u[MAXLINE];
+    char **body, *rtype, *fname, *args, *p;
+
+    nl    = t->nl;
+    body  = t->body;
+    rtype = t->rtype;
+    fname = t->fname;
+    args  = t->args;
+
+    fprintf(fp, "        case %d :\n", id);
+
+    for (i = 0; i < nl; i++)
+        {nstrncpy(s, MAXLINE, body[i], -1);
+	 p = subst(s, "<TYPE>", types[id], -1);
+	 p = subst(p, "<CTYPE>", comp[id], -1);
+	 p = subst(p, "<MIN>", mn[id], -1);
+	 p = subst(p, "<MAX>", mx[id], -1);
+
+	 nstrncpy(u, MAXLINE, "          ", -1);
+	 nstrcat(u, MAXLINE, p);
+
+	 fputs(u, fp);};
+
+    fprintf(fp, "             break;\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_SWITCH - write switch based template */
+
+static void write_switch(FILE *fp, template *t)
+   {int i, nl;
+    char **body, *rtype, *fname, *args;
+
+    Separator(fp);
+
+    nl    = t->nl;
+    body  = t->body;
+    rtype = t->rtype;
+    fname = t->fname;
+    args  = t->args;
+
+    fprintf(fp, "static %s %s_switch(%s)\n", rtype, fname, args);
+    fprintf(fp, "   {\n");
+    fprintf(fp, "    \n");
+    fprintf(fp, "    switch (id)\n");
+    fprintf(fp, "       {\n");
+
+    for (i = 0; i < N_TYPES; i++)
+        {if (types[i] != NULL)
+            write_switch_clause(fp, i, t);};
+
+/* add empty default clause */
+    fprintf(fp, "         default :\n");
+    fprintf(fp, "             break;\n");
+    fprintf(fp, "       };\n");
+    fprintf(fp, "\n");
+
+    fprintf(fp, "    return;}\n");
+    fprintf(fp, "\n");
+
+    Separator(fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            VA ARG TEMPLATES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_VA_ARG_CLAUSE - write the variable arg clause for type ID */
+
+static void write_va_arg_clause(FILE *fp, int id)
+   {
+
+    fprintf(fp, "       case %d:                                    \\\n",
+	    id);
+    fprintf(fp, "            {%s *_pv = (%s *) (_d);                \\\n",
+	    types[id], types[id]);
+    fprintf(fp, "             _pv[_n] = va_arg(__a__, %s);};        \\\n",
+	    promo[id]);
+    fprintf(fp, "            break;                                 \\\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_VA_ARG - write the va arg routines */
+
+static void write_va_arg(FILE *fp)
+   {int i, ng, no_complex;
+
+/* PATHSCALE 2.5 does not support complex types in va_arg */
+#if defined(COMPILER_PATHSCALE)
+    no_complex = TRUE;
+#else
+    no_complex = FALSE;
+#endif
+
+    fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
+    fprintf(fp, "   {int _lid;                                        \\\n");
+    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
+    fprintf(fp, "       _lid = _id;                                   \\\n");
+    fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
+    fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
+    fprintf(fp, "    else                                             \\\n");
+    fprintf(fp, "       _lid = _id;                                   \\\n");
+    fprintf(fp, "    switch (_lid) {                                  \\\n");
+
+    for (i = 0; i < N_TYPES; i++)
+        {ng = ((types[i] == NULL) ||
+	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
+	 if (ng == FALSE)
+            write_va_arg_clause(fp, i);};
+
+    fprintf(fp, "       }                                             \\\n");
+    fprintf(fp, "   }                                                 \\\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             PARSING ROUTINES                             */
+
 /*--------------------------------------------------------------------------*/
 
 /* PARSE_TMPL - read and parse the next template from FP */
@@ -356,30 +525,78 @@ static template *parse_tmpl(FILE *fp, int *flo)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* HELP - print usage info */
+
+static void help(void)
+   {
+
+    printf("\n");
+    printf("Usage: template [-h] [-f] [-o <file>] [-s] [-va] [<tf>]\n");
+    printf("\n");
+    printf("   h    this help message\n");
+    printf("   f    generate templates as array of functions (default)\n");
+    printf("   s    generate templates as switch statement\n");
+    printf("   o    write output to file (default stdout)\n");
+    printf("   va   write special variable argument handler\n");
+    printf("   <tf> is an template file containing one or more\n");
+    printf("        templates\n");
+    printf("\n");
+    printf("\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, ln, nt, rv;
+   {int i, ln, nt, rv, tgt;
     char *inf, *outf;
     FILE *fi, *fo;
     template *t, *tl[NMAX];
 
     rv = 0;
 
+    tgt  = 0;
     inf  = NULL;
     outf = NULL;
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-o") == 0)
+        {if (strcmp(v[i], "-h") == 0)
+	    {help();
+	     return(1);}
+	 else if (strcmp(v[i], "-f") == 0)
+	    tgt = 0;
+	 else if (strcmp(v[i], "-o") == 0)
 	    outf = v[++i];
+	 else if (strcmp(v[i], "-s") == 0)
+	    tgt = 1;
+	 else if (strcmp(v[i], "-va") == 0)
+	    tgt = 2;
 	 else
 	    inf = v[i];};
 
     if (inf != NULL)
        fi = fopen(inf, "r+");
 
-    if ((inf == NULL) || (fi == NULL))
+    if (tgt == 2)
+       {nt  = 0;
+	inf = "scarg.h";}
+
+    else if ((inf == NULL) || (fi == NULL))
        {printf("No input file specified - exiting\n");
-	return(1);};
+	return(1);}
+
+    else
+       {memset(tl, 0, sizeof(tl));
+
+	ln = 1;
+
+	for (nt = 0; nt < NMAX; nt++)
+	    {t = parse_tmpl(fi, &ln);
+	     if (t == NULL)
+	        break;
+	     tl[nt] = t;};};
 
     if (outf != NULL)
        fo = fopen(outf, "w");
@@ -388,24 +605,34 @@ int main(int c, char **v)
 
     write_header(fo, inf);
 
-    memset(tl, 0, sizeof(tl));
+    switch (tgt)
 
-    ln = 1;
+/* write template as an array of functions */
+       {case 0 :
+	     for (i = 0; i < nt; i++)
+	         write_fnc(fo, tl, i, nt);
 
-    for (nt = 0; nt < NMAX; nt++)
-        {t = parse_tmpl(fi, &ln);
-	 if (t == NULL)
-	    break;
-         tl[nt] = t;};
+	     for (i = 0; i < nt; i++)
+	         write_fnc_decls(fo, tl, i, nt);
 
-    for (i = 0; i < nt; i++)
-        write_tmpl(fo, tl, i, nt);
+	     break;
 
-    for (i = 0; i < nt; i++)
-        write_decls(fo, tl, i, nt);
+/* write template as a switch statement */
+	case 1 :
+	     for (i = 0; i < nt; i++)
+	         write_switch(fo, tl[i]);
+
+	     break;
+
+/* write special template for variable arg handler */
+	case 2 :
+	     write_va_arg(fo);
+	     break;};
 
     for (i = 0; i < nt; i++)
 	free_template(tl[i]);
+
+    write_trailer(fo, inf);
 
     if (outf != NULL)
        fclose(fo);
