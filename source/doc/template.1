@@ -6,11 +6,34 @@
 .\"
 
 .TH TEMPLATE 1 "12 December 2010"
+
 .SH NAME
 template \- generate an array of functions, one per primitive data type,
 to be used in C source in lieu of a similar set of macros.
+
 .SH SYNOPSIS
-.B template
+.B template [-h] [-f] [-o <file>] [-s] [-va] <tf>
+
+.SH OPTIONS
+.TP
+.B \-h
+A summary of options.
+.TP
+.B \-f
+Generate templates as an array of functions (default).
+.TP
+.B \-o
+Write generated code to specified file (default is stdout).
+.TP
+.B \-s
+Generate templates as a switch statement in a function.
+.TP
+.B \-va
+Generate special template for variable argument handling.
+.TP
+.B <tf>
+Is a template file as described below.
+
 .SH DESCRIPTION
 Since types are not first class objects in C, it is a common idiom
 to use macros to stamp out a template for code that differs only by

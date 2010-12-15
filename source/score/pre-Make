@@ -186,17 +186,9 @@ ${IncDir}/sctypeg.h : ${BinDir}/convert
 	@(echo "convert -o ${IncDir}/sctypeg.h" ; \
 	  ${CFE} ${BinDir}/convert -o ${IncDir}/sctypeg.h)
 
-#
-# varg
-#
-${BinDir}/varg : varg.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score varg.c -o ${BinDir}/varg ${Cfe_LD_Lib}
-
-varg : ${BinDir}/varg
-
-${IncDir}/scarg.h : ${BinDir}/varg
-	@(echo "varg -o scarg.h" ; \
-	  ${CFE} ${BinDir}/varg -o ${IncDir}/scarg.h)
+${IncDir}/scarg.h :
+	@(echo "template -va -o ${IncDir}/scarg.h" ; \
+	  ${BinDir}/template -va -o ${IncDir}/scarg.h)
 
 ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
