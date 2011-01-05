@@ -109,34 +109,28 @@ web : ${BinDir}/pcweb
 # binary data tests
 #
 ${BinDir}/pcbtst : ${TGTLib} pcbtst.c
-	${CC} -c pcbtst.c -o ${PACTTmpDir}/pcbtst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pcbtst.o -o ${BinDir}/pcbtst ${Libs}
+	${CLD} ${LdFlags} pcbtst.c -o ${BinDir}/pcbtst ${Libs}
 
 ${BinDir}/pcctst : ${TGTLib} pcctst.c
-	${CC} -c pcctst.c -o ${PACTTmpDir}/pcctst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pcctst.o -o ${BinDir}/pcctst ${Libs}
+	${CLD} ${LdFlags} pcctst.c -o ${BinDir}/pcctst ${Libs}
 
 ${BinDir}/pcftst : ${TGTLib} pcftst.f
-	${FC} -c pcftst.f -o ${PACTTmpDir}/pcftst.o
-	${FC} ${LdFlags} ${PACTTmpDir}/pcftst.o -o ${BinDir}/pcftst ${Libs}
+	${FC} ${LdFlags} pcftst.c -o ${BinDir}/pcftst ${Libs}
 #
 # multiple process tests
 #
 ${BinDir}/pcmtst : ${TGTLib} pcmtst.c
-	${CC} -c pcmtst.c -o ${PACTTmpDir}/pcmtst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pcmtst.o -o ${BinDir}/pcmtst ${Libs}
+	${CLD} ${LdFlags} pcmtst.c -o ${BinDir}/pcmtst ${Libs}
 #
 # parallel process tests
 #
 ${BinDir}/pcptst : ${TGTLib} pcptst.c
-	${CC} -c pcptst.c -o ${PACTTmpDir}/pcptst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pcptst.o -o ${BinDir}/pcptst ${Libs}
+	${CLD} ${LdFlags} pcptst.c -o ${BinDir}/pcptst ${Libs}
 #
 # http reader
 #
 ${BinDir}/pcweb : ${TGTLib} pcweb.c
-	${CC} -c pcweb.c -o ${PACTTmpDir}/pcweb.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pcweb.o -o ${BinDir}/pcweb ${Libs}
+	${CLD} ${LdFlags} pcweb.c -o ${BinDir}/pcweb ${Libs}
 
 #
 # process report
@@ -145,8 +139,7 @@ ${BinDir}/pcweb : ${TGTLib} pcweb.c
 proc : ${BinDir}/pcchld
 
 ${BinDir}/pcchld : ${TGTLib} pcchld.c
-	${CCCfe} -c pcchld.c -o ${PACTTmpDir}/pcchld.o
-	${CCCfe} ${LdFlags} ${PACTTmpDir}/pcchld.o -o ${BinDir}/pcchld ${Libs}
+	${CCCfe} ${LdFlags} pcchld.c -o ${BinDir}/pcchld ${Libs}
 
 #
 # make the executable

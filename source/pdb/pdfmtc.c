@@ -183,7 +183,7 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 /* check for floating point types (proper) */
     else if (SC_is_type_fp(id) == TRUE)
        {ifp = SC_TYPE_FP(id);
-	if (ifp < N_PRIMITIVE_FP)
+	if ((ifp < N_PRIMITIVE_FP) && (std->fp[ifp].format == NULL))
 	   {std->fp[ifp].bpi    = nb;
 	    std->fp[ifp].order  = ordr;
 	    std->fp[ifp].format = formt;

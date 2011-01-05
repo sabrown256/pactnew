@@ -380,7 +380,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "FOptimize  = ${FC_Optimize}"
 
     Note $STDOUT "Linker     = ${LD_Exe}"
-    Note $STDOUT "Template   = template"
 
 # get the entries for RPATH
     set npath = `analyze/rpath -o link`
@@ -468,7 +467,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     call PrintRule(".y.c:", YaccC)
     call PrintRule(".f.o:", FCObj)
     call PrintRule(".f.a:", FCArc)
-    call PrintRule(".t.h:", TemplH)
 
     Note $STDOUT ""
 

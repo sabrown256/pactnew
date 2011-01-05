@@ -89,8 +89,7 @@ profiler :
 
 # make the executable
 ${TGTExe} : ${BinDep}
-	${CC} -c sccmain.c -o ${PACTTmpDir}/sccmain.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/sccmain.o -o ${TGTExe} ${Libs}
+	${CLD} ${LdFlags} sccmain.c -o ${TGTExe} ${Libs}
 
 scc :
 	pact install

@@ -170,8 +170,7 @@ profiler :
 
 # make the executable
 ${TGTExe} : ${BinDep}
-	${CC} -c shmain.c -o ${PACTTmpDir}/shmain.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/shmain.o -o ${TGTExe} ${Libs}
+	${CLD} ${LdFlags} shmain.c -o ${TGTExe} ${Libs}
 
 scheme :
 	touch shmain.c

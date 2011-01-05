@@ -155,7 +155,7 @@ HAVE_SUBROUTINES
     endif
     Note $FOUT ''
 
-    Note $FOUT 'System : pact {'
+    Note $FOUT 'System/pact {'
     Note $FOUT '  PACT          = '$proot
     Note $FOUT '  PACTRoot      = '$proot
     Note $FOUT '  PACTVersion   = '$pvers
@@ -167,7 +167,7 @@ HAVE_SUBROUTINES
     Note $FOUT '}'
     Note $FOUT ''
 
-    Note $FOUT 'Tool : config_pact {'
+    Note $FOUT 'Tool/config_pact {'
     Note $FOUT '  AddressSize = '$lbits
     Note $FOUT '}'
     Note $FOUT ''
@@ -177,7 +177,7 @@ HAVE_SUBROUTINES
     set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
 
     if ($CCBin != none) then
-       Note $FOUT 'Tool : cc_pact {'
+       Note $FOUT 'Tool/cc_pact {'
        Note $FOUT '  ToolClass    = CGroup'
        Note $FOUT '  BinDir       = '$CCBin
        Note $FOUT '  LibDir       = '$llibs
@@ -196,7 +196,7 @@ HAVE_SUBROUTINES
     endif
 
     if ($FCBin != none) then
-       Note $FOUT 'Tool : fc_pact {'
+       Note $FOUT 'Tool/fc_pact {'
        Note $FOUT '  ToolClass    = FGroup'
        Note $FOUT '  BinDir       = '$FCBin
        Note $FOUT '  LibDir       = '$llibs
@@ -213,7 +213,7 @@ HAVE_SUBROUTINES
        Note $FOUT ''
     endif
 
-    Note $FOUT 'Tool : lib_pact {'
+    Note $FOUT 'Tool/lib_pact {'
     Note $FOUT '  ToolClass   = LibGroup'
     Note $FOUT '  LibFlags    = -r'
     Note $FOUT '  ARFlags     = '$AR_Flags $AR_IFlag
@@ -221,7 +221,7 @@ HAVE_SUBROUTINES
     Note $FOUT '}'
     Note $FOUT ''
 
-    Note $FOUT 'Library : pact {'
+    Note $FOUT 'Library/pact {'
     Note $FOUT '  Archives = pgs ppc pdb pml score'
     Note $FOUT '  IncPaths = '$proot/include
 
@@ -243,7 +243,7 @@ HAVE_SUBROUTINES
 
        Note $FOUT '# MATH specifications'
        Note $FOUT ''
-       Note $FOUT 'Library : lib_math {'
+       Note $FOUT 'Library/lib_math {'
        Note $FOUT '  Archives = '$libm
        Note $FOUT '  LibPaths = '$LibM_Path
        Note $FOUT '  RPaths   = '$LibM_Path
@@ -271,14 +271,14 @@ HAVE_SUBROUTINES
        Note $FOUT "IncMPI = $linc"
 
        if ($CCBin != none) then
-          Note $FOUT 'Tool : cc_pact_mpi {'
+          Note $FOUT 'Tool/cc_pact_mpi {'
           Note $FOUT '  MPI_Flags = -I'$linc
           Note $FOUT '}'
           Note $FOUT ''
        endif
 
        if ($FCBin != none) then
-          Note $FOUT 'Tool : fc_pact_mpi {'
+          Note $FOUT 'Tool/fc_pact_mpi {'
           Note $FOUT '  MPI_Flags = -I'$linc
           Note $FOUT '}'
           Note $FOUT ''
@@ -292,7 +292,7 @@ HAVE_SUBROUTINES
              set lar = ( $lar `echo "$i" | sed 's/-l//'` )
           endif
        end
-       Note $FOUT 'Library : lib_pact_mpi {'
+       Note $FOUT 'Library/lib_pact_mpi {'
        Note $FOUT '  Archives = '$lar
        Note $FOUT '  LibPaths = '${MPILib}
        Note $FOUT '  RPaths   = '${MPILib}
