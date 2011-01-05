@@ -97,8 +97,7 @@ pixie : ${TGTBin}
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CC} -c ultra.c -o ${PACTTmpDir}/ultra.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/ultra.o -o ${TGTExe} ${Libs}
+	${CLD} ${LdFlags} ultra.c -o ${TGTExe} ${Libs}
 
 #
 # link 

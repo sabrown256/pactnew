@@ -173,12 +173,10 @@ sharedlib:
 Cstd : ${BinDir}/gsatst
 
 ${BinDir}/gsatst : gsatst.c ${TGTLib}
-	${CC} -c gsatst.c -o ${PACTTmpDir}/gsatst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsatst.o -o ${BinDir}/gsatst ${Libs}
+	${CLD} ${LdFlags} gsatst.c -o ${BinDir}/gsatst ${Libs}
 
 foo : foo.c ${TGTLib}
-	${CC} -c foo.c -o foo.o
-	${CLD} ${LdFlags} foo.o -o foo ${Libs}
+	${CLD} ${LdFlags} foo.c -o foo ${Libs}
 
 #
 # fortran API test
@@ -186,8 +184,7 @@ foo : foo.c ${TGTLib}
 Fstd : ${BinDir}/gsftst
 
 ${BinDir}/gsftst : gsftst.f ${TGTLib}
-	${FC} -c gsftst.f -o ${PACTTmpDir}/gsftst.o
-	${FC} ${LdFlags} ${PACTTmpDir}/gsftst.o -o ${BinDir}/gsftst ${Libs}
+	${FC} ${LdFlags} gsftst.c -o ${BinDir}/gsftst ${Libs}
 
 #
 # event handling test
@@ -196,8 +193,7 @@ ${BinDir}/gsftst : gsftst.f ${TGTLib}
 event : ${BinDir}/gsevts
 
 ${BinDir}/gsevts : ${TGTLib} gsevts.c
-	${CC} -c gsevts.c -o ${PACTTmpDir}/gsevts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsevts.o -o ${BinDir}/gsevts ${Libs}
+	${CLD} ${LdFlags} gsevts.c -o ${BinDir}/gsevts ${Libs}
 
 #
 # line drawing test
@@ -205,8 +201,7 @@ ${BinDir}/gsevts : ${TGTLib} gsevts.c
 line : ${BinDir}/gsclts
 
 ${BinDir}/gsclts : gsclts.c ${TGTLib}
-	${CC} -c gsclts.c -o ${PACTTmpDir}/gsclts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsclts.o -o ${BinDir}/gsclts ${Libs}
+	${CLD} ${LdFlags} gsclts.c -o ${BinDir}/gsclts ${Libs}
 
 #
 # poly segment test
@@ -214,8 +209,7 @@ ${BinDir}/gsclts : gsclts.c ${TGTLib}
 polyseg : ${BinDir}/gsmlts
 
 ${BinDir}/gsmlts : gsmlts.c ${TGTLib}
-	${CC} -c gsmlts.c -o ${PACTTmpDir}/gsmlts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsmlts.o -o ${BinDir}/gsmlts ${Libs}
+	${CLD} ${LdFlags} gsmlts.c -o ${BinDir}/gsmlts ${Libs}
 
 #
 # text handling test
@@ -223,8 +217,7 @@ ${BinDir}/gsmlts : gsmlts.c ${TGTLib}
 text : ${BinDir}/gstxts
 
 ${BinDir}/gstxts : gstxts.c ${TGTLib}
-	${CC} -c gstxts.c -o ${PACTTmpDir}/gstxts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gstxts.o -o ${BinDir}/gstxts ${Libs}
+	${CLD} ${LdFlags} gstxts.c -o ${BinDir}/gstxts ${Libs}
 
 #
 # transformation test
@@ -232,8 +225,7 @@ ${BinDir}/gstxts : gstxts.c ${TGTLib}
 trans : ${BinDir}/gstrts
 
 ${BinDir}/gstrts : gstrts.c ${TGTLib}
-	${CC} -c gstrts.c -o ${PACTTmpDir}/gstrts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gstrts.o -o ${BinDir}/gstrts ${Libs}
+	${CLD} ${LdFlags} gstrts.c -o ${BinDir}/gstrts ${Libs}
 
 #
 # curve drawing test
@@ -241,8 +233,7 @@ ${BinDir}/gstrts : gstrts.c ${TGTLib}
 curve : ${BinDir}/gsltst
 
 ${BinDir}/gsltst : gsltst.c ${TGTLib}
-	${CC} -c gsltst.c -o ${PACTTmpDir}/gsltst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsltst.o -o ${BinDir}/gsltst ${Libs}
+	${CLD} ${LdFlags} gsltst.c -o ${BinDir}/gsltst ${Libs}
 
 #
 # surface test
@@ -250,8 +241,7 @@ ${BinDir}/gsltst : gsltst.c ${TGTLib}
 surface : ${BinDir}/gssfts
 
 ${BinDir}/gssfts : gssfts.c ${TGTLib}
-	${CC} -c gssfts.c -o ${PACTTmpDir}/gssfts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gssfts.o -o ${BinDir}/gssfts ${Libs}
+	${CLD} ${LdFlags} gssfts.c -o ${BinDir}/gssfts ${Libs}
 
 #
 # fill-poly test
@@ -259,8 +249,7 @@ ${BinDir}/gssfts : gssfts.c ${TGTLib}
 fillpoly: ${BinDir}/gsfpts
 
 ${BinDir}/gsfpts : gsfpts.c ${TGTLib}
-	${CC} -c gsfpts.c -o ${PACTTmpDir}/gsfpts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsfpts.o -o ${BinDir}/gsfpts ${Libs}
+	${CLD} ${LdFlags} gsfpts.c -o ${BinDir}/gsfpts ${Libs}
 
 #
 # contour test
@@ -268,8 +257,7 @@ ${BinDir}/gsfpts : gsfpts.c ${TGTLib}
 contour : ${BinDir}/gsctst
 
 ${BinDir}/gsctst : gsctst.c ${TGTLib}
-	${CC} -c gsctst.c -o ${PACTTmpDir}/gsctst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsctst.o -o ${BinDir}/gsctst ${Libs}
+	${CLD} ${LdFlags} gsctst.c -o ${BinDir}/gsctst ${Libs}
 
 #
 # simple contour test
@@ -277,8 +265,7 @@ ${BinDir}/gsctst : gsctst.c ${TGTLib}
 scontour : ${BinDir}/gssctst
 
 ${BinDir}/gssctst : gssctst.c ${TGTLib}
-	${CC} -c gssctst.c -o ${PACTTmpDir}/gssctst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gssctst.o -o ${BinDir}/gssctst ${Libs}
+	${CLD} ${LdFlags} gssctst.c -o ${BinDir}/gssctst ${Libs}
 
 #
 # fortran contour test
@@ -286,8 +273,7 @@ ${BinDir}/gssctst : gssctst.c ${TGTLib}
 Fcontour : ${BinDir}/gsfctst
 
 ${BinDir}/gsfctst : gsfctst.f ${TGTLib}
-	${FC} -c gsfctst.f -o ${PACTTmpDir}/gsfctst.o
-	${FC} ${LdFlags} ${PACTTmpDir}/gsfctst.o -o ${BinDir}/gsfctst ${Libs}
+	${FC} ${LdFlags} gsfctst.c -o ${BinDir}/gsfctst ${Libs}
 
 
 #
@@ -296,8 +282,7 @@ ${BinDir}/gsfctst : gsfctst.f ${TGTLib}
 vector : ${BinDir}/gsvtst
 
 ${BinDir}/gsvtst : gsvtst.c ${TGTLib}
-	${CC} -c gsvtst.c -o ${PACTTmpDir}/gsvtst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsvtst.o -o ${BinDir}/gsvtst ${Libs}
+	${CLD} ${LdFlags} gsvtst.c -o ${BinDir}/gsvtst ${Libs}
 
 #
 # image test
@@ -305,8 +290,7 @@ ${BinDir}/gsvtst : gsvtst.c ${TGTLib}
 image : ${BinDir}/gsimts
 
 ${BinDir}/gsimts : gsimts.c ${TGTLib}
-	${CC} -c gsimts.c -o ${PACTTmpDir}/gsimts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsimts.o -o ${BinDir}/gsimts ${Libs}
+	${CLD} ${LdFlags} gsimts.c -o ${BinDir}/gsimts ${Libs}
 
 #
 # show colormap
@@ -314,12 +298,10 @@ ${BinDir}/gsimts : gsimts.c ${TGTLib}
 colormap : ${BinDir}/gsshcm
 
 ${BinDir}/gsshcm : gsshcm.c ${TGTLib}
-	${CC} -c gsshcm.c -o ${PACTTmpDir}/gsshcm.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsshcm.o -o ${BinDir}/gsshcm ${Libs}
+	${CLD} ${LdFlags} gsshcm.c -o ${BinDir}/gsshcm ${Libs}
 
 ${BinDir}/gscmts : gscmts.c ${TGTLib}
-	${CC} -c gscmts.c -o ${PACTTmpDir}/gscmts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gscmts.o -o ${BinDir}/gscmts ${Libs}
+	${CLD} ${LdFlags} gscmts.c -o ${BinDir}/gscmts ${Libs}
 
 #
 # Raster test
@@ -327,8 +309,7 @@ ${BinDir}/gscmts : gscmts.c ${TGTLib}
 raster : ${BinDir}/gsrstt
 
 ${BinDir}/gsrstt : gsrstt.c ${TGTLib}
-	${CC} -c gsrstt.c -o ${PACTTmpDir}/gsrstt.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsrstt.o -o ${BinDir}/gsrstt ${Libs}
+	${CLD} ${LdFlags} gsrstt.c -o ${BinDir}/gsrstt ${Libs}
 
 #
 # axis test
@@ -336,8 +317,7 @@ ${BinDir}/gsrstt : gsrstt.c ${TGTLib}
 axis : ${BinDir}/gslaxt
 
 ${BinDir}/gslaxt : gslaxt.c ${TGTLib}
-	${CC} -c gslaxt.c -o ${PACTTmpDir}/gslaxt.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gslaxt.o -o ${BinDir}/gslaxt ${Libs}
+	${CLD} ${LdFlags} gslaxt.c -o ${BinDir}/gslaxt ${Libs}
 
 #
 # grotrian test
@@ -345,8 +325,7 @@ ${BinDir}/gslaxt : gslaxt.c ${TGTLib}
 grotrian : ${BinDir}/gsgrts
 
 ${BinDir}/gsgrts : gsgrts.c ${TGTLib}
-	${CC} -c gsgrts.c -o ${PACTTmpDir}/gsgrts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsgrts.o -o ${BinDir}/gsgrts ${Libs}
+	${CLD} ${LdFlags} gsgrts.c -o ${BinDir}/gsgrts ${Libs}
 
 #
 # inform
@@ -367,12 +346,10 @@ test :
 mpeg : ${BinDir}/gsmpgt1 ${BinDir}/gsmpgt2
 
 ${BinDir}/gsmpgt1 : gsmpgt1.c ${TGTLib}
-	${CC} -c gsmpgt1.c -o ${PACTTmpDir}/gsmpgt1.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsmpgt1.o -o ${BinDir}/gsmpgt1 ${Libs}
+	${CLD} ${LdFlags} gsmpgt1.c -o ${BinDir}/gsmpgt1 ${Libs}
 
 ${BinDir}/gsmpgt2 : gsmpgt2.c ${TGTLib}
-	${CC} -c gsmpgt2.c -o ${PACTTmpDir}/gsmpgt2.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/gsmpgt2.o -o ${BinDir}/gsmpgt2 ${Libs}
+	${CLD} ${LdFlags} gsmpgt2.c -o ${BinDir}/gsmpgt2 ${Libs}
 
 #
 # Make C prototypes file

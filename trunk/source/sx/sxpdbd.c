@@ -166,7 +166,7 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
 /* they must have the same base type */
 
 /* PRIMITIVES */
-    if (dpa->members == NULL && dpb->members == NULL)
+    if ((dpa->members == NULL) && (dpb->members == NULL))
 
 /* type promotion SHORT-CIRCUITS */
        {if (SX_promote_flag)
@@ -199,7 +199,7 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
                 ret &= _SX_type_equal(pfa, pfb, dea->type, deb->type);
    
 /* short-circuit the check if return value becomes FALSE */
-             if (!ret)
+             if (ret == FALSE)
                 return(ret);};
     
 /* they must have the same number of members */

@@ -19,6 +19,8 @@ int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
      a = (<CTYPE> *) bfa;
      b = (<CTYPE> *) bfb;
 
+     ret = TRUE;
+
      ne = ipt*n;
      if (SX_disp_individ_diff == TRUE)
         {for (i = 0L; i < ne; i++)
@@ -44,6 +46,8 @@ int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
 
      a = (<CTYPE> *) bfa;
      b = (<CTYPE> *) bfb;
+
+     ret = TRUE;
 
      ne = ipt*n;
      if (SX_disp_individ_diff == TRUE)

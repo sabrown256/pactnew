@@ -18,7 +18,7 @@ TGTInc = ${Hdrs}
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${CDebug} -I. -I${PACTTmpDir} -I${IncDir} ${MDInc}
+CcFlags = ${CDebug} -I. -I${IncDir} ${MDInc}
 FcFlags = ${FDebug}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
@@ -119,7 +119,7 @@ ${LibDep} : ${Hdrs} ${IncDir}/pdform.h pdspoke.c
 # detect
 #
 ${BinDir}/detect : detect.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
+	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
 
 detect : ${BinDir}/detect
 
@@ -148,66 +148,51 @@ Gst : ${BinDir}/pdgsts
 Lst : ${BinDir}/pdlsts
 
 ${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs}
-	${CC} -c pdbtst.c -o ${PACTTmpDir}/pdbtst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdbtst.o -o ${BinDir}/pdbtst ${Libs}
+	${CLD} ${LdFlags} pdbtst.c -o ${BinDir}/pdbtst ${Libs}
 
 ${BinDir}/pdctst : pdctst.c ${InstallDep} ${Hdrs}
-	${CC} -c pdctst.c -o ${PACTTmpDir}/pdctst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdctst.o -o ${BinDir}/pdctst ${Libs}
+	${CLD} ${LdFlags} pdctst.c -o ${BinDir}/pdctst ${Libs}
 
 ${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs}
-	${CC} -c pdatst.c -o ${PACTTmpDir}/pdatst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdatst.o -o ${BinDir}/pdatst ${Libs}
+	${CLD} ${LdFlags} pdatst.c -o ${BinDir}/pdatst ${Libs}
 
 ${BinDir}/pdasts : pdasts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdasts.c -o ${PACTTmpDir}/pdasts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdasts.o -o ${BinDir}/pdasts ${Libs}
+	${CLD} ${LdFlags} pdasts.c -o ${BinDir}/pdasts ${Libs}
 
 ${BinDir}/pdopts : pdopts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdopts.c -o ${PACTTmpDir}/pdopts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdopts.o -o ${BinDir}/pdopts ${Libs}
+	${CLD} ${LdFlags} pdopts.c -o ${BinDir}/pdopts ${Libs}
 
 ${BinDir}/pdapts : pdapts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdapts.c -o ${PACTTmpDir}/pdapts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdapts.o -o ${BinDir}/pdapts ${Libs}
+	${CLD} ${LdFlags} pdapts.c -o ${BinDir}/pdapts ${Libs}
 
 ${BinDir}/pdgsts : pdgsts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdgsts.c -o ${PACTTmpDir}/pdgsts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdgsts.o -o ${BinDir}/pdgsts ${Libs}
+	${CLD} ${LdFlags} pdgsts.c -o ${BinDir}/pdgsts ${Libs}
 
 ${BinDir}/pdlsts : pdlsts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdlsts.c -o ${PACTTmpDir}/pdlsts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdlsts.o -o ${BinDir}/pdlsts ${Libs}
+	${CLD} ${LdFlags} pdlsts.c -o ${BinDir}/pdlsts ${Libs}
 
 ${BinDir}/pdnormtst : pdnormtst.c ${InstallDep} ${Hdrs}
-	${CC} -c pdnormtst.c -o ${PACTTmpDir}/pdnormtst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdnormtst.o -o ${BinDir}/pdnormtst ${Libs}
+	${CLD} ${LdFlags} pdnormtst.c -o ${BinDir}/pdnormtst ${Libs}
 
 ${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdcsts.c -o ${PACTTmpDir}/pdcsts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdcsts.o -o ${BinDir}/pdcsts ${Libs}
+	${CLD} ${LdFlags} pdcsts.c -o ${BinDir}/pdcsts ${Libs}
         
 ${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdfrts.c -o ${PACTTmpDir}/pdfrts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdfrts.o -o ${BinDir}/pdfrts ${Libs}
+	${CLD} ${LdFlags} pdfrts.c -o ${BinDir}/pdfrts ${Libs}
         
 ${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdbfts.c -o ${PACTTmpDir}/pdbfts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdbfts.o -o ${BinDir}/pdbfts ${Libs}
+	${CLD} ${LdFlags} pdbfts.c -o ${BinDir}/pdbfts ${Libs}
         
 ${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdfcts.c -o ${PACTTmpDir}/pdfcts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdfcts.o -o ${BinDir}/pdfcts ${Libs}
+	${CLD} ${LdFlags} pdfcts.c -o ${BinDir}/pdfcts ${Libs}
         
 Fstd : ${BinDir}/pdftst ${BinDir}/pdfhyts
 
 ${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
-	${FC} -c pdftst.f -o ${PACTTmpDir}/pdftst.o
-	${FC} ${LdFlags} ${PACTTmpDir}/pdftst.o -o ${BinDir}/pdftst ${Libs}
+	${FC} ${LdFlags} pdftst.c -o ${BinDir}/pdftst ${Libs}
 
 ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
-	${FC} -c pdfhyts.f -o ${PACTTmpDir}/pdfhyts.o
-	${FC} ${LdFlags} ${PACTTmpDir}/pdfhyts.o -o ${BinDir}/pdfhyts ${Libs}
+	${FC} ${LdFlags} pdfhyts.c -o ${BinDir}/pdfhyts ${Libs}
 
 #
 # net io test
@@ -215,8 +200,7 @@ ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
 net : ${BinDir}/pdntst
 
 ${BinDir}/pdntst : pdntst.c ${InstallDep} ${Hdrs}
-	${CC} -c pdntst.c -o ${PACTTmpDir}/pdntst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdntst.o -o ${BinDir}/pdntst ${Libs}
+	${CLD} ${LdFlags} pdntst.c -o ${BinDir}/pdntst ${Libs}
 
 #
 # pdb to hdf converter
@@ -224,8 +208,7 @@ ${BinDir}/pdntst : pdntst.c ${InstallDep} ${Hdrs}
 pdb2hdf :
 
 ${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs}
-	${CC} -c applications/pdb2hdf.c -o ${PACTTmpDir}/pdb2hdf.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdb2hdf.o -o ${BinDir}/pdb2hdf ${Libs}
+	${CLD} ${LdFlags} pdb2hdf.c -o ${BinDir}/pdb2hdf ${Libs}
 
 #
 # smp i/o test
@@ -233,8 +216,7 @@ ${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs}
 smp : ${BinDir}/pdsmp
 
 ${BinDir}/pdsmp : pdsmp.c ${InstallDep} ${Hdrs}
-	${CC} -c pdsmp.c -o ${PACTTmpDir}/pdsmp.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdsmp.o -o ${BinDir}/pdsmp ${Libs}
+	${CLD} ${LdFlags} pdsmp.c -o ${BinDir}/pdsmp ${Libs}
 
 #
 # distributed mp i/o test
@@ -242,14 +224,12 @@ ${BinDir}/pdsmp : pdsmp.c ${InstallDep} ${Hdrs}
 dp : ${BinDir}/pddpts
 
 ${BinDir}/pddpts : pddpts.c ${InstallDep} ${Hdrs}
-	${CC} -c pddpts.c -o ${PACTTmpDir}/pddpts.o
-	${CC} ${LdFlags} ${PACTTmpDir}/pddpts.o -o ${BinDir}/pddpts ${Libs} ${DPLib}
+	${CC} ${LdFlags} pddpts.c -o ${BinDir}/pddpts ${Libs} ${DPLib}
 
 fdp : ${BinDir}/pdfdpt
 
 ${BinDir}/pdfdpt : pdfdpt.f ${InstallDep} ${Hdrs}
-	${FC} -c pdfdpt.f -o ${PACTTmpDir}/pdfdpt.o
-	${FC} ${LdFlags} ${PACTTmpDir}/pdfdpt.o -o ${BinDir}/pdfdpt ${Libs} ${DPLib}
+	${FC} ${LdFlags} pdfdpt.c -o ${BinDir}/pdfdpt ${Libs} ${DPLib}
 
 #
 # test attribute handling
@@ -257,12 +237,10 @@ ${BinDir}/pdfdpt : pdfdpt.f ${InstallDep} ${Hdrs}
 attr : ${BinDir}/pdatst ${BinDir}/pxrdts ${BinDir}/pxntst
 
 ${BinDir}/pxrdts : pxrdts.c ${InstallDep} ${Hdrs}
-	${CC} -c pxrdts.c -o ${PACTTmpDir}/pxrdts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pxrdts.o -o ${BinDir}/pxrdts ${Libs}
+	${CLD} ${LdFlags} pxrdts.c -o ${BinDir}/pxrdts ${Libs}
 
 ${BinDir}/pxntst : pxntst.c ${InstallDep} ${Hdrs}
-	${CC} -c pxntst.c -o ${PACTTmpDir}/pxntst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pxntst.o -o ${BinDir}/pxntst ${Libs}
+	${CLD} ${LdFlags} pxntst.c -o ${BinDir}/pxntst ${Libs}
 
 #
 # test cast and typedef of primitives handling
@@ -270,12 +248,10 @@ ${BinDir}/pxntst : pxntst.c ${InstallDep} ${Hdrs}
 def : ${BinDir}/pdrcts ${BinDir}/pdtdeftst
 
 ${BinDir}/pdrcts : pdrcts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdrcts.c -o ${PACTTmpDir}/pdrcts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdrcts.o -o ${BinDir}/pdrcts ${Libs}
+	${CLD} ${LdFlags} pdrcts.c -o ${BinDir}/pdrcts ${Libs}
 
 ${BinDir}/pdtdeftst : pdtdeftst.c ${InstallDep} ${Hdrs}
-	${CC} -c pdtdeftst.c -o ${PACTTmpDir}/pdtdeftst.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdtdeftst.o -o ${BinDir}/pdtdeftst ${Libs}
+	${CLD} ${LdFlags} pdtdeftst.c -o ${BinDir}/pdtdeftst ${Libs}
 
 #
 # test file descriptor usage
@@ -283,8 +259,7 @@ ${BinDir}/pdtdeftst : pdtdeftst.c ${InstallDep} ${Hdrs}
 fd : ${BinDir}/pdfdts
 
 ${BinDir}/pdfdts : pdfdts.c ${InstallDep} ${Hdrs}
-	${CC} -c pdfdts.c -o ${PACTTmpDir}/pdfdts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdfdts.o -o ${BinDir}/pdfdts ${Libs}
+	${CLD} ${LdFlags} pdfdts.c -o ${BinDir}/pdfdts ${Libs}
 
 #
 # timing test
@@ -292,19 +267,16 @@ ${BinDir}/pdfdts : pdfdts.c ${InstallDep} ${Hdrs}
 time : ${BinDir}/pdtime
 
 ${BinDir}/pdtime : pdtime.c ${InstallDep} ${Hdrs}
-	${CC} -c pdtime.c -o ${PACTTmpDir}/pdtime.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pdtime.o -o ${BinDir}/pdtime ${Libs}
+	${CLD} ${LdFlags} pdtime.c -o ${BinDir}/pdtime ${Libs}
 
 #
 # exam
 #
 exambin :
-	${CC} -c exambin.c -o ${PACTTmpDir}/exambin.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/exambin.o -o ${BinDir}/exambin
+	${CLD} ${LdFlags} exambin.c -o ${BinDir}/exambin
 
 exam :
-	${CC} -c exam.c -o ${PACTTmpDir}/exam.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/exam.o -o ${BinDir}/exam
+	${CLD} ${LdFlags} exam.c -o ${BinDir}/exam
 
 # extra commands needed when building TGTLib
 LibAction = build-spokes

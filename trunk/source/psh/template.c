@@ -430,14 +430,33 @@ static void write_va_arg_clause(FILE *fp, int id)
 /* WRITE_VA_ARG - write the va arg routines */
 
 static void write_va_arg(FILE *fp)
-   {int i, ng, no_complex;
+   {int i;
 
-/* PATHSCALE 2.5 does not support complex types in va_arg */
-#if defined(COMPILER_PATHSCALE)
-    no_complex = TRUE;
-#else
-    no_complex = FALSE;
-#endif
+/* PATHSCALE 3.2.99 does not support complex types in va_arg */
+    fprintf(fp, "#ifdef COMPILER_PATHSCALE\n");
+
+    fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
+    fprintf(fp, "   {int _lid;                                        \\\n");
+    fprintf(fp, "    if (_id == SC_STRING_I)                          \\\n");
+    fprintf(fp, "       _lid = _id;                                   \\\n");
+    fprintf(fp, "    else if (SC_is_type_ptr(_id) == TRUE)            \\\n");
+    fprintf(fp, "       _lid = SC_POINTER_I;                          \\\n");
+    fprintf(fp, "    else                                             \\\n");
+    fprintf(fp, "       _lid = _id;                                   \\\n");
+    fprintf(fp, "    switch (_lid) {                                  \\\n");
+
+    for (i = 0; i <= I_FLOAT; i++)
+        {if (types[i] != NULL)
+            write_va_arg_clause(fp, i);};
+
+    for (i = I_COMPLEX+1; i < N_TYPES; i++)
+        {if (types[i] != NULL)
+            write_va_arg_clause(fp, i);};
+
+    fprintf(fp, "       }                                             \\\n");
+    fprintf(fp, "   }\n");
+
+    fprintf(fp, "#else\n");
 
     fprintf(fp, "#define SC_VA_ARG_ID(_id, _d, _n)                    \\\n");
     fprintf(fp, "   {int _lid;                                        \\\n");
@@ -450,13 +469,13 @@ static void write_va_arg(FILE *fp)
     fprintf(fp, "    switch (_lid) {                                  \\\n");
 
     for (i = 0; i < N_TYPES; i++)
-        {ng = ((types[i] == NULL) ||
-	       ((no_complex == TRUE) && (I_FLOAT < i) && (i <= I_COMPLEX)));
-	 if (ng == FALSE)
+        {if (types[i] != NULL)
             write_va_arg_clause(fp, i);};
 
     fprintf(fp, "       }                                             \\\n");
-    fprintf(fp, "   }                                                 \\\n");
+    fprintf(fp, "   }\n");
+
+    fprintf(fp, "#endif\n");
 
     return;}
 

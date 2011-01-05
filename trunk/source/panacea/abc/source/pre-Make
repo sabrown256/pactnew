@@ -55,8 +55,7 @@ ${TGTLib} : ${Hdrs}
 
 
 ${TGTExe} : ${BinDep}
-	${CC} -c s.c -o ${PACTTmpDir}/s.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/s.o -o ${TGTExe} ${Libs}
+	${CLD} ${LdFlags} s.c -o ${TGTExe} ${Libs}
 
 install : ${InstallDep}
 	@cp ${Hdrs} ${DevInc}

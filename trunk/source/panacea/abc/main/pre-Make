@@ -43,10 +43,8 @@ purify :
 	purify ${CLD} ${MDIncs} ${LdFlags} b.c -o ${TGTB} ${Libs}
 
 install : ${InstallDep}
-	${CC} -c a.c -o ${PACTTmpDir}/a.o
-	${CLD} ${LdFlags} ${MDIncs} ${PACTTmpDir}/a.o -o ${TGTA} ${Libs}
-	${CC} -c b.c -o ${PACTTmpDir}/b.o
-	${CLD} ${LdFlags} ${MDIncs} ${PACTTmpDir}/b.o -o ${TGTB} ${Libs}
+	${CLD} ${LdFlags} ${MDIncs} a.c -o ${TGTA} ${Libs}
+	${CLD} ${LdFlags} ${MDIncs} b.c -o ${TGTB} ${Libs}
 
 test :
 

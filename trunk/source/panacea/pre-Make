@@ -112,21 +112,18 @@ ${IncDir}/pasrc.h : pasrc.t
 Cth : ${BinDir}/pathts
 
 ${BinDir}/pathts : pathts.c ${TGTLib}
-	${CC} -c pathts.c -o ${PACTTmpDir}/pathts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pathts.o -o ${BinDir}/pathts ${NGLibs}
+	${CLD} ${LdFlags} pathts.c -o ${BinDir}/pathts ${NGLibs}
 
 Fth : ${BinDir}/pathft
 
 ${BinDir}/pathft : pathft.f ${TGTLib}
-	${FC} -c pathft.f -o ${PACTTmpDir}/pathft.o
-	${FC} ${LdFlags} ${PACTTmpDir}/pathft.o -o ${BinDir}/pathft ${NGLibs}
+	${FC} ${LdFlags} pathft.c -o ${BinDir}/pathft ${NGLibs}
 
 #
 # pata
 #
 ${BinDir}/pata : pata.c ${TGTLib}
-	${CC} -c pata.c -o ${PACTTmpDir}/pata.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pata.o -o ${BinDir}/pata ${NGLibs}
+	${CLD} ${LdFlags} pata.c -o ${BinDir}/pata ${NGLibs}
 
 #
 # preprocessing test
@@ -134,23 +131,20 @@ ${BinDir}/pata : pata.c ${TGTLib}
 prep : ${BinDir}/pacppt
 
 ${BinDir}/pacppt : pacppt.c ${TGTLib}
-	${CC} -c pacppt.c -o ${PACTTmpDir}/pacppt.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/pacppt.o -o ${BinDir}/pacppt ${NGLibs}
+	${CLD} ${LdFlags} pacppt.c -o ${BinDir}/pacppt ${NGLibs}
 #
 # test new variable definition
 #
 defvar : ${BinDir}/padeft
 
 ${BinDir}/padeft : padeft.c ${TGTLib}
-	${CC} -c padeft.c -o ${PACTTmpDir}/padeft.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/padeft.o -o ${BinDir}/padeft ${NGLibs}
+	${CLD} ${LdFlags} padeft.c -o ${BinDir}/padeft ${NGLibs}
 
 #
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CC} -c toul.c -o ${PACTTmpDir}/toul.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/toul.o -o ${TGTExe} ${Libs}
+	${CLD} ${LdFlags} toul.c -o ${TGTExe} ${Libs}
 
 #
 # link 

@@ -125,8 +125,7 @@ ${IncDir}/sxpdbd.h : sxpdbd.t
 # make the executable
 #
 ${TGTExe} : ${BinDep}
-	${CC} -c sxmain.c -o ${PACTTmpDir}/sxmain.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/sxmain.o -o ${TGTExe} ${Libs}
+	${CLD} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs}
 
 # extra commands needed when building TGTLib
 LibAction = build-ext
@@ -135,8 +134,7 @@ LibAction = build-ext
 # make the command test wrapper
 #
 ${BinDir}/sxcmts : ${BinDep}
-	${CC} -c sxcmts.c -o ${PACTTmpDir}/sxcmts.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/sxcmts.o -o ${BinDir}/sxcmts ${Libs}
+	${CLD} ${LdFlags} sxcmts.c -o ${BinDir}/sxcmts ${Libs}
 
 command :
 	pact ${BinDir}/sxcmts
