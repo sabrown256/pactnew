@@ -54,10 +54,10 @@ static data_alignment *_PD_mk_alignment(char *vals)
 	    align->fx[i+1] = vals[i + 2];
 
 /* default int8_t alignment equal to char alignment*/
-	align->fx[0] = vals[0];
+	align->fx[SC_TYPE_FIX(SC_INT8_I)] = vals[0];
 
 /* default long long alignment equal to long alignment*/
-	align->fx[3] = vals[4];
+	align->fx[SC_TYPE_FIX(SC_LONG_LONG_I)] = vals[4];
 
 /* floating point alignments */
 	for (i = 0; i < 2; i++)
@@ -82,7 +82,8 @@ static data_alignment *_PD_mk_alignment(char *vals)
 	    align->fx[i] = vals[i + 4];
 
 /* default long long alignment equal to long alignment*/
-	align->fx[4] = vals[7];
+	i = SC_TYPE_FIX(SC_LONG_LONG_I);
+	align->fx[i] = vals[7];
 
 /* floating point alignments */
 	for (i = 0; i < N_PRIMITIVE_FP; i++)
@@ -94,6 +95,39 @@ static data_alignment *_PD_mk_alignment(char *vals)
 	   align->struct_alignment = 0;};
 
     return(align);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_REGEN_STD - regenerate the file standard using the primitive
+ *               - type definitions from the extras section
+ *               - the type info from the header is incomplete
+ */
+
+static void _PD_regen_std(PDBfile *file, char *type, PD_type_kind kind,
+			  long bpi, int align, PD_byte_order ord,
+			  int *ordr, long *formt)
+   {int i, id;
+    data_standard *std;
+
+    id = SC_type_id(type, FALSE);
+    if (SC_is_type_prim(id) == TRUE)
+       {std = file->std;
+
+	if (SC_is_type_fix(id) == TRUE)
+           {i = SC_TYPE_FIX(id);
+	    std->fx[i].bpi   = bpi;
+	    std->fx[i].order = ord;}
+/*
+	else if (SC_is_type_fp(id) == TRUE)
+           {i = SC_TYPE_FIX(id);
+	    std->fp[i].bpi    = bpi;
+	    std->fp[i].order  = ordr;
+	    std->fp[i].format = formt;};
+*/
+       };
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -203,7 +237,8 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
  */
 
 static int _PD_rd_fmt_ii(PDBfile *file)
-   {int i, j, n, *order;
+   {int i, j, n, id;
+    int *order;
     long *format;
     char infor[MAXLINE], *p, *s, *pi;
     data_standard *std;
@@ -224,36 +259,47 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 
 /* get the byte lengths in */
     std->ptr_bytes = *(p++);
-    for (i = 0; i < 3; i++)
-        std->fx[i].bpi = *(p++);
 
-    for (i = 0; i < 2; i++)
-        std->fp[i].bpi = *(p++);
+    for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+        {i = SC_TYPE_FIX(id);
+	 std->fx[i].bpi = *(p++);};
+
+    std->fx[SC_TYPE_FIX(SC_INT8_I)].bpi = 1;
+
+    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+        {i = SC_TYPE_FP(id);
+	 std->fp[i].bpi = *(p++);};
 
 /* get the fix point byte orders in */
-    for (i = 0; i < 3; i++)
-        std->fx[i].order = (PD_byte_order) *(p++);
+    for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+        {i = SC_TYPE_FIX(id);
+	 std->fx[i].order = (PD_byte_order) *(p++);};
+
+    std->fx[SC_TYPE_FIX(SC_INT8_I)].order = std->fx[i].order;
 
 /* get the floating point byte orders in */
-    for (i = 0; i < 2; i++)
-        {n     = std->fp[i].bpi;
+    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+        {i = SC_TYPE_FP(id);
+	 n     = std->fp[i].bpi;
 	 order = std->fp[i].order;
 	 REMAKE_N(order, int, n);
 	 std->fp[i].order = order;
 	 for (j = 0; j < n; j++, *(order++) = *(p++));};
 
 /* get the floating point format data in */
-    n      = FORMAT_FIELDS - 1;
-    for (i = 0; i < 2; i++)
-        {format = std->fp[i].format;
+    n = FORMAT_FIELDS - 1;
+    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+        {i = SC_TYPE_FP(id);
+	 format = std->fp[i].format;
 	 for (j = 0; j < n; j++, *(format++) = *(p++));};
 
 /* read the biases */
     if (_PD_rfgets(infor, MAXLINE, file->stream) == NULL)
        PD_error("CAN'T READ THE BIASES - _PD_RD_FMT_II", PD_OPEN);
     
-    for (i = 0, pi = infor; i < 2; i++, pi = NULL)
-        {format    = std->fp[i].format;
+    for (id = SC_FLOAT_I, pi = infor; id <= SC_DOUBLE_I; id++, pi = NULL)
+        {i = SC_TYPE_FP(id);
+	 format    = std->fp[i].format;
 	 format[7] = SC_stol(SC_strtok(pi, "\001", s));};
 
     file->std = std;
@@ -489,7 +535,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
     int dc, rec;
     int unsgned, onescmp;
     int *ordr, *aord, *tord;
-    long i, size, conv, bsz;
+    long i, bpi, conv, bsz;
     long *formt, *tfmt;
     char *token, *type, *origtype, *atype, delim[10], *s, *local;
     defstr *dp;
@@ -518,7 +564,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 
         type  = SC_strsavef(SC_strtok(local, delim, s),
                             "char*:_PD_RD_PRIM_TYP_II:type");
-        size    = SC_stol(SC_strtok(NULL, delim, s));
+        bpi     = SC_stol(SC_strtok(NULL, delim, s));
         align   = SC_stol(SC_strtok(NULL, delim, s));
         ord     = (PD_byte_order) SC_stol(SC_strtok(NULL, delim, s));
         unsgned = FALSE;
@@ -531,8 +577,8 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 
         token = SC_strtok(NULL, delim, s);
         if ((token != NULL) && (strcmp(token, "ORDER") == 0))
-           {ordr = FMAKE_N(int, size, "_PD_RD_PRIM_TYP_II:order");
-            for (i = 0L; i < size; i++)
+           {ordr = FMAKE_N(int, bpi, "_PD_RD_PRIM_TYP_II:order");
+            for (i = 0L; i < bpi; i++)
                 ordr[i] = SC_stol(SC_strtok(NULL, delim, s));};
                     
         token = SC_strtok(NULL, delim, s);
@@ -546,13 +592,13 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 	       {std  = file->std;
 		tord = std->fp[2].order;
 		tfmt = std->fp[2].format;
-		REMAKE_N(tord, int, size);
+		REMAKE_N(tord, int, bpi);
 		std->fp[2].order = tord;
-		for (i = 0L; i < size; i++)
+		for (i = 0L; i < bpi; i++)
 		    tord[i] = ordr[i];
 		for (i = 0L; i < 8; i++)
 		    tfmt[i] = formt[i];
-		std->fp[2].bpi = size;};
+		std->fp[2].bpi = bpi;};
 	       
 	    kind = FLOAT_KIND;}
 
@@ -616,13 +662,15 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 	    _PD_free_tuple(tuple);}
 
         else 
-           {if (conv == FALSE)
+           {_PD_regen_std(file, type, kind, bpi, align, ord, ordr, formt);
+
+	    if (conv == FALSE)
                _PD_defstr(file, TRUE, type, kind,
-			  NULL, tuple, size, align, ord, FALSE,
+			  NULL, tuple, bpi, align, ord, FALSE,
                           ordr, formt, unsgned, onescmp);
 
             _PD_defstr(file, FALSE, type, kind,
-		       NULL, tuple, size, align, ord, TRUE,
+		       NULL, tuple, bpi, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}
 
         SFREE(type);};
@@ -681,14 +729,17 @@ int _PD_rd_ext_ii(PDBfile *file)
 	       palgn->struct_alignment = atoi(token);}
 
         else if (strcmp(token, "Longlong-Format-Alignment") == 0)
-           {token = SC_strtok(NULL, "\n", p);
+	   {int i;
+
+	    i = SC_TYPE_FIX(SC_LONG_LONG_I);
+	    token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
                {ps = file->std;
 		if (ps != NULL)
-		   {ps->fx[3].bpi   = token[0];
-		    ps->fx[3].order = (PD_byte_order) token[1];};
+		   {ps->fx[i].bpi   = token[0];
+		    ps->fx[i].order = (PD_byte_order) token[1];};
 		if (palgn != NULL)
-		   palgn->fx[3] = token[2];};}
+		   palgn->fx[i] = token[2];};}
 
         else if (strcmp(token, "Casts") == 0)
            {long n_casts, i;
@@ -1124,7 +1175,7 @@ static int _PD_wr_csum_ii(PDBfile *file)
  */
 
 static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
-   {int has_dirs, ok;
+   {int i, n, ap, has_dirs, ok;
     long nbo, nbw;
     char al[MAXLINE];
     char *bf;
@@ -1146,21 +1197,28 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     ok &= _PD_put_string(1, "Offset:%d\n", file->default_offset);
 
 /* write the alignment data */
-    pl     = file->align;
-    al[0]  = pl->ptr_alignment;
-    al[1]  = pl->bool_alignment;
-    al[2]  = pl->chr[0];
-    al[3]  = pl->chr[1];
-    al[4]  = pl->fx[0];
-    al[5]  = pl->fx[1];
-    al[6]  = pl->fx[2];
-    al[7]  = pl->fx[3];
-    al[8]  = pl->fp[0];
-    al[9]  = pl->fp[1];
-    al[10] = pl->fp[2];
-    al[11] = '\0';
+    pl      = file->align;
+    n       = 0;
+    al[n++] = pl->ptr_alignment;
+    al[n++] = pl->bool_alignment;
 
-    if (al[0]*al[1]*al[3]*al[4]*al[5]*al[6]*al[7]*al[8]*al[9]*al[10] == 0) 
+    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+        al[n++] = pl->chr[i];
+
+/* NOTE: long long is handled separately - hence the -1 */
+    for (i = 0; i < N_PRIMITIVE_FIX-1; i++)
+        al[n++] = pl->fx[i];
+
+    for (i = 0; i < N_PRIMITIVE_FP; i++)
+        al[n++] = pl->fp[i];
+
+    al[n] = '\0';
+
+    ap = 1;
+    for (i = 0; i < n; i++)
+        ap *= al[i];
+
+    if (ap == 0) 
        return(FALSE);
 
     ok &= _PD_put_string(1, "Alignment:%s\n", al);
@@ -1168,10 +1226,11 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 			 file->align->struct_alignment);
 
 /* write out the long long standard and alignment */
+    i  = SC_TYPE_FIX(SC_LONG_LONG_I);
     ps = file->std;
-    al[0] = ps->fx[3].bpi;
-    al[1] = ps->fx[3].order;
-    al[2] = pl->fx[3];
+    al[0] = ps->fx[i].bpi;
+    al[1] = ps->fx[i].order;
+    al[2] = pl->fx[i];
     al[3] = '\0';
 
     ok &= _PD_put_string(1, "Longlong-Format-Alignment:%s\n", al);
@@ -1266,7 +1325,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
     sz  = strlen(nht) + 1;
 
     if (_PD_set_current_address(file, sz, SEEK_SET, PD_GENERIC) != 0)
-       {PD_error("FSEEK FAILED - PD_CHANGE_PRIMITIVE", PD_GENERIC);
+       {PD_error("FSEEK FAILED - _PD_WR_FMT_II", PD_GENERIC);
 	rv = FALSE;}
 
     else
