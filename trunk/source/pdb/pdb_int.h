@@ -78,7 +78,7 @@
 #define _PD_NEXT_ADDRESS(f, t, n, v, sf, tf, cf) (*PD_par_fnc.next_address)(f, t, n, v, sf, tf, cf)
 
 #define GET_PFILE(_f)       ((PD_Pfile *) (_f))
-#define _PD_TEXT_OUT(_f)    ((_f)->std->fx[2].order == TEXT_ORDER)
+#define _PD_TEXT_OUT(_f)    ((_f)->std->fx[PD_LONG_I].order == TEXT_ORDER)
 
 #define IS_PDBFILE(_f)                                                       \
     (((_f)->type == NULL) || (strcmp((_f)->type, "PDBfile") == 0))
@@ -125,8 +125,8 @@ struct s_PD_printdes
 
 struct s_PD_address
    {int indx;                  /* indx for /&ptrs - possible future use */
-    int64_t addr;                /* disk address of start of data or itag */
-    int64_t reta;                /* disk address of end of data */
+    int64_t addr;              /* disk address of start of data or itag */
+    int64_t reta;              /* disk address of end of data */
     syment *entry;             /* symbol table entry */
     char *ptr;                 /* memory address of data */
     int written;};             /* flag--1 if data written, 0 if not */
