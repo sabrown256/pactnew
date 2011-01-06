@@ -92,14 +92,14 @@ foreach i ( $cnd )
    endif
    if ("$file" == "") continue
 
-   set exe = `swhich -1 $i:r`
+   set exe = `where $i:r | head -n 1`
    Note $Log "   candidate for $i name = |$exe|"
    if (-x "$exe") then
       call ADD($file)
    else
       set inf = ( `grep Exe $file` )
       if ($#inf > 2) then
-         set exe = `swhich -1 $inf[3]`
+         set exe = `where $inf[3] | head -n 1`
          Note $Log "   candidate for $i file = |$exe|"
          if (-x "$exe") then
             call ADD($file)
