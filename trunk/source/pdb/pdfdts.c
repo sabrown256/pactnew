@@ -13,10 +13,27 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CHECK_FD - check the descriptors
+ *          - they should all be the same
+ */
+
+static int check_fd(int n, int *fd)
+   {int i, ok;
+
+    ok = TRUE;
+
+    for (i = 1; i < n; i++)
+        ok &= (fd[i] == fd[0]);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* TEXT_FILE - return TRUE iff PD_open a text file releases all descriptors */
 
 static int text_file(void)
-   {int i, n, ok;
+   {int n, ok;
     int fd[10];
     FILE *fp;
     PDBfile *pf;
@@ -50,9 +67,7 @@ static int text_file(void)
 
     unlink("fd.dat");
 
-    ok = TRUE;
-    for (i = 1; i < n; i++)
-        ok &= (fd[i] == fd[0]);
+    ok = check_fd(n, fd);
 
     return(ok);}
 
@@ -62,7 +77,7 @@ static int text_file(void)
 /* PDB_FILE - return TRUE iff PD_open a PDB file releases all descriptors */
 
 static int pdb_file(void)
-   {int i, n, ok;
+   {int n, ok;
     int fd[10];
     FILE *fp;
     PDBfile *pf;
@@ -96,9 +111,7 @@ static int pdb_file(void)
 
     unlink("fd.dat");
 
-    ok = TRUE;
-    for (i = 1; i < n; i++)
-        ok &= (fd[i] == fd[0]);
+    ok = check_fd(n, fd);
 
     return(ok);}
 

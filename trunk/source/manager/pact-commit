@@ -514,7 +514,6 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
 # PDB depends on the detect executable so extra
 # measures must be taken now
    if (-e libpdb.a) then
-      flog $Log touch ../../../pdb/z-$System/obj/pdform.h
       flog $Log ar x libpdb.a
       flog $Log rm -f libpdb.a
       flog $Log touch *.o

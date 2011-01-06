@@ -1298,6 +1298,9 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
  *               - the file header block
  *               - this is largely ignored in favor of the primitive
  *               - types in the extras section
+ *               - however it must be written out the way versions
+ *               - older than 24 expect in order for them to read
+ *               - files written by versions 24 or newer
  *               -
  *               - Floating Point Format Descriptor
  *               -   format[0] = # of bits per number
@@ -1311,7 +1314,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
  */
 
 static int _PD_wr_fmt_ii(PDBfile *file)
-   {int i, j, n, rv, sz, nw;
+   {int i, j, n, id, rv, sz, nw;
     int *order;
     long *format, fp_bias[2];
     char outfor[MAXLINE];
@@ -1333,25 +1336,30 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 /* get the byte lengths in */
        {*(p++) = std->ptr_bytes;
 
-	for (i = 0; i < 3; i++)
-	    *(p++) = std->fx[i].bpi;
+	for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+	    {i = SC_TYPE_FIX(id);
+	     *(p++) = std->fx[i].bpi;};
 
-	for (i = 0; i < 2; i++)
-	    *(p++) = std->fp[i].bpi;
+	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+	    {i = SC_TYPE_FP(id);
+	     *(p++) = std->fp[i].bpi;};
 
 /* get the integral types byte order in */
-	for (i = 0; i < 3; i++)
-	    *(p++) = std->fx[i].order;
+	for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+	    {i = SC_TYPE_FIX(id);
+	     *(p++) = std->fx[i].order;};
 
 /* get the floating point format byte orders in */
-	for (i = 0; i < 2; i++)
-	    {order = std->fp[i].order;
+	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+	    {i = SC_TYPE_FP(id);
+	     order = std->fp[i].order;
 	     n     = std->fp[i].bpi;
 	     for (j = 0; j < n; j++, *(p++) = *(order++));};
 
 /* get the floating point formats in */
-	for (i = 0; i < 2; i++)
-	    {format = std->fp[i].format;
+	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+	    {i = SC_TYPE_FP(id);
+	     format = std->fp[i].format;
 	     n = FORMAT_FIELDS - 1;
 	     for (j = 0; j < n; j++, *(p++) = *(format++));
 
