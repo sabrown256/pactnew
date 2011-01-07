@@ -1,0 +1,75 @@
+#!/bin/csh -f
+#
+# CCOMP-INSTALL - install and setup ccomp
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+set dst = ""
+set cf  = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -c:
+           shift
+           set cf = $1
+           breaksw
+      case -d:
+           shift
+           set dst = $1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: ccomp-install -c <file> -d <dir> [-h]"
+           echo "   c   compilers database file to be installed"
+           echo "   d   destination directory"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+           breaksw
+   endsw
+   shift
+end
+
+if ("$dst" == "") then
+   echo "No destination specified - exiting"
+   exit(1)
+endif
+
+if (!(-d $dst)) then
+   echo "Destination $dst does not exist - exiting"
+   exit(1)
+endif
+
+if ("$cf" == "") then
+   echo "No compilers database specified - exiting"
+   exit(1)
+endif
+
+if (!(-f $cf)) then
+   echo "Compilers database does not exist - exiting"
+   exit(1)
+endif
+
+# copy files
+cp ccomp $cf $dst
+chmod 775 $dst/ccomp
+chmod 664 $dst/$cf:t
+
+# setup links
+set lst = ( `$dst/ccomp -cwlist name` )
+pushd $dst >& /dev/null
+foreach i ($lst)
+   echo "   $i"
+   rm -f $i >& /dev/null
+   ln -s ccomp $i
+end
+popd >& /dev/null
+
+exit($err)
+
