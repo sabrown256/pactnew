@@ -79,11 +79,6 @@ EOF
     set MakeOpt = ( $MakeOpt -DSYSTEM_ID=\"${System}\" )
     set MakeOpt = ( $MakeOpt -DPACT_VERSION=\"${PACTVer}\" )
     set MakeOpt = ( $MakeOpt $GnuMakeOpt )
-
-    if ("$FilterDir" != "") then
-       set FiltFile = $FilterDir/$Arch
-       set MakeOpt = ( $MakeOpt -DFILTER=\"$FiltFile\" )
-    endif
     set MakeOpt = ( $MakeOpt -I${IncDir} )
 
     set RootOpt = ( $MakeOpt )
@@ -97,7 +92,16 @@ EOF
     set opt = ( $opt $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags )
     set opt = ( $opt $Cfg_LD_Flags $Cfg_LD_RPath )
 
-    flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
+    set direct = FALSE
+
+    if ($direct == TRUE) then
+       flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
+    else
+       flog $Log pushd ../../psh
+       flog $Log ./ccw "$opt" smake.c -o $BinDir/smake
+       flog $Log popd
+    endif
+
     flog $Log ls -l $BinDir/smake
     flog $Log $BinDir/smake -f $TMAKEF a
     if ($status == 0) then
@@ -107,9 +111,16 @@ EOF
     else
        flog $Log ${RM} $BinDir/smake
 
-       set RootOpt = ( $RootOpt -DSTUPID_MAKE )
+       set opt = ( $opt -DSTUPID_MAKE )
 
-       flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
+       if ($direct == TRUE) then
+          flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
+       else
+          flog $Log pushd ../../psh
+          flog $Log ./ccw "$opt" smake.c -o $BinDir/smake
+          flog $Log popd
+       endif
+
        flog $Log ls -l $BinDir/smake
        flog $Log $BinDir/smake -f $TMAKEF a
        if ($status == 0) then

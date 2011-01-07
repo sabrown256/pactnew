@@ -39,5 +39,6 @@ switch ($os)
         breaksw
 endsw
 
+echo "$cc $argv $lib"
 exec $cc $argv $lib
 
