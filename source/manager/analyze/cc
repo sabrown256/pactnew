@@ -171,8 +171,8 @@ if ($Cfg_CC_Exe != "") then
 
    Note $ALog ""
    Note $ALog "Check the version of the C compiler"
-   Note $ALog "   PATH = $PATH"
-   flog $ALog which $Cfg_CC_Exe
+   Note $ALog "   PATH   = $PATH"
+   Note $ALog "   FAMILY = $COMPILER_FAMILY"
    flog $ALog which $Cfe_CC_Exe
 
    if ($HostOS == SunOS) then
@@ -241,6 +241,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+   flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
       set F77IntPtrDiffer = `$CFE ./$Tmp $BE`
@@ -274,6 +275,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+   flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
       set LONG64 = `$CFE ./$Tmp $BE`
@@ -305,6 +307,7 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+   flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
       set NEED_ALT_LARGE_FILE = `$CFE ./$Tmp $BE`
@@ -346,6 +349,7 @@ EOF
 
       set hw = `uname -m`
       flog $ALog which $Cfe_CC_Exe
+      flog $ALog cat $Tmp.c
       flog $ALog $Cfe_CC_Exe -arch $hw $Tmp.c -o $Tmp $ccopt
       if ($status == 0) then
          flog $ALog $Tmp

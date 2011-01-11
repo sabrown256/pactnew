@@ -516,12 +516,15 @@ int PD_isfile(char *fname)
    {int vers, ok;
     FILE *fp;
 
-    fp = io_open(fname, "r");
+    ok = FALSE;
 
-    vers = _PD_id_file(fp);
-    ok   = (vers > 0);
+    if (fname != NULL)
+       {fp = io_open(fname, "r");
+	if (fp != NULL)
+	   {vers = _PD_id_file(fp);
+	    ok   = (vers > 0);
 
-    io_close(fp);
+	    io_close(fp);};};
 
     return(ok);}
 

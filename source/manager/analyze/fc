@@ -118,6 +118,10 @@ if ($FC_Exe != "") then
 
 # check the compiler version
    Note $ALog "Check the version of the FORTRAN compiler"
+   Note $ALog "   PATH   = $PATH"
+   Note $ALog "   FAMILY = $COMPILER_FAMILY"
+   flog $ALog which $Cfe_FC_Exe
+
    if ($HostOS == SunOS) then
       flog $ALog $Cfg_FC_Exe $FC_Version
       set CmpVers = any
@@ -156,6 +160,7 @@ if ($FC_Exe != "") then
    Note $ALog ""
 
    Note $ALog "Verify the standard of $FC_Exe"
+   flog $ALog cat $Tmp.f
    flog $ALog $FC_Exe $Tmp.f -c $FC_Flags
    if ($status == 0) then
       setenv F_STD "F90"
@@ -179,6 +184,8 @@ cat << EOF >! $Tmp.f
       subroutine Bar
       end subroutine Bar
 EOF
+
+   flog $ALog cat $Tmp.f
    flog $ALog $FC_Exe $FC_Flags -c $Tmp.f -o $Tmp.o
    if (-f $Tmp.o) then
 

@@ -100,7 +100,7 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${ArBind}
 
 ${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs}
+${LibDep} : ${Hdrs} ${IncDir}/mlsrch.h
 
 ${IncDir}/mlsrch.h : mlsrch.t
 	@(echo "template mlsrch.t -o ${IncDir}/mlsrch.h" ;  \

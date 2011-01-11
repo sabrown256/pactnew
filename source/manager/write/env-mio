@@ -82,6 +82,7 @@ HAVE_SUBROUTINES
        Note $FOUT ''
        Note $FOUT "COMPILER_GNU_VERSION = $COMPILER_GNU_VERSION"
        Note $FOUT "COMPILER_GNU_PATH    = $lgnu"
+       Note $FOUT "COMPILER_FAMILY      = $COMPILER_FAMILY"
 
     else if ($?COMPILER_PGI_VERSION == 1) then
        set PACTSpec = /pgi
@@ -91,6 +92,7 @@ HAVE_SUBROUTINES
        Note $FOUT 'VEnv  += COMPILER_PGI_VERSION $@'
        Note $FOUT ''
        Note $FOUT "COMPILER_PGI_VERSION = $COMPILER_PGI_VERSION"
+       Note $FOUT "COMPILER_FAMILY      = $COMPILER_FAMILY"
        Note $FOUT "NUMA                 = $NUMA"
 
     else if ($?COMPILER_IC_VERSION == 1) then
@@ -100,6 +102,7 @@ HAVE_SUBROUTINES
        Note $FOUT 'VEnv  += COMPILER_IC_VERSION $@'
        Note $FOUT ''
        Note $FOUT "COMPILER_IC_VERSION = $COMPILER_IC_VERSION"
+       Note $FOUT "COMPILER_FAMILY     = $COMPILER_FAMILY"
 
 # crap Solaris cannot handle long variable names so bail now
     else if ($HostOS == SunOS) then
@@ -117,6 +120,7 @@ HAVE_SUBROUTINES
           Note $FOUT 'VEnv  += COMPILER_PATH_VERSION $@'
           Note $FOUT ''
           Note $FOUT "COMPILER_PATH_VERSION = $COMPILER_PATH_VERSION"
+          Note $FOUT "COMPILER_FAMILY       = $COMPILER_FAMILY"
        endif
     endif
 
