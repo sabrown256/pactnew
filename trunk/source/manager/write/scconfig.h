@@ -66,23 +66,23 @@ source $ldir/env-csh
 
     Note $STDOUT '#define USE_COMPILER        '$QUOTE$CC_Exe$QUOTE
     if ($?COMPILER_GNU_VERSION == 1) then
-       Note $STDOUT '#define COMPILER_GNU'
+       Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
        Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_GNU_VERSION${QUOTE}
     endif
 
     if ($HostOS != SunOS) then
        if ($?COMPILER_PGI_VERSION == 1) then
-          Note $STDOUT '#define COMPILER_PGI'
+          Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
           Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_PGI_VERSION${QUOTE}
        endif
 
        if ($?COMPILER_IC_VERSION == 1) then
-          Note $STDOUT '#define COMPILER_INTEL'
+          Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
           Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_IC_VERSION${QUOTE}
        endif
 
        if ($?COMPILER_PATH_VERSION == 1) then
-          Note $STDOUT '#define COMPILER_PATHSCALE'
+          Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
           Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_PATH_VERSION${QUOTE}
        endif
     endif

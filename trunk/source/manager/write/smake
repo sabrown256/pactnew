@@ -86,56 +86,58 @@ EOF
        set RootOpt = ( $RootOpt -DUSE_TMP_DIR )
     endif
 
-    set smkc = ../../psh/smake.c
+    flog $Log set direct = FALSE
 
-    set opt = ""
-    set opt = ( $opt $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags )
-    set opt = ( $opt $Cfg_LD_Flags $Cfg_LD_RPath )
-
-    set direct = FALSE
-
-    if ($direct == TRUE) then
-       flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
-    else
-       flog $Log pushd ../../psh
-       flog $Log ./ccw "$opt" smake.c -o $BinDir/smake
-       flog $Log popd
-    endif
-
-    flog $Log ls -l $BinDir/smake
-    flog $Log $BinDir/smake -f $TMAKEF a
-    if ($status == 0) then
-       NoteD $Log " (Does use PATH)"
-
-# if that failed try building for STUPID makes
-    else
+    set ok = FALSE
+    foreach n ( 1 2 )
+       Note $Log "--------  Pass $n ---------"
        flog $Log ${RM} $BinDir/smake
 
-       set opt = ( $opt -DSTUPID_MAKE )
+       if ($n == 2) then
+          set RootOpt = ( $RootOpt -DSTUPID_MAKE )
+       endif
 
        if ($direct == TRUE) then
-          flog $Log $Cfg_CC_Exe $opt $smkc -o $BinDir/smake
+          set opt = ""
+          set opt = ( $opt $RootOpt $Cfg_CC_Flags $Cfg_Lex_Flags )
+          set opt = ( $opt $Cfg_LD_Flags $Cfg_LD_RPath )
+
+          flog $Log $Cfg_CC_Exe $opt ../../psh/smake.c -o $BinDir/smake
        else
+
+# put path to compiler at the head of the path variable for ccw
+          source $IncDir/env-pact.csh
+
           flog $Log pushd ../../psh
-          flog $Log ./ccw "$opt" smake.c -o $BinDir/smake
+          flog $Log ./ccw "$RootOpt" smake.c -o $BinDir/smake
           flog $Log popd
        endif
 
        flog $Log ls -l $BinDir/smake
        flog $Log $BinDir/smake -f $TMAKEF a
        if ($status == 0) then
-          NoteD $Log " (Does NOT use PATH)"
-       else
-          flog $Log ${RM} $BinDir/smake
-          NoteD $Log " "
-          NoteD $Log " "
-          NoteD $Log "ERROR: SERIOUS MAKE PROBLEM ON THIS PLATFORM"
-          NoteD $Log " "
-          exit(1)
+          if ($n == 1) then
+             NoteD $Log " (Does use PATH)"
+          else
+             NoteD $Log " (Does NOT use PATH)"
+          endif
+          set ok = TRUE
+          break
        endif
+    end
+    Note $Log "--------  Pass $n ---------"
+
+    if ($ok == FALSE) then
+       flog $Log ${RM} $BinDir/smake
+       NoteD $Log " "
+       NoteD $Log " "
+       NoteD $Log "ERROR: SERIOUS MAKE PROBLEM ON THIS PLATFORM"
+       NoteD $Log " "
+       exit(1)
     endif
 
     unset opt
+    unset ok
 
     flog $Log $RMDir z-*
     flog $Log $RM `ls`

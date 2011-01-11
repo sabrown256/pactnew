@@ -349,9 +349,8 @@ static int method_1(int c, char **v, char *pmname)
 
 /* find the current directory */
     if (getcwd(cwd, MAXLINE) == NULL)
-       {fprintf(stderr, "%d - %s\n", errno, strerror(errno));
-fprintf(stderr, "%d - %s\n", MAXLINE, cwd);
-fprintf(stderr, "ERROR: CAN'T GET CURRENT DIRECTORY\n");
+       {fprintf(stderr, "ERROR: CAN'T GET CURRENT DIRECTORY\n");
+        fprintf(stderr, "   %d - %s\n", errno, strerror(errno));
         return(1);};
 
 /* manage the hidden directory for the temporary files */

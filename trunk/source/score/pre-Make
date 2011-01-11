@@ -175,16 +175,16 @@ ${LibDep} : ${Hdrs} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 ${MMDep}  : ${Hdrs}
 
 #
-# convert
+# scoerce
 #
-${BinDir}/convert : convert.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score convert.c -o ${BinDir}/convert ${Cfe_LD_Lib}
+${BinDir}/scoerce : scoerce.c ${Hdrs} 
+	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib}
 
-convert : ${BinDir}/convert
+scoerce : ${BinDir}/scoerce
 
-${IncDir}/sctypeg.h : ${BinDir}/convert
-	@(echo "convert -o ${IncDir}/sctypeg.h" ; \
-	  ${CFE} ${BinDir}/convert -o ${IncDir}/sctypeg.h)
+${IncDir}/sctypeg.h : ${BinDir}/scoerce
+	@(echo "scoerce -o ${IncDir}/sctypeg.h" ; \
+	  ${CFE} ${BinDir}/scoerce -o ${IncDir}/sctypeg.h)
 
 ${IncDir}/scarg.h :
 	@(echo "template -va -o ${IncDir}/scarg.h" ; \

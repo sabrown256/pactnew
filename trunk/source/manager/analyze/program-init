@@ -10,6 +10,9 @@
 run analyze/default-bits
 run analyze/rpath init
 
+setenv COMPILER_FAMILY    generic
+setenv COMPILER_EXE       `which cc`
+
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
 setenv RootInc  /usr/include

@@ -30,7 +30,7 @@ unsetenv OBJECT_MODE
 
 set vers = "any"
 
-if ($?COMPILER_VERSION) then
+if ($?COMPILER_VERSION == 1) then
    set vers = $COMPILER_VERSION
 endif
 
@@ -118,11 +118,15 @@ endif
 # NOTE: newest GNU compilers require this because to run
 # for some reason they were not built with -rpath
 # this is not for the compiled executables
-#setenv LD_LIBRARY_PATH  $GNU/lib64:$GNU/lib:${LD_LIBRARY_PATH}
+if (($comp == gcc) || ($comp == g++) || ($comp == gfortran)) then
+   set GNU = $exe:h
+   set GNU = $GNU:h
+   setenv LD_LIBRARY_PATH  $GNU/lib64:$GNU/lib:${LD_LIBRARY_PATH}
 
-#if (-d $GNU/share/man) then
-#   setenv MANPATH   ${MANPATH}:$GNU/share/man
-#endif
+   if (-d $GNU/share/man) then
+      setenv MANPATH   ${MANPATH}:$GNU/share/man
+   endif
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -133,6 +137,13 @@ if ($prenv == TRUE) then
    echo "MANPATH               $MANPATH"
 
 else
+
+# these are common variable which may be used by the compiler drivers
+# for example the Intel compiler drivers use some of these
+# we are done with them - so unset them
+   unsetenv COMPILER_FAMILY
+   unsetenv COMPILER_VERSION
+   unsetenv COMPILER_PATH
 
 # verbose mode diagnostic for debugging
    if ($vrb == TRUE) then

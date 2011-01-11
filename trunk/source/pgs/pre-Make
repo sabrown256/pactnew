@@ -132,7 +132,7 @@ ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
 GrDep = ${GraphicsDevices} ${LibDep}
-${GrDep}  : ${Hdrs}
+${GrDep}  : ${Hdrs} ${IncDir}/gsimag.h
 ${TGTLib} : ${GrDep}
 
 ${ArMPG} : ${MpgHdr}

@@ -3,6 +3,10 @@
 # CCW - wrapper for C compiler to manifest POSIX compliance
 #
 
+unsetenv COMPILER_FAMILY
+unsetenv COMPILER_VERSION
+unsetenv COMPILER_PATH
+
 set os  = `uname -s`
 set lib = ""
 
@@ -39,6 +43,5 @@ switch ($os)
         breaksw
 endsw
 
-echo "$cc $argv $lib"
-exec $cc $argv $lib
+exec $cc -cwvrb $argv $lib
 

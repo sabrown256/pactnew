@@ -41,8 +41,11 @@ else if (-x "$CmpPath/bin/pgcc") then
    set CCRoot = $CmpPath
 endif
 
-set Info = ( `$CCRoot/bin/pgcc -V |& grep pgcc` )
+setenv COMPILER_EXE  $CCRoot/bin/pgcc
 
+set Info = ( `$COMPILER_EXE -V |& grep pgcc` )
+
+setenv COMPILER_FAMILY        PGI
 setenv COMPILER_PGI_VERSION   $Info[2]
 setenv PGRoot                 $CCRoot
 setenv PATH                   $CCRoot/bin':$PATH'
@@ -62,6 +65,8 @@ endif
 SetParent PATH
 SetParent PGRoot
 SetParent COMPILER_PGI_VERSION
+SetParent COMPILER_FAMILY
+SetParent COMPILER_EXE
 SetParent NUMA
 
 exit(0)

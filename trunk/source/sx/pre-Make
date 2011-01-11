@@ -115,7 +115,7 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
 sxmain.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}
 ${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs}
+${LibDep} : ${Hdrs} ${IncDir}/sxpdbd.h
 
 ${IncDir}/sxpdbd.h : sxpdbd.t
 	@(echo "template sxpdbd.t -o ${IncDir}/sxpdbd.h" ;  \

@@ -274,6 +274,7 @@ switch ($Cmnd)
 
         if ("$Tgts" == "") then
            NoteD $Log "Building PACT on $Host ($Msg) ..."
+           NoteD $Log "Using C Compiler $COMPILER_EXE ($COMPILER_FAMILY)"
 
            flog $Log $DSYS linstall
            flog $Log pushd ..
@@ -562,6 +563,10 @@ switch ($Cmnd)
         set DoingConfig = TRUE
 
 # do not let the current environment dictate compiler choices
+        unsetenv COMPILER_FAMILY
+        unsetenv COMPILER_EXE
+        unsetenv COMPILER_VERSION
+        unsetenv COMPILER_PATH
         unsetenv COMPILER_GNU_VERSION
         unsetenv COMPILER_IC_VERSION
         unsetenv COMPILER_PATH_VERSION
