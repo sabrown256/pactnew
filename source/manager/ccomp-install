@@ -56,14 +56,25 @@ if (!(-f $cf)) then
    exit(1)
 endif
 
-# copy files
+# copy master script
 cp ccomp $cf $dst
 chmod 775 $dst/ccomp
 chmod 664 $dst/$cf:t
 
-# setup links
+# make list of compiler names to link
 set lst = ( `$dst/ccomp -cwlist name` )
+
 pushd $dst >& /dev/null
+
+# remove existing links to comp
+set rlst = ( `ls -l | grep ccomp | awk '{print $(NF-2)}'` )
+foreach i ($rlst)
+   if (-f $i) then
+      rm -f $i
+   endif
+end
+
+# make new links to comp
 foreach i ($lst)
    echo "   $i"
    rm -f $i >& /dev/null

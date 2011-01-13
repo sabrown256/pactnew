@@ -1,6 +1,13 @@
 #!/bin/csh -f
 #
 # CCOMP - compiler version wrapper
+#       - requirement: select and run a viable compiler
+#       - selection decision tree
+#       -   1) select the specified compiler if possible
+#       -   2) select the last compiler of the system type
+#       -      if no match
+#       -   3) if you do not care which version to use
+#       -      take the default which is 'any'
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -30,8 +37,8 @@ unsetenv OBJECT_MODE
 
 set vers = "any"
 
-if ($?COMPILER_VERSION == 1) then
-   set vers = $COMPILER_VERSION
+if ($?PACT_CC_VERSION == 1) then
+   set vers = $PACT_CC_VERSION
 endif
 
 set compilers = $base/compilers
@@ -89,24 +96,37 @@ while ($#argv > 0)
    shift
 end
 
-if ($vers == any) then
-   set inf = ( `grep -w $comp $compilers | grep $sys | tail -n 1` )
-else
-   set inf = ( `grep -w $comp $compilers | grep $sys | grep $vers` )
+set inf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") && ($3 == "'$vers'") {print}' $compilers` )
+if ($#inf < 4) then
+   set inf = ( `awk '($2 == "'$comp'") && ($1 == "'$sys'") {print}' $compilers | tail -n 1` )
 endif
 
-if ($#inf > 3) then
-   set exe = $inf[4]
-else
+if ($#inf < 4) then
    echo "No compiler found matching '$comp $vers' - exiting"
    exit(1)
+else
+   shift inf
+   shift inf
+   shift inf
+   set exe = $inf[1]
+   shift inf
+
+# get other key,value pairs
+# useful for setting compiler license variables
+   while ($#inf > 1)
+      set var = $inf[1]
+      set val = $inf[2]
+      shift inf
+      shift inf
+      setenv $var $val      
+   end
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set root   = $exe:h
-set BinDir = $root
+set bindir = $exe:h
+set path   = ( $bindir $path )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -141,13 +161,13 @@ else
 # these are common variable which may be used by the compiler drivers
 # for example the Intel compiler drivers use some of these
 # we are done with them - so unset them
-   unsetenv COMPILER_FAMILY
-   unsetenv COMPILER_VERSION
-   unsetenv COMPILER_PATH
+   unsetenv PACT_CC_FAMILY
+   unsetenv PACT_CC_VERSION
+   unsetenv PACT_CC_PATH
 
 # verbose mode diagnostic for debugging
    if ($vrb == TRUE) then
-      echo "   Root: $root"
+      echo "   Root: $bindir"
       echo "   LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
       echo "   Compile line: $exe $args"
    endif

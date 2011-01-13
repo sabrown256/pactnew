@@ -44,19 +44,19 @@ foreach v ($CCRoot/lib/*)
    setenv LD_LIBRARY_PATH ${v}:$LD_LIBRARY_PATH
 end
 
-setenv COMPILER_EXE $CCRoot/bin/pathcc
+setenv PACT_CC_EXE $CCRoot/bin/pathcc
 
-set Info = ( `$COMPILER_EXE -v |& egrep 'PathScale\(TM\)|EKOPath'` )
+set Info = ( `$PACT_CC_EXE -v |& egrep 'PathScale\(TM\)|EKOPath'` )
 
-setenv COMPILER_FAMILY        PATHSCALE
-setenv COMPILER_PATH_VERSION  $Info[6]
-setenv PSRoot                 $CCRoot/lib/$COMPILER_PATH_VERSION
-setenv PATH                   $CCRoot/bin':$PATH'
+setenv PACT_CC_FAMILY        PATHSCALE
+setenv PACT_CC_PATH_VERSION  $Info[6]
+setenv PSRoot                $CCRoot/lib/$PACT_CC_PATH_VERSION
+setenv PATH                  $CCRoot/bin':$PATH'
 
 SetParent PATH
 SetParent PSRoot
-SetParent COMPILER_PATH_VERSION
-SetParent COMPILER_FAMILY
-SetParent COMPILER_EXE
+SetParent PACT_CC_PATH_VERSION
+SetParent PACT_CC_FAMILY
+SetParent PACT_CC_EXE
 
 exit(0)

@@ -29,7 +29,7 @@ SafeEnv Std_UseOGL       FALSE
 
 set UTime = `timer -r`
 
-if ($HostOS == Darwin) then
+if (($HostOS == Darwin) && ($CC_Exe !~ pgc*)) then
    Note $ALog "Finding GL on MAC OS X"
    setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
 endif

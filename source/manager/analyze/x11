@@ -55,6 +55,7 @@ else if ($Std_UseX == TRUE) then
    if ($HostOS == SunOS) then
 
       cat << EOF >! $Tmp.c
+#include <stdint.h>
 #include <X11/Xlib.h>
 int main(int c, char **v)
 {char *dsp;
@@ -72,6 +73,7 @@ EOF
    else
 
       cat << EOF >! $Tmp.c
+#include <stdint.h>
 #include <X11/Xlib.h>
 int main(int c, char **v)
 {char *dsp;

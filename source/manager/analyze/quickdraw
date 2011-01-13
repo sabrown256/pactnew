@@ -51,7 +51,9 @@ EOF
 
    set opt = ""
    set opt = ( $opt $LD_Flags $LD_RPath )
-   set opt = ( $opt -framework Carbon )
+   if ($CC_Exe !~ pgc*) then
+      set opt = ( $opt -framework Carbon )
+   endif
    set opt = ( $opt $Cfg_LD_Lib )
 
    flog $ALog $Cfg_CC_Exe $Tmp.c -o $Tmp $opt

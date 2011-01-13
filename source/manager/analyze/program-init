@@ -10,8 +10,10 @@
 run analyze/default-bits
 run analyze/rpath init
 
-setenv COMPILER_FAMILY    generic
-setenv COMPILER_EXE       `which cc`
+# PACT_CC_ refers to the Compiler Collection used to build PACT
+# rather than COMPILER_ which is overloaded to the extreme
+setenv PACT_CC_FAMILY    generic
+setenv PACT_CC_EXE       `which cc`
 
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
