@@ -172,28 +172,28 @@ if ($Cfg_CC_Exe != "") then
    Note $ALog ""
    Note $ALog "Check the version of the C compiler"
    Note $ALog "   PATH   = $PATH"
-   Note $ALog "   FAMILY = $COMPILER_FAMILY"
+   Note $ALog "   FAMILY = $PACT_CC_FAMILY"
    flog $ALog which $Cfe_CC_Exe
 
    if ($HostOS == SunOS) then
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any
       set xstatus = $status
-   else if ($?COMPILER_GNU_VERSION == 1) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_GNU_VERSION )
-      flog $ALog set CmpVers = $COMPILER_GNU_VERSION
+   else if ($?PACT_CC_GNU_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_GNU_VERSION )
+      flog $ALog set CmpVers = $PACT_CC_GNU_VERSION
       set xstatus = $status
-   else if ($?COMPILER_PGI_VERSION == 1) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_PGI_VERSION )
-      flog $ALog set CmpVers = $COMPILER_PGI_VERSION
+   else if ($?PACT_CC_PGI_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_PGI_VERSION )
+      flog $ALog set CmpVers = $PACT_CC_PGI_VERSION
       set xstatus = $status
-   else if ($?COMPILER_IC_VERSION == 1) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_IC_VERSION )
-      flog $ALog set CmpVers = $COMPILER_IC_VERSION
+   else if ($?PACT_CC_IC_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_IC_VERSION )
+      flog $ALog set CmpVers = $PACT_CC_IC_VERSION
       set xstatus = $status
-   else if ($?COMPILER_PATH_VERSION == 1) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $COMPILER_PATH_VERSION )
-      flog $ALog set CmpVers = $COMPILER_PATH_VERSION
+   else if ($?PACT_CC_PATH_VERSION == 1) then
+      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_PATH_VERSION )
+      flog $ALog set CmpVers = $PACT_CC_PATH_VERSION
       set xstatus = $status
    else
       set inf  = ( `$Cfg_CC_Exe $CC_Version |& grep version` )

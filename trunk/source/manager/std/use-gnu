@@ -41,15 +41,15 @@ else if (-x "$CmpPath/bin/gcc") then
    set GNU = $CmpPath
 endif
 
-setenv COMPILER_FAMILY   GNU
-setenv COMPILER_EXE      $CmpPath
-setenv PATH              $GNU/bin':$PATH'
-setenv GNURoot           $GNU
+setenv PACT_CC_FAMILY   GNU
+setenv PACT_CC_EXE      $CmpPath
+setenv PATH             $GNU/bin':$PATH'
+setenv GNURoot          $GNU
 
 SetParent PATH
 SetParent GNURoot
-SetParent COMPILER_FAMILY
-SetParent COMPILER_EXE
+SetParent PACT_CC_FAMILY
+SetParent PACT_CC_EXE
 
 exit(0)
 

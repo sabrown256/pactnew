@@ -25,7 +25,7 @@ while ($#argv > 0)
    shift
 end
 
-setenv COMPILER_FAMILY   INTEL
+setenv PACT_CC_FAMILY   INTEL
 
 # because Intel puts its compilers in different
 # directories check both ifort and icc to get
@@ -49,20 +49,20 @@ foreach c (ifort icc)
       set CCRoot = $lcp
    endif
 
-   setenv COMPILER_EXE   $CCRoot/bin/$c
+   setenv PACT_CC_EXE   $CCRoot/bin/$c
 
-   set Info = ( `$COMPILER_EXE -v |& cat` )
+   set Info = ( `$PACT_CC_EXE -v |& cat` )
 
-   setenv COMPILER_IC_VERSION   $Info[2]
-   setenv ICRoot                $CCRoot
-   setenv PATH                  $CCRoot/bin':$PATH'
+   setenv PACT_CC_IC_VERSION   $Info[2]
+   setenv ICRoot               $CCRoot
+   setenv PATH                 $CCRoot/bin':$PATH'
 end
 
 SetParent PATH
 SetParent ICRoot
-SetParent COMPILER_IC_VERSION
-SetParent COMPILER_FAMILY
-SetParent COMPILER_EXE
+SetParent PACT_CC_IC_VERSION
+SetParent PACT_CC_FAMILY
+SetParent PACT_CC_EXE
 
 exit(0)
 

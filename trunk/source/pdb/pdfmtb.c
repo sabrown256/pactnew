@@ -33,7 +33,7 @@
  */
 
 static data_alignment *_PD_mk_alignment(char *vals)
-   {int i, nc;
+   {int i, n, nc;
     data_alignment *align;
 
     nc = strlen(vals);
@@ -70,27 +70,31 @@ static data_alignment *_PD_mk_alignment(char *vals)
 
 /* versions 25 and after have 11 alignments for C99 types */
     else if (nc >= 11)
-       {align->ptr_alignment  = vals[0];
-	align->bool_alignment = vals[1];
+       {n = 0;
+
+	align->ptr_alignment  = vals[n++];
+	align->bool_alignment = vals[n++];
 	
 /* character alignments */
-	for (i = 0; i < 2; i++)
-	    align->chr[i] = vals[i + 2];
+        for (i = 0; i < N_PRIMITIVE_CHAR; i++)
+	    align->chr[i] = vals[n++];
 
-/* fixed point alignments */
-	for (i = 0; i < 4; i++)
-	    align->fx[i] = vals[i + 4];
+/* fixed point alignments
+ * NOTE: long long is handled separately - hence the -1
+ */
+        for (i = 0; i < N_PRIMITIVE_FIX-1; i++)
+	    align->fx[i] = vals[n++];
 
 /* default long long alignment equal to long alignment*/
 	i = SC_TYPE_FIX(SC_LONG_LONG_I);
-	align->fx[i] = vals[7];
+	align->fx[i] = align->fx[i-1];
 
 /* floating point alignments */
 	for (i = 0; i < N_PRIMITIVE_FP; i++)
-	    align->fp[i] = vals[i + 8];
+	    align->fp[i] = vals[n++];
 
-	if (nc > 11)
-	   align->struct_alignment = vals[11];
+	if (nc >= n)
+	   align->struct_alignment = vals[n++];
 	else
 	   align->struct_alignment = 0;};
 

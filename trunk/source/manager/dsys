@@ -274,7 +274,7 @@ switch ($Cmnd)
 
         if ("$Tgts" == "") then
            NoteD $Log "Building PACT on $Host ($Msg) ..."
-           NoteD $Log "Using C Compiler $COMPILER_EXE ($COMPILER_FAMILY)"
+           NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
 
            flog $Log $DSYS linstall
            flog $Log pushd ..
@@ -563,14 +563,14 @@ switch ($Cmnd)
         set DoingConfig = TRUE
 
 # do not let the current environment dictate compiler choices
-        unsetenv COMPILER_FAMILY
-        unsetenv COMPILER_EXE
-        unsetenv COMPILER_VERSION
-        unsetenv COMPILER_PATH
-        unsetenv COMPILER_GNU_VERSION
-        unsetenv COMPILER_IC_VERSION
-        unsetenv COMPILER_PATH_VERSION
-        unsetenv COMPILER_PGI_VERSION
+        unsetenv PACT_CC_FAMILY
+        unsetenv PACT_CC_EXE
+        unsetenv PACT_CC_VERSION
+        unsetenv PACT_CC_PATH
+        unsetenv PACT_CC_GNU_VERSION
+        unsetenv PACT_CC_IC_VERSION
+        unsetenv PACT_CC_PATH_VERSION
+        unsetenv PACT_CC_PGI_VERSION
 
         setenv ConfigDir ""
         if ($?SYS_SITE == 1) then
@@ -1220,7 +1220,6 @@ CFG_DONE:
            shift
         end
 
-# no point in logging since the log directory is to be removed
         foreach c ($Cfgs)
            Separator $Log
            NoteD $Log -n "Deleting configuration $c ... "
@@ -1229,15 +1228,8 @@ CFG_DONE:
            flog $Log pwd
            flog $Log $CfgMan delete $c
 
-           if (-f ../dev/.pc-$c) then
-              flog $Log mv ../dev/.pc-$c ../dev/.pc-save
-              find .. -name "*$c*" -exec rm -rf {} \;
-              set RStatus = $status
-              flog $Log mv ../dev/.pc-save ../dev/.pc-$c
-           else
-              find .. -name "*$c*" -exec rm -rf {} \;
-              set RStatus = $status
-           endif
+           find .. -name "*$c" -type d |& grep -v '\.pc' |& xargs rm -rf
+           set RStatus = $status
 
            NoteD $Log "done"
         end

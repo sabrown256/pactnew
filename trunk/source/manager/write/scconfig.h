@@ -65,25 +65,25 @@ source $ldir/env-csh
     endif
 
     Note $STDOUT '#define USE_COMPILER        '$QUOTE$CC_Exe$QUOTE
-    if ($?COMPILER_GNU_VERSION == 1) then
-       Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
-       Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_GNU_VERSION${QUOTE}
+    if ($?PACT_CC_GNU_VERSION == 1) then
+       Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
+       Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_GNU_VERSION${QUOTE}
     endif
 
     if ($HostOS != SunOS) then
-       if ($?COMPILER_PGI_VERSION == 1) then
-          Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
-          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_PGI_VERSION${QUOTE}
+       if ($?PACT_CC_PGI_VERSION == 1) then
+          Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
+          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_PGI_VERSION${QUOTE}
        endif
 
-       if ($?COMPILER_IC_VERSION == 1) then
-          Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
-          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_IC_VERSION${QUOTE}
+       if ($?PACT_CC_IC_VERSION == 1) then
+          Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
+          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_IC_VERSION${QUOTE}
        endif
 
-       if ($?COMPILER_PATH_VERSION == 1) then
-          Note $STDOUT '#define COMPILER_'$COMPILER_FAMILY
-          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$COMPILER_PATH_VERSION${QUOTE}
+       if ($?PACT_CC_PATH_VERSION == 1) then
+          Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
+          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_PATH_VERSION${QUOTE}
        endif
     endif
 

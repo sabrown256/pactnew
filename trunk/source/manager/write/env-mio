@@ -73,54 +73,54 @@ HAVE_SUBROUTINES
        set lgnu = $GNURoot
     endif
 
-    if ($?COMPILER_GNU_VERSION == 1) then
+    if ($?PACT_CC_GNU_VERSION == 1) then
        set PACTSpec = /gnu
        set CmpBin   = $GNURoot/bin
        set cmplib   = $GNURoot/$LIB
-       Note $FOUT 'VMake += COMPILER_GNU_VERSION COMPILER_GNU_PATH $@'
-       Note $FOUT 'VEnv  += COMPILER_GNU_VERSION COMPILER_GNU_PATH $@'
+       Note $FOUT 'VMake += PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VEnv  += PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
-       Note $FOUT "COMPILER_GNU_VERSION = $COMPILER_GNU_VERSION"
-       Note $FOUT "COMPILER_GNU_PATH    = $lgnu"
-       Note $FOUT "COMPILER_FAMILY      = $COMPILER_FAMILY"
+       Note $FOUT "PACT_CC_VERSION = $PACT_CC_GNU_VERSION"
+       Note $FOUT "PACT_CC_PATH    = $lgnu"
+       Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
 
-    else if ($?COMPILER_PGI_VERSION == 1) then
+    else if ($?PACT_CC_PGI_VERSION == 1) then
        set PACTSpec = /pgi
        set cmplib   = $PGRoot/lib
        set lnuma    = $NUMA
-       Note $FOUT 'VMake += COMPILER_PGI_VERSION NUMA $@'
-       Note $FOUT 'VEnv  += COMPILER_PGI_VERSION $@'
+       Note $FOUT 'VMake += PACT_CC_VERSION NUMA $@'
+       Note $FOUT 'VEnv  += PACT_CC_VERSION $@'
        Note $FOUT ''
-       Note $FOUT "COMPILER_PGI_VERSION = $COMPILER_PGI_VERSION"
-       Note $FOUT "COMPILER_FAMILY      = $COMPILER_FAMILY"
-       Note $FOUT "NUMA                 = $NUMA"
+       Note $FOUT "PACT_CC_VERSION = $PACT_CC_PGI_VERSION"
+       Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
+       Note $FOUT "NUMA             = $NUMA"
 
-    else if ($?COMPILER_IC_VERSION == 1) then
+    else if ($?PACT_CC_IC_VERSION == 1) then
        set PACTSpec = /intel
        set cmplib   = $ICRoot/lib
-       Note $FOUT 'VMake += COMPILER_IC_VERSION $@'
-       Note $FOUT 'VEnv  += COMPILER_IC_VERSION $@'
+       Note $FOUT 'VMake += PACT_CC_IC_VERSION $@'
+       Note $FOUT 'VEnv  += PACT_CC_IC_VERSION $@'
        Note $FOUT ''
-       Note $FOUT "COMPILER_IC_VERSION = $COMPILER_IC_VERSION"
-       Note $FOUT "COMPILER_FAMILY     = $COMPILER_FAMILY"
+       Note $FOUT "PACT_CC_VERSION = $PACT_CC_IC_VERSION"
+       Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
 
 # crap Solaris cannot handle long variable names so bail now
     else if ($HostOS == SunOS) then
        Note $FOUT ''
 
     else
-       if ($?COMPILER_PATH_VERSION == 1) then
+       if ($?PACT_CC_PATH_VERSION == 1) then
           set PACTSpec = /path
           if ("$Bits" == 32) then
              set cmplib = ${PSRoot}:${PSRoot}/32
           else
              set cmplib = $PSRoot
           endif
-          Note $FOUT 'VMake += COMPILER_PATH_VERSION $@'
-          Note $FOUT 'VEnv  += COMPILER_PATH_VERSION $@'
+          Note $FOUT 'VMake += PACT_CC_VERSION $@'
+          Note $FOUT 'VEnv  += PACT_CC_VERSION $@'
           Note $FOUT ''
-          Note $FOUT "COMPILER_PATH_VERSION = $COMPILER_PATH_VERSION"
-          Note $FOUT "COMPILER_FAMILY       = $COMPILER_FAMILY"
+          Note $FOUT "PACT_CC_VERSION = $PACT_CC_PATH_VERSION"
+          Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
        endif
     endif
 
