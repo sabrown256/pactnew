@@ -516,16 +516,39 @@ static void _SC_free_variables(anadep *state)
  */
 
 static char *_SC_begin_var_ref(char *s)
-   {char *p, *ps;
+   {int i, id, np, nd, ok;
+    int cp, cc, cn;
+    char *p;
 
-    for (ps = s; TRUE; )
-        {p = strchr(ps, '$');
-	 if (p == NULL)
-	    break;
-	 else if (strchr("{(", p[1]) == NULL)
-	    ps = p + 1;
-	 else
-	    break;};
+    id = -1;
+    np = 0;
+    nd = 0;
+    ok = TRUE;
+    p  = NULL;
+
+    cp = '\0';
+    cc = s[0];
+    for (i = 0; (s[i] != '\0') && (ok == TRUE); i++)
+        {cn = s[i+1];
+	 switch (cc)
+	    {case '{' :
+	     case '(' :
+	          np++;
+		  break;
+	     case '}' :
+	     case ')' :
+	          np--;
+		  if ((id != -1) && (nd > 0))
+		     {ok = FALSE;
+		      p = s + id;};
+		  break;
+	     case '$' :
+	          if ((strchr("$<@*", cn) == NULL) && (cp != '$'))
+		     {nd++;
+		      id = i;};
+		  break;};
+	 cp = cc;
+         cc = cn;};
 
     return(p);}
 

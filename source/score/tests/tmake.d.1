@@ -1,0 +1,29 @@
+#
+# test nested variables
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+a = a
+b = b
+c = c
+
+abc = 123
+
+x1 = ${${a}bc}
+x2 = ${a${b}c}
+x3 = ${ab${c}}
+
+y1 = ${${a}${b}c}
+y2 = ${a${b}${c}}
+y3 = ${${a}b${c}}
+
+all :
+	@echo "Expect: |123| from all"
+	@echo "-> ${x1}"
+	@echo "-> ${x2}"
+	@echo "-> ${x3}"
+	@echo "-> ${y1}"
+	@echo "-> ${y2}"
+	@echo "-> ${y3}"

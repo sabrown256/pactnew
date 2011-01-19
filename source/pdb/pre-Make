@@ -119,7 +119,7 @@ ${LibDep} : ${Hdrs} ${IncDir}/pdform.h pdspoke.c
 # detect
 #
 ${BinDir}/detect : detect.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
+	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
 
 detect : ${BinDir}/detect
 
