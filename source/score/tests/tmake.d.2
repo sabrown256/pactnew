@@ -1,0 +1,21 @@
+#
+# test nested macro expansion
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+dbg_fooa.c = a_g
+opt_fooa   = a_o
+any_a.c    = a_a
+
+a.c :
+	@touch ${any_$@}
+
+fooa.c : a.c
+	@echo "Expect: |fooa.c| |fooa| |a.c|"
+	@echo "        |$@| |$*| |$<|"
+	@echo "        |a_g| |a_o| |a_a|"
+	@echo "        |${dbg_$@}| |${opt_$*}| |${any_$<}|"
+	@rm a.c
+

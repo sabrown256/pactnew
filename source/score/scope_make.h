@@ -128,6 +128,11 @@ extern void
  SC_make_def_var(char *var, anadep *state),
  SC_free_state(anadep *state);
 
+extern char
+  *_SC_subst_macro(char *src, int off,
+		   SC_rule_cat whch, char *tgt, char *dep, char *sfx),
+ *_SC_subst_str(ruledes *rd, char *src, anadep *state);
+
 extern int
  SC_parse_makefile(char *fname, anadep *state),
  SC_parse_premake(char *fname, anadep *state);

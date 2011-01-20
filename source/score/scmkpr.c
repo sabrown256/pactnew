@@ -510,15 +510,15 @@ static void _SC_free_variables(anadep *state)
 
 /* _SC_BEGIN_VAR_REF - find the beginning of a variable reference in S
  *                   - which will be of the form
- *                   -   ${foo}
+ *                   -   ${foo}, ${...${foo}...}
  *                   - or
- *                   -   $(foo)
+ *                   -   $(foo), $(...$(foo)...)
  */
 
-static char *_SC_begin_var_ref(char *s)
+static char *_SC_begin_var_ref(ruledes *rd, char *s)
    {int i, id, np, nd, ok;
     int cp, cc, cn;
-    char *p;
+    char *p, *pm;
 
     id = -1;
     np = 0;
@@ -543,9 +543,22 @@ static char *_SC_begin_var_ref(char *s)
 		      p = s + id;};
 		  break;
 	     case '$' :
-	          if ((strchr("$<@*", cn) == NULL) && (cp != '$'))
+	          pm = strchr("$<@*%", cn);
+	          if ((pm == NULL) && (cp != '$'))
 		     {nd++;
-		      id = i;};
+		      id = i;}
+/*
+		  else if ((pm != NULL) && (rd != NULL))
+		     {char *sfx, *mac;
+
+		      sfx = NULL;
+		      mac = _SC_subst_macro(s, i, EXPLICIT,
+					    rd->name, rd->depend,
+					    sfx);
+		      i  = -1;
+		      cp = '\0';
+		      cc = s[0];};
+*/
 		  break;};
 	 cp = cc;
          cc = cn;};
@@ -574,18 +587,111 @@ static char *_SC_end_var_ref(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_SUBST_MACRO - carry out the substitutions for the
+ *                 - the macros:
+ *                 -    $@  the full target
+ *                 -    $*  base of the full target (i.e. $@:r)
+ *                 -    $<  the dependent file
+ *                 -    $%  the name of the archive member
+ *                 -    $$  a single '$'
+ *                 - the returned string must be freshly allocated
+ */
+
+char *_SC_subst_macro(char *src, int off,
+		      SC_rule_cat whch, char *tgt, char *dep, char *sfx)
+   {int c, nf, ns, nr;
+    char s[MAXLINE];
+    char *dst, *base, *p, *t;
+
+    if (src == NULL)
+       dst = NULL;
+
+    else
+       {p = strchr(src+off, '$');
+	if (p == NULL)
+	   {dst = SC_strsavef(src, "_SC_SUBST_MACRO:dsta");
+	    SFREE(src);}
+
+	else
+	   {*p++ = '\0';
+	    c    = *p++;
+	    base = NULL;
+	    switch (c)
+	       {case '*':
+		     strcpy(s, tgt);
+		     if (whch == ARCHIVE)
+		        {t = strtok(s, "(");
+			 t = strtok(NULL, ")");
+			 base = strtok(t, ".");}
+		     else
+			base = strtok(s, ".");
+		     break;
+
+		case '@':
+		     base = tgt;
+		     break;
+
+		case '<':
+		     strcpy(s, tgt);
+		     if (whch == ARCHIVE)
+		        {t = strtok(s, "(");
+			 t = strtok(NULL, ")");
+			 if (t != NULL)
+			    {base = strchr(t, '.');
+			     if (base != NULL)
+			        base[1] = sfx[1];
+			     base = t;};}
+		     else if (whch == EXPLICIT)
+		        base = dep;
+		     else
+		        {base = strchr(s, '.');
+			 if (base != NULL)
+			    base[1] = sfx[1];
+			 base = s;};
+		     break;
+
+		case '%':
+		     io_printf(stdout, "Not handling $% macro yet\n");
+		     dst = NULL;
+		     break;
+
+		case '$':
+		     snprintf(s, MAXLINE, "$");
+		     base = s;
+		     break;
+
+		default:
+		     snprintf(s, MAXLINE, "$%c", c);
+		     base = s;
+		     break;};
+
+	    nf  = strlen(src);
+	    ns  = (base != NULL) ? strlen(base) : 0;
+	    nr  = strlen(p);
+	    dst = FMAKE_N(char, nf+ns+nr+2, "_SC_SUBST_MACRO:dstb");
+	    snprintf(dst, nf+ns+nr+2,
+		     "%s%s%s", src, base, p);
+	    SFREE(src);
+
+	    dst = _SC_subst_macro(dst, nf+ns, whch, tgt, dep, sfx);};};
+
+    return(dst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_SUBST_STR - recursively substitute variable references in the
  *               - given string SRC until there are no more
  *               - each substitution goes into DST and sent to the next pass
  *               - return DST when done
  */
 
-char *_SC_subst_str(char *src, anadep *state)
+char *_SC_subst_str(ruledes *rd, char *src, anadep *state)
    {int i, nf, ne;
     char *pf, *pe, *dst, *text;
 
     for (i = 0; TRUE; i++)
-        {pf = _SC_begin_var_ref(src);
+        {pf = _SC_begin_var_ref(rd, src);
 	 if (pf == NULL)
 
 /* DST absolutely must be a fresh copy */
@@ -621,14 +727,14 @@ char *_SC_subst_str(char *src, anadep *state)
  *                   - return the number of substitutions made
  */
 
-static int _SC_subst_strings(char **a, anadep *state)
+static int _SC_subst_strings(ruledes *rd, char **a, anadep *state)
    {int ns;
     char *pa, *pb;
 
     ns = 0;
     if (*a != NULL)
        {pa = *a;
-	pb = _SC_subst_str(*a, state);
+	pb = _SC_subst_str(rd, *a, state);
 	if (pa != pb)
 	   {ns++;
 	    *a = pb;
@@ -656,7 +762,7 @@ static int _SC_do_subst_name(haelem *hp, void *a)
  * into the new rule table
  */
     s = SC_strsavef(key, "DO_SUBST:s[0]");
-    _SC_subst_strings(&s, state);
+    _SC_subst_strings(NULL, &s, state);
 
 /* the rule name may have expanded into more than one item
  * enter the rule under each item
@@ -701,8 +807,8 @@ static int _SC_do_subst_body(haelem *hp, void *a)
     ok    = SC_haelem_data(hp, NULL, NULL, (void **) &rd);
 
 /* do substitutions in the dependencies and actions */
-    _SC_subst_strings(&rd->depend, state);
-    _SC_subst_strings(&rd->act, state);
+    _SC_subst_strings(rd, &rd->depend, state);
+    _SC_subst_strings(rd, &rd->act, state);
 
 /* now breaks dependencies and actions down into arrays */
     _SC_process_rule(&rd->n_dependencies, &rd->dependencies,
@@ -913,7 +1019,7 @@ int SC_parse_makefile(char *fname, anadep *state)
 		     pt = SC_strsavef(t, "SC_PARSE_MAKEFILE:t");
 		     _SC_end_rule(&a, state);
 		     _SC_end_var(&v, state);
-		     _SC_subst_strings(&pt, state);
+		     _SC_subst_strings(NULL, &pt, state);
 		     SC_parse_makefile(pt, state);}
 
 		 else
