@@ -550,8 +550,8 @@ static char *_SC_begin_var_ref(ruledes *rd, char *s)
 /*
 		  else if ((pm != NULL) && (rd != NULL))
 		     {char *sfx, *mac;
-
 		      sfx = NULL;
+
 		      mac = _SC_subst_macro(s, i, EXPLICIT,
 					    rd->name, rd->depend,
 					    sfx);
@@ -597,8 +597,8 @@ static char *_SC_end_var_ref(char *s)
  *                 - the returned string must be freshly allocated
  */
 
-char *_SC_subst_macro(char *src, int off,
-		      SC_rule_cat whch, char *tgt, char *dep, char *sfx)
+char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
+		      char *tgt, char *dep, char *sfx)
    {int c, nf, ns, nr;
     char s[MAXLINE];
     char *dst, *base, *p, *t;
@@ -673,7 +673,7 @@ char *_SC_subst_macro(char *src, int off,
 		     "%s%s%s", src, base, p);
 	    SFREE(src);
 
-	    dst = _SC_subst_macro(dst, nf+ns, whch, tgt, dep, sfx);};};
+	    dst = _SC_subst_macro(dst, nf+ns, whch, exd, tgt, dep, sfx);};};
 
     return(dst);}
 
@@ -708,6 +708,11 @@ char *_SC_subst_str(ruledes *rd, char *src, anadep *state)
 
 	     nf = strlen(src);
 	     ne = strlen(pe);
+
+             if ((rd != NULL) && (strchr(pf, '$') != NULL))
+	        pf = _SC_subst_macro(pf, 0, EXPLICIT, FALSE,
+		                     rd->name, rd->depend,
+				     NULL);
 
 	     text = (char *) SC_hasharr_def_lookup(state->variables, pf);
 	     if (text == NULL)

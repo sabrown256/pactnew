@@ -10,7 +10,9 @@ opt_fooa   = a_o
 any_a.c    = a_a
 
 a.c :
-	@touch ${any_$@}
+	@echo "Expect: |a_a|"
+	@echo "        |${any_$@}|"
+	@touch a.c
 
 fooa.c : a.c
 	@echo "Expect: |fooa.c| |fooa| |a.c|"

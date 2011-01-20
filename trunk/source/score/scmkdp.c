@@ -816,7 +816,7 @@ char **SC_action_commands(anadep *state, int recur)
  * freshly allocated one
  */
 		  if ((tgt != NULL) && (sfx != NULL))
-		     p = _SC_subst_macro(p, 0, whch, tgt, dep, sfx);
+		     p = _SC_subst_macro(p, 0, whch, TRUE, tgt, dep, sfx);
 
 		  cmnds[m++] = p;};};
 

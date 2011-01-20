@@ -129,8 +129,8 @@ extern void
  SC_free_state(anadep *state);
 
 extern char
-  *_SC_subst_macro(char *src, int off,
-		   SC_rule_cat whch, char *tgt, char *dep, char *sfx),
+  *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
+		   char *tgt, char *dep, char *sfx),
  *_SC_subst_str(ruledes *rd, char *src, anadep *state);
 
 extern int
