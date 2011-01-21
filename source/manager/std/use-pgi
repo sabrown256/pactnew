@@ -46,15 +46,15 @@ setenv PACT_CC_EXE  $CCRoot/bin/pgcc
 set Info = ( `$PACT_CC_EXE -V |& grep pgcc` )
 
 setenv PACT_CC_FAMILY        PGI
-setenv PACT_CC_PGI_VERSION   $Info[2]
+setenv PACT_CC_VERSION       $Info[2]
 setenv PGRoot                $CCRoot
 setenv PATH                  $CCRoot/bin':$PATH'
 
-expr "$PACT_CC_PGI_VERSION" '>' "7.0" >& /dev/null
+expr "$PACT_CC_VERSION" '>' "7.0" >& /dev/null
 if ($status == 0) then
    setenv NUMA  "-Mconcur=numa"
 else
-   expr "$PACT_CC_PGI_VERSION" '>' "6.2" >& /dev/null
+   expr "$PACT_CC_VERSION" '>' "6.2" >& /dev/null
    if ($status == 0) then
       setenv NUMA  "-Mconcur=nonuma"
    else
@@ -64,7 +64,7 @@ endif
 
 SetParent PATH
 SetParent PGRoot
-SetParent PACT_CC_PGI_VERSION
+SetParent PACT_CC_VERSION
 SetParent PACT_CC_FAMILY
 SetParent PACT_CC_EXE
 SetParent NUMA

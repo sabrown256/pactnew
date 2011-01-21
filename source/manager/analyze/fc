@@ -126,21 +126,21 @@ if ($FC_Exe != "") then
       flog $ALog $Cfg_FC_Exe $FC_Version
       set CmpVers = any
       set xstatus = $status
-   else if ($?PACT_CC_GNU_VERSION == 1) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_GNU_VERSION )
-      set CmpVers = $PACT_CC_GNU_VERSION
+   else if ($PACT_CC_FAMILY == 1) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_VERSION )
+      set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
-   else if ($?PACT_CC_PGI_VERSION == 1) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_PGI_VERSION )
-      set CmpVers = $PACT_CC_PGI_VERSION
+   else if ($PACT_CC_FAMILY == PGI) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_VERSION )
+      set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
-   else if ($?PACT_CC_IC_VERSION == 1) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_IC_VERSION )
-      set CmpVers = $PACT_CC_IC_VERSION
+   else if ($PACT_CC_FAMILY == INTEL) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_VERSION )
+      set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
-   else if ($?PACT_CC_PATH_VERSION == 1) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_PATH_VERSION )
-      set CmpVers = $PACT_CC_PATH_VERSION
+   else if ($PACT_CC_FAMILY == PATHSCALE) then
+      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_CC_VERSION )
+      set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
    else
       flog $ALog $Cfg_FC_Exe $FC_Version

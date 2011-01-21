@@ -567,10 +567,6 @@ switch ($Cmnd)
         unsetenv PACT_CC_EXE
         unsetenv PACT_CC_VERSION
         unsetenv PACT_CC_PATH
-        unsetenv PACT_CC_GNU_VERSION
-        unsetenv PACT_CC_IC_VERSION
-        unsetenv PACT_CC_PATH_VERSION
-        unsetenv PACT_CC_PGI_VERSION
 
         setenv ConfigDir ""
         if ($?SYS_SITE == 1) then
