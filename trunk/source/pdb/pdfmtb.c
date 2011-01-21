@@ -27,90 +27,13 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_MK_ALIGNMENT - THREADSAFE
- *                  - allocate, initialize and return a pointer to a
- *                  - data_alignment
- */
-
-static data_alignment *_PD_mk_alignment(char *vals)
-   {int i, n, nc;
-    data_alignment *align;
-
-    nc = strlen(vals);
-
-    align = FMAKE(data_alignment, "_PD_MK_ALIGNMENT:align");
-
-/* versions before 25 have 7 alignments for C types */
-    if (nc == 7)
-       {align->ptr_alignment  = vals[1];
-	align->bool_alignment = vals[0];
-
-/* character alignments */
-	for (i = 0; i < N_PRIMITIVE_CHAR; i++)
-	    align->chr[i] = vals[0];
-
-/* fixed point alignments */
-	for (i = 0; i < 3; i++)
-	    align->fx[i+1] = vals[i + 2];
-
-/* default int8_t alignment equal to char alignment*/
-	align->fx[SC_TYPE_FIX(SC_INT8_I)] = vals[0];
-
-/* default long long alignment equal to long alignment*/
-	align->fx[SC_TYPE_FIX(SC_LONG_LONG_I)] = vals[4];
-
-/* floating point alignments */
-	for (i = 0; i < 2; i++)
-	    align->fp[i] = vals[i + 5];
-
-/* default long double alignment equal to twice double alignment*/
-	align->fp[2] = 2*vals[6];
-
-	align->struct_alignment = 0;}
-
-/* versions 25 and after have 11 alignments for C99 types */
-    else if (nc >= 11)
-       {n = 0;
-
-	align->ptr_alignment  = vals[n++];
-	align->bool_alignment = vals[n++];
-	
-/* character alignments */
-        for (i = 0; i < N_PRIMITIVE_CHAR; i++)
-	    align->chr[i] = vals[n++];
-
-/* fixed point alignments
- * NOTE: long long is handled separately - hence the -1
- */
-        for (i = 0; i < N_PRIMITIVE_FIX-1; i++)
-	    align->fx[i] = vals[n++];
-
-/* default long long alignment equal to long alignment*/
-	i = SC_TYPE_FIX(SC_LONG_LONG_I);
-	align->fx[i] = align->fx[i-1];
-
-/* floating point alignments */
-	for (i = 0; i < N_PRIMITIVE_FP; i++)
-	    align->fp[i] = vals[n++];
-
-	if (nc >= n)
-	   align->struct_alignment = vals[n++];
-	else
-	   align->struct_alignment = 0;};
-
-    return(align);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PD_REGEN_STD - regenerate the file standard using the primitive
  *               - type definitions from the extras section
  *               - the type info from the header is incomplete
  */
 
-static void _PD_regen_std(PDBfile *file, char *type, PD_type_kind kind,
-			  long bpi, int align, PD_byte_order ord,
-			  int *ordr, long *formt)
+static void _PD_regen_std(PDBfile *file, char *type,
+			  long bpi, PD_byte_order ord)
    {int i, id;
     data_standard *std;
 
@@ -121,15 +44,7 @@ static void _PD_regen_std(PDBfile *file, char *type, PD_type_kind kind,
 	if (SC_is_type_fix(id) == TRUE)
            {i = SC_TYPE_FIX(id);
 	    std->fx[i].bpi   = bpi;
-	    std->fx[i].order = ord;}
-/*
-	else if (SC_is_type_fp(id) == TRUE)
-           {i = SC_TYPE_FIX(id);
-	    std->fp[i].bpi    = bpi;
-	    std->fp[i].order  = ordr;
-	    std->fp[i].format = formt;};
-*/
-       };
+	    std->fx[i].order = ord;};};
 
     return;}
 
@@ -532,6 +447,39 @@ int _PD_rd_chrt_ii(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_RD_PRIM_ALIGN_TYPE - set the alignment for TYPE */
+
+static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
+   {int i, id;
+
+    if ((strcmp(type, "pointer") == 0) || (strcmp(type, "*") == 0))
+       align->ptr_alignment = al;
+
+    else
+       {id = SC_type_id(type, FALSE);
+	if (id == SC_BOOL_I)
+	   align->bool_alignment = al;
+
+	else if (SC_is_type_char(id) == TRUE)
+	   {i = SC_TYPE_CHAR(id);
+	    if (i < N_PRIMITIVE_CHAR)
+	       align->chr[i] = al;}
+
+	else if (SC_is_type_fix(id) == TRUE)
+	   {i = SC_TYPE_FIX(id);
+	    if (i < N_PRIMITIVE_FIX)
+	       align->fx[i] = al;}
+
+	else if (SC_is_type_fp(id) == TRUE)
+	   {i = SC_TYPE_FP(id);
+	    if (i < N_PRIMITIVE_FP)
+	       align->fp[i] = al;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
@@ -578,6 +526,8 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
         ordr    = NULL;
         formt   = NULL;
 	tuple   = NULL;
+
+	_PD_rd_prim_align_type(type, align, file->align);
 
         token = SC_strtok(NULL, delim, s);
         if ((token != NULL) && (strcmp(token, "ORDER") == 0))
@@ -666,7 +616,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 	    _PD_free_tuple(tuple);}
 
         else 
-           {_PD_regen_std(file, type, kind, bpi, align, ord, ordr, formt);
+           {_PD_regen_std(file, type, bpi, ord);
 
 	    if (conv == FALSE)
                _PD_defstr(file, TRUE, type, kind,
@@ -699,11 +649,12 @@ int _PD_rd_ext_ii(PDBfile *file)
 
     pa->n_casts = 0L;
 
+    palgn = FMAKE(data_alignment, "_PD_RD_EXT_II:palgn");
+
+    file->align          = palgn;
     file->default_offset = 0;
     file->system_version = 0;
     SFREE(file->date);
-
-    palgn = NULL;
 
     local = pa->local;
     bsz   = sizeof(pa->local);
@@ -719,13 +670,6 @@ int _PD_rd_ext_ii(PDBfile *file)
            {token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
                file->default_offset = atoi(token);}
-
-        else if (strcmp(token, "Alignment") == 0)
-           {token = SC_strtok(NULL, "\n", p);
-            if (token != NULL)
-               palgn = _PD_mk_alignment(token);
-	    else
-	       return(FALSE);}
 
         else if (strcmp(token, "Struct-Alignment") == 0)
            {token = SC_strtok(NULL, "\n", p);
@@ -811,14 +755,6 @@ int _PD_rd_ext_ii(PDBfile *file)
             if (token != NULL)
                file->date = SC_strsavef(token,
                                         "char*:_PD_RD_EXT_II:date");};};
-
-/* set the file->align (if pre-PDB_SYSTEM_VERSION 3 use the default
- * alignment)
- */
-    if (palgn != NULL)
-       file->align = palgn;
-    else
-       file->align = _PD_copy_alignment(&WORD4_ALIGNMENT);
 
 /* release the buffer which held both the symbol table and the extras */
     SFREE(pa->tbuffer);
@@ -1155,6 +1091,67 @@ static int _PD_wr_csum_ii(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_WR_PRIM_ALIGN - write alignment extras
+ *                   - counterpart of _PD_rd_prim_align
+ */
+
+static int _PD_wr_prim_align(PDBfile *file)
+   {int i, n, id, ap, ok;
+    char al[MAXLINE];
+    data_alignment *pl;
+    data_standard *ps;
+
+    ok = TRUE;
+
+    pl = file->align;
+    n  = 0;
+
+/* prepare original C type data for Alignment */
+    for (id = SC_CHAR_I; id < SC_WCHAR_I; id++)
+        {i = SC_TYPE_CHAR(id);
+	 al[n++] = pl->chr[i];};
+
+    al[n++] = pl->ptr_alignment;
+
+    for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
+        {i = SC_TYPE_FIX(id);
+	 al[n++] = pl->fx[i];};
+
+    for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
+        {i = SC_TYPE_FP(id);
+	 al[n++] = pl->fp[i];};
+
+    al[n] = '\0';
+
+    ap = 1;
+    for (i = 0; i < n; i++)
+        ap *= al[i];
+
+    if (ap == 0) 
+       return(FALSE);
+
+    ok &= _PD_put_string(1, "Alignment:%s\n", al);
+
+/* write out struct alignment */
+    ok &= _PD_put_string(1, "Struct-Alignment:%d\n",
+			 file->align->struct_alignment);
+
+
+/* write out the long long standard and alignment */
+    i  = SC_TYPE_FIX(SC_LONG_LONG_I);
+    ps = file->std;
+    al[0] = ps->fx[i].bpi;
+    al[1] = ps->fx[i].order;
+    al[2] = pl->fx[i];
+    al[3] = '\0';
+
+    ok &= _PD_put_string(1, "Longlong-Format-Alignment:%s\n", al);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_WR_EXT_II - write any extraneous data to the file
  *               - this is essentially a place for expansion of the file
  *               - to complete the definition of a PDB file the following
@@ -1179,12 +1176,9 @@ static int _PD_wr_csum_ii(PDBfile *file)
  */
 
 static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
-   {int i, n, ap, has_dirs, ok;
+   {int has_dirs, ok;
     long nbo, nbw;
-    char al[MAXLINE];
     char *bf;
-    data_alignment *pl;
-    data_standard *ps;
     FILE *fp;
     PD_smp_state *pa;
 
@@ -1201,43 +1195,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
     ok &= _PD_put_string(1, "Offset:%d\n", file->default_offset);
 
 /* write the alignment data */
-    pl      = file->align;
-    n       = 0;
-    al[n++] = pl->ptr_alignment;
-    al[n++] = pl->bool_alignment;
-
-    for (i = 0; i < N_PRIMITIVE_CHAR; i++)
-        al[n++] = pl->chr[i];
-
-/* NOTE: long long is handled separately - hence the -1 */
-    for (i = 0; i < N_PRIMITIVE_FIX-1; i++)
-        al[n++] = pl->fx[i];
-
-    for (i = 0; i < N_PRIMITIVE_FP; i++)
-        al[n++] = pl->fp[i];
-
-    al[n] = '\0';
-
-    ap = 1;
-    for (i = 0; i < n; i++)
-        ap *= al[i];
-
-    if (ap == 0) 
-       return(FALSE);
-
-    ok &= _PD_put_string(1, "Alignment:%s\n", al);
-    ok &= _PD_put_string(1, "Struct-Alignment:%d\n",
-			 file->align->struct_alignment);
-
-/* write out the long long standard and alignment */
-    i  = SC_TYPE_FIX(SC_LONG_LONG_I);
-    ps = file->std;
-    al[0] = ps->fx[i].bpi;
-    al[1] = ps->fx[i].order;
-    al[2] = pl->fx[i];
-    al[3] = '\0';
-
-    ok &= _PD_put_string(1, "Longlong-Format-Alignment:%s\n", al);
+    ok &= _PD_wr_prim_align(file);
 
 /* write out the date and version data */
     ok &= _PD_put_string(1, "Version:%d|%s\n",
