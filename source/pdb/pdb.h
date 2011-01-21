@@ -107,9 +107,13 @@
  * Version 25 add support for C99 types: long double, boolean,
  * float complex, double complex, long double complex. 10/25/2010
  *
+ * Version 26 revert and deprecate Alignment extra.
+ * It matches versions 24 and earlier for forward compatibility
+ * with old codes and is ignored by new versions of PDBLib. 01/21/2011
+ *
  */
 
-#define PDB_SYSTEM_VERSION  25
+#define PDB_SYSTEM_VERSION  26
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
