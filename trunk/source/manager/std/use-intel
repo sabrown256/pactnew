@@ -53,14 +53,14 @@ foreach c (ifort icc)
 
    set Info = ( `$PACT_CC_EXE -v |& cat` )
 
-   setenv PACT_CC_IC_VERSION   $Info[2]
+   setenv PACT_CC_VERSION      $Info[2]
    setenv ICRoot               $CCRoot
    setenv PATH                 $CCRoot/bin':$PATH'
 end
 
 SetParent PATH
 SetParent ICRoot
-SetParent PACT_CC_IC_VERSION
+SetParent PACT_CC_VERSION
 SetParent PACT_CC_FAMILY
 SetParent PACT_CC_EXE
 

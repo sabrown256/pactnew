@@ -49,13 +49,13 @@ setenv PACT_CC_EXE $CCRoot/bin/pathcc
 set Info = ( `$PACT_CC_EXE -v |& egrep 'PathScale\(TM\)|EKOPath'` )
 
 setenv PACT_CC_FAMILY        PATHSCALE
-setenv PACT_CC_PATH_VERSION  $Info[6]
-setenv PSRoot                $CCRoot/lib/$PACT_CC_PATH_VERSION
+setenv PACT_CC_VERSION       $Info[6]
+setenv PSRoot                $CCRoot/lib/$PACT_CC_VERSION
 setenv PATH                  $CCRoot/bin':$PATH'
 
 SetParent PATH
 SetParent PSRoot
-SetParent PACT_CC_PATH_VERSION
+SetParent PACT_CC_VERSION
 SetParent PACT_CC_FAMILY
 SetParent PACT_CC_EXE
 
