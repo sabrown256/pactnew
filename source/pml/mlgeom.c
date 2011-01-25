@@ -76,7 +76,7 @@ struct s_polywalk
 int _PM_cross(double *x1, double *x2, double *x3, double *x4,
 	      double *x0, int line1, int line2)
    {int cross;
-    double a, b, dx21, dy21, dx43, dy43, dx13, dy13, idx, idy;
+    double a, b, dx21[2], dx43[2], dx13[2], idx;
     double d, t1, t2;
 
 /* assume they don't intersect */
@@ -89,56 +89,78 @@ int _PM_cross(double *x1, double *x2, double *x3, double *x4,
     x0[0] = HUGE;
     x0[1] = HUGE;
 
-    dx21 = x2[0] - x1[0];
-    dy21 = x2[1] - x1[1];
-    dx43 = x4[0] - x3[0];
-    dy43 = x4[1] - x3[1];
-    dx13 = x1[0] - x3[0];
-    dy13 = x1[1] - x3[1];
+    dx21[0] = x2[0] - x1[0];
+    dx21[1] = x2[1] - x1[1];
+    dx43[0] = x4[0] - x3[0];
+    dx43[1] = x4[1] - x3[1];
+    dx13[0] = x1[0] - x3[0];
+    dx13[1] = x1[1] - x3[1];
 
 /* if either vector is zero */
-    if (((dx21 == 0.0) && (dy21 == 0.0)) ||
-	((dx43 == 0.0) && (dy43 == 0.0)))
+    if (((dx21[0] == 0.0) && (dx21[1] == 0.0)) ||
+	((dx43[0] == 0.0) && (dx43[1] == 0.0)))
        return(cross);
 
 /* find determinant for equation (1) */
-    a = dx21*dy43;
-    b = dy21*dx43;
+    a = dx21[0]*dx43[1];
+    b = dx21[1]*dx43[0];
 
 /* check for parallel lines (i.e. d = 0 or a = b) */
     if (PM_CLOSETO_REL(a, b))
 
 /* check the cross product (2) (i.e. cp = 0 or a = b) */
-       {a = dx13*dy21;
-	b = dx21*dy13;
+       {a = dx13[0]*dx21[1];
+	b = dx21[0]*dx13[1];
 	if (PM_CLOSETO_REL(a, b))
 
 /* compute and test t1 and t2 */
            {if (x2[0] == x1[0])
-               {idy = 1.0/dy43;
-		t1  = dy13*idy;
-                t2  = (x2[1] - x3[1])*idy;}
-            else if (dx43 != 0.0)
-               {idx = 1.0/dx43;
-		t1  = dx13*idx;
+               {idx = 1.0/dx43[1];
+		t1  = dx13[1]*idx;
+                t2  = (x2[1] - x3[1])*idx;}
+            else if (dx43[0] != 0.0)
+               {idx = 1.0/dx43[0];
+		t1  = dx13[0]*idx;
                 t2  = (x2[0] - x3[0])*idx;}
             else
-               {idx = 1.0/dx21;
-		t1  = -dx13*idx;
+               {idx = 1.0/dx21[0];
+		t1  = -dx13[0]*idx;
                 t2  = (x4[0] - x1[0])*idx;};
 
-	    x0[0] = x3[0] + dx43*min(t1, t2);
-	    x0[1] = x3[1] + dy43*min(t1, t2);}}
+	    x0[0] = x3[0] + dx43[0]*min(t1, t2);
+	    x0[1] = x3[1] + dx43[1]*min(t1, t2);}}
 
 /* compute the point of intersection of the segment and ray */
     else
-       {d  = 1.0/(a - b);
-        t1 = (dy13*dx43 - dx13*dy43)*d;
-        t2 = (dy13*dx21 - dx13*dy21)*d;
+       {double dsa[2], xa[2], dxa[2], ta;
 
-	x0[0] = x1[0] + dx21*t1;
-	x0[1] = x1[1] + dy21*t1;};
+	d  = 1.0/(a - b);
+        t1 = (dx13[1]*dx43[0] - dx13[0]*dx43[1])*d;
+        t2 = (dx13[1]*dx21[0] - dx13[0]*dx21[1])*d;
 
+/* derive the intersection from the shortest segment for numerical
+ * stability against order of end points
+ */
+	dsa[0] = (dx21[0]*dx21[0] + dx21[1]*dx21[1]);
+	dsa[1] = (dx43[0]*dx43[0] + dx43[1]*dx43[1]);
+
+	if (dsa[0] < dsa[1])
+	   {xa[0]  = x1[0];
+	    xa[1]  = x1[1];
+	    dxa[0] = dx21[0];
+	    dxa[1] = dx21[1];
+	    ta     = t1;}
+	else
+	   {xa[0]  = x3[0];
+	    xa[1]  = x3[1];
+	    dxa[0] = dx43[0];
+	    dxa[1] = dx43[1];
+	    ta     = t2;};
+
+	x0[0] = xa[0] + dxa[0]*ta;
+	x0[1] = xa[1] + dxa[1]*ta;};
+
+/* determine which kind of crossing we have */
     switch (line1)
        {case 0 :
 	     switch (line2)
@@ -605,7 +627,7 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
 /* check for XC being a node
  * stop immediately in that case to save flops
  */
-    for (i = 0; i < n && (rv == TRUE); i++)
+    for (i = 0; (i < n) && (rv == TRUE); i++)
         {PM_polygon_get_point(x1, py, i);
 	 if (PM_array_equal(xc, x1, 2, -1.0) == TRUE)
 	    {rv = 0;
@@ -619,7 +641,7 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
     xi = pt->x;
     PM_vector_put_point(2, xc, xi, 2);
     PM_vector_copy_point(2, xi, 0, py->x, 0);
-    for (i = 1; i < n && (rv == TRUE); i++)
+    for (i = 1; (i < n) && (rv == TRUE); i++)
         {PM_vector_copy_point(2, xi, (i & 1), py->x, i);
 	 if (_PM_colinear_2d(xi, 3) == TRUE)
 	    {rv = 0;
