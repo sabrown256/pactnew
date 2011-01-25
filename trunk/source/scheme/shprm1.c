@@ -450,6 +450,7 @@ static object *_SSI_letstr(object *letr)
     return(SS_Exn);}
 
 /*--------------------------------------------------------------------------*/
+
 #endif
 #endif
 
