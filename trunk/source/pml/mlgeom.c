@@ -36,6 +36,52 @@ struct s_polywalk
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PM_ORDER_SEGMENTS - load the two segments (X1,X2) and (X3,X4) into
+ *                    - XS so that the shorter segment is first
+ *                    - also load the line flags to match
+ */
+
+static void _PM_order_segments(int nd, int *lf, double xs[4][PM_SPACEDM],
+			       double *x1, double *x2, double *x3, double *x4,
+			       int line1, int line2)
+   {int i, id, wh;
+    double dx1, dx2;
+    double ds[2];
+
+    for (i = 0; i < 2; i++)
+        {ds[0] = 0.0;
+	 ds[1] = 0.0;
+	 for (id = 0; id < nd; id++)
+	     {dx1 = x2[id] - x1[id];
+	      dx2 = x4[id] - x3[id];
+	      ds[0] += dx1*dx1;
+	      ds[1] += dx2*dx2;};
+
+	 wh = (ds[0] < ds[1]);
+	 for (id = 0; id < nd; id++)
+	     {if (wh == TRUE)
+		 {xs[0][id] = x1[id];
+		  xs[1][id] = x2[id];
+		  xs[2][id] = x3[id];
+		  xs[3][id] = x4[id];}
+	      else
+		 {xs[0][id] = x3[id];
+		  xs[1][id] = x4[id];
+		  xs[2][id] = x1[id];
+		  xs[3][id] = x2[id];};};
+
+	 if (wh == TRUE)
+	    {lf[0] = line1;
+	     lf[1] = line2;}
+	 else
+	    {lf[0] = line2;
+	     lf[1] = line1;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PM_CROSS - test for the intersection of lines or parts of lines
  *           - LINEx has value 0, 1, 2 for segment, ray, or line
  *           - the lines are defined by the vectors: X1 and X2
@@ -54,7 +100,7 @@ struct s_polywalk
  *           - if 0 <= t <= 1 and  0 <= s <= 1 then the segments intersect
  *           -
  *           - the determinant of these two equations is
- *           -    d = (X1-X2)x(X3-X4)
+ *           -    d = (X2-X1)x(X4-X3)
  *           -
  *           - if d = 0 then the lines are parallel and further tests
  *           - are:
@@ -76,11 +122,16 @@ struct s_polywalk
 int _PM_cross(double *x1, double *x2, double *x3, double *x4,
 	      double *x0, int line1, int line2)
    {int cross;
-    double a, b, dx21[2], dx43[2], dx13[2], idx;
-    double d, t1, t2;
+    int lf[2];
+    double a, b, idx, d, t1, t2, s1, s2, dt;
+    double dx21[PM_SPACEDM], dx43[PM_SPACEDM];
+    double dx13[PM_SPACEDM], dx24[PM_SPACEDM];
+    double xs[4][PM_SPACEDM];
 
 /* assume they don't intersect */
     cross = FALSE;
+
+    _PM_order_segments(2, lf, xs, x1, x2, x3, x4, line1, line2);
 
     t1 = -HUGE;
     t2 = -HUGE;
@@ -89,12 +140,14 @@ int _PM_cross(double *x1, double *x2, double *x3, double *x4,
     x0[0] = HUGE;
     x0[1] = HUGE;
 
-    dx21[0] = x2[0] - x1[0];
-    dx21[1] = x2[1] - x1[1];
-    dx43[0] = x4[0] - x3[0];
-    dx43[1] = x4[1] - x3[1];
-    dx13[0] = x1[0] - x3[0];
-    dx13[1] = x1[1] - x3[1];
+    dx21[0] = xs[1][0] - xs[0][0];
+    dx21[1] = xs[1][1] - xs[0][1];
+    dx43[0] = xs[3][0] - xs[2][0];
+    dx43[1] = xs[3][1] - xs[2][1];
+    dx13[0] = xs[0][0] - xs[2][0];
+    dx13[1] = xs[0][1] - xs[2][1];
+    dx24[0] = xs[1][0] - xs[3][0];
+    dx24[1] = xs[1][1] - xs[3][1];
 
 /* if either vector is zero */
     if (((dx21[0] == 0.0) && (dx21[1] == 0.0)) ||
@@ -114,56 +167,54 @@ int _PM_cross(double *x1, double *x2, double *x3, double *x4,
 	if (PM_CLOSETO_REL(a, b))
 
 /* compute and test t1 and t2 */
-           {if (x2[0] == x1[0])
+           {if (xs[1][0] == xs[0][0])
                {idx = 1.0/dx43[1];
 		t1  = dx13[1]*idx;
-                t2  = (x2[1] - x3[1])*idx;}
+                t2  = (xs[1][1] - xs[2][1])*idx;}
             else if (dx43[0] != 0.0)
                {idx = 1.0/dx43[0];
 		t1  = dx13[0]*idx;
-                t2  = (x2[0] - x3[0])*idx;}
+                t2  = (xs[1][0] - xs[2][0])*idx;}
             else
                {idx = 1.0/dx21[0];
 		t1  = -dx13[0]*idx;
-                t2  = (x4[0] - x1[0])*idx;};
+                t2  = (xs[3][0] - xs[0][0])*idx;};
 
-	    x0[0] = x3[0] + dx43[0]*min(t1, t2);
-	    x0[1] = x3[1] + dx43[1]*min(t1, t2);}}
+	    x0[0] = xs[2][0] + dx43[0]*min(t1, t2);
+	    x0[1] = xs[2][1] + dx43[1]*min(t1, t2);}}
 
 /* compute the point of intersection of the segment and ray */
     else
-       {double dsa[2], xa[2], dxa[2], ta;
+       {d  = 1.0/(a - b);
 
-	d  = 1.0/(a - b);
+/* find the intersection starting with X1 and X3 */
         t1 = (dx13[1]*dx43[0] - dx13[0]*dx43[1])*d;
         t2 = (dx13[1]*dx21[0] - dx13[0]*dx21[1])*d;
 
-/* derive the intersection from the shortest segment for numerical
- * stability against order of end points
+/* find the intersection starting with X2 and X4 */
+        s1 = (dx24[0]*dx43[1] - dx24[1]*dx43[0])*d;
+        s2 = (dx24[0]*dx21[1] - dx24[1]*dx21[0])*d;
+
+/* the sum of the Ts and Ss should be exactly one
+ * split the difference - this compensates for numerical roundoff
+ * and makes the result independent of the order of the arguments
+ * this is crucial for applications like polygon intersection
  */
-	dsa[0] = (dx21[0]*dx21[0] + dx21[1]*dx21[1]);
-	dsa[1] = (dx43[0]*dx43[0] + dx43[1]*dx43[1]);
+	dt  = 0.5*(1.0 - (t1 + s1));
+	t1 += dt;
+	s1 += dt;
 
-	if (dsa[0] < dsa[1])
-	   {xa[0]  = x1[0];
-	    xa[1]  = x1[1];
-	    dxa[0] = dx21[0];
-	    dxa[1] = dx21[1];
-	    ta     = t1;}
-	else
-	   {xa[0]  = x3[0];
-	    xa[1]  = x3[1];
-	    dxa[0] = dx43[0];
-	    dxa[1] = dx43[1];
-	    ta     = t2;};
+	dt  = 0.5*(1.0 - (t2 + s2));
+	t2 += dt;
+	s2 += dt;
 
-	x0[0] = xa[0] + dxa[0]*ta;
-	x0[1] = xa[1] + dxa[1]*ta;};
+	x0[0] = xs[0][0] + dx21[0]*t1;
+	x0[1] = xs[0][1] + dx21[1]*t1;};
 
 /* determine which kind of crossing we have */
-    switch (line1)
+    switch (lf[0])
        {case 0 :
-	     switch (line2)
+	     switch (lf[1])
 	         {case 0 :
 		       cross = ((-TOLERANCE <= t1) && (t1 <= 1.0000000001) &&
 				(-TOLERANCE <= t2) && (t2 <= 1.0000000001));
@@ -177,7 +228,7 @@ int _PM_cross(double *x1, double *x2, double *x3, double *x4,
 		       break;};
 	     break;
 	case 1 :
-	     switch (line2)
+	     switch (lf[1])
 	        {case 0 :
 		      cross = ((-TOLERANCE <= t1) &&
 			       (-TOLERANCE <= t2) && (t2 <= 1.0000000001));
@@ -190,7 +241,7 @@ int _PM_cross(double *x1, double *x2, double *x3, double *x4,
 		      break;};
 	     break;
         case 2 :
-	     switch (line2)
+	     switch (lf[1])
 	        {case 0 :
 		      cross = ((-TOLERANCE <= t2) && (t2 <= 1.0000000001));
 		      break;
