@@ -1669,7 +1669,7 @@ void splice_out_path(char *path)
 /* PUSH_PATH - look thru PATH for things to add to destination DPATH */
 
 void push_path(int end, char *dpath, char *path)
-   {char lpth[MAXLINE], tp[LRG];
+   {char lpth[LRG], tp[LRG];
 
     strcpy(lpth, strip_quote(path));
 
@@ -1814,6 +1814,69 @@ void key_val(char **key, char **val, char *s, char *dlm)
        *val = v;
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DELIMITED - return substring of S between matched delimiters BGN and END
+ *           - example:
+ *           -   "aa (foo(bar)) zz"
+ *           - should return "foo(bar)"
+ *           - NOTE: S will be terminated at the first delimiter instance
+ */
+
+char *delimited(char *s, char *bgn, char *end)
+   {int nc, ncb, nce;
+    char *tb, *te, *val, *ps, *wh;
+
+    tb    = s + strcspn(s, bgn);
+    *tb++ = '\0';
+
+    val   = tb;
+/*
+    tb    = val + strcspn(val, end);
+    *tb++ = '\0';
+*/
+    nc  = 1;
+    ncb = strlen(bgn);
+    nce = strlen(end);
+
+    for (ps = tb; IS_NULL(ps) == FALSE; )
+        {tb = strstr(ps, bgn);
+	 te = strstr(ps, end);
+	 if ((tb != NULL) && (tb[ncb] != '\'') &&
+	     (te != NULL) && (te[nce] != '\''))
+	    wh = (tb < te) ? tb : te;
+	 else if ((tb != NULL) && (tb[ncb] != '\''))
+	    wh = tb;
+	 else if ((te != NULL) && (te[nce] != '\''))
+	    wh = te;
+	 else
+	    wh = NULL;
+
+/* no instance of BGN or END */
+	 if (wh == NULL)
+	    {if (nc == 0)
+	        nstrcat(s, LRG, ps);
+	     ps = NULL;}
+
+/* if an instance of BGN came first */
+	 else if (wh == tb)
+	    {nc++;
+	     if (nc == 1)
+	        val = tb;
+	     ps = tb + ncb;}
+
+/* if an instance of END came first */
+	 else if (wh == te)
+	    {nc--;
+	     if (nc == 0)
+	        {*te = '\0';
+		 ps  = NULL;}
+	     else
+	        ps = te + nce;};};
+
+    return(val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -1,3 +1,17 @@
+1/26/2011
+
+PDBLib supports C99 data types (version 26).
+
+SCORE type manager expanded and made integral to
+PACT in general.  The template utility was added to
+generate functions for specified data types.  The
+advantage over macros is debuggability and more
+nearly first class behavior with respect to types.
+
+More general polygon intersection handles non-simple,
+non-convex polygons, multiple discreet polygon
+intersections, and polygon unions as well.
+
 
 11/10/2009
 
