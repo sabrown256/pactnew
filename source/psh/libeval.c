@@ -13,7 +13,7 @@
 
 /* EXPAND - expand all environment variables in EXPR */
 
-char *expand(char *expr, int nc, char *varn)
+char *expand(char *expr, int nc, char *varn, int rnull)
    {int i, n;
     char var[MAXLINE], t[MAXLINE];
     char *rv, *p, *val;
@@ -47,7 +47,11 @@ char *expand(char *expr, int nc, char *varn)
 
 /* if we encounter an undefined variable - stop and return NULL */
 	     else
-		return(NULL);
+	        {if (rnull == TRUE)
+		    return(NULL);
+		 else
+		    {snprintf(s, LRG, "'%s'", trim(expr, FRONT | BACK, "\""));
+		     break;};};
 
 	     nstrncpy(s, nc, subst(s, var, val, -1), -1);};};
 
@@ -64,7 +68,7 @@ char *eval(char *expr, int nc, char *varn)
    {char *rv, *s;
     static char res[20];
 
-    rv = expand(expr, nc, varn);
+    rv = expand(expr, nc, varn, TRUE);
 
     if (rv != NULL)
        s = strpbrk(rv, "`*+");

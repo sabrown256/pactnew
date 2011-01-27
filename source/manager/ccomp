@@ -135,6 +135,10 @@ if ($?LD_LIBRARY_PATH == 0) then
    setenv LD_LIBRARY_PATH  /usr/lib
 endif
 
+if ($?MANPATH == 0) then
+   setenv MANPATH  ":"
+endif
+
 # NOTE: newest GNU compilers require this because to run
 # for some reason they were not built with -rpath
 # this is not for the compiled executables

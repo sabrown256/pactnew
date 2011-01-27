@@ -613,7 +613,7 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
        val = "\"\"";
 
     nstrncpy(s, LRG, val, -1);
-    vl = trim(expand(s, LRG, NULL), BOTH, " \t");
+    vl = trim(expand(s, LRG, NULL, FALSE), BOTH, " \t");
 
     note(fsh,  TRUE, "export %s=%s",    var, vl);
     note(fcsh, TRUE, "setenv %s %s",    var, vl);
@@ -1010,7 +1010,7 @@ static void parse_opt(char *s)
 /* PARSE_LINE - parse the next line from the input */
 
 static void parse_line(char *s, char *key, char *oper, char *value)
-   {char t[MAXLINE];
+   {char t[LRG];
     char *p;
 
     strcpy(t, s);
@@ -1030,7 +1030,7 @@ static void parse_line(char *s, char *key, char *oper, char *value)
        {strcpy(value, p);
 	if ((strchr(oper, '=') != NULL) && (p[0] == '['))
 	   {while (strchr(value, ']') == NULL)
-	       {read_line(t, MAXLINE);
+	       {read_line(t, LRG);
 		strcat(value, " ");
 		strcat(value, trim(t, FRONT, " \t"));};
 	    parse_opt(value);};}
@@ -1815,7 +1815,7 @@ static void process_use(char *sg, char *oper)
 
 static void read_config(char *cfg, int quiet)
    {int il;
-    char line[MAXLINE], key[MAXLINE], oper[MAXLINE], value[MAXLINE];
+    char line[LRG], key[MAXLINE], oper[LRG], value[LRG];
     char *path;
     gt_entry *ge;
 
@@ -1841,7 +1841,7 @@ static void read_config(char *cfg, int quiet)
 	    {noted(Log, " ");
 	     exit(1);};
 
-	 read_line(line, MAXLINE);
+	 read_line(line, LRG);
 
 	 if (IS_NULL(line) == TRUE)
             continue;
@@ -1909,13 +1909,9 @@ static void read_config(char *cfg, int quiet)
 	 else if (strcmp(key, "parent") == 0)
 	    {char *s, *var, *val;
 
-	     s    = line + 7;
-	     var  = s + strspn(s, " \t");
-	     s    = var + strcspn(var, "(");
-	     *s++ = '\0';
-	     val  = s;
-	     s    = val + strcspn(val, ")");
-	     *s++ = '\0';
+	     s   = line + 7;
+	     var = s + strspn(s, " \t");
+	     val = delimited(var, "(", ")");
 
 	     if (strcmp(var, "PATH") == 0)
 	        {push_path(APPEND, epath, val);
