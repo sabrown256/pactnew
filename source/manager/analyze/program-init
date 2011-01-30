@@ -14,6 +14,7 @@ run analyze/rpath init
 # rather than COMPILER_ which is overloaded to the extreme
 setenv PACT_CC_FAMILY    generic
 setenv PACT_CC_EXE       `which cc`
+setenv PACT_CC_VERSION   ""
 
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
