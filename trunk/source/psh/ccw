@@ -43,5 +43,6 @@ switch ($os)
         breaksw
 endsw
 
-exec $cc -cwvrb $argv $lib
+#exec $cc -cwvrb $argv $lib
+exec $cc $argv $lib
 
