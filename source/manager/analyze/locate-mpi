@@ -132,7 +132,7 @@ if (-f local/mpi-db) then
                break
             else
                if ($Verbose == TRUE) then
-                  echo "Match: not found"
+                  echo "Match: missing component"
                   echo "   $linc"
                   echo "   $llib"
                   echo "   $lbin"
@@ -294,7 +294,10 @@ TRY:
 
    set tlink = ( $larg )
 
-   set ok = FALSE
+   set ok   = FALSE
+   set fbin = FALSE
+   set flib = FALSE
+   set finc = FALSE
 
    @ i = 0
 
@@ -302,6 +305,7 @@ TRY:
    foreach e ( $tbin )
       if (-d $e) then
          @ i = $i + 1
+         set fbin = TRUE
       endif
    end
 
@@ -309,6 +313,7 @@ TRY:
    foreach e ( $tlib )
       if (-d $e) then
          @ i = $i + 1
+         set flib = TRUE
       endif
    end
 
@@ -320,11 +325,11 @@ TRY:
 # test that mpi.h exists in the include directory
          if (-f $e/mpi.h) then
             @ i = $i + 1
+            set finc = TRUE
          endif
       endif
    end
 
-#   @ n = $#tbin + $#tlib + ( 2 * $#tinc )
    @ n = $#tbin + $#tlib + $#tinc + 1
 
 # if everything is ok look for the load libraries
@@ -345,6 +350,10 @@ TRY:
             endif
          endif
       end
+   else
+      echo "      have bin $fbin ($tbin)"
+      echo "      have lib $flib ($tlib)"
+      echo "      have inc $finc ($tinc)"
    endif
 
    return
