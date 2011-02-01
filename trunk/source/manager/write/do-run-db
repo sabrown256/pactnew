@@ -92,6 +92,8 @@ foreach i ( $cnd )
    endif
    if ("$file" == "") continue
 
+   Note $Log "   config file = |$file|"
+
    set exe = `where $i:r | head -n 1`
    Note $Log "   candidate for $i name = |$exe|"
    if (-x "$exe") then

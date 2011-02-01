@@ -116,6 +116,7 @@ EOF
    Note $ALog "DP_Inc   = $DP_Inc"
    Note $ALog "DP_Lib   = $DP_Lib"
    Note $ALog "lLib     = $lLib"
+   Note $ALog "lrpath   = $lrpath"
 
    flog $ALog cat $Tmp.c
 

@@ -1,0 +1,26 @@
+#
+# DO-RUN-APRUN - DO-RUN database entry for CRAY aprun
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+MPI : aprun {
+
+# aprun/mpich has good I/O behaviour so mpi-io-wrap is not needed
+   Env Wrap = ""
+
+   Exe   = aprun
+   Flags = -n $NProc
+   Flags = ($?DO_RUN_APRUN_ENV == 0) ? $MPI_Flags : $MPI_Flags $DO_RUN_APRUN_ENV
+
+   Cmd = $MPI_Exe $DBG_Delim $DBG_Exe $MPI_Flags $Code $CArgs
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
