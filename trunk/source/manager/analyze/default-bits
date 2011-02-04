@@ -17,7 +17,9 @@ set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/env-csh
 
-setenv Bits `nbit -d`
+if ($?Bits == 0) then
+   setenv Bits `nbit -d`
+endif
 
 SetParent Bits
 

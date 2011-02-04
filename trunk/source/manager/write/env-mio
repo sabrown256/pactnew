@@ -64,47 +64,44 @@ HAVE_SUBROUTINES
     set lnuma  = ""
 
     set lbits = $Bits
-    set lgnu  = ""
-    if (($CPU == ia64) || ("$Arch" =~ osx-10.3-*)) then
+    if ($CPU == ia64) then
        set lbits = ""
-    else if ("$Arch" =~ osx-10.3-*) then
-       set lbits = ""
-    else if ($?GNURoot == 1) then
-       set lgnu = $GNURoot
     endif
 
     if ($PACT_CC_FAMILY == GNU) then
        set PACTSpec = /gnu
-       set CmpBin   = $GNURoot/bin
-       set cmplib   = $GNURoot/$LIB
-       Note $FOUT 'VMake += PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT 'VEnv  += PACT_CC_VERSION PACT_CC_PATH $@'
+       set CmpBin   = $PACT_CC_PATH/bin
+       set cmplib   = $PACT_CC_PATH/$LIB
+       Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
-       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
-       Note $FOUT "PACT_CC_PATH    = $lgnu"
        Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
+       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
+       Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
 
     else if ($PACT_CC_FAMILY == PGI) then
        set PACTSpec = /pgi
-       set cmplib   = $PGRoot/lib
+       set cmplib   = $PACT_CC_PATH/lib
        set lnuma    = $NUMA
-       Note $FOUT 'VMake += PACT_CC_VERSION NUMA $@'
-       Note $FOUT 'VEnv  += PACT_CC_VERSION $@'
+       Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH NUMA $@'
+       Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
-       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
        Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
-       Note $FOUT "NUMA             = $NUMA"
+       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
+       Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
+       Note $FOUT "NUMA            = $NUMA"
 
     else if ($PACT_CC_FAMILY == INTEL) then
        set PACTSpec = /intel
-       set cmplib   = $ICRoot/lib
-       Note $FOUT 'VMake += PACT_CC_VERSION $@'
-       Note $FOUT 'VEnv  += PACT_CC_VERSION $@'
+       set cmplib   = $PACT_CC_PATH/lib
+       Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
-       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
        Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
+       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
+       Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
 
-# crap Solaris cannot handle long variable names so bail now
+# Solaris cannot handle long variable names so bail now
     else if ($HostOS == SunOS) then
        Note $FOUT ''
 
@@ -112,15 +109,16 @@ HAVE_SUBROUTINES
        if ($PACT_CC_FAMILY == PATHSCALE) then
           set PACTSpec = /path
           if ("$Bits" == 32) then
-             set cmplib = ${PSRoot}:${PSRoot}/32
+             set cmplib = ${PACT_CC_PATH}:${PACT_CC_PATH}/32
           else
-             set cmplib = $PSRoot
+             set cmplib = $PACT_CC_PATH
           endif
-          Note $FOUT 'VMake += PACT_CC_VERSION $@'
-          Note $FOUT 'VEnv  += PACT_CC_VERSION $@'
+          Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+          Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
           Note $FOUT ''
-          Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
           Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
+          Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
+          Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
        endif
     endif
 

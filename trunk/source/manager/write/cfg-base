@@ -21,12 +21,12 @@
    echo "include spokes" >>& $Tmp
    switch ($los)
       case aix:
-           set cfg = "$cfg-$bits"
-           echo "include ${bits}-bit" >>& $Tmp
+           set cfg = "$cfg-$Bits"
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/xlc" >>& $Tmp
            breaksw
       case cygwin*:
-           echo "include ${bits}-bit" >>& $Tmp
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/cygwin" >>& $Tmp
            breaksw
       case darwin:
@@ -34,14 +34,14 @@
            breaksw
       case freebsd:
            echo "define FREEBSD" >>& $Tmp
-           echo "include ${bits}-bit" >>& $Tmp
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/gnu" >>& $Tmp
            breaksw
       case hp-ux*:
            echo "include compilers/hpux" >>& $Tmp
            breaksw
       case irix*:
-           echo "include ${bits}-bit" >>& $Tmp
+           echo "include ${Bits}-bit" >>& $Tmp
            echo "include cpp-rule" >>& $Tmp
            echo "include compilers/irix" >>& $Tmp
            breaksw
@@ -52,7 +52,7 @@
            set CCRoot = `$Which cc`
            set CCRoot = $CCRoot:h
            set CCRoot = $CCRoot:h
-           echo "setenv SOLRoot $CCRoot" >>& $Tmp
+           echo "setenv PACT_CC_PATH $CCRoot" >>& $Tmp
            echo "include compilers/sol" >>& $Tmp
            breaksw
       default:
@@ -66,24 +66,24 @@
                    breaksw
               case *icc:
                    echo "run std/use-intel $CCompiler" >>& $Tmp
-                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/icc" >>& $Tmp
                    breaksw
               case *path:
               case *pathcc:
                    echo "run std/use-path $CCompiler" >>& $Tmp
-                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/path" >>& $Tmp
                    breaksw
               case *pgi:
               case *pgcc:
                    echo "run std/use-pgi $CCompiler" >>& $Tmp
-                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/pgi" >>& $Tmp
                    breaksw
 	      case sun:
 		   set CCRoot = '/usr/apps/gnu/sun/sunstudio12/bin'
-		   echo "setenv SOLRoot $CCRoot" >>& $Tmp
+		   echo "setenv PACT_CC_PATH $CCRoot" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
                    breaksw
               case xlc-bgl:
@@ -101,7 +101,7 @@
                       set lcc = $CCompiler
                    endif
                    echo "run std/use-gnu $lcc" >>& $Tmp
-                   echo "include ${bits}-bit" >>& $Tmp
+                   echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/gnu" >>& $Tmp
                    unset lcc
                    breaksw

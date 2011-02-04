@@ -87,12 +87,11 @@ switch ($Tgt)
         endif
         breaksw
 
-# GNU compiler configs may have GNURoot
    case gnu:
-	if ($?GNURoot == 1) then
-           if ($GNURoot != "/usr") then
-              setenv RPATH     ${GNURoot}/${LIB}:${RPATH}
-              setenv Cfg_RPATH ${GNURoot}/${LIB}:${RPATH}
+	if ($?PACT_CC_PATH == 1) then
+           if ($PACT_CC_PATH != "/usr") then
+              setenv RPATH     ${PACT_CC_PATH}/${LIB}:${RPATH}
+              setenv Cfg_RPATH ${PACT_CC_PATH}/${LIB}:${RPATH}
            endif
         endif
         breaksw
@@ -102,11 +101,10 @@ switch ($Tgt)
         setenv Cfg_RPATH ""
         breaksw
 
-# Intel compiler configs may have ICRoot
    case intel:
-	if ($?ICRoot == 1) then
-           setenv RPATH     ${ICRoot}/lib:${RPATH}
-           setenv Cfg_RPATH ${ICRoot}/lib:${RPATH}
+	if ($?PACT_CC_PATH == 1) then
+           setenv RPATH     ${PACT_CC_PATH}/lib:${RPATH}
+           setenv Cfg_RPATH ${PACT_CC_PATH}/lib:${RPATH}
         endif
         breaksw
 
@@ -115,37 +113,29 @@ switch ($Tgt)
         setenv Cfg_RPATH /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
         breaksw
 
-# PathScale compiler configs may have PSRoot
    case path:
-	if ($?PSRoot == 1) then
-           setenv RPATH     ${PSRoot}/32:${RPATH}
-           setenv Cfg_RPATH ${PSRoot}/32:${RPATH}
+	if ($?PACT_CC_PATH == 1) then
+           setenv RPATH     ${PACT_CC_PATH}/32:${RPATH}
+           setenv Cfg_RPATH ${PACT_CC_PATH}/32:${RPATH}
            if ($Bits == 64) then
-              setenv RPATH     ${PSRoot}:${RPATH}
-              setenv Cfg_RPATH ${PSRoot}:${RPATH}
+              setenv RPATH     ${PACT_CC_PATH}:${RPATH}
+              setenv Cfg_RPATH ${PACT_CC_PATH}:${RPATH}
            endif
         endif
         breaksw
 
-# PGI compiler configs may have PGRoot
    case pgi:
-	if ($?PGRoot == 1) then
-           setenv RPATH     ${PGRoot}/lib:${RPATH}
-           setenv Cfg_RPATH ${PGRoot}/lib:${RPATH}
+	if ($?PACT_CC_PATH == 1) then
+           setenv RPATH     ${PACT_CC_PATH}/lib:${RPATH}
+           setenv Cfg_RPATH ${PACT_CC_PATH}/lib:${RPATH}
         endif
         breaksw
 
    case sun:
-        if ($?SOLRoot == 1) then
-           setenv RPATH     ${SOLRoot}/lib:${RPATH}
-           setenv Cfg_RPATH ${SOLRoot}/lib:${RPATH}
-        endif
-        breaksw
-
    case solaris:
-        if ($?SOLRoot == 1) then
-           setenv RPATH     ${SOLRoot}/lib:${RPATH}
-           setenv Cfg_RPATH ${SOLRoot}/lib:${RPATH}
+        if ($?PACT_CC_PATH == 1) then
+           setenv RPATH     ${PACT_CC_PATH}/lib:${RPATH}
+           setenv Cfg_RPATH ${PACT_CC_PATH}/lib:${RPATH}
         endif
         breaksw
 

@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv SOLRoot /opt/SUNWspro
+setenv PACT_CC_PATH /opt/SUNWspro
 
 include spokes
 include compilers/sol
