@@ -39,6 +39,10 @@ source $Me:h/common
        endif
     endif
 
+    if ("$Bits" != "") then
+       NoteD $Log "   Building for $Bits bit pointers"
+    endif
+
     if ($CROSS_COMPILE != "FALSE") then
        NoteD $Log "   Cross compiling for target $CROSS_COMPILE"
     endif

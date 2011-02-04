@@ -567,6 +567,7 @@ switch ($Cmnd)
         unsetenv PACT_CC_EXE
         unsetenv PACT_CC_VERSION
         unsetenv PACT_CC_PATH
+        unsetenv Bits
 
         setenv ConfigDir ""
         if ($?SYS_SITE == 1) then
@@ -579,7 +580,7 @@ switch ($Cmnd)
         setenv CCompiler  gnu
 
         setenv Arch  `$ScrDir/system-id`
-	setenv bits  `$ScrDir/nbit -d`
+	setenv Bits  `$ScrDir/nbit -d`
 
         set Configuration = ""
         set ExplSystem    = FALSE
@@ -614,7 +615,7 @@ switch ($Cmnd)
                    breaksw
               case -b:
                    shift
-                   setenv bits $1
+                   setenv Bits $1
                    breaksw
               case -cc:
                    shift

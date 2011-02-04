@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv GNURoot
+setenv PACT_CC_PATH
 
 include compilers/gnu
 

@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# USE-PATH - decide on the correct PathScale environment
+# USE-SUN - decide on the correct Sun compiler environment
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -8,9 +8,10 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 source ../scripts/env-csh
 
-set Which   = "$cwd/pwhich"
 set CmpPath = ""
 while ($#argv > 0)
    switch ($1)
@@ -23,36 +24,34 @@ while ($#argv > 0)
    shift
 end
 
-# if blank find pathcc on your path
+# if blank find suncc on your path
 if ("$CmpPath" == "") then
-   set CmpPath = ( `$Which pathcc` )
+   set CmpPath = ( `which suncc` )
 
 # if not a full path find it on your path
 else if ("$CmpPath" !~ /*) then
-   set CmpPath = ( `$Which $CmpPath` )
+   set CmpPath = ( `which $CmpPath` )
 endif
 
 if (-xf "$CmpPath") then
    set CCRoot = $CmpPath:h
    set CCRoot = $CCRoot:h
-else if (-x "$CmpPath/bin/pathcc") then
+else if (-x "$CmpPath/bin/suncc") then
    set CCRoot = $CmpPath
 endif
 
-setenv LD_LIBRARY_PATH /lib
-foreach v ($CCRoot/lib/*)
-   setenv LD_LIBRARY_PATH ${v}:$LD_LIBRARY_PATH
-end
+set SDir   = $CCRoot/bin
+set Exe    = $SDir/suncc
+set Info   = ( `$Exe -V |& grep "cc: Sun"` )
+set lvers  = $Info[4]
+set BinDir = $Exe:h
+set Root   = $BinDir:h
 
-set Exe   = $CCRoot/bin/pathcc
-set Info  = ( `$Exe -v |& egrep 'PathScale\(TM\)|EKOPath'` )
-set lvers = $Info[6]
-
-setenv PATH                  $CCRoot/bin':$PATH'
-setenv PACT_CC_FAMILY        PATHSCALE
-setenv PACT_CC_VERSION       $lvers
-setenv PACT_CC_PATH          $CCRoot/lib/$lvers
-setenv PACT_CC_EXE           $Exe
+setenv PATH                 $SDir':$PATH'
+setenv PACT_CC_FAMILY       SUN
+setenv PACT_CC_VERSION      $lvers
+setenv PACT_CC_PATH         $Root
+setenv PACT_CC_EXE          $Exe
 
 SetParent PATH
 SetParent PACT_CC_FAMILY
@@ -61,3 +60,4 @@ SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
 
 exit(0)
+

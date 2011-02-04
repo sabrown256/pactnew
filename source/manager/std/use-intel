@@ -25,8 +25,6 @@ while ($#argv > 0)
    shift
 end
 
-setenv PACT_CC_FAMILY   INTEL
-
 # because Intel puts its compilers in different
 # directories check both ifort and icc to get
 # both on the PATH
@@ -35,33 +33,37 @@ foreach c (ifort icc)
 
 # if blank find compiler on your path
    if ("$CmpPath" == "") then
-      set lcp = ( `$Which $c` )
+      set Exe = ( `$Which $c` )
 
 # if not a full path find it on your path
    else if ("$CmpPath" !~ /*) then
-      set lcp = ( `$Which $CmpPath` )
+      set Exe = ( `$Which $CmpPath` )
    endif
 
-   if (-xf "$lcp") then
-      set CCRoot = $lcp:h
-      set CCRoot = $CCRoot:h
-   else if (-x "$lcp/bin/$c") then
-      set CCRoot = $lcp
+   if (-xf "$Exe") then
+      set Root = $Exe:h
+      set Root = $Root:h
+   else if (-x "$Exe/bin/$c") then
+      set Root = $Exe
    endif
 
-   setenv PACT_CC_EXE   $CCRoot/bin/$c
+   setenv PATH    $Root/bin':$PATH'
 
-   set Info = ( `$PACT_CC_EXE -v |& cat` )
-
-   setenv PACT_CC_VERSION      $Info[2]
-   setenv ICRoot               $CCRoot
-   setenv PATH                 $CCRoot/bin':$PATH'
+   set Info  = ( `$PACT_CC_EXE -v |& cat` )
+   set lvers = $Info[2]
+   set lroot = $Root
+   set lexe  = $Root/bin/$c
 end
 
+setenv PACT_CC_FAMILY   INTEL
+setenv PACT_CC_VERSION  $lvers
+setenv PACT_CC_PATH     $lroot
+setenv PACT_CC_EXE      $lexe
+
 SetParent PATH
-SetParent ICRoot
-SetParent PACT_CC_VERSION
 SetParent PACT_CC_FAMILY
+SetParent PACT_CC_VERSION
+SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
 
 exit(0)

@@ -85,12 +85,12 @@ case bin:
         endif
 
         if ("$Lst" != "") then
-           set Tgts = ( srun dmpirun mpirun prun run )
+           set Tgts = ( aprun srun dmpirun mpirun prun run )
            set Dir  = ( `echo "$Lst" | awk '{for (i = 1; i <= NF; i++) {if ($i ~ /mpi/ || $i ~ /MPI/) {print $i};};}'` )
 
 # search directories generally
         else
-           set Tgts = ( srun dmpirun mpirun prun run poe )
+           set Tgts = ( aprun srun dmpirun mpirun prun run poe )
            if ($HostOS =~ sol*) then
               set tLst = ( `strings -a $Exe |& grep '/lib' | grep '^/' | grep -v intel/compiler | grep -v /home | grep -v -e '\.c$' | sed 's/:/ /g'` )
            else if ($HostOS =~ lnx-2.4-ppc) then

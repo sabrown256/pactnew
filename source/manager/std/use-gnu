@@ -27,28 +27,33 @@ end
 
 # if blank find gcc on your path
 if ("$CmpPath" == "") then
-   set CmpPath = ( `$Which gcc` )
+   set Exe = ( `$Which gcc` )
 
 # if not a full path find it on your path
 else if ("$CmpPath" !~ /*) then
-   set CmpPath = ( `$Which $CmpPath` )
+   set Exe = ( `$Which $CmpPath` )
 endif
 
-if (-x "$CmpPath") then
-   set GNU = $CmpPath:h
-   set GNU = $GNU:h
-else if (-x "$CmpPath/bin/gcc") then
-   set GNU = $CmpPath
+if (-x "$Exe") then
+   set Root = $Exe:h
+   set Root = $Root:h
+else if (-x "$Exe/bin/gcc") then
+   set Root = $Exe
 endif
 
+set Info  = ( `$Exe -v |& grep 'gcc version'` )
+set lvers = $Info[3]
+
+setenv PATH             $Root/bin':$PATH'
 setenv PACT_CC_FAMILY   GNU
-setenv PACT_CC_EXE      $CmpPath
-setenv PATH             $GNU/bin':$PATH'
-setenv GNURoot          $GNU
+setenv PACT_CC_VERSION  $lvers
+setenv PACT_CC_PATH     $Root
+setenv PACT_CC_EXE      $Exe
 
 SetParent PATH
-SetParent GNURoot
 SetParent PACT_CC_FAMILY
+SetParent PACT_CC_VERSION
+SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
 
 exit(0)

@@ -41,7 +41,11 @@ static void _SC_omp_init(void)
 	   omp_set_num_threads(nt);
 	END_SAFE;
 
-	if (SC_n_threads > 0)
+/* before 2/4/2011 the test was against 0 but setting
+ * omp_set_num_threads is prohibitively expensive with
+ * the PGI OpenMP implementation (GNU, Intel, PathScale, and Sun are fine)
+ */
+	if (SC_n_threads > 1)
 	   omp_set_num_threads(SC_n_threads);};
 
     return;}
