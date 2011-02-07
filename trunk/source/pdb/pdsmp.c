@@ -438,12 +438,13 @@ void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDSMP - run basic PDB smp test\n\n");
-    PRINT(STDOUT, "Usage: pdsmp [-h] [-i n] [-m #] [-v #]\n");
+    PRINT(STDOUT, "Usage: pdsmp [-h] [-i n] [-m #] [-t #] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
     PRINT(STDOUT, "       i - set number of iterations in reading and writing loops to n\n");
     PRINT(STDOUT, "       m - memory strategy: 1, do not track pointers;\n");
     PRINT(STDOUT, "           2, track pointers and reset between read and write\n");
+    PRINT(STDOUT, "       t - number of threads to use (default 5)\n");
     PRINT(STDOUT, "       v - use specified format version (default 2)\n");
     PRINT(STDOUT, "\n");
 
@@ -468,6 +469,12 @@ int main(int c, char **v)
     int nt[2];
     void *(*fnc[2])(void *);
 
+#ifdef IBM_BGP
+    nthreads = 3;
+#else
+    nthreads = 5;
+#endif
+
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -480,6 +487,9 @@ int main(int c, char **v)
                  case 'm' :
                       opt = atol(v[++i]);
                       break;
+                 case 't' :
+                      nthreads = atol(v[++i]);
+                      break;
                  case 'v' :
                       PD_set_format_version(SC_stoi(v[++i]));
                       break;};}
@@ -488,14 +498,13 @@ int main(int c, char **v)
 
     ok_count = 0;
 
-    PRINT(stdout, "%d iterations per thread\n", n_iter);
-
 /* load up the output arrays */
     for (i = 0; i < 100; i++)
         {d[i] = d2[i] = (float) i;
          j[i] = j2[i] = i;}
 
-    nthreads = 5;
+    PRINT(stdout, "%8d threads\n", nthreads);
+    PRINT(stdout, "%8d iterations per thread\n", n_iter);
 
 /* initialize PDBlib for 5 threads (includes main thread) */
     PD_init_threads(nthreads, NULL);
