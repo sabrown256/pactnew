@@ -10,8 +10,6 @@
 
 unalias *
 
-set Awk = `which awk`
-
 set lbits = ""
 set lvers = ""
 set cpath = ""
@@ -34,6 +32,8 @@ while ($#argv > 0)
    shift
 end
 
+set Awk = `which awk`
+
 # figure out the site context
 if (-f extensions/sys-site) then
    eval `extensions/sys-site`
@@ -54,15 +54,17 @@ source $ldir/env-csh
 unset ldir
 unset scrd
 
+set cname = pgcc
+
 # default compiler and query info
-set cc  = ( `which pgcc` )
+set cc  = ( `which $cname` )
 set opt = ( -V )
 set pat = ( target on )
 
-# if blank find pgcc on your path
+# if blank find $cname on your path
 if ("$cpath" == "") then
-   if (-x $DAI_ROOT/pact/scripts/pgcc) then
-      set cc  = $DAI_ROOT/pact/scripts/pgcc
+   if (-x $DAI_ROOT/pact/scripts/$cname) then
+      set cc  = $DAI_ROOT/pact/scripts/$cname
       set pat = ( Compile line: )
       set opt = ( $opt -cwvrb )
       if ("$lvers" != "") then
@@ -86,7 +88,7 @@ set sdir   = $cc:h
 set bindir = $sdir
 
 # query the compiler for information
-set inf = ( `$cc $opt |& $Awk '$0 ~ /target on/ { print $2 } $0 ~ /Compile line:/ { print $3 }'` )
+set inf = ( `$cc $opt |& $Awk '$0 ~ /'"$pat"'/ { print $2 } $0 ~ /Compile line:/ { print $3 }'` )
 if ($#inf > 1) then
    set lvers  = ( `echo $inf[2] | sed 's/[-_]/./g'` )
    set cc     = $inf[1]

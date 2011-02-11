@@ -54,15 +54,17 @@ source $ldir/env-csh
 unset ldir
 unset scrd
 
+set cname = suncc
+
 # default compiler and query info
-set cc  = ( `which suncc` )
+set cc  = ( `which $cname` )
 set opt = ( -V )
 set pat = ( cc: Sun C )
 
-# if blank find suncc on your path
+# if blank find $cname on your path
 if ("$cpath" == "") then
-   if (-x $DAI_ROOT/pact/scripts/suncc) then
-      set cc  = $DAI_ROOT/pact/scripts/suncc
+   if (-x $DAI_ROOT/pact/scripts/$cname) then
+      set cc  = $DAI_ROOT/pact/scripts/$cname
       set pat = ( Compile line: )
       set opt = ( $opt -cwvrb )
       if ("$lvers" != "") then

@@ -54,15 +54,17 @@ source $ldir/env-csh
 unset ldir
 unset scrd
 
+set cname = pathcc
+
 # default compiler and query info
-set cc  = ( `which pathcc` )
+set cc  = ( `which $cname` )
 set opt = ( -v )
 set pat = ( target on )
 
-# if blank find pathcc on your path
+# if blank find $cname on your path
 if ("$cpath" == "") then
-   if (-x $DAI_ROOT/pact/scripts/pathcc) then
-      set cc  = $DAI_ROOT/pact/scripts/pathcc
+   if (-x $DAI_ROOT/pact/scripts/$cname) then
+      set cc  = $DAI_ROOT/pact/scripts/$cname
       set pat = ( Compile line: )
       set opt = ( $opt -cwvrb )
       if ("$lvers" != "") then
