@@ -42,7 +42,8 @@ if ($cpath == $cname) then
    set cpath = ""
 endif
 
-set Awk = `which awk`
+set Awk  = `which awk`
+set Expr = `which expr`
 
 # figure out the site context
 if (-f extensions/sys-site) then
@@ -65,53 +66,122 @@ unset ldir
 unset scrd
 
 # default compiler and query info
-set cc  = ( `which $cname` )
-set opt = ( -v )
-set pat = ( gcc version )
+set cc = ( `which $cname` )
+switch ($cname)
+
+# PGI
+   case pgcc*:
+        setenv PACT_CC_FAMILY   PGI
+        set opt   = ( -V )
+        set pat   = ( target on )
+        set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = pgf90
+        breaksw
+
+# INTEL
+   case icc*:
+        setenv PACT_CC_FAMILY   INTEL
+        set opt   = ( -v )
+        set pat   = ( Version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = ifort
+        breaksw
+
+# PATHSCALE
+   case pathcc*:
+        setenv PACT_CC_FAMILY   PATHSCALE
+        set opt   = ( -v )
+        set pat   = ( Compiler Suite: Version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = pathf90
+        breaksw
+
+# SUN
+   case suncc*:
+        setenv PACT_CC_FAMILY   SUN
+        set opt   = ( -V )
+        set pat   = ( cc: Sun C )
+        set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = sunf90
+        breaksw
+
+# GNU is default
+   default:
+        setenv PACT_CC_FAMILY   GNU
+        set opt   = ( -v )
+        set pat   = ( gcc version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $3 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = gfortran
+        breaksw
+endsw
+
+# in case compilers were put in different directories (ala Intel)
+# check both Fortran and C compilers to get both on the PATH
+# do C last to get its environment as the final result
+
+set dirl = ""
+foreach c ($fname $cname)
 
 # if blank try to find compiler on your path
-if ("$cpath" == "") then
-   if (-x $DAI_ROOT/pact/scripts/$cname) then
-      set cc  = $DAI_ROOT/pact/scripts/$cname
-      set pat = ( Compile line: )
-      set opt = ( $opt -cwvrb )
-      if ("$lvers" != "") then
-         set opt = ( $opt -cwvers $lvers )
+   if ("$cpath" == "") then
+      if (-x $DAI_ROOT/pact/scripts/$c) then
+         set cc = $DAI_ROOT/pact/scripts/$c
+         if ($c == $cname) then
+            set opt = ( $opt -cwvrb )
+            if ("$lvers" != "") then
+               set opt = ( $opt -cwvers $lvers )
+            endif
+         endif
       endif
-   endif
 
 # if not a full path find it on your path
-else if ("$cpath" !~ /*) then
-   set inf = ( `which $cpath` )
-   if (-x "$inf") then
-      set cc = $inf
+   else if ("$cpath" !~ /*) then
+      set inf = ( `which $cpath` )
+      if (-x "$inf") then
+         set cc = $inf
+      endif
+
+   else if (-xf "$cpath") then
+      set cc = $cpath
+
+# try adding bin/$c
+   else if (-x "$cpath/bin/$c") then
+      set cc = $cpath/bin/$c
+
    endif
 
-else if (-xf "$cpath") then
-   set cc = $cpath
+   set sdir = $cc:h
+   set dirl = ( $dirl $sdir )
 
-# try adding bin/$cname
-else if (-x "$cpath/bin/$cname") then
-   set cc = $cpath/bin/$cname
-
-endif
-
-set sdir   = $cc:h
-set bindir = $sdir
+# only take lvers and root from C compiler
+   if ($c == $cname) then
+      set bindir = $sdir
 
 # query the compiler for information
-set inf = ( `$cc $opt |& $Awk '$0 ~ /gcc version/ { print $3 } $0 ~ /Compile line:/ { print $3 }'` )
-if ($#inf > 1) then
-   set lvers  = $inf[2]
-   set cc     = $inf[1]
-   set bindir = $cc:h
-else if ($#inf > 0) then
-   set lvers = $inf[1]
-endif
-set root = $bindir:h
+      set inf = ( `$cc $opt |& $Awk "$prog"` )
+      if ($#inf > 1) then
+         set lvers  = ( `echo $inf[2] | sed 's/[-_]/./g'` )
+         set cc     = $inf[1]
+         set bindir = $cc:h
+      else if ($#inf > 0) then
+         set lvers = ( `echo $inf[1] | sed 's/[-_]/./g'` )
+      endif
+      set root = $bindir:h
+   endif
+end
 
-setenv PATH             $sdir':$PATH'
-setenv PACT_CC_FAMILY   GNU
+# check the bits for the compiler library
+if ("$lbits" == 32) then
+   set root = `echo $root | sed 's/-64//'`
+endif
+
+if ($#dirl == 1) then
+   setenv PATH  $dirl[1]':$PATH'
+else if ($dirl[1] == $dirl[2]) then
+   setenv PATH  $dirl[1]':$PATH'
+else
+   setenv PATH  $dirl[1]:$dirl[2]':$PATH'
+endif
 setenv PACT_CC_VERSION  $lvers
 setenv PACT_CC_PATH     $root
 setenv PACT_CC_EXE      $cc
@@ -121,6 +191,21 @@ SetParent PACT_CC_FAMILY
 SetParent PACT_CC_VERSION
 SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
+
+# check the compiler for NUMA flags
+if ($PACT_CC_FAMILY == PGI) then
+   setenv NUMA  ""
+   $Expr "$lvers" '>=' "7.0" >& /dev/null
+   if ($status == 0) then
+      setenv NUMA  "-Mconcur=numa"
+   else
+      $Expr "$lvers" '>' "6.2" >& /dev/null
+      if ($status == 0) then
+         setenv NUMA  "-Mconcur=nonuma"
+      endif
+   endif
+   SetParent NUMA
+endif
 
 exit(0)
 

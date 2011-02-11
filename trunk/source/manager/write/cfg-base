@@ -65,25 +65,45 @@
                    echo "include auto-bgp-gnu" >>& $Tmp
                    breaksw
               case *icc:
-                   echo "run std/use-intel $CCompiler" >>& $Tmp
+                   if ("$CCompiler" == intel) then
+                      set lcc = icc
+                   else
+                      set lcc = $CCompiler
+                   endif
+                   echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/icc" >>& $Tmp
                    breaksw
               case *path:
               case *pathcc:
-                   echo "run std/use-path $CCompiler" >>& $Tmp
+                   if ("$CCompiler" == path) then
+                      set lcc = pathcc
+                   else
+                      set lcc = $CCompiler
+                   endif
+                   echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/path" >>& $Tmp
                    breaksw
               case *pgi:
               case *pgcc:
-                   echo "run std/use-pgi $CCompiler" >>& $Tmp
+                   if ("$CCompiler" == pgi) then
+                      set lcc = pgcc
+                   else
+                      set lcc = $CCompiler
+                   endif
+                   echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/pgi" >>& $Tmp
                    breaksw
-	      case sun:
-		   set CCRoot = '/usr/apps/gnu/sun/sunstudio12/bin'
-		   echo "setenv PACT_CC_PATH $CCRoot" >>& $Tmp
+	      case *sun:
+	      case *suncc:
+                   if ("$CCompiler" == sun) then
+                      set lcc = suncc
+                   else
+                      set lcc = $CCompiler
+                   endif
+                   echo "run std/use-compiler $lcc" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
                    breaksw
               case xlc-bgl:
