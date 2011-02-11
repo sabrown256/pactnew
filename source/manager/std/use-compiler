@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# USE-PGI - decide on the correct PGI environment
+# USE-COMPILER - decide on the correct compiler environment
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -10,11 +10,10 @@
 
 unalias *
 
-set Awk = `which awk`
-
 set lbits = ""
 set lvers = ""
 set cpath = ""
+
 while ($#argv > 0)
    switch ($1)
       case bits:
@@ -33,6 +32,17 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+if ("$cpath" == "") then
+   echo "No compiler specified - exiting"
+   exit(1)
+endif
+set cname = $cpath:t
+if ($cpath == $cname) then
+   set cpath = ""
+endif
+
+set Awk = `which awk`
 
 # figure out the site context
 if (-f extensions/sys-site) then
@@ -55,14 +65,14 @@ unset ldir
 unset scrd
 
 # default compiler and query info
-set cc  = ( `which pgcc` )
-set opt = ( -V )
-set pat = ( target on )
+set cc  = ( `which $cname` )
+set opt = ( -v )
+set pat = ( gcc version )
 
-# if blank find pgcc on your path
+# if blank try to find compiler on your path
 if ("$cpath" == "") then
-   if (-x $DAI_ROOT/pact/scripts/pgcc) then
-      set cc  = $DAI_ROOT/pact/scripts/pgcc
+   if (-x $DAI_ROOT/pact/scripts/$cname) then
+      set cc  = $DAI_ROOT/pact/scripts/$cname
       set pat = ( Compile line: )
       set opt = ( $opt -cwvrb )
       if ("$lvers" != "") then
@@ -77,8 +87,12 @@ else if ("$cpath" !~ /*) then
       set cc = $inf
    endif
 
-else if (-x "$cpath") then
+else if (-xf "$cpath") then
    set cc = $cpath
+
+# try adding bin/$cname
+else if (-x "$cpath/bin/$cname") then
+   set cc = $cpath/bin/$cname
 
 endif
 
@@ -86,36 +100,18 @@ set sdir   = $cc:h
 set bindir = $sdir
 
 # query the compiler for information
-set inf = ( `$cc $opt |& $Awk '$0 ~ /target on/ { print $2 } $0 ~ /Compile line:/ { print $3 }'` )
+set inf = ( `$cc $opt |& $Awk '$0 ~ /gcc version/ { print $3 } $0 ~ /Compile line:/ { print $3 }'` )
 if ($#inf > 1) then
-   set lvers  = ( `echo $inf[2] | sed 's/[-_]/./g'` )
+   set lvers  = $inf[2]
    set cc     = $inf[1]
    set bindir = $cc:h
 else if ($#inf > 0) then
-   set lvers = ( `echo $inf[1] | sed 's/[-_]/./g'` )
+   set lvers = $inf[1]
 endif
 set root = $bindir:h
 
-# check the bits for the compiler library
-if ("$bits" == 32) then
-   set root = `echo $root | sed 's/-64//'`
-endif
-
-# check the compiler for NUMA flags
-expr "$lvers" '>' "7.0" >& /dev/null
-if ($status == 0) then
-   setenv NUMA  "-Mconcur=numa"
-else
-   expr "$lvers" '>' "6.2" >& /dev/null
-   if ($status == 0) then
-      setenv NUMA  "-Mconcur=nonuma"
-   else
-      setenv NUMA  ""
-   endif
-endif
-
 setenv PATH             $sdir':$PATH'
-setenv PACT_CC_FAMILY   PGI
+setenv PACT_CC_FAMILY   GNU
 setenv PACT_CC_VERSION  $lvers
 setenv PACT_CC_PATH     $root
 setenv PACT_CC_EXE      $cc
@@ -125,7 +121,6 @@ SetParent PACT_CC_FAMILY
 SetParent PACT_CC_VERSION
 SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
-SetParent NUMA
 
 exit(0)
 

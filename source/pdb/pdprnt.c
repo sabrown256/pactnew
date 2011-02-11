@@ -986,7 +986,10 @@ void _PD_set_digits(PDBfile *file)
 
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {f = std->fp[i].format;
-	 d = min(f[2], dig);
+	 if (f != NULL)
+	    d = min(f[2], dig);
+	 else
+	    d = dig;
 	 fp_pre[i].tolerance = POWL(2.0L, -((long double) d));
 	 fp_pre[i].digits    = log2*d + 1;};
 

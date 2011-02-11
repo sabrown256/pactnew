@@ -122,6 +122,9 @@ HAVE_SUBROUTINES
        endif
     endif
 
+    if (!(-d $cmplib)) then
+       set cmplib = ""
+    endif
     if ($?CROSS_COMPILE == 1) then
        set cmplib = ""
     endif
