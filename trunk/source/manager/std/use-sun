@@ -10,48 +10,94 @@
 
 unalias *
 
-source ../scripts/env-csh
+set Awk = `which awk`
 
-set CmpPath = ""
+set lbits = ""
+set lvers = ""
+set cpath = ""
 while ($#argv > 0)
    switch ($1)
+      case bits:
+           shift
+           set lbits = $1
+           breaksw
+      case vers:
+           shift
+           set lvers = $1
+           breaksw
       default:
-           if ("$CmpPath" == "") then
-              set CmpPath = $1
+           if ("$cpath" == "") then
+              set cpath = $1
            endif
            breaksw
    endsw
    shift
 end
 
+# figure out the site context
+if (-f extensions/sys-site) then
+   eval `extensions/sys-site`
+else
+   setenv DAI_ROOT /usr/share
+   setenv DAS_ROOT /usr/local
+endif
+
+# find and source env-csh
+if (-f ../scripts/env-csh) then
+   set scrd = $cwd
+else if (-f ../../scripts/env-csh) then
+   set scrd = $cwd:h
+endif
+set ldir = $scrd:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+unset ldir
+unset scrd
+
+# default compiler and query info
+set cc  = ( `which suncc` )
+set opt = ( -V )
+set pat = ( cc: Sun C )
+
 # if blank find suncc on your path
-if ("$CmpPath" == "") then
-   set CmpPath = ( `which suncc` )
+if ("$cpath" == "") then
+   if (-x $DAI_ROOT/pact/scripts/suncc) then
+      set cc  = $DAI_ROOT/pact/scripts/suncc
+      set pat = ( Compile line: )
+      set opt = ( $opt -cwvrb )
+      if ("$lvers" != "") then
+         set opt = ( $opt -cwvers $lvers )
+      endif
+   endif
 
 # if not a full path find it on your path
-else if ("$CmpPath" !~ /*) then
-   set CmpPath = ( `which $CmpPath` )
+else if ("$cpath" !~ /*) then
+   set cpath = ( `which $cpath` )
+
+else if (-x "$cpath") then
+   set cc = $cpath
+
 endif
 
-if (-xf "$CmpPath") then
-   set CCRoot = $CmpPath:h
-   set CCRoot = $CCRoot:h
-else if (-x "$CmpPath/bin/suncc") then
-   set CCRoot = $CmpPath
+set sdir   = $cc:h
+set bindir = $sdir
+
+# query the compiler for information
+set inf = ( `$cc $opt |& $Awk '$0 ~ /cc: Sun C/ { print $4 } $0 ~ /Compile line:/ { print $3 }'` )
+if ($#inf > 1) then
+   set lvers  = ( `echo $inf[2] | sed 's/[-_]/./g'` )
+   set cc     = $inf[1]
+   set bindir = $cc:h
+else if ($#inf > 0) then
+   set lvers = ( `echo $inf[1] | sed 's/[-_]/./g'` )
 endif
+set root = $bindir:h
 
-set SDir   = $CCRoot/bin
-set Exe    = $SDir/suncc
-set Info   = ( `$Exe -V |& grep "cc: Sun"` )
-set lvers  = $Info[4]
-set BinDir = $Exe:h
-set Root   = $BinDir:h
-
-setenv PATH                 $SDir':$PATH'
+setenv PATH                 $sdir':$PATH'
 setenv PACT_CC_FAMILY       SUN
 setenv PACT_CC_VERSION      $lvers
-setenv PACT_CC_PATH         $Root
-setenv PACT_CC_EXE          $Exe
+setenv PACT_CC_PATH         $root
+setenv PACT_CC_EXE          $cc
 
 SetParent PATH
 SetParent PACT_CC_FAMILY

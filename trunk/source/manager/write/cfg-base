@@ -100,7 +100,7 @@
                    else
                       set lcc = $CCompiler
                    endif
-                   echo "run std/use-gnu $lcc" >>& $Tmp
+                   echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/gnu" >>& $Tmp
                    unset lcc

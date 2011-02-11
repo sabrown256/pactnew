@@ -10,45 +10,102 @@
 
 unalias *
 
-source ../scripts/env-csh
+set Awk = `which awk`
 
-set Which   = "$cwd/pwhich"
-set CmpPath = ""
+set lbits = ""
+set lvers = ""
+set cpath = ""
 while ($#argv > 0)
    switch ($1)
+      case bits:
+           shift
+           set lbits = $1
+           breaksw
+      case vers:
+           shift
+           set lvers = $1
+           breaksw
       default:
-           if ("$CmpPath" == "") then
-              set CmpPath = $1
+           if ("$cpath" == "") then
+              set cpath = $1
            endif
            breaksw
    endsw
    shift
 end
 
-# if blank find gcc on your path
-if ("$CmpPath" == "") then
-   set Exe = ( `$Which gcc` )
+# figure out the site context
+if (-f extensions/sys-site) then
+   eval `extensions/sys-site`
+else
+   setenv DAI_ROOT /usr/share
+   setenv DAS_ROOT /usr/local
+endif
+
+# find and source env-csh
+if (-f ../scripts/env-csh) then
+   set scrd = $cwd
+else if (-f ../../scripts/env-csh) then
+   set scrd = $cwd:h
+endif
+set ldir = $scrd:h/scripts
+set path = ( $ldir $path )
+source $ldir/env-csh
+unset ldir
+unset scrd
+
+# default compiler and query info
+set cn  = gcc
+set cc  = ( `which $cn` )
+set opt = ( -v )
+set pat = ( gcc version )
+
+# if blank try to find compiler on your path
+if ("$cpath" == "") then
+   if (-x $DAI_ROOT/pact/scripts/$cn) then
+      set cc  = $DAI_ROOT/pact/scripts/$cn
+      set pat = ( Compile line: )
+      set opt = ( $opt -cwvrb )
+      if ("$lvers" != "") then
+         set opt = ( $opt -cwvers $lvers )
+      endif
+   endif
 
 # if not a full path find it on your path
-else if ("$CmpPath" !~ /*) then
-   set Exe = ( `$Which $CmpPath` )
+else if ("$cpath" !~ /*) then
+   set inf = ( `which $cpath` )
+   if (-x "$inf") then
+      set cc = $inf
+   endif
+
+# try adding bin/$cn
+else if (-x "$cpath/bin/$cn") then
+   set cc = $cpath/bin/$cn
+
+else if (-x "$cpath") then
+   set cc = $cpath
+
 endif
 
-if (-x "$Exe") then
-   set Root = $Exe:h
-   set Root = $Root:h
-else if (-x "$Exe/bin/gcc") then
-   set Root = $Exe
+set sdir   = $cc:h
+set bindir = $sdir
+
+# query the compiler for information
+set inf = ( `$cc $opt |& $Awk '$0 ~ /gcc version/ { print $3 } $0 ~ /Compile line:/ { print $3 }'` )
+if ($#inf > 1) then
+   set lvers  = $inf[2]
+   set cc     = $inf[1]
+   set bindir = $cc:h
+else if ($#inf > 0) then
+   set lvers = $inf[1]
 endif
+set root = $bindir:h
 
-set Info  = ( `$Exe -v |& grep 'gcc version'` )
-set lvers = $Info[3]
-
-setenv PATH             $Root/bin':$PATH'
+setenv PATH             $sdir':$PATH'
 setenv PACT_CC_FAMILY   GNU
 setenv PACT_CC_VERSION  $lvers
-setenv PACT_CC_PATH     $Root
-setenv PACT_CC_EXE      $Exe
+setenv PACT_CC_PATH     $root
+setenv PACT_CC_EXE      $cc
 
 SetParent PATH
 SetParent PACT_CC_FAMILY
