@@ -180,6 +180,7 @@ HAVE_SUBROUTINES
     set llibs = ""
     set llibs = ( $llibs $cmplib )
     set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
+    set llibs = ( `../scripts/simplify-list $llibs` )
 
     if ($CCBin != none) then
        Note $FOUT 'Tool/cc_pact {'

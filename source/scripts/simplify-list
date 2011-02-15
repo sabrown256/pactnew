@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# SIMPLIFY-LIST - eliminate duplicate list entries
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+unalias *
+
+set lst = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: simplify-list -h <item>*"
+           echo "    h       this help message"
+           echo "    <item>  list item"
+           echo ""
+           exit(1)
+      default:
+           set lst = ( $lst $1 )
+           breaksw
+   endsw
+   shift
+end
+
+# compute a new lst in list form
+set nlst = ""
+foreach i ($lst)
+   set ok = TRUE
+   foreach j ($nlst)
+      if ($j == $i) then
+         set ok = FALSE
+         break
+      endif
+   end
+   if ($ok == TRUE) then
+      set nlst = ( $nlst $i )
+   endif
+end
+
+echo $nlst
+
+exit($status)
