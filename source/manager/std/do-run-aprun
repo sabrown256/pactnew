@@ -12,14 +12,23 @@
 
 MPI : aprun {
 
-# aprun/mpich has good I/O behaviour so mpi-io-wrap is not needed
-   Env Wrap = ""
+   Env WArg = -s
 
-   Exe   = aprun
-   Flags = -n $NProc
+# check whether an MPI run has been requested
+   Env Par  = (($NProc > 1) || ($Force == TRUE)) ? TRUE : FALSE
+
+# check whether or not we must use salloc 
+# either MPI_Init is unconditionally called or it is conditional
+# and we will definitely be calling it
+   Env Init = (($MPICnd == FALSE) || (($MPICnd == TRUE) && ($Par == TRUE))) ? TRUE : FALSE
+
+   Exe   = ($Init == TRUE) ? aprun : -noop-
+   Flags = ($Init == TRUE) ? -n $NProc : -noop-
+   Flags = ($?DO_RUN_MPIRUN_ENV == 0) ? $MPI_Flags : $MPI_Flags $DO_RUN_MPIRUN_ENV
+
    Flags = ($?DO_RUN_APRUN_ENV == 0) ? $MPI_Flags : $MPI_Flags $DO_RUN_APRUN_ENV
 
-   Cmd = $MPI_Exe $DBG_Delim $DBG_Exe $MPI_Flags $Code $CArgs
+   Cmd = $Wrap $WArg $MPI_Exe $DBG_Delim $DBG_Exe $MPI_Flags $Code $CArgs
 }
 
 #-------------------------------------------------------------------------

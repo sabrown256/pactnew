@@ -1,0 +1,23 @@
+#
+# AUTO-CXE-PGI - 64-bit CRAY XE6 back end configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run analyze/locate-mpi mpich any pgi
+
+include 64-bit
+include compilers/pgi
+
+run std/module-cray pgi 3.1.37G
+
+include no-opengl
+include no-sql
+
+setenv DO_RUN_MPI     "aprun"
+setenv CRAY_XE
+define CRAY_XE
+

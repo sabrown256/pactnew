@@ -84,6 +84,11 @@ while ($#argv > 0)
    shift
 end
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP - get ready to go to work
+
 if ("$UpF" == "") then
    if ($?UPDATE_SYS_DB == 1) then
       set UpF = $UPDATE_SYS_DB
@@ -102,11 +107,6 @@ if ("$UpF" !~ /*) then
    set UpF = $HOME/$UpF
 endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# WORK - do the main business
-
 set Loc = `awk '$1 ~ /Loc/  {print $3}' $UpF`
 
 cd $Loc >& /dev/null
@@ -116,6 +116,29 @@ set Ret = 0
 if ($LogAction == TRUE) then
    InitLog Log $cwd/.log.$LSite.$USER
 endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for other update-watch sessions running with the same database
+
+set pids = ( `ls-jobs update-watch | grep $UpF | awk '{ print $2 }'` )
+set npids = ""
+foreach p ($pids)
+   if ($p != $$) then
+      set npids = ( $npids $p )
+   endif
+end
+
+if ("$npids" != "") then
+   Note $Log "Orphaned/competing update-watch sessions: $npids"
+   Note $Log "Should do:   kill -9 $npids"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# WORK - do the main business
 
 while (1)
    touch $LSite.+

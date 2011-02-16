@@ -76,6 +76,7 @@ else
    set cnd = ( $cnd submit )
 endif
 
+Note $Log "PATH = $PATH"
 foreach i ( $cnd )
    Note $Log "Checking $i"
 
