@@ -1,0 +1,67 @@
+#!/bin/csh -f
+#
+# MODULE-CRAY - load specified compiler module for XE6 compilations
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set cmp  = ""
+set vers = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: module-cray <compiler> <version>"
+           echo ""
+           exit(1)
+      default:
+           if ("$cmp" == "") then
+              set cmp = $1
+           else if ("$vers" == "") then
+              set vers = $1
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+if ("$cmp" == "") then
+   echo "No compiler specified - exiting"
+   exit(1)
+endif
+
+# take only known default possibility
+if ("$vers" == "") then
+   set vers = 3.1.37G
+endif
+
+if ($MODULESHOME == 1) then
+
+   alias setup 'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
+
+# unload any currently loaded modules
+   set mlst = ( `echo $PRGENVMODULES | sed 's|:| |g'` )
+   foreach mod ($mlst)
+      eval `$MODULESHOME/bin/modulecmd tcsh unload $mod`
+   end
+
+# load and export the requested module
+   eval `$MODULESHOME/bin/modulecmd tcsh load PrgEnv-$cmp/$vers | sed 's|setenv|setp|g'`
+
+   foreach i ($LD_LIBRARY_PATH)
+      setenv RPATH `analyze/rpath -a $i -o echo`
+   end
+
+   setp IncMPI   -I$MPICH_DIR/include
+   setp MPILib   $MPICH_DIR/lib
+   setp LibMPI   -lmpich
+   setp RPATH    $RPATH
+
+endif
+
+exit($status)
+

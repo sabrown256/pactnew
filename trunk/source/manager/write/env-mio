@@ -72,8 +72,8 @@ HAVE_SUBROUTINES
        set PACTSpec = /gnu
        set CmpBin   = $PACT_CC_PATH/bin
        set cmplib   = $PACT_CC_PATH/$LIB
-       Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
        Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
        Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
@@ -83,8 +83,8 @@ HAVE_SUBROUTINES
        set PACTSpec = /pgi
        set cmplib   = $PACT_CC_PATH/lib
        set lnuma    = $NUMA
-       Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH NUMA $@'
-       Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH NUMA $@'
+       Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
        Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
        Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
@@ -94,8 +94,8 @@ HAVE_SUBROUTINES
     else if ($PACT_CC_FAMILY == INTEL) then
        set PACTSpec = /intel
        set cmplib   = $PACT_CC_PATH/lib
-       Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+       Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
        Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
        Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
@@ -113,8 +113,8 @@ HAVE_SUBROUTINES
           else
              set cmplib = $PACT_CC_PATH
           endif
-          Note $FOUT 'VMake += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-          Note $FOUT 'VEnv  += PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+          Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+          Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
           Note $FOUT ''
           Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
           Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"

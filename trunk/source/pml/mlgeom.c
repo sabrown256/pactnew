@@ -1253,7 +1253,7 @@ static void _PM_combine_polygons(SC_array *a,
     int add, same, more, closed, nin, nout, inc, ok;
     int *bnd;
     signed char *wh;
-    double x1[PM_SPACEDM];
+    double x1[PM_SPACEDM], xt[PM_SPACEDM];
     PM_polygon *pa, *pb, *pc;
     polywalk *wa, *wb;
 
@@ -1335,8 +1335,17 @@ static void _PM_combine_polygons(SC_array *a,
 	    {nout++;
 	     if (op == PM_INTERSECT)
 	        {if (nout >= na)
-		    {closed = TRUE;
-		     PM_polygon_copy_points(pc, pb);};}
+		    {PM_polygon_get_point(xt, pb, 0);
+
+/* if one point of PA is in PB then PA is contained in PB */
+		     if (PM_contains_nd(xt, pa) == 1)
+		        {closed = TRUE;
+			 PM_polygon_copy_points(pc, pb);}
+
+/* otherwise the intersection of PA and PB is empty */
+		     else
+		        {closed = FALSE;
+			 more   = FALSE;};};}
 
 	     else if (op == PM_UNION)
 	        add = TRUE;}

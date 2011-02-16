@@ -57,18 +57,20 @@
            breaksw
       default:
       case linux:
-           switch ($CCompiler)
+           set lcc = $CCompiler
+           switch ($lcc)
               case gnu-bgl:
                    echo "include auto-bgl-gnu" >>& $Tmp
                    breaksw
               case gnu-bgp:
                    echo "include auto-bgp-gnu" >>& $Tmp
                    breaksw
+              case gnu-cxe:
+                   echo "include auto-cxe-gnu" >>& $Tmp
+                   breaksw
               case *icc:
-                   if ("$CCompiler" == intel) then
+                   if ("$lcc" == intel) then
                       set lcc = icc
-                   else
-                      set lcc = $CCompiler
                    endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
@@ -76,21 +78,20 @@
                    breaksw
               case *path:
               case *pathcc:
-                   if ("$CCompiler" == path) then
+                   if ("$lcc" == path) then
                       set lcc = pathcc
-                   else
-                      set lcc = $CCompiler
                    endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/path" >>& $Tmp
                    breaksw
+              case pgi-cxe:
+                   echo "include auto-cxe-pgi" >>& $Tmp
+                   breaksw
               case *pgi:
               case *pgcc:
-                   if ("$CCompiler" == pgi) then
+                   if ("$lcc" == pgi) then
                       set lcc = pgcc
-                   else
-                      set lcc = $CCompiler
                    endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
@@ -98,10 +99,8 @@
                    breaksw
 	      case *sun:
 	      case *suncc:
-                   if ("$CCompiler" == sun) then
+                   if ("$lcc" == sun) then
                       set lcc = suncc
-                   else
-                      set lcc = $CCompiler
                    endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
@@ -115,10 +114,8 @@
               default:
               case *gnu:
               case *gcc:
-                   if ("$CCompiler" == gnu) then
+                   if ("$lcc" == gnu) then
                       set lcc = gcc
-                   else
-                      set lcc = $CCompiler
                    endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp

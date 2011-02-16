@@ -30,7 +30,7 @@
 
 #define TRUE       1
 #define FALSE      0
-#define MAXLINE    512
+#define MAXLINE    4096
 #define LRG        4096
 #define MEGA       1048576
 #define N_STACK    32
