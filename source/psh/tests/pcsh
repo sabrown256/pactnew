@@ -75,7 +75,7 @@ foreach t ($List)
    flog $Log $RM ${t}*
 
    set noglob
-   $PCSH $TstDir/$t |& sed 's|/tmp/psh.*$|xxx|' >&! $Res
+   $PCSH $TstDir/$t |& sed 's|/tmp/psh.*$|xxx|' | grep -v "open display" >&! $Res
    set xstatus = $status
    unset noglob
 

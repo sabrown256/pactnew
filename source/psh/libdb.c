@@ -587,6 +587,9 @@ int db_srv_launch(char *root)
 
 	free_strings(sa);
 
+/* GOTCHA: if it is not running - clean up and restart */
+	st = is_running(pid);
+
 	srv.pid = pid;
 
         log_activity(flog, dbg_db, "CLIENT", "server pid %d (%d)",
