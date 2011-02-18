@@ -2015,15 +2015,17 @@ int demonize(void)
 	close(2);
 
 /* disassociate from the controlling terminal */
-	setsid();
+	st = setsid();
 
 /* prevent possibility of reacquiring a controlling terminal
  * the parent will return and exit
  * the child will belong to init and
  * will not be process group or session leader
  */
+/*
 	st = fork();
 	if (st != 0)
+*/
 	   rv = TRUE;
 
 /* go to direct attached directory so that mounts won't

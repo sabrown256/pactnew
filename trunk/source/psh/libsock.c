@@ -17,6 +17,8 @@
 # define INADDR_NONE NULL
 #endif
 
+#define C_OR_S(_p)    ((_p) ? "CLIENT" : "SERVER")
+
 typedef struct s_connection connection;
 typedef struct s_client client;
 
@@ -107,11 +109,7 @@ static int sock_exists(char *fmt, ...)
 
 	sock = name_sock(s, -1);
 	rv   = (sock != NULL);
-
-	if (srv.server == 0)
-	   wh = "CLIENT";
-	else
-	   wh = "SERVER";
+	wh   = C_OR_S(srv.server == 0);
 
 #ifdef VERBOSE
 	{char *flog;
@@ -123,6 +121,27 @@ static int sock_exists(char *fmt, ...)
        };
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CONNECT_CLOSE - close the socket connection */
+
+static int connect_close(int fd, client *cl, char *root)
+   {char *wh, *flog;
+
+    wh = "SERVER";
+    if (cl != NULL)
+       {root = cl->root;
+	wh   = C_OR_S(cl->type == CLIENT);};
+
+    close(fd);
+
+    flog = name_log(root);
+    log_activity(flog, dbg_sock, wh,
+		 "close socket %d", fd);
+
+    return(-1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -171,11 +190,10 @@ static int init_server(char *root)
 
 /* FIN_SERVER - close the server socket down */
 
-static void fin_server()
+static void fin_server(char *root)
    {
 
-    close(srv.server);
-    srv.server = -1;
+    srv.server = connect_close(srv.server, NULL, root);
 
     return;}
 
@@ -290,8 +308,7 @@ static int connect_client(client *cl)
 				     "connect error %s@%s  %d - %s (%d)",
 				     host, prt, fd,
 				     strerror(errno), errno);
-			close(fd);
-			fd = -1;};
+			fd = connect_close(fd, cl, NULL);};
 
 		    if (async_srv == TRUE)
 		       srv->server = fd;
@@ -315,11 +332,7 @@ static int open_sock(char *root)
     rv = TRUE;
     rv = init_server(root);
     rv = sock_exists(root);
-
-    if (srv.server == 0)
-       wh = "CLIENT";
-    else
-       wh = "SERVER";
+    wh = C_OR_S(srv.server == 0);
 
     flog = name_log(root);
     log_activity(flog, dbg_sock, wh, "open %d", rv);
@@ -341,12 +354,9 @@ static int close_sock(char *root)
     st   = unlink(sock);
     rv  &= (st == 0);
 
-    fin_server();
+    fin_server(root);
 
-    if (srv.server == 0)
-       wh = "CLIENT";
-    else
-       wh = "SERVER";
+    wh = C_OR_S(srv.server == 0);
 
     flog = name_log(root);
     log_activity(flog, dbg_sock, wh, "close %d", st);
@@ -375,30 +385,27 @@ static int read_sock(client *cl, char *s, int nc)
         else
 	   fd = connect_server(cl);};
 
-    if (cl->type == CLIENT)
-       wh = "CLIENT";
-    else
-       wh = "SERVER";
+    wh = C_OR_S(cl->type == CLIENT);
 
     if (fd < 0)
        {nb = -1;
-	log_activity(flog, dbg_sock, wh, "read - no db");}
+	log_activity(flog, dbg_sock, wh, "read - no connection");}
 
     else
        {nb = read(fd, s, nc);
-
-	if (async_srv == FALSE)
-	   {close(fd);
-	    cl->fd = -1;};
 
 	if (s[nb] != '\0')
 	   s[nb] = '\0';
 
 	if (nb > 0)
-	   log_activity(flog, dbg_sock, wh, "read |%s| (%d)", s, nb);
+	   log_activity(flog, dbg_sock, wh, "read %d |%s| (%d)",
+			fd, s, nb);
 	else
-	   log_activity(flog, dbg_sock, wh, "read |%s| - %s (%d)",
-			s, strerror(errno), errno);};
+	   log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
+			fd, s, strerror(errno), errno);
+
+	if (async_srv == FALSE)
+	   cl->fd = connect_close(fd, cl, NULL);};
 
     return(nb);}
 
@@ -427,27 +434,24 @@ static int write_sock(client *cl, char *s, int nc)
         else
 	   fd = connect_server(cl);};
 
-    if (cl->type == CLIENT)
-       wh = "CLIENT";
-    else
-       wh = "SERVER";
+    wh = C_OR_S(cl->type == CLIENT);
 
     if (fd < 0)
        {nb = -1;
-	log_activity(flog, dbg_sock, wh, "write - no db");}
+	log_activity(flog, dbg_sock, wh, "write - no connection");}
 
     else
        {nb = write(fd, s, nc);
 
-	if (async_srv == FALSE)
-	   {close(fd);
-	    cl->fd = -1;};
-
 	if ((nb >= 0) && (nb == nc))
-	   log_activity(flog, dbg_sock, wh, "write |%s| (%d)", s, nb);
+	   log_activity(flog, dbg_sock, wh, "write %d |%s| (%d)",
+			fd, s, nb);
 	else
-	   log_activity(flog, dbg_sock, wh, "write |%s| - %s (%d)",
-			s, strerror(errno), errno);};
+	   log_activity(flog, dbg_sock, wh, "write %d |%s| - %s (%d)",
+			fd, s, strerror(errno), errno);
+
+	if (async_srv == FALSE)
+	   cl->fd = connect_close(fd, cl, NULL);};
 
     return(nb);}
 
