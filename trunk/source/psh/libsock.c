@@ -38,6 +38,7 @@ static connection
  srv;
 
 static int
+ async_srv = FALSE,
  dbg_sock = FALSE;
 
 /*--------------------------------------------------------------------------*/
@@ -129,7 +130,7 @@ static int sock_exists(char *fmt, ...)
 /* INIT_SERVER - make a connection with the server */
 
 static int init_server(char *root)
-   {int ip, port, sasz, rv, fd;
+   {int iprt, port, sasz, rv, fd;
     char s[MAXLINE], host[MAXLINE];
     char *hst;
 
@@ -142,11 +143,11 @@ static int init_server(char *root)
        {srv.sck.sin_family      = PF_INET;
 	srv.sck.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	for (ip = 15000; ip < 65000; ip++)
-	    {srv.sck.sin_port = htons(ip);
+	for (iprt = 15000; iprt < 65000; iprt++)
+	    {srv.sck.sin_port = htons(iprt);
 
 	     if (bind(srv.server, (struct sockaddr *) &srv.sck, sasz) >= 0)
-	        {port = ip;
+	        {port = iprt;
 		 break;};};};
 
     srv.port = port;
@@ -184,7 +185,7 @@ static void fin_server()
 /* CONNECT_SERVER - make a connection with the server */
 
 static int connect_server(client *cl)
-   {int fd, err, sasz;
+   {int fdc, fds, err, sasz;
     char *root, *flog;
     socklen_t len;
     struct sockaddr *sa;
@@ -195,31 +196,38 @@ static int connect_server(client *cl)
 
     flog = name_log(root);
 
-    fd   = -1;
+    fdc  = -1;
     sasz = sizeof(struct sockaddr_in);
     len  = sasz;
 
     sa = (struct sockaddr *) &srv->sck;
 
     if (srv->port >= 0)
-       {getsockname(srv->server, sa, &len);
-
-	err = listen(srv->server, 5);
+       {fds = srv->server;
+	err = listen(fds, 5);
 	if (err >= 0)
-	   {fd = accept(srv->server, sa, &len);
-	    if (fd >= 0)
-	       log_activity(flog, dbg_sock, "SERVER", "listening %d", fd);
-	    else
-	       log_activity(flog, dbg_sock, "SERVER", "accept error %d - s",
-			    errno, strerror(errno));}
-	else
-	   log_activity(flog, dbg_sock, "SERVER", "listen error %d - %s",
-			errno, strerror(errno));};
+	   {err = getsockname(fds, sa, &len);
+	    if (err == -1)
+	       log_activity(flog, dbg_sock, "SERVER",
+			    "getsockname error %d - %s (%d)",
+			    fds, strerror(errno), errno);
 
-    cl->fd   = fd;
+	    fdc = accept(fds, sa, &len);
+	    if (fdc >= 0)
+	       log_activity(flog, dbg_sock, "SERVER", "listening %d", fdc);
+	    else
+	       log_activity(flog, dbg_sock, "SERVER",
+			    "accept error on %d - %s (%d)",
+			    fds, strerror(errno), errno);}
+	else
+	   log_activity(flog, dbg_sock, "SERVER",
+			"listen error on %d - %s (%d)",
+			fds, strerror(errno), errno);};
+
+    cl->fd   = fdc;
     cl->type = SERVER;
 
-    return(fd);}
+    return(fdc);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -268,24 +276,26 @@ static int connect_client(client *cl)
 
 		fd = socket(PF_INET, SOCK_STREAM, 0);
 		if (fd >= 0)
-		   {err = connect(fd, (struct sockaddr *) &srv->sck, sasz);
+		   {char *flog;
 
-/*#ifdef VERBOSE*/
-#if 1
-		    {char *flog;
-		     flog = name_log(root);
-		     log_activity(flog, dbg_sock,
-				  "CLIENT", "connect %s@%s  %d  %s (%d)",
-				  host, prt, fd,
-				  strerror(errno), errno);};
-#endif
-		    if (err < 0)
-		       {close(fd);
+		    flog = name_log(root);
+
+		    err = connect(fd, (struct sockaddr *) &srv->sck, sasz);
+		    if (err >= 0)
+		       log_activity(flog, dbg_sock,
+				    "CLIENT", "connect %s@%s  %d",
+				    host, prt, fd);
+		    else
+		       {log_activity(flog, dbg_sock, "CLIENT",
+				     "connect error %s@%s  %d - %s (%d)",
+				     host, prt, fd,
+				     strerror(errno), errno);
+			close(fd);
 			fd = -1;};
 
-#ifdef NEWWAY
-		    srv->server = fd;
-#endif
+		    if (async_srv == TRUE)
+		       srv->server = fd;
+
 		    srv->port   = port;};};};};
 
     cl->fd   = fd;
@@ -377,19 +387,18 @@ static int read_sock(client *cl, char *s, int nc)
     else
        {nb = read(fd, s, nc);
 
-#ifndef NEWWAY
-	close(fd);
-	cl->fd = -1;
-#endif
+	if (async_srv == FALSE)
+	   {close(fd);
+	    cl->fd = -1;};
 
 	if (s[nb] != '\0')
 	   s[nb] = '\0';
 
-	if (nb < 0)
-	   log_activity(flog, dbg_sock, wh, "read |%s| (%s)",
-			s, strerror(errno));
-	else if (nb > 0)
-	   log_activity(flog, dbg_sock, wh, "read |%s| (%d)", s, nb);};
+	if (nb > 0)
+	   log_activity(flog, dbg_sock, wh, "read |%s| (%d)", s, nb);
+	else
+	   log_activity(flog, dbg_sock, wh, "read |%s| - %s (%d)",
+			s, strerror(errno), errno);};
 
     return(nb);}
 
@@ -430,16 +439,15 @@ static int write_sock(client *cl, char *s, int nc)
     else
        {nb = write(fd, s, nc);
 
-#ifndef NEWWAY
-	close(fd);
-	cl->fd = -1;
-#endif
+	if (async_srv == FALSE)
+	   {close(fd);
+	    cl->fd = -1;};
 
-	if ((nb < 0) || (nb != nc))
-	   log_activity(flog, dbg_sock, wh, "write |%s| (%s)",
-			s, strerror(errno));
+	if ((nb >= 0) && (nb == nc))
+	   log_activity(flog, dbg_sock, wh, "write |%s| (%d)", s, nb);
 	else
-	   log_activity(flog, dbg_sock, wh, "write |%s| (%d)", s, nb);};
+	   log_activity(flog, dbg_sock, wh, "write |%s| - %s (%d)",
+			s, strerror(errno), errno);};
 
     return(nb);}
 

@@ -8,8 +8,6 @@
  *
  */
 
-/* #define NEWWAY */
-
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"
@@ -143,21 +141,23 @@ char *srv_load_db(client *cl, char *fname, char *var)
 
 /* NEW_CONNECTION - make a new connection on SFD and add it to AFS */
 
-void new_connection(connection *srv)
+void new_connection(char *root, connection *srv)
    {int fd;
+    char *flog;
     socklen_t sz;
+
+    flog = name_log(root);
 
     sz = sizeof(srv->sck);
 
     fd = accept(srv->server, (struct sockaddr *) &srv->sck, &sz);
     if (fd > 0)
        {FD_SET(fd, &srv->afs);
-/*
-        printf("Server: connect from host %s, port %hd\n",
-	       inet_ntoa(srv->sck.sin_addr),
-	       srv->sck.sin_port);
-*/
-       };
+	log_activity(flog, dbg_db, "SERVER", "accept %d", fd);}
+    else
+       log_activity(flog, dbg_db, "SERVER",
+		    "accept error - %s (%d)",
+		    strerror(errno), errno);
 
     return;}
 
@@ -261,15 +261,75 @@ int proc_connection(client *cl)
 	nb = comm_write(cl, val, 0, 10);
 	nb = comm_write(cl, EOM, 0, 10);
 
-#ifdef NEWWAY
-	close(fd);
-	FD_CLR(fd, &srv->afs);
-	cl->fd = -1;
-	nsleep(100);
-#endif
-        };
+	if (async_srv == TRUE)
+	   {close(fd);
+	    FD_CLR(fd, &srv->afs);
+	    cl->fd = -1;
+	    nsleep(100);};};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ASYNC_SERVER - run a fully asynchronous server */
+
+static void async_server(client *cl)
+   {int fd, nr, ok;
+    char *root, *flog;
+    fd_set rfs;
+    connection *srv;
+
+    root = cl->root;
+    srv  = cl->server;
+
+    flog = name_log(root);
+
+    if (listen(srv->server, 5) >= 0)
+       {for (ok = TRUE; ok == TRUE; )
+	    {rfs = srv->afs;
+	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, NULL);
+	     if (nr > 0)
+	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
+		     {if (FD_ISSET(fd, &rfs))
+		    
+/* new connection request */
+			 {if (fd == srv->server)
+			     new_connection(root, srv);
+
+/* data arriving on an existing connection */
+			  else
+			     {cl->fd = fd;
+			      ok     = proc_connection(cl);};};};};};}
+    else
+       log_activity(flog, dbg_db, "SERVER",
+		    "listen error - %s (%d)",
+		    strerror(errno), errno);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SYNC_SERVER - run a synchronous server in which
+ *             - transactions come in one at a time sequentially
+ */
+
+static void sync_server(client *cl)
+   {int ok;
+    char *root;
+    connection *srv;
+
+    root = cl->root;
+    srv  = cl->server;
+
+    for (ok = TRUE; ok == TRUE; )
+        {ok = sock_exists(root);
+	 if (ok == TRUE)
+	    {cl->fd = -1;
+	     ok     = proc_connection(cl);};};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -277,7 +337,7 @@ int proc_connection(client *cl)
 /* SERVER - run the server side of the database */
 
 int server(char *root, int init, int dmn)
-   {int ok;
+   {char *flog;
     client cl;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
@@ -285,7 +345,9 @@ int server(char *root, int init, int dmn)
 	signal(SIGINT, sigdone);
 	signal(SIGHUP, sigrestart);
 
-	log_activity(name_log(root), dbg_db, "SERVER", "begin");
+	flog = name_log(root);
+
+	log_activity(flog, dbg_db, "SERVER", "begin");
 
 	cl.root   = root;
 	cl.type   = SERVER;
@@ -295,38 +357,16 @@ int server(char *root, int init, int dmn)
 	if (cl.db != NULL)
 	   {db = cl.db;
 
-#ifdef NEWWAY
-	    if (listen(srv.server, 5) >= 0)
-	       {int fd, nr;
-		fd_set rfs;
+	    if (async_srv == TRUE)
+	       async_server(&cl);
 
-		for (ok = TRUE; ok == TRUE; )
-		    {rfs = srv.afs;
-		     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, NULL);
-		     if (nr > 0)
-		        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
-			     {if (FD_ISSET(fd, &rfs))
-		    
-/* new connection request */
-				 {if (fd == srv.server)
-				     new_connection(&srv);
-
-/* data arriving on an existing connection */
-				  else
-				     {cl.fd = fd;
-				      ok    = proc_connection(&cl);};};};};};};
-#else
-	    for (ok = TRUE; ok == TRUE; )
-	        {ok = sock_exists(root);
-		 if (ok == TRUE)
-		    {cl.fd = -1;
-		     ok    = proc_connection(&cl);};};
-#endif
+	    else
+	       sync_server(&cl);
 
 	    db_srv_save(-1, cl.db);
 	    db_srv_close(cl.db);
 
-	    log_activity(name_log(root), dbg_db, "SERVER", "end");};};
+	    log_activity(flog, dbg_db, "SERVER", "end");};};
 
     return(0);}
 
@@ -365,7 +405,8 @@ int exchange(char *root, char *req)
 void help(void)
    {
     printf("\n");
-    printf("Usage: perdb [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]\n");
+    printf("Usage: perdb [-as] [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]\n");
+    printf("   as  run the database asynchronously\n");
     printf("   c   create the database, removing any existing\n");
     printf("   d   do not run server as daemon\n");
     printf("   f   root path to database\n");
@@ -392,7 +433,11 @@ int main(int c, char **v)
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
 	    {switch (v[i][1])
-                {case 'c' :
+                {case 'a' :
+		      if (v[i][2] == 's')
+			 async_srv = TRUE;
+		      break;
+                 case 'c' :
                       init = TRUE;
 		      break;
                  case 'd' :
