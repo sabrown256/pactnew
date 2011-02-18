@@ -2194,9 +2194,10 @@ static void help(void)
    {
 
     printf("\n");
-    printf("Usage: pact-config [-a] [-c] [-f <db>] [-F] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] -n | <cfg>\n");
+    printf("Usage: pact-config [-a] [-as] [-c] [-f <db>] [-F] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] -n | <cfg>\n");
     printf("\n");
     printf("             -a      do NOT perform PACT-ANALYZE step\n");
+    printf("             -as     run the database asynchronously\n");
     printf("             -c      create missing directories for -i option\n");
     printf("             -f      path to database\n");
     printf("             -F      do builds in /tmp for speed\n");
@@ -2264,7 +2265,10 @@ int main(int c, char **v)
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'a':
-                       st.analyzep = TRUE;
+		       if (vp[i][2] == 's')
+			  async_srv = TRUE;
+		       else
+			  st.analyzep = TRUE;
                        break;
 
                  case 'c':
