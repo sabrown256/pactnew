@@ -259,13 +259,7 @@ int proc_connection(client *cl)
 		val = t;};};
 
 	nb = comm_write(cl, val, 0, 10);
-	nb = comm_write(cl, EOM, 0, 10);
-
-	if (async_srv == TRUE)
-	   {close(fd);
-	    FD_CLR(fd, &srv->afs);
-	    cl->fd = -1;
-	    nsleep(100);};};
+	nb = comm_write(cl, EOM, 0, 10);};
 
     return(rv);}
 
@@ -300,7 +294,15 @@ static void async_server(client *cl)
 /* data arriving on an existing connection */
 			  else
 			     {cl->fd = fd;
-			      ok     = proc_connection(cl);};};};};};}
+			      ok     = proc_connection(cl);
+/*
+			      FD_CLR(fd, &srv->afs);
+			      cl->fd = connect_close(fd, cl, NULL);
+			      cl->fd = -1;
+			      nsleep(100);
+ */
+			      sched_yield();
+			      };};};};};}
     else
        log_activity(flog, dbg_db, "SERVER",
 		    "listen error - %s (%d)",

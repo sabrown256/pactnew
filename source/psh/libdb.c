@@ -627,19 +627,22 @@ void db_srv_restart(database *db)
 char **_db_clnt_ex(char *root, char *req)
    {int nb, to;
     char **p, *flog;
-    client cl;
+    static int first = TRUE;
     static char s[MAXLINE];
+    static client cl;
 
-    cl.fd     = -1;
-    cl.root   = root;
-    cl.type   = CLIENT;
-    cl.server = &srv;
+    if (first == TRUE)
+       {first     = FALSE;
+	cl.fd     = -1;
+	cl.root   = root;
+	cl.type   = CLIENT;
+	cl.server = &srv;};
 
     p = NULL;
 
     flog = name_log(root);
 
-    log_activity(flog, dbg_db, "CLIENT", "begin |%s|", req);
+    log_activity(flog, dbg_db, "CLIENT", "begin request |%s|", req);
 
 /* make sure that there is a server running */
     db_srv_launch(root);
@@ -657,7 +660,7 @@ char **_db_clnt_ex(char *root, char *req)
 	    else
 	       p = lst_push(p, s);};};
 
-    log_activity(flog, dbg_db, "CLIENT", "end");
+    log_activity(flog, dbg_db, "CLIENT", "end request");
 
     return(p);}
 

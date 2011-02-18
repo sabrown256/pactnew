@@ -2222,7 +2222,7 @@ static void help(void)
 int main(int c, char **v)
    {int i, append, havedb;
     char base[MAXLINE];
-    char *s;
+    char *s, *strct;
 
     if (c == 0)
        {help();
@@ -2251,8 +2251,8 @@ int main(int c, char **v)
 
     strcpy(base, path_head(st.dir.mng));
     strcpy(st.cfgf, "DEFAULT");
-    dbset(NULL, "STRICT", "0");
 
+    strct  = "0";
     append = FALSE;
 
     st.na   = c - 1;
@@ -2260,7 +2260,7 @@ int main(int c, char **v)
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-strict") == 0)
-	    dbset(NULL, "STRICT", v[++i]);
+	    strct = v[++i];
 
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
@@ -2326,6 +2326,8 @@ int main(int c, char **v)
 
          else
             strcpy(st.cfgf, v[i]);};
+
+    dbset(NULL, "STRICT", strct);
 
     push_file(st.cfgf, STACK_FILE);
     strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
