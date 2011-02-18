@@ -2062,13 +2062,35 @@ char **file_text(char *fname, ...)
     in = fopen(file, "r");
     if (in != NULL)
        {for (i = 0; fgets(s, LRG, in) != NULL; i++)
-	    {LAST_CHAR(s) = '\0';
+	    {if (LAST_CHAR(s) == '\n')
+	        LAST_CHAR(s) = '\0';
 	     sa = lst_add(sa, s);};
 	sa = lst_add(sa, NULL);
 
 	fclose(in);};
 
     return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_RUNNING - return the TRUE iff PID is running process */
+
+int is_running(int pid)
+   {int st, ok, err;
+
+    err = 0;
+    st  = kill(pid, 0);
+    if (st == -1)
+       {err = errno;
+	if (err == EPERM)
+	   ok = TRUE;
+	else if (err == ESRCH)
+	   ok = FALSE;}
+    else
+       ok = TRUE;
+
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

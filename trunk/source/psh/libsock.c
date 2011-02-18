@@ -207,7 +207,11 @@ static int connect_server(client *cl)
 	err = listen(srv->server, 5);
 	if (err >= 0)
 	   {fd = accept(srv->server, sa, &len);
-	    log_activity(flog, dbg_sock, "SERVER", "connect %d", fd);}
+	    if (fd >= 0)
+	       log_activity(flog, dbg_sock, "SERVER", "connect %d", fd);
+	    else
+	       log_activity(flog, dbg_sock, "SERVER", "accept error %d - s",
+			    errno, strerror(errno));}
 	else
 	   log_activity(flog, dbg_sock, "SERVER", "connect error %d - %s",
 			errno, strerror(errno));};
@@ -265,8 +269,6 @@ static int connect_client(client *cl)
 		fd = socket(PF_INET, SOCK_STREAM, 0);
 		if (fd >= 0)
 		   {err = connect(fd, (struct sockaddr *) &srv->sck, sasz);
-		    if (err < 0)
-		       close(fd);
 
 /*#ifdef VERBOSE*/
 #if 1
@@ -277,6 +279,9 @@ static int connect_client(client *cl)
 				  host, prt, fd,
 				  strerror(errno), errno);};
 #endif
+		    if (err < 0)
+		       {close(fd);
+			fd = -1;};
 
 #ifdef NEWWAY
 		    srv->server = fd;

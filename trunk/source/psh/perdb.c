@@ -262,9 +262,10 @@ int proc_connection(client *cl)
 	nb = comm_write(cl, EOM, 0, 10);
 
 #ifdef NEWWAY
-	if (rv == 0)
-	   {close(fd);
-	    FD_CLR(fd, &srv->afs);};
+	close(fd);
+	FD_CLR(fd, &srv->afs);
+	cl->fd = -1;
+	nsleep(100);
 #endif
         };
 
