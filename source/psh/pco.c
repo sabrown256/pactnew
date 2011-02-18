@@ -2265,7 +2265,7 @@ int main(int c, char **v)
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'a':
-		       if (vp[i][2] == 's')
+		       if (v[i][2] == 's')
 			  async_srv = TRUE;
 		       else
 			  st.analyzep = TRUE;
