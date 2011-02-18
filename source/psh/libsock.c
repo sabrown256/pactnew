@@ -208,12 +208,12 @@ static int connect_server(client *cl)
 	if (err >= 0)
 	   {fd = accept(srv->server, sa, &len);
 	    if (fd >= 0)
-	       log_activity(flog, dbg_sock, "SERVER", "connect %d", fd);
+	       log_activity(flog, dbg_sock, "SERVER", "listening %d", fd);
 	    else
 	       log_activity(flog, dbg_sock, "SERVER", "accept error %d - s",
 			    errno, strerror(errno));}
 	else
-	   log_activity(flog, dbg_sock, "SERVER", "connect error %d - %s",
+	   log_activity(flog, dbg_sock, "SERVER", "listen error %d - %s",
 			errno, strerror(errno));};
 
     cl->fd   = fd;
