@@ -1,0 +1,25 @@
+#!/bin/csh -f
+#
+# NUMA - analyze libnuma
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+SafeEnv NUMA ""
+
+if ($PACT_CC_FAMILY == PGI) then
+   /bin/ls /usr/lib*/libnuma*.so >& /dev/null
+   if ($status == 0) then
+      setenv NUMA "-Mconcur=numa"
+   else
+      setenv NUMA "-Mconcur=nonuma"
+   endif
+endif
+
+SetParent NUMA
+
+#exit(0)
+
