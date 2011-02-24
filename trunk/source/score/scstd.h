@@ -31,7 +31,9 @@
 #include <string.h>
 
 #include <math.h>
+#ifdef HAVE_ANSI_C9X_COMPLEX
 #include <complex.h>
+#endif
 #include <stdbool.h>
 #include <ctype.h>
 #include <wctype.h>

@@ -92,22 +92,6 @@ end
                   endif
 
 # check against fiducials
-                  if (-f $RefDir/$ob) then
-                     flog $Log ( diff $ob.res $RefDir/$ob > $ob.res.diff )
-                     if (-z $ob.res.diff) then
-                        flog $Log rm $ob.res.diff
-                        flog $Log set ResFile = ""
-                     else
-                        flog $Log set ResFile = "$ob.res.diff"
-                     endif
-
-# first time add results as fiducials
-                  else
-                     flog $Log mv $ob.res $RefDir/$ob
-                     NoteD $Log "Adding $ob.res fiducial to $RefDir - rerun"
-                     flog $Log set ResFile = ""
-                  endif
-
                   if (-f $RefDir/$ob.ps) then
                      flog $Log ( $CFE $PSDIFF -tp 2 $ob.ps $RefDir/$ob.ps > $ob.ps.diff )
                      set dstatus = $status
@@ -119,6 +103,29 @@ end
                      NoteD $Log "Adding $ob.ps fiducial to $RefDir - rerun"
                      set dstatus = 0
                   endif
+
+                  flog $Log set ResFile = ""
+                  if (-f $RefDir/$ob) then
+
+# since the axis tests probe regions where roundoff can effect
+# the floating point results
+# only compare the numerical text output if the picture differs
+# the picture is what we really care about
+                     if ($dstatus != 0) then
+                        flog $Log ( diff $ob.res $RefDir/$ob > $ob.res.diff )
+                        if (-z $ob.res.diff) then
+                           flog $Log rm $ob.res.diff
+                        else
+                           flog $Log set ResFile = "$ob.res.diff"
+                        endif
+                     endif
+
+# first time add results as fiducials
+                  else
+                     flog $Log mv $ob.res $RefDir/$ob
+                     NoteD $Log "Adding $ob.res fiducial to $RefDir - rerun"
+                  endif
+
                   Note $Log "Status results: |$ResFile| |$dstatus|"
 
                   if (($dstatus == 254) || ($dstatus == 255)) then

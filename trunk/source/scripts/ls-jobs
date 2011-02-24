@@ -150,7 +150,7 @@ else if ($OSType == "IRIX64") then
 
 # CYGWIN has no -o option - the 'elf' combination is the best we can do
 else if ($OSType =~ CYGWIN*) then
-   set PS      = "ps -elf"
+   set PS      = "/bin/ps -elf"
    set CED     = "[2J"    # clear all
    set Home    = "[1;1H"
    set LOADAVE = ( echo "No load info available" )
@@ -236,12 +236,20 @@ loop:
 
 # for all user processes
    if ("$PName" == "") then
-
-      $PS            |\
-      cut -b 1-256   |\
-      awk "$Prog"    |\
-      $Sort          |\
-      head -n $TOP
+      if ($OSType =~ CYGWIN*) then
+         $PS            |\
+         ls-jobs-cygwin |\
+         cut -b 1-256   |\
+         awk "$Prog"    |\
+         $Sort          |\
+         head -n $TOP
+      else
+         $PS            |\
+         cut -b 1-256   |\
+         awk "$Prog"    |\
+         $Sort          |\
+         head -n $TOP
+      endif
 
 # for named user processes
    else
@@ -251,12 +259,22 @@ loop:
             echo "Checking for processes under $name"
          endif
 
-         $PS              |\
-         cut -b 1-256     |\
-         grep -e "$name"  |\
-         awk "$Prog"      |\
-         $Sort            |\
-         head -n $TOP
+         if ($OSType =~ CYGWIN*) then
+            $PS              |\
+            ls-jobs-cygwin   |\
+            cut -b 1-256     |\
+            grep -e "$name"  |\
+            awk "$Prog"      |\
+            $Sort            |\
+            head -n $TOP
+         else
+            $PS              |\
+            cut -b 1-256     |\
+            grep -e "$name"  |\
+            awk "$Prog"      |\
+            $Sort            |\
+            head -n $TOP
+         endif
          echo ""
       end
    endif

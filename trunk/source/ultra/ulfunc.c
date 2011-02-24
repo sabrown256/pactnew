@@ -894,7 +894,7 @@ static object *_ULI_prefix(object *argl)
         if (strlen(prefix) != 1)
            SS_error("BAD PREFIX - _ULI_PREFIX", arg1);
 
-        pre = tolower(prefix[0]);
+        pre = tolower((int) prefix[0]);
         if ((pre < 'a') || (pre > 'z'))
            SS_error("BAD PREFIX - _ULI_PREFIX", arg1);
 

@@ -228,7 +228,7 @@ char *upcase(char *s)
         
     nc = strlen(s);
     for (i = 0; i < nc; i++)
-        s[i] = toupper(s[i]);
+        s[i] = toupper((int) s[i]);
 
     return(s);}
 
@@ -242,7 +242,7 @@ char *downcase(char *s)
         
     nc = strlen(s);
     for (i = 0; i < nc; i++)
-        s[i] = tolower(s[i]);
+        s[i] = tolower((int) s[i]);
 
     return(s);}
 

@@ -535,7 +535,8 @@ static void _PG_tick_div_lin(PG_axis_tick_def *td,
  */
 
 void _PG_tick(PG_axis_def *ad, int tick)
-   {double dvi, sp;
+   {int i;
+    double dvi, sp;
     double w[2], a[2], vo[2], tn[2];
     PG_axis_tick_def *td;
 
@@ -555,21 +556,19 @@ void _PG_tick(PG_axis_def *ad, int tick)
     else
        _PG_tick_div_lin(td, ad, sp);
 
-    vo[1] = ad->vo[1];
-    vo[0] = ad->vo[0];
-    tn[1] = ad->tn[1];
-    tn[0] = ad->tn[0];
+    for (i = 0; i < 2; i++)
+        {vo[i] = ad->vo[i];
+	 tn[i] = ad->tn[i];};
 
 /* TN is only used to compute the scale - not for drawing */
     dvi  = ad->dr/((vo[1] - vo[0])*ad->scale);
     a[0] = (vo[0]*tn[1] - vo[1]*tn[0])*dvi;
     a[1] = (tn[1] - tn[0])*dvi;
 
-    w[0] = a[1]*(td->vo[0]);
-    w[1] = a[1]*(td->vo[1]);
-
-    td->en[0] = (PM_CLOSETO_REL(w[0], a[0]) == TRUE) ? 0.0 : w[0] - a[0];
-    td->en[1] = w[1] - a[0];
+/* shift down by A[0] - taking care about roundoff */
+    for (i = 0; i < 2; i++)
+        {w[i]      = a[1]*(td->vo[i]);
+	 td->en[i] = (PM_CLOSETO_REL(w[i], a[0]) == TRUE) ? 0.0 : w[i] - a[0];};
 
     return;}
 

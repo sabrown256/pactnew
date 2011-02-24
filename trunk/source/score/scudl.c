@@ -120,7 +120,7 @@ SC_udl *_SC_parse_udl(char *s)
 		   *p++ = '\0';};
 
 /* get attributes */
-	    if ((p != NULL) && isalnum(*p))
+	    if ((p != NULL) && isalnum((int) (*p)))
 	       {for (attr = p; attr != NULL; attr = strchr(n, ','))
 		    {n = strchr(attr, ',');
 		     if (n != NULL)
