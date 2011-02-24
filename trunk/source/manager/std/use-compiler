@@ -42,8 +42,8 @@ if ($cpath == $cname) then
    set cpath = ""
 endif
 
-set Awk  = `which awk`
-set Expr = `which expr`
+set Sed = `which sed`
+set Awk = `which awk`
 
 # figure out the site context
 if (-f extensions/sys-site) then
@@ -160,11 +160,11 @@ foreach c ($fname $cname)
 # query the compiler for information
       set inf = ( `$cc $opt |& $Awk "$prog"` )
       if ($#inf > 1) then
-         set lvers  = ( `echo $inf[2] | sed 's/[-_]/./g'` )
+         set lvers  = ( `echo $inf[2] | $Sed 's/[-_]/./g'` )
          set cc     = $inf[1]
          set bindir = $cc:h
       else if ($#inf > 0) then
-         set lvers = ( `echo $inf[1] | sed 's/[-_]/./g'` )
+         set lvers = ( `echo $inf[1] | $Sed 's/[-_]/./g'` )
       endif
       set root = $bindir:h
    endif
@@ -172,7 +172,7 @@ end
 
 # check the bits for the compiler library
 if ("$lbits" == 32) then
-   set root = `echo $root | sed 's/-64//'`
+   set root = `echo $root | $Sed 's/-64//'`
 endif
 
 if ($#dirl == 1) then
@@ -192,20 +192,7 @@ SetParent PACT_CC_VERSION
 SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
 
-# check the compiler for NUMA flags
-if ($PACT_CC_FAMILY == PGI) then
-   setenv NUMA  ""
-   $Expr "$lvers" '>=' "7.0" >& /dev/null
-   if ($status == 0) then
-      setenv NUMA  "-Mconcur=numa"
-   else
-      $Expr "$lvers" '>' "6.2" >& /dev/null
-      if ($status == 0) then
-         setenv NUMA  "-Mconcur=nonuma"
-      endif
-   endif
-   SetParent NUMA
-endif
+source analyze/numa
 
 exit(0)
 

@@ -573,9 +573,10 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    ret = TRUE;};}
 
     else if (id != -1)
-       {styp = operand->type;
-	sa   = operand->data;
-	sid  = SC_deref_id(styp, TRUE);
+       {if (operand == NULL)
+           sid = id;
+        else
+	   sid = SC_deref_id(operand->type, TRUE);
 
 /* fixed and floating point types (ok) */
 	if ((sid == SC_BOOL_I) ||
