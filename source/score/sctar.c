@@ -237,20 +237,21 @@ fcdes *SC_scan_tarfile(char *tarf)
  */
 
 int _SC_tar_checksize(tarhdr *thdr)
-   {int i, ret, ndig; 
+   {int i, c, ret, ndig; 
     char *pch;           
 
     ret = TRUE;
     pch = (char *) &thdr->size; 
             
     for (i = 0, ndig = 0; i < 12; i++)
-        {if (*pch == '\0')
+        {c = *pch;
+	 if (c == 0)
             {pch++;
              continue;}
-         else if (isdigit(*pch))
+         else if (isdigit(c))
             {pch++;
              ndig++;}
-         else if (*pch == '\0')
+         else if (c == 0)
             break;
          else             /* illegal digit */
             {ret = FALSE;

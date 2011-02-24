@@ -56,7 +56,7 @@ source ../../tests/common
       NoteD $Log ""
 
       if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                    PGS AC Map Test ........ OMITTED ($ETime)"
+         NoteD $Log "                    PGS Basic Test ......... OMITTED ($ETime)"
          flog $Log touch gsjpgt.jpg.foo
          flog $Log rm -f gscgmt.cgm gspsts.ps gscgmt.cgm gsjpgt.jpg.* gspngt.png.*
       else if ($xstatus != 0) then

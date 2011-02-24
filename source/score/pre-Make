@@ -109,7 +109,7 @@ PObjs = scerr.o schp.o scpman.o schttp.o \
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 
 OW32Objs = sclpwin32.o scwin32.o
-OUnxObjs = sclppsx.o scunix.o scbgl.o scaix.o
+OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o
 
 Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scctl.o scfia.o scfis.o scfnca.o scfncb.o scfnct.o \
@@ -141,7 +141,7 @@ ArTObjs = ${TGTLib}(scpar.o) ${TGTLib}(scthn.o) ${TGTLib}(scthe.o) \
 
 ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
 ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
-            ${TGTLib}(scbgl.o) ${TGTLib}(scaix.o)
+            ${TGTLib}(scaix.o) ${TGTLib}(scbgl.o) ${TGTLib}(sccyg.o)
 
 ArBind = ${TGTLib}(gf-${LibName}.o)
 
