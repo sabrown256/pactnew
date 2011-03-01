@@ -663,6 +663,8 @@ while (1)
            set lfile = std/$Line[2]
         else if (-f features/$lfile) then
            set lfile = features/$Line[2]
+        else if (-f compilers/$lfile) then
+           set lfile = compilers/$Line[2]
         endif
 
         set nline  = `cat $lfile | wc -l`

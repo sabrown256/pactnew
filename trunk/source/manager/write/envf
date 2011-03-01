@@ -134,7 +134,7 @@ source $ldir/env-csh
 # write the CSH version like this because PCSH scripts like
 # PDBView need to get the users SCHEME variable if defined
     Note $EnvCsh 'if ($?SCHEME == 1) then'
-    Note $EnvCsh "   setenv SCHEME  ${SCHEME}:$RootDir/scheme"
+    Note $EnvCsh '   setenv SCHEME  ${SCHEME}:'"$RootDir/scheme"
     Note $EnvCsh 'else'
     Note $EnvCsh "   setenv SCHEME  $RootDir/scheme"
     Note $EnvCsh 'endif'
