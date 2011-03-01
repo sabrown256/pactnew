@@ -1,0 +1,53 @@
+#
+# test dependency analysis - following pattern rules to completion
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+%.o : %.c
+	@echo "CO $< -> $@"
+
+a.c :
+	@touch a.c
+
+all : a.c a.o
+
+# %.c : %.o
+# 	@echo "CO $< -> $@"
+# 	@touch $@
+# 
+# %.l : %.c
+# 	@echo "LC $< -> $@"
+# 	@touch $@
+# 
+# %.y : %.o
+# 	@echo "YO $< -> $@"
+# 	@touch $@
+# 
+# a.y :
+# 	@touch a.y
+# 
+# b.l :
+# 	@touch b.l
+# 
+# c.c :
+# 	@touch c.c
+# 
+# d.h :
+# 	@touch d.h
+# 
+# Hdrs = d.h
+# Objs = a.o c.o
+# 
+# a.y : b.c
+# 
+# ${Objs} : a.y ${Hdrs}
+# 
+# all: ${Objs}
+# 	rm -f [a-d].[ylcho]
+# 
+# luck:
+# 	touch a.y b.l c.c d.h
+# 	dmake -f mkfua work
+

@@ -60,6 +60,7 @@ if ($G2 == TRUE) then
    set Tsts = ($Tsts b.4 a.o)
    set Tsts = ($Tsts b.5 d.o)
    set Tsts = ($Tsts b.6 all)
+   set Tsts = ($Tsts b.7 all)
 
    flog $Log rm -f *.[chlyoa]
 
@@ -129,10 +130,10 @@ if ($G2 == TRUE) then
 
    Separator $Log
    if ($LErr == 0) then
-      NoteD $Log ".. ok ($ETime)"
+      NoteD $Log ". ok ($ETime)"
       flog $Log *.[chlyoa]
    else
-      NoteD $Log ".. ng ($ETime)"
+      NoteD $Log ". ng ($ETime)"
       @ Err = $Err + 16
    endif
 endif
