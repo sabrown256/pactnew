@@ -440,10 +440,15 @@ void PG_setup_attrs_glb(void)
 	_PG_gattrs.ref_mesh              = FALSE;
 	_PG_gattrs.restore_viewport      = TRUE;
 	_PG_gattrs.scatter_plot          = FALSE;
-	_PG_gattrs.stroke_raster_text    = TRUE;
 	_PG_gattrs.squeeze_labels        = FALSE;
 	_PG_gattrs.text_color            = 1;
 	_PG_gattrs.use_pixmap            = TRUE;
+
+#ifdef HAVE_X11
+	_PG_gattrs.stroke_raster_text    = FALSE;
+#else
+	_PG_gattrs.stroke_raster_text    = TRUE;
+#endif
 
 	_PG_gattrs.axis_char_angle       = 0.0;
 	_PG_gattrs.axis_label_x_standoff = 2.0;

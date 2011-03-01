@@ -589,7 +589,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    da  = (double *) acc->data;
 	    fnc = (PFDoubledd) proc[0];
 
-	    SC_convert_id(did, &s, 0, 1, id, val, 0, 1, n, FALSE);
+	    SC_convert_id(did, &s, 0, 1, id, val, 0, 1, 1, FALSE);
 
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s);
