@@ -11,7 +11,7 @@
 unalias *
 
 set Err   = 0
-set Arch  = `cfgman use`
+set Arch  = `./cfgman use`
 set ZArch = z-$Arch
 set Which = "$cwd/pwhich"
 

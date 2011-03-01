@@ -186,6 +186,10 @@ setenv PACT_CC_VERSION  $lvers
 setenv PACT_CC_PATH     $root
 setenv PACT_CC_EXE      $cc
 
+if ($PACT_CC_FAMILY == PATHSCALE) then
+   setnev PACT_CC_PATH  $PACT_CC_PATH/lib/$lvers
+endif
+
 SetParent PATH
 SetParent PACT_CC_FAMILY
 SetParent PACT_CC_VERSION

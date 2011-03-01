@@ -12,8 +12,7 @@
 
 set noglob
 
-foreach i (`/usr/bin/env`)
-   set var = `echo $i | sed 's/=/ /g'`
-   unsetenv $var[1]
+foreach i (`/usr/bin/env | sed 's/=.*//'`)
+   unsetenv $i
 end
 

@@ -1337,6 +1337,20 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; DEMO
+
+(define (demo . x)
+    "DEMO - Run the PDBView demo.
+     Usage: demo
+     Examples: demo"
+
+; run the demo in its own process to avoid contaminating
+; current session
+   (system "pdbview -l pdbvdemo.scm"))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; DESC - describe variables or structure members in current file directory
 
 (define-macro (desc . rest)

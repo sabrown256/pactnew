@@ -64,8 +64,9 @@ set LogDir  = $Root/log
 set ScmDir  = $Root/scheme
 set PACT    = $BinDir/pact
 set PERDB   = $BinDir/perdb
-set PCKS    = "-"
 set EnvCsh  = $IncDir/env-pact.csh
+
+set PCKS    = "-"
 set Tmp     = tmp_$System
 set Host    = `uname -n`
 set Time    = time
@@ -856,6 +857,7 @@ switch ($Cmnd)
         set LogDir = $Root/log
         set ScmDir = $Root/scheme
         set PACT   = $BinDir/pact
+        set PERDB  = $BinDir/perdb
 
         if ($ExplSystem == FALSE) then
            set EnvCsh = $IncDir/env-pact.csh
