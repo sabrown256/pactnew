@@ -450,10 +450,11 @@ static void _PG_X_txt_write_text(PG_device *dev, char *s,
 
 int _PG_X_txt_place_image(PG_device *src, int *dx,
 			  PG_device *dst, int *xo, int bc, int pad)
-   {int ix, iy, irx, iry, ok;
+   {int ix, iy, ok;
     int ri, gi, bi;
     int w, h, wow, bob;
     int pxss, bprs, ord;
+    int ir[PG_SPACEDM], ip[PG_SPACEDM];
     unsigned long msk;
     unsigned char *sr, *dr, *dg, *db;
     double ca, sa;
@@ -480,7 +481,11 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 	pxss = xi->bits_per_pixel >> 3;
 	bprs = xi->bytes_per_line;
 
-	xo[1] -= (3*dx[1]/4);
+	if (dst->quadrant == QUAD_FOUR)
+	   {xo[1] += (3*dx[1]/4);
+	    PG_QUAD_FOUR_POINT(dst, xo);}
+	else
+	   xo[1] -= (3*dx[1]/4);
 
 	PG_get_char_path(dst, &ca, &sa);
 
@@ -493,13 +498,17 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 		      bi  = sr[2];
 		      sr += pxss;
 
-		      irx =  ix*ca + iy*sa;
-		      iry = -ix*sa + iy*ca;
+		      ir[0] =  ix*ca + iy*sa;
+		      ir[1] = -ix*sa + iy*ca;
 
-		      dr = img->r + w*(xo[1] + iry) + (xo[0] + irx);
-		      dg = img->g + w*(xo[1] + iry) + (xo[0] + irx);
-		      db = img->b + w*(xo[1] + iry) + (xo[0] + irx);
+		      ip[0] = xo[0] + ir[0];
+		      ip[1] = xo[1] + ir[1];
 
+		      dr = img->r + w*ip[1] + ip[0];
+		      dg = img->g + w*ip[1] + ip[0];
+		      db = img->b + w*ip[1] + ip[0];
+
+		      img->n_on++;
 		      *dr = ri;
 		      *dg = gi;
 		      *db = bi;};}
@@ -510,12 +519,15 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 		      ri  = sr[2];
 		      sr += pxss;
 
-		      irx =  ix*ca + iy*sa;
-		      iry = -ix*sa + iy*ca;
+		      ir[0] =  ix*ca + iy*sa;
+		      ir[1] = -ix*sa + iy*ca;
 
-		      dr = img->r + w*(xo[1] + iry) + (xo[0] + irx);
-		      dg = img->g + w*(xo[1] + iry) + (xo[0] + irx);
-		      db = img->b + w*(xo[1] + iry) + (xo[0] + irx);
+		      ip[0] = xo[0] + ir[0];
+		      ip[1] = xo[1] + ir[1];
+
+		      dr = img->r + w*ip[1] + ip[0];
+		      dg = img->g + w*ip[1] + ip[0];
+		      db = img->b + w*ip[1] + ip[0];
 
 /* white on white - in spite of the name */
 		      wow = ((bc == src->BLACK) &&
@@ -527,7 +539,8 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 
 /* do not write pixels in background color if it is white or black */
 		      if ((wow == FALSE) && (bob == FALSE))
-			 {*dr = ri;
+			 {img->n_on++;
+			  *dr = ri;
 			  *dg = gi;
 			  *db = bi;};};};};
 

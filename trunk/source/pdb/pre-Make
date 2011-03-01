@@ -189,7 +189,7 @@ ${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
 Fstd : ${BinDir}/pdftst ${BinDir}/pdfhyts
 
 ${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdftst.c -o ${BinDir}/pdftst ${Libs}
+	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs}
 
 ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
 	${FC} ${LdFlags} pdfhyts.c -o ${BinDir}/pdfhyts ${Libs}
