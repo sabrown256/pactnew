@@ -13,6 +13,7 @@ include 64-bit
 include compilers/gnu
 
 run std/module-cray gnu 3.1.37G
+run std/use-compiler gcc
 
 include no-opengl
 include no-sql

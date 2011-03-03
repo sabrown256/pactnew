@@ -194,7 +194,6 @@ HAVE_SUBROUTINES
        Note $FOUT '  MPI_Exe      = '$CC_Exe
 
        Note $FOUT '  Flags        = '$Cfe_CC_Flags
-       Note $FOUT '  LXFlags      = '$Lex_Flags
        Note $FOUT '  AddressSize  = '$lbits
        Note $FOUT '  Numa         = '$lnuma
        Note $FOUT '}'
@@ -273,9 +272,7 @@ HAVE_SUBROUTINES
 
        set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
 
-# more convenient access to include path for mio
-       Note $FOUT "IncMPI = $linc"
-
+# NOTE: eventually remove this when Lee says so
        if ($CCBin != none) then
           Note $FOUT 'Tool/cc_pact_mpi {'
           Note $FOUT '  MPI_Flags = -I'$linc
@@ -283,6 +280,7 @@ HAVE_SUBROUTINES
           Note $FOUT ''
        endif
 
+# NOTE: eventually remove this when Lee says so
        if ($FCBin != none) then
           Note $FOUT 'Tool/fc_pact_mpi {'
           Note $FOUT '  MPI_Flags = -I'$linc
@@ -300,6 +298,7 @@ HAVE_SUBROUTINES
        end
        Note $FOUT 'Library/lib_pact_mpi {'
        Note $FOUT '  Archives = '$lar
+       Note $FOUT '  IncPaths = '$linc
        Note $FOUT '  LibPaths = '${MPILib}
        Note $FOUT '  RPaths   = '${MPILib}
        Note $FOUT '}'

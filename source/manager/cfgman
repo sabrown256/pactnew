@@ -22,22 +22,6 @@
 # include "cpyright.h"
 #
 
-# make the most common usage as fast as possible
-# also if SESSION_CONFIG is set do NOT change the database at all
-# this will virtually eliminate corruption of the database as
-# well as speeding things up
-# if you need to change the database you MUST unset SESSION_CONFIG
-
-if ($?PACT_CONFIG == 1) then
-   if ("$PACT_CONFIG" == "") then
-      echo "CFGMAN: PACT_CONFIG is null"
-      exit(113)
-   else
-      echo $PACT_CONFIG
-      exit(0)
-   endif
-endif
-
 set Cmnd = $0
 if ("$Cmnd" == "") then
    echo "CFGMAN: bad invocation"
@@ -99,32 +83,53 @@ end
 pushd $ExeRoot >& /dev/null
 set path = ( $ExeRoot $path )
 
-set Base   = $cwd:h
-set MngDir = $Base/manager
-set ScrDir = $Base/scripts
-set PLOCK  = "$Base/scripts/plock"
-set Which  = "./pwhich"
+set root   = $cwd:h
+set MngDir = $root/manager
+set ScrDir = $root/scripts
+set PLOCK  = $root/scripts/plock
 set Arch   = `$ScrDir/system-id`
 
 if (-d $MngDir) then
-   set BaseDev = $Base/dev
+   set dev = $root/dev
 else
-   set Tmp = `$Which pact`
-   set Tmp = $Tmp:h
-   set Tmp = $Tmp:h
-   pushd $Tmp >& /dev/null
-   set BaseDev = $cwd
-   popd >& /dev/null
+   echo "CFGMAN: Bad $MngDir"
+   exit(112)
 endif
 
 popd >& /dev/null
 
-if (!(-d $BaseDev)) then
-   mkdir -p $BaseDev
+set DB      = $dev/$SGN-$Arch
+set LockDir = $DB.lock
+
+if (!(-d $dev)) then
+   mkdir -p $dev
 endif
 
-set DB      = $BaseDev/$SGN-$Arch
-set LockDir = $DB.lock
+if (!(-d $DB)) then
+   mkdir -p $DB
+   chmod 2770 $DB >& /dev/null
+endif
+
+# make the most common usage as fast as possible
+# also if SESSION_CONFIG is set do NOT change the database at all
+# this will virtually eliminate corruption of the database as
+# well as speeding things up
+# if you need to change the database you MUST unset SESSION_CONFIG
+
+if ($?PACT_CONFIG == 1) then
+   if ("$PACT_CONFIG" == "") then
+      echo "CFGMAN: PACT_CONFIG is null"
+      exit(113)
+   else
+      if ($Tgt == add) then
+         set i = $DB/$PACT_CONFIG
+         touch $i
+         chmod 660 $i >& /dev/null
+      endif
+      echo $PACT_CONFIG
+      exit(0)
+   endif
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -135,32 +140,6 @@ onintr INTERRUPT
 
 # lock the DB
    $PLOCK lock -d $LockDir -t $LockT >& /dev/null
-
-# convert old file databases to directory form
-   if (-f $DB) then
-      mv $DB $DB.file
-      mkdir $DB
-      set first = ""
-      foreach i (`cat $DB.file`)
-         touch $DB/$i
-         chmod 660 $DB/$i >& /dev/null
-         if ("$first" == "") then
-            set first = $i
-         endif
-      end
-      pushd $DB >& /dev/null
-      if ("$first" != "") then
-         ln -s $first current
-      endif
-      popd >& /dev/null
-      rm -f $DB.file
-
-# create the database initially
-   else if (!(-e $DB)) then
-      mkdir $DB
-   endif
-
-   chmod 2770 $DB >& /dev/null
 
 # all subsequent work to be done in database directory
    pushd $DB >& /dev/null
@@ -175,35 +154,19 @@ switch ($Tgt)
 
 # ADD - add the specified config or make it first on the current host
 #     - the following two cases must work:
-#     -   1) cfgman add <cfg> [ <alias> ]
-#     -      add cfg[@alias]
-#     -   2) cfgman add <cfg> | <alias>
-#     -      make cfg or cfg@alias the current configuration
+#     -   1) cfgman add <alias>
+#     -      add alias
 
    case add:
-        if ($#argv == 1) then
-           set ent = $1
-        else
-           set ent = $1@$2
-           touch $ent
-           chmod 660 $ent >& /dev/null
-        endif
+        set ent = $1
 
 # check everybody on the current list
         foreach i (`ls -1`)
            if ($i == current) continue
 
-           if ("$i" =~ *@*) then
-              set base = `echo $i | sed 's/@.*$//'`
-              set alia = `echo $i | sed 's/^.*@//'`
+           set sid = $i
 
-# otherwise the entry is the base
-           else
-              set base = $i
-              set alia = ""
-           endif
-
-           if (("$i" == "$ent") || ("$base" == "$ent") || ("$alia" == "$ent")) then
+           if (("$i" == "$ent") || ("$sid" == "$ent")) then
               touch $i
               chmod 660 $i >& /dev/null
               rm -f current
@@ -211,8 +174,7 @@ switch ($Tgt)
               break
            endif
         end
-        unset base
-        unset alia
+        unset sid
         unset ent
 
         goto USE
@@ -231,22 +193,13 @@ switch ($Tgt)
            foreach i (`ls -1`)
               if ($i == current) continue
 
-              if ("$i" =~ *@*) then
-                 set base = `echo $i | sed 's/@.*$//'`
-                 set alia = `echo $i | sed 's/^.*@//'`
+              set sid = $i
 
-# otherwise the entry is the base
-              else
-                 set base = $i
-                 set alia = ""
-              endif
-
-              if (("$ent" == "$i") || ("$ent" == "$base") || ("$ent" == "$alia")) then
+              if (("$ent" == "$i") || ("$ent" == "$sid")) then
                  rm -f $i >& /dev/null
               endif
            end
-           unset base
-           unset alia
+           unset sid
         endif
         unset ent
 
@@ -341,17 +294,14 @@ exit($ret)
 # USE - report the current configuration
 
 USE:
-   if ($?PACT_CONFIG) then
+   if ($?PACT_CONFIG == 1) then
       set use = $PACT_CONFIG
    else
       set use = "$Arch"
       if (-e current) then
          set inf = ( `ls -l current` )
          if ("$inf" != "") then
-            set inf = "$inf[$#inf]"
-            if ("$inf" =~ *@*) then
-               set use = ( `echo "$inf" | sed 's/^.*@//'` )
-            endif
+            set use = "$inf[$#inf]"
          endif
          unset inf
       endif

@@ -39,9 +39,9 @@ if ("$vers" == "") then
    set vers = 3.1.37G
 endif
 
-if ($MODULESHOME == 1) then
+if ($?MODULESHOME == 1) then
 
-   alias setup 'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
+   alias setp 'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
 
 # unload any currently loaded modules
    set mlst = ( `echo $PRGENVMODULES | sed 's|:| |g'` )
