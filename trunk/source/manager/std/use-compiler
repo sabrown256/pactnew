@@ -69,6 +69,15 @@ unset scrd
 set cc = ( `which $cname` )
 switch ($cname)
 
+# XLC
+   case *xlc*:
+        setenv PACT_CC_FAMILY   XLC
+        set opt   = ( -qversion )
+        set pat   = ( IBM XL C )
+        set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = xlf90
+        breaksw
+
 # PGI
    case pgcc*:
         setenv PACT_CC_FAMILY   PGI
@@ -180,7 +189,7 @@ if ($#dirl == 1) then
 else if ($dirl[1] == $dirl[2]) then
    setenv PATH  $dirl[1]':$PATH'
 else
-   setenv PATH  $dirl[1]:$dirl[2]':$PATH'
+   setenv PATH  ${dirl[1]}:${dirl[2]}':$PATH'
 endif
 setenv PACT_CC_VERSION  $lvers
 setenv PACT_CC_PATH     $root

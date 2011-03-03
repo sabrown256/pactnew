@@ -60,9 +60,11 @@
            set lcc = $CCompiler
            switch ($lcc)
               case gnu-bgl:
+                   echo "run std/use-compiler mpgcc" >>& $Tmp
                    echo "include auto-bgl-gnu" >>& $Tmp
                    breaksw
               case gnu-bgp:
+                   echo "run std/use-compiler mpicc" >>& $Tmp
                    echo "include auto-bgp-gnu" >>& $Tmp
                    breaksw
               case gnu-cxe:
@@ -106,9 +108,11 @@
 		   echo "include compilers/sun" >>& $Tmp
                    breaksw
               case xlc-bgl:
+                   echo "run std/use-compiler mpxlc" >>& $Tmp
                    echo "include auto-bgl-xlc" >>& $Tmp
                    breaksw
               case xlc-bgp:
+                   echo "run std/use-compiler mpixlc_r" >>& $Tmp
                    echo "include auto-bgp-xlc" >>& $Tmp
                    breaksw
               default:

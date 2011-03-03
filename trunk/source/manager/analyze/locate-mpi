@@ -350,7 +350,7 @@ TRY:
             endif
          endif
       end
-   else
+   else if ($Verbose == TRUE) then
       echo "      have bin $fbin ($tbin)"
       echo "      have lib $flib ($tlib)"
       echo "      have inc $finc ($tinc)"
