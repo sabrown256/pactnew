@@ -430,13 +430,6 @@ GET_HOST_ARG:
 
 QUALIFY:
 
-# figure out qualifications on Cfg
-   if (`expr "$Cfg" : '.*@.*'` > 0) then
-      set Alias = `expr "$Cfg" : '.*@\(.*\)'`
-      set Cfg   = `expr "$Cfg" : '\(.*\)@.*'`
-      setenv PACT_CONFIG $Alias
-   endif
-   
    if ($MultiConfig == yes) then
       setenv PACT_CONFIG $UHost-$Cfg
    endif

@@ -42,14 +42,14 @@ All of this interacts with various dsys targets as follows:
 
 1) dsys config ... <config>
    <config> is added to or replaces the current configuration in the
-   database of configurations for that 'cpu -r' and is made the current
+   database of configurations and is made the current
    configuration.  If it already exists then it is
    only made the current configuration.  The name of the configuration
-   as returned by 'cfgman use' will be of the form `cpu -r`.
+   as returned by 'cfgman use' will be of the form `system-id`.
 
 2) dsys config ... <config> -a <alias>
    <config> is added to or replaces the configuration under <alias> in
-   the database of configurations for that 'cpu -r' and is made the
+   the database of configurations for that 'system-id' and is made the
    current configuration.  However, the name of the configuration
    as returned by 'cfgman use' (and hence the name you will see on
    directories) will be <alias>.
@@ -60,7 +60,7 @@ All of this interacts with various dsys targets as follows:
    the literal name you see in the pact/dev directories; an alias name;
    or the config file name.
 
-4) dsys use <config>
+4) dsys select <config>
    Makes the named configuration be the current one.  That means that
    it will be the one return by 'cfgman use' and hence the one used
    for builds.

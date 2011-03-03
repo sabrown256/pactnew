@@ -593,7 +593,7 @@ switch ($Cmnd)
         set openmp        = FALSE
         set pthread       = FALSE
         set pydir         = ""
-        set Alias         = ""
+        set sid         = ""
         set flst          = ""
 
         set HelpCode      = ./$0
@@ -612,7 +612,7 @@ switch ($Cmnd)
            switch ($1)
               case -a:
                    shift
-                   set Alias = $1
+                   set sid = $1
                    breaksw
               case -b:
                    shift
@@ -660,12 +660,12 @@ switch ($Cmnd)
                    breaksw
               case -h:
                    echo ""
-                   echo "Usage: dsys config [-a <alias>] [-b 32 | 64] [-c]"
+                   echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
                    echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp] [-os <sys-id>] [-p]"
                    echo "                   [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
-                   echo "        -a         set the alias/id for this config"
+                   echo "        -a         set the system id for this config"
                    echo "        -c         create missing directories for -i option"
                    echo "        -f         a directory containing your configuration file"
                    echo "        -F         do fast builds using /tmp"
@@ -847,7 +847,7 @@ switch ($Cmnd)
         unset gdir
 
 # set the configuration for this system
-        setenv System `$CfgMan add $Configuration $Alias`
+        setenv System `$CfgMan add $sid`
 
 # now that we have the system, reset the variables that depend on it
         set Root   = $BaseDev/$System
@@ -1148,7 +1148,7 @@ CFG_DONE:
                    echo ""
                    echo 'Usage: dsys configured [-a] [-h]'
                    echo ""
-                   echo "   a      - show config name and alias"
+                   echo "   a      - show config name and sid"
                    echo "   h      - this help message"
                    echo ""
                    exit(1)
@@ -2069,9 +2069,15 @@ CFG_DONE:
 # SELECT - select the configuration (for multiple configs per platform)
 
    case select:
+
+        set Cfg = $1
+
+        echo ""
         echo -n "Changing from configuration `$CfgMan use` to "
-        $CfgMan add $1
+
+        $CfgMan add $Cfg
         set RStatus = $status
+
         echo ""
         breaksw
 
@@ -2863,23 +2869,6 @@ CFG_DONE:
 
         $Cmd |& tee -ai $Log
 
-        breaksw
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-   case use:
-
-        set Cfg = $1
-
-        echo ""
-        echo -n "Changing configuration to $Cfg ... "
-
-        $CfgMan add $Cfg
-        set RStatus = $status
-
-        echo "done"
-        echo ""
         breaksw
 
 #--------------------------------------------------------------------------
