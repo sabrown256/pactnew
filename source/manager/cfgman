@@ -139,7 +139,7 @@ endif
 onintr INTERRUPT
 
 # lock the DB
-   $PLOCK lock -d $LockDir -t $LockT >& /dev/null
+#   $PLOCK lock -d $LockDir -t $LockT >& /dev/null
 
 # all subsequent work to be done in database directory
    pushd $DB >& /dev/null
@@ -153,29 +153,34 @@ switch ($Tgt)
 #--------------------------------------------------------------------------
 
 # ADD - add the specified config or make it first on the current host
-#     - the following two cases must work:
-#     -   1) cfgman add <alias>
-#     -      add alias
 
    case add:
         set ent = $1
 
+        set lst = ( `ls -1` )
+
+# if no entries add it
+        if (("$lst" == "") || ("$lst" == current)) then
+           touch $ent
+           chmod 660 $ent >& /dev/null
+           rm -f current >& /dev/null
+           ln -s $ent current
+
 # check everybody on the current list
-        foreach i (`ls -1`)
-           if ($i == current) continue
+        else
+           foreach i ($lst)
+              if ($i == current) continue
 
-           set sid = $i
-
-           if (("$i" == "$ent") || ("$sid" == "$ent")) then
-              touch $i
-              chmod 660 $i >& /dev/null
-              rm -f current
-              ln -s $i current
-              break
-           endif
-        end
-        unset sid
-        unset ent
+              if ("$i" == "$ent") then
+                 touch $i
+                 chmod 660 $i >& /dev/null
+                 rm -f current >& /dev/null
+                 ln -s $i current
+                 break
+              endif
+           end
+           unset ent
+        endif
 
         goto USE
         breaksw
@@ -233,12 +238,18 @@ switch ($Tgt)
 # find the proper entries in the host file
 	set lst = ( `grep $arch $hf | grep host | awk '{print $6}'` )
         foreach i ($lst)
-           touch $i
-           chmod 660 $i >& /dev/null
+           set j = ( `echo $i | sed 's|^.*@||'` )
+           if ("$j" != "") then
+              touch $j
+              chmod 660 $j >& /dev/null
+           endif
         end
 
 # first entry is defined to be current
-        ln -s $lst[1] current
+        set j = ( `echo $lst[1] | sed 's|^.*@||'` )
+        if ("$j" != "") then
+           ln -s $j current
+        endif
 
         breaksw
 
@@ -263,7 +274,7 @@ switch ($Tgt)
         echo "Usage: cfgman <tgt> [<opt>]"
         echo " "
         echo " Targets:"
-        echo "    add     - add the specified configuration (and optionally alias)"
+        echo "    add     - add the specified configuration"
         echo "    delete  - delete the specified configuration"
         echo "    help    - this help message"
         echo "    list    - list all configurations"
@@ -284,7 +295,7 @@ endsw
 INTERRUPT:
 
 # unlock the DB
-$PLOCK unlock -d $LockDir >& /dev/null
+#$PLOCK unlock -d $LockDir >& /dev/null
 
 exit($ret)
 
