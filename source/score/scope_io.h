@@ -12,6 +12,11 @@
 
 #include "cpyright.h"
 
+#ifdef HAVE_READLINE
+# include <readline/readline.h>
+# include <readline/history.h>
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                           DEFINED CONSTANTS                              */
@@ -471,6 +476,7 @@ extern int64_t
  SC_filelen(FILE *fp);
 
 extern char
+ *_SC_rl_fgets(char *s, int n),
  *SC_dgets(char *bf, int *pnc, FILE *fp),
  *SC_fgets(char *s, int n, FILE *fp),
  *io_gets(char *s, int n, FILE *fp),

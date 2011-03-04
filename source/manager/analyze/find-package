@@ -72,6 +72,12 @@ flog $ALog set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
 # check for implicit library reference - does the linker know how to find it
 
+# make the list of libraries for linking
+set ldlibs = ""
+foreach i ($lLib)
+   set ldlibs = ( $ldlibs -l$i )
+end
+
 if ($Implicit == TRUE) then
    Note $ALog ""
    Note $ALog "See if implicit library reference works"
@@ -87,7 +93,7 @@ if ($Implicit == TRUE) then
          flog $ALog set PckPath = ""
          flog $ALog set lLPath  = ""
       endif
-      flog $ALog set PckLib = ( -l$lLib )
+      flog $ALog set PckLib = ( $ldlibs )
       flog $ALog $Cfe_CC_Exe $opt $lLPath $PckLib $lALibs $Cfe_LD_Lib
       set xstatus = $status
       if ($xstatus == 0) then
@@ -96,15 +102,15 @@ if ($Implicit == TRUE) then
          set xstatus = $status
          if ($xstatus == 0) then
             flog $ALog set PckOK = TRUE
-            Note $ALog "    success with -l$lLib (implicit)"
+            Note $ALog "    success with $ldlibs (implicit)"
             goto GotIt
          else
-            Note $ALog "    exec failed ($xstatus) with -l$lLib (implicit)"
+            Note $ALog "    exec failed ($xstatus) with $ldlibs (implicit)"
             flog $ALog ls -l $lFile*
          endif
          flog $ALog unsetenv LD_LIBRARY_PATH
       else
-         Note $ALog "    build failed ($xstatus) with -l$lLib (implicit)"
+         Note $ALog "    build failed ($xstatus) with $ldlibs (implicit)"
       endif
    end
 endif
@@ -128,9 +134,9 @@ foreach i ($lLibDirs)
       flog $ALog set RLib = $i/lib$lLib
       foreach a ( none $ASList )
          if ("$a" == none) then
-            set LDir = "-L$i -l$lLib"
+            set LDir = "-L$i $ldlibs"
             flog $ALog set PckPath = ( $i )
-            flog $ALog set PckLib  = ( -l$lLib )
+            flog $ALog set PckLib  = ( $ldlibs )
             flog $ALog $Cfe_CC_Exe $opt $LDir $lALibs $Cfe_LD_Lib
             set xstatus = $status
             if ($xstatus == 0) then
@@ -138,14 +144,14 @@ foreach i ($lLibDirs)
                set xstatus = $status
                if ($xstatus == 0) then
                   flog $ALog set PckOK = TRUE
-                  Note $ALog "    success with -L$i -l$lLib (explicit)"
+                  Note $ALog "    success with -L$i $ldlibs (explicit)"
                   goto GotIt
                else
-                  Note $ALog "    exec failed ($xstatus) with -L$i -l$lLib (explicit)"
+                  Note $ALog "    exec failed ($xstatus) with -L$i $ldlibs (explicit)"
                   flog $ALog ls -l $lFile*
                endif
             else
-               Note $ALog "    build failed ($xstatus) with -L$i -l$lLib (explicit)"
+               Note $ALog "    build failed ($xstatus) with -L$i $ldlibs (explicit)"
             endif
 
          else if (-e $RLib.$a) then

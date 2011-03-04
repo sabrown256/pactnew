@@ -190,8 +190,8 @@ HAVE_SUBROUTINES
        Note $FOUT '  Exe          = '$Cfe_CC_Exe
 
 # NOTE: eventually remove this when Lee says so
-       Note $FOUT '  MPI_Compiler = '$CC_Exe
-       Note $FOUT '  MPI_Exe      = '$CC_Exe
+       Note $FOUT '#  MPI_Compiler = '$CC_Exe
+       Note $FOUT '#  MPI_Exe      = '$CC_Exe
 
        Note $FOUT '  Flags        = '$Cfe_CC_Flags
        Note $FOUT '  AddressSize  = '$lbits
@@ -208,8 +208,8 @@ HAVE_SUBROUTINES
        Note $FOUT '  Exe          = '$Cfe_FC_Exe
 
 # NOTE: eventually remove this when Lee says so
-       Note $FOUT '  MPI_Compiler = '$FC_Exe
-       Note $FOUT '  MPI_Exe      = '$FC_Exe
+       Note $FOUT '#  MPI_Compiler = '$FC_Exe
+       Note $FOUT '#  MPI_Exe      = '$FC_Exe
 
        Note $FOUT '  Flags        = '$Cfe_FC_Flags
        Note $FOUT '  AddressSize  = '$lbits

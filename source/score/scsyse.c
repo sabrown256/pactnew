@@ -28,19 +28,20 @@ struct s_descriptors
 #ifdef DEBUG
 
 # define START_LOG                                                           \
-   {FILE *log;                                                               \
-    log = io_open("log.wrap", "w")                                           \
+   {lgf = io_open("log.wrap", "w")
 
-# define WRITE_LOG(_x)                                                       \
-    io_printf(log, "\n%s %s", _x, s)
+# define WRITE_LOG(_x, _s)                                                   \
+    io_printf(lgf, "\n%s %s", _x, _s)
 
 # define END_LOG                                                             \
-    io_close(log);}
+    io_close(lgf);}
+
+static FILE *lgf = NULL;
 
 #else
 
 # define START_LOG
-# define WRITE_LOG(_x)
+# define WRITE_LOG(_x, _s)
 # define END_LOG
 
 #endif
@@ -152,7 +153,7 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
     s[0] = '\0';
 
     while (SC_fgets(s, MAXLINE, stdin) != NULL)
-       {WRITE_LOG(">");
+       {WRITE_LOG(">", s);
 	SC_printf(pp, "%s", s);
 	count = 0;
 	s[0]  = '\0';};
@@ -271,7 +272,7 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 
     nc = strlen(SC_DEFEAT_MPI_BUG);
     while (SC_gets(_SC.ecbf, nb-1, pp) != NULL)
-       {WRITE_LOG("<");
+       {WRITE_LOG("<", _SC.ecbf);
 
 	ns = strlen(_SC.ecbf);
 

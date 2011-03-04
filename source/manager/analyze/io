@@ -16,6 +16,7 @@ Note $Log "Analyze: I/O features"
 
 NoteD $ALog "   I/O Features:"
 
+source $AnaDir/readline
 source $AnaDir/hdf5
 source $AnaDir/sql
 
