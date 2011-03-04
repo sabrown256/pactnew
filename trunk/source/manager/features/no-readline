@@ -1,0 +1,14 @@
+#
+# NO-READLINE - override finding a READLINE which is in some way bad
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group RL {
+   Path = none
+}
+
+

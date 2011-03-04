@@ -1337,7 +1337,7 @@ static char *_SC_bgets(char *s, int n, FILE *fp)
     ACCESS(fp);
 
     if (fp == stdin)
-       r = fgets(s, n, stdin);
+       r = _SC_rl_fgets(s, n);
 
     else
        {pos = _SC_bio_tell(bid);

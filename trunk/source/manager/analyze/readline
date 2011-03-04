@@ -1,0 +1,127 @@
+#!/bin/csh -f
+#
+# READLINE - analyze platform READLINE
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $Log
+Note $Log "Analyze: readline"
+
+# vanilla place to look if previously undefined
+SafeEnv MD_Inc     ""
+SafeEnv MD_Lib     ""
+SafeEnv MD_Pck     ""
+SafeEnv RL_Path   /usr
+SafeEnv RL_RPath  /usr/lib
+SafeEnv RL_Inc    ""
+SafeEnv RL_Lib    ""
+SafeEnv HAVE_READLINE   FALSE
+
+# if we have explicitly said we do not want READLINE
+# do NOT detect it
+if ("$RL_Path" == none) then
+   NoteD $ALog "      no readline (by request)"
+
+else
+
+   set incl = ""
+   set pthl = ""
+   set libl = ""
+   set spkl = ""
+
+   set UTime = `timer -r`
+
+# write a little readline test to do better detection than mere
+# existence - mere existence doesn't work with 32/64 bit machines
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+int main(int c, char **v)
+{int rv;
+ char *(*f)(const char *p);
+ f  = readline;
+ rv = (f == NULL);
+ return(rv);}
+EOF
+
+   if ($?RL_Path == 1) then
+      set lIncDirs = ( $RL_Path/include /usr/local/include $RootInc )
+      set lLibDirs = ( $RL_Path/$LIB /usr/local/lib /usr/$LIB )
+   else
+      set lIncDirs = ( /usr/local/include $RootInc )
+      set lLibDirs = ( /usr/local/lib /usr/$LIB )
+   endif
+   set Implicit = FALSE
+   set lHdrs    = ( readline/readline.h readline/history.h )
+   set ASList   = ( a so )
+   set lLib     = ( readline curses )
+   set lFile    = $Tmp
+
+   set lALibs = ""
+   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+       set lALibs = ( $lALibs -L$i )
+   end
+   set lALibs = ( $lALibs $LD_Lib )
+
+   source $AnaDir/find-package
+
+   if (("$PckLib" != "") && ("$PckInc" != "")) then
+
+      if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
+         set incl = ( $incl $PckInc )
+      endif
+      if ("$PckPath" != "") then
+         set pthl = ( $pthl $PckPath )
+      endif
+
+      set libl = ( $libl $PckLib )
+      set spkl = ( $ldlibs )
+
+      flog $ALog setenv MD_Lib        "$PckLib $MD_Lib"
+      flog $ALog setenv MD_Pck        "$MD_Pck RL"
+      flog $ALog setenv HAVE_READLINE TRUE
+   else
+      setenv HAVE_READLINE ""
+   endif
+
+   set ETime = `timer -b $UTime`
+
+   setenv RL_RPath "$pthl"
+   setenv RL_Lib   "$libl"
+   setenv RL_Inc   "$incl"
+
+   foreach p ($pthl)
+      setenv RPATH   ${RPATH}:$p
+   end
+
+   if ("$RL_Lib" != "") then
+      flog $ALog setenv HAVE_READLINE   TRUE
+      NoteD $ALog "      has readline ($spkl)"
+   else
+      NoteD $ALog "      no readline"
+   endif
+
+# export the results
+   SetParent RPATH
+   SetParent MD_Lib
+   SetParent MD_Pck
+   SetParent RL_Path
+   SetParent RL_RPath
+   SetParent RL_Lib
+   SetParent RL_Inc
+   SetParent HAVE_READLINE
+
+endif
+
+SetParent HAVE_READLINE
+
+exit(0)
+

@@ -206,6 +206,41 @@ int64_t SC_get_buffer_size(void)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_RL_FGETS - a readline wrapper for fgets on stdin */ 
+
+char *_SC_rl_fgets(char *s, int n)
+   {char *rv;
+
+/* GOTCHA: readline not getting control characters when terminal
+ * conditioned as for mpi-io-wrap
+ */
+#undef HAVE_READLINE
+
+#ifdef HAVE_READLINE
+
+    char *t;
+
+    if (SC_isblocked_file(stdin) == TRUE)
+       {t = readline(NULL);
+	if (t != NULL)
+	   {snprintf(s, n, "%s\n", t);
+	    rv = s;}
+	else
+	   rv = NULL;}
+    else
+       rv = fgets(s, n, stdin);
+
+#else
+
+    rv = fgets(s, n, stdin);
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                              LOCAL FILE I/O                              */
 
@@ -440,7 +475,7 @@ char *SC_fgets(char *s, int n, FILE *fp)
     static int count = 0;
 
     if (fp == stdin)
-       r = fgets(s, n, stdin);
+       r = _SC_rl_fgets(s, n);
 
     else
        {pos = ftell(fp);
