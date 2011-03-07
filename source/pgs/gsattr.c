@@ -445,7 +445,8 @@ void PG_setup_attrs_glb(void)
 	_PG_gattrs.use_pixmap            = TRUE;
 
 #ifdef HAVE_X11
-	_PG_gattrs.stroke_raster_text    = FALSE;
+/*	_PG_gattrs.stroke_raster_text    = FALSE; */
+	_PG_gattrs.stroke_raster_text    = TRUE;
 #else
 	_PG_gattrs.stroke_raster_text    = TRUE;
 #endif

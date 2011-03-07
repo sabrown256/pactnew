@@ -1089,11 +1089,11 @@ static void _SC_get_term_timeout(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_GET_TERM_SIZE - read and parse the reply of terminal
+/* _SC_GET_TERM_RESP - read and parse the reply of terminal
  *                   - in response to a width/height query
  */
 
-static void _SC_get_term_size(int fd, int *pw, int *ph)
+void _SC_get_term_resp(int fd, int c, int *pw, int *ph)
    {int i, w, h, nc;
     char s[MAXLINE];
     char *t;
@@ -1111,7 +1111,7 @@ static void _SC_get_term_size(int fd, int *pw, int *ph)
 	    {nc = SC_read_sigsafe(fd, s+i, MAXLINE);
 	     if (nc > 0)
 	        i += nc;
-	     else if ((i > 0) && (strchr(s, 't') != NULL))
+	     else if ((i > 0) && (strchr(s, c) != NULL))
 	        break;
 	     SC_sleep(10);};
 
@@ -1139,6 +1139,73 @@ static void _SC_get_term_size(int fd, int *pw, int *ph)
 
 #endif
 
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_TERM_ATTR - get the value of some terminal attribute
+ *                  - in the current program session
+ *                  - return TRUE iff successful
+ *                  - example terminal window size
+ *                  -  SC_get_term_attr("14t", "t", 2, val)
+ */
+
+int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
+   {int rv;
+
+#ifdef MACOSX
+
+    rv  = FALSE;
+
+#else
+
+    int i, fd, bg, act;
+    char *name, *s;
+    TERMINAL_STATE *ts;
+
+    rv  = FALSE;
+    bg  = SC_is_background_process(-1);
+    act = bg & 5;
+
+    if (act == 0)
+       {SC_putenv("TERM=xterm");
+
+/* open the actual terminal device */
+	fd   = fileno(stderr);
+	name = ttyname(fd);
+	if (name == NULL)
+	   name = "/dev/tty";
+
+	fd = open(name, O_RDWR | O_NDELAY | O_NOCTTY);
+
+	if (fd < 0)
+	   rv = FALSE;
+
+	else
+	   {ts = SC_get_term_state(fd, FALSE);
+
+/* set the terminal for nice querying */
+	    _SC_set_query_state(fd);
+
+/* send the query code */
+	    for (i = 0; i < n; i++)
+	        val[i] = -1;
+
+	    s = SC_dsnprintf(TRUE, "%c[%s", SC_ESC_CHAR, cmd);
+	    SC_write_sigsafe(fd, s, strlen(s));
+	    SFREE(s);
+
+	    _SC_get_term_resp(fd, rsp[0], &val[0], &val[1]);
+
+	    rv = TRUE;
+
+/* close the terminal */
+	    SC_set_term_state(ts, fd);
+	    close(fd);};};
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SC_GET_TERM_SIZE - get the number of lines NR and columns NC
@@ -1194,7 +1261,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 		SC_write_sigsafe(fd, s, strlen(s));
                 SFREE(s);
 
-		_SC_get_term_size(fd, &pw, &ph);
+		_SC_get_term_resp(fd, 't', &pw, &ph);
 		if (ppr != NULL)
 		   *ppr = ph;
 
@@ -1213,7 +1280,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 		SC_write_sigsafe(fd, s, strlen(s));
                 SFREE(s);
 
-		_SC_get_term_size(fd, &cw, &ch);
+		_SC_get_term_resp(fd, 't', &cw, &ch);
 		if (pcr != NULL)
 		   *pcr = ch;
 
@@ -1410,6 +1477,105 @@ int SC_io_suspend(int fl)
 	SC_signal(SIGTSTP, SIG_DFL);};
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LINE_BUFFER_FD - set file descriptor FD to be in line buffered mode */
+
+int SC_line_buffer_fd(int fd)
+   {int rv;
+
+    rv = SC_set_io_attrs(fd,
+			 ICANON,    SC_TERM_LOCAL,    TRUE,
+			 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LINE_BUFFER_FILE - set file FP to be in line buffered mode */
+
+int SC_line_buffer_file(FILE *fp)
+   {int fd, rv;
+
+    fd = fileno(fp);
+    rv = SC_line_buffer_fd(fd);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CHAR_BUFFER_FD - set file descriptor FD to be in char at a time mode */
+
+int SC_char_buffer_fd(int fd)
+   {int rv;
+
+    rv = SC_set_io_attrs(fd,
+			 ICANON,    SC_TERM_LOCAL,    FALSE,
+			 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_CHAR_BUFFER_FILE - set file FP to be in char at a time mode */
+
+int SC_char_buffer_file(FILE *fp)
+   {int fd, rv;
+
+    fd = fileno(fp);
+    rv = SC_char_buffer_fd(fd);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_LINE_BUFFERED_FD - return TRUE iff FD is in line buffered mode */
+
+int SC_is_line_buffered_fd(int fd)
+   {int rv;
+
+    rv = TRUE;
+
+#ifdef TERMINAL
+
+    {int c;
+     TERMINFO s;
+
+     rv = tcgetattr(fd, &s);
+     if (rv == -1)
+        SC_error(-1, "COULDN'T GET STATE - SC_IS_LINE_BUFFERED");
+
+/* local mode constants */
+     c = s.c_lflag;
+
+# ifdef ICANON
+     rv = ((c & ICANON) != 0);
+# endif
+
+     };
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_LINE_BUFFERED_FILE - return TRUE iff FP is in line buffered mode */
+
+int SC_is_line_buffered_file(FILE *fp)
+   {int fd, rv;
+
+    fd = fileno(fp);
+    rv = SC_is_line_buffered_fd(fd);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

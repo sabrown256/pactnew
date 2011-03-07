@@ -250,6 +250,18 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
+/* SCTERM.C declarations */
+
+extern int
+ SC_get_term_attr(char *cmd, char *rsp, int n, int *val),
+ SC_line_buffer_fd(int fd),
+ SC_line_buffer_file(FILE *fp),
+ SC_char_buffer_fd(int fd),
+ SC_char_buffer_file(FILE *fp),
+ SC_is_line_buffered_fd(int fd),
+ SC_is_line_buffered_file(FILE *fp);
+
+
 #ifdef __cplusplus
 }
 #endif
