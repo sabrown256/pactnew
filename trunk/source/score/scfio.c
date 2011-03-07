@@ -213,11 +213,6 @@ int64_t SC_get_buffer_size(void)
 char *_SC_rl_fgets(char *s, int n)
    {char *rv;
 
-/* GOTCHA: readline not getting control characters when terminal
- * conditioned as for mpi-io-wrap
- */
-#undef HAVE_READLINE
-
 #ifdef HAVE_READLINE
 
     char *t;

@@ -139,6 +139,31 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
     pp = pd->pp;
     pe = pd->pe;
 
+/* null out initial character in order to be clear that something
+ * has been read or not
+ */
+    s[0] = '\0';
+
+#ifdef HAVE_READLINE
+
+    SC_set_io_attrs(fileno(stdin),
+		    ICANON,    SC_TERM_LOCAL,    TRUE,
+		    ECHO,      SC_TERM_LOCAL,    TRUE,
+		    0);
+
+    SC_block_file(stdin);
+
+    if (SC_fgets(s, MAXLINE, stdin) != NULL)
+       {WRITE_LOG(">", s);
+	SC_printf(pp, "%s", s);};
+
+    SC_set_io_attrs(fileno(stdin),
+		    ICANON,    SC_TERM_LOCAL,    FALSE,
+		    ECHO,      SC_TERM_LOCAL,    FALSE,
+		    0);
+
+#else
+
 /* NOTE: we must unblock stdin here because we really do not
  * know how many "messages" there are
  * this way we take input until there is nothing available
@@ -147,11 +172,6 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
  */
     SC_unblock_file(stdin);
 
-/* null out initial character in order to be clear that something
- * has been read or not
- */
-    s[0] = '\0';
-
     while (SC_fgets(s, MAXLINE, stdin) != NULL)
        {WRITE_LOG(">", s);
 	SC_printf(pp, "%s", s);
@@ -159,6 +179,8 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
 	s[0]  = '\0';};
 
     SC_block_file(stdin);
+
+#endif
 
     _SC.tty_n_rej = 0;
 
@@ -380,6 +402,17 @@ static int _SC_do_session(PROCESS *pp,
     d.fd = -1;
     d.pp = pp;
     d.pe = pe;
+
+#ifdef HAVE_READLINE
+
+    SC_unblock_file(stdin);
+
+    SC_set_io_attrs(fileno(stdin),
+		    SC_NDELAY, SC_TERM_DESC,     FALSE,
+		    ICANON,    SC_TERM_LOCAL,    FALSE,
+		    ECHO,      SC_TERM_LOCAL,    FALSE,
+		    0);
+#endif
 
     rv = SC_event_loop(pe, &d, -1);
 
