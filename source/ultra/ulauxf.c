@@ -402,13 +402,11 @@ PM_matrix *UL_lsq(PM_matrix *a, PM_matrix *ay)
 /* UL_FIT - curve fitting routine */
 
 object *UL_fit(object *obj, object *tok)
-   {int j, n, k, sgn;
-    int i, j1, order, aord;
-    double accum, temp, xc, xpi, delx;
+   {int i, j, n, sgn, order, aord;
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
+    double *cf, **p;
     char *lbl;
-    PM_matrix *a, *ay, *solution;
     object *ret;
 
     order = 0;
@@ -427,54 +425,28 @@ object *UL_fit(object *obj, object *tok)
     x[1]  = SX_dataset[j].x[1];
     wc[0] = SX_dataset[j].wc[0];
     wc[1] = SX_dataset[j].wc[1];
-    ay    = PM_create(n, 1);
-    a     = PM_create(n, aord);
 
-    if ((order < 0) && (wc[0]*wc[1] <= 0.0))
-       SS_error("BAD DOMAIN FOR NEGATIVE POWER FIT - UL_FIT", SS_null);
-
-    for (i = 1; i <= n; i++)
-        {temp  = (order < 0) ? 1.0/x[0][i-1] : x[0][i-1];
-         accum = 1;
-         PM_element(ay, i, 1) = x[1][i-1];
-         for (k = 1; k <= aord; k++)
-             {PM_element(a, i, k) = accum;
-              accum *= temp;};};
-        
-    solution = UL_lsq(a, ay);
-    PM_destroy(a);
-    PM_destroy(ay);
+    cf = PM_lsq_fit(2, n, x, wc, order);
 
 /* display coefficients and cons up the return list */
     if (SS_interactive == ON)
-       {if ((SX_dataset[i].id >= 'A') &&
-            (SX_dataset[i].id <= 'Z'))
+       {if ((SX_dataset[j].id >= 'A') &&
+            (SX_dataset[j].id <= 'Z'))
            {PRINT(stdout, "\nCurve %c\n", SX_dataset[j].id);}
         else
            {PRINT(stdout, "\nCurve @%d\n", SX_dataset[j].id);};}
 
     ret = SS_null;
     sgn = (order < 0) ? -1 : 1;
-    for (i = 1 ; i <= aord; i++)
+    for (i = 0 ; i < aord; i++)
         {if (SS_interactive == ON)
 	    {PRINT(stdout, "    ");
-	     PRINT(stdout, SX_text_output_format, PM_element(solution, i, 1));
-	     PRINT(stdout, " *x^%d\n", sgn*(i-1));};
-         ret = SS_mk_cons(SS_mk_float(PM_element(solution, i, 1)), ret);};
+	     PRINT(stdout, SX_text_output_format, cf[i]);
+	     PRINT(stdout, " *x^%d\n", sgn*i);};
+         ret = SS_mk_cons(SS_mk_float(cf[i]), ret);};
         
 /* create curve of fit */
-    UL_buf1x = FMAKE_N(double, SX_default_npts, "UL_FIT:buf1x");
-    UL_buf1y = FMAKE_N(double, SX_default_npts, "UL_FIT:buf1y");
-    delx     = (wc[1] - wc[0])/(SX_default_npts - 1);
-    for (i = 0; i < SX_default_npts; i++)
-        {xpi         =  wc[0] + i*delx;
-	 xc          = (order < 0) ? 1.0/xpi : xpi;
-         UL_buf1x[i] = xpi;
-         UL_buf1y[i] = 0;
-         accum       = 1;
-         for (j1 = 1; j1 <= aord; j1++)
-             {UL_buf1y[i] += (PM_element(solution, j1, 1))*accum;
-              accum       *= xc;};};
+    p = PM_lsq_polynomial(SX_default_npts, order, cf, wc);
 
     if ((SX_dataset[i].id >= 'A') &&
         (SX_dataset[i].id <= 'Z'))
@@ -483,13 +455,12 @@ object *UL_fit(object *obj, object *tok)
         {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_dataset[j].id, order);}
 
     ret = SS_mk_cons(SS_reverse(ret),
-                     SX_mk_curve(SX_default_npts, UL_buf1x, UL_buf1y,
+                     SX_mk_curve(SX_default_npts, p[0], p[1],
 				 lbl, NULL, (PFVoid) UL_plot));
 
-/* clean up */
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
-    PM_destroy(solution);
+    SFREE(cf);
+
+    PM_free_vectors(2, p);
 
     return(ret);}
 

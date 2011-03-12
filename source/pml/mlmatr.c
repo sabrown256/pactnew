@@ -53,6 +53,22 @@ int PM_destroy(PM_matrix *mp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_MATRIX_DONE - free the matrix but return the array */
+
+double *PM_matrix_done(PM_matrix *mp)
+   {double *rv;
+
+    rv = NULL;
+
+    if (mp != NULL)
+       {rv = mp->array;
+	SFREE(mp);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_ZERO - zero a matrix with NR rows and NC columns */
 
 PM_matrix *PM_zero(PM_matrix *a)
