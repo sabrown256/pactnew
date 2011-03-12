@@ -934,6 +934,13 @@ extern double
  PM_linear_int(double *x, double *f, int n, double xc);
 
 
+/* MLLSQ.C declarations */
+
+extern double
+ *PM_lsq_fit(int nd, int n, double **x, double *dextr, int ord),
+ **PM_lsq_polynomial(int n, int ord, double *cf, double *dextr);
+
+
 /* MLMATH.C declarations */
 
 extern void
@@ -986,6 +993,9 @@ extern PM_matrix
  *PM_ident(PM_matrix *a),
  *PM_copy(PM_matrix *to, PM_matrix *from),
  *PM_print(PM_matrix *a);
+
+extern double
+ *PM_matrix_done(PM_matrix *mp);
 
 extern int
  PM_is_zero(PM_matrix *a),
