@@ -859,16 +859,9 @@ object *UL_dupx(int j)
 /* UL_STAT - return a list of relevant statistics for the given curve */
 
 object *UL_stat(int j)
-   {double sumy, sumy2, sumx, sumx2;
+   {int n;
     double xmean, xstd, ymean, ystd;
-    double xc[PG_SPACEDM];
-    double *x[PG_SPACEDM], *ypmax, fn;
     object *ret;
-
-    sumy  = 0.0;
-    sumy2 = 0.0;
-    sumx  = 0.0;
-    sumx2 = 0.0;
 
     if (SS_interactive == ON)
        {if ((SX_dataset[j].id >= 'A') &&
@@ -877,20 +870,9 @@ object *UL_stat(int j)
         else
            {PRINT(stdout, "\nCurve @%d\n", SX_dataset[j].id);};}
 
-    fn = SX_dataset[j].n;
-    ypmax = SX_dataset[j].x[1]+SX_dataset[j].n;
-    for (x[1] = SX_dataset[j].x[1], x[0] = SX_dataset[j].x[0]; x[1] < ypmax; x[1]++, x[0]++)
-        {xc[0] = *x[0];
-         xc[1] = *x[1];
-         sumx  += xc[0];
-         sumx2 += xc[0]*xc[0];
-         sumy  += xc[1];
-         sumy2 += xc[1]*xc[1];};
-        
-    xmean = sumx / fn;
-    xstd  = sqrt((fn*sumx2-sumx*sumx)/(fn*(fn-1)));
-    ymean = sumy / fn;
-    ystd  = sqrt((fn*sumy2-sumy*sumy)/(fn*(fn-1)));
+    n = SX_dataset[j].n;
+    PM_stats_mean(n, SX_dataset[j].x[0], &xmean, NULL, NULL, &xstd);
+    PM_stats_mean(n, SX_dataset[j].x[1], &ymean, NULL, NULL, &ystd);
 
     ret = SS_make_list(SC_DOUBLE_I, &xmean,
                        SC_DOUBLE_I, &xstd,

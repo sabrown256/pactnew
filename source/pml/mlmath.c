@@ -337,6 +337,36 @@ double PM_curve_len_3d(double *x, double *y, double *z, int n)
 
 /*--------------------------------------------------------------------------*/
 
+/*                           STATISTICS FUNCTIONS                           */
+
+/*--------------------------------------------------------------------------*/
+
+/* PM_STATS_MEAN - compute mean, median, mode, and standard deviation */
+
+void PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
+		   double *pmod, double *pstd)
+   {int i;
+    double xc, xs, xsq;
+
+    xs  = 0.0;
+    xsq = 0.0;
+    for (i = 0; i < n; i++)
+        {xc   = x[i];
+         xs  += xc;
+         xsq += xc*xc;};
+        
+/* the mean */
+    if (pmn != NULL)
+       *pmn = xs/((double) n);
+
+/* the standard deviation */
+    if (pstd != NULL)
+       *pstd = sqrt((n*xsq - xs*xs)/(n*(n - 1.0)));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
 /*                          ADVANCED MATH FUNCTIONS                         */
 
 /*--------------------------------------------------------------------------*/
