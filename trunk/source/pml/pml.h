@@ -944,6 +944,8 @@ extern double
 /* MLMATH.C declarations */
 
 extern void
+ PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
+	       double *pmod, double *pstd),
  PM_derivative(int n, double *fncx, double *fncy,
 	       double *derx, double *dery),
  PM_array_scale(double *p, int n, double f),
