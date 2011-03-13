@@ -1527,7 +1527,7 @@ int PG_place_image(PG_image *dim, PG_image *sim, int scale)
  */
 
 int PG_copy_image(PG_image *dim, PG_image *sim, int bck)
-   {int id, is, od, os, c;
+   {int ic, id, is, od, os, c, bpp;
     int k, kmnd, kmxd, lmnd, lmxd, dk;
     int l, kmns, kmxs, lmns, lmxs, dl;
     unsigned char *sp, *dp;
@@ -1578,14 +1578,20 @@ int PG_copy_image(PG_image *dim, PG_image *sim, int bck)
     od = lmnd*dx + kmnd;
     os = lmns*sx + kmns;
 
+    bpp = sim->bits_pixel >> 3;
+
     for (l = 0; l < dl; l++)
         {for (k = 0; k < dk; k++)
              {id = l*dx + k + od;
               is = l*sx + k + os;
 
-	      c = sp[is];
-	      if (c != bck)
-		 dp[id] = c;};};
+	      if (bpp == 1)
+		 {c = sp[is];
+		  if (c != bck)
+		     dp[id] = c;}
+	      else
+		 {for (ic = 0; ic < bpp; ic++)
+		      dp[bpp*id+ic] = sp[bpp*is+ic];};};};
 
     return(TRUE);}
 
