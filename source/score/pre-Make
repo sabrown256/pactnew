@@ -196,6 +196,8 @@ ${IncDir}/scfnca.h : scfnca.t
 
 IncAction = pact ${IncDir}/scarg.h
 
+gen : ${IncDir}/sctypeg.h ${IncDir}/scarg.h
+
 #
 # MMLib 
 #

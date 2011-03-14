@@ -402,7 +402,7 @@ static int check(rundes *st)
     csetenv("Code", exe);
     c = cgetenv(TRUE, "Code");
     if ((file_executable(c) == FALSE) && (st->dryrun == FALSE))
-       {printf("No '%s' on your path\n", c);
+       {printf("No code '%s' on your path\n", c);
 	rv = FALSE;};
 
     if (IS_NULL(st->sgn) == TRUE)
@@ -897,7 +897,7 @@ static int setup_dbg_path(rundes *st)
 
     c = cgetenv(TRUE, "DBG_Exe");
     if ((file_executable(cwhich(c)) == FALSE) && (st->dryrun == FALSE))
-       {printf("No %s on your path\n", c);
+       {printf("No debugger '%s' on your path\n", c);
 	rv = FALSE;}
 
     else

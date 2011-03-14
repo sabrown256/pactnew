@@ -31,12 +31,17 @@ struct s_edgedes
  */
 
 void _PG_rst_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
-   {
+   {int i;
 
     p[0] = strlen(s)*(dev->char_width_s + dev->char_space_s) -
            dev->char_space_s;
     p[1] = dev->char_height_s;
     p[2] = 0.0;
+
+/* clip the box to safe limits in NORMC */
+    for (i = 0; i < PG_SPACEDM; i++)
+        {p[i] = min(p[i], 0.99);
+	 p[i] = max(p[i], 0.01);};
 
     PG_trans_interval(dev, nd, NORMC, p, cs, p);
 

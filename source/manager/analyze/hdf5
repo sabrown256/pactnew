@@ -64,7 +64,7 @@ EOF
    foreach i ( `echo $RPATH | sed 's|:| |g'` )
        set lALibs = ( $lALibs -L$i )
    end
-   set lALibs = ( $lALibs $LD_Lib $LibM $Z_Lib )
+   set lALibs = ( $lALibs $LD_Lib $LibM_Lib $Z_Lib )
 
    source $AnaDir/find-package
 
