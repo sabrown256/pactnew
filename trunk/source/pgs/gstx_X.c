@@ -450,7 +450,7 @@ static void _PG_X_txt_write_text(PG_device *dev, char *s,
 
 int _PG_X_txt_place_image(PG_device *src, int *dx,
 			  PG_device *dst, int *xo, int bc, int pad)
-   {int ix, iy, ok;
+   {int i, ix, iy, ok;
     int ri, gi, bi;
     int w, h, wow, bob;
     int pxss, bprs, ord;
@@ -473,6 +473,18 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 
 	dx[0] += 2*pad;
 
+	if (dst->quadrant == QUAD_FOUR)
+	   {xo[1] += (3*dx[1]/4);
+	    PG_QUAD_FOUR_POINT(dst, xo);}
+	else
+	   xo[1] -= (3*dx[1]/4);
+
+/* impose proper limits on XO and DX */
+	for (i = 0; i < PG_SPACEDM; i++)
+	    {dx[i] = max(dx[i], 1.01*src->g.pc[2*i]);
+	     dx[i] = min(dx[i], 0.99*src->g.pc[2*i+1]);
+	     xo[i] = max(xo[i], 0);};
+
 	msk = AllPlanes;
 	xi  = XGetImage(src->display, src->pixmap,
 			0, 0, dx[0], dx[1], msk, ZPixmap);
@@ -480,12 +492,6 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 	ord  = xi->byte_order;
 	pxss = xi->bits_per_pixel >> 3;
 	bprs = xi->bytes_per_line;
-
-	if (dst->quadrant == QUAD_FOUR)
-	   {xo[1] += (3*dx[1]/4);
-	    PG_QUAD_FOUR_POINT(dst, xo);}
-	else
-	   xo[1] -= (3*dx[1]/4);
 
 	PG_get_char_path(dst, &ca, &sa);
 

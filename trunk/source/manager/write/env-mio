@@ -68,57 +68,31 @@ HAVE_SUBROUTINES
        set lbits = ""
     endif
 
+    Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+    Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
+    Note $FOUT ''
+    Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
+    Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
+    Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
+
     if ($PACT_CC_FAMILY == GNU) then
-       set PACTSpec = /gnu
        set CmpBin   = $PACT_CC_PATH/bin
        set cmplib   = $PACT_CC_PATH/$LIB
-       Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT ''
-       Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
-       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
-       Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
 
     else if ($PACT_CC_FAMILY == PGI) then
-       set PACTSpec = /pgi
        set cmplib   = $PACT_CC_PATH/lib
        set lnuma    = $NUMA
-       Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH NUMA $@'
-       Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
        Note $FOUT ''
-       Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
-       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
-       Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
-       Note $FOUT "NUMA            = $NUMA"
+       Note $FOUT 'VMake += NUMA'
 
     else if ($PACT_CC_FAMILY == INTEL) then
-       set PACTSpec = /intel
        set cmplib   = $PACT_CC_PATH/lib
-       Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-       Note $FOUT ''
-       Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
-       Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
-       Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
 
-# Solaris cannot handle long variable names so bail now
-    else if ($HostOS == SunOS) then
-       Note $FOUT ''
-
-    else
-       if ($PACT_CC_FAMILY == PATHSCALE) then
-          set PACTSpec = /path
-          if ("$Bits" == 32) then
-             set cmplib = ${PACT_CC_PATH}:${PACT_CC_PATH}/32
-          else
-             set cmplib = $PACT_CC_PATH
-          endif
-          Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-          Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-          Note $FOUT ''
-          Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
-          Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
-          Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
+    else if ($PACT_CC_FAMILY == PATHSCALE) then
+       if ("$Bits" == 32) then
+          set cmplib = ${PACT_CC_PATH}:${PACT_CC_PATH}/32
+       else
+          set cmplib = $PACT_CC_PATH
        endif
     endif
 
@@ -147,8 +121,6 @@ HAVE_SUBROUTINES
     endif
     set pvers = `cat .pact-version`
 
-    set lrpath = `analyze/rpath -o list`
-
     Note $FOUT 'CFE           = '$CFE
     Note $FOUT 'PFE           = '$PFE
     Note $FOUT 'CROSS_COMPILE = '$CROSS_COMPILE
@@ -166,7 +138,7 @@ HAVE_SUBROUTINES
     Note $FOUT '  PACTVersion   = '$pvers
     Note $FOUT '  PACTLibs      = -lpdb -lpml -lscore '${LD_Lib}
     Note $FOUT '  PACTMDGL      = '${MDG_Lib}
-    Note $FOUT '  PACTMDL       = '${LD_Lib} ${LibM}
+    Note $FOUT '  PACTMDL       = '${LD_Lib} ${LibM_Lib}
     Note $FOUT '  VMake         = PACT PACTRoot PACTVersion PACTMDGL PACTMDL PACTLibs'
     Note $FOUT '  VEnv          = PACT'
     Note $FOUT '}'
@@ -188,11 +160,6 @@ HAVE_SUBROUTINES
        Note $FOUT '  BinDir       = '$CCBin
        Note $FOUT '  LibDir       = '$llibs
        Note $FOUT '  Exe          = '$Cfe_CC_Exe
-
-# NOTE: eventually remove this when Lee says so
-       Note $FOUT '#  MPI_Compiler = '$CC_Exe
-       Note $FOUT '#  MPI_Exe      = '$CC_Exe
-
        Note $FOUT '  Flags        = '$Cfe_CC_Flags
        Note $FOUT '  AddressSize  = '$lbits
        Note $FOUT '  Numa         = '$lnuma
@@ -206,11 +173,6 @@ HAVE_SUBROUTINES
        Note $FOUT '  BinDir       = '$FCBin
        Note $FOUT '  LibDir       = '$llibs
        Note $FOUT '  Exe          = '$Cfe_FC_Exe
-
-# NOTE: eventually remove this when Lee says so
-       Note $FOUT '#  MPI_Compiler = '$FC_Exe
-       Note $FOUT '#  MPI_Exe      = '$FC_Exe
-
        Note $FOUT '  Flags        = '$Cfe_FC_Flags
        Note $FOUT '  AddressSize  = '$lbits
        Note $FOUT '  Numa         = '$lnuma
@@ -227,13 +189,29 @@ HAVE_SUBROUTINES
     Note $FOUT ''
 
     Note $FOUT 'Library/pact {'
-    Note $FOUT '  Archives = pgs ppc pdb pml score'
-    Note $FOUT '  IncPaths = '$proot/include
+    Note $FOUT '  Archives  = pgs ppc pdb pml score'
+    Note $FOUT '  IncPaths  = '$proot/include
+
+#    set lrpath = `analyze/rpath -o list`
+    set lrpath = ""
+    if ($?PACT_CC_PATH == 1) then
+       set lrpath = ${PACT_CC_PATH}/${LIB}
+    endif
 
 # temporary expedient
-    Note $FOUT '  LibPaths = '$proot/lib $LibM_Path
-    Note $FOUT '  LDFlags  = '$LD_Lib $MDG_Lib $MD_Lib $LibM
-    Note $FOUT '  RPaths   = '$lrpath
+#    Note $FOUT '  LibPaths  = '$proot/lib $LibM_RPath
+    Note $FOUT '  LibPaths  = '$proot/lib
+    Note $FOUT '  RPaths    = '$lrpath
+    Note $FOUT '  LDFlags   = '$LD_Lib $MDG_Lib
+#    Note $FOUT '  LDFlags   = '$LD_Lib $MDG_Lib $MD_Lib $LibM_Lib
+
+    set llibs = ""
+    foreach p ($MD_Pck)
+       set lp = `echo $p | tr "[A-Z]" "[a-z]"`
+       set llibs = ( $llibs $lp )
+    end
+    Note $FOUT '  Libraries = '$llibs
+    unset llibs
 
     Note $FOUT '}'
     Note $FOUT ''
@@ -243,18 +221,20 @@ HAVE_SUBROUTINES
 
 # MATH - generate MATH library configuration info
 
-    if ("$LibM" != "") then
-       set libm = `echo $LibM | sed 's/-l//'`
+if (0) then
+    if ("$LibM_Lib" != "") then
+       set libm = `echo $LibM_Lib | sed 's/-l//'`
 
        Note $FOUT '# MATH specifications'
        Note $FOUT ''
        Note $FOUT 'Library/lib_math {'
        Note $FOUT '  Archives = '$libm
-       Note $FOUT '  LibPaths = '$LibM_Path
-       Note $FOUT '  RPaths   = '$LibM_Path
+       Note $FOUT '  LibPaths = '$LibM_RPath
+       Note $FOUT '  RPaths   = '$LibM_RPath
        Note $FOUT '}'
        Note $FOUT ''
     endif
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -271,22 +251,6 @@ HAVE_SUBROUTINES
        Note $FOUT ''
 
        set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
-
-# NOTE: eventually remove this when Lee says so
-       if ($CCBin != none) then
-          Note $FOUT 'Tool/cc_pact_mpi {'
-          Note $FOUT '  MPI_Flags = -I'$linc
-          Note $FOUT '}'
-          Note $FOUT ''
-       endif
-
-# NOTE: eventually remove this when Lee says so
-       if ($FCBin != none) then
-          Note $FOUT 'Tool/fc_pact_mpi {'
-          Note $FOUT '  MPI_Flags = -I'$linc
-          Note $FOUT '}'
-          Note $FOUT ''
-       endif
 
        set lar = ""
        foreach i ($LibMPI)
@@ -305,6 +269,33 @@ HAVE_SUBROUTINES
        Note $FOUT ''
 
     endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PACKAGES - generate configuration info for Packages
+
+    foreach p ($MD_Pck)
+       Note $FOUT "# $p package"
+       Note $FOUT ''
+
+       set lp = `echo $p | tr "[A-Z]" "[a-z]"`
+
+       set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
+
+       set lar   = ( `printenv ${p}_Lib | sed 's|-l||g'` )
+       set linc  = ( `printenv ${p}_Inc | sed 's|-I||g'` )
+       set lrpth = `printenv ${p}_RPath`
+
+       Note $FOUT "Library/$lp {"
+       Note $FOUT '  Archives = '$lar
+       Note $FOUT '  IncPaths = '$linc
+       Note $FOUT '  LibPaths = '$lrpth
+       Note $FOUT '  RPaths   = '$lrpth
+       Note $FOUT '}'
+       Note $FOUT ''
+
+    end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

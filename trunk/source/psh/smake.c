@@ -66,22 +66,28 @@ static int report_var(char *file, char *q, char *key,
 
 		 if (tst)
 		    {txt = strtok(NULL, "\n");
-		     if (txt == NULL)
-		        printf("%s", tok);
 
+/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val> */
+		     if (txt == NULL)
+		        {p = strchr(tok, '=');
+			 if (p != NULL)
+			    {*p++ = '\0';
+			     txt  = p;};}
+
+/* with env-pact.csh you WILL get here with txt <val> and tok <var> */
 		     else
 		        {while (*txt != '\0')
 			    {if (strchr("= \t", *txt) == NULL)
 			        break;
 			     else
-			        txt++;};
+			        txt++;};};
 
-			 if (compl)
-			    printf("%s = %s", tok, txt);
-			 else
-			    printf("%s", txt);
+		     if (compl)
+		        printf("%s = %s", tok, txt);
+		     else
+		        printf("%s", txt);
 
-			 ok = TRUE;};
+		     ok = TRUE;
 
 		     if (newl == TRUE)
 		        printf("\n");

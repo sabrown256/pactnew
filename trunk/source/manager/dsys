@@ -273,6 +273,11 @@ switch ($Cmnd)
 # provide context for child processes
         setenv DSYS_TARGET pact_build
 
+# preliminary - generate headers in score needed by other packages
+        flog $Log pushd ../score
+        flog $Log pact $Args gen
+        flog $Log popd
+
         if ("$Tgts" == "") then
            NoteD $Log "Building PACT on $Host ($Msg) ..."
            NoteD $Log "Using C Compiler $PACT_CC_EXE ($PACT_CC_FAMILY)"
@@ -569,6 +574,7 @@ switch ($Cmnd)
         unsetenv PACT_CC_VERSION
         unsetenv PACT_CC_PATH
         unsetenv Bits
+        unsetenv CPU
 
         setenv ConfigDir ""
         if ($?SYS_SITE == 1) then

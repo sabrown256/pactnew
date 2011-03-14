@@ -19,15 +19,13 @@ if (-x "$Exe/system-id") then
    set path = ( $Exe $path )
 endif
 
-set Which = "swhich -1"
-
 set Here = $0
 set Here = $Here:h
 if (-d "$Here") then
    cd $Here
 endif
 
-set PX = `$Which px`
+set PX = `where px | head -n 1`
 if (!(-x "$PX")) then
    set PX = ""
 endif
@@ -37,13 +35,15 @@ set RL = `$PX uname -r`
 
 switch ($OS[1])
    case "aix" :
-        set VS = `uname -v`
-        echo "aix-${VS}.${RL}"
+        set lvs = `uname -v`
+        echo "aix-${lvs}.${RL}"
+	unset lvs
         breaksw
 
    case "cygwin*" :
-        set VS = ( `echo "$RL" | sed 's/\./ /g'` )
-        echo "cygwin-$VS[1].$VS[2]"
+        set lvs = ( `echo "$RL" | sed 's/\./ /g'` )
+        echo "cygwin-$lvs[1].$lvs[2]"
+	unset lvs
         breaksw
 
    case "darwin" :
@@ -51,15 +51,17 @@ switch ($OS[1])
         @ DaRel = `/usr/bin/uname -r | sed 's/\..*//'`
         @ DaRel = $DaRel - 4;
 
-        set CPU = `/usr/bin/uname -p`
-        if ($CPU =~ *86*) then
-           set CPQ = "-x86"
-        else if ($CPU =~ *powerpc*) then
-           set CPQ = "-ppc"
+        set lcpu = `/usr/bin/uname -p`
+        if ($lcpu =~ *86*) then
+           set lcpq = "-x86"
+        else if ($lcpu =~ *powerpc*) then
+           set lcpq = "-ppc"
         else
-           set CPQ = ""
+           set lcpq = ""
         endif
-        echo "osx-10.$DaRel$CPQ"
+        echo "osx-10.$DaRel$lcpq"
+        unset lcpu
+        unset lcpq
         breaksw
 
    case "hp-ux" :
@@ -128,13 +130,15 @@ switch ($OS[1])
         breaksw
 
    case "freebsd*" :
-        set rl = `expr "$RL" : '\(.*\)-RELEASE'`
-        echo "freebsd-$rl"
+        set lvs = `expr "$RL" : '\(.*\)-RELEASE'`
+        echo "freebsd-$lvs"
+        unset lvs
         breaksw
 
    case "osf*" :
-        set rl = `expr "$RL" : 'V\(.*\)'`
-        echo "osf-$rl"
+        set lvs = `expr "$RL" : 'V\(.*\)'`
+        echo "osf-$lvs"
+        unset lvs
         breaksw
 
    case "sunos" :

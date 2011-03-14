@@ -32,7 +32,7 @@ static int report_var(char *file, char *q, char *key,
 		      int compl, int litrl, int newl)
    {int i, ok, doit, tst;
     char s[MAXLINE];
-    char *tok, *txt, *ps;
+    char *tok, *txt, *ps, *p;
     FILE *fp;
 
     ok = FALSE;
@@ -58,23 +58,29 @@ static int report_var(char *file, char *q, char *key,
 
 		 if (tst)
 		    {txt = strtok(NULL, "\n");
-		     if (txt == NULL)
-		        io_printf(stdout, "%s", tok);
 
+/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val> */
+		     if (txt == NULL)
+		        {p = strchr(tok, '=');
+			 if (p != NULL)
+			    {*p++ = '\0';
+			     txt  = p;};}
+
+/* with env-pact.csh you WILL get here with txt <val> and tok <var> */
 		     else
 		        {while (*txt != '\0')
 			    {if (strchr("= \t", *txt) == NULL)
 			        break;
 			     else
-			        txt++;};
+			        txt++;};};
 
-			 if (compl)
-			    io_printf(stdout, "%s = %s", tok, txt);
-			 else
-			    io_printf(stdout, "%s", txt);
+		     if (compl)
+		        io_printf(stdout, "%s = %s", tok, txt);
+		     else
+		        io_printf(stdout, "%s", txt);
 
-			 memset(s, 0, MAXLINE);
-			 ok = TRUE;};
+		     memset(s, 0, MAXLINE);
+		     ok = TRUE;
 
 		     if (newl == TRUE)
 		        io_printf(stdout, "\n");

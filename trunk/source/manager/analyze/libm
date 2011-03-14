@@ -16,8 +16,9 @@ Note $Log "Analyze: math"
 
 SafeEnv RPATH        ""
 SafeEnv Cfg_RPATH    ""
-SafeEnv LibM         "-lm"
-SafeEnv LibM_Path    ""
+SafeEnv MD_Pck       ""
+SafeEnv LibM_Lib     "-lm"
+SafeEnv LibM_RPath   ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -36,12 +37,14 @@ if (-d "$IMF_Path") then
 else
    set inf = ""
 endif
+Note $ALog "IMF_Path = |$IMF_Path|"
+Note $ALog "inf       = |$inf|"
 
 if (-f "$inf") then
    set root = $inf:h
-   flog $Log setenv IMF_Path $root
+   flog $ALog setenv IMF_Path $root
 else
-   flog $Log setenv IMF_Path ""
+   flog $ALog setenv IMF_Path ""
 endif
 
 #--------------------------------------------------------------------------
@@ -52,14 +55,15 @@ endif
 if ("$IMF_Path" != "") then
    flog $ALog setenv RPATH         ${RPATH}:${IMF_Path}
    flog $ALog setenv Cfg_RPATH     ${Cfg_RPATH}:${IMF_Path}
-   flog $ALog setenv LibM          "-limf"
-   flog $ALog setenv LibM_Path     ${IMF_Path}
+   flog $ALog setenv MD_Pck        "$MD_Pck LibM"
+   flog $ALog setenv LibM_Lib      "-limf"
+   flog $ALog setenv LibM_RPath    ${IMF_Path}
 
 else
-   flog $ALog setenv LibM      "-lm"
+   flog $ALog setenv LibM_Lib      "-lm"
 
 endif
-NoteD $ALog "   Math library: $LibM"
+NoteD $ALog "   Math library: $LibM_Lib"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -67,8 +71,9 @@ NoteD $ALog "   Math library: $LibM"
 SetParent IMF_Path
 SetParent RPATH
 SetParent Cfg_RPATH
-SetParent LibM
-SetParent LibM_Path
+SetParent MD_Pck
+SetParent LibM_Lib
+SetParent LibM_RPath
 
 exit(0)
 
