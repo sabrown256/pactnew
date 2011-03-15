@@ -7,6 +7,8 @@
 # include "cpyright.h"
 #
 
+setenv REQUEST_MPI   TRUE
+
 # NOTE: on BG/P MPIBin has to come after path to compiler
 setenv PATH   ${PATH}:${MPIBin}
 
