@@ -52,6 +52,30 @@ HAVE_SUBROUTINES
        set FCBin = none
     endif
 
+# site signature variables
+    Note $FOUT 'SYS_SITE = '$SYS_SITE
+    Note $FOUT 'SYS_TYPE = '$SYS_TYPE
+    Note $FOUT 'DAI_ROOT = '$DAI_ROOT
+    Note $FOUT 'DAS_ROOT = '$DAS_ROOT
+    Note $FOUT ''
+
+    Note $FOUT "VMake = DAI_ROOT DAS_ROOT"
+    Note $FOUT "VEnv  = DAI_ROOT DAS_ROOT"
+    Note $FOUT "VCDef = DAI_ROOT DAS_ROOT"
+    Note $FOUT "VMDef = DAI_ROOT DAS_ROOT"
+    Note $FOUT ''
+
+# database variables
+    Note $FOUT "HOST_SERVER_DB    = $HOST_SERVER_DB"
+    Note $FOUT "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
+    Note $FOUT "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
+    Note $FOUT "UPDATE_SYS_DB     = $UPDATE_SYS_DB"
+    Note $FOUT ''
+
+    Note $FOUT "VMake += HOST_SERVER_DB RUN_SIGNATURE_DB SITE_SIGNATURE_DB UPDATE_SYS_DB"
+    Note $FOUT "VEnv  += HOST_SERVER_DB RUN_SIGNATURE_DB SITE_SIGNATURE_DB UPDATE_SYS_DB"
+    Note $FOUT ''
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -74,6 +98,14 @@ HAVE_SUBROUTINES
     Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
     Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
     Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
+    Note $FOUT ''
+
+    Note $FOUT 'VMake = PACT_FC_VERSION PACT_FC_PATH $@'
+    Note $FOUT 'VEnv  = PACT_FC_VERSION PACT_FC_PATH $@'
+    Note $FOUT ''
+    Note $FOUT "PACT_FC_VERSION = $PACT_FC_VERSION"
+    Note $FOUT "PACT_FC_PATH    = $PACT_FC_PATH"
+    Note $FOUT ''
 
     if ($PACT_CC_FAMILY == GNU) then
        set CmpBin   = $PACT_CC_PATH/bin
@@ -195,7 +227,11 @@ HAVE_SUBROUTINES
 #    set lrpath = `analyze/rpath -o list`
     set lrpath = ""
     if ($?PACT_CC_PATH == 1) then
-       set lrpath = ${PACT_CC_PATH}/${LIB}
+       if (-d ${PACT_CC_PATH}/lib$Bits) then
+          set lrpath = ${PACT_CC_PATH}/lib$Bits
+       else if (-d ${PACT_CC_PATH}/lib) then
+          set lrpath = ${PACT_CC_PATH}/lib
+       endif
     endif
 
 # temporary expedient

@@ -37,6 +37,12 @@ while ($#argv > 0)
            set Var = ""
            set Tgt = add
            breaksw
+      case -d:
+           shift
+           set Dir = $1
+           set Var = ""
+           set Tgt = del
+           breaksw
       case -e:
            shift
            set Dir = ""
@@ -45,16 +51,17 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: rpath [-a <dir>] [-e <var>] [-h] [-o parent | echo | list]"
+           echo "Usage: rpath [-a <dir>] [-d <dir>] [-e <var>] [-h] [-o parent | echo | list | link | rpath]"
            echo "  a   add <dir> to the RPATH"
+           echo "  d   remove <dir> from the RPATH"
            echo "  e   add value of <var> to the RPATH"
            echo "  h   this help message"
-           echo "  o   return result in specified mode"
-           echo "      parent displays as parent(a:b:c)"
-           echo "      echo displays as a:b:c"
-           echo "      list displays as 'a b c'"
-           echo "      link displays as '-La -Lb -Lc'"
-           echo "      rpath expands LD_RPath, for example '-Wl,-rpath,a:b:c'"
+           echo "  o   return result in specified mode:"
+           echo "         parent displays as parent(a:b:c)"
+           echo "         echo displays as a:b:c"
+           echo "         list displays as 'a b c'"
+           echo "         link displays as '-La -Lb -Lc'"
+           echo "         rpath expands LD_RPath, for example '-Wl,-rpath,a:b:c'"
            echo "      default is parent"
            echo ""
            exit(1)
@@ -154,6 +161,26 @@ switch ($Tgt)
               setenv RPATH ${Dir}:${RPATH}
            endif
         endif
+        breaksw
+
+   case del:
+        set lrpath = ( `echo $RPATH | sed 's|:| |g'` )
+        set nrpath = ""
+        foreach d ($lrpath)
+           if ($d != $Dir) then
+              set nrpath = ( ${nrpath}:${d} )
+           endif
+        end
+        setenv RPATH $nrpath
+
+        set lrpath = ( `echo $Cfg_RPATH | sed 's|:| |g'` )
+        set nrpath = ""
+        foreach d ($lrpath)
+           if ($d != $Dir) then
+              set nrpath = ( ${nrpath}:${d} )
+           endif
+        end
+        setenv Cfg_RPATH $nrpath
         breaksw
 endsw
 

@@ -137,6 +137,7 @@ struct s_state
     char env_csh[MAXLINE];
     char env_sh[MAXLINE];
     char env_dk[MAXLINE];
+    char env_mdl[MAXLINE];
 
     char arch[MAXLINE];
     char host[MAXLINE];
@@ -637,16 +638,16 @@ static void write_envf(int lnotice)
 
     separator(Log);
     if (lnotice == TRUE)
-       {noted(Log, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mod");
+       {noted(Log, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
         note(Log, TRUE, "");}
     else
-       {note(Log, TRUE, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mod");
+       {note(Log, TRUE, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
         note(Log, TRUE, "");};
 
     fcsh = open_file("w", "%s/env-pact.csh", st.dir.inc);
-    fsh  = open_file("w", "%s/env-pact.sh", st.dir.inc);
-    fdk  = open_file("w", "%s/env-pact.dk", st.dir.inc);
-    fmd  = open_file("w", "%s/env-pact.mod", st.dir.inc);
+    fsh  = open_file("w", "%s/env-pact.sh",  st.dir.inc);
+    fdk  = open_file("w", "%s/env-pact.dk",  st.dir.inc);
+    fmd  = open_file("w", "%s/env-pact.mdl", st.dir.inc);
 
 /* initialize module with boilerplate */
     note(fmd, TRUE,  "#%%Module1.0");
@@ -781,9 +782,9 @@ static void write_envf(int lnotice)
     fclose(fmd);
 
     cat(Log, 0, -1, "%s/env-pact.csh", st.dir.inc);
-    cat(Log, 0, -1, "%s/env-pact.sh", st.dir.inc);
-    cat(Log, 0, -1, "%s/env-pact.dk", st.dir.inc);
-    cat(Log, 0, -1, "%s/env-pact.mod", st.dir.inc);
+    cat(Log, 0, -1, "%s/env-pact.sh",  st.dir.inc);
+    cat(Log, 0, -1, "%s/env-pact.dk",  st.dir.inc);
+    cat(Log, 0, -1, "%s/env-pact.mdl", st.dir.inc);
 
 /* source this now before trying to compile smake in write/smake */
     note(Log, TRUE, "Sourcing %s", st.env_csh);
@@ -1353,6 +1354,7 @@ static void default_var(char *base)
     snprintf(st.env_csh,  MAXLINE, "%s/env-pact.csh", st.dir.inc);
     snprintf(st.env_sh,   MAXLINE, "%s/env-pact.sh",  st.dir.inc);
     snprintf(st.env_dk,   MAXLINE, "%s/env-pact.dk",  st.dir.inc);
+    snprintf(st.env_mdl,  MAXLINE, "%s/env-pact.mdl", st.dir.inc);
 
     snprintf(st.dir.inc, MAXLINE, "%s/include", st.dir.root);
     snprintf(st.dir.lib, MAXLINE, "%s/lib",     st.dir.root);

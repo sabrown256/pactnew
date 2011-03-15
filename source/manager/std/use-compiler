@@ -134,12 +134,10 @@ foreach c ($fname $cname)
 # if blank try to find compiler on your path
    if ("$cpath" == "") then
       if (-x $DAI_ROOT/pact/scripts/$c) then
-         set cc = $DAI_ROOT/pact/scripts/$c
-         if ($c == $cname) then
-            set opt = ( $opt -cwvrb )
-            if ("$lvers" != "") then
-               set opt = ( $opt -cwvers $lvers )
-            endif
+         set cmp = $DAI_ROOT/pact/scripts/$c
+         set opt = ( $opt -cwvrb )
+         if ("$lvers" != "") then
+            set opt = ( $opt -cwvers $lvers )
          endif
       endif
 
@@ -147,41 +145,61 @@ foreach c ($fname $cname)
    else if ("$cpath" !~ /*) then
       set inf = ( `which $cpath` )
       if (-x "$inf") then
-         set cc = $inf
+         set cmp = $inf
       endif
 
    else if (-xf "$cpath") then
-      set cc = $cpath
+      set cmp = $cpath
 
 # try adding bin/$c
    else if (-x "$cpath/bin/$c") then
-      set cc = $cpath/bin/$c
+      set cmp = $cpath/bin/$c
 
    endif
 
-   set sdir = $cc:h
+   set sdir = $cmp:h
    set dirl = ( $dirl $sdir )
 
-# only take lvers and root from C compiler
-   if ($c == $cname) then
+# only take lfvers and froot from Fortran compiler
+   if ($c == $fname) then
       set bindir = $sdir
 
 # query the compiler for information
-      set inf = ( `$cc $opt |& $Awk "$prog"` )
+      set inf = ( `$cmp $opt |& $Awk "$prog"` )
       if ($#inf > 1) then
-         set lvers  = ( `echo $inf[2] | $Sed 's/[-_]/./g'` )
+         set lfvers = ( `echo $inf[2] | $Sed 's/[-_]/./g'` )
+         set fc     = $inf[1]
+         set bindir = $fc:h
+      else if ($#inf > 0) then
+         set fc     = $cmp
+         set lfvers = ( `echo $inf[1] | $Sed 's/[-_]/./g'` )
+      endif
+      set froot = $bindir:h
+      unset bindir
+
+# only take lcvers and croot from C compiler
+   else if ($c == $cname) then
+      set bindir = $sdir
+
+# query the compiler for information
+      set inf = ( `$cmp $opt |& $Awk "$prog"` )
+      if ($#inf > 1) then
+         set lcvers = ( `echo $inf[2] | $Sed 's/[-_]/./g'` )
          set cc     = $inf[1]
          set bindir = $cc:h
       else if ($#inf > 0) then
-         set lvers = ( `echo $inf[1] | $Sed 's/[-_]/./g'` )
+         set cc     = $cmp
+         set lcvers = ( `echo $inf[1] | $Sed 's/[-_]/./g'` )
       endif
-      set root = $bindir:h
+      set croot = $bindir:h
+      unset bindir
    endif
 end
 
 # check the bits for the compiler library
 if ("$lbits" == 32) then
-   set root = `echo $root | $Sed 's/-64//'`
+   set croot = `echo $croot | $Sed 's/-64//'`
+   set froot = `echo $froot | $Sed 's/-64//'`
 endif
 
 if ($#dirl == 1) then
@@ -191,12 +209,17 @@ else if ($dirl[1] == $dirl[2]) then
 else
    setenv PATH  ${dirl[1]}:${dirl[2]}':$PATH'
 endif
-setenv PACT_CC_VERSION  $lvers
-setenv PACT_CC_PATH     $root
+setenv PACT_CC_VERSION  $lcvers
+setenv PACT_CC_PATH     $croot
 setenv PACT_CC_EXE      $cc
 
+setenv PACT_FC_VERSION  $lfvers
+setenv PACT_FC_PATH     $froot
+setenv PACT_FC_EXE      $fc
+
 if ($PACT_CC_FAMILY == PATHSCALE) then
-   setenv PACT_CC_PATH  $PACT_CC_PATH/lib/$lvers
+   setenv PACT_CC_PATH  $PACT_CC_PATH/lib/$lcvers
+   setenv PACT_FC_PATH  $PACT_FC_PATH/lib/$lfvers
 endif
 
 SetParent PATH
@@ -204,6 +227,9 @@ SetParent PACT_CC_FAMILY
 SetParent PACT_CC_VERSION
 SetParent PACT_CC_PATH
 SetParent PACT_CC_EXE
+SetParent PACT_FC_VERSION
+SetParent PACT_FC_PATH
+SetParent PACT_FC_EXE
 
 source analyze/numa
 

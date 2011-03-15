@@ -15,6 +15,8 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 @ err = 0
 
 set sys = `system-id`
@@ -24,6 +26,7 @@ set base = $comp:h
 set comp = $comp:t
 if ($comp == ccomp) then
    set comp = gcc
+   set comp = pathcc
 endif
 if ($base == $comp) then
    set base = $cwd
@@ -105,6 +108,9 @@ if ($#inf < 4) then
    echo "No compiler found matching '$comp $vers' - exiting"
    exit(1)
 else
+#   if ($vrb == TRUE) then
+#      echo "Specification: $inf"
+#   endif
    shift inf
    shift inf
    shift inf
@@ -118,7 +124,10 @@ else
       set val = $inf[2]
       shift inf
       shift inf
-      setenv $var $val      
+      if ($vrb == TRUE) then
+         echo "   setenv $var $val"
+      endif
+      setenv $var $val
    end
 endif
 
@@ -139,18 +148,47 @@ if ($?MANPATH == 0) then
    setenv MANPATH  ":"
 endif
 
-# NOTE: newest GNU compilers require this because to run
-# for some reason they were not built with -rpath
-# this is not for the compiled executables
-if (($comp == gcc) || ($comp == g++) || ($comp == gfortran)) then
-   set GNU = $exe:h
-   set GNU = $GNU:h
-   setenv LD_LIBRARY_PATH  $GNU/lib64:$GNU/lib:${LD_LIBRARY_PATH}
+switch ($comp)
 
-   if (-d $GNU/share/man) then
-      setenv MANPATH   ${MANPATH}:$GNU/share/man
-   endif
-endif
+# NOTE: newest GNU compilers require this to run because
+# for some reason they were not built with -rpath
+# this is not for the compiled executables but the compiler
+   case gcc:
+   case g++:
+   case gfortran:
+        set root = $exe:h
+        set root = $root:h
+        if ("$LD_LIBRARY_PATH" == "") then
+           setenv LD_LIBRARY_PATH  $root/lib64:$root/lib
+        else
+           setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}
+        endif
+
+        if (-d $root/share/man) then
+           setenv MANPATH   ${MANPATH}:$root/share/man
+        endif
+        unset root
+        breaksw
+
+   case pathcc:
+   case pathCC:
+   case pathf90:
+        set root  = $exe:h
+        set root  = $root:h
+        set lvers = `ls $root/lib`
+        if ("$LD_LIBRARY_PATH" == "") then
+           setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32
+        else
+           setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}
+        endif
+
+        if (-d $root/man) then
+           setenv MANPATH   ${MANPATH}:$root/man
+        endif
+        unset root
+        breaksw
+endsw
+
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -17,6 +17,7 @@ if ($?Log == 1) then
    Note $Log "Analyze: mpi"
 endif
 
+SafeEnv REQUEST_MPI     FALSE
 SafeEnv ParCommSupport  PARC
 SafeEnv MPIGoodIO       FALSE
 SafeEnv MPIAllStdin     FALSE
@@ -25,6 +26,14 @@ SafeEnv LibMPI          ""
 SafeEnv MPILib          ""
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
+
+# NOTE: because locate-mpi ends up getting MPILib on your RPATH
+# before feature/mpi is invoked you can end up with MPI
+# libary paths in your link line for non-MPI builds
+# so if feature/mpi is not invoked remove MPILib from RPATH
+if ($REQUEST_MPI == FALSE) then
+   ../analyze/rpath -d $MPILib
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -75,7 +84,6 @@ Note $ALog "lParComm = $lParComm"
 
 if ("$lParComm" =~ *mpi*) then
 
-#   setenv DP_Lib  "$LibMPI"
    set llib = ""
    foreach i ($MPILib)
       set llib = ( $llib -L$i )
@@ -157,14 +165,14 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ("$lParComm" == no) then
+if (("$lParComm" == no) || ($REQUEST_MPI == FALSE)) then
    setenv LibMPI    ""
    setenv MPILib    ""
    setenv DP_Inc    ""
    setenv DP_Lib    ""
    NoteD $ALog "      no MPI"
 
-else if ("$lParComm" != "") then
+else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
    NoteD $ALog "      has MPI"
    NoteD $ALog "         $LibMPI"
    NoteD $ALog "         stdin $MPIStdIO"
