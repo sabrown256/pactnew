@@ -16,15 +16,14 @@ setenv PACT_CC_FAMILY    generic
 setenv PACT_CC_EXE       `which cc`
 setenv PACT_CC_VERSION   ""
 
+setenv PACT_FC_FAMILY    generic
+setenv PACT_FC_VERSION   ""
+
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
 setenv RootInc  /usr/include
 
-setenv LIB      lib
-setenv MPIBin   /usr/bin
-setenv MPILib   /usr/lib
-setenv IncMPI   ""
-setenv LibMPI   ""
+setenv LIB       lib
 
 setenv SUFFIXES  '.i'
 
@@ -41,6 +40,35 @@ Tool LD {
 }
 
 # define some groups for analysis
+
+# machine dependent graphics for PGS - e.g. X11
+Group MDG {
+   Inc   = ""
+   Lib   = ""
+   Pck   = ""
+}
+
+# machine dependent I/O for PDB - e.g. SQL
+Group MDI {
+   Inc   = ""
+   Lib   = ""
+   Pck   = ""
+}
+
+# other machine dependent packages for PACT - e.g. RL
+Group MD {
+   Inc   = ""
+   Lib   = ""
+   Pck   = ""
+}
+
+# distributed processing group
+Group DP {
+   Inc   = ""
+   Lib   = ""
+   RPath = /usr/lib
+   Path  = /usr/bin
+}
 
 Group Z {
 }

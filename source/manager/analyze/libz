@@ -18,10 +18,10 @@ Note $Log "Analyze: libz"
 SafeEnv MD_Inc    ""
 SafeEnv MD_Lib    ""
 SafeEnv MD_Pck    ""
-SafeEnv Z_Path    /usr
-SafeEnv Z_RPath   /usr/lib
 SafeEnv Z_Inc     ""
 SafeEnv Z_Lib     ""
+SafeEnv Z_RPath   /usr/lib
+SafeEnv Z_Path    /usr
 
 # if we have explicitly said we do not want libZ do NOT detect it
 if ("$Z_Path" == none) then
@@ -79,16 +79,19 @@ EOF
          flog $ALog setenv RPATH    ${RPATH}:${PckPath}
       endif
       flog $ALog setenv MD_Lib      "$MD_Lib $PckLib"
-      flog $ALog setenv MD_Pck      "$MD_Pck Z"
+      flog $ALog setenv MD_Pck      "Z $MD_Pck"
       flog $ALog setenv HAVE_ZLIB   TRUE
    else
       NoteD $ALog "      no libz"
       flog $ALog setenv HAVE_ZLIB   ""
    endif
 
-   setenv Z_RPath "$PckPath"
-   setenv Z_Lib   "$PckLib"
    setenv Z_Inc   "$PckInc"
+   setenv Z_Lib   "$PckLib"
+   setenv Z_RPath "$PckPath"
+
+# NOTE: used Z_Path to find libs, incs - there are no executables
+   setenv Z_Path ""
 
    set ETime = `timer -b $UTime`
 
@@ -97,10 +100,10 @@ EOF
    SetParent MD_Inc
    SetParent MD_Lib
    SetParent MD_Pck
-   SetParent Z_Path
-   SetParent Z_RPath
-   SetParent Z_Lib
    SetParent Z_Inc
+   SetParent Z_Lib
+   SetParent Z_RPath
+   SetParent Z_Path
 
 endif
 

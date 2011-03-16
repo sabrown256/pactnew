@@ -52,6 +52,14 @@ HAVE_SUBROUTINES
        set FCBin = none
     endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SITE - generate the site definition info
+
+    Note $FOUT '# SITE specifications'
+    Note $FOUT ""
+
 # site signature variables
     Note $FOUT "SYS_SITE = $SYS_SITE"
     Note $FOUT "SYS_TYPE = $SYS_TYPE"
@@ -108,9 +116,10 @@ HAVE_SUBROUTINES
     Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
     Note $FOUT ""
 
-    Note $FOUT 'VMake = PACT_FC_VERSION PACT_FC_PATH $@'
-    Note $FOUT 'VEnv  = PACT_FC_VERSION PACT_FC_PATH $@'
+    Note $FOUT 'VMake = PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH $@'
+    Note $FOUT 'VEnv  = PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH $@'
     Note $FOUT ""
+    Note $FOUT "PACT_FC_FAMILY  = $PACT_FC_FAMILY"
     Note $FOUT "PACT_FC_VERSION = $PACT_FC_VERSION"
     Note $FOUT "PACT_FC_PATH    = $PACT_FC_PATH"
     Note $FOUT ""
@@ -228,11 +237,10 @@ HAVE_SUBROUTINES
     Note $FOUT '}'
     Note $FOUT ""
 
-    Note $FOUT 'Library/pact {'
-    Note $FOUT '  Archives  = pgs ppc pdb pml score'
-    Note $FOUT '  IncPaths  = '$proot/include
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-#    set lrpath = `analyze/rpath -o list`
+# emit the PACT Library
     set lrpath = ""
     if ($?PACT_CC_PATH == 1) then
        if (-d ${PACT_CC_PATH}/lib$Bits) then
@@ -242,62 +250,123 @@ HAVE_SUBROUTINES
        endif
     endif
 
-# temporary expedient
-#    Note $FOUT '  LibPaths  = '$proot/lib $LibM_RPath
-    Note $FOUT '  LibPaths  = '$proot/lib
-    Note $FOUT '  RPaths    = '$lrpath
-    Note $FOUT '  LDFlags   = '$LD_Lib $MDG_Lib
-#    Note $FOUT '  LDFlags   = '$LD_Lib $MDG_Lib $MD_Lib $LibM_Lib
+# PACT Library
+    Note $FOUT 'Library/pact {'
+    Note $FOUT '  Libraries = pgs pdb pml score'
+    Note $FOUT '}'
+    Note $FOUT ''
 
+# SCORE Library
     set llibs = ""
     foreach p ($MD_Pck)
+       if ($p != DP) then
+          set lp = `echo $p | tr "[A-Z]" "[a-z]"`
+          set llibs = ( $llibs $lp )
+       endif
+    end
+
+    Note $FOUT 'Library/score {'
+    Note $FOUT '  Archives  = score'
+    Note $FOUT '  IncPaths  = '$proot/include
+    Note $FOUT '  LibPaths  = '$proot/lib
+    Note $FOUT '  RPaths    = '$lrpath
+    Note $FOUT '  LDFlags   = '$LD_Lib
+    Note $FOUT '  Libraries = '$llibs
+    Note $FOUT '}'
+    Note $FOUT ''
+    unset llibs
+
+# PML Library
+    Note $FOUT 'Library/pml {'
+    Note $FOUT '  Archives  = pml'
+    Note $FOUT '  Libraries = score'
+    Note $FOUT '}'
+    Note $FOUT ''
+
+# PDB Library
+    set llibs = ""
+    foreach p ($MDI_Pck)
        set lp = `echo $p | tr "[A-Z]" "[a-z]"`
        set llibs = ( $llibs $lp )
     end
-    Note $FOUT '  Libraries = '$llibs
+
+    Note $FOUT 'Library/pdb {'
+    Note $FOUT '  Archives  = pdb'
+    Note $FOUT '  Libraries = pml' $llibs
+    Note $FOUT '}'
+    Note $FOUT ''
     unset llibs
 
+# PGS Library
+    set llibs = ""
+    foreach p ($MDG_Pck)
+       set lp = `echo $p | tr "[A-Z]" "[a-z]"`
+       set llibs = ( $llibs $lp )
+    end
+
+    Note $FOUT 'Library/pgs {'
+    Note $FOUT '  Archives  = pgs ppc'
+    Note $FOUT '  Libraries = pml' $llibs
     Note $FOUT '}'
-    Note $FOUT ""
+    Note $FOUT ''
+
+    unset llibs
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# MATH - generate MATH library configuration info
+# PACKAGES - generate configuration info packages
 
-if (0) then
-    if ("$LibM_Lib" != "") then
-       set libm = `echo $LibM_Lib | sed 's/-l//'`
-
-       Note $FOUT '# MATH specifications'
+    foreach p ($MDG_Pck $MDI_Pck $MD_Pck)
+       Note $FOUT "# $p package"
        Note $FOUT ""
-       Note $FOUT 'Library/lib_math {'
-       Note $FOUT '  Archives = '$libm
-       Note $FOUT '  LibPaths = '$LibM_RPath
-       Note $FOUT '  RPaths   = '$LibM_RPath
-       Note $FOUT '}'
+
+       set lp    = `echo $p | tr "[A-Z]" "[a-z]"`
+       set lar   = ( `printenv ${p}_Lib | sed 's|-l||g'` )
+       set linc  = ( `printenv ${p}_Inc | sed 's|-I||g'` )
+       set lrpth = `printenv ${p}_RPath`
+
+# emit the package only if at least one element is non-empty
+       if (("$lar" != "") || ("$linc" != "") || ("$lrpth" != "")) then
+          Note $FOUT "Library/$lp {"
+          Note $FOUT '  Archives = '$lar
+          Note $FOUT '  IncPaths = '$linc
+          Note $FOUT '  LibPaths = '$lrpth
+          Note $FOUT '  RPaths   = '$lrpth
+          Note $FOUT '}'
+          Note $FOUT ""
+       endif
+    end
+
+# see if any package has additions to the PATH
+    set lpth = ""
+    foreach p ($MDG_Pck $MDI_Pck $MD_Pck)
+       set lval = ( `printenv ${p}_Path` )
+       if ("$lval" != "") then
+          set lpth = ( $lpth $lval )
+       endif
+    end
+    if ("$lpth" != "") then
+       Note $FOUT 'Path = '$lpth' $@'
        Note $FOUT ""
     endif
-endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # MPI - generate MPI configuration info
+#     - this is completely redundant and should be remove
+#     - when basis/features/mpi has Libraries += dp
+#     - instead of Libraries += lib_pact_mpi
 
     if ("$DP_Lib" != "") then
        Note $FOUT '# MPI specifications'
        Note $FOUT ""
 
-       if ($?MPIBin == 1) then
-          Note $FOUT 'Path = '${MPIBin}' $@'
-       endif
-       Note $FOUT ""
-
-       set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
+       set linc = ( `echo "$DP_Inc" | sed 's/-I//g'` )
 
        set lar = ""
-       foreach i ($LibMPI)
+       foreach i ($DP_Lib)
           if ("$i" =~ \-L*) then
              continue
           else if ("$i" =~ \-l*) then
@@ -307,39 +376,12 @@ endif
        Note $FOUT 'Library/lib_pact_mpi {'
        Note $FOUT '  Archives = '$lar
        Note $FOUT '  IncPaths = '$linc
-       Note $FOUT '  LibPaths = '${MPILib}
-       Note $FOUT '  RPaths   = '${MPILib}
+       Note $FOUT '  LibPaths = '${DP_RPath}
+       Note $FOUT '  RPaths   = '${DP_RPath}
        Note $FOUT '}'
        Note $FOUT ""
 
     endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# PACKAGES - generate configuration info for Packages
-
-    foreach p ($MD_Pck)
-       Note $FOUT "# $p package"
-       Note $FOUT ""
-
-       set lp = `echo $p | tr "[A-Z]" "[a-z]"`
-
-       set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
-
-       set lar   = ( `printenv ${p}_Lib | sed 's|-l||g'` )
-       set linc  = ( `printenv ${p}_Inc | sed 's|-I||g'` )
-       set lrpth = `printenv ${p}_RPath`
-
-       Note $FOUT "Library/$lp {"
-       Note $FOUT '  Archives = '$lar
-       Note $FOUT '  IncPaths = '$linc
-       Note $FOUT '  LibPaths = '$lrpth
-       Note $FOUT '  RPaths   = '$lrpth
-       Note $FOUT '}'
-       Note $FOUT ""
-
-    end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

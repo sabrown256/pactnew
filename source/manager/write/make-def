@@ -392,8 +392,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
     Note $STDOUT "LDFLAGS    = ${LD_Flags}"' ${LDRPath} ${LDPath}'
     Note $STDOUT "LXFLAGS    = ${Lex_Flags}"
-    Note $STDOUT "MDInc      = ${MD_Inc} ${CC_Inc}"
-    Note $STDOUT "MDLib      = ${MD_Lib} ${LD_Lib} ${LibM_Lib}"
+    Note $STDOUT "MDInc      = ${MDI_Inc} ${MD_Inc} ${CC_Inc}"
+    Note $STDOUT "MDLib      = ${MDI_Lib} ${MD_Lib} ${LD_Lib} ${LibM_Lib}"
     Note $STDOUT "DPInc      = ${DP_Inc}"
     Note $STDOUT "DPLib      = ${DP_Lib}"
     Note $STDOUT ""

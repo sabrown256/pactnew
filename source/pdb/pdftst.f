@@ -1,59 +1,59 @@
-c
-c Fortran routine to test the Fortran application interface to
-c the PACT pdb library.
-c
-c Source Version: 3.0
-c Software Release #: LLNL-CODE-422942
-c include "cpyright.h"
-c
-c Usage: 
-c   pdftst [help|-h]
-c     Print this help package
-c  
-c   pdftst
-c     Test attributes; make directory;
-c     write curve, image and mappings in
-c     directory dir1; write double as float
-c     to CRAY Unicos file.
-c  
-c   pdftst [-p] [-a] [-d] [-o opt] [-as] [-t]
-c     -p   PRINT progress to terminal          (df = false)
-c     -a   Define, set, remove attributes      (df = true)
-c     -d   Make Directory                      (df = false)
-c     -o   Write curve,image and mappings:     (df = 0)
-c            0 - none
-c            1 - before directory created
-c            2 - in root directory
-c            3 - in directory dir1
-c     -as f|d                                  (df = d)
-c          Set write_as to float or double
-c     -t   Set target to CRAY Unicos           (df = false)
-c
+!
+! Fortran routine to test the Fortran application interface to
+! the PACT pdb library.
+!
+! Source Version: 3.0
+! Software Release #: LLNL-CODE-422942
+! include "cpyright.h"
+!
+! Usage: 
+!   pdftst [help|-h]
+!     Print this help package
+!  
+!   pdftst
+!     Test attributes; make directory;
+!     write curve, image and mappings in
+!     directory dir1; write double as float
+!     to CRAY Unicos file.
+!  
+!   pdftst [-p] [-a] [-d] [-o opt] [-as] [-t]
+!     -p   PRINT progress to terminal          (df = false)
+!     -a   Define, set, remove attributes      (df = true)
+!     -d   Make Directory                      (df = false)
+!     -o   Write curve,image and mappings:     (df = 0)
+!            0 - none
+!            1 - before directory created
+!            2 - in root directory
+!            3 - in directory dir1
+!     -as f|d                                  (df = d)
+!          Set write_as to float or double
+!     -t   Set target to CRAY Unicos           (df = false)
+!
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c PDFTST - main test routine
+! PDFTST - main test routine
 
       program pdftst
       implicit none 
 
-c     Program input command option flags:
+!     Program input command option flags:
       logical PRINT
       logical DIR
       logical TARGET
       logical ATTR
 
-c     OPTION determines when curve, image and mappings are written:
-c        0 - none
-c        1 - before directory created
-c        2 - in root directory
-c        3 - in directory dir1
+!     OPTION determines when curve, image and mappings are written:
+!        0 - none
+!        1 - before directory created
+!        2 - in root directory
+!        3 - in directory dir1
       character*8  OPTION
       integer LAST
       real*8 TOLERANCE
 
-c     PDBlib Fortran ADI:
+! ... PDBlib Fortran API
       integer pfopen, pfsbfs, pfgbfs, pfsoff
       integer pfgoff, pfdefs, pfwrta, pfclos
       integer pfityp, pfivar, pfread, pfptrd
@@ -120,7 +120,7 @@ c     PDBlib Fortran ADI:
       err = pfinth(0, 0)
       err = sczrsp(0)
 
-c     ..........initialize input command option flags
+! ... initialize input command option flags
       PRINT  = .false.
       DIR    = .false.
       TARGET = .false.
@@ -136,9 +136,9 @@ c     ..........initialize input command option flags
          write(6,2)
  2       format(/,'Version call failed')
          stop 1
-c      else
-c         write(6,3) vers
-c 3       format(/,'A version: ',a)
+!      else
+!         write(6,3) vers
+! 3       format(/,'A version: ',a)
       endif
 
       narg = iargc()
@@ -189,23 +189,23 @@ c 3       format(/,'A version: ',a)
             write(6,*) '    to CRAY Unicos file.'
             write(6,*) ' '
             write(6,*) '  pdftst [-p] [-a] [-d] [-o opt] [-as] [-t]'
-            write(6,*) 
-     $           '    -p   PRINT progress to terminal     (df=false)'
-            write(6,*) 
-     $           '    -a   Define, set, remove attributes (df=true)'
-            write(6,*) 
-     $           '    -d   Make Directory                 (df=false)'
-            write(6,*) 
-     $           '    -o   Write curve,image and mappings:    (df=0)'
+            write(6,*) &
+                 '    -p   PRINT progress to terminal     (df=false)'
+            write(6,*) &
+                 '    -a   Define, set, remove attributes (df=true)'
+            write(6,*) &
+                 '    -d   Make Directory                 (df=false)'
+            write(6,*) &
+                 '    -o   Write curve,image and mappings:    (df=0)'
             write(6,*) '           0 - none'
             write(6,*) '           1 - before directory created'
             write(6,*) '           2 - in root directory'
             write(6,*) '           3 - in directory dir1'
-            write(6,*) 
-     $           '    -as f|d                                 (df=d)'
+            write(6,*) &
+                 '    -as f|d                                 (df=d)'
             write(6,*) '         Set write_as to float or double'
-            write(6,*) 
-     $            '    -t   Set target to CRAY Unicos     (df=false)'
+            write(6,*) &
+                  '    -t   Set target to CRAY Unicos     (df=false)'
             stop 1
          endif
          iarg = iarg + 1
@@ -218,8 +218,7 @@ c 3       format(/,'A version: ',a)
  1       format(/,'A date: ',a)
       endif
 
-c     ..........initialization
-
+! ... initialization
       do 100 i = 1, 20
          x(i) = float(i)
  100  continue
@@ -228,8 +227,7 @@ c     ..........initialization
          a(i) = float(i)
  101  continue
 
-c     ..........initialize zz array (a(94)...)
-
+! ... initialize zz array (a(94)...)
       do 102 i = 1, 40
          a(i+93) = float(i) + 1000.0
          a(i+40+93) = 2*(float(i) + 1000.0)
@@ -243,8 +241,7 @@ c     ..........initialize zz array (a(94)...)
       k = 2
       l = 3
 
-c     ..........set and get buffer size
-
+! ... set and get buffer size
       bufsiz1 = 4096
       bufsiz2 = pfsbfs(bufsiz1)
       bufsiz3 = pfgbfs()
@@ -259,45 +256,40 @@ c     ..........set and get buffer size
  201     format(/,'Buffer size in bytes:',i8)
       endif
 
-      if ((bufsiz1 .ne. bufsiz2) .or. (bufsiz2 .ne. bufsiz3))
-     $     call errproc
+      if ((bufsiz1 .ne. bufsiz2) .or. (bufsiz2 .ne. bufsiz3)) &
+         call errproc
 
-c     ..........set target architecture
-
+! ... set target architecture
       if (TARGET) then
          if (PRINT) then
             write(6,205)
  205        format(/,'TARGET is CRAY_STD with UNICOS_ALIGNMENT')
          endif
-c        CRAY_STD 
+!        CRAY_STD 
          is = 7
-c        UNICOS_ALIGNMENT
+!        UNICOS_ALIGNMENT
          ia = 7
-         if (pftrgt(is, ia) .eq. 0)
-     $        call errproc
+         if (pftrgt(is, ia) .eq. 0) &
+            call errproc
       endif
 
-c     ..........open file for writing
-
+! ... open file for writing
       fileid = pfopen(8, 'file.pdb', 'w')
-      if (fileid .le. 0)
-     $     call errproc
+      if (fileid .le. 0) &
+         call errproc
 
-c     ..........faux fam
+! ... faux fam
+      if (pffami(fileid, 1) .eq. 0) &
+         call errproc
 
-      if (pffami(fileid, 1) .eq. 0)
-     $     call errproc
+! ... check file mode
+      if (pfgmod(fileid) .ne. 4) &
+         call errproc
 
-c     ..........check file mode
-
-      if (pfgmod(fileid) .ne. 4)
-     $     call errproc
-
-c     ..........set and get and verify default offset
-
+! ... set and get and verify default offset
       offset = 1
-      if (pfsoff(fileid, offset) .eq. 0)
-     $     call errproc
+      if (pfsoff(fileid, offset) .eq. 0) &
+         call errproc
       offset = pfgoff(fileid)
 
       if (PRINT) then
@@ -305,16 +297,15 @@ c     ..........set and get and verify default offset
  300     format(/,'Current default offset:',i4)
       endif
 
-      if (offset .ne. 1)
-     $     call errproc
+      if (offset .ne. 1) &
+         call errproc
 
-c     ..........write at least one variable before creating a directory
+! ... write at least one variable before creating a directory
+      if (pfwrta(fileid, 5, 'x(20)', 6, 'double', x) .eq. 0) &
+         call errproc
 
-      if (pfwrta(fileid, 5, 'x(20)', 6, 'double', x) .eq. 0)
-     $     call errproc
-
-      if (pfappa(fileid, 7, 'x(1:10)', x) .eq. 0)
-     $     call errproc
+      if (pfappa(fileid, 7, 'x(1:10)', x) .eq. 0) &
+         call errproc
 
 
       if (PRINT) then 
@@ -322,36 +313,32 @@ c     ..........write at least one variable before creating a directory
  301     format(/,'Variable X written and appended to')
       endif
 
-c     ..........write curve, image, and mappings before creating directory
-
+! ... write curve, image, and mappings before creating directory
       if (OPTION .eq. "1") then
          call wrtcur(fileid)
          call wrtima(fileid)
          call wrtmap(fileid)
       endif
 
-c     ..........create a directory
-
+! ... create a directory
       if (DIR) then
-         if (pfmkdr(fileid, 4, "dir1") .eq. 0)
-     $        call errproc
+         if (pfmkdr(fileid, 4, "dir1") .eq. 0) &
+            call errproc
       endif
 
-c     ..........get current working directory
-
-      if (pfpwd(fileid, nchar, name) .eq. 0)
-     $     call errproc
+! ... get current working directory
+      if (pfpwd(fileid, nchar, name) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,350) (name(i), i=1,nchar)
  350     format(/,'Current working directory:  ',256a1)
       endif
 
-      if ((name(1) .ne. '/') .or. (nchar .ne. 1))
-     $     call errproc
+      if ((name(1) .ne. '/') .or. (nchar .ne. 1)) &
+         call errproc
 
-c     ..........write curve, image, and mappings in root after creating directory
-
+! ... write curve, image, and mappings in root after creating directory
       if (OPTION .eq. "2") then
          call wrtcur(fileid)
          call wrtima(fileid)
@@ -360,13 +347,12 @@ c     ..........write curve, image, and mappings in root after creating director
 
       x(1) = 100
 
-c     ..........write  data item z   write_as,  append,  append_alt
+! ... write  data item z   write_as,  append,  append_alt
+      if (pfwras(fileid, 8, 'z(4,5,1)', 6, 'double', 6, 'double', z) &
+            .eq. 0)  call errproc
 
-      if (pfwras(fileid, 8, 'z(4,5,1)', 6, 'double', 6, 'double', z)
-     $      .eq. 0)  call errproc
-
-      if (pfappa(fileid, 14, 'z(1:4,1:5,1:1)', z) .eq. 0)
-     $     call errproc
+      if (pfappa(fileid, 14, 'z(1:4,1:5,1:1)', z) .eq. 0) &
+         call errproc
 
       ndims = 3
       dims(1) = 1
@@ -378,11 +364,11 @@ c     ..........write  data item z   write_as,  append,  append_alt
       dims(7) = 1
       dims(8) = 2
       dims(9) = 1
-      if (pfappd(fileid, 1, 'z', z, ndims, dims) .eq. 0)
-     $     call errproc
+      if (pfappd(fileid, 1, 'z', z, ndims, dims) .eq. 0) &
+         call errproc
 
-c     ..........write  data item zz   write_as_alt
-c                                     append_as,  append_as_alt
+! ... write  data item zz   write_as_alt
+!                                     append_as,  append_as_alt
 
       ndims = 3
       dims(1) = 1
@@ -394,11 +380,11 @@ c                                     append_as,  append_as_alt
       dims(7) = 1
       dims(8) = 1
       dims(9) = 1
-      if (pfwrad(fileid, 2,'zz', 6,'double', nout, outtype, zz,
-     $      ndims, dims) .eq. 0)  call errproc
+      if (pfwrad(fileid, 2,'zz', 6,'double', nout, outtype, zz,&
+            ndims, dims) .eq. 0)  call errproc
 
-      if (pfapas(fileid, 15, 'zz(1:4,1:5,1:1)', 6,'double', zz(1,1,2))
-     $      .eq. 0)  call errproc
+      if (pfapas(fileid, 15, 'zz(1:4,1:5,1:1)', 6,'double', zz(1,1,2)) &
+            .eq. 0)  call errproc
 
       ndims = 3
       dims(1) = 1
@@ -410,8 +396,8 @@ c                                     append_as,  append_as_alt
       dims(7) = 1
       dims(8) = 2
       dims(9) = 1
-      if (pfapad(fileid, 2, 'zz', 6, 'double', zzx, ndims, dims) .eq. 0)
-     $     call errproc
+      if (pfapad(fileid, 2, 'zz', 6, 'double', zzx, ndims, dims) .eq. 0) &
+         call errproc
 
 
       if (PRINT) then 
@@ -419,44 +405,40 @@ c                                     append_as,  append_as_alt
  305     format(/,'Variables z and zz written',/)
       endif
 
-c     ..........change directory
-
+! ... change directory
       if (DIR) then
-         if (pfcd(fileid, 4, "dir1") .eq. 0)
-     $        call errproc
+         if (pfcd(fileid, 4, "dir1") .eq. 0) &
+            call errproc
       endif
 
-c     ..........get current working directory
-
-      if (pfpwd(fileid, nchar, name) .eq. 0)
-     $     call errproc
+! ... get current working directory
+      if (pfpwd(fileid, nchar, name) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,350) (name(i), i=1,nchar)
       endif
 
-      if (((.not. DIR) .and. (nchar .ne. 1)) .or.
-     $    (DIR .and. (nchar .ne. 5)))
-     $     call errproc
+      if (((.not. DIR) .and. (nchar .ne. 1)) .or.&
+          (DIR .and. (nchar .ne. 5))) &
+         call errproc
 
-c     ..........create a link
-
+! ... create a link
       if (DIR) then
-         if (pfln(fileid, 2, '/x', 6, 'x_link') .eq. 0)
-     $        call errproc
+         if (pfln(fileid, 2, '/x', 6, 'x_link') .eq. 0) &
+            call errproc
       else
-         if (pfln(fileid, 1, 'x', 6, 'x_link') .eq. 0)
-     $        call errproc
+         if (pfln(fileid, 1, 'x', 6, 'x_link') .eq. 0) &
+            call errproc
       endif
 
-c     ..........define and write some data structures
+! ... define and write some data structures
+      if (pfdefs(fileid, 3, 'abc', 11, 'double a(2)', 8, 'double b',&
+           15, 'double c(2,2:4)', LAST) .eq. 0) &
+         call errproc
 
-      if (pfdefs(fileid, 3, 'abc', 11, 'double a(2)', 8, 'double b',
-     $     15, 'double c(2,2:4)', LAST) .eq. 0)
-     $     call errproc
-
-      if (pfwrta(fileid, 3, 'abc', 3, 'abc', a) .eq. 0)
-     $     call errproc
+      if (pfwrta(fileid, 3, 'abc', 3, 'abc', a) .eq. 0) &
+         call errproc
 
       pairs(1) = 0
       pairs(2) = 5
@@ -464,14 +446,13 @@ c     ..........define and write some data structures
       pairs(4) = 5
       pairs(5) = 10
       pairs(6) = 5
-      if (pfdeft(fileid, 3, 'jkl', 3, pairs, 'int jint kint l') .eq. 0)
-     $     call errproc
+      if (pfdeft(fileid, 3, 'jkl', 3, pairs, 'int jint kint l') .eq. 0) &
+         call errproc
 
-      if (pfwrta(fileid, 3, 'jkl', 3, 'jkl', j) .eq. 0)
-     $     call errproc
+      if (pfwrta(fileid, 3, 'jkl', 3, 'jkl', j) .eq. 0) &
+         call errproc
 
-c     ..........define and write arrays of strings
-
+! ... define and write arrays of strings
       strings(1) = 'abcdefgh'
       strings(2) = 'hgfedcba'
       strings(3) = 'ijklmnop'
@@ -484,29 +465,27 @@ c     ..........define and write arrays of strings
       dims(4) = 1
       dims(5) = 4
       dims(6) = 1
-      if (pfwrtd(fileid, 7, 'strings', 4, 'char', istring,
-     $     ndims, dims) .eq. 0)
-     $     call errproc
+      if (pfwrtd(fileid, 7, 'strings', 4, 'char', istring,&
+           ndims, dims) .eq. 0) &
+         call errproc
 
-c     ..........define an attribute
-
+! ... define an attribute
       if (ATTR) then
-         if (pfdatt(fileid, 4, 'date', 6, 'char *') .eq. 0)
-     $        call errproc
+         if (pfdatt(fileid, 4, 'date', 6, 'char *') .eq. 0) &
+            call errproc
       endif
 
-c     ..........define some symbol table entries and reserve disk space
-
-      if (pfdefa(fileid, 14, 'f(0:3,4:6,1:2)', 6, 'double') .eq. 0)
-     $     call errproc
+! ... define some symbol table entries and reserve disk space
+      if (pfdefa(fileid, 14, 'f(0:3,4:6,1:2)', 6, 'double') .eq. 0) &
+         call errproc
 
       ndims = 2
       dims(1) = 1
       dims(2) = 5
       dims(3) = 2
       dims(4) = 10
-      if (pfdefd(fileid, 1, 'g', 6, 'double', ndims, dims) .eq. 0)
-     $     call errproc
+      if (pfdefd(fileid, 1, 'g', 6, 'double', ndims, dims) .eq. 0) &
+         call errproc
 
       ndims = 2
       dims(1) = 1
@@ -517,18 +496,18 @@ c     ..........define some symbol table entries and reserve disk space
       dims(6) = 1
       g(1,2) = 100
       g(2,2) = 101
-      if (pfwrtd(fileid, 1, 'g', 6, 'double', g, ndims, dims) .eq. 0)
-     $     call errproc
-c      if (pfwrtd(fileid, 6, 'g[1,2]', 6, 'double', g, ndims, dims)
-c     $     .eq. 0)
-c     $     call errproc
+      if (pfwrtd(fileid, 1, 'g', 6, 'double', g, ndims, dims) .eq. 0) &
+         call errproc
+!      if (pfwrtd(fileid, 6, 'g[1,2]', 6, 'double', g, ndims, dims) &
+!           .eq. 0) &
+!         call errproc
 
       ndims = 1
       dims(1) = 1
       dims(2) = 2
       dims(3) = 1
-      if (pfwrtd(fileid, 1, 'a', 6, 'double', a, ndims, dims) .eq. 0)
-     $     call errproc
+      if (pfwrtd(fileid, 1, 'a', 6, 'double', a, ndims, dims) .eq. 0) &
+         call errproc
 
       ndims = 2
       dims(1) = 1
@@ -537,99 +516,87 @@ c     $     call errproc
       dims(4) = 2
       dims(5) = 4
       dims(6) = 1
-      if (pfwrtd(fileid, 1, 'c', 6, 'double', c, ndims, dims) .eq. 0)
-     $     call errproc
+      if (pfwrtd(fileid, 1, 'c', 6, 'double', c, ndims, dims) .eq. 0) &
+         call errproc
 
-c     ..........create a link
+! ... create a link
+      if (pfln(fileid, 3, 'jkl', 9, '/jkl_link') .eq. 0) &
+         call errproc
 
-      if (pfln(fileid, 3, 'jkl', 9, '/jkl_link') .eq. 0)
-     $     call errproc
-
-c     ..........set attribute value for member of struct
-
+! ... set attribute value for member of struct
       if (ATTR) then
-         if (pfsvat(fileid, 11, '/jkl_link.k', 4, 'date', date) .eq. 0)
-     $        call errproc
+         if (pfsvat(fileid, 11, '/jkl_link.k', 4, 'date', date) .eq. 0) &
+            call errproc
       endif
 
-c     ..........write curve, image, and mappings in a directory
-
+! ... write curve, image, and mappings in a directory
       if (OPTION .eq. "3") then
          call wrtcur(fileid)
          call wrtima(fileid)
          call wrtmap(fileid)
       endif
 
-c     ..........flush the file
+! ... flush the file
+      if (pfflsh(fileid) .eq. 0) &
+         call errproc
 
-      if (pfflsh(fileid) .eq. 0)
-     $     call errproc
+! ... close the file
+      if (pfclos(fileid) .eq. 0) &
+         call errproc
 
-c     ..........close the file
-
-      if (pfclos(fileid) .eq. 0)
-     $     call errproc
-
-c     ..........open the file for reading
-
+! ... open the file for reading
       fileid = pfopen(8, 'file.pdb', 'a')
-      if (fileid .eq. 0)
-     $     call errproc
+      if (fileid .eq. 0) &
+         call errproc
 
-c     ..........get file name given id
-
+! ... get file name given id
       nchar = 8
-      if (pfgfnm(fileid, nchar, name1) .eq. 0)
-     $     call errproc
+      if (pfgfnm(fileid, nchar, name1) .eq. 0) &
+         call errproc
 
       name2 = 'file.pdb'
-      if (name1 .ne. name2)
-     $     call errproc
+      if (name1 .ne. name2) &
+         call errproc
 
-c     ..........check file mode
+! ... check file mode
+      if (pfgmod(fileid) .ne. 2) &
+         call errproc
 
-      if (pfgmod(fileid) .ne. 2)
-     $     call errproc
-
-c     ..........retrieve and verify the value of an attribute
-
+! ... retrieve and verify the value of an attribute
       if (ATTR) then
-         if (pfcd(fileid, 4, "dir1") .eq. 0)
-     $        call errproc
+         if (pfcd(fileid, 4, "dir1") .eq. 0) &
+            call errproc
 
-         if (pfgvat(fileid, 11, '/jkl_link.k', 4, 'date', dt) .eq. 0)
-     $        call errproc
+         if (pfgvat(fileid, 11, '/jkl_link.k', 4, 'date', dt) .eq. 0) &
+            call errproc
 
          if (PRINT) then
             write(6,1) dt
          endif
 
          do 375 i = 1, 25
-            if (date(i:i) .ne. dt(i:i))
-     $           call errproc
+            if (date(i:i) .ne. dt(i:i)) &
+               call errproc
  375     continue
 
-c     ..........remove an attribute
+! ... remove an attribute
+         if (pfratt(fileid, 4, 'date') .eq. 0) &
+            call errproc
 
-         if (pfratt(fileid, 4, 'date') .eq. 0)
-     $        call errproc
-
-c     ..........verify that attribute was removed
-
-         if (pfgvat(fileid, 11, '/jkl_link.k', 4, 'date', dt)
-     $        .ne. 0) then
+! ... verify that attribute was removed
+         if (pfgvat(fileid, 11, '/jkl_link.k', 4, 'date', dt) &
+              .ne. 0) then
             write(6,380)
  380        format(/,'Attribute was not removed.')
             stop 1
          endif
       
-         if (pfcd(fileid, 1, "/") .eq. 0)
-     $        call errproc
+         if (pfcd(fileid, 1, "/") .eq. 0) &
+            call errproc
 
       endif
 
-c     ..........verify z values
-
+! ... verify z values
       dims(1) = 1
       dims(2) = 4
       dims(3) = 1
@@ -643,16 +610,16 @@ c     ..........verify z values
       do 404 n = 1, 4
          dims(7) = n
          dims(8) = n
-         if (pfptrd(fileid, 1, 'z', z2, dims) .eq. 0)
-     $        call errproc
+         if (pfptrd(fileid, 1, 'z', z2, dims) .eq. 0) &
+            call errproc
 
          do 405 j = 1, 5
             do 406 i = 1, 4
                nt = n/4 + 1
                v1 = z2(i, j)
                v2 = z(i, j, nt)
-               if (v1 .ne. v2)
-     $              call errproc
+               if (v1 .ne. v2) &
+                  call errproc
  406        continue
  405     continue
  404  continue
@@ -663,8 +630,8 @@ c     ..........verify z values
       endif
 
 
-c     ..........verify zz values  ('double' written as 'float')
-c               read_as_alt  read_as
+! ... verify zz values  ('double' written as 'float')
+!               read_as_alt  read_as
 
       dims(1) = 1
       dims(2) = 4
@@ -676,32 +643,32 @@ c               read_as_alt  read_as
       dims(8) = 2
       dims(9) = 1
 
-      if (pfrdad(fileid, 2, 'zz', 6, 'double', zz2, dims) .eq. 0)
-     $        call errproc
-c$$$      if (pfptrd(fileid, 2, 'zz', zz2, dims) .eq. 0)
-c$$$     $        call errproc
+      if (pfrdad(fileid, 2, 'zz', 6, 'double', zz2, dims) .eq. 0) &
+         call errproc
+!      if (pfptrd(fileid, 2, 'zz', zz2, dims) .eq. 0) &
+!         call errproc
       do 414 kindx = 1,2
          do 415 j = 1, 5
             do 416 i = 1, 4
-               if (abs(zz2(i,j,kindx) - zz(i,j,kindx))
-     $             .gt. tolerance)
-     $              call errproc
+               if (abs(zz2(i,j,kindx) - zz(i,j,kindx)) &
+                   .gt. tolerance) &
+                  call errproc
  416        continue
  415     continue
  414  continue
 
 
-      if (pfrdas(fileid, 15, 'zz(1:4,1:5,3:4)', 6, 'double', zz2)
-     $       .eq. 0) call errproc
-c$$$      if (pfread(fileid, 15, 'zz(1:4,1:5,3:4)', zz2)
-c$$$     $       .eq. 0) call errproc
+      if (pfrdas(fileid, 15, 'zz(1:4,1:5,3:4)', 6, 'double', zz2) &
+             .eq. 0) call errproc
+!      if (pfread(fileid, 15, 'zz(1:4,1:5,3:4)', zz2) &
+!             .eq. 0) call errproc
 
          do 424 kindx = 1,2
             do 425 j = 1, 5
                do 426 i = 1, 4
-                 if (abs(zz2(i,j,kindx) - zzx(i,j,kindx))
-     $               .gt. tolerance)
-     $                 call errproc
+                 if (abs(zz2(i,j,kindx) - zzx(i,j,kindx)) &
+                     .gt. tolerance) &
+                    call errproc
  426           continue
  425        continue
  424     continue
@@ -712,65 +679,60 @@ c$$$     $       .eq. 0) call errproc
       endif
 
 
-c     ..........get current working directory
-
-      if (pfpwd(fileid, nchar, name) .eq. 0)
-     $     call errproc
+! ... get current working directory
+      if (pfpwd(fileid, nchar, name) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,350) (name(i), i=1,nchar)
       endif
 
-      if ((name(1) .ne. '/') .or. (nchar .ne. 1))
-     $     call errproc
+      if ((name(1) .ne. '/') .or. (nchar .ne. 1)) &
+         call errproc
 
-c     ..........change directory
-
+! ... change directory
       if (DIR) then
-         if (pfcd(fileid, 4, "dir1") .eq. 0)
-     $        call errproc
+         if (pfcd(fileid, 4, "dir1") .eq. 0) &
+            call errproc
       endif
 
-c     ..........get current working directory
-
-      if (pfpwd(fileid, nchar, name) .eq. 0)
-     $     call errproc
+! ... get current working directory
+      if (pfpwd(fileid, nchar, name) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,350) (name(i), i=1,nchar)
       endif
 
-      if (((.not. DIR) .and. (nchar .ne. 1)) .or.
-     $    (DIR .and. (nchar .ne. 5)))
-     $     call errproc
+      if (((.not. DIR) .and. (nchar .ne. 1)) .or.&
+          (DIR .and. (nchar .ne. 5))) &
+         call errproc
 
-c     ..........inquire about a struct types
-
-      if (pfityp(fileid, 3, 'abc', typsiz, align, nptr) .eq. 0)
-     $     call errproc
+! ... inquire about a struct types
+      if (pfityp(fileid, 3, 'abc', typsiz, align, nptr) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,450) typsiz, align, nptr
- 450     format(/,'Size in bytes, alignment, and pointer members ',
-     $        'of type abc:',3i5)
+ 450     format(/,'Size in bytes, alignment, and pointer members ',&
+              'of type abc:',3i5)
       endif
 
-      if ((typsiz .ne. 72) .or. (nptr .ne. 0))
-     $     call errproc
+      if ((typsiz .ne. 72) .or. (nptr .ne. 0)) &
+         call errproc
 
       nchar = 5
-      if (pfimbr(fileid, 3, 'jkl', 3, nchar, name3) .eq. 0)
-     $     call errproc
+      if (pfimbr(fileid, 3, 'jkl', 3, nchar, name3) .eq. 0) &
+         call errproc
 
       name4 = 'int l'
-      if ((nchar .ne. 5) .or. (name3 .ne. name4))
-     $     call errproc
+      if ((nchar .ne. 5) .or. (name3 .ne. name4)) &
+         call errproc
 
-c     ..........inquire about unwritten variable
-
-      if (pfivar(fileid, 1, 'f', ntype, type, nitems, ndims, dims)
-     $     .eq. 0)
-     $     call errproc
+! ... inquire about unwritten variable
+      if (pfivar(fileid, 1, 'f', ntype, type, nitems, ndims, dims) &
+           .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,500) nitems
@@ -779,14 +741,13 @@ c     ..........inquire about unwritten variable
  501     format('Number of dimensions for variable f:',i5)
       endif
 
-      if ((nitems .ne. 24) .or. (ndims .ne. 3))
-     $     call errproc
+      if ((nitems .ne. 24) .or. (ndims .ne. 3)) &
+         call errproc
 
-c     ..........inquire about written variable
-
-      if (pfivar(fileid, 1, 'c', ntype, type, nitems, ndims, dims)
-     $     .eq. 0)
-     $     call errproc
+! ... inquire about written variable
+      if (pfivar(fileid, 1, 'c', ntype, type, nitems, ndims, dims) &
+           .eq. 0) &
+         call errproc
       if (PRINT) then
          write(6,502) nitems
  502     format(/,'Number of items in variable c:',i5)
@@ -794,48 +755,44 @@ c     ..........inquire about written variable
  503     format('Number of dimensions for variable c:',i5)
       endif
 
-      if ((nitems .ne. 6) .or. (ndims .ne. 2))
-     $     call errproc
+      if ((nitems .ne. 6) .or. (ndims .ne. 2)) &
+         call errproc
 
-c     ..........copy type definition to new file and write variable
-
+! ... copy type definition to new file and write variable
       nfileid = pfopen(9, 'file2.pdb', 'w')
-      if (nfileid .le. 0)
-     $     call errproc
+      if (nfileid .le. 0) &
+         call errproc
 
-      if (pfctyp(fileid, nfileid, 3, 'jkl') .eq. 0)
-     $     call errproc
+      if (pfctyp(fileid, nfileid, 3, 'jkl') .eq. 0) &
+         call errproc
 
       j = 1
       k = 2
       l = 3
-      if (pfwrta(nfileid, 3, 'jkl', 3, 'jkl', j) .eq. 0)
-     $     call errproc
+      if (pfwrta(nfileid, 3, 'jkl', 3, 'jkl', j) .eq. 0) &
+         call errproc
 
-      if (pfclos(nfileid) .eq. 0)
-     $     call errproc
+      if (pfclos(nfileid) .eq. 0) &
+         call errproc
 
-c     ..........verify correctness of variable
+! ... verify correctness of variable
+      if (pfread(fileid, 1, 'a', a2) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 1, 'a', a2) .eq. 0)
-     $     call errproc
+      if ((a(1) .ne. 1.) .or. (a(2) .ne. 2.)) &
+         call errproc
 
-      if ((a(1) .ne. 1.) .or. (a(2) .ne. 2.))
-     $     call errproc
+! ... verify correctness of partially written variable
+      if (pfread(fileid, 1, 'g', g2) .eq. 0) &
+         call errproc
 
-c     ..........verify correctness of partially written variable
+      if ((g2(1,2) .ne. 100) .or. (g2(2,2) .ne. 0)) &
+         call errproc
 
-      if (pfread(fileid, 1, 'g', g2) .eq. 0)
-     $     call errproc
-
-      if ((g2(1,2) .ne. 100) .or. (g2(2,2) .ne. 0))
-     $     call errproc
-
-c     ..........inquire about a structure member
-
-      if (pfivar(fileid, 3, 'abc.c', ntype, type, nitems, ndims, dims)
-     $     .eq. 0)
-     $     call errproc
+! ... inquire about a structure member
+      if (pfivar(fileid, 3, 'abc.c', ntype, type, nitems, ndims, dims) &
+           .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,504) nitems
@@ -844,18 +801,16 @@ c     ..........inquire about a structure member
  505     format('Number of dimensions for abc.c:',i5)
       endif
 
-c     ..........read struct by link and verify
+! ... read struct by link and verify
+      if (pfread(fileid, 9, '/jkl_link', j2) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 9, '/jkl_link', j2) .eq. 0)
-     $     call errproc
+      if ((j2 .ne. 1) .or. (k2 .ne. 2) .or. (l2 .ne. 3)) &
+         call errproc
 
-      if ((j2 .ne. 1) .or. (k2 .ne. 2) .or. (l2 .ne. 3))
-     $     call errproc
-
-c     ..........read struct member
-
-      if (pfread(fileid, 5, 'jkl.k', k2) .eq. 0)
-     $     call errproc
+! ... read struct member
+      if (pfread(fileid, 5, 'jkl.k', k2) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,600) k
@@ -864,14 +819,14 @@ c     ..........read struct member
  601     format('Value of jkl.k read:',i5)
       endif
 
-      if (k .ne. k2)
-     $     call errproc
+      if (k .ne. k2) &
+         call errproc
 
       dims(1) = 2
       dims(2) = 2
       dims(3) = 1
-      if (pfptrd(fileid, 5, 'abc.a', abc_a, dims) .eq. 0)
-     $     call errproc
+      if (pfptrd(fileid, 5, 'abc.a', abc_a, dims) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,602)
@@ -880,29 +835,27 @@ c     ..........read struct member
  603     format('Value of abc.a(2) read:',f5.1)
       endif
 
-      if (abc_a .ne. 2.0)
-     $     call errproc
+      if (abc_a .ne. 2.0) &
+         call errproc
 
-c     ..........read elements of struct members
+! ... read elements of struct members
+      if (pfread(fileid, 8, 'abc.a(2)', abc_a) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 8, 'abc.a(2)', abc_a) .eq. 0)
-     $     call errproc
+      if (abc_a .ne. 2.0) &
+         call errproc
 
-      if (abc_a .ne. 2.0)
-     $     call errproc
+      if (pfread(fileid, 10, 'abc.c(1,2)', c_1_2) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 10, 'abc.c(1,2)', c_1_2) .eq. 0)
-     $     call errproc
+      if (c_1_2 .ne. 4.0) &
+         call errproc
 
-      if (c_1_2 .ne. 4.0)
-     $     call errproc
-
-c     ..........get the variable names in alphabetic order and check last name
-
+! ... get the variable names in alphabetic order and check last name
       pord = 1
       nvar = 0
-      if (pfvart(fileid, pord, nvar) .eq. 0)
-     $     call errproc
+      if (pfvart(fileid, pord, nvar) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,700)
@@ -910,25 +863,24 @@ c     ..........get the variable names in alphabetic order and check last name
       endif
 
       do 701 n = 1, nvar
-         if (pfgvar(n, nchar, name) .eq. 0)
-     $        call errproc
+         if (pfgvar(n, nchar, name) .eq. 0) &
+            call errproc
          if (PRINT) then
             write(6,702) (name(i), i=1,nchar)
  702        format('            ',256a1)
          endif
  701  continue
 
-c      if ((DIR .and. (name(1) .ne. 'x')) .or.
-c     $    ((.not. DIR) .and. (name(1) .ne. 'z')))
-c     $     call errproc
+!      if ((DIR .and. (name(1) .ne. 'x')) .or.&
+!          ((.not. DIR) .and. (name(1) .ne. 'z'))) &
+!         call errproc
 
-      if (pfdvar() .eq. 0)
-     $     call errproc
+      if (pfdvar() .eq. 0) &
+         call errproc
 
-c     ..........get the variable and directory names in root
-
-      if (pflst(fileid, 1, '/', 0, ' ', nvar) .eq. 0)
-     $     call errproc
+! ... get the variable and directory names in root
+      if (pflst(fileid, 1, '/', 0, ' ', nvar) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6,800)
@@ -936,23 +888,22 @@ c     ..........get the variable and directory names in root
       endif
 
       do 801 n = 1, nvar
-         if (pfgls(n, nchar, name) .eq. 0)
-     $        call errproc
+         if (pfgls(n, nchar, name) .eq. 0) &
+            call errproc
          if (PRINT) then
             write(6,702) (name(i), i=1,nchar)
          endif
  801  continue
 
-      if (name(1) .ne. 'z')
-     $     call errproc
+      if (name(1) .ne. 'z') &
+         call errproc
 
-c     ..........get the variable and directory names in dir1
-
+! ... get the variable and directory names in dir1
       nvar = 0
 
       if (DIR) then
-         if (pflst(fileid, 5, '/dir1', 0, ' ', nvar) .eq. 0)
-     $        call errproc
+         if (pflst(fileid, 5, '/dir1', 0, ' ', nvar) .eq. 0) &
+            call errproc
       endif
 
       if (PRINT) then
@@ -961,28 +912,26 @@ c     ..........get the variable and directory names in dir1
       endif
 
       do 851 n = 1, nvar
-         if (pfgls(n, nchar, name) .eq. 0)
-     $        call errproc
+         if (pfgls(n, nchar, name) .eq. 0) &
+            call errproc
          if (PRINT) then
             write(6,702) (name(i), i=1,nchar)
          endif
  851  continue
 
-      if(pfdls() .eq. 0)
-     $     call errproc
+      if (pfdls() .eq. 0) &
+         call errproc
 
-c     ..........check curve, image, mapping
-
+! ... check curve, image, mapping
       if (OPTION .ne. "0") then
          call chkcur(fileid, TOLERANCE)
          call chkima(fileid)
          call chkmap(fileid, TOLERANCE)
       endif
 
-c     ..........close the file
-
-      if (pfclos(fileid) .eq. 0)
-     $     call errproc
+! ... close the file
+      if (pfclos(fileid) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6, 900)
@@ -992,10 +941,10 @@ c     ..........close the file
       stop 0
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c WRTCUR - write a curve
+! WRTCUR - write a curve
 
       subroutine wrtcur(fileid)
 
@@ -1006,26 +955,26 @@ c WRTCUR - write a curve
       index = 0
 
       do 100 i = 0, 99
-         dm(i) = 6.28*float(i)/99.
+         dm(i)  = 6.28*float(i)/99.
          rm1(i) = cos(6.28*float(i)/99.)
          rm2(i) = sin(6.28*float(i)/99.)
  100  continue
 
-      if (pfwulc(fileid, 12, "cosine curve", 100, dm, rm1, index)
-     $     .eq. 0)
-     $     call errproc
+      if (pfwulc(fileid, 12, "cosine curve", 100, dm, rm1, index) &
+           .eq. 0) &
+         call errproc
 
-      if (pfwuly(fileid, 9, "sin curve", 100, index - 1, rm2, index)
-     $     .eq. 0)
-     $     call errproc
+      if (pfwuly(fileid, 9, "sin curve", 100, index - 1, rm2, index) &
+           .eq. 0) &
+         call errproc
 
       return
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c CHKCUR - check curve
+! CHKCUR - check curve
 
       subroutine chkcur(fileid, tolerance)
 
@@ -1040,29 +989,29 @@ c CHKCUR - check curve
          rm2(i) = sin(6.28*float(i)/99.)
  100  continue
 
-      if (pfread(fileid, 5, "xval0", odm) .eq. 0)
-     $     call errproc
+      if (pfread(fileid, 5, "xval0", odm) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 5, "yval0", orm1) .eq. 0)
-     $     call errproc
+      if (pfread(fileid, 5, "yval0", orm1) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 5, "yval1", orm2) .eq. 0)
-     $     call errproc
+      if (pfread(fileid, 5, "yval1", orm2) .eq. 0) &
+         call errproc
 
       do 200 i = 0, 99
-         if ((abs(dm(i) - odm(i)) .gt. tolerance)
-     $        .or. (abs(rm1(i) - orm1(i)) .gt. tolerance)
-     $        .or. (abs(rm2(i) - orm2(i)) .gt. tolerance))
-     $        call errproc
+         if ((abs(dm(i) - odm(i)) .gt. tolerance) &
+              .or. (abs(rm1(i) - orm1(i)) .gt. tolerance) &
+              .or. (abs(rm2(i) - orm2(i)) .gt. tolerance)) &
+            call errproc
  200  continue
 
       return
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c WRTIMA - write an image
+! WRTIMA - write an image
 
       subroutine wrtima(fileid)
 
@@ -1081,17 +1030,17 @@ c WRTIMA - write an image
  101     continue
  100  continue
 
-      if (pfwima(fileid, 10, 'Test image', 0, 10, 0, 10,
-     $     data, xmin, xmax, ymin, ymax, 0) .eq. 0)
-     $     call errproc
+      if (pfwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
+           data, xmin, xmax, ymin, ymax, 0) .eq. 0)       &
+         call errproc
 
       return
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c CHKIMA - check image
+! CHKIMA - check image
 
       subroutine chkima(fileid)
 
@@ -1106,23 +1055,23 @@ c CHKIMA - check image
  100  continue
 
       ret = pfrptr(fileid, 14, 'Image0->buffer', 121, odata)
-      if (ret .eq. 0)
-     $     call errproc
+      if (ret .eq. 0) &
+         call errproc
 
       do 200 l = 0, 10
          do 201 k = 0, 10
-            if (data(k, l) .ne. odata(k, l))
-     $           call errproc
+            if (data(k, l) .ne. odata(k, l)) &
+               call errproc
  201     continue
  200  continue
 
       return
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c WRTMAP - write some mappings
+! WRTMAP - write some mappings
 
       subroutine wrtmap(fileid)
 
@@ -1147,23 +1096,23 @@ c WRTMAP - write some mappings
          rm(i) = sin(6.28*float(i)/99.)
  100  continue
 
-      if (pfwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim)
-     $    .eq. 0)
-     $     call errproc
+      if (pfwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim) &
+          .eq. 0) &
+         call errproc
 
       pim = 1
-      if (pfwset(fileid, 'Domain1', dp, dm) .eq. 0)
-     $     call errproc
-      if (pfwran(fileid, 'Domain1', 7, 'Range1', rp, rm, pim) .eq. 0)
-     $     call errproc
+      if (pfwset(fileid, 'Domain1', dp, dm) .eq. 0) &
+         call errproc
+      if (pfwran(fileid, 'Domain1', 7, 'Range1', rp, rm, pim) .eq. 0) &
+         call errproc
 
       return
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c CHKMAP - check mappings
+! CHKMAP - check mappings
 
       subroutine chkmap(fileid, tolerance)
 
@@ -1177,42 +1126,42 @@ c CHKMAP - check mappings
          rm(i) = sin(6.28*float(i)/99.)
  100  continue
 
-      if (pfrptr(fileid, 29, 'Mapping0->domain->elements[1]',
-     $     100, odm) .eq. 0)
-     $     call errproc
+      if (pfrptr(fileid, 29, 'Mapping0->domain->elements[1]',&
+           100, odm) .eq. 0) &
+         call errproc
 
-      if (pfread(fileid, 35, 'Mapping0->range->elements[1][1:100]',
-     $     orm) .eq. 0)
-     $     call errproc
+      if (pfread(fileid, 35, 'Mapping0->range->elements[1][1:100]',&
+           orm) .eq. 0) &
+         call errproc
 
       do 200 i = 0, 99
-         if ((abs(dm(i) - odm(i)) .gt. tolerance)
-     $        .or. (abs(rm(i) - orm(i)) .gt. tolerance))
-     $        call errproc
+         if ((abs(dm(i) - odm(i)) .gt. tolerance) &
+              .or. (abs(rm(i) - orm(i)) .gt. tolerance)) &
+            call errproc
  200  continue
 
-      if (pfread(fileid, 27, 'Domain1->elements[1][1:100]', odm)
-     $     .eq. 0)
-     $     call errproc
+      if (pfread(fileid, 27, 'Domain1->elements[1][1:100]', odm) &
+           .eq. 0) &
+         call errproc
 
-      if (pfrptr(fileid, 28, 'Mapping1->range->elements[1]',
-     $     100, orm)
-     $     .eq. 0)
-     $     call errproc
+      if (pfrptr(fileid, 28, 'Mapping1->range->elements[1]',&
+           100, orm) &
+           .eq. 0) &
+         call errproc
 
       do 300 i = 0, 99
-         if ((abs(dm(i) - odm(i)) .gt. tolerance)
-     $        .or. (abs(rm(i) - orm(i)) .gt. tolerance))
-     $        call errproc
+         if ((abs(dm(i) - odm(i)) .gt. tolerance) &
+              .or. (abs(rm(i) - orm(i)) .gt. tolerance)) &
+            call errproc
  300  continue
 
       return
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 
-c ERRPROC - handle errors
+! ERRPROC - handle errors
 
       subroutine errproc
 
@@ -1234,6 +1183,6 @@ c ERRPROC - handle errors
       stop 1
       end
 
-c --------------------------------------------------------------------------
-c --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
+! --------------------------------------------------------------------------
 

@@ -88,7 +88,7 @@ switch ($Tgt)
 
 # AIX cannot tolerate an empty RPATH
    case aix:
-        if ($?MPILib == 0) then
+        if ($?DP_RPath == 0) then
            setenv RPATH     /lib
            setenv Cfg_RPATH /lib
         endif

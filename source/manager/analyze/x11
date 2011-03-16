@@ -25,10 +25,10 @@ SafeEnv Cfe_CC_Flags     "-g"
 SafeEnv MDG_Inc          ""
 SafeEnv MDG_Lib          ""
 SafeEnv MDG_Pck          ""
-SafeEnv X11_Path         /usr
-SafeEnv X11_RPath        /usr/lib
 SafeEnv X11_Inc          ""
 SafeEnv X11_Lib          ""
+SafeEnv X11_RPath        /usr/lib
+SafeEnv X11_Path         /usr
 SafeEnv Std_UseX         TRUE
 
 # if we have explicitly said we do not want X11
@@ -142,19 +142,24 @@ EOF
 
    set ETime = `timer -b $UTime`
 
-   setenv X11_RPath "$PckPath"
-   setenv X11_Lib   "$PckLib"
    setenv X11_Inc   "$PckInc"
+   setenv X11_Lib   "$PckLib"
+   setenv X11_RPath "$PckPath"
+
+# NOTE: used X11_Path to find libs, incs - there are no executables we need
+   if ("$X11_Path" == /usr) then
+      setenv X11_Path  ""
+   endif
 
 # export the results
    SetParent RPATH
    SetParent MDG_Inc
    SetParent MDG_Lib
    SetParent MDG_Pck
-   SetParent X11_Path
-   SetParent X11_RPath
-   SetParent X11_Lib
    SetParent X11_Inc
+   SetParent X11_Lib
+   SetParent X11_RPath
+   SetParent X11_Path
    SetParent GraphicsDevices
 
 endif

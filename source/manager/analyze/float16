@@ -37,13 +37,19 @@ flog $ALog cat $Tmp.c
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt -lm
 if ($status == 0) then
-   flog $ALog $CFE $Tmp
-   if ($status == 0) then
-      setenv HaveFLOAT16 TRUE
-      NoteD $ALog "      has long double support"
+   set inf = ( `$CFE $Tmp | grep "b ="` )
+   if ($#inf > 2) then
+      flog $ALog set val = $inf[3]
+   else
+      flog $ALog set val = none
+   endif
+   if ($val =~ 1.41421*) then
+      flog $ALog setenv HaveFLOAT16 TRUE
    endif
 endif
 
+if ($HaveFLOAT16 == TRUE) then
+   NoteD $ALog "      has long double support"
 else
    NoteD $ALog "      no long double support"
 endif

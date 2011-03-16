@@ -53,10 +53,10 @@ while ($#argv > 0)
 end
 
 setenv HAVE_OPENMPI FALSE
-unsetenv MPIBin
-unsetenv MPILib
-unsetenv IncMPI
-unsetenv LibMPI
+unsetenv DP_Inc
+unsetenv DP_Lib
+unsetenv DP_RPath
+unsetenv DP_Path
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -202,21 +202,20 @@ endif
 # FINISH - set the ultimate environment variables and prepare to export
 
 if ($ok == TRUE) then
-   setenv MPIBin "$lbin"
-   setenv MPILib "$llib"
-
    set tinc = ""
    foreach i ( $linc )
       set tinc = ( $tinc -I$i )
    end
-   setenv IncMPI "$tinc"
+   setenv DP_Inc "$tinc"
 
    set libs = ""
    foreach i ( $link )
       set libs = ( $libs -l$i )
    end   
-   setenv LibMPI "$libs"
+   setenv DP_Lib "$libs"
 
+   setenv DP_RPath "$llib"
+   setenv DP_Path  "$lbin"
 endif
 
 if ($SW == openmpi) then
@@ -230,16 +229,16 @@ endif
 
 # EXPORT - export the results
 
-if ($?MPIBin == 1) then
-   foreach i ( $MPILib )
+if ($?DP_Path == 1) then
+   foreach i ( $DP_RPath )
       setenv RPATH `analyze/rpath -a $i -o echo`
    end
 
    SetParent HAVE_OPENMPI
-   SetParent MPIBin
-   SetParent MPILib
-   SetParent IncMPI
-   SetParent LibMPI
+   SetParent DP_Inc
+   SetParent DP_Lib
+   SetParent DP_RPath
+   SetParent DP_Path
    SetParent RPATH
 endif
 

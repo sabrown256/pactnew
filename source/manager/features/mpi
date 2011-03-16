@@ -9,18 +9,8 @@
 
 setenv REQUEST_MPI   TRUE
 
-# NOTE: on BG/P MPIBin has to come after path to compiler
-setenv PATH   ${PATH}:${MPIBin}
-
-Group MPI {
-   CC_Inc = ${IncMPI}
-   LD_Lib = ${LibMPI}
-}
-
-Group DP {
-   Inc =? ${MPI_CC_Inc}
-   Lib += ${MPI_LD_Lib}
-}
+# NOTE: on BG/P DP_Path has to come after path to compiler
+setenv PATH   ${PATH}:${DP_Path}
 
 Tool CC {
    Exe    =? ${MPI_CC_Exe}
