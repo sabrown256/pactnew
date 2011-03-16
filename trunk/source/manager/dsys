@@ -573,6 +573,10 @@ switch ($Cmnd)
         unsetenv PACT_CC_EXE
         unsetenv PACT_CC_VERSION
         unsetenv PACT_CC_PATH
+        unsetenv PACT_FC_FAMILY
+        unsetenv PACT_FC_EXE
+        unsetenv PACT_FC_VERSION
+        unsetenv PACT_FC_PATH
         unsetenv Bits
         unsetenv CPU
 

@@ -22,17 +22,18 @@ SafeEnv ParCommSupport  PARC
 SafeEnv MPIGoodIO       FALSE
 SafeEnv MPIAllStdin     FALSE
 SafeEnv HAVE_OPENMPI    FALSE
-SafeEnv LibMPI          ""
-SafeEnv MPILib          ""
+SafeEnv DP_Lib          ""
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
+SafeEnv DP_RPath        ""
+SafeEnv MD_Pck          ""
 
-# NOTE: because locate-mpi ends up getting MPILib on your RPATH
+# NOTE: because locate-mpi ends up getting DP_RPath on your RPATH
 # before feature/mpi is invoked you can end up with MPI
 # libary paths in your link line for non-MPI builds
-# so if feature/mpi is not invoked remove MPILib from RPATH
+# so if feature/mpi is not invoked remove DP_RPath from RPATH
 if ($REQUEST_MPI == FALSE) then
-   ../analyze/rpath -d $MPILib
+   ../analyze/rpath -d $DP_RPath
 endif
 
 #--------------------------------------------------------------------------
@@ -73,22 +74,22 @@ end
 
 # MPI Library
 
-if ($?MPILib == 0) then
+if ($?DP_RPath == 0) then
    set LRoot = /usr
    source $Base/common-lib64
-   setenv MPILib /usr/$LibT
+   setenv DP_RPath /usr/$LibT
 endif
 
-Note $ALog "MPILib   = $MPILib"
+Note $ALog "DP_RPath = $DP_RPath"
 Note $ALog "lParComm = $lParComm"
 
 if ("$lParComm" =~ *mpi*) then
 
    set llib = ""
-   foreach i ($MPILib)
+   foreach i ($DP_RPath)
       set llib = ( $llib -L$i )
    end
-   setenv lLib   "$llib $LibMPI"
+   setenv lLib   "$llib $DP_Lib"
 
    set UTime = `timer -r`
 
@@ -135,7 +136,7 @@ EOF
    flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
    if ($status != 0) then
       set lParComm = "no"
-      setenv LibMPI    ""
+      setenv DP_Lib    ""
       setenv DP_Lib    ""
    else
       flog $ALog ldd $Tmp
@@ -166,22 +167,23 @@ endif
 #--------------------------------------------------------------------------
 
 if (("$lParComm" == no) || ($REQUEST_MPI == FALSE)) then
-   setenv LibMPI    ""
-   setenv MPILib    ""
+   setenv DP_Lib    ""
    setenv DP_Inc    ""
    setenv DP_Lib    ""
+   setenv DP_RPath  ""
    NoteD $ALog "      no MPI"
 
 else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
    NoteD $ALog "      has MPI"
-   NoteD $ALog "         $LibMPI"
+   NoteD $ALog "         $DP_Lib"
    NoteD $ALog "         stdin $MPIStdIO"
+   flog $ALog setenv MD_Pck   "DP $MD_Pck"
 
 else
-   setenv LibMPI    ""
-   setenv MPILib    ""
+   setenv DP_Lib    ""
    setenv DP_Inc    ""
    setenv DP_Lib    ""
+   setenv DP_RPath  ""
    NoteD $ALog "      no MPI (by request)"
 endif
 
@@ -192,10 +194,11 @@ SetParent ParCommSupport
 SetParent MPIAllStdin
 SetParent MPIGoodIO
 SetParent HAVE_OPENMPI
-SetParent MPILib
-SetParent LibMPI
+SetParent DP_Lib
 SetParent DP_Inc
 SetParent DP_Lib
+SetParent DP_RPath
+SetParent MD_Pck
 
 exit(0)
 

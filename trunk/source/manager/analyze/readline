@@ -18,10 +18,10 @@ Note $Log "Analyze: readline"
 SafeEnv MD_Inc     ""
 SafeEnv MD_Lib     ""
 SafeEnv MD_Pck     ""
-SafeEnv RL_Path   /usr
-SafeEnv RL_RPath  /usr/${LIB}
 SafeEnv RL_Inc    ""
 SafeEnv RL_Lib    ""
+SafeEnv RL_RPath  /usr/${LIB}
+SafeEnv RL_Path   /usr
 SafeEnv HAVE_READLINE   FALSE
 
 # if we have explicitly said we do not want READLINE
@@ -54,6 +54,7 @@ EOF
 
    setenv HAVE_READLINE FALSE
 
+   set llib = ""
    set libl = ( -lreadline -lcurses )
    set opt  = ""
    set opt  = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath $libl )
@@ -62,29 +63,37 @@ EOF
       flog $ALog $CFE $Tmp
       if ($status == 0) then
          setenv HAVE_READLINE TRUE
-         flog $ALog setenv MD_Lib        "$libl $MD_Lib"
-         flog $ALog setenv MD_Pck        "$MD_Pck RL"
-         flog $ALog setenv RL_Lib        "$libl"
-         set spkl = ( $libl )
+         flog $ALog set llib = ( $libl )
+         flog $ALog setenv MD_Pck        "RL $MD_Pck"
          flog $ALog $RM $Tmp.c $Tmp
       endif
    endif
+   unset opt
+   unset libl
 
-   if ("$RL_Lib" != "") then
+   if ("$llib" != "") then
       flog $ALog setenv HAVE_READLINE   TRUE
-      NoteD $ALog "      has readline ($spkl)"
+      NoteD $ALog "      has readline ($llib)"
    else
       NoteD $ALog "      no readline"
    endif
+
+   setenv MD_Lib   "$llib $MD_Lib"
+   setenv RL_Inc   ""
+   setenv RL_Lib   "$llib"
+   setenv RL_RPath ""
+
+# NOTE: used RL_Path to find libs, incs - there are no executables
+   setenv RL_Path  ""
 
 # export the results
    SetParent RPATH
    SetParent MD_Lib
    SetParent MD_Pck
-   SetParent RL_Path
-   SetParent RL_RPath
-   SetParent RL_Lib
    SetParent RL_Inc
+   SetParent RL_Lib
+   SetParent RL_RPath
+   SetParent RL_Path
    SetParent HAVE_READLINE
 
 endif

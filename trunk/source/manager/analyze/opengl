@@ -21,10 +21,10 @@ SafeEnv GraphicsFlag     ""
 SafeEnv MDG_Inc          ""
 SafeEnv MDG_Lib          ""
 SafeEnv MDG_Pck          ""
-SafeEnv OGL_Path         /usr
-SafeEnv OGL_RPath        /usr/lib
 SafeEnv OGL_Inc          ""
 SafeEnv OGL_Lib          ""
+SafeEnv OGL_RPath        /usr/lib
+SafeEnv OGL_Path         /usr
 SafeEnv Std_UseOGL       FALSE
 
 # if we have explicitly said we do not want OGL
@@ -98,9 +98,14 @@ EOF
       setenv Std_UseOGL FALSE
    endif
 
-   setenv OGL_RPath "$PckPath"
-   setenv OGL_Lib   "$PckLib"
    setenv OGL_Inc   "$PckInc"
+   setenv OGL_Lib   "$PckLib"
+   setenv OGL_RPath "$PckPath"
+
+# NOTE: used OGL_Path to find libs, incs - there are no executables we need
+   if ("$OGL_Path" == /usr) then
+      setenv OGL_Path  ""
+   endif
 
    set ETime = `timer -b $UTime`
 
@@ -110,10 +115,10 @@ EOF
       SetParent MDG_Inc
       SetParent MDG_Lib
       SetParent MDG_Pck
-      SetParent OGL_Path
-      SetParent OGL_RPath
-      SetParent OGL_Lib
       SetParent OGL_Inc
+      SetParent OGL_Lib
+      SetParent OGL_RPath
+      SetParent OGL_Path
       SetParent GraphicsDevices
 
    endif

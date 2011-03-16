@@ -56,10 +56,10 @@ if ($?MODULESHOME == 1) then
       setenv RPATH `analyze/rpath -a $i -o echo`
    end
 
-   setp IncMPI   -I$MPICH_DIR/include
-   setp MPILib   $MPICH_DIR/lib
-   setp LibMPI   -lmpich
-   setp RPATH    $RPATH
+   setp DP_Inc     -I$MPICH_DIR/include
+   setp DP_Lib     -lmpich
+   setp DP_RPath   $MPICH_DIR/lib
+   setp RPATH      $RPATH
 
 endif
 

@@ -15,13 +15,13 @@ Separator $Log
 Note $Log "Analyze: hdf5"
 
 # vanilla place to look if previously undefined
-SafeEnv MD_Inc     ""
-SafeEnv MD_Lib     ""
-SafeEnv MD_Pck     ""
-SafeEnv HDF_Path   /usr
-SafeEnv HDF_RPath  /usr/lib
+SafeEnv MDI_Inc    ""
+SafeEnv MDI_Lib    ""
+SafeEnv MDI_Pck    ""
 SafeEnv HDF_Inc    ""
 SafeEnv HDF_Lib    ""
+SafeEnv HDF_RPath  /usr/lib
+SafeEnv HDF_Path   /usr
 SafeEnv Z_Lib      "-lz"
 
 # if we have explicitly said we do not want HDF5
@@ -72,12 +72,12 @@ EOF
       NoteD $ALog "      has HDF5 ($PckLib)"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv MD_Inc "$MD_Inc $PckInc"
+         setenv MDI_Inc "$MDI_Inc $PckInc"
       endif
 
       flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}
-      flog $ALog setenv MD_Lib        "$PckLib $MD_Lib"
-      flog $ALog setenv MD_Pck        "$MD_Pck HDF"
+      flog $ALog setenv MDI_Lib       "$PckLib $MDI_Lib"
+      flog $ALog setenv MDI_Pck       "HDF $MDI_Pck"
       flog $ALog setenv HAVE_HDF5     TRUE
    else
       NoteD $ALog "      no compatible HDF5 version"
@@ -86,19 +86,22 @@ EOF
 
    set ETime = `timer -b $UTime`
 
-   setenv HDF_RPath "$PckPath"
-   setenv HDF_Lib   "$PckLib"
    setenv HDF_Inc   "$PckInc"
+   setenv HDF_Lib   "$PckLib"
+   setenv HDF_RPath "$PckPath"
+
+# NOTE: used HDF_Path to find libs, incs - there are no executables
+   setenv HDF_Path  ""
 
 # export the results
    SetParent RPATH
-   SetParent MD_Inc
-   SetParent MD_Lib
-   SetParent MD_Pck
-   SetParent HDF_Path
-   SetParent HDF_RPath
+   SetParent MDI_Inc
+   SetParent MDI_Lib
+   SetParent MDI_Pck
    SetParent HDF_Inc
    SetParent HDF_Lib
+   SetParent HDF_RPath
+   SetParent HDF_Path
 
 endif
 

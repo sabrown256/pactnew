@@ -21,9 +21,15 @@ set LogFB = log.fgbg.$LogSfx
 #--------------------------------------------------------------------------
 
 # PPC Background test
+      set ok = TRUE
+      if ($?DP_Path == 1) then
+         if ("$DP_Path" != "") then
+            set ok = FALSE
+         endif
+      endif
 
       set TCSH = `which tcsh`
-      if (("$MPIBin" == "") && ($?CROSS_COMPILE == 0) && (-x "$TCSH")) then
+      if (($ok == TRUE) && ($?CROSS_COMPILE == 0) && (-x "$TCSH")) then
          NoteD $Log ""
          NoteD $Log "                    PPC Background Test ............ "
          Note $Log ""

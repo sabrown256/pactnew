@@ -21,10 +21,10 @@ SafeEnv ALog             $cwd/log.analyze
 SafeEnv MDG_Inc          ""
 SafeEnv MDG_Lib          ""
 SafeEnv MDG_Pck          ""
-SafeEnv QD_Path          /usr
-SafeEnv QD_RPath         /usr/lib
 SafeEnv QD_Inc           ""
 SafeEnv QD_Lib           ""
+SafeEnv QD_RPath         /usr/lib
+SafeEnv QD_Path          /usr
 SafeEnv Std_UseQD        FALSE
 
 if ($HostOS == Darwin) then
@@ -66,10 +66,11 @@ EOF
          setenv GraphicsDevices  "$GraphicsDevices QD"
          setenv GraphicsFlag     "$GraphicsFlag -framework Carbon"
 
-         setenv QD_RPath         ""
-         setenv QD_Lib           ""
-         setenv QD_Inc           "-framework Carbon"
          setenv MDG_Pck          "$MDG_Pck QD"
+
+         setenv QD_Inc           "-framework Carbon"
+         setenv QD_Lib           ""
+         setenv QD_RPath         ""
 
       else
          NoteD $ALog "      no Quickdraw (by request)"
@@ -81,14 +82,19 @@ EOF
 
    set ETime = `timer -b $UTime`
 
+# NOTE: used QD_Path to find libs, incs - there are no executables we need
+   if ("$QD_Path" == /usr) then
+      setenv QD_Path  ""
+   endif
+
 # export the results
    SetParent MDG_Inc
    SetParent MDG_Lib
    SetParent MDG_Pck
-   SetParent QD_Path
-   SetParent QD_RPath
-   SetParent QD_Lib
    SetParent QD_Inc
+   SetParent QD_Lib
+   SetParent QD_RPath
+   SetParent QD_Path
    SetParent GraphicsDevices
 
 endif
