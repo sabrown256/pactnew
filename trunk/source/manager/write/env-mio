@@ -53,28 +53,36 @@ HAVE_SUBROUTINES
     endif
 
 # site signature variables
-    Note $FOUT 'SYS_SITE = '$SYS_SITE
-    Note $FOUT 'SYS_TYPE = '$SYS_TYPE
-    Note $FOUT 'DAI_ROOT = '$DAI_ROOT
-    Note $FOUT 'DAS_ROOT = '$DAS_ROOT
-    Note $FOUT ''
+    Note $FOUT "SYS_SITE = $SYS_SITE"
+    Note $FOUT "SYS_TYPE = $SYS_TYPE"
+    Note $FOUT "DAI_ROOT = $DAI_ROOT"
+    Note $FOUT "DAS_ROOT = $DAS_ROOT"
+    Note $FOUT ""
 
     Note $FOUT "VMake = DAI_ROOT DAS_ROOT"
     Note $FOUT "VEnv  = DAI_ROOT DAS_ROOT"
     Note $FOUT "VCDef = DAI_ROOT DAS_ROOT"
     Note $FOUT "VMDef = DAI_ROOT DAS_ROOT"
-    Note $FOUT ''
+    Note $FOUT ""
 
 # database variables
-    Note $FOUT "HOST_SERVER_DB    = $HOST_SERVER_DB"
-    Note $FOUT "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
-    Note $FOUT "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
-    Note $FOUT "UPDATE_SYS_DB     = $UPDATE_SYS_DB"
-    Note $FOUT ''
+    if ($?HOST_SERVER_DB == 1) then
+       Note $FOUT "HOST_SERVER_DB    = $HOST_SERVER_DB"
+    endif
+    if ($?RUN_SIGNATURE_DB == 1) then
+       Note $FOUT "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
+    endif
+    if ($?SITE_SIGNATURE_DB == 1) then
+       Note $FOUT "SITE_SIGNATURE_DB = $SITE_SIGNATURE_DB"
+    endif
+    if ($?UPDATE_SYS_DB == 1) then
+       Note $FOUT "UPDATE_SYS_DB     = $UPDATE_SYS_DB"
+    endif
+    Note $FOUT ""
 
     Note $FOUT "VMake += HOST_SERVER_DB RUN_SIGNATURE_DB SITE_SIGNATURE_DB UPDATE_SYS_DB"
     Note $FOUT "VEnv  += HOST_SERVER_DB RUN_SIGNATURE_DB SITE_SIGNATURE_DB UPDATE_SYS_DB"
-    Note $FOUT ''
+    Note $FOUT ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -94,18 +102,18 @@ HAVE_SUBROUTINES
 
     Note $FOUT 'VMake = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
     Note $FOUT 'VEnv  = PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH $@'
-    Note $FOUT ''
+    Note $FOUT ""
     Note $FOUT "PACT_CC_FAMILY  = $PACT_CC_FAMILY"
     Note $FOUT "PACT_CC_VERSION = $PACT_CC_VERSION"
     Note $FOUT "PACT_CC_PATH    = $PACT_CC_PATH"
-    Note $FOUT ''
+    Note $FOUT ""
 
     Note $FOUT 'VMake = PACT_FC_VERSION PACT_FC_PATH $@'
     Note $FOUT 'VEnv  = PACT_FC_VERSION PACT_FC_PATH $@'
-    Note $FOUT ''
+    Note $FOUT ""
     Note $FOUT "PACT_FC_VERSION = $PACT_FC_VERSION"
     Note $FOUT "PACT_FC_PATH    = $PACT_FC_PATH"
-    Note $FOUT ''
+    Note $FOUT ""
 
     if ($PACT_CC_FAMILY == GNU) then
        set CmpBin   = $PACT_CC_PATH/bin
@@ -114,7 +122,7 @@ HAVE_SUBROUTINES
     else if ($PACT_CC_FAMILY == PGI) then
        set cmplib   = $PACT_CC_PATH/lib
        set lnuma    = $NUMA
-       Note $FOUT ''
+       Note $FOUT ""
        Note $FOUT 'VMake += NUMA'
 
     else if ($PACT_CC_FAMILY == INTEL) then
@@ -136,7 +144,7 @@ HAVE_SUBROUTINES
     endif
 
     Note $FOUT "Path += $CCBin"
-    Note $FOUT ''
+    Note $FOUT ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -144,7 +152,7 @@ HAVE_SUBROUTINES
 # SYSTEM - generate the System group
 
     Note $FOUT '# PACT SYSTEM specifications'
-    Note $FOUT ''
+    Note $FOUT ""
 
     if ($InstBase == none) then
        set proot = $RootDir
@@ -153,16 +161,16 @@ HAVE_SUBROUTINES
     endif
     set pvers = `cat .pact-version`
 
-    Note $FOUT 'CFE           = '$CFE
-    Note $FOUT 'PFE           = '$PFE
-    Note $FOUT 'CROSS_COMPILE = '$CROSS_COMPILE
+    Note $FOUT "CFE           = $CFE"
+    Note $FOUT "PFE           = $PFE"
+    Note $FOUT "CROSS_COMPILE = $CROSS_COMPILE"
     Note $FOUT 'VMake        += CFE PFE CROSS_COMPILE'
 
 # NOTE: PathScale/Intel build of Basis/MPPL requires this
     if ("$cmplib" != "") then
        Note $FOUT 'RPATH = '$cmplib' $@'
     endif
-    Note $FOUT ''
+    Note $FOUT ""
 
     Note $FOUT 'System/pact {'
     Note $FOUT '  PACT          = '$proot
@@ -174,12 +182,12 @@ HAVE_SUBROUTINES
     Note $FOUT '  VMake         = PACT PACTRoot PACTVersion PACTMDGL PACTMDL PACTLibs'
     Note $FOUT '  VEnv          = PACT'
     Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT ""
 
     Note $FOUT 'Tool/config_pact {'
     Note $FOUT '  AddressSize = '$lbits
     Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT ""
 
     set llibs = ""
     set llibs = ( $llibs $cmplib )
@@ -196,7 +204,7 @@ HAVE_SUBROUTINES
        Note $FOUT '  AddressSize  = '$lbits
        Note $FOUT '  Numa         = '$lnuma
        Note $FOUT '}'
-       Note $FOUT ''
+       Note $FOUT ""
     endif
 
     if ($FCBin != none) then
@@ -209,7 +217,7 @@ HAVE_SUBROUTINES
        Note $FOUT '  AddressSize  = '$lbits
        Note $FOUT '  Numa         = '$lnuma
        Note $FOUT '}'
-       Note $FOUT ''
+       Note $FOUT ""
     endif
 
     Note $FOUT 'Tool/lib_pact {'
@@ -218,7 +226,7 @@ HAVE_SUBROUTINES
     Note $FOUT '  ARFlags     = '$AR_Flags $AR_IFlag
     Note $FOUT '  AddressSize = '$lbits
     Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT ""
 
     Note $FOUT 'Library/pact {'
     Note $FOUT '  Archives  = pgs ppc pdb pml score'
@@ -250,7 +258,7 @@ HAVE_SUBROUTINES
     unset llibs
 
     Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -262,13 +270,13 @@ if (0) then
        set libm = `echo $LibM_Lib | sed 's/-l//'`
 
        Note $FOUT '# MATH specifications'
-       Note $FOUT ''
+       Note $FOUT ""
        Note $FOUT 'Library/lib_math {'
        Note $FOUT '  Archives = '$libm
        Note $FOUT '  LibPaths = '$LibM_RPath
        Note $FOUT '  RPaths   = '$LibM_RPath
        Note $FOUT '}'
-       Note $FOUT ''
+       Note $FOUT ""
     endif
 endif
 
@@ -279,12 +287,12 @@ endif
 
     if ("$DP_Lib" != "") then
        Note $FOUT '# MPI specifications'
-       Note $FOUT ''
+       Note $FOUT ""
 
        if ($?MPIBin == 1) then
           Note $FOUT 'Path = '${MPIBin}' $@'
        endif
-       Note $FOUT ''
+       Note $FOUT ""
 
        set linc = ( `echo "$IncMPI" | sed 's/-I//g'` )
 
@@ -302,7 +310,7 @@ endif
        Note $FOUT '  LibPaths = '${MPILib}
        Note $FOUT '  RPaths   = '${MPILib}
        Note $FOUT '}'
-       Note $FOUT ''
+       Note $FOUT ""
 
     endif
 
@@ -313,7 +321,7 @@ endif
 
     foreach p ($MD_Pck)
        Note $FOUT "# $p package"
-       Note $FOUT ''
+       Note $FOUT ""
 
        set lp = `echo $p | tr "[A-Z]" "[a-z]"`
 
@@ -329,7 +337,7 @@ endif
        Note $FOUT '  LibPaths = '$lrpth
        Note $FOUT '  RPaths   = '$lrpth
        Note $FOUT '}'
-       Note $FOUT ''
+       Note $FOUT ""
 
     end
 

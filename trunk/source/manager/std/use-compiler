@@ -131,6 +131,8 @@ endsw
 set dirl = ""
 foreach c ($fname $cname)
 
+   set cmp = `which $c`
+
 # if blank try to find compiler on your path
    if ("$cpath" == "") then
       if (-x $DAI_ROOT/pact/scripts/$c) then

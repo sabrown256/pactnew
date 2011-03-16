@@ -853,7 +853,11 @@ switch ($Cmnd)
         unset gdir
 
 # set the configuration for this system
-        setenv System `$CfgMan add $sid`
+        if ("$sid" == "") then
+           setenv System `$CfgMan use`
+        else
+           setenv System `$CfgMan add $sid`
+        endif
 
 # now that we have the system, reset the variables that depend on it
         set Root   = $BaseDev/$System
