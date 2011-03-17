@@ -16,14 +16,13 @@ if (-x "$Exe/ls-all") then
    set path = ( $Exe $path )
 endif
 
-set Which   = "swhich -1"
 set PName   = ""
 set Verbose = "-q"
 set LUser   = ""
 set SSH     = 'ssh -q -x -o BatchMode=yes -o StrictHostKeyChecking=no'
 
 set HostFile = $HOME/.all-hosts
-if (-x `$Which hserve`) then
+if (-x `where hserve | head -n 1`) then
    set Method = hserve
 else
    set Method = script

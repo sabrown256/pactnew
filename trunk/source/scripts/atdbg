@@ -16,7 +16,6 @@ if (-x "$Exe/atdbg") then
    set path = ( $Exe $path )
 endif
 
-set Which    = "swhich -1"
 set OSType   = `uname -s`
 set PName    = ""
 set Verbose  = FALSE
@@ -108,7 +107,7 @@ endif
 
 set dbg = ""
 foreach i ($dbglst)
-   set j = `$Which $i`
+   set j = `where $i | head -n 1`
    if (-x "$j") then
       set dbg = $j
       break

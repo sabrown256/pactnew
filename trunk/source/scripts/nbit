@@ -15,7 +15,6 @@ set Err = 0
 set Tmp = $cwd/.tmp-nbit.$$
 set OS  = `uname -s`
 
-set Which   = "swhich -1"
 set DefOnly = FALSE
 
 while ($#argv > 0)
@@ -59,7 +58,7 @@ while ($#lst > 0)
    shift lst
    shift lst
 
-   set CExe = `$Which $Cmp`
+   set CExe = `where $Cmp | head -n 1`
    if (-x "$CExe") then
 
       if ("$Cmp" == gcc) then

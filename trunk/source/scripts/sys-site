@@ -61,7 +61,7 @@ if (-f "$SignF") then
       foreach var ($VarLst)
          set val = `set | awk '$1 == "'$var'" { print }'`
          shift val
-         echo ">>   $var = $val"
+         echo "local:   $var = $val"
       end
    endif
 
@@ -90,7 +90,7 @@ if (-f "$SignF") then
          set Section = $line[3]
          set skip    = FALSE
          if ($Verbose == TRUE) then
-            echo ">>   $Section"
+            echo "line ${iline}:   determine $Section"
          endif
 
 # do tests until one succeeds
@@ -104,7 +104,7 @@ if (-f "$SignF") then
          if ("$line" =~ \(*\)) then
             eval "if $line set Res = TRUE"
             if ($Verbose == TRUE) then
-               echo ">>      test $line => $Res"
+               echo "line ${iline}:      test $line => $Res"
             endif
 
 # anything with TRUE succeeds
@@ -117,7 +117,7 @@ if (-f "$SignF") then
             $line >& /dev/null
             if ($status == 0) set Res = TRUE
             if ($Verbose == TRUE) then
-               echo ">>      $line => $Res"
+               echo "line ${iline}:      $line => $Res"
             endif
          endif
 
@@ -126,7 +126,7 @@ if (-f "$SignF") then
             eval "setenv $Section $Val"
             set skip = TRUE
             if ($Verbose == TRUE) then
-               echo ">>   $Section = $Val"
+               echo "line ${iline}:   $Section = $Val"
             endif
             if ($OutShell == csh) then
                echo "setenv $Section `printenv $Section` ; "

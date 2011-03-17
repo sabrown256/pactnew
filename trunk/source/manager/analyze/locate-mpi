@@ -91,6 +91,11 @@ if (-f local/mpi-db) then
 
    call RESET_STATE()
 
+   if ($Verbose == TRUE) then
+      echo "Seeking match for: $SW $HW $Comp"
+      echo ""
+   endif
+
    while ($il < $nl)
       @ il = $il + 1
       set line = ( `head -n $il local/mpi-db | tail -n 1` )
@@ -118,25 +123,19 @@ if (-f local/mpi-db) then
 
          if ($match == TRUE) then
             if ($Verbose == TRUE) then
-               echo "Match: $SW $HW $Comp"
+               echo "Check stanza ending on line ${il}:"
             endif
             call TRY($lbin, end, $llib, end, $linc, end, $link)
             if ($ok == TRUE) then
                if ($Verbose == TRUE) then
-                  echo "Match: found"
-                  echo "   $linc"
-                  echo "   $llib"
-                  echo "   $lbin"
-                  echo "   $link"
+                  echo "Accepted: all components found"
+                  echo ""
                endif
                break
             else
                if ($Verbose == TRUE) then
-                  echo "Match: missing component"
-                  echo "   $linc"
-                  echo "   $llib"
-                  echo "   $lbin"
-                  echo "   $link"
+                  echo "Rejected: missing $missing"
+                  echo ""
                endif
             endif
          endif
@@ -240,6 +239,9 @@ if ($?DP_Path == 1) then
    SetParent DP_RPath
    SetParent DP_Path
    SetParent RPATH
+
+else if ($Verbose == TRUE) then
+   echo "No MPI found matching: $SW $HW $Comp"
 endif
 
 exit($status)
@@ -293,10 +295,11 @@ TRY:
 
    set tlink = ( $larg )
 
-   set ok   = FALSE
-   set fbin = FALSE
-   set flib = FALSE
-   set finc = FALSE
+   set ok      = FALSE
+   set fbin    = FALSE
+   set flib    = FALSE
+   set finc    = FALSE
+   set missing = ""
 
    @ i = 0
 
@@ -307,6 +310,9 @@ TRY:
          set fbin = TRUE
       endif
    end
+   if ($fbin == FALSE) then
+      set missing = ( $missing bin )
+   endif
 
 # test for the lib directory
    foreach e ( $tlib )
@@ -315,6 +321,9 @@ TRY:
          set flib = TRUE
       endif
    end
+   if ($flib == FALSE) then
+      set missing = ( $missing lib )
+   endif
 
 # test for the include directory
    foreach e ( $tinc )
@@ -328,6 +337,9 @@ TRY:
          endif
       endif
    end
+   if ($finc == FALSE) then
+      set missing = ( $missing include )
+   endif
 
    @ n = $#tbin + $#tlib + $#tinc + 1
 
@@ -349,10 +361,24 @@ TRY:
             endif
          endif
       end
-   else if ($Verbose == TRUE) then
-      echo "      have bin $fbin ($tbin)"
-      echo "      have lib $flib ($tlib)"
-      echo "      have inc $finc ($tinc)"
+   endif
+
+   if ($Verbose == TRUE) then
+      if ($fbin == TRUE) then
+         echo "      have bin ($tbin)"
+      else
+         echo "      no bin ($tbin)"
+      endif
+      if ($flib == TRUE) then
+         echo "      have lib ($tlib)"
+      else
+         echo "      no lib ($tlib)"
+      endif
+      if ($finc == TRUE) then
+         echo "      have inc ($tinc)"
+      else
+         echo "      no inc ($tinc)"
+      endif
    endif
 
    return

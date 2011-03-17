@@ -20,8 +20,6 @@ umask 002
 
 onintr INTERRUPT
 
-set Which = "swhich -1"
-
 # NOTE: horrible bootstrap to find csh-subroutines
 set IncPath = ""
 foreach i (`dirname $0` $cwd $cwd/.. $path)
@@ -330,7 +328,7 @@ while ($#argv > 0)
    shift
 end
 
-set RPATH  = `$Which rpath`
+set RPATH  = `where rpath | head -n 1`
 set SSH    = ""
 set TIMER  = ""
 set HSERVE = ""
@@ -948,7 +946,7 @@ SESSION:
    if ($Watch == TRUE) then
       set Title    = "DO-NET-WATCH"
       set Geometry = ( 90x15-10+10 )
-      set DO_NET   = `$Which do-net`
+      set DO_NET   = `where do-net | head -n 1`
 
       if ($WatchOut == TEXT) then
          set WArgs = "+watch"
@@ -1224,13 +1222,13 @@ READHOST:
    endif
 
    if ("$Mailer" == "") then
-      $Which mailx >& /dev/null
+      where mailx | head -n 1 >& /dev/null
       if ($status == 0) then
-         set Mailer = `$Which mailx`
+         set Mailer = `where mailx | head -n 1`
       else
-         $Which mail >& /dev/null
+         where mail | head -n 1 >& /dev/null
          if ($status == 0) then
-            set Mailer = `$Which mail`
+            set Mailer = `where mail | head -n 1`
          else
             echo ""
             echo "Can't determine the mail program to be used"
@@ -2122,7 +2120,7 @@ return
 
 FINDRUN:
 
-   set DoBin   = `$Which do-net`
+   set DoBin   = `where do-net | head -n 1`
    set DoBin   = $DoBin:h
    set DoLocal = $DoBin/do-local
    set DLocal  = .$DoLocal:t.$Stamp

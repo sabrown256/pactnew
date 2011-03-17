@@ -10,8 +10,6 @@
 
 unalias *
 
-set Which   = "swhich -1"
-
 set HostOS  = `uname -s`
 set HostHW  = `uname -m`
 
@@ -157,7 +155,7 @@ if ($Info != "") then
       set TimeMax = $tTimeMax
    endif
    if ("$HaveMPI" != "") then
-      setenv Wrap `$Which mpi-io-wrap`
+      setenv Wrap `where mpi-io-wrap | head -n 1`
    endif
 
 # Note: count on the Info file having been automatically generated

@@ -69,11 +69,11 @@ if (-d $dst) then
 endif
 
 # decide on MD5 checksumming command
-set md5cmd = ( `swhich -1 md5sum` )
+set md5cmd = ( `where md5sum | head -n 1` )
 if (-x "$md5cmd") then
    set md5cmd = ( $md5cmd -b )
 else
-   set md5cmd = ( `swhich -1 md5` )
+   set md5cmd = ( `where md5 | head -n 1` )
    if (!(-x "$md5cmd")) then
       set md5cmd = ( wc -c )
    endif

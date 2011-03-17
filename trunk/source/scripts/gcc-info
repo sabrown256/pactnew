@@ -22,11 +22,11 @@ while ($#argv > 0)
 end
 
 if ("$Gcc" == "") then
-   set Gcc = ( `swhich -1 gcc` )
+   set Gcc = ( `where gcc | head -n 1` )
 endif
 
 if ("$Gcc" !~ /*) then
-   set Gcc = ( `swhich -1 $Gcc` )
+   set Gcc = ( `where $Gcc | head -n 1` )
 endif
 
 if (!(-x "$Gcc")) then

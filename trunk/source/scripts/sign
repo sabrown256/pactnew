@@ -17,10 +17,8 @@ if (-x "$Exe/sign") then
    set path = ( $Exe $path )
 endif
 
-set Which = "swhich -1"
-
 # absolutely must have ls-jobs - stop without it (update-sys for example)
-set LSJOBS = `$Which ls-jobs`
+set LSJOBS = `where ls-jobs | head -n 1`
 if (!(-x "$LSJOBS")) then
    echo "SIGN error - no ls-jobs found on path:"
    echo "    $path"

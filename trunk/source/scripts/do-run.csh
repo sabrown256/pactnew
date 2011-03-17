@@ -28,8 +28,6 @@ pushd `dirname $0` >& /dev/null
 set BinDir = $cwd
 popd >& /dev/null
 
-set Which = "$BinDir/swhich -1"
-
 setenv PACT $BinDir:h
 
 if ((-x /usr/bin/bpsh) && ($?NODES == 1)) then
@@ -58,7 +56,7 @@ if (!($?Wrap)) then
    if (-x $BinDir/mpi-io-wrap) then
       setenv Wrap $BinDir/mpi-io-wrap
    else
-      setenv Wrap "`$Which mpi-io-wrap`"
+      setenv Wrap "`where mpi-io-wrap | head -n 1`"
       if (!(-x "$Wrap")) then
          setenv Wrap ""
       endif
@@ -102,7 +100,7 @@ while ($#argv > 0)
 
       case -d:
            set Debug = TRUE
-           set DBG   = `$Which totalview`
+           set DBG   = `where totalview | head -n 1`
            breaksw
 
       case -dr:
@@ -124,7 +122,7 @@ while ($#argv > 0)
               set BCdr = `expr "$List" : '\(.*\) .*'`
               set BCar = `expr "$List" : '.* \(.*\)'`
               if (("$BCar" == "") && ("$BCdr" == "")) then
-		 set DBG     = `$Which $List`
+		 set DBG     = `where $List | head -n 1`
                  set List    = ""
               else
                  set DBGArgs = ( $BCar $DBGArgs )
@@ -243,7 +241,7 @@ while ($#argv > 0)
 end
 
 set NCPU = $MP_PROCS
-set Code = `$Which $Code`
+set Code = `where $Code | head -n 1`
 if (!(-x "$Code") && ($DryRun == FALSE)) then
    echo "No '"$Code"' on your path"
    exit(1)
@@ -296,11 +294,11 @@ endif
 
 if ($HaveMPI == TRUE) then
 
-   set SRUN    = `$Which srun`
-   set PRUN    = `$Which prun`
-   set DMPIRUN = `$Which dmpirun`
-   set MPIRUN  = `$Which mpirun`
-   set RUN     = `$Which run`
+   set SRUN    = `where srun | head -n 1`
+   set PRUN    = `where prun | head -n 1`
+   set DMPIRUN = `where dmpirun | head -n 1`
+   set MPIRUN  = `where mpirun | head -n 1`
+   set RUN     = `where run | head -n 1`
 
    if ($HostOS == AIX) then
       set MPIArgs = $Code
@@ -485,9 +483,9 @@ if ($Debug == TRUE) then
 
 # figure which debugger to use
    if (!(-x "$DBG")) then
-      set DBG = `$Which tv5`
+      set DBG = `where tv5 | head -n 1`
       if (!(-x "$DBG")) then
-         set DBG = `$Which totalview`
+         set DBG = `where totalview | head -n 1`
          if (!(-x "$DBG")) then
             echo "No TOTALVIEW on your path"
             exit(1)

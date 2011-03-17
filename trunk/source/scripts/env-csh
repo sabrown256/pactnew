@@ -16,7 +16,7 @@ unalias mv
 
 # nasty bootstrapping issue here when building PACT for the first time
 # we are not supposed to be doing a lot of work in this script
-#setenv PERDB `swhich -1 perdb`
+#setenv PERDB `where perdb | head -n 1`
 setenv PERDB perdb
 
 # these two go together
