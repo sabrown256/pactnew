@@ -12,7 +12,7 @@ run analyze/locate-mpi mpich any pgi
 include 64-bit
 include compilers/pgi
 
-run std/module-cray pgi 3.1.37G
+run std/module-cray env 3.1.37G pgi 10.9.0
 run std/use-compiler pgcc
 
 include no-opengl

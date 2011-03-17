@@ -163,6 +163,34 @@ int PM_qvalue_compare(long double x1, long double x2, long double tol)
 
     return(rv);}
 
+#else
+
+/* GOTCHA: this version works for PGI who have no idea what to
+ * do with long double - the compiler supports the syntax but they
+ * do nothing right with the actual arithmetic
+ */
+
+int PM_qvalue_compare(long double x1, long double x2, long double tol)
+   {int rv;
+    double dx, lx1, lx2, ltol;
+
+    lx1  = x1;
+    lx2  = x2;
+    ltol = tol;
+
+    if (ltol < 0.0)
+       ltol = TOLERANCE;
+
+    dx = (lx1 - lx2)/(ABS(lx1) + ABS(lx2) + SMALL);
+    if (dx < -ltol)
+       rv = -1;
+    else if (ltol < dx)
+       rv = 1;
+    else
+       rv = 0;
+
+    return(rv);}
+
 #endif
 
 /*--------------------------------------------------------------------------*/

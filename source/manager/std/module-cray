@@ -8,21 +8,26 @@
 # include "cpyright.h"
 #
 
-set cmp  = ""
-set vers = ""
+set cmp   = ""
+set cvers = ""
+set evers = ""
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: module-cray <compiler> <version>"
+           echo "Usage: module-cray env <version> <compiler> <version>"
            echo ""
            exit(1)
+      case env:
+           shift
+           set evers = $1
+           breaksw
       default:
            if ("$cmp" == "") then
-              set cmp = $1
-           else if ("$vers" == "") then
-              set vers = $1
+              set cmp   = $1
+              set cvers = $1
+              shift
            endif
            breaksw
    endsw
@@ -34,14 +39,26 @@ if ("$cmp" == "") then
    exit(1)
 endif
 
-# take only known default possibility
-if ("$vers" == "") then
-   set vers = 3.1.37G
+if ("$cvers" == "") then
+   echo "No compiler version specified - exiting"
+   exit(1)
+endif
+
+if ("$evers" == "") then
+   echo "No environment version specified - exiting"
+   exit(1)
+endif
+
+if ($cmp == gnu) then
+   set cc = gcc
+else
+   set cc = $cmp
 endif
 
 if ($?MODULESHOME == 1) then
 
-   alias setp 'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
+   alias setp   'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
+   alias unsetp 'echo "\!*"'
 
 # unload any currently loaded modules
    set mlst = ( `echo $PRGENVMODULES | sed 's|:| |g'` )
@@ -49,8 +66,11 @@ if ($?MODULESHOME == 1) then
       eval `$MODULESHOME/bin/modulecmd tcsh unload $mod`
    end
 
-# load and export the requested module
-   eval `$MODULESHOME/bin/modulecmd tcsh load PrgEnv-$cmp/$vers | sed 's|setenv|setp|g'`
+# load and export the requested environment module
+   eval `$MODULESHOME/bin/modulecmd tcsh load PrgEnv-$cmp/$evers | sed 's|setenv|setp|g'`
+
+# load and export the requested compiler module
+   eval `$MODULESHOME/bin/modulecmd tcsh load $cc/$cvers | sed 's|setenv|setp|g'`
 
    foreach i ($LD_LIBRARY_PATH)
       setenv RPATH `analyze/rpath -a $i -o echo`
