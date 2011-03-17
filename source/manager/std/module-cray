@@ -8,25 +8,30 @@
 # include "cpyright.h"
 #
 
-set cmp   = ""
-set cvers = ""
-set evers = ""
+set cmp     = ""
+set cvers   = ""
+set evers   = ""
+set mpivers = ""
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: module-cray env <version> <compiler> <version>"
+           echo "Usage: module-cray env <version> [mpi <version>] <compiler> <version>"
            echo ""
            exit(1)
       case env:
            shift
            set evers = $1
            breaksw
+      case mpi:
+           shift
+           set mpivers = $1
+           breaksw
       default:
            if ("$cmp" == "") then
               set cmp   = $1
-              set cvers = $1
+              set cvers = $2
               shift
            endif
            breaksw
@@ -36,11 +41,6 @@ end
 
 if ("$cmp" == "") then
    echo "No compiler specified - exiting"
-   exit(1)
-endif
-
-if ("$cvers" == "") then
-   echo "No compiler version specified - exiting"
    exit(1)
 endif
 
@@ -60,25 +60,77 @@ if ($?MODULESHOME == 1) then
    alias setp   'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
    alias unsetp 'echo "\!*"'
 
-# unload any currently loaded modules
-   set mlst = ( `echo $PRGENVMODULES | sed 's|:| |g'` )
-   foreach mod ($mlst)
-      eval `$MODULESHOME/bin/modulecmd tcsh unload $mod`
+   set MODULE = ( $MODULESHOME/bin/modulecmd tcsh )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ENVIRONMENT
+
+# unload programming environment modules
+   set envmod = ( `echo $PRGENVMODULES | sed 's|:| |g'` )
+   foreach m ($envmod)
+      if ("$m" =~ PrgEnv*) then
+         eval `$MODULE unload $m`
+      endif
    end
 
 # load and export the requested environment module
-   eval `$MODULESHOME/bin/modulecmd tcsh load PrgEnv-$cmp/$evers | sed 's|setenv|setp|g'`
+   eval `$MODULE load PrgEnv-$cmp/$evers | sed 's|setenv|setp|g'`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILER
 
 # load and export the requested compiler module
-   eval `$MODULESHOME/bin/modulecmd tcsh load $cc/$cvers | sed 's|setenv|setp|g'`
+   if ("$cvers" != "") then
+      eval `$MODULE load $cc/$cvers | sed 's|setenv|setp|g'`
+   endif
 
-   foreach i ($LD_LIBRARY_PATH)
-      setenv RPATH `analyze/rpath -a $i -o echo`
-   end
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MPI
+
+   if ("$mpivers" != "") then
+
+# unload any xt-mpt modules
+      set ldmod = ( `echo $LOADEDMODULES | sed 's|:| |g'` )
+      foreach m ($ldmod)
+         if ("$m" =~ xt-mpt*) then
+            eval `$MODULE unload $m`
+         endif
+      end
+
+# load and export the requested MPICH module
+      eval `$MODULE load xt-mpich2/$mpivers | sed 's|setenv|setp|g'`
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# RPATH
+
+   if ($?LD_LIBRARY_PATH == 1) then
+      foreach i ($LD_LIBRARY_PATH)
+         setenv RPATH `analyze/rpath -a $i -o echo`
+      end
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH
+
+# NOTE: aprun is the MPI front end but it is not installed on the front end nodes
+# so just use /usr/bin as a place holder
+   set lbin = /usr/bin
 
    setp DP_Inc     -I$MPICH_DIR/include
    setp DP_Lib     -lmpich
    setp DP_RPath   $MPICH_DIR/lib
+   setp DP_Path    $lbin
    setp RPATH      $RPATH
 
 endif

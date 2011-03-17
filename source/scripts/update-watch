@@ -10,26 +10,25 @@
 
 unalias *
 
-set Exe   = `dirname $0`
-set Which = "$Exe/swhich -1"
+set Exe = `dirname $0`
 
 # look for PACT and use it if available
 # if you have PACT you get certain defaults and otherwise
 # you have to specify everything in the command line
-set PACT = `$Which pact`
+set PACT = `where pact | head -n 1`
 if (-x "$PACT") then
    set Exe  = `rpath $0`
    set Root = $Exe:h
    set Root = $Root:h
    if (!(-d $Root/include)) then
-      set Exe  = `$Which pact`
+      set Exe  = `where pact | head -n 1`
       set Root = $Exe:h
       set Root = $Root:h
    endif
    source $Root/include/env-csh
 
 # PACT must be on your path - end of story
-   set lsys = `$Which sys-site`
+   set lsys = `where sys-site | head -n 1`
    eval `$lsys`
 
 else
@@ -39,7 +38,7 @@ else
    alias InitLog   'set t = \!\!:2 ; rm -f $t ; echo $USER >&! $t ; date >> $t ; pwd >> $t ; echo "" >> $t ; setenv \!\!:1 $t ; unset t'
 endif
 
-set SSH       = `$Which ssh`
+set SSH       = `where ssh | head -n 1`
 set UpF       = ""
 set Tags      = ""
 set AllSites  = FALSE

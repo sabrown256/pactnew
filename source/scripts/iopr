@@ -19,8 +19,7 @@ if (-x "$Exe/iopr") then
    set path = ( $Exe $path )
 endif
 
-set Which = "swhich -1"
-set TIMER = `$Which timer`
+set TIMER = `where timer | head -n 1`
 if (!(-x $TIMER)) then
    set TIMER = none
 endif
@@ -86,7 +85,7 @@ end
 
 # CHECK - verify that we can run netstat to get info
 
-set NETSTAT = `$Which netstat`
+set NETSTAT = `where netstat | head -n 1`
 if (!(-x $NETSTAT)) then
    exit(1)
 else

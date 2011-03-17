@@ -15,11 +15,10 @@ onintr INTERRUPT
 umask 002
 
 # PACT must be on your path - end of story
-set Which = "swhich -1"
-set Exe   = `rpath $0`
-set Root  = $Exe:h
+set Exe  = `rpath $0`
+set Root = $Exe:h
 if (!(-d $Root/include)) then
-   set Exe  = `$Which pact`
+   set Exe  = `where pact | head -n 1`
    set Root = $Exe:h
    set Root = $Root:h
 endif
@@ -27,11 +26,11 @@ source $Root/include/env-csh
 
 Intervene help.update-sys
 
-set lsys  = `$Which sys-site`
+set lsys  = `where sys-site | head -n 1`
 eval `$lsys`
 
-set SSH      = ( `$Which ssh` -o TCPKeepAlive=yes )
-set SCP      = `$Which scp`
+set SSH      = ( `where ssh | head -n 1` -o TCPKeepAlive=yes )
+set SCP      = `where scp | head -n 1`
 set UpF      = ""
 set Tags     = ""
 set Oper     = "add"

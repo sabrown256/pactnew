@@ -19,7 +19,6 @@ setenv Err  0
 
 umask 007
 
-set Which = "swhich -1"
 set argv  = `cat $ArgFile`
 set Phase = $1
 shift
@@ -128,7 +127,7 @@ switch ($Phase)
         flog $LogHost set HaveGMake = FALSE
         flog $LogHost set UMake     = make
         foreach i (gmake make)
-           set lMake = `$Which $i`
+           set lMake = `where $i | head -n 1`
            if (-x "$lMake") then
               flog $LogHost $lMake --version
               if ($status == 0) then

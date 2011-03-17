@@ -25,21 +25,14 @@ switch ($os)
         set cc  = ( cc -DNO_UNSETENV )
         breaksw
 
-# find gcc or cc on path without using unreliable 'which'
    default:
-        set cc = none
-        foreach d ( $path )
-           foreach i ( gcc cc )
-              set cx = $d/$i
-              if (-x $cx) then
-                 set cc = $cx
-                 break
-              endif
-           end
-           if ($cc != none) then
-              break
+        set cc = ( `where gcc | head -n 1` )
+	if (!(-x "$cc")) then
+           set cc = ( `where cc | head -n 1` )
+	   if (!(-x "$cc")) then
+              set cc = none
            endif
-        end
+        endif
         breaksw
 endsw
 

@@ -16,9 +16,9 @@ foreach f (../scripts ../../scripts ../../../scripts)
    endif
 end
 
-set Which = "swhich -1"
-set TLog  = test
-if (-x "`$Which valgrind`") then
+set TLog = test
+set VG   = `where valgrind | head -n 1`
+if (-x "$VG") then
    set largs = ( $argv )
    while ($#largs > 0)
       switch ($largs[1])
@@ -251,7 +251,7 @@ set FAIL   = "NO"
 set status = 0
 
 if ("$Valgrind" != "") then
-   Note $Log "Using valgrind: `$Which valgrind`"
+   Note $Log "Using valgrind: $VG"
 endif
 
 
