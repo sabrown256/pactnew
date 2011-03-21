@@ -236,10 +236,11 @@ struct s_gattrdes
 /* global PGS controls */
 
 struct s_gcontdes
-   {int input_nc;
+   {int input_nr;                          /* number of characters requested */
+    int input_nc;
     int input_ncx;
     char default_window_device[MAXLINE];
-    char *input_bf;
+    char *input_bf;                                          /* input buffer */
     PG_event current_event;
     PFGetEvent get_event;
     PFOpenConsole open_console;

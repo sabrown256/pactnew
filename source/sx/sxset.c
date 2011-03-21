@@ -269,14 +269,14 @@ int _SX_get_input(object *str)
 
     else if (fp == stdin)
        {
-#if 1
-/* keep mouse events - lose readline */
+
+#ifdef HAVE_READLINE
+        rl_getc_function = PG_wind_fgetc;
+	p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
+#else
 	if (_SS.pr_prompt != NULL)
 	   PRINT(stdout, "%s", _SS.pr_prompt);
 	p = _SX.gets(SS_BUFFER(str), MAXLINE, fp);
-#else
-/* keep readline - lose mouse events */
-	p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
 #endif
 
 	_SS.pr_prompt = NULL;

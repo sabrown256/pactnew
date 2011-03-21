@@ -558,6 +558,11 @@
         (PG_console_device->close_console != NULL))                          \
        (*PG_console_device->close_console)
 
+#define PG_fgetc(stream)                                                     \
+    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
+     (*PG_console_device->ggetc)(stream) :                                   \
+     EOF)
+
 #define PG_fgets(buffer, maxlen, stream)                                     \
     (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
      (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
@@ -1302,6 +1307,7 @@ struct s_PG_device
     void (*get_image)(PG_device *dev, unsigned char *bf, int ix, int iy,
 		      int nx, int ny);
     void (*get_text_ext)(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *bx);
+    PFfgetc ggetc;
     PFfgets ggets;
     void (*gputs)(char *bf);
     void (*set_clipping)(PG_device *dev, int flag);
@@ -1578,7 +1584,7 @@ extern void
 /* GSDV.C declarations */
 
 extern void
- PG_setup_input(char *s, int nc),
+ PG_setup_input(char *s, int nc, size_t nr),
  PG_reset_input(void),
  PG_device_filename(char *fname, char *raw, char *ext),
  PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc),
@@ -1597,6 +1603,7 @@ extern int
  PG_fprintf(FILE *fp, char *fmt, ...),
  PG_fputs(char *s, FILE *fp),
  PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ...),
+ PG_wind_fgetc(FILE *stream),
  PG_wind_fprintf(FILE *fp, char *fmt, ...),
  PG_wind_fputs(char *s, FILE *fp),
  PG_open_console(char *title, char *type, int bckgr,

@@ -112,9 +112,13 @@ static void _PG_get_input(int fd, int mask, void *a)
 
     _PG_gcont.input_nc = 0;
 
-    eof = (char) EOF;
     fd  = fileno(stdin);
-    n   = SC_read_sigsafe(fd, bf, MAX_BFSZ);
+    eof = (char) EOF;
+
+    if (_PG_gcont.input_nr != -1)
+       n = SC_read_sigsafe(fd, bf, _PG_gcont.input_nr);
+    else
+       n = SC_read_sigsafe(fd, bf, MAX_BFSZ);
 
 /* if we have no input buffer throw the input away (nobody asked for it)
  * and return to whoever called
