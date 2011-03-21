@@ -1558,7 +1558,7 @@ static char *_PG_X_wind_fgets(char *str, int maxlen, FILE *fp)
        p = io_gets(str, maxlen, fp);
 
     else
-       {PG_setup_input(str, maxlen);
+       {PG_setup_input(str, maxlen, -1);
 
 	if (SETJMP(io_avail) == ERR_FREE)
 
@@ -1574,6 +1574,41 @@ static char *_PG_X_wind_fgets(char *str, int maxlen, FILE *fp)
 	    PG_catch_interrupts(FALSE);};};
 
     return(p);}
+
+/*-------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PG_X_WIND_FGETC - get and return a character from the window environment
+ *                  - start with a clean event slate, and cycle the main
+ *                  - event loop until some event sets
+ *                  - PG_console_device->DoneFlag
+ */
+ 
+static int _PG_X_wind_fgetc(FILE *fp)
+   {int c;
+    char bf[10];
+
+    c = 0;
+    if (fp != stdin)
+       c = io_getc(fp);
+
+    else
+       {PG_setup_input(bf, 10, 1);
+
+	if (SETJMP(io_avail) == ERR_FREE)
+
+/* turn off interrupts until the next call to _PG_X_wind_fgetc */
+	   {PG_catch_interrupts(FALSE);
+	    c = _PG_gcont.input_bf[0];}
+
+	else
+
+/* don't catch interrupts until the SETJMP is successful */
+           {PG_catch_interrupts(TRUE);
+	    PG_poll(TRUE, 100);
+	    PG_catch_interrupts(FALSE);};};
+
+    return(c);}
 
 /*-------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------*/
@@ -1873,6 +1908,7 @@ int PG_setup_x11_device(PG_device *d)
     d->get_char               = _PG_X_get_char;
     d->get_image              = _PG_X_get_image;
     d->get_text_ext           = _PG_X_get_text_ext;
+    d->ggetc                  = (PFfgetc) _PG_X_wind_fgetc;
     d->ggets                  = (PFfgets) _PG_X_wind_fgets;
     d->gputs                  = _PG_X_puts;
     d->make_device_current    = _PG_X_make_device_current;

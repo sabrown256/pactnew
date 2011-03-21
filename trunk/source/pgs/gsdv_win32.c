@@ -979,6 +979,7 @@ int PG_setup_win32_device(PG_device *d)
     d->get_char               = NULL;
     d->get_image              = _PG_win32_get_image;
     d->get_text_ext           = _PG_win32_get_text_ext;
+    d->ggetc                   = io_getc;
     d->ggets                  = (PFfgets) _PG_win32_wind_fgets;
     d->gputs                  = _PG_win32_puts;
     d->make_device_current    = _PG_win32_make_device_current;

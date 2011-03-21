@@ -659,7 +659,7 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
        {p = io_gets(str, maxlen, fp);
 	return(p);};
 
-    PG_setup_input(str, maxlen);
+    PG_setup_input(str, maxlen, -1);
 
     if (SETJMP(io_avail) == ERR_FREE)
 
@@ -1826,6 +1826,7 @@ int PG_setup_qd_device(PG_device *d)
     d->get_char               = NULL;
     d->get_image              = _PG_qd_get_image;
     d->get_text_ext           = _PG_qd_get_text_ext;
+    d->ggetc                  = io_getc;
     d->ggets                  = (PFfgets) _PG_qd_wind_fgets;
     d->gputs                  = _PG_qd_puts;
     d->make_device_current    = _PG_qd_make_device_current;

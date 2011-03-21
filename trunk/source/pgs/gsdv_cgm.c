@@ -664,6 +664,7 @@ int PG_setup_cgm_device(PG_device *d)
     d->get_char                = NULL;
     d->get_image               = NULL;
     d->get_text_ext            = _PG_CGM_get_text_ext;
+    d->ggetc                   = io_getc;
     d->ggets                   = io_gets;
     d->gputs                   = NULL;
     d->make_device_current     = _PG_CGM_make_device_current;

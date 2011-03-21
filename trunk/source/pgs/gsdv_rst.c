@@ -744,6 +744,7 @@ int PG_setup_raster_device(PG_device *d)
     d->get_char                = NULL;
     d->get_image               = _PG_rst_get_image;
     d->get_text_ext            = _PG_rst_get_text_ext;
+    d->ggetc                   = io_getc;
     d->ggets                   = io_gets;
     d->gputs                   = NULL;
     d->make_device_current     = _PG_rst_make_device_current;

@@ -368,6 +368,23 @@ int PG_fputs(char *s, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_WIND_FGETC - window version of fgetc
+ *               - event handling loop driver
+ */
+
+int PG_wind_fgetc(FILE *stream)
+   {int c;
+
+    if (stream == stdin)
+       c = PG_fgetc(stream);
+    else
+       c = io_getc(stream);
+
+    return(c);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PG_WIND_FGETS - window version of fgets
  *               - event handling loop driver
  */
@@ -387,10 +404,11 @@ char *PG_wind_fgets(char *str, int maxlen, FILE *stream)
 
 /* PG_SETUP_INPUT - reset the input state */
 
-void PG_setup_input(char *s, int nc)
+void PG_setup_input(char *s, int nc, size_t nr)
    {
 
     _PG_gcont.input_bf  = s;
+    _PG_gcont.input_nr  = nr;
     _PG_gcont.input_nc  = 0;
     _PG_gcont.input_ncx = nc;
 
