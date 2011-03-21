@@ -15,6 +15,7 @@
 #ifdef HAVE_READLINE
 # include <readline/readline.h>
 # include <readline/history.h>
+# undef CTRL
 #endif
 
 /*--------------------------------------------------------------------------*/

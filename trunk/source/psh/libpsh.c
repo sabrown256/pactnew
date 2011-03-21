@@ -648,8 +648,11 @@ int file_exists(char *fmt, ...)
 
 /* FILE_EXECUTABLE - return TRUE iff the named file is executable */
 
-#ifndef NGROUPS_MAX
-# define NGROUPS_MAX 16
+#undef NGROUPX
+#ifdef NGROUPS_MAX
+# define NGROUPX NGROUPS_MAX
+#else
+# define NGROUPX 16
 #endif
 
 int file_executable(char *fmt, ...)
@@ -674,7 +677,7 @@ int file_executable(char *fmt, ...)
        strncpy(err, strerror(errno), MAXLINE);
     else
        {int ig, ng;
-	gid_t gl[NGROUPS_MAX+1];
+	gid_t gl[NGROUPX+1];
 
 	fuid = bf.st_uid;
 	fgid = bf.st_gid;
@@ -691,7 +694,7 @@ int file_executable(char *fmt, ...)
 	if (only)
 	   grpx = (mgid == fgid);
 	else
-	   {ng   = getgroups(NGROUPS_MAX, gl);
+	   {ng   = getgroups(NGROUPX, gl);
 	    grpx = 0;
 	    for (ig = 0; (grpx == 0) && (ig < ng); ig++)
 	        grpx |= (gl[ig] == fgid);};

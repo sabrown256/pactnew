@@ -16,6 +16,10 @@
 
 /* to add a new primitive type you need to check at least the
  * following places:
+ *   in score/scoerce.c check:
+ *      variables: names, types, mn, and mx
+ *      add any special conversion coding
+ *      add any special printing coding
  *   in score/sctyp.c check:
  *      add the type definition and register it
  *          for example:  SC_INT8_I, SC_INT8_P_I, SC_INT8_S, SC_INT8_P_S
@@ -23,10 +27,6 @@
  *      add the type declaration
  *          for example:  SC_INT8_I, SC_INT8_P_I, SC_INT8_S, SC_INT8_P_S
  *      check the N_PRIMITIVE_ and N_TYPE count macros
- *   in score/convert.c check:
- *      variables: names, types, mn, and mx
- *      add any special conversion coding
- *      add any special printing coding
  *   in score/varg.c check:
  *      variables: types and promo
  *      add any special va_arg coding

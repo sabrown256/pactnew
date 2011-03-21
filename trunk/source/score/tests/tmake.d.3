@@ -1,0 +1,20 @@
+#
+# test command line override
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+opt  = va
+flag = -f
+ag   = -g
+
+va_s.o = va $(ag)
+vb_s.o = vb $(ag)
+
+cmd_s.o = cmd $($(opt)_s.o) $(flag)
+prt_s.o = prt $($(opt)_s.o) $(flag)
+
+s.o : 
+	@(echo "$(prt_s.o) -c ../s.c" ; \
+	  echo "$(cmd_s.o) -c ../s.c -o $@")

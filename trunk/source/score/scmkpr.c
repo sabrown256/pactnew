@@ -14,6 +14,92 @@
 
 #define DEFAULT_BARRIER   "@sync"
 
+typedef struct s_vardes vardes;
+
+struct s_vardes
+   {int line;
+    char *text;};
+
+/*--------------------------------------------------------------------------*/
+
+/*                           VARIABLE DATABASE                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* _SC_VAR_INSTALL - install variable NAME with value VAL in STATE */
+
+void _SC_var_install(anadep *state, char *name, char *val, int line)
+   {vardes *vd;
+
+    vd = SC_hasharr_def_lookup(state->variables, name);
+    if ((vd == NULL) || (vd->line != -2))
+       {vd = FMAKE(vardes, "_SC_VAR_INSTALL:vd");
+	vd->line = line;
+	vd->text = SC_strsavef(val, "char*:_SC_VAR_INSTALL:val");
+
+	SC_hasharr_install(state->variables, name, vd, "vardes", TRUE, TRUE);};
+
+    if (state->show_vars)
+       {switch (line)
+	   {case -2 :
+	         io_printf(state->log, "Variable> %s = %s (command line)\n",
+			   name, val);
+		 break;
+	    case -1 :
+	         io_printf(state->log, "Variable> %s = %s (built in)\n",
+			   name, val);
+		 break;
+	    default :
+	         io_printf(state->log, "Variable> %s = %s (line %d)\n",
+			   name, val, line);
+		 break;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_VAR_LOOKUP - lookup variable NAME in the STATE variable table */
+
+char *_SC_var_lookup(anadep *state, char *name)
+   {char *vl;
+    vardes *vd;
+
+    vd = SC_hasharr_def_lookup(state->variables, name);
+    vl = (vd != NULL) ? vd->text : NULL;
+
+    return(vl);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_FREE_VARDES - free a variable table entry */
+
+static int _SC_free_vardes(haelem *hp, void *a)
+   {vardes *vd;
+
+    vd = hp->def;
+
+    SFREE(vd->text);
+    SFREE(vd);
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_FREE_VARIABLES - free the variable table */
+
+static void _SC_free_variables(anadep *state)
+   {
+
+    if (state->variables != NULL)
+       {SC_free_hasharr(state->variables, _SC_free_vardes, NULL);
+
+	state->variables = NULL;};
+
+    return;}
+
 /*--------------------------------------------------------------------------*/
 
 /*                             RULE DEFINITION                              */
@@ -299,7 +385,7 @@ static void _SC_end_rule(ruledef *a, anadep *state)
  *                  - <>+ means zero or more
  */
 
-void SC_make_def_rule(char *rule, anadep *state)
+void SC_make_def_rule(anadep *state, char *rule)
    {ruledef a;
 
     a.text = NULL;
@@ -461,11 +547,7 @@ static void _SC_end_var(vardef *v, anadep *state)
 	else
 	   text = "";
 
-	text = SC_strsavef(text, "char*:_SC_END_VAR:text");
-	SC_hasharr_install(state->variables, name, text, SC_CHAR_S, TRUE, TRUE);
-
-        if (state->show_vars)
-	   io_printf(state->log, "Variable> %s = %s\n", name, text);
+	_SC_var_install(state, name, text, v->line);
 
 	SFREE(v->text);
         v->line = -1;};
@@ -477,31 +559,16 @@ static void _SC_end_var(vardef *v, anadep *state)
 
 /* SC_MAKE_DEF_VAR - define a variable */
 
-void SC_make_def_var(char *var, anadep *state)
+void SC_make_def_var(anadep *state, char *var, int wh)
    {vardef v;
 
     v.text    = SC_dstrcpy(NULL, var);
-    v.line    = -1;
+    v.line    = wh;
     v.name[0] = '\0';
 
     _SC_end_var(&v, state);
 
     SFREE(v.text);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_FREE_VARIABLES - free the variable table */
-
-static void _SC_free_variables(anadep *state)
-   {
-
-    if (state->variables != NULL)
-       {SC_free_hasharr(state->variables, NULL, NULL);
-
-	state->variables = NULL;};
 
     return;}
 
@@ -686,7 +753,7 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
  *               - return DST when done
  */
 
-char *_SC_subst_str(ruledes *rd, char *src, anadep *state)
+static char *_SC_subst_str(anadep *state, ruledes *rd, char *src)
    {int i, nf, ne;
     char *pf, *pe, *dst, *text;
 
@@ -714,7 +781,7 @@ char *_SC_subst_str(ruledes *rd, char *src, anadep *state)
 		                     rd->name, rd->depend,
 				     NULL);
 
-	     text = (char *) SC_hasharr_def_lookup(state->variables, pf);
+	     text = _SC_var_lookup(state, pf);
 	     if (text == NULL)
 	        dst = SC_dsnprintf(TRUE, "%s%s", src, pe);
 	     else
@@ -732,14 +799,14 @@ char *_SC_subst_str(ruledes *rd, char *src, anadep *state)
  *                   - return the number of substitutions made
  */
 
-static int _SC_subst_strings(ruledes *rd, char **a, anadep *state)
+static int _SC_subst_strings(anadep *state, ruledes *rd, char **a)
    {int ns;
     char *pa, *pb;
 
     ns = 0;
     if (*a != NULL)
        {pa = *a;
-	pb = _SC_subst_str(rd, *a, state);
+	pb = _SC_subst_str(state, rd, *a);
 	if (pa != pb)
 	   {ns++;
 	    *a = pb;
@@ -767,7 +834,7 @@ static int _SC_do_subst_name(haelem *hp, void *a)
  * into the new rule table
  */
     s = SC_strsavef(key, "DO_SUBST:s[0]");
-    _SC_subst_strings(NULL, &s, state);
+    _SC_subst_strings(state, NULL, &s);
 
 /* the rule name may have expanded into more than one item
  * enter the rule under each item
@@ -812,8 +879,8 @@ static int _SC_do_subst_body(haelem *hp, void *a)
     ok    = SC_haelem_data(hp, NULL, NULL, (void **) &rd);
 
 /* do substitutions in the dependencies and actions */
-    _SC_subst_strings(rd, &rd->depend, state);
-    _SC_subst_strings(rd, &rd->act, state);
+    _SC_subst_strings(state, rd, &rd->depend);
+    _SC_subst_strings(state, rd, &rd->act);
 
 /* now breaks dependencies and actions down into arrays */
     _SC_process_rule(&rd->n_dependencies, &rd->dependencies,
@@ -906,11 +973,11 @@ anadep *SC_make_state(void)
     state->pred        = _SC_is_newer;
 
     s = SC_dsnprintf(TRUE, "SHELL = %s", DEFAULT_SHELL);
-    SC_make_def_var(s, state);
+    SC_make_def_var(state, s, -1);
     SFREE(s);
 
     s = SC_dsnprintf(TRUE, "BARRIER = %s", DEFAULT_BARRIER);
-    SC_make_def_var(s, state);
+    SC_make_def_var(state, s, -1);
     SFREE(s);
 
     state->actions = SC_MAKE_ARRAY("SC_MAKE_STATE", cmdes, NULL);
@@ -976,7 +1043,7 @@ void SC_free_state(anadep *state)
  *                   - return TRUE iff successful
  */
 
-int SC_parse_makefile(char *fname, anadep *state)
+int SC_parse_makefile(anadep *state, char *fname)
    {int i, nb, rv, ok;
     char *s, *peq, *pcl, *t, *pt;
     FILE *fp;
@@ -1024,8 +1091,8 @@ int SC_parse_makefile(char *fname, anadep *state)
 		     pt = SC_strsavef(t, "SC_PARSE_MAKEFILE:t");
 		     _SC_end_rule(&a, state);
 		     _SC_end_var(&v, state);
-		     _SC_subst_strings(NULL, &pt, state);
-		     SC_parse_makefile(pt, state);}
+		     _SC_subst_strings(state, NULL, &pt);
+		     SC_parse_makefile(state, pt);}
 
 		 else
 		    {peq = strchr(s, '=');
@@ -1058,7 +1125,7 @@ int SC_parse_makefile(char *fname, anadep *state)
 
 	    rv = TRUE;};
 
-	t = (char *) SC_hasharr_def_lookup(state->variables, "BARRIER");
+	t = _SC_var_lookup(state, "BARRIER");
 	if (t != NULL)
 	   {if (BARRIER != NULL)
 	       {SFREE(BARRIER);};
@@ -1078,7 +1145,7 @@ int SC_parse_makefile(char *fname, anadep *state)
  *                  - return TRUE iff successful
  */
 
-int SC_parse_premake(char *fname, anadep *state)
+int SC_parse_premake(anadep *state, char *fname)
    {int rv, ok;
     char *s;
 
@@ -1091,28 +1158,28 @@ int SC_parse_premake(char *fname, anadep *state)
 
     if (rv == TRUE)
        {s  = SC_dsnprintf(TRUE, "%s/include/make-def", state->root);
-	ok = SC_parse_makefile(s, state);
+	ok = SC_parse_makefile(state, s);
         if (ok != TRUE)
 	   rv = -2;
 	SFREE(s);};
 	
     if (rv == TRUE)
        {s = SC_dsnprintf(TRUE, "PACTTmpDir = %s/obj", state->arch);
-	SC_make_def_var(s, state);
+	SC_make_def_var(state, s, -1);
 	SFREE(s);
 
 	s = SC_dsnprintf(TRUE, "PACTSrcDir = ../..");
-	SC_make_def_var(s, state);
+	SC_make_def_var(state, s, -1);
 	SFREE(s);};
 
     if (rv == TRUE)
-       {ok = SC_parse_makefile(fname, state);
+       {ok = SC_parse_makefile(state, fname);
 	if (ok != TRUE)
 	   rv = -3;};
 
     if (rv == TRUE)
        {s  = SC_dsnprintf(TRUE, "%s/include/make-macros", state->root);
-	ok = SC_parse_makefile(s, state);
+	ok = SC_parse_makefile(state, s);
         if (ok != TRUE)
 	   rv = -4;
 	SFREE(s);};
