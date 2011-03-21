@@ -964,7 +964,6 @@ object *UL_mode_text(void)
     SS_post_read_hook  = NULL;
     SS_post_eval_hook  = NULL;
     SS_post_print_hook = NULL;
-    SS_pr_ch_in        = SS_get_ch;
     SS_pr_ch_un        = SS_unget_ch;
     SS_pr_ch_out       = SS_put_ch;
 
@@ -1008,7 +1007,7 @@ object *UL_mode_graphics(void)
         SS_post_read_hook  =  _UL_read;
         SS_post_eval_hook  =  _UL_parse;
         SS_post_print_hook =  _UL_print;
-        SS_pr_ch_in        =  SX_get_ch;
+	SS_pr_gets         = _SX_get_input;
 	SC_set_put_line(SX_fprintf);
 	SC_set_put_string(SX_fputs);
 	if (PG_console_device == NULL)

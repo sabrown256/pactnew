@@ -240,7 +240,7 @@ static int _SS_repl(void)
         SS_nrestore   = 0;
 
 /* print the prompt call the Reader */
-        PRINT(stdout, "%s", SS_prompt);
+	_SS.pr_prompt = SS_prompt;
         SS_Assign(SS_rdobj, SS_read(SS_indev));
 
         if (SS_post_read_hook != NULL)
@@ -470,7 +470,6 @@ void SS_init_scheme(char *code, char *vers)
     SS_post_read_hook  = NULL;
     SS_post_eval_hook  = NULL;
     SS_post_print_hook = NULL;
-    SS_pr_ch_in        = SS_get_ch;
     SS_pr_ch_un        = SS_unget_ch;
     SS_pr_ch_out       = SS_put_ch;
 

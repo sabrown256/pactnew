@@ -107,6 +107,7 @@ typedef void (*PFNameReproc)(char *s, char *name);
 typedef void (*PFPostRead)(object *strm);
 typedef void (*PFPostEval)(object *strm);
 typedef int (*PFPostPrint)(void);
+typedef int (*PFPrGetS)(object *str);
 typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrChOut)(int c, object *str);
 typedef void (*PFPrChUn)(int c, object *str);
@@ -836,8 +837,8 @@ extern char
 extern PFPostPrint
  SS_post_print_hook;
 
-extern PFPrChIn
- SS_pr_ch_in;
+extern PFPrGetS
+ SS_pr_gets;
 
 extern PFNameReproc
  SS_name_reproc_hook;

@@ -130,6 +130,13 @@ switch ($cname)
         breaksw
 endsw
 
+set cc     = none
+set fc     = none
+set croot  = none
+set froot  = none
+set lcvers = none
+set lfvers = none
+
 # in case compilers were put in different directories (ala Intel)
 # check both Fortran and C compilers to get both on the PATH
 # do C last to get its environment as the final result

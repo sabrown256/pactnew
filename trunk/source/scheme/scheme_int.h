@@ -89,6 +89,7 @@ struct s_SS_state
     PFPrintErrMsg pr_err;
 
 /* SHTTY.C */
+    char *pr_prompt;
     PFfprintf pr_print;
     PFfputs pr_puts;
     PFfgets pr_gets;

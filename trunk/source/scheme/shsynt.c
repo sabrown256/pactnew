@@ -40,7 +40,7 @@ int SS_input_synt(char *ltxt)
     
     SS_lex_text = ltxt;
 
-    c = (*SS_pr_ch_in)(SS_character_stream, FALSE);
+    c = SS_get_ch(SS_character_stream, FALSE);
 
     _SS.have_eof = (c == EOF);
 

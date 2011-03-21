@@ -208,30 +208,48 @@ int64_t SC_get_buffer_size(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_RL_FGETS - a readline wrapper for fgets on stdin */ 
+/* SC_PROMPT - fprintf PROMPT on stdout and fgets S on stdin */ 
+
+char *SC_prompt(char *prompt, char *s, int n)
+   {int ok;
+    char *rv;
+
+    ok = FALSE;
+
+#ifdef HAVE_READLINE
+
+    if (SC_isblocked_file(stdin) == TRUE)
+       {char *t;
+
+	t = readline(prompt);
+	if (t != NULL)
+	   {snprintf(s, n, "%s\n", t);
+	    if (strlen(s) > 0)
+	       add_history(s);
+	    rv = s;}
+	else
+	   rv = NULL;
+
+        ok = TRUE;};
+
+#endif
+
+    if (ok == FALSE)
+       {if (prompt != NULL)
+	   printf("%s", prompt);
+	rv = fgets(s, n, stdin);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_RL_FGETS - use SC_prompt for fgets on stdin */ 
 
 char *_SC_rl_fgets(char *s, int n)
    {char *rv;
 
-#ifdef HAVE_READLINE
-
-    char *t;
-
-    if (SC_isblocked_file(stdin) == TRUE)
-       {t = readline(NULL);
-	if (t != NULL)
-	   {snprintf(s, n, "%s\n", t);
-	    rv = s;}
-	else
-	   rv = NULL;}
-    else
-       rv = fgets(s, n, stdin);
-
-#else
-
-    rv = fgets(s, n, stdin);
-
-#endif
+    rv = SC_prompt(NULL, s, n);
 
     return(rv);}
 

@@ -14,8 +14,6 @@
     else if (strcmp(type, str) == 0)                                         \
        *((typ *) (var->val)) =  *((typ *) val)
 
-#define PRIMITIVE_GETLN (*_SX.gets)
-
 char
  *SX_current_palette = NULL,
  *SX_console_type;
@@ -153,7 +151,6 @@ void SX_init(char *code, char *vers)
  * give default values to the lisp package interface variables
  * set some default values for flags
  */
-    SS_pr_ch_in   = SS_get_ch;
     SS_pr_ch_un   = SS_unget_ch;
     SS_pr_ch_out  = SS_put_ch;
     SS_print_flag = TRUE;
@@ -245,14 +242,18 @@ void SX_reset_prefix(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_GET_CH - the do it right character reader
- *           - must get the next character from the given stream
+/* _SX_GET_INPUT - get more text to feed SS_get_ch
+ *               - return -1 to break
+ *               -         0 to continue
+ *               -         1 for further processing
  */
 
-int SX_get_ch(object *str, int ign_ws)
-   {char *t;
-    int c;
-    FILE *s;
+int _SX_get_input(object *str)
+   {int c, rv;
+    char *p;
+    FILE *fp;
+
+    rv = 0;
 
     if (_SX.gets == NULL)
        {if (PG_console_device == NULL)
@@ -260,57 +261,48 @@ int SX_get_ch(object *str, int ign_ws)
         else
 	   _SX.gets = (PFfgets) PG_wind_fgets;};
 
-    s = SS_INSTREAM(str);
+    fp = SS_INSTREAM(str);
 
-    while (TRUE)
-       {if (EOI(str))
-           {if (s == stdin)
-               {PG_make_device_current(PG_console_device);
-                t = PRIMITIVE_GETLN(SS_BUFFER(str), MAXLINE, stdin);
-                if (t == NULL)
-                   continue;
+    if (fp == NULL)
+       {c  = EOF;
+	rv = -1;}
+
+    else if (fp == stdin)
+       {
+#if 1
+/* keep mouse events - lose readline */
+	if (_SS.pr_prompt != NULL)
+	   PRINT(stdout, "%s", _SS.pr_prompt);
+	p = _SX.gets(SS_BUFFER(str), MAXLINE, fp);
+#else
+/* keep readline - lose mouse events */
+	p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
+#endif
+
+	_SS.pr_prompt = NULL;
+
+	if (p == NULL)
+	   rv = 0;
 
 /* the \r check is for the benefit of those non-UNIX systems who use it */
-                if ((*t == '\n') || (*t == '\r'))
-                   {if ((SX_autoplot == ON) && (SX_plot_hook != NULL))
-                       (*SX_plot_hook)();
-                    return('\n');};}
+	else if ((*p == '\n') || (*p == '\r'))
+	   {if ((SX_autoplot == ON) && (SX_plot_hook != NULL))
+	       SX_plot_hook();
+	    c  = '\n';
+	    rv = -1;};}
 
-            else if (s == NULL)
-               return(EOF);
+    else
+       p = _SX.gets(SS_BUFFER(str), MAXLINE, fp);
 
-            else
-               t = PRIMITIVE_GETLN(SS_BUFFER(str), MAXLINE, s);
+    if (p == NULL)
+       {*SS_PTR(str) = (char) EOF;
+	c  = EOF;
+	rv = -1;}
 
-            if (t == NULL)
-               {*SS_PTR(str) = (char) EOF;
-                return(EOF);}
-            else 
-               SS_PTR(str) = SS_BUFFER(str);};
+    else 
+       SS_PTR(str) = SS_BUFFER(str);
 
-        c = *SS_PTR(str)++;
-
-        if (c == EOF)
-           SS_PTR(str)--;
-
-        if (ign_ws)
-           {switch (c)
-               {case '\n':
-                case '\r':
-                case '\t':
-                case ' ' :
-		     break;
-                case ';' :
-		     while ((c = *SS_PTR(str)++) != '\0')
-		        {if (c == EOF)
-			    return(c);
-			 else if ((c == '\n') || (c == '\r'))
-			    break;};
-		     break;
-                default :
-		     return(c);};}
-        else
-           return(c);};}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

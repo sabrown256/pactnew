@@ -919,8 +919,7 @@ extern void
  SX_install_funcs(void);
 
 extern int
- SX_next_prefix(void),
- SX_get_ch(object *str, int ign_ws);
+ SX_next_prefix(void);
 
 
 /* SXULIO.C declarations */
