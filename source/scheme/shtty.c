@@ -12,7 +12,6 @@
 
 #define PRIMITIVE_PRINT (*_SS.pr_print)
 #define PRIMITIVE_PUTS  (*_SS.pr_puts)
-#define PRIMITIVE_GETLN (*_SS.pr_gets)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -38,16 +37,19 @@ static INLINE int EOI(object *str)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_GET_CH - the do it right character reader
- *           - must get the next character from the given stream
+/* _SS_GET_INPUT - get more text to feed SS_get_ch
+ *               - return -1 to break
+ *               -         0 to continue
+ *               -         1 for further processing
  */
 
-int SS_get_ch(object *str, int ign_ws)
-   {int c;
-    char eof;
+static int _SS_get_input(object *str)
+   {int c, rv;
+    char *p;
     FILE *fp;
 
-    eof = (char) EOF;
+    rv = 0;
+
     if (_SS.pr_gets == NULL)
 #ifdef NO_SHELL
        _SS.pr_gets = (PFfgets) PG_wind_fgets;
@@ -57,47 +59,81 @@ int SS_get_ch(object *str, int ign_ws)
 
     fp = SS_INSTREAM(str);
 
-    while (TRUE)
-       {if (EOI(str))
-           {if (fp == NULL)
-               return(EOF);
+    if (fp == NULL)
+       {c  = EOF;
+	rv = -1;}
 
-            if (PRIMITIVE_GETLN(SS_BUFFER(str), MAXLINE, fp) == NULL)
-               {*SS_PTR(str) = eof;
-                return(EOF);};
+    if (fp == stdin)
+       {p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
+	_SS.pr_prompt = NULL;}
+    else
+       p = _SS.pr_gets(SS_BUFFER(str), MAXLINE, fp);
 
-            SS_PTR(str) = SS_BUFFER(str);};
+    if (p == NULL)
+       {*SS_PTR(str) = (char) EOF;
+	c  = EOF;
+	rv = -1;}
+    else
+       SS_PTR(str) = SS_BUFFER(str);
 
-        c = *SS_PTR(str)++;
-	SS_CHAR_INDEX(str)++;
+    return(rv);}
 
-        if (c == EOF)
-           SS_PTR(str)--;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-        if (ign_ws)
-           {switch (c)
-               {case '\n':
-                case '\r':
-                     SS_LINE_NUMBER(str)++;
-                     SS_CHAR_INDEX(str) = 1;
-		     break;
-                case '\t':
-                case ' ' :
-		     break;
-                case ';' :
-		     while ((c = *SS_PTR(str)++) != '\0')
-		        {if (c == EOF)
-			    return(c);
-			 else if ((c == '\n') || (c == '\r'))
-			    {SS_LINE_NUMBER(str)++;
-			     SS_CHAR_INDEX(str) = 1;
-			     break;};};
-		     break;
+/* SS_GET_CH - the do it right character reader
+ *           - must get the next character from the given stream
+ */
 
-                default :
-		     return(c);};}
-        else
-           return(c);};}
+int SS_get_ch(object *str, int ign_ws)
+   {int c, ok, st;
+
+    if (SS_pr_gets == NULL)
+       SS_pr_gets = _SS_get_input;
+
+    for (ok = TRUE; ok == TRUE; )
+        {if (EOI(str))
+	    {st = SS_pr_gets(str);
+	     if (st == -1)
+	        {c = EOF;
+		 break;}
+	     else if (st == 0)
+	        {c = '\n';
+		 continue;};};
+
+	 c = *SS_PTR(str)++;
+	 SS_CHAR_INDEX(str)++;
+
+	 if (c == EOF)
+            SS_PTR(str)--;
+
+	 if (ign_ws)
+            {switch (c)
+                {case '\n':
+                 case '\r':
+                      SS_LINE_NUMBER(str)++;
+                      SS_CHAR_INDEX(str) = 1;
+		      break;
+                 case '\t':
+                 case ' ' :
+		      break;
+                 case ';' :
+		      while ((ok == TRUE) && ((c = *SS_PTR(str)++) != '\0'))
+		         {if (c == EOF)
+			     ok = FALSE;
+			  else if ((c == '\n') || (c == '\r'))
+			     {SS_LINE_NUMBER(str)++;
+			      SS_CHAR_INDEX(str) = 1;
+			      break;};};
+		      break;
+
+                 default :
+		      ok = FALSE;
+		      break;};}
+	 else
+	    ok = FALSE;};
+
+    return(c);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

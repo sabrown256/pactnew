@@ -477,6 +477,7 @@ extern int64_t
  SC_filelen(FILE *fp);
 
 extern char
+ *SC_prompt(char *prompt, char *s, int n),
  *_SC_rl_fgets(char *s, int n),
  *SC_dgets(char *bf, int *pnc, FILE *fp),
  *SC_fgets(char *s, int n, FILE *fp),
