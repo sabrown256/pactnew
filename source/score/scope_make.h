@@ -83,7 +83,7 @@ struct s_anadep
     char arch[MAXLINE];
     char root[PATH_MAX];
     char exe[PATH_MAX];
-    int (*pred)(char *fa, char *fb, int force, anadep *state);};
+    int (*pred)(anadep *state, char *fa, char *fb, int force);};
 
 enum e_SC_rule_cat
    {IMPLICIT  = 1,
@@ -108,8 +108,8 @@ typedef enum e_SC_rule_cat SC_rule_cat;
 /* SCMKDP.C declarations */
 
 extern int
- _SC_is_newer(char *fa, char *fb, int force, anadep *state),
- SC_analyze_dependencies(char *tgt, anadep *state);
+ _SC_is_newer(anadep *state, char *fa, char *fb, int force),
+ SC_analyze_dependencies(anadep *state, char *tgt);
 
 extern char
  **SC_action_commands(anadep *state, int recur);
@@ -121,21 +121,22 @@ extern anadep
  *SC_make_state(void);
 
 extern void
+ _SC_var_install(anadep *state, char *name, char *val, int line),
  _SC_do_substitutions(anadep *state),
  _SC_print_rule_info(anadep *state, int n, ruledes *rd),
  SC_show_make_rules(anadep *state),
- SC_make_def_rule(char *rule, anadep *state),
- SC_make_def_var(char *var, anadep *state),
+ SC_make_def_rule(anadep *state, char *rule),
+ SC_make_def_var(anadep *state, char *var, int wh),
  SC_free_state(anadep *state);
 
 extern char
-  *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
-		   char *tgt, char *dep, char *sfx),
- *_SC_subst_str(ruledes *rd, char *src, anadep *state);
+ *_SC_var_lookup(anadep *state, char *name),
+ *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
+		  char *tgt, char *dep, char *sfx);
 
 extern int
- SC_parse_makefile(char *fname, anadep *state),
- SC_parse_premake(char *fname, anadep *state);
+ SC_parse_makefile(anadep *state, char *fname),
+ SC_parse_premake(anadep *state, char *fname);
 
 #endif
 

@@ -128,7 +128,7 @@ static int _SC_is_newer_archive(char *fa, char *fb, time_t tb, anadep *state)
  *              - if FORCE is TRUE the answer is TRUE if FB exists
  */
 
-int _SC_is_newer(char *fa, char *fb, int force, anadep *state)
+int _SC_is_newer(anadep *state, char *fa, char *fb, int force)
    {int i, ns, rv;
     struct stat bb;
     time_t tb;
@@ -266,7 +266,7 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
     char s[MAXLINE], src[MAXLINE];
     char *base, *sfx, *ptrn, *t;
     ruledes *rd;
-    int (*pred)(char *fa, char *fb, int force, anadep *state);
+    int (*pred)(anadep *state, char *fa, char *fb, int force);
 
     pred = state->pred;
 
@@ -292,7 +292,7 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
 	     else
 	        frc = force;
 
-	     if ((*pred)(tgt, src, frc, state))
+	     if ((*pred)(state, tgt, src, frc))
 	        {na += _SC_add_actions(tgt, NULL, t, rd, knd, state);
 		 break;};};};
 
@@ -309,7 +309,7 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
 static int _SC_try_implicit_rule(char *tgt, char *dep, char *sfx,
 				 ruledes *rd, int force, anadep *state)
    {int na, nt, knd;
-    int (*pred)(char *fa, char *fb, int force, anadep *state);
+    int (*pred)(anadep *state, char *fa, char *fb, int force);
 
     pred = state->pred;
     nt   = 0;
@@ -318,10 +318,10 @@ static int _SC_try_implicit_rule(char *tgt, char *dep, char *sfx,
 /* see if we hit a rule to update dep
  * GOTCHA: we could hit a loop here
  */
-    na = SC_analyze_dependencies(dep, state);
+    na = SC_analyze_dependencies(state, dep);
     nt += na;
 
-    if ((*pred)(tgt, dep, force, state))
+    if ((*pred)(state, tgt, dep, force))
        {na  = _SC_add_actions(tgt, NULL, sfx, rd, knd, state);
 	nt += na;};
 
@@ -449,12 +449,12 @@ static int _SC_find_rule(int *pfnd, char *tgt, char *dep, int force,
    {int na;
     char s[MAXLINE], sfx[MAXLINE];
     char *t;
-    int (*pred)(char *fa, char *fb, int force, anadep *state);
+    int (*pred)(anadep *state, char *fa, char *fb, int force);
 
     pred = state->pred;
     na   = 0;
 
-    if ((*pred)(tgt, dep, force, state))
+    if ((*pred)(state, tgt, dep, force))
        {if (rd->actions != NULL)
 	   {strcpy(s, dep);
 	    strtok(s, ".\n");
@@ -507,7 +507,7 @@ void _SC_add_suffices(anadep *state)
  *                         - return the number of command to execute
  */
 
-int SC_analyze_dependencies(char *tgt, anadep *state)
+int SC_analyze_dependencies(anadep *state, char *tgt)
    {int i, n, na, nt, found;
     char **dp;
     ruledes *rd;
@@ -529,7 +529,7 @@ int SC_analyze_dependencies(char *tgt, anadep *state)
 
 /* recurse to find all rules governing the dependencies */
 	for (i = 0; i < n; i++)
-            nt += SC_analyze_dependencies(dp[i], state);
+            nt += SC_analyze_dependencies(state, dp[i]);
 
 /* find a rule to update tgt from any dependency */
 	found = FALSE;
@@ -741,7 +741,7 @@ static char **_SC_recurse_make(char **cmnds, anadep *state)
 	     if ((tgt != NULL) &&
 		 (tgt[0] != '-') &&
 		 (strchr(tgt, '=') == NULL))
-	        {SC_analyze_dependencies(tgt, state);
+	        {SC_analyze_dependencies(state, tgt);
 		 ecmd = SC_action_commands(state, TRUE);
 		 break;};
 

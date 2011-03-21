@@ -81,6 +81,14 @@ smake : ${BinDir}/smake
 ${BinDir}/smake : smake.c common.h
 	${PCC} -DSYSTEM_ID=\"${System}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
 
+
+# debugging only - never to be included in InstallDep
+template : ${BinDir}/template
+
+${BinDir}/template : template.c ${LibFiles}
+	ccw -g -I../score -I../manager template.c -o ${BinDir}/template
+
+
 link : ${InstallDep}
 	cp common.h nonstd.h ${LibFiles} ${IncDir}/shell
 

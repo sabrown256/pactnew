@@ -154,11 +154,11 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
 template<char|long double>
 void PM_min_max(void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
-    <TYPE> *d, *pvn, *pvx, vn, vx, v;
+    <SIGNED> *d, *pvn, *pvx, vn, vx, v;
 
-    d   = (<TYPE> *) p;
-    pvn = (<TYPE> *) pn;
-    pvx = (<TYPE> *) px;
+    d   = (<SIGNED> *) p;
+    pvn = (<SIGNED> *) pn;
+    pvx = (<SIGNED> *) px;
     vn  =  <MAX>;
     vx  = -<MAX>;
     in  = -1;

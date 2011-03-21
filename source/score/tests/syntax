@@ -44,8 +44,9 @@ setenv SC_EXEC_TIME_FACTOR    16
    set UTime = `$TIMER -r`
 
    set Tsts = ""
-   set Tsts = ($Tsts d.1 all)
-   set Tsts = ($Tsts d.2 fooa.c)
+   set Tsts = ($Tsts d.1 - all)
+   set Tsts = ($Tsts d.2 - fooa.c)
+   set Tsts = ($Tsts d.3 opt=vb s.o)
 
    set LErr = 0
    while ($#Tsts > 1)
@@ -56,9 +57,15 @@ setenv SC_EXEC_TIME_FACTOR    16
 
       flog $Log set i   = $Tsts[1]
       flog $Log set mkf = tmake.$i
-      flog $Log set tgt = $Tsts[2]
+      flog $Log set opt = $Tsts[2]
+      flog $Log set tgt = $Tsts[3]
       shift Tsts
       shift Tsts
+      shift Tsts
+
+      if ("$opt" != "-") then
+         flog $Log set tgt = ( $opt $tgt )
+      endif
 
       foreach m (dmake $Make)
 
@@ -113,10 +120,10 @@ setenv SC_EXEC_TIME_FACTOR    16
 
    Separator $Log
    if ($LErr == 0) then
-      NoteD $Log "...... ok ($ETime)"
+      NoteD $Log "..... ok ($ETime)"
       flog $Log *.[chlyoa]
    else
-      NoteD $Log "...... ng ($ETime)"
+      NoteD $Log "..... ng ($ETime)"
       @ Err = $Err + 32
    endif
 

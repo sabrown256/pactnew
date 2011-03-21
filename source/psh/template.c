@@ -38,45 +38,61 @@ struct s_template
     char **body;};
 
 static char
- *names[] = { NULL, NULL, "bool",
-	      "char", "wchar",
-	      "int8", "shrt", "int", "lng", "ll",
-	      "flt", "dbl", "ldbl",
-	      "fcx", "dcx", "ldcx",
-	      "qut", "ptr", NULL, "str" },
- *types[] = { NULL, NULL, "bool",
-	      "char", "wchar_t",
-	      "int8_t", "short", "int", "long", "long long",
-	      "float", "double", "long double",
-	      "float _Complex", "double _Complex",
-	      "long double _Complex",
-	      "quaternion", "void *", NULL, "char *" },
- *comp[]  = { NULL, NULL, "bool",
-	      "char", "wchar_t",
-	      "int8_t", "short", "int", "long", "long long",
-	      "float", "double", "long double",
-	      "float", "double",
-	      "long double",
-	      "double", "void *", NULL, "char *" },
- *promo[] = { NULL, NULL, "int",
-              "int", "int",
-	      "int", "int", "int", "long", "long long",
-	      "double", "double", "long double",
-	      "float _Complex", "double _Complex",
-	      "long double _Complex",
-	      "quaternion", "void *", NULL, "char *" },
- *mn[]    = { NULL, NULL, "BOOL_MIN",
-	      "CHAR_MIN", "WCHAR_MIN",
-	      "INT8_MIN", "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
-	      "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
-	      "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
-	      "-DBL_MAX", "-LLONG_MAX" },
- *mx[]    = { NULL, NULL, "BOOL_MAX",
-	      "CHAR_MAX", "WCHAR_MAX",
-	      "INT8_MAX", "SHRT_MAX", "INT_MAX", "LONG_MAX", "LLONG_MAX",
-	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
-	      "FLT_MAX", "DBL_MAX", "LDBL_MAX",
-	      "DBL_MAX", "LLONG_MAX" };
+ *names[]  = { NULL, NULL, "bool",
+	       "char", "wchar",
+	       "int8", "shrt", "int", "lng", "ll",
+	       "flt", "dbl", "ldbl",
+	       "fcx", "dcx", "ldcx",
+	       "qut", "ptr", NULL, "str" },
+ *types[]  = { NULL, NULL, "bool",
+	       "char", "wchar_t",
+	       "int8_t", "short", "int", "long", "long long",
+	       "float", "double", "long double",
+	       "float _Complex", "double _Complex",
+	       "long double _Complex",
+	       "quaternion", "void *", NULL, "char *" },
+ *stypes[] = { NULL, NULL, "bool",
+	       "signed char", "wchar_t",
+	       "int8_t", "signed short", "signed int",
+               "signed long", "signed long long",
+	       "float", "double", "long double",
+	       "float _Complex", "double _Complex",
+	       "long double _Complex",
+	       "quaternion", "void *", NULL, "char *" },
+ *utypes[] = { NULL, NULL, "bool",
+	       "unsigned char", "wchar_t",
+	       "uint8_t", "unsigned short", "unsigned int",
+               "unsigned long", "unsigned long long",
+	       "float", "double", "long double",
+	       "float _Complex", "double _Complex",
+	       "long double _Complex",
+	       "quaternion", "void *", NULL, "char *" },
+ *comp[]   = { NULL, NULL, "bool",
+	       "char", "wchar_t",
+	       "int8_t", "short", "int", "long", "long long",
+	       "float", "double", "long double",
+	       "float", "double",
+	       "long double",
+	       "double", "void *", NULL, "char *" },
+ *promo[] =  { NULL, NULL, "int",
+               "int", "int",
+	       "int", "int", "int", "long", "long long",
+	       "double", "double", "long double",
+	       "float _Complex", "double _Complex",
+	       "long double _Complex",
+	       "quaternion", "void *", NULL, "char *" },
+ *mn[]    =  { NULL, NULL, "BOOL_MIN",
+	       "CHAR_MIN", "WCHAR_MIN",
+	       "INT8_MIN", "SHRT_MIN", "INT_MIN", "LONG_MIN", "LLONG_MIN",
+	       "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
+	       "-FLT_MAX", "-DBL_MAX", "-LDBL_MAX",
+	       "-DBL_MAX", "-LLONG_MAX" },
+ *mx[]    =  { NULL, NULL, "BOOL_MAX",
+	       "CHAR_MAX", "WCHAR_MAX",
+	       "INT8_MAX", "SHRT_MAX", "INT_MAX", "LONG_MAX", "LLONG_MAX",
+	       "FLT_MAX", "DBL_MAX", "LDBL_MAX",
+	       "FLT_MAX", "DBL_MAX", "LDBL_MAX",
+	       "DBL_MAX", "LLONG_MAX" };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -217,10 +233,12 @@ static void write_fnc_instance(FILE *fp, int id, template *t)
     fprintf(fp, "static %s %s_%s(%s)\n", rtype, fname, names[id], args);
     for (i = 0; i < nl; i++)
         {nstrncpy(s, MAXLINE, body[i], -1);
-	 p = subst(s, "<TYPE>", types[id], -1);
-	 p = subst(p, "<CTYPE>", comp[id], -1);
-	 p = subst(p, "<MIN>", mn[id], -1);
-	 p = subst(p, "<MAX>", mx[id], -1);
+	 p = subst(s, "<TYPE>",     types[id],  -1);
+	 p = subst(p, "<SIGNED>",   stypes[id], -1);
+	 p = subst(p, "<UNSIGNED>", utypes[id], -1);
+	 p = subst(p, "<CTYPE>",    comp[id],   -1);
+	 p = subst(p, "<MIN>",      mn[id],     -1);
+	 p = subst(p, "<MAX>",      mx[id],     -1);
 	 fputs(p, fp);};
 
     fprintf(fp, "\n");

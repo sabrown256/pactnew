@@ -81,10 +81,17 @@ template<char|long double _Complex>
 Finally, the following elements are replaced by the appropriate
 values:
 
-  <TYPE>    the actual data type
-  <CTYPE>   the component type
-  <MIN>     the minimum value for data of the type
-  <MAX>     the maximum value for data of the type
+  <TYPE>     the actual data type
+  <SIGNED>   the signed version of the actual data type
+  <UNSIGNED> the unsigned version of the actual data type
+  <CTYPE>    the component type
+  <MIN>      the minimum value for data of the type
+  <MAX>      the maximum value for data of the type
+
+For non-character and non-integral types <TYPE>, <SIGNED>,
+and <UNSIGNED> are all the same.  For character and integral
+types <SIGNED> is like 'signed <TYPE>' and <UNSIGNED> is
+like 'unsigned <TYPE>'.
 
 You can write different templates for different types and
 use them under a single name so long as the prototype is

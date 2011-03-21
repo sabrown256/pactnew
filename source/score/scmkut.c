@@ -212,7 +212,7 @@ static int build_makefile(char *mkfile, anadep *state)
  *                  - return 0 iff successful
  */
 
-static int command_makefile(char **a, anadep *state)
+static int command_makefile(anadep *state, char **a)
    {int i, err;
     char s[MAXLINE];
     char *fname, *tok, *dir, *p, *t, *rule, *cmnd;
@@ -250,7 +250,7 @@ static int command_makefile(char **a, anadep *state)
 
 	io_close(fp);
 
-	SC_make_def_rule(rule, state);
+	SC_make_def_rule(state, rule);
 
 	SFREE(rule);
 
@@ -695,7 +695,7 @@ int main(int c, char **v, char **env)
              state->verbose = TRUE;}
 	 else
             {if (strchr(v[i], '=') != NULL)
-	        SC_make_def_var(v[i], state);
+	        SC_make_def_var(state, v[i], -2);
 	     else
 	        tgt = v[i];};};
 
@@ -734,15 +734,15 @@ int main(int c, char **v, char **env)
     phase = 1;
 
     if (strcmp(mkname, ".command") == 0)
-       rv = command_makefile(v+i+1, state);
+       rv = command_makefile(state, v+i+1);
 
 /* read a pre-Make if that is what is requested */
     else if (strcmp(mkname, "pre-Make") == 0)
-       rv = SC_parse_premake(mkname, state);
+       rv = SC_parse_premake(state, mkname);
 
 /* read anything else as if a complete Makefile */
     else
-       rv = SC_parse_makefile(mkname, state);
+       rv = SC_parse_makefile(state, mkname);
 
     if (rv != TRUE)
        {err = SC_error_msg();
@@ -760,7 +760,7 @@ int main(int c, char **v, char **env)
     else
        {SC_show_make_rules(state);
 
-	shell = (char *) SC_hasharr_def_lookup(state->variables, "SHELL");
+	shell = _SC_var_lookup(state, "SHELL");
 	shell = SC_strsavef(shell, "MAIN:shell");
 	snprintf(s, MAXLINE, "SHELL=%s", shell);
 
@@ -771,7 +771,7 @@ int main(int c, char **v, char **env)
 /* analyze dependencies */
 	phase = 2;
 
-	nt    = SC_analyze_dependencies(tgt, state);
+	nt    = SC_analyze_dependencies(state, tgt);
 	cmnds = SC_action_commands(state, recur);
 
 	SC_free_state(state);

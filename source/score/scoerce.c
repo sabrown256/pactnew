@@ -29,6 +29,16 @@
 
 #define Separator(_f)  fprintf(_f, "/*--------------------------------------------------------------------------*/\n\n")
 
+static size_t
+ sizes[] = { 0, 0, sizeof(bool),
+	     sizeof(char), sizeof(wchar_t),
+	     sizeof(int8_t), sizeof(short), sizeof(int),
+             sizeof(long), sizeof(long long),
+	     sizeof(float), sizeof(double), sizeof(long double),
+	     sizeof(float _Complex), sizeof(double _Complex),
+	     sizeof(long double _Complex),
+	     sizeof(quaternion), sizeof(void *), 0, sizeof(char *) };
+
 static char
  *names[] = { NULL, NULL, "bool",
 	      "char", "wchar",
@@ -136,13 +146,15 @@ static void _SC_write_n_to_n_fast(FILE *fp, int did, int sid)
 /* _SC_WRITE_N_TO_N_SAFE - number to number conversions */
 
 static void _SC_write_n_to_n_safe(FILE *fp, int did, int sid)
-   {
+   {int ok;
+
+    ok = ((sizes[did] < sizes[sid]) && (did <= I_FIX));
 
     fprintf(fp, "long _SC_%s_%s(void *d, long od, long ds, void *s, long os, long ss, long n)\n",
 	    names[did], names[sid]);
 
     fprintf(fp, "   {long i;\n");
-    if (did < sid)
+    if (ok == TRUE)
        fprintf(fp, "    %s sm, smn, smx;\n", types[sid]);
     fprintf(fp, "    %s *ps = (%s *) s;\n", types[sid], types[sid]);
     fprintf(fp, "    %s *pd = (%s *) d;\n", types[did], types[did]);
@@ -150,13 +162,13 @@ static void _SC_write_n_to_n_safe(FILE *fp, int did, int sid)
     fprintf(fp, "    ps += os;\n");
     fprintf(fp, "    pd += od;\n");
 
-    if (did < sid)
+    if (ok == TRUE)
        {fprintf(fp, "    smn = (%s) %s;\n", types[sid], mn[did]);
 	fprintf(fp, "    smx = (%s) %s;\n", types[sid], mx[did]);
 	fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
-	fprintf(fp, "        {sm = *ps;\n");
-	fprintf(fp, "         sm = min(sm, smx);\n");
-	fprintf(fp, "         sm = max(sm, smn);\n");
+	fprintf(fp, "        {sm  = *ps;\n");
+	fprintf(fp, "         sm  = min(sm, smx);\n");
+	fprintf(fp, "         sm  = max(sm, smn);\n");
 	fprintf(fp, "         *pd = sm;};\n");}
     else
        {fprintf(fp, "    for (i = 0; i < n; i++, pd += ds, ps += ss)\n");
