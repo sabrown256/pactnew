@@ -212,6 +212,7 @@ struct s_SC_state
    int tty_n_rej;
    char *sqbf;
    char *ecbf;
+   char *elbf;
 
 /* SCTHE.C */
    SC_array *eth_locks;
