@@ -221,15 +221,28 @@ char *SC_prompt(char *prompt, char *s, int n)
     if (SC_isblocked_file(stdin) == TRUE)
        {char *t;
 
+/* if we have no prompt assume that we are working with SC_exec_job
+ * and the last line received from the child is the prompt
+ */
+	if (prompt == NULL)
+	   {prompt = _SC.elbf;
+	    rl_already_prompted = TRUE;}
+	else
+	   rl_already_prompted = FALSE;
+
+	rl_save_prompt();
 	t = readline(prompt);
 	if (t != NULL)
 	   {snprintf(s, n, "%s\n", t);
-	    if (strlen(s) > 0)
-	       add_history(s);
+	    if (strlen(t) > 0)
+	       add_history(t);
 	    rv = s;}
 	else
 	   rv = NULL;
 
+	rl_restore_prompt();
+	rl_clear_message();
+ 	    
         ok = TRUE;};
 
 #endif

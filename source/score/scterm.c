@@ -380,88 +380,88 @@ void SC_print_term_state(FILE *fp, int fd)
 /* input mode constants */
     c = s.c_iflag;
 # ifdef IGNBRK
-    if (c & IGNBRK) printf("i> IGNBRK - ignore break\n");
+    if (c & IGNBRK) printf("i> IGNBRK  - ignore break\n");
 # endif
 # ifdef BRKINT
-    if (c & BRKINT) printf("i> BRKINT - break causes input and output to be flushed\n");
+    if (c & BRKINT) printf("i> BRKINT  - break causes input and output to be flushed\n");
 # endif
 # ifdef IGNPAR
-    if (c & IGNPAR) printf("i> IGNPAR - ignore parity error\n");
+    if (c & IGNPAR) printf("i> IGNPAR  - ignore parity error\n");
 # endif
 # ifdef PARMRK
-    if (c & PARMRK) printf("i> PARMRK - prefix character with parity error\n");
+    if (c & PARMRK) printf("i> PARMRK  - prefix character with parity error\n");
 # endif
 # ifdef INPCK
-    if (c & INPCK)  printf("i> INPCK  - enable input parity check\n");
+    if (c & INPCK)  printf("i> INPCK   - enable input parity check\n");
 # endif
 # ifdef ISTRIP
-    if (c & ISTRIP) printf("i> ISTRIP - strip off bit 8\n");
+    if (c & ISTRIP) printf("i> ISTRIP  - strip off bit 8\n");
 # endif
 # ifdef IGNCR
-    if (c & IGNCR)  printf("i> IGNCR  - ignore CR on input\n");
+    if (c & IGNCR)  printf("i> IGNCR   - ignore CR on input\n");
 # endif
 # ifdef INLCR
-    if (c & INLCR)  printf("i> INLCR  - NL -> CR on input\n");
+    if (c & INLCR)  printf("i> INLCR   - NL -> CR on input\n");
 # endif
 # ifdef ICRNL
-    if (c & ICRNL)  printf("i> ICRNL  - CR -> NL on input\n");
+    if (c & ICRNL)  printf("i> ICRNL   - CR -> NL on input\n");
 # endif
 # ifdef IXON
-    if (c & IXON)   printf("i> IXON   - enable XON/XOFF on output\n");
+    if (c & IXON)   printf("i> IXON    - enable XON/XOFF on output\n");
 # endif
 # ifdef IXOFF
-    if (c & IXOFF)  printf("i> IXOFF  - enable XON/XOFF on input\n");
+    if (c & IXOFF)  printf("i> IXOFF   - enable XON/XOFF on input\n");
 # endif
 # ifdef IUCLC
-    if (c & IUCLC)  printf("i> IUCLC  - UC -> LC on input   (non-POSIX)\n");
+    if (c & IUCLC)  printf("i> IUCLC   - UC -> LC on input   (non-POSIX)\n");
 # endif
 # ifdef IXANY
-    if (c & IXANY)  printf("i> IXANY  - enable any character restart   (non-POSIX)\n");
+    if (c & IXANY)  printf("i> IXANY   - enable any character restart   (non-POSIX)\n");
 # endif
 
 /* output mode constants */
     c = s.c_oflag;
 # ifdef OPOST
-    if (c & OPOST)  printf("o> OPOST  - enable output processing\n");
+    if (c & OPOST)  printf("o> OPOST   - enable output processing\n");
 # endif
 # ifdef ONLCR
-    if (c & ONLCR)  printf("o> ONLCR  - NL -> CR-NL on output\n");
+    if (c & ONLCR)  printf("o> ONLCR   - NL -> CR-NL on output\n");
 # endif
 # ifdef OCRNL
-    if (c & OCRNL)  printf("o> OCRNL  - CR -> NL on output\n");
+    if (c & OCRNL)  printf("o> OCRNL   - CR -> NL on output\n");
 # endif
 # ifdef ONOCR
-    if (c & ONOCR)  printf("o> ONOCR  - no CR at column 0\n");
+    if (c & ONOCR)  printf("o> ONOCR   - no CR at column 0\n");
 # endif
 # ifdef ONLRET
-    if (c & ONLRET) printf("o> ONLRET - no CR\n");
+    if (c & ONLRET) printf("o> ONLRET  - no CR\n");
 # endif
 # ifdef OFILL
-    if (c & OFILL)  printf("o> OFILL  - fill for delay\n");
+    if (c & OFILL)  printf("o> OFILL   - fill for delay\n");
 # endif
 # ifdef NLDLY
-    if (c & NLDLY)  printf("o> NLDLY  - NL delay mask\n");
+    if (c & NLDLY)  printf("o> NLDLY   - NL delay mask\n");
 # endif
 # ifdef CRDLY
-    if (c & CRDLY)  printf("o> CRDLY  - CR delay mask\n");
+    if (c & CRDLY)  printf("o> CRDLY   - CR delay mask\n");
 # endif
 # ifdef TABDLY
-    if (c & TABDLY) printf("o> TABDLY - hor. tab delay mask\n");
+    if (c & TABDLY) printf("o> TABDLY  - hor. tab delay mask\n");
 # endif
 # ifdef BSDLY
-    if (c & BSDLY)  printf("o> BSDLY  - backspace delay mask\n");
+    if (c & BSDLY)  printf("o> BSDLY   - backspace delay mask\n");
 # endif
 # ifdef VTDLY
-    if (c & VTDLY)  printf("o> VTDLY  - vert. tab delay mask\n");
+    if (c & VTDLY)  printf("o> VTDLY   - vert. tab delay mask\n");
 # endif
 # ifdef FFDLY
-    if (c & FFDLY)  printf("o> FFDLY  - form feed delay mask\n");
+    if (c & FFDLY)  printf("o> FFDLY   - form feed delay mask\n");
 # endif
 # ifdef OLCUC
-    if (c & OLCUC)  printf("o> OLCUC  - LC -> UC on output (non-POSIX)\n");
+    if (c & OLCUC)  printf("o> OLCUC   - LC -> UC on output (non-POSIX)\n");
 # endif
 # ifdef OFDEL
-    if (c & OFDEL)  printf("o> OFDEL  - fill is DEL (NUL be default) (non-POSIX)\n");
+    if (c & OFDEL)  printf("o> OFDEL   - fill is DEL (NUL be default) (non-POSIX)\n");
 # endif
 
 /* control mode constants */
@@ -520,23 +520,23 @@ void SC_print_term_state(FILE *fp, int fd)
 # ifdef ECHONL
     if (c & ECHONL)  printf("l> ECHONL  - if ICANON echo NL\n");
 # endif
+# ifdef ECHOPRT
+    if (c & ECHOPRT) printf("l> ECHOPRT - if ICANON and ECHO print char as they are erased (non-POSIX)\n");
+# endif
+# ifdef ECHOKE
+    if (c & ECHOKE)  printf("l> ECHOKE  - if ICANON echo KILL by erasing line (non-POSIX)\n");
+# endif
+# ifdef ECHOCTL
+    if (c & ECHOCTL) printf("l> ECHOCTL - if ECHO Ctl-X echos as ^X (non-POSIX)\n");
+# endif
+# ifdef IEXTEN
+    if (c & IEXTEN)  printf("l> IEXTEN  - enable input processing\n");
+# endif
 # ifdef NOFLSH
     if (c & NOFLSH)  printf("l> NOFLSH  - disable flush on signals\n");
 # endif
 # ifdef TOSTOP
     if (c & TOSTOP)  printf("l> TOSTOP  - send SIGTTOU when needed\n");
-# endif
-# ifdef IEXTEN
-    if (c & IEXTEN)  printf("l> IEXTEN  - enable input processing\n");
-# endif
-# ifdef ECHOCTL
-    if (c & ECHOCTL) printf("l> ECHOCTL - if ECHO Ctl-X echos as ^X (non-POSIX)\n");
-# endif
-# ifdef ECHOPRT
-    if (c & ECHOPRT) printf("l> ECHOPRT - if ICANON and IECHO print char as they are erased (non-POSIX)\n");
-# endif
-# ifdef ECHOKE
-    if (c & ECHOKE)  printf("l> ECHOKE  - if ICANON echo KILL by erasing line (non-POSIX)\n");
 # endif
 
     printf("s> VMIN   %d\n", s.c_cc[VMIN]);

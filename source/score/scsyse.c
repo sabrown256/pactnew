@@ -153,7 +153,7 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
 
     SC_block_file(stdin);
 
-    if (SC_fgets(s, MAXLINE, stdin) != NULL)
+    if (SC_prompt(NULL, s, MAXLINE) != NULL)
        {WRITE_LOG(">", s);
 	SC_printf(pp, "%s", s);};
 
@@ -290,7 +290,9 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
     if (nb == -1L)
        {nb             = SIZE_BUF;
 	_SC.ecbf       = FMAKE_N(char, nb, "PERM|_SC_EX_CH_OUT:ecbf");
-	_SC.ecbf[nb-1] = '\0';};
+	_SC.ecbf[nb-1] = '\0';
+	_SC.elbf       = FMAKE_N(char, nb, "PERM|_SC_EX_CH_OUT:elbf");
+	_SC.elbf[nb-1] = '\0';};
 
     nc = strlen(SC_DEFEAT_MPI_BUG);
     while (SC_gets(_SC.ecbf, nb-1, pp) != NULL)
@@ -322,7 +324,8 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 	if ((no > 0) || (suppress == FALSE))
 	   {_SC_squeeze_tag(_SC.ecbf, nb, SC_DEFEAT_MPI_BUG);
             if (_SC.ecbf[0] != '\0')
-	       printf("%s", _SC.ecbf);};
+	       {printf("%s", _SC.ecbf);
+	        SC_strncpy(_SC.elbf, nb, _SC.ecbf, -1);};};
 
 /* if we are even close enlarge the buffer */
 	if (2*ns > nb)
@@ -405,9 +408,13 @@ static int _SC_do_session(PROCESS *pp,
 
 #ifdef HAVE_READLINE
 
-    SC_unblock_file(stdin);
+    int fd;
 
-    SC_set_io_attrs(fileno(stdin),
+    fd = fileno(stdin);
+
+    SC_unblock_fd(fd);
+
+    SC_set_io_attrs(fd,
 		    SC_NDELAY, SC_TERM_DESC,     FALSE,
 		    ICANON,    SC_TERM_LOCAL,    FALSE,
 		    ECHO,      SC_TERM_LOCAL,    FALSE,
