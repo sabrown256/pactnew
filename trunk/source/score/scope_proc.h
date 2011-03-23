@@ -462,6 +462,15 @@ extern int
  SC_connect(int fd, struct sockaddr *addr, socklen_t ln, int to);
 
 
+/* SCINET.C declarations */
+
+extern struct sockaddr_in
+ *_SC_tcp_address(char *host, int port);
+
+extern int
+ _SC_tcp_connect(char *host, int port, int to);
+
+
 /* SCLPPSX.C declarations */
 
 extern PROCESS

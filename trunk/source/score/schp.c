@@ -343,145 +343,6 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DSOCKET - diagnostic print of socket info */
-
-void dsocket(int s)
-   {
-
-#ifdef HAVE_SOCKETS_P
-
-    int ok;
-    socklen_t iv, nb;
-
-# ifdef SO_DEBUG
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_DEBUG, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Socket debugging: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_REUSEADDR
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_REUSEADDR, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Address reuse: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_REUSEPORT
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_REUSEPORT, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Port reuse: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_KEEPALIVE
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Keep alive: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_DONTROUTE
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_DONTROUTE, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Routing bypass: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_LINGER
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_LINGER, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Linger on close: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_BROADCAST
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_BROADCAST, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Permission to broadcast: %d (%d)\n",
-	     (int) iv, (int) nb);
-# endif
-
-# ifdef SO_OOBINLINE
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_OOBINLINE, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Out-of-band reception: %d (%d)\n",
-	     (int) iv, (int) nb);
-# endif
-
-# ifdef SO_SNDBUF
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_SNDBUF, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Output buffer size: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_RCVBUF
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_RCVBUF, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Input buffer size: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_SNDLOWAT
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_SNDLOWAT, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Output threshold: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_RCVLOWAT
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_RCVLOWAT, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Input threshold: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_SNDTIMEO
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_SNDTIMEO, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Output timeout: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_RCVTIMEO
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Input timeout: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_TYPE
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_TYPE, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Socket type: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-# ifdef SO_NOSIGPIPE
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_NOSIGPIPE, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Return EPIPE instead of SIGPIPE: %d (%d)\n",
-	     (int) iv, (int) nb);
-# endif
-
-# ifdef SO_ERROR
-    nb = sizeof(socklen_t);
-    ok = getsockopt(s, SOL_SOCKET, SO_ERROR, &iv, &nb);
-    if (ok == 0)
-       io_printf(stdout, "Socket error: %d (%d)\n", (int) iv, (int) nb);
-# endif
-
-#endif
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_FIXUP_SOCKET - reset socket setup to values we want
  *                  - instead of system defaults
  */
@@ -1805,52 +1666,38 @@ int SC_init_server(int step, int closep)
  */
 
 int SC_init_client(char *host, int port)
-   {int sasz, fd, err, ok;
-    struct sockaddr_in *srvr;
+   {int fd;
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    if ((host == NULL) || (port < 0))
-       return(-1);
+#if 0
+    int ok;
 
+    fd = -1;
     ok = SC_ERR_TRAP();
-    if (ok != 0)
-       fd = -1;
+    if (ok == 0)
+       {if ((host != NULL) && (port >= 0))
+	   {int sasz, err;
+	    struct sockaddr_in *srvr;
 
-    else
-       {in_addr_t haddr;
+	    sasz = sizeof(in_addr_t);
+	    srvr = _SC_tcp_address(host, port);
+	    if (srvr != NULL)
+	       {fd = socket(PF_INET, SOCK_STREAM, 0);
+		if (fd < 0)
+		   SC_error(-1, "CAN'T OPEN SOCKET - SC_TCP_CONNECT");
 
-	srvr = FMAKE(struct sockaddr_in, "SC_INIT_CLIENT:srvr");
-	srvr->sin_family = PF_INET;
-	srvr->sin_port   = htons(port);
+		err = connect(fd, (struct sockaddr *) srvr, sasz);
+		if (err < 0)
+		   {close(fd);
+		    SC_error(-1, "CAN'T CONNECT TO SERVER - SC_TCP_CONNECT");};};
 
-	sasz  = sizeof(in_addr_t);
-	haddr = inet_addr(host);
-
-#if defined(HAVE_GETHOSTBYNAME)
-	if (haddr == INADDR_NONE)
-	   {struct hostent *hp;
-
-	    hp = gethostbyname(host);
-	    if (hp != NULL)
-	       memcpy(&haddr, hp->h_addr, sasz);};
-#endif
-
-	if (haddr == INADDR_NONE)
-	   SC_error(-1, "CAN'T GET SERVER ADDRESS - SC_INIT_CLIENT");
-
-	memcpy(&srvr->sin_addr, &haddr, sizeof(long));
-
-	fd = socket(PF_INET, SOCK_STREAM, 0);
-	if (fd < 0)
-	   SC_error(-1, "CAN'T OPEN SOCKET - SC_INIT_CLIENT");
-
-	err = connect(fd, (struct sockaddr *) srvr, sasz);
-	if (err < 0)
-	   {close(fd);
-	    SC_error(-1, "CAN'T CONNECT TO SERVER - SC_INIT_CLIENT");};};
+	    SFREE(srvr);};};
 
     SC_ERR_UNTRAP();
+#else
+    fd = _SC_tcp_connect(host, port, -1);
+#endif
 
 #else
     fd = 0;

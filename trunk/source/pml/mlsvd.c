@@ -35,7 +35,7 @@ int PM_svd_solve(double *u, double *w, double *v, int m, int n,
         {s = 0.0;
 	 if (w[j] != 0.0)
 	    {for (i = 0; i < m; i++)
-	         {ij = INDEX(i, j, m);
+	         {ij = INDEX(i, j, n);
 		  s += u[ij]*b[i];};
 	     s /= w[j];};
 
@@ -79,16 +79,16 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 	 sc     = 0.0;
 	 if (i < m)
 	    {for (k = i; k < m; k++)
-	         {ki  = INDEX(k, i, m);
+	         {ki  = INDEX(k, i, n);
 		  sc += ABS(a[ki]);};
 
 	     if (sc != 0.0)
 		{for (k = i; k < m; k++)
-		     {ki     = INDEX(k, i, m);
+		     {ki     = INDEX(k, i, n);
 		      a[ki] /= sc;
 		      s     += a[ki]*a[ki];};
 
-		 ii = INDEX(i, i, m);
+		 ii = INDEX(i, i, n);
 		 f  = a[ii];
 		 g  = -SIGN(sqrt(s), f);
 		 h  = f*g - s;
@@ -99,18 +99,18 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 		    {for (j = l; j < n; j++)
 			 {s = 0.0;
 			  for (k = i; k < m; k++)
-			      {ki = INDEX(k, i, m);
-			       kj = INDEX(k, j, m);
+			      {ki = INDEX(k, i, n);
+			       kj = INDEX(k, j, n);
 			       s += a[ki]*a[kj];};
 
 			  f = s/h;
 			  for (k = i; k < m; k++)
-			      {ki = INDEX(k, i, m);
-			       kj = INDEX(k, j, m);
+			      {ki = INDEX(k, i, n);
+			       kj = INDEX(k, j, n);
 			       a[kj] += f*a[ki];};};};
 
 		 for (k = i; k < m; k++)
-		     {ki     = INDEX(k, i, m);
+		     {ki     = INDEX(k, i, n);
 		      a[ki] *= sc;};};};
 
 	 w[i]  = sc*g;
@@ -119,16 +119,16 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 	 sc    = 0.0;
 	 if ((i < m) && (i != n-1))
 	    {for (k = l; k < n; k++)
-	         {ik  = INDEX(i, k, m);
+	         {ik  = INDEX(i, k, n);
 		  sc += ABS(a[ik]);};
 
 	     if (sc != 0.0)
 		{for (k = l; k < n; k++)
-		     {ik     = INDEX(i, k, m);
+		     {ik     = INDEX(i, k, n);
 		      a[ik] /= sc;
 		      s     += a[ik]*a[ik];};
 
-	         il = INDEX(i, l, m);
+	         il = INDEX(i, l, n);
 		 f  = a[il];
 		 g  = -SIGN(sqrt(s), f);
 		 h  = f*g - s;
@@ -136,23 +136,23 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 		 a[il] = f - g;
 
 		 for (k = l; k < n; k++)
-		     {ik     = INDEX(i, k, m);
+		     {ik     = INDEX(i, k, n);
 		      rv1[k] = a[ik]/h;};
 
 		 if (i != m-1)
 		    {for (j = l; j < m; j++)
 			 {s = 0.0;
 			  for (k = l; k < n; k++)
-			      {jk = INDEX(j, k, m);
-			       ik = INDEX(i, k, m);
+			      {jk = INDEX(j, k, n);
+			       ik = INDEX(i, k, n);
 			       s += a[jk]*a[ik];};
 
 			  for (k = l; k < n; k++)
-			      {jk     = INDEX(j, k, m);
+			      {jk     = INDEX(j, k, n);
 			       a[jk] += s*rv1[k];};};};
 
 		 for (k = l; k < n; k++)
-		     {ik     = INDEX(i, k, m);
+		     {ik     = INDEX(i, k, n);
 		      a[ik] *= sc;};};};
 
 	 bnrm = ABS(w[i]) + ABS(rv1[i]);
@@ -182,14 +182,14 @@ static void _PM_svd_v(double *v, double *a, int m, int n, double *rv1)
 	    {if (g != 0.0)
 		{for (j = l; j < n; j++)
 		     {ji = INDEX(j, i, n);
-		      ij = INDEX(i, j, m);
-		      il = INDEX(i, l, m);
+		      ij = INDEX(i, j, n);
+		      il = INDEX(i, l, n);
 		      v[ji] = (a[ij]/a[il])/g;};
 
 		 for (j = l; j < n; j++)
 		     {s = 0.0;
 		      for (k = l; k < n; k++)
-			  {ik = INDEX(i, k, m);
+			  {ik = INDEX(i, k, n);
 			   kj = INDEX(k, j, n);
 			   s += a[ik]*v[kj];};
 
@@ -227,7 +227,7 @@ static void _PM_svd_u(double *a, double *w, int m, int n)
 	 g = w[i];
 	 if (i < n-1)
 	    for (j = l; j < n; j++)
-	        {ij = INDEX(i, j, m);
+	        {ij = INDEX(i, j, n);
 		 a[ij] = 0.0;};
 
 	 if (g != 0.0)
@@ -236,27 +236,27 @@ static void _PM_svd_u(double *a, double *w, int m, int n)
 		{for (j = l; j < n; j++)
 		     {s = 0.0;
 		      for (k = l; k < m; k++)
-			  {ki = INDEX(k, i, m);
-			   kj = INDEX(k, j, m);
+			  {ki = INDEX(k, i, n);
+			   kj = INDEX(k, j, n);
 			   s += a[ki]*a[kj];};
 
-		      ii = INDEX(i, i, m);
+		      ii = INDEX(i, i, n);
 		      f  = (s/a[ii])*g;
 		      for (k = i; k < m; k++)
-			  {ki = INDEX(k, i, m);
-			   kj = INDEX(k, j, m);
+			  {ki = INDEX(k, i, n);
+			   kj = INDEX(k, j, n);
 			   a[kj] += f*a[ki];};};};
 
 	     for (j = i; j < m; j++)
-	         {ji     = INDEX(j, i, m);
+	         {ji     = INDEX(j, i, n);
 		  a[ji] *= g;};}
 
 	 else
 	    {for (j = i; j < m; j++)
-	         {ji    = INDEX(j, i, m);
+	         {ji    = INDEX(j, i, n);
 		  a[ji] = 0.0;};};
 
-	 ii     = INDEX(i, i, m);
+	 ii     = INDEX(i, i, n);
 	 a[ii] += 1.0;};
 
     return;}
@@ -308,7 +308,7 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 	      {flag = 1;
 	       for (l = k; l >= 0; l--)
 		   {nm = l - 1;
-                    wc = (l > 0) ? w[l-1] : 0.0;
+                    wc = (l > 0) ? w[nm] : 0.0;
 		    if (ABS(rv1[l]) + anrm == anrm)
 		       {flag = 0;
 			break;};
@@ -329,8 +329,8 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 			    c = g*h;
 			    s = -f*h;
 			    for (j = 0; j < m; j++)
-			        {jn = INDEX(j, nm, m);
-				 ji = INDEX(j, i, m);
+			        {jn = INDEX(j, nm, n);
+				 ji = INDEX(j, i, n);
 				 y  = a[jn];
 				 z  = a[ji];
 				 a[jn] = y*c + z*s;
@@ -400,8 +400,8 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 		    f = c*g + s*y;
 		    x = c*y - s*g;
 		    for (jp = 0; jp < m; jp++)
-		        {jj = INDEX(jp, j, m);
-			 ji = INDEX(jp, i, m);
+		        {jj = INDEX(jp, j, n);
+			 ji = INDEX(jp, i, n);
 			 y  = a[jj];
 			 z  = a[ji];
 			 a[jj] = y*c + z*s;

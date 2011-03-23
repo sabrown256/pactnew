@@ -101,7 +101,7 @@ DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 MObjs = scmemc.o scmemda.o scmemdb.o scmeme.o scmemf.o \
         scmemg.o scmemh.o scmemt.o sctyp.o
 
-PObjs = scerr.o schp.o scpman.o schttp.o \
+PObjs = scerr.o schp.o scpman.o schttp.o scinet.o \
         scmmap.o sclmmap.o scmmaps.o \
         scsysa.o scsysb.o scsysc.o scsysd.o scsyse.o \
         scfio.o scbio.o scudl.o scioctl.o scsig.o schsrv.o scterm.o
@@ -126,7 +126,7 @@ ArMObjs = ${TGTLib}(scmemc.o) ${TGTLib}(scmemda.o) ${TGTLib}(scmemdb.o) \
           ${TGTLib}(scmemh.o) ${TGTLib}(scmemt.o) ${TGTLib}(sctyp.o)
 
 ArPObjs = ${TGTLib}(scerr.o) ${TGTLib}(schp.o) ${TGTLib}(scpman.o) \
-          ${TGTLib}(sclppsx.o) ${TGTLib}(schttp.o) \
+          ${TGTLib}(sclppsx.o) ${TGTLib}(schttp.o) ${TGTLib}(scinet.o) \
           ${TGTLib}(scmmap.o) ${TGTLib}(sclmmap.o) ${TGTLib}(scmmaps.o) \
 	  ${TGTLib}(scsysa.o) ${TGTLib}(scsysb.o) \
           ${TGTLib}(scsysc.o) ${TGTLib}(scsysd.o) ${TGTLib}(scsyse.o) \
