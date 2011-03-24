@@ -49,6 +49,41 @@ static FILE *lgf = NULL;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_RESET_STDIN - fix up stdin for poll depending
+ *                 - on the presence of readline
+ *                 - WH FALSE puts stdin in raw mode with echo off
+ *                 - WH TRUE puts stdin in line mode with echo on
+ */
+
+int _SC_reset_stdin(int wh)
+   {int fd, rv;
+
+    fd = fileno(stdin);
+
+    rv = TRUE;
+
+#ifdef HAVE_READLINE
+
+    if (wh == FALSE)
+       {SC_unblock_fd(fd);
+
+	rv = SC_set_io_attrs(fd,
+			     SC_NDELAY, SC_TERM_DESC,     FALSE,
+			     ICANON,    SC_TERM_LOCAL,    FALSE,
+			     ECHO,      SC_TERM_LOCAL,    FALSE,
+			     0);}
+    else
+       rv = SC_set_io_attrs(fd,
+			    ICANON,    SC_TERM_LOCAL,    TRUE,
+			    ECHO,      SC_TERM_LOCAL,    TRUE,
+			    0);
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_SIGNAL_RELAY - relay signals received by the parent
  *                  - to the child
  */
@@ -75,6 +110,8 @@ static void _SC_ex_int_hnd(int sig)
    {
 
     SC_block_file(stdin);
+
+    _SC_reset_stdin(TRUE);
 
     _SC_signal_relay(sig);
 
@@ -144,23 +181,15 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
  */
     s[0] = '\0';
 
-#ifdef HAVE_READLINE
+    _SC_reset_stdin(TRUE);
 
-    SC_set_io_attrs(fileno(stdin),
-		    ICANON,    SC_TERM_LOCAL,    TRUE,
-		    ECHO,      SC_TERM_LOCAL,    TRUE,
-		    0);
+#ifdef HAVE_READLINE
 
     SC_block_file(stdin);
 
     if (SC_prompt(NULL, s, MAXLINE) != NULL)
        {WRITE_LOG(">", s);
 	SC_printf(pp, "%s", s);};
-
-    SC_set_io_attrs(fileno(stdin),
-		    ICANON,    SC_TERM_LOCAL,    FALSE,
-		    ECHO,      SC_TERM_LOCAL,    FALSE,
-		    0);
 
 #else
 
@@ -181,6 +210,8 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
     SC_block_file(stdin);
 
 #endif
+
+    _SC_reset_stdin(FALSE);
 
     _SC.tty_n_rej = 0;
 
@@ -406,22 +437,11 @@ static int _SC_do_session(PROCESS *pp,
     d.pp = pp;
     d.pe = pe;
 
-#ifdef HAVE_READLINE
-
-    int fd;
-
-    fd = fileno(stdin);
-
-    SC_unblock_fd(fd);
-
-    SC_set_io_attrs(fd,
-		    SC_NDELAY, SC_TERM_DESC,     FALSE,
-		    ICANON,    SC_TERM_LOCAL,    FALSE,
-		    ECHO,      SC_TERM_LOCAL,    FALSE,
-		    0);
-#endif
+    _SC_reset_stdin(FALSE);
 
     rv = SC_event_loop(pe, &d, -1);
+
+    _SC_reset_stdin(TRUE);
 
     SC_free_event_loop(pe);
 

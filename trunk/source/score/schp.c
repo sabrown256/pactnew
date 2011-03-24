@@ -1556,9 +1556,7 @@ int SC_init_server(int step, int closep)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    int sasz, err, port, ok;
-    socklen_t len;
-    struct sockaddr *sa;
+    int sasz, ok;
     
     if (_SC_debug)
        {fprintf(_SC_diag, "   SC_init_server: %d\n", step);
@@ -1587,52 +1585,16 @@ int SC_init_server(int step, int closep)
 		    {fprintf(_SC_diag, "      Socket opened: %d\n", _SC.sfd);
 		     fflush(_SC_diag);};
 
-		 _SC.srvr = FMAKE(struct sockaddr_in, "SC_INIT_SERVER:srvr");
-		 _SC.srvr->sin_family      = PF_INET;
-		 _SC.srvr->sin_addr.s_addr = htonl(INADDR_ANY);
-
-		 for (port = 5000; port < 65000; port++)
-		     {_SC.srvr->sin_port = htons(port);
-
-		      if (bind(_SC.sfd, (struct sockaddr *) _SC.srvr, sasz) >= 0)
-			 {if (_SC_debug)
-			     {fprintf(_SC_diag, "      Bind succeeded: %d\n", port);
-			      fflush(_SC_diag);};
-
-			  rv = port;
-			  break;};};
-
-		 if (port >= 65000)
+		 _SC.srvr = _SC_tcp_bind(_SC.sfd, -1);
+		 if (_SC.srvr == NULL)
 		    SC_error(-1, "BIND FAILED - SC_INIT_SERVER");
+
+		 rv = ntohs(_SC.srvr->sin_port);
+
 		 break;
 
 	    case SC_GET_CONNECTION :
-		 sa  = (struct sockaddr *) _SC.srvr;
-		 len = sasz;
-
-		 getsockname(_SC.sfd, sa, &len);
-
-		 err = listen(_SC.sfd, 5);
-		 if (_SC_debug)
-		    {if (err < 0)
-		        fprintf(_SC_diag, "      Listen failed %d (%d)\n",
-				_SC.sfd, errno);
-		     else
-		        fprintf(_SC_diag, "      Listen succeeded\n");
-		     fflush(_SC_diag);};
-
-		 if (err < 0)
-		    SC_error(-1, "LISTEN FAILED - SC_INIT_SERVER");
-
-		 _SC.nfd = accept(_SC.sfd, (struct sockaddr *) _SC.srvr, &len);
-		 if (_SC_debug)
-		    {if (_SC.nfd < 0)
-		        fprintf(_SC_diag, "      Accept failed %d (%d)\n",
-				_SC.sfd, errno);
-		     else
-		        fprintf(_SC_diag, "      Accept succeeded: %d\n", _SC.nfd);
-		     fflush(_SC_diag);};
-
+	         _SC.nfd = _SC_tcp_accept_connection(_SC.sfd, _SC.srvr);
 		 if (_SC.nfd < 0)
 		    SC_error(-1, "ACCEPT FAILED - SC_INIT_SERVER");
 
@@ -1669,36 +1631,7 @@ int SC_init_client(char *host, int port)
    {int fd;
 
 #ifdef HAVE_PROCESS_CONTROL
-
-#if 0
-    int ok;
-
-    fd = -1;
-    ok = SC_ERR_TRAP();
-    if (ok == 0)
-       {if ((host != NULL) && (port >= 0))
-	   {int sasz, err;
-	    struct sockaddr_in *srvr;
-
-	    sasz = sizeof(in_addr_t);
-	    srvr = _SC_tcp_address(host, port);
-	    if (srvr != NULL)
-	       {fd = socket(PF_INET, SOCK_STREAM, 0);
-		if (fd < 0)
-		   SC_error(-1, "CAN'T OPEN SOCKET - SC_TCP_CONNECT");
-
-		err = connect(fd, (struct sockaddr *) srvr, sasz);
-		if (err < 0)
-		   {close(fd);
-		    SC_error(-1, "CAN'T CONNECT TO SERVER - SC_TCP_CONNECT");};};
-
-	    SFREE(srvr);};};
-
-    SC_ERR_UNTRAP();
-#else
     fd = _SC_tcp_connect(host, port, -1);
-#endif
-
 #else
     fd = 0;
 #endif

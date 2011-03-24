@@ -465,9 +465,14 @@ extern int
 /* SCINET.C declarations */
 
 extern struct sockaddr_in
- *_SC_tcp_address(char *host, int port);
+ *_SC_tcp_address(char *host, int port),
+ *_SC_tcp_bind(int fd, int port);
 
 extern int
+ _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
+	       int (*ex)(int *rv, void *a),
+	       PFFileCallback acc, PFFileCallback rej),
+ _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad),
  _SC_tcp_connect(char *host, int port, int to);
 
 

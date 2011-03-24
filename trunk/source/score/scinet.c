@@ -10,6 +10,15 @@
 
 #include "scope_proc.h"
 
+typedef struct s_tcp_loop tcp_loop;
+
+struct s_tcp_loop
+   {void *a;
+    struct sockaddr_in *ad;
+    SC_evlpdes *pe;
+    PFFileCallback acc;
+    PFFileCallback rej;};
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -152,126 +161,6 @@ void dsocket(int s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_INIT_SERVER - perform steps to initialize a server
- *                - for SC_GET_PORT return the port for the client connection
- *                - for SC_GET_CONNECTION return the socket for the client
- *                - connection
- */
-
-#if 0
-
-int SC_init_server(int step, int closep)
-   {int rv;
-
-#ifdef HAVE_PROCESS_CONTROL
-
-    int sasz, err, port, ok;
-    socklen_t len;
-    struct sockaddr *sa;
-    
-    if (_SC_debug)
-       {fprintf(_SC_diag, "   SC_init_server: %d\n", step);
-        fflush(_SC_diag);};
-
-    sasz = sizeof(struct sockaddr_in);
-
-    rv = -1;
-    ok = SC_ERR_TRAP();
-    if (ok != 0)
-       {if (closep)
-	   {if (_SC.sfd >= 0)
-	       close(_SC.sfd);
-	    _SC.sfd = -1;};
-
-	rv = _SC.sfd;}
-
-    else
-       {switch (step)
-	   {case SC_GET_PORT :
-	         _SC.sfd = socket(PF_INET, SOCK_STREAM, 0);
-		 if (_SC.sfd < 0)
-		    SC_error(-1, "COULDN'T OPEN SOCKET - SC_INIT_SERVER");
-
-		 if (_SC_debug)
-		    {fprintf(_SC_diag, "      Socket opened: %d\n", _SC.sfd);
-		     fflush(_SC_diag);};
-
-		 _SC.srvr = FMAKE(struct sockaddr_in, "SC_INIT_SERVER:srvr");
-		 _SC.srvr->sin_family      = PF_INET;
-		 _SC.srvr->sin_addr.s_addr = htonl(INADDR_ANY);
-
-		 for (port = 5000; port < 65000; port++)
-		     {_SC.srvr->sin_port = htons(port);
-
-		      if (bind(_SC.sfd, (struct sockaddr *) _SC.srvr, sasz) >= 0)
-			 {if (_SC_debug)
-			     {fprintf(_SC_diag, "      Bind succeeded: %d\n", port);
-			      fflush(_SC_diag);};
-
-			  rv = port;
-			  break;};};
-
-		 if (port >= 65000)
-		    SC_error(-1, "BIND FAILED - SC_INIT_SERVER");
-		 break;
-
-	    case SC_GET_CONNECTION :
-		 sa  = (struct sockaddr *) _SC.srvr;
-		 len = sasz;
-
-		 getsockname(_SC.sfd, sa, &len);
-
-		 err = listen(_SC.sfd, 5);
-		 if (_SC_debug)
-		    {if (err < 0)
-		        fprintf(_SC_diag, "      Listen failed %d (%d)\n",
-				_SC.sfd, errno);
-		     else
-		        fprintf(_SC_diag, "      Listen succeeded\n");
-		     fflush(_SC_diag);};
-
-		 if (err < 0)
-		    SC_error(-1, "LISTEN FAILED - SC_INIT_SERVER");
-
-		 _SC.nfd = accept(_SC.sfd, (struct sockaddr *) _SC.srvr, &len);
-		 if (_SC_debug)
-		    {if (_SC.nfd < 0)
-		        fprintf(_SC_diag, "      Accept failed %d (%d)\n",
-				_SC.sfd, errno);
-		     else
-		        fprintf(_SC_diag, "      Accept succeeded: %d\n", _SC.nfd);
-		     fflush(_SC_diag);};
-
-		 if (_SC.nfd < 0)
-		    SC_error(-1, "ACCEPT FAILED - SC_INIT_SERVER");
-
-		 if (closep)
-		    {close(_SC.sfd);
-
-		     if (_SC_debug)
-		        {fprintf(_SC_diag, "      Socket closed: %d\n", _SC.sfd);
-			 fflush(_SC_diag);};
-
-		     _SC.sfd = -1;
-		     SFREE(_SC.srvr);};
-
-		 rv = _SC.nfd;
-
-		 break;};};
-
-    SC_ERR_UNTRAP();
-
-#else
-    rv = 0;
-#endif
-
-    return(rv);}
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_TCP_ADDRESS - allocate and initialize a sockaddr
  *                 - to connect to HOST on PORT
  */
@@ -321,6 +210,167 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_TCP_BIND - bind the socket FD to PORT
+ *              - return the sockaddr of the bound descriptor
+ *              - if PORT == -1 search for a port
+ */
+
+struct sockaddr_in *_SC_tcp_bind(int fd, int port)
+   {int ok, sasz;
+    struct sockaddr_in *ad;
+
+    ad = NULL;
+
+#ifdef HAVE_PROCESS_CONTROL
+
+    ad = FMAKE(struct sockaddr_in, "_SC_TCP_BIND:ad");
+    if (ad != NULL)
+       {ad->sin_family      = PF_INET;
+	ad->sin_addr.s_addr = htonl(INADDR_ANY);
+
+	ok = -1;
+
+	sasz = sizeof(struct sockaddr_in);
+
+	if (port > 0)
+	   {ad->sin_port = htons(port);
+	    ok = bind(_SC.sfd, (struct sockaddr *) ad, sasz);}
+
+	else
+	   {for (port = 5000; port < 65000; port++)
+	        {ad->sin_port = htons(port);
+		 ok = bind(_SC.sfd, (struct sockaddr *) ad, sasz);
+		 if (ok >= 0)
+		    break;};};
+
+	if (ok >= 0)
+	   {if (_SC_debug)
+	       {fprintf(_SC_diag, "      Bind succeeded: %d\n", port);
+		fflush(_SC_diag);};}
+	else
+	   {SFREE(ad);};};
+
+#endif
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_TCP_ACCEPTOR - register newly accepted connections on FD */
+
+static void _SC_tcp_acceptor(int fd, int mask, void *a)
+   {
+
+#ifdef HAVE_PROCESS_CONTROL
+
+    int nfd, pi;
+    socklen_t sasz;
+    struct sockaddr_in *ad;
+    PFFileCallback acc;
+    PFFileCallback rej;
+    SC_evlpdes *pe;
+    tcp_loop *lp;
+
+    lp  = (tcp_loop *) a;
+    pe  = lp->pe;
+    ad  = lp->ad;
+    acc = lp->acc;
+    rej = lp->rej;
+
+    sasz = sizeof(struct sockaddr_in);
+
+    nfd = accept(fd, (struct sockaddr *) ad, &sasz);
+    if (nfd > 0)
+       pi = SC_register_event_loop_callback(pe, SC_INT_I, &nfd,
+					    acc, rej, -1);
+
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_TCP_SERVE - listen on bound socket (FD, AD)
+ *               - accept connections and run an event loop on them
+ *               - this is the core of a server
+ */
+ 
+int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
+		  int (*ex)(int *rv, void *a),
+		  PFFileCallback acc, PFFileCallback rej)
+   {int pi, ok;
+    socklen_t sasz;
+    SC_evlpdes *pe;
+    tcp_loop lp;
+
+    ok = -1;
+
+#ifdef HAVE_PROCESS_CONTROL
+
+    if (listen(fd, 5) >= 0)
+       {sasz = sizeof(struct sockaddr_in);
+
+/* create the event loop state */
+	pe = SC_make_event_loop(NULL, NULL, ex, -1, -1, -1);
+
+/* register the I/O channels for the event loop to monitor */
+	pi = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
+					     _SC_tcp_acceptor, NULL, -1);
+
+/* if all channels are OK activate the interrupt handling */
+	SC_io_interrupts_on = pi;
+	if (pi)
+	   SC_catch_event_loop_interrupts(pe, SC_io_interrupts_on);
+
+	lp.a   = a;
+	lp.ad  = ad;
+	lp.pe  = pe;
+	lp.acc = acc;
+	lp.rej = rej;
+
+	ok = SC_event_loop(pe, &lp, -1);
+
+	SC_free_event_loop(pe);};
+
+#endif
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_TCP_ACCEPT_CONNECTION - listen on bound socket FD, AD
+ *                           - and return the descriptor of an accepted
+ *                           - connection
+ */
+
+int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
+   {int err, nfd;
+    socklen_t sasz;
+    struct sockaddr *sa;
+    
+    nfd = -1;
+
+#ifdef HAVE_PROCESS_CONTROL
+
+    sa   = (struct sockaddr *) ad;
+    sasz = sizeof(struct sockaddr_in);
+
+    getsockname(fd, sa, &sasz);
+
+    err = listen(fd, 5);
+    if (err >= 0)
+       nfd = accept(fd, sa, &sasz);
+
+#endif
+
+    return(nfd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_CONNECT_TO - initiate connection to ADDR over socket FD
  *                - timeout after TO milliseconds
  *                - if TO is -1 let connect finish or timeout on its own
@@ -333,6 +383,10 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
    {int ok, blck, nrdy, dt, ta, sz, rv;
     SC_poll_desc pd;
+
+    ok = -1;
+
+#ifdef HAVE_PROCESS_CONTROL
 
 /* do a blocking connect if an infinite timeout has been requested */
     if (to < 0)
@@ -373,6 +427,8 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
 /* restore the socket status wrt blocking */
 	if (blck == TRUE)
 	   SC_block_fd(fd);};
+
+#endif
 
     return(ok);}
 
