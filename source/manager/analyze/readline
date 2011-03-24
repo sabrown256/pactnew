@@ -47,21 +47,29 @@ else
 int main(int c, char **v)
 {int rv;
  char *(*f)(const char *p);
+ rl_already_prompted = 0;
+ rl_save_prompt();
  f  = readline;
  rv = (f == NULL);
+ rl_restore_prompt();
+ rl_clear_message();
+ printf("%s 0x%04x\n", rl_library_version, rl_readline_version);
  return(rv);}
 EOF
 
    setenv HAVE_READLINE FALSE
 
-   set llib = ""
-   set libl = ( -lreadline -lcurses )
-   set opt  = ""
-   set opt  = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath $libl )
+   set lvers = none
+   set llib  = ""
+   set libl  = ( -lreadline -lcurses )
+   set opt   = ""
+   set opt   = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath $libl )
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
    if ($status == 0) then
       flog $ALog $CFE $Tmp
       if ($status == 0) then
+         set inf   = ( `$CFE $Tmp` )
+         set lvers = $inf[1]
          setenv HAVE_READLINE TRUE
          flog $ALog set llib = ( $libl )
          flog $ALog setenv MD_Pck        "RL $MD_Pck"
@@ -73,7 +81,7 @@ EOF
 
    if ("$llib" != "") then
       flog $ALog setenv HAVE_READLINE   TRUE
-      NoteD $ALog "      has readline ($llib)"
+      NoteD $ALog "      has readline $lvers ($llib)"
    else
       NoteD $ALog "      no readline"
    endif
