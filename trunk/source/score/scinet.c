@@ -402,11 +402,9 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
        ok = connect(fd, (struct sockaddr *) addr, ln);
 
     else
-       {pd.fd     = fd;
-	pd.events = POLLOUT;
 
 /* choose a good sampling interval */
-	if (to < 100)
+       {if (to < 100)
 	   dt = to / 16;
 	else if (to < 10000)
 	   dt = 100;
@@ -425,13 +423,17 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
 	   {ok = ETIMEDOUT;
 
 /* wait for the connection to be made */
+	    pd.fd     = fd;
+	    pd.events = POLLOUT;
 	    for (ta = 0; ta < to; ta += dt)
 	        {nrdy = SC_poll(&pd, 1, dt);
 		 if ((nrdy > 0) && (pd.revents & POLLOUT))
 		    {sz = sizeof(int);
 		     rv = getsockopt(fd, SOL_SOCKET, SO_ERROR,
 				     &ok, (socklen_t *) &sz);
-		     break;};};};
+		     break;};};
+
+	    ok = (ok != 0) ? -1 : 0;};
 
 /* restore the socket status wrt blocking */
 	if (blck == TRUE)
@@ -452,11 +454,12 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
 int _SC_tcp_connect(char *host, int port, int to)
    {int fd;
 
+    fd = -1;
+
 #ifdef HAVE_PROCESS_CONTROL
 
     int ok;
 
-    fd = -1;
     ok = SC_ERR_TRAP();
     if (ok == 0)
        {if ((host != NULL) && (port >= 0))
@@ -474,6 +477,7 @@ int _SC_tcp_connect(char *host, int port, int to)
 		err  = _SC_connect_to(fd, (struct sockaddr *) srvr, sasz, to);
 		if (err < 0)
 		   {close(fd);
+		    fd = -1;
 		    SC_error(-1, "CAN'T CONNECT TO SERVER (%d) - _SC_TCP_CONNECT",
 			      errno);};};
 
@@ -481,8 +485,6 @@ int _SC_tcp_connect(char *host, int port, int to)
 
     SC_ERR_UNTRAP();
 
-#else
-    fd = 0;
 #endif
 
     return(fd);}
