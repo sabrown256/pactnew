@@ -76,7 +76,7 @@ switch ($cname)
         set opt   = ( -qversion )
         set pat   = ( IBM XL C )
         set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = xlf90
+        set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
         breaksw
 
 # PGI

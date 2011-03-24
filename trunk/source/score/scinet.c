@@ -180,20 +180,29 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 
 #if defined(HAVE_GETHOSTBYNAME)
     if (haddr == INADDR_NONE)
-       {struct hostent *hp;
+       {struct hostent *ip, *hp;
 
-	 hp = gethostbyname(host);
-	 if (hp != NULL)
-	    {char *s;
-	     struct in_addr ipa;
+	ip = gethostbyname(host);
+	if (ip != NULL)
+	   {char *s;
+	    struct in_addr ipa;
 
-	     ipa.s_addr = *(in_addr_t *) hp->h_addr_list[0];
-	     s = inet_ntoa(ipa);
+	    ipa.s_addr = *(in_addr_t *) ip->h_addr_list[0];
+	    s = inet_ntoa(ipa);
 
 /* diagnostic print host name and IP address 
-             printf("%s -> %s\n", host, s);
+            printf("%s -> %s\n", host, s);
  */
-	     memcpy(&haddr, hp->h_addr, sasz);};};
+/* verify that host associated with the address matches the specified host
+ * things like OpenDNS give you a special address for unknown hosts
+ * which will not match your original host
+ */
+	    haddr = *(in_addr_t *) ip->h_addr_list[0];
+	    hp = gethostbyaddr(&haddr, sizeof(haddr), AF_INET);
+	    if (strcmp(hp->h_name, ip->h_name) == 0)
+	       memcpy(&haddr, ip->h_addr, sasz);
+	    else
+	       haddr = INADDR_NONE;};};
 #endif
 
     if (haddr != INADDR_NONE)
