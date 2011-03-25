@@ -1035,7 +1035,8 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 
 	PG_set_clipping(dev, clip);};
 
-    PG_set_view_angle(dev, th, ph, ch);
+    if ((th != 0.0) || (ph != 0.0) || (ch != 0.0))
+       PG_set_view_angle(dev, th, ph, ch);
     PG_set_light_angle(dev, thl, phl);
 
     PG_set_palette(dev, "standard");
