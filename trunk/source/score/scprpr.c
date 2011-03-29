@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "score.h"
-#include <pwd.h>
 
 #define DISP_BYNAME   1
 #define DISP_BYUID    2
@@ -76,13 +75,8 @@ void show_uname(char *s, int nc, SC_rusedes *ru, int umod)
     if (umod == 1)
        snprintf(s, nc, "  %8d", ru->uid);
 
-#if defined(HAVE_GETPWUID)
     else
-       {struct passwd *pw;
-
-	pw = getpwuid(ru->uid);
-	snprintf(s, nc, "%10s", pw->pw_name);};
-#endif
+       SC_get_uname(s, nc, ru->uid);
 
     return;}
 

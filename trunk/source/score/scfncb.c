@@ -10,6 +10,8 @@
 
 #include "scope_proc.h"
 
+#include <pwd.h>
+
 #define SC_DBG_GDB         1
 #define SC_DBG_TOTALVIEW   2
 #define SC_DBG_DBX         3
@@ -1007,6 +1009,36 @@ void SC_get_latencies(double *ptmp, double *phm, double *pnet, double *pprc)
        *pprc = _SC_time_command(_SC_time_exec, s, 8);
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_UNAME - return the NAME of the user UID
+ *              - NAME is NC long
+ */
+
+char *SC_get_uname(char *name, int nc, int uid)
+   {char *rv;
+
+    rv = NULL;
+
+    if (uid == -1)
+       uid = getuid();
+
+    name[0] = '\0';
+
+#if defined(HAVE_GETPWUID)
+
+    {struct passwd *pw;
+
+     pw = getpwuid(uid);
+     if (pw != NULL)
+        {snprintf(name, nc, "%10s", pw->pw_name);
+	 rv = name;};}
+
+#endif
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "score.h"
-#include <pwd.h>
 
 #define TEST   1
 #define PS     2

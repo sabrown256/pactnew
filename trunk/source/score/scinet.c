@@ -172,37 +172,38 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    int sasz;
     in_addr_t haddr;
 
-    sasz  = sizeof(in_addr_t);
     haddr = inet_addr(host);
 
 #if defined(HAVE_GETHOSTBYNAME)
     if (haddr == INADDR_NONE)
-       {struct hostent *ip, *hp;
+       {struct hostent *hen, *hea;
 
-	ip = gethostbyname(host);
-	if (ip != NULL)
-	   {char *s;
-	    struct in_addr ipa;
+	hen = gethostbyname(host);
+	if (hen != NULL)
+	   {in_addr_t nad;
 
-	    ipa.s_addr = *(in_addr_t *) ip->h_addr_list[0];
-	    s = inet_ntoa(ipa);
+	    nad = *(in_addr_t *) hen->h_addr_list[0];
 
-/* diagnostic print host name and IP address 
-            printf("%s -> %s\n", host, s);
- */
+#if 0
+/* diagnostic print host name and IP address */
+	    {char *sad;
+	     struct in_addr iad;
+
+	     iad.s_addr = nad;
+	     sad = inet_ntoa(iad);
+
+             printf("%s -> %s\n", host, sad);};
+#endif
+
 /* verify that host associated with the address matches the specified host
  * things like OpenDNS give you a special address for unknown hosts
  * which will not match your original host
  */
-	    haddr = *(in_addr_t *) ip->h_addr_list[0];
-	    hp = gethostbyaddr(&haddr, sizeof(haddr), AF_INET);
-	    if (strcmp(hp->h_name, ip->h_name) == 0)
-	       memcpy(&haddr, ip->h_addr, sasz);
-	    else
-	       haddr = INADDR_NONE;};};
+	    hea = gethostbyaddr(&nad, sizeof(nad), AF_INET);
+	    if (strcmp(hea->h_name, hen->h_name) == 0)
+	       haddr = nad;};};
 #endif
 
     if (haddr != INADDR_NONE)
