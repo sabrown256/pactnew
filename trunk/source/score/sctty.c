@@ -39,8 +39,48 @@ int lprintf(FILE *fp, int flag, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CYCLE - do one read/print cycle */
+
+static int cycle(int ne)
+   {char s[MAXLINE], emsg[MAXLINE];
+    char *p;
+    static int begin = TRUE;
+
+    if (begin == TRUE)
+       lprintf(stdout, 0, "-> ");
+
+    s[MAXLINE] = '\0';
+    p = SC_fgets(s, MAXLINE, stdin);
+
+    if (p != NULL)
+       {ne = 0;
+	if (begin == TRUE)
+	   lprintf(stdout, 0, "Response: ");
+
+	if (strchr(p, '\n') == NULL)
+	   {lprintf(stdout, 0, "%s", s);
+	    begin = FALSE;}
+	else
+	   {lprintf(stdout, 0, "%s\n", s);
+	    begin = TRUE;};
+
+	if (strncmp(s, "end\n", 4) == 0)
+	   {lprintf(stdout, 0, "Done\n");
+	    ne = INT_MAX;};}
+
+    else
+       {SC_strerror(errno, emsg, MAXLINE);
+	lprintf(stdout, 0, "FGETS: %s\n", emsg);
+
+	ne++;};
+
+    return(ne);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 int main(int c, char **v)
-   {int i, noth;
+   {int i, noth, ne;
     int tststdio, begin, quiet;
     char s[MAXLINE+1];
     char *p;
@@ -91,71 +131,23 @@ int main(int c, char **v)
 /* all processes get the input */
 	if (quiet == FALSE)
 	   lprintf(stdout, 0, " (all processes get input)\n");
-	while (TRUE)
-	   {if (begin == TRUE)
-	       lprintf(stdout, 0, "-> ");
 
-	    s[MAXLINE] = '\0';
-	    p = SC_fgets(s, MAXLINE, stdin);
-	    if (p != NULL)
-	       {if (begin == TRUE)
-		   lprintf(stdout, 0, "Response: ");
-
-		if (strchr(p, '\n') == NULL)
-		   {lprintf(stdout, 0, "%s", s);
-		    begin = FALSE;}
-		else
-		   {lprintf(stdout, 0, "%s\n", s);
-		    begin = TRUE;};
-
-		if (strncmp(s, "end\n", 4) == 0)
-		   {lprintf(stdout, 0, "Done\n");
-		    break;};}
-	    else
-	       lprintf(stdout, 0, "FGETS returned\n");};
+	for (ne = -1; ne < 4; )
+	    ne = cycle(ne);
 
 #else
-	{int ne;
-
-	 if (quiet == FALSE)
-	    lprintf(stdout, 0, " (only master process gets input)\n");
+	if (quiet == FALSE)
+	   lprintf(stdout, 0, " (only master process gets input)\n");
 
 /* only process 0 gets the input */
-	 if (SC_comm_rank == 0)
-	    {ne = 0;
-	     while (ne < 4)
-	        {if (begin == TRUE)
-		    lprintf(stdout, 0, "-> ");
-
-		 s[MAXLINE] = '\0';
-		 p = SC_fgets(s, MAXLINE, stdin);
-		 if (p != NULL)
-		    {ne = 0;
-		     if (begin == TRUE)
-		        lprintf(stdout, 0, "Response: ");
-
-		     if (strchr(p, '\n') == NULL)
-		        {lprintf(stdout, 0, "%s", s);
-			 begin = FALSE;}
-		     else
-		        {lprintf(stdout, 0, "%s\n", s);
-			 begin = TRUE;};
-
-		     if (strncmp(s, "end\n", 4) == 0)
-		        {lprintf(stdout, 0, "Done\n");
-			 break;};}
-		 else
-		    {char emsg[MAXLINE];
-
-		     SC_strerror(errno, emsg, MAXLINE);
-		     lprintf(stdout, 0, "FGETS: %s\n", emsg);
-
-		     ne++;};};};
+	if (SC_comm_rank == 0)
+	   {for (ne = -1; ne < 4; )
+	        ne = cycle(ne);};
 
 # ifdef HAVE_MPI
-	 MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Barrier(MPI_COMM_WORLD);
 # endif
-	};
+
 #endif
 
 	lprintf(stdout, 0, "\n");};
