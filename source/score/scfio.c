@@ -262,7 +262,8 @@ char *SC_prompt(char *prompt, char *s, int n)
 char *_SC_rl_fgets(char *s, int n)
    {char *rv;
 
-    rv = SC_prompt(NULL, s, n);
+/*    rv = SC_prompt(NULL, s, n); */
+    rv = fgets(s, n, stdin);
 
     return(rv);}
 
