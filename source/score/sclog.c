@@ -10,8 +10,6 @@
 
 #include "scope_proc.h"
 
-#include <pwd.h>
-
 #define TMP_DIR          "/tmp"
 #define LOGNAME_PREFIX   "pact-log"
 #define HOSTNAME_MAX     64
@@ -78,9 +76,8 @@ int SC_log(SC_logfile log, char *format, ...)
  */
 
 SC_logfile SC_open_log(void)
-   {char hostname[HOSTNAME_MAX];
+   {char hostname[HOSTNAME_MAX], uname[MAXLINE];
     char *uf;
-    struct passwd *data;
     SC_logfile log;
 
     log.file  = NULL;
@@ -104,12 +101,12 @@ SC_logfile SC_open_log(void)
 
 /* if successful: print initial log and setup tmp log to delete on close */
     if (log.file != NULL)
-       {data = getpwuid(getuid());
+       {SC_get_uname(uname, MAXLINE, -1);
         log.entry = _SC.nlog;
         _SC.nlog++; 
 
         fprintf(log.file, "\n");
-        SC_log(log, "opened by %s on %s", data->pw_name, hostname, _SC.nlog); 
+        SC_log(log, "opened by '%s' on %s", uname, hostname, _SC.nlog); 
 
 /* this just makes the link counter on the inode zero
  * the file will not actually be deleted until it is closed

@@ -877,6 +877,7 @@ extern void
  SC_get_latencies(double *ptmp, double *phm, double *pnet, double *pprc);
 
 extern char
+ *SC_get_uname(char *name, int nc, int uid),
  **SC_get_env(void);
 
 

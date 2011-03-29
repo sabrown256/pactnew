@@ -446,13 +446,13 @@ void SC_print_term_state(FILE *fp, int fd)
     if (c & CRDLY)  printf("o> CRDLY   - CR delay mask\n");
 # endif
 # ifdef TABDLY
-    if (c & TABDLY) printf("o> TABDLY  - hor. tab delay mask\n");
+    if (c & TABDLY) printf("o> TABDLY  - horizontal tab delay mask\n");
 # endif
 # ifdef BSDLY
     if (c & BSDLY)  printf("o> BSDLY   - backspace delay mask\n");
 # endif
 # ifdef VTDLY
-    if (c & VTDLY)  printf("o> VTDLY   - vert. tab delay mask\n");
+    if (c & VTDLY)  printf("o> VTDLY   - vertical tab delay mask\n");
 # endif
 # ifdef FFDLY
     if (c & FFDLY)  printf("o> FFDLY   - form feed delay mask\n");
