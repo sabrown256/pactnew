@@ -28,12 +28,16 @@ static char
 
 /* REPORT_VAR - report on the variable Q in FILE */
 
-static int report_var(char *file, char *q, char *key,
-		      int compl, int litrl, int newl)
-   {int i, ok, doit, tst;
+static int report_var(anadep *state, char *file, char *q, char *key, int newl)
+   {int i, nc, ok, doit, tst;
+    int compl, litrl, quote;
     char s[MAXLINE];
     char *tok, *txt, *ps, *p;
     FILE *fp;
+
+    compl = state->complete;
+    litrl = state->literal;
+    quote = state->quotes;
 
     ok = FALSE;
 
@@ -74,6 +78,11 @@ static int report_var(char *file, char *q, char *key,
 			     else
 			        txt++;};};
 
+		     if (quote == FALSE)
+		        {nc = strlen(txt);
+			 if (nc > 2)
+			    SC_strsubst(txt, nc+1, txt, "\"", "", -1);};
+
 		     if (compl)
 		        io_printf(stdout, "%s = %s", tok, txt);
 		     else
@@ -96,7 +105,7 @@ static int report_var(char *file, char *q, char *key,
 
 /* REPORT - report the value of one of the configuration quantities */
 
-static void report(char *q, int compl, int litrl, int newl, anadep *state)
+static void report(anadep *state, char *q, int newl)
    {int ok;
     char *s, *devdir, *file;
 
@@ -109,34 +118,34 @@ static void report(char *q, int compl, int litrl, int newl, anadep *state)
 
     if (strcmp(q, "config") == 0)
        {file = SC_dsnprintf(TRUE, "%s/include/make-def", devdir);
-        ok   = report_var(file, "System", NULL, compl, litrl, newl);
+        ok   = report_var(state, file, "System", NULL, newl);
 	SFREE(file);};
 
     if (!ok)
        {file = SC_dsnprintf(TRUE, "%s/include/scconfig.h", devdir);
-	ok   = report_var(file, q, "#define", compl, litrl, newl);
+	ok   = report_var(state, file, q, "#define", newl);
 	SFREE(file);};
 
     if (!ok)
        {file = SC_dsnprintf(TRUE, "%s/include/make-def", devdir);
-	ok   = report_var(file, q, NULL, compl, litrl, newl);
+	ok   = report_var(state, file, q, NULL, newl);
 	SFREE(file);};
 
     if (!ok)
        {file = SC_dsnprintf(TRUE, "%s/include/configured", devdir);
-	ok   = report_var(file, q, NULL, compl, litrl, newl);
+	ok   = report_var(state, file, q, NULL, newl);
 	SFREE(file);};
 
     if (!ok)
        {s = getenv("SHELL");
 	if ((s != NULL) && (strstr(s, "csh") != NULL))
 	   {file = SC_dsnprintf(TRUE, "%s/include/env-pact.csh", devdir);
-	    ok   = report_var(file, q, "setenv", compl, litrl, newl);
+	    ok   = report_var(state, file, q, "setenv", newl);
 	    SFREE(file);}
 
         else
 	   {file = SC_dsnprintf(TRUE, "%s/include/env-pact.sh", devdir);
-	    ok   = report_var(file, q, "export", compl, litrl, newl);
+	    ok   = report_var(state, file, q, "export", newl);
 	    SFREE(file);};};
 
     SFREE(devdir);
@@ -151,16 +160,18 @@ static void report(char *q, int compl, int litrl, int newl, anadep *state)
 static void report_cl(char *q, anadep *state)
    {
 
+    state->literal = TRUE;
+
     if (strcmp(q, "-incpath") == 0)
-       {report("MDGInc", FALSE, TRUE, FALSE, state);
-        report("MDInc", FALSE, TRUE, TRUE, state);}
+       {report(state, "MDGInc", FALSE);
+        report(state, "MDInc", TRUE);}
 
     else if (strcmp(q, "-link") == 0)
-       {report("LDRPath", FALSE, TRUE, FALSE, state);
-        report("LDPath", FALSE, TRUE, FALSE, state);
-	report("DP_Lib", FALSE, TRUE, FALSE, state);
-	report("MDGLib", FALSE, TRUE, FALSE, state);
-	report("MDLib",  FALSE, TRUE, TRUE, state);};
+       {report(state, "LDRPath", FALSE);
+        report(state, "LDPath", FALSE);
+	report(state, "DP_Lib", FALSE);
+	report(state, "MDGLib", FALSE);
+	report(state, "MDLib",  TRUE);};
 
     return;}
 
@@ -632,14 +643,15 @@ int main(int c, char **v, char **env)
 	     return(0);}
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
-	        report(v[i], FALSE, litrl, TRUE, state);
+	        report(state, v[i], TRUE);
 	     return(0);}
 	 else if (strcmp(v[i], "+info") == 0)
 	    {if (++i < c)
-	        report(v[i], TRUE, litrl, TRUE, state);
+	        {state->complete = TRUE;
+		 report(state, v[i], TRUE);};
 	     return(0);}
          else if (strcmp(v[i], "+l") == 0)
-	    litrl = TRUE;
+	    state->literal = TRUE;
 	 else if (strcmp(v[i], "-link") == 0)
 	    {report_cl(v[i], state);
 	     return(0);}

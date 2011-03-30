@@ -73,6 +73,9 @@ struct s_anadep
     int show_vars;
     int show_rules;
     int verbose;
+    int complete;              /* info mode <var> = <val>  or just <val> */
+    int literal;               /* info mode <var> must be exact match */
+    int quotes;                /* info mode strip quotes from <val> */
     hasharr *rules;
     hasharr *variables;
     hasharr *archives;

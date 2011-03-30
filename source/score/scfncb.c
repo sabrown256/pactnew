@@ -11,6 +11,7 @@
 #include "scope_proc.h"
 
 #include <pwd.h>
+#include <sched.h>
 
 #define SC_DBG_GDB         1
 #define SC_DBG_TOTALVIEW   2
@@ -1036,6 +1037,23 @@ char *SC_get_uname(char *name, int nc, int uid)
         {snprintf(name, nc, "%10s", pw->pw_name);
 	 rv = name;};}
 
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_YIELD - wrapper for function to yield the processor */
+
+int SC_yield(void)
+   {int rv;
+
+#if 1
+    rv = sched_yield();
+#else
+    SC_sleep(10);
+    rv = TRUE;
 #endif
 
     return(rv);}

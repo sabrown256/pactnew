@@ -189,7 +189,8 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
 
     if (SC_prompt(NULL, s, MAXLINE) != NULL)
        {WRITE_LOG(">", s);
-	SC_printf(pp, "%s", s);};
+	SC_printf(pp, "%s", s);
+        SC_yield();};
 
 #else
 

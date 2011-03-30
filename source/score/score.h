@@ -870,7 +870,8 @@ extern int
  SC_attach_dbg(int pid),
  SC_retrace_exe(char ***pout, int pid, int to),
  SC_retrace_dbg(char ***pout, int pid),
- SC_nfs_monitor(int *st, int nc);
+ SC_nfs_monitor(int *st, int nc),
+ SC_yield(void);
 
 extern void
  SC_sleep(int to),

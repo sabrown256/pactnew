@@ -961,6 +961,9 @@ anadep *SC_make_state(void)
 
     state = FMAKE(anadep, "SC_MAKE_STATE:state");
 
+    state->complete    = FALSE;
+    state->literal     = FALSE;
+    state->quotes      = FALSE;
     state->need_suffix = TRUE;
     state->need_subst  = TRUE;
     state->show_vars   = FALSE;

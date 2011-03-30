@@ -67,6 +67,10 @@ if ("$TEST_MPI" == "YES") then
       NoteD $LogF -n "                       wrap .... "
       Note $LogF ""
       set lTime = `$TIMER -r`
+
+# GOTCHA: as a matter of theory the I/O in this test is asynchronous
+# therefore sort the output to impose an ordering
+# if necessary to pass test
       if ("$MPI" == "") then
          if (-x $BinDir/mpi-io-wrap) then
             Note $LogF "Running non-MPI version of test"

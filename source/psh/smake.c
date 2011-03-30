@@ -39,10 +39,13 @@ void exit(int status);
 
 static int report_var(char *file, char *q, char *key,
 		      int compl, int litrl, int newl)
-   {int i, ok, doit, tst;
+   {int i, nc, ok, doit, tst;
+    int quote;
     char *p, *tok, *txt, *ps, **sa;
 
     ok = FALSE;
+
+    quote = FALSE;
 
     sa = file_text(file);
     if (sa != NULL)
@@ -81,6 +84,11 @@ static int report_var(char *file, char *q, char *key,
 			        break;
 			     else
 			        txt++;};};
+
+		     if (quote == FALSE)
+		        {nc = strlen(txt);
+			 if (nc > 2)
+			    txt = subst(txt, "\"", "", -1);};
 
 		     if (compl)
 		        printf("%s = %s", tok, txt);
