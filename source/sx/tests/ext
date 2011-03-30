@@ -31,7 +31,7 @@ source ../../tests/common
       flog $Log popd
 
       if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
+         NoteD $Log "OMITTED ($xstatus/$ETime)"
       else if ($xstatus != 0) then
          NoteD $Log "FAILED ($ETime)"
          set Err = 1

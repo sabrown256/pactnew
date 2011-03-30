@@ -707,7 +707,7 @@ void _PG_rl_markers(void)
  */
 
 int PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2)
-   {int ne;
+   {int ne, nm;
     PG_marker *mrk;
     double *x1a, *y1a, *x2a, *y2a;
 
@@ -738,7 +738,9 @@ int PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2)
        {_PG.marker_max += 10;
         REMAKE_N(_PG.marker_list, PG_marker, _PG.marker_max);};
 
-    return(_PG_gattrs.marker_index - 1);}
+    nm = _PG_gattrs.marker_index - 1;
+
+    return(nm);}
 
 /*--------------------------------------------------------------------------*/
 
