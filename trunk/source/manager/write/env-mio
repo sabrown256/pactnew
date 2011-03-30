@@ -177,25 +177,25 @@ HAVE_SUBROUTINES
 
 # NOTE: PathScale/Intel build of Basis/MPPL requires this
     if ("$cmplib" != "") then
-       Note $FOUT 'RPATH = '$cmplib' $@'
+       Note $FOUT "RPATH = $cmplib" '$@'
     endif
     Note $FOUT ""
 
-    Note $FOUT 'System/pact {'
-    Note $FOUT '  PACT          = '$proot
-    Note $FOUT '  PACTRoot      = '$proot
-    Note $FOUT '  PACTVersion   = '$pvers
-    Note $FOUT '  PACTLibs      = -lpdb -lpml -lscore '${LD_Lib}
-    Note $FOUT '  PACTMDGL      = '${MDG_Lib}
-    Note $FOUT '  PACTMDL       = '${LD_Lib} ${LibM_Lib}
-    Note $FOUT '  VMake         = PACT PACTRoot PACTVersion PACTMDGL PACTMDL PACTLibs'
-    Note $FOUT '  VEnv          = PACT'
-    Note $FOUT '}'
+    Note $FOUT "System/pact {"
+    Note $FOUT "  PACT          = $proot"
+    Note $FOUT "  PACTRoot      = $proot"
+    Note $FOUT "  PACTVersion   = $pvers"
+    Note $FOUT "  PACTLibs      = -lpdb -lpml -lscore ${LD_Lib}"
+    Note $FOUT "  PACTMDGL      = ${MDG_Lib}"
+    Note $FOUT "  PACTMDL       = ${LD_Lib} ${LibM_Lib}"
+    Note $FOUT "  VMake         = PACT PACTRoot PACTVersion PACTMDGL PACTMDL PACTLibs"
+    Note $FOUT "  VEnv          = PACT"
+    Note $FOUT "}"
     Note $FOUT ""
 
-    Note $FOUT 'Tool/config_pact {'
-    Note $FOUT '  AddressSize = '$lbits
-    Note $FOUT '}'
+    Note $FOUT "Tool/config_pact {"
+    Note $FOUT "  AddressSize = $lbits"
+    Note $FOUT "}"
     Note $FOUT ""
 
     set llibs = ""
@@ -204,37 +204,37 @@ HAVE_SUBROUTINES
     set llibs = ( `../scripts/simplify-list $llibs` )
 
     if ($CCBin != none) then
-       Note $FOUT 'Tool/cc_pact {'
-       Note $FOUT '  ToolClass    = CGroup'
-       Note $FOUT '  BinDir       = '$CCBin
-       Note $FOUT '  LibDir       = '$llibs
-       Note $FOUT '  Exe          = '$Cfe_CC_Exe
-       Note $FOUT '  Flags        = '$Cfe_CC_Flags
-       Note $FOUT '  AddressSize  = '$lbits
-       Note $FOUT '  Numa         = '$lnuma
-       Note $FOUT '}'
+       Note $FOUT "Tool/cc_pact {"
+       Note $FOUT "  ToolClass    = CGroup"
+       Note $FOUT "  BinDir       = $CCBin"
+       Note $FOUT "  LibDir       = $llibs"
+       Note $FOUT "  Exe          = $Cfe_CC_Exe"
+       Note $FOUT "  Flags        = $Cfe_CC_Flags"
+       Note $FOUT "  AddressSize  = $lbits"
+       Note $FOUT "  Numa         = $lnuma"
+       Note $FOUT "}"
        Note $FOUT ""
     endif
 
     if ($FCBin != none) then
-       Note $FOUT 'Tool/fc_pact {'
-       Note $FOUT '  ToolClass    = FGroup'
-       Note $FOUT '  BinDir       = '$FCBin
-       Note $FOUT '  LibDir       = '$llibs
-       Note $FOUT '  Exe          = '$Cfe_FC_Exe
-       Note $FOUT '  Flags        = '$Cfe_FC_Flags
-       Note $FOUT '  AddressSize  = '$lbits
-       Note $FOUT '  Numa         = '$lnuma
-       Note $FOUT '}'
+       Note $FOUT "Tool/fc_pact {"
+       Note $FOUT "  ToolClass    = FGroup"
+       Note $FOUT "  BinDir       = $FCBin"
+       Note $FOUT "  LibDir       = $llibs"
+       Note $FOUT "  Exe          = $Cfe_FC_Exe"
+       Note $FOUT "  Flags        = $Cfe_FC_Flags"
+       Note $FOUT "  AddressSize  = $lbits"
+       Note $FOUT "  Numa         = $lnuma"
+       Note $FOUT "}"
        Note $FOUT ""
     endif
 
-    Note $FOUT 'Tool/lib_pact {'
-    Note $FOUT '  ToolClass   = LibGroup'
-    Note $FOUT '  LibFlags    = -r'
-    Note $FOUT '  ARFlags     = '$AR_Flags $AR_IFlag
-    Note $FOUT '  AddressSize = '$lbits
-    Note $FOUT '}'
+    Note $FOUT "Tool/lib_pact {"
+    Note $FOUT "  ToolClass   = LibGroup"
+    Note $FOUT "  LibFlags    = -r"
+    Note $FOUT "  ARFlags     = $AR_Flags $AR_IFlag"
+    Note $FOUT "  AddressSize = $lbits"
+    Note $FOUT "}"
     Note $FOUT ""
 
 #--------------------------------------------------------------------------
@@ -251,10 +251,10 @@ HAVE_SUBROUTINES
     endif
 
 # PACT Library
-    Note $FOUT 'Library/pact {'
-    Note $FOUT '  Libraries = pgs pdb pml score'
-    Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT "Library/pact {"
+    Note $FOUT "  Libraries = pgs pdb pml score"
+    Note $FOUT "}"
+    Note $FOUT ""
 
 # SCORE Library
     set llibs = ""
@@ -265,23 +265,23 @@ HAVE_SUBROUTINES
        endif
     end
 
-    Note $FOUT 'Library/score {'
-    Note $FOUT '  Archives  = score'
-    Note $FOUT '  IncPaths  = '$proot/include
-    Note $FOUT '  LibPaths  = '$proot/lib
-    Note $FOUT '  RPaths    = '$lrpath
-    Note $FOUT '  LDFlags   = '$LD_Lib
-    Note $FOUT '  Libraries = '$llibs
-    Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT "Library/score {"
+    Note $FOUT "  Archives  = score"
+    Note $FOUT "  IncPaths  = $proot/include"
+    Note $FOUT "  LibPaths  = $proot/lib"
+    Note $FOUT "  RPaths    = $lrpath"
+    Note $FOUT "  LDFlags   = $LD_Lib"
+    Note $FOUT "  Libraries = $llibs"
+    Note $FOUT "}"
+    Note $FOUT ""
     unset llibs
 
 # PML Library
-    Note $FOUT 'Library/pml {'
-    Note $FOUT '  Archives  = pml'
-    Note $FOUT '  Libraries = score'
-    Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT "Library/pml {"
+    Note $FOUT "  Archives  = pml"
+    Note $FOUT "  Libraries = score"
+    Note $FOUT "}"
+    Note $FOUT ""
 
 # PDB Library
     set llibs = ""
@@ -289,12 +289,13 @@ HAVE_SUBROUTINES
        set lp = `echo $p | tr "[A-Z]" "[a-z]"`
        set llibs = ( $llibs $lp )
     end
+    set llibs = ( $llibs dp )
 
-    Note $FOUT 'Library/pdb {'
-    Note $FOUT '  Archives  = pdb'
-    Note $FOUT '  Libraries = pml' $llibs
-    Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT "Library/pdb {"
+    Note $FOUT "  Archives  = pdb"
+    Note $FOUT "  Libraries = pml $llibs"
+    Note $FOUT "}"
+    Note $FOUT ""
     unset llibs
 
 # PGS Library
@@ -304,11 +305,11 @@ HAVE_SUBROUTINES
        set llibs = ( $llibs $lp )
     end
 
-    Note $FOUT 'Library/pgs {'
-    Note $FOUT '  Archives  = pgs ppc'
-    Note $FOUT '  Libraries = pml' $llibs
-    Note $FOUT '}'
-    Note $FOUT ''
+    Note $FOUT "Library/pgs {"
+    Note $FOUT "  Archives  = pgs ppc"
+    Note $FOUT "  Libraries = pml $llibs"
+    Note $FOUT "}"
+    Note $FOUT ""
 
     unset llibs
 
@@ -329,11 +330,11 @@ HAVE_SUBROUTINES
 # emit the package only if at least one element is non-empty
        if (("$lar" != "") || ("$linc" != "") || ("$lrpth" != "")) then
           Note $FOUT "Library/$lp {"
-          Note $FOUT '  Archives = '$lar
-          Note $FOUT '  IncPaths = '$linc
-          Note $FOUT '  LibPaths = '$lrpth
-          Note $FOUT '  RPaths   = '$lrpth
-          Note $FOUT '}'
+          Note $FOUT "  Archives = $lar"
+          Note $FOUT "  IncPaths = $linc"
+          Note $FOUT "  LibPaths = $lrpth"
+          Note $FOUT "  RPaths   = $lrpth"
+          Note $FOUT "}"
           Note $FOUT ""
        endif
     end
@@ -347,7 +348,7 @@ HAVE_SUBROUTINES
        endif
     end
     if ("$lpth" != "") then
-       Note $FOUT 'Path = '$lpth' $@'
+       Note $FOUT "Path = $lpth" '$@'
        Note $FOUT ""
     endif
 
@@ -360,7 +361,7 @@ HAVE_SUBROUTINES
 #     - instead of Libraries += lib_pact_mpi
 
     if ("$DP_Lib" != "") then
-       Note $FOUT '# MPI specifications'
+       Note $FOUT "# MPI specifications"
        Note $FOUT ""
 
        set linc = ( `echo "$DP_Inc" | sed 's/-I//g'` )
@@ -373,12 +374,12 @@ HAVE_SUBROUTINES
              set lar = ( $lar `echo "$i" | sed 's/-l//'` )
           endif
        end
-       Note $FOUT 'Library/lib_pact_mpi {'
-       Note $FOUT '  Archives = '$lar
-       Note $FOUT '  IncPaths = '$linc
-       Note $FOUT '  LibPaths = '${DP_RPath}
-       Note $FOUT '  RPaths   = '${DP_RPath}
-       Note $FOUT '}'
+       Note $FOUT "Library/lib_pact_mpi {"
+       Note $FOUT "  Archives = $lar"
+       Note $FOUT "  IncPaths = $linc"
+       Note $FOUT "  LibPaths = ${DP_RPath}"
+       Note $FOUT "  RPaths   = ${DP_RPath}"
+       Note $FOUT "}"
        Note $FOUT ""
 
     endif

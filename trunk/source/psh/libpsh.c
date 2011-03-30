@@ -353,8 +353,8 @@ char *strstri(char *string1, char *string2)
 
 char *subst(char *s, char *a, char *b, size_t n)
    {int i, o;
-    static char bfa[1024*LRG], bfb[1024*LRG];
     char *p, *pr, *ps, *pa, *pb, *r;
+    static char bfa[1024*LRG], bfb[1024*LRG];
 
 /* make sure s is not bfa to avoid buffer overlap errors */
     if (s == bfa)

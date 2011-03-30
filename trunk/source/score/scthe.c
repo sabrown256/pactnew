@@ -10,7 +10,6 @@
 
 #include "score_int.h"
 #include "scope_mem.h"
-#include <sched.h>
 
 /* these are increments for growing quantities */
 #define N_KEYS        8
@@ -172,7 +171,7 @@ static int _SC_eth_lock(SC_thread_lock *lck, int mode)
 	if (lock->ide != lck->next_run)
 	   {lock->cond = LOCKED;
 	    while (lock->cond == LOCKED)
-	       sched_yield();}
+	       SC_yield();}
 	else
 	   lock->cond = ACTIVE;
 
