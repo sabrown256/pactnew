@@ -660,15 +660,13 @@ static object *_SSI_untrace(object *argl)
 
 static void _SS_check_all_objects(char *name, char *addr,
 				  long length, int count, int type)
-   {int oe;
-    char atype[MAXLINE];
+   {char atype[MAXLINE];
     char *on, *p;
     object *o;
 
     if (strcmp(name, "SS_MK_OBJECT:op") == 0)
        {o  = (object *) addr;
         on = SS_OBJECT_NAME(o);
-	oe = SS_OBJECT_ETYPE(o);
 	
 	if (on == NULL)
 	   on = "none";
@@ -693,15 +691,13 @@ static void _SS_check_all_objects(char *name, char *addr,
 
 static void _SS_check_bad_names(char *name, char *addr,
 				long length, int count, int type)
-   {int oe;
-    char atype[MAXLINE];
+   {char atype[MAXLINE];
     char *on, *p;
     object *o;
 
     if (strcmp(name, "SS_MK_OBJECT:op") == 0)
        {o  = (object *) addr;
         on = SS_OBJECT_NAME(o);
-	oe = SS_OBJECT_ETYPE(o);
 	
 	if (on != NULL)
 	   {if (!SS_stringp(o) && !SC_print_charsp(on, FALSE))
@@ -786,6 +782,7 @@ static void SS_do_watch(object *pfun, char *msg)
        {vl = SS_VARIABLE_VALUE(_SS.watch_var);
 	if (vl != _SS.watch_val)
 	   {fp = SS_OUTSTREAM(SS_outdev);
+	    SC_ASSERT(fp != NULL);
 
 	    SS_print(_SS.watch_var, "Value of ", " changed", SS_outdev);
 	    SS_print(pfun, msg, "\n", SS_outdev);

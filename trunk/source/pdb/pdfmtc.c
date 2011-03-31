@@ -124,7 +124,8 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 
     else
        {i  = _PD_ptr_index(p);
-	ok = _PD_ptr_entry_itag(file, i, pi);};
+	ok = _PD_ptr_entry_itag(file, i, pi);
+	SC_ASSERT(ok == TRUE);};
 
     return(TRUE);}
 
@@ -408,8 +409,7 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
  */
 
 static int _PD_rd_chrt_iii(PDBfile *file)
-   {int hasd;
-    long sz, nbc, ncast, icast, bsz;
+   {long sz, nbc, ncast, icast, bsz;
     char **pl;
     char type[MAXLINE];
     char *nxt, *bf, *p, *local, *member, *cast;
@@ -428,10 +428,10 @@ static int _PD_rd_chrt_iii(PDBfile *file)
     local = pa->local;
     bsz   = sizeof(pa->local);
     bf    = pa->tbuffer;
-    hasd  = pa->has_dirs;
 
     if (lio_read(bf, 1, nbc, fp) != nbc)
        return(FALSE);
+
     bf[nbc-1] = (char) EOF;
 
     if (strncmp(bf, PRIMITIVE_TYPE_TAG, strlen(PRIMITIVE_TYPE_TAG)) != 0)
@@ -465,7 +465,8 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 
         nxt = SC_strtok(NULL, " \t()", p);
 	if (nxt != NULL)
-	   sz = SC_stol(nxt);
+	   {sz = SC_stol(nxt);
+	    SC_ASSERT(sz != 0);};
 
 	nxt = SC_strtok(NULL, " \t\n", p);
 
@@ -538,7 +539,6 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
     char *name, *type, *var, *adr, *s, *local;
     int64_t addr, numb;
     syment *ep;
-    hasharr *tab;
     memdes *desc;
     dimdes *dims;
     PD_smp_state *pa;
@@ -555,7 +555,6 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
 
     _PD_get_token(buf, local, bsz, '\n');
 
-    tab = file->symtab;
     while (_PD_get_token(NULL, local, bsz, ';'))
        {if (local[0] == '\0')
 	   break;
@@ -1071,7 +1070,6 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
-    FILE *fp;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -1079,7 +1077,6 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
     if (file == NULL)
        return(-1);
 
-    fp   = file->stream;
     addr = _PD_get_current_address(file, PD_WRITE);
     if (addr == -1)
        return(-1);

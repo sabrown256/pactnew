@@ -183,13 +183,11 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
     defstr *dp;
     sql_table *members;
     sql_cmd *cl;
-    PD_smp_state *pa;
     FILE *fp;
 
     fp = file->stream;
     cl = GET_SYSTEM(fp);
 
-    pa = _PD_get_state(-1);
     rv = TRUE;
 
     members = cl->describe(fp, type);
@@ -392,7 +390,7 @@ int _SQL_sym_chart(PDBfile *file)
 
 int _SQL_read(PDBfile *file, char *name, long ni, dimind *dim, void *vr)
    {int rv;
-    long i, nr, ne, start, stop, step;
+    long i, ne, start, stop, step;
     char qu[MAXLINE];
     char **sa, *s, *out, *in;
     hasharr *chi, *cho;
@@ -416,7 +414,6 @@ int _SQL_read(PDBfile *file, char *name, long ni, dimind *dim, void *vr)
 
     entry = cl->select(fp, qu);
     sa    = entry->table;
-    nr    = entry->nr;
 
     PD_set_text_delimiter(file, "|");
 
@@ -449,14 +446,12 @@ static syment *_SQL_wr_entry(PDBfile *file, char *tab, int ni, void *vr)
     char bf[MAX_BFSZ], qu[MAX_BFSZ];
     char *out, *in;
     syment *ep;
-    PD_smp_state *pa;
     sql_cmd *cl;
     FILE *fp;
 
     fp = file->stream;
     cl = GET_SYSTEM(fp);
 
-    pa = _PD_get_state(-1);
     ep = NULL;
 
     out = bf;

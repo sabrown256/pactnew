@@ -618,7 +618,7 @@ static object *_SXI_table_map(object *argl)
 /* SX_WRT_TEXT_TABLE - write mapping to an ASCII file */
 
 static object *SX_wrt_text_table(object *argl)
-   {long i, j, ne, ndd, ndr, nded, nder;
+   {long i, j, ne, ndd, nded, nder;
     int *maxes;
     object *outprt;
     double **delem, **relem;
@@ -640,7 +640,6 @@ static object *SX_wrt_text_table(object *argl)
          range  = f->range;
 
          ndd  = domain->dimension;
-         ndr  = range->dimension;
          nded = domain->dimension_elem;
          nder = range->dimension_elem;
          ne   = domain->n_elements;

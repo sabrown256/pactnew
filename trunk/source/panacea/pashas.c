@@ -441,7 +441,7 @@ static void _PA_adjust_refs(PA_variable *pp, void *pdata, long psz)
  */
 
 static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
-   {char *ptype, *pname;
+   {char *pname;
     int pclass, n_ref;
     long psz;
     pcons *lst;
@@ -449,7 +449,6 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
     defstr *pd;
 
     pname  = PA_VARIABLE_NAME(pp);
-    ptype  = PA_VARIABLE_TYPE_S(pp);
     pclass = PA_VARIABLE_CLASS(pp);
     pdata  = PA_VARIABLE_DATA(pp);
     pd     = PA_VARIABLE_TYPE(pp);

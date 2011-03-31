@@ -23,13 +23,10 @@ FUNCTION_POINTER(expr, *(*PFPExpr));
  */
 
 int CC_get_ch(FILE *fp, int ign_ws)
-   {int c, ok, ncx;
-    char eof;
+   {int c, ncx;
     decl *pd;
 
-    eof = (char) EOF;
-    ok  = TRUE;
-    c   = getc(fp);
+    c = getc(fp);
 
     if (_CC.cur == NULL)
        _CC.cur = CC_mk_decl(_CC.rloc.iln, MAX_BFSZ);
@@ -129,6 +126,7 @@ void CC_unput_c(int c)
     pd->text[--_CC.ich] = '\0';
 
     rv = ungetc(c, _CC.fp);
+    SC_ASSERT(rv == c);
 
     return;}
 
@@ -300,7 +298,8 @@ int CC_parse_error_c(char *s, PFPExpr fnc)
     char *t;
     expr *tok;
 
-    tok = (*fnc)();
+    tok = fnc();
+    SC_ASSERT(tok != NULL);
 
     if (_CC.have_eof == TRUE)
        {_CC.have_eof = FALSE;

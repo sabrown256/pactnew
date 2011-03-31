@@ -88,12 +88,12 @@ PG_device *PG_open_device(PG_device *dev, double xf, double yf,
 /* PG_DEVICE_FILENAME - make a good file name for a device */
 
 void PG_device_filename(char *fname, char *raw, char *ext)
-   {char *name, *s, *pf;
+   {char *s, *pf;
 
     if (fname != NULL)
        {strcpy(fname, raw);
 
-	name = SC_strtok(fname, " \t\n\r\\?~,;:<>/'`\"[]{}()=+|!@#$%^&*", s);
+	SC_strtok(fname, " \t\n\r\\?~,;:<>/'`\"[]{}()=+|!@#$%^&*", s);
 
 	if (ext != NULL)
 

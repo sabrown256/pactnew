@@ -323,7 +323,8 @@ void SC_free_array(SC_array *a, int (*rel)(void *a))
 	        {for (i = 0; i < nx; i++)
 		     {e = SC_array_get(a, i);
 		      if (e != NULL)
-			 rv = rel(e);};};
+			 {rv = rel(e);
+			  SC_ASSERT(rv == TRUE);};};};
 
 	     memset(a->array, 0, nx*bpi);};
 
@@ -864,8 +865,7 @@ void *SC_array_push(SC_array *a, void *v)
 /* SC_ARRAY_POP - pop A */
 
 void *SC_array_pop(SC_array *a)
-    {long n;
-     void *rv;
+    {void *rv;
 
      rv = NULL;
 
@@ -875,7 +875,7 @@ void *SC_array_pop(SC_array *a)
         {rv = SC_array_get(a, -1);
 
 /* reduce the number of elements */
-	 n  = SC_array_dec_n(a, 1L, -1);};
+	 SC_array_dec_n(a, 1L, -1);};
 
      return(rv);}
 

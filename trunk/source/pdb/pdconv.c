@@ -899,8 +899,9 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
  */
     strdelim = strpbrk;
 
-    lin = *in;
+    lin  = *in;
     lout = *out;
+    SC_ASSERT(lout != NULL);
 
 /* GOTCHA: should this now be quad_format? */
     hfmt = hstd->fp[PD_DOUBLE_I].format;
@@ -1998,7 +1999,6 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     char *inty, *outty, *delim;
     PD_type_kind iknd, oknd;
     PD_byte_order isord, osord, lsord, inord, outord;
-    multides *itup, *otup;
 
     inty    = idp->type;
     iknd    = idp->kind;
@@ -2006,7 +2006,6 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     iaord   = idp->fp.order;
     isord   = idp->fix.order;
     ifmt    = idp->fp.format;
-    itup    = idp->tuple;
     iusg    = idp->unsgned;
     inbts   = idp->size_bits;
     onescmp = idp->onescmp;
@@ -2017,7 +2016,6 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     oaord   = odp->fp.order;
     osord   = odp->fix.order;
     ofmt    = odp->fp.format;
-    otup    = odp->tuple;
     ousg    = odp->unsgned;
 
     if ((strchr(inty, '*') != NULL) || (strchr(outty, '*') != NULL))

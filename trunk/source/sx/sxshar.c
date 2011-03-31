@@ -31,7 +31,8 @@ object *TR_write_bin(object *arg)
     if (po != NULL)
        {file = FILE_FILE(PDBfile, po);
 	tr   = file->tr;
-	fun  = tr->write;};
+	fun  = tr->write;
+	SC_ASSERT(fun != NULL);};
 
     return(o);}
 
@@ -56,7 +57,8 @@ object *TR_read_bin(object *arg)
     if (po != NULL)
        {file = FILE_FILE(PDBfile, po);
 	tr   = file->tr;
-	fun  = tr->read;};
+	fun  = tr->read;
+	SC_ASSERT(fun != NULL);};
 
     return(o);}
 

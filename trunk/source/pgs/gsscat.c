@@ -75,12 +75,10 @@ static void _PG_draw_scatter(PG_device *dev, int nd, double **f,
     double lextr[2], bx[PG_BOXSZ];
     double **t, **r, *rd[PG_SPACEDM];
     PG_palette *pl;
-    PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
 
-    g  = &dev->g;
     pl = dev->current_palette;
 
     nn = max(nn, 12);
@@ -244,6 +242,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
     alst = PM_mapping_info(h,
 			   "CENTERING", &centering,
 			   NULL);
+    SC_ASSERT(alst != NULL);
 
     if (centering == N_CENT)
        _PG_draw_scatter(dev, nd, afd, rextr, dextr,

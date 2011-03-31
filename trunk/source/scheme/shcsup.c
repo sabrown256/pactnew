@@ -252,6 +252,7 @@ object *SS_syntax_c(object *str)
     object *ret;
 
     s = SS_BUFFER(str);
+    SC_ASSERT(s != NULL);
 
     if (SETJMP(SS_prs_cpu))
        ret = SS_eof;

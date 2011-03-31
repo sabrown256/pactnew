@@ -402,8 +402,10 @@ int SC_pointer_ok(void *p)
         oill  = SC_signal(SIGILL, _SC_segv_handler);
 
         if (SETJMP(_SC.ok_ptr) == 0)
-           {s  = (char *) p;
-            c  = *s++;
+           {s = (char *) p;
+            c = *s++;
+	    SC_ASSERT(c >= 0);
+
             ok = TRUE;}
         else
             ok = FALSE;

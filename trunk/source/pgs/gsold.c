@@ -524,8 +524,8 @@ void PG_get_text_ext(PG_device *dev, char *s, double *px, double *py)
     if (dev != NULL)
        {g = &dev->g;
 
-	t[0] *= dev->g.nd_w[1];
-	t[1] *= dev->g.nd_w[3];
+	t[0] *= g->nd_w[1];
+	t[1] *= g->nd_w[3];
 
 /* since this was not given to PG_set_viewspace as logs
  * don't return it that way

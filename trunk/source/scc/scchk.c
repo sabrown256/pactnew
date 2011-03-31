@@ -201,6 +201,7 @@ static int _CC_var_exist(haelem *hp, void *a)
     n  = *(int *) a;
     ok = SC_haelem_data(hp, &name, NULL, (void **) &v);
     pd = _CC.all[n];
+    SC_ASSERT(pd != NULL);
 
     ok = FALSE;
     for (i = 0; (i <= n) && (ok == FALSE); i++)

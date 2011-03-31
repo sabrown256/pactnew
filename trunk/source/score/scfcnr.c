@@ -59,6 +59,8 @@ static int _SC_rel_entry(haelem *hp, void *a)
     fcent *ae;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &ae);
+    SC_ASSERT(ok == TRUE);
+
     if (ae != NULL)
        {SFREE(ae->name);
 	SFREE(ae);};

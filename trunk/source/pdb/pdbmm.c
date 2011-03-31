@@ -498,6 +498,8 @@ int _PD_ha_rl_syment(haelem *hp, void *a)
     syment *ep;
 
     ok = SC_haelem_data(hp, &name, NULL, (void **) &ep);
+    SC_ASSERT(ok == TRUE);
+
     _PD_rl_syment_d(ep);
 
     SFREE(name);
@@ -672,6 +674,8 @@ int _PD_ha_rl_defstr(haelem *hp, void *a)
     defstr *dp;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp);
+    SC_ASSERT(ok == TRUE);
+
     _PD_rl_defstr(dp);
 
     return(TRUE);}

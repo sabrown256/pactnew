@@ -292,8 +292,9 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
 
     nfd = accept(fd, (struct sockaddr *) ad, &sasz);
     if (nfd > 0)
-       pi = SC_register_event_loop_callback(pe, SC_INT_I, &nfd,
-					    acc, rej, -1);
+       {pi = SC_register_event_loop_callback(pe, SC_INT_I, &nfd,
+					     acc, rej, -1);
+	SC_ASSERT(pi != 0);};
 
 #endif
 
@@ -311,7 +312,6 @@ int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
 		  int (*ex)(int *rv, void *a),
 		  PFFileCallback acc, PFFileCallback rej)
    {int pi, ok;
-    socklen_t sasz;
     SC_evlpdes *pe;
     tcp_loop lp;
 
@@ -320,10 +320,9 @@ int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
 #ifdef HAVE_PROCESS_CONTROL
 
     if (listen(fd, 5) >= 0)
-       {sasz = sizeof(struct sockaddr_in);
 
 /* create the event loop state */
-	pe = SC_make_event_loop(NULL, NULL, ex, -1, -1, -1);
+       {pe = SC_make_event_loop(NULL, NULL, ex, -1, -1, -1);
 
 /* register the I/O channels for the event loop to monitor */
 	pi = SC_register_event_loop_callback(pe, SC_INT_I, &fd,
@@ -432,6 +431,7 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
 		    {sz = sizeof(int);
 		     rv = getsockopt(fd, SOL_SOCKET, SO_ERROR,
 				     &ok, (socklen_t *) &sz);
+		     SC_ASSERT(rv == 0);
 		     break;};};
 
 	    ok = (ok != 0) ? -1 : 0;};

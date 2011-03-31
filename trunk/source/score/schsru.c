@@ -339,11 +339,10 @@ static int _SC_sys_host(char *lst, int vrb)
 
 static int _SC_query(void)
    {char s[MAXLINE], out[MAXLINE];
-    char *t;
 
     while (TRUE)
        {io_gets(s, MAXLINE, stdin);
-        t = strtok(s, "\n");
+        strtok(s, "\n");
 
 	if (strcmp(s, "quit") == 0)
            break;

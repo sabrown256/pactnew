@@ -340,6 +340,7 @@ static object *_SXI_rd_raw(object *argl)
 		 break;};
 
 	ni = _PD_sys_read(file, ep, outtype, vr);
+	SC_ASSERT(ni >= 0);
 
 	rv = _SX_mk_gpdbdata("data", vr, ep, file);};
 
@@ -1766,7 +1767,7 @@ static object *_SXI_def_prim(object *argl)
  */
  
 static object *_SXI_chg_prim(object *argl)
-   {int i, id, n, ityp, nb, no, align;
+   {int i, id, ityp, nb, no, align;
     int *ordr;
     long fmt[7];
     PDBfile *file;
@@ -1777,20 +1778,20 @@ static object *_SXI_chg_prim(object *argl)
     ord   = NULL;
     align = 0;
 
-    n = SS_args(argl,
-                G_FILE, &po,
-                SC_INT_I, &ityp,
-                SC_INT_I, &nb,
-                SC_INT_I, &align,
-                SS_OBJECT_I, &ord,
-                SC_LONG_I, fmt + 0,
-                SC_LONG_I, fmt + 1,
-                SC_LONG_I, fmt + 2,
-                SC_LONG_I, fmt + 3,
-                SC_LONG_I, fmt + 4,
-                SC_LONG_I, fmt + 5,
-                SC_LONG_I, fmt + 6,
-                0);
+    SS_args(argl,
+	    G_FILE, &po,
+	    SC_INT_I, &ityp,
+	    SC_INT_I, &nb,
+	    SC_INT_I, &align,
+	    SS_OBJECT_I, &ord,
+	    SC_LONG_I, fmt + 0,
+	    SC_LONG_I, fmt + 1,
+	    SC_LONG_I, fmt + 2,
+	    SC_LONG_I, fmt + 3,
+	    SC_LONG_I, fmt + 4,
+	    SC_LONG_I, fmt + 5,
+	    SC_LONG_I, fmt + 6,
+	    0);
 
     if ((po == NULL) || (po == SX_gvif))
        file = SX_vif;

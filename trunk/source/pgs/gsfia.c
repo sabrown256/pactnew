@@ -688,9 +688,7 @@ FIXNUM F77_FUNC(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
 
 FIXNUM F77_FUNC(pggclm, PGGCLM)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
-    PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
     PG_get_clear_mode(*pc);
 
     rv = TRUE;
@@ -1535,9 +1533,7 @@ FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(FIXNUM *psz)
 
 FIXNUM F77_FUNC(pgsclm, PGSCLM)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
-    PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
     PG_set_clear_mode(*pc);
 
     rv = TRUE;

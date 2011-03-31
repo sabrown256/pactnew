@@ -451,10 +451,9 @@ void PM_set_sls_coef(PM_sp_lin_sys *sls, int i, int j, double a)
 /* PM_RL_SP_LIN_SYS - free sparse linear system */
 
 void PM_rl_sp_lin_sys(PM_sp_lin_sys *sls)
-   {int n_rhs, n_ups;
+   {int n_rhs;
 
     n_rhs = sls->n_rhs;
-    n_ups = sls->n_ups;
 
     SFREE(sls->diagonal);
 
@@ -683,7 +682,7 @@ int PM_sls_b_chk(PM_sp_lin_sys *sls)
 
 int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
    {int i, j, n, js, njs, its, itmx, zs;
-    double ibn, bn, tol, mtol, inn, aij;
+    double ibn, bn, tol, mtol, aij;
     double alpha, beta, omega, omhat, rho, rho_old, rn, sn, rtv, tts, ttt;
     double *b, *x0, *x, *Ax, *p, *phat, *r, *rtil, *s, *shat, *t, *v, *w;
 
@@ -715,8 +714,6 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
     t    = FMAKE_N(double, n, "PM_DSBICG:t");
     v    = FMAKE_N(double, n, "PM_DSBICG:v");
     w    = FMAKE_N(double, n, "PM_DSBICG:w");
-
-    inn = 1.0/((double) n);
 
 /* set iterate to initial guess x0 */
     COPY(x, x0, n);
@@ -877,7 +874,7 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
 
 int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
    {int n, its, itmx;
-    double a, c, cstar, fac, ptAp, ibn, bn, rn, tol, mtol, inn;
+    double a, c, cstar, fac, ptAp, ibn, bn, rn, tol, mtol;
     double *b, *x0, *p, *r, *x, *Lr, *Ap, *Ax;
 
     if (sls == NULL)
@@ -902,16 +899,14 @@ int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
     Ap  = FMAKE_N(double, n, "PM_DSCG:Ap");
     Ax  = FMAKE_N(double, n, "PM_DSCG:Ax");
 
-    inn = 1.0/((double) n);
-
-/* Set iterate to initial guess x0 */
+/* set iterate to initial guess x0 */
     COPY(x, x0, n);
 
 /* use a preconditioner if there is one */
     if (sls->pre != NULL)
        (*sls->pre)(sls);
 
-/* Calculate initial residual */
+/* calculate initial residual */
     (*sls->cmp_Ap)(Ax, sls, x);
     LINEAR_COMB(r, b, -1.0, Ax, n);
 

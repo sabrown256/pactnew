@@ -293,6 +293,7 @@ FILE *_SQLITE_open(PDBfile *file, char *name, char *mode)
     pu = file->udl;
 
     path = SC_search_file(NULL, pu->path);
+    SC_ASSERT(path != NULL);
 
 /*#ifdef HAVE_SQLITE_V2*/
 #if 0

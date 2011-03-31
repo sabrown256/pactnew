@@ -27,12 +27,12 @@
 
 FIXNUM F77_FUNC(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
    {int i, n;
-    char *name, t[MAXLINE];
+    char t[MAXLINE];
     void **ptr;
     PA_package *pck;
 
-    pck  = PA_current_package();
-    name = pck->name;
+    pck = PA_current_package();
+    SC_ASSERT(pck != NULL);
 
     n = *pn;
     for (i = 0; i < n; i++)

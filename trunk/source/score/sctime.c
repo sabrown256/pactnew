@@ -17,13 +17,11 @@
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, n, verbose;
+   {int i, n;
     char *fmt;
     double since;
     time_t now, then;
     struct tm td;
-
-    verbose = FALSE;
 
     td.tm_sec   = 0;        /* seconds */
     td.tm_min   = 0;        /* minutes */
@@ -42,9 +40,7 @@ int main(int c, char **v)
     fmt = SC_dsnprintf(TRUE, "%%.2f\n");
 
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-v") == 0)
-            verbose = TRUE;
-	 else if (strcmp(v[i], "-min") == 0)
+        {if (strcmp(v[i], "-min") == 0)
             since /= 60.0;
 	 else if (strcmp(v[i], "-hour") == 0)
             since /= 3600.0;

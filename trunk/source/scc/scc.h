@@ -11,7 +11,7 @@
 #ifndef PCK_SCC
 #define PCK_SCC
 
-#include "score.h"
+#include "score_int.h"
 
 /*--------------------------------------------------------------------------*/
 

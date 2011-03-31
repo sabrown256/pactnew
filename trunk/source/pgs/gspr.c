@@ -842,12 +842,9 @@ static void _PG_draw_markers_2(PG_device *dev, PG_coord_sys cs,
     double *xa[2], *xb[2];
     double **rd;
     PG_marker *mrk;
-    PG_dev_geometry *g;
 
     if ((dev == NULL) || (n <= 0))
        return;
-
-    g  = &dev->g;
 
     sc = _PG_get_marker_scale(dev);
 

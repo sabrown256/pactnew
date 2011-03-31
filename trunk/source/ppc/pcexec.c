@@ -111,18 +111,18 @@ static int process_end(int *prv, void *a)
 /* POLL_MODE - poll the process and the tty */
 
 static int poll_mode(descriptors *pd)
-   {int err, quiet, ok;
+   {int quiet, ok;
     char s[MAX_BFSZ];
-    char *t, *name, *msg;
+    char *t, *msg;
     PROCESS *pp;
 
-    name  = pd->name;
     quiet = pd->quiet;
     pp    = pd->pp;
 
     pd->reason = -1;
     while (TRUE)
        {ok = SC_process_status(pp);
+	SC_ASSERT(ok == TRUE);
 
 	while (PC_gets(s, MAX_BFSZ, pp) != NULL)
            PRINT(stdout, "%s", s);
@@ -130,9 +130,9 @@ static int poll_mode(descriptors *pd)
         if (process_end(NULL, pd))
            break;
 
-        err = SC_unblock_file(stdin);
-        t   = SC_fgets(s, MAX_BFSZ, stdin);
-        err = SC_block_file(stdin);
+        SC_unblock_file(stdin);
+        t = SC_fgets(s, MAX_BFSZ, stdin);
+        SC_block_file(stdin);
         if (t != NULL)
            PC_printf(pp, "%s", s);
 
@@ -187,6 +187,7 @@ static int interrupt_mode(descriptors *pd)
     SC_unblock_file(stdin);
 
     rv = SC_event_loop(pe, pd, -1);
+    SC_ASSERT(rv == TRUE);
 
     SC_block_file(stdin);
 
@@ -205,6 +206,7 @@ static void error_handler(int sig)
     SC_reset_terminal();
 
     err = PC_block_file(stdin);
+    SC_ASSERT(err == TRUE);
 
     if (sig == SIGALRM)
        {PRINT(stdout, "PCEXEC timed out\n");

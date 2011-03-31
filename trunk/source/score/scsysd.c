@@ -1319,10 +1319,7 @@ static void _SC_recover_connection(conpool *cp, int ic)
 static void _SC_pool_rejected(asyncstate *as, conpool *cp, int ic,
 			      PROCESS *pp)
    {int st;
-    SC_evlpdes *pe;
     connectdes *pco;
-
-    pe = cp->loop;
 
     pco = GET_CONNECTION(cp, ic);
 
@@ -1446,13 +1443,10 @@ static void _SC_pool_reject(int fd, int mask, void *a)
     PROCESS *pp;
     conpool *cp;
     connectdes *pco;
-    SC_evlpdes *pe;
     asyncstate *as;
 
     as = NULL;
     cp = (conpool *) a;
-
-    pe = cp->loop;
 
     nc = SC_array_get_n(cp->pool);
     for (ic = 0; ic < nc; ic++)
@@ -1811,6 +1805,8 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
 					     _SC_pool_output,
 					     _SC_pool_reject,
 					     -1);
+	SC_ASSERT(pi >= 0);
+
 	_SC_pool_connection_env(pco);}
 
     else
@@ -1845,19 +1841,14 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
  */
 
 static int _SC_check_pool_connection(conpool *cp, int ic)
-   {int nc;
-    PROCESS *pp;
+   {PROCESS *pp;
     connectdes *pco;
-    asyncstate *as;
 
-    as = cp->as;
     if (ic < 0)
        ic = _SC_find_best_connection(cp);
 
     if (ic >= 0)
-       {nc = SC_array_get_n(cp->pool);
-
-        pco = GET_CONNECTION(cp, ic);
+       {pco = GET_CONNECTION(cp, ic);
 	pp  = pco->pp;
 
 /* if there is no connection launch one */
@@ -1893,15 +1884,13 @@ static int _SC_check_pool_connection(conpool *cp, int ic)
  */
 
 static void _SC_reconnect_pool(conpool *cp, int ic, char *msg, int recon)
-   {int ico, nc;
+   {int ico;
     char *hno;
     PROCESS *pp;
     connectdes *pco;
     asyncstate *as;
 
     as = cp->as;
-
-    nc = SC_array_get_n(cp->pool);
 
     pco = GET_CONNECTION(cp, ic);
     pco->n_env_sent = 0;

@@ -238,13 +238,12 @@ static void _SC_ex_trm_rej(int fd, int mask, void *a)
    {int nr;
     descriptors *pd;
     SC_evlpdes *pe;
-    PROCESS *pp;
 
     pd = (descriptors *) a;
-    pp = pd->pp;
     pe = pd->pe;
 
     nr = SC_running_children();
+    SC_ASSERT(nr >= 0);
 
 /* if we have more than 16 consecutive tty rejects remove the interrupt
  * callback on stdin - chances are the terminal has gone away and we
@@ -304,7 +303,7 @@ static int _SC_squeeze_tag(char *s, int ns, char *tag)
 /* _SC_EX_CH_OUT - handle output from the child process */
 
 static void _SC_ex_ch_out(int fd, int mask, void *a)
-   {int nc, no, suppress;
+   {int no, suppress;
     long ns;
     char *tag;
     PROCESS *pp;
@@ -326,7 +325,6 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 	_SC.elbf       = FMAKE_N(char, nb, "PERM|_SC_EX_CH_OUT:elbf");
 	_SC.elbf[nb-1] = '\0';};
 
-    nc = strlen(SC_DEFEAT_MPI_BUG);
     while (SC_gets(_SC.ecbf, nb-1, pp) != NULL)
        {WRITE_LOG("<", _SC.ecbf);
 
@@ -374,13 +372,9 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 
 static void _SC_ex_ch_rej(int fd, int mask, void *a)
    {int nr;
-    PROCESS *pp;
-    descriptors *pd;
-
-    pd = (descriptors *) a;
-    pp = pd->pp;
 
     nr = SC_check_children();
+    SC_ASSERT(nr >= 0);
 
     return;}
 

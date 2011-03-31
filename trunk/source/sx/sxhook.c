@@ -132,10 +132,12 @@ void _SX_init_hash_objects(PDBfile *file)
  */
 
 int SX_fprintf(FILE *fp, char *fmt, ...)
-   {int ret;
+   {int rv;
     char *bf;
     FILE *hp;
     extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
+
+    rv = FALSE;
 
     if (fp != NULL)
        {SC_VDSNPRINTF(FALSE, bf, fmt);
@@ -148,11 +150,13 @@ int SX_fprintf(FILE *fp, char *fmt, ...)
  * LEAVE THEM ALONE !!!!
  */
 	if ((PG_console_device != NULL) && ((fp == stdout) || (fp == stdscr)))
-	   ret = (PG_console_device->gprint_flag) ?
+	   rv = (PG_console_device->gprint_flag) ?
 	         _PG_display_page(PG_console_device, fp, bf) :
 		 FALSE;
 	else
-	   ret = io_puts(bf, fp);};
+	   rv = io_puts(bf, fp);};
+
+    SC_ASSERT(rv == TRUE);
 
     return(FALSE);}
 
@@ -168,6 +172,8 @@ int SX_fputs(char *s, FILE *fp)
    {int rv;
     FILE *hp;
     extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
+
+    rv = FALSE;
 
     if (fp != NULL)
        {hp = SS_OUTSTREAM(SS_histdev);
@@ -187,6 +193,8 @@ int SX_fputs(char *s, FILE *fp)
 		    _PG_display_page(PG_console_device, fp, "\"");};};}
 	else
 	   rv = SS_puts(s, fp, io_puts);}
+
+    SC_ASSERT(rv == TRUE);
 
     return(FALSE);}
 

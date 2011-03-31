@@ -151,8 +151,7 @@ extern boolean
  */
 
 boolean Default_Init(void)
-   {int qscaleB, qscaleP, bsearchAlg, psearchAlg;
-    boolean resizeFrame;
+   {
 
     /* should set defaults */
     numInputFiles = 0;
@@ -171,24 +170,13 @@ boolean Default_Init(void)
     /* aspectRatio = ratio;           (default: 1) */
 
     /* BQSCALE, IQSCALE & PQSCALE */
-    /* qscaleB = value;               (default: 0)
-     * qscaleI = value;               (default: 0)
-     * qscaleP = value;               (default: 0)
+    /* qscaleI = value;               (default: 0)
      */
-    qscaleB = 1;   /* 0 is ok as I-frame only is used??? */
     qscaleI = 1;   /* our default value */
-    qscaleP = 1;   /* 0 is ok as I-frame only is used??? */
 
     /* BASE_FILE_FORMAT: JPEG_FILE_TYPE for now */
     /* baseFormat = file_type;        (default: PPM_FILE_TYPE = 0) */
     /* baseFormat = JPEG_FILE_TYPE; - probably not used at all */
-
-    /* BSEARCH_ALG & PSEARCH_ALG */
-    /* bsearchAlg = bsearch;          (default: PSEARCH_SUBSAMPLE = 0)
-     * psearchAlg = psearch;          (default: BSEARCH_EXHAUSTIVE = 0)
-     */
-    bsearchAlg = BSEARCH_SIMPLE;      /* probably not used??? */
-    psearchAlg = PSEARCH_TWOLEVEL;    /* probably not used??? */
 
     /* BIT_RATE */
     /* RateControlMode = FIXED_RATE;  (default: VARIABLE_RATE)
@@ -317,9 +305,7 @@ boolean Default_Init(void)
     /* RESIZE - never seen RESIZE in all param files in examples dir */
     /* outputWidth = val1;            (default: 0)
      * outputHeight = val2;           (default: 0)
-     * resizeFrame = TRUE;            (default: FALSE) see SetResize below
      */
-    resizeFrame = FALSE;              /* deleted SetResize */
 
     /* SLICES_PER_FRAME */
     /* slicesPerFrame = number        (default: 0) */
@@ -386,7 +372,7 @@ boolean Default_Init(void)
  */
 
 boolean init_MPEGjob(PG_device *dev)
-   {int i, bitstreamMode, res;
+   {int i, bitstreamMode;
     BitBucket *bbPtr;
     MpegDevInfo *MpegDev;
 
@@ -426,7 +412,7 @@ boolean init_MPEGjob(PG_device *dev)
     /* Rate Control Initialization */
     bitstreamMode = getRateMode();
     if (bitstreamMode == FIXED_RATE) {
-      res = initRateControl();
+       initRateControl();
       /*
         SetFrameRate();
         */
@@ -506,8 +492,7 @@ static MpegDevInfo *del_MpegDev(PG_device *dev)
  */
 
 void close_MPEGjob(PG_device *dev)
-   {int numBits; /*Could be global?*/
-    MpegFrame *mpgfr;
+   {MpegFrame *mpgfr;
     BitBucket *bbPtr;
     MpegDevInfo *MpegDev;
 
@@ -524,16 +509,6 @@ void close_MPEGjob(PG_device *dev)
     /* SEQUENCE END CODE */
     if ((whichGOP == -1) && (frameStart == -1))
        {Mhead_GenSequenceEnder(bbPtr);}
-
-    if (frameStart == -1)
-      /* I think this is right, since (bbPtr == NULL) if (frameStart != -1).
-         See above where "bbPtr" is initialized  */
-       {numBits = bbPtr->cumulativeBits;}
-    else
-      /* What should the correct value be?  Most likely 1.  "numBits" is
-         used below, so we need to make sure it's properly initialized 
-       to somthing (anything).  */
-       {numBits = 1;}
 
     if (frameStart == -1)
        {Bitio_Flush(bbPtr);
@@ -556,8 +531,7 @@ void close_MPEGjob(PG_device *dev)
  */
 
 void save_image2file(PG_device *dev)
-   {int inputFrameBits;
-    int bitstreamMode;
+   {int bitstreamMode;
     BitBucket *bbPtr;
     int frameType;
     int FrameId;
@@ -594,7 +568,6 @@ void save_image2file(PG_device *dev)
        {char *userData = (char *)NULL;
         int userDataSize = 0;
 
-        inputFrameBits = 24*Fsize_x*Fsize_y;
         SetBlocksPerSlice();
 
         if ((whichGOP == -1) && (frameStart == -1))
@@ -756,7 +729,6 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
                             char *outputFileName)
    {MpegFrame *mfr;
     BitBucket *bb;
-    MpegFrame **frameMemory;
 
     char fileName[1024];
     FILE *fpointer = NULL;
@@ -766,7 +738,6 @@ static void ProcessRefFrame(MpegDevInfo *MpegDev, int lastFrame,
     bb           = MpegDev->bbPtr;
     currentGOP   = MpegDev->currentGOP;
     framesOutput = MpegDev->framesOutput;
-    frameMemory  = MpegDev->frameMemory;
 
     separateFiles = (bb == NULL);
 

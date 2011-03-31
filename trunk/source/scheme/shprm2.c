@@ -134,6 +134,8 @@ object *SS_unary_fix(C_procedure *cp, object *argl)
     fnc = (PFDoubled) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
 
+    SC_ASSERT(type != 0);
+
     iv = (*fnc)(operand);
     rv = SS_mk_integer(iv);
 
@@ -157,6 +159,8 @@ static object *SS_unary_bit(C_procedure *cp, object *argl)
 
     fnc = (PFInt64I) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
+
+    SC_ASSERT(type != 0);
 
     iv = (*fnc)(operand);
     rv = SS_mk_integer(iv);
@@ -479,6 +483,8 @@ object *SS_un_comp(C_procedure *cp, object *argl)
     fnc = (PFIntd) cp->proc[0];
     SS_GET_OPERAND(operand, argl, type);
 
+    SC_ASSERT(type != 0);
+
     lv = (*fnc)(operand);
     rv = lv ? SS_t : SS_f;
 
@@ -504,6 +510,8 @@ object *SS_bin_comp(C_procedure *cp, object *argl)
     fnc = (PFIntdd) cp->proc[0];
     SS_GET_OPERAND(c1, argl, type);
     SS_GET_OPERAND(c2, argl, type);
+
+    SC_ASSERT(type != 0);
 
     lv = (*fnc)(c1, c2);
     rv = lv ? SS_t : SS_f;
@@ -615,6 +623,8 @@ static object *_SS_xor_pow(object *argl)
 	SS_GET_OPERAND(d2, argl, type);
 	dv = pow(d1, d2);
 	rv = SS_mk_float(dv);};
+
+    SC_ASSERT(type != 0);
 
     return(rv);}
 

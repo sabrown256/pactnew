@@ -920,13 +920,9 @@ int SC_file_flags(FILE *fp)
 int SC_io_callback_pid(int fd, PFFileCallback acc, PFFileCallback rej,
                        int pid)
    {int rv;
-    SC_poll_desc pd;
 
     if (_SC.evloop == NULL)
        _SC.evloop = SC_make_event_loop(NULL, NULL, NULL, 0, -1, -1);
-
-    pd.fd     = fd;
-    pd.events = _SC.evloop->maccpt;
 
     rv = SC_register_event_loop_callback(_SC.evloop, 0, &fd, acc, rej, pid);
 

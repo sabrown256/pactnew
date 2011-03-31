@@ -70,6 +70,7 @@ int CC_parse(FILE *fp)
 	sccgr_parse();
 
 	e = CC_parse_token_val_c();
+	SC_ASSERT(e != NULL);
 
 	ret = (_CC.have_eof == FALSE);};
 
@@ -134,6 +135,7 @@ static int _CC_rel_expr(haelem *hp, void *a)
     expr *e;
 
     ok = SC_haelem_data(hp, &name, NULL, (void **) &e);
+    SC_ASSERT(ok == TRUE);
 
     if (e != NULL)
        {SFREE(e->name);
@@ -224,6 +226,8 @@ static int _CC_rel_type(haelem *hp, void *a)
     expr *e;
 
     ok = SC_haelem_data(hp, &name, NULL, (void **) &e);
+    SC_ASSERT(ok == TRUE);
+
     if (e != NULL)
        {SFREE(e->type);
 	SFREE(e->name);

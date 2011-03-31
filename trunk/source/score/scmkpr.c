@@ -412,6 +412,8 @@ static int _SC_rel_rule(haelem *hp, void *a)
     ruledes *rd;
 
     ok = SC_haelem_data(hp, &name, NULL, (void **) &rd);
+    SC_ASSERT(ok == TRUE);
+
     if (rd != NULL)
        {if (SC_ref_count(rd) < 2)
 	   {sa = rd->dependencies;
@@ -460,6 +462,7 @@ static int _SC_print_rule(haelem *hp, void *arg)
     fp    = state->log;
 
     ok = SC_haelem_data(hp, &name, NULL, (void **) &rd);
+    SC_ASSERT(ok == TRUE);
 
     io_printf(fp, "Rule> %s\n", name);
 
@@ -754,7 +757,7 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
  */
 
 static char *_SC_subst_str(anadep *state, ruledes *rd, char *src)
-   {int i, nf, ne;
+   {int i;
     char *pf, *pe, *dst, *text;
 
     for (i = 0; TRUE; i++)
@@ -772,9 +775,6 @@ static char *_SC_subst_str(anadep *state, ruledes *rd, char *src)
 
 	     pe = _SC_end_var_ref(pf);
 	     *pe++ = '\0';
-
-	     nf = strlen(src);
-	     ne = strlen(pe);
 
              if ((rd != NULL) && (strchr(pf, '$') != NULL))
 	        pf = _SC_subst_macro(pf, 0, EXPLICIT, FALSE,
@@ -827,6 +827,7 @@ static int _SC_do_subst_name(haelem *hp, void *a)
     anadep *state;
 
     ok = SC_haelem_data(hp, &key, NULL, (void **) &rd);
+    SC_ASSERT(ok == TRUE);
 
     state = (anadep *) a;
 
@@ -877,6 +878,7 @@ static int _SC_do_subst_body(haelem *hp, void *a)
 
     state = (anadep *) a;
     ok    = SC_haelem_data(hp, NULL, NULL, (void **) &rd);
+    SC_ASSERT(ok == TRUE);
 
 /* do substitutions in the dependencies and actions */
     _SC_subst_strings(state, rd, &rd->depend);
@@ -999,6 +1001,7 @@ static int _SC_rel_ar(haelem *hp, void *a)
     fcdes *ar;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &ar);
+    SC_ASSERT(ok == TRUE);
 
     SC_free_fcontainer(ar);
 

@@ -166,13 +166,11 @@ static defstr *_NAC_proc_str(PDBfile *file, char *names,
     int doffs, ndims, skip;
     long next, itype, mini, maxi, width, numb, mult;
     long *pd, *pa, *pm;
-    hasharr *fchrt;
     defstr *dp;
     memdes *desc, *lst, *prev;
 
     prev  = NULL;
     lst   = NULL;
-    fchrt = file->chart;
     doffs = file->default_offset;
 
     pd = ofd + (n - 1)*numdir;
@@ -656,6 +654,7 @@ void PD_register_nacf(void)
 
     n = PD_REGISTER(NACFILE_S, "nacf", _NAC_filep,
 		    NULL, _NAC_open, _NAC_close, NULL, NULL);
+    SC_ASSERT(n >= 0);
 
     return;}
  

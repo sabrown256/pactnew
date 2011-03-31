@@ -367,7 +367,7 @@ static object *_SSI_strset(object *argl)
 
 static object *_SSI_strsub(object *argl)
    {int n, n1, n2;
-    char *s, c;
+    char *s;
     object *str;
 
     s  = NULL;
@@ -386,7 +386,6 @@ static object *_SSI_strsub(object *argl)
     if ((n2 > n) || (n2 < 0))
        n2 = n;
 
-    c     = s[n2];
     s[n2] = '\0';
     str   = SS_mk_string(&s[n1]);
 

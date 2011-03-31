@@ -671,7 +671,9 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
 		     if (sp->valid == PD_BLOCK_INVALID)
 		        _PD_csum_block_write(file, ep, j);
 
-		     st  = _PD_block_get_csum(bl, j, dig);
+		     st = _PD_block_get_csum(bl, j, dig);
+		     SC_ASSERT(st == TRUE);
+
 		     ok &= _PD_put_string(1, " %ld %s", j, dig);};};
 
 	    ok &= _PD_put_string(1, "\n");};};
@@ -708,6 +710,8 @@ int _PD_block_csum_read(PDBfile *file)
 	name = SC_strtok(local, " \n", s);
 	n    = SC_stoi(SC_strtok(NULL, " \n", s));
 	ne   = SC_stoi(SC_strtok(NULL, " \n", s));
+
+	SC_ASSERT(n > 0);
 
 	ep = PD_inquire_entry(file, name, FALSE, NULL);
 	bl = ep->blocks;

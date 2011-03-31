@@ -215,15 +215,14 @@ static int64_t _PD_mptell(FILE *stream)
 static int _PD_mpseek(FILE *stream, int64_t offset, int whence)
    {int rv, fail;
     PD_Pfile *pf;
-    MPI_Offset moffset, rmoffset;
+    MPI_Offset rmoffset;
     MPI_File *fh;
     SC_THREAD_ID(tid);
 
     pf = GET_PFILE(stream);
 
-    fail    = -1;
-    rv      = 0;
-    moffset = offset;
+    fail = -1;
+    rv   = 0;
 
     if (pf == NULL)
        rv = fail;
@@ -523,18 +522,20 @@ static uint64_t _PD_mpwritec(void *s, size_t nbi, uint64_t ni, FILE *stream)
 /* _PD_MPPRINTF - do an fprintf on the parallel file */
 
 static int _PD_mpprintf(FILE *stream, char *fmt, va_list a)
-   {int nwritten;
+   {int rv;
     size_t ni, nw;
     char *bf;
 
-    nwritten = 0;
+    nw = 0;
     
     if (stream != NULL)
        {bf = SC_vdsnprintf(FALSE, fmt, a);
         ni = strlen(bf);
         nw = _PD_mpwrite(bf, (size_t) 1, ni, stream);}
 
-    return((int) nw);}
+    rv = nw;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1222,7 +1223,9 @@ static int _PD_pfm_remote_flush(char *buf)
     PN_close(inf);
 
     file = _PD_pflst->elem[req.id].file;
-    rv   = (*file->parse_symt)(file, req.buf, TRUE);
+
+    rv = (*file->parse_symt)(file, req.buf, TRUE);
+    SC_ASSERT(rv == TRUE);
 
 /* if everyone has checked in actually flush the file to disk */
     if (++_PD_pflst->elem[req.id].nflushed == (_PD_pflst->elem[req.id].nprocs - 1))
@@ -1510,7 +1513,9 @@ static int64_t _PD_get_file_size_d(PDBfile *file)
 
     pf = FILE_IO_INFO(PD_Pfile, file->stream);
     fp = (pf != NULL) ? (MPI_File *) pf->stream : NULL;
+
     status = MPI_File_get_size(*fp, &sz);
+    SC_ASSERT(status == 0);
 
 /* is there a portable way to check the return value (status)? */
 

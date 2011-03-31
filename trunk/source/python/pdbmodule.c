@@ -1060,6 +1060,8 @@ static int _PP_extra_defstr_mark(haelem *hp, void *arg)
     defstr *dp;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp);
+    SC_ASSERT(ok == TRUE);
+
     SC_mark(dp, 1);
 
     return(0);}
@@ -1246,6 +1248,7 @@ init_pdb(void)
 
         /* mark every currently existing defstr in the host_chart */
 	err = SC_hasharr_foreach(PP_vif->host_chart, _PP_extra_defstr_mark, NULL);
+	SC_ASSERT(err == TRUE);
 
         /* XXX - test err */
         if (PyModule_AddObject(m, "vif", (PyObject *) PP_vif_obj) < 0)

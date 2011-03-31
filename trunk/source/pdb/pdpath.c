@@ -193,8 +193,7 @@ void dpstack(int tid, int n)
 /* DSTCKTR - debugging aid */
 
 static void dstcktr(int cmnd, int i, int64_t addr, long numb, int end)
-   {int nf;
-    char *cmd;
+   {char *cmd;
     parse_frame *fr;
     locator *stck;
     PD_smp_state *pa;
@@ -205,7 +204,6 @@ static void dstcktr(int cmnd, int i, int64_t addr, long numb, int end)
 
         fr   = FRAME_OBJ + FRAME_N;
 	stck = fr->stack;
-	nf   = fr->n;
 	if (end == 0)
 	   {if (cmnd == DEREF_C)
 	       cmd = "deref";
@@ -441,16 +439,13 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
  */
 
 int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
-   {int indir, itags;
+   {int indir;
     long bpi;
     int64_t addr;
-    FILE *fp;
     hasharr *tab;
     PD_itag itag;
 
-    fp    = file->stream;
-    tab   = file->chart;
-    itags = file->use_itags;
+    tab = file->chart;
 
     while (skip-- > 0L)
        {(*file->rd_itag)(file, NULL, &itag);
@@ -568,23 +563,20 @@ static int64_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
 
 static int64_t _PD_itag_index_deref(PD_smp_state *pa, int n,
 				  dimdes **pdims, long *pnumb)
-   {int itags;
-    long indx, numb, naitems, bpi, fn;
+   {long indx, numb, naitems, bpi, fn;
     int64_t addr;
     char *type, *typc, *typp;
     SC_array *nbl;
     symindir iloc;
     PDBfile *file;
-    FILE *fp;
     parse_frame *fr;
     locator *stck;
     hasharr *tab;
 
-    file  = FILE_S;
-    fr    = FRAME_OBJ + FRAME_N;
-    stck  = fr->stack;
-    fn    = fr->n;
-    itags = file->use_itags;
+    file = FILE_S;
+    fr   = FRAME_OBJ + FRAME_N;
+    stck = fr->stack;
+    fn   = fr->n;
 
     nbl = NULL;
 
@@ -605,7 +597,6 @@ static int64_t _PD_itag_index_deref(PD_smp_state *pa, int n,
 	typc = stck[n+1].intype;
 	indx = stck[n].n_array_items;
 
-        fp  = file->stream;
         tab = file->chart;
 
 	iloc.n_ind_type = _PD_num_indirects(type, tab);
@@ -900,10 +891,8 @@ static long _PD_itag_reduce(PD_smp_state *pa)
  */
 
 static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
-   {long i, numb, bpi;
+   {long i, numb;
     int64_t addr;
-    char *type;
-    hasharr *tab;
     syment *ep;
     parse_frame *fr;
     locator *stck;
@@ -912,10 +901,6 @@ static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
     file = FILE_S;
     fr   = FRAME_OBJ + FRAME_N;
     stck = fr->stack;
-
-    tab  = file->chart;
-    type = stck[n-1].intype;
-    bpi  = _PD_lookup_size(type, tab);
 
 /* handle the case of in memory pointers */
     if (file->virtual_internal)
@@ -955,9 +940,7 @@ static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
 
 static int64_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
                                  dimdes **pdims, long *pnumb)
-   {int itags;
-    long fn;
-    int64_t addr;
+   {int64_t addr;
     char *type;
     SC_array *nbl;
     symindir iloc;
@@ -966,11 +949,9 @@ static int64_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
     locator *stck;
     hasharr *tab;
 
-    file  = FILE_S;
-    fr    = FRAME_OBJ + FRAME_N;
-    stck  = fr->stack;
-    fn    = fr->n;
-    itags = file->use_itags;
+    file = FILE_S;
+    fr   = FRAME_OBJ + FRAME_N;
+    stck = fr->stack;
 
     nbl = NULL;
 

@@ -387,6 +387,7 @@ void SC_timeout(int to, PFSignal_handler fnc)
 /* set the handler and the alarm */
 	_SC.to_err = SC_signal(SIGALRM, fn);
 	ns         = ALARM(to);
+	SC_ASSERT(ns >= 0);
 
 	if (_SC.to_err == SIG_ERR)
 	   SC_error(-1, "SETTING SIGALRM FAILED (%d) - SC_TIMEOUT\n", errno);

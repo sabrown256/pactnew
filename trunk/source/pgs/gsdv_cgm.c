@@ -369,12 +369,9 @@ static void _PG_CGM_clear_window(PG_device *dev)
     double ca[2];
     char s[MAXLINE];
     PG_palette *cp;
-    PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
-
-    g = &dev->g;
 
     PG_make_device_current(dev);
 

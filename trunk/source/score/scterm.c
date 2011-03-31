@@ -1330,12 +1330,11 @@ void dpterm(void)
  */
 
 int SC_set_term_size(int fd, int nr, int nc, int pw, int ph)
-   {int rv, pr, pc, pid;
+   {int rv, pr, pc;
     char *s;
     struct winsize w;
 
-    rv  = FALSE;
-    pid = getpid();
+    rv = FALSE;
 
     pr = pw;
     pc = ph;

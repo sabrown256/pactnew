@@ -44,7 +44,7 @@ static INLINE int EOI(object *str)
  */
 
 static int _SS_get_input(object *str)
-   {int c, rv;
+   {int rv;
     char *p;
     FILE *fp;
 
@@ -60,8 +60,7 @@ static int _SS_get_input(object *str)
     fp = SS_INSTREAM(str);
 
     if (fp == NULL)
-       {c  = EOF;
-	rv = -1;}
+       rv = -1;
 
     if (fp == stdin)
        {p = SC_prompt(_SS.pr_prompt, SS_BUFFER(str), MAXLINE);
@@ -71,7 +70,6 @@ static int _SS_get_input(object *str)
 
     if (p == NULL)
        {*SS_PTR(str) = (char) EOF;
-	c  = EOF;
 	rv = -1;}
     else
        SS_PTR(str) = SS_BUFFER(str);

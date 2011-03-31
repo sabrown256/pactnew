@@ -148,11 +148,7 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
     else
        {s  = SC_dsnprintf(FALSE, "%s -merge %s", xrdb, rn);
         rv = system(s);
-/*
-	if (rv != 0)
-	   printf("Failed to set X resources for GhostScript (%d)\n", rv);
-*/
-       };
+	SC_ASSERT(rv == 0);};
 
     unlink(rn);
 
@@ -611,6 +607,7 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
 
     cmnd = SC_dsnprintf(FALSE, "diff %s %s > __tmp__", f1, f2);
     st   = system(cmnd);
+    SC_ASSERT(st == 0);
 
     fd = io_open("__tmp__", "r");
 
@@ -745,7 +742,7 @@ static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
 		     pixdes *pd, int verbose, char *ecnt, char *ea, char *eb)
    {int n, errl, more, dntok;
     int na, pl;
-    double da, db, dd, toler;
+    double da, db, dd;
     double ddmn, ddmx, dav, ddf;
     char tba[MAXLINE], tbb[MAXLINE];
     char *ta, *tb, *pa, *pb;
@@ -753,21 +750,6 @@ static int diff_frac(char *bfa, char *bfb, diff_stat *ds,
     ddmn = ds->fdmn;
     ddmx = ds->fdmx;
     errl = 0;
-
-/* some SGI libraries have a problem printing floating point numbers
- * so for example where another platform prints
- *      -6.02e+22
- * the SGI prints
- *      -0.60e+23
- * this limits the comparison tolerance severely
- * we'll assume at least three digits are printed - two after the decimal
- * and limit the tolerance therefore to 1.0e-2
- */
-#ifdef SGI
-    toler = 1.0e-2;
-#else
-    toler = 1.0e-10;
-#endif
 
 /* ignore PostScript comments (they begin with %) */
     if ((bfa[0] == '%') && (bfb[0] == '%'))
@@ -897,7 +879,7 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
    {int i, err, la, lb;
     char *ea, *eb, *ecnt;
     double ddmn, ddmx;
-    double nd, dsum, dave, dfave, dfab;
+    double nd, dfave;
     FILE *fda, *fdb;
     diff_stat ds;
     static int na = BFSZ, nb = BFSZ;
@@ -948,10 +930,7 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
 	     REMAKE_N(sb, char, nb);};};
 
     nd    = ds.ndiff + 1;
-    dave  = ds.dsm/nd;
-    dsum  = ds.asum/nd;
     dfave = ds.fdsm/nd;
-    dfab  = ds.fdsm/(ds.asum + 1);
 
     printf("\n");
     printf("Fractional differences range: %10.3e <= fr <= %10.3e\n",

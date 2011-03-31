@@ -406,9 +406,11 @@ static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
 	   ad = bid->curr;
 
 	ok = _SC_bio_seek(bid, fi[0], SEEK_SET);
+	SC_ASSERT(ok >= 0);
 
 /* GOTCHA: does this go past end of file? */
 	nw = SC_write_sigsafe(bid->fd, fr->bf, nb);
+	SC_ASSERT(nw == nb);
 
 	bid->nhits[BIO_OPER_WRITE]++;
 
@@ -740,14 +742,13 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
 
 static int _SC_check_read(bio_desc *bid, bio_frame *rq)
    {int fd, ok;
-    int64_t cad, oad, nb;
+    int64_t oad, nb;
     unsigned char *rbf;
 
     ok = TRUE;
 
     if (_SC_bio_debug & 1)
        {fd  = bid->fd;
-	cad = bid->curr;
 	oad = rq->addr;
 	nb  = rq->sz;
 	rbf = rq->bf;
@@ -762,15 +763,14 @@ static int _SC_check_read(bio_desc *bid, bio_frame *rq)
 /* _SC_CHECK_WRITE - debugging diagnostic to verify buffered writes */
 
 static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
-   {int fd, ok;
+   {int ok;
     int64_t cad, rad, nbr, bad, nbb;
     static int count = 1;
 
     ok = TRUE;
 
     if (_SC_bio_debug & 2)
-       {fd  = bid->fd;
-	cad = bid->curr;
+       {cad = bid->curr;
 
 	rad = rq->addr;
 	nbr = rq->sz;
@@ -913,7 +913,9 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 		nlc = olc + bsz;
 		if (olc != bid->curr)
 		   {na += (bid->curr - nlc);
-		    ad  = _SC_bio_seek(bid, nlc, SEEK_SET);};
+		    ad  = _SC_bio_seek(bid, nlc, SEEK_SET);
+		    SC_ASSERT(ad >= 0);};
+
 		fr = _SC_bfr_read_setup(bid, fr);
 
 /* signify that something happened and we cannot exit the loop */
@@ -986,7 +988,9 @@ static int64_t _SC_bio_out(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 	    if (fr->nb == fr->sz)
 	       {if (fr->addr != bid->curr)
 		   {na += (bid->curr - fr->addr);
-		    ad  = _SC_bio_seek(bid, fr->addr, SEEK_SET);};
+		    ad  = _SC_bio_seek(bid, fr->addr, SEEK_SET);
+		    SC_ASSERT(ad >= 0);};
+
 		nbw = SC_write_sigsafe(bid->fd, fr->bf, fr->nb);
 		_SC_bfr_init(fr, bid->curr + nbw, bid->bfsz);
 		bid->nhits[BIO_OPER_WRITE]++;};}
@@ -1270,6 +1274,8 @@ static int _SC_bgetc(FILE *fp)
        rv = EOF;
     else
        {nb = _SC_bio_in(s, 1, 1, bid);
+	SC_ASSERT(nb >= 0);
+
         rv = s[0];};};
 
 #endif

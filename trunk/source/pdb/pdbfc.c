@@ -107,11 +107,8 @@ static uint64_t _PD_fcread(void *p, size_t sz, uint64_t ni, FILE *fp)
     cf = GET_CONTAINERF(fp);
     fl = GET_FILE(cf);
 
-{int64_t ada;
-ada = ftell(fl);
-
     rv = fread(p, sz, ni, fl);
-};
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

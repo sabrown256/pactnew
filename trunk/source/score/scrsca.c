@@ -149,16 +149,13 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
 
 #ifdef HAVE_RESOURCE_USAGE
 
-    {int who;
-     struct rusage r, *pr;
+    {struct rusage r, *pr;
      static struct rusage rs, rc;
 
      if (whch == FALSE)
-        {who = RUSAGE_SELF;
-	 pr  = &rs;}
+        pr = &rs;
      else
-        {who = RUSAGE_CHILDREN;
-	 pr  = &rc;};
+        pr = &rc;
 
      rv = getrusage(RUSAGE_SELF, &r);
      if (rv == 0)

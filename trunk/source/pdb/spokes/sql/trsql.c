@@ -257,10 +257,12 @@ int PD_register_sql(void)
     n = PD_REGISTER(SQL_DATABASE_S, "mysql", _SQL_databasep,
 		    _SQL_create, _SQL_open, _SQL_close,
 		    _SQL_write_entry, _SQL_read_entry);
+    SC_ASSERT(n >= 0);
 
     n = PD_REGISTER(SQL_DATABASE_S, "sqlite", _SQL_databasep,
 		    _SQL_create, _SQL_open, _SQL_close,
 		    _SQL_write_entry, _SQL_read_entry);
+    SC_ASSERT(n >= 0);
 
     return(TRUE);}
  

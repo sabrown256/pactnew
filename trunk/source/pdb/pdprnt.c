@@ -394,22 +394,16 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
 				char *type, int quo, int idx,
 				int n, long *ind)
    {int max1, max2;
-    int mjr, nn, def_off;
     long i, offset;
     char bf[MAXLINE];
     char *cp, *prefix, *before, *after, *nodename;
-    dimdes *dims;
     FILE *f0;
 
-    mjr      = prnt->mjr;
-    nn       = prnt->nn;
-    def_off  = prnt->def_off;
     offset   = prnt->offset;
     prefix   = prnt->prefix;
     before   = prnt->before;
     after    = prnt->after;
     nodename = prnt->nodename;
-    dims     = prnt->dims;
     f0       = prnt->fp;
 
     cp = (char *) vr;
@@ -498,11 +492,10 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     char *cp, **t;
     defstr *pd;
     FILE *f0;
-    char *prefix, *before, *after, *nodename;
+    char *prefix, *before, *nodename;
 
     prefix   = prnt->prefix;
     before   = prnt->before;
-    after    = prnt->after;
     nodename = prnt->nodename;
     f0       = prnt->fp;
 
@@ -702,7 +695,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 				 long ni, char *type,
                                  int irecursion, int n, long *ind)
    {int min_index, status;
-    int mjr, def_off;
+    int def_off;
     long i, ditems;
     char field[80], bf[MAXLINE];
     char *dtype, *s;
@@ -714,7 +707,6 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
     before   = prnt->before;
     after    = prnt->after;
     nodename = prnt->nodename;
-    mjr      = prnt->mjr;
     def_off  = prnt->def_off;
     dims     = prnt->dims;
     f0       = prnt->fp;

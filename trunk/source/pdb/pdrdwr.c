@@ -745,9 +745,6 @@ static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi,
 				syment *ep, int hbyt, int fbyt)
    {long stride, step;
     int64_t offset, start, stop;
-    char *outtype;
-
-    outtype = PD_entry_type(ep);
 
 /* for each index specification compute the range and recurse */
     stride = fbyt*pi->stride;
@@ -1698,7 +1695,6 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
     SC_array *bl;
     PD_itag pi;
     PD_smp_state *pa;
-    FILE *fp;
 
     if ((file == NULL) || (ep == NULL))
        return(0);
@@ -1714,11 +1710,9 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
     size    = 0;
     nitems  = 0;
 
-    fp    = file->stream;
     vif   = file->virtual_internal;
     itags = file->use_itags;
 
-    fp   = file->stream;
     iloc = ep->indirects;
 
     _PD_init_stacks(100L, 1000L);

@@ -219,12 +219,11 @@ static void _SC_tree_rebalance(SC_tree_node *q, SC_tree_node *t,
                                SC_tree_node *s, SC_ntree *tree)
    {int a, b, ib, nd;
     int dr, ds, dp;
-    SC_tree_node *p, *r, **branch;
+    SC_tree_node *p, *r;
     void *k;
     PFIntBin compare;
 
     nd      = tree->head->nd;
-    branch  = tree->head->branch;
     compare = tree->compare;
     k       = q->key;
 

@@ -863,7 +863,7 @@ int SC_check_children(void)
  */
 
 int SC_running_children(void)
-   {int i, n, nr, st, pid;
+   {int i, n, nr, st;
     PROCESS *pp;
 
     n = SC_array_get_n(_SC.process_list);
@@ -872,8 +872,7 @@ int SC_running_children(void)
     for (i = 0; i < n; i++)
         {pp = *(PROCESS **) SC_array_get(_SC.process_list, i);
 	 if (SC_process_alive(pp))
-	    {pid = pp->id;
-	     st  = SC_process_status(pp);
+	    {st = SC_process_status(pp);
 	     if (st == 0)
 	        nr++;
 	     else if ((st & (SC_DEAD | SC_KILLED | SC_SIGNALED)) != 0)

@@ -319,7 +319,7 @@ static int _PM_fit_neg(PM_side *base, double a, double b, double c)
 static int _PM_fit_curve(PM_side *base)
    {double axx, ayy, axy, ax, ay;
     double x1, y1, x2, y2;
-    double apxx, apyy, apxy, apx, apy;
+    double apxx, apyy, apxy, apy;
     double s, ssq, ct, ctsq, st, stsq;
     double a, b, c;
     double xx1, xx2, xx3, xx4;
@@ -360,7 +360,7 @@ static int _PM_fit_curve(PM_side *base)
     apxy = ssq*(-axy*stsq+(2*ayy-2*axx)*ct*st+axy*ctsq);
     apxx = ssq*(ayy*stsq+axy*ct*st+axx*ctsq);
     apy = s*((2*ayy*ct-axy*st)*y1+(axy*ct-2*axx*st)*x1-ax*st+ay*ct);
-    apx = s*((2*ayy*st+axy*ct)*y1+(axy*st+2*axx*ct)*x1+ay*st+ax*ct);
+/*    apx = s*((2*ayy*st+axy*ct)*y1+(axy*st+2*axx*ct)*x1+ay*st+ax*ct); */
 
 /* case checking on types of equations */
     if (apyy != 0.0)
@@ -1034,13 +1034,11 @@ static double _PM_comp_ratio(double b0, int nz)
 static void _PM_compute_ratios(double *fr, PM_side *base, PM_mesh *mesh)
    {int i, j, n, dk, dl, kbnd;
     double t, sdl, sdk, dkdl, dke, dldk, dle;
-    double *kra, *lra, *apk, *apl;
+    double *kra, *lra;
 
     kbnd = mesh->kmax + 1;
     kra  = mesh->kra;
     lra  = mesh->lra;
-    apk  = mesh->apk;
-    apl  = mesh->apl;
 
     dk = base->dk;
     dl = base->dl;

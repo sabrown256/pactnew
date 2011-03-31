@@ -144,6 +144,9 @@ struct s_SC_state
 
 /* initializes to 0 bytes */
 
+/* SCSTD.H */
+    int assert_fail;
+
 /* SCFIA.C */
    int ip;                                        /* pointer list variables */
    SC_array *ptr_lst;

@@ -135,7 +135,8 @@ long _PD_write_bin(PDBfile *file)
 
     if (file != NULL)
        {tr  = file->tr;
-	fun = tr->write;};
+	fun = tr->write;
+	SC_ASSERT(fun != NULL);};
 
     return(ni);}
 
@@ -153,7 +154,8 @@ long PD_read_bin(PDBfile *file)
 
     if (file != NULL)
        {tr  = file->tr;
-	fun = tr->read;};
+	fun = tr->read;
+	SC_ASSERT(fun != NULL);};
 
     return(ni);}
 
@@ -203,6 +205,7 @@ int PD_register_pdb(void)
 
     n = PD_REGISTER(PDBFILE_S, "pdb", _PD_pdbfilep,
 		    _PD_create, _PD_open, _PD_close, _PD_write, _PD_read);
+    SC_ASSERT(n >= 0);
 
     return(TRUE);}
  

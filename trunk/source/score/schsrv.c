@@ -263,6 +263,8 @@ static int _SC_host_server_rel(haelem *hp, void *a)
     hrng *rng;
 
     ok = SC_haelem_data(hp, NULL, &type, &v);
+    SC_ASSERT(ok == TRUE);
+
     if (strcmp(type, "hrng") == 0)
        {rng = (hrng *) v;
 	hst = rng->hosts;
@@ -543,7 +545,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
  */
 
 int SC_verify_host(char *hst, int to)
-   {int i, is, it, nc, np, ns, ok, pr;
+   {int i, is, it, nc, np, ok, pr;
     int dt, ta, pt, done;
     char s[MAXLINE];
     char *ca[20], *tc, *tk, *prompt, *swd, *p;
@@ -582,7 +584,6 @@ int SC_verify_host(char *hst, int to)
     prompt = "(yes/no)?";
     np     = strlen(prompt);
     swd    = "sword:";
-    ns     = strlen(swd);
 
     ok = 0;
     pr = FALSE;
@@ -790,6 +791,8 @@ char **SC_get_host_types(int whch, char *net)
     bf[0] = '\0';
 
     rv = SC_host_server_init(_SC.hsdb, FALSE, FALSE);
+    SC_ASSERT(rv == TRUE);
+
     switch (whch)
        {case 1 :
 	     spec = SC_dsnprintf(TRUE, "-types-");
@@ -804,7 +807,9 @@ char **SC_get_host_types(int whch, char *net)
 	     spec = SC_dsnprintf(TRUE, "-types.net-");
 	     break;}
 	
-    rv   = SC_host_server_query(bf, MAXLINE, spec);
+    rv = SC_host_server_query(bf, MAXLINE, spec);
+    SC_ASSERT(rv == TRUE);
+
     strs = SC_tokenize(bf, " \n");
 
     SFREE(spec);
@@ -906,16 +911,18 @@ char **SC_get_host_list(char *sys, int single)
 /* get the number of hosts for this system type */
         {n  = SC_get_nhosts(ss[is]);
 	 nc = SC_get_host_length_max(ss[is], TRUE, FALSE);
+	 SC_ASSERT(nc >= 0);
 
 	 if (single == TRUE)
 	    {st = SC_host_server_query(out, MAXLINE, "%s", ss[is]);
+	     SC_ASSERT(st == TRUE);
 	     SC_array_string_add_copy(arr, out);}
 
 /* check each host of this type */
 	 else
 	    {for (i = 0; i < n; i++)
-	         {st = SC_host_server_query(out, MAXLINE, "%s %d",
-					    ss[is], i);
+	         {st = SC_host_server_query(out, MAXLINE, "%s %d", ss[is], i);
+		  SC_ASSERT(st == TRUE);
 		  SC_array_string_add_copy(arr, out);};};};
 
     SC_free_strings(ss);
