@@ -159,7 +159,7 @@ long PM_lr_mesh_lookup(PM_mesh_map *sm, double *p)
     int *dim;
     char *emap;
     long j;
-    long *indx, ip[10], nxt[5], in[5], cross[5];
+    long *indx, nxt[5], in[5], cross[5];
     double *rmn, *dr, **r;
 
     nd   = sm->nd;
@@ -176,9 +176,7 @@ long PM_lr_mesh_lookup(PM_mesh_map *sm, double *p)
         {ic = (p[id] - rmn[id])/dr[id];
 	 ic = max(ic, 0);
 	 ic = min(ic, nl-1);
-
-	 ip[id] = ic;
-         i     += (i*nd + ic);};
+         i += (i*nd + ic);};
 
 /* get initial guess */
     j = indx[i];

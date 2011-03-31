@@ -24,21 +24,15 @@ double
  */
 
 static object *_SX_binary_arr(C_procedure *cp, object *argl)
-   {int n, id, ident;
+   {int n, id;
     char v[MAX_PRSZ];
     char *otyp;
     PFVoid *proc;
-    PFDoubledd fnc;
     C_array *reta, *operand, *acc;
     object *obj, *al, *rv;
 
-    proc  = (PFVoid *) cp->proc;
-    fnc   = (PFDoubledd) proc[0];
-    ident = 1;
-    reta  = NULL;
-
-    if ((fnc == PM_fplus) || (fnc == PM_fminus))
-       ident = 0;
+    proc = (PFVoid *) cp->proc;
+    reta = NULL;
 
     if (SS_nullobjp(argl))
        return(SS_null);
@@ -373,20 +367,13 @@ static double **_SX_extract_range(PM_mapping *dest, PM_mapping *source,
 
 static double **_SX_accumulate_mapping(PM_mapping *dest, PM_mapping *source,
 				       int wgtfl)
-   {int dne, dnde;
-    double tol;
+   {double tol;
     double **tre;
-    PM_set *dr, *dd;
     PM_mapping *srcm;
 
     srcm = PM_node_centered_mapping(source);
 
     tol = 1.0e-12;
-
-    dd   = dest->domain;
-    dr   = dest->range;
-    dne  = dd->n_elements;
-    dnde = dr->dimension_elem;
 
 /* if the domains are the same just extract */
     if (PM_set_equal(srcm->domain, dest->domain, tol))
@@ -421,7 +408,7 @@ static PM_mapping *_SX_build_accumulator_mapping(PM_set *domain,
    {int i, nd, nde, nbe, tnd, tnde, ne;
     int *maxes, *dm;
     char label[MAXLINE];
-    char *type, *ttype, *lbl;
+    char *type, *lbl;
     void **elem;
     PM_set *range, *set;
     PM_mapping *f, *ph;
@@ -436,7 +423,6 @@ static PM_mapping *_SX_build_accumulator_mapping(PM_set *domain,
         {range = ph->range;
          tnd   = range->dimension;
          tnde  = range->dimension_elem;
-         ttype = range->element_type;
          if ((tnd != nd) || (tnde != nde))
             SS_error("INCOMMENSURATE RANGE SET - _SX_BUILD_ACCUMULATOR_MAPPING",
                      SS_null);
@@ -489,10 +475,9 @@ static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
    {int i, dnde, ne, ok;
     char *dty;
     double **tre;
-    double val;
     void **dre;
     C_array src, dst;
-    PM_set *dr, *dd, *sr;
+    PM_set *dr, *dd;
 
     dd = d->domain;
     ne = dd->n_elements;
@@ -504,7 +489,6 @@ static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
 
 /* accumulate the results */
     tre = NULL;
-    val = -HUGE;
 
     src.length = ne;
     src.type   = SC_DOUBLE_P_S;
@@ -513,14 +497,7 @@ static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
     dst.type   = dty;
 
     if (s != NULL)
-       {sr  = s->range;
-	tre = _SX_accumulate_mapping(d, s, wgt);}
-
-    else if (SS_floatp(obj))
-       val = SS_FLOAT_VALUE(obj);
-
-    else if (SS_integerp(obj))
-       val = SS_INTEGER_VALUE(obj);
+       tre = _SX_accumulate_mapping(d, s, wgt);
 
     for (i = 0; i < dnde; i++)
         {dst.data = dre[i];
@@ -585,7 +562,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
     double **tre;
     void **dre;
     C_array operand, **acc;
-    PM_set *dr, *dd, *sr;
+    PM_set *dr, *dd;
     PM_mapping *ps;
     object *obj, *al;
 
@@ -615,8 +592,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
 	 SX_determine_drw_obj(&ps, &obj, &al);
 
 	 if (ps != NULL)
-	    {sr  = ps->range;
-	     tre = _SX_accumulate_mapping(d, ps, FALSE);}
+	    tre = _SX_accumulate_mapping(d, ps, FALSE);
 
 	 else
 	    {id = SC_arrtype(obj, -1);
@@ -858,6 +834,7 @@ PM_mapping *_SXI_refine_mapping(PM_mapping *h, object **pargl)
     object *argl, *obj;
 
     plf = SX_have_display_list();
+    SC_ASSERT(plf == TRUE);
 
     hd = h->domain;
 
@@ -894,6 +871,7 @@ PM_mapping *_SXI_interp_mapping(PM_mapping *h, object **pargl)
     object *argl, *obj;
 
     plf = SX_have_display_list();
+    SC_ASSERT(plf == TRUE);
 
     hd = h->domain;
 

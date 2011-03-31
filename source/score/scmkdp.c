@@ -163,10 +163,9 @@ int _SC_is_newer(anadep *state, char *fa, char *fb, int force)
 /* _SC_REL_ACTIONS - release the given set of actions */
 
 static void _SC_rel_actions(anadep *state, int i)
-   {int ns;
-    cmdes *pa;
+   {cmdes *pa;
 
-    ns = SC_array_dec_n(state->actions, 1L, -1);
+    SC_array_dec_n(state->actions, 1L, -1);
     pa = SC_array_get(state->actions, i);
 
     SFREE(pa->target);

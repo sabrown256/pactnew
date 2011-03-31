@@ -319,6 +319,7 @@ void SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
 
     if (SC_safe_to_free(ha))
        {rv = SC_hasharr_foreach(ha, f, a);
+	SC_ASSERT(rv == TRUE);
 
 	_SC_hasharr_free_elements(ha);
 
@@ -627,7 +628,7 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
  */
 
 int SC_hasharr_remove(hasharr *ha, void *key)
-   {int sz, string, rv;
+   {int sz, rv;
     long i;
     haelem *hp, *curr, **tb;
     PFKeyHash hash;
@@ -637,8 +638,6 @@ int SC_hasharr_remove(hasharr *ha, void *key)
     sz   = ha->size;
     tb   = ha->table;
     hash = ha->hash;
-
-    string = HA_STRING_KEY(hash);
 
     i  = (*hash)(key, sz);
     hp = tb[i];

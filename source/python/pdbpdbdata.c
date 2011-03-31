@@ -121,7 +121,6 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     char *kw_list[] = {"obj", "type", "file", NULL};
     int ierr;
     long number;
-    dimdes *dims;
     defstr *dp;
     void *vr;
     PP_defstrObject *dpobj;
@@ -136,7 +135,6 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
             return -1;
 
     vr       = NULL;
-    dims     = NULL;
     fileinfo = file->fileinfo;
     fp       = fileinfo->file;
 
@@ -178,6 +176,8 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
 /*    self->dict = PP_defstr_dict(ts, fp);*/
 
 #if 0
+    dimdes *dims;
+    dims   = NULL;
     retobj = PP_make_object(fp, vr, number, ts, dims);
     if (retobj == NULL) return -1;
 #endif

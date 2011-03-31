@@ -832,7 +832,7 @@ static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb,
     FILE *fpa, *fpb;
     syment *epa, *epb;
     char *s, *typa, *typb;
-    char fullpatha[MAXLINE], fullpathb[MAXLINE], *fullpath;
+    char fullpatha[MAXLINE], fullpathb[MAXLINE];
 
     switch (SETJMP(_SX.diff_err))
        {case ABORT :
@@ -873,11 +873,6 @@ static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb,
        {_PD_rl_syment_d(epa);
         _PD_rl_syment_d(epb);
         return(NOT_PRESENT);};
-
-    if (strlen(fullpatha) < strlen(fullpathb))
-       fullpath = fullpatha;
-    else
-       fullpath = fullpathb;
 
     fpa = pfa->stream;
     fpb = pfb->stream;

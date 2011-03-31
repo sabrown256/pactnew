@@ -89,6 +89,7 @@ int PD_register_xml(void)
 
     n = PD_REGISTER(XML_S, "xml", _XML_filep,
 		    NULL, _XML_open, _XML_close, NULL, NULL);
+    SC_ASSERT(n >= 0);
 
     return(TRUE);}
  

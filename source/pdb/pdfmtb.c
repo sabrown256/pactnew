@@ -239,7 +239,6 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
     long mini, leng, bsz;
     int64_t addr, numb;
     syment *ep;
-    hasharr *tab;
     dimdes *dims, *next, *prev;
     PD_smp_state *pa;
 
@@ -250,7 +249,6 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
 
     pbf  = buf;
     prev = NULL;
-    tab  = file->symtab;
     while (_PD_get_token(pbf, local, bsz, '\n'))
        {pbf  = NULL;
         name = SC_strtok(local, "\001", s);
@@ -416,7 +414,10 @@ int _PD_rd_chrt_ii(PDBfile *file)
        {pbf = NULL;
 	if (type[0] == '\002')
            break;
-        sz   = SC_stol(_PD_get_token(pbf, local, bsz, '\001'));
+
+        sz = SC_stol(_PD_get_token(pbf, local, bsz, '\001'));
+	SC_ASSERT(sz != 0);
+
         lst  = NULL;
         while ((nxt = _PD_get_token(pbf, local, bsz, '\001')) != NULL)
            {if (*nxt == '\0')
@@ -780,7 +781,6 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
-    FILE *fp;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -788,7 +788,6 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
     if (file == NULL)
        return(-1);
 
-    fp   = file->stream;
     addr = _PD_get_current_address(file, PD_WRITE);
     if (addr == -1)
        return(-1);

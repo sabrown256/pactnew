@@ -71,12 +71,9 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 		      syment *ep, void *vr)
    {int rv, ni, bpi, len, ok;
     unsigned char rdig[PD_CKSUM_LEN], cdig[PD_CKSUM_LEN];
-    char bf[MAXLINE];
-    char *path, *lname;
+    char *path;
             
     rv = TRUE;
-
-    lname = _PD_var_namef(NULL, name, bf);
 
 /* if requested, check MD5 checksum for this var */
     if ((file->use_cksum & PD_MD5_RW) && (strstr(name, PD_MD5_DIR) == NULL)) 
@@ -128,7 +125,7 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
  */
 
 int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
-   {int rv, bpi;
+   {int rv;
     long i, nb, n, ni;
     int64_t addr;
     char bf[MAXLINE];
@@ -145,8 +142,7 @@ int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
 	   {strcpy(bf, name);
 	    name = SC_strtok(bf, ".[(", s);};
 
-	bpi = _PD_lookup_size(PD_entry_type(ef), file->chart);
-	ep  = PD_inquire_entry(file, name, FALSE, NULL);
+	ep = PD_inquire_entry(file, name, FALSE, NULL);
 
 /* if the entry and the effective entry are not the same then 
  * the blocks of the entry indicated by the effective entry have
@@ -441,7 +437,9 @@ int64_t _PD_locate_checksum(PDBfile* file)
 /* read the checksum extra's signature (from where it *should* be) */
 	_PD_set_current_address(file, -MAXLINE, SEEK_END, PD_GENERIC);
 
-	nb  = lio_read(bf, 1, MAXLINE, fp);
+	nb = lio_read(bf, 1, MAXLINE, fp);
+	SC_ASSERT(nb > 0);
+
 	pcs = SC_strstr(bf, sgn);
 
 /* this is a PDBfile hence do *NOT* checksum the entire file
@@ -468,12 +466,11 @@ int64_t _PD_locate_checksum(PDBfile* file)
 
 void _PD_md5_checksum(PDBfile* file, unsigned char digest[PD_CKSUM_LEN]) 
    {int64_t start, stop, here;
-    FILE *fp, *fr;
+    FILE *fr;
     
     if (file != NULL)
        {memset(digest, 0, PD_CKSUM_LEN);
 
-	fp = file->stream;
 	fr = _PD_GET_FILE_STREAM(file);
     
 	here = _PD_get_current_address(file, PD_GENERIC);

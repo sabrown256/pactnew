@@ -1618,9 +1618,9 @@ void PM_compute_quad_rot_volume(double *vol, int nc, int *indx, double **x)
  */
 
 void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
-   {int i, i1, i2, i3, i4, i5, i6, i7, i8;
+   {int i;
     int *ri;
-    double vca, vcb;
+    double vca;
     double v1, v2, v3, v4, v5, v6;
     double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4;
     double x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
@@ -1635,14 +1635,7 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
     rz = x[2] - 1;
 
     for (i = 0; i < nc; i++)
-        {i1 = *ri++;
-	 i2 = *ri++;
-	 i3 = *ri++;
-	 i4 = *ri++;
-	 i5 = *ri++;
-	 i6 = *ri++;
-	 i7 = *ri++;
-	 i8 = *ri++;
+        {ri += 8;
 
          x1 = rx[1];
 	 x2 = rx[2];
@@ -1680,6 +1673,7 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
 			  
 	 vca = v1 + v2 + v3 + v4 + v5 + v6;
 
+#if 0
 	 v1 = PM_VOLTET(1, 2, 4, 5);
 	 v2 = PM_VOLTET(3, 4, 2, 7);
 	 v3 = PM_VOLTET(6, 2, 5, 7);
@@ -1687,6 +1681,7 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
 	 v5 = PM_VOLTET(4, 2, 7, 5);
 			  
 	 vcb = v1 + v2 + v3 + v4 + v5 + v6;
+#endif
 
 	 vol[i] = vca;};
 

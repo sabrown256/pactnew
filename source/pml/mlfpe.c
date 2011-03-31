@@ -145,6 +145,8 @@ int _PM_fpe_traps(int pfl)
 	 FE_UNDERFLOW |
 	 FE_INEXACT;
 
+    SC_ASSERT(fe != 0);
+
 /* fetch current FPU flags */
     fegetexceptflag(&fs, FE_ALL_EXCEPT);
 
@@ -545,13 +547,10 @@ long PM_count_nanf(long n, float *f, int mask)
  */
 
 int PM_fp_typed(double d)
-   {int rv, le, sg;
+   {int rv, sg;
     uint64_t ba, bm, bs, b1, l1, l2, l3;
-    char *ca;
 
     rv = 1;
-    ca = (char *) &rv;
-    le = (ca[0] == 1);
     ba = *(uint64_t *) &d;
 
     l1 = 0xf0;
@@ -612,13 +611,10 @@ int PM_fp_typed(double d)
  */
 
 int PM_fp_typef(float f)
-   {int rv, le, sg;
+   {int rv, sg;
     int ba, bm, bs, b1, l1, l2, l3;
-    char *ca;
 
     rv = 1;
-    ca = (char *) &rv;
-    le = (ca[0] == 1);
     ba = *(int *) &f;
 
     l1 = 0x800000;

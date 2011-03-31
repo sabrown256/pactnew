@@ -175,6 +175,7 @@ void _SC_process_out_reject(int fd, int mask, void *a)
     SC_START_ACTIVITY(state, EXEC_OUT_REJECT);
 
     nr = SC_running_children();
+    SC_ASSERT(nr >= 0);
 
     n = SC_array_get_n(state->tasks);
     for (i = 0; i < n; i++)
@@ -292,11 +293,8 @@ static int _SC_process_end(int *prv, void *a)
 void SC_show_state_log(parstate *state)
    {int it, nt;
     char *s;
-    asyncstate *as;
 
     SC_START_ACTIVITY(state, EXEC_LOG);
-
-    as = NULL;
 
     nt = SC_array_get_n(state->log);
     for (it = 0; it < nt; it++)
@@ -737,12 +735,14 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 
 	rv = SC_event_loop(pe, &state, DEFAULT_WAIT);
 	ns = SC_array_string_append(out, job->inf.out);
+	SC_ASSERT(ns != 0);
 
 	state.free_tasks(&state);};
 
     _SC_set_run_task_state(NULL);
 
     st = chdir(cwd);
+    SC_ASSERT(st == 0);
 
     SFREE(cwd);
 
@@ -896,6 +896,7 @@ char **SC_syscmnd(char *fmt, ...)
     SC_VDSNPRINTF(TRUE, cmd, fmt);
 
     rv = SC_exec(&icmnd, cmd, NULL, -1);
+    SC_ASSERT(rv == 0);
     
     SFREE(cmd);
 

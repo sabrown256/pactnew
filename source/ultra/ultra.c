@@ -1182,7 +1182,7 @@ static void usage(void)
 /* MAIN - start up a fun filled session of ULTRA right here */
 
 int main(int c, char **v)
-   {int i, n, load_data, load_init, load_rc, zero_space, rv;
+   {int i, n, load_init, load_rc, zero_space, rv;
     int commnd_flag, no_banner, n_files, tflag, track;
     SIGNED int order[4096];
     char commnd[MAXLINE];
@@ -1211,7 +1211,6 @@ int main(int c, char **v)
     tflag       = FALSE;
     no_banner   = FALSE;
     track       = TRUE;
-    load_data   = 0;
 
 /* initialize the file order */
     n_files = 0;

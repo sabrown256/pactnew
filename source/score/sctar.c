@@ -295,6 +295,8 @@ int _SC_is_tarfile(FILE *fp)
     tarhdr p;
 
     addsave = ftell(fp);
+    SC_ASSERT(addsave >= 0);
+
     fseek(fp, 0, SEEK_SET);
 
     ret = FALSE;

@@ -155,7 +155,7 @@ static SC_file_block *_SC_find_and_split(SC_file_block *bl, int64_t a)
 /* _SC_RESET_BLOCKS - reset the starts and ends of the given block list */
 
 static void _SC_reset_blocks(SC_file_block *bl)
-   {int64_t ob, oe, nb, ne;
+   {int64_t oe, nb, ne;
     SC_file_block *pb, *nxt;
 
 /* shift the start and ends of the remaining blocks */
@@ -164,8 +164,7 @@ static void _SC_reset_blocks(SC_file_block *bl)
 	 bl->start = 0;
 
 	 for (pb = bl; pb->next != NULL; pb = nxt)
-	     {ob = pb->start;
-	      oe = pb->end;
+	     {oe = pb->end;
 
 	      nxt = pb->next;
 
@@ -335,8 +334,8 @@ static SC_mapped_file *_SC_mf_create_file(char *name, int64_t len, int extend,
 
 static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
 				       void (*setup)(SC_mapped_file *mf))
-   {int fd, prot, shar, create, flags;
-    int rw, ro, wo, cr;
+   {int fd, prot, shar, create;
+    int rw, wo, cr;
     int64_t len, off;
     size_t ssz;
     void *p;
@@ -344,12 +343,10 @@ static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
     SC_mapped_file *mf;
 
     rw = O_RDWR;
-    ro = O_RDONLY;
     wo = O_WRONLY;
     cr = O_CREAT;
 
     create = (action & cr);
-    flags  = action - create;
 
     if (create)
        mf = _SC_mf_create_file(name, _SC_mf_initial_length, extend, setup);
@@ -392,7 +389,7 @@ FILE *_SC_mf_open(char *name, char *mode, void (*setup)(SC_mapped_file *mf))
 
 #ifdef HAVE_MMAP
 
-    int action, binary, extend, exists;
+    int action, extend, exists;
     int rw, ro, wo, cr;
     SC_mapped_file *mf;
     
@@ -431,7 +428,6 @@ FILE *_SC_mf_open(char *name, char *mode, void (*setup)(SC_mapped_file *mf))
     wo = O_WRONLY;
     cr = O_CREAT;
 
-    binary = (strchr(mode, 'b') != NULL);
     extend = (strchr(mode, '+') != NULL);
 
     exists = SC_isfile(name);
@@ -525,14 +521,13 @@ static char *_SC_mf_ptr(void *fp)
 
 static void _SC_mf_remap(SC_mapped_file *mf, int64_t ad, int seta)
    {int rv;
-    int64_t pos, sts, stn, len;
+    int64_t sts, stn, len;
     int64_t nbc, nbn, nbp;
     unsigned char *p;
 
     p   = mf->scp;
     nbn = mf->scsizex;
     nbp = mf->page;
-    pos = mf->lcpos;
     len = mf->lclen;
     sts = mf->lcoff;
     nbc = mf->scsize;
@@ -549,7 +544,9 @@ static void _SC_mf_remap(SC_mapped_file *mf, int64_t ad, int seta)
 
 /* unmap the old segment */
 	if (p != NULL)
-	   rv = munmap(p, nbc);
+	   {rv = munmap(p, nbc);
+	    SC_ASSERT(rv == 0);};
+
 	p = NULL;
 
 /* map the next segment */
@@ -596,9 +593,11 @@ static void _SC_mf_unmap(SC_mapped_file *mf)
     mf->scp = NULL;
 
     if (action & O_CREAT)
-       st = truncate(mf->name, len);
+       {st = truncate(mf->name, len);
+	SC_ASSERT(st == 0);};
 
     err = close(mf->fd);
+    SC_ASSERT(err == 0);
 
     return;}
 
@@ -608,7 +607,7 @@ static void _SC_mf_unmap(SC_mapped_file *mf)
 /* _SC_MF_EXTEND - extend a file with mmap */
 
 static void _SC_mf_extend(SC_mapped_file *mf, int64_t nb)
-   {int fd, action, extend;
+   {int fd, extend;
     int64_t pos, ne, ns, np, ln, sz, nsz, pgsz;
     char *name, *p;
     FILE *fp;
@@ -623,12 +622,11 @@ static void _SC_mf_extend(SC_mapped_file *mf, int64_t nb)
     extend = mf->extend;
 
     if ((ne > ln) && extend)
-       {name   = mf->name;
-	fd     = mf->fd;
-	action = mf->perm;
-	p      = mf->scp;
-	sz     = mf->scsizex;
-	pgsz   = mf->page;
+       {name = mf->name;
+	fd   = mf->fd;
+	p    = mf->scp;
+	sz   = mf->scsizex;
+	pgsz = mf->page;
 
 	ns = ne - ln;
 	ns = max(ns, _SC_mf_max_extend);
@@ -1259,13 +1257,12 @@ void SC_mf_set_size(int64_t mnsz, int64_t extsz)
  */
 
 uint64_t _SC_mf_segment_size(FILE *fp, int64_t nsz)
-   {int64_t osz, len, nbp;
+   {int64_t len, nbp;
     uint64_t rv;
     SC_mapped_file *mf;
 
     mf = (SC_mapped_file *) fp;
 
-    osz = mf->scsizex;
     len = mf->lclen;
     nbp = mf->page;
 
@@ -1347,7 +1344,7 @@ SC_file_block *SC_mf_insert(FILE *fp, SC_file_block *nbl, int64_t off)
  */
 
 SC_file_block *SC_mf_delete(FILE *fp, int64_t off, int64_t nb)
-   {int64_t so, sb, se, ab, ae;
+   {int64_t sb, se, ab, ae;
     SC_file_block *pb, *bl, *bld, *bls, *nxt;
     SC_mapped_file *mf;
     file_io_desc *fid;
@@ -1372,7 +1369,6 @@ SC_file_block *SC_mf_delete(FILE *fp, int64_t off, int64_t nb)
     for (pb = bl; pb != NULL; pb = nxt)
         {nxt = pb->next;
 
-	 so = pb->off;
 	 sb = pb->start;
 	 se = pb->end;
 	 if ((ab <= sb) && (se <= ae))
@@ -1699,7 +1695,7 @@ int _SC_mf_flush(FILE *fp)
 
 int _SC_mf_eof(FILE *fp)
    {int rv;
-    int64_t sb, se;
+    int64_t se;
     SC_mapped_file *mf;
     SC_file_block *pb;
 
@@ -1707,8 +1703,7 @@ int _SC_mf_eof(FILE *fp)
     se = 0;
 
     for (pb = mf->map; pb != NULL; pb = pb->next)
-        {sb = pb->start;
-	 se = pb->end;};
+        se = pb->end;
 
     rv = ((mf->scp == NULL) || (mf->lcpos >= se));
 
@@ -1731,6 +1726,7 @@ int _SC_mf_close(FILE *fp)
     _SC_mf_unmap(mf);
 
     err = close(mf->fd);
+    SC_ASSERT(err == 0);
 
     SC_mf_free(mf);
 
@@ -1770,6 +1766,7 @@ FILE *SC_mf_copy(char *name, FILE *fp, int bckup)
 
     nnm = SC_dsnprintf(FALSE, ".sc-mf-XXXXXX");
     st = mkstemp(nnm);
+    SC_ASSERT(st == 0);
 
     ln  = _SC_mf_length(mf);
     nmf = _SC_mf_create_file(nnm, ln, mf->extend, setup);

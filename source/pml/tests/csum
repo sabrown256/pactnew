@@ -61,9 +61,9 @@ source ../../tests/common
    set ETime = `$TIMER -b $UTime`
 
    if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "                    PML Checksum Test ...... OMITTED ($xstatus/$ETime)"
+      NoteD $Log "OMITTED ($xstatus/$ETime)"
    else if ($xstatus != 0) then
-      NoteD $Log "                    PML Checksum Test ...... FAILED ($xstatus/$ETime)"
+      NoteD $Log "FAILED ($xstatus/$ETime)"
       @ Err = 1
    else
       NoteD $Log "PASSED ($ETime)"

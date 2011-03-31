@@ -360,16 +360,19 @@ void _SC_fixup_socket(int s)
 #ifdef SO_SNDBUF
     iv = 65535;
     ok = setsockopt(s, SOL_SOCKET, SO_SNDBUF, &iv, nb);
+    SC_ASSERT(ok == 0);
 #endif
 
 #ifdef SO_RCVBUF
     iv = 65535;
     ok = setsockopt(s, SOL_SOCKET, SO_RCVBUF, &iv, nb);
+    SC_ASSERT(ok == 0);
 #endif
 
 #ifdef SO_SNDLOWAT
     iv = 1;
     ok = setsockopt(s, SOL_SOCKET, SO_SNDLOWAT, &iv, nb);
+    SC_ASSERT(ok == 0);
 #endif
 
 #endif
@@ -1556,13 +1559,11 @@ int SC_init_server(int step, int closep)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    int sasz, ok;
+    int ok;
     
     if (_SC_debug)
        {fprintf(_SC_diag, "   SC_init_server: %d\n", step);
         fflush(_SC_diag);};
-
-    sasz = sizeof(struct sockaddr_in);
 
     rv = -1;
     ok = SC_ERR_TRAP();

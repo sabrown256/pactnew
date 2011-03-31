@@ -451,6 +451,8 @@ static int _PD_id_file(FILE *fp)
 	       PD_error("FSEEK FAILED TO END - _PD_IDENTIFY_FILE", PD_OPEN);
 
 	    nb = lio_read(str, (size_t) 1, (size_t) 32, fp);
+            SC_ASSERT(nb == 32);
+
 	    str[32] = '\0';
 
 	    vers = _PD_identify_version(str);};};
@@ -477,7 +479,8 @@ int _PD_identify_file(PDBfile *file)
 
     vers = _PD_id_file(fp);
     if (vers != -1)
-       ok = _PD_format_version(file, vers);
+       {ok = _PD_format_version(file, vers);
+	SC_ASSERT(ok == TRUE);};
 
     return(vers);}
 

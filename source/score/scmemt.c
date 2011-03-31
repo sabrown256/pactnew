@@ -360,7 +360,7 @@ void *SC_get_thread_element(int it, int ie)
 /* SC_GET_THREAD_ELEMENTS - return an array of elements for thread IT */
 
 void **SC_get_thread_elements(void *a, int *pne, int it, int lck)
-   {int is, ie, ne, nt, nex;
+   {int is, ie, ne, nex;
     void **dst, **src;
 
     dst = NULL;
@@ -373,7 +373,6 @@ void **SC_get_thread_elements(void *a, int *pne, int it, int lck)
           _SC_grow_thread_data(it, -1);
 
        ne  = st.ne;
-       nt  = st.nt;
        nex = st.nex;
        src = st.data;
 

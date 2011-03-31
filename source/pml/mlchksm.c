@@ -487,7 +487,7 @@ void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
 
 void PM_checksum(long *psum, int *prmdr, void *parr, int boff,
 		 int ni, int bpi, int nbts)
-   {int i, l, nf, rmdr, sbi, sbo, ln;
+   {int i, l, nf, rmdr, sbi, ln;
     int ord[64];
     long is, sum, nby, nbi, msk;
     char *in;
@@ -518,7 +518,6 @@ void PM_checksum(long *psum, int *prmdr, void *parr, int boff,
     if (ln > 0)
        {nf  = ln/nbts + 1;
 	sbi = boff + rmdr;
-	sbo = 32 - nbts;
 
 	for (l = 0; l < nf; l++, sbi += nbts, ln -= nbts)
 	    {is += SC_extract_field(in, sbi, min(ln, nbts), bpi, ord);

@@ -955,11 +955,12 @@ pcons *SC_change_alist(pcons *alist, char *name, char *type, void *val)
  */
 
 pcons *SC_alist_map(pcons *alist, int (*fnc)(pcons *hp, void *arg), void *arg)
-   {int status;
+   {int st;
     pcons *ths;
 
     for (ths = alist; ths != NULL; ths = ths->cdr)
-        {status = (*fnc)(ths, arg);};
+        {st = (*fnc)(ths, arg);
+	 SC_ASSERT(st == TRUE);};
 
     return(alist);}
 

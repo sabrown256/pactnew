@@ -271,6 +271,7 @@ static char *_SC_omp_ttyname(int fd, char *name, size_t sz)
    {int rv;
 
     rv = ttyname_r(fd, name, sz);
+    SC_ASSERT(rv == 0);
 
     return(name);}
 

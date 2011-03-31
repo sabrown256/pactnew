@@ -247,7 +247,10 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 	    {pb += strspn(pb, ", \t\n\f");
 	     if (*pb == '\0')
 	        break;
+
 	     l = SC_strtol(pb, &pe, 10);
+	     SC_ASSERT(l >= 0);
+
 	     if (pe == pb)
 	        ok = FALSE;};
         type = SC_LONG_S;};
@@ -260,7 +263,10 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 	    {pb += strspn(pb, ", \t\n\f");
 	     if (*pb == '\0')
 	        break;
+
 	     d = SC_strtod(pb, &pe);
+	     SC_ASSERT(d != 0.0);
+
 	     if (pe == pb)
 	        ok = FALSE;};
         type = SC_DOUBLE_S;};

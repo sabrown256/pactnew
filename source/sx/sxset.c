@@ -249,7 +249,7 @@ void SX_reset_prefix(void)
  */
 
 int _SX_get_input(object *str)
-   {int c, rv;
+   {int rv;
     char *p;
     FILE *fp;
 
@@ -264,8 +264,7 @@ int _SX_get_input(object *str)
     fp = SS_INSTREAM(str);
 
     if (fp == NULL)
-       {c  = EOF;
-	rv = -1;}
+       rv = -1;
 
     else if (fp == stdin)
        {
@@ -288,7 +287,6 @@ int _SX_get_input(object *str)
 	else if ((*p == '\n') || (*p == '\r'))
 	   {if ((SX_autoplot == ON) && (SX_plot_hook != NULL))
 	       SX_plot_hook();
-	    c  = '\n';
 	    rv = -1;};}
 
     else
@@ -296,7 +294,6 @@ int _SX_get_input(object *str)
 
     if (p == NULL)
        {*SS_PTR(str) = (char) EOF;
-	c  = EOF;
 	rv = -1;}
 
     else 

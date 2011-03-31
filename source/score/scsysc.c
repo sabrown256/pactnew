@@ -1104,7 +1104,7 @@ static int _SC_handle_echo(taskdesc *job, asyncstate *as, subtask *sub)
  */
 
 static int _SC_handle_sleep(taskdesc *job, asyncstate *as, subtask *sub)
-   {int na, ns, rv;
+   {int ns, rv;
     double ds;
     char *t, **ta;
     jobinfo *inf;
@@ -1118,7 +1118,6 @@ static int _SC_handle_sleep(taskdesc *job, asyncstate *as, subtask *sub)
 	SC_START_ACTIVITY(state, HANDLE_SLEEP);
 
 	inf = &job->inf;
-	na  = sub->nt;
 	ta  = sub->argf;
 
 	t = ta[1];
@@ -1153,7 +1152,7 @@ static int _SC_handle_sleep(taskdesc *job, asyncstate *as, subtask *sub)
  */
 
 static int _SC_handle_cd(taskdesc *job, asyncstate *as, subtask *sub)
-   {int na, st, rv, ok;
+   {int st, rv, ok;
     char *dir, **ta;
     jobinfo *inf;
     tasklst *tl;
@@ -1168,7 +1167,6 @@ static int _SC_handle_cd(taskdesc *job, asyncstate *as, subtask *sub)
 
 	inf = &job->inf;
 	tl  = job->command;
-	na  = sub->nt;
 	ta  = sub->argf;
 
 	dir = ta[1];
@@ -1274,7 +1272,7 @@ static int _SC_process_lost(PROCESS *pp)
  */
 
 static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
-   {int id, idp, ifd, it, pi, rv;
+   {int idp, ifd, it, pi, rv;
     char *cmd;
     tasklst *tl;
     subtask *sub;
@@ -1292,7 +1290,6 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
 
 	pe  = state->loop;
 	inf = &job->inf;
-	id  = inf->id;
 
 	tl  = job->command;
 	it  = _SC_get_command(tl, 0);
@@ -1312,7 +1309,8 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
 
 		pi = SC_register_event_loop_callback(pe, SC_PROCESS_I, pp,
 						     state->acc, state->rej,
-						     -1);};
+						     -1);
+		SC_ASSERT(pi >= 0);};
 
 	    job->pp = pp;
 
@@ -1361,7 +1359,7 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
  */
 
 static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
-   {int id, st, to;
+   {int st, to;
     char **ca, *icmnd[5];
     jobinfo *inf;
     PROCESS *pp;
@@ -1376,7 +1374,6 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 	SC_START_ACTIVITY(state, COMMAND_EXEC);
 
 	inf = &job->inf;
-	id  = inf->id;
 	fd  = sub->fd;
 
 	if (sub->need == FALSE)
@@ -1430,19 +1427,16 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
  */
 
 static int _SC_do_command(taskdesc *job, asyncstate *as, int it)
-   {int nt, rv, st, done, fl;
+   {int rv, st, done, fl;
     char *t, **ta;
     tasklst *tl;
     subtask *sub;
-    jobinfo *inf;
 
     st = TRUE;
 
     if (job != NULL)
        {tl  = job->command;
-	inf = &job->inf;
 	sub = tl->tasks + it;
-	nt  = sub->nt;
 	ta  = sub->argf;
 
 /* initialize the zero read count for each new task */
@@ -1465,7 +1459,8 @@ static int _SC_do_command(taskdesc *job, asyncstate *as, int it)
 
 /* anything else is a command that must be exec'd one way or the other */
 	else
-	   {rv   = _SC_cmnd_exec(job, as, sub);
+	   {rv = _SC_cmnd_exec(job, as, sub);
+	    SC_ASSERT(rv == 0);
 	    done = FALSE;};
 
 	_SC_incr_task_count(job, 1, done);
@@ -1657,11 +1652,10 @@ static int _SC_task_retry_p(taskdesc *job, subtask *sub,
  */
 
 static int _SC_task_done(taskdesc *job, int setst)
-   {int id, it, rv, sts, sgn;
+   {int it, rv, sts, sgn;
     PROCESS *pp;
     tasklst *tl;
     subtask *sub;
-    jobinfo *inf;
     PFFileCallback acc;
     parstate *state;
 
@@ -1679,8 +1673,6 @@ static int _SC_task_done(taskdesc *job, int setst)
  */
 	if (tl->nl > tl->nc)
 	   {pp  = job->pp;
-	    inf = &job->inf;
-	    id  = inf->id;
 
 	    it  = _SC_get_command(tl, 1);
 	    sub = tl->tasks + it;
@@ -1822,23 +1814,19 @@ static void _SC_state_check_process(taskdesc *job, asyncstate *as,
  */
 
 static int _SC_launch_job(taskdesc *job, asyncstate *as)
-   {int id, rv, more;
-    char *cm, *sh, *dr, *hs, *cmc;
+   {int rv, more;
+    char *cm, *dr, *hs, *cmc;
     jobinfo *inf;
     PROCESS *pp;
-    parstate *state;
 
     rv = FALSE;
 
     if (job != NULL)
-       {hs    = job->host;
-	inf   = &job->inf;
-	state = job->context;
+       {hs  = job->host;
+	inf = &job->inf;
 
-	sh = inf->shell;
 	dr = inf->directory;
 	cm = inf->full;
-	id = inf->id;
 
 	_SC_setup_output(inf, "_SC_LAUNCH_JOB");
 
@@ -1886,7 +1874,7 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
  */
 
 static int _SC_fin_job(taskdesc *job, asyncstate *as, int srv)
-   {int pid, sts, rtry;
+   {int pid, rtry;
     char *p, **out;
     jobinfo *inf;
     parstate *state;
@@ -1907,10 +1895,9 @@ static int _SC_fin_job(taskdesc *job, asyncstate *as, int srv)
 
 	rtry = job->close(job, TRUE);
 	if (rtry == FALSE)
-	   {sts = inf->status;
-
-	    if (srv == FALSE)
-	       p = _SC_show_command(as, inf->full, state->show);
+	   {if (srv == FALSE)
+	       {p = _SC_show_command(as, inf->full, state->show);
+		SC_ASSERT(p != NULL);};
 
 /* print job output thru filter */
 	    if (SC_array_get_n(inf->out) == 0L)

@@ -131,13 +131,12 @@ static void _PM_cg_lapl(solver_method *sv, PM_matrix *n_map)
    {int n, j, i, k, na, nd, nt, nh, ni, in, itmx;
     int strategy;
     double tol, itol;
-    double **x, **b, *pxi, *pxo;
+    double **x, *pxi, *pxo;
     PM_sp_lin_sys *axb;
    
     nd       = sv->nd;
     na       = sv->n_rhs;
     x        = sv->x;
-    b        = sv->b;
     axb      = sv->axb;
     strategy = sv->strategy;
 
@@ -324,7 +323,7 @@ static void _PM_rl_lin_sys(solver_method *sv)
 
 static PM_matrix *_PM_fill_map(double *nodet, int *unm, int *str,
 			       int n0, int nd, int *lmt)
-   {int m, j, i, l, n, nt, nh;
+   {int m, j, i, l, n, nt;
     int imx, jmx;
     PM_matrix *n_map;
 
@@ -332,7 +331,6 @@ static PM_matrix *_PM_fill_map(double *nodet, int *unm, int *str,
     jmx = lmt[1];
 
     nt = PM_ipow(3, nd);
-    nh = nt >> 1;
 
     n_map = PM_create(n0, nt);
 
@@ -506,19 +504,14 @@ static void _PM_copy_sol(PM_matrix *xo, PM_matrix *xn,
 static void _PM_load_lin_sys(solver_method *sv,
 			     int i, PM_matrix *n_map,
 			     int n, double *av, int *unm, int *str)
-   {int j, k, l, m, na, nd, nh;
+   {int j, k, l, m, na;
     double **x, **b;
-    PM_matrix *lapl;
     void (*a)(solver_method *sv, int i, int j, double v);
 
-    na   = sv->n_rhs;
-    nd   = sv->nd;
-    lapl = sv->lapl;
-    b    = sv->b;
-    x    = sv->x;
-    a    = sv->set;
-
-    nh = n >> 1;
+    na = sv->n_rhs;
+    b  = sv->b;
+    x  = sv->x;
+    a  = sv->set;
 
     for (k = 0; k < na; k++)
         b[k][i] = 0.0;
@@ -633,11 +626,10 @@ static void _PM_compute_a_bnd(double as, double xs, double ae, double xe,
 			      double *v, int *lmt,
 			      int kmn, int kmx, int lmn, int lmx)
    {int i, j, n, nt, sdk, sdl;
-    int kbnd, lbnd;
+    int kbnd;
     double ps, pe, dk, dl;
 
     kbnd = lmt[0];
-    lbnd = lmt[0];
 
     if (as < 0.0)
        {ps  = -1.0;
@@ -821,7 +813,7 @@ static void _PM_fill_lapl_opa(solver_method *sv, int *lmt,
 			      PM_matrix *n_map, int *unm, int *str,
 			      double ts, double krc, double lrc,
 			      int crf, double theta)
-   {int i, j, n, kbnd, lbnd;
+   {int i, j, n, kbnd;
     int nd, nt, nh;
     double alpha, beta;
     double s1, s2, s3, s4, sr, sl, sb, st;
@@ -841,7 +833,6 @@ static void _PM_fill_lapl_opa(solver_method *sv, int *lmt,
     beta  /= pnt;
 
     kbnd = lmt[0];
-    lbnd = lmt[1];
 
     n  = n_map->nrow;
     nt = PM_ipow(3, nd);

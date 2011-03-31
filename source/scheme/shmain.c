@@ -39,7 +39,7 @@ static void usage(void)
 /* MAIN - a fairly vanilla place to start up a Scheme */
 
 int main(int c, char **v, char **env)
-   {int i, ok, lsch, ret;
+   {int i, lsch, ret;
     int rfl, cfl, qfl, trerr;
     char *cmnd;
 
@@ -60,7 +60,7 @@ int main(int c, char **v, char **env)
 /* initialize the available syntax modes */
     DEF_SYNTAX_MODES();
 
-    ok = SS_define_argv("scheme", c, v);
+    SS_define_argv("scheme", c, v);
 
     cmnd  = NULL;
     qfl   = FALSE;

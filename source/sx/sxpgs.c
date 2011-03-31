@@ -1843,7 +1843,7 @@ static object *_SXI_draw_image(object *argl)
 /* SX_SET_ATTR_ALIST - set an attribute on an alist */
 
 pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
-   {int id, sid, did;
+   {int id, sid;
     void *v;
     object *obj;
     C_array *arr;
@@ -1870,7 +1870,6 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
 	strcpy(stype, arr->type);
 	SC_dereference(dtype);
 	SC_dereference(stype);
-	did = SC_type_id(dtype, FALSE);
 	sid = SC_type_id(stype, FALSE);
 
 	v = SC_convert_id(sid, NULL, 0, 1,

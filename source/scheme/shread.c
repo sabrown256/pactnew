@@ -167,7 +167,7 @@ static object *_SSI_rd_chr(object *arg)
  */
 
 static int _SS_intstrp(char *s, int64_t *piv)
-   {int rv, sgn, rdx, ext, c;
+   {int rv, sgn, rdx, c;
     int64_t iv;
     char *pt;
 
@@ -188,7 +188,6 @@ static int _SS_intstrp(char *s, int64_t *piv)
     else
        {sgn = 1;
         rdx = 10;
-	ext = TRUE;
 	pt  = s;
 
 /* check for sign */
@@ -224,12 +223,10 @@ static int _SS_intstrp(char *s, int64_t *piv)
 		     c   = *++pt;
                      break;
 	        case 'e' :
-                     ext = TRUE;
-		     c   = *++pt;
+		     c = *++pt;
                      break;
 	        case 'i' :
-                     ext = FALSE;
-		     c   = *++pt;
+		     c = *++pt;
                      break;
 	        default :
                      *piv = iv;

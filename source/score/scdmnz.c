@@ -268,7 +268,7 @@ static void show_help(void)
 int main(int c, char **v)
    {int i, ia, na;
     int ti, tc, tr, rv;
-    char **cmnd, *prog, *lf;
+    char **cmnd, *lf;
 
     rv = 0;
     ti = 60;
@@ -323,7 +323,6 @@ int main(int c, char **v)
        fp = stdout;
 
     cmnd = v + i;
-    prog = cmnd[0];
 
     SC_signal(SIGINT, interrupt_handler);
     SC_signal(SIGUSR1, report_handler);

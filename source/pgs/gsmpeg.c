@@ -5196,7 +5196,6 @@ int in_total;
 int out_total;
 uint8 *inptr;
 uint8 *outptr;
-uint8 pointA,pointB;
 /* double slope,diff; */
 
  for(i=0;i<in_y;i++){     /* For every row */
@@ -5218,18 +5217,8 @@ uint8 pointA,pointB;
 	inptr--;
       }
     } else {  
-      pointA = *inptr;
       inptr++;
-      pointB = *inptr;
       inptr--;
-/*Interpolative solution */
-/*      slope = ((double)(pointB -pointA))/((double)(out_x));
-      diff = (((double)(out_total - in_total)));
-      if(diff < (out_x/2)){
-      *outptr = (pointA + (uint8)(slope*diff));
-    } else {
-      *outptr = (pointB - (uint8)(slope*(((float)(out_x)) - diff)));
-    } */
 /* Non-Interpolative solution */
     *outptr = *inptr;  
 
@@ -5267,7 +5256,6 @@ int i,j,k;
 int in_total;
 int out_total;
 uint8 pointA,pointB;
-double slope,diff;
 
  for(i=0;i<in_x;i++){    /* for each column */
   in_total = 0;
@@ -5293,11 +5281,7 @@ double slope,diff;
       } else {
       pointB = pointA;
       }
-/* Interpolative case */
-      slope = ((double)(pointB -pointA))/(double)(out_y);
-      diff = (double)(out_total - in_total);
-/*      outarray[j][i] = (inarray[k][i] + (uint8)(slope*diff));
-*/
+
 /* Non-Interpolative case */
     outarray[j][i] = inarray[k][i];
       out_total=out_total+in_y;
@@ -6047,8 +6031,8 @@ void
 ComputeFrameTable()
 {
     register int index;
-    FrameTable	*lastI, *lastIP, *firstB, *secondIP;
-    FrameTable	*ptr;
+    FrameTable *lastIP, *firstB, *secondIP;
+    FrameTable *ptr;
     char typ;
     int table_size;
 
@@ -6061,7 +6045,6 @@ ComputeFrameTable()
     frameTable = MAKE_N(FrameTable, 1 + table_size);
     ERRCHK(frameTable, "malloc");
 
-    lastI = NULL;
     lastIP = NULL;
     firstB = NULL;
     secondIP = NULL;
@@ -12235,7 +12218,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 		    FILE *ofp, char *outputFileName)
    {
     int i, firstFrame, lastFrame, inputFrameBits;
-    int32 bitstreamMode, res;
+    int32 bitstreamMode;
     long numBits;
     char inputFileName[1024], frameType;
     boolean firstFrameDone;
@@ -12414,7 +12397,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 /* rate control initialization  */
     bitstreamMode = getRateMode();
     if (bitstreamMode == FIXED_RATE)
-       {res = initRateControl();
+       {initRateControl();
 
 /*        SetFrameRate();        */
        };
@@ -21476,7 +21459,6 @@ FILE *fp;
 /* Version 1 */
 void Parse_Specifics_File_v1(FILE *fp)
    {int fnum,snum, bnum, qs, newqs;
-    int num_scanned;
     char line[1024], *lp;
     char typ; 
     FrameSpecList *current, *new;
@@ -21515,7 +21497,7 @@ void Parse_Specifics_File_v1(FILE *fp)
 		 break;
 	    case 'B':
 		 lp += 6;
-		 num_scanned = sscanf(lp, "%d %d", &bnum, &newqs);
+		 sscanf(lp, "%d %d", &bnum, &newqs);
 		 if (qs == newqs) break;
 		 qs = newqs;
 		 AddBs(current, bnum, FALSE, qs);

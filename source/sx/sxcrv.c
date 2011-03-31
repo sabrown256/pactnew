@@ -531,7 +531,9 @@ object *SX_re_id(void)
         {if (SX_data_index[j] != -1)
 	    {id[0] = 'A' + i;
              if (j != i)
-	        obj = SX_set_crv_id(j, id);
+	        {obj = SX_set_crv_id(j, id);
+		 SC_ASSERT(obj != NULL);};
+
              i++;};}
 
     return(SS_f);}

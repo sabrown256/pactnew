@@ -654,6 +654,7 @@ void _PP_cleanup_defstrs(PDBfile *fp)
     int err;
     
     err = SC_hasharr_foreach(_PP_defstr_tab, _PP_clr_defstr, fp);
+    SC_ASSERT(err == TRUE);
 
     /* XXX - test err? */
 }

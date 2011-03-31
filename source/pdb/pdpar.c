@@ -105,7 +105,7 @@ static void _PD_pfm_init_t(void)
 /* _PD_PFM_ADD_FILE_T - add a file to the list of managed files */
 
 static void _PD_pfm_add_file_t(PDBfile *file, int64_t start_addr)
-   {int i, id, ins;
+   {int i, ins;
     pfmanager *pm;
     PD_Pfile *pf;
 
@@ -129,7 +129,7 @@ static void _PD_pfm_add_file_t(PDBfile *file, int64_t start_addr)
 	_PD_pfman[ins].available = FALSE;
 	_PD_pfman[ins].addr      = start_addr;
 
-	id = pf->id = ins;
+	pf->id = ins;
 
 	SC_LOCKOFF(pfmanager_lock_t);};
 

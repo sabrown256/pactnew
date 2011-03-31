@@ -92,6 +92,7 @@ void *_SC_alloc_guarded(size_t nb)
 		 *pl = nb;
 
 		 err = mprotect(pc, _SC.page_size, PROT_NONE);
+		 SC_ASSERT(err == 0);
 
 		 _SC.start = pc + na;
 		 pr    = pc + no;};};};};
@@ -133,8 +134,10 @@ void _SC_free_guarded(void *p)
 
 	pc -= no;
 	err = mprotect(pc, _SC.page_size, PROT_READ);
+	SC_ASSERT(err == 0);
 
-	err = munmap(pc, na);};
+	err = munmap(pc, na);
+	SC_ASSERT(err == 0);};
 
     if (SC_n_threads != -1)
        SC_LOCKOFF(SC_mmf_lock);
@@ -165,7 +168,8 @@ void *_SC_realloc_guarded(void *p, size_t nb)
 	s   = pc;
 	pc -= no;
 
-	err = mprotect(pc, _SC.page_size, PROT_READ);};
+	err = mprotect(pc, _SC.page_size, PROT_READ);
+	SC_ASSERT(err == 0);};
 
     t = _SC_alloc_guarded(nb);
 

@@ -925,6 +925,7 @@ int PP_rl_type_entry(haelem *hp, void *a)
     PP_type_entry *entry;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &entry);
+    SC_ASSERT(ok == TRUE);
 
     n = SC_mark(entry, 0);
     if (n < 2) {
@@ -1018,6 +1019,8 @@ int _PP_rl_class_descr(haelem *hp, void *a)
     PP_class_descr *cdescr;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &cdescr);
+    SC_ASSERT(ok == TRUE);
+
     n = SC_mark(cdescr, 0);
     if (n < 2) {
         SFREE(cdescr->type);
@@ -1991,7 +1994,7 @@ static int _PP_get_sequence_descr(PP_file *fileinfo, PyObject *obj, int nd,  PP_
 
 PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
 {
-    int i, rv, nd, nindir, regular;
+    int i, rv, nd, nindir;
     long ind[3*MAXDIM];
     PP_descr *descr;
     PP_type_entry *entry;
@@ -2014,7 +2017,6 @@ PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
                           obj->ob_type->tp_name);
         descr = NULL;
     } else {
-        regular = TRUE;
         for (i = 0; i < MAXDIM; i++) {
             seqinfo.dims[i] = 0;
         }
@@ -2386,6 +2388,8 @@ int _PP_decref_object(haelem *hp, void *a)
     PyObject *obj;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &obj);
+    SC_ASSERT(ok == TRUE);
+
     Py_DECREF(obj);
 
     return(TRUE);

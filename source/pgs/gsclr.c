@@ -1854,7 +1854,7 @@ void PG_show_colormap(char *type, int wbck)
 /* PG_DUMP_COLORMAP - dump the colormap for the given device */
 
 void PG_dump_colormap(char *type, char *file)
-   {int k, ntc, nc, nbw, nsp, nrb;
+   {int k, ntc, nc, nbw, nsp;
     double r, g, b;
     PG_palette *root_pal;
     RGB_color_map *cm;
@@ -1875,7 +1875,6 @@ void PG_dump_colormap(char *type, char *file)
 /* build up the device color table */
 	nbw = 0.5*nc;
 	nsp = nc;
-	nrb = 1.3125*nc;
 
 	PRINT(fp, "            Red     Green    Blue\n");
 	for (k = 0; k < ntc; k++)
@@ -2298,7 +2297,7 @@ static int _PG_add_selected_color(PG_device *dev, double *h,
 
 static void _PG_select_colors(PG_device *dev, PG_palette *npal,
                               int nc, int *ncl, RGB_color_map *cm)
-   {int ndims, btn, mod, ipc, npc, ic;
+   {int btn, mod, ipc, npc, ic;
     int reset, row, col;
     int ix[PG_SPACEDM];
     double dx[PG_SPACEDM], dxw[PG_SPACEDM], dxb[PG_SPACEDM];
@@ -2308,8 +2307,6 @@ static void _PG_select_colors(PG_device *dev, PG_palette *npal,
     npc = npal->n_pal_colors;
     pcm = npal->true_colormap + 2;
     ipc = 0;
-
-    ndims = (ncl[1] > 1) ? 2 : 1;
 
     bx[0] = 0.1;
     bx[1] = 0.9;

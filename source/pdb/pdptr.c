@@ -494,7 +494,10 @@ static int _PD_ptr_register(haelem *hp, void *a)
     SC_array *ap;
 
     file = (PDBfile *) a;
-    ok   = SC_haelem_data(hp, &name, NULL, (void **) &ep);
+
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &ep);
+    SC_ASSERT(ok == TRUE);
+
     if ((file != NULL) && (ep != NULL))
        {nc = strlen(file->ptr_base);
 	if (strncmp(name, file->ptr_base, nc) == 0) 
@@ -959,11 +962,13 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
 	frst = FALSE;}
 
     else if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       i = _PD_ptr_read_push(file, vr, pi, &frst);
+       {i = _PD_ptr_read_push(file, vr, pi, &frst);
+	SC_ASSERT(i > 0);}
 
     else
        {frst = TRUE;
-	p    = _PD_ptr_alloc_space(file, vr, pi, TRUE);};
+	p    = _PD_ptr_alloc_space(file, vr, pi, TRUE);
+	SC_ASSERT(p != NULL);};
 
     return(frst);}
 

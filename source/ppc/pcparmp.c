@@ -38,7 +38,8 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
     if (strcmp(tok, "HOST") == 0)
        {u = SC_strtok(NULL, ",\n", s);
         strcpy(srvr, t);
-	port = SC_stoi(SC_strtok(NULL, ",\n", s));
+	u    = SC_strtok(NULL, ",\n", s);
+	port = SC_stoi(u);
         argv[argc] = NULL;};
 
     pp = PC_mk_process(argv, "rb+", SC_CHILD);

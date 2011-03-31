@@ -332,7 +332,7 @@ static PM_matrix *_PM_fill_map(int id, int side, int nd,
 
 static void _PM_fill_unknown_templ(int *unt, int *str,
                                    int nd, int id, int side)
-   {int i, j, k, l, m, nn;
+   {int i, j, k, l, nn;
     int imn, imx, jmn, jmx, kmn, kmx;
     int din, djn;
 
@@ -374,7 +374,6 @@ static void _PM_fill_unknown_templ(int *unt, int *str,
     for (i = 0; i < nn; i++)
         unt[i] = 1;
 
-    m = 0;
     for (k = kmn; k <= kmx; k++)
         for (j = jmn; j <= jmx; j++)
             for (i = imn; i <= imx; i++)
@@ -930,11 +929,9 @@ void PM_mesh_exwk(double *y, int id, int side, int nd,
 
 static void _PM_mesh_extr_1d(double *x, int *smn, int *smx, int *mn, int *mx,
                              int ng, int side)
-   {int ig, im, in, nn;
+   {int ig, im, in;
     int ic, i0, i1, i2;
     double r1, r2, r3;
-
-    nn = mx[0] - mn[0] + 1;
 
 /* extrapolate one layer at a time */
     for (ig = 0; ig < ng; ig++)

@@ -590,12 +590,10 @@ static void *_SC_do_new_thread(void *x)
  */
 
 static void _SC_do_new_threads(int n, thread_work *tw)
-   {int i, j, k, nt, nx, ok, id;
+   {int i, j, k, nt, nx, ok;
     void *(*f)(void *a);
     void *a, **r;
     emu_thread_info *ti;
-
-    id = SC_current_thread();
 
     nx = 0;
     for (i = 0; i < n; i++)
@@ -679,16 +677,14 @@ static void _SC_tw_which_item(thread_pool *tp, thread_work **ptw, int *pj)
  */
 
 static void _SC_do_pool_thread(void *x)
-   {int j, t, id;
+   {int j;
     void *a, **r;
     PFPVoidAPV f;
     thread_work *tw;
     thread_pool *tp;
 
-    id = SC_current_thread();
     tp = &_SC_tp;
 
-    t = *(int *) x;
     SC_SET_KEY(int, SC_thread_oper->ikey, x);
 
     while (TRUE)

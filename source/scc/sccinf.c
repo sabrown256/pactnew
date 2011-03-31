@@ -172,6 +172,7 @@ int CC_lookup_identifier_c(char *txt, expr **lval)
 
     *lval = CC_f;
     pd    = _CC.cur;
+    SC_ASSERT(pd != NULL);
 
     e = (expr *) SC_hasharr_def_lookup(_CC.types, txt);
     if (e != NULL)
@@ -656,6 +657,7 @@ expr *_CC_mem_decl(expr *t, expr *v)
    {decl *pd;
 
     pd = _CC.cur;
+    SC_ASSERT(pd != NULL);
 
     v->cat = CC_MEMBER;
 
@@ -799,6 +801,7 @@ static int _CC_dep_local(haelem *hp, void *a)
     decl *pd;
 
     ok = SC_haelem_data(hp, &name, NULL, (void **) &v);
+    SC_ASSERT(ok == TRUE);
 
     dl = _CC.cur->dep;
     nd = _CC.nd;
@@ -856,7 +859,7 @@ static void _CC_sort_dep(decl *dc)
 /* _CC_DEP_OBJS - make an ordered list of objects on which DC depends */
 
 static void _CC_dep_objs(decl *dc)
-   {int id, il, jl, nd, nl;
+   {int id, il, jl, nl;
     int *dl, *pl;
     char *tr;
     decl *pr;
@@ -867,8 +870,6 @@ static void _CC_dep_objs(decl *dc)
         dl[il] = -1;
 
     dc->dep = dl;
-
-    nd = _CC.nd;
 
     SC_hasharr_foreach(dc->refobjs, _CC_dep_local, NULL);
 

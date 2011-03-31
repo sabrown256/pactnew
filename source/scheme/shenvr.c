@@ -17,9 +17,11 @@
     _t = SS_GET(hasharr, SS_cadr(_l));                                      \
     _n = NULL;                                                              \
     if (SS_variablep(_v))                                                   \
-       _n = SS_VARIABLE_NAME(_v);                                           \
+       {_n = SS_VARIABLE_NAME(_v);                                          \
+        SC_ASSERT(_n != NULL);}                                             \
     else if (SS_stringp(_v))                                                \
-       _n = SS_STRING_TEXT(_v);}
+       {_n = SS_STRING_TEXT(_v);                                            \
+        SC_ASSERT(_n != NULL);};}
 
 typedef object *(*PFZargs)(void);
 typedef object *(*PFSargs)(object *argl);
@@ -49,6 +51,8 @@ void dproc(object *pp)
 	params = SS_params(pp);
 	penv   = SS_proc_env(pp);
 	bdy    = SS_proc_body(pp);
+
+	SC_ASSERT(penv != NULL);
 
 	SS_print(name,   "Name: ", "\n", SS_outdev);
 	SS_print(params, "Params: ", "\n", SS_outdev);
@@ -353,6 +357,7 @@ static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
 	snprintf(s, nc, "%s=%s", vr+1, t);
 
 	ok = SC_putenv(s);
+	SC_ASSERT(ok == TRUE);
 
 	SFREE(s);
 	SFREE(t);};
@@ -750,7 +755,6 @@ object *SS_lk_var_val(object *vr, object *penv)
 char *_SS_get_print_name(object *o)
    {char *s, *rv;
     procedure *pp;
-    S_procedure *sp;
 
     rv = NULL;
     s  = NULL;
@@ -758,7 +762,6 @@ char *_SS_get_print_name(object *o)
     if (o != NULL)
        {if (SS_procedurep(o))
 	   {pp = SS_GET(procedure, o);
-	    sp = SS_COMPOUND_PROCEDURE(o);
 	    switch (pp->type)
 	       {case SS_MACRO :
 		case SS_PROC  :

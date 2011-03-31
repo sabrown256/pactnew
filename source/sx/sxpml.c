@@ -56,7 +56,7 @@ static object *_SXI_setp(object *obj)
  */
 
 static object *_SXI_mk_array(object *argl)
-   {long size, bpi;
+   {long size;
     char *type;
     C_array *arr;
     object *rv;
@@ -76,7 +76,6 @@ static object *_SXI_mk_array(object *argl)
 	if (dp != NULL)
 	   type = dp->type;
 
-	bpi = _PD_lookup_size(type, SX_vif->host_chart);
 	arr = PM_make_array(type, size, NULL);
 
 	rv = SX_mk_C_array(arr);};

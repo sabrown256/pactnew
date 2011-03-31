@@ -1496,6 +1496,7 @@ static int _SC_rexit(haelem *hp, void *a)
     PROCESS *pp;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &pp);
+    SC_ASSERT(ok == TRUE);
 
     ret = TRUE;
 

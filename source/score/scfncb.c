@@ -168,11 +168,10 @@ int SC_free_mem(double *mem)
 #ifdef UNIX
 
     int st;
-    char **res, *cmd;
+    char **res;
 
     st  = 1;
     res = NULL;
-    cmd = NULL;
 
     mem[0] = mem[1] = 0.0;
 
@@ -197,6 +196,8 @@ int SC_free_mem(double *mem)
      io_close(fp);}
 
 #elif defined(AIX)
+    char *cmd;
+
     cmd = "(vmstat -vs | awk '/free pages/ {print $1} /memory pages/ {print $1}')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
@@ -204,6 +205,7 @@ int SC_free_mem(double *mem)
 	mem[1] = 4096.0*SC_stof(res[1]);};
 
 #elif defined(OSF)
+    char *cmd;
 
 /* NOTE: on OSF the result from top can take at least two forms:
  *  Memory: Real: #/# act/tot  Virtual: #/# use/tot  Free: #
@@ -217,6 +219,8 @@ int SC_free_mem(double *mem)
 	mem[1] = _SC_mem_real(res[0], 9, " \t\n\r");};
 
 #elif defined(SGI)
+    char *cmd;
+
     cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
@@ -224,6 +228,8 @@ int SC_free_mem(double *mem)
 	mem[1] = _SC_mem_real(res[0], 6, " \t\n\r");};
 
 #elif defined(FREEBSD)
+    char *cmd;
+
     cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Mem/) { print }')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
@@ -232,6 +238,8 @@ int SC_free_mem(double *mem)
 	mem[0] += mem[1];};
 
 #elif defined(SOLARIS)
+    char *cmd;
+
     cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
     st  = SC_exec(&res, cmd, NULL, -1);
     if (st == 0)
@@ -418,14 +426,8 @@ int SC_get_ncpu(void)
 
 int SC_get_pname(char *path, int nc, int pid)
    {int rv, st;
-    char *cmd, *p, *t;
+    char *p, *t;
     SC_rusedes ru;
-
-#if defined(MACOSX)
-    cmd = "ps -eo pid,command";
-#else
-    cmd = "ps -eo pid,args";
-#endif
 
     if (pid < 0)
        pid = getpid();
@@ -441,7 +443,13 @@ int SC_get_pname(char *path, int nc, int pid)
 	 SFREE(s);};};
 #else
     {int i, tid;
-     char *s, **out;
+     char *cmd, *s, **out;
+
+#if defined(MACOSX)
+     cmd = "ps -eo pid,command";
+#else
+     cmd = "ps -eo pid,args";
+#endif
 
      rv = -1;
      st = SC_exec(&out, cmd, NULL, -1);

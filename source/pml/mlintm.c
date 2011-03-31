@@ -64,7 +64,7 @@ static INLINE double DISTANCE(double **a, int ia, double **b,
 
 static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
 				    double *prm)
-   {int id, dnde, snde, snd, sne, dne;
+   {int id, dnde, snde, snd;
     int lc, tc;
     int *ddix, *sdix, *ta;
     char *sty, *dty;
@@ -76,13 +76,11 @@ static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
     snd  = sd->dimension;
     snde = sd->dimension_elem;
     sdix = sd->max_index;
-    sne  = sd->n_elements;
     sty  = sd->es_type;
     PM_array_real(sty, sd->scales, snde, ssc);
 
-    dnde  = dd->dimension_elem;
+    dnde = dd->dimension_elem;
     ddix = dd->max_index;
-    dne  = dd->n_elements;
     dty  = dd->es_type;
     PM_array_real(dty, dd->scales, dnde, dsc);
 
@@ -274,6 +272,8 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
 	    {ist = ism;
 	     dc  = dm;};
 #if 1
+	 SC_ASSERT(dc != 0.0);
+
 	 for (j = 0; j < snde; j++)
 	     ds[j] = (sde[j][ist] - sde[j][is]);
 #else
@@ -602,12 +602,10 @@ static INLINE void MASK(double *d)
  */
 
 static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
-   {int i, j, id, rv;
+   {int i, j, id;
     double dx[2], dc;
     double *xc, *coef;
     PM_matrix *a, *b;
-
-    rv = TRUE;
 
     a = PM_create(n, n);
     b = PM_create(n, 1);

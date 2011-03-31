@@ -608,7 +608,7 @@ void PD_typedef_primitive_types(PDBfile *file)
  */
 
 defstr *_PD_type_container(PDBfile *file, defstr *dp)
-   {int i, n, id, bpi, ipt;
+   {int i, n, id, ipt;
     long size;
     char *type;
     defstr *ndp;
@@ -643,7 +643,6 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
     else if ((dp->fp.format == NULL) && (dp->fix.order != NO_ORDER))
        id = SC_type_container_size(KIND_INT, size);
 
-    bpi  = SC_type_size_i(id);
     type = SC_type_name(id);
     ndp  = PD_inquire_host_type(file, type);
 

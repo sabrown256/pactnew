@@ -177,6 +177,7 @@ int PD_gather_as(PDBfile *file, char *name, char *type,
 	tv  = FMAKE_N(char, ni*bpi, "PD_GATHER_AS:tv");
 
 	nr = PD_read_as_alt(file, name, type, tv, sind);
+	SC_ASSERT(nr > 0);
 
 	ng = _PD_hyper_scatter((char *) vr, 0, ndst, dind, (char *) tv, bpi, mo);
 
@@ -238,6 +239,7 @@ int PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
 	tv  = FMAKE_N(char, ni*bpi, "PD_SCATTER_AS:tv");
 
 	ng = _PD_hyper_gather((char *) tv, (char *) vr, 0, nsrc, sind, bpi, mo);
+	SC_ASSERT(ng == TRUE);
 
 	ret = PD_write_as_alt(file, name, intype, outtype, tv, ndst, dind);
 

@@ -848,6 +848,7 @@ static object *_SSI_describe(object *argl)
        SS_error("LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
 
     ok = SS_prim_des(strm, obj);
+    SC_ASSERT(ok == TRUE);
 /*
     if (ok == FALSE)
        SS_error("DESCRIPTIONS ONLY AVAIBLE FOR PROCEDURES", obj);
@@ -955,8 +956,10 @@ int SS_prim_apr(FILE *str, char *s)
 
     penv = SS_Env;
     for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
-        {l   = SS_car(penv);
-	 v   = SS_car(l);
+        {l = SS_car(penv);
+	 v = SS_car(l);
+	 SC_ASSERT(v != NULL);
+
 	 tab = SS_GET(hasharr, SS_cadr(l));
 	 flag |= _SS_prim_apr(str, s, tab);};
 

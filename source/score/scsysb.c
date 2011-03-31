@@ -446,7 +446,7 @@ int _SC_server_heartbeat(int *prv, void *a)
 
 static int _SC_server_env(parstate *state, char *t)
    {int rv, st;
-    char *p, *var, *val, *evl, *nvl, *ex;
+    char *p, *var, *evl, *nvl, *ex;
     asyncstate *as;
 
     SC_START_ACTIVITY(state, SERVER_ENV);
@@ -464,7 +464,7 @@ static int _SC_server_env(parstate *state, char *t)
 	nvl = SC_strsavef(ex, "_SC_SERVER_ENV:nvl");
 	    
 	var = SC_strtok(ex, " =", p);
-	val = SC_strtok(NULL, "\n", p);
+	SC_strtok(NULL, "\n", p);
 	evl = (var != NULL) ? getenv(var) : NULL;
 	if ((evl == NULL) ||
 	    (strcmp(var, "PATH") == 0) ||
@@ -488,7 +488,7 @@ static int _SC_server_env(parstate *state, char *t)
  */
 
 static void _SC_server_command(parstate *state, char *t)
-   {int i, n, jid, rtry;
+   {int i, n, jid;
     char *p, *r;
     taskdesc *job;
     jobinfo *inf;
@@ -512,7 +512,7 @@ static void _SC_server_command(parstate *state, char *t)
 	        {inf = &job->inf;
 		 if (inf->id == jid)
 		    {if (state->finish != NULL)
-		        rtry = state->finish(job, _SC_EXEC_KILLED);
+		        state->finish(job, _SC_EXEC_KILLED);
 		     break;};};};}
 
 /* handle a show log request */
@@ -542,7 +542,7 @@ static void _SC_server_command(parstate *state, char *t)
  */
 
 static void _SC_server_job(parstate *state, char *t)
-   {int more, jid;
+   {int jid;
     char tag[MAXLINE];
     char *shell, *dir, *cmd, *p;
     taskdesc *job;
@@ -586,7 +586,7 @@ static void _SC_server_job(parstate *state, char *t)
 
 	    _SC_chg_dir(dir, &inf->directory);
 
-	    more = job->exec(job, FALSE);};};
+	    job->exec(job, FALSE);};};
 
     SC_END_ACTIVITY(state);
 
@@ -658,7 +658,6 @@ static void _SC_server_input(int fd, int mask, void *a)
 
 static void _SC_server_in_reject(int fd, int mask, void *a)
    {int i, n, nzp;
-    int err, hup, nvl;
     parstate *state;
     asyncstate *as;
     PROCESS *pp;
@@ -677,11 +676,7 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
 	        {if (pp->in == fd)
-		    {err = ((mask & POLLERR)  != 0);
-		     hup = ((mask & POLLHUP)  != 0);
-		     nvl = ((mask & POLLNVAL) != 0);
-
-		     _SC_exec_printf(as,
+		    {_SC_exec_printf(as,
 				     "_SC_SERVER_IN_REJECT: error\n");
 
 		     nzp = job->nzip++;
@@ -750,6 +745,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
 					 _SC_server_input,
 					 _SC_server_in_reject,
 					 -1);
+    SC_ASSERT(pi >= 0);
 
     SC_unblock_file(stdin);
 

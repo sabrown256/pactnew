@@ -1158,6 +1158,7 @@ static void SX_wrt_bin(FILE *fp, object *argl)
              SX_zero_curve(j);};};
 
     err = io_flush(fp);
+    SC_ASSERT(err == 0);
 
     return;}
 

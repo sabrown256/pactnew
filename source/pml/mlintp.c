@@ -872,6 +872,8 @@ double **PM_interpol(PM_lagrangian_mesh *grid, double **pts, int np,
          for (j = 0; j < nf; j++)
              vals[j][i] = PM_interpolate_value(vertices, fncs[j]);};
 
+    SC_ASSERT(ok == TRUE);
+
     return(vals);}
 
 /*--------------------------------------------------------------------------*/

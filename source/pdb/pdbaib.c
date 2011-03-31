@@ -46,6 +46,7 @@ void PD_contents(PDBfile *file, FILE *out, int fh, int vers)
    {int rv;
 
     rv = file->wr_meta(file, out, fh);
+    SC_ASSERT(rv == TRUE);
 
     return;}
 

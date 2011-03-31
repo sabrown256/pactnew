@@ -266,9 +266,9 @@ static int _SC_list_major_blocks(char *arr, int nc,
  */
 
 static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
-   {int n, nr, nbl;
+   {int n, nbl;
     long i, nb, nbthr, nt, ntc, ntx;
-    char *arr, *name;
+    char *arr;
     SC_heap_des *ph;
     mem_header *space, *nxt;
     mem_descriptor *desc;
@@ -319,10 +319,8 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 		 nxt = desc->next;
 		 nb  = BLOCK_LENGTH(desc);
 		 if (nb > nbthr)
-		    {nr   = REF_COUNT(desc);
-		     name = desc->name;
-		     nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-						space, nb, flag, show);};
+		    nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
+					       space, nb, flag, show);
 
 		 if (nxt == SC_LATEST_BLOCK(ph))
 		    break;};};
@@ -547,7 +545,10 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
 	    if (old != d)
 	       {st = SYSTEM(sd);
-		st = SYSTEM(cd);};
+		SC_ASSERT(st == 0);
+
+		st = SYSTEM(cd);
+		SC_ASSERT(st == 0);};
 
 	    REMOVE(tb);
 	    REMOVE(ta);};

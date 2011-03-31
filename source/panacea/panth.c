@@ -1440,7 +1440,7 @@ FIXNUM F77_FUNC(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnm,
 /* PAEREC - finish a time domain struct definition */
 
 FIXNUM F77_FUNC(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
-   {int nm, nl;
+   {int nm;
     FIXNUM rv;
     char **sm, **sl;
     PDBfile *file;
@@ -1456,7 +1456,6 @@ FIXNUM F77_FUNC(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
     nm = SC_array_get_n(fm);
     sm = SC_array_array(fm);
 
-    nl = SC_array_get_n(fl);
     sl = SC_array_array(fl);
 
     dp = PA_th_def_rec(file, fth->entry_name, fth->type, nm, sm, sl);

@@ -201,6 +201,11 @@
 # define FUNCTION_POINTER(t, n) typedef t n(void)
 #endif
 
+/* this is a minor diagnostic that counts unexpected results
+ * it will also silence warnings about variables being set but not used
+ */
+#define SC_ASSERT(_t)   _SC.assert_fail += ((_t) == FALSE)
+
 /*--------------------------------------------------------------------------*/
 
 /*                           STANDARD TYPEDEFS                              */

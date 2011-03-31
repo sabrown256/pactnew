@@ -175,7 +175,8 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
 
     loc = LOC_HERE;
     if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))
-       i = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
+       {i = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
+	SC_ASSERT(i >= 0);};
 
     ret = (loc == LOC_HERE);
 

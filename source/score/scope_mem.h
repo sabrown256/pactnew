@@ -182,6 +182,7 @@ struct s_major_block_des
 struct s_SC_heap_des
    {int init;
     int tid;
+    int zero_space;         /* per thread version of _SC_zero_space */
     mem_descriptor **free_list;
     mem_header *latest_block;
     major_block_des *major_block_list;

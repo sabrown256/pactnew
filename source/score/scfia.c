@@ -537,7 +537,8 @@ FIXNUM F77_FUNC(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, F77_string pname,
 
     pc = SC_change_alist(pc, lname, ltype, val);
     if (*pal != 0)
-       p = SC_DEL_POINTER(void, *pal);
+       {p = SC_DEL_POINTER(void, *pal);
+	SC_ASSERT(p != NULL);};
 
     *pal = (FIXNUM) SC_ADD_POINTER(pc);
 
@@ -565,8 +566,10 @@ FIXNUM F77_FUNC(scrmal, SCRMAL)(FIXNUM *pal, FIXNUM *nn, F77_string pname)
     else
        {SC_FORTRAN_STR_C(lname, pname, *nn);
 
-	pc   = SC_rem_alist(pc, lname);
-	p    = SC_DEL_POINTER(void, *pal);
+	pc = SC_rem_alist(pc, lname);
+	p  = SC_DEL_POINTER(void, *pal);
+	SC_ASSERT(p != NULL);
+
 	*pal = (FIXNUM) SC_ADD_POINTER(pc);
 
 	rv = TRUE;};
@@ -592,7 +595,9 @@ FIXNUM F77_FUNC(scrlal, SCRLAL)(FIXNUM *pal, FIXNUM *pl)
     else
        {SC_free_alist(pc, *pl);
 
-	p    = SC_DEL_POINTER(void, *pal);    
+	p = SC_DEL_POINTER(void, *pal);    
+	SC_ASSERT(p != NULL);
+
 	*pal = 0L;
 
 	rv = TRUE;};
@@ -615,7 +620,9 @@ FIXNUM F77_FUNC(scapal, SCAPAL)(FIXNUM *pal1, FIXNUM *pal2)
     pc2 = SC_copy_alist(pc2);
     pc1 = SC_append_alist(pc1, pc2);
 
-    p     = SC_DEL_POINTER(void, *pal1);
+    p = SC_DEL_POINTER(void, *pal1);
+    SC_ASSERT(p != NULL);
+
     *pal1 = (FIXNUM) SC_ADD_POINTER(pc1);
 
     rv = TRUE;

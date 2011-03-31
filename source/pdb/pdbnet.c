@@ -57,6 +57,7 @@ static int _PN_bsetvbuf(FILE *stream, char *bf, int type, size_t size)
     BF_FILE *fb;
 
     fb = _PD_GET_FILE_PTR(stream);
+    SC_ASSERT(fb != NULL);
 
     ret = 0;
 

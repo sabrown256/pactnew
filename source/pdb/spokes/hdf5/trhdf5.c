@@ -699,7 +699,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
     char t[BUFFER_SIZE];
     char *mname, *regName;
     char *typename, *type;
-    defstr *dp, *dpr;
+    defstr *dpr;
     memdes *members, *mnxt;
     hid_t idtid;
     dimdes *dimensions;
@@ -719,7 +719,6 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
         convert  = FALSE;
     
 /* begin creating a defstr for the charts */
-        dp = FMAKE(defstr, "_H5_HANDLE_COMPOUND:dp");
         members = FMAKE(memdes, "_H5_HANDLE_COMPOUND:members");
    
 /* how many members are there? */ 
@@ -809,6 +808,9 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
              SFREE(type);};
 
 #if 0
+	defstr *dp;
+
+        dp = FMAKE(defstr, "_H5_HANDLE_COMPOUND:dp");
         dp->type        = SC_strsavef(typename, "_H5_HANDLE_COMPOUND:type");
         dp->size_bits   = dp->size * 8; 
         dp->size        = H5Tget_size(dtid);
@@ -1068,7 +1070,7 @@ static int _H5_close(PDBfile *file)
  */
 
 static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
-   {int status, depth;
+   {int status;
     syment *ep;
     PDBfile *file;
     PD_smp_state *pa;
@@ -1086,7 +1088,6 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
 /* setup any local variables */
     status = 0;
-    depth  = 0;
     file   = NULL;
 
 /* turn off the un-intelligent H5E print subsystem */
@@ -1168,7 +1169,7 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
  */
 
 static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
-   {int status, depth;
+   {int status;
     hid_t hdf_root_group;
     syment *ep;
     PDBfile *file;
@@ -1187,7 +1188,6 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* setup any local variables */
     status = 0;
-    depth  = 0;
     file   = NULL;
 
 /* turn off the un-intelligent H5E print subsystem */
@@ -1327,6 +1327,7 @@ void PD_register_hdf5(void)
     n = PD_REGISTER(H5FILE_S, "hdf5", _H5_filep,
 		    _H5_create, _H5_open, _H5_close,
 		    _H5_write_entry, _H5_read_entry);
+    SC_ASSERT(n >= 0);
 
     return;}
  

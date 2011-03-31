@@ -903,7 +903,7 @@ static long _PA_copy_sub_select(int did, void *d, long od,
 
 double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
    {int nd, id;
-    unsigned long nitems, dims, offset, stride;
+    unsigned long nitems, dims, offset;
     unsigned long strides[50], maxes[50];
     char *type;
     double conv;
@@ -922,9 +922,8 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
 
     data = FMAKE_N(double, nitems, "PA_SET_DATA:data");
 
-    stride = strides[0];
-    type   = PA_VARIABLE_TYPE_S(pp);
-    id     = SC_type_id(type, FALSE);
+    type = PA_VARIABLE_TYPE_S(pp);
+    id   = SC_type_id(type, FALSE);
 
     nd = dims - 1;
         

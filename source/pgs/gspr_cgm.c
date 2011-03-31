@@ -510,12 +510,9 @@ void _PG_CGM_draw_disjoint_polyline_2(PG_device *dev, double **r,
     int pc[PG_BOXSZ];
     double *px, *py;
     double box[PG_BOXSZ];
-    PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
-
-    g = &dev->g;
 
     PG_trans_points(dev, 2*n, 2, cs, r, WORLDC, r);
 

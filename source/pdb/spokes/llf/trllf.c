@@ -177,10 +177,13 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 			NULL, NULL,
 			8, 8, file->std->fx[1].order, TRUE,
 			NULL, NULL, FALSE, FALSE);
+	SC_ASSERT(dp != NULL);
+
 	dp = _PD_defstr(file, TRUE, "int64_t", INT_KIND,
 			NULL, NULL,
 			8, 8, file->host_std->fx[1].order, TRUE,
 			NULL, NULL, FALSE, FALSE);
+	SC_ASSERT(dp != NULL);
 
 /* define the structs from the LLF header */
 	PD_DEFINE_FDIR_HEADER; 
@@ -233,6 +236,7 @@ void PD_register_llf(void)
 
     n = PD_REGISTER(LLFILE_S, "llf", _LLF_filep,
 		    NULL, _LLF_open, _LLF_close, NULL, NULL);
+    SC_ASSERT(n >= 0);
 
     return;}
  
