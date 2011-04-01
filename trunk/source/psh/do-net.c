@@ -449,6 +449,7 @@ static void aexit(process *pp)
 
 /* drain text from the job - apoll will no longer check it after this */
     rv = job_read(pp, pp->accept);
+    ASSERT(rv == 0);
 
     return;}
 
@@ -713,6 +714,7 @@ static void brun(FILE *fo, char *fmt, ...)
     snprintf(cmd, LRG, "PATH=.:%s ; %s", lpath, s);
 
     fp = popen(cmd, "r");
+    ASSERT(fp != NULL);
 
     return;}
 
@@ -1742,6 +1744,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
 
 /* wait for the work to complete */
     tc = await(st->vfyt, "verify", check_tty, NULL, NULL);
+    ASSERT(tc == TRUE);
 
 /* close out the jobs */
     afin(finup);
@@ -2732,6 +2735,7 @@ static void hostinstall(donetdes *st, int ip)
     nsp = st->n_hosts;
 
     ok = work(st, sp, nsp, ip, FALSE);
+    ASSERT(ok == 0);
 
     return;}
 
@@ -2748,6 +2752,7 @@ static void netinstall(donetdes *st, int ip)
     nsp = st->n_nets;
 
     ok = work(st, sp, nsp, ip, FALSE);
+    ASSERT(ok == 0);
 
     return;}
 
@@ -2773,6 +2778,7 @@ static void clean(donetdes *st, hfspec *sp, int nsp, int ip, double *gti)
 	nsp = st->n_hosts;};
 
     ok = work(st, sp, nsp, ip, TRUE);
+    ASSERT(ok == TRUE);
 
     noten(Log, st->verbose, "   All jobs completed");
 
@@ -3139,6 +3145,7 @@ static void interrupt(int sig)
       {state.inintr = TRUE;
 
        ohnd = signal(SIGINT, interrupt);
+       ASSERT(ohnd == 0);
 
 /* the watch option process does not have Log defined and
  * does not need to cleanup

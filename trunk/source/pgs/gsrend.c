@@ -518,18 +518,16 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
    {int i, id, did, di, nl, datafl, tclr, clr, idt;
     int oflg[PG_SPACEDM], nflg[PG_SPACEDM];
     int *lpl;
-    double ml, dx, dy, dt;
+    double ml, dt;
     double dxt[PG_SPACEDM], ndc[PG_BOXSZ];
     double xf[PG_SPACEDM], xw[PG_SPACEDM], dxw[PG_SPACEDM], p[PG_SPACEDM];
     double **r;
     double *lv;
     PG_palette *opl, *spl;
-    PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
 
-    g      = &dev->g;
     lpl    = pd->legend_place;
     datafl = PG_render_data_type(data);
     opl    = PG_get_palette(dev, NULL);
@@ -545,9 +543,6 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 
     if (nl > 0)
        {PG_viewport_frame(dev, 2, ndc);
-
-	dx = ndc[1] - ndc[0];
-	dy = ndc[3] - ndc[2];
 
 	_PG_get_place(ndc+2, lpl, ndc+2);
 

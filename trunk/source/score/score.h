@@ -108,7 +108,8 @@
 /* NREMAKE_N - reallocate a block of type _t and return a pointer to it */
 
 #define NREMAKE_N(p, _t, n)                                                  \
-   (p = (_t *) (*SC_mem_hook.realloc)((void *) p, (long) (n), (long) sizeof(_t), TRUE))
+   (p = (_t *) (*SC_mem_hook.realloc)((void *) p, (long) (n),                \
+                                      (long) sizeof(_t), TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -166,8 +167,8 @@
 /* CMAKE - memory allocation and bookkeeping macro */
 
 #define CMAKE(_t)                                                            \
-    ((_t *) (*SC_mem_hook.alloc)(1L, (long) sizeof(_t),                      \
-                                 (char *) __func__, FALSE))
+    ((_t *) (*SC_mem_hook.nalloc)(1L, (long) sizeof(_t), FALSE,              \
+                                  __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -175,8 +176,8 @@
 /* CMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define CMAKE_N(_t, n)                                                       \
-    ((_t *) (*SC_mem_hook.alloc)((long) n, (long) sizeof(_t),                \
-                                 (char *) __func__, FALSE))
+    ((_t *) (*SC_mem_hook.nalloc)((long) n, (long) sizeof(_t), FALSE,        \
+                                  __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -187,14 +188,7 @@
    {(*SC_mem_hook.free)(x);                                                  \
     x = NULL;}
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SFREE_N - release memory and do bookkeeping on arrays */
-
-#define SFREE_N(x, n)                                                        \
-   {(*SC_mem_hook.free)(x);                                                  \
-    x = NULL;}
+#define SFREE_N(x, n)  SFREE(x)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -229,40 +223,42 @@
  *         - won't let you LONGJMP back into function from which a
  *         - return has been done
  *         - Prototype arguments would be:
- *         -   char *msg;
- *         -   void (*fnc)(int err);
- *         -   int sighand;
- *         -   PFByte sigfnc;
- *         -   int bfhand;
- *         -   char *bf;
- *         -   int bfsize;
+ *         -   char *_msg;
+ *         -   void (*_ef)(int err);
+ *         -   int _sh;
+ *         -   void (*_sf)(int sig);
+ *         -   int _bh;
+ *         -   char *_bf;
+ *         -   int _bsz;
  */
 
-#define SC_init(msg, fnc, sighand, sigfnc, bfhand, bf, bfsize)               \
-   {static void (*lfnc)(int err) = NULL;                                     \
+#define SC_init(_msg, _ef, _sh, _sf, _bh, _bf, _bsz)                         \
+   {void (*_lsf)(int sig);                                                   \
+    static void (*_lef)(int err) = NULL;                                     \
     switch (SETJMP(SC_top_lev))                                              \
        {case ABORT :                                                         \
-             io_printf(STDOUT, "\n%s\n\n", msg);                             \
-             if (lfnc != NULL)                                               \
-                (*lfnc)(ABORT);                                              \
+             io_printf(STDOUT, "\n%s\n\n", _msg);                            \
+             if (_lef != NULL)                                               \
+                (*_lef)(ABORT);                                              \
              exit(1);                                                        \
         case ERR_FREE :                                                      \
-             if (lfnc != NULL)                                               \
-                (*lfnc)(ERR_FREE);                                           \
+             if (_lef != NULL)                                               \
+                (*_lef)(ERR_FREE);                                           \
              exit(0);                                                        \
         default :                                                            \
-             lfnc = fnc;                                                     \
+             _lef = _ef;                                                     \
              break;};                                                        \
-    if (sighand)                                                             \
-       {if (sigfnc != NULL)                                                  \
-           SC_signal(SIGINT, sigfnc);                                        \
+    if (_sh == TRUE)                                                         \
+       {_lsf = _sf;                                                          \
+        if (_lsf != NULL)                                                    \
+           SC_signal(SIGINT, _lsf);                                          \
         else                                                                 \
            SC_signal(SIGINT, SC_interrupt_handler);};                        \
-    if (bfhand)                                                              \
-       {if ((bf == NULL) || (bfsize <= 0))                                   \
+    if (_bh == TRUE)                                                         \
+       {if ((_bf == NULL) || (_bsz <= 0))                                    \
            {SC_setbuf(stdout, NULL);}                                        \
         else                                                                 \
-           {io_setvbuf(stdout, bf, _IOFBF, bfsize);};};}
+           {io_setvbuf(stdout, _bf, _IOFBF, _bsz);};};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -674,7 +670,9 @@ struct s_SC_rusedes
 
 
 struct s_SC_mem_fnc
-   {void *(*alloc)(long nitems, long bpi, char *name, int na);
+   {void *(*nalloc)(long nitems, long bpi, int na,
+		    const char *fnc, const char *file, int line);
+    void *(*alloc)(long nitems, long bpi, char *name, int na);
     void *(*realloc)(void *p, long nitems, long bpi, int na);
     int (*free)(void *p);};
 
@@ -704,19 +702,10 @@ extern int
  SC_io_interrupts_on,
  SC_mm_debug,
  SC_verify_writes,
+ SC_assert_fail,
  Zero_I,
  One_I,
- Two_I,
- Three_I,
- Four_I,
  Radix;
-
-extern double
- Zero_D,
- One_D,
- Two_D,
- Three_D,
- Four_D;
 
 extern char
  SC_version_string[];
@@ -1041,9 +1030,11 @@ extern void
  SC_mem_stats(long *al, long *fr, long *df, long *mx),
  SC_mem_stats_acc(long a, long f),
  SC_mem_stats_set(long a, long f),
+ *SC_nalloc_na(long nitems, long bpi, int na,
+	       const char *fnc, const char *file, int line),
  *SC_alloc_na(long nitems, long bpi, char *name, int na),
  *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
- *SC_alloc_nzt(long nitems, long bpi, char *name, void *a),
+ *SC_alloc_nzt(long nitems, long bpi, void *a),
  *SC_realloc_na(void *p, long nitems, long bpi, int na),
  *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp);
 

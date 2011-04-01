@@ -371,12 +371,9 @@ void _PG_X_set_clipping(PG_device *dev, int flag)
  
 void _PG_X_move_gr_abs(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
- 
-	p[0] = x;
+       {p[0] = x;
 	p[1] = y;
 
 	_PG_move_gr_abs(dev, p);};
@@ -392,12 +389,9 @@ void _PG_X_move_gr_abs(PG_device *dev, double x, double y)
  
 void _PG_X_move_tx_abs(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
- 
-	p[0] = x;
+       {p[0] = x;
 	p[1] = y;
 
 	_PG_move_tx_abs(dev, p);};
@@ -413,12 +407,9 @@ void _PG_X_move_tx_abs(PG_device *dev, double x, double y)
  
 void _PG_X_move_tx_rel(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	p[0] = x;
+       {p[0] = x;
 	p[1] = y;
 
 	_PG_move_tx_rel(dev, p);};
@@ -436,12 +427,9 @@ void _PG_X_move_tx_rel(PG_device *dev, double x, double y)
 void _PG_X_draw_to_abs(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM], o[PG_SPACEDM];
     Display *disp;
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	disp = dev->display;
+       {disp = dev->display;
 	if (disp == NULL)
 	   return;
  
@@ -475,12 +463,9 @@ void _PG_X_draw_to_abs(PG_device *dev, double x, double y)
 void _PG_X_draw_to_rel(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM], o[PG_SPACEDM];
     Display *disp;
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	disp = dev->display;
+       {disp = dev->display;
 	if (disp == NULL)
 	   return;
 
@@ -871,7 +856,6 @@ int _PG_X_put_raster(PG_device *dev, int bc,
    {int ix, iy;
     int w, h, ok, bcp, nb, nv;
     int pxsd, bprd, l, ri, gi, bi;
-    int sbc, swc;
     int ir[PG_SPACEDM];
     unsigned char *db, *dr;
     unsigned long msk;
@@ -892,13 +876,6 @@ int _PG_X_put_raster(PG_device *dev, int bc,
     fr = mdv->raster;
     if ((fr == NULL) || (fr->n_on < 1))
        return(FALSE);
-
-    if (dev->background_color_white)
-       {swc = dev->BLACK;
-	sbc = dev->WHITE;}
-    else
-       {swc = dev->WHITE;
-	sbc = dev->BLACK;};
 
     w = fr->width;
     h = fr->height;

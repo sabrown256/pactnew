@@ -35,6 +35,8 @@ void compute_2d_data(double *f, double *x, double *y, int kmax, int lmax)
     ymin = -5.0;
     ymax =  5.0;
 
+    SC_ASSERT(ymax > ymin);
+
     dx = (xmax - xmin)/((double) kmax - 1.0);
     dy = (xmax - xmin)/((double) kmax - 1.0);
 

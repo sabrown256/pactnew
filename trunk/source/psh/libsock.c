@@ -98,7 +98,7 @@ static char *name_sock(char *root, int ch)
 static int sock_exists(char *fmt, ...)
    {int rv;
     char s[MAXLINE];
-    char *sock, *wh;
+    char *sock;
 
     rv = FALSE;
 
@@ -109,11 +109,12 @@ static int sock_exists(char *fmt, ...)
 
 	sock = name_sock(s, -1);
 	rv   = (sock != NULL);
-	wh   = C_OR_S(srv.server == 0);
 
 #ifdef VERBOSE
-	{char *flog;
+	{char *flog, *wh;
+
 	 flog = name_log(s);
+	 wh   = C_OR_S(srv.server == 0);
 	 log_activity(flog, dbg_sock, wh, "exist |%s| (%s)",
 		      sock,
 		      (rv == TRUE) ? "yes" : "no");};

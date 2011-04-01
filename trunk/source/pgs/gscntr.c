@@ -24,7 +24,6 @@ typedef void (*PFCntrNC)(PG_device *dev, double *a,
         {ilx[inp] = _x;                                                       \
          ily[inp] = _y;                                                       \
          ila[inp] = _a;                                                       \
-         isd[inp] = inp;                                                      \
          inp++;};}
 
 #define ADD_EXTERIOR_PT(_x, _y, _a)                                           \
@@ -188,10 +187,10 @@ static void _PG_poly_fill_contour(PG_device *dev, double *lev,
 				  int is1, int is2, long *sides,
 				  int nsp, int id, int method,
 				  int *mcnt, int *mark, double *xpt, double *ypt)
-   {int inp, onp, ok_ids, ofs, clr;
+   {int inp, onp, ofs, clr;
     int is, os, in1, in2, ic, l1, l2;
     int icross[20];
-    long isd[20], osd[20];
+    long osd[20];
     double fraca, fracb;
     double lv, a1, a2, xc, yc;
     double ilx[20], ily[20], ila[20];
@@ -203,8 +202,7 @@ static void _PG_poly_fill_contour(PG_device *dev, double *lev,
 
     clr = _PG_get_fill_contour_color(dev, ilev, levmx);
 
-    ok_ids = dev->data_id;
-    ofs    = (nsp < 2);
+    ofs = (nsp < 2);
 
 /* recursively fill between contour levels */
     if (ilev < levmx)
@@ -441,7 +439,7 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
 			     int ndd, double **x, double *lev,
 			     int nlev, int id, void *cnnct, pcons *alist)
    {int i, im, j, jm, l, l1, ilev;
-    int method, imx, jmx, n, nmap, eflag;
+    int method, imx, jmx, nmap, eflag;
     int *maxes, *mcnt, *mark;
     long sides[5];
     double xpt[10], ypt[10];
@@ -454,7 +452,6 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
     maxes = (int *) cnnct;
     imx   = maxes[0];
     jmx   = maxes[1];
-    n     = imx*jmx;
     nmap  = (imx - 1)*(jmx - 1);
 
     PG_get_attrs_alist(alist,

@@ -529,7 +529,7 @@ FIXNUM F77_FUNC(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, F77_string pname,
 /* copy the incoming values */
     nb  = SIZEOF(ltype);
     ni  = *nv;
-    val = SC_alloc_nzt(ni, nb, "SCCHAL:val", NULL);
+    val = CMAKE_N(char, ni*nb);
     memcpy(val, pv, ni*nb);
 
 /* add the extra level of indirection needed */

@@ -114,6 +114,7 @@ static int test_2(void)
     io_setvbuf(fp, NULL, _IOFBF, bu*bpi);
 
     addr = io_tell(fp);
+    SC_ASSERT(addr == 0);
 
     ni = 0;
 

@@ -566,23 +566,18 @@ static int _PG_rst_image_text(PG_device *dev, FILE *fp, char *s)
 /* _PG_RST_STROKE_TEXT - write out text to the appropriate device */
  
 static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
-   {int i, index, savlinclr, ncharfont, ncharin;
+   {int i, index, savlinclr, ncharin;
     double savlwd, lwd, dx;
     double x[PG_SPACEDM];
     double *r[PG_SPACEDM];
     char *target, *style;
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	for (i = 0; i < 2; i++)
+       {for (i = 0; i < 2; i++)
 	    r[i] = &x[i];
 
-	ncharfont = strlen(_PG_rst_char_list);
 	ncharin   = strlen(s);
-	dx        = (dev->char_width_s + dev->char_space_s) * 
-	            dev->g.nd_w[1];
+	dx        = (dev->char_width_s + dev->char_space_s)*(dev->g.nd_w[1]);
 	savlinclr = dev->line_color;
 	PG_set_line_color(dev, dev->text_color);
 

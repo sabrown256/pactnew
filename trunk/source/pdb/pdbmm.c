@@ -217,7 +217,7 @@ void *_PD_alloc_entry(PDBfile *file, char *type, long ni)
 	ipt = _PD_items_per_tuple(dp);
         bpi = dp->size;
         len = ni*ipt*bpi;
-        vr  = SC_alloc_nzt(len, 1L, "_PD_ALLOC_ENTRY:vr", NULL);};
+        vr  = CMAKE_N(char, len);};
 
     return(vr);}
 

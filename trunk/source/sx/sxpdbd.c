@@ -636,7 +636,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
        convert = TRUE;
 
     if (convert)
-       {buf = (char *) SC_alloc_nzt(ni, bpi, "_SX_RD_LEAF_T:buf", NULL);
+       {buf = CMAKE_N(char, ni*bpi);
         if (buf == NULL)
            return(FALSE);}
     else
@@ -723,8 +723,8 @@ static int _SX_diff_leaf(char *nma, char *nmb,
     if ((bpi = _PD_lookup_size(tc, hc)) == -1L)
        return(BAD_UNIT_SIZE);
 
-    bfa = (char *) SC_alloc_nzt(na, bpi, "_SX_DIFF_LEAF:bfa", NULL);
-    bfb = (char *) SC_alloc_nzt(nb, bpi, "_SX_DIFF_LEAF:bfb", NULL);
+    bfa = CMAKE_N(char, na*bpi);
+    bfb = CMAKE_N(char, nb*bpi);
 
     if ((bfa == NULL) || (bfb == NULL))
        {if ((bfa == NULL) && (bfb == NULL) &&

@@ -485,7 +485,7 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
         nbn = psz*(pd->size);
         nbo = SC_arrlen(pdata);
 
-        newsp = SC_alloc_nzt(nbn, 1, NULL, NULL);
+        newsp = CMAKE_N(char, nbn);
         oldsp = pdata;
 
 /* see whether there is a routine to map the old space into the new one */

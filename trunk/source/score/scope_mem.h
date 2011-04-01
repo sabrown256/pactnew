@@ -204,7 +204,10 @@ struct s_SC_heap_des
 struct s_SC_mem_opt
    {int na;               /* if 1 do not add block to allocated count */
     int zsp;              /* zero space flag */
-    int typ;};            /* set the type field to this type index */
+    int typ;              /* set the type field to this type index */
+    const char *fnc;      /* info supplied free by C99 */
+    const char *file;
+    int line;};
 
 struct s_SC_mem_hst
    {int action;

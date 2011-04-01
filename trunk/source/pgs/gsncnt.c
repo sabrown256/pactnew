@@ -592,7 +592,7 @@ static void _PG_fill_topology(itf_array *ifs, int it, int n)
  */
 
 static PM_set *_PG_make_domain(itf_array *ifs, int it)
-   {int id, nd, ni, nn;
+   {int id, nd, nn;
     int *bnc, *bnp;
     long **bnd;
     double **xn;
@@ -603,7 +603,6 @@ static PM_set *_PG_make_domain(itf_array *ifs, int it)
     iri = ifs->db_info;
 
     nd = iri->nd;
-    ni = iri->nmc;
 
 /* allocate the domain coordinate arrays */
     nn = PM_ipow(3, nd);
@@ -645,7 +644,7 @@ static PM_set *_PG_make_domain(itf_array *ifs, int it)
 /* _PG_LOAD_CELL - load up the local template with the function values */
 
 static void _PG_load_cell(itf_array *ifs, int jo, int it)
-   {int i, id, jd, io, nd, nn, dj, dk, off, ofn, nt;
+   {int i, id, jd, io, nd, nn, dj, dk, off, ofn;
     int *dm, *cc;
     double *fn, *f, *pf, **xm, **xn, *px, *py;
     PM_set *domain;
@@ -670,7 +669,6 @@ static void _PG_load_cell(itf_array *ifs, int jo, int it)
     dj = dm[0];
     dk = dm[0]*dm[1];
 
-    nt = PM_ipow(3, nd);
     pf = f + io;
     for (id = 1; id < nd; id++)
         {fn[0] = pf[0];
@@ -946,7 +944,7 @@ static int _PG_move_x(int i0, int i1, int i2, int nd, double d,
  */
 
 static int _PG_examine_poly(itf_array *ifs, int it)
-   {int m, jo, im, in, nc, nd, nn;
+   {int m, im, in, nc, nd, nn;
     int ia, ie, i1, i2, iu, e1;
     int nte, ntf, ntn, sit;
     int df;
@@ -959,15 +957,12 @@ static int _PG_examine_poly(itf_array *ifs, int it)
     PM_set *domain;
     PM_mesh_topology *mt;
     level_surface *itf;
-    db_ls_info *iri;
 
     LOCAL_START_TIME(cntr_times.surf_seg_inter);
 
-    iri    = ifs->db_info;
     itf    = ifs->itf[it];
     domain = ifs->domain[it];
 
-    jo = itf->j_ac;
     d  = itf->d;
     dn = itf->dn;
     f  = itf->fn;
@@ -981,6 +976,8 @@ static int _PG_examine_poly(itf_array *ifs, int it)
 
     GET_POLY_TOPOLOGY(pt, nd, df,
 		      ntn, nl, nte, el, ntf, fe, fn, nc, cl);
+
+    SC_ASSERT(nc >= 0);
 
 /* make it easy to spot trouble later */
     for (in = 0; in < nn; in++)
@@ -1209,11 +1206,9 @@ static PM_set *_PG_make_surface_set(itf_array *ifs, int no, int it)
 /* _PG_MAKE_IFS - initialize an itf_array */
 
 itf_array *_PG_make_ifs(db_ls_info *iri, int ilv)
-   {int ip, nl, nw, np;
+   {int ip, np;
     itf_array *ifs;
 
-    nw = iri->nuc;
-    nl = iri->nlev;
     np = iri->nthread;
 
     ifs = FMAKE(itf_array, "_PG_MAKE_IFS:ifs");
@@ -1250,14 +1245,11 @@ itf_array *_PG_make_ifs(db_ls_info *iri, int ilv)
 /* _PG_MAKE_INTER_SURFACE - initialize a level intersection surface */
 
 level_surface *_PG_make_inter_surface(db_ls_info *iri, int it)
-   {int nd, nl, nt;
+   {int nd;
     level_surface *itf;
 
     nd  = iri->nd;
-    nl  = iri->nlev;
     itf = FMAKE(level_surface, "_PG_MAKE_INTER_SURFACE:itf");
-
-    nt = PM_ipow(3, nd);
 
     itf->ip       = it;
     itf->dn       = NULL;
@@ -1274,7 +1266,7 @@ level_surface *_PG_make_inter_surface(db_ls_info *iri, int it)
 /* _PG_FREE_INTER_SURFACE - release a level intersection surface */
 
 void _PG_free_inter_surface(itf_array *ifs)
-   {int ip, nd, np;
+   {int ip, np;
     level_surface *itf;
 
     PM_rel_set(ifs->domain[0], TRUE);
@@ -1287,9 +1279,7 @@ void _PG_free_inter_surface(itf_array *ifs)
 	    {itf = ifs->itf[ip];
 
 	     if (itf != NULL)
-	        {nd = itf->nd;
-
-		 SFREE(itf->fn);
+	        {SFREE(itf->fn);
 		 SFREE(itf->dn);
 		 SFREE(itf);};
 
@@ -1329,14 +1319,13 @@ void _PG_init_chunk(itf_array *ifs, int it)
 
 static int _PG_surface_contained(int *js, itf_array *ifs, int ic, int id,
 				 long **bnd, int it)
-   {int io, jo;
+   {int io;
     int ok, off;
     double dc, *dn;
     level_surface *itf;
 
     itf = ifs->itf[it];
     dn  = itf->dn;
-    jo  = itf->j_ac;
     off = 0;
 
     _PG_grab_points(js, id+1, ic, off, dn, bnd);
@@ -1410,7 +1399,7 @@ static void _PG_add_surf_facet(int id, int nc, int nd, int *js, double **xn,
 			       long **b1d, int *b1c, int *b1p, double **x1,
 			       int nex, int pty)
    {int ie, in, je, jn;
-    int mc, me, mn, alt;
+    int mc, me, mn;
     long *p1;
     double or[3], om;
     double *px1, *pxn;
@@ -1430,7 +1419,7 @@ static void _PG_add_surf_facet(int id, int nc, int nd, int *js, double **xn,
         {p1     = SIZED(long, b1d[1], me, nex);
 	 p1[je] = (ie == nc-1) ? b1c[0] : jn;};
 
-    alt = _PG_fix_orientation(js, 0, p1+b1c[1], xn, nd);
+    _PG_fix_orientation(js, 0, p1+b1c[1], xn, nd);
 
 /* copy the points */
     for (in = 0, jn = b1c[0]; in < nd; in++, jn++)
@@ -1442,6 +1431,8 @@ static void _PG_add_surf_facet(int id, int nc, int nd, int *js, double **xn,
 
 /* compute the surface normal */
     om = _PG_compute_oriented_face(or, x1, mn, mn+1, mn+2);
+
+    SC_ASSERT(om > 1.0e-8);
 
 /* update the cell counts if the surface is not degenerate */
 /*    if (om > 1.0e-8) */
@@ -1548,25 +1539,20 @@ static void _PG_add_surf_perim(int count, int last, int *nlst,
  */
 
 static void _PG_compute_surface(itf_array *ifs, int it)
-   {int i, i1, i2, id, nd, ns, os, jo;
+   {int i, i1, i2, id, nd, ns, os;
     int ilv, nc, nex;
     int js[4], nlst[100];
     int *bnc, *bsc, *bsp;
     long **bnd, **bsd;
-    double d;
     double **xn, **xs;
     PM_mesh_topology *mt, *ms;
     PM_set *domain, *srf;
     PG_rendering pty;
-    level_surface *itf;
     db_ls_info *iri;
 
-    itf    = ifs->itf[it];
     iri    = ifs->db_info;
     ilv    = ifs->ilev;
     domain = ifs->domain[it];
-    d      = itf->d;
-    jo     = itf->j_ac;
 
     nex = 10*iri->nmc;
     pty = iri->plot_type;
@@ -1633,7 +1619,7 @@ static void _PG_compute_surface(itf_array *ifs, int it)
 /* _PG_SINGLE_CELL - find the intersections in a single cell */
 
 static void _PG_single_cell(double d0, itf_array *ifs, int jo, int io, int it)
-   {int nd, sit;
+   {int nd;
     level_surface *itf;
     db_ls_info *iri;
 
@@ -1650,7 +1636,7 @@ static void _PG_single_cell(double d0, itf_array *ifs, int jo, int io, int it)
     if (jo >= 0)
 
 /* find the intersection of the surface with the crossed cell JO */
-       {sit = _PG_examine_poly(ifs, it);
+       {_PG_examine_poly(ifs, it);
 
 /* find the intersection surface */
 	_PG_compute_surface(ifs, it);};
@@ -1667,7 +1653,6 @@ static int _PG_do_cells(itf_array **pifs, int *pit)
     int *mmc, *cd;
     double d0;
     double *lev;
-    level_surface *itf;
     itf_array *ifs;
     db_ls_info *iri;
 
@@ -1680,7 +1665,6 @@ static int _PG_do_cells(itf_array **pifs, int *pit)
     jmn = cd[0];
     jmx = cd[1];
 
-    itf  = ifs->itf[it];
     ilev = ifs->ilev;
     iri  = ifs->db_info;
 

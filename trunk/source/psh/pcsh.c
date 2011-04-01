@@ -335,7 +335,7 @@ static void fix_env(char *prog)
 int main(int c, char **v)
    {int i, j, k, ok, done;
     char shell[MAXLINE], pact[MAXLINE], s[MAXLINE];
-    char *cmd, *scr, *vo[1024];
+    char *scr, *vo[1024];
     static int verbose = FALSE;
 
     setbuf(stdout, NULL);
@@ -356,9 +356,8 @@ int main(int c, char **v)
 	printf("\n");};
 
 /* parse the command line arguments */
-    k    = 0;
-    cmd  = NULL;
-    scr  = v[0];
+    k   = 0;
+    scr = v[0];
     for (done = FALSE, i = 1; (i < c) && (done == FALSE); i++)
         {if (v[i][0] == '-')
 	    {for (ok = TRUE, j = 1; ok == TRUE; j++)

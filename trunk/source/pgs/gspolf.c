@@ -283,6 +283,8 @@ static void _PG_fill_glyph(PG_device *dev, int nd, double *a, double *aext,
     ny = glyph[1];
     nc = nx*ny;
 
+    SC_ASSERT(nc > 0);
+
     switch (np)
 
 /* triangles */
@@ -375,6 +377,9 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
     nmap  = (kmax - 1) * (lmax - 1);
     nz    = SC_MEM_GET_N(double, a[0]);
 
+    SC_ASSERT(nn > 0);
+    SC_ASSERT(nz > 0);
+
     glyph = SC_assoc(alist, "GLYPH");
 
     emap = PM_check_emap(&eflag, alist, nmap);
@@ -386,6 +391,8 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
 
     kz = kmax - 1;
     lz = lmax - 1;
+
+    SC_ASSERT(lz > 0);
 
     SC_chunk_split(&lmn, &lmx, &rv);
 
@@ -467,6 +474,9 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
     nn    = kmax*lmax;
     nmap  = (kmax - 1) * (lmax - 1);
     nz    = SC_MEM_GET_N(double, a[0]);
+
+    SC_ASSERT(nn > 0);
+    SC_ASSERT(nz > 0);
 
     kz = kmax - 1;
     lz = lmax - 1;
@@ -565,6 +575,8 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
     lmax  = maxes[1];
     nn    = kmax*lmax;
 
+    SC_ASSERT(nn > 0);
+
     km   = kmax - 1;
     lm   = lmax - 1;
     nmap = km*lm;
@@ -649,6 +661,8 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
     kmax  = maxes[0];
     lmax  = maxes[1];
     n     = kmax*lmax;
+
+    SC_ASSERT(n > 0);
 
     km   = kmax - 1;
     lm   = lmax - 1;

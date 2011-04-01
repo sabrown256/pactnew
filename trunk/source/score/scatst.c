@@ -286,6 +286,8 @@ static int test_5_callback(haelem *hp, void *arg)
     rv = TRUE;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &v);
+    SC_ASSERT(ok == TRUE);
+
     if (v != NULL)
        SFREE(v);
 

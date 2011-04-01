@@ -338,7 +338,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
 			   char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
     char cl[MAXLINE], fmt[MAXLINE];
-    char *c, *pc, *t, *var, *val, *dlm, *entry;
+    char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
     strncpy(cl, clss, MAXLINE);
@@ -353,14 +353,12 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t   = dbget(NULL, FALSE, "Globals");
-	     dlm = " ";
-	     sa  = tokenize(t, " \t\n\r");}
+	    {t  = dbget(NULL, FALSE, "Globals");
+	     sa = tokenize(t, " \t\n\r");}
          else
 	    {fprintf(out, "%s%s %s {\n", ind, ctype, c);
-	     t   = run(BOTH, "env | egrep '^%s_' | sort", c);
-	     dlm = "\n";
-	     sa  = tokenize(t, "\n\r");};
+	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
+	     sa = tokenize(t, "\n\r");};
 
          for (n = 0; sa[n] != NULL; n++);
 
@@ -434,7 +432,10 @@ static void write_pco(state *st, char *dbname)
     out = open_file("w", t);
 
     rv = write_class_pco(out, st->def_tools, "Tool", NULL, NULL, "");
+    ASSERT(rv == 0);
+
     rv = write_class_pco(out, st->def_groups, "Group", st->def_tools, "Tool", "");
+    ASSERT(rv == 0);
 
     fclose(out);
 
@@ -452,7 +453,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
 			    char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
     char cl[MAXLINE], fmt[MAXLINE];
-    char *c, *pc, *t, *var, *val, *dlm, *entry;
+    char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
     strncpy(cl, clss, MAXLINE);
@@ -467,14 +468,12 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t   = dbget(NULL, FALSE, "Globals");
-	     dlm = " ";
-	     sa  = tokenize(t, " \t\n\r");}
+	    {t  = dbget(NULL, FALSE, "Globals");
+	     sa = tokenize(t, " \t\n\r");}
          else
 	    {fprintf(out, "%s'%s:%s_pact' => {\n", ind, ctype, c);
-	     t   = run(BOTH, "env | egrep '^%s_' | sort", c);
-	     dlm = "\n";
-	     sa  = tokenize(t, "\n\r");};
+	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
+	     sa = tokenize(t, "\n\r");};
 
          for (n = 0; sa[n] != NULL; n++);
 
@@ -550,8 +549,11 @@ static void write_perl(state *st, char *dbname)
 
     rv = write_class_perl(out, st->def_tools, "Tool",
 			  NULL, NULL, "   ");
+    ASSERT(rv == 0);
+
     rv = write_class_perl(out, st->def_groups, "Group",
 			  st->def_tools, "Tool", "   ");
+    ASSERT(rv == 0);
 
     fprintf(out, "}\n");
 
@@ -1819,7 +1821,6 @@ static void read_config(char *cfg, int quiet)
    {int il;
     char line[LRG], key[MAXLINE], oper[LRG], value[LRG];
     char *path;
-    gt_entry *ge;
 
     separator(Log);
     if (quiet == TRUE)
@@ -1851,8 +1852,6 @@ static void read_config(char *cfg, int quiet)
             break;
 
 	 parse_line(line, key, oper, value);
-
-	 ge = st.gstck.st + st.gstck.n - 1;
 
 /* handle include directives */
 	 if (strcmp(key, "include") == 0)

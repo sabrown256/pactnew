@@ -1833,7 +1833,7 @@ static object *_SXI_draw_image(object *argl)
 
     if (vp == TRUE)
        {alist = PG_rem_attrs_alist(alist, "VIEW-PORT", NULL);
-        SFREE_N(pv, 4);}    
+        SFREE(pv);}    
 
     return(SS_t);}
 
@@ -1882,13 +1882,13 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
 	SC_mark(v, -1);}
 
     else if (id == SC_INT_P_I)
-       {v = SC_alloc_nzt(1L, sizeof(int), NULL, NULL);
+       {v = CMAKE(int);
         SS_args(val,
 		SC_INT_I, v,
 		0);}
 
     else if (id == SC_DOUBLE_P_I)
-       {v = SC_alloc_nzt(1L, sizeof(double), NULL, NULL);
+       {v = CMAKE(double);
         SS_args(val,
 		SC_DOUBLE_I, v,
 		0);}

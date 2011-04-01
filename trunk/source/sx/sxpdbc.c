@@ -64,9 +64,9 @@ void _SX_copy_indirection(PDBfile *file, char **vrin, char **vrout,
                     SS_mk_string(type));
         nitems = nbytes / bpi;
 
-        DEREF(vrout) = pv = (char *) SC_alloc_nzt(nitems, bpi,
-						  "_SX_COPY_INDIRECTION:pv",
-						  NULL);
+        pv = CMAKE_N(char, nitems*bpi);
+        DEREF(vrout) = pv;
+
         SC_arrtype(pv, SC_arrtype(*vrin, 0));
         _SX_copy_tree(file, *vrin, pv, nitems, type);};
 

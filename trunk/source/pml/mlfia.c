@@ -245,7 +245,8 @@ FIXNUM F77_FUNC(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
         bpi  = SIZEOF(type);
 	ne   = set->n_elements;
 
-	elem[ie] = nv = SC_alloc_nzt(ne, bpi, "PMASET:nv", NULL);
+	nv = CMAKE_N(char, ne*bpi);
+	elem[ie] = nv;
 	memcpy(nv, px, ne*bpi);}
 
     else

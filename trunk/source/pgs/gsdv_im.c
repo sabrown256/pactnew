@@ -145,7 +145,6 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
     double *re, *dc, *adc, *pdc;
     PG_rendering render;
     PG_par_rend_info *pri;
-    PG_dev_geometry *g;
     PROCESS *pp;
     static int sp[] = {SC_MATCH_NODE, 1, 0,
                        SC_MATCH_TAG, PG_DPMT_SETUP,
@@ -246,8 +245,6 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
 
             SFREE(adc);
 
-	    g = &pri->dd->g;
-
 	    dc[8] = PG_window_width(dev);
 	    dc[9] = PG_window_height(dev);
 
@@ -326,19 +323,17 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
 /* _PG_TRANSMIT_IMAGES - transmit images between nodes */
 
 static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
-   {int i, ip, np, dp, pw, dfl, w, h;
+   {int i, ip, np, dp, dfl;
     int *map;
     PROCESS *pp;
     PG_par_rend_info *pri;
     PG_image *pim;
-    PG_dev_geometry *g;
     static int sp[] = {SC_MATCH_NODE, 1, 0,
                        SC_MATCH_TAG, PG_DPMT_IMAGE,
                        SC_BLOCK_STATE, FALSE,
                        SC_BUFFER_SIZE, 0,
                        0};
 
-    g   = &dev->g;
     pim = NULL;
 
     if (_PG_gattrs.parallel_simulate == TRUE)
@@ -365,11 +360,6 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
         dp  = pri->ip;
         map = pri->map;
         dfl = pri->have_data;
-
-	w = PG_window_width(dev);
-        h = PG_window_height(dev);
-
-        pw = max(w, h);
 
         sp[6] = FALSE;
 
@@ -717,15 +707,12 @@ static PG_device *_PG_IM_open(PG_device *dev, double xf, double yf,
 /* _PG_IM_CLOSE_DEVICE - close a device */
  
 static void _PG_IM_close_device(PG_device *dev)
-   {PG_RAST_device *rdv;
-    PG_image *im;
+   {PG_image *im;
 
     PG_get_device_image(dev, im);
     if (im != NULL)
        {PG_rl_image(im);
         PG_put_device_image(dev, NULL);};
-
-    GET_RAST_DEVICE(dev, rdv);
 
 /* clean up the device */
     PG_rl_device(dev);

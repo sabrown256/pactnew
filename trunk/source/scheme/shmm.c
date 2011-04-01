@@ -945,11 +945,14 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
    {object *op;
     SC_mem_opt opt;
 
-    opt.na  = FALSE;
-    opt.zsp = _SC_zero_space;
-    opt.typ = SS_OBJECT_I;
+    opt.na   = FALSE;
+    opt.zsp  = _SC_zero_space;
+    opt.typ  = SS_OBJECT_I;
+    opt.fnc  = __func__;
+    opt.file = __FILE__;
+    opt.line = __LINE__;
 
-    op = SC_alloc_nzt(1L, sizeof(object), "SS_MK_OBJECT:op", &opt);
+    op = SC_alloc_nzt(1L, sizeof(object), &opt);
 
     if ((pname != NULL) && (SC_arrlen(pname) < 1))
        pname = SC_strsavef(pname, "char*:SS_MK_OBJECT:pname");

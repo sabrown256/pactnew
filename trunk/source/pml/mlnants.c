@@ -19,7 +19,6 @@
 
 int dbl_test(void)
    {int i, nn, rv, le;
-    uint64_t *ba;
     char *ca, *msg;
     double d[N], dhuge;
 
@@ -33,7 +32,6 @@ int dbl_test(void)
     le = (ca[0] == 1);
 
     ca = (char *) d;
-    ba = (uint64_t *) d;
 
 /* plus and minus infinities
  *   positive double 0x7ff0000000000000
@@ -160,7 +158,6 @@ int dbl_test(void)
 
 int flt_test(void)
    {int i, nn, rv, le;
-    int *ba;
     char *ca, *msg;
     float f[N], fhuge;
 
@@ -174,7 +171,6 @@ int flt_test(void)
     le = (ca[0] == 1);
 
     ca = (char *) f;
-    ba = (int *) f;
 
 /* plus and minus infinities
  *   positive float  0x7f800000

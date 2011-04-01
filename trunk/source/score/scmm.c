@@ -55,7 +55,7 @@ long
 static void *_SC_malloc_s(unsigned int nbytes)
    {void *rv;
 
-    rv = SC_alloc_nzt(nbytes, 1L, NULL, NULL);
+    rv = CMAKE_N(char, nbytes);
 
     return(rv);}
 

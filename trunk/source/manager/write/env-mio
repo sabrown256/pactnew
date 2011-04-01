@@ -67,10 +67,10 @@ HAVE_SUBROUTINES
     Note $FOUT "DAS_ROOT = $DAS_ROOT"
     Note $FOUT ""
 
-    Note $FOUT "VMake = DAI_ROOT DAS_ROOT"
-    Note $FOUT "VEnv  = DAI_ROOT DAS_ROOT"
-    Note $FOUT "VCDef = DAI_ROOT DAS_ROOT"
-    Note $FOUT "VMDef = DAI_ROOT DAS_ROOT"
+    Note $FOUT "VMake += DAI_ROOT DAS_ROOT"
+    Note $FOUT "VEnv  += DAI_ROOT DAS_ROOT"
+    Note $FOUT "VCDef += DAI_ROOT DAS_ROOT"
+    Note $FOUT "VMDef += DAI_ROOT DAS_ROOT"
     Note $FOUT ""
 
 # database variables

@@ -21,13 +21,9 @@
 #define SYS      2
 #define SM_MAX   4096                /* upper bound of small memory store */
 
-#define ALLOC(_p, _t, _n, _s)                                              \
+#define ALLOC(_p, _t, _n)                                                  \
    {if (mm == SCORE)                                                       \
-       {SC_mem_opt opt;                                                    \
-        opt.na   = FALSE;                                                  \
-        opt.zsp  = _SC_zero_space;                                         \
-        opt.typ  = -1;                                                     \
-        _p = SC_alloc_nzt(_n, sizeof(_t), _s, &opt);}                      \
+       _p = CMAKE_N(char, (_n)*sizeof(_t));                                \
     else                                                                   \
        _p = (_t *) malloc((_n)*sizeof(_t));}
 
@@ -96,7 +92,7 @@ int ds_realloc(double *ptf, double *pnif, int nir)
 
     for (m = 0; m < nir; m++)
         {n = SM_MAX;
-	 ALLOC(a, char, n, "DS_REALLOC:a");
+	 ALLOC(a, char, n);
 
 	 tr = SC_wall_clock_time();
 
@@ -147,7 +143,7 @@ int us_realloc(double *ptf, double *pnif, int nir)
 
     for (m = 0; m < nir; m++)
         {for (i = 1; i < n; i++, ni++)
-	     {ALLOC(p[i], char, i, "US_REALLOC:p[i]");};
+	     {ALLOC(p[i], char, i);};
 
 	 tr = SC_wall_clock_time();
 
@@ -199,7 +195,7 @@ int sm_alloc(double *ptf, double *pnif, int nir)
 
 	 for (i = 1; i < n; i++, ni++)
 	     {nb = SC_random_int(1, SM_MAX);
-	      ALLOC(p[i], char, nb, "SM_ALLOC:p[i]");};
+	      ALLOC(p[i], char, nb);};
 
 	 tf += (SC_wall_clock_time() - tr);
 
@@ -244,7 +240,7 @@ int sm_free(double *ptf, double *pnif, int nir)
 
 	 for (i = 1; i < n; i++)
 	     {nb = SC_random_int(1, SM_MAX);
-	      ALLOC(p[i], char, nb, "SM_FREE:p[i]");};
+	      ALLOC(p[i], char, nb);};
 
 	 tr = SC_wall_clock_time();
 
@@ -269,12 +265,11 @@ int sm_free(double *ptf, double *pnif, int nir)
 /* LR_RAND_ALLOC - allocate random sized large chunks of memory */
 
 static void lr_rand_alloc(int *pl, int *pni, char **p, int n)
-   {int l, nb, ni, full;
+   {int l, nb, ni;
     int64_t nt;
     static int sz = sizeof(double);
 
-    full = TRUE;
-    ni   = *pni;
+    ni = *pni;
 
     nt = 0;
     for (l = 1; (l < n) && (nt < 100000000); l++, ni++)
@@ -282,7 +277,7 @@ static void lr_rand_alloc(int *pl, int *pni, char **p, int n)
 	 nb  = sz*((nb + sz - 1)/sz);
 	 nt += nb;
 
-	 ALLOC(p[l], char, nb, "LR_RAND_ALLOC:p[l]");
+	 ALLOC(p[l], char, nb);
 
 /* to defeat cheating lazy memory managers - zero out
  * the memory which will force them to actually allocate

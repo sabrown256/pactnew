@@ -792,8 +792,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
              {j   = NODE_OF(k, l, kbnd);
               apk[j] = 0.5*(s[j] + t[j]) + apk[j0];};};
 
-    SFREE_N(s, nz);
-    SFREE_N(t, nz);
+    SFREE(s);
+    SFREE(t);
 
     return;}
 

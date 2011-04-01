@@ -307,6 +307,7 @@ int test_4(void)
     prm[1] = 0.0;
     prm[2] = 0.0;
     ok = PM_interp_mesh_mq(nd, nf, nl, r, f, mxo, xo, fo, prm);
+    SC_ASSERT(ok == TRUE);
 
 /* print the results */
     out = fopen("test_4.out", "w");
@@ -379,6 +380,7 @@ int test_5(void)
     prm[1] = 2.0;
     prm[2] = 2.0;
     ok = PM_interp_mesh_id(nd, nf, nl, r, f, mxo, xo, fo, prm);
+    SC_ASSERT(ok == TRUE);
 
 /* print the results */
     out = fopen("test_5.out", "w");

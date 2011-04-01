@@ -100,7 +100,7 @@ void PG_invert_image(PG_image *im)
 static void PG_image_hand(PG_device *dev, PG_graph *g,
 			  double fmin, double fmax,
 			  PFImgZC fnc_zc, PFImgNC fnc_nc)
-   {int npts, ndpts, autodomain;
+   {int npts, autodomain;
     char *name;
     double *f, x[4], wc[PG_BOXSZ];
     PM_centering centering;
@@ -116,7 +116,6 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 	{PG_get_viewspace(dev, WORLDC, wc);
 
 	 domain = h->domain;
-	 ndpts  = domain->n_elements;
 
 	 PM_array_real(domain->element_type, domain->extrema, 4, x);
 	 PG_box_copy(2, wc, x);
@@ -676,7 +675,6 @@ static PG_image *PG_prep_image(PG_device *dev, PG_image *im,
 
 void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
    {int ix, iy, nx, ny, do_par_set;
-    double *vwprt;
     PG_image *nim;
     PG_graph g, *data;
     PG_picture_desc *pd;
@@ -702,8 +700,6 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 	pd = PG_setup_picture(dev, data, TRUE, TRUE, do_par_set);
 
 	PG_adorn_before(dev, pd, data);
-
-	vwprt = pd->viewport;
 
 	PG_get_viewport_size(dev, &ix, &iy, &nx, &ny);
 
@@ -1529,7 +1525,7 @@ int PG_place_image(PG_image *dim, PG_image *sim, int scale)
 int PG_copy_image(PG_image *dim, PG_image *sim, int bck)
    {int ic, id, is, od, os, c, bpp;
     int k, kmnd, kmxd, lmnd, lmxd, dk;
-    int l, kmns, kmxs, lmns, lmxs, dl;
+    int l, kmns, lmns, dl;
     unsigned char *sp, *dp;
     double dx, dy, dxp, dyp, sx, sy, sxp, syp;
     double ubx[PG_BOXSZ], dbx[PG_BOXSZ], sbx[PG_BOXSZ];
@@ -1569,9 +1565,7 @@ int PG_copy_image(PG_image *dim, PG_image *sim, int bck)
     lmxd = (ubx[3] - dbx[2])/dyp;
 
     kmns = (ubx[0] - sbx[0])/sxp;
-    kmxs = (ubx[1] - sbx[0])/sxp;
     lmns = (ubx[2] - sbx[2])/syp;
-    lmxs = (ubx[3] - sbx[2])/syp;
 
     dk = kmxd - kmnd;
     dl = lmxd - lmnd;

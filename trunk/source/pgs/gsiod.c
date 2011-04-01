@@ -289,6 +289,8 @@ void PG_iob_register_toggle(PG_device *dev, PG_interface_object *cnt,
 		     PG_IOB_DRW, "draw-text",
 		     PG_IOB_END);
 
+    SC_ASSERT(iob != NULL);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -334,6 +336,8 @@ void PG_iob_register_slider(PG_device *dev, PG_interface_object *cnt,
 		     PG_IOB_FLG, PG_IsSel,
 		     PG_IOB_END);
 
+    SC_ASSERT(var != NULL);
+
     PG_box_init(2, abx, 0.0, 1.0);
     c2 = PG_add_iob(dev, c1, abx, "Container",
 		    PG_IOB_CLR, 2, 2,
@@ -352,6 +356,8 @@ void PG_iob_register_slider(PG_device *dev, PG_interface_object *cnt,
 		     PG_IOB_FLG, PG_IsVis,
 		     PG_IOB_FLG, PG_IsSel,
 		     PG_IOB_END);
+
+    SC_ASSERT(btn != NULL);
 
     return;}
 

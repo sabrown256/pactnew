@@ -109,16 +109,12 @@ static void *awc(void *arg)
     double ptot;
     double *rx1, *rx2, *rx3, *rx4;
     double *ry1, *ry2, *ry3, *ry4;
-    double *vx1, *vx2, *vx3, *vx4;
-    double *vy1, *vy2, *vy3, *vy4;
     double *dvxdt1, *dvxdt2, *dvxdt3, *dvxdt4;
     double *dvydt1, *dvydt2, *dvydt3, *dvydt4;
     void *rv;
 
     vecset4(rx, rx1, rx2, rx3, rx4);
     vecset4(ry, ry1, ry2, ry3, ry4);
-    vecset4(vx, vx1, vx2, vx3, vx4);
-    vecset4(vy, vy1, vy2, vy3, vy4);
     vecset4(dvxdt, dvxdt1, dvxdt2, dvxdt3, dvxdt4);
     vecset4(dvydt, dvydt1, dvydt2, dvydt3, dvydt4);
 
@@ -321,7 +317,7 @@ static void *areaw(void *arg)
 /* DAREADT - calculate the projected quadrant volume change */
 
 static double dareadt(double *rx, double *ry, double *vx, double *vy)
-   {int j, k;
+   {int j;
     double *rx1, *rx2, *rx3, *rx4;
     double *ry1, *ry2, *ry3, *ry4;
     double *vx1, *vx2, *vx3, *vx4;
@@ -338,9 +334,7 @@ static double dareadt(double *rx, double *ry, double *vx, double *vy)
     dta  = HUGE;
 
     for (j = frz; j <= lrz; j++)
-        {k = 5*j;
-
-         da = VOLR(rx1[j], rx2[j], rx3[j], rx4[j],
+        {da = VOLR(rx1[j], rx2[j], rx3[j], rx4[j],
                    vy1[j], vy2[j], vy3[j], vy4[j])  +
               VOLR(vx1[j], vx2[j], vx3[j], vx4[j],
                    ry1[j], ry2[j], ry3[j], ry4[j]);

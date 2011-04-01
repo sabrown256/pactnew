@@ -69,8 +69,9 @@ static void _SX_rd_indirection_list(object *obj, PDBfile *file,
            SS_error("CAN'T FIND NUMBER OF BYTES - _SX_RD_INDIRECTION_LIST",
                     SS_null);
 
-        DEREF(vr) = pv = SC_alloc_nzt(nitems, bpi,
-				      "_SX_RD_INDIRECTION_LIST:pv", NULL);
+	pv = CMAKE_N(char, nitems*bpi);
+        DEREF(vr) = pv;
+
         _SX_rd_tree_list(obj, file, pv, nitems, type, (dimdes *) NULL);};
 
     return;}

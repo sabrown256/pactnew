@@ -61,6 +61,7 @@ targets :
 	@echo "   lnnorm    : make ln norm test"
 	@echo "   lrac      : make LR to AC mapping test"
 	@echo "   matrix    : make matrix tests"
+	@echo "   perf      : test arithmetic performance"
 	@echo "   sharedlib : build and install PML shared libs in dev/arch"
 	@echo "   svdsolv   : make SVD solvers test"
 	@echo "   topsort   : make topological sort test"
@@ -224,6 +225,14 @@ ${BinDir}/mlfpets : mlfpets.c ${TGTLib}
 ${BinDir}/mlnants : mlnants.c ${TGTLib}
 	${CC} -c mlnants.c -o ${PACTTmpDir}/mlnants.o
 	${CLD} ${LdFlags} ${PACTTmpDir}/mlnants.o -o ${BinDir}/mlnants ${Libs}
+
+#
+# test performance
+#
+perf : ${BinDir}/mlpfts ${BinDir}/mlnants
+
+${BinDir}/mlpfts : mlpfts.c ${TGTLib}
+	${CLD} ${LdFlags} mlpfts.c -o ${BinDir}/mlpfts ${Libs}
 
 #
 # link 

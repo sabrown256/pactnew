@@ -519,12 +519,11 @@ static void PG_scan_triangle(PG_device *dev, double *zbf,
 /* _PG_DO_SCAN_LINE - do a chunk of scan lines for the picture */
 
 static void *_PG_do_scan_line(void *arg)
-   {int i, id, nic, ok, p1, p2;
-    int ds, np, iymn, iymx;
+   {int i, nic, ok, p1, p2;
+    int ds, iymn, iymx;
     int a[4];
     int *iextr;
     double u[4];
-    double vmn;
     double **xi;
     PM_polygon *py, *pl;
     PG_scan_line_data *par;
@@ -532,9 +531,11 @@ static void *_PG_do_scan_line(void *arg)
     PFSurfScan fnc_scan;
     void *rv;
 
+#if 0
+    int id;
+
     id = SC_current_thread();
 
-#if 0
 /* GOTCHA: cause crash to test atdbg thread handling */
     if (id == 3)
        printf("-> %s\n", *((char **) -1));
@@ -543,9 +544,7 @@ static void *_PG_do_scan_line(void *arg)
     par = (PG_scan_line_data *) arg;
 
     ds       = par->ds;
-    np       = par->np;
     iextr    = par->iextr;
-    vmn      = par->vmn;
     py       = par->py;
     fnc_scan = par->fnc_scan;
     dev      = par->dev;
@@ -619,7 +618,7 @@ static void _PG_draw_surface(PG_device *dev, int nd,
 			     double width, int color, int mesh, int style,
 			     PG_rendering pty, char *name, void *cnnct,
 			     pcons *alist, PFSurfScan fnc_scan)
-   {int i, n, np, mpts, ds;
+   {int i, np, mpts, ds;
     int jx, jy, lx, ly, nx, ny;
     int iext[4];
     double vext[PG_SPACEDM];
@@ -627,13 +626,10 @@ static void _PG_draw_surface(PG_device *dev, int nd,
     double **ir, **r, **p, *t[PG_SPACEDM];
     PM_polygon *py;
     PG_scan_line_data par;
-    PG_RAST_device *mdv;
-    PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
 
-    g  = &dev->g;
     ds = dev->resolution_scale_factor;
 
     t[0] = x;
@@ -673,8 +669,6 @@ static void _PG_draw_surface(PG_device *dev, int nd,
 
     PG_set_clipping(dev, FALSE);
 
-    mdv = _PG_get_raster(dev, TRUE);
-
 /* find mins and maxes for the integer mesh */
     PM_vector_extrema(1, nn, &r[2], vext);
 
@@ -704,8 +698,6 @@ static void _PG_draw_surface(PG_device *dev, int nd,
        {ny++;
         ly++;
         iext[3]++;};
-
-    n = nx*ny;
 
     if (POSTSCRIPT_DEVICE(dev) && !COLOR_POSTSCRIPT_DEVICE(dev))
        i = dev->current_palette->n_pal_colors + 1;
@@ -774,8 +766,7 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
     int color, mesh, style, rexfl;
     char bf[MAXLINE], *mtype, *s;
     double width;
-    double va[PG_NANGLES], box[PG_BOXSZ];
-    double dx, dy, wc[PG_BOXSZ];
+    double va[PG_NANGLES], box[PG_BOXSZ], wc[PG_BOXSZ];
     double **r, **d, *dextr, *rextr, **afd;
     void **afs;
     PM_centering centering;
@@ -816,8 +807,6 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
     dextr = PM_array_real(domain->element_type, domain->extrema, 4, NULL);
 
     PG_get_viewspace(dev, WORLDC, wc);
-    dx = wc[1] - wc[0];
-    dy = wc[3] - wc[2];
 
     range = h->range;
     strcpy(bf, range->element_type);
@@ -1021,7 +1010,7 @@ static void _PG_surface_core(PG_device *dev, PG_graph *data, void *cnnct,
 
 static void PG_scan_convert_lr(PG_device *dev, PG_scan_line_data *par,
 			       int *ip, int indx, int sweep)
-   {int i, j, l, l0, ln, lc, ic, n, nmap, im, jm, eflag;
+   {int i, j, l, l0, ln, lc, ic, nmap, im, jm, eflag;
     int nd, color, mesh, iline;
     int ix[5], iy[5];
     int *maxes, imax, jmax;
@@ -1060,7 +1049,6 @@ static void PG_scan_convert_lr(PG_device *dev, PG_scan_line_data *par,
     maxes = (int *) cnnct;
     imax  = maxes[0];
     jmax  = maxes[1];
-    n     = imax*jmax;
     nmap  = (imax - 1)*(jmax - 1);
 
     emap = PM_check_emap(&eflag, alist, nmap);
@@ -1196,7 +1184,6 @@ static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
     double **v, *ft, **f, **ir, *fextr;
     double *zbf;
     void *cnnct;
-    pcons *alist;
     frame *fr;
     PG_rendering pty;
     PG_RAST_device *mdv;
@@ -1216,7 +1203,6 @@ static void PG_scan_convert_ac(PG_device *dev, PG_scan_line_data *par,
     mesh  = par->mesh;
     pty  = par->type;
     cnnct = par->cnnct;
-    alist = par->alist;
     nd    = par->nd;
     ir    = par->ir;
     f     = par->f;

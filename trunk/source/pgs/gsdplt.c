@@ -121,7 +121,7 @@ static void _PG_dom_1d(PG_device *dev, PM_set *dom, PM_set *ran)
 
 static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
 			  void *cnnct, pcons *alist)
-   {int i, k, l, i1, i2, n, nmap, imp, imq;
+   {int i, k, l, i1, i2, nmap, imp, imq;
     int kb, lb, km, lm, kmax, lmax, eflag, refl;
     int kmn, kmx, knc, kon, kcl, kst;
     int lmn, lmx, lnc, lon, lcl, lst;
@@ -134,7 +134,6 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
     maxes = (int *) cnnct;
     kmax  = maxes[0];
     lmax  = maxes[1];
-    n     = kmax*lmax;
 
     km   = kmax - 1;
     lm   = lmax - 1;
@@ -755,9 +754,6 @@ static void _PG_dom_0d_3d(PG_device *dev, long npts,
     double u[PG_SPACEDM];
     double wc[PG_BOXSZ];
     double **t;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     PG_get_attrs_alist(alst,
 		       "MARKER-INDEX", SC_INT_I,    &mrk,  0,
@@ -795,12 +791,9 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
     double **r;
     char lbl[MAXLINE], ltype[MAXLINE];
     char *s;
-    PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
-
-    g = &dev->g;
 
     PG_make_device_current(dev);
 
@@ -966,7 +959,6 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
     double wid, th, ph, ch, thl, phl;
     double *dpex, *ddex, *pdx;
     double *ndc;
-    PM_set *dom;
     PG_picture_desc *pd;
     PG_par_rend_info *pri;
     PG_device *dd;
@@ -974,8 +966,6 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 
     if (dev == NULL)
        return(NULL);
-
-    dom = data->f->domain;
 
     change = !dev->supress_setup;
 
@@ -1399,7 +1389,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 
 	if (ndc == NULL)
 	   {PG_rem_attrs_graph(data, "VIEW-PORT", NULL);
-	    SFREE_N(pv, 4);};
+	    SFREE(pv);};
 
 	if (pc == NULL)
 	   PG_rem_attrs_set(domain, "LINE-COLOR", NULL);

@@ -15,7 +15,7 @@
 #include "scope_mem.h"
 
 SC_mem_fnc
- SC_mem_hook = {SC_alloc_na, SC_realloc_na, SC_free};
+ SC_mem_hook = {SC_nalloc_na, SC_alloc_na, SC_realloc_na, SC_free};
 
 SC_thread_lock
  SC_mm_lock = SC_LOCK_INIT_STATE,
@@ -625,10 +625,11 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
  *              - set the type field of the descriptor to TYP
  */
 
-void *SC_alloc_nzt(long nitems, long bpi, char *name, void *arg)
+void *SC_alloc_nzt(long nitems, long bpi, void *arg)
    {int na, zsp, typ;
     long nb, nbp;
     uint64_t a, f;
+    char *name;
     SC_mem_opt *opt;
     SC_heap_des *ph;
     mem_header *space;
@@ -637,12 +638,14 @@ void *SC_alloc_nzt(long nitems, long bpi, char *name, void *arg)
     if (arg == NULL)
        {na   = FALSE;
 	zsp  = _SC_zero_space;
-	typ  = -1;}
+	typ  = -1;
+        name = NULL;}
     else
        {opt  = (SC_mem_opt *) arg;
 	na   = opt->na;
 	zsp  = opt->zsp;
-	typ  = opt->typ;};
+	typ  = opt->typ;
+        name = (char *) opt->fnc;};
 
     ph = _SC_tid_mm();
     nb  = nitems*bpi;
@@ -897,11 +900,44 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
    {void *p;
     SC_mem_opt opt;
 
-    opt.na  = na;
-    opt.zsp = zsp;
-    opt.typ = -1;
+    opt.na   = na;
+    opt.zsp  = zsp;
+    opt.typ  = -1;
+    opt.fnc  = name;
+    opt.file = NULL;
+    opt.line = -1;
 
-    p = SC_alloc_nzt(nitems, bpi, name, &opt);
+    p = SC_alloc_nzt(nitems, bpi, &opt);
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_NALLOC_NA - add a layer of control over the C level memory management
+ *              - system to store the byte length of allocated spaces
+ *              - a space EXTRA_WORD_SIZE greater than requested is allocated
+ *              - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *              - bytes with a 4 bit marker in the high bits and a pointer to the
+ *              - next byte is returned
+ *              - if the maximum size is exceeded a NULL pointer is returned
+ *              - iff NA TRUE fudge the accounting so that this block
+ *              - will not show up in the bytes allocated count
+ */
+
+void *SC_nalloc_na(long nitems, long bpi, int na,
+		   const char *fnc, const char *file, int line)
+   {void *p;
+    SC_mem_opt opt;
+
+    opt.na   = na;
+    opt.zsp  = _SC_zero_space;
+    opt.typ  = -1;
+    opt.fnc  = fnc;
+    opt.file = file;
+    opt.line = line;
+
+    p = SC_alloc_nzt(nitems, bpi, &opt);
 
     return(p);}
 
@@ -926,8 +962,11 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
     opt.na  = na;
     opt.zsp = _SC_zero_space;
     opt.typ = -1;
+    opt.fnc  = name;
+    opt.file = NULL;
+    opt.line = -1;
 
-    p = SC_alloc_nzt(nitems, bpi, name, &opt);
+    p = SC_alloc_nzt(nitems, bpi, &opt);
 
     return(p);}
 
@@ -1014,4 +1053,3 @@ FIXNUM F77_FUNC(sczrsp, SCZRSP)(FIXNUM *pf)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-

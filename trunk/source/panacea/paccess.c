@@ -705,12 +705,12 @@ void *_PA_alloc(defstr *dp, char *type, long nitems, void *pval)
 
     bpi = dp->size;
     if (_PD_indirection(type))
-       vr = SC_alloc_nzt(nitems, sizeof(char *), "_PA_ALLOC:vra", NULL);
+       vr = CMAKE_N(char *, nitems);
 
     else
        {PA_ERR((dp == NULL),
                "BAD TYPE %s - _PA_ALLOC", type);
-        vr = SC_alloc_nzt(nitems, bpi, "_PA_ALLOC:vrb", NULL);};
+        vr = CMAKE_N(char, nitems*bpi);};
 
 /* if given a non-NULL initial value, broadcast it in
  * otherwise make sure the space is filled with zeroes
