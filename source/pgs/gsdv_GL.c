@@ -148,13 +148,10 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
                                        Window window, GC gc,
 				       double xf, double yf,
                                        double dxf, double dyf)
-   {unsigned long bck_color, for_color, valuemask;
-    unsigned int icon_width, icon_height;
+   {unsigned long bck_color, for_color;
     int i, Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int screen, win_x, win_y, win_width, win_height;
-    int display_width, display_height, min_dim;
+    int screen, display_width, display_height, min_dim;
     int n_dev_colors;
-    char *window_name, *icon_name;
     double intensity;
     XVisualInfo *vi;
     XWindowAttributes windowattr;
@@ -179,8 +176,6 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
 
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
-
-    valuemask = 0;
 
     PG_query_screen(dev, &display_width, &display_height, &n_dev_colors);
     if ((display_width == 0) && (display_height == 0) &&
@@ -217,19 +212,6 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
 
     min_dim = min(display_width, display_height);
 
-    win_x = xf*min_dim;
-    win_y = yf*min_dim;
-
-    win_width  = dxf*min_dim;
-    win_height = dyf*min_dim;
-
-/* window manager hints */
-    icon_width  = 16;
-    icon_height = 16;
-
-    icon_name = window_name = SC_strsavef(dev->title,
-                              "char*:_PG_GL_OPEN_IMBEDDED_SCREEN:name");
-
 /* decide on the overall color layout and choose WHITE or BLACK background */
     dev->absolute_n_color = n_dev_colors;
     intensity = dev->max_intensity*MAXPIX;
@@ -265,6 +247,8 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
         Darkest    = 0;
         bck_color  = BlackPixel(dev->display, screen);
         for_color  = WhitePixel(dev->display, screen);};
+
+    SC_ASSERT(for_color != bck_color);
 
 /* Note: This flag was added in order to get PG_define_region and
  *       PG_move_object to work properly. Whether the GS_XOR logical

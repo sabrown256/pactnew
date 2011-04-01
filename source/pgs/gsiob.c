@@ -592,15 +592,12 @@ void PG_draw_interface_object(PG_interface_object *iob)
     int oflg[PG_SPACEDM], nflg[PG_SPACEDM];
     PG_interface_object *ch;
     PG_device *dev;
-    PG_dev_geometry *g;
 
     if (iob != NULL)
        {if (iob->is_visible)
 	   {dev = iob->device;
 	    if ((dev != NULL) && (iob->draw != NULL))
-	       {g = &dev->g;
-
-	        PG_make_device_current(dev);
+	       {PG_make_device_current(dev);
 
 		PG_get_axis_log_scale(dev, 2, oflg);
 

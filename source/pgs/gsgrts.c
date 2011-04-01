@@ -155,6 +155,7 @@ static int scr_test(char *name, int color, int debug_mode, int nt, gtest tst)
     PG_rl_all();
 
     sc = test_check(name, 1L, debug_mode);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -188,6 +189,7 @@ static int ps_test(char *name, int color, int debug_mode, int nt, gtest tst)
     PG_rl_all();
 
     sc = test_check(name, 1L, debug_mode);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 

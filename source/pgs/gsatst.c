@@ -57,6 +57,7 @@ static void compute_2d_data(double *f, double *x, double *y,
     xmax =  5.0;
     ymin = -5.0;
     ymax =  5.0;
+    SC_ASSERT(ymax > ymin);
 
     dx = (xmax - xmin)/((double) kmax - 1.0);
     dy = (xmax - xmin)/((double) kmax - 1.0);
@@ -112,6 +113,7 @@ static PM_mapping *compute_2d_ac_mapping_2(double *x, double *y,
     xmax =  5.0;
     ymin = -5.0;
     ymax =  5.0;
+    SC_ASSERT(ymax > ymin);
 
     dx = (xmax - xmin)/((double) kmax - 1.0);
     dy = (xmax - xmin)/((double) kmax - 1.0);
@@ -231,6 +233,7 @@ static PM_mapping *compute_2d_ac_mapping_1(double *x, double *y,
     xmax =  5.0;
     ymin = -5.0;
     ymax =  5.0;
+    SC_ASSERT(ymax > ymin);
 
     dx = (xmax - xmin)/((double) kmax - 1.0);
     dy = (xmax - xmin)/((double) kmax - 1.0);
@@ -478,6 +481,7 @@ static int test_3(PG_device *dev)
 	exit(1);};
 
     pl = PG_set_palette(dev, PAL(1));
+    SC_ASSERT(pl != NULL);
 
 /* compute the first image */
     bf = calc_im->buffer;
@@ -489,8 +493,10 @@ static int test_3(PG_device *dev)
 /* draw the first image */
     PG_draw_image(dev, calc_im, "Test Data A", NULL);
 
-/* compute the second image */
     pl = PG_set_palette(dev, PAL(2));
+    SC_ASSERT(pl != NULL);
+
+/* compute the second image */
     dx = 2.0*PI/((double) w);
     dy = 2.0*PI/((double) h);
     bf = calc_im->buffer;
@@ -728,7 +734,6 @@ static int test_6(PG_device *dev)
    {int i, k, l, kmax, lmax, kxl;
     int id, lncolor, lnstyle;
     double km, lm, lnwidth;
-    double xmin, xmax, ymin, ymax;
     double *x, *y, *u, *v;
     PM_centering centering;
     PM_set *domain, *range;
@@ -740,10 +745,6 @@ static int test_6(PG_device *dev)
 /* set up data */
     kmax      = 20;
     lmax      = 20;
-    xmin      = -5.0;
-    xmax      = 5.0;
-    ymin      = -5.0;
-    ymax      = 5.0;
     id        = 'A';
     lncolor   = dev->BLUE;
     lnwidth   = 0.0;
@@ -944,7 +945,7 @@ static int test_8(PG_device *dev)
 static int test_9(PG_device *dev)
    {int i, k, l, m, kmax, lmax, mmax, kxl;
     int id, lncolor, lnstyle;
-    double xmin, xmax, ymin, ymax, zmin, zmax, dx, dy;
+    double xmin, xmax, ymin, ymax, dx, dy;
     double lnwidth, theta, phi, chi;
     double *x, *y, *z, *f;
     PM_centering centering;
@@ -972,6 +973,8 @@ static int test_9(PG_device *dev)
     x         = FMAKE_N(double, kxl, "TEST_9:x");
     y         = FMAKE_N(double, kxl, "TEST_9:y");
     f         = FMAKE_N(double, kxl, "TEST_9:f");
+
+    SC_ASSERT(ymax > ymin);
 
     dx = (xmax - xmin)/((double) kmax - 1.0);
     dy = (xmax - xmin)/((double) kmax - 1.0);
@@ -1013,8 +1016,6 @@ static int test_9(PG_device *dev)
     xmax      = 3.0;
     ymin      = -3.0;
     ymax      = 5.0;
-    zmin      = 0.0;
-    zmax      = 7.0;
     kxl       = kmax*lmax*mmax;
     x         = FMAKE_N(double, kxl, "TEST_9:x");
     y         = FMAKE_N(double, kxl, "TEST_9:y");
@@ -1138,19 +1139,17 @@ static int test_10(PG_device *dev)
 static int test_11(PG_device *dev)
    {int kmax, lmax, kxl;
     double *x, *y;
-    PM_centering centering;
     PM_mapping *f;
 
     if (dev == NULL)
        return(FALSE);
 
 /* set up data */
-    centering = Z_CENT;
-    kmax      = 11;
-    lmax      = 11;
-    kxl       = kmax*lmax;
-    x         = FMAKE_N(double, kxl, "TEST_11:x");
-    y         = FMAKE_N(double, kxl, "TEST_11:y");
+    kmax = 11;
+    lmax = 11;
+    kxl  = kmax*lmax;
+    x    = FMAKE_N(double, kxl, "TEST_11:x");
+    y    = FMAKE_N(double, kxl, "TEST_11:y");
 
     f = compute_2d_ac_mapping_2(x, y, kmax, lmax);
 
@@ -1196,23 +1195,21 @@ static int test_11(PG_device *dev)
 static int test_12(PG_device *dev)
    {int kmax, lmax, kxl;
     double *x, *y;
-    PM_centering centering;
     PM_mapping *f;
 
     if (dev == NULL)
        return(FALSE);
 
 /* set up data */
-    centering = Z_CENT;
-    kmax      = 11;
-    lmax      = 11;
+    kmax = 11;
+    lmax = 11;
 /*
-    kmax      = 3;
-    lmax      = 3;
+    kmax = 3;
+    lmax = 3;
 */
-    kxl       = kmax*lmax;
-    x         = FMAKE_N(double, kxl, "TEST_12:x");
-    y         = FMAKE_N(double, kxl, "TEST_12:y");
+    kxl = kmax*lmax;
+    x   = FMAKE_N(double, kxl, "TEST_12:x");
+    y   = FMAKE_N(double, kxl, "TEST_12:y");
 
     f = compute_2d_ac_mapping_1(x, y, kmax, lmax);
 
@@ -1347,6 +1344,7 @@ static int scr_test(char *name, int color, int debug_mode, int nt,
     PG_rl_all();
 
     sc = test_check(name, 1L, debug_mode);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -1387,6 +1385,7 @@ static int ps_test(char *name, int color, int debug_mode, int nt,
     PG_rl_all();
 
     sc = test_check(name, 1L, debug_mode);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -1421,6 +1420,7 @@ static int cgm_test(char *name, int color, int debug_mode, int nt,
     PG_rl_all();
 
     sc = test_check(name, 1L, debug_mode);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -1454,7 +1454,8 @@ static int jpeg_test(char *name, int color, int debug_mode, int nt,
 
 	PG_rl_all();
 
-	sc = test_check(name, 1L, debug_mode);};
+	sc = test_check(name, 1L, debug_mode);
+	SC_ASSERT(sc == TRUE);};
 
     return(ok);}
 
@@ -1488,7 +1489,8 @@ static int png_test(char *name, int color, int debug_mode, int nt,
 
 	PG_rl_all();
 
-	sc = test_check(name, 1L, debug_mode);};
+	sc = test_check(name, 1L, debug_mode);
+	SC_ASSERT(sc == TRUE);};
 
     return(ok);}
 
@@ -1524,7 +1526,8 @@ static int image_test(char *name, int color,int debug_mode,int nt,
 
 	    PG_rl_all();
 
-	    sc = test_check(name, 1L, debug_mode);};};
+	    sc = test_check(name, 1L, debug_mode);
+	    SC_ASSERT(sc == TRUE);};};
 
     return(ok);}
 

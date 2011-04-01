@@ -204,7 +204,7 @@
 /* this is a minor diagnostic that counts unexpected results
  * it will also silence warnings about variables being set but not used
  */
-#define SC_ASSERT(_t)   _SC.assert_fail += ((_t) == FALSE)
+#define SC_ASSERT(_t)   {if ((_t) == FALSE) SC_assert_fail++;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -319,16 +319,19 @@ struct s_quaternion
  *    _F   lock and unlock the block iff TRUE
  *    _L   use the supplied lock if non-NULL otherwise
  *         use a locally defined lock of block scope
+ * NOTE: some of the bizarre coding is to avoid compiler warnings
+ * deal with it
  */
 
 #define ONCE_SAFE(_f, _l)                                                    \
    {static int _first = TRUE;                                                \
     if (_first == TRUE)                                                      \
        {int _use;                                                            \
-        SC_thread_lock *_lck;                                                \
+        SC_thread_lock *_lck, *_lc;                                          \
         static SC_thread_lock _lock = SC_LOCK_INIT_STATE;                    \
-	_lck = (_l == NULL) ? &_lock : _l;                                   \
-	_use = ((_f) == TRUE);                                               \
+        _lc  = _l;                                                           \
+	_lck = (_lc == NULL) ? &_lock : _lc;                                 \
+	_use = (_f);                                                         \
         if (_use == TRUE)                                                    \
            _SC_eth_lockon(_lck);                                             \
         if (_first == TRUE)                                                  \
@@ -337,10 +340,11 @@ struct s_quaternion
 #define IF_SAFE(_f, _l, _t)                                                  \
    {if (_t)                                                                  \
        {int _use;                                                            \
-        SC_thread_lock *_lck;                                                \
+        SC_thread_lock *_lck, *_lc;                                          \
         static SC_thread_lock _lock = SC_LOCK_INIT_STATE;                    \
-	_lck = (_l == NULL) ? &_lock : _l;                                   \
-	_use = ((_f) == TRUE);                                               \
+        _lc  = _l;                                                           \
+	_lck = (_lc == NULL) ? &_lock : _lc;                                 \
+	_use = (_f);                                                         \
         if (_use == TRUE)                                                    \
            _SC_eth_lockon(_lck);                                             \
         if (_t)                                                              \
@@ -402,15 +406,7 @@ struct s_quaternion
     free(x);                                                                 \
     x = NULL;}
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SFREE_N - release memory and do bookkeeping on arrays */
-
-#define SFREE_N(x, n)                                                        \
-   {SC_mem_stats_acc(0L, (long) n*sizeof(*x));                               \
-    free(x);                                                                 \
-    x = NULL;}
+#define SFREE_N(x, n)    SFREE(x)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

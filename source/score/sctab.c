@@ -909,7 +909,7 @@ FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, F77_string pname, void *ptr,
 	void *s;
 
         n = SIZEOF(type);
-        s = SC_alloc_nzt(1L, n, NULL, NULL);
+        s = CMAKE_N(char, n);
         memcpy(s, ptr, n);
 
         ptr = s;};

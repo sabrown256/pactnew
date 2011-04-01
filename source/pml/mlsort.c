@@ -119,8 +119,8 @@ int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
 
         f = q[f];};
 
-    SFREE_N(link, n_dep+n_pts+1);
-    SFREE_N(q, n_pts+1);
+    SFREE(link);
+    SFREE(q);
 
 /* if n is non-zero there was a loop in the topology */
     if (n != 0)

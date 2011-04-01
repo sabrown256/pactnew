@@ -199,6 +199,7 @@ static int test_3(void)
 
     fp = io_open("mft.3", "w");
     nw = io_write(src, 1, m, fp);
+    SC_ASSERT(nw == m);
 
     od = 20;
     oi = 100;
@@ -209,6 +210,7 @@ static int test_3(void)
 
     io_seek(fp, 0, SEEK_SET);
     nr = io_read(dst, 1, m, fp);
+    SC_ASSERT(nr == m);
 
     ps = src + od;
     pd = dst + oi;

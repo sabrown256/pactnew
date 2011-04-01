@@ -114,7 +114,7 @@ FIXNUM F77_FUNC(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
 
     SC_VA_END;
 
-    *pv = SC_alloc_nzt(size, *pbpi, "PALOCA:pv", NULL);
+    *pv = CMAKE_N(char, size*(*pbpi));
 
     return(TRUE);}
 

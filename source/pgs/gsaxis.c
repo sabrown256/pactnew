@@ -113,7 +113,7 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
 
 static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
    {int nt, troa[2], lroa[2];
-    double majoren[2], wext[2], tn[2], vw[2];
+    double majoren[2], tn[2], vw[2];
     double bnd[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
@@ -126,9 +126,6 @@ static void _PG_draw_cartesian_axes(PG_device *dev, int labl)
 
 /* get window and viewport limits */
     PG_get_viewspace(dev, BOUNDC, bnd);
-
-    wext[0] = bnd[1] - bnd[0];
-    wext[1] = bnd[3] - bnd[2];
 
 /* if the coordinate system has x increasing to the right */
     if (bnd[1] >= bnd[0])
@@ -783,7 +780,7 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 
 static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
    {int n;
-    double en[2], csa, sna, log_scale;
+    double en[2], csa, sna;
     double x1[PG_SPACEDM], x2[PG_SPACEDM], x3[PG_SPACEDM], x4[PG_SPACEDM];
     double xa[PG_SPACEDM], xb[PG_SPACEDM], xs[PG_SPACEDM], sx[PG_SPACEDM];
     double fdx[PG_SPACEDM];
@@ -815,7 +812,7 @@ static int _PG_draw_tick(PG_device *dev, PG_axis_def *ad, double sz, int tick)
     xb[0] = xs[0] + en[1]*csa*sx[0];
     xb[1] = xs[1] + en[1]*sna*sx[1];
 
-    log_scale = _PG_axis_place(dev, fdx, ad, sz, tick);
+    _PG_axis_place(dev, fdx, ad, sz, tick);
 
 /* depending on the tick type compute the actual starting and ending points
  * for the first and last ticks
@@ -953,7 +950,7 @@ static void _PG_axis_label_fmt(PG_device *dev,
 			       double *ptol, char *fmt,
 			       PG_axis_tick_def *td)
    {int i, n, ti;
-    double tol, yo, sp, ls, db, dv;
+    double tol, yo, ls, db, dv;
     double en[2], vo[2];
     double ld[PG_SPACEDM], tdx[PG_SPACEDM];
     double *dx;
@@ -964,7 +961,6 @@ static void _PG_axis_label_fmt(PG_device *dev,
 
     strcpy(format, fmt);
 
-    sp = td->space;
     dx = td->dx;
     n  = td->n;
     en[0] = td->en[0];

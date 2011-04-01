@@ -272,8 +272,8 @@ static int _PG_rst_clip_line(PG_device *dev, double *x1, double *x2)
 /* _PG_RST_DRAW_LINE_2D - draw a line on the current frame buffer */
 
 void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
-   {int i, dxi, dyi, nx, ny, np, visible, rgb;
-    int limit, il, icnt, lim0, lim1, nn, sp, dl[4];
+   {int i, dxi, dyi, visible, rgb;
+    int limit, il, icnt, lim1, nn, sp, dl[4];
     int ls, lc;
     int ir[PG_SPACEDM];
     double lw, dxr, dyr, rx, ry;
@@ -301,9 +301,6 @@ void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
 
     rgb = mdv->rgb_mode;
     fr  = mdv->raster;
-    nx  = fr->width;
-    ny  = fr->height;
-    np  = nx*ny;
 
 /* take negative LC to mean the background color - dev->BLACK */
     if (lc < 0)
@@ -333,7 +330,6 @@ void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
 
     il   = 1;
     icnt = 0;
-    lim0 = 0;
     lim1 = dl[0];
 
 /* should we use "+ 0.49" or not ? */
@@ -361,7 +357,6 @@ void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
 		  sp = (((icnt % 2 == 0) && (il <= lim1)) || (il > lim1));
 		  if (il > lim1)
 		     {icnt++;
-		      lim0 = lim1;
 		      lim1 += dl[icnt % nn];};
 		  break;};
 
@@ -378,8 +373,8 @@ void _PG_rst_draw_line_2d(PG_device *dev, int *i1, int *i2)
  */
 
 void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
-   {int i, id, dxi, dyi, nx, ny, np, visible, rgb;
-    int limit, il, icnt, lim0, lim1, nn, sp, dl[4];
+   {int i, id, dxi, dyi, visible, rgb;
+    int limit, il, icnt, lim1, nn, sp, dl[4];
     int ls, lc, wox, woy;
     int ir[PG_SPACEDM];
     double lw, sf, dxr, dyr, dzr, rx, ry, rz;
@@ -411,9 +406,6 @@ void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
 
     rgb = mdv->rgb_mode;
     fr  = mdv->raster;
-    nx  = fr->width;
-    ny  = fr->height;
-    np  = nx*ny;
 
 /* GOTCHA: why isn't this like the case in _PG_rst_draw_line_2d */
     if (lc < 0)
@@ -448,7 +440,6 @@ void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
 
     il   = 1;
     icnt = 0;
-    lim0 = 0;
     lim1 = dl[0];
 
 /* should we use "+ 0.49" or not ? */
@@ -483,7 +474,6 @@ void _PG_rst_draw_line_3d(PG_device *dev, int *i1, int *i2)
 		  sp = (((icnt % 2 == 0) && (il <= lim1)) || (il > lim1));
 		  if (il > lim1)
 		     {icnt++;
-		      lim0 = lim1;
 		      lim1 += dl[icnt % nn];};
 		  break;};
 
@@ -536,7 +526,7 @@ void dacrst(frame *fr)
  */
 
 void dprst(frame *fr)
-   {int i, j, l, n, w, h;
+   {int i, j, l, w, h;
     char *s;
     unsigned char bc, *a;
     double *z;
@@ -547,8 +537,6 @@ void dprst(frame *fr)
     bc = '\377';
 
     s = FMAKE_N(char, w, "DPRRST:s");
-
-    n = w*h;
 
     a = fr->r;
     io_puts("Red component:\n", stdout);

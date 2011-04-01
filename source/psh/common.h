@@ -45,6 +45,9 @@
 #define FREE(_p)          {if (_p != NULL) free(_p); _p = NULL;}
 #define STRSAVE(_s)       strdup(_s)
 
+#undef ASSERT
+#define ASSERT(_t)        {if (_t) _assert_fail++;}
+
 #define LST_FREE(_x)                                                         \
     {lst_free(_x);                                                           \
      _x = NULL;}
@@ -85,6 +88,9 @@
 
 extern int
  sched_yield(void);
+
+int
+ _assert_fail = 0;
 
 #endif
 

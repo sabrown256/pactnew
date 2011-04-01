@@ -158,7 +158,7 @@ static object *_SSI_opn_pr(object *argl)
     if (pp == NULL)
        SS_error("CAN'T OPEN PROCESS - PROCESS-OPEN", obj);
 
-    SFREE_N(argv, n);
+    SFREE(argv);
 
     obj = SS_mk_object(pp, SS_PROCESS_I, SELF_EV, NULL,
 		       _SS_wr_process, _SS_rl_process);

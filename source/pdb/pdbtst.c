@@ -245,6 +245,8 @@ static void test_target(char *tgt, char *base, int n,
 
     if (tgt != NULL)
        {rv = PD_target_platform(tgt);
+	SC_ASSERT(rv == TRUE);
+
         sprintf(fname, "%s-%s.rs%d", base, tgt, n);
         sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
 
@@ -3663,6 +3665,8 @@ static int run_test(PFTest test, int n, char *host, int native)
        {m = PD_target_n_platforms();
 	for (i = 0; i < m; i++)
 	    {rv = PD_target_platform_n(i);
+	     SC_ASSERT(rv == TRUE);
+
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
 	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);

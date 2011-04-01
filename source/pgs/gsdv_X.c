@@ -302,10 +302,10 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
 				      Window window, GC gc,
 				      double xf, double yf,
 				      double dxf, double dyf)
-   {unsigned long bck_color, for_color, valuemask;
-    unsigned int icon_width, icon_height, depth;
+   {unsigned long bck_color, for_color;
+    unsigned int depth;
     int i, Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int screen, win_x, win_y, win_width, win_height;
+    int screen, win_width, win_height;
     int display_width, display_height, min_dim;
     int n_dev_colors;
     double intensity;
@@ -331,8 +331,6 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
 
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
-
-    valuemask = 0;
 
     PG_query_screen(dev, &display_width, &display_height, &n_dev_colors);
     if ((display_width == 0) && (display_height == 0) &&
@@ -370,15 +368,8 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
  */
     min_dim = min(display_width, display_height);
 
-    win_x = xf*min_dim;
-    win_y = yf*min_dim;
-
     win_width  = dxf*min_dim;
     win_height = dyf*min_dim;
-
-/* window manager hints */
-    icon_width  = 16;
-    icon_height = 16;
 
     _PG_X_point_list = SC_MAKE_ARRAY("_PG_X_OPEN_IMBEDDED_SCREEN", XPoint, NULL);
 
@@ -417,6 +408,8 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
         Darkest    = 0;
         bck_color  = BlackPixel(dev->display, screen);
         for_color  = WhitePixel(dev->display, screen);};
+
+    SC_ASSERT(for_color != bck_color);
 
 /* Note: This flag was added in order to get PG_define_region and
  *       PG_move_object to work properly. Whether the GS_XOR logical
@@ -519,7 +512,7 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
 				    double xf, double yf,
 				    double dxf, double dyf)
    {unsigned long bck_color, for_color, valuemask;
-    unsigned int icon_width, icon_height, depth;
+    unsigned int depth;
     int i, Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     int Xargc, screen, win_x, win_y, win_width, win_height;
     int display_width, display_height, min_dim;
@@ -592,10 +585,6 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
 
     win_width  = dxf*min_dim;
     win_height = dyf*min_dim;
-
-/* window manager hints */
-    icon_width  = 16;
-    icon_height = 16;
 
 /* size hints */
     size_hints.flags      = USPosition | USSize | PMinSize;
@@ -1189,15 +1178,13 @@ static PG_device *_PG_X_get_event_device(PG_event *ev)
 /* _PG_X_FILL_PIXMAP - helper to fill pixmap */
 
 void _PG_X_fill_pixmap(PG_device *dev, unsigned int *ipc, int color)
-  {int screen;
-   unsigned long valuemask;
+  {unsigned long valuemask;
    Display *disp;
    XGCValues vreturn;
    GC xgc;
 
    if (dev->use_pixmap)
       {disp      = dev->display;
-       screen    = DefaultScreen(disp);
        valuemask = 0;
        xgc       = XCreateGC(disp, dev->window, valuemask, &vreturn);
 
@@ -1216,9 +1203,7 @@ static void _PG_X_clear_drawable(PG_device *dev)
   {int color, screen;
    unsigned int ipc[PG_BOXSZ];
    Display *disp;
-   PG_dev_geometry *g;
 
-   g    = &dev->g;
    disp = dev->display;
 
    if (disp != NULL)
@@ -1285,14 +1270,11 @@ static void _PG_X_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
     unsigned int ipc[PG_BOXSZ];
     double pc[PG_BOXSZ];
     Display *disp;
-    PG_dev_geometry *g;
 
     if (dev != NULL)
        {disp = dev->display;
 	if (disp == NULL)
 	   return;
-
-	g = &dev->g;
 
 	PG_trans_box(dev, 2, cs, bx, PIXELC, pc);
 

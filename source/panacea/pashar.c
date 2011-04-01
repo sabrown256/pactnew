@@ -854,19 +854,19 @@ void _PA_rdrstrt(char *fname, int conv_flag)
     for (pck = Packages; pck != NULL; pck = pck->next)
         {pck_name = pck->name;
          snprintf(bf, MAXLINE, "%s-names", pck_name);
-         SFREE_N(pck->ascii, pck->n_ascii);
+         SFREE(pck->ascii);
          pp = PA_INQUIRE_VARIABLE(bf);
          if (pp != NULL)
             PA_CONNECT(pck->ascii, bf, TRUE);
 
          snprintf(bf, MAXLINE, "%s-params", pck_name);
-         SFREE_N(pck->rparam, pck->n_param);
+         SFREE(pck->rparam);
          pp = PA_INQUIRE_VARIABLE(bf);
          if (pp != NULL)
             PA_CONNECT(pck->rparam, bf, TRUE);
 
          snprintf(bf, MAXLINE, "%s-swtchs", pck_name);
-         SFREE_N(pck->iswtch, pck->n_swtch);
+         SFREE(pck->iswtch);
          pp = PA_INQUIRE_VARIABLE(bf);
          if (pp != NULL)
             PA_CONNECT(pck->iswtch, bf, TRUE);};

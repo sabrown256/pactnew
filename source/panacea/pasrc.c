@@ -375,7 +375,7 @@ void _PA_step_queue(PA_src_variable *svp, double t)
  * the second slot in the queue
  */
       {if (indx > 3)
-          {SFREE_N(pd[0], svp->size);};
+          {SFREE(pd[0]);};
 
 /* shift everybody up the queue by one */
        for (i = 1; i < 4; i++)

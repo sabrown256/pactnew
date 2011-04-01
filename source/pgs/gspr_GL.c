@@ -329,12 +329,9 @@ void _PG_GL_set_clipping(PG_device *dev, int flag)
  
 void _PG_GL_move_gr_abs(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
- 
-	p[0] = x;
+       {p[0] = x;
 	p[1] = y;
 
 	_PG_move_gr_abs(dev, p);};
@@ -350,12 +347,9 @@ void _PG_GL_move_gr_abs(PG_device *dev, double x, double y)
  
 void _PG_GL_move_tx_abs(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
- 
-	p[0] = x;
+       {p[0] = x;
 	p[1] = y;
 
 	_PG_move_tx_abs(dev, p);};
@@ -371,12 +365,9 @@ void _PG_GL_move_tx_abs(PG_device *dev, double x, double y)
  
 void _PG_GL_move_tx_rel(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	p[0] = x;
+       {p[0] = x;
 	p[1] = y;
 
 	_PG_move_tx_rel(dev, p);};
@@ -392,12 +383,9 @@ void _PG_GL_move_tx_rel(PG_device *dev, double x, double y)
  
 void _PG_GL_draw_to_abs(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM], o[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	o[0] = dev->gcur[0];
+       {o[0] = dev->gcur[0];
 	o[1] = dev->gcur[1];
 
 	p[0] = x;
@@ -428,12 +416,9 @@ void _PG_GL_draw_to_abs(PG_device *dev, double x, double y)
  
 void _PG_GL_draw_to_rel(PG_device *dev, double x, double y)
    {double p[PG_SPACEDM], o[PG_SPACEDM];
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	o[0] = dev->gcur[0];
+       {o[0] = dev->gcur[0];
 	o[1] = dev->gcur[1];
 
 	p[0] = x;
@@ -583,7 +568,6 @@ void _PG_GL_shade_poly(PG_device *dev, int nd, int n, double **r)
 
 void _PG_GL_fill_curve(PG_device *dev, PG_curve *crv)
    {int i, n;
-    int xo[PG_SPACEDM];
     int *r[PG_SPACEDM];
     double ix[PG_SPACEDM];
     GLdouble v[2];
@@ -592,8 +576,6 @@ void _PG_GL_fill_curve(PG_device *dev, PG_curve *crv)
     n     = crv->n - 1;
     r[0]  = crv->x;
     r[1]  = crv->y;
-    xo[0] = crv->x_origin;
-    xo[1] = crv->y_origin;
     
 /* GOTCHA: This only works for convex polygons - tessellation needed */
 

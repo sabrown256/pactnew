@@ -5677,13 +5677,13 @@ the swtch array for the package for efficiency in handling the state file.<p>
 <p>
 
 <PRE>
-       def_foo(pck)
+       def_foo(PA_package *pck)
+          {int two = 2, three = 3;
 
-          PA_package *pck;
-          {P_dim_1 = &swtch[4];
+           P_dim_1 = &swtch[4];
            P_dim_2 = &swtch[5];
-           P_dim_3 = &Two_I;
-           P_dim_4 = &Three_I;
+           P_dim_3 = &two;
+           P_dim_4 = &three;
 
        /* RESTART VARIABLES */
 

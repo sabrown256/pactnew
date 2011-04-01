@@ -63,6 +63,8 @@ static void test_target(char *tgt, char *base, int n,
 
     if (tgt != NULL)
        {rv = PD_target_platform(tgt);
+	SC_ASSERT(rv == TRUE);
+
         sprintf(fname, "%s-%s.rs%d", base, tgt, n);
         sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
 
@@ -227,6 +229,7 @@ static int test_1(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
     old = PD_activate_cksum(strm, PD_MD5_FILE);
+    SC_ASSERT(old == TRUE);
 
 /* read the data from the file */
     err = read_test_1_data(strm);
@@ -411,6 +414,7 @@ static int test_2(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
     old = PD_activate_cksum(strm, PD_MD5_FILE | PD_MD5_RW);
+    SC_ASSERT(old == TRUE);
 
 /* read the data from the file */
     err = read_test_2_data(strm);
@@ -462,6 +466,7 @@ static void write_test_3_data(PDBfile *strm)
         
 /* turn off variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_OFF);
+    SC_ASSERT(old == TRUE);
            
     if (!PD_write(strm, tsname, "teststruct", foo))
        PRINT(stdout, "%s", PD_get_error());
@@ -526,6 +531,7 @@ static int test_3(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
     old = PD_activate_cksum(strm, PD_MD5_RW);
+    SC_ASSERT(old == TRUE);
 
 /* read the data from the file */
     err = read_test_2_data(strm);
@@ -727,6 +733,7 @@ static int test_4(char *base, char *tgt, int n)
 
 /* turn on per variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_RW);
+    SC_ASSERT(old == TRUE);
            
 /* read the data from the file */
     read_test_4_data(strm);
@@ -951,6 +958,7 @@ static int test_5(char *base, char *tgt, int n)
 
 /* turn on per variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_RW);
+    SC_ASSERT(old == TRUE);
            
 /* modify the file data */
     if (read_only == FALSE)
@@ -1017,7 +1025,10 @@ static void change_test_6_data(char *name)
 /* clobber part of IA */
     fp = io_open(name, "r+");
     io_seek(fp, addr+2, SEEK_SET);
+
     nw = io_write("    ", 1, 4, fp);
+    SC_ASSERT(nw == 4);
+
     io_close(fp);
 
     return;}
@@ -1077,6 +1088,7 @@ static int test_6(char *base, char *tgt, int n)
 
 /* turn on per variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_RW);
+    SC_ASSERT(old == TRUE);
            
 /* read the entire corrupted variable from the file */
     fail = read_test_4_data(strm);
@@ -1137,6 +1149,8 @@ static int run_test(PFTest test, int n, char *host)
        {m = PD_target_n_platforms();
 	for (i = 0; i < m; i++)
 	    {rv = PD_target_platform_n(i);
+	     SC_ASSERT(rv == TRUE);
+
 	     nm = PD_target_platform_name(i);
 	     if ((*test)(host, nm, n) == FALSE)
 	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);

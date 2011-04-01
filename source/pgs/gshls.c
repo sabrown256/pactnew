@@ -55,7 +55,7 @@ static PG_triangle *PG_triangularize_ac(PG_device *dev, PM_mesh_topology *mt,
 					double norm, int *pn, int *pnx,
 					double **orient)
    {int i, id, jf, je, je1, je2, nfp, nep;
-    int of, oe, nf, ne, nn, ni, nd, ntri, ntrix, off, ofs;
+    int of, oe, nf, ne, nn, ni, nd, ntri, ntrix, off;
     int *nc, *np, n[PG_SPACEDM];
     long **cells, *faces, *edges;
     double p1, nrm;
@@ -82,6 +82,8 @@ static PG_triangle *PG_triangularize_ac(PG_device *dev, PM_mesh_topology *mt,
     nf = nc[2];
     ne = nc[1];
     nn = 2*ne;
+
+    SC_ASSERT(nn > 0);
 
     t = PM_copy_vectors(nd, nc[0], r);
 
@@ -111,7 +113,6 @@ static PG_triangle *PG_triangularize_ac(PG_device *dev, PM_mesh_topology *mt,
 
               ntri = 0;
 	      off  = (nfp < 2);
-	      ofs  = (nep < 2);
 	      for (jf = 0; jf < nf; jf++)
 		  {of  = jf*nfp;
 		   je1 = faces[of];
@@ -295,7 +296,7 @@ static PG_triangle *_PG_depth_sort(PG_triangle *trial, int ntr,
 PG_triangle *_PG_hls_remove(PG_device *dev, char *type, 
 			    double **r, double *f,
 			    void *cnnct, pcons *alst, int *pn)
-   {int ntr, ntrx, nvi, nvix;
+   {int ntr, ntrx, nvi;
     int ntrin, ntrout;
     double norm;
     double *orient;
@@ -306,7 +307,6 @@ PG_triangle *_PG_hls_remove(PG_device *dev, char *type,
 		       "NORMAL-DIRECTION", SC_DOUBLE_I, &norm, 1.0,
 		       NULL);
     nvi    = 0;
-    nvix   = 0;
     vis    = NULL;
     orient = NULL;
     trial  = PG_triangularize(dev, type, r, f, cnnct,

@@ -5255,7 +5255,6 @@ int out_y;
 int i,j,k; 
 int in_total;
 int out_total;
-uint8 pointA,pointB;
 
  for(i=0;i<in_x;i++){    /* for each column */
   in_total = 0;
@@ -5275,12 +5274,15 @@ uint8 pointA,pointB;
       }
     } else {  
  
+#if 0
+      uint8 pointA, pointB;
+
       pointA = inarray[k][i];
-      if(k != (in_y -1)){
-      pointB = inarray[k+1][i];
-      } else {
-      pointB = pointA;
-      }
+      if (k != (in_y -1))
+         pointB = inarray[k+1][i];
+      else
+         pointB = pointA;
+#endif
 
 /* Non-Interpolative case */
     outarray[j][i] = inarray[k][i];
@@ -18863,6 +18865,7 @@ static int Qscale;	       /* Clipped, truncated quantization value */
 static FILE *RC_FILE;
 #endif
 
+#if 0
 static char *Frame_header1 = "  Fm         #     Bit      GOP                    V                ";
 static char *Frame_header2 = "   #  type   MBs   Alloc    left  Ni Np Nb  N_act  buff   Q_rc Qscale";
 static char *Frame_header3 = "----     -  ----  ------ -------  -- -- --  -----  ------ ----   ----";
@@ -18872,6 +18875,7 @@ static char *Frame_trailer3 = "------ --.-- -------  --- --.-- -------   --- ---
 
 static char *MB_header1 = "MB#  #bits  Q mqt     Dj  Q_j   actj  N_act  totbits b/MB %alloc %done";
 static char *MB_header2 = "---  ----- -- --- ------  ---  -----  --.--   ------ ----    ---   ---";
+#endif
 
 static char rc_buffer[101];
 
@@ -19050,7 +19054,6 @@ MpegFrame   *frame;
   float tempX, tempY, tempZ;
   int result;
   int frameType;
-  char *strPtr;
   
   minimumBits = (bit_Rate / (8 * frameRateRounded));
   
@@ -19109,12 +19112,15 @@ MpegFrame   *frame;
   Qscale = (Qscale < 1 ? 1 : Qscale);
   
   /*   Print headers for Frame info */
+#if 0
+  char *strPtr;
   strPtr = Frame_header1;
   DBG_PRINT(("%s\n",strPtr));
   strPtr = Frame_header2;
   DBG_PRINT(("%s\n",strPtr));
   strPtr = Frame_header3;
   DBG_PRINT(("%s\n",strPtr));
+#endif
   
   /*   Print Frame info */
   snprintf(rc_buffer, 101, "%4d     %1c  %4d  %6d %7d  %2d %2d %2d   %2.2f  %6d %4d    %3d",
@@ -19130,10 +19136,12 @@ MpegFrame   *frame;
   
   /*  Print headers for Macroblock info */
   if (RC_MB_SAMPLE_RATE) {
+#if 0
     strPtr = MB_header1;
     DBG_PRINT(("%s\n",strPtr));
     strPtr = MB_header2;
     DBG_PRINT(("%s\n",strPtr));
+#endif
   } else {
     return;
   }
@@ -19161,7 +19169,6 @@ int type;
 {
   int totalBits, frameComplexity, pctAllocUsed, pctGOPUsed;
   float avgQuant;
-  char *strPtr;
   
   totalBits = rc_totalFrameBits;
   avgQuant = ((float) rc_totalQuant / (float) rc_numBlocks);
@@ -19203,12 +19210,15 @@ int type;
   
   
   /*  Print Frame info */
+#if 0
+  char *strPtr;
   strPtr = Frame_trailer1;
   DBG_PRINT(("%s\n",strPtr));
   strPtr = Frame_trailer2;
   DBG_PRINT(("%s\n",strPtr));
   strPtr = Frame_trailer3;
   DBG_PRINT(("%s\n",strPtr));
+#endif
   
   snprintf(rc_buffer, 101, "%6d  %2.2f  %6d  %3d  %2.2f %7d   %3d %7d   %3d  %6d %6d",
 	  totalBits, avgQuant, frameComplexity, avg_act, N_act, currentVirtBuf, pctAllocUsed, rc_R, pctGOPUsed, VBV_buffer, VBV_delay);

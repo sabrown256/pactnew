@@ -775,7 +775,7 @@ static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
        PD_error("CAN'T FIND NUMBER OF BYTES - _PD_PTR_ALLOC_SPACE",
                 PD_READ);
 
-    pv = (char *) SC_alloc_nzt(nitems, bpi, "_PD_PTR_ALLOC_SPACE:pv", NULL);
+    pv = CMAKE_N(char, nitems*bpi);
 
     if (asgn == TRUE)
        {DEREF(vr) = pv;

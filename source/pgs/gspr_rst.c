@@ -423,12 +423,9 @@ void _PG_rst_draw_disjoint_polyline_2(PG_device *dev, double **r,
    {int i, ix1[PG_SPACEDM], ix2[PG_SPACEDM];
     double box[PG_BOXSZ];
     double *px, *py;
-    PG_dev_geometry *g;
 
     if ((dev != NULL) && (n > 0))
-       {g = &dev->g;
-
-	px = r[0];
+       {px = r[0];
 	py = r[1];
 
 	for (i = 0; i < n; i++)
@@ -814,25 +811,22 @@ void _PG_rst_fill_curve(PG_device *dev, PG_curve *crv)
 void _PG_rst_put_image(PG_device *dev, unsigned char *bf,
                        int ix, int iy, int nx, int ny)
    {int bpp, l, k, m, dx, dy, sz, rgb, pc;
-    int nc, color, red_fl, green_fl, blue_fl, ok;
+    int color, red_fl, green_fl, blue_fl, ok;
     int ir[PG_SPACEDM];
     unsigned long *pv;
     unsigned char *pbf, *r, *g, *b;
     double scale;
-    FILE *fp;
     PG_palette *pal;
     RGB_color_map *true_cm;
     PG_RAST_device *mdv;
     frame *fr;
 
     pal     = dev->current_palette;
-    nc      = pal->n_pal_colors;
     true_cm = pal->true_colormap;
     pv      = pal->pixel_value;
 
     pbf = bf;
     bpp = log((double) (dev->absolute_n_color))/log(2.0) + 0.5;
-    fp  = dev->file;
     if (bpp == 1)
        nx = _PG_byte_bit_map(bf, nx, ny, TRUE);
 
@@ -943,7 +937,13 @@ void _PG_rst_get_image(PG_device *dev, unsigned char *bf,
     mx = mdv->width;
     my = mdv->height;
 
+    SC_ASSERT(my != 0);
+
     GET_RGB(fr, r, g, b);
+
+    SC_ASSERT(r != NULL);
+    SC_ASSERT(g != NULL);
+    SC_ASSERT(b != NULL);
 
     for (l = 0; l < ny; l++)
         {for (k = 0; k < nx; k++)
@@ -974,6 +974,8 @@ void dpranom(PG_device *dev)
     fr = mdv->raster;
     nx = mdv->width;
     ny = mdv->height;
+
+    SC_ASSERT(ny != 0);
 
     imn = fr->box[0];
     imx = fr->box[1];

@@ -16,6 +16,7 @@
 
 int
  SC_unary_plus = TRUE,
+ SC_assert_fail = 0,
  Radix = 10,
  *LAST = NULL;
 
@@ -25,15 +26,9 @@ char
 int
  Zero_I  = 0,
  One_I   = 1,
- Two_I   = 2,
- Three_I = 3,
  Four_I  = 4;
 
 double
- Zero_D  = 0.0,
- One_D   = 1.0,
- Two_D   = 2.0,
- Three_D = 3.0,
  Four_D  = 4.0;
 
 JMP_BUF

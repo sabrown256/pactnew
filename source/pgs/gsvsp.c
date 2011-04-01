@@ -156,15 +156,11 @@ static INLINE double _PG_sc_pc_to_wc_a(PG_device *dev, int id,
 
 static INLINE void _PG_sc_wc_to_ndc(PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_sc_wc_to_ndc_a(dev, id, nd, pi[i]);};
@@ -178,15 +174,11 @@ static INLINE void _PG_sc_wc_to_ndc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_sc_ndc_to_wc(PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_sc_ndc_to_wc_a(dev, id, nd, pi[i]);};
@@ -200,12 +192,11 @@ static INLINE void _PG_sc_ndc_to_wc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_sc_ndc_to_pc(PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_sc_ndc_to_pc_a(dev, id, nd, pi[i]);};
@@ -237,12 +228,11 @@ static INLINE void _PG_sc_pc_to_ndc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_sc_wc_to_pc(PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_sc_wc_to_pc_a(dev, id, nd, pi[i]);};
@@ -256,12 +246,11 @@ static INLINE void _PG_sc_wc_to_pc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_sc_pc_to_wc(PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_sc_pc_to_wc_a(dev, id, nd, pi[i]);};
@@ -590,15 +579,11 @@ static INLINE double _PG_tr_pc_to_wc_a(PG_device *dev, int id, int nd,
 
 static INLINE void _PG_tr_wc_to_ndc(PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_tr_wc_to_ndc_a(dev, id, nd, pi[i]);};
@@ -612,15 +597,11 @@ static INLINE void _PG_tr_wc_to_ndc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_tr_ndc_to_wc(PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_tr_ndc_to_wc_a(dev, id, nd, pi[i]);};
@@ -634,15 +615,11 @@ static INLINE void _PG_tr_ndc_to_wc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_tr_ndc_to_frm(PG_device *dev, int n, int nd,
 				     double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_tr_ndc_to_frm_a(dev, id, nd, pi[i]);};
@@ -656,19 +633,15 @@ static INLINE void _PG_tr_ndc_to_frm(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_tr_ndc_to_pc(PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double wo[PG_SPACEDM];
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
         wo[id] = dev->window_x[2*id];
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_tr_ndc_to_pc_a(dev, id, nd, pi[i], wo);};
@@ -685,9 +658,6 @@ static INLINE void _PG_tr_pc_to_ndc(PG_device *dev, int n, int nd,
    {int i, id;
     double wo[PG_SPACEDM];
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
         wo[id] = dev->window_x[2*id];
@@ -707,19 +677,15 @@ static INLINE void _PG_tr_pc_to_ndc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_tr_wc_to_pc(PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double wo[PG_SPACEDM];
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
         wo[id] = dev->window_x[2*id];
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_tr_wc_to_pc_a(dev, id, nd, pi[i], wo);};
@@ -733,19 +699,15 @@ static INLINE void _PG_tr_wc_to_pc(PG_device *dev, int n, int nd,
 
 static INLINE void _PG_tr_pc_to_wc(PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
-   {int i, l, id;
+   {int i, id;
     double wo[PG_SPACEDM];
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
         wo[id] = dev->window_x[2*id];
 
     for (id = 0; id < nd; id++)
-        {l  = 2*id;
-	 pi = xi[id];
+        {pi = xi[id];
 	 po = xo[id];
 	 for (i = 0; i < n; i++)
 	     po[i] = _PG_tr_pc_to_wc_a(dev, id, nd, pi[i], wo);};
@@ -901,9 +863,7 @@ static void _PG_box_pc(PG_device *dev, int nd, PG_coord_sys cs,
    {int id, l, n, ix, idx;
     double wo[PG_SPACEDM];
     double bx[PG_BOXSZ];
-    PG_dev_geometry *g;
 
-    g = &dev->g;
     n = nd << 1;
 
 /* guard against conversions in place */
@@ -963,9 +923,7 @@ static void _PG_box_ndc(PG_device *dev, int nd, PG_coord_sys cs,
    {int id, l, n;
     double wo[PG_SPACEDM];
     double bx[PG_BOXSZ];
-    PG_dev_geometry *g;
 
-    g = &dev->g;
     n = nd << 1;
 
 /* guard against conversions in place */
@@ -1007,9 +965,7 @@ static void _PG_box_wc(PG_device *dev, int nd, PG_coord_sys cs,
    {int id, l, n;
     double wo[PG_SPACEDM];
     double bx[PG_BOXSZ];
-    PG_dev_geometry *g;
 
-    g = &dev->g;
     n = nd << 1;
 
 /* guard against conversions in place */
@@ -1225,15 +1181,13 @@ void PG_log_space(PG_device *dev, int nd, int dec, double *box)
 /* PG_LOG_POINT - get WC point P values correctly transformed for log scales */
 
 void PG_log_point(PG_device *dev, int nd, double *p)
-   {int l, id, *iflog;
+   {int id, *iflog;
     double pc;
 
     iflog = dev->g.iflog;
 
     for (id = 0; id < nd; id++)
-        {l = 2*id;
-
-	 pc = p[id];
+        {pc = p[id];
 
 /* if log axis options have been used take log */
 	 if (iflog[id] == TRUE)
@@ -1280,15 +1234,13 @@ void PG_lin_space(PG_device *dev, int nd, double *box)
  */
 
 void PG_lin_point(PG_device *dev, int nd, double *p)
-   {int l, id, *iflog;
+   {int id, *iflog;
     double pc;
 
     iflog = dev->g.iflog;
 
     for (id = 0; id < nd; id++)
-        {l = 2*id;
-
-	 pc = p[id];
+        {pc = p[id];
 
 /* if log axis options have been used transform back to linear */
 	 if (iflog[id] == TRUE)
@@ -1936,9 +1888,6 @@ void PG_frame_points(PG_device *dev, int nd, PG_coord_sys cs, long n, double **x
 		     double **xo)
    {int i, id;
     double *pi, *po;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < nd; id++)
         {pi = xi[id];
@@ -1999,12 +1948,9 @@ void PG_frame_interval(PG_device *dev, int nd, double *dxi, double *dxo)
 void PG_frame_box(PG_device *dev, int nd, PG_coord_sys cs, double *box)
    {int id, l;
     double mn, mx;
-    PG_dev_geometry *g;
 
     if (dev != NULL)
-       {g = &dev->g;
-
-	for (id = 0; id < nd; id++)
+       {for (id = 0; id < nd; id++)
 	    {l = 2*id;
 
 	     mn = min(box[l], box[l+1]);

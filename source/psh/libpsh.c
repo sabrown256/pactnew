@@ -839,7 +839,9 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
 	if (clf == TRUE)
 	   err = fclose(fp);
 	else
-	   err = fseek(fp, 0, SEEK_END);};
+	   err = fseek(fp, 0, SEEK_END);
+
+	ASSERT(err == 0);};
 
     return(r);}
 

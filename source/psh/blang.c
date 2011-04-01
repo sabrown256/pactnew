@@ -231,6 +231,7 @@ fdecl *find_proto(char **spr, char *f)
 
 /* get the function name */
 	cfn = ty[--nt];
+	ASSERT(cfn != NULL);
 
 /* get the args */
 	args = split_args(pa);

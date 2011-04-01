@@ -320,9 +320,6 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 static void _PG_interp_point(PG_device *dev, double *yp, double x,
                              double *xa, double *xb)
    {double p[PG_SPACEDM];
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
 #if 0
     p[0] = x;

@@ -109,7 +109,7 @@ static int _PG_X_txt_setup_font(PG_device *dev, char *bf)
  
 static PG_device *_PG_X_txt_open_screen(PG_device *dev, double dxf, double dyf)
    {unsigned long bck_color, for_color, valuemask;
-    unsigned int icon_width, icon_height, depth;
+    unsigned int depth;
     int i, Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     int Xargc, screen, win_x, win_y, win_width, win_height;
     int display_width, display_height, min_dim;
@@ -162,10 +162,6 @@ static PG_device *_PG_X_txt_open_screen(PG_device *dev, double dxf, double dyf)
 
     win_width  = dxf*min_dim;
     win_height = dyf*min_dim;
-
-/* window manager hints */
-    icon_width  = 16;
-    icon_height = 16;
 
 /* size hints */
     size_hints.flags      = USPosition | USSize | PMinSize;
@@ -441,6 +437,8 @@ static void _PG_X_txt_write_text(PG_device *dev, char *s,
 
     st = XDrawString(disp, dev->pixmap, dev->gc, xpad, ypad, s, len);
  
+    SC_ASSERT(st == 0);
+
     return;}
  
 /*--------------------------------------------------------------------------*/
@@ -470,6 +468,8 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 
 	w  = img->width;
 	h  = img->height;
+
+	SC_ASSERT(h != 0);
 
 	dx[0] += 2*pad;
 

@@ -92,6 +92,7 @@ static int test_omp(int nt, int nd, int ni)
     io_printf(stdout, "\t\t\tomp ............... ");
 
     tid = -1;
+    SC_ASSERT(tid == -1);
 
 /* allocate something trivial to initialize the heap for this thread */
     mem = FMAKE_N(char, 1, "MAIN:mem");

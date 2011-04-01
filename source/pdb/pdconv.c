@@ -1472,7 +1472,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
     bpio = (nbo + 7) >> 3;
 
     if ((nbi % 8 != 0) || boffs)
-       {aligned = SC_alloc_nzt(bpii*ni, 1L, "_PD_FCONVERT:aligned", NULL);
+       {aligned = CMAKE_N(char, bpii*ni);
         _PD_byte_align(aligned, *in, ni, infor, inord, boffs);
         insave = *in;
         *in    = aligned;};
@@ -1553,7 +1553,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
  * logic
  */
     if (!((infor[3] < infor[4]) && (infor[4] < infor[5])))
-       {freorder = SC_alloc_nzt(bpii*ni, 1L, "_PD_FCONVERT:freorder", NULL);
+       {freorder = CMAKE_N(char, bpii*ni);
         tformat[0] = infor[0];
         tformat[1] = infor[1];
         tformat[2] = infor[2];
@@ -1951,7 +1951,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
         *in = insave;};
 
     if (out_freorder == TRUE)
-       {freorder = SC_alloc_nzt(bpio*ni, 1L, "_PD_FCONVERT:freorder", NULL);
+       {freorder = CMAKE_N(char, bpio*ni);
         tformat[0] = outfor[0];
         tformat[1] = outfor[1];
         tformat[2] = outfor[2];
@@ -2100,9 +2100,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* convert integers */
         else
-	   {intord = (int *) SC_alloc_nzt(onb, sizeof(int),
-					  "_PD_CONVERT:intord",
-					  NULL);
+	   {intord = CMAKE_N(int, onb);
             if (osord == NORMAL_ORDER)
                for (i = 0; i < onb; intord[i] = i + 1, i++);
             else                         

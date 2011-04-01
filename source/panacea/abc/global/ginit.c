@@ -47,33 +47,26 @@ void
 int init_problem_b(int c, char **v)
    {int i, n_threads;
     char *fname;
-    int load_sch, interactive_flag, commnd_flag;
     char commnd[MAXLINE];
 
 /* process the command line arguments */
-    interactive_flag = FALSE;
-    commnd_flag      = FALSE;
-    fname            = NULL;
-    load_sch         = 0;
-    n_threads        = 1;
+    fname     = NULL;
+    n_threads = 1;
     for (i = 1; i < c; i++)
         if (v[i][0] == '-')
            {switch (v[i][1])
-               {case 'i' : interactive_flag = TRUE;
-                           break;
-                case 'l' : load_sch = ++i;
-                           break;
-                case 'n' : n_threads = SC_stoi(v[++i]);
-                           break;
-                default  : break;};}
+               {case 'n' :
+		     n_threads = SC_stoi(v[++i]);
+		     break;
+                default :
+		     break;};}
          else if (v[i][0] != '(')
             fname = v[i];
          else
-           {commnd_flag = TRUE;
-            strcpy(commnd, " ");
+           {strcpy(commnd, " ");
             for ( ; i < c; i++)
-               {SC_strcat(commnd, MAXLINE, v[i]);
-                SC_strcat(commnd, MAXLINE, " ");};};
+                {SC_strcat(commnd, MAXLINE, v[i]);
+                 SC_strcat(commnd, MAXLINE, " ");};};
 
     n_threads = max(n_threads, 1);
     PA_init_threads(n_threads, NULL);
@@ -343,14 +336,14 @@ void assign_globals(void)
 /* PART_REG - give all parts with the same name the same material region */
 
 int part_reg(char *s)
-   {int i;
-    PM_part *ipart;
+   {PM_part *ipart;
 
-    for (i = 0, ipart = parts; ipart != NULL; ipart = ipart->next)
+    for (ipart = parts; ipart != NULL; ipart = ipart->next)
         if (strcmp(ipart->name, s) == 0)
            return(ipart->reg);
 
     N_regs++;
+
     return(N_regs);}
 
 /*--------------------------------------------------------------------------*/

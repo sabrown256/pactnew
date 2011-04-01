@@ -21,7 +21,8 @@ SC_mem_fnc SC_use_mm(SC_mem_fnc *mf)
     rv = SC_mem_hook;
 
     if (mf != NULL)
-       {SC_mem_hook.alloc   = mf->alloc;
+       {SC_mem_hook.nalloc  = mf->nalloc;
+	SC_mem_hook.alloc   = mf->alloc;
 	SC_mem_hook.realloc = mf->realloc;
 	SC_mem_hook.free    = mf->free;};
 
@@ -37,6 +38,7 @@ SC_mem_fnc SC_use_score_mm(void)
 
     rv = SC_mem_hook;
 
+    SC_mem_hook.nalloc  = SC_nalloc_na;
     SC_mem_hook.alloc   = SC_alloc_na;
     SC_mem_hook.realloc = SC_realloc_na;
     SC_mem_hook.free    = SC_free;
@@ -57,8 +59,16 @@ SC_mem_fnc SC_use_score_mm(void)
 
 void *SC_alloc(long nitems, long bpi, char *name)
    {void *rv;
+    SC_mem_opt opt;
 
-    rv = SC_alloc_nzt(nitems, bpi, name, NULL);
+    opt.na  = FALSE;
+    opt.zsp = _SC_zero_space;
+    opt.typ = -1;
+    opt.fnc  = name;
+    opt.file = NULL;
+    opt.line = -1;
+
+    rv = SC_alloc_nzt(nitems, bpi, &opt);
 
     return(rv);}
 
@@ -81,6 +91,19 @@ void *SC_realloc(void *p, long nitems, long bpi)
     rv = SC_realloc_na(p, nitems, bpi, FALSE);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_NALLOC_STD - use the C std library malloc */
+
+static void *_SC_nalloc_std(long nitems, long bpi, int na,
+			    const char *fnc, const char *file, int line)
+   {void *space;
+
+    space = malloc(nitems*bpi);
+
+    return(space);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -128,11 +151,39 @@ SC_mem_fnc SC_use_c_mm(void)
 
     rv = SC_mem_hook;
 
+    SC_mem_hook.nalloc  = _SC_nalloc_std;
     SC_mem_hook.alloc   = _SC_alloc_std;
     SC_mem_hook.realloc = _SC_realloc_std;
     SC_mem_hook.free    = _SC_free_std;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_NALLOC_CHK - wrap a check for a specific pointer value
+ *                - around the SC_alloc_na call
+ *                - part of a usable API for memory debugging
+ */
+
+static void *_SC_nalloc_chk(long nitems, long bpi, int na,
+			    const char *fnc, const char *file, int line)
+   {void *space;
+    SC_mem_opt opt;
+
+    opt.na   = na;
+    opt.zsp  = _SC_zero_space;
+    opt.typ  = -1;
+    opt.fnc  = fnc;
+    opt.file = file;
+    opt.line = line;
+
+    space = SC_alloc_nzt(nitems, bpi, &opt);
+
+    if (space == _SC_trap_ptr)
+       raise(_SC_trap_sig);
+
+    return(space);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -149,8 +200,11 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na)
     opt.na  = na;
     opt.zsp = _SC_zero_space;
     opt.typ = -1;
+    opt.fnc  = name;
+    opt.file = NULL;
+    opt.line = -1;
 
-    space = SC_alloc_nzt(nitems, bpi, name, &opt);
+    space = SC_alloc_nzt(nitems, bpi, &opt);
 
     if (space == _SC_trap_ptr)
        raise(_SC_trap_sig);
@@ -211,6 +265,7 @@ SC_mem_fnc SC_trap_pointer(void *p, int sig)
     _SC_trap_ptr = p;
     _SC_trap_sig = sig;
 
+    SC_mem_hook.nalloc  = _SC_nalloc_chk;
     SC_mem_hook.alloc   = _SC_alloc_chk;
     SC_mem_hook.realloc = _SC_realloc_chk;
     SC_mem_hook.free    = _SC_free_chk;

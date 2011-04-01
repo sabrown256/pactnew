@@ -52,6 +52,7 @@ int test_1(int nir, int nim)
 
     io_printf(stdout, "   First leak check\n\n");
     ma = SC_mem_monitor(na, 2, "t2a", msg);
+    SC_ASSERT(ma > 0);
 
     SC_dereg_mem(b);
     SFREE(a);
@@ -59,6 +60,7 @@ int test_1(int nir, int nim)
     io_printf(stdout, "\n");
     io_printf(stdout, "   Second leak check\n\n");
     mb = SC_mem_monitor(nb, 2, "t2b", msg);
+    SC_ASSERT(mb > 0);
 
     if (err == FALSE)
        io_printf(stdout, "\nMemory registration test passed\n");

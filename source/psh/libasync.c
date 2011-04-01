@@ -287,6 +287,7 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 	out = cp->out;
 
 	rv = block_fd(in, TRUE);
+	ASSERT(rv == 0);
 
 /* set the process stdin, stdout, and stderr to those from the pipe */
 	dup2(in, 0);
@@ -655,6 +656,7 @@ static void _job_timeout(int to)
 /* set the handler and the alarm */
        {err = signal(SIGALRM, _timeout_error);
 	ns  = alarm(to);
+	ASSERT(ns == 0);
 
 	if (err == SIG_ERR)
 	   printf("Setting SIGALRM failed\n");
@@ -678,7 +680,7 @@ static void _job_timeout(int to)
  */
 
 process *job_launch(char *cmd, char *mode, void *a)
-   {int i, n, pid, to, st, off;
+   {int i, n, pid, st, off;
     int *pl;
     char **al, **argv;
     process *pp, *cp, **pa, **ca;
@@ -695,7 +697,7 @@ process *job_launch(char *cmd, char *mode, void *a)
 /* setup each process in the pipeline */
     for (i = 0; i < n; i++)
         {off = pl[i];
-	 to  = _job_setup_proc(&pa[i], &ca[i]);};
+	 _job_setup_proc(&pa[i], &ca[i]);};
 
     _job_reconnect_pipeline(n, pa, ca);
 
@@ -1074,6 +1076,7 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 
 	fd = pp->in;
 	rv = block_fd(fd, FALSE);
+	ASSERT(rv == 0);
 
 	stck.proc[ip] = pp;
 
@@ -1243,6 +1246,7 @@ void afin(void (*f)(process *pp, void *a))
 
 /* check the job status one last time */
     nd = acheck();
+    ASSERT(nd >= 0);
 
     amap(f);
 

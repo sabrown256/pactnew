@@ -515,7 +515,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
        {el = (void **) elem;
 	for (i = 0; i < nde; i++)
             {ov = el[i];
-	     nv = SC_alloc_nzt(ne, bpi, "PM_MK_SET:nv", NULL);
+	     nv = CMAKE_N(char, ne*bpi);
 	     memcpy(nv, ov, ne*bpi);
 	     el[i] = nv;};};
 

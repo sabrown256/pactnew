@@ -494,7 +494,7 @@ static int read_data_array(PDBfile *file, int rank, int numprocs,
 static int read_data_struct(PDBfile *file, int rank, int numprocs,
 			    SC_communicator comm)
    {char var[MAXLINE];
-    int i, nread, rv;
+    int i, rv;
 
     rv = TRUE;
 
@@ -508,7 +508,6 @@ static int read_data_struct(PDBfile *file, int rank, int numprocs,
     check_myplot(mypl_w, mypl_r, comm);
 
 /* read the PD_defented array */
-    nread = N_ELEM;
     snprintf(var, MAXLINE, "x[0:%d]", N_ELEM-1);
 
     if (!PD_read(file, var, xr))
@@ -541,6 +540,7 @@ static int read_data_struct(PDBfile *file, int rank, int numprocs,
  */
     if (mypl_r.label != mypl_w.label)
        {SFREE(mypl_r.label)};
+
     if (mypl_r.view != mypl_w.view)
        {SFREE(mypl_r.view);};
 

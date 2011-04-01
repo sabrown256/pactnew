@@ -1103,6 +1103,8 @@ static int finish(rundes *st, int rv)
        {sts = 0;
 	rsn = WSTOPSIG(rv);};
 
+    ASSERT(rsn >= 0);
+
     if (((strcmp(st->mpife, "srun") == 0) && (sts != 0)) ||
 	((strcmp(st->mpife, "salloc") == 0) && (sts != 0)))
        {see = getenv("SLURM_EXIT_ERROR");

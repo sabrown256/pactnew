@@ -473,7 +473,7 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
 
 static void _LR_fill_coordw(double **elem, int ne, int *pist)
    {int i, j, k, l, m, ist, nst;
-    double *xc, *yc, *pxc, *pyc, conv, vx, vy;
+    double *xc, *yc, *pxc, *pyc, conv;
 
     pxc = *elem++ = xc = FMAKE_N(double, ne, "_LR_FILL_COORDW:pxc");
     pyc = *elem++ = yc = FMAKE_N(double, ne, "_LR_FILL_COORDW:pyc");
@@ -484,8 +484,6 @@ static void _LR_fill_coordw(double **elem, int ne, int *pist)
         for (l = 1; l <= lmax; l++)
             for (k = 1; k <= kmax; k++)
                 {i = NODE_OF(k, l);
-                 vx = rx[i];
-                 vy = ry[i];
                  for (j = 0; j < ist; j++)
                      {*pxc++ = rx[i];
                       *pyc++ = ry[i];};};
@@ -505,7 +503,7 @@ static void _LR_fill_coordw(double **elem, int ne, int *pist)
 
 int LR_flatten_space(PA_plot_request *pr)
    {int i, j;
-    double rv, xv, yv, zv;
+    double xv, yv;
     C_array *arr;
     PA_set_index *dmap;
     int n;
@@ -515,20 +513,14 @@ int LR_flatten_space(PA_plot_request *pr)
     n    = arr->length;
     dmap = (PA_set_index *) arr->data;
 
-    rv = 0.0;
     xv = 0.0;
     yv = 0.0;
-    zv = 0.0;
 
     for (i = 0; i < n; i++)
-        {if (strcmp("r", dmap[i].name) == 0)
-            rv = dmap[i].val;
-         else if (strcmp("rx", dmap[i].name) == 0)
+        {if (strcmp("rx", dmap[i].name) == 0)
             xv = dmap[i].val;
          else if (strcmp("ry", dmap[i].name) == 0)
-            yv = dmap[i].val;
-         else if (strcmp("rz", dmap[i].name) == 0)
-            zv = dmap[i].val;};
+            yv = dmap[i].val;};
 
     for (i = 0; i < n; i++)
         if (strcmp(dmap[i].name, "rx") == 0)
@@ -629,7 +621,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
 
     domain = LR_mesh_set(dname);
     snprintf(label, MAXLINE, "%s->%s", domain->name, range->name);
-    f = PM_make_mapping(label, PM_LR_S, domain, range, centering, f);
+    f = PM_make_mapping(label, PM_LR_S, domain, range, centering, NULL);
 
     PA_put_mapping(dev, NULL, f, pty);
  

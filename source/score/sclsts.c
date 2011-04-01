@@ -22,7 +22,6 @@ int main(int c, char **v)
     char msg[MAXLINE];
     char *t, *name;
     SC_lexical_stream *str;
-    FILE *fp;
 
     SC_zero_space(0);
 
@@ -37,8 +36,7 @@ int main(int c, char **v)
 				 F77_FUNC(f77lxr, F77LXR),
 				 NULL, NULL, NULL, NULL, NULL, NULL);
 
-    fp = str->file;
-    t  = str->out_bf;
+    t = str->out_bf;
 
     line = 1;
     while ((n = SC_scan(str, TRUE)) != -1)

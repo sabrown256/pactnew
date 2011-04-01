@@ -225,7 +225,7 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     int kz, lz, kzm, lzm, dk;
     int lmn, lmx, kmax, lmax, eflag, cnt;
     int a0c, a1c, a2c, a3c, a4c;
-    int *a, *maxes, *aext;
+    int *a, *maxes;
     int *a1, *a2, *a3, *a4;
     double wc[PG_BOXSZ];
     double x1c[PG_SPACEDM], x2c[PG_SPACEDM];
@@ -245,7 +245,6 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     a     = par->a;
     x     = par->x;
     y     = par->y;
-    aext  = par->aext;
     cnnct = par->cnnct;
     alist = par->alist;
 
@@ -255,6 +254,9 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
     nn    = kmax*lmax;
     nmap  = (kmax - 1) * (lmax - 1);
     nz    = SC_MEM_GET_N(int, a);
+
+    SC_ASSERT(nz > 0);
+    SC_ASSERT(nn > 0);
 
     PG_get_attrs_alist(alist,
 		       "CENTERING", SC_INT_I, &cnt, N_CENT,
@@ -352,6 +354,8 @@ void PG_dv_bnd_zc_lr(PG_device *dev, int nd, int *a,
 
     kz = kmax - 1;
     lz = lmax - 1;
+
+    SC_ASSERT(kz > 0);
 
     par.dev   = dev;
     par.nd    = nd;

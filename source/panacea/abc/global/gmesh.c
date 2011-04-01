@@ -328,17 +328,13 @@ int volumew(double *vol, double *rx, double *ry)
 
 int gen_dumpw(hasharr *curves)
    {int i, j, k, l, sz;
-    double length, vel, mass, temp, energy;
+    double length;
     char *edname;
     haelem *np, **tb;
     FILE *fp;
     PM_conic_curve *cp;
 
     length = 1.0/unit[CM];
-    vel    = unit[SEC]/unit[CM];
-    mass   = 1.0/unit[G];
-    energy = 1.0/unit[ERG];
-    temp   = 1.0/unit[K];
 
     edname = NAME[3];
 
@@ -499,9 +495,7 @@ void parth(void)
    {int i, reg;
     char *name, *token;
     double krat, kms, kes, kme, kee, lrat, lms, les, lme, lee;
-    PM_part *ipart; 
 
-    ipart = parts;
     name  = PA_get_field("NAME", "PART", REQU);
     reg   = part_reg(name);
 

@@ -106,9 +106,6 @@ static void show_dir(PG_device *dev, int k)
     double va, dv;
     double vbx[PG_BOXSZ];
     double *x[PG_SPACEDM], *u[PG_SPACEDM];
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     for (id = 0; id < 2; id++)
         nflg[id] = FALSE;
@@ -205,16 +202,13 @@ static void test_axis(PG_device *dev, int ticks, int rev,
 static void axis_core(PG_device *dev, int k, int l, FILE *fp,
 		      double t1i, double t2i,
 		      int lax, int ticks, int pause)
-   {int i, j, id, ret;
+   {int i, j, id;
     int nflg[PG_SPACEDM];
     char s[MAXLINE], *token, *t;
     double sdx, sdy;
     double ndc[PG_BOXSZ], wc[PG_BOXSZ];
     double axmn, axmx, aymn, aymx, amin, amax;
     double va, vb, t1, t2;
-    PG_dev_geometry *g;
-
-    g = &dev->g;
 
     sdx = 0.125;
     sdy = 0.125;
@@ -233,15 +227,13 @@ static void axis_core(PG_device *dev, int k, int l, FILE *fp,
 	    PRINT(STDOUT, "End Points (#%2d): ", j+1);
 
 	 if (GETLN(s, MAXLINE, fp) == NULL)
-	    {ret = 1;
-	     break;};
+	    break;
 
 	 if (s[0] == '#')
 	    continue;
 
 	 if (strcmp(s, "end\n") == 0)
-	    {ret = 0;
-	     break;};
+	    break;
 
 	 token = SC_strtok(s, " ,\n", t);
 	 if (token == NULL)

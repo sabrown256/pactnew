@@ -368,6 +368,8 @@ void PG_draw_vector_n(PG_device *dev, int nd, PG_coord_sys cs, long n,
             {rmx = size;
 	     imx = i;};};
 
+    SC_ASSERT(imx >= 0);
+
     xs = 0.0;
     for (id = 0; id < nd; id++)
         {l   = 2*id;
@@ -819,11 +821,9 @@ FIXNUM F77_FUNC(pgplvc, PGPLVC)(FIXNUM *devid,
                                 FIXNUM *pn, FIXNUM *pal)
    {FIXNUM rv;
     double *x[PG_SPACEDM], *u[PG_SPACEDM];
-    pcons *alst;
     PG_device *dev;
 
-    dev  = SC_GET_POINTER(PG_device, *devid);
-    alst = SC_GET_POINTER(pcons, *pal);
+    dev = SC_GET_POINTER(PG_device, *devid);
 
     x[0] = px;
     x[1] = py;

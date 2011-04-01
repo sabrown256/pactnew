@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb_int.h"
+#include "pdb.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -53,6 +53,8 @@ static int text_file(void)
 
 /* check append mode */
     pf = PD_open("fd.dat", "a");
+    SC_ASSERT(pf != NULL);
+    
     fp = fopen("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);
@@ -61,6 +63,8 @@ static int text_file(void)
 
 /* check read only mode */
     pf = PD_open("fd.dat", "r");
+    SC_ASSERT(pf != NULL);
+
     fp = fopen("fd.dat", "r");
     fd[n++] = fileno(fp);
     fclose(fp);

@@ -976,6 +976,7 @@ static int scr_test(char *name, testdes *a, int nt, gtest *tst)
     PG_rl_all();
 
     sc = test_check(name, 1L, a, ok);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -1007,6 +1008,7 @@ static int ps_test(char *name, testdes *a, int nt, gtest *tst)
     PG_rl_all();
 
     sc = test_check(name, 1L, a, ok);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -1035,6 +1037,7 @@ static int cgm_test(char *name, testdes *a, int nt, gtest *tst)
     PG_rl_all();
 
     sc = test_check(name, 1L, a, ok);
+    SC_ASSERT(sc == TRUE);
 
     return(ok);}
 
@@ -1065,7 +1068,8 @@ static int jpeg_test(char *name, testdes *a, int nt, gtest *tst)
 
 	PG_rl_all();
 
-	sc = test_check(name, 1L, a, ok);};
+	sc = test_check(name, 1L, a, ok);
+	SC_ASSERT(sc == TRUE);};
 
     return(ok);}
 
@@ -1096,7 +1100,8 @@ static int png_test(char *name, testdes *a, int nt, gtest *tst)
 
 	PG_rl_all();
 
-	sc = test_check(name, 1L, a, ok);};
+	sc = test_check(name, 1L, a, ok);
+	SC_ASSERT(sc == TRUE);};
 
     return(ok);}
 

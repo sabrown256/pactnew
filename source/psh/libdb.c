@@ -497,6 +497,7 @@ database *db_srv_open(char *root, int init)
     if (file_exists(db->fpid) == FALSE)
        {ioc_server = SERVER;
 	rv = open_sock(root);
+	ASSERT(rv == 0);
 
 	fp = fopen(db->fpid, "w");
 	fprintf(fp, "%d", pid);
@@ -612,7 +613,8 @@ void db_srv_restart(database *db)
 	log_activity(db->flog, dbg_db, "SERVER", "restart");
 
 	ioc_server = SERVER;
-	rv = open_sock(db->root);};
+	rv = open_sock(db->root);
+	ASSERT(rv == 0);};
 
     return;}
 
@@ -839,6 +841,7 @@ int db_restore(char *root, char *db)
        snprintf(t, MAXLINE, "load %s:", db);
 
     ok = dbcmd(NULL, t);
+    ASSERT(ok == 0);
 
 /* the server has the database - now we need it
  * GOTCHA: this can go when utilities using this are
@@ -860,10 +863,12 @@ int db_restore(char *root, char *db)
 #else
 	    {s  = subst(s, "\"", "", -1);
 	     ok = putenv(s);
+	     ASSERT(ok == 0);
 	     note(Log, TRUE, "setenv %s", s);};};
 
     FREE(ta);
 #endif
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/

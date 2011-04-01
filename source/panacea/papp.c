@@ -190,7 +190,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
          snprintf(_PA.pp_title, MAXLINE, "td%d", i);
 
          PD_write_alt(pduf, _PA.pp_title, type, crve[i], 1, ind);
-         SFREE_N(crve[i], nptm);};
+         SFREE(crve[i]);};
 
 /* write out the time plot range data */
     ind[0] = 1L;
@@ -205,9 +205,9 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
          snprintf(_PA.pp_title, MAXLINE, "td%d", i + n_dom);
          PD_write_alt(pduf, _PA.pp_title, type, crve[j], 1, ind);
 
-         SFREE_N(crve[j], nptm);};
+         SFREE(crve[j]);};
 
-    SFREE_N(stripe, n_arrays);
+    SFREE(stripe);
 
     return;}
 

@@ -54,13 +54,12 @@ static void child_has_txt(int fd, int mask, void *a)
 /* TTY_HAS_TXT - handle text from the tty */
 
 static void tty_has_txt(int fd, int mask, void *a)
-   {int i, n;
+   {int i;
     char s[MAX_BFSZ], *t, *pt;
     PROCESS *p, **pp;
     descriptors *pd;
 
     pd = (descriptors *) a;
-    n  = pd->n_processes;
     pp = pd->processes;
 
     t = SC_fgets(s, MAX_BFSZ, stdin);
@@ -90,14 +89,12 @@ static void tty_has_txt(int fd, int mask, void *a)
 
 static int process_end(int *prv, void *a)
    {int i, n, status, reason, quiet, ret, rv;
-    char *name;
     PROCESS *p, **pp;
     descriptors *pd;
 
     pd = (descriptors *) a;
     n     = pd->n_processes;
     pp    = pd->processes;
-    name  = pd->name;
     quiet = pd->quiet;
 
     SC_check_children();
@@ -211,15 +208,13 @@ static int interrupt_mode(descriptors *pd)
 /* POLL_MODE - poll the process and the tty */
 
 static int poll_mode(descriptors *pd)
-   {int i, n, quiet;
+   {int i, n;
     char s[MAX_BFSZ];
-    char *name, *t, *pt;
+    char *t, *pt;
     PROCESS *p, **pp;
 
-    name  = pd->name;
-    quiet = pd->quiet;
-    pp    = pd->processes;
-    n     = pd->n_processes;
+    pp = pd->processes;
+    n  = pd->n_processes;
 
     SC_signal(SIGINT, clean_up);
 

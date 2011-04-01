@@ -71,6 +71,7 @@ char *srv_save_db(client *cl, char *fname, char *var)
         fname = path_tail(s);};
 	   
     ok = save_db(fd, db, var, fp);
+    ASSERT(ok == 0);
 
     if (fp != NULL)
        fclose(fp);
@@ -171,16 +172,12 @@ void new_connection(char *root, connection *srv)
  */
 
 int proc_connection(client *cl)
-   {int fd, rv, nb, st, to;
+   {int rv, nb, st, to;
     char s[MAXLINE], t[MAXLINE];
-    char *var, *val, *nvl, *root, *p;
-    connection *srv;
+    char *var, *val, *nvl, *p;
     database *db;
 
-    fd   = cl->fd;
-    root = cl->root;
-    srv  = cl->server;
-    db   = cl->db;
+    db = cl->db;
 
     to = 60;
     rv = 1;
@@ -320,10 +317,8 @@ static void async_server(client *cl)
 static void sync_server(client *cl)
    {int ok;
     char *root;
-    connection *srv;
 
     root = cl->root;
-    srv  = cl->server;
 
     for (ok = TRUE; ok == TRUE; )
         {ok = sock_exists(root);

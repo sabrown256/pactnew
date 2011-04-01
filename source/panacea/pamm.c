@@ -369,7 +369,7 @@ void _PA_rl_domain_map(PA_set_index *dmap)
         if (dmap[i].name != NULL)
            {SFREE(dmap[i].name);};
 
-    SFREE_N(dmap, nmax); 
+    SFREE(dmap); 
 
     return;}
 

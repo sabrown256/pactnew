@@ -19,15 +19,12 @@ typedef int (*PFtfc)(PDBfile *vif);
 
 static void fcnv(char *out, char *in, long ni,
 		 int dir, PDBfile *vif, char *type)
-   {int rv;
-    int lnby, onescmp;
+   {int lnby, onescmp;
     int *iaord, *oaord;
     long *ifmt, *ofmt;
     defstr *idp, *odp;
     data_standard *hstd;
     PD_byte_order lsord;
-
-    rv = TRUE;
 
     odp  = PD_inquire_table_type(vif->chart, type);
     idp  = PD_inquire_table_type(vif->host_chart, type);
@@ -187,6 +184,8 @@ static PDBfile *test_target(int n)
     PDBfile *vif;
 
     rv = PD_target_platform_n(n);
+    SC_ASSERT(rv == TRUE);
+
     nm = PD_target_platform_name(n);
 
     vif = PD_open_vif(nm);

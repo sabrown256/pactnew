@@ -26,11 +26,14 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     mem_descriptor *desc;
     SC_mem_opt opt;
 
-    opt.na  = FALSE;
-    opt.zsp = zsp;
-    opt.typ = -1;
+    opt.na   = FALSE;
+    opt.zsp  = zsp;
+    opt.typ  = -1;
+    opt.fnc  = pname;
+    opt.file = NULL;
+    opt.line = -1;
 
-    s = SC_alloc_nzt((long) *pni, (long) *pnb, (char *) pname, &opt);
+    s = SC_alloc_nzt((long) *pni, (long) *pnb, &opt);
 
 /* mark this block as having been allocated to FORTRAN
  * the memory map will need to know how to interpret the
