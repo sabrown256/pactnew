@@ -68,7 +68,7 @@ int main(argc, argv)
     long i;
     PFPVoidAPV fnc;
 
-    SC_zero_space(FALSE);
+    SC_zero_space(0);
     SC_configure_mm(128L, 2000000L, 65536L, 1.2);
     SC_setbuf(STDOUT, NULL);
 

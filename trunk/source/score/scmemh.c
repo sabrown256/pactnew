@@ -63,7 +63,7 @@ static void _SC_mem_history(int act, mem_descriptor *space)
     hst->space  = space;
     hst->nb     = space->length;
     if (act == SC_MEM_ALLOC)
-       hst->name = space->name;
+       hst->name = space->func;
     else
        hst->name = NULL;
 

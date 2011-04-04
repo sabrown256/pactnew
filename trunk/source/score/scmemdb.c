@@ -45,7 +45,7 @@ static long _SC_count_tagged(int flag)
 	    {desc = &space->block;
 	     if (SCORE_BLOCK_P(desc))
 	        {nb   = BLOCK_LENGTH(desc);
-		 name = desc->name;
+		 name = _SC_block_name(desc);
 		 if (name == NULL)
 		    nbt += nb;
 		 else
@@ -100,7 +100,7 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 
     prev = desc->prev;
     next = desc->next;
-    name = desc->name;
+    name = _SC_block_name(desc);
     nr   = desc->ref_count;
     ty   = desc->type;
     nb   = desc->length;
@@ -641,7 +641,7 @@ long SC_mem_object_trace(long nb, int type,
 				   int count, int type))
    {int j, jt, it;
     long i, l, us, nu, nmj, nm, ib;
-    char *pn;
+    char *pn, *name;
     SC_heap_des *ph;
     major_block_des *mbl;
     mem_descriptor *md;
@@ -680,7 +680,8 @@ long SC_mem_object_trace(long nb, int type,
 		  if (((type == -1) || (type == it)) && (nb == ib))
 		     {nm++;
 		      space = (mem_header *) md;
-		      (*f)(BLOCK_NAME(md), (char *) (space + 1), ib,
+		      name = _SC_block_name(md);
+		      (*f)(name, (char *) (space + 1), ib,
 			   (int) REF_COUNT(md), (int) it);};};};};
 
     SC_LOCKOFF(SC_mm_lock);
@@ -708,12 +709,12 @@ void SC_mem_print(void *p)
 	io_printf(stdout, "  Type index     : %x\n",    desc->type);
 	io_printf(stdout, "  Reference count: %x\n",    desc->ref_count);
 	io_printf(stdout, "  Block id       : %lx\n",   desc->id);
-	io_printf(stdout, "  Next block     : 0x%lx\n", desc->name);}
+	io_printf(stdout, "  Next block     : 0x%lx\n", desc->func);}
 
     else if (SCORE_BLOCK_P(desc))
        {io_printf(stdout, "  Address        : 0x%lx\n", p);
 	io_printf(stdout, "  Active         : yes\n");
-	io_printf(stdout, "  Associated name: %s\n",    desc->name);
+	io_printf(stdout, "  Associated name: %s\n",    _SC_block_name(desc));
 	io_printf(stdout, "  Number of bytes: %ld\n",   desc->length);
 	io_printf(stdout, "  Type index     : %d\n",    desc->type);
 	io_printf(stdout, "  Reference count: %d\n",    desc->ref_count);

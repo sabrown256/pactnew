@@ -946,7 +946,7 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
     SC_mem_opt opt;
 
     opt.na   = FALSE;
-    opt.zsp  = _SC_zero_space;
+    opt.zsp  = -1;
     opt.typ  = SS_OBJECT_I;
     opt.fnc  = __func__;
     opt.file = __FILE__;

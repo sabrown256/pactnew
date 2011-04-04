@@ -29,7 +29,7 @@
 
 #define REALLOC(_p, _sz)                                                   \
    {if (mm == SCORE)                                                       \
-       _p = SC_realloc_nz(_p, _sz, 1, FALSE, _SC_zero_space);              \
+       _p = SC_realloc_nz(_p, _sz, 1, FALSE, -1);                          \
     else                                                                   \
        _p = realloc(_p, (size_t) _sz);}
 

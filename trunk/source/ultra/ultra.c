@@ -1182,7 +1182,7 @@ static void usage(void)
 /* MAIN - start up a fun filled session of ULTRA right here */
 
 int main(int c, char **v)
-   {int i, n, load_init, load_rc, zero_space, rv;
+   {int i, n, load_init, load_rc, zsp, rv;
     int commnd_flag, no_banner, n_files, tflag, track;
     SIGNED int order[4096];
     char commnd[MAXLINE];
@@ -1226,9 +1226,9 @@ int main(int c, char **v)
 
     PG_set_use_pixmap(FALSE);
 
-    zero_space = 2;
+    zsp = 2;
 
-    SC_zero_space(zero_space);
+    SC_zero_space(zsp);
 
     SS_set_scheme_env(v[0], NULL);
     SS_init_scheme(CODE, VERSION);
@@ -1302,8 +1302,8 @@ int main(int c, char **v)
                      track = FALSE;
                      break;
                case 'z' :                              
-                     zero_space = SC_stoi(v[++i]);
-                     SC_zero_space(zero_space);
+                     zsp = SC_stoi(v[++i]);
+                     SC_zero_space(zsp);
                      break;};}
 
         else if ((v[i][0] != '(') && !commnd_flag)

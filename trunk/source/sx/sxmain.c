@@ -23,7 +23,7 @@
 
 int main(int c, char **v, char **env)
    {int i, n, commnd_flag, tflag, pvflag, load_rc;
-    int load_init, n_files, ret, zero_space, trap_error;
+    int load_init, n_files, ret, zsp, trap_error;
     int upix, script_file;
     char *cmd, *prog;
     SIGNED char order[MAXLINE];
@@ -54,7 +54,7 @@ int main(int c, char **v, char **env)
     trap_error  = TRUE;
     SX_gr_mode  = TRUE;
     load_rc     = TRUE;
-    zero_space  = 2;
+    zsp         = 2;
 
     upix = FALSE;
 
@@ -122,7 +122,7 @@ int main(int c, char **v, char **env)
 		     upix = FALSE;
                      break;
                 case 'z' :                              
-                     zero_space = SC_stoi(v[++i]);
+                     zsp = SC_stoi(v[++i]);
                      break;
                 default :
 		     if (script_file == FALSE)
@@ -146,7 +146,7 @@ int main(int c, char **v, char **env)
 
 #endif
 
-    SC_zero_space(zero_space);
+    SC_zero_space(zsp);
     SS_set_scheme_env(v[0], NULL);
 
 /* initialize SX

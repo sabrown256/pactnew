@@ -1549,6 +1549,10 @@ extern void
  PG_iso_limit(double *a, int npts, double *pmin, double *pmax),
  PG_contour_plot(PG_device *dev, PG_graph *data, ...);
 
+extern int
+ PG_contour_levels(double *lev, int nlev, double fmin, double fmax,
+		   double ratio);
+
 
 /* GSDLIN.C declarations */
 
