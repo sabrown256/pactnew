@@ -62,7 +62,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
     SC_mem_opt opt;
 
     opt.na  = FALSE;
-    opt.zsp = _SC_zero_space;
+    opt.zsp = _SC.zero_space;
     opt.typ = -1;
     opt.fnc  = name;
     opt.file = NULL;
@@ -172,7 +172,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na,
     SC_mem_opt opt;
 
     opt.na   = na;
-    opt.zsp  = _SC_zero_space;
+    opt.zsp  = _SC.zero_space;
     opt.typ  = -1;
     opt.fnc  = fnc;
     opt.file = file;
@@ -198,7 +198,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na)
     SC_mem_opt opt;
 
     opt.na  = na;
-    opt.zsp = _SC_zero_space;
+    opt.zsp = _SC.zero_space;
     opt.typ = -1;
     opt.fnc  = name;
     opt.file = NULL;
@@ -352,6 +352,33 @@ int _SC_name_ok(char *name, int flag)
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
+/* _SC_BLOCK_NAME - return the name associated with the object P */
+
+char *_SC_block_name(mem_descriptor *desc)
+   {char *p, *rv;
+    static char name[MAXLINE];
+
+    rv = NULL;
+    if (desc != NULL)
+       {if (desc->file != NULL)
+	   {p = strrchr(desc->file, '/');
+	    if (p == NULL)
+	       p = desc->file;
+	    else
+	       p++;
+	    snprintf(name, MAXLINE, "%s(%d):%s", p, desc->line, desc->func);}
+	else if (desc->func != NULL)
+	   SC_strncpy(name, MAXLINE, desc->func, -1);
+	else
+	   SC_strncpy(name, MAXLINE, "-none-", -1);
+
+	rv = name;};
+
+    return(rv);}
+
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
 /* _SC_PRINT_BLOCK_INFO - print out the descriptive info about a
  *                      - memory block
  */
@@ -368,7 +395,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
     desc  = &space->block;
     nb    = BLOCK_LENGTH(desc);
     nr    = REF_COUNT(desc);
-    name  = desc->name;
+    name  = _SC_block_name(desc);
     if (name == NULL)
        {if (flag == 0)
 	   io_printf(fp, "   0x%012lx %9ld\t(no name)\n",
@@ -451,7 +478,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
 	       {ln = desc->length;
 		ty = desc->type;
 		rf = desc->ref_count;
-		nm = desc->name;};
+		nm = _SC_block_name(desc);};
 	    
 	    if (pl != NULL)
 	       *pl = ln;
@@ -569,7 +596,9 @@ int SC_reg_mem(void *p, long length, char *name)
 
     SET_HEAP(pd, ph);
 
-    pd->name      = name;
+    pd->func      = name;
+    pd->file      = NULL;
+    pd->line      = -1;
     pd->ref_count = 1;
     pd->type      = 0;
     pd->length    = length;
@@ -621,7 +650,7 @@ char *SC_mem_lookup(void *p)
 	    {ps = (void *) (space + 1);
 	     if (ps == p)
 	        {desc = &space->block;
-		 name = desc->name;
+		 name = _SC_block_name(desc);
 		 break;};
 
 	     space = space->block.next;};};
@@ -647,7 +676,7 @@ void dprfree(void)
         {io_printf(stdout, "%3ld %4ld ", j, SC_BIN_SIZE(j));
          for (md  = SC_FREE_LIST(ph)[j], i = 0L;
 	      md != NULL;
-	      md  = (mem_descriptor *) md->name, i++)
+	      md  = (mem_descriptor *) md->func, i++)
              {io_printf(stdout, " %lx", md);
 	      fflush(stdout);};
 	 io_printf(stdout, "\n");};
@@ -671,7 +700,7 @@ void dflpr(int j)
 	  
     for (md = SC_FREE_LIST(ph)[j];
 	 md != NULL;
-	 md = (mem_descriptor *) md->name)
+	 md = (mem_descriptor *) md->func)
         io_printf(stdout, "%8lx\n", md);
 
     return;}
@@ -695,7 +724,7 @@ static long _SC_flchk(void)
         {hd = SC_FREE_LIST(ph)[j];
          for (k = 0L, md = hd;
 	      md != NULL;
-	      k++, md = (mem_descriptor *) md->name)
+	      k++, md = (mem_descriptor *) md->func)
 	     {ok = SC_pointer_ok(md);
 	      if (!ok)
 		 {io_printf(stdout,
@@ -705,7 +734,7 @@ static long _SC_flchk(void)
 		  bad++;
 		  break;};
 		
-	      ok = SC_pointer_ok(md->name);
+	      ok = SC_pointer_ok(md->func);
  	      if (ok &&
 		  (md->ref_count == SC_MEM_MFA) &&
 		  (md->type == SC_MEM_MFB))
@@ -956,14 +985,14 @@ int SC_arrtype(void *p, int type)
 /* SC_ARRNAME - return the name associated with the object P */
 
 char *SC_arrname(void *p)
-   {char *name;
+   {char *rv;
     mem_descriptor *desc;
 
-    name = NULL;
+    rv = NULL;
     if (SC_is_score_space(p, NULL, &desc))
-       name = desc->name;
+       rv = _SC_block_name(desc);
 
-    return(name);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1003,15 +1032,14 @@ void dprblk(void *p)
             if (FREE_SCORE_BLOCK_P(desc) == TRUE)
                printf("Free Block\n");
 	    else
-	       {printf("Name: %s\n",       BLOCK_NAME(desc));
+	       {printf("Name: %s\n",       _SC_block_name(desc));
 		printf("Length: %ld\n",    BLOCK_LENGTH(desc));
 		printf("Type: %d\n",       BLOCK_TYPE(desc));
 		printf("References: %d\n", REF_COUNT(desc));};
 
-	    printf("Next Block: %p\n", desc->next);
+	    printf("Next Block: %p\n",     desc->next);
 	    printf("Previous Block: %p\n", desc->prev);
-
-	    printf("Heap: %d\n", desc->heap->tid);};};
+	    printf("Heap: %d\n",           desc->heap->tid);};};
 
     return;}
 

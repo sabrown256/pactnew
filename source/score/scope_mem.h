@@ -161,13 +161,15 @@ typedef struct s_SC_mem_hst SC_mem_hst;
 struct s_mem_descriptor
    {mem_header *prev;
     mem_header *next;
-    char *name;
     SC_heap_des *heap;
     long length;
     long id;
     char initialized;
     short ref_count;
-    short type;};
+    short type;
+    char *func;
+    char *file;
+    int line;};
 
 union u_mem_header
    {mem_descriptor block;
@@ -182,7 +184,7 @@ struct s_major_block_des
 struct s_SC_heap_des
    {int init;
     int tid;
-    int zero_space;         /* per thread version of _SC_zero_space */
+    int zero_space;         /* per thread version of _SC.zero_space */
     mem_descriptor **free_list;
     mem_header *latest_block;
     major_block_des *major_block_list;
@@ -239,7 +241,6 @@ SC_DECLARE_VAR(long, *_SC_mm_bins, NULL);
 SC_DECLARE_VAR(int, _SC_mem_align_expt, 0);
 SC_DECLARE_VAR(int, _SC_mem_align_size, 0);
 SC_DECLARE_VAR(int, _SC_mem_align_pad, 0);
-SC_DECLARE_VAR(int, _SC_zero_space, 0);
 SC_DECLARE_VAR(int, SC_mm_debug, FALSE);
 SC_DECLARE_VAR(int, _SC_trap_sig, -1);
 
@@ -283,6 +284,9 @@ extern long
 
 extern int
  _SC_name_ok(char *name, int flag);
+
+extern char
+ *_SC_block_name(mem_descriptor *desc);
 
 extern void
  _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag);

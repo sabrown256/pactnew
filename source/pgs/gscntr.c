@@ -68,8 +68,8 @@ int _PG_get_fill_contour_color(PG_device *dev, int l, int n)
 
 /* PG_CONTOUR_LEVELS - compute an array of contour levels */
 
-static int PG_contour_levels(double *lev, int nlev, double fmin, double fmax,
-			     double ratio)
+int PG_contour_levels(double *lev, int nlev, double fmin, double fmax,
+		      double ratio)
    {int i;
     double delta, levn;
 

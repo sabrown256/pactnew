@@ -181,6 +181,9 @@ struct s_SC_state
 /* SCLPPSX.C */
    PROCESS *terminal;
 
+/* SCMEMC.C */
+   int zero_space;
+
 /* SCMEMDA.C */
    hasharr *mem_table;
 
@@ -250,9 +253,6 @@ extern SC_state
 
 extern SC_oscapdes
  _SC_os;
-
-extern int
- _SC_zero_space;
 
 /*--------------------------------------------------------------------------*/
 

@@ -188,6 +188,7 @@ static uint64_t _PN_bread(void *s, size_t nbi, uint64_t ni, FILE *stream)
 
 static uint64_t _PN_bwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {long nbw;
+    void *d;
     BF_FILE *fb;
 
     fb = _PD_GET_FILE_PTR(stream);
@@ -197,7 +198,8 @@ static uint64_t _PN_bwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
        nbw = 0;
 
     else
-       {memcpy(MEM(fb), s, nbw);
+       {d = MEM(fb);
+	memcpy(d, s, nbw);
 
 /* adjust the current address */
         DISK(fb) += nbw;};

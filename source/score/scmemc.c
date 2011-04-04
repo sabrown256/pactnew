@@ -12,6 +12,7 @@
 
 #define SC_DEFINE
 
+#include "score_int.h"
 #include "scope_mem.h"
 
 SC_mem_fnc
@@ -249,7 +250,7 @@ long _SC_bin_index(long n)
  */
 
 static void INLINE _SC_assign_block(SC_heap_des *ph, mem_header *space,
-				    long nb, char *name)
+				    long nb, char *func, char *file, int line)
    {mem_descriptor *desc;
     mem_header *prev, *next, *lb;
 
@@ -260,7 +261,9 @@ static void INLINE _SC_assign_block(SC_heap_des *ph, mem_header *space,
     desc->ref_count = 0;
     desc->type      = 0;
     desc->length    = nb;
-    desc->name      = name;
+    desc->func      = func;
+    desc->file      = file;
+    desc->line      = line;
 
     lb = ph->latest_block;
     if (lb != NULL)
@@ -290,13 +293,15 @@ static INLINE void _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 
     SET_HEAP(desc, ph);
 
-    desc->name      = (char *) addr;
     desc->ref_count = SC_MEM_MFA;
     desc->type      = SC_MEM_MFB;
     desc->length    = 0L;
 
     desc->prev = NULL;
     desc->next = NULL;
+    desc->func = (char *) addr;
+    desc->file = NULL;
+    desc->line = -1;
 
     return;}
 
@@ -500,7 +505,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 	if (md != NULL)
 
 /* attach the new chunks to the free list */
-	   {SC_FREE_LIST(ph)[j] = (mem_descriptor *) (md->name);
+	   {SC_FREE_LIST(ph)[j] = (mem_descriptor *) (md->func);
 
 /* take the top of the free list for this size chunk */
 	    md->initialized = FALSE;
@@ -626,28 +631,33 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
  */
 
 void *SC_alloc_nzt(long nitems, long bpi, void *arg)
-   {int na, zsp, typ;
+   {int na, zsp, typ, line;
     long nb, nbp;
     uint64_t a, f;
-    char *name;
+    char *func, *file;
     SC_mem_opt *opt;
     SC_heap_des *ph;
     mem_header *space;
     void *rv;
 
+    ph = _SC_tid_mm();
+
     if (arg == NULL)
        {na   = FALSE;
-	zsp  = _SC_zero_space;
+	zsp  = _SC.zero_space;
 	typ  = -1;
-        name = NULL;}
+        func = NULL;
+        func = NULL;
+        line = -1;}
     else
        {opt  = (SC_mem_opt *) arg;
 	na   = opt->na;
-	zsp  = opt->zsp;
+	zsp  = (opt->zsp == -1) ? _SC.zero_space : opt->zsp;
 	typ  = opt->typ;
-        name = (char *) opt->fnc;};
+        func = (char *) opt->fnc;
+        file = (char *) opt->file;
+        line = opt->line;};
 
-    ph = _SC_tid_mm();
     nb  = nitems*bpi;
     nbp = nb + SC_HDR_SIZE(ph);
 
@@ -667,7 +677,7 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
     if (space != NULL)
        {mem_descriptor *desc;
 
-        _SC_assign_block(ph, space, nb, name);
+        _SC_assign_block(ph, space, nb, func, file, line);
 
 	_SC_mem_stats_acc((long) nb, 0L, ph);
     
@@ -828,7 +838,7 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
  */
 
 int SC_free_z(void *p, int zsp)
-   {long nbp;
+   {long nb, nbp;
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
@@ -854,11 +864,14 @@ int SC_free_z(void *p, int zsp)
     if (ph == NULL)
        return(TRUE);
 
+    zsp = (zsp == -1) ? _SC.zero_space : zsp;
+
 /* log this entry if doing memory history */
     if (_SC_mem_hst_hook != NULL)
        (*_SC_mem_hst_hook)(SC_MEM_FREE, desc);
 
-    nbp = BLOCK_LENGTH(desc) + SC_HDR_SIZE(ph);
+    nb  = BLOCK_LENGTH(desc);
+    nbp = nb + SC_HDR_SIZE(ph);
 
     SC_LOCKON(SC_mm_lock);
 
@@ -931,7 +944,7 @@ void *SC_nalloc_na(long nitems, long bpi, int na,
     SC_mem_opt opt;
 
     opt.na   = na;
-    opt.zsp  = _SC_zero_space;
+    opt.zsp  = _SC.zero_space;
     opt.typ  = -1;
     opt.fnc  = fnc;
     opt.file = file;
@@ -960,7 +973,7 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
     SC_mem_opt opt;
 
     opt.na  = na;
-    opt.zsp = _SC_zero_space;
+    opt.zsp = _SC.zero_space;
     opt.typ = -1;
     opt.fnc  = name;
     opt.file = NULL;
@@ -988,7 +1001,7 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
 void *SC_realloc_na(void *p, long nitems, long bpi, int na)
    {void *rv;
 
-    rv = SC_realloc_nz(p, nitems, bpi, na, _SC_zero_space);
+    rv = SC_realloc_nz(p, nitems, bpi, na, _SC.zero_space);
 
     return(rv);}
 
@@ -1003,7 +1016,56 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
 int SC_free(void *p)
    {int rv;
 
-    rv = SC_free_z(p, _SC_zero_space);
+    rv = SC_free_z(p, _SC.zero_space);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_ZERO_SPACE_N - set zero space flag on heap for thread TID
+ *                 - thread action
+ *                 -   -2 : all heaps
+ *                 -   -1 : current heap
+ *                 -  0-N : specified heap
+ *                 - flag action
+ *                 -   0 : don't zero
+ *                 -   1 : zero on alloc and free
+ *                 -   2 : zero on alloc only
+ *                 -   3 : zero on free only
+ *                 - return the original value
+ */
+
+int SC_zero_space_n(int flag, int tid)
+   {int it, itn, itx, rv;
+    SC_heap_des *ph;
+
+    SC_LOCKON(SC_mm_lock);
+
+    rv = 0;
+
+    switch (tid)
+       {case -2 :
+	     itn = 0;
+	     itx = SC_get_n_thread();
+	     break;
+        case -1 :
+	     itn = SC_current_thread();
+	     itx = itn+1;
+	     break;
+	default :
+	     itn = tid;
+	     itx = itn+1;
+	     break;};
+
+    for (it = itn; it < itx; it++)
+        {ph = _SC_get_heap(it);
+	 if (ph != NULL)
+	    {rv = ph->zero_space;
+	     if ((0 <= flag) && (flag <= 5))
+	        ph->zero_space = flag;}};
+
+    SC_LOCKOFF(SC_mm_lock);
 
     return(rv);}
 
@@ -1021,9 +1083,10 @@ int SC_free(void *p)
 int SC_zero_space(int flag)
    {int rv;
 
-    rv = _SC_zero_space;
-    if ((flag >= 0) && (flag <= 5))
-       _SC_zero_space = flag;
+    rv = _SC.zero_space;
+    if ((0 <= flag) && (flag <= 5))
+       {SC_zero_space_n(flag, -2);
+	_SC.zero_space = flag;};
 
     return(rv);}
 
@@ -1035,7 +1098,7 @@ int SC_zero_space(int flag)
 int SC_zero_on_alloc(void)
    {int rv;
 
-    rv = ((_SC_zero_space == 1) || (_SC_zero_space == 2));
+    rv = ((_SC.zero_space == 1) || (_SC.zero_space == 2));
 
     return(rv);}
 

@@ -1042,6 +1042,7 @@ extern int
  SC_free(void *p),
  SC_free_z(void *p, int zsp),
  SC_zero_on_alloc(void),
+ SC_zero_space_n(int flag, int tid),
  SC_zero_space(int flag);
 
 
