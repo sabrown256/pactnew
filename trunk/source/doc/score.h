@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 12/06/2010
+MOD: 04/05/2011
 
 <CENTER>
 <P>
@@ -1342,7 +1342,7 @@ to permit a wide range of sizes to be covered.
 When memory is requested, the number of bytes is hashed to a bin.  The first
 element of the free list for that bin is popped off the free list and
 returned.  It may or may not be zeroed out depending on the flag set by
-<tt>SC_zero_space</tt>.  It is also marked as having a reference count of 0.
+<tt>SC_zero_space_n</tt>.  It is also marked as having a reference count of 0.
 Each block is also inserted into a doubly linked list of active blocks.
 This permits the SCORE memory manager to check the integrity of managed
 memory as the application runs (via calls to <tt>SC_mem_chk</tt>).
@@ -1357,7 +1357,7 @@ When a pointer to allocated memory is handed to <tt>SC_free</tt>, several things
 are done.  The reference count is decremented.  If the new count is less
 than 1, the block is added to the free list of the bin whose size it
 hashes to.  The block may or may not be zeroed out depending on the value
-of the flag set by <tt>SC_zero_space</tt>.
+of the flag set by <tt>SC_zero_space_n</tt>.
 <p>
 
 When the SCORE memory manager finds an empty free list while trying to
@@ -1965,17 +1965,26 @@ and always returns 1.
 <p>
 
 <pre>
-<I>C Binding: </I>int SC_zero_space(int flag)
+<I>C Binding: </I>int SC_zero_space_n(int flag, int tid)
 <I>F77 Binding: </I>integer sczrsp(integer flag)
 <I>SX Binding: not applicable</I>
-<I>Python Binding: </I>
+<I>Python Binding: zero_space(int flag)</I>
 </pre>
 
-If input <em>flag</em> is set to 1 memory will be zeroed out when
-allocated and when released.
-If <em>flag</em> is 2 memory will be zeroed out on allocation only.
-If <em>flag</em> is 3 memory will be zeroed out on release only.
-If <em>flag</em> is 0 memory will not be zeroed out.
+The value of <em>flag</em> variable determines the action:<p>
+<pre>
+    0 - memory will not be zeroed out.
+    1 - memory will be zeroed out when allocated and when released.
+    2 - memory will be zeroed out on allocation only.
+    3 - memory will be zeroed out on release only.
+</pre>
+The value of <em>tid</em> variable determines which threads
+have their value set:<p>
+<pre>
+    -2 - all threads set.
+    -1 - the current thread is set.
+   0-N - the specified thread is set.
+</pre>
 The zeroing of memory on release can be useful (in spite of the overhead) 
 in order to spot the situation where space is freed when more than one pointer 
 points to it.  The default is for space not to be zeroed out.

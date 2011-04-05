@@ -364,8 +364,8 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
 
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
-    ioi = SC_io_interrupts_on;
-    SC_io_interrupts_on = FALSE;
+    ioi = SC_gs.io_interrupts_on;
+    SC_gs.io_interrupts_on = FALSE;
     SC_signal(SC_SIGIO, SIG_IGN);
 
     filter = _SC_read_filter(fname);
@@ -434,7 +434,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
     _SC_free_filter(filter);
 
 /* restore old interrupt state */
-    SC_io_interrupts_on = ioi;
+    SC_gs.io_interrupts_on = ioi;
     SC_signal(SC_SIGIO, hnd);
 
     if (sig == SC_EXIT_BAD)
@@ -496,8 +496,8 @@ int SC_exec_async_s(char *shell, char **env,
 
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
-    ioi = SC_io_interrupts_on;
-    SC_io_interrupts_on = FALSE;
+    ioi = SC_gs.io_interrupts_on;
+    SC_gs.io_interrupts_on = FALSE;
     SC_signal(SC_SIGIO, SIG_IGN);
 
     state.time_limit = to;
@@ -550,7 +550,7 @@ int SC_exec_async_s(char *shell, char **env,
     state.free_tasks(&state);
 
 /* restore old interrupt state */
-    SC_io_interrupts_on = ioi;
+    SC_gs.io_interrupts_on = ioi;
     SC_signal(SC_SIGIO, hnd);
 
     return(st);}
@@ -610,8 +610,8 @@ int SC_exec_async_h(char *shell, char **env,
 
 /* save old interrupt state */
     hnd = SC_which_signal_handler(SC_SIGIO);
-    ioi = SC_io_interrupts_on;
-    SC_io_interrupts_on = FALSE;
+    ioi = SC_gs.io_interrupts_on;
+    SC_gs.io_interrupts_on = FALSE;
     SC_signal(SC_SIGIO, SIG_IGN);
 
     state.time_limit = to;
@@ -662,7 +662,7 @@ int SC_exec_async_h(char *shell, char **env,
     state.free_tasks(&state);
 
 /* restore old interrupt state */
-    SC_io_interrupts_on = ioi;
+    SC_gs.io_interrupts_on = ioi;
     SC_signal(SC_SIGIO, hnd);
 
     return(st);}
@@ -700,8 +700,8 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     _SC_setup_async_state(&_SC_async_state, 0);
 
 /* save old interrupt state */
-    ioi = SC_io_interrupts_on;
-    SC_io_interrupts_on = FALSE;
+    ioi = SC_gs.io_interrupts_on;
+    SC_gs.io_interrupts_on = FALSE;
     osi = SC_signal(SC_SIGIO, SIG_IGN);
 
     rv = FALSE;
@@ -756,7 +756,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     SC_free_event_loop(pe);
 
 /* restore old interrupt state */
-    SC_io_interrupts_on = ioi;
+    SC_gs.io_interrupts_on = ioi;
     SC_signal(SC_SIGIO, osi);
 
     _SC_async_state.pool      = cpo;

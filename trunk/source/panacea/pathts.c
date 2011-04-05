@@ -902,7 +902,7 @@ int main(argc, argv)
     int test_one, test_two, test_three, test_four;
     int iter, cleanup_level, opt;
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     SC_init("PATHTS: Exit with error", NULL,
             TRUE, NULL,
@@ -922,7 +922,7 @@ int main(argc, argv)
                 {case 'c' : cleanup_level = atoi(argv[++i]);
                             break;
                  case 'd' : debug_mode  = TRUE;
-                            SC_mm_debug = TRUE;
+                            SC_gs.mm_debug = TRUE;
                             break;
                  case 'i' : iter = atoi(argv[++i]);
                             break;

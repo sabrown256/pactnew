@@ -606,8 +606,8 @@ static object *_SSI_strnum(object *argl)
             0);
 
     rv = SS_f;
-    if (SC_intstrp(text, Radix))
-       {l  = STRTOL(text, &pt, Radix);
+    if (SC_intstrp(text, SC_gs.radix))
+       {l  = STRTOL(text, &pt, SC_gs.radix);
 	rv = SS_mk_integer(l);}
 
     else if (SC_fltstrp(text))

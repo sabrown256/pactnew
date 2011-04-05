@@ -204,7 +204,7 @@
 /* this is a minor diagnostic that counts unexpected results
  * it will also silence warnings about variables being set but not used
  */
-#define SC_ASSERT(_t)   {if ((_t) == FALSE) SC_assert_fail++;}
+#define SC_ASSERT(_t)   {if ((_t) == FALSE) SC_gs.assert_fail++;}
 
 /*--------------------------------------------------------------------------*/
 

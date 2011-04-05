@@ -87,6 +87,17 @@
     (to > 0) ? SETJMP(*_SC_get_to_buf(-1)) : TRUE)
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#ifdef SC_DEBUG
+# define SC_ENTERING _SC_trace_entering(__FILE__, __func__, __LINE__)
+# define SC_LEAVING  _SC_trace_leaving(__FILE__, __func__, __LINE__)
+#else
+# define SC_ENTERING
+# define SC_LEAVING
+#endif
+
+/*--------------------------------------------------------------------------*/
 
 /*                         TYPEDEFS AND STRUCTS                             */
 
@@ -122,6 +133,9 @@ struct s_SC_state
 /* SCMEMG.C */
     int mem_guard_high;
     int page_size;
+    void *(*alloc)(size_t nb);
+    void *(*realloc)(void *p, size_t nb);
+    void (*free)(void *p);
 
 /* SCMEMH.C */
     double t0[2];
@@ -194,7 +208,8 @@ struct s_SC_state
 #endif
 
 /* SCMEMH.C */
-    long mem_hst_sz;
+   long mem_hst_sz;
+   void (*mem_hst)(int act, void *a);
 
 /* SCPAR.C */
    PFTid tid_hook;
@@ -328,6 +343,13 @@ extern char
  *_SC_pr_tok(char *s, char *delim),
  *_SC_quoted_tok(char *s, char *qdelim);
 
+
+/* SCTRACE.C declarations */
+
+extern void
+ _SC_trace_entering(const char *file, const char *fnc, int line),
+ _SC_trace_leaving(const char *file, const char *fnc, int line),
+ _SC_trace_show(int n);
 
 #ifdef __cplusplus
 }

@@ -90,7 +90,7 @@ targets :
 #
 Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
        sclnx.h scosx.h sccyg.h scaix.h scsol.h schpux.h scirix.h \
-       score.h score_int.h \
+       score.h score_int.h score_old.h \
        scope_hash.h scope_typeh.h scope_io.h scope_array.h
 
 #
@@ -104,7 +104,8 @@ MObjs = scmemc.o scmemda.o scmemdb.o scmeme.o scmemf.o \
 PObjs = scerr.o schp.o scpman.o schttp.o scinet.o \
         scmmap.o sclmmap.o scmmaps.o \
         scsysa.o scsysb.o scsysc.o scsysd.o scsyse.o \
-        scfio.o scbio.o scudl.o scioctl.o scsig.o schsrv.o scterm.o
+        scfio.o scbio.o scudl.o scioctl.o scsig.o schsrv.o scterm.o \
+        sctrace.o
 
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 
@@ -132,7 +133,7 @@ ArPObjs = ${TGTLib}(scerr.o) ${TGTLib}(schp.o) ${TGTLib}(scpman.o) \
           ${TGTLib}(scsysc.o) ${TGTLib}(scsysd.o) ${TGTLib}(scsyse.o) \
           ${TGTLib}(scfio.o) ${TGTLib}(scbio.o) ${TGTLib}(scudl.o) \
           ${TGTLib}(scioctl.o) ${TGTLib}(scsig.o) \
-          ${TGTLib}(schsrv.o) ${TGTLib}(scterm.o)
+          ${TGTLib}(schsrv.o) ${TGTLib}(scterm.o) ${TGTLib}(sctrace.o)
 
 ArSObjs = ${TGTLib}(sclexs.o)
 

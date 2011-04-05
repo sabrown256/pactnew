@@ -34,11 +34,14 @@ static void _SC_mem_hst_init(SC_heap_des *ph)
 
 /* _SC_MEM_HISTORY - activate/deactivate memory history tracking */
 
-static void _SC_mem_history(int act, mem_descriptor *space)
+static void _SC_mem_history(int act, void *a)
    {long ih, nh;
     double t[2], dt;
     SC_heap_des *ph;
     SC_mem_hst *hst;
+    mem_descriptor *space;
+
+    space = (mem_descriptor *) a;
 
     ph = GET_HEAP(space);
     if (ph->ring == NULL)
@@ -85,9 +88,9 @@ long SC_mem_history(long sz)
     osz = _SC.mem_hst_sz;
 
     if (sz > 0L)
-       _SC_mem_hst_hook = _SC_mem_history;
+       _SC.mem_hst = _SC_mem_history;
     else
-       _SC_mem_hst_hook = NULL;
+       _SC.mem_hst = NULL;
 
     if (sz >= 0L)
        _SC.mem_hst_sz = sz;
@@ -188,7 +191,7 @@ void SC_mem_history_out(FILE *fp, int tid)
 	nt = max(nt, 1);
 
 /* disable to avoid temporaries in print process corrupting the results */
-	_SC_mem_hst_hook = NULL;
+	_SC.mem_hst = NULL;
 
 	if (tid < 0)
 	   {for (i = 0; i < nt; i++)
@@ -200,7 +203,7 @@ void SC_mem_history_out(FILE *fp, int tid)
 	    _SC_mem_hst_dump(fp, ph);};
 
 /* re-enable memory history */
-	_SC_mem_hst_hook = _SC_mem_history;};
+	_SC.mem_hst = _SC_mem_history;};
 
     return;}
 

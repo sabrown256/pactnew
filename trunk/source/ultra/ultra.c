@@ -922,8 +922,8 @@ static void UL_init_env(void)
     SS_arg_hook  = _UL_args;
     SX_plot_hook = (PFByte) UL_plot;
 
-    SC_atof_hook   = SC_atof;
-    SC_strtod_hook = SC_strtod;
+    SC_gs.atof   = SC_atof;
+    SC_gs.strtod = SC_strtod;
 
 /* you doublely want to do interrupt based terminal I/O so as to not
  * have ULTRA hog the CPU while polling for input (especially on a CRAY)
@@ -1228,7 +1228,7 @@ int main(int c, char **v)
 
     zsp = 2;
 
-    SC_zero_space(zsp);
+    SC_zero_space_n(zsp, -2);
 
     SS_set_scheme_env(v[0], NULL);
     SS_init_scheme(CODE, VERSION);
@@ -1303,7 +1303,7 @@ int main(int c, char **v)
                      break;
                case 'z' :                              
                      zsp = SC_stoi(v[++i]);
-                     SC_zero_space(zsp);
+                     SC_zero_space_n(zsp, -2);
                      break;};}
 
         else if ((v[i][0] != '(') && !commnd_flag)

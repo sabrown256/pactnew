@@ -68,9 +68,9 @@
 #define EXTRA_WORD_SIZE   sizeof(long)
 #define NBITS             (BITS_PER_BYTE*EXTRA_WORD_SIZE - 4)
 
-#define _SC_ALLOC   (*_SC_alloc_hook)
-#define _SC_REALLOC (*_SC_realloc_hook)
-#define _SC_FREE    (*_SC_free_hook)
+#define _SC_ALLOC   (*_SC.alloc)
+#define _SC_REALLOC (*_SC.realloc)
+#define _SC_FREE    (*_SC.free)
 
 /*--------------------------------------------------------------------------*/
 
@@ -241,17 +241,7 @@ SC_DECLARE_VAR(long, *_SC_mm_bins, NULL);
 SC_DECLARE_VAR(int, _SC_mem_align_expt, 0);
 SC_DECLARE_VAR(int, _SC_mem_align_size, 0);
 SC_DECLARE_VAR(int, _SC_mem_align_pad, 0);
-SC_DECLARE_VAR(int, SC_mm_debug, FALSE);
 SC_DECLARE_VAR(int, _SC_trap_sig, -1);
-
-SC_DECLARE_VAR(void, (*_SC_free_hook)(void *p), free);
-SC_DECLARE_VAR(PFMalloc,  _SC_alloc_hook,   (PFMalloc) malloc);
-SC_DECLARE_VAR(PFRealloc, _SC_realloc_hook, (PFRealloc) realloc);
-
-SC_DECLARE_VAR(void,
-	       (*_SC_mem_hst_hook)(int act, mem_descriptor *space),
-	       NULL);
-
 
 SC_DECLARE_VAR(void, *_SC_trap_ptr, NULL);
 

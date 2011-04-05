@@ -178,7 +178,7 @@ static int interrupt_mode(descriptors *pd)
     n  = pd->n_processes;
     pp = pd->processes;
 
-    SC_io_interrupts_on = TRUE;
+    SC_gs.io_interrupts_on = TRUE;
 
 /* create the event loop state */
     pe = SC_make_event_loop(NULL, NULL, process_end, -1, -1, -1);
@@ -192,9 +192,9 @@ static int interrupt_mode(descriptors *pd)
 						  child_has_txt, NULL, -1);};
 
 /* if all channels are OK activate the interrupt handling */
-    SC_io_interrupts_on = pi;
+    SC_gs.io_interrupts_on = pi;
     if (pi)
-       SC_catch_event_loop_interrupts(pe, SC_io_interrupts_on);
+       SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);
 
     rv = SC_event_loop(pe, pd, -1);
 

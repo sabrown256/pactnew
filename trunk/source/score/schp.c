@@ -27,7 +27,6 @@
 typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
 int
- SC_errno = 0,
  _SC_current_flushed_process = -1;
 
 static char
@@ -916,8 +915,8 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
     char **ca;
     PROCESS *pp;
 
-    pp       = NULL;
-    SC_errno = 0;
+    pp         = NULL;
+    SC_gs.errn = 0;
 
     if (argv == NULL)
        na = 0;
@@ -949,11 +948,11 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
 	   SC_error(st-10, "CANNOT VERIFY HOST %s - SC_OPEN_REMOTE", host);
 
 	if (pp == NULL)
-	   SC_error(SC_errno, "OPEN FAILED %s - SC_OPEN_REMOTE", host);}
+	   SC_error(SC_gs.errn, "OPEN FAILED %s - SC_OPEN_REMOTE", host);}
 
     else
-      {SC_errno = ok;
-       pp       = NULL;};
+      {SC_gs.errn = ok;
+       pp         = NULL;};
 
     SC_ERR_UNTRAP();
 
@@ -1461,7 +1460,7 @@ void _SC_copy_filedes(SC_filedes *fb, SC_filedes *fa)
  *         - only one of "pst" can be used and only for current CPU/host
  *         - processes
  *         - NOTE: for ftp or telnet the "t" option is useful
- *         - return NULL and set SC_errno on failure
+ *         - return NULL and set SC_gs.errn on failure
  */
 
 PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
@@ -1474,15 +1473,15 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
     PFProcExit exitf;
     void *exita;
 
-    SC_errno = 0;
+    SC_gs.errn = 0;
 
     if ((argv == NULL) || (argv[0] == NULL))
        return(NULL);
 
     ok = SC_ERR_TRAP();
     if (ok != 0)
-       {SC_errno = ok;
-	pp = NULL;}
+       {SC_gs.errn = ok;
+	pp         = NULL;}
 
     else
        {initf = NULL;
@@ -1649,7 +1648,7 @@ int SC_init_client(char *host, int port)
 int SC_get_number_processors(void)
    {int n;
 
-    n = SC_comm_size;
+    n = SC_gs.comm_size;
 
     return(n);}
 
@@ -1661,7 +1660,7 @@ int SC_get_number_processors(void)
 int SC_get_processor_number(void)
    {int n;
 
-    n = SC_comm_rank;
+    n = SC_gs.comm_rank;
 
     return(n);}
 
@@ -1675,8 +1674,8 @@ int SC_get_processor_number(void)
 void SC_set_processor_info(int size, int rank)
    {
 
-    SC_comm_size = size;
-    SC_comm_rank = rank;
+    SC_gs.comm_size = size;
+    SC_gs.comm_rank = rank;
 
     return;}
 

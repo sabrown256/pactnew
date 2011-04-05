@@ -188,7 +188,7 @@ int main(int c, char **v)
     
     PD_init_threads(1, NULL);
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     debug_mode = FALSE;
     read_only  = FALSE;
@@ -197,7 +197,7 @@ int main(int c, char **v)
             {switch (v[i][1])
                 {case 'd' :
 		      debug_mode  = TRUE;
-		      SC_mm_debug = TRUE;
+		      SC_gs.mm_debug = TRUE;
 		      break;
                  case 'h' :
 		      print_help();

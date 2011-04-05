@@ -25,9 +25,6 @@ int
 int
  (*SC_sizeof_hook)(char *s) = SC_sizeof;
 
-void
- (*SC_type_container_hook)(char *dtype, char *stype) = SC_type_container;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

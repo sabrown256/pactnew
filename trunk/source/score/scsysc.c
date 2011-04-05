@@ -1405,7 +1405,7 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 		     NULL);
 
 	if (pp == NULL)
-	   job->print(job, as, "exec failed %d\n", SC_errno);
+	   job->print(job, as, "exec failed %d\n", SC_gs.errn);
 	else
 	   pp->lost = _SC_process_lost;
 
@@ -1841,7 +1841,7 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
 	    if (pp == NULL)
 	       job->print(job, as,
 			  "remote exec on %s failed %d\n",
-			  hs, SC_errno);
+			  hs, SC_gs.errn);
 	    else
 	       pp->lost = _SC_process_lost;
 

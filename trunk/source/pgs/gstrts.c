@@ -1186,7 +1186,7 @@ int main(int c, char **v)
     name[3] = "trjpg";
     name[4] = "trpng";
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     nt = N_TEST;
     nd = N_DEV;

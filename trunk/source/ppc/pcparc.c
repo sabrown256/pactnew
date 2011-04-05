@@ -340,7 +340,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	PC_printf(pp, "%s,%d,%d\n", srvr, port, (int) getpid());
 	pp->data = PC_init_client(srvr, port);
 
-	SC_comm_size = *pnn;};
+	SC_gs.comm_size = *pnn;};
 
 /* conditional diagnostic messages */
     if (_SC_debug)

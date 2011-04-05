@@ -103,7 +103,7 @@ void SS_print(object *obj, char *begin, char *end, object *strm)
     PRINT(str, "%s", end);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_io_interrupts_on);
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
 
     return;}
 
@@ -161,7 +161,7 @@ char *_SS_sprintf(char *fmt, object *obj)
 	s = SC_strsavef(_SS.vbf, "_SS_SPRINT:s");};
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_io_interrupts_on);
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
 
     return(s);}
 
@@ -182,7 +182,7 @@ static object *_SS_sprint(object *obj, char *fmt, object *strm)
     SFREE(s);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_io_interrupts_on);
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
 
     return(SS_f);}
 
@@ -301,7 +301,7 @@ static object *_SSI_fprintf(object *argl)
     SC_set_put_string(ps);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_io_interrupts_on);
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
 
     return(SS_f);}
 

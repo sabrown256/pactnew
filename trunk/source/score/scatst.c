@@ -303,7 +303,7 @@ static int test_5(void)
     char *type;
     hasharr *tab;
 
-    SC_zero_space(1);
+    SC_zero_space_n(1, -2);
 
     err = 0;
 

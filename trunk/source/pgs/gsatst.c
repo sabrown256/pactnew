@@ -1722,7 +1722,7 @@ int main(int c, char **v)
 
     trm = init_parallel(c, v);
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     nt = N_TEST;
     nd = N_DEV;
@@ -1778,7 +1778,7 @@ int main(int c, char **v)
 		         mode = LANDSCAPE_MODE;
 			 break;
 		    case 'n' :
-		         SC_comm_size = SC_stoi(v[++i]);
+		         SC_gs.comm_size = SC_stoi(v[++i]);
 			 PG_set_attrs_glb(TRUE,
 					  "parallel-simulate", TRUE,
 					  "parallel-graphics", TRUE,

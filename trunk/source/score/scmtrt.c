@@ -449,7 +449,7 @@ int main(int c, char **v)
     err = FALSE;
 
 /* turn this on to test the efficient memset replacement */
-    SC_zero_space(1);
+    SC_zero_space_n(1, -2);
 
 /* NOTE: we can use io_printf up until the heap is corrupted by
  * deliberate overwrites - thereafter we must use fprintf

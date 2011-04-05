@@ -218,7 +218,7 @@ int main(int c, char **v)
     nt = 1;
     nd = 2;
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     color      = 4;
     debug_mode = FALSE;

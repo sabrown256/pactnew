@@ -66,9 +66,7 @@ SC_thread_attr
  *_SC_new_attr  = &_SC_attr_attached;
 
 int
- SC_n_threads = -1,
- SC_comm_rank =  0,
- SC_comm_size =  1;
+ SC_n_threads = -1;
 
 /*--------------------------------------------------------------------------*/
 

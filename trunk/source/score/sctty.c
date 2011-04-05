@@ -26,7 +26,7 @@ int lprintf(FILE *fp, int flag, char *fmt, ...)
     SC_VDSNPRINTF(TRUE, s, fmt);
 
     if (fp == stdout)
-       {if ((flag < 0) || (SC_comm_rank == flag))
+       {if ((flag < 0) || (SC_gs.comm_rank == flag))
 	   SC_mpi_fputs(s, fp);}
 
     else
@@ -108,8 +108,8 @@ int main(int c, char **v)
 
 #ifdef HAVE_MPI
     MPI_Init(&c, &v);
-    MPI_Comm_rank(MPI_COMM_WORLD, &SC_comm_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &SC_comm_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &SC_gs.comm_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &SC_gs.comm_size);
 #endif
 
     SC_setbuf(stdout, NULL);
@@ -118,7 +118,7 @@ int main(int c, char **v)
        {SC_unblock_file(stdin);
 	p = SC_fgets(s, MAXLINE, stdin);
 	if (p != NULL)
-	   lprintf(stdout, -1, "Proc %d : %s\n", SC_comm_rank, s);
+	   lprintf(stdout, -1, "Proc %d : %s\n", SC_gs.comm_rank, s);
 	SC_block_file(stdin);}
 
     else
@@ -140,7 +140,7 @@ int main(int c, char **v)
 	   lprintf(stdout, 0, " (only master process gets input)\n");
 
 /* only process 0 gets the input */
-	if (SC_comm_rank == 0)
+	if (SC_gs.comm_rank == 0)
 	   {for (ne = -1; ne < 4; )
 	        ne = cycle(ne);};
 

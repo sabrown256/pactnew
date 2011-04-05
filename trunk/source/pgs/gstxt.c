@@ -1010,7 +1010,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
 	    _PG.std_keymap = FMAKE_N(PFKeymap, ni,
 				     "PG_OPEN_TEXT_RECT:std_keymap");
 
-	    if (SC_zero_on_alloc() == FALSE)
+	    if (SC_zero_on_alloc_n(-1) == FALSE)
 	       SC_MEM_INIT_N(PFByte, _PG.std_keymap, ni);
 
 	    _PG.std_keymap[CTL_A] = _PG_goto_bol;

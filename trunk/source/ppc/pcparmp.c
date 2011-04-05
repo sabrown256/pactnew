@@ -46,8 +46,8 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 
 /* initialize MPI */
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &SC_comm_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &SC_comm_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &SC_gs.comm_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &SC_gs.comm_size);
 
 /* conditional diagnostic messages */
     if (_SC_debug)

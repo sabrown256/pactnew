@@ -194,13 +194,13 @@ void SC_use_guarded_mem(int on)
    {
 
     if (on)
-       {_SC_alloc_hook   = _SC_alloc_guarded;
-	_SC_realloc_hook = _SC_realloc_guarded;
-	_SC_free_hook    = _SC_free_guarded;}
+       {_SC.alloc   = _SC_alloc_guarded;
+	_SC.realloc = _SC_realloc_guarded;
+	_SC.free    = _SC_free_guarded;}
     else
-       {_SC_alloc_hook   = malloc;
-	_SC_realloc_hook = realloc;
-	_SC_free_hook    = free;};
+       {_SC.alloc   = malloc;
+	_SC.realloc = realloc;
+	_SC.free    = free;};
 
     return;}
 

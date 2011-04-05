@@ -1531,7 +1531,7 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
 /* take NFS stats before as a reference */
     SC_nfs_monitor(cp->ref_net, 8);
 
-/*    SC_io_interrupts_on = TRUE; */
+/*    SC_gs.io_interrupts_on = TRUE; */
 
     cp->as        = NULL;
     cp->show      = show;
@@ -1810,7 +1810,7 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
 	_SC_pool_connection_env(pco);}
 
     else
-       {st = -(10 + SC_errno)/1000000;
+       {st = -(10 + SC_gs.errn)/1000000;
         sgn = (st / 10000) % 100;
         pta = (st / 100) % 100;
         nms = st % 100;

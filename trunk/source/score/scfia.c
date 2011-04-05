@@ -214,11 +214,11 @@ FIXNUM F77_FUNC(scvers, SCVERS)(FIXNUM *pn, F77_string name)
     FIXNUM rv;
 
     n = *pn;
-    m = strlen(SC_version_string);
+    m = strlen(SC_gs.version);
 
     l = min(n, m);
 
-    SC_strncpy(SC_F77_C_STRING(name), *pn, SC_version_string, l);
+    SC_strncpy(SC_F77_C_STRING(name), *pn, SC_gs.version, l);
 
     rv = m;
 

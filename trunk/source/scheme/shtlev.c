@@ -347,7 +347,7 @@ static object *_SSI_quit(object *arg)
             SC_INT_I, &_SS.exit_val,
             0);
 
-    LONGJMP(SC_top_lev, ERR_FREE);
+    LONGJMP(SC_gs.cpu, ERR_FREE);
 
     return(SS_null);}
 
@@ -519,7 +519,7 @@ static object *SS_get_ext_ref(char *name)
        {strcpy(uname, name);
 	SC_str_upper(uname);
 	PRINT(ERRDEV, "Error initializing %s\n", uname);
-        LONGJMP(SC_top_lev, ABORT);};  
+        LONGJMP(SC_gs.cpu, ABORT);};  
 
     o = (object *) hp->def;
 
@@ -619,21 +619,21 @@ void SS_init_cont(void)
     SS_continue = FMAKE_N(continuation, SS_stack_size,
 			  "SS_INIT_CONT:SS_continue");
     if (SS_continue == NULL)
-       LONGJMP(SC_top_lev, ABORT);
+       LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < SS_stack_size; SS_continue[i++].signal = SS_null);
     SS_cont_ptr = 0;
 
     SS_err_continue = FMAKE_N(err_continuation, SS_stack_size,
 			      "SS_INIT_CONT:err_continue");
     if (SS_err_continue == NULL)
-       LONGJMP(SC_top_lev, ABORT);
+       LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < SS_stack_size; SS_err_continue[i++].signal = SS_null);
     SS_err_cont_ptr = 0;
 
     SS_err_stack = FMAKE_N(object *, SS_stack_size,
 			   "SS_INIT_CONT:err_stack");
     if (SS_err_stack == NULL)
-       LONGJMP(SC_top_lev, ABORT);
+       LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < SS_stack_size; SS_err_stack[i++] = NULL);
     SS_errlev = 0;
 
@@ -1045,7 +1045,7 @@ void SS_error(char *s, object *obj)
        LONGJMP(SS_continue[nc].cont, ABORT);
 
     else
-       LONGJMP(SC_top_lev, ABORT);
+       LONGJMP(SC_gs.cpu, ABORT);
 
     return;}
 

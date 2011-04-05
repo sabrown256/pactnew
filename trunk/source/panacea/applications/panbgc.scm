@@ -87,7 +87,7 @@
     
       (generate-b-arg-handler file (up-case codename))
     
-      (printf file "    SC_zero_space(1);\n")
+      (printf file "    SC_zero_space_n(1, -2);\n")
 
       (printf file "    SC_init(\"%s: Exit with error\", %s,\n"
 	      (up-case codename) exit-hook)
@@ -129,7 +129,7 @@
       (comment file "close the parallel message passing system down")
       (printf file "    PC_close_member(PA_pp);\n\n")
     
-      (printf file "    LONGJMP(SC_top_lev, ERR_FREE);}\n")
+      (printf file "    LONGJMP(SC_gs.cpu, ERR_FREE);}\n")
       (printf file "\n")
     
       (function-separator file)))
@@ -146,12 +146,10 @@
     (comment file "B_DEF_SYSTEM - define PANACEA packages to simulation code")
     (printf file "\n")
 
-    (cond ((eqv? target-language 'C)
-	   (printf file "static void B_def_system()\n"))
-	  ((eqv? target-language 'C++)
-	   (printf file "static void B_def_system(void)\n")))
+    (printf file "static void B_def_system(void)\n")
 
-    (printf file "   {")
+    (printf file "   {\n")
+    (printf file "\n")
 
     (define (print-def pck)
         (let* ((fname NULL))
@@ -161,7 +159,7 @@
 		   (name (declaration-name function)))
 	      (printf file "                        %s,\n" name)))
 
-	  (printf file "PA_run_time_package(\"%s\",\n"
+	  (printf file "    PA_run_time_package(\"%s\",\n"
 		  (down-case (package-name pck)))
 
 	  (print-fnc "install-type-definitions")
@@ -173,7 +171,7 @@
 	  (print-fnc "post-process-output")
 	  (print-fnc "finish")
 
-	  (printf file "                        %s);\n    " fname)))
+	  (printf file "                        %s);\n" fname)))
 
     (for-each print-def packages)
 
@@ -194,12 +192,7 @@
       (comment file "B_INIT_PROBLEM - initialize this session with an initial value problem")
       (printf file "\n")
 
-      (cond ((eqv? target-language 'C)
-	     (printf file "static int B_init_problem(c, v)\n")
-	     (printf file "   int c;\n")
-	     (printf file "   char **v;\n"))
-	    ((eqv? target-language 'C++)
-	     (printf file "static int B_init_problem(int c, char **v)\n")))
+      (printf file "static int B_init_problem(int c, char **v)\n")
 
       (printf file "   {int i;\n")
       (printf file "    char *fname;\n")

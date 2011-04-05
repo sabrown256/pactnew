@@ -50,7 +50,7 @@
 #define SC_put_string_cmp(_f)  (_SC_putstr == (PFfputs) (_f))
 
 #undef STDOUT
-#define STDOUT ((SC_comm_rank == 0) ? stdout : NULL)
+#define STDOUT ((SC_gs.comm_rank == 0) ? stdout : NULL)
 
 #undef PRINT
 #define PRINT (*_SC_putln)

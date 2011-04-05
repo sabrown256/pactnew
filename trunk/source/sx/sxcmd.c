@@ -556,7 +556,7 @@ int SX_command(char *file, char *cmd)
 	SX_qflag   = TRUE;
 	zsp        = 2;
 
-	SC_zero_space(zsp);
+	SC_zero_space_n(zsp, -2);
 
 /* initialize SX
  * the following variables must be initialized before SX_init

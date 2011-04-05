@@ -195,7 +195,7 @@
 
 #define KEY_ACTION(b, bf, nc) PG_key_action(b, bf, nc)
 
-#define PG_IO_INTERRUPTS(x)   SC_io_interrupts_on = (x)
+#define PG_IO_INTERRUPTS(x)   SC_gs.io_interrupts_on = (x)
 
 #define PG_clear_screen       PG_clear_window
 

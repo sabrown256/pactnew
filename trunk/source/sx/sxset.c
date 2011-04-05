@@ -160,11 +160,11 @@ void SX_init(char *code, char *vers)
 
     SS_set_print_err_func(NULL, TRUE);
 
-    SS_arg_hook            = _SX_args;
-    SS_call_arg_hook       = _SX_call_args;
-    SC_atof_hook           = SC_atof;
-    SC_strtod_hook         = SC_strtod;
-    SC_type_container_hook = SX_type_container;
+    SS_arg_hook          = _SX_args;
+    SS_call_arg_hook     = _SX_call_args;
+    SC_gs.atof           = SC_atof;
+    SC_gs.strtod         = SC_strtod;
+    SC_gs.type_container = SX_type_container;
 
     SS_interactive = TRUE;
 

@@ -209,7 +209,7 @@ static void _SC_array_grow(SC_array *a, long nn)
            {for (i = nx; i < nn; i++)
 	        {e = arr + i*bpi;
 		 a->init(e);};}
-	else if (SC_zero_on_alloc() == FALSE)
+	else if (SC_zero_on_alloc_n(-1) == FALSE)
 	   memset(arr + nx*bpi, 0, (nn-nx)*bpi);
 
 	a->nx    = nn;

@@ -123,7 +123,7 @@
       (comment file "close the parallel message passing system down")
       (printf file "    PC_close_member(PA_pp);\n\n")
     
-      (printf file "    LONGJMP(SC_top_lev, ERR_FREE);}\n")
+      (printf file "    LONGJMP(SC_gs.cpu, ERR_FREE);}\n")
       (printf file "\n")
     
       (function-separator file)))
@@ -140,12 +140,10 @@
     (comment file "AB_DEF_SYSTEM - define PANACEA packages to combined simulation code")
     (printf file " \n")
 
-    (cond ((eqv? target-language 'C)
-	   (printf file "static void AB_def_system()\n"))
-	  ((eqv? target-language 'C++)
-	   (printf file "static void AB_def_system(void)\n")))
+    (printf file "static void AB_def_system(void)\n")
 
-    (printf file "   {")
+    (printf file "   {\n")
+    (printf file "\n")
 
     (define (print-def pck)
         (let* ((fname NULL))
@@ -158,7 +156,7 @@
 			  (car rest) name)
 		  (printf file "                   %s,\n" name))))
      
-	  (printf file "PA_def_package(\"%s\",\n"
+	  (printf file "    PA_def_package(\"%s\",\n"
 		  (down-case (package-name pck)))
 
 	  (print-fnc "install-generator-commands" "(PFPkgGencmd)")
@@ -173,7 +171,7 @@
 	  (print-fnc "finish" "(PFPkgFinzer)")
 	  (print-fnc "install-pp-commands" "(PFPkgPpcmd)")
 
-	  (printf file "                   %s);\n    " fname)))
+	  (printf file "                   %s);\n" fname)))
 
     (for-each print-def packages)
 
@@ -197,12 +195,7 @@
       (comment file "AB_INIT_PROBLEM - initialize this session with an initial value problem")
       (printf file "\n")
 
-      (cond ((eqv? target-language 'C)
-	     (printf file "static int AB_init_problem(c, v)\n")
-	     (printf file "   int c;\n")
-	     (printf file "   char **v;\n"))
-	    ((eqv? target-language 'C++)
-	     (printf file "static int AB_init_problem(int c, char **v)\n")))
+      (printf file "static int AB_init_problem(int c, char **v)\n")
 
       (printf file "   {char *base_name;\n")
       (printf file "\n")

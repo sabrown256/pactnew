@@ -511,7 +511,7 @@ int main(int c, char **v)
 		      break;};};};
 
 /* turn this on to test the efficient memset replacement */
-    SC_zero_space(zsp);
+    SC_zero_space_n(zsp, -2);
 
     io_printf(stdout, "\n");
     io_printf(stdout, "\t\tTest                # calls      Mem  Time/Call\n");

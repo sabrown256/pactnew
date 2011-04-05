@@ -65,7 +65,7 @@ int main(argc, argv)
     for (i = 0; i < n; i++)
         {snprintf(s, 20, "f%d-%d(%d)", len, i, len);
 	 names[i] = SC_strsave(s);};
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
     strcpy(filename, "time.pdb");
     if ((pdbf = PD_open(filename, "w")) == NULL)
        {printf("Time couldn't create PDB file %s\r\n", filename);

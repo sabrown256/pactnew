@@ -96,7 +96,7 @@
       (comment file "close the parallel message passing system down")
       (printf file "    PC_close_member(PA_pp);\n\n")
     
-      (printf file "    LONGJMP(SC_top_lev, ERR_FREE);}\n")
+      (printf file "    LONGJMP(SC_gs.cpu, ERR_FREE);}\n")
       (printf file "\n")
     
       (function-separator file)))
@@ -113,12 +113,10 @@
     (comment file "A_DEF_SYSTEM - define PANACEA packages to generator code")
     (printf file "\n")
 
-    (cond ((eqv? target-language 'C)
-	   (printf file "static void A_def_system()\n"))
-	  ((eqv? target-language 'C++)
-	   (printf file "static void A_def_system(void)\n")))
+    (printf file "static void A_def_system(void)\n")
 
-    (printf file "   {")
+    (printf file "   {\n")
+    (printf file "\n")
 
     (define (print-def pck)
         (let* ((fname NULL))
@@ -128,7 +126,7 @@
 		   (name (declaration-name function)))
 	      (printf file "                   %s,\n" name)))
      
-	  (printf file "PA_gen_package(\"%s\",\n"
+	  (printf file "    PA_gen_package(\"%s\",\n"
 		  (down-case (package-name pck)))
 	  (print-fnc "install-generator-commands")
 	  (print-fnc "install-type-definitions")
@@ -136,7 +134,7 @@
 	  (print-fnc "define-variables")
 	  (print-fnc "define-controls")
 	  (print-fnc "intern-variables")
-	  (printf file "                   %s);\n    " fname)))
+	  (printf file "                   %s);\n" fname)))
 
     (for-each print-def packages)
 
@@ -160,12 +158,7 @@
       (comment file "A_INIT_PROBLEM - initialize this session with an initial value problem")
       (printf file "\n")
 
-      (cond ((eqv? target-language 'C)
-	     (printf file "static int A_init_problem(c, v)\n")
-	     (printf file "   int c;\n")
-	     (printf file "   char **v;\n"))
-	    ((eqv? target-language 'C++)
-	     (printf file "static int A_init_problem(int c, char **v)\n")))
+      (printf file "static int A_init_problem(int c, char **v)\n")
 
       (printf file "   {char *base_name;\n")
       (printf file "\n")

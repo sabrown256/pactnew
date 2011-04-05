@@ -701,7 +701,7 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
     b  = sls->b[no];
     x0 = sls->x[no];
 
-    zs = SC_zero_space(2);
+    zs = SC_zero_space_n(2, -1);
 
     x    = FMAKE_N(double, n, "PM_DSBICG:x");
     Ax   = FMAKE_N(double, n, "PM_DSBICG:Ax");
@@ -851,7 +851,7 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
     SFREE(x);
     SFREE(w);
 
-    zs = SC_zero_space(zs);
+    zs = SC_zero_space_n(zs, -1);
 
     return(its);}
 
