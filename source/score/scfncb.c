@@ -935,7 +935,7 @@ static void _SC_time_file_open(char *s)
 static void _SC_time_ping(char *s)
    {
 
-    _SC_ping_host(NULL, 100);
+    _SC_ping_host(NULL, 100, TRUE);
 
     return;}
 

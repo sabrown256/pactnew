@@ -89,7 +89,7 @@ static hrng *_SC_list(char *s)
  *               - return TRUE if available
  */
 
-int _SC_ping_host(char *host, int to)
+int _SC_ping_host(char *host, int to, int fm)
    {int fd, st;
     char hst[MAXLINE];
     char *ph;
@@ -102,10 +102,10 @@ int _SC_ping_host(char *host, int to)
     else
        ph = host;
 
-    fd = SC_open_port(ph, 22, to);
+    fd = SC_open_port(ph, 22, to, fm);
 
     if (fd > 0)
-       {SC_close_http(fd);
+       {close(fd);
 	st = TRUE;}
     else
        st = FALSE;
@@ -208,19 +208,19 @@ static int _SC_get_next_host(char *out, int nc,
 			 if (h->noping == TRUE)
 			    st = TRUE;
 			 else
-			    st = _SC_ping_host(host, to);};}
+			    st = _SC_ping_host(host, to, FALSE);};}
 	       
 /* find requested host only */
 		else
 		   {id  %= nh;
 		    host = hl[id];
-		    st   = _SC_ping_host(host, to);};};};
+		    st   = _SC_ping_host(host, to, FALSE);};};};
 
 /* if we don't have a table the best we can do
  * is to see if TYPE is a valid host
  */
 	if (host == NULL)
-	   {st   = _SC_ping_host(type, to);
+	   {st   = _SC_ping_host(type, to, TRUE);
 	    host = (st == TRUE) ? type : "-none-";};
 
 	na = strlen(host);

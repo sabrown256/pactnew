@@ -453,7 +453,7 @@ extern PROCESS
 /* SCHSRV.C declarations */
 
 extern int
- _SC_ping_host(char *host, int to);
+ _SC_ping_host(char *host, int to, int fm);
 
 
 /* SCHTTP.C declarations */
@@ -473,7 +473,7 @@ extern int
 	       int (*ex)(int *rv, void *a),
 	       PFFileCallback acc, PFFileCallback rej),
  _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad),
- _SC_tcp_connect(char *host, int port, int to);
+ _SC_tcp_connect(char *host, int port, int to, int fm);
 
 
 /* SCLPPSX.C declarations */
