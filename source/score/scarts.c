@@ -8,7 +8,9 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#define SC_DEBUG
+
+#include "score_int.h"
 
 typedef struct s_ts1 ts1;
 
@@ -26,6 +28,8 @@ static int run_test(int n, PFInt tst)
     double time;
     long da, db;
 
+    SC_ENTERING;
+
     time = SC_wall_clock_time();
     SC_mem_stats(NULL, NULL, &db, NULL);
 
@@ -35,6 +39,8 @@ static int run_test(int n, PFInt tst)
     SC_mem_stats(NULL, NULL, &da, NULL);
 
     io_printf(STDOUT, "\t\t\t%2d\t%8ld\t%.2f\t%d\n", n, da - db, time, err);
+
+    SC_LEAVING;
 
     return(err);}
 
@@ -46,9 +52,13 @@ static int run_test(int n, PFInt tst)
 static int ts_free(void *a)
    {ts1 *t;
 
+    SC_ENTERING;
+
     if (a != NULL)
        {t = (ts1 *) a;
 	SFREE(t->c);};
+
+    SC_LEAVING;
 
     return(TRUE);}
 
@@ -66,6 +76,8 @@ static int test_1(void)
     static char   ca[] = { 'a', 'b', '9' };
     static int    ia[] = { 1, 100, 100000 };
     static double da[] = { 0.0, 2.7183, 3.1415926 };
+
+    SC_ENTERING;
 
     ac = SC_MAKE_ARRAY("TEST_1", char, NULL);
     ai = SC_MAKE_ARRAY("TEST_1", int, NULL);
@@ -120,6 +132,8 @@ static int test_1(void)
     SC_free_array(ai, NULL);
     SC_free_array(ad, NULL);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -133,6 +147,8 @@ static int test_2(void)
     char **cb, *ca[3];
     double **db, *da[3];
     SC_array *ac, *ai, *ad;
+
+    SC_ENTERING;
 
     na = 3;
     for (i = 0; i < na; i++)
@@ -195,6 +211,8 @@ static int test_2(void)
     SC_free_array(ai, SC_array_free_n);
     SC_free_array(ad, SC_array_free_n);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -207,6 +225,8 @@ static int test_3(void)
     ts1 *sb;
     SC_array *as;
     static ts1 sa[] = { {1, "hello"}, {2, " "}, {3, "world"} };
+
+    SC_ENTERING;
 
     as = SC_MAKE_ARRAY("TEST_3", ts1, NULL);
 
@@ -242,6 +262,8 @@ static int test_3(void)
 
     SC_free_array(as, NULL);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -254,6 +276,8 @@ static int test_4(void)
     ts1 *sb;
     SC_array *as;
     static ts1 sa[] = { {1, NULL}, {2, NULL}, {3, NULL} };
+
+    SC_ENTERING;
 
     na = 3;
 
@@ -293,6 +317,8 @@ static int test_4(void)
 
     SC_free_array(as, ts_free);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -304,6 +330,8 @@ static int test_5(void)
    {int i, na, ns, err;
     ts1 **sb, **sa;
     SC_array *as;
+
+    SC_ENTERING;
 
     na = 3;
     sa = FMAKE_N(ts1 *, na, "TEST_5:sa");
@@ -354,6 +382,8 @@ static int test_5(void)
 
     SC_free_array(as, ts_free);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -365,10 +395,14 @@ static int test_6_less(void *a, void *b)
    {int ok;
     long la, lb;
 
+    SC_ENTERING;
+
     la = *(long *) a;
     lb = *(long *) b;
 
     ok = (la < lb);
+
+    SC_LEAVING;
 
     return(ok);}
 
@@ -381,6 +415,8 @@ static int test_6(void)
    {int err;
     long i, l, m, na;
     SC_array *a;
+
+    SC_ENTERING;
 
     na = 100;
 
@@ -401,6 +437,8 @@ static int test_6(void)
 
     SC_free_array(a, NULL);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -411,6 +449,8 @@ static int test_6(void)
 static void test_7_add(SC_array *ia, int n, int recy)
    {int i, ni;
     int *pi;
+
+    SC_ENTERING;
 
     ni = ia->nx;
 
@@ -426,6 +466,8 @@ static void test_7_add(SC_array *ia, int n, int recy)
 	for (i = 0; i < ni; i++)
 	    pi[i] = 100;};
 
+    SC_LEAVING;
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -437,6 +479,8 @@ static int test_7(void)
    {int i, ni, err;
     int *pi;
     SC_array *ia;
+
+    SC_ENTERING;
 
     ia = SC_MAKE_ARRAY("TEST_7", int, NULL);
     test_7_add(ia, 10, FALSE);
@@ -464,6 +508,8 @@ static int test_7(void)
 
     SC_free_array(ia, NULL);
 
+    SC_LEAVING;
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -476,6 +522,8 @@ static int test_8(void)
     double fc, tm, ts, tg, tr, rs, rg;
     double *dp;
     SC_array *da;
+
+    SC_ENTERING;
 
     err = TRUE;
 
@@ -546,6 +594,8 @@ static int test_8(void)
 
     SC_free_array(da, NULL);
     SFREE(dp);
+
+    SC_LEAVING;
 
     return(err);}
 

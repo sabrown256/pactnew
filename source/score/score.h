@@ -12,6 +12,7 @@
 
 #include "cpyright.h"
 #include "scstd.h"
+#include "score_old.h"
 #include "scope_hash.h"
 #include "scope_typeh.h"
 #include "scope_io.h"
@@ -20,7 +21,7 @@
 
 /* version designation of CODE */
 #ifndef VERSION
-# define VERSION   SC_version_string
+# define VERSION   SC_gs.version
 #endif
 
 /*--------------------------------------------------------------------------*/
@@ -39,14 +40,14 @@
 #define SIZEOF (*SC_sizeof_hook)
 
 #undef CONTAINER
-#define CONTAINER (*SC_type_container_hook)
+#define CONTAINER (*SC_gs.type_container)
 
-#define OTOL    (*SC_otol_hook)
-#define HTOL    (*SC_htol_hook)
-#define ATOL    (*SC_atol_hook)
-#define ATOF    (*SC_atof_hook)
-#define STRTOD  (*SC_strtod_hook)
-#define STRTOL  (*SC_strtol_hook)
+#define OTOL    (*SC_gs.otol)
+#define HTOL    (*SC_gs.htol)
+#define ATOL    (*SC_gs.atol)
+#define ATOF    (*SC_gs.atof)
+#define STRTOD  (*SC_gs.strtod)
+#define STRTOL  (*SC_gs.strtol)
 #define STRTOLL strtoll
 
 #ifndef SYSTEM
@@ -84,7 +85,7 @@
 /* NMAKE - memory allocation and bookkeeping macro */
 
 #define NMAKE(_t, name)                                                      \
-    ((_t *) (*SC_mem_hook.alloc)(1L, (long) sizeof(_t), name, TRUE))
+    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -92,7 +93,7 @@
 /* NMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define NMAKE_N(_t, n, name)                                                 \
-    ((_t *) (*SC_mem_hook.alloc)((long) n, (long) sizeof(_t), name, TRUE))
+    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -100,7 +101,7 @@
 /* NREMAKE - memory reallocation and bookkeeping macro */
 
 #define NREMAKE(p, _t)                                                       \
-   (p = (_t *) (*SC_mem_hook.realloc)((void *) p, 1L, (long) sizeof(_t), TRUE))
+   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, 1L, (long) sizeof(_t), TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -108,8 +109,8 @@
 /* NREMAKE_N - reallocate a block of type _t and return a pointer to it */
 
 #define NREMAKE_N(p, _t, n)                                                  \
-   (p = (_t *) (*SC_mem_hook.realloc)((void *) p, (long) (n),                \
-                                      (long) sizeof(_t), TRUE))
+   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
+				   (long) sizeof(_t), TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -117,7 +118,7 @@
 /* FMAKE - memory allocation and bookkeeping macro */
 
 #define FMAKE(_t, name)                                                      \
-    ((_t *) (*SC_mem_hook.alloc)(1L, (long) sizeof(_t), name, FALSE))
+    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, FALSE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -125,7 +126,7 @@
 /* FMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define FMAKE_N(_t, n, name)                                                 \
-    ((_t *) (*SC_mem_hook.alloc)((long) n, (long) sizeof(_t), name, FALSE))
+    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, FALSE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -133,7 +134,7 @@
 /* MAKE - memory allocation and bookkeeping macro */
 
 #define MAKE(_t)                                                             \
-    ((_t *) (*SC_mem_hook.alloc)(1L, (long) sizeof(_t), NULL, FALSE))
+    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), NULL, FALSE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -141,7 +142,7 @@
 /* MAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define MAKE_N(_t, n)                                                        \
-    ((_t *) (*SC_mem_hook.alloc)((long) n, (long) sizeof(_t), NULL, FALSE))
+    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), NULL, FALSE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -149,8 +150,8 @@
 /* REMAKE - memory reallocation and bookkeeping macro */
 
 #define REMAKE(p, _t)                                                        \
-   (p = (_t *) (*SC_mem_hook.realloc)((void *) p, 1L,                        \
-				      (long) sizeof(_t), FALSE))
+   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, 1L,                           \
+				   (long) sizeof(_t), FALSE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -158,8 +159,8 @@
 /* REMAKE_N - reallocate a block of type _t and return a pointer to it */
 
 #define REMAKE_N(p, _t, n)                                                   \
-   (p = (_t *) (*SC_mem_hook.realloc)((void *) p, (long) (n),                \
-                                     (long) sizeof(_t), FALSE))
+   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
+				   (long) sizeof(_t), FALSE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -167,8 +168,8 @@
 /* CMAKE - memory allocation and bookkeeping macro */
 
 #define CMAKE(_t)                                                            \
-    ((_t *) (*SC_mem_hook.nalloc)(1L, (long) sizeof(_t), FALSE,              \
-                                  __func__, __FILE__, __LINE__))
+    ((_t *) (*SC_gs.mm.nalloc)(1L, (long) sizeof(_t), FALSE,                 \
+			       __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -176,8 +177,8 @@
 /* CMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define CMAKE_N(_t, n)                                                       \
-    ((_t *) (*SC_mem_hook.nalloc)((long) n, (long) sizeof(_t), FALSE,        \
-                                  __func__, __FILE__, __LINE__))
+    ((_t *) (*SC_gs.mm.nalloc)((long) n, (long) sizeof(_t), FALSE,           \
+			       __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -185,7 +186,7 @@
 /* SFREE - release memory and do bookkeeping */
 
 #define SFREE(x)                                                             \
-   {(*SC_mem_hook.free)(x);                                                  \
+   {(*SC_gs.mm.free)(x);                                                     \
     x = NULL;}
 
 #define SFREE_N(x, n)  SFREE(x)
@@ -235,7 +236,7 @@
 #define SC_init(_msg, _ef, _sh, _sf, _bh, _bf, _bsz)                         \
    {void (*_lsf)(int sig);                                                   \
     static void (*_lef)(int err) = NULL;                                     \
-    switch (SETJMP(SC_top_lev))                                              \
+    switch (SETJMP(SC_gs.cpu))                                               \
        {case ABORT :                                                         \
              io_printf(STDOUT, "\n%s\n\n", _msg);                            \
              if (_lef != NULL)                                               \
@@ -421,6 +422,7 @@ typedef struct s_SC_logfile SC_logfile;
 typedef struct s_SC_evlpdes SC_evlpdes;
 typedef struct s_SC_rusedes SC_rusedes;
 typedef struct s_SC_mem_fnc SC_mem_fnc;
+typedef struct s_SC_global_state SC_global_state;
 
 typedef void (*PFFileCallback)(int fd, int mask, void *a);
 typedef PROCESS *(*PFProcInit)(char **argv, char *mode, int type);
@@ -621,10 +623,6 @@ struct s_SC_evlpdes
 typedef void *(*PFMalloc)(size_t size);
 typedef void *(*PFRealloc)(void *ptr, size_t size);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct s_SC_sigstate
    {int mn;
     int mx;
@@ -676,53 +674,44 @@ struct s_SC_mem_fnc
     void *(*realloc)(void *p, long nitems, long bpi, int na);
     int (*free)(void *p);};
 
+struct s_SC_global_state
+   {char version[32];
+    int assert_fail;
+    int comm_rank;
+    int comm_size;
+    int errn;
+    int io_interrupts_on;
+    int mm_debug;
+    int radix;
+    int unary_plus;
+    int verify_writes;
+
+    double (*atof)(const char *s);
+    double (*strtod)(const char *s, char **endp);
+    long (*otol)(char *s);
+    long (*htol)(char *s);
+    long (*atol)(const char *s);
+    long (*strtol)(const char *s, char **endp, int base);
+    void (*type_container)(char *dtype, char *stype);
+    SC_mem_fnc mm;
+    JMP_BUF cpu;};       /* top level environment - mainly for error return */
+
 /*--------------------------------------------------------------------------*/
 
 /*                         VARIABLE DECLARATIONS                            */
 
 /*--------------------------------------------------------------------------*/
 
-extern JMP_BUF
- SC_top_lev;             /* top level environment - mainly for error return */
-
-extern SC_mem_fnc
- SC_mem_hook;
-
-/* other hooks */
-
-extern void
- (*SC_type_container_hook)(char *dtype, char *stype);
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int
- SC_errno,
- SC_unary_plus,
- SC_comm_rank,
- SC_comm_size,
- SC_io_interrupts_on,
- SC_mm_debug,
- SC_verify_writes,
- SC_assert_fail,
  Zero_I,
- One_I,
- Radix;
+ One_I;
 
-extern char
- SC_version_string[];
-
-
-/* string to number hooks */
-
-extern double
- (*SC_atof_hook)(const char *s),
- (*SC_strtod_hook)(const char *s, char **endp);
-
-extern long
- (*SC_otol_hook)(char *s),
- (*SC_htol_hook)(char *s),
- (*SC_atol_hook)(const char *s),
- (*SC_strtol_hook)(const char *s, char **endp, int base);
-
+extern SC_global_state
+ SC_gs;
 
 /*--------------------------------------------------------------------------*/
 
@@ -1032,18 +1021,13 @@ extern void
  SC_mem_stats_set(long a, long f),
  *SC_nalloc_na(long nitems, long bpi, int na,
 	       const char *fnc, const char *file, int line),
- *SC_alloc_na(long nitems, long bpi, char *name, int na),
- *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
  *SC_alloc_nzt(long nitems, long bpi, void *a),
- *SC_realloc_na(void *p, long nitems, long bpi, int na),
- *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp);
+ *SC_realloc_nzt(void *p, long nitems, long bpi, void *a);
 
 extern int
- SC_free(void *p),
- SC_free_z(void *p, int zsp),
- SC_zero_on_alloc(void),
+ SC_free_nzt(void *p, void *a),
  SC_zero_space_n(int flag, int tid),
- SC_zero_space(int flag);
+ SC_zero_on_alloc_n(int tid);
 
 
 /* SCMEMDA.C declarations */
@@ -1056,7 +1040,11 @@ extern SC_mem_fnc
 
 extern void
  *SC_alloc(long nitems, long bpi, char *name),
+ *SC_alloc_na(long nitems, long bpi, char *name, int na),
+ *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
  *SC_realloc(void *p, long nitems, long bpi),
+ *SC_realloc_na(void *p, long nitems, long bpi, int na),
+ *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp),
  SC_untrap_pointer(void *p),
  *SC_copy_item(void *in);
 
@@ -1064,6 +1052,8 @@ extern char
  *SC_arrname(void *p);
 
 extern int
+ SC_free(void *p),
+ SC_free_z(void *p, int zsp),
  SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn),
  SC_mem_trace(void),
  SC_reg_mem(void *p, long length, char *name),

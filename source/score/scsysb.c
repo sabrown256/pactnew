@@ -713,7 +713,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
     as->debug  = debug;
 
 /* create the event loop state */
-    SC_io_interrupts_on = FALSE;
+    SC_gs.io_interrupts_on = FALSE;
 
     shell = SC_get_shell(shell);
     pe    = SC_make_event_loop(NULL, NULL,

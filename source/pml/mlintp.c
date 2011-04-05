@@ -56,7 +56,7 @@ static double *_PM_redist_nodes_lr(double *f, int km, int lm, int kmax, int lmax
 
     ip = FMAKE_N(double, nn, "_PM_REDIST_NODES_LR:ip");
     fp = FMAKE_N(double, nn, "_PM_REDIST_NODES_LR:fp");
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        {PM_set_value(ip, nn, 0.0);
 	PM_set_value(fp, nn, 0.0);};
 
@@ -111,11 +111,11 @@ static double *_PM_redist_nodes_ac(double *f, int nz, int nn,
     double *fp, fv;
 
     fp = FMAKE_N(double, nn, "_PM_REDIST_NODES_AC:fp");
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        PM_set_value(fp, nn, 0.0);
 
     np = FMAKE_N(int, nn, "_PM_REDIST_NODES_AC:np");
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        SC_MEM_INIT_N(int, np, nn);
 
 /* accumulate nodal values from the zones */
@@ -173,7 +173,7 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
 
     ip = FMAKE_N(double, nn, "_PM_INTERP_NODES_LR:ip");
     fp = FMAKE_N(double, nn, "_PM_INTERP_NODES_LR:fp");
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        {PM_set_value(ip, nn, 0.0);
 	PM_set_value(fp, nn, 0.0);};
 
@@ -266,7 +266,7 @@ static double *_PM_interp_nodes_ac(double *f, double *x, double *y, int nz, int 
     fp = FMAKE_N(double, nn, "_PM_INTERP_NODES_AC:fp");
     np = FMAKE_N(double, nn, "_PM_INTERP_NODES_AC:np");
     w  = FMAKE_N(double, 20, "_PM_INTERP_NODES_AC:w");
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        {PM_set_value(fp, nn, 0.0);
 	PM_set_value(np, nn, 0.0);
 	PM_set_value(w, 20, 0.0);};
@@ -436,7 +436,7 @@ double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
     emap += delta;
 
     fp = FMAKE_N(double, npts, "PM_NODE_ZONE_LR_2D:fp");
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        PM_set_value(fp, npts, 0.0);
     PM_LOGICAL_ZONE(f, f1, f2, f3, f4, kmax);
 

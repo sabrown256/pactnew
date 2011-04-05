@@ -238,7 +238,7 @@ int main(int c, char **v)
 
     PD_init_threads(0, NULL);
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')

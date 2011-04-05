@@ -222,11 +222,11 @@ int main(int c, char **v)
      nt   = min(nt, ncpu);};
 #endif
 
-    SC_zero_space(1);
+    SC_zero_space_n(1, -2);
 
     SC_init_threads(nt, NULL);
 
-/*    SC_mm_debug = 1; */
+/*    SC_gs.mm_debug = 1; */
 /*    SC_use_c_mm(); */
 /*    SC_configure_mm(0, 0, 0, 1.5); */
 /*    SC_configure_mm(128, 1048576, 1048576, 1.5); */

@@ -56,7 +56,7 @@ int main(int c, char **v)
             {switch (v[i][1])
                 {case 'd' :
 		      debug_mode  = TRUE;
-		      SC_mm_debug = TRUE;
+		      SC_gs.mm_debug = TRUE;
 		      break;
                  case 'h' :
 		      print_help();

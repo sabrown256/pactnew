@@ -716,7 +716,7 @@ void *_PA_alloc(defstr *dp, char *type, long nitems, void *pval)
  * otherwise make sure the space is filled with zeroes
  */
     if (pval == NULL)
-       {if (SC_zero_on_alloc() == FALSE)
+       {if (SC_zero_on_alloc_n(-1) == FALSE)
 	   memset(vr, 0, nitems*bpi);}
     else
        {for (pvr = (char *) vr, i = 0L; i < nitems; i++, pvr += bpi)

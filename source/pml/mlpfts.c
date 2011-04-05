@@ -11,6 +11,18 @@
 #include "pml.h"
 #include "scope_math.h"
 
+#ifdef HAVE_ANSI_FLOAT16
+
+/* older compilers may lack these declarations and
+ * still have the functions
+ * GNU 3.3.3 for example
+ */
+
+extern long double
+ expl(long double x),
+ logl(long double x),
+ sqrtl(long double x);
+
 static JMP_BUF
  cpu;
 
@@ -71,7 +83,7 @@ static int unary_test(char *name, int to,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAIN - a sample program */
+/* MAIN - test double and long double performance */
 
 int main(int c, char **v)
    {int err, rv;
@@ -96,3 +108,21 @@ int main(int c, char **v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#else
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAIN - a stub program */
+
+int main(int c, char **v)
+   {int rv;
+
+    rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#endif

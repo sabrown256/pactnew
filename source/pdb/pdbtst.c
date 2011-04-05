@@ -3740,7 +3740,7 @@ int main(int c, char **v)
     PD_init_threads(0, NULL);
 
     SC_bf_set_hooks();
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     bfsz             = -1;
     bfsz             = 100000;
@@ -3771,7 +3771,7 @@ int main(int c, char **v)
 		      break;
 		 case 'd' :
 		      debug_mode  = TRUE;
-/*		      SC_mm_debug = TRUE; */
+/*		      SC_gs.mm_debug = TRUE; */
 		      break;
                  case 'h' :
 		      print_help();

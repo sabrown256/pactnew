@@ -27,9 +27,9 @@
 int PD_verify_writes(int st)
    {int ost;
 
-    ost = SC_verify_writes;
+    ost = SC_gs.verify_writes;
 
-    SC_verify_writes = st;
+    SC_gs.verify_writes = st;
 
     return(ost);}
 

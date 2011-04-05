@@ -7,7 +7,6 @@
  */
 
 #include "cpyright.h"
-#include "score_int.h"
 #include "scope_mem.h"
 
 /*---------------------------------------------------------------------------*/
@@ -81,7 +80,7 @@ FIXNUM F77_FUNC(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
 				FIXNUM *pnc, F77_string pname)
    {FIXNUM ok;
 
-    ok = _SC_make_f77(pm, pni, pnb, pnc, pname, _SC.zero_space);
+    ok = _SC_make_f77(pm, pni, pnb, pnc, pname, -1);
 
     return(ok);}
 
@@ -96,7 +95,7 @@ FIXNUM F77_FUNC(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
 FIXNUM F77_FUNC(scmake, SCMAKE)(void **pm, FIXNUM *pni, FIXNUM *pnb)
    {FIXNUM ok;
 
-    ok = _SC_make_f77(pm, pni, pnb, NULL, NULL, _SC.zero_space);
+    ok = _SC_make_f77(pm, pni, pnb, NULL, NULL, -1);
 
     return(ok);}
 

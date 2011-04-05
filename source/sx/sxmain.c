@@ -146,7 +146,7 @@ int main(int c, char **v, char **env)
 
 #endif
 
-    SC_zero_space(zsp);
+    SC_zero_space_n(zsp, -2);
     SS_set_scheme_env(v[0], NULL);
 
 /* initialize SX

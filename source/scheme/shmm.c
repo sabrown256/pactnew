@@ -155,13 +155,13 @@ void _SS_install(char* pname, char *pdoc, PFPHand phand,
     cp = _SS_mk_C_proc(phand, n, pr);
     if (cp == NULL)
        {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
-        LONGJMP(SC_top_lev, ABORT);};
+        LONGJMP(SC_gs.cpu, ABORT);};
 
 /* create the Scheme level procedure */
     pp = _SS_mk_scheme_proc(pname, pdoc, ptype, cp);
     if (pp == NULL)
        {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
-        LONGJMP(SC_top_lev, ABORT);};
+        LONGJMP(SC_gs.cpu, ABORT);};
 
     op = SS_mk_proc_object(pp);
     SS_UNCOLLECT(op);

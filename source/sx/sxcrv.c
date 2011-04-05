@@ -186,13 +186,13 @@ void SX_enlarge_dataset(PFVoid eval)
 
          if (i < 26)
             {if (SC_hasharr_install(SS_symtab, s1, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
-                LONGJMP(SC_top_lev, ABORT);};
+                LONGJMP(SC_gs.cpu, ABORT);};
 
          if (SC_hasharr_install(SS_symtab, s, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
-            LONGJMP(SC_top_lev, ABORT);
+            LONGJMP(SC_gs.cpu, ABORT);
 
          if (SC_hasharr_install(SS_symtab, t, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
-            LONGJMP(SC_top_lev, ABORT);};
+            LONGJMP(SC_gs.cpu, ABORT);};
 
     return;}
 

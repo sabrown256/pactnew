@@ -599,7 +599,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
         if (bf == NULL)
            PD_error("CAN'T ALLOCATE MEMORY - _PD_WR_LEAF_MEMBERS", PD_WRITE);
 
-	if (SC_zero_on_alloc() == FALSE)
+	if (SC_zero_on_alloc_n(-1) == FALSE)
 	   memset(bf, 0, nb);
 
         out = bf;
@@ -1366,7 +1366,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
 	if (bf == NULL)
 	   PD_error("CAN'T ALLOCATE MEMORY - _PD_RD_LEAF_MEMBERS", PD_READ);
 
-	if (SC_zero_on_alloc() == FALSE)
+	if (SC_zero_on_alloc_n(-1) == FALSE)
 	   memset(bf, 0, nb);
 
         nir = lio_read(bf, (size_t) bpi, (size_t) nia, fp);

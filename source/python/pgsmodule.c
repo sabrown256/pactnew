@@ -76,7 +76,9 @@ PP_zero_space(
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:zero_space", kw_list,
                                      &flag))
         return NULL;
-    result = SC_zero_space(flag);
+
+    result = SC_zero_space_n(flag, -2);
+
     return PyInt_FromLong((long) result);
 }
 

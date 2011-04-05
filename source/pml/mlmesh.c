@@ -996,7 +996,7 @@ void PM_mesh_part(double *rx, double *ry, double *nodet,
     double **x;
     PM_matrix *n_map;
 
-    zs = SC_zero_space(2);
+    zs = SC_zero_space_n(2, -1);
 
     nd = 2;
 
@@ -1086,7 +1086,7 @@ void PM_mesh_part(double *rx, double *ry, double *nodet,
     PM_destroy(n_map);
     SFREE(unm);
 
-    zs = SC_zero_space(zs);
+    zs = SC_zero_space_n(zs, -1);
 
     return;}
 

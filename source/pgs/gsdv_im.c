@@ -367,7 +367,7 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
         if (ip == dp)
            {pim = FMAKE_N(PG_image, np, "_PG_TRANSMIT_IMAGES:pim");
 
-	    if (SC_zero_on_alloc() == FALSE)
+	    if (SC_zero_on_alloc_n(-1) == FALSE)
 	       SC_MEM_INIT_N(PG_image, pim, np);
 
             for (i = 0; i < np; i++)

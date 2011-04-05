@@ -249,6 +249,7 @@ int SC_free_mem(double *mem)
 #elif defined(MACOSX)
     {int ok;
      char path[PATH_MAX];
+     char *cmd;
 
      ok = SC_full_path("pcexec", path, PATH_MAX);
      if (ok == 0)

@@ -329,9 +329,9 @@ int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
 					     _SC_tcp_acceptor, NULL, -1);
 
 /* if all channels are OK activate the interrupt handling */
-	SC_io_interrupts_on = pi;
+	SC_gs.io_interrupts_on = pi;
 	if (pi)
-	   SC_catch_event_loop_interrupts(pe, SC_io_interrupts_on);
+	   SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);
 
 	lp.a   = a;
 	lp.ad  = ad;

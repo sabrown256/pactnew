@@ -129,7 +129,7 @@
 
 #define PC_file_access              SC_file_access
 #define PC_exit_all                 SC_exit_all
-#define PC_io_interrupts_on         SC_io_interrupts_on
+#define PC_io_interrupts_on         SC_gs.io_interrupts_on
 
 
 #define PC_BINARY_MODEP(x)  (strchr(&((x)[1]), 'b') != NULL)

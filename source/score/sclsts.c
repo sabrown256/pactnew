@@ -23,7 +23,7 @@ int main(int c, char **v)
     char *t, *name;
     SC_lexical_stream *str;
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
 
     sc = SC_mem_monitor(-1, 2, "sclsts", msg);
 

@@ -39,26 +39,6 @@
     if (_ln < _nd)                                                          \
        _d[_ln++] = '\0';}
 
-#ifndef ATOF_FUNCTION
-# define ATOF_FUNCTION atof
-#endif
-
-#ifndef ATOL_FUNCTION
-# define ATOL_FUNCTION atol
-#endif
-
-#ifndef STRTOD_FUNCTION
-# define STRTOD_FUNCTION strtod
-#endif
-
-#ifndef STRTOL_FUNCTION
-# define STRTOL_FUNCTION strtol
-#endif
-
-#ifndef STRTOLL_FUNCTION
-# define STRTOLL_FUNCTION strtoll
-#endif
-
 /* Python on 10.4 cannot resolve/find vsnprintf dynamically */
 #if defined(MACOSX) && defined(HAVE_PYTHON)
 # define VSNPRINTF_FUNCTION SC_vsnprintf
@@ -73,16 +53,6 @@
 #endif
 
 SC_THREAD_LOCK(_SC_str_lock);
-
-double
- (*SC_atof_hook)(const char *s) = ATOF_FUNCTION,
- (*SC_strtod_hook)(const char *s, char **endp) = STRTOD_FUNCTION;
-
-long
- (*SC_otol_hook)(char *s)   = _SC_otol,
- (*SC_htol_hook)(char *s)   = _SC_htol,
- (*SC_atol_hook)(const char *s) = ATOL_FUNCTION,
- (*SC_strtol_hook)(const char *s, char **endp, int base) = STRTOL_FUNCTION;
 
 int
  (*SC_vsnprintf_hook)(char *dst, size_t nc,
@@ -1585,7 +1555,7 @@ int SC_print_charsp(char *s, int sp)
 int SC_numstrp(char *s)
    {int rv;
 
-    rv = (SC_intstrp(s, Radix) || SC_fltstrp(s));
+    rv = (SC_intstrp(s, SC_gs.radix) || SC_fltstrp(s));
 
     return(rv);}
 
@@ -1601,7 +1571,7 @@ int SC_intstrp(char *s, int base)
     if (s == NULL)
        rv = FALSE;
 
-    else if (!SC_unary_plus && (*s == '+'))
+    else if (!SC_gs.unary_plus && (*s == '+'))
        rv = FALSE;
 
     else if ((strcmp(s, "+") == 0) || (strcmp(s, "-") == 0))
@@ -1631,7 +1601,7 @@ int SC_fltstrp(char *s)
     if (s == NULL)
        rv = FALSE;
 
-    else if (!SC_unary_plus && (*s == '+'))
+    else if (!SC_gs.unary_plus && (*s == '+'))
        rv = FALSE;
 
     else if ((strcmp(s, "+") == 0) ||

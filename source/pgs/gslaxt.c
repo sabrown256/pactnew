@@ -377,7 +377,7 @@ int main(int c, char **v)
     PG_device *tdev;
     FILE *fp;
 
-    SC_zero_space(0);
+    SC_zero_space_n(0, -2);
     debug_mode = FALSE;
 
     SC_setbuf(STDOUT, NULL);

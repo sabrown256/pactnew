@@ -539,7 +539,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
  *                -
  *                - return -1 if host does not respond in time
  *                -           (presumed down)
- *                - return  0 if not at all  (SC_errno set)
+ *                - return  0 if not at all  (SC_gs.errn set)
  *                - return  1 if so and no prompt
  *                - return  2 if so with a prompt
  */

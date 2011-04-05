@@ -16,8 +16,7 @@ FILE
 
 int
  _SC_debug = FALSE,
- _SC_unblock = FALSE,
- SC_io_interrupts_on = FALSE;
+ _SC_unblock = FALSE;
 
 /*--------------------------------------------------------------------------*/
 
@@ -30,7 +29,7 @@ int
 void SC_catch_event_loop_interrupts(SC_evlpdes *pe, int flag)
    {
 
-    if ((pe != NULL) && flag && SC_io_interrupts_on)
+    if ((pe != NULL) && flag && SC_gs.io_interrupts_on)
        SC_signal_action(SC_SIGIO, pe->sigio, 0,	BLOCK_WITH_SIGIO, -1);
     else
        SC_signal_action(SC_SIGIO, SIG_IGN, 0, -1);
@@ -398,7 +397,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 		 if (fn != NULL)
 		    (*fn)(pd->fd, rev, a);};
 
-             SC_catch_event_loop_interrupts(pe, SC_io_interrupts_on);};
+             SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);};
 
 	nrdy -= (nacc + nrej);}
 
@@ -477,9 +476,9 @@ int SC_process_event_loop(PROCESS *pp, void *a,
 					 acc, rej, -1);
 
 /* if all channels are OK activate the interrupt handling */
-    SC_io_interrupts_on = pi;
+    SC_gs.io_interrupts_on = pi;
     if (pi)
-       SC_catch_event_loop_interrupts(pe, SC_io_interrupts_on);
+       SC_catch_event_loop_interrupts(pe, SC_gs.io_interrupts_on);
 
     rv = SC_event_loop(pe, a, -1);
 
@@ -502,7 +501,7 @@ static int SC_set_fd_async_streams(int fd, int state)
 
     rv = FALSE;
 
-    if (SC_io_interrupts_on)
+    if (SC_gs.io_interrupts_on)
        {
 
 #if defined(HAVE_ASYNC_STREAMS)
@@ -558,7 +557,7 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 
     rv = FALSE;
 
-    if (SC_io_interrupts_on)
+    if (SC_gs.io_interrupts_on)
 
 /* get the control flag */
        {arg = fcntl(fd, F_GETFL);
@@ -1111,7 +1110,7 @@ void SC_catch_io_interrupts(int flag)
     if (_SC.evloop != NULL)
        SC_catch_event_loop_interrupts(_SC.evloop, flag);
 
-    else if (flag && SC_io_interrupts_on)
+    else if (flag && SC_gs.io_interrupts_on)
        SC_signal_action(SC_SIGIO, _SC_event_loop_handler, 0,
 			BLOCK_WITH_SIGIO,  -1);
     else

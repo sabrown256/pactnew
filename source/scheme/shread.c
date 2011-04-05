@@ -176,7 +176,7 @@ static int _SS_intstrp(char *s, int64_t *piv)
     if (s == NULL)
        rv = FALSE;
 
-    else if (!SC_unary_plus && (*s == '+'))
+    else if (!SC_gs.unary_plus && (*s == '+'))
        rv = FALSE;
 
     else if ((strcmp(s, "+") == 0) || (strcmp(s, "-") == 0))
@@ -624,7 +624,7 @@ object *SS_add_variable(char *name)
     op = SS_mk_variable(name, SS_null);
     SS_UNCOLLECT(op);
     if (SC_hasharr_install(SS_symtab, name, op, SS_POBJECT_S, TRUE, TRUE) == NULL)
-       LONGJMP(SC_top_lev, ABORT);
+       LONGJMP(SC_gs.cpu, ABORT);
 
     return(op);}
 

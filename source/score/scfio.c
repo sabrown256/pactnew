@@ -55,9 +55,6 @@ struct s_REMOTE_FILE
     long size;
     int64_t cf_addr;};
 
-int
- SC_verify_writes = FALSE;
-
 PFfprintf
  _SC_putln = io_printf;
 
@@ -439,7 +436,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
 
-    if (SC_verify_writes == TRUE)
+    if (SC_gs.verify_writes == TRUE)
 
 /* eliminate stdin, stdout, and stderr */
        {fd = fileno(fp);
@@ -486,7 +483,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
        nw = _SC_fwrite_atm(s, bpi, nitems, fp);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_io_interrupts_on);
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
 
     return(nw);}
  
@@ -2681,7 +2678,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
     PFSignal_handler oh;
 
 /* turn off SIGIO handler */
-    if (SC_io_interrupts_on == TRUE)
+    if (SC_gs.io_interrupts_on == TRUE)
        oh = SC_signal_action(SC_SIGIO, SIG_IGN, 0, -1);
 
 #endif
@@ -2711,7 +2708,7 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 #ifdef AIX
 
 /* turn on SIGIO handler */
-    if (SC_io_interrupts_on == TRUE)
+    if (SC_gs.io_interrupts_on == TRUE)
        SC_signal_action(SC_SIGIO, oh, 0, BLOCK_WITH_SIGIO, -1);
  
 #endif
@@ -2798,13 +2795,13 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
     PFSignal_handler oh;
 
 /* turn off SIGIO handler */
-    if (SC_io_interrupts_on == TRUE)
+    if (SC_gs.io_interrupts_on == TRUE)
        oh = SC_signal_action(SC_SIGIO, SIG_IGN, 0, -1);
 
     rv = _SC_fread_safe(s, bpi, nitems, fp);
 
 /* turn on SIGIO handler */
-    if (SC_io_interrupts_on == TRUE)
+    if (SC_gs.io_interrupts_on == TRUE)
        SC_signal_action(SC_SIGIO, oh, 0, BLOCK_WITH_SIGIO, -1);
  
 #else
@@ -2870,7 +2867,7 @@ char *SC_dgets(char *bf, int *pnc, FILE *fp)
     else
        {no = *pnc;
 
-	zsp = SC_zero_space(2);
+	zsp = SC_zero_space_n(2, -1);
 
 	if (bf == NULL)
 	   {if (no == 0)
@@ -2908,7 +2905,7 @@ char *SC_dgets(char *bf, int *pnc, FILE *fp)
 
 	io_seek(fp, ad + nb, SEEK_SET);
 
-	zsp = SC_zero_space(zsp);};
+	zsp = SC_zero_space_n(zsp, -1);};
 
     *pnc = nn;
 

@@ -685,7 +685,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 	     PA_ERR(!PD_close(pdrs),
 		    "CAN'T CLOSE STATE FILE %s - _PA_WRRSTRT",
 		    rsname);
-	     LONGJMP(SC_top_lev, ABORT);
+	     LONGJMP(SC_gs.cpu, ABORT);
         case ERR_FREE :
 	     return;
         default :
@@ -1082,7 +1082,7 @@ void PA_error(char *msg)
 
     PRINT(stdout, "%s \n\n", msg);
 
-    LONGJMP(SC_top_lev, ABORT);}
+    LONGJMP(SC_gs.cpu, ABORT);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -13,41 +13,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_USE_MM - use the supplied set of memory manager functions */
-
-SC_mem_fnc SC_use_mm(SC_mem_fnc *mf)
-   {SC_mem_fnc rv;
-
-    rv = SC_mem_hook;
-
-    if (mf != NULL)
-       {SC_mem_hook.nalloc  = mf->nalloc;
-	SC_mem_hook.alloc   = mf->alloc;
-	SC_mem_hook.realloc = mf->realloc;
-	SC_mem_hook.free    = mf->free;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_USE_SCORE_MM - use the SCORE memory manager */
-
-SC_mem_fnc SC_use_score_mm(void)
-   {SC_mem_fnc rv;
-
-    rv = SC_mem_hook;
-
-    SC_mem_hook.nalloc  = SC_nalloc_na;
-    SC_mem_hook.alloc   = SC_alloc_na;
-    SC_mem_hook.realloc = SC_realloc_na;
-    SC_mem_hook.free    = SC_free;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_ALLOC - add a layer of control over the C level memory management
  *          - system to store the byte length of allocated spaces
  *          - a space EXTRA_WORD_SIZE greater than requested is allocated
@@ -61,9 +26,9 @@ void *SC_alloc(long nitems, long bpi, char *name)
    {void *rv;
     SC_mem_opt opt;
 
-    opt.na  = FALSE;
-    opt.zsp = _SC.zero_space;
-    opt.typ = -1;
+    opt.na   = FALSE;
+    opt.zsp  = -1;
+    opt.typ  = -1;
     opt.fnc  = name;
     opt.file = NULL;
     opt.line = -1;
@@ -71,6 +36,94 @@ void *SC_alloc(long nitems, long bpi, char *name)
     rv = SC_alloc_nzt(nitems, bpi, &opt);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_ALLOC_NA - add a layer of control over the C level memory management
+ *             - system to store the byte length of allocated spaces
+ *             - a space EXTRA_WORD_SIZE greater than requested is allocated
+ *             - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *             - bytes with a 4 bit marker in the high bits and a pointer to the
+ *             - next byte is returned
+ *             - if the maximum size is exceeded a NULL pointer is returned
+ *             - iff NA TRUE fudge the accounting so that this block
+ *             - will not show up in the bytes allocated count
+ */
+
+void *SC_alloc_na(long nitems, long bpi, char *name, int na)
+   {void *p;
+    SC_mem_opt opt;
+
+    opt.na  = na;
+    opt.zsp = -1;
+    opt.typ = -1;
+    opt.fnc  = name;
+    opt.file = NULL;
+    opt.line = -1;
+
+    p = SC_alloc_nzt(nitems, bpi, &opt);
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_ALLOC_NZ - add a layer of control over the C level memory management
+ *             - system to store the byte length of allocated spaces
+ *             - a space EXTRA_WORD_SIZE greater than requested is allocated
+ *             - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *             - bytes with a 4 bit marker in the high bits and a pointer
+ *             - to the next byte is returned
+ *             - if the maximum size is exceeded a NULL pointer is returned
+ *             - iff NA TRUE fudge the accounting so that this block
+ *             - will not show up in the bytes allocated count
+ */
+
+void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
+   {void *p;
+    SC_mem_opt opt;
+
+    opt.na   = na;
+    opt.zsp  = zsp;
+    opt.typ  = -1;
+    opt.fnc  = name;
+    opt.file = NULL;
+    opt.line = -1;
+
+    p = SC_alloc_nzt(nitems, bpi, &opt);
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_NALLOC_NA - add a layer of control over the C level memory management
+ *              - system to store the byte length of allocated spaces
+ *              - a space EXTRA_WORD_SIZE greater than requested is allocated
+ *              - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *              - bytes with a 4 bit marker in the high bits and a pointer to the
+ *              - next byte is returned
+ *              - if the maximum size is exceeded a NULL pointer is returned
+ *              - iff NA TRUE fudge the accounting so that this block
+ *              - will not show up in the bytes allocated count
+ */
+
+void *SC_nalloc_na(long nitems, long bpi, int na,
+		   const char *fnc, const char *file, int line)
+   {void *p;
+    SC_mem_opt opt;
+
+    opt.na   = na;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = fnc;
+    opt.file = file;
+    opt.line = line;
+
+    p = SC_alloc_nzt(nitems, bpi, &opt);
+
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -87,8 +140,122 @@ void *SC_alloc(long nitems, long bpi, char *name)
 
 void *SC_realloc(void *p, long nitems, long bpi)
    {void *rv;
+    SC_mem_opt opt;
 
-    rv = SC_realloc_na(p, nitems, bpi, FALSE);
+    opt.na   = FALSE;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_REALLOC_NA - add a layer of control over the C level memory management
+ *               - system to store the byte length of allocated spaces
+ *               - a space EXTRA_WORD_SIZE greater than requested is reallocated
+ *               - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *               - bytes with a 4 bit marker in the high bits and a pointer to
+ *               - the next byte is returned
+ *               - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
+ *               - exceeded a NULL pointer is returned
+ *               - iff NA TRUE fudge the accounting so that this block
+ *               - will not show up in the bytes allocated count
+ */
+
+void *SC_realloc_na(void *p, long nitems, long bpi, int na)
+   {void *rv;
+    SC_mem_opt opt;
+
+    opt.na   = na;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_REALLOC_NZ - add a layer of control over the C level memory management
+ *               - system to store the byte length of allocated spaces
+ *               - a space EXTRA_WORD_SIZE greater than requested is reallocated
+ *               - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *               - bytes with a 4 bit marker in the high bits and a pointer to
+ *               - the next byte is returned
+ *               - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
+ *               - exceeded a NULL pointer is returned
+ *               - iff NA TRUE fudge the accounting so that this block
+ *               - will not show up in the bytes allocated count
+ */
+
+void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
+   {void *rv;
+    SC_mem_opt opt;
+
+    opt.na   = na;
+    opt.zsp  = zsp;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FREE - the complementary routine for SC_alloc
+ *         - free all the space including the counter
+ *         - return TRUE if successful and FALSE otherwise
+ */
+
+int SC_free(void *p)
+   {int rv;
+    SC_mem_opt opt;
+
+    opt.na   = -1;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    rv = SC_free_nzt(p, &opt);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FREE_Z - the complementary routine for SC_alloc
+ *           - free all the space including the counter
+ *           - return TRUE if successful and FALSE otherwise
+ */
+
+int SC_free_z(void *p, int zsp)
+   {int rv;
+    SC_mem_opt opt;
+
+    opt.na   = -1;
+    opt.zsp  = zsp;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    rv = SC_free_nzt(p, &opt);
 
     return(rv);}
 
@@ -144,23 +311,6 @@ static int _SC_free_std(void *p)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_USE_C_MM - use the C memory manager */
-
-SC_mem_fnc SC_use_c_mm(void)
-   {SC_mem_fnc rv;
-
-    rv = SC_mem_hook;
-
-    SC_mem_hook.nalloc  = _SC_nalloc_std;
-    SC_mem_hook.alloc   = _SC_alloc_std;
-    SC_mem_hook.realloc = _SC_realloc_std;
-    SC_mem_hook.free    = _SC_free_std;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_NALLOC_CHK - wrap a check for a specific pointer value
  *                - around the SC_alloc_na call
  *                - part of a usable API for memory debugging
@@ -172,7 +322,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na,
     SC_mem_opt opt;
 
     opt.na   = na;
-    opt.zsp  = _SC.zero_space;
+    opt.zsp  = -1;
     opt.typ  = -1;
     opt.fnc  = fnc;
     opt.file = file;
@@ -198,7 +348,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na)
     SC_mem_opt opt;
 
     opt.na  = na;
-    opt.zsp = _SC.zero_space;
+    opt.zsp = -1;
     opt.typ = -1;
     opt.fnc  = name;
     opt.file = NULL;
@@ -251,6 +401,61 @@ static int _SC_free_chk(void *p)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                        MEMORY MANAGER COLLECTIONS                        */
+
+/*--------------------------------------------------------------------------*/
+
+/* SC_USE_SCORE_MM - use the SCORE memory manager */
+
+SC_mem_fnc SC_use_score_mm(void)
+   {SC_mem_fnc rv;
+
+    rv = SC_gs.mm;
+
+    SC_gs.mm.nalloc  = SC_nalloc_na;
+    SC_gs.mm.alloc   = SC_alloc_na;
+    SC_gs.mm.realloc = SC_realloc_na;
+    SC_gs.mm.free    = SC_free;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_USE_C_MM - use the C memory manager */
+
+SC_mem_fnc SC_use_c_mm(void)
+   {SC_mem_fnc rv;
+
+    rv = SC_gs.mm;
+
+    SC_gs.mm.nalloc  = _SC_nalloc_std;
+    SC_gs.mm.alloc   = _SC_alloc_std;
+    SC_gs.mm.realloc = _SC_realloc_std;
+    SC_gs.mm.free    = _SC_free_std;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_USE_MM - use the supplied set of memory manager functions */
+
+SC_mem_fnc SC_use_mm(SC_mem_fnc *mf)
+   {SC_mem_fnc rv;
+
+    rv = SC_gs.mm;
+
+    if (mf != NULL)
+       {SC_gs.mm.nalloc  = mf->nalloc;
+	SC_gs.mm.alloc   = mf->alloc;
+	SC_gs.mm.realloc = mf->realloc;
+	SC_gs.mm.free    = mf->free;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SC_TRAP_POINTER - arrange for the memory manager to raise signal SIG when
@@ -260,15 +465,15 @@ static int _SC_free_chk(void *p)
 SC_mem_fnc SC_trap_pointer(void *p, int sig)
    {SC_mem_fnc rv;
 
-    rv = SC_mem_hook;
+    rv = SC_gs.mm;
 
     _SC_trap_ptr = p;
     _SC_trap_sig = sig;
 
-    SC_mem_hook.nalloc  = _SC_nalloc_chk;
-    SC_mem_hook.alloc   = _SC_alloc_chk;
-    SC_mem_hook.realloc = _SC_realloc_chk;
-    SC_mem_hook.free    = _SC_free_chk;
+    SC_gs.mm.nalloc  = _SC_nalloc_chk;
+    SC_gs.mm.alloc   = _SC_alloc_chk;
+    SC_gs.mm.realloc = _SC_realloc_chk;
+    SC_gs.mm.free    = _SC_free_chk;
 
     return(rv);}
 

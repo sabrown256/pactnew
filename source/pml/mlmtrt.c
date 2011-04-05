@@ -116,8 +116,8 @@ int main()
    {int err;
     long bytaa, bytfa, bytab, bytfb;
 
-    SC_mm_debug = TRUE;
-    SC_zero_space(0);
+    SC_gs.mm_debug = TRUE;
+    SC_zero_space_n(0, -2);
 
     SC_mem_stats(&bytab, &bytfb, NULL, NULL);
 

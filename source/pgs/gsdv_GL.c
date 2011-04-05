@@ -672,7 +672,7 @@ static void _PG_GL_connect_server(PG_device *dev)
 	    _PG.tty_intr = FALSE;};};
 
 /* if interrupts were on before, turn them back on again */
-    PG_catch_interrupts(SC_io_interrupts_on);
+    PG_catch_interrupts(SC_gs.io_interrupts_on);
 
     return;}
 

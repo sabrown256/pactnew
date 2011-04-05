@@ -90,7 +90,7 @@ int main(int argc, char **argv)
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')
             {switch (argv[i][1])
-                {case 'd' : SC_mm_debug = TRUE;
+                {case 'd' : SC_gs.mm_debug = TRUE;
                             break;
                  case 'f' : use_names  = TRUE;
 		            first_indx = i + 1;

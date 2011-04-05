@@ -126,7 +126,7 @@ int main(int c, char **v)
     pdsf = PD_create(s);
     if (pdsf == NULL)
        {printf("%s", PD_err);
-        LONGJMP(SC_top_lev, ABORT);};
+        LONGJMP(SC_gs.cpu, ABORT);};
 
 /* define the source_record for the PDB source file */
    PD_defstr(pdsf, "source_record",
@@ -142,7 +142,7 @@ int main(int c, char **v)
 /* dispatch on commands from the terminal */
     PA_get_commands(stdin, (PFVString) S_gen);
  
-    LONGJMP(SC_top_lev, ERR_FREE);}
+    LONGJMP(SC_gs.cpu, ERR_FREE);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -10,32 +10,53 @@
 
 #include "score_int.h" 
 
+#ifndef ATOF_FUNCTION
+# define ATOF_FUNCTION atof
+#endif
+
+#ifndef ATOL_FUNCTION
+# define ATOL_FUNCTION atol
+#endif
+
+#ifndef STRTOD_FUNCTION
+# define STRTOD_FUNCTION strtod
+#endif
+
+#ifndef STRTOL_FUNCTION
+# define STRTOL_FUNCTION strtol
+#endif
+
+#ifndef STRTOLL_FUNCTION
+# define STRTOLL_FUNCTION strtoll
+#endif
+
 #ifndef NGROUPS_MAX
 # define NGROUPS_MAX 16
 #endif
 
 int
- SC_unary_plus = TRUE,
- SC_assert_fail = 0,
- Radix = 10,
  *LAST = NULL;
-
-char
- SC_version_string[] = PACT_VERSION;
 
 int
  Zero_I  = 0,
- One_I   = 1,
- Four_I  = 4;
+ One_I   = 1;
 
-double
- Four_D  = 4.0;
-
-JMP_BUF
- SC_top_lev;
+SC_global_state
+ SC_gs = {PACT_VERSION,
+	  0, 0, 0, 1, FALSE, FALSE, 10, TRUE, FALSE,
+          ATOF_FUNCTION,
+          STRTOD_FUNCTION,
+          _SC_otol,
+          _SC_htol,
+          ATOL_FUNCTION,
+          STRTOL_FUNCTION,
+	  SC_type_container,
+          {SC_nalloc_na, SC_alloc_na, SC_realloc_na, SC_free}};
 
 SC_state
- _SC = {-1, TRUE, -1, {-1.0, -1.0}, -1, -1,
+ _SC = {-1, TRUE, -1,
+        malloc, realloc, free,
+	{-1.0, -1.0}, -1, -1,
 	(PFSignal_handler) -1, SIG_DFL, -1,
         TYPE_STATE_INIT};
 

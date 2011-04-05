@@ -1,5 +1,5 @@
 TXT: PPC User's Manual
-MOD: 12/19/2005
+MOD: 04/05/2011
 
 <CENTER>
 <H1><font color="#ff0000">$TXT</font></H1>
@@ -31,7 +31,6 @@ MOD: 12/19/2005
 <ul>
 <li><a href="#PPCapi">The PPC API</a>
 <li><a href="#PPCcons"> PPC Constants</a>
-<li><a href="#PPCvars"> PPC Variables</a>
 <li><a href="#PPCcompiling"> Compiling and Loading</a>
 <li><a href="#PPCdata"> Data Structures for PPC</a>
 <li><a href="#PPCexample"> Example</a>
@@ -610,19 +609,6 @@ The following #define&#146;d constants should be used in the contexts indicated:
 </TABLE>
 </BLOCKQUOTE>
 
-<P>
-<a name="PPCvars"></a>
-<h3> PPC Variables</h3>
-
-PPC provides the following global variables:<p>
-
-<BLOCKQUOTE>
-<TABLE>
-<TR><TD>char PC_err[]	</TD><TD>Buffer for error messages from PPC routines</TD></TR>
-<P>
-<TR><TD>int PC_io_interrupts_on	</TD><TD>Flag which iff TRUE enables I/O interrupts</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
 
 <P>
 <a name="PPCcompiling"></a>

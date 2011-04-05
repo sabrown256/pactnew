@@ -91,7 +91,7 @@ static int test_srv(char *mode, int dt)
     pp = SC_open(ca, NULL, mode, NULL);
 
 /* create the event loop */
-    SC_io_interrupts_on = FALSE;
+    SC_gs.io_interrupts_on = FALSE;
 
     pe = SC_make_event_loop(NULL, NULL, child_has_txt, -1, -1, -1);
     pi = SC_register_event_loop_callback(pe, SC_FILE_I, stdin,

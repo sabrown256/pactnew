@@ -64,7 +64,7 @@ void SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name)
      a->bpi   = bpi;
      a->array = lst;
 
-    if (SC_zero_on_alloc() == FALSE)
+    if (SC_zero_on_alloc_n(-1) == FALSE)
        memset(lst, 0, n);
 
      return;}
@@ -155,7 +155,7 @@ void _SC_da_alloc(SC_dynamic_array *a, char *name)
          nx  = d;
 
          lst = FMAKE_N(char, nx*bpi, name);
-	 if (SC_zero_on_alloc() == FALSE)
+	 if (SC_zero_on_alloc_n(-1) == FALSE)
 	    memset(lst, 0, nx*bpi);
 
          a->array = lst;
@@ -193,7 +193,7 @@ void _SC_da_extend(SC_dynamic_array *a, double pad)
          nlst = FMAKE_N(char, nn*bpi, name);
 
 	 memcpy(nlst, lst, nx*bpi);
-	 if (SC_zero_on_alloc() == FALSE)
+	 if (SC_zero_on_alloc_n(-1) == FALSE)
 	    memset(nlst + nx*bpi, 0, d*bpi);
 
          a->array = nlst;
@@ -254,7 +254,7 @@ void SC_da_shrink(SC_dynamic_array *a, int n)
      lst = (char *) a->array;
      if (lst == NULL)
         {lst = FMAKE_N(char, n*bpi, "SC_DA_SHRINK:lst");
-	 if (SC_zero_on_alloc() == FALSE)
+	 if (SC_zero_on_alloc_n(-1) == FALSE)
 	    memset(lst, 0, n*bpi);
 	 SC_mark(lst, 1);}
 

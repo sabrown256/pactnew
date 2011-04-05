@@ -475,7 +475,7 @@ int main(int c, char **v)
     static operator opers[] = {{load_lapl, "laplacian", 100, 10000},
 			       {load_bilpl, "bilaplacian", 2, 1000}};
 
-    SC_zero_space(1);
+    SC_zero_space_n(1, -2);
 
     PM_enable_fpe(TRUE, NULL);
 

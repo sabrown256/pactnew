@@ -15,9 +15,6 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
-SC_mem_fnc
- SC_mem_hook = {SC_nalloc_na, SC_alloc_na, SC_realloc_na, SC_free};
-
 SC_thread_lock
  SC_mm_lock = SC_LOCK_INIT_STATE,
  SC_mc_lock = SC_LOCK_INIT_STATE;
@@ -644,7 +641,7 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
 
     if (arg == NULL)
        {na   = FALSE;
-	zsp  = _SC.zero_space;
+	zsp  = ph->zero_space;
 	typ  = -1;
         func = NULL;
         func = NULL;
@@ -652,7 +649,7 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
     else
        {opt  = (SC_mem_opt *) arg;
 	na   = opt->na;
-	zsp  = (opt->zsp == -1) ? _SC.zero_space : opt->zsp;
+	zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;
 	typ  = opt->typ;
         func = (char *) opt->fnc;
         file = (char *) opt->file;
@@ -669,7 +666,7 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
     if (na == TRUE)
        SC_mem_statb(&a, &f, NULL, NULL);
 
-    if (SC_mm_debug == TRUE)
+    if (SC_gs.mm_debug == TRUE)
        space = (mem_header *) _SC_ALLOC((size_t) nbp);
     else
        space = (mem_header *) _SC_prim_alloc((size_t) nbp, ph, zsp);
@@ -691,14 +688,14 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
 
 /* zero out the space */
 	if ((zsp == 1) || (zsp == 2) || (zsp == 5))
-	   {if (SC_mm_debug == TRUE)
+	   {if (SC_gs.mm_debug == TRUE)
 	       memset(space, 0, nb);
 	    else if (desc->initialized == FALSE)
                _SC_prim_memset(space, nb);};
 
 /* log this entry if doing memory history */
-	if (_SC_mem_hst_hook != NULL)
-	   (*_SC_mem_hst_hook)(SC_MEM_ALLOC, desc);};
+	if (_SC.mem_hst != NULL)
+	   _SC.mem_hst(SC_MEM_ALLOC, desc);};
 
     if (na == TRUE)
        SC_mem_statb_set(a, f);
@@ -712,23 +709,25 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_REALLOC_NZ - add a layer of control over the C level memory management
- *               - system to store the byte length of allocated spaces
- *               - a space EXTRA_WORD_SIZE greater than requested is reallocated
- *               - the length in bytes is written into the first EXTRA_WORD_SIZE
- *               - bytes with a 4 bit marker in the high bits and a pointer to
- *               - the next byte is returned
- *               - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
- *               - exceeded a NULL pointer is returned
- *               - iff NA TRUE fudge the accounting so that this block
- *               - will not show up in the bytes allocated count
+/* SC_REALLOC_NZT - add a layer of control over the C level memory management
+ *                - system to store the byte length of allocated spaces
+ *                - a space EXTRA_WORD_SIZE greater than requested is reallocated
+ *                - the length in bytes is written into the first EXTRA_WORD_SIZE
+ *                - bytes with a 4 bit marker in the high bits and a pointer to
+ *                - the next byte is returned
+ *                - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
+ *                - exceeded a NULL pointer is returned
+ *                - iff NA TRUE fudge the accounting so that this block
+ *                - will not show up in the bytes allocated count
  */
 
-void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
-   {long nb, ob, db, nbp, obp, a, f;
+void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
+   {int na, zsp;
+    long nb, ob, db, nbp, obp, a, f;
     mem_header *space, *tmp;
     mem_header *prev, *next, *osp;
     mem_descriptor *desc;
+    SC_mem_opt *opt;
     SC_heap_des *ph;
     void *rv;
 
@@ -736,6 +735,15 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
     
     if (SC_is_score_space(p, &space, &desc))
        {ph  = GET_HEAP(desc);
+
+	if (arg == NULL)
+	   {na   = FALSE;
+	    zsp  = ph->zero_space;}
+	else
+	   {opt  = (SC_mem_opt *) arg;
+	    na   = opt->na;
+	    zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
+
 	nb  = nitems*bpi;
 	nbp = nb + SC_HDR_SIZE(ph);
 
@@ -760,7 +768,7 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 
 	SAVE_LINKS(desc);
 
-	if (SC_mm_debug)
+	if (SC_gs.mm_debug)
 	   {osp   = space;
 	    space = (mem_header *) _SC_REALLOC((void *) osp, (size_t) nbp);
 	    if (osp != prev)
@@ -817,8 +825,8 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 	       memset(((char *) space + ob), 0, db);
 
 /* log this entry if doing memory history */
-	    if (_SC_mem_hst_hook != NULL)
-	       (*_SC_mem_hst_hook)(SC_MEM_REALLOC, desc);};
+	    if (_SC.mem_hst != NULL)
+	       _SC.mem_hst(SC_MEM_REALLOC, desc);};
 
 	if (na == TRUE)
 	   SC_mem_stats_set(a, f);
@@ -832,13 +840,15 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_Z - the complementary routine for SC_alloc
- *           - free all the space including the counter
- *           - return TRUE if successful and FALSE otherwise
+/* SC_FREE_NZT - the complementary routine for SC_alloc
+ *             - free all the space including the counter
+ *             - return TRUE if successful and FALSE otherwise
  */
 
-int SC_free_z(void *p, int zsp)
-   {long nb, nbp;
+int SC_free_nzt(void *p, void *arg)
+   {int zsp;
+    long nb, nbp;
+    SC_mem_opt *opt;
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
@@ -864,11 +874,15 @@ int SC_free_z(void *p, int zsp)
     if (ph == NULL)
        return(TRUE);
 
-    zsp = (zsp == -1) ? _SC.zero_space : zsp;
+    if (arg == NULL)
+       zsp = ph->zero_space;
+    else
+       {opt = (SC_mem_opt *) arg;
+	zsp = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
 
 /* log this entry if doing memory history */
-    if (_SC_mem_hst_hook != NULL)
-       (*_SC_mem_hst_hook)(SC_MEM_FREE, desc);
+    if (_SC.mem_hst != NULL)
+       _SC.mem_hst(SC_MEM_FREE, desc);
 
     nb  = BLOCK_LENGTH(desc);
     nbp = nb + SC_HDR_SIZE(ph);
@@ -884,7 +898,7 @@ int SC_free_z(void *p, int zsp)
     else
        {_SC_deassign_block(ph, desc, NULL);};
 
-    if (SC_mm_debug)
+    if (SC_gs.mm_debug)
        _SC_FREE((void *) space);
     else
        _SC_prim_free((void *) space, nbp, ph);
@@ -894,131 +908,6 @@ int SC_free_z(void *p, int zsp)
     SC_LOCKOFF(SC_mm_lock);
 
     return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_ALLOC_NZ - add a layer of control over the C level memory management
- *             - system to store the byte length of allocated spaces
- *             - a space EXTRA_WORD_SIZE greater than requested is allocated
- *             - the length in bytes is written into the first EXTRA_WORD_SIZE
- *             - bytes with a 4 bit marker in the high bits and a pointer
- *             - to the next byte is returned
- *             - if the maximum size is exceeded a NULL pointer is returned
- *             - iff NA TRUE fudge the accounting so that this block
- *             - will not show up in the bytes allocated count
- */
-
-void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
-   {void *p;
-    SC_mem_opt opt;
-
-    opt.na   = na;
-    opt.zsp  = zsp;
-    opt.typ  = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
-
-    p = SC_alloc_nzt(nitems, bpi, &opt);
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_NALLOC_NA - add a layer of control over the C level memory management
- *              - system to store the byte length of allocated spaces
- *              - a space EXTRA_WORD_SIZE greater than requested is allocated
- *              - the length in bytes is written into the first EXTRA_WORD_SIZE
- *              - bytes with a 4 bit marker in the high bits and a pointer to the
- *              - next byte is returned
- *              - if the maximum size is exceeded a NULL pointer is returned
- *              - iff NA TRUE fudge the accounting so that this block
- *              - will not show up in the bytes allocated count
- */
-
-void *SC_nalloc_na(long nitems, long bpi, int na,
-		   const char *fnc, const char *file, int line)
-   {void *p;
-    SC_mem_opt opt;
-
-    opt.na   = na;
-    opt.zsp  = _SC.zero_space;
-    opt.typ  = -1;
-    opt.fnc  = fnc;
-    opt.file = file;
-    opt.line = line;
-
-    p = SC_alloc_nzt(nitems, bpi, &opt);
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_ALLOC_NA - add a layer of control over the C level memory management
- *             - system to store the byte length of allocated spaces
- *             - a space EXTRA_WORD_SIZE greater than requested is allocated
- *             - the length in bytes is written into the first EXTRA_WORD_SIZE
- *             - bytes with a 4 bit marker in the high bits and a pointer to the
- *             - next byte is returned
- *             - if the maximum size is exceeded a NULL pointer is returned
- *             - iff NA TRUE fudge the accounting so that this block
- *             - will not show up in the bytes allocated count
- */
-
-void *SC_alloc_na(long nitems, long bpi, char *name, int na)
-   {void *p;
-    SC_mem_opt opt;
-
-    opt.na  = na;
-    opt.zsp = _SC.zero_space;
-    opt.typ = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
-
-    p = SC_alloc_nzt(nitems, bpi, &opt);
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_REALLOC_NA - add a layer of control over the C level memory management
- *               - system to store the byte length of allocated spaces
- *               - a space EXTRA_WORD_SIZE greater than requested is reallocated
- *               - the length in bytes is written into the first EXTRA_WORD_SIZE
- *               - bytes with a 4 bit marker in the high bits and a pointer to
- *               - the next byte is returned
- *               - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
- *               - exceeded a NULL pointer is returned
- *               - iff NA TRUE fudge the accounting so that this block
- *               - will not show up in the bytes allocated count
- */
-
-void *SC_realloc_na(void *p, long nitems, long bpi, int na)
-   {void *rv;
-
-    rv = SC_realloc_nz(p, nitems, bpi, na, _SC.zero_space);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_FREE - the complementary routine for SC_alloc
- *         - free all the space including the counter
- *         - return TRUE if successful and FALSE otherwise
- */
-
-int SC_free(void *p)
-   {int rv;
-
-    rv = SC_free_z(p, _SC.zero_space);
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1033,6 +922,7 @@ int SC_free(void *p)
  *                 -   1 : zero on alloc and free
  *                 -   2 : zero on alloc only
  *                 -   3 : zero on free only
+ *                 -   5 : use calloc to get zeroed memory in _SC_prim_alloc
  *                 - return the original value
  */
 
@@ -1040,14 +930,11 @@ int SC_zero_space_n(int flag, int tid)
    {int it, itn, itx, rv;
     SC_heap_des *ph;
 
-    SC_LOCKON(SC_mm_lock);
-
-    rv = 0;
-
     switch (tid)
        {case -2 :
 	     itn = 0;
 	     itx = SC_get_n_thread();
+	     itx = max(itx, 1);
 	     break;
         case -1 :
 	     itn = SC_current_thread();
@@ -1057,6 +944,10 @@ int SC_zero_space_n(int flag, int tid)
 	     itn = tid;
 	     itx = itn+1;
 	     break;};
+
+    rv = 0;
+
+    SC_LOCKON(SC_mm_lock);
 
     for (it = itn; it < itx; it++)
         {ph = _SC_get_heap(it);
@@ -1072,33 +963,39 @@ int SC_zero_space_n(int flag, int tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ZERO_SPACE - set flag to zero space
- *               - 0 : don't zero
- *               - 1 : zero on alloc and free
- *               - 2 : zero on alloc only
- *               - 3 : zero on free only
- *               - return the original value
+/* SC_ZERO_ON_ALLOC_N - return TRUE iff zero_space is 1 or 2
+ *                    - for specified thread/heap
  */
 
-int SC_zero_space(int flag)
-   {int rv;
+int SC_zero_on_alloc_n(int tid)
+   {int it, itn, itx, rv;
+    SC_heap_des *ph;
 
-    rv = _SC.zero_space;
-    if ((0 <= flag) && (flag <= 5))
-       {SC_zero_space_n(flag, -2);
-	_SC.zero_space = flag;};
+    switch (tid)
+       {case -2 :
+	     itn = 0;
+	     itx = SC_get_n_thread();
+	     itx = max(itx, 1);
+	     break;
+        case -1 :
+	     itn = SC_current_thread();
+	     itx = itn+1;
+	     break;
+	default :
+	     itn = tid;
+	     itx = itn+1;
+	     break;};
 
-    return(rv);}
+    rv = TRUE;
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+    SC_LOCKON(SC_mm_lock);
 
-/* SC_ZERO_ON_ALLOC - return TRUE iff zero_space is 1 or 2 */
+    for (it = itn; it < itx; it++)
+        {ph = _SC_get_heap(it);
+	 if (ph != NULL)
+	    rv &= ((ph->zero_space == 1) || (ph->zero_space == 2));};
 
-int SC_zero_on_alloc(void)
-   {int rv;
-
-    rv = ((_SC.zero_space == 1) || (_SC.zero_space == 2));
+    SC_LOCKOFF(SC_mm_lock);
 
     return(rv);}
 
@@ -1110,7 +1007,7 @@ int SC_zero_on_alloc(void)
 FIXNUM F77_FUNC(sczrsp, SCZRSP)(FIXNUM *pf)
    {FIXNUM zsp;
 
-    zsp = SC_zero_space((int) *pf);
+    zsp = SC_zero_space_n((int) *pf, -2);
 
     return(zsp);}
 
