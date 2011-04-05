@@ -366,7 +366,7 @@ char *_SC_block_name(mem_descriptor *desc)
 	       p = desc->file;
 	    else
 	       p++;
-	    snprintf(name, MAXLINE, "%s(%d):%s", p, desc->line, desc->func);}
+	    snprintf(name, MAXLINE, "%s(%s:%d)", desc->func, p, desc->line);}
 	else if (desc->func != NULL)
 	   SC_strncpy(name, MAXLINE, desc->func, -1);
 	else

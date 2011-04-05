@@ -1632,7 +1632,7 @@ int SC_init_client(char *host, int port)
    {int fd;
 
 #ifdef HAVE_PROCESS_CONTROL
-    fd = _SC_tcp_connect(host, port, -1);
+    fd = _SC_tcp_connect(host, port, -1, FALSE);
 #else
     fd = 0;
 #endif

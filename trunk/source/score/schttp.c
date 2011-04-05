@@ -19,7 +19,7 @@
  *              - return the socket which connects to the server
  */
 
-int SC_open_port(char *host, int port, int to)
+int SC_open_port(char *host, int port, int to, int fm)
    {int fd;
 
 #ifdef HAVE_PROCESS_CONTROL
@@ -28,7 +28,7 @@ int SC_open_port(char *host, int port, int to)
 
      lport = (port < 0) ? 80 : port;
 
-     fd = _SC_tcp_connect(host, lport, to);
+     fd = _SC_tcp_connect(host, lport, to, fm);
 #else
     fd = 0;
 #endif
@@ -72,7 +72,7 @@ void SC_split_http(char *url, char *host, char *page)
 int SC_open_http(char *host, int port)
    {int fd;
 
-    fd = SC_open_port(host, port, DEFAULT_TIMEOUT);
+    fd = SC_open_port(host, port, DEFAULT_TIMEOUT, FALSE);
 
     return(fd);}
 

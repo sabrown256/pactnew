@@ -384,12 +384,15 @@ int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
  *                - timeout after TO milliseconds
  *                - if TO is -1 let connect finish or timeout on its own
  *                - return the usual connect result
+ *                - if FM is TRUE timeout is non-fatal and
+ *                - ETIMEDOUT is returned
  *                - NOTE: this should be simply the connect system call
  *                - with a timeout determined by the application instead
  *                - some anonymous implementer somewhere
  */
 
-static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
+static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln,
+			  int to, int fm)
    {int ok, blck, nrdy, dt, ta, sz, rv;
     SC_poll_desc pd;
 
@@ -434,7 +437,8 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
 		     SC_ASSERT(rv == 0);
 		     break;};};
 
-	    ok = (ok != 0) ? -1 : 0;};
+	    if (fm == FALSE)
+	       ok = (ok != 0) ? -1 : 0;};
 
 /* restore the socket status wrt blocking */
 	if (blck == TRUE)
@@ -450,9 +454,10 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln, int to)
 /* _SC_TCP_CONNECT - initialize a TCP connection to HOST on PORT
  *                 - return the socket which connects to the server
  *                 - timeout after TO milliseconds
+ *                 - if FM is TRUE timeout is non-fatal
  */
 
-int _SC_tcp_connect(char *host, int port, int to)
+int _SC_tcp_connect(char *host, int port, int to, int fm)
    {int fd;
 
     fd = -1;
@@ -475,7 +480,8 @@ int _SC_tcp_connect(char *host, int port, int to)
 		   SC_error(-1, "CAN'T OPEN SOCKET - _SC_TCP_CONNECT");
 
 		sasz = sizeof(struct sockaddr_in);
-		err  = _SC_connect_to(fd, (struct sockaddr *) srvr, sasz, to);
+		err  = _SC_connect_to(fd, (struct sockaddr *) srvr, sasz,
+				      to, fm);
 		if (err < 0)
 		   {close(fd);
 		    fd = -1;

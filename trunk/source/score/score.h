@@ -945,7 +945,7 @@ extern void
  SC_close_http(int fd);
 
 extern int
- SC_open_port(char *host, int port, int to),
+ SC_open_port(char *host, int port, int to, int fm),
  SC_open_http(char *host, int port),
  SC_request_http(int fd, char *cmnd, char *url, char *vrs),
  SC_http_url_file(char *url, char *file, char *vrs);
