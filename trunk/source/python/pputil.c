@@ -162,7 +162,7 @@ int PP_alloc_data(char *type, long nitems, PP_file *fileinfo, void **vr)
 
 void PP_free(void *p)
 {
-    SFREE(p);
+    CFREE(p);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -195,7 +195,7 @@ char *PP_add_indirection(char *type, int n)
     /* space for space, star(s), and buffer */
     sz = strlen(type) + 2 + n;
     
-    ptype  = FMAKE_N(char, sz, "PP_add_indirection:p");
+    ptype  = CMAKE_N(char, sz);
     if (ptype == NULL) {
         PyErr_NoMemory();
         return NULL;

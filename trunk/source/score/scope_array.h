@@ -30,11 +30,11 @@
     {if (lst == NULL)                                                        \
         {nx = delta;                                                         \
          n  = 0;                                                             \
-         lst = FMAKE_N(_t, nx, "SC_REMEMBER:lst");};                         \
+         lst = CMAKE_N(_t, nx);};                                            \
      lst[n++] = item;                                                        \
      if (n >= nx)                                                            \
         {nx += delta;                                                        \
-         REMAKE_N(lst, _t, nx);};}
+         CREMAKE(lst, _t, nx);};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -83,7 +83,7 @@
      _lst[_n++] = _item;                                                     \
      if (_n >= _nx)                                                          \
         {_nx += _delta;                                                      \
-         REMAKE_N(_lst, _t, _nx);};}
+         CREMAKE(_lst, _t, _nx);};}
 
 #define SC_INIT_DYNAMIC_ARRAY_F(_a, _t, _tn, _d, _name)                      \
     SC_da_init(&(_a), sizeof(_t), _tn, _d, _name)

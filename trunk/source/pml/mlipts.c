@@ -60,9 +60,9 @@ int test_1(void)
 	     t[1][l] = yc;};
 
     ns = nc*nc;
-    ry = FMAKE_N(PM_polygon *, nc, "TEST_1:ry");
-    ty = FMAKE_N(PM_polygon *, nc, "TEST_1:ty");
-    a  = FMAKE_N(SC_array *, ns, "TEST_1:a");
+    ry = CMAKE_N(PM_polygon *, nc);
+    ty = CMAKE_N(PM_polygon *, nc);
+    a  = CMAKE_N(SC_array *, ns);
 
     for (j = 0; j < nc; j++)
         {for (i = 0; i < nc; i++)
@@ -98,8 +98,8 @@ int test_1(void)
 	 PM_free_polygon(ry[j]);
 	 PM_free_polygon(ty[j]);};
 
-    SFREE(ry);
-    SFREE(ty);
+    CFREE(ry);
+    CFREE(ty);
 
     PM_free_vectors(2, r);
     PM_free_vectors(2, t);

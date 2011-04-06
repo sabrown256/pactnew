@@ -27,11 +27,11 @@ sql_table *_SQL_mk_table(int nr, int nf)
 
     ne = nr*nf;
 
-    tab = FMAKE(sql_table, "_SQL_MK_TABLE:tab");
+    tab = CMAKE(sql_table);
 
     tab->nr    = nr;
     tab->nf    = nf;
-    tab->table = FMAKE_N(char *, ne, "_SQL_MK_TABLE:table");
+    tab->table = CMAKE_N(char *, ne);
 
     return(tab);}
 
@@ -45,7 +45,7 @@ void _SQL_rl_table(sql_table *tab)
 
     SC_free_strings(tab->table);
 
-    SFREE(tab);
+    CFREE(tab);
 
     return;}
 
@@ -108,7 +108,7 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
     dimdes *nd;
     defstr *dp;
 
-    desc = FMAKE(memdes, "_SQL_MK_DESCRIPTOR:desc");
+    desc = CMAKE(memdes);
 
 /* get rid of any leading white space or parens */
     p = SC_trim_left(member, " (\t\n\r\f");
@@ -147,9 +147,9 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
     else
        snprintf(s, MAXLINE, "%s %s", bs, ns);
 
-    ms = SC_strsavef(s, "char*:_SQL_MK_DESCRIPTOR:ms");
-    bs = SC_strsavef(bs, "char*:_SQL_MK_DESCRIPTOR:bs");
-    ns = SC_strsavef(ns, "char*:_SQL_MK_DESCRIPTOR:ns");
+    ms = CSTRSAVE(s);
+    bs = CSTRSAVE(bs);
+    ns = CSTRSAVE(ns);
 	
     desc->member      = ms;
     desc->type        = bs;

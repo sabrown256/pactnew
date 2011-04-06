@@ -529,7 +529,7 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
        _SX_display_diff(pf, nma, nmb, bfa, bfb, indx, ni, type, dims);
 
     if (SX_disp_individ_diff == TRUE)
-       SFREE(indx);
+       CFREE(indx);
 
     return(ret);}
 
@@ -655,7 +655,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
 
     if (nrd != ni)
        {if (convert)
-          SFREE(buf);
+          CFREE(buf);
         return(FALSE);}
 
     if (convert)
@@ -664,7 +664,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
         PD_convert(&svr, &vbuf, in_type, out_type, ni, 
                    pf->std, pf->host_std, pf->host_std, 
                    pf->chart, pf->host_chart, 0, PD_TRACE);
-        SFREE(buf);}
+        CFREE(buf);}
 
     return(TRUE);}
 
@@ -762,8 +762,8 @@ static int _SX_diff_leaf(char *nma, char *nmb,
 					      bfa, bfb, na, 
 					      nma, nmb, dp);};
 
-	SFREE(bfa);
-	SFREE(bfb);};
+	CFREE(bfa);
+	CFREE(bfb);};
 
     return(ret);}
 
@@ -850,14 +850,14 @@ static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb,
     if (s == NULL)
        return(NOT_PRESENT);
     strcpy(fullpatha, s);
-    SFREE(s);
+    CFREE(s);
 
     strcpy(fullpathb, _PD_fixname(pfb, nmb));
     s = _PD_expand_hyper_name(pfb, fullpathb);
     if (s == NULL)
        return(NOT_PRESENT);
     strcpy(fullpathb, s);
-    SFREE(s);
+    CFREE(s);
 
     epa = _PD_effective_ep(pfa, fullpatha, FALSE, NULL);
     epb = _PD_effective_ep(pfb, fullpathb, FALSE, NULL);

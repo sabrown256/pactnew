@@ -428,7 +428,7 @@ fflush(stdout);
     futureRefFrame = NULL;
 
 /* allocate MpegDevInfo item */
-    MpegDev = FMAKE(MpegDevInfo, "init_MPEGjob");
+    MpegDev = CMAKE(MpegDevInfo);
 
 /* allocates sizeof(MpegFrame) memory to frameMemory - frame.c */
     Frame_Init(MpegDev->frameMemory);
@@ -520,7 +520,7 @@ void close_MPEGjob(PG_device *dev)
     numMpegDevices--;
 
     Frame_Exit(MpegDev->frameMemory);
-    SFREE(MpegDev);}
+    CFREE(MpegDev);}
 
 
 /*--------------------------------------------------------------------------*/
@@ -626,9 +626,9 @@ static void ConvertRGB2YIV(PG_RAST_device *mdv)
     h = fr->height;
     size = w*h;
 
-    Y = FMAKE_N(unsigned char, size, "ConvertRGB2YIV:Y");
-    I = FMAKE_N(unsigned char, size, "ConvertRGB2YIV:I");
-    V = FMAKE_N(unsigned char, size, "ConvertRGB2YIV:V");
+    Y = CMAKE_N(unsigned char, size);
+    I = CMAKE_N(unsigned char, size);
+    V = CMAKE_N(unsigned char, size);
     memset(Y, 0, size);
     memset(I, 0, size);
     memset(V, 0, size);
@@ -663,9 +663,9 @@ static void ConvertRGB2YIV(PG_RAST_device *mdv)
 
     PUT_RGB(fr, Y, I, V);
 
-    SFREE(rpx);
-    SFREE(gpx);
-    SFREE(bpx);
+    CFREE(rpx);
+    CFREE(gpx);
+    CFREE(bpx);
 
     return;}
 

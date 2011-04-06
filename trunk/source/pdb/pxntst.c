@@ -34,11 +34,11 @@ int main(int c, char **v)
     if (PD_def_attribute(file, "rank", "integer") == FALSE)
        printf("Error defining RANK\n");
 
-    rank = FMAKE(int, "PXNTST.C:rank");
+    rank = CMAKE(int);
     *rank = 1;
 
-    pc = FMAKE(int *, "PXNTST.C:pc");
-    *pc = center = FMAKE_N (int, 2, "PXNTST.C:*pc");
+    pc = CMAKE(int *);
+    *pc = center = CMAKE_N (int, 2);
     center[0] = 44;
     center[1] = 55;
 

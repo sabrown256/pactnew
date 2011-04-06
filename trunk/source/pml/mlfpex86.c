@@ -157,7 +157,7 @@ void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
 fpu_state *PM_save_fpu_x86(void)
    {fpu_state *fs;
 
-    fs = FMAKE(fpu_state, "PM_SAVE_FPU_X86:fs");
+    fs = CMAKE(fpu_state);
 
 #ifdef CPU_ENABLE_SSE
     __asm __volatile("fxsave %0" : "=m" (*fs));

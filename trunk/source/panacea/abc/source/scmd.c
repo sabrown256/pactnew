@@ -74,7 +74,7 @@ char *next_name(void)
    {static int n = 0;
     char *s;
 
-    s = FMAKE_N(char, 10, "NEXT_NAME:s");
+    s = CMAKE_N(char, 10);
     snprintf(s, 10, "var%d", n++);
 
     return(s);}
@@ -87,7 +87,7 @@ char *next_name(void)
 static source_record *mk_source_record(double time, double *data)
    {source_record *sp;
 
-    sp       = FMAKE(source_record, "MK_SOURCE_RECORD:sp");
+    sp       = CMAKE(source_record);
     sp->time = time;
     sp->name = next_name();
     sp->data = data;
@@ -102,7 +102,7 @@ static source_record *mk_source_record(double time, double *data)
 static time_list *mk_time_list(void)
    {time_list *tp;
 
-    tp         = FMAKE(time_list, "MK_TIME_LIST:tp");
+    tp         = CMAKE(time_list);
     tp->list   = NULL;
     tp->length = 0;
 
@@ -185,15 +185,15 @@ static void makeh(void)
              l  = tp->length;
 
 /* copy the list into arrays */
-             tt = time = FMAKE_N(double, l, "MAKEH:tt");
-             td = data = FMAKE_N(double *, l, "MAKEH:td");
+             tt = time = CMAKE_N(double, l);
+             td = data = CMAKE_N(double *, l);
              for (pp = tp->list; pp != NULL; pp = pn)
                  {sp = (source_record *) pp->car;
                   *(tt++) = sp->time;
                   *(td++) = sp->data;
                   pn = (pcons *) pp->cdr;
-                  SFREE(sp);
-                  SFREE(pp);};
+                  CFREE(sp);
+                  CFREE(pp);};
 
 /* sort the arrays according to the times */
              change = TRUE;
@@ -279,7 +279,7 @@ static void varh(PA_variable *pp)
     size = PA_get_num_field("SIZE", "VARIABLE", REQU);
 
 /* allocate storage for the data */
-    data   = FMAKE_N(double, size, "VARH:data");
+    data   = CMAKE_N(double, size);
     count  = 0;
     var_sz = size;
 
@@ -411,7 +411,7 @@ static void doneh(void)
 void inst_s(void)
    {
 
-    PAN_COMMAND = SC_strsave("command");
+    PAN_COMMAND = CSTRSAVE("command");
 
     PA_inst_c("end", NULL, FALSE, 0, doneh, SRC_zargs);
     PA_inst_c("clear", NULL, FALSE, 0, clear_sys, SRC_zargs);

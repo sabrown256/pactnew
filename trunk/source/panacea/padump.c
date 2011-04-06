@@ -70,7 +70,7 @@ static void _PA_begin_premap(PA_plot_request *pr)
 
 /* compute the domain information */
 	pr->domain_map       = PA_get_domain_info(pr, dname, MAXLINE);
-	pr->base_domain_name = SC_strsavef(dname, "char*:_PA_BEGIN_PREMAP:dname");
+	pr->base_domain_name = CSTRSAVE(dname);
 
 /* if a PSEUDO variable, splice it out into the package list */
 	if (PA_VARIABLE_CLASS(pp) == PSEUDO)
@@ -175,10 +175,8 @@ static int _PA_init_time_plot(PA_plot_request *pr,
     rname = pr->range->var_name;
 
     pr->domain_map       = arr;
-    pr->base_domain_name = SC_strsavef(dname,
-				       "char*:_PA_INIT_TIME_PLOT:dname");
-    pr->range_name       = SC_strsavef(rname,
-				       "char*:_PA_INIT_TIME_PLOT:rname");
+    pr->base_domain_name = CSTRSAVE(dname);
+    pr->range_name       = CSTRSAVE(rname);
     pr->str_index        = itu;
     pr->size             = 1L;
     pr->offset           = 0L;
@@ -200,7 +198,7 @@ static int _PA_init_time_plot(PA_plot_request *pr,
 
     labels[itu-1] = pr->text;
     snprintf(bf, MAXLINE, "y%d", itu);
-    members[itu] = SC_strsavef(bf, "char*:_PA_INIT_TIME_PLOT:bf");
+    members[itu] = CSTRSAVE(bf);
 
 /* if not a PSEUDO variable we're done */
     if (pr->status == PSEUDO)
@@ -268,12 +266,12 @@ static void _PA_init_time_plots(char *ppname)
 
 /* allow for t in the data stripe */
     n_dom = 1;
-    labels  = FMAKE_N(char *, N_time_plots, "_PA_INIT_TIME_PLOTS:labels");
-    members = FMAKE_N(char *, N_time_plots+1, "_PA_INIT_TIME_PLOTS:members");
+    labels  = CMAKE_N(char *, N_time_plots);
+    members = CMAKE_N(char *, N_time_plots+1);
 
     itu = n_dom;
     snprintf(bf, MAXLINE, "t");
-    members[0] = SC_strsavef(bf, "char*:_PA_INIT_TIME_PLOTS:bf");
+    members[0] = CSTRSAVE(bf);
 
 /* finish the curve arrays for the packages */
     for (pck = Packages; pck != NULL; pck = pck->next)
@@ -291,16 +289,15 @@ static void _PA_init_time_plots(char *ppname)
        PA_th_def_rec(PA_pp_file, "time_data", "time_stripe",
                      itu, members, labels);
 
-    SFREE(labels);
+    CFREE(labels);
 
     for (i = 0; i < N_time_plots; i++)
-        SFREE(members[i]);
-    SFREE(members);
+        CFREE(members[i]);
+    CFREE(members);
 
     if (N_time_plots > 0)
        {N_unique_variables = itu;
-        t_data = FMAKE_N(double, N_unique_variables,
-                         "_PA_INIT_TIME_PLOTS:t_data");};
+        t_data = CMAKE_N(double, N_unique_variables);};
 
     return;}
 
@@ -581,8 +578,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
     SC_strcat(dname, nc, "}");
 
     if (domain_list == NULL)
-       {domain_list = FMAKE_N(PA_domain_spec, 10,
-                              "PA_GET_DOMAIN_INFO:domain_list");
+       {domain_list = CMAKE_N(PA_domain_spec, 10);
         n_domains   = 0;
         max_domains = 10;};
 
@@ -596,7 +592,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
        {arr = domain_list[i].map;
         return(arr);};
 
-    dmap = FMAKE_N(PA_set_index, n, "PA_GET_DOMAIN_INFO:dmap");
+    dmap = CMAKE_N(PA_set_index, n);
 
 /* encapsulate the domain map indices */
     arr = PM_make_array(PA_SET_INDEX_P_S, n, dmap);
@@ -605,7 +601,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
  * domain_list
  */
     if (!pr->time_plot)
-       {nm = SC_strsavef(dname, "char*:PA_GET_DOMAIN_INFO:name");
+       {nm = CSTRSAVE(dname);
 	domain_list[i].name = PD_process_set_name(nm);
         domain_list[i].map  = arr;
         domain_list[i].time = pr->domain;
@@ -613,7 +609,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 
         if (n_domains >= max_domains)
            {max_domains += 10;
-            REMAKE_N(domain_list, PA_domain_spec, max_domains);};};
+            CREMAKE(domain_list, PA_domain_spec, max_domains);};};
 
 /* initialize the map */
     size = 1L;
@@ -624,7 +620,7 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 	 pname = pi->var_name;
          pp    = PA_inquire_variable(pname);
 
-         dmap[i].name = SC_strsavef(pname, "char*:PA_GET_DOMAIN_INFO:name");
+         dmap[i].name = CSTRSAVE(pname);
          if (pi->text != NULL)
             {ps  = (char **) PA_VARIABLE_DATA(pp);
              ndx = PA_VARIABLE_SIZE(pp);
@@ -737,7 +733,7 @@ void PA_get_range_info(PA_plot_request *pr)
         SC_LAST_CHAR(rname) = '\0';
         SC_strcat(rname, MAXLINE, "}");};
 
-    pr->range_name = SC_strsavef(rname, "char*:PA_GET_RANGE_INFO:rname");
+    pr->range_name = CSTRSAVE(rname);
 
     return;}
 
@@ -781,15 +777,15 @@ static void _PA_init_pseudo_set(PA_plot_request *pr)
 
 /* this is not quite right, but shouldn't be too wrong either */
     nd = 1;
-    maxes = FMAKE_N(int, nd, "_PA_INIT_PSEUDO_SET:maxes");
+    maxes = CMAKE_N(int, nd);
     maxes[0] = ne;
 
 /* compute the dimensionality of the set elements */
     for (nde = 0, pi = pr->range; pi != NULL; pi = pi->next, nde++);
-    elem = FMAKE_N(double *, nde, "_PA_INIT_PSEUDO_SET:elem");
+    elem = CMAKE_N(double *, nde);
 
     for (nde = 0, pi = pr->range; pi != NULL; pi = pi->next, nde++)
-        {elem[nde] = FMAKE_N(double, ne, "_PA_INIT_PSEUDO_SET:elem");};
+        {elem[nde] = CMAKE_N(double, ne);};
 
     set = PM_mk_set(pr->range_name, SC_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
@@ -920,7 +916,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
 /* interactive plot requests among others will have arr = NULL */
     PA_general_select(pp, arr, &nitems, &dims, &offset, strides, maxes);
 
-    data = FMAKE_N(double, nitems, "PA_SET_DATA:data");
+    data = CMAKE_N(double, nitems);
 
     type = PA_VARIABLE_TYPE_S(pp);
     id   = SC_type_id(type, FALSE);
@@ -988,7 +984,7 @@ double *PA_fill_component(double *data, int len, int *pist, int ne)
    {int i, j, k, ist, nst;
     double *pc, *comp, val;
 
-    comp = FMAKE_N(double, ne, "PA_FILL_COMPONENT:comp");
+    comp = CMAKE_N(double, ne);
 
     ist = *pist;
     nst = ist*len;
@@ -1166,7 +1162,7 @@ static PM_set *_PA_get_n_set(PA_plot_request *pr, char *name)
 
 /* compute the dimensionality of the set elements */
     for (nde = 0, s = rp; s != NULL; s = s->next, nde++);
-    elem = FMAKE_N(double *, nde, "_PA_GET_N_SET:elem");
+    elem = CMAKE_N(double *, nde);
 
 /* get the element components */
     for (nde = 0, s = rp; s != NULL; s = s->next, nde++)
@@ -1175,7 +1171,7 @@ static PM_set *_PA_get_n_set(PA_plot_request *pr, char *name)
     ne = SC_arrlen(elem[0])/SIZEOF(arr->type);
 
     nd       = 1;
-    maxes    = FMAKE_N(int, nd, "_PA_GET_N_SET:maxes");
+    maxes    = CMAKE_N(int, nd);
     maxes[0] = ne;
     pr->size = ne;
 
@@ -1235,7 +1231,7 @@ static PM_set *_PA_build_domain(char *base_name, C_array *arr, double t)
              else
                 nd++;};};
 
-    maxes = FMAKE_N(int, nd, "_PA_BUILD_DOMAIN:maxes");
+    maxes = CMAKE_N(int, nd);
     pm    = maxes;
     for (i = 0; i < n; i++)
         {if (dmap[i].val == -HUGE)
@@ -1252,7 +1248,7 @@ static PM_set *_PA_build_domain(char *base_name, C_array *arr, double t)
     for (i = 0; i < nd; i++)
         ne *= maxes[i];
 
-    elem = FMAKE_N(double *, nd, "_PA_BUILD_DOMAIN:elem");
+    elem = CMAKE_N(double *, nd);
 
     nde = 0;
     ist = 1;
@@ -1293,10 +1289,8 @@ static void _PA_init_mappings(char *ppname)
    {PA_plot_request *pr, *nxt;
     PFPreMap hook;
 
-    PAN_EDIT     = SC_strsavef("edit_variable",
-                               "char*:_PA_INIT_MAPPINGS:edit_var");
-    PAN_PLOT_REQ = SC_strsavef("PA_plot_reqest",
-                               "char*:_PA_INIT_MAPPINGS:plot_req");
+    PAN_EDIT     = CSTRSAVE("edit_variable");
+    PAN_PLOT_REQ = CSTRSAVE("PA_plot_reqest");
     SC_permanent(PAN_EDIT);
     SC_permanent(PAN_PLOT_REQ);
 

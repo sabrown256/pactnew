@@ -95,7 +95,7 @@ static int process_end(int *prv, void *a)
         child_has_txt(pp->in, 0, a);
 
         PC_close(pp);
-	SFREE(pp);
+	CFREE(pp);
 
         if (!quiet)
            PRINT(stdout, "\nProcess %s terminated (%d %d)\n",

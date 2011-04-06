@@ -96,12 +96,11 @@ SC_lexical_stream *SC_open_lexical_stream(char *name, int inbfsz,
 					  PFInt less)
    {SC_lexical_stream *str;
 
-    str = FMAKE(SC_lexical_stream, "SC_OPEN_LEXICAL_STREAM:str");
+    str = CMAKE(SC_lexical_stream);
 
 /* set up the file */
     if (name != NULL)
-       {str->name = SC_strsavef(name,
-                    "char*:SC_OPEN_LEXICAL_STREAM:name");
+       {str->name = CSTRSAVE(name);
         str->file = io_open(name, "r");}
     else
        {str->name = NULL;
@@ -110,27 +109,20 @@ SC_lexical_stream *SC_open_lexical_stream(char *name, int inbfsz,
 /* allocate the token space */
     str->n_tokens_max = 50;
     str->n_tokens     = 0;
-    str->tokens       = FMAKE_N(SC_lexical_token, 50,
-				"SC_OPEN_LEXICAL_STREAM:tokens");
+    str->tokens       = CMAKE_N(SC_lexical_token, 50);
 
 /* allocate the buffers */
     if (inbfsz != 0)
-       {str->in_bf  = FMAKE_N(char, inbfsz,
-	                      "SC_OPEN_LEXICAL_STREAM:in_bf");
-        str->out_bf = FMAKE_N(char, inbfsz,
-			      "SC_OPEN_LEXICAL_STREAM:out_bf");}
+       {str->in_bf  = CMAKE_N(char, inbfsz);
+        str->out_bf = CMAKE_N(char, inbfsz);}
     else
-       {str->in_bf  = FMAKE_N(char, MAXLINE,
-			      "SC_OPEN_LEXICAL_STREAM:in_bf");
-        str->out_bf = FMAKE_N(char, MAXLINE,
-			      "SC_OPEN_LEXICAL_STREAM:out_bf");}
+       {str->in_bf  = CMAKE_N(char, MAXLINE);
+        str->out_bf = CMAKE_N(char, MAXLINE);}
 
     if (strbfsz != 0)
-       str->str_bf = FMAKE_N(char, strbfsz,
-			     "SC_OPEN_LEXICAL_STREAM:str_bf");
+       str->str_bf = CMAKE_N(char, strbfsz);
     else
-       str->str_bf = FMAKE_N(char, MAX_BFSZ,
-			     "SC_OPEN_LEXICAL_STREAM:str_bf");
+       str->str_bf = CMAKE_N(char, MAX_BFSZ);
 
     str->str_ptr = str->str_bf;
     str->in_ptr  = str->in_bf;
@@ -175,14 +167,14 @@ void SC_close_lexical_stream(SC_lexical_stream *str)
 
     if (str->name != NULL)
        {io_close(str->file);
-        SFREE(str->name);};
+        CFREE(str->name);};
 
-    SFREE(str->tokens);
-    SFREE(str->in_bf);
-    SFREE(str->out_bf);
-    SFREE(str->str_bf);
+    CFREE(str->tokens);
+    CFREE(str->in_bf);
+    CFREE(str->out_bf);
+    CFREE(str->str_bf);
 
-    SFREE(str);
+    CFREE(str);
 
     return;}
 
@@ -309,7 +301,7 @@ void SC_lex_push_token(int type, ...)
 
     if (str->n_tokens >= str->n_tokens_max)
        {str->n_tokens_max += 50;
-        REMAKE_N(str->tokens, SC_lexical_token, str->n_tokens_max);};
+        CREMAKE(str->tokens, SC_lexical_token, str->n_tokens_max);};
 
     return;}
 

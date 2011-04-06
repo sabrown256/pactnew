@@ -39,7 +39,7 @@ char *_PD_member_type(char *s)
     else
        SC_strtok(bf, " \t\n\r", pt);
 
-    return(SC_strsavef(bf, "char*:_PD_MEMBER_TYPE:bf"));}
+    return(CSTRSAVE(bf));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -55,7 +55,7 @@ char *_PD_member_base_type(char *s)
     strcpy(bf, s);
     token = SC_strtok(bf, " *", p);
 
-    p = SC_strsavef(token, "char*:_PD_MEMBER_BASE_TYPE:token");
+    p = CSTRSAVE(token);
 
     return(p);}
 
@@ -98,7 +98,7 @@ char *_PD_member_name(char *s)
 /* get the name without any dimension info */
 	token = SC_strtok(pt, "()[", p);
 
-	p = SC_strsavef(token, "char*:_PD_MEMBER_NAME:token");}
+	p = CSTRSAVE(token);}
     else
        p = NULL;
 
@@ -119,7 +119,7 @@ char *_PD_var_name(char *s)
     strcpy(bf, s);
     token = SC_strtok(bf, "([", p);
 
-    p = SC_strsavef(token, "char*:_PD_VAR_NAME:token");
+    p = CSTRSAVE(token);
 
     return(p);}
 

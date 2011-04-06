@@ -574,7 +574,7 @@ pcons *_PA_process_att(int tag, va_list *list, pcons *alist)
 	value_name = PA_cpp_value_to_name(group, ival);
 
 	if (value_name != NULL)
-	   {pival = FMAKE(int, "_PA_PROCESS_ATT:pival");
+	   {pival = CMAKE(int);
 	    *pival = ival;
 	    alist = SC_add_alist(alist,
 				 tag_name,
@@ -649,7 +649,7 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
        {dm = SC_VA_ARG(int);
         if ((dm == PER) || (dm == UNITS))
            break;
-        pv  = FMAKE(int, "_PA_PROCESS_UNITS:pv");
+        pv  = CMAKE(int);
         *pv = dm;
         next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
         if (nu == NULL)
@@ -661,7 +661,7 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
     du = NULL;
     if (dm != UNITS)
        while ((dm = SC_VA_ARG(int)) != UNITS)
-          {pv  = FMAKE(int, "_PA_PROCESS_UNITS:pv");
+          {pv  = CMAKE(int);
            *pv = dm;
 	   next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
            if (du == NULL)

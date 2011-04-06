@@ -248,7 +248,7 @@ static PG_device *_PG_PS_open(PG_device *dev,
     io_printf(ps_fp, "%%%%Title: %s plots\n", lname);
     date = SC_date();
     io_printf(ps_fp, "%%%%CreationDate: %s\n", date);
-    SFREE(date);
+    CFREE(date);
 
     io_printf(ps_fp, "%%%%BoundingBox: 0 0 612 792\n");
     io_printf(ps_fp, "%%%%DocumentFonts: Helvetica\n");
@@ -691,7 +691,7 @@ static void _PG_PS_write_text(PG_device *dev, FILE *fp, char *s)
 
     nlrp = SC_char_count(s, '(') + SC_char_count(s, ')');
     if (nlrp > 0)
-       {t = FMAKE_N(char, strlen(s) + nlrp + 1, "_PG_PS_WRITE_TEXT:t");
+       {t = CMAKE_N(char, strlen(s) + nlrp + 1);
         strcpy(t, s);
         SC_str_replace(t, "(", "\\(");
         SC_str_replace(t, ")", "\\)");}
@@ -740,7 +740,7 @@ static void _PG_PS_write_text(PG_device *dev, FILE *fp, char *s)
        io_printf(file, "grestore\n");
 
     if (nlrp > 0)
-       SFREE(t);
+       CFREE(t);
 
     return;}
  

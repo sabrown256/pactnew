@@ -383,7 +383,7 @@ int SS_set_scheme_env(char *exepath, char *path)
             err = SC_putenv(npath);
             rv  = (err == 0);
 
-	    SFREE(npath);};};
+	    CFREE(npath);};};
 
     return(rv);}
 
@@ -553,8 +553,8 @@ static object *SS_make_ext_boolean(char *name, int val)
 void SS_inst_const(void)
    {
 
-    SS_OBJECT_S  = SC_strsavef("object", "char*:SS_INST_CONST:object");
-    SS_POBJECT_S = SC_strsavef("object *", "char*:SS_INST_CONST:pobject");
+    SS_OBJECT_S  = CSTRSAVE("object");
+    SS_POBJECT_S = CSTRSAVE("object *");
 
     SS_quoteproc = SS_get_ext_ref("quote");
     SS_quasiproc = SS_get_ext_ref("quasiquote");
@@ -616,22 +616,19 @@ void SS_init_cont(void)
     SS_nsetc = 0;
     SS_ngoc  = 0;
 
-    SS_continue = FMAKE_N(continuation, SS_stack_size,
-			  "SS_INIT_CONT:SS_continue");
+    SS_continue = CMAKE_N(continuation, SS_stack_size);
     if (SS_continue == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < SS_stack_size; SS_continue[i++].signal = SS_null);
     SS_cont_ptr = 0;
 
-    SS_err_continue = FMAKE_N(err_continuation, SS_stack_size,
-			      "SS_INIT_CONT:err_continue");
+    SS_err_continue = CMAKE_N(err_continuation, SS_stack_size);
     if (SS_err_continue == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < SS_stack_size; SS_err_continue[i++].signal = SS_null);
     SS_err_cont_ptr = 0;
 
-    SS_err_stack = FMAKE_N(object *, SS_stack_size,
-			   "SS_INIT_CONT:err_stack");
+    SS_err_stack = CMAKE_N(object *, SS_stack_size);
     if (SS_err_stack == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
     for (i = 0; i < SS_stack_size; SS_err_stack[i++] = NULL);
@@ -650,13 +647,13 @@ void SS_expand_stack(void)
     size = SS_stack_size;
     SS_stack_size = 2*size;
 
-    REMAKE_N(SS_continue, continuation, SS_stack_size);
+    CREMAKE(SS_continue, continuation, SS_stack_size);
     for (i = size; i < SS_stack_size; SS_continue[i++].signal = SS_null);
 
-    REMAKE_N(SS_err_continue, err_continuation, SS_stack_size);
+    CREMAKE(SS_err_continue, err_continuation, SS_stack_size);
     for (i = size; i < SS_stack_size; SS_err_continue[i++].signal = SS_null);
 
-    REMAKE_N(SS_err_stack, object *, SS_stack_size);
+    CREMAKE(SS_err_stack, object *, SS_stack_size);
     for (i = size; i < SS_stack_size; SS_err_stack[i++] = NULL);
 
     return;}
@@ -703,7 +700,7 @@ object *SS_lookup_object(object *obj)
 
     obj = SS_bound_name(name);
 
-    SFREE(name);
+    CFREE(name);
 
     if (SS_variablep(obj))
        {vnm = SS_VARIABLE_NAME(obj);
@@ -1019,7 +1016,7 @@ void SS_error(char *s, object *obj)
     FILE *str;
     object *esc;
 
-    t = SC_strsavef(s, "char*:SS_ERROR:t");
+    t = CSTRSAVE(s);
 
     SS_Assign(SS_err_state, SS_make_list(SS_OBJECT_I, SS_Fun,
 					 SS_OBJECT_I, SS_Argl,
@@ -1031,7 +1028,7 @@ void SS_error(char *s, object *obj)
     if (_SS.pr_err != NULL)
        SS_PRINT_ERR_MSG(str, t, obj);
 
-    SFREE(t);
+    CFREE(t);
 
     t = SS_BUFFER(SS_indev);
     SS_PTR(SS_indev) = t;
@@ -1150,7 +1147,7 @@ static object *_SSI_system(object *argl)
     else
        rv = SYSTEM(cmd);
 
-    SFREE(cmd);
+    CFREE(cmd);
 
     o = SS_mk_integer(rv);
 
@@ -1184,7 +1181,7 @@ static object *_SSI_syscmnd(object *argl)
     else
        output = SC_syscmnd(cmd);
 
-    SFREE(cmd);
+    CFREE(cmd);
 
     lst = SS_null;
     if (output != NULL)

@@ -61,10 +61,10 @@ int main(argc, argv)
 	printf("Data Standard  = %d\nData Alignment = %d\n", is, ia);};
 	
 #ifdef PDB_TIME
-    names = MAKE_N(char *, n);
+    names = CMAKE_N(char *, n);
     for (i = 0; i < n; i++)
         {snprintf(s, 20, "f%d-%d(%d)", len, i, len);
-	 names[i] = SC_strsave(s);};
+	 names[i] = CSTRSAVE(s);};
     SC_zero_space_n(0, -2);
     strcpy(filename, "time.pdb");
     if ((pdbf = PD_open(filename, "w")) == NULL)
@@ -83,7 +83,7 @@ int main(argc, argv)
     printf("\nArray Size  Iterations    Time        Rate\n");
     printf("(elements)                (sec)    (bytes/sec)\n");
 
-    if ((f = MAKE_N(double, len)) == NULL)
+    if ((f = CMAKE_N(double, len)) == NULL)
        {printf("\nCAN'T ALLOCATE %d DOUBLES\n\n", len);
 	exit(1);};
 
@@ -105,7 +105,7 @@ int main(argc, argv)
     printf("%8d   %8d   %11.3e %11.3e\n\n", len, n,
 	   dt, ((double) bytes)/dt);
 
-    SFREE(f);
+    CFREE(f);
 
 #ifdef PDB_TIME
     PD_close(pdbf);

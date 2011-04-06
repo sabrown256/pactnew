@@ -189,7 +189,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
        {dm = SC_VA_ARG(int);
         if ((dm == PER) || (dm == UNITS))
            break;
-        pv  = FMAKE(int, "PA_DEF_VAR:pv");
+        pv  = CMAKE(int);
         *pv = dm;
         nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
         if (nu == NULL)
@@ -201,7 +201,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
     du = NULL;
     if (dm != UNITS)
        while ((dm = SC_VA_ARG(int)) != UNITS)
-          {pv  = FMAKE(int, "PA_DEF_VAR:pv");
+          {pv  = CMAKE(int);
            *pv = dm;
            nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
            if (du == NULL)
@@ -335,7 +335,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
        {dm = SC_VA_ARG(int);
         if ((dm == PER) || (dm == UNITS))
            break;
-        pv  = FMAKE(int, "PA_INST_VAR:pv");
+        pv  = CMAKE(int);
         *pv = dm;
         nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
         if (nu == NULL)
@@ -347,7 +347,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
     du = NULL;
     if (dm != UNITS)
        while ((dm = SC_VA_ARG(int)) != UNITS)
-          {pv  = FMAKE(int, "PA_INST_VAR:pv");
+          {pv  = CMAKE(int);
            *pv = dm;
            nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
            if (du == NULL)
@@ -432,7 +432,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
        {dm = SC_VA_ARG(int);
         if ((dm == PER) || (dm == UNITS))
            break;
-        pv  = FMAKE(int, "PA_INST_SCALAR:pv");
+        pv  = CMAKE(int);
         *pv = dm;
         next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
         if (nu == NULL)
@@ -444,7 +444,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
     du = NULL;
     if (dm != UNITS)
        while ((dm = SC_VA_ARG(int)) != UNITS)
-          {pv  = FMAKE(int, "PA_INST_SCALAR:pv");
+          {pv  = CMAKE(int);
            *pv = dm;
            next = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
            if (du == NULL)
@@ -854,19 +854,19 @@ void _PA_rdrstrt(char *fname, int conv_flag)
     for (pck = Packages; pck != NULL; pck = pck->next)
         {pck_name = pck->name;
          snprintf(bf, MAXLINE, "%s-names", pck_name);
-         SFREE(pck->ascii);
+         CFREE(pck->ascii);
          pp = PA_INQUIRE_VARIABLE(bf);
          if (pp != NULL)
             PA_CONNECT(pck->ascii, bf, TRUE);
 
          snprintf(bf, MAXLINE, "%s-params", pck_name);
-         SFREE(pck->rparam);
+         CFREE(pck->rparam);
          pp = PA_INQUIRE_VARIABLE(bf);
          if (pp != NULL)
             PA_CONNECT(pck->rparam, bf, TRUE);
 
          snprintf(bf, MAXLINE, "%s-swtchs", pck_name);
-         SFREE(pck->iswtch);
+         CFREE(pck->iswtch);
          pp = PA_INQUIRE_VARIABLE(bf);
          if (pp != NULL)
             PA_CONNECT(pck->iswtch, bf, TRUE);};
@@ -894,8 +894,7 @@ void _PA_rdrstrt(char *fname, int conv_flag)
 	    continue;
 
 	 if (PA_VARIABLE_SCOPE(pp) == DMND)
-	    {PA_VARIABLE_FILE_NAME(pp)    = SC_strsavef(_PA_rsname,
-							"char*:_PA_RDRSTRT:rsname");
+	    {PA_VARIABLE_FILE_NAME(pp)    = CSTRSAVE(_PA_rsname);
 	     PA_VARIABLE_FILE_CONVERS(pp) = conv_flag;
 	     PA_VARIABLE_FILE(pp)         = pdrs;
 	     n_dmnd++;}
@@ -918,12 +917,11 @@ void _PA_rdrstrt(char *fname, int conv_flag)
     PA_advance_name(_PA_rsname);
 
     if (_PA_state_files == NULL)
-       {_PA_state_files = FMAKE_N(PDBfile *, _PA_max_state_files,
-                                  "_PA_RDRSTRT:files");}
+       {_PA_state_files = CMAKE_N(PDBfile *, _PA_max_state_files);}
 
     else if (_PA_n_state_files >= _PA_max_state_files)
        {_PA_max_state_files += 10;
-        REMAKE_N(_PA_state_files, PDBfile *, _PA_max_state_files);};
+        CREMAKE(_PA_state_files, PDBfile *, _PA_max_state_files);};
 
     _PA_state_files[_PA_n_state_files++] = pdrs;
 

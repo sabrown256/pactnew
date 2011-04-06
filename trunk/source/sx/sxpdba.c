@@ -135,8 +135,7 @@ static object *_SXI_set_attr_val(object *argl)
         {char **cv;
 
          cv   = CMAKE(char *);
-         *cv  = SC_strsavef(SS_STRING_TEXT(obj),
-                "char*:_SXI_SET_ATTR_VAL:cv");
+         *cv  = CSTRSAVE(SS_STRING_TEXT(obj));
          data = (void *) cv;}
 
     else if (id == SC_CHAR_I)
@@ -276,9 +275,9 @@ static object *_SXI_lst_attr(object *argl)
         {if (strcmp(ty, "attribute *") == 0)
 	    {if (attr != NULL)
 	        {if (attr->data != NULL)
-		    entries[n++] = SC_strsavef(name, "char*:_SXI_LST_ATTR:name");};};};
+		    entries[n++] = CSTRSAVE(name);};};};
 
-    REMAKE_N(entries, char *, n);
+    CREMAKE(entries, char *, n);
 
 /* listify the names and release them */
     obj = SS_null;
@@ -287,10 +286,10 @@ static object *_SXI_lst_attr(object *argl)
          if (name != NULL)
             {SS_Assign(obj, SS_mk_cons(SS_mk_string(name), obj));};
 
-         SFREE(name);};
+         CFREE(name);};
 
 /* release the pointers */
-    SFREE(entries);
+    CFREE(entries);
 
     return(obj);}
 

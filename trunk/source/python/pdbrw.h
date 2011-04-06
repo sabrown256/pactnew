@@ -27,10 +27,10 @@ typedef enum e_PD_instr_kind PD_instr_kind;
  
 #define SAVE_S(s, t)                                                         \
     {str_stack[str_ptr++] = s;                                               \
-     s = SC_strsavef(t, "char*:SAVE_S:t");}
+     s = CSTRSAVE(t);}
 
 #define RESTORE_S(s)                                                         \
-    {SFREE(s);                                                               \
+    {CFREE(s);                                                               \
      s = str_stack[--str_ptr];}
 
 #define SAVE_I(val)     lval_stack[lval_ptr++].diskaddr = (long) val;

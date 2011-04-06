@@ -28,7 +28,7 @@ int PM_svd_solve(double *u, double *w, double *v, int m, int n,
     double s;
     double *t;
 
-    t = FMAKE_N(double, n, "PM_SVD_SOLVE:t");
+    t = CMAKE_N(double, n);
 
 /* compute tr(U).B */
     for (j = 0; j < n;j++)
@@ -50,7 +50,7 @@ int PM_svd_solve(double *u, double *w, double *v, int m, int n,
 
 	 x[j] = s;};
 
-    SFREE(t);
+    CFREE(t);
 
     return(TRUE);}
 
@@ -69,7 +69,7 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
     g    = 0.0;
     sc   = 0.0;
 
-    rv1 = FMAKE_N(double, n, "_PM_SVD_REDUCE:rv1");
+    rv1 = CMAKE_N(double, n);
     for (i = 0; i < n; i++)
         {l = i + 1;
 
@@ -411,7 +411,7 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
 	       rv1[k] = f;
 	       w[k]   = x;};};
 
-    SFREE(rv1);
+    CFREE(rv1);
 
     return(TRUE);}
      
@@ -439,8 +439,8 @@ int PM_svd_fit(double *x, double *y, double *sig, int np,
     double wmax, c, wl, afs, cs;
     double *b, *f;
 
-    b = FMAKE_N(double, np, "PM_SVD_FIT:b");
-    f = FMAKE_N(double, ma, "PM_SVD_FIT:f");
+    b = CMAKE_N(double, np);
+    f = CMAKE_N(double, ma);
 
     for (i = 0; i < np; i++)
         {(*fnc)(x[i], f, ma);
@@ -477,8 +477,8 @@ int PM_svd_fit(double *x, double *y, double *sig, int np,
 	 c   = (y[i] - afs)/sig[i];
 	 cs += c*c;};
 
-    SFREE(f);
-    SFREE(b);
+    CFREE(f);
+    CFREE(b);
 
     if (pcs != NULL)
        *pcs = cs;
@@ -498,7 +498,7 @@ int PM_svd_covariance(double **v, int ma, double *w, double **cvm)
    {int i, j, k;
     double c, *wti;
 
-    wti = FMAKE_N(double, ma, "PM_SVD_COVARIANCE:wti");
+    wti = CMAKE_N(double, ma);
 
     for (i = 0; i < ma; i++)
         {wti[i] = 0.0;
@@ -514,7 +514,7 @@ int PM_svd_covariance(double **v, int ma, double *w, double **cvm)
 	      cvm[j][i] = c;
 	      cvm[i][j] = c;};};
 
-    SFREE(wti);
+    CFREE(wti);
 
     return(TRUE);}
 

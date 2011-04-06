@@ -36,8 +36,8 @@ static void *mm_test(arg)
     n = parallel.niter;
 
     for (i = 1; i <= n; ++i)
-      {arr = FMAKE_N(double, 1, "MM_TEST:arr");
-       SFREE(arr);};
+      {arr = CMAKE_N(double, 1);
+       CFREE(arr);};
 
 /* Make sure we get the correct key value back */
     index = 1;

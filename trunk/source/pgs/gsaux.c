@@ -100,7 +100,7 @@ static int PG_CGM_color(PG_device *dev, PG_palette *cp, int offs)
     nw = nb + fl*24;
 
     nz = nb + 28;
-    out = FMAKE_N(unsigned char, nz, "PG_CGM_COLOR:out");
+    out = CMAKE_N(unsigned char, nz);
     memset(out, 0, nz);
 
 /* GOTCHA: not prepared to handle more than 4K of color table data yet
@@ -128,7 +128,7 @@ static int PG_CGM_color(PG_device *dev, PG_palette *cp, int offs)
 /* write the buffer */
     no = io_write(out, 1L, na, dev->file);
 
-    SFREE(out);
+    CFREE(out);
 
     return((no == na) ? nb : -1);}
 

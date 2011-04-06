@@ -375,7 +375,7 @@ static INLINE int _PM_insert_point(int i, int ln, int lx, int **pd, int *pn)
 
      if (n >= lx)
         {n += 10;
-	 REMAKE_N(d, int, n);};
+	 CREMAKE(d, int, n);};
 
      for (l = lx-1; l > ln; l--)
          d[l] = d[l-1];
@@ -458,7 +458,7 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
 
 /* make the first point be the minimum y point */
     SC_SWAP_VALUE(pt, pa[imn], pa[0]);
-    SFREE(pa);
+    CFREE(pa);
 
     SC_array_sort(a, _PM_by_angle);
     pa = SC_array_array(a);
@@ -486,7 +486,7 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
 
     py->nn = py->np;
 
-    SFREE(pa);
+    CFREE(pa);
     SC_free_array(a, NULL);
 
     return(py);}
@@ -968,7 +968,7 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 
     n     = 100;
     xi    = PM_make_vectors(nd, n);
-    sides = FMAKE_N(int, n, "PM_INTERSECT_LINE_POLYGON:sides");
+    sides = CMAKE_N(int, n);
 
     ni = 0;
     for (i = 1; i < nn; i++)
@@ -1007,7 +1007,7 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
        *pxi = xi;
 
     if (psides == NULL)
-       {SFREE(sides);}
+       {CFREE(sides);}
     else
        *psides = sides;
 
@@ -1192,7 +1192,7 @@ static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
 
 	 PM_copy_point(nda, x1, x2);
 	 PM_free_vectors(ndb, xi);
-	 SFREE(sides);};
+	 CFREE(sides);};
 
     _PM_add_node(pc, x1, NULL);
 
@@ -1200,16 +1200,16 @@ static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
     nc = pc->nn;
     nb = nc*sizeof(int);
 
-    mk = FMAKE_N(signed char, nc, "_PM_DECOMPOSE_POLYGON:mk");
+    mk = CMAKE_N(signed char, nc);
     memset(mk, 0, nc);
 
-    wh = FMAKE_N(signed char, nc, "_PM_DECOMPOSE_POLYGON:wh");
+    wh = CMAKE_N(signed char, nc);
     memset(wh, 0, nc);
 
-    bnd = FMAKE_N(int, nb, "_PM_DECOMPOSE_POLYGON:bnd");
+    bnd = CMAKE_N(int, nb);
     memset(bnd, 0, nb);
 
-    pw = FMAKE(polywalk, "_PM_DECOMPOSE_POLYGON:pw");
+    pw = CMAKE(polywalk);
     pw->nn        = nc;
     pw->nt        = 0;
     pw->marked    = mk;
@@ -1230,10 +1230,10 @@ static void _PM_free_polywalk(polywalk *pw, int rel)
     if (rel == TRUE)
        PM_free_polygon(pw->py);
 
-    SFREE(pw->marked);
-    SFREE(pw->where);
-    SFREE(pw->boundary);
-    SFREE(pw);
+    CFREE(pw->marked);
+    CFREE(pw->where);
+    CFREE(pw->boundary);
+    CFREE(pw);
 
     return;}
 
@@ -1918,7 +1918,7 @@ double **PM_convert_vectors(int nd, int n, void *v, char *typ)
     double **t, **x;
 
     x = (double **) v;
-    t = FMAKE_N(double *, nd, "PM_CONVERT_VECTORS:t");
+    t = CMAKE_N(double *, nd);
 
     for (id = 0; id < nd; id++)
         t[id] = PM_array_real(typ, x[id], n, NULL);

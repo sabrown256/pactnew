@@ -104,7 +104,7 @@ void dpenv(object *penv)
 		     snprintf(pre, MAXLINE, "%4d\t%s\t", nx, lines[nx-1]);
 		     SS_print(b, pre, "\n", SS_outdev);};
 
-		 SFREE(lines);};};};
+		 CFREE(lines);};};};
 
     return;}
 
@@ -359,8 +359,8 @@ static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
 	ok = SC_putenv(s);
 	SC_ASSERT(ok == TRUE);
 
-	SFREE(s);
-	SFREE(t);};
+	CFREE(s);
+	CFREE(t);};
 
     return;}
 
@@ -459,7 +459,7 @@ char **SS_bound_vars(char *patt, object *penv)
 
     vrs = SC_hasharr_dump(tab, patt, NULL, TRUE);
     for (i = 0; vrs[i] != NULL; i++)
-        vrs[i] = SC_strsavef(vrs[i], "char*:SS_BOUND_VARS:vrs[i]");
+        vrs[i] = CSTRSAVE(vrs[i]);
 
     return(vrs);}
 
@@ -784,7 +784,7 @@ char *_SS_get_print_name(object *o)
 	else
 	   s = "- no print name -";
 
-	rv = SC_strsavef(s, "char*:_SS_GET_PRINT_NAME:s");};
+	rv = CSTRSAVE(s);};
 
     return(rv);}
 
@@ -830,7 +830,7 @@ void SS_env_vars(char **vrs, object *penv)
 	        {*p = '\0';
 
 		 nc = strlen(s) + 2;
-		 vr = FMAKE_N(char, nc, "char*:SS_ENV_VARS:s");
+		 vr = CMAKE_N(char, nc);
 		 snprintf(vr, nc, "$%s", s);
 
 		 vl = SS_mk_string(p+1);
@@ -838,7 +838,7 @@ void SS_env_vars(char **vrs, object *penv)
 		 _SS_def_varc(vr, vl, penv);
 
 		 *p  = '=';
-		 SFREE(vr);};};};
+		 CFREE(vr);};};};
 
     SS_know_env = TRUE;
 

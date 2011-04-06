@@ -133,7 +133,7 @@ int main(int c, char **v, char **env)
 
         ret = 0;};
 
-    SFREE(cmnd);
+    CFREE(cmnd);
 
     return(ret);}
 

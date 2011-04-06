@@ -76,7 +76,7 @@ void _SS_rl_process(object *obj)
     pp = SS_PROCESS_VALUE(obj);
     SC_close(pp);
 
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_OBJECT(obj));
 
     return;}
 
@@ -139,7 +139,7 @@ static object *_SSI_opn_pr(object *argl)
     n = (int) SS_length(argl);
 
 /* we need one extra for a NULL argument to terminate argv */
-    argv = FMAKE_N(char *, n+1, "_SSI_OPN_PR:argv");
+    argv = CMAKE_N(char *, n+1);
 
     for (i = 0 ; i < n; argl = SS_cdr(argl))
         {obj = SS_car(argl);
@@ -158,7 +158,7 @@ static object *_SSI_opn_pr(object *argl)
     if (pp == NULL)
        SS_error("CAN'T OPEN PROCESS - PROCESS-OPEN", obj);
 
-    SFREE(argv);
+    CFREE(argv);
 
     obj = SS_mk_object(pp, SS_PROCESS_I, SELF_EV, NULL,
 		       _SS_wr_process, _SS_rl_process);
@@ -346,7 +346,7 @@ static object *_SSI_get_host_name(object *argl)
 
     ret = SC_get_host_name(hst, MAXLINE, sys);
 
-    SFREE(sys);
+    CFREE(sys);
 
     if (ret)
        rv = SS_mk_string(hst);

@@ -84,8 +84,8 @@ PG_picture_desc *PG_setup_picture_dv_bnd(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, 2, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);};
+	CFREE(ddex);
+	CFREE(rdex);};
 
     return(pd);}
 
@@ -205,13 +205,13 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 
 /* reset user's values for various attributes */
 	 PG_set_attributes(dev, attr);
-	 SFREE(attr);
+	 CFREE(attr);
 
 	 PM_free_vectors(2, d);
 
-	 SFREE(aext);
+	 CFREE(aext);
 	 if (!same)
-	    SFREE(afd);};
+	    CFREE(afd);};
 
     return;}
 
@@ -328,7 +328,7 @@ static void *_PG_dvb_chunk_zc_lr(void *arg)
 	        PG_draw_line_n(dev, 2, WORLDC, x4c, x1c, dev->clipping);};
 
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     return(rv);}
 
@@ -394,9 +394,9 @@ static void PG_dv_bnd_nc_lr(PG_device *dev, int nd, int *a,
 
     PG_dv_bnd_zc_lr(dev, nd, ia, x, y, npts, aext, cnnct, alist);
 
-    SFREE(ap);
-    SFREE(ra);
-    SFREE(ia);
+    CFREE(ap);
+    CFREE(ra);
+    CFREE(ia);
 
     return;}
   
@@ -439,8 +439,8 @@ void PG_dv_bnd_zc_ac(PG_device *dev, int nd, int *a,
 
 /* can compute this by looping over the sides */
     npt = 4*nz;
-    nd1 = FMAKE_N(int, npt, "PG_DV_BND_ZC_AC:nd1");
-    nd2 = FMAKE_N(int, npt, "PG_DV_BND_ZC_AC:nd2");
+    nd1 = CMAKE_N(int, npt);
+    nd2 = CMAKE_N(int, npt);
 
     a1 = aext[0];
     a2 = aext[1];
@@ -496,8 +496,8 @@ void PG_dv_bnd_zc_ac(PG_device *dev, int nd, int *a,
 	 x2[1] = y[in2];
 	 PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);};
 
-    SFREE(nd1);
-    SFREE(nd2);
+    CFREE(nd1);
+    CFREE(nd2);
 
     return;}
 
@@ -525,9 +525,9 @@ static void PG_dv_bnd_nc_ac(PG_device *dev, int nd, int *a,
 
     PG_dv_bnd_zc_ac(dev, nd, ia, x, y, npts, aext, cnnct, alist);
 
-    SFREE(ap);
-    SFREE(ia);
-    SFREE(ra);
+    CFREE(ap);
+    CFREE(ia);
+    CFREE(ra);
 
     return;}
   

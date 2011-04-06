@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     maxes[1] = Y_max;
     n_pts    = X_max*Y_max;
 
-    emap = FMAKE_N(char, n_pts, "GSSFTS.C:emap");
+    emap = CMAKE_N(char, n_pts);
     memset(emap, 1, n_pts);
     alist = PG_set_attrs_alist(NULL,
 			      "EXISTENCE", SC_CHAR_I, TRUE, emap,
@@ -186,16 +186,16 @@ int main(int argc, char **argv)
 	    PG_set_palette(PS_cdev, palettes[palette]);
 	    PG_set_palette(CGM_cdev, palettes[palette]);};};
 
-    rx = px = FMAKE_N(double, n_pts, "GSSFTS.C:rx");
-    ry = py = FMAKE_N(double, n_pts, "GSSFTS.C:ry");
-    rz = pz = FMAKE_N(double, n_pts, "GSSFTS.C:rz");
+    rx = px = CMAKE_N(double, n_pts);
+    ry = py = CMAKE_N(double, n_pts);
+    rz = pz = CMAKE_N(double, n_pts);
 
     if (pty == PLOT_SURFACE)
-       rs = ps = FMAKE_N(double, n_pts, "GSSFTS.C:rs");
+       rs = ps = CMAKE_N(double, n_pts);
     else
        rs = ps = pz;
 
-    ext = FMAKE_N(double, 4, "GSSFTS.C:ext");
+    ext = CMAKE_N(double, 4);
     ext[0] = -1;
     ext[1] =  1;
     ext[2] = -1;
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
 	PG_close_device(PS_mdev);
 	PG_close_device(CGM_mdev);};
 
-    SFREE(emap);
+    CFREE(emap);
 
     exit(0);}
 

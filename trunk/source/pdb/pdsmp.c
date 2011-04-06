@@ -60,7 +60,7 @@ static void release(void *p, char *lbl, int op)
    {extern void dprap(PDBfile *file);
 
     if (p != NULL)
-       SFREE(p);
+       CFREE(p);
 
     return;}
 
@@ -72,8 +72,8 @@ static void release(void *p, char *lbl, int op)
 static void setup_plot(myplot *xp, int whch)
    {int i;
 
-    xp->label = SC_strsavef("Myplot Xplot label", "char*:SETUP_PLOT:label");
-    xp->view  = FMAKE(l_frame, "SETUP_PLOT:view");
+    xp->label = CSTRSAVE("Myplot Xplot label");
+    xp->view  = CMAKE(l_frame);
 
     if (whch == 0)
        {mypl.view->x_min = 0.1;
@@ -121,10 +121,10 @@ myplot *make_plot(void)
    {int i;
     myplot *xp;
 
-    xp = FMAKE(myplot, "MAKE_PLOT:xp");
+    xp = CMAKE(myplot);
 
-    xp->label = SC_strsavef("Dynamic XP label", "char*:MAKE_PLOT:xp");
-    xp->view  = FMAKE(l_frame, "MAKE_PLOT:view");
+    xp->label = CSTRSAVE("Dynamic XP label");
+    xp->view  = CMAKE(l_frame);
 
     xp->view->x_min = 0.2;
     xp->view->x_max = 0.9;

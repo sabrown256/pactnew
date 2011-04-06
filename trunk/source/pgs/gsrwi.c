@@ -107,12 +107,11 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
     if (strcmp(type, PG_TEXT_OBJECT_S) == 0)
        {PG_text_box *b;
 
-        SFREE(iob->name);
+        CFREE(iob->name);
 	b = (PG_text_box *) iob->obj;
 	
 	snprintf(s, MAXLINE, "\"%s\"", b->text_buffer[0]);
-	iob->name = SC_strsavef(s,
-                    "char*:PG_WRITE_INTERFACE_OBJECT:name");};
+	iob->name = CSTRSAVE(s);};
 
     if (iob->name != NULL)
        PRINT(fp, " NAME(%s)", iob->name);
@@ -479,8 +478,8 @@ static void _PG_fix_boundary(PG_device *dev, int *pnp, double **pxd, double **py
     tok = SC_firsttok(ps, ")");
     if (strcmp(tok, "RECT") == 0)
        {npt = 5;
-	xd  = FMAKE_N(double, npt, "_PG_FIX_BOUNDARY:xd");
-	yd  = FMAKE_N(double, npt, "_PG_FIX_BOUNDARY:yd");
+	xd  = CMAKE_N(double, npt);
+	yd  = CMAKE_N(double, npt);
         ok  = FALSE;
 	if (_PG_get_xy(&xs, &ys, xmn, ymn, dx, dy, ps))
            {xd[0] = xs;
@@ -496,18 +495,18 @@ static void _PG_fix_boundary(PG_device *dev, int *pnp, double **pxd, double **py
                 yd[3] = ys;
                 ok    = TRUE;};};
         if (!ok)
-           {SFREE(xd);
-            SFREE(yd);
+           {CFREE(xd);
+            CFREE(yd);
             npt = -1;};}
 
     else
        {npt = SC_stoi(tok);
-	xd  = FMAKE_N(double, npt, "_PG_FIX_BOUNDARY:xd");
-	yd  = FMAKE_N(double, npt, "_PG_FIX_BOUNDARY:yd");
+	xd  = CMAKE_N(double, npt);
+	yd  = CMAKE_N(double, npt);
 	for (i = 0; i < npt; i++)
 	    {if (!_PG_get_xy(&xd[i], &yd[i], xmn, ymn, dx, dy, ps))
-                {SFREE(xd);
-                 SFREE(yd);
+                {CFREE(xd);
+                 CFREE(yd);
                  npt = -1;
                  break;};};};
 

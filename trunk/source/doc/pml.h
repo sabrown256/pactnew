@@ -1,5 +1,5 @@
 TXT: PML User's Manual
-MOD: 09/29/2010
+MOD: 04/06/2011
 
 <CENTER>
 <P>
@@ -231,8 +231,8 @@ other sets it knows about.<p>
 <a name="PMLexampset"></a>
 <b> Example of building a set</b><br><br>
 This example is taken from the source for PML and illustrates how a
-set can be built. The routine uses the SCORE functions MAKE, MAKE_N,
-SC_arrlen, and SC_strsave as well as the SCORE variable SC_DOUBLE_S.<p>
+set can be built. The routine uses the SCORE functions CMAKE, CMAKE_N,
+SC_arrlen, and CSTRSAVE as well as the SCORE variable SC_DOUBLE_S.<p>
 
 <BLOCKQUOTE>
 <PRE> 
@@ -254,10 +254,10 @@ main()
     ymax = 5.0;
 
     kxl  = kmax*lmax;
-    x    = MAKE_N(double, kxl);
-    y    = MAKE_N(double, kxl);
-    u    = MAKE_N(double, kxl);
-    v    = MAKE_N(double, kxl);
+    x    = CMAKE_N(double, kxl);
+    y    = CMAKE_N(double, kxl);
+    u    = CMAKE_N(double, kxl);
+    v    = CMAKE_N(double, kxl);
 
     km   = 2.0*PI/((double) (kmax - 1));
     lm   = 2.0*PI/((double) (lmax - 1));

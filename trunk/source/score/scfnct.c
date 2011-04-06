@@ -46,7 +46,7 @@ char *SC_date(void)
     tm = time(NULL);
     pt = SC_ctime(tm, t, MAXLINE);
     if (pt != NULL)
-       d = SC_strsavef(SC_strtok(t, "\n", s), "char*:SC_DATE:time");
+       d = CSTRSAVE(SC_strtok(t, "\n", s));
     else
        d = NULL;
 

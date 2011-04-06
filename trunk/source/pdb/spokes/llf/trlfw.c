@@ -375,9 +375,9 @@ void LB_vlb(char *orgname, char *stdname, char *orgunits,
     vlb_desc *pv;
 
 /* compute length and get buffer */
-    maxdim = FMAKE_N(int, ndim, "LB_VLB:maxdim");
-    lendim = FMAKE_N(int, ndim, "LB_VLB:lendim");
-    jdim   = FMAKE_N(int, ndim, "LB_VLB:jdim");
+    maxdim = CMAKE_N(int, ndim);
+    lendim = CMAKE_N(int, ndim);
+    jdim   = CMAKE_N(int, ndim);
 
     len = 1;
     for (idim = 0; idim < ndim; idim++)
@@ -391,7 +391,7 @@ void LB_vlb(char *orgname, char *stdname, char *orgunits,
     nwdpdim = 6;
     nwdvlb  = nwdvlbh + nwdpdim*ndim + (2+ndwdpa+len);
 
-    buf = MAKE_N(double, nwdvlb);
+    buf = CMAKE_N(double, nwdvlb);
 
 /* setup header, etc. */
     ph = (vlb_header *) buf;
@@ -458,10 +458,10 @@ void LB_vlb(char *orgname, char *stdname, char *orgunits,
 
     LB_addvlb(buf, nwdvlb);
 
-    SFREE(maxdim);
-    SFREE(lendim);
-    SFREE(jdim);
-    SFREE(buf);
+    CFREE(maxdim);
+    CFREE(lendim);
+    CFREE(jdim);
+    CFREE(buf);
 
     return;}
 

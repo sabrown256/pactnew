@@ -272,7 +272,7 @@ static int _SC_squeeze_tag(char *s, int ns, char *tag)
     if (nb < ns)
        {nb = 2*ns;
 	if (_SC.sqbf != NULL)
-	   {SFREE(_SC.sqbf);};
+	   {CFREE(_SC.sqbf);};
 
 	_SC.sqbf = FMAKE_N(char, nb, "PERM|_SC_SQUEEZE_TAG:bf");};
 
@@ -360,7 +360,7 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 /* if we are even close enlarge the buffer */
 	if (2*ns > nb)
 	   {nb = 2*ns;
-	    REMAKE_N(_SC.ecbf, char, nb);
+	    CREMAKE(_SC.ecbf, char, nb);
 	    _SC.ecbf[nb-1] = '\0';};};
 
     return;}

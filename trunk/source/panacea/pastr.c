@@ -72,7 +72,7 @@ void PA_rl_instance(char *name)
        return;
 
     addr.diskaddr = PD_entry_address(ep);
-    SFREE(addr.memaddr);
+    CFREE(addr.memaddr);
 
     _PD_rl_syment_d(ep);
     SC_hasharr_remove(PA_vif->symtab, name);

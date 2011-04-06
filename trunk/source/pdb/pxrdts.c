@@ -65,7 +65,7 @@ int main(int c, char **v)
     printf("center[0] = %d ; [1] = %d\n", center[0], center[1]);
 
 /* can we read second copy of att hash tab? */
-    tab = FMAKE(hasharr, "PXRDTS.C:tab");
+    tab = CMAKE(hasharr);
 
     if ((PD_read(file, "foo", tab)) == FALSE)
        {printf("Error reading attribute hash table from file.\n");

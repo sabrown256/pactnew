@@ -89,7 +89,7 @@ PFfopen
 file_io_desc *SC_make_io_desc(void *fp)
    {file_io_desc *fid;
 
-    fid = FMAKE(file_io_desc, "SC_MAKE_IO_DESC:fid");
+    fid = CMAKE(file_io_desc);
 
     SC_MEM_INIT(file_io_desc, fid);
 
@@ -345,7 +345,7 @@ static int _SC_fprintf(FILE *fp, char *fmt, va_list a)
     if (fp != NULL)
        {msg = SC_vdsnprintf(TRUE, fmt, a);
 	ret = _SC_fputs(msg, fp);
-	SFREE(msg);};
+	CFREE(msg);};
 
     FLUSH_ON(fp, NULL);
 
@@ -458,7 +458,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
  */
 	if ((addr >= 0) && (nw > 0) && (rw == TRUE))
 	   {nb = bpi*nitems;
-	    t  = FMAKE_N(char, nb, "char*:_SC_FWRITE:t");
+	    t  = CMAKE_N(char, nb);
 
 	    fseek(fp, addr, SEEK_SET);
 	    nr = _SC_fread(t, bpi, nitems, fp);
@@ -477,7 +477,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 	       {nw = 0;
 		fseek(fp, addr, SEEK_SET);};
 
-	    SFREE(t);};}
+	    CFREE(t);};}
 
     else
        nw = _SC_fwrite_atm(s, bpi, nitems, fp);
@@ -577,7 +577,7 @@ static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
    {char *bf, *ps;
     long nbw, nbt, nbr;
 
-    bf = FMAKE_N(char, nbe, "_SC_TRANSFER_BYTES:bf");
+    bf = CMAKE_N(char, nbe);
 
 /* read the data looping until all expected bytes come in */
     nbt = nbe;
@@ -589,7 +589,7 @@ static long _SC_transfer_bytes(int cfd, long nbe, FILE *fp)
 
     nbw = _SC_fwrite(bf, 1, nbe, fp);
 
-    SFREE(bf);
+    CFREE(bf);
 
     return(nbw);}
 
@@ -741,13 +741,11 @@ int SC_file_access(int log)
 		  switch (ptype)
 		     {case 1 :
 		 	   type = _IOFBF;
-			   bf   = FMAKE_N(char, size,
-                                  "SC_FILE_ACCESS:bf");
+			   bf   = CMAKE_N(char, size);
 			   break;
 		      case 2 :
 			   type = _IOLBF;
-			   bf   = FMAKE_N(char, size,
-                                  "SC_FILE_ACCESS:bf");
+			   bf   = CMAKE_N(char, size);
 			   break;
 		      case 3 :
 			   type = _IONBF;
@@ -808,8 +806,7 @@ int SC_file_access(int log)
 
                   nbi = SC_stol(SC_strtok(s+2, ",\n", t));
                   ni  = SC_stol(SC_strtok(NULL, ",\n", t));
-                  bf  = FMAKE_N(char, nbi*ni,
-                        "SC_FILE_ACCESS:bf");
+                  bf  = CMAKE_N(char, nbi*ni);
 
                   nir = SC_fread_sigsafe(bf, nbi, ni, fp);
                   REPLY(READ_MSG, nir);
@@ -817,7 +814,7 @@ int SC_file_access(int log)
                   nbw = SC_write_sigsafe(cfd, bf, nbi*nir);
                   REPLY(READ_MSG, nbw);
 
-                  SFREE(bf);};
+                  CFREE(bf);};
 
                  break;
 
@@ -850,12 +847,11 @@ int SC_file_access(int log)
 
                   nc = SC_stol(SC_strtok(s+2, ",\n", t));
 
-                  bf = FMAKE_N(char, nc+1,
-                               "SC_FILE_ACCESS:bf");
+                  bf = CMAKE_N(char, nc+1);
                   memset(bf, '\n', nc+1);
                   ret = SC_fgets(bf, nc, fp);
                   printf("%s", bf);
-                  SFREE(bf);
+                  CFREE(bf);
 
                   REPLY(GETS_MSG, ((ret == NULL) ? -1 : 1));};
 
@@ -975,7 +971,7 @@ static int _SC_rclose(FILE *stream)
 /* wait for the response */
         ret = _SC_get_cmd_resp(pp, CLOSE_MSG);};
 
-    SFREE(fp);
+    CFREE(fp);
 
     return(ret);}
 
@@ -1205,7 +1201,7 @@ static int _SC_rprintf(FILE *stream, char *fmt, va_list a)
        {msg = SC_vdsnprintf(TRUE, fmt, a);
 	ni  = strlen(msg);
 	nw  = io_write((void *) msg, (size_t) 1, ni, (FILE *) fp->pp);
-	SFREE(msg);};
+	CFREE(msg);};
 
     return(nw);}
 
@@ -1386,13 +1382,13 @@ static FILE *_SC_ropen(char *name, char *mode)
     strcpy(fname, name);
     type = SC_LOCAL;
 
-    fp = FMAKE(REMOTE_FILE, "SC_ROPEN:fp");
+    fp = CMAKE(REMOTE_FILE);
     fp->type = type;
 
     if (type == SC_LOCAL)
        {fp->pp = (PROCESS *) SC_fopen(name, mode);
 	if (!SC_process_alive(fp->pp))
-           {SFREE(fp);};}
+           {CFREE(fp);};}
 
     else
        {get_data_line = FALSE;
@@ -1417,7 +1413,7 @@ static FILE *_SC_ropen(char *name, char *mode)
 
             pp = SC_open(argv, NULL, mode, NULL);
 	    if (!SC_process_alive(pp))
-               {SFREE(fp);
+               {CFREE(fp);
                 return(NULL);};
 
             SC_block(pp);
@@ -1439,7 +1435,7 @@ static FILE *_SC_ropen(char *name, char *mode)
             data = SC_init_client(SC_strtok(s, ",:", t), port);
             if (data == -1)
                {SC_close(pp);
-                SFREE(fp);}
+                CFREE(fp);}
 	    else
 	       {SC_block_fd(data);
 		pp->data = data;};};
@@ -1456,7 +1452,7 @@ static FILE *_SC_ropen(char *name, char *mode)
             fp->file_size = len;}
         else
 	   {SC_close(pp);
-	    SFREE(fp);};};
+	    CFREE(fp);};};
 
     if (fp != NULL)
        {fid          = SC_make_io_desc(fp);
@@ -1500,7 +1496,7 @@ static int _SC_rexit(haelem *hp, void *a)
 /* send the SC_FEXIT command to the server */
     if (SC_process_alive(pp))
        {SC_printf(pp, "%c%c\n", SC_FEXIT, 'A');
-	SFREE(pp);};
+	CFREE(pp);};
 
     return(ret);}
 
@@ -1833,7 +1829,7 @@ int io_close(FILE *fp)
 
 	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FCLOSE);
 
-	    SFREE(fid);};};
+	    CFREE(fid);};};
 
     return(rv);}
 
@@ -1856,7 +1852,7 @@ int io_printf(FILE *fp, char *fmt, ...)
 
 	    SC_mpi_fputs(s, fp);
 
-	    SFREE(s);}
+	    CFREE(s);}
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -2271,7 +2267,7 @@ int lio_close(FILE *fp)
 
 	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FCLOSE);
 
-	    SFREE(fid);};};
+	    CFREE(fid);};};
 
     return(rv);}
 
@@ -2297,7 +2293,7 @@ int lio_printf(FILE *fp, char *fmt, ...)
 
 	    SAFE_FPUTS(s, fp);
 
-	    SFREE(s);}
+	    CFREE(s);}
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -2873,7 +2869,7 @@ char *SC_dgets(char *bf, int *pnc, FILE *fp)
 	   {if (no == 0)
 	       no = MAX_BFSZ;
 
-	    bf = FMAKE_N(char, no, "char*:SC_DGETS:bf");};
+	    bf = CMAKE_N(char, no);};
 
 	ad  = io_tell(fp);
 	nb  = 0;
@@ -2896,11 +2892,11 @@ char *SC_dgets(char *bf, int *pnc, FILE *fp)
 		 else
 		    {no  = nn;
 		     nn  = (no << 1);
-		     REMAKE_N(bf, char, nn);
+		     CREMAKE(bf, char, nn);
 		     pbf = bf + no;};};};
 
 	if (nbr == 0)
-	   {SFREE(bf);
+	   {CFREE(bf);
 	    nn = 0;};
 
 	io_seek(fp, ad + nb, SEEK_SET);

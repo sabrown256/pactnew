@@ -48,12 +48,12 @@ void mm_test(void *x)
 
     if (s)
        for (i = 1; i <= n; ++i)
-           {arr = FMAKE_N(double, i, "MM_TEST:arr");  
+           {arr = CMAKE_N(double, i);  
             if (p)
                printf("(%d,%d) ",
 		      (int) SC_MEM_GET_N(double, arr),
 		      id);
-            SFREE(arr);};
+            CFREE(arr);};
 
     if (m)
        for (i = 1; i <= n; ++i)
@@ -117,11 +117,11 @@ int main(int argc, char **argv)
     SC_SET_KEY(int, index_key, &i);
 
 /* this must appear before any SC_GET_KEYs */
-    indexes    = FMAKE_N(int, n + 1, "MAIN:threads");
+    indexes    = CMAKE_N(int, n + 1);
     indexes[0] = 0;
     SC_SET_KEY(int, index_key, &indexes[0]);
 
-    threads  = FMAKE_N(SC_thread, n + 1, "MAIN:threads");
+    threads  = CMAKE_N(SC_thread, n + 1);
 
     for (i = 1; i <= n; i++)
         {indexes[i] = i;
@@ -135,10 +135,10 @@ int main(int argc, char **argv)
 
     printf("\n");
 
-    SFREE(threads);
+    CFREE(threads);
 
 /* this must appear after last key reference */
-    SFREE(indexes);
+    CFREE(indexes);
 
     return(0);}
 

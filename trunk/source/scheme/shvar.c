@@ -110,15 +110,15 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 
 	else if (type == SC_POINTER_I)
 	   {if (sv != NULL)
-	       *((char **) vr) = SC_strsavef(sv, "char*:_SS_SET_VAR:sv");
+	       *((char **) vr) = CSTRSAVE(sv);
 
 	    else if (lv != -HUGE_INT)
 	       {snprintf(bf, MAXLINE, "%ld", lv);
-		*((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");}
+		*((char **) vr) = CSTRSAVE(bf);}
 
 	    else if (dv != -HUGE)
 	       {snprintf(bf, MAXLINE, "%g", dv);
-		*((char **) vr) = SC_strsavef(bf, "char*:_SS_SET_VAR:bf");};}
+		*((char **) vr) = CSTRSAVE(bf);};}
 
 	else
 	   SS_error("OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};

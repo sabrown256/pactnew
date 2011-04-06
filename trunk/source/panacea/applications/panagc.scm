@@ -166,7 +166,7 @@
       (printf file "       PA_readh(v[1]);\n")
 
       (printf file "    else\n")
-      (printf file "       {base_name = SC_strsave(\"gen\");\n")
+      (printf file "       {base_name = CSTRSAVE(\"gen\");\n")
       (printf file "        PA_name_files(base_name, &%s, &%s, &%s, &%s);};\n"
 	      edname-var sfname-var ppname-var pvname-var)
 

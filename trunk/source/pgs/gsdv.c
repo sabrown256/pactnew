@@ -149,8 +149,8 @@ void PG_register_range_extrema(PG_device *dev, int nd, double *extr)
     no = dev->range_n_extrema;
 
     if ((re == NULL) || (no != nd))
-       {SFREE(re);
-	re = FMAKE_N(double, nd, "PG_REGISTER_RANGE_EXTREMA:re");};
+       {CFREE(re);
+	re = CMAKE_N(double, nd);};
 
     for (i = 0; i < nd; i++)
         re[i] = extr[i];
@@ -268,7 +268,7 @@ int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ..
 #endif
 	   };
 
-        SFREE(s);
+        CFREE(s);
 
 	rv = TRUE;};
 
@@ -307,7 +307,7 @@ int _PG_display_page(PG_device *dev, FILE *fp, char *s)
             if (p != NULL)
                s1 = p;};};
 
-    SFREE(bf);
+    CFREE(bf);
 
     return(0);}
  

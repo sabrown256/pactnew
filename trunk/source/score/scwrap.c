@@ -71,6 +71,8 @@ int main(int c, char **v)
 	 else
 	    break;};
 	 
+    SC_ASSERT(line_mode >= 0);
+
     argl = v + i;
 
 /* to cause untagged messages to be suppressed set the variable */

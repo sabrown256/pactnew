@@ -295,10 +295,8 @@ void PA_init_strings(void)
 
 /* replace the static type strings with dynamic ones */
     ONCE_SAFE(TRUE, NULL)
-       PA_SET_INDEX_P_S = SC_strsavef("PA_set_index *",
-				      "char*:PA_INIT_STRINGS:indexp"),
-       PA_SET_INDEX_S   = SC_strsavef("PA_set_index",
-				      "char*:PA_INIT_STRINGS:index"),
+       PA_SET_INDEX_P_S = CSTRSAVE("PA_set_index *"),
+       PA_SET_INDEX_S   = CSTRSAVE("PA_set_index"),
 
 /* do not delete any of these strings */
        SC_permanent(PA_SET_INDEX_P_S);
@@ -502,8 +500,8 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
 /* count the dimensions */
             for (nd = 0, pod = olddm; pod != NULL; nd++, pod = pod->next);
 
-            ndm = FMAKE_N(long, nd, "_PA_REALLOC:ndm");
-            odm = FMAKE_N(long, nd, "_PA_REALLOC:odm");
+            ndm = CMAKE_N(long, nd);
+            odm = CMAKE_N(long, nd);
 
 /* make arrays of values */
             for (i = 0, pnd = newdm, pod = olddm;
@@ -516,8 +514,8 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
 
 	    _PD_rl_dimensions(newdm);
 
-            SFREE(ndm);
-            SFREE(odm);}
+            CFREE(ndm);
+            CFREE(odm);}
 
 /* copy the smaller number of bytes
  * oldsp+nbn may be out of bounds and a coredump will ensue
@@ -528,7 +526,7 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
 
         pdata = newsp;
 
-        SFREE(oldsp);};
+        CFREE(oldsp);};
 
     _PA_adjust_refs(pp, pdata, psz);
 

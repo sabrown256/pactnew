@@ -285,8 +285,8 @@ long in_out(PDBfile *file, char *type, long n, void *vi, void *vo)
 
     nb = PD_sizeof(file, type, n, vi);
 
-    bo = FMAKE_N(char, nb, "IN_OUT:bo");
-    bi = FMAKE_N(char, nb, "IN_OUT:bi");
+    bo = CMAKE_N(char, nb);
+    bi = CMAKE_N(char, nb);
 
 /* write in to the buffer */
     outf = PN_open(file, bo);
@@ -295,7 +295,7 @@ long in_out(PDBfile *file, char *type, long n, void *vi, void *vo)
 
 /* move the buffer contents thus invalidating all ITAG addresses */
     memcpy(bi, bo, nb);
-    SFREE(bo);
+    CFREE(bo);
 
 /* read out of the buffer */
     inf = PN_open(file, bi);
@@ -304,7 +304,7 @@ long in_out(PDBfile *file, char *type, long n, void *vi, void *vo)
     PN_read(inf, type, n, vo);
     PN_close(inf);
 
-    SFREE(bi);
+    CFREE(bi);
 
     return(nb);}
 
@@ -366,14 +366,13 @@ static void prep_test_1_data(void)
     strcpy(ca_w, "Hi there!");
     len = strlen(ca_w) + 1;
 
-    cap_w[0] = SC_strsavef("lev1", "char*:PREP_TEST_1_DATA:lev1");
-    cap_w[1] = SC_strsavef("lev2", "char*:PREP_TEST_1_DATA:lev2");
+    cap_w[0] = CSTRSAVE("lev1");
+    cap_w[1] = CSTRSAVE("lev2");
     if (mlt_cnnct == TRUE)
        {cap_w[2] = cap_w[0];
 	SC_mark(cap_w[0], 1);}
     else
-       cap_w[2] = SC_strsavef("tar fu blat",
-			      "char*:PREP_TEST_1_DATA:tarfublat");
+       cap_w[2] = CSTRSAVE("tar fu blat");
 
     cap_r[0] = NULL;
     cap_r[1] = NULL;
@@ -397,8 +396,7 @@ static void prep_test_1_data(void)
     view_r.y_max = -1.e-10;
 
     graph_w.npts  = N_CHAR;
-    graph_w.label = SC_strsavef("test graph",
-                                "char*:PREP_TEST_1_DATA:label");
+    graph_w.label = CSTRSAVE("test graph");
     graph_w.view  = view_w;
 
     graph_r.npts  = 0;
@@ -446,16 +444,16 @@ static void send_test_1_data(PDBfile *strm)
 static void cleanup_test_1(void)
    {
 
-    SFREE(cap_w[0]);
-    SFREE(cap_w[1]);
-    SFREE(cap_w[2]);
+    CFREE(cap_w[0]);
+    CFREE(cap_w[1]);
+    CFREE(cap_w[2]);
 
-    SFREE(cap_r[0]);
-    SFREE(cap_r[1]);
-    SFREE(cap_r[2]);
+    CFREE(cap_r[0]);
+    CFREE(cap_r[1]);
+    CFREE(cap_r[2]);
 
-    SFREE(graph_w.label);
-    SFREE(graph_r.label);
+    CFREE(graph_w.label);
+    CFREE(graph_r.label);
 
     return;}
 
@@ -706,44 +704,36 @@ void prep_test_2_data(void)
         {p_w[i] = i;
          p_r[i] = 0;};
 
-    tar_w = FMAKE_N(lev1, 2, "PREP_TEST_2_DATA:tar_w");
+    tar_w = CMAKE_N(lev1, 2);
 
-    p1 = tar_w[0].a = FMAKE_N(int, N_INT, "PREP_TEST_2_DATA:tar_w[0].a");
-    p2 = tar_w[1].a = FMAKE_N(int, N_INT, "PREP_TEST_2_DATA:tar_w[1].a");
+    p1 = tar_w[0].a = CMAKE_N(int, N_INT);
+    p2 = tar_w[1].a = CMAKE_N(int, N_INT);
     for (i = 0; i < N_INT; i++)
         {p1[i] = i;
          p2[i] = i + 10;};
 
-    p3 = tar_w[0].b = FMAKE_N(double, N_DOUBLE,
-                              "PREP_TEST_2_DATA:tar_w[0].b");
-    p4 = tar_w[1].b = FMAKE_N(double, N_DOUBLE,
-                              "PREP_TEST_2_DATA:tar_w[1].b");
+    p3 = tar_w[0].b = CMAKE_N(double, N_DOUBLE);
+    p4 = tar_w[1].b = CMAKE_N(double, N_DOUBLE);
     for (i = 0; i < N_DOUBLE; i++)
         {p3[i] = exp((double) i);
          p4[i] = log(1.0 + (double) i);};
 
-    tar_w[0].c = FMAKE_N(lev2, 2, "PREP_TEST_2_DATA:tar_w[0].c");
-    tar_w[1].c = FMAKE_N(lev2, 2, "PREP_TEST_2_DATA:tar_w[0].c");
+    tar_w[0].c = CMAKE_N(lev2, 2);
+    tar_w[1].c = CMAKE_N(lev2, 2);
 
-    tar_w[0].c[0].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_2_DATA:tar_w[0].c[0].s");
-    tar_w[0].c[0].s[0] = SC_strsavef("Hello",
-                           "char*:PREP_TEST_2_DATA:Hello");
-    tar_w[0].c[0].s[1] = SC_strsavef(" ", "char*:PREP_TEST_2_DATA:blank");
-    tar_w[0].c[1].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_2_DATA:tar_w[0].c[1].s");
-    tar_w[0].c[1].s[0] = SC_strsavef("world",
-                           "char*:PREP_TEST_2_DATA:world");
-    tar_w[0].c[1].s[1] = SC_strsavef("!", "char*:PREP_TEST_2_DATA:!");
+    tar_w[0].c[0].s    = CMAKE_N(char *, 2);
+    tar_w[0].c[0].s[0] = CSTRSAVE("Hello");
+    tar_w[0].c[0].s[1] = CSTRSAVE(" ");
+    tar_w[0].c[1].s    = CMAKE_N(char *, 2);
+    tar_w[0].c[1].s[0] = CSTRSAVE("world");
+    tar_w[0].c[1].s[1] = CSTRSAVE("!");
 
-    tar_w[1].c[0].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_2_DATA:tar_w[1].c[0].s");
-    tar_w[1].c[0].s[0] = SC_strsavef("Foo", "char*:PREP_TEST_2_DATA:Foo");
-    tar_w[1].c[0].s[1] = SC_strsavef(" ", "char*:PREP_TEST_2_DATA:blank");
-    tar_w[1].c[1].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_2_DATA:tar_w[1].c[1].s");
-    tar_w[1].c[1].s[0] = SC_strsavef("Bar", "char*:PREP_TEST_2_DATA:Bar");
-    tar_w[1].c[1].s[1] = SC_strsavef("!!!", "char*:PREP_TEST_2_DATA:!!!");
+    tar_w[1].c[0].s    = CMAKE_N(char *, 2);
+    tar_w[1].c[0].s[0] = CSTRSAVE("Foo");
+    tar_w[1].c[0].s[1] = CSTRSAVE(" ");
+    tar_w[1].c[1].s    = CMAKE_N(char *, 2);
+    tar_w[1].c[1].s[0] = CSTRSAVE("Bar");
+    tar_w[1].c[1].s[1] = CSTRSAVE("!!!");
 
     tar_w[0].c[0].type = 1;
     tar_w[0].c[1].type = 2;
@@ -763,58 +753,58 @@ void cleanup_test_2(void)
    {
 
     if (tar_w != NULL)
-       {SFREE(tar_w[0].c[0].s[0]);
-        SFREE(tar_w[0].c[0].s[1]);
-        SFREE(tar_w[0].c[1].s[0]);
-        SFREE(tar_w[0].c[1].s[1]);
+       {CFREE(tar_w[0].c[0].s[0]);
+        CFREE(tar_w[0].c[0].s[1]);
+        CFREE(tar_w[0].c[1].s[0]);
+        CFREE(tar_w[0].c[1].s[1]);
 
-        SFREE(tar_w[1].c[0].s[0]);
-        SFREE(tar_w[1].c[0].s[1]);
-        SFREE(tar_w[1].c[1].s[0]);
-        SFREE(tar_w[1].c[1].s[1]);
+        CFREE(tar_w[1].c[0].s[0]);
+        CFREE(tar_w[1].c[0].s[1]);
+        CFREE(tar_w[1].c[1].s[0]);
+        CFREE(tar_w[1].c[1].s[1]);
 
-        SFREE(tar_w[0].c[0].s);
-        SFREE(tar_w[0].c[1].s);
-        SFREE(tar_w[1].c[0].s);
-        SFREE(tar_w[1].c[1].s);
+        CFREE(tar_w[0].c[0].s);
+        CFREE(tar_w[0].c[1].s);
+        CFREE(tar_w[1].c[0].s);
+        CFREE(tar_w[1].c[1].s);
 
-        SFREE(tar_w[0].c);
-        SFREE(tar_w[1].c);
+        CFREE(tar_w[0].c);
+        CFREE(tar_w[1].c);
 
-        SFREE(tar_w[0].a);
-        SFREE(tar_w[1].a);
+        CFREE(tar_w[0].a);
+        CFREE(tar_w[1].a);
 
-        SFREE(tar_w[0].b);
-        SFREE(tar_w[1].b);
+        CFREE(tar_w[0].b);
+        CFREE(tar_w[1].b);
 
-        SFREE(tar_w);};
+        CFREE(tar_w);};
 
     if (tar_r != NULL)
-       {SFREE(tar_r[0].c[0].s[0]);
-        SFREE(tar_r[0].c[0].s[1]);
-        SFREE(tar_r[0].c[1].s[0]);
-        SFREE(tar_r[0].c[1].s[1]);
+       {CFREE(tar_r[0].c[0].s[0]);
+        CFREE(tar_r[0].c[0].s[1]);
+        CFREE(tar_r[0].c[1].s[0]);
+        CFREE(tar_r[0].c[1].s[1]);
 
-        SFREE(tar_r[1].c[0].s[0]);
-        SFREE(tar_r[1].c[0].s[1]);
-        SFREE(tar_r[1].c[1].s[0]);
-        SFREE(tar_r[1].c[1].s[1]);
+        CFREE(tar_r[1].c[0].s[0]);
+        CFREE(tar_r[1].c[0].s[1]);
+        CFREE(tar_r[1].c[1].s[0]);
+        CFREE(tar_r[1].c[1].s[1]);
 
-        SFREE(tar_r[0].c[0].s);
-        SFREE(tar_r[0].c[1].s);
-        SFREE(tar_r[1].c[0].s);
-        SFREE(tar_r[1].c[1].s);
+        CFREE(tar_r[0].c[0].s);
+        CFREE(tar_r[0].c[1].s);
+        CFREE(tar_r[1].c[0].s);
+        CFREE(tar_r[1].c[1].s);
 
-        SFREE(tar_r[0].c);
-        SFREE(tar_r[1].c);
+        CFREE(tar_r[0].c);
+        CFREE(tar_r[1].c);
 
-        SFREE(tar_r[0].a);
-        SFREE(tar_r[1].a);
+        CFREE(tar_r[0].a);
+        CFREE(tar_r[1].a);
 
-        SFREE(tar_r[0].b);
-        SFREE(tar_r[1].b);
+        CFREE(tar_r[0].b);
+        CFREE(tar_r[1].b);
 
-        SFREE(tar_r);};
+        CFREE(tar_r);};
 
     return;}
 
@@ -1072,8 +1062,7 @@ void prep_test_3_data(void)
     vr1_w.i[2] = 'b';
     vr1_w.i[3] = 'c';
     vr1_w.i[4] = 'd';
-    vr1_w.j    = SC_strsavef("whoa there big fella!",
-                     "char*:PREP_TEST_3_DATA:whoa");
+    vr1_w.j    = CSTRSAVE("whoa there big fella!");
     vr1_w.k[0] = 'F';
     vr1_w.k[1] = 'a';
     vr1_w.k[2] = 'b';
@@ -1118,8 +1107,8 @@ void prep_test_3_data(void)
 void cleanup_test_3(void)
    {
 
-    SFREE(vr1_w.j);
-    SFREE(vr1_r.j);
+    CFREE(vr1_w.j);
+    CFREE(vr1_r.j);
 
     return;}
 
@@ -1310,35 +1299,35 @@ void prep_test_4_data(void)
 
     tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY);
 
-    CHAR_S   = SC_strsavef("char *", "char*:PREP_TEST_4_DATA:char");
-    SHORT_S  = SC_strsavef("short *", "char*:PREP_TEST_4_DATA:short");
-    INT_S    = SC_strsavef("int *", "char*:PREP_TEST_4_DATA:integer");
-    LONG_S   = SC_strsavef("long *", "char*:PREP_TEST_4_DATA:long");
-    FLOAT_S  = SC_strsavef("float *", "char*:PREP_TEST_4_DATA:float");
-    DOUBLE_S = SC_strsavef("double *", "char*:PREP_TEST_4_DATA:double");
-    HASHEL_S = SC_strsavef("haelem *", "char*:PREP_TEST_4_DATA:haelem");
+    CHAR_S   = CSTRSAVE("char *");
+    SHORT_S  = CSTRSAVE("short *");
+    INT_S    = CSTRSAVE("int *");
+    LONG_S   = CSTRSAVE("long *");
+    FLOAT_S  = CSTRSAVE("float *");
+    DOUBLE_S = CSTRSAVE("double *");
+    HASHEL_S = CSTRSAVE("haelem *");
 
-    pc  = FMAKE(char, "PREP_TEST_4_DATA:pc");
+    pc  = CMAKE(char);
     *pc = 'A';   
     SC_hasharr_install(tab4_w, "pc", pc, CHAR_S, TRUE, TRUE);
 
-    ps  = FMAKE(short, "PREP_TEST_4_DATA:ps");
+    ps  = CMAKE(short);
     *ps = -1024;
     SC_hasharr_install(tab4_w, "ps", ps, SHORT_S, TRUE, TRUE);
 
-    pi  = FMAKE(int, "PREP_TEST_4_DATA:pi");
+    pi  = CMAKE(int);
     *pi = 16384;
     SC_hasharr_install(tab4_w, "pi", pi, INT_S, TRUE, TRUE);
 
-    pl  = FMAKE(long, "PREP_TEST_4_DATA:pl");
+    pl  = CMAKE(long);
     *pl = -1048576;
     SC_hasharr_install(tab4_w, "pl", pl, LONG_S, TRUE, TRUE);
 
-    pf  = FMAKE(float, "PREP_TEST_4_DATA:pf");
+    pf  = CMAKE(float);
     *pf = 3.141596;
     SC_hasharr_install(tab4_w, "pf", pf, FLOAT_S, TRUE, TRUE);
 
-    pd  = FMAKE(double, "PREP_TEST_4_DATA:pd");
+    pd  = CMAKE(double);
     *pd = -1.0e-30;
     hp = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, TRUE, TRUE);
 
@@ -1346,7 +1335,7 @@ void prep_test_4_data(void)
 
     tab4_r = NULL;
 
-    vr4_w = FMAKE_N(st4, 3, "PREP_TEST_4_DATA:vr4_w");
+    vr4_w = CMAKE_N(st4, 3);
 
     vr4_w[0].a =  2048;
     vr4_w[0].b =  'G';
@@ -1367,7 +1356,7 @@ void prep_test_4_data(void)
 static int cleanup_ha_test_4(haelem *hp, void *a)
    {
 
-    SFREE(hp->type);
+    CFREE(hp->type);
 
     return(TRUE);}
 
@@ -1384,16 +1373,16 @@ void cleanup_test_4(void)
     if (tab4_r != NULL)
        SC_free_hasharr(tab4_r, cleanup_ha_test_4, NULL);
 
-    SFREE(CHAR_S);
-    SFREE(SHORT_S);
-    SFREE(INT_S);
-    SFREE(LONG_S);
-    SFREE(FLOAT_S);
-    SFREE(DOUBLE_S);
-    SFREE(HASHEL_S);
+    CFREE(CHAR_S);
+    CFREE(SHORT_S);
+    CFREE(INT_S);
+    CFREE(LONG_S);
+    CFREE(FLOAT_S);
+    CFREE(DOUBLE_S);
+    CFREE(HASHEL_S);
 
-    SFREE(vr4_w);
-    SFREE(vr4_r);
+    CFREE(vr4_w);
+    CFREE(vr4_r);
 
     return;}
 
@@ -1572,7 +1561,7 @@ static int test_4(char *base, char *tgt, int n)
 
     prep_test_4_data();
 
-    strm->previous_file = SC_strsavef(base, "char*:TEST_4:prev");
+    strm->previous_file = CSTRSAVE(base);
 
 /* make a few defstructs */
     PD_def_hash_types(strm, 3);

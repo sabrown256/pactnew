@@ -50,14 +50,14 @@ PP_pdbdata_tp_dealloc(PP_pdbdataObject *self)
     if (self->parent == NULL) {
         if (self->data != NULL) {
             (void) _PP_rel_syment(self->dpobj->host_chart, self->data, self->nitems, self->type);
-            SFREE(self->data);
+            CFREE(self->data);
         }
     } else {
         Py_DECREF(self->parent);
         self->parent = NULL;
         self->data = NULL;
     }
-    SFREE(self->type);
+    CFREE(self->type);
     _PD_rl_dimensions(self->dims);
     _PD_rl_defstr(self->dp);
     Py_XDECREF(self->dpobj);
@@ -161,10 +161,10 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     }
 
     /* get base type, without dimension information */
-    tbase = SC_strsavef(descr->type, "PP_pdbdata_init:ts");
+    tbase = CSTRSAVE(descr->type);
     strtok(tbase, " *()[");
     dpobj = _PP_defstr_find_singleton(tbase, NULL, fileinfo);
-    SFREE(tbase);
+    CFREE(tbase);
     if (dpobj == NULL)
         goto err;
 /*        return -1;*/
@@ -181,7 +181,7 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     retobj = PP_make_object(fp, vr, number, ts, dims);
     if (retobj == NULL) return -1;
 #endif
-/*    SFREE(ts);  XXX saved in self */
+/*    CFREE(ts);  XXX saved in self */
     _PP_rl_descr(descr);
     
     return 0;
@@ -190,11 +190,11 @@ PP_pdbdata_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
     if (descr != NULL) {
         if (descr->data == NULL) {
             (void) _PP_rel_syment(fp->host_chart, vr, number, descr->type);
-            SFREE(vr);
+            CFREE(vr);
         }
         _PP_rl_descr(descr);
     }    
-/*    SFREE(ts);*/
+/*    CFREE(ts);*/
 /*    _PD_rl_dimensions(dims); */
     return -1;
 /* DO-NOT-DELETE splicer.end(pdb.pdbdata.as_type.init) */

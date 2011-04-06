@@ -138,7 +138,7 @@ static void _SC_sproc_init_thread(emu_thread_info *pt,
        pt->key_data = NULL;
 
     if (pt->key_data != NULL)
-       SFREE(pt->key_data);
+       CFREE(pt->key_data);
 
     if (nk > 0)
        pt->key_data = NMAKE_N(void *, nk, "_SC_SPROC_INIT_THREAD:key_data");

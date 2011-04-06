@@ -203,7 +203,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 	     date);
 #endif
 
-    SFREE(date);
+    CFREE(date);
 
     PG_CGM_command(dev, METAFILE_DESCRIPTION, description);
 
@@ -300,7 +300,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
     for (ff = dev->font_family; ff != NULL; ff = ff->next)
         nfonts += ff->n_styles;
 
-    font_name = FMAKE_N(char *, nfonts, "_PG_CGM_OPEN:fontname");
+    font_name = CMAKE_N(char *, nfonts);
     for (nfonts = 0, ff = dev->font_family; ff != NULL; ff = ff->next)
         {nt = ff->n_styles;
          fs = ff->type_styles;
@@ -309,7 +309,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 
     PG_CGM_command(dev, FONT_LIST(nfonts), font_name);
 
-    SFREE(font_name);
+    CFREE(font_name);
 
     PG_set_font(dev, "helvetica", "medium", 12);
 

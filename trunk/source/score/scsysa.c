@@ -131,7 +131,7 @@ void _SC_process_output(int fd, int mask, void *a)
 		    {nb = pp->n_read;
 
 		     while (SC_gets(s, MAX_BFSZ, pp) != NULL)
-		        {ps = SC_strsavef(s, "_SC_PROCESS_OUTPUT:out");
+		        {ps = CSTRSAVE(s);
 
 			 SC_trim_right(s, "\n");
 			 job->print(job, as, "out  '%s'\n", s);
@@ -349,7 +349,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
     asyncstate *as;
     PFSignal_handler hnd;
 
-    as = FMAKE(asyncstate, "SC_EXEC_ASYNC:as");
+    as = CMAKE(asyncstate);
     SC_MEM_INIT(asyncstate, as);
 
     _SC_setup_async_state(as,
@@ -428,7 +428,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
        {as->to_stdout = FALSE;
 	SC_close_connection_pool(cp, sig, TRUE);};
 
-    SFREE(as);
+    CFREE(as);
 
 /* cleanup */
     _SC_free_filter(filter);
@@ -535,7 +535,7 @@ int SC_exec_async_s(char *shell, char **env,
 			  {job->start(job, NULL, TRUE);
 			   SC_array_push(state.tasks, &job);};
 
-		       SFREE(cm);};};};};
+		       CFREE(cm);};};};};
 
 /* we have launched everything we have */
     state.done = TRUE;
@@ -647,7 +647,7 @@ int SC_exec_async_h(char *shell, char **env,
 		      {job->start(job, NULL, TRUE);
 		       SC_array_push(state.tasks, &job);};
 
-                   SFREE(cm);};};};
+                   CFREE(cm);};};};
 
 /* we have launched everything we have */
     state.done = TRUE;
@@ -744,7 +744,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     st = chdir(cwd);
     SC_ASSERT(st == 0);
 
-    SFREE(cwd);
+    CFREE(cwd);
 
     if (dbg == TRUE)
        SC_show_state_log(&state);
@@ -815,7 +815,7 @@ int SC_execa(char ***out, char *shell, int to, char *fmt, ...)
 
     rv = SC_exec(out, cmd, shell, to);
     
-    SFREE(cmd);
+    CFREE(cmd);
 
     return(rv);}
 
@@ -856,7 +856,7 @@ int SC_execs(char *out, int nc, char *shell, int to, char *fmt, ...)
 
         SC_free_strings(res);};
     
-    SFREE(cmd);
+    CFREE(cmd);
 
     return(rv);}
 
@@ -898,7 +898,7 @@ char **SC_syscmnd(char *fmt, ...)
     rv = SC_exec(&icmnd, cmd, NULL, -1);
     SC_ASSERT(rv == 0);
     
-    SFREE(cmd);
+    CFREE(cmd);
 
     return(icmnd);}
 

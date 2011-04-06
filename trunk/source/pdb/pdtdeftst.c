@@ -50,7 +50,7 @@ int main(int c, char **v)
 	      "Float y",
 	      LAST);
 
-    ptr = MAKE(point);
+    ptr = CMAKE(point);
     ptr->x = 1.0;
     ptr->y = 2.0;
 
@@ -59,8 +59,8 @@ int main(int c, char **v)
 
     PD_close(file);
   
-    SFREE(ptr); 
-    ptr = MAKE(point);
+    CFREE(ptr); 
+    ptr = CMAKE(point);
   
     file = PD_open("out.pdb", "r");
   
@@ -72,7 +72,7 @@ int main(int c, char **v)
     if (ptr->x != 1.0 || ptr->y != 2.0)
        err = 1;
    
-    SFREE(ptr);
+    CFREE(ptr);
   
     return(err);}
 

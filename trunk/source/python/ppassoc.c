@@ -172,7 +172,7 @@ int PP_update_assoc(pcons **in, PyObject *dict)
             break;
         }
 
-        SFREE(ptype); /* SC_add_alist copies */
+        CFREE(ptype); /* SC_add_alist copies */
         _PP_rl_descr(descr);
         descr = NULL;
         Py_XDECREF(value);

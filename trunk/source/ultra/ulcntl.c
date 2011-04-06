@@ -168,7 +168,7 @@ static void _UL_fix_text_buf(PG_text_box *fileBox, PG_text_box *screenBox)
  */
     for (i = 0; i < fileBox->n_lines; i++)
         {strcpy(bf[i], fileBox->text_buffer[i]);
-	 SFREE(fileBox->text_buffer[i]);}
+	 CFREE(fileBox->text_buffer[i]);}
 
     fileBox->text_buffer  = bf;
     fileBox->n_lines      = n_lines;
@@ -247,12 +247,12 @@ static void _UL_print_curve_labels(PG_device *dev, int *mark)
 			   "CURVE", labln, labcf,
 			   sqzlab, labts);
 
-	SFREE(labels);
-	SFREE(files);
-	SFREE(dataid);
-	SFREE(modified);
-	SFREE(clr);
-        SFREE(extr);};
+	CFREE(labels);
+	CFREE(files);
+	CFREE(dataid);
+	CFREE(modified);
+	CFREE(clr);
+        CFREE(extr);};
 
     return;}
 

@@ -98,9 +98,9 @@ PyObject *_PP_read_data(PP_file *fileinfo, char *name, char *intype,
  done:
     if (addr.memaddr != NULL) {
         (void) _PP_rel_syment(file->host_chart, addr.memaddr, number, type);
-        SFREE(addr.memaddr);
+        CFREE(addr.memaddr);
     }
-    SFREE(name);
+    CFREE(name);
     _PD_rl_syment_d(ep);
     
     return rv;

@@ -53,7 +53,7 @@ static double **_PG_setup_points(int *pnp,
 	     n++;};};
 
     for (id = 0; id < PG_SPACEDM; id++)
-        {REMAKE_N(x[id], double, n);};
+        {CREMAKE(x[id], double, n);};
 
     *pnp = n;
 
@@ -213,7 +213,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
     sid   = SC_type_id(mtype, FALSE);
     same  = (sid == SC_DOUBLE_I);
 
-    afd   = FMAKE_N(double *, nd, "PG_SCATTER_HAND:afd");
+    afd   = CMAKE_N(double *, nd);
     afs   = (void **) range->elements;
 
 /* find the range limits if any */
@@ -252,13 +252,13 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
 
     if (same == FALSE)
        {for (i = 0; i < nd; i++)
-            SFREE(afd[i]);
+            CFREE(afd[i]);
 
         if (rexfl)
-           SFREE(rextr);};
+           CFREE(rextr);};
 
-    SFREE(afd);
-    SFREE(dextr);
+    CFREE(afd);
+    CFREE(dextr);
 
     return;}
 
@@ -320,8 +320,8 @@ PG_picture_desc *PG_setup_picture_scatter(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, 2, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);
+	CFREE(ddex);
+	CFREE(rdex);
 
 /* GOTCHA: this isn't the only time we want 3d axes */
 	if (((data->f->range != NULL) && (pd->va[0] != HUGE)) || (nde == 3))

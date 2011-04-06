@@ -38,11 +38,10 @@ void _SX_rd_tree_list(object *obj, PDBfile *file, char *vr, long nitems,
        _SX_rd_leaf_list(obj, file, vr, nitems, type, dims);
     else
        {lvr = (char **) vr;
-        dtype = PD_dereference(SC_strsavef(type,
-                               "char*:_SX_RD_TREE_LIST:dtype"));
+        dtype = PD_dereference(CSTRSAVE(type));
         for (i = 0L; i < nitems; i++, obj = SS_cdr(obj))
             _SX_rd_indirection_list(SS_car(obj), file, &lvr[i], dtype);
-        SFREE(dtype);};
+        CFREE(dtype);};
 
     return;}
 
@@ -182,7 +181,7 @@ object *_SXI_read_numeric_data(object *argl)
 
     s = name;
     name = _PD_expand_hyper_name(file, s);
-    SFREE(s);
+    CFREE(s);
     if (name == NULL)
        return(SS_null);
 
@@ -210,8 +209,7 @@ object *_SXI_read_numeric_data(object *argl)
 	sz    = 0;}
 
     else if (!_PD_indirection(PD_entry_type(cp)))
-       {dtype = SC_strsavef(PD_entry_type(cp),
-			    "_SXI_READ_NUMERIC_DATA:type");
+       {dtype = CSTRSAVE(PD_entry_type(cp));
 	sz    = PD_entry_number(cp);}
     else
        {dtype = PD_dereference(PD_entry_type(cp));
@@ -277,14 +275,12 @@ syment *_SX_rd_data(PDBfile *file, char *name, syment *ep,
 	    if (dpf->convert)
 	       {odp = PD_inquire_table_type(file->host_chart, type);
 		if (strcmp(type, odp->type) != 0)
-		   {SFREE(PD_entry_type(cp));
-		    PD_entry_type(cp) = SC_strsavef(odp->type,
-						    "_SX_RD_DATA:type");};};};}
+		   {CFREE(PD_entry_type(cp));
+		    PD_entry_type(cp) = CSTRSAVE(odp->type);};};};}
 
     else
 
-       {dtype = PD_dereference(SC_strsavef(type,
-                               "char*:_SX_RD_DATA:dtype"));
+       {dtype = PD_dereference(CSTRSAVE(type));
 
 	if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))
 	   SS_error("MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
@@ -296,7 +292,7 @@ syment *_SX_rd_data(PDBfile *file, char *name, syment *ep,
 	else
 	    PD_read(file, name, &addr->memaddr);
 
-	SFREE(dtype);};
+	CFREE(dtype);};
 
     return(cp);}
 

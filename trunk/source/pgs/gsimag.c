@@ -162,7 +162,7 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
 
 	 PG_draw_domain_boundary(dev, h);
 
-	 SFREE(f);};
+	 CFREE(f);};
 
     dev->autodomain = autodomain;
 
@@ -289,8 +289,8 @@ PG_picture_desc *PG_setup_picture_image(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, 2, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);
+	CFREE(ddex);
+	CFREE(rdex);
 
 	PG_set_clipping(dev, FALSE);};
 
@@ -321,7 +321,7 @@ static void _PG_image_core(PG_device *dev, PG_graph *data,
     for (g = data; g != NULL; g = g->next)
         PG_image_hand(dev, g, amin, amax, fnc_zc, fnc_nc);
 
-    SFREE(pd);
+    CFREE(pd);
 
     return;}
 
@@ -439,8 +439,7 @@ static void PG_polar_image(PG_image *im, double *ext, int bc)
     dy = (box[3] - box[2])/((double) lp - 1.0);
 
     polar = im->buffer;
-    cart  = im->buffer = FMAKE_N(unsigned char, ns,
-				 "PG_POLAR_IMAGE:cart");
+    cart  = im->buffer = CMAKE_N(unsigned char, ns);
 
     memset(cart, bc, ns);
 
@@ -464,7 +463,7 @@ static void PG_polar_image(PG_image *im, double *ext, int bc)
 
               cart[j] = polar[i];};};
 
-    SFREE(polar);
+    CFREE(polar);
 
     return;}
 
@@ -514,14 +513,13 @@ static void PG_crop_image(PG_device *dev, PG_image *im)
     im->ymax = wc[3];
 
     bf = im->buffer;
-    nb = im->buffer = FMAKE_N(unsigned char, im->size,
-			      "PG_CROP_IMAGE:nb");
+    nb = im->buffer = CMAKE_N(unsigned char, im->size);
     for (l = l1; l <= l2; l++)
         for (k = k1; k <= k2; k++)
             {i = l*kmax + k;
              *nb++ = bf[i];};
 
-    SFREE(bf);
+    CFREE(bf);
 
     return;}
 
@@ -631,7 +629,7 @@ static PG_image *PG_prep_image(PG_device *dev, PG_image *im,
 
     nc = pal->n_pal_colors;
 
-    bf = FMAKE_N(unsigned char, n, "PG_PREP_IMAGE:bf");
+    bf = CMAKE_N(unsigned char, n);
     wrk.buffer = bf;
 
     _PG_map_type_image(dev, type, bf, w, h, n, nc, z, zmin, zmax);
@@ -662,7 +660,7 @@ static PG_image *PG_prep_image(PG_device *dev, PG_image *im,
     if (nim != NULL)
        PG_place_image(nim, &wrk, TRUE);
 
-    SFREE(wrk.buffer);
+    CFREE(wrk.buffer);
 
     return(nim);}
 
@@ -1038,7 +1036,7 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
 /* draw the palette image */
     PG_put_image(dev, bf, ix, iy, nx, ny);
 
-    SFREE(bf);
+    CFREE(bf);
 
     return;}
 
@@ -1193,7 +1191,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 /* draw the palette image */
     PG_put_image(dev, bf, ix, iy, nx, ny);
 
-    SFREE(bf);
+    CFREE(bf);
 
     return;}
 
@@ -1273,15 +1271,14 @@ PG_image *PG_make_image_n(char *label, char *type, void *z,
     height = h;
     size   = width*height*byp;
 
-    im = FMAKE(PG_image, "PG_MAKE_IMAGE_N:im");
+    im = CMAKE(PG_image);
     if (im == NULL)
        return(NULL);
 
     if (z == NULL)
-       {im->buffer = FMAKE_N(unsigned char, size*SC_sizeof(type),
-                             "PG_MAKE_IMAGE_N:imbuffer");
+       {im->buffer = CMAKE_N(unsigned char, size*SC_sizeof(type));
 	if (im->buffer == NULL)
-	   {SFREE(im);
+	   {CFREE(im);
 	    return(NULL);};}
     else
        im->buffer = (unsigned char *) z;
@@ -1289,8 +1286,8 @@ PG_image *PG_make_image_n(char *label, char *type, void *z,
     snprintf(bf, MAXLINE, "%s *", type);
 
     im->version_id   = PG_IMAGE_VERSION;
-    im->label        = SC_strsavef(label, "char*:PG_MAKE_IMAGE_N:label");
-    im->element_type = SC_strsavef(bf, "char*:PG_MAKE_IMAGE_N:type");
+    im->label        = CSTRSAVE(label);
+    im->element_type = CSTRSAVE(bf);
     im->xmin         = dbx[0];
     im->xmax         = dbx[1];
     im->ymin         = dbx[2];
@@ -1339,8 +1336,7 @@ int _PG_allocate_image_buffer(PG_device *dev, unsigned char **pbf,
 	     if (iy & 1)
 	        iy++;};
 
-	 bf = FMAKE_N(unsigned char, ix*iy,
-                      "_PG_ALLOCATE_IMAGE_BUFFER:bf");
+	 bf = CMAKE_N(unsigned char, ix*iy);
          if (bf != NULL)
             break;};
 
@@ -1352,7 +1348,7 @@ int _PG_allocate_image_buffer(PG_device *dev, unsigned char **pbf,
     if (pbf != NULL)
        *pbf = bf;
     else
-       SFREE(bf);
+       CFREE(bf);
 
     *pnx = ix;
     *pny = iy;
@@ -1369,18 +1365,18 @@ void PG_rl_image(PG_image *im)
 
     if (im != NULL)
        {if (im->label)
-           {SFREE(im->label);
+           {CFREE(im->label);
             im->label = NULL;};
 
         if (im->element_type)
-           {SFREE(im->element_type);
+           {CFREE(im->element_type);
             im->element_type = NULL;};
 
         if (im->buffer)
-           {SFREE(im->buffer);
+           {CFREE(im->buffer);
             im->buffer = NULL;};
 
-	SFREE(im);};
+	CFREE(im);};
 
     return;}
 

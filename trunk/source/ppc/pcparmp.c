@@ -157,7 +157,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
        SC_error(-1, "SPECIFIED BUFFER SIZE TOO SMALL - PC_OUT");
 
 /* allocate the buffer */
-    bf = FMAKE_N(char, nb, "PC_OUT:bf");
+    bf = CMAKE_N(char, nb);
 
 /* convert the data into a message buffer */
     tf  = PN_open(vif, bf);
@@ -178,7 +178,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	 else if (block)
 	    {MPI_Send(bf, nb, MPI_CHAR, dn, ityp,
 		      MPI_COMM_WORLD);
-	     SFREE(bf);}
+	     CFREE(bf);}
 
 	 else
 	    {MPI_Isend(bf, nb, MPI_CHAR, dn, ityp,
@@ -237,7 +237,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     else
        nb = PC_size_message(ip, type, ityp);
 
-    bf = FMAKE_N(char, nb, "PC_IN:bf");
+    bf = CMAKE_N(char, nb);
 
     if (block)
        {MPI_Status stat;
@@ -260,7 +260,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	nir = PN_read(tf, type, ni, vr);
 	PN_close(tf);
 
-	SFREE(bf);};
+	CFREE(bf);};
 
 /* conditional diagnostic messages */
     if (_SC_debug)
@@ -299,15 +299,15 @@ static long _PC_wait_d(PROCESS *pp)
    {MPI_Status *stats;
     MPI_Request *reqs;
 
-    stats = FMAKE_N(MPI_Status, np, "_PC_WAIT_D:stats");
+    stats = CMAKE_N(MPI_Status, np);
 
     reqs = SC_array_array(_PC.reqs);
 
     MPI_Waitall(np, reqs, stats);
 
-    SFREE(reqs);
+    CFREE(reqs);
 
-    SFREE(stats);}
+    CFREE(stats);}
 
 /* convert the message to the requested output data */
     for (i = 0; i < np; i++)
@@ -318,8 +318,8 @@ static long _PC_wait_d(PROCESS *pp)
 	     PN_read(tf, type, ni, vr);
 	     PN_close(tf);};
 
-	 SFREE(type);
-	 SFREE(bf);};
+	 CFREE(type);
+	 CFREE(bf);};
 
 /* conditional diagnostic messages */
     if (_SC_debug)

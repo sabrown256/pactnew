@@ -511,7 +511,7 @@ static INLINE edgedes *_PG_desc_edge(int nd, double **ir,
     double dx[PG_SPACEDM];
     edgedes *ei;
 
-    ei = FMAKE(edgedes, "_PG_DESC_EDGE:ei");
+    ei = CMAKE(edgedes);
 
     for (id = 0; id < nd; id++)
         {ix1[id] = ir[id][ia];
@@ -550,8 +550,8 @@ static edgedes **_PG_make_edge_table(PG_device *dev, int nd,
 
     if (n > 0)
        {narr  = iymx - iymn;
-	et    = FMAKE_N(edgedes *, narr, "_PG_MAKE_EDGE_TABLE:et");
-	flags = FMAKE_N(int, n-1, "_PG_MAKE_EDGE_TABLE:flags");
+	et    = CMAKE_N(edgedes *, narr);
+	flags = CMAKE_N(int, n-1);
 	SC_MEM_INIT_N(int, flags, n-1);
 
 /* transform to PC for efficiency */
@@ -582,7 +582,7 @@ static edgedes **_PG_make_edge_table(PG_device *dev, int nd,
 
 	PM_free_vectors(nd, ir);
 
-	SFREE(flags);};
+	CFREE(flags);};
 
     return(et);}
 
@@ -598,9 +598,9 @@ static void _PG_free_edge_table(edgedes **et, int iymn, int iymx)
     for (i = iymn; i < iymx; i++)
         for (ei = et[i-iymn]; ei != NULL; ei = nxt)
 	    {nxt = ei->next;
-	     SFREE(ei);};
+	     CFREE(ei);};
 
-    SFREE(et);
+    CFREE(et);
 
     return;}
 
@@ -735,7 +735,7 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
 
 	et = _PG_make_edge_table(dev, nd, n, r, iymx, iymn);
 	if (et != NULL)
-	   {ae = FMAKE_N(edgedes *, n-1, "_PG_RST_SHADE_POLY:ae");
+	   {ae = CMAKE_N(edgedes *, n-1);
 
 	    ne = 0;
 	    for (i = iymx-1; i >= iymn; i--)
@@ -743,7 +743,7 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
 		 _PG_bsort_x(ae, ne);
 		 _PG_fill_rst_line(dev, ae, nd, ne, i);};
 
-	    SFREE(ae);
+	    CFREE(ae);
 	    _PG_free_edge_table(et, iymn, iymx);};
 
 	PG_set_line_width(dev, lwd);

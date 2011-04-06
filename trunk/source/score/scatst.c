@@ -56,8 +56,8 @@ static int test_1_hash(void)
 
     err = 0;
 
-    sa = SC_strsavef("string-a", "char*:TEST_1:sa");
-    sb = SC_strsavef("string-b", "char*:TEST_1:sb");
+    sa = CSTRSAVE("string-a");
+    sb = CSTRSAVE("string-b");
 
     tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
     hpa = SC_hasharr_install(tab, "a", sa, SC_STRING_S, TRUE, TRUE);
@@ -99,8 +99,8 @@ static int test_1_ha(void)
 
     err = 0;
 
-    sa = SC_strsavef("string-a", "char*:TEST_1:sah");
-    sb = SC_strsavef("string-b", "char*:TEST_1:sbh");
+    sa = CSTRSAVE("string-a");
+    sb = CSTRSAVE("string-b");
 
     ha = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
     hpa = SC_hasharr_install(ha, "a", sa, SC_STRING_S, TRUE, TRUE);
@@ -141,8 +141,8 @@ static int test_1_al(void)
 
     err = 0;
 
-    sa = SC_strsavef("string-a", "char*:TEST_1:sa_list");
-    sb = SC_strsavef("string-b", "char*:TEST_1:sb_list");
+    sa = CSTRSAVE("string-a");
+    sb = CSTRSAVE("string-b");
 
     lsa = SC_add_alist(NULL, "a", SC_STRING_S, sa);
     lsb = SC_add_alist(lsa,  "b", SC_STRING_S, sb);
@@ -212,8 +212,8 @@ static int test_3(void)
 
     err = 0;
 
-    sa = SC_strsavef("string-a", "char*:TEST_3:sa");
-    sb = SC_strsavef("string-b", "char*:TEST_3:sb");
+    sa = CSTRSAVE("string-a");
+    sb = CSTRSAVE("string-b");
 
     lsa = NULL;
     lsa = SC_add_alist(lsa, "a1", SC_STRING_S, sa);
@@ -289,7 +289,7 @@ static int test_5_callback(haelem *hp, void *arg)
     SC_ASSERT(ok == TRUE);
 
     if (v != NULL)
-       SFREE(v);
+       CFREE(v);
 
     return(rv);}
 
@@ -307,7 +307,7 @@ static int test_5(void)
 
     err = 0;
 
-    type = SC_strsave("char *");
+    type = CSTRSAVE("char *");
 
 /* table size of 1 forces a linked list */
     tab = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY);
@@ -319,7 +319,7 @@ static int test_5(void)
     err += (SC_hasharr_foreach(tab, test_5_callback, NULL) < 0);
 
     SC_free_hasharr(tab, NULL, NULL);
-    SFREE(type);
+    CFREE(type);
 
     return(err);}
 

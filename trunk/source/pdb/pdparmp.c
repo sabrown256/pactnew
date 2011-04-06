@@ -788,10 +788,10 @@ static FILE *_PD_mpopen(char *name, char *mode)
 /* if an error occurs MPI_File_open will call a default error
  * handler rather than returning.  Need to provide our version.
  */
-            fh  = FMAKE(MPI_File, "_PD_MP_SETUP_MPI_FILE:fh");
+            fh  = CMAKE(MPI_File);
             err = MPI_File_open(mcomm, name, mpi_mode, MPI_INFO_NULL, fh);
             if (err != 0)
-               {SFREE(fh);};
+               {CFREE(fh);};
     
             file_comm = (SC_communicator) mcomm;}
 
@@ -805,12 +805,12 @@ static FILE *_PD_mpopen(char *name, char *mode)
 #endif
             file_comm = comm;};};
     
-    fa = FMAKE_N(SC_address, _PD_nthreads+1, "_PD_MPOPEN:fa");
+    fa = CMAKE_N(SC_address, _PD_nthreads+1);
     for (i = 0; i <= _PD_nthreads; i++)
         fa[i].diskaddr = 0;
 
 /* no buffered I/O for now */
-    pf = FMAKE(PD_Pfile, "_PD_MPOPEN:pf");
+    pf = CMAKE(PD_Pfile);
     pf->stream = (_PD_is_comm_null(comm) == TRUE) ? (FILE *) fpstream : (FILE *) fh;
     pf->f_addr = fa;
     pf->bf     = NULL; 
@@ -890,7 +890,7 @@ static int _PD_pfm_add_d(PDBfile *file, int64_t start_addr)
 /* allocate more entries in _PD_pflst and register the file */
     if (ins == _PD_pflst->len)
        {_PD_pflst->len += PFM_N_INC;
-        NREMAKE_N(_PD_pflst->elem, pfelement, _PD_pflst->len);
+        NREMAKE(_PD_pflst->elem, pfelement, _PD_pflst->len);
 
         fe = &_PD_pflst->elem[ins];
         for (i = ins; i < _PD_pflst->len; fe++, i++)
@@ -903,8 +903,7 @@ static int _PD_pfm_add_d(PDBfile *file, int64_t start_addr)
     _PD_pflst->elem[ins].available = FALSE;
     _PD_pflst->elem[ins].file      = file;
     _PD_pflst->elem[ins].addr      = start_addr;
-    _PD_pflst->elem[ins].name      = SC_strsavef(file->name,
-						  "_PD_PFM_ADD_D:name");
+    _PD_pflst->elem[ins].name      = CSTRSAVE(file->name);
     pf->id = ins;
 
     SC_LOCKOFF(pflist_lock_d);
@@ -947,7 +946,7 @@ static void _PD_pfm_remove_file_d(FILE *fp)
     _PD_pflst->elem[id].addr      = 0;
     _PD_pflst->elem[id].nflushed  = 0;
     _PD_pflst->elem[id].file      = NULL;
-    SFREE(_PD_pflst->elem[id].name);
+    CFREE(_PD_pflst->elem[id].name);
 
     SC_LOCKOFF(pflist_lock_d);
  
@@ -1000,7 +999,7 @@ static long _PD_pfm_buffer_mp_req(char *type, void *request, char **buffer)
     nb = PD_sizeof(PD_pvif, type, 1, request);
 
 /* allocate the buffer */
-    *buffer = FMAKE_N(char, nb, "_PD_pfm_buffer_mp_req:*buffer");
+    *buffer = CMAKE_N(char, nb);
 
 /* write to the buffer */
     outf = PN_open(PD_pvif, *buffer);
@@ -1056,7 +1055,7 @@ static int64_t _PD_pfm_getspace_aux(int id, size_t nbytes, int mpi_flag)
                  MPI_BYTE, _PD.mp_master_proc,
                  PD_MP_GETSPACE, comm, &stat);
 
-        SFREE(mpbuf);}
+        CFREE(mpbuf);}
 
     DBG("- _PD_pfm_getspace_aux");
 
@@ -1148,7 +1147,7 @@ static int _PD_pfm_get_msg(char **buf, int *length, int *sender)
     MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &stat);
     MPI_Get_count(&stat, MPI_BYTE, length);
 
-    *buf = FMAKE_N(char, *length, "_PD_pfm_get_msg:buf");
+    *buf = CMAKE_N(char, *length);
 
     MPI_Recv(*buf, *length, MPI_BYTE, MPI_ANY_SOURCE, MPI_ANY_TAG,
              comm, &stat);
@@ -1236,7 +1235,7 @@ static int _PD_pfm_remote_flush(char *buf)
         if (lio_flush(fp))
            PD_error("FFLUSH FAILED _PD_pfm_remote_flush", PD_WRITE);}
 
-    SFREE(req.buf);
+    CFREE(req.buf);
     
     DBG("- _PD_pfm_remote_flush");
 
@@ -1299,7 +1298,7 @@ static int _PD_pfm_complete_request(PD_MP_request req, MPI_Comm comm)
              break;}
 
     if (req.buf != NULL)
-       {SFREE(req.buf);
+       {CFREE(req.buf);
         req.buf = NULL;}
 
     DBG("- _PD_pfm_complete_request");
@@ -1318,7 +1317,7 @@ static void _PD_pfm_service_req(int id, int request)
     MPI_Comm comm;
     PD_MP_request req, *pend_req;
 
-    pend_req   = FMAKE_N(PD_MP_request, _PD.mp_size, "_PD_PFM_SERVICE_REQ:pend_req");
+    pend_req   = CMAKE_N(PD_MP_request, _PD.mp_size);
     n_expected = _PD.mp_size - 1;
     n_received = 0;
 
@@ -1347,7 +1346,7 @@ static void _PD_pfm_service_req(int id, int request)
 
     DBG2("%d: - _PD_pfm_service_req for req type %d\n", _PD.mp_rank, request);
 
-    SFREE(pend_req);
+    CFREE(pend_req);
 
     return;}
 
@@ -1609,8 +1608,8 @@ static int _PD_mp_flush(PDBfile *file)
 
         MPI_Send(mpbuf, nbuf, MPI_BYTE, _PD.mp_master_proc, PD_MP_FLUSH, mcomm);
 
-        SFREE(buf);
-        SFREE(mpbuf);
+        CFREE(buf);
+        CFREE(mpbuf);
 
 /* have everybody except master process flush again after writing
  * the tables master process will flush when the tables are flushed
@@ -1623,12 +1622,12 @@ static int _PD_mp_flush(PDBfile *file)
 
 /* sync the in-memory symbol table amongst all processes */
         MPI_Recv(&len, 1, MPI_INT, _PD.mp_master_proc, PD_MP_SYNC, mcomm, &stat);
-        symtab_buf = FMAKE_N(char, len, "_PD_MP_FLUSH:symtab_buf"); 
+        symtab_buf = CMAKE_N(char, len); 
 
         MPI_Bcast(symtab_buf, len, MPI_BYTE, _PD.mp_master_proc, mcomm);
         (*file->parse_symt)(file, symtab_buf, TRUE);
 
-        SFREE(symtab_buf);}
+        CFREE(symtab_buf);}
 
     else
 
@@ -1651,7 +1650,7 @@ static int _PD_mp_flush(PDBfile *file)
 
         MPI_Bcast(symtab_buf, len, MPI_BYTE, _PD.mp_master_proc, mcomm);
     
-        SFREE(symtab_buf);};
+        CFREE(symtab_buf);};
 
 /* wait until everybody has flushed */
     MPI_Barrier(fcomm);

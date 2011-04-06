@@ -96,8 +96,8 @@
 static fcdes *_SC_make_tarfile(char *name, FILE *fp, hasharr *tab)
    {fcdes *fc;
 
-    fc = FMAKE(fcdes, "_SC_MAKE_TARFILE:fc");
-    fc->name     = SC_strsavef(name, "_SC_MAKE_TARFILE:name");
+    fc = CMAKE(fcdes);
+    fc->name     = CSTRSAVE(name);
     fc->file     = fp;
     fc->entries  = tab;
 
@@ -125,9 +125,9 @@ static fcent *_SC_make_tar_entry(FILE *fp, int round,
 
     pos = ftell(fp);
 		
-    ae = FMAKE(fcent, "_SC_MAKE_TAR_ENTRY:ae");
+    ae = CMAKE(fcent);
 
-    ae->name    = SC_strsavef(name, "_SC_MAKE_TAR_ENTRY:name");
+    ae->name    = CSTRSAVE(name);
     ae->date    = SC_stoi(date);
     ae->uid     = SC_strtol(uid, &p, 8);
     ae->gid     = SC_strtol(gid, &p, 8);

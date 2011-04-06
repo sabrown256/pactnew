@@ -130,7 +130,7 @@ static void _PG_PNG_finish_plot(PG_device *dev)
     png_set_sBIT(pw, pi, &pnc);
 
 /* setup text */
-    tp = FMAKE_N(png_text, 1, "_PG_PNG_FINISH_PLOT:tp");
+    tp = CMAKE_N(png_text, 1);
 
     i = 0;
     tp[i].key         = "author";
@@ -143,7 +143,7 @@ static void _PG_PNG_finish_plot(PG_device *dev)
 
     png_write_info(pw, pi);
 
-    row = FMAKE_N(unsigned char, 3*width, "_PG_PNG_FINISH_PLOT:row");
+    row = CMAKE_N(unsigned char, 3*width);
 
     for (i = 0; i < height; i++)
         {pr = row;
@@ -153,8 +153,8 @@ static void _PG_PNG_finish_plot(PG_device *dev)
 	      *pr++ = *b++;};
 	 png_write_row(pw, row);};
 
-    SFREE(row);
-    SFREE(tp);
+    CFREE(row);
+    CFREE(tp);
 
     png_write_end(pw, pi);
 

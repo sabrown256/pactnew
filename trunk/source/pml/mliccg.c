@@ -668,7 +668,7 @@ double _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
  
 /* set pointers (note that many arrays share storage) */
     nw = 6*(neq + 1);
-    di = FMAKE_N(double, nw, "_PM_ICCG_V:di");
+    di = CMAKE_N(double, nw);
     PM_set_value(di, nw, 0.0);
 
     c1  = di + neq;
@@ -704,7 +704,7 @@ double _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
         a0[j] = a0s[j];
  
 /* free temporary storage */
-    SFREE(di);
+    CFREE(di);
 
     return(eps);}
 

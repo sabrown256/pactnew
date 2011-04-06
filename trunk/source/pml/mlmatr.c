@@ -24,12 +24,12 @@ PM_matrix *PM_create(int nr, int nc)
    {PM_matrix *mp;
     double *ap;
 
-    mp = FMAKE(PM_matrix, "PM_CREATE:mp");
+    mp = CMAKE(PM_matrix);
 
     mp->nrow = nr;
     mp->ncol = nc;
     
-    ap = FMAKE_N(double, nr*nc, "PM_CREATE:ap");
+    ap = CMAKE_N(double, nr*nc);
     mp->array = ap;
 
     return(mp);}
@@ -45,8 +45,8 @@ int PM_destroy(PM_matrix *mp)
     if (mp == NULL)
        return(FALSE);
 
-    SFREE(mp->array);
-    SFREE(mp);
+    CFREE(mp->array);
+    CFREE(mp);
 
     return(TRUE);}
 
@@ -62,7 +62,7 @@ double *PM_matrix_done(PM_matrix *mp)
 
     if (mp != NULL)
        {rv = mp->array;
-	SFREE(mp);};
+	CFREE(mp);};
 
     return(rv);}
 
@@ -426,7 +426,8 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
     if ((col[ncol-1] >= nc) || (col[0] < 0))
        return(FALSE);
 
-    new  = nptr = FMAKE_N(double, nr * (nc - ncol), "PM_DEL_COL:new");
+    nptr = CMAKE_N(double, nr*(nc - ncol));
+    new  = nptr;
     optr = a->array;
 
     for (i = 0; i < nr; i++)
@@ -439,7 +440,7 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
                      ndcol++;};}
              optr++;};
 
-    SFREE(a->array);
+    CFREE(a->array);
     a->array = new;
     a->ncol  = nc - ndcol;
 
@@ -463,7 +464,7 @@ double *_PM_get_col(PM_matrix *a, int col)
     if ((col >= nc) || (col < 0))
        return(NULL);
 
-    get  = nptr = FMAKE_N(double, nr, "_PM_GET_COL:get");
+    get  = nptr = CMAKE_N(double, nr);
     optr = a->array + col;
 
     for (i = 0; i < nr; i++, nptr++)
@@ -520,14 +521,14 @@ int PM_sort_on_col(PM_matrix *a, int col)
 
     rcol = _PM_get_col(a, col);
 
-    ind = FMAKE_N(int, nr, "PM_SORT_ON_COL:ind");
+    ind = CMAKE_N(int, nr);
     for (i = 0; i < nr; ind[i] = i, i++);
 
     PM_q_sort(rcol, ind, nr);
 
     _PM_put_col(a, col, rcol);
 
-    temp = FMAKE_N(double, nr, "PM_SORT_ON_COL:temp");
+    temp = CMAKE_N(double, nr);
     
     for (i = 0; i < nc; i++)
         {if (i != col)
@@ -537,9 +538,9 @@ int PM_sort_on_col(PM_matrix *a, int col)
 		     temp[j] = rcol[ind[j]];
 		 _PM_put_col(a, i, temp);};};};
 
-    SFREE(rcol);
-    SFREE(ind);
-    SFREE(temp);
+    CFREE(rcol);
+    CFREE(ind);
+    CFREE(temp);
 
     return(TRUE);}
                 

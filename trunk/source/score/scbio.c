@@ -161,8 +161,8 @@ static void _SC_bfr_free(bio_frame *fr)
    {
 
     if (fr != NULL)
-       {SFREE(fr->bf);
-	SFREE(fr);};
+       {CFREE(fr->bf);
+	CFREE(fr);};
 
     return;}
 
@@ -236,10 +236,10 @@ static void _SC_bfr_init(bio_frame *fr, int64_t addr, size_t bfsz)
 
     if (fr != NULL)
        {if (fr->sz != bfsz)
-	   SFREE(fr->bf);
+	   CFREE(fr->bf);
 
 	if (fr->bf == NULL)
-	   fr->bf = FMAKE_N(unsigned char, bfsz, "_SC_BFR_INIT:bf");
+	   fr->bf = CMAKE_N(unsigned char, bfsz);
 
         memset(fr->bf, 0, bfsz);
 
@@ -259,7 +259,7 @@ static void _SC_bfr_init(bio_frame *fr, int64_t addr, size_t bfsz)
 static bio_frame *_SC_bfr_alloc(int64_t addr, size_t bfsz)
    {bio_frame *fr;
 
-    fr = FMAKE(bio_frame, "_SC_BFR_ALLOC:fr");
+    fr = CMAKE(bio_frame);
 
     SC_MEM_INIT(bio_frame, fr);
     
@@ -716,7 +716,7 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
 
     rad = lseek(fd, 0, SEEK_CUR);
 
-    cbf = FMAKE_N(unsigned char, nb, "_SC_VERIFY_FILE:cbf");
+    cbf = CMAKE_N(unsigned char, nb);
     st  = lseek(fd, ad, SEEK_SET);
 
 /* read the file contents */
@@ -731,7 +731,7 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
 	    ok = (cbf[i] == bf[i]);};
 
     st = lseek(fd, rad, SEEK_SET);
-    SFREE(cbf);
+    CFREE(cbf);
 
     return(ok);}
 
@@ -1218,7 +1218,7 @@ static int _SC_bprintf(FILE *fp, char *fmt, va_list a)
 
     msg = SC_vdsnprintf(TRUE, fmt, a);
     ret = _SC_bout(msg, bid);
-    SFREE(msg);
+    CFREE(msg);
 
     return(ret);}
 
@@ -1389,7 +1389,7 @@ static int _SC_bclose(FILE *fp)
 
     _SC_bio_free(bid, TRUE);
 
-    SFREE(bid);
+    CFREE(bid);
 
     return(ret);}
 
@@ -1432,7 +1432,7 @@ FILE *SC_bopen(char *name, char *mode)
     if (name != NULL)
        {fp = fopen(name, mode);
 	if (fp != NULL)
-	   {bid        = FMAKE(bio_desc, "SC_BOPEN:bid");
+	   {bid        = CMAKE(bio_desc);
             bid->sz    = SC_file_size(fp);
 	    bid->curr  = 0;
 	    bid->bfsz  = 0;
@@ -1492,7 +1492,7 @@ FILE *SC_lbopen(char *name, char *mode)
     if (name != NULL)
        {fp = fopen(name, mode);
 	if (fp != NULL)
-	   {bid        = FMAKE(bio_desc, "SC_LBOPEN:bid");
+	   {bid        = CMAKE(bio_desc);
             bid->sz    = SC_file_size(fp);
 	    bid->curr  = 0;
 	    bid->bfsz  = 0;

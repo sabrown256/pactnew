@@ -640,11 +640,10 @@ static void write_envf(int lnotice)
 
     separator(Log);
     if (lnotice == TRUE)
-       {noted(Log, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
-        note(Log, TRUE, "");}
+       noted(Log, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
     else
-       {note(Log, TRUE, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
-        note(Log, TRUE, "");};
+       note(Log, TRUE, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
+    note(Log, TRUE, "");
 
     fcsh = open_file("w", "%s/env-pact.csh", st.dir.inc);
     fsh  = open_file("w", "%s/env-pact.sh",  st.dir.inc);
@@ -1921,7 +1920,7 @@ static void read_config(char *cfg, int quiet)
 	     else
 	        dbset(NULL, var, val);
 
-	     if (st.phase == PHASE_READ)
+/*	     if (st.phase == PHASE_READ) */
 	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
 	     note(Log, TRUE, "Command: setenv %s %s", var, val);}
 

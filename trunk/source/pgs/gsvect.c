@@ -77,8 +77,8 @@ PG_picture_desc *PG_setup_picture_vector(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, 2, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);
+	CFREE(ddex);
+	CFREE(rdex);
 
 	PG_set_palette(dev, "standard");
 
@@ -166,7 +166,7 @@ static void PG_vct_hand(PG_device *dev, PG_graph *g,
 
 /* reset user's values for various attributes */
     PG_set_attributes(dev, attr);
-    SFREE(attr);
+    CFREE(attr);
 
     PM_free_vectors(2, d);
     PM_free_vectors(2, v);
@@ -222,7 +222,7 @@ static void _PG_draw_vct_zc_lr(PG_device *dev, double **u, double **r,
     PM_free_vectors(2, v);
 
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return;}
 
@@ -278,8 +278,8 @@ static void _PG_draw_vct_zc_ac(PG_device *dev, double **u, double **r,
 
     _PG_draw_vct_nc_ac(dev, a, r, cnnct, alst);
 
-    SFREE(a[0]);
-    SFREE(a[1]);
+    CFREE(a[0]);
+    CFREE(a[1]);
 
     return;}
 

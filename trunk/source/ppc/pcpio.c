@@ -67,18 +67,15 @@ static int _PC_register_proc(PROCESS *pp, int i)
 	nx = PC_procs.nx;
 	if (PC_procs.p == NULL)
 	   {nx = i + 8;
-	    PC_procs.p  = FMAKE_N(PROCESS *, nx,
-				  "_PC_REGISTER_PROC:procsp");
-	    PC_procs.m  = FMAKE_N(SC_message, nx,
-				  "_PC_REGISTER_PROC:procsm");
-	    PC_procs.fd = FMAKE_N(SC_poll_desc, nx,
-				  "_PC_REGISTER_PROC:procsfd");};
+	    PC_procs.p  = CMAKE_N(PROCESS *, nx);
+	    PC_procs.m  = CMAKE_N(SC_message, nx);
+	    PC_procs.fd = CMAKE_N(SC_poll_desc, nx);};
 
 	if (i >= nx)
 	   {nx = i + 8;
-	    REMAKE_N(PC_procs.p, PROCESS *, nx);
-	    REMAKE_N(PC_procs.m, SC_message, nx);
-	    REMAKE_N(PC_procs.fd, SC_poll_desc, nx);};
+	    CREMAKE(PC_procs.p, PROCESS *, nx);
+	    CREMAKE(PC_procs.m, SC_message, nx);
+	    CREMAKE(PC_procs.fd, SC_poll_desc, nx);};
 
 	pd.fd     = pp->in;
 	pd.events = POLLIN | POLLPRI;
@@ -194,14 +191,13 @@ static int _PC_setup_children(char **argv, char *mode)
 
 /* setup a special new arglist for the new children */
     for (argc = 0; argv[argc] != NULL; argc++);
-    args = FMAKE_N(char *, argc + 1,
-           "_PC_SETUP_CHILDREN:args");
+    args = CMAKE_N(char *, argc + 1);
     for (argc = 0; argv[argc] != NULL; argc++)
         args[argc] = argv[argc];
 
 /* add an additional argument at the end of the old list */
     snprintf(s, MAXLINE, "HOST:%s,%d", host, port);
-    args[argc] = SC_strsavef(s, "char*:_PC_SETUP_CHILDREN:s");
+    args[argc] = CSTRSAVE(s);
     args[argc+1] = NULL;
 
 /* open the requested additional nodes */
@@ -236,8 +232,8 @@ static int _PC_setup_children(char **argv, char *mode)
 	        {fprintf(_PC_diag, "I/O interrupt: %d\n\n", cbk);
 		 fflush(_PC_diag);};};};
 
-    SFREE(args[argc]);
-    SFREE(args);
+    CFREE(args[argc]);
+    CFREE(args);
 
     if ((_SC_debug) && (_PC_diag != NULL))
        {fprintf(_PC_diag, "   ------ End of Setup ------\n\n");
@@ -324,7 +320,7 @@ static int _PC_put_msg(PROCESS *pi, char *type, int ni, int indx)
 
     bpi = PN_sizeof(type, pf->host_chart);
     nbi = ni*bpi;
-    bf  = FMAKE_N(char, nbi, "_PC_PUT_MSG:bf");
+    bf  = CMAKE_N(char, nbi);
     if (_SC_debug)
        {fprintf(_PC_diag, "   Write Get(%d,%s,%d)", ni, type, pi->acpu);
 	fflush(_PC_diag);};
@@ -496,18 +492,18 @@ int PC_push_message(SC_message *msg, int i, int ni, char *type, char *bf)
     nx  = msg->nx;
     if (msg->msg == NULL)
        {nx = i + 8;
-	msg->ni   = FMAKE_N(int, nx, "PC_PUSH_MESSAGE:ni");
-	msg->type = FMAKE_N(char *, nx, "PC_PUSH_MESSAGE:type");
-	msg->msg  = FMAKE_N(char *, nx, "PC_PUSH_MESSAGE:msg");};
+	msg->ni   = CMAKE_N(int, nx);
+	msg->type = CMAKE_N(char *, nx);
+	msg->msg  = CMAKE_N(char *, nx);};
 
     if (i >= nx)
        {nx = i + 8;
-	REMAKE_N(msg->ni,   int, nx);
-	REMAKE_N(msg->type, char *, nx);
-	REMAKE_N(msg->msg,  char *, nx);};
+	CREMAKE(msg->ni,   int, nx);
+	CREMAKE(msg->type, char *, nx);
+	CREMAKE(msg->msg,  char *, nx);};
 
     msg->ni[n]   = ni;
-    msg->type[n] = SC_strsavef(type, "char*:PC_PUSH_MESSAGE:type");
+    msg->type[n] = CSTRSAVE(type);
     msg->msg[n]  = bf;
 
     msg->n  = n + 1;
@@ -530,8 +526,8 @@ void PC_pop_message(int i)
     nis = MESSAGE_LENGTHS(i);
 
     n = N_MESSAGES(i)--;
-    SFREE(msg[0]);
-    SFREE(typ[0]);
+    CFREE(msg[0]);
+    CFREE(typ[0]);
     for (j = 0; j < n; j++)
         {msg[j] = msg[j+1];
 	 typ[j] = typ[j+1];
@@ -562,7 +558,7 @@ int PC_buffer_data_in(PROCESS *pp)
     if (bf == NULL)
        {nx = DATA_BLOCK;
 	nb = 0L;
-	bf = FMAKE_N(char, nx, "PC_BUFFER_DATA_IN:bf");};
+	bf = CMAKE_N(char, nx);};
 
     PC_unblock_fd(fd);
 
@@ -577,7 +573,7 @@ int PC_buffer_data_in(PROCESS *pp)
 
         if (nbt > nx)
            {nx += DATA_BLOCK;
-	    REMAKE_N(bf, char, nx);};
+	    CREMAKE(bf, char, nx);};
 
 	memcpy(bf+nb, s, nbr);
 	nb = nbt;};

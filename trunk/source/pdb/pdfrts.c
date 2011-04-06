@@ -87,44 +87,36 @@ static void prep_test_1_data(void)
    {int i, *p1, *p2;
     double *p3, *p4;
 
-    tar_w = FMAKE_N(lev1, 2, "PREP_TEST_1_DATA:tar_w");
+    tar_w = CMAKE_N(lev1, 2);
 
-    p1 = tar_w[0].a = FMAKE_N(int, N_INT, "PREP_TEST_1_DATA:tar_w[0].a");
-    p2 = tar_w[1].a = FMAKE_N(int, N_INT, "PREP_TEST_1_DATA:tar_w[1].a");
+    p1 = tar_w[0].a = CMAKE_N(int, N_INT);
+    p2 = tar_w[1].a = CMAKE_N(int, N_INT);
     for (i = 0; i < N_INT; i++)
         {p1[i] = i;
          p2[i] = i + 10;};
 
-    p3 = tar_w[0].b = FMAKE_N(double, N_DOUBLE,
-                              "PREP_TEST_1_DATA:tar_w[0].b");
-    p4 = tar_w[1].b = FMAKE_N(double, N_DOUBLE,
-                              "PREP_TEST_1_DATA:tar_w[1].b");
+    p3 = tar_w[0].b = CMAKE_N(double, N_DOUBLE);
+    p4 = tar_w[1].b = CMAKE_N(double, N_DOUBLE);
     for (i = 0; i < N_DOUBLE; i++)
         {p3[i] = exp((double) i);
          p4[i] = log(1.0 + (double) i);};
 
-    tar_w[0].c = FMAKE_N(lev2, 2, "PREP_TEST_1_DATA:tar_w[0].c");
-    tar_w[1].c = FMAKE_N(lev2, 2, "PREP_TEST_1_DATA:tar_w[0].c");
+    tar_w[0].c = CMAKE_N(lev2, 2);
+    tar_w[1].c = CMAKE_N(lev2, 2);
 
-    tar_w[0].c[0].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_1_DATA:tar_w[0].c[0].s");
-    tar_w[0].c[0].s[0] = SC_strsavef("Hello",
-                           "char*:PREP_TEST_1_DATA:Hello");
-    tar_w[0].c[0].s[1] = SC_strsavef(" ", "char*:PREP_TEST_1_DATA:blank");
-    tar_w[0].c[1].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_1_DATA:tar_w[0].c[1].s");
-    tar_w[0].c[1].s[0] = SC_strsavef("world",
-                           "char*:PREP_TEST_1_DATA:world");
-    tar_w[0].c[1].s[1] = SC_strsavef("!", "char*:PREP_TEST_1_DATA:!");
+    tar_w[0].c[0].s    = CMAKE_N(char *, 2);
+    tar_w[0].c[0].s[0] = CSTRSAVE("Hello");
+    tar_w[0].c[0].s[1] = CSTRSAVE(" ");
+    tar_w[0].c[1].s    = CMAKE_N(char *, 2);
+    tar_w[0].c[1].s[0] = CSTRSAVE("world");
+    tar_w[0].c[1].s[1] = CSTRSAVE("!");
 
-    tar_w[1].c[0].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_1_DATA:tar_w[1].c[0].s");
-    tar_w[1].c[0].s[0] = SC_strsavef("Foo", "char*:PREP_TEST_1_DATA:Foo");
-    tar_w[1].c[0].s[1] = SC_strsavef(" ", "char*:PREP_TEST_1_DATA:blank");
-    tar_w[1].c[1].s    = FMAKE_N(char *, 2,
-                                 "PREP_TEST_1_DATA:tar_w[1].c[1].s");
-    tar_w[1].c[1].s[0] = SC_strsavef("Bar", "char*:PREP_TEST_1_DATA:Bar");
-    tar_w[1].c[1].s[1] = SC_strsavef("!!!", "char*:PREP_TEST_1_DATA:!!!");
+    tar_w[1].c[0].s    = CMAKE_N(char *, 2);
+    tar_w[1].c[0].s[0] = CSTRSAVE("Foo");
+    tar_w[1].c[0].s[1] = CSTRSAVE(" ");
+    tar_w[1].c[1].s    = CMAKE_N(char *, 2);
+    tar_w[1].c[1].s[0] = CSTRSAVE("Bar");
+    tar_w[1].c[1].s[1] = CSTRSAVE("!!!");
 
     tar_w[0].c[0].type = 1;
     tar_w[0].c[1].type = 2;

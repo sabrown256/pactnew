@@ -116,7 +116,7 @@ int *SC_process_ids(void)
 		   nid++;};
 
 	    rewinddir(dir);
-	    ids = FMAKE_N(int, nid+1, "SC_PROCESS_IDS:ids");
+	    ids = CMAKE_N(int, nid+1);
 
 /* add the entries to ids */
 	    nid = 0;
@@ -137,12 +137,12 @@ int *SC_process_ids(void)
 	struct kinfo_proc *kp;
 
 	if (sysctl(mib, 4, NULL, &ln, NULL, 0) == 0)
-	   {kp = FMAKE_N(struct kinfo_proc, ln/sizeof(struct kinfo_proc),
+	   {kp = CMAKE_N(struct kinfo_proc),
 			 "SC_PROCESS_IDS:kp");
 
 	    if (sysctl(mib, 4, kp, &ln, NULL, 0) == 0)
 	       {nid = ln/sizeof(struct kinfo_proc);
-		ids = FMAKE_N(int, nid+1, "SC_PROCESS_IDS:kp");
+		ids = CMAKE_N(int, nid+1);
 	        for (i = 0; i < nid; i++)
 		    ids[i] = kp[i].kp_proc.p_pid;};};};
 
@@ -155,14 +155,14 @@ int *SC_process_ids(void)
 	st  = SC_exec(&res, cmd, NULL, -1);
 	if (st == 0)
 	   {ns  = SC_MEM_GET_N(int, res);
-	    ids = FMAKE_N(int, ns, "SC_PROCESS_IDS:ids");
+	    ids = CMAKE_N(int, ns);
 
 	    nid = 0;
 	    for (i = 0; res[i] != NULL; i++)
 	        {SC_LAST_CHAR(res[i]) = '\0';
 		 if (SC_intstrp(res[i], 10) == TRUE)
 		    ids[nid++] = SC_stoi(res[i]);};};
-	SFREE(cmd);
+	CFREE(cmd);
 
 	SC_free_strings(res);};
 

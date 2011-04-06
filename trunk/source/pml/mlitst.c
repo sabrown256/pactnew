@@ -20,7 +20,7 @@ double *setup_1d_points(int nl)
     double r0;
     double *r;
 
-    r = FMAKE_N(double, nl, "SETUP_1D_POINTS:r");
+    r = CMAKE_N(double, nl);
 
     for (l = 0; l < nl; l++)
         {r0 = ((double) l)/(nl - 1.0);
@@ -66,8 +66,8 @@ int test_1(void)
 
     inx = 1.0/(nx - 1.0);
 
-    x = FMAKE_N(double, nx, "TEST_1:x");
-    f = FMAKE_N(double, nx, "TEST_1:f");
+    x = CMAKE_N(double, nx);
+    f = CMAKE_N(double, nx);
 
     for (i = 0; i < nx; i++)
 
@@ -79,7 +79,7 @@ int test_1(void)
 
 /* setup the interpolation points */
     r = setup_1d_points(nl);
-    y = FMAKE_N(double, nl, "TEST_1:y");
+    y = CMAKE_N(double, nl);
 
 /* compute Y(R) */
     for (l = 0; l < nl; l++)
@@ -106,10 +106,10 @@ int test_1(void)
 
 	rv = TRUE;};
 
-    SFREE(x);
-    SFREE(f);
-    SFREE(r);
-    SFREE(y);
+    CFREE(x);
+    CFREE(f);
+    CFREE(r);
+    CFREE(y);
 
     return(rv);}
 
@@ -132,8 +132,8 @@ int test_2(void)
 
     inx = 1.0/(nx - 1.0);
 
-    x = FMAKE_N(double, nx, "TEST_2:x");
-    f = FMAKE_N(double, nx, "TEST_2:f");
+    x = CMAKE_N(double, nx);
+    f = CMAKE_N(double, nx);
 
     for (i = 0; i < nx; i++)
 
@@ -145,7 +145,7 @@ int test_2(void)
 
 /* setup the interpolation points */
     r = setup_1d_points(nl);
-    y = FMAKE_N(double, nl, "TEST_2:y");
+    y = CMAKE_N(double, nl);
 
 /* compute Y(R) */
     df = PM_compute_splines(x, f, nx, HUGE, HUGE);
@@ -173,11 +173,11 @@ int test_2(void)
 
 	rv = TRUE;};
 
-    SFREE(x);
-    SFREE(f);
-    SFREE(df);
-    SFREE(r);
-    SFREE(y);
+    CFREE(x);
+    CFREE(f);
+    CFREE(df);
+    CFREE(r);
+    CFREE(y);
 
     return(rv);}
 
@@ -222,13 +222,13 @@ int test_3(void)
 /* get in the number of interpolation points */
     r = setup_2d_points(nl);
 
-    grid       = FMAKE(PM_lagrangian_mesh, "COMPUTE_F:grid");
+    grid       = CMAKE(PM_lagrangian_mesh);
     grid->x    = x[0];
     grid->y    = x[1];
     grid->kmax = nx;
     grid->lmax = ny;
 
-    fncs    = FMAKE_N(double *, 4, "COMPUTE_F:fncs");
+    fncs    = CMAKE_N(double *, 4);
     fncs[0] = x[0];
     fncs[1] = x[1];
     fncs[2] = f[0];
@@ -298,8 +298,8 @@ int test_4(void)
     nl = 20;
     r  = setup_2d_points(nl);
 
-    xo = FMAKE_N(double *, nd, "TEST_4:xo");
-    fo = FMAKE_N(double *, nf, "TEST_4:fo");
+    xo = CMAKE_N(double *, nd);
+    fo = CMAKE_N(double *, nf);
 
     mxo[0] = nx;
     mxo[1] = ny;
@@ -371,8 +371,8 @@ int test_5(void)
     nl = 20;
     r  = setup_2d_points(nl);
 
-    xo = FMAKE_N(double *, nd, "TEST_5:xo");
-    fo = FMAKE_N(double *, nf, "TEST_5:fo");
+    xo = CMAKE_N(double *, nd);
+    fo = CMAKE_N(double *, nf);
 
     mxo[0] = nx;
     mxo[1] = ny;

@@ -186,7 +186,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
     SC_convert_id(did, d, 0, 1, SC_DOUBLE_I, w, 0, 1, n, FALSE);
 
     if (rel)
-       SFREE(w);
+       CFREE(w);
 
     return;}
 
@@ -251,7 +251,7 @@ object *_SX_mh_u_s(C_procedure *cp, object *argl)
 		    {pd = elem[id];
 		     _SX_unop(fn, type, (void *) pd, ne, d);};
 
-		SFREE(d);
+		CFREE(d);
 		PM_find_extrema(set);};};
 
 	SX_prep_ret(ret);};

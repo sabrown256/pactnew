@@ -193,14 +193,14 @@ static void _SC_array_grow(SC_array *a, long nn)
        {if (nn == 0)
 	   {nx = 0;
 	    nn = 1;};
-	arr = FMAKE_N(char, nn*bpi, a->name);
+	arr = CMAKE_N(char, nn*bpi);
 	chg = TRUE;}
 
 /* if too small */
     else if (nn > nx)
        {_SC_array_err(a, "growing array %s from %ld to %ld", a->name, nx, nn);
 
-	REMAKE_N(arr, char, nn*bpi);
+	CREMAKE(arr, char, nn*bpi);
 	chg = TRUE;};
 
 /* if we changed it - make it consistent */
@@ -242,8 +242,8 @@ void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
         {nm  = NMAKE_N(char, nn, "PERM|char*:_SC_INIT_ARRAY:nm");
 	 ty  = NMAKE_N(char, nt, "PERM|char*:_SC_INIT_ARRAY:ty");}
      else
-        {nm  = FMAKE_N(char, nn, "char*:_SC_INIT_ARRAY:nm");
-	 ty  = FMAKE_N(char, nt, "char*:_SC_INIT_ARRAY:ty");};
+        {nm  = CMAKE_N(char, nn);
+	 ty  = CMAKE_N(char, nt);};
 
      snprintf(nm, nn, "%s",   name);
      snprintf(ty, nt, "%s *", type);
@@ -272,7 +272,7 @@ SC_array *SC_make_array(char *name, char *type, int bpi,
 			void (*init)(void *a))
     {SC_array *a;
 
-     a = FMAKE(SC_array, name);
+     a = CMAKE(SC_array);
      if (a != NULL)
         _SC_init_array(a, name, type, bpi, init);
 
@@ -300,7 +300,7 @@ int SC_array_free_n(void *a)
 
     if (a != NULL)
        {t = *(void **) a;
-	SFREE(t);};
+	CFREE(t);};
 
     return(TRUE);}
 
@@ -328,10 +328,10 @@ void SC_free_array(SC_array *a, int (*rel)(void *a))
 
 	     memset(a->array, 0, nx*bpi);};
 
-	 SFREE(a->array);
-	 SFREE(a->type);
-	 SFREE(a->name);
-	 SFREE(a);};
+	 CFREE(a->array);
+	 CFREE(a->type);
+	 CFREE(a->name);
+	 CFREE(a);};
 
      return;}
 
@@ -350,9 +350,9 @@ void *SC_array_done(SC_array *a)
      if (a != NULL)
         {rv = a->array;
 	 a->array = NULL;
-	 SFREE(a->name); 
-	 SFREE(a->type);
-	 SFREE(a);};
+	 CFREE(a->name); 
+	 CFREE(a->type);
+	 CFREE(a);};
 
      return(rv);}
 
@@ -502,7 +502,7 @@ void *SC_array_get(SC_array *a, long n)
 
 /* SC_ARRAY_ARRAY - return the actual array from A
  *                - the array is marked and the caller
- *                - must SFREE the returned pointer
+ *                - must CFREE the returned pointer
  *                - this convention makes it possible for _SC_array_grow
  *                - to detect whether the array it will grow is in use
  */
@@ -670,7 +670,7 @@ void SC_array_string_add(SC_array *a, char *s)
 void SC_array_string_add_copy(SC_array *a, char *s)
    {char *t;
 
-    t = SC_strsavef(s, "char*:SC_ARRAY_STRING_ADD_COPY:t");
+    t = CSTRSAVE(s);
 
     SC_array_string_add(a, t);
 
@@ -763,7 +763,7 @@ char **_SC_array_string_join(SC_array **psa)
 	   {if (bf[0] != '\0')
 	       SC_array_string_add(na, bf);
 	    else
-	       SFREE(bf);};};
+	       CFREE(bf);};};
 
 /* add a terminating NULL */
     SC_array_string_add(na, NULL);
@@ -808,14 +808,14 @@ SC_array *SC_array_copy(SC_array *a)
      bpi = a->bpi;
      nb  = nx*bpi;
 
-     arr = FMAKE_N(char, nb, "SC_ARRAY_COPY:arr");
+     arr = CMAKE_N(char, nb);
      memcpy(arr, a->array, nb);
 
-     ca  = FMAKE(SC_array, "SC_ARRAY_COPY:ca");
+     ca  = CMAKE(SC_array);
      *ca = *a;
 
-     ca->name  = SC_strsavef(a->name, "SC_ARRAY_COPY:name");
-     ca->type  = SC_strsavef(a->type, "SC_ARRAY_COPY:type");
+     ca->name  = CSTRSAVE(a->name);
+     ca->type  = CSTRSAVE(a->type);
      ca->array = arr;
 
      SC_mark(arr, 1);
@@ -830,7 +830,7 @@ SC_array *SC_array_copy(SC_array *a)
 SC_array *SC_strings_array(int n, char **sa)
    {SC_array *a;
 
-    a = FMAKE(SC_array, "SC_STRINGS_ARRAY:a");
+    a = CMAKE(SC_array);
 
     a->name  = "SC_STRINGS_ARRAY";
     a->type  = SC_STRING_S;

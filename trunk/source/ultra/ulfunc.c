@@ -205,9 +205,9 @@ static int UL_expunge(int j)
             {i = SX_number[j];
              if (i != -1)
                 {if (SX_dataset[i].x[0] != NULL)
-                    {SFREE(SX_dataset[i].x[0]);};
+                    {CFREE(SX_dataset[i].x[0]);};
                  if (SX_dataset[i].x[1] != NULL)
-                    {SFREE(SX_dataset[i].x[1]);};
+                    {CFREE(SX_dataset[i].x[1]);};
 
                  SX_zero_curve(i);
                  SX_number[j] = -1;};};
@@ -218,9 +218,9 @@ static int UL_expunge(int j)
        {i = SX_number[j];
         if (i != -1)
            {if (SX_dataset[i].x[0] != NULL)
-               {SFREE(SX_dataset[i].x[0]);};
+               {CFREE(SX_dataset[i].x[0]);};
             if (SX_dataset[i].x[1] != NULL)
-               {SFREE(SX_dataset[i].x[1]);};
+               {CFREE(SX_dataset[i].x[1]);};
 
             SX_zero_curve(i);
             SX_number[j] = -1;
@@ -644,23 +644,23 @@ static object *_ULI_open_device(object *argl)
         {out = SX_get_device(i);
 	 if (out->exist && out->active)
 	    {if (strcmp(name, out->dupp) == 0)
-	        {SFREE(out->type);
+	        {CFREE(out->type);
 		 out->type = type;
 
-		 SFREE(out->fname);   
+		 CFREE(out->fname);   
 		 out->fname = title;
 
-		 SFREE(name);
+		 CFREE(name);
 		 break;};};};
 
     if (i >= N_OUTPUT_DEVICES)
-       {SFREE(SX_display_type);
+       {CFREE(SX_display_type);
         SX_display_type = type;
 
-        SFREE(SX_display_title);   
+        CFREE(SX_display_title);   
         SX_display_title = title;
 
-        SFREE(SX_display_name);
+        CFREE(SX_display_name);
         SX_display_name = name;
 
         if (SX_gr_mode)
@@ -678,16 +678,15 @@ static object *_ULI_close_device(object *arg)
     char *name;
     out_device *out;
 
-    name = SC_strsavef(SS_get_string(arg),
-                      "char*:_ULI_CLOSE_DEVICE:name");
+    name = CSTRSAVE(SS_get_string(arg));
 
     SC_str_upper(name);
     for (i = 0; i < N_OUTPUT_DEVICES; i++)
         {out = SX_get_device(i);
 	 if (out->exist && out->active)
 	    {if (strcmp(name, out->dupp) == 0)
-	        {SFREE(out->type);
-		 SFREE(out->fname);   
+	        {CFREE(out->type);
+		 CFREE(out->fname);   
 		 if (out->dev != NULL)
 		    {PG_close_device(out->dev);
 		     out->dev    = NULL;
@@ -699,7 +698,7 @@ static object *_ULI_close_device(object *arg)
            {PG_close_device(SX_graphics_device);
             SX_graphics_device = NULL;};};
 
-    SFREE(name);
+    CFREE(name);
 
     return(SS_f);}
 
@@ -1056,8 +1055,8 @@ static object *UL_derivative(int j)
 
     ch = SX_mk_curve(n-1, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);      
 
     return(ch);}
 
@@ -1103,8 +1102,8 @@ static object *UL_thin(int j, object *argl)
 
     ch = SX_mk_curve(m, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);      
 
     return(ch);}
 
@@ -1158,8 +1157,8 @@ static object *UL_filter(int j, object *argl)
     SS_Assign(yexpr, SS_null);
 
     if (k < 2)
-       {SFREE(UL_buf1x);
-        SFREE(UL_buf1y);
+       {CFREE(UL_buf1x);
+        CFREE(UL_buf1y);
         SS_error("FEWER THAN TWO POINTS REMAIN - UL_FILTER", SS_null);};
 
     SX_dataset[j].n  = k;
@@ -1172,8 +1171,8 @@ static object *UL_filter(int j, object *argl)
     SX_dataset[j].wc[2] = wc[2];
     SX_dataset[j].wc[3] = wc[3];
         
-    SFREE(x[0]);
-    SFREE(x[1]);
+    CFREE(x[0]);
+    CFREE(x[1]);
 
     o = (object *) SX_dataset[j].obj;
 
@@ -1212,8 +1211,8 @@ static object *UL_integrate(int j, double d1, double d2)
 
     ch = SX_mk_curve(n, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);
         
     return(ch);}
         
@@ -1242,7 +1241,7 @@ static object *_ULI_label(object *argl)
     if (labl == NULL)
        SS_error("BAD LABEL ARGUMENT - _ULI_LABEL", argl);
 
-    SFREE(SX_dataset[j].text);
+    CFREE(SX_dataset[j].text);
 
     SX_dataset[j].text     = labl;
     SX_dataset[j].modified = FALSE;
@@ -1307,9 +1306,9 @@ static object *_ULI_average(object *s)
 
         SC_strtok(SX_dataset[i].text, " ", t);
         lbl = SC_dsnprintf(FALSE, "Append %s", SC_strtok(NULL, "\n", t));
-        SFREE(SX_dataset[i].text);
+        CFREE(SX_dataset[i].text);
 
-        SX_dataset[i].text = SC_strsavef(lbl, "char*:_ULI_AVERAGE:lbl");
+        SX_dataset[i].text = CSTRSAVE(lbl);
         UL_restore_plot();
 
 	_SS_rl_C_proc(cpd);
@@ -1354,10 +1353,10 @@ static object *_ULI_syscmnd(object *s)
        {i = 0;
         while (output[i] != NULL)
            {SS_Assign(lst, SS_mk_cons(SS_mk_string(output[i]), lst));
-            SFREE(output[i]);
+            CFREE(output[i]);
             i++;}
         SS_Assign(lst, SS_reverse(lst));
-        SFREE(output);}
+        CFREE(output);}
 
     return(lst);}
 
@@ -1437,12 +1436,12 @@ static object *UL_xmm(int j, double d1, double d2)
              
     ch = SX_mk_curve(k, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);      
 
     if (decreasing)
-       {SFREE(xrev);
-        SFREE(yrev);}
+       {CFREE(xrev);
+        CFREE(yrev);}
 
     return(ch);}
 
@@ -1632,8 +1631,8 @@ static object *UL_smp_append(object *a, object *b)
 
     c = SX_mk_curve(n, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);      
 
     return(c);}
 
@@ -1731,8 +1730,8 @@ static object *UL_pr_append(object *a, object *b)
 
     c = SX_mk_curve(n, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);      
 
     return(c);}
 
@@ -1791,8 +1790,8 @@ static object *_ULI_append(object *argl)
     UL_delete(acc);
 
     i = SX_get_crv_index_i(target);
-    SFREE(SX_dataset[i].text);
-    SX_dataset[i].text = SC_strsavef(lbl, "char*:_ULI_APPEND:lbl");
+    CFREE(SX_dataset[i].text);
+    SX_dataset[i].text = CSTRSAVE(lbl);
 
     SX_autoplot = ON;
 
@@ -1859,8 +1858,8 @@ object *_UL_make_ln(double slope, double interc,
     ch = SX_mk_curve(i, UL_buf1x, UL_buf1y, "Straight line", NULL,
 		     (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);      
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);      
 
     return(ch);}
 
@@ -1941,8 +1940,8 @@ static object *_ULI_mk_curve(object *argl)
 
     ch = SX_mk_curve(n, UL_buf1x, UL_buf1y, labls, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);
 
     return(ch);}
 

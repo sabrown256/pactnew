@@ -210,7 +210,7 @@ void SC_warn(char *fmt, ...)
 
     strcat(s, err);
 
-    SFREE(err);
+    CFREE(err);
 
     return;}
 
@@ -232,7 +232,7 @@ void SC_error(int st, char *fmt, ...)
 
     strcat(s, err);
 
-    SFREE(err);
+    CFREE(err);
 
     if (pe->active == TRUE)
        {

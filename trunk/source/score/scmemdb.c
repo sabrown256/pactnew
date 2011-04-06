@@ -462,7 +462,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 		     else
 		        fprintf(fp, "%s\n", s);};};
 
-/*	    SFREE(arr); */
+/*	    CFREE(arr); */
 	    free(arr);
 
 	    nbl = i;};
@@ -755,7 +755,7 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 
 /* first call - make a copy of the non-NULL argument */
     if (p != NULL)
-       {s = FMAKE_N(char, nb, "SC_MEM_DIFF:s");
+       {s = CMAKE_N(char, nb);
 	memcpy(s, p, nb);}
 
 /* second call report the differences */
@@ -785,7 +785,7 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 		 if (id - is == 1)
 		    nd++;};};
 
-	SFREE(b);
+	CFREE(b);
 	s = NULL;};
 
     return(s);}

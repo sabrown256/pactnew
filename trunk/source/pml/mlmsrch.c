@@ -27,7 +27,7 @@ static void _PM_init_search_map(PM_mesh_map *sm, int *map)
     for (n = 1, id = 0; id < nd; id++)
         n *= dims[id];
 
-    emap = FMAKE_N(char, n, "_PM_INIT_SEARCH_MAP:emap");
+    emap = CMAKE_N(char, n);
 
     if (map == NULL)
        {for (i = 0; i < n; i++)
@@ -87,12 +87,12 @@ PM_mesh_map *PM_init_mesh_search(int nd, int *dims, double **r, int *map)
     nl = PM_ipow(2, 9-nd);
     nc = PM_ipow(nl, nd);
 
-    indx = FMAKE_N(long, nc, "PM_INIT_MESH_SEARCH:indx");
+    indx = CMAKE_N(long, nc);
     for (i = 0; i < nc; i++)
         indx[i] = -1;
 
-    dr   = FMAKE_N(double, nd, "PM_INIT_MESH_SEARCH:dr");
-    rmin = FMAKE_N(double, nd, "PM_INIT_MESH_SEARCH:rmin");
+    dr   = CMAKE_N(double, nd);
+    rmin = CMAKE_N(double, nd);
 
     for (n = 1, id = 0; id < nd; id++)
         n *= dims[id];
@@ -116,7 +116,7 @@ PM_mesh_map *PM_init_mesh_search(int nd, int *dims, double **r, int *map)
 	 rmin[id] = rmn;
 	 dr[id]   = (rmx - rmn)/nl;};
 
-    sm = FMAKE(PM_mesh_map, "PM_INIT_MESH_SEARCH:sm");
+    sm = CMAKE(PM_mesh_map);
     sm->nd   = nd;
     sm->nl   = nl;
     sm->nc   = nc;
@@ -138,11 +138,11 @@ PM_mesh_map *PM_init_mesh_search(int nd, int *dims, double **r, int *map)
 void PM_fin_mesh_search(PM_mesh_map *sm)
    {
 
-    SFREE(sm->emap);
-    SFREE(sm->dr);
-    SFREE(sm->rmin);
-    SFREE(sm->indx);
-    SFREE(sm);
+    CFREE(sm->emap);
+    CFREE(sm->dr);
+    CFREE(sm->rmin);
+    CFREE(sm->indx);
+    CFREE(sm);
 
     return;}
 

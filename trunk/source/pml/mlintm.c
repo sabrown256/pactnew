@@ -71,7 +71,7 @@ static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
     double sc, dc, rc, ic;
     double ssc[20], dsc[20];
 
-    ta = FMAKE_N(int, nc, "_PM_FIND_OVERLAP_MARGIN:ta");
+    ta = CMAKE_N(int, nc);
 
     snd  = sd->dimension;
     snde = sd->dimension_elem;
@@ -205,12 +205,12 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
     dde = PM_make_real_set_elements(dd);
     sde = PM_make_real_set_elements(sd);
 
-    it = FMAKE_N(int, snde, "_PM_INV_DIST_WGT:it");
-    dt = FMAKE_N(int, snde, "_PM_INV_DIST_WGT:dt");
-    tb = FMAKE_N(int, snde, "_PM_INV_DIST_WGT:tb");
-    to = FMAKE_N(int, snde, "_PM_INV_DIST_WGT:to");
-    on = FMAKE_N(int, snde, "_PM_INV_DIST_WGT:on");
-    ds = FMAKE_N(double, snde, "_PM_INV_DIST_WGT:ds");
+    it = CMAKE_N(int, snde);
+    dt = CMAKE_N(int, snde);
+    tb = CMAKE_N(int, snde);
+    to = CMAKE_N(int, snde);
+    on = CMAKE_N(int, snde);
+    ds = CMAKE_N(double, snde);
 
 /* PS defines the strength of the pole obtained at zero distance
  * the relationships here are imperical and give better results
@@ -336,12 +336,12 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
     PM_rel_real_set_elements(dde);
     PM_rel_real_set_elements(sde);
 
-    SFREE(it);
-    SFREE(dt);
-    SFREE(tb);
-    SFREE(to);
-    SFREE(on);
-    SFREE(ds);
+    CFREE(it);
+    CFREE(dt);
+    CFREE(tb);
+    CFREE(to);
+    CFREE(on);
+    CFREE(ds);
 
     return;}
 
@@ -402,10 +402,10 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
         nn *= ta[j];
 
     wda = SC_MAKE_ARRAY("PM_INTERPOLATE_MAPPING", weight, NULL);
-    nof = FMAKE_N(int, sne+1, "PM_INTERPOLATE_MAPPING:nof");
+    nof = CMAKE_N(int, sne+1);
 
-    ad = FMAKE_N(double, snde, "PM_INTERPOLATE_MAPPING:ad");
-    bd = FMAKE_N(double, snde, "PM_INTERPOLATE_MAPPING:bd");
+    ad = CMAKE_N(double, snde);
+    bd = CMAKE_N(double, snde);
 
 /* compute the coordinate interpolation parameters */
     _PM_coord_interp_param(ad, bd, snde, ddextr, ddix);
@@ -413,7 +413,7 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 /* compute the inverse distance weights */
     _PM_inv_dist_wgt(wda, nof, dd, sd, ad, bd, ddix, ta, prm);
 
-    wgt = FMAKE_N(double, dne, "PM_INTERPOLATE_MAPPING:wgt");
+    wgt = CMAKE_N(double, dne);
 
     PM_set_value(wgt, dne, 0.0);
 
@@ -468,12 +468,12 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 
     SC_free_array(wda, NULL);
 
-    SFREE(ddextr);
-    SFREE(ad);
-    SFREE(bd);
-    SFREE(wgt);
-    SFREE(nof);
-    SFREE(ta);
+    CFREE(ddextr);
+    CFREE(ad);
+    CFREE(bd);
+    CFREE(wgt);
+    CFREE(nof);
+    CFREE(ta);
 
     return(tre);}
 
@@ -503,8 +503,8 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 
     rv = TRUE;
 
-    extr = FMAKE_N(double, 2*nd, "PM_INTERP_MESH_ID:extr");
-    rat  = FMAKE_N(double, nd, "PM_INTERP_MESH_ID:rat");
+    extr = CMAKE_N(double, 2*nd);
+    rat  = CMAKE_N(double, nd);
 
 /* compute the output cartesian product mesh */
     for (id = 0; id < nd; id++)
@@ -524,7 +524,7 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 	 extr[2*id+1] = xmx;
 	 rat[id]      = 1.0;
 
-	 xoc    = FMAKE_N(double, nxo, "PM_INTERP_MESH_ID:xo[id]");
+	 xoc    = CMAKE_N(double, nxo);
 	 xo[id] = xoc;
 	 for (i = 0; i < nxo; i++)
 	     xoc[i] = xmn + i*dx;};
@@ -534,7 +534,7 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 
     ne = dd->n_elements;
     for (id = 0; id < nf; id++)
-        fo[id] = FMAKE_N(double, ne, "PM_INTERP_MESH_ID:fo[id]");
+        fo[id] = CMAKE_N(double, ne);
 
     sr = PM_make_set_alt("sr", SC_DOUBLE_S, FALSE, 1, &ni, nf, (void **) fi);
     dr = PM_make_set_alt("dr", SC_DOUBLE_S, FALSE, nd, mxo, nf, (void **) fo);
@@ -559,8 +559,8 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 
 	 PM_conv_array(&da, &sa, FALSE);};
 
-    SFREE(extr);
-    SFREE(rat);
+    CFREE(extr);
+    CFREE(rat);
 
     PM_free_vectors(nf, tre);
 
@@ -631,7 +631,7 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 
     PM_solve(a, b);
 
-    coef = FMAKE_N(double, n, "_PM_MQ_COEF:coef");
+    coef = CMAKE_N(double, n);
 
     for (i = 1; i <= n; i++)
         coef[i-1] = PM_element(b, i, 1);
@@ -720,7 +720,7 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
 	 rsc *= dx;
 	 dx  /= (nxo - 1.0);
 
-	 xoc    = FMAKE_N(double, nxo, "PM_INTERP_MESH_MQ:xo[id]");
+	 xoc    = CMAKE_N(double, nxo);
 	 xo[id] = xoc;
 	 for (i = 0; i < nxo; i++)
 	     xoc[i] = xmn + i*dx;};
@@ -732,12 +732,12 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
     rv = FALSE;
 
     for (i = 0; i < nf; i++)
-        {fo[i] = FMAKE_N(double, no, "PM_INTERP_MESH_MQ:fo[i]");
+        {fo[i] = CMAKE_N(double, no);
 
 	 coef = _PM_mq_coef(nd, ni, xi, fi[i], rsc);
 	 if (coef != NULL)
 	    {_PM_mq_eval(nd, ni, xi, rsc, coef, mxo, xo, fo[i]);
-	     SFREE(coef);
+	     CFREE(coef);
 	     rv = TRUE;};};
 
     return(rv);}

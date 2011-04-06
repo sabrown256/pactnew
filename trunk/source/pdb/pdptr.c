@@ -843,7 +843,7 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
 
 	ad = _PD_ptr_get_ad(file, i);
 	ad->reta = here;
-	SFREE(ad);};
+	CFREE(ad);};
 
 /* restore the file pointer to its original location if necessary */
     if (loc != LOC_HERE)

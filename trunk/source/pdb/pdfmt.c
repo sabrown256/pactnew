@@ -202,7 +202,7 @@ int _PD_put_text(int reset, int ns, char *s)
     
     if (nc + ns + 10 > ncx)
        {ncx += BUFINCR;
-	REMAKE_N(bf, char, ncx);
+	CREMAKE(bf, char, ncx);
 	spl = bf + strlen(bf);};
 
     SC_strncpy(spl, ncx, s, ns+1);
@@ -256,7 +256,7 @@ int _PD_cp_tbuffer(char **buf)
 
     bf   = pa->tbuffer;
     nc   = strlen(bf) + 1;
-    *buf = FMAKE_N(char, nc, "_PD_CP_TBUFFER:buf");
+    *buf = CMAKE_N(char, nc);
 
     strcpy(*buf, bf);
 
@@ -276,7 +276,7 @@ char *_PD_get_tbuffer(void)
 
     bf  = pa->tbuffer;
     nc  = strlen(bf) + 1;
-    ret = FMAKE_N(char, nc, "_PD_GET_TBUFFER:ret");
+    ret = CMAKE_N(char, nc);
 
     strcpy(ret, bf);
 
@@ -359,10 +359,10 @@ void _PD_check_casts(PDBfile *file)
 
 /* clean up the mess */
 	for (i = 0L; i < nc; i += 3)
-	    {SFREE(clst[i]);
-	     SFREE(clst[i+1]);};};
+	    {CFREE(clst[i]);
+	     CFREE(clst[i+1]);};};
 
-    SFREE(pa->cast_lst);
+    CFREE(pa->cast_lst);
     pa->n_casts = 0L;
 
     return;}

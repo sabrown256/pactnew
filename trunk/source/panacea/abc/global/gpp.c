@@ -98,7 +98,7 @@ PM_set *_LR_get_pseudo_set(PA_plot_request *pr, char *name)
     centering = pr->centering;
     space     = pr->mesh_plot;
     set       = pr->data;
-    set->name = SC_strsave(name);
+    set->name = CSTRSAVE(name);
 
     elem = (double **) set->elements;
     ne   = pr->size;
@@ -109,7 +109,7 @@ PM_set *_LR_get_pseudo_set(PA_plot_request *pr, char *name)
 /* resize the data array to the correct length - don't lie to others */
 	 sz = SC_MEM_GET_N(double, data);
          if (sz != ne)
-            REMAKE_N(data, double, ne);
+            CREMAKE(data, double, ne);
 
 /* if this is a mesh plot worry about centering */
          if (space)
@@ -154,7 +154,7 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
 
 /* compute the dimensionality of the set elements */
     for (nde = 0, s = rp; s != NULL; s = s->next, nde++);
-    elem = FMAKE_N(double *, nde, "_LR_GET_N_SET:elem");
+    elem = CMAKE_N(double *, nde);
 
     for (nde = 0, s = rp; s != NULL; s = s->next, nde++)
         {data = PA_set_data(s->var_name, arr, &centering);
@@ -168,26 +168,24 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
     ne = SC_MEM_GET_N(double, elem[0]);
 
     nd       = 1;
-    maxes    = FMAKE_N(int, nd, "_LR_GET_N_SET:maxes");
+    maxes    = CMAKE_N(int, nd);
     maxes[0] = ne;
 
     pr->centering = N_CENT;
     pr->size      = ne;
 
 /* build the set */
-    set                 = FMAKE(PM_set, "_LR_GET_N_SET:set");
-    set->name           = SC_strsave(name);
-    set->element_type   = SC_strsave("double **");
+    set                 = CMAKE(PM_set);
+    set->name           = CSTRSAVE(name);
+    set->element_type   = CSTRSAVE("double **");
     set->n_elements     = ne;
     set->dimension      = nd;
     set->dimension_elem = nde;
     set->max_index      = maxes;
     set->elements       = (byte *) elem;
-    set->es_type        = SC_strsave("double *");
-    set->extrema        = (byte *) FMAKE_N(double, 2*nde,
-					   "_LR_GET_N_SET:extrema");
-    set->scales         = (byte *) FMAKE_N(double, nde,
-					   "_LR_GET_N_SET:scales");
+    set->es_type        = CSTRSAVE("double *");
+    set->extrema        = (byte *) CMAKE_N(double, 2*nde);
+    set->scales         = (byte *) CMAKE_N(double, nde);
     set->opers          = PM_fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
@@ -251,7 +249,7 @@ double *LR_map_centers(double *data, int centering)
                       break;
 
         case Z_CENT : nz  = kmax*lmax;
-                      fp  = FMAKE_N(double, nz, "LR_MAP_CENTERS:fp");
+                      fp  = CMAKE_N(double, nz);
                       fp2 = fp;
                       fp1 = fp2 - kmax;
                       fp3 = fp2 - 1;
@@ -320,7 +318,7 @@ double *LR_map_centers(double *data, int centering)
 
                       break;};
 
-    REMAKE_N(data, double, ns);
+    CREMAKE(data, double, ns);
 
     return(data);}
 
@@ -353,7 +351,7 @@ void LR_expand_plot_data(PA_plot_request *pr, int ni)
 	 osz  = SC_MEM_GET_N(double, data);
          nsz  = ni*nz;
          if (osz <= nsz)
-            {elem[nde] = REMAKE_N(data, double, nsz);
+            {elem[nde] = CREMAKE(data, double, nsz);
              PA_PR_RANGE_SIZE(pr, nsz);};};
 
     return;}
@@ -396,7 +394,7 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
                  else
                     nd++;};};};
 
-    maxes = FMAKE_N(int, nd, "LR_BUILD_DOMAIN:maxes");
+    maxes = CMAKE_N(int, nd);
     pm    = maxes;
     for (i = 0; i < n; i++)
         {if (dmap[i].val == -HUGE)
@@ -420,7 +418,7 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
     for (i = 0; i < nd; i++)
         ne *= maxes[i];
 
-    elem = FMAKE_N(double *, nd, "LR_BUILD_DOMAIN:elem");
+    elem = CMAKE_N(double *, nd);
 
     nde = 0;
     ist = 1;
@@ -440,19 +438,17 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
 						    &ist,
                                                     ne);};};};
 
-    set                 = FMAKE(PM_set, "LR_BUILD_DOMAIN:set");
-    set->name           = SC_strsave(dname);
-    set->element_type   = SC_strsave("double **");
+    set                 = CMAKE(PM_set);
+    set->name           = CSTRSAVE(dname);
+    set->element_type   = CSTRSAVE("double **");
     set->n_elements     = ne;
     set->dimension      = nd;
     set->dimension_elem = nde;
     set->max_index      = maxes;
     set->elements       = (byte *) elem;
-    set->es_type        = SC_strsave("double *");
-    set->extrema        = (byte *) FMAKE_N(double, 2*nde,
-                                           "LR_BUILD_DOMAIN:extrema");
-    set->scales         = (byte *) FMAKE_N(double, nde,
-                                           "LR_BUILD_DOMAIN:scales");
+    set->es_type        = CSTRSAVE("double *");
+    set->extrema        = (byte *) CMAKE_N(double, 2*nde);
+    set->scales         = (byte *) CMAKE_N(double, nde);
     set->opers          = PM_fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
@@ -475,8 +471,8 @@ static void _LR_fill_coordw(double **elem, int ne, int *pist)
    {int i, j, k, l, m, ist, nst;
     double *xc, *yc, *pxc, *pyc, conv;
 
-    pxc = *elem++ = xc = FMAKE_N(double, ne, "_LR_FILL_COORDW:pxc");
-    pyc = *elem++ = yc = FMAKE_N(double, ne, "_LR_FILL_COORDW:pyc");
+    pxc = *elem++ = xc = CMAKE_N(double, ne);
+    pyc = *elem++ = yc = CMAKE_N(double, ne);
 
     ist = *pist;
     nst = ist*kmax*lmax;
@@ -531,7 +527,7 @@ int LR_flatten_space(PA_plot_request *pr)
             else
                PA_ERR(TRUE,
                       "NOT READY FOR MESH SUB-SETS - LR_FLATTEN_SPACE");
-            dmap[i].name = SC_strsave("R");
+            dmap[i].name = CSTRSAVE("R");
             n--;
             for (j = i+1; j < n; j++)
                 dmap[j] = dmap[j+1];};
@@ -583,7 +579,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
 
     snprintf(dname, MAXLINE, "{rx, ry}");
     nd = 2;
-    maxes    = FMAKE_N(int, nd, "LR_INT_PLOT:maxes");
+    maxes    = CMAKE_N(int, nd);
     maxes[0] = kmax;
     maxes[1] = lmax;
 
@@ -600,19 +596,17 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
     ne = SC_MEM_GET_N(double, elem[0]);
 
 /* build the set */
-    range                 = FMAKE(PM_set, "LR_INT_PLOT:range");
-    range->name           = SC_strsave(rname);
-    range->element_type   = SC_strsave("double **");
+    range                 = CMAKE(PM_set);
+    range->name           = CSTRSAVE(rname);
+    range->element_type   = CSTRSAVE("double **");
     range->n_elements     = ne;
     range->dimension      = nd;
     range->dimension_elem = nde;
     range->max_index      = maxes;
     range->elements       = (byte *) elem;
-    range->es_type        = SC_strsave("double *");
-    range->extrema        = (byte *) FMAKE_N(double, 2*nde,
-                                             "LR_INT_PLOT:extrema");
-    range->scales         = (byte *) FMAKE_N(double, nde,
-                                             "LR_INT_PLOT:scales");
+    range->es_type        = CSTRSAVE("double *");
+    range->extrema        = (byte *) CMAKE_N(double, 2*nde);
+    range->scales         = (byte *) CMAKE_N(double, nde);
 
     PM_find_extrema(range);
 
@@ -804,8 +798,8 @@ static PM_set *LR_mesh_set(char *name)
     double conv;
 
     nitems = kmax*lmax;
-    pxc = xc = FMAKE_N(double, nitems, "LR_MESH_SET:pxc");
-    pyc = yc = FMAKE_N(double, nitems, "LR_MESH_SET:pyc");
+    pxc = xc = CMAKE_N(double, nitems);
+    pyc = yc = CMAKE_N(double, nitems);
     for (l = 1; l <= lmax; l++)
         for (k = 1; k <= kmax; k++)
             {i = NODE_OF(k, l);
@@ -995,9 +989,9 @@ object *LR_def_domain(object *argl)
     char dname[MAXLINE], numval[20];
 
     nmax = SS_length(argl);
-    dmap = FMAKE_N(PA_set_index, nmax, "LR_DEF_DOMAIN:dmap");
+    dmap = CMAKE_N(PA_set_index, nmax);
 
-    arr         = FMAKE(C_array, "LR_DEF_DOMAIN:arr");
+    arr         = CMAKE(C_array);
     arr->type   = PA_SET_INDEX_P_S;
     arr->length = nmax;
     arr->data   = (byte *) dmap;
@@ -1007,7 +1001,7 @@ object *LR_def_domain(object *argl)
     while (SS_consp(argl))
        {obj  = SS_car(argl);
         argl = SS_cdr(argl);
-        dmap[i].name = SC_strsave(SS_get_string(obj));
+        dmap[i].name = CSTRSAVE(SS_get_string(obj));
         if (SS_consp(argl))
            {obj = SS_car(argl);
             if (SS_numbp(obj))
@@ -1037,7 +1031,7 @@ object *LR_def_domain(object *argl)
     dom = LR_build_domain(dname, arr, t);
 
 /* encapsulate the domain map indices */
-    arr         = FMAKE(C_array, "LR_DEF_DOMAIN:arr");
+    arr         = CMAKE(C_array);
     arr->type   = PA_SET_INDEX_S;
     arr->length = n;
     arr->data   = (byte *) dmap;

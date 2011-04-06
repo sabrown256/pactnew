@@ -28,11 +28,11 @@ static int oper_test()
     PM_matrix *m, *t, *b, *a, *c;
 
     m = PM_create(nrow, ncol);
-    SFREE(m->array);
+    CFREE(m->array);
     m->array = (double *) a1;
 
     b = PM_create(nrow, 1);
-    SFREE(b->array);
+    CFREE(b->array);
     b->array = (double *) b1;
         
     PRINT(STDOUT, "\nMatrix M\n");
@@ -63,7 +63,7 @@ static int oper_test()
 
     PRINT(STDOUT, "\nTest LU decomposition\n");
     a = PM_create(3, 3);
-    SFREE(a->array);
+    CFREE(a->array);
     a->array = (double *) tstd;
 
     PRINT(STDOUT, "\nMatrix A\n");
@@ -75,9 +75,9 @@ static int oper_test()
     PM_destroy(t);
     PM_destroy(c);
 
-    SFREE(a);
-    SFREE(b);
-    SFREE(m);
+    CFREE(a);
+    CFREE(b);
+    CFREE(m);
 
     return(TRUE);}
 

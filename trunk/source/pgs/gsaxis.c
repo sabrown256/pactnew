@@ -619,7 +619,7 @@ void PG_axis(PG_device *dev, int axis_type)
 
 /* reset user's values for various attributes */
     PG_set_attributes(dev, attr);
-    SFREE(attr);
+    CFREE(attr);
 
     return;}
 
@@ -732,9 +732,8 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 		 break;
 
             case AXIS_LABELFONT :
-	         SFREE(_PG_gattrs.axis_type_face);
-		 _PG_gattrs.axis_type_face = SC_strsavef(SC_VA_ARG(char *),
-							 "char*:PG_SET_AXIS_ATTRIBUTES:labelfont");
+	         CFREE(_PG_gattrs.axis_type_face);
+		 _PG_gattrs.axis_type_face = CSTRSAVE(SC_VA_ARG(char *));
 		 break;
 
             case AXIS_X_FORMAT :
@@ -1035,7 +1034,7 @@ static void _PG_write_label(PG_device *dev, char *format,
 
     PG_write_n(dev, 2, WORLDC, xc, "%s", ps);
 
-    SFREE(ps);
+    CFREE(ps);
 
     return;}
 
@@ -1236,8 +1235,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 /* reset the axis type */
     if (_PG_gattrs.axis_char_size >= 8)
        {PG_set_font(dev, tf, ts, sz);
-        SFREE(tf);
-        SFREE(ts);};
+        CFREE(tf);
+        CFREE(ts);};
 
     return(TRUE);}
 

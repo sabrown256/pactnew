@@ -86,13 +86,13 @@ void PG_close_text_box(PG_text_box *b)
     ln = b->n_lines;
     bf = b->text_buffer;
     for (i = 0; i < ln; i++)
-        {SFREE(bf[i]);};
+        {CFREE(bf[i]);};
 
-    SFREE(bf);
+    CFREE(bf);
 
     PG_release_curve(b->bnd);
 
-    SFREE(b);
+    CFREE(b);
 
     return;}
 
@@ -139,10 +139,10 @@ void PG_resize_text_box(PG_text_box *b, double *cbx, int n_lines)
     if (n_lines != onl)
        {off = (n_lines < onl) ? onl - n_lines : 0;
 	of  = b->text_buffer;
-        nf  = FMAKE_N(char *, n_lines, "PG_RESIZE_TEXT_BOX:nf");
+        nf  = CMAKE_N(char *, n_lines);
 	for (i = 0; i < n_lines; i++)
 	    {j = i + off;
-	     nf[i] = FMAKE_N(char, n_chars, "PG_RESIZE_TEXT_BOX:bf[]");
+	     nf[i] = CMAKE_N(char, n_chars);
 	     if (j < onl)
 	        strcpy(nf[i], of[j]);};}
 
@@ -393,7 +393,7 @@ static char *_PG_insert_text(char *bf, int ncpl, int c, char *s)
     nb = strlen(bf);
     ns = strlen(s);
 
-    tmp = FMAKE_N(char, ncpl+ns, "_PG_INSERT_TEXT:tmp");
+    tmp = CMAKE_N(char, ncpl+ns);
     strcpy(tmp, bf);
 
     p = tmp + nb;
@@ -415,7 +415,7 @@ static char *_PG_insert_text(char *bf, int ncpl, int c, char *s)
        {strcpy(bf, tmp);
         overflow  = NULL;};
 
-    SFREE(tmp);
+    CFREE(tmp);
 
     return(overflow);}
 
@@ -1007,8 +1007,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
        {SC_LOCKON(PG_text_lock);
 	if (_PG.std_keymap == NULL)
 	   {ni = 256;
-	    _PG.std_keymap = FMAKE_N(PFKeymap, ni,
-				     "PG_OPEN_TEXT_RECT:std_keymap");
+	    _PG.std_keymap = CMAKE_N(PFKeymap, ni);
 
 	    if (SC_zero_on_alloc_n(-1) == FALSE)
 	       SC_MEM_INIT_N(PFByte, _PG.std_keymap, ni);
@@ -1027,7 +1026,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
 	    _PG.std_keymap[DEL]   = _PG_delete_previous;};
 	SC_LOCKOFF(PG_text_lock);};
 
-    b = FMAKE(PG_text_box, "PG_OPEN_TEXT_RECT:b");
+    b = CMAKE(PG_text_box);
 
     PG_get_text_ext_n(dev, 2, NORMC, "s", dx);
     PG_get_curve_extent(dev, crv, NORMC, bx);
@@ -1045,7 +1044,7 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
 /* this might want to be different at some point */
     n_lines = n_linep;
 
-    b->name         = SC_strsavef(name, "char*:PG_OPEN_TEXT_BOX:name");
+    b->name         = CSTRSAVE(name);
     b->type         = type;
     b->active       = TRUE;
     b->dev          = dev;
@@ -1062,11 +1061,10 @@ PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
     b->n_lines      = n_lines;
     b->n_chars_line = n_chars;
     b->n_lines_page = n_linep;
-    b->text_buffer  = bf = FMAKE_N(char *, n_lines,
-				   "PG_OPEN_TEXT_RECT:text_buffer");
+    b->text_buffer  = bf = CMAKE_N(char *, n_lines);
 
     for (i = 0; i < n_lines; i++)
-        bf[i] = FMAKE_N(char, n_chars, "PG_OPEN_TEXT_RECT:bf[]");
+        bf[i] = CMAKE_N(char, n_chars);
 
     if (keymap == NULL)
        b->keymap = _PG.std_keymap;
@@ -1123,9 +1121,9 @@ PG_text_box *PG_copy_text_object(PG_text_box *ib,
 /* copy the strings from the input buffer */
 	bfo = ob->text_buffer;
 	for (i = 0; i < nl; i++)
-	    {SFREE(bfo[i]);
+	    {CFREE(bfo[i]);
 	   
-	     bfo[i] = FMAKE_N(char, nc, "PG_COPY_TEXT_BOX:bfo[i]");
+	     bfo[i] = CMAKE_N(char, nc);
 
 	     strcpy(bfo[i], bfi[i]);};};
 

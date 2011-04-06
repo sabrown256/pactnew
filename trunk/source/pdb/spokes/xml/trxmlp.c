@@ -80,12 +80,12 @@ static int _XML_push_char(parse_state *st, int c)
     char *bf;
 
     if (st->bf == NULL)
-       {st->bf = FMAKE_N(char, MAX_BFSZ, "char*:_XML_PUSH_CHAR:bf");
+       {st->bf = CMAKE_N(char, MAX_BFSZ);
 	st->nc = MAX_BFSZ;
 	st->ic = 0;}
     else if (st->ic > st->nc - 10)
        {nc = 2*(st->nc);
-	REMAKE_N(st->bf, char, nc);
+	CREMAKE(st->bf, char, nc);
 	st->nc = nc;};
 
     ic = st->ic++;
@@ -276,7 +276,7 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
        {type = SC_CHAR_S;
 	ni   = strlen(s);};
 
-    type = SC_strsavef(type, "char*:_XML_ENTRY_INFO:type");
+    type = CSTRSAVE(type);
 
     *ptype = type;
     *pni   = ni;
@@ -292,9 +292,9 @@ static void _XML_push_value(parse_state *st, char *t, int ts, int te)
    {int nc;
     char *s;
 
-    SFREE(st->value);
+    CFREE(st->value);
 
-    s = SC_strsavef(t+ts, "char*:_XML_PUSH_VALUE:t");
+    s = CSTRSAVE(t+ts);
     nc = strlen(s);
     s[nc-te] = '\0';
 
@@ -340,9 +340,9 @@ static void _XML_end_tag(parse_state *st, char *t)
 
 	    _PD_e_install(file, name, ep, FALSE);
 
-	    SFREE(type);
-	    SFREE(name);
-	    SFREE(st->value);};}
+	    CFREE(type);
+	    CFREE(name);
+	    CFREE(st->value);};}
 
     else
        PD_error("SYNTAX ERROR ON TAG - _XML_END_TAG", PD_OPEN);
@@ -416,8 +416,8 @@ static void _XML_parse_tags(PDBfile *file)
 	        _XML_push_value(&st, t, 0, 0);};};
 	   
     SC_free_array(st.stack, NULL);
-    SFREE(st.value);
-    SFREE(st.bf);
+    CFREE(st.value);
+    CFREE(st.bf);
     st.ic   = 0;
     st.nc   = 0;
     st.file = NULL;
@@ -451,7 +451,7 @@ PDBfile *_XML_parse_xml(SC_udl *pu, char *mode)
 
     file->default_offset = 0;
     file->major_order    = ROW_MAJOR_ORDER;
-    file->type           = SC_strsavef(XML_S, "char*:_XML_PARSE_XML:type");
+    file->type           = CSTRSAVE(XML_S);
     if (*mode == 'a')
        file->mode = PD_APPEND;
     else
@@ -461,7 +461,7 @@ PDBfile *_XML_parse_xml(SC_udl *pu, char *mode)
 
     _PD_init_chrt(file, TRUE);
 
-    file->current_prefix = SC_strsavef("/", "char*:_XML_PARSE_XML:dir");
+    file->current_prefix = CSTRSAVE("/");
 
     PD_set_text_delimiter(file, ",");
 

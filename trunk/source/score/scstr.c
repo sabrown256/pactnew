@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "score_int.h" 
+#include "scope_mem.h" 
 
 #ifndef EDOM
 # define EDOM 16
@@ -20,7 +21,7 @@
    {if (nl == TRUE)                                                         \
        *_p++ = '\n';                                                        \
     *_p++ = '\0';                                                           \
-    _s    = SC_strsavef(bf, "SC_TOKENIZE_LITERAL:s");}
+    _s    = CSTRSAVE(bf);}
 
 #define CAT(_d, _nd, _n, _s)                                                \
    {int _ns;                                                                \
@@ -112,7 +113,7 @@ char *SC_strsave(char *s)
 
     if (s != NULL)
        {sz = strlen(s) + 2;
-	p  = FMAKE_N(char, sz, "char*:SC_STRSAVE:p");
+	p  = CMAKE_N(char, sz);
 	if (p != NULL)
 	   {strcpy(p, s);
 	    p[sz-1] = '\0';};};
@@ -135,7 +136,39 @@ char *SC_strsavef(char *s, char *name)
 
     if (s != NULL)
        {sz = strlen(s) + 2;
-	p  = FMAKE_N(char, sz, name);
+	p  = CMAKE_N(char, sz);
+	if (p != NULL)
+	   {strcpy(p, s);
+	    p[sz-1] = '\0';};};
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_STRSAVEC - save string s somewhere remember its name
+ *             - allocate one extra character so that firsttok won't kill
+ *             - things in the one bad case
+ */
+
+char *SC_strsavec(char *s, const char *file, const char *fnc, int line)
+   {char *p;
+    int sz;
+    SC_mem_opt opt;
+
+    p = NULL;
+
+    if (s != NULL)
+       {sz = strlen(s) + 2;
+
+	opt.na   = FALSE;
+	opt.zsp  = -1;
+	opt.typ  = SC_STRING_I;
+	opt.fnc  = file;
+	opt.file = fnc;
+	opt.line = line;
+
+	p = SC_alloc_nzt(sz, sizeof(char), &opt);
 	if (p != NULL)
 	   {strcpy(p, s);
 	    p[sz-1] = '\0';};};
@@ -217,7 +250,7 @@ char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
    {size_t ld, ls;
     char *s, *t;
         
-    t = FMAKE_N(char, lnd, "char*:SC_VSTRCAT:t");
+    t = CMAKE_N(char, lnd);
 
     SC_VA_START(fmt);
     SC_VSNPRINTF(t, lnd, fmt);
@@ -230,7 +263,7 @@ char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
     else
        s = strncat(dest, t, lnd - ld - 1);
 
-    SFREE(t);
+    CFREE(t);
 
     return(s);}
 
@@ -249,7 +282,7 @@ char *SC_dstrcat(char *dest, char *src)
 
     if (dest == NULL)
        {lnd  = 2*max(ls, MAXLINE);
-	dest = FMAKE_N(char, lnd, "char*:SC_DSTRCAT:dest");
+	dest = CMAKE_N(char, lnd);
         dest[0] = '\0';};
 
     lnd = SC_arrlen(dest);
@@ -257,7 +290,7 @@ char *SC_dstrcat(char *dest, char *src)
 
     if (ls + ld >= lnd)
        {ln = 2*(ls + ld);
-	REMAKE_N(dest, char, ln);};
+	CREMAKE(dest, char, ln);};
 
     s = strcat(dest, src);
 
@@ -295,14 +328,14 @@ char *SC_dstrcpy(char *dest, char *src)
 
     if (dest == NULL)
        {ld   = 2*max(ls, MAXLINE);
-	dest = FMAKE_N(char, ld, "char*:SC_DSTRCPY:dest");
+	dest = CMAKE_N(char, ld);
         dest[0] = '\0';};
 
     ld = SC_arrlen(dest);
 
     if (ls + 2 >= ld)
        {ld = 2*ls;
-	REMAKE_N(dest, char, ld);};
+	CREMAKE(dest, char, ld);};
 
     s = strcpy(dest, src);
 
@@ -385,7 +418,7 @@ char *SC_strrev(char *s)
 
     p = s;
     i = strlen(s) + 1;
-    t = FMAKE_N(char, i, "SC_STRREV:t");
+    t = CMAKE_N(char, i);
 
     if (t == NULL)
        return(NULL);
@@ -395,7 +428,7 @@ char *SC_strrev(char *s)
        t[--i] = *p++;
 
     strcpy(s, t);
-    SFREE(t);
+    CFREE(t);
 
     return(s);}
 
@@ -475,7 +508,7 @@ char *SC_dstrsubst(char *s, char *a, char *b, size_t n)
 	 else
 	    break;};
 
-    SFREE(pt);
+    CFREE(pt);
 
     return(ps);}
 
@@ -495,7 +528,7 @@ char *SC_strsubst(char *d, int nc, char *s, char *a, char *b, size_t n)
     if (d != NULL)
        SC_strncpy(d, nc, ps, -1);
 
-    SFREE(ps);
+    CFREE(ps);
 
     return(d);}
 
@@ -830,7 +863,7 @@ char *SC_firsttok(char *s, char *delim)
     for (r = t; strchr(delim, *r) == NULL; r++);
 
     nb = strlen(t) + 2;
-    tb = FMAKE_N(char, nb, "SC_FIRSTTOK:tb");
+    tb = CMAKE_N(char, nb);
 
 /* if we aren't at the end of the string */
     if (*r != '\0')
@@ -855,7 +888,7 @@ char *SC_firsttok(char *s, char *delim)
         t  = s + 1;
         strcpy(t, tb);};
 
-    SFREE(tb);
+    CFREE(tb);
 
     return(t);}
 
@@ -1029,7 +1062,7 @@ char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
     t = NULL;
     p = NULL;
     if (s != NULL)
-       {cp = SC_strsavef(s, "SC_NTOK:s");
+       {cp = CSTRSAVE(s);
 
 	for (p = cp, i = 0; i < n; p = NULL, i++)
 	    t = SC_strtok(p, delim, pp);
@@ -1039,7 +1072,7 @@ char *SC_ntok(char *d, int nc, char *s, int n, char *delim)
 	    SC_strncpy(d, nc, t, ln);
 	    p = d;};
 
-	SFREE(cp);};
+	CFREE(cp);};
 
     return(p);}
         
@@ -1058,7 +1091,7 @@ char **SC_tokenize(char *s, char *delim)
     SC_array *arr;
 
     n = strlen(s);
-    t = FMAKE_N(char, n+100, "char*:SC_TOKENIZE:t");
+    t = CMAKE_N(char, n+100);
     if (t != NULL)
        {strcpy(t, s);
 
@@ -1074,7 +1107,7 @@ char **SC_tokenize(char *s, char *delim)
 
 	SC_array_string_add(arr, NULL);
 
-	SFREE(t);};
+	CFREE(t);};
 
     sa = SC_array_done(arr);
 
@@ -1103,7 +1136,7 @@ static void _SC_match_quote(char **ppi, char **ppo, int qc,
 	    c = *pi++;};
 
 /* make a copy of the target string */
-    s = FMAKE_N(char, n+1, "_SC_MATCH_QUOTE:s");
+    s = CMAKE_N(char, n+1);
 
     pi = *ppi;
     for (i = 0, c = *pi++; c != qc; c = *pi++, i++)
@@ -1136,7 +1169,7 @@ static void _SC_match_quote(char **ppi, char **ppo, int qc,
     *ppi = pi;
     *ppo = po;
 
-    SFREE(s);
+    CFREE(s);
 
     return;}
 
@@ -1195,7 +1228,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
     char *bf, *pi, *po, *t, *u, *sb, **sa;
     SC_array *arr;
 
-    t = SC_strsavef(s, "SC_TOKENIZE_LITERAL:t");
+    t = CSTRSAVE(s);
     if (t == NULL)
        return(NULL);
 
@@ -1204,7 +1237,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
     arr = SC_STRING_ARRAY();
     SC_array_resize(arr, n/2, -1.0);
 
-    bf   = FMAKE_N(char, MAX_BFSZ, "char*:SC_TOKENIZE_LITERAL:bf");
+    bf   = CMAKE_N(char, MAX_BFSZ);
     pi   = t;
     more = TRUE;
     while (more)
@@ -1274,8 +1307,8 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
 
 	SC_array_string_add(arr, sb);};
 
-    SFREE(t);
-    SFREE(bf);
+    CFREE(t);
+    CFREE(bf);
 
     sa = SC_array_done(arr);
 
@@ -1342,9 +1375,9 @@ void SC_free_strings(char **sa)
 	    {s = sa[i];
 	     if (s == NULL)
 	        break;
-	     SFREE(s);};
+	     CFREE(s);};
 
-	SFREE(sa);};
+	CFREE(sa);};
 
     return;}
 
@@ -1359,7 +1392,7 @@ void SC_remove_string(char **sa, int n)
 
     if (sa != NULL)
        {SC_ptr_arr_len(ns, sa);
-	SFREE(sa[n]);
+	CFREE(sa[n]);
 
 	bpi = sizeof(char *);
 	pa  = (char *) sa;
@@ -1417,7 +1450,7 @@ char *SC_dconcatenate(int n, char **a, char *delim)
 	    nc += strlen(a[i]);
 	nc += n*strlen(delim);
 
-	s = FMAKE_N(char, nc, "char*:SC_DCONCATENATE:s");
+	s = CMAKE_N(char, nc);
 
 	rv = SC_concatenate(s, nc, n, a, delim, FALSE);};
 
@@ -2001,7 +2034,7 @@ char *SC_vdsnprintf(int cp, const char *format, va_list lst)
 /* if too small, resize the buffer and try again */
     else if (rv >= nc)
        {nc = 2*rv;
-        REMAKE_N(a, char, nc);
+        CREMAKE(a, char, nc);
 	*pa = a;
         rv  = vsnprintf(a, nc, format, __a__);
         ps  = a;}
@@ -2013,7 +2046,7 @@ char *SC_vdsnprintf(int cp, const char *format, va_list lst)
     SC_VA_RESTORE(&lst);
 
     if ((cp == TRUE) && (ps != NULL))
-       ps = SC_strsavef(ps, "char*:SC_VDSNPRINTF:ps");
+       ps = CSTRSAVE(ps);
 
     return(ps);}
 

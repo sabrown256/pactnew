@@ -28,11 +28,10 @@ source $ldir/env-csh
     Separator $Log
     if ($lnotice == TRUE) then
        NoteD $Log "   Environment setup files - env-pact.csh, env-pact.sh, and env-pact.dk"
-       Note $Log " "
     else
        Note $Log "   Environment setup files - env-pact.csh, env-pact.sh, and env-pact.dk"
-       Note $Log " "
     endif
+    Note $Log " "
 
     set tmpF = $SEFile.tmp
     $RM $tmpF

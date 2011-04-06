@@ -84,7 +84,7 @@ static void _PM_decsol_lapl(solver_method *sv, PM_matrix *n_map)
     nh = (nt >> 1) + 1;
 
     n   = n_map->nrow;
-    ips = FMAKE_N(int, n, "_PM_SOLV_LAPL:ips");
+    ips = CMAKE_N(int, n);
 
 /* do the lu decomposition */
     PM_decompose(lapl, ips, FALSE);
@@ -99,7 +99,7 @@ static void _PM_decsol_lapl(solver_method *sv, PM_matrix *n_map)
 	    {for (k = 0; k < na; k++)
 	         x[k][i] = b[k][j];};};
 
-    SFREE(ips);
+    CFREE(ips);
 
     return;}
 
@@ -223,7 +223,7 @@ static solver_method *_PM_mk_lin_sys(int n_unk, int n_rhs, int nd,
     PM_matrix *lapl, **mb;
     PM_sp_lin_sys *axb;
 
-    sv = FMAKE(solver_method, "_PM_MK_LIN_SYS:sv");
+    sv = CMAKE(solver_method);
 
     sv->n_unk    = n_unk;
     sv->n_rhs    = n_rhs;
@@ -267,8 +267,8 @@ static solver_method *_PM_mk_lin_sys(int n_unk, int n_rhs, int nd,
     else
        {lapl = PM_create(n_unk, n_unk);
 
-	b  = FMAKE_N(double *, n_rhs, "_PM_MK_LIN_SYS:b");
-	mb = FMAKE_N(PM_matrix *, n_rhs, "_PM_MK_LIN_SYS:mb");
+	b  = CMAKE_N(double *, n_rhs);
+	mb = CMAKE_N(PM_matrix *, n_rhs);
 	for (j = 0; j < n_rhs; j++)
 	    {mb[j] = PM_create(n_unk, 1);
 	     b[j]  = mb[j]->array;};
@@ -303,13 +303,13 @@ static void _PM_rl_lin_sys(solver_method *sv)
 	for (j = 0; j < n_rhs; j++)
 	    PM_destroy(sv->mb[j]);
 
-	SFREE(sv->b);
-	SFREE(sv->mb);}
+	CFREE(sv->b);
+	CFREE(sv->mb);}
 
     else
        PM_free_vectors(4*n_rhs+4, sv->b);
 
-    SFREE(sv);
+    CFREE(sv);
 
     return;}
 
@@ -721,8 +721,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
     _PM_compute_a_bnd(asl, xsl, ael, xel, apl,
 		      lmt, kmx, kmx, lmn, lmx);
 
-    t = FMAKE_N(double, nz, "COMPUTE_A:t");
-    s = FMAKE_N(double, nz, "COMPUTE_A:s");
+    t = CMAKE_N(double, nz);
+    s = CMAKE_N(double, nz);
 
 /* compute apl */
     PM_set_value(s, nz, 0.0);
@@ -792,8 +792,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
              {j   = NODE_OF(k, l, kbnd);
               apk[j] = 0.5*(s[j] + t[j]) + apk[j0];};};
 
-    SFREE(s);
-    SFREE(t);
+    CFREE(s);
+    CFREE(t);
 
     return;}
 
@@ -1024,7 +1024,7 @@ void PM_mesh_part(double *rx, double *ry, double *nodet,
 	else
 	   strategy = PM_ICCG;};
 
-    unm   = FMAKE_N(int, nn, "PM_MESH_PART:unm");
+    unm   = CMAKE_N(int, nn);
     n_map = _PM_fill_map(nodet, unm, str, n, nd, lmt);
 
     switch (method)
@@ -1033,7 +1033,7 @@ void PM_mesh_part(double *rx, double *ry, double *nodet,
        {case 1 :
 
 	     na = 2;
-	     x = FMAKE_N(double *, na, "PM_MESH_PART:x");
+	     x = CMAKE_N(double *, na);
 
 	     x[0] = kra;
 	     x[1] = lra;
@@ -1052,7 +1052,7 @@ void PM_mesh_part(double *rx, double *ry, double *nodet,
         case 2 :
 
 	     na = 4;
-	     x  = FMAKE_N(double *, na, "PM_MESH_PART:x");
+	     x  = CMAKE_N(double *, na);
 
 	     x[0] = kra;
 	     x[1] = lra;
@@ -1084,7 +1084,7 @@ void PM_mesh_part(double *rx, double *ry, double *nodet,
     _PM_fin_sol(n_map, m, reg_map, nodet);
 
     PM_destroy(n_map);
-    SFREE(unm);
+    CFREE(unm);
 
     zs = SC_zero_space_n(zs, -1);
 

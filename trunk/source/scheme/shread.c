@@ -300,7 +300,7 @@ static object *SS_rd_str(object *str)
     object *ret;
 
     bfsz = MAXLINE;
-    bf   = FMAKE_N(char, bfsz + 2, "SS_RD_STR:bf");
+    bf   = CMAKE_N(char, bfsz + 2);
     while (TRUE)
        {pt = bf + bfsz - MAXLINE;
         for (i = 0; i < MAXLINE;)
@@ -326,13 +326,13 @@ static object *SS_rd_str(object *str)
 
         else
            {bfsz += MAXLINE;
-            REMAKE_N(bf, char, bfsz + 2);};};
+            CREMAKE(bf, char, bfsz + 2);};};
 
     pt[i] = '\0';
     delta = SC_arrlen(bf);
     ret   = SS_mk_string(bf);
 
-    SFREE(bf);
+    CFREE(bf);
 
 /* help out with the byte count */
     SC_mem_stats_acc(-delta, -delta);
@@ -507,11 +507,11 @@ static object *_SSI_opn_in(object *obj)
 	   {msg = SC_dsnprintf(FALSE, "CAN'T OPEN '%s' - OPEN-INPUT-FILE", t);
 	    SS_error(msg, obj);};
 
-	SFREE(t);};
+	CFREE(t);};
 
     rv = SS_mk_inport(str, s);
 
-    SFREE(s);
+    CFREE(s);
 
     return(rv);}
 
@@ -735,7 +735,7 @@ static PFPObject SS_change_parser(object *fnm)
 	       {(*np)();
 		SS_set_parser(np);};};
 
-	SFREE(s);};
+	CFREE(s);};
 
     return(op);}
 

@@ -143,8 +143,8 @@ static int setup_data(int rank)
         mypl_w.x_axis[i] = mypl_w.y_axis[i] = (float)i;
 
     mypl_w.npts  = N_PTS;
-    mypl_w.label = SC_strsavef("Myplot MYPL label", "PDDPTS:main mypl_w");
-    mypl_w.view  = FMAKE(l_frame, "Myplot MYPL view");
+    mypl_w.label = CSTRSAVE("Myplot MYPL label");
+    mypl_w.view  = CMAKE(l_frame);
 
     mypl_w.view->x_min = 0.1;
     mypl_w.view->x_max = 0.8;
@@ -152,7 +152,7 @@ static int setup_data(int rank)
     mypl_w.view->y_max = 0.7;
    
 /* set up the int array */
-    p_int_w = FMAKE_N(int, N_INT, "SETUP_DATA:p_int_w");
+    p_int_w = CMAKE_N(int, N_INT);
     if (p_int_w == NULL)
        {printf("Error allocating p_int_w, process %d--quitting\n", rank);
         exit(1);}
@@ -161,7 +161,7 @@ static int setup_data(int rank)
         p_int_w[i] = rank * i;
 
 /* set up the float array */
-    p_float_w = FMAKE_N(float, N_FLOAT, "SETUP_DATA:p_float_w");
+    p_float_w = CMAKE_N(float, N_FLOAT);
     if (p_float_w == NULL)
        {printf("Error allocating p_float_w, process %d--quitting\n", rank);
         return(FALSE);};
@@ -170,7 +170,7 @@ static int setup_data(int rank)
         p_float_w[i] = (float)(rank * i);
 
 /* setup the serial array */
-    p_fserial_w = FMAKE_N(float, N_FLOAT, "SETUP_DATA:p_fserial_w");
+    p_fserial_w = CMAKE_N(float, N_FLOAT);
     if (p_fserial_w == NULL)
        {printf("Error allocating p_fserial_w, process %d--quitting\n", rank);
         return(FALSE);};
@@ -192,10 +192,10 @@ static int setup_data(int rank)
 static int free_memory()
    {
 
-    SFREE(mypl_w.label);
-    SFREE(mypl_w.view);
-    SFREE(p_int_w);
-    SFREE(p_fserial_w);
+    CFREE(mypl_w.label);
+    CFREE(mypl_w.view);
+    CFREE(p_int_w);
+    CFREE(p_fserial_w);
 
     return(TRUE);}
 
@@ -480,9 +480,9 @@ static int read_data_array(PDBfile *file, int rank, int numprocs,
  * wrong - by definition, once it is fixed the tests should go
  */
     if (p_int_r != p_int_w)
-       {SFREE(p_int_r);};
+       {CFREE(p_int_r);};
     if (p_float_r != p_float_w)
-       {SFREE(p_float_r);};
+       {CFREE(p_float_r);};
 
     return(rv);}
 
@@ -539,10 +539,10 @@ static int read_data_struct(PDBfile *file, int rank, int numprocs,
  * wrong - by definition, once it is fixed the tests should go
  */
     if (mypl_r.label != mypl_w.label)
-       {SFREE(mypl_r.label)};
+       {CFREE(mypl_r.label)};
 
     if (mypl_r.view != mypl_w.view)
-       {SFREE(mypl_r.view);};
+       {CFREE(mypl_r.view);};
 
     return(rv);}
 

@@ -33,8 +33,8 @@ static void send_binary(long nitems, char *type)
     if (tty == NULL)
        {char **argv;
 
-        argv    = FMAKE_N(char *, 2, "SEND_BINARY:argv");
-        argv[0] = SC_strsavef("VIF", "char*:SEND_BINARY:argv0");
+        argv    = CMAKE_N(char *, 2);
+        argv[0] = CSTRSAVE("VIF");
 
         tty      = PC_mk_process(argv, "ab", SC_CHILD);
         tty->in  = 0;
@@ -62,7 +62,7 @@ static void send_binary(long nitems, char *type)
 
 	PRINT(stdout, ":A\n");
 
-	SFREE(space);};
+	CFREE(space);};
 
     return;}
 

@@ -1,5 +1,5 @@
 TXT: PACT User's Guide
-MOD: 10/26/2010
+MOD: 04/06/2011
 
 <CENTER>
 <h1><FONT color="#ff0000">PACT User's Guide</FONT></h1>
@@ -429,7 +429,7 @@ The list of designators for the PACT tools is:<p>
 <TABLE>
 
 <TR><TD WIDTH="100">Package</TD><TD WIDTH="100">Designator</TD><TD>Example</TD></TR>
-<TR><TD>SCORE</TD><TD>SC</TD><TD>SC_strsave</TD></TR>
+<TR><TD>SCORE</TD><TD>SC</TD><TD>SC_exec</TD></TR>
 <TR><TD>PPC</TD><TD>PC</TD><TD>PC_open</TD></TR>
 <TR><TD>PML</TD><TD>PM</TD><TD>PM_decompose</TD></TR>
 <TR><TD>PDB</TD><TD>PD</TD><TD>PD_read</TD></TR>

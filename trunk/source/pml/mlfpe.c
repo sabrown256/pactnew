@@ -414,7 +414,7 @@ void PM_clear_fpu(void)
  *             - return it as a void pointer
  *             - NOTE: the space can be used any number of times to
  *             - restore a particular state hence it is the application's
- *             - responsibility to SFREE it
+ *             - responsibility to CFREE it
  */
 
 void *PM_save_fpu(void)

@@ -420,7 +420,7 @@ SC_sigstate *SC_save_signal_handlers(int sigmn, int sigmx)
     sigmn = max(1,          sigmn);
     sigmx = min(SC_NSIG-1, sigmx);
 
-    ss = FMAKE(SC_sigstate, "SC_SAVE_SIGNAL_HANDLERS:ss");
+    ss = CMAKE(SC_sigstate);
 
     ss->ignore = SIG_IGN;
     ss->deflt  = SIG_DFL;
@@ -457,7 +457,7 @@ void SC_restore_signal_handlers(SC_sigstate *ss, int rel)
 	 SC_signal(i, hnd);};
 
     if (rel == TRUE)
-       {SFREE(ss);};
+       {CFREE(ss);};
 
     return;}
 

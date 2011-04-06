@@ -73,7 +73,7 @@ int init_problem_b(int c, char **v)
 
     if (fname != NULL)
        {PA_rd_restart(fname, NONE);
-        NAME[2] = SC_strsave(fname);};
+        NAME[2] = CSTRSAVE(fname);};
 
     PA_trap_signals(4, SIGSEGV, PA_signal_handler,
                        SIGABRT, PA_signal_handler,
@@ -98,7 +98,7 @@ static void init_prob(char *s)
 
     PA_name_files(s, &NAME[3], &NAME[2], &NAME[4], &NAME[5]);
 
-    NAME[8] = SC_strsave(s);
+    NAME[8] = CSTRSAVE(s);
 
     N_parts  = 0;
     N_regs   = 0;

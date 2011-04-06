@@ -332,7 +332,7 @@ void PG_register_callback(char *name, ...)
     addr.funcaddr = SC_VA_ARG(PFInt);
     SC_VA_END;
 
-    ip  = FMAKE(long, "PG_REGISTER_CALLBACK:ip");
+    ip  = CMAKE(long);
     *ip = addr.mdiskaddr;
 
     SC_hasharr_install(_PG.callback_tab, name, ip, "procedure", TRUE, TRUE);
@@ -373,7 +373,7 @@ void PG_register_variable(char *name, char *type,
     if (_PG.callback_tab == NULL)
        _PG_setup_callback_table();
 
-    s = FMAKE_N(char *, 3, "PG_REGISTER_VARIABLE:s");
+    s = CMAKE_N(char *, 3);
     s[0] = (char *) var;
     s[1] = (char *) vn;
     s[2] = (char *) vx;
@@ -397,7 +397,7 @@ haelem *PG_lookup_variable(char *name)
  * this is useful for controlling transient objects at least
  */
     if (hp == NULL)
-       {sp = FMAKE(char *, "PG_LOOKUP_VARIABLE:sp");
+       {sp = CMAKE(char *);
         *sp = NULL;
 	PG_register_variable(name, SC_STRING_S, sp, NULL, NULL);
 	hp = SC_hasharr_lookup(_PG.callback_tab, name);};
@@ -1279,8 +1279,8 @@ static void PG_handle_variable(PG_interface_object *iob, PG_event *ev)
 		else if (id == SC_STRING_I)
 		   {char **p;
 		    p = *(char ***) hp->def;
-		    SFREE(*p);
-		    *p = SC_strsave(val);};};
+		    CFREE(*p);
+		    *p = CSTRSAVE(val);};};
 
 	    if (piob->action != NULL)
 	       (*piob->action)(piob, ev);
@@ -1376,8 +1376,8 @@ static int _PG_string_value(int ityp, haelem *hp, char *s)
     else if (ityp == SC_STRING_I)
        {char *ps;
 	ps = **(char ***) hp->def;
-	SFREE(ps);
-	**(char ***) hp->def = SC_strsavef(s, "char*:_PG_STRING_VALUE:string");}
+	CFREE(ps);
+	**(char ***) hp->def = CSTRSAVE(s);}
 
     else
        match = FALSE;
@@ -1637,14 +1637,12 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
    {PG_interface_object *iob;
     PFVoid fnc;
 
-    iob = FMAKE(PG_interface_object, "PG_MAKE_INTERFACE_OBJECT:iob");
+    iob = CMAKE(PG_interface_object);
    
     iob->device        = dev;
     iob->curve         = crv;
-    iob->name          = SC_strsavef(name,
-				     "char*:PG_MAKE_INTERFACE_OBJECT:name");
-    iob->type          = SC_strsavef(type,
-				     "char*:PG_MAKE_INTERFACE_OBJECT:type");
+    iob->name          = CSTRSAVE(name);
+    iob->type          = CSTRSAVE(type);
     iob->obj           = obj;
     iob->foreground    = fc;
     iob->background    = bc;
@@ -1669,9 +1667,8 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
 
 	b = PG_open_text_rect(dev, "IOB", FALSE, NULL, crv, 0.0, TRUE);
 
-	SFREE(b->text_buffer[0]);
-	b->text_buffer[0] = SC_strsavef(name,
-					"char*:PG_MAKE_INTERFACE_OBJECT:name");
+	CFREE(b->text_buffer[0]);
+	b->text_buffer[0] = CSTRSAVE(name);
 	b->n_chars_line = max(b->n_chars_line, strlen(name));
 	b->align        = align;
 	b->angle        = ang;
@@ -1697,8 +1694,7 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
        iob->draw = _PG_draw_button_object;
 
     if (select != NULL)
-       {iob->select_name = SC_strsavef(select,
-				       "char*:PG_MAKE_INTERFACE_OBJECT:select");
+       {iob->select_name = CSTRSAVE(select);
         iob->select      = (PFIobSelect) PG_lookup_callback(select);};
 
     if (iob->select == NULL)
@@ -1708,13 +1704,11 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
            iob->select = PG_event_select_visual;};
 
     if (draw != NULL)
-       {iob->draw_name = SC_strsavef(draw,
-				     "char*:PG_MAKE_INTERFACE_OBJECT:draw");
+       {iob->draw_name = CSTRSAVE(draw);
         iob->draw      = (PFIobDraw) PG_lookup_callback(draw);};
 
     if (action != NULL)
-       {iob->action_name = SC_strsavef(action,
-				       "char*:PG_MAKE_INTERFACE_OBJECT:action");
+       {iob->action_name = CSTRSAVE(action);
         fnc              = PG_lookup_callback(action);
         if (fnc == (PFVoid) PG_slider)
            _PG_shift_curve(iob->curve, 0, 0);
@@ -1750,15 +1744,13 @@ PG_interface_object *PG_copy_interface_object(PG_device *dvd,
 
     dvs = iob->device;
 
-    niob = FMAKE(PG_interface_object, "PG_COPY_INTERFACE_OBJECT:niob");
+    niob = CMAKE(PG_interface_object);
 
     *niob = *iob;
 
     niob->device = dvd;
-    niob->name   = SC_strsavef(iob->name,
-			       "char*:PG_COPY_INTERFACE_OBJECT:name");
-    niob->type   = SC_strsavef(iob->type,
-			       "char*:PG_COPY_INTERFACE_OBJECT:type");
+    niob->name   = CSTRSAVE(iob->name);
+    niob->type   = CSTRSAVE(iob->type);
 
 /* check to see if this object is a text box */
     if (strcmp(iob->type, PG_TEXT_OBJECT_S) == 0)
@@ -1805,11 +1797,11 @@ void _PG_rl_interface_object(PG_interface_object *iob, int flag)
        PG_close_text_box((PG_text_box *) (iob->obj));
 
     else if (strcmp(iob->type, PG_VARIABLE_OBJECT_S) == 0)
-       SFREE(iob->obj);
+       CFREE(iob->obj);
 
-    SFREE(iob->name);
-    SFREE(iob->type);
-    SFREE(iob);
+    CFREE(iob->name);
+    CFREE(iob->type);
+    CFREE(iob);
    
     return;}
 

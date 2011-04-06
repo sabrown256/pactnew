@@ -481,8 +481,8 @@ static void setup()
         filt[i] = 0;
 
 /* check buffer alignment */
-    buf1 = FMAKE_N(int, BSIZE + 8, "SETUP:buf1");
-    buf2 = FMAKE_N(int, BSIZE + 8, "SETUP:buf2");
+    buf1 = CMAKE_N(int, BSIZE + 8);
+    buf2 = CMAKE_N(int, BSIZE + 8);
 
     if (buf1 == NULL)
        PRINT(stdout, "FAILED TO ALLOCATE buf1\n");

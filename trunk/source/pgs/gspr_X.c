@@ -516,7 +516,7 @@ void _PG_X_draw_curve(PG_device *dev, PG_curve *crv, int clip)
     xo[1] = crv->y_origin;
     
     nmax = (XMaxRequestSize(disp) - 3L) >> 1L;
-    pts  = FMAKE_N(XPoint, nmax, "_PG_X_DRAW_CURVE:pts");
+    pts  = CMAKE_N(XPoint, nmax);
     for (i = 0; i < n; i += nmax)
         {if (i+nmax > n)
 	    nmax = n - i;
@@ -532,7 +532,7 @@ void _PG_X_draw_curve(PG_device *dev, PG_curve *crv, int clip)
 
 	 XDrawLines(disp, wind, gc, pts, nmax, CoordModeOrigin);};
     
-    SFREE(pts);
+    CFREE(pts);
 
     return;}
  
@@ -569,8 +569,7 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
     SC_MEM_INIT_V(wc);
 
     nmax = (XMaxRequestSize(disp) - 3L) >> 1L;
-    segs = FMAKE_N(XSegment, nmax,
-                   "_PG_X_DRAW_DISJOINT_POLYLINE_2:segs");
+    segs = CMAKE_N(XSegment, nmax);
     wind = PG_X11_DRAWABLE(dev);
 
     gc  = dev->gc;
@@ -627,7 +626,7 @@ void _PG_X_draw_disjoint_polyline_2(PG_device *dev, double **r, long n,
          XDrawSegments(disp, wind, gc, segs, k);
          XFlush(disp);};
     
-    SFREE(segs);
+    CFREE(segs);
 
     return;}
 
@@ -671,7 +670,7 @@ void _PG_X_shade_poly(PG_device *dev, int nd, int n, double **r)
 	XFillPolygon(disp, PG_X11_DRAWABLE(dev), dev->gc, points, n,
 		     Nonconvex, CoordModeOrigin);
 
-	SFREE(points);};
+	CFREE(points);};
 
     return;}
 
@@ -715,7 +714,7 @@ void _PG_X_fill_curve(PG_device *dev, PG_curve *crv)
     XFillPolygon(disp, PG_X11_DRAWABLE(dev), dev->gc, points, n,
                  Nonconvex, CoordModeOrigin);
 
-    SFREE(points);
+    CFREE(points);
 
     return;}
 
@@ -797,7 +796,7 @@ void _PG_X_put_image(PG_device *dev, unsigned char *bf,
         else
 	   nb = n*bpi;
 
-	ibf = FMAKE_N(unsigned char, nb, "_PG_X_PUT_IMAGE:ibf");
+	ibf = CMAKE_N(unsigned char, nb);
 
 	xim = XCreateImage(disp, DefaultVisual(disp, XDefaultScreen(disp)),
 			   pd,
@@ -826,7 +825,7 @@ void _PG_X_put_image(PG_device *dev, unsigned char *bf,
     xim->data = NULL;
 
     if (ibf)
-       SFREE(ibf);
+       CFREE(ibf);
 
     XDestroyImage(xim);
 

@@ -378,7 +378,7 @@ void **SC_get_thread_elements(void *a, int *pne, int it, int lck)
 
        dst = (void **) a;
        if (dst == NULL)
-          dst = FMAKE_N(void *, ne, "SC_GET_THREAD_ELEMENTS:dst");
+          dst = CMAKE_N(void *, ne);
 
        for (ie = 0; ie < ne; ie++)
            {is      = it*nex + ie;
@@ -415,7 +415,7 @@ void **SC_get_element_threads(void *a, int *pnt, int ie, int lck)
 
        dst = (void **) a;
        if (dst == NULL)
-          dst = FMAKE_N(void *, ne, "SC_GET_ELEMENT_THREADS:dst");
+          dst = CMAKE_N(void *, ne);
 
        for (it = 0; it < nt; it++)
            {is      = it*nex + ie;
@@ -449,7 +449,7 @@ void **SC_get_threads_elements(void *a, int *pnt, int *pne, int lck)
 
        dst = (void **) a;
        if (dst == NULL)
-          dst = FMAKE_N(void *, nt*ne, "SC_GET_THREADS_ELEMENTS:dst");
+          dst = CMAKE_N(void *, nt*ne);
 
        for (it = 0; it < nt; it++)
            {for (ie = 0; ie < ne; ie++)

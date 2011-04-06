@@ -69,14 +69,14 @@ PG_RAST_device *PG_make_raster_device(int w, int h, char *name,
 				      frame *infr, int rgb, FILE *fp)
    {PG_RAST_device *mdv;
 
-    mdv = FMAKE(PG_RAST_device, "PG_MAKE_RASTER_DEVICE:mdv");
+    mdv = CMAKE(PG_RAST_device);
 
     mdv->nf         = 0;
     mdv->width      = w;
     mdv->height     = h;
     mdv->rgb_mode   = rgb;
     mdv->text_scale = 1.0;
-    mdv->out_fname  = SC_strsavef(name, "char*:PG_MAKE_RASTER_DEVICE:fname");
+    mdv->out_fname  = CSTRSAVE(name);
     mdv->fp         = fp;
     mdv->raster     = infr;
 
@@ -93,8 +93,8 @@ void PG_free_raster_device(PG_RAST_device *mdv)
     if (mdv != NULL)
        {PG_free_frame(mdv->raster);
 
-        SFREE(mdv->out_fname);
-        SFREE(mdv);};
+        CFREE(mdv->out_fname);
+        CFREE(mdv);};
 
     return;}
 
@@ -259,7 +259,7 @@ static frame *_PG_make_frame(PG_device *dev, int w, int h)
     double box[6];
     frame *fr;
 
-    fr = FMAKE(frame, "_PG_MAKE_FRAME:fr");
+    fr = CMAKE(frame);
     if (fr != NULL)
        {SC_MEM_INIT(frame, fr);
 
@@ -269,9 +269,9 @@ static frame *_PG_make_frame(PG_device *dev, int w, int h)
  *       RGB and converted to YCbCr at the end so have all the
  *       spaces be np
  */
-	fr->r = FMAKE_N(unsigned char, np, "_PG_MAKE_FRAME:r");
-	fr->g = FMAKE_N(unsigned char, np, "_PG_MAKE_FRAME:g");
-	fr->b = FMAKE_N(unsigned char, np, "_PG_MAKE_FRAME:b");
+	fr->r = CMAKE_N(unsigned char, np);
+	fr->g = CMAKE_N(unsigned char, np);
+	fr->b = CMAKE_N(unsigned char, np);
 
 	fr->width  = w;
 	fr->height = h;
@@ -300,18 +300,18 @@ void PG_free_frame(frame *fr)
        return;
 
     if (fr->zb != NULL)
-       SFREE(fr->zb);
+       CFREE(fr->zb);
 
     if (fr->r != NULL)
-       SFREE(fr->r);
+       CFREE(fr->r);
 
     if (fr->g != NULL)
-       SFREE(fr->g);
+       CFREE(fr->g);
 
     if (fr->b != NULL)
-       SFREE(fr->b);
+       CFREE(fr->b);
 
-    SFREE(fr);
+    CFREE(fr);
 
     return;}
 
@@ -387,7 +387,7 @@ double *_PG_frame_z_buffer(frame *fr)
 	ny = fr->height;
 	np = nx*ny;
 
-        zb = FMAKE_N(double, np, "_PG_FRAME_Z_BUFFER:zb");
+        zb = CMAKE_N(double, np);
         PM_set_value(zb, np, -HUGE);
 
 	fr->zb = zb;};
@@ -408,14 +408,12 @@ static int _PG_rst_init_fonts(PG_device *dev)
     if (_PG.rst_marker_fonts != NULL)
        return(TRUE);
     
-    _PG.rst_marker_fonts = FMAKE_N(int *, _PG_RST_N_FONTS,
-                                   "_PG_RST_INIT_FONTS:_PG.rst_marker_fonts");
+    _PG.rst_marker_fonts = CMAKE_N(int *, _PG_RST_N_FONTS);
     if (_PG.rst_marker_fonts == NULL)
         return(FALSE);
 
     for (i = 0; i < _PG_RST_N_FONTS; i++)
-        {_PG.rst_marker_fonts[i] = FMAKE_N(int, strlen(_PG_rst_char_list),
-                                           "_PG_RST_INIT_FONTS:_PG.rst_marker_fonts[]");
+        {_PG.rst_marker_fonts[i] = CMAKE_N(int, strlen(_PG_rst_char_list));
          if (_PG.rst_marker_fonts[i] == NULL)
              return(FALSE);}
 
@@ -436,9 +434,9 @@ void _PG_rl_rst_fonts(void)
 
     if (_PG.rst_marker_fonts != NULL)
        {for (i = 0; i < _PG_RST_N_FONTS; i++)
-	    {SFREE(_PG.rst_marker_fonts[i]);};
+	    {CFREE(_PG.rst_marker_fonts[i]);};
 
-	SFREE(_PG.rst_marker_fonts);
+	CFREE(_PG.rst_marker_fonts);
 
 	_PG.rst_current_font = NULL;};
 

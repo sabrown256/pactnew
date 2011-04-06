@@ -69,12 +69,10 @@
 #define REMOVE remove
 #endif
 
-#undef MAKE
-#undef MAKE_N
-#undef REMAKE
-#undef REMAKE_N
-#undef SFREE
-#undef SFREE_N
+#undef CMAKE
+#undef CMAKE_N
+#undef CREMAKE
+#undef CFREE
 
 /*--------------------------------------------------------------------------*/
 
@@ -98,69 +96,18 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* NREMAKE - memory reallocation and bookkeeping macro */
+/* NREMAKE - reallocate a block of type _t and return a pointer to it */
 
-#define NREMAKE(p, _t)                                                       \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, 1L, (long) sizeof(_t), TRUE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NREMAKE_N - reallocate a block of type _t and return a pointer to it */
-
-#define NREMAKE_N(p, _t, n)                                                  \
+#define NREMAKE(p, _t, n)                                                    \
    (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
 				   (long) sizeof(_t), TRUE))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FMAKE - memory allocation and bookkeeping macro */
+/* CSTRSAVE - copy a string */
 
-#define FMAKE(_t, name)                                                      \
-    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FMAKE_N - allocate a block of type _t and return a pointer to it */
-
-#define FMAKE_N(_t, n, name)                                                 \
-    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MAKE - memory allocation and bookkeeping macro */
-
-#define MAKE(_t)                                                             \
-    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), NULL, FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MAKE_N - allocate a block of type _t and return a pointer to it */
-
-#define MAKE_N(_t, n)                                                        \
-    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), NULL, FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REMAKE - memory reallocation and bookkeeping macro */
-
-#define REMAKE(p, _t)                                                        \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, 1L,                           \
-				   (long) sizeof(_t), FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REMAKE_N - reallocate a block of type _t and return a pointer to it */
-
-#define REMAKE_N(p, _t, n)                                                   \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
-				   (long) sizeof(_t), FALSE))
+#define CSTRSAVE(_t)    SC_strsavec(_t, __func__, __FILE__, __LINE__)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -183,13 +130,20 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SFREE - release memory and do bookkeeping */
+/* CREMAKE - reallocate a block of type _t and return a pointer to it */
 
-#define SFREE(x)                                                             \
+#define CREMAKE(p, _t, n)                                                    \
+   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
+				   (long) sizeof(_t), FALSE))
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CFREE - release memory and do bookkeeping */
+
+#define CFREE(x)                                                             \
    {(*SC_gs.mm.free)(x);                                                     \
     x = NULL;}
-
-#define SFREE_N(x, n)  SFREE(x)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -198,7 +152,7 @@
 
 #define SC_ADD_VALUE_ALIST(lst, _t, str, name, val)                          \
    {_t *pt;                                                                  \
-    pt  = FMAKE(_t, "SC_ADD_VALUE_ALIST:pt");                                \
+    pt  = CMAKE(_t);                                                         \
     *pt = val;                                                               \
     lst = SC_add_alist(lst, name, str, pt);}
 
@@ -209,7 +163,7 @@
 
 #define SC_CHANGE_VALUE_ALIST(lst, _t, str, name, val)                       \
    {_t *pt;                                                                  \
-    pt  = FMAKE(_t, "SC_CHANGE_VALUE_ALIST:pt");                             \
+    pt  = CMAKE(_t);                                                         \
     *pt = val;                                                               \
     lst = SC_change_alist(lst, name, str, (void *) pt);}
 
@@ -1165,6 +1119,7 @@ extern void
 extern char
  *SC_strsave(char *s),
  *SC_strsavef(char *s, char *name),
+ *SC_strsavec(char *s, const char *file, const char *fnc, int line),
  *SC_strsaven(char *s, char *name),
  *SC_strcat(char *dest, size_t lnd, char *src),
  *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...),

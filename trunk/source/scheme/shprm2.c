@@ -48,7 +48,7 @@ void SS_install_mf(char* pname, char *pdoc, PFPHand phand, ...)
     PFVoid *pr;
 
     n  = 3;
-    pr = FMAKE_N(PFVoid, n, "SS_INSTALL_MF:pr");
+    pr = CMAKE_N(PFVoid, n);
 
     SC_VA_START(phand);
 
@@ -229,7 +229,7 @@ static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
 
     idf = ((op == PM_fdivide) || (op == HYPOT)) ? SC_FLOAT_I : SC_INT_I;
 
-    v = FMAKE_N(double, ni, "_SS_BIN_FIX:double");
+    v = CMAKE_N(double, ni);
     _SS_list_to_numtype_id(SC_DOUBLE_I, v, ni, argl);
 
     if (ni < 2)
@@ -248,7 +248,7 @@ static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
     else
        acc = SS_mk_float(accv);
 
-    SFREE(v);
+    CFREE(v);
 
     return(acc);}
 
@@ -265,7 +265,7 @@ static object *_SS_bin_float(long ni, object *argl, PFDoubledd op)
     double accv, *v;
     object *acc;
 
-    v = FMAKE_N(double, ni, "_SS_BIN_FLOAT:double");
+    v = CMAKE_N(double, ni);
     _SS_list_to_numtype_id(SC_DOUBLE_I, v, ni, argl);
 
     if (ni < 2)
@@ -281,7 +281,7 @@ static object *_SS_bin_float(long ni, object *argl, PFDoubledd op)
 
     acc = SS_mk_float(accv);
 
-    SFREE(v);
+    CFREE(v);
 
     return(acc);}
 
@@ -298,7 +298,7 @@ static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
     double _Complex accv, *v;
     object *acc;
 
-    v = FMAKE_N(double _Complex, ni, "_SS_BIN_COMPLEX:v");
+    v = CMAKE_N(double _Complex, ni);
     _SS_list_to_numtype_id(SC_DOUBLE_COMPLEX_I, v, ni, argl);
 
     if (ni < 2)
@@ -314,7 +314,7 @@ static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
 
     acc = SS_mk_complex(accv);
 
-    SFREE(v);
+    CFREE(v);
 
     return(acc);}
 
@@ -331,7 +331,7 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
     quaternion accv, *v;
     object *acc;
 
-    v = FMAKE_N(quaternion, ni, "_SS_BIN_QUATERNION:v");
+    v = CMAKE_N(quaternion, ni);
     _SS_list_to_numtype_id(SC_QUATERNION_I, v, ni, argl);
 
     accv.i = 0;
@@ -351,7 +351,7 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
 
     acc = SS_mk_quaternion(accv);
 
-    SFREE(v);
+    CFREE(v);
 
     return(acc);}
 

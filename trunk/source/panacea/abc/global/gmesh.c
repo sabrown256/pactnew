@@ -85,13 +85,13 @@ int make_lrm(void)
     frz     = mesh->frz;
 
 /* now that we have the mesh set other mesh variables */
-    vx = FMAKE_N(double, N_nodes, "MAKE_LRM:vx");
-    vy = FMAKE_N(double, N_nodes, "MAKE_LRM:vy");
+    vx = CMAKE_N(double, N_nodes);
+    vy = CMAKE_N(double, N_nodes);
 
     kbnd = kmax + 1;
     lbnd = lmax + 1;
 
-    SFREE(mesh);
+    CFREE(mesh);
 
     zs = SC_zero_space(zs);
 
@@ -115,7 +115,7 @@ mesh_quality *compute_mesh_quality(void)
     mesh_quality *mq;
     static double pot = PI/2.0;
 
-    mq = FMAKE(mesh_quality, "COMPUTE_MESH_QUALITY:mq");
+    mq = CMAKE(mesh_quality);
 
     count = 0;
     skew  = 0.0;
@@ -442,7 +442,7 @@ void make_mesh(void)
     make_lrm();
 
 /* fill the array node with 1's for real nodes and 0's for phony nodes */
-    node = FMAKE_N(double, N_nodes, "MAKE_MESH:node");
+    node = CMAKE_N(double, N_nodes);
     for (i = 0; i < N_nodes; i++)
         if (nodet[i] != 0.0)
            node[i] = 1.0;
@@ -710,7 +710,7 @@ PM_conic_curve *rd_cline(char *s)
 
     if (curves == NULL)
        {curves = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
-        MESH_CURVE = SC_strsave("PM_conic_curve");};
+        MESH_CURVE = CSTRSAVE("PM_conic_curve");};
 
     PA_ERR((SC_hasharr_lookup(curves, s) != NULL),
            "CURVE: %s ALREADY EXISTS", s);
@@ -788,7 +788,7 @@ int what_axis(char *s, char **sub)
             SC_strcat(bfo, MAXLINE, t);};
 
 /* reassign the axis specification to a fresh copy of the output buffer */
-        *sub = SC_strsave(bfo);};
+        *sub = CSTRSAVE(bfo);};
 
     return(zon);}
     
@@ -824,16 +824,16 @@ int rl_mesh(void)
             break;
          ipart = parts;
          parts = parts->next;
-         SFREE(ipart->name);
+         CFREE(ipart->name);
          for (ib = ipart->leg; ib != ipart->leg; )
              {jbase = ib;
               ib = ib->next;
-              SFREE(jbase);};
+              CFREE(jbase);};
          for (iend = ipart->ends; iend != NULL; )
              {jend = iend;
               iend = iend->next;
-              SFREE(jend);};
-         SFREE(ipart);};
+              CFREE(jend);};
+         CFREE(ipart);};
 
     mesh_bndry   = FALSE;
     mesh_bndry_r = FALSE;

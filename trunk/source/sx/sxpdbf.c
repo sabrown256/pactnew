@@ -66,8 +66,7 @@ static void _SX_find_indirection(hasharr *tytab, PDBfile *file,
    {long i, ditems;
     char *dtype, *bf;
 
-    dtype = PD_dereference(SC_strsavef(type,
-                           "char*:_SX_FIND_INDIRECTION:dtype"));
+    dtype = PD_dereference(CSTRSAVE(type));
 
     for (i = 0L; i < nitems; i++, vr++)
         {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
@@ -91,7 +90,7 @@ static void _SX_find_indirection(hasharr *tytab, PDBfile *file,
          else
             _SX_find_leaf(tytab, file, DEREF(vr), ditems, dtype);};
 
-    SFREE(dtype);
+    CFREE(dtype);
 
     return;}
 

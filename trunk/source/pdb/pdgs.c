@@ -174,14 +174,14 @@ int PD_gather_as(PDBfile *file, char *name, char *type,
 	mo  = PD_get_major_order(file);
 	bpi = _PD_lookup_size(type, file->host_chart);
 	ni  = _PD_n_spec_elements(ndst, dind);
-	tv  = FMAKE_N(char, ni*bpi, "PD_GATHER_AS:tv");
+	tv  = CMAKE_N(char, ni*bpi);
 
 	nr = PD_read_as_alt(file, name, type, tv, sind);
 	SC_ASSERT(nr > 0);
 
 	ng = _PD_hyper_scatter((char *) vr, 0, ndst, dind, (char *) tv, bpi, mo);
 
-	SFREE(tv);};
+	CFREE(tv);};
 
     return(ng);}
 
@@ -236,14 +236,14 @@ int PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
        {mo  = PD_get_major_order(file);
 	ni  = _PD_n_spec_elements(nsrc, sind);
 	bpi = _PD_lookup_size(intype, file->host_chart);
-	tv  = FMAKE_N(char, ni*bpi, "PD_SCATTER_AS:tv");
+	tv  = CMAKE_N(char, ni*bpi);
 
 	ng = _PD_hyper_gather((char *) tv, (char *) vr, 0, nsrc, sind, bpi, mo);
 	SC_ASSERT(ng == TRUE);
 
 	ret = PD_write_as_alt(file, name, intype, outtype, tv, ndst, dind);
 
-	SFREE(tv);};
+	CFREE(tv);};
 
     return(ret);}
 

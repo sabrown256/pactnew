@@ -438,7 +438,7 @@ void _PG_CGM_draw_curve(PG_device *dev, PG_curve *crv, int clip)
         xo = crv->x_origin;
         yo = crv->y_origin;
 
-	pts = FMAKE_N(int, 2*n, "_PG_CGM_DRAW_CURVE:pts");
+	pts = CMAKE_N(int, 2*n);
     
 	if (pc[2] > pc[3])
 	   {SC_SWAP_VALUE(int, pc[2], pc[3]);};
@@ -492,7 +492,7 @@ void _PG_CGM_draw_curve(PG_device *dev, PG_curve *crv, int clip)
         
         PG_CGM_command(dev, POLYLINE(ix), pts);
 
-        SFREE(pts);};
+        CFREE(pts);};
 
     return;}
  
@@ -521,7 +521,7 @@ void _PG_CGM_draw_disjoint_polyline_2(PG_device *dev, double **r,
 
     _PG_find_clip_region(dev, pc, dev->clipping, TRUE);
 
-    pts = FMAKE_N(int, 4*n, "_PG_CGM_DRAW_DISJOINT_POLYLINE_2:pts");
+    pts = CMAKE_N(int, 4*n);
     for (i = 0, ix = 0, iy = 1; i < n; i++)
         {box[0] = *px++;
          box[2] = *py++;
@@ -559,7 +559,7 @@ void _PG_CGM_draw_disjoint_polyline_2(PG_device *dev, double **r,
 
     PG_CGM_command(dev, DISJOINT_POLYLINE(ix), pts);
 
-    SFREE(pts);
+    CFREE(pts);
 
     return;}
 
@@ -577,7 +577,7 @@ void _PG_CGM_shade_poly(PG_device *dev, int nd, int n, double **r)
 
     else if (dev->cgm_page_set)
        {if (n > 0)     
-           {pts = FMAKE_N(int, 2*n, "_PG_CGM_SHADE_POLY:pts");
+           {pts = CMAKE_N(int, 2*n);
             for (i = 0, ix = 0, iy = 1; i < n; i++, ix += 2, iy += 2)
                 {x[0] = r[0][i];
                  x[1] = r[1][i];
@@ -588,7 +588,7 @@ void _PG_CGM_shade_poly(PG_device *dev, int nd, int n, double **r)
  
             PG_CGM_command(dev, POLYGON(2*n), pts);
 
-            SFREE(pts);};};
+            CFREE(pts);};};
 
     return;}
 
@@ -608,7 +608,7 @@ void _PG_CGM_fill_curve(PG_device *dev, PG_curve *crv)
     yo = crv->y_origin;
     
     if (dev->cgm_page_set)
-       {pts = FMAKE_N(int, 2*n, "_PG_CGM_FILL_CURVE:pts");
+       {pts = CMAKE_N(int, 2*n);
         for (i = 0, ix = 0, iy = 1; i < n; i++, ix += 2, iy += 2)
             {pts[ix] = x[i] + xo;
              pts[iy] = y[i] + yo;};
@@ -619,7 +619,7 @@ void _PG_CGM_fill_curve(PG_device *dev, PG_curve *crv)
         PG_CGM_command(dev, POLYLINE(2*n), pts);
         PG_CGM_command(dev, LINE_COLOUR, dev->line_color);
 
-        SFREE(pts);};
+        CFREE(pts);};
 
     return;}
 

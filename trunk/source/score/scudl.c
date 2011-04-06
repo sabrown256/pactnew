@@ -82,7 +82,7 @@ SC_udl *_SC_parse_udl(char *s)
     info   = NULL;
     entry  = NULL;
 
-    pu = FMAKE(SC_udl, "_SC_PARSE_UDL:pu");
+    pu = CMAKE(SC_udl);
     if (s != NULL)
        {path = s;
 
@@ -103,8 +103,8 @@ SC_udl *_SC_parse_udl(char *s)
 		p     = strchr(srvr, '/');
 		*p++  = '\0';
 
-		proto = SC_strsavef(proto, "char*:_SC_PARSE_UDL:proto");
-		srvr  = SC_strsavef(srvr, "char*:_SC_PARSE_UDL:srvr");};
+		proto = CSTRSAVE(proto);
+		srvr  = CSTRSAVE(srvr);};
 
 /* get rough path */	
 	    path = p;
@@ -132,7 +132,7 @@ SC_udl *_SC_parse_udl(char *s)
 		        val = NULL;
 		     else
 		        {*p++ = '\0';
-			 val  = SC_strsavef(p, "char*:_SC_PARSE_UDL:val");};
+			 val  = CSTRSAVE(p);};
 
 		     info = SC_add_alist(info, key, SC_STRING_S, val);
 
@@ -141,14 +141,14 @@ SC_udl *_SC_parse_udl(char *s)
 
 /* resolve path for container and entry */
 	    entry = _SC_udl_container(path, TRUE);
-	    path  = SC_strsavef(path, "char*:_SC_PARSE_UDL:path");
-	    entry = SC_strsavef(entry, "char*:_SC_PARSE_UDL:entry");};};
+	    path  = CSTRSAVE(path);
+	    entry = CSTRSAVE(entry);};};
 
     if (pu != NULL)
        {pu->stream   = NULL;
 	pu->buffer   = NULL;
         pu->mode     = NULL;
-	pu->udl      = SC_strsavef(s, "char*:_SC_PARSE_UDL:udl");
+	pu->udl      = CSTRSAVE(s);
 	pu->protocol = proto;
 	pu->server   = srvr;
 	pu->path     = path;
@@ -173,21 +173,21 @@ void _SC_rel_udl(SC_udl *pu)
     if (pu != NULL)
        {if (pu->stream != NULL)
 	   io_close(pu->stream);
-	SFREE(pu->stream);
-	SFREE(pu->buffer);
-	SFREE(pu->mode);
-        SFREE(pu->udl);
-	SFREE(pu->protocol);
-	SFREE(pu->server);
-	SFREE(pu->path);
-	SFREE(pu->entry);
-	SFREE(pu->target);
-	SFREE(pu->format);
-	SFREE(pu->protocol);
+	CFREE(pu->stream);
+	CFREE(pu->buffer);
+	CFREE(pu->mode);
+        CFREE(pu->udl);
+	CFREE(pu->protocol);
+	CFREE(pu->server);
+	CFREE(pu->path);
+	CFREE(pu->entry);
+	CFREE(pu->target);
+	CFREE(pu->format);
+	CFREE(pu->protocol);
 
 	SC_free_alist(pu->info, 3);
 
-        SFREE(pu);};
+        CFREE(pu);};
 
     return;}
 

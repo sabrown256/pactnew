@@ -42,7 +42,7 @@ object *_SX_make_list_syment(PDBfile *file, void *vr, long ni, char *type)
        {if ((strcmp(type, SC_CHAR_S) == 0) && (ni == 1))
 	   {char *s;
 
-	    s = SC_strsavef("a", "char*:_SX_MAKE_LIST_SYMENT:s");
+	    s = CSTRSAVE("a");
 	    s[0] = *(char *) vr;
 	    obj  = _SX_make_list_leaf(file, s, ni, type);}
 	else
@@ -63,8 +63,7 @@ object *_SX_make_list_indirection(PDBfile *file, char **vr,
     char *dtype;
     object *obj, *obj1, *o;
 
-    dtype = PD_dereference(SC_strsavef(type,
-                           "char*:_SX_MAKE_LIST_INDIRECTION:dtype"));
+    dtype = PD_dereference(CSTRSAVE(type));
 
     obj = SS_null;
 
@@ -83,7 +82,7 @@ object *_SX_make_list_indirection(PDBfile *file, char **vr,
 
         obj = SS_mk_cons(obj1, obj);};
 
-    SFREE(dtype);
+    CFREE(dtype);
 
     o = SS_reverse(obj);
 
@@ -174,7 +173,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
 	ARRAY_VECTOR(obj, d, _SX_mk_boolean, ni, offset);
 
-	SFREE(d);}
+	CFREE(d);}
 
 /* character types (proper) */
     else if (SC_is_type_char(id) == TRUE)
@@ -192,7 +191,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
 	ARRAY_VECTOR(obj, d, SS_mk_integer, ni, offset);
 
-	SFREE(d);}
+	CFREE(d);}
 
 /* floating point types (proper) */
     else if (SC_fp_type_id(type) != -1)
@@ -203,7 +202,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
 	ARRAY_VECTOR(obj, d, SS_mk_float, ni, offset);
 
-	SFREE(d);}
+	CFREE(d);}
 
 /* complex floating point types (proper) */
     else if (SC_cx_type_id(type) != -1)
@@ -214,7 +213,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
 
 	ARRAY_VECTOR(obj, d, SS_mk_complex, ni, offset);
 
-	SFREE(d);}
+	CFREE(d);}
 
 /* handle user defined primitive types by turning them into vectors of
  * integers containing the byte values

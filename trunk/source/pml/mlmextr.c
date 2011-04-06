@@ -606,8 +606,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
     _PM_compute_a_bnd(asl, xsl, ael, xel, apl,
 		      kmax, lmax, kmx, kmx, lmn, lmx);
 
-    t = FMAKE_N(double, nz, "COMPUTE_A:t");
-    s = FMAKE_N(double, nz, "COMPUTE_A:s");
+    t = CMAKE_N(double, nz);
+    s = CMAKE_N(double, nz);
 
 /* compute apl */
     PM_set_value(s, nz, 0.0);
@@ -678,8 +678,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
              {j   = NODE_OF(k, l);
               apk[j] = 0.5*(s[j] + t[j]) + apk[j0];};};
 
-    SFREE(s);
-    SFREE(t);
+    CFREE(s);
+    CFREE(t);
 
     return;}
 
@@ -866,8 +866,8 @@ void PM_mesh_exwk(double *y, int id, int side, int nd,
     lapl = PM_create(n, n);
 
     na = 2;
-    b  = FMAKE_N(PM_matrix *, na, "PM_MESH_EXWK:b");
-    x  = FMAKE_N(double *, na, "PM_MESH_EXWK:x");
+    b  = CMAKE_N(PM_matrix *, na);
+    x  = CMAKE_N(double *, na);
     for (j = 0; j < na; j++)
         b[j] = PM_create(n, 1);
 
@@ -909,8 +909,8 @@ void PM_mesh_exwk(double *y, int id, int side, int nd,
     for (j = 0; j < na; j++)
         PM_destroy(b[j]);
 
-    SFREE(b);
-    SFREE(x);
+    CFREE(b);
+    CFREE(x);
 
     return;}
 
@@ -985,10 +985,10 @@ static void _PM_mesh_extr_nd(double *x, int *smn, int *smx, int *mn, int *mx,
     for (jd = 0; jd < nd; jd++)
         nn *= (mx[jd] - mn[jd] + 1);
 
-    kra = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:kra");
-    lra = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:lra");
-    apk = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:apk");
-    apl = FMAKE_N(double, nn, "PM_MESH_EXTR_ND:apl");
+    kra = CMAKE_N(double, nn);
+    lra = CMAKE_N(double, nn);
+    apk = CMAKE_N(double, nn);
+    apl = CMAKE_N(double, nn);
 
     PM_set_value(kra, nn, 1.0);
     PM_set_value(lra, nn, 1.0);
@@ -996,8 +996,8 @@ static void _PM_mesh_extr_nd(double *x, int *smn, int *smx, int *mn, int *mx,
     PM_set_value(apl, nn, 1.0);
 
     nt  = PM_ipow(3, nd);
-    unt = FMAKE_N(int, nt, "PM_MESH_EXTR_ND:unt");
-    str = FMAKE_N(int, nt, "PM_MESH_EXTR_ND:str");
+    unt = CMAKE_N(int, nt);
+    str = CMAKE_N(int, nt);
 
     if (debug)
        {SC_mark(x, 1);
@@ -1019,13 +1019,13 @@ static void _PM_mesh_extr_nd(double *x, int *smn, int *smx, int *mn, int *mx,
 	 else
 	    smx[id]--;};
 
-    SFREE(kra);
-    SFREE(lra);
-    SFREE(apk);
-    SFREE(apl);
+    CFREE(kra);
+    CFREE(lra);
+    CFREE(apk);
+    CFREE(apl);
 
-    SFREE(unt);
-    SFREE(str);
+    CFREE(unt);
+    CFREE(str);
 
     return;}
 

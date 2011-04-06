@@ -31,7 +31,7 @@ PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
     if (PA_vif == NULL)
        PA_vif = PA_open("PA_vif", "r+", TRUE);
 
-    pp = FMAKE(PA_variable, "_PA_MK_VARIABLE:pp");
+    pp = CMAKE(PA_variable);
 
     nd = 0;
     if (vdims == NULL)
@@ -55,8 +55,7 @@ PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
     PA_VARIABLE_FILE_NAME(pp)       = NULL;
     PA_VARIABLE_ATTR(pp)            = alist;
 
-    PA_VARIABLE_NAME(pp)            = SC_strsavef(vname,
-						  "char*:_PA_MK_VARIABLE:vname");
+    PA_VARIABLE_NAME(pp)            = CSTRSAVE(vname);
     PA_VARIABLE_FILE(pp)            = NULL;
     PA_VARIABLE_FILE_CONVERS(pp)    = NONE;
     PA_VARIABLE_CACHE_FILE_NAME(pp) = NULL;
@@ -91,7 +90,7 @@ PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
 PA_dimens *_PA_mk_dimens(int *mini, int *maxi, int method)
    {PA_dimens *pd;
 
-    pd = FMAKE(PA_dimens, "_PA_MK_DIMENS:pd");
+    pd = CMAKE(PA_dimens);
     pd->index_min = mini;
     pd->index_max = maxi;
     pd->method    = method;
@@ -123,13 +122,13 @@ dimdes *_PA_mk_sym_dims(PA_dimens *vdims)
         {if (pvd->index_max != NULL)
             maxi = pvd->index_max;
          else
-            {maxi  = FMAKE(int, "_PA_MK_SYM_DIMS:maxi");
+            {maxi  = CMAKE(int);
              *maxi = 0;};
 
          if (pvd->index_min != NULL)
             mini = pvd->index_min;
          else
-            {mini  = FMAKE(int, "_PA_MK_SYM_DIMS:mini");
+            {mini  = CMAKE(int);
              *mini = 0;};
 
          switch (pvd->method)
@@ -166,15 +165,15 @@ PA_src_variable *_PA_mk_src_variable(char *name, int vindx, int n,
 				     double *pt, PDBfile *fp)
    {PA_src_variable *svp;
 
-    svp = FMAKE(PA_src_variable, "_PA_MK_SRC_VARIABLE:svp");
+    svp = CMAKE(PA_src_variable);
 
     svp->name        = name;
     svp->var_index   = vindx;
     svp->n_times     = n;
     svp->times       = pt;
     svp->index       = 0;
-    svp->queue_times = FMAKE_N(double, 4, "_PA_MK_SRC_VARIABLE:queue_times");
-    svp->queue       = FMAKE_N(double *, 4, "_PA_MK_SRC_VARIABLE:queue");
+    svp->queue_times = CMAKE_N(double, 4);
+    svp->queue       = CMAKE_N(double *, 4);
     svp->interpolate = TRUE;
     svp->file        = fp;
 
@@ -203,7 +202,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
     pck->n_ascii = n_a;
     if (n_a > 0)
        {snprintf(bf, MAXLINE, "%s-names", s);
-        pn_a  = FMAKE(int, "PA_MK_CONTROL:pn_a");
+        pn_a  = CMAKE(int);
         *pn_a = n_a;
         PA_inst_var(bf, SC_STRING_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
@@ -219,7 +218,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
     pck->n_param = n_p;
     if (n_p > 0)
        {snprintf(bf, MAXLINE, "%s-params", s);
-        pn_p  = FMAKE(int, "PA_MK_CONTROL:pn_p");
+        pn_p  = CMAKE(int);
         *pn_p = n_p;
         PA_inst_var(bf, SC_DOUBLE_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
@@ -235,7 +234,7 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
     pck->n_swtch = n_s;
     if (n_s > 0)
        {snprintf(bf, MAXLINE, "%s-swtchs", s);
-        pn_s  = FMAKE(int, "PA_MK_CONTROL:pn_s");
+        pn_s  = CMAKE(int);
         *pn_s = n_s;
         PA_inst_var(bf, SC_INT_S, NULL, NULL,
                     SCOPE, DEFN, ATTRIBUTE,
@@ -264,12 +263,12 @@ PA_iv_specification *PA_mk_spec(char *id, int type, char *fn, int n,
 				PA_iv_specification *nxt)
    {PA_iv_specification *sp;
 
-    sp = FMAKE(PA_iv_specification, "_PA_MK_SPEC:sp");
+    sp = CMAKE(PA_iv_specification);
 
     sp->type = type;
-    sp->name = SC_strsavef(id, "char*:_PA_MK_SPEC :id");
+    sp->name = CSTRSAVE(id);
     if (fn != NULL)
-       sp->file = SC_strsavef(fn, "char*:_PA_MK_SPEC :fn");
+       sp->file = CSTRSAVE(fn);
     else
        sp->file = NULL;
     sp->num         = n;
@@ -292,9 +291,9 @@ PA_iv_specification *PA_mk_spec(char *id, int type, char *fn, int n,
 void _PA_rl_variable(PA_variable *pp)
    {
 
-    SFREE(PA_VARIABLE_NAME(pp));
+    CFREE(PA_VARIABLE_NAME(pp));
     _PD_rl_syment_d(PA_VARIABLE_DESC(pp));
-    SFREE(pp);
+    CFREE(pp);
 
     return;}
 
@@ -306,12 +305,12 @@ void _PA_rl_variable(PA_variable *pp)
 void _PA_rl_set_spec(PA_set_spec *ip)
    {
 
-    SFREE(ip->var_name);
-    SFREE(ip->function);
-    SFREE(ip->text);
-    SFREE(ip->values);
+    CFREE(ip->var_name);
+    CFREE(ip->function);
+    CFREE(ip->text);
+    CFREE(ip->values);
 
-    SFREE(ip);
+    CFREE(ip);
 
     return;}
 
@@ -334,7 +333,7 @@ void _PA_rl_request(PA_plot_request *rq)
 	      _PA_rl_set_spec(ip);};
 
          nxt = pp->next;
-         SFREE(pp);};
+         CFREE(pp);};
 
     return;}
 
@@ -347,11 +346,11 @@ void _PA_rl_spec(PA_iv_specification *lst)
    {PA_iv_specification *sp, *nxt;
 
     for (sp = lst; sp != NULL; sp = nxt)
-        {SFREE(sp->name);
-         SFREE(sp->file);
-         SFREE(sp->data);
+        {CFREE(sp->name);
+         CFREE(sp->file);
+         CFREE(sp->data);
          nxt = sp->next;
-         SFREE(sp);};
+         CFREE(sp);};
 
     return;}
 
@@ -367,9 +366,9 @@ void _PA_rl_domain_map(PA_set_index *dmap)
 
     for (i = 0; i < nmax; i++)
         if (dmap[i].name != NULL)
-           {SFREE(dmap[i].name);};
+           {CFREE(dmap[i].name);};
 
-    SFREE(dmap); 
+    CFREE(dmap); 
 
     return;}
 

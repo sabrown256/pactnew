@@ -78,7 +78,7 @@ int plotw(dev, new, name)
        {window_init = TRUE;
 
         strcpy(s, name);
-        elem  = FMAKE_N(double *, 10, "PLOTW:elem");
+        elem  = CMAKE_N(double *, 10);
         token = SC_firsttok(s, " \t,;");
         nde   = 0;
         for (; token != NULL; token = SC_firsttok(s, " \t,;"))
@@ -86,15 +86,16 @@ int plotw(dev, new, name)
              PA_ERR((pp == NULL),
                     "BAD VARIABLE %s - PLOTW", token);
 
-             v = FMAKE_N(double, PA_VARIABLE_SIZE(pp), "PLOTW:v");
-             PA_copy_array(v, PA_VARIABLE_DATA(pp), PA_VARIABLE_SIZE(pp));
+             v = CMAKE_N(double, PA_VARIABLE_SIZE(pp));
+	     PA_copy_array(v, PA_VARIABLE_DATA(pp), PA_VARIABLE_SIZE(pp));
+
              v      = LR_map_centers(v, PA_VARIABLE_CENTERING(pp));
 	     nitems = SC_MEM_GET_N(double, v);
 
              conv = PA_VARIABLE_INT_UNIT(pp)/PA_VARIABLE_EXT_UNIT(pp);
              PA_scale_array(v, nitems, conv);
              elem[nde++] = v;};
-        REMAKE_N(elem, double *, nde);};
+        CREMAKE(elem, double *, nde);};
 
     if (elem != NULL)
        {rvp = FALSE;
@@ -185,7 +186,7 @@ int newframew(PG_device *dev, int new)
         PG_write_abs(dev, 0.20, 0.84,
                      "Skew = %5.2f  J = %5.2f  Ortho = %5.2f",
                      mq->skew, mq->jac, mq->orth);
-        SFREE(mq);
+        CFREE(mq);
 
         if (mesh_plot_phys)
            snprintf(label, MAXLINE, "Physical: (%f, %f) (%f, %f)",
@@ -421,7 +422,7 @@ int make_frame()
        {graphics_init = TRUE;
 
         if (global_name[7] == NULL)
-           global_name[7] = SC_strsave("COLOR");
+           global_name[7] = CSTRSAVE("COLOR");
 
         mesh_display = PG_make_device("WINDOW", global_name[7],
                                       global_name[8]);

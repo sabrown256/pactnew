@@ -31,8 +31,8 @@ int main(int c, char **v)
     l1 = 1;
     l2 = 4;
 
-    x = FMAKE_N(double, kmax*lmax, "MLACTS.C:x");
-    y = FMAKE_N(double, kmax*lmax, "MLACTS.C:y");
+    x = CMAKE_N(double, kmax*lmax);
+    y = CMAKE_N(double, kmax*lmax);
     for (l = 0; l < lmax; l++)
         for (k = 0; k < kmax; k++)
             {i = l*kmax + k;
@@ -58,11 +58,11 @@ int main(int c, char **v)
               PRINT(STDOUT, "\n");};
          PRINT(STDOUT, "\n");};
 
-    SFREE(x);
-    SFREE(y);
+    CFREE(x);
+    CFREE(y);
 
-    SFREE(px);
-    SFREE(py);
+    CFREE(px);
+    CFREE(py);
 
     return(0);}
 

@@ -268,7 +268,7 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 
 	      PG_get_render_info(g, info);
 	      if (pty == PLOT_LOGICAL)
-		 {ix = FMAKE_N(double, n, "PG_CURVE_PLOT:ix");
+		 {ix = CMAKE_N(double, n);
 		  for (j = 1; j <= n; j++)
 		      ix[j-1] = (double) j;
 
@@ -281,7 +281,7 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 				       g->identifier, info);
 		      PG_set_color_text(dev, dev->WHITE, TRUE);};
 
-		  SFREE(ix);}
+		  CFREE(ix);}
 
 	      else
 		 {x = PM_array_real(domain->element_type,
@@ -296,9 +296,9 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 				       g->identifier, info);
 		      PG_set_color_text(dev, dev->WHITE, TRUE);};
 
-		  SFREE(x);};
+		  CFREE(x);};
 
-	      SFREE(y);
+	      CFREE(y);
 
 	      PG_draw_domain_boundary(dev, pf);};};
 
@@ -414,7 +414,7 @@ static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
 		       NULL);
 
     if (!scatter && ((pty == PLOT_CARTESIAN) || (pty == PLOT_HISTOGRAM)))
-       {ln = FMAKE_N(double, n, "PG_DRAW_DATA_IDS_ALT:ln");
+       {ln = CMAKE_N(double, n);
 
 /* NOTE: the following assume that the arrays are sorted */
         for (imn = 0; imn < n; imn++)
@@ -495,7 +495,7 @@ static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
                  if (PG_box_contains(2, wc, xp) == TRUE)
                     PG_write_n(dev, 2, WORLDC, xp, mark);};};
 
-	SFREE(ln);}
+	CFREE(ln);}
 
     else if (pty == PLOT_POLAR)
        {double tc, rc, xc, yc;

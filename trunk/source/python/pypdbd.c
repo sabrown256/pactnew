@@ -190,7 +190,7 @@ long _PP_rel_syment(hasharr *host_chart, char *vr, long nitems, char *intype)
          if (i >= nitems) {
              RESTORE_P(char, vr);  /* start of indirect */
              if (vr != first )
-                 SFREE(vr);
+                 CFREE(vr);
              RESTORE_S(litype);
              GO_CONT;
          }
@@ -233,7 +233,7 @@ long _PP_rel_syment(hasharr *host_chart, char *vr, long nitems, char *intype)
 
      case INDIR_RET:
          if (vr != first )
-             SFREE(vr);
+             CFREE(vr);
          RESTORE_I(i);
          RESTORE_I(nitems);
          RESTORE_P(char, vr);

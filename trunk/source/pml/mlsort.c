@@ -77,8 +77,8 @@ int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
     int r, f, ind, dep;
     sort_link *link, *nln;
 
-    link = FMAKE_N(sort_link, n_dep+n_pts+1, "PM_T_SORT:link");
-    q    = FMAKE_N(int, n_pts+1, "PM_T_SORT:q");
+    link = CMAKE_N(sort_link, n_dep+n_pts+1);
+    q    = CMAKE_N(int, n_pts+1);
 
 /* map the partial ordering into a structured list to do the sort */
     nln = link + n_pts + 1;
@@ -100,7 +100,7 @@ int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
 
 /* determine what to do about output */
     if (ord == NULL)
-       out = pout = FMAKE_N(int, n_pts, "PM_T_SORT:out");
+       out = pout = CMAKE_N(int, n_pts);
     else
        out = pout = ord;
 
@@ -119,12 +119,12 @@ int *PM_t_sort(int *in, int n_dep, int n_pts, int *ord)
 
         f = q[f];};
 
-    SFREE(link);
-    SFREE(q);
+    CFREE(link);
+    CFREE(q);
 
 /* if n is non-zero there was a loop in the topology */
     if (n != 0)
-       {SFREE(out);
+       {CFREE(out);
         out = NULL;};
 
     return(out);}

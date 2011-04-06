@@ -75,16 +75,13 @@ FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
     prec          = TEXT_CHARACTER_PRECISION;
 
     if (_PG_gattrs.axis_label_x_format == NULL)
-       _PG_gattrs.axis_label_x_format = SC_strsavef("%10.2g",
-						    "char*:PGSAXA:xformat");
+       _PG_gattrs.axis_label_x_format = CSTRSAVE("%10.2g");
 
     if (_PG_gattrs.axis_label_y_format == NULL)
-       _PG_gattrs.axis_label_y_format = SC_strsavef("%10.2g",
-						    "char*:PGSAXA:yformat");
+       _PG_gattrs.axis_label_y_format = CSTRSAVE("%10.2g");
 
     if (_PG_gattrs.axis_type_face == NULL)
-       _PG_gattrs.axis_type_face = SC_strsavef("helvetica",
-					       "char*:PGSAXA:type_face");
+       _PG_gattrs.axis_type_face = CSTRSAVE("helvetica");
 
     charspace    = 0.0;
     chpthx       = 1.0;
@@ -140,13 +137,12 @@ FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
                   break;
 
              case AXIS_LABELFONT :
-                  SFREE(_PG_gattrs.axis_type_face);
+                  CFREE(_PG_gattrs.axis_type_face);
                   nc = *attr++;
                   SC_strncpy(bf, MAXLINE, pc, nc);
 
                   pc += nc;
-                  _PG_gattrs.axis_type_face = SC_strsavef(bf,
-							  "char*:PGSAXA:bf");
+                  _PG_gattrs.axis_type_face = CSTRSAVE(bf);
                   break;
 
              case AXIS_X_FORMAT :
@@ -1015,8 +1011,8 @@ FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
         SC_strncpy(SC_F77_C_STRING(pst), *pncs, st, lns);
         *psz = ls;
 
-        SFREE(f);
-        SFREE(st);
+        CFREE(f);
+        CFREE(st);
 
         rv = TRUE;};
 
@@ -1370,7 +1366,7 @@ FIXNUM F77_FUNC(pgrgvr, PGRGVR)(FIXNUM *pnc, F77_string name,
     SC_FORTRAN_STR_C(ltype, type, *pnt);
 
     PG_register_variable(lname,
-			 SC_strsavef(ltype, "char*:PGRGVR:ltype"),
+			 CSTRSAVE(ltype),
 			 vr, vn, vx);
 
     rv = TRUE;
@@ -1895,13 +1891,12 @@ FIXNUM F77_FUNC(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
        {if (_PG.view_attr_list == NULL)
            {_PG.view_attr_indx     = 0;
             _PG.view_attr_max_indx = 10;
-            _PG.view_attr_list     = FMAKE_N(PG_view_attributes *,
-					     _PG.view_attr_max_indx,
-					     "PGSVPA:_PG.view_attr_list");}
+            _PG.view_attr_list     = CMAKE_N(PG_view_attributes *,
+					     _PG.view_attr_max_indx);}
 
         if (_PG.view_attr_max_indx <= _PG.view_attr_indx)
            {_PG.view_attr_max_indx += 10;
-            REMAKE_N(_PG.view_attr_list,
+            CREMAKE(_PG.view_attr_list,
                      PG_view_attributes *,
                      _PG.view_attr_max_indx);};
 

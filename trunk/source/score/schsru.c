@@ -70,7 +70,7 @@ static int _SC_exec_cmd(char **cmd, char *sys,
 	SC_ptr_arr_len(n, sa);
 	for (i = 0; i < n; i++)
 	    {if (strcmp(sa[i], hst) == 0)
-	        {SFREE(sa[i]);
+	        {CFREE(sa[i]);
 		 sa[i] = sa[n-1];
 		 sa[--n] = NULL;
 		 break;};};};
@@ -87,7 +87,7 @@ static int _SC_exec_cmd(char **cmd, char *sys,
 
     SC_free_strings(sa);
 
-    SFREE(cm);
+    CFREE(cm);
 
     return(rv);}
 
@@ -114,7 +114,7 @@ static int _SC_list(char *sys, int vrb)
 	SC_ptr_arr_len(n, sa);
 	for (i = 0; i < n; i++)
 	    io_printf(stdout, "   %s\n", sa[i]);
-	SFREE(sa);}
+	CFREE(sa);}
 
     else
 

@@ -39,12 +39,12 @@ static PD_Pfile *_PD_make_pfile(FILE *fp)
     SC_address *fa;
     PD_Pfile *pf;
 
-    fa = FMAKE_N(SC_address, _PD_nthreads+1, "_PD_MAKE_PFILE:fa");
+    fa = CMAKE_N(SC_address, _PD_nthreads+1);
     for (i = 0; i <= _PD_nthreads; i++)
         fa[i].diskaddr = 0;
 
 /* no buffered i/o for now */
-    pf = FMAKE(PD_Pfile, "_PD_MAKE_PFILE:pf");
+    pf = CMAKE(PD_Pfile);
 
     pf->f_addr = fa;
     pf->bf     = NULL; 
@@ -64,8 +64,8 @@ static PD_Pfile *_PD_make_pfile(FILE *fp)
 static void _PD_free_pfile(PD_Pfile *pf)
    {
 
-    SFREE(pf->f_addr);
-    SFREE(pf);
+    CFREE(pf->f_addr);
+    CFREE(pf);
 
     return;}
 
@@ -119,7 +119,7 @@ static void _PD_pfm_add_file_t(PDBfile *file, int64_t start_addr)
 
 	if (ins == _PD.nfilesx)
 	   {_PD.nfilesx += N_PFM_INC;
-	    NREMAKE_N(_PD_pfman, pfmanager, _PD.nfilesx);
+	    NREMAKE(_PD_pfman, pfmanager, _PD.nfilesx);
 
 	    pm = &_PD_pfman[ins];
 	    for (i = ins; i < _PD.nfilesx; pm++, i++)
@@ -610,7 +610,7 @@ static FILE *_PD_pfm_setup_file_t(BF_FILE *fb)
 	pf->stream = fb;
 	rf         = (FILE *) pf;
 
-	SFREE(fid);};
+	CFREE(fid);};
 
     return(rf);}
 

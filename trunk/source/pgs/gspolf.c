@@ -108,8 +108,8 @@ PG_picture_desc *PG_setup_picture_fill_poly(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, 2, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);};
+	CFREE(ddex);
+	CFREE(rdex);};
 
     return(pd);}
 
@@ -158,7 +158,7 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	    afd  = (double **) range->elements;
 	 else
 	    {afs = (double **) range->elements;
-	     afd = FMAKE_N(double *, nd, "PG_FILL_HAND:afd");
+	     afd = CMAKE_N(double *, nd);
 	     for (i = 0; i < nd; i++)
 	         afd[i] = SC_convert_id(SC_DOUBLE_I, NULL, 0, 1, 
 					sid, afs[i], 0, 1, npts, FALSE);};
@@ -220,14 +220,14 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 
 /* reset user's values for various attributes */
 	 PG_set_attributes(dev, attr);
-	 SFREE(attr);
+	 CFREE(attr);
 
 	 PM_free_vectors(2, d);
 
 	 if (same == FALSE)
 	    {for (i = 0; i < nd; i++)
-	         SFREE(afd[i]);
-	     SFREE(afd);};};
+	         CFREE(afd[i]);
+	     CFREE(afd);};};
 
     return;}
 
@@ -396,7 +396,7 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
 
     SC_chunk_split(&lmn, &lmx, &rv);
 
-    vl = FMAKE_N(double, nd, "_PG_FILL_CHUNK_ZC_LR:vl");
+    vl = CMAKE_N(double, nd);
 
     pal = dev->current_palette;
 
@@ -436,9 +436,9 @@ static void *_PG_fill_chunk_zc_lr(void *arg)
                     _PG_fill_cell(dev, nd, vl, aext,
 				  rx, ry, 5);};};
 
-    SFREE(vl);
+    CFREE(vl);
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return(rv);}
 
@@ -534,7 +534,7 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
 		     PG_draw_polyline_n(dev, 2, WORLDC, 5, r, TRUE);};};};
 
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return;}
 
@@ -590,7 +590,7 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
 
     SC_chunk_split(&lmn, &lmx, &rv);
 
-    vl = FMAKE_N(double, nd, "_PG_FILL_CHUNK_NC_LR:vl");
+    vl = CMAKE_N(double, nd);
 
     for (l = lmn; l < lmx; l++)
         for (k = 0; k < km; k++)
@@ -626,9 +626,9 @@ static void *_PG_fill_chunk_nc_lr(void *arg)
 		 color = PG_select_color(dev, nd, vl, aext);
 		 PG_fill_polygon(dev, color, TRUE, rx, ry, 5);};};
 
-    SFREE(vl);
+    CFREE(vl);
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return(rv);}
 
@@ -720,7 +720,7 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
 		     PG_draw_polyline_n(dev, 2, WORLDC, 5, r, TRUE);};};};
 
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return;}
   
@@ -762,7 +762,7 @@ void PG_fill_poly_zc_ac(PG_device *dev, int nd, double **a,
     nzp = np[2];
     nsp = np[1];
 
-    vl = FMAKE_N(double, nd, "PG_FILL_POLY_ZC_AC:vl");
+    vl = CMAKE_N(double, nd);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -835,7 +835,7 @@ void PG_fill_poly_zc_ac(PG_device *dev, int nd, double **a,
 	     if (xok && yok)
 	        PG_draw_polyline_n(dev, 2, WORLDC, npt, r, TRUE);};};
 
-    SFREE(vl);
+    CFREE(vl);
     PM_free_vectors(2, r);
 
     return;}
@@ -854,15 +854,15 @@ void PG_fill_poly_nc_ac(PG_device *dev, int nd, double **a,
    {double **ap;
     int j;
 
-    ap = FMAKE_N(double *, nd, "PG_FILL_POLY_NC_AC:ap");
+    ap = CMAKE_N(double *, nd);
     for (j = 0; j < nd; j++)
         ap[j] = PM_node_zone_ac_2d(a[j], cnnct, alist);
 
     PG_fill_poly_zc_ac(dev, nd, ap, x, y, aext, cnnct, alist);
 
     for (j = 0; j < nd; j++)
-        SFREE(ap[j]);
-    SFREE(ap);
+        CFREE(ap[j]);
+    CFREE(ap);
 
     return;}
   

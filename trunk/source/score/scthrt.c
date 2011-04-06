@@ -93,9 +93,9 @@ void *test_mem(void *x)
     n  = *((int *) x);
 
     for (i = 1; i <= n; ++i)
-        {arr = FMAKE_N(double, 1, "TEST_MEM:arr");
+        {arr = CMAKE_N(double, 1);
 /*         io_printf(stdout, "%d ", SC_arrlen(arr)/sizeof(double)); */
-         SFREE(arr);};
+         CFREE(arr);};
 
 /* make sure we get the correct key value back */
     io_printf(stdout, "Thread %d executing mm_test\n", id);
@@ -146,10 +146,10 @@ int test(int n, int strategy)
 	     SC_n_threads = n + 1;
 
 /* this must appear before any SC_GET_KEYs */
-	     indices    = FMAKE_N(int, SC_n_threads, "MAIN:threads");
+	     indices    = CMAKE_N(int, SC_n_threads);
 	     indices[0] = 0;
 
-	     threads = FMAKE_N(SC_thread, SC_n_threads, "MAIN:threads");
+	     threads = CMAKE_N(SC_thread, SC_n_threads);
 
 /* make this call exactly once for each key */
 	     SC_CREATE_KEY(index_key, NULL);
@@ -171,10 +171,10 @@ int test(int n, int strategy)
 	     for (i = 1; i < SC_n_threads; i++)
 	         SC_THREAD_JOIN(threads[i], NULL);
 
-	     SFREE(threads);
+	     CFREE(threads);
 
 /* this must appear after last key reference */
-	     SFREE(indices);
+	     CFREE(indices);
 	     break;
 
 	case 1 :

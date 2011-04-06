@@ -245,7 +245,7 @@ static object *_SXI_center_label(object *argl)
 
     PG_center_label(dev, sy, label);
 
-    SFREE(label);
+    CFREE(label);
 
     return(SS_f);}
 
@@ -282,10 +282,10 @@ static object *_SXI_def_mrk(object *argl)
 
     indx = PG_def_marker(ns, x1, y1, x2, y2);
 
-    SFREE(x1);
-    SFREE(y1);
-    SFREE(x2);
-    SFREE(y2);
+    CFREE(x1);
+    CFREE(y1);
+    CFREE(x2);
+    CFREE(y2);
 
     obj = SS_mk_integer(indx);
 
@@ -560,7 +560,7 @@ static object *_SXI_draw_axis(object *argl)
 		   sc, fmt, tt, lt, FALSE,
 		   td, 0);
 
-    SFREE(fmt);
+    CFREE(fmt);
 
     return(SS_f);}
 
@@ -637,7 +637,7 @@ static object *_SXI_ddpn(object *argl)
     PG_draw_disjoint_polyline_n(dev, nd, cs, (long) n/2, x, clip);
 
     for (i = 0; i < nd; i++)
-        {SFREE(x[i]);};
+        {CFREE(x[i]);};
 
     return(SS_f);}
 
@@ -759,7 +759,7 @@ static object *_SXI_draw_polyline(object *argl)
 	PG_draw_polyline_n(dev, nd, cs, n, x, clip);
 
 	for (i = 0; i < nd; i++)
-	    {SFREE(x[i]);};};
+	    {CFREE(x[i]);};};
 
     return(SS_f);}
 
@@ -826,7 +826,7 @@ static object *_SXI_draw_text(object *argl)
     PG_set_text_color(dev, dev->text_color);
     PG_write_n(dev, nd, cs, p, "%s", txt);
 
-    SFREE(txt);
+    CFREE(txt);
 
     return(SS_f);}
 
@@ -862,8 +862,8 @@ static object *_SXI_fply(object *argl)
 
 	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, n, r);
 
-	SFREE(r[0]);
-	SFREE(r[1]);};
+	CFREE(r[0]);
+	CFREE(r[1]);};
 
     return(SS_f);}
 
@@ -1168,7 +1168,7 @@ static object *_SXI_gtew(object *argl)
 
     PG_get_text_ext_n(dev, nd, cs, s, x);
 
-    SFREE(s);
+    CFREE(s);
 
     o = SS_make_list(SC_DOUBLE_I, &x[0],
 		     SC_DOUBLE_I, &x[1],
@@ -1227,8 +1227,8 @@ static object *_SXI_gtxf(object *argl)
                        SC_INT_I, &size,
                        0);
 
-    SFREE(face);
-    SFREE(style);
+    CFREE(face);
+    CFREE(style);
 
     return(ret);}
 
@@ -1852,7 +1852,7 @@ static object *_SXI_spal(object *argl)
     else
        o = (PG_set_palette(dev, txt) == NULL) ? SS_f : SS_t;
 
-    SFREE(txt);
+    CFREE(txt);
 
     return(o);}
 
@@ -1960,15 +1960,15 @@ static object *_SXI_stxf(object *argl)
 
     if (dev != NULL)
        {if (face == NULL)
-	   face = SC_strsavef("helvetica", "char*:_SXI_STXF:face");
+	   face = CSTRSAVE("helvetica");
 
 	if (style == NULL)
-	   style = SC_strsavef("medium", "char*:_SXI_STXF:style");
+	   style = CSTRSAVE("medium");
 
 	PG_set_font(dev, face, style, size);};
 
-    SFREE(face);
-    SFREE(style);
+    CFREE(face);
+    CFREE(style);
 
     return(SS_f);}
 
@@ -2377,7 +2377,7 @@ static object *_SXI_pal_list(object *argl)
 					    0),
 			       lst);};};
 
-    SFREE(name);
+    CFREE(name);
 
     return(lst);}
 
@@ -2424,7 +2424,7 @@ static object *_SXI_list_pal(object *argl)
     pal->max_blue_intensity  = dev->max_blue_intensity;
     pal->n_pal_colors        = min(n_pal_colors, 256);
     pal->n_dev_colors        = min(n_dev_colors, 256);
-    pal->name                = SC_strsavef(name, "char*:_SXI_LIST_PAL:name");
+    pal->name                = CSTRSAVE(name);
 
 /* compute the color maps */
     for (i = 0; i < n_pal_colors; i++)
@@ -2439,7 +2439,7 @@ static object *_SXI_list_pal(object *argl)
 
     PG_register_palette(dev, pal, TRUE);
 
-    SFREE(name);
+    CFREE(name);
 
     return(SS_t);}
 
@@ -2545,7 +2545,7 @@ static object *_SXI_mk_pal(object *argl)
     dev->current_palette = PG_make_ndim_palette(dev, name, ndims, 
 						dims, wbck);
 
-    SFREE(name);
+    CFREE(name);
 
     return(SS_f);}
 
@@ -2569,7 +2569,7 @@ static object *_SXI_rd_pal(object *argl)
 
     dev->current_palette = PG_rd_palette(dev, name);
 
-    SFREE(name);
+    CFREE(name);
 
     return(SS_f);}
 
@@ -2596,8 +2596,8 @@ static object *_SXI_wr_pal(object *argl)
 
     PG_wr_palette(dev, pal, fname);
 
-    SFREE(pname);
-    SFREE(fname);
+    CFREE(pname);
+    CFREE(fname);
 
     return(SS_f);}
 
@@ -2673,12 +2673,11 @@ static object *_SXI_set_color_type(object *argl)
         {out = SX_get_device(i);
 	 if (out->exist && out->active)
 	    {if (strcmp(out->type, color) != 0)
-	        {SFREE(out->type);
-		 out->type = SC_strsavef(color,
-					 "char*:_SXI_SET_COLOR_TYPE:type");};};};
+	        {CFREE(out->type);
+		 out->type = CSTRSAVE(color);};};};
 
-    SFREE(dev_type);
-    SFREE(color);
+    CFREE(dev_type);
+    CFREE(color);
 
     return(SS_t);}
 
@@ -2727,7 +2726,7 @@ static object *_SXI_gatgl(object *argl)
 	        {o  = SS_mk_string((char *) pvo);
 		 rv = SS_mk_cons(o, rv);};};
 
-	 SFREE(name);};
+	 CFREE(name);};
 
     return(rv);}
 
@@ -2769,7 +2768,7 @@ static object *_SX_get_attrs_alist(pcons *alst, object *argl)
 	 o   = _SS_numtype_to_object(typ, pc->cdr, 1);
 	 rv  = SS_mk_cons(o, rv);
 
-	 SFREE(name);};
+	 CFREE(name);};
 
     return(rv);}
 
@@ -2888,7 +2887,7 @@ static object *_SXI_satgl(object *argl)
 
 	     _PG_ptr_attr_set(typ, pvo, pvi);};
 
-	 SFREE(name);};
+	 CFREE(name);};
 
     return(SS_t);}
 
@@ -2982,7 +2981,7 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
 		 SC_CHANGE_VALUE_ALIST(alst, void *, SC_POINTER_S,
 				       name, pv);};};
 
-	 SFREE(name);};
+	 CFREE(name);};
 
     return(alst);}
 

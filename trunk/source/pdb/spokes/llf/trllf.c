@@ -29,7 +29,7 @@ static mcd_header *LLF_parse_mcd(PDBfile *file, fdir_header filehdr,
     size_t ni;
     mcd_header* mcdhdr, mhtemp;
 
-    mcdhdr = FMAKE_N(mcd_header, filehdr.n_record, "LLF_PARSE_MCD:mcdhdr");
+    mcdhdr = CMAKE_N(mcd_header, filehdr.n_record);
 
     for (i = 0; i < filehdr.n_record; i++)
         {if (lio_seek(file->stream, (8L * (long)fileentry[i].address), SEEK_SET))
@@ -55,7 +55,7 @@ static vld_header *LLF_parse_vld(PDBfile *file, fdir_header filehdr,
     size_t ni;
     vld_header* vldhdr, vhtemp;
  
-    vldhdr = FMAKE_N(vld_header, filehdr.n_record, "LLF_PARSE_VLD:vldhdr");
+    vldhdr = CMAKE_N(vld_header, filehdr.n_record);
 
     for (i = 0; i < filehdr.n_record; i++)
         {if (lio_seek(file->stream, (8L * (long)mcdhdr[i].vld_addr), SEEK_SET))
@@ -160,7 +160,7 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 	file->default_offset = 1;
 	file->major_order    = COLUMN_MAJOR_ORDER;
-	file->type           = SC_strsavef(LLFILE_S, "char*:_LLF_OPEN:type");
+	file->type           = CSTRSAVE(LLFILE_S);
 
 	if (*mode == 'a')
 	   file->mode = PD_APPEND;
@@ -201,7 +201,7 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	fhtemp = filehdr;
 	_PD_conv_in(file, &filehdr, &fhtemp, "fdir_header", 1);
 
-	fileentry = FMAKE_N(fdir_entry, filehdr.n_record, "_LLF_OPEN:fileentry");
+	fileentry = CMAKE_N(fdir_entry, filehdr.n_record);
 
 /* read the file directory */
 	ni = lio_read(&fileentry[0], sizeof(fdir_entry), filehdr.n_record, file->stream);
@@ -220,9 +220,9 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	vldhdr = LLF_parse_vld(file, filehdr, mcdhdr);
 
 /* read the VLBs */
-	SFREE(fileentry);
-	SFREE(mcdhdr);
-	SFREE(vldhdr);};
+	CFREE(fileentry);
+	CFREE(mcdhdr);
+	CFREE(vldhdr);};
 
     return(file);}
 

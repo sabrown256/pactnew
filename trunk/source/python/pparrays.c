@@ -94,7 +94,7 @@ int pplong_extractor(PyObject *obj, void *arg)
     }
 
     nd = PySequence_Size(obj);
-    buf = FMAKE_N(long *, nd, "PPLONG_EXTRACTOR:buf");
+    buf = CMAKE_N(long *, nd);
 
     for (i = 0; i < nd; i++) {
         subobj = PySequence_GetItem(obj, i);
@@ -239,7 +239,7 @@ void _PP_init_numpy(void)
 /*                        {PP__I,         PyArray_CDOUBLE, ""},          */
                         {0,             0,               NULL}};
 
-    XX_FOO_MAP = SC_strsave("PP_numpy_map");
+    XX_FOO_MAP = CSTRSAVE("PP_numpy_map");
     SC_permanent(XX_FOO_MAP);
     
     import_array();

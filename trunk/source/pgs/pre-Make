@@ -184,7 +184,7 @@ foo : foo.c ${TGTLib}
 Fstd : ${BinDir}/gsftst
 
 ${BinDir}/gsftst : gsftst.f ${TGTLib}
-	${FC} ${LdFlags} gsftst.c -o ${BinDir}/gsftst ${Libs}
+	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${Libs}
 
 #
 # event handling test
@@ -273,7 +273,7 @@ ${BinDir}/gssctst : gssctst.c ${TGTLib}
 Fcontour : ${BinDir}/gsfctst
 
 ${BinDir}/gsfctst : gsfctst.f ${TGTLib}
-	${FC} ${LdFlags} gsfctst.c -o ${BinDir}/gsfctst ${Libs}
+	${FC} ${LdFlags} gsfctst.f -o ${BinDir}/gsfctst ${Libs}
 
 
 #

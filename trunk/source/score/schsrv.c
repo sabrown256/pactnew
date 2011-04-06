@@ -31,7 +31,7 @@ struct s_host_server
 static hrng *_SC_make_range(int n, char **hosts)
    {hrng *rng;
 
-    rng = FMAKE(hrng, "_SC_MAKE_RANGE:rng");
+    rng = CMAKE(hrng);
 
     rng->hosts   = hosts;
     rng->nhosts  = n;
@@ -271,14 +271,14 @@ static int _SC_host_server_rel(haelem *hp, void *a)
 	n   = rng->nhosts;
 
 	for (i = 0; i < n; i++)
-	    SFREE(hst[i]);
+	    CFREE(hst[i]);
 
-	SFREE(hst);
-	SFREE(rng);}
+	CFREE(hst);
+	CFREE(rng);}
 
     else if (strcmp(type, SC_STRING_S) == 0)
        {type = (char *) v;
-	SFREE(type);};
+	CFREE(type);};
 
     return(TRUE);}
 
@@ -322,7 +322,7 @@ static void _SC_read_host_server_db(char *file)
        {_SC.hsst = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
          
         if (net != NULL)
-	   {net = SC_strsavef(net, "SC_HOST_SERVER_INIT:net");
+	   {net = CSTRSAVE(net);
 	    SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);};
 
 	s  = NULL;
@@ -338,12 +338,12 @@ static void _SC_read_host_server_db(char *file)
 
 	    else if ((strncmp(s, ".net ", 5) == 0) && (net == NULL))
 	       {net = SC_strtok(s+5, " \t\n", u);
-	        net = SC_strsavef(net, "SC_HOST_SERVER_INIT:net");
+	        net = CSTRSAVE(net);
 		SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);}
 
 	    else if (strncmp(s, ".noping ", 8) == 0)
 	       {pnglst = SC_strtok(s+8, " \t\n", u);
-	        pnglst = SC_strsavef(pnglst, "SC_HOST_SERVER_INIT:noping");}
+	        pnglst = CSTRSAVE(pnglst);}
 
 	    else
 	       {type = SC_strtok(s, " \t", u);
@@ -367,7 +367,7 @@ static void _SC_read_host_server_db(char *file)
 
 	io_close(fp);};
 
-    SFREE(pnglst);
+    CFREE(pnglst);
 
     return;}
 
@@ -458,7 +458,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 		        break;};};
 
 	    SC_LAST_CHAR(out) = '\0';
-	    SFREE(strs);}
+	    CFREE(strs);}
 
 /* list all types with suffix specified in .net */
 	else if (strcmp(s, "-types.net-") == 0)
@@ -481,7 +481,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 		        break;};};
 
 	    SC_LAST_CHAR(out) = '\0';
-	    SFREE(strs);}
+	    CFREE(strs);}
 
 /* list all types with specified suffix */
 	else if (strncmp(s, "-types.at-", 10) == 0)
@@ -505,7 +505,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 		        break;};};
 
 	    SC_LAST_CHAR(out) = '\0';
-	    SFREE(strs);}
+	    CFREE(strs);}
 
 	else if (strncmp(s, "-nhosts-", 8) == 0)
 	   {SC_strtok(s, " \n", p);
@@ -812,7 +812,7 @@ char **SC_get_host_types(int whch, char *net)
 
     strs = SC_tokenize(bf, " \n");
 
-    SFREE(spec);
+    CFREE(spec);
 
     return(strs);}
 
@@ -878,7 +878,7 @@ char **SC_get_system_list(char *sys)
        tp = SC_get_host_types(1, NULL);
 
     else
-       {tp = FMAKE_N(char *, 2, "SC_GET_SYSTEM_LIST:tp");
+       {tp = CMAKE_N(char *, 2);
 	tp[0] = sys;
 	tp[1] = NULL;};
 

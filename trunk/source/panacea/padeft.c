@@ -24,7 +24,7 @@ void PA_print_var_tab(hasharr *tab)
 	    {pp = PA_inquire_variable(*work);
 	     PA_print_variable(pp);};
 
-	 SFREE(dump);};
+	 CFREE(dump);};
 
    return;}
 

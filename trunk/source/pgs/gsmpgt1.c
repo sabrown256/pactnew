@@ -58,8 +58,8 @@ int main(int c, char **v)
 
     PG_open_device(dev, 0.0, 0.0, 512.0, 512.0);
 
-    x = FMAKE_N(double, N, "MPGTST:x");
-    y = FMAKE_N(double, N, "MPGTST:y");
+    x = CMAKE_N(double, N);
+    y = CMAKE_N(double, N);
     label = 'A';
 
     data = NULL;

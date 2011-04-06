@@ -638,8 +638,8 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
 	_PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
 	ok = _PG_X_txt_place_text(_PG.txtd, dx, dev, ir, bc, pad);
 
-	SFREE(face);
-	SFREE(sty);};
+	CFREE(face);
+	CFREE(sty);};
 
     return(ok);}
 
@@ -689,8 +689,8 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
     _PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
     ok = _PG_X_txt_place_image(_PG.txtd, dx, dev, io, bc, pad);
 
-    SFREE(face);
-    SFREE(sty);
+    CFREE(face);
+    CFREE(sty);
 
     return(ok);}
 

@@ -14,16 +14,19 @@
 #undef MAXLINE
 #define MAXLINE 4096
 
-static int
- show = 0;
+typedef struct s_statedes statedes;
 
-static char
- sys[MAXLINE],
- arch[MAXLINE],
- root[MAXLINE],
- cwd[MAXLINE],
- srcdir[MAXLINE],
- tmpdir[MAXLINE];
+struct s_statedes
+   {int show;
+    int complete;
+    int literal;
+    int quote;
+    char sys[MAXLINE];
+    char arch[MAXLINE];
+    char root[MAXLINE];
+    char cwd[MAXLINE];
+    char srcdir[MAXLINE];
+    char tmpdir[MAXLINE];};
 
 int system();
 int atoi();
@@ -37,15 +40,19 @@ void exit(int status);
 
 /* REPORT_VAR - report on the variable Q in FILE */
 
-static int report_var(char *file, char *q, char *key,
-		      int compl, int litrl, int newl)
+static int report_var(statedes *st, char *fname, char *q, char *key, int newl)
    {int i, nc, ok, doit, tst;
-    int quote;
+    int compl, litrl, quote;
+    char file[MAXLINE];
     char *p, *tok, *txt, *ps, **sa;
 
     ok = FALSE;
 
+    compl = st->complete;
+    litrl = st->literal;
     quote = FALSE;
+
+    snprintf(file, MAXLINE, "%s/include/%s", st->root, fname);
 
     sa = file_text(file);
     if (sa != NULL)
@@ -87,7 +94,7 @@ static int report_var(char *file, char *q, char *key,
 
 		     if (quote == FALSE)
 		        {nc = strlen(txt);
-			 if (nc > 2)
+			 if (nc >= 2)
 			    txt = subst(txt, "\"", "", -1);};
 
 		     if (compl)
@@ -111,44 +118,33 @@ static int report_var(char *file, char *q, char *key,
 
 /* REPORT - report the value of one of the configuration quantities */
 
-static void report(char *q, int compl, int litrl, int newl)
+static void report(statedes *st, char *q, int newl)
    {int ok;
-    char devdir[MAXLINE], file[MAXLINE];
     char *s;
-
-    strcpy(devdir, root);
 
     ok = FALSE;
 
     if (strcmp(q, "make") == 0)
-       {snprintf(file, MAXLINE, "%s/include/make-def", devdir);
-        ok = report_var(file, "UMake", NULL, compl, litrl, newl);};
+       ok = report_var(st, "make-def", "UMake", NULL, newl);
 
     if (strcmp(q, "config") == 0)
-       {snprintf(file, MAXLINE, "%s/include/make-def", devdir);
-        ok = report_var(file, "System", NULL, compl, litrl, newl);};
+       ok = report_var(st, "make-def", "System", NULL, newl);
 
     if (!ok)
-       {snprintf(file, MAXLINE, "%s/include/scconfig.h", devdir);
-	ok = report_var(file, q, "#define", compl, litrl, newl);};
+       ok = report_var(st, "scconfig.h", q, "#define", newl);
 
     if (!ok)
-       {snprintf(file, MAXLINE, "%s/include/make-def", devdir);
-	ok = report_var(file, q, NULL, compl, litrl, newl);};
+       ok = report_var(st, "make-def", q, NULL, newl);
 
     if (!ok)
-       {snprintf(file, MAXLINE, "%s/include/configured", devdir);
-	ok = report_var(file, q, NULL, compl, litrl, newl);};
+       ok = report_var(st, "configured", q, NULL, newl);
 
     if (!ok)
        {s = getenv("SHELL");
-	if (s != NULL)
-	   {if (strstr(s, "csh") != NULL)
-	       {snprintf(file, MAXLINE, "%s/include/env-pact.csh", devdir);
-		ok = report_var(file, q, "setenv", compl, litrl, newl);}
-	    else
-	       {snprintf(file, MAXLINE, "%s/include/env-pact.sh", devdir);
-		ok = report_var(file, q, "export", compl, litrl, newl);};};};
+	if ((s != NULL) && (strstr(s, "csh") != NULL))
+	   ok = report_var(st, "env-pact.csh", q, "setenv", newl);
+	else
+	   ok = report_var(st, "env-pact.sh", q, "export", newl);};
 
     return;}
 
@@ -157,19 +153,21 @@ static void report(char *q, int compl, int litrl, int newl)
 
 /* REPORT_CL - report the information relevant to compiling and linking */
 
-static void report_cl(char *q)
+static void report_cl(statedes *st, char *q)
    {
 
+    st->literal = TRUE;
+
     if (strcmp(q, "-incpath") == 0)
-       {report("MDGInc", FALSE, TRUE, FALSE);
-        report("MDInc", FALSE, TRUE, TRUE);}
+       {report(st, "MDGInc", FALSE);
+        report(st, "MDInc", TRUE);}
 
     else if (strcmp(q, "-link") == 0)
-       {report("LDRPath", FALSE, TRUE, FALSE);
-        report("LDPath", FALSE, TRUE, FALSE);
-	report("DP_Lib", FALSE, TRUE, FALSE);
-	report("MDGLib", FALSE, TRUE, FALSE);
-	report("MDLib",  FALSE, TRUE, TRUE);};
+       {report(st, "LDRPath", FALSE);
+        report(st, "LDPath", FALSE);
+	report(st, "DP_Lib", FALSE);
+	report(st, "MDGLib", FALSE);
+	report(st, "MDLib", TRUE);};
 
     return;}
 
@@ -182,25 +180,25 @@ static void report_cl(char *q)
  *                - of recursive pact invocations
  */
 
-void manage_tmp_dir(char *cwd, char *sname, int start)
+void manage_tmp_dir(statedes *st, int start)
    {int ss;
     char cmd[MAXLINE];
     static int dir_was_there = FALSE;
 
 /* do this at the beginning */
     if (start == TRUE)
-       {strcpy(srcdir, cwd);
+       {strcpy(st->srcdir, st->cwd);
 
 #ifdef USE_TMP_DIR
-        if (strncmp(cwd, "/tmp/pact_make_", 15) == 0)
-	   strcpy(tmpdir, cwd);
+        if (strncmp(st->cwd, "/tmp/pact_make_", 15) == 0)
+	   strcpy(st->tmpdir, st->cwd);
         else
-	    sprintf(tmpdir, "/tmp/pact_make_%d", (int) getpid());
+	    sprintf(st->tmpdir, "/tmp/pact_make_%d", (int) getpid());
 #else
-	sprintf(tmpdir, "%s/z-%s/obj", cwd, sname);
+	sprintf(st->tmpdir, "%s/z-%s/obj", st->cwd, st->sys);
 #endif
 
-	snprintf(cmd, MAXLINE, "test -d %s/", tmpdir);
+	snprintf(cmd, MAXLINE, "test -d %s/", st->tmpdir);
 	ss = system(cmd);
 	if (ss != 0)
 	   dir_was_there = FALSE;
@@ -208,15 +206,14 @@ void manage_tmp_dir(char *cwd, char *sname, int start)
 	   dir_was_there = TRUE;
 
         if (!dir_was_there)
-	   {snprintf(cmd, MAXLINE, "mkdir -p %s/", tmpdir);
+	   {snprintf(cmd, MAXLINE, "mkdir -p %s/", st->tmpdir);
 	    ss = system(cmd);};}
 
 /* do this at the end */
     else
        {if (!dir_was_there)
-	   {snprintf(cmd, MAXLINE, "rm -rf %s/", tmpdir);
+	   {snprintf(cmd, MAXLINE, "rm -rf %s/", st->tmpdir);
 	    ss = system(cmd);};};
-
 
     return;}
 
@@ -228,16 +225,16 @@ void manage_tmp_dir(char *cwd, char *sname, int start)
  *                - return 0 iff successful
  */
 
-int build_makefile(char *mkfile)
+int build_makefile(statedes *st, char *mkfile)
    {int err;
     char cmd[MAXLINE], makef[MAXLINE], inc[MAXLINE];
 
     err = 0;
 
-    snprintf(inc, MAXLINE, "%s/include", root);
+    snprintf(inc, MAXLINE, "%s/include", st->root);
     snprintf(makef, MAXLINE, "%s", mkfile);
 
-    snprintf(cmd, MAXLINE, "csh -c \"mkdir -p %s/obj >& /dev/null\"", arch);
+    snprintf(cmd, MAXLINE, "csh -c \"mkdir -p %s/obj >& /dev/null\"", st->arch);
     system(cmd);
 
 /*    printf("\nMaking %s from pre-Make\n\n", makef); */
@@ -245,7 +242,7 @@ int build_makefile(char *mkfile)
     snprintf(cmd, MAXLINE, "cp %s/make-def %s", inc, makef);
     err |= system(cmd);
 
-    snprintf(cmd, MAXLINE, "echo PACTTmpDir = %s/obj >> %s", arch, makef);
+    snprintf(cmd, MAXLINE, "echo PACTTmpDir = %s/obj >> %s", st->arch, makef);
     err |= system(cmd);
 
     snprintf(cmd, MAXLINE, "echo PACTSrcDir = ../.. >> %s", makef);
@@ -276,8 +273,8 @@ static void handler(int sig)
 
 /* INVOKE_MAKE - complete the command line CMD and exec it */
 
-static int invoke_make(char *cmd, int nc, char *mkf, int c, char **v)
-   {int i, st, na, ns;
+static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char **v)
+   {int i, rv, na, ns;
     char s[MAXLINE];
     char *log, *p;
     
@@ -329,23 +326,23 @@ static int invoke_make(char *cmd, int nc, char *mkf, int c, char **v)
 	nstrcat(cmd, nc, s);};
 
 /* do the make */
-    if (show)
+    if (st->show)
        printf("Command: %s\n", cmd);
 
 /* retry until successful */
     for (i = 0; i < na; i++)
-        {st = system(cmd);   
-	 if (st == 0)
+        {rv = system(cmd);   
+	 if (rv == 0)
 	    break;
 	 else if (i+1 < na)
             {ns = (i < 1) ? 1 : 30;
 	     printf("***> failed (%d) - attempt %d in %d seconds\n",
-		    st, i+2, ns);
+		    rv, i+2, ns);
 	     printf("***>      %s\n", cmd);
 	     printf("***> retry '%s' - task 1\n", cmd);
 	     sleep(ns);};};
 
-    return(st);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -357,26 +354,26 @@ static int invoke_make(char *cmd, int nc, char *mkf, int c, char **v)
  *          - can kill you
  */
 
-static int method_1(int c, char **v, char *pmname)
+static int method_1(statedes *st, int c, char **v, char *pmname)
    {int i, status;
     char cmd[MAXLINE], s[MAXLINE];
 
 /* find the current directory */
-    if (getcwd(cwd, MAXLINE) == NULL)
+    if (getcwd(st->cwd, MAXLINE) == NULL)
        {fprintf(stderr, "ERROR: CAN'T GET CURRENT DIRECTORY\n");
         fprintf(stderr, "   %d - %s\n", errno, strerror(errno));
         return(1);};
 
 /* manage the hidden directory for the temporary files */
-    manage_tmp_dir(cwd, sys, TRUE);
+    manage_tmp_dir(st, TRUE);
 
 /* write the command line */
     strcpy(cmd, "(");
 	
-    i = strlen(cwd) - 7;
+    i = strlen(st->cwd) - 7;
     i = max(i, 0);
-    if (strcmp(cwd+i, "manager") == 0)
-       {snprintf(s, MAXLINE, "echo \"System = %s\" ; ", sys);
+    if (strcmp(st->cwd+i, "manager") == 0)
+       {snprintf(s, MAXLINE, "echo \"System = %s\" ; ", st->sys);
 
         snprintf(s, MAXLINE, "cat %s", pmname);
 	nstrcat(cmd, MAXLINE, s);}
@@ -386,28 +383,28 @@ static int method_1(int c, char **v, char *pmname)
 	nstrcat(cmd, MAXLINE, s);}
 
     else
-       {snprintf(s, MAXLINE, "echo \"include %s/include/make-def\" ; ", root);
+       {snprintf(s, MAXLINE, "echo \"include %s/include/make-def\" ; ", st->root);
 	nstrcat(cmd, MAXLINE, s);
 
-        snprintf(s, MAXLINE, "echo \"PACTTmpDir = %s\" ; ", tmpdir);
+        snprintf(s, MAXLINE, "echo \"PACTTmpDir = %s\" ; ", st->tmpdir);
 	nstrcat(cmd, MAXLINE, s);
 
-        snprintf(s, MAXLINE, "echo \"PACTSrcDir = %s\" ; ", srcdir);
+        snprintf(s, MAXLINE, "echo \"PACTSrcDir = %s\" ; ", st->srcdir);
 	nstrcat(cmd, MAXLINE, s);
 
         snprintf(s, MAXLINE, "cat %s ; ", pmname);
 	nstrcat(cmd, MAXLINE, s);
 
-	snprintf(s, MAXLINE, "echo \"include %s/include/make-macros\"", root);
+	snprintf(s, MAXLINE, "echo \"include %s/include/make-macros\"", st->root);
 	nstrcat(cmd, MAXLINE, s);};
 
     nstrcat(cmd, MAXLINE, ") | ");
 
 /* make the command to invoke make */
-    status = invoke_make(cmd, MAXLINE, "-", c, v);
+    status = invoke_make(st, cmd, MAXLINE, "-", c, v);
 
 /* remove the hidden directory for the temporary files */
-    manage_tmp_dir(cwd, sys, FALSE);
+    manage_tmp_dir(st, FALSE);
 
     return(status);}
 
@@ -416,22 +413,22 @@ static int method_1(int c, char **v, char *pmname)
 
 /* METHOD_2 - try to use a pre-built Makefile in MKFILE */
 
-static int method_2(int c, char **v, char *mkfile, long tmm)
+static int method_2(statedes *st, int c, char **v, char *mkfile, long tmm)
    {int status;
     long tmp;
     char cmd[MAXLINE];
-    struct stat st;
+    struct stat sbf;
 
 /* check to see if the pre-Make is newer than the Makefile */
-    if (stat("pre-Make", &st) == 0)
-       {if (S_ISREG(st.st_mode))
-	   {tmp = st.st_mtime;
+    if (stat("pre-Make", &sbf) == 0)
+       {if (S_ISREG(sbf.st_mode))
+	   {tmp = sbf.st_mtime;
 	    if (tmp > tmm)
-               build_makefile(mkfile);};};
+               build_makefile(st, mkfile);};};
 
 /* make the command to invoke make */
     cmd[0] = '\0';
-    status = invoke_make(cmd, MAXLINE, mkfile, c, v);
+    status = invoke_make(st, cmd, MAXLINE, mkfile, c, v);
 
     return(status);}
 
@@ -444,7 +441,7 @@ static int method_2(int c, char **v, char *mkfile, long tmm)
  *                  - return 0 iff successful
  */
 
-static int command_makefile(char *fname, int c, char **v, char **a)
+static int command_makefile(statedes *st, char *fname, int c, char **v, char **a)
    {int i, err;
     char s[MAXLINE], u[MAXLINE], cmd[MAXLINE];
     char *p, *tok, *dir, **sa;
@@ -477,7 +474,7 @@ static int command_makefile(char *fname, int c, char **v, char **a)
 	free_strings(sa);
 
 	nstrcat(cmd, MAXLINE, ") | ");
-	err = invoke_make(cmd, MAXLINE, "-", c, v);};
+	err = invoke_make(st, cmd, MAXLINE, "-", c, v);};
 
     return(err);}
 
@@ -620,41 +617,47 @@ int file_path(char *name, char *path, int nc)
  *           - return TRUE iff successful with both
  */
 
-static int setup_env(char *src, char *arch, char *root)
+static int setup_env(statedes *st, char *src)
    {char s[MAXLINE];
     char *p, *ps;
 
-    file_path(src, root, MAXLINE);
+    st->show     = 0;
+    st->complete = FALSE;
+    st->literal  = FALSE;
 
-    sys[0] = '\0';
+    memset(st->cwd, 0, MAXLINE);
+
+    file_path(src, st->root, MAXLINE);
+
+    st->sys[0] = '\0';
 
 /* remove exe name */
-    p = pop_path(root);
+    p = pop_path(st->root);
 
 /* remove bin dir */
-    p = pop_path(root);
+    p = pop_path(st->root);
 
 /* setup the architecture string */
     p = getenv("PACT_CONFIG");
     if (p != NULL)
-       {strncpy(sys, p, MAXLINE);
-	sys[MAXLINE-1] = '\0';}
+       {strncpy(st->sys, p, MAXLINE);
+	st->sys[MAXLINE-1] = '\0';}
 
     else
-       {strcpy(s, root);
+       {strcpy(s, st->root);
 
 	ps = pop_path(s);
 	p  = pop_path(s);
 
 /* if root is of the form /.../dev/<arch> use <arch> */
 	if (strcmp(p, "dev") == 0)
-	   strcpy(sys, ps);
+	   strcpy(st->sys, ps);
 
 /* otherwise use the configured system_id */
 	else
-	   strcpy(sys, SYSTEM_ID);};
+	   strcpy(st->sys, SYSTEM_ID);};
 
-    sprintf(arch, "z-%s", sys);
+    sprintf(st->arch, "z-%s", st->sys);
 
     return(TRUE);}
 
@@ -699,30 +702,28 @@ void usage(void)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, status, ok, litrl, mc;
+   {int i, status, ok, mc;
     long tmm;
     char mkfile[MAXLINE];
     char *pmname, *mv[100];
+    statedes st;
     static char *default_pmname = "pre-Make";
-    struct stat st;
+    struct stat sbf;
 
     signal(2, handler);
-    memset(cwd, 0, MAXLINE);
 
     pmname = default_pmname;
-    show   = 0;
 
-    setup_env(v[0], arch, root);
+    setup_env(&st, v[0]);
 
-    ok    = TRUE;
-    litrl = FALSE;
-    mc    = 1;
+    ok = TRUE;
+    mc = 1;
     for (i = 1; (i < c) && ok; i++)
         {if (strcmp(v[i], "-sys") == 0)
-	    sprintf(arch, "%s", v[++i]);
+	    sprintf(st.arch, "%s", v[++i]);
 
          else if (strcmp(v[i], "-show") == 0)
-	    show = 1;
+	    st.show = 1;
 
 /* get dmake options taking the next argument later */
 	 else if ((strcmp(v[i], "-async") == 0) ||
@@ -735,7 +736,7 @@ int main(int c, char **v)
 /* handle dmake -cmd option */
 	 else if (strcmp(v[i], "-cmd") == 0)
             {i++;
-	     ok = command_makefile(v[i], c, v, v+i+1);
+	     ok = command_makefile(&st, v[i], c, v, v+i+1);
 	     return(ok);}
 
 /* ignore dmake options taking the next argument */
@@ -746,11 +747,11 @@ int main(int c, char **v)
 	     i++;}
 
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_cl(v[i]);
+	    {report_cl(&st, v[i]);
 	     return(0);}
 
 	 else if (strcmp(v[i], "-link") == 0)
-	    {report_cl(v[i]);
+	    {report_cl(&st, v[i]);
 	     return(0);}
 
 /* ignore dmake options taking no argument */
@@ -764,8 +765,8 @@ int main(int c, char **v)
          else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'B' :
-                      snprintf(mkfile, MAXLINE, "%s/Makefile", arch);
-                      status = build_makefile(mkfile);
+                      snprintf(mkfile, MAXLINE, "%s/Makefile", st.arch);
+                      status = build_makefile(&st, mkfile);
 		      return(status);
 		      break;
 		 case 'h' :
@@ -775,7 +776,7 @@ int main(int c, char **v)
 		 case 'i' :
 		      if (strcmp(v[i], "-info") == 0)
 			 {if (++i < c)
-                             report(v[i], FALSE, litrl, TRUE);
+                             report(&st, v[i], TRUE);
 			  return(0);};
 		      i--;
 		      ok = FALSE;
@@ -795,11 +796,12 @@ int main(int c, char **v)
                 {case 'i' :
 		      if (strcmp(v[i], "+info") == 0)
 			 {if (++i < c)
-                             report(v[i], TRUE, litrl, TRUE);
+			     {st.complete = TRUE;
+			      report(&st, v[i], TRUE);};
 			  return(0);};
 		      break;
 		 case 'l' :
-		      litrl = TRUE;
+		      st.literal = TRUE;
 		      break;};}
 	 else
 	    {mv[mc++] = v[i];
@@ -811,16 +813,20 @@ int main(int c, char **v)
     mv[mc] = NULL;
     mv[0]  = v[0];
 
-    snprintf(mkfile, MAXLINE, "%s/Makefile", arch);
-    if (stat(mkfile, &st) == 0)
-       {if (S_ISREG(st.st_mode))
-	   {tmm    = (long) st.st_mtime;
-	    status = method_2(mc, mv, mkfile, tmm);
-	    return((status == 0) ? 0 : 1);};};
+    snprintf(mkfile, MAXLINE, "%s/Makefile", st.arch);
+    if (stat(mkfile, &sbf) == 0)
+       {if (S_ISREG(sbf.st_mode))
+	   {tmm    = (long) sbf.st_mtime;
+	    status = method_2(&st, mc, mv, mkfile, tmm);
+	    status = (status == 0) ? 0 : 1;
+	    return(status);};};
 
-    status = method_1(mc, mv, pmname);
+    status = method_1(&st, mc, mv, pmname);
 
-    return((status == 0) ? 0 : 1);}
+/* reverse the status */
+    status = (status == 0) ? 0 : 1;
+
+    return(status);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

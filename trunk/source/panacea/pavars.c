@@ -452,15 +452,15 @@ int PA_def_unit(double fac, ...)
             return(rv);};};
 
 /* add a unit to the list */
-    unit = FMAKE(PA_unit_spec, "PA_DEF_UNIT:unit");
+    unit = CMAKE(PA_unit_spec);
 
     unit->index       = N_Units++;
     unit->factor      = fac;
     unit->fundamental = fundamental;
     unit->n_num       = nn;
-    unit->numerator   = FMAKE_N(int, nn, "PA_DEF_UNIT:numerator");
+    unit->numerator   = CMAKE_N(int, nn);
     unit->n_den       = nd;
-    unit->denominator = FMAKE_N(int, nd, "PA_DEF_UNIT:denominator");
+    unit->denominator = CMAKE_N(int, nd);
 
 /* add fundamental units at the front */
     if (fundamental)
@@ -507,8 +507,8 @@ void PA_set_conversions(int flag)
 
     ONCE_SAFE(TRUE, NULL)
        if ((unit == NULL) || (convrsn == NULL))
-	  {unit    = FMAKE_N(double, N_Units, "PA_SET_CONVERSIONS:unit");
-	   convrsn = FMAKE_N(double, N_Units, "PA_SET_CONVERSIONS:convrsn");};
+	  {unit    = CMAKE_N(double, N_Units);
+	   convrsn = CMAKE_N(double, N_Units);};
     END_SAFE;
 
     for (pu = _PA.units; pu != NULL; pu = pu->next)

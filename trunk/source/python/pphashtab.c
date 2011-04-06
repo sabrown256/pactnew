@@ -82,7 +82,7 @@ PyObject *PP_unpack_hashtab_haelem(char *type, void *vr)
 
     form = PP_global_form;
 
-    type = SC_dereference(SC_strsavef(type, "_PP_unpack_hashtab_haelem"));
+    type = SC_dereference(CSTRSAVE(type));
     bpi = _PD_lookup_size(type, PP_vif->host_chart);
     if (bpi < 0)
         return NULL;
@@ -92,7 +92,7 @@ PyObject *PP_unpack_hashtab_haelem(char *type, void *vr)
     else
         dims = NULL;
     rv = _PP_wr_syment(PP_vif_info, type, dims, nitems, vr, &form);
-    SFREE(type);
+    CFREE(type);
     _PD_rl_dimensions(dims);
 
     return rv;
@@ -113,7 +113,7 @@ static PP_descr *_PP_get_hashtab_descr(PP_file *fileinfo, PyObject *obj)
         return NULL;
     }
 
-    descr = MAKE(PP_descr);
+    descr = CMAKE(PP_descr);
     descr->typecode = PP_UNKNOWN_I;
     descr->bpi = dp->size;
     descr->type = dp->type;

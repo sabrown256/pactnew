@@ -45,7 +45,7 @@ static SC_file_block *_SC_make_file_block(SC_mapped_file *file, int64_t off,
 					  SC_file_block *nxt)
    {SC_file_block *bl;
 
-    bl = FMAKE(SC_file_block, "_SC_MAKE_FILE_BLOCK:bl");
+    bl = CMAKE(SC_file_block);
 
     bl->off   = off;
     bl->start = start;
@@ -66,10 +66,10 @@ static void _SC_free_file_block(SC_file_block *bl)
     if (SC_safe_to_free(bl))
        {for (pb = bl; pb != NULL; pb = nxt)
 	    {nxt = pb->next;
-	     SFREE(pb);};}
+	     CFREE(pb);};}
 
     else
-       {SFREE(bl);};
+       {CFREE(bl);};
 
     return;}
 
@@ -217,9 +217,9 @@ SC_mapped_file *SC_mf_make(char *name, int prot, int shar, int perm,
 			   int extend, void (*setup)(SC_mapped_file *mf))
    {SC_mapped_file *mf;
 
-    mf = FMAKE(SC_mapped_file, "SC_MF_MAKE:mf");
+    mf = CMAKE(SC_mapped_file);
 
-    mf->name    = SC_strsavef(name, "SC_MF_MAKE:name");
+    mf->name    = CSTRSAVE(name);
     mf->fd      = -1;
     mf->prot    = prot;
     mf->share   = shar;
@@ -479,8 +479,8 @@ void SC_mf_free(SC_mapped_file *mf)
 
     _SC_free_file_block(mf->map);
 
-    SFREE(mf->name);
-    SFREE(mf);
+    CFREE(mf->name);
+    CFREE(mf);
 
     return;}
 
@@ -1802,8 +1802,8 @@ FILE *SC_mf_copy(char *name, FILE *fp, int bckup)
 
     rename(nnm, name);
 
-    SFREE(nmf->name);
-    nmf->name = SC_strsavef(name, "SC_MF_COPY:name");
+    CFREE(nmf->name);
+    nmf->name = CSTRSAVE(name);
 
 /* close the original file */
     (*fid->fclose)(fp);

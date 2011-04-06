@@ -31,20 +31,14 @@ void _PA_internal_init(void)
 
     PA_variable_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
 
-    PAN_VARIABLE     = SC_strsavef("PA_variable",
-                                  "char*:_PA_INTERNAL_INIT:var");
-    PAN_PACKAGE      = SC_strsavef("PA_package",
-                                  "char*:_PA_INTERNAL_INIT:pkg");
-    PAN_ATTRIBUTE    = SC_strsavef(SC_PCONS_P_S, "char*:_PA_INTERNAL_INIT:attr");
-    PAN_UNIT         = SC_strsavef(SC_PCONS_P_S, "char*:_PA_INTERNAL_INIT:unit");
-    PAN_DIMENSION    = SC_strsavef("PA_dimens",
-                                  "char*:_PA_INTERNAL_INIT:dimens");
-    PAN_DOMAIN       = SC_strsavef("PA_edit_domain",
-                                  "char*:_PA_INTERNAL_INIT:domain");
-    PAN_EDIT_REQUEST = SC_strsavef("PA_edit_request",
-                                  "char*:_PA_INTERNAL_INIT:request");
-    PAN_EDIT_OUT     = SC_strsavef("PA_edit_out",
-                                  "char*:_PA_INTERNAL_INIT:out");
+    PAN_VARIABLE     = CSTRSAVE("PA_variable");
+    PAN_PACKAGE      = CSTRSAVE("PA_package");
+    PAN_ATTRIBUTE    = CSTRSAVE(SC_PCONS_P_S);
+    PAN_UNIT         = CSTRSAVE(SC_PCONS_P_S);
+    PAN_DIMENSION    = CSTRSAVE("PA_dimens");
+    PAN_DOMAIN       = CSTRSAVE("PA_edit_domain");
+    PAN_EDIT_REQUEST = CSTRSAVE("PA_edit_request");
+    PAN_EDIT_OUT     = CSTRSAVE("PA_edit_out");
 
     SC_permanent(PAN_VARIABLE);
     SC_permanent(PAN_PACKAGE);
@@ -55,8 +49,8 @@ void _PA_internal_init(void)
     SC_permanent(PAN_EDIT_REQUEST);
     SC_permanent(PAN_EDIT_OUT);
 
-    PA_DUL = FMAKE(int, "_PA_INTERNAL_INIT:PA_DUL");
-    PA_DON = FMAKE(int, "_PA_INTERNAL_INIT:PA_DON");
+    PA_DUL = CMAKE(int);
+    PA_DON = CMAKE(int);
 
     *PA_DUL = PA_UPPER_LOWER;
     *PA_DON = PA_OFFSET_NUMBER;
@@ -78,7 +72,7 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
 
     N_Packages++;
 
-    pck = FMAKE(PA_package, "PA_GEN_PACKAGE:pck");
+    pck = CMAKE(PA_package);
     SC_MEM_INIT(PA_package, pck);
 
 /* make the variable hash table if it doesn't exist yet */
@@ -89,7 +83,7 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
     if (_PA.last_gen == NULL)
        Packages = pck;
 
-    pck->name    = SC_strsavef(name, "char*:PA_GEN_PACKAGE:name");
+    pck->name    = CSTRSAVE(name);
     pck->gencmd  = cmd;
     pck->dfstrc  = dfs;
     pck->defun   = dfu;
@@ -137,7 +131,7 @@ void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
    {PA_package *pck;
 
     N_Packages++;
-    pck = FMAKE(PA_package, "PA_RUN_TIME_PACKAGE:pck");
+    pck = CMAKE(PA_package);
 
 /* make the variable hash table if it doesn't exist yet */
     if (PA_variable_tab == NULL)
@@ -147,7 +141,7 @@ void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
     if (_PA.last_run == NULL)
        Packages = pck;
 
-    pck->name    = SC_strsavef(name, "char*:PA_RUN_TIME_PACKAGE:name");
+    pck->name    = CSTRSAVE(name);
     pck->gencmd  = NULL;
     pck->intrn   = NULL;
     pck->dfstrc  = dfs;

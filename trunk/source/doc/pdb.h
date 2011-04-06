@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 1/27/2011
+MOD: 04/06/2011
 
 <CENTER>
 <P>
@@ -838,7 +838,7 @@ through arbitrary levels of pointers. In order to do this it is necessary
 to put an extra layer of memory management over the standard C library
 routines. The basic requirement is that given a pointer, one would like
 to know how many bytes of data it points to. The functions, <tt>SC_alloc</tt>,
-<tt>SC_realloc</tt>, <tt>SC_strsave</tt>, <tt>SC_free</tt>, and <tt>SC_arrlen</tt>,
+<tt>SC_realloc</tt>, <tt>CSTRSAVE</tt>, <tt>SC_free</tt>, and <tt>SC_arrlen</tt>,
 built on top of the
 standard C library functions, malloc and free, provide this capability.
 For C programmers, macros are provided which offer a nice and intuitive
@@ -854,9 +854,9 @@ Consider the following:
 <p>
 
 <dd><tt>int a[10], *b;</tt><P>
-<dd><tt>b = MAKE_N(int, 10);</tt><P>
+<dd><tt>b = CMAKE_N(int, 10);</tt><P>
 
-Both a and b are pointers to 10 integers (macro <tt>MAKE_N</tt> is used to
+Both a and b are pointers to 10 integers (macro <tt>CMAKE_N</tt> is used to
 allocate the necessary space). The difference as far as an application
 is concerned is that the space that <tt>a</tt> points to was set aside by the
 compiler at compile time (for all practical purposes) while the space
@@ -897,8 +897,8 @@ many bytes they contain and hence care should be taken in their use.
 The example on the following page shows the different ways that statically
 allocated arrays, dynamically allocated arrays, statically allocated
 arrays of pointers, and dynamically allocated arrays of pointers are
-handled by PDBLib. Note: The function <tt>SC_strsave</tt> invokes the
-<tt>MAKE_N</tt> macro.
+handled by PDBLib. Note: The function <tt>CSTRSAVE</tt> invokes the
+<tt>CMAKE_N</tt> macro.
 <p>
 
 <pre>
@@ -909,18 +909,18 @@ handled by PDBLib. Note: The function <tt>SC_strsave</tt> invokes the
     char *e[3], *f[3];
     char **s, **t;
 
-    s = MAKE_N(char *, 2);
+    s = CMAKE_N(char *, 2);
 
 /* fill statically and dynamically allocated arrays */
     strcpy(c, "bar");
-    a = SC_strsave("foo");
+    a = CSTRSAVE("foo");
 
 /* fill statically and dynamically allocated arrays of pointers */
-    e[0] = SC_strsave("Foo");
+    e[0] = CSTRSAVE("Foo");
     e[1] = NULL;
-    e[2] = SC_strsave("Bar");
-    s[0] = SC_strsave("Hello");
-    s[1] = SC_strsave("world");
+    e[2] = CSTRSAVE("Bar");
+    s[0] = CSTRSAVE("Hello");
+    s[1] = CSTRSAVE("world");
 
 /* write these variables out
  * note the dimension specifications and the type
@@ -1116,8 +1116,8 @@ the type specified for the entry. For example,
 
 <h4>Rule #3</h4>
 When using pointers and dynamically allocated memory with PDBLib, use
-<tt>SC_alloc</tt>, <tt>SC_realloc</tt>, <tt>SC_strsave</tt>, <tt>MAKE</tt>,
-<tt>MAKE_N</tt>, <tt>REMAKE</tt>, or <tt>REMAKE_N</tt> to allocate 
+<tt>SC_alloc</tt>, <tt>SC_realloc</tt>, <tt>CSTRSAVE</tt>, <tt>CMAKE</tt>,
+<tt>CMAKE_N</tt>, or <tt>CREMAKE</tt> to allocate 
 memory. These functions and macros are documented in the SCORE User's Manual.
 <p>
 
@@ -2924,8 +2924,8 @@ and
     float* fvalue;
     double* dvalue;
 
-    fvalue = MAKE_N(float, 3);
-    dvalue = MAKE_N(double, 1);
+    fvalue = CMAKE_N(float, 3);
+    dvalue = CMAKE_N(double, 1);
             .
             .
             .
@@ -5827,16 +5827,16 @@ be retrieved by invoking function <tt>PFGERR</tt>.
            .
            .
 
-     members = MAKE_N(char *, 3);
-     members[0] = SC_strsave("float x[20]");
-     members[1] = SC_strsave("float y[20]");
-     members[2] = SC_strsave("integer number");
+     members = CMAKE_N(char *, 3);
+     members[0] = CSTRSAVE("float x[20]");
+     members[1] = CSTRSAVE("float y[20]");
+     members[2] = CSTRSAVE("integer number");
      ptr = PD_defstr_alt(file, "sample", 3, members);
  
-     SFREE(members[0]);
-     SFREE(members[1]);
-     SFREE(members[3]);
-     SFREE(members);
+     CFREE(members[0]);
+     CFREE(members[1]);
+     CFREE(members[3]);
+     CFREE(members);
            .
            .
            .
@@ -6324,7 +6324,7 @@ See also:
             .
             .
 
-     dt = SC_strsave("Mon March 23, 1921");
+     dt = CSTRSAVE("Mon March 23, 1921");
      if (PD_set_attribute(file, "foo", "date", dt) == FALSE)
         printf("%s", PD_get_error());
             .
@@ -8046,7 +8046,7 @@ any single character.
 For the sake of efficiency, the returned names are not duplicated.
 That is, the caller should not free the space associated with each
 of the individual strings, but should free the char ** pointer. This
-should be done using the <tt>SFREE</tt> macro as shown in the example.
+should be done using the <tt>CFREE</tt> macro as shown in the example.
 <p>
 The return value is a pointer to an array of strings,
 if successful; otherwise, NULL is returned 
@@ -8081,7 +8081,7 @@ See also:
           .
           .
 
-     SFREE(list);
+     CFREE(list);
           .
           .
           .
@@ -8094,7 +8094,7 @@ See also:
           .
           .
 
-     SFREE(list);
+     CFREE(list);
           .
           .
           .
@@ -10911,7 +10911,7 @@ type and perhaps using <tt>PD_cd</tt> to move to other directories.
 			names[i], type, ni, nd, dims);
 		 PD_free_entry_info(type, dims);};};};
 
-    SFREE(names);
+    CFREE(names);
 
 /* close file */
     PD_close(file);
@@ -11280,10 +11280,10 @@ void *writeit(arg)
     myplot *xp;
     char sname1[100], sname2[100], sname3[100], suffix[10];
 
-    xp = FMAKE(myplot, "Writeit:xp");
-    xp->view = FMAKE(l_frame, "Writeit:xp->view");
+    xp = CMAKE(myplot);
+    xp->view = CMAKE(l_frame);
 
-    xp->label = SC_strsavef("Dynamic XP label", "char*:writeit:xp");
+    xp->label = CSTRSAVE("Dynamic XP label");
     xp->view->x_min = 0.2;
     xp->view->x_max = 0.9;
     xp->view->y_min = 0.33;
@@ -11318,9 +11318,9 @@ void *writeit(arg)
 
     ok_count++;
 
-    SFREE(xp->label);
-    SFREE(xp->view);
-    SFREE(xp);
+    CFREE(xp->label);
+    CFREE(xp->view);
+    CFREE(xp);
 
     return(NULL);}
      
@@ -11333,8 +11333,8 @@ void *writeit2(arg)
     char sname1[100], sname2[100], suffix[100];
     myplot xplot;
 
-    xplot.label = SC_strsavef("Myplot Xplot label", "char*:writeit2:xplot");
-    xplot.view = FMAKE(l_frame, "Xplot.view:writeit2");
+    xplot.label = CSTRSAVE("Myplot Xplot label");
+    xplot.view = CMAKE(l_frame);
 
     xplot.view->x_min = 0.15;
     xplot.view->x_max = 0.85;
@@ -11364,8 +11364,8 @@ void *writeit2(arg)
 
     ok_count++;
 
-    SFREE(xplot.label);
-    SFREE(xplot.view);
+    CFREE(xplot.label);
+    CFREE(xplot.view);
  
     return NULL;}
      
@@ -11378,10 +11378,10 @@ void *readit(arg)
     myplot *xp, *rxp, rmypl;
     char sname1[100], sname2[100], sname3[100], suffix[10];
 
-    xp = FMAKE(myplot, "Writeit:xp");
-    xp->view = FMAKE(l_frame, "Writeit:xp->view");
+    xp = CMAKE(myplot);
+    xp->view = CMAKE(l_frame);
 
-    xp->label = SC_strsavef("Dynamic XP label", "char*:writeit:xp");
+    xp->label = CSTRSAVE("Dynamic XP label");
     xp->view->x_min = 0.2;
     xp->view->x_max = 0.9;
     xp->view->y_min = 0.33;
@@ -11410,8 +11410,8 @@ void *readit(arg)
         check_myplot1(mypl, rmypl);
 
 /* free the memory */    
-        SFREE(rmypl.label);
-        SFREE(rmypl.view);
+        CFREE(rmypl.label);
+        CFREE(rmypl.view);
 
         if (!PD_read(file, sname2, &amp;rxp))
            {printf("Error writing %s-exiting\n", sname2);
@@ -11421,9 +11421,9 @@ void *readit(arg)
         check_myplot2(xp, rxp);
 
 /* free the memory   */ 
-        SFREE(rxp->label);
-        SFREE(rxp->view);
-        SFREE(rxp);
+        CFREE(rxp->label);
+        CFREE(rxp->view);
+        CFREE(rxp);
 
         if (!PD_read(file, sname3, &amp;rmypl))
            {printf("Error writing %s-exiting\n", sname3);
@@ -11433,14 +11433,14 @@ void *readit(arg)
 	 check_myplot1(mypl, rmypl);
 
 /* free the memory    */
-	 SFREE(rmypl.label);
-	 SFREE(rmypl.view);};
+	 CFREE(rmypl.label);
+	 CFREE(rmypl.view);};
 
     ok_count++;
 
-    SFREE(xp->label);
-    SFREE(xp->view);
-    SFREE(xp);
+    CFREE(xp->label);
+    CFREE(xp->view);
+    CFREE(xp);
 
     return NULL;}
      
@@ -11453,8 +11453,8 @@ void *readit2(arg)
     char sname1[100], sname2[100], suffix[100];
     myplot xplot, rxplot;
 
-    xplot.label = SC_strsavef("Myplot Xplot label", "char*:writeit2:xplot");
-    xplot.view = FMAKE(l_frame, "Xplot.view:writeit2");
+    xplot.label = CSTRSAVE("Myplot Xplot label");
+    xplot.view = CMAKE(l_frame);
 
     xplot.view->x_min = 0.15;
     xplot.view->x_max = 0.85;
@@ -11482,8 +11482,8 @@ void *readit2(arg)
          check_myplot1(xplot, rxplot);
 
 /* free the memory    */
-         SFREE(rxplot.label);
-         SFREE(rxplot.view);
+         CFREE(rxplot.label);
+         CFREE(rxplot.view);
 
          if (!PD_read(file, sname2, &amp;rxplot))
             {printf("Error writing %s-exiting\n", sname2);
@@ -11493,13 +11493,13 @@ void *readit2(arg)
          check_myplot1(xplot, rxplot);
 
 /* free the memory    */
-	 SFREE(rxplot.label);
-	 SFREE(rxplot.view);};
+	 CFREE(rxplot.label);
+	 CFREE(rxplot.view);};
 
     ok_count++;
 
-    SFREE(xplot.label);
-    SFREE(xplot.view);
+    CFREE(xplot.label);
+    CFREE(xplot.view);
  
     return(NULL);}
      
@@ -11580,8 +11580,8 @@ main(argc, argv)
                LAST);
 
 /* put some values in the structures */
-    mypl.label = SC_strsavef("Myplot MYPL label", "PDPTST:main mypl");
-    mypl.view  = FMAKE(l_frame, "Myplot MYPL view");
+    mypl.label = CSTRSAVE("Myplot MYPL label");
+    mypl.view  = CMAKE(l_frame);
 
     mypl.view->x_min = 0.1;
     mypl.view->x_max = 0.8;
@@ -11798,8 +11798,8 @@ static void write_data(path, rank, size, comm)
                LAST);
 
 /* put some values in the structures */
-    mypl.label = SC_strsavef("Myplot MYPL label", "PDDMP:main mypl");
-    mypl.view  = FMAKE(l_frame, "Myplot MYPL view");
+    mypl.label = CSTRSAVE("Myplot MYPL label");
+    mypl.view  = CMAKE(l_frame);
 
     mypl.view->x_min = 0.1;
     mypl.view->x_max = 0.8;
@@ -11827,7 +11827,7 @@ static void write_data(path, rank, size, comm)
        {printf("Error writing frank: process %d\n", rank);}
 
 /* write an int array */
-    pi1 = FMAKE_N(int, N_INT, "WRITE_DATA:pi1");
+    pi1 = CMAKE_N(int, N_INT);
     if (pi1 == NULL)
        {printf("Error allocating pi1, process %d--quitting\n", rank);
         exit(1);}
@@ -11838,7 +11838,7 @@ static void write_data(path, rank, size, comm)
        {printf("Error writing pi1: process %d\n", rank);}
 
 /* write an float array */
-    pf1 = FMAKE_N(float, N_FLOAT, "WRITE_DATA:pf1");
+    pf1 = CMAKE_N(float, N_FLOAT);
     if (pf1 == NULL)
        {printf("Error allocating pf1, process %d--quitting\n", rank);
         exit(1);}

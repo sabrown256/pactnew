@@ -290,13 +290,13 @@ FILE *_PD_open_container_file(char *name, char *mode)
 
     fp = NULL;
 
-    cf = FMAKE(containerf, "_PD_OPEN_GET_CONTAINERF:cf");
+    cf = CMAKE(containerf);
 
     fc = SC_open_fcontainer(cntr, SC_UNKNOWN);
     fe = (fcent *) SC_hasharr_def_lookup(fc->handle->entries, file);
     if (fe == NULL)
        {SC_close_fcontainer(fc);
-	SFREE(cf);}
+	CFREE(cf);}
     else
        {cf->fc    = fc;
 	cf->begin = fe->address;

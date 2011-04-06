@@ -18,8 +18,8 @@
 static fcdes *_SC_make_archive(char *name, FILE *fp, int nb, hasharr *tab)
    {fcdes *fc;
 
-    fc = FMAKE(fcdes, "_SC_MAKE_ARCHIVE:fc");
-    fc->name     = SC_strsavef(name, "_SC_MAKE_ARCHIVE:name");
+    fc = CMAKE(fcdes);
+    fc->name     = CSTRSAVE(name);
     fc->file     = fp;
     fc->hdr_size = nb;
     fc->entries  = tab;
@@ -49,9 +49,9 @@ static fcent *_SC_make_ar_entry(FILE *fp, int round,
     ada  = ftell(fp);
     pos += ada;
 		
-    ae = FMAKE(fcent, "_SC_make_ar_entry:ae");
+    ae = CMAKE(fcent);
 
-    ae->name    = SC_strsavef(name, "_SC_MAKE_AR_ENTRY:name");
+    ae->name    = CSTRSAVE(name);
     ae->date    = SC_stoi(date);
     ae->uid     = SC_stoi(uid);
     ae->gid     = SC_stoi(gid);

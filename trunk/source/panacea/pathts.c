@@ -206,28 +206,28 @@ static int test_1(char *base, char *seq, char *prev, char *mode,
        {PRINT(STDOUT, "OPEN FAILED - TEST_1\n");
         exit(1);};
 
-    thname = SC_strsavef("data", "char*:TEST_1:thname");
-    thtype = SC_strsavef("strt", "char*:TEST_1:thtype");
+    thname = CSTRSAVE("data");
+    thtype = CSTRSAVE("strt");
 
     n_members = 3;
     n_labels  = n_members - 1;
 
-    members = FMAKE_N(char *, n_members, "TEST_1:members");
-    labels  = FMAKE_N(char *, n_labels, "TEST_1:labels");
+    members = CMAKE_N(char *, n_members);
+    labels  = CMAKE_N(char *, n_labels);
 
-    members[0] = SC_strsavef("t",  "char*:TEST_1:t");
-    members[1] = SC_strsavef("v1", "char*:TEST_1:v1");
-    members[2] = SC_strsavef("v2", "char*:TEST_1:v2");
+    members[0] = CSTRSAVE("t");
+    members[1] = CSTRSAVE("v1");
+    members[2] = CSTRSAVE("v2");
 
     labels[0] = NULL;
-    labels[1] = SC_strsavef("v2 label", "char*:TEST_1:v2l");
+    labels[1] = CSTRSAVE("v2 label");
 
     if (mode[0] != 'a')
        if (PA_th_def_rec(file, thname, thtype, n_members, members, labels) == NULL)
           {PRINT(STDOUT, "DEF_REC FAILED - TEST_1\n");
            exit(1);};
 
-    outa  = FMAKE_N(double, n_members*steps, "TEST_1:outa");
+    outa  = CMAKE_N(double, n_members*steps);
 
     n0    = indx/steps - 1;
     count = 0;
@@ -293,24 +293,24 @@ static int test_1(char *base, char *seq, char *prev, char *mode,
        {PRINT(STDOUT, "MEMBER WRITE 2 AT indx = %d FAILED - TEST_1\n", indx);
 	exit(1);};
 
-    SFREE(outa);
+    CFREE(outa);
 
-    SFREE(members[0]);
-    members[0] = SC_strsavef(file->name, "char*:TEST_1:fn");
+    CFREE(members[0]);
+    members[0] = CSTRSAVE(file->name);
 
     PD_close(file);
     PA_th_trans_link(1, members, -1, 20);
 
     for (i = 0; i < n_labels; i++)
-        SFREE(labels[i]);
-    SFREE(labels);
+        CFREE(labels[i]);
+    CFREE(labels);
 
     for (i = 0; i < n_members; i++)
-        SFREE(members[i]);
-    SFREE(members);
+        CFREE(members[i]);
+    CFREE(members);
 
-    SFREE(thname);
-    SFREE(thtype);
+    CFREE(thname);
+    CFREE(thtype);
 
     if (ret)
        {switch (flush)
@@ -351,33 +351,33 @@ static int test_2(char *base, char *seq, char *prev, char *mode,
        {PRINT(STDOUT, "OPEN FAILED - TEST_2\n");
         exit(1);};
 
-    thname = SC_strsavef("data", "char*:TEST_2:thname");
-    thtype = SC_strsavef("strt", "char*:TEST_2:thtype");
+    thname = CSTRSAVE("data");
+    thtype = CSTRSAVE("strt");
 
     n_members = 5;
     n_labels  = n_members - 1;
 
-    members = FMAKE_N(char *, n_members, "TEST_2:members");
-    labels  = FMAKE_N(char *, n_labels, "TEST_2:labels");
+    members = CMAKE_N(char *, n_members);
+    labels  = CMAKE_N(char *, n_labels);
 
-    members[0] = SC_strsavef("t",       "char*:TEST_2:t");
-    members[1] = SC_strsavef("short a", "char*:TEST_2:a");
-    members[2] = SC_strsavef("long b",  "char*:TEST_2:b");
-    members[3] = SC_strsavef("float c", "char*:TEST_2:c");
-    members[4] = SC_strsavef("char d",  "char*:TEST_2:d");
+    members[0] = CSTRSAVE("t");
+    members[1] = CSTRSAVE("short a");
+    members[2] = CSTRSAVE("long b");
+    members[3] = CSTRSAVE("float c");
+    members[4] = CSTRSAVE("char d");
 
     labels[0] = NULL;
-/*    labels[0] = SC_strsavef("a vs. t", "char*:TEST_2:al"); */
-    labels[1] = SC_strsavef("b vs. t", "char*:TEST_2:bl");
-    labels[2] = SC_strsavef("c vs. t", "char*:TEST_2:cl");
-    labels[3] = SC_strsavef("d vs. t", "char*:TEST_2:dl");
+/*    labels[0] = CSTRSAVE("a vs. t"); */
+    labels[1] = CSTRSAVE("b vs. t");
+    labels[2] = CSTRSAVE("c vs. t");
+    labels[3] = CSTRSAVE("d vs. t");
 
     if (mode[0] != 'a')
        if (PA_th_def_rec(file, thname, thtype, 5, members, labels) == NULL)
           {PRINT(STDOUT, "DEF_REC FAILED - TEST_2\n");
            exit(1);};
 
-    outa  = FMAKE_N(dt_2, steps, "TEST_2:outa");
+    outa  = CMAKE_N(dt_2, steps);
 
     n0    = indx/steps - 1;
     count = 0;
@@ -429,24 +429,24 @@ static int test_2(char *base, char *seq, char *prev, char *mode,
          offs += nr;
          indx += nr;};
 
-    SFREE(outa);
+    CFREE(outa);
 
-    SFREE(members[0]);
-    members[0] = SC_strsavef(file->name, "char*:TEST_2:fn");
+    CFREE(members[0]);
+    members[0] = CSTRSAVE(file->name);
 
     PD_close(file);
     PA_th_trans_link(1, members, -1, 20);
 
     for (i = 0; i < n_labels; i++)
-        SFREE(labels[i]);
-    SFREE(labels);
+        CFREE(labels[i]);
+    CFREE(labels);
 
     for (i = 0; i < n_members; i++)
-        SFREE(members[i]);
-    SFREE(members);
+        CFREE(members[i]);
+    CFREE(members);
 
-    SFREE(thname);
-    SFREE(thtype);
+    CFREE(thname);
+    CFREE(thtype);
 
     if (ret)
        {switch (flush)
@@ -492,26 +492,26 @@ static int test_3(char *base, char *seq, char *prev, char *mode,
         exit(1);};
 
 /* define the first record */
-    thnama = SC_strsavef("data-a", "char*:TEST_3:thnama");
-    thtypa = SC_strsavef("strt-a", "char*:TEST_3:thtypa");
+    thnama = CSTRSAVE("data-a");
+    thtypa = CSTRSAVE("strt-a");
 
     n_memba = 5;
     n_labla = n_memba - 1;
 
-    memba = FMAKE_N(char *, n_memba, "TEST_3:memba");
-    labla = FMAKE_N(char *, n_labla, "TEST_3:labla");
+    memba = CMAKE_N(char *, n_memba);
+    labla = CMAKE_N(char *, n_labla);
 
-    memba[0] = SC_strsavef("t",       "char*:TEST_3:t");
-    memba[1] = SC_strsavef("short a", "char*:TEST_3:a");
-    memba[2] = SC_strsavef("long b",  "char*:TEST_3:b");
-    memba[3] = SC_strsavef("float c", "char*:TEST_3:c");
-    memba[4] = SC_strsavef("char d",  "char*:TEST_3:d");
+    memba[0] = CSTRSAVE("t");
+    memba[1] = CSTRSAVE("short a");
+    memba[2] = CSTRSAVE("long b");
+    memba[3] = CSTRSAVE("float c");
+    memba[4] = CSTRSAVE("char d");
 
     labla[0] = NULL;
-/*    labla[0] = SC_strsavef("a vs. t", "char*:TEST_3:al"); */
-    labla[1] = SC_strsavef("b vs. t", "char*:TEST_3:bl");
-    labla[2] = SC_strsavef("c vs. t", "char*:TEST_3:cl");
-    labla[3] = SC_strsavef("d vs. t", "char*:TEST_3:dl");
+/*    labla[0] = CSTRSAVE("a vs. t"); */
+    labla[1] = CSTRSAVE("b vs. t");
+    labla[2] = CSTRSAVE("c vs. t");
+    labla[3] = CSTRSAVE("d vs. t");
 
     if (mode[0] != 'a')
        if (PA_th_def_rec(file, thnama, thtypa, 5, memba, labla) == NULL)
@@ -519,21 +519,21 @@ static int test_3(char *base, char *seq, char *prev, char *mode,
            exit(1);};
 
 /* define the second record */
-    thnamb = SC_strsavef("data-b", "char*:TEST_3:thnamb");
-    thtypb = SC_strsavef("strt-b", "char*:TEST_3:thtypb");
+    thnamb = CSTRSAVE("data-b");
+    thtypb = CSTRSAVE("strt-b");
 
     n_membb = 3;
     n_lablb = n_membb - 1;
 
-    membb = FMAKE_N(char *, n_membb, "TEST_3:membb");
-    lablb = FMAKE_N(char *, n_lablb, "TEST_3:lablb");
+    membb = CMAKE_N(char *, n_membb);
+    lablb = CMAKE_N(char *, n_lablb);
 
-    membb[0] = SC_strsavef("t",  "char*:TEST_3:t");
-    membb[1] = SC_strsavef("v1", "char*:TEST_3:v1");
-    membb[2] = SC_strsavef("v2", "char*:TEST_3:v2");
+    membb[0] = CSTRSAVE("t");
+    membb[1] = CSTRSAVE("v1");
+    membb[2] = CSTRSAVE("v2");
 
     lablb[0] = NULL;
-    lablb[1] = SC_strsavef("v2 label", "char*:TEST_3:v2l");
+    lablb[1] = CSTRSAVE("v2 label");
 
     if (mode[0] != 'a')
        if (PA_th_def_rec(file, thnamb, thtypb, n_membb, membb, lablb) == NULL)
@@ -541,8 +541,8 @@ static int test_3(char *base, char *seq, char *prev, char *mode,
            exit(1);};
 
 /* generate the data */
-    outa  = FMAKE_N(dt_2, steps, "TEST_3:outa");
-    outb  = FMAKE_N(double, n_membb*steps, "TEST_3:outb");
+    outa  = CMAKE_N(dt_2, steps);
+    outb  = CMAKE_N(double, n_membb*steps);
 
     inda  = indx;
     indb  = indx;
@@ -648,41 +648,41 @@ static int test_3(char *base, char *seq, char *prev, char *mode,
          offb += n_membb*nrb;};
 
 /* clean up the a record */
-    SFREE(outa);
+    CFREE(outa);
 
-    SFREE(memba[0]);
-    memba[0] = SC_strsavef(file->name, "char*:TEST_3:fn");
+    CFREE(memba[0]);
+    memba[0] = CSTRSAVE(file->name);
 
     for (i = 0; i < n_labla; i++)
-        SFREE(labla[i]);
-    SFREE(labla);
+        CFREE(labla[i]);
+    CFREE(labla);
 
     for (i = 0; i < n_memba; i++)
-        SFREE(memba[i]);
-    SFREE(memba);
+        CFREE(memba[i]);
+    CFREE(memba);
 
-    SFREE(thnama);
-    SFREE(thtypa);
+    CFREE(thnama);
+    CFREE(thtypa);
 
 /* clean up the b record */
-    SFREE(outb);
+    CFREE(outb);
 
-    SFREE(membb[0]);
-    membb[0] = SC_strsavef(file->name, "char*:TEST_3:fn");
+    CFREE(membb[0]);
+    membb[0] = CSTRSAVE(file->name);
 
     PD_close(file);
     PA_th_trans_link(1, membb, -1, 20);
 
     for (i = 0; i < n_lablb; i++)
-        SFREE(lablb[i]);
-    SFREE(lablb);
+        CFREE(lablb[i]);
+    CFREE(lablb);
 
     for (i = 0; i < n_membb; i++)
-        SFREE(membb[i]);
-    SFREE(membb);
+        CFREE(membb[i]);
+    CFREE(membb);
 
-    SFREE(thnamb);
-    SFREE(thtypb);
+    CFREE(thnamb);
+    CFREE(thtypb);
 
 /* remove requested files */
     if (ret)
@@ -737,21 +737,21 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
        {PRINT(STDOUT, "OPEN FAILED - TEST_4\n");
         exit(1);};
 
-    thname = SC_strsavef("data", "char*:TEST_4:thname");
-    thtype = SC_strsavef("strt", "char*:TEST_4:thtype");
+    thname = CSTRSAVE("data");
+    thtype = CSTRSAVE("strt");
 
     n_members = 3;
     n_labels  = n_members - 1;
 
-    members = FMAKE_N(char *, n_members, "TEST_4:members");
-    labels  = FMAKE_N(char *, n_labels, "TEST_4:labels");
+    members = CMAKE_N(char *, n_members);
+    labels  = CMAKE_N(char *, n_labels);
 
-    members[0] = SC_strsavef("t",  "char*:TEST_4:t");
-    members[1] = SC_strsavef("v1", "char*:TEST_4:v1");
-    members[2] = SC_strsavef("v2", "char*:TEST_4:v2");
+    members[0] = CSTRSAVE("t");
+    members[1] = CSTRSAVE("v1");
+    members[2] = CSTRSAVE("v2");
 
     labels[0] = NULL;
-    labels[1] = SC_strsavef("v2 label", "char*:TEST_4:v2l");
+    labels[1] = CSTRSAVE("v2 label");
 
     nc = strlen(thname);
     nt = strlen(thtype);
@@ -792,7 +792,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
 	   {PRINT(STDOUT, "PAGRID FAILED - TEST_4\n");
 	    exit(1);};};
 
-    outa  = FMAKE_N(double, n_members*steps, "TEST_4:outa");
+    outa  = CMAKE_N(double, n_members*steps);
 
     n0    = indx/steps - 1;
     count = 0;
@@ -845,10 +845,10 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
          indx += nr;
          offs += n_members*nr;};
 
-    SFREE(outa);
+    CFREE(outa);
 
-    SFREE(members[0]);
-    members[0] = SC_strsavef(file->name, "char*:TEST_4:fn");
+    CFREE(members[0]);
+    members[0] = CSTRSAVE(file->name);
 
     F77_FUNC(pfclos, PFCLOS)(&fileid);
 
@@ -858,15 +858,15 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     F77_FUNC(patrnl, PATRNL)(&nm, SC_C_F77_STRING(members[0]), &ord, &nc);
 
     for (i = 0; i < n_labels; i++)
-        SFREE(labels[i]);
-    SFREE(labels);
+        CFREE(labels[i]);
+    CFREE(labels);
 
     for (i = 0; i < n_members; i++)
-        SFREE(members[i]);
-    SFREE(members);
+        CFREE(members[i]);
+    CFREE(members);
 
-    SFREE(thname);
-    SFREE(thtype);
+    CFREE(thname);
+    CFREE(thtype);
 
     F77_FUNC(pafrec, PAFREC)(&recid);
 

@@ -20,7 +20,7 @@ double *PM_uniform_real_x(int no, double xmin, double xmax, int flag)
     double step;
     double *x;
 
-    x = FMAKE_N(double, no, "PM_UNIFORM_REAL_X:x");
+    x = CMAKE_N(double, no);
 
     na = (flag == 1) ? no - 1 : no;
 
@@ -49,7 +49,7 @@ double *PM_uniform_real_y(int no, double *xo,
     double dx, xa, xb;
     double *yo, *py;
 
-    yo = FMAKE_N(double, no, "PM_UNIFORM_REAL_Y:yo");
+    yo = CMAKE_N(double, no);
 
     if (xi == NULL)
        {xa = xo[0];
@@ -98,8 +98,8 @@ complex *PM_uniform_complex_y(int no, double *xo,
     double *yti, *yto;
     complex *yo;
 
-    yo  = FMAKE_N(complex, no, "PM_UNIFORM_COMPLEX_Y:yo");
-    yti = FMAKE_N(double, ni, "PM_UNIFORM_COMPLEX_Y:yti");
+    yo  = CMAKE_N(complex, no);
+    yti = CMAKE_N(double, ni);
     if ((yti != NULL) && (yo != NULL))
 
 /* interpolate the real part of y */
@@ -111,7 +111,7 @@ complex *PM_uniform_complex_y(int no, double *xo,
 	for (i = 0; i < no; i++)
 	    yo[i] = PM_COMPLEX(yto[i], PM_IMAGINARY_C(yo[i]));
 
-	SFREE(yto);
+	CFREE(yto);
 
 /* interpolate the imaginary part of y */
 	for (i = 0; i < ni; i++)
@@ -122,8 +122,8 @@ complex *PM_uniform_complex_y(int no, double *xo,
 	for (i = 0; i < no; i++)
 	    yo[i] = PM_COMPLEX(PM_REAL_C(yo[i]), yto[i]);
 
-	SFREE(yto);
-	SFREE(yti);};
+	CFREE(yto);
+	CFREE(yti);};
 
     return(yo);}
 
@@ -355,7 +355,7 @@ complex *PM_fft_sc_real(double *x, int n, int flag)
    {int i;
     complex *cx;
 
-    cx = FMAKE_N(complex, n + 1, "PM_FFT_SC_REAL:cx");
+    cx = CMAKE_N(complex, n + 1);
     if (cx == NULL)
        {PM_err("CAN'T ALLOCATE SPACE - PM_FFT_SC_REAL");
         return(NULL);};
@@ -399,13 +399,13 @@ int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
 
     cy = PM_fft_sc_real(y, n, 1);
 
-    SFREE(y);
+    CFREE(y);
 
     nr = _PM_fft_fin(cy, x, np, 1, ordr);
 
     *pyo = cy;
     if (pxo == NULL)
-       {SFREE(x);}
+       {CFREE(x);}
     else
        *pxo = x;
 
@@ -447,7 +447,7 @@ int PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,
 
 /* reorder to high/low frequency order */
     if ((flag != 1) && (ordr != 0))
-       {ay = FMAKE_N(complex, np, "PM_FFT_SC_COMPLEX_DATA:ay");
+       {ay = CMAKE_N(complex, np);
 
 	for (i = 0; i < np; i++)
 	    ay[i] = y[i];
@@ -456,7 +456,7 @@ int PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,
 	    {y[i]   = ay[nh+i];   /* this one needs to be first */
 	     y[n-i] = ay[nh-i];};
 
-	SFREE(ay);};
+	CFREE(ay);};
 
     PM_fft_sc_complex(y, n, flag);
         
@@ -464,7 +464,7 @@ int PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,
 
     *pyo = y;
     if (pxo == NULL)
-       {SFREE(x);}
+       {CFREE(x);}
     else
        *pxo = x;
 
@@ -562,11 +562,11 @@ int PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy,
     gtn = (cxmx - cxmn + 2*hdx)/dt;
     gtn = PM_next_power_two(gtn);
 
-    xret = FMAKE_N(double, gtn, "PM_CONVOLVE:xret");
-    gty  = FMAKE_N(double, gtn, "PM_CONVOLVE:gty");
-    hty  = FMAKE_N(double, gtn, "PM_CONVOLVE:hty");
-    hix  = FMAKE_N(double, hin, "PM_CONVOLVE:hix");
-    hiy  = FMAKE_N(double, hin, "PM_CONVOLVE:hiy");
+    xret = CMAKE_N(double, gtn);
+    gty  = CMAKE_N(double, gtn);
+    hty  = CMAKE_N(double, gtn);
+    hix  = CMAKE_N(double, hin);
+    hiy  = CMAKE_N(double, hin);
 
 /* interpolate signal */
     init_y = gy[0];
@@ -616,13 +616,13 @@ int PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy,
     nrm = 1.0/nrm;
 
 /* call fft convolution */
-    yret = FMAKE_N(double, 2*gtn, "PM_CONVOLVE:yret");
+    yret = CMAKE_N(double, 2*gtn);
     PM_convolve_logical(gty, gtn, hty, gtn, 1, yret);
   
-    SFREE(hix);
-    SFREE(hiy);
-    SFREE(gty);
-    SFREE(hty);
+    CFREE(hix);
+    CFREE(hiy);
+    CFREE(gty);
+    CFREE(hty);
 
 /* replace initial value */
     for (i = 0; xret[i] < cxmx; i++)
@@ -653,7 +653,7 @@ int PM_convolve_logical(double *g, int n, double *h, int m, int sgn, double *cnv
     if (sgn*sgn != 1)
        return(FALSE);
 
-    ft = FMAKE_N(double, 2*n, "PM_CONVOLVE_LOGICAL:ft");
+    ft = CMAKE_N(double, 2*n);
 
 /* pad h in the middle */
     mh = (m - 1)/2;
@@ -688,7 +688,7 @@ int PM_convolve_logical(double *g, int n, double *h, int m, int sgn, double *cnv
 
     _PM_fft_sc_real_hsp(cnv, nh, -1);
 
-    SFREE(ft);
+    CFREE(ft);
 
     return(TRUE);}
 

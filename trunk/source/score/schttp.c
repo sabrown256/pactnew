@@ -98,7 +98,7 @@ int SC_request_http(int fd, char *cmnd, char *url, char *vers)
     no = SC_write_sigsafe(fd, s, ni);
     err = (ni != no);
 
-    SFREE(s);
+    CFREE(s);
 
     return(err);}
 

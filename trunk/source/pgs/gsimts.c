@@ -91,7 +91,7 @@ int main(int argc, char **argv)
        {PRINT(STDOUT, "CAN'T ALLOCATE IMAGE");
         exit(1);};
 
-    s = SC_strsavef("WINDOW", "char*:GSIMTS:s");
+    s = CSTRSAVE("WINDOW");
 
 /* calculate the first image */
     bf = (double *) calc_im->buffer;

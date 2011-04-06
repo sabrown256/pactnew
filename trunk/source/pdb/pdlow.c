@@ -211,14 +211,14 @@ void _PD_set_io_buffer(SC_udl *pu)
     sz = pa->buffer_size;
     if (pa->buffer_size != -1)
        {fp = pu->stream;
-	bf = FMAKE_N(char, sz, "_PD_SET_IO_BUFFER:bf");
+	bf = CMAKE_N(char, sz);
 
 	if (lio_setvbuf(fp, bf, _IOFBF, sz) != 0)
-	   {SFREE(bf);
+	   {CFREE(bf);
 	    PD_error("CANNOT SET FILE BUFFER - _PD_SET_IO_BUFFER", PD_OPEN);}
 	else
 	   {if (pu->buffer != NULL)
-	       SFREE(pu->buffer);
+	       CFREE(pu->buffer);
 	    pu->buffer = bf;};};
 
     return;}
@@ -257,7 +257,7 @@ SC_udl *_PD_pio_open(char *name, char *mode)
 	    pu = NULL;}
 	else
 	   {pu->stream = fp;
-	    pu->mode   = SC_strsavef(md, "char*:_PD_PIO_OPEN:md");
+	    pu->mode   = CSTRSAVE(md);
 	    _PD_set_io_buffer(pu);};};
 
     return(pu);}
@@ -1078,9 +1078,9 @@ char *PD_set_text_delimiter(PDBfile *file, char *d)
    {char *rv;
     
     if (d != NULL)
-       {SFREE(file->delim);
+       {CFREE(file->delim);
 
-	file->delim = SC_strsavef(d, "char*PD_SET_TEXT_DELIMITER:d");};
+	file->delim = CSTRSAVE(d);};
 
     rv = file->delim;
 
@@ -1101,7 +1101,7 @@ int PD_get_entry_info(syment *ep, char **ptyp, long *pni,
     dimdes *pd;
 
     if (ep != NULL)
-       {*ptyp = SC_strsavef(PD_entry_type(ep), "PD_GET_ENTRY_INFO:ptyp");
+       {*ptyp = CSTRSAVE(PD_entry_type(ep));
 	*pni  = PD_entry_number(ep);
 
 /* count dimensions */
@@ -1110,7 +1110,7 @@ int PD_get_entry_info(syment *ep, char **ptyp, long *pni,
 	     nd++, pd = pd->next);
 
 	*pnd = nd;
-	dims = FMAKE_N(long, 2*nd, "PD_GET_ENTRY_INFO:dims");
+	dims = CMAKE_N(long, 2*nd);
 
 /* copy dimensions */
 	for (nd = 0, pd = PD_entry_dimensions(ep);
@@ -1141,8 +1141,8 @@ int PD_get_entry_info(syment *ep, char **ptyp, long *pni,
 void PD_free_entry_info(char *typ, long *pdim)
    {
 
-    SFREE(typ);
-    SFREE(pdim);
+    CFREE(typ);
+    CFREE(pdim);
 
     return;}
 
@@ -1363,7 +1363,7 @@ void _PD_add_free_space(PDBfile *file, int64_t address, int64_t size)
    {PD_disk_block *block, *free, *prev;
 
     if (size > 0)
-       {block = FMAKE(PD_disk_block, "_PD_add_free_space:block");
+       {block = CMAKE(PD_disk_block);
         block->addr.diskaddr = address;
         block->length        = size;
         block->next          = NULL;
@@ -1414,7 +1414,7 @@ int64_t _PD_get_free_space(PDBfile *file, int64_t size)
                           file->free_list = free;
                        else
                           save->next = free;
-                       SFREE(prev);};}
+                       CFREE(prev);};}
                save = prev;
                prev = free;}
 
@@ -1424,7 +1424,7 @@ int64_t _PD_get_free_space(PDBfile *file, int64_t size)
                   prev->length -= size;
                else
                   {save->next = NULL;
-                   SFREE(prev);};};} 
+                   CFREE(prev);};};} 
 
     return(ret);} 
 

@@ -705,7 +705,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
         else
            {shbits = NULL;
 	    spm    = NULL;
-	    dcs    = FMAKE_N(ColorSpec, n_pal_colors + 18, "_PG_QD_PUT_IMAGE:dcs");};
+	    dcs    = CMAKE_N(ColorSpec, n_pal_colors + 18);};
 
 /* NOTE: the following loop maxes out at n_pal_colors + 2 because
  * n_pal_colors does not include black and white!
@@ -754,7 +754,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
 		     SetCPixel(k, j, &dcs[bf[i]].rgb);};}        
 
         if (dpm->pixelSize > 8)
-           {SFREE(dcs);}
+           {CFREE(dcs);}
         else
            {spm->pmTable = sct;
             DisposePixMap(shbits);};}
@@ -766,7 +766,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
 
         bx = _PG_byte_bit_map(bf, nx, ny, FALSE);
 
-        spm = FMAKE(BitMap, "_PG_QD_PUT_IMAGE:spm");
+        spm = CMAKE(BitMap);
         spm->baseAddr = (char *) bf;
         spm->rowBytes = bx;
         spm->bounds   = srect;
@@ -775,7 +775,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
 
         CopyBits(spm, dpm, &srect, &drect, srcCopy, NULL);
 
-        SFREE(spm);};
+        CFREE(spm);};
 
     return;}
     
@@ -852,8 +852,8 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
            {dcs = (*dct)->ctTable;
             spm->baseAddr = (char *) bf;}
         else
-           {dcs   = FMAKE_N(ColorSpec, n_pal_colors + 18, "_PG_qd_put_image:dcs");
-            bfRGB = FMAKE_N(RGBColor, k, "_PG_qd_put_image:bfRGB");
+           {dcs   = CMAKE_N(ColorSpec, n_pal_colors + 18);
+            bfRGB = CMAKE_N(RGBColor, k);
             spm->baseAddr = (char *) bfRGB;};
 
 /* NOTE: the following loop maxes out at n_pal_colors + 2 because
@@ -905,8 +905,8 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
         spm->pmTable = sct;
 
         if (dpm->pixelSize > 8)
-           {SFREE(dcs);
-            SFREE(bfRGB);};
+           {CFREE(dcs);
+            CFREE(bfRGB);};
 
         DisposePixMap(shbits);}
 
@@ -917,7 +917,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
 
         bx = _PG_byte_bit_map(bf, nx, ny, FALSE);
 
-        spm = FMAKE(BitMap, "_PG_QD_PUT_IMAGE:spm");
+        spm = CMAKE(BitMap);
         spm->baseAddr = (char *) bf;
         spm->rowBytes = bx;
         spm->bounds   = srect;
@@ -926,7 +926,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
 
         CopyBits(spm, dpm, &srect, &drect, srcCopy, NULL);
 
-        SFREE(spm);};
+        CFREE(spm);};
 
     return;}
 

@@ -155,8 +155,7 @@ void _SX_args(object *obj, void *v, int type)
 
         case G_PANVAR :
              if (!SX_PANVARP(obj))
-                {s   = SC_strsavef(SS_get_string(obj),
-                       "char*:_SX_ARGS:s");
+                {s   = CSTRSAVE(SS_get_string(obj));
                  *pv = (void *) PA_INQUIRE_VARIABLE(s);
                  if (pv == NULL)
                     SS_error("NOT PANACEA VARIABLE - _SX_ARGS",
@@ -393,25 +392,25 @@ void _SX_get_menu(g_file *po)
     names = PD_ls(file, dir, "PM_mapping *", &n);
     for (i = 0; i < n; i++)
         _SX_push_menu_item(po, names[i], SX_MAPPING_S);
-    SFREE(names);
+    CFREE(names);
 
     names = PD_ls(file, dir, "PG_image *", &n);
     for (i = 0; i < n; i++)
         _SX_push_menu_item(po, names[i], SX_IMAGE_S);
-    SFREE(names);
+    CFREE(names);
 
     names = PD_ls(file, dir, SC_CHAR_S, &n);
     for (i = 0; i < n; i++)
         if (SC_regx_match(names[i], "curve????"))
 	   _SX_push_menu_item(po, names[i], SX_CURVE_S);
-    SFREE(names);
+    CFREE(names);
 
     n      = SC_array_get_n(po->menu_lst);
     mitems = SC_array_array(po->menu_lst);
 
     _SX_sort_lists(mitems, n);
 
-    SFREE(mitems);
+    CFREE(mitems);
 
 /* let's give the next place a break */
     PD_reset_ptr_list(file);
@@ -434,7 +433,7 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
     mitem.type = type;
 
     strcpy(s, _PD_fixname(file, name));
-    mitem.vname = SC_strsavef(s, "char*:_SX_PUSH_MENU_ITEM:vname");
+    mitem.vname = CSTRSAVE(s);
 
 /* get mapping label */
     if (strcmp(type, SX_MAPPING_S) == 0)
@@ -442,7 +441,7 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
         if (!PD_read(file, var, &lb))
  	   SS_error("FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM", SS_null);
 
-	mitem.label = SC_strsavef(lb, "char*:_SX_PUSH_MENU_ITEM:label");
+	mitem.label = CSTRSAVE(lb);
 
 	SC_array_push(po->menu_lst, &mitem);}
 
@@ -469,7 +468,7 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
 
         if (!PD_read(file, s, t))
            SS_error("FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM", SS_null);
-        mitem.label = SC_strsavef(t, "char*:_SX_PUSH_MENU_ITEM:label");
+        mitem.label = CSTRSAVE(t);
 
 	SC_array_push(po->menu_lst, &mitem);}
 
@@ -478,7 +477,7 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
        {var = SC_dsnprintf(FALSE, "%s[%d].label", s, file->default_offset);
         if (!PD_read(file, var, &lb))
            SS_error("FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM", SS_null);
-	mitem.label = SC_strsavef(lb, "char*:_SX_PUSH_MENU_ITEM:label");
+	mitem.label = CSTRSAVE(lb);
 
 	SC_array_push(po->menu_lst, &mitem);}
 
@@ -833,14 +832,11 @@ static void SX_install_device_vars(void)
 	 SC_str_upper(dupp);
 
 	 if (out->exist)
-	    {out->fname = SC_strsavef("plots",
-				      "char*:SX_INSTALL_DEVICE_VARS:fname");
+	    {out->fname = CSTRSAVE("plots");
              if (strcmp(dupp, "PS") == 0)
-	        out->type = SC_strsavef("monochrome",
-					 "char*:SX_INSTALL_DEVICE_VARS:type");
+	        out->type = CSTRSAVE("monochrome");
              else
-	        out->type = SC_strsavef("RGB",
-					 "char*:SX_INSTALL_DEVICE_VARS:type");
+	        out->type = CSTRSAVE("RGB");
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: When TRUE print will generate a plot in a %s file",
 				 dupp);
@@ -985,7 +981,7 @@ void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
 
 /* figure out the runtime file */
     if (SC_query_file(ffn, "r", "ascii"))
-       s = SC_strsavef(ffn, "char*:SX_LOAD_RC:s");
+       s = CSTRSAVE(ffn);
 
     else
        {s = SC_search_file(NULL, ffn);
@@ -997,13 +993,13 @@ void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
 /* load the runtime file */
     SS_load_scm(s);
 
-    SFREE(s);
+    CFREE(s);
 
 /* figure out the init file */
     if (ldrc == TRUE)
        {s = SC_search_file(NULL, ifna);
 	if ((s == NULL) || !SC_query_file(s, "r", "ascii"))
-	   {SFREE(s);
+	   {CFREE(s);
 
 	    s = SC_search_file(NULL, ifnb);
 	    if (s == NULL)
@@ -1018,7 +1014,7 @@ void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
 /* load the init file */
 	SS_load_scm(s);
 
-	SFREE(s);};
+	CFREE(s);};
 
     return;}
 
@@ -1104,9 +1100,9 @@ void SX_install_global_vars(void)
     *labsp  = 0.0;
     *labts  = 8;
     *labyo  = 0.0;
-    *axslxf = SC_strsavef("%10.2g", "char*:SX_INSTALL_GLOBAL_VARS:xformat");
-    *axslyf = SC_strsavef("%10.2g", "char*:SX_INSTALL_GLOBAL_VARS:yformat");
-    *axstf  = SC_strsavef("helvetica", "char*:SX_INSTALL_GLOBAL_VARS:type_face");
+    *axslxf = CSTRSAVE("%10.2g");
+    *axslyf = CSTRSAVE("%10.2g");
+    *axstf  = CSTRSAVE("helvetica");
 
     SX_autodomain             = TRUE;
     SX_autoplot               = ON;
@@ -1122,14 +1118,11 @@ void SX_install_global_vars(void)
     SX_grid                   = OFF;
     SX_marker_orientation     = 0.0;
 
-/*    SX_palette              = SC_strsavef("spectrum",
-                                            "char*:SX_INSTALL_GLOBAL_VARS:palette"); */
+/*    SX_palette              = CSTRSAVE("spectrum"); */
     SX_phi                    = 0.0;
     SX_plot_type_size         = 12;
-    SX_plot_type_style        = SC_strsavef("medium",
-					    "char*:SX_INSTALL_GLOBAL_VARS:type_style");
-    SX_promotion_type         = SC_strsavef("none",
-					    "char*:SX_INSTALL_GLOBAL_VARS:promotion_type");
+    SX_plot_type_style        = CSTRSAVE("medium");
+    SX_promotion_type         = CSTRSAVE("none");
     SX_render_def             = PLOT_MESH;
     SX_render_1d_1d           = *ppty;
     SX_render_2d_1d           = PLOT_CONTOUR;
@@ -1138,16 +1131,12 @@ void SX_install_global_vars(void)
     SX_show_mouse_location    = FALSE;
     SX_show_mouse_location_x  = 0.025;
     SX_show_mouse_location_y  = 0.955;
-    SX_smooth_method          = SC_strsavef("averaging",
-					    "char*:SX_INSTALL_GLOBAL_VARS:method");
+    SX_smooth_method          = CSTRSAVE("averaging");
     SX_theta                  = 0.0;
 
-    SX_GRI_title            = SC_strsavef("PDBView Controls",
-					  "char*:SX_INSTALL_GLOBAL_VARS:GRI_title");
-    SX_GRI_type_face        = SC_strsavef("helvetica",
-					  "char*:SX_INSTALL_GLOBAL_VARS:GRI_face");
-    SX_GRI_type_style       = SC_strsavef("medium",
-					  "char*:SX_INSTALL_GLOBAL_VARS:GRI_style");
+    SX_GRI_title            = CSTRSAVE("PDBView Controls");
+    SX_GRI_type_face        = CSTRSAVE("helvetica");
+    SX_GRI_type_style       = CSTRSAVE("medium");
     SX_GRI_type_size        = 12;
 
     SS_interactive = FALSE;

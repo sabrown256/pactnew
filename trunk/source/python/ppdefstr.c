@@ -66,7 +66,7 @@ static PP_descr *_PP_get_defstr_descr(PP_file *fileinfo, PyObject *obj)
 
     dp = _PD_lookup_type("DEFSTR", PP_vif->host_chart); 
 
-    descr = MAKE(PP_descr);
+    descr = CMAKE(PP_descr);
     descr->typecode = PP_UNKNOWN_I;
     descr->bpi = dp->size;
     descr->type = dp->type;
@@ -134,7 +134,7 @@ defstr *PP_defstr_alt(PDBfile *file, char *name, PyObject *members)
     if (nmemb == -1)
         return NULL;
 
-    list = MAKE_N(char *, nmemb);
+    list = CMAKE_N(char *, nmemb);
 
     /* create list of names */
     for (i = 0; i < nmemb; i++) {
@@ -151,7 +151,7 @@ defstr *PP_defstr_alt(PDBfile *file, char *name, PyObject *members)
         PP_error_from_pdb();
 
     /* clean up list */
-    SFREE(list);
+    CFREE(list);
 
     return dp;
 }
@@ -166,7 +166,7 @@ PP_defmap *_PP_mk_defmap(PyTypeObject *defctor, defstr *dp)
 {
     PP_defmap *map;
 
-    map = FMAKE(PP_defmap, "_PP_mk_defmap");
+    map = CMAKE(PP_defmap);
 
     map->defctor = defctor;
     map->dp = dp;
@@ -189,7 +189,7 @@ void _PP_rl_defmap(PP_defmap *map)
         _PD_rl_descriptor(map->dp);
     }
 
-    SFREE(map);
+    CFREE(map);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -267,8 +267,8 @@ PP_defstr_ctor_tp_init(PP_pdbdataObject *self, PyObject *args, PyObject *kwds)
  err:
 /* XXX   PD_free(file, ts, vr); */
     (void) _PP_rel_syment(dpobj->host_chart, vr, number, ts);
-    SFREE(vr);
-/* XXX  SFREE(ts); */
+    CFREE(vr);
+/* XXX  CFREE(ts); */
     _PD_rl_dimensions(dims);
 
     return -1;
@@ -544,10 +544,10 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
     }
 
     /* get base type */
-    ts = SC_strsavef(type, "PP_pdbdata_init:ts0");
+    ts = CSTRSAVE(type);
     strtok(ts, " *()[");
     dpobj = _PP_defstr_find_singleton(ts, NULL, fileinfo);
-    SFREE(ts);
+    CFREE(ts);
     if (dpobj == NULL)
         return NULL;
 
@@ -559,10 +559,10 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
         dp = (defstr *) SC_hasharr_def_lookup(file->host_chart, type);
         break;
     case 1:
-        dtype = SC_dereference(SC_strsave(type));
+        dtype = SC_dereference(CSTRSAVE(type));
         dp = (defstr *) SC_hasharr_def_lookup(file->host_chart, dtype);
         vr = DEREF(vr);
-        SFREE(dtype);
+        CFREE(dtype);
         break;
     default:
         PP_error_set_user(NULL, "Too many levels of indirection: %s",
@@ -587,10 +587,10 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
                          Py_None, NULL);
 
             /* get base type */
-            ts = SC_strsavef(ttype, "PP_getattr_from_defstr:ts0");
+            ts = CSTRSAVE(ttype);
             strtok(ts, " *()[");
             dpobj = _PP_defstr_find_singleton(ts, NULL, fileinfo);
-            SFREE(ts);
+            CFREE(ts);
             if (dpobj == NULL)
                 return NULL;
 

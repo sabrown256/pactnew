@@ -181,7 +181,7 @@ sql_table *_SQLITE_query(FILE *fp, char *sql, char *delim, int add)
 
 	SC_array_string_add(arr, NULL);
 
-	SFREE(tab->table);
+	CFREE(tab->table);
 	tab->table = SC_array_done(arr);};
 
     return(tab);}
@@ -328,7 +328,7 @@ FILE *_SQLITE_open(PDBfile *file, char *name, char *mode)
        _SQLITE_error(ok, "connection");
 
     else
-       {fs       = FMAKE(sql_file, "_SQLITE_DB_OPEN:fs");
+       {fs       = CMAKE(sql_file);
 	fs->conn = (FILE *) conn;
 	fs->sys  = &_SQLITE_cmd;
 

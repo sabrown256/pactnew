@@ -156,7 +156,7 @@ sql_table *_MYSQL_query(FILE *fp, char *sql, char *delim, int add)
 
 	    SC_array_string_add(arr, NULL);
 
-	    SFREE(tab->table);
+	    CFREE(tab->table);
 	    tab->table = SC_array_done(arr);};};
 
     return(tab);}
@@ -309,7 +309,7 @@ FILE *_MYSQL_open(PDBfile *file, char *name, char *mode)
 	    if (st != 0)
 	       _MYSQL_error(conn, "set names");
 
-	    fs       = FMAKE(sql_file, "_MYSQL_DB_OPEN:fs");
+	    fs       = CMAKE(sql_file);
 	    fs->conn = (FILE *) conn;
 	    fs->sys  = &_MYSQL_cmd;
 

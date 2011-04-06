@@ -56,7 +56,7 @@ static int ts_free(void *a)
 
     if (a != NULL)
        {t = (ts1 *) a;
-	SFREE(t->c);};
+	CFREE(t->c);};
 
     SC_LEAVING;
 
@@ -124,9 +124,9 @@ static int test_1(void)
 	 err += (ib[na+i] != ia[i]);
 	 err += (db[na+i] != da[i]);};
     
-    SFREE(cb);
-    SFREE(ib);
-    SFREE(db);
+    CFREE(cb);
+    CFREE(ib);
+    CFREE(db);
 
     SC_free_array(ac, NULL);
     SC_free_array(ai, NULL);
@@ -152,9 +152,9 @@ static int test_2(void)
 
     na = 3;
     for (i = 0; i < na; i++)
-        {ca[i] = FMAKE(char, "TEST_2:ca[i]");
-	 ia[i] = FMAKE(int, "TEST_2:ia[i]");
-	 da[i] = FMAKE(double, "TEST_2:da[i]");
+        {ca[i] = CMAKE(char);
+	 ia[i] = CMAKE(int);
+	 da[i] = CMAKE(double);
 
 	 *ca[i] = 'a' + i;
 	 *ia[i] = 10 + i;
@@ -203,9 +203,9 @@ static int test_2(void)
 	 err += (*ib[na+i] != *ia[i]);
 	 err += (*db[na+i] != *da[i]);};
     
-    SFREE(cb);
-    SFREE(ib);
-    SFREE(db);
+    CFREE(cb);
+    CFREE(ib);
+    CFREE(db);
 
     SC_free_array(ac, SC_array_free_n);
     SC_free_array(ai, SC_array_free_n);
@@ -258,7 +258,7 @@ static int test_3(void)
         {err += (sb[i].n != sa[i].n);
 	 err += (strcmp(sb[i].c, sa[i].c) != 0);}
     
-    SFREE(sb);
+    CFREE(sb);
 
     SC_free_array(as, NULL);
 
@@ -281,9 +281,9 @@ static int test_4(void)
 
     na = 3;
 
-    sa[0].c = SC_strsavef("hello", "char*:TEST_4:c");
-    sa[1].c = SC_strsavef(" ", "char*:TEST_4:c");
-    sa[2].c = SC_strsavef("world", "char*:TEST_4:c");
+    sa[0].c = CSTRSAVE("hello");
+    sa[1].c = CSTRSAVE(" ");
+    sa[2].c = CSTRSAVE("world");
 
     as = SC_MAKE_ARRAY("TEST_4", ts1, NULL);
 
@@ -313,7 +313,7 @@ static int test_4(void)
         {err += (sb[i].n != sa[i].n);
 	 err += (strcmp(sb[i].c, sa[i].c) != 0);}
     
-    SFREE(sb);
+    CFREE(sb);
 
     SC_free_array(as, ts_free);
 
@@ -334,15 +334,15 @@ static int test_5(void)
     SC_ENTERING;
 
     na = 3;
-    sa = FMAKE_N(ts1 *, na, "TEST_5:sa");
+    sa = CMAKE_N(ts1 *, na);
 
     for (i = 0; i < na; i++)
-        {sa[i] = FMAKE(ts1, "TEST_5:sa[i]");
+        {sa[i] = CMAKE(ts1);
 	 sa[i]->n = i;};
 
-    sa[0]->c = SC_strsavef("hello", "char*:TEST_5:c");
-    sa[1]->c = SC_strsavef(" ", "char*:TEST_5:c");
-    sa[2]->c = SC_strsavef("world", "char*:TEST_5:c");
+    sa[0]->c = CSTRSAVE("hello");
+    sa[1]->c = CSTRSAVE(" ");
+    sa[2]->c = CSTRSAVE("world");
 
     as = SC_MAKE_ARRAY("TEST_5", ts1 *, NULL);
 
@@ -374,11 +374,11 @@ static int test_5(void)
     
 /* cleanup */
     for (i = 0; i < na; i++)
-        {SFREE(sa[i]->c);
-         SFREE(sa[i]);};
-    SFREE(sa);
+        {CFREE(sa[i]->c);
+         CFREE(sa[i]);};
+    CFREE(sa);
 
-    SFREE(sb);
+    CFREE(sb);
 
     SC_free_array(as, ts_free);
 
@@ -462,7 +462,7 @@ static void test_7_add(SC_array *ia, int n, int recy)
  * pointer will be available
  */
     if (recy == TRUE)
-       {pi = FMAKE_N(int, ni, "TEST_7_ADD:pi");
+       {pi = CMAKE_N(int, ni);
 	for (i = 0; i < ni; i++)
 	    pi[i] = 100;};
 
@@ -504,7 +504,7 @@ static int test_7(void)
 /* there should be 10 differences */
     err = (err != 10);
 
-    SFREE(pi);
+    CFREE(pi);
 
     SC_free_array(ia, NULL);
 
@@ -532,7 +532,7 @@ static int test_8(void)
     da = SC_MAKE_ARRAY("TEST_8", double, NULL);
     SC_array_resize(da, na, -1.0);
 
-    dp = FMAKE_N(double, na, "TEST_8:dp");
+    dp = CMAKE_N(double, na);
 
 /* time setting DP */
     lm = 0;
@@ -593,7 +593,7 @@ static int test_8(void)
 	   (double) lg, 1.0e6*tg/((double) lg), rg);
 
     SC_free_array(da, NULL);
-    SFREE(dp);
+    CFREE(dp);
 
     SC_LEAVING;
 

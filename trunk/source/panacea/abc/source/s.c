@@ -118,7 +118,7 @@ int main(int c, char **v)
     PA_proc_units();
     inst_s();
     srctab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
-    PAN_SOURCE = SC_strsave("source");
+    PAN_SOURCE = CSTRSAVE("source");
  
 /* create the pdb file */
     strcpy(s, fname);

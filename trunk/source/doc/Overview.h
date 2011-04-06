@@ -1,5 +1,5 @@
 TXT: PACT Overview
-MOD: 12/19/2005
+MOD: 04/06/2011
 
 <blockquote>
 
@@ -189,7 +189,7 @@ The list of designators for the PACT tools is:
 <TR>
 <TD WIDTH="80">SCORE</TD>
 <TD ALIGN="CENTER">SC</TD>
-<TD>SC_strsave</TD>
+<TD>CSTRSAVE</TD>
 </TR>
 <TR>
 <TD WIDTH="80">PPC</TD>

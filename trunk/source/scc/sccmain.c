@@ -88,8 +88,8 @@ int main(int c, char **v, char **env)
     cmp = USE_COMPILER;
     ret = TRUE;
 
-    args  = FMAKE_N(char *, c+1, "MAIN:args");
-    files = FMAKE_N(char *, c+1, "MAIN:files");
+    args  = CMAKE_N(char *, c+1);
+    files = CMAKE_N(char *, c+1);
 
 /* process the command line arguments */
     for (i = 1, j = 0, l = 0; i < c; i++)
@@ -124,8 +124,8 @@ int main(int c, char **v, char **env)
 
     CC_finish();
 
-    SFREE(args);
-    SFREE(files);
+    CFREE(args);
+    CFREE(files);
 
     if (dbg > 0)	
        cs = SC_mem_monitor(cs, dbg, "CC", msg);

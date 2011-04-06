@@ -18,7 +18,7 @@
 double *get_temp(int ni, char *name)
    {double *d;
 
-    d = FMAKE_N(double, ni, name);
+    d = CMAKE_N(double, ni);
 
     return(d);}
 
@@ -28,7 +28,7 @@ double *get_temp(int ni, char *name)
 double *rel_temp(double *d)
    {
 
-    SFREE(d);
+    CFREE(d);
 
     return(d);}
 
@@ -95,10 +95,10 @@ static int test_omp(int nt, int nd, int ni)
     SC_ASSERT(tid == -1);
 
 /* allocate something trivial to initialize the heap for this thread */
-    mem = FMAKE_N(char, 1, "MAIN:mem");
-    SFREE(mem);
+    mem = CMAKE_N(char, 1);
+    CFREE(mem);
 
-    dptr = FMAKE_N(double *, 11, "MAIN:dptr");
+    dptr = CMAKE_N(double *, 11);
 
     for (i = 0; i < ni; i++)
         {i++;
@@ -166,7 +166,7 @@ static int test_omp(int nt, int nd, int ni)
 
     io_printf(stdout, "ok\n\n");
 
-    SFREE(dptr);
+    CFREE(dptr);
 
 #endif
 

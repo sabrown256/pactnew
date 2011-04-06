@@ -825,7 +825,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
     else if (kndi == INT_KIND)
        {long *lv;
 
-	lv   = FMAKE_N(long, nitems, "_PD_BIN_TEXT:lv");
+	lv   = CMAKE_N(long, nitems);
 	tout = (char *) lv;
 
 	_PD_iconvert(&tout, in, nitems, nbi, ordi, nbl, ordl, onescmp, usg);
@@ -839,7 +839,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
         for (p = lout, i = 0; i < nitems; p += nbo, i++)
 	    snprintf(p, nbo+1, fmt, lv[i]);
 
-	SFREE(lv);
+	CFREE(lv);
 
 	*out += nbo*nitems;}
 
@@ -847,7 +847,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
     else if (kndi == FLOAT_KIND)
        {double *dv;
 
-	dv   = FMAKE_N(double, nitems, "_PD_BIN_TEXT:dv");
+	dv   = CMAKE_N(double, nitems);
 	tout = (char *) dv;
 
 	_PD_fconvert(&tout, in, nitems, boffs,
@@ -865,7 +865,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
         for (p = lout, i = 0; i < nitems; p += nbo, i++)
 	    snprintf(p, nbo+1, fmt, dv[i]);
 
-	SFREE(dv);
+	CFREE(dv);
 
 	*out += nbo*nitems;};
 
@@ -933,7 +933,7 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
     else if (kndi == INT_KIND)
        {long *lv;
 
-	lv = FMAKE_N(long, nitems, "_PD_TEXT_BIN:lv");
+	lv = CMAKE_N(long, nitems);
 
         for (i = 0; i < nitems; i++)
 	    {p = strdelim(lin, delim);
@@ -947,13 +947,13 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
 	tin = (char *) lv;
 	_PD_iconvert(out, &tin, nitems, nbl, ordl, nbo, ordo, onescmp, usg);
 
-	SFREE(lv);}
+	CFREE(lv);}
 
 /* convert floating point types */
     else if (kndi == FLOAT_KIND)
        {double *dv;
 
-	dv = FMAKE_N(double, nitems, "_PD_TEXT_BIN:dv");
+	dv = CMAKE_N(double, nitems);
 
 	for (i = 0; i < nitems; i++)
 	    {p = strdelim(lin, delim);
@@ -969,7 +969,7 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
 		     hfmt, hord, ofmt, oord,
 		     ordl, nbl, onescmp);
 
-	SFREE(dv);};
+	CFREE(dv);};
 
     *in = lin;
 
@@ -1943,11 +1943,11 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
                 rout[indxout] = 0;};};
 
     if (*in == freorder)
-       {SFREE(freorder);
+       {CFREE(freorder);
         *in = inrsave;};
 
     if (*in == aligned)
-       {SFREE(aligned);
+       {CFREE(aligned);
         *in = insave;};
 
     if (out_freorder == TRUE)
@@ -1961,7 +1961,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
         _PD_field_reorder(*out, freorder, tformat, outfor, outord,
                           l_order, l_bytes, ni);
         memcpy(*out, freorder, ni*bpio);
-        SFREE(freorder);};
+        CFREE(freorder);};
 
 
 /* put the output bytes into the specified order */
@@ -2112,7 +2112,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
             if (onescmp)
                _PD_ones_complement(*out, nitems, onb, intord);
 
-            SFREE(intord);
+            CFREE(intord);
 
 	    *in        += nbi;
 	    *out       += nbo;
