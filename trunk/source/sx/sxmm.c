@@ -21,7 +21,7 @@
 g_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
    {g_pdbdata *pp;
 
-    pp = FMAKE(g_pdbdata, "_SX_MK_PDBDATA:pp");
+    pp = CMAKE(g_pdbdata);
 
     SC_mark(data, 1);
     SC_mark(ep, 1);
@@ -173,7 +173,7 @@ static void _SX_wr_gfile(object *obj, object *strm)
 g_file *_SX_mk_file(char *name, char *type, void *file)
    {g_file *po;
 
-    po = FMAKE(g_file, "_SX_MK_FILE:po");
+    po = CMAKE(g_file);
 
     SC_mark(file, 1);
 

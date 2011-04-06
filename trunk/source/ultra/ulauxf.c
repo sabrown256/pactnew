@@ -51,7 +51,7 @@ static object *_UL_fft(object *argl, char *type, int no, int flag, int ordr)
     n  = PM_near_power(n0, 2);
 
 /* make an array of complex values out of the real and imaginary values */
-    icy = FMAKE_N(complex, n0, "_UL_FFT:icy");
+    icy = CMAKE_N(complex, n0);
     for (i = 0; i < n0; i++)
         icy[i] = PM_COMPLEX(ypr[i], ypi[i]);
 
@@ -61,7 +61,7 @@ static object *_UL_fft(object *argl, char *type, int no, int flag, int ordr)
 
     no += n;
 
-    y = FMAKE_N(double, no, "_UL_FFT:y");
+    y = CMAKE_N(double, no);
 
 /* extract the real part */
     for (i = 0; i < no; i++)
@@ -109,7 +109,7 @@ object *UL_fft(int j)
     if (n == 0)
        SS_error("FFT FAILED - UL_FFT", SS_null);
 
-    y = FMAKE_N(double, n, "UL_FFT:y");
+    y = CMAKE_N(double, n);
     if (y == NULL)
        SS_error("INSUFFICIENT MEMORY - UL_FFT", SS_null);
 
@@ -490,7 +490,7 @@ static object *_ULI_fit_curve(object *argl)
     argl  = SS_cdr(argl);
     order = SS_length(argl);
     aord  = abs(order) + 1;
-    curid = FMAKE_N(int, order, "_ULI_FIT_CURVE:curid");
+    curid = CMAKE_N(int, order);
     for (i = 0; i < order; i++, argl = SS_cdr(argl))
         curid[i] = SX_get_crv_index_i(SS_car(argl));
         
@@ -556,7 +556,7 @@ static object *_ULI_fit_curve(object *argl)
     PM_destroy(ay);
     ay = PM_times(a, solution);
 
-    UL_buf1y = FMAKE_N(double, n, "_ULI_FIT_CURVE:buf1y");
+    UL_buf1y = CMAKE_N(double, n);
     for (i = 1; i <= n; i++)
         UL_buf1y[i-1] = PM_element(ay, i, 1);
 
@@ -776,7 +776,7 @@ static object *_ULI_edit(int ie)
     x[0]   = crv->x[0];
     x[1]   = crv->x[1];
 
-    indx = FMAKE_N(char, n, "_ULI_EDIT:indx");
+    indx = CMAKE_N(char, n);
 
 /* remember the original curve's color */
     PG_get_attrs_alist(ocv->info,

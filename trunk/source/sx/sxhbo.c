@@ -176,9 +176,9 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
     nde = sd->dimension_elem;
 
 /* get the number of bytes per component of a range element */
-    dmx    = FMAKE_N(int, nd, "_SX_BUILD_COMMON_DOMAIN:dmx");
-    dextr  = FMAKE_N(double, 2*nde, "_SX_BUILD_COMMON_DOMAIN:dextr");
-    sdextr = FMAKE_N(double, 2*nde, "_SX_BUILD_COMMON_DOMAIN:sdextr");
+    dmx    = CMAKE_N(int, nd);
+    dextr  = CMAKE_N(double, 2*nde);
+    sdextr = CMAKE_N(double, 2*nde);
     for (i = 0; i < nde; i++)
         {dextr[2*i]   = HUGE;
          dextr[2*i+1] = -HUGE;};
@@ -443,15 +443,14 @@ static PM_mapping *_SX_build_accumulator_mapping(PM_set *domain,
     ne = domain->n_elements;
     dm = domain->max_index;
 
-    maxes = FMAKE_N(int, nd, "_SX_BUILD_ACCUMULATOR_MAPPING:maxes");
+    maxes = CMAKE_N(int, nd);
     for (i = 0; i < nd; i++)
         maxes[i] = dm[i];
 
     nbe *= ne;
-    elem = FMAKE_N(void *, nde, "_SX_BUILD_ACCUMULATOR_MAPPING:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
-        elem[i] = FMAKE_N(char, nbe,
-                          "_SX_BUILD_ACCUMULATOR_MAPPING:elem[]");
+        elem[i] = CMAKE_N(char, nbe);
 
     set = PM_mk_set(range->name, type, FALSE,
 		    ne, nd, range->dimension_elem,
@@ -575,7 +574,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
     dty  = dr->es_type;
 
 /* setup accumulators for each component */
-    acc = FMAKE_N(C_array *, dnde, "_SX_ACCUMULATE_RANGE:acc");
+    acc = CMAKE_N(C_array *, dnde);
     for (i = 0; i < dnde; i++)
         acc[i] = NULL;
 
@@ -698,8 +697,8 @@ PM_set *SX_build_restricted_domain(PM_set *hd, object *argl)
        SS_error("DOMAIN DIMENSION MISMATCH - SX_BUILD_RESTRICTED_DOMAIN",
 		argl);
 
-    extr  = FMAKE_N(double, ne, "SX_BUILD_RESTRICTED_DOMAIN:extr");
-    maxes = FMAKE_N(int, nd, "SX_BUILD_RESTRICTED_DOMAIN:maxes");
+    extr  = CMAKE_N(double, ne);
+    maxes = CMAKE_N(int, nd);
 
     PM_array_real(hd->element_type, hd->extrema, ne, extr);
 
@@ -792,8 +791,8 @@ static PM_set *SX_build_lr_domain(PM_set *hd, object *argl)
 
     ne = 2*nd;
 
-    extr  = FMAKE_N(double, ne, "SX_BUILD_LR_DOMAIN:extr");
-    maxes = FMAKE_N(int, nd, "SX_BUILD_LR_DOMAIN:maxes");
+    extr  = CMAKE_N(double, ne);
+    maxes = CMAKE_N(int, nd);
 
     PM_array_real(hd->element_type, hd->extrema, ne, extr);
 

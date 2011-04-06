@@ -567,7 +567,7 @@ static object *_SXI_def_var(object *argl)
                                  "BAD UNIT - _SXI_DEF_VAR");
         if ((dm == PER) || (dm == UNITS))
            break;
-        pv  = FMAKE(int, "_SXI_DEF_VAR:pv");
+        pv  = CMAKE(int);
         *pv = dm;
         nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
         if (nu == NULL)
@@ -584,7 +584,7 @@ static object *_SXI_def_var(object *argl)
            if (dm == UNITS)
               break;
 
-           pv  = FMAKE(int, "_SXI_DEF_VAR:pv");
+           pv  = CMAKE(int);
            *pv = dm;
            nxt = SC_mk_pcons(SC_INT_P_S, pv, SC_PCONS_P_S, NULL);
            if (du == NULL)

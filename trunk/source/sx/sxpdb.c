@@ -1745,7 +1745,7 @@ static object *_SXI_def_prim(object *argl)
         if (no != bytespitem)
            SS_error("INCONSISTENT SIZE - _SXI_DEF_PRIM", ord);
 
-        ordr = FMAKE_N(int, no, "_SXI_DEF_PRIM:ordr");
+        ordr = CMAKE_N(int, no);
         for (i = 0L; i < no; i++, ord = SS_cdr(ord))
             ordr[i] = SS_INTEGER_VALUE(SS_car(ord));
 
@@ -1805,7 +1805,7 @@ static object *_SXI_chg_prim(object *argl)
     if (no != nb)
        SS_error("INCONSISTENT SIZE - _SXI_CHG_PRIM", ord);
 
-    ordr = FMAKE_N(int, no, "_SXI_CHG_PRIM:ordr");
+    ordr = CMAKE_N(int, no);
     for (i = 0L; i < no; i++, ord = SS_cdr(ord))
         ordr[i] = SS_INTEGER_VALUE(SS_car(ord));
 
@@ -3229,7 +3229,7 @@ object *SX_pdbdata_handler(PDBfile *file, char *name, char *type,
  */
        {if (_PD_indirection(type))
            {char **p;
-            p  = FMAKE(char *, "SX_PDBDATA_HANDLER:p");
+            p  = CMAKE(char *);
             *p = DEREF(vr);
             data.memaddr = (char *) p;
 	    SC_mark(*p, 1);
@@ -3739,7 +3739,7 @@ static object *_SXI_index_to_expr(object *argl)
        SS_error("BAD FILE - _SXI_INDEX_TO_EXPR", argl);
 
     if (file != NULL)
-       {s = FMAKE_N(char, MAXLINE, "char*:_SXI_INDEX_TO_EXPR:s");
+       {s = CMAKE_N(char, MAXLINE);
 
 	ep = _PD_effective_ep(file, name, TRUE, path);
 	if (ep != NULL)

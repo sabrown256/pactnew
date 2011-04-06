@@ -492,7 +492,7 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
     fp_pre = _SC.types.fp_precision;
 
     if (SX_disp_individ_diff == TRUE)
-       indx = FMAKE_N(char, ni, "_SX_DIFF_PRIMITIVES:indx");
+       indx = CMAKE_N(char, ni);
     else
        indx = NULL;
 

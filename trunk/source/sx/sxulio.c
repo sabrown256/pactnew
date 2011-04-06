@@ -365,13 +365,13 @@ static void SX_read_bin(FILE *fp, char *fname)
         read_int(n, fp);
 
         SX_dataset[j].n = n;
-        SX_dataset[j].x[0] = FMAKE_N(double, n, "SX_READ_BIN:x[0]");
-        SX_dataset[j].x[1] = FMAKE_N(double, n, "SX_READ_BIN:x[1]");
+        SX_dataset[j].x[0] = CMAKE_N(double, n);
+        SX_dataset[j].x[1] = CMAKE_N(double, n);
         if ((SX_dataset[j].x[0] == NULL) || (SX_dataset[j].x[1] == NULL))
            SS_error("INSUFFICIENT MEMORY - READ_BIN", SS_null);
 
 /* set up the file info for this curve */
-        pbi = FMAKE(bin_info, "SX_READ_BIN:pbi");
+        pbi = CMAKE(bin_info);
         pbi->stream = fp;
         pbi->fileaddr = io_tell(fp);
 
@@ -471,8 +471,8 @@ static void SX_read_text(FILE *fp, char *fname)
 
 /* allocate space for buffer */
 	     csz = MAXPTS;
-	     x[0] = xb[0] = FMAKE_N(double, csz, "SX_READ_TEXT:x[0]");
-	     x[1] = xb[1] = FMAKE_N(double, csz, "SX_READ_TEXT:x[1]");}
+	     x[0] = xb[0] = CMAKE_N(double, csz);
+	     x[1] = xb[1] = CMAKE_N(double, csz);}
 	 else
             {if ((x[0] == NULL) || (x[1] == NULL))
                 continue;
@@ -592,7 +592,7 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
 	        {icurve++;
 
 /* set up the file info for this curve */
-		 ppi = FMAKE(pdb_info, "SX_READ_PDB:ppi");
+		 ppi = CMAKE(pdb_info);
 		 ppi->file = fp;
 		 ppi->curve_name = SC_strsavef(names[i],
 					       "char*:SX_READ_PDB:cur_name");
@@ -750,7 +750,7 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
     else
        nafter = -nlab;
 
-    addr = FMAKE_N(int64_t, nbefore+1, "SX_FIND_TEXT_TABLE:addr");
+    addr = CMAKE_N(int64_t, nbefore+1);
 
     nr  = 0;
     nc  = 0;
@@ -983,7 +983,7 @@ static double *SX_extract_vector(PM_matrix *a, int o, int s, int n)
     double *val, *src;
 
     src = a->array + o;
-    val = FMAKE_N(double, n, "SX_EXTRACT_VECTOR:val");
+    val = CMAKE_N(double, n);
     for (i = 0; i < n; i++)
         val[i] = src[i*s];
 
@@ -1023,7 +1023,7 @@ object *SX_table_curve(object *argl)
        xa = SX_extract_vector(_SX.current_table, xo, xs, na);
     else
        {xo = 0;
-        xa = FMAKE_N(double, na, "SX_TABLE_CURVE:xa");
+        xa = CMAKE_N(double, na);
         for (k = 0; k < na; k++)
             xa[k] = (double) (k+1);};
 
@@ -1389,7 +1389,7 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
 
 	     snprintf(bf, MAXLINE, "curve%04d", _SX.icc);
 
-	     ppi = FMAKE(pdb_info, "SX_CACHE_CURVE:ppi");
+	     ppi = CMAKE(pdb_info);
 	     ppi->file       = _SX.cache_file;
 	     ppi->curve_name = SC_strsavef(bf, "char*:SX_CACHE_CURVE:bf");
 

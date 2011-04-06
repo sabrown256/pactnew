@@ -118,18 +118,12 @@ void SX_enlarge_dataset(PFVoid eval)
        _SX.cproc = _SS_mk_C_proc_va(SS_sargs, 1, eval);
 
     if (nc == 0)
-       {SX_dataset    = FMAKE_N(curve, NCURVE,
-				"SX_ENLARGE_DATASET:dataset");
-        SX_number     = FMAKE_N(int, NCURVE,
-				"SX_ENLARGE_DATASET:number");
-        SX_data_index = FMAKE_N(int, NCURVE,
-				"SX_ENLARGE_DATASET:data_index");
-	_SX.crv_obj   = FMAKE_N(object *, NCURVE,
-				"SX_ENLARGE_DATASET:crv_obj");
-	_SX.crv_proc  = FMAKE_N(object *, NCURVE,
-				"SX_ENLARGE_DATASET:crv_proc");
-	_SX.crv_varbl = FMAKE_N(object *, NCURVE,
-                                "SX_ENLARGE_DATASET:crv_varbl");
+       {SX_dataset    = CMAKE_N(curve, NCURVE);
+        SX_number     = CMAKE_N(int, NCURVE);
+        SX_data_index = CMAKE_N(int, NCURVE);
+	_SX.crv_obj   = CMAKE_N(object *, NCURVE);
+	_SX.crv_proc  = CMAKE_N(object *, NCURVE);
+	_SX.crv_varbl = CMAKE_N(object *, NCURVE);
 
         SX_N_Curves += NCURVE;}
 
@@ -422,8 +416,8 @@ object *SX_mk_curve(int na, double *xa, double *ya,
 
     xj[0] = xa;
     xj[1] = ya;
-    xi[0] = SX_dataset[i].x[0] = FMAKE_N(double, na, "SX_MK_CURVE:xi[0]");
-    xi[1] = SX_dataset[i].x[1] = FMAKE_N(double, na, "SX_MK_CURVE:xi[1]");
+    xi[0] = SX_dataset[i].x[0] = CMAKE_N(double, na);
+    xi[1] = SX_dataset[i].x[1] = CMAKE_N(double, na);
     if (xi[0] == NULL || xi[1] == NULL)
        SS_error("OUT OF MEMORY - CREATE_CURVE", SS_null);
 

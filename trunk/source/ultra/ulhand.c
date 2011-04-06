@@ -732,8 +732,8 @@ object *UL_bc(C_procedure *cp, object *argl)
 		return(ch);};};
 
         n1 = SX_dataset[i].n;
-        UL_buf1x = FMAKE_N(double, n1, "UL_BC:buf1x");
-        UL_buf1y = FMAKE_N(double, n1, "UL_BC:buf1y");
+        UL_buf1x = CMAKE_N(double, n1);
+        UL_buf1y = CMAKE_N(double, n1);
 
 /* copy the curve data into the buffer
  * this protects against hacking the curve
@@ -750,8 +750,8 @@ object *UL_bc(C_procedure *cp, object *argl)
         xp1 = UL_buf1x;
         yp1 = UL_buf1y;};
         
-    UL_buf2x = FMAKE_N(double, 1, "UL_BC:buf2x");
-    UL_buf2y = FMAKE_N(double, 1, "UL_BC:buf2y");
+    UL_buf2x = CMAKE_N(double, 1);
+    UL_buf2y = CMAKE_N(double, 1);
 
     na = n1;
     xa = xp1;
@@ -867,8 +867,8 @@ object *UL_bcxl(C_procedure *cp, object *argl)
     else
        {snprintf(local, MAXLINE, "@%d", SX_dataset[i].id);}
 
-    UL_buf1x = FMAKE_N(double, n, "UL_BCXL:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "UL_BCXL:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
     for (j = 0; j < n; j++)                          /* copy to accumulator */
         {UL_buf1x[j] = x[0][j];
          UL_buf1y[j] = x[1][j];};

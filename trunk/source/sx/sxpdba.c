@@ -134,7 +134,7 @@ static object *_SXI_set_attr_val(object *argl)
     else if ((id == SC_STRING_I) && (SS_stringp(obj)))
         {char **cv;
 
-         cv   = FMAKE(char *, "_SXI_SET_ATTR_VAL:cv");
+         cv   = CMAKE(char *);
          *cv  = SC_strsavef(SS_STRING_TEXT(obj),
                 "char*:_SXI_SET_ATTR_VAL:cv");
          data = (void *) cv;}
@@ -142,7 +142,7 @@ static object *_SXI_set_attr_val(object *argl)
     else if (id == SC_CHAR_I)
         {char *cv;
 
-         cv = FMAKE(char, "_SXI_SET_ATTR_VAL:cv");
+         cv = CMAKE(char);
          if (SS_charobjp(obj))
             *cv = SS_CHARACTER_VALUE(obj);
          else
@@ -153,7 +153,7 @@ static object *_SXI_set_attr_val(object *argl)
     else if ((id == SC_INT_I) && (SS_numbp(obj)))
         {int *iv;
 
-         iv = FMAKE(int, "_SXI_SET_ATTR_VAL:iv");
+         iv = CMAKE(int);
          if (SS_integerp(obj))
             *iv = SS_INTEGER_VALUE(obj);
          else 
@@ -164,7 +164,7 @@ static object *_SXI_set_attr_val(object *argl)
     else if ((id == SC_DOUBLE_I) && (SS_numbp(obj)))
         {double *dv;
 
-         dv = FMAKE(double, "_SXI_SET_ATTR_VAL:dv");
+         dv = CMAKE(double);
          if (SS_integerp(obj))
             *dv = SS_INTEGER_VALUE(obj);
          else 
@@ -266,7 +266,7 @@ static object *_SXI_lst_attr(object *argl)
        return(SS_null);
 
     ne      = SC_hasharr_get_n(tab);
-    entries = FMAKE_N(char *, ne, "_SXI_LST_ATTR:entries");
+    entries = CMAKE_N(char *, ne);
     if (entries == NULL)
        SS_error("CAN'T ALLOCATE MEMORY - _SXI_LST_ATTR", SS_null);
 
