@@ -159,10 +159,9 @@ static void _UL_fix_text_buf(PG_text_box *fileBox, PG_text_box *screenBox)
                fileBox->n_chars_line : screenBox->n_chars_line;
 
 /* allocate the space */
-    bf = FMAKE_N(char *, n_lines, "_UL_FIX_TEXT_BUF:bf");
+    bf = CMAKE_N(char *, n_lines);
     for (i = 0; i < n_lines; i++)
-        bf[i] = FMAKE_N(char, n_chars,
-                        "_UL_FIX_TEXT_BUF:bf[]");
+        bf[i] = CMAKE_N(char, n_chars);
 
 /* copy the contents
  * don't copy more strings than we've got; free up old string space
@@ -202,19 +201,13 @@ static void _UL_print_curve_labels(PG_device *dev, int *mark)
 		     NULL);
 
     if (HARDCOPY_DEVICE(dev) || (labsp > 0.0))
-       {labels   = FMAKE_N(char *, SX_N_Curves,
-			   "_UL_PRINT_CURVE_LABELS:labels");
-	files    = FMAKE_N(char *, SX_N_Curves,
-			   "_UL_PRINT_CURVE_LABELS:files");
-	dataid   = FMAKE_N(int, SX_N_Curves,
-			   "_UL_PRINT_CURVE_LABELS:dataid");
-	modified = FMAKE_N(int, SX_N_Curves,
-			   "_UL_PRINT_CURVE_LABELS:modified");
-	clr      = FMAKE_N(int, SX_N_Curves,
-			   "_UL_PRINT_CURVE_LABELS:clr");
+       {labels   = CMAKE_N(char *, SX_N_Curves);
+	files    = CMAKE_N(char *, SX_N_Curves);
+	dataid   = CMAKE_N(int, SX_N_Curves);
+	modified = CMAKE_N(int, SX_N_Curves);
+	clr      = CMAKE_N(int, SX_N_Curves);
 
-        extr     = FMAKE_N(double, 4 * SX_N_Curves,
-			   "_UL_PRINT_CURVE_LABELS:extr");
+        extr     = CMAKE_N(double, 4 * SX_N_Curves);
                         
 	data  = SX_dataset;
 	nlabs = 0;

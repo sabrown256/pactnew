@@ -453,7 +453,7 @@ static PM_mapping *_SXI_norm_mapping(PM_mapping *h)
     ne  = range->n_elements;
     sre = (double **) range->elements;
 
-    dre = FMAKE_N(double, ne, "_SXI_NORM_MAPPING:dre");
+    dre = CMAKE_N(double, ne);
 
     for (j = 0; j < nde; j++)
         {pr = dre;
@@ -623,7 +623,7 @@ object *SX_plane(object *argl)
 
     plf   = SX_have_display_list();
     nd    = SS_length(argl);
-    coeff = pc = FMAKE_N(double, nd--, "SX_PLANE:coeff");
+    coeff = pc = CMAKE_N(double, nd--);
 
     SS_args(argl,
 	    SC_DOUBLE_I, pc++,
@@ -631,9 +631,9 @@ object *SX_plane(object *argl)
     argl = SS_cdr(argl);
 
 /* organize the args into input to make the domain */
-    ratio = pt = FMAKE_N(double, nd, "SX_PLANE:ratio");
-    maxes = pm = FMAKE_N(int, nd, "SX_PLANE:maxes");
-    extr  = px = FMAKE_N(double, 2*nd, "SX_PLANE:extr");
+    ratio = pt = CMAKE_N(double, nd);
+    maxes = pm = CMAKE_N(int, nd);
+    extr  = px = CMAKE_N(double, 2*nd);
     for (i = 0, ne = 0L; i < nd; i++, argl = SS_cdr(argl))
         {lst = SS_car(argl);
 	 
@@ -661,7 +661,7 @@ object *SX_plane(object *argl)
     ne    = dom->n_elements;
     delem = (double **) dom->elements;
 
-    r  = pr = FMAKE_N(double, ne, "SX_PLANE:r");
+    r  = pr = CMAKE_N(double, ne);
     for (i = 0; i < ne; i++)
         {for (j = 0, v = coeff[0]; j < nde; j++)
              {v += coeff[j+1]*delem[j][i];};
@@ -696,8 +696,8 @@ static PM_mapping *_SXI_derivative(PM_mapping *h)
 
     m = n + 5;
 
-    bx = FMAKE_N(double, m, "_SXI_DERIVATIVE:bx");
-    by = FMAKE_N(double, m, "_SXI_DERIVATIVE:by");
+    bx = CMAKE_N(double, m);
+    by = CMAKE_N(double, m);
 
     PM_derivative(n, x[0], x[1], bx, by);
 
@@ -842,7 +842,7 @@ static object *_SXI_pp_names(argl)
     object *obj;
 
     n   = SS_length(argl);
-    lst = FMAKE_N(char *, n+1, "_SXI_PP_NAMES:lst");
+    lst = CMAKE_N(char *, n+1);
 
     nchar = 0;
     for (i = 0; i < n; i++)

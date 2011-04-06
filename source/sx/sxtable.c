@@ -143,7 +143,7 @@ static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
     else
        nafter = -nlab;
 
-    addr = FMAKE_N(long, nbefore+1, "SX_FIND_TEXT_TABLE:addr");
+    addr = CMAKE_N(long, nbefore+1);
 
     nr  = 0;
     nc  = 0;
@@ -295,8 +295,8 @@ static object *_SXI_read_text_table(object *argl)
        SS_error("CAN'T READ FILE - _SXI_READ_TEXT_TABLE", argl);
 
     linelen += 10;
-    label  = FMAKE_N(char, linelen, "_SXI_READ_TEXT_TABLE:label");
-    linein = FMAKE_N(char, linelen, "_SXI_READ_TEXT_TABLE:linein");
+    label  = CMAKE_N(char, linelen);
+    linein = CMAKE_N(char, linelen);
 
     memset(label, 0, linelen);
 
@@ -370,7 +370,7 @@ static double *SX_extract_vector(PM_matrix *a, long o, long s, long n)
     double *val, *src;
 
     src = a->array + o;
-    val = FMAKE_N(double, n, "SX_EXTRACT_VECTOR:val");
+    val = CMAKE_N(double, n);
     for (i = 0L; i < n; i++)
         val[i] = src[i*s];
 
@@ -449,7 +449,7 @@ static PM_set *_SX_lr_zc_domain(char *name)
     int i, nelem;
 
     nd = 2;
-    maxes = FMAKE_N(int, nd, "_SX_LR_ZC_DOMAIN:maxes");
+    maxes = CMAKE_N(int, nd);
     maxes[0] = SX_current_table->ncol + 1;
     maxes[1] = SX_current_table->nrow + 1;
 
@@ -506,7 +506,7 @@ static PM_set *_SX_table_set(object *specs)
 
     else
        {nd    = SS_length(dims);
-	maxes = FMAKE_N(int, nd, "_SX_TABLE_SET:maxes");
+	maxes = CMAKE_N(int, nd);
 	for (i = 0; dims != SS_null; dims = SS_cdr(dims), i++)
 	    {SS_args(dims,
 		     SC_INT_I, &dv,
@@ -515,7 +515,7 @@ static PM_set *_SX_table_set(object *specs)
 
 	comps = SS_cddr(specs);
 	nde   = SS_length(comps);
-	elem  = FMAKE_N(double *, nde, "_SX_TABLE_SET:elem");
+	elem  = CMAKE_N(double *, nde);
 	ne    = 0;
 
 	for (i = 0; comps != SS_null; comps = SS_cdr(comps), i++)
@@ -782,7 +782,7 @@ static int _SX_del_label(long *cols, long ncol)
     char **temp;
 
     nc = SX_current_table->ncol;
-    temp = FMAKE_N(char *, nc, "_SX_DEL_LABEL:temp");
+    temp = CMAKE_N(char *, nc);
 
     for (i = 0, j = 0, scols = cols, ndcol = 0; i < nc; i++)
         {if (i != *scols)
@@ -834,7 +834,7 @@ static object *SX_delete_column(object *argl)
                     done = 0;};}                  
 
 /* remove duplicate entries */
-        sdata = FMAKE_N(long, ncol, "SX_DELETE_COLUMN:sdata");
+        sdata = CMAKE_N(long, ncol);
         
         sdata[0] = data[0];
         for (i = 1, j = 1; i < ncol; i++)

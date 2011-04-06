@@ -298,7 +298,7 @@ static void _UL_del_intermediate(object *cla, ...)
     object *cb, *clb, *clr, **oa;
 
     na = SS_length(cla);
-    oa = FMAKE_N(object *, na, "_UL_DEL_INTERMEDIATE:oa");
+    oa = CMAKE_N(object *, na);
 
     for (i = 0, lsta = cla; i < na; i++, lsta = SS_cdr(lsta))
         oa[i] = SS_car(lsta);
@@ -689,10 +689,8 @@ object *UL_copy_curve(int j)
 
     xpj = SX_dataset[j].x[0];
     ypj = SX_dataset[j].x[1];
-    xpi = SX_dataset[i].x[0] = FMAKE_N(double, SX_dataset[j].n,
-                             "UL_COPY_CURVE:xpi");
-    ypi = SX_dataset[i].x[1] = FMAKE_N(double, SX_dataset[j].n,
-                             "UL_COPY_CURVE:ypi");
+    xpi = SX_dataset[i].x[0] = CMAKE_N(double, SX_dataset[j].n);
+    ypi = SX_dataset[i].x[1] = CMAKE_N(double, SX_dataset[j].n);
     if (xpi == NULL || ypi == NULL)
        SS_error("INSUFFICIENT MEMORY - UL_COPY_CURVE", SS_null);
 
@@ -745,10 +743,8 @@ object *_ULI_extract_curve(object *argl)
 
     if ((SX_dataset[j].wc[0] == xpj[SX_dataset[j].n - 1]) &&
         (SX_dataset[j].wc[1] == xpj[0]))
-       {xpjtmp = FMAKE_N(double, SX_dataset[j].n,
-                         "_ULI_EXTRACT_CURVE:xpjtmp");
-        ypjtmp = FMAKE_N(double, SX_dataset[j].n,
-                         "_ULI_EXTRACT_CURVE:ypjtmp");
+       {xpjtmp = CMAKE_N(double, SX_dataset[j].n);
+        ypjtmp = CMAKE_N(double, SX_dataset[j].n);
         for (l = 0; l < SX_dataset[j].n; l++)
             {xpjtmp[l] = xpj[SX_dataset[j].n - l - 1];
              ypjtmp[l] = ypj[SX_dataset[j].n - l - 1];}
@@ -756,10 +752,8 @@ object *_ULI_extract_curve(object *argl)
         ypj = ypjtmp;
         irev = TRUE;}
 
-    xpi = SX_dataset[i].x[0] = FMAKE_N(double, n,
-                             "_ULI_EXTRACT_CURVE:xpi");
-    ypi = SX_dataset[i].x[1] = FMAKE_N(double, n,
-                             "_ULI_EXTRACT_CURVE:ypi");
+    xpi = SX_dataset[i].x[0] = CMAKE_N(double, n);
+    ypi = SX_dataset[i].x[1] = CMAKE_N(double, n);
     if (xpi == NULL || ypi == NULL)
        SS_error("INSUFFICIENT MEMORY - _ULI_EXTRACT_CURVE", SS_null);
 
@@ -859,8 +853,8 @@ object *UL_xindex_curve(int j)
 
     xpj = SX_dataset[j].x[0];
     ypj = SX_dataset[j].x[1];
-    xpi = SX_dataset[i].x[0] = FMAKE_N(double, n, "UL_XINDEX_CURVE:xpi");
-    ypi = SX_dataset[i].x[1] = FMAKE_N(double, n, "UL_XINDEX_CURVE:ypi");
+    xpi = SX_dataset[i].x[0] = CMAKE_N(double, n);
+    ypi = SX_dataset[i].x[1] = CMAKE_N(double, n);
     if (xpi == NULL || ypi == NULL)
        SS_error("INSUFFICIENT MEMORY - UL_XINDEX_CURVE", SS_null);
 

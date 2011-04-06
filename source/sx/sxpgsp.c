@@ -22,8 +22,8 @@ static void _SX_args_arr_2(object *argl, int *pn, double **px, double **py)
 
     n = SS_length(argl) >> 1;
 
-    x = FMAKE_N(double, n, "_SX_ARGS_ARR_2:x");
-    y = FMAKE_N(double, n, "_SX_ARGS_ARR_2:y");
+    x = CMAKE_N(double, n);
+    y = CMAKE_N(double, n);
     for (i = 0; !SS_nullobjp(argl); i++)
         {if (SS_consp(argl))
             SX_GET_FLOAT_FROM_LIST(x[i], argl,
@@ -50,9 +50,9 @@ static void _SX_args_arr_3(object *argl, int *pn,
 
     n = SS_length(argl)/3;
 
-    x = FMAKE_N(double, n, "_SX_ARGS_ARR_3:x");
-    y = FMAKE_N(double, n, "_SX_ARGS_ARR_3:y");
-    z = FMAKE_N(double, n, "_SX_ARGS_ARR_3:z");
+    x = CMAKE_N(double, n);
+    y = CMAKE_N(double, n);
+    z = CMAKE_N(double, n);
     for (i = 0; !SS_nullobjp(argl); i++)
         {if (SS_consp(argl))
             SX_GET_FLOAT_FROM_LIST(x[i], argl,
@@ -265,10 +265,10 @@ static object *_SXI_def_mrk(object *argl)
 
     ns = SS_length(argl) >> 2;
 
-    x1 = FMAKE_N(double, ns, "_SXI_DEF_MRK:x1");
-    y1 = FMAKE_N(double, ns, "_SXI_DEF_MRK:y1");
-    x2 = FMAKE_N(double, ns, "_SXI_DEF_MRK:x2");
-    y2 = FMAKE_N(double, ns, "_SXI_DEF_MRK:y2");
+    x1 = CMAKE_N(double, ns);
+    y1 = CMAKE_N(double, ns);
+    x2 = CMAKE_N(double, ns);
+    y2 = CMAKE_N(double, ns);
 
     for (i = 0; i < ns; i++)
         {SX_GET_FLOAT_FROM_LIST(x1[i], argl,
@@ -2408,8 +2408,8 @@ static object *_SXI_list_pal(object *argl)
     n_pal_colors = SS_length(colors)/3;
     n_dev_colors = dev->absolute_n_color;
 
-    pal = FMAKE(PG_palette, "_SXI_LIST_PAL:pal");
-    cm  = FMAKE_N(RGB_color_map, n_pal_colors, "_SXI_LIST_PAL:cm");
+    pal = CMAKE(PG_palette);
+    cm  = CMAKE_N(RGB_color_map, n_pal_colors);
     if (cm == NULL)
        return(SS_f);
 

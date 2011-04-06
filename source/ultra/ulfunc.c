@@ -1037,8 +1037,8 @@ static object *UL_derivative(int j)
     n  = SX_dataset[j].n;
     x[0] = SX_dataset[j].x[0];
     x[1] = SX_dataset[j].x[1];
-    UL_buf1x = FMAKE_N(double, n+5, "UL_DERIVATIVE:buf1x");
-    UL_buf1y = FMAKE_N(double, n+5, "UL_DERIVATIVE:buf1y");
+    UL_buf1x = CMAKE_N(double, n+5);
+    UL_buf1y = CMAKE_N(double, n+5);
 
     PM_derivative(n, x[0], x[1], UL_buf1x, UL_buf1y);
 
@@ -1083,8 +1083,8 @@ static object *UL_thin(int j, object *argl)
     n  = SX_dataset[j].n;
     x[0] = SX_dataset[j].x[0];
     x[1] = SX_dataset[j].x[1];
-    UL_buf1x = FMAKE_N(double, n, "UL_THIN:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "UL_THIN:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
     toler = (toler < n) ? toler : n;
 
     if (strncmp(type, "int", 3) == 0)
@@ -1136,8 +1136,8 @@ static object *UL_filter(int j, object *argl)
     n  = SX_dataset[j].n;
     x[0] = SX_dataset[j].x[0];
     x[1] = SX_dataset[j].x[1];
-    UL_buf1x = FMAKE_N(double, n, "UL_FILTER:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "UL_FILTER:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
 
     xexpr = SS_null;
     yexpr = SS_null;
@@ -1192,8 +1192,8 @@ static object *UL_integrate(int j, double d1, double d2)
 
     n = SX_dataset[j].n;
 
-    UL_buf1x = FMAKE_N(double, n+5, "UL_INTEGRATE:buf1x");
-    UL_buf1y = FMAKE_N(double, n+5, "UL_INTEGRATE:buf1y");
+    UL_buf1x = CMAKE_N(double, n+5);
+    UL_buf1y = CMAKE_N(double, n+5);
 
     x[0] = SX_dataset[j].x[0];
     x[1] = SX_dataset[j].x[1];
@@ -1377,8 +1377,8 @@ static object *UL_xmm(int j, double d1, double d2)
     k = 0;
     decreasing = FALSE;
 
-    UL_buf1x = FMAKE_N(double, SX_dataset[j].n+1, "UL_XMM:buf1x");
-    UL_buf1y = FMAKE_N(double, SX_dataset[j].n+1, "UL_XMM:buf1y");
+    UL_buf1x = CMAKE_N(double, SX_dataset[j].n+1);
+    UL_buf1y = CMAKE_N(double, SX_dataset[j].n+1);
     x[0]       = SX_dataset[j].x[0];
     x[1]       = SX_dataset[j].x[1];
 
@@ -1388,8 +1388,8 @@ static object *UL_xmm(int j, double d1, double d2)
 
 /* check to see if x is decreasing */
     if (x[0][0] > x[0][1])
-       {xrev = FMAKE_N(double, SX_dataset[j].n, "UL_XMM:xrev");
-        yrev = FMAKE_N(double, SX_dataset[j].n, "UL_XMM:yrev");
+       {xrev = CMAKE_N(double, SX_dataset[j].n);
+        yrev = CMAKE_N(double, SX_dataset[j].n);
         n    = SX_dataset[j].n;
         for (l = 0; l < n; l++)
             {xrev[l] = x[0][n-(l+1)];
@@ -1607,8 +1607,8 @@ static object *UL_smp_append(object *a, object *b)
     nb = SX_dataset[j].n;
     n  = na + nb;
 
-    UL_buf1x = FMAKE_N(double, n, "UL_SMP_APPEND:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "UL_SMP_APPEND:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
 
 /* insert the first curve */
     x[0] = SX_dataset[i].x[0];
@@ -1675,8 +1675,8 @@ static object *UL_pr_append(object *a, object *b)
     xmx = SX_dataset[k].wc[1];
 
     n = na + nb + nc + 10;
-    UL_buf1x = FMAKE_N(double, n, "UL_PR_APPEND:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "UL_PR_APPEND:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
 
 /* insert region of A less than averaged region */
     x[0] = SX_dataset[i].x[0];
@@ -1844,8 +1844,8 @@ object *_UL_make_ln(double slope, double interc,
     int i;
    
     step = (last - first)/(n-1);
-    UL_buf1x = FMAKE_N(double, n, "_UL_MAKE_LN:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "_UL_MAKE_LN:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
     x[0] = UL_buf1x;
     x[1] = UL_buf1y;
     for (xo = first, i = 0; i < n; i++, xo += step, x[0]++, x[1]++)
@@ -1918,8 +1918,8 @@ static object *_ULI_mk_curve(object *argl)
 
     n = min(SS_length(xvals), SS_length(yvals));
 
-    UL_buf1x = FMAKE_N(double, n, "_ULI_MK_CURVE:buf1x");
-    UL_buf1y = FMAKE_N(double, n, "_ULI_MK_CURVE:buf1y");
+    UL_buf1x = CMAKE_N(double, n);
+    UL_buf1y = CMAKE_N(double, n);
     for (x[0] = UL_buf1x, x[1] = UL_buf1y;
          SS_consp(xvals) && SS_consp(yvals);
          xvals = SS_cdr(xvals), yvals = SS_cdr(yvals))

@@ -1215,8 +1215,7 @@ static object *_SXI_make_pgs_graph(object *argl)
                                 SC_PCONS_P_S, info, _SX.igg, NULL);
 
     if (arr == NULL)
-       {emap = FMAKE_N(char, domain->n_elements,
-                       "_SXI_MAKE_PGS_GRAPH:emap");
+       {emap = CMAKE_N(char, domain->n_elements);
         memset(emap, 1, domain->n_elements);}
     else
        {PM_ARRAY_CONTENTS(arr, void, n, type, d);
@@ -1248,7 +1247,7 @@ static void _SX_set_limits(char *t, PM_set *s, object *argl)
 
         else
 	   {nd   = s->dimension_elem;
-	    extr = FMAKE_N(double, 2*nd, "_SX_SET_LIMITS:extr");
+	    extr = CMAKE_N(double, 2*nd);
 	    pe   = extr;
 	    for (i = 0; i < nd; i++, argl = SS_cddr(argl))
 	        {if (SS_nullobjp(argl))
@@ -1820,7 +1819,7 @@ static object *_SXI_draw_image(object *argl)
 /* if viewport box has been specified, create an assoc list and pass it in */
     if ((xmn < xmx) && (ymn < ymx))
        {vp = TRUE;
-        pv = FMAKE_N(double, 4, "_SXI_DRAW_IMAGE:pv");
+        pv = CMAKE_N(double, 4);
         pv[0] = xmn;
         pv[1] = xmx;
         pv[2] = ymn;
@@ -2015,8 +2014,8 @@ static object *_SX_map_dom_extrema(PM_mapping *m)
     nd = m->domain->dimension;
     n  = 2*nd;
 
-    rextr = FMAKE_N(double, n, "_SX_MAP_DOM_EXTREMA:rextr");
-    extr  = FMAKE_N(double, n, "_SX_MAP_DOM_EXTREMA:extr");
+    rextr = CMAKE_N(double, n);
+    extr  = CMAKE_N(double, n);
     for (id = 0; id < nd; id++)
         {rextr[2*id]   = HUGE_REAL;
 	 rextr[2*id+1] = -HUGE_REAL;};

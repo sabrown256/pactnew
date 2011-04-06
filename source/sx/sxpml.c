@@ -156,7 +156,7 @@ static object *_SXI_sub_array(object *argl)
 
     else
        {nd       = SS_length(dims);
-        idims    = FMAKE_N(long, nd + 1, "_SXI_SUB_ARRAY:idims");
+        idims    = CMAKE_N(long, nd + 1);
         idims[0] = nd/2;
         for (pd = idims + 1; !SS_nullobjp(dims); pd++)
             SX_GET_INTEGER_FROM_LIST(*pd, dims,
@@ -169,7 +169,7 @@ static object *_SXI_sub_array(object *argl)
 
     else
        {nr      = SS_length(reg);
-        ireg    = FMAKE_N(long, nr + 1, "_SXI_SUB_ARRAY:ireg");
+        ireg    = CMAKE_N(long, nr + 1);
         ireg[0] = nr/2;
         for (pr = ireg + 1; !SS_nullobjp(reg); pr++)
             SX_GET_INTEGER_FROM_LIST(*pr, reg,
@@ -578,7 +578,7 @@ static object *_SXI_make_pml_set(object *argl)
        SS_error("BAD MESH SHAPE - _SXI_MAKE_PML_SET", argl);
     else
        {nd    = SS_length(shape);
-        maxes = FMAKE_N(int, nd, "_SXI_MAKE_PML_SET:maxes");
+        maxes = CMAKE_N(int, nd);
         for (pm = maxes; !SS_nullobjp(shape); )
             SX_GET_INTEGER_FROM_LIST(*pm++, shape,
                                      "BAD MESH INDEX - _SXI_MAKE_PML_SET");};
@@ -590,7 +590,7 @@ static object *_SXI_make_pml_set(object *argl)
 
     else
        {nde  = SS_length(components);
-	elem = FMAKE_N(void *, nde, "_SXI_MAKE_PML_SET:elem");
+	elem = CMAKE_N(void *, nde);
 
 /* get the number of elements */
 	obj = SS_car(components);
@@ -644,7 +644,7 @@ static object *_SXI_make_cp_set(object *argl)
     object *obj;
 
     n = SS_length(argl);
-    sets = FMAKE_N(PM_set *, n, "_SXI_MAKE_CP_SET:sets");
+    sets = CMAKE_N(PM_set *, n);
 
     for (i = 0; i < n; i++)
         {SX_GET_SET_FROM_LIST(sets[i], argl,
@@ -1102,18 +1102,18 @@ static object *_SXI_arrays_set(object *argl)
 /* extract the mesh shape */
     if (SS_nullobjp(shape))
        {nd    = SS_length(components) + tflag;
-        maxes = FMAKE_N(int, nd, "_SXI_ARRAYS_SET:maxes");
+        maxes = CMAKE_N(int, nd);
         maxes[nd-1] = SS_length(SS_car(components));}
     else
        {nd    = SS_length(shape);
-        maxes = FMAKE_N(int, nd, "_SXI_ARRAYS_SET:maxes");
+        maxes = CMAKE_N(int, nd);
         for (pm = maxes; !SS_nullobjp(shape); )
             SX_GET_INTEGER_FROM_LIST(*pm++, shape,
                                      "BAD MESH INDEX - _SXI_ARRAYS_SET");};
 
 /* each component is a list of arrays */
     nde  = SS_length(components) + tflag;
-    elem = FMAKE_N(double *, nde, "_SXI_ARRAYS_SET:elem");
+    elem = CMAKE_N(double *, nde);
     for (lst = components; !SS_nullobjp(lst); lst = SS_cdr(lst))
         {if (lst == components)
             n = SS_length(SS_car(lst));
@@ -1135,7 +1135,7 @@ static object *_SXI_arrays_set(object *argl)
     ne   = nep*n;
 
     for (j = 0; !SS_nullobjp(components); j++, components = SS_cdr(components))
-        {pe = FMAKE_N(double, ne, "_SXI_ARRAYS_SET:pe");
+        {pe = CMAKE_N(double, ne);
          elem[j] = pe;
          lst = SS_car(components);
          for (i = 0; i < n; i++)
@@ -1149,7 +1149,7 @@ static object *_SXI_arrays_set(object *argl)
 
 /* the new component must be made */
     if (tflag)
-       {pe = FMAKE_N(double, ne, "_SXI_ARRAYS_SET:pe");
+       {pe = CMAKE_N(double, ne);
         elem[j] = pe;
         for (i = 0; i < n; i++)
             {for (j = 0; j < nep; j++)
@@ -1227,7 +1227,7 @@ static object *_SXI_lr_ac(object *argl)
 	         {if ((x[i] != px[i]) || (y[i] != py[i]))
 		     SS_error("BAD CONVERSION - _SXI_LR_AC", SS_null);};};
 
-	    elements = FMAKE_N(void *, 2, "_SXI_LR_AC:elements");
+	    elements = CMAKE_N(void *, 2);
 	    elements[0] = (void *) x;
 	    elements[1] = (void *) y;
 
@@ -1288,9 +1288,9 @@ static object *_SXI_make_ac_set(object *argl)
     nde = SS_length(SS_car(nodes));
 
 /* construct the element arrays from the lists */
-    elem = FMAKE_N(double *, nde, "_SXI_MAKE_AC_SET:elem");
+    elem = CMAKE_N(double *, nde);
     for (i = 0; i < nde; i++)
-        elem[i] = FMAKE_N(double, ne, "_SXI_MAKE_AC_SET:elem[]");
+        elem[i] = CMAKE_N(double, ne);
 
     for (i = 0; i < ne; i++, nodes = SS_cdr(nodes))
         {node = SS_car(nodes);
@@ -1300,14 +1300,14 @@ static object *_SXI_make_ac_set(object *argl)
 		      0);};};
 
 /* construct the cell boundary arrays */
-    bnd = FMAKE_N(long *, nd, "_SXI_MAKE_AC_SET:bnd");
-    ncs = FMAKE_N(int, nd, "_SXI_MAKE_AC_SET:ncs");
-    nbp = FMAKE_N(int, nd, "_SXI_MAKE_AC_SET:nbp");
+    bnd = CMAKE_N(long *, nd);
+    ncs = CMAKE_N(int, nd);
+    nbp = CMAKE_N(int, nd);
     for (j = 1; j < nd; j++, argl = SS_cdr(argl))
         {ncells = SS_car(argl);
          ord = SS_length(SS_car(ncells));
          nc  = SS_length(ncells);
-         pb  = FMAKE_N(long, ord*nc, "_SXI_MAKE_AC_SET:pb");
+         pb  = CMAKE_N(long, ord*nc);
          bnd[j] = pb;
          ncs[j] = (ord == 1) ? nc - 1 : nc;
          nbp[j] = ord;
@@ -1553,14 +1553,13 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
     PM_mesh_topology *mt;
     long **bnd, *ncell, *pcell;
 
-    elem = FMAKE_N(double *, 2, "SX_REP_TO_AC:elem");
+    elem = CMAKE_N(double *, 2);
     elem[0] = rx;
     elem[1] = ry;
 
 /* allocate the boundary arrays */
-    bnd = FMAKE_N(long *, 3, "SX_REP_TO_AC:bnd");
-    bnd[2] = FMAKE_N(long, 2*n_zones,
-                     "SX_REP_TO_AC:bnd[2]");
+    bnd = CMAKE_N(long *, 3);
+    bnd[2] = CMAKE_N(long, 2*n_zones);
 
 /* fill the 2-cells */
     ncell   = bnd[2];
@@ -1576,8 +1575,7 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
 	 n_sides += incr;
          pzone   += incr + 1;};
 
-    bnd[1] = FMAKE_N(long, 2*n_sides,
-                     "SX_REP_TO_AC:bnd[1]");
+    bnd[1] = CMAKE_N(long, 2*n_sides);
 
 /* fill the 1-cells */
     pcell = bnd[1];
@@ -1597,13 +1595,13 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
     bnd[0] = NULL;
 
 /* setup the number of cells array */
-    nc = FMAKE_N(int, 3, "SX_REP_TO_AC:nc");
+    nc = CMAKE_N(int, 3);
     nc[0] = n_nodes;
     nc[1] = n_sides;
     nc[2] = n_zones;
 
 /* setup the number of boundary parameters array */
-    nbp = FMAKE_N(int, 3, "SX_REP_TO_AC:nbp");
+    nbp = CMAKE_N(int, 3);
     nbp[0] = 1;
     nbp[1] = 2;
     nbp[2] = 2;
@@ -1670,8 +1668,8 @@ static object *_SXI_rep_ac_domain(object *argl)
 	if (!PD_read(file, nzname, &n_zones))
 	   SS_error("CAN'T READ NUMBER OF ZONES - _SXI_REP_AC_DOMAIN", argl);
 
-	rx = FMAKE_N(double, n_nodes, "_SXI_REP_AC_DOMAIN:rx");
-	ry = FMAKE_N(double, n_nodes, "_SXI_REP_AC_DOMAIN:ry");
+	rx = CMAKE_N(double, n_nodes);
+	ry = CMAKE_N(double, n_nodes);
 
 	incr = PD_read(file, xname, rx);
 	if (incr != n_nodes)

@@ -170,7 +170,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
 
 /* make sure that we have a working array */
     if (w == NULL)
-       {w   = FMAKE_N(double, n, "_SX_UNOP:w");
+       {w   = CMAKE_N(double, n);
 	rel = TRUE;}
     else
        rel = FALSE;
@@ -246,7 +246,7 @@ object *_SX_mh_u_s(C_procedure *cp, object *argl)
 		ne   = set->n_elements;
 		nde  = set->dimension_elem;
 		elem = (double **) set->elements;
-		d    = FMAKE_N(double, ne, "_SX_MH_U_S:d");
+		d    = CMAKE_N(double, ne);
 		for (id = 0; id < nde; id++)
 		    {pd = elem[id];
 		     _SX_unop(fn, type, (void *) pd, ne, d);};
