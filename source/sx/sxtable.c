@@ -87,7 +87,7 @@ static int _SX_setup_clabels(char *label, int nc, int linelen)
 
 	if (ntokens == (nc+1))
 /* Assume first token is comment char and take it out of list */
-	   {SFREE(SX_current_table_labels[0]);
+	   {CFREE(SX_current_table_labels[0]);
 
 	    for (i = 0; i < nc; i++)
 	        SX_current_table_labels[i] = SX_current_table_labels[i+1];
@@ -238,7 +238,7 @@ static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
              if (GETLN(linein, linelen, fp) == NULL)
                 return(FALSE);};};
 
-    SFREE(addr);
+    CFREE(addr);
 
     if ((j == n) && (nc > 0))
        {*pfn    = firstnum;
@@ -280,7 +280,7 @@ static object *_SXI_read_text_table(object *argl)
             SC_INT_I, &nl,
             0);
 
-    SX_table_name = SC_strsavef(name, "char*:_SXI_READ_TEXT_TABLE:tablename");
+    SX_table_name = CSTRSAVE(name);
 
     name = SC_search_file(NULL, SX_table_name);
     if (name == NULL)
@@ -302,16 +302,16 @@ static object *_SXI_read_text_table(object *argl)
 
     if (!SX_find_text_table(fp, n, linelen, linein, &fn, &nr, &nc,
 			    nl, &addrt, nlabel, &addrl))
-       {SFREE(linein);
-        SFREE(label);
+       {CFREE(linein);
+        CFREE(label);
         SS_error("REQUESTED TABLE NOT FOUND - _SXI_READ_TEXT_TABLE", argl);}
 
     SX_current_table = PM_create(nr, nc);
 
     if (addrl != -1)
        {if (io_seek(fp, addrl, SEEK_SET))
-	   {SFREE(linein);
-            SFREE(label);
+	   {CFREE(linein);
+            CFREE(label);
             return(FALSE);}
 
 	GETLN(label, linelen, fp);}
@@ -319,8 +319,8 @@ static object *_SXI_read_text_table(object *argl)
         label[0] = '\0';
 
     if (io_seek(fp, addrt, SEEK_SET))
-       {SFREE(linein);
-        SFREE(label);
+       {CFREE(linein);
+        CFREE(label);
         return(FALSE);}
 
     for (i = 1; i <= nr; i++)
@@ -348,8 +348,8 @@ static object *_SXI_read_text_table(object *argl)
                  "\n Table %d : %d rows and %d columns\n Label: %s\n\n",
                  n, nr, nc, label);};
 
-    SFREE(linein);
-    SFREE(label);
+    CFREE(linein);
+    CFREE(label);
 
     _SX_table_n = n;
     _SX_table_ln = nl;
@@ -788,12 +788,12 @@ static int _SX_del_label(long *cols, long ncol)
         {if (i != *scols)
             temp[j++] = SX_current_table_labels[i];
          else
-            {SFREE(SX_current_table_labels[i]);
+            {CFREE(SX_current_table_labels[i]);
              if (ndcol < ncol)
                 {scols++;
                  ndcol++;};};}
 
-    SFREE(SX_current_table_labels);
+    CFREE(SX_current_table_labels);
     SX_current_table_labels = temp;
 
     return(TRUE);}
@@ -844,7 +844,7 @@ static object *SX_delete_column(object *argl)
 	_SX_del_label(sdata, j);
 	PM_del_col(SX_current_table, sdata, j);
 
-        SFREE(sdata);
+        CFREE(sdata);
 
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;

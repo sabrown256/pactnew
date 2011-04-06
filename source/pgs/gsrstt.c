@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     PG_image *calc_im;
     PG_device *PS_dev;
 
-    s = SC_strsavef("WINDOW", "char*:GSRSTT:s");
+    s = CSTRSAVE("WINDOW");
 
     image_test = TRUE;
     color      = FALSE;
@@ -46,8 +46,8 @@ int main(int argc, char **argv)
                 case 's' : image_test = FALSE;
                            break;};};
 
-    x = FMAKE_N(double, N, "GSRSTT.C:x");
-    y = FMAKE_N(double, N, "GSRSTT.C:y");
+    x = CMAKE_N(double, N);
+    y = CMAKE_N(double, N);
 
     for (i = 0; i < N; i++)
         {x[i] = -(i+1)/10.0;

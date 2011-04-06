@@ -59,7 +59,7 @@ int main(int c, char **v)
 			names[i], type, ni, nd, dims);
 		 PD_rel_entry_info(ep, type, dims);};};};
 
-    SFREE(names);
+    CFREE(names);
     SC_free_strings(list);
 
 /* close file */

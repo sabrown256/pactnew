@@ -816,7 +816,7 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
     sid   = SC_type_id(mtype, FALSE);
     same  = (sid == SC_DOUBLE_I);
 
-    afd   = FMAKE_N(double *, nd, "PG_SURFACE_HAND:afd");
+    afd   = CMAKE_N(double *, nd);
     afs   = (void **) range->elements;
 
 /* find the range limits if any */
@@ -855,7 +855,7 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
        {case Z_CENT :
              {double **afdp;
 
-	      afdp = FMAKE_N(double *, nd, "PG_SURFACE_HAND:afdp");
+	      afdp = CMAKE_N(double *, nd);
 	      for (i = 0; i < nd; i++)
                   afdp[i] = (*fnc_map)(afd[i], d[0], d[1],
 				       _PG_gattrs.interp_flag,
@@ -866,8 +866,8 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
 			       h->name, cnnct, alst, fnc_scan);
 
 	      for (i = 0; i < nd; i++)
-		  SFREE(afdp[i]);
-	      SFREE(afdp);};
+		  CFREE(afdp[i]);
+	      CFREE(afdp);};
 
 	     break;
 
@@ -886,13 +886,13 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
 
     if (same == FALSE)
        {for (i = 0; i < nd; i++)
-            SFREE(afd[i]);
+            CFREE(afd[i]);
 
         if (rexfl)
-           SFREE(rextr);};
+           CFREE(rextr);};
 
-    SFREE(afd);
-    SFREE(dextr);
+    CFREE(afd);
+    CFREE(dextr);
 
     return;}
 
@@ -960,8 +960,8 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, 2, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);
+	CFREE(ddex);
+	CFREE(rdex);
 
 /* GOTCHA: this isn't the only time we want 3d axes */
 	if ((pd->va[0] != HUGE) || (nde == 3))
@@ -1158,7 +1158,7 @@ static void PG_scan_convert_lr(PG_device *dev, PG_scan_line_data *par,
     PM_free_vectors(5, v);
 
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return;}
 

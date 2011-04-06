@@ -282,7 +282,7 @@ static void _PG_tick_div_dec(PG_axis_tick_def *td, double *vo,
     na = (na/dexp) + step*(na - 1);
     step++;
 
-    dx = FMAKE_N(double, step*na, "_PG_TICK_DIV_DEC:dx");
+    dx = CMAKE_N(double, step*na);
 
 /* fill array of division locations - subdivide decades */
     for (j = 0, decade = lvo[0]-db; j < na; decade += dexp)
@@ -362,7 +362,7 @@ static void _PG_tick_div_eqr(PG_axis_tick_def *td, double *vo,
     na = (na/dexp) + step*(na - 1);
     step++;
 
-    dx = FMAKE_N(double, step*na, "_PG_TICK_DIV_EQR:dx");
+    dx = CMAKE_N(double, step*na);
 
 /* fill array of division locations - equal ratio spacing */
     for (i = 0, j = 0, t = va[0]; i < na; i++)
@@ -510,7 +510,7 @@ static void _PG_tick_div_lin(PG_axis_tick_def *td,
     n = max(n, 2.0 + EPSILON);
 
 /* fill the tick spacings array */
-    dx  = FMAKE_N(double, n, "_PG_TICK:dx");
+    dx  = CMAKE_N(double, n);
     dx0 = 1.0/((double) n - 1.0);
     for (i = 0; i < n; i++)
         dx[i] = i*dx0;
@@ -589,7 +589,7 @@ PG_axis_def *_PG_mk_axis_def(int atype, int ttype, int ltype,
     PG_axis_def *ad;
     PG_axis_tick_def *td;
 
-    ad = FMAKE(PG_axis_def, "_PG_MK_AXIS_DEF:ad");
+    ad = CMAKE(PG_axis_def);
 
 /* compute various quantities needed by the axis routines */
     dx[0] = xr[0] - xl[0];
@@ -661,9 +661,9 @@ void _PG_rl_axis_def(PG_axis_def *ad)
    {int i;
 
     for (i = 0; i < 3; i++)
-        {SFREE(ad->tick[i].dx);};
+        {CFREE(ad->tick[i].dx);};
 
-    SFREE(ad);
+    CFREE(ad);
 
     return;}
 

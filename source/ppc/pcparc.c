@@ -153,10 +153,10 @@ void PC_push_pending(PROCESS *pp, int op, char *bf, char *type,
 		     size_t ni, void *vr, void *req)
    {SC_pending_msg *pm;
 
-    pm = FMAKE(SC_pending_msg, "PC_PUSH_PENDING:pm");
+    pm = CMAKE(SC_pending_msg);
 
     pm->bf     = bf;
-    pm->type   = SC_strsavef(type, "PC_PUSH_PENDING:type");
+    pm->type   = CSTRSAVE(type);
     pm->nitems = ni;
     pm->vr     = vr;
     pm->oper   = op;
@@ -204,7 +204,7 @@ void PC_pop_pending(PROCESS *pp, int *po, char **pbf, char **pty,
 	*pni = pm->nitems;
 	*pvr = pm->vr;
 
-	SFREE(pm);};
+	CFREE(pm);};
 
 #ifdef HAVE_MPI
 
@@ -246,11 +246,11 @@ int PC_open_group(char **argv, int *pn)
     argc = 0;
     while (argv[argc++] != NULL);
 
-    args = FMAKE_N(char *, argc + offs, "PCPARC.C:args");
+    args = CMAKE_N(char *, argc + offs);
 
-    args[0] = SC_strsavef("pcexec", "char*:PC_OPEN_GROUP:args0");
-    args[1] = SC_strsavef("-r", "char*:PC_OPEN_GROUP:args1");
-    args[2] = SC_strsavef("1", "char*:PC_OPEN_GROUP:args2");
+    args[0] = CSTRSAVE("pcexec");
+    args[1] = CSTRSAVE("-r");
+    args[2] = CSTRSAVE("1");
 
     for (i = 0; i < argc; i++)
         args[i + offs] = argv[i];
@@ -269,8 +269,8 @@ int PC_open_group(char **argv, int *pn)
     _SC_debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
 
     for (i = 0; i < offs; i++)
-        SFREE(args[i]);
-    SFREE(args);
+        CFREE(args[i]);
+    CFREE(args);
 
     if (pn != NULL)
        *pn = _PC.n_nodes;
@@ -475,7 +475,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
        SC_error(-1, "SPECIFIED BUFFER SIZE TOO SMALL - PC_OUT");
 
 /* allocate the buffer */
-    bf = FMAKE_N(char, nb, "PC_OUT:bf");
+    bf = CMAKE_N(char, nb);
 
 /* convert the data into a message buffer */
     tf  = PN_open(vif, bf);
@@ -552,7 +552,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     else
        nb = PC_size_message(ip, type, ityp);
 
-    bf = FMAKE_N(char, nb, "PC_IN:bf");
+    bf = CMAKE_N(char, nb);
 
     strcpy(types, type);
 
@@ -591,7 +591,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	nir = PN_read(tf, type, ni, vr);
 	PN_close(tf);
 
-	SFREE(bf);};
+	CFREE(bf);};
 
 /* conditional diagnostic messages */
     if (_SC_debug)
@@ -636,8 +636,8 @@ static long _PC_wait_n(PROCESS *pp)
 	     PN_read(tf, type, ni, vr);
 	     PN_close(tf);};
 
-	 SFREE(type);
-	 SFREE(bf);};
+	 CFREE(type);
+	 CFREE(bf);};
 
 /* conditional diagnostic messages */
     if (_SC_debug)
@@ -672,7 +672,7 @@ void PC_init_communications(void (*init)(PC_par_fnc *p))
    {
 
     if (PC_par_oper == NULL)
-       {PC_par_oper = FMAKE(PC_par_fnc, "PERM|PC_INIT:PC_par_oper");
+       {PC_par_oper = CMAKE(PC_par_fnc);
 	if (init == NULL)
 	   _PC_init_n(PC_par_oper);
 	else

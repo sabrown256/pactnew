@@ -460,8 +460,7 @@ object *UL_bftoc(C_procedure *cp, object *argl)
     tok  = SS_car(argl);
     argl = SS_cdr(argl);
 
-    s1 = SC_strsavef(SS_get_string(tok),
-         "char*:UL_BFTOC:s1");
+    s1 = CSTRSAVE(SS_get_string(tok));
 
     for (t = argl ; SS_consp(t); t = SS_cdr(t))
         {s = SS_car(t);
@@ -470,7 +469,7 @@ object *UL_bftoc(C_procedure *cp, object *argl)
             {i = SX_get_crv_index_i(s);
              (*(PFVoidis) cp->proc[0])(i, s1);};};
 
-    SFREE(s1);
+    CFREE(s1);
 
     SS_Assign(argl, SS_null);
 
@@ -794,16 +793,16 @@ object *UL_bc(C_procedure *cp, object *argl)
              if (af == UL_buf2x)
                 {xp1 = UL_buf2x;
                  yp1 = UL_buf2y;
-                 REMAKE_N(UL_buf1x, double, n1+2+n2);
-                 REMAKE_N(UL_buf1y, double, n1+2+n2);
+                 CREMAKE(UL_buf1x, double, n1+2+n2);
+                 CREMAKE(UL_buf1y, double, n1+2+n2);
                  xa = af = UL_buf1x;
                  ya = UL_buf1y;}
              else
                 {xp1 = UL_buf1x;
 
                  yp1 = UL_buf1y;
-                 REMAKE_N(UL_buf2x, double, n1+2+n2);
-                 REMAKE_N(UL_buf2y, double, n1+2+n2);
+                 CREMAKE(UL_buf2x, double, n1+2+n2);
+                 CREMAKE(UL_buf2y, double, n1+2+n2);
                  xa = af = UL_buf2x;
                  ya = UL_buf2y;};
 
@@ -820,10 +819,10 @@ object *UL_bc(C_procedure *cp, object *argl)
 /* create new curve with data in the accumulator */
     ch = SX_mk_curve(na, xa, ya, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);
-    SFREE(UL_buf2x);
-    SFREE(UL_buf2y);
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);
+    CFREE(UL_buf2x);
+    CFREE(UL_buf2y);
 
     return(ch);}
         
@@ -898,8 +897,8 @@ object *UL_bcxl(C_procedure *cp, object *argl)
 
     SS_Assign(argl, SS_null);
 
-    SFREE(UL_buf1x);
-    SFREE(UL_buf1y);           
+    CFREE(UL_buf1x);
+    CFREE(UL_buf1y);           
 
     return(ch);}
                 

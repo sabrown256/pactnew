@@ -196,8 +196,7 @@ static PG_interface_object *SX_add_text_ann(PG_device *dev, double *ndc,
     flags[2] = TRUE;
 
     if (s == NULL)
-       s = SC_strsavef("                        ",
-		       "char*:SX_ADD_TEXT_ANN:blankstring");
+       s = CSTRSAVE("                        ");
 
     xo[0] = ndc[0];
     xo[1] = ndc[2];
@@ -455,28 +454,22 @@ static object *_SXI_toggle_gri(object *toggle)
         _SX.th_mx  =  180.0;
 
 	if (SX_GRI_type_face == NULL)
-	   SX_GRI_type_face = SC_strsavef("helvetica",
-                              "char*:_SXI_TOGGLE_GRI:GRI_type_face");
+	   SX_GRI_type_face = CSTRSAVE("helvetica");
 
 	if (SX_GRI_type_style == NULL)
-	   SX_GRI_type_style = SC_strsavef("medium",
-                               "char*:_SXI_TOGGLE_GRI:GRI_type_style");
+	   SX_GRI_type_style = CSTRSAVE("medium");
 
 	if (SX_GRI_title == NULL)
-	   SX_GRI_title = SC_strsavef("PDBView Controls",
-                          "char*:_SXI_TOGGLE_GRI:title");
+	   SX_GRI_title = CSTRSAVE("PDBView Controls");
 
 	if (*axslxf == NULL)
-	   *axslxf = SC_strsavef("%10.2g",
-                                     "char*:_SXI_TOGGLE_GRI:xformat");
+	   *axslxf = CSTRSAVE("%10.2g");
 
 	if (*axslyf == NULL)
-	   *axslyf = SC_strsavef("%10.2g",
-				 "char*:_SXI_TOGGLE_GRI:yformat");
+	   *axslyf = CSTRSAVE("%10.2g");
 
 	if (*axstf == NULL)
-	   *axstf = SC_strsavef("helvetica",
-                                "char*:_SXI_TOGGLE_GRI:type_face");
+	   *axstf = CSTRSAVE("helvetica");
 
 /* connect the I/O functions */
 	_SX.gri = PG_make_device("WINDOW", "COLOR", SX_GRI_title);
@@ -626,7 +619,7 @@ static object *_SXI_toggle_gri(object *toggle)
 
 	PG_read_interface(_SX.gri, name);
 
-	SFREE(name);
+	CFREE(name);
 
 	_SX_clear_window((void *) _SX.gri, NULL);}
 

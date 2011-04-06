@@ -54,8 +54,7 @@ PDBfile *PA_th_open(char *name, char *mode, long size, char *prev)
            PD_set_max_file_size(file, size);
 
         if (prev != NULL)
-           file->previous_file = SC_strsavef(prev,
-					     "char*:PA_TH_OPEN:file");};
+           file->previous_file = CSTRSAVE(prev);};
 
     return(file);}
 
@@ -73,17 +72,17 @@ static void _PA_rl_th(th_record *thd, int nthd)
 	    {str = thd[i].members;
 	     n   = SC_MEM_GET_N(char *, str);
 	     for (j = 0; j < n; j++)
-	         SFREE(str[j]);
-	     SFREE(thd[i].members);
+	         CFREE(str[j]);
+	     CFREE(thd[i].members);
 
 	     str = thd[i].labels;
 	     n   = SC_MEM_GET_N(char *, str);
 	     for (j = 0; j < n; j++)
-	         SFREE(str[j]);
-	     SFREE(thd[i].labels);
+	         CFREE(str[j]);
+	     CFREE(thd[i].labels);
 
-	     SFREE(thd[i].type);
-	     SFREE(thd[i].entry_name);
+	     CFREE(thd[i].type);
+	     CFREE(thd[i].entry_name);
 	     
 	     thd[i].n_members = 0;};};
 
@@ -177,7 +176,7 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
 #endif
 
     n    = nmemb - 1;
-    lbls = FMAKE_N(char *, n, "PA_TH_DEF_REC:lbls");
+    lbls = CMAKE_N(char *, n);
 
     if (labels != NULL)
        {for (i = 0; i < n; i++)
@@ -185,25 +184,25 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
                 snprintf(bf, MAXLINE, "%s vs %s", members[i+1], members[0]);
              else
                 snprintf(bf, MAXLINE, "%s", labels[i]);
-             lbls[i] = SC_strsavef(bf, "char*:PA_TH_DEF_REC:lbls[i]");};}
+             lbls[i] = CSTRSAVE(bf);};}
 
     else
        {for (i = 0; i < n; i++)
             {snprintf(bf, MAXLINE, "%s vs %s", members[i+1], members[0]);
-             lbls[i] = SC_strsavef(bf, "char*:PA_TH_DEF_REC:lbls[i]");};};
+             lbls[i] = CSTRSAVE(bf);};};
 
 /* process the members to make them legal for PDB */
-    mbrs = FMAKE_N(char *, nmemb, "PA_TH_DEF_REC:mbrs");
+    mbrs = CMAKE_N(char *, nmemb);
     for (i = 0; i < nmemb; i++)
         {ltyp = _PD_member_base_type(members[i]);
          dp = PD_inquire_type(file, ltyp);
-         SFREE(ltyp);
+         CFREE(ltyp);
 
          if (dp == NULL)
             {snprintf(bf, MAXLINE, "double %s", members[i]);
-             mbrs[i] = SC_strsavef(bf, "char*:PA_TH_DEF_REC:mbrs[i]");}
+             mbrs[i] = CSTRSAVE(bf);}
          else
-            mbrs[i] = SC_strsavef(members[i], "char*:PA_TH_DEF_REC:mbrs[i]");};
+            mbrs[i] = CSTRSAVE(members[i]);};
 
 /* define the th_record type if necessary */
     dp = PD_inquire_type(file, "th_record");
@@ -220,14 +219,14 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
     ht.n_members  = nmemb;
     ht.members    = mbrs;
     ht.labels     = lbls;
-    ht.type       = SC_strsavef(type, "char*:PA_TH_DEF_REC:type");
-    ht.entry_name = SC_strsavef(name, "char*:PA_TH_DEF_REC:name");
+    ht.type       = CSTRSAVE(type);
+    ht.entry_name = CSTRSAVE(name);
 
     snprintf(bf, MAXLINE, "th%d", count++);
     PD_write(file, bf, "th_record", &ht);
 
-    SFREE(ht.type);
-    SFREE(ht.entry_name);
+    CFREE(ht.type);
+    CFREE(ht.entry_name);
 
 /* define the type */
     dp = PD_defstr_alt(file, type, nmemb, mbrs);
@@ -240,13 +239,13 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
 
 /* free the labels */
     for (i = 0; i < n; i++)
-        SFREE(lbls[i]);
-    SFREE(lbls);
+        CFREE(lbls[i]);
+    CFREE(lbls);
 
 /* free the members */
     for (i = 0; i < nmemb; i++)
-        SFREE(mbrs[i]);
-    SFREE(mbrs);
+        CFREE(mbrs[i]);
+    CFREE(mbrs);
 
     return(dp);}
 
@@ -420,7 +419,7 @@ int PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
     dp    = PD_inquire_type(strm, mtype);
     if (dp == NULL)
        PD_error("CAN'T FIND TYPE - PA_TH_WR_MEMBER", PD_WRITE);
-    SFREE(mtype);
+    CFREE(mtype);
 
     for (desc = dp->members; desc != NULL; desc = desc->next)
         {if ((strcmp(desc->name, member) == 0) ||
@@ -506,8 +505,8 @@ int PA_th_transpose(char *name, int ncpf)
     ret  = PA_th_trans_files(name, ncpf, nthf, thfiles, 1, FALSE);
 
     for (i = 0; i < nthf; i++)
-        SFREE(thfiles[i]);
-    SFREE(thfiles);
+        CFREE(thfiles[i]);
+    CFREE(thfiles);
 
     return(ret);}
 
@@ -530,8 +529,8 @@ int PA_th_trans_family(char *name, int ord, int ncpf)
     ret  = PA_th_trans_files(name, ncpf, nthf, thfiles, ord, FALSE);
 
     for (i = 0; i < nthf; i++)
-        SFREE(thfiles[i]);
-    SFREE(thfiles);
+        CFREE(thfiles[i]);
+    CFREE(thfiles);
 
     return(ret);}
 
@@ -587,8 +586,8 @@ int PA_th_trans_name(int n, char **names, int ord, int ncpf)
     ret = PA_th_trans_files(root, ncpf, nthf, thfiles, ord, FALSE);
 
     for (i = 0; i < nthf; i++)
-        SFREE(thfiles[i]);
-    SFREE(thfiles);
+        CFREE(thfiles[i]);
+    CFREE(thfiles);
 
     return(ret);}
 
@@ -649,8 +648,8 @@ int PA_th_trans_link(int n, char **names, int ord, int ncpf)
     ret = PA_th_trans_files(root, ncpf, nthf, thfiles, ord, FALSE);
 
     for (i = 0; i < nthf; i++)
-        SFREE(thfiles[i]);
-    SFREE(thfiles);
+        CFREE(thfiles[i]);
+    CFREE(thfiles);
 
     return(ret);}
 
@@ -718,9 +717,9 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
     strcpy(type, SC_DOUBLE_S);
 
     n_max       = 10;
-    _PA.thd  = FMAKE_N(th_record, n_max, "_PA_SETUP_UF_FAMILY:thd");
-    _PA.ndpt = FMAKE_N(dimdes, n_max, "_PA_SETUP_UF_FAMILY:ndpt");
-    _PA.ncrv = FMAKE_N(int, n_max, "_PA_SETUP_UF_FAMILY:_PA.ncrv");
+    _PA.thd  = CMAKE_N(th_record, n_max);
+    _PA.ndpt = CMAKE_N(dimdes, n_max);
+    _PA.ncrv = CMAKE_N(int, n_max);
     for (k = 0; k < n_max; k++)
         {_PA.thd[k].n_members  = 0;
 	 _PA.ndpt[k].index_min = LONG_MAX;
@@ -758,13 +757,13 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
 
               if (i >= (n_max - 1))
                  {n_max += 10;
-                  REMAKE_N(_PA.thd, th_record, n_max);
-                  REMAKE_N(_PA.ndpt, dimdes, n_max);
+                  CREMAKE(_PA.thd, th_record, n_max);
+                  CREMAKE(_PA.ndpt, dimdes, n_max);
                   for (k = n_max - 10; k < n_max; k++)
                       {_PA.thd[k].n_members = 0;
 		       _PA.ndpt[k].index_min = LONG_MAX;
                        _PA.ndpt[k].index_max = 0L;};
-                  REMAKE_N(_PA.ncrv, int, n_max);};};
+                  CREMAKE(_PA.ncrv, int, n_max);};};
 
          _PA.ndom = max(_PA.ndom, i);
 
@@ -773,7 +772,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
     for (i = 0; i < _PA.ndom; i++)
         _PA.ndpt[i].number = _PA.ndpt[i].index_max - _PA.ndpt[i].index_min + 1L;
 
-    _PA.uf = FMAKE_N(PDBfile *, _PA.ndom, "_PA_SETUP_UF_FAMILY:uf");
+    _PA.uf = CMAKE_N(PDBfile *, _PA.ndom);
     ind[0] = 0L;
     ind[2] = 1L;
 
@@ -910,7 +909,7 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
             {for (j = 0; j < nv; j++)
                  crve[j][k] = *pd++;};
 
-        SFREE(data);};
+        CFREE(data);};
 
     rv = ns*nv;
 
@@ -999,12 +998,12 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
     stripe = _PD_alloc_entry(th, rtyp, ns);
 
 /* allocate the curve arrays */
-    crve = FMAKE_N(double *, nv, "_PA_PROC_REC:crve");
+    crve = CMAKE_N(double *, nv);
     strcpy(type, SC_DOUBLE_S);
 
     nptm = _PA.ndpt[recn].number;
     for (i = 0; i < nv; i++)
-        crve[i] = FMAKE_N(double, nptm, "_PA_PROC_REC:crve[]");
+        crve[i] = CMAKE_N(double, nptm);
 
     na  = 0L;
     nrd = 0L;
@@ -1039,17 +1038,17 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 /* write out the time plot domain data */
     PD_write_alt(pduf, "xval0", type, crve[0], 1, ind);
 
-    SFREE(crve[0]);
+    CFREE(crve[0]);
 
 /* write out the time plot range data */
     for (i = 0; i < nc; i++)
         {j = i + 1;
          snprintf(bf, MAXLINE, "yval%d", i);
          PD_write_alt(pduf, bf, type, crve[j], 1, ind);
-         SFREE(crve[j]);};
+         CFREE(crve[j]);};
 
-    SFREE(stripe);
-    SFREE(crve);
+    CFREE(stripe);
+    CFREE(crve);
 
     return(TRUE);}
 
@@ -1105,7 +1104,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
 
     for (i = 0; i < _PA.ndom; i++)
 	{PD_read(_PA.uf[i], "npts0", &n);
-	 data = FMAKE_N(double, n, "PA_TH_TRANS_FILES:data");
+	 data = CMAKE_N(double, n);
 	 PD_read(_PA.uf[i], "xval0", data);
 	 PM_maxmin(data, ext, ext + 1, n);
 	 PD_write(_PA.uf[i], "xext0", type, ext);
@@ -1117,14 +1116,14 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
 	      snprintf(bf, MAXLINE, "yext%d", j);
 	      PD_write(_PA.uf[i], bf, type, ext);};
 
-         SFREE(data)};
+         CFREE(data)};
 
 /* clean up the memory */
     _PA_rl_th(_PA.thd, _PA.ndom);
 
-    SFREE(_PA.thd);
-    SFREE(_PA.ndpt);
-    SFREE(_PA.ncrv);
+    CFREE(_PA.thd);
+    CFREE(_PA.ndpt);
+    CFREE(_PA.ncrv);
 
 /* close out the ULTRA files */
     ret = TRUE;
@@ -1137,7 +1136,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
                 PRINT(stdout, "Error closing ULTRA file %s.u%02d\n", name, i);
              ret = FALSE;};};
 
-    SFREE(_PA.uf);
+    CFREE(_PA.uf);
 
     return(ret);}
 
@@ -1162,8 +1161,8 @@ int PA_merge_family(char *base, char *family, int ncpf)
     ret = PA_merge_files(base, n, files, ncpf);
 
     for (i = 0; i < n; i++)
-        SFREE(files[i]);
-    SFREE(files);
+        CFREE(files[i]);
+    CFREE(files);
 
     return(ret);}
 
@@ -1241,7 +1240,7 @@ int PA_merge_files(char *base, int n, char **files, int ncpf)
 			    "WARNING: SKIPPED CURVE %d FILE %s - PA_MERGE_FILES\n",
 			    ics + 1, files[i]);
 		      ict--;};};};
-	 SFREE(names);
+	 CFREE(names);
 
 	 if ((ncpf != 0) && (ict >= ncpf) && ((i + 1) < n))
 	    {fpt = PD_family(fpt, TRUE);
@@ -1339,12 +1338,12 @@ FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, F77_string fname,
     nc = *pnf;
     SC_FORTRAN_STR_C(lname, fname, nc);
 
-    fth = FMAKE(f77_th_record, "PABREC:fth");
+    fth = CMAKE(f77_th_record);
     
     fth->labels     = SC_STRING_ARRAY();
     fth->members    = SC_STRING_ARRAY();
-    fth->type       = SC_strsavef(ltype, "char*:PABREC:type");
-    fth->entry_name = SC_strsavef(lname, "char*:PABREC:name");
+    fth->type       = CSTRSAVE(ltype);
+    fth->entry_name = CSTRSAVE(lname);
 
     nc = *pnd;
     SC_FORTRAN_STR_C(ltime, ftime, nc);
@@ -1376,7 +1375,7 @@ FIXNUM F77_FUNC(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
     
     snprintf(dname, MAXLINE, "th%d", (int) *pind);
     if (PD_read(file, dname, &thd) != 0)
-       {fth = FMAKE(f77_th_record, "PAGRID:fth");
+       {fth = CMAKE(f77_th_record);
     
 	n = thd.n_members;
 
@@ -1424,7 +1423,7 @@ FIXNUM F77_FUNC(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnm,
     SC_array_string_add_copy(fth->members, lmemb);
 
     if (nc > 0)
-       s = SC_strsavef(llabl, "char*:PAAREC:s");
+       s = CSTRSAVE(llabl);
     else
        s = NULL;
 
@@ -1462,8 +1461,8 @@ FIXNUM F77_FUNC(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
 
     rv = (dp != NULL);
 
-    SFREE(sm);
-    SFREE(sl);
+    CFREE(sm);
+    CFREE(sl);
 
     return(rv);}
 
@@ -1599,7 +1598,7 @@ FIXNUM F77_FUNC(patrnn, PATRNN)(FIXNUM *pnchrs, F77_string chrs,
     FIXNUM ret;
     char **names, *pc;
 
-    pc = FMAKE_N(char, *pnchrs + 2, "PATRNN:pc");
+    pc = CMAKE_N(char, *pnchrs + 2);
     SC_FORTRAN_STR_C(pc, chrs, *pnchrs);
 
     names = SC_tokenize(pc, " \t\f\n\r");
@@ -1609,7 +1608,7 @@ FIXNUM F77_FUNC(patrnn, PATRNN)(FIXNUM *pnchrs, F77_string chrs,
 
     SC_free_strings(names);
 
-    SFREE(pc);
+    CFREE(pc);
 
     return(ret);}
 
@@ -1648,7 +1647,7 @@ FIXNUM F77_FUNC(patrnl, PATRNL)(FIXNUM *pnchrs, F77_string chrs,
     FIXNUM ret;
     char **names, *pc;
 
-    pc = FMAKE_N(char, *pnchrs + 2, "PATRNL:pc");
+    pc = CMAKE_N(char, *pnchrs + 2);
     SC_FORTRAN_STR_C(pc, chrs, *pnchrs);
 
     names = SC_tokenize(pc, " \t\f\n\r");
@@ -1658,7 +1657,7 @@ FIXNUM F77_FUNC(patrnl, PATRNL)(FIXNUM *pnchrs, F77_string chrs,
     
     SC_free_strings(names);
 
-    SFREE(pc);
+    CFREE(pc);
 
     return(ret);}
 
@@ -1707,7 +1706,7 @@ FIXNUM F77_FUNC(pamrgn, PAMRGN)(FIXNUM *pnb, F77_string base, FIXNUM *pnchrs,
     FIXNUM ret;
     char **files, *pc, s[MAXLINE];
 
-    pc = FMAKE_N(char, *pnchrs + 2, "PAMRGN:pc");
+    pc = CMAKE_N(char, *pnchrs + 2);
     SC_FORTRAN_STR_C(pc, chrs, *pnchrs);
     SC_FORTRAN_STR_C(s, base, *pnb);
 
@@ -1718,7 +1717,7 @@ FIXNUM F77_FUNC(pamrgn, PAMRGN)(FIXNUM *pnb, F77_string base, FIXNUM *pnchrs,
 
     SC_free_strings(files);
 
-    SFREE(pc);
+    CFREE(pc);
 
     return(ret);}
 
@@ -1736,10 +1735,10 @@ FIXNUM F77_FUNC(pafrec, PAFREC)(FIXNUM *recid)
     SC_free_array(fth->labels, SC_array_free_n);
     SC_free_array(fth->members, SC_array_free_n);
 
-    SFREE(fth->type);
-    SFREE(fth->entry_name);
+    CFREE(fth->type);
+    CFREE(fth->entry_name);
 
-    SFREE(fth);
+    CFREE(fth);
 
     rv = TRUE;
 

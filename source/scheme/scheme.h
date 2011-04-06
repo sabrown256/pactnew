@@ -602,7 +602,7 @@ struct s_SS_vect
        SS_error("FREED OBJECT - SS_GC", SS_null);                            \
     if (x != NULL)                                                           \
        {if ((SS_OBJECT_GC(x) != 1) || (x->val == NULL))                      \
-           {SFREE(x);}                                                       \
+           {CFREE(x);}                                                       \
         else                                                                 \
            x->release(x);};}
 
@@ -613,7 +613,7 @@ struct s_SS_vect
     x = obj;                                                                 \
     if (x != NULL)                                                           \
        {if ((SS_OBJECT_GC(x) != 1) || (x->val == NULL))                      \
-           {SFREE(x);}                                                       \
+           {CFREE(x);}                                                       \
         else                                                                 \
            x->release(x);};}
 

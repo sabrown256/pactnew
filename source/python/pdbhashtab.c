@@ -190,7 +190,7 @@ PP_hashtab_keys(PP_hashtabObject *self,
             break;
         }
     }
-    SFREE(names);
+    CFREE(names);
   
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.hashtab.method.keys) */
@@ -313,8 +313,8 @@ static PyGetSetDef PP_hashtab_getset[] = {
 static int _PP_hash_cln(haelem *hp, void *a)
 {
     (void) _PP_rel_syment(PP_vif->host_chart, (char *) &hp->def, 1L, hp->type);
-    SFREE(hp->type);
-    SFREE(hp->def);
+    CFREE(hp->type);
+    CFREE(hp->def);
 
     return(TRUE);
 }

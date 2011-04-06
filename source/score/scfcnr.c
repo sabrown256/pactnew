@@ -41,9 +41,9 @@ static SC_file_type _SC_fcontainer_type(char *name)
 fcontainer *_SC_make_fcontainer(char *name, SC_file_type type, void *handle)
    {fcontainer *cf;
 
-    cf = FMAKE(fcontainer, "_SC_MAKE_FCONTAINER:cf");
+    cf = CMAKE(fcontainer);
 
-    cf->name   = SC_strsavef(name, "_SC_MAKE_FCONTAINER:name");
+    cf->name   = CSTRSAVE(name);
     cf->type   = type;
     cf->handle = handle;
     
@@ -62,8 +62,8 @@ static int _SC_rel_entry(haelem *hp, void *a)
     SC_ASSERT(ok == TRUE);
 
     if (ae != NULL)
-       {SFREE(ae->name);
-	SFREE(ae);};
+       {CFREE(ae->name);
+	CFREE(ae);};
 
     return(TRUE);}
 
@@ -76,7 +76,7 @@ void SC_free_fcontainer(fcdes *fc)
    {
 
     if (fc != NULL)
-       {SFREE(fc->name);
+       {CFREE(fc->name);
 
 	if (fc->file != NULL)
 	   fclose(fc->file);
@@ -84,7 +84,7 @@ void SC_free_fcontainer(fcdes *fc)
 	if (fc->entries != NULL)
 	   SC_hasharr_clear(fc->entries, _SC_rel_entry, NULL);
 
-	SFREE(fc);};
+	CFREE(fc);};
 
     return;}
 
@@ -142,7 +142,7 @@ char **SC_fcontainer_list(fcontainer *cf, int full)
 
     n = SC_hasharr_get_n(tab);
     if (n > 0)
-       {rv = FMAKE_N(char *, n + 1, "_SC_FCONTAINER_LIST:rv");
+       {rv = CMAKE_N(char *, n + 1);
 	ne = 0;
 	for (i = 0; SC_hasharr_next(tab, &i, NULL, NULL, (void **) &te); i++)
 	    {if (full == TRUE)
@@ -155,7 +155,7 @@ char **SC_fcontainer_list(fcontainer *cf, int full)
 	     else
 	        SC_strncpy(s, MAXLINE, te->name, -1);
 
-	     rv[ne++] = SC_strsavef(s, "_SC_FCONTAINER_LIST:rv[ne]");};
+	     rv[ne++] = CSTRSAVE(s);};
 
 	rv[ne] = NULL;};
             
@@ -180,8 +180,8 @@ void SC_list_fcontainer(FILE *f, fcontainer *cf, int full)
         if (ret != NULL)
            {for (i = 0; ret[i] != NULL; i++)
 	        {PRINT(f, "     %s\n", ret[i]);
-		 SFREE(ret[i]);};
-            SFREE(ret);};}
+		 CFREE(ret[i]);};
+            CFREE(ret);};}
             
     else 
        PRINT(f, "Invalid file container specified\n");
@@ -197,8 +197,8 @@ void SC_close_fcontainer(fcontainer *cf)
    {
 
     SC_free_fcontainer(cf->handle);        
-    SFREE(cf->name);
-    SFREE(cf);
+    CFREE(cf->name);
+    CFREE(cf);
 
     return;}
 

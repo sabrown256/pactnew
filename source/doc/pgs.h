@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 11/27/2010
+MOD: 04/06/2011
 
 <CENTER>
 <P>
@@ -4855,9 +4855,9 @@ pcons *alst;
 double *clev;
 int *nlev;
 
-nlev  = MAKE(int);
+nlev  = CMAKE(int);
 *nlev = 6;
-clev  = MAKE_N(double, *nlev);
+clev  = CMAKE_N(double, *nlev);
 
 PG_get_render_info(g, alst);
 alst = SC_change_alist(alst, "LEVELS", "double *", clev);
@@ -4874,10 +4874,10 @@ PG_set_render_info(g, alst);
 integer gid, ial, nlev
 real clev(10)
 
-call pgginf (gid, ial)
-call scchal (ial, 6, 'LEVELS', 6, 'double', nlev, clev)
-call scchal (ial, 8, 'N-LEVELS', 7, 'integer', 1, nlev)
-call pgsinf (gid, ial)
+call pgginf(gid, ial)
+call scchal(ial, 6, 'LEVELS', 6, 'double', nlev, clev)
+call scchal(ial, 8, 'N-LEVELS', 7, 'integer', 1, nlev)
+call pgsinf(gid, ial)
 </PRE>
 </BLOCKQUOTE>
 
@@ -5155,7 +5155,7 @@ main(argc, argv)
     PG_graph *data;
     PG_device *SCR_dev, *SCR_dew, *PS_dev;
 
-    s = SC_strsave("WINDOW");
+    s = CSTRSAVE("WINDOW");
 
     for (i = 1; i < argc; i++)
         if (argv[i][0] == '-')
@@ -5164,8 +5164,8 @@ main(argc, argv)
                            s = argv[i];
                            break;};};
 
-    x = MAKE_N(double, N);
-    y = MAKE_N(double, N);
+    x = CMAKE_N(double, N);
+    y = CMAKE_N(double, N);
 
     for (i = 0; i < N; i++)
         {x[i] = -(i+1)/8.0;
@@ -5303,9 +5303,9 @@ int main(int argc, char **argv)
     ymin      = -5.0;
     ymax      = 5.0;
     kxl       = kmax*lmax;
-    x         = MAKE_N(double, kxl);
-    y         = MAKE_N(double, kxl);
-    f         = MAKE_N(double, kxl);
+    x         = CMAKE_N(double, kxl);
+    y         = CMAKE_N(double, kxl);
+    f         = CMAKE_N(double, kxl);
     id        = 'A';
     lncolor   = SCR_dev->BLUE;
     lnwidth   = 0.0;
@@ -5647,16 +5647,16 @@ main(argc, argv)
     if (type == PLOT_SURFACE)
        PG_set_palette(SCR_dev, "spectrum");
 
-    rx = px = MAKE_N(double, n_pts);
-    ry = py = MAKE_N(double, n_pts);
-    rz = pz = MAKE_N(double, n_pts);
+    rx = px = CMAKE_N(double, n_pts);
+    ry = py = CMAKE_N(double, n_pts);
+    rz = pz = CMAKE_N(double, n_pts);
 
     if (type == PLOT_SURFACE)
-       rs = ps = MAKE_N(double, n_pts);
+       rs = ps = CMAKE_N(double, n_pts);
     else
        rs = ps = pz;
 
-    ext = MAKE_N(double, 4);
+    ext = CMAKE_N(double, 4);
 
     ext[0] = -1;
     ext[1] =  1;

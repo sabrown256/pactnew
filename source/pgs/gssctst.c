@@ -37,9 +37,9 @@ int main(int argc, char **argv)
    ymin      = -5.0;
    ymax      = 5.0;
    kxl       = kmax*lmax;
-   x         = MAKE_N(double, kxl);
-   y         = MAKE_N(double, kxl);
-   f         = MAKE_N(double, kxl);
+   x         = CMAKE_N(double, kxl);
+   y         = CMAKE_N(double, kxl);
+   f         = CMAKE_N(double, kxl);
    id        = 'A';
    lncolor   = (SCR_dev != NULL) ? SCR_dev->BLUE : 4;
    lnwidth   = 0.0;

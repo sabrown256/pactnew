@@ -17,11 +17,11 @@
     {if (lst == NULL)                                                       \
         {nx  = 1000;                                                        \
 	 n   = 0;                                                           \
-	 lst = FMAKE_N(PG_triangle, nx, "GSHLS.C:lst");};                   \
+	 lst = CMAKE_N(PG_triangle, nx);};                   \
      lst[n++] = *a;                                                         \
      if (n >= nx)                                                           \
 	{nx += 1000;                                                        \
-	 REMAKE_N(lst, PG_triangle, nx);};}
+	 CREMAKE(lst, PG_triangle, nx);};}
 
 static int
  debug = FALSE;
@@ -104,11 +104,9 @@ static PG_triangle *PG_triangularize_ac(PG_device *dev, PM_mesh_topology *mt,
                    ntri += (je2 - je1 - 1);};
 
               ntrix = 1000*(1 + ((int) (ntri/1000)));
-              tri   = FMAKE_N(PG_triangle, ntrix,
-                              "PG_TRIANGULARIZE_AC:tri");
+              tri   = CMAKE_N(PG_triangle, ntrix);
 
-              *orient = FMAKE_N(double, ntrix,
-				"PG_TRIANGULARIZE_AC:orient");
+              *orient = CMAKE_N(double, ntrix);
               lorient = *orient;
 
               ntri = 0;
@@ -239,9 +237,9 @@ static PG_triangle *_PG_depth_sort(PG_triangle *trial, int ntr,
     PG_node *node[PG_SPACEDM];
     PG_triangle *triout, *a;
  
-    z      = FMAKE_N(double, ntr, "_PG_DEPTH_SORT:z");
-    ind    = FMAKE_N(int, ntr, "_PG_DEPTH_SORT:ind");
-    triout = FMAKE_N(PG_triangle, ntr, "_PG_DEPTH_SORT:triout");
+    z      = CMAKE_N(double, ntr);
+    ind    = CMAKE_N(int, ntr);
+    triout = CMAKE_N(PG_triangle, ntr);
 
     third = 1.0/3.0;
 
@@ -279,8 +277,8 @@ static PG_triangle *_PG_depth_sort(PG_triangle *trial, int ntr,
 	*pno = ntr;
 	*pni = 0;};
 
-    SFREE(z);
-    SFREE(ind);
+    CFREE(z);
+    CFREE(ind);
 
     return(triout);}
 
@@ -327,10 +325,10 @@ PG_triangle *_PG_hls_remove(PG_device *dev, char *type,
     else if (_PG.depth_sort)
        {vis = _PG_depth_sort(trial, ntr, orient, &ntrout, &ntrin);
         nvi = ntr;
-        SFREE(trial);};
+        CFREE(trial);};
 
     if (orient != NULL)
-       {SFREE(orient);};
+       {CFREE(orient);};
 
     *pn = nvi;
 

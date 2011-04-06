@@ -469,7 +469,7 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
 #endif
 	   };
 
-	SFREE(s);};
+	CFREE(s);};
 
     return(TRUE);}
 
@@ -504,7 +504,7 @@ int PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...)
 	 PG_draw_box_n(dev, 2, WORLDC, wc);};
 #endif
 
-        SFREE(s);
+        CFREE(s);
 
 	rv = TRUE;};
 

@@ -50,7 +50,7 @@ int64_t SC_dsk_space(char *dir, int64_t nbx)
 /* go back to the directory we came from */
     st = chdir(cwd);
 
-    SFREE(cwd);
+    CFREE(cwd);
 
     return(nb);}
 

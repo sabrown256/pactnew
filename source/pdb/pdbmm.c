@@ -36,7 +36,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
     if (_PD.maxfsize == 0)
        SC_fix_lmt(sizeof(int64_t), NULL, &_PD.maxfsize, NULL);
 
-    file = FMAKE(PDBfile, "_PD_MK_PDB:file");
+    file = CMAKE(PDBfile);
     if (file != NULL)
        {if (sys == NULL)
 	   sys = &_PD_sys;
@@ -54,7 +54,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 
 	file->udl        = pu;
 	file->stream     = fp;
-	file->name       = SC_strsavef(name, "char*:_PD_MK_PDB:name");
+	file->name       = CSTRSAVE(name);
 	file->type       = NULL;
 
 	file->symtab            = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
@@ -62,14 +62,14 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->host_chart        = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 	file->attrtab           = NULL;
 	file->mode              = PD_UNINIT;
-	file->file_mode         = SC_strsavef(md, "char*:_PD_MK_PDB:file_mode");
+	file->file_mode         = CSTRSAVE(md);
 
 	file->maximum_size     = _PD.maxfsize;                   /* family info */
 	file->previous_file    = NULL;
 
 	file->virtual_internal = FALSE;                 /* disk file by default */
 	file->current_prefix   = NULL;       /* read/write variable name prefix */
-	file->ptr_base         = SC_strsavef("/&ptrs/ia_", "_PD_MK_PDB:ptr_base");
+	file->ptr_base         = CSTRSAVE("/&ptrs/ia_");
 
 	file->default_offset = 0;           /* default offset for array indexes */
 	file->major_order    = ROW_MAJOR_ORDER;
@@ -136,8 +136,8 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 void _PD_rl_pdb(PDBfile *file)
    {
 
-    SFREE(file->date);
-    SFREE(file->ptr_base);
+    CFREE(file->date);
+    CFREE(file->ptr_base);
 
     _SC_rel_udl(file->udl);
 
@@ -155,15 +155,15 @@ void _PD_rl_pdb(PDBfile *file)
     _PD_rl_alignment(file->host_align);
 
     if (file->previous_file != NULL)
-       SFREE(file->previous_file);
+       CFREE(file->previous_file);
 
     if (file->type != NULL)
-       SFREE(file->type);
+       CFREE(file->type);
 
-    SFREE(file->current_prefix);
-    SFREE(file->file_mode);
-    SFREE(file->name);
-    SFREE(file);
+    CFREE(file->current_prefix);
+    CFREE(file->file_mode);
+    CFREE(file->name);
+    CFREE(file);
 
     return;}
 
@@ -200,7 +200,7 @@ void *_PD_alloc_entry(PDBfile *file, char *type, long ni)
     pa = _PD_get_state(-1);
 
     if (_PD_indirection(type))
-       {vr = (char *) FMAKE_N(char *, ni, "_PD_ALLOC_ENTRY:char *");}
+       {vr = (char *) CMAKE_N(char *, ni);}
     else
        {dp = PD_inquire_host_type(file, type);
         if (dp == NULL)
@@ -249,7 +249,7 @@ data_standard *_PD_mk_standard(PDBfile *file)
    {int i;
     data_standard *std;
 
-    std = FMAKE(data_standard, "_PD_MK_STANDARD:std");
+    std = CMAKE(data_standard);
 
     std->bits_byte         = BITS_DEFAULT;
     std->ptr_bytes         = 0;
@@ -285,7 +285,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     long *fstd, *fsrc;
     data_standard *std;
 
-    std = FMAKE(data_standard, "_PD_COPY_STANDARD:std");
+    std = CMAKE(data_standard);
 
     std->bits_byte  = src->bits_byte;
     std->ptr_bytes  = src->ptr_bytes;
@@ -303,7 +303,7 @@ data_standard *_PD_copy_standard(data_standard *src)
         {std->fp[i].bpi = src->fp[i].bpi;
 
 	 n    = FORMAT_FIELDS;
-         fstd = FMAKE_N(long, n, "_PD_COPY_STANDARD:fp_format");
+         fstd = CMAKE_N(long, n);
 	 SC_mark(fstd, 1);
 	 std->fp[i].format = fstd;
 	 fsrc = src->fp[i].format;
@@ -311,7 +311,7 @@ data_standard *_PD_copy_standard(data_standard *src)
 
 	 n = std->fp[i].bpi;
 	 n = (n > 0) ? n : -(n / std->bits_byte);
-	 ostd = FMAKE_N(int,  n, "_PD_COPY_STANDARD:fp_order");
+	 ostd = CMAKE_N(int,  n);
 	 SC_mark(ostd, 1);
 	 std->fp[i].order = ostd;
 	 osrc = src->fp[i].order;
@@ -328,14 +328,14 @@ data_standard *_PD_copy_standard(data_standard *src)
 
 void _PD_rl_standard(data_standard *std)
    {if (std != NULL)
-       {SFREE(std->fp[0].format);
-        SFREE(std->fp[0].order);
-        SFREE(std->fp[1].format);
-        SFREE(std->fp[1].order);
-        SFREE(std->fp[2].format);
-        SFREE(std->fp[2].order);
+       {CFREE(std->fp[0].format);
+        CFREE(std->fp[0].order);
+        CFREE(std->fp[1].format);
+        CFREE(std->fp[1].order);
+        CFREE(std->fp[2].format);
+        CFREE(std->fp[2].order);
 
-        SFREE(std);};
+        CFREE(std);};
 
     return;}
 
@@ -349,7 +349,7 @@ void _PD_rl_standard(data_standard *std)
 data_alignment *_PD_copy_alignment(data_alignment *src)
    {data_alignment *align;
 
-    align = FMAKE(data_alignment, "_PD_COPY_ALIGNMENT:align");
+    align = CMAKE(data_alignment);
 
     *align = *src;
 
@@ -364,7 +364,7 @@ data_alignment *_PD_copy_alignment(data_alignment *src)
 
 void _PD_rl_alignment(data_alignment *align)
    {if (SC_arrlen(align) > 0)
-       {SFREE(align);};
+       {CFREE(align);};
 
     return;}
 
@@ -380,7 +380,7 @@ dimdes *PD_copy_dims(dimdes *odims)
     ndims = NULL;
     
     for (od = odims; od != NULL; od = od->next)
-        {next  = FMAKE(dimdes, "PD_COPY_DIMS:next");
+        {next  = CMAKE(dimdes);
          *next = *od;
 	 next->next = NULL;
 
@@ -407,9 +407,9 @@ syment *PD_copy_syment(syment *osym)
     if (osym == NULL)
        return(NULL);
 
-    nsym = FMAKE(syment, "PD_COPY_SYMENT:nsym");
+    nsym = CMAKE(syment);
 
-    ntype = SC_strsavef(PD_entry_type(osym), "char*:PD_COPY_SYMENT:type");
+    ntype = CSTRSAVE(PD_entry_type(osym));
     ndims = PD_copy_dims(PD_entry_dimensions(osym));
 
     _PD_block_copy(nsym, osym);
@@ -436,7 +436,7 @@ syment *_PD_mk_syment(char *type, long ni, int64_t addr, symindir *indr,
    {syment *ep;
     char *t;
 
-    ep = FMAKE(syment, "_PD_MK_SYMENT:ep");
+    ep = CMAKE(syment);
     if (ep != NULL)
        {ep->blocks = NULL;
 
@@ -447,7 +447,7 @@ syment *_PD_mk_syment(char *type, long ni, int64_t addr, symindir *indr,
 	if (type == NULL)
 	   t = NULL;
 	else
-	   {t = SC_strsavef(type, "char*:_PD_MK_SYMENT:type");
+	   {t = CSTRSAVE(type);
 	    SC_mark(t, 1);};
 
 	PD_entry_type(ep)       = t;
@@ -502,7 +502,7 @@ int _PD_ha_rl_syment(haelem *hp, void *a)
 
     _PD_rl_syment_d(ep);
 
-    SFREE(name);
+    CFREE(name);
 
     return(TRUE);}
 
@@ -517,9 +517,9 @@ void _PD_rl_syment(syment *ep)
    {
 
     if (ep != NULL)
-       {SFREE(PD_entry_type(ep));
+       {CFREE(PD_entry_type(ep));
 	_PD_block_rel(ep);
-	SFREE(ep);};
+	CFREE(ep);};
 
     return;}
 
@@ -536,9 +536,9 @@ defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
     memdes *desc;
     int n;
 
-    dp = FMAKE(defstr, "_PD_MK_DEFSTR:dp");
+    dp = CMAKE(defstr);
 
-    dp->type        = SC_strsavef(type, "char*:_PD_MK_DEFSTR:type");
+    dp->type        = CSTRSAVE(type);
     dp->is_indirect = _PD_indirection(dp->type);   
     dp->alignment   = align;
     dp->kind        = kind;
@@ -650,15 +650,15 @@ void _PD_rl_defstr(defstr *dp)
 
 	ord = dp->fp.order;
 	if ((ord != NULL) && (SC_arrlen(ord) > -1))
-	   SFREE(dp->fp.order);
+	   CFREE(dp->fp.order);
 
 	frm = dp->fp.format;
 	if ((frm != NULL) && (SC_arrlen(frm) > -1))
-	   SFREE(dp->fp.format);
+	   CFREE(dp->fp.format);
 
-	SFREE(dp->type);};
+	CFREE(dp->type);};
 
-    SFREE(dp);
+    CFREE(dp);
 
     return;}
 
@@ -688,9 +688,9 @@ int _PD_ha_rl_defstr(haelem *hp, void *a)
 multides *_PD_make_tuple(char *type, int ni, int *ord)
    {multides *tuple;
 
-    tuple = FMAKE(multides, "_PD_MAKE_TUPLE:tuple");
+    tuple = CMAKE(multides);
 
-    tuple->type  = SC_strsavef(type, "char*:_PD_MAKE_TUPLE:type");
+    tuple->type  = CSTRSAVE(type);
     tuple->ni    = ni;
     tuple->order = ord;
 
@@ -706,11 +706,11 @@ multides *_PD_make_tuple(char *type, int ni, int *ord)
 multides *_PD_copy_tuple(multides *tuple)
    {multides *ntuple;
 
-    ntuple = FMAKE(multides, "_PD_COPY_TUPLE:ntuple");
+    ntuple = CMAKE(multides);
 
     *ntuple = *tuple;
 
-    ntuple->type  = SC_strsavef(tuple->type, "char*:_PD_COPY_TUPLE:type");
+    ntuple->type  = CSTRSAVE(tuple->type);
     ntuple->order = SC_copy_item(tuple->order);
 
     return(ntuple);}
@@ -724,9 +724,9 @@ void _PD_free_tuple(multides *tuple)
    {
 
     if (tuple != NULL)
-       {SFREE(tuple->type);
-	SFREE(tuple->order);
-	SFREE(tuple);};
+       {CFREE(tuple->type);
+	CFREE(tuple->order);
+	CFREE(tuple);};
 
     return;}
 
@@ -743,16 +743,12 @@ memdes *PD_copy_members(memdes *desc)
     newm  = NULL;
     prevm = NULL;
     for (thism = desc; thism != NULL; thism = thism->next)
-        {nnxt = FMAKE(memdes, "PD_COPY_MEMBERS:nnxt");
+        {nnxt = CMAKE(memdes);
 
-         ms = SC_strsavef(thism->member,
-			  "char*:PD_COPY_MEMBERS:member");
-         ts = SC_strsavef(thism->type,
-			  "char*:PD_COPY_MEMBERS:type");
-         bs = SC_strsavef(thism->base_type,
-			  "char*:PD_COPY_MEMBERS:base_type");
-         ns = SC_strsavef(thism->name,
-			  "char*:PD_COPY_MEMBERS:name");
+         ms = CSTRSAVE(thism->member);
+         ts = CSTRSAVE(thism->type);
+         bs = CSTRSAVE(thism->base_type);
+         ns = CSTRSAVE(thism->name);
          nd = PD_copy_dims(thism->dimensions);
 
          nnxt->member      = ms;
@@ -774,8 +770,7 @@ memdes *PD_copy_members(memdes *desc)
          nnxt->number      = thism->number;
 
          if (thism->cast_memb != NULL)
-	    {cs = SC_strsavef(thism->cast_memb,
-			      "char*:PD_COPY_MEMBERS:cast_memb");
+	    {cs = CSTRSAVE(thism->cast_memb);
 	     nnxt->cast_memb  = cs;
              SC_mark(cs, 1);}
 	 else
@@ -803,26 +798,26 @@ memdes *_PD_mk_descriptor(char *member, int defoff)
     memdes *desc;
     dimdes *nd;
 
-    desc = FMAKE(memdes, "_PD_MK_DESCRIPTOR:desc");
+    desc = CMAKE(memdes);
 
 /* get rid of any leading white space */
     for (p = member; strchr(" \t\n\r\f", *p) != NULL; p++);
 
     fp = SC_strstr(p, "(*");
     if (fp == NULL)
-       {ms = SC_strsavef(p, "char*:_PD_MK_DESCRIPTOR:member");
+       {ms = CSTRSAVE(p);
 	ts = _PD_member_type(p);
 	bs = _PD_member_base_type(p);
 	ns = _PD_member_name(p);
 	nd = _PD_ex_dims(p, defoff, &ie);}
 
     else
-       {ts = SC_strsave("function");
-	bs = SC_strsave("function");
+       {ts = CSTRSAVE("function");
+	bs = CSTRSAVE("function");
 	ns = _PD_member_name(p);
 	nd = NULL;
 	snprintf(bf, MAXLINE, "function %s", ns);
-	ms = SC_strsavef(bf, "char*:_PD_MK_DESCRIPTOR:member");};
+	ms = CSTRSAVE(bf);};
 	
     desc->member      = ms;
     desc->type        = ts;
@@ -859,15 +854,15 @@ void _PD_rl_descriptor(memdes *desc)
        return;
 
     if (SC_safe_to_free(desc))
-       {SFREE(desc->member);
-        SFREE(desc->name);
-        SFREE(desc->type);
-        SFREE(desc->base_type);
-        SFREE(desc->cast_memb);
+       {CFREE(desc->member);
+        CFREE(desc->name);
+        CFREE(desc->type);
+        CFREE(desc->base_type);
+        CFREE(desc->cast_memb);
 
         _PD_rl_dimensions(desc->dimensions);}
 
-    SFREE(desc);
+    CFREE(desc);
 
     return;}
 
@@ -887,7 +882,7 @@ void _PD_rl_descriptor(memdes *desc)
 dimdes *_PD_mk_dimensions(long mini, long leng)
    {dimdes *dims;
 
-    dims            = FMAKE(dimdes, "_PD_MK_DIMENSIONS:dims");
+    dims            = CMAKE(dimdes);
     dims->index_min = mini;
     dims->index_max = mini + leng - 1L;
     dims->number    = leng;
@@ -909,7 +904,7 @@ void _PD_rl_dimensions(dimdes *dims)
     for (pp = dims; pp != NULL; pp = nxt)
         {nxt = pp->next;
          nc  = SC_ref_count(pp);
-         SFREE(pp);
+         CFREE(pp);
          if (nc > 1)
 	    break;};
 

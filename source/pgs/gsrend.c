@@ -165,16 +165,16 @@ void PG_find_extrema(PG_graph *data, double stdoff, double **pdpex, double **prp
        {nde = 2;
 	nre = 1;};
 
-    ddex = FMAKE_N(double, 2*nde, "PG_FIND_EXTREMA:ddex");
+    ddex = CMAKE_N(double, 2*nde);
     PG_box_init(nde, ddex, HUGE_REAL, -HUGE_REAL);
 
-    rdex = FMAKE_N(double, 2*nre, "PG_FIND_EXTREMA:rdex");
+    rdex = CMAKE_N(double, 2*nre);
     PG_box_init(nre, rdex, HUGE_REAL, -HUGE_REAL);
 
 /* fill in the data extrema info */
     if (datafl)
-       {ddet = FMAKE_N(double, 2*nde, "PG_FIND_EXTREMA:ddet");
-	rdet = FMAKE_N(double, 2*nre, "PG_FIND_EXTREMA:rdet");
+       {ddet = CMAKE_N(double, 2*nde);
+	rdet = CMAKE_N(double, 2*nre);
 
 	for (g = data; g != NULL; g = g->next)
 	    {for (f = g->f; f != NULL; f = f->next)
@@ -190,8 +190,8 @@ void PG_find_extrema(PG_graph *data, double stdoff, double **pdpex, double **prp
 		     if (_PG_find_set_extrema(range, rdet, rdex, first))
 		        continue;};};
 
-	SFREE(ddet);
-	SFREE(rdet);
+	CFREE(ddet);
+	CFREE(rdet);
 
 	if (pdpex != NULL)
 	   {domain = data->f->domain;
@@ -258,12 +258,12 @@ void PG_find_extrema(PG_graph *data, double stdoff, double **pdpex, double **prp
     if (pddex != NULL)
        *pddex = ddex;
     else
-       SFREE(ddex);
+       CFREE(ddex);
 
     if (prdex != NULL)
        *prdex = rdex;
     else
-       SFREE(rdex);
+       CFREE(rdex);
 
     return;}
 
@@ -366,7 +366,7 @@ PG_picture_desc *PG_get_rendering_properties(PG_device *dev, PG_graph *data)
     meshfl = (data->mesh | (_PG_gattrs.ref_mesh == TRUE));
     pty    = data->rendering;
 
-    pd = FMAKE(PG_picture_desc, "PG_GET_RENDERING_PROPERTIES:pd");
+    pd = CMAKE(PG_picture_desc);
 
     PG_get_render_info(data, alst);
 
@@ -421,8 +421,7 @@ PG_picture_desc *PG_get_rendering_properties(PG_device *dev, PG_graph *data)
     if (pri != NULL)
        {pri->render = pty;
 	if (pri->label == NULL)
-	   pri->label = SC_strsavef(pd->legend_label,
-				    "PG_GET_RENDERING_PROPERTIES:label");};
+	   pri->label = CSTRSAVE(pd->legend_label);};
 
     return(pd);}
 
@@ -1062,7 +1061,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
 /*	 SC_free_alist(inf, 3); */
 	 SC_free_alist(g->info, 3);
 
-	 SFREE(g);
+	 CFREE(g);
 
 	 if (id > 'Z')
 	    id = 'A';
@@ -1144,8 +1143,8 @@ void PG_finish_picture(PG_device *dev, PG_graph *data, PG_picture_desc *pd)
 	if ((wc[0] != wc[1]) && (wc[2] != wc[3]))
 	   PG_set_viewspace(dev, 2, WORLDC, wc);};
 
-    SFREE(pd->levels);
-    SFREE(pd);
+    CFREE(pd->levels);
+    CFREE(pd);
 
 /* release the device */
     PG_release_current_device(dev);

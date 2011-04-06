@@ -655,7 +655,7 @@ object *SX_plane(object *argl)
     dom  = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nde,
 				   maxes, extr, ratio);
 
-    SFREE(extr);
+    CFREE(extr);
 
 /* make the range */
     ne    = dom->n_elements;
@@ -744,7 +744,7 @@ void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
 	for (i = 0; i < ntimes; i++)
 	    PM_filter_coeff(yp, n, coeff + 1, nc);
 
-	SFREE(coeff);}
+	CFREE(coeff);}
 
     else
        SS_error("BAD COEFFICIENT ARRAY - _SX_FILTER_COEF", SS_null);

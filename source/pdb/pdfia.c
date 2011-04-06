@@ -62,13 +62,13 @@ FIXNUM _PD_read_aux(PDBfile *file, char *name, char *type, void *vr,
 
     ne = 3*nd;
 
-    pi = FMAKE_N(long, ne, "_PD_READ_AUX:pi");
+    pi = CMAKE_N(long, ne);
     for (i = 0; i < ne; i++)
         pi[i] = ind[i];
 
     ret = _PD_indexed_read_as(file, fullpath, type, vr, nd, pi, ep);
 
-    SFREE(pi);
+    CFREE(pi);
 
     return(ret);}
 
@@ -86,13 +86,13 @@ FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
     FIXNUM ret;
 
     ne = 3*nd;
-    pi = FMAKE_N(long, ne, "_PD_WRITE_AUX:pi");
+    pi = CMAKE_N(long, ne);
     for (i = 0; i < ne; i++)
         pi[i] = dims[i];
 
     ret = PD_write_as_alt(file, name, typi, typo, space, nd, pi);
 
-    SFREE(pi);
+    CFREE(pi);
 
     return(ret);}
     
@@ -109,13 +109,13 @@ static FIXNUM _PD_append_aux(PDBfile *file, char *name, char *type,
     FIXNUM ret;
 
     ne = 3*nd;
-    pi = FMAKE_N(long, ne, "_PD_APPEND_AUX:pi");
+    pi = CMAKE_N(long, ne);
     for (i = 0; i < ne; i++)
         pi[i] = dims[i];
 
     ret = PD_append_as_alt(file, name, type, space, nd, pi);
 
-    SFREE(pi);
+    CFREE(pi);
 
     return(ret);}
     
@@ -132,13 +132,13 @@ static FIXNUM _PD_defent_aux(PDBfile *file, char *name, char *type,
     syment *ep;
 
     ne = 3*nd;
-    pi = FMAKE_N(long, ne, "_PD_DEFENT_AUX:pi");
+    pi = CMAKE_N(long, ne);
     for (i = 0; i < ne; i++)
         pi[i] = dims[i];
 
     ep = PD_defent_alt(file, name, type, nd, pi);
 
-    SFREE(pi);
+    CFREE(pi);
 
     return(ep != NULL);}
     
@@ -1013,7 +1013,7 @@ FIXNUM F77_FUNC(pfrptr, PFRPTR)(FIXNUM *fileid, FIXNUM *pnchr,
 
 	    memcpy(space, vr, nb);
 
-	    SFREE(vr);
+	    CFREE(vr);
 
 	    _PD_rl_syment_d(ep);};};
 
@@ -1377,7 +1377,7 @@ FIXNUM F77_FUNC(pfdefs, PFDEFS)(FIXNUM *fileid,
          SC_FORTRAN_STR_C(s, ps, n);
 
          desc  = _PD_mk_descriptor(s, file->default_offset);
-         type  = SC_strsavef(s, "char*:PFDEFS:type");
+         type  = CSTRSAVE(s);
          ptype = SC_firsttok(type, " \n");
          if (SC_hasharr_lookup(fchrt, ptype) == NULL)
             if ((strcmp(ptype, lname) != 0) || !_PD_indirection(s))
@@ -1385,7 +1385,7 @@ FIXNUM F77_FUNC(pfdefs, PFDEFS)(FIXNUM *fileid,
 			 "ERROR: %s BAD MEMBER TYPE - PFDEFS\n",
 			 s);
                 return(FALSE);};
-         SFREE(type);
+         CFREE(type);
          if (lst == NULL)
             lst = desc;
          else
@@ -1424,21 +1424,21 @@ FIXNUM F77_FUNC(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, F77_string name,
     SC_FORTRAN_STR_C(lname, name, *pnchr);
 
     n = *pnm;
-    members = FMAKE_N(char *, n, "PFDEFT:members");
+    members = CMAKE_N(char *, n);
     for (i = 0; i < n; i++)
         {indx = nc[2*i];
          mc   = nc[2*i + 1];
 
          SC_strncpy(bf, MAXLINE, lnm+indx, mc);
 
-         members[i] = SC_strsavef(bf, "char*:PFDEFT:bf");};
+         members[i] = CSTRSAVE(bf);};
 
 /* install the type in both charts */
     dp = PD_defstr_alt(file, lname, n, members);
 
     for (i = 0; i < n; i++)
-        SFREE(members[i]);
-    SFREE(members);
+        CFREE(members[i]);
+    CFREE(members);
 
     rv = (dp != NULL);
     
@@ -1584,13 +1584,13 @@ static PM_set *_PD_build_set(FIXNUM *si, double *sd, char *sname)
     nde = si[1];
     ne  = si[2];
 
-    maxes = FMAKE_N(int, nd, "_PD_BUILD_SET:maxes");
+    maxes = CMAKE_N(int, nd);
     for (i = 0; i < nd; i++)
         maxes[i] = (int) si[i+3];
 
-    elem = FMAKE_N(void *, nde, "_PD_BUILD_SET:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
-        {data    = FMAKE_N(double, ne, "_PD_BUILD_SET:data");
+        {data    = CMAKE_N(double, ne);
          elem[i] = (void *) data;
          for (j = 0; j < ne; j++)
              {tmp = *sd++;
@@ -1710,7 +1710,7 @@ FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
 	kx   = k2 - k1 + 1;
 	lx   = l2 - l1 + 1;
 	n    = kx*lx;
-	d    = pd = FMAKE_N(double, n, "PFWIMA:d");
+	d    = pd = CMAKE_N(double, n);
 	zmax = -HUGE;
 	zmin =  HUGE;
 	for (l = l1; l <= l2; l++)
@@ -2013,9 +2013,9 @@ FIXNUM F77_FUNC(pfsvat, PFSVAT)(FIXNUM *fileid, FIXNUM *pnv,
     SC_FORTRAN_STR_C(lattr, fattr, nc);
 
     attr = PD_inquire_attribute(file, lattr, NULL);
-    lvl  = FMAKE(char *, "PFSVAT:lvl");
+    lvl  = CMAKE(char *);
     if (strcmp(attr->type, "char ***") == 0)
-       *lvl = SC_strsavef(vl, "char*:PFSVAT:vl");
+       *lvl = CSTRSAVE(vl);
     else
        *lvl = vl;
 
@@ -2159,7 +2159,7 @@ FIXNUM F77_FUNC(pflst, PFLST)(FIXNUM *fileid, FIXNUM *npath, F77_string path,
 
     pa->n_entries = 0;
     if (pa->outlist != NULL)
-       SFREE(pa->outlist);
+       CFREE(pa->outlist);
 
     file = SC_GET_POINTER(PDBfile, *fileid);
 
@@ -2239,7 +2239,7 @@ FIXNUM F77_FUNC(pfdls, PFDLS)(void)
     rv = TRUE;
 
     if (pa->outlist != NULL)
-       SFREE(pa->outlist);
+       CFREE(pa->outlist);
 
     return(rv);}
 
@@ -2403,7 +2403,7 @@ FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
            rv = FALSE;};
 
     if (rv)
-       SFREE(dataout);
+       CFREE(dataout);
 
     return(rv);}
 

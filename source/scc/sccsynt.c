@@ -36,7 +36,7 @@ int CC_get_ch(FILE *fp, int ign_ws)
     if (_CC.ich >= pd->ncx - 2)
        {ncx     = _CC.ich + MAX_BFSZ;
         pd->ncx = ncx;
-        REMAKE_N(pd->text, char, ncx);};
+        CREMAKE(pd->text, char, ncx);};
 
     pd->text[_CC.ich++] = c;
     pd->text[_CC.ich]   = '\0';
@@ -159,10 +159,10 @@ void CC_reckon_line(void)
 
     st = stat(fn, &sb);
     if (st == 0)
-       {SFREE(_CC.vloc.fname);
+       {CFREE(_CC.vloc.fname);
 
 	_CC.vloc.iln   = ln;
-	_CC.vloc.fname = SC_strsavef(fn, "char*:CC_RECKON_LINE:fn");};
+	_CC.vloc.fname = CSTRSAVE(fn);};
 
     return;}
 

@@ -49,7 +49,7 @@ static void _SC_server_show_log(parstate *state, FILE *fp)
        {home = getenv("HOME");
 	dir  = SC_dsnprintf(TRUE, "%s/dmake-srv.%d", home, (int) getpid());
 	fp   = io_open(dir, "w");
-	SFREE(dir);
+	CFREE(dir);
 
 	io_printf(fp, "----- server log -----------------------\n");
 
@@ -458,10 +458,10 @@ static int _SC_server_env(parstate *state, char *t)
 
     rv = (strchr(t, '=') != NULL);
     if (rv == TRUE)
-       {ex = SC_strsavef(t, "_SC_SERVER_ENV:ex");
+       {ex = CSTRSAVE(t);
 	SC_LAST_CHAR(ex) = '\0';
 
-	nvl = SC_strsavef(ex, "_SC_SERVER_ENV:nvl");
+	nvl = CSTRSAVE(ex);
 	    
 	var = SC_strtok(ex, " =", p);
 	SC_strtok(NULL, "\n", p);
@@ -473,8 +473,8 @@ static int _SC_server_env(parstate *state, char *t)
 	    _SC_server_printf(as, state, _SC_EXEC_ENV,
 			      "%s (%d)\n", nvl, st);};
 
-	SFREE(ex);
-	SFREE(nvl);};
+	CFREE(ex);
+	CFREE(nvl);};
 
     SC_END_ACTIVITY(state);
 
@@ -912,7 +912,7 @@ int _SC_exec_printf(asyncstate *as, char *fmt, ...)
     else
        rv = _SC_exec_puts(as, msg);
 
-    SFREE(msg);
+    CFREE(msg);
 
     return(rv);}
 

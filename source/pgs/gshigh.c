@@ -109,7 +109,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
             memset(label, '\0', MAXLINE);
 	    s = SC_date();
             strcpy(label, s);
-	    SFREE(s);
+	    CFREE(s);
 #ifdef UNIX
 # ifndef SUNMOS
             label[strlen(label)] = ' ';
@@ -307,8 +307,8 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     PG_set_axis_log_scale(dev, 2, oflg);
     PG_set_font(dev, face, style, size);
 
-    SFREE(face);
-    SFREE(style);
+    CFREE(face);
+    CFREE(style);
 
     dev->current_palette = pl;
 
@@ -351,12 +351,12 @@ void _PG_print_labels(PG_device *dev, PG_graph *data)
 	else
 	   nlabs = 1;
 
-	labels   = FMAKE_N(char *, nlabs, "_PG_PRINT_LABELS:labels");
-	files    = FMAKE_N(char *, nlabs, "_PG_PRINT_LABELS:files");
-	dataid   = FMAKE_N(int, nlabs, "_PG_PRINT_LABELS:dataid");
-	modified = FMAKE_N(int, nlabs, "_PG_PRINT_LABELS:modified");
-	clr      = FMAKE_N(int, nlabs, "_PG_PRINT_LABELS:clr");
-	extr     = FMAKE_N(double, 4*nlabs, "_PG_PRINT_LABELS:extr");
+	labels   = CMAKE_N(char *, nlabs);
+	files    = CMAKE_N(char *, nlabs);
+	dataid   = CMAKE_N(int, nlabs);
+	modified = CMAKE_N(int, nlabs);
+	clr      = CMAKE_N(int, nlabs);
+	extr     = CMAKE_N(double, 4*nlabs);
 
 	ne = 0;
 	if (datafl)
@@ -426,12 +426,12 @@ void _PG_print_labels(PG_device *dev, PG_graph *data)
 			   _PG_gattrs.squeeze_labels,
 			   _PG_gattrs.label_type_size);
 
-	SFREE(labels);
-	SFREE(files);
-	SFREE(dataid);
-	SFREE(modified);
-	SFREE(clr);
-	SFREE(extr);};
+	CFREE(labels);
+	CFREE(files);
+	CFREE(dataid);
+	CFREE(modified);
+	CFREE(clr);
+	CFREE(extr);};
 
     return;}
 

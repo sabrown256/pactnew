@@ -86,10 +86,10 @@ static int SX_termdata(int *aryptr, double *xbuff, double *ybuff)
 
     j = *aryptr;
 
-    REMAKE_N(xbuff, double, _SX.dataptr);
+    CREMAKE(xbuff, double, _SX.dataptr);
     x[0] = SX_dataset[j].x[0] = xbuff;
 
-    REMAKE_N(ybuff, double, _SX.dataptr);
+    CREMAKE(ybuff, double, _SX.dataptr);
     x[1] = SX_dataset[j].x[1] = ybuff;
 
 /* bail out if not enough memory */
@@ -158,8 +158,8 @@ static int SX_read_pdb_curve(PDBfile *fp, char *fname, char *cname,
 
 	    crv->id   = ' ';
 	    crv->n    = n;
-	    crv->text = SC_strsavef(label, "char*:SX_READ_PDB_CURVE:label");
-	    crv->file = SC_strsavef(fname, "char*:SX_READ_PDB_CURVE:fname");};
+	    crv->text = CSTRSAVE(label);
+	    crv->file = CSTRSAVE(fname);};
 
 	rv = TRUE;};
 
@@ -217,7 +217,7 @@ static int _SX_ultra_text_filep(FILE *fp, int cmnt)
 
 	 rv = TRUE;};
 
-    SFREE(bf);
+    CFREE(bf);
 
     return(rv);}
 
@@ -304,10 +304,10 @@ object *_SXI_valid_ultra_filep(object *obj)
 
 	    ret = ok ? SS_t : SS_f;
 
-	    SFREE(cu);
-	    SFREE(cv);
-	    SFREE(mo);
-	    SFREE(mp);
+	    CFREE(cu);
+	    CFREE(cv);
+	    CFREE(mo);
+	    CFREE(mp);
 
 	    PD_close(pfp);}
 
@@ -329,7 +329,7 @@ object *_SXI_valid_ultra_filep(object *obj)
 		       {io_close(fp);
 			ret = SS_t;};};};};
 
-	SFREE(path);};
+	CFREE(path);};
 
     return(ret);}
 
@@ -359,8 +359,8 @@ static void SX_read_bin(FILE *fp, char *fname)
            break;
         bf[len] = '\0';
 
-        SX_dataset[j].text = SC_strsavef(bf, "char*:SX_READ_BIN:text");
-        SX_dataset[j].file = SC_strsavef(fname, "char*:SX_READ_BIN:fname");
+        SX_dataset[j].text = CSTRSAVE(bf);
+        SX_dataset[j].file = CSTRSAVE(fname);
                 
         read_int(n, fp);
 
@@ -461,13 +461,10 @@ static void SX_read_text(FILE *fp, char *fname)
 /* get rid of \n */
 	     text = SC_strtok(pin, "\n\r", s);
 	     if (text == NULL)
-	        SX_dataset[j].text = SC_strsavef("",
-						 "char*:SX_READ_TEXT:NULL");
+	        SX_dataset[j].text = CSTRSAVE("");
 	     else
-	        SX_dataset[j].text = SC_strsavef(text,
-						 "char*:SX_READ_TEXT:text");
-	     SX_dataset[j].file = SC_strsavef(fname,
-					      "char*:SX_READ_TEXT:fname");
+	        SX_dataset[j].text = CSTRSAVE(text);
+	     SX_dataset[j].file = CSTRSAVE(fname);
 
 /* allocate space for buffer */
 	     csz = MAXPTS;
@@ -500,8 +497,8 @@ static void SX_read_text(FILE *fp, char *fname)
 /* get more space if needed */
 		  if (_SX.dataptr >= csz)
                      {csz += MAXPTS;
-		      REMAKE_N(xb[0], double, csz);
-		      REMAKE_N(xb[1], double, csz);
+		      CREMAKE(xb[0], double, csz);
+		      CREMAKE(xb[1], double, csz);
 		      x[0] = xb[0] + _SX.dataptr;
 		      x[1] = xb[1] + _SX.dataptr;};};};};
 
@@ -509,7 +506,7 @@ static void SX_read_text(FILE *fp, char *fname)
        icurve++;
     io_close(fp);
 
-    SFREE(bf);
+    CFREE(bf);
 
     if (icurve == 0)
        PRINT(stdout, "%s FILE HAS NO LEGAL CURVES - SX_READ_TEXT: %s\n\n",
@@ -553,7 +550,7 @@ object *SX_read_ver1(object *obj)
 	k = SX_next_prefix();
 	SX_prefix_list[k] = j;};
 
-    SFREE(path);
+    CFREE(path);
 
     return(SS_t);}
 
@@ -594,8 +591,7 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
 /* set up the file info for this curve */
 		 ppi = CMAKE(pdb_info);
 		 ppi->file = fp;
-		 ppi->curve_name = SC_strsavef(names[i],
-					       "char*:SX_READ_PDB:cur_name");
+		 ppi->curve_name = CSTRSAVE(names[i]);
 		 SX_dataset[j].file_info = (void *) ppi;
 		 SX_dataset[j].file_type = SC_PDB;
 
@@ -608,7 +604,7 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
 		 SX_number[k] = j;};};
 
 	SX_n_curves_read += icurve;
-	SFREE(names);};
+	CFREE(names);};
 
     return;}
 
@@ -670,7 +666,7 @@ object *SX_read_data(object *obj)
 
 		 rv = SS_f;};};};
 
-    SFREE(path);
+    CFREE(path);
 
     return(rv);}
 
@@ -706,7 +702,7 @@ object *SX_crv_file_info(object *obj)
         PD_close(pfp);
         o = SS_t;};
 
-    SFREE(path);
+    CFREE(path);
 
     return(o);}
 
@@ -854,8 +850,8 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
              if (bf == NULL)
                 return(FALSE);};};
 
-    SFREE(bf);
-    SFREE(addr);
+    CFREE(bf);
+    CFREE(addr);
 
     rv = FALSE;
     if ((j == n) && (nc > 0))
@@ -899,7 +895,7 @@ object *SX_read_text_table(object *argl)
             SC_LONG_I, &nl,
             0);
 
-    _SX.table_name = SC_strsavef(name, "char*:SX_READ_TEXT_TABLE:name");
+    _SX.table_name = CSTRSAVE(name);
 
     name = SC_search_file(NULL, _SX.table_name);
     if (name == NULL)
@@ -922,7 +918,7 @@ object *SX_read_text_table(object *argl)
 
 	return(SS_f);};
 
-    SFREE(name);
+    CFREE(name);
 
     _SX.current_table = PM_create(nr, nc);
 
@@ -950,7 +946,7 @@ object *SX_read_text_table(object *argl)
 
               PM_element(_SX.current_table, i, j) = ATOF(token);};};
 
-    SFREE(bf);
+    CFREE(bf);
 
     io_close(fp);
 
@@ -1032,8 +1028,8 @@ object *SX_table_curve(object *argl)
 
     ret = SX_mk_curve(na, xa, ya, label, _SX.table_name, NULL);
 
-    SFREE(ya);
-    SFREE(xa);
+    CFREE(ya);
+    CFREE(xa);
 
     return(ret);}
 
@@ -1101,8 +1097,8 @@ static void SX_wrt_pdb(PDBfile *fp, object *argl)
 
          if (uncached)
             {uncached = FALSE;
-             SFREE(SX_dataset[j].x[0]);
-             SFREE(SX_dataset[j].x[1]);
+             CFREE(SX_dataset[j].x[0]);
+             CFREE(SX_dataset[j].x[1]);
              SX_zero_curve(j);};};
 
     PD_flush(fp);
@@ -1153,8 +1149,8 @@ static void SX_wrt_bin(FILE *fp, object *argl)
 
          if (uncached)
             {uncached = FALSE;
-             SFREE(SX_dataset[j].x[0]);
-             SFREE(SX_dataset[j].x[1]);
+             CFREE(SX_dataset[j].x[0]);
+             CFREE(SX_dataset[j].x[1]);
              SX_zero_curve(j);};};
 
     err = io_flush(fp);
@@ -1205,8 +1201,8 @@ static void SX_wrt_text(FILE *fp, object *argl)
 
          if (uncached)
             {uncached = FALSE;
-             SFREE(SX_dataset[j].x[0]);
-             SFREE(SX_dataset[j].x[1]);
+             CFREE(SX_dataset[j].x[0]);
+             CFREE(SX_dataset[j].x[1]);
              SX_zero_curve(j);};};
 
     io_flush(fp);
@@ -1250,7 +1246,7 @@ object *SX_write_data(object *argl)
     else
        {imode = SC_PDB;
 	fname = mode;
-	mode  = SC_strsavef("pdb", "char*:SX_WRITE_DATA:mode");
+	mode  = CSTRSAVE("pdb");
         fobj  = SS_car(argl);
         argl  = SS_cdr(argl);};
 
@@ -1391,7 +1387,7 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
 
 	     ppi = CMAKE(pdb_info);
 	     ppi->file       = _SX.cache_file;
-	     ppi->curve_name = SC_strsavef(bf, "char*:SX_CACHE_CURVE:bf");
+	     ppi->curve_name = CSTRSAVE(bf);
 
 	     crv->file_info = (void *) ppi;
 	     crv->file_type = SC_PDB;
@@ -1400,8 +1396,8 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
 
         case SC_BINARY :
         case SC_PDB    :
-	     SFREE(crv->x[0]);
-	     SFREE(crv->x[1]);
+	     CFREE(crv->x[0]);
+	     CFREE(crv->x[1]);
 	     crv->x[0] = NULL;
 	     crv->x[1] = NULL;
 
@@ -1535,7 +1531,7 @@ void SX_close_open_files(void)
 		  if (SX_file_open(fp))
 		     {SX_remove_file(fp);
 		      io_close(fp);};
-		  SFREE(pbi);
+		  CFREE(pbi);
 		  break;
 
              case SC_PDB :
@@ -1552,8 +1548,8 @@ void SX_close_open_files(void)
 			  if (file == _SX.cache_file)
                              _SX.cache_file = NULL;};
 
-		      SFREE(ppi->curve_name);
-		      SFREE(ppi);};};
+		      CFREE(ppi->curve_name);
+		      CFREE(ppi);};};
 
 		  break;
 

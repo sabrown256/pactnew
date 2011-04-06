@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 11/10/2010
+MOD: 04/06/2011
 
 <CENTER>
 <P>
@@ -429,7 +429,7 @@ main(c, v)
 
     if (fname != NULL)
        {PA_rd_restart(fname, NONE);
-        name[2] = SC_strsave(fname);};
+        name[2] = CSTRSAVE(fname);};
 
 /* perform initialization */
 
@@ -866,12 +866,12 @@ init_hydro(pck)
 
 /* allocate local zonal variables */
 
-    cs    = MAKE_N(double, N_zones);
-    dtvg  = MAKE_N(double, N_zones);
-    pdv   = MAKE_N(double, N_zones);
-    qdv   = MAKE_N(double, N_zones);
-    voln  = MAKE_N(double, N_zones);
-    volo  = MAKE_N(double, N_zones);
+    cs    = CMAKE_N(double, N_zones);
+    dtvg  = CMAKE_N(double, N_zones);
+    pdv   = CMAKE_N(double, N_zones);
+    qdv   = CMAKE_N(double, N_zones);
+    voln  = CMAKE_N(double, N_zones);
+    volo  = CMAKE_N(double, N_zones);
 
 /* set some scalars */
 
@@ -2914,18 +2914,18 @@ See also PA_merge_family.<p>
 
 /* only merge foo.u09 through foo.u0b */
 
-   names    = MAKE_N(char *, 3);
-   names[0] = SC_strsave("foo.t09");
-   names[1] = SC_strsave("foo.t0a");
-   names[2] = SC_strsave("foo.t0b");
+   names    = CMAKE_N(char *, 3);
+   names[0] = CSTRSAVE("foo.t09");
+   names[1] = CSTRSAVE("foo.t0a");
+   names[2] = CSTRSAVE("foo.t0b");
 
    if (!PA_merge_files("bar", 3, names, 0))
       printf(stderr, "%s\n", PD_err);
 
-   SFREE(names[0]);
-   SFREE(names[1]);
-   SFREE(names[2]);
-   SFREE(names);
+   CFREE(names[0]);
+   CFREE(names[1]);
+   CFREE(names[2]);
+   CFREE(names);
 
          .
          .
@@ -2991,17 +2991,17 @@ See also PA_th_wr_iattr, PA_th_write, and PA_th_trans_family.<p>
           .
           .
 
-   members = MAKE_N(char *, 3);
-   members[0] = SC_strsave("time");
-   members[1] = SC_strsave("d[20]");
-   members[2] = SC_strsave("p at x,y");
+   members = CMAKE_N(char *, 3);
+   members[0] = CSTRSAVE("time");
+   members[1] = CSTRSAVE("d[20]");
+   members[2] = CSTRSAVE("p at x,y");
 
    ptr = PA_th_def_rec(file, "t-data", "t-struct", 3, members, NULL);
 
-   SFREE(members[0]);
-   SFREE(members[1]);
-   SFREE(members[2]);
-   SFREE(members);
+   CFREE(members[0]);
+   CFREE(members[1]);
+   CFREE(members[2]);
+   CFREE(members);
 
           .
           .
@@ -3253,16 +3253,16 @@ See also PA_th_trans_name, PA_trans_family, PA_th_def_rec, and PA_th_write.<p>
 
 /* files foo.t09 through foo.t11 are missing */
 
-   names    = MAKE_N(char *, 2);
-   names[0] = SC_strsave("foo.t1f");
-   names[1] = SC_strsave("foo.t08");
+   names    = CMAKE_N(char *, 2);
+   names[0] = CSTRSAVE("foo.t1f");
+   names[1] = CSTRSAVE("foo.t08");
 
    if (!PA_th_trans_link(2, names, -1, 1000))
       err_proc();
 
-   SFREE(names[0]);
-   SFREE(names[1]);
-   SFREE(names);
+   CFREE(names[0]);
+   CFREE(names[1]);
+   CFREE(names);
 
          .
          .
@@ -3337,18 +3337,18 @@ See also PA_th_trans_link, PA_trans_family, PA_th_def_rec, and PA_th_write.<p>
 
 /* only transpose foo.t09 through foo.t0b */
 
-   names    = MAKE_N(char *, 3);
-   names[0] = SC_strsave("foo.t09");
-   names[1] = SC_strsave("foo.t0a");
-   names[2] = SC_strsave("foo.t0b");
+   names    = CMAKE_N(char *, 3);
+   names[0] = CSTRSAVE("foo.t09");
+   names[1] = CSTRSAVE("foo.t0a");
+   names[2] = CSTRSAVE("foo.t0b");
 
    if (!PA_th_trans_name(3, names, 1, 1000))
       err_proc();
 
-   SFREE(names[0]);
-   SFREE(names[1]);
-   SFREE(names[2]);
-   SFREE(names);
+   CFREE(names[0]);
+   CFREE(names[1]);
+   CFREE(names[2]);
+   CFREE(names);
 
           .
           .
@@ -3454,7 +3454,7 @@ See also PA_th_def_rec, PA_th_write, and PA_th_trans_family.<p>
           .
           .
 
-   vr = MAKE_N(double, 9);
+   vr = CMAKE_N(double, 9);
 
           .
           .
@@ -3528,7 +3528,7 @@ See also PA_th_wr_iattr, PA_th_def_rec, and PA_th_trans_family.<p>
           .
           .
 
-   vr = MAKE_N(double, 9);
+   vr = CMAKE_N(double, 9);
 
           .
           .
@@ -3619,7 +3619,7 @@ See also PA_th_wr_iattr, PA_th_def_rec, and PA_th_trans_family.<p>
           .
           .
 
-   vr = MAKE_N(double, 10000);
+   vr = CMAKE_N(double, 10000);
 
           .
           .
@@ -5772,15 +5772,15 @@ endure for the entire simulation run.<p>
 
            PA_CONNECT(foo_var_1, "variable_1", int *, TRUE);
 
-       /* MAKE_N for non-database local variables */
+       /* CMAKE_N for non-database local variables */
 
-           loc_var_1   = MAKE_N(int, N_foo_1);
-           loc_var_2   = MAKE_N(double, N_foo_1*N_foo_2);
+           loc_var_1   = CMAKE_N(int, N_foo_1);
+           loc_var_2   = CMAKE_N(double, N_foo_1*N_foo_2);
 
            return(TRUE);}
 </PRE>
 
-Note: 1) the use of PA_CONNECT and MAKE_N; and 2) the dimension constants
+Note: 1) the use of PA_CONNECT and CMAKE_N; and 2) the dimension constants
 extracted from the swtch array.<p>
 
 <a name="PAN3563"></a>

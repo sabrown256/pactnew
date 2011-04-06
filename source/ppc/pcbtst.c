@@ -53,7 +53,7 @@ static void process_binary(PROCESS *pp)
 	   printf("P> Binary data receive failed: %s %ld/%ld\n",
 		  type, number, nitems);
 
-	SFREE(space);};
+	CFREE(space);};
 
     return;}
 
@@ -87,9 +87,9 @@ int main(int argc, char **argv)
     to   = 30;
     if (argc < 2)
        {printf("\nRunning PCCTST by default\n\n");
-        argl = FMAKE_N(char *, 3, "PCBTST.C:argl");
-        argl[0] = SC_strsavef("pcctst", "char*:PCBTST:argl0");
-        argl[1] = SC_strsavef("-b", "char*:PCBTST:argl1");
+        argl = CMAKE_N(char *, 3);
+        argl[0] = CSTRSAVE("pcctst");
+        argl[1] = CSTRSAVE("-b");
         argl[2] = NULL;}
     else
        argl = argv + 1;

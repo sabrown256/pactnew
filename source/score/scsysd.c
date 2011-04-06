@@ -93,14 +93,14 @@ static contask *_SC_make_contask(int jid, int na,
 				 connectdes *pco)
    {contask *pto;
 
-    pto = FMAKE(contask, "_SC_MAKE_CONTASK:pto");
+    pto = CMAKE(contask);
 
     pto->inf.id        = jid;
     pto->inf.ia        = 0;
     pto->inf.na        = na;
-    pto->inf.shell     = SC_strsavef(shell, "_SC_MAKE_CONTASK:shell");
-    pto->inf.directory = SC_strsavef(dir, "_SC_MAKE_CONTASK:dir");
-    pto->inf.full      = SC_strsavef(cmnd, "_SC_MAKE_CONTASK:cmnd");
+    pto->inf.shell     = CSTRSAVE(shell);
+    pto->inf.directory = CSTRSAVE(dir);
+    pto->inf.full      = CSTRSAVE(cmnd);
     pto->inf.signal    = -1;
     pto->inf.status    = NOT_FINISHED;
     pto->inf.tstart    = SC_wall_clock_time();
@@ -124,10 +124,10 @@ static int _SC_free_contask(void *a)
     if (a != NULL)
        {pto = *(contask **) a;
 	if (pto != NULL)
-	   {SFREE(pto->inf.shell);
-	    SFREE(pto->inf.directory);
-	    SFREE(pto->inf.full);
-	    SFREE(pto);};};
+	   {CFREE(pto->inf.shell);
+	    CFREE(pto->inf.directory);
+	    CFREE(pto->inf.full);
+	    CFREE(pto);};};
 
     return(TRUE);}
 
@@ -226,13 +226,13 @@ static connectdes *_SC_make_connectdes(int na, char *sys,
 				       char *hst, char *shell, char **env)
    {connectdes *pc;
 
-    pc = FMAKE(connectdes, "_SC_MAKE_CONNNECTDES:cp");
+    pc = CMAKE(connectdes);
 
     SC_init_connection(pc, na, TRUE);
 
-    pc->system = SC_strsavef(sys, "_SC_MAKE_CONNNECTDES:sys");
-    pc->host   = SC_strsavef(hst, "_SC_MAKE_CONNNECTDES:hst");
-    pc->shell  = SC_strsavef(shell, "_SC_MAKE_CONNNECTDES:shell");
+    pc->system = CSTRSAVE(sys);
+    pc->host   = CSTRSAVE(hst);
+    pc->shell  = CSTRSAVE(shell);
     pc->env    = env;
 
     return(pc);}
@@ -254,9 +254,9 @@ static void _SC_free_connectdes(connectdes *pc)
     pc->dt     = -1.0;
     pc->env    = NULL;
 
-    SFREE(pc->system);
-    SFREE(pc->host);
-    SFREE(pc->shell);
+    CFREE(pc->system);
+    CFREE(pc->host);
+    CFREE(pc->shell);
 
 /* free the tasks */
     SC_free_array(pc->taska, _SC_free_contask);
@@ -266,7 +266,7 @@ static void _SC_free_connectdes(connectdes *pc)
     SC_free_array(pc->log, SC_array_free_n);
     pc->log = NULL;
 
-    SFREE(pc);
+    CFREE(pc);
 
     return;}
 
@@ -299,7 +299,7 @@ static void _SC_pool_tag(char *tag, int nc, char *lbl)
 
     snprintf(tag, nc, "[%s %s]", lbl, tms);
 
-    SFREE(tm);
+    CFREE(tm);
 
     return;}
 
@@ -324,7 +324,7 @@ static void _SC_pool_log(connectdes *pc, char *lbl, char *fmt, ...)
 
     SC_array_string_add(pc->log, msg);
 
-    SFREE(txt);
+    CFREE(txt);
 
     return;}
 
@@ -347,7 +347,7 @@ static void _SC_pool_printf(asyncstate *as, char *tag,
     if (pc != NULL)
        _SC_pool_log(pc, lbl, txt);
 
-    SFREE(txt);
+    CFREE(txt);
 
     return;}
 
@@ -437,7 +437,7 @@ static void _SC_show_server_logs(conpool *cp, int n)
 		 else
 		    io_printf(stdout, "%s", s);};};};
 
-    SFREE(end);
+    CFREE(end);
 
     return;}
 
@@ -906,7 +906,7 @@ static void _SC_process_task_output(asyncstate *as, conpool *cp,
  */
     tag = SC_dsnprintf(TRUE, "job %2d", inf->id);
     _SC_pool_log(pco, tag, "%s", p);
-    SFREE(tag);
+    CFREE(tag);
 
     if (pto->killed == FALSE)
        {r = _SC_exec_msg_match(p, _SC_EXEC_COMPLETE);
@@ -1202,7 +1202,7 @@ static int _SC_remove_connection_dup(conpool *cp)
 		 {nc = _SC_remove_connection(cp, j, FALSE);
 		  j--;};};};
 
-    SFREE(pc);
+    CFREE(pc);
 
     return(nc);}
 
@@ -1236,7 +1236,7 @@ static int _SC_shift_pool_connection(conpool *cp, int ic)
     for (jh = 0; jh < nh; jh++)
         {hst = hsts[jh];
 	 if ((hst != NULL) && (strcmp(hst, pco->host) == 0))
-	    {SFREE(hsts[jh]);
+	    {CFREE(hsts[jh]);
 	     break;};};
 
 /* check for a new host */
@@ -1266,8 +1266,8 @@ static int _SC_shift_pool_connection(conpool *cp, int ic)
 			"re-opening connection %d from %s on %s",
 			ic, pco->host, hst);
 
-	SFREE(pco->host);
-	pco->host = SC_strsavef(hst, "_SC_SHIFT_POOL_CONNECTION:hst");
+	CFREE(pco->host);
+	pco->host = CSTRSAVE(hst);
 
 	ok = TRUE;};
 
@@ -1510,23 +1510,23 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
 /* determine all possible hosts */
     if (n < 2)
        {nh   = 1;
-	hsts = FMAKE_N(char *, nh, "SC_OPEN_CONNECTION_POOL:hsts");
+	hsts = CMAKE_N(char *, nh);
 	SC_hostname(hst, MAXLINE);
-	hsts[0] = SC_strsavef(hst, "SC_OPEN_CONNECTION_POOL:hst");}
+	hsts[0] = CSTRSAVE(hst);}
 
     else
        {nh   = SC_get_nhosts(sys);
-	hsts = FMAKE_N(char *, nh, "SC_OPEN_CONNECTION_POOL:hsts");
+	hsts = CMAKE_N(char *, nh);
 	for (i = 0; i < nh; i++)
 	    {if (n == 1)
 	        SC_hostname(hst, MAXLINE);
 	     else
 	        SC_get_host_name(hst, MAXLINE, sys);
 
-	     hsts[i] = SC_strsavef(hst, "SC_OPEN_CONNECTION_POOL:hst");};};
+	     hsts[i] = CSTRSAVE(hst);};};
 
     n  = max(n, 1);
-    cp = FMAKE(conpool, "SC_OPEN_CONNECTION_POOL:cp");
+    cp = CMAKE(conpool);
 
 /* take NFS stats before as a reference */
     SC_nfs_monitor(cp->ref_net, 8);
@@ -1743,7 +1743,7 @@ static void _SC_pool_connection_env(connectdes *pc)
     if (_SC.log_env == TRUE)
        _SC_pool_log(pc, "client", "%s send %s", _SC_EXEC_ENV, t);
 
-    SFREE(t);
+    CFREE(t);
 
     ne = 1;
 
@@ -2430,10 +2430,10 @@ void SC_close_connection_pool(conpool *cp, int log, int sum)
     nh   = cp->n_hosts;
     hsts = cp->hosts;
     for (ih = 0; ih < nh; ih++)
-        {SFREE(hsts[ih]);};
-    SFREE(hsts);
+        {CFREE(hsts[ih]);};
+    CFREE(hsts);
 
-    SFREE(cp);
+    CFREE(cp);
 
     return;}
 

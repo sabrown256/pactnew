@@ -114,7 +114,7 @@ static object *_SXI_graph_pdbdata(object *argl)
 
 	rv = SX_pdbdata_handler(file, name, "PM_mapping *", &(g->f) , TRUE);};
 
-    SFREE(name);
+    CFREE(name);
 
     return(rv);}
 
@@ -310,8 +310,7 @@ static object *_SXI_pdbdata_graph(object *argl)
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        {argl = SS_cdr(argl);
-        name = SC_strsavef(SS_get_string(obj),
-			   "char*:_SXI_PDBDATA_GRAPH:name");};
+        name = CSTRSAVE(SS_get_string(obj));};
 
     if (name == NULL)
        return(SS_null);
@@ -358,8 +357,8 @@ static void _SX_rl_ggraph(object *obj)
 
     g = SS_GET(PG_graph, obj);
     if (g->info != NULL)
-       SFREE(g->info);
-    SFREE(g);
+       CFREE(g->info);
+    CFREE(g);
 
 /* GOTCHA: don't know if it is safe to GC the mapping or its sets */
 
@@ -401,7 +400,7 @@ static void _SX_rl_gdev_attr(object *obj)
    {PG_dev_attributes *da;
 
     da = SS_GET(PG_dev_attributes, obj);
-    SFREE(da);
+    CFREE(da);
 
     SS_rl_object(obj);
 
@@ -473,8 +472,7 @@ static object *_SXI_get_text_image_name(object *argl)
 	mi   = _SX_get_menu_item(po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
-       name = SC_strsavef(SS_get_string(argl),
-			  "char*:_SXI_GET_TEXT_IMAGE_NAME:name");
+       name = CSTRSAVE(SS_get_string(argl));
 
     if (name == NULL)
        o = SS_null;
@@ -505,8 +503,7 @@ static object *_SXI_get_text_mapping_name(object *argl)
 	mi   = _SX_get_menu_item(po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
-       name = SC_strsavef(SS_get_string(argl),
-			  "char*:_SXI_GET_TEXT_MAPPING_NAME:name");
+       name = CSTRSAVE(SS_get_string(argl));
 
     if (name == NULL)
        o = SS_null;
@@ -550,8 +547,7 @@ static object *_SXI_pdbdata_image(object *argl)
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        {argl = SS_cdr(argl);
-        name = SC_strsavef(SS_get_string(obj),
-			   "char*:_SXI_PDBDATA_IMAGE:name");};
+        name = CSTRSAVE(SS_get_string(obj));};
 
     if (name == NULL)
        o = SS_null;
@@ -605,10 +601,10 @@ static void _SX_rl_gimage(object *obj)
     PG_image *im;
 
     im = SS_GET(PG_image, obj);
-    SFREE(im->label);
-    SFREE(im->element_type);
-    SFREE(im->buffer);
-    SFREE(im);
+    CFREE(im->label);
+    CFREE(im->element_type);
+    CFREE(im->buffer);
+    CFREE(im);
 */
 
     SS_rl_object(obj);
@@ -814,9 +810,9 @@ static object *_SXI_make_device(object *argl)
 
     o = SX_mk_graphics_device(dev);
 
-    SFREE(name);
-    SFREE(type);
-    SFREE(title);
+    CFREE(name);
+    CFREE(type);
+    CFREE(title);
 
     return(o);}
 
@@ -1202,7 +1198,7 @@ static object *_SXI_make_pgs_graph(object *argl)
     else
        lbl = SC_dsnprintf(FALSE, name);
 
-    SFREE(name);
+    CFREE(name);
 
 /* build the graph
  * NOTE: since the addition of PG_graph info member there will have to
@@ -1251,7 +1247,7 @@ static void _SX_set_limits(char *t, PM_set *s, object *argl)
 	    pe   = extr;
 	    for (i = 0; i < nd; i++, argl = SS_cddr(argl))
 	        {if (SS_nullobjp(argl))
-		    {SFREE(extr);
+		    {CFREE(extr);
 		     break;};
 
 		 nset = SS_args(argl,
@@ -1293,7 +1289,7 @@ static object *_SX_get_limits(PM_set *s)
 	    {obj = SS_mk_float(*limits++);
 	     lst = SS_mk_cons(obj, lst);};
     
-	SFREE(limits);
+	CFREE(limits);
 
 	if (lst != SS_null)
 	   lst = SS_reverse(lst);};
@@ -1321,7 +1317,7 @@ static object *_SX_get_extrema(PM_set *s)
         {obj = SS_mk_float(*extr++);
 	 lst = SS_mk_cons(obj, lst);};
     
-    SFREE(extr);
+    CFREE(extr);
 
     if (lst != SS_null)
        lst = SS_reverse(lst);
@@ -1718,7 +1714,7 @@ static object *_SXI_make_image(object *argl)
 			     2, WORLDC, dbx, rbx, w, h, 8, NULL);
 	rv = SX_mk_image(im);};
 
-    SFREE(name);
+    CFREE(name);
 
     return(rv);}
 
@@ -1779,7 +1775,7 @@ static object *_SXI_build_image(object *argl)
 			    w, h, 2, WORLDC, dbx, rbx);
 	rv = SX_mk_image(im);};
 
-    SFREE(name);
+    CFREE(name);
 
     return(rv);}
 
@@ -1832,7 +1828,7 @@ static object *_SXI_draw_image(object *argl)
 
     if (vp == TRUE)
        {alist = PG_rem_attrs_alist(alist, "VIEW-PORT", NULL);
-        SFREE(pv);}    
+        CFREE(pv);}    
 
     return(SS_t);}
 
@@ -1946,8 +1942,8 @@ static object *_SXI_set_attr_graph(object *argl)
 	g->info      = SX_set_attr_alist(inf, name, type, val);
 	g->info_type = SC_PCONS_P_S;};
 
-    SFREE(name);
-    SFREE(type);
+    CFREE(name);
+    CFREE(type);
 
     return(SS_t);}
 
@@ -2042,8 +2038,8 @@ static object *_SX_map_dom_extrema(PM_mapping *m)
     if (lst != SS_null)
        lst = SS_reverse(lst);
 
-    SFREE(rextr);
-    SFREE(extr);
+    CFREE(rextr);
+    CFREE(extr);
 
     return(lst);}
 
@@ -2311,28 +2307,28 @@ static object *_SXI_set_label(object *argl)
        {PM_set *s;
 
         s = SS_GET(PM_set, obj);
-	SFREE(s->name);
+	CFREE(s->name);
 	s->name = label;}
 
     else if (SX_MAPPINGP(obj))
        {PM_mapping *s;
 
 	s = SS_GET(PM_mapping, obj);
-	SFREE(s->name);
+	CFREE(s->name);
 	s->name = label;}
 
     else if (SX_GRAPHP(obj))
        {PM_mapping *s;
 
 	s = SS_GET(PG_graph, obj)->f;
-	SFREE(s->name);
+	CFREE(s->name);
 	s->name = label;}
 
     else if (SX_IMAGEP(obj))
        {PG_image *s;
 
 	s = SS_GET(PG_image, obj);
-	SFREE(s->label);
+	CFREE(s->label);
 	s->label = label;}
 
     else
@@ -2787,7 +2783,7 @@ static object *_SXI_drawable_info(object *argl)
     else
        SS_error("BAD DRAWABLE - _SXI_DRAWABLE_INFO", obj);
 
-    SFREE(name);
+    CFREE(name);
 
     return(ret);}
 

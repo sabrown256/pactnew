@@ -109,8 +109,8 @@ static void _PG_dom_1d(PG_device *dev, PM_set *dom, PM_set *ran)
        default :
 	     break;};
 
-    SFREE(rx);
-    SFREE(f);
+    CFREE(rx);
+    CFREE(f);
 
     return;}
 
@@ -240,10 +240,10 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
     PG_set_line_width(dev, lw);
 
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     if (str != NULL)
-       SFREE(str);
+       CFREE(str);
 
     return;}
 
@@ -380,7 +380,7 @@ static void _PG_dom_2d(PG_device *dev, PM_set *dom, PM_set *ran)
 		 _PG_dom_ac_2d(dev, d[0], d[1], cnnct, alst);};
 
 	     PM_free_vectors(2, d);
-	     SFREE(f);};};
+	     CFREE(f);};};
 
     return;}
 
@@ -535,7 +535,7 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
     PG_set_line_width(dev, lw);
 
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     PM_free_vectors(3, t);
 
@@ -738,7 +738,7 @@ static void _PG_dom_ac_3d_shaded(PG_device *dev, double **r,
 
     PM_free_vectors(nd, s);
 
-    SFREE(tri);
+    CFREE(tri);
 
     return;}
 
@@ -821,7 +821,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 		p[1] = r[1][i];
 		PG_write_n(dev, 2, WORLDC, p, t);};
 
-	   SFREE(fi);}
+	   CFREE(fi);}
 
 /* fixed point types (proper) */
 	else if (SC_is_type_fix(id) == TRUE)
@@ -834,7 +834,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 		 p[1] = r[1][i];
 		 PG_write_n(dev, 2, WORLDC, p, lbl);};
 
-	    SFREE(fi);}
+	    CFREE(fi);}
 
 /* floating point types (proper) */
        else if (SC_is_type_fp(id) == TRUE)
@@ -847,7 +847,7 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
 		p[1] = r[1][i];
 		PG_write_n(dev, 2, WORLDC, p, lbl);};
 
-	   SFREE(fi);};
+	   CFREE(fi);};
 
 	PM_free_vectors(3, r);};
 
@@ -942,7 +942,7 @@ static void _PG_dom_3d(PG_device *dev, PM_set *dom, PM_set *ran)
 	 PM_free_vectors(nd, t);};
 
     if (alloc == TRUE)
-       {SFREE(dextr);};
+       {CFREE(dextr);};
 
     return;}
 
@@ -1010,7 +1010,7 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 	   {pdx = (dpex == NULL) ? ddex : dpex;
 	    PG_set_viewspace(dev, nde, WORLDC, pdx);};
 
-	SFREE(ddex);
+	CFREE(ddex);
 
 	axfl = pd->axis_fl;
 	if (axfl && (nde == 3))
@@ -1153,7 +1153,7 @@ void PG_mesh_plot(PG_device *dev, PG_graph *data, ...)
 	      domain->info = (void *) tlst;
 	      if (f != g->f)
 		 {nde   = 2*domain->dimension;
-		  dextr = FMAKE_N(double, nde, "PG_MESH_PLOT:dextr");
+		  dextr = CMAKE_N(double, nde);
 		  memcpy(dextr, extr, nde*sizeof(double));
 		  PM_set_limits(domain, dextr);};
 
@@ -1316,7 +1316,7 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
 	         break;};
 
 	if (eflag)
-	   SFREE(emap);
+	   CFREE(emap);
 
 	PG_set_clipping(dev, cl);
 	PG_set_line_color(dev, clr);
@@ -1349,7 +1349,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 
 /* set the viewport to incoming values */
 	if (ndc == NULL)
-	   {pv = FMAKE_N(double, 4, "PG_REF_MESH:pv");
+	   {pv = CMAKE_N(double, 4);
 	    PG_box_copy(2, pv, bx);
 	    PG_set_attrs_graph(data,
 			       "VIEW-PORT", SC_DOUBLE_I, TRUE, pv,
@@ -1389,7 +1389,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 
 	if (ndc == NULL)
 	   {PG_rem_attrs_graph(data, "VIEW-PORT", NULL);
-	    SFREE(pv);};
+	    CFREE(pv);};
 
 	if (pc == NULL)
 	   PG_rem_attrs_set(domain, "LINE-COLOR", NULL);

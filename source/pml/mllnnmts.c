@@ -20,8 +20,8 @@ int main(int c, char **v)
     int i;
     int npoints = 10;
 
-    x = FMAKE_N(double, npoints, "MLLNNMTS.C:x");
-    y = FMAKE_N(double, npoints, "MLLNNMTS.C:y");
+    x = CMAKE_N(double, npoints);
+    y = CMAKE_N(double, npoints);
 
     for (i = 0; i < npoints; i++)
         {x[i] = (double) i;
@@ -63,7 +63,7 @@ int main(int c, char **v)
     PRINT(STDOUT, "Linfinity norm of y = index(0:%d) alternating sign: %12.6e\n",
           npoints-1, result);
 
-    SFREE(x);
+    CFREE(x);
 
     return(0);}
 

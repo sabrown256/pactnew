@@ -194,7 +194,7 @@ int SS_printf(FILE *fp, char *fmt, ...)
 
 	PRIMITIVE_PRINT(fp, "%s", s);};
 
-    SFREE(s);
+    CFREE(s);
 
     return(FALSE);}
 

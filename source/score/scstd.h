@@ -365,48 +365,35 @@ struct s_quaternion
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAKE - memory allocation and bookkeeping macro */
+/* CMAKE - memory allocation and bookkeeping macro */
 
-#define MAKE(x)                                                              \
+#define CMAKE(x)                                                             \
     (SC_mem_stats_acc((long) sizeof(x), 0L), (x *) calloc(1, sizeof(x)))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAKE_N - allocate a block of type x and return a pointer to it */
+/* CMAKE_N - allocate a block of type x and return a pointer to it */
 
-#define MAKE_N(x, n)                                                         \
+#define CMAKE_N(x, n)                                                        \
     (SC_mem_stats_acc((long) n*sizeof(x), 0L), (x *) calloc(n, sizeof(x)))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* REMAKE - memory reallocation and bookkeeping macro 
- *        - no book keeping here since we don't have sufficient info
- */
+/* CREMAKE - reallocate a block of memory */
 
-#define REMAKE(p, x) ((x *) realloc(p, (long) sizeof(x)))
+#define CREMAKE(p, x, n) ((x *) realloc(p, n*sizeof(x)))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* REMAKE_N - reallocate a block of type x and return a pointer to it
- *          - no book keeping here since we don't have sufficient info
- */
+/* CFREE - release memory and do bookkeeping */
 
-#define REMAKE_N(p, x, n) ((x *) realloc(p, n*sizeof(x)))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SFREE - release memory and do bookkeeping */
-
-#define SFREE(x)                                                             \
+#define CFREE(x)                                                             \
    {SC_mem_stats_acc(0L, (long) sizeof(*x));                                 \
     free(x);                                                                 \
     x = NULL;}
-
-#define SFREE_N(x, n)    SFREE(x)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

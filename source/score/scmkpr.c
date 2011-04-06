@@ -33,9 +33,9 @@ void _SC_var_install(anadep *state, char *name, char *val, int line)
 
     vd = SC_hasharr_def_lookup(state->variables, name);
     if ((vd == NULL) || (vd->line != -2))
-       {vd = FMAKE(vardes, "_SC_VAR_INSTALL:vd");
+       {vd = CMAKE(vardes);
 	vd->line = line;
-	vd->text = SC_strsavef(val, "char*:_SC_VAR_INSTALL:val");
+	vd->text = CSTRSAVE(val);
 
 	SC_hasharr_install(state->variables, name, vd, "vardes", TRUE, TRUE);};
 
@@ -80,8 +80,8 @@ static int _SC_free_vardes(haelem *hp, void *a)
 
     vd = hp->def;
 
-    SFREE(vd->text);
-    SFREE(vd);
+    CFREE(vd->text);
+    CFREE(vd);
 
     return(TRUE);}
 
@@ -115,7 +115,7 @@ static void _SC_prep_rule(ruledef *a, char *s)
     ns = strlen(s);
     if (a->text == NULL)
        {nx      = 8*ns;
-	a->text = FMAKE_N(char, nx, "char*:_SC_PREP_RULE:text");
+	a->text = CMAKE_N(char, nx);
 	a->nc   = nx;
 
 	memset(a->text, 0, nx);};
@@ -127,7 +127,7 @@ static void _SC_prep_rule(ruledef *a, char *s)
     nn = (nt + ns) << 1;
 
     if (nn > nx)
-       {REMAKE_N(a->text, char, nn);
+       {CREMAKE(a->text, char, nn);
 	a->nc = nn;};
 
     return;}
@@ -186,7 +186,7 @@ static void _SC_process_rule(int *pn, char ***pt, char *s, char *delim)
        {sa = SC_tokenize(s, delim);
         for (n = 0; sa[n] != NULL; n++);
 	if (n == 0)
-	   {SFREE(sa);};};
+	   {CFREE(sa);};};
 
     *pn = n;
     *pt = sa;
@@ -208,13 +208,13 @@ static void _SC_merge_rule(char *tgt, char *dep, char *act,
 /* add the dependencies */
     odp = ord->depend;
     if (odp == NULL)
-       ord->depend = SC_strsavef(dep, "_SC_MERGE_RULE:ndpa");
+       ord->depend = CSTRSAVE(dep);
 
     else
        {ndp = SC_dsnprintf(TRUE, "%s %s", odp, dep);
 
 	ord->depend = ndp;
-	SFREE(odp);};
+	CFREE(odp);};
 
 /* replace the actions */
     if ((act != NULL) && (act[0] != '\0') && (act != ord->act))
@@ -227,8 +227,8 @@ static void _SC_merge_rule(char *tgt, char *dep, char *act,
 	    io_printf(fp, "PACT: old actions:\n %s", ord->act);
 	    io_printf(fp, "PACT: new actions:\n %s", act);};
 
-	SFREE(ord->act);
-	ord->act = SC_strsavef(act, "_SC_MERGE_RULE:acto");};
+	CFREE(ord->act);
+	ord->act = CSTRSAVE(act);};
 
     return;}
 
@@ -241,17 +241,17 @@ static ruledes *_SC_make_rule(char *tname, char *fname, int line,
 			      char *dep, char *act)
    {ruledes *rd;
 
-    rd = FMAKE(ruledes, "_SC_MAKE_RULE:rd");
+    rd = CMAKE(ruledes);
 
-    rd->name           = SC_strsavef(tname, "char*:_SC_MAKE_RULE:tname");
-    rd->file           = SC_strsavef(fname, "char*:_SC_MAKE_RULE:fname");
+    rd->name           = CSTRSAVE(tname);
+    rd->file           = CSTRSAVE(fname);
     rd->line           = line;
     rd->n_dependencies = 0;
     rd->n_actions      = 0;
     rd->dependencies   = NULL;
     rd->actions        = NULL;
-    rd->depend         = SC_strsavef(dep, "char*:_SC_MAKE_RULE:dep");
-    rd->act            = SC_strsavef(act, "char*:_SC_MAKE_RULE:act");
+    rd->depend         = CSTRSAVE(dep);
+    rd->act            = CSTRSAVE(act);
 
     return(rd);}
 
@@ -329,7 +329,7 @@ void _SC_print_rule_info(anadep *state, int n, ruledes *rd)
 	for (i = 0; i < na; i++)
 	    io_printf(fp, "     %s\n", acts[i]);};
 
-    SFREE(as);
+    CFREE(as);
 
     return;}
 
@@ -366,7 +366,7 @@ static void _SC_end_rule(ruledef *a, anadep *state)
 	   {rd = _SC_make_rule(name, a->name, a->line, dep, act);
 	    SC_hasharr_install(state->rules, name, rd, "ruledes", TRUE, TRUE);};
 
-	SFREE(a->text);
+	CFREE(a->text);
 	a->nc   = 0;
         a->line = -1;};
 
@@ -424,13 +424,13 @@ static int _SC_rel_rule(haelem *hp, void *a)
 	    SC_free_strings(sa);
 	    rd->actions = NULL;
 
-	    SFREE(rd->act);
-	    SFREE(rd->depend);
+	    CFREE(rd->act);
+	    CFREE(rd->depend);
 
-	    SFREE(rd->name);
-	    SFREE(rd->file);};};
+	    CFREE(rd->name);
+	    CFREE(rd->file);};};
 
-/*    SFREE(rd); */
+/*    CFREE(rd); */
 
     return(TRUE);}
 
@@ -552,7 +552,7 @@ static void _SC_end_var(vardef *v, anadep *state)
 
 	_SC_var_install(state, name, text, v->line);
 
-	SFREE(v->text);
+	CFREE(v->text);
         v->line = -1;};
 
     return;}
@@ -571,7 +571,7 @@ void SC_make_def_var(anadep *state, char *var, int wh)
 
     _SC_end_var(&v, state);
 
-    SFREE(v.text);
+    CFREE(v.text);
 
     return;}
 
@@ -679,8 +679,8 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
     else
        {p = strchr(src+off, '$');
 	if (p == NULL)
-	   {dst = SC_strsavef(src, "_SC_SUBST_MACRO:dsta");
-	    SFREE(src);}
+	   {dst = CSTRSAVE(src);
+	    CFREE(src);}
 
 	else
 	   {*p++ = '\0';
@@ -738,10 +738,10 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
 	    nf  = strlen(src);
 	    ns  = (base != NULL) ? strlen(base) : 0;
 	    nr  = strlen(p);
-	    dst = FMAKE_N(char, nf+ns+nr+2, "_SC_SUBST_MACRO:dstb");
+	    dst = CMAKE_N(char, nf+ns+nr+2);
 	    snprintf(dst, nf+ns+nr+2,
 		     "%s%s%s", src, base, p);
-	    SFREE(src);
+	    CFREE(src);
 
 	    dst = _SC_subst_macro(dst, nf+ns, whch, exd, tgt, dep, sfx);};};
 
@@ -765,8 +765,8 @@ static char *_SC_subst_str(anadep *state, ruledes *rd, char *src)
 	 if (pf == NULL)
 
 /* DST absolutely must be a fresh copy */
-	    {dst = SC_strsavef(src, "_SC_SUBST_STR:dsta");
-	     SFREE(src);
+	    {dst = CSTRSAVE(src);
+	     CFREE(src);
 	     break;}
 
 	 else
@@ -787,7 +787,7 @@ static char *_SC_subst_str(anadep *state, ruledes *rd, char *src)
 	     else
 	        dst = SC_dsnprintf(TRUE, "%s%s%s", src, text, pe);
 
-	     SFREE(src);
+	     CFREE(src);
 	     src = dst;};};
 
     return(dst);}
@@ -810,7 +810,7 @@ static int _SC_subst_strings(anadep *state, ruledes *rd, char **a)
 	if (pa != pb)
 	   {ns++;
 	    *a = pb;
-	    SFREE(pa);};};
+	    CFREE(pa);};};
 
     return(ns);}
 
@@ -834,7 +834,7 @@ static int _SC_do_subst_name(haelem *hp, void *a)
 /* do substitutions in the rule name and enter the expanded rule
  * into the new rule table
  */
-    s = SC_strsavef(key, "DO_SUBST:s[0]");
+    s = CSTRSAVE(key);
     _SC_subst_strings(state, NULL, &s);
 
 /* the rule name may have expanded into more than one item
@@ -860,7 +860,7 @@ static int _SC_do_subst_name(haelem *hp, void *a)
 	 else
 	    _SC_merge_rule(t, rd->depend, rd->act, enr, state);};
 
-    SFREE(s);
+    CFREE(s);
 
     return(0);}
 
@@ -891,8 +891,8 @@ static int _SC_do_subst_body(haelem *hp, void *a)
     _SC_process_rule(&rd->n_actions, &rd->actions,
 		     rd->act, "\n");
 
-    SFREE(rd->depend);
-    SFREE(rd->act);
+    CFREE(rd->depend);
+    CFREE(rd->act);
 
     return(0);}
 
@@ -961,7 +961,7 @@ anadep *SC_make_state(void)
    {char *s;
     anadep *state;
 
-    state = FMAKE(anadep, "SC_MAKE_STATE:state");
+    state = CMAKE(anadep);
 
     state->complete    = FALSE;
     state->literal     = FALSE;
@@ -979,11 +979,11 @@ anadep *SC_make_state(void)
 
     s = SC_dsnprintf(TRUE, "SHELL = %s", DEFAULT_SHELL);
     SC_make_def_var(state, s, -1);
-    SFREE(s);
+    CFREE(s);
 
     s = SC_dsnprintf(TRUE, "BARRIER = %s", DEFAULT_BARRIER);
     SC_make_def_var(state, s, -1);
-    SFREE(s);
+    CFREE(s);
 
     state->actions = SC_MAKE_ARRAY("SC_MAKE_STATE", cmdes, NULL);
 
@@ -1037,7 +1037,7 @@ void SC_free_state(anadep *state)
     SC_free_array(state->actions, NULL);
     SC_free_array(state->suffices, NULL);
 
-    SFREE(state);
+    CFREE(state);
 
     return;}
 
@@ -1094,7 +1094,7 @@ int SC_parse_makefile(anadep *state, char *fname)
 		 else if ((strncmp(s, "include ", 8) == 0) ||
 			  (strncmp(s, "include\t", 8) == 0))
 		    {t  = strtok(s+8, " \t\n\r");
-		     pt = SC_strsavef(t, "SC_PARSE_MAKEFILE:t");
+		     pt = CSTRSAVE(t);
 		     _SC_end_rule(&a, state);
 		     _SC_end_var(&v, state);
 		     _SC_subst_strings(state, NULL, &pt);
@@ -1134,7 +1134,7 @@ int SC_parse_makefile(anadep *state, char *fname)
 	t = _SC_var_lookup(state, "BARRIER");
 	if (t != NULL)
 	   {if (BARRIER != NULL)
-	       {SFREE(BARRIER);};
+	       {CFREE(BARRIER);};
 	    BARRIER = SC_strsavef(t, "PERM|char*:SC_PARSE_MAKEFILE:barrier");};};
 
     SC_ERR_UNTRAP();
@@ -1167,16 +1167,16 @@ int SC_parse_premake(anadep *state, char *fname)
 	ok = SC_parse_makefile(state, s);
         if (ok != TRUE)
 	   rv = -2;
-	SFREE(s);};
+	CFREE(s);};
 	
     if (rv == TRUE)
        {s = SC_dsnprintf(TRUE, "PACTTmpDir = %s/obj", state->arch);
 	SC_make_def_var(state, s, -1);
-	SFREE(s);
+	CFREE(s);
 
 	s = SC_dsnprintf(TRUE, "PACTSrcDir = ../..");
 	SC_make_def_var(state, s, -1);
-	SFREE(s);};
+	CFREE(s);};
 
     if (rv == TRUE)
        {ok = SC_parse_makefile(state, fname);
@@ -1188,7 +1188,7 @@ int SC_parse_premake(anadep *state, char *fname)
 	ok = SC_parse_makefile(state, s);
         if (ok != TRUE)
 	   rv = -4;
-	SFREE(s);};
+	CFREE(s);};
 
     return(rv);}
 

@@ -487,12 +487,10 @@ static syment *_SX_spec_instance(PDBfile *file, int defent, object *argl)
 	if (!SS_consp(data))
 	   SS_error("SHOULD BE LIST - _SX_SPEC_INSTANCE", data);
 
-	label = SC_strsavef(SS_get_string(SS_car(data)),
-			    "char*:_SX_SPEC_INSTANCE:label");
+	label = CSTRSAVE(SS_get_string(SS_car(data)));
 	data  = SS_cdr(data);
 	if (strcmp(label, "type") == 0)
-	   {type        = SC_strsavef(SS_get_string(SS_car(data)),
-				      "char*:_SX_SPEC_INSTANCE:type");
+	   {type        = CSTRSAVE(SS_get_string(SS_car(data)));
 	    dims        = _SX_make_dims_dimdes(file, SS_cdr(data));
 	    number      = _PD_comp_num(dims);
 	    if (defent)
@@ -505,8 +503,7 @@ static syment *_SX_spec_instance(PDBfile *file, int defent, object *argl)
 		_SX_rd_tree_list(argl, file, val.memaddr, number, type, dims);
 		SC_mark(val.memaddr, 1);};
 
-	    PD_entry_type(ep)       = SC_strsavef(type,
-						  "char*:_SX_SPEC_INSTANCE:type");
+	    PD_entry_type(ep)       = CSTRSAVE(type);
             PD_entry_dimensions(ep) = dims;
             PD_entry_number(ep)     = number;
             PD_entry_set_address(ep, val.diskaddr);};};
@@ -1469,7 +1466,7 @@ static object *_SXI_list_variables(object *argl)
     all = SS_true(oall);
 
     if ((flags != NULL) && (strcmp(flags, "nil") == 0))
-       {SFREE(flags);
+       {CFREE(flags);
         flags = NULL;}
 
     names = _PD_ls_extr(file, patt, type, size, &num, all, flags);
@@ -1478,7 +1475,7 @@ static object *_SXI_list_variables(object *argl)
     for (i = num - 1; i >= 0; i--)
         {SS_Assign(obj, SS_mk_cons(SS_mk_string(names[i]), obj));};
 
-    SFREE(names);
+    CFREE(names);
 
     return(obj);}
 
@@ -1961,7 +1958,7 @@ static object *_SXI_make_defstr(object *argl)
 		  dim0 = dims->next;
 		  if (dim0 != NULL)
 		     *memtemp++ = ',';
-		  SFREE(dims);};
+		  CFREE(dims);};
 	     *memtemp++ = ')';
 	     *memtemp = '\000';};
  
@@ -2077,7 +2074,7 @@ static object *_SXI_file_varp(object *argl)
     flag = (fobj != SS_f);
 
     ret = _SX_file_varp(file, name, flag);
-    SFREE(name);
+    CFREE(name);
 
     o = ret ? SS_t : SS_f;
 
@@ -2157,13 +2154,13 @@ static object *_SXI_rd_syment(object *argl)
 
     s = name;
     name = _PD_expand_hyper_name(file, s);
-    SFREE(s);
+    CFREE(s);
     if (name == NULL)
        return(SS_null);
 
     ep = _PD_effective_ep(file, name, TRUE, NULL);
     if (ep == NULL)
-       {SFREE(name);
+       {CFREE(name);
 	if (SS_true(err))
 	   return(SS_null);
 	else
@@ -2447,8 +2444,7 @@ static object *SX_write_filedata(object *argl)
        {SS_MARK(symo);
         ep           = PDBDATA_EP(symo);
         addr.memaddr = (char *) PDBDATA_DATA(symo);
-        type         = SC_strsavef(PD_entry_type(ep),
-				   "char*:SX_WRITE_FILEDATA:type");
+        type         = CSTRSAVE(PD_entry_type(ep));
         number       = PD_entry_number(ep);
         dims         = PD_copy_dims(PD_entry_dimensions(ep));
         if (file->virtual_internal == TRUE)
@@ -2465,8 +2461,8 @@ static object *SX_write_filedata(object *argl)
 	    ep    = wr(file, fullpath, ntype, ntype, addr.memaddr, dims,
 		       FALSE, &new);
             if (ep == NULL)
-	       {SFREE(type);
-		SFREE(dims);
+	       {CFREE(type);
+		CFREE(dims);
 		SS_error(PD_err, namo);};};}
         
 /* otherwise the next thing should be a cons */
@@ -2653,8 +2649,7 @@ static object *_SXI_reserve_pdbdata(object *argl)
        {SS_MARK(symo);
         ep           = PDBDATA_EP(symo);
         addr.memaddr = (char *) PDBDATA_DATA(symo);
-        type         = SC_strsavef(PD_entry_type(ep),
-				   "char*:_SXI_RESERVE_PDBDATA:type");
+        type         = CSTRSAVE(PD_entry_type(ep));
         number       = PD_entry_number(ep);
         dims         = PD_copy_dims(PD_entry_dimensions(ep));
 
@@ -2663,8 +2658,8 @@ static object *_SXI_reserve_pdbdata(object *argl)
 	ntype = (ndp == NULL) ? type : ndp->type;
 	ep    = _PD_defent(file, fullpath, ntype, number, dims);
 	if (ep == NULL)
-	   {SFREE(type);
-	    SFREE(dims);
+	   {CFREE(type);
+	    CFREE(dims);
 	    SS_error(PD_err, namo);};
 
 	ep = PD_copy_syment(ep);}
@@ -2745,18 +2740,17 @@ static object *SX_read_filedata(object *argl)
 
 /* get the name of the variable */
     namo = SS_car(argl);
-    name = SC_strsavef(_PD_fixname(file, SS_get_string(namo)),
-		       "char*:SX_READ_FILEDATA:name");
+    name = CSTRSAVE(_PD_fixname(file, SS_get_string(namo)));
     s    = name;
     name = _PD_expand_hyper_name(file, s);
-    SFREE(s);
+    CFREE(s);
     if (name == NULL)
        SS_error("BAD SUBSCRIPT EXPRESSION - SX_READ_FILEDATA", namo);
 
     ep = _PD_effective_ep(file, name, FALSE, NULL);
 
     if (ep == NULL)
-       {SFREE(name);
+       {CFREE(name);
 	return(SS_null);};
   
 /* make sure the dimension specification is valid */
@@ -3436,12 +3430,12 @@ static object *_SX_set_user_format(int i, char *format, int whch)
     if (format != NULL)
        {if (h1 == TRUE)
 	   {if (ufmts[i] != NULL)
-	       {SFREE(ufmts[i]);};
-	    ufmts[i] = SC_strsavef(format, "char*:_SX_SET_USER_FORMAT:ufmts");}
+	       {CFREE(ufmts[i]);};
+	    ufmts[i] = CSTRSAVE(format);}
 	if (h2 == TRUE)
 	   {if (ufmta[i] != NULL)
-	       {SFREE(ufmta[i]);};
-	    ufmta[i] = SC_strsavef(format, "char*:_SX_SET_USER_FORMAT:ufmta");};};
+	       {CFREE(ufmta[i]);};
+	    ufmta[i] = CSTRSAVE(format);};};
 
     if (h1 == TRUE)
        {if (ufmts[i] != NULL)
@@ -3575,9 +3569,8 @@ static object *_SXI_set_format(object *argl)
 
 	else if (strcmp(field, "suppress-member") == 0)
 	   {if (_SC.types.suppress_member != NULL)
-	       {SFREE(_SC.types.suppress_member);};
-	    _SC.types.suppress_member = SC_strsavef(format,
-						    "char*:_SXI_SET_FORMAT:npm");}
+	       {CFREE(_SC.types.suppress_member);};
+	    _SC.types.suppress_member = CSTRSAVE(format);}
 
 	else if (strcmp(field, "default") == 0)
 	   _SC_set_user_defaults();
@@ -3585,8 +3578,8 @@ static object *_SXI_set_format(object *argl)
 	else
 	   SS_error("UNKNOWN TYPE - _SXI_SET_FORMAT", argl);};
 
-    SFREE(field);
-    SFREE(format);
+    CFREE(field);
+    CFREE(format);
 
     return(rv);}
 

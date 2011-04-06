@@ -78,7 +78,7 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 /* if requested, check MD5 checksum for this var */
     if ((file->use_cksum & PD_MD5_RW) && (strstr(name, PD_MD5_DIR) == NULL)) 
        {len  = strlen(PD_MD5_DIR) + strlen(name) + strlen(PD_MD5_SUFFIX) + 2;
-        path = FMAKE_N(char, len, "char*:_PD_CSUM_VAR_READ:path");
+        path = CMAKE_N(char, len);
 
 /* read checksum as /&md5/<varname> */
         snprintf(path, len, "%s%s", PD_MD5_DIR, name);
@@ -103,7 +103,7 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 /* read previous checksum */
             PD_read(file, path, rdig);
         
-            SFREE(path);
+            CFREE(path);
         
 /* return -1 and set PD_error if MD5 mismatch */
 	    ok = _PD_csum_compare(cdig, rdig);

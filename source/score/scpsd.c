@@ -152,7 +152,7 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
 
     unlink(rn);
 
-    SFREE(rn);
+    CFREE(rn);
 
 /* restore the handler on SIGCHLD */
     SC_signal(SIGCHLD, shnd);
@@ -660,13 +660,13 @@ static int ps_diff_a(char *f1, char *f2, pixdes *pd, int verbose)
 
 	if (strlen(s) > (n >> 1))
            {n <<= 1;
-	    REMAKE_N(s, char, n);};};
+	    CREMAKE(s, char, n);};};
 
-    SFREE(ea);
-    SFREE(eb);
-    SFREE(bfa);
-    SFREE(bfb);
-    SFREE(ecnt);
+    CFREE(ea);
+    CFREE(eb);
+    CFREE(bfa);
+    CFREE(bfb);
+    CFREE(ecnt);
 
     return(err);}
 
@@ -716,17 +716,17 @@ static int ps_diff_b(char *f1, char *f2, pixdes *pd, int verbose)
 	 if ((la != 0) && (lb != 0))
 	    err |= diff_line(sa, sb, pd, verbose, ecnt, ea, eb);
 
-	 SFREE(ea);
-	 SFREE(eb);
-	 SFREE(ecnt);
+	 CFREE(ea);
+	 CFREE(eb);
+	 CFREE(ecnt);
 
 	 if (la > (na >> 1))
             {na <<= 1;
-	     REMAKE_N(sa, char, na);};
+	     CREMAKE(sa, char, na);};
 
 	 if (lb > (nb >> 1))
             {nb <<= 1;
-	     REMAKE_N(sb, char, nb);};};
+	     CREMAKE(sb, char, nb);};};
 
     return(err);}
 
@@ -917,17 +917,17 @@ static int ps_diff_frac(char *f1, char *f2, pixdes *pd, int verbose)
 	 if ((la != 0) && (lb != 0))
 	    err |= diff_frac(sa, sb, &ds, pd, verbose, ecnt, ea, eb);
 
-	 SFREE(ea);
-	 SFREE(eb);
-	 SFREE(ecnt);
+	 CFREE(ea);
+	 CFREE(eb);
+	 CFREE(ecnt);
 
 	 if (la > (na >> 1))
             {na <<= 1;
-	     REMAKE_N(sa, char, na);};
+	     CREMAKE(sa, char, na);};
 
 	 if (lb > (nb >> 1))
             {nb <<= 1;
-	     REMAKE_N(sb, char, nb);};};
+	     CREMAKE(sb, char, nb);};};
 
     nd    = ds.ndiff + 1;
     dfave = ds.fdsm/nd;

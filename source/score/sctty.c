@@ -32,7 +32,7 @@ int lprintf(FILE *fp, int flag, char *fmt, ...)
     else
        io_puts(s, fp);
 
-    SFREE(s);
+    CFREE(s);
 
     return(TRUE);}
 

@@ -82,7 +82,7 @@ count++;
 
     _PD_REMOVE_FILE(stream);
 
-    SFREE(fb);
+    CFREE(fb);
 
     return(ret);}
 
@@ -322,7 +322,7 @@ static FILE *_PN_bopen(char *name, char *mode)
     file_io_desc *fid;
     extern FILE *_PD_popen(char *name, char *mode);
 
-    fb = FMAKE(BF_FILE, "_PN_BOPEN:fb");
+    fb = CMAKE(BF_FILE);
 
     fb->length       = SC_arrlen(name);
     fb->bf.memaddr   = name;
@@ -556,7 +556,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
     for (nxt = SC_VA_ARG(char *); (int) *nxt != 0;
          nxt = SC_VA_ARG(char *))
         {desc  = _PD_mk_descriptor(nxt, defoff);
-         type  = SC_strsavef(nxt, "char*:PN_DEFSTR:type");
+         type  = CSTRSAVE(nxt);
          ptype = SC_firsttok(type, " \n");
          if (SC_hasharr_lookup(chart, ptype) == NULL)
             if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
@@ -564,7 +564,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
                          "ERROR: %s BAD MEMBER TYPE - PN_DEFSTR\n",
                          nxt);
                 return(NULL);};
-         SFREE(type);
+         CFREE(type);
          if (lst == NULL)
             lst = desc;
          else
@@ -574,7 +574,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
     SC_VA_END;
 
 /* create a tmp PDBfile */
-    file = FMAKE(PDBfile, "PN_DEFSTR:file");
+    file = CMAKE(PDBfile);
     file->chart      = chart;
     file->host_chart = pa->host_chart;
     file->align      = align;
@@ -585,7 +585,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
 			 NO_ORDER, NULL, NULL, FALSE);
 
 /* free tmp PDBfile */
-    SFREE(file);
+    CFREE(file);
  
     if (dp == NULL)
        PD_error("CAN'T HANDLE PRIMITIVE TYPE - PN_DEFSTR", PD_GENERIC);
@@ -639,7 +639,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
     fp = pu->stream;
 
 /* make the PDBfile */
-    file = FMAKE(PDBfile, "PN_OPEN:file");
+    file = CMAKE(PDBfile);
     if (file == NULL)
        PD_error("CAN'T ALLOCATE PDBFILE - PN_OPEN", PD_CREATE);
 
@@ -653,11 +653,10 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 
 	_SC_rel_udl(pu);
 
-	file->name             = SC_strsavef("pseudo", "char*:PN_OPEN:name");
+	file->name             = CSTRSAVE("pseudo");
 	file->stream           = fp;
 	file->mode             = PD_APPEND;
-	file->file_mode        = SC_strsavef(BINARY_MODE_WPLUS,
-					     "char*:PN_OPEN:file_mode");
+	file->file_mode        = CSTRSAVE(BINARY_MODE_WPLUS);
 	file->chrtaddr         = _PD_get_current_address(file, PD_CREATE);
 	file->date             = SC_date();
 	file->virtual_internal = FALSE;
@@ -699,11 +698,11 @@ int PN_close(PDBfile *file)
 
     _PD_clr_table(file->symtab, _PD_ha_rl_syment);
 
-    SFREE(file->current_prefix);
-    SFREE(file->date);
-    SFREE(file->file_mode);
-    SFREE(file->name);
-    SFREE(file);
+    CFREE(file->current_prefix);
+    CFREE(file->date);
+    CFREE(file->file_mode);
+    CFREE(file->name);
+    CFREE(file);
 
     return(ret);}
 

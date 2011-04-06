@@ -138,9 +138,9 @@ static int _CC_rel_expr(haelem *hp, void *a)
     SC_ASSERT(ok == TRUE);
 
     if (e != NULL)
-       {SFREE(e->name);
-	SFREE(e->type);
-        SFREE(e->ptr);};
+       {CFREE(e->name);
+	CFREE(e->type);
+        CFREE(e->ptr);};
 
     return(TRUE);}
 
@@ -164,7 +164,7 @@ void _CC_free_exprs(hasharr *vt)
 decl *CC_mk_decl(int ln, int nc)
    {decl *pd;
 
-    pd = FMAKE(decl, "CC_GET_CH:pd");
+    pd = CMAKE(decl);
 
     pd->lb      = ln;
     pd->le      = -1;
@@ -177,7 +177,7 @@ decl *CC_mk_decl(int ln, int nc)
     pd->type    = NULL;
     pd->name    = NULL;
     pd->out     = NULL;
-    pd->text    = FMAKE_N(char, nc, "CC_MK_DECL:text");
+    pd->text    = CMAKE_N(char, nc);
     pd->refobjs = NULL;
 
     return(pd);}
@@ -193,10 +193,10 @@ void CC_rl_decl(decl *pd)
     if (pd != NULL)
        {_CC_free_exprs(pd->refobjs);
 
-	 SFREE(pd->name);
-	 SFREE(pd->type);
-	 SFREE(pd->text);
-	 SFREE(pd);};
+	 CFREE(pd->name);
+	 CFREE(pd->type);
+	 CFREE(pd->text);
+	 CFREE(pd);};
 
     return;}
 
@@ -208,10 +208,10 @@ void CC_rl_decl(decl *pd)
 void CC_rl_expr(expr *e)
    {
 
-    SFREE(e->type);
-    SFREE(e->name);
-    SFREE(e->ptr);
-    SFREE(e);
+    CFREE(e->type);
+    CFREE(e->name);
+    CFREE(e->ptr);
+    CFREE(e);
 
     return;}
 
@@ -229,9 +229,9 @@ static int _CC_rel_type(haelem *hp, void *a)
     SC_ASSERT(ok == TRUE);
 
     if (e != NULL)
-       {SFREE(e->type);
-	SFREE(e->name);
-        SFREE(e->ptr);};
+       {CFREE(e->type);
+	CFREE(e->name);
+        CFREE(e->ptr);};
 
     return(TRUE);}
 
@@ -264,15 +264,15 @@ void CC_finish(void)
         {pd = _CC.all[i];
          CC_rl_decl(pd);};
 
-    SFREE(_CC.all);
+    CFREE(_CC.all);
 
     _CC_free_exprs(_CC.consts);
     _CC_free_exprs(_CC.depend);
     _CC_free_types();
 
 /* release the remainder of the parse state */
-    SFREE(_CC.lex_text);
-    SFREE(_CC.rloc.fname);
+    CFREE(_CC.lex_text);
+    CFREE(_CC.rloc.fname);
 
 /* release some variables */
     CC_rl_expr(CC_enum);

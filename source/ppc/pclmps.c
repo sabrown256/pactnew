@@ -56,7 +56,7 @@ PROCESS *PC_open_member(pnn)
    int *pnn;
    {PROCESS *pp;
 
-    pp = FMAKE(PROCESS, "PC_OPEN_MEMBER:pp");
+    pp = CMAKE(PROCESS);
 
     INITENV();  
     NUM_NODES(pnn);

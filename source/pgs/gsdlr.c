@@ -536,7 +536,7 @@ void dprst(frame *fr)
 
     bc = '\377';
 
-    s = FMAKE_N(char, w, "DPRRST:s");
+    s = CMAKE_N(char, w);
 
     a = fr->r;
     io_puts("Red component:\n", stdout);
@@ -578,7 +578,7 @@ void dprst(frame *fr)
 	    io_printf(stdout, "%5d: %s\n", j, s);};
     io_puts("\n", stdout);
 
-    SFREE(s);
+    CFREE(s);
 
     return;}
 

@@ -14,12 +14,7 @@
 /*--------------------------------------------------------------------------*/
 
 /* SC_ALLOC - add a layer of control over the C level memory management
- *          - system to store the byte length of allocated spaces
- *          - a space EXTRA_WORD_SIZE greater than requested is allocated
- *          - the length in bytes is written into the first EXTRA_WORD_SIZE
- *          - bytes with a 4 bit marker in the high bits and a pointer to the
- *          - next byte is returned
- *          - if the maximum size is exceeded a NULL pointer is returned
+ *          - system to store extra information about the allocated spaces
  */
 
 void *SC_alloc(long nitems, long bpi, char *name)
@@ -41,12 +36,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ALLOC_NA - add a layer of control over the C level memory management
- *             - system to store the byte length of allocated spaces
- *             - a space EXTRA_WORD_SIZE greater than requested is allocated
- *             - the length in bytes is written into the first EXTRA_WORD_SIZE
- *             - bytes with a 4 bit marker in the high bits and a pointer to the
- *             - next byte is returned
- *             - if the maximum size is exceeded a NULL pointer is returned
+ *             - system to store extra information about the allocated spaces
  *             - iff NA TRUE fudge the accounting so that this block
  *             - will not show up in the bytes allocated count
  */
@@ -70,14 +60,11 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ALLOC_NZ - add a layer of control over the C level memory management
- *             - system to store the byte length of allocated spaces
- *             - a space EXTRA_WORD_SIZE greater than requested is allocated
- *             - the length in bytes is written into the first EXTRA_WORD_SIZE
- *             - bytes with a 4 bit marker in the high bits and a pointer
- *             - to the next byte is returned
- *             - if the maximum size is exceeded a NULL pointer is returned
+ *             - system to store extra information about the allocated spaces
  *             - iff NA TRUE fudge the accounting so that this block
  *             - will not show up in the bytes allocated count
+ *             - ZSP controls the initialization of the block
+ *             - see SC_zero_space_n for values
  */
 
 void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
@@ -99,12 +86,7 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
 /*--------------------------------------------------------------------------*/
 
 /* SC_NALLOC_NA - add a layer of control over the C level memory management
- *              - system to store the byte length of allocated spaces
- *              - a space EXTRA_WORD_SIZE greater than requested is allocated
- *              - the length in bytes is written into the first EXTRA_WORD_SIZE
- *              - bytes with a 4 bit marker in the high bits and a pointer to the
- *              - next byte is returned
- *              - if the maximum size is exceeded a NULL pointer is returned
+ *              - system to store extra information about the allocated spaces
  *              - iff NA TRUE fudge the accounting so that this block
  *              - will not show up in the bytes allocated count
  */
@@ -129,13 +111,7 @@ void *SC_nalloc_na(long nitems, long bpi, int na,
 /*--------------------------------------------------------------------------*/
 
 /* SC_REALLOC - add a layer of control over the C level memory management
- *            - system to store the byte length of allocated spaces
- *            - a space EXTRA_WORD_SIZE greater than requested is reallocated
- *            - the length in bytes is written into the first EXTRA_WORD_SIZE
- *            - bytes with a 4 bit marker in the high bits and a pointer to
- *            - the next byte is returned
- *            - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
- *            - exceeded a NULL pointer is returned
+ *            - system to store extra information about the allocated spaces
  */
 
 void *SC_realloc(void *p, long nitems, long bpi)
@@ -157,13 +133,7 @@ void *SC_realloc(void *p, long nitems, long bpi)
 /*--------------------------------------------------------------------------*/
 
 /* SC_REALLOC_NA - add a layer of control over the C level memory management
- *               - system to store the byte length of allocated spaces
- *               - a space EXTRA_WORD_SIZE greater than requested is reallocated
- *               - the length in bytes is written into the first EXTRA_WORD_SIZE
- *               - bytes with a 4 bit marker in the high bits and a pointer to
- *               - the next byte is returned
- *               - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
- *               - exceeded a NULL pointer is returned
+ *               - system to store extra information about the allocated spaces
  *               - iff NA TRUE fudge the accounting so that this block
  *               - will not show up in the bytes allocated count
  */
@@ -187,15 +157,11 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
 /*--------------------------------------------------------------------------*/
 
 /* SC_REALLOC_NZ - add a layer of control over the C level memory management
- *               - system to store the byte length of allocated spaces
- *               - a space EXTRA_WORD_SIZE greater than requested is reallocated
- *               - the length in bytes is written into the first EXTRA_WORD_SIZE
- *               - bytes with a 4 bit marker in the high bits and a pointer to
- *               - the next byte is returned
- *               - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
- *               - exceeded a NULL pointer is returned
+ *               - system to store extra information about the allocated spaces
  *               - iff NA TRUE fudge the accounting so that this block
  *               - will not show up in the bytes allocated count
+ *               - ZSP controls the initialization of the block
+ *               - see SC_zero_space_n for values
  */
 
 void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
@@ -510,7 +476,7 @@ void *SC_copy_item(void *in)
     if (len == 0)
        return NULL;
 
-    out = FMAKE_N(char, len, "SC_COPY_ITEM:out");
+    out = CMAKE_N(char, len);
     if (out == NULL)
        return NULL;
 

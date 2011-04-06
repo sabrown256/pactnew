@@ -204,7 +204,7 @@
 
       (printf file "    if (fname != NULL)\n")
       (printf file "       {PA_rd_restart(fname, NONE);\n")
-      (printf file "        %s = SC_strsave(fname);};\n"
+      (printf file "        %s = CSTRSAVE(fname);};\n"
 	      sfname-var)
 
       (printf file "\n")

@@ -97,11 +97,11 @@ static void prep_test_1_data(void)
 	 foo[i].y_max = (float) i+3;};
      
     nc    = 3 + strlen(STR_MULTIPLE) + 1;
-    yname = FMAKE_N(char, nc, "char*:PREP_TEST_1_DATA:yname");
+    yname = CMAKE_N(char, nc);
     snprintf(yname, LARGE_MULTIPLE, "y(%s)", STR_MULTIPLE);
      
     nc     = 5 + strlen(STR_NON_MULTIPLE) + 1;
-    tsname = FMAKE_N(char, nc, "char*:PREP_TEST_1_DATA:tsname");
+    tsname = CMAKE_N(char, nc);
 
     snprintf(tsname, nc, "foo[%s]", STR_NON_MULTIPLE);
                
@@ -115,8 +115,8 @@ static void prep_test_1_data(void)
 static void cleanup_test_1_data(void)
    {
                
-    SFREE(yname);
-    SFREE(tsname);
+    CFREE(yname);
+    CFREE(tsname);
 
     return;}
 
@@ -281,11 +281,11 @@ static void prep_test_2_data(void)
 	 foo[i].y_max = (float) i+3;};
      
     nc    = 3 + strlen(STR_MULTIPLE) + 1;
-    yname = FMAKE_N(char, nc, "char*:PREP_TEST_2_DATA:yname");
+    yname = CMAKE_N(char, nc);
     snprintf(yname, LARGE_MULTIPLE, "y(%s)", STR_MULTIPLE);
      
     nc     = 5 + strlen(STR_NON_MULTIPLE) + 1;
-    tsname = FMAKE_N(char, nc, "char*:PREP_TEST_2_DATA:tsname");
+    tsname = CMAKE_N(char, nc);
     snprintf(tsname, nc, "foo[%s]", STR_NON_MULTIPLE);
                
     return;}
@@ -298,8 +298,8 @@ static void prep_test_2_data(void)
 static void cleanup_test_2_data(void)
    {
                
-    SFREE(yname);
-    SFREE(tsname);
+    CFREE(yname);
+    CFREE(tsname);
 
     return;}
 

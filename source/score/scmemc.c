@@ -749,7 +749,7 @@ void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
 
 	if ((nb <= 0) ||
 	    ((unsigned long) nb > SC_HDR_SIZE_MAX(ph)))
-	   {SFREE(p);
+	   {CFREE(p);
 	    return(NULL);};
 
 	ob = BLOCK_LENGTH(desc);

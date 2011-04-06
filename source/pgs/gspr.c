@@ -87,8 +87,8 @@ void PG_get_clipping(PG_device *dev, int *flag)
 void PG_get_font(PG_device *dev, char **pf, char **pst, int *psz)
    {
 
-    *pf  = SC_strsavef(dev->type_face, "char*:PG_GET_FONT:face");
-    *pst = SC_strsavef(dev->type_style, "char*:PG_GET_FONT:style");
+    *pf  = CSTRSAVE(dev->type_face);
+    *pst = CSTRSAVE(dev->type_style);
     *psz = dev->type_size;
 
     return;}
@@ -232,7 +232,7 @@ PG_dev_attributes *PG_get_attributes(PG_device *dev)
    {int id;
     PG_dev_attributes *attr;
 
-    attr = FMAKE(PG_dev_attributes, "PG_GET_ATTRIBUTES:attr");
+    attr = CMAKE(PG_dev_attributes);
 
     attr->clipping       = dev->clipping;
     attr->char_frac      = dev->char_frac;
@@ -266,18 +266,18 @@ int PG_setup_font(PG_device *dev, char *face, char *style, int size,
     char **fs;
 
     if (dev->type_face == NULL)
-       dev->type_face = SC_strsavef(face, "char*:PG_SETUP_FONT:face");
+       dev->type_face = CSTRSAVE(face);
 
     else if (strcmp(dev->type_face, face) != 0)
-       {SFREE(dev->type_face);
-	dev->type_face = SC_strsavef(face, "char*:PG_SETUP_FONT:face");};
+       {CFREE(dev->type_face);
+	dev->type_face = CSTRSAVE(face);};
 
     if (dev->type_style == NULL)
-       dev->type_style = SC_strsavef(style, "char*:PG_SETUP_FONT:style");
+       dev->type_style = CSTRSAVE(style);
 
     else if (strcmp(dev->type_style, style) != 0)
-       {SFREE(dev->type_style);
-	dev->type_style = SC_strsavef(style, "char*:PG_SETUP_FONT:style");};
+       {CFREE(dev->type_style);
+	dev->type_style = CSTRSAVE(style);};
 
     dev->type_size  = size;
 
@@ -684,12 +684,12 @@ void _PG_rl_markers(void)
 
     for (i = 0; i < _PG_gattrs.marker_index; i++)
         {mrk = &_PG.marker_list[i];
-	 SFREE(mrk->x1);
-	 SFREE(mrk->y1);
-	 SFREE(mrk->x2);
-	 SFREE(mrk->y2);};
+	 CFREE(mrk->x1);
+	 CFREE(mrk->y1);
+	 CFREE(mrk->x2);
+	 CFREE(mrk->y2);};
 
-    SFREE(_PG.marker_list);
+    CFREE(_PG.marker_list);
 
     _PG_gattrs.marker_index = 0;
 
@@ -713,13 +713,12 @@ int PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2)
 
     if (_PG.marker_list == NULL)
        {_PG.marker_max = 10;
-        _PG.marker_list = FMAKE_N(PG_marker, _PG.marker_max,
-                                  "PG_DEF_MARKER:marker_list");};
+        _PG.marker_list = CMAKE_N(PG_marker, _PG.marker_max);};
 
-    x1a = FMAKE_N(double, n, "PG_DEF_MARKER:x1a");    
-    y1a = FMAKE_N(double, n, "PG_DEF_MARKER:y1a");    
-    x2a = FMAKE_N(double, n, "PG_DEF_MARKER:x2a");    
-    y2a = FMAKE_N(double, n, "PG_DEF_MARKER:y2a");    
+    x1a = CMAKE_N(double, n);    
+    y1a = CMAKE_N(double, n);    
+    x2a = CMAKE_N(double, n);    
+    y2a = CMAKE_N(double, n);    
 
     ne = n*sizeof(double);
     memcpy(x1a, x1, ne);
@@ -736,7 +735,7 @@ int PG_def_marker(int n, double *x1, double *y1, double *x2, double *y2)
 
     if (_PG_gattrs.marker_index >= _PG.marker_max)
        {_PG.marker_max += 10;
-        REMAKE_N(_PG.marker_list, PG_marker, _PG.marker_max);};
+        CREMAKE(_PG.marker_list, PG_marker, _PG.marker_max);};
 
     nm = _PG_gattrs.marker_index - 1;
 

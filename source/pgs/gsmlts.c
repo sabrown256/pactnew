@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 #endif
 
     for (i = 0; i < 3; i++)
-        r[i] = FMAKE_N(double, n_pts, "GSMLTS.C:r[i]");
+        r[i] = CMAKE_N(double, n_pts);
 
     px = r[0];
     py = r[1];

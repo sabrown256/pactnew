@@ -94,11 +94,11 @@ static int write_test(FILE *fp)
 	   {PRINT(fp, "Error defining CENTERING\n");
 	    err = FALSE;};
 
-	rank  = FMAKE(int, "WRITE_TEST:rank");
+	rank  = CMAKE(int);
 	*rank = 1;
 
-	pc  = FMAKE(int *, "WRITE_TEST:pc");
-	*pc = center = FMAKE_N (int, 2, "WRITE_TEST:*pc");
+	pc  = CMAKE(int *);
+	*pc = center = CMAKE_N (int, 2);
 	center[0] = 44;
 	center[1] = 55;
 
@@ -113,8 +113,8 @@ static int write_test(FILE *fp)
 	err &= print_info(file, fp, file->attrtab, "d", "Attribute Table");
 
 	PD_close(file);
-	SFREE(rank);
-	SFREE(center);};
+	CFREE(rank);
+	CFREE(center);};
 
     return(err);}
 
@@ -143,7 +143,7 @@ static int hash_test(FILE *fp)
 	    PRINT(fp, "PD_err = %s\n", PD_get_error());
 	    err = FALSE;};};
 
-    tab = FMAKE(hasharr, "HASH_TEST:tab");
+    tab = CMAKE(hasharr);
 
     if (PD_read(file, "foo", tab) == FALSE)
        {PRINT(fp, "Error reading attribute hash table from file\n");

@@ -152,8 +152,7 @@ int main(int c, char **v, char **env)
 /* initialize SX
  * the following variables must be initialized before SX_init
  */
-    SX_console_type     = SC_strsavef("MONOCHROME",
-				      "char*:SXMAIN:console_type");
+    SX_console_type     = CSTRSAVE("MONOCHROME");
     SX_console_x        = 0.0;
     SX_console_y        = 0.0;
     SX_console_width    = 0.33;
@@ -248,7 +247,7 @@ int main(int c, char **v, char **env)
 
         ret = TRUE;};
 
-    SFREE(cmd);
+    CFREE(cmd);
 
     return(ret);}
         

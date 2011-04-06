@@ -27,11 +27,11 @@ attribute *PD_mk_attribute(char *at, char *type)
    {int i;
     attribute *attr;
 
-    attr = FMAKE(attribute, "PD_MK_ATTRIBUTE:attr");
+    attr = CMAKE(attribute);
 
-    attr->name = SC_strsavef(at, "char*:PD_MK_ATTRIBUTE:name");
-    attr->type = SC_strsavef(type, "char*:PD_MK_ATTRIBUTE:type");
-    attr->data = FMAKE_N(void *, 50L, "PD_MK_ATTRIBUTE:data");
+    attr->name = CSTRSAVE(at);
+    attr->type = CSTRSAVE(type);
+    attr->data = CMAKE_N(void *, 50L);
     attr->size = 50L;
     attr->indx = 0L;
 
@@ -53,9 +53,9 @@ static void _PD_rl_attr_data(attribute *attr)
     if (data != NULL)
        {indx = attr->indx;
         for (i = 0; i < indx; i++)
-            SFREE(data[i]);
+            CFREE(data[i]);
 
-        SFREE(attr->data);};
+        CFREE(attr->data);};
 
     return;}
 
@@ -69,9 +69,9 @@ void _PD_rl_attribute(attribute *attr)
 
     _PD_rl_attr_data(attr);
 
-    SFREE(attr->name);
-    SFREE(attr->type);
-    SFREE(attr);
+    CFREE(attr->name);
+    CFREE(attr->type);
+    CFREE(attr);
 
     return;}
 
@@ -83,7 +83,7 @@ void _PD_rl_attribute(attribute *attr)
 static attribute_value *_PD_mk_attribute_value(attribute *attr)
    {attribute_value *avl;
 
-    avl        = FMAKE(attribute_value, "_PD_MK_ATTRIBUTE_VALUE:avl");
+    avl        = CMAKE(attribute_value);
     avl->attr  = attr;
     avl->indx  = (attr->indx)++;
     avl->next  = NULL;
@@ -100,7 +100,7 @@ static void _PD_rl_attribute_value(attribute_value *avl)
 
     for (pa = avl; pa != NULL; pa = nxt)
         {nxt = pa->next;
-	 SFREE(pa);};
+	 CFREE(pa);};
 
     return;}
 
@@ -279,7 +279,7 @@ int PD_set_attribute(PDBfile *file, char *vr, char *at, void *vl)
 /* adjust the size of the attribute value data array */
     if (attr->indx >= attr->size)
        {attr->size += 50L;
-        REMAKE_N(attr->data, void *, attr->size);
+        CREMAKE(attr->data, void *, attr->size);
 
 /* clear out new data pointers */
         for (i = attr->indx; i < attr->size; i++)
@@ -298,8 +298,7 @@ int PD_set_attribute(PDBfile *file, char *vr, char *at, void *vl)
        {avl->next =  NULL;
 
 	if (ATTRIBUTE_VALUE == NULL)
-	   ATTRIBUTE_VALUE = SC_strsavef("attribute_value *",
-					 "char*:PD_SET_ATTRIBUTE:attribute_value");
+	   ATTRIBUTE_VALUE = CSTRSAVE("attribute_value *");
 
         SC_hasharr_install(file->attrtab, fullname, avl, ATTRIBUTE_VALUE, TRUE, TRUE);};
 
@@ -543,7 +542,7 @@ static void _PD_check_old_hashtab(PDBfile *file)
 
 	if (cnv == TRUE)
 	   {oht  = (struct oHASHTAB *) file->attrtab;
-	    atab = FMAKE(hasharr, "_PD_CHECK_OLD_hasharr:atab");
+	    atab = CMAKE(hasharr);
 
 	    atab->size      = oht->size;
 	    atab->ne        = oht->nelements;
@@ -553,7 +552,7 @@ static void _PD_check_old_hashtab(PDBfile *file)
 	
 	    file->attrtab = atab;
 
-	    SFREE(oht);
+	    CFREE(oht);
 
 	    _PD_rl_defstr(dp);
 	    _PD_remove_type(file, "HASHTAB");
@@ -604,7 +603,7 @@ static void _PD_check_old_hashel(PDBfile *file)
 	    for (i = 0; i < sz; i++)
 	        {prev = NULL;
 		 for (onp = otb[i]; onp!= NULL; onp = nxt)
-		     {np = FMAKE(hashel, "_PD_CHECK_OLD_HASHEL:np");
+		     {np = CMAKE(hashel);
 		      np->name = onp->name;
 		      np->type = onp->type;
 		      np->def  = onp->def;
@@ -616,7 +615,7 @@ static void _PD_check_old_hashel(PDBfile *file)
 			 prev->next = np;
 		      prev = np;
 		      nxt  = onp->next;
-		      SFREE(onp);};};
+		      CFREE(onp);};};
 
 	    _PD_rl_defstr(dp);
 	    _PD_remove_type(file, "hashel");
@@ -778,7 +777,7 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
 
 /* get the x array if requested or forced by lack of extrema */
     if ((flag == X_AND_Y) || (flag == X_ONLY))
-       {x[0] = FMAKE_N(double, n, "PD_READ_PDB_CURVE:x[0]");
+       {x[0] = CMAKE_N(double, n);
         if (x[0] == NULL)
            {PD_error("INSUFFICIENT MEMORY - PD_READ_PDB_CURVE", PD_GENERIC);
             return(FALSE);};
@@ -793,7 +792,7 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
 
 /* get the y array if requested or forced by lack of extrema */
     if ((flag == X_AND_Y) || (flag == Y_ONLY))
-       {x[1] = FMAKE_N(double, n, "PD_READ_PDB_CURVE:x[1]");
+       {x[1] = CMAKE_N(double, n);
         if (x[1] == NULL)
            {PD_error("INSUFFICIENT MEMORY - PD_READ_PDB_CURVE", PD_GENERIC);
             rv = FALSE;}
@@ -842,17 +841,17 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
  * for convenience external files are handled similarly
  * and then the space is freed later
  */
-    dp  = SC_strsavef(desc, "char*:PD_wrt_pdb_curve");
-    lp  = SC_strsavef(labl, "char*:PD_wrt_pdb_curve");
-    np  = FMAKE(int, "PD_WRT_PDB_CURVE:np");
+    dp  = CSTRSAVE(desc);
+    lp  = CSTRSAVE(labl);
+    np  = CMAKE(int);
     *np = n;
-    x[0]  = FMAKE_N(double, n, "PD_WRT_PDB_CURVE:x[0]");
-    x[1]  = FMAKE_N(double, n, "PD_WRT_PDB_CURVE:x[1]");
+    x[0]  = CMAKE_N(double, n);
+    x[1]  = CMAKE_N(double, n);
     for (i = 0; i < n; i++)
         {x[0][i] = px[i];
          x[1][i] = py[i];};
-    xext = FMAKE_N(double, 2, "PD_WRT_PDB_CURVE:xext");
-    yext = FMAKE_N(double, 2, "PD_WRT_PDB_CURVE:yext");
+    xext = CMAKE_N(double, 2);
+    yext = CMAKE_N(double, 2);
     PM_maxmin(x[0], &xext[0], &xext[1], n);
     PM_maxmin(x[1], &yext[0], &yext[1], n);
 
@@ -889,13 +888,13 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
        return(FALSE);
 
     if (!fp->virtual_internal)
-       {SFREE(dp);
-        SFREE(lp);
-	SFREE(np);
-        SFREE(xext);
-        SFREE(yext);
-        SFREE(x[0]);
-        SFREE(x[1])};
+       {CFREE(dp);
+        CFREE(lp);
+	CFREE(np);
+        CFREE(xext);
+        CFREE(yext);
+        CFREE(x[0]);
+        CFREE(x[1])};
 
     return(TRUE);}
 
@@ -1289,18 +1288,18 @@ PD_image *PD_make_image(char *name, char *type, void *data,
 			double zmin, double zmax)
    {PD_image *im;
 
-    im = FMAKE(PD_image, "PD_MAKE_IMAGE:im");
+    im = CMAKE(PD_image);
 
 /* distinguish this from the PG_image */
     im->version_id   = -1;
-    im->label        = SC_strsavef(name, "char*:PD_MK_IMAGE:label");
+    im->label        = CSTRSAVE(name);
     im->xmin         = xmin;
     im->xmax         = xmax;
     im->ymin         = ymin;
     im->ymax         = ymax;
     im->zmin         = zmin;
     im->zmax         = zmax;
-    im->element_type = SC_strsavef(type, "char*:PD_MK_IMAGE:type");
+    im->element_type = CSTRSAVE(type);
     im->buffer       = (unsigned char *) data;
     im->kmax         = kmax;
     im->lmax         = lmax;
@@ -1318,10 +1317,10 @@ PD_image *PD_make_image(char *name, char *type, void *data,
 void PD_rel_image(PD_image *im)
    {
 
-    SFREE(im->label);
-    SFREE(im->element_type);
-    SFREE(im->buffer);
-    SFREE(im);
+    CFREE(im->label);
+    CFREE(im->element_type);
+    CFREE(im->buffer);
+    CFREE(im);
 
     return;}
 

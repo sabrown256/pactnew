@@ -27,7 +27,7 @@ g_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
     SC_mark(ep, 1);
     SC_mark(file, 1);
 
-    pp->name = SC_strsavef(name, "char*:_SX_MK_PDBDATA:name");
+    pp->name = CSTRSAVE(name);
     pp->data = data;
     pp->ep   = ep;
     pp->file = file;
@@ -44,16 +44,16 @@ static void _SX_rl_gpdbdata(object *obj)
 
     pp = SS_GET(g_pdbdata, obj);
     if (SC_safe_to_free(pp))
-       {SFREE(pp->name);
+       {CFREE(pp->name);
 
 /* for now this only lowers the reference count but is NOT prepared to
  * free the objects themselves - that is for the next pass
  */
-	SFREE(pp->data);
-	SFREE(pp->file);
-	SFREE(pp->ep);};
+	CFREE(pp->data);
+	CFREE(pp->file);
+	CFREE(pp->ep);};
 
-    SFREE(pp);
+    CFREE(pp);
 
     SS_rl_object(obj);
 
@@ -177,8 +177,8 @@ g_file *_SX_mk_file(char *name, char *type, void *file)
 
     SC_mark(file, 1);
 
-    po->name        = SC_strsavef(name, "char*:_SX_MK_FILE:name");
-    po->type        = SC_strsavef(type, "char*:_SX_MK_FILE:type");
+    po->name        = CSTRSAVE(name);
+    po->type        = CSTRSAVE(type);
     po->file        = file;
     po->file_object = NULL;
     po->menu_lst    = SC_MAKE_ARRAY("_SX_MK_FILE", SX_menu_item, NULL);
@@ -196,8 +196,8 @@ static int _SX_rl_menu_item(void *a)
 
     if (a != NULL)
        {mi = (SX_menu_item *) a;
-        SFREE(mi->vname);
-        SFREE(mi->label);};
+        CFREE(mi->vname);
+        CFREE(mi->label);};
 
     return(TRUE);}
 
@@ -227,13 +227,13 @@ static void _SX_rl_file(g_file *po)
 
     _SX_free_menu(po, FALSE);
 
-    SFREE(po->file);
-    SFREE(po->type);
-    SFREE(po->name);
+    CFREE(po->file);
+    CFREE(po->type);
+    CFREE(po->name);
 
     po->file_object = NULL;
 
-    SFREE(po);
+    CFREE(po);
 
     return;}
 

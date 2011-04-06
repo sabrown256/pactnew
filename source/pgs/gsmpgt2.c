@@ -98,9 +98,9 @@ int main(int c, char **v)
     kmax      = 20;
     lmax      = 20;
     kxl       = kmax*lmax;
-    x         = FMAKE_N(double, kxl, "TEST:x");
-    y         = FMAKE_N(double, kxl, "TEST:y");
-    f         = FMAKE_N(double, kxl, "TEST:f");
+    x         = CMAKE_N(double, kxl);
+    y         = CMAKE_N(double, kxl);
+    f         = CMAKE_N(double, kxl);
     label     = 'A';
 
     data = NULL;

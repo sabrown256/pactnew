@@ -31,7 +31,7 @@ int main(int c, char **v, char **env)
 
     rv = SX_command(file, cmd);
 
-    SFREE(cmd);
+    CFREE(cmd);
 
     return(rv);}
         

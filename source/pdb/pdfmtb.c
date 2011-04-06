@@ -201,7 +201,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
         {i = SC_TYPE_FP(id);
 	 n     = std->fp[i].bpi;
 	 order = std->fp[i].order;
-	 REMAKE_N(order, int, n);
+	 CREMAKE(order, int, n);
 	 std->fp[i].order = order;
 	 for (j = 0; j < n; j++, *(order++) = *(p++));};
 
@@ -305,7 +305,7 @@ int _PD_rd_symt_ii(PDBfile *file)
 
 /* read in the symbol table and extras table as a single block */
     symt_sz     = numb - file->symtaddr;
-    pa->tbuffer = FMAKE_N(char, symt_sz + 1, "_PD_RD_SYMT_II:tbuffer");
+    pa->tbuffer = CMAKE_N(char, symt_sz + 1);
 
     bf = pa->tbuffer;
 
@@ -400,7 +400,7 @@ int _PD_rd_chrt_ii(PDBfile *file)
 
 /* read the entire chart into memory to speed processing */
     chrt_sz     = file->symtaddr - file->chrtaddr + 1;
-    pa->tbuffer = FMAKE_N(char, chrt_sz, "_PD_RD_CHRT_II:tbuffer");
+    pa->tbuffer = CMAKE_N(char, chrt_sz);
     if (lio_read(pa->tbuffer, 1, chrt_sz, fp) != chrt_sz)
        return(FALSE);
     pa->tbuffer[chrt_sz-1] = (char) EOF;
@@ -436,12 +436,12 @@ int _PD_rd_chrt_ii(PDBfile *file)
 /* complete the setting of the directory indicator */
     if (pa->has_dirs)
        {PD_defncv(file, "Directory", 1, 0);
-	file->current_prefix = SC_strsavef("/", "char*:_PD_RD_CHRT_II:slash");};
+	file->current_prefix = CSTRSAVE("/");};
     pa->has_dirs = FALSE;
 
     _PD_check_casts(file);
 
-    SFREE(pa->tbuffer);
+    CFREE(pa->tbuffer);
 
     return(TRUE);}
 
@@ -515,8 +515,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
        {if (*local == rec)
            break;
 
-        type  = SC_strsavef(SC_strtok(local, delim, s),
-                            "char*:_PD_RD_PRIM_TYP_II:type");
+        type  = CSTRSAVE(SC_strtok(local, delim, s));
         bpi     = SC_stol(SC_strtok(NULL, delim, s));
         align   = SC_stol(SC_strtok(NULL, delim, s));
         ord     = (PD_byte_order) SC_stol(SC_strtok(NULL, delim, s));
@@ -532,13 +531,13 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 
         token = SC_strtok(NULL, delim, s);
         if ((token != NULL) && (strcmp(token, "ORDER") == 0))
-           {ordr = FMAKE_N(int, bpi, "_PD_RD_PRIM_TYP_II:order");
+           {ordr = CMAKE_N(int, bpi);
             for (i = 0L; i < bpi; i++)
                 ordr[i] = SC_stol(SC_strtok(NULL, delim, s));};
                     
         token = SC_strtok(NULL, delim, s);
         if ((token != NULL) && (strcmp(token, "FLOAT") == 0))
-           {formt = FMAKE_N(long, 8, "_PD_RD_PRIM_TYP_II:format");
+           {formt = CMAKE_N(long, 8);
             for (i = 0L; i < 8; i++)
                 formt[i] = SC_stol(SC_strtok(NULL, delim, s));
 
@@ -547,7 +546,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 	       {std  = file->std;
 		tord = std->fp[2].order;
 		tfmt = std->fp[2].format;
-		REMAKE_N(tord, int, bpi);
+		CREMAKE(tord, int, bpi);
 		std->fp[2].order = tord;
 		for (i = 0L; i < bpi; i++)
 		    tord[i] = ordr[i];
@@ -565,13 +564,13 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
         if ((token != NULL) && (strcmp(token, "TUPLE") == 0))
 	   {atype = SC_strtok(NULL, delim, s);
 	    ni    = SC_stol(SC_strtok(NULL, delim, s));
-	    aord  = FMAKE_N(int, ni, "_PD_RD_PRIM_TYP_II:aord");
+	    aord  = CMAKE_N(int, ni);
 	    for (i = 0L; i < ni; i++)
 	        {aord[i] = SC_stol(SC_strtok(NULL, delim, s));
 		 if (aord[i] == -1)
 		    break;};
 	    if (aord[0] == -1)
-	       {SFREE(aord);};
+	       {CFREE(aord);};
 	    tuple = _PD_make_tuple(atype, ni, aord);};
 
         token = SC_strtok(NULL, delim, s);
@@ -612,8 +611,8 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
             if ((dp != NULL) && host_empty)
                _PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
 
-	    SFREE(ordr);
-	    SFREE(formt);
+	    CFREE(ordr);
+	    CFREE(formt);
 	    _PD_free_tuple(tuple);}
 
         else 
@@ -628,7 +627,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 		       NULL, tuple, bpi, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}
 
-        SFREE(type);};
+        CFREE(type);};
 
     return(TRUE);}
 
@@ -650,12 +649,12 @@ int _PD_rd_ext_ii(PDBfile *file)
 
     pa->n_casts = 0L;
 
-    palgn = FMAKE(data_alignment, "_PD_RD_EXT_II:palgn");
+    palgn = CMAKE(data_alignment);
 
     file->align          = palgn;
     file->default_offset = 0;
     file->system_version = 0;
-    SFREE(file->date);
+    CFREE(file->date);
 
     local = pa->local;
     bsz   = sizeof(pa->local);
@@ -695,20 +694,17 @@ int _PD_rd_ext_ii(PDBfile *file)
             char **sa;
 
             n_casts = N_CASTS_INCR;
-            sa      = FMAKE_N(char *, N_CASTS_INCR, "_PD_RD_EXT_II:cast-list");
+            sa      = CMAKE_N(char *, N_CASTS_INCR);
             i       = 0L;
             while (_PD_get_token(NULL, local, bsz, '\n'))
                {if (*local == '\002')
                    break;
-                sa[i++] = SC_strsavef(SC_strtok(local, "\001\n", s),
-                                      "char*:_PD_RD_EXT_II:local1");
-                sa[i++] = SC_strsavef(SC_strtok(NULL, "\001\n", s),
-                                      "char*:_PD_RD_EXT_II:local2");
-                sa[i++] = SC_strsavef(SC_strtok(NULL, "\001\n", s),
-                                      "char*:_PD_RD_EXT_II:local3");
+                sa[i++] = CSTRSAVE(SC_strtok(local, "\001\n", s));
+                sa[i++] = CSTRSAVE(SC_strtok(NULL, "\001\n", s));
+                sa[i++] = CSTRSAVE(SC_strtok(NULL, "\001\n", s));
                 if (i >= n_casts)
                    {n_casts += N_CASTS_INCR;
-                    REMAKE_N(sa, char *, n_casts);};};
+                    CREMAKE(sa, char *, n_casts);};};
             pa->cast_lst = sa;
             pa->n_casts  = i;}
 
@@ -744,8 +740,7 @@ int _PD_rd_ext_ii(PDBfile *file)
         else if (strcmp(token, "Previous-File") == 0)
            {token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
-               file->previous_file = SC_strsavef(token,
-						 "char*:_PD_RD_EXT_II:prev");}
+               file->previous_file = CSTRSAVE(token);}
 
         else if (strcmp(token, "Version") == 0)
            {token = SC_strtok(NULL, "|", p);
@@ -754,11 +749,10 @@ int _PD_rd_ext_ii(PDBfile *file)
 
             token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
-               file->date = SC_strsavef(token,
-                                        "char*:_PD_RD_EXT_II:date");};};
+               file->date = CSTRSAVE(token);};};
 
 /* release the buffer which held both the symbol table and the extras */
-    SFREE(pa->tbuffer);
+    CFREE(pa->tbuffer);
 
     return(TRUE);}
 
@@ -793,7 +787,7 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
        return(-1);
 
     if (pa->tbuffer != NULL)
-       SFREE(pa->tbuffer);
+       CFREE(pa->tbuffer);
 
     n = 0;
     for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
@@ -894,7 +888,7 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
        return(-1);
 
     if (pa->tbuffer != NULL)
-       SFREE(pa->tbuffer);
+       CFREE(pa->tbuffer);
 
     if (fh == 0)
        ch = file->chart;
@@ -930,7 +924,7 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
     else
        lio_write(bf, 1, strlen(bf), fp);
 
-    SFREE(pa->tbuffer);
+    CFREE(pa->tbuffer);
 
     return(addr);}
 
@@ -1248,7 +1242,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 
     ok &= (nbw == nbo);
 
-    SFREE(pa->tbuffer);
+    CFREE(pa->tbuffer);
 
     return(ok);}
 

@@ -30,7 +30,7 @@ int CC_preprocess(char *s, char *cmp, char **v)
     nc = strlen(p);
     fl = &_CC.rloc;
 
-    fl->fname       = SC_strsavef(p, "CC_PREPROCESS:name");
+    fl->fname       = CSTRSAVE(p);
     fl->fname[nc-2] = '\0';
 
     snprintf(inm, MAXLINE, "%s.i", fl->fname);
@@ -156,7 +156,7 @@ static void _CC_emit_var_decl(FILE *fp, decl *pd)
 static void _CC_emit_fnc_decl(FILE *fp, decl *pd)
    {char *t, *p;
 
-    t = SC_strsavef(pd->out, "char*:_CC_EMIT_FNC_DECLS:out");
+    t = CSTRSAVE(pd->out);
     p = strchr(t, ')');
     if (p != NULL)
        {p++;
@@ -170,7 +170,7 @@ static void _CC_emit_fnc_decl(FILE *fp, decl *pd)
     else
        fprintf(fp, "extern %s\n", t);
 		    
-    SFREE(t);
+    CFREE(t);
 
     return;}
 

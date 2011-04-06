@@ -394,7 +394,7 @@ static object *_SXI_num_arr_extr(object *arg)
 
     PM_minmax(d, n, &fmin, &fmax, &imin, &imax);
 
-    SFREE(d);
+    CFREE(d);
 
     lst = SS_null;
     obj = SS_mk_integer(imax);
@@ -446,7 +446,7 @@ static object *_SXI_set_pdbdata(object *argl)
        strcpy(set_name, s->name);
     else
        {strcpy(set_name, mn);
-        SFREE(mn);};
+        CFREE(mn);};
 
     if (s == NULL)
        SS_error("BAD ARGUMENT - _SXI_SET_PDBDATA", argl);
@@ -482,8 +482,7 @@ static object *_SXI_pdbdata_set(object *argl)
 
     obj  = SS_car(argl);
     argl = SS_cdr(argl);
-    name = SC_strsavef(SS_get_string(obj),
-               "char*:_SXI_PDBDATA_SET:name");
+    name = CSTRSAVE(SS_get_string(obj));
 
 /* check to see whether or not the variable is in the file */
     ep = PD_inquire_entry(file, name, TRUE, NULL);
@@ -654,7 +653,7 @@ static object *_SXI_make_cp_set(object *argl)
 
     cp = PM_make_lr_cp_domain(name, SC_DOUBLE_S, n, sets);
 
-    SFREE(sets);
+    CFREE(sets);
 
     obj = SX_mk_set(cp);
 
@@ -862,7 +861,7 @@ static object *_SXI_set_map_type(object *argl)
        SS_error("INSUFFICIENT ARGUMENTS - _SXI_SET_MAP_TYPE", argl);
 
     else
-       f->map_type = SC_strsavef(name,"char*:_SXI_SET_MAP_TYPE:type");
+       f->map_type = CSTRSAVE(name);
 
     return(SS_t);}
 
@@ -913,7 +912,7 @@ static object *_SXI_mapping_pdbdata(object *argl)
                 break;};}
     else
        {name = SC_dsnprintf(FALSE, mn);
-        SFREE(mn);};
+        CFREE(mn);};
 
 /* disconnect any function pointers or undefined structs/members */
     for (pf = f; pf != NULL; pf = pf->next)
@@ -968,8 +967,7 @@ static object *_SXI_pdbdata_mapping(object *argl)
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        {argl = SS_cdr(argl);
-        name = SC_strsavef(SS_get_string(obj),
-			   "char*:_SXI_PDBDATA_MAPPING:name");};
+        name = CSTRSAVE(SS_get_string(obj));};
 
     if (name == NULL)
        return(SS_null);
@@ -1385,7 +1383,7 @@ static object *_SXI_array_pdbdata(object *argl)
 
     else
        {name = SC_dsnprintf(FALSE, mn);
-        SFREE(mn);};
+        CFREE(mn);};
 
     rv = SX_pdbdata_handler(file, name, "C_array", arr, TRUE);
 
@@ -1437,7 +1435,7 @@ static object *_SXI_array_pdbdata_i(object *argl)
 
     else
        {name = SC_dsnprintf(FALSE, mn);
-        SFREE(mn);};
+        CFREE(mn);};
 
     if (arr != NULL)
        {strcpy(type, arr->type);
@@ -1511,10 +1509,10 @@ static void _SX_rl_gnum_array(object *obj)
 
 /*  GOTCHA - it's currently possible that some PM_set may still be pointing
  *  at type and/or array even though the reference count doesn't reflect it
- *  SFREE(arr->type);
- *  SFREE(arr->data);
+ *  CFREE(arr->type);
+ *  CFREE(arr->data);
  */
-    SFREE(arr);
+    CFREE(arr);
     SS_rl_object(obj);
 
     return;}

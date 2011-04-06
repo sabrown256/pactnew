@@ -580,9 +580,8 @@
 
 #define PG_set_color_type(dev, dev_type, color)                              \
     if (strcmp(dev_type, "PS") == 0)                                         \
-       {SFREE(dev->type);                                                    \
-        dev->type = SC_strsavef(color,                                       \
-                                "char*:PG_SET_COLOR_TYPE:ps_type");          \
+       {CFREE(dev->type);                                                    \
+        dev->type = CSTRSAVE(color);                                         \
         if (strcmp(color, "COLOR"))                                          \
 	   dev->ps_color = TRUE;                                             \
 	else                                                                 \

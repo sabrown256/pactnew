@@ -129,12 +129,12 @@ void SX_enlarge_dataset(PFVoid eval)
 
     else
        {SX_N_Curves += NCURVE;
-        REMAKE_N(SX_dataset, curve, SX_N_Curves);
-        REMAKE_N(SX_number, int, SX_N_Curves);
-        REMAKE_N(SX_data_index, int, SX_N_Curves);
-        REMAKE_N(_SX.crv_obj, object *, SX_N_Curves);
-        REMAKE_N(_SX.crv_proc, object *, SX_N_Curves);
-        REMAKE_N(_SX.crv_varbl, object *, SX_N_Curves);};
+        CREMAKE(SX_dataset, curve, SX_N_Curves);
+        CREMAKE(SX_number, int, SX_N_Curves);
+        CREMAKE(SX_data_index, int, SX_N_Curves);
+        CREMAKE(_SX.crv_obj, object *, SX_N_Curves);
+        CREMAKE(_SX.crv_proc, object *, SX_N_Curves);
+        CREMAKE(_SX.crv_varbl, object *, SX_N_Curves);};
 
 /* initialize the new curves */
     for (i = nc; i < SX_N_Curves; i++)
@@ -324,8 +324,8 @@ void SX_zero_curve(int i)
     if (i < _SX.next_avail)
        _SX.next_avail = i;
 
-    SFREE(crv->text);
-    SFREE(crv->file);
+    CFREE(crv->text);
+    CFREE(crv->file);
 
     return;}
 
@@ -388,13 +388,11 @@ object *SX_mk_curve(int na, double *xa, double *ya,
     SX_zero_curve(i);
     SX_assign_next_id(i, fnc);
 
-    SX_dataset[i].text     = SC_strsavef(label,
-					 "char*:SX_MK_CURVE:label");
+    SX_dataset[i].text     = CSTRSAVE(label);
     SX_dataset[i].modified = FALSE;
 
     if (filename != NULL)
-       SX_dataset[i].file = SC_strsavef(filename,
-					"char*:SX_MK_CURVE:fname");
+       SX_dataset[i].file = CSTRSAVE(filename);
     else
        SX_dataset[i].file = NULL;
 
@@ -446,8 +444,8 @@ object *SX_rl_curve(int j)
     i = SX_data_index[j];
 
 /* release the curve data points */
-    SFREE(SX_dataset[i].x[0]);
-    SFREE(SX_dataset[i].x[1]);
+    CFREE(SX_dataset[i].x[0]);
+    CFREE(SX_dataset[i].x[1]);
 
 /* make the curve object a simple variable for the benefit of objects
  * still pointing to it

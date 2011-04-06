@@ -44,7 +44,7 @@ static object *_SSI_hash_install(object *argl)
 
     obj = SS_mk_haelem(hp);
 
-    SFREE(name);
+    CFREE(name);
 
     return(obj);}
 
@@ -72,7 +72,7 @@ static object *_SSI_hash_lookup(object *argl)
     else
        o = SS_mk_cons(SS_car(argl), vr);
 
-    SFREE(name);
+    CFREE(name);
 
     return(o);}
 
@@ -102,7 +102,7 @@ static object *_SSI_hash_remove(object *argl)
 /* now remove it */
     obj = (SC_hasharr_remove(tab, name)) ? SS_t : SS_f;
 
-    SFREE(name);
+    CFREE(name);
 
     return(obj);}
 
@@ -154,8 +154,8 @@ object *SS_hash_dump(object *argl)
            {SS_Assign(obj, SS_mk_cons(SS_mk_string(name), obj));};
 
 /* release the pointers */
-    SFREE(names);
-    SFREE(patt);
+    CFREE(names);
+    CFREE(patt);
 
     return(obj);}
 
@@ -290,7 +290,7 @@ static void _SS_rl_haelem(object *obj)
    {haelem *hp;
 
     hp = SS_GET(haelem, obj);
-    SFREE(hp);
+    CFREE(hp);
 
     SS_rl_object(obj);
 

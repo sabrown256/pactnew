@@ -41,10 +41,10 @@ static material *mk_material(char *s, double rho, double n, double a,
 			     double z, double tm, double p)
    {material *mat;
 
-    mat = FMAKE(material, "MK_MATERIAL:mat");
+    mat = CMAKE(material);
 
     mat->index       = 0;
-    mat->name        = SC_strsave(s);
+    mat->name        = CSTRSAVE(s);
     mat->rho         = rho;
     mat->n           = n;
     mat->a           = a;
@@ -63,7 +63,7 @@ static material *mk_material(char *s, double rho, double n, double a,
 static component *mk_component(int z, double a, double frac, component *nxt)
    {component *comp;
 
-    comp = FMAKE(component, "MK_COMPONENT:comp");
+    comp = CMAKE(component);
 
     comp->z      = z;
     comp->a      = a;
@@ -120,7 +120,7 @@ int intern_misc(void)
 
     PA_control_set("misc");
 
-    tc1 = FMAKE_N(double, N_zones, "INTERN_MISC:tc1");
+    tc1 = CMAKE_N(double, N_zones);
     PA_INTERN(tc1, "cache-f-1");
 
     PA_INTERN(ab, "ab");
@@ -349,12 +349,12 @@ void load_reg(void)
     material *mat;
     PM_part *parta;
 
-    ab  = FMAKE_N(double, N_zones, "LOAD_REG:ab");
-    zb  = FMAKE_N(double, N_zones, "LOAD_REG:zb");
-    tm  = FMAKE_N(double, N_zones, "LOAD_REG:tm");
-    n   = FMAKE_N(double, N_zones, "LOAD_REG:n");
-    p   = FMAKE_N(double, N_zones, "LOAD_REG:p");
-    rho = FMAKE_N(double, N_zones, "LOAD_REG:rho");
+    ab  = CMAKE_N(double, N_zones);
+    zb  = CMAKE_N(double, N_zones);
+    tm  = CMAKE_N(double, N_zones);
+    n   = CMAKE_N(double, N_zones);
+    p   = CMAKE_N(double, N_zones);
+    rho = CMAKE_N(double, N_zones);
 
     for (j = 0; j < N_zones; j++)
         {ab[j]  = 0.0;

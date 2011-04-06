@@ -107,17 +107,12 @@ void UL_init_view(void)
     SX_console_width     = 0.33;
     SX_console_height    = 0.33;
 
-    SX_console_type     = SC_strsavef("MONOCHROME",
-				      "char*:UL_INIT_VIEW:console_type");
-    SX_text_output_format = SC_strsavef("%13.6e",
-					"char*:UL_INIT_VIEW:format");
+    SX_console_type     = CSTRSAVE("MONOCHROME");
+    SX_text_output_format = CSTRSAVE("%13.6e");
 
-    SX_display_name  = SC_strsavef("WINDOW",
-				   "char*:UL_INIT_VIEW:display_name");
-    SX_display_type  = SC_strsavef("COLOR",
-				   "char*:UL_INIT_VIEW:display_type");
-    SX_display_title = SC_strsavef("ULTRA II",
-				   "char*:UL_INIT_VIEW:display_title");
+    SX_display_name  = CSTRSAVE("WINDOW");
+    SX_display_type  = CSTRSAVE("COLOR");
+    SX_display_title = CSTRSAVE("ULTRA II");
 
     UL_derivative_tolerance = 2.0e-2;
     UL_window_height_factor = 1.0;
@@ -126,8 +121,7 @@ void UL_init_view(void)
     SS_print_flag  = FALSE;
     SS_stat_flag   = FALSE;
 
-    SX_command_log_name = SC_strsavef("ultra.log",
-				      "char*:UL_INIT_VIEW:log_name");
+    SX_command_log_name = CSTRSAVE("ultra.log");
 
     for (j = 0; j < SX_N_Curves; j++)
         SX_data_index[j] = -1;
@@ -347,7 +341,7 @@ static void _UL_del_intermediate(object *cla, ...)
        _UL_re_id_crv(clr);
 #endif
 
-    SFREE(oa);
+    CFREE(oa);
 
     return;}
 
@@ -670,8 +664,7 @@ object *UL_copy_curve(int j)
 
     SX_assign_next_id(i, (PFVoid) UL_plot);
 
-    SX_dataset[i].text      = SC_strsavef(SX_dataset[j].text,
-                              "char*:UL_COPY_CURVE:text");
+    SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
     SX_dataset[i].wc[0]      = SX_dataset[j].wc[0];
     SX_dataset[i].wc[1]      = SX_dataset[j].wc[1];
     SX_dataset[i].wc[2]      = SX_dataset[j].wc[2];
@@ -682,8 +675,7 @@ object *UL_copy_curve(int j)
     SX_dataset[i].modified  = FALSE;
 
     if (SX_dataset[j].file != NULL)
-       SX_dataset[i].file = SC_strsavef(SX_dataset[j].file,
-                            "char*:UL_COPY_CURVE:file");
+       SX_dataset[i].file = CSTRSAVE(SX_dataset[j].file);
     else
        SX_dataset[i].file = NULL;
 
@@ -789,15 +781,15 @@ object *_ULI_extract_curve(object *argl)
              ypi[l] = ypi[n - l - 1];
              ypi[n - l - 1] = tmp;}
 
-        SFREE(xpjtmp);
-        SFREE(ypjtmp);}
+        CFREE(xpjtmp);
+        CFREE(ypjtmp);}
 
     snprintf(s, MAXLINE, "Extract %c (%e to %e by %e)",
             SX_dataset[j].id, xstart, xstop, xstep);
 
     SX_assign_next_id(i, (PFVoid) UL_plot);
 
-    SX_dataset[i].text      = SC_strsavef(s, "char*:_ULI_EXTRACT_CURVE:text");
+    SX_dataset[i].text      = CSTRSAVE(s);
     SX_dataset[i].file      = NULL;
     SX_dataset[i].wc[0]      = xstart;
     SX_dataset[i].wc[1]      = xstop;
@@ -834,8 +826,7 @@ object *UL_xindex_curve(int j)
 
     SX_assign_next_id(i, (PFVoid) UL_plot);
 
-    SX_dataset[i].text      = SC_strsavef(SX_dataset[j].text,
-                              "char*:UL_XINDEX_CURVE:text");
+    SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
     SX_dataset[i].wc[0]      = 1.0;
     SX_dataset[i].wc[1]      = (double) n;
     SX_dataset[i].wc[2]      = SX_dataset[j].wc[2];
@@ -846,8 +837,7 @@ object *UL_xindex_curve(int j)
     SX_dataset[i].modified  = FALSE;
 
     if (SX_dataset[j].file != NULL)
-       SX_dataset[i].file = SC_strsavef(SX_dataset[j].file,
-                            "char*:UL_XINDEX_CURVE:file");
+       SX_dataset[i].file = CSTRSAVE(SX_dataset[j].file);
     else
        SX_dataset[i].file = NULL;
 
@@ -897,9 +887,8 @@ static void UL_init_env(void)
     for (i = 0; i < NPREFIX; i++)
         SX_prefix_list[i] = 0;
 
-    SX_pui_file  = SC_strsavef("ultra.pui", "char*:UL_INIT_ENV:file");
-    SX_GRI_title = SC_strsavef("ULTRA Controls",
-                   "char*:UL_INIT_ENV:title");
+    SX_pui_file  = CSTRSAVE("ultra.pui");
+    SX_GRI_title = CSTRSAVE("ULTRA Controls");
 
     PG_register_callback("Replot", UL_plot);
 

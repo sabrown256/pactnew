@@ -399,9 +399,9 @@ double _PM_iccg_s(int km, int lm, double eps, int maxit,
     double *di, *la1, *lb0, *lb1, *lbm1, *p, *q, *r, *w;
 
 /* assign temporary memory */
-    nkl   = km*lm;
+    nkl  = km*lm;
 
-    w    = FMAKE_N(double, 4*(neq+nkl), "_PM_ICCG_S:w");
+    w    = CMAKE_N(double, 4*(neq+nkl));
     di   = w;
     la1  = di + neq;
     lb0  = la1 + nkl;
@@ -420,7 +420,7 @@ double _PM_iccg_s(int km, int lm, double eps, int maxit,
                     r, q, p, km, lm, neq, method, maxit, eps);
  
 /* free temporary storage */
-    SFREE(w);
+    CFREE(w);
 
     return(eps);}
 

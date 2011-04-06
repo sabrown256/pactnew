@@ -373,10 +373,10 @@ static void _SC_rl_process(PROCESS *pp)
        {if ((pp->vif != NULL) && (pp->rl_vif != NULL))
 	   (*pp->rl_vif)(pp->vif);
 
-	SFREE(pp->start_time);
-	SFREE(pp->stop_time);
-	SFREE(pp->spty);
-	SFREE(pp->in_ring);
+	CFREE(pp->start_time);
+	CFREE(pp->stop_time);
+	CFREE(pp->spty);
+	CFREE(pp->in_ring);
 
         pp->status    = -1;
         pp->reason    = -1;
@@ -416,7 +416,7 @@ static void _SC_rl_process(PROCESS *pp)
 	pp->lost     = NULL;
 	pp->setup    = NULL;};
 
-    SFREE(pp);
+    CFREE(pp);
 
     return;}
 
@@ -482,7 +482,7 @@ void _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm)
        tm = SC_datef();
 #endif
 
-    SFREE(pp->stop_time);
+    CFREE(pp->stop_time);
 
     pp->status    = sts;
     pp->reason    = rsn;
@@ -675,7 +675,7 @@ int SC_child_status(int pid, int *pcnd, int *psts)
 SC_process_rusedes *SC_process_init_rusage(void)
    {SC_process_rusedes *pru;
 
-    pru = FMAKE(SC_process_rusedes, "SC_PROCESS_INIT_RUSAGE:pru");
+    pru = CMAKE(SC_process_rusedes);
 
     if (pru != NULL)
        {pru->wcr   = SC_wall_clock_time();
@@ -699,7 +699,7 @@ SC_process_rusedes *SC_process_init_rusage(void)
 void SC_process_free_rusage(SC_process_rusedes *pru)
    {
 
-    SFREE(pru);
+    CFREE(pru);
 
     return;}
 

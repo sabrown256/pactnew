@@ -114,7 +114,7 @@ static void _PM_sort_sp(PM_sp_lin_sys *sls)
 /* find the diagonals */
     diag = sls->diagonal;
     if (diag == NULL)
-       diag = FMAKE_N(int, n, "_PM_SORT_SP:diag");
+       diag = CMAKE_N(int, n);
 
     for (i = 0; i < n; i++)
         {njs = jj[i].n;
@@ -361,7 +361,7 @@ PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
     if (clr == NULL)
        clr = _PM_cg_cmp_Lr;
 
-    sls = FMAKE(PM_sp_lin_sys, "PM_MK_SP_LIN_SYS:sls");
+    sls = CMAKE(PM_sp_lin_sys);
 
     sls->ilo       = 0;
     sls->ihi       = 0;
@@ -371,16 +371,16 @@ PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
     sls->transpose = trans;
     sls->diagonal  = NULL;
 
-    sls->j  = FMAKE_N(SC_array, n_ups, "PM_MK_SP_LIN_SYS:j");
-    sls->aj = FMAKE_N(SC_array, n_ups, "PM_MK_SP_LIN_SYS:aj");
+    sls->j  = CMAKE_N(SC_array, n_ups);
+    sls->aj = CMAKE_N(SC_array, n_ups);
 
     for (i = 0; i < n_ups; i++)
         {SC_INIT_ARRAY((sls->j  + i), "PM_MK_SP_LIN_SYS", int,  NULL);
 	 SC_INIT_ARRAY((sls->aj + i), "PM_MK_SP_LIN_SYS", double, NULL);};
 
     if (trans)
-       {sls->jt  = FMAKE_N(SC_array, n_ups, "PM_MK_SP_LIN_SYS:jt");
-	sls->atj = FMAKE_N(SC_array, n_ups, "PM_MK_SP_LIN_SYS:atj");
+       {sls->jt  = CMAKE_N(SC_array, n_ups);
+	sls->atj = CMAKE_N(SC_array, n_ups);
 
 	for (i = 0; i < n_ups; i++)
 	    {SC_INIT_ARRAY((sls->jt  + i), "PM_MK_SP_LIN_SYS", int,  NULL);
@@ -455,7 +455,7 @@ void PM_rl_sp_lin_sys(PM_sp_lin_sys *sls)
 
     n_rhs = sls->n_rhs;
 
-    SFREE(sls->diagonal);
+    CFREE(sls->diagonal);
 
     SC_free_array(sls->j, NULL);
     SC_free_array(sls->aj, NULL);
@@ -470,7 +470,7 @@ void PM_rl_sp_lin_sys(PM_sp_lin_sys *sls)
     if (sls->next != NULL)
        PM_rl_sp_lin_sys(sls->next);
 
-    SFREE(sls);
+    CFREE(sls);
     
     return;}
 
@@ -703,17 +703,17 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
 
     zs = SC_zero_space_n(2, -1);
 
-    x    = FMAKE_N(double, n, "PM_DSBICG:x");
-    Ax   = FMAKE_N(double, n, "PM_DSBICG:Ax");
-    p    = FMAKE_N(double, n, "PM_DSBICG:p");
-    phat = FMAKE_N(double, n, "PM_DSBICG:ptil");
-    r    = FMAKE_N(double, n, "PM_DSBICG:r");
-    rtil = FMAKE_N(double, n, "PM_DSBICG:r");
-    s    = FMAKE_N(double, n, "PM_DSBICG:s");
-    shat = FMAKE_N(double, n, "PM_DSBICG:shat");
-    t    = FMAKE_N(double, n, "PM_DSBICG:t");
-    v    = FMAKE_N(double, n, "PM_DSBICG:v");
-    w    = FMAKE_N(double, n, "PM_DSBICG:w");
+    x    = CMAKE_N(double, n);
+    Ax   = CMAKE_N(double, n);
+    p    = CMAKE_N(double, n);
+    phat = CMAKE_N(double, n);
+    r    = CMAKE_N(double, n);
+    rtil = CMAKE_N(double, n);
+    s    = CMAKE_N(double, n);
+    shat = CMAKE_N(double, n);
+    t    = CMAKE_N(double, n);
+    v    = CMAKE_N(double, n);
+    w    = CMAKE_N(double, n);
 
 /* set iterate to initial guess x0 */
     COPY(x, x0, n);
@@ -840,16 +840,16 @@ int PM_dsbicg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
 /* put answer into sls.x[no] */
     COPY(x0, x, n);
 
-    SFREE(v);
-    SFREE(shat);
-    SFREE(s);
-    SFREE(rtil);
-    SFREE(r);
-    SFREE(phat);
-    SFREE(p);
-    SFREE(Ax);
-    SFREE(x);
-    SFREE(w);
+    CFREE(v);
+    CFREE(shat);
+    CFREE(s);
+    CFREE(rtil);
+    CFREE(r);
+    CFREE(phat);
+    CFREE(p);
+    CFREE(Ax);
+    CFREE(x);
+    CFREE(w);
 
     zs = SC_zero_space_n(zs, -1);
 
@@ -892,12 +892,12 @@ int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
     b  = sls->b[no];
     x0 = sls->x[no];
 
-    p   = FMAKE_N(double, n, "PM_DSCG:p");
-    r   = FMAKE_N(double, n, "PM_DSCG:r");
-    x   = FMAKE_N(double, n, "PM_DSCG:x");
-    Lr  = FMAKE_N(double, n, "PM_DSCG:Lr");
-    Ap  = FMAKE_N(double, n, "PM_DSCG:Ap");
-    Ax  = FMAKE_N(double, n, "PM_DSCG:Ax");
+    p   = CMAKE_N(double, n);
+    r   = CMAKE_N(double, n);
+    x   = CMAKE_N(double, n);
+    Lr  = CMAKE_N(double, n);
+    Ap  = CMAKE_N(double, n);
+    Ax  = CMAKE_N(double, n);
 
 /* set iterate to initial guess x0 */
     COPY(x, x0, n);
@@ -971,12 +971,12 @@ int PM_dscg(PM_sp_lin_sys *sls, int no, int *pit, double *ptol)
 /* put answer into sls.x[no] */
     COPY(x0, x, n);
 
-    SFREE(p);
-    SFREE(r);
-    SFREE(x);
-    SFREE(Lr);
-    SFREE(Ap);
-    SFREE(Ax);
+    CFREE(p);
+    CFREE(r);
+    CFREE(x);
+    CFREE(Lr);
+    CFREE(Ap);
+    CFREE(Ax);
 
     return(its);}
 

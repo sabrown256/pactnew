@@ -212,8 +212,8 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
 				     sd->dimension, sd->dimension_elem,
 				     dmx, dextr, NULL);
 
-    SFREE(dextr);
-    SFREE(sdextr);
+    CFREE(dextr);
+    CFREE(sdextr);
 
     return(domain);}
 
@@ -238,8 +238,8 @@ static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
 
     SC_strcat(label, MAXLINE, ")");
 
-    SFREE(f->name);
-    f->name = SC_strsavef(label, "char*:_SX_ACC_LABEL:label");
+    CFREE(f->name);
+    f->name = CSTRSAVE(label);
 
     return;}
 
@@ -538,9 +538,8 @@ PM_mapping *SX_build_return_mapping(PM_mapping *h, char *label,
     f = _SX_build_accumulator_mapping(domain, h);
 
     if (label != NULL)
-       {SFREE(f->name);
-	f->name = SC_strsavef(label,
-			      "char*:SX_BUILD_RETURN_MAPPING:label");};
+       {CFREE(f->name);
+	f->name = CSTRSAVE(label);};
 
     if (init)
        _SX_init_range(f, h, SS_null, wgt);
@@ -624,7 +623,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
         {operand.data = dre[i];
 	 PM_conv_array(&operand, acc[i], TRUE);};
 
-    SFREE(acc);
+    CFREE(acc);
 
     PM_find_extrema(dr);
 
@@ -729,7 +728,7 @@ PM_set *SX_build_restricted_domain(PM_set *hd, object *argl)
     fd   = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nde,
 				   maxes, extr, NULL);
 
-    SFREE(extr);
+    CFREE(extr);
 
     return(fd);}
 
@@ -813,7 +812,7 @@ static PM_set *SX_build_lr_domain(PM_set *hd, object *argl)
     fd = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nde,
 				 maxes, extr, NULL);
 
-    SFREE(extr);
+    CFREE(extr);
 
     return(fd);}
 

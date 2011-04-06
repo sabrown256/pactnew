@@ -52,7 +52,7 @@ int main(int c, char **v)
             {n = atoi((const char *) v[++i]);
              n = min(n, 16);
              n = max(n, 0);
-	     SFREE(fmt);
+	     CFREE(fmt);
 	     fmt = SC_dsnprintf(TRUE, "%%.%df\n", n);}
          else
 	    {printf("\n");
@@ -70,7 +70,7 @@ int main(int c, char **v)
 
     printf(fmt, since);
 
-    SFREE(fmt);
+    CFREE(fmt);
 
     return(0);}
 

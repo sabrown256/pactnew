@@ -37,8 +37,7 @@ void _SX_gc_indirection(PDBfile *file, char **vr, long nitems, char *type)
    {long i, ditems;
     char *dtype, *bf;
 
-    dtype = PD_dereference(SC_strsavef(type,
-               "char*:_SX_GC_INDIRECTION:dtype"));
+    dtype = PD_dereference(CSTRSAVE(type));
 
     for (i = 0L; i < nitems; i++, vr++)
         {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
@@ -58,9 +57,9 @@ void _SX_gc_indirection(PDBfile *file, char **vr, long nitems, char *type)
 /* if the type is an indirection, follow the pointer */
 	 _SX_gc_data(file, (char **) DEREF(vr), ditems, dtype);
 	 
-	 SFREE(DEREF(vr));};
+	 CFREE(DEREF(vr));};
 
-    SFREE(dtype);
+    CFREE(dtype);
 
     return;}
 
@@ -94,7 +93,7 @@ void _SX_gc_leaf(PDBfile *file, char *vr, long nitems, char *type)
 					    (char **) (svr + desc->member_offs),
 					    desc->number, desc->type);};};};};
 
-/* SFREE(vr); */
+/* CFREE(vr); */
 
     return;}
 

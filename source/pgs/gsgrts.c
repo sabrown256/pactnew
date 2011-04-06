@@ -31,8 +31,8 @@ static int test_1(PG_device *dev)
     ns = 5;
     nt = 3;
 
-    x = FMAKE_N(double, ns, "TEST_1:x");
-    y = FMAKE_N(double, ns, "TEST_1:y");
+    x = CMAKE_N(double, ns);
+    y = CMAKE_N(double, ns);
 
     x[0] = 1.0;
     x[1] = 1.0;
@@ -46,9 +46,9 @@ static int test_1(PG_device *dev)
     y[3] = 1.5;
     y[4] = 4.5;
 
-    tr = FMAKE_N(double, nt, "TEST_1:tr");
-    up = FMAKE_N(double, nt, "TEST_1:up");
-    dn = FMAKE_N(double, nt, "TEST_1:dn");
+    tr = CMAKE_N(double, nt);
+    up = CMAKE_N(double, nt);
+    dn = CMAKE_N(double, nt);
 
 /* transition #1 */
     tr[0] = 10.0;

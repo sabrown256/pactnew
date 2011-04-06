@@ -47,7 +47,7 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
     static int size_max = SC_BITS_BYTE*sizeof(long);
 
     n  = nrt/5;
-    ft = FMAKE_N(long, nrt, "_NAC_UNPACK_TABLE:ft");
+    ft = CMAKE_N(long, nrt);
     _PD_conv_in(file, ft, rt, SC_LONG_S, (long) nrt);
 
 /* compute the number of words per entry (nwpe) */
@@ -61,12 +61,12 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
     nbpe   = CRAY_BYTES_WORD*nwpe;
 
 /* compute the byte order */
-    ord = FMAKE_N(int, nbpe, "_NAC_UNPACK_TABLE:ord");
+    ord = CMAKE_N(int, nbpe);
     for (i = 0; i < nbpe; i++)
         ord[i] = i+1;
 
 /* compute the number of bits in each mask */
-    nb = FMAKE_N(char, n, "_NAC_UNPACK_TABLE:nb");
+    nb = CMAKE_N(char, n);
     for (i = 0; i < n; i++)
         {prt   = (long *) (rt + i*40 + 16);
          switch (sizeof(long))
@@ -82,7 +82,7 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
 			   PD_OPEN);};
          nb[i] = count;};
 
-    out = FMAKE_N(long, nitems*n, "_NAC_UNPACK_TABLE:out");
+    out = CMAKE_N(long, nitems*n);
 
     first = TRUE;
     for (i = 0; i < nitems; i++)
@@ -102,9 +102,9 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
               pout[j] = SC_extract_field(pdt, bit_off, n_bits,
 					 nbpe, ord);};};
                                           
-    SFREE(ord);
-    SFREE(ft);
-    SFREE(nb);
+    CFREE(ord);
+    CFREE(ft);
+    CFREE(nb);
 
     *pnum = n;
 
@@ -522,7 +522,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 	file->default_offset = 1;
 	file->major_order    = COLUMN_MAJOR_ORDER;
-	file->type           = SC_strsavef(NACFILE_S, "char*:_NAC_OPEN:type");
+	file->type           = CSTRSAVE(NACFILE_S);
 	if (*mode == 'a')
 	   file->mode = PD_APPEND;
 	else
@@ -537,8 +537,8 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* get the table pointer table */
 	tptlen  = SS_params[4];
 	tptaddr = SS_params[5]*CRAY_BYTES_WORD;
-	bf = FMAKE_N(char, tptlen*CRAY_BYTES_WORD, "_NAC_OPEN:bf");
-	tp = FMAKE_N(long, tptlen, "_NAC_OPEN:tp");
+	bf = CMAKE_N(char, tptlen*CRAY_BYTES_WORD);
+	tp = CMAKE_N(long, tptlen);
 
 	if (lio_seek(fp, tptaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND TABLE POINTER TABLE - _NAC_OPEN", PD_OPEN);
@@ -547,12 +547,12 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	   PD_error("FAILED TO READ TABLE POINTER TABLE - _NAC_OPEN", PD_OPEN);
 
 	_PD_conv_in(file, tp, bf, SC_LONG_S, (long) tptlen);
-	SFREE(bf);
+	CFREE(bf);
 
 /* get the directory field table */
 	dftaddr = tp[19]*CRAY_BYTES_WORD;
 	dftlen  = tp[20];
-	idf = FMAKE_N(char, dftlen*CRAY_BYTES_WORD, "_NAC_OPEN:idf");
+	idf = CMAKE_N(char, dftlen*CRAY_BYTES_WORD);
 
 	if (lio_seek(fp, dftaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND DIRECTORY FIELD TABLE - _NAC_OPEN", PD_OPEN);
@@ -563,7 +563,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* get the directory table */
 	dtaddr = tp[3]*CRAY_BYTES_WORD;
 	dtlen  = tp[4];
-	ifd = FMAKE_N(char, dtlen*CRAY_BYTES_WORD, "_NAC_OPEN:ifd");
+	ifd = CMAKE_N(char, dtlen*CRAY_BYTES_WORD);
 
 	if (lio_seek(fp, dtaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND DIRECTORY TABLE - _NAC_OPEN", PD_OPEN);
@@ -574,7 +574,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* get the attribute field table */
 	aftaddr = tp[22]*CRAY_BYTES_WORD;
 	aftlen  = tp[23];
-	iaf = FMAKE_N(char, aftlen*CRAY_BYTES_WORD, "_NAC_OPEN:iaf");
+	iaf = CMAKE_N(char, aftlen*CRAY_BYTES_WORD);
 
 	if (lio_seek(fp, aftaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND ATTRIBUTE FIELD TABLE - _NAC_OPEN", PD_OPEN);
@@ -585,7 +585,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* get the attribute table */
 	ataddr = tp[7]*CRAY_BYTES_WORD;
 	atlen  = tp[8];
-	ifa = FMAKE_N(char, atlen*CRAY_BYTES_WORD, "_NAC_OPEN:ifa");
+	ifa = CMAKE_N(char, atlen*CRAY_BYTES_WORD);
 
 	if (lio_seek(fp, ataddr, SEEK_SET))
 	   PD_error("FAILED TO FIND ATTRIBUTE TABLE - _NAC_OPEN", PD_OPEN);
@@ -599,7 +599,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* get the dimensionality field table */
 	dmftaddr = tp[25]*CRAY_BYTES_WORD;
 	dmftlen  = tp[26];
-	idmf = FMAKE_N(char, dmftlen*CRAY_BYTES_WORD, "_NAC_OPEN:idmf");
+	idmf = CMAKE_N(char, dmftlen*CRAY_BYTES_WORD);
 
 	if (lio_seek(fp, dmftaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND DIMENSIONALITY FIELD TABLE - _NAC_OPEN", PD_OPEN);
@@ -612,7 +612,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	dmlen  = tp[11];
 	ofm    = NULL;
 	if (dmlen > 0)
-	   {ifdm = FMAKE_N(char, dmlen*CRAY_BYTES_WORD, "_NAC_OPEN:ifdm");
+	   {ifdm = CMAKE_N(char, dmlen*CRAY_BYTES_WORD);
 	    if (lio_seek(fp, dmaddr, SEEK_SET))
 	       PD_error("FAILED TO FIND DIMENSIONALITY TABLE - _NAC_OPEN", PD_OPEN);
 
@@ -623,7 +623,7 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* get the name table */
 	ntaddr = tp[13]*CRAY_BYTES_WORD;
 	ntlen  = tp[14];
-	names  = FMAKE_N(char, ntlen, "_NAC_OPEN:names");
+	names  = CMAKE_N(char, ntlen);
 
 	if (lio_seek(fp, ntaddr, SEEK_SET))
 	   PD_error("FAILED TO FIND NAME TABLE - _NAC_OPEN", PD_OPEN);
@@ -634,13 +634,13 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	_NAC_build_name_table(file, names, ofd, ofa, ofm, tp[6],
 			      numdir, numatt, numdim);
 
-	SFREE(idf);
-	SFREE(ifd);
-	SFREE(iaf);
-	SFREE(ifa);
-	SFREE(ofd);
-	SFREE(ofa);
-	SFREE(names);};
+	CFREE(idf);
+	CFREE(ifd);
+	CFREE(iaf);
+	CFREE(ifa);
+	CFREE(ofd);
+	CFREE(ofa);
+	CFREE(names);};
 
     return(file);}
 

@@ -28,11 +28,11 @@ static char
 
 /* REPORT_VAR - report on the variable Q in FILE */
 
-static int report_var(anadep *state, char *file, char *q, char *key, int newl)
+static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
    {int i, nc, ok, doit, tst;
     int compl, litrl, quote;
     char s[MAXLINE];
-    char *tok, *txt, *ps, *p;
+    char *tok, *txt, *ps, *p, *file;
     FILE *fp;
 
     compl = state->complete;
@@ -40,6 +40,8 @@ static int report_var(anadep *state, char *file, char *q, char *key, int newl)
     quote = state->quotes;
 
     ok = FALSE;
+
+    file = SC_dsnprintf(TRUE, "%s/include/%s", state->root, fname);
 
     fp = io_open(file, "r");
     if (fp != NULL)
@@ -80,7 +82,7 @@ static int report_var(anadep *state, char *file, char *q, char *key, int newl)
 
 		     if (quote == FALSE)
 		        {nc = strlen(txt);
-			 if (nc > 2)
+			 if (nc >= 2)
 			    SC_strsubst(txt, nc+1, txt, "\"", "", -1);};
 
 		     if (compl)
@@ -98,6 +100,8 @@ static int report_var(anadep *state, char *file, char *q, char *key, int newl)
 
 	io_close(fp);};
 
+    CFREE(file);
+
     return(ok);}
 
 /*--------------------------------------------------------------------------*/
@@ -107,48 +111,33 @@ static int report_var(anadep *state, char *file, char *q, char *key, int newl)
 
 static void report(anadep *state, char *q, int newl)
    {int ok;
-    char *s, *devdir, *file;
-
-    devdir = SC_dstrcpy(NULL, state->root);
+    char *s, *devdir;
 
     ok = FALSE;
 
     if (strcmp(q, "make") == 0)
-       io_printf(stdout, "%s/bin/dmake\n", devdir);
+       {devdir = SC_dstrcpy(NULL, state->root);
+	io_printf(stdout, "%s/bin/dmake\n", devdir);
+	CFREE(devdir);};
 
     if (strcmp(q, "config") == 0)
-       {file = SC_dsnprintf(TRUE, "%s/include/make-def", devdir);
-        ok   = report_var(state, file, "System", NULL, newl);
-	SFREE(file);};
+       ok = report_var(state, "make-def", "System", NULL, newl);
 
     if (!ok)
-       {file = SC_dsnprintf(TRUE, "%s/include/scconfig.h", devdir);
-	ok   = report_var(state, file, q, "#define", newl);
-	SFREE(file);};
+       ok = report_var(state, "scconfig.h", q, "#define", newl);
 
     if (!ok)
-       {file = SC_dsnprintf(TRUE, "%s/include/make-def", devdir);
-	ok   = report_var(state, file, q, NULL, newl);
-	SFREE(file);};
+       ok = report_var(state, "make-def", q, NULL, newl);
 
     if (!ok)
-       {file = SC_dsnprintf(TRUE, "%s/include/configured", devdir);
-	ok   = report_var(state, file, q, NULL, newl);
-	SFREE(file);};
+       ok = report_var(state, "configured", q, NULL, newl);
 
     if (!ok)
        {s = getenv("SHELL");
 	if ((s != NULL) && (strstr(s, "csh") != NULL))
-	   {file = SC_dsnprintf(TRUE, "%s/include/env-pact.csh", devdir);
-	    ok   = report_var(state, file, q, "setenv", newl);
-	    SFREE(file);}
-
+	   ok = report_var(state, "env-pact.csh", q, "setenv", newl);
         else
-	   {file = SC_dsnprintf(TRUE, "%s/include/env-pact.sh", devdir);
-	    ok   = report_var(state, file, q, "export", newl);
-	    SFREE(file);};};
-
-    SFREE(devdir);
+	   ok = report_var(state, "env-pact.sh", q, "export", newl);};
 
     return;}
 
@@ -157,7 +146,7 @@ static void report(anadep *state, char *q, int newl)
 
 /* REPORT_CL - report the information relevant to compiling and linking */
 
-static void report_cl(char *q, anadep *state)
+static void report_cl(anadep *state, char *q)
    {
 
     state->literal = TRUE;
@@ -263,11 +252,11 @@ static int command_makefile(anadep *state, char **a)
 
 	SC_make_def_rule(state, rule);
 
-	SFREE(rule);
+	CFREE(rule);
 
 	err = TRUE;};
 
-    SFREE(cmnd);
+    CFREE(cmnd);
 
     return(err);}
 
@@ -325,7 +314,7 @@ static int setup_env(char *src, anadep *state)
 	       {snprintf(state->arch, MAXLINE, "z-%s", t);
 		ok = TRUE;};};
 	       
-	SFREE(s);
+	CFREE(s);
 
 	if (!ok)
 	   snprintf(state->arch, MAXLINE, "z-%s", SYSTEM_ID);};
@@ -378,7 +367,7 @@ static int make_by_host(char *lst, char **v, char *shell, char **env,
 static int make_distributed(char *tgt, char *file, char *server,
 			    char *shell, char **env,
 			    char *flt, int na, int show, int ignore)
-   {int n, ok;
+   {int ok;
     char s[MAXLINE], cm[MAXLINE];
     char *p, **dirs, *cmnds[2];
     FILE *fp;
@@ -404,7 +393,6 @@ static int make_distributed(char *tgt, char *file, char *server,
 	       {p = strtok(s, " \n");
 		SC_array_string_add_copy(arr, p);};};
 
-	n = SC_array_get_n(arr);
 	SC_array_string_add(arr, NULL);
 
 	dirs = SC_array_done(arr);
@@ -540,7 +528,7 @@ void usage(void)
 /* MAIN - start here */
 
 int main(int c, char **v, char **env)
-   {int i, dryrun, ignore, litrl, show, st, na, nt, rv;
+   {int i, dryrun, ignore, show, st, na, nt, rv;
     int async, nconn, recur, dmp, mem, cs;
     int rnfd, rnprc;
     int64_t rmem, rcpu, rfsz;
@@ -591,7 +579,6 @@ int main(int c, char **v, char **env)
     debug  = FALSE;
     dryrun = FALSE;
     ignore = FALSE;
-    litrl  = FALSE;
     mem    = FALSE;
     nconn  = -1;
     recur  = FALSE;
@@ -639,7 +626,7 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "-i") == 0)
 	    ignore = TRUE;
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_cl(v[i], state);
+	    {report_cl(state, v[i]);
 	     return(0);}
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
@@ -653,7 +640,7 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "+l") == 0)
 	    state->literal = TRUE;
 	 else if (strcmp(v[i], "-link") == 0)
-	    {report_cl(v[i], state);
+	    {report_cl(state, v[i]);
 	     return(0);}
          else if (strcmp(v[i], "-log") == 0)
 	    log = v[++i];
@@ -765,7 +752,7 @@ int main(int c, char **v, char **env)
 
 	    cwd = SC_getcwd();
 	    io_printf(stdout, "PACT: error %d parsing %s/%s\n", rv, cwd, mkname);
-	    SFREE(cwd);};
+	    CFREE(cwd);};
 
 	st = 1;}
 
@@ -773,7 +760,7 @@ int main(int c, char **v, char **env)
        {SC_show_make_rules(state);
 
 	shell = _SC_var_lookup(state, "SHELL");
-	shell = SC_strsavef(shell, "MAIN:shell");
+	shell = CSTRSAVE(shell);
 	snprintf(s, MAXLINE, "SHELL=%s", shell);
 
 /* GOTCHA: POSIX says that we cannot set the SHELL environment variable
@@ -783,7 +770,9 @@ int main(int c, char **v, char **env)
 /* analyze dependencies */
 	phase = 2;
 
-	nt    = SC_analyze_dependencies(state, tgt);
+	nt = SC_analyze_dependencies(state, tgt);
+	SC_ASSERT(nt >= 0);
+
 	cmnds = SC_action_commands(state, recur);
 
 	SC_free_state(state);
@@ -814,7 +803,7 @@ int main(int c, char **v, char **env)
 /* cleanup */
 	phase = 4;
 
-	SFREE(shell);
+	CFREE(shell);
 	if (cmnds != NULL)
 	   SC_free_strings(cmnds);};
 

@@ -54,7 +54,7 @@ PROCESS *PC_open_member(argv, pnn)
 
     mpsc_init();
 
-    pp = FMAKE(PROCESS, "PC_OPEN_MEMBER:pp");
+    pp = CMAKE(PROCESS);
     pp->acpu = mynode();
     pp->rcpu = myhost();
 

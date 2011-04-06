@@ -646,9 +646,7 @@ int SC_set_raw_state(int fd, int trap)
 #  if 0
        {TERMINAL t;
 
-	rv = _SC_get_tty_attr(fd, &t);
-	if (rv > -1)
-	   {cfmakeraw(&t);
+	rv = _SC_get_tty_attr(fd);
 
 	    rv = _SC_set_tty_attr(fd, &t, TRUE);
 	    if (rv < 0)
@@ -769,13 +767,13 @@ void *SC_get_term_state(int fd, int size)
 #ifdef TERMINAL
     {int st;
 
-     t = FMAKE(TERMINAL_STATE, "SC_GET_TERM_STATE:t");
+     t = CMAKE(TERMINAL_STATE);
      t->fd        = fd;
      t->full_info = TRUE;
 
      st = _SC_get_tty_attr(fd, &t->term);
      if (st < 0)
-        {SFREE(t);
+        {CFREE(t);
 	 return(NULL);};
 
 # ifdef BSD_TERMINAL
@@ -801,7 +799,7 @@ void *SC_get_term_state(int fd, int size)
 	 {SC_set_term_size(fd, -1, -1, -1, -1);
 	  st = ioctl(fd, TIOCGWINSZ, &t->window_size);
 	  if (st < 0)
-	     {SFREE(t);
+	     {CFREE(t);
 	      return(NULL);};};};
 #endif
 
@@ -892,7 +890,7 @@ static char *_SC_mpi_proc_str(const char *s, int trm)
        {if (s != NULL)
 	   {d = SC_dstrcat(d, tag);
 
-	    t = SC_strsavef((char *) s, "char*:_SC_MPI_PROC_STR:s");
+	    t = CSTRSAVE((char *) s);
 
 	    for (pt = t; TRUE; )
 	        {pe = strchr(pt, '\n');
@@ -907,7 +905,7 @@ static char *_SC_mpi_proc_str(const char *s, int trm)
 
 		     pt = pe + 1;};};
 
-	    SFREE(t);
+	    CFREE(t);
 
 	    if (trm == TRUE)
 	       d = SC_dstrcat(d, SC_DEFEAT_MPI_BUG);};};
@@ -931,17 +929,17 @@ int SC_mpi_fputs(const char *s, FILE *fp)
     if (fp == stdout)
        p = _SC_mpi_proc_str(s, TRUE);
     else
-       p = SC_strsavef((char *) s, "char*:SC_MPI_FPUTS:s");
+       p = CSTRSAVE((char *) s);
 
 #else
 
-    p = SC_strsavef((char *) s, "char*:SC_MPI_FPUTS:s");
+    p = CSTRSAVE((char *) s);
 
 #endif
 
     nc = SAFE_FPUTS(p, fp);
 
-    SFREE(p);
+    CFREE(p);
 
     return(nc);}
 
@@ -961,7 +959,7 @@ int SC_mpi_printf(FILE *fp, char *fmt, ...)
 
     nc = SC_mpi_fputs(s, fp);
 
-    SFREE(s);
+    CFREE(s);
 
     return(nc);}
 
@@ -983,8 +981,8 @@ int SC_mpi_ftn_snprintf(char *bf, int nc, char *fmt, ...)
     strncpy(bf, t, nc);
     nc = strlen(bf);
 
-    SFREE(s);
-    SFREE(t);
+    CFREE(s);
+    CFREE(t);
 
     return(nc);}
 
@@ -1191,7 +1189,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 
 	    s = SC_dsnprintf(TRUE, "%c[%s", SC_ESC_CHAR, cmd);
 	    SC_write_sigsafe(fd, s, strlen(s));
-	    SFREE(s);
+	    CFREE(s);
 
 	    _SC_get_term_resp(fd, rsp[0], &val[0], &val[1]);
 
@@ -1259,7 +1257,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 	    if ((ppr != NULL) || (ppc != NULL))
 	       {s = SC_dsnprintf(TRUE, "%c[14t", SC_ESC_CHAR);
 		SC_write_sigsafe(fd, s, strlen(s));
-                SFREE(s);
+                CFREE(s);
 
 		_SC_get_term_resp(fd, 't', &pw, &ph);
 		if (ppr != NULL)
@@ -1278,7 +1276,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 	    if ((pcr != NULL) || (pcc != NULL))
 	       {s = SC_dsnprintf(TRUE, "%c[18t", SC_ESC_CHAR);
 		SC_write_sigsafe(fd, s, strlen(s));
-                SFREE(s);
+                CFREE(s);
 
 		_SC_get_term_resp(fd, 't', &cw, &ch);
 		if (pcr != NULL)

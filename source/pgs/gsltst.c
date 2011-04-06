@@ -148,7 +148,7 @@ int main(int argc, char **argv)
     PG_device *SCR_dev, *SCR_dew, *PS_dev, *CGM_dev;
 
     use_color = FALSE;
-    s = SC_strsavef("WINDOW", "char*:GSLTST:s");
+    s = CSTRSAVE("WINDOW");
     for (i = 1; i < argc; i++)
         if (argv[i][0] == '-')
            {switch (argv[i][1])
@@ -158,8 +158,8 @@ int main(int argc, char **argv)
                            s = argv[i];
                            break;};};
 
-    x = FMAKE_N(double, N, "GSLTST.C:x");
-    y = FMAKE_N(double, N, "GSLTST.C:y");
+    x = CMAKE_N(double, N);
+    y = CMAKE_N(double, N);
 
 /* set up the left window */
     SCR_dev = PG_make_device(s, "COLOR", "PGS Test A");

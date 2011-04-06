@@ -258,7 +258,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 		ru->minflt = val[LINUX_PROC_MNFLT];
 		ru->majflt = val[LINUX_PROC_MJFLT];
 		ru->nswap  = val[LINUX_PROC_NSWAP];};};
-	SFREE(fname);
+	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/cmdline", pid);
 	fd    = open(fname, O_RDONLY);
@@ -267,7 +267,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    close(fd);
 	    if (nc > 0)
 	       SC_strncpy(ru->cmd, MAXLINE, s, -1);};
-	SFREE(fname);
+	CFREE(fname);
 
 	rv = TRUE;};
 
@@ -303,7 +303,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 		ru->ut     = ut;
 		ru->st     = st;
 		ru->maxrss = mby*sp.pr_brksize;};};
-	SFREE(fname);
+	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/psinfo", pid);
 	fd    = open(fname, O_RDONLY);
@@ -314,7 +314,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 	    if (nb == nc)
 	       SC_strncpy(ru->cmd, MAXLINE, si.pr_psargs, -1);};
-	SFREE(fname);
+	CFREE(fname);
 
 	rv = TRUE;};
 
@@ -351,7 +351,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 		ru->ut     = ut;
 		ru->st     = st;
 		ru->maxrss = mby*sp.pr_brksize;};};
-	SFREE(fname);
+	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/psinfo", pid);
 	fd    = open(fname, O_RDONLY);
@@ -362,7 +362,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 	    if (nb == nc)
 	       SC_strncpy(ru->cmd, MAXLINE, si.pr_psargs, -1);};
-	SFREE(fname);
+	CFREE(fname);
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/usage", pid);
 	fd    = open(fname, O_RDONLY);
@@ -383,7 +383,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 		ru->nvcsw    = su.pr_vctx;     /* voluntary context switches */
 		ru->nivcsw   = su.pr_ictx;     /* involuntary context switches */
 		ru->nsysc    = su.pr_sysc;};}; /* system calls */
-	SFREE(fname);
+	CFREE(fname);
 
 	rv = TRUE;};
 
@@ -413,13 +413,13 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 	if (sysctl(mib, 4, NULL, &sz, NULL, 0) == 0)
 	   {ne = sz/sizeof(struct kinfo_proc);
-	    kp = FMAKE_N(struct kinfo_proc, ne, "SC_RESOURCE_USAGE:kpa");
+	    kp = CMAKE_N(struct kinfo_proc, ne);
 
 	    if (sysctl(mib, 4, kp, &sz, NULL, 0) == 0)
 	       {ru->uid  = kp->kp_eproc.e_pcred.p_ruid;
 		ru->ppid = kp->kp_eproc.e_ppid;};
 
-	    SFREE(kp);};
+	    CFREE(kp);};
 
 /* get command line */
 	mib[0] = CTL_KERN;
@@ -429,7 +429,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 	if (sysctl(mib, 2, &na, &sz, NULL, 0) == 0)
 	   {if (na > MAX_BFSZ)
-	       {pc = FMAKE_N(char,  na, "SC_RESOURCE_USAGE:pc");
+	       {pc = CMAKE_N(char,  na);
 
 		mib[0] = CTL_KERN;
 		mib[1] = KERN_PROCARGS;
@@ -452,7 +452,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 			 while ((ps - pe < 0) && (*ps == '\0'))
 			    ps++;};};
 			     
-		SFREE(pc);};};
+		CFREE(pc);};};
 
 /* get timing and other run related info */
 	job = MACH_PORT_NULL;
@@ -515,7 +515,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    SC_strncpy(ru->cmd, MAXLINE, pcmd, -1);
 
 	    rv = TRUE;};
-	SFREE(cmd);
+	CFREE(cmd);
 
 	SC_free_strings(res);};
 

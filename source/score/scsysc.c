@@ -80,9 +80,9 @@ int _SC_chg_dir(char *dir, char **pndir)
     if ((st == 0) && (pndir != NULL))
        {cwd = SC_getcwd();
 	if ((ndr == NULL) || (strcmp(cwd, ndr) != 0))
-	   {SFREE(ndr);
-	    *pndir = SC_strsavef(cwd, "_SC_CHG_DIR:dir");};
-	SFREE(cwd);};
+	   {CFREE(ndr);
+	    *pndir = CSTRSAVE(cwd);};
+	CFREE(cwd);};
 
     return(st);}
 
@@ -154,7 +154,7 @@ fspec *_SC_read_filter(char *fname)
        fp = fopen(fname, "r");
 
     if (fp != NULL)
-       {filter = FMAKE_N(fspec, 1000, "_SC_READ_FILTER:filter");
+       {filter = CMAKE_N(fspec, 1000);
 
 	n  = 0;
 	while (SC_fgets(s, MAXLINE, fp) != NULL)
@@ -188,7 +188,7 @@ void _SC_free_filter(fspec *filter)
    {
 
     if (filter != NULL)
-       {SFREE(filter);};
+       {CFREE(filter);};
 
     return;}
 
@@ -213,7 +213,7 @@ static int _SC_match(char *t, fspec *filter)
 	        ok = (strstr(t, f) != NULL);
 
 	     else
-	        {s  = SC_strsavef(t, "char*:_SC_MATCH:t");
+	        {s  = CSTRSAVE(t);
 		 ps = s;
 
 		 tok = NULL;
@@ -224,7 +224,7 @@ static int _SC_match(char *t, fspec *filter)
 		 if (tok != NULL)
 		    ok = (strstr(tok, f) != NULL);
 
-		 SFREE(s);};};};
+		 CFREE(s);};};};
 
     return(ok);}
 
@@ -242,14 +242,14 @@ static void _SC_free_tasklst(tasklst *tl)
 	for (it = 0; it < nt; it++)
 	    {sub = tl->tasks + it;
 
-	     SFREE(sub->shell);
-	     SFREE(sub->command);
+	     CFREE(sub->shell);
+	     CFREE(sub->command);
 
 	     SC_free_strings(sub->argf);};
 
-	SFREE(tl->tasks);};
+	CFREE(tl->tasks);};
 
-    SFREE(tl);
+    CFREE(tl);
 
     return;}
 
@@ -271,11 +271,11 @@ static int _SC_free_taskdesc(void *a)
 
 	    _SC_free_tasklst(job->command);
 
-	    SFREE(inf->full);
-	    SFREE(inf->directory);
-	    SFREE(inf->shell);
-	    SFREE(job->host);
-	    SFREE(job);};};
+	    CFREE(inf->full);
+	    CFREE(inf->directory);
+	    CFREE(inf->shell);
+	    CFREE(job->host);
+	    CFREE(job);};};
 
     return(TRUE);}
 
@@ -381,7 +381,7 @@ void _SC_exec_free_state(parstate *state, int flt)
    {
 
     _SC_chg_dir(state->directory, NULL);
-    SFREE(state->directory);
+    CFREE(state->directory);
 
     if (flt == TRUE)
        _SC_free_filter(state->filter);
@@ -417,7 +417,7 @@ int _SC_server_printf(asyncstate *as, parstate *state, char *tag,
 
     _SC_exec_printf(as, "%s %s %s", _SC_EXEC_SRV_ID, tag, msg);
 
-    SFREE(msg);
+    CFREE(msg);
 
     SC_END_ACTIVITY(state);
 
@@ -442,11 +442,11 @@ void dstatelog(char *fmt, ...)
 
 	snprintf(tag, MAXLINE, "[Job  -/- %s]", tms);
 
-	SFREE(tm);
+	CFREE(tm);
 
 	state->print(state, "%s (%d) %s", tag, state->doing, msg);};
 
-    SFREE(msg);
+    CFREE(msg);
 
     return;}
 
@@ -571,7 +571,7 @@ int _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st)
 				 "***> failed (%d) [%s] - quitting after %d attempts\n",
 				 st, time, na);};
 
-	SFREE(time);}
+	CFREE(time);}
 
     else
        {if ((ia > 1) && (na > 1))
@@ -581,7 +581,7 @@ int _SC_decide_retry(asyncstate *as, jobinfo *inf, tasklst *tl, int st)
 				 "***> succeeded [%s] - on attempt %d\n",
 				 time, ia);
 
-	    SFREE(time);};
+	    CFREE(time);};
 
 	rv = 0;};
 
@@ -626,12 +626,12 @@ static char *_SC_prep_command(char *in, int check)
     nc = strlen(in) - 1;
     nc = max(nc, 0);
     if ((in[0] == '(') && (in[nc] == ')'))
-       {out = SC_strsavef(in+1, "char*:_SC_PREP_COMMAND:p");
+       {out = CSTRSAVE(in+1);
         SC_LAST_CHAR(out) = '\0';}
 
 /* copy in the command if not of the form ( ... ) */
     else
-       out = SC_strsavef(in, "char*:_SC_PREP_COMMAND:np");
+       out = CSTRSAVE(in);
 
     return(out);}
 
@@ -685,7 +685,7 @@ static void _SC_subst_task_env(int na, char **ta)
 		     r = SC_dstrcat(r, val);
 		     r = SC_dstrcat(r, pe);
 
-		     SFREE(t);
+		     CFREE(t);
 		     t = r;};};};
 
 	 ta[i] = t;};
@@ -764,7 +764,7 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
     di = j - i + 1;
     n -= di;
     for ( ; i <= j; j--)
-        {SFREE(ta[j]);};
+        {CFREE(ta[j]);};
 
     for (j = i; j < n; j++)
         ta[j] = ta[j+di];
@@ -848,9 +848,9 @@ static void _SC_unquote_subtask(subtask *ps)
        {for (i = 0; i < n; i++)
 	    {t = ta[i];
 	     if (strchr("'\"", *t) != NULL)
-	        {p = SC_strsavef(t+1, "_SC_UNQUOTE_SUBTASK:p");
+	        {p = CSTRSAVE(t+1);
 		 SC_LAST_CHAR(p) = '\0';
-		 SFREE(t);
+		 CFREE(t);
 		 ta[i] = p;};};};
 
     return;}
@@ -877,7 +877,7 @@ static void _SC_push_subtask(subtask *sub, int it, char *shell,
 
     ps->need    = dosh;
     ps->pipe    = pipe;
-    ps->shell   = SC_strsavef(shell, "_SC_PUSH_SUBTASK:shell");
+    ps->shell   = CSTRSAVE(shell);
     ps->nt      = nt;
     ps->argf    = sa;
     ps->command = sc;
@@ -902,7 +902,7 @@ static void _SC_push_subtask(subtask *sub, int it, char *shell,
 static void _SC_push_token(SC_array *tf, char *t)
    {char *s;
 
-    s = SC_strsavef(t, "_SC_PUSH_TOKEN:t");
+    s = CSTRSAVE(t);
     SC_LAST_CHAR(s) = '\0';
 		 
     SC_array_string_add(tf, s);
@@ -1064,12 +1064,12 @@ static int _SC_handle_echo(taskdesc *job, asyncstate *as, subtask *sub)
 
 	     t[0] = '\0';};
 
-	SFREE(t);
+	CFREE(t);
 
 /* handle the dispostion of S */
 	if (n != -1)
 	   {if (s == NULL)
-	       s = SC_strsavef("", "char*:_SC_HANDLE_ECHO:s");
+	       s = CSTRSAVE("");
 	    else
 	       SC_LAST_CHAR(s) = '\0';
 
@@ -1085,7 +1085,7 @@ static int _SC_handle_echo(taskdesc *job, asyncstate *as, subtask *sub)
 	    else
 	       {job->print(job, as, "%s\n", sub->command);
 		job->redir(job, as, fd, s, newl);
-		SFREE(s);};
+		CFREE(s);};
 
 	    inf->status = 0;
 	    inf->signal = SC_EXITED;};
@@ -1483,7 +1483,7 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
     subtask *sub;
     tasklst *tl;
 
-    tl = FMAKE(tasklst, "_SC_MAKE_TASKLST:tl");
+    tl = CMAKE(tasklst);
 
 /* convert the command from ( ... ) form to just ... form */
     s = _SC_prep_command(cmd, FALSE);
@@ -1494,7 +1494,7 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
 
     _SC_subst_task_env(na, ta);
 
-    SFREE(s);
+    CFREE(s);
 
 /* count the apparent subtasks
  * constructs such as (cd .. ; ) would look like 2 subtasks
@@ -1502,7 +1502,7 @@ static tasklst *_SC_make_tasklst(char *shell, char *cmd)
     for (nt = 1, n = 0; n < na; n++)
         nt += (strcmp(ta[n], ";\n") == 0);
 
-    sub = FMAKE_N(subtask, nt, "_SC_MAKE_TASKLIST:sub");
+    sub = CMAKE_N(subtask, nt);
 
 /* initialize and get the real number of subtasks
  * constructs such as (cd .. ; ) would actually have 1 subtask
@@ -1852,7 +1852,7 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
 /* launch job on current host */
 	else
 	   {rv  = TRUE;
-	    cmc = SC_strsavef(cm, "_SC_LAUNCH_JOB:cm");
+	    cmc = CSTRSAVE(cm);
 
 	    _SC_chg_dir(dr, &inf->directory);
 
@@ -1861,7 +1861,7 @@ static int _SC_launch_job(taskdesc *job, asyncstate *as)
 	       {inf->status = 0;
 		inf->signal = SC_EXITED;};
 
-	    SFREE(cmc);};};
+	    CFREE(cmc);};};
 
     return(rv);}
 
@@ -1944,7 +1944,7 @@ static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
 	if (launch == TRUE)
 	   {ok = job->launch(job, as);
 	    if (ok == FALSE)
-	       {SFREE(job);};}
+	       {CFREE(job);};}
 	else
 	   _SC_setup_output(inf, "_SC_START_JOB");
 
@@ -1976,7 +1976,7 @@ static int _SC_close_job_process(taskdesc *job, int setst)
 
 	    p = SC_datef();
 	    strcpy(inf->stop_time, p);
-	    SFREE(p);
+	    CFREE(p);
 
 	    pp = job->pp;
 	    if (SC_process_alive(pp))
@@ -2023,7 +2023,7 @@ static void _SC_job_tag(taskdesc *job, char *tag, int nc, char *tm)
        snprintf(tag, nc, "[Job --/- %s]", tms);
 
     if (rl)
-       SFREE(tm);
+       CFREE(tm);
 
     return;}
 
@@ -2059,7 +2059,7 @@ int _SC_job_print(taskdesc *job, asyncstate *as, char *fmt, ...)
 	if (state->server == TRUE)
 	   _SC_exec_printf(as, "%s %s %s", _SC_EXEC_SRV_ID, tag, msg);
 
-	SFREE(msg);
+	CFREE(msg);
 
 	SC_END_ACTIVITY(state);};
 
@@ -2147,7 +2147,7 @@ static void _SC_remove_job(taskdesc *job)
 	    {SC_array_set(ta, i, NULL);
 	     break;};};
 
-    SFREE(tsk);
+    CFREE(tsk);
 
     return;}
 
@@ -2161,7 +2161,7 @@ taskdesc *SC_make_taskdesc(parstate *state, int jid,
    {taskdesc *job;
     jobinfo *inf;
 
-    job = FMAKE(taskdesc, "_SC_MAKE_TASKDESC:job");
+    job = CMAKE(taskdesc);
     if (job != NULL)
        {inf = &job->inf;
 
@@ -2171,17 +2171,17 @@ taskdesc *SC_make_taskdesc(parstate *state, int jid,
 	   dir = state->directory;
 
 	if (dir != NULL)
-	   dir = SC_strsavef(dir, "_SC_MAKE_TASKDESC:dir");
+	   dir = CSTRSAVE(dir);
 
 	inf->id        = jid;
 	inf->ia        = 0;
 	inf->na        = state->na;
-	inf->shell     = SC_strsavef(shell, "_SC_MAKE_TASKDESC:shell");
+	inf->shell     = CSTRSAVE(shell);
 	inf->directory = dir;
-	inf->full      = SC_strsavef(cmd, "_SC_MAKE_TASKDESC:cmd");
+	inf->full      = CSTRSAVE(cmd);
 	inf->tstart    = 0.0;
 
-	job->host     = SC_strsavef(host, "_SC_MAKE_TASKDESC:host");
+	job->host     = CSTRSAVE(host);
 	job->arch     = NULL;
 	job->command  = _SC_make_tasklst(shell, cmd);
 	job->finished = FALSE;

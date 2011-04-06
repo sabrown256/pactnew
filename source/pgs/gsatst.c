@@ -125,22 +125,22 @@ static PM_mapping *compute_2d_ac_mapping_2(double *x, double *y,
     nd  = 2;
 
 /* setup the number of boundary parameters array */
-    bnp    = FMAKE_N(int, nd+1, "COMPUTE_2D_AC_MAPPING_2:bnp");
+    bnp    = CMAKE_N(int, nd+1);
     bnp[0] = 1;
     for (id = 1; id <= nd; id++)
         bnp[id] = ord;
 
 /* setup the number of cells array */
-    bnc = FMAKE_N(int, nd+1, "COMPUTE_2D_AC_MAPPING_2:bnc");
+    bnc = CMAKE_N(int, nd+1);
     bnc[0] = kmax*lmax;
     bnc[1] = 4*nc;
     bnc[2] = nc;
 
 /* allocate the boundary arrays */
-    bnd    = FMAKE_N(long *, nd+1, "COMPUTE_2D_AC_MAPPING_2:bnd");
+    bnd    = CMAKE_N(long *, nd+1);
     bnd[0] = NULL;
     for (id = 1; id <= nd; id++)
-        bnd[id] = FMAKE_N(long, ord*bnc[id], "COMPUTE_2D_AC_MAPPING_2:bnd[id]");
+        bnd[id] = CMAKE_N(long, ord*bnc[id]);
 
 /* fill the zone list */
     zone = bnd[2];
@@ -169,7 +169,7 @@ static PM_mapping *compute_2d_ac_mapping_2(double *x, double *y,
              x[i] = k*dx + xmin;
              y[i] = l*dy + ymin;};
 
-    f = FMAKE_N(double, nc, "COMPUTE_2D_AC_MAPPING_2:f");
+    f = CMAKE_N(double, nc);
     for (i = 0; i < nc; i++)
         {i1 = edge[ord*(4*i + 0)];
          i2 = edge[ord*(4*i + 1)];
@@ -243,22 +243,22 @@ static PM_mapping *compute_2d_ac_mapping_1(double *x, double *y,
     nd  = 2;
 
 /* setup the number of boundary parameters array */
-    bnp    = FMAKE_N(int, nd+1, "COMPUTE_2D_AC_MAPPING_1:bnp");
+    bnp    = CMAKE_N(int, nd+1);
     bnp[0] = 1;
     for (id = 1; id <= nd; id++)
         bnp[id] = 1;
 
 /* setup the number of cells array */
-    bnc = FMAKE_N(int, nd+1, "COMPUTE_2D_AC_MAPPING_1:bnc");
+    bnc = CMAKE_N(int, nd+1);
     bnc[0] = kmax*lmax;
     bnc[1] = 5*nc;
     bnc[2] = nc;
 
 /* allocate the boundary arrays */
-    bnd    = FMAKE_N(long *, nd+1, "COMPUTE_2D_AC_MAPPING_1:bnd");
+    bnd    = CMAKE_N(long *, nd+1);
     bnd[0] = NULL;
     for (id = 1; id <= nd; id++)
-        bnd[id] = FMAKE_N(long, bnc[id]+1, "COMPUTE_2D_AC_MAPPING_1:bnd[id]");
+        bnd[id] = CMAKE_N(long, bnc[id]+1);
 
 /* fill the zone list */
     zone = bnd[2];
@@ -286,7 +286,7 @@ static PM_mapping *compute_2d_ac_mapping_1(double *x, double *y,
              x[i] = k*dx + xmin;
              y[i] = l*dy + ymin;};
 
-    f = FMAKE_N(double, nc, "COMPUTE_2D_AC_MAPPING_1:f");
+    f = CMAKE_N(double, nc);
     for (i = 0; i < nc; i++)
         {i1 = edge[5*i + 0];
          i2 = edge[5*i + 1];
@@ -325,8 +325,8 @@ static int test_1(PG_device *dev)
 
     n = N;
 
-    x = FMAKE_N(double, n, "TEST_1:x");
-    y = FMAKE_N(double, n, "TEST_1:y");
+    x = CMAKE_N(double, n);
+    y = CMAKE_N(double, n);
 
 /* prepare the data */
     ip = PG_get_processor_number();
@@ -394,8 +394,8 @@ static int test_2(PG_device *dev)
 
     n = N;
 
-    x = FMAKE_N(double, n, "TEST_2:x");
-    y = FMAKE_N(double, n, "TEST_2:y");
+    x = CMAKE_N(double, n);
+    y = CMAKE_N(double, n);
 
 /* prepare the data */
     ip = PG_get_processor_number();
@@ -691,9 +691,9 @@ static int test_5(PG_device *dev)
     kmax      = 20;
     lmax      = 20;
     kxl       = kmax*lmax;
-    x         = FMAKE_N(double, kxl, "TEST_5:x");
-    y         = FMAKE_N(double, kxl, "TEST_5:y");
-    f         = FMAKE_N(double, kxl, "TEST_5:f");
+    x         = CMAKE_N(double, kxl);
+    y         = CMAKE_N(double, kxl);
+    f         = CMAKE_N(double, kxl);
     id        = 'A';
     lncolor   = dev->BLUE;
     lnwidth   = 0.0;
@@ -752,10 +752,10 @@ static int test_6(PG_device *dev)
     centering = N_CENT;
 
     kxl = kmax*lmax;
-    x   = FMAKE_N(double, kxl, "TEST_6:x");
-    y   = FMAKE_N(double, kxl, "TEST_6:y");
-    u   = FMAKE_N(double, kxl, "TEST_6:u");
-    v   = FMAKE_N(double, kxl, "TEST_6:v");
+    x   = CMAKE_N(double, kxl);
+    y   = CMAKE_N(double, kxl);
+    u   = CMAKE_N(double, kxl);
+    v   = CMAKE_N(double, kxl);
 
     km = 2.0*PI/((double) kmax - 1.0);
     lm = 2.0*PI/((double) lmax - 1.0);
@@ -811,9 +811,9 @@ static int test_7(PG_device *dev)
     kmax      = 20;
     lmax      = 20;
     kxl       = kmax*lmax;
-    x         = FMAKE_N(double, kxl, "TEST_7:x");
-    y         = FMAKE_N(double, kxl, "TEST_7:y");
-    f         = FMAKE_N(double, kxl, "TEST_7:f");
+    x         = CMAKE_N(double, kxl);
+    y         = CMAKE_N(double, kxl);
+    f         = CMAKE_N(double, kxl);
     id        = 'A';
 
     compute_2d_data(f, x, y, kmax, lmax);
@@ -857,7 +857,7 @@ static int test_8(PG_device *dev)
 /* make the data */
     r = PM_make_vectors(3, kxl);
     pz = r[2];
-    rs = ps = FMAKE_N(double, kxl, "TEST_8:rs");
+    rs = ps = CMAKE_N(double, kxl);
 
     for (id = 0; id < 3; id++)
         SC_mark(r[id], 1);
@@ -873,13 +873,13 @@ static int test_8(PG_device *dev)
     maxes[0] = kmax;
     maxes[1] = lmax;
 
-    emap = FMAKE_N(char, kxl, "TEST_8:emap");
+    emap = CMAKE_N(char, kxl);
     memset(emap, 1, kxl);
     alist = PG_set_attrs_alist(NULL,
 			      "EXISTENCE", SC_CHAR_I, TRUE, emap,
 			      NULL);
 
-    ext = FMAKE_N(double, 4, "TEST_8:ext");
+    ext = CMAKE_N(double, 4);
     ext[0] = -1;
     ext[1] =  1;
     ext[2] = -1;
@@ -930,9 +930,9 @@ static int test_8(PG_device *dev)
 				       PM_LR_S, maxes, alist);};};
 
     PM_free_vectors(3, r);
-    SFREE(rs);
-    SFREE(ext);
-    SFREE(emap);
+    CFREE(rs);
+    CFREE(ext);
+    CFREE(emap);
     SC_free_alist(alist, 3);
 
     return(TRUE);}
@@ -970,9 +970,9 @@ static int test_9(PG_device *dev)
     ymin      = -5.0;
     ymax      = 5.0;
     kxl       = kmax*lmax;
-    x         = FMAKE_N(double, kxl, "TEST_9:x");
-    y         = FMAKE_N(double, kxl, "TEST_9:y");
-    f         = FMAKE_N(double, kxl, "TEST_9:f");
+    x         = CMAKE_N(double, kxl);
+    y         = CMAKE_N(double, kxl);
+    f         = CMAKE_N(double, kxl);
 
     SC_ASSERT(ymax > ymin);
 
@@ -1017,10 +1017,10 @@ static int test_9(PG_device *dev)
     ymin      = -3.0;
     ymax      = 5.0;
     kxl       = kmax*lmax*mmax;
-    x         = FMAKE_N(double, kxl, "TEST_9:x");
-    y         = FMAKE_N(double, kxl, "TEST_9:y");
-    z         = FMAKE_N(double, kxl, "TEST_9:z");
-    f         = FMAKE_N(double, kxl, "TEST_9:f");
+    x         = CMAKE_N(double, kxl);
+    y         = CMAKE_N(double, kxl);
+    z         = CMAKE_N(double, kxl);
+    f         = CMAKE_N(double, kxl);
 
     dx = (xmax - xmin)/((double) kmax - 1.0);
     dy = (xmax - xmin)/((double) kmax - 1.0);
@@ -1148,8 +1148,8 @@ static int test_11(PG_device *dev)
     kmax = 11;
     lmax = 11;
     kxl  = kmax*lmax;
-    x    = FMAKE_N(double, kxl, "TEST_11:x");
-    y    = FMAKE_N(double, kxl, "TEST_11:y");
+    x    = CMAKE_N(double, kxl);
+    y    = CMAKE_N(double, kxl);
 
     f = compute_2d_ac_mapping_2(x, y, kmax, lmax);
 
@@ -1208,8 +1208,8 @@ static int test_12(PG_device *dev)
     lmax = 3;
 */
     kxl = kmax*lmax;
-    x   = FMAKE_N(double, kxl, "TEST_12:x");
-    y   = FMAKE_N(double, kxl, "TEST_12:y");
+    x   = CMAKE_N(double, kxl);
+    y   = CMAKE_N(double, kxl);
 
     f = compute_2d_ac_mapping_1(x, y, kmax, lmax);
 

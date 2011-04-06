@@ -31,7 +31,7 @@ static int test_1(void)
     bpi = sizeof(int);
     bu  = 10;
 
-    iv = FMAKE_N(int, n, "TEST_1:iv");
+    iv = CMAKE_N(int, n);
     for (i = 0; i < n; i++)
         iv[i] = i+1;
 
@@ -73,7 +73,7 @@ static int test_1(void)
 
     io_close(fp);
 
-    SFREE(iv);
+    CFREE(iv);
 
     st = (ni == 123);
     io_printf(stdout, "\t\t\twrite seq ............... %s\n",
@@ -105,7 +105,7 @@ static int test_2(void)
     bpi = sizeof(int);
     bu  = 10;
 
-    iv = FMAKE_N(int, n, "TEST_1:iv");
+    iv = CMAKE_N(int, n);
     for (i = 0; i < n; i++)
         iv[i] = 0;
 
@@ -158,7 +158,7 @@ static int test_2(void)
     io_printf(stdout, "\t\t\tread seq ................ %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
-    SFREE(iv);
+    CFREE(iv);
 
     cs = SC_mem_monitor(cs, dbg, "T1", msg);
 
@@ -186,7 +186,7 @@ static int test_3(void)
     bpi = sizeof(int);
     bu  = 3;
 
-    iv = FMAKE_N(int, n, "TEST_1:iv");
+    iv = CMAKE_N(int, n);
     for (i = 0; i < n; i++)
         iv[i] = i+1;
 
@@ -205,7 +205,7 @@ static int test_3(void)
 
     io_close(fp);
 
-    SFREE(iv);
+    CFREE(iv);
 
     st = (ni == nu*nw);
     io_printf(stdout, "\t\t\twrite rnd ............... %s\n",
@@ -237,7 +237,7 @@ static int test_4(void)
     bpi = sizeof(int);
     bu  = 10;
 
-    iv = FMAKE_N(int, n, "TEST_1:iv");
+    iv = CMAKE_N(int, n);
     for (i = 0; i < n; i++)
         iv[i] = 0;
 
@@ -261,7 +261,7 @@ static int test_4(void)
     for (i = 0; i < ni; i++)
         st &= (iv[i] == i+1);
 
-    SFREE(iv);
+    CFREE(iv);
 
     io_printf(stdout, "\t\t\tread rnd ................ %s\n",
 	      (st == TRUE) ? "ok" : "ng");
@@ -297,7 +297,7 @@ static int test_5(void)
     bpi = sizeof(int);
     bu  = 10;
 
-    iv = FMAKE_N(int, n, "TEST_1:iv");
+    iv = CMAKE_N(int, n);
     for (i = 0; i < n; i++)
         iv[i] = 0;
 
@@ -322,7 +322,7 @@ static int test_5(void)
     for (i = 0; (i < n) && (st == TRUE); i++)
         st &= ((iv[i] == 0) || (iv[i] == i+1));
 
-    SFREE(iv);
+    CFREE(iv);
 
     io_printf(stdout, "\t\t\tread bck ................ %s\n",
 	      (st == TRUE) ? "ok" : "ng");

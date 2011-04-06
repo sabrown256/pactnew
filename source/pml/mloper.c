@@ -535,7 +535,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s[i]);
 
-	    SFREE(s);
+	    CFREE(s);
 
 	    ret = TRUE;}
 
@@ -552,7 +552,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s[i]);
 
-	    SFREE(s);
+	    CFREE(s);
 
 	    ret = TRUE;}
 
@@ -568,7 +568,7 @@ static int _PM_acc_oper(PFVoid *proc, C_array *acc,
 	    for (i = 0; i < n; i++)
 	        da[i] = fnc(da[i], s[i]);
 
-	    SFREE(s);
+	    CFREE(s);
 
 	    ret = TRUE;};}
 
@@ -705,8 +705,8 @@ int PM_set_equal(PM_set *a, PM_set *b, double tol)
 
 	     ok = PM_array_equal(aed, bed, ne, tol);};
 
-	SFREE(aed);
-	SFREE(bed);};
+	CFREE(aed);
+	CFREE(bed);};
 
     return(ok);}
 

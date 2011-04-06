@@ -223,7 +223,7 @@ void _PM_offsets(long *dims, long **strtind, long *start, long *stride,
     long i, j;
 
     ndims = dims[0];
-    min_index = FMAKE_N(long, ndims, "offsets:min_index");
+    min_index = CMAKE_N(long, ndims);
 
     for (i = 1; i <= ndims; i++)
         min_index[i-1] = dims[2*i-1];
@@ -234,7 +234,7 @@ void _PM_offsets(long *dims, long **strtind, long *start, long *stride,
 	    {start[i] += (strtind[i][j] - min_index[j]) 
 	                 * stride[j];};}
 
-    SFREE(min_index);
+    CFREE(min_index);
 
     return;} 
 
@@ -251,7 +251,7 @@ long _PM_hyper_indices(long *dims, long *region, long **start, long *chunk)
 
     ndims = dims[0];
 
-    stride = FMAKE_N(long, ndims, "_PM_hyper_indices:stride");
+    stride = CMAKE_N(long, ndims);
 
 /* compute stride for each dimension */
     stride[0] = 1;
@@ -264,14 +264,14 @@ long _PM_hyper_indices(long *dims, long *region, long **start, long *chunk)
         noffs *= region[i] - region[i-1] + 1;
 
 /* allocate the start array */
-    *start = FMAKE_N(long, noffs, "_PM_hyper_indices:start");
+    *start = CMAKE_N(long, noffs);
 
 /* allocate temporary to store permuted indices */
-    strtind = FMAKE_N(long *, noffs, "_PM_hyper_indices:strtind");
+    strtind = CMAKE_N(long *, noffs);
 
     ndims = region[0];
     for (i = 0; i < noffs; i++)
-        strtind[i] = FMAKE_N(long, ndims, "_PM_hyper_indices:strtind[i]");
+        strtind[i] = CMAKE_N(long, ndims);
 
 /* permute the indices */
     _PM_permute(region, strtind, noffs);
@@ -282,12 +282,12 @@ long _PM_hyper_indices(long *dims, long *region, long **start, long *chunk)
     *chunk = region[2] - region[1] + 1;
 
 /* free up memory */
-    SFREE(stride)
+    CFREE(stride)
 
     for (i = 0; i < noffs; i++)
-        SFREE(strtind[i]);
+        CFREE(strtind[i]);
 
-    SFREE(strtind);
+    CFREE(strtind);
  
     return(noffs);}
 
@@ -312,7 +312,7 @@ void PM_sub_array(void *in, void *out, long *dims, long *reg, long bpi)
          memcpy(pout, pin, chunk*bpi);
          pout = pout + chunk * bpi;}
 
-    SFREE(start);
+    CFREE(start);
 
     return;}
 

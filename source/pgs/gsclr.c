@@ -90,27 +90,24 @@ PG_palette *PG_mk_palette(PG_device *dev, char *name, int nclr)
     npc = min(nclr, nclim);
     ndc = min(dev->absolute_n_color, nclim);
 
-    npal = FMAKE(PG_palette, "PG_MK_PALETTE:npal");
+    npal = CMAKE(PG_palette);
 
     if (strcmp(dev->name, "IMAGE") == 0)
-       pv = FMAKE_N(unsigned long, npc+2, "PG_MK_PALETTE:pv");
+       pv = CMAKE_N(unsigned long, npc+2);
     else
        pv = NULL;
 
     npal->max_pal_dims        = 0;
     npal->pal_dims            = NULL;
     npal->pixel_value         = pv;
-    npal->true_colormap       = FMAKE_N(RGB_color_map, npc + 2,
-                                        "PG_MK_PALETTE:true_colormap");
-    npal->pseudo_colormap     = FMAKE_N(RGB_color_map, npc + 2,
-                                        "PG_MK_PALETTE:pseudo_colormap");
+    npal->true_colormap       = CMAKE_N(RGB_color_map, npc + 2);
+    npal->pseudo_colormap     = CMAKE_N(RGB_color_map, npc + 2);
     npal->max_red_intensity   = mxr;
     npal->max_green_intensity = mxg;
     npal->max_blue_intensity  = mxb;
     npal->n_pal_colors        = npc;
     npal->n_dev_colors        = ndc;
-    npal->name                = SC_strsavef(name,
-                                            "char*:PG_MK_PALETTE:name");
+    npal->name                = CSTRSAVE(name);
     npal->next                = NULL;
 
     pcm  = npal->true_colormap;
@@ -148,19 +145,19 @@ PG_palette *PG_mk_palette(PG_device *dev, char *name, int nclr)
 void PG_rl_palette(PG_palette *pal)
    {int i, **pd;
 
-    SFREE(pal->name);
-    SFREE(pal->pixel_value);
-    SFREE(pal->true_colormap);
-    SFREE(pal->pseudo_colormap);
+    CFREE(pal->name);
+    CFREE(pal->pixel_value);
+    CFREE(pal->true_colormap);
+    CFREE(pal->pseudo_colormap);
     pal->next = NULL;
 
     if (pal->pal_dims != NULL)
        {pd = pal->pal_dims;
         for (i = 0; i < pal->max_pal_dims; i++)
-            SFREE(pd[i]);
-        SFREE(pd);}
+            CFREE(pd[i]);
+        CFREE(pd);}
 
-    SFREE(pal);
+    CFREE(pal);
 
     return;}
 
@@ -175,12 +172,12 @@ static PG_palette *_PG_attach_palette_dims(PG_palette *pal, int nc,
                                            int nd, int *sh)
    {int i, j, ncd, **pd, *pp;
 
-    pd = FMAKE_N(int *, nd, "_PG_ATTACH_PALETTE_DIMS:pd");
+    pd = CMAKE_N(int *, nd);
     for (i = 0; i < nd; i++)
         {if (sh == NULL)
             ncd = POW((double) nc, 1.0/((double) (i + 1)));
 
-         pp = FMAKE_N(int, i+1, "_PG_ATTACH_PALETTE_DIMS:pp");
+         pp = CMAKE_N(int, i+1);
          for (j = 0; j <= i; j++)
              pp[j] = (sh == NULL) ? ncd : sh[j];
 
@@ -594,7 +591,7 @@ static PG_palette *_PG_rand_palette(PG_device *dev, PG_palette *pal)
     root_cm = root->true_colormap;
     nc      = root->n_pal_colors;
 
-    ip = FMAKE_N(int, nc, "_PG_RAND_PALETTE:ip");
+    ip = CMAKE_N(int, nc);
     for (i = 0; i < nc; i++)
         ip[i] = i;
 
@@ -614,7 +611,7 @@ static PG_palette *_PG_rand_palette(PG_device *dev, PG_palette *pal)
     for (i = 0; i < nc; i++)
         true_cm[i] = root_cm[ip[i]];
 
-    SFREE(ip);
+    CFREE(ip);
 
     if (reg)
        PG_register_palette(dev, pal, FALSE);
@@ -2078,7 +2075,7 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
 
                  case 'c' :
                  case 'C' :
-                      SFREE(pals);
+                      CFREE(pals);
                       PG_close_device(dev);
                       _PG_gattrs.axis_label_y_standoff = old;
                       return;
@@ -2098,7 +2095,7 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
          else
             page += 8;};
 
-    SFREE(pals);
+    CFREE(pals);
     PG_close_device(dev);
     _PG_gattrs.axis_label_y_standoff = old;
 
@@ -2381,7 +2378,7 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
     PG_palette *root, *npal;
 
     if (name == NULL)
-       name = SC_strsavef("new", "char*:PG_MAKE_PALETTE:name");
+       name = CSTRSAVE("new");
 
 /* dimensionality greater than 2 not currently supported */
     if (ndims > 2)
@@ -2413,7 +2410,7 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 	scm  = root->true_colormap;
 	nc   = root->n_pal_colors + 2;
 
-	cm  = FMAKE_N(RGB_color_map, nc, "PG_MAKE_NDIM_PALETTE:cm");
+	cm  = CMAKE_N(RGB_color_map, nc);
 	pcm = cm;
 	for (l = 0; l < nc; l++)
 	    *pcm++ = *scm++;
@@ -2568,7 +2565,7 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 	    else
 	       PG_rl_palette(npal);};
 
-	SFREE(cm);
+	CFREE(cm);
 
 	PG_close_device(dev);};
 

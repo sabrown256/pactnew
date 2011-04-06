@@ -29,10 +29,10 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
  
 #define SAVE_S(s, t)                                                         \
     {RW_STR_STACK[RW_STR_PTR++] = s;                                         \
-     s = SC_strsavef(t, "char*:SAVE_S:t");}
+     s = CSTRSAVE(t);}
 
 #define RESTORE_S(s)                                                         \
-    {SFREE(s);                                                               \
+    {CFREE(s);                                                               \
      s = RW_STR_STACK[--RW_STR_PTR];}
 
 #define SAVE_I(val)                                                          \
@@ -71,7 +71,7 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
 	 if (_s == NULL)                                                     \
 	    {_s = FMAKE_N(_t, _px, "PERM|_PD_DYN_STK:s");}                   \
 	 else                                                                \
-	    REMAKE_N(_s, _t, _px);};}
+	    CREMAKE(_s, _t, _px);};}
 
 #define START                                                                \
     count = 0;                                                               \
@@ -230,7 +230,7 @@ static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
     dimind *pi;
 
     if (dims == NULL)
-       {pi = FMAKE(dimind, "_PD_COMPUTE_HYPER_STRIDES:pi");
+       {pi = CMAKE(dimind);
 
         _PD_init_dimind(pi, (long) file->default_offset, 0L,
                         SC_firsttok(ind, ",()[]\n\r"));
@@ -240,7 +240,7 @@ static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
 
 /* count the number of dimensions and allocate some temporaries */
     for (nd = 0, pd = dims; pd != NULL; pd = pd->next, nd++);
-    pi = FMAKE_N(dimind, nd, "_PD_COMPUTE_HYPER_STRIDES:pi");
+    pi = CMAKE_N(dimind, nd);
 
     off = PD_get_offset(file);
 
@@ -367,7 +367,7 @@ long _PD_hyper_number(PDBfile *file, char *indxpr, long numb, dimdes *dims, long
          offs += pi[i].start*pi[i].stride;
          sum  *= maxs;};
 
-    SFREE(pi);
+    CFREE(pi);
 
     if (poff != NULL)
        *poff = offs;
@@ -494,7 +494,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 
     strcpy(s, name);
     if (SC_LAST_CHAR(s) != ']')
-       return(SC_strsavef(s, "char*:_PD_EXPAND_HYPER_NAME:s"));
+       return(CSTRSAVE(s));
     if (SC_NTH_LAST_CHAR(s, 1) == '[')
        return(NULL);
 
@@ -510,7 +510,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     dims = PD_entry_dimensions(ep);
     if (dims == NULL)
        {_PD_rl_syment_d(ep);
-	return(SC_strsavef(s, "char*:_PD_EXPAND_HYPER_NAME:s"));};
+	return(CSTRSAVE(s));};
 
     t = SC_lasttok(s, "[]()");
     strcpy(s, t);
@@ -542,7 +542,7 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
     if (err == 0)
        {SC_LAST_CHAR(index) = ']';
         snprintf(s, MAXLINE, "%s%s", lname, index);
-        rv = SC_strsavef(s, "char*:_PD_EXPAND_HYPER_NAME:s");};
+        rv = CSTRSAVE(s);};
 
     return(rv);}
 
@@ -595,7 +595,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 /* add 100 extra bytes in case we are in TEXT mode and need quotes
  * terminating nulls and maybe a newline
  */
-	bf = FMAKE_N(char, nb+100, "_PD_WR_LEAF_MEMBERS:bf");
+	bf = CMAKE_N(char, nb+100);
         if (bf == NULL)
            PD_error("CAN'T ALLOCATE MEMORY - _PD_WR_LEAF_MEMBERS", PD_WRITE);
 
@@ -608,7 +608,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
                    file->host_std, file->std, file->host_std,
                    file->host_chart, file->chart, 0, PD_WRITE);
         ni = lio_write(bf, (size_t) bpi, (size_t) nitems, fp);
-        SFREE(bf);}
+        CFREE(bf);}
     else
        ni = lio_write(vr, (size_t) bpi, (size_t) nitems, fp);
 
@@ -1119,7 +1119,7 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 	_PD_wr_hyper_index(file, vr, pi, intype, PD_entry_address(ep),
 			   ep, hbyt, fbyt);
 
-	SFREE(pi);};
+	CFREE(pi);};
 
     return(rv);}
 
@@ -1362,7 +1362,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
 /* add 4 extra bytes in case we are in TEXT mode and need quotes
  * terminating nulls and maybe a newline
  */
-	bf = FMAKE_N(char, nb+4, "_PD_RD_LEAF_MEMBERS:bf");
+	bf = CMAKE_N(char, nb+4);
 	if (bf == NULL)
 	   PD_error("CAN'T ALLOCATE MEMORY - _PD_RD_LEAF_MEMBERS", PD_READ);
 
@@ -1377,9 +1377,9 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
                        file->std, file->host_std, file->host_std,
                        file->chart, file->host_chart,
 		       boffs, PD_READ);
-            SFREE(bf);}
+            CFREE(bf);}
         else
-           {SFREE(bf);
+           {CFREE(bf);
             PD_error("FILE READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};}
 
     else
@@ -1540,7 +1540,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 
 	    _PD_rl_syment(tep);
 
-	    SFREE(pi);};};
+	    CFREE(pi);};};
 
     return(nrd);}
 
@@ -1622,15 +1622,15 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
     ebyte = _PD_lookup_size(etype, file->chart);
     enumb = nitemsin * ebyte;
 
-    in = MAKE_N(char, enumb);
+    in = CMAKE_N(char, enumb);
 
-    SFREE(etype);
+    CFREE(etype);
 
-    PD_entry_type(ep)   = SC_strsavef(SC_CHAR_S, "char*:_PD_RD_BITS:type");
+    PD_entry_type(ep)   = CSTRSAVE(SC_CHAR_S);
     PD_entry_number(ep) = enumb;
     ni = _PD_sys_read(file, ep, SC_CHAR_S, in);
     if (ni != enumb)
-       {SFREE(in);
+       {CFREE(in);
 	_PD_rl_syment_d(ep);
 	return(FALSE);};
 
@@ -1645,7 +1645,7 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
 
 /* convert integers */
     if (SC_is_type_char(ityp) == FALSE)
-       {ord = FMAKE_N(int, obyte, "_PD_RD_BITS:ord");
+       {ord = CMAKE_N(int, obyte);
 
         if (out_flag == NORMAL_ORDER)
            for (i = 0; i < obyte; ord[i] = i + 1, i++);
@@ -1658,12 +1658,12 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
         if (onescmp)
            _PD_ones_complement(out, nitems, obyte, ord);
 
-        SFREE(ord);};
+        CFREE(ord);};
 
     *pan   = nitems;
     *pdata = out;
 
-    SFREE(in);
+    CFREE(in);
     _PD_rl_syment_d(ep);
 
     return(TRUE);}

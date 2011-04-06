@@ -31,10 +31,10 @@ int SC_send_tracker(char *code, char *version, int status, char *dst)
      path = SC_make_search_path(1, "PATH");
      pa   = SC_array_done(path);
      trk  = SC_search_file(pa, "tracker");
-     SFREE(pa);
+     CFREE(pa);
 
      if (trk == NULL)
-        trk = SC_strsavef(TRACKER_EXE, "char*:SC_SEND_TRACKER:trk");
+        trk = CSTRSAVE(TRACKER_EXE);
 
 /* there is only one call because a time duration is not needed,
  * we leave it unfinished (wrt current tracker implementation)
@@ -50,7 +50,7 @@ int SC_send_tracker(char *code, char *version, int status, char *dst)
 	 rv  = system(cmd);
 	 rv  = (rv == 0);};
 
-     SFREE(trk);};
+     CFREE(trk);};
 
 #endif
 

@@ -26,10 +26,10 @@ double *PM_compute_splines(double *x, double *y, int n,
     double p, qn, sig, un, *u;
     double *dy;
 
-    dy = FMAKE_N(double, n, "PM_COMPUTE_SPLINES:dy");
+    dy = CMAKE_N(double, n);
 
     nm = n - 1;
-    u  = FMAKE_N(double, nm, "PM_COMPUTE_SPLINES:u");
+    u  = CMAKE_N(double, nm);
     if (dyl == HUGE)
        dy[0] = u[0] = 0.0;
     else
@@ -55,7 +55,7 @@ double *PM_compute_splines(double *x, double *y, int n,
     for (k = nm-1; k >= 0; k--)
         dy[k] = dy[k]*dy[k+1] + u[k];
 
-    SFREE(u);
+    CFREE(u);
 
     return(dy);}
 

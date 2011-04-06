@@ -197,12 +197,12 @@ int CC_lookup_identifier_c(char *txt, expr **lval)
 expr *CC_copy_expr(expr *e)
    {expr *c;
 
-    c = FMAKE(expr, "CC_MK_TYPE:c");
+    c = CMAKE(expr);
 
     c->cat      = e->cat;
     c->declared = e->declared;
-    c->type     = SC_strsavef(e->type, "char*:CC_COPY_EXPR:type");
-    c->name     = SC_strsavef(e->name, "char*:CC_COPY_EXPR:name");
+    c->type     = CSTRSAVE(e->type);
+    c->name     = CSTRSAVE(e->name);
     c->ptr      = NULL;
 
     return(c);}
@@ -219,11 +219,11 @@ expr *CC_mk_type(char *t)
     SC_strncpy(s, MAXLINE, t, -1);
     SC_squeeze_chars(s, "\n\r\t");
 
-    e = FMAKE(expr, "CC_MK_TYPE:e");
+    e = CMAKE(expr);
 
     e->cat      = CC_TYPE;
     e->declared = CC_DEF;
-    e->type     = SC_strsavef(s, "CC_MK_TYPE:t");
+    e->type     = CSTRSAVE(s);
     e->name     = NULL;
     e->ptr      = NULL;
 
@@ -237,12 +237,12 @@ expr *CC_mk_type(char *t)
 expr *CC_mk_variable(char *type, char *name, qtype declared)
    {expr *e;
 
-    e = FMAKE(expr, "CC_MK_VARIABLE:e");
+    e = CMAKE(expr);
 
     e->cat      = CC_VARIABLE;
     e->declared = declared;
-    e->type     = SC_strsavef(type, "CC_MK_VARIABLE:type");
-    e->name     = SC_strsavef(name, "CC_MK_VARIABLE:name");
+    e->type     = CSTRSAVE(type);
+    e->name     = CSTRSAVE(name);
     e->ptr      = NULL;
 
     return(e);}
@@ -255,13 +255,13 @@ expr *CC_mk_variable(char *type, char *name, qtype declared)
 expr *CC_mk_char(char *s)
    {expr *e;
 
-    e = FMAKE(expr, "CC_MK_CHAR:e");
+    e = CMAKE(expr);
 
     e->cat      = CC_CHAR;
     e->declared = CC_DEF;
     e->type     = NULL;
     e->name     = NULL;
-    e->ptr      = SC_strsavef(s, "CC_MK_CHAR:s");
+    e->ptr      = CSTRSAVE(s);
 
     CC_add_const(e);
 
@@ -275,13 +275,13 @@ expr *CC_mk_char(char *s)
 expr *CC_mk_string(char *s)
    {expr *e;
 
-    e = FMAKE(expr, "CC_MK_STRING:e");
+    e = CMAKE(expr);
 
     e->cat      = CC_STRING;
     e->declared = CC_DEF;
     e->type     = NULL;
     e->name     = NULL;
-    e->ptr      = SC_strsavef(s, "CC_MK_STRING:s");
+    e->ptr      = CSTRSAVE(s);
 
     CC_add_const(e);
 
@@ -296,8 +296,8 @@ expr *CC_mk_integer(int64_t l)
    {int64_t *v;
     expr *e;
 
-    v = FMAKE(int64_t, "CC_MK_INTEGER:v");
-    e = FMAKE(expr, "CC_MK_INTEGER:e");
+    v = CMAKE(int64_t);
+    e = CMAKE(expr);
 
     *v = l;
 
@@ -320,8 +320,8 @@ expr *CC_mk_float(double d)
    {double *v;
     expr *e;
 
-    v = FMAKE(double, "CC_MK_FLOAT:v");
-    e = FMAKE(expr, "CC_MK_FLOAT:e");
+    v = CMAKE(double);
+    e = CMAKE(expr);
 
     *v = d;
 
@@ -380,7 +380,7 @@ int CC_compile_file(char *name, char *cmp, char **v)
 
     fclose(fp);
 
-    SFREE(_CC.rloc.fname);
+    CFREE(_CC.rloc.fname);
 
     return(rv);}
 
@@ -509,7 +509,7 @@ expr *_CC_name_decl(expr *t, expr *v, qtype k)
 	    else
 	       nm = v->name;
 
-	    pd->name = SC_strsavef(nm, "char*:_CC_NAME_DECL:name");};
+	    pd->name = CSTRSAVE(nm);};
 
 	_CC_var_def(v, TRUE);};
 
@@ -560,9 +560,9 @@ expr *_CC_type_decl(expr *t)
 	    pd->cat = ct;};
 
        if (pd->type != NULL)
-	  {SFREE(pd->type);};
+	  {CFREE(pd->type);};
 
-       pd->type = SC_strsavef(s, "char*:_CC_TYPE_DECL:s");};
+       pd->type = CSTRSAVE(s);};
 
     return(t);}
 
@@ -575,7 +575,7 @@ expr *_CC_add_var(expr *l, expr *v)
    {decl *pd;
 
     pd       = _CC.cur;
-    pd->name = SC_strsavef(v->name, "char*:_CC_ADD_VAR:name");
+    pd->name = CSTRSAVE(v->name);
 
     return(v);}
 
@@ -598,8 +598,8 @@ expr *_CC_var_decl(expr *t, expr *v, qtype wh)
         _CC_name_decl(t, v, wh);
 
 	if (t != NULL)
-	   {SFREE(v->type);
-	    v->type = SC_strsavef(t->type, "char*:_CC_VAR_DECL:type");};
+	   {CFREE(v->type);
+	    v->type = CSTRSAVE(t->type);};
 
 	if (pd->stor == CC_TYPEDEF)
 	   v->cat = CC_TYPE;};
@@ -634,14 +634,14 @@ expr *_CC_der_decl(expr *t, expr *v)
        v = CC_copy_expr(v);
 
     if (v->name != NULL)
-       {SFREE(v->name);};
+       {CFREE(v->name);};
 
     v->declared = t->declared;
     v->cat      = t->cat;
 
-    SFREE(v->type);
+    CFREE(v->type);
 
-    v->type = SC_strsavef(s, "char*:_CC_DER_DECL:type");
+    v->type = CSTRSAVE(s);
 
     if (pd->stor == CC_TYPEDEF)
        v->cat = CC_TYPE;
@@ -676,7 +676,7 @@ expr *_CC_fnc_decl(expr *e)
     pd = _CC.cur;
     if (pd != NULL)
        {pd->kind = CC_FNC;
-	pd->name = SC_strsavef(e->name, "char*:_CC_FNC_DECL:name");};
+	pd->name = CSTRSAVE(e->name);};
 
     return(e);}
 
@@ -865,7 +865,7 @@ static void _CC_dep_objs(decl *dc)
     decl *pr;
 
     nl = 10000;
-    dl = FMAKE_N(int, nl, "_CC_DEP_OBJS:dl");
+    dl = CMAKE_N(int, nl);
     for (il = 0; il <= nl; il++)
         dl[il] = -1;
 
@@ -904,11 +904,11 @@ static void _CC_push_decl(decl *pd)
 
     if ((_CC.ndx == 0) || (_CC.all == NULL))
        {_CC.ndx = 100;
-	_CC.all = FMAKE_N(decl *, _CC.ndx, "_CC_PUSH_DECL: all");}
+	_CC.all = CMAKE_N(decl *, _CC.ndx);}
 
     else if (_CC.nd >= _CC.ndx)
        {_CC.ndx += 100;
-	REMAKE_N(_CC.all, decl *, _CC.ndx);};
+	CREMAKE(_CC.all, decl *, _CC.ndx);};
 
     _CC.all[_CC.nd++] = pd;
 
@@ -950,7 +950,7 @@ void _CC_obj_decl(expr *e, int force)
 	pd->le = _CC.rloc.iln;
 
 	if ((e->name != NULL) && (strcmp(pd->name, "__identifier__") == 0))
-	   pd->name = SC_strsavef(e->name, "char*:_CC_OBJ_DECL:name");
+	   pd->name = CSTRSAVE(e->name);
 
 	more = (SC_LAST_CHAR(pd->text) == ',');
 	if (more == TRUE)
@@ -984,7 +984,7 @@ void _CC_obj_decl(expr *e, int force)
 
 	     pd->name = nm;
 	     pd->out  = out;
-	     pd->text = FMAKE_N(char, pd->ncx, "char*:_CC_OBJ_DECL:text");
+	     pd->text = CMAKE_N(char, pd->ncx);
 	     SC_strncpy(pd->text, pd->ncx, out, -1);
 
 	     _CC.ich = strlen(pd->text);};};

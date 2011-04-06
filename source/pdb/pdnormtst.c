@@ -30,8 +30,8 @@ int main(int argc, char **argv)
        {fprintf(stderr, "Error creating tester.pdb\n");
         return(-1);};
 
-    fvalue = MAKE_N(float, 3);
-    dvalue = MAKE_N(double, 2);
+    fvalue = CMAKE_N(float, 3);
+    dvalue = CMAKE_N(double, 2);
 
     if (file->std->fx[PD_LONG_I].order == REVERSE_ORDER)
 
@@ -116,8 +116,8 @@ int main(int argc, char **argv)
     PD_close(file);
 
     REMOVE(DENORM_FILE);
-    SFREE(fvalue);
-    SFREE(dvalue);
+    CFREE(fvalue);
+    CFREE(dvalue);
  
     return(status);}
 

@@ -41,7 +41,7 @@
 #define DIMSPACE       3             /* maximum spacial dimension */
 
 #define START_TIME(v)                                                      \
-   {double __timing_tmp;                                                     \
+   {double __timing_tmp;                                                   \
     __timing_tmp = SC_cpu_time()
 
 #define STOP_TIME(v)                                                       \
@@ -57,10 +57,10 @@
 
 #define SIZED(type, pa, nn, n1)                                            \
    ((pa == NULL) ?                                                         \
-      (pa = FMAKE_N(type, 2*(nn+n1), "SIZED:pa")) :                        \
-      ((nn+n1) >= SC_arrlen(pa)/((long) sizeof(type))) ?                   \
-         (REMAKE_N(pa, type, (nn+n1+200))) :                               \
-         pa)
+    (pa = CMAKE_N(type, 2*(nn+n1))) :                                      \
+    ((nn+n1) >= SC_arrlen(pa)/((long) sizeof(type))) ?                     \
+    (CREMAKE(pa, type, nn+n1+200)) :                                      \
+    pa)
 
 #define GET_POLY_TOPOLOGY(pt, _nd, _df, _nn, _nl, _ne, _el,                \
                           _nf, _fel, _fnl, _nc, _cl)                       \
@@ -609,20 +609,20 @@ static PM_set *_PG_make_domain(itf_array *ifs, int it)
     xn = PM_make_vectors(nd, nn);
 
 /* allocate the number of boundary parameters array */
-    bnp = FMAKE_N(int, nd+1, "_PG_MAKE_DOMAIN:bnp");
+    bnp = CMAKE_N(int, nd+1);
     for (id = 0; id <= nd; id++)
         bnp[id] = 1;
 
 /* allocate the number of cells array */
-    bnc = FMAKE_N(int, nd+1, "_PG_MAKE_DOMAIN:bnc");
+    bnc = CMAKE_N(int, nd+1);
     for (id = 0; id <= nd; id++)
         bnc[id] = 0;
 
 /* allocate the boundary arrays */
-    bnd    = FMAKE_N(long *, nd+1, "_PG_MAKE_DOMAIN:bnd");
+    bnd    = CMAKE_N(long *, nd+1);
     bnd[0] = NULL;
     for (id = 1; id <= nd; id++)
-        bnd[id] = FMAKE_N(long, bnp[id]*bnc[id]+1, "_PG_MAKE_DOMAIN:bnd[id]");
+        bnd[id] = CMAKE_N(long, bnp[id]*bnc[id]+1);
 
 /* put it all together */
     mt = PM_make_topology(nd, bnp, bnc, bnd);
@@ -756,13 +756,13 @@ int *_PG_init_cell(itf_array *ifs, int jo, int io, int it)
 	     break;};
 
     if (pp != NULL)
-       {pt = FMAKE_N(int, nv, "_PG_INIT_CELL:pt");
+       {pt = CMAKE_N(int, nv);
 	for (i = 0; i < nv; i++)
 	    pt[i] = pp[i];
 
 	itf->poly_topology = pt;
-	itf->dn            = FMAKE_N(double, nt, "_PG_INIT_CELL:dn");
-	itf->fn            = FMAKE_N(double, nt, "_PG_INIT_CELL:fn");};
+	itf->dn            = CMAKE_N(double, nt);
+	itf->fn            = CMAKE_N(double, nt);};
 
     _PG_load_cell(ifs, jo, it);
 
@@ -780,9 +780,9 @@ void _PG_fin_cell(itf_array *ifs, int it)
 
     itf = ifs->itf[it];
 
-    SFREE(itf->fn);
-    SFREE(itf->dn);
-    SFREE(itf->poly_topology);
+    CFREE(itf->fn);
+    CFREE(itf->dn);
+    CFREE(itf->poly_topology);
 
     return;}
 
@@ -1011,8 +1011,8 @@ static int _PG_examine_poly(itf_array *ifs, int it)
     else
        {sit = ON_SURF;
 
-	em = FMAKE_N(int, nte, "_PG_EXAMINE_POLY:em");
-	il = FMAKE_N(int, 10*nte, "_PG_EXAMINE_POLY:il");
+	em = CMAKE_N(int, nte);
+	il = CMAKE_N(int, 10*nte);
 
 /* check all the edges for intersection with the surface */
 	for (ie = 0; ie < nte; ie++)
@@ -1122,8 +1122,8 @@ static int _PG_examine_poly(itf_array *ifs, int it)
 	       {_PG_move_x(im, i1, i2, nd, d, xn, f);
 		dn[in] = 0.0;};};
 
-      SFREE(em);
-      SFREE(il);};
+      CFREE(em);
+      CFREE(il);};
 
     LOCAL_STOP_TIME(cntr_times.surf_seg_inter);
 
@@ -1162,12 +1162,12 @@ static PM_set *_PG_make_surface_set(itf_array *ifs, int no, int it)
         xs[id] = NULL;
 
 /* setup the number of cells array */
-    bsc = FMAKE_N(int, nd, "_PG_MAKE_SURFACE_SET:bsc");
+    bsc = CMAKE_N(int, nd);
     for (id = 0; id < nd; id++)
         bsc[id] = 0;
 
 /* setup the number of boundary parameters array */
-    bsp = FMAKE_N(int, nd, "_PG_MAKE_SURFACE_SET:bsp");
+    bsp = CMAKE_N(int, nd);
     for (id = 0; id <= md; id++)
         bsp[id] = 1;
 
@@ -1175,7 +1175,7 @@ static PM_set *_PG_make_surface_set(itf_array *ifs, int no, int it)
        bsp[1] = 2;
 
 /* allocate the boundary arrays */
-    bsd = FMAKE_N(long *, md+1, "_PG_MAKE_SURFACE_SET:bsd");
+    bsd = CMAKE_N(long *, md+1);
     for (id = 0; id <= md; id++)
         bsd[id] = NULL;
 
@@ -1211,24 +1211,24 @@ itf_array *_PG_make_ifs(db_ls_info *iri, int ilv)
 
     np = iri->nthread;
 
-    ifs = FMAKE(itf_array, "_PG_MAKE_IFS:ifs");
+    ifs = CMAKE(itf_array);
 
     ifs->ilev     = ilv;
     ifs->db_info  = iri;
     ifs->n_pieces = np;
 
 /* make the parallel chunk map */
-    ifs->chunk_desc = FMAKE_N(int *, np, "_PG_MAKE_IFS:chunk_desc");
+    ifs->chunk_desc = CMAKE_N(int *, np);
 
 /* setup the single cell work spaces */
-    ifs->itf = FMAKE_N(level_surface *, np, "_PG_MAKE_IFS:itf");
+    ifs->itf = CMAKE_N(level_surface *, np);
 	
 /* setup the domain of the crossed cell mapping */
-    ifs->domain = FMAKE_N(PM_set *, np, "_PG_MAKE_IFS:domain");
+    ifs->domain = CMAKE_N(PM_set *, np);
 	
 /* initialize the domains and ranges */
     for (ip = 0; ip < np; ip++)
-        {ifs->chunk_desc[ip] = FMAKE_N(int, 2, "_PG_MAKE_IFS:chunk_desc[i]");
+        {ifs->chunk_desc[ip] = CMAKE_N(int, 2);
 
 	 ifs->itf[ip]        = NULL;
          ifs->domain[ip]     = NULL;};
@@ -1249,7 +1249,7 @@ level_surface *_PG_make_inter_surface(db_ls_info *iri, int it)
     level_surface *itf;
 
     nd  = iri->nd;
-    itf = FMAKE(level_surface, "_PG_MAKE_INTER_SURFACE:itf");
+    itf = CMAKE(level_surface);
 
     itf->ip       = it;
     itf->dn       = NULL;
@@ -1270,7 +1270,7 @@ void _PG_free_inter_surface(itf_array *ifs)
     level_surface *itf;
 
     PM_rel_set(ifs->domain[0], TRUE);
-    SFREE(ifs->domain);
+    CFREE(ifs->domain);
 
     np = ifs->n_pieces;
 
@@ -1279,19 +1279,19 @@ void _PG_free_inter_surface(itf_array *ifs)
 	    {itf = ifs->itf[ip];
 
 	     if (itf != NULL)
-	        {SFREE(itf->fn);
-		 SFREE(itf->dn);
-		 SFREE(itf);};
+	        {CFREE(itf->fn);
+		 CFREE(itf->dn);
+		 CFREE(itf);};
 
 	     ifs->itf[ip] = NULL;};
 
-	SFREE(ifs->itf);};
+	CFREE(ifs->itf);};
 
     for (ip = 0; ip < np; ip++)
-        SFREE(ifs->chunk_desc[ip]);
-    SFREE(ifs->chunk_desc);
+        CFREE(ifs->chunk_desc[ip]);
+    CFREE(ifs->chunk_desc);
 
-    SFREE(ifs);
+    CFREE(ifs);
 
     return;}
 
@@ -1849,11 +1849,11 @@ static void _PG_complete_level_surfaces(itf_array *ifs)
 
 /* resize the coordinates */
     for (id = 0; id < nde; id++)
-        {REMAKE_N(xs[id], double, np);};
+        {CREMAKE(xs[id], double, np);};
 
 /* resize the cell index arrays */
     for (id = 1; id <= nd; id++)
-        {REMAKE_N(bsd[id], long, bsc[id]*bsp[id]+1);};
+        {CREMAKE(bsd[id], long, bsc[id]*bsp[id]+1);};
 
     PM_find_extrema(srf);
 
@@ -1911,7 +1911,7 @@ void PG_plot_level_surfaces(PG_device *dev, db_ls_info *iri)
     fnc = iri->par_task;
     par = iri->parallel;
 
-    _PG.bnd_surf = FMAKE_N(PM_set *, nl, "PG_PLOT_LEVEL_SURFACES:_PG.bnd_surf");
+    _PG.bnd_surf = CMAKE_N(PM_set *, nl);
 
     for (i = 0; i < nl; i++)
         {ifs = _PG_make_ifs(iri, i);
@@ -1944,7 +1944,7 @@ void PG_plot_level_surfaces(PG_device *dev, db_ls_info *iri)
 
     _PG_plot_surface(dev, nl, iri->nd);
 
-    SFREE(_PG.bnd_surf);
+    CFREE(_PG.bnd_surf);
 
     return;}
 
@@ -1975,7 +1975,7 @@ void _PG_iso_nc_lr_3d(PG_device *dev, double *a,
     for (ne = 1, i = 0; i < ndd; i++)
         ne *= maxes[i];
 
-    cc = FMAKE_N(int, ne, "_PG_ISO_NC_LR_3D:cc");
+    cc = CMAKE_N(int, ne);
 
 /* NOTE: adjust the levels to try to get them off the nodes
  *       the min and max will certainly have come from node values
@@ -2016,7 +2016,7 @@ void _PG_iso_nc_lr_3d(PG_device *dev, double *a,
 
     PG_plot_level_surfaces(dev, &iri);
 
-    SFREE(cc);
+    CFREE(cc);
 
     return;}
   

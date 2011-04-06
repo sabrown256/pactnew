@@ -305,9 +305,9 @@ int main(int argc, char **argv, char **envp)
 
     argc -= i;
     if (argc < 1)
-       {prog = SC_strsavef("pcctst", "char*:PCMTST:pcctst");
-        argl = FMAKE_N(char *, 2, "PCMTST.C:argl");
-        argl[0] = SC_strsavef("pcctst", "char*:PCMTST:argl0");
+       {prog = CSTRSAVE("pcctst");
+        argl = CMAKE_N(char *, 2);
+        argl[0] = CSTRSAVE("pcctst");
         argl[1] = NULL;}
     else
        {prog = argv[i];
@@ -320,7 +320,7 @@ int main(int argc, char **argv, char **envp)
 
     PC_unblock_file(stdin);
 
-    pp = FMAKE_N(PROCESS *, n, "PCMTST.C:processes");
+    pp = CMAKE_N(PROCESS *, n);
 
     for (i = 0; i < n; i++)
         {p = PC_open(argl, envp, mode);

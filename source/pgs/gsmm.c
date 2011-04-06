@@ -25,17 +25,17 @@ static void _PG_rl_font_family(PG_font_family *f)
    {int i, n;
     char **fs;
 
-    SFREE(f->type_face);
+    CFREE(f->type_face);
 
     n  = f->n_styles;
     fs = f->type_styles;
     for (i = 0; i < n; i++)
-        SFREE(fs[i]);
-    SFREE(fs);
+        CFREE(fs[i]);
+    CFREE(fs);
 
     f->next = NULL;
 
-    SFREE(f);
+    CFREE(f);
 
     return;}
 
@@ -50,7 +50,7 @@ static void _PG_rl_device_table(void)
     if (_PG.device_table != NULL)
        {np = SC_hasharr_lookup(_PG.device_table, "PS");
 	if (np != NULL)
-	   SFREE(np->type);
+	   CFREE(np->type);
 
 	SC_free_hasharr(_PG.device_table, NULL, NULL);
 
@@ -72,10 +72,10 @@ void PG_rl_all(void)
     _PG_X_txt_close_device();
 #endif
 
-    SFREE(_PG_gattrs.text_format);
-    SFREE(_PG_gattrs.axis_label_x_format);
-    SFREE(_PG_gattrs.axis_label_y_format);
-    SFREE(_PG_gattrs.axis_type_face);
+    CFREE(_PG_gattrs.text_format);
+    CFREE(_PG_gattrs.axis_label_x_format);
+    CFREE(_PG_gattrs.axis_label_y_format);
+    CFREE(_PG_gattrs.axis_type_face);
 
     _PG_rl_rst_fonts();
     _PG_rl_device_table();
@@ -275,7 +275,7 @@ PG_graph *PG_make_graph_from_mapping(PM_mapping *f, char *info_type,
    {PG_graph *g;
 
 /* build the graph */
-    g             = FMAKE(PG_graph, "PG_MAKE_GRAPH_FROM_MAPPING:g");
+    g             = CMAKE(PG_graph);
     g->f          = f;
     g->info_type  = info_type;
     g->info       = info;
@@ -304,7 +304,7 @@ void PG_rl_graph(PG_graph *g, int rld, int rlr)
     if (g->f != NULL)
        PM_rel_mapping(g->f, rld, rlr);
 
-    SFREE(g);
+    CFREE(g);
 
     return;}
 
@@ -323,7 +323,7 @@ void PG_register_device(char *name, PFRDev fnc)
     PG_setup_attrs_glb();
 
     if (_PG.device_table == NULL)
-       {type = SC_strsavef("PFVoid", "char*:PG_REGISTER_DEVICE:type");
+       {type = CSTRSAVE("PFVoid");
 	_PG.device_table = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 
 /* register the default set of devices */
@@ -429,7 +429,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 
     PG_setup_attrs_glb();
 
-    d = FMAKE(PG_device, "PG_MAKE_RAW_DEVICE:d");
+    d = CMAKE(PG_device);
 
     if (d == NULL)
        return(NULL);
@@ -508,7 +508,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     d->map_fill_color          = TRUE;
 
     d->mode                    = -1;
-    d->name                    = SC_strsavef(name, "char*:PG_MAKE_RAW_DEVICE:name");
+    d->name                    = CSTRSAVE(name);
     d->ncolor                  = 16;
     d->palettes                = NULL;
     d->print_labels            = FALSE;
@@ -522,17 +522,13 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     d->scatter                 = 0;
     d->supress_setup           = FALSE;
     d->text_color              = txclr;
-    d->title                   = SC_strsavef(pttl,
-					     "char*:PG_MAKE_RAW_DEVICE:title");
+    d->title                   = CSTRSAVE(pttl);
     PG_get_use_pixmap(d->use_pixmap);
 
     d->txt_ratio               = 1.0;
-    d->type                    = SC_str_upper(SC_strsavef(type,
-							  "char*:PG_MAKE_RAW_DEVICE:type"));
-    d->type_face               = SC_strsavef("helvetica",
-					     "char*:PG_MAKE_RAW_DEVICE:face");
-    d->type_style              = SC_strsavef("medium",
-					     "char*:PG_MAKE_RAW_DEVICE:style");
+    d->type                    = SC_str_upper(CSTRSAVE(type));
+    d->type_face               = CSTRSAVE("helvetica");
+    d->type_style              = CSTRSAVE("medium");
     d->type_size               = 12;
 
 /* physical device properties */
@@ -650,12 +646,12 @@ void PG_rl_device(PG_device *dev)
     PG_device *dd;
     PG_par_rend_info *pri;
 
-    SFREE(dev->name);
-    SFREE(dev->range_extrema);
-    SFREE(dev->title);
-    SFREE(dev->type);
-    SFREE(dev->type_face);
-    SFREE(dev->type_style);
+    CFREE(dev->name);
+    CFREE(dev->range_extrema);
+    CFREE(dev->title);
+    CFREE(dev->type);
+    CFREE(dev->type_face);
+    CFREE(dev->type_style);
 
 /* free any raster device */
     PG_free_raster_device(dev->raster);
@@ -669,9 +665,9 @@ void PG_rl_device(PG_device *dev)
 	if (dd != NULL)
 	   PG_close_device(dd);
 
-	SFREE(pri->map);
-	SFREE(pri->label);
-        SFREE(pri);};
+	CFREE(pri->map);
+	CFREE(pri->label);
+        CFREE(pri);};
 
 /* free any font info */
     for (f = dev->font_family; f != NULL; f = nxt_f)
@@ -692,7 +688,7 @@ void PG_rl_device(PG_device *dev)
     if (dev->color_table != NULL)
        PG_rl_palette(dev->color_table);
 
-    SFREE(dev);
+    CFREE(dev);
 
     return;}
 
@@ -709,18 +705,18 @@ PG_font_family *PG_make_font_family(PG_device *dev, char *name,
     char *ft, **fs;
     PG_font_family *f;
 
-    f  = FMAKE(PG_font_family, "PG_MAKE_FONT_FAMILY:f");
-    fs = FMAKE_N(char *, n, "PG_MAKE_FONT_FAMILY:fs");
+    f  = CMAKE(PG_font_family);
+    fs = CMAKE_N(char *, n);
 
     SC_VA_START(n);
 
     for (i = 0; i < n; i++)
         {ft    = SC_VA_ARG(char *);
-	 fs[i] = SC_strsavef(ft, "char*:PG_MAKE_FONT_FAMILY:fs");};
+	 fs[i] = CSTRSAVE(ft);};
 
     SC_VA_END;
 
-    f->type_face   = SC_strsavef(name, "char*:PG_MAKE_FONT_FAMILY:name");
+    f->type_face   = CSTRSAVE(name);
     f->n_styles    = n;
     f->type_styles = fs;
     f->next        = next;
@@ -735,7 +731,7 @@ PG_font_family *PG_make_font_family(PG_device *dev, char *name,
 PG_view_attributes *PG_make_view_attributes(PG_device *dev)
    {PG_view_attributes *d;
 
-    d = FMAKE(PG_view_attributes, "PG_MAKE_VIEW_ATTRIBUTES:d");
+    d = CMAKE(PG_view_attributes);
     PG_save_view_attributes(d, dev);
 
     return(d);}
@@ -812,9 +808,9 @@ PG_curve *PG_make_curve(PG_device *dev, PG_coord_sys cs, int closed, int n,
 	   PG_log_point(dev, 2, p);
 	PG_trans_point(dev, 2, cs, p, PIXELC, ixo);
 
-	crv   = FMAKE(PG_curve, "PG_MAKE_CURVE:crv");
-	xi[0] = FMAKE_N(int, n, "PG_MAKE_CURVE:xi[0]");
-	xi[1] = FMAKE_N(int, n, "PG_MAKE_CURVE:xi[1]");
+	crv   = CMAKE(PG_curve);
+	xi[0] = CMAKE_N(int, n);
+	xi[1] = CMAKE_N(int, n);
 
 	for (i = 0; i < n; i++)
 	    {p[0] = r[0][i];
@@ -846,9 +842,9 @@ PG_curve *PG_make_curve(PG_device *dev, PG_coord_sys cs, int closed, int n,
 void PG_release_curve(PG_curve *crv)
    {
 
-    SFREE(crv->x);
-    SFREE(crv->y);
-    SFREE(crv);
+    CFREE(crv->x);
+    CFREE(crv->y);
+    CFREE(crv);
 
     return;}
 
@@ -896,7 +892,7 @@ PG_curve *PG_copy_curve(PG_curve *icv, PG_device *odv, PG_device *idv)
     double ixo[PG_SPACEDM], oxo[PG_SPACEDM];
     PG_curve *ocv;
 
-    ocv = FMAKE(PG_curve, "PG_COPY_CURVE:ocv");
+    ocv = CMAKE(PG_curve);
 
     *ocv = *icv;
 
@@ -911,8 +907,8 @@ PG_curve *PG_copy_curve(PG_curve *icv, PG_device *odv, PG_device *idv)
     xi = icv->x;
     yi = icv->y;
 
-    xo = FMAKE_N(int, n, "PG_COPY_CURVE:xo");
-    yo = FMAKE_N(int, n, "PG_COPY_CURVE:yo");
+    xo = CMAKE_N(int, n);
+    yo = CMAKE_N(int, n);
 
 /* convert the curve points */
     for (i = 0; i < n; i++)

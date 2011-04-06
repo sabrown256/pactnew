@@ -106,7 +106,7 @@ static void _SC_omp_do_work(void **rv)
 	    for (i = 0; i < n; i++)
 	        rv[i] = (*a[i].f)(a[i].a);};
 
-	SFREE(a);};
+	CFREE(a);};
 
     SC_array_set_n(_SC_omp_arr, 0);
 

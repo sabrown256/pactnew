@@ -438,10 +438,10 @@ int SC_get_pname(char *path, int nc, int pid)
 
      st = SC_resource_usage(&ru, pid);
      if (st == 1)
-        {s  = SC_strsavef(ru.cmd, "char*:SC_GET_PNAME:s");
+        {s  = CSTRSAVE(ru.cmd);
 	 t  = SC_strtok(s, " \t\n", p);
 	 rv = SC_full_path(t, path, nc);
-	 SFREE(s);};};
+	 CFREE(s);};};
 #else
     {int i, tid;
      char *cmd, *s, **out;
@@ -493,7 +493,7 @@ SC_proc_info *_SC_get_cygwin_processes(char *cmd, int uid)
     if (st == 0)
        {SC_ptr_arr_len(n, out);
 
-	pi = FMAKE_N(SC_proc_info, n+1, "_SC_GET_CYGWIN_PROCESSES:pi");
+	pi = CMAKE_N(SC_proc_info, n+1);
 	m  = 0;
 
 	for (i = 1; i < n; i++)
@@ -533,7 +533,7 @@ SC_proc_info *_SC_get_cygwin_processes(char *cmd, int uid)
 
 	pc      = pi + m++;
 	pc->pid = -1;
-	REMAKE_N(pi, SC_proc_info, m);};
+	CREMAKE(pi, SC_proc_info, m);};
 
     SC_free_strings(out);
 
@@ -557,7 +557,7 @@ SC_proc_info *_SC_get_unix_processes(char *cmd, int uid)
     if (st == 0)
        {SC_ptr_arr_len(n, out);
 
-	pi = FMAKE_N(SC_proc_info, n+1, "_SC_GET_UNIX_PROCESSES:pi");
+	pi = CMAKE_N(SC_proc_info, n+1);
 	m  = 0;
 
 	for (i = 1; i < n; i++)
@@ -594,7 +594,7 @@ SC_proc_info *_SC_get_unix_processes(char *cmd, int uid)
 
 	pc      = pi + m++;
 	pc->pid = -1;
-	REMAKE_N(pi, SC_proc_info, m);};
+	CREMAKE(pi, SC_proc_info, m);};
 
     SC_free_strings(out);
 
@@ -805,7 +805,7 @@ int SC_attach_dbg(int pid)
     if (rv == 0)
        {cmd = SC_dsnprintf(TRUE, "atdbg -l log.atdbg -p %d -e %s", pid, path);
 	rv  = system(cmd);
-	SFREE(cmd);}
+	CFREE(cmd);}
     else
        rv = -1;
 
@@ -832,7 +832,7 @@ int SC_attach_dbg(int pid)
 		 rv = FALSE;
 		 break;};
 
-	SFREE(cmd);};
+	CFREE(cmd);};
 #endif
 
     return(rv);}
@@ -871,7 +871,7 @@ int SC_retrace_exe(char ***pout, int pid, int to)
 
 	cmd = SC_dsnprintf(TRUE, "atdbg -r -p %d -e %s", pid, path);
 	rv = SC_exec(&t, cmd, NULL, to);
-	SFREE(cmd);
+	CFREE(cmd);
 
 /* strip off newlines */
 	for (i = 0; t[i] != NULL; i++)
@@ -973,7 +973,7 @@ static double _SC_time_command(void (*fnc)(char *s), char *s, int n)
 
 	 (*fnc)(fn);
 
-	 SFREE(fn);
+	 CFREE(fn);
 
 	 et = SC_wall_clock_time() - t0;
 

@@ -89,8 +89,8 @@ static int driver(int nt)
 
     nto = SC_init_threads(nt, NULL);
 
-    fnc = FMAKE_N(PFPVoidAPV, nto, "DRIVER:fnc");
-    npt = FMAKE_N(int, nto, "DRIVER:npt");
+    fnc = CMAKE_N(PFPVoidAPV, nto);
+    npt = CMAKE_N(int, nto);
 
     for (i = 0; i < nto; i++)
         {fnc[i] = work;
@@ -100,8 +100,8 @@ static int driver(int nt)
 
     rv = 1;
 
-    SFREE(fnc);
-    SFREE(npt);
+    CFREE(fnc);
+    CFREE(npt);
 
     return(rv);}
 
@@ -122,8 +122,8 @@ static int driver(int nt)
 
     nto = SC_init_threads(nt, NULL);
 
-    fnc = FMAKE_N(PFPVoidAPV, 1, "DRIVER:fnc");
-    npt = FMAKE_N(int, 1, "DRIVER:npt");
+    fnc = CMAKE_N(PFPVoidAPV, 1);
+    npt = CMAKE_N(int, 1);
 
     fnc[0] = work;
     npt[0] = nto;
@@ -132,8 +132,8 @@ static int driver(int nt)
 
     rv = 1;
 
-    SFREE(fnc);
-    SFREE(npt);
+    CFREE(fnc);
+    CFREE(npt);
 
     return(rv);}
 

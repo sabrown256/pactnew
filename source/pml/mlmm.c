@@ -34,9 +34,9 @@ double **PM_make_vectors(int nd, int n)
    {int id;
     double **x;
 
-    x = FMAKE_N(double *, nd, "PM_MAKE_VECTORS:x");
+    x = CMAKE_N(double *, nd);
     for (id = 0; id < nd; id++)
-	{x[id] = FMAKE_N(double, n, "PM_MAKE_VECTORS:x[id]");
+	{x[id] = CMAKE_N(double, n);
 	 SC_mark(x[id], 1);};
 
     return(x);}
@@ -71,7 +71,7 @@ void PM_free_vectors(int nd, double **x)
     for (id = 0; id < nd; id++)
         SC_free(x[id]);
 
-    SFREE(x);
+    CFREE(x);
 
     return;}
 
@@ -86,7 +86,7 @@ C_array *PM_make_array(char *type, long size, void *data)
     char *pt;
     C_array *arr;
 
-    arr = FMAKE(C_array, "PM_MAKE_ARRAY:arr");
+    arr = CMAKE(C_array);
 
     strcpy(ttype, type);
     pt = SC_firsttok(ttype, " *");
@@ -94,14 +94,13 @@ C_array *PM_make_array(char *type, long size, void *data)
     bpi = SIZEOF(pt);
     snprintf(ltype, MAXLINE, "%s *", pt);
 
-    arr->type = SC_strsavef(ltype, "char*:PM_MAKE_ARRAY:ltype");
+    arr->type = CSTRSAVE(ltype);
     SC_mark(arr->type, 1);
 
     arr->length = size;
 
     if (data == NULL)
-       {arr->data = (void *) FMAKE_N(char, size*bpi,
-				     "PM_MAKE_ARRAY:data");
+       {arr->data = (void *) CMAKE_N(char, size*bpi);
 	data = arr->data;}
     else
        arr->data = data;
@@ -118,9 +117,9 @@ C_array *PM_make_array(char *type, long size, void *data)
 void PM_rel_array(C_array *arr)
    {
 
-    SFREE(arr->type);
-    SFREE(arr->data);
-    SFREE(arr);
+    CFREE(arr->type);
+    CFREE(arr->data);
+    CFREE(arr);
 
     return;}
 
@@ -136,13 +135,13 @@ PM_polygon *PM_init_polygon(int nd, int n)
     double **x;
     PM_polygon *py;
 
-    x = FMAKE_N(double *, nd, "PM_INIT_POLYGON:x");
+    x = CMAKE_N(double *, nd);
 
     for (id = 0; id < nd; id++)
-	{x[id] = FMAKE_N(double, n, "PM_INIT_POLYGON:x[id]");
+	{x[id] = CMAKE_N(double, n);
 	 SC_mark(x[id], 1);};
 
-    py = FMAKE(PM_polygon, "PM_INIT_POLYGON:py");
+    py = CMAKE(PM_polygon);
 
     py->nd = nd;
     py->np = n;
@@ -163,7 +162,7 @@ PM_polygon *PM_make_polygon(int nd, int n, ...)
     double **x;
     PM_polygon *py;
 
-    x = FMAKE_N(double *, nd, "PM_MAKE_POLYGON:x");
+    x = CMAKE_N(double *, nd);
 
     SC_VA_START(n);
 
@@ -173,7 +172,7 @@ PM_polygon *PM_make_polygon(int nd, int n, ...)
 
     SC_VA_END;
 
-    py = FMAKE(PM_polygon, "PM_MAKE_POLYGON:py");
+    py = CMAKE(PM_polygon);
 
     py->nd = nd;
     py->np = n;
@@ -260,7 +259,7 @@ PM_polygon *PM_copy_polygon(PM_polygon *py)
     n  = py->nn;
     x  = PM_copy_vectors(nd, n, py->x);
 
-    ly = FMAKE(PM_polygon, "PM_COPY_POLYGON:ly");
+    ly = CMAKE(PM_polygon);
     *ly   = *py;
     ly->x = x;
 
@@ -301,7 +300,7 @@ void PM_free_polygon(PM_polygon *py)
 
 	    PM_free_vectors(nd, py->x);};
 
-	SFREE(py);};
+	CFREE(py);};
 
     return;}
 
@@ -326,14 +325,14 @@ PM_set *PM_copy_set(PM_set *s)
     selem = s->elements;
 
     if (mx != NULL)
-       {maxes = FMAKE_N(int, nd, "PM_COPY_SET:maxes");
+       {maxes = CMAKE_N(int, nd);
 	for (i = 0; i < nd; i++)
 	    maxes[i] = mx[i];}
     else
        {maxes = NULL;
 	mt    = PM_copy_topology(mt);};
 
-    elem = FMAKE_N(void *, nde, "PM_COPY_SET:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = selem[i];
 
@@ -360,14 +359,14 @@ PM_set *PM_make_set_alt(char *name, char *type, int cp, int nd,
     void **elem;
     PM_set *set;
 
-    maxes = FMAKE_N(int, nd, "PM_MAKE_SET:maxes");
+    maxes = CMAKE_N(int, nd);
     ne    = 1;
     for (i = 0; i < nd; i++)
         {d = diml[i];
 	 maxes[i] = d;
          ne *= d;};
 
-    elem = FMAKE_N(void *, nde, "PM_MAKE_SET:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = elml[i];
 
@@ -391,7 +390,7 @@ PM_set *PM_make_set(char *name, char *type, int cp, int nd, ...)
 
     SC_VA_START(nd);
 
-    maxes = FMAKE_N(int, nd, "PM_MAKE_SET:maxes");
+    maxes = CMAKE_N(int, nd);
     ne    = 1;
     for (i = 0; i < nd; i++)
         {d = SC_VA_ARG(int);
@@ -399,7 +398,7 @@ PM_set *PM_make_set(char *name, char *type, int cp, int nd, ...)
          ne *= d;};
 
     nde  = SC_VA_ARG(int);
-    elem = FMAKE_N(void *, nde, "PM_MAKE_SET:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = SC_VA_ARG(void *);
 
@@ -429,7 +428,7 @@ PM_set *PM_make_ac_set(char *name, char *type, int cp,
 
     SC_VA_START(nde);
 
-    elem = FMAKE_N(void *, nde, "PM_MAKE_AC_SET:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = SC_VA_ARG(void *);
 
@@ -478,8 +477,8 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
     inf = (void *) info;
 
 /* build the set */
-    set                 = FMAKE(PM_set, "PM_MK_SET:set");
-    set->name           = SC_strsavef(name, "char*:PM_MK_SET:name");
+    set                 = CMAKE(PM_set);
+    set->name           = CSTRSAVE(name);
     set->n_elements     = ne;
     set->dimension      = nd;
     set->dimension_elem = nde;
@@ -487,11 +486,11 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
     set->elements       = (void *) elem;
     set->opers          = PM_fp_opers;
     set->metric         = metric;
-    set->symmetry_type  = SC_strsavef(symtype, "PM_MK_SET:stype");
+    set->symmetry_type  = CSTRSAVE(symtype);
     set->symmetry       = sym;
-    set->topology_type  = SC_strsavef(toptype, "PM_MK_SET:ttype");
+    set->topology_type  = CSTRSAVE(toptype);
     set->topology       = top;
-    set->info_type      = SC_strsavef(inftype, "PM_MK_SET:itype");
+    set->info_type      = CSTRSAVE(inftype);
     set->info           = inf;
     set->next           = next;
 
@@ -501,14 +500,14 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
 /* get the byte size of type before it is changes with indirections */
     bpi = SIZEOF(bf);
 
-    set->extrema = (void *) FMAKE_N(char, 2*nde*bpi, "PM_MK_SET:extrema");
-    set->scales  = (void *) FMAKE_N(char, nde*bpi, "PM_MK_SET:scales");
+    set->extrema = (void *) CMAKE_N(char, 2*nde*bpi);
+    set->scales  = (void *) CMAKE_N(char, nde*bpi);
 
     SC_strcat(bf, MAXLINE, " *");
-    set->es_type = SC_strsavef(bf, "char*:PM_MK_SET:type");
+    set->es_type = CSTRSAVE(bf);
 
     SC_strcat(bf, MAXLINE, "*");
-    set->element_type = SC_strsavef(bf, "char*:PM_MK_SET:type");
+    set->element_type = CSTRSAVE(bf);
 
 /* if requested copy the incoming data */
     if (cp == TRUE)
@@ -553,10 +552,10 @@ void PM_rel_set(PM_set *set, int mfl)
        return;
 
     if (SC_safe_to_free(set))
-       {SFREE(set->name);
-	SFREE(set->element_type);
-	SFREE(set->es_type);
-	SFREE(set->max_index);
+       {CFREE(set->name);
+	CFREE(set->element_type);
+	CFREE(set->es_type);
+	CFREE(set->max_index);
 
 	if (set->topology_type != NULL)
 	   {if (strcmp(set->topology_type, PM_MESH_TOPOLOGY_P_S) == 0)
@@ -564,14 +563,14 @@ void PM_rel_set(PM_set *set, int mfl)
 		if (mt != NULL)
 		   PM_rel_topology(mt);};
 
-	    SFREE(set->topology_type);};
+	    CFREE(set->topology_type);};
 
 	if (set->info_type != NULL)
 	   {if (strcmp(set->info_type, SC_PCONS_P_S) == 0)
 	       {inf = (pcons *) set->info;
 		if (inf != NULL)
 		   SC_free_alist(inf, 3);};
-	    SFREE(set->info_type);};
+	    CFREE(set->info_type);};
 
 	if (mfl)
 	   {int i, nde;
@@ -580,14 +579,14 @@ void PM_rel_set(PM_set *set, int mfl)
 	    nde  = set->dimension_elem;
 	    elem = (void **) set->elements;
 	    for (i = 0; i < nde; i++)
-	        {SFREE(elem[i]);};};
+	        {CFREE(elem[i]);};};
 
-	SFREE(set->elements);
+	CFREE(set->elements);
 
-	SFREE(set->extrema);
-	SFREE(set->scales);};
+	CFREE(set->extrema);
+	CFREE(set->scales);};
 
-    SFREE(set);
+    CFREE(set);
 
     return;}
 
@@ -599,7 +598,7 @@ void PM_rel_set(PM_set *set, int mfl)
 PM_mesh_topology *PM_make_topology(int nd, int *bnp, int *bnc, long **bnd)
    {PM_mesh_topology *mt;
 
-    mt = FMAKE(PM_mesh_topology, "PM_MAKE_TOPOLOGY:mt");
+    mt = CMAKE(PM_mesh_topology);
 
     mt->n_dimensions   = nd;
     mt->n_bound_params = bnp;
@@ -630,21 +629,21 @@ PM_mesh_topology *PM_copy_topology(PM_mesh_topology *mt)
 
     ndp = nd + 1;
 
-    nbnp = FMAKE_N(int, ndp, "PM_COPY_TOPOLOGY:nbnp");
-    nbnc = FMAKE_N(int, ndp, "PM_COPY_TOPOLOGY:nbnc");
+    nbnp = CMAKE_N(int, ndp);
+    nbnc = CMAKE_N(int, ndp);
     for (i = 0; i < ndp; i++)
         {nbnp[i] = bnp[i];
 	 nbnc[i] = bnc[i];};
 
 /* copy the boundary arrays */
-    nbnd = FMAKE_N(long *, ndp, "PM_COPY_TOPOLOGY:nbnd");
+    nbnd = CMAKE_N(long *, ndp);
     for (i = 0; i < ndp; i++)
         {pb = bnd[i];
 	 if (pb != NULL)
 	    {np = bnp[i];
 	     nc = bnc[i];
 	     nc = (np == 1) ? nc + 1 : nc*np;
-	     pbp = FMAKE_N(long, nc, "PM_COPY_TOPOLOGY:nbnd[i]");
+	     pbp = CMAKE_N(long, nc);
 	     for (j = 0; j < nc; j++)
 	         pbp[j] = pb[j];}
 
@@ -674,13 +673,13 @@ void PM_rel_topology(PM_mesh_topology *mt)
 
 	nd = mt->n_dimensions;
 	for (id = 0; id <= nd; id++)
-	    {SFREE(bnd[id]);};
+	    {CFREE(bnd[id]);};
 
-	SFREE(mt->boundaries);
-	SFREE(mt->n_bound_params);
-	SFREE(mt->n_cells);};
+	CFREE(mt->boundaries);
+	CFREE(mt->n_bound_params);
+	CFREE(mt->n_cells);};
 
-    SFREE(mt);
+    CFREE(mt);
 
     return;}
 
@@ -720,9 +719,9 @@ double **PM_make_real_set_elements(PM_set *s)
     e = s->elements;
     t = s->es_type;
 
-    r = FMAKE_N(double *, m, "PM_REAL_SET_ELEMENTS:r");
+    r = CMAKE_N(double *, m);
     for (i = 0; i < m; i++)
-        {r[i] = FMAKE_N(double, n, "PM_REAL_SET_ELEMENTS:r[i]");
+        {r[i] = CMAKE_N(double, n);
 	 PM_array_real(t, e[i], n, r[i]);};
 
     return(r);}
@@ -740,9 +739,9 @@ void PM_rel_real_set_elements(double **r)
     n = SC_MEM_GET_N(double *, r);
 
     for (i = 0; i < n; i++)
-        SFREE(r[i]);
+        CFREE(r[i]);
 
-    SFREE(r);
+    CFREE(r);
 
     return;}
 
@@ -782,8 +781,8 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
     sid  = SC_type_id(typ, FALSE);
     emap = SC_convert_id(SC_CHAR_I, NULL, 0, 1, sid, em, 0, 1, ne, FALSE);
 
-    extr   = FMAKE_N(double, 2*nde, "PM_FIND_EXIST_EXTREMA:extr");
-    scales = FMAKE_N(double, nde, "PM_FIND_EXIST_EXTREMA:scales");
+    extr   = CMAKE_N(double, 2*nde);
+    scales = CMAKE_N(double, nde);
 
     sid = SC_deref_id(s->element_type, TRUE);
 
@@ -798,7 +797,7 @@ void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
 
     PM_free_vectors(nde, x);
 
-    SFREE(emap);
+    CFREE(emap);
 
 /* compute the scales of the components */
     pe    = extr;
@@ -853,12 +852,12 @@ void PM_find_extrema(PM_set *s)
     if (ne == 0)
        return;
 
-    emap = FMAKE_N(char, ne, "PM_FIND_EXTREMA:emap");
+    emap = CMAKE_N(char, ne);
     memset(emap, 1, ne);
 
     PM_find_exist_extrema(s, SC_CHAR_S, emap);
 
-    SFREE(emap);
+    CFREE(emap);
 
     return;}
 
@@ -878,8 +877,8 @@ double *PM_set_extrema(PM_set *s)
     nd = s->dimension_elem;
     nl = 2*nd;
 
-    tex  = FMAKE_N(double, nl, "PM_SET_EXTREMA:tex");
-    extr = FMAKE_N(double, nl, "PM_SET_EXTREMA:extr");
+    tex  = CMAKE_N(double, nl);
+    extr = CMAKE_N(double, nl);
 
     if (extr != NULL)
        {for (i = 0; i < nl; i += 2)
@@ -896,7 +895,7 @@ double *PM_set_extrema(PM_set *s)
 		  extr[i]   = mn;
 		  extr[i+1] = mx;};};};
 
-    SFREE(tex);
+    CFREE(tex);
 
     return(extr);}
 
@@ -970,8 +969,8 @@ PM_set *PM_make_lr_cp_domain(char *name, char *type, int nd, PM_set **sets)
     void **el;
     PM_set *set, *s;
 
-    maxes = FMAKE_N(int, nd, "PM_MAKE_LR_CP_DOMAIN:maxes");
-    x1    = FMAKE_N(double *, nd, "PM_MAKE_LR_CP_DOMAIN:x1");
+    maxes = CMAKE_N(int, nd);
+    x1    = CMAKE_N(double *, nd);
 
 /* compute the number of points */
     ne = 1L; 
@@ -1111,7 +1110,7 @@ PM_set *PM_make_lr_index_domain(char *name, char *type, int nd, int nde,
 
 /* convert the components to the desired type */
     did  = SC_type_id(type, FALSE);
-    elem = FMAKE_N(void *, nde, "PM_MAKE_LR_INDEX_DOMAIN:elem");
+    elem = CMAKE_N(void *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = SC_convert_id(did, NULL, 0, 1,
 				SC_DOUBLE_I, x[i], 0, 1, ne, FALSE);
@@ -1186,11 +1185,11 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
     snprintf(nest, MAXLINE, "%s *", ltyp);
 
 /* change the type names */
-    SFREE(elt);
-    SFREE(est);
+    CFREE(elt);
+    CFREE(est);
 
-    s->element_type = SC_strsavef(nelt, "char*:PM_PROMOTE_SET:nelt");
-    s->es_type      = SC_strsavef(nest, "char*:PM_PROMOTE_SET:nest");
+    s->element_type = CSTRSAVE(nelt);
+    s->es_type      = CSTRSAVE(nest);
 
 /* change the element data */
     ne   = s->n_elements;
@@ -1229,9 +1228,9 @@ void PM_promote_array(C_array *a, char *ntyp, int flag)
 	did = SC_type_id(ltyp, FALSE);
 
 /* change the type name */
-	SFREE(elt);
+	CFREE(elt);
 
-	a->type = SC_strsavef(ltyp, "char*:PM_PROMOTE_ARRAY:ltyp");
+	a->type = CSTRSAVE(ltyp);
 
 /* change the element data */
 	ne      = a->length;
@@ -1256,14 +1255,14 @@ PM_mapping *PM_make_mapping(char *name, char *cat,
     pcons *inf;
 
 /* build the map information */
-    pi  = FMAKE(int, "PM_MAKE_MAPPING:pi");
+    pi  = CMAKE(int);
     *pi = centering;
     inf = SC_add_alist(NULL, "CENTERING", SC_INT_P_S, (void *) pi);
 
 /* build the mapping */
-    f             = FMAKE(PM_mapping, "PM_MAKE_MAPPING:f");
-    f->name       = SC_strsavef(name, "char*:PM_MAKE_MAPPING:name");
-    f->category   = SC_strsavef(cat, "char*:PM_MAKE_MAPPING:cat");
+    f             = CMAKE(PM_mapping);
+    f->name       = CSTRSAVE(name);
+    f->category   = CSTRSAVE(cat);
     f->domain     = domain;
     f->range      = range;
     f->map_type   = SC_PCONS_P_S;
@@ -1300,8 +1299,7 @@ PM_mapping *PM_build_grotrian(char *name, char *type,
     if (labels != NULL)
        {domain->info = SC_add_alist(NULL, "GROTRIAN-LABELS",
 				    "char **", (void *) labels);
-        domain->info_type = SC_strsavef("pcons *",
-					"char*:PM_BUILD_GROTRIAN:type");};
+        domain->info_type = CSTRSAVE("pcons *");};
 
     range  = PM_make_set("Transitions", type, cp,
                          1, n_tr, 3, tr, up, low);
@@ -1330,18 +1328,18 @@ void PM_rel_mapping(PM_mapping *f, int rld, int rlr)
 	if (f->range != NULL)
 	   PM_rel_set(f->range, rlr);
 
-	SFREE(f->name);
-	SFREE(f->category);
+	CFREE(f->name);
+	CFREE(f->category);
 	if (strcmp(f->map_type, SC_PCONS_P_S) == 0)
 	   SC_free_alist((pcons *) mi, 3);
 	else
-	   SFREE(mi);
+	   CFREE(mi);
 
 	nxt = f->next;
 	if (nxt != NULL)
 	   PM_rel_mapping(nxt, rld, rlr);};
 
-    SFREE(f);
+    CFREE(f);
 
     return;}
 
@@ -1514,8 +1512,8 @@ PM_mesh_topology *PM_lr_ac_mesh_2d(double **px, double **py,
     ns  = 4*nz;
 
 /* setup new node arrays */
-    x = FMAKE_N(double, nn, "PM_LR_AC_MESH_2D:x");
-    y = FMAKE_N(double, nn, "PM_LR_AC_MESH_2D:y");
+    x = CMAKE_N(double, nn);
+    y = CMAKE_N(double, nn);
 
     rx = *px;
     ry = *py;
@@ -1527,9 +1525,9 @@ PM_mesh_topology *PM_lr_ac_mesh_2d(double **px, double **py,
              y[i] = ry[j];};
 
 /* allocate the boundary arrays */
-    bnd = FMAKE_N(long *, 3, "PM_LR_AC_MESH_2D:bnd");
-    bnd[2] = FMAKE_N(long, ord*nz, "PM_LR_AC_MESH_2D:bnd[2]");
-    bnd[1] = FMAKE_N(long, ord*ns, "PM_LR_AC_MESH_2D:bnd[1]");
+    bnd = CMAKE_N(long *, 3);
+    bnd[2] = CMAKE_N(long, ord*nz);
+    bnd[1] = CMAKE_N(long, ord*ns);
     bnd[0] = NULL;
 
 /* fill the 2-cells */
@@ -1545,13 +1543,13 @@ PM_mesh_topology *PM_lr_ac_mesh_2d(double **px, double **py,
 	    _PM_lr_ac_2d_1_cell(ncell, k, l, k1, k2, l1, l2, dkz, dkn, ord);
 
 /* setup the number of cells array */
-    nc = FMAKE_N(int, 3, "PM_LR_AC_MESH_2D:nc");
+    nc = CMAKE_N(int, 3);
     nc[0] = nn;
     nc[1] = ns;
     nc[2] = nz;
 
 /* setup the number of boundary parameters array */
-    nbp = FMAKE_N(int, 3, "PM_LR_AC_MESH_2D:nbp");
+    nbp = CMAKE_N(int, 3);
     nbp[0] = 1;
     nbp[1] = ord;
     nbp[2] = ord;
@@ -1682,7 +1680,7 @@ void PM_set_limits(PM_set *s, double *extr)
 
 /* if it's there change it */
     else if (data != NULL)
-       {SFREE(data->cdr);
+       {CFREE(data->cdr);
 	data->cdr = (void *) extr;}
 
 /* otherwise add it */
@@ -1707,7 +1705,7 @@ pcons *PM_map_info_alist(PM_map_info *ti)
 
     inf = NULL;
 
-    pi  = FMAKE(int, "PM_MAP_INFO_ALIST:pi");
+    pi  = CMAKE(int);
     *pi = ti->centering;
     inf = SC_add_alist(inf, "CENTERING", SC_INT_P_S, (void *) pi);
 
@@ -1733,7 +1731,7 @@ char *PM_check_emap(int *peflag, pcons *alst, long n)
 
     eflg = (pc == NULL);
     if (eflg == TRUE)
-       {emap = FMAKE_N(char, n, "PM_CHECK_EMAP:emap");
+       {emap = CMAKE_N(char, n);
 	memset(emap, 1, n);}
 
     else

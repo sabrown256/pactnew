@@ -28,9 +28,9 @@ static char *_SS_load_bf(char *s)
     if (nc >= _SS.ncx)
        {_SS.ncx = nc + 1;
 	if (_SS.ibf != NULL)
-	   {SFREE(_SS.ibf);};
+	   {CFREE(_SS.ibf);};
 
-	_SS.ibf = FMAKE_N(char, _SS.ncx, "chr*:_SS_LOAD_BF:_SS.ibf");};
+	_SS.ibf = CMAKE_N(char, _SS.ncx);};
 
     SC_strncpy(_SS.ibf, _SS.ncx, s, strlen(s));
 
@@ -979,12 +979,12 @@ int SS_define_argv(char *program, int c, char **v)
 		 p = s;}
 	     else if (SC_intstrp(s, 10))
 	        {t   = SC_LONG_I;
-		 lp  = FMAKE(long, "SS_DEFINE_ARGV:lp");
+		 lp  = CMAKE(long);
 		 *lp = SC_stoi(s);
 		 p   = lp;}
 	     else if (SC_fltstrp(s))
 	        {t   = SC_DOUBLE_I;
-		 dp  = FMAKE(double, "SS_DEFINE_ARGV:dp");
+		 dp  = CMAKE(double);
 		 *dp = SC_stof(s);
 		 p   = dp;}
 	     else

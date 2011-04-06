@@ -681,7 +681,7 @@ FIXNUM F77_FUNC(scdate, SCDATE)(FIXNUM *pnc, F77_string date)
     lc    = strlen(cdate);    
 
     SC_strncpy(SC_F77_C_STRING(date), *pnc, cdate, nc);
-    SFREE(cdate);
+    CFREE(cdate);
 
     *pnc = lc;
 

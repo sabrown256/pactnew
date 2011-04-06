@@ -91,7 +91,7 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
  * size variables from the dd table
  */
     n_max = 50;
-    nl    = FMAKE_N(char *, n_max, "_PA_PROC_DD_TAB:nl");
+    nl    = CMAKE_N(char *, n_max);
     n     = 0;
 
 /* get all of the names */
@@ -104,7 +104,7 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 	      nl[n++] = (char *) c->cdr;
 	      if (n >= n_max)
 		 {n_max += 50;
-		  REMAKE_N(nl, char *, n_max);};};};
+		  CREMAKE(nl, char *, n_max);};};};
 
 /* eliminate duplicate names (in general there will be many duplicates) */
     for (i = 0; i < n; i++)
@@ -175,7 +175,7 @@ static void _PA_get_alist_dims(PA_package *pck, PA_variable *pp, hasharr *tab)
     for (i = 0; i < nd; i++)
         {dname = dimns[i];
          if (SC_numstrp(dname))
-            {ip   = FMAKE(int, "_PA_GET_ALIST_DIMS:ip");
+            {ip   = CMAKE(int);
              *ip  = SC_stoi(dname);
              leng = (void *) ip;}
          else if (strcmp(dname, "?") == 0)
@@ -301,7 +301,7 @@ static int _PA_proc_info(PA_variable *pp, int req, void *vr)
 /* make Klocworks happy */
 	     nd    = min(nd, 10000);
 
-             dims = FMAKE_N(char *, nd, "_PA_PROC_INFO:dims");
+             dims = CMAKE_N(char *, nd);
              for (i = 1; i <= nd; i++)
                  {snprintf(bf, MAXLINE, "D%d", i);
                   dims[i-1] = PA_assoc(alist, bf);};
@@ -494,13 +494,12 @@ static PA_tab_head *_PA_rd_tab_head(FILE *fp, char *fn)
          if (!SC_blankp(bf, "c#"))
             break;};
 
-    pt = FMAKE(PA_tab_head, "_PA_RD_TAB_HEAD:pt");
+    pt = CMAKE(PA_tab_head);
 
     token = SC_strtok(bf, _PA.delim, s);
     if ((token != NULL) && (strcmp(token, "database") == 0))
        {name     = PA_get_field("SPECIFICATION", fn, REQU);
-        pt->name = SC_strsavef(name,
-                    "char*:_PA_RD_TAB_HEAD:name");
+        pt->name = CSTRSAVE(name);
         pt->type = _PA.dict;}
     else
        {pt->type = _PA.dimtab;
@@ -524,8 +523,7 @@ static PA_tab_head *_PA_rd_tab_head(FILE *fp, char *fn)
             break;
 
          pb   = NULL;
-         next = SC_mk_pcons(SC_STRING_S, SC_strsavef(key,
-                "char*:_PA_RD_TAB_HEAD:key"), SC_PCONS_P_S, NULL);
+         next = SC_mk_pcons(SC_STRING_S, CSTRSAVE(key), SC_PCONS_P_S, NULL);
          if (keys == NULL)
             keys = next;
          else
@@ -590,7 +588,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
               PA_ERR((token == NULL),
                      "BAD FIELD %d IN ENTRY %d - _PA_RD_DD_TAB", j, i);
 
-              token = SC_strsavef(token, "char*:_PA_RD_DD_TAB:token");
+              token = CSTRSAVE(token);
               if (pb != NULL)
                  key = token;
 
@@ -698,8 +696,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 /* NOTE: clean this out using SC_add_alist */
               next = SC_mk_pcons(SC_PCONS_P_S,
 				 SC_mk_pcons(SC_PCONS_P_S, pk->car,
-					     SC_STRING_S, SC_strsavef(token,
-                                             "char*:_PA_RD_DB_TAB:token")),
+					     SC_STRING_S, CSTRSAVE(token)),
 				 SC_PCONS_P_S, NULL);
               if (alist == NULL)
                  alist = next;
@@ -739,14 +736,13 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
             snprintf(memb, MAXLINE, "%s %s", type, bname);
 
          desc  = _PD_mk_descriptor(memb, 0L);
-         type  = SC_strsavef(memb,
-                  "char*:_PA_RD_DB_TAB:memb");
+         type  = CSTRSAVE(memb);
          ptype = SC_firsttok(type, " \n");
          if (SC_hasharr_lookup(fc, ptype) == NULL)
             PA_ERR(((strcmp(ptype, pt->name) != 0) || !_PD_indirection(memb)),
                    "%s BAD MEMBER TYPE - _PA_RD_DB_TAB", memb);
 
-         SFREE(type);
+         CFREE(type);
          if (lst == NULL)
             lst = desc;
          else
@@ -767,8 +763,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     PA_token_delimiters = old_delim;
 
 /* cons this dictionary name onto the list */
-    pck->db_list = SC_mk_pcons(SC_STRING_S, SC_strsavef(pt->name,
-                               "char*:_PA_RD_DB_TAB:name"),
+    pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
 			       SC_PCONS_P_S, pck->db_list);
 
     return(ne_read);}

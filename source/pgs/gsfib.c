@@ -354,7 +354,7 @@ FIXNUM F77_FUNC(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
     g = SC_GET_POINTER(PG_graph, *grid);
     n = *pn;
 
-    pt = FMAKE_N(double, n, "PGSDLM:pt");
+    pt = CMAKE_N(double, n);
     memcpy(pt, v, n*sizeof(double));
 
     PM_set_limits(g->f->domain, pt);
@@ -591,7 +591,7 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
     else
        return((FIXNUM) FALSE);
 
-    pv = FMAKE_N(char, n, "PGSRAT:pv");
+    pv = CMAKE_N(char, n);
     memcpy(pv, SC_F77_C_STRING(val), n);
 
     info = (pcons *) g->info;
@@ -617,7 +617,7 @@ FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
     g = SC_GET_POINTER(PG_graph, *grid);
     n = *pn;
 
-    pt = FMAKE_N(double, n, "PGSRLM:pt");
+    pt = CMAKE_N(double, n);
     memcpy(pt, v, n*sizeof(double));
 
     PM_set_limits(g->f->range, pt);
@@ -636,7 +636,7 @@ FIXNUM F77_FUNC(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
 
     g = SC_GET_POINTER(PG_graph, *grid);
 
-    pv = FMAKE_N(double, 4, "PGSVLM:pv");
+    pv = CMAKE_N(double, 4);
     memcpy(pv, v, 4*sizeof(double));
 
     PG_set_attrs_graph(g,

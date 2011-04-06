@@ -195,10 +195,9 @@ object *_SSI_define_global(object *argl)
         val  = SS_mk_procedure(argl, obj, SS_Global_Env);
 
         s = SS_PROCEDURE_NAME(val);
-        SFREE(s);
+        CFREE(s);
         s = SS_VARIABLE_NAME(argl);
-        SS_PROCEDURE_NAME(val) = SC_strsavef(s,
-                                 "char*:_SSI_DEFINE_GLOBAL:name");}
+        SS_PROCEDURE_NAME(val) = CSTRSAVE(s);}
 
     else if (SS_variablep(argl))
        {obj = SS_car(obj);
@@ -260,7 +259,7 @@ static object *_SSI_getcwd(void)
     vr = SC_getcwd();
     if (vr != NULL)
        {wd = SS_mk_string(vr);
-	SFREE(vr);};
+	CFREE(vr);};
 
     return(wd);}
 
@@ -287,7 +286,7 @@ static object *_SSI_getenv(object *obj)
     else
        ev = SS_null;
 
-    SFREE(vr);
+    CFREE(vr);
 
     return(ev);}
 
@@ -314,8 +313,8 @@ static object *_SSI_setenv(object *obj)
        {snprintf(s, MAXLINE, "%s=%s", vr, vl);
 	ok = SC_putenv(s);};
 
-    SFREE(vr);
-    SFREE(vl);
+    CFREE(vr);
+    CFREE(vl);
 
     rv = SS_mk_integer(ok);
 
@@ -344,7 +343,7 @@ static object *_SSI_printenv(object *argl)
 /* make a list of names from the argument list */
     else
        {n   = SS_length(argl);
-	vrs = FMAKE_N(char *, n+1, "_SSI_PRINTENV:vrs");
+	vrs = CMAKE_N(char *, n+1);
 
 	n = 0;
 	for (l = argl; !SS_nullobjp(l); l = SS_cdr(l))
@@ -353,9 +352,9 @@ static object *_SSI_printenv(object *argl)
 		     SC_STRING_I, &vr,
 		     0);
 	     snprintf(s, MAXLINE, "$%s", vr);
-	     vrs[n++] = SC_strsavef(s, "char*:_SSI_PRINTENV:vr");
+	     vrs[n++] = CSTRSAVE(s);
 
-	     SFREE(vr);};
+	     CFREE(vr);};
 
 	vrs[n++] = NULL;};
 
@@ -526,8 +525,8 @@ object *_SSI_fopen(object *argl)
     else
        prt = SS_mk_outport(str, name);
 
-    SFREE(name);
-    SFREE(mode);
+    CFREE(name);
+    CFREE(mode);
 
     return(prt);}
 
@@ -624,7 +623,7 @@ static object *_SSI_mem_monitor(object *arg)
 
 /* make this local copy to avoid reporting that S leaked */
     strncpy(id, s, MAXLINE);
-    SFREE(s);
+    CFREE(s);
 
     nb = SC_mem_monitor(old, lev, id, msg);
 
@@ -685,7 +684,7 @@ static object *_SSI_sizeof(object *arg)
 
     nb = (type == NULL) ? 0 : SIZEOF(type);
 
-    SFREE(type);
+    CFREE(type);
 
     o = SS_mk_integer(nb);
 

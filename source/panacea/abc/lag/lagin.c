@@ -469,7 +469,7 @@ int node_massw(double *mass, double *rho, double *rx, double *ry)
    {double *volq;
     par_nm pn;
 
-    volq = FMAKE_N(double, 4*N_nodes, "NODE_MASSW:volq");
+    volq = CMAKE_N(double, 4*N_nodes);
     volfrac(volq, rx, ry);
 
     PA_set_value(mass, N_nodes, 0.0);
@@ -551,13 +551,13 @@ int lagw(void)
     double *pn;
 
 /* allocate the temporary storage */
-    aq  = FMAKE_N(double, 5*N_zones, "LAGW:aq");
-    rxn = FMAKE_N(double, N_nodes, "LAGW:rxn");
-    ryn = FMAKE_N(double, N_nodes, "LAGW:ryn");
-    vxn = FMAKE_N(double, N_nodes, "LAGW:vxn");
-    vyn = FMAKE_N(double, N_nodes, "LAGW:vyn");
-    pn  = FMAKE_N(double, N_zones, "LAGW:pn");
-    di  = FMAKE_N(double, N_zones, "LAGW:di");
+    aq  = CMAKE_N(double, 5*N_zones);
+    rxn = CMAKE_N(double, N_nodes);
+    ryn = CMAKE_N(double, N_nodes);
+    vxn = CMAKE_N(double, N_nodes);
+    vyn = CMAKE_N(double, N_nodes);
+    pn  = CMAKE_N(double, N_zones);
+    di  = CMAKE_N(double, N_zones);
 
     nhcycle = 0;
     dtsmin  = PARAM[12];
@@ -599,13 +599,13 @@ int lagw(void)
               vy[i] = vyn[i];};};
 
 /* release temporary storage */
-    SFREE(aq);
-    SFREE(rxn);
-    SFREE(ryn);
-    SFREE(vxn);
-    SFREE(vyn);
-    SFREE(pn);
-    SFREE(di);
+    CFREE(aq);
+    CFREE(rxn);
+    CFREE(ryn);
+    CFREE(vxn);
+    CFREE(vyn);
+    CFREE(pn);
+    CFREE(di);
 
     return(TRUE);}
 
@@ -708,12 +708,12 @@ int init_lag(PA_package *pck)
     PA_CONNECT(rpdv, "rpdv", TRUE);
 
 /* allocate local zonal variables */
-    csp   = FMAKE_N(double, N_zones, "INIT_LAG:csp");
-    dtvg  = FMAKE_N(double, N_zones, "INIT_LAG:dtvg");
-    massz = FMAKE_N(double, N_zones, "INIT_LAG:massz");
-    pdv   = FMAKE_N(double, N_zones, "INIT_LAG:pdv");
-    voln  = FMAKE_N(double, N_zones, "INIT_LAG:voln");
-    volo  = FMAKE_N(double, N_zones, "INIT_LAG:volo");
+    csp   = CMAKE_N(double, N_zones);
+    dtvg  = CMAKE_N(double, N_zones);
+    massz = CMAKE_N(double, N_zones);
+    pdv   = CMAKE_N(double, N_zones);
+    voln  = CMAKE_N(double, N_zones);
+    volo  = CMAKE_N(double, N_zones);
 
 /* set some scalars */
     csmin  = PARAM[9];
@@ -725,10 +725,10 @@ int init_lag(PA_package *pck)
          massz[j] = rho[j]*vol[j];};
 
 /* nodal variables */
-    lpm   = FMAKE_N(double, N_nodes, "INIT_LAG:lpm");
-    dvxdt = FMAKE_N(double, N_nodes, "INIT_LAG:dvxdt");
-    dvydt = FMAKE_N(double, N_nodes, "INIT_LAG:dvydt");
-    massn = FMAKE_N(double, N_nodes, "INIT_LAG:massn");
+    lpm   = CMAKE_N(double, N_nodes);
+    dvxdt = CMAKE_N(double, N_nodes);
+    dvydt = CMAKE_N(double, N_nodes);
+    massn = CMAKE_N(double, N_nodes);
 
     for (i = 0; i < N_nodes; i++)
         massn[i] = 0.0;

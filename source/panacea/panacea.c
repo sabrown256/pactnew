@@ -362,7 +362,7 @@ void PA_terminate(edname, ppname, gfname, cycle)
                 "TROUBLE CLOSING STATE FILE %d - PA_TERMINATE", i);
          _PA_state_files[i] = NULL;};
 
-    SFREE(_PA_state_files);
+    CFREE(_PA_state_files);
 
     PA_pva_file   = NULL;
     PA_edit_file  = NULL;

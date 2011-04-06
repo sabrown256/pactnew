@@ -184,7 +184,7 @@ defstr *PD_defloat(PDBfile *file, char *name, long bpi,
     long *formt;
     int *order;
 
-    formt    = FMAKE_N(long, 8, "PD_DEFLOAT:long");
+    formt    = CMAKE_N(long, 8);
     formt[0] = bpi*8;
     formt[1] = expb;
     formt[2] = mantb;
@@ -194,7 +194,7 @@ defstr *PD_defloat(PDBfile *file, char *name, long bpi,
     formt[6] = hmb;
     formt[7] = bias;
 
-    order    = FMAKE_N(int, bpi, "PD_DEFLOAT:order");
+    order    = CMAKE_N(int, bpi);
     memcpy(order, ordr, sizeof(int)*bpi);
 
 /* file chart */
@@ -328,7 +328,7 @@ defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
     for (i = 0; i < nmemb; i++)
         {nxt   = members[i];
          desc  = _PD_mk_descriptor(nxt, doffs);
-         type  = SC_strsavef(nxt, "char*:PD_DEFSTR_ALT:type");
+         type  = CSTRSAVE(nxt);
          ptype = SC_firsttok(type, " \n");
          if (SC_hasharr_lookup(fchrt, ptype) == NULL)
             if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
@@ -345,7 +345,7 @@ defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
 			 ptype);
                 return(NULL);};
 
-         SFREE(type);
+         CFREE(type);
          if (lst == NULL)
             lst = desc;
          else

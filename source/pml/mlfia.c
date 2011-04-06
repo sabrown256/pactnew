@@ -53,8 +53,8 @@ FIXNUM F77_FUNC(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
 	     outyi[i] = PM_IMAGINARY_C(cy[i]);
 	     outx[i]  = rx[i];};
 
-	SFREE(rx);
-	SFREE(cy);
+	CFREE(rx);
+	CFREE(cy);
 
 	rv = TRUE;};
 
@@ -83,7 +83,7 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
     flag = *pf;
     ordr = *po;
 
-    incy = FMAKE_N(complex, n, "PMCFFT:incy");
+    incy = CMAKE_N(complex, n);
     for (i = 0; i < n; i++)
         incy[i] = PM_COMPLEX(inyr[i], inyi[i]);
 
@@ -98,9 +98,9 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
 	     outyi[i] = PM_IMAGINARY_C(cy[i]);
 	     outx[i]  = rx[i];};
 
-	SFREE(rx);
-	SFREE(cy);
-	SFREE(incy);
+	CFREE(rx);
+	CFREE(cy);
+	CFREE(incy);
 
 	rv = TRUE;};
 
@@ -135,7 +135,7 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
     tp   = *ptp;
 
     if (tp == -1)
-       {maxes = FMAKE_N(int, nd, "PMBSET:maxes");
+       {maxes = CMAKE_N(int, nd);
 	ne    = 1L;
         for (i = 0; i < nd; i++)
 	    {d = pmx[i];
@@ -153,14 +153,14 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
     info = NULL;
     SC_CHANGE_VALUE_ALIST(info, int, SC_INT_P_S, "COPY-MEMORY", cp);
 
-    elem = FMAKE_N(void *, nde, "PMBSET:elem");
+    elem = CMAKE_N(void *, nde);
 
     rv = -1;
 
 /* build the set */
-    set = FMAKE(PM_set, "PMBSET:set");
+    set = CMAKE(PM_set);
     if (set != NULL)
-       {set->name           = SC_strsavef(name, "char*:PMBSET:name");
+       {set->name           = CSTRSAVE(name);
 	set->n_elements     = ne;
 	set->dimension      = nd;
 	set->dimension_elem = nde;
@@ -186,14 +186,14 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
 	       bpi = SC_type_size_a(bf);
 
 	    if (bpi > 0)
-	       {set->extrema = FMAKE_N(char, 2*bpi*nde, "PMBSET:extrema");
-		set->scales  = FMAKE_N(char, bpi*nde, "PMBSET:scales");};}
+	       {set->extrema = CMAKE_N(char, 2*bpi*nde);
+		set->scales  = CMAKE_N(char, bpi*nde);};}
 
 	SC_strcat(bf, MAXLINE, " *");
-	set->es_type = SC_strsavef(bf, "char*:PMBSET:type");
+	set->es_type = CSTRSAVE(bf);
 
 	SC_strcat(bf, MAXLINE, "*");
-	set->element_type = SC_strsavef(bf, "char*:PMBSET:type");
+	set->element_type = CSTRSAVE(bf);
 
 	rv = SC_ADD_POINTER(set);};
 
@@ -272,21 +272,21 @@ FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
     ndp = nd + 1;
 
 /* setup the number of cells array */
-    nc = FMAKE_N(int, ndp, "PMMTOP:nc");
+    nc = CMAKE_N(int, ndp);
     for (i = 0; i < ndp; i++)
         nc[i] = pnc[i];
 
 /* setup the number of boundary parameters array */
-    nbp = FMAKE_N(int, ndp, "PMMTOP:nbp");
+    nbp = CMAKE_N(int, ndp);
     for (i = 0; i < ndp; i++)
         nbp[i] = pbp[i];
 
     pbs = pbnd;
-    bnd = FMAKE_N(long *, ndp, "PMMTOP:bnd");
+    bnd = CMAKE_N(long *, ndp);
     for (i = 1; i < ndp; i++)
         {n = nbp[i]*nc[i];
 
-	 bnd[i] = FMAKE_N(long, n, "PMMTOP:bnd[]");
+	 bnd[i] = CMAKE_N(long, n);
 
          pbd = bnd[i];
 	 for (j = 0; j < n; j++)

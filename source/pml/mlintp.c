@@ -51,11 +51,11 @@ static double *_PM_redist_nodes_lr(double *f, int km, int lm, int kmax, int lmax
     nn    = kmax*lmax;
     eflag = (emap == NULL);
     if (eflag)
-       {emap = FMAKE_N(char, nn, "_PM_REDIST_NODES_LR:emap");
+       {emap = CMAKE_N(char, nn);
 	memset(emap, 1, nn);};
 
-    ip = FMAKE_N(double, nn, "_PM_REDIST_NODES_LR:ip");
-    fp = FMAKE_N(double, nn, "_PM_REDIST_NODES_LR:fp");
+    ip = CMAKE_N(double, nn);
+    fp = CMAKE_N(double, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
        {PM_set_value(ip, nn, 0.0);
 	PM_set_value(fp, nn, 0.0);};
@@ -88,9 +88,9 @@ static double *_PM_redist_nodes_lr(double *f, int km, int lm, int kmax, int lmax
         else
            fp[j] = 0.0;
 
-    SFREE(ip);
+    CFREE(ip);
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     return(fp);}
                        
@@ -110,11 +110,11 @@ static double *_PM_redist_nodes_ac(double *f, int nz, int nn,
     int *np;
     double *fp, fv;
 
-    fp = FMAKE_N(double, nn, "_PM_REDIST_NODES_AC:fp");
+    fp = CMAKE_N(double, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
        PM_set_value(fp, nn, 0.0);
 
-    np = FMAKE_N(int, nn, "_PM_REDIST_NODES_AC:np");
+    np = CMAKE_N(int, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
        SC_MEM_INIT_N(int, np, nn);
 
@@ -137,7 +137,7 @@ static double *_PM_redist_nodes_ac(double *f, int nz, int nn,
         {fv = (double) np[in] + SMALL;
 	 fp[in] /= fv;};
 
-    SFREE(np);
+    CFREE(np);
 
     return(fp);}
                        
@@ -168,11 +168,11 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
     nn    = kmax*lmax;
     eflag = (emap == NULL);
     if (eflag)
-       {emap = FMAKE_N(char, nn, "_PM_INTERP_NODES_LR:emap");
+       {emap = CMAKE_N(char, nn);
 	memset(emap, 1, nn);};
 
-    ip = FMAKE_N(double, nn, "_PM_INTERP_NODES_LR:ip");
-    fp = FMAKE_N(double, nn, "_PM_INTERP_NODES_LR:fp");
+    ip = CMAKE_N(double, nn);
+    fp = CMAKE_N(double, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
        {PM_set_value(ip, nn, 0.0);
 	PM_set_value(fp, nn, 0.0);};
@@ -241,9 +241,9 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
          else
             fp[j] = 0.0;};
 
-    SFREE(ip);
+    CFREE(ip);
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     return(fp);}
                        
@@ -263,9 +263,9 @@ static double *_PM_interp_nodes_ac(double *f, double *x, double *y, int nz, int 
     double xc, yc, dxc, dyc;
     double *fp, *np, *w;
 
-    fp = FMAKE_N(double, nn, "_PM_INTERP_NODES_AC:fp");
-    np = FMAKE_N(double, nn, "_PM_INTERP_NODES_AC:np");
-    w  = FMAKE_N(double, 20, "_PM_INTERP_NODES_AC:w");
+    fp = CMAKE_N(double, nn);
+    np = CMAKE_N(double, nn);
+    w  = CMAKE_N(double, 20);
     if (SC_zero_on_alloc_n(-1) == FALSE)
        {PM_set_value(fp, nn, 0.0);
 	PM_set_value(np, nn, 0.0);
@@ -328,8 +328,8 @@ static double *_PM_interp_nodes_ac(double *f, double *x, double *y, int nz, int 
 	 else
 	    fp[in] = 0.0;};
 
-    SFREE(np);
-    SFREE(w);
+    CFREE(np);
+    CFREE(w);
 
     return(fp);}
                        
@@ -367,7 +367,7 @@ double *PM_z_n_lr_2d(double *f, double *x, double *y, int mode, void *cnnct,
        ret = _PM_redist_nodes_lr(f, km, lm, kmax, lmax, emap);
 
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     return(ret);}
                        
@@ -435,7 +435,7 @@ double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
 
     emap += delta;
 
-    fp = FMAKE_N(double, npts, "PM_NODE_ZONE_LR_2D:fp");
+    fp = CMAKE_N(double, npts);
     if (SC_zero_on_alloc_n(-1) == FALSE)
        PM_set_value(fp, npts, 0.0);
     PM_LOGICAL_ZONE(f, f1, f2, f3, f4, kmax);
@@ -451,7 +451,7 @@ double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
     emap -= delta;
 
     if (eflag)
-       SFREE(emap);
+       CFREE(emap);
 
     return(fp);}
 
@@ -537,7 +537,7 @@ double *PM_node_zone_ac_2d(double *f, void *cnnct, pcons *alist)
     nzp = np[2];
     nsp = np[1];
 
-    fp = FMAKE_N(double, nz, "PM_NODE_ZONE_AC_2D:fp");
+    fp = CMAKE_N(double, nz);
 
 /* accumulate nodal values from the zones */
     for (iz = 0; iz < nz; iz++)
@@ -570,8 +570,8 @@ void PM_zone_centered_mesh_2d(double **px, double **py, double *rx, double *ry,
 
     n = kmax*lmax;
 
-    xc = FMAKE_N(double, n, "PM_ZONE_CENTERED_MESH_2D:xc");
-    yc = FMAKE_N(double, n, "PM_ZONE_CENTERED_MESH_2D:yc");
+    xc = CMAKE_N(double, n);
+    yc = CMAKE_N(double, n);
 
     PM_LOGICAL_ZONE(rx, x1, x2, x3, x4, kmax);
     PM_LOGICAL_ZONE(ry, y1, y2, y3, y4, kmax);
@@ -606,13 +606,13 @@ static PM_set *_PM_shift_center_lr(PM_set *s)
     x  = s->elements;
 
     mxn = s->max_index;
-    mxc = FMAKE_N(int, nd, "_PM_SHIFT_CENTER_LR:mxc");
+    mxc = CMAKE_N(int, nd);
 
     ng  = 2*nd;
-    ngb = FMAKE_N(int, ng, "_PM_SHIFT_CENTER_LR:ngb");
+    ngb = CMAKE_N(int, ng);
 
-    strn = FMAKE_N(int, nd, "_PM_SHIFT_CENTER_LR:strn");
-    strc = FMAKE_N(int, nd, "_PM_SHIFT_CENTER_LR:strc");
+    strn = CMAKE_N(int, nd);
+    strc = CMAKE_N(int, nd);
 
 /* compute the number of nodes and cells
  * also the new index limits and the strides
@@ -673,9 +673,9 @@ static PM_set *_PM_shift_center_lr(PM_set *s)
 		   s->info_type, s->info,
 		   NULL);
 
-    SFREE(ngb);
-    SFREE(strn);
-    SFREE(strc);
+    CFREE(ngb);
+    CFREE(strn);
+    CFREE(strc);
 
     return(ns);}
                        
@@ -742,7 +742,7 @@ static PM_set *_PM_shift_center_ac(PM_set *s)
 
     nc = bnc[nd];
 
-    xc = FMAKE_N(double, nd, "_PM_SHIFT_CENTER_AC:xc");
+    xc = CMAKE_N(double, nd);
     y  = PM_make_vectors(nd, nc);
     x  = PM_make_vectors(nd, ne);
     for (id = 0; id < nd; id++)
@@ -769,7 +769,7 @@ static PM_set *_PM_shift_center_ac(PM_set *s)
 		   NULL);
 
     PM_free_vectors(nd, x);
-    SFREE(xc);
+    CFREE(xc);
 
     return(ns);}
                        
@@ -961,13 +961,11 @@ coefficient *PM_alloc_vertices(PM_lagrangian_mesh *grid)
 
     grid = NULL;
 
-    vertices = FMAKE(coefficient, "PM_ALLOC_VERTICES:vertices");
+    vertices = CMAKE(coefficient);
 
     vertices->n_points = n_v = 4;
-    vertices->indexes  = FMAKE_N(int, n_v,
-                         "PM_ALLOC_VERTICES:indexes");
-    vertices->weights  = FMAKE_N(double, n_v,
-                         "PM_ALLOC_VERTICES:weights");
+    vertices->indexes  = CMAKE_N(int, n_v);
+    vertices->weights  = CMAKE_N(double, n_v);
 
     return(vertices);}
 

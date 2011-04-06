@@ -225,8 +225,8 @@ ev_define:
 
         s = SS_VARIABLE_NAME(SS_Unev);
 
-        SFREE(pg->name);
-        pg->name = SC_strsavef(s, "char*:SS_DEFINE:name");}
+        CFREE(pg->name);
+        pg->name = CSTRSAVE(s);}
 
 /* define a variable */
     else if (SS_variablep(SS_Unev))

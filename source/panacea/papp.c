@@ -99,7 +99,7 @@ void PA_transpose_pp(ppname, ntp, nuv)
     else
        SC_strcat(s, MAXLINE, ".u00");
 
-    ufname = SC_strsavef(s, "char*:PA_TRANSPOSE_PP:s");
+    ufname = CSTRSAVE(s);
 
 /* open the pp file */
     PA_pp_file = PD_open(ppname, "r");
@@ -148,8 +148,8 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
 
 /* allocate the data arrays */
     n_arrays = nlast - nfirst + 1 + n_dom;
-    crve     = FMAKE_N(double *, n_arrays, "_PA_T_WR_DATA:crve");
-    stripe   = FMAKE_N(double, n_arrays, "_PA_T_WR_DATA:stripe");
+    crve     = CMAKE_N(double *, n_arrays);
+    stripe   = CMAKE_N(double, n_arrays);
 
     strcpy(type, SC_DOUBLE_S);
 
@@ -157,7 +157,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
     nptm = last_cycle - first_cycle + 1;
 
     for (i = 0; i < n_arrays; i++)
-        crve[i] = FMAKE_N(double, nptm, "_PA_T_WR_DATA:crve[]");
+        crve[i] = CMAKE_N(double, nptm);
 
 /* read the data in from the pp file */
     for (i = 0; i < nptm; i++)
@@ -190,7 +190,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
          snprintf(_PA.pp_title, MAXLINE, "td%d", i);
 
          PD_write_alt(pduf, _PA.pp_title, type, crve[i], 1, ind);
-         SFREE(crve[i]);};
+         CFREE(crve[i]);};
 
 /* write out the time plot range data */
     ind[0] = 1L;
@@ -205,9 +205,9 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
          snprintf(_PA.pp_title, MAXLINE, "td%d", i + n_dom);
          PD_write_alt(pduf, _PA.pp_title, type, crve[j], 1, ind);
 
-         SFREE(crve[j]);};
+         CFREE(crve[j]);};
 
-    SFREE(stripe);
+    CFREE(stripe);
 
     return;}
 

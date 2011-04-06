@@ -642,14 +642,14 @@ static int _SS_filep(object *argl, char *dtype)
 
     if (mode != NULL)
        if (strcmp(mode, "nil") == 0)
-	  SFREE(mode);
+	  CFREE(mode);
 
     if (type != NULL)
        if (strcmp(type, "nil") == 0)
-	  SFREE(type);
+	  CFREE(type);
 
     if (scope == NULL)
-       scope = SC_strsavef("local", "char*:_SS_FILEP:local");
+       scope = CSTRSAVE("local");
 
     if (strcmp(scope, "local") == 0)
        list = NULL;
@@ -663,12 +663,12 @@ static int _SS_filep(object *argl, char *dtype)
 
     _SC_rel_udl(pu);
 
-    SFREE(list);
-    SFREE(name);
-    SFREE(mode);
-    SFREE(scope);
+    CFREE(list);
+    CFREE(name);
+    CFREE(mode);
+    CFREE(scope);
     if (type != dtype)
-       SFREE(type);
+       CFREE(type);
 
     return(ret);}
 

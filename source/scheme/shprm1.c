@@ -231,9 +231,8 @@ static object *_SSI_lambdam(object *argl)
 
     SS_PROCEDURE_TYPE(lambda) = SS_MACRO;
 
-    SFREE(SS_PROCEDURE_NAME(lambda));
-    SS_PROCEDURE_NAME(lambda) = SC_strsavef("lambda-macro",
-					    "char*:_SSI_LAMBDAM:name");
+    CFREE(SS_PROCEDURE_NAME(lambda));
+    SS_PROCEDURE_NAME(lambda) = CSTRSAVE("lambda-macro");
 
     return(lambda);}
 

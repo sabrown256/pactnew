@@ -74,7 +74,7 @@ static void test_1(long ni, long nc)
     double t0, dt;
     PDBfile *strm;
 
-    d = FMAKE_N(char, ni, "TEST_1:d");
+    d = CMAKE_N(char, ni);
     memset(d, 0, ni);
 
     strm = PD_create("wrn.pdb");

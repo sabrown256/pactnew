@@ -113,7 +113,7 @@ void SC_free_event_loop(SC_evlpdes *pe)
 	SC_free_array(pe->faccpt, NULL);
 	SC_free_array(pe->frejct, NULL);
 
-	SFREE(pe);};
+	CFREE(pe);};
 
     return;}
 
@@ -373,7 +373,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
     pd   = SC_array_array(pe->fd);
     nrdy = SC_poll(pd, n, to);
-    SFREE(pd);
+    CFREE(pd);
 
 /* restore the original SIGCHLD handler */
     if (sc != NULL)

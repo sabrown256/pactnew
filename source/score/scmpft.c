@@ -35,7 +35,7 @@
 
 #define FREE(_p)                                                           \
    {if (mm == SCORE)                                                       \
-       {SFREE(_p);}                                                        \
+       {CFREE(_p);}                                                        \
     else                                                                   \
        {free(_p);                                                          \
         _p = NULL;};}

@@ -74,10 +74,10 @@ PM_conic_curve *PM_mk_cline(char *type, double axx, double ayy, double axy,
    {PM_conic_curve *cp;
 
     if (MESH_CURVE == NULL)
-       MESH_CURVE = SC_strsave("PM_conic_curve");
+       MESH_CURVE = CSTRSAVE("PM_conic_curve");
 
-    cp       = FMAKE(PM_conic_curve, "PM_MK_CLINE:cp");
-    cp->type = SC_strsave(type);
+    cp       = CMAKE(PM_conic_curve);
+    cp->type = CSTRSAVE(type);
     cp->xx   = axx;
     cp->xy   = axy;
     cp->yy   = ayy;
@@ -99,7 +99,7 @@ PM_side *PM_mk_side(PM_conic_curve *cur, int dir, double x, double y,
    {PM_side *base;
     double rk, rl, sdk, sdl;
 
-    base = FMAKE(PM_side, "MK_SIDE:base");
+    base = CMAKE(PM_side);
     base->x         = x;
     base->y         = y;
     base->dk        = dk;
@@ -157,12 +157,12 @@ PM_part *PM_mk_part(char *name, int rg, int nsides,
 		    double lee, double lrat, PM_part *next)
    {PM_part *ipart;
 
-    ipart          = FMAKE(PM_part, "PM_MK_PART:ipart");
+    ipart          = CMAKE(PM_part);
     ipart->n_sides = nsides;
     ipart->leg     = leg;
     ipart->ends    = ends;
     ipart->comp    = comp;
-    ipart->name    = SC_strsave(name);
+    ipart->name    = CSTRSAVE(name);
     ipart->reg     = rg;
     ipart->next    = next;
 
@@ -188,7 +188,7 @@ PM_end_point *PM_mk_endpt(double rn, double rx, int dk, double rat,
 			  double drn, double drx, PM_end_point *nxt)
    {PM_end_point *end;
 
-    end       = FMAKE(PM_end_point, "PM_MK_ENDPT:end");
+    end       = CMAKE(PM_end_point);
     end->rn   = rn;
     end->rx   = rx;
     end->k    = 0;
@@ -475,7 +475,7 @@ static char *_PM_nxt_name(void)
  
     snprintf(s, 10, "#C%06d", _PM.ncv++);
 
-    rv = SC_strsave(s);
+    rv = CSTRSAVE(s);
  
     return(rv);}
  
@@ -1300,8 +1300,8 @@ static void _PM_compute_points(PM_mesh *mesh, double x1, double y1,
              ry[j] = y1 + f[i]*(y2 - y1);};}
     else
        {m  = 40*n;
-        xp = FMAKE_N(double, m, "_PM_COMPUTE_POINTS:xp");
-        yp = FMAKE_N(double, m, "_PM_COMPUTE_POINTS:yp");
+        xp = CMAKE_N(double, m);
+        yp = CMAKE_N(double, m);
 
         dt = 3.0*sqrt(ABS(ac/(axx*axx + ayy*ayy + axy*axy)))/(10.0*n);
         if (dt == 0.0)
@@ -1880,7 +1880,7 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     base->k = 0;
     base->l = 0;
 
-    mesh = FMAKE(PM_mesh, "_PM_FILL_MESH:mesh");
+    mesh = CMAKE(PM_mesh);
     SC_MEM_INIT(PM_mesh, mesh);
 
     _PM_fill_tree(base, mesh);
@@ -1903,16 +1903,16 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     mesh->n_zones = n_zones;
     mesh->n_nodes = n_nodes;
 
-    reg_map = FMAKE_N(int, n_zones, "_PM_FILL_MESH:reg_map");
-    rx      = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:rx");
-    ry      = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:ry");
-    nodet   = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:nodet");
-    zone    = FMAKE_N(double, n_zones, "_PM_FILL_MESH:zone");
+    reg_map = CMAKE_N(int, n_zones);
+    rx      = CMAKE_N(double, n_nodes);
+    ry      = CMAKE_N(double, n_nodes);
+    nodet   = CMAKE_N(double, n_nodes);
+    zone    = CMAKE_N(double, n_zones);
 
-    kra = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:kra");
-    lra = FMAKE_N(double, n_nodes, "_PM_FILL_MESH:lra");
-    apk = FMAKE_N(double, n_zones, "_PM_FILL_MESH:apk");
-    apl = FMAKE_N(double, n_zones, "_PM_FILL_MESH:apl");
+    kra = CMAKE_N(double, n_nodes);
+    lra = CMAKE_N(double, n_nodes);
+    apk = CMAKE_N(double, n_zones);
+    apl = CMAKE_N(double, n_zones);
 
     mesh->reg_map = reg_map;
     mesh->nodet   = nodet;

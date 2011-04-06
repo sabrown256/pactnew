@@ -112,7 +112,7 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
     lx = PM_make_vectors(2, n_tr);
     lu = PM_make_vectors(2, n_tr);
 
-    nt = FMAKE_N(int, ndpt, "_PG_GROTRIAN_PLOT:nt");
+    nt = CMAKE_N(int, ndpt);
     for (i = 0; i < ndpt; i++)
         nt[i] = 0;
 
@@ -122,7 +122,7 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
          nt[u]++;
          nt[l]++;};
 
-    dx = FMAKE_N(double, ndpt, "_PG_GROTRIAN_PLOT:dx");
+    dx = CMAKE_N(double, ndpt);
     for (i = 0; i < ndpt; i++)
         dx[i] = 0.5/((double) nt[i] + 1);
 
@@ -155,8 +155,8 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
     PM_free_vectors(2, lx);
     PM_free_vectors(2, lu);
 
-    SFREE(nt);
-    SFREE(dx);
+    CFREE(nt);
+    CFREE(dx);
 
     return;}
 
@@ -248,7 +248,7 @@ void PG_grotrian_plot(PG_device *dev, PG_graph *data, ...)
 
 /* reset user's values for various attributes */
     PG_set_attributes(dev, attr);
-    SFREE(attr);
+    CFREE(attr);
 
     return;}
 

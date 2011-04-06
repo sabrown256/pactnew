@@ -396,8 +396,7 @@ static void _PA_cache_group(PA_variable *pp)
     if (!new)
        _PD_rl_syment_d(ep);
 
-    PA_VARIABLE_CACHE_FILE_NAME(pp) = SC_strsavef(s,
-						  "char*:_PA_CACHE_GROUP:s");
+    PA_VARIABLE_CACHE_FILE_NAME(pp) = CSTRSAVE(s);
 
     return;}
 
@@ -423,7 +422,7 @@ static void _PA_cache_individ(PA_variable *pp)
     pfn = PA_VARIABLE_CACHE_FILE_NAME(pp);
     if (pfn == NULL)
        {snprintf(s, MAXLINE, "%s.c%02d", _PA_base_name, ps->ic++);
-        pfn = SC_strsavef(s, "char*:_PA_CACHE_INDIVID:s");
+        pfn = CSTRSAVE(s);
         REMOVE(pfn);
         PA_VARIABLE_CACHE_FILE_NAME(pp) = pfn;};
 
@@ -596,7 +595,7 @@ void PA_rel_access(void **vp, char *s, long offs, long ne)
     switch (pscope)
        {case EDIT    :
 	     if (psz > 1)
-	        {SFREE(pdata);};
+	        {CFREE(pdata);};
 	     PA_VARIABLE_DATA(pp) = NULL;
 	     break;
 
@@ -624,14 +623,14 @@ void PA_rel_access(void **vp, char *s, long offs, long ne)
 
             case CACHE_F :
                  _PA_cache_group(pp);
-                 SFREE(PA_VARIABLE_DATA(pp));
+                 CFREE(PA_VARIABLE_DATA(pp));
                  break;
 
             case CACHE_R :
                  _PA_cache_individ(pp);
 
             case REL     :
-                 SFREE(PA_VARIABLE_DATA(pp));
+                 CFREE(PA_VARIABLE_DATA(pp));
                  break;};
 
 /* zero out a scalar value */

@@ -38,7 +38,7 @@ int PM_tridi(double *a, double *b, double *c, double *r, double *u, int n)
        {PM_err("B[1] = 0 ERROR - PM_TRIDI");
         return(FALSE);};
 
-    t = FMAKE_N(double, n, "PM_TRIDI:t");
+    t = CMAKE_N(double, n);
 
 /* decomposition and forward substitution sweep */
     bc   = b[0];
@@ -49,7 +49,7 @@ int PM_tridi(double *a, double *b, double *c, double *r, double *u, int n)
          bc   = b[j] - a[j]*t[j];
          if (bc == 0.0)
             {PM_err("CAN'T DECOMPOSE THE MATRIX - PM_TRIDI");
-             SFREE(t);
+             CFREE(t);
              return(FALSE);};
 
          u[j] = (r[j] - a[j]*u[j-1])/bc;};
@@ -58,7 +58,7 @@ int PM_tridi(double *a, double *b, double *c, double *r, double *u, int n)
     for (j = n-2; j >= 0; j--)
         u[j] -= t[j+1]*u[j+1];
 
-    SFREE(t);
+    CFREE(t);
 
     return(TRUE);}
 
@@ -728,7 +728,7 @@ PM_matrix *PM_solve(PM_matrix *a, PM_matrix *b)
 
 /* allocate the pivot array */
     nr  = a->nrow;
-    ips = FMAKE_N(int, nr, "PM_SOLVE:ips");
+    ips = CMAKE_N(int, nr);
 
 /* do the lu decomposition */
     lu = PM_decompose(a, ips, FALSE);
@@ -738,7 +738,7 @@ PM_matrix *PM_solve(PM_matrix *a, PM_matrix *b)
        PM_sol(lu, b, ips, FALSE);
 
 /* release the intermediate storage */
-    SFREE(ips);
+    CFREE(ips);
 
     return(b);}
                 
@@ -773,7 +773,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
     else
        ul = a;
 
-    scales = FMAKE_N(double, n, "PM_DECOMP:scales");
+    scales = CMAKE_N(double, n);
     ula    = ul->array;
 
     for (i = 0; i < n; i++)
@@ -842,7 +842,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
 
     *pnc = nc;
 
-    SFREE(scales);
+    CFREE(scales);
 
     return(ul);}
 
@@ -877,7 +877,7 @@ double PM_determinant(PM_matrix *a)
     PM_matrix *ul;
 
     n   = a->nrow;
-    ips = FMAKE_N(int, n, "PM_DETERMINANT:ips");
+    ips = CMAKE_N(int, n);
 
     ul = PM_decomp(a, ips, TRUE, &nc);
     if (ul == NULL)
@@ -890,7 +890,7 @@ double PM_determinant(PM_matrix *a)
 
 	PM_destroy(ul);};
 
-    SFREE(ips);
+    CFREE(ips);
 
     return(det);}
 
@@ -971,11 +971,11 @@ PM_matrix *_PM_inverse(PM_matrix *b, PM_matrix *a)
        {PM_err("NON-SQUARE MATRIX - _PM_INVERSE");
         return(NULL);};
 
-    ips = FMAKE_N(int, row, "_PM_INVERSE:ips");
+    ips = CMAKE_N(int, row);
     lu  = PM_decompose(a, ips, TRUE);
     if (lu == NULL)
        {PM_err("SINGULAR MATRIX - _PM_INVERSE");
-	SFREE(ips);
+	CFREE(ips);
         return(NULL);};
 
     t = PM_create(row, 1);
@@ -991,7 +991,7 @@ PM_matrix *_PM_inverse(PM_matrix *b, PM_matrix *a)
 /* release the temporary storage */
     PM_destroy(t);
     PM_destroy(lu);
-    SFREE(ips);
+    CFREE(ips);
         
     return(b);}
 

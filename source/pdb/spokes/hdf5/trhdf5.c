@@ -166,30 +166,30 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
 
 /* grow a compound_desc there (or at registry itself if it is empty) */
         if (prev == NULL)
-          {hst->registry = FMAKE(compound_desc, "_H5_REGISTER:iter"); 
+          {hst->registry = CMAKE(compound_desc); 
            iter         = hst->registry;}
         else 
-          {prev->next = FMAKE(compound_desc, "_H5_REGISTER:iter");  
+          {prev->next = CMAKE(compound_desc);  
            iter       = prev->next;};
 
 /* insert the data into the new compound_desc */
-        iter->compound_name = SC_strsavef(type, "_H5_REGISTER:type");
+        iter->compound_name = CSTRSAVE(type);
         iter->num_members   = H5Tget_nmembers(id);
 
 /* link in all of the compound member info objects */
-        iter->info = FMAKE(compound_member_info, "_H5_REGISTER:info");
+        iter->info = CMAKE(compound_member_info);
         info = iter->info;
 
         for (i = 0 ; i < iter->num_members ; i++)
             {tempname = H5Tget_member_name(id, i);
 
              info->member_offset = H5Tget_member_offset(id, i); 
-             info->member_name   = SC_strsavef(tempname, "_H5_REGISTER:name");
+             info->member_name   = CSTRSAVE(tempname);
 
              free(tempname);
 
              if ((i+1) < iter->num_members)
-                {info->next = FMAKE(compound_member_info, "_H5_REGISTER:info");}
+                {info->next = CMAKE(compound_member_info);}
              else
                 {info->next = NULL;}; 
              
@@ -234,7 +234,7 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
 
     hst      = file->meta;
     typename = NULL;
-    dp       = FMAKE(defstr, "_H5_HANDLE_FIXED_PT:dp");
+    dp       = CMAKE(defstr);
 
     precision = (short) H5Tget_precision(dtid);
 
@@ -249,30 +249,30 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
  */
     if (H5Tget_sign(dtid)) 
        {if (precision == 8)
-           {typename = SC_strsavef(SC_CHAR_S,      "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE(SC_CHAR_S);}
         else if (precision == 16)
-           {typename = SC_strsavef(SC_SHORT_S,     "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE(SC_SHORT_S);}
         else if (precision == 32)
-           {typename = SC_strsavef(SC_INT_S,       "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE(SC_INT_S);}
         else if (precision == 64)
-           {typename = SC_strsavef(SC_LONG_S,      "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE(SC_LONG_S);}
         else if (precision >  64)
-           {typename = SC_strsavef(SC_LONG_LONG_S, "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE(SC_LONG_LONG_S);}
         else
-           {typename = SC_strsavef("UNKNOWN",      "_H5_HANDLE_FIXED_PT:typename");};}
+           {typename = CSTRSAVE("UNKNOWN");};}
     else
        {if (precision == 8)
-           {typename = SC_strsavef("u_char",      "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE("u_char");}
         else if (precision == 16)
-           {typename = SC_strsavef("u_short",     "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE("u_short");}
         else if (precision == 32)
-           {typename = SC_strsavef("u_int",       "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE("u_int");}
         else if (precision == 64)
-           {typename = SC_strsavef("u_long",      "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE("u_long");}
         else if (precision >  64)
-           {typename = SC_strsavef("u_long_long", "_H5_HANDLE_FIXED_PT:typename");}
+           {typename = CSTRSAVE("u_long_long");}
         else
-           {typename = SC_strsavef("UNKNOWN",     "_H5_HANDLE_FIXED_PT:typename");};};
+           {typename = CSTRSAVE("UNKNOWN");};};
 
 /* handle byte ordering */ 
     if (H5Tget_order(dtid) == H5T_ORDER_BE) 
@@ -290,7 +290,7 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
  * NOTE: as far as we know -- HDF5 does not support 1's comp
  */
     dp->onescmp   = FALSE;
-    dp->type      = SC_strsavef(typename, "_H5_HANDLE_FIXED_PT:dp->type");
+    dp->type      = CSTRSAVE(typename);
     dp->size_bits = 0;
     dp->size      = precision / 8;
 
@@ -349,15 +349,15 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
     fstd     = hst->pf->std;
     typename = NULL;
 
-    dp = FMAKE(defstr, "_H5_HANDLE_FLOAT_PT:dp");
+    dp = CMAKE(defstr);
 
     bpif              = sizeof(float);
     fstd->fp[0].bpi   = bpif;
-    fstd->fp[0].order = MAKE_N(int, bpif);
+    fstd->fp[0].order = CMAKE_N(int, bpif);
 
     bpid              = sizeof(double);
     fstd->fp[1].bpi   = bpid;
-    fstd->fp[1].order = MAKE_N(int, bpid);
+    fstd->fp[1].order = CMAKE_N(int, bpid);
 
 /* handle bit field
  * you never know who might use file->std in the future: fill it in
@@ -392,16 +392,16 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
  */
     if (precision <= 32) 
        {format   = fstd->fp[0].format;
-        typename = SC_strsavef(SC_FLOAT_S, "_H5_HANDLE_FLOAT_PT:typename");
-        dp->fp.order = FMAKE_N(int, bpif, "_H5_HANDLE_FLOAT_PT:order");
+        typename = CSTRSAVE(SC_FLOAT_S);
+        dp->fp.order = CMAKE_N(int, bpif);
 
         for (i = 0; i < bpif; i++) 
             dp->fp.order[i] = fstd->fp[0].order[i];}
 
     else 
        {format   = fstd->fp[1].format;
-        typename = SC_strsavef(SC_DOUBLE_S, "_H5_HANDLE_FLOAT_PT:typename");
-        dp->fp.order = FMAKE_N(int, bpid, "_H5_HANDLE_FLOAT_PT:order");
+        typename = CSTRSAVE(SC_DOUBLE_S);
+        dp->fp.order = CMAKE_N(int, bpid);
 
         for (i = 0; i < bpid; i++) 
             dp->fp.order[i] = fstd->fp[1].order[i];};
@@ -440,7 +440,7 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
     format[3] = 0;   /* Calculate this? */      
     format[6] = 0;   /* Calculate this? */      
 
-    dp->fp.format = FMAKE_N(long, 8, "_H5_HANDLE_FLOAT_PT:format");
+    dp->fp.format = CMAKE_N(long, 8);
 
     for (i = 0; i < 8; i++)
         dp->fp.format[i] = format[i];
@@ -490,7 +490,7 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
 /* NOTE: as far as we know -- HDF5 does not support 1's comp */
     dp->onescmp   = FALSE;
     dp->fix.order = NO_ORDER;
-    dp->type      = SC_strsavef(typename, "_H5_HANDLE_FLOAT_PT:dp->type");
+    dp->type      = CSTRSAVE(typename);
     dp->size_bits = 0;  /* format[0]; */
     dp->size      = format[0] / 8;
 
@@ -661,7 +661,7 @@ static dimdes *_H5_parse_dimensions(PDBfile *file, hid_t dtid, hid_t dataspace_i
 
 /* construct the dimensionality information */
      if (rank > 0)
-        {dimensions = FMAKE(dimdes, "_H5_READ_DATASPACE:dimensions");
+        {dimensions = CMAKE(dimdes);
          dim        = dimensions;}
      else 
         dimensions = NULL;
@@ -678,7 +678,7 @@ static dimdes *_H5_parse_dimensions(PDBfile *file, hid_t dtid, hid_t dataspace_i
 
 /* are we going around again? */
          if (i+1 < rank)
-            {dim->next = FMAKE(dimdes, "_H5_READ_DATASPACE:dim");
+            {dim->next = CMAKE(dimdes);
              dim = dim->next;}
          else
             dim->next = NULL;};
@@ -719,7 +719,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
         convert  = FALSE;
     
 /* begin creating a defstr for the charts */
-        members = FMAKE(memdes, "_H5_HANDLE_COMPOUND:members");
+        members = CMAKE(memdes);
    
 /* how many members are there? */ 
         nm = H5Tget_nmembers(dtid);
@@ -733,7 +733,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
 /* create a unique type name placeholder */ 
         snprintf(t, BUFFER_SIZE, "%s%d", PD_TYPE_PLACEHOLDER, hst->nstr);
         hst->nstr++;
-        typename = SC_strsavef(t, "_H5_HANDLE_COMPOUND:typename");
+        typename = CSTRSAVE(t);
         _H5_register(file, dtid, typename);
     
 /* begin creating a memdes for the defstr */ 
@@ -774,13 +774,13 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
              dimensions = _H5_parse_dimensions(file, idtid, 0); 
    
 /* fill in the memdes */ 
-             mnxt->member      = SC_strsavef(t, "_H5_HANDLE_COMPOUND:member");
-             mnxt->cast_memb   = SC_strsavef(type, "_H5_HANDLE_COMPOUND:type"); 
+             mnxt->member      = CSTRSAVE(t);
+             mnxt->cast_memb   = CSTRSAVE(type); 
              mnxt->member_offs = moffs;
              mnxt->cast_offs   = -1; 
-             mnxt->type        = SC_strsavef(type, "_H5_HANDLE_COMPOUND:type");
-             mnxt->base_type   = SC_strsavef(type, "_H5_HANDLE_COMPOUND:type");
-             mnxt->name        = SC_strsavef(mname, "_H5_HANDLE_COMPOUND:type");
+             mnxt->type        = CSTRSAVE(type);
+             mnxt->base_type   = CSTRSAVE(type);
+             mnxt->name        = CSTRSAVE(mname);
              mnxt->dimensions  = dimensions;
 
              if (dimensions == NULL)
@@ -798,20 +798,20 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
 
 /* continue to link the memdes members as we loop over the entries */
              if ((i + 1) < nm)
-                {mnxt->next = FMAKE(memdes, "_H5_HANDLE_COMPOUND:next"); 
+                {mnxt->next = CMAKE(memdes); 
                  mnxt = mnxt->next;}
              else
                 {mnxt = NULL;}; 
 
              free(mname);
              H5Tclose(idtid);
-             SFREE(type);};
+             CFREE(type);};
 
 #if 0
 	defstr *dp;
 
-        dp = FMAKE(defstr, "_H5_HANDLE_COMPOUND:dp");
-        dp->type        = SC_strsavef(typename, "_H5_HANDLE_COMPOUND:type");
+        dp = CMAKE(defstr);
+        dp->type        = CSTRSAVE(typename);
         dp->size_bits   = dp->size * 8; 
         dp->size        = H5Tget_size(dtid);
 /* GOTCHA: we have no alignment info from the file; so we guess */
@@ -842,10 +842,10 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
         _PD_d_install(hst->pf, typename, dp, TRUE);
     
 /* make a copy of dp for the file charts */
-        host_entry = FMAKE(defstr, "_H5_HANDLE_COMPOUND:host_entry");
+        host_entry = CMAKE(defstr);
         memcpy(host_entry, dp, sizeof(defstr));
     
-        host_entry->type    = SC_strsavef(dp->type, "_H5_HANDLE_COMPOUND:type");
+        host_entry->type    = CSTRSAVE(dp->type);
         host_entry->members = PD_copy_members(dp->members);
     
 /* set convert just before adding to the file charts */
@@ -858,7 +858,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
 
     else
        {DEBUG1("Compound type for %s already defined\n", regName);
-        typename = SC_strsavef(regName, "_H5_HANDLE_COMPOUND:typename");};
+        typename = CSTRSAVE(regName);};
 
     return(typename);}
 
@@ -890,7 +890,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
     prev_group = hst->group_prefix;
     dimensions = NULL;
 
-    ep = FMAKE(syment, "_H5_READ_GROUP_NODE:ep");
+    ep = CMAKE(syment);
 
     DEBUG1("ENTERING read group node for: %s\n", mname);
 
@@ -911,7 +911,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
 
 /* append to group prefix */
 	     nc = strlen(hst->group_prefix) + strlen(mname) + 2,
-	     temp_prefix = FMAKE_N(char, nc, "H5_READ_GROUP_NODE:temp_prefix");
+	     temp_prefix = CMAKE_N(char, nc);
 	     temp_prefix[0] = '\0';
 
 /* end it in slash '/' */
@@ -921,7 +921,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
 
 	     hst->group_prefix = temp_prefix;
 
-	     ep->type = SC_strsavef("Directory", "H5_READ_GROUP_NODE:type");
+	     ep->type = CSTRSAVE("Directory");
 	     ep->number               = 1; 
 	     ep->dimensions           = NULL; 
 	     ep->indirects.addr       = 0;
@@ -943,7 +943,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
 
 /* return the group prefix to what it was before */
 	     hst->group_prefix = prev_group;
-	     SFREE(temp_prefix);
+	     CFREE(temp_prefix);
 	     break;
  
         case H5G_DATASET :
@@ -963,7 +963,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
 	     DEBUG1("TYPE is %s\n", typename);
  
 /* create another entry in the symbol table */
-	     ep->type = SC_strsavef(typename, "H5_READ_GROUP_NODE:type");
+	     ep->type = CSTRSAVE(typename);
 
 /* setup the dimensionality */
 	     if (dimensions != NULL)
@@ -989,7 +989,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
 	     ep->indirects.arr_offs   = 0;
 	     
 	     nc = strlen(hst->group_prefix) + strlen(mname) + 1;
-	     fullname = FMAKE_N(char, nc, "H5_READ_GROUP_NODE:fullname");
+	     fullname = CMAKE_N(char, nc);
 	     fullname[0] = '\0';
 	     SC_vstrcat(fullname, nc, "%s%s",
 			hst->group_prefix, (char *) mname); 
@@ -1003,8 +1003,8 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
 	     H5Tclose(dtid);
 	     H5Sclose(dp_id);
 	     H5Dclose(dt_id);
-	     SFREE(fullname);
-	     SFREE(typename);
+	     CFREE(fullname);
+	     CFREE(typename);
 	     break;
 
         case H5G_LINK :
@@ -1050,7 +1050,7 @@ static int _H5_filep(char *type)
 static int _H5_close(PDBfile *file)
    {FILE *fp;
 
-    SFREE(file->meta);
+    CFREE(file->meta);
 
 /* this closes the FILE* stream shared by both hdf_file and file */
     fp = file->stream; 
@@ -1081,7 +1081,7 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     DEBUG1("_H5_create called: name(%s)\n", name);
 
 /* setup any global variables we will not read from the file */
-    hst = FMAKE(hdf_state, "_H5_OPEN:hst");
+    hst = CMAKE(hdf_state);
     hst->nstr         = 0;
     hst->registry     = NULL;
     hst->group_prefix = NULL;
@@ -1121,14 +1121,14 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     file->align            = _PD_copy_alignment(file->host_align); 
     file->mode             = PD_APPEND; 
     file->virtual_internal = FALSE; 
-    file->type             = SC_strsavef(H5FILE_S, "char*:_H5_CREATE:type");
-    file->current_prefix   = SC_strsavef("/", "char*:_H5_CREATE:current_prefix");
+    file->type             = CSTRSAVE(H5FILE_S);
+    file->current_prefix   = CSTRSAVE("/");
 
 /* init the group/directory prefix to the root dir */
-    hst->group_prefix = SC_strsavef("/", "char*:_H5_CREATE:group_prefix");
+    hst->group_prefix = CSTRSAVE("/");
 
-    ep = FMAKE(syment, "_H5_CREATE:ep");
-    ep->type = SC_strsavef("Directory", "_H5_CREATE:type");
+    ep = CMAKE(syment);
+    ep->type = CSTRSAVE("Directory");
     ep->number               = 1; 
     ep->dimensions           = NULL; 
     ep->indirects.addr       = 0;
@@ -1157,7 +1157,7 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
         _H5_close(file);
 	file = NULL;};
 
-    SFREE(hst->group_prefix);
+    CFREE(hst->group_prefix);
 
     return(file);}
     
@@ -1181,7 +1181,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     DEBUG1("_H5_open called: name(%s)\n", name);
 
 /* setup any global variables we will not read from the file */
-    hst = FMAKE(hdf_state, "_H5_OPEN:hst");
+    hst = CMAKE(hdf_state);
     hst->nstr         = 0;
     hst->registry     = NULL;
     hst->group_prefix = NULL;
@@ -1222,14 +1222,14 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     file->align            = _PD_copy_alignment(file->host_align); 
     file->mode             = PD_APPEND; 
     file->virtual_internal = FALSE; 
-    file->type             = SC_strsavef(H5FILE_S, "char*:_H5_OPEN:type");
-    file->current_prefix   = SC_strsavef("/", "char*:_H5_OPEN:current_prefix");
+    file->type             = CSTRSAVE(H5FILE_S);
+    file->current_prefix   = CSTRSAVE("/");
 
 /* init the group/directory prefix to the root dir */
-    hst->group_prefix = SC_strsavef("/", "char*:_H5_OPEN:group_prefix");
+    hst->group_prefix = CSTRSAVE("/");
 
-    ep = FMAKE(syment, "_H5_OPEN:ep");
-    ep->type                 = SC_strsavef("Directory", "_H5_OPEN:type");
+    ep = CMAKE(syment);
+    ep->type                 = CSTRSAVE("Directory");
     ep->number               = 1; 
     ep->dimensions           = NULL; 
     ep->indirects.addr       = 0;
@@ -1258,7 +1258,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
        {_H5_close(file);
 	file = NULL;};
 
-    SFREE(hst->group_prefix);
+    CFREE(hst->group_prefix);
 
     return(file);}
     

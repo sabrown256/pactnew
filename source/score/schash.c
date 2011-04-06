@@ -95,7 +95,7 @@ int SC_hash_key_type(HASHTAB *self, char *name, PFKeyHash hash, PFIntBin comp)
        {if (self->key_type != NULL)
            {SC_hash_key_clear(self);}
  
-        self->key_type = SC_strsavef(name, "char*:SC_HASH_KEY_TYPE:key_type");
+        self->key_type = CSTRSAVE(name);
         self->hash     = hash;
         self->comp     = comp;
 
@@ -150,10 +150,10 @@ HASHTAB *_SC_make_hash_table(int sz, int docflag)
     int i;
 
 /* allocate a new hash table */
-    self = FMAKE(HASHTAB, "_SC_MAKE_HASH_TABLE:self");
+    self = CMAKE(HASHTAB);
 
     if (self != NULL)
-       {tb = FMAKE_N(hashel *, sz, "_SC_MAKE_HASH_TABLE:tb");
+       {tb = CMAKE_N(hashel *, sz);
 
         if (tb != NULL)
            {self->size      = sz;
@@ -169,7 +169,7 @@ HASHTAB *_SC_make_hash_table(int sz, int docflag)
 	        tb[i] = NULL;}
 
 	else
-           {SFREE(self);};};
+           {CFREE(self);};};
 
     return(self);}
 
@@ -239,10 +239,10 @@ void SC_rl_hash_table(HASHTAB *self)
     if (SC_safe_to_free(self))
        {SC_hash_clr(self);
 
-        SFREE(self->key_type);
-        SFREE(self->table);};
+        CFREE(self->key_type);
+        CFREE(self->table);};
 
-    SFREE(self);
+    CFREE(self);
 
     return;}
 
@@ -279,7 +279,7 @@ char **_SC_dump_hash(HASHTAB *self, char *patt, char *type, int sort)
        return(NULL);
 
 /* allocate a list of pointers to the keys in the hash table */
-    keyptr = FMAKE_N(char *, self->nelements, "_SC_HASH_DUMP:keyptr");
+    keyptr = CMAKE_N(char *, self->nelements);
 
     if (keyptr == NULL)
        return(NULL);
@@ -304,7 +304,7 @@ char **_SC_dump_hash(HASHTAB *self, char *patt, char *type, int sort)
     if (nkeys > self->nelements)
        return(NULL);
 
-    REMAKE_N(keyptr, char *, nkeys + 1);
+    CREMAKE(keyptr, char *, nkeys + 1);
     keyptr[nkeys] = NULL;
 
 /* sort the names
@@ -407,14 +407,14 @@ hashel *_SC_install(void *key, void *obj, char *type, HASHTAB *self,
 
 /* if not found, then insert it */
     if (hp == NULL)
-       {hp = FMAKE(hashel, "_SC_INSTALL:hp");
+       {hp = CMAKE(hashel);
         if (hp != NULL)
 
 /* setup the key */
            {if (STRING_KEY(self->hash))
-               {hp->name = SC_strsavef(key, "char*:_SC_INSTALL:name");
+               {hp->name = CSTRSAVE(key);
                 if (hp->name == NULL)
-                   SFREE(hp);}
+                   CFREE(hp);}
             else
                hp->name = key;
 
@@ -515,12 +515,12 @@ static void _SC_free_hashel(hashel *hp, PFIntUn rel, int string)
 
 /* undo the MARK in SC_install */
     else if (hp->free == TRUE)
-       SFREE(hp->def);
+       CFREE(hp->def);
 
     if (string)
-       SFREE(hp->name);
+       CFREE(hp->name);
 
-    SFREE(hp);
+    CFREE(hp);
 
     return;}
 
@@ -763,7 +763,7 @@ void SC_hash_resize(HASHTAB *tab, int buckets)
 
 /* handle the case of an empty table */
        {if (tab->nelements == 0)
-           REMAKE_N(tab->table, hashel *, buckets);
+           CREMAKE(tab->table, hashel *, buckets);
 
         else 
            {temp = SC_hash_alloc();
@@ -784,7 +784,7 @@ void SC_hash_resize(HASHTAB *tab, int buckets)
             SC_hash_clr(tab);
          
 /* resize the table */
-            REMAKE_N(tab->table, hashel *, buckets);
+            CREMAKE(tab->table, hashel *, buckets);
         
 /* reinsert the hashel's from the temp table */
             iter = SC_hashiter_alloc(temp);
@@ -795,7 +795,7 @@ void SC_hash_resize(HASHTAB *tab, int buckets)
         
             SC_hashiter_free(iter);
         
-            SFREE(temp);};}
+            CFREE(temp);};}
 
     return;}
    
@@ -817,7 +817,7 @@ void SC_hash_key_clear(HASHTAB *tab)
    {
 
     if (tab != NULL)
-       {SFREE(tab->key_type);
+       {CFREE(tab->key_type);
 
         tab->hash = NULL;
         tab->comp = NULL;};
@@ -879,9 +879,9 @@ void SC_hash_cln_table(HASHTAB *tab, PFIntUn rel)
                      {(*rel)(hp);}
             
 		  if (string)
-		     {SFREE(hp->name);};
+		     {CFREE(hp->name);};
 
-                  SFREE(hp);};
+                  CFREE(hp);};
 
              tb[i] = NULL;};};
 
@@ -910,7 +910,7 @@ hashiter *SC_hashiter_alloc(HASHTAB *htab)
    {hashiter *self; 
 
     if (htab != NULL) 
-       {self = FMAKE(hashiter, "_SC_HASHITER_ALLOC:self");
+       {self = CMAKE(hashiter);
 
         self->htab       = htab;
         self->match_type = NULL;
@@ -939,9 +939,9 @@ void SC_hashiter_free(hashiter *self)
    {
 
     if ((self != NULL) && (self->match_type != NULL))
-       {SFREE(self->match_type);}
+       {CFREE(self->match_type);}
 
-    SFREE(self);
+    CFREE(self);
 
     return;}
 
@@ -957,10 +957,10 @@ void SC_hashiter_kind(hashiter *self, char *type)
    {
 
     if ((self != NULL) && (self->match_type != NULL))
-       {SFREE(self->match_type);};
+       {CFREE(self->match_type);};
 
     if ((self != NULL) && (type != NULL))
-       self->match_type = SC_strsavef(type, "SC_hashiter_kind:match_type");
+       self->match_type = CSTRSAVE(type);
 
     return;}
 
@@ -1014,14 +1014,14 @@ int SC_hashiter_del(hashiter *self)
 
 /* undo the SC_mark done during installation */
         if (curr->free == TRUE)
-           {SFREE(curr->def);}
+           {CFREE(curr->def);}
 
 /* free key if we are using SC_HASH_NAME_KEYs */
         if (freeKey)
-           {SFREE(curr->name);}
+           {CFREE(curr->name);}
 
 /* finally actually free the hashel itself */
-        SFREE(curr);
+        CFREE(curr);
         (self->htab->nelements)--;
 
         SC_LOCKOFF(SC_hash_lock);}

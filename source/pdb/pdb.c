@@ -145,7 +145,7 @@ PDBfile *PD_family(PDBfile *of, int flag)
 	    PD_set_track_pointers(nf, PD_get_track_pointers(of));
 	    PD_set_major_order(nf, PD_get_major_order(of));
 
-	    nf->previous_file = SC_strsavef(of->name, "char*:PD_FAMILY:fname");
+	    nf->previous_file = CSTRSAVE(of->name);
 
 /* copy the types over */
 	    for (i = 0; SC_hasharr_next(of->chart, &i, NULL, NULL, (void **) &dp); i++)
@@ -448,7 +448,7 @@ int PD_read_as_dwim(PDBfile *file, char *name, char *outtype, long nix,
 /* since we are freeing the space we had better reset the pointer lists */
 	_PD_ptr_reset(file, vr);
 
-	SFREE(vr);}
+	CFREE(vr);}
 
 /* read same as for direct case - should be equivalent to PD_read_as */
     else
@@ -1143,8 +1143,8 @@ int PD_cast(PDBfile *file, char *type, char *memb, char *contr)
 		 continue;
 
 /* make an independent copy in case the one in the file chart is released */
-	      SFREE(desc->cast_memb);
-	      desc->cast_memb = SC_strsavef(contr, "char*:PD_CAST:memb");
+	      CFREE(desc->cast_memb);
+	      desc->cast_memb = CSTRSAVE(contr);
 	      desc->cast_offs = _PD_member_location(contr, tab, dp, &lst);};};
 
 /* too slow? */
@@ -1179,7 +1179,7 @@ void _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast)
              continue;
 
 /* make an independent copy in case the one passed in is released */
-         desc->cast_memb = SC_strsavef(cast, "char*:PD_CAST:memb");
+         desc->cast_memb = CSTRSAVE(cast);
          desc->cast_offs = _PD_member_location(cast, chart, dp, &lst);};
 
    return;}
@@ -1296,14 +1296,14 @@ int PD_free(PDBfile *file, char *type, void *var)
 	     if (_PD_indirection(ityp))
 	        {p = DEREF(p);
 		 if (SC_is_score_space(p, NULL, NULL)) 
-		    {SFREE(p);};};};
+		    {CFREE(p);};};};
 
 /* free array or scalar compound itself */
 	if (SC_is_score_space(pc, NULL, NULL)) 
-	   {SFREE(pc);};
+	   {CFREE(pc);};
 
-	SFREE(dtyp);
-	SFREE(ityp);};
+	CFREE(dtyp);
+	CFREE(ityp);};
 
     return(TRUE);}
 
@@ -1427,7 +1427,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 
 	var = (char *) vr;
 	if (reord == TRUE)
-	   {buf = FMAKE_N(char, nb * ni, "PD_FIX_DENORM:buf");
+	   {buf = CMAKE_N(char, nb * ni);
        
 	    if (buf == NULL)
 	       {PD_error("MEM ALLOC FAILED - PD_FIX_DENORM", PD_GENERIC);
@@ -1499,7 +1499,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
   
 /* if we reordered into a buffer, then free the buffer */
 	if (reord == TRUE)
-	   {SFREE(buf);};};
+	   {CFREE(buf);};};
 
     return(st);}
 

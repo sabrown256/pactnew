@@ -68,7 +68,7 @@ static void tty_has_txt(int fd, int mask, void *a)
 
 	SC_printf(pp, "%s", msg);};
 
-    SFREE(dir);
+    CFREE(dir);
 
     return;}
 

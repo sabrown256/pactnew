@@ -454,10 +454,10 @@ PP_assoc_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
         if (alist != NULL)
             alist = SC_rem_alist(alist, name);
 
-        /* SC_add_alist will SC_strsave ptype and SC_mark vr */
+        /* SC_add_alist will CSTRSAVE ptype and SC_mark vr */
         alist = SC_add_alist(alist, name, ptype, vr);
 
-        SFREE(ptype);
+        CFREE(ptype);
         _PP_rl_descr(descr);
 
         if (alist == NULL) {

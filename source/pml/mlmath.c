@@ -601,7 +601,7 @@ int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny
     xc  = 0.0;
 
 /* compute the areas */
-    area = FMAKE_N(double, n, "PM_THIN_1D_INT:area");
+    area = CMAKE_N(double, n);
     for (i = 1; i < n-1; i++)
         {xc = thnx[i+1] - thnx[i-1];
          if (xc == 0.0)
@@ -646,7 +646,7 @@ int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny
                   ht = ABS(thny[i] - sm*thnx[i] - b)/sqrt(sm*sm + 1.0);
                   area[i] = 0.5*ht*HYPOT(xc, yc);};};};
 
-    SFREE(area);
+    CFREE(area);
 
     return(nth);}
 
@@ -695,7 +695,7 @@ int PM_filter_coeff(double *y, int n, double *coef, int nc)
     nm = nh*(3*nh + 1) >> 1;
     nu = n - nh;
 
-    ny = FMAKE_N(double, n, "PM_FILTER_COEFF:ny");
+    ny = CMAKE_N(double, n);
 
     jn = 0;
     jx = 0;
@@ -725,7 +725,7 @@ int PM_filter_coeff(double *y, int n, double *coef, int nc)
          ny[i] = yn;};
 
     memcpy(y, ny, n*sizeof(double));
-    SFREE(ny);
+    CFREE(ny);
 
     return(TRUE);}
 
@@ -747,8 +747,8 @@ int PM_smooth_int_ave(double *x, double *y, int n, int pts)
     nh = pts >> 1;
     nt = n - 1;
 
-    nx = FMAKE_N(double, n, "PM_SMOOTH_INT_AVE:nx");
-    ny = FMAKE_N(double, n, "PM_SMOOTH_INT_AVE:ny");
+    nx = CMAKE_N(double, n);
+    ny = CMAKE_N(double, n);
 
     for (i = 0; i < n; i++)
         {jn = i - nh;
@@ -780,8 +780,8 @@ int PM_smooth_int_ave(double *x, double *y, int n, int pts)
     memcpy(x, nx, n);
     memcpy(y, ny, n);
 
-    SFREE(nx);
-    SFREE(ny);
+    CFREE(nx);
+    CFREE(ny);
 
     return(TRUE);}
 
@@ -840,8 +840,8 @@ int PM_smooth_fft(double *x, double *y, int n, int pts,
     for (i = 0; i < n; i++)
         y[i] += (ya*(n - 1 - i) + yb*i);
 
-    SFREE(xo);
-    SFREE(cx);
+    CFREE(xo);
+    CFREE(cx);
 
     return(TRUE);}
 
@@ -910,8 +910,8 @@ int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
         xmx = xa[na - 1] - xb[0];};
 
     nf = (xmx - xmn)/dxa + 1;
-    xf = *pxf = FMAKE_N(double, nf, "_PM_FOLD:xf");
-    yf = *pyf = FMAKE_N(double, nf, "_PM_FOLD:yf");
+    xf = *pxf = CMAKE_N(double, nf);
+    yf = *pyf = CMAKE_N(double, nf);
 
 /* decide how many points at most are in the product function */
     nm  = 0;
@@ -926,7 +926,7 @@ int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
 
          nm = max(nm, nt);};
 
-    yn = FMAKE_N(double, nm, "_PM_FOLD:yn");
+    yn = CMAKE_N(double, nm);
 
     dxb *= 0.5;
     for (xt = xmn, i = 0; i < nf; i++, xt += dxa)
@@ -959,7 +959,7 @@ int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
 /* stash the value */
          yf[i] = yt;};
 
-    SFREE(yn);
+    CFREE(yn);
 
     return(nf);}
 

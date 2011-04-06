@@ -110,28 +110,28 @@ int main(int c, char **v)
     if (PD_cast(file, "List", "data", "type") == 0)
        PRINT(stdout, "PD_cast: %s\n", PD_get_error());
 
-    head = MAKE(List);
+    head = CMAKE(List);
     ptr  = head;
 
-    aname = SC_strsave("ASTRUCT *");
-    bname = SC_strsave("BSTRUCT *");
+    aname = CSTRSAVE("ASTRUCT *");
+    bname = CSTRSAVE("BSTRUCT *");
 
     for (i = 0; i < 10; ++i)
         {if (i % 2 == 0)
-	    {aptr      = MAKE(ASTRUCT);
+	    {aptr      = CMAKE(ASTRUCT);
 	     ptr->data = aptr;
 	     ptr->type = aname;
 	     aptr->val = i;}
 
 	 else
-	    {bptr      = MAKE(BSTRUCT);
+	    {bptr      = CMAKE(BSTRUCT);
 	     ptr->data = bptr;
 	     ptr->type = bname;
 	     bptr->x   = 1.2*i;
 	     bptr->y   = 1.1*i;};
      
 	 if (i != 9)
-	    {ptr->next = MAKE(List);
+	    {ptr->next = CMAKE(List);
 	     ptr       = ptr->next;}
 	 else
 	    ptr->next = NULL;};

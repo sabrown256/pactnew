@@ -33,25 +33,11 @@ void SC_end_session(void)
     SC_free_array(_SC.eth_conds, NULL);
 
 /* free strings */
-    SFREE(_SC.ta);
-    SFREE(BARRIER);
-    SFREE(_SC.signame);
-    SFREE(_SC.sqbf);
-    SFREE(_SC.ecbf);
-
-#if 0
-/* environment variables - do not know how */
-    t   = SC_strsavef(s, "PERM|char*:SC_PUTENV:s");
-
-/* per thread data - do not know how */
-    *pa = FMAKE_N(char, 4096, "PERM|char*:SC_VDSNPRINTF:pa");
-
-/* what loop is this? */
-    pe = FMAKE(SC_evlpdes, "PERM|SC_MAKE_EVENT_LOOP:pe");
-    pe->fd     = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", SC_poll_desc, NULL);
-    pe->faccpt = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", PFFileCallback, NULL);
-    pe->frejct = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", PFFileCallback, NULL);
-#endif
+    CFREE(_SC.ta);
+    CFREE(BARRIER);
+    CFREE(_SC.signame);
+    CFREE(_SC.sqbf);
+    CFREE(_SC.ecbf);
 
     return;}
 

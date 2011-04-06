@@ -34,11 +34,10 @@ void _SX_copy_tree(PDBfile *file, char *vrin, char *vrout,
     else
        {lvr = (char **) vrin;
         lvo = (char **) vrout;
-        dtype = PD_dereference(SC_strsavef(type,
-                               "char*:_SX_COPY_TREE:dtype"));
+        dtype = PD_dereference(CSTRSAVE(type));
         for (i = 0L; i < nitems; i++)
             _SX_copy_indirection(file, &lvr[i], &lvo[i], dtype);
-        SFREE(dtype);};
+        CFREE(dtype);};
 
     return;}
 
@@ -124,13 +123,12 @@ void _SX_copy_leaf(PDBfile *file, char *vrin, char *vrout,
 				   "BAD CAST - _SX_COPY_LEAF", SS_null);
 
 		      if (_PD_indirection(mtype))
-			 {dtype = PD_dereference(SC_strsavef(mtype,
-							     "char*:_SX_COPY_LEAF:dtype"));
+			 {dtype = PD_dereference(CSTRSAVE(mtype));
 			  _SX_copy_indirection(file,
 					       (char **) (svrin + member_offs),
 					       (char **) (svrout + member_offs),
                                           dtype);
-			  SFREE(dtype);};};};};};
+			  CFREE(dtype);};};};};};
 
     return;}
 

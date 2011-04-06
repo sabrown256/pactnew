@@ -37,18 +37,18 @@ int tSC_firsttok(void)
 			  "*abc", "*", "*abc",
 			  "x", "x", "x", "x"};
 
-    str[0]  = SC_strsavef("", "char*:TSCMEMC:str0");
-    str[1]  = SC_strsavef(" ", "char*:TSCMEMC:str1");
-    str[2]  = SC_strsavef("  *", "char*:TSCMEMC:str2");
-    str[3]  = SC_strsavef(" *", "char*:TSCMEMC:str3");
-    str[4]  = SC_strsavef("* ", "char*:TSCMEMC:str4");
-    str[5]  = SC_strsavef("*abc", "char*:TSCMEMC:str5");
-    str[6]  = SC_strsavef("* abc", "char*:TSCMEMC:str6");
-    str[7]  = SC_strsavef("*abc ", "char*:TSCMEMC:str7");
-    str[8]  = SC_strsavef("xyz", "char*:TSCMEMC:str8");
-    str[9]  = SC_strsavef("xyz*", "char*:TSCMEMC:str9");
-    str[10] = SC_strsavef("xyz *", "char*:TSCMEMC:str10");
-    str[11] = SC_strsavef("xyz * ", "char*:TSCMEMC:str11");
+    str[0]  = CSTRSAVE("");
+    str[1]  = CSTRSAVE(" ");
+    str[2]  = CSTRSAVE("  *");
+    str[3]  = CSTRSAVE(" *");
+    str[4]  = CSTRSAVE("* ");
+    str[5]  = CSTRSAVE("*abc");
+    str[6]  = CSTRSAVE("* abc");
+    str[7]  = CSTRSAVE("*abc ");
+    str[8]  = CSTRSAVE("xyz");
+    str[9]  = CSTRSAVE("xyz*");
+    str[10] = CSTRSAVE("xyz *");
+    str[11] = CSTRSAVE("xyz * ");
 
     failsum  = 0;
 

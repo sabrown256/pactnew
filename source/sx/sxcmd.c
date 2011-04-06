@@ -117,22 +117,17 @@ void SX_init_view(void)
     SX_window_width_P  = 1.0;
     SX_window_height_P = 1.0;
 
-    SX_text_output_format = SC_strsavef("%13.6e",
-					"char*:SX_INIT_VIEW:format");
+    SX_text_output_format = CSTRSAVE("%13.6e");
 
-    SX_display_name  = SC_strsavef("WINDOW",
-				   "char*:SX_INIT_VIEW:name");
-    SX_display_type  = SC_strsavef("COLOR",
-				   "char*:SX_INIT_VIEW:type");
-    SX_display_title = SC_strsavef("PDBView",
-				   "char*:SX_INIT_VIEW:title");
+    SX_display_name  = CSTRSAVE("WINDOW");
+    SX_display_type  = CSTRSAVE("COLOR");
+    SX_display_title = CSTRSAVE("PDBView");
 
     SS_interactive = FALSE;
     SS_print_flag  = FALSE;
     SS_stat_flag   = FALSE;
 
-    SX_command_log_name = SC_strsavef("pdbview.log",
-				      "char*:SX_INIT_VIEW:log_name");
+    SX_command_log_name = CSTRSAVE("pdbview.log");
 
     SX_enlarge_dataset(NULL);
 
@@ -487,8 +482,7 @@ void SX_init_env(void)
 /* initialize the prefix list */
     SX_reset_prefix();
 
-    SX_pui_file  = SC_strsavef("pdbview.pui",
-			       "char*:SX_INIT_ENV:fname");
+    SX_pui_file  = CSTRSAVE("pdbview.pui");
 
 /* initialize the some global objects */
 
@@ -561,8 +555,7 @@ int SX_command(char *file, char *cmd)
 /* initialize SX
  * the following variables must be initialized before SX_init
  */
-	SX_console_type     = SC_strsavef("MONOCHROME",
-					  "char*:SX_COMMAND:console_type");
+	SX_console_type     = CSTRSAVE("MONOCHROME");
 	SX_console_x        = 0.0;
 	SX_console_y        = 0.0;
 	SX_console_width    = 0.33;

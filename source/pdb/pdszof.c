@@ -29,10 +29,10 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
  
 #define SAVE_S(s, t)                                                         \
     {SZ_STR_STACK[SZ_STR_PTR++] = s;                                         \
-     s = SC_strsavef(t, "char*:SAVE_S:t");}
+     s = CSTRSAVE(t);}
 
 #define RESTORE_S(s)                                                         \
-    {SFREE(s);                                                               \
+    {CFREE(s);                                                               \
      s = SZ_STR_STACK[--SZ_STR_PTR];}
 
 #define SAVE_I(val)                                                          \
@@ -86,7 +86,7 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
 	 if (_s == NULL)                                                     \
 	    {_s = FMAKE_N(_t, _px, "PERM|_PD_DYN_STK:s");}                   \
 	 else                                                                \
-	    REMAKE_N(_s, _t, _px);};}
+	    CREMAKE(_s, _t, _px);};}
 
 #define START                                                                \
     while (TRUE)                                                             \

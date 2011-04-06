@@ -204,7 +204,7 @@ static pcons *_PG_set_attrs_alist(pcons *alst, va_list __a__)
 
 	 if ((ptr == FALSE) &&
 	     ((SC_is_type_num(ityp) == TRUE) || (ityp == SC_POINTER_I)))
-	    {pv = FMAKE_N(char, bpi, "_PG_SET_ATTRS_ALIST:pv");
+	    {pv = CMAKE_N(char, bpi);
 	     SC_VA_ARG_ID(ityp, pv, 0);}
 	 else
 	    pv = SC_VA_ARG(void *);

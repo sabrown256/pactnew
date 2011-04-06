@@ -58,16 +58,16 @@ static int _PP_extra_defstr_delete(haelem *hp, void *arg)
     SC_ASSERT(ok == TRUE);
 
     if (SC_safe_to_free(dp)) {
-        char *name = SC_strsave(dp->type);
+        char *name = CSTRSAVE(dp->type);
         PP_defstr_rem(name, fp);
-        SFREE(name);
+        CFREE(name);
     }
 #if 0
     int dorm;
     if (SC_safe_to_free(dp)) {
-        char *name = SC_strsave(dp->type);
+        char *name = CSTRSAVE(dp->type);
         PP_defstr_rem(name, fp);
-        SFREE(name);
+        CFREE(name);
     } else {
         /* Do nothing, don't even change the refcount
          * so the extra mark will remain.
@@ -215,8 +215,8 @@ PP_PDBfile_write(PP_PDBfileObject *self,
         ptype = PP_add_indirection(descr->type, 1);
         (void) _PP_rel_syment(fp->host_chart, (char *) &vr, 1, ptype);
 /*        (void) _PP_rel_syment(fp->host_chart, &vr, nitems, descr->ptype);*/
-        SFREE(vr);
-        SFREE(ptype);
+        CFREE(vr);
+        CFREE(ptype);
     }
     _PP_rl_descr(descr);
     
@@ -621,7 +621,7 @@ PP_PDBfile_ls(PP_PDBfileObject *self,
         Py_DECREF(rv);
         rv = NULL;
     }
-    SFREE(out);
+    CFREE(out);
 
     return rv;
 /* DO-NOT-DELETE splicer.end(pdb.PDBfile.method.ls) */
@@ -1127,7 +1127,7 @@ PP_PDBfile_tp_init(PP_PDBfileObject *self, PyObject *args, PyObject *kwds)
      */
     PD_set_track_pointers(fp, FALSE);
 
-    fileinfo = FMAKE(PP_file, "PP_PDBFILE_TP_INIT:fileinfo");
+    fileinfo = CMAKE(PP_file);
     fileinfo->file = fp;
     PP_init_type_map_basic(fileinfo);
     

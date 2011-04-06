@@ -54,10 +54,10 @@ int main(int argc, char **argv)
     centering = N_CENT;
 
     kxl = kmax*lmax;
-    x   = FMAKE_N(double, kxl, "GSVTST.C:x");
-    y   = FMAKE_N(double, kxl, "GSVTST.C:y");
-    u   = FMAKE_N(double, kxl, "GSVTST.C:u");
-    v   = FMAKE_N(double, kxl, "GSVTST.C:v");
+    x   = CMAKE_N(double, kxl);
+    y   = CMAKE_N(double, kxl);
+    u   = CMAKE_N(double, kxl);
+    v   = CMAKE_N(double, kxl);
 
     km = 2.0*PI/((double) (kmax - 1));
     lm = 2.0*PI/((double) (lmax - 1));

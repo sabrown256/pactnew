@@ -68,8 +68,7 @@
 #define SX_GET_STRING_FROM_LIST(x, argl, s)                                  \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
-    x    = SC_strsavef(SS_get_string(obj),				     \
-           "char*:SX_GET_STRING_FROM_LIST:x");}
+    x    = CSTRSAVE(SS_get_string(obj));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

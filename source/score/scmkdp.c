@@ -168,9 +168,9 @@ static void _SC_rel_actions(anadep *state, int i)
     SC_array_dec_n(state->actions, 1L, -1);
     pa = SC_array_get(state->actions, i);
 
-    SFREE(pa->target);
-    SFREE(pa->dependent);
-    SFREE(pa->suffix);
+    CFREE(pa->target);
+    CFREE(pa->dependent);
+    CFREE(pa->suffix);
 
     pa->n       = 0;
     pa->kind    = 0;
@@ -198,12 +198,12 @@ static int _SC_add_actions(char *tgt, char *dep, char *sfx,
     a.n         = n;
     a.actions   = b;
     a.kind      = whch;
-    a.target    = SC_strsavef(tgt, "char*:_SC_ADD_ACTIONS:target");
+    a.target    = CSTRSAVE(tgt);
 
     if (sfx == NULL)
-       a.suffix = SC_strsavef("", "char*:_SC_ADD_ACTIONS:suffixa");
+       a.suffix = CSTRSAVE("");
     else
-       a.suffix = SC_strsavef(sfx, "char*:_SC_ADD_ACTIONS:suffixb");
+       a.suffix = CSTRSAVE(sfx);
 
     if (dep == NULL)
        {strcpy(s, tgt);
@@ -217,7 +217,7 @@ static int _SC_add_actions(char *tgt, char *dep, char *sfx,
         a.dependent = dep;}
 
     else
-        a.dependent = SC_strsavef(dep, "char*:_SC_ADD_ACTIONS:dependent");
+        a.dependent = CSTRSAVE(dep);
 
 /* check whether we have an explicit rule that should override 
  * an implicit one
@@ -606,7 +606,7 @@ static char **_SC_join_split_lines(char **cmnds)
 /* count the lines */
     SC_ptr_arr_len(n, cmnds);
 
-    ncmd = FMAKE_N(char *, n+1, "_SC_JOIN_SPLIT_LINES:ncmd");
+    ncmd = CMAKE_N(char *, n+1);
     
     ifrst = -1;
     for (i = 0, j = 0; i < n; i++)
@@ -638,7 +638,7 @@ static char **_SC_join_split_lines(char **cmnds)
 	     for (l = ifrst; l <= i; l++)
 	         nc += strlen(cmnds[l]);
 
-	     t = FMAKE_N(char, nc, "_SC_JOIN_SPLIT_LINES:t");
+	     t = CMAKE_N(char, nc);
 
 /* cat the lines together in t */
 	     t[0] = '\0';
@@ -651,7 +651,7 @@ static char **_SC_join_split_lines(char **cmnds)
 
 /* a single line was good so copy it over */
          else if (!join)
-	   ncmd[j++] = SC_strsavef(s, "_SC_JOIN_SPLIT_LINES:ncmd[j]");};
+	   ncmd[j++] = CSTRSAVE(s);};
 
     ncmd[j++] = NULL;
 
@@ -681,21 +681,21 @@ char **_SC_splice_in_strings(char **a, int i, char **b)
     SC_ptr_arr_len(nb, b);
     
     nc = na + nb;
-    c  = FMAKE_N(char *, nc, "_SC_SPLICE_IN_STRINGS:c");
+    c  = CMAKE_N(char *, nc);
     
     l = 0;
 
 /* add A[0], ..., A[I-1] */
     for (j = 0; j < i; j++)
-        c[l++] = SC_strsavef(a[j], "_SC_SPLICE_IN_STRINGS:c1");
+        c[l++] = CSTRSAVE(a[j]);
 
 /* add B[0], ..., B[Nb] */
     for (j = 0; j < nb; j++)
-        c[l++] = SC_strsavef(b[j], "_SC_SPLICE_IN_STRINGS:c2");
+        c[l++] = CSTRSAVE(b[j]);
 
 /* add A[I+1], ..., A[Na] */
     for (j = i+1; j < na; j++)
-        c[l++] = SC_strsavef(a[j], "_SC_SPLICE_IN_STRINGS:c3");
+        c[l++] = CSTRSAVE(a[j]);
 
 /* add null termination */
     c[l++] = NULL;
@@ -746,7 +746,7 @@ static char **_SC_recurse_make(char **cmnds, anadep *state)
 
 	     t[0] = '\0';};};
 
-    SFREE(t);
+    CFREE(t);
 
     ncmd = cmnds;
     if (ecmd != NULL)
@@ -799,7 +799,7 @@ char **SC_action_commands(anadep *state, int recur)
 	    nc += na;};
 
 /* build the command set */
-    cmnds = FMAKE_N(char *, nc+1, "SC_ACTION_COMMANDS:cmnds");
+    cmnds = CMAKE_N(char *, nc+1);
 
     if (state->verbose)
        io_printf(stdout, "-------------------------------------------------------\n");
@@ -821,7 +821,7 @@ char **SC_action_commands(anadep *state, int recur)
 	     for (j = 0; j < na; j++)
 
 /* save a copy so that the rules can safely be freed later */
-	         {p = SC_strsavef(ca[j], "SC_ACTION_COMMANDS:p");
+	         {p = CSTRSAVE(ca[j]);
 		  
 /* carry out any required macro substitutions before adding to A
  * NOTE: _SC_subst_macro will free the input string and return a

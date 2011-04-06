@@ -75,9 +75,9 @@ int main(int argc, char **argv)
     ymin    = -5.0;
     ymax    = 5.0;
     kxl     = kmax*lmax;
-    x       = FMAKE_N(double, kxl, "GSFPTS.C:x");
-    y       = FMAKE_N(double, kxl, "GSFPTS.C:y");
-    f       = FMAKE_N(double, kxl, "GSFPTS.C:f");
+    x       = CMAKE_N(double, kxl);
+    y       = CMAKE_N(double, kxl);
+    f       = CMAKE_N(double, kxl);
     id      = 'A';
 
     for (k = 0; k < kmax; k++)

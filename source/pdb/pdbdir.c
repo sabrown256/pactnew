@@ -74,8 +74,8 @@ int PD_cd(PDBfile *file, char *dirname)
 
     else
        {if (file->current_prefix != NULL)
-           SFREE(file->current_prefix);
-        file->current_prefix = SC_strsavef(name, "char*:PD_CD:name");}
+           CFREE(file->current_prefix);
+        file->current_prefix = CSTRSAVE(name);}
 
     return(TRUE);}
 
@@ -139,9 +139,8 @@ int PD_ln(PDBfile *file, char *oldname, char *newname)
 	      {PD_error("CANNOT CREATE LINK ATTRIBUTE - PD_LN", PD_GENERIC);
 	       return(FALSE);};
 
-	avl  = FMAKE(char *, "PD_LN:avl");
-	*avl = SC_strsavef(_PD_fixname(file, oldname),
-			   "char*:PD_LN:fname");
+	avl  = CMAKE(char *);
+	*avl = CSTRSAVE(_PD_fixname(file, oldname));
 
 	if (!PD_set_attribute(file, nname, "LINK", (void *) avl))
 	   {PD_error("CANNOT SET LINK ATTRIBUTE - PD_LN", PD_GENERIC);
@@ -307,7 +306,7 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  * requested pattern are returned.
  */
     nvars = 0;
-    outlist = FMAKE_N(char *, ne + 1, "char*:PD_LS:outlist");
+    outlist = CMAKE_N(char *, ne + 1);
      
 /* the second pass is in case variables were written to the file before
  * the first directory was created. Such variables lack an initial slash.
@@ -436,11 +435,11 @@ static int _PD_wr_dir(PDBfile *file, char *name)
        {if (PD_inquire_type(file, "Directory") == NULL)
 	   PD_def_dir(file);};
 
-    dir  = FMAKE(int, "_PD_WR_DIR:dir");
+    dir  = CMAKE(int);
     *dir = _PD.dir_num;
     ret  = PD_write(file, name, "Directory", dir);
 
-    SFREE(dir);
+    CFREE(dir);
 
     if (ret)
        INCR(_PD.dir_num);
@@ -466,8 +465,7 @@ int PD_def_dir(PDBfile *file)
     else
        {ret = _PD_wr_dir(file, "/");
 	if (ret)
-	   file->current_prefix = SC_strsavef("/",
-					      "char*:PD_DEF_DIR:slash");
+	   file->current_prefix = CSTRSAVE("/");
         PD_mkdir(file, "/&ptrs");};
 
     return(ret);}

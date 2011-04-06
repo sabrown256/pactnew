@@ -88,8 +88,7 @@ static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     file->mode = PD_CREATE;
     file->default_offset = 0;
     file->major_order    = ROW_MAJOR_ORDER;
-    file->type           = SC_strsavef(SQL_DATABASE_S,
-				       "char*:_SQL_CREATE:type");
+    file->type           = CSTRSAVE(SQL_DATABASE_S);
 
     _PD_set_standard(file, &TEXT_STD, &TEXT_ALIGNMENT);
 
@@ -153,8 +152,7 @@ static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
     file->default_offset = 0;
     file->major_order    = ROW_MAJOR_ORDER;
-    file->type           = SC_strsavef(SQL_DATABASE_S,
-				       "char*:_SQL_OPEN:type");
+    file->type           = CSTRSAVE(SQL_DATABASE_S);
     if (*mode == 'a')
        file->mode = PD_APPEND;
     else

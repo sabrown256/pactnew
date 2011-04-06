@@ -89,7 +89,7 @@ void _PD_block_free(SC_array *bl)
 
     if (bl != NULL)
        {SC_free_array(bl, NULL);
-	SFREE(bl);};
+	CFREE(bl);};
 
     return;}
 
@@ -121,7 +121,7 @@ void _PD_block_rel(syment *ep)
 
     if (ep->blocks != NULL)
        {SC_free_array(ep->blocks, NULL);
-	SFREE(ep->blocks);};
+	CFREE(ep->blocks);};
 
     return;}
 
@@ -531,7 +531,7 @@ void _PD_block_switch(syment *ep, SC_array *bln)
     _PD_block_free(bln);
 
     bl = ep->blocks;
-    SFREE(bl->array);
+    CFREE(bl->array);
     bl->array = spn;
     bl->n     = nb;
     bl->nx    = nb;
@@ -539,7 +539,7 @@ void _PD_block_switch(syment *ep, SC_array *bln)
 /* GOTCHA: the ref count may be correct because of its origin in bln */
 /*    SC_mark(spn, 1); */
 
-    SFREE(spn);
+    CFREE(spn);
 
     return;}
 

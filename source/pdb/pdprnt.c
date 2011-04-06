@@ -372,14 +372,13 @@ static int _PD_test_recursion(char *type, char *mtype)
     char *dtype;
 
     if (_PD_indirection(mtype))
-       {dtype = PD_dereference(SC_strsavef(mtype,
-                               "char*:_PD_TEST_RECURSION:dtype"));
+       {dtype = PD_dereference(CSTRSAVE(mtype));
         if (strcmp(dtype, type) == 0)
            irec = TRUE;
         else
            irec = FALSE;
 
-        SFREE(dtype);}
+        CFREE(dtype);}
     else
        irec = FALSE;
 
@@ -543,16 +542,15 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	else if (id == SC_CHAR_8_I)
 	   {if (SC_strstr(_SC.types.formats[SC_INT_I], "%s") != NULL)
 	       {cp = (char *) vr;
-		t  = FMAKE_N(char *, ni, "_PD_IO_PRINT:t");
+		t  = CMAKE_N(char *, ni);
 		for (i = 0; i < ni; i++, cp += isz)
-		    {t[i] = FMAKE_N(char, isz + 1,
-                                          "_PD_IO_PRINT:t[]");
+		    {t[i] = CMAKE_N(char, isz + 1);
 		     memcpy(t[i], cp, isz);
 		     t[i][isz] = '\0';};
 		_PD_disp_data(prnt, t, ni, SC_BIT_I, n, ind);
 		for (i = 0; i < ni; i++)
-		    SFREE(t[i]);
-		SFREE(t);}
+		    CFREE(t[i]);
+		CFREE(t);}
 	    else
 	       _PD_disp_data(prnt, vr, isz*ni, 0, n, ind);}
 
@@ -713,8 +711,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 
     status = 0;
 
-    dtype = PD_dereference(SC_strsavef(type,
-				       "char*:_PD_PRINT_INDIRECTION:dtype"));
+    dtype = PD_dereference(CSTRSAVE(type));
 
     strcpy(field, nodename);
     s = field + strlen(field);
@@ -759,7 +756,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 
          before = after;};
 
-    SFREE(dtype);
+    CFREE(dtype);
 
     return(status);}
 
@@ -870,7 +867,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
     if (mem_lst == NULL)
        status &= _PD_io_print(prnt, file, vr, ni, type, n, ind);
     else
-       {s2     = SC_strsavef(prefix, "char*:_PD_PRINT_LEAF:s2");
+       {s2     = CSTRSAVE(prefix);
         nchars = strlen(prefix) + strlen(before) + 1;
 
         if (nchars > 80)
@@ -943,7 +940,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
 
              svr += size;};
 
-        SFREE(s2);
+        CFREE(s2);
         *s = '\0';};
 
     return(status);}

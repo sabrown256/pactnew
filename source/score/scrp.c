@@ -108,14 +108,14 @@ int main(int c, char **v)
 	    break;};
 
     if (i >= c)
-       {tname = MAKE_N(char, PATH_MAX);
+       {tname = CMAKE_N(char, PATH_MAX);
 	nc = PATH_MAX - 1;
 	snprintf(fmt, 80, "%%%ds", nc);
 
         while (scanf(fmt, tname) == 1)
            rv = expand(tname, full_path, nt, dt, rv);
 
-        SFREE(tname);}
+        CFREE(tname);}
 
     else
        for ( ; i < c; i++)

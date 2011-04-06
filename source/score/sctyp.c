@@ -706,8 +706,8 @@ void SC_fin_type_manager(void)
     fmta = _SC.types.formata;
 
     for (i = 0; i < N_TYPES; i++)
-        {SFREE(fmts[i]);
-	 SFREE(fmta[i]);};
+        {CFREE(fmts[i]);
+	 CFREE(fmta[i]);};
 
     SC_free_hasharr(ha, NULL, NULL);
 
@@ -1028,7 +1028,7 @@ void *SC_convert_id(int did, void *d, long od, long ds,
 /* allocate the space if need be */
     if (d == NULL)
        {bpi = SC_type_size_i(did);
-	d   = FMAKE_N(char, n*bpi, "SC_CONVERT_ID:d");};
+	d   = CMAKE_N(char, n*bpi);};
 
     if (_SC_convf[did][sid] != NULL)
        nc = _SC_convf[did][sid](d, od, ds, s, os, ss, n);
@@ -1036,7 +1036,7 @@ void *SC_convert_id(int did, void *d, long od, long ds,
     rv = (nc == n);
 
     if (flag && (rv == TRUE))
-       SFREE(s);
+       CFREE(s);
 
     return(d);}
 
@@ -1114,13 +1114,13 @@ void _SC_set_user_defaults(void)
 
     for (i = 0; i < N_PRIMITIVES; i++)
         {if (ufmts[i] != NULL)
-	    {SFREE(ufmts[i]);};
+	    {CFREE(ufmts[i]);};
 
 	 if (ufmta[i] != NULL)
-	    {SFREE(ufmta[i]);};};
+	    {CFREE(ufmta[i]);};};
 
     if (_SC.types.suppress_member != NULL)
-       {SFREE(_SC.types.suppress_member);};
+       {CFREE(_SC.types.suppress_member);};
 
     return;}
 
@@ -1141,14 +1141,12 @@ void _SC_set_user_formats(void)
 
     for (i = 0; i < N_PRIMITIVES; i++)
         {if (ufmts[i] != NULL)
-	    {SFREE(fmts[i]);
-	     fmts[i] = SC_strsavef(ufmts[i],
-				   "char*:_SC_SET_USER_FORMATS:fmts(i)");};
+	    {CFREE(fmts[i]);
+	     fmts[i] = CSTRSAVE(ufmts[i]);};
 
 	 if (ufmta[i] != NULL)
-	    {SFREE(fmta[i]);
-	     fmta[i] = SC_strsavef(ufmta[i],
-				   "char*:_SC_SET_USER_FORMATS:fmta(i)");};};
+	    {CFREE(fmta[i]);
+	     fmta[i] = CSTRSAVE(ufmta[i]);};};
 
     return;}
 
@@ -1186,13 +1184,13 @@ void _SC_set_format_defaults(void)
 /* fmts is used for scalars */
 
     if (fmts[SC_BIT_I] != NULL)
-       SFREE(fmts[SC_BIT_I]);
+       CFREE(fmts[SC_BIT_I]);
 
     t = SC_strsavef("%x", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
     fmts[SC_BIT_I] = t;
 
     if (fmts[SC_BOOL_I] != NULL)
-       SFREE(fmts[SC_BOOL_I]);
+       CFREE(fmts[SC_BOOL_I]);
 
     t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
     fmts[SC_BOOL_I] = t;
@@ -1201,7 +1199,7 @@ void _SC_set_format_defaults(void)
     for (i = 0; i < N_PRIMITIVE_CHAR; i++)
         {id = i + SC_CHAR_I;
 	 if (fmts[id] != NULL)
-	    SFREE(fmts[id]);
+	    CFREE(fmts[id]);
 
 	 if (id == SC_CHAR_I)
 	    snprintf(tmp, MAXLINE, "%%c");
@@ -1215,7 +1213,7 @@ void _SC_set_format_defaults(void)
     for (i = 0; i < N_PRIMITIVE_FIX; i++)
         {id = i + SC_INT8_I;
 	 if (fmts[id] != NULL)
-	    SFREE(fmts[id]);
+	    CFREE(fmts[id]);
 
 	 if (id == SC_LONG_LONG_I)
 	    snprintf(tmp, MAXLINE, "%%%dlld", fix_pre[i]);
@@ -1231,7 +1229,7 @@ void _SC_set_format_defaults(void)
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {id = i + SC_FLOAT_I;
 	 if (fmts[id] != NULL)
-	    SFREE(fmts[id]);
+	    CFREE(fmts[id]);
 
 	 if (id == SC_LONG_DOUBLE_I)
 	    snprintf(tmp, MAXLINE, "%%# .%dle", fp_pre[i].digits);
@@ -1245,7 +1243,7 @@ void _SC_set_format_defaults(void)
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {id = i + SC_FLOAT_COMPLEX_I;
 	 if (fmts[id] != NULL)
-	    SFREE(fmts[id]);
+	    CFREE(fmts[id]);
 
 	 if (id == SC_LONG_DOUBLE_COMPLEX_I)
 	    snprintf(tmp, MAXLINE, "%%# .%dle + %%# .%dle*I",
@@ -1259,7 +1257,7 @@ void _SC_set_format_defaults(void)
 
 /* other primitive types */
     if (fmts[SC_STRING_I] != NULL)
-       SFREE(fmts[SC_STRING_I]);
+       CFREE(fmts[SC_STRING_I]);
 
     t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(string)");
     fmts[SC_STRING_I] = t;
@@ -1267,7 +1265,7 @@ void _SC_set_format_defaults(void)
 /* fmta is used for arrays */
     for (i = 0; i < N_TYPES; i++)
         {if (fmta[i] != NULL)
-            SFREE(fmta[i]);
+            CFREE(fmta[i]);
 
          t = SC_strsavef(fmts[i],
 			 "PERM|char*:_SC_SET_FORMAT_DEFAULTS:formats2");

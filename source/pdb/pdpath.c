@@ -255,9 +255,9 @@ static void _PD_rl_frame_blocks(PD_smp_state *pa, int nmn, int nmx, long ne)
 static void _PD_rl_frames(PD_smp_state *pa)
    {
 
-    SFREE(FRAME(stack));
-    SFREE(FRAME(lex_bf));
-    SFREE(FRAME_FRAME);
+    CFREE(FRAME(stack));
+    CFREE(FRAME(lex_bf));
+    CFREE(FRAME_FRAME);
 
     return;}
 
@@ -272,7 +272,7 @@ static void _PD_save_stack(PD_smp_state *pa)
     FRAME_N++;
     if (FRAME_N >= FRAME_NX)
        {FRAME_NX += 2;
-        REMAKE_N(FRAME_FRAME, parse_frame, FRAME_NX);};
+        CREMAKE(FRAME_FRAME, parse_frame, FRAME_NX);};
 
     SC_MEM_INIT(parse_frame, &FRAME_OBJ[FRAME_N]);
 
@@ -286,8 +286,8 @@ static void _PD_save_stack(PD_smp_state *pa)
 static void _PD_restore_stack(PD_smp_state *pa)
    {
 
-    SFREE(FRAME(stack));
-    SFREE(FRAME(lex_bf));
+    CFREE(FRAME(stack));
+    CFREE(FRAME(lex_bf));
     FRAME_N--;
 
     return;}
@@ -309,7 +309,7 @@ long _PD_num_indirects(char *type, hasharr *tab)
 
     mtype = _PD_member_base_type(type);
     dp    = PD_inquire_table_type(tab, mtype);
-    SFREE(mtype);
+    CFREE(mtype);
 
     if (dp == NULL)
        PD_error("CAN'T FIND TYPE - _PD_NUM_INDIRECTS", PD_TRACE);
@@ -1159,12 +1159,12 @@ static void _PD_shift(PD_smp_state *pa, char *name, char *type,
     if (FRAME_FRAME == NULL)
        {FRAME_N     = 0;
         FRAME_NX    = 2;
-        FRAME_FRAME = FMAKE_N(parse_frame, FRAME_NX, "_PD_SHIFT:frames");};
+        FRAME_FRAME = CMAKE_N(parse_frame, FRAME_NX);};
 
     FRAME(n)++;
     if (FRAME(n) >= FRAME(nx))
        {FRAME(nx) += 10;
-        REMAKE_N(FRAME(stack), locator, FRAME(nx));};
+        CREMAKE(FRAME(stack), locator, FRAME(nx));};
 
     SC_MEM_INIT(locator, FRAME(stack)+FRAME(n));
 
@@ -1730,9 +1730,9 @@ long _PD_parse_index_expr(char *expr, dimdes *dim, long *pstart,
 
     FRAME_N  = 0;
     FRAME_NX = 2;
-    FRAME_FRAME   = FMAKE_N(parse_frame, FRAME_NX, "_PD_PARSE_INDEX_EXPR:frames");
+    FRAME_FRAME   = CMAKE_N(parse_frame, FRAME_NX);
 
-    FRAME(lex_bf) = SC_strsavef(expr, "char*:_PD_PARSE_INDEX_EXPR:lex_bf");
+    FRAME(lex_bf) = CSTRSAVE(expr);
     FRAME(index)  = 0;
    
 /* count the number of colons in the expression */
@@ -1833,7 +1833,7 @@ static void _PD_disp_rules(PD_smp_state *pa, int rule, char **pvt)
 /*    | postfix_expression OPEN_PAREN index_expression CLOSE_PAREN */
 	case 9:
 	     _PD_do_index(pa, pvt[-1]);
-	     SFREE(pvt[-1]);
+	     CFREE(pvt[-1]);
 	     break;
 
 /*    | postfix_expression DOT primary_expression */
@@ -1852,9 +1852,9 @@ static void _PD_disp_rules(PD_smp_state *pa, int rule, char **pvt)
  */
 	case 13:
 	     snprintf(MSG, MAXLINE, "%s,%s", pvt[-2], pvt[-0]);
-	     SFREE(pvt[-2]);
-	     SFREE(pvt[-0]);
-	     FRAME(val) = SC_strsavef(MSG, "char*:PARSE:COMMA");
+	     CFREE(pvt[-2]);
+	     CFREE(pvt[-0]);
+	     FRAME(val) = CSTRSAVE(MSG);
 	     break;
 
 /* range : index
@@ -1864,9 +1864,9 @@ static void _PD_disp_rules(PD_smp_state *pa, int rule, char **pvt)
 	     if (strcmp(pvt[-2], pvt[-0]) != 0)
 	        HAVE_COLON = TRUE;
 	     snprintf(MSG, MAXLINE, "%s:%s", pvt[-2], pvt[-0]);
-	     SFREE(pvt[-2]);
-	     SFREE(pvt[-0]);
-	     FRAME(val) = SC_strsavef(MSG, "char*:PARSE:COLON");
+	     CFREE(pvt[-2]);
+	     CFREE(pvt[-0]);
+	     FRAME(val) = CSTRSAVE(MSG);
 	     break;
 
 /*       | index COLON index COLON index */
@@ -1874,22 +1874,22 @@ static void _PD_disp_rules(PD_smp_state *pa, int rule, char **pvt)
 	     if (strcmp(pvt[-4], pvt[-2]) != 0)
 	        HAVE_COLON = TRUE;
 	     snprintf(MSG, MAXLINE, "%s:%s:%s", pvt[-4], pvt[-2], pvt[-0]);
-	     SFREE(pvt[-4]);
-	     SFREE(pvt[-2]);
-	     SFREE(pvt[-0]);
-	     FRAME(val) = SC_strsavef(MSG, "char*:PARSE:COLON:COLON");
+	     CFREE(pvt[-4]);
+	     CFREE(pvt[-2]);
+	     CFREE(pvt[-0]);
+	     FRAME(val) = CSTRSAVE(MSG);
 	     break;
 
 /* index : INTEGER */
 	case 17:
 	     snprintf(MSG, MAXLINE, "%ld", NUM_VAL);
-	     FRAME(val) = SC_strsavef(MSG, "char*:PARSE:INTEGER");
+	     FRAME(val) = CSTRSAVE(MSG);
 	     break;
 
 /*       | variable_expression */
 	case 18:
 	     snprintf(MSG, MAXLINE, "%ld", _PD_do_digress(pa, pvt[-0]));
-	     FRAME(val) = SC_strsavef(MSG, "char*:PARSE:VARIABLE_EXPRESSION");
+	     FRAME(val) = CSTRSAVE(MSG);
 	     break;
 
 /* primary_expression : IDENTIFIER */
@@ -2117,17 +2117,17 @@ syment *_PD_effective_ep(PDBfile *file, char *name, int flag, char *fullname)
 
 	FRAME_N      = 0;
         FRAME_NX     = 4;
-        FRAME_FRAME  = FMAKE_N(parse_frame, FRAME_NX, "_PD_EFFECTIVE_EP:frames");
+        FRAME_FRAME  = CMAKE_N(parse_frame, FRAME_NX);
         FRAME(stack) = NULL;
         FRAME(nx)    = 0;};
 
-    FRAME(lex_bf) = SC_strsavef(name, "char*:_PD_EFFECTIVE_EP:lex_bf");
+    FRAME(lex_bf) = CSTRSAVE(name);
     FRAME(index)  = 0;
 
     FRAME(n) = 0L;
     if (FRAME(stack) == NULL)
        {FRAME(nx)   += 10;
-	FRAME(stack) = FMAKE_N(locator, 10, "_PD_EFFECTIVE_EP:loc_stack");};
+	FRAME(stack) = CMAKE_N(locator, 10);};
 
     switch (SETJMP(pa->trace_err))
        {case ABORT :

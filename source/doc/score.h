@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 04/05/2011
+MOD: 04/06/2011
 
 <CENTER>
 <P>
@@ -597,8 +597,7 @@ being added to the list (arrays may be used as values!);
 <em>val</em>, a pointer to the values to be added to the list;
 and, in FORTRAN, <em>nv</em>, the number of values to be added.
 In the C binding val must have been
-dynamically allocated with <tt>MAKE</tt>, <tt>MAKE_N</tt>, <tt>FMAKE</tt>, 
-<tt>FMAKE_N</tt>, or <tt>SC_alloc</tt>.
+dynamically allocated with <tt>CMAKE</tt>, <tt>CMAKE_N</tt>, or <tt>SC_alloc</tt>.
 <p>
 
 <pre>
@@ -1068,7 +1067,7 @@ specifies the types by id.  The arguments are:
    OS         an offset from the start of S
    SS         a stride thru S
    N          the number of elements to convert
-   FLAG       if TRUE the source array is freed with SFREE
+   FLAG       if TRUE the source array is freed with CFREE
 </pre>
 If D is NULL a new space of the apropriate size will be allocated
 and returned.
@@ -1109,7 +1108,7 @@ Example:
 
        SC_VA_START(n);
 
-       a = MAKE_N(int, n);
+       a = CMAKE_N(int, n);
 
        while ((id = SC_VA_ARG(int)) != -1)
           {if (SC_is_type_num(id) == TRUE)
@@ -1261,7 +1260,7 @@ Some applications use dynamic memory in very complex ways which make it
 difficult to know when it is safe to release a piece of dynamically
 allocated memory.  Reference counting is a good technique in many cases.
 The SCORE memory manager provides functions to let applications tag
-pointers with the number of references and <tt>SC_free</tt> (and <tt>SFREE</tt>)
+pointers with the number of references and <tt>SC_free</tt> (and <tt>CFREE</tt>)
 act properly with respect to the number of references.
 <p>
 
@@ -1767,7 +1766,7 @@ The pointer should be cast to the appropriate type in C.
 <p>
 
 <pre>
-<I>C Binding: </I>char *SC_strsave(char *s)
+<I>C Binding: </I>char *CSTRSAVE(char *s)
 <I>F77 Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
@@ -1812,8 +1811,8 @@ Undo the trap on pointer setup by a call to <tt>SC_trap_pointer</tt>.
 Use the C library memory management functions directly for allocation, reallocation
 and freeing memory.  This function and <tt>SC_use_score_mm</tt> set the SCORE memory
 manager hooks to the appropriate set of lower level functions to be called.  These
-hooks can only be accessed by using the SCORE memory manager macros (<tt>MAKE</tt>, 
-<tt>FMAKE</tt>, etc.) to allocate, reallocate and free memory. 
+hooks can only be accessed by using the SCORE memory manager macros
+(<tt>CMAKE</tt>, etc.) to allocate, reallocate and free memory. 
 <p>
 
 <pre>
@@ -1842,16 +1841,17 @@ Turn on memory protection if the argument is not 0 and turn it off otherwise.
 <p>
 
 <pre>
-<I>C Binding: </I>type *FMAKE(type, name)
+<I>C Binding: </I>type *CMAKE(type)
 <I>F77 Binding: </I> use scmakf
 <I>SX Binding: memory management is automatic</I> 
 <I>Python Binding: </I>
 </pre>
 
 Allocate a new space in memory the size of type and return a pointer to it which
-has been cast to <em>type *</em>.  Associate name <em>name</em> with the returned block of
-memory.  This name will be printed in the report written via a call to <tt>SC_mem_map</tt>
-to aid in ferreting out memory leaks.  In the C binding this is a macro and type is a primitive
+has been cast to <em>type *</em>.  This macro attaches a name to the returned memory
+block generated from standard C99 predefined macros and will be printed in
+the report written via a call to <tt>SC_mem_map</tt> to aid in ferreting out
+memory leaks.  In the C binding this is a macro and type is a primitive
 or derived type specifier.<p>
 Returns a non-NULL pointer to a newly allocated space if successful and NULL if not.
 <p>
@@ -1859,7 +1859,7 @@ Fortran binding returns 1 iff successful.
 <p>
 
 <pre>
-<I>C Binding: </I>type *FMAKE_N(type, long ni, name)
+<I>C Binding: </I>type *CMAKE_N(type, long ni)
 <I>F77 Binding: </I>integer scmakf(pointer ptr, integer ni, integer bpi,
                                    integer nc, char *name)
 <I>SX Binding: memory management is automatic</I>
@@ -1871,8 +1871,8 @@ Allocate a new space in memory for <em>ni</em> items the size of type (C) or
 each (FORTRAN) and return a pointer to it. In the C binding, which is a macro,
 <em>type</em> is a primitive or derived type specifier,
 and the return value is a pointer
-cast to <em>type *</em>. Name <em>name</em> will be associated with the returned
-block of memory.  See documentation of <tt>FMAKE</tt> above.  In the FORTRAN binding, 
+cast to <em>type *</em>. See documentation of <tt>CMAKE</tt> above concerning
+naming of memory blocks.  In the FORTRAN binding, 
 which is intended for use in FORTRAN implementations which support the integer 
 (a.k.a cray) pointer extension, <em>ptr</em> is a pointer (e.g. <tt>ipa</tt> of 
 <tt>pointer (ipa, a)</tt>).  <em>Name</em> is the name to be associated with the
@@ -1883,41 +1883,7 @@ and NULL if not. The FORTRAN binding returns 1 if successful and 0 if not.
 <p>
 
 <pre>
-<I>C Binding: </I>type *MAKE(type)
-<I>F77 Binding: </I> use scmake
-<I>SX Binding: memory management is automatic</I> 
-<I>Python Binding: </I>
-</pre>
-
-Allocate a new space in memory the size of type and return a pointer to it which
-has been cast to type *.  In the C binding this is a macro and type is a primitive
-or derived type specifier.<p>
-Returns a non-NULL pointer to a newly allocated space if successful and NULL if not.
-<p>
-Fortran binding returns 1 iff successful.
-<p>
-
-<pre>
-<I>C Binding: </I>type *MAKE_N(type, long ni)
-<I>F77 Binding: </I>integer scmake(pointer ptr, integer ni, integer bpi)
-<I>SX Binding: memory management is automatic</I>
-<I>Python Binding: </I>
-</pre>
-
-Allocate a new space in memory for <em>ni</em> items the size of type (C) or
-<em>bpi</em> bytes
-each (FORTRAN) and return a pointer to it. In the C binding, which is a macro,
-<em>type</em> is a primitive or derived type specifier,
-and the return value is a pointer
-cast to <em>type *</em>. In the FORTRAN binding, which is intended for use in FORTRAN
-implementations which support the integer (a.k.a cray) pointer extension,
-<em>ptr</em> is a pointer (e.g. <tt>ipa</tt> of <tt>pointer (ipa, a)</tt>).<p>
-The C binding returns a non-NULL pointer to a newly allocated space if successful
-and NULL if not. The FORTRAN binding returns 1 if successful and 0 if not.
-<p>
-
-<pre>
-<I>C Binding: </I>type *REMAKE(void *ptr, type)
+<I>C Binding: </I>type *CREMAKE(void *ptr, type)
 <I>F77 Binding: use</I> screma
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
@@ -1933,7 +1899,7 @@ Returns a non-NULL pointer to a reallocated space if successful and NULL if not.
 <p>
 
 <pre>
-<I>C Binding: </I>type *REMAKE_N(void *ptr, type, long ni)
+<I>C Binding: </I>type *CREMAKE_N(void *ptr, type, long ni)
 <I>F77 Binding: </I>integer screma(pointer ptr, integer ni, integer bpi)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
@@ -1953,7 +1919,7 @@ and NULL if not. The FORTRAN binding returns 1 if successful and 0 if not.
 <p>
 
 <pre>
-<I>C Binding: </I>void SFREE(void *ptr)
+<I>C Binding: </I>void CFREE(void *ptr)
 <I>F77 Binding: </I>integer scfree(pointer ptr)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
@@ -2142,7 +2108,7 @@ Is the string the name of an existing ascii file?
 
 Search a list of directories for a file and return the full path name
 if the file exists.  The return string is dynamically allocated and
-the application is responsible for releasing it with <tt>SFREE</tt>.
+the application is responsible for releasing it with <tt>CFREE</tt>.
 <p>
 
 <a name="score.io">

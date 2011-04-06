@@ -19,13 +19,12 @@
 #undef MAKE
 #undef MAKE_N
 #undef REMAKE
-#undef REMAKE_N
+#undef REMAKE
 #undef SFREE
 
 #define MAKE(_t)              ((_t *) malloc(sizeof(_t)))
 #define MAKE_N(_t, _n)        ((_t *) malloc((_n)*sizeof(_t)))
-#define REMAKE(_p, _t)        (_p = (_t *) realloc(_p, sizeof(_t)))
-#define REMAKE_N(_p, _t, _n)  (_p = (_t *) realloc(_p, (_n)*sizeof(_t)))
+#define REMAKE(_p, _t, _n)    (_p = (_t *) realloc(_p, (_n)*sizeof(_t)))
 #define SFREE(_p)                                                            \
    {free(_p);                                                                \
     _p = NULL;}
@@ -15574,7 +15573,7 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 	if (numInputFileEntries == maxInputFileEntries)
  	   {maxInputFileEntries += INPUT_ENTRY_BLOCK_SIZE;
 
-	    REMAKE_N(inputFileEntries, InputFileEntry *,  maxInputFileEntries);};
+	    REMAKE(inputFileEntries, InputFileEntry *,  maxInputFileEntries);};
 
 	if (inputFileEntries == NULL)
 	   return;

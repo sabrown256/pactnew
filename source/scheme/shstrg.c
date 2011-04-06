@@ -30,8 +30,8 @@ static object *_SS_strcmp(object *argl, int (*func)(char *s1, char *s2))
     cmp = func(s1, s2);
     rv  = (cmp == TRUE) ? SS_t : SS_f;
 
-    SFREE(s1);
-    SFREE(s2);
+    CFREE(s1);
+    CFREE(s2);
 
     return(rv);}
 
@@ -58,8 +58,8 @@ static object *_SS_cistrcmp(object *argl, int (*func)(char *s1, char *s2))
     cmp = func(s1, s2);
     rv  = (cmp == TRUE) ? SS_t : SS_f;
 
-    SFREE(s1);
-    SFREE(s2);
+    CFREE(s1);
+    CFREE(s2);
 
     return(rv);}
 
@@ -290,7 +290,7 @@ static object *_SSI_strref(object *argl)
     c  = s[n];
     rv = SS_mk_char(c);
 
-    SFREE(s);
+    CFREE(s);
 
     return(rv);}
 
@@ -310,7 +310,7 @@ static object *_SSI_strcpy(object *argl)
 
     str = SS_mk_string(s);
 
-    SFREE(s);
+    CFREE(s);
 
     return(str);}
 
@@ -389,7 +389,7 @@ static object *_SSI_strsub(object *argl)
     s[n2] = '\0';
     str   = SS_mk_string(&s[n1]);
 
-    SFREE(s);
+    CFREE(s);
 
     return(str);}
 
@@ -404,7 +404,7 @@ static object *_SSI_string(object *argl)
     object *str;
 
     n = SS_length(argl);
-    t = FMAKE_N(char, n+2, "_SSI_STRING:t");
+    t = CMAKE_N(char, n+2);
     for (i = 0; i < n; i++, argl = SS_cdr(argl))
         {str = SS_car(argl);
          if (SS_charobjp(str))
@@ -413,7 +413,7 @@ static object *_SSI_string(object *argl)
 
     t[i] = '\0';
     str  = SS_mk_string(t);
-    SFREE(t);
+    CFREE(t);
 
     return(str);}
 
@@ -427,20 +427,20 @@ static object *_SSI_strapp(object *argl)
     char *s, *t;
     object *ths;
 
-    t = FMAKE(char, "_SSI_STRAPP:t");
+    t = CMAKE(char);
     *t = '\0';
     for (n = 1; SS_consp(argl); argl = SS_cdr(argl))
         {ths = SS_car(argl);
          if (SS_stringp(ths))
             {n += SS_STRING_LENGTH(ths);
-             s  = FMAKE_N(char, n, "_SSI_STRAPP:s");
+             s  = CMAKE_N(char, n);
              strcpy(s, t);
              SC_strcat(s, n, SS_STRING_TEXT(ths));
-             SFREE(t);
+             CFREE(t);
              t = s;};};
 
     ths = SS_mk_string(t);
-    SFREE(t);
+    CFREE(t);
 
     return(ths);}
 
@@ -481,7 +481,7 @@ static object *_SSI_lststr(object *argl)
        SS_error("ARGUMENT MUST BE LIST - LIST->STRING", argl);
 
     n = SS_length(argl);
-    s = FMAKE_N(char, n+1, "_SSI_LSTSTR:s");
+    s = CMAKE_N(char, n+1);
     for (i = 0; SS_consp(argl); argl = SS_cdr(argl))
         {ths = SS_car(argl);
          if (SS_charobjp(ths))
@@ -489,7 +489,7 @@ static object *_SSI_lststr(object *argl)
     s[i] = '\0';
 
     str = SS_mk_string(s);
-    SFREE(s);
+    CFREE(s);
 
     return(str);}
 
@@ -580,7 +580,7 @@ static object *_SSI_mk_str(object *argl)
             SC_INT_I, &c,
             0);
 
-    s = FMAKE_N(char, n+2, "char*:_SSI_MK_STR:s");
+    s = CMAKE_N(char, n+2);
 
     memset(s, c, n);
     s[n] = '\0';
@@ -614,7 +614,7 @@ static object *_SSI_strnum(object *argl)
        {r  = ATOF(text);
 	rv = SS_mk_float(r);};
 
-    SFREE(text);
+    CFREE(text);
 
     return(rv);}
 
@@ -637,8 +637,8 @@ static object *_SSI_strchr(object *argl)
     s  = strchr(text, (int) delim[0]);
     rv = (s == NULL) ? SS_null : SS_mk_string(s);
 
-    SFREE(text);
-    SFREE(delim);
+    CFREE(text);
+    CFREE(delim);
 
     return(rv);}
 
@@ -661,8 +661,8 @@ static object *_SSI_strstr(object *argl)
     s  = strstr(cs, ct);
     rv = (s == NULL) ? SS_null : SS_mk_string(s);
 
-    SFREE(cs);
-    SFREE(ct);
+    CFREE(cs);
+    CFREE(ct);
 
     return(rv);}
 
@@ -688,8 +688,8 @@ static object *_SSI_strcasestr(object *argl)
     s  = strstr(cs, ct);
     rv = (s == NULL) ? SS_null : SS_mk_string(s);
 
-    SFREE(cs);
-    SFREE(ct);
+    CFREE(cs);
+    CFREE(ct);
 
     return(rv);}
 
@@ -721,8 +721,8 @@ static object *_SSI_istrchr(object *argl)
 
     rv = SS_mk_integer(ind);
 
-    SFREE(text);
-    SFREE(delim);
+    CFREE(text);
+    CFREE(delim);
 
     return(rv);}
 
@@ -751,8 +751,8 @@ static object *_SSI_istrstr(object *argl)
 
     rv = SS_mk_integer(ind);
 
-    SFREE(cs);
-    SFREE(ct);
+    CFREE(cs);
+    CFREE(ct);
 
     return(rv);}
 
@@ -777,8 +777,8 @@ static object *_SSI_blankstr(object *argl)
 
     rv = (ok == TRUE) ? SS_t : SS_f;
 
-    SFREE(cs);
-    SFREE(ct);
+    CFREE(cs);
+    CFREE(ct);
 
     return(rv);}
 
@@ -810,8 +810,8 @@ static object *_SSI_trim(object *argl)
 
     rv = SS_mk_string(r);
 
-    SFREE(s);
-    SFREE(d);
+    CFREE(s);
+    CFREE(d);
 
     return(rv);}
 
@@ -879,7 +879,7 @@ static object *_SS_strtok(object *argl, char *(*fnc)(char *, char *))
 
     rv = (ps == NULL) ? SS_null : SS_mk_string(ps);
 
-    SFREE(delim);
+    CFREE(delim);
 
     return(rv);}
 

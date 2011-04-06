@@ -178,7 +178,7 @@ char *SC_getcwd(void)
     sz = pathconf(".", _PC_PATH_MAX);
 #endif
 
-    vr = FMAKE_N(char, sz, "SC_GETCWD:vr");
+    vr = CMAKE_N(char, sz);
     if (vr != NULL)
        wd = getcwd(vr, (size_t) sz);
 
@@ -219,7 +219,7 @@ int SC_file_path(char *name, char *path, int nc, int full)
         case '.' :
 	     t = SC_getcwd();
              _SC_handle_path_dot(fp, t, name);
-	     SFREE(t);
+	     CFREE(t);
 
              n = strlen(fp);
 	     p = fp;
@@ -263,7 +263,7 @@ int SC_full_path(char *name, char *path, int nc)
         case '.' :
 	     t = SC_getcwd();
              _SC_handle_path_dot(fp, t, name);
-	     SFREE(t);
+	     CFREE(t);
 	     n = _SC_is_executable_file(path, fp, nc);
              break;
 
@@ -323,14 +323,14 @@ void SC_init_path(int nd, ...)
         {var = SC_VA_ARG(char *);
 	 ptr = getenv(var);
          if (ptr != NULL)
-            {bf  = SC_strsavef(ptr, "SC_INIT_PATH:bf");
+            {bf  = CSTRSAVE(ptr);
              ptr = bf;
 
              while ((token = SC_strtok(ptr, delim, s)) != NULL)
                 {SC_array_string_add_copy(_SC.path, token);
                  ptr = NULL;};
 
-	     SFREE(bf);};};
+	     CFREE(bf);};};
 
     SC_VA_END;
 
@@ -358,14 +358,14 @@ SC_array *SC_make_search_path(int nd, ...)
     for (j = 0; j < nd; j++)
         {ptr = getenv(SC_VA_ARG(char *));
          if (ptr != NULL)
-            {bf  = SC_strsavef(ptr, "SC_MAKE_SEARCH_PATH:bf");
+            {bf  = CSTRSAVE(ptr);
              ptr = bf;
 
              while ((token = SC_strtok(ptr, delim, t)) != NULL)
                 {SC_array_string_add_copy(path, token);
                  ptr = NULL;};
 
-             SFREE(bf);};};
+             CFREE(bf);};};
 
     SC_VA_END;
 
@@ -606,7 +606,7 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
         if (SC_query_file(bp, mode, type))
            rv = bp;
 	else
-	   {SFREE(bp);};}
+	   {CFREE(bp);};}
 
     else if (name[0] == '~')
        {char pth[MAXLINE];
@@ -618,16 +618,16 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 
         cmnd   = SC_dsnprintf(TRUE, "echo %s", name);
         output = SC_syscmnd(cmnd);
-        SFREE(cmnd);
+        CFREE(cmnd);
 
         if ((output != NULL) &&
             (output[0] != NULL))
 	   {strcpy(pth, output[0]);
-            SFREE(output[0]);
-            SFREE(output);}
+            CFREE(output[0]);
+            CFREE(output);}
 
         if (SC_query_file(pth, mode, type))
-           rv = SC_strsavef(pth, "_SC_SEARCH_FILE:pth");}
+           rv = CSTRSAVE(pth);}
 
     else
        {if (path == NULL)
@@ -646,7 +646,7 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 	        {rv = bp;
 	         break;};
 
-	     SFREE(bp);};};
+	     CFREE(bp);};};
 
     return(rv);}
  
@@ -654,7 +654,7 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 /*--------------------------------------------------------------------------*/
 
 /* SC_GET_SEARCH_PATH - return a pointer to the path array
- *                    - the caller must SFREE it
+ *                    - the caller must CFREE it
  */
 
 char **SC_get_search_path(void)
@@ -683,7 +683,7 @@ char *SC_search_file(char **path, char *name)
     s = _SC_search_file(path, name, NULL, NULL);
 
     if (ok == TRUE)
-       SFREE(path);
+       CFREE(path);
 
     return(s);}
 
@@ -895,9 +895,7 @@ pcons *SC_add_alist(pcons *alist, char *name, char *type, void *val)
    {pcons *rv;
 
     rv = SC_mk_pcons(SC_PCONS_P_S,
-		     SC_mk_pcons(SC_STRING_S,
-				 SC_strsavef(name, "char*:SC_ADD_ALIST:name"),
-				 type, val),
+		     SC_mk_pcons(SC_STRING_S, CSTRSAVE(name), type, val),
 		     SC_PCONS_P_S, alist);
 
     return(rv);}
@@ -951,10 +949,10 @@ pcons *SC_change_alist(pcons *alist, char *name, char *type, void *val)
        rv = SC_add_alist(alist, name, type, val);
 
     else
-       {SFREE(pc->cdr_type);
-        pc->cdr_type = SC_strsavef(type, "char*:SC_CHANGE_ALIST:type");
+       {CFREE(pc->cdr_type);
+        pc->cdr_type = CSTRSAVE(type);
 
-        SFREE(pc->cdr);
+        CFREE(pc->cdr);
         pc->cdr = val;
         SC_mark(val, 1);
 
@@ -989,7 +987,7 @@ pcons *SC_make_pcons(char *cat, int ma, void *ca,
 		     char *cdt, int md, void *cd)
    {pcons *cp;
 
-    cp = FMAKE(pcons, "SC_MAKE_PCONS:cp");
+    cp = CMAKE(pcons);
     cp->car = ca;
     cp->cdr = cd;
 
@@ -1000,10 +998,10 @@ pcons *SC_make_pcons(char *cat, int ma, void *ca,
        SC_mark(cd, 1);
 
     if (cat != NULL)
-       cp->car_type = SC_strsavef(cat, "char*:SC_MAKE_PCONS:car_type");
+       cp->car_type = CSTRSAVE(cat);
 
     if (cdt != NULL)
-       cp->cdr_type = SC_strsavef(cdt, "char*:SC_MAKE_PCONS:cdr_type");
+       cp->cdr_type = CSTRSAVE(cdt);
 
     return(cp);}
 
@@ -1033,17 +1031,17 @@ void SC_rl_pcons(pcons *cp, int level)
 
     if (cp != NULL)
        {if (level & 1)
-	   {SFREE(cp->car);};
+	   {CFREE(cp->car);};
 	cp->car = NULL;
 
 	if (level & 2)
-	   {SFREE(cp->cdr);};
+	   {CFREE(cp->cdr);};
 	cp->cdr = NULL;
 
-	SFREE(cp->car_type);
-	SFREE(cp->cdr_type);
+	CFREE(cp->car_type);
+	CFREE(cp->cdr_type);
 
-	SFREE(cp);};
+	CFREE(cp);};
 
     return;}
 

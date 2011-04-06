@@ -75,10 +75,10 @@ static object *_UL_fft(object *argl, char *type, int no, int flag, int ordr)
     lbl = SC_dsnprintf(FALSE, "Imaginary part %s %c %c", type, crvr->id, crvi->id);
     ch2 = SX_mk_curve(no, x, y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(x);
-    SFREE(y);
-    SFREE(icy);
-    SFREE(cy);
+    CFREE(x);
+    CFREE(y);
+    CFREE(icy);
+    CFREE(cy);
 
     rv = SS_make_list(SS_OBJECT_I, ch1,
 		      SS_OBJECT_I, ch2,
@@ -125,9 +125,9 @@ object *UL_fft(int j)
     lbl = SC_dsnprintf(FALSE, "Imaginary part FFT %c", crv->id);
     cim = SX_mk_curve(n, x, y, lbl, NULL, (PFVoid) UL_plot);
 
-    SFREE(x);
-    SFREE(y);
-    SFREE(cy);
+    CFREE(x);
+    CFREE(y);
+    CFREE(cy);
 
     rv = SS_make_list(SS_OBJECT_I, cre,
 		      SS_OBJECT_I, cim,
@@ -458,7 +458,7 @@ object *UL_fit(object *obj, object *tok)
                      SX_mk_curve(SX_default_npts, p[0], p[1],
 				 lbl, NULL, (PFVoid) UL_plot));
 
-    SFREE(cf);
+    CFREE(cf);
 
     PM_free_vectors(2, p);
 
@@ -570,8 +570,8 @@ static object *_ULI_fit_curve(object *argl)
     PM_destroy(a);
     PM_destroy(ay);
     PM_destroy(solution);
-    SFREE(UL_buf1y);
-    SFREE(curid);
+    CFREE(UL_buf1y);
+    CFREE(curid);
         
     return(ch);}
         
@@ -655,9 +655,8 @@ static object *_ULI_mk_palette(object *argl)
        {dev->current_palette = pal;
 	fname = SC_dsnprintf(FALSE, "%s.pal", name);
         if (SX_current_palette != NULL)
-               SFREE(SX_current_palette);
-        SX_current_palette = SC_strsavef(fname,
-					 "char*:_ULI_MK_PALETTE:cp");
+               CFREE(SX_current_palette);
+        SX_current_palette = CSTRSAVE(fname);
 	PG_wr_palette(dev, pal, fname);};
 
     return(SS_f);}
@@ -685,9 +684,9 @@ static object *_ULI_rd_palette(object *argl)
 	if (pal != NULL)
 	   {dev->current_palette = pal;
             if (SX_current_palette != NULL)
-               SFREE(SX_current_palette);
+               CFREE(SX_current_palette);
             SX_current_palette = 
-               SC_strsavef(name, "char*:_ULI_RD_PALETTE:SX_CURRENT_PALETTE");};};
+               CSTRSAVE(name);};};
 
     return(SS_f);}
 
@@ -807,11 +806,11 @@ static object *_ULI_edit(int ie)
 		  x[1][k]   = x[1][k+1];
                   indx[k] = indx[k+1];};};};
 
-    SFREE(indx);
+    CFREE(indx);
 
 /* resize the xp and yp arrays */
-    REMAKE_N(crv->x[0], double, n);
-    REMAKE_N(crv->x[1], double, n);
+    CREMAKE(crv->x[0], double, n);
+    CREMAKE(crv->x[1], double, n);
 
     crv->n = n;
 

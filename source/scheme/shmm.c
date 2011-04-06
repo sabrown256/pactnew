@@ -49,7 +49,7 @@ int
 C_procedure *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr)
    {C_procedure *cp;
 
-    cp = FMAKE(C_procedure, "_SS_MK_C_PROC:cp");
+    cp = CMAKE(C_procedure);
     if (cp != NULL)
        {cp->handler = phand;
 	cp->n       = n;
@@ -65,8 +65,8 @@ C_procedure *_SS_mk_C_proc(PFPHand phand, int n, PFVoid *pr)
 void _SS_rl_C_proc(C_procedure *cp)
    {
 
-    SFREE(cp->proc);
-    SFREE(cp);
+    CFREE(cp->proc);
+    CFREE(cp);
 
     return;}
 
@@ -80,7 +80,7 @@ C_procedure *_SS_mk_C_proc_va(PFPHand phand, int n, ...)
     C_procedure *cp;
     PFVoid *pr;
 
-    pr = FMAKE_N(PFVoid, n, "_SS_MK_C_PROC_VA:pr");
+    pr = CMAKE_N(PFVoid, n);
 
     SC_VA_START(n);
     for (i = 0; i < n; i++)
@@ -101,15 +101,15 @@ procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
    {char *ds, *ns;
     procedure *pp;
 
-    pp = FMAKE(procedure, "_SS_MK_SCHEME_PROC:pp");
+    pp = CMAKE(procedure);
     if (pp != NULL)
        {ds = NULL;
 	if (pdoc != NULL)
-	   ds = SC_strsavef(pdoc, "char*:_SS_MK_SCHEME_PROC:doc");
+	   ds = CSTRSAVE(pdoc);
 
 	ns = NULL;
 	if (pname != NULL)
-	   ns = SC_strsavef(pname, "char*:_SS_MK_SCHEME_PROC:name");
+	   ns = CSTRSAVE(pname);
 
 	pp->doc   = ds;
 	pp->name  = ns;
@@ -189,7 +189,7 @@ void SS_install(char* pname, char *pdoc, PFPHand phand, ...)
    {SS_form ptype;
     PFVoid *pr;
 
-    pr = FMAKE(PFVoid, "SS_INSTALL:pr");
+    pr = CMAKE(PFVoid);
 
     SC_VA_START(phand);
     pr[0] = SC_VA_ARG(PFVoid);
@@ -215,7 +215,7 @@ void SS_install(char* pname, char *pdoc, PFPHand phand, ...)
 static void _SS_rl_char(object *obj)
    {
 
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -235,8 +235,8 @@ static void _SS_rl_vector(object *obj)
     for (i = 0; i < k; i++)
         {SS_Assign(va[i], SS_null);};
 
-    SFREE(va);
-    SFREE(SS_OBJECT(obj));
+    CFREE(va);
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -252,7 +252,7 @@ static void _SS_rl_vector(object *obj)
 static void _SS_rl_integer(object *obj)
    {
 
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -265,7 +265,7 @@ static void _SS_rl_integer(object *obj)
 static void _SS_rl_float(object *obj)
    {
 
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -278,7 +278,7 @@ static void _SS_rl_float(object *obj)
 static void _SS_rl_complex(object *obj)
    {
 
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -291,7 +291,7 @@ static void _SS_rl_complex(object *obj)
 static void _SS_rl_quaternion(object *obj)
    {
 
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -304,8 +304,8 @@ static void _SS_rl_quaternion(object *obj)
 static void _SS_rl_string(object *obj)
    {
 
-    SFREE(SS_STRING_TEXT(obj));
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_STRING_TEXT(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -318,8 +318,8 @@ static void _SS_rl_string(object *obj)
 static void _SS_rl_variable(object *obj)
    {
 
-    SFREE(SS_VARIABLE_NAME(obj));
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_VARIABLE_NAME(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -343,7 +343,7 @@ static void _SS_rl_cons(object *obj)
 
 /* if more than 1 reference simply reduce the reference count */
 	if (nr > 1)
-           {SFREE(lst);}
+           {CFREE(lst);}
 
 	else
 	   {cdr = SS_cdr(lst);
@@ -351,7 +351,7 @@ static void _SS_rl_cons(object *obj)
 
 /* free the cons cell now that the car and cdr have been extracted */
 	    cell = SS_OBJECT(lst); 
-	    SFREE(cell);
+	    CFREE(cell);
 
 /* free the object that wrapped the cell */
 	    SS_rl_object(lst);
@@ -392,7 +392,7 @@ static void _SS_rl_procedure(object *obj)
 	     SS_GC(sp->name);
 	     SS_GC(sp->lambda);
 /*	     SS_GC(sp->env); */
-	     SFREE(sp);
+	     CFREE(sp);
 
         case SS_PR_PROC  :
         case SS_UR_MACRO :
@@ -400,13 +400,13 @@ static void _SS_rl_procedure(object *obj)
         case SS_UE_MACRO :
         case SS_ESC_PROC :
 	     pr = pp->proc;
-             SFREE(pr);
+             CFREE(pr);
         default :
              break;};
 
 /* release the name of the procedure */
-    SFREE(pp->name);
-    SFREE(pp);
+    CFREE(pp->name);
+    CFREE(pp);
 
 /* free the object wrapper of the procedure */
     SS_rl_object(obj);
@@ -425,8 +425,8 @@ static void _SS_rl_inport(object *obj)
 
     name = SS_IFILE_NAME(obj);
 
-    SFREE(name);
-    SFREE(SS_OBJECT(obj));
+    CFREE(name);
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -443,8 +443,8 @@ static void _SS_rl_outport(object *obj)
 
     name = SS_OFILE_NAME(obj);
 
-    SFREE(name);
-    SFREE(SS_OBJECT(obj));
+    CFREE(name);
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -457,8 +457,8 @@ static void _SS_rl_outport(object *obj)
 static void _SS_rl_boolean(object *obj)
    {
 
-    SFREE(SS_BOOLEAN_NAME(obj));
-    SFREE(SS_OBJECT(obj));
+    CFREE(SS_BOOLEAN_NAME(obj));
+    CFREE(SS_OBJECT(obj));
     SS_rl_object(obj);
 
     return;}
@@ -474,7 +474,7 @@ void SS_rl_object(object *obj)
     if (_SS.trace_object == obj)
        PRINT(stdout, "free>  %p\n", obj);
 
-    SFREE(obj);
+    CFREE(obj);
 
     return;}
 
@@ -496,7 +496,7 @@ void SS_gc(object *obj)
        return;
 
     if ((SS_OBJECT_GC(obj) != 1) || (obj->val == NULL))
-       {SFREE(obj);}
+       {CFREE(obj);}
     else
        SS_OBJECT_FREE(obj);
 
@@ -605,7 +605,7 @@ object *SS_mk_procedure(object *name, object *lam_exp, object *penv)
     procedure *pp;
     object *op;
 
-    sp = FMAKE(S_procedure, "SS_MK_PROCEDURE:sp");
+    sp = CMAKE(S_procedure);
 
 /* it is a circular gc problem to have a procedure point
  * to the environment in which it is defined
@@ -619,11 +619,11 @@ object *SS_mk_procedure(object *name, object *lam_exp, object *penv)
     SS_MARK(sp->lambda);
 /*    SS_MARK(sp->env); */
 
-    pp = FMAKE(procedure, "SS_MK_PROCEDURE:pp");
+    pp = CMAKE(procedure);
 
     pp->type  = SS_PROC;
     pp->doc   = NULL;
-    pp->name  = SC_strsavef("lambda", "char*:SS_MK_PROCEDURE:name");
+    pp->name  = CSTRSAVE("lambda");
     pp->trace = FALSE;
     pp->proc  = (object *) sp;
 
@@ -645,16 +645,16 @@ object *SS_mk_esc_proc(int err, int type)
     cont = SS_cont_ptr;
     stck = SC_array_get_n(SS_stack) - 1;
 
-    ep = FMAKE(Esc_procedure, "SS_MK_ESC_PROC:ep");
+    ep = CMAKE(Esc_procedure);
     ep->cont = cont;
     ep->stck = stck;
     ep->err  = err;
     ep->type = type;
 
-    pp = FMAKE(procedure, "SS_MK_ESC_PROC:pp");
+    pp = CMAKE(procedure);
     pp->type = SS_ESC_PROC;
     pp->proc = (object *) ep;
-    pp->name = SC_strsavef("escape", "char*:SS_MK_ESC_PROC:name");
+    pp->name = CSTRSAVE("escape");
 
     op = SS_mk_proc_object(pp);
 
@@ -669,8 +669,8 @@ object *SS_mk_variable(char *n, object *v)
    {variable *vp;
     object *op;
 
-    vp = FMAKE(variable, "SS_MK_VARIABLE:vp");
-    vp->name  = SC_strsavef(n, "char*:SS_MK_VARIABLE:name");
+    vp = CMAKE(variable);
+    vp->name  = CSTRSAVE(n);
     vp->value = v;
 
     op = SS_mk_object(vp, SS_VARIABLE_I, VAR_EV, vp->name,
@@ -688,9 +688,9 @@ object *SS_mk_string(char *s)
     object *op;
 
     if (s != NULL)
-       {sp = FMAKE(string, "SS_MK_STRING:sp");
+       {sp = CMAKE(string);
 	sp->length = strlen(s);
-	sp->string = SC_strsavef(s, "char*:SS_MK_STRING:string");
+	sp->string = CSTRSAVE(s);
 
 	op = SS_mk_object(sp, SC_STRING_I, SELF_EV, sp->string,
 			  SS_wr_atm, _SS_rl_string);}
@@ -710,8 +710,8 @@ object *SS_mk_inport(FILE *str, char *name)
    {input_port *pp;
     object *op;
 
-    pp = FMAKE(input_port, "SS_MK_INPORT:pp");
-    pp->name = SC_strsavef(name, "SS_MK_INPORT:name");
+    pp = CMAKE(input_port);
+    pp->name = CSTRSAVE(name);
     pp->iln  = 1;
     pp->ichr = 1;
     pp->str  = str;
@@ -737,8 +737,8 @@ object *SS_mk_outport(FILE *str, char *name)
     if (str != NULL)
        SC_setbuf(str, NULL);
 
-    pp = FMAKE(output_port, "SS_MK_OUTPORT:pp");
-    pp->name = SC_strsavef(name, "SS_MK_OUTPORT:name");
+    pp = CMAKE(output_port);
+    pp->name = CSTRSAVE(name);
     pp->str  = str;
 
     op = SS_mk_object(pp, SS_OUTPUT_PORT_I, SELF_EV, NULL,
@@ -755,7 +755,7 @@ object *SS_mk_integer(int64_t i)
    {int64_t *lp;
     object *op;
 
-    lp  = FMAKE(int64_t, "SS_MK_INTEGER:lp");
+    lp  = CMAKE(int64_t);
     *lp = i;
 
     op = SS_mk_object(lp, SC_INT_I, SELF_EV, NULL,
@@ -772,7 +772,7 @@ object *SS_mk_float(double d)
    {double *dp;
     object *op;
 
-    dp  = FMAKE(double, "SS_MK_FLOAT:dp");
+    dp  = CMAKE(double);
     *dp = d;
 
     op = SS_mk_object(dp, SC_FLOAT_I, SELF_EV, NULL,
@@ -789,7 +789,7 @@ object *SS_mk_complex(double _Complex d)
    {double _Complex *dp;
     object *op;
 
-    dp  = FMAKE(double _Complex, "SS_MK_COMPLEX:dp");
+    dp  = CMAKE(double _Complex);
     *dp = d;
 
     op = SS_mk_object(dp, SC_DOUBLE_COMPLEX_I, SELF_EV, NULL,
@@ -806,7 +806,7 @@ object *SS_mk_quaternion(quaternion q)
    {quaternion *qp;
     object *op;
 
-    qp  = FMAKE(quaternion, "SS_MK_QUATERNION:qp");
+    qp  = CMAKE(quaternion);
     *qp = q;
 
     op = SS_mk_object(qp, SC_QUATERNION_I, SELF_EV, NULL,
@@ -823,8 +823,8 @@ object *SS_mk_boolean(char *s, int v)
    {SS_boolean *bp;
     object *op;
 
-    bp = FMAKE(SS_boolean, "SS_MK_BOOLEAN:bp");
-    bp->name  = SC_strsavef(s, "char*:SS_MK_BOOLEAN:name");
+    bp = CMAKE(SS_boolean);
+    bp->name  = CSTRSAVE(s);
     bp->value = v;
 
     op = SS_mk_object(bp, SC_BOOL_I, SELF_EV, bp->name,
@@ -846,7 +846,7 @@ object *SS_mk_cons(object *ca, object *cd)
    {cons *cp;
     object *op;
 
-    cp = FMAKE(cons, "SS_MK_CONS:cp");
+    cp = CMAKE(cons);
     SS_MARK(ca);
     SS_MARK(cd);
     cp->car = ca;
@@ -884,7 +884,7 @@ int _SS_object_map(FILE *fp, int flag)
 	   fp = stdout;
 
 	nox = 10000;
-	map = FMAKE_N(obj_map, nox, "_SS_OBJECT_MAP:map");
+	map = CMAKE_N(obj_map, nox);
 
 /* find all the relevant blocks */
 	no   = 0;
@@ -901,7 +901,7 @@ int _SS_object_map(FILE *fp, int flag)
 		 no++;
 		 if (no >= nox)
 		    {nox <<= 1;
-		     REMAKE_N(map, obj_map, nox);};};
+		     CREMAKE(map, obj_map, nox);};};
 
 	     if (desc->next == SC_LATEST_BLOCK(ph))
 	        break;};
@@ -928,7 +928,7 @@ int _SS_object_map(FILE *fp, int flag)
 		 snprintf(s, MAXLINE, " %p  %3d %3d : ", p, ityp, nr);
 		 SS_print(p, s, "\n", SS_outdev);};};
 
-	SFREE(map);
+	CFREE(map);
 
 	PRINT(fp, "\n");};
 
@@ -955,7 +955,7 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
     op = SC_alloc_nzt(1L, sizeof(object), &opt);
 
     if ((pname != NULL) && (SC_arrlen(pname) < 1))
-       pname = SC_strsavef(pname, "char*:SS_MK_OBJECT:pname");
+       pname = CSTRSAVE(pname);
 
     SC_arrtype(op, type);
 
@@ -983,7 +983,7 @@ object *SS_mk_char(int i)
    {int *ip;
     object *op;
 
-    ip  = FMAKE(int, "SS_MK_CHAR:ip");
+    ip  = CMAKE(int);
     *ip = i;
 
     op = SS_mk_object(ip, SS_CHARACTER_I, SELF_EV, NULL,
@@ -1002,8 +1002,8 @@ object *SS_mk_vector(int l)
     object **va;
     object *op;
 
-    vp = FMAKE(vector, "SS_MK_VECTOR:vp");
-    va = FMAKE_N(object *, l, "SS_MK_VECTOR:va");
+    vp = CMAKE(vector);
+    va = CMAKE_N(object *, l);
     for (i = 0; i < l; i++)
         va[i] = SS_null;
 

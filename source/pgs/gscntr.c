@@ -152,9 +152,9 @@ void PG_setup_iso_levels(PG_device *dev, PG_graph *data, PG_picture_desc *pd)
        {rlmn = rextr[0];
 	rlmx = rextr[1];};
 
-    SFREE(pd->levels);
+    CFREE(pd->levels);
 
-    lev = FMAKE_N(double, nlev, "PG_SETUP_ISO_LEVELS:lev");
+    lev = CMAKE_N(double, nlev);
     if (lv == NULL)
        {if (dev->autorange || (rlmn == HUGE) || (rlmx == -HUGE))
 	   {rextr = dev->range_extrema;
@@ -404,8 +404,8 @@ PG_picture_desc *PG_setup_picture_contour(PG_device *dev, PG_graph *data,
 	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
 	PG_set_viewspace(dev, nde, WORLDC, pdx);
 
-	SFREE(ddex);
-	SFREE(rdex);
+	CFREE(ddex);
+	CFREE(rdex);
 
 /* set up the drawing properties */
 	PG_set_palette(dev, "standard");
@@ -464,8 +464,8 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
     PM_LOGICAL_ZONE(x[1], y1, y2, y3, y4, imx);
     PM_LOGICAL_ZONE(a,    a1, a2, a3, a4, imx);
 
-    mark = FMAKE_N(int, nlev, "_PG_ISO_NC_LR_2D:mark");
-    mcnt = FMAKE_N(int, nlev, "_PG_ISO_NC_LR_2D:mcnt");
+    mark = CMAKE_N(int, nlev);
+    mcnt = CMAKE_N(int, nlev);
 
     for (ilev = 0; ilev < nlev; ilev++)
         {if (id)
@@ -513,11 +513,11 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
 				 0, 4, sides, 1, id,
 				 mcnt, mark, xpt, ypt);};
 
-    SFREE(mark);
-    SFREE(mcnt);
+    CFREE(mark);
+    CFREE(mcnt);
 
     if (eflag)
-        SFREE(emap);
+        CFREE(emap);
 
     return;}
   
@@ -574,7 +574,7 @@ static void PG_draw_iso_zc_lr(PG_device *dev, double *a,
 
 	PG_draw_iso_nc_lr(dev, ap, ndd, x, lev, nlev, id, cnnct, alist);
 
-	SFREE(ap);};
+	CFREE(ap);};
 
     return;}
 
@@ -620,11 +620,11 @@ static void PG_draw_iso_nc_ac(PG_device *dev, double *a,
     py = x[1];
 
 /* can compute this by looping over the sides */
-    xpt = FMAKE_N(double, 10, "PG_DRAW_ISO_NC_AC:xpt");
-    ypt = FMAKE_N(double, 10, "PG_DRAW_ISO_NC_AC:ypt");
+    xpt = CMAKE_N(double, 10);
+    ypt = CMAKE_N(double, 10);
 
-    mark = FMAKE_N(int, nlev, "PG_DRAW_ISO_NC_AC:mark");
-    mcnt = FMAKE_N(int, nlev, "PG_DRAW_ISO_NC_AC:mcnt");
+    mark = CMAKE_N(int, nlev);
+    mcnt = CMAKE_N(int, nlev);
 
     ofz = (nzp < 2);
     for (ilev = 0; ilev < nlev; ilev++)
@@ -646,10 +646,10 @@ static void PG_draw_iso_nc_ac(PG_device *dev, double *a,
 			     is1, is2, sides,
 			     nsp, id, mcnt, mark, xpt, ypt);};
 
-    SFREE(mark);
-    SFREE(mcnt);
-    SFREE(xpt);
-    SFREE(ypt);
+    CFREE(mark);
+    CFREE(mcnt);
+    CFREE(xpt);
+    CFREE(ypt);
 
     return;}
   
@@ -670,7 +670,7 @@ static void PG_draw_iso_zc_ac(PG_device *dev, double *a,
 
     PG_draw_iso_nc_ac(dev, ap, ndd, x, lev, nlev, id, cnnct, alist);
 
-    SFREE(ap);
+    CFREE(ap);
 
     return;}
 
@@ -754,7 +754,7 @@ static void PG_iso_hand(PG_device *dev, PG_graph *g, PG_picture_desc *pd,
 
 	 PM_free_vectors(ndd, x);
 
-	 SFREE(f);};
+	 CFREE(f);};
 
     return;}
 
@@ -799,7 +799,7 @@ void PG_contour_plot(PG_device *dev, PG_graph *data, ...)
 		       NULL);
     if (ratio == 0.0)
        {SC_VA_START(data);
-        pr  = FMAKE(double, "PG_CONTOUR_PLOT:pr");
+        pr  = CMAKE(double);
         *pr = SC_VA_ARG(double);
 	PG_set_attrs_graph(data,
 			   "RATIO", SC_DOUBLE_I, TRUE, pr,

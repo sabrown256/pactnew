@@ -44,9 +44,9 @@ static void test_2d_simple(void)
     ymn       = -5.0;
     ymx       = 5.0;
     ne        = imx*jmx;
-    x         = FMAKE_N(double, ne, "TEST_2D_SIMPLE:x");
-    y         = FMAKE_N(double, ne, "TEST_2D_SIMPLE:y");
-    f         = FMAKE_N(double, ne, "TEST_2D_SIMPLE:f");
+    x         = CMAKE_N(double, ne);
+    y         = CMAKE_N(double, ne);
+    f         = CMAKE_N(double, ne);
     id        = 'A';
     lncolor   = SCR_dev->BLUE;
     lnwidth   = 0.0;
@@ -109,9 +109,9 @@ static void test_2d_new(int method)
     jmx       = 3;
 #endif
     ne        = imx*jmx;
-    x         = FMAKE_N(double, ne, "TEST_2D_NEW:x");
-    y         = FMAKE_N(double, ne, "TEST_2D_NEW:y");
-    f         = FMAKE_N(double, ne, "TEST_2D_NEW:f");
+    x         = CMAKE_N(double, ne);
+    y         = CMAKE_N(double, ne);
+    f         = CMAKE_N(double, ne);
     id        = 'A';
     lncolor   = SCR_dev->BLUE;
     lnwidth   = 0.0;
@@ -201,10 +201,10 @@ static void test_3d_new(void)
     jmx       = sz;
     kmx       = sz;
     ne        = imx*jmx*kmx;
-    x         = FMAKE_N(double, ne, "TEST_3D_NEW:x");
-    y         = FMAKE_N(double, ne, "TEST_3D_NEW:y");
-    z         = FMAKE_N(double, ne, "TEST_3D_NEW:z");
-    f         = FMAKE_N(double, ne, "TEST_3D_NEW:f");
+    x         = CMAKE_N(double, ne);
+    y         = CMAKE_N(double, ne);
+    z         = CMAKE_N(double, ne);
+    f         = CMAKE_N(double, ne);
     id        = 'A';
     lncolor   = SCR_dev->BLUE;
     lnwidth   = 0.0;

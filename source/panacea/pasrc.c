@@ -46,7 +46,7 @@ void _PA_init_sources(double t, double dt)
          ivs != NULL;
          ivs = ivs->next, N_sf++);
 
-    files = FMAKE_N(char *, N_sf, "_PA_INIT_SOURCES:files");
+    files = CMAKE_N(char *, N_sf);
     N_Variables = 0;
     N_sf = 0;
     for (ivs = iv_spec_lst; ivs != NULL; ivs = ivs->next)
@@ -71,8 +71,7 @@ void _PA_init_sources(double t, double dt)
          PD_close(fp);};
 
 /* loop over all source files and make a list of PA_src_variables */
-    SV_List = FMAKE_N(PA_src_variable *, N_Variables,
-                      "_PA_INIT_SOURCES:List");
+    SV_List = CMAKE_N(PA_src_variable *, N_Variables);
     n_vars  = 0;
     for (j = 0; j < N_sf; j++)
         {fp = PD_open(files[j], "r");
@@ -92,13 +91,12 @@ void _PA_init_sources(double t, double dt)
                      break;
 
                   tok  = SC_strtok(title, "|", s);
-                  name = SC_strsavef(tok, "char*:_PA_INIT_SOURCES:tok");
+                  name = CSTRSAVE(tok);
                   if ((ivs->type != 'v') ||
                       (strcmp(name, ivs->name) == 0))
                      {n_times = SC_stoi(SC_strtok(NULL, "|", s));
                       token   = SC_strtok(NULL, "|", s);
-                      times   = FMAKE_N(double, n_times,
-                                        "_PA_INIT_SOURCES:times");
+                      times   = CMAKE_N(double, n_times);
                       PA_ERR(!PD_read(fp, token, times),
                              "CAN'T READ %s IN %s - INIT-SOURCES",
                              token, files[j]);
@@ -375,7 +373,7 @@ void _PA_step_queue(PA_src_variable *svp, double t)
  * the second slot in the queue
  */
       {if (indx > 3)
-          {SFREE(pd[0]);};
+          {CFREE(pd[0]);};
 
 /* shift everybody up the queue by one */
        for (i = 1; i < 4; i++)

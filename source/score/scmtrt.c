@@ -48,14 +48,14 @@ int test_1(int nir, int nim)
 
     SC_reg_mem(b, sizeof(b), "TEST_1:b");
 
-    a = FMAKE_N(double *, nir, "TEST_1:a");
+    a = CMAKE_N(double *, nir);
 
     io_printf(stdout, "   First leak check\n\n");
     ma = SC_mem_monitor(na, 2, "t2a", msg);
     SC_ASSERT(ma > 0);
 
     SC_dereg_mem(b);
-    SFREE(a);
+    CFREE(a);
 
     io_printf(stdout, "\n");
     io_printf(stdout, "   Second leak check\n\n");
@@ -105,12 +105,12 @@ int test_2(int nir, int nim)
        {io_printf(stdout, "\n-----------------------------\n");
 	io_printf(stdout, "\nSimple memory allocation test\n\n");
 
-	a = FMAKE_N(double *, nir, "TEST_2:a");
+	a = CMAKE_N(double *, nir);
 
 	for (i = 0; i < nir; i++)
 	    {jmx = (i == 3) ? nim+10 : nim;
 
-	     a[i] = FMAKE_N(double, nim, "TEST_2:a[i]");
+	     a[i] = CMAKE_N(double, nim);
 	     for (j = 0; j < jmx; j++)
 	         a[i][j] = (j + 1.0)*(i + 1.0);
 
@@ -123,9 +123,9 @@ int test_2(int nir, int nim)
 			  i, ok);};
 
 	for (i = 0; i < nir; i++)
-	   SFREE(a[i]);
+	   CFREE(a[i]);
 
-	SFREE(a);
+	CFREE(a);
 
 	if (err == FALSE)
 	   io_printf(stdout, "\nSimple memory allocation test passed\n");
@@ -190,10 +190,10 @@ int test_3(int nir, int nim)
     ne = 106L;
 
 /* simple allocation and free test */
-    f1 = FMAKE_N(double,   ne, "TEST_3:f1");
-    f2 = FMAKE_N(double, ne+4, "TEST_3:f2");
-    f3 = FMAKE_N(double, ne+2, "TEST_3:f3");
-    f4 = FMAKE_N(double, ne+3, "TEST_3:f4");
+    f1 = CMAKE_N(double,   ne);
+    f2 = CMAKE_N(double, ne+4);
+    f3 = CMAKE_N(double, ne+2);
+    f4 = CMAKE_N(double, ne+3);
 
     SC_set_arrtype(f1, SC_DOUBLE_I);
     SC_set_arrtype(f2, SC_DOUBLE_I);
@@ -210,7 +210,7 @@ int test_3(int nir, int nim)
 #if 0
 
 /* test over and under indexing the space */
-    a = FMAKE_N(double, ne, "TEST_3:a");
+    a = CMAKE_N(double, ne);
 
     SC_signal(SIGSEGV, sigh_3);
     SC_signal(SIGBUS,  sigh_3);
@@ -246,7 +246,7 @@ int test_3(int nir, int nim)
 	      "   Memory descriptor size: %d\n",
 	      N_DOUBLES_MD);
 
-    SFREE(a);
+    CFREE(a);
 #endif
 
 /* reverse the sense of err */
@@ -311,32 +311,32 @@ int test_4(int nir, int nim)
      ne = 10013L;
 
 /* simple allocation and free test */
-     ad = FMAKE_N(double, ne, "TEST_4:a");
-     REMAKE_N(ad, double, 2*ne);
-     SFREE(ad);
+     ad = CMAKE_N(double, ne);
+     CREMAKE(ad, double, 2*ne);
+     CFREE(ad);
 
-     af = FMAKE_N(float, ne, "TEST_4:a");
-     REMAKE_N(af, float, 2*ne);
-     SFREE(af);
+     af = CMAKE_N(float, ne);
+     CREMAKE(af, float, 2*ne);
+     CFREE(af);
 
-     al = FMAKE_N(long, ne, "TEST_4:a");
-     REMAKE_N(al, long, 2*ne);
-     SFREE(al);
+     al = CMAKE_N(long, ne);
+     CREMAKE(al, long, 2*ne);
+     CFREE(al);
 
-     ai = FMAKE_N(int, ne, "TEST_4:a");
-     REMAKE_N(ai, int, 2*ne);
-     SFREE(ai);
+     ai = CMAKE_N(int, ne);
+     CREMAKE(ai, int, 2*ne);
+     CFREE(ai);
 
-     as = FMAKE_N(short, ne, "TEST_4:a");
-     REMAKE_N(as, short, 2*ne);
-     SFREE(as);
+     as = CMAKE_N(short, ne);
+     CREMAKE(as, short, 2*ne);
+     CFREE(as);
 
-     ac = FMAKE_N(char, ne, "TEST_4:a");
-     REMAKE_N(ac, char, 2*ne);
-     SFREE(ac);
+     ac = CMAKE_N(char, ne);
+     CREMAKE(ac, char, 2*ne);
+     CFREE(ac);
 
 /* test over and under indexing the space */
-     a = FMAKE_N(double, ne, "TEST_4:a");
+     a = CMAKE_N(double, ne);
 
      SC_signal(SIGSEGV, sigh_4);
      SC_signal(SIGBUS,  sigh_4);
@@ -375,7 +375,7 @@ int test_4(int nir, int nim)
 	     "   Memory descriptor size: %d\n",
 	     N_DOUBLES_MD);
 
-     SFREE(a);};
+     CFREE(a);};
 
 #endif
 

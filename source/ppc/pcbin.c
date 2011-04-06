@@ -84,7 +84,7 @@ int PC_send_formats(void)
 	_PD_tbuffer = _PD_get_tbuffer();
 	io_write(_PD_tbuffer, 1, strlen(_PD_tbuffer), fp);
 	io_flush(fp);
-	SFREE(_PD_tbuffer);
+	CFREE(_PD_tbuffer);
 
 	PRINT(fp, "END FORMATS\n");
 

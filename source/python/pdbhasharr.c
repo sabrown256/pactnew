@@ -79,8 +79,8 @@ int _PP_rl_haelem(haelem *hp, void *a)
 {
 
     (void) _PP_rel_syment(PP_vif->host_chart, (char *) &hp->def, 1L, hp->type);
-    SFREE(hp->type);
-    SFREE(hp->def);
+    CFREE(hp->type);
+    CFREE(hp->def);
 
     return TRUE;
 }
@@ -456,7 +456,7 @@ PyObject *PP_unpack_hasharr_haelem(char *type, void *vr)
 
     form = PP_global_form;
 
-    type = SC_dereference(SC_strsavef(type, "_PP_unpack_hasharr_haelem"));
+    type = SC_dereference(CSTRSAVE(type));
     bpi = _PD_lookup_size(type, PP_vif->host_chart);
     if (bpi < 0)
         return NULL;
@@ -466,7 +466,7 @@ PyObject *PP_unpack_hasharr_haelem(char *type, void *vr)
     else
         dims = NULL;
     rv = _PP_wr_syment(PP_vif_info, type, dims, nitems, vr, &form);
-    SFREE(type);
+    CFREE(type);
     _PD_rl_dimensions(dims);
 
     return rv;

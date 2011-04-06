@@ -328,7 +328,7 @@ int ps(char *ptrn, int pid, int tmod, int all, int mode, int nc, int dt)
 			   show_time_info(&ru, tmod, pid);
 			   break;};};};
         
-	 SFREE(ids);
+	 CFREE(ids);
 
 /* if no jobs matched the constraints do not repeat */
 	 if (nm == 0)

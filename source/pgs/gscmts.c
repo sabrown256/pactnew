@@ -17,7 +17,7 @@ main()
    {char *s;
     PG_device *SCR_dev, *SCR_dew;
 
-    s = SC_strsavef("WINDOW", "char*:GSCMTS:s");
+    s = CSTRSAVE("WINDOW");
 
     SCR_dev = PG_make_device(s, "COLOR", "PGS Image Test");
     PG_white_background(SCR_dev, FALSE);

@@ -817,7 +817,7 @@ static PyObject *_indirect_work(
                       int need_sequence);
 
     file  = fileinfo->file;
-    litype = SC_strsave(outtype);
+    litype = CSTRSAVE(outtype);
     SC_dereference(litype);
 
     if (_PD_indirection(litype)) {
@@ -846,7 +846,7 @@ static PyObject *_indirect_work(
             }
             
             obj = hook(fileinfo, litype, mitems, NULL, pvr, form, need_sequence);
-/*            SFREE(pvr) */
+/*            CFREE(pvr) */
         }
     } else {
         switch (form->array_kind) {
@@ -876,7 +876,7 @@ static PyObject *_indirect_work(
                                       litype);
                 }
                 item = hook(fileinfo, litype, mitems, NULL, pvr, form, need_sequence);
-/*                SFREE(pvr) */
+/*                CFREE(pvr) */
             }
 
             
@@ -893,7 +893,7 @@ static PyObject *_indirect_work(
         }
     }
 
-    SFREE(litype);
+    CFREE(litype);
 
     return obj;
 }

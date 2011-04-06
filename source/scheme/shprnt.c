@@ -120,7 +120,7 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
 
     s = SC_vdsnprintf(cp, fmt, __a__);
 
-    SFREE(_SS.vbf);
+    CFREE(_SS.vbf);
     _SS.vbf = SC_strsavef(s, "PERM|char*:_SS_VDSNPRINTF:s");
 
     return(s);}
@@ -144,9 +144,9 @@ char *_SS_sprintf(char *fmt, object *obj)
 
     if (SS_stringp(obj))
        {s = SS_STRING_TEXT(obj);
-	s = SC_strsavef(s, "_SS_SPRINT:s");}
+	s = CSTRSAVE(s);}
     else
-       {SFREE(_SS.vbf);
+       {CFREE(_SS.vbf);
 
 	SC_get_put_line(pr);
 	SC_get_put_string(ps);
@@ -158,7 +158,7 @@ char *_SS_sprintf(char *fmt, object *obj)
 	SC_set_put_line(pr);
 	SC_set_put_string(ps);
 
-	s = SC_strsavef(_SS.vbf, "_SS_SPRINT:s");};
+	s = CSTRSAVE(_SS.vbf);};
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_gs.io_interrupts_on);
@@ -179,7 +179,7 @@ static object *_SS_sprint(object *obj, char *fmt, object *strm)
 
     PRINT(str, fmt, s);
 
-    SFREE(s);
+    CFREE(s);
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_gs.io_interrupts_on);
@@ -449,13 +449,13 @@ static int _SS_push_chars(FILE *fp, char *fmt, ...)
     SC_VDSNPRINTF(FALSE, bf, fmt);
 
     if (_SS.bf == NULL)
-       {_SS.bf = FMAKE_N(char, MAXLINE, "_SS_PUSH_CHARS:_SS.bf");
+       {_SS.bf = CMAKE_N(char, MAXLINE);
 	_SS.bf[0] = '\0';};
 
     nb = strlen(_SS.bf);
     ns = strlen(bf);
     if ((ns + nb + 2) >= SC_arrlen(_SS.bf))
-       REMAKE_N(_SS.bf, char, ns+nb+MAXLINE);
+       CREMAKE(_SS.bf, char, ns+nb+MAXLINE);
 
     strcat(_SS.bf, bf);
 
@@ -473,13 +473,13 @@ static int _SS_push_string(char *s, FILE *fp)
    {int ns, nb;
 
     if (_SS.bf == NULL)
-       {_SS.bf = FMAKE_N(char, MAXLINE, "_SS_PUSH_STRING:_SS.bf");
+       {_SS.bf = CMAKE_N(char, MAXLINE);
 	_SS.bf[0] = '\0';};
 
     nb = strlen(_SS.bf);
     ns = strlen(s);
     if ((ns + nb + 2) >= SC_arrlen(_SS.bf))
-       REMAKE_N(_SS.bf, char, ns+nb+MAXLINE);
+       CREMAKE(_SS.bf, char, ns+nb+MAXLINE);
 
     if (_SS.disp_flag == TRUE)
        strcat(_SS.bf, s);
@@ -625,7 +625,7 @@ static object *_SSI_opn_out(object *obj)
 
     prt = SS_mk_outport(str, s);
 
-    SFREE(s);
+    CFREE(s);
 
     return(prt);}
 
@@ -675,7 +675,7 @@ object *_SSI_call_of(object *argl)
     _SSI_cls_out(SS_outdev);
     SS_outdev = old_outdev;
 
-    SFREE(s);
+    CFREE(s);
 
     return(ret);}
 

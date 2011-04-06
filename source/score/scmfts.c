@@ -35,7 +35,7 @@ static int test_1(void)
     nj = sizeof(mlt)/sizeof(double);
 
     m  = 3*msa[n-1]/2;
-    bf = FMAKE_N(char, m, "TEST_1:bf");
+    bf = CMAKE_N(char, m);
 
     io_printf(stdout, "                       Mapped write    ");
 
@@ -82,7 +82,7 @@ static int test_1(void)
     else
        io_printf(stdout, " FAIL\n");
 
-    SFREE(bf);
+    CFREE(bf);
 
     return(st);}
 
@@ -113,7 +113,7 @@ static int test_2(void)
     nj = sizeof(mlt)/sizeof(double);
 
     m  = 3*msa[n-1]/2;
-    bf = FMAKE_N(char, m, "TEST_2:bf");
+    bf = CMAKE_N(char, m);
 
     io_printf(stdout, "                       Alternate write ");
 
@@ -160,7 +160,7 @@ static int test_2(void)
     else
        io_printf(stdout, " FAIL\n");
 
-    SFREE(bf);
+    CFREE(bf);
 
 #else
 
@@ -188,8 +188,8 @@ static int test_3(void)
     SC_mf_set_hooks();
 
     m   = 200;
-    dst = FMAKE_N(char, m, "TEST_3:dst");
-    src = FMAKE_N(char, m, "TEST_3:src");
+    dst = CMAKE_N(char, m);
+    src = CMAKE_N(char, m);
     for (i = 0; i < m; i++)
         src[i] = i + 1;
 
@@ -226,8 +226,8 @@ static int test_3(void)
     else
        io_printf(stdout, " FAIL\n");
 
-    SFREE(src);
-    SFREE(dst);
+    CFREE(src);
+    CFREE(dst);
 
     return(st);}
 
@@ -253,8 +253,8 @@ static int test_4(void)
     SC_lmf_set_hooks();
 
     m   = 200;
-    dst = FMAKE_N(char, m, "TEST_4:dst");
-    src = FMAKE_N(char, m, "TEST_4:src");
+    dst = CMAKE_N(char, m);
+    src = CMAKE_N(char, m);
     for (i = 0; i < m; i++)
         src[i] = i + 1;
 
@@ -289,8 +289,8 @@ static int test_4(void)
     else
        io_printf(stdout, " FAIL\n");
 
-    SFREE(src);
-    SFREE(dst);
+    CFREE(src);
+    CFREE(dst);
 
 #else
 

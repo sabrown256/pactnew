@@ -207,7 +207,7 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 #endif
 
     if (haddr != INADDR_NONE)
-       {ad = FMAKE(struct sockaddr_in, "SC_TCP_ADDRESS:ad");
+       {ad = CMAKE(struct sockaddr_in);
 	ad->sin_family = PF_INET;
 	ad->sin_port   = htons(port);
 
@@ -233,7 +233,7 @@ struct sockaddr_in *_SC_tcp_bind(int fd, int port)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    ad = FMAKE(struct sockaddr_in, "_SC_TCP_BIND:ad");
+    ad = CMAKE(struct sockaddr_in);
     if (ad != NULL)
        {ad->sin_family      = PF_INET;
 	ad->sin_addr.s_addr = htonl(INADDR_ANY);
@@ -258,7 +258,7 @@ struct sockaddr_in *_SC_tcp_bind(int fd, int port)
 	       {fprintf(_SC_diag, "      Bind succeeded: %d\n", port);
 		fflush(_SC_diag);};}
 	else
-	   {SFREE(ad);};};
+	   {CFREE(ad);};};
 
 #endif
 
@@ -488,7 +488,7 @@ int _SC_tcp_connect(char *host, int port, int to, int fm)
 		    SC_error(-1, "CAN'T CONNECT TO SERVER (%d) - _SC_TCP_CONNECT",
 			      errno);};};
 
-	    SFREE(srvr);};};
+	    CFREE(srvr);};};
 
     SC_ERR_UNTRAP();
 

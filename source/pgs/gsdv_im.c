@@ -75,10 +75,10 @@ PG_par_rend_info *_PG_init_dev_parallel(PG_device *dd, int dp)
         ip = PG_get_processor_number();
 
         map = (ip == dp) ?
-              FMAKE_N(int, np, "_PG_INIT_DEV_PARALLEL:map") :
+              CMAKE_N(int, np) :
               NULL;
 
-        pri = FMAKE(PG_par_rend_info, "_PG_INIT_DEV_PARALLEL:pri");
+        pri = CMAKE(PG_par_rend_info);
         pri->dd        = dd;
         pri->pp        = _PG.pp_me;
         pri->ip        = dp;
@@ -173,7 +173,7 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
         ndf = 10;
 
         ne = ndf + ndr;
-        dc = FMAKE_N(double, ne, "PG_PARALLEL_SETUP:dc");
+        dc = CMAKE_N(double, ne);
 
         if (dfl)
            {PG_get_viewspace(dev, WORLDC, dc);
@@ -192,7 +192,7 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
 
 /* post the receives */
         if (ip == dp)
-           {adc = FMAKE_N(double, np*ne, "PG_PARALLEL_SETUP:adc");
+           {adc = CMAKE_N(double, np*ne);
 	    if (adc == NULL)
 	       return;
 
@@ -243,7 +243,7 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
                           dc[ia] = min(dc[ia], pdc[ia]);
                           dc[ib] = max(dc[ib], pdc[ib]);};};};
 
-            SFREE(adc);
+            CFREE(adc);
 
 	    dc[8] = PG_window_width(dev);
 	    dc[9] = PG_window_height(dev);
@@ -310,7 +310,7 @@ void PG_parallel_setup(PG_device *dev, PG_picture_desc *pd)
             for (i = 0; i < nr; i++)
                 re[i] = *pdc++;};
 
-        SFREE(dc);};
+        CFREE(dc);};
 
     return;}
 
@@ -343,7 +343,7 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
 
 /* post the receives */
         if (ip == dp)
-           {pim = FMAKE_N(PG_image, np, "_PG_TRANSMIT_IMAGES:pim");
+           {pim = CMAKE_N(PG_image, np);
 
             for (i = 0; i < np; i++)
                 pim[i] = *im;
@@ -365,7 +365,7 @@ static PG_image *_PG_transmit_images(PG_device *dev, PG_image *im)
 
 /* post the receives */
         if (ip == dp)
-           {pim = FMAKE_N(PG_image, np, "_PG_TRANSMIT_IMAGES:pim");
+           {pim = CMAKE_N(PG_image, np);
 
 	    if (SC_zero_on_alloc_n(-1) == FALSE)
 	       SC_MEM_INIT_N(PG_image, pim, np);
@@ -504,25 +504,25 @@ static void _PG_display_image(PG_device *dev, PG_image *pim)
 			 PG_copy_image(nim, tim, 0);};};
 
 /* prevent rescaling the image data by NULLing the type */
-		SFREE(nim->element_type);
+		CFREE(nim->element_type);
 
 		PG_set_viewspace(dev, 2, WORLDC, dbx);
 		PG_render_parallel(dd, nim, np, pim);};
 
-            SFREE(pri->label);};};
+            CFREE(pri->label);};};
 
 /* cleanup */
     for (i = 0; i < np; i++)
-        {SFREE(pim[i].buffer);
+        {CFREE(pim[i].buffer);
          pim[i].buffer = NULL;
 
-         SFREE(pim[i].element_type);
+         CFREE(pim[i].element_type);
          pim[i].element_type = NULL;
 
-         SFREE(pim[i].label);
+         CFREE(pim[i].label);
          pim[i].label = NULL;};
 
-    SFREE(pim);
+    CFREE(pim);
 
     return;}
 

@@ -253,7 +253,7 @@ static void _SX_read(object *strm)
 	    SS_PTR(strm) = t;
 	    SS_Assign(SS_rdobj, SS_read(strm));};};
 
-    SFREE(s);
+    CFREE(s);
 
     return;}
     

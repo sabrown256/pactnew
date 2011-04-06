@@ -169,7 +169,7 @@ STATIC int get_string_object_data(PyObject *obj, void *vr, long nitems,
     }
 
     if (gc == PP_GC_YES) {
-        DEREF(vr) = SC_strsave(PyString_AS_STRING(obj));
+        DEREF(vr) = CSTRSAVE(PyString_AS_STRING(obj));
     } else {
         DEREF(vr) = PyString_AS_STRING(obj);
     }
@@ -293,7 +293,7 @@ STATIC int get_float_object_data(PyObject *obj, void *vr, long nitems,
         switch (type) {
         case PP_FLOAT_I:
             if (gc == PP_GC_YES) {
-                *(float **) vr = MAKE(float);
+                *(float **) vr = CMAKE(float);
 
                 **(float **) vr = (float) PyFloat_AS_DOUBLE(obj);
             } else {
@@ -305,7 +305,7 @@ STATIC int get_float_object_data(PyObject *obj, void *vr, long nitems,
             break;
         case PP_DOUBLE_I:
             if (gc == PP_GC_YES) {
-                *(double **) vr = MAKE(double);
+                *(double **) vr = CMAKE(double);
 
                 **(double **) vr = PyFloat_AS_DOUBLE(obj);
             } else {
@@ -420,7 +420,7 @@ STATIC int get_int_object_data(PyObject *obj, void *vr, long nitems,
         switch (type) {
         case PP_INT_I:
             if (gc == PP_GC_YES) {
-                *(int **) vr = MAKE(int);
+                *(int **) vr = CMAKE(int);
 
                 **(int **) vr = (int) PyInt_AS_LONG(obj);
             } else {
@@ -432,7 +432,7 @@ STATIC int get_int_object_data(PyObject *obj, void *vr, long nitems,
             break;
         case PP_LONG_I:
             if (gc == PP_GC_YES) {
-                *(long **) vr = MAKE(long);
+                *(long **) vr = CMAKE(long);
 
                 **(long **) vr = PyInt_AS_LONG(obj);
             } else {
@@ -531,7 +531,7 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -
 -    switch (typecode) {
 -    case PP_CHAR_I:
--        pv = MAKE_N(char *, nitems);
+-        pv = CMAKE_N(char *, nitems);
 -
 -        obj1 = PySequence_GetItem(obj, 0);
 -        entry = PP_inquire_object(fileinfo, obj1);
@@ -617,8 +617,8 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -#if 0
 -            strcpy(ts, type);
 -	    SC_strcat(ts, MAXLINE, "**");
--            SFREE(type);
--            type = SC_strsave(ts);
+-            CFREE(type);
+-            type = CSTRSAVE(ts);
 -#endif
 -        } else {
 -            char *nextdescr;
@@ -641,14 +641,14 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -#if 0
 -            strcpy(ts, type);
 -	    SC_strcat(ts, MAXLINE, "*");
--            SFREE(type);
--            type = SC_strsave(ts);
+-            CFREE(type);
+-            type = CSTRSAVE(ts);
 -#endif
 -        }
 -        strcpy(ts, type);
 -	SC_strcat(ts, MAXLINE, "*");
--        SFREE(type);
--        type = SC_strsave(ts);
+-        CFREE(type);
+-        type = CSTRSAVE(ts);
 -
 -    } else {
 -        typecode = PP_ObjectType(obj, 0);
@@ -717,8 +717,8 @@ STATIC int get_none_object_data(PyObject *obj, void *vr, long nitems,
 -    type = get_sequence_object_type(obj);
 -    strcpy(ts, type);
 -    SC_strcat(ts, MAXLINE, "*");
--    SFREE(type);
--    type = SC_strsave(ts);
+-    CFREE(type);
+-    type = CSTRSAVE(ts);
 -
 -    return(type);
 -}
@@ -829,7 +829,7 @@ PP_descr *PP_make_descr(
 {
     return _PP_mk_descr(
         typecode, bpi,
-        SC_strsavef(type, "PP_make_descr:type"),
+        CSTRSAVE(type),
         NULL, NULL);
 }
 
@@ -848,7 +848,7 @@ PP_descr *_PP_mk_descr(
 {
     PP_descr *descr;
 
-    descr = FMAKE(PP_descr, "_PP_mk_descr:descr");
+    descr = CMAKE(PP_descr);
 
     descr->typecode  = typecode;
     descr->bpi       = bpi;
@@ -871,9 +871,9 @@ void _PP_rl_descr(PP_descr *descr)
 
     n = SC_mark(descr, 0);
     if (n < 2) {
-        SFREE(descr->type);
+        CFREE(descr->type);
         _PD_rl_dimensions(descr->dims);
-        SFREE(descr);
+        CFREE(descr);
     } else {
         SC_mark(descr, -1);
     }
@@ -897,7 +897,7 @@ PP_type_entry *PP_make_type_entry(
 {
     PP_type_entry *entry;
 
-    entry = MAKE(PP_type_entry);
+    entry = CMAKE(PP_type_entry);
 
     entry->typecode  = typecode;
     entry->sequence  = sequence;
@@ -932,7 +932,7 @@ int PP_rl_type_entry(haelem *hp, void *a)
         if (entry->descr) {
             _PP_rl_descr(entry->descr);
         }
-        SFREE(entry);
+        CFREE(entry);
     } else {
         SC_mark(entry, -1);
     }
@@ -997,7 +997,7 @@ PP_class_descr *PP_make_class_descr(
 
     descr = PP_make_descr(PP_INSTANCE_I, type, 0);
 
-    cdescr = MAKE(PP_class_descr);
+    cdescr = CMAKE(PP_class_descr);
 
     cdescr->cls       = cls;
     cdescr->ctor      = ctor;
@@ -1023,9 +1023,9 @@ int _PP_rl_class_descr(haelem *hp, void *a)
 
     n = SC_mark(cdescr, 0);
     if (n < 2) {
-        SFREE(cdescr->type);
+        CFREE(cdescr->type);
         _PP_rl_descr(cdescr->descr);
-        SFREE(cdescr);
+        CFREE(cdescr);
     } else {
         SC_mark(cdescr, -1);
     }
@@ -1298,12 +1298,12 @@ void PP_init_type_map_instance(PP_file *fileinfo, PP_class_descr *cdescr)
 void PP_init_type_map(void)
 {
     /* XXX - sab - this should be in score */
-    SC_INT_S = SC_strsavef("int", "PP_init_type_map:SC_INT_S");
-    SC_INT_P_S = SC_strsavef("int *", "PP_init_type_map:SC_INT_P_S");
+    SC_INT_S = CSTRSAVE("int");
+    SC_INT_P_S = CSTRSAVE("int *");
     SC_mark(SC_INT_S, 1);
     SC_mark(SC_INT_P_S, 1);
 
-    XX_OBJECT_MAP_S = SC_strsave("PP_type_entry");
+    XX_OBJECT_MAP_S = CSTRSAVE("PP_type_entry");
     SC_permanent(XX_OBJECT_MAP_S);
 
     _PP_create_defstr_tab();
@@ -1432,7 +1432,7 @@ PP_file *_PP_open_vif(char *name)
     PDBfile *fp;
         
     fp = PD_open_vif(name);
-    fileinfo = FMAKE(PP_file, "_PP_open_vif:fileinfo");
+    fileinfo = CMAKE(PP_file);
     fileinfo->file = fp;
 
     _PP_init_file(fp);
@@ -1466,7 +1466,7 @@ void _PP_close_file(PP_file *fileinfo)
     SC_free_hasharr(fileinfo->object_map, PP_rl_type_entry, NULL);
     SC_free_hasharr(fileinfo->class_map, _PP_rl_class_descr, NULL);
     
-    SFREE(fileinfo);
+    CFREE(fileinfo);
     PD_close(fp);
     
     return;
@@ -1804,7 +1804,7 @@ int PP_make_data(PyObject *obj, PP_file *fileinfo, char *type,
 
         if (ierr < 0) {
             (void) _PP_rel_syment(fileinfo->file->host_chart, pv, nitems, type);
-            SFREE(pv);
+            CFREE(pv);
         }
         DEREF(vr) = pv;
 
@@ -1893,7 +1893,7 @@ static int _PP_get_sequence_descr_work(PP_file *fileinfo, PyObject *obj, int nd,
             if (descr->typecode > seqinfo->tc) {
                 seqinfo->tc = descr->typecode;
                 if (seqinfo->type != NULL) {
-                    SFREE(seqinfo->type);
+                    CFREE(seqinfo->type);
                 }
                 seqinfo->type = descr->type;
                 SC_mark(seqinfo->type, 1);
@@ -2062,7 +2062,7 @@ PP_descr *PP_get_object_descr(PP_file *fileinfo, PyObject *obj)
             descr = _PP_mk_descr(seqinfo.tc, seqinfo.bpi,
                                  type, dims, NULL);
             SC_mark(descr, 1);
-            SFREE(seqinfo.type);
+            CFREE(seqinfo.type);
         } else {
             PP_error_set_user(obj, "cannot get PACT type for %s",
                               obj->ob_type->tp_name);
@@ -2102,7 +2102,7 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 
         if (dims != NULL) {
             /* get base type, without dimension information */
-            ts    = SC_strsavef(type, "PP_outtype_descr:ts");
+            ts    = CSTRSAVE(type);
             strtok(ts, "()[");
             type = ts;
         }
@@ -2209,8 +2209,8 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 -#if 0
 -            strcpy(ts, type);
 -	    SC_strcat(ts, MAXLINE, "**");
--            SFREE(type);
--            type = SC_strsave(ts);
+-            CFREE(type);
+-            type = CSTRSAVE(ts);
 -#endif
 -        } else {
 -            char *nextdescr;
@@ -2233,14 +2233,14 @@ PP_descr *PP_outtype_descr(PDBfile *fp, PP_descr *descr, char *type)
 -#if 0
 -            strcpy(ts, type);
 -	    SC_strcat(ts, MAXLINE, "*");
--            SFREE(type);
--            type = SC_strsave(ts);
+-            CFREE(type);
+-            type = CSTRSAVE(ts);
 -#endif
 -        }
 -        strcpy(ts, type);
 -	SC_strcat(ts, MAXLINE, "*");
--        SFREE(type);
--        type = SC_strsave(ts);
+-        CFREE(type);
+-        type = CSTRSAVE(ts);
 -
 -    } else {
 -        typecode = PP_ObjectType(obj, 0);

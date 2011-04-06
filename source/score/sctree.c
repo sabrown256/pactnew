@@ -72,9 +72,9 @@ static SC_tree_node *_SC_make_tree_node(void *k, void *v, int nd)
     int *pr;
     SC_tree_node *pn, **pb;
 
-    pn = FMAKE(SC_tree_node, "_SC_MAKE_TREE_NODE:pn");
-    pr = FMAKE_N(int, nd, "_SC_MAKE_TREE_NODE:branch");
-    pb = FMAKE_N(SC_tree_node *, nd, "_SC_MAKE_TREE_NODE:branch");
+    pn = CMAKE(SC_tree_node);
+    pr = CMAKE_N(int, nd);
+    pb = CMAKE_N(SC_tree_node *, nd);
     for (i = 0; i < nd; i++)
         {pr[i] = 0;
 	 pb[i] = NULL;};
@@ -104,9 +104,9 @@ static void SC_rel_tree_node(SC_tree_node *pn)
          if (p != NULL)
             SC_rel_tree_node(p);};
 
-    SFREE(pn->rank);
-    SFREE(pn->branch);
-    SFREE(pn);
+    CFREE(pn->rank);
+    CFREE(pn->branch);
+    CFREE(pn);
 
     return;}
 
@@ -138,7 +138,7 @@ static int _SC_tree_cmp(void *a, void *b)
 SC_ntree *SC_make_ntree(int nd, PFIntBin cmp)
    {SC_ntree *pt;
 
-    pt = FMAKE(SC_ntree, "SC_MAKE_NTREE:pt");
+    pt = CMAKE(SC_ntree);
 
     pt->nd                 = nd;
     pt->n_entry            = 0;
@@ -163,10 +163,10 @@ void SC_rel_ntree(SC_ntree *tree)
 
     SC_rel_tree_node(branch[nd-1]);
 
-    SFREE(tree->head->branch);
-    SFREE(tree->head->rank);
-    SFREE(tree->head);
-    SFREE(tree);
+    CFREE(tree->head->branch);
+    CFREE(tree->head->rank);
+    CFREE(tree->head);
+    CFREE(tree);
 
     return;}
 

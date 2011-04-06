@@ -196,7 +196,7 @@ static double *test_dcsl(int n, int *pit, double *ptol, int nd, int *dim,
 	  n, mx->array, NULL);
 
 /* solve the system A.x = b */
-    ips = FMAKE_N(int, n, "TEST_DCSL:ips");
+    ips = CMAKE_N(int, n);
 
 /* do the lu decomposition */
     PM_decompose(ma, ips, FALSE);
@@ -212,7 +212,7 @@ static double *test_dcsl(int n, int *pit, double *ptol, int nd, int *dim,
     PM_destroy(ma);
     PM_destroy(mx);
 
-    SFREE(ips);
+    CFREE(ips);
 
     *pit  = 1;
     *ptol = 0.0;
@@ -446,10 +446,10 @@ static int compare_answer(double *xs, double *xc, double *xi, double *xb,
 
     err = (cc || ci || cb);
 
-    SFREE(xs);
-    SFREE(xc);
-    SFREE(xi);
-    SFREE(xb);
+    CFREE(xs);
+    CFREE(xc);
+    CFREE(xi);
+    CFREE(xb);
 
     return(err);}
 

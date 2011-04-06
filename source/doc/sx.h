@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 11/12/2010
+MOD: 04/06/2011
 
 <CENTER>
 <P>
@@ -4574,8 +4574,8 @@ static void _rl_gnum_array(obj)
 
     arr = ARRAY(obj);
 
-    SFREE(arr->data);
-    SFREE(arr);
+    CFREE(arr->data);
+    CFREE(arr);
 
     SS_rl_object(obj);
 
@@ -4631,13 +4631,13 @@ static object *mk_array(argl)
             SC_LONG_I, &bpi,
             0);
 
-    arr = MAKE(array);
+    arr = CMAKE(array);
 
     sprintf(ltype, "%s *", type);
 
-    arr->type   = SC_strsave(ltype);
+    arr->type   = CSTRSAVE(ltype);
     arr->length = size;
-    arr->data   = (byte *) MAKE_N(char, size*bpi);
+    arr->data   = CMAKE_N(char, size*bpi);
 
     return(_mk_array(arr));
 

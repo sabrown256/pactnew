@@ -46,14 +46,14 @@ void SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name)
      if (prm == TRUE)
         s = NMAKE_N(char, n, "PERM|char*:SC_DA_INIT:s");
      else
-        s = FMAKE_N(char, n, "char*:SC_DA_INIT:s");
+        s = CMAKE_N(char, n);
      snprintf(s, n, "%s *", tn);
 
      n = d*bpi;
      if (prm == TRUE)
         lst = NMAKE_N(char, n, name);
      else
-        lst = FMAKE_N(char, n, name);
+        lst = CMAKE_N(char, n);
 
      SC_mark(lst, 1);
 
@@ -78,9 +78,9 @@ void SC_da_free(SC_dynamic_array *a)
     {
 
      if (a != NULL)
-        {SFREE(a->type);
-	 SFREE(a->array);
-	 SFREE(a);};
+        {CFREE(a->type);
+	 CFREE(a->array);
+	 CFREE(a);};
 
      return;}
 
@@ -93,8 +93,8 @@ void SC_da_rel(SC_dynamic_array *a)
     {
 
      if (a != NULL)
-        {SFREE(a->type);
-	 SFREE(a->array);
+        {CFREE(a->type);
+	 CFREE(a->array);
 
 	 SC_da_clear(a, 0, 0);};
 
@@ -109,13 +109,13 @@ SC_dynamic_array *SC_da_copy(SC_dynamic_array *a)
     {long nb;
      SC_dynamic_array *ca;
 
-     ca  = FMAKE(SC_dynamic_array, "SC_DA_COPY:ca");
+     ca  = CMAKE(SC_dynamic_array);
      *ca = *a;
 
      nb = SC_arrlen(a->array);
 
-     ca->type  = SC_strsavef(a->type, "SC_DA_COPY:type");
-     ca->array = FMAKE_N(char, nb, "SC_DA_COPY:array");
+     ca->type  = CSTRSAVE(a->type);
+     ca->array = CMAKE_N(char, nb);
 
      memcpy(ca->array, a->array, nb);
 
@@ -133,7 +133,7 @@ void *SC_da_done(SC_dynamic_array *a)
 
      rv = a->array;
 
-     SFREE(a->type);
+     CFREE(a->type);
 
      SC_da_clear(a, 0, 0);
 
@@ -154,7 +154,7 @@ void _SC_da_alloc(SC_dynamic_array *a, char *name)
 	 bpi = a->bpi;
          nx  = d;
 
-         lst = FMAKE_N(char, nx*bpi, name);
+         lst = CMAKE_N(char, nx*bpi);
 	 if (SC_zero_on_alloc_n(-1) == FALSE)
 	    memset(lst, 0, nx*bpi);
 
@@ -190,7 +190,7 @@ void _SC_da_extend(SC_dynamic_array *a, double pad)
          nn  = nx + d;
 
 	 name = SC_arrname(lst);
-         nlst = FMAKE_N(char, nn*bpi, name);
+         nlst = CMAKE_N(char, nn*bpi);
 
 	 memcpy(nlst, lst, nx*bpi);
 	 if (SC_zero_on_alloc_n(-1) == FALSE)
@@ -201,7 +201,7 @@ void _SC_da_extend(SC_dynamic_array *a, double pad)
 
 	 SC_mark(nlst, 1);
 
-	 SFREE(lst);};
+	 CFREE(lst);};
 
      return;}
 
@@ -253,13 +253,13 @@ void SC_da_shrink(SC_dynamic_array *a, int n)
      bpi = a->bpi;
      lst = (char *) a->array;
      if (lst == NULL)
-        {lst = FMAKE_N(char, n*bpi, "SC_DA_SHRINK:lst");
+        {lst = CMAKE_N(char, n*bpi);
 	 if (SC_zero_on_alloc_n(-1) == FALSE)
 	    memset(lst, 0, n*bpi);
 	 SC_mark(lst, 1);}
 
      else
-        {REMAKE_N(lst, char, n*bpi);};
+        {CREMAKE(lst, char, n*bpi);};
 
      a->array = lst;
      a->n     = n;
@@ -333,7 +333,7 @@ void SC_da_reset(SC_dynamic_array *daa, int elem)
     for (ida = 0; ida < nda; ida++)
         {da = daa + ida;
 
-	 SFREE(da->array);
+	 CFREE(da->array);
 	 da->n = 0;};
 
     return;}
@@ -362,8 +362,8 @@ void SC_da_clean(SC_dynamic_array *daa, int elem)
     for (ida = 0; ida < nda; ida++)
         {da = daa + ida;
 
-	 SFREE(da->array);
-	 SFREE(da->type);
+	 CFREE(da->array);
+	 CFREE(da->type);
 	 da->n  = 0;
 	 da->nx = 0;};
 
@@ -414,7 +414,7 @@ void SC_da_release_pointees(SC_dynamic_array *daa, int elem)
 	 np  = SC_N_DYNAMIC((*(daa+ida)));
 	 ppa = da->array;
 	 for (ip = 0; ip < np; ip++)
-             SFREE(ppa[ip]);};
+             CFREE(ppa[ip]);};
 
     return;}
 
@@ -556,7 +556,7 @@ void SC_remember_string(char *s, SC_dynamic_array *a)
 void SC_remember_string_copy(char *s, SC_dynamic_array *a)
     {char *t;
 
-     t = SC_strsavef(s, "char*:SC_REMEMBER_STRING_COPY:t");
+     t = CSTRSAVE(s);
 
      SC_remember_string(t, a);
 
@@ -626,16 +626,16 @@ char **_SC_join_lines(SC_dynamic_array *sa)
 		     if (SC_is_print_char(*s, 4))
 		        bf = SC_dstrcat(bf, s);};};
 
-	     SFREE(sao[i]);};
+	     CFREE(sao[i]);};
 
-	SFREE(sao);
+	CFREE(sao);
 
 /* add the whatever is left if anything */
 	if (bf != NULL) 
 	   {if (bf[0] != '\0')
 	       {SC_remember_string(bf, &na);}
 	    else
-	       {SFREE(bf);};};};
+	       {CFREE(bf);};};};
 
 /* add a terminating NULL */
     SC_remember_string(NULL, &na);

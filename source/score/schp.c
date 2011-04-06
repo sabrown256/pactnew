@@ -42,7 +42,7 @@ void SC_reset_terminal(void)
 
     if (_SC.orig_tty != NULL)
        {SC_set_term_state(_SC.orig_tty, -1);
-        SFREE(_SC.orig_tty);};
+        CFREE(_SC.orig_tty);};
 
     return;}
 
@@ -133,7 +133,7 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 
     pc = _getpty(&pty, O_RDWR | O_NDELAY, 0600, FALSE);
     if (pc != NULL)
-       {cp->spty = SC_strsavef(pc, "char*:_SC_OPEN_PTY_UNIX:spty");
+       {cp->spty = CSTRSAVE(pc);
 
 	cp->in  = pty;
 	cp->out = pty;
@@ -208,7 +208,7 @@ static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
     err |= unlockpt(pty);
     if ((pty >= 0) && (err == 0))
        {ps = ptsname(pty);
-	cp->spty = SC_strsavef(ps, "char*:_SC_OPEN_PTY_UNIX98:spty");
+	cp->spty = CSTRSAVE(ps);
 
 	cp->in  = pty;
 	cp->out = pty;
@@ -255,7 +255,7 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
    {unsigned int nb;
     PROCESS *pp;
 
-    pp = FMAKE(PROCESS, "SC_MK_PROCESS:pp");
+    pp = CMAKE(PROCESS);
 
     if ((iex < 10) || (30 < iex))
        nb = SIZE_BUF;
@@ -277,7 +277,7 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
     pp->data_type   = SC_UNKNOWN;
 
     pp->nb_ring     = nb;
-    pp->in_ring     = FMAKE_N(unsigned char, nb, "SC_MK_PROCESS:in_ring");
+    pp->in_ring     = CMAKE_N(unsigned char, nb);
     pp->ib_in       = 0;
     pp->ob_in       = 0;
 
@@ -396,8 +396,8 @@ static int _SC_init_pty(PROCESS *pp, PROCESS *cp)
     ph = -1;
     SC_get_term_size(&nr, &nc, &ph, &pw);
 
-    pp->tty = FMAKE(SC_ttydes, "_SC_INIT_IPC_PROC:pp->tty");
-    cp->tty = FMAKE(SC_ttydes, "_SC_INIT_IPC_PROC:cp->tty");
+    pp->tty = CMAKE(SC_ttydes);
+    cp->tty = CMAKE(SC_ttydes);
 
     pp->tty->nr = nr;
     pp->tty->nc = nc;
@@ -622,7 +622,7 @@ static int *_SC_make_pipeline(char **argv)
     for (i = 0; argv[i] != NULL; i++)
         n += (strcmp(argv[i], "|") == 0);
 
-    pl = FMAKE_N(int, n+1, "_SC_MAKE_PIPELINE:pl");
+    pl = CMAKE_N(int, n+1);
     n  = 0;
 
     pl[n++] = 0;
@@ -772,10 +772,10 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 /* set up the communications pipe */
     flag = _SC_init_ipc(pp, cp);
     if (flag == FALSE)
-       {SFREE(pp->tty);
-	SFREE(pp);
-	SFREE(cp->tty);
-        SFREE(cp);
+       {CFREE(pp->tty);
+	CFREE(pp);
+	CFREE(cp->tty);
+        CFREE(cp);
         SC_error(-1, "COULDN'T CREATE IPC CHANNELS - _SC_SETUP_PROC");
 	return(-1);};
 
@@ -837,8 +837,8 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
     pl = _SC_make_pipeline(argv);
     n  = _SC_pipeline_length(pl);
 
-    pa = FMAKE_N(PROCESS *, n, "_SC_OPEN_PROC:pa");
-    ca = FMAKE_N(PROCESS *, n, "_SC_OPEN_PROC:ca");
+    pa = CMAKE_N(PROCESS *, n);
+    ca = CMAKE_N(PROCESS *, n);
 
 /* setup each process in the pipeline */
     for (i = 0; i < n; i++)
@@ -885,9 +885,9 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 		      pp = NULL;};
 		  break;};};
 
-    SFREE(pl);
-    SFREE(pa);
-    SFREE(ca);
+    CFREE(pl);
+    CFREE(pa);
+    CFREE(ca);
 
 #else
 
@@ -923,7 +923,7 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
     else
        SC_ptr_arr_len(na, argv);
 
-    ca = FMAKE_N(char *, na+7, "_SC_OPEN_REMOTE:ca");
+    ca = CMAKE_N(char *, na+7);
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -956,7 +956,7 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
 
     SC_ERR_UNTRAP();
 
-    SFREE(ca);
+    CFREE(ca);
 
     return(pp);}
 
@@ -995,7 +995,7 @@ int SC_buffer_in(char *bf, int n, PROCESS *pp)
 
 /* resize the ring */
 	nnb = nb + db;
-	REMAKE_N(ring, unsigned char, nnb);
+	CREMAKE(ring, unsigned char, nnb);
 
 /* adjust the ring if the "in use" section is discontiguous */
 	if (ib < ob)
@@ -1230,7 +1230,7 @@ int SC_printf(PROCESS *pp, char *fmt, ...)
 	if (SC_process_alive(pp) && (prnt != NULL))
 	   ret = (*prnt)(pp, bf);
 
-	SFREE(bf);}
+	CFREE(bf);}
 
     else if (ok == -2)
        {SC_close(pp);};
@@ -1306,7 +1306,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 	    fl  = fd[ofd].flag;}
 	else
 	   {ofd = ifd;
-	    nm  = SC_strsavef(name, "_SC_SET_FILEDES:nm");
+	    nm  = CSTRSAVE(name);
 	    fl  = -1;};
 
 /* do not try to use O_EXCL bit with devices - think about it */
@@ -1372,7 +1372,7 @@ void _SC_set_filedes(SC_filedes *fd, int ifd, char *name, int fl)
    {char *nm;
 
     if (name != NULL)
-       {nm = SC_strsavef(name, "_SC_SET_FILEDES:nm");
+       {nm = CSTRSAVE(name);
 
 	fd[ifd].name = nm;
 	fd[ifd].flag = fl;};
@@ -1393,7 +1393,7 @@ void _SC_fin_filedes(SC_filedes *fd)
        n = 2;
 
     for (i = 0; i < n; i++)
-        {SFREE(fd[i].name);};
+        {CFREE(fd[i].name);};
 
     return;}
 
@@ -1606,7 +1606,7 @@ int SC_init_server(int step, int closep)
 			 fflush(_SC_diag);};
 
 		     _SC.sfd = -1;
-		     SFREE(_SC.srvr);};
+		     CFREE(_SC.srvr);};
 
 		 rv = _SC.nfd;
 

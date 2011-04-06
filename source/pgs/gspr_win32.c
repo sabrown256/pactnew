@@ -608,7 +608,7 @@ void _PG_win32_shade_poly(PG_device *dev, int nd, int n, double **r)
 
 	ReleaseDC(dev->window, hdc);
 
-	SFREE(points);};
+	CFREE(points);};
 
     return;}
 
@@ -651,7 +651,7 @@ void _PG_win32_fill_curve(PG_device *dev, PG_curve *crv)
 
     ReleaseDC(dev->window, hdc);    
 
-    SFREE(points);
+    CFREE(points);
 
     return;}
 

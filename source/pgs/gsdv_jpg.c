@@ -101,7 +101,7 @@ static void _PG_JP_finish_plot(PG_device *dev)
 
     imagesize = mdv->width * mdv->height * cinfo.input_components;
    
-    input = FMAKE_N(unsigned char, imagesize, "PG_CLOSE_JPEG:input");
+    input = CMAKE_N(unsigned char, imagesize);
 
     GET_RGB(fr, r, g, b);
 

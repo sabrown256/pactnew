@@ -448,8 +448,7 @@ static PG_device *_PG_GL_open_screen(PG_device *dev, double xf, double yf,
     size_hints.min_width  = 0.25*dw[0];
     size_hints.min_height = 0.25*dw[1];
  
-    icon_name = window_name = SC_strsavef(dev->title,
-					  "char*:_PG_GL_OPEN_SCREEN:name");
+    icon_name = window_name = CSTRSAVE(dev->title);
 
     Xargc = 0;
     Xargv = NULL;
@@ -735,8 +734,7 @@ static void _PG_GL_map_to_color_table(PG_device *dev, PG_palette *pal)
     if (disp == NULL)
        return;
 
-    pi     = FMAKE_N(unsigned long, n_pal_colors,
-                     "_PG_GL_MAP_TO_COLOR_TABLE:pi");
+    pi     = CMAKE_N(unsigned long, n_pal_colors);
     screen = DefaultScreen(disp);
     clrmp  = DefaultColormap(disp, screen);
 
@@ -792,8 +790,7 @@ static void _PG_GL_match_rgb_colors(PG_device *dev, PG_palette *pal)
     npc     = pal->n_pal_colors + 2;
     true_cm = pal->true_colormap;
 
-    pi  = FMAKE_N(unsigned long, npc,
-                  "_PG_GL_MATCH_RGB_COLORS:pi");
+    pi  = CMAKE_N(unsigned long, npc);
     pir = dev->color_table->pixel_value;
 
     for (i = 0; i < npc; i++)

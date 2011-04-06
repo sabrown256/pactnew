@@ -499,7 +499,7 @@ void _SC_eth_thread_broadcast(SC_thread_cond *tc)
         {ci = SC_array_get(_SC.eth_conds, i);
 	 ci->waiting = FALSE;};
 
-    SFREE(ci);
+    CFREE(ci);
 
     return;}
 

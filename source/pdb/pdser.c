@@ -482,14 +482,14 @@ PD_smp_state *_PD_get_state(int id)
 void _PD_rl_pfile(PD_Pfile *pf)
    {
 
-    SFREE(pf->f_addr);
+    CFREE(pf->f_addr);
 
 /* GOTCHA: valgrind and ZeroFault will complain when this is a genuine
  * C library FILE
  */
-    SFREE(pf->stream);
+    CFREE(pf->stream);
 
-    SFREE(pf);
+    CFREE(pf);
 
     return;}
 

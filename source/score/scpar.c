@@ -132,7 +132,7 @@ static void _SC_init_thread_work(thread_work *tw, int nt,
     nt = max(nt, 1);
     np = nt + 1;
 
-    r = FMAKE_N(void *, np, "_SC_INIT_THREAD_WORK:r");
+    r = CMAKE_N(void *, np);
     for (i = 0; i < np; i++)
         r[i] = NULL;
 
@@ -154,7 +154,7 @@ static void _SC_init_thread_work(thread_work *tw, int nt,
 static thread_work *_SC_make_thread_work(int nt, PFPVoidAPV f, void *a)
    {thread_work *tw;
 
-    tw = FMAKE(thread_work, "_SC_MAKE_THREAD_WORK:tw");
+    tw = CMAKE(thread_work);
 
     _SC_init_thread_work(tw, nt, f, a);
 
@@ -169,8 +169,8 @@ static void _SC_free_thread_work(thread_work *tw, int n)
    {int i;
 
     for (i = 0; i < n; i++)
-        SFREE(tw[i].ret);
-    SFREE(tw);
+        CFREE(tw[i].ret);
+    CFREE(tw);
 
     return;}
 
@@ -196,7 +196,7 @@ void SC_do_threads(int n, int *nt, PFPVoidAPV fnc[],
     void *a;
     thread_work *tw;
 
-    tw = FMAKE_N(thread_work, n, "SC_DO_THREADS:tw");
+    tw = CMAKE_N(thread_work, n);
 
 /* load up the thread work array */
     for (i = 0; i < n; i++)
@@ -337,7 +337,7 @@ void SC_chunk_loop(PFPVoidAPV fnc, int mn, int mx, int serial, void *argl)
 
     tw = _SC_make_thread_work(nt, fnc, argl);
 
-    _SC_tc.index = FMAKE_N(int, np, "SC_CHUNK_LOOP:ret");
+    _SC_tc.index = CMAKE_N(int, np);
 
 /* compute the index range each thread is to do */
     dj = (mx - mn)/nt;
@@ -370,7 +370,7 @@ void SC_chunk_loop(PFPVoidAPV fnc, int mn, int mx, int serial, void *argl)
 		 "MISSED CHUNK IN PARALLEL LOOP - SC_CHUNK_LOOP");
 
     _SC_free_thread_work(tw, 1);
-    SFREE(_SC_tc.index);
+    CFREE(_SC_tc.index);
 
     _SC.tid_hook = otid;
 

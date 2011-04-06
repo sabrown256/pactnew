@@ -87,12 +87,12 @@ static haelem *_SC_make_haelem(hasharr *ha, void *key)
    {void *lkey;
     haelem *hp;
 
-    hp = FMAKE(haelem, "_SC_MAKE_HAELEM:hp");
+    hp = CMAKE(haelem);
     if (hp != NULL)
 
 /* setup the key */
        {if (HA_STRING_KEY(ha->hash))
-	   {lkey = SC_strsavef(key, "char*:_SC_MAKE_HAELEM:name");
+	   {lkey = CSTRSAVE(key);
 	    SC_mark(lkey, 1);}
         else
 	   lkey = key;
@@ -114,13 +114,13 @@ static void _SC_free_haelem(hasharr *ha, haelem *hp)
 
 /* undo the MARK in SC_hasharr_install */
     if (hp->free == TRUE)
-       SFREE(hp->def);
+       CFREE(hp->def);
 
     string = HA_STRING_KEY(ha->hash);
     if (string == TRUE)
-       SFREE(hp->name);
+       CFREE(hp->name);
 
-/*    SFREE(hp->type); */
+/*    CFREE(hp->type); */
     hp->type = NULL;
 
     hp->iht = -10000;
@@ -128,7 +128,7 @@ static void _SC_free_haelem(hasharr *ha, haelem *hp)
 
     SC_mark(hp, -2);
 
-    SFREE(hp);
+    CFREE(hp);
 
     return;}
 
@@ -234,9 +234,9 @@ hasharr *SC_make_hasharr(int sz, int docflag, char *lm)
     haelem **tb;
 
 /* allocate a new hash array */
-    ha = FMAKE(hasharr, "SC_MAKE_HASHARR:ha");
+    ha = CMAKE(hasharr);
     if (ha != NULL)
-       {tb = FMAKE_N(haelem *, sz, "SC_MAKE_HASHARR:tb");
+       {tb = CMAKE_N(haelem *, sz);
         if (tb != NULL)
            {ha->size     = sz;
             ha->docp     = docflag;
@@ -249,7 +249,7 @@ hasharr *SC_make_hasharr(int sz, int docflag, char *lm)
 	    _SC_hasharr_init(ha, lm);}
 
 	else
-	   SFREE(ha);};
+	   CFREE(ha);};
 
     return(ha);}
 
@@ -323,10 +323,10 @@ void SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
 
 	_SC_hasharr_free_elements(ha);
 
-        SFREE(ha->key_type);
-        SFREE(ha->table);};
+        CFREE(ha->key_type);
+        CFREE(ha->table);};
 
-    SFREE(ha);
+    CFREE(ha);
 
     return;}
 
@@ -372,7 +372,7 @@ int SC_hasharr_free_n(void *d, void *a)
 
     if (a != NULL)
        {t = *(void **) d;
-	SFREE(t);};
+	CFREE(t);};
 
     return(TRUE);}
 
@@ -398,7 +398,7 @@ int SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
 	    {if (hp[i] != NULL)
 	        rv &= f(hp[i], a);};
 
-	SFREE(hp);};
+	CFREE(hp);};
 
     return(rv);}
 
@@ -442,7 +442,7 @@ int SC_hasharr_next(hasharr *ha, long *pi,
 
 		 break;};};
 
-	SFREE(tb);};
+	CFREE(tb);};
 
     return(rv);}
 
@@ -565,9 +565,8 @@ int SC_hasharr_rekey(hasharr *ha, char *method)
 	    ha->comp = NULL;};
 
 	if (ha->hash != NULL)
-	   {SFREE(ha->key_type);
-	    ha->key_type = SC_strsavef(method,
-					"char*:SC_HASHARR_REKEY:key_type");};
+	   {CFREE(ha->key_type);
+	    ha->key_type = CSTRSAVE(method);};
 
 /* force array to reset access method
  * needed when hasharr has been read from PDB file
@@ -685,7 +684,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 	ne  = SC_array_get_n(arr);
 	tb  = SC_array_array(arr);
 
-	sa = FMAKE_N(char *, ne+1, "SC_HASHARR_DUMP:sa");
+	sa = CMAKE_N(char *, ne+1);
 	if (sa != NULL)
 	   {ns = 0;
 	    for (ie = 0; ie < ne; ie++)
@@ -703,7 +702,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 	    if ((sort == TRUE) && (HA_STRING_KEY(ha->hash) == TRUE))
 	       SC_string_sort(sa, ns);};
 
-	SFREE(tb);};
+	CFREE(tb);};
 
     return(sa);}
 
@@ -754,12 +753,10 @@ int SC_set_hash_dump(hasharr *ha, int (*fun)(haelem **v, int n))
         _SC.ne = SC_MEM_GET_N(char *, _SC.hash_entries) - 1;
 
         for (i = 0; i < _SC.ne; i++)
-            _SC.hash_entries[i] = SC_strsavef(_SC.hash_entries[i],
-					      "char*:SC_SET_HASH_DUMP:hash_entries");}
+            _SC.hash_entries[i] = CSTRSAVE(_SC.hash_entries[i]);}
 
     else
-       {entries = FMAKE_N(haelem *, ha->ne,
-			  "SC_SET_HASH_DUMP:entries");
+       {entries = CMAKE_N(haelem *, ha->ne);
         if (entries == NULL)
            return(-1);
 
@@ -774,18 +771,16 @@ int SC_set_hash_dump(hasharr *ha, int (*fun)(haelem **v, int n))
 /* sort the array of haelem's */
         n_entries = (*fun)(entries, n_entries);
 
-        _SC.hash_entries = FMAKE_N(char *, n_entries,
-				  "SC_HASHARR_DUMP:_SC.hash_entries");
+        _SC.hash_entries = CMAKE_N(char *, n_entries);
         if (_SC.hash_entries == NULL)
            return(-1);
 
         for (i = 0; i < n_entries; i++)
-            _SC.hash_entries[i] = SC_strsavef(entries[i]->name,
-                                 "char*:SC_SET_HASH_DUMP:name");
+            _SC.hash_entries[i] = CSTRSAVE(entries[i]->name);
 
         _SC.ne = n_entries;
 
-        SFREE(entries);};
+        CFREE(entries);};
 
     return(_SC.ne);}
 
@@ -799,8 +794,8 @@ int SC_free_hash_dump(void)
 
     if (_SC.hash_entries != NULL)
        {for (i = 0; i < _SC.ne; i++)
-            {SFREE(_SC.hash_entries[i]);};
-        SFREE(_SC.hash_entries);};
+            {CFREE(_SC.hash_entries[i]);};
+        CFREE(_SC.hash_entries);};
 
     return(TRUE);}
 
@@ -914,7 +909,7 @@ FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, F77_string pname, void *ptr,
 
         ptr = s;};
 
-    t  = SC_strsavef(type, "char*:SCHINS:type"),
+    t  = CSTRSAVE(type),
     hp = SC_hasharr_install(ha, name, ptr, t, FALSE, TRUE);
 
     rv = _SC_to_number(hp);

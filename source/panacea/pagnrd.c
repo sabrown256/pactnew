@@ -100,7 +100,7 @@ hasharr *PA_inst_com(void)
    {
 
     PA_alias_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
-    PAN_COMMAND  = SC_strsavef("PA_command", "char*:PA_INST_COM:command");
+    PAN_COMMAND  = CSTRSAVE("PA_command");
 
 /* this call should be moved into PA_inst_pck_gen_cmmnds */
     PA_gencmd();
@@ -138,8 +138,8 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
     if (PA_commands == NULL)
        PA_commands  = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
 
-    cp          = FMAKE(PA_command, "PA_INST_C:cp");
-    cp->name    = SC_strsavef(cname, "char*:PA_INST_C:cname");
+    cp          = CMAKE(PA_command);
+    cp->name    = CSTRSAVE(cname);
     cp->type    = ctype;
     cp->num     = cnum;
     cp->proc    = cproc;
@@ -239,7 +239,7 @@ void PA_defh(void)
 	PA_def_alias(var, SC_LONG_S, &lv);}
 
     else
-       {sv = SC_strsavef(val, "char*:PA_DEFH:val");
+       {sv = CSTRSAVE(val);
 	PA_def_alias(var, SC_STRING_S, &sv);};
 
     return;}
@@ -264,7 +264,7 @@ void PA_specifyh(void)
         ivident = PA_get_field("IDENTIFIER", "PA_SPECIFY", REQU);}
     else
        {ivtype = 'v';
-        ivident = SC_strsavef(s, "char*:PA_SPECIFYH:s");};
+        ivident = CSTRSAVE(s);};
 
     first  = NULL;
     _PA.ivlst  = NULL;
@@ -302,7 +302,7 @@ void PA_specifyh(void)
             else
                nxt = PA_alias_value(s);
 
-            nxtp = FMAKE(double, "PA_SPECIFYH:nxtp");
+            nxtp = CMAKE(double);
             *nxtp = nxt;
             _PA.ivlst = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
             if (first == NULL)
@@ -329,7 +329,7 @@ void PA_sh(void)
 
     while ((s = PA_get_field("SPECIFICATION", "S", OPTL)) != NULL)
        {nxt = PA_alias_value(s);
-        nxtp = FMAKE(double, "PA_SH:nxtp");
+        nxtp = CMAKE(double);
         *nxtp = nxt;
         next = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
         if (_PA.ivlst == NULL)
@@ -364,7 +364,7 @@ void PA_proc_iv_spec(PA_iv_specification *lst)
             continue;
 
 /* if a data base variable is being specified then connect to it */
-         data = FMAKE_N(double, sp->num, "PA_PROC_IV_SPEC:data");
+         data = CMAKE_N(double, sp->num);
          if (sp->type == 'v')
             PA_INTERN(data, sp->name);
 
@@ -646,7 +646,7 @@ void PA_pshand(PA_command *cp)
     else if (strcmp(cp->name, "name") == 0)
        {i    = SC_stoi(PA_get_field("INDEX", "NAME", REQU));
         sval = SC_strtok(NULL, "\n\r", PA_strtok_p);
-        NAME[i] = SC_strsavef(sval, "char*:PA_PSHAND:s");}
+        NAME[i] = CSTRSAVE(sval);}
 
     else if (strcmp(cp->name, "unit") == 0)
        {i    = SC_stoi(PA_get_field("INDEX", "UNIT", REQU));
@@ -671,7 +671,7 @@ void PA_pshand(PA_command *cp)
 	   SC_convert_id(did, cp->vr, i, 1, SC_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
         else if ((did == SC_CHAR_I) || (did == SC_STRING_I))
-           ((char **) cp->vr)[i] = SC_strsavef(sval, "char*:PA_PSHAND:s");
+           ((char **) cp->vr)[i] = CSTRSAVE(sval);
 
 /* since char_8 is a FORTRAN disease treat it as static */
         else if (did == SC_CHAR_8_I)
@@ -755,15 +755,14 @@ PA_plot_request *_PA_mk_plot_request(PA_set_spec *range, PA_set_spec *domain,
 				     char *text, PA_plot_request *next)
    {PA_plot_request *req;
 
-    req = FMAKE(PA_plot_request, "_PA_MK_PLOT_REQUEST:req");
+    req = CMAKE(PA_plot_request);
 
     req->range            = range;
     req->range_name       = NULL;
     req->domain           = domain;
     req->base_domain_name = NULL;
     req->domain_map       = NULL;
-    req->text             = SC_strsavef(text,
-                             "char*:_PA_MK_PLOT_REQUEST:text");
+    req->text             = CSTRSAVE(text);
     req->time_plot        = FALSE;
     req->mesh_plot        = FALSE;
     req->status           = EDIT;
@@ -831,7 +830,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
 
 	ret = FALSE;};
 
-    spec->function = SC_strsavef(fnc, "char*:PA_FUNCTION_FORM:function");
+    spec->function = CSTRSAVE(fnc);
     spec->n_values = SC_array_get_n(val);
     spec->values   = SC_array_done(val);
 
@@ -851,13 +850,13 @@ PA_set_spec *_PA_proc_set_spec(char *s, PA_set_spec *lst)
 
     strcpy(t, s);
 
-    spec = FMAKE(PA_set_spec, "_PA_PROC_SET_SPEC:spec");
+    spec = CMAKE(PA_set_spec);
 
     token = SC_firsttok(t, " \t=");
     if (token == NULL)
        return(lst);
 
-    spec->var_name = SC_strsavef(token, "char*:_PA_PROC_SET_SPEC:name");
+    spec->var_name = CSTRSAVE(token);
     spec->text     = NULL;
     spec->values   = NULL;
 
@@ -872,7 +871,7 @@ PA_set_spec *_PA_proc_set_spec(char *s, PA_set_spec *lst)
 	if (SC_numstrp(token) || (vc != -2.0*HUGE))
 	   {spec->function = NULL;
 	    spec->n_values = 1;
-	    spec->values   = FMAKE(double, "_PA_PROC_SET_SPEC:values");
+	    spec->values   = CMAKE(double);
 	    *spec->values  = vc;}
 
 /* handle cases "var=func(#;#;#)" and "var=<string>" */
@@ -961,22 +960,22 @@ void PA_name_files(char *base_name, char **ped, char **prs,
 /* name the first edit file */
     if (ped != NULL)
        {snprintf(s, 50, "%s.e00", t);
-	*ped = SC_strsavef(s, "char*:PA_NAME_FILES:ped");};
+	*ped = CSTRSAVE(s);};
 
 /* name the restart dump file */
     if (prs != NULL)
        {snprintf(s, 50, "%s.r00", t);
-	*prs = _PA.rsname = SC_strsavef(s, "char*:PA_NAME_FILES:prs");};
+	*prs = _PA.rsname = CSTRSAVE(s);};
 
 /* name the post-processor file */
     if (ppp != NULL)
        {snprintf(s, 50, "%s.t00", t);
-	*ppp = SC_strsavef(s, "char*:PA_NAME_FILES:ppp");};
+	*ppp = CSTRSAVE(s);};
 
 /* name the post-processor file */
     if (pgf != NULL)
        {snprintf(s, 50, "%s.s00", t);
-	*pgf = SC_strsavef(s, "char*:PA_NAME_FILES:pgf");};
+	*pgf = CSTRSAVE(s);};
 
     return;}
 
