@@ -396,7 +396,7 @@ static int get_array_object_data(PyObject *obj, void *vr, long nitems,
                                  int type, int gc)
 {
     int elsize;
-    int len;
+    int len, nb;
     void *value;
     PyArrayObject *array;
 
@@ -420,8 +420,9 @@ static int get_array_object_data(PyObject *obj, void *vr, long nitems,
     /* XXXX - under some cases it may be possible to just point this memory 
      * instead of allocating our own */
     if (gc == PP_GC_YES) {
-        DEREF(vr) = (void *) SC_alloc(nitems, elsize, NULL);
-        memcpy(DEREF(vr), value, nitems * elsize);
+        nb = nitems*elsize;
+        DEREF(vr) = CMAKE_N(char, nb);
+        memcpy(DEREF(vr), value, nb);
     } else {
         DEREF(vr) = value;
     }

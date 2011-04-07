@@ -74,19 +74,16 @@ if ("$TEST_MPI" == "YES") then
       if ("$MPI" == "") then
          if (-x $BinDir/mpi-io-wrap) then
             Note $LogF "Running non-MPI version of test"
-            Note $LogF "(echo a; echo b; echo end) | $BinDir/mpi-io-wrap $BinDir/sctty -q > scmpiwrap.res"
-            (echo "a"; echo "b"; echo "end") | $BinDir/mpi-io-wrap $BinDir/sctty -q > scmpiwrap.res
+            flog $LogF ( (echo "a"; echo "b"; echo "end") | $BinDir/mpi-io-wrap $BinDir/sctty -q |& sort > scmpiwrap.res )
             set LStat = $status
          else
             Note $LogF "Running non-MPI version of test (without mpi-io-wrap)"
-            Note $LogF "(echo a; echo b; echo end) | $DORUN -m $BinDir/sctty -q > scmpiwrap.res"
-            (echo "a"; echo "b"; echo "end") | $DORUN -m $BinDir/sctty -q > scmpiwrap.res
+            flog $LogF ( (echo "a"; echo "b"; echo "end") | $DORUN -m $BinDir/sctty -q |& sort > scmpiwrap.res )
             set LStat = $status
          endif
       else
          Note $LogF "Running MPI version of test"
-         Note $LogF "(echo a; echo b; echo end) | $PFE -f -p 1 $BinDir/sctty -q > scmpiwrap.res"
-         (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $BinDir/sctty -q |& grep -v ATTENTION: >! scmpiwrap.res
+         flog $Log  ( (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $BinDir/sctty -q |& sort |& grep -v ATTENTION: >! scmpiwrap.res )
          set LStat = $status
       endif
 

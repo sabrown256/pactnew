@@ -479,7 +479,7 @@ int node_massw(double *mass, double *rho, double *rx, double *ry)
 
     SC_chunk_loop(nmw, frz, lrz, TRUE, &pn);
 
-    SFREE_N(volq, 4*N_nodes);
+    CFREE(volq);
 
     return(TRUE);}
 

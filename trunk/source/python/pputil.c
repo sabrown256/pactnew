@@ -131,7 +131,7 @@ int PP_alloc_data(char *type, long nitems, PP_file *fileinfo, void **vr)
          * for NULL and SX_firsttok which get carried into the
          * PyStringObject making it larger than requested.
          */
-        DEREF(vr) = SC_alloc(nitems, sizeof(char), "PP_alloc_data:ptr");
+        DEREF(vr) = CMAKE_N(char, nitems);
         ierr = 1;
     } else {
         DEREF(vr) = _PD_alloc_entry(fileinfo->file, type, nitems);

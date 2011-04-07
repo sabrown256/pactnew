@@ -107,7 +107,7 @@ PP_alloc(
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "lls:alloc", kw_list,
                                      &nitems, &bpi, &name))
         return NULL;
-    result = SC_alloc(nitems, bpi, name);
+    result = SC_alloc_nz(nitems, bpi, name, FALSE, -1);
     if (result != NULL) {
         SC_mark(result, 1);
         rv = PyCObject_FromVoidPtr(result, PP_free);
@@ -144,7 +144,7 @@ PP_realloc(
                                      &PyCObject_Type, &pobj, &nitems, &bpi))
         return NULL;
     p = (void *) PyCObject_AsVoidPtr(pobj);
-    result = SC_realloc(p, nitems, bpi);
+    result = CREMAKE(p, char, nitems*bpi);
     return PyCObject_FromVoidPtr((void *) result, NULL);
 }
 

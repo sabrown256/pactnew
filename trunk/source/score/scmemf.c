@@ -127,10 +127,12 @@ FIXNUM F77_FUNC(scremz, SCREMZ)(void **pm, FIXNUM *pni,
  */
 
 FIXNUM F77_FUNC(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
-   {FIXNUM rv;
+   {long nb;
+    FIXNUM rv;
     void *s;
 
-    s = SC_realloc_na(*pm, (long) *pni, (long) *pnb, FALSE);
+    nb = (*pni)*(*pnb);
+    s  = CREMAKE(*pm, char, nb);
 
     rv = ((*pm = s) != NULL);
 
@@ -158,9 +160,7 @@ FIXNUM F77_FUNC(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
 FIXNUM F77_FUNC(scfree, SCFREE)(void **pm)
    {FIXNUM ok;
 
-    ok = SC_free(*pm);
-    if (ok)
-       *pm = NULL;
+    ok = SC_free_nzt(*pm, NULL);
 
     return(ok);}
 
