@@ -92,7 +92,7 @@ void _SC_setup_output(jobinfo *inf, char *name)
  */
     ns = 512;
 
-    inf->out = SC_string_array(name);
+    inf->out = _SC_string_array(name);
     SC_array_resize(inf->out, ns, -1.0);
 
     return;}

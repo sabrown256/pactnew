@@ -819,7 +819,7 @@ static PG_device *_PG_win32_open_screen(PG_device *dev,
     else
        _PG_win32_open_graphics_window(dev, xf, yf, dxf, dyf);
 
-    _PG_win23_point_list = SC_MAKE_ARRAY("_PG_WIN32_PTS", POINT, NULL);
+    _PG_win23_point_list = CMAKE_ARRAY(POINT, NULL, 0);
 
     intensity = dev->max_intensity*MAXPIX;
     if (dev->background_color_white)

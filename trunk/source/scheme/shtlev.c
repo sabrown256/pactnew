@@ -598,7 +598,7 @@ void SS_inst_const(void)
 void SS_init_stack(void)
    {
 
-    SS_stack = SC_MAKE_ARRAY("SC_INIT_STACK", object *, NULL);
+    SS_stack = CMAKE_ARRAY(object *, NULL, 0);
 
     SS_nsave    = 0;
     SS_nrestore = 0;

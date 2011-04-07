@@ -34,7 +34,7 @@ static long _SC_count_tagged(int flag)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     nbt = 0;
     if (SC_LATEST_BLOCK(ph) != NULL)
@@ -68,7 +68,7 @@ static long _SC_count_tagged(int flag)
 		 (space == NULL))
 	        break;};};
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(nbt);}
 
@@ -159,12 +159,11 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 
     nc = ENTRY_SIZE - nc - 1;
 
-    perm = ((name != NULL) && (strncmp(name, "PERM|", 5) == 0));
+    perm = ((name != NULL) &&
+	    ((strncmp(name, "PERM|", 5) == 0) || (nr == UNCOLLECT)));
 
     if ((perm == FALSE) || (show == TRUE))
        {strcpy(s, t);
-
-/* GOTCHA: what do we do with "PERM|char*:..."? */
 	if (strncmp(name, "char*:", 6) == 0)
 	   {strncat(s, " = \"", nc);
 
@@ -262,7 +261,7 @@ static int _SC_list_major_blocks(char *arr, int nc,
  *              -    2  free blocks
  *              -    4  registered blocks
  *              - this follows the convention of SC_mem_chk
- *              - if SHOW is TRUE include active blocks with "PERM|"
+ *              - if SHOW is TRUE include active UNCOLLECT'able blocks
  */
 
 static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
@@ -363,17 +362,17 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
  *             -    2  free blocks
  *             -    4  registered blocks
  *             - this follows the convention of SC_mem_chk
- *             - if SHOW is TRUE include active blocks with "PERM|"
+ *             - if SHOW is TRUE include active UNCOLLECT'able blocks
  */
 
 char *SC_mem_list(int flag, int show)
    {char *arr;
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     _SC_mem_list(flag, show, &arr, NULL);
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(arr);}
 
@@ -389,7 +388,7 @@ int SC_mem_corrupt(int flag)
    {int i, nbl, nc, last;
     char *arr, *pa;
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     _SC_mem_list(flag, TRUE, &arr, &nbl);
 
@@ -409,7 +408,7 @@ int SC_mem_corrupt(int flag)
 	    {io_printf(stdout, "%8d %s\n", i, pa);
 	     last = TRUE;};};
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(nc);}
 
@@ -429,7 +428,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     nbl = 0;
 
@@ -469,7 +468,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
 	fprintf(fp, "\n");};
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(nbl);}
 
@@ -585,7 +584,7 @@ int SC_mem_neighbor(void *p, void *a, void *b)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     rv = FALSE;
     pa = NULL;
@@ -627,7 +626,7 @@ int SC_mem_neighbor(void *p, void *a, void *b)
     ppa  = (mem_header **) b;
     *ppa = (pb == NULL) ? NULL : ((mem_header *) pb + 1);
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(rv);}
 
@@ -649,13 +648,13 @@ long SC_mem_object_trace(long nb, int type,
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     if ((nb > 0) && (f != NULL))
        {j  = SC_BIN_INDEX(nb);
 	us = SC_HDR_SIZE(ph) + SC_BIN_SIZE(j);
-	us = ((us + _SC_mem_align_pad) >> _SC_mem_align_expt) <<
-	     _SC_mem_align_expt;
+	us = ((us + _SC_ms.mem_align_pad) >> _SC_ms.mem_align_expt) <<
+	     _SC_ms.mem_align_expt;
 	nu = SC_BIN_UNITS(us);
 
 /* check all the major blocks */
@@ -682,9 +681,9 @@ long SC_mem_object_trace(long nb, int type,
 		      space = (mem_header *) md;
 		      name = _SC_block_name(md);
 		      (*f)(name, (char *) (space + 1), ib,
-			   (int) REF_COUNT(md), (int) it);};};};};
+			   (int) md->ref_count, (int) it);};};};};
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(nm);}
 

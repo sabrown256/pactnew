@@ -36,7 +36,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
     opt.file = NULL;
     opt.line = -1;
 
-    rv = SC_alloc_nzt(nitems, bpi, &opt);
+    rv = _SC_alloc_n(nitems, bpi, &opt);
 
     return(rv);}
 
@@ -53,14 +53,14 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
    {void *p;
     SC_mem_opt opt;
 
-    opt.na  = na;
-    opt.zsp = -1;
-    opt.typ = -1;
+    opt.na   = na;
+    opt.zsp  = -1;
+    opt.typ  = -1;
     opt.fnc  = name;
     opt.file = NULL;
     opt.line = -1;
 
-    p = SC_alloc_nzt(nitems, bpi, &opt);
+    p = _SC_alloc_n(nitems, bpi, &opt);
 
     return(p);}
 
@@ -82,7 +82,7 @@ void *SC_realloc(void *p, long nitems, long bpi)
     opt.file = NULL;
     opt.line = -1;
 
-    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
+    rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
     return(rv);}
 
@@ -106,14 +106,14 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
     opt.file = NULL;
     opt.line = -1;
 
-    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
+    rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE - the complementary routine for SC_alloc_nzt
+/* SC_FREE - the complementary routine for _SC_alloc_n
  *         - free all the space including the counter
  *         - return TRUE if successful and FALSE otherwise
  */
@@ -129,9 +129,87 @@ int SC_free(void *p)
     opt.file = NULL;
     opt.line = -1;
 
-    rv = SC_free_nzt(p, &opt);
+    rv = _SC_free_n(p, &opt);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
+/* SC_STRSAVE - save string s somewhere
+ *            - allocate one extra character so that firsttok won't kill
+ *            - things in the one bad case
+ */
+
+char *SC_strsave(char *s)
+   {char *p;
+    int sz;
+
+    p = NULL;
+
+    if (s != NULL)
+       {sz = strlen(s) + 2;
+	p  = CMAKE_N(char, sz);
+	if (p != NULL)
+	   {strcpy(p, s);
+	    p[sz-1] = '\0';};};
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_STRSAVEF - save string s somewhere remember its name
+ *             - allocate one extra character so that firsttok won't kill
+ *             - things in the one bad case
+ */
+
+char *SC_strsavef(char *s, char *name)
+   {char *p;
+    int sz;
+
+    p = NULL;
+
+    if (s != NULL)
+       {sz = strlen(s) + 2;
+	p  = CMAKE_N(char, sz);
+	if (p != NULL)
+	   {strcpy(p, s);
+	    p[sz-1] = '\0';};};
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_STRSAVEN - save string s somewhere remember its name
+ *             - allocate one extra character so that firsttok won't kill
+ *             - things in the one bad case
+ */
+
+char *SC_strsaven(char *s, char *name)
+   {int sz;
+    char *p;
+    SC_mem_opt opt;
+
+    p = NULL;
+
+    if (s != NULL)
+       {sz = strlen(s) + 2;
+
+	opt.na   = TRUE;
+	opt.zsp  = -1;
+	opt.typ  = SC_STRING_I;
+	opt.fnc  = name;
+	opt.file = NULL;
+	opt.line = -1;
+
+	p = _SC_alloc_n(sz, 1, &opt);
+	if (p != NULL)
+	   {strcpy(p, s);
+	    p[sz-1] = '\0';};};
+
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

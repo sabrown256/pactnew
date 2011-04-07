@@ -13,15 +13,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ALLOC_NZ - add a layer of control over the C level memory management
- *             - system to store extra information about the allocated spaces
- *             - iff NA TRUE fudge the accounting so that this block
- *             - will not show up in the bytes allocated count
- *             - ZSP controls the initialization of the block
- *             - see SC_zero_space_n for values
- */
+/* _SC_ALLOC_W - wrapper for _SC_alloc_n */
 
-void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
+void *_SC_alloc_w(long nitems, long bpi, char *name, int na, int zsp)
    {void *p;
     SC_mem_opt opt;
 
@@ -32,20 +26,16 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
     opt.file = NULL;
     opt.line = -1;
 
-    p = SC_alloc_nzt(nitems, bpi, &opt);
+    p = _SC_alloc_n(nitems, bpi, &opt);
 
     return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_NALLOC_NZ - add a layer of control over the C level memory management
- *              - system to store extra information about the allocated spaces
- *              - iff NA TRUE fudge the accounting so that this block
- *              - will not show up in the bytes allocated count
- */
+/* _SC_NALLOC_W - wrapper for _SC_alloc_n */
 
-void *SC_nalloc_nz(long nitems, long bpi, int na, int zsp,
+void *_SC_nalloc_w(long nitems, long bpi, int na, int zsp,
 		   const char *fnc, const char *file, int line)
    {void *p;
     SC_mem_opt opt;
@@ -57,22 +47,16 @@ void *SC_nalloc_nz(long nitems, long bpi, int na, int zsp,
     opt.file = file;
     opt.line = line;
 
-    p = SC_alloc_nzt(nitems, bpi, &opt);
+    p = _SC_alloc_n(nitems, bpi, &opt);
 
     return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_REALLOC_NZ - add a layer of control over the C level memory management
- *               - system to store extra information about the allocated spaces
- *               - iff NA TRUE fudge the accounting so that this block
- *               - will not show up in the bytes allocated count
- *               - ZSP controls the initialization of the block
- *               - see SC_zero_space_n for values
- */
+/* _SC_REALLOC_W - wrapper for _SC_realloc_n */
 
-void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
+void *_SC_realloc_w(void *p, long nitems, long bpi, int na, int zsp)
    {void *rv;
     SC_mem_opt opt;
 
@@ -83,19 +67,16 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
     opt.file = NULL;
     opt.line = -1;
 
-    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
+    rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_Z - the complementary routine for SC_alloc_nzt
- *           - free all the space including the counter
- *           - return TRUE if successful and FALSE otherwise
- */
+/* _SC_FREE_W - wrapper for _SC_free_n */
 
-int SC_free_z(void *p, int zsp)
+int _SC_free_w(void *p, int zsp)
    {int rv;
     SC_mem_opt opt;
 
@@ -106,7 +87,7 @@ int SC_free_z(void *p, int zsp)
     opt.file = NULL;
     opt.line = -1;
 
-    rv = SC_free_nzt(p, &opt);
+    rv = _SC_free_n(p, &opt);
 
     return(rv);}
 
@@ -163,7 +144,7 @@ static int _SC_free_std(void *p, int zsp)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_NALLOC_CHK - wrap a check for a specific pointer value
- *                - around the SC_alloc_nzt call
+ *                - around the _SC_alloc_n call
  *                - part of a usable API for memory debugging
  */
 
@@ -179,10 +160,10 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
     opt.file = file;
     opt.line = line;
 
-    space = SC_alloc_nzt(nitems, bpi, &opt);
+    space = _SC_alloc_n(nitems, bpi, &opt);
 
-    if (space == _SC_trap_ptr)
-       raise(_SC_trap_sig);
+    if (space == _SC_ms.trap_ptr)
+       raise(_SC_ms.trap_sig);
 
     return(space);}
 
@@ -190,7 +171,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
 /*--------------------------------------------------------------------------*/
 
 /* _SC_ALLOC_CHK - wrap a check for a specific pointer value
- *               - around the SC_alloc_nzt call
+ *               - around the _SC_alloc_n call
  *               - part of a usable API for memory debugging
  */
 
@@ -205,10 +186,10 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
     opt.file = NULL;
     opt.line = -1;
 
-    space = SC_alloc_nzt(nitems, bpi, &opt);
+    space = _SC_alloc_n(nitems, bpi, &opt);
 
-    if (space == _SC_trap_ptr)
-       raise(_SC_trap_sig);
+    if (space == _SC_ms.trap_ptr)
+       raise(_SC_ms.trap_sig);
 
     return(space);}
 
@@ -216,20 +197,20 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_REALLOC_CHK - wrap a check for a specific pointer value
- *                 - around the SC_alloc_nzt call
+ *                 - around the _SC_alloc_n call
  *                 - part of a usable API for memory debugging
  */
 
 static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na, int zsp)
    {void *space;
 
-    if (p == _SC_trap_ptr)
-       raise(_SC_trap_sig);
+    if (p == _SC_ms.trap_ptr)
+       raise(_SC_ms.trap_sig);
 
-    space = SC_realloc_nz(p, nitems, bpi, na, zsp);
+    space = _SC_realloc_w(p, nitems, bpi, na, zsp);
 
-    if (space == _SC_trap_ptr)
-       raise(_SC_trap_sig);
+    if (space == _SC_ms.trap_ptr)
+       raise(_SC_ms.trap_sig);
 
     return(space);}
 
@@ -244,10 +225,10 @@ static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na, int zsp)
 static int _SC_free_chk(void *p, int zsp)
    {int rv;
 
-    if (p == _SC_trap_ptr)
-       raise(_SC_trap_sig);
+    if (p == _SC_ms.trap_ptr)
+       raise(_SC_ms.trap_sig);
 
-    rv = SC_free_z(p, zsp);
+    rv = _SC_free_w(p, zsp);
 
     return(rv);}
 
@@ -264,10 +245,10 @@ SC_mem_fnc SC_use_score_mm(void)
 
     rv = SC_gs.mm;
 
-    SC_gs.mm.nalloc  = SC_nalloc_nz;
-    SC_gs.mm.alloc   = SC_alloc_nz;
-    SC_gs.mm.realloc = SC_realloc_nz;
-    SC_gs.mm.free    = SC_free_z;
+    SC_gs.mm.nalloc  = _SC_nalloc_w;
+    SC_gs.mm.alloc   = _SC_alloc_w;
+    SC_gs.mm.realloc = _SC_realloc_w;
+    SC_gs.mm.free    = _SC_free_w;
 
     return(rv);}
 
@@ -318,8 +299,8 @@ SC_mem_fnc SC_trap_pointer(void *p, int sig)
 
     rv = SC_gs.mm;
 
-    _SC_trap_ptr = p;
-    _SC_trap_sig = sig;
+    _SC_ms.trap_ptr = p;
+    _SC_ms.trap_sig = sig;
 
     SC_gs.mm.nalloc  = _SC_nalloc_chk;
     SC_gs.mm.alloc   = _SC_alloc_chk;
@@ -338,8 +319,8 @@ SC_mem_fnc SC_trap_pointer(void *p, int sig)
 void SC_untrap_pointer(void *p)
    {
 
-    _SC_trap_ptr = NULL;
-    _SC_trap_sig = -1;
+    _SC_ms.trap_ptr = NULL;
+    _SC_ms.trap_sig = -1;
 
     SC_use_score_mm();
 
@@ -378,7 +359,7 @@ void *SC_copy_item(void *in)
 /* _SC_NAME_OK - filter names for PACT function names */
 
 int _SC_name_ok(char *name, int flag)
-   {int i, n;
+   {int i, n, rv;
     char t[MAXLINE];
     static char *prefixes[] = { "_SC_", "SC_", "_PM_", "PM_", "_PD_", "PD_",
 				"_PC_", "PC_", "_PG_", "PG_", "_PA_", "PA_",
@@ -386,24 +367,28 @@ int _SC_name_ok(char *name, int flag)
 				"PAAREC", "PABREC", "PAGRID", "PATRNL",
 				"PATRNN", "PAMRGN"};
 
-    if (name == NULL)
-       return(FALSE);
+    rv = FALSE;
 
-    n = sizeof(prefixes)/sizeof(char *);
-    if (flag & 1)
-       {for (i = 0; i < n; i++)
-	    {if (strncmp(name, prefixes[i], strlen(prefixes[i])) == 0)
-	        return(FALSE);
+    if (name != NULL)
+       {rv = TRUE;
+	n  = sizeof(prefixes)/sizeof(char *);
+	if (flag & 1)
+	   {for (i = 0; i < n; i++)
+	        {if (strncmp(name, prefixes[i], strlen(prefixes[i])) == 0)
+		    break;
 
-	     snprintf(t, MAXLINE, "char*:%s", prefixes[i]);
-	     if (strncmp(name, t, strlen(t)) == 0)
-	        return(FALSE);};};
+		 snprintf(t, MAXLINE, "char*:%s", prefixes[i]);
+		 if (strncmp(name, t, strlen(t)) == 0)
+		    break;};
 
-    if (flag & 2)
-       {if (strncmp(name, "PERM|", 5) == 0)
-	   return(FALSE);};
+	    if (i >= n)
+	       rv = FALSE;};
 
-    return(TRUE);}
+	if ((flag & 2) && (rv == TRUE))
+	   {if (strncmp(name, "PERM|", 5) == 0)
+	       rv = FALSE;};};
+
+    return(rv);}
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
@@ -450,7 +435,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
     space = (mem_header *) ptr;
     desc  = &space->block;
     nb    = BLOCK_LENGTH(desc);
-    nr    = REF_COUNT(desc);
+    nr    = desc->ref_count;
     name  = _SC_block_name(desc);
     if (name == NULL)
        {if (flag == 0)
@@ -475,7 +460,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 	    SC_strncpy(bf, MAXLINE, name, nc);
 	    name = bf;};
 		     
-	if (_SC_name_ok(name, flag))
+	if ((_SC_name_ok(name, flag)) && (desc->ref_count != UNCOLLECT))
 	   {if (sizeof(char *) == 4)
 	       io_printf(fp, "   0x%012lx %9ld %3d\t%s",
 			 space+1, nb, nr, name);
@@ -483,8 +468,8 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 	       io_printf(fp, "   0x%012lx %9ld %3d\t%s",
 			 space+1, nb, nr, name);
 
-/* GOTCHA: what do we do with "PERM|char*:..."? */
-	    if (strncmp(name, "char*:", 6) == 0)
+	    if ((strncmp(name, "char*:", 6) == 0) ||
+		(desc->type == SC_STRING_I))
 	       {io_printf(fp, " = \"");
 		pc = (char *) (space + 1);
 		for (j = 0; j < nb; j++)
@@ -557,7 +542,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
 
 /* SC_MEM_TRACE - return the number of active chunks of memory managed
  *              - by the system
- *              - the given pointer must have been allocated by SC_alloc_nzt
+ *              - the given pointer must have been allocated by _SC_alloc_n
  *              - return -1 if the forward and backward counts differ
  *              - return -2 if a NULL pointer occurs in the chain
  *              - return -3 if the link count exceeds the number of blocks
@@ -575,7 +560,7 @@ int SC_mem_trace(void)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     ret = 0;
     if (SC_LATEST_BLOCK(ph) != NULL)
@@ -626,7 +611,7 @@ int SC_mem_trace(void)
 	    else
 	       ret = n_mf;};};
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(ret);}
 
@@ -648,7 +633,7 @@ int SC_reg_mem(void *p, long length, char *name)
 
     ph = _SC_tid_mm();
 
-    pd = FMAKE(mem_descriptor, "PERM|SC_REG_MEM:pd");
+    pd = SC_permanent(CMAKE(mem_descriptor));
 
     SET_HEAP(pd, ph);
 
@@ -695,7 +680,7 @@ char *SC_mem_lookup(void *p)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(SC_mm_lock);
+    SC_LOCKON(_SC_ms.lock_mm);
 
     name  = NULL;
     space = SC_LATEST_BLOCK(ph);
@@ -711,7 +696,7 @@ char *SC_mem_lookup(void *p)
 
 	     space = space->block.next;};};
 
-    SC_LOCKOFF(SC_mm_lock);
+    SC_LOCKOFF(_SC_ms.lock_mm);
 
     return(name);}
 
@@ -728,7 +713,7 @@ void dprfree(void)
     ph = _SC_tid_mm();
 
     io_printf(stdout, "Bin  Max  Blocks\n");
-    for (j = 0L; j < _SC_n_bins; j++)
+    for (j = 0L; j < _SC_ms.n_bins; j++)
         {io_printf(stdout, "%3ld %4ld ", j, SC_BIN_SIZE(j));
          for (md  = SC_FREE_LIST(ph)[j], i = 0L;
 	      md != NULL;
@@ -776,7 +761,7 @@ static long _SC_flchk(void)
 
     nf  = 0L;
     bad = 0;
-    for (j = 0L; j < _SC_n_bins; j++)
+    for (j = 0L; j < _SC_ms.n_bins; j++)
         {hd = SC_FREE_LIST(ph)[j];
          for (k = 0L, md = hd;
 	      md != NULL;
@@ -916,7 +901,7 @@ int SC_is_score_ptr(void *p)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ARRLEN - return the length of an array which was allocated
- *           - with SC_alloc_nzt
+ *           - with _SC_alloc_n
  *           - return -1L on error
  */
 
@@ -941,12 +926,12 @@ int SC_mark(void *p, int n)
    {mem_descriptor *desc;
 
     if (SC_is_score_space(p, NULL, &desc))
-       {if (REF_COUNT(desc) < UNCOLLECT)
-           {REF_COUNT(desc) += n;}
+       {if (desc->ref_count < UNCOLLECT)
+           desc->ref_count += n;
 
-        n = REF_COUNT(desc);}
+        n = desc->ref_count;}
     else
-       {n = -1;}
+       n = -1;
 
     return(n);}
 
@@ -959,12 +944,56 @@ int SC_set_count(void *p, int n)
    {mem_descriptor *desc;
 
     if (SC_is_score_space(p, NULL, &desc))
-       {REF_COUNT(desc) = n;}
-
+       desc->ref_count = n;
     else
        n = -1;
 
     return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_PERMANENT - set the reference count of the given object
+ *              - to make it uncollectable
+ *              - pass the pointer P through
+ */
+
+void *SC_permanent(void *p)
+   {mem_descriptor *desc;
+
+    if (SC_is_score_space(p, NULL, &desc))
+       desc->ref_count = UNCOLLECT;
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_ATTRS - set various attribute on the memory block P */
+
+void *SC_mem_attrs(void *p, int attr)
+   {mem_descriptor *desc;
+
+    if (SC_is_score_space(p, NULL, &desc))
+
+/* mark the block uncollectable */
+       {if (attr & 1)
+	   desc->ref_count = UNCOLLECT;
+
+/* remove this block from the memory accounting
+ * decrement the total bytes allocated by the size of the block
+ * this is not the same as doing the allocation with NA == TRUE
+ * the difference and maximum difference could be different
+ */
+	else if (attr & 2)
+	   {uint64_t a, f, nb;
+
+	    SC_mem_statb(&a, &f, NULL, NULL);
+	    nb = desc->length;
+	    a -= nb;
+	    SC_mem_statb_set(a, f);};};
+
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -994,25 +1023,7 @@ int SC_ref_count(void *p)
     n = -1;
 
     if (SC_is_score_space(p, NULL, &desc))
-       {n = REF_COUNT(desc);};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_PERMANENT - make an object unfreeable */
-
-int SC_permanent(void *p)
-   {int n;
-    mem_descriptor *desc;
-
-    n = -1;
-
-    if (SC_is_score_space(p, NULL, &desc))
-       {REF_COUNT(desc) = UNCOLLECT;
-
-	n = REF_COUNT(desc);};
+       n = desc->ref_count;
 
     return(n);}
 
@@ -1091,7 +1102,7 @@ void dprblk(void *p)
 	       {printf("Name: %s\n",       _SC_block_name(desc));
 		printf("Length: %ld\n",    BLOCK_LENGTH(desc));
 		printf("Type: %d\n",       BLOCK_TYPE(desc));
-		printf("References: %d\n", REF_COUNT(desc));};
+		printf("References: %d\n", desc->ref_count);};
 
 	    printf("Next Block: %p\n",     desc->next);
 	    printf("Previous Block: %p\n", desc->prev);

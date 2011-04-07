@@ -181,7 +181,7 @@ g_file *_SX_mk_file(char *name, char *type, void *file)
     po->type        = CSTRSAVE(type);
     po->file        = file;
     po->file_object = NULL;
-    po->menu_lst    = SC_MAKE_ARRAY("_SX_MK_FILE", SX_menu_item, NULL);
+    po->menu_lst    = CMAKE_ARRAY(SX_menu_item, NULL, 0);
     po->next        = SX_file_list;
 
     return(po);}
@@ -211,7 +211,7 @@ void _SX_free_menu(g_file *po, int re)
 
     SC_free_array(po->menu_lst, _SX_rl_menu_item);
     if (re == TRUE)
-       po->menu_lst = SC_MAKE_ARRAY("_SX_FREE_FILE", SX_menu_item, NULL);
+       po->menu_lst = CMAKE_ARRAY(SX_menu_item, NULL, 0);
 
     return;}
 

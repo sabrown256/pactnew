@@ -282,7 +282,7 @@ static void _SC_bio_buffer(bio_desc *bid, size_t bfsz)
     else
        {bid->bfsz = bfsz;
 	if (bid->stack == NULL)
-	   bid->stack = SC_MAKE_ARRAY("_SC_BIO_BUFFER", bio_frame *, NULL);};
+	   bid->stack = CMAKE_ARRAY(bio_frame *, NULL, 0);};
 
     bid->nhits[BIO_OPER_SETVBUF]++;
 

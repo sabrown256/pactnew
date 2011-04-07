@@ -223,27 +223,30 @@ static void _SC_array_grow(SC_array *a, long nn)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_INIT_ARRAY - initialize an SC_array A
- *                - array has NAME, TYPE, and BPI
+ *                - array has TYPE, BPI, and attributes
  *                - NOTE: default growth factor is chosen to give
  *                - exponential with factor of 10 for 0 items
  *                - to 1% at 1 GB
  */
 
-void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
-		    void (*init)(void *a))
+void _SC_init_array(SC_array *a, char *type, int bpi,
+		    void (*init)(void *a), char *name, int flags)
     {int nt, nn, prm;
      char *ty, *nm;
 
-     prm = (strncmp(name, "PERM|", 5) == 0);
+     prm = ((flags & 1) != 0);
 
+     if (name == NULL)
+        name = "array";
      nn = strlen(name) + 1;
+     nm = CMAKE_N(char, nn);
+
      nt = strlen(type) + 4;
+     ty = CMAKE_N(char, nt);
+
      if (prm == TRUE)
-        {nm  = NMAKE_N(char, nn, "PERM|char*:_SC_INIT_ARRAY:nm");
-	 ty  = NMAKE_N(char, nt, "PERM|char*:_SC_INIT_ARRAY:ty");}
-     else
-        {nm  = CMAKE_N(char, nn);
-	 ty  = CMAKE_N(char, nt);};
+        {nm = SC_mem_attrs(nm, 3);
+	 ty = SC_mem_attrs(ty, 3);};
 
      snprintf(nm, nn, "%s",   name);
      snprintf(ty, nt, "%s *", type);
@@ -264,29 +267,29 @@ void _SC_init_array(SC_array *a, char *name, char *type, int bpi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MAKE_ARRAY - initialize and return an SC_array
- *               - array has NAME, TYPE, and BPI
+/* _SC_MAKE_ARRAY - initialize and return an SC_array
+ *                - array has TYPE, BPI, and attributes
  */
 
-SC_array *SC_make_array(char *name, char *type, int bpi,
-			void (*init)(void *a))
+SC_array *_SC_make_array(char *type, int bpi,
+			 void (*init)(void *a), char *name, int flags)
     {SC_array *a;
 
      a = CMAKE(SC_array);
      if (a != NULL)
-        _SC_init_array(a, name, type, bpi, init);
+        _SC_init_array(a, type, bpi, init, name, flags);
 
      return(a);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_STRING_ARRAY - common specialization of SC_make_array */
+/* _SC_STRING_ARRAY - common specialization of SC_make_array */
 
-SC_array *SC_string_array(char *name)
+SC_array *_SC_string_array(char *name)
    {SC_array *a;
 
-    a = SC_MAKE_ARRAY(name, char *, NULL);
+    a = _SC_make_array(SC_STRING_S, sizeof(char *), NULL, name, 0);
 
     return(a);}
 

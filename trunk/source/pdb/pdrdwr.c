@@ -69,7 +69,7 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
     {if (_p >= _px)                                                          \
         {_px += RW_LIST_D;                                                   \
 	 if (_s == NULL)                                                     \
-	    {_s = FMAKE_N(_t, _px, "PERM|_PD_DYN_STK:s");}                   \
+	    {_s = SC_permanent(CMAKE_N(_t, _px));}                           \
 	 else                                                                \
 	    CREMAKE(_s, _t, _px);};}
 

@@ -13,6 +13,7 @@
 
 #define N_DOUBLES_MD 3
 
+#include "scope_thread.h"
 #include "scope_mem.h"
 
 /*---------------------------------------------------------------------------*/

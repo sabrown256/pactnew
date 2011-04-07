@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "score_int.h" 
+#include "scope_mem.h" 
 
 #ifndef ATOF_FUNCTION
 # define ATOF_FUNCTION atof
@@ -51,7 +52,7 @@ SC_global_state
           ATOL_FUNCTION,
           STRTOL_FUNCTION,
 	  SC_type_container,
-          {SC_nalloc_nz, SC_alloc_nz, SC_realloc_nz, SC_free_z}};
+          {_SC_nalloc_w, _SC_alloc_w, _SC_realloc_w, _SC_free_w}};
 
 SC_state
  _SC = {-1, TRUE, -1,
@@ -312,7 +313,7 @@ void SC_init_path(int nd, ...)
     char *bf, *ptr, *s, *var, *token;
 
     if (_SC.path == NULL)
-       {_SC.path = SC_MAKE_ARRAY("SC_INIT_PATH", char *, NULL);
+       {_SC.path = CMAKE_ARRAY(char *, NULL, 0);
 	SC_array_string_add_copy(_SC.path, ".");};
 
     SC_PATH_DELIMITER(delim);

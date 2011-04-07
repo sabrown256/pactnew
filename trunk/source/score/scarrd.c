@@ -43,17 +43,16 @@ void SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name)
      prm = (strncmp(name, "PERM|", 5) == 0);
 
      n = strlen(tn) + 4;
+     s = CMAKE_N(char, n);
      if (prm == TRUE)
-        s = NMAKE_N(char, n, "PERM|char*:SC_DA_INIT:s");
-     else
-        s = CMAKE_N(char, n);
+        s = SC_mem_attrs(s, 3);
+
      snprintf(s, n, "%s *", tn);
 
-     n = d*bpi;
+     n   = d*bpi;
+     lst = CMAKE_N(char, n);
      if (prm == TRUE)
-        lst = NMAKE_N(char, n, name);
-     else
-        lst = CMAKE_N(char, n);
+        lst = SC_mem_attrs(lst, 2);
 
      SC_mark(lst, 1);
 
@@ -173,7 +172,7 @@ void _SC_da_alloc(SC_dynamic_array *a, char *name)
 
 void _SC_da_extend(SC_dynamic_array *a, double pad)
     {int n, nx, nn, d, dn, bpi;
-     char *lst, *nlst, *name;
+     char *lst, *nlst;
 
      n = a->n;
      d = a->delta;
@@ -189,7 +188,6 @@ void _SC_da_extend(SC_dynamic_array *a, double pad)
 	 bpi = a->bpi;
          nn  = nx + d;
 
-	 name = SC_arrname(lst);
          nlst = CMAKE_N(char, nn*bpi);
 
 	 memcpy(nlst, lst, nx*bpi);

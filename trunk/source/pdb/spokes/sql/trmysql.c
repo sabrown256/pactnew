@@ -142,7 +142,7 @@ sql_table *_MYSQL_query(FILE *fp, char *sql, char *delim, int add)
 
 	    tab = _SQL_mk_table(nr, nf);
 
-	    arr = SC_MAKE_ARRAY("_MYSQL_QUERY", char *, NULL);
+	    arr = CMAKE_ARRAY(char *, NULL, 0);
 
 	    if (add == TRUE)
 	       SC_array_string_add_copy(arr, sql);

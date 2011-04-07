@@ -360,7 +360,7 @@ void _SC_exec_setup_state(parstate *state, char *shell, char **env,
     state->directory    = NULL;
     _SC_chg_dir(".", &state->directory);
 
-    state->tasks = SC_MAKE_ARRAY("_SC_EXEC_SETUP_STATE", taskdesc *, NULL);
+    state->tasks = CMAKE_ARRAY(taskdesc *, NULL, 0);
     state->log   = SC_STRING_ARRAY();
 
     state->acc        = acc;
@@ -1911,7 +1911,7 @@ static int _SC_fin_job(taskdesc *job, asyncstate *as, int srv)
 
 		SC_free_strings(out);
 
-		inf->out = SC_MAKE_ARRAY("_SC_FIN_JOB", char *, NULL);};
+		inf->out = CMAKE_ARRAY(char *, NULL, 0);};
 
 	    state->n_complete++;};
 

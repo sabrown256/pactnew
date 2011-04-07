@@ -211,7 +211,7 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
     pc->time_contact   = tlst;
 
     if (fl == TRUE)
-       {pc->taska = SC_MAKE_ARRAY("SC_INIT_CONNECTION", contask *, NULL);
+       {pc->taska = CMAKE_ARRAY(contask *, NULL, 0);
 	pc->log   = SC_STRING_ARRAY();
         SC_array_resize(pc->taska, 512, -1.0);};
 
@@ -1544,7 +1544,7 @@ conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
     cp->heartbeat = th;
     cp->filter    = filter;
 
-    cp->pool = SC_MAKE_ARRAY("SC_OPEN_CONNECTION_POOL", connectdes *, NULL);
+    cp->pool = CMAKE_ARRAY(connectdes *, NULL, 0);
     SC_array_resize(cp->pool, 512, -1.0);
 
     shell = SC_get_shell(shell);

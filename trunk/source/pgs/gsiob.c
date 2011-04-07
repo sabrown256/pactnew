@@ -688,8 +688,7 @@ void PG_register_interface_object(PG_device *dev, PG_interface_object *iob)
    {
 
     if (dev->iobjs == NULL)
-       dev->iobjs = SC_MAKE_ARRAY("PG_REGISTER_INTERFACE_OBJECT",
-				  PG_interface_object *, NULL);
+       dev->iobjs = CMAKE_ARRAY(PG_interface_object *, NULL, 0);
 
     SC_array_push(dev->iobjs, &iob);
     SC_mark(iob, 1);
@@ -772,8 +771,7 @@ void PG_clear_interface_objects(PG_device *dev)
    {
 
     PG_free_interface_objects(dev);
-    dev->iobjs = SC_MAKE_ARRAY("PG_CLEAR_INTERFACE_OBJECTS",
-			       PG_interface_object *, NULL);
+    dev->iobjs = CMAKE_ARRAY(PG_interface_object *, NULL, 0);
 
     return;}
 
@@ -1659,8 +1657,7 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
     iob->select        = NULL;
 
     iob->parent        = parent;
-    iob->children      = SC_MAKE_ARRAY("PG_MAKE_INTERFACE_OBJECT",
-				       PG_interface_object *, NULL);
+    iob->children      = CMAKE_ARRAY(PG_interface_object *, NULL, 0);
 
     if (strcmp(type, PG_TEXT_OBJECT_S) == 0)
        {PG_text_box *b;
@@ -1763,7 +1760,7 @@ PG_interface_object *PG_copy_interface_object(PG_device *dvd,
     niob->parent = PG_copy_interface_object(dvd, iob->parent);
 
 /* copy the children */
-    da = SC_MAKE_ARRAY("PG_COPY_INTERFACE_OBJECT", PG_interface_object *, NULL);
+    da = CMAKE_ARRAY(PG_interface_object *, NULL, 0);
     sn = SC_array_get_n(iob->children);
     for (i = 0; i < sn; i++)
         {sch = IOB(iob->children, i);

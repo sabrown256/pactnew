@@ -98,52 +98,6 @@ int _SC_fmt_strcat(char *d, int nd, int ln, char *fmt, char *s)
 
 /*                                STRING FUNCTIONS                           */
 
-/*---------------------------------------------------------------------------*/
-
-/* SC_STRSAVE - save string s somewhere
- *            - allocate one extra character so that firsttok won't kill
- *            - things in the one bad case
- */
-
-char *SC_strsave(char *s)
-   {char *p;
-    int sz;
-
-    p = NULL;
-
-    if (s != NULL)
-       {sz = strlen(s) + 2;
-	p  = CMAKE_N(char, sz);
-	if (p != NULL)
-	   {strcpy(p, s);
-	    p[sz-1] = '\0';};};
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_STRSAVEF - save string s somewhere remember its name
- *             - allocate one extra character so that firsttok won't kill
- *             - things in the one bad case
- */
-
-char *SC_strsavef(char *s, char *name)
-   {char *p;
-    int sz;
-
-    p = NULL;
-
-    if (s != NULL)
-       {sz = strlen(s) + 2;
-	p  = CMAKE_N(char, sz);
-	if (p != NULL)
-	   {strcpy(p, s);
-	    p[sz-1] = '\0';};};
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SC_STRSAVEC - save string s somewhere remember its name
@@ -168,30 +122,7 @@ char *SC_strsavec(char *s, const char *file, const char *fnc, int line)
 	opt.file = fnc;
 	opt.line = line;
 
-	p = SC_alloc_nzt(sz, sizeof(char), &opt);
-	if (p != NULL)
-	   {strcpy(p, s);
-	    p[sz-1] = '\0';};};
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_STRSAVEN - save string s somewhere remember its name
- *             - allocate one extra character so that firsttok won't kill
- *             - things in the one bad case
- */
-
-char *SC_strsaven(char *s, char *name)
-   {char *p;
-    int sz;
-
-    p = NULL;
-
-    if (s != NULL)
-       {sz = strlen(s) + 2;
-	p  = NMAKE_N(char, sz, name);
+	p = _SC_alloc_n(sz, sizeof(char), &opt);
 	if (p != NULL)
 	   {strcpy(p, s);
 	    p[sz-1] = '\0';};};
@@ -2018,7 +1949,7 @@ char *SC_vdsnprintf(int cp, const char *format, va_list lst)
 
     pa = (char **) SC_get_thread_array(ita);
     if (*pa == NULL)
-       *pa = FMAKE_N(char, 4096, "PERM|char*:SC_VDSNPRINTF:pa");
+       *pa = SC_permanent(CMAKE_N(char, 4096));
 
     a  = *pa;
     nc = SC_arrlen(a);

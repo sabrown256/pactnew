@@ -39,100 +39,23 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_dynamic_array macros - deprecated as of 01/2010 */
-
-#define SC_RELEASE_DYNAMIC(_a)                                               \
-    SC_da_rel(&(_a))
-
-/* cleaned up, partially functionalized dynamic array macros */
-
-#define SC_START_DYNAMIC_ARRAY(_a, _t, _d, _name)                            \
-    SC_da_init(&(_a), sizeof(_t), #_t, _d, _name)
-
-#define SC_ARRAY_DYNAMIC(_t, _a)          ((_t *) (_a).array)
-#define SC_GET_NTH_DYNAMIC(_t, _a, n)     (((_t *) (_a).array)[n])
-#define SC_N_DYNAMIC(_a)                  ((_a).n)
-
-/* SC_array macros */
-
 #define IS_BARRIER(_s)                                                       \
    ((BARRIER != NULL) &&                                                     \
     (strncmp(_s, BARRIER, strlen(BARRIER)) == 0))
 
-#define SC_INIT_ARRAY(_a, _n, _t, _init)                                     \
-    _SC_init_array(_a, _n, #_t, sizeof(_t), _init)
+#define CINIT_ARRAY(_a, _t, _init, _flags)                                   \
+    _SC_init_array(_a, #_t, sizeof(_t), _init, (char *) __func__, _flags)
 
-#define SC_MAKE_ARRAY(_n, _t, _init)                                         \
-    SC_make_array(_n, #_t, sizeof(_t), _init)
+#define CMAKE_ARRAY(_t, _init, _flags)                                       \
+    _SC_make_array(#_t, sizeof(_t), _init, (char *) __func__, _flags)
 
-#define SC_STRING_ARRAY()    SC_string_array((char *) __func__)
-
-/*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* SC_dynamic_array macros - not used */
-
-#define SC_REMEMBERF(_t, _item, _lst, _n, _nx, _delta, _name)                \
-    {if (_lst == NULL)                                                       \
-        {_nx = _delta;                                                       \
-         _n  = 0;                                                            \
-         _lst = FMAKE_N(_t, _nx, _name);};                                   \
-     _lst[_n++] = _item;                                                     \
-     if (_n >= _nx)                                                          \
-        {_nx += _delta;                                                      \
-         CREMAKE(_lst, _t, _nx);};}
-
-#define SC_INIT_DYNAMIC_ARRAY_F(_a, _t, _tn, _d, _name)                      \
-    SC_da_init(&(_a), sizeof(_t), _tn, _d, _name)
-
-#define SC_REMEMBER_DYNAMIC_F(_t, item, _a, name)                            \
-    SC_da_remember(&(_a), &(item))
-
-#define SC_REMEMBER_STRING(_s, _a)                                           \
-    SC_remember_string(_s, &(_a))
-
-#define SC_REMEMBER_STRING_COPY(_s, _a)                                      \
-    SC_remember_string_copy(_s, &(_a))
-
-#define SC_SET_NTH_DYNAMIC(_t, _a, n, v)  ((_t *) (_a).array)[(n)] = (v)
-
-#define SC_SIZE_DYNAMIC(_t, _a, m)        SC_da_grow(&(_a), m)
-
-#define SC_SHRINK_DYNAMIC(_t, _a, _n)     SC_da_shrink(&(_a), _n)
-
-/*--------------------------------------------------------------------------*/
-
-#endif
+#define SC_STRING_ARRAY()    _SC_string_array((char *) __func__)
 
 /*--------------------------------------------------------------------------*/
 
 /*                         TYPEDEFS AND STRUCTS                             */
 
 /*--------------------------------------------------------------------------*/
-
-typedef struct s_SC_dynamic_array SC_dynamic_array;
-
-struct s_SC_dynamic_array
-  {char *type;
-   void *array;
-   int n;
-   int nx;
-   int bpi;
-   int delta;};
-
-#define PD_DEFINE_DYNAMIC_ARRAY(_f)                                \
-    {PD_defstr(_f, "SC_dynamic_array",                             \
-                    "char *type",                                  \
-                    "char *array",                                 \
-                    "int n",                                       \
-                    "int nx",                                      \
-                    "int bpi",                                     \
-                    "int delta",                                   \
-                    LAST);                                         \
-     PD_cast(_f, "SC_dynamic_array", "array", "type");}
 
 typedef struct s_SC_array SC_array;
 
@@ -220,14 +143,15 @@ extern void
 /* SCARRS.C declarations */
 
 extern SC_array
- *SC_make_array(char *name, char *type, int bpi, void (*init)(void *a)),
- *SC_string_array(char *name),
+ *_SC_make_array(char *type, int bpi,
+		 void (*init)(void *a), char *name, int flags),
+ *_SC_string_array(char *name),
  *SC_array_copy(SC_array *a),
  *SC_strings_array(int n, char **sa);
 
 extern void
- _SC_init_array(SC_array *a, char *name, char *type, int bpi,
-		void (*init)(void *a)),
+ _SC_init_array(SC_array *a, char *type, int bpi,
+		void (*init)(void *a), char *name, int flags),
  SC_array_init(SC_array *a, long n),
  SC_free_array(SC_array *a, int (*rel)(void *a)),
  SC_array_string_add(SC_array *a, char *s),

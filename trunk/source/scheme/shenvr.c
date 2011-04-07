@@ -353,7 +353,7 @@ static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
        {t = _SS_sprintf("%s", vl);
 
 	nc = strlen(vr) + strlen(t) + 2;
-	s  = FMAKE_N(char, nc, "PERM|char*:SS_ADD_TO_FRAME:s");
+	s  = SC_permanent(CMAKE_N(char, nc));
 	snprintf(s, nc, "%s=%s", vr+1, t);
 
 	ok = SC_putenv(s);

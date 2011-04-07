@@ -73,7 +73,7 @@ static void _PD_symblock_init(void *a)
 SC_array *_PD_block_make(long n)
    {SC_array *bl;
 
-    bl = SC_MAKE_ARRAY("_PD_BLOCK_MAKE", symblock, _PD_symblock_init);
+    bl = CMAKE_ARRAY(symblock, _PD_symblock_init, 0);
 
     SC_array_resize(bl, n, -1.0);
 
@@ -103,11 +103,11 @@ SC_array *_PD_block_init(syment *ep, int fl)
 
     bl = ep->blocks;
     if ((bl == NULL) || (fl == TRUE))
-       {bl = SC_MAKE_ARRAY("_PD_BLOCK_INIT", symblock, _PD_symblock_init);
+       {bl = CMAKE_ARRAY(symblock, _PD_symblock_init, 0);
 	ep->blocks = bl;
         SC_mark(bl, 1);}
     else
-       SC_INIT_ARRAY(bl, "_PD_BLOCK_INIT", symblock, _PD_symblock_init);
+       CINIT_ARRAY(bl, symblock, _PD_symblock_init, 0);
 
     return(bl);}
 

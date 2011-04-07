@@ -191,7 +191,7 @@ int _PD_put_text(int reset, int ns, char *s)
 
     if (bf == NULL)
        {ncx = BUFINCR;
-	bf  = FMAKE_N(char, ncx, "PERM|_PD_PUT_TEXT:tbuffer");
+	bf  = SC_permanent(CMAKE_N(char, ncx));
 	spl = bf;
         nc  = 0;}
 

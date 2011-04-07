@@ -433,7 +433,7 @@ int SC_putenv(char *s)
    {int err;
     char *t;
 
-    t   = SC_strsavef(s, "PERM|char*:SC_PUTENV:s");
+    t   = SC_permanent(CSTRSAVE(s));
     err = putenv(t);
 
     return(err);}

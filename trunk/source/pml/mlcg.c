@@ -375,16 +375,16 @@ PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
     sls->aj = CMAKE_N(SC_array, n_ups);
 
     for (i = 0; i < n_ups; i++)
-        {SC_INIT_ARRAY((sls->j  + i), "PM_MK_SP_LIN_SYS", int,  NULL);
-	 SC_INIT_ARRAY((sls->aj + i), "PM_MK_SP_LIN_SYS", double, NULL);};
+        {CINIT_ARRAY((sls->j  + i), int,  NULL, 0);
+	 CINIT_ARRAY((sls->aj + i), double, NULL, 0);};
 
     if (trans)
        {sls->jt  = CMAKE_N(SC_array, n_ups);
 	sls->atj = CMAKE_N(SC_array, n_ups);
 
 	for (i = 0; i < n_ups; i++)
-	    {SC_INIT_ARRAY((sls->jt  + i), "PM_MK_SP_LIN_SYS", int,  NULL);
-	     SC_INIT_ARRAY((sls->atj + i), "PM_MK_SP_LIN_SYS", double, NULL);};};
+	    {CINIT_ARRAY((sls->jt  + i), int,  NULL, 0);
+	     CINIT_ARRAY((sls->atj + i), double, NULL, 0);};};
 
 
     sls->b      = PM_make_vectors(n_rhs, n_ups);

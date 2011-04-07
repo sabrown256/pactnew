@@ -219,7 +219,7 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
     for (i = 0; i < sz; i++)
         tb[i] = NULL;
 
-    ha->a  = SC_MAKE_ARRAY("SC_MAKE_HASHARR", haelem *, NULL);
+    ha->a  = CMAKE_ARRAY(haelem *, NULL, 0);
     ha->ne = 0L;
 
     return;}

@@ -121,7 +121,7 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
     s = SC_vdsnprintf(cp, fmt, __a__);
 
     CFREE(_SS.vbf);
-    _SS.vbf = SC_strsavef(s, "PERM|char*:_SS_VDSNPRINTF:s");
+    _SS.vbf = SC_permanent(CSTRSAVE(s));
 
     return(s);}
 

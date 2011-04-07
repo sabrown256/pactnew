@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "pml_int.h"
+#include "scope_mem.h"
 
 char
  *PM_AC_S              = "Arbitrarily-Connected",
@@ -69,7 +70,7 @@ void PM_free_vectors(int nd, double **x)
  * a bad idea in general
  */
     for (id = 0; id < nd; id++)
-        SC_free_nzt(x[id], NULL);
+        _SC_free_n(x[id], NULL);
 
     CFREE(x);
 

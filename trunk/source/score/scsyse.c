@@ -274,7 +274,7 @@ static int _SC_squeeze_tag(char *s, int ns, char *tag)
 	if (_SC.sqbf != NULL)
 	   {CFREE(_SC.sqbf);};
 
-	_SC.sqbf = FMAKE_N(char, nb, "PERM|_SC_SQUEEZE_TAG:bf");};
+	_SC.sqbf = SC_permanent(CMAKE_N(char, nb));};
 
     no = 0;
     if ((s != NULL) && (tag != NULL))
@@ -320,9 +320,9 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 /* make a big buffer to start out with */
     if (nb == -1L)
        {nb             = SIZE_BUF;
-	_SC.ecbf       = FMAKE_N(char, nb, "PERM|_SC_EX_CH_OUT:ecbf");
+	_SC.ecbf       = SC_permanent(CMAKE_N(char, nb));
 	_SC.ecbf[nb-1] = '\0';
-	_SC.elbf       = FMAKE_N(char, nb, "PERM|_SC_EX_CH_OUT:elbf");
+	_SC.elbf       = SC_permanent(CMAKE_N(char, nb));
 	_SC.elbf[nb-1] = '\0';};
 
     while (SC_gets(_SC.ecbf, nb-1, pp) != NULL)

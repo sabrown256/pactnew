@@ -393,7 +393,7 @@ static void _XML_parse_tags(PDBfile *file)
     st.ic    = 0;
     st.nc    = 0;
     st.bf    = NULL;
-    st.stack = SC_MAKE_ARRAY("_XML_STACK", char *, NULL);
+    st.stack = CMAKE_ARRAY(char *, NULL, 0);
 
     for (ok = TRUE; ok == TRUE; )
         {t = _XML_read_next(&st);

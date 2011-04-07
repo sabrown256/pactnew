@@ -172,7 +172,7 @@ void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, F77_string d, F77_string f, ...)
            {case 's' :
                  if (_SC.ta == NULL)
                     {_SC.nt = MAX_BFSZ;
-                     _SC.ta = FMAKE_N(char, _SC.nt, "PERM|SCSPNT:ta");
+                     _SC.ta = SC_permanent(CMAKE_N(char, _SC.nt));
                      memset(_SC.ta, 0, _SC.nt);}
 
 	         sv = SC_VA_ARG(F77_string);

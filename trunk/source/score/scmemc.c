@@ -29,7 +29,7 @@ SC_thread_lock
  *                   - takes pthread id as argument
  */
 
-static void _SC_mem_stats_acc(long a, long f, SC_heap_des *ph)
+static void _SC_mem_stats_acc(SC_heap_des *ph, long a, long f)
    {
 
     SC_SP_ALLOC(ph) += a;
@@ -37,7 +37,7 @@ static void _SC_mem_stats_acc(long a, long f, SC_heap_des *ph)
 
     SC_SP_DIFF(ph) = SC_SP_ALLOC(ph) - SC_SP_FREE(ph);
     SC_SP_MAX(ph)  = (SC_SP_MAX(ph) > SC_SP_DIFF(ph)) ?
-                   SC_SP_MAX(ph) : SC_SP_DIFF(ph);
+                     SC_SP_MAX(ph) : SC_SP_DIFF(ph);
 
     return;}
 
@@ -51,7 +51,7 @@ void SC_mem_stats_acc(long a, long f)
 
     ph = _SC_tid_mm();
 
-    _SC_mem_stats_acc(a, f, ph);
+    _SC_mem_stats_acc(ph, a, f);
 
     return;}
 
@@ -169,46 +169,46 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
 
     ONCE_SAFE(_SC_init_emu_threads == TRUE, &SC_mc_lock)
 
-       _SC_mem_align_size = SC_MEM_ALIGN_SIZE;
-       _SC_mem_align_pad  = _SC_mem_align_size - 1;
-       _SC_mem_align_expt = 0;
-       for (n = _SC_mem_align_size; 1L < n; n >>= 1L)
-	   _SC_mem_align_expt++;
+       _SC_ms.mem_align_size = SC_MEM_ALIGN_SIZE;
+       _SC_ms.mem_align_pad  = _SC_ms.mem_align_size - 1;
+       _SC_ms.mem_align_expt = 0;
+       for (n = _SC_ms.mem_align_size; 1L < n; n >>= 1L)
+	   _SC_ms.mem_align_expt++;
 
-       _SC_block_size = bsz;
+       _SC_ms.block_size = bsz;
 
 /* find the number of bins */
        if (mxm > 0L)
 
 /* compute the number of linear bins */
-	  {n    = (mxl >> _SC_mem_align_expt);
-	   szbn = (n << _SC_mem_align_expt);
+	  {n    = (mxl >> _SC_ms.mem_align_expt);
+	   szbn = (n << _SC_ms.mem_align_expt);
 
 /* count the logarithmic bins */
 	   for ( ; szbn < mxm; n++)
 	       {l    = (long) (r*((double) szbn));
-		szbn = (((l + _SC_mem_align_pad) >> _SC_mem_align_expt) <<
-			_SC_mem_align_expt);};
-	   _SC_n_bins = n;}
+		szbn = (((l + _SC_ms.mem_align_pad) >> _SC_ms.mem_align_expt) <<
+			_SC_ms.mem_align_expt);};
+	   _SC_ms.n_bins = n;}
 
        else
-	  _SC_n_bins = 1;
+	  _SC_ms.n_bins = 1;
 
-       nb = sizeof(long)*_SC_n_bins;
-       _SC_mm_bins = (long *) malloc(nb);
+       nb = sizeof(long)*_SC_ms.n_bins;
+       _SC_ms.bins = (long *) malloc(nb);
 
-       assert(_SC_mm_bins != NULL);
+       assert(_SC_ms.bins != NULL);
 
 /* fill the linear region */
-       for (n = 1L; _SC_mem_align_size*n <= mxl; n++)
-	   _SC_mm_bins[n-1] = (n << _SC_mem_align_expt);
+       for (n = 1L; _SC_ms.mem_align_size*n <= mxl; n++)
+	   _SC_ms.bins[n-1] = (n << _SC_ms.mem_align_expt);
 
 /* fill the exponential region */
-       for (--n; n < _SC_n_bins; n++)
-	   {l = (long) (r*((double) _SC_mm_bins[n-1]));
-	    _SC_mm_bins[n] = (((l + _SC_mem_align_pad) >>
-			       _SC_mem_align_expt) <<
-			      _SC_mem_align_expt);};
+       for (--n; n < _SC_ms.n_bins; n++)
+	   {l = (long) (r*((double) _SC_ms.bins[n-1]));
+	    _SC_ms.bins[n] = (((l + _SC_ms.mem_align_pad) >>
+			       _SC_ms.mem_align_expt) <<
+			      _SC_ms.mem_align_expt);};
 
     END_SAFE;
 
@@ -223,14 +223,14 @@ long _SC_bin_index(long n)
    {long m, imn, imx, rv;
 
     m = -1L;
-    if (n > _SC_mm_bins[0])
-       {m = _SC_n_bins - 1L;
+    if (n > _SC_ms.bins[0])
+       {m = _SC_ms.n_bins - 1L;
 
-	if (n < _SC_mm_bins[m])
+	if (n < _SC_ms.bins[m])
 	   {imn = 0L;
 	    imx = m;
 	    for (m = (imn + imx) >> 1L; m > imn; m = (imn + imx) >> 1L)
-	        {if (n <= _SC_mm_bins[m])
+	        {if (n <= _SC_ms.bins[m])
 		    imx = m;
 		 else
 		    imn = m;};};};
@@ -352,12 +352,12 @@ void _SC_init_heap(SC_heap_des *ph, int id)
 
     _SC_thread_error(id, "initializing heap");
 
-    nb  = _SC_n_bins*sizeof(mem_descriptor *);
+    nb  = _SC_ms.n_bins*sizeof(mem_descriptor *);
     lst = (mem_descriptor **) malloc(nb);
 
     assert(lst != NULL);
 
-    for (i = 0; i < _SC_n_bins; i++)
+    for (i = 0; i < _SC_ms.n_bins; i++)
         lst[i] = NULL;
 
     SC_FREE_LIST(ph)        = lst;
@@ -412,8 +412,8 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
     static int mblsz = sizeof(major_block_des);
 
     us = SC_HDR_SIZE(ph) + SC_BIN_SIZE(j);
-    us = ((us + _SC_mem_align_pad) >> _SC_mem_align_expt) <<
-         _SC_mem_align_expt;
+    us = ((us + _SC_ms.mem_align_pad) >> _SC_ms.mem_align_expt) <<
+         _SC_ms.mem_align_expt;
     nu = SC_BIN_UNITS(us);
     ns = nu*us;
     pn = _SC_ALLOC((size_t) ns);
@@ -491,7 +491,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
     j  = SC_BIN_INDEX(nb);
 
 /* if this chunk size is within SCORE managed space handle it here */
-    if (j < _SC_n_bins)
+    if (j < _SC_ms.n_bins)
        {md = SC_FREE_LIST(ph)[j];
 
 /* if we are out of free chunks get a block of them from the system */
@@ -546,7 +546,7 @@ static void _SC_prim_free(void *p, long nbp, SC_heap_des *ph)
 
     nb = nbp - SC_HDR_SIZE(ph);
     j  = SC_BIN_INDEX(nb);
-    if (j < _SC_n_bins)
+    if (j < _SC_ms.n_bins)
        {ths = (mem_descriptor *) p;
         lst = SC_FREE_LIST(ph)[j];
 
@@ -615,19 +615,19 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ALLOC_NZT - add a layer of control over the C level memory management
- *              - system to store the byte length of allocated spaces
- *              - a space EXTRA_WORD_SIZE greater than requested is allocated
- *              - the length in bytes is written into the first EXTRA_WORD_SIZE
- *              - bytes with a 4 bit marker in the high bits and a pointer
- *              - to the next byte is returned
- *              - if the maximum size is exceeded a NULL pointer is returned
- *              - iff NA TRUE fudge the accounting so that this block
- *              - will not show up in the bytes allocated count
- *              - set the type field of the descriptor to TYP
+/* _SC_ALLOC_N - add a layer of control over the C level memory management
+ *             - system to store the byte length of allocated spaces
+ *             - attributes arriving in ARG are:
+ *             -
+ *             -    SC_MEM_ATTR_NO_ACCOUNT   memory block not include in totals
+ *             -    SC_MEM_ATTR_ZERO_SPACE   set zero_space behavior
+ *             -    SC_MEM_ATTR_TYPE         data type index
+ *             -    SC_MEM_ATTR_FUNC         function containing call
+ *             -    SC_MEM_ATTR_FILE         file containing function
+ *             -    SC_MEM_ATTR_LINE         line number in file
  */
 
-void *SC_alloc_nzt(long nitems, long bpi, void *arg)
+void *_SC_alloc_n(long ni, long bpi, void *arg)
    {int na, zsp, typ, line;
     long nb, nbp;
     uint64_t a, f;
@@ -655,7 +655,7 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
         file = (char *) opt->file;
         line = opt->line;};
 
-    nb  = nitems*bpi;
+    nb  = ni*bpi;
     nbp = nb + SC_HDR_SIZE(ph);
 
     if ((nb <= 0) || ((unsigned long) nb > SC_HDR_SIZE_MAX(ph)))
@@ -676,7 +676,7 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
 
         _SC_assign_block(ph, space, nb, func, file, line);
 
-	_SC_mem_stats_acc((long) nb, 0L, ph);
+	_SC_mem_stats_acc(ph, nb, 0L);
     
 	SC_MAX_MEM_BLOCKS(ph)++;
 	SC_N_MEM_BLOCKS(ph)++;
@@ -709,19 +709,88 @@ void *SC_alloc_nzt(long nitems, long bpi, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_REALLOC_NZT - add a layer of control over the C level memory management
- *                - system to store the byte length of allocated spaces
- *                - a space EXTRA_WORD_SIZE greater than requested is reallocated
- *                - the length in bytes is written into the first EXTRA_WORD_SIZE
- *                - bytes with a 4 bit marker in the high bits and a pointer to
- *                - the next byte is returned
- *                - if the maximum size implied by the EXTRA_WORD_SIZE - 4 is
- *                - exceeded a NULL pointer is returned
- *                - iff NA TRUE fudge the accounting so that this block
- *                - will not show up in the bytes allocated count
+/* SC_ALLOC_N - add a layer of control over the C level memory management
+ *            - system to store extra information about the allocated spaces
+ *            - if the maximum size is exceeded a NULL pointer is returned
+ *            - options are:
+ *            -
+ *            -    SC_MEM_ATTR_NO_ACCOUNT   memory block not include in totals
+ *            -    SC_MEM_ATTR_ZERO_SPACE   set zero_space behavior
+ *            -    SC_MEM_ATTR_TYPE         data type index
+ *            -    SC_MEM_ATTR_FUNC         function containing call
+ *            -    SC_MEM_ATTR_FILE         file containing function
+ *            -    SC_MEM_ATTR_LINE         line number in file
+ *            -
+ *            - Example:
+ *            -
+ *            -  p = SC_alloc_n(10, sizeof(int),
+ *            -                 SC_MEM_ATTR_ZERO_SPACE, 2,
+ *            -                 SC_MEM_ATTR_FUNC, "my_func",
+ *            -                 SC_MEM_ATTR_FILE, "my_file.c",
+ *            -                 SC_MEM_ATTR_LINE, 384,
+ *            -                 0);
  */
 
-void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
+void *SC_alloc_n(long ni, long bpi, ...)
+   {int is, ok;
+    void *rv;
+    SC_mem_opt opt;
+
+    opt.na   = FALSE;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    SC_VA_START(bpi);
+    for (ok = TRUE; ok == TRUE; )
+        {is = SC_VA_ARG(int);
+         switch (is)
+            {case SC_MEM_ATTR_NO_ACCOUNT :
+                  opt.na = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_ZERO_SPACE :
+                  opt.zsp = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_TYPE :
+                  opt.typ = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_FUNC :
+                  opt.fnc = SC_VA_ARG(char *);
+                  break;
+             case SC_MEM_ATTR_FILE :
+                  opt.file = SC_VA_ARG(char *);
+                  break;
+             case SC_MEM_ATTR_LINE :
+                  opt.line = SC_VA_ARG(int);
+                  break;
+	     default :
+                  ok = FALSE;
+	          break;};};
+
+    SC_VA_END;
+
+    rv = _SC_alloc_n(ni, bpi, &opt);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_REALLOC_N - add a layer of control over the C level memory management
+ *               - system to store the byte length of allocated spaces
+ *               - attributes arriving in ARG are:
+ *               -
+ *               -    SC_MEM_ATTR_NO_ACCOUNT   memory block not include in totals
+ *               -    SC_MEM_ATTR_ZERO_SPACE   set zero_space behavior
+ *               -    SC_MEM_ATTR_TYPE         data type index
+ *               -    SC_MEM_ATTR_FUNC         function containing call
+ *               -    SC_MEM_ATTR_FILE         file containing function
+ *               -    SC_MEM_ATTR_LINE         line number in file
+ */
+
+void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
    {int na, zsp;
     long nb, ob, db, nbp, obp, a, f;
     mem_header *space, *tmp;
@@ -744,7 +813,7 @@ void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
 	    na   = opt->na;
 	    zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
 
-	nb  = nitems*bpi;
+	nb  = ni*bpi;
 	nbp = nb + SC_HDR_SIZE(ph);
 
 	if ((nb <= 0) ||
@@ -788,7 +857,7 @@ void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
 	    dn = 1;
 
 	    if ((jo-dn >= jn) || (jn > jo) ||
-		(jo >= _SC_n_bins) || (jn >= _SC_n_bins))
+		(jo >= _SC_ms.n_bins) || (jn >= _SC_ms.n_bins))
 	       {tmp = (mem_header *) _SC_prim_alloc((size_t) nbp, ph, zsp);
 		if (tmp == NULL)
 		   space = NULL;
@@ -816,7 +885,7 @@ void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
  */
 	    desc->ref_count = 0;
 	    BLOCK_LENGTH(desc) = nb;
-	    _SC_mem_stats_acc((long) db, 0L, ph);
+	    _SC_mem_stats_acc(ph, db, 0L);
 
 	    space++;
 
@@ -840,12 +909,81 @@ void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_NZT - the complementary routine for SC_alloc_nzt
- *             - free all the space including the counter
- *             - return TRUE if successful and FALSE otherwise
+/* SC_REALLOC_N - add a layer of control over the C level memory management
+ *              - system to store extra information about the allocated spaces
+ *              - if the maximum size is exceeded a NULL pointer is returned
+ *              - options are:
+ *              -
+ *              -    SC_MEM_ATTR_NO_ACCOUNT   memory block not include in totals
+ *              -    SC_MEM_ATTR_ZERO_SPACE   set zero_space behavior
+ *              -    SC_MEM_ATTR_TYPE         data type index
+ *              -    SC_MEM_ATTR_FUNC         function containing call
+ *              -    SC_MEM_ATTR_FILE         file containing function
+ *              -    SC_MEM_ATTR_LINE         line number in file
+ *              -
+ *              - Example:
+ *              -
+ *              -  p = SC_realloc_n(p, 10, sizeof(int),
+ *              -                   SC_MEM_ATTR_ZERO_SPACE, 2,
+ *              -                   SC_MEM_ATTR_FUNC, "my_func",
+ *              -                   SC_MEM_ATTR_FILE, "my_file.c",
+ *              -                   SC_MEM_ATTR_LINE, 384,
+ *              -                   0);
  */
 
-int SC_free_nzt(void *p, void *arg)
+void *SC_realloc_n(void *p, long ni, long bpi, ...)
+   {int is, ok;
+    void *rv;
+    SC_mem_opt opt;
+
+    opt.na   = FALSE;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    SC_VA_START(bpi);
+    for (ok = TRUE; ok == TRUE; )
+        {is = SC_VA_ARG(int);
+         switch (is)
+            {case SC_MEM_ATTR_NO_ACCOUNT :
+                  opt.na = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_ZERO_SPACE :
+                  opt.zsp = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_TYPE :
+                  opt.typ = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_FUNC :
+                  opt.fnc = SC_VA_ARG(char *);
+                  break;
+             case SC_MEM_ATTR_FILE :
+                  opt.file = SC_VA_ARG(char *);
+                  break;
+             case SC_MEM_ATTR_LINE :
+                  opt.line = SC_VA_ARG(int);
+                  break;
+	     default :
+                  ok = FALSE;
+	          break;};};
+
+    SC_VA_END;
+
+    rv = _SC_realloc_n(p, ni, bpi, &opt);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_FREE_N - the complementary routine for _SC_alloc_n
+ *            - free all the space including the counter
+ *            - return TRUE if successful and FALSE otherwise
+ */
+
+int _SC_free_n(void *p, void *arg)
    {int zsp;
     long nb, nbp;
     SC_mem_opt *opt;
@@ -861,13 +999,13 @@ int SC_free_nzt(void *p, void *arg)
     if (!SCORE_BLOCK_P(desc))
        return(FALSE);
 
-    if (REF_COUNT(desc) == UNCOLLECT)
+    if (desc->ref_count == UNCOLLECT)
        return(TRUE);
 
     if (FREE_SCORE_BLOCK_P(desc))
        return(TRUE);
 
-    if (--REF_COUNT(desc) > 0)
+    if (--(desc->ref_count) > 0)
        return(TRUE);
 
     ph = GET_HEAP(desc);
@@ -891,7 +1029,7 @@ int SC_free_nzt(void *p, void *arg)
 
     _SC_unassign_block(ph, space);
 
-    _SC_mem_stats_acc(0L, (long) (nbp - SC_HDR_SIZE(ph)), ph);
+    _SC_mem_stats_acc(ph, 0L, nbp - SC_HDR_SIZE(ph));
 
     if ((zsp == 1) || (zsp == 3))
        _SC_prim_memset(space, nbp);
@@ -908,6 +1046,73 @@ int SC_free_nzt(void *p, void *arg)
     SC_LOCKOFF(SC_mm_lock);
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FREE_N - add a layer of control over the C level memory management
+ *           - system to store extra information about the allocated spaces
+ *           - options are:
+ *           -
+ *           -    SC_MEM_ATTR_NO_ACCOUNT   memory block not include in totals
+ *           -    SC_MEM_ATTR_ZERO_SPACE   set zero_space behavior
+ *           -    SC_MEM_ATTR_TYPE         data type index
+ *           -    SC_MEM_ATTR_FUNC         function containing call
+ *           -    SC_MEM_ATTR_FILE         file containing function
+ *           -    SC_MEM_ATTR_LINE         line number in file
+ *           -
+ *           - Example:
+ *           -
+ *           -  ok = SC_free_n(p,
+ *           -                 SC_MEM_ATTR_ZERO_SPACE, 1,
+ *           -                 SC_MEM_ATTR_FUNC, "my_func",
+ *           -                 SC_MEM_ATTR_FILE, "my_file.c",
+ *           -                 SC_MEM_ATTR_LINE, 384,
+ *           -                 0);
+ */
+
+int SC_free_n(void *p, ...)
+   {int is, ok, rv;
+    SC_mem_opt opt;
+
+    opt.na   = FALSE;
+    opt.zsp  = -1;
+    opt.typ  = -1;
+    opt.fnc  = NULL;
+    opt.file = NULL;
+    opt.line = -1;
+
+    SC_VA_START(p);
+    for (ok = TRUE; ok == TRUE; )
+        {is = SC_VA_ARG(int);
+         switch (is)
+            {case SC_MEM_ATTR_NO_ACCOUNT :
+                  opt.na = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_ZERO_SPACE :
+                  opt.zsp = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_TYPE :
+                  opt.typ = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_FUNC :
+                  opt.fnc = SC_VA_ARG(char *);
+                  break;
+             case SC_MEM_ATTR_FILE :
+                  opt.file = SC_VA_ARG(char *);
+                  break;
+             case SC_MEM_ATTR_LINE :
+                  opt.line = SC_VA_ARG(int);
+                  break;
+	     default :
+                  ok = FALSE;
+	          break;};};
+
+    SC_VA_END;
+
+    rv = _SC_free_n(p, &opt);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

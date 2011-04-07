@@ -206,7 +206,7 @@ static int _SC_omp_thread_create(SC_thread *thread, SC_thread_attr *attr,
     a.f = func;
 
     if (_SC_omp_arr == NULL)
-       _SC_omp_arr = SC_MAKE_ARRAY("_SC_OMP_THREAD_CREATE", omp_funarg, NULL);
+       _SC_omp_arr = CMAKE_ARRAY(omp_funarg, NULL, 0);
 
     SC_array_push(_SC_omp_arr, &a);
 
