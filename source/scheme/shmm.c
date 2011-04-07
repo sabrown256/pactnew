@@ -891,7 +891,7 @@ int _SS_object_map(FILE *fp, int flag)
 	space = SC_LATEST_BLOCK(ph);
 	for (i = 0; (i < n) && (space != NULL); space = desc->next, i++)
             {desc = &space->block;
-	     nr   = REF_COUNT(desc);
+	     nr   = desc->ref_count;
 	     ityp = BLOCK_TYPE(desc);
 	     if ((ityp >= SS_OBJECT_I) && (nr != UNCOLLECT))
 	        {map[no].indep = TRUE;
@@ -952,7 +952,7 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
     opt.file = __FILE__;
     opt.line = __LINE__;
 
-    op = SC_alloc_nzt(1L, sizeof(object), &opt);
+    op = _SC_alloc_n(1L, sizeof(object), &opt);
 
     if ((pname != NULL) && (SC_arrlen(pname) < 1))
        pname = CSTRSAVE(pname);

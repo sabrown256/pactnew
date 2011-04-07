@@ -33,7 +33,7 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     opt.file = NULL;
     opt.line = -1;
 
-    s = SC_alloc_nzt((long) *pni, (long) *pnb, &opt);
+    s = _SC_alloc_n((long) *pni, (long) *pnb, &opt);
 
 /* mark this block as having been allocated to FORTRAN
  * the memory map will need to know how to interpret the
@@ -112,7 +112,7 @@ FIXNUM F77_FUNC(scremz, SCREMZ)(void **pm, FIXNUM *pni,
    {FIXNUM rv;
     void *s;
 
-    s = SC_realloc_nz(*pm, (long) *pni, (long) *pnb, FALSE, (int) *pzsp);
+    s = _SC_realloc_w(*pm, (long) *pni, (long) *pnb, FALSE, (int) *pzsp);
 
     rv = ((*pm = s) != NULL);
 
@@ -146,7 +146,7 @@ FIXNUM F77_FUNC(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
 FIXNUM F77_FUNC(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
    {FIXNUM ok;
 
-    ok = SC_free_z(*pm, (int) *pzsp);
+    ok = _SC_free_w(*pm, (int) *pzsp);
     if (ok)
        *pm = NULL;
 
@@ -160,7 +160,7 @@ FIXNUM F77_FUNC(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
 FIXNUM F77_FUNC(scfree, SCFREE)(void **pm)
    {FIXNUM ok;
 
-    ok = SC_free_nzt(*pm, NULL);
+    ok = _SC_free_n(*pm, NULL);
 
     return(ok);}
 

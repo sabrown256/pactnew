@@ -30,7 +30,7 @@ void _SC_trace_entering(const char *file, const char *fnc, int line)
    {stackent s;
 
     if (_SC_stack == NULL)
-       _SC_stack = SC_MAKE_ARRAY("TRACE", stackent, NULL);
+       _SC_stack = CMAKE_ARRAY(stackent, NULL, 0);
 
     s.file = file;
     s.fnc  = fnc;
@@ -49,7 +49,7 @@ void _SC_trace_leaving(const char *file, const char *fnc, int line)
    {stackent *s;
 
     if (_SC_stack == NULL)
-       _SC_stack = SC_MAKE_ARRAY("TRACE", stackent, NULL);
+       _SC_stack = CMAKE_ARRAY(stackent, NULL, 0);
 
     s = SC_array_pop(_SC_stack);
 

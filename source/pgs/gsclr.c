@@ -2010,7 +2010,7 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
     _PG_gattrs.axis_label_y_standoff = 0.5;
 
 /* count the palettes and make an array of them */
-    pa = SC_MAKE_ARRAY("PG_SHOW_PALETTES", PG_palette *, NULL);
+    pa = CMAKE_ARRAY(PG_palette *, NULL, 0);
     for (pal = sdev->palettes; TRUE; )
         {SC_array_push(pa, &pal);
          pal = pal->next;

@@ -194,11 +194,9 @@ int PD_def_attribute(PDBfile *file, char *at, char *type)
        PD_def_attr_str(file);
   
     if (file->attrtab == NULL)
-       {file->attrtab = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_NAME_KEY);
-        ATTRIBUTE = SC_strsavef("attribute *",
-				"PERM|char*:PD_DEF_ATTRIBUTE:attribute");
-        ATTRIBUTE_VALUE = SC_strsavef("attribute_value *",
-				      "PERM|char*:PD_DEF_ATTRIBUTE:attribute_value");};
+       {file->attrtab   = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_NAME_KEY);
+        ATTRIBUTE       = SC_permanent(CSTRSAVE("attribute *"));
+        ATTRIBUTE_VALUE = SC_permanent(CSTRSAVE("attribute_value *"));};
 
     if (SC_LAST_CHAR(type) == '*')
        snprintf(atype, MAXLINE, "%s**", type);
@@ -1155,18 +1153,12 @@ int PD_def_mapping(PDBfile *fp)
 
     ONCE_SAFE(TRUE, NULL)
 
-       SC_PCONS_P_S         = SC_strsavef("pcons *",
-					  "PERM|char*:PD_DEF_MAPPING:pcons");
-       PM_SET_S             = SC_strsavef("PM_set",
-					  "PERM|char*:PD_DEF_MAPPING:set");
-       PM_SET_P_S           = SC_strsavef("PM_set *",
-					  "PERM|char*:PD_DEF_MAPPING:set_s");
-       PM_MESH_TOPOLOGY_P_S = SC_strsavef("PM_mesh_topology *",
-					  "PERM|char*:PD_DEF_MAPPING:mesh_s");
-       PM_MAPPING_P_S       = SC_strsavef("PM_mapping *",
-					  "PERM|char*:PD_DEF_MAPPING:mapping_s");
-       PM_MAPPING_S         = SC_strsavef("PM_mapping",
-					  "PERM|char*:PD_DEF_MAPPING:mapping");
+       SC_PCONS_P_S         = SC_permanent(CSTRSAVE("pcons *"));
+       PM_SET_S             = SC_permanent(CSTRSAVE("PM_set"));
+       PM_SET_P_S           = SC_permanent(CSTRSAVE("PM_set *"));
+       PM_MESH_TOPOLOGY_P_S = SC_permanent(CSTRSAVE("PM_mesh_topology *"));
+       PM_MAPPING_P_S       = SC_permanent(CSTRSAVE("PM_mapping *"));
+       PM_MAPPING_S         = SC_permanent(CSTRSAVE("PM_mapping"));
     END_SAFE;
 
 /* define the SC_array */

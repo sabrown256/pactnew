@@ -427,7 +427,7 @@ PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
     SC_array *a;
     PM_polygon *py;
 
-    a = SC_MAKE_ARRAY("PM_CONVEX_HULL", pt, NULL);
+    a = CMAKE_ARRAY(pt, NULL, 0);
     SC_array_resize(a, nh+10, -1.0);
     SC_array_set_n(a, nh);
 
@@ -1021,7 +1021,7 @@ int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
 SC_array *PM_polygon_array(void)
    {SC_array *a;
 
-    a = SC_MAKE_ARRAY("PM_POLYGON_ARRAY", PM_polygon *, NULL);
+    a = CMAKE_ARRAY(PM_polygon *, NULL, 0);
 
     return(a);}
 

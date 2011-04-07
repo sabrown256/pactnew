@@ -966,9 +966,8 @@ static void _PD_pfm_init_d(void)
     SC_LOCKON(pflist_lock_d);
 
     if (_PD_pflst == NULL)
-       {_PD_pflst = NMAKE(pflist, "PERM|_PD_PFM_INIT:_PD_pflst"); 
-        _PD_pflst->elem = NMAKE_N(pfelement, PFM_N_FILES, 
-                                   "PERM|_PD_PFM_INIT:_PD_pflst");
+       {_PD_pflst       = SC_mem_attrs(CMAKE(pflist), 3);
+        _PD_pflst->elem = SC_mem_attrs(CMAKE_N(pfelement, PFM_N_FILES), 3);
         _PD_pflst->len  = PFM_N_FILES;
 
         for(pf = _PD_pflst->elem, i = 0; 

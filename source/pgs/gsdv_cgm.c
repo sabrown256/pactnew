@@ -138,8 +138,8 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 
     _PG_CGM_query(dev, &display_width, &display_height, &n_colors);
 
-    _PG_CGM_x_point_list = SC_MAKE_ARRAY("_PG_CGM_X", double, NULL);
-    _PG_CGM_y_point_list = SC_MAKE_ARRAY("_PG_CGM_Y", double, NULL);
+    _PG_CGM_x_point_list = CMAKE_ARRAY(double, NULL, 0);
+    _PG_CGM_y_point_list = CMAKE_ARRAY(double, NULL, 0);
 
     w = display_width*dxf;
     h = display_width*dyf;

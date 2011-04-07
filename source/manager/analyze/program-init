@@ -92,6 +92,10 @@ Group SQL {
 }
 
 Group HDF {
+   Inc   = ""
+   Lib   = ""
+   RPath = ""
+   Path  = ""
 }
 
 

@@ -371,7 +371,7 @@ PG_device *_PG_X_open_imbedded_screen(PG_device *dev, Display *display,
     win_width  = dxf*min_dim;
     win_height = dyf*min_dim;
 
-    _PG_X_point_list = SC_MAKE_ARRAY("_PG_X_OPEN_IMBEDDED_SCREEN", XPoint, NULL);
+    _PG_X_point_list = CMAKE_ARRAY(XPoint, NULL, 0);
 
 /* decide on the overall color layout and choose WHITE or BLACK background */
     dev->absolute_n_color = n_dev_colors;
@@ -598,7 +598,7 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
     window_name = dev->title;
 
     if (_PG_X_point_list == NULL)
-       _PG_X_point_list = SC_MAKE_ARRAY("PERM|_PG_X_OPEN_SCREEN", XPoint, NULL);
+       _PG_X_point_list = CMAKE_ARRAY(XPoint, NULL, 1);
 
 /* GOTCHA: if we do this it will be a memory leak
     window_name = CSTRSAVE(dev->title);

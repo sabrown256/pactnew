@@ -485,8 +485,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 /* TRUE for hard copy devices */
     d->hard_copy_device        = FALSE;
 
-    d->iobjs                   = SC_MAKE_ARRAY("PG_MAKE_RAW_DEVICE",
-					       PG_interface_object *, NULL);
+    d->iobjs                   = CMAKE_ARRAY(PG_interface_object *, NULL, 0);
     d->is_visible              = TRUE;
     d->line_style              = lnsty;
     d->line_color              = lnclr;

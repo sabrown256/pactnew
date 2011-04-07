@@ -401,7 +401,7 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
     for (j = 0; j < snde; j++)
         nn *= ta[j];
 
-    wda = SC_MAKE_ARRAY("PM_INTERPOLATE_MAPPING", weight, NULL);
+    wda = CMAKE_ARRAY(weight, NULL, 0);
     nof = CMAKE_N(int, sne+1);
 
     ad = CMAKE_N(double, snde);

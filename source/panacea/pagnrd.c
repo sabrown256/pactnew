@@ -393,7 +393,7 @@ void PA_read_file(char *str, int sfl)
 
     ONCE_SAFE(TRUE, NULL)
        _PA.input_stream = stdin;
-       _PA.inf = SC_MAKE_ARRAY("PERM|PA_READ_FILE", FILE *, NULL);
+       _PA.inf          = CMAKE_ARRAY(FILE *, NULL, 1);
     END_SAFE;
 
     if (sfl)
@@ -796,7 +796,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
 
     strcpy(s, t);
 
-    val = SC_MAKE_ARRAY("PA_FUNCTION_FORM", double, NULL);
+    val = CMAKE_ARRAY(double, NULL, 0);
 
     ps = strchr(s, '(');
     if (ps != NULL)

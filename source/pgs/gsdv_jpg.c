@@ -120,7 +120,7 @@ static void _PG_JP_finish_plot(PG_device *dev)
 /* close the output file */
     fclose(fh);
 
-    SC_free_nzt(input, NULL);
+    CFREE(input);
 
 /* release the compression object's subsidiary memory */
     jpeg_destroy_compress(&cinfo);

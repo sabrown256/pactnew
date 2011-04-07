@@ -193,7 +193,7 @@ void _PG_push_device(PG_device *dev)
    {
 
     if (_PG.devlst == NULL)
-       _PG.devlst = SC_MAKE_ARRAY("_PG_PUSH_DEVICE", PG_device *, NULL);
+       _PG.devlst = CMAKE_ARRAY(PG_device *, NULL, 0);
 
     SC_array_push(_PG.devlst, &dev);
 

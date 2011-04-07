@@ -79,10 +79,10 @@
 /*--------------------------------------------------------------------------*/
 
 #define SC_BIN_INDEX(_n)  _SC_bin_index(_n)
-#define SC_BIN_SIZE(_n)   (((_n) >= _SC_n_bins) ? -1 : _SC_mm_bins[_n])
-#define SC_BIN_UNITS(_n)  (((_n) < _SC_block_size) ? _SC_block_size/(_n) : 1)
+#define SC_BIN_SIZE(_n)   (((_n) >= _SC_ms.n_bins) ? -1 : _SC_ms.bins[_n])
+#define SC_BIN_UNITS(_n)  (((_n) < _SC_ms.block_size) ? _SC_ms.block_size/(_n) : 1)
 
-#define SC_BIN_THRESHOLD()   _SC_mm_bins[_SC_n_bins-1]
+#define SC_BIN_THRESHOLD()   _SC_ms.bins[_SC_ms.n_bins-1]
 
 #define ASSIGN_ID(_d)                                                       \
     (_d)->id = SC_MEM_ID
@@ -104,9 +104,6 @@
 
 #define BLOCK_LENGTH(desc)                                                  \
     (desc)->length
-
-#define REF_COUNT(desc)                                                     \
-    ((desc)->ref_count)
 
 #define BLOCK_TYPE(desc)                                                    \
     ((desc)->type)
@@ -147,12 +144,31 @@
 
 /*--------------------------------------------------------------------------*/
 
+enum e_SC_mem_attribute
+   {SC_MEM_ATTR_NO_ACCOUNT = 1,   /* memory block not included in totals */
+    SC_MEM_ATTR_ZERO_SPACE,       /* set zero_space behavior */
+    SC_MEM_ATTR_TYPE,             /* data type index */
+    SC_MEM_ATTR_FUNC,             /* function containing call */
+    SC_MEM_ATTR_FILE,             /* file containing function */
+    SC_MEM_ATTR_LINE};            /* line number in file */
+
+typedef enum e_SC_mem_attribute SC_mem_attribute;
+
+enum e_SC_mem_tag
+   {SC_MEM_ALLOC = 1,
+    SC_MEM_REALLOC,
+    SC_MEM_FREE};
+
+typedef enum e_SC_mem_tag SC_mem_tag;
+
+
 typedef union u_mem_header mem_header;
 typedef struct s_mem_descriptor mem_descriptor;
 typedef struct s_major_block_des major_block_des;
 typedef struct s_SC_heap_des SC_heap_des;
 typedef struct s_SC_mem_opt SC_mem_opt;
 typedef struct s_SC_mem_hst SC_mem_hst;
+typedef struct s_SC_mem_state SC_mem_state;
 
 /* use the mem_header struct to force alignment to that of a double
  * this solves all alignment problems (especially for RISC chips)
@@ -219,12 +235,17 @@ struct s_SC_mem_hst
     char *name;
     mem_descriptor *space;};
 
-enum e_SC_mem_tag
-   {SC_MEM_ALLOC = 1,
-    SC_MEM_REALLOC,
-    SC_MEM_FREE};
-
-typedef enum e_SC_mem_tag SC_mem_tag;
+struct s_SC_mem_state
+   {int trap_sig;
+    void *trap_ptr;
+    int mem_align_expt;
+    int mem_align_size;
+    int mem_align_pad;
+    long block_size;
+    long n_bins;
+    long *bins;
+    SC_thread_lock lock_mm;
+    SC_thread_lock lock_mc;};
 
 # ifndef MM_CONFIG
 
@@ -234,20 +255,17 @@ typedef enum e_SC_mem_tag SC_mem_tag;
 
 /*--------------------------------------------------------------------------*/
 
-SC_DECLARE_VAR(long, _SC_block_size, 0L);
-SC_DECLARE_VAR(long, _SC_n_bins, 0L);
-SC_DECLARE_VAR(long, *_SC_mm_bins, NULL);
+#ifdef SC_DEFINE
 
-SC_DECLARE_VAR(int, _SC_mem_align_expt, 0);
-SC_DECLARE_VAR(int, _SC_mem_align_size, 0);
-SC_DECLARE_VAR(int, _SC_mem_align_pad, 0);
-SC_DECLARE_VAR(int, _SC_trap_sig, -1);
+SC_mem_state
+ _SC_ms = {-1, NULL, 0, 0, 0, 0L, 0L, NULL};
 
-SC_DECLARE_VAR(void, *_SC_trap_ptr, NULL);
+#else
 
-extern SC_thread_lock
- SC_mm_lock,
- SC_mc_lock;
+extern SC_mem_state
+ _SC_ms;
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -261,9 +279,22 @@ extern SC_heap_des
  *_SC_tid_mm(void);
 
 extern void
+ *_SC_alloc_n(long ni, long bpi, void *a),
+ *SC_alloc_n(long ni, long bpi, ...),
+ *_SC_realloc_n(void *p, long nitems, long bpi, void *a),
+ *SC_realloc_n(void *p, long nitems, long bpi, ...),
+ *_SC_nalloc_w(long nitems, long bpi, int na, int zsp,
+	       const char *fnc, const char *file, int line),
+ *_SC_alloc_w(long nitems, long bpi, char *name, int na, int zsp),
+ *_SC_realloc_w(void *p, long nitems, long bpi, int na, int zsp);
+
+extern void
  _SC_init_heap(SC_heap_des *ph, int id);
 
 extern int
+ _SC_free_n(void *p, void *a),
+ SC_free_n(void *p, ...),
+ _SC_free_w(void *p, int zsp),
  SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds);
 
 extern long

@@ -16,6 +16,7 @@
 
 #define _pdb_MODULE
 #include "pdbmodule.h"
+#include "scope_mem.h"
 
 /* DO-NOT-DELETE splicer.begin(pdb.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pdb.C_definition) */
@@ -112,7 +113,11 @@ PP_alloc(
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "lls:alloc", kw_list,
                                      &nitems, &bpi, &name))
         return NULL;
-    result = SC_alloc_nz(nitems, bpi, name, FALSE, -1);
+    result = SC_alloc_n(nitems, bpi,
+			SC_MEM_ATTR_FUNC,       name,
+                        SC_MEM_ATTR_NO_ACCOUNT, FALSE,
+                        SC_MEM_ATTR_ZERO_SPACE, -1,
+                        0);
     if (result != NULL) {
         SC_mark(result, 1);
         rv = PyCObject_FromVoidPtr(result, PP_free);

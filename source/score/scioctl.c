@@ -74,11 +74,11 @@ SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio, PFSignal_handler sigchld,
    {int nfd;
     SC_evlpdes *pe;
 
-    pe = FMAKE(SC_evlpdes, "PERM|SC_MAKE_EVENT_LOOP:pe");
+    pe = SC_permanent(CMAKE(SC_evlpdes));
 
-    pe->fd     = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", SC_poll_desc, NULL);
-    pe->faccpt = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", PFFileCallback, NULL);
-    pe->frejct = SC_MAKE_ARRAY("PERM|SC_MAKE_EVENT_LOOP", PFFileCallback, NULL);
+    pe->fd     = CMAKE_ARRAY(SC_poll_desc, NULL, 1);
+    pe->faccpt = CMAKE_ARRAY(PFFileCallback, NULL, 1);
+    pe->frejct = CMAKE_ARRAY(PFFileCallback, NULL, 1);
 
 /* guess number of descriptors that will be needed
  * not crucial but start out with enough to prevent

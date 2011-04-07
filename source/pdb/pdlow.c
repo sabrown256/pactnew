@@ -773,15 +773,12 @@ void _PD_init_consts(void)
    {
 
     if (PD_DEFSTR_S == NULL)
-       {LAST        = NMAKE(int, "PERM|_PD_INIT_CONSTS:LAST");
+       {LAST        = SC_mem_attrs(CMAKE(int), 3);
         *LAST       = 0;
 
-        PD_DEFSTR_S = SC_strsaven("defstr *",
-				  "PERM|char*:_PD_INIT_CONTST:defstr");
-        SYMENT_P_S  = SC_strsaven("syment *",
-				  "PERM|char*:_PD_INIT_CONTST:syment*");
-        SYMENT_S    = SC_strsaven("syment",
-				  "PERM|char*:_PD_INIT_CONTST:syment");};
+        PD_DEFSTR_S = SC_mem_attrs(CSTRSAVE("defstr *"), 3);
+        SYMENT_P_S  = SC_mem_attrs(CSTRSAVE("syment *"), 3);
+        SYMENT_S    = SC_mem_attrs(CSTRSAVE("syment"), 3);};
 
     return;}
 

@@ -266,9 +266,9 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
     else
        {id = SC_hasharr_get_n(ha);
 
-	t = FMAKE(SC_type, "PERM|SC_TYPE_REGISTER:t");
+	t = SC_permanent(CMAKE(SC_type));
 	t->id   = id;
-	t->type = SC_strsavef(name, "PERM|char*:SC_TYPE_REGISTER:type");
+	t->type = SC_permanent(CSTRSAVE(name));
 	t->kind = kind;
 	t->bpi  = bpi;
 
@@ -319,10 +319,10 @@ int SC_type_alias(char *name, int id)
 
     ot = _SC_get_type_id(id);
 
-    t  = FMAKE(SC_type, "PERM|SC_TYPE_ALIAS:t");
+    t  = SC_permanent(CMAKE(SC_type));
     *t = *ot;
 
-    t->type = SC_strsavef(name, "PERM|char*:SC_TYPE_ALIAS:type");
+    t->type = SC_permanent(CSTRSAVE(name));
 
     SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);
 
@@ -1186,13 +1186,13 @@ void _SC_set_format_defaults(void)
     if (fmts[SC_BIT_I] != NULL)
        CFREE(fmts[SC_BIT_I]);
 
-    t = SC_strsavef("%x", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bit)");
+    t = SC_permanent(CSTRSAVE("%x"));
     fmts[SC_BIT_I] = t;
 
     if (fmts[SC_BOOL_I] != NULL)
        CFREE(fmts[SC_BOOL_I]);
 
-    t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(bool)");
+    t = SC_permanent(CSTRSAVE("%s"));
     fmts[SC_BOOL_I] = t;
 
 /* character types (proper) */
@@ -1206,7 +1206,7 @@ void _SC_set_format_defaults(void)
 	 else if (id == SC_WCHAR_I)
 	    snprintf(tmp, MAXLINE, "%%Lc");
 
-	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(char)");
+	 t = SC_permanent(CSTRSAVE(tmp));
 	 fmts[id] = t;};
 
 /* fixed point types (proper) */
@@ -1222,7 +1222,7 @@ void _SC_set_format_defaults(void)
 	 else
 	    snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
 
-	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(fix)");
+	 t = SC_permanent(CSTRSAVE(tmp));
 	 fmts[id] = t;};
 
 /* real floating point types (proper) */
@@ -1236,7 +1236,7 @@ void _SC_set_format_defaults(void)
 	 else
 	    snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
 
-	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
+	 t = SC_permanent(CSTRSAVE(tmp));
 	 fmts[id] = t;};
 
 /* complex floating point types (proper) */
@@ -1252,14 +1252,14 @@ void _SC_set_format_defaults(void)
 	    snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
 		     fp_pre[i].digits, fp_pre[i].digits);
 
-	 t = SC_strsavef(tmp, "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(fp)");
+	 t = SC_permanent(CSTRSAVE(tmp));
 	 fmts[id] = t;};
 
 /* other primitive types */
     if (fmts[SC_STRING_I] != NULL)
        CFREE(fmts[SC_STRING_I]);
 
-    t = SC_strsavef("%s", "PERM|char*:_SC_SET_FORMAT_DEFAULTS:format1(string)");
+    t = SC_permanent(CSTRSAVE("%s"));
     fmts[SC_STRING_I] = t;
 
 /* fmta is used for arrays */
@@ -1267,8 +1267,7 @@ void _SC_set_format_defaults(void)
         {if (fmta[i] != NULL)
             CFREE(fmta[i]);
 
-         t = SC_strsavef(fmts[i],
-			 "PERM|char*:_SC_SET_FORMAT_DEFAULTS:formats2");
+         t = SC_permanent(CSTRSAVE(fmts[i]));
          fmta[i] = t;};
 
     return;}

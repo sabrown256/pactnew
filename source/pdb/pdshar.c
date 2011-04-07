@@ -33,7 +33,7 @@ int _PD_register(char *type, char *fmt, PFBinType hook,
     tr_layer tr;
 		 
     if (_PD_file_types == NULL)
-       _PD_file_types = SC_MAKE_ARRAY("PERM|_PD_REGISTER", tr_layer, NULL);
+       _PD_file_types = CMAKE_ARRAY(tr_layer, NULL, 1);
 
     if (write == NULL)
        write = _PD_write;

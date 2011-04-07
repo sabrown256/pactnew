@@ -985,7 +985,7 @@ anadep *SC_make_state(void)
     SC_make_def_var(state, s, -1);
     CFREE(s);
 
-    state->actions = SC_MAKE_ARRAY("SC_MAKE_STATE", cmdes, NULL);
+    state->actions = CMAKE_ARRAY(cmdes, NULL, 0);
 
     _SC_init_suffices(state);
 
@@ -1135,7 +1135,7 @@ int SC_parse_makefile(anadep *state, char *fname)
 	if (t != NULL)
 	   {if (BARRIER != NULL)
 	       {CFREE(BARRIER);};
-	    BARRIER = SC_strsavef(t, "PERM|char*:SC_PARSE_MAKEFILE:barrier");};};
+	    BARRIER = SC_permanent(CSTRSAVE(t));};};
 
     SC_ERR_UNTRAP();
 

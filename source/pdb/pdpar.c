@@ -86,8 +86,7 @@ static void _PD_pfm_init_t(void)
     if (_PD_pfman == NULL)
        {_PD.nfilesx = N_PFM_FILES;
 
-        _PD_pfman = NMAKE_N(pfmanager, _PD.nfilesx,
-			    "PERM|_PD_PFM_INIT_T:_PD_pfman");
+        _PD_pfman = SC_mem_attrs(CMAKE_N(pfmanager, _PD.nfilesx), 3);
 
 	pm = _PD_pfman;
 

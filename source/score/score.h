@@ -80,22 +80,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* NMAKE - memory allocation and bookkeeping macro */
-
-#define NMAKE(_t, name)                                                      \
-    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, TRUE, -1))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NMAKE_N - allocate a block of type _t and return a pointer to it */
-
-#define NMAKE_N(_t, n, name)                                                 \
-    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, TRUE, -1))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* NREMAKE - reallocate a block of type _t and return a pointer to it */
 
 #define NREMAKE(p, _t, n)                                                    \
@@ -972,14 +956,9 @@ extern void
  SC_mem_statb_set(uint64_t a, uint64_t f),
  SC_mem_stats(long *al, long *fr, long *df, long *mx),
  SC_mem_stats_acc(long a, long f),
- SC_mem_stats_set(long a, long f),
- *SC_nalloc_nz(long nitems, long bpi, int na, int zsp,
-	       const char *fnc, const char *file, int line),
- *SC_alloc_nzt(long nitems, long bpi, void *a),
- *SC_realloc_nzt(void *p, long nitems, long bpi, void *a);
+ SC_mem_stats_set(long a, long f);
 
 extern int
- SC_free_nzt(void *p, void *a),
  SC_zero_space_n(int flag, int tid),
  SC_zero_on_alloc_n(int tid);
 
@@ -993,8 +972,8 @@ extern SC_mem_fnc
  SC_trap_pointer(void *p, int sig);
 
 extern void
- *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
- *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp),
+ *SC_permanent(void *p),
+ *SC_mem_attrs(void *p, int attr),
  SC_untrap_pointer(void *p),
  *SC_copy_item(void *in);
 
@@ -1002,7 +981,6 @@ extern char
  *SC_arrname(void *p);
 
 extern int
- SC_free_z(void *p, int zsp),
  SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn),
  SC_mem_trace(void),
  SC_reg_mem(void *p, long length, char *name),
@@ -1012,7 +990,6 @@ extern int
  SC_set_count(void *p, int n),
  SC_ref_count(void *p),
  SC_safe_to_free(void *p),
- SC_permanent(void *p),
  SC_arrtype(void *p, int type),
  SC_set_arrtype(void *p, int type);
 
@@ -1112,10 +1089,7 @@ extern void
 /* SCSTR.C declarations */
 
 extern char
- *SC_strsave(char *s),
- *SC_strsavef(char *s, char *name),
  *SC_strsavec(char *s, const char *file, const char *fnc, int line),
- *SC_strsaven(char *s, char *name),
  *SC_strcat(char *dest, size_t lnd, char *src),
  *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...),
  *SC_dstrcat(char *dest, char *src),

@@ -108,7 +108,7 @@ SC_array *_PD_ptr_make_ap(void)
     SC_array *a;
 
 /* if uninitialized allocate them */
-    a = SC_MAKE_ARRAY("_PD_PTR_MAKE_AP", PD_address, _PD_ptr_init_ad);
+    a = CMAKE_ARRAY(PD_address, _PD_ptr_init_ad, 0);
 
 /* grow the array to at least na elements */
     SC_array_resize(a, _PD.ninc, -1.0);
@@ -333,7 +333,7 @@ void _PD_ptr_free_apl(PDBfile *file)
 void _PD_ptr_init_apl(PDBfile *file)
    {
 
-    file->ap = SC_MAKE_ARRAY("_PD_PTR_INIT_APL", SC_array *, NULL);
+    file->ap = CMAKE_ARRAY(SC_array *, NULL, 0);
 
     _PD_ptr_init_ap(file, TRUE);
 

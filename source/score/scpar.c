@@ -743,7 +743,7 @@ void _SC_init_pool(thread_pool *tp, int nt)
 	tp->nf   =  0;
 	tp->ni   =  0;
 
-	tp->wrk = SC_MAKE_ARRAY("PERM|_SC_INIT_POOL", thread_work *, NULL);
+	tp->wrk = CMAKE_ARRAY(thread_work *, NULL, 1);
 
 	for (i = 0; i < nt; i++)
 	    {ti = _SC_get_thread_info(i+1);

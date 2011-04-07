@@ -141,7 +141,7 @@ static void _SC_sproc_init_thread(emu_thread_info *pt,
        CFREE(pt->key_data);
 
     if (nk > 0)
-       pt->key_data = NMAKE_N(void *, nk, "_SC_SPROC_INIT_THREAD:key_data");
+       pt->key_data = SC_mem_attrs(CMAKE_N(void *, nk), 2);
 
     return;}
 
@@ -155,8 +155,7 @@ static emu_thread_info *_SC_sproc_lookup_thread(SC_thread *thread)
     emu_thread_info tv, *rv, *ta;
 
     if (_SC_sproc_threads == NULL)
-       _SC_sproc_threads = SC_MAKE_ARRAY("_SC_SPROC_LOOKUP_THREAD",
-					 _emu_thread_info, NULL);
+       _SC_sproc_threads = CMAKE_ARRAY(_emu_thread_info, NULL, 0);
 
     nt = SC_array_get_n(_SC_sproc_threads);
 

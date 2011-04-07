@@ -79,9 +79,9 @@ static int test_1(void)
 
     SC_ENTERING;
 
-    ac = SC_MAKE_ARRAY("TEST_1", char, NULL);
-    ai = SC_MAKE_ARRAY("TEST_1", int, NULL);
-    ad = SC_MAKE_ARRAY("TEST_1", double, NULL);
+    ac = CMAKE_ARRAY(char, NULL, 0);
+    ai = CMAKE_ARRAY(int, NULL, 0);
+    ad = CMAKE_ARRAY(double, NULL, 0);
 
     na = 3;
 
@@ -160,9 +160,9 @@ static int test_2(void)
 	 *ia[i] = 10 + i;
 	 *da[i] = -10.3 + i;};
 
-    ac = SC_MAKE_ARRAY("TEST_2", char *, NULL);
-    ai = SC_MAKE_ARRAY("TEST_2", int *, NULL);
-    ad = SC_MAKE_ARRAY("TEST_2", double *, NULL);
+    ac = CMAKE_ARRAY(char *, NULL, 0);
+    ai = CMAKE_ARRAY(int *, NULL, 0);
+    ad = CMAKE_ARRAY(double *, NULL, 0);
 
 /* test array set */
     for (i = 0; i < na; i++)
@@ -228,7 +228,7 @@ static int test_3(void)
 
     SC_ENTERING;
 
-    as = SC_MAKE_ARRAY("TEST_3", ts1, NULL);
+    as = CMAKE_ARRAY(ts1, NULL, 0);
 
     na = 3;
 
@@ -285,7 +285,7 @@ static int test_4(void)
     sa[1].c = CSTRSAVE(" ");
     sa[2].c = CSTRSAVE("world");
 
-    as = SC_MAKE_ARRAY("TEST_4", ts1, NULL);
+    as = CMAKE_ARRAY(ts1, NULL, 0);
 
 /* test array set */
     for (i = 0; i < na; i++)
@@ -344,7 +344,7 @@ static int test_5(void)
     sa[1]->c = CSTRSAVE(" ");
     sa[2]->c = CSTRSAVE("world");
 
-    as = SC_MAKE_ARRAY("TEST_5", ts1 *, NULL);
+    as = CMAKE_ARRAY(ts1 *, NULL, 0);
 
 /* test array set */
     for (i = 0; i < na; i++)
@@ -420,7 +420,7 @@ static int test_6(void)
 
     na = 100;
 
-    a = SC_MAKE_ARRAY("TEST_6", long, NULL);
+    a = CMAKE_ARRAY(long, NULL, 0);
     for (i = 0; i < na; i++)
         {l = SC_random_int(1, na+1);
 	 SC_array_push(a, &l);};
@@ -482,7 +482,7 @@ static int test_7(void)
 
     SC_ENTERING;
 
-    ia = SC_MAKE_ARRAY("TEST_7", int, NULL);
+    ia = CMAKE_ARRAY(int, NULL, 0);
     test_7_add(ia, 10, FALSE);
 
     ni = SC_array_get_n(ia);
@@ -529,7 +529,7 @@ static int test_8(void)
 
     na = 1000000;
 
-    da = SC_MAKE_ARRAY("TEST_8", double, NULL);
+    da = CMAKE_ARRAY(double, NULL, 0);
     SC_array_resize(da, na, -1.0);
 
     dp = CMAKE_N(double, na);

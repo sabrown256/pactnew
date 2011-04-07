@@ -172,7 +172,7 @@ void PC_push_pending(PROCESS *pp, int op, char *bf, char *type,
      requ = *(MPI_Request *) req;
 
      if (_PC.reqs == NULL)
-        _PC.reqs = SC_MAKE_ARRAY("PC_PUSH_PENDING", MPI_Request, NULL);
+        _PC.reqs = CMAKE_ARRAY(MPI_Request, NULL, 0);
 
      SC_array_push(_PC.reqs, &requ);};
 

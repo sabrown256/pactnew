@@ -287,7 +287,7 @@ char *SC_signal_name(int sig)
    {int i;
 
     if (_SC.signame == NULL)
-       {_SC.signame = FMAKE_N(char *, SC_NSIG, "PERM|char*:SC_SIGNAL_NAME:name");
+       {_SC.signame = SC_permanent(CMAKE_N(char *, SC_NSIG));
 
 	for (i = 0; i < SC_NSIG; i++)
 	    _SC.signame[i] = "unknown";
