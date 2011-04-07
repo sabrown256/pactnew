@@ -840,7 +840,7 @@ void *SC_realloc_nzt(void *p, long nitems, long bpi, void *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_NZT - the complementary routine for SC_alloc
+/* SC_FREE_NZT - the complementary routine for SC_alloc_nzt
  *             - free all the space including the counter
  *             - return TRUE if successful and FALSE otherwise
  */

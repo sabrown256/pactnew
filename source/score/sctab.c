@@ -365,7 +365,7 @@ haelem *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_FREE_N - do SC_free for hasharr element */
+/* SC_HASHARR_FREE_N - do CFREE for hasharr element */
 
 int SC_hasharr_free_n(void *d, void *a)
    {void *t;

@@ -18,6 +18,12 @@
 
 /*--------------------------------------------------------------------------*/
 
+/*--------------------------------------------------------------------------*/
+
+/*                           PROCEDURAL MACROS                              */
+
+/*--------------------------------------------------------------------------*/
+
 #undef MAKE
 #undef MAKE_N
 #undef REMAKE
@@ -25,24 +31,12 @@
 #undef SFREE
 #undef SFREE_N
 
-/*--------------------------------------------------------------------------*/
-
-/*                           PROCEDURAL MACROS                              */
-
-/*--------------------------------------------------------------------------*/
-
-/* MAKE - memory allocation and bookkeeping macro */
-
-#define MAKE(_t)                                                             \
-    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), NULL, FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MAKE_N - allocate a block of type _t and return a pointer to it */
-
-#define MAKE_N(_t, n)                                                        \
-    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), NULL, FALSE))
+#define MAKE(_t)             CMAKE(_t)
+#define MAKE_N(_t, n)        CMAKE_N(_t, n)
+#define REMAKE(p, _t)        CREMAKE(p, _t, 1)
+#define REMAKE_N(p, _t, n)   CREMAKE(p, _t, n)
+#define SFREE(x)             CFREE(x)
+#define SFREE_N(x, n)        CFREE(x)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -59,35 +53,6 @@
 
 #define FMAKE_N(_t, n, name)                                                 \
     ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REMAKE - memory reallocation and bookkeeping macro */
-
-#define REMAKE(p, _t)                                                        \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, 1L,                           \
-				   (long) sizeof(_t), FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REMAKE_N - reallocate a block of type _t and return a pointer to it */
-
-#define REMAKE_N(p, _t, n)                                                   \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
-				   (long) sizeof(_t), FALSE))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SFREE - release memory and do bookkeeping */
-
-#define SFREE(x)                                                             \
-   {(*SC_gs.mm.free)(x);                                                     \
-    x = NULL;}
-
-#define SFREE_N(x, n)  SFREE(x)
 
 /*--------------------------------------------------------------------------*/
 

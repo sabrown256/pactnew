@@ -215,8 +215,8 @@ static void makeh(void)
              N_var++;
 
 /* release the temporary storage for this variable */
-             SFREE_N(time, l);
-             SFREE_N(data, l);};
+             CFREE(time);
+             CFREE(data);};
 
 /* finish up */
     PD_write(pdsf, "N_Variables", "integer", &N_var);

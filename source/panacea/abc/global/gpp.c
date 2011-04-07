@@ -314,7 +314,7 @@ double *LR_map_centers(double *data, int centering)
                                *dp++ = fp[k];
                            pd += N_zones;};
 
-                      SFREE_N(fp, nz);
+                      CFREE(fp);
 
                       break;};
 

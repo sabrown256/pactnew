@@ -182,7 +182,7 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE - the complementary routine for SC_alloc
+/* SC_FREE - the complementary routine for SC_alloc_nzt
  *         - free all the space including the counter
  *         - return TRUE if successful and FALSE otherwise
  */
@@ -205,7 +205,7 @@ int SC_free(void *p)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_Z - the complementary routine for SC_alloc
+/* SC_FREE_Z - the complementary routine for SC_alloc_nzt
  *           - free all the space including the counter
  *           - return TRUE if successful and FALSE otherwise
  */
@@ -278,7 +278,7 @@ static int _SC_free_std(void *p)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_NALLOC_CHK - wrap a check for a specific pointer value
- *                - around the SC_alloc_na call
+ *                - around the SC_alloc_nzt call
  *                - part of a usable API for memory debugging
  */
 
@@ -305,7 +305,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na,
 /*--------------------------------------------------------------------------*/
 
 /* _SC_ALLOC_CHK - wrap a check for a specific pointer value
- *               - around the SC_alloc_na call
+ *               - around the SC_alloc_nzt call
  *               - part of a usable API for memory debugging
  */
 
@@ -331,7 +331,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_REALLOC_CHK - wrap a check for a specific pointer value
- *                 - around the SC_alloc_na call
+ *                 - around the SC_alloc_nzt call
  *                 - part of a usable API for memory debugging
  */
 
@@ -352,7 +352,7 @@ static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_FREE_CHK - wrap a check for a specific pointer value
- *              - around the SC_free
+ *              - around an CFREE
  *              - part of a usable API for memory debugging
  */
 
@@ -362,7 +362,7 @@ static int _SC_free_chk(void *p)
     if (p == _SC_trap_ptr)
        raise(_SC_trap_sig);
 
-    rv = SC_free(p);
+    rv = SC_free_nzt(p, NULL);
 
     return(rv);}
 
@@ -672,7 +672,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
 
 /* SC_MEM_TRACE - return the number of active chunks of memory managed
  *              - by the system
- *              - the given pointer must have been allocated by SC_alloc
+ *              - the given pointer must have been allocated by SC_alloc_nzt
  *              - return -1 if the forward and backward counts differ
  *              - return -2 if a NULL pointer occurs in the chain
  *              - return -3 if the link count exceeds the number of blocks
@@ -1031,7 +1031,7 @@ int SC_is_score_ptr(void *p)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ARRLEN - return the length of an array which was allocated
- *           - with SC_alloc
+ *           - with SC_alloc_nzt
  *           - return -1L on error
  */
 

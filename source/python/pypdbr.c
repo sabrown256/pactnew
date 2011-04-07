@@ -426,8 +426,8 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
 
         lvr = &lvr[i];
 
-        DEREF(lvr) = pv = (char *) SC_alloc(nitems, bpi,
-                                            "_PP_rd_syment:pv");
+        pv = CMAKE_N(char, nitems*bpi);
+        DEREF(lvr) = pv;
         if (pv == NULL) {
             PyErr_NoMemory();
             return -1;

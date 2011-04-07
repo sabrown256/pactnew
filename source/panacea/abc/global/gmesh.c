@@ -846,11 +846,11 @@ int rl_mesh(void)
 
     SC_free_hasharr(curves, NULL, NULL);
 
-    SFREE_N(rx, N_nodes);
-    SFREE_N(ry, N_nodes);
-    SFREE_N(nodet, N_nodes);
-    SFREE_N(reg_map, N_nodes);
-    SFREE_N(zone, N_zones);
+    CFREE(rx);
+    CFREE(ry);
+    CFREE(nodet);
+    CFREE(reg_map);
+    CFREE(zone);
 
     kmax = kmin = 0;
     lmax = lmin = 0;

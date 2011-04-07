@@ -383,7 +383,7 @@ void SC_da_release(SC_dynamic_array *daa)
    {
 
     SC_da_clean(daa, FALSE);
-    SC_free(daa);
+    CFREE(daa);
 
     return;}
 

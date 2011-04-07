@@ -108,7 +108,7 @@ static object *_SXI_resz_array(object *argl)
 	bpi = SC_arrlen(d)/os;
 
         arr->length = size;
-        arr->data   = SC_realloc_na(d, size, bpi, FALSE);};
+        arr->data   = CREMAKE(d, char, size*bpi);};
 
     o = SS_car(argl);
 

@@ -69,7 +69,7 @@ void PM_free_vectors(int nd, double **x)
  * a bad idea in general
  */
     for (id = 0; id < nd; id++)
-        SC_free(x[id]);
+        SC_free_nzt(x[id], NULL);
 
     CFREE(x);
 

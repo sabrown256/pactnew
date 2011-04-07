@@ -67,7 +67,7 @@ static void *_SC_malloc_s(unsigned int nbytes)
 static void _SC_free_s(void *ap)
    {
 
-    SC_free(ap);
+    CFREE(ap);
 
     return;}
 
