@@ -44,7 +44,7 @@
 /* FMAKE - memory allocation and bookkeeping macro */
 
 #define FMAKE(_t, name)                                                      \
-    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, FALSE))
+    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, FALSE, -1))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -52,7 +52,7 @@
 /* FMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define FMAKE_N(_t, n, name)                                                 \
-    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, FALSE))
+    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, FALSE, -1))
 
 /*--------------------------------------------------------------------------*/
 
@@ -77,11 +77,23 @@ extern "C" {
 /*--------------------------------------------------------------------------*/
 
 
-/* SCMEMC.C declarations */
+/* former SCMEMC.C declarations */
 
 extern int
  SC_zero_space(int flag),
  SC_zero_on_alloc(void);
+
+
+/* former SCMEMDA.C declarations */
+
+extern int
+ SC_free(void *p);
+
+extern void
+ *SC_alloc(long nitems, long bpi, char *name),
+ *SC_alloc_na(long nitems, long bpi, char *name, int na),
+ *SC_realloc(void *p, long nitems, long bpi),
+ *SC_realloc_na(void *p, long nitems, long bpi, int na);
 
 
 #ifdef __cplusplus
