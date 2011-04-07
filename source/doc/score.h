@@ -597,7 +597,7 @@ being added to the list (arrays may be used as values!);
 <em>val</em>, a pointer to the values to be added to the list;
 and, in FORTRAN, <em>nv</em>, the number of values to be added.
 In the C binding val must have been
-dynamically allocated with <tt>CMAKE</tt>, <tt>CMAKE_N</tt>, or <tt>SC_alloc</tt>.
+dynamically allocated with <tt>CMAKE</tt> or <tt>CMAKE_N</tt>.
 <p>
 
 <pre>
@@ -1260,7 +1260,7 @@ Some applications use dynamic memory in very complex ways which make it
 difficult to know when it is safe to release a piece of dynamically
 allocated memory.  Reference counting is a good technique in many cases.
 The SCORE memory manager provides functions to let applications tag
-pointers with the number of references and <tt>SC_free</tt> (and <tt>CFREE</tt>)
+pointers with the number of references and <tt>CFREE</tt>
 act properly with respect to the number of references.
 <p>
 
@@ -1352,7 +1352,7 @@ count, the size in bytes of allocation request.  This can be accessed
 by <tt>SC_arrlen</tt> at any time until the block is freed.
 <p>
 
-When a pointer to allocated memory is handed to <tt>SC_free</tt>, several things
+When a pointer to allocated memory is handed to <tt>CFREE</tt>, several things
 are done.  The reference count is decremented.  If the new count is less
 than 1, the block is added to the free list of the bin whose size it
 hashes to.  The block may or may not be zeroed out depending on the value
@@ -1585,7 +1585,7 @@ NOTE: All arguments but the first must be the same in the pairs of
 <I>Python Binding: </I>
 </pre>
 
-Given a pointer to space allocated with <tt>SC_alloc</tt> or <tt>SC_realloc</tt> 
+Given a pointer to space allocated with <tt>CMAKE</tt>, <tt>CMAKE_N</tt>, or <tt>CREMAKE</tt> 
 extract the number of
 bytes to which the pointer points and return it. WARNING: this function can fail to
 recognize the presence of a pointer allocated statically or with malloc, calloc, or
@@ -1594,20 +1594,6 @@ support the pointer extension.
 <p>
 The number of bytes pointed to by <em>ptr</em> is returned if successful,
 and -1 if not.
-<p>
-
-<pre>
-<I>C Binding: </I>void *SC_alloc(long nitems, long bytepitem)
-<I>F77 Binding: use</I> scmake
-<I>SX Binding: memory management is automatic</I> 
-<I>Python Binding: </I>
-</pre>
-Allocate a new space in memory <em>nitems * bytepitem</em> long and return a pointer to it.
-The arguments are:
-<em>nitems</em>, the number of items (e.g. floats);
-and <em>bytepitem</em>, the number of bytes per item.<p>
-Returns a non-NULL pointer to a newly allocated space if successful and NULL if not.
-The pointer should be cast to the appropriate type in C.
 <p>
 
 <pre>
@@ -1628,17 +1614,6 @@ The arguments are:
 <em>mxm</em>, the target maximum managed block size;
 <em>bsz</em>, the maximum block size requested from the system;
 and <em>r</em>, the bin size ratio in the exponential region.
-<p>
-
-<pre>
-<I>C Binding: </I>int SC_free(void *ptr)
-<I>F77 Binding: use</I> scfree
-<I>SX Binding: memory management is automatic</I>
-<I>Python Binding: </I>
-</pre>
-
-Release the space pointed to by <em>ptr</em>. 
-Returns <tt>TRUE</tt> if successful, <tt>FALSE</tt> otherwise.
 <p>
 
 <pre>
@@ -1745,24 +1720,6 @@ later to get the statistics on memory usage since the call to <tt>SC_mem_stats_s
 The arguments are:
 <em>a</em>, the value to store in the allocated counter and <em>f</em>, the
 value to store in the freed counter.
-<p>
-
-<pre>
-<I>C Binding: </I>void *SC_realloc(void *ptr, long nitems, long bytepitem)
-<I>F77 Binding: use</I> screma
-<I>SX Binding: memory management is automatic</I>
-<I>Python Binding: </I>
-</pre>
-
-Reallocate the space in memory associated with ptr so that it is nitems x bytepitem
-long and return a pointer to it. Copy the contents of the old space into the new space
-if necessary, but preserve the original contents pointed to.
-<em>Ptr</em> must be a pointer to a space previously allocated by <tt>SC_alloc</tt>.
-The other argument are:
-<em>nitems</em>, the number of items (e.g. floats);
-and <em>bytepitem</em>, the number of bytes per item.<p>
-Returns a non-NULL pointer to a newly allocated space if successful and NULL if not.
-The pointer should be cast to the appropriate type in C.
 <p>
 
 <pre>
@@ -1883,23 +1840,7 @@ and NULL if not. The FORTRAN binding returns 1 if successful and 0 if not.
 <p>
 
 <pre>
-<I>C Binding: </I>type *CREMAKE(void *ptr, type)
-<I>F77 Binding: use</I> screma
-<I>SX Binding: memory management is automatic</I>
-<I>Python Binding: </I>
-</pre>
-
-Reallocate the space in memory associated with <em>ptr</em> to the
-size of type and return a pointer to it, which has been cast to
-<em>type *</em>. Copy the contents of the old space into the new space
-if necessary. In the C binding this is a macro and <em>type</em> is a
-primitive or derived type specifier.
-<p>
-Returns a non-NULL pointer to a reallocated space if successful and NULL if not.
-<p>
-
-<pre>
-<I>C Binding: </I>type *CREMAKE_N(void *ptr, type, long ni)
+<I>C Binding: </I>type *CREMAKE(void *ptr, type, long ni)
 <I>F77 Binding: </I>integer screma(pointer ptr, integer ni, integer bpi)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>

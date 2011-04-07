@@ -837,8 +837,8 @@ PDBLib is capable of correctly handling data that is indirectly referenced
 through arbitrary levels of pointers. In order to do this it is necessary
 to put an extra layer of memory management over the standard C library
 routines. The basic requirement is that given a pointer, one would like
-to know how many bytes of data it points to. The functions, <tt>SC_alloc</tt>,
-<tt>SC_realloc</tt>, <tt>CSTRSAVE</tt>, <tt>SC_free</tt>, and <tt>SC_arrlen</tt>,
+to know how many bytes of data it points to. The functions, <tt>CMAKE</tt>,
+<tt>CREMAKE</tt>, <tt>CSTRSAVE</tt>, <tt>CFREE</tt>, and <tt>SC_arrlen</tt>,
 built on top of the
 standard C library functions, malloc and free, provide this capability.
 For C programmers, macros are provided which offer a nice and intuitive
@@ -1116,7 +1116,7 @@ the type specified for the entry. For example,
 
 <h4>Rule #3</h4>
 When using pointers and dynamically allocated memory with PDBLib, use
-<tt>SC_alloc</tt>, <tt>SC_realloc</tt>, <tt>CSTRSAVE</tt>, <tt>CMAKE</tt>,
+<tt>CSTRSAVE</tt>, <tt>CMAKE</tt>,
 <tt>CMAKE_N</tt>, or <tt>CREMAKE</tt> to allocate 
 memory. These functions and macros are documented in the SCORE User's Manual.
 <p>

@@ -13,52 +13,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ALLOC - add a layer of control over the C level memory management
- *          - system to store extra information about the allocated spaces
- */
-
-void *SC_alloc(long nitems, long bpi, char *name)
-   {void *rv;
-    SC_mem_opt opt;
-
-    opt.na   = FALSE;
-    opt.zsp  = -1;
-    opt.typ  = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
-
-    rv = SC_alloc_nzt(nitems, bpi, &opt);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_ALLOC_NA - add a layer of control over the C level memory management
- *             - system to store extra information about the allocated spaces
- *             - iff NA TRUE fudge the accounting so that this block
- *             - will not show up in the bytes allocated count
- */
-
-void *SC_alloc_na(long nitems, long bpi, char *name, int na)
-   {void *p;
-    SC_mem_opt opt;
-
-    opt.na  = na;
-    opt.zsp = -1;
-    opt.typ = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
-
-    p = SC_alloc_nzt(nitems, bpi, &opt);
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_ALLOC_NZ - add a layer of control over the C level memory management
  *             - system to store extra information about the allocated spaces
  *             - iff NA TRUE fudge the accounting so that this block
@@ -85,19 +39,19 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_NALLOC_NA - add a layer of control over the C level memory management
+/* SC_NALLOC_NZ - add a layer of control over the C level memory management
  *              - system to store extra information about the allocated spaces
  *              - iff NA TRUE fudge the accounting so that this block
  *              - will not show up in the bytes allocated count
  */
 
-void *SC_nalloc_na(long nitems, long bpi, int na,
+void *SC_nalloc_nz(long nitems, long bpi, int na, int zsp,
 		   const char *fnc, const char *file, int line)
    {void *p;
     SC_mem_opt opt;
 
     opt.na   = na;
-    opt.zsp  = -1;
+    opt.zsp  = zsp;
     opt.typ  = -1;
     opt.fnc  = fnc;
     opt.file = file;
@@ -106,52 +60,6 @@ void *SC_nalloc_na(long nitems, long bpi, int na,
     p = SC_alloc_nzt(nitems, bpi, &opt);
 
     return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_REALLOC - add a layer of control over the C level memory management
- *            - system to store extra information about the allocated spaces
- */
-
-void *SC_realloc(void *p, long nitems, long bpi)
-   {void *rv;
-    SC_mem_opt opt;
-
-    opt.na   = FALSE;
-    opt.zsp  = -1;
-    opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
-
-    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_REALLOC_NA - add a layer of control over the C level memory management
- *               - system to store extra information about the allocated spaces
- *               - iff NA TRUE fudge the accounting so that this block
- *               - will not show up in the bytes allocated count
- */
-
-void *SC_realloc_na(void *p, long nitems, long bpi, int na)
-   {void *rv;
-    SC_mem_opt opt;
-
-    opt.na   = na;
-    opt.zsp  = -1;
-    opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
-
-    rv = SC_realloc_nzt(p, nitems, bpi, &opt);
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -176,29 +84,6 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
     opt.line = -1;
 
     rv = SC_realloc_nzt(p, nitems, bpi, &opt);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_FREE - the complementary routine for SC_alloc_nzt
- *         - free all the space including the counter
- *         - return TRUE if successful and FALSE otherwise
- */
-
-int SC_free(void *p)
-   {int rv;
-    SC_mem_opt opt;
-
-    opt.na   = -1;
-    opt.zsp  = -1;
-    opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
-
-    rv = SC_free_nzt(p, &opt);
 
     return(rv);}
 
@@ -230,7 +115,7 @@ int SC_free_z(void *p, int zsp)
 
 /* _SC_NALLOC_STD - use the C std library malloc */
 
-static void *_SC_nalloc_std(long nitems, long bpi, int na,
+static void *_SC_nalloc_std(long nitems, long bpi, int na, int zsp,
 			    const char *fnc, const char *file, int line)
    {void *space;
 
@@ -243,7 +128,7 @@ static void *_SC_nalloc_std(long nitems, long bpi, int na,
 
 /* _SC_ALLOC_STD - use the C std library malloc */
 
-static void *_SC_alloc_std(long nitems, long bpi, char *name, int na)
+static void *_SC_alloc_std(long nitems, long bpi, char *name, int na, int zsp)
    {void *space;
 
     space = malloc(nitems*bpi);
@@ -255,7 +140,7 @@ static void *_SC_alloc_std(long nitems, long bpi, char *name, int na)
 
 /* _SC_REALLOC_STD - use the C std library realloc */
 
-static void *_SC_realloc_std(void *p, long nitems, long bpi, int na)
+static void *_SC_realloc_std(void *p, long nitems, long bpi, int na, int zsp)
    {void *space;
 
     space = realloc(p, nitems*bpi);
@@ -267,7 +152,7 @@ static void *_SC_realloc_std(void *p, long nitems, long bpi, int na)
 
 /* _SC_FREE_STD - use the C std library free */
 
-static int _SC_free_std(void *p)
+static int _SC_free_std(void *p, int zsp)
    {
 
     free(p);
@@ -282,13 +167,13 @@ static int _SC_free_std(void *p)
  *                - part of a usable API for memory debugging
  */
 
-static void *_SC_nalloc_chk(long nitems, long bpi, int na,
+static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
 			    const char *fnc, const char *file, int line)
    {void *space;
     SC_mem_opt opt;
 
     opt.na   = na;
-    opt.zsp  = -1;
+    opt.zsp  = zsp;
     opt.typ  = -1;
     opt.fnc  = fnc;
     opt.file = file;
@@ -309,12 +194,12 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na,
  *               - part of a usable API for memory debugging
  */
 
-static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na)
+static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
    {void *space;
     SC_mem_opt opt;
 
     opt.na  = na;
-    opt.zsp = -1;
+    opt.zsp = zsp;
     opt.typ = -1;
     opt.fnc  = name;
     opt.file = NULL;
@@ -335,13 +220,13 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na)
  *                 - part of a usable API for memory debugging
  */
 
-static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na)
+static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na, int zsp)
    {void *space;
 
     if (p == _SC_trap_ptr)
        raise(_SC_trap_sig);
 
-    space = SC_realloc_na(p, nitems, bpi, na);
+    space = SC_realloc_nz(p, nitems, bpi, na, zsp);
 
     if (space == _SC_trap_ptr)
        raise(_SC_trap_sig);
@@ -356,13 +241,13 @@ static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na)
  *              - part of a usable API for memory debugging
  */
 
-static int _SC_free_chk(void *p)
+static int _SC_free_chk(void *p, int zsp)
    {int rv;
 
     if (p == _SC_trap_ptr)
        raise(_SC_trap_sig);
 
-    rv = SC_free_nzt(p, NULL);
+    rv = SC_free_z(p, zsp);
 
     return(rv);}
 
@@ -379,10 +264,10 @@ SC_mem_fnc SC_use_score_mm(void)
 
     rv = SC_gs.mm;
 
-    SC_gs.mm.nalloc  = SC_nalloc_na;
-    SC_gs.mm.alloc   = SC_alloc_na;
-    SC_gs.mm.realloc = SC_realloc_na;
-    SC_gs.mm.free    = SC_free;
+    SC_gs.mm.nalloc  = SC_nalloc_nz;
+    SC_gs.mm.alloc   = SC_alloc_nz;
+    SC_gs.mm.realloc = SC_realloc_nz;
+    SC_gs.mm.free    = SC_free_z;
 
     return(rv);}
 

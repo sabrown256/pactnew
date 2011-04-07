@@ -51,7 +51,7 @@ SC_global_state
           ATOL_FUNCTION,
           STRTOL_FUNCTION,
 	  SC_type_container,
-          {SC_nalloc_na, SC_alloc_na, SC_realloc_na, SC_free}};
+          {SC_nalloc_nz, SC_alloc_nz, SC_realloc_nz, SC_free_z}};
 
 SC_state
  _SC = {-1, TRUE, -1,

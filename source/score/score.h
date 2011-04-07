@@ -83,7 +83,7 @@
 /* NMAKE - memory allocation and bookkeeping macro */
 
 #define NMAKE(_t, name)                                                      \
-    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, TRUE))
+    ((_t *) (*SC_gs.mm.alloc)(1L, (long) sizeof(_t), name, TRUE, -1))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -91,7 +91,7 @@
 /* NMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define NMAKE_N(_t, n, name)                                                 \
-    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, TRUE))
+    ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t), name, TRUE, -1))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -100,7 +100,7 @@
 
 #define NREMAKE(p, _t, n)                                                    \
    (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
-				   (long) sizeof(_t), TRUE))
+				   (long) sizeof(_t), TRUE, -1))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -115,7 +115,7 @@
 /* CMAKE - memory allocation and bookkeeping macro */
 
 #define CMAKE(_t)                                                            \
-    ((_t *) (*SC_gs.mm.nalloc)(1L, (long) sizeof(_t), FALSE,                 \
+    ((_t *) (*SC_gs.mm.nalloc)(1L, (long) sizeof(_t), FALSE, -1,             \
 			       __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
@@ -124,7 +124,7 @@
 /* CMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define CMAKE_N(_t, n)                                                       \
-    ((_t *) (*SC_gs.mm.nalloc)((long) n, (long) sizeof(_t), FALSE,           \
+    ((_t *) (*SC_gs.mm.nalloc)((long) n, (long) sizeof(_t), FALSE, -1,       \
 			       __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
@@ -134,7 +134,7 @@
 
 #define CREMAKE(p, _t, n)                                                    \
    (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
-				   (long) sizeof(_t), FALSE))
+				   (long) sizeof(_t), FALSE, -1))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -142,7 +142,7 @@
 /* CFREE - release memory and do bookkeeping */
 
 #define CFREE(x)                                                             \
-   {(*SC_gs.mm.free)(x);                                                     \
+   {(*SC_gs.mm.free)(x, -1);                                                 \
     x = NULL;}
 
 /*--------------------------------------------------------------------------*/
@@ -622,11 +622,11 @@ struct s_SC_rusedes
 
 
 struct s_SC_mem_fnc
-   {void *(*nalloc)(long nitems, long bpi, int na,
+   {void *(*nalloc)(long nitems, long bpi, int na, int zsp,
 		    const char *fnc, const char *file, int line);
-    void *(*alloc)(long nitems, long bpi, char *name, int na);
-    void *(*realloc)(void *p, long nitems, long bpi, int na);
-    int (*free)(void *p);};
+    void *(*alloc)(long nitems, long bpi, char *name, int na, int zsp);
+    void *(*realloc)(void *p, long nitems, long bpi, int na, int zsp);
+    int (*free)(void *p, int zsp);};
 
 struct s_SC_global_state
    {char version[32];
@@ -973,7 +973,7 @@ extern void
  SC_mem_stats(long *al, long *fr, long *df, long *mx),
  SC_mem_stats_acc(long a, long f),
  SC_mem_stats_set(long a, long f),
- *SC_nalloc_na(long nitems, long bpi, int na,
+ *SC_nalloc_nz(long nitems, long bpi, int na, int zsp,
 	       const char *fnc, const char *file, int line),
  *SC_alloc_nzt(long nitems, long bpi, void *a),
  *SC_realloc_nzt(void *p, long nitems, long bpi, void *a);
@@ -993,11 +993,7 @@ extern SC_mem_fnc
  SC_trap_pointer(void *p, int sig);
 
 extern void
- *SC_alloc(long nitems, long bpi, char *name),
- *SC_alloc_na(long nitems, long bpi, char *name, int na),
  *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
- *SC_realloc(void *p, long nitems, long bpi),
- *SC_realloc_na(void *p, long nitems, long bpi, int na),
  *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp),
  SC_untrap_pointer(void *p),
  *SC_copy_item(void *in);
@@ -1006,7 +1002,6 @@ extern char
  *SC_arrname(void *p);
 
 extern int
- SC_free(void *p),
  SC_free_z(void *p, int zsp),
  SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn),
  SC_mem_trace(void),
