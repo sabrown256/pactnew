@@ -558,9 +558,9 @@ static void _SC_eth_init(void)
 
        _SC.eth_locks = CMAKE_ARRAY(SC_thread_lock *, NULL, 1);
 
-       _SC_eth_push_lock(&_SC_ms.lock_mm, 0);
-       _SC_eth_push_lock(&_SC_ms.lock_mc, 1);
-       _SC_eth_push_lock(&SC_ts_lock,     2);
+       _SC_eth_push_lock(&SC_mm_lock, 0);
+       _SC_eth_push_lock(&SC_mc_lock, 1);
+       _SC_eth_push_lock(&SC_ts_lock, 2);
 
        _SC.eth_keys = CMAKE_ARRAY(SC_thread_key *, NULL, 1);
 

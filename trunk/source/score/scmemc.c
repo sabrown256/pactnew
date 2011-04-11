@@ -628,7 +628,7 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
  */
 
 void *_SC_alloc_n(long ni, long bpi, void *arg)
-   {int na, zsp, typ, line;
+   {int na, zsp, prm, typ, line;
     long nb, nbp;
     uint64_t a, f;
     char *func, *file;
@@ -641,6 +641,7 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
 
     if (arg == NULL)
        {na   = FALSE;
+	prm  = FALSE;
 	zsp  = ph->zero_space;
 	typ  = -1;
         func = NULL;
@@ -648,6 +649,7 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
         line = -1;}
     else
        {opt  = (SC_mem_opt *) arg;
+	prm  = opt->perm;
 	na   = opt->na;
 	zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;
 	typ  = opt->typ;
@@ -685,6 +687,9 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
 
         desc = (mem_descriptor *) space;
         space++;
+
+	if (prm == TRUE)
+	   desc->ref_count = UNCOLLECT;
 
 /* zero out the space */
 	if ((zsp == 1) || (zsp == 2) || (zsp == 5))
@@ -736,6 +741,7 @@ void *SC_alloc_n(long ni, long bpi, ...)
     void *rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -747,7 +753,10 @@ void *SC_alloc_n(long ni, long bpi, ...)
     for (ok = TRUE; ok == TRUE; )
         {is = SC_VA_ARG(int);
          switch (is)
-            {case SC_MEM_ATTR_NO_ACCOUNT :
+            {case SC_MEM_ATTR_PERMANENT :
+                  opt.perm = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_NO_ACCOUNT :
                   opt.na = SC_VA_ARG(int);
                   break;
              case SC_MEM_ATTR_ZERO_SPACE :
@@ -791,7 +800,7 @@ void *SC_alloc_n(long ni, long bpi, ...)
  */
 
 void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
-   {int na, zsp;
+   {int na, zsp, prm;
     long nb, ob, db, nbp, obp, a, f;
     mem_header *space, *tmp;
     mem_header *prev, *next, *osp;
@@ -806,12 +815,16 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
        {ph  = GET_HEAP(desc);
 
 	if (arg == NULL)
-	   {na   = FALSE;
-	    zsp  = ph->zero_space;}
+	   {prm = FALSE;
+	    na  = FALSE;
+	    zsp = ph->zero_space;}
 	else
-	   {opt  = (SC_mem_opt *) arg;
-	    na   = opt->na;
-	    zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
+	   {opt = (SC_mem_opt *) arg;
+	    prm = opt->perm;
+	    na  = opt->na;
+	    zsp = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
+
+	prm |= (desc->ref_count == UNCOLLECT);
 
 	nb  = ni*bpi;
 	nbp = nb + SC_HDR_SIZE(ph);
@@ -880,12 +893,17 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
 	if (space != NULL)
 	   {desc = &space->block;
 
+	    if (prm == TRUE)
+	       desc->ref_count = UNCOLLECT;
+
 /* reset the reference count - nobody is pointing to this space
  * GOTCHA: should we allow a realloc with multiple references
  */
-	    desc->ref_count = 0;
+	    else
+	       {desc->ref_count = 0;
+		_SC_mem_stats_acc(ph, db, 0L);};
+
 	    BLOCK_LENGTH(desc) = nb;
-	    _SC_mem_stats_acc(ph, db, 0L);
 
 	    space++;
 
@@ -936,6 +954,7 @@ void *SC_realloc_n(void *p, long ni, long bpi, ...)
     void *rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -947,7 +966,10 @@ void *SC_realloc_n(void *p, long ni, long bpi, ...)
     for (ok = TRUE; ok == TRUE; )
         {is = SC_VA_ARG(int);
          switch (is)
-            {case SC_MEM_ATTR_NO_ACCOUNT :
+            {case SC_MEM_ATTR_PERMANENT :
+                  opt.perm = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_NO_ACCOUNT :
                   opt.na = SC_VA_ARG(int);
                   break;
              case SC_MEM_ATTR_ZERO_SPACE :
@@ -1075,6 +1097,7 @@ int SC_free_n(void *p, ...)
    {int is, ok, rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -1086,7 +1109,10 @@ int SC_free_n(void *p, ...)
     for (ok = TRUE; ok == TRUE; )
         {is = SC_VA_ARG(int);
          switch (is)
-            {case SC_MEM_ATTR_NO_ACCOUNT :
+            {case SC_MEM_ATTR_PERMANENT :
+                  opt.perm = SC_VA_ARG(int);
+                  break;
+             case SC_MEM_ATTR_NO_ACCOUNT :
                   opt.na = SC_VA_ARG(int);
                   break;
              case SC_MEM_ATTR_ZERO_SPACE :

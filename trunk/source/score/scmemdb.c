@@ -34,7 +34,7 @@ static long _SC_count_tagged(int flag)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     nbt = 0;
     if (SC_LATEST_BLOCK(ph) != NULL)
@@ -46,7 +46,7 @@ static long _SC_count_tagged(int flag)
 	     if (SCORE_BLOCK_P(desc))
 	        {nb   = BLOCK_LENGTH(desc);
 		 name = _SC_block_name(desc);
-		 if (name == NULL)
+		 if ((name == NULL) && ((flag & 8) == TRUE))
 		    nbt += nb;
 		 else
 		    {if (FTN_NAME(desc))
@@ -61,14 +61,14 @@ static long _SC_count_tagged(int flag)
 			 SC_strncpy(bf, MAXLINE, name, nc);
 			 name = bf;};
 		     
-		    if (_SC_name_ok(name, flag))
+		    if ((_SC_name_ok(name, flag)) && ((flag & 8) == TRUE))
 		       nbt += nb;};};
 
 	     if ((desc->next == SC_LATEST_BLOCK(ph)) ||
 		 (space == NULL))
 	        break;};};
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(nbt);}
 
@@ -260,6 +260,7 @@ static int _SC_list_major_blocks(char *arr, int nc,
  *              -    1  active blocks
  *              -    2  free blocks
  *              -    4  registered blocks
+ *              -    8  non-accountable blocks reported
  *              - this follows the convention of SC_mem_chk
  *              - if SHOW is TRUE include active UNCOLLECT'able blocks
  */
@@ -361,6 +362,7 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
  *             -    1  active blocks
  *             -    2  free blocks
  *             -    4  registered blocks
+ *             -    8  non-accountable blocks reported
  *             - this follows the convention of SC_mem_chk
  *             - if SHOW is TRUE include active UNCOLLECT'able blocks
  */
@@ -368,11 +370,11 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 char *SC_mem_list(int flag, int show)
    {char *arr;
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     _SC_mem_list(flag, show, &arr, NULL);
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(arr);}
 
@@ -388,7 +390,7 @@ int SC_mem_corrupt(int flag)
    {int i, nbl, nc, last;
     char *arr, *pa;
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     _SC_mem_list(flag, TRUE, &arr, &nbl);
 
@@ -408,7 +410,7 @@ int SC_mem_corrupt(int flag)
 	    {io_printf(stdout, "%8d %s\n", i, pa);
 	     last = TRUE;};};
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(nc);}
 
@@ -428,7 +430,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     nbl = 0;
 
@@ -468,7 +470,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
 	fprintf(fp, "\n");};
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(nbl);}
 
@@ -497,6 +499,7 @@ int SC_mem_map(FILE *fp, int flag)
  *                -          0 - off
  *                -          1 - total byte measure only
  *                -          2 - give detailed map of leaked blocks
+ *                -          4 - non-accountable blocks included
  *                -    ID    identifier for temporary files
  *                -    MSG   user allocated space to return error message
  */
@@ -524,6 +527,8 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
     actfl = 1;
     prmfl = 2;
+    if (lev & 4)
+       prmfl |= 8;
 
     d = _SC_count_tagged(prmfl);
 /*    SC_mem_stats(NULL, NULL, &d, NULL); */
@@ -584,7 +589,7 @@ int SC_mem_neighbor(void *p, void *a, void *b)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     rv = FALSE;
     pa = NULL;
@@ -626,7 +631,7 @@ int SC_mem_neighbor(void *p, void *a, void *b)
     ppa  = (mem_header **) b;
     *ppa = (pb == NULL) ? NULL : ((mem_header *) pb + 1);
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(rv);}
 
@@ -648,7 +653,7 @@ long SC_mem_object_trace(long nb, int type,
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     if ((nb > 0) && (f != NULL))
        {j  = SC_BIN_INDEX(nb);
@@ -683,7 +688,7 @@ long SC_mem_object_trace(long nb, int type,
 		      (*f)(name, (char *) (space + 1), ib,
 			   (int) md->ref_count, (int) it);};};};};
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(nm);}
 

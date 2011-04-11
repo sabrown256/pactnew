@@ -16,7 +16,6 @@
 
 #define _pdb_MODULE
 #include "pdbmodule.h"
-#include "scope_mem.h"
 
 /* DO-NOT-DELETE splicer.begin(pdb.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pdb.C_definition) */

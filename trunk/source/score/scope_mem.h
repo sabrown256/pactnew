@@ -145,7 +145,8 @@
 /*--------------------------------------------------------------------------*/
 
 enum e_SC_mem_attribute
-   {SC_MEM_ATTR_NO_ACCOUNT = 1,   /* memory block not included in totals */
+   {SC_MEM_ATTR_PERMANENT = 1,    /* memory block is UNCOLLECT'able */
+    SC_MEM_ATTR_NO_ACCOUNT,       /* memory block not included in totals */
     SC_MEM_ATTR_ZERO_SPACE,       /* set zero_space behavior */
     SC_MEM_ATTR_TYPE,             /* data type index */
     SC_MEM_ATTR_FUNC,             /* function containing call */
@@ -220,7 +221,8 @@ struct s_SC_heap_des
     void (*history)(int act, mem_descriptor *space);};
 
 struct s_SC_mem_opt
-   {int na;               /* if 1 do not add block to allocated count */
+   {int perm;             /* if 1 make block UNCOLLECT */
+    int na;               /* if 1 do not add block to allocated count */
     int zsp;              /* zero space flag */
     int typ;              /* set the type field to this type index */
     const char *fnc;      /* info supplied free by C99 */
@@ -243,9 +245,7 @@ struct s_SC_mem_state
     int mem_align_pad;
     long block_size;
     long n_bins;
-    long *bins;
-    SC_thread_lock lock_mm;
-    SC_thread_lock lock_mc;};
+    long *bins;};
 
 # ifndef MM_CONFIG
 
@@ -266,6 +266,10 @@ extern SC_mem_state
  _SC_ms;
 
 #endif
+
+extern SC_thread_lock
+ SC_mm_lock,
+ SC_mc_lock;
 
 /*--------------------------------------------------------------------------*/
 

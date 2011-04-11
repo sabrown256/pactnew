@@ -86,9 +86,15 @@ static void _PD_pfm_init_t(void)
     if (_PD_pfman == NULL)
        {_PD.nfilesx = N_PFM_FILES;
 
-        _PD_pfman = SC_mem_attrs(CMAKE_N(pfmanager, _PD.nfilesx), 3);
+	pm = SC_alloc_n(_PD.nfilesx, sizeof(pfmanager),
+			SC_MEM_ATTR_PERMANENT,  TRUE,
+			SC_MEM_ATTR_NO_ACCOUNT, TRUE,
+			SC_MEM_ATTR_FUNC, __func__,
+			SC_MEM_ATTR_FILE, __FILE__,
+			SC_MEM_ATTR_LINE, __LINE__,
+			0);
 
-	pm = _PD_pfman;
+	_PD_pfman = pm;
 
         for(i = 0; i < _PD.nfilesx; i++, pm++)
            {pm->available = TRUE;

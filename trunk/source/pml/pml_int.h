@@ -14,6 +14,7 @@
 
 #include "score_int.h"
 #include "pml.h"
+#include "scope_mem.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "pml_int.h"
-#include "scope_mem.h"
 
 char
  *PM_AC_S              = "Arbitrarily-Connected",
