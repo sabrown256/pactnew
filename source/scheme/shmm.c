@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "scheme_int.h"
-#include "scope_mem.h"
 
 typedef struct s_obj_map obj_map;
 
@@ -945,6 +944,7 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
    {object *op;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = SS_OBJECT_I;

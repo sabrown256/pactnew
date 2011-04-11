@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "score_int.h" 
+#include "scope_mem.h" 
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -37,22 +38,31 @@ void SC_da_clear(SC_dynamic_array *a, int d, int bpi)
  */
 
 void SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name)
-    {int n, prm;
+    {int n, prm, na;
      char *s, *lst;
 
      prm = (strncmp(name, "PERM|", 5) == 0);
+     na  = (prm == TRUE);
 
      n = strlen(tn) + 4;
-     s = CMAKE_N(char, n);
-     if (prm == TRUE)
-        s = SC_mem_attrs(s, 3);
+
+     s = SC_alloc_n(n, sizeof(char),
+		    SC_MEM_ATTR_PERMANENT,  prm,
+		    SC_MEM_ATTR_NO_ACCOUNT, na,
+		    SC_MEM_ATTR_FUNC, __func__,
+		    SC_MEM_ATTR_FILE, __FILE__,
+		    SC_MEM_ATTR_LINE, __LINE__,
+		    0);
 
      snprintf(s, n, "%s *", tn);
 
      n   = d*bpi;
-     lst = CMAKE_N(char, n);
-     if (prm == TRUE)
-        lst = SC_mem_attrs(lst, 2);
+     lst = SC_alloc_n(n, sizeof(char),
+		      SC_MEM_ATTR_NO_ACCOUNT, na,
+		      SC_MEM_ATTR_FUNC, __func__,
+		      SC_MEM_ATTR_FILE, __FILE__,
+		      SC_MEM_ATTR_LINE, __LINE__,
+		      0);
 
      SC_mark(lst, 1);
 

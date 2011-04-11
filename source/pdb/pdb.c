@@ -18,8 +18,6 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
-#include "scope_mpi.h"
-#include "scope_mem.h"
 
 int
  PD_DIM = INT_MIN,

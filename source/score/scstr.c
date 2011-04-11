@@ -115,6 +115,7 @@ char *SC_strsavec(char *s, const char *file, const char *fnc, int line)
     if (s != NULL)
        {sz = strlen(s) + 2;
 
+	opt.perm = FALSE;
 	opt.na   = FALSE;
 	opt.zsp  = -1;
 	opt.typ  = SC_STRING_I;

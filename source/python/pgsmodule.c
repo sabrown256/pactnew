@@ -16,7 +16,6 @@
 
 #define _pgs_MODULE
 #include "pgsmodule.h"
-#include "scope_mem.h"
 
 /* DO-NOT-DELETE splicer.begin(pgs.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pgs.C_definition) */

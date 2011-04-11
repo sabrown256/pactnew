@@ -29,6 +29,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
    {void *rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -53,6 +54,7 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
    {void *p;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -75,6 +77,7 @@ void *SC_realloc(void *p, long nitems, long bpi)
    {void *rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -99,6 +102,7 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
    {void *rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -122,6 +126,7 @@ int SC_free(void *p)
    {int rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = -1;
     opt.zsp  = -1;
     opt.typ  = -1;
@@ -197,6 +202,7 @@ char *SC_strsaven(char *s, char *name)
     if (s != NULL)
        {sz = strlen(s) + 2;
 
+	opt.perm = FALSE;
 	opt.na   = TRUE;
 	opt.zsp  = -1;
 	opt.typ  = SC_STRING_I;

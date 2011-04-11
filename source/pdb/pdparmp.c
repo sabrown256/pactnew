@@ -966,18 +966,31 @@ static void _PD_pfm_init_d(void)
     SC_LOCKON(pflist_lock_d);
 
     if (_PD_pflst == NULL)
-       {_PD_pflst       = SC_mem_attrs(CMAKE(pflist), 3);
-        _PD_pflst->elem = SC_mem_attrs(CMAKE_N(pfelement, PFM_N_FILES), 3);
+       {pf = SC_alloc_n(PFM_N_FILES, sizeof(pfelement),
+			SC_MEM_ATTR_PERMANENT,  TRUE,
+			SC_MEM_ATTR_NO_ACCOUNT, TRUE,
+			SC_MEM_ATTR_FUNC, __func__,
+			SC_MEM_ATTR_FILE, __FILE__,
+			SC_MEM_ATTR_LINE, __LINE__,
+			0);
+
+        _PD_pflst = SC_alloc_n(1, sizeof(pflist),
+			       SC_MEM_ATTR_PERMANENT,  TRUE,
+			       SC_MEM_ATTR_NO_ACCOUNT, TRUE,
+			       SC_MEM_ATTR_FUNC, __func__,
+			       SC_MEM_ATTR_FILE, __FILE__,
+			       SC_MEM_ATTR_LINE, __LINE__,
+			       0);
+
+	_PD_pflst->elem = pf;
         _PD_pflst->len  = PFM_N_FILES;
 
-        for(pf = _PD_pflst->elem, i = 0; 
-            i < _PD_pflst->len; 
-            i++, pf++)
-	  {pf->available = TRUE;
-	   pf->addr      = 0;
-           pf->nflushed  = 0;
-           pf->file      = NULL;
-           pf->name      = NULL;};};
+        for (pf = _PD_pflst->elem, i = 0; i < _PD_pflst->len; i++, pf++)
+	    {pf->available = TRUE;
+	     pf->addr      = 0;
+	     pf->nflushed  = 0;
+	     pf->file      = NULL;
+	     pf->name      = NULL;};};
 
     SC_LOCKOFF(pflist_lock_d);
 

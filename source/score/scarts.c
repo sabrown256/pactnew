@@ -515,9 +515,51 @@ static int test_7(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_8 - performance test */
+/* TEST_8 - test permanent arrays */
 
 static int test_8(void)
+   {int i, na, err, cs;
+    char msg[MAXLINE];
+    double fc;
+    double *dp;
+    SC_array *da;
+
+    SC_ENTERING;
+
+    cs = SC_mem_monitor(-1, 2, "T9", msg);
+
+    na = 1000;
+
+    da = CMAKE_ARRAY(double, NULL, 1);
+    SC_array_resize(da, na, -1.0);
+
+/* setting DA */
+    for (i = 0; i < na; i++)
+        {fc = i;
+	 SC_array_set(da, i, &fc);};
+
+/* fetching DA */
+    dp = CMAKE_N(double, na);
+
+    for (i = 0; i < na; i++)
+        dp[i] = *(double *) SC_array_get(da, i);
+
+    CFREE(dp);
+
+    cs = SC_mem_monitor(cs, 2, "T9", msg);
+
+    err = (cs != 0);
+
+    SC_LEAVING;
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_9 - performance test */
+
+static int test_9(void)
    {int i, ms, mm, mg, ls, lm, lg, na, err;
     double fc, tm, ts, tg, tr, rs, rg;
     double *dp;
@@ -525,7 +567,7 @@ static int test_8(void)
 
     SC_ENTERING;
 
-    err = TRUE;
+    err = 0;
 
     na = 1000000;
 
@@ -605,16 +647,38 @@ static int test_8(void)
 /* MAIN - start here */
 
 int main(int c, char **v)
-   {int i, err, debug;
+   {int i, n, err, debug;
     long sc;
     char msg[MAXLINE];
+    int tstf[] = { TRUE, TRUE, TRUE, TRUE, TRUE,
+		   TRUE, TRUE, TRUE, TRUE, TRUE };
+    PFInt tfnc[] = { NULL, test_1, test_2, test_3, test_4,
+		     test_5, test_6, test_7, test_8, test_9 };
 
     debug = 0;
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-m") == 0)
+        {if (strcmp(v[i], "-1") == 0)
+            tstf[1] = FALSE;
+	 else if (strcmp(v[i], "-2") == 0)
+            tstf[2] = FALSE;
+	 else if (strcmp(v[i], "-3") == 0)
+            tstf[3] = FALSE;
+	 else if (strcmp(v[i], "-4") == 0)
+            tstf[4] = FALSE;
+	 else if (strcmp(v[i], "-5") == 0)
+            tstf[5] = FALSE;
+	 else if (strcmp(v[i], "-6") == 0)
+            tstf[6] = FALSE;
+	 else if (strcmp(v[i], "-7") == 0)
+            tstf[7] = FALSE;
+	 else if (strcmp(v[i], "-8") == 0)
+            tstf[8] = FALSE;
+	 else if (strcmp(v[i], "-9") == 0)
+            tstf[9] = FALSE;
+	 else if (strcmp(v[i], "-m") == 0)
             debug = 2;
 	 else if (strcmp(v[i], "-h") == 0)
-	    {printf("Usage: scarts [-m] [-h]\n");
+	    {printf("Usage: scarts [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8] [-9] [-m] [-h]\n");
              return(1);};};
 
     sc = SC_mem_monitor(-1, debug, "A", msg);
@@ -623,15 +687,10 @@ int main(int c, char **v)
 
     err = 0;
 
-    err += run_test(1, test_1);
-    err += run_test(2, test_2);
-    err += run_test(3, test_3);
-    err += run_test(4, test_4);
-    err += run_test(5, test_5);
-    err += run_test(6, test_6);
-    err += run_test(7, test_7);
-
-    test_8();
+    n = sizeof(tstf)/sizeof(int);
+    for (i = 1; i <= n; i++)
+        {if (tstf[i] == TRUE)
+	    err += run_test(i, tfnc[i]);};
 
     io_printf(STDOUT, "\n");
 

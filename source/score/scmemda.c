@@ -19,6 +19,7 @@ void *_SC_alloc_w(long nitems, long bpi, char *name, int na, int zsp)
    {void *p;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -40,6 +41,7 @@ void *_SC_nalloc_w(long nitems, long bpi, int na, int zsp,
    {void *p;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -60,6 +62,7 @@ void *_SC_realloc_w(void *p, long nitems, long bpi, int na, int zsp)
    {void *rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -80,6 +83,7 @@ int _SC_free_w(void *p, int zsp)
    {int rv;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = -1;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -153,6 +157,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
    {void *space;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -179,6 +184,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
    {void *space;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na  = na;
     opt.zsp = zsp;
     opt.typ = -1;
@@ -560,7 +566,7 @@ int SC_mem_trace(void)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     ret = 0;
     if (SC_LATEST_BLOCK(ph) != NULL)
@@ -611,7 +617,7 @@ int SC_mem_trace(void)
 	    else
 	       ret = n_mf;};};
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(ret);}
 
@@ -680,7 +686,7 @@ char *SC_mem_lookup(void *p)
 
     ph = _SC_tid_mm();
 
-    SC_LOCKON(_SC_ms.lock_mm);
+    SC_LOCKON(SC_mm_lock);
 
     name  = NULL;
     space = SC_LATEST_BLOCK(ph);
@@ -696,7 +702,7 @@ char *SC_mem_lookup(void *p)
 
 	     space = space->block.next;};};
 
-    SC_LOCKOFF(_SC_ms.lock_mm);
+    SC_LOCKOFF(SC_mm_lock);
 
     return(name);}
 

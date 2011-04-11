@@ -20,7 +20,7 @@
 #define PY_pgs_H
 
 #include <Python.h>
-#include <pgs.h>
+#include <pgs_int.h>
 #include <pputil.h>
 #include "utilpgs.h"
 

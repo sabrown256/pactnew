@@ -26,6 +26,7 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     mem_descriptor *desc;
     SC_mem_opt opt;
 
+    opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = zsp;
     opt.typ  = -1;
