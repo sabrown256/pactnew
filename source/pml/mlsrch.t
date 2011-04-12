@@ -79,7 +79,7 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
             {u = f[in[i]];
              if ((*prd)(u, v))
                 {if (!init)
-                    {ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);
+                    {ta   = CMAKE_ARRAY(int, NULL, 0);
                      init = TRUE;}
                  SC_array_push(ta, in+i);};};}
     else
@@ -88,13 +88,13 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
             {u = f[i];
              if ((*prd)(u, v))
                 {if (init == FALSE)
-                    {ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);
+                    {ta   = CMAKE_ARRAY(int, NULL, 0);
                      init = TRUE;}
                  SC_array_push(ta, &i);};};};
 
     if (init == TRUE)
        {no   = SC_array_get_n(ta);
-        oind = FMAKE_N(int, no, "FIND_VALUE:oind");
+        oind = CMAKE_N(int, no);
         memcpy(oind, ta->array, no*sizeof(int));
         SC_free_array(ta, NULL);};
 
@@ -125,7 +125,7 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
             {u = f[in[i]].s;
              if ((*prd)(u, v))
                 {if (!init)
-                    {ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);
+                    {ta   = CMAKE_ARRAY(int, NULL, 0);
                      init = TRUE;}
                  SC_array_push(ta, in+i);};};}
     else
@@ -134,13 +134,13 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
             {u = f[i].s;
              if ((*prd)(u, v))
                 {if (init == FALSE)
-                    {ta   = SC_MAKE_ARRAY("FIND_VALUE", int, NULL);
+                    {ta   = CMAKE_ARRAY(int, NULL, 0);
                      init = TRUE;}
                  SC_array_push(ta, &i);};};};
 
     if (init == TRUE)
        {no   = SC_array_get_n(ta);
-        oind = FMAKE_N(int, no, "FIND_VALUE:oind");
+        oind = CMAKE_N(int, no);
         memcpy(oind, ta->array, no*sizeof(int));
         SC_free_array(ta, NULL);};
 

@@ -1377,12 +1377,12 @@ postfix_expression :
   | postfix_expression DOT variable
       {char t[MAXLINE];
        sprintf(t, "\"%s\"", SS_VARIABLE_NAME($3));
-       SS_GR_VAL(SS_make_form(_SS_c_mref, $1, SC_strsave(t), LAST));}
+       SS_GR_VAL(SS_make_form(_SS_c_mref, $1, CSTRSAVE(t), LAST));}
 
   | postfix_expression ACC variable
       {char t[MAXLINE];
        sprintf(t, "\"%s\"", SS_VARIABLE_NAME($3));
-       SS_GR_VAL(SS_make_form(_SS_c_mref, $1, SC_strsave(t), LAST));}
+       SS_GR_VAL(SS_make_form(_SS_c_mref, $1, CSTRSAVE(t), LAST));}
 
   | postfix_expression INC
       {SS_GR_VAL(SS_make_form(_SS_c_postinc, $1, LAST));}
@@ -1721,7 +1721,7 @@ object *SS_parse_string_c()
 
     if (s == NULL)
        {ns = MAX_BFSZ;
-	s  = FMAKE_N(char, ns, "PERM|SS_PARSE_STRING_C:s");
+	s  = SC_permanent(CMAKE_N(char, ns));
 	memset(s, 0, ns);};
 
     strcpy(s, "\"");

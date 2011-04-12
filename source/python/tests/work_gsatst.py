@@ -37,7 +37,7 @@ def compute_2d_ac_mapping_2(kmax, lmax):
     nd  = 2
 
     # setup the number of boundary parameters array 
-    # bnp    = FMAKE_N(int, nd+1, "COMPUTE_2D_AC_MAPPING_2:bnp")
+    # bnp    = CMAKE_N(int, nd+1)
     # for (id = 1; id <= nd; id++):
     #    bnp[id] = ord
     
@@ -46,14 +46,14 @@ def compute_2d_ac_mapping_2(kmax, lmax):
         bnp.append(ord)
 
     # setup the number of cells array
-    # bnc = FMAKE_N(int, nd+1, "COMPUTE_2D_AC_MAPPING_2:bnc")
+    # bnc = CMAKE_N(int, nd+1)
     bnc = [kmax*lmax, 4*nc, nc]
 
     # allocate the boundary arrays
-    # bnd    = FMAKE_N(long *, nd+1, "COMPUTE_2D_AC_MAPPING_2:bnd")
+    # bnd    = CMAKE_N(long *, nd+1)
     # bnd[0] = NULL;
     # for (id = 1; id <= nd; id++):
-    #    bnd[id] = FMAKE_N(long, ord*bnc[id], "COMPUTE_2D_AC_MAPPING_2:bnd[id]")
+    #    bnd[id] = CMAKE_N(long, ord*bnc[id])
     bnd = [None]
     for id in range(nd):
         bnd.append(Numeric.zeros(ord * bnc[id + 1], Numeric.Int32))
@@ -93,7 +93,7 @@ def compute_2d_ac_mapping_2(kmax, lmax):
             x[i] = k*dx + xmin
             y[i] = l*dy + ymin
 
-    #    f = FMAKE_N(REAL, nc, "COMPUTE_2D_AC_MAPPING_2:f")
+    #    f = CMAKE_N(REAL, nc)
     f = Numeric.zeros(nc, Numeric.Float)
     for i in range(nc):
         i1 = edge[ord*(4*i + 0)]

@@ -96,7 +96,7 @@ int main(int c, char **v)
     io_printf(stdout, "\t   Function      calls      double   longdouble  ratio\n");
 
     err &= unary_test("exp",  1.0,  exp,  expl,   -2.0, 10.0);
-    err &= unary_test("log",  1.0,  log,  logl,   -2.0, 10.0);
+    err &= unary_test("log",  1.0,  log,  logl, 1.0e-8, 1.0e4);
     err &= unary_test("sqrt", 1.0, sqrt, sqrtl, 1.0e-8, 1.0e4);
 
     io_printf(stdout, "\n");

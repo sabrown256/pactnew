@@ -1390,7 +1390,7 @@ expr *CC_parse_string_c()
 
     if (s == NULL)
        {ns = MAX_BFSZ;
-	s  = FMAKE_N(char, ns, "PERM|CC_PARSE_STRING_C:s");
+	s  = CMAKE_N(char, ns);
 	memset(s, 0, ns);};
 
     strcpy(s, "\"");

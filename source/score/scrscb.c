@@ -137,9 +137,7 @@ int *SC_process_ids(void)
 	struct kinfo_proc *kp;
 
 	if (sysctl(mib, 4, NULL, &ln, NULL, 0) == 0)
-	   {kp = CMAKE_N(struct kinfo_proc),
-			 "SC_PROCESS_IDS:kp");
-
+	   {kp = CMAKE_N(struct kinfo_proc, ln/sizeof(struct kinfo_proc));
 	    if (sysctl(mib, 4, kp, &ln, NULL, 0) == 0)
 	       {nid = ln/sizeof(struct kinfo_proc);
 		ids = CMAKE_N(int, nid+1);

@@ -540,14 +540,14 @@ class Gsatst(unittest.TestCase):
 
         maxes = Numeric.array([kmax, lmax], 'i')
 
-        #emap = FMAKE_N(char, kxl, "TEST_8:emap");
+        #emap = CMAKE_N(char, kxl);
         #memset(emap, 1, kxl);
         #alist = PG_set_attrs_alist(NULL,
         #                           "EXISTENCE", SC_CHAR_I, TRUE, emap,
         #                            "EXISTENCE", SC_CHAR_I, pdb.TRUE, emap,
         #                           NULL);
 
-        #ext = FMAKE_N(REAL, 4, "TEST_8:ext");
+        #ext = CMAKE_N(REAL, 4);
         #ext[0] = -1;
         #ext[1] =  1;
         #ext[2] = -1;
@@ -661,8 +661,8 @@ class Gsatst(unittest.TestCase):
         kmax      = 11
         lmax      = 11
         # kxl       = kmax*lmax
-        # x         = FMAKE_N(REAL, kxl, "TEST_11:x")
-        # y         = FMAKE_N(REAL, kxl, "TEST_11:y")
+        # x         = CMAKE_N(REAL, kxl)
+        # y         = CMAKE_N(REAL, kxl)
 
         f = work_gsatst.compute_2d_ac_mapping_2(kmax, lmax)
 

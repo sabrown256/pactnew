@@ -52,6 +52,10 @@
     ((_t *) (*SC_gs.mm.alloc)((long) n, (long) sizeof(_t),                   \
 			      (char *) __func__, TRUE, -1))
 
+#define NREMAKE(p, _t, n)                                                    \
+   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
+				   (long) sizeof(_t), TRUE, -1))
+
 #define SC_MAKE_ARRAY(_n, _t, _init)                                         \
     _SC_make_array(#_t, sizeof(_t), _init, _n, 0)
 
