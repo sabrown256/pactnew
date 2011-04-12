@@ -948,6 +948,19 @@ switch ($Cmnd)
         endif
         flog $Log popd
 
+# remove standard Tool and Group variables from the environment
+	foreach v ( `env | sed 's|=.*$||'` )
+           switch ($v)
+              case CC_*:
+              case FC_*:
+              case LD_*:
+              case Std_*:
+              case Cfg_*:
+              case Cfe_*:
+                   unsetenv $v
+           endsw
+	end
+
 # set path for PERDB - spawned by PCO
         flog $Log set dbopt = ( -f $IncDir/cfg )
         flog $Log $RM $IncDir/cfg*

@@ -69,7 +69,7 @@ Group Cfg {
 Group OpenMP {
    CC_Flags = -fopenmp
    LD_Flags = -fopenmp
-   LD_Lib   = -lgomp
+#   LD_Lib   = -lgomp
 }
 
 Group Shared {

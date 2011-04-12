@@ -1637,7 +1637,7 @@ PM_mapping *Get_requested_mapping(int varnum, int blocknum)
 #endif
 
     if (!varlist[varnum].indirect)
-       {mapping = FMAKE(PM_mapping, "Get_requested_mapping:mapping");    
+       {mapping = CMAKE(PM_mapping);    
         if (!PD_read(cur_file, varlist[varnum].name, mapping))
            {printf("Error 1 getting requested mapping\n");
             return (NULL);};}
@@ -1804,7 +1804,7 @@ var_info *Get_3D_mappings(char **tvarlist, int nvariables)
   either through pointers or statically allocated to arrays of mappings
   either static or indirect
 */
-    retlist = FMAKE_N(var_info, nvariables, "Get_3D_mappings:retlist");
+    retlist = CMAKE_N(var_info, nvariables);
 
     for (i = 0; i < nvariables; i++)
         {if ((ep = PD_inquire_entry(cur_file, tvarlist[i], TRUE, path)) == NULL)
@@ -1859,7 +1859,7 @@ var_info *Get_3D_mappings(char **tvarlist, int nvariables)
                  else
                     {printf("Unclassifiable variable %s\n", tvarlist[i]);
                      continue;}
-                 retlist[Num_variables].name = SC_strsavef(tvarlist[i], "Get_3D_mappings:retlist.name");
+                 retlist[Num_variables].name     = CSTRSAVE(tvarlist[i]);
                  retlist[Num_variables].indirect = (_PD_indirection(type)) ? TRUE : FALSE;
                  strcpy(retlist[Num_variables].description, pmapping->range->name);
                  strcpy(retlist[Num_variables].filename, current_file);

@@ -24,7 +24,9 @@ int
 /* PRINT_HELP - print a help message */
 
 static void print_help()
-   {PRINT(STDOUT, "\nENDRIVER - driver to exercise the EnSight PDB reader\n\n");
+   {
+
+    PRINT(STDOUT, "\nENDRIVER - driver to exercise the EnSight PDB reader\n\n");
     PRINT(STDOUT, "Usage: endriver file\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       where file is either a pdbfile containing mappings\n");
@@ -36,21 +38,21 @@ static void print_help()
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*
-   NEW_SUFFIX - Replace a suffix (insuffix) if it exists with another
-                suffix (outsuffix).
-                If insuffix is not there append outsuffix.
-*/
 
-static char *new_suffix(in, insuffix, outsuffix)
-   char *in, *insuffix, *outsuffix;
-   {int found = TRUE;
+/* NEW_SUFFIX - replace a suffix INSUFFIX if it exists with another
+ *            - suffix OUTSUFFIX
+ *            - if INSUFFIX is not there append OUTSUFFIX
+ */
+
+static char *new_suffix(char *in, char *insuffix, char *outsuffix)
+   {int found, len_in, len_insuffix, len_out;
     char in_rev[MAXLINE], insuffix_rev[MAXLINE];
     char *out;
-    int len_in, len_insuffix, len_out;
+
+    found = TRUE;
 
     if (in == NULL)
-       return (char *)NULL;
+       return(NULL);
 
 /* look for insuffix at the end of in */
     SC_strrev(strcpy(in_rev, in));
@@ -64,7 +66,7 @@ static char *new_suffix(in, insuffix, outsuffix)
     len_out      = (found) ? len_in - len_insuffix + strlen(outsuffix) + 1:
                              len_in + strlen(outsuffix) + 1;
 
-    out =  FMAKE_N(char, len_out, "NEW_SUFFIX:out");
+    out = CMAKE_N(char, len_out);
 
     if (found)
        strncpy(out, in, len_in - len_insuffix);
@@ -77,25 +79,24 @@ static char *new_suffix(in, insuffix, outsuffix)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
 /* Exercise the EnSight PDB reader functions for debugging purposes */
 
-int main(argc, argv)
-   int argc;
-   char **argv;
-   {PDBfile *pdb_file;
-    char infile[MAXLINE];
-    char dline1[MAXLINE], dline2[MAXLINE];
-    char **part_description, **var_description, **var_filename;
-    int i, iret;
+int main(int argc, char **argv)
+   {int i, iret;
     int nvariables = -1, ntimesteps = -1, nfiles, nparts;
     int time_step = 0; 
     int gstatus, nstatus, estatus;
     int part_numbers[MAXPARTS], part_types[MAXPARTS];
     int *ijk_dimensions[3], *var_type, *var_classify;
     int ncoords;
+    char infile[MAXLINE];
+    char dline1[MAXLINE], dline2[MAXLINE];
+    char **part_description, **var_description, **var_filename;
     float solution_times[MAXTIMES];
     float *xcoord_array, *ycoord_array, *zcoord_array;
     float *scalar_array;
+    PDBfile *pdb_file;
 
     if (argc == 2)
        {strcpy(infile, argv[1]);}  /* the name of the geometry or
@@ -106,12 +107,13 @@ int main(argc, argv)
 
     SC_zero_space(1);
 
-    if ((iret = USERD_set_filenames(infile, NULL, NULL, FALSE)) 
-                != Z_OK)
+    iret = USERD_set_filenames(infile, NULL, NULL, FALSE);
+    if (iret != Z_OK)
        {printf("USERD_set_filenames returned error--MAIN\n");
         exit(1);}
 
-    if ((ntimesteps = USERD_get_number_of_time_steps()) < 0)
+    ntimesteps = USERD_get_number_of_time_steps();
+    if (ntimesteps < 0)
        {printf("USERD_get_number_of_time_steps returned %d\n",
                ntimesteps);
         exit(1);}
@@ -121,8 +123,8 @@ int main(argc, argv)
     USERD_set_time_step(time_step);
 
     if ((gstatus = USERD_get_changing_geometry_status()) != Z_STATIC)
-       {printf("USERD_get_changing_geometry_status returned unexpected\
- value: %d\n", gstatus);
+       {printf("USERD_get_changing_geometry_status returned unexpected value: %d\n",
+	       gstatus);
         exit(1);}
 
     nstatus = USERD_get_node_label_status();
@@ -136,16 +138,17 @@ int main(argc, argv)
     nparts = USERD_get_number_of_model_parts();
 
     for (i = 0; i < 3; i++)
-        {ijk_dimensions[i] = FMAKE_N(int, nparts, "ENDRIVER:ijk_dimensions[i]");}
+        ijk_dimensions[i] = CMAKE_N(int, nparts);
 
-    part_description = FMAKE_N(char *, nparts, "ENDRIVER:PARTS_DESCRIPTION");
+    part_description = CMAKE_N(char *, nparts);
 
     for (i = 0; i < nparts; i++)
-       {part_description[i] = FMAKE_N(char, Z_BUFL,"ENDRIVER:PARTS_DESCRIPTION[i]");}
+        part_description[i] = CMAKE_N(char, Z_BUFL);
 
-    if ((iret = USERD_get_part_build_info(part_numbers, part_types,
-                      part_description, NULL, 
-                      ijk_dimensions, NULL)) != Z_OK)
+    iret = USERD_get_part_build_info(part_numbers, part_types,
+				     part_description, NULL, 
+				     ijk_dimensions, NULL);
+    if (iret != Z_OK)
        {printf("USERD_get_part_build_info returned error\n");
         exit(1);}
 
@@ -153,52 +156,52 @@ int main(argc, argv)
     ncoords = ijk_dimensions[0][0] * ijk_dimensions[0][1] *
               ijk_dimensions[0][2];
 
-    xcoord_array = FMAKE_N(float, ncoords, "ENDRIVER:XCOORD_ARRAY");
-    ycoord_array = FMAKE_N(float, ncoords, "ENDRIVER:YCOORD_ARRAY");
-    zcoord_array = FMAKE_N(float, ncoords, "ENDRIVER:ZCOORD_ARRAY");
+    xcoord_array = CMAKE_N(float, ncoords);
+    ycoord_array = CMAKE_N(float, ncoords);
+    zcoord_array = CMAKE_N(float, ncoords);
 
-    if ((iret = USERD_get_block_coords_by_component(1, Z_COMPX,
-                        xcoord_array)) != Z_OK)
-       {printf("USERD_get_block_coords_by_component returned error\
-for Z_COMPX\n");
-        exit(1);}
-    if ((iret = USERD_get_block_coords_by_component(1, Z_COMPY,
-                        ycoord_array)) != Z_OK)
-       {printf("USERD_get_block_coords_by_component returned error\
-for Z_COMPY\n");
+    iret = USERD_get_block_coords_by_component(1, Z_COMPX, xcoord_array);
+    if (iret != Z_OK)
+       {printf("USERD_get_block_coords_by_component returned error for Z_COMPX\n");
         exit(1);}
 
-    if ((iret = USERD_get_block_coords_by_component(1, Z_COMPZ,
-                        zcoord_array)) != Z_OK)
-       {printf("USERD_get_block_coords_by_component returned error\
-for Z_COMPZ\n");
+    iret = USERD_get_block_coords_by_component(1, Z_COMPY, ycoord_array);
+    if (iret != Z_OK)
+       {printf("USERD_get_block_coords_by_component returned error for Z_COMPY\n");
         exit(1);}
 
-    if ((nvariables = USERD_get_number_of_variables()) < 0)
+    iret = USERD_get_block_coords_by_component(1, Z_COMPZ, zcoord_array);
+    if (iret != Z_OK)
+       {printf("USERD_get_block_coords_by_component returned error for Z_COMPZ\n");
+        exit(1);}
+
+    nvariables = USERD_get_number_of_variables();
+    if (nvariables < 0)
        {printf("USERD_get_number_of_variables returned %d\n",
                nvariables);
         exit(1);}
 
-    var_description = FMAKE_N(char *, nvariables, "ENDRIVER:VAR_DESCRIPTION");
-    var_filename    = FMAKE_N(char *, nvariables, "ENDRIVER:VAR_FILENAME");
-    var_type        = FMAKE_N(int, nvariables,    "ENDRIVER:VAR_TYPE"); 
-    var_classify        = FMAKE_N(int, nvariables,    "ENDRIVER:VAR_CLASSIFY"); 
+    var_description = CMAKE_N(char *, nvariables);
+    var_filename    = CMAKE_N(char *, nvariables);
+    var_type        = CMAKE_N(int, nvariables); 
+    var_classify    = CMAKE_N(int, nvariables); 
 
     for (i = 0; i < nvariables; i++)
-        {var_description[i] = FMAKE_N(char, Z_BUFL, "ENDRIVER:VAR_DESCRIPTION[i]");
-         var_filename[i]    = FMAKE_N(char, Z_BUFL, "ENDRIVER:VAR_FILENAME[i]");}
+        {var_description[i] = CMAKE_N(char, Z_BUFL);
+         var_filename[i]    = CMAKE_N(char, Z_BUFL);}
 
-    if ((iret = USERD_get_variable_info(var_description,
-                                        var_filename,
-                                        var_type,
-                                        var_classify)) != Z_OK)
-       {printf("USERD_get_variable_info returned error--MAIN\n");
+    iret = USERD_get_variable_info(var_description,
+				   var_filename,
+				   var_type,
+				   var_classify);
+    if (iret != Z_OK)
+       {printf("USERD_get_variable_info returned error -- MAIN\n");
         exit(1);}
 
 /* should loop over nvariables and read each */
-    scalar_array = FMAKE_N(float, ncoords, "ENDRIVER:SCALAR_ARRAY");
-    if ((iret = USERD_get_block_scalar_values(1, 1,
-                        scalar_array)) != Z_OK)
+    scalar_array = CMAKE_N(float, ncoords);
+    iret         = USERD_get_block_scalar_values(1, 1, scalar_array);
+    if (iret != Z_OK)
        {printf("USERD_get_block_calar_values returned error\n");
         exit(1);}
 

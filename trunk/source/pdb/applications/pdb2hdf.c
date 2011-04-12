@@ -54,7 +54,7 @@ static hsize_t *PDB_to_HDF_dims(dm, rank)
 
     for (lst = dm, i = 0; lst != NULL; lst = lst->next, i++);
 
-    ret =  FMAKE_N(hsize_t, i, "PDB_TO_HDF_DIMS:ret");
+    ret =  CMAKE_N(hsize_t, i);
 
     for (lst = dm, j = 0; j < i; lst = lst->next, j++)
         ret[j] = lst->number;
@@ -131,7 +131,7 @@ static int PDB_to_HDF_ctype(pdb_file, dp, datatype)
 /* make the static compound types hash table */
     if (HDF_ctypes == NULL)
        {HDF_ctypes = SC_make_hash_table(HSZLARGE, NODOC);
-        HID_T_S = SC_strsavef("hid_t *", "char*:PDB_to_HDF_ctype:hid_t");}
+        HID_T_S    = CSTRSAVE("hid_t *");}
 
 /* look for the type in the hash table, if there return a copy  */
     if ((stype = (hid_t *) SC_def_lookup(dp->type, HDF_ctypes))
@@ -171,7 +171,7 @@ static int PDB_to_HDF_ctype(pdb_file, dp, datatype)
              SFREE(dimsf);};}
 
 /* return the new type, save a copy in the hash table */
-    stype = FMAKE(hid_t, "PDB_to_HDF_ctyp:stype");
+    stype = CMAKE(hid_t);
     *stype = H5Tcopy(dtype);
     if (SC_install(dp->type, stype, HID_T_S, HDF_ctypes)
                   == NULL)
@@ -310,7 +310,7 @@ static char *new_suffix(in, insuffix, outsuffix)
     len_out      = (found) ? len_in - len_insuffix + strlen(outsuffix) + 1:
                              len_in + strlen(outsuffix) + 1;
 
-    out =  FMAKE_N(char, len_out, "NEW_SUFFIX:out");
+    out =  CMAKE_N(char, len_out);
 
     if (found)
        strncpy(out, in, len_in - len_insuffix);

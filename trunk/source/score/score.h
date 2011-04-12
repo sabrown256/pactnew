@@ -80,15 +80,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* NREMAKE - reallocate a block of type _t and return a pointer to it */
-
-#define NREMAKE(p, _t, n)                                                    \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
-				   (long) sizeof(_t), TRUE, -1))
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* CSTRSAVE - copy a string */
 
 #define CSTRSAVE(_t)    SC_strsavec(_t, __func__, __FILE__, __LINE__)
