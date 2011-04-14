@@ -30,17 +30,15 @@ if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
 endif
 
-if ($?OSType == 0) then
-   Note $ALog "HostOS  = $HostOS"
-   Note $ALog "RootInc = $RootInc"
-   if (("$HostOS" == "Windows_NT") || \
-       (("$HostOS" == "Linux") && (-e $RootInc/termio.h)) || \
-       ($?IBM_BGP == 1) || \
-       (-e $RootInc/sys/termio.h)) then
-      setenv OSType "SYSV"
-   else
-      setenv OSType "BSD"
-   endif
+Note $ALog "HostOS  = $HostOS"
+Note $ALog "RootInc = $RootInc"
+if (("$HostOS" == "Windows_NT") || \
+    (("$HostOS" == "Linux") && (-e $RootInc/termio.h)) || \
+    ($?IBM_BGP == 1) || \
+    (-e $RootInc/sys/termio.h)) then
+   setenv OSType "SYSV"
+else
+   setenv OSType "BSD"
 endif
 
 if ($HostOS == Darwin) then

@@ -1168,6 +1168,41 @@ int cinitenv(char *var, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CCLEARENV - clear out the environment for safety
+ *           - do not remove variables in NULL terminated EXCEPT
+ */
+
+int cclearenv(char **except)
+   {int i, j, ok, err;
+    char s[MAXLINE];
+    char *t, **pe;
+    extern char **environ;
+
+    err = 0;
+
+    for (pe = environ, i = 0; *pe != NULL; pe++, i++)
+        {nstrncpy(s, MAXLINE, *pe, -1);
+	 t = strchr(s, '=');
+	 if (t != NULL)
+	    *t = '\0';
+
+	 ok = TRUE;
+	 if (except != NULL)
+	    {for (j = 0; (except[j] != NULL) && (ok == TRUE); j++)
+		 ok = (strcmp(s, except[j]) != 0);};
+
+	 if (ok == TRUE)
+	    err |= unsetenv(s);};
+
+/* let us know if there was nothing to do */
+    if (i == 0)
+       err = -1;
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CWHICH - check the path for EXE */
 
 char *cwhich(char *fmt, ...)

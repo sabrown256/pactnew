@@ -160,7 +160,11 @@ void PA_def_alias(char *name, char *type, void *pv)
     void *v;
 
     id = SC_type_id(type, FALSE);
-    v  = SC_convert_id(id, NULL, 0, 1, id, pv, 0, 1, 1, FALSE);
+    if (id == SC_STRING_I)
+       v = CSTRSAVE(pv);
+    else
+       v = SC_convert_id(id, NULL, 0, 1, id, pv, 0, 1, 1, FALSE);
+
     SC_hasharr_install(PA_alias_tab, name, v, type, TRUE, TRUE);
 
     return;}

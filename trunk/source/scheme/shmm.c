@@ -876,8 +876,8 @@ int _SS_object_map(FILE *fp, int flag)
 
     no = 0;
 
-    if (SC_LATEST_BLOCK(ph) != NULL)
-       {n = SC_MAX_MEM_BLOCKS(ph) + BLOCKS_UNIT_DELTA;
+    if (ph->latest_block != NULL)
+       {n = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
 
 	if (fp == NULL)
 	   fp = stdout;
@@ -887,11 +887,11 @@ int _SS_object_map(FILE *fp, int flag)
 
 /* find all the relevant blocks */
 	no   = 0;
-	space = SC_LATEST_BLOCK(ph);
+	space = ph->latest_block;
 	for (i = 0; (i < n) && (space != NULL); space = desc->next, i++)
             {desc = &space->block;
 	     nr   = desc->ref_count;
-	     ityp = BLOCK_TYPE(desc);
+	     ityp = desc->type;
 	     if ((ityp >= SS_OBJECT_I) && (nr != UNCOLLECT))
 	        {map[no].indep = TRUE;
 		 map[no].type  = ityp;
@@ -902,7 +902,7 @@ int _SS_object_map(FILE *fp, int flag)
 		    {nox <<= 1;
 		     CREMAKE(map, obj_map, nox);};};
 
-	     if (desc->next == SC_LATEST_BLOCK(ph))
+	     if (desc->next == ph->latest_block)
 	        break;};
 
 /* mark all the objects as dependent if someone else points to them */

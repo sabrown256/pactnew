@@ -37,14 +37,14 @@ static long _SC_count_tagged(int flag)
     SC_LOCKON(SC_mm_lock);
 
     nbt = 0;
-    if (SC_LATEST_BLOCK(ph) != NULL)
-       {n = SC_MAX_MEM_BLOCKS(ph) + BLOCKS_UNIT_DELTA;
-	for (space = SC_LATEST_BLOCK(ph), i = 0L;
+    if (ph->latest_block != NULL)
+       {n = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
+	for (space = ph->latest_block, i = 0L;
 	     i < n;
 	     space = space->block.next, i++)
 	    {desc = &space->block;
 	     if (SCORE_BLOCK_P(desc))
-	        {nb   = BLOCK_LENGTH(desc);
+	        {nb   = desc->length;
 		 name = _SC_block_name(desc);
 		 if ((name == NULL) && ((flag & 8) == TRUE))
 		    nbt += nb;
@@ -64,7 +64,7 @@ static long _SC_count_tagged(int flag)
 		    if ((_SC_name_ok(name, flag)) && ((flag & 8) == TRUE))
 		       nbt += nb;};};
 
-	     if ((desc->next == SC_LATEST_BLOCK(ph)) ||
+	     if ((desc->next == ph->latest_block) ||
 		 (space == NULL))
 	        break;};};
 
@@ -206,8 +206,8 @@ static int _SC_n_blocks(SC_heap_des *ph)
    {int i, n, nmj;
     major_block_des *mbl;
 
-    nmj = SC_N_MAJOR_BLOCKS(ph);
-    mbl = SC_MAJOR_BLOCK_LIST(ph);
+    nmj = ph->n_major_blocks;
+    mbl = ph->major_block_list;
     for (i = 0, n = 0; i < nmj; i++)
         n += mbl[i].nunits;
 
@@ -232,8 +232,8 @@ static int _SC_list_major_blocks(char *arr, int nc,
 
     nbl = 0;
 
-    nmj = SC_N_MAJOR_BLOCKS(ph);
-    mbl = SC_MAJOR_BLOCK_LIST(ph);
+    nmj = ph->n_major_blocks;
+    mbl = ph->major_block_list;
     for (i = 0; i < nmj; i++)
         {pn = mbl[i].block;
 	 nu = mbl[i].nunits;
@@ -284,9 +284,9 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
     n = 1;
 
 /* add active block count */
-    if ((flag & 1) && (SC_LATEST_BLOCK(ph) != NULL))
-       {ntx = SC_MAX_MEM_BLOCKS(ph);
-	ntc = SC_N_MEM_BLOCKS(ph);
+    if ((flag & 1) && (ph->latest_block != NULL))
+       {ntx = ph->nx_mem_blocks;
+	ntc = ph->n_mem_blocks;
 	nt  = min(ntx, 10*ntc);
 	n  += nt + BLOCKS_UNIT_DELTA;};
 
@@ -308,21 +308,21 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
     if (arr != NULL)
 
 /* handle active blocks that are too big to be in the major blocks lists */
-       {if ((flag & 1) && (SC_LATEST_BLOCK(ph) != NULL))
-	   {n     = SC_MAX_MEM_BLOCKS(ph) + BLOCKS_UNIT_DELTA;
-	    space = SC_LATEST_BLOCK(ph);
+       {if ((flag & 1) && (ph->latest_block != NULL))
+	   {n     = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
+	    space = ph->latest_block;
 	    for (i = 0; (i < n) && (space != NULL); i++, space = nxt)
 	        {desc = &space->block;
 		 if (!SC_pointer_ok(desc))
 		    break;
 
 		 nxt = desc->next;
-		 nb  = BLOCK_LENGTH(desc);
+		 nb  = desc->length;
 		 if (nb > nbthr)
 		    nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
 					       space, nb, flag, show);
 
-		 if (nxt == SC_LATEST_BLOCK(ph))
+		 if (nxt == ph->latest_block)
 		    break;};};
 
 /* handle blocks in the major blocks lists */
@@ -333,7 +333,7 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 	if ((flag & 4) && (_SC.mem_table != NULL))
 	   {for (i = 0; SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &space); i++)
 	        {desc  = &space->block;
-		 nb    = BLOCK_LENGTH(desc);
+		 nb    = desc->length;
 		 nbl  += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
 					     space, nb, flag, show);};};
 
@@ -434,7 +434,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
     nbl = 0;
 
-    if (SC_LATEST_BLOCK(ph) != NULL)
+    if (ph->latest_block != NULL)
        {if (fp == NULL)
 	   fp = stdout;
 
@@ -603,8 +603,8 @@ int SC_mem_neighbor(void *p, void *a, void *b)
 	if (SCORE_BLOCK_P(md))
 
 /* check all the major blocks */
-	   {nmj = SC_N_MAJOR_BLOCKS(ph);
-	    mbl = SC_MAJOR_BLOCK_LIST(ph);
+	   {nmj = ph->n_major_blocks;
+	    mbl = ph->major_block_list;
 	    for (i = 0; i < nmj; i++)
 	        {bs = mbl[i].block;
 		 nu = mbl[i].nunits;
@@ -657,20 +657,20 @@ long SC_mem_object_trace(long nb, int type,
 
     if ((nb > 0) && (f != NULL))
        {j  = SC_BIN_INDEX(nb);
-	us = SC_HDR_SIZE(ph) + SC_BIN_SIZE(j);
+	us = ph->hdr_size + SC_BIN_SIZE(j);
 	us = ((us + _SC_ms.mem_align_pad) >> _SC_ms.mem_align_expt) <<
 	     _SC_ms.mem_align_expt;
 	nu = SC_BIN_UNITS(us);
 
 /* check all the major blocks */
-	nmj = SC_N_MAJOR_BLOCKS(ph);
-	mbl = SC_MAJOR_BLOCK_LIST(ph);
+	nmj = ph->n_major_blocks;
+	mbl = ph->major_block_list;
 	nm  = 0L;
 	for (i = 0; i < nmj; i++)
 	    {md = (mem_descriptor *) mbl[i].block;
 
 /* check if the blocks in this major block could match the size */
-	     ib = BLOCK_LENGTH(md);
+	     ib = md->length;
 	     jt = SC_BIN_INDEX(ib);
 	     if (j != jt)
 	        continue;
@@ -679,8 +679,8 @@ long SC_mem_object_trace(long nb, int type,
 	     pn = (char *) md;
 	     for (l = 0; l < nu; l++, pn += us)
 	         {md = (mem_descriptor *) pn;
-		  ib = BLOCK_LENGTH(md);
-		  it = BLOCK_TYPE(md);
+		  ib = md->length;
+		  it = md->type;
 		  if (((type == -1) || (type == it)) && (nb == ib))
 		     {nm++;
 		      space = (mem_header *) md;

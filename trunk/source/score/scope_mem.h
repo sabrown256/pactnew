@@ -84,17 +84,8 @@
 
 #define SC_BIN_THRESHOLD()   _SC_ms.bins[_SC_ms.n_bins-1]
 
-#define ASSIGN_ID(_d)                                                       \
-    (_d)->id = SC_MEM_ID
-
 #define SCORE_BLOCK_P(_d)                                                   \
     (((_d)->id) == SC_MEM_ID)
-
-#define SET_HEAP(_d, _p)                                                    \
-    (_d)->heap = _p
-
-#define GET_HEAP(_d)                                                        \
-    ((_d)->heap)
 
 #define FREE_SCORE_BLOCK_P(_d)                                              \
     (((_d)->ref_count == SC_MEM_MFA) && ((_d)->type == SC_MEM_MFB))
@@ -102,41 +93,11 @@
 #define FTN_NAME(desc)                                                      \
     ((SC_FTN_NAME_MASK & (desc)->id) == 0)
 
-#define BLOCK_LENGTH(desc)                                                  \
-    (desc)->length
-
-#define BLOCK_TYPE(desc)                                                    \
-    ((desc)->type)
-
-#define BLOCK_NAME(desc)                                                    \
-    ((desc)->name)
-
 #define SAVE_LINKS(desc)                                                    \
    {prev = desc->prev;                                                      \
     next = desc->next;                                                      \
-    if (space == SC_LATEST_BLOCK(ph))                                       \
-       SC_LATEST_BLOCK(ph) = next;}
-
-/*--------------------------------------------------------------------------*/
-
-#define SC_HEAP_TID(x)           (x)->tid
-#define SC_HEAP_INIT(x)          (x)->init
-#define SC_FREE_LIST(x)          (x)->free_list
-#define SC_MAJOR_BLOCK_LIST(x)   (x)->major_block_list
-#define SC_N_MAJOR_BLOCKS(x)     (x)->n_major_blocks
-#define SC_NX_MAJOR_BLOCKS(x)    (x)->nx_major_blocks
-#define SC_MAX_MEM_BLOCKS(x)     (x)->max_mem_blocks
-#define SC_N_MEM_BLOCKS(x)       (x)->n_mem_blocks
-#define SC_HDR_SIZE_MAX(x)       (x)->size_max
-#define SC_HDR_SIZE(x)           (x)->size
-#define SC_LATEST_BLOCK(x)       (x)->latest_block
-#define SC_MEM_TRACE_PTR(x)      (x)->mem_trace_ptr
-#define SC_SP_ALLOC(x)           (x)->sp_alloc
-#define SC_SP_FREE(x)            (x)->sp_free
-#define SC_SP_DIFF(x)            (x)->sp_diff
-#define SC_SP_MAX(x)             (x)->sp_max
-
-#define SC_HEAP_READY(x)         ((x) != NULL)
+    if (space == ph->latest_block)                                          \
+       ph->latest_block = next;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -207,18 +168,17 @@ struct s_SC_heap_des
     major_block_des *major_block_list;
     long n_major_blocks;
     long nx_major_blocks;
-    long max_mem_blocks;
     long n_mem_blocks;
-    unsigned long size_max;
-    unsigned long size;
+    long nx_mem_blocks;
+    unsigned long hdr_size;
+    unsigned long hdr_size_max;
     uint64_t sp_alloc;
     uint64_t sp_free;
     uint64_t sp_diff;
     uint64_t sp_max;
     long ih;                /* current history index */
     long nh;                /* number of history entries */
-    SC_mem_hst *ring;       /* ring of history entries */
-    void (*history)(int act, mem_descriptor *space);};
+    SC_mem_hst *ring;};     /* ring of history entries */
 
 struct s_SC_mem_opt
    {int perm;             /* if 1 make block UNCOLLECT */

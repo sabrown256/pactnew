@@ -32,12 +32,12 @@ SC_thread_lock
 static void _SC_mem_stats_acc(SC_heap_des *ph, long a, long f)
    {
 
-    SC_SP_ALLOC(ph) += a;
-    SC_SP_FREE(ph)  += f;
+    ph->sp_alloc += a;
+    ph->sp_free  += f;
 
-    SC_SP_DIFF(ph) = SC_SP_ALLOC(ph) - SC_SP_FREE(ph);
-    SC_SP_MAX(ph)  = (SC_SP_MAX(ph) > SC_SP_DIFF(ph)) ?
-                     SC_SP_MAX(ph) : SC_SP_DIFF(ph);
+    ph->sp_diff = ph->sp_alloc - ph->sp_free;
+    ph->sp_max  = (ph->sp_max > ph->sp_diff) ?
+                     ph->sp_max : ph->sp_diff;
 
     return;}
 
@@ -66,16 +66,16 @@ void SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx)
     ph = _SC_tid_mm();
 
     if (al != NULL)
-       *al = SC_SP_ALLOC(ph);
+       *al = ph->sp_alloc;
 
     if (fr != NULL)
-       *fr = SC_SP_FREE(ph);
+       *fr = ph->sp_free;
 
     if (df != NULL)
-       *df = SC_SP_DIFF(ph);
+       *df = ph->sp_diff;
 
     if (mx != NULL)
-       *mx = SC_SP_MAX(ph);
+       *mx = ph->sp_max;
 
     return;}
 
@@ -89,12 +89,12 @@ void SC_mem_statb_set(uint64_t a, uint64_t f)
 
     ph = _SC_tid_mm();
 
-    SC_SP_ALLOC(ph) = a;
-    SC_SP_FREE(ph)  = f;
+    ph->sp_alloc = a;
+    ph->sp_free  = f;
 
-    SC_SP_DIFF(ph) = SC_SP_ALLOC(ph) - SC_SP_FREE(ph);
-    SC_SP_MAX(ph)  = (SC_SP_MAX(ph) > SC_SP_DIFF(ph)) ?
-                     SC_SP_MAX(ph) : SC_SP_DIFF(ph);
+    ph->sp_diff = ph->sp_alloc - ph->sp_free;
+    ph->sp_max  = (ph->sp_max > ph->sp_diff) ?
+                     ph->sp_max : ph->sp_diff;
 
     return;}
 
@@ -109,16 +109,16 @@ void SC_mem_stats(long *al, long *fr, long *df, long *mx)
     ph = _SC_tid_mm();
 
     if (al != NULL)
-       *al = SC_SP_ALLOC(ph);
+       *al = ph->sp_alloc;
 
     if (fr != NULL)
-       *fr = SC_SP_FREE(ph);
+       *fr = ph->sp_free;
 
     if (df != NULL)
-       *df = SC_SP_DIFF(ph);
+       *df = ph->sp_diff;
 
     if (mx != NULL)
-       *mx = SC_SP_MAX(ph);
+       *mx = ph->sp_max;
 
     return;}
 
@@ -132,12 +132,12 @@ void SC_mem_stats_set(long a, long f)
 
     ph = _SC_tid_mm();
 
-    SC_SP_ALLOC(ph) = a;
-    SC_SP_FREE(ph)  = f;
+    ph->sp_alloc = a;
+    ph->sp_free  = f;
 
-    SC_SP_DIFF(ph) = SC_SP_ALLOC(ph) - SC_SP_FREE(ph);
-    SC_SP_MAX(ph)  = (SC_SP_MAX(ph) > SC_SP_DIFF(ph)) ?
-                     SC_SP_MAX(ph) : SC_SP_DIFF(ph);
+    ph->sp_diff = ph->sp_alloc - ph->sp_free;
+    ph->sp_max  = (ph->sp_max > ph->sp_diff) ?
+                     ph->sp_max : ph->sp_diff;
 
     return;}
 
@@ -253,8 +253,8 @@ static void INLINE _SC_assign_block(SC_heap_des *ph, mem_header *space,
 
     desc = &space->block;
 
-    ASSIGN_ID(desc);
-    SET_HEAP(desc, ph);
+    desc->id        = SC_MEM_ID;
+    desc->heap      = ph;
     desc->ref_count = 0;
     desc->type      = 0;
     desc->length    = nb;
@@ -286,10 +286,8 @@ static INLINE void _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 				      void *addr)
    {
 
-    ASSIGN_ID(desc);
-
-    SET_HEAP(desc, ph);
-
+    desc->id        = SC_MEM_ID;
+    desc->heap      = ph;
     desc->ref_count = SC_MEM_MFA;
     desc->type      = SC_MEM_MFB;
     desc->length    = 0L;
@@ -340,7 +338,7 @@ static INLINE void _SC_unassign_block(SC_heap_des *ph, mem_header *space)
 /* _SC_INIT_HEAP - initialize an SC_heap instance */
 
 void _SC_init_heap(SC_heap_des *ph, int id)
-   {int i;
+   {int i, zsp;
     size_t nb;
     mem_descriptor **lst;
 
@@ -360,24 +358,34 @@ void _SC_init_heap(SC_heap_des *ph, int id)
     for (i = 0; i < _SC_ms.n_bins; i++)
         lst[i] = NULL;
 
-    SC_FREE_LIST(ph)        = lst;
-    SC_HEAP_TID(ph)         = id;
-    SC_MAJOR_BLOCK_LIST(ph) = NULL;
-    SC_N_MAJOR_BLOCKS(ph)   = 0L;
-    SC_NX_MAJOR_BLOCKS(ph)  = 0L;
-    SC_MAX_MEM_BLOCKS(ph)   = 0L;
-    SC_N_MEM_BLOCKS(ph)     = 0L;
-/*    SC_HDR_SIZE_MAX(ph)     = (1L << NBITS) - 1; */
-    SC_HDR_SIZE_MAX(ph)     = LONG_MAX;
-    SC_HDR_SIZE(ph)         = sizeof(mem_header);
-    SC_LATEST_BLOCK(ph)     = NULL;
+/* new heaps inherit the zero_space flag from heap 0 */
+    if (id > 0)
+       {SC_heap_des *phz;
 
-    SC_SP_ALLOC(ph) = 0L;
-    SC_SP_FREE(ph)  = 0L; 
-    SC_SP_DIFF(ph)  = 0L;
-    SC_SP_MAX(ph)   = 0L;
+	phz = _SC_get_heap(0);
+	zsp = phz->zero_space;}
+    else
+       zsp = 0;
 
-    SC_HEAP_INIT(ph) = TRUE;
+    ph->init             = TRUE;
+    ph->tid              = id;
+    ph->zero_space       = zsp;
+    ph->free_list        = lst;
+    ph->latest_block     = NULL;
+    ph->major_block_list = NULL;
+    ph->n_major_blocks   = 0L;
+    ph->nx_major_blocks  = 0L;
+    ph->n_mem_blocks     = 0L;
+    ph->nx_mem_blocks    = 0L;
+    ph->hdr_size         = sizeof(mem_header);
+    ph->hdr_size_max     = LONG_MAX;
+    ph->sp_alloc         = 0L;
+    ph->sp_free          = 0L; 
+    ph->sp_diff          = 0L;
+    ph->sp_max           = 0L;
+    ph->ih               = 0L;
+    ph->nh               = 0L;
+    ph->ring             = NULL;
 
     return;}
 
@@ -411,7 +419,7 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
     major_block_des mbl, *pm;
     static int mblsz = sizeof(major_block_des);
 
-    us = SC_HDR_SIZE(ph) + SC_BIN_SIZE(j);
+    us = ph->hdr_size + SC_BIN_SIZE(j);
     us = ((us + _SC_ms.mem_align_pad) >> _SC_ms.mem_align_expt) <<
          _SC_ms.mem_align_expt;
     nu = SC_BIN_UNITS(us);
@@ -427,32 +435,32 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
     mbl.block  = pn;
 
 /* initialize the major block list if necessary */
-    if (SC_MAJOR_BLOCK_LIST(ph) == NULL)
-       {SC_NX_MAJOR_BLOCKS(ph) = BLOCKS_UNIT_DELTA;
-	SC_N_MAJOR_BLOCKS(ph)  = 0;
+    if (ph->major_block_list == NULL)
+       {ph->nx_major_blocks = BLOCKS_UNIT_DELTA;
+	ph->n_major_blocks  = 0;
 
-	tnb = mblsz*SC_NX_MAJOR_BLOCKS(ph);
+	tnb = mblsz*ph->nx_major_blocks;
 	pm  = (major_block_des *) malloc(tnb);
 
 	assert(pm != NULL);
 
-	SC_MAJOR_BLOCK_LIST(ph) = pm;};
+	ph->major_block_list = pm;};
 
 /* add the new major block */
-    SC_MAJOR_BLOCK_LIST(ph)[SC_N_MAJOR_BLOCKS(ph)++] = mbl;
+    ph->major_block_list[ph->n_major_blocks++] = mbl;
 
 /* expand the major block list if necessary */
-    if (SC_N_MAJOR_BLOCKS(ph) >= SC_NX_MAJOR_BLOCKS(ph))
-       {SC_NX_MAJOR_BLOCKS(ph) += BLOCKS_UNIT_DELTA;
+    if (ph->n_major_blocks >= ph->nx_major_blocks)
+       {ph->nx_major_blocks += BLOCKS_UNIT_DELTA;
 
-	tnb = mblsz*SC_NX_MAJOR_BLOCKS(ph);
+	tnb = mblsz*ph->nx_major_blocks;
 
-	pm = SC_MAJOR_BLOCK_LIST(ph);
+	pm = ph->major_block_list;
 	pm = (major_block_des *) realloc(pm, tnb);
 
 	assert(pm != NULL);
 
-	SC_MAJOR_BLOCK_LIST(ph) = pm;};
+	ph->major_block_list = pm;};
 
 /* chain the new chunks on the block properly */
     md = (mem_descriptor *) pn;
@@ -487,12 +495,12 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
     if (nbp <= 0)
        return(NULL);
 
-    nb = nbp - SC_HDR_SIZE(ph);
+    nb = nbp - ph->hdr_size;
     j  = SC_BIN_INDEX(nb);
 
 /* if this chunk size is within SCORE managed space handle it here */
     if (j < _SC_ms.n_bins)
-       {md = SC_FREE_LIST(ph)[j];
+       {md = ph->free_list[j];
 
 /* if we are out of free chunks get a block of them from the system */
         if (md == NULL)
@@ -502,7 +510,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 	if (md != NULL)
 
 /* attach the new chunks to the free list */
-	   {SC_FREE_LIST(ph)[j] = (mem_descriptor *) (md->func);
+	   {ph->free_list[j] = (mem_descriptor *) (md->func);
 
 /* take the top of the free list for this size chunk */
 	    md->initialized = FALSE;
@@ -544,11 +552,11 @@ static void _SC_prim_free(void *p, long nbp, SC_heap_des *ph)
     if (p == NULL)
        return;
 
-    nb = nbp - SC_HDR_SIZE(ph);
+    nb = nbp - ph->hdr_size;
     j  = SC_BIN_INDEX(nb);
     if (j < _SC_ms.n_bins)
        {ths = (mem_descriptor *) p;
-        lst = SC_FREE_LIST(ph)[j];
+        lst = ph->free_list[j];
 
 	_SC_deassign_block(ph, ths, lst);
 
@@ -560,7 +568,7 @@ static void _SC_prim_free(void *p, long nbp, SC_heap_des *ph)
 	ths->next = NULL;
 	ths->prev = NULL;
 
-        SC_FREE_LIST(ph)[j] = ths;}
+        ph->free_list[j] = ths;}
 
     else
        _SC_FREE(p);
@@ -658,9 +666,9 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
         line = opt->line;};
 
     nb  = ni*bpi;
-    nbp = nb + SC_HDR_SIZE(ph);
+    nbp = nb + ph->hdr_size;
 
-    if ((nb <= 0) || ((unsigned long) nb > SC_HDR_SIZE_MAX(ph)))
+    if ((nb <= 0) || ((unsigned long) nb > ph->hdr_size_max))
        return(NULL);
 
     SC_LOCKON(SC_mm_lock);
@@ -680,10 +688,10 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
 
 	_SC_mem_stats_acc(ph, nb, 0L);
     
-	SC_MAX_MEM_BLOCKS(ph)++;
-	SC_N_MEM_BLOCKS(ph)++;
+	ph->nx_mem_blocks++;
+	ph->n_mem_blocks++;
 
-	BLOCK_TYPE(&space->block) = typ;
+	space->block.type = typ;
 
         desc = (mem_descriptor *) space;
         space++;
@@ -812,7 +820,7 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
     space = NULL;
     
     if (SC_is_score_space(p, &space, &desc))
-       {ph  = GET_HEAP(desc);
+       {ph  = desc->heap;
 
 	if (arg == NULL)
 	   {prm = FALSE;
@@ -827,14 +835,14 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
 	prm |= (desc->ref_count == UNCOLLECT);
 
 	nb  = ni*bpi;
-	nbp = nb + SC_HDR_SIZE(ph);
+	nbp = nb + ph->hdr_size;
 
 	if ((nb <= 0) ||
-	    ((unsigned long) nb > SC_HDR_SIZE_MAX(ph)))
+	    ((unsigned long) nb > ph->hdr_size_max))
 	   {CFREE(p);
 	    return(NULL);};
 
-	ob = BLOCK_LENGTH(desc);
+	ob = desc->length;
 	if (nb < ob)
 	   return(p);
 
@@ -875,7 +883,7 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
 		if (tmp == NULL)
 		   space = NULL;
 		else
-		   {obp   = ob + SC_HDR_SIZE(ph);
+		   {obp   = ob + ph->hdr_size;
 		    osp   = space;
 		    space = tmp;
 		    memcpy(space, osp, min(obp, nbp));
@@ -903,7 +911,7 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
 	       {desc->ref_count = 0;
 		_SC_mem_stats_acc(ph, db, 0L);};
 
-	    BLOCK_LENGTH(desc) = nb;
+	    desc->length = nb;
 
 	    space++;
 
@@ -1030,7 +1038,7 @@ int _SC_free_n(void *p, void *arg)
     if (--(desc->ref_count) > 0)
        return(TRUE);
 
-    ph = GET_HEAP(desc);
+    ph = desc->heap;
     if (ph == NULL)
        return(TRUE);
 
@@ -1044,14 +1052,14 @@ int _SC_free_n(void *p, void *arg)
     if (_SC.mem_hst != NULL)
        _SC.mem_hst(SC_MEM_FREE, desc);
 
-    nb  = BLOCK_LENGTH(desc);
-    nbp = nb + SC_HDR_SIZE(ph);
+    nb  = desc->length;
+    nbp = nb + ph->hdr_size;
 
     SC_LOCKON(SC_mm_lock);
 
     _SC_unassign_block(ph, space);
 
-    _SC_mem_stats_acc(ph, 0L, nbp - SC_HDR_SIZE(ph));
+    _SC_mem_stats_acc(ph, 0L, nbp - ph->hdr_size);
 
     if ((zsp == 1) || (zsp == 3))
        _SC_prim_memset(space, nbp);
@@ -1063,7 +1071,7 @@ int _SC_free_n(void *p, void *arg)
     else
        _SC_prim_free((void *) space, nbp, ph);
 
-    SC_N_MEM_BLOCKS(ph)--;
+    ph->n_mem_blocks--;
 
     SC_LOCKOFF(SC_mm_lock);
 
@@ -1165,6 +1173,7 @@ int SC_zero_space_n(int flag, int tid)
        {case -2 :
 	     itn = 0;
 	     itx = SC_get_n_thread();
+	     itx = max(itx, SC_n_threads);
 	     itx = max(itx, 1);
 	     break;
         case -1 :

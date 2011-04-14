@@ -1649,6 +1649,7 @@ int SC_get_number_processors(void)
    {int n;
 
     n = SC_gs.comm_size;
+    n = max(n, 1);
 
     return(n);}
 

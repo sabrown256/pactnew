@@ -171,13 +171,16 @@ extern int
 /* former SCMEMDA.C declarations */
 
 extern int
- SC_free(void *p);
+ SC_free(void *p),
+ SC_free_z(void *p, int zsp);
 
 extern void
  *SC_alloc(long nitems, long bpi, char *name),
  *SC_alloc_na(long nitems, long bpi, char *name, int na),
+ *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
  *SC_realloc(void *p, long nitems, long bpi),
- *SC_realloc_na(void *p, long nitems, long bpi, int na);
+ *SC_realloc_na(void *p, long nitems, long bpi, int na),
+ *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp);
 
 
 /* former SCSTR.C declarations */

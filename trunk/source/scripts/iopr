@@ -162,8 +162,12 @@ if ("$inf" == "") then
    set inf  = ( `nslookup $SrvI |& tail -n 2` )
    set SrvN = ( `echo $inf[4] | sed 's/\.$//'` )
 else
-   set inf  = ( `ping $popt $SrvN |& grep PING | head -n 1` )
-   set SrvI = ( `echo $inf[3] | sed 's/[():]//g'` )
+   set inf = ( `ping $popt $SrvN |& grep PING | head -n 1` )
+   if ($#inf > 2) then
+      set SrvI = ( `echo $inf[3] | sed 's/[():]//g'` )
+   else
+      set SrvI = ""
+   endif
 endif
 
 set RTdT = 0
