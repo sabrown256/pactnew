@@ -33,7 +33,7 @@ source ../../tests/common
          set xstatus = $TStatus
       else
          if ("$Valgrind" == "") then
-            $cfe $BinDir/mlpfts
+            $CFE $BinDir/mlpfts
             set xstatus = $status
          else
             $Valgrind $BinDir/mlpfts

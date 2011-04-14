@@ -440,7 +440,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 
     space = (mem_header *) ptr;
     desc  = &space->block;
-    nb    = BLOCK_LENGTH(desc);
+    nb    = desc->length;
     nr    = desc->ref_count;
     name  = _SC_block_name(desc);
     if (name == NULL)
@@ -451,7 +451,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
     else if (!SC_pointer_ok(name))
        {io_printf(fp, "   Block: 0x%012lx (corrupted active memory block ",
 		  space+1);
-	io_printf(fp, "- %d\n", SC_HEAP_TID(ph));}
+	io_printf(fp, "- %d\n", ph->tid);}
 
     else
        {if (FTN_NAME(desc))
@@ -569,13 +569,13 @@ int SC_mem_trace(void)
     SC_LOCKON(SC_mm_lock);
 
     ret = 0;
-    if (SC_LATEST_BLOCK(ph) != NULL)
-       {n    = SC_MAX_MEM_BLOCKS(ph) + BLOCKS_UNIT_DELTA;
+    if (ph->latest_block != NULL)
+       {n    = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
 	n_mf = 1;
 	n_mb = 1;
 
 	ok = TRUE;
-	for (space = SC_LATEST_BLOCK(ph), i = 0L;
+	for (space = ph->latest_block, i = 0L;
 	     i < n;
 	     space = space->block.next, n_mf++, i++)
 	    {desc = &space->block;
@@ -584,28 +584,28 @@ int SC_mem_trace(void)
 		 ok = FALSE;
 		 break;};
 
-	     if ((desc->next == SC_LATEST_BLOCK(ph)) ||
+	     if ((desc->next == ph->latest_block) ||
 		 (space == NULL))
 	        break;};
 
 	if (!ok)
 	   ret = -4;
 
-	else if ((i >= n) && (SC_MAX_MEM_BLOCKS(ph) != 0))
+	else if ((i >= n) && (ph->nx_mem_blocks != 0))
 	   ret = -3;
 
 	else if (space == NULL)
 	   ret = -2;
 
 	else
-	   {for (space = SC_LATEST_BLOCK(ph), i = 0L;
+	   {for (space = ph->latest_block, i = 0L;
 		 i < n;
 		 space = space->block.prev, n_mb++, i++)
 	        if ((space == NULL) ||
-		    (space->block.prev == SC_LATEST_BLOCK(ph)))
+		    (space->block.prev == ph->latest_block))
 		   break;
 
-	    if ((i >= n) && (SC_MAX_MEM_BLOCKS(ph) != 0))
+	    if ((i >= n) && (ph->nx_mem_blocks != 0))
 	       ret = -3;
 
 	    else if (space == NULL)
@@ -641,8 +641,7 @@ int SC_reg_mem(void *p, long length, char *name)
 
     pd = SC_permanent(CMAKE(mem_descriptor));
 
-    SET_HEAP(pd, ph);
-
+    pd->heap      = ph;
     pd->func      = name;
     pd->file      = NULL;
     pd->line      = -1;
@@ -689,9 +688,9 @@ char *SC_mem_lookup(void *p)
     SC_LOCKON(SC_mm_lock);
 
     name  = NULL;
-    space = SC_LATEST_BLOCK(ph);
+    space = ph->latest_block;
     if (space != NULL)
-       {n = SC_MAX_MEM_BLOCKS(ph) + BLOCKS_UNIT_DELTA;
+       {n = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
 
 	for (i = 0; (i < n) && (space != NULL); i++)
 	    {ps = (void *) (space + 1);
@@ -721,7 +720,7 @@ void dprfree(void)
     io_printf(stdout, "Bin  Max  Blocks\n");
     for (j = 0L; j < _SC_ms.n_bins; j++)
         {io_printf(stdout, "%3ld %4ld ", j, SC_BIN_SIZE(j));
-         for (md  = SC_FREE_LIST(ph)[j], i = 0L;
+         for (md  = ph->free_list[j], i = 0L;
 	      md != NULL;
 	      md  = (mem_descriptor *) md->func, i++)
              {io_printf(stdout, " %lx", md);
@@ -745,7 +744,7 @@ void dflpr(int j)
 	  (j < 1) ? 1L : SC_BIN_SIZE(j-1) + 1L,
 	  SC_BIN_SIZE(j));
 	  
-    for (md = SC_FREE_LIST(ph)[j];
+    for (md = ph->free_list[j];
 	 md != NULL;
 	 md = (mem_descriptor *) md->func)
         io_printf(stdout, "%8lx\n", md);
@@ -768,7 +767,7 @@ static long _SC_flchk(void)
     nf  = 0L;
     bad = 0;
     for (j = 0L; j < _SC_ms.n_bins; j++)
-        {hd = SC_FREE_LIST(ph)[j];
+        {hd = ph->free_list[j];
          for (k = 0L, md = hd;
 	      md != NULL;
 	      k++, md = (mem_descriptor *) md->func)
@@ -918,7 +917,7 @@ long SC_arrlen(void *p)
     rv = -1L;
 
     if (SC_is_score_space(p, NULL, &desc))
-       {nb = BLOCK_LENGTH(desc);
+       {nb = desc->length;
 	rv = (nb < 0L) ? -1L : nb;};
 
     return(rv);}
@@ -1106,8 +1105,8 @@ void dprblk(void *p)
                printf("Free Block\n");
 	    else
 	       {printf("Name: %s\n",       _SC_block_name(desc));
-		printf("Length: %ld\n",    BLOCK_LENGTH(desc));
-		printf("Type: %d\n",       BLOCK_TYPE(desc));
+		printf("Length: %ld\n",    desc->length);
+		printf("Type: %d\n",       desc->type);
 		printf("References: %d\n", desc->ref_count);};
 
 	    printf("Next Block: %p\n",     desc->next);

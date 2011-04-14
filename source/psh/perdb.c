@@ -420,6 +420,7 @@ void help(void)
 int main(int c, char **v)
    {int i, rv, srv, dmn, init;
     char root[MAXLINE], r[MAXLINE], req[MAXLINE];
+    char *except[] = {"PATH", NULL};
 
     req[0] = '\0';
     r[0]   = '\0';
@@ -465,6 +466,8 @@ int main(int c, char **v)
        snprintf(r, MAXLINE, "%s/.perdb", cgetenv(TRUE, "HOME"));
 
     full_path(root, MAXLINE, NULL, r);
+
+    rv = cclearenv(except);
 
     rv = TRUE;
     if (srv == TRUE)

@@ -43,7 +43,7 @@ static void _SC_mem_history(int act, void *a)
 
     space = (mem_descriptor *) a;
 
-    ph = GET_HEAP(space);
+    ph = space->heap;
     if (ph->ring == NULL)
        _SC_mem_hst_init(ph);
 
