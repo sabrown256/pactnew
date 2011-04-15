@@ -349,7 +349,7 @@ switch ($Cmnd)
            set CrossFix = ( hserve mpi-io-wrap ps-diff png-diff )
            set CrossFix = ( hserve mpi-io-wrap )
            foreach i ( $CrossFix )
-              set exe = `which-exe $i`
+              set exe = `which-exe -d ${BinDir} $i`
               if (-x "$exe") then
                  NoteD $Log "   $exe"
                  flog $Log cp $exe ${BinDir}
@@ -1090,7 +1090,7 @@ switch ($Cmnd)
            flog $Log $RM ${BinDir}/dmake.exec
            flog $Log popd
         else
-           set dm = `which-exe dmake`
+           set dm = `which-exe -d ${BinDir} dmake`
            if (-x "$dm") then
               flog $Log cp $dm ${BinDir}/dmake
               set LStat = 0

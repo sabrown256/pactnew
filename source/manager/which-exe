@@ -10,13 +10,38 @@
 
 unalias *
 
-@ err = 1
+@ err    = 1
+set exe  = ""
+set dirs = ""
 
-if ($#argv != 1) then
-   echo "Usage: which-exe <program>"
+while ($#argv > 0)
+   switch ($1)
+      case -d:
+           shift
+           if (-d $1) then
+              pushd $1 >& /dev/null
+              set dirs = ( $dirs $cwd )
+              popd >& /dev/null
+           else
+              echo "No such directory '$1' - ignored"
+           endif
+           breaksw
+      case -h:
+           echo "Usage: which-exe [-d <dir>]* [-h] <exe>"
+           echo "   d     do not accept a candidate from <dir>"
+           echo "   h     this help message"
+           echo "   <exe> executable program wanted"
+           exit(1)
+      default:
+           set exe = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$exe" == "") then
+   echo "No executable specified - exiting"
    exit(1)
-else
-   set exe = $1
 endif
 
 set prg   = ""
@@ -28,20 +53,32 @@ if ($?DAS_ROOT == 1) then
 endif
 
 # GOTCHA: this is very weak logic in a do-net situation
+set path = ( /usr/bin /bin . )
+rehash
 foreach d ( ../dev/*/bin $extra )
-   set path = ( $d /usr/bin /bin . )
-   rehash
-   set nl = ( `$exe -h |& grep -iw usage | wc -l` )
-   if ("$nl" == 1) then
-      strings $d/$exe |& grep $sys >>& /dev/null
-      if ($status == 0) then
-         pushd $d >>& /dev/null
-         set prg = $cwd/$exe
-         popd >>& /dev/null
-         @ err = 0
+   pushd $d >>& /dev/null
+
+   set ok = TRUE
+   foreach r ($dirs)
+      if ($r == $cwd) then
+         set ok = FALSE
          break
       endif
+   end
+
+   if ($ok == TRUE) then
+      set nl = ( `./$exe -h |& grep -iw usage | wc -l` )
+      if ("$nl" == 1) then
+         strings ./$exe |& grep $sys >>& /dev/null
+         if ($status == 0) then
+            set prg = $cwd/$exe
+            @ err = 0
+            break
+         endif
+      endif
    endif
+
+   popd >>& /dev/null
 end
 
 echo "$prg"

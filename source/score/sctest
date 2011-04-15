@@ -20,7 +20,7 @@ while ($#argv > 0)
       case -h:
            echo "Usage: sctest [-h] [<test>]*"
            echo "  h       this help message"
-           echo "  <test>  one of: sharp ar mk error mpi array"
+           echo "  <test>  one of: sharp ar mk mkinfo error mpi array"
            echo "                  lookup lex heap mprf resrc retrc"
            echo "                  smp mmap io buf"
            echo ""
@@ -81,7 +81,7 @@ else if (-e $RootDir/score/scstd.h) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ($Test sharp ar mk error mpi)
+      set Test = ($Test sharp ar mk mkinfo error mpi)
       set Test = ($Test array lookup lex)
       set Test = ($Test heap mprf resrc retrc)
       set Test = ($Test smp mmap io buf)
@@ -90,7 +90,6 @@ else if (-e $RootDir/score/scstd.h) then
    foreach i ($Test)
       $SrcDir/tests/$i
       if ($status == 1) then
-echo "-------------->>>>  $i failed"
          set ERROR = TRUE
       endif
    end

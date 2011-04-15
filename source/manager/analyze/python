@@ -120,6 +120,18 @@ if (-d ../../python) then
 
    if ($found == FALSE) then
       NoteD $ALog "none recognizable"
+      flog $ALog setenv HavePython        FALSE
+      flog $ALog setenv HavePythonNumeric FALSE
+      flog $ALog setenv HavePythonNumpy   FALSE
+      flog $ALog setenv Python_Path ""
+      flog $ALog setenv PyExe ""
+      flog $ALog setenv PyCC ""
+      flog $ALog setenv PyCfg ""
+      flog $ALog setenv PyDirSrc ""
+      flog $ALog setenv PyDirDst ""
+      flog $ALog setenv PyDirPy ""
+      flog $ALog setenv PyInc ""
+      flog $ALog setenv PyVers ""
    endif
 
    if ($BuildSharedLibs == FALSE) then
@@ -152,10 +164,10 @@ if (-d ../../python) then
 endif
 
 # export the results
-SetParent Python_Path
 SetParent HavePython
 SetParent HavePythonNumeric
 SetParent HavePythonNumpy
+SetParent Python_Path
 SetParent PyExe
 SetParent PyCC
 SetParent PyCfg
