@@ -1,0 +1,73 @@
+#!/bin/csh -f
+#
+# MKINFO - test dmake -info option
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set ok = TRUE
+if ($ok == TRUE) then
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE Make Info Test ........ "
+   NoteD $LogF ""
+
+   set UTime = `$TIMER -r`
+   flog $LogF pushd $SrcDir/tests
+
+   set vars = ""
+
+# things found in scconfig.h
+#  ANSI           has no token (no value)
+#  SIGNED         has single token with no quotes
+#  DEFAULT_SHELL  has single token in double quotes
+#  FF_ID          has complex macro expression
+   set vars = ( $vars ANSI SIGNED DEFAULT_SHELL FF_ID )
+
+# things found in env-pact.csh
+#  LIB       has single token with no quotes
+#  Bits      has single token in double quotes
+#  SUFFIXES  has single token in single quotes
+#  NUMA      has ""
+#  CList     has multiple tokens in double quotes
+   set vars = ( $vars LIB Bits SUFFIXES NUMA CList )
+
+   foreach m (smake dmake)
+      Separator $LogF
+      NoteD $LogF -n "                       $m ......... "
+      Note $LogF ""
+      @ lerr = 0
+      foreach v ($vars)
+         flog $LogF $m -info $v
+         if ($status != 0) then
+            Note $LogF "Test $v failed for $m"
+            @ lerr = $lerr + 1
+         else
+            Note $LogF "Test $v passed for $m"
+         endif
+      end
+      if ($lerr == 0) then
+         NoteD $LogF "ok"
+      else
+         NoteD $LogF "ng"
+         @ Err = $Err + 1
+      endif
+   end
+
+   flog $LogF popd
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($Err != 0) then
+      NoteD $LogF "                    SCORE Make Info Test ........ FAILED ($ETime)"
+   else
+      NoteD $LogF "                    SCORE Make Info Test ........ PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)
+

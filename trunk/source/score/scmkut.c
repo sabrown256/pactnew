@@ -65,12 +65,16 @@ static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
 		 if (tst)
 		    {txt = strtok(NULL, "\n");
 
-/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val> */
+/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val>
+ * or in scconfig.h with txt NULL and tok <var>
+ */
 		     if (txt == NULL)
 		        {p = strchr(tok, '=');
 			 if (p != NULL)
 			    {*p++ = '\0';
-			     txt  = p;};}
+			     txt  = p;}
+			 else
+			    txt = tok;}
 
 /* with env-pact.csh you WILL get here with txt <val> and tok <var> */
 		     else
