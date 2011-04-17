@@ -1350,6 +1350,11 @@ extern int
  PM_svd_covariance(double **v, int ma, double *w, double **cvm);
 
 
+/* MLVND.c declarations */
+
+extern double
+ *PM_vandermonde(int n, double *x, double *b);
+
 
 /* MLVECT.c declarations */
 
