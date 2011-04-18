@@ -103,8 +103,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef char char_8[8];
-
 typedef struct s_SC_oscapdes SC_oscapdes;
 typedef struct s_SC_state SC_state;
 

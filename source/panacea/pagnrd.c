@@ -675,16 +675,7 @@ void PA_pshand(PA_command *cp)
 	   SC_convert_id(did, cp->vr, i, 1, SC_DOUBLE_I, &d, 0, 1, 1, FALSE);
 
         else if ((did == SC_CHAR_I) || (did == SC_STRING_I))
-           ((char **) cp->vr)[i] = CSTRSAVE(sval);
-
-/* since char_8 is a FORTRAN disease treat it as static */
-        else if (did == SC_CHAR_8_I)
-           {int nb;
-            char *s;
-
-            s  = ((char **) cp->vr)[i];
-            nb = (strlen(sval) + 7)/8 << 3;
-            SC_strncpy(s, nb, sval, strlen(sval));};};
+           ((char **) cp->vr)[i] = CSTRSAVE(sval);};
 
     return;}
 

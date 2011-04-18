@@ -25,14 +25,14 @@
 
 unalias *
 
-if ($?MngDir == 0) then
-   if (-f ../scripts/env-csh) then
-      setenv MngDir $cwd
-   else if (-f ../../scripts/env-csh) then
-      setenv MngDir $cwd:h
+if ($?ScrDir == 0) then
+   if (-d ../scripts) then
+      setenv ScrDir ../scripts
+   else if (-d ../../scripts) then
+      setenv ScrDir ../../scripts
    endif
 endif
-set Base   = $MngDir:h
+set Base   = $ScrDir:h
 set ScrDir = $Base/scripts
 source $ScrDir/env-csh
 source $ScrDir/csh-subroutines
@@ -46,10 +46,7 @@ setenv HostOSRel     `uname -r`
 setenv HostName      `uname -n`
 setenv MajorVersion  `expr $HostOSRel : "\(.\)"`
 
-set Which = "$MngDir/pwhich"
-
-SafeEnv CfgMan  $MngDir/cfgman
-SafeEnv System  `$CfgMan use`
+SafeEnv System  `$ScrDir/cfgman use`
 SafeEnv RootDir $Base/dev/$System
 
 InitLog ALog $RootDir/log/analyze
@@ -58,7 +55,7 @@ Note $ALog "HostName         = $HostName"
 Note $ALog "HostOS           = $HostOS"
 Note $ALog "HostOSRel        = $HostOSRel"
 Note $ALog "MajorVersion     = $MajorVersion"
-Note $ALog "Source Directory = $MngDir"
+Note $ALog "Source Directory = $ScrDir"
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then
@@ -113,7 +110,7 @@ flog $ALog setenv TIMER  $ScrDir/timer
 if ($HostOS == "AIX") then
    set lNM = ( /usr/bin/nm -g )
 else
-   set lNM = ( `$Which nm` -g )
+   set lNM = ( `where nm | head -n 1` -g )
 endif
 flog $ALog setenv NM "$lNM"
 

@@ -485,8 +485,7 @@ if ($status > 1) then
    exit(1)
 endif
 
-set CfgMan    = $cwd/cfgman
-setenv System `$CfgMan use`
+setenv System `../scripts/cfgman use`
 set Base      = $cwd:h
 set Root      = $Base/dev/$System
 set IncDir    = $Root/include

@@ -28,7 +28,7 @@ alias RETURN  'goto $Return'
 
 set Base     = $Root:h
 set Base     = $Base:h
-set HostArch = `$Base/manager/cfgman use`
+set HostArch = `$Base/scripts/cfgman use`
 set DevDir   = "dev/$HostArch"
 set BuildDir = "$Root/builder"
 

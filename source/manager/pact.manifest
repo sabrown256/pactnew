@@ -49,7 +49,7 @@ scm tpu.scm trig.scm ultra.ini ultra.pui ultra.scm mouse.scm
 
 script do-local do-automake do-stats iopr iocl nbit
 script nfsmon timer rmalbut px sinstall ls-jobs ls-all
-script run-all load-all mall sign swhich gcc-info system-id
+script run-all load-all mall sign swhich gcc-info system-id cfgman
 script update-sys update-watch plock cleanup-jobs fix-group
 script herd cover find-fnc diff-code diff-tree descend bckgr
 script broadcast check-hosts check-service all-service dot-silent
@@ -67,6 +67,6 @@ mgr clib.fncs code-date compare-date pact-analyze pact-changes
 mgr pact-commit pact-config cpyright.h pact-dist
 mgr pact-import pact-scs
 mgr pact-update pact.c pact.manifest
-mgr cfgman systems.unix
+mgr systems.unix
 mgr scscom scshist scslock scstag scsup
 

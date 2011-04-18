@@ -28,11 +28,11 @@ set ldir = $MngDir:h/scripts
 set Which = "$MngDir/pwhich"
 
 if ($?FirstCommon == 0) then
-   if (-x cfgman) then
-      set larch = `cfgman use`
+   if (-x ../scripts/cfgman) then
+      set larch = `../scripts/cfgman use`
       set lroot = $cwd:h
-   else if (-x ../cfgman) then
-      set larch = `../cfgman use`
+   else if (-x ../../scripts/cfgman) then
+      set larch = `../../scripts/cfgman use`
       set lroot = $cwd:h
       set lroot = $lroot:h
    endif

@@ -77,8 +77,8 @@ switch ($Phase)
         call GET_NET_ARG($LogHost)
 
 	if ($MultiConfig == yes) then
-           setenv PACT_CONFIG $UHost+$Cfg
-           Note $LogHost "Using multiconfig name $PACT_CONFIG"
+           setenv SESSION_CONFIG $UHost+$Cfg
+           Note $LogHost "Using multiconfig name $SESSION_CONFIG"
         endif
 
         flog $LogHost cd $WrkDir
@@ -104,7 +104,7 @@ switch ($Phase)
 # if syncing from the repository
            if (($SyncOnly == "yes") && ("$Repo" != "")) then
               flog $LogHost cd $Builder
-              set Arch = `./cfgman use`
+              set Arch = `../scripts/cfgman use`
               Note $LogHost "System id = $Arch"
 
 # clean out old builds first
@@ -193,7 +193,7 @@ switch ($Phase)
 
         call QUALIFY()
 
-        set arch   = `./cfgman use`
+        set arch   = `../scripts/cfgman use`
         set DevDir = $WrkDir/dev/$arch
         set LogDir = $DevDir/log
         set IncDir = $DevDir/include
@@ -296,7 +296,7 @@ switch ($Phase)
            source $EnvCsh
         endif
         if ($MultiConfig == yes) then
-           Note $LogHost "   Using MultiConfig with PACT_CONFIG = |$PACT_CONFIG|"
+           Note $LogHost "   Using MultiConfig with SESSION_CONFIG = |$SESSION_CONFIG|"
         endif
 
         Note $LogHost "   Debug/Optimization options: $DOList"
@@ -341,7 +341,7 @@ switch ($Phase)
                  set Opt   = ( $Opt $Where )
 
                  if ($DeleteOld == yes) then
-                    set OldCfg = `./cfgman delete all`
+                    set OldCfg = `../scripts/cfgman delete all`
                  endif
 
 # add standard config/option message to enable do-net watch option
@@ -354,12 +354,12 @@ switch ($Phase)
                  endif
 
                  Separator $LogHost
-                 if ($?PACT_CONFIG == 0) then
+                 if ($?SESSION_CONFIG == 0) then
                     set Alias = ""
                     Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt"
                  else
-                    set Alias = "-a $PACT_CONFIG"
-                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt ($PACT_CONFIG)"
+                    set Alias = "-a $SESSION_CONFIG"
+                    Note $LogHost "Configuring source tag $PTag from $CfgQual using $dbgopt ($SESSION_CONFIG)"
                  endif
 
                  Note $LogHost `date`
@@ -701,7 +701,7 @@ switch ($Phase)
         call QUALIFY()
 
         flog $LogHost pwd
-        flog $LogHost setenv System `./cfgman use`
+        flog $LogHost setenv System `../scripts/cfgman use`
         flog $LogHost set path = ( . $WrkDir/dev/$System/bin $path )
 
         flog $LogHost setenv Err  2
@@ -713,7 +713,7 @@ switch ($Phase)
               flog $LogHost setenv Err  0
               tlog "(LOG)" cat $LogHost
               if ($MultiConfig == yes) then
-                 ./dsys delete $PACT_CONFIG >& /dev/null
+                 ./dsys delete $SESSION_CONFIG >& /dev/null
               endif
            else
               flog $LogHost ls -lR $InstBase
@@ -923,10 +923,10 @@ QUALIFY:
    if (`expr "$tCfg" : '.*@.*'` > 0) then
       set Alias = `expr "$tCfg" : '.*@\(.*\)'`
       set tCfg  = `expr "$tCfg" : '\(.*\)@.*'`
-      setenv PACT_CONFIG $Alias
+      setenv SESSION_CONFIG $Alias
    
    else if ($MultiConfig == yes) then
-      setenv PACT_CONFIG $UHost+$tCfg
+      setenv SESSION_CONFIG $UHost+$tCfg
    endif
 
    return

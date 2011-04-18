@@ -13,8 +13,7 @@ unalias *
 @ err = 0
 
 set MngDir = $cwd
-set CfgMan = $MngDir/cfgman
-setenv System  `$CfgMan use`
+setenv System  `../scripts/cfgman use`
 
 set Base    = $MngDir:h
 set BaseDev = $Base/dev

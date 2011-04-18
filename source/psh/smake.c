@@ -642,7 +642,7 @@ static int setup_env(statedes *st, char *src)
     p = pop_path(st->root);
 
 /* setup the architecture string */
-    p = getenv("PACT_CONFIG");
+    p = getenv("SESSION_CONFIG");
     if (p != NULL)
        {strncpy(st->sys, p, MAXLINE);
 	st->sys[MAXLINE-1] = '\0';}

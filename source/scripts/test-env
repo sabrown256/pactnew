@@ -94,7 +94,7 @@ setenv ZeroSpace  "-z 2"
    setenv RootDir  $cwd
    popd >& /dev/null
 
-   setenv System    `$RootDir/manager/cfgman use`
+   setenv System    `$RootDir/scripts/cfgman use`
    setenv BuildDir  $RootDir/dev/$System
    setenv SrcDir    $RootDir/$Package
 

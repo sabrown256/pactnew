@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb_int.h"
+#include "pdb.h"
 
 #define DATFILE "nat"
 
@@ -39,10 +39,6 @@ static long
  ls_r,
  la_w[N_INT],
  la_r[N_INT];
-
-static char_8
- chrs_r[10],
- chrs_w[10];
 
 static float
  fs_w,
@@ -151,20 +147,6 @@ static void prep_test_1_data(void)
         {da_w[i] = POW(ds_w, (double) (i+1));
          da_r[i] = 0.0;};
 
-    strcpy(chrs_w[0], "foo");
-    strcpy(chrs_w[1], "bar");
-    strcpy(chrs_w[2], "baz");
-    strcpy(chrs_w[3], "blat");
-    strcpy(chrs_w[4], "tar fu");
-    strcpy(chrs_w[5], "fu baba");
-    memset(chrs_w[6], 0, 8);
-    memset(chrs_w[7], 0, 8);
-    memset(chrs_w[8], 0, 8);
-    memset(chrs_w[9], 0, 8);
-
-    for (i = 0; i < 10; i++)
-        memset(chrs_r[i], 0, 8);
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -174,8 +156,6 @@ static void prep_test_1_data(void)
 
 static void write_test_1_data(PDBfile *strm)
    {
-
-    PD_write(strm, "chrs(10)", "char_8", chrs_w);
 
 /* write scalars into the file */
     PD_write_as(strm, "ss", "short",   "int8",  &ss_w);
@@ -198,8 +178,6 @@ static void write_test_1_data(PDBfile *strm)
 
 static void read_test_1_data(PDBfile *strm)
    {
-
-    PD_read(strm, "chrs", chrs_r);
 
 /* read the scalar data from the file */
     PD_read_as(strm, "ss", "short",   &ss_r);
@@ -283,19 +261,6 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
        PRINT(fp, "Scalars differ\n");
     err_tot &= err;
 
-/* compare char_8 array */
-    err = TRUE;
-    for (i = 0; i < 10; i++)
-        err &= (strncmp(chrs_w[i], chrs_r[i], 8) == 0);
-
-    if (err)
-       PRINT(fp, "Char_8 arrays compare\n");
-    else
-       PRINT(fp, "Char_8 arrays differ\n");
-    err_tot &= err;
-
-    err = TRUE;
-
 /* compare short array */
     for (i = 0; i < N_INT; i++)
         err &= (sa_r[i] == sa_w[i]);
@@ -348,7 +313,6 @@ static int test_1(char *base, char *tgt, int n)
 
     PD_defix(strm, "int8", 1, 1, NORMAL_ORDER);
     PD_defix(strm, "int40", 5, 4, REVERSE_ORDER);
-    PD_defncv(strm, "char_8", 8, 1);
 
     PD_defloat(strm, "fp8", 1L, 1, ord_int8, 2L, 5L, 5L, 6L, 0L, 0L, 1L);
     PD_defloat(strm, "fp24", 3L, 4, ord_int24, 7L, 16L, 0L, 1L, 8L, 0L, 0x3FL);

@@ -578,9 +578,6 @@ PDBfile *PA_open(char *name, char *mode, int flag)
     PD_set_major_order(fp, COLUMN_MAJOR_ORDER);
     PD_set_offset(fp, PA_get_default_offset());
 
-/* always add the character*8 type of FORTRAN */
-    PD_defncv(fp, SC_CHAR_8_S, 8, 1);
-
 /* not all packages have been defined so this will miss structs for
  * any future packages if called to early
  * go get any special structures defined for the dump

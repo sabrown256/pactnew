@@ -111,7 +111,7 @@ object *by_config(char *dr)
 		  dr);
     cfg = sprintf("%s", list_ref(syscmnd(cmd), 0));
     sys = lasttok(sprintf("%s", cfg), " \t\n");
-    rv  = list(sys, "PACT_CONFIG", dr);
+    rv  = list(sys, "SESSION_CONFIG", dr);
 
     return(rv);}
 
@@ -142,7 +142,7 @@ object *by_host(char *host)
          if (not(sys))
 	    sys = hostsystem(hst);
 
-         ent = list(sys, "PACT_CONFIG", cfg);
+         ent = list(sys, "SESSION_CONFIG", cfg);
          rv  = cons(ent, rv);};
 
     return(rv);}
@@ -195,7 +195,7 @@ char *make_log_file_name(char *sys, char *cmd)
     if (pairp(sys))
        {n = length(sys);
         for (i = 1; i < n; i += 2)
-            {if (sys[i] == "PACT_CONFIG")
+            {if (sys[i] == "SESSION_CONFIG")
                 {cfg = sys[i+1];
 	         break;};};
         if (cfg == NULL)
@@ -216,7 +216,7 @@ char *make_log_file_name(char *sys, char *cmd)
     else
        log = "unknown";
 
-    arch = car(syscmnd(sprintf("./cfgman use")));
+    arch = car(syscmnd(sprintf("../scripts/cfgman use")));
     path = sprintf("../dev/%s/log/%s", arch, log);
 
     return(path);}
@@ -245,14 +245,14 @@ void remove_log_files(object *hsts)
 	 cfg = NULL;
 	 if (pairp(sys))
             {n = length(sys);
-	     if ((2 < n) && (sys[1] == "PACT_CONFIG"))
+	     if ((2 < n) && (sys[1] == "SESSION_CONFIG"))
 		cfg = sys[2];
 	     else
 	        cfg = sys[0];}
 	 else
 	    cfg = sys;
 
-	 arch = car(syscmnd(sprintf("./cfgman use")));
+	 arch = car(syscmnd(sprintf("../scripts/cfgman use")));
 
 /* now remove the log files */
 	 path = sprintf("../dev/%s/log/build", arch);
@@ -278,7 +278,7 @@ void remove_log_files(object *hsts)
 char *command(char *s)
    {char *t;
 
-    t = sprintf("source ../dev/`../manager/cfgman use`/include/env-pact.csh ; %s", s);
+    t = sprintf("source ../dev/`../scripts/cfgman use`/include/env-pact.csh ; %s", s);
     printf(stdout, "   %s\n", t);
 
     return(t);}

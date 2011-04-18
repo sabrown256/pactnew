@@ -14,7 +14,7 @@ set Which = "$cwd/pwhich"
 set Exe   = `$Which toby`
 
 if (-x "$Exe") then
-   set Arch = `./cfgman use`
+   set Arch = `../scripts/cfgman use`
    set Base = $cwd:h
    set Root = $Base/dev/$Arch/lib
    set Libs = `ls $Root`

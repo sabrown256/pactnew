@@ -100,7 +100,7 @@ setenv AbsoluteOpt    FALSE
 setenv CROSS_COMPILE  FALSE
 
 setenv MngDir   $cwd
-setenv CfgMan   $MngDir/cfgman
+setenv CfgMan   $ScrDir/cfgman
 setenv System   `$CfgMan use`
 setenv CfgDir   cfg-$System
 setenv RootDir  $Base/dev/$System

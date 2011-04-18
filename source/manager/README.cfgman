@@ -11,7 +11,7 @@ I) Introduction
 
 On some platforms it is sometimes convenient to have multiple
 versions of PACT built simultaneously from one set of sources.
-For example, comparing two compilers.  With the aid of a new
+For example, comparing two compilers.  With the aid of the
 script called cfgman, this is now possible to do.
 
 II) Overview
@@ -28,15 +28,13 @@ hardware/OS platform as identified by 'system-id'.
 III) CFGMAN
 
 The script pact/manager/cfgman maintains a database of configurations
-for a set of sources.  The database file is pact/dev/cfgdb.  The
+for a set of sources.  The database is in pact/dev/.pc-$arch.  The
 operations which cfgman performs on the database are:
 
     add    - add a configuration to the database
     delete - remove a configuration from the database
-    first  - return the first configuration for the current architecture
-    use    - return the effective config designation for builds
     list   - return all configurations for the current architecture
-    alias  - set or unset alias for the first configuration
+    use    - return the effective config designation for builds
   
 All of this interacts with various dsys targets as follows:
 

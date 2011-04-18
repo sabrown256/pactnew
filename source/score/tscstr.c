@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "score_int.h"
+#include "score.h"
 
 #define MAX 32
 

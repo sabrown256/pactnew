@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
     status = 0;
 
-    /* Open a file so we have a standard */
+/* open a file so we have a standard */
     file = PD_open(DENORM_FILE, "w");
 
     if (file == NULL)

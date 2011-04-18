@@ -107,7 +107,7 @@ while ($#argv > 0)
            breaksw
       case -e:
            shift
-           setenv PACT_CONFIG "$1"
+           setenv SESSION_CONFIG "$1"
            breaksw
       case -f:
            shift
@@ -222,7 +222,7 @@ if ("$Base" == "") then
    set Base = $cwd
 endif
 
-set arch    = `$Base/manager/cfgman use`
+set arch    = `$Base/scripts/cfgman use`
 set Root    = $Base/dev/$arch
 set CFDFile = $Root/include/configured
 set FORPACT = $Root/bin/for-pact
@@ -396,7 +396,7 @@ SETUP_PARALLEL:
 
 DO_PARALLEL_MASTER:
 
-   setenv PACT_CONFIG "$arch"
+   setenv SESSION_CONFIG "$arch"
 
    if ("$Directories" == "") then
       cd .. >& /dev/null
@@ -483,7 +483,7 @@ ProcLoop:
                set Job = ( $FORPACT )
                set Job = ( $Job -na $NAttempts,$Delay )
                set Job = ( $Job -l $hout )
-               set Job = ( $Job -e $PACT_CONFIG )
+               set Job = ( $Job -e $SESSION_CONFIG )
                set Job = ( $Job -p $m )
                set Job = ( $Job -a $Base $Dir $n $MPId $HostName $HInd +a)
                set Job = ( $Job $Cmmnd )
@@ -570,17 +570,17 @@ DO_PACKAGE:
 
       call HANDLE_ENV($LogFile)
 
-      Note $LogFile "FOR-PACT: PACT_CONFIG = |$PACT_CONFIG|"
-      Note $LogFile "FOR-PACT: Arch        = |$arch|"
-      Note $LogFile "FOR-PACT: LogFile     = |$LogFile|"
-      Note $LogFile "FOR-PACT: CWD         = |$cwd|"
-      Note $LogFile "FOR-PACT: Base        = |$Base|"
-      Note $LogFile "FOR-PACT: Dir         = |$Dir|"
-      Note $LogFile "FOR-PACT: ProcN       = |$ProcN|"
-      Note $LogFile "FOR-PACT: NameSeed    = |$NameSeed|"
-      Note $LogFile "FOR-PACT: HostName    = |$HostName|"
-      Note $LogFile "FOR-PACT: Master      = |$Master|"
-      Note $LogFile "FOR-PACT: PIndx       = |$PIndx|"
+      Note $LogFile "FOR-PACT: SESSION_CONFIG = |$SESSION_CONFIG|"
+      Note $LogFile "FOR-PACT: Arch           = |$arch|"
+      Note $LogFile "FOR-PACT: LogFile        = |$LogFile|"
+      Note $LogFile "FOR-PACT: CWD            = |$cwd|"
+      Note $LogFile "FOR-PACT: Base           = |$Base|"
+      Note $LogFile "FOR-PACT: Dir            = |$Dir|"
+      Note $LogFile "FOR-PACT: ProcN          = |$ProcN|"
+      Note $LogFile "FOR-PACT: NameSeed       = |$NameSeed|"
+      Note $LogFile "FOR-PACT: HostName       = |$HostName|"
+      Note $LogFile "FOR-PACT: Master         = |$Master|"
+      Note $LogFile "FOR-PACT: PIndx          = |$PIndx|"
 
       Note $LogFile "Doing $Cmmnd in directory $Dir ($HostInd $ProcN)"
 

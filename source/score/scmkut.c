@@ -301,7 +301,7 @@ static int setup_env(char *src, anadep *state)
        SC_strncpy(state->root, PATH_MAX, p, PATH_MAX);
 
 /* setup the architecture string */
-    p = getenv("PACT_CONFIG");
+    p = getenv("SESSION_CONFIG");
     if (p != NULL)
        snprintf(state->arch, MAXLINE, "z-%s", p);
     else
