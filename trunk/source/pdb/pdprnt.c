@@ -488,7 +488,6 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     int id, ifx, ifp, icx;
     long offset, i, j;
     char bf[MAXLINE], s[MAXLINE];
-    char *cp, **t;
     defstr *pd;
     FILE *f0;
     char *prefix, *before, *nodename;
@@ -535,24 +534,6 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     else if (pd->convert >= 0)
        {if ((ifx = SC_fix_type_id(type, FALSE)) != -1)
 	   _PD_disp_data(prnt, vr, ni, ifx, n, ind);
-
-/* GOTCHA: This is a feeble first step toward a generalized
- *         print capability for user defined types
- */
-	else if (id == SC_CHAR_8_I)
-	   {if (SC_strstr(_SC.types.formats[SC_INT_I], "%s") != NULL)
-	       {cp = (char *) vr;
-		t  = CMAKE_N(char *, ni);
-		for (i = 0; i < ni; i++, cp += isz)
-		    {t[i] = CMAKE_N(char, isz + 1);
-		     memcpy(t[i], cp, isz);
-		     t[i][isz] = '\0';};
-		_PD_disp_data(prnt, t, ni, SC_BIT_I, n, ind);
-		for (i = 0; i < ni; i++)
-		    CFREE(t[i]);
-		CFREE(t);}
-	    else
-	       _PD_disp_data(prnt, vr, isz*ni, 0, n, ind);}
 
 	else if (id == SC_BOOL_I)
 	  _PD_disp_data(prnt, vr, ni, SC_BOOL_I, n, ind);

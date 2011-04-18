@@ -11,7 +11,7 @@
 unalias *
 
 set err  = 0
-set arch = `cfgman use`
+set arch = `../scripts/cfgman use`
 
 source ../scripts/env-csh
 

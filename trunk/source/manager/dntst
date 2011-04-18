@@ -97,8 +97,8 @@ switch ($Phase)
         end
 
 	if ($MultiConfig == yes) then
-           setenv PACT_CONFIG $UHost-$Cfg
-           Note $LogHost "Using multiconfig name $PACT_CONFIG"
+           setenv SESSION_CONFIG $UHost-$Cfg
+           Note $LogHost "Using multiconfig name $SESSION_CONFIG"
         endif
 
         flog $LogHost cd $WrkDir
@@ -134,7 +134,7 @@ switch ($Phase)
 
         call QUALIFY()
 
-        set arch   = `../cfgman use`
+        set arch   = `../../scripts/cfgman use`
         set DevDir = $WrkDir/dev/$arch
 
         mkdir -p $DevDir
@@ -167,14 +167,14 @@ switch ($Phase)
            source $EnvCsh
         endif
         if ($MultiConfig == yes) then
-           Note $LogHost "   Using MultiConfig with PACT_CONFIG = |$PACT_CONFIG|"
+           Note $LogHost "   Using MultiConfig with SESSION_CONFIG = |$SESSION_CONFIG|"
         endif
 
         set IErr = 0
 
         if ($MultiConfig == yes) then
-           setenv PACT_CONFIG $UHost-$Cfg
-           Note $LogHost "  Multiconfig name: $PACT_CONFIG"
+           setenv SESSION_CONFIG $UHost-$Cfg
+           Note $LogHost "  Multiconfig name: $SESSION_CONFIG"
         endif
 
         flog $LogHost $RM $Passed
@@ -330,7 +330,7 @@ switch ($Phase)
            if ($xstatus == 0) then
               flog $LogHost setenv Err  OK
               if ($MultiConfig == yes) then
-                 Note $LogHost ./dsys delete $PACT_CONFIG
+                 Note $LogHost ./dsys delete $SESSION_CONFIG
               endif
            else
               flog $LogHost setenv Err  FAILED
@@ -431,7 +431,7 @@ GET_HOST_ARG:
 QUALIFY:
 
    if ($MultiConfig == yes) then
-      setenv PACT_CONFIG $UHost-$Cfg
+      setenv SESSION_CONFIG $UHost-$Cfg
    endif
 
    return

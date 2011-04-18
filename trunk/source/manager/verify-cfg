@@ -6,7 +6,7 @@
 
 unalias *
 
-set Arch = `./cfgman use`
+set Arch = `../scripts/cfgman use`
 set Base = ""
 set Err  = 0
 

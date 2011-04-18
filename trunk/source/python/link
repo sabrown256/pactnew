@@ -32,7 +32,7 @@ while ($#argv > 0)
 end
 
 @ Err    = 0
-set Arch = `../manager/cfgman use`
+set Arch = `../scripts/cfgman use`
 
 InitLog Log $cwd/z-$Arch/obj/log.load
 

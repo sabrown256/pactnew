@@ -31,7 +31,7 @@ if ("$lst" == "") then
 endif
 
 set path = ( /usr/gapps/pact/scripts $path )
-set arch = `../manager/cfgman use`
+set arch = `../scripts/cfgman use`
 
 source ../dev/$arch/include/env-csh
 

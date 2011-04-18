@@ -1337,9 +1337,9 @@ static void default_var(char *base)
 
 /* check variables which may have been initialized from the command line */
     if (IS_NULL(st.system) == TRUE)
-       strncpy(st.system, run(BOTH, "%s/cfgman use", st.dir.mng), MAXLINE);
+       strncpy(st.system, run(BOTH, "%s/cfgman use", st.dir.scr), MAXLINE);
 
-    dbinitv(NULL, "CfgMan",        "%s/cfgman", run(BOTH, "pwd"));
+    dbinitv(NULL, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(NULL, "Globals",       "");
     dbinitv(NULL, "MngDir",        st.dir.mng);
     dbinitv(NULL, "InstBase",      "none");

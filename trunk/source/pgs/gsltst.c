@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pgs_int.h"
+#include "pgs.h"
 
 #define N 50
 
@@ -39,10 +39,12 @@ static void draw_set_1(double *x, double *y,
     PG_turn_grid(PS_dev, OFF);
     PG_turn_grid(CGM_dev, OFF);
 
-    _PG_gattrs.plot_labels = TRUE;
+    PG_set_attrs_glb(TRUE,
+		     "plot-labels", TRUE,
+		     "axis-tick-type", AXIS_TICK_RIGHT,
+		     NULL);
 
 /* picture #1 */
-    _PG_gattrs.axis_tick_type = AXIS_TICK_RIGHT;
     data->info = PG_set_line_info(data->info, PLOT_CARTESIAN, CARTESIAN_2D,
 				  DASHED, FALSE, 0, 4, 0, 0.0);
     PG_draw_graph(SCR_dev, data);
@@ -66,8 +68,11 @@ static void draw_set_1(double *x, double *y,
     PG_draw_graph(CGM_dev, data);
     SC_pause();
 
+    PG_set_attrs_glb(TRUE,
+		     "axis-tick-type", AXIS_TICK_LEFT,
+		     NULL);
+
 /* picture #4 */
-    _PG_gattrs.axis_tick_type = AXIS_TICK_LEFT;
     data->info = PG_set_line_info(data->info, PLOT_HISTOGRAM, CARTESIAN_2D,
 				  LINE_SOLID, FALSE, 0, 4, 0, 0.0);
     PG_draw_graph(SCR_dew, data);
@@ -100,10 +105,12 @@ static void draw_set_2(double *x, double *y,
     PG_turn_grid(PS_dev, ON);
     PG_turn_grid(CGM_dev, ON);
 
-    _PG_gattrs.plot_labels = FALSE;
+    PG_set_attrs_glb(TRUE,
+		     "plot-labels", FALSE,
+		     "axis-tick-type", AXIS_TICK_RIGHT,
+		     NULL);
 
 /* picture #5 */
-    _PG_gattrs.axis_tick_type = AXIS_TICK_RIGHT;
     data->info = PG_set_line_info(data->info, PLOT_HISTOGRAM, CARTESIAN_2D,
 				  LINE_SOLID, FALSE, 0, 5, 1, 0.0);
     PG_draw_graph(SCR_dev, data);
@@ -127,8 +134,11 @@ static void draw_set_2(double *x, double *y,
     PG_draw_graph(CGM_dev, data);
     SC_pause();
 
+    PG_set_attrs_glb(TRUE,
+		     "axis-tick-type", AXIS_TICK_LEFT,
+		     NULL);
+
 /* picture #8 */
-    _PG_gattrs.axis_tick_type = AXIS_TICK_LEFT;
     data->info = PG_set_line_info(data->info, PLOT_CARTESIAN, CARTESIAN_2D,
 				  LINE_SOLID, FALSE, 0, 5, 0, 0.0);
     PG_draw_graph(SCR_dew, data);

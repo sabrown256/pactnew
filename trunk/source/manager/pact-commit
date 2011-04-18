@@ -45,7 +45,7 @@ set OS        = `uname -s | tr "[A-Z]" "[a-z]"`
 
 set VersionID = `code-date`
 set HelpCode  = $MngDir/$0
-set CfgMan    = $MngDir/cfgman
+set CfgMan    = $ScrDir/cfgman
 
 setenv System  `$CfgMan use`
 

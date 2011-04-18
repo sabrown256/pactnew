@@ -34,9 +34,8 @@ set RootDir  = $Base/dev
 set PBase    = $Base:h
 set PBase    = $PBase:h
 set PRootDir = $PBase/dev
-set MgrDir   = $PBase/manager
 
-set System   = `$MgrDir/cfgman use`
+set System   = `$PBase/scripts/cfgman use`
 set RootDir  = $RootDir/$System
 set BinDir   = $RootDir/bin
 set IncDir   = $RootDir/include
@@ -75,8 +74,8 @@ cd $TstDir
 rm -f $Log
 touch $Log
 
-Note $Log `$MgrDir/pwhich pact`
-Note $Log `$MgrDir/pwhich cc`
+Note $Log `where pact | head -n 1`
+Note $Log `where cc | head -n 1`
 Note $Log "BinDir = $BinDir"
 
 set Tmp = $cwd/.tmp.$$

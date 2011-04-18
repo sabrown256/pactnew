@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pml_int.h"
+#include "pml.h"
 
 /* number of test matrices to run */
 #define NM 3

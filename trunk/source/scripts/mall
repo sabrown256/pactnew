@@ -83,16 +83,12 @@ switch ($md)
 
    case config:
         set syst = `system-id`
-        set sysc = `cpu -r`
         if (-f ../dev/.pc-$syst) then
            set clst = ( `cat ../dev/.pc-$syst` )
-           set var  = PACT_CONFIG
-        else if (-f ../dev/.mc-$sysc) then
-           set clst = ( `cat ../dev/.mc-$sysc` )
            set var  = SESSION_CONFIG
         else
            set clst = $syst
-           set var  = PACT_CONFIG
+           set var  = SESSION_CONFIG
         endif
 
         if ($?SHELL == 1) then

@@ -704,8 +704,8 @@ void print_html(FILE *fp)
             align[I_CHAR], CHAR_MIN, CHAR_MAX);
 
 /* wchar */
-     fprintf(fp, "<TR ALIGN=RIGHT><TD>Wchar</TD><TD>1</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",
-            align[I_WCHAR], WCHAR_MIN, WCHAR_MAX);
+     fprintf(fp, "<TR ALIGN=RIGHT><TD>Wchar</TD><TD>1</TD><TD>%d</TD><TD>%ld</TD><TD>%ld</TD></TR>\n",
+            align[I_WCHAR], (long) WCHAR_MIN, (long) WCHAR_MAX);
 
 /* int8_t */
      fprintf(fp, "<TR ALIGN=RIGHT><TD>Int8_t</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD></TR>\n",

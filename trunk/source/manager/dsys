@@ -50,7 +50,7 @@ limit stacksize unlimited >& /dev/null
 unset System
 unsetenv System
 
-set CfgMan = $MngDir/cfgman
+set CfgMan = $ScrDir/cfgman
 
 setenv System  `$CfgMan use`
 setenv PACTVer `cat $MngDir/.pact-version`
@@ -285,7 +285,7 @@ switch ($Cmnd)
            flog $Log $DSYS linstall
            flog $Log pushd ..
 
-           flog $Log setenv PACT_CONFIG $System
+           flog $Log setenv SESSION_CONFIG $System
            flog $Log setenv PACTRoot $cwd
 
            flog $Log setenv  SC_EXEC_SERVER_WAIT     300
@@ -448,7 +448,7 @@ switch ($Cmnd)
            NoteD $Log "Linking PACT on $Host ..."
 
            flog $Log pushd ..
-           flog $Log setenv PACT_CONFIG $System
+           flog $Log setenv SESSION_CONFIG $System
            flog $Log setenv PACTRoot $cwd
 
            flog $Log setenv  SC_EXEC_SERVER_WAIT     300
@@ -1160,11 +1160,9 @@ CFG_DONE:
         while ($#argv > 0)
            switch ($1)
               case -a:
-                   set Lst = ( `$CfgMan list` )
-                   echo -n "Configuration list:    "
-                   echo "$Lst"
-                   echo -n "Current configuration: "
-                   echo "$Lst[1]"
+                   set inf = ( `$CfgMan list` )
+                   echo "Configuration list:    $inf"
+                   echo "Current configuration: `$CfgMan use`"
                    echo -n "Current config file:   "
                    head -n 1 $IncDir/configured | awk '{ print $3 }'
                    echo ""
@@ -1904,7 +1902,7 @@ CFG_DONE:
 
         InitLog LogFile $LogDir/rebuild
 
-        flog $LogFile setenv PACT_CONFIG $Cfg
+        flog $LogFile setenv SESSION_CONFIG $Cfg
         flog $LogFile source $BaseDev/$Cfg/include/env-pact.csh
 
         NoteD $LogFile -n "   Re-compiling ... "

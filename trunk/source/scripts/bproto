@@ -10,8 +10,7 @@
 
 unalias *
 
-pushd ../manager >& /dev/null
-set arch  = `cfgman use`
+set arch  = `../scripts/cfgman use`
 popd >& /dev/null
 
 set err = 0

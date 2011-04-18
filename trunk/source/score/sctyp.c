@@ -109,12 +109,11 @@ int
  SC_COMPLEX128_P_I          = 31,
 
  SC_VOID_I                  = 33,
- SC_CHAR_8_I                = 34,
- SC_STRUCT_I                = 35,
- SC_PCONS_I                 = 36,
- SC_PROCESS_I               = 37,
- SC_FILE_I                  = 38,
- SC_PCONS_P_I               = 39,
+ SC_STRUCT_I                = 34,
+ SC_PCONS_I                 = 35,
+ SC_PROCESS_I               = 36,
+ SC_FILE_I                  = 37,
+ SC_PCONS_P_I               = 38,
 
 /* aliases */
  SC_ENUM_I                  = 7,
@@ -180,7 +179,6 @@ char
  *SC_COMPLEX128_P_S          = "float128_t *",
 
  *SC_VOID_S                  = "void",
- *SC_CHAR_8_S                = "char_8",
  *SC_STRUCT_S                = "struct",
  *SC_PCONS_S                 = "pcons",
  *SC_PROCESS_S               = "PROCESS",
@@ -775,7 +773,6 @@ void SC_init_base_types(void)
        SC_QUATERNION_P_I          = SC_type_register(SC_QUATERNION_P_S,          KIND_POINTER, szptr, 0);
 
        SC_VOID_I                  = SC_type_register(SC_VOID_S,     KIND_OTHER,   0,               0);
-       SC_CHAR_8_I                = SC_type_register(SC_CHAR_8_S,   KIND_CHAR,    sizeof(char),    0);
        SC_STRUCT_I                = SC_type_register(SC_STRUCT_S,   KIND_STRUCT,  0,               0);
        SC_PCONS_I                 = SC_type_register(SC_PCONS_S,    KIND_STRUCT,  sizeof(pcons),   0);
        SC_PROCESS_I               = SC_type_register(SC_PROCESS_S,  KIND_STRUCT,  sizeof(PROCESS), 0);
