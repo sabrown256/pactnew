@@ -91,35 +91,32 @@ while ($#argv > 0)
 end
 
 # settle on the root database directory
-if ("$dbdir" == "") then
-   if ($?CFGMAN_DB == 1) then
-      set dbdir = $CFGMAN_DB
-   else
-      set DB  = $SGN-$Arch
-      set lwd = $cwd
-      @ nd    = 10
-      @ i     = 0
-      while ($i < $nd)
-         if ((-d dev) && (-e dev/$DB)) then
-            set dbdir = $cwd/dev
-            break
-         endif
-         cd .. >& /dev/null
-         @ i = $i + 1
-      end
-      cd $lwd
-      unset lwd
-   endif
+set DB = $SGN-$Arch
+if ("$dbdir" != "") then
+   set DB = $dbdir/$DB
+else if ($?CFGMAN_DB == 1) then
+   set DB = $CFGMAN_DB/$DB
+else
+   set lwd = $cwd
+   @ nd = 10
+   @ i  = 0
+   while ($i < $nd)
+      if (-d dev) then
+         set DB = $cwd/dev/$DB
+         break
+      endif
+      cd .. >& /dev/null
+      @ i = $i + 1
+   end
+   cd $lwd
+   unset lwd
 endif
 
-if ("$dbdir" == "") then
+if ("$DB" !~ /*) then
    echo "CFGMAN: no database directory found"
    exit(112)
-endif
 
-set DB = $dbdir/$SGN-$Arch
-
-if (!(-d $DB)) then
+else if (!(-d $DB)) then
    mkdir -p $DB
    chmod 2770 $DB >& /dev/null
 endif

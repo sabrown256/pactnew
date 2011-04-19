@@ -14,15 +14,16 @@ LibName=pdb
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs}
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${CDebug} -I. -I${IncDir} ${MDInc}
-FcFlags = ${FDebug}
-LdFlags = -L${LibDir} ${LDFLAGS}
+CcFlags  = ${ODC} -I. -I${IncDir} ${MDInc}
+LdFlags  = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)

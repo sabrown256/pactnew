@@ -107,7 +107,7 @@ void _SC_setup_output(jobinfo *inf, char *name)
 
 void _SC_process_output(int fd, int mask, void *a)
    {int i, n;
-    long nb;
+    long nb, nr;
     char s[MAX_BFSZ+1];
     char *ps;
     PROCESS *pp;
@@ -140,9 +140,10 @@ void _SC_process_output(int fd, int mask, void *a)
 
 /* something is wrong if we read no characters because we were called
  * following a poll which said we had characters to read
+ * NOTE: not any more - this is called from other places too
  */
-		     nb = pp->n_read - nb;
-		     if (nb == 0)
+		     nr = pp->n_read - nb;
+		     if (nr == 0)
 		        _SC_rejected_process(as, state, job, mask);
 		     else
 		        job->nzip = 0;
@@ -684,7 +685,7 @@ int SC_exec_async_h(char *shell, char **env,
 
 static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 		    char **env, int to, int na, int dbg)
-   {int ns, rv, ioi, sto, st;
+   {int ns, rv, ioi, sto, st, nf;
     char *cwd;
     SC_evlpdes *pe;
     taskdesc *job;
@@ -692,6 +693,8 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     parstate state;
     PFSignal_handler osi;
     conpool *cpo;
+
+    nf = SC_gs.assert_fail;
 
     as  = NULL;
     cpo = _SC_async_state.pool;
@@ -735,7 +738,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 
 	rv = SC_event_loop(pe, &state, DEFAULT_WAIT);
 	ns = SC_array_string_append(out, job->inf.out);
-	SC_ASSERT(ns != 0);
+	SC_ASSERT(ns >= 0);
 
 	state.free_tasks(&state);};
 
@@ -761,6 +764,10 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 
     _SC_async_state.pool      = cpo;
     _SC_async_state.to_stdout = sto;
+
+    nf = SC_gs.assert_fail - nf;
+    if (nf > 0)
+       state.print(&state, "***> %d internal assertions violated", nf);
 
     return(rv);}
 

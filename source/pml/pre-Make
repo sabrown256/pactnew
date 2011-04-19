@@ -14,15 +14,17 @@ LibName=pml
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs}
 
+OD = DefaultO
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${COptimize} -I${IncDir} ${MDInc}
+CcFlags = ${ODC} -I${IncDir} ${MDInc}
 FcFlags =
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)

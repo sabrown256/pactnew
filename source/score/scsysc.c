@@ -1460,7 +1460,7 @@ static int _SC_do_command(taskdesc *job, asyncstate *as, int it)
 /* anything else is a command that must be exec'd one way or the other */
 	else
 	   {rv = _SC_cmnd_exec(job, as, sub);
-	    SC_ASSERT(rv == 0);
+	    SC_ASSERT(rv == TRUE);
 	    done = FALSE;};
 
 	_SC_incr_task_count(job, 1, done);
@@ -1943,8 +1943,9 @@ static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
 
 	if (launch == TRUE)
 	   {ok = job->launch(job, as);
+	    SC_ASSERT(ok == TRUE);
 	    if (ok == FALSE)
-	       {CFREE(job);};}
+	       CFREE(job);}
 	else
 	   _SC_setup_output(inf, "_SC_START_JOB");
 
@@ -1958,7 +1959,7 @@ static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
 /* _SC_CLOSE_JOB_PROCESS - close the current process of the JOB properly */
 
 static int _SC_close_job_process(taskdesc *job, int setst)
-   {int rtry;
+   {int rtry, ok;
     char *p;
     PROCESS *pp;
     jobinfo *inf;
@@ -1988,7 +1989,8 @@ static int _SC_close_job_process(taskdesc *job, int setst)
 		if (state != NULL)
 		   SC_remove_event_loop_callback(state->loop, SC_PROCESS_I, pp);
 
-		SC_close(pp);};
+		ok = SC_close(pp);
+		SC_ASSERT(ok == TRUE);};
 
 	    job->pp = NULL;
 

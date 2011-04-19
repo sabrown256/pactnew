@@ -18,14 +18,16 @@ TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
 
 MMLib = ${LibDir}/libpsmm.a
 
+OD = DefaultO
+
 #
 # Compiler/Loader Options
 #
-CcFlags = ${COptimize} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
-FcFlags = ${FDebug} -mp
+CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
+FcFlags = ${ODF}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 #
 # Files to Save for Backup (make save)
@@ -369,7 +371,7 @@ ${BinDir}/sctrts : ${TGTLib} sctrts.c
 fha : ${BinDir}/schtst
 
 ${BinDir}/schtst : schtst.f ${TGTLib} ${Hdrs}
-	${FC} ${FDebug} ${PACTTmpDic}/schtst.o -o ${BinDir}/schtst ${Libs}
+	${FC} ${FcFlags} ${PACTTmpDic}/schtst.o -o ${BinDir}/schtst ${Libs}
 
 #
 # resource usage test
@@ -385,7 +387,7 @@ ${BinDir}/scrsts : ${TGTLib} scrsts.c
 omp : ${BinDir}/scompt
 
 ${BinDir}/scompt : scompt.f ${TGTLib} ${Hdrs}
-	${FC} ${FDebug} ${PACTTmpDic}/scompt.o -o ${BinDir}/scompt ${Libs}
+	${FC} ${FcFlags} ${PACTTmpDic}/scompt.o -o ${BinDir}/scompt ${Libs}
 
 #
 # io file test

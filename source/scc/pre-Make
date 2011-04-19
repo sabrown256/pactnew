@@ -13,13 +13,15 @@ TGTLib = ${LibDir}/lib${LibName}.a
 TGTExe = ${BinDir}/scc
 TGTInc = scc.h scc_int.h
 
+OD = DefaultO
+
 # Compiler/Loader Options
 UniFlags =
-CcFlags = ${COptimize} -I. -I../.. -I${IncDir} ${MDInc}
+CcFlags = ${ODC} -I. -I../.. -I${IncDir} ${MDInc}
 FcFlags =
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 # files to Save for Backup (pact save)
 SaveFiles = *.c *.h *.y *.l

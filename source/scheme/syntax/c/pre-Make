@@ -15,11 +15,13 @@ TGTBin = none
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTScm = csynt.scm
 
+OD = DefaultO
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${COptimize} -I. -I${RootSrc}/scheme -I${PACTSrcDir} -I${IncDir} ${MDInc}
+CcFlags = ${ODC} -I. -I${RootSrc}/scheme -I${PACTSrcDir} -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 #

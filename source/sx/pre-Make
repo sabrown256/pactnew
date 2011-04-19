@@ -28,15 +28,17 @@ TGTScr = applications/pdbview applications/pdbdiff applications/pdbcp
 
 TGTScrX = tpu tzu
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags  = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags  = ${ODC} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags  =
 LdFlags  = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)

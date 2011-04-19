@@ -26,7 +26,9 @@ InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
              ${BinDir}/smake ${BinDir}/elide ${BinDir}/blang
 
-CcFlags = ${CDebug} ${LDRPath}
+OD = DefaultG
+
+CcFlags = ${ODC} ${LDRPath}
 PCC     = ${CCSer}
 #PCC     = cc -g
 

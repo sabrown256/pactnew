@@ -24,12 +24,14 @@ InstallDep = ${Hdrs} ${TGTLib} ${TGTExe}
 BinDep     = ${TGTLib} s.c
 BinObj     = ${TGTLib} s.c
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
 LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
-CcFlags  = ${CDebug} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags  = ${ODC} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
 
 PactLibs = ${LSX} ${LSCHEME} ${LPANACEA} ${LPGS} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLibs}
 SysLibs  = -lmesh -llag \

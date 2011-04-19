@@ -19,11 +19,13 @@ DepLib     =
 InstallDep = ${TGTLib}
 BinDep     = ${TGTLib}
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${CDebug} ${GraphicsFlag} -I${DevInc} -I${IncDir} ${MDGInc}
+CcFlags = ${ODC} ${GraphicsFlag} -I${DevInc} -I${IncDir} ${MDGInc}
 LdFlags = 
 
 #
