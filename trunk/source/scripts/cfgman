@@ -1,14 +1,14 @@
 #!/bin/csh -f
 #
-# CFGMAN - manage PACT code configurations
-#        - With this facility it will be possible to have
+# CFGMAN - manage code configurations
+#        - with this facility it will be possible to have
 #        - multiple versions of the codes configured from a
 #        - single source on a single platform.
-#        - This represents an improvement over the previous
-#        - scheme which permitted only a single configuration
+#        - this represents an improvement over the uname
+#        - based schemes which permitted only a single configuration
 #        - per architecture
 #
-#        - Configuration management is achieved by the following
+#        - configuration management is achieved by the following
 #        - operations:
 #        -
 #        -   add    - add a configuration to the managed database
@@ -22,27 +22,48 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 set Cmnd = $0
 if ("$Cmnd" == "") then
    echo "CFGMAN: bad invocation"
    exit(110)
 endif
 
-unalias *
+# NOTE: this insanity is because under high system loads
+# dirname has returned an empty string which cannot be tolerated
+@ count = 1
+while (1)
+   set ExeRoot = `dirname $Cmnd`
+   if ("$ExeRoot" != "") break
+   if ($count >= 10) then
+      echo "CFGMAN: dirname returned null"
+      exit(111)
+   endif
+   @ count = $count + 1
+   sleep 1
+end
+
+set path = ( $ExeRoot /usr/bin /bin )
+set Arch = `system-id`
 
 set SGN   = .pc
 set ret   = 0
+set dbdir = ""
 set Tgt   = ""
-set LockT = 300
 while ($#argv > 0)
    switch ($1)
+      case -d:
+           shift
+           set dbdir = $1
+           breaksw
       case -h:
            echo ""
-           echo "Usage: cfgman [-h] [-to <#sec>]"
+           echo "Usage: cfgman [-d <dir>] [-h]"
            echo "              add <cfg> | delete <cfg> | list | reconst <host> [<arch>] | use"
            echo ""
+           echo "  d    directory where database lives"
            echo "  h    this help message"
-           echo "  to   number of seconds to wait for requisite locks (default 300)"
            echo ""
            echo "  add      add a configuration to the data base"
            echo "  delete   remove a configuration from the data base"
@@ -57,7 +78,8 @@ while ($#argv > 0)
            breaksw
       case -to:
            shift
-           set LockT = $1
+           breaksw
+      case -*:
            breaksw
       default:
            set Tgt = $1
@@ -68,42 +90,34 @@ while ($#argv > 0)
    shift
 end
 
-@ count = 1
-while (1)
-   set ExeRoot = `dirname $Cmnd`
-   if ("$ExeRoot" != "") break
-   if ($count >= 10) then
-      echo "CFGMAN: dirname returned null"
-      exit(111)
+# settle on the root database directory
+if ("$dbdir" == "") then
+   if ($?CFGMAN_DB == 1) then
+      set dbdir = $CFGMAN_DB
+   else
+      set DB  = $SGN-$Arch
+      set lwd = $cwd
+      @ nd    = 10
+      @ i     = 0
+      while ($i < $nd)
+         if ((-d dev) && (-e dev/$DB)) then
+            set dbdir = $cwd/dev
+            break
+         endif
+         cd .. >& /dev/null
+         @ i = $i + 1
+      end
+      cd $lwd
+      unset lwd
    endif
-   @ count = $count + 1
-   sleep 1
-end
+endif
 
-pushd $ExeRoot >& /dev/null
-set path = ( $ExeRoot $path )
-
-set root   = $cwd:h
-set MngDir = $root/manager
-set ScrDir = $root/scripts
-set PLOCK  = $root/scripts/plock
-set Arch   = `$ScrDir/system-id`
-
-if (-d $MngDir) then
-   set dev = $root/dev
-else
-   echo "CFGMAN: Bad $MngDir"
+if ("$dbdir" == "") then
+   echo "CFGMAN: no database directory found"
    exit(112)
 endif
 
-popd >& /dev/null
-
-set DB      = $dev/$SGN-$Arch
-set LockDir = $DB.lock
-
-if (!(-d $dev)) then
-   mkdir -p $dev
-endif
+set DB = $dbdir/$SGN-$Arch
 
 if (!(-d $DB)) then
    mkdir -p $DB
@@ -116,17 +130,17 @@ endif
 # well as speeding things up
 # if you need to change the database you MUST unset SESSION_CONFIG
 
-if ($?PACT_CONFIG == 1) then
-   if ("$PACT_CONFIG" == "") then
-      echo "CFGMAN: PACT_CONFIG is null"
+if ($?SESSION_CONFIG == 1) then
+   if ("$SESSION_CONFIG" == "") then
+      echo "CFGMAN: SESSION_CONFIG is null"
       exit(113)
    else
       if ($Tgt == add) then
-         set i = $DB/$PACT_CONFIG
+         set i = $DB/$SESSION_CONFIG
          touch $i
          chmod 660 $i >& /dev/null
       endif
-      echo $PACT_CONFIG
+      echo $SESSION_CONFIG
       exit(0)
    endif
 endif
@@ -137,9 +151,6 @@ endif
 # READ_DB - read the existing database
 
 onintr INTERRUPT
-
-# lock the DB
-#   $PLOCK lock -d $LockDir -t $LockT >& /dev/null
 
 # all subsequent work to be done in database directory
    pushd $DB >& /dev/null
@@ -266,26 +277,6 @@ switch ($Tgt)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# HELP - describe cfgman
-
-   case -h:
-   case help:
-        echo " "
-        echo "Usage: cfgman <tgt> [<opt>]"
-        echo " "
-        echo " Targets:"
-        echo "    add     - add the specified configuration"
-        echo "    delete  - delete the specified configuration"
-        echo "    help    - this help message"
-        echo "    list    - list all configurations"
-        echo "    reconst - reconstitute databse from host file"
-        echo "    use     - return the name or alias of the current configuration"
-        echo " "
-        breaksw
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
    default:
         echo "CFGMAN: Unknown operation $1"
         set ret = 1
@@ -293,9 +284,6 @@ switch ($Tgt)
 endsw
 
 INTERRUPT:
-
-# unlock the DB
-#$PLOCK unlock -d $LockDir >& /dev/null
 
 exit($ret)
 
@@ -305,8 +293,8 @@ exit($ret)
 # USE - report the current configuration
 
 USE:
-   if ($?PACT_CONFIG == 1) then
-      set use = $PACT_CONFIG
+   if ($?SESSION_CONFIG == 1) then
+      set use = $SESSION_CONFIG
    else
       set use = "$Arch"
       if (-e current) then
@@ -322,9 +310,6 @@ USE:
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-# unlock the DB
-$PLOCK unlock -d $LockDir >& /dev/null
 
 exit($ret)
 
