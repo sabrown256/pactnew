@@ -21,12 +21,14 @@ TGTB = ${DevBin}/b
 BinDep     = 
 InstallDep = a.c b.c
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
 LdFlags  = -L${DevLib} -L${LibDir} ${LDFLAGS}
-CcFlags  = ${CDebug} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags  = ${ODC} -I${DevInc} -I${IncDir} ${MDInc} ${MDGInc}
 
 #
 # Things upon which install depends (pact install)

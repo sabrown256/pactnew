@@ -24,6 +24,7 @@ if (-d $RootDir/panacea/abc) then
      set xstatus = $status
      flog $LogF popd
    else
+     setenv SESSION_CONFIG `cfgman use`
      flog $LogF pushd $SrcDir/abc/builder
      flog $LogF dsys remove
      flog $LogF dsys config

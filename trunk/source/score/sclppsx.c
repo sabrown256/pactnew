@@ -30,41 +30,51 @@ PROCESS *SC_get_terminal_process(void)
 /* _SC_POSIX_RELEASE - close the file descriptors */
 
 static int _SC_posix_release(PROCESS *pp)
-   {
+   {int rv;
+
+    rv = TRUE;
 
 #ifdef HAVE_PROCESS_CONTROL
 
     if (!SC_process_alive(pp))
-       return(FALSE);
+       rv = FALSE;
 
 #ifdef UNIX
 
-    {int in, out, sts;
+    else
+       {int in, out, sts;
+	int ex, cnd, rsn;
 
-     sts = pp->flags & SC_PROC_IO;
+	sts = pp->flags & SC_PROC_IO;
 
 /* because it is possible to get in here many times with the same process
  * make sure that we do the following only once
  */
-     if (sts == 0)
-        {in  = pp->in;
-	 out = pp->out;
+	if (sts == 0)
+	   {in  = pp->in;
+	    out = pp->out;
 
-	 if (SC_time_allow(1) == 0)
-	    {if (in >= 0)
-	        close(in);
-	     SC_time_allow(0);};
+/* check to see that the process has indeed exited */
+	    if (pp->ischild == FALSE)
+	       {ex = SC_child_status(pp->id, &cnd, &rsn);
+		SC_ASSERT(ex == pp->id);
+	        rv = (ex == pp->id);};
 
-	 if ((in != out) && (out >= 0))
-	    close(out);
+	    if (SC_time_allow(1) == 0)
+	       {if (in >= 0)
+		   close(in);
+		SC_time_allow(0);};
 
-	 SC_process_state(pp, SC_PROC_IO);};};
+	    if ((in != out) && (out >= 0))
+	       close(out);
+
+	    SC_process_state(pp, SC_PROC_IO);};};
 
 #endif
 
 #endif
 
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -365,7 +375,8 @@ static int _SC_posix_close(PROCESS *pp)
     SC_flush(pp);
 
     if (SC_process_alive(pp))
-       {pid = pp->id;
+       {rv  = TRUE;
+	pid = pp->id;
         sts = pp->flags & SC_PROC_SIG;
 
 /* because it is possible to get in here many times with the same process
@@ -385,11 +396,9 @@ static int _SC_posix_close(PROCESS *pp)
 
 /* close the communications pipe */
 	    if (pp->release != NULL)
-	       pp->release(pp);
+	       rv = pp->release(pp);
 
-	    SC_catch_io_interrupts(TRUE);
-
-	    rv = TRUE;};};
+	    SC_catch_io_interrupts(TRUE);};};
 
     return(rv);}
 

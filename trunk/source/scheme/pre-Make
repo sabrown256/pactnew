@@ -18,13 +18,15 @@ TGTScm = applications/runt.scm applications/lang.scm \
          applications/rmath.scm \
          ${SyntaxScheme}
 
+OD = DefaultO
+
 # Compiler/Loader Options
 UniFlags =
-CcFlags = ${COptimize} -I. -I../.. -I${IncDir} ${MDInc}
+CcFlags = ${ODC} -I. -I../.. -I${IncDir} ${MDInc}
 FcFlags =
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${COptimize} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 # files to Save for Backup (pact save)
 SaveFiles = *.c *.h *.scm

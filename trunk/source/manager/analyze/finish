@@ -61,14 +61,17 @@ endif
 set tmp = ($Save_CFLAGS)
 flog $ALog setenv CC_Flags "$tmp"
 
-if ($AbsoluteDeb == TRUE) then
-   flog $Log setenv CC_Optimize "$CC_Debug"
-   flog $Log setenv FC_Optimize "$FC_Debug"
-endif
+flog $Log setenv CDefOptimize "$CC_Optimize"
+flog $Log setenv CDefDebug    "$CC_Debug"
+flog $Log setenv FDefOptimize "$FC_Optimize"
+flog $Log setenv FDefDebug    "$FC_Debug"
 
-if ($AbsoluteOpt == TRUE) then
-   flog $Log setenv CC_Debug "$CC_Optimize"
-   flog $Log setenv FC_Debug "$FC_Optimize"
+if ($AbsoluteDeb == TRUE) then
+   flog $Log setenv CDefOptimize "$CC_Debug"
+   flog $Log setenv FDefOptimize "$FC_Debug"
+else if ($AbsoluteOpt == TRUE) then
+   flog $Log setenv CDefDebug "$CC_Optimize"
+   flog $Log setenv FDefDebug "$FC_Optimize"
 endif
 
 #--------------------------------------------------------------------------
@@ -78,10 +81,10 @@ endif
 SetParent Cfe_CC_Inc
 SetParent CC_Exe
 SetParent CC_Flags
-SetParent CC_Optimize
-SetParent FC_Optimize
-SetParent CC_Debug
-SetParent FC_Debug
+SetParent CDefDebug
+SetParent CDefOptimize
+SetParent FDefDebug
+SetParent FDefOptimize
 SetParent MDG_Inc
 
 exit(0)

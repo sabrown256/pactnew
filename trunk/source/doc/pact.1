@@ -5,7 +5,7 @@
 .\" include cpyright.h
 .\"
 
-.TH PACT 1 "7 June 2005"
+.TH PACT 1 "19 April 2011"
 .SH NAME
 pact \- a make-type utility featuring persistence and distributed parallel
 operation.  Also reports how it was configured.
@@ -358,7 +358,77 @@ The features built into dmake include:
       before any of the 'pact devlib's are started.
   
 
-  9) Input
+  9) Nested Macro Expansion
+
+     This capability allows you to write make files with
+     variable names that are computed from other variables.
+     For example,
+
+        a_b = vab
+        b   = b
+        foo :
+              @echo "${a_${b}}"
+     
+     Coupled with command line overrides this allows a
+     more general and flexible Makefile to be constructed
+     and behaviors changed via the command line without
+     having to change the Makefile.
+
+  10) Special Builtins
+
+     There are special builtins which are there to facilitate
+     choosing between building debuggable or optimized from the
+     command line.
+
+     When PACT is configured a default is chosen for building
+     everything debuggable, everything optimized, or each part
+     of PACT specifies which.  The variables DefaultO and DefaultG
+     specify this default configuration choice (default optimized
+     and default debuggable respectively).
+
+     The idea is to put something like:
+
+        OD      = DefaultO
+        CcFlags = ${ODC} -I${IncDir}
+        FcFlags = ${ODF} -I${IncDir}
+
+     in your pre-Make file.  Then when you do, for example:
+
+        pact build
+
+     You get the default optimized build.  If you then decide
+     that you want to recompile debuggable, you can override
+     the default by doing:
+
+        pact OD=g build
+
+     The special builtins "g" and "o" refer to the full set
+     of debug options and optimize options respectively.  The
+     special variables provided are:
+
+         DefaultG   default config time debug options
+         DefaultO   default config time optimization options
+	 g          reference to debug options at run time
+         o          reference to optimization options at run time
+
+     These only specify whether debuggable or optimized compilations
+     are desired.  They do not contain any actual flags to be
+     give to a C or Fortran compiler.  To get specific sets of
+     flags for the appropriate compiler the following are
+     supplied:
+
+         ODC        actual C compilation options at run time
+         ODF        actual Fortran compilation options at run time
+
+     From the standpoint of the dmake engine there is nothing
+     special about them.  They are in fact supplied in the
+     make-def file generated during the configuration of PACT.
+     Supplying them simply saves the user from having to have
+     a bunch of boiler plate specifications in their pre-Make
+     files.
+
+
+  11) Input
 
      Input files for dmake are handled like most make utilities.
      It has the familiar -f option.  If no file is specified via
@@ -369,7 +439,7 @@ The features built into dmake include:
      in a particular directory.  The remaining specifications come
      from files automatically generated when PACT is configured.
 
- 10) Redirection
+ 12) Redirection
 
      Commands in rules may have I/O redirection specifications
      which will be processed by dmake itself rather than being
@@ -426,12 +496,12 @@ The features built into dmake include:
          ls file1 file2 >>& outb
 
 
- 11) What Dmake Does NOT Support
+ 13) What Dmake Does NOT Support
 
      Dmake does not support conditionals.
 
 
- 12) Environment Variables
+ 14) Environment Variables
      In addition to the command line arguments there are environment
      variables which can be used to control how dmake works in
      asynchronous mode.
@@ -499,7 +569,7 @@ The features built into dmake include:
            to verify that a remote host is available.  The default
            is 10000.
 
- 13) Output Filtering
+ 15) Output Filtering
      With dmake one can have unwanted output removed via user supplied
      files specifying messages to be filtered out.  In the following
      example:
@@ -513,7 +583,7 @@ The features built into dmake include:
      means to use the entire line.  If a line of output matches one of
      the specifications, it is not printed to stdout.
 
- 14) Command Mapping
+ 16) Command Mapping
      The -cmd option of dmake allows you to conveniently have the
      command specified be executed in each directory listed in the
      file argument of the -cmd option.  For example,
@@ -523,7 +593,7 @@ The features built into dmake include:
      would run the command 'pact incinstall' in each directory
      mentioned in the file dirlist.
 
- 15) Diagnostics
+ 17) Diagnostics
      There are two command line options: -d and -vrb.
      The -d option causes all the rules and variables to be printed
      out. The -vrb option reports dependency matches and the rules
@@ -665,11 +735,6 @@ Group
    and the Cfg group will be the same as the standard
    group.  See pdb/pre-Make for an example of the usage.
 
-INSTALL
-   Place holder for either "install <options>" or "cp"
-   depending on whether or not your system has install.
-   Default is "cp".
-
 InstBase
    The directory in which the PACT manager expects to find
    lib, bin, include, man, and scheme directories into which
@@ -798,28 +863,8 @@ X11R4
 AIX
    This indicates the IBM UNIX variant.
 
-BINARY_MODE_R
-   Binary file mode parameter for read only mode.
-   Default is "rb".
-
-BINARY_MODE_RPLUS
-   Binary file mode parameter for open for update mode.
-   Default is "r+b".
-
-BINARY_MODE_W
-   Binary file mode parameter for create mode.
-   Default is "wb".
-
-BINARY_MODE_WPLUS 
-   Binary file mode parameter for create for update.
-   Default is "w+b".
-
 BSD
    This indicates the presence of BSD UNIX 4.2 or later.
-
-FIXNUM
-   C type corresponding to FORTRAN integer. Defaults to
-   long. Don't set this.
 
 HAVE_MPI
    Indicate the presence of the MPI parallel message
@@ -827,35 +872,8 @@ HAVE_MPI
    internal purposes as well as supporting applications
    which want to use PACT in a distributed parallel mode.
 
-HAVE_NO_RUSAGE
-   Indicate the absence of the "getrusage" utility which
-   provides information about resource utilization.
-
-HAVE_NO_SIGFPE
-   Indicate the absence of the floating point exception
-   handler package.
-
-HAVE_SELECT_P
-   Indicate the presence of a working "select" system
-   call iff there is no working STREAMS package
-   available.  PACT-ANALYZE detects this for you.
-
-HAVE_SOCKETS_P
-   Indicate the presence of a working socket library.
-   Default is off.  If you have X windows you have this.
-
-HAVE_STREAMS_P
-   Indicate the presence of a working STREAMS package.
-   Default is off.  PACT-ANALYZE detects this for you.
-
 HPUX
    This indicates the HP UNIX variant.
-
-HYPOT
-   This allows the user to specify a routine to be used
-   in place of the standard math library's "hypot". The
-   PACT routine PM_hypot may be used here, or the user
-   may provide their own.
 
 LINUX
    This indicates the presence of the LINUX OS.
@@ -866,30 +884,11 @@ MAC
 OSF
    This indicates the presence of the OSF OS.
 
-POW
-   This allows the user to specify a routine to be used
-   in place of the standard math library's "pow". The
-   PACT routine PM_pow may be used here, or the user
-   may provide their own.
-
-PTHREAD_DRAFT4
-   This indicates the presence of a POSIX DRAFT 4
-   compliant thread library for the system.  This is
-   one of the thread standards which PACT can use to
-   support shared memory parallel applications.
-
 PTHREAD_POSIX
    This indicates the presence of a POSIX compliant
    thread library for the system.  This is one of the
    thread standards which PACT can use to support
    shared memory parallel applications.
-
-PTHREAD_PSEUDO_SGI_SROC
-   This directs the use of the SGI sproc facility
-   to emulate the pthread functionality used by PACT.
-   This is one of the thread "standards" which PACT
-   can use to support shared memory parallel
-   applications.
 
 RAND_MAX
    This allows the user to set a value for the
@@ -898,41 +897,11 @@ RAND_MAX
    this value is not already defined. Check the man
    pages for "rand" to be sure.
 
-REMOVE
-   This allows the user to specify a routine to be
-   used in place of the standard i/o library's "remove".
-   The PACT routine SC_remove may be used
-   here, or the user may provide their own.
-
 SGI
    This indicates the presence of an SGI machine.
 
-SIGNAL_FUNCTION
-   This allows the user to specify a routine to be
-   used in place of the standard signal library's
-   "signal". The PACT routine SC_signal may be
-   used here, or the user may provide their own.
-   (NOTE: SC_signal is a stub routine provided to
-   prevent unsatisfied externals; it does not
-   perform any actual signal handling.)
-
 SOLARIS
    This indicates the presence of the SOLARIS OS.
-
-STRTOD_FUNCTION
-   This allows the user to specify a routine to be
-   used in place of the standard math library's
-   "strtod". The PACT routine _SC_strtod may be
-   used here, or the user may provide their own.
-
-SYSTEM
-   This allows the user to specify a routine to be
-   used in place of the standard i/o library's
-   "system". The PACT routine SC_system may be used
-   here, or the user may provide their own. (NOTE:
-   SC_system is a stub routine provided to prevent
-   unsatisfied externals; it does not perform
-   any actual system calls.)
 
 SYSV
    This indicates the presence of UNIX System V.
@@ -954,6 +923,8 @@ SYSV
 .SH BUGS
 
 Contact with servers is sometimes lost mysteriously.
-Reconnections some times fail.
+
+Under high network load, some commands are issued then lost.
+
 
 

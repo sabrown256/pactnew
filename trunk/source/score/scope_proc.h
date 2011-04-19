@@ -127,30 +127,31 @@
 #define SC_OTHER_HOSTP(x)   (strchr((x), ':') != NULL)
 #define SC_OTHER_CPUP(x)    (strchr((x), '@') != NULL)
 
-#define SC_flush(pp)                                                         \
-   ((((pp) != NULL) && ((pp)->flush != NULL)) ?                              \
-   (pp)->flush(pp) :                                                         \
+#define SC_flush(_p)                                                         \
+   ((((_p) != NULL) && ((_p)->flush != NULL)) ?                              \
+   (_p)->flush(_p) :                                                         \
    0)
 
-#define SC_close(pp)                                                         \
-   {PROCESS *x;                                                              \
-    x = pp;                                                                  \
-    if ((x != NULL) && (x->close != NULL))                                   \
-       x->close(x);}
+#define SC_close(_p)                                                         \
+   ((((_p) != NULL) && ((_p)->close != NULL)) ?                              \
+    (_p)->close(_p) :                                                        \
+    0)
 
-#define SC_process_alive(pp)                                                 \
-   ((pp != NULL) && (pp->in != -1))
+#define SC_process_alive(_p)                                                 \
+   (((_p) != NULL) && ((_p)->in != -1))
 
-#define SC_status(pp)                                                        \
-   ((SC_process_alive(pp)) ? (pp)->statusp(pp) : SC_DEAD)
+#define SC_status(_p)                                                        \
+   ((SC_process_alive(_p)) ? (_p)->statusp(_p) : SC_DEAD)
 
-#define SC_read(ptr, type, nitems, pp)                                       \
-   ((((pp) != NULL) && ((pp)->read != NULL)) ?                               \
-    (pp)->read(ptr, type, nitems, pp) : -1)
+#define SC_read(ptr, type, nitems, _p)                                       \
+   ((((_p) != NULL) && ((_p)->read != NULL)) ?                               \
+    (_p)->read(ptr, type, nitems, _p) :                                      \
+    -1)
 
-#define SC_write(ptr, type, nitems, pp)                                      \
-   ((((pp) != NULL) && ((pp)->write != NULL)) ?                              \
-    (pp)->write(ptr, type, nitems, pp) : -1)
+#define SC_write(ptr, type, nitems, _p)                                      \
+   ((((_p) != NULL) && ((_p)->write != NULL)) ?                              \
+    (_p)->write(ptr, type, nitems, _p) :                                     \
+    -1)
 
 
 # define SC_DISABLE_SIGNAL(_sig)                                             \

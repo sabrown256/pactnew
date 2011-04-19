@@ -13,18 +13,19 @@ LibName=py
 PyDir  = ${LibDir}/python${PyVers}/pact
 TGTLib = ${LibDir}/lib${LibName}.a
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${CDebug} -I. -I../.. -I${PyIncDir} -I${IncDir} ${MDInc} ${MDGInc}
-FcFlags = ${FDebug}
+CcFlags = ${ODC} -I. -I../.. -I${PyIncDir} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 # other flags -Wl,-bhalt:4 -Wl,-bM:SRE -Wl,-T512 -Wl,-H512
 LDShared0 = -b32 -Wl,-bnoentry -Wl,-bE:/g/g14/taylor/pact/src/python/pypdb.exp -Wl,-bI:${PyCfgDir}/python.exp -Wl,-bM:SRE
 
 
-CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)

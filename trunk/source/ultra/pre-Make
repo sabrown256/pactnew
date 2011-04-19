@@ -20,15 +20,17 @@ TGTScmD = applications/toolbox.scm applications/mouse.scm applications/ultra.pui
 TGTScmE = applications/slib.scm
 TGTScm  = ${TGTScmA} ${TGTScmB} ${TGTScmC} ${TGTScmD} ${TGTScmE}
 
+OD = DefaultG
+
 #
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags  = ${CDebug} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags  = ${ODC} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags  =
 LdFlags  = -L${LibDir} ${LDFLAGS} 
 
-CCAnnounce = ${CCompiler} ${CDebug} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)
