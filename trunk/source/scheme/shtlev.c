@@ -12,43 +12,9 @@
 
 #define SS_PRINT_ERR_MSG (*_SS.pr_err)
 
-continuation
- *SS_continue;
-
-err_continuation
- *SS_err_continue;
-
 char
  *SS_OBJECT_S,
  *SS_POBJECT_S;
-
-PFPostRead
- SS_post_read_hook;
-
-PFPostEval
- SS_post_eval_hook;
-
-PFPostPrint
- SS_post_print_hook;
-
-int
- SS_interactive,
- SS_trap_error,
- SS_lines_page,
- SS_print_flag,
- SS_stat_flag,
- SS_nsave,
- SS_nrestore,
- SS_nsetc,
- SS_ngoc,
- SS_stack_size,
- SS_stack_mask,
- SS_cont_ptr,
- SS_err_cont_ptr,
- SS_errlev;
-
-hasharr
- *SS_symtab;
 
 object
  *SS_anon_proc,
@@ -64,22 +30,10 @@ object
  *SS_eof,
  *SS_t,
  *SS_f,
- *SS_else,
- *SS_This,
- *SS_Val,
- *SS_Unev,
- *SS_Exn,
- *SS_Argl,
- *SS_Fun,
- *SS_Env,
- *SS_Global_Env,
- *SS_err_state,
- **SS_err_stack,
- *SS_rdobj,
- *SS_evobj;
+ *SS_else;
 
-SC_array
- *SS_stack;
+psides
+ _SS_si;
 
 SS_state
  _SS = { -1, 1, -1, 1, };
@@ -97,7 +51,7 @@ static void _SS_fpe_handler(int sig)
 #endif
 
     SS_error("FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
-	     SS_mk_cons(SS_Fun, SS_Argl));
+	     SS_mk_cons(_SS_si.fun, _SS_si.argl));
 
     return;}
 
@@ -121,7 +75,7 @@ static void _SS_sig_handler(int sig)
 #else
     {object *o;
 
-     o = SS_mk_cons(SS_Fun, SS_Argl);
+     o = SS_mk_cons(_SS_si.fun, _SS_si.argl);
 
      SC_signal(sig, _SS_sig_handler);
 
@@ -142,10 +96,10 @@ static void _SS_print_err_msg(FILE *str, char *s, object *obj)
     char *p;
 
     if (obj == NULL)
-       PRINT(str, "(%d):  ERROR: %s\n", SS_errlev, s);
+       PRINT(str, "(%d):  ERROR: %s\n", _SS_si.errlev, s);
 
     else
-       {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", SS_errlev, s);
+       {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", _SS_si.errlev, s);
 
 	p = SS_object_type_name(obj, atype);
 	if (p == NULL)
@@ -161,7 +115,7 @@ static void _SS_print_err_msg(FILE *str, char *s, object *obj)
 
 	PRINT(str, atype);
 
-	SS_print(obj, "): ", "\n\n", SS_outdev);};
+	SS_print(obj, "): ", "\n\n", _SS_si.outdev);};
 
     return;}
 
@@ -178,9 +132,9 @@ static void _SS_print_err_msg_a(FILE *str, char *s, object *obj)
     if (SC_arrtype(obj, -1) == 0)
        PRINT(str, "MEMORY PROBABLY CORRUPTED\n");
     else
-       SS_print(obj, "", "\n", SS_outdev);
+       SS_print(obj, "", "\n", _SS_si.outdev);
 
-    SS_print(SS_Fun, "CURRENT FUNCTION: ", "\n\n", SS_outdev);
+    SS_print(_SS_si.fun, "CURRENT FUNCTION: ", "\n\n", _SS_si.outdev);
 
     return;}
 
@@ -226,58 +180,58 @@ static int _SS_repl(void)
    {long a, f, d;
     double evalt;
 
-    SS_Assign(SS_rdobj, SS_null);
-    SS_Assign(SS_evobj, SS_null);
+    SS_Assign(_SS_si.rdobj, SS_null);
+    SS_Assign(_SS_si.evobj, SS_null);
 
     _SS_set_ans_prompt();
 
     d = 0L;
     while (TRUE)
        {SC_mem_stats_set(0L, 0L);
-        SS_ngoc       = 0;
-        SS_nsetc      = 0;
-        SS_nsave      = 0;
-        SS_nrestore   = 0;
+        _SS_si.ngoc       = 0;
+        _SS_si.nsetc      = 0;
+        _SS_si.nsave      = 0;
+        _SS_si.nrestore   = 0;
 
 /* print the prompt call the Reader */
-	_SS.pr_prompt = SS_prompt;
-        SS_Assign(SS_rdobj, SS_read(SS_indev));
+	_SS.pr_prompt = _SS_si.prompt;
+        SS_Assign(_SS_si.rdobj, SS_read(_SS_si.indev));
 
-        if (SS_post_read_hook != NULL)
-           (*SS_post_read_hook)(SS_indev);
+        if (_SS_si.post_read != NULL)
+           (*_SS_si.post_read)(_SS_si.indev);
 
-        SS_interactive = TRUE;
+        _SS_si.interactive = TRUE;
 
 /* eval the object returned by the Reader */
 	evalt = SC_cpu_time();
-        SS_Assign(SS_evobj, SS_eval(SS_rdobj));
+        SS_Assign(_SS_si.evobj, SS_eval(_SS_si.rdobj));
 	evalt = SC_cpu_time() - evalt;
 
-        if (SS_post_eval_hook != NULL)
-           (*SS_post_eval_hook)(SS_indev);
+        if (_SS_si.post_eval != NULL)
+           (*_SS_si.post_eval)(_SS_si.indev);
 
 /* print the evaluated object */
-        if (SS_print_flag)
-           SS_print(SS_evobj, SS_ans_prompt, "\n", SS_outdev);
+        if (_SS_si.print_flag)
+           SS_print(_SS_si.evobj, _SS_si.ans_prompt, "\n", _SS_si.outdev);
 
-        SS_Assign(SS_Env,   SS_Global_Env);
-        SS_Assign(SS_This,  SS_null);
-        SS_Assign(SS_Exn,   SS_null);
-        SS_Assign(SS_Val,   SS_null);
-        SS_Assign(SS_Unev,  SS_null);
-        SS_Assign(SS_Argl,  SS_null);
-        SS_Assign(SS_Fun,   SS_null);
-        SS_Assign(SS_rdobj, SS_null);
-        SS_Assign(SS_evobj, SS_null);
+        SS_Assign(_SS_si.env,   _SS_si.global_env);
+        SS_Assign(_SS_si.this,  SS_null);
+        SS_Assign(_SS_si.exn,   SS_null);
+        SS_Assign(_SS_si.val,   SS_null);
+        SS_Assign(_SS_si.unev,  SS_null);
+        SS_Assign(_SS_si.argl,  SS_null);
+        SS_Assign(_SS_si.fun,   SS_null);
+        SS_Assign(_SS_si.rdobj, SS_null);
+        SS_Assign(_SS_si.evobj, SS_null);
 
 /* restore the global environment */
 	SC_mem_stats(&a, &f, NULL, NULL);
         d += a - f;
-        if (SS_stat_flag)
+        if (_SS_si.stat_flag)
            {PRINT(stdout, "Stack Usage (S/R): (%d/%d)",
-                  SS_nsave, SS_nrestore);
+                  _SS_si.nsave, _SS_si.nrestore);
             PRINT(stdout, "   Continuations (S/G): (%d/%d)\n",
-                  SS_nsetc, SS_ngoc);
+                  _SS_si.nsetc, _SS_si.ngoc);
             PRINT(stdout, "Memory Usage(A/F): (%ld/%ld)",
                   a, f);
             PRINT(stdout, "   Net (A-F): (%ld)",
@@ -285,8 +239,8 @@ static int _SS_repl(void)
             PRINT(stdout, "   Time: (%10.3e)\n",
 		  evalt);};
 
-        if (SS_post_print_hook != NULL)
-           (*SS_post_print_hook)();
+        if (_SS_si.post_print != NULL)
+           (*_SS_si.post_print)();
         else
            PRINT(stdout, "\n");}
 
@@ -304,8 +258,8 @@ void SS_repl(void)
        {SS_err_catch(_SS_repl, NULL);
 
 /* reset the input buffer */
-        t = SS_BUFFER(SS_indev);
-        SS_PTR(SS_indev) = t;
+        t = SS_BUFFER(_SS_si.indev);
+        SS_PTR(_SS_si.indev) = t;
         *t = '\0';};}
 
 /*--------------------------------------------------------------------------*/
@@ -316,7 +270,7 @@ void SS_repl(void)
 void SS_end_scheme(int val)
    {int ev;
 
-    if (!SS_nullobjp(SS_histdev))
+    if (!SS_nullobjp(_SS_si.histdev))
        SS_trans_off();
 
     if (_SS.active_objects == TRUE)
@@ -431,47 +385,47 @@ void SS_init_scheme(char *code, char *vers)
 #endif
 
 #ifdef LARGE
-    SS_stack_size = 128;
+    _SS_si.stack_size = 128;
 #else
-    SS_stack_size = 32;
+    _SS_si.stack_size = 32;
 #endif
-    SS_stack_mask = SS_stack_size - 1;
+    _SS_si.stack_mask = _SS_si.stack_size - 1;
 
     SS_register_types();
 
     SS_inst_prm();
     SS_inst_const();
 
-    SS_trap_error = TRUE;
-    SS_err_state  = SS_null;
-    SS_Env        = SS_null;
+    _SS_si.trap_error = TRUE;
+    _SS_si.err_state  = SS_null;
+    _SS_si.env        = SS_null;
 
     fr            = SS_mk_new_frame(SS_mk_string("global-environment"), NULL);
-    SS_Global_Env = SS_mk_cons(fr, SS_null);
-    SS_UNCOLLECT(SS_Global_Env);
+    _SS_si.global_env = SS_mk_cons(fr, SS_null);
+    SS_UNCOLLECT(_SS_si.global_env);
 
-    SS_Assign(SS_Env, SS_Global_Env);
+    SS_Assign(_SS_si.env, _SS_si.global_env);
 
     SS_define_constant(1,
 		       "system-id", SC_STRING_I, SYSTEM_ID,
 		       "argv",      SS_OBJECT_I, SS_null,
 		       NULL);
 
-    SS_This  = SS_null;
-    SS_Exn   = SS_null;
-    SS_Val   = SS_null;
-    SS_Unev  = SS_null;
-    SS_Argl  = SS_null;
-    SS_Fun   = SS_null;
-    SS_rdobj = SS_null;
-    SS_evobj = SS_null;
+    _SS_si.this  = SS_null;
+    _SS_si.exn   = SS_null;
+    _SS_si.val   = SS_null;
+    _SS_si.unev  = SS_null;
+    _SS_si.argl  = SS_null;
+    _SS_si.fun   = SS_null;
+    _SS_si.rdobj = SS_null;
+    _SS_si.evobj = SS_null;
 
 /* give default values to the lisp package interface variables  */
-    SS_post_read_hook  = NULL;
-    SS_post_eval_hook  = NULL;
-    SS_post_print_hook = NULL;
-    SS_pr_ch_un        = SS_unget_ch;
-    SS_pr_ch_out       = SS_put_ch;
+    _SS_si.post_read  = NULL;
+    _SS_si.post_eval  = NULL;
+    _SS_si.post_print = NULL;
+    _SS_si.pr_ch_un        = SS_unget_ch;
+    _SS_si.pr_ch_out       = SS_put_ch;
 
     SC_set_put_line(SS_printf);
     SC_set_put_string(SS_fputs);
@@ -482,14 +436,14 @@ void SS_init_scheme(char *code, char *vers)
     SC_set_get_line(io_gets);
 #endif
 
-    SS_interactive = TRUE;
-    SS_lines_page  = 50;
-    SS_print_flag  = TRUE;
-    SS_stat_flag   = TRUE;
-    SS_nsave       = 0;
-    SS_nrestore    = 0;
-    SS_nsetc       = 0;
-    SS_ngoc        = 0;
+    _SS_si.interactive = TRUE;
+    _SS_si.lines_page  = 50;
+    _SS_si.print_flag  = TRUE;
+    _SS_si.stat_flag   = TRUE;
+    _SS_si.nsave       = 0;
+    _SS_si.nrestore    = 0;
+    _SS_si.nsetc       = 0;
+    _SS_si.ngoc        = 0;
 
     SC_mem_stats_set(0L, 0L);
 
@@ -513,7 +467,7 @@ static object *SS_get_ext_ref(char *name)
     haelem *hp;
     object *o;
    
-    hp = SC_hasharr_lookup(SS_symtab, name);
+    hp = SC_hasharr_lookup(_SS_si.symtab, name);
 
     if (hp == NULL)
        {strcpy(uname, name);
@@ -539,7 +493,7 @@ static object *SS_make_ext_boolean(char *name, int val)
    
     o = SS_mk_boolean(name, val);
 
-    SC_hasharr_install(SS_symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(_SS_si.symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
 
     SS_UNCOLLECT(o);
 
@@ -571,11 +525,11 @@ void SS_inst_const(void)
     SC_arrtype(SS_null, SS_NULL_I);
     SC_arrtype(SS_eof, SS_EOF_I);
     
-    SS_histdev = SS_null;
-    SS_indev   = SS_mk_inport(stdin, "stdin");
-    SS_UNCOLLECT(SS_indev);
-    SS_outdev  = SS_mk_outport(stdout, "stdout");
-    SS_UNCOLLECT(SS_outdev);
+    _SS_si.histdev = SS_null;
+    _SS_si.indev   = SS_mk_inport(stdin, "stdin");
+    SS_UNCOLLECT(_SS_si.indev);
+    _SS_si.outdev  = SS_mk_outport(stdout, "stdout");
+    SS_UNCOLLECT(_SS_si.outdev);
 
     SS_anon_proc  = SS_mk_string("lambda");
     SS_UNCOLLECT(SS_anon_proc);
@@ -598,10 +552,10 @@ void SS_inst_const(void)
 void SS_init_stack(void)
    {
 
-    SS_stack = CMAKE_ARRAY(object *, NULL, 0);
+    _SS_si.stack = CMAKE_ARRAY(object *, NULL, 0);
 
-    SS_nsave    = 0;
-    SS_nrestore = 0;
+    _SS_si.nsave    = 0;
+    _SS_si.nrestore = 0;
 
     return;}
 
@@ -613,26 +567,26 @@ void SS_init_stack(void)
 void SS_init_cont(void)
    {int i;
 
-    SS_nsetc = 0;
-    SS_ngoc  = 0;
+    _SS_si.nsetc = 0;
+    _SS_si.ngoc  = 0;
 
-    SS_continue = CMAKE_N(continuation, SS_stack_size);
-    if (SS_continue == NULL)
+    _SS_si.continue_int = CMAKE_N(continuation, _SS_si.stack_size);
+    if (_SS_si.continue_int == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
-    for (i = 0; i < SS_stack_size; SS_continue[i++].signal = SS_null);
-    SS_cont_ptr = 0;
+    for (i = 0; i < _SS_si.stack_size; _SS_si.continue_int[i++].signal = SS_null);
+    _SS_si.cont_ptr = 0;
 
-    SS_err_continue = CMAKE_N(err_continuation, SS_stack_size);
-    if (SS_err_continue == NULL)
+    _SS_si.continue_err = CMAKE_N(err_continuation, _SS_si.stack_size);
+    if (_SS_si.continue_err == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
-    for (i = 0; i < SS_stack_size; SS_err_continue[i++].signal = SS_null);
-    SS_err_cont_ptr = 0;
+    for (i = 0; i < _SS_si.stack_size; _SS_si.continue_err[i++].signal = SS_null);
+    _SS_si.err_cont_ptr = 0;
 
-    SS_err_stack = CMAKE_N(object *, SS_stack_size);
-    if (SS_err_stack == NULL)
+    _SS_si.err_stack = CMAKE_N(object *, _SS_si.stack_size);
+    if (_SS_si.err_stack == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
-    for (i = 0; i < SS_stack_size; SS_err_stack[i++] = NULL);
-    SS_errlev = 0;
+    for (i = 0; i < _SS_si.stack_size; _SS_si.err_stack[i++] = NULL);
+    _SS_si.errlev = 0;
 
     return;}
 
@@ -644,17 +598,17 @@ void SS_init_cont(void)
 void SS_expand_stack(void)
    {int i, size;
 
-    size = SS_stack_size;
-    SS_stack_size = 2*size;
+    size = _SS_si.stack_size;
+    _SS_si.stack_size = 2*size;
 
-    CREMAKE(SS_continue, continuation, SS_stack_size);
-    for (i = size; i < SS_stack_size; SS_continue[i++].signal = SS_null);
+    CREMAKE(_SS_si.continue_int, continuation, _SS_si.stack_size);
+    for (i = size; i < _SS_si.stack_size; _SS_si.continue_int[i++].signal = SS_null);
 
-    CREMAKE(SS_err_continue, err_continuation, SS_stack_size);
-    for (i = size; i < SS_stack_size; SS_err_continue[i++].signal = SS_null);
+    CREMAKE(_SS_si.continue_err, err_continuation, _SS_si.stack_size);
+    for (i = size; i < _SS_si.stack_size; _SS_si.continue_err[i++].signal = SS_null);
 
-    CREMAKE(SS_err_stack, object *, SS_stack_size);
-    for (i = size; i < SS_stack_size; SS_err_stack[i++] = NULL);
+    CREMAKE(_SS_si.err_stack, object *, _SS_si.stack_size);
+    for (i = size; i < _SS_si.stack_size; _SS_si.err_stack[i++] = NULL);
 
     return;}
 
@@ -676,8 +630,8 @@ static object *_SSI_synonym(object *argl)
 
     for (argl = SS_cdr(argl); SS_consp(argl); argl = SS_cdr(argl))
         {synname = SS_get_string(SS_car(argl));
-         SC_hasharr_remove(SS_symtab, synname);
-         SC_hasharr_install(SS_symtab, synname, func, SS_OBJECT_S, TRUE, TRUE);};
+         SC_hasharr_remove(_SS_si.symtab, synname);
+         SC_hasharr_install(_SS_si.symtab, synname, func, SS_OBJECT_S, TRUE, TRUE);};
 
     return(SS_t);}
 
@@ -704,7 +658,7 @@ object *SS_lookup_object(object *obj)
 
     if (SS_variablep(obj))
        {vnm = SS_VARIABLE_NAME(obj);
-	obj = _SS_lk_var_valc(vnm, SS_Env);
+	obj = _SS_lk_var_valc(vnm, _SS_si.env);
 	if (obj == NULL)
 	   obj = SS_null;};
 
@@ -723,11 +677,11 @@ void SS_push_err(int flag, int type)
 
     SS_save_registers(flag);
 
-    x = SS_mk_esc_proc(SS_errlev, type);
+    x = SS_mk_esc_proc(_SS_si.errlev, type);
     SS_MARK(x);
-    SS_err_stack[SS_errlev] = x;
+    _SS_si.err_stack[_SS_si.errlev] = x;
 
-    SS_errlev = (SS_errlev + 1) & SS_stack_mask;
+    _SS_si.errlev = (_SS_si.errlev + 1) & _SS_si.stack_mask;
 
     return;}
 
@@ -743,15 +697,15 @@ void SS_push_err(int flag, int type)
 object *SS_pop_err(int n, int flag)
    {object *x;
 
-    if (SS_errlev < 1)
+    if (_SS_si.errlev < 1)
        {PRINT(stdout, "\nERROR: ERROR STACK BLOWN - SS_POP_ERR\n\n");
         exit(SC_EXIT_CORRUPT);};
 
 /* GC the other error stack frames */
     while (TRUE)
-       {x = SS_err_stack[--SS_errlev];
-        SS_err_stack[SS_errlev] = NULL;
-        if (SS_errlev <= n)
+       {x = _SS_si.err_stack[--_SS_si.errlev];
+        _SS_si.err_stack[_SS_si.errlev] = NULL;
+        if (_SS_si.errlev <= n)
            {_SS_restore_state(x);
             break;}
         else
@@ -772,35 +726,35 @@ static void _SS_restore_state_prim(int ns, int nc, int ne)
    {int n;
     object *x, *esc;
 
-    n = SC_array_get_n(SS_stack) - 1;
+    n = SC_array_get_n(_SS_si.stack) - 1;
 
 /* restore the stack */
     if (n < ns)
        SS_error("CORRUPT STACK FRAME - _SS_RESTORE_STATE_PRIM", SS_null);
 
     for (; n > ns; n--)
-        {SS_nrestore++;
+        {_SS_si.nrestore++;
 
-         x = SC_array_pop(SS_stack);
+         x = SC_array_pop(_SS_si.stack);
 
          SS_GC(x);};
 
 /* restore the continuation stack */
-    if (SS_cont_ptr < nc)
+    if (_SS_si.cont_ptr < nc)
        SS_error("CORRUPT CONTINUATION FRAME - _SS_RESTORE_STATE_PRIM",
                 SS_null);
 
-    for (; SS_cont_ptr > nc; SS_cont_ptr--)
-        {SS_ngoc++;
-         SS_Assign(SS_continue[SS_cont_ptr].signal, SS_null);};
+    for (; _SS_si.cont_ptr > nc; _SS_si.cont_ptr--)
+        {_SS_si.ngoc++;
+         SS_Assign(_SS_si.continue_int[_SS_si.cont_ptr].signal, SS_null);};
 
 /* restore the error stack */
-    if (SS_errlev < ne)
+    if (_SS_si.errlev < ne)
        SS_error("CORRUPT ERROR FRAME - _SS_RESTORE_STATE_PRIM", SS_null);
 
-    for (; SS_errlev > ne; SS_errlev--)
-        {esc = SS_err_stack[SS_errlev-1];
-         SS_err_stack[SS_errlev-1] = NULL;
+    for (; _SS_si.errlev > ne; _SS_si.errlev--)
+        {esc = _SS_si.err_stack[_SS_si.errlev-1];
+         _SS_si.err_stack[_SS_si.errlev-1] = NULL;
          SS_GC(esc);};
 
     _SS_set_ans_prompt();
@@ -836,8 +790,8 @@ void _SS_restore_state(object *esc_proc)
 static object *_SSI_break(void)
    {
 
-    SS_Save(SS_evobj);
-    SS_Save(SS_rdobj);
+    SS_Save(_SS_si.evobj);
+    SS_Save(_SS_si.rdobj);
 
     SS_push_err(TRUE, SS_ERROR_I);
     PRINT(stdout,"\n");
@@ -857,8 +811,8 @@ static object *_SSI_reset(void)
     _SS_restore_state_prim(0, 1, 0);
     PRINT(stdout,"\n");
 
-    LONGJMP(SS_continue[1].cont, ABORT);
-/*    LONGJMP(SS_continue[1].cont, RETURN_OK); */
+    LONGJMP(_SS_si.continue_int[1].cont, ABORT);
+/*    LONGJMP(_SS_si.continue_int[1].cont, RETURN_OK); */
 
     return(SS_f);}
 
@@ -880,18 +834,18 @@ static object *_SSI_retlev(object *argl)
        SS_error("FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
 
     n = (int) SS_INTEGER_VALUE(x);
-    n = SS_errlev - n;
+    n = _SS_si.errlev - n;
     n = max(1, n);
 
     if (!SS_consp(argl))
        SS_error("SECOND ARG MISSING - _SSI_RETLEV", x);
     val = SS_car(argl);    
 
-    if (SS_errlev > 1)
+    if (_SS_si.errlev > 1)
        {x = SS_pop_err(n, TRUE);
 
-        SS_Restore(SS_rdobj);
-        SS_Restore(SS_evobj);
+        SS_Restore(_SS_si.rdobj);
+        SS_Restore(_SS_si.evobj);
 
 	expr = SS_make_form(x, SS_make_form(SS_quoteproc, val, LAST), LAST);
         x    = SS_exp_eval(expr);}
@@ -913,7 +867,7 @@ void SS_interrupt_handler(int sig)
 
     SC_signal(SIGINT, SS_interrupt_handler);
 
-    PRINT(stdout, "\n\nInterrupt (%d frames):\n", SS_errlev - 1);
+    PRINT(stdout, "\n\nInterrupt (%d frames):\n", _SS_si.errlev - 1);
     PRINT(stdout, "  a     - Reset to starting frame\n");
     PRINT(stdout, "  b     - Enter SCHEME break\n");
     PRINT(stdout, "  r     - Resume from here\n");
@@ -943,8 +897,8 @@ void SS_interrupt_handler(int sig)
 
         case 'b' :
 	     PRINT(stdout, "\nEntering SCHEME break\n\n");
-	     t = SS_BUFFER(SS_indev);
-	     SS_PTR(SS_indev) = t;
+	     t = SS_BUFFER(_SS_si.indev);
+	     SS_PTR(_SS_si.indev) = t;
 	     *t = '\0';
 	     _SSI_break();
 	     break;
@@ -978,9 +932,9 @@ int SS_err_catch(PFInt func, PFInt errf)
    {object *esc;
 
     _SS.ret = TRUE;
-    SS_cont_ptr++;
+    _SS_si.cont_ptr++;
     SS_push_err(FALSE, SS_ERROR_I);
-    switch (SETJMP(SS_continue[SS_cont_ptr].cont))
+    switch (SETJMP(_SS_si.continue_int[_SS_si.cont_ptr].cont))
        {case ABORT :
 	     if (errf != NULL)
 	        _SS.ret = (*errf)();
@@ -996,10 +950,10 @@ int SS_err_catch(PFInt func, PFInt errf)
 	        _SS.ret = (*func)();
 
         case ERR_FREE :
-	     esc = SS_pop_err(SS_errlev - 1, FALSE);
+	     esc = SS_pop_err(_SS_si.errlev - 1, FALSE);
 	     SS_GC(esc);};
 
-    SS_cont_ptr--;
+    _SS_si.cont_ptr--;
 
     return(_SS.ret);}
 
@@ -1018,28 +972,28 @@ void SS_error(char *s, object *obj)
 
     t = CSTRSAVE(s);
 
-    SS_Assign(SS_err_state, SS_make_list(SS_OBJECT_I, SS_Fun,
-					 SS_OBJECT_I, SS_Argl,
+    SS_Assign(_SS_si.err_state, SS_make_list(SS_OBJECT_I, _SS_si.fun,
+					 SS_OBJECT_I, _SS_si.argl,
 					 SS_OBJECT_I, obj,
 					 SC_STRING_I, t,
 					 0));
 
-    str = SS_OUTSTREAM(SS_outdev);
+    str = SS_OUTSTREAM(_SS_si.outdev);
     if (_SS.pr_err != NULL)
        SS_PRINT_ERR_MSG(str, t, obj);
 
     CFREE(t);
 
-    t = SS_BUFFER(SS_indev);
-    SS_PTR(SS_indev) = t;
+    t = SS_BUFFER(_SS_si.indev);
+    SS_PTR(_SS_si.indev) = t;
     *t = '\0';
 
-    esc = SS_pop_err(SS_errlev - 1, FALSE);
+    esc = SS_pop_err(_SS_si.errlev - 1, FALSE);
     nc  = SS_ESCAPE_CONTINUATION(esc);
     SS_GC(esc);
 
-    if (SS_trap_error)
-       LONGJMP(SS_continue[nc].cont, ABORT);
+    if (_SS_si.trap_error)
+       LONGJMP(_SS_si.continue_int[nc].cont, ABORT);
 
     else
        LONGJMP(SC_gs.cpu, ABORT);
@@ -1203,8 +1157,8 @@ static object *_SSI_syscmnd(object *argl)
 void SS_inst_prm(void)
    {
 
-    if (SS_symtab == NULL)
-       SS_symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
+    if (_SS_si.symtab == NULL)
+       _SS_si.symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
 
     SS_install("break",
                "Procedure: enter a Scheme break, return with return-level",

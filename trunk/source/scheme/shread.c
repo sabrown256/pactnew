@@ -11,22 +11,7 @@
 #include "scheme_int.h"
 #include "syntax.h"
 
-#define PUSH_CHAR (*SS_pr_ch_un)
-
-PFPrGetS
- SS_pr_gets;
-
-PFPrChUn
- SS_pr_ch_un;
-
-object
- *SS_indev;
-
-PFSSRead
- SS_read_hook = NULL;
-
-int
- SS_bracket_flag = FALSE;
+#define PUSH_CHAR (*_SS_si.pr_ch_un)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -52,7 +37,7 @@ static object *_SSI_rd_line(object *str)
     object *ret;
 
     if (SS_nullobjp(str))
-       str = SS_indev;
+       str = _SS_si.indev;
     else if (!SS_inportp(str = SS_car(str)))
        SS_error("ARGUMENT NOT INPUT-PORT - READ-LINE", str);
 
@@ -143,8 +128,8 @@ static object *_SSI_rd_chr(object *arg)
     o = SS_null;
 
     if (SS_nullobjp(arg))
-       {*SS_PTR(SS_indev) = '\0';
-        o = SS_mk_char((int) SS_get_ch(SS_indev, FALSE));}
+       {*SS_PTR(_SS_si.indev) = '\0';
+        o = SS_mk_char((int) SS_get_ch(_SS_si.indev, FALSE));}
 
     else if (SS_inportp(str = SS_car(arg)))
        {*SS_PTR(str) = '\0';
@@ -264,7 +249,7 @@ static object *SS_rd_atm(object *str)
                inbrackets = TRUE;
             if (c == ']')
                inbrackets = FALSE;}
-        else if ((SS_bracket_flag) && (inbrackets) && (c == ' '))
+        else if ((_SS_si.bracket_flag) && (inbrackets) && (c == ' '))
            continue;
         else
            {if ((c == '(') || (c == ')') || (c == ';'))
@@ -431,18 +416,18 @@ static object *_SS_pr_read(object *str)
 object *SS_read(object *str)
    {object *obj;
 
-    if (SS_read_hook == NULL)
-       SS_read_hook = _SS_pr_read;
+    if (_SS_si.read == NULL)
+       _SS_si.read = _SS_pr_read;
 
     obj = SS_READ_EXPR(str);
 
-    switch (SS_hist_flag)
+    switch (_SS_si.hist_flag)
        {case STDIN_ONLY :
-	     if (str != SS_indev)
+	     if (str != _SS_si.indev)
 	        break;
 
         case ALL :
-	     SS_print(obj, "", "\r\n", SS_histdev);
+	     SS_print(obj, "", "\r\n", _SS_si.histdev);
 
         default :
 	     break;};
@@ -460,7 +445,7 @@ static object *_SSI_read(object *obj)
     o = SS_null;
 
     if (SS_nullobjp(obj))
-       o = SS_read(SS_indev);
+       o = SS_read(_SS_si.indev);
 
     else if (SS_inportp(op = SS_car(obj)))
        o = SS_read(op);
@@ -557,13 +542,13 @@ static object *_SSI_call_if(object *argl)
     if (str == NULL)
        SS_error("CAN'T OPEN FILE - OPEN-INPUT-FILE", obj);
 
-    old_indev = SS_indev;
-    SS_indev  = SS_mk_inport(str, s);
+    old_indev = _SS_si.indev;
+    _SS_si.indev  = SS_mk_inport(str, s);
     ret       = SS_exp_eval(SS_cdr(argl));
 
-    _SSI_cls_in(SS_indev);
+    _SSI_cls_in(_SS_si.indev);
 
-    SS_indev = old_indev;
+    _SS_si.indev = old_indev;
 
     return(ret);}
 
@@ -575,7 +560,7 @@ static object *_SSI_call_if(object *argl)
 object *_SSI_curr_ip(void)
     {
 
-     return(SS_indev);}
+     return(_SS_si.indev);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -617,13 +602,13 @@ static object *_SSI_strprt(object *arg)
 object *SS_add_variable(char *name)
    {object *op;
 
-    op = (object *) SC_hasharr_def_lookup(SS_symtab, name);
+    op = (object *) SC_hasharr_def_lookup(_SS_si.symtab, name);
     if (op != NULL)
        return(op);
 
     op = SS_mk_variable(name, SS_null);
     SS_UNCOLLECT(op);
-    if (SC_hasharr_install(SS_symtab, name, op, SS_POBJECT_S, TRUE, TRUE) == NULL)
+    if (SC_hasharr_install(_SS_si.symtab, name, op, SS_POBJECT_S, TRUE, TRUE) == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
 
     return(op);}
@@ -785,8 +770,8 @@ object *_SSI_scheme_mode(void)
     if (cp != _SSI_scheme_mode)
        SS_set_prompt("Scheme-> ");
 
-    SS_read_hook        = _SS_pr_read;
-    SS_name_reproc_hook = NULL;
+    _SS_si.read        = _SS_pr_read;
+    _SS_si.name_reproc = NULL;
 
     SS_set_parser(_SSI_scheme_mode);
 
@@ -814,8 +799,8 @@ object *SS_load(object *argl)
     if (SS_consp(argl))
        {flag = SS_car(argl);
         if (SS_true(flag))
-           {SS_Save(SS_Env);
-            SS_Env = SS_Global_Env;};};
+           {SS_Save(_SS_si.env);
+            _SS_si.env = _SS_si.global_env;};};
 
     strm = _SSI_opn_in(fnm);
 
@@ -831,34 +816,34 @@ object *SS_load(object *argl)
     else
        PUSH_CHAR(c, strm);
 
-    SS_Save(SS_rdobj);
-    SS_Save(SS_evobj);
+    SS_Save(_SS_si.rdobj);
+    SS_Save(_SS_si.evobj);
 
     prs = SS_change_parser(fnm);
 
     while (TRUE)
-       {SS_Assign(SS_rdobj, SS_read(strm));
-        if (SS_post_read_hook != NULL)
-           (*SS_post_read_hook)(strm);
+       {SS_Assign(_SS_si.rdobj, SS_read(strm));
+        if (_SS_si.post_read != NULL)
+           (*_SS_si.post_read)(strm);
 
-        if (SS_eofobjp(SS_rdobj))
+        if (SS_eofobjp(_SS_si.rdobj))
            {_SSI_cls_in(strm);
 	    SS_GC(strm);
             break;};
-        SS_Save(SS_Env);
-        SS_Assign(SS_evobj, SS_exp_eval(SS_rdobj));
-        SS_Restore(SS_Env);
+        SS_Save(_SS_si.env);
+        SS_Assign(_SS_si.evobj, SS_exp_eval(_SS_si.rdobj));
+        SS_Restore(_SS_si.env);
 
-        if (SS_post_eval_hook != NULL)
-           (*SS_post_eval_hook)(strm);};
+        if (_SS_si.post_eval != NULL)
+           (*_SS_si.post_eval)(strm);};
 
     SS_restore_parser(prs);
 
-    SS_Restore(SS_evobj);
-    SS_Restore(SS_rdobj);
+    SS_Restore(_SS_si.evobj);
+    SS_Restore(_SS_si.rdobj);
 
     if (SS_true(flag))
-       {SS_Restore(SS_Env);};
+       {SS_Restore(_SS_si.env);};
 
     return(SS_t);}
 

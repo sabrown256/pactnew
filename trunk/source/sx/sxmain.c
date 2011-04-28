@@ -162,7 +162,7 @@ int main(int c, char **v, char **env)
 /* run in PDBView mode */
     if (pvflag)
        {SX_init(PCODE, VERSION);
-        SS_trap_error = trap_error;
+        _SS_si.trap_error = trap_error;
 
 	prog = "pdbview";
 
@@ -186,7 +186,7 @@ int main(int c, char **v, char **env)
 
 	prog = "sx";
 
-        SS_trap_error = trap_error;};
+        _SS_si.trap_error = trap_error;};
 
     SS_env_vars(env, NULL);
     SS_load_scm("nature.scm");
@@ -229,11 +229,11 @@ int main(int c, char **v, char **env)
 		      "   %s load time: (%10.3e)\n",
 		      v[n], evalt);};};
 
-    SS_nsave        = 0;
-    SS_nrestore     = 0;
-    SS_nsetc        = 0;
-    SS_ngoc         = 0;
-    SS_bracket_flag = TRUE;
+    _SS_si.nsave        = 0;
+    _SS_si.nrestore     = 0;
+    _SS_si.nsetc        = 0;
+    _SS_si.ngoc         = 0;
+    _SS_si.bracket_flag = TRUE;
 
     SC_mem_stats_set(0L, 0L);
 

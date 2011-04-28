@@ -178,10 +178,10 @@ static char *_SX_reproc_in(char *line)
 void SX_plot(void)
    {object *var, *fnc;
 
-    var = (object *) SC_hasharr_def_lookup(SS_symtab, "viewport-update");
+    var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "viewport-update");
     if (var != NULL)
-       {if (SS_bind_env(var, SS_Env) != NULL)
-	   {fnc = SS_lk_var_val(var, SS_Env);
+       {if (SS_bind_env(var, _SS_si.env) != NULL)
+	   {fnc = SS_lk_var_val(var, _SS_si.env);
 	    if (SS_procedurep(fnc))
 	       SS_call_scheme("viewport-update", 0);};};
 
@@ -191,7 +191,7 @@ void SX_plot(void)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_PARSE - determine whether or not to reprocess the input for PDBView
- *           - this is the real worker for the SS_post_eval_hook
+ *           - this is the real worker for the _SS_si.post_eval
  */
 
 static void _SX_parse(object *strm)
@@ -204,7 +204,7 @@ static void _SX_parse(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_READ - this is the SS_post_read_hook function for PDBView
+/* _SX_READ - this is the _SS_si.post_read function for PDBView
  *          - trap implicit requests to print or change file variable
  *          - values and make them explicit
  */
@@ -215,7 +215,7 @@ static void _SX_read(object *strm)
     PDBfile *file;
 
     s = NULL;
-    SS_args(SS_rdobj,
+    SS_args(_SS_si.rdobj,
             SC_STRING_I, &s,
             0);
 
@@ -227,12 +227,12 @@ static void _SX_read(object *strm)
         strcpy(t, bf);
 
         SS_PTR(strm) = t;
-        SS_Assign(SS_rdobj, SS_read(strm));}
+        SS_Assign(_SS_si.rdobj, SS_read(strm));}
 
 /* if it is an unbound variable check to see if it is a file variable
  * in which case print or change it
  */
-    else if (SS_variablep(SS_rdobj) && !SS_bind_env(SS_rdobj, SS_Env))
+    else if (SS_variablep(_SS_si.rdobj) && !SS_bind_env(_SS_si.rdobj, _SS_si.env))
        {SS_var_value("current-file", G_FILE, &po, TRUE);
 	if (po == NULL)
 	   file = SX_vif;
@@ -251,7 +251,7 @@ static void _SX_read(object *strm)
 
 	    strcpy(t, bf);
 	    SS_PTR(strm) = t;
-	    SS_Assign(SS_rdobj, SS_read(strm));};};
+	    SS_Assign(_SS_si.rdobj, SS_read(strm));};};
 
     CFREE(s);
 
@@ -260,7 +260,7 @@ static void _SX_read(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_PRINT - the SS_post_print_hook function for PDBView */
+/* _SX_PRINT - the _SS_si.post_print function for PDBView */
 
 int _SX_print(void)
    {
@@ -292,15 +292,15 @@ object *SX_mode_text(void)
         SX_graphics_device = NULL;
 
 /* give default values to the lisp package interface variables */
-        SS_post_read_hook  = NULL;
-        SS_post_eval_hook  = NULL;
-        SS_post_print_hook = NULL;
-	SS_pr_gets         = _SX_get_input;
-        SS_pr_ch_un        = SS_unget_ch;
-        SS_pr_ch_out       = SS_put_ch;
-        SS_post_read_hook  = _SX_read;
-        SS_post_eval_hook  = _SX_parse;
-        SS_post_print_hook = _SX_print;
+        _SS_si.post_read  = NULL;
+        _SS_si.post_eval  = NULL;
+        _SS_si.post_print = NULL;
+	_SS_si.pr_gets         = _SX_get_input;
+        _SS_si.pr_ch_un        = SS_unget_ch;
+        _SS_si.pr_ch_out       = SS_put_ch;
+        _SS_si.post_read  = _SX_read;
+        _SS_si.post_eval  = _SX_parse;
+        _SS_si.post_print = _SX_print;
 
 #ifdef NO_SHELL
         SC_set_put_line(SX_fprintf);
@@ -405,12 +405,12 @@ object *SX_mode_graphics(void)
 
     if (SX_graphics_device == NULL)
        {SS_set_prompt("\n-> ");
-        strcpy(SS_ans_prompt, "");
+        strcpy(_SS_si.ans_prompt, "");
 
-        SS_post_read_hook  = _SX_read;
-        SS_post_eval_hook  = _SX_parse;
-        SS_post_print_hook = _SX_print;
-	SS_pr_gets         = _SX_get_input;
+        _SS_si.post_read  = _SX_read;
+        _SS_si.post_eval  = _SX_parse;
+        _SS_si.post_print = _SX_print;
+	_SS_si.pr_gets         = _SX_get_input;
 
 	SC_set_put_line(SX_fprintf);
 	SC_set_put_string(SX_fputs);

@@ -254,7 +254,7 @@ object *UL_get_value(double *sp, double *vp, double val, int n, int id)
 
     flag = 'f';
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        PRINT(stdout, "\nCurve %c\n", id);
 
     ret = SS_null;
@@ -272,7 +272,7 @@ object *UL_get_value(double *sp, double *vp, double val, int n, int id)
                 {y = vp[i+1];
                  flag = 't';};};
          if (flag == 't')
-            {if (SS_interactive == ON)
+            {if (_SS_si.interactive == ON)
                 {PRINT(stdout, "    ");
                  PRINT(stdout, SX_text_output_format, val);
                  PRINT(stdout, "    ");
@@ -300,10 +300,10 @@ object *UL_curve_eval(object *arg)
     double value;
     object *ret;
 
-    s = SS_GET(procedure, SS_Fun)->name;
+    s = SS_GET(procedure, _SS_si.fun)->name;
     i = SX_get_data_index(s);
     if (i < 0)
-       SS_error("CURVE DELETED, NO PROCEDURE - CURVE-EVAL", SS_Fun);
+       SS_error("CURVE DELETED, NO PROCEDURE - CURVE-EVAL", _SS_si.fun);
 
     if (SS_integerp(arg))
        value = (double) *SS_GET(int64_t, arg);
@@ -429,7 +429,7 @@ object *UL_fit(object *obj, object *tok)
     cf = PM_lsq_fit(2, n, x, wc, order);
 
 /* display coefficients and cons up the return list */
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        {if ((SX_dataset[j].id >= 'A') &&
             (SX_dataset[j].id <= 'Z'))
            {PRINT(stdout, "\nCurve %c\n", SX_dataset[j].id);}
@@ -439,7 +439,7 @@ object *UL_fit(object *obj, object *tok)
     ret = SS_null;
     sgn = (order < 0) ? -1 : 1;
     for (i = 0 ; i < aord; i++)
-        {if (SS_interactive == ON)
+        {if (_SS_si.interactive == ON)
 	    {PRINT(stdout, "    ");
 	     PRINT(stdout, SX_text_output_format, cf[i]);
 	     PRINT(stdout, " *x^%d\n", sgn*i);};
@@ -512,7 +512,7 @@ static object *_ULI_fit_curve(object *argl)
               PM_interp(yv, xp0[i], *x[0], *x[1], x[0][1], x[1][1]);
               PM_element(a, i, k) = yv;};};
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        PRINT(stdout, "\n    Fit curves\n\n");
 
     solution = UL_lsq(a, ay);
@@ -522,7 +522,7 @@ static object *_ULI_fit_curve(object *argl)
     alpha_id = ((SX_dataset[i].id >= 'A') &&
                 (SX_dataset[i].id <= 'Z'));
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        {if (alpha_id)
            {PRINT(stdout, "Fit to curve %c\n\n", id);}
         else
@@ -537,7 +537,7 @@ static object *_ULI_fit_curve(object *argl)
         {id = SX_dataset[curid[i-1]].id;
          alpha_id = ((SX_dataset[i].id >= 'A') &&
                      (SX_dataset[i].id <= 'Z'));
-	 if (SS_interactive == ON)
+	 if (_SS_si.interactive == ON)
 	    {PRINT(stdout, "    ");
 	     PRINT(stdout, SX_text_output_format, PM_element(solution, i, 1));
              if (alpha_id)
@@ -560,7 +560,7 @@ static object *_ULI_fit_curve(object *argl)
     for (i = 1; i <= n; i++)
         UL_buf1y[i-1] = PM_element(ay, i, 1);
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        PRINT(stdout, "\n");
 
     ch = SX_mk_curve(SX_dataset[j].n, SX_dataset[j].x[0], UL_buf1y,
@@ -862,7 +862,7 @@ object *UL_stat(int j)
     double xmean, xstd, ymean, ystd;
     object *ret;
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        {if ((SX_dataset[j].id >= 'A') &&
             (SX_dataset[j].id <= 'Z'))
            {PRINT(stdout, "\nCurve %c\n", SX_dataset[j].id);}
@@ -879,7 +879,7 @@ object *UL_stat(int j)
                        SC_DOUBLE_I, &ystd,
                        0);
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        {PRINT(stdout, "\nX Mean =               ");
 	PRINT(stdout, SX_text_output_format, xmean);
 	PRINT(stdout, "\nX Standard deviation = ");
@@ -975,7 +975,7 @@ static object *_ULI_crv_label(object *obj)
     o = SS_null;
     i = SX_get_crv_index_i(obj);
     if (i != -1)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
            PRINT(stdout, "\n Label: %s\n\n", SX_dataset[i].text);
         o = SS_mk_string(SX_dataset[i].text);};
 
@@ -999,7 +999,7 @@ static object *_ULI_crv_domain(object *obj)
 
     o = SS_null;
     if (j != -1)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
            {PRINT(stdout, "\n Domain: (");
             PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[0]);
             PRINT(stdout, " . ");
@@ -1029,7 +1029,7 @@ static object *_ULI_crv_range(object *obj)
 
     o = SS_null;
     if (j != -1)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
            {PRINT(stdout, "\n Range: (");
             PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[2]);
             PRINT(stdout, " . ");
@@ -1058,7 +1058,7 @@ static object *_ULI_crv_npts(object *obj)
     o = SS_null;
 
     if (j != -1)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
            PRINT(stdout, "\n Number of points: %ld\n\n", SX_dataset[j].n);
 
         o = SS_mk_integer(SX_dataset[j].n);};
@@ -1095,7 +1095,7 @@ static object *_ULI_crv_attr(object *obj)
 			   "LINE-WIDTH", SC_DOUBLE_I,    &lnwid, 0.0,
 			   NULL);
 
-        if (SS_interactive == ON)
+        if (_SS_si.interactive == ON)
            {PRINT(stdout, "\n Color, width, style: (%ld ", lncol);
             PRINT(stdout, SX_text_output_format, lnwid);
             PRINT(stdout, " %ld)\n\n", lnsty);};

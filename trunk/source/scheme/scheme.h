@@ -293,12 +293,12 @@ struct s_SS_vect
 #define SS_PP(fun, member)      ((procedure *) SS_OBJECT(fun))->member
 
 #define SS_READ_EXPR(x)                                                      \
-    ((SS_read_hook == NULL) ? SS_null : (*SS_read_hook)(x))
+    ((_SS_si.read == NULL) ? SS_null : (*_SS_si.read)(x))
 
 
 /* OBJECT ACCESSORS */
 
-#define SS_INQUIRE_OBJECT(x)      ((object *) SC_hasharr_def_lookup(SS_symtab, (x)))
+#define SS_INQUIRE_OBJECT(x)      ((object *) SC_hasharr_def_lookup(_SS_si.symtab, (x)))
 #define SS_OBJECT_GC(x)           SC_ref_count(x)
 #define SS_UNCOLLECT(x)           SC_permanent(x)
 #define SS_OBJECT_TYPE(x)         SC_arrtype(x, -1)
@@ -665,14 +665,14 @@ struct s_SS_vect
  */
 
 #define SS_set_cont(to_go, to_return)                                        \
-    SS_nsetc++;                                                              \
-    SS_cont_ptr++;                                                           \
-    if (SS_cont_ptr >= SS_stack_size)                                        \
+    _SS_si.nsetc++;                                                              \
+    _SS_si.cont_ptr++;                                                           \
+    if (_SS_si.cont_ptr >= _SS_si.stack_size)                                    \
        SS_expand_stack();                                                    \
-    if (SETJMP(SS_continue[SS_cont_ptr].cont))                               \
+    if (SETJMP(_SS_si.continue_int[_SS_si.cont_ptr].cont))                       \
        {SS_end_trace();                                                      \
-        SS_cont_ptr--;                                                       \
-        SS_ngoc++;                                                           \
+        _SS_si.cont_ptr--;                                                       \
+        _SS_si.ngoc++;                                                           \
         SS_jump(to_return);}                                                 \
     else                                                                     \
        {SS_jump(to_go);}
@@ -682,7 +682,7 @@ struct s_SS_vect
 
 /* SS_GO_CONT - go (LONGJMP) to the current continuation */
 
-#define SS_go_cont LONGJMP(SS_continue[SS_cont_ptr].cont, TRUE)
+#define SS_go_cont LONGJMP(_SS_si.continue_int[_SS_si.cont_ptr].cont, TRUE)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -701,16 +701,16 @@ extern void
 #  define SS_Save(obj)                                                       \
    {if ((obj->val == NULL) || (obj->eval_type == NO_EV))                     \
        SS_error("FREED OBJECT - SS_SAVE", SS_null);                          \
-    SS_nsave++;                                                              \
+    _SS_si.nsave++;                                                              \
     SS_MARK(obj);                                                            \
-    SC_array_push(SS_stack, &obj);}
+    SC_array_push(_SS_si.stack, &obj);}
 
 # else
 
 #  define SS_Save(obj)                                                       \
-   {SS_nsave++;                                                              \
+   {_SS_si.nsave++;                                                              \
     SS_MARK(obj);                                                            \
-    SC_array_push(SS_stack, &obj);}
+    SC_array_push(_SS_si.stack, &obj);}
 
 # endif
 #endif
@@ -732,18 +732,18 @@ extern void
 # ifdef SCHEME_DEBUG
 
 #  define SS_Restore(x)                                                      \
-   {SS_nrestore++;                                                           \
+   {_SS_si.nrestore++;                                                           \
     SS_GC(x);                                                                \
-    x = *(object **) SC_array_pop(SS_stack);                                 \
+    x = *(object **) SC_array_pop(_SS_si.stack);                             \
     if ((x->val == NULL) || (x->eval_type == NO_EV))                         \
        SS_error("FREED OBJECT - SS_RESTORE", SS_null);}                       
 
 # else
 
 #  define SS_Restore(x)                                                      \
-   {SS_nrestore++;                                                           \
+   {_SS_si.nrestore++;                                                           \
     SS_GC(x);                                                                \
-    x = *(object **) SC_array_pop(SS_stack);}
+    x = *(object **) SC_array_pop(_SS_si.stack);}
 
 # endif
 #endif
@@ -779,26 +779,10 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern JMP_BUF
- SS_prs_cpu;
-
-extern continuation
- *SS_continue;
-
-extern err_continuation
- *SS_err_continue;
-
-extern hasharr
- *SS_symtab,
- *SS_types;
-
 extern object
  *SS_anon_proc,
  *SS_anon_macro,
  *SS_block_proc,
- *SS_indev,
- *SS_outdev,
- *SS_histdev,
  *SS_scheme_symtab,
  *SS_quoteproc,
  *SS_quasiproc,
@@ -809,84 +793,11 @@ extern object
  *SS_eof,
  *SS_t,
  *SS_f,
- *SS_else,
- *SS_This,
- *SS_Val,
- *SS_Unev,
- *SS_Exn,
- *SS_Argl,
- *SS_Fun,
- *SS_Env,
- *SS_Global_Env,
- *SS_err_state,
- **SS_err_stack,
- *SS_rdobj,
- *SS_evobj,
- *SS_character_stream;
-
-extern SC_array
- *SS_stack;
+ *SS_else;
 
 extern char
  *SS_OBJECT_S,
- *SS_POBJECT_S,
- SS_prompt[],
- SS_ans_prompt[],
- *SS_lex_text;
-
-extern PFPostPrint
- SS_post_print_hook;
-
-extern PFPrGetS
- SS_pr_gets;
-
-extern PFNameReproc
- SS_name_reproc_hook;
-
-extern PFPostRead
- SS_post_read_hook;
-
-extern PFPostEval
- SS_post_eval_hook;
-
-extern PFPrChOut
- SS_pr_ch_out;
-
-extern PFPrChUn
- SS_pr_ch_un;
-
-extern PFExtractArg
- SS_arg_hook;
-
-extern PFSSRead
- SS_read_hook;
-
-extern PFCallArg
- SS_call_arg_hook;
-
-extern SS_io_logging
- SS_hist_flag;
-
-extern int
- SS_interactive,
- SS_trace_env,
- SS_know_env,
- SS_trap_error,
- SS_lines_page,
- SS_print_flag,
- SS_stat_flag,
- SS_bracket_flag,
- SS_nsave,
- SS_nrestore,
- SS_nsetc,
- SS_ngoc,
- SS_stack_size,
- SS_stack_mask,
- SS_cont_ptr,
- SS_err_cont_ptr,
- SS_errlev,
- SS_eox,
- SS_strict_c;
+ *SS_POBJECT_S;
 
 extern int
  SS_OBJECT_I,

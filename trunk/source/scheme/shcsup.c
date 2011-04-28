@@ -148,7 +148,7 @@ object *_SS_del_var(object *var)
 
     name = SS_VARIABLE_NAME(var);
 
-    _SS_rem_varc(name, SS_Env);
+    _SS_rem_varc(name, _SS_si.env);
 
     return(SS_f);}
 
@@ -227,7 +227,7 @@ int SS_lookup_identifier_c(char *txt, object **lval)
 
     *lval = SS_f;
 
-    o = (object *) SC_hasharr_def_lookup(SS_types, txt);
+    o = (object *) SC_hasharr_def_lookup(_SS_si.types, txt);
     if (o != NULL)
        {*lval = o;
 	type  = SS_c_tokens[0];}
@@ -254,11 +254,11 @@ object *SS_syntax_c(object *str)
     s = SS_BUFFER(str);
     SC_ASSERT(s != NULL);
 
-    if (SETJMP(SS_prs_cpu))
+    if (SETJMP(_SS_si.cpu))
        ret = SS_eof;
 
     else
-       {SS_character_stream   = str;
+       {_SS_si.character_stream   = str;
 	_SS_cps.cpp_directive = FALSE;
        
 	shgrc_parse();
@@ -275,9 +275,9 @@ object *SS_syntax_c(object *str)
 static object *SS_c_mode(void)
    {
 
-    snprintf(SS_prompt, MAXLINE, "C-> ");
-    SS_read_hook        = SS_syntax_c;
-    SS_name_reproc_hook = SS_name_map_synt;
+    snprintf(_SS_si.prompt, MAXLINE, "C-> ");
+    _SS_si.read        = SS_syntax_c;
+    _SS_si.name_reproc = SS_name_map_synt;
 
     SS_set_parser(SS_c_mode);
 
@@ -385,7 +385,7 @@ void SS_init_c_syntax_mode(void)
 	SS_add_parser(".c", (PFPObject) SS_c_mode);
 	SS_add_parser(".h", (PFPObject) SS_c_mode);
 
-	SS_eox                   = TRUE;
+	_SS_si.eox                   = TRUE;
 	_SS_cps.diagnose_grammar = FALSE;
 
 	ssdbg  = SS_parse_debug_c();

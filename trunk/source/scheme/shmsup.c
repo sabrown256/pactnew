@@ -88,7 +88,7 @@ int SS_lookup_identifier_m(char *txt, object **lval)
 
     *lval = SS_f;
 
-    o = (object *) SC_hasharr_def_lookup(SS_types, txt);
+    o = (object *) SC_hasharr_def_lookup(_SS_si.types, txt);
     if (o != NULL)
        {*lval = o;
 	type  = SS_m_tokens[0];}
@@ -114,11 +114,11 @@ int SS_lookup_identifier_m(char *txt, object **lval)
 object *SS_syntax_m(object *str)
    {object *ret;
 
-    if (SETJMP(SS_prs_cpu))
+    if (SETJMP(_SS_si.cpu))
        ret = SS_eof;
 
     else
-       {SS_character_stream = str;
+       {_SS_si.character_stream = str;
 
 	for (ret = SS_null; ret == SS_null; )
 	    {shgrm_parse();
@@ -134,9 +134,9 @@ object *SS_syntax_m(object *str)
 static object *SS_m_mode(void)
    {
 
-    snprintf(SS_prompt, MAXLINE, "M-> ");
-    SS_read_hook        = SS_syntax_m;
-    SS_name_reproc_hook = SS_name_map_synt;
+    snprintf(_SS_si.prompt, MAXLINE, "M-> ");
+    _SS_si.read        = SS_syntax_m;
+    _SS_si.name_reproc = SS_name_map_synt;
 
     SS_set_parser(SS_m_mode);
 
@@ -209,7 +209,7 @@ void SS_init_m_syntax_mode(void)
 	SS_add_parser(".m", (PFPObject) SS_m_mode);
 	SS_add_parser(".v", (PFPObject) SS_m_mode);
 
-	SS_eox                   = TRUE;
+	_SS_si.eox                   = TRUE;
 	_SS_mps.diagnose_grammar = FALSE;
 
 	ssdbg  = SS_parse_debug_m();

@@ -609,9 +609,9 @@ static object *_SXI_toggle_gri(object *toggle)
 
 /* tty output controls */
 	PG_register_variable("answer_prompt", SC_STRING_S,
-			     SS_ans_prompt, NULL, NULL);
+			     _SS_si.ans_prompt, NULL, NULL);
 	PG_register_variable("prompt", SC_STRING_S,
-			     SS_prompt, NULL, NULL);
+			     _SS_si.prompt, NULL, NULL);
 
 	name = SC_search_file(NULL, SX_pui_file);
 	if (name == NULL)

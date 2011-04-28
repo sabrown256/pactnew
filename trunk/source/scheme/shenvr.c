@@ -26,13 +26,6 @@
 typedef object *(*PFZargs)(void);
 typedef object *(*PFSargs)(object *argl);
 
-PFNameReproc
- SS_name_reproc_hook = NULL;
-
-int
- SS_trace_env = 0,
- SS_know_env  = FALSE;
-
 char
  *SS_OBJECT_P_S = "object *";
 
@@ -54,9 +47,9 @@ void dproc(object *pp)
 
 	SC_ASSERT(penv != NULL);
 
-	SS_print(name,   "Name: ", "\n", SS_outdev);
-	SS_print(params, "Params: ", "\n", SS_outdev);
-	SS_print(bdy,    "Body: ", "\n", SS_outdev);};
+	SS_print(name,   "Name: ", "\n", _SS_si.outdev);
+	SS_print(params, "Params: ", "\n", _SS_si.outdev);
+	SS_print(bdy,    "Body: ", "\n", _SS_si.outdev);};
 
     return;}
 
@@ -75,7 +68,7 @@ void dpenv(object *penv)
     object *b;
 
     if (penv == NULL)
-       penv = SS_Env;
+       penv = _SS_si.env;
 
     for (ie = 1; !SS_nullobjp(penv); penv = SS_cdr(penv), ie++)
         {GET_FRAME(fname, tab, penv);
@@ -91,18 +84,18 @@ void dpenv(object *penv)
 		 PRINT(stdout, "----------------------------------------\n");
 		 PRINT(stdout, "Frame %d: %s\n", ie, fname);
 
-		 n = min(nx, SS_trace_env);
+		 n = min(nx, _SS_si.trace_env);
 		 for (i = 0; i < n; i++)
 		     {if ((i != (n-1)) || (lines[i] != NULL))
 			 {b = (object *) SC_hasharr_def_lookup(tab, lines[i]);
 			  snprintf(pre, MAXLINE, "%4d\t%s\t", i+1, lines[i]);
-			  SS_print(b, pre, "\n", SS_outdev);};};
+			  SS_print(b, pre, "\n", _SS_si.outdev);};};
 
 		 if (n != nx)
 		    {PRINT(stdout, "\t...\n");
 		     b = (object *) SC_hasharr_def_lookup(tab, lines[nx-1]);
 		     snprintf(pre, MAXLINE, "%4d\t%s\t", nx, lines[nx-1]);
-		     SS_print(b, pre, "\n", SS_outdev);};
+		     SS_print(b, pre, "\n", _SS_si.outdev);};
 
 		 CFREE(lines);};};};
 
@@ -116,7 +109,7 @@ void dpenv(object *penv)
 void _SS_eval_err(void)
    {
 
-    SS_Assign(SS_Val, SS_f);
+    SS_Assign(_SS_si.val, SS_f);
 
     return;}
 
@@ -128,11 +121,11 @@ void _SS_eval_err(void)
 object *SS_exp_eval(object *obj)
    {
 
-    SS_Assign(SS_Exn, obj);
+    SS_Assign(_SS_si.exn, obj);
 
     _SS_eval();
 
-    return(SS_Val);}
+    return(_SS_si.val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -142,12 +135,12 @@ object *SS_exp_eval(object *obj)
 object *SS_eval(object *obj)
    {
 
-    SS_Assign(SS_Exn, obj);
-    SS_Assign(SS_Env, SS_Global_Env);
+    SS_Assign(_SS_si.exn, obj);
+    SS_Assign(_SS_si.env, _SS_si.global_env);
 
     _SS_eval();
 
-    return(SS_Val);}
+    return(_SS_si.val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -158,14 +151,14 @@ void SS_save_registers(int vp)
    {
 
     if (vp)
-       {SS_Save(SS_Val);};
+       {SS_Save(_SS_si.val);};
 
-    SS_Save(SS_Exn);
-    SS_Save(SS_Env);
-    SS_Save(SS_Fun);
-    SS_Save(SS_This);
-    SS_Save(SS_Unev);
-    SS_Save(SS_Argl);
+    SS_Save(_SS_si.exn);
+    SS_Save(_SS_si.env);
+    SS_Save(_SS_si.fun);
+    SS_Save(_SS_si.this);
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.argl);
 
     return;}
 
@@ -177,15 +170,15 @@ void SS_save_registers(int vp)
 void SS_restore_registers(int vp)
    {
 
-    SS_Restore(SS_Argl);
-    SS_Restore(SS_Unev);
-    SS_Restore(SS_This);
-    SS_Restore(SS_Fun);
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Exn);
+    SS_Restore(_SS_si.argl);
+    SS_Restore(_SS_si.unev);
+    SS_Restore(_SS_si.this);
+    SS_Restore(_SS_si.fun);
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.exn);
 
     if (vp)
-       {SS_Restore(SS_Val);};
+       {SS_Restore(_SS_si.val);};
 
     return;}
 
@@ -349,7 +342,7 @@ static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
 
     SC_hasharr_install(tab, vr, vl, SS_OBJECT_P_S, TRUE, TRUE);
 
-    if ((SS_know_env) && (vr[0] == '$'))
+    if ((_SS_si.know_env) && (vr[0] == '$'))
        {t = _SS_sprintf("%s", vl);
 
 	nc = strlen(vr) + strlen(t) + 2;
@@ -432,7 +425,7 @@ object *SS_do_bindings(object *pp, object *argp)
     penv   = SS_proc_env(pp);
     nenv   = SS_xtnd_env(name, params, argp, penv);
 
-    if ((SS_trace_env > 0) && (!SS_nullobjp(params)))
+    if ((_SS_si.trace_env > 0) && (!SS_nullobjp(params)))
        dpenv(nenv);
 
     return(nenv);}
@@ -453,7 +446,7 @@ char **SS_bound_vars(char *patt, object *penv)
     hasharr *tab;
 
     if (penv == NULL)
-       penv = SS_Env;
+       penv = _SS_si.env;
 
     GET_FRAME(fname, tab, penv);
 
@@ -475,9 +468,9 @@ char **SS_bound_vars(char *patt, object *penv)
 object *SS_bound_name(char *name)
    {object *obj;
 
-    obj = _SS_bind_envc(name, SS_Env);
+    obj = _SS_bind_envc(name, _SS_si.env);
     if (obj == NULL)
-       obj = (object *) SC_hasharr_def_lookup(SS_symtab, name);
+       obj = (object *) SC_hasharr_def_lookup(_SS_si.symtab, name);
 
     return(obj);}
 
@@ -505,8 +498,8 @@ static object *_SS_bound_var(char *name, hasharr *tab, char *under)
  * even if posed in a different syntax mode
  * so a C mode define of foo_bar could replace an existing foo-bar
  */
-    if ((b == NULL) && (SS_name_reproc_hook != NULL))
-       {(*SS_name_reproc_hook)(s, name);
+    if ((b == NULL) && (_SS_si.name_reproc != NULL))
+       {(*_SS_si.name_reproc)(s, name);
 	strcpy(under, s);
 	b = (object *) SC_hasharr_def_lookup(tab, under);};
 
@@ -684,7 +677,7 @@ object *SS_bind_env(object *vr, object *penv)
 object *SS_defp(object *vr)
    {object *b, *o;
 
-    b = SS_bind_env(vr, SS_Env);
+    b = SS_bind_env(vr, _SS_si.env);
     o = (b == NULL) ? SS_f : SS_t;
 
     return(o);}
@@ -734,8 +727,8 @@ object *SS_lk_var_val(object *vr, object *penv)
  * it's poison for C so in C-mode we could map the legal
  * for_each into for-each and do the lookup
  */
-    if ((obj == NULL) && (SS_name_reproc_hook != NULL))
-       {(*SS_name_reproc_hook)(s, name);
+    if ((obj == NULL) && (_SS_si.name_reproc != NULL))
+       {(*_SS_si.name_reproc)(s, name);
 	obj = _SS_lk_var_valc(s, penv);};
 
 /* if there is no variable complain */
@@ -821,7 +814,7 @@ void SS_env_vars(char **vrs, object *penv)
 
     if (vrs != NULL)
        {if (penv == NULL)
-	   penv = SS_Global_Env;
+	   penv = _SS_si.global_env;
 
 	for (i = 0; vrs[i] != NULL; i++)
 	    {s = vrs[i];
@@ -840,7 +833,7 @@ void SS_env_vars(char **vrs, object *penv)
 		 *p  = '=';
 		 CFREE(vr);};};};
 
-    SS_know_env = TRUE;
+    _SS_si.know_env = TRUE;
 
     return;}
 

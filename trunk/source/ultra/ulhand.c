@@ -68,7 +68,7 @@ void UL_check_order(double *p, int n, int i)
 
     for (p1 = p, p2 = p+1, j = 1; j < n; p1++, p2++, j++)
         {if (*p1 > *p2)                             /* sort if out of order */
-            {if (SS_interactive == ON)
+            {if (_SS_si.interactive == ON)
                 {if ((SX_dataset[i].id >= 'A') &&
                      (SX_dataset[i].id <= 'Z'))
                     {PRINT(stdout, "\nSorting curve %c\n", SX_dataset[i].id);}
@@ -525,8 +525,8 @@ object *UL_bltocnp(C_procedure *cp, object *argl)
     if (!SS_numbp(tok))
        SS_error("BAD LAST ARGUMENT - BLTOCNP", tok);
 
-    if (SS_interactive == ON)
-       {r  = SS_get_string(SS_Fun);
+    if (_SS_si.interactive == ON)
+       {r  = SS_get_string(_SS_si.fun);
 	*r = (char) toupper((int) *r);
 	PRINT(stdout, "\n     %s\n", r);};
 
@@ -699,7 +699,7 @@ object *UL_bc(C_procedure *cp, object *argl)
 
                     i   = SX_get_crv_index_i(tmp);
                     lbl = SC_dsnprintf(FALSE, "%s %g",
-				       SS_get_string(SS_Fun),
+				       SS_get_string(_SS_si.fun),
 				       value);}
 
                 else if (SX_curvep_a(s))
@@ -707,11 +707,11 @@ object *UL_bc(C_procedure *cp, object *argl)
                     if ((SX_dataset[i].id >= 'A') &&
                         (SX_dataset[i].id <= 'Z'))
                        {lbl = SC_dsnprintf(FALSE, "%s %c",
-					   SS_get_string(SS_Fun),
+					   SS_get_string(_SS_si.fun),
 					   SX_dataset[i].id);}
                     else
                        {lbl = SC_dsnprintf(FALSE, "%s @%d",
-					   SS_get_string(SS_Fun),
+					   SS_get_string(_SS_si.fun),
 					   SX_dataset[i].id);};}
                 else
                    SS_error("BAD ARGUMENT - BC", s);
@@ -892,7 +892,7 @@ object *UL_bcxl(C_procedure *cp, object *argl)
              {x[1][j] = (double) (*(PFDoubleRi) cp->proc[0])(x[1][j], i);};};
 
     lbl = SC_dsnprintf(FALSE, "%s %s",
-		       SS_get_string(SS_Fun), SC_strrev(local));
+		       SS_get_string(_SS_si.fun), SC_strrev(local));
     ch = SX_mk_curve(n, x[0], x[1], lbl, NULL, (PFVoid) UL_plot);
 
     SS_Assign(argl, SS_null);

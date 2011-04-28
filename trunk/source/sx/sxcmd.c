@@ -34,7 +34,7 @@ static object *_SXI_describe(object *argl)
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
          if (obj != NULL)
-            {if (!SS_prim_des(SS_outdev, obj))
+            {if (!SS_prim_des(_SS_si.outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
     return(SS_f);}
@@ -123,9 +123,9 @@ void SX_init_view(void)
     SX_display_type  = CSTRSAVE("COLOR");
     SX_display_title = CSTRSAVE("PDBView");
 
-    SS_interactive = FALSE;
-    SS_print_flag  = FALSE;
-    SS_stat_flag   = FALSE;
+    _SS_si.interactive = FALSE;
+    _SS_si.print_flag  = FALSE;
+    _SS_si.stat_flag   = FALSE;
 
     SX_command_log_name = CSTRSAVE("pdbview.log");
 
@@ -368,7 +368,7 @@ static object *_SXI_thru(object *argl)
 /* GOTCHA: in general, when processing something like "f1.1:4",
            f1 will not refer to the current input file */
 
-	SS_args(SS_lk_var_val(SX_curfile, SS_Env),
+	SS_args(SS_lk_var_val(SX_curfile, _SS_si.env),
 		G_FILE, &po,
 		0);
 
@@ -563,7 +563,7 @@ int SX_command(char *file, char *cmd)
 	SX_background_color_white = TRUE;
 
 	SX_init(PCODE, VERSION);
-	SS_trap_error = FALSE;
+	_SS_si.trap_error = FALSE;
 
 	SX_init_view();
 	SX_install_global_vars();
@@ -584,11 +584,11 @@ int SX_command(char *file, char *cmd)
 
 	PG_expose_device(PG_console_device);
 
-	SS_nsave        = 0;
-	SS_nrestore     = 0;
-	SS_nsetc        = 0;
-	SS_ngoc         = 0;
-	SS_bracket_flag = TRUE;
+	_SS_si.nsave        = 0;
+	_SS_si.nrestore     = 0;
+	_SS_si.nsetc        = 0;
+	_SS_si.ngoc         = 0;
+	_SS_si.bracket_flag = TRUE;
 
 	SC_mem_stats_set(0L, 0L);};
 

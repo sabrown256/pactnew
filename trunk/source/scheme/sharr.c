@@ -28,7 +28,7 @@ static object *_SSI_hash_install(object *argl)
 
     name = NULL;
     obj  = SS_null;
-    tab  = SS_symtab;
+    tab  = _SS_si.symtab;
     SS_args(argl,
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &obj,
@@ -60,7 +60,7 @@ static object *_SSI_hash_lookup(object *argl)
     object *o;
 
     name = NULL;
-    tab  = SS_symtab;
+    tab  = _SS_si.symtab;
     SS_args(argl,
 	    SC_STRING_I, &name,
 	    SS_HASHARR_I, &tab,
@@ -87,14 +87,14 @@ static object *_SSI_hash_remove(object *argl)
     hasharr *tab;
 
     name = NULL;
-    tab  = SS_symtab;
+    tab  = _SS_si.symtab;
     SS_args(argl,
 	    SC_STRING_I, &name,
 	    SS_HASHARR_I, &tab,
 	    0);
 
 /* lookup up the object and do a SS_GC on it */
-    if (tab == SS_symtab)
+    if (tab == _SS_si.symtab)
        {obj = (object *) SC_hasharr_def_lookup(tab, name);
 	if (obj != NULL)
 	   SS_GC(obj);};
@@ -119,7 +119,7 @@ object *SS_hash_dump(object *argl)
     object *obj, *sort, *to;
     hasharr *tab;
 
-    tab  = SS_symtab;
+    tab  = _SS_si.symtab;
     patt = NULL;
     sort = SS_t;
 
@@ -169,7 +169,7 @@ static object *_SSI_hash_info(object *arg)
     object *obj, *flg;
     hasharr *tab;
 
-    tab = SS_symtab;
+    tab = _SS_si.symtab;
     SS_args(arg,
 	    SS_HASHARR_I, &tab,
 	    0);
@@ -384,8 +384,8 @@ void _SS_inst_hash(void)
                _SSI_make_hasharr, SS_PR_PROC);
 
 
-    SS_scheme_symtab = SS_mk_hasharr(SS_symtab);
-    SC_hasharr_install(SS_symtab, "system-hash-table", SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
+    SS_scheme_symtab = SS_mk_hasharr(_SS_si.symtab);
+    SC_hasharr_install(_SS_si.symtab, "system-hash-table", SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
     SS_UNCOLLECT(SS_scheme_symtab);
 
     return;}

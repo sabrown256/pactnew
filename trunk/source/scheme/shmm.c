@@ -169,7 +169,7 @@ void _SS_install(char* pname, char *pdoc, PFPHand phand,
     vp = SS_mk_variable(pname, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(SS_symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(_SS_si.symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
 
     return;}
 
@@ -641,8 +641,8 @@ object *SS_mk_esc_proc(int err, int type)
     Esc_procedure *ep;
     object *op;
 
-    cont = SS_cont_ptr;
-    stck = SC_array_get_n(SS_stack) - 1;
+    cont = _SS_si.cont_ptr;
+    stck = SC_array_get_n(_SS_si.stack) - 1;
 
     ep = CMAKE(Esc_procedure);
     ep->cont = cont;
@@ -925,7 +925,7 @@ int _SS_object_map(FILE *fp, int flag)
 		 ityp = map[i].type;
 		 nr   = map[i].nref;
 		 snprintf(s, MAXLINE, " %p  %3d %3d : ", p, ityp, nr);
-		 SS_print(p, s, "\n", SS_outdev);};};
+		 SS_print(p, s, "\n", _SS_si.outdev);};};
 
 	CFREE(map);
 
@@ -967,7 +967,7 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
 
     if (_SS.trace_object == op)
        {PRINT(stdout, "alloc> %p\n", op);
-        SS_print(op, "       ", "\n", SS_outdev);};
+        SS_print(op, "       ", "\n", _SS_si.outdev);};
 
     return(op);}
 

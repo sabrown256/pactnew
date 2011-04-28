@@ -397,7 +397,7 @@ void B_init(void)
     SX_pan_data_hook = (PFInt) LR_get_data;
 
     PRINT(stdout, "\n");
-    strcpy(SS_prompt, "B-> ");
+    strcpy(_SS_si.prompt, "B-> ");
 
     return;}
 

@@ -20,10 +20,10 @@
 void SS_Save(object *obj)
    {
 
-    SS_nsave++;
+    _SS_si.nsave++;
     SS_MARK(obj);
 
-    SC_array_push(SS_stack, &obj);
+    SC_array_push(_SS_si.stack, &obj);
 
     return;}
 
@@ -41,10 +41,10 @@ void _SS_Restore(object **px)
 
     x = *px;
 
-    SS_nrestore++;
+    _SS_si.nrestore++;
     SS_GC(x);
 
-    *px = *(object **) SC_array_pop(SS_stack);
+    *px = *(object **) SC_array_pop(_SS_si.stack);
 
     return;}
 
@@ -71,9 +71,9 @@ void _SS_eval(void)
 /* EVAL_DISP - eval-dispatch the real starting point for the evaluator */
 
 eval_disp:
-    switch (SS_Exn->eval_type)
+    switch (_SS_si.exn->eval_type)
        {case NO_EV :
-             SS_error("ILLEGAL EVALUATION TYPE", SS_Exn);
+             SS_error("ILLEGAL EVALUATION TYPE", _SS_si.exn);
 
 	case SELF_EV :
 	     SS_jump(self_ev);
@@ -90,7 +90,7 @@ eval_disp:
 /* SELF_EV - do self evaluating forms */
 
 self_ev:
-    SS_Assign(SS_Val, SS_Exn);
+    SS_Assign(_SS_si.val, _SS_si.exn);
     SS_go_cont;
 
 /*--------------------------------------------------------------------------*/
@@ -99,7 +99,7 @@ self_ev:
 /* VAR_EV - evaluate variables */
 
 var_ev:
-    SS_Assign(SS_Val, SS_lk_var_val(SS_Exn, SS_Env));
+    SS_Assign(_SS_si.val, SS_lk_var_val(_SS_si.exn, _SS_si.env));
     SS_go_cont;
 
 /*--------------------------------------------------------------------------*/
@@ -108,20 +108,20 @@ var_ev:
 /* PROC_EV - evaluate a procedure/list object */
 
 proc_ev:
-    SS_Assign(SS_Unev, SS_cdr(SS_Exn));
-    SS_Assign(SS_Exn, SS_car(SS_Exn));
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Assign(_SS_si.unev, SS_cdr(_SS_si.exn));
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.exn));
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, ev_args);
 
 ev_args:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    SS_Assign(SS_Fun, SS_Val);
-    if (!SS_procedurep(SS_Fun))
-       SS_error("ILLEGAL PROCEDURE OBJECT", SS_Fun);
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    SS_Assign(_SS_si.fun, _SS_si.val);
+    if (!SS_procedurep(_SS_si.fun))
+       SS_error("ILLEGAL PROCEDURE OBJECT", _SS_si.fun);
 
-    pf  = SS_GET(procedure, SS_Fun);
+    pf  = SS_GET(procedure, _SS_si.fun);
     pty = pf->type;
     switch (pty)
        {case SS_ESC_PROC :
@@ -132,9 +132,9 @@ ev_args:
 
 /* procedure with evaluated args and post-evaluated results */
         case SS_EE_MACRO :
-	     SS_Save(SS_Fun);
-	     SS_Assign(SS_This, SS_null);
-	     SS_Assign(SS_Argl, SS_null);
+	     SS_Save(_SS_si.fun);
+	     SS_Assign(_SS_si.this, SS_null);
+	     SS_Assign(_SS_si.argl, SS_null);
 	     SS_jump(eva_loop);
 
 /* macro with unevaluated args and post-evaluated results */
@@ -173,7 +173,7 @@ ev_args:
 	     SS_jump(ev_cond);
 
         default :
-	     SS_error("BAD PROCEDURE TYPE", SS_Fun);};
+	     SS_error("BAD PROCEDURE TYPE", _SS_si.fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -181,21 +181,21 @@ ev_args:
 /* SS_SET - set! macro in Scheme */
 
 ev_set:
-    SS_Assign(SS_Exn, SS_cadr(SS_Unev));
-    SS_Assign(SS_Unev, SS_car(SS_Unev));
+    SS_Assign(_SS_si.exn, SS_cadr(_SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_car(_SS_si.unev));
 
-    if (!SS_variablep(SS_Unev))
-       SS_error("CAN'T SET NON-VARIABLE OBJECT - SET", SS_Unev);
+    if (!SS_variablep(_SS_si.unev))
+       SS_error("CAN'T SET NON-VARIABLE OBJECT - SET", _SS_si.unev);
 
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, ev_seta);
 
 ev_seta:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    SS_set_var(SS_Unev, SS_Val, SS_Env);
-    SS_Assign(SS_Val, SS_Unev);
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    SS_set_var(_SS_si.unev, _SS_si.val, _SS_si.env);
+    SS_Assign(_SS_si.val, _SS_si.unev);
     SS_go_cont;
 
 /*--------------------------------------------------------------------------*/
@@ -204,18 +204,18 @@ ev_seta:
 /* SS_DEFINE - define macro in Scheme */
 
 ev_define:
-    SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Assign(SS_Exn, SS_cdr(SS_Unev));
-    SS_Assign(SS_Unev, SS_car(SS_Unev));
+    SS_bgn_trace(_SS_si.fun, _SS_si.unev);
+    SS_Assign(_SS_si.exn, SS_cdr(_SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_car(_SS_si.unev));
 
 /* define a compound procedure */
-    if (SS_consp(SS_Unev))
-       {SS_Assign(SS_Exn, SS_mk_cons(SS_cdr(SS_Unev), SS_Exn));
-        SS_Assign(SS_Unev, SS_car(SS_Unev));
-        SS_Assign(SS_Val, SS_mk_procedure(SS_Unev, SS_Exn, SS_Env));
+    if (SS_consp(_SS_si.unev))
+       {SS_Assign(_SS_si.exn, SS_mk_cons(SS_cdr(_SS_si.unev), _SS_si.exn));
+        SS_Assign(_SS_si.unev, SS_car(_SS_si.unev));
+        SS_Assign(_SS_si.val, SS_mk_procedure(_SS_si.unev, _SS_si.exn, _SS_si.env));
 
-	pf = SS_GET(procedure, SS_Fun);
-	pg = SS_GET(procedure, SS_Val);
+	pf = SS_GET(procedure, _SS_si.fun);
+	pg = SS_GET(procedure, _SS_si.val);
 
         if (strcmp(pf->name, "define-macro") == 0)
            pg->type = SS_MACRO;
@@ -223,27 +223,27 @@ ev_define:
         else if (strcmp(pf->name, "define-macro-ev") == 0)
            pg->type = SS_MACRO_EV;
 
-        s = SS_VARIABLE_NAME(SS_Unev);
+        s = SS_VARIABLE_NAME(_SS_si.unev);
 
         CFREE(pg->name);
         pg->name = CSTRSAVE(s);}
 
 /* define a variable */
-    else if (SS_variablep(SS_Unev))
-       {SS_Save(SS_Unev);
-        SS_Save(SS_Env);
-        SS_Assign(SS_Exn, SS_car(SS_Exn));
+    else if (SS_variablep(_SS_si.unev))
+       {SS_Save(_SS_si.unev);
+        SS_Save(_SS_si.env);
+        SS_Assign(_SS_si.exn, SS_car(_SS_si.exn));
         SS_set_cont(eval_disp, ev_def);
 
 ev_def:
-        SS_Restore(SS_Env);
-        SS_Restore(SS_Unev);}
+        SS_Restore(_SS_si.env);
+        SS_Restore(_SS_si.unev);}
 
     else
-       SS_error("CAN'T DEFINE NON-VARIABLE OBJECT - DEFINE", SS_Unev);
+       SS_error("CAN'T DEFINE NON-VARIABLE OBJECT - DEFINE", _SS_si.unev);
 
-    SS_def_var(SS_Unev, SS_Val, SS_Env);
-    SS_Assign(SS_Val, SS_Unev);
+    SS_def_var(_SS_si.unev, _SS_si.val, _SS_si.env);
+    SS_Assign(_SS_si.val, _SS_si.unev);
     SS_end_trace();
     SS_go_cont;
 
@@ -253,10 +253,10 @@ ev_def:
 /* PR_APPLY - jump on primitive (i.e. C level) procedure applications */
 
 pr_apply:
-    cp = SS_GET_C_PROCEDURE(SS_Fun);
+    cp = SS_GET_C_PROCEDURE(_SS_si.fun);
     ph = cp->handler;
 
-    SS_Assign(SS_Val, (*ph)(cp, SS_Argl));
+    SS_Assign(_SS_si.val, (*ph)(cp, _SS_si.argl));
 
     SS_go_cont;
 
@@ -268,11 +268,11 @@ pr_apply:
  */
 
 macro_ur:
-    cp = SS_GET_C_PROCEDURE(SS_Fun);
+    cp = SS_GET_C_PROCEDURE(_SS_si.fun);
     ph = cp->handler;
 
-    SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Assign(SS_Val, (*ph)(cp, SS_Unev));
+    SS_bgn_trace(_SS_si.fun, _SS_si.unev);
+    SS_Assign(_SS_si.val, (*ph)(cp, _SS_si.unev));
 
     SS_go_cont;
 
@@ -284,11 +284,11 @@ macro_ur:
  */
 
 macro_ue:
-    cp = SS_GET_C_PROCEDURE(SS_Fun);
+    cp = SS_GET_C_PROCEDURE(_SS_si.fun);
     ph = cp->handler;
 
-    SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Assign(SS_Exn, (*ph)(cp, SS_Unev));
+    SS_bgn_trace(_SS_si.fun, _SS_si.unev);
+    SS_Assign(_SS_si.exn, (*ph)(cp, _SS_si.unev));
 
     SS_jump(eval_disp);
 
@@ -298,37 +298,37 @@ macro_ue:
 /* EVA_LOOP - eval the args */
 
 eva_loop:
-    if (SS_nullobjp(SS_Unev))
-       {SS_Restore(SS_Fun);
-        SS_Assign(SS_Argl, SS_null);
+    if (SS_nullobjp(_SS_si.unev))
+       {SS_Restore(_SS_si.fun);
+        SS_Assign(_SS_si.argl, SS_null);
         SS_jump(apply_dis);};
 
-    SS_Save(SS_Argl);
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
-    if (SS_nullobjp(SS_cdr(SS_Unev)))
-       {SS_Save(SS_This);
+    SS_Save(_SS_si.argl);
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
+    if (SS_nullobjp(SS_cdr(_SS_si.unev)))
+       {SS_Save(_SS_si.this);
         SS_set_cont(eval_disp, acc_last);
 
 acc_last:
-        SS_Restore(SS_This);
-        SS_Restore(SS_Argl);
-        SS_Restore(SS_Fun);
-        SS_end_cons_macro(SS_Argl, SS_This, SS_Val);
-        SS_Assign(SS_This, SS_null);            /* done with SS_This for now */
+        SS_Restore(_SS_si.this);
+        SS_Restore(_SS_si.argl);
+        SS_Restore(_SS_si.fun);
+        SS_end_cons_macro(_SS_si.argl, _SS_si.this, _SS_si.val);
+        SS_Assign(_SS_si.this, SS_null);            /* done with _SS_si.this for now */
         SS_jump(apply_dis);}
     else
-       {SS_Save(SS_Unev);
-        SS_Save(SS_This);
-        SS_Save(SS_Env);
+       {SS_Save(_SS_si.unev);
+        SS_Save(_SS_si.this);
+        SS_Save(_SS_si.env);
         SS_set_cont(eval_disp, acc_arg);
 
 acc_arg:
-        SS_Restore(SS_Env);
-        SS_Restore(SS_This);
-        SS_Restore(SS_Unev);
-        SS_Restore(SS_Argl);
-        SS_end_cons_macro(SS_Argl, SS_This, SS_Val);
-        SS_Assign(SS_Unev, SS_cdr(SS_Unev));
+        SS_Restore(_SS_si.env);
+        SS_Restore(_SS_si.this);
+        SS_Restore(_SS_si.unev);
+        SS_Restore(_SS_si.argl);
+        SS_end_cons_macro(_SS_si.argl, _SS_si.this, _SS_si.val);
+        SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
         SS_jump(eva_loop);};
 
 /*--------------------------------------------------------------------------*/
@@ -339,9 +339,9 @@ acc_arg:
  */
 
 apply_dis:
-    SS_bgn_trace(SS_Fun, SS_Argl);
+    SS_bgn_trace(_SS_si.fun, _SS_si.argl);
 
-    pf  = SS_GET(procedure, SS_Fun);
+    pf  = SS_GET(procedure, _SS_si.fun);
     pty = pf->type;
     switch (pty)
        {case SS_PROC :
@@ -358,7 +358,7 @@ apply_dis:
 
         default :
 	     SS_error("UNKNOWN PROCEDURE TYPE - APPLY-DISP",
-		      SS_Fun);};
+		      _SS_si.fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -368,17 +368,17 @@ apply_dis:
  */
 
 macro_ee:
-    SS_Assign(SS_Unev, SS_Argl);
-    SS_Assign(SS_Fun, SS_car(SS_Unev));
+    SS_Assign(_SS_si.unev, _SS_si.argl);
+    SS_Assign(_SS_si.fun, SS_car(_SS_si.unev));
 
-    pf  = SS_GET(procedure, SS_Fun);
+    pf  = SS_GET(procedure, _SS_si.fun);
     pty = pf->type;
     switch (pty)
        {case SS_PROC     :
 	case SS_EE_MACRO :
 	case SS_ESC_PROC :
 	case SS_PR_PROC  :
-	     SS_Assign(SS_Argl, SS_cadr(SS_Unev));
+	     SS_Assign(_SS_si.argl, SS_cadr(_SS_si.unev));
 	     SS_jump(apply_dis);
 
 	case SS_UE_MACRO :
@@ -392,15 +392,15 @@ macro_ee:
         case SS_IF       :
         case SS_AND      :
         case SS_OR       :
-	     SS_Assign(SS_Exn,
-		       SS_mk_cons(SS_Fun, SS_cadr(SS_Unev)));
+	     SS_Assign(_SS_si.exn,
+		       SS_mk_cons(_SS_si.fun, SS_cadr(_SS_si.unev)));
 	     SS_jump(eval_disp);
 
         default :
  	     snprintf(msg, MAXLINE,
 		      "UNKNOWN PROCEDURE TYPE %d (%c) - MACRO_EE",
 		     pty, pty);
-	     SS_error(msg, SS_Fun);};
+	     SS_error(msg, _SS_si.fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -408,9 +408,9 @@ macro_ee:
 /* EV_MACRO - set up the evaluation of a composite macro */
 
 ev_macro:
-    SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Assign(SS_Env, SS_do_bindings(SS_Fun, SS_Unev));
-    SS_Assign(SS_Unev, SS_proc_body(SS_Fun));
+    SS_bgn_trace(_SS_si.fun, _SS_si.unev);
+    SS_Assign(_SS_si.env, SS_do_bindings(_SS_si.fun, _SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_proc_body(_SS_si.fun));
     SS_jump(ev_begin);
 
 /*--------------------------------------------------------------------------*/
@@ -419,18 +419,18 @@ ev_macro:
 /* EV_MACRO_EV - set up the evaluation of a composite macro with post eval */
 
 ev_macro_ev:
-    SS_bgn_trace(SS_Fun, SS_Unev);
-    SS_Save(SS_Env);
-    SS_Save(SS_Fun);
-    SS_Assign(SS_Env, SS_do_bindings(SS_Fun, SS_Unev));
-    SS_Assign(SS_Unev, SS_proc_body(SS_Fun));
+    SS_bgn_trace(_SS_si.fun, _SS_si.unev);
+    SS_Save(_SS_si.env);
+    SS_Save(_SS_si.fun);
+    SS_Assign(_SS_si.env, SS_do_bindings(_SS_si.fun, _SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_proc_body(_SS_si.fun));
     SS_set_cont(ev_begin, ev_macro_evb);
 
 ev_macro_evb:
-    SS_Restore(SS_Fun);
-    SS_Restore(SS_Env);
+    SS_Restore(_SS_si.fun);
+    SS_Restore(_SS_si.env);
     SS_end_trace();
-    SS_Assign(SS_Exn, SS_Val);
+    SS_Assign(_SS_si.exn, _SS_si.val);
     SS_jump(eval_disp);
 
 /*--------------------------------------------------------------------------*/
@@ -439,8 +439,8 @@ ev_macro_evb:
 /* COMP_APP - compound apply (i.e. Scheme level) procedure applications */
 
 comp_app:
-    SS_Assign(SS_Env, SS_do_bindings(SS_Fun, SS_Argl));
-    SS_Assign(SS_Unev, SS_proc_body(SS_Fun));
+    SS_Assign(_SS_si.env, SS_do_bindings(_SS_si.fun, _SS_si.argl));
+    SS_Assign(_SS_si.unev, SS_proc_body(_SS_si.fun));
     SS_jump(ev_begin);
 
 /*--------------------------------------------------------------------------*/
@@ -452,13 +452,13 @@ comp_app:
  */
 
 pr_throw:
-    if (SS_ESCAPE_TYPE(SS_Fun) == SS_PROCEDURE_I)
-       _SS_restore_state(SS_Fun);
+    if (SS_ESCAPE_TYPE(_SS_si.fun) == SS_PROCEDURE_I)
+       _SS_restore_state(_SS_si.fun);
     else
-       {SS_GC(SS_Fun);};
+       {SS_GC(_SS_si.fun);};
 
 /* assign the return value */
-    SS_Assign(SS_Val, SS_car(SS_Argl));
+    SS_Assign(_SS_si.val, SS_car(_SS_si.argl));
 
     SS_go_cont;
 
@@ -468,17 +468,17 @@ pr_throw:
 /* EV_BEGIN - R3RS version of progn */
 
 ev_begin:
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
-    if (SS_nullobjp(SS_cdr(SS_Unev)))
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
+    if (SS_nullobjp(SS_cdr(_SS_si.unev)))
        SS_jump(eval_disp);
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, evb_cont);
 
 evb_cont:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    SS_Assign(SS_Unev, SS_cdr(SS_Unev));
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
     SS_jump(ev_begin);
 
 /*--------------------------------------------------------------------------*/
@@ -487,25 +487,25 @@ evb_cont:
 /* EV_AND - the and special form */
 
 ev_and:
-    if (SS_nullobjp(SS_Unev))
-       {SS_Assign(SS_Val, SS_t);
+    if (SS_nullobjp(_SS_si.unev))
+       {SS_Assign(_SS_si.val, SS_t);
         SS_go_cont;};
 
 eva_iter:
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
-    SS_Assign(SS_Unev, SS_cdr(SS_Unev));
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
 
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, eva_dec);
 
 eva_dec:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    if (!SS_true(SS_Val))
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    if (!SS_true(_SS_si.val))
        SS_go_cont;
     else
-       {if (SS_nullobjp(SS_Unev))
+       {if (SS_nullobjp(_SS_si.unev))
           SS_go_cont;
         else
           SS_jump(eva_iter);};
@@ -516,24 +516,24 @@ eva_dec:
 /* EV_OR - the or special form */
 
 ev_or:
-    if (SS_nullobjp(SS_Unev))
-       {SS_Assign(SS_Val, SS_f);
+    if (SS_nullobjp(_SS_si.unev))
+       {SS_Assign(_SS_si.val, SS_f);
         SS_go_cont;};
 
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
-    SS_Assign(SS_Unev, SS_cdr(SS_Unev));
-    if (SS_nullobjp(SS_Exn))
-       {SS_Assign(SS_Val, SS_f);
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
+    if (SS_nullobjp(_SS_si.exn))
+       {SS_Assign(_SS_si.val, SS_f);
         SS_go_cont;};
 
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, evo_dec);
 
 evo_dec:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    if (SS_true(SS_Val))
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    if (SS_true(_SS_si.val))
        SS_go_cont;
     else
        SS_jump(ev_or);
@@ -544,28 +544,28 @@ evo_dec:
 /* EV_COND - cond, the conditional special form in Scheme */
 
 ev_cond:
-    if (SS_nullobjp(SS_Unev))
-       {SS_Assign(SS_Val, SS_f);
+    if (SS_nullobjp(_SS_si.unev))
+       {SS_Assign(_SS_si.val, SS_f);
         SS_go_cont;};
 
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
-    if (SS_nullobjp(SS_Exn))
-       {SS_Assign(SS_Val, SS_f);
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
+    if (SS_nullobjp(_SS_si.exn))
+       {SS_Assign(_SS_si.val, SS_f);
         SS_go_cont;};
 
-    SS_Assign(SS_Exn, SS_car(SS_Exn));
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.exn));
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, evc_dec);
 
 evc_dec:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    if (SS_true(SS_Val))
-       {SS_Assign(SS_Unev, SS_cdar(SS_Unev));
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    if (SS_true(_SS_si.val))
+       {SS_Assign(_SS_si.unev, SS_cdar(_SS_si.unev));
         SS_jump(ev_begin);}
     else
-       {SS_Assign(SS_Unev, SS_cdr(SS_Unev));
+       {SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
         SS_jump(ev_cond);};
 
 /*--------------------------------------------------------------------------*/
@@ -574,26 +574,26 @@ evc_dec:
 /* EV_IF - the if special form */
 
 ev_if:
-    if (SS_nullobjp(SS_Unev))
-       SS_error("BAD IF FORM", SS_Unev);
+    if (SS_nullobjp(_SS_si.unev))
+       SS_error("BAD IF FORM", _SS_si.unev);
 
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
-    SS_Assign(SS_Unev, SS_cdr(SS_Unev));
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
+    SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
 
-    SS_Save(SS_Unev);
-    SS_Save(SS_Env);
+    SS_Save(_SS_si.unev);
+    SS_Save(_SS_si.env);
     SS_set_cont(eval_disp, evi_dec);
 
 evi_dec:
-    SS_Restore(SS_Env);
-    SS_Restore(SS_Unev);
-    if (!SS_true(SS_Val))
-       {SS_Assign(SS_Unev, SS_cdr(SS_Unev));
-        if (SS_nullobjp(SS_Unev))
-           {SS_Assign(SS_Val, SS_f);
+    SS_Restore(_SS_si.env);
+    SS_Restore(_SS_si.unev);
+    if (!SS_true(_SS_si.val))
+       {SS_Assign(_SS_si.unev, SS_cdr(_SS_si.unev));
+        if (SS_nullobjp(_SS_si.unev))
+           {SS_Assign(_SS_si.val, SS_f);
             SS_go_cont;};};
 
-    SS_Assign(SS_Exn, SS_car(SS_Unev));
+    SS_Assign(_SS_si.exn, SS_car(_SS_si.unev));
     SS_jump(eval_disp);
 
 /*--------------------------------------------------------------------------*/
@@ -602,7 +602,7 @@ evi_dec:
 /* RET_VAL - finish up an eval */
 
 ret_val:
-/*    SS_print(SS_Val, "   ", "\n", SS_outdev); */
+/*    SS_print(_SS_si.val, "   ", "\n", _SS_si.outdev); */
     return;}
 
 /*--------------------------------------------------------------------------*/

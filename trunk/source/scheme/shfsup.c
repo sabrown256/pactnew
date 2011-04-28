@@ -54,7 +54,7 @@ int SS_lookup_identifier_f(char *txt, object **lval)
 
     *lval = SS_f;
 
-    o = (object *) SC_hasharr_def_lookup(SS_types, txt);
+    o = (object *) SC_hasharr_def_lookup(_SS_si.types, txt);
     if (o != NULL)
        {*lval = o;
 	type  = SS_f_tokens[0];}
@@ -73,11 +73,11 @@ int SS_lookup_identifier_f(char *txt, object **lval)
 object *SS_syntax_f(object *str)
    {object *ret;
 
-    if (SETJMP(SS_prs_cpu))
+    if (SETJMP(_SS_si.cpu))
        ret = SS_eof;
 
     else
-       {SS_character_stream = str;
+       {_SS_si.character_stream = str;
 
 	shgrf_parse();
 
@@ -93,9 +93,9 @@ object *SS_syntax_f(object *str)
 static object *SS_f_mode(void)
    {
 
-    snprintf(SS_prompt, MAXLINE, "F-> ");
-    SS_read_hook        = SS_syntax_f;
-    SS_name_reproc_hook = SS_name_map_synt;
+    snprintf(_SS_si.prompt, MAXLINE, "F-> ");
+    _SS_si.read        = SS_syntax_f;
+    _SS_si.name_reproc = SS_name_map_synt;
 
     SS_set_parser(SS_f_mode);
 
@@ -161,7 +161,7 @@ void SS_init_f_syntax_mode(void)
 
 	SS_add_parser(".f", (PFPObject) SS_f_mode);
 
-	SS_eox          = TRUE;
+	_SS_si.eox          = TRUE;
 	SS_diagnostic_f = FALSE;
 
 	ssdbg  = SS_parse_debug_f();
