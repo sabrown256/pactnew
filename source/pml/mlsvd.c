@@ -20,7 +20,10 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_SVD_SOLVE - do the back substitution step in an SVD solve */
+/* PM_SVD_SOLVE - do the back substitution step in an SVD solve
+ *              - completing the solution to A.X = B
+ *              - where A = UWV - the SVD decomposition of A
+ */
 
 int PM_svd_solve(double *u, double *w, double *v, int m, int n,
 		 double *b, double *x)
@@ -442,6 +445,7 @@ int PM_svd_fit(double *x, double *y, double *sig, int np,
     b = CMAKE_N(double, np);
     f = CMAKE_N(double, ma);
 
+/* construct the B matrix */
     for (i = 0; i < np; i++)
         {(*fnc)(x[i], f, ma);
 
@@ -454,18 +458,18 @@ int PM_svd_fit(double *x, double *y, double *sig, int np,
 
     PM_svd_decompose(u, np, ma, w, v);
 
-    wmax = 0.0;
-    for (j = 0; j < ma; j++)
-        if (w[j] > wmax)
-	   wmax = w[j];
+/* find the maximum eigenvalue */
+    PM_minmax(w, ma, NULL, &wmax, NULL, NULL);
 
     wl = TOL*wmax;
     for (j = 0; j < ma; j++)
         if (w[j] < wl)
            w[j] = 0.0;
 
+/* solve (UWV).A = B */
     PM_svd_solve(u, w, v, np, ma, b, a);
 
+/* find the chi-squared value for the fit */
     cs = 0.0;
     for (i = 0; i < np; i++)
         {(*fnc)(x[i], f, ma);

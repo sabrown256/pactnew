@@ -659,21 +659,21 @@ static object *_SXI_list_pan_pck(void)
     lst_nxt = SS_null;
     for (pck = Packages; pck != NULL; pck = pck->next)
         {name = pck->name;
-         if ((hp = SC_hasharr_lookup(SS_symtab, name)) != NULL)
+         if ((hp = SC_hasharr_lookup(_SS_si.symtab, name)) != NULL)
             obj = (object *) hp->def;
          else
             {obj = SS_mk_variable(name, SS_null);
              SS_UNCOLLECT(obj);
-             if (SC_hasharr_install(SS_symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
+             if (SC_hasharr_install(_SS_si.symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
                 SS_error("CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame
- * not the best place but SS_Env won't last through most expression
+ * not the best place but _SS_si.env won't last through most expression
  * evaluations
  */
          SS_def_var(obj,
                     SX_mk_package(pck),
-                    SS_Global_Env);
+                    _SS_si.global_env);
 
          SS_end_cons(lst, lst_nxt, obj);};
 
@@ -696,21 +696,21 @@ static object *_SXI_intern_packages(void)
     lst_nxt = SS_null;
     for (pck = Packages; pck != NULL; pck = pck->next)
         {name = pck->name;
-         if ((hp = SC_hasharr_lookup(SS_symtab, name)) != NULL)
+         if ((hp = SC_hasharr_lookup(_SS_si.symtab, name)) != NULL)
             obj = (object *) hp->def;
          else
             {obj = SS_mk_variable(name, SS_null);
              SS_UNCOLLECT(obj);
-             if (SC_hasharr_install(SS_symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
+             if (SC_hasharr_install(_SS_si.symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
                 SS_error("CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame
- * not the best place but SS_Env won't last through most expression
+ * not the best place but _SS_si.env won't last through most expression
  * evaluations
  */
          SS_def_var(obj,
                     SX_mk_package(pck),
-                    SS_Global_Env);
+                    _SS_si.global_env);
 
          SS_end_cons(lst, lst_nxt, obj);};
 

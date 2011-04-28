@@ -30,9 +30,9 @@ int SX_have_display_list(void)
 
     plf = FALSE;
 
-    var = (object *) SC_hasharr_def_lookup(SS_symtab, "display-mapping*");
+    var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "display-mapping*");
     if (var != NULL)
-       {pl  = SS_lk_var_val(var, SS_Env);
+       {pl  = SS_lk_var_val(var, _SS_si.env);
 	plf = SS_procedurep(pl);};
 
     return(plf);}
@@ -70,17 +70,17 @@ object *SX_display_map(object *mo)
 static object *_SX_resolve_mapping(object *argl)
    {object *obj, *fo, *var, *fnc;
 
-    SS_Save(SS_Argl);
+    SS_Save(_SS_si.argl);
 
     obj = SS_car(argl);
     fo  = obj;
 
-    var = (object *) SC_hasharr_def_lookup(SS_symtab, "map-resolve");
+    var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "map-resolve");
     if (var != NULL)
-       {fnc = SS_lk_var_val(var, SS_Env);
+       {fnc = SS_lk_var_val(var, _SS_si.env);
 	if (SS_procedurep(fnc))
 
-/* NOTE: the way this is called argl will end up in SS_This and will be
+/* NOTE: the way this is called argl will end up in _SS_si.this and will be
  * freed if this path is taken, so add the mark that tells it that
  * someone else it pointing at it
  */
@@ -90,7 +90,7 @@ static object *_SX_resolve_mapping(object *argl)
 				SS_OBJECT_I, obj,
 				0);};};
 
-    SS_Restore(SS_Argl);
+    SS_Restore(_SS_si.argl);
 
     return(fo);}
 

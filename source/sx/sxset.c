@@ -140,7 +140,7 @@ void SX_init(char *code, char *vers)
 
     _SX_var_tab = SS_mk_hasharr(PA_variable_tab);
     SS_UNCOLLECT(_SX_var_tab);
-    if (SC_hasharr_install(SS_symtab, "pa-variable-table", _SX_var_tab,
+    if (SC_hasharr_install(_SS_si.symtab, "pa-variable-table", _SX_var_tab,
 			   SS_POBJECT_S, TRUE, TRUE) == NULL)
        SS_error("CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
                 _SX_var_tab);
@@ -151,22 +151,22 @@ void SX_init(char *code, char *vers)
  * give default values to the lisp package interface variables
  * set some default values for flags
  */
-    SS_pr_ch_un   = SS_unget_ch;
-    SS_pr_ch_out  = SS_put_ch;
-    SS_print_flag = TRUE;
-    SS_stat_flag  = TRUE;
+    _SS_si.pr_ch_un   = SS_unget_ch;
+    _SS_si.pr_ch_out  = SS_put_ch;
+    _SS_si.print_flag = TRUE;
+    _SS_si.stat_flag  = TRUE;
 
     SS_set_prompt("SX-> ");
 
     SS_set_print_err_func(NULL, TRUE);
 
-    SS_arg_hook          = _SX_args;
-    SS_call_arg_hook     = _SX_call_args;
+    _SS_si.get_arg          = _SX_args;
+    _SS_si.call_arg     = _SX_call_args;
     SC_gs.atof           = SC_atof;
     SC_gs.strtod         = SC_strtod;
     SC_gs.type_container = SX_type_container;
 
-    SS_interactive = TRUE;
+    _SS_si.interactive = TRUE;
 
     SX_file_exist_action = FAIL;
 
@@ -182,12 +182,12 @@ void SX_init(char *code, char *vers)
 object *SX_arg_prep(object *argl)
    {object *acc, *lst, *obj;
 
-/* because argl might be SS_Argl and since it is passed as an argument to
+/* because argl might be _SS_si.argl and since it is passed as an argument to
  * a function instead of being SS_Assign'd in the usual manner we MUST
- * protect against GC'ing it when the reference from SS_Argl is lost
+ * protect against GC'ing it when the reference from _SS_si.argl is lost
  */
     SS_MARK(argl);
-    SS_Assign(SS_Argl, SS_null);
+    SS_Assign(_SS_si.argl, SS_null);
 
 /* make a copy of the arg list other people may be pointing at it */
     for (lst = SS_null, acc = argl; !SS_nullobjp(acc); acc = SS_cdr(acc))

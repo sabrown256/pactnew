@@ -142,8 +142,8 @@ int SX_fprintf(FILE *fp, char *fmt, ...)
     if (fp != NULL)
        {SC_VDSNPRINTF(FALSE, bf, fmt);
 
-	hp = SS_OUTSTREAM(SS_histdev);
-	if ((SS_hist_flag != NO_LOG) && (fp != hp))
+	hp = SS_OUTSTREAM(_SS_si.histdev);
+	if ((_SS_si.hist_flag != NO_LOG) && (fp != hp))
 	   io_printf(hp, "%s", bf);
 
 /* the ifs are nested to get the right behavior wrt the print_flag
@@ -176,8 +176,8 @@ int SX_fputs(char *s, FILE *fp)
     rv = FALSE;
 
     if (fp != NULL)
-       {hp = SS_OUTSTREAM(SS_histdev);
-	if ((SS_hist_flag != NO_LOG) && (fp != hp))
+       {hp = SS_OUTSTREAM(_SS_si.histdev);
+	if ((_SS_si.hist_flag != NO_LOG) && (fp != hp))
 	   rv = SS_puts(s, hp, io_puts);
 
 /* the ifs are nested to get the right behavior wrt the print_flag

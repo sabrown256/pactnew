@@ -2644,9 +2644,9 @@ the stack entry </TD></TR>
 <TD>string containing &#147;object&#148; </TD></TR>
 <TR><TD>SS_POBJECT_S</TD>
 <TD>string containing &#147;object *&#148; </TD></TR>
-<TR><TD>SS_prompt</TD>
+<TR><TD>_SS_si.prompt</TD>
 <TD>the prompt which is displayed by the interpreter </TD></TR>
-<TR><TD>SS_ans_prompt</TD>
+<TR><TD>_SS_si.ans_prompt</TD>
 <TD>the preamble to the interpreter&#146;s printing of the result </TD></TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -2660,11 +2660,11 @@ the stack entry </TD></TR>
 <TABLE>
 <TR><TD WIDTH="150">SS_quoteproc</TD>
 <TD>pointer to the quote procedure</TD></TR>
-<TR><TD>SS_indev</TD>
+<TR><TD>_SS_si.indev</TD>
 <TD>pointer to the standard input port object (stdin equivalent)</TD></TR>
-<TR><TD>SS_outdev</TD>
+<TR><TD>_SS_si.outdev</TD>
 <TD>pointer to the standard output port object (stdout equivalent)</TD></TR>
-<TR><TD>SS_histdev</TD>
+<TR><TD>_SS_si.histdev</TD>
 <TD>pointer to the history output port object (see transcript)</TD></TR>
 <TR><TD>SS_null</TD>
 <TD>pointer to the () object</TD></TR>

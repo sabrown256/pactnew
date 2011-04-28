@@ -27,9 +27,6 @@ typedef object         *(*PFBINOBJ)(object *argl);
      else                                                                    \
         SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", _num);}
 
-int
- SS_strict_c = FALSE;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -612,7 +609,7 @@ static object *_SS_xor_pow(object *argl)
 
     rv = SS_null;
 
-    if (SS_strict_c == TRUE)
+    if (_SS_si.strict_c == TRUE)
        {SS_GET_OPERAND(i1, argl, type);
 	SS_GET_OPERAND(i2, argl, type);
 	iv = PM_lxor(i1, i2);
@@ -1075,7 +1072,7 @@ void _SS_install_math(void)
     SS_install_cf("strict-c", 
 		  "Variable: Strict C compliance for operators if 1\n     Usage: strict-c [0|1]",
 		  SS_acc_int,
-		  &SS_strict_c);
+		  &_SS_si.strict_c);
 
 
     _SS_install_heterogeneous();

@@ -899,21 +899,21 @@ object *SX_read_text_table(object *argl)
 
     name = SC_search_file(NULL, _SX.table_name);
     if (name == NULL)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
 	   PRINT(stdout, "\n No file name given\n");
 
 	return(SS_f);};
 
     fp = io_open(name, "r");
     if (fp == NULL)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
 	   PRINT(stdout, "\n Can't open file %s\n", name);
 
 	return(SS_f);};
 
     ok = SX_find_text_table(fp, n, &fn, &nr, &nc, nl, &addrt, nlabel, &addrl);
     if (ok == FALSE)
-       {if (SS_interactive == ON)
+       {if (_SS_si.interactive == ON)
 	   PRINT(stdout, "\n No table #%d in file %s\n", n, name);
 
 	return(SS_f);};
@@ -950,7 +950,7 @@ object *SX_read_text_table(object *argl)
 
     io_close(fp);
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        {if (label[0] == '\0')
            PRINT(stdout,
                  "\n Table %d : %d rows and %d columns\n\n",
@@ -1053,7 +1053,7 @@ object *SX_table_attr(void)
         ncols   = _SX.current_table->ncol;
         table_n = _SX.table_n;
 
-        if (SS_interactive == ON)
+        if (_SS_si.interactive == ON)
            PRINT(stdout, "\n Table %d : %d rows and %d columns\n\n",
                  table_n, nrows, ncols);
 

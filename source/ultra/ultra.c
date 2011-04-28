@@ -117,9 +117,9 @@ void UL_init_view(void)
     UL_derivative_tolerance = 2.0e-2;
     UL_window_height_factor = 1.0;
 
-    SS_interactive = FALSE;
-    SS_print_flag  = FALSE;
-    SS_stat_flag   = FALSE;
+    _SS_si.interactive = FALSE;
+    _SS_si.print_flag  = FALSE;
+    _SS_si.stat_flag   = FALSE;
 
     SX_command_log_name = CSTRSAVE("ultra.log");
 
@@ -349,8 +349,8 @@ static void _UL_del_intermediate(object *cla, ...)
 /*--------------------------------------------------------------------------*/
 
 /* _UL_PARSE - determine whether or not to reprocess the input for Ultra
- *           - this is the double worker for the SS_post_eval_hook
- *           - since this SS_evobj is not the same as in SS_REPL
+ *           - this is the double worker for the _SS_si.post_eval
+ *           - since this _SS_si.evobj is not the same as in SS_REPL
  *           - it should be SS_MARK'd as being an additional pointer to its
  *           - respective object
  */
@@ -367,12 +367,12 @@ static void _UL_parse(object *strm)
     if (UL_save_intermediate == OFF)
        {na = SS_length(crva);
 	nb = SS_length(crvb);
-	nr = SS_length(SS_evobj);
+	nr = SS_length(_SS_si.evobj);
 	if (na > nb+nr)
 	   {if (SS_consp(crvb) == TRUE)
-	       _UL_del_intermediate(crva, crvb, SS_Val, NULL);
+	       _UL_del_intermediate(crva, crvb, _SS_si.val, NULL);
 	    else
-	       _UL_del_intermediate(crva, SS_Val, NULL);};};
+	       _UL_del_intermediate(crva, _SS_si.val, NULL);};};
 
 /* free the curve lists */
     SS_Assign(crva, SS_null);
@@ -383,7 +383,7 @@ static void _UL_parse(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _UL_READ - this is the SS_post_read_hook function for Ultra */
+/* _UL_READ - this is the _SS_si.post_read function for Ultra */
 
 static void _UL_read(object *strm)
    {
@@ -396,7 +396,7 @@ static void _UL_read(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _UL_PRINT - the SS_post_print_hook function for Ultra */
+/* _UL_PRINT - the _SS_si.post_print function for Ultra */
 
 static int _UL_print(void)
    {
@@ -902,7 +902,7 @@ static void UL_init_env(void)
 
 /* these lisp package special variables are initialized in all modes */
     SS_set_print_err_func(NULL, TRUE);
-    SS_arg_hook  = _UL_args;
+    _SS_si.get_arg  = _UL_args;
     SX_plot_hook = (PFByte) UL_plot;
 
     SC_gs.atof   = SC_atof;
@@ -944,11 +944,11 @@ object *UL_mode_text(void)
         ret = SS_f;
 
 /* give default values to the lisp package interface variables */
-    SS_post_read_hook  = NULL;
-    SS_post_eval_hook  = NULL;
-    SS_post_print_hook = NULL;
-    SS_pr_ch_un        = SS_unget_ch;
-    SS_pr_ch_out       = SS_put_ch;
+    _SS_si.post_read  = NULL;
+    _SS_si.post_eval  = NULL;
+    _SS_si.post_print = NULL;
+    _SS_si.pr_ch_un        = SS_unget_ch;
+    _SS_si.pr_ch_out       = SS_put_ch;
 
 #ifdef NO_SHELL
     SC_set_put_line(SX_fprintf);
@@ -985,12 +985,12 @@ object *UL_mode_graphics(void)
 
     if (SX_graphics_device == NULL)
        {SS_set_prompt("U-> ");
-        strcpy(SS_ans_prompt, "");
+        strcpy(_SS_si.ans_prompt, "");
 
-        SS_post_read_hook  =  _UL_read;
-        SS_post_eval_hook  =  _UL_parse;
-        SS_post_print_hook =  _UL_print;
-	SS_pr_gets         = _SX_get_input;
+        _SS_si.post_read  =  _UL_read;
+        _SS_si.post_eval  =  _UL_parse;
+        _SS_si.post_print =  _UL_print;
+	_SS_si.pr_gets         = _SX_get_input;
 	SC_set_put_line(SX_fprintf);
 	SC_set_put_string(SX_fputs);
 	if (PG_console_device == NULL)
@@ -1240,7 +1240,7 @@ int main(int c, char **v)
         if (v[i][0] == '-')
            {switch (v[i][1])
                {case 'e' :
-		     SS_trap_error = FALSE;
+		     _SS_si.trap_error = FALSE;
 		     break;
 		case 'h' :
 		     usage();
@@ -1340,10 +1340,10 @@ int main(int c, char **v)
 			  "   %s load time: (%10.3e)\n",
 			  v[n], evalt);};};};
 
-    SS_nsave    = 0;
-    SS_nrestore = 0;
-    SS_nsetc    = 0;
-    SS_ngoc     = 0;
+    _SS_si.nsave    = 0;
+    _SS_si.nrestore = 0;
+    _SS_si.nsetc    = 0;
+    _SS_si.ngoc     = 0;
 
     SC_mem_stats_set(0L, 0L);
 

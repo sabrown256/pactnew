@@ -226,7 +226,7 @@ static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
    {char label[MAXLINE];
     PM_mapping *ph;
 
-    snprintf(label, MAXLINE, "(%s %s", SS_get_string(SS_Fun), h->name);
+    snprintf(label, MAXLINE, "(%s %s", SS_get_string(_SS_si.fun), h->name);
 
 /* build up the label */
     for (ph = h->next; ph != NULL; ph = ph->next)
@@ -252,7 +252,7 @@ static void _SX_map_list_label(char *label, object *argl)
    {char t[MAXLINE];
     object *obj;
 
-    snprintf(label, MAXLINE, "(%s", SS_get_string(SS_Fun));
+    snprintf(label, MAXLINE, "(%s", SS_get_string(_SS_si.fun));
 
 /* build up the label */
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))

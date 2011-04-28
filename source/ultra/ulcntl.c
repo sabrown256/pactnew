@@ -44,7 +44,7 @@ object *_ULI_describe(object *argl)
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
          if (obj != NULL)
-            {if (!SS_prim_des(SS_outdev, obj))
+            {if (!SS_prim_des(_SS_si.outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
     UL_pause(TRUE);
@@ -531,7 +531,7 @@ void UL_pause(int pf)
    {if (pf)
        SX_plot_flag = FALSE;
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        PRINT(stdout, "\n");
 
     return;}

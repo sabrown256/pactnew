@@ -26,7 +26,7 @@ object *SX_print(argl)
     str  = SS_car(argl);
     argl = SS_cdr(argl);
     if (SS_nullobjp(str))
-       str = SS_outdev;
+       str = _SS_si.outdev;
 
     if (!SS_outportp(str))
        SS_error("BAD PORT - PRINT", str);

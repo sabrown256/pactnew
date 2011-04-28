@@ -786,10 +786,10 @@ static object *UL_print_labels(int *indx, int nc,
     else
        fp = stdout;
 
-    if (SS_lines_page == 0)
+    if (_SS_si.lines_page == 0)
        nlp = INT_MAX;
     else
-       nlp = max(26, SS_lines_page);
+       nlp = max(26, _SS_si.lines_page);
 
     np    = 0;
     nmore = 0;
@@ -816,7 +816,7 @@ static object *UL_print_labels(int *indx, int nc,
                 {SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));}
 
              if ((silent == FALSE) &&
-		 ((SS_interactive == ON) || (fp != stdout)))
+		 ((_SS_si.interactive == ON) || (fp != stdout)))
 
 /* prep the label text */
 	        {_UL_print_label(i, j, md, s, id_flag, fp, f, id);
@@ -915,10 +915,10 @@ static object *_ULI_prefix(object *argl)
            {if ((mindex = SX_prefix_list[pre - 'a']) > 0)
                {if (mindex <= SX_n_curves_read)
                     fname = SX_dataset[SX_number[mindex]].file;
-                if (SS_interactive == ON)
+                if (_SS_si.interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);}
             else
-               {if (SS_interactive == ON)
+               {if (_SS_si.interactive == ON)
                    PRINT(stdout, " Prefix %c is not assigned\n", pre);};}
 
         {SS_Assign(ret,
@@ -933,7 +933,7 @@ static object *_ULI_prefix(object *argl)
                 fname = "";
                 if (mindex <= SX_n_curves_read)
                    fname = SX_dataset[SX_number[mindex]].file;
-                if (SS_interactive == ON)
+                if (_SS_si.interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);
                 arg1 = SS_mk_char((int) pre);
                 {SS_Assign(ret,
@@ -1536,7 +1536,7 @@ static object *UL_smooth(int l, object *argl)
 			      SX_smooth_method);
 	    SS_error(bf, SS_null);};
 
-        SS_args(SS_lk_var_val(obj, SS_Env),
+        SS_args(SS_lk_var_val(obj, _SS_si.env),
                 G_NUM_ARRAY, &arr,
 		0);
 

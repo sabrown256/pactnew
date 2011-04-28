@@ -214,7 +214,7 @@ enum           {DIAG_RETURN(ENUM);}
 {OREQS}        {DIAG_RETURN(OREQ);}
 {XOREQS}       {DIAG_RETURN(XOREQ);}
 
-{CAROTS}       {if (SS_strict_c == TRUE)
+{CAROTS}       {if (_SS_si.strict_c == TRUE)
                    {DIAG_RETURN(XOR);}
                 else
                    {DIAG_RETURN(EXPT);};}

@@ -338,7 +338,7 @@ static object *_SXI_read_text_table(object *argl)
 /* store column labels if available */
     _SX_setup_clabels(label, nc, linelen);
 
-    if (SS_interactive == ON)
+    if (_SS_si.interactive == ON)
        {if (label[0] == '\0')
            PRINT(stdout,
                  "\n Table %d : %d rows and %d columns\n\n",
@@ -761,7 +761,7 @@ static object *SX_print_column(object *argl)
 	for (j = 0L; j < nr; j++)
 	    {PRINT(stdout, " %10.3e\n", val[j]);}
 
-	if (SS_interactive == ON)
+	if (_SS_si.interactive == ON)
 	   PRINT(stdout,
                  "\n Column %ld : %ld values\n\n",
                  col, nr);
@@ -849,7 +849,7 @@ static object *SX_delete_column(object *argl)
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;
 
-	if (SS_interactive == ON)
+	if (_SS_si.interactive == ON)
 	   PRINT(stdout,
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
@@ -884,7 +884,7 @@ static object *SX_sort_on_column(object *argl)
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;
 
-	if (SS_interactive == ON)
+	if (_SS_si.interactive == ON)
 	   PRINT(stdout,
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
@@ -915,7 +915,7 @@ static object *SX_cnormalize_table(object *argl)
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;
 
-	if (SS_interactive == ON)
+	if (_SS_si.interactive == ON)
 	   PRINT(stdout,
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);

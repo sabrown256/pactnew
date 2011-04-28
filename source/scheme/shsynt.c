@@ -12,21 +12,6 @@
 
 typedef object *objp;
 
-char
- *SS_lex_text;
-
-hasharr
- *SS_types;
-
-object
- *SS_character_stream;
-
-JMP_BUF
- SS_prs_cpu;
-
-int
- SS_eox;
-
 /*--------------------------------------------------------------------------*/
 
 /*                       LEXICAL ANALYZER SUPPORT                           */
@@ -38,9 +23,9 @@ int
 int SS_input_synt(char *ltxt)
    {int c;
     
-    SS_lex_text = ltxt;
+    _SS_si.lex_text = ltxt;
 
-    c = SS_get_ch(SS_character_stream, FALSE);
+    c = SS_get_ch(_SS_si.character_stream, FALSE);
 
     _SS.have_eof = (c == EOF);
 
@@ -78,7 +63,7 @@ void _SS_push_token(char *s)
 void SS_unput_synt(int c)
    {
 
-    (*SS_pr_ch_un)(c, SS_character_stream);
+    (*_SS_si.pr_ch_un)(c, _SS_si.character_stream);
 
     return;}
 
@@ -195,15 +180,15 @@ object *SS_lookup_variable(char *txt, int verbose)
 object *SS_add_type_synt(char *name)
    {object *typ;
 
-    if (SS_types == NULL)
-       SS_types = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    if (_SS_si.types == NULL)
+       _SS_si.types = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 
     if (name == NULL)
        typ = SS_null;
 
     else
        {typ = SS_mk_string(name);
-        SC_hasharr_install(SS_types, name, typ, SS_POBJECT_S, TRUE, TRUE);};
+        SC_hasharr_install(_SS_si.types, name, typ, SS_POBJECT_S, TRUE, TRUE);};
 
     return(typ);}
 
@@ -222,7 +207,7 @@ void _SS_diagnostic_synt(object *expr, char *msg, int diag)
 
     if (diag)
        {snprintf(s, MAXLINE, "%s: ", msg);
-        SS_print(expr, s, "\n", SS_outdev);};
+        SS_print(expr, s, "\n", _SS_si.outdev);};
 
     return;}
 
@@ -238,7 +223,7 @@ int _SS_diagnose_return_synt(int x, char *y, PFPInt fnc)
     dbg  = *pdbg;
 
     if (dbg)
-       PRINT(stdout, "Token %s (%d) - %s\n", y, x, SS_lex_text);
+       PRINT(stdout, "Token %s (%d) - %s\n", y, x, _SS_si.lex_text);
 
     return(x);}
 
@@ -267,13 +252,13 @@ int SS_parse_error_synt(char *s, PFPObject fnc)
 
     if (_SS.have_eof == TRUE)
        {_SS.have_eof = FALSE;
-        LONGJMP(SS_prs_cpu, TRUE);}
+        LONGJMP(_SS_si.cpu, TRUE);}
 
-    else if (SS_lex_text[0] <= 0)
-       LONGJMP(SS_prs_cpu, TRUE);
+    else if (_SS_si.lex_text[0] <= 0)
+       LONGJMP(_SS_si.cpu, TRUE);
 
     else
-       {snprintf(msg, MAXLINE, "BAD SYNTAX\n      TEXT:  %s", SS_lex_text);
+       {snprintf(msg, MAXLINE, "BAD SYNTAX\n      TEXT:  %s", _SS_si.lex_text);
         obj = (tok == NULL) ? SS_f : tok;
         SS_error(msg, obj);};
 
@@ -293,7 +278,7 @@ void dbgst(objp *st)
          (i > -20) && (st[i] != NULL) && (st[i] != (objp) 0x1000000);
          i--)
         {snprintf(msg, MAXLINE, "$%d = ", abs(i)+1);
-         SS_print(st[i], msg, "\n", SS_outdev);};
+         SS_print(st[i], msg, "\n", _SS_si.outdev);};
 
     return;}
 

@@ -14,6 +14,7 @@
 #define PCK_GLOIN
 
 #include <sx.h>
+#include <scheme_int.h>
 #include "global.h"
 #include "mesh.h"
 

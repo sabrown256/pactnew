@@ -21,7 +21,7 @@ static object *_SS_exa_var(void *vr, int type)
 
     ret = SS_f;
 
-    if (SS_interactive == TRUE)
+    if (_SS_si.interactive == TRUE)
        {char bf[MAXLINE];
 
 	SC_ntos(bf, MAXLINE, type, vr, 0, 1);
@@ -63,10 +63,10 @@ static object *_SS_exa_var(void *vr, int type)
 	   ret = SS_f;}
 
     else
-       {if (SS_interactive)
+       {if (_SS_si.interactive)
 	   PRINT(stdout, "    Unknown type ...");};
 
-    if (SS_interactive)
+    if (_SS_si.interactive)
        PRINT(stdout, "\n");
 
     return(ret);}
@@ -165,7 +165,7 @@ object *SS_install_cf(char *name, char *doc, ...)
     vp = SS_mk_variable(name, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(SS_symtab, name, vp, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(_SS_si.symtab, name, vp, SS_POBJECT_S, TRUE, TRUE);
 
     return(vp);}
 
@@ -191,34 +191,34 @@ object *SS_install_cv(char *name, void *pval, int ityp)
     if (SC_is_type_char(ityp) == TRUE)
        {long long v;
 	v = *(char *) pval;
-	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
+	SS_def_var(var, SS_mk_integer(v), _SS_si.global_env);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(var, SS_mk_integer(v), SS_Global_Env);}
+	SS_def_var(var, SS_mk_integer(v), _SS_si.global_env);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double v;
 	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(var, SS_mk_float(v), SS_Global_Env);}
+	SS_def_var(var, SS_mk_float(v), _SS_si.global_env);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(var, SS_mk_complex(v), SS_Global_Env);}
+	SS_def_var(var, SS_mk_complex(v), _SS_si.global_env);}
 
     else if (ityp == SC_STRING_I)
        {char *v;
 	v = (char *) pval;
-	SS_def_var(var, SS_mk_string(v), SS_Global_Env);}
+	SS_def_var(var, SS_mk_string(v), _SS_si.global_env);}
 
     else if (ityp == SS_OBJECT_I)
-       {SS_def_var(var, (object *) pval, SS_Global_Env);
+       {SS_def_var(var, (object *) pval, _SS_si.global_env);
 	typ = SS_POBJECT_S;}
 
     else
@@ -229,7 +229,7 @@ object *SS_install_cv(char *name, void *pval, int ityp)
  *         replaced by SS_POBJECT_S if one wants to conform to the rules
  *         for such things
  */
-    if (SC_hasharr_install(SS_symtab, name, var, typ, TRUE, TRUE) == NULL)
+    if (SC_hasharr_install(_SS_si.symtab, name, var, typ, TRUE, TRUE) == NULL)
        SS_error("INSTALL FAILED - SS_INSTALL_CV", var);
 
     return(var);}

@@ -10,12 +10,6 @@
 
 #include "scheme_int.h"
 
-PFExtractArg
- SS_arg_hook = NULL;
-
-PFCallArg
- SS_call_arg_hook = NULL;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -336,8 +330,8 @@ static void _SS_args(object *obj, void *v, int type)
 #endif
 
     else
-       {if (SS_arg_hook != NULL)
-	   (*SS_arg_hook)(obj, v, type);
+       {if (_SS_si.get_arg != NULL)
+	   (*_SS_si.get_arg)(obj, v, type);
         else
 	   *pv = obj->val;};
 
@@ -449,8 +443,8 @@ object *SS_define_constant(int n, ...)
        vr = SS_mk_variable(name, SS_null);
        SS_UNCOLLECT(vr);
 
-       SC_hasharr_install(SS_symtab, name, vr, SS_POBJECT_S, TRUE, TRUE);
-       SS_def_var(vr, val, SS_Global_Env);};
+       SC_hasharr_install(_SS_si.symtab, name, vr, SS_POBJECT_S, TRUE, TRUE);
+       SS_def_var(vr, val, _SS_si.global_env);};
 
     SC_VA_END;
 
@@ -472,7 +466,7 @@ void SS_var_value(char *s, int type, void *vr, int flag)
     obj = SS_INQUIRE_OBJECT(s);
 
     if (flag && SS_variablep(obj))
-       obj = SS_lk_var_val(obj, SS_Env);
+       obj = SS_lk_var_val(obj, _SS_si.env);
 
     if ((obj == NULL) || SS_nullobjp(obj))
        DEREF(vr) = NULL;
@@ -496,7 +490,7 @@ void *SS_var_reference(char *s)
 
     obj = SS_INQUIRE_OBJECT(s);
     if (SS_variablep(obj))
-       obj = SS_lk_var_val(obj, SS_Env);
+       obj = SS_lk_var_val(obj, _SS_si.env);
 
     if (SS_integerp(obj) || SS_floatp(obj) || SS_charobjp(obj))
        vr = SS_OBJECT(obj);
@@ -597,8 +591,8 @@ static object *_SS_make_list(int n, int *type, void **ptr)
 #endif
  
 	 else
-	    {if (SS_call_arg_hook != NULL)
-	        {o   = (*SS_call_arg_hook)(type[i], vl);
+	    {if (_SS_si.call_arg != NULL)
+	        {o   = (*_SS_si.call_arg)(type[i], vl);
 		 lst = SS_mk_cons(o, lst);}
 	     else
 	        lst = SS_mk_cons(SS_null, lst);};};
@@ -713,7 +707,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
 
     SC_VA_START(name);
 
-    fnc = (object *) SC_hasharr_def_lookup(SS_symtab, func);
+    fnc = (object *) SC_hasharr_def_lookup(_SS_si.symtab, func);
     if (fnc == NULL)
        SS_error("UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(func));
 
@@ -735,7 +729,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
 
     SS_Assign(expr, SS_null);
 
-    ret.memaddr = (char *) SS_Val;
+    ret.memaddr = (char *) _SS_si.val;
 
     rv = ret.diskaddr;
 
@@ -755,8 +749,8 @@ object *SS_call_scheme(char *func, ...)
 
     SC_VA_START(func);
 
-    fnc = _SS_lk_var_valc(func, SS_Env);
-/*    fnc = (object *) SC_hasharr_def_lookup(SS_symtab, func); */
+    fnc = _SS_lk_var_valc(func, _SS_si.env);
+/*    fnc = (object *) SC_hasharr_def_lookup(_SS_si.symtab, func); */
     if (fnc == NULL)
        SS_error("UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(func));
 
@@ -780,14 +774,14 @@ object *SS_call_scheme(char *func, ...)
 
     SS_GC(expr);
 
-    SS_Assign(SS_Env, SS_Global_Env);
-    SS_Assign(SS_This, SS_null);
-    SS_Assign(SS_Exn, SS_null);
-    SS_Assign(SS_Unev, SS_null);
-    SS_Assign(SS_Argl, SS_null);
-    SS_Assign(SS_Fun, SS_null);
+    SS_Assign(_SS_si.env, _SS_si.global_env);
+    SS_Assign(_SS_si.this, SS_null);
+    SS_Assign(_SS_si.exn, SS_null);
+    SS_Assign(_SS_si.unev, SS_null);
+    SS_Assign(_SS_si.argl, SS_null);
+    SS_Assign(_SS_si.fun, SS_null);
 
-    return(SS_Val);}
+    return(_SS_si.val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
