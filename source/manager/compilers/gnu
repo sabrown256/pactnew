@@ -38,7 +38,8 @@ Tool FC {
    Exe       = gfortran
    Flags     = -ffloat-store -ffree-form
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                  4.*   = -fsignaling-nans ]
+                 4.*   = -fsignaling-nans ;
+                 4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
    Flags    += [ _env_ = Bits ;                 # address bit size
                  32    = -m32 ;
                  64    = -m64 -fPIC ]

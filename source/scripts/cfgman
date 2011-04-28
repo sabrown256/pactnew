@@ -91,18 +91,18 @@ while ($#argv > 0)
 end
 
 # settle on the root database directory
-set DB = $SGN-$Arch
+set DB = ""
 if ("$dbdir" != "") then
-   set DB = $dbdir/$DB
+   set DB = $dbdir
 else if ($?CFGMAN_DB == 1) then
-   set DB = $CFGMAN_DB/$DB
+   set DB = $CFGMAN_DB
 else
    set lwd = $cwd
    @ nd = 10
    @ i  = 0
    while ($i < $nd)
       if (-d dev) then
-         set DB = $cwd/dev/$DB
+         set DB = $cwd/dev
          break
       endif
       cd .. >& /dev/null
@@ -112,13 +112,20 @@ else
    unset lwd
 endif
 
-if ("$DB" !~ /*) then
+if ("$DB" == "") then
    echo "CFGMAN: no database directory found"
    exit(112)
+else
+   set DB = $DB/$SGN-$Arch
+   if (!(-d $DB)) then
+      mkdir -p $DB
+      chmod 2770 $DB >& /dev/null
+   endif
 
-else if (!(-d $DB)) then
-   mkdir -p $DB
-   chmod 2770 $DB >& /dev/null
+# make full expanded path name for DB
+   pushd $DB >& /dev/null
+   set DB = $cwd
+   popd >& /dev/null
 endif
 
 # make the most common usage as fast as possible
