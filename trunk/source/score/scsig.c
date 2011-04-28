@@ -40,16 +40,12 @@ PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
 
     if ((0 < sig) && (sig < SC_NSIG) &&
 	(sig != SIGKILL) && (sig != SIGSTOP))
-       {na.sa_flags   = 0;
+       {na.sa_flags   = SA_RESTART;
 	na.sa_handler = fnc;
 	sigemptyset(&na.sa_mask);
 
-	SC_MEM_INIT(struct sigaction, &oa);
-
-	if (sigaction(sig, NULL, &oa) == 0)
-	   rv = oa.sa_handler;
-
-	sigaction(sig, &na, NULL);};
+	if (sigaction(sig, &na, &oa) != -1)
+	   rv = oa.sa_handler;};
 
 #else
 
@@ -142,8 +138,11 @@ int SC_signal_block(sigset_t *pos, ...)
        {is = SC_VA_ARG(int);
 	if (is < 0)
 	   break;
-	if ((0 < is) && (is < SC_NSIG) &&
-	    (is != SIGKILL) && (is != SIGSTOP))
+	else if (is == SC_ALL_SIGNALS)
+	   {sigfillset(&ns);
+	    break;}
+	else if ((0 < is) && (is < SC_NSIG) &&
+		 (is != SIGKILL) && (is != SIGSTOP))
 	   sigaddset(&ns, is);};
 
     SC_VA_END;
@@ -200,7 +199,10 @@ int SC_signal_unblock(sigset_t *pos, ...)
        {is = SC_VA_ARG(int);
 	if (is < 0)
 	   break;
-	if ((0 < is) && (is < SC_NSIG) &&
+	else if (is == SC_ALL_SIGNALS)
+	   {sigfillset(&ns);
+	    break;}
+	else if ((0 < is) && (is < SC_NSIG) &&
 	    (is != SIGKILL) && (is != SIGSTOP))
 	   sigaddset(&ns, is);};
 

@@ -36,6 +36,8 @@
 
 #define SC_LINE      0x10000000
 
+#define SC_ALL_SIGNALS  0x7fffff
+
 /*
 #define BLOCK_WITH_SIGIO                                                     \
    SIGCHLD, SIGPIPE, SIGSTOP, SIGTSTP, SIGTTIN, SIGTTOU

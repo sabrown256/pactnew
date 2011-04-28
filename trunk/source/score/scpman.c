@@ -529,7 +529,7 @@ static void _SC_child_exit(int w, int *pcnd, int *psts)
  *                 -    -2   on error
  *                 -    -1   if child is unknown (never existed)
  *                 -     0   if child is still running
- *                 -     PID if child is known and has completed
+ *                 -    PID  if child is known and has completed
  *                 - a value of -1 is acceptable for PID in which case
  *                 - any one child that is finished will be reported
  *                 - if PID was indeed exec'd and has exited
@@ -547,9 +547,7 @@ static void _SC_child_exit(int w, int *pcnd, int *psts)
 static int _SC_child_check(int pid)
    {int st, w, cnd, sts;
 
-    SC_signal_block(NULL,
-		    SIGCHLD, SC_SIGIO, SIGPIPE,
-		    -1);
+    SC_signal_block(NULL, SC_ALL_SIGNALS, -1);
 
     st = waitpid(pid, &w, WNOHANG);
     if (st > 0)
@@ -562,9 +560,7 @@ static int _SC_child_check(int pid)
     else if ((st == -1) && (errno != ECHILD))
        st = -2;
 
-    SC_signal_unblock(NULL,
-		      SIGCHLD, SC_SIGIO, SIGPIPE,
-		      -1);
+    SC_signal_unblock(NULL, SC_ALL_SIGNALS, -1);
 
     return(st);}
 
@@ -589,10 +585,15 @@ int SC_child_kill(int pid)
 	 if (kst == 0)
 	    {wst = 0;
 
+	     SC_signal_block(NULL, SC_ALL_SIGNALS, -1);
+	     SC_signal_unblock(NULL, SIGALRM, -1);
+
 /* wait at most a second for the child to die */
 	     if (SC_time_allow(1) == 0)
 	        {wst = waitpid(pid, &w, 0);
 		 SC_time_allow(0);};
+
+	     SC_signal_unblock(NULL, SC_ALL_SIGNALS, -1);
 
 /* if the child is gone we are done */
 	     if (wst == pid)
@@ -788,14 +789,17 @@ int SC_process_status(PROCESS *pp)
 
 	    SC_process_rusage(pp);
 
-/* we lost track of the process or is completely stalled */
+/* we lost track of the process or it is completely stalled */
 	    if ((pp->lost != NULL) && ((*pp->lost)(pp) == TRUE))
-	       {dstatelog("idle process %d (%d/%d)\n",
+	       {ex = -3;
+		dstatelog("idle process %d (%d/%d)\n",
 			  pid, SC_LOST, SC_EXIT_TIMEOUT);
 		_SC_set_process_status(pp, SC_EXITED | SC_LOST, SC_EXIT_BAD,
 				       NULL);}
 	    else
 	       ex = SC_child_status(pid, &cnd, &sts);
+
+	    SC_ASSERT(ex >= 0);
 
 /* if it just finished record the condition and status */
 	    if (ex == pid)

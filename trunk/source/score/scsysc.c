@@ -1227,8 +1227,9 @@ int _SC_get_command(tasklst *tl, int off)
 
 static int _SC_process_lost(PROCESS *pp)
    {int idle;
-    double t, ifr, ift;
+    double t, ifh, ifs, ift;
     SC_process_rusedes *pru;
+    static double ft = -1.0, fit = -1.0, fis = -1.0, fih = -1.0;
 
     idle = FALSE;
 
@@ -1236,30 +1237,47 @@ static int _SC_process_lost(PROCESS *pp)
        {pru = pp->pru;
 	if (pru != NULL)
 	   {t   = pru->wct - pru->wcr;
-	    ifr = pru->since / t;
 	    ift = pru->idlet / t;
+	    ifs = pru->since / t;
+	    ifh = pru->since / ((double) DEFAULT_HEARTBEAT);
 
 	    idle = TRUE;
 
 /* do not worry until the job has run more than a minute */
-	    idle &= (t > 60.0);
-
-/* do not kill off servers unless they have greatly exceeded the heartbeat */
-	    idle &= (pru->since > 2.5*DEFAULT_HEARTBEAT);
+	    if (ft < 0.0)
+	       {ft = SC_stof(getenv("SC_EXEC_LOST_TIME"));
+		if (ft == 0.0)
+		   ft = 60.0;};
+	    idle &= (t > ft);
 
 /* do not kill off shell scripts which are mostly idle
  * it must have run at least 10% of its lifetime to be considered lost
  */
-	    idle &= (ift < 0.9);
+	    if (fit < 0.0)
+	       {fit = SC_stof(getenv("SC_EXEC_LOST_IDLE"));
+		if (fit == 0.0)
+		   fit = 0.9;};
+	    idle &= (ift < fit);
 
 /* kill off process that has been idle for the last half of its life */
-	    idle &= (ifr > 0.5);};};
+	    if (fis < 0.0)
+	       {fis = SC_stof(getenv("SC_EXEC_LOST_SINCE"));
+		if (fis == 0.0)
+		   fis = 0.5;};
+	    idle &= (ifs > fis);
 
-#if 0
+/* do not kill off servers unless they have greatly exceeded the heartbeat */
+	    if (fih < 0.0)
+	       {fih = SC_stof(getenv("SC_EXEC_LOST_BEATS"));
+		if (fih == 0.0)
+		   fih = 2.5;};
+	    idle &= (ifh > fih);};};
+
+/* log lost processes which can be extremely hard to find without this info */
     if (idle == TRUE)
-       printf(">>> process %d is idle: %.2e  %.2e  %.2e  %.2f  %.2f\n",
-	      pp->id, t, pru->since, pru->idlet, ifr, ift);
-#endif
+       _SC_exec_printf(NULL,
+		       "***> idle process %d  sec(%.2e) idle(%.0f%%) since(%.0f%%) beats(%.2f)\n",
+		       pp->id, t, 100.0*ift, 100.0*ifs, ifh);
 
     return(idle);}
 
