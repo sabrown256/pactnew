@@ -155,7 +155,7 @@ static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
  *                        - (pdb-read-numeric-data [file] name)
  */
 
-object *_SXI_read_numeric_data(object *argl)
+object *_SXI_read_numeric_data(SS_psides *si, object *argl)
    {long sz;
     char *name, *s, *dtype;
     object *ret, *name_obj;

@@ -2690,9 +2690,9 @@ interfacing compiled and interpreted code.<p>
 <BLOCKQUOTE>
 object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
 <P>
-object *SS_sargs(object *argl)
+object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
 <P>
-object *SS_nargs(object *argl)
+object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
 </BLOCKQUOTE>
 </B>
 

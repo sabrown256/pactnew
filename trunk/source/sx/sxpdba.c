@@ -17,7 +17,7 @@
  *               - Usage: (def-attribute <file> <name> <type>)
  */
 
-static object *_SXI_def_attr(object *argl)
+static object *_SXI_def_attr(SS_psides *si, object *argl)
    {char *at, *type;
     PDBfile *file;
     g_file *po;
@@ -50,7 +50,7 @@ static object *_SXI_def_attr(object *argl)
  *               - Usage: (rem-attribute <file> <name>)
  */
 
-static object *_SXI_rem_attr(object *argl)
+static object *_SXI_rem_attr(SS_psides *si, object *argl)
    {char *at;
     PDBfile *file;
     g_file *po;
@@ -83,7 +83,7 @@ static object *_SXI_rem_attr(object *argl)
  *                   -                              <name> <attribute> <value>)
  */
 
-static object *_SXI_set_attr_val(object *argl)
+static object *_SXI_set_attr_val(SS_psides *si, object *argl)
    {int id;
     char *at, *vr, *data_type, attr_type[MAXLINE];
     void *data;
@@ -190,7 +190,7 @@ static object *_SXI_set_attr_val(object *argl)
  *                   -                             <name> <attribute>)
  */
 
-static object *_SXI_get_attr_val(object *argl)
+static object *_SXI_get_attr_val(SS_psides *si, object *argl)
    {char *at, *vr, attr_type[MAXLINE];
     PDBfile *file;
     g_file *po;
@@ -240,7 +240,7 @@ static object *_SXI_get_attr_val(object *argl)
  *               - Usage: (list-attributes <file>)
  */
 
-static object *_SXI_lst_attr(object *argl)
+static object *_SXI_lst_attr(SS_psides *si, object *argl)
    {int n;
     long i, ne;
     char *ty, *name, **entries;

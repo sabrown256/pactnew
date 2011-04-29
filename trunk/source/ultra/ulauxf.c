@@ -140,7 +140,7 @@ object *UL_fft(int j)
 
 /* _ULI_IFFT - main controlling routine for IFFT */
 
-static object *_ULI_ifft(object *argl)
+static object *_ULI_ifft(SS_psides *si, object *argl)
    {object *rv;
 
     rv = _UL_fft(argl, "IFFT", 0, -1, _SX.fft_order);
@@ -152,7 +152,7 @@ static object *_ULI_ifft(object *argl)
 
 /* _ULI_CFFT - main controlling routine for complex FFT */
 
-static object *_ULI_cfft(object *argl)
+static object *_ULI_cfft(SS_psides *si, object *argl)
    {object *rv;
 
     rv = _UL_fft(argl, "CFFT", 0, 1, _SX.fft_order);
@@ -196,7 +196,7 @@ static double _UL_effective_dx(double *x, double *y, int n)
 
 /* _ULI_CONVLV - compute and return the convolution of two curves */
 
-static object *_ULI_convlv(object *argl)
+static object *_ULI_convlv(SS_psides *si, object *argl)
    {int jg, jh, n, gn, hn;
     double *y, *x, *gx, *gy, *hx, *hy, dt, dxeg, dxeh;
     char *lbl;
@@ -478,7 +478,7 @@ object *UL_fit(object *obj, object *tok)
 
 /* _ULI_FIT_CURVE - generate least squares fits to the given curves */
 
-static object *_ULI_fit_curve(object *argl)
+static object *_ULI_fit_curve(SS_psides *si, object *argl)
    {int j, i, k, n, order, aord, id;
     int alpha_id;
     int *curid;
@@ -487,9 +487,6 @@ static object *_ULI_fit_curve(object *argl)
     char local[MAXLINE];
     PM_matrix *ay, *a, *solution;
     object *ch;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SS_args(argl,
             UL_CURVE_INDEX_I, &j,
@@ -592,7 +589,7 @@ static object *_ULI_fit_curve(object *argl)
 
 /* _ULI_ERROR_PLOT - plot error bars on the specified curve */
 
-static object *_ULI_error_plot(object *argl)
+static object *_ULI_error_plot(SS_psides *si, object *argl)
    {pcons *info;
     object *c, *xp[PG_SPACEDM], *xm[PG_SPACEDM], *o;
     curve *crv;
@@ -644,7 +641,7 @@ static object *_ULI_error_plot(object *argl)
 
 /* _ULI_MK_PALETTE - make a new palette */
 
-static object *_ULI_mk_palette(object *argl)
+static object *_ULI_mk_palette(SS_psides *si, object *argl)
    {int nc, wbck;
     char *name, *fname;
     PG_device *dev;
@@ -913,7 +910,7 @@ object *UL_stat(int j)
  *            - a specified set of curves
  */
 
-static object *_ULI_stats(object *argl)
+static object *_ULI_stats(SS_psides *si, object *argl)
    {int i;
     object *ret, *o;
 
@@ -1144,7 +1141,7 @@ static object *_ULI_crv_attr(object *obj)
  *                - specified in NDC
  */
 
-static object *_ULI_write_abs(PG_device *dev, object *argl)
+static object *_ULI_write_abs(SS_psides *si, object *argl)
    {double x[PG_SPACEDM];
     char *text;
 

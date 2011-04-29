@@ -55,7 +55,7 @@ static object *_SXI_setp(object *obj)
  *               - form: (pm-make-array <type> <size>)
  */
 
-static object *_SXI_mk_array(object *argl)
+static object *_SXI_mk_array(SS_psides *si, object *argl)
    {long size;
     char *type;
     C_array *arr;
@@ -89,7 +89,7 @@ static object *_SXI_mk_array(object *argl)
  *                 - form: (pm-resize-array <array> <size>)
  */
 
-static object *_SXI_resz_array(object *argl)
+static object *_SXI_resz_array(SS_psides *si, object *argl)
    {long os, size, bpi;
     C_array *arr;
     void *d;
@@ -122,7 +122,7 @@ static object *_SXI_resz_array(object *argl)
  *                - form: (pm-sub-array <array> <dimensions> <region>)
  */
 
-static object *_SXI_sub_array(object *argl)
+static object *_SXI_sub_array(SS_psides *si, object *argl)
    {int i, nd, nr;
     long n, length, rlength, bpi;
     long *idims, *ireg, *pd, *pr;
@@ -210,7 +210,7 @@ static object *_SXI_sub_array(object *argl)
  *                - form: (pm-array-ref <array> <n>)
  */
 
-static object *_SXI_array_ref(object *argl)
+static object *_SXI_array_ref(SS_psides *si, object *argl)
    {long n;
     C_array *arr;
     object *o;
@@ -250,7 +250,7 @@ static object *_SXI_array_ref(object *argl)
  *                - form: (pm-array-set! <array> <n> <value>)
  */
 
-static object *_SXI_array_set(object *argl)
+static object *_SXI_array_set(SS_psides *si, object *argl)
    {long n;
     C_array *arr;
     object *val;
@@ -323,6 +323,18 @@ object *SX_list_array(object *argl)
 		     0);};};
 
     rv = SX_mk_C_array(arr);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_LIST_ARRAY - wrapper over SX_list_array */
+
+object *_SXI_list_array(SS_psides *si, object *argl)
+   {object *rv;
+
+    rv = SX_list_array(argl);
 
     return(rv);}
 
@@ -416,7 +428,7 @@ static object *_SXI_num_arr_extr(object *arg)
  *                  - PM_set and return it
  */
 
-static object *_SXI_set_pdbdata(object *argl)
+static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
    {char *mn, set_name[MAXLINE];
     PM_set *s;
     g_file *po;
@@ -464,7 +476,7 @@ static object *_SXI_set_pdbdata(object *argl)
  *                  -    (pdbdata->pm-set <file> <name>)
  */
 
-static object *_SXI_pdbdata_set(object *argl)
+static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
    {char *name;
     PDBfile *file;
     g_file *po;
@@ -549,7 +561,7 @@ static object *_SXI_pdbdata_set(object *argl)
  *                   -       more generally.
  */
 
-static object *_SXI_make_pml_set(object *argl)
+static object *_SXI_make_pml_set(SS_psides *si, object *argl)
    {int *maxes, *pm, nd, ne, nde;
     char *name, *type;
     void **elem, **pe;
@@ -636,7 +648,7 @@ static object *_SXI_make_pml_set(object *argl)
  *                  - (pm-make-cartesian-product-set [<set>]*)
  */
 
-static object *_SXI_make_cp_set(object *argl)
+static object *_SXI_make_cp_set(SS_psides *si, object *argl)
    {int i, n;
     char *name;
     PM_set **sets, *cp;
@@ -675,7 +687,7 @@ static object *_SXI_make_cp_set(object *argl)
  *                       - mapping name
  */
 
-static object *_SXI_make_pml_mapping(object *argl)
+static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
    {char *lbl, *name, *category;
     PM_centering centering;
     PM_mapping *f, *next;
@@ -803,7 +815,7 @@ static object *_SXI_get_text_set_name(object *set)
  *                   -                               <name> <type> <value>)
  */
 
-static object *_SXI_set_attr_set(object *argl)
+static object *_SXI_set_attr_set(SS_psides *si, object *argl)
    {PM_set *s;
     char *name, *type;
     object *val;
@@ -846,7 +858,7 @@ static object *_SXI_set_attr_set(object *argl)
  *                   - a PG_graph object
  */
 
-static object *_SXI_set_map_type(object *argl)
+static object *_SXI_set_map_type(SS_psides *si, object *argl)
    {PM_mapping *f;
     char *name;
 
@@ -873,7 +885,7 @@ static object *_SXI_set_map_type(object *argl)
  *                      - PM_mapping and return it
  */
 
-static object *_SXI_mapping_pdbdata(object *argl)
+static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
    {PM_mapping *f, *pf;
     g_file *po;
     PDBfile *file;
@@ -939,7 +951,7 @@ static object *_SXI_mapping_pdbdata(object *argl)
  *                      -    (pdbdata->pm-mapping <file> <name>)
  */
 
-static object *_SXI_pdbdata_mapping(object *argl)
+static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
    {int i, ret;
     char *name, dname[MAXLINE];
     PDBfile *file;
@@ -1069,7 +1081,7 @@ object *SX_mk_mapping(PM_mapping *f)
  *                 -    (pm-arrays->set name <array> ...)
  */
 
-static object *_SXI_arrays_set(object *argl)
+static object *_SXI_arrays_set(SS_psides *si, object *argl)
    {int i, j, n, sid;
     int nd, ne, nde, nep, tflag;
     int *maxes, *pm;
@@ -1171,7 +1183,7 @@ static object *_SXI_arrays_set(object *argl)
  *            -    (pm-lr->ac <mapping>)
  */
 
-static object *_SXI_lr_ac(object *argl)
+static object *_SXI_lr_ac(SS_psides *si, object *argl)
    {int ord, *maxes;
     void **elements;
     PM_centering cent;
@@ -1261,7 +1273,7 @@ static object *_SXI_lr_ac(object *argl)
  *                  - see the description in pml.h for details
  */
 
-static object *_SXI_make_ac_set(object *argl)
+static object *_SXI_make_ac_set(SS_psides *si, object *argl)
    {int i, j, k;
     int ne, nd, nde;
     int *nbp, *ncs, nc, ord;
@@ -1348,7 +1360,7 @@ static object *_SXI_make_ac_set(object *argl)
  *                    -    (pm-array->pdbdata <array> <file> [<name>])
  */
 
-static object *_SXI_array_pdbdata(object *argl)
+static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
    {char *mn, *name;
     C_array *arr;
     g_file *po;
@@ -1398,7 +1410,7 @@ static object *_SXI_array_pdbdata(object *argl)
  *                      -    (pm-array->pdbdata-i <array> <file> [<name>])
  */
 
-static object *_SXI_array_pdbdata_i(object *argl)
+static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
    {char type[MAXLINE];
     char *mn, *pt, *name;
     void *x;
@@ -1457,7 +1469,7 @@ static object *_SXI_array_pdbdata_i(object *argl)
  *                    -    (pdbdata->pm-array <pdbdata>)
  */
 
-static object *_SXI_pdbdata_array(object *arg)
+static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
    {g_pdbdata *pd;
     syment *ep;
     C_array *arr;
@@ -1623,7 +1635,7 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
  *                    - an offset; and a maximum number of nodes per zone
  */
 
-static object *_SXI_rep_ac_domain(object *argl)
+static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
    {int incr;
     int n_zones, n_nodes, *zones;
     char *xname, *yname, *nzname, *nnname, *sname;
@@ -1694,7 +1706,7 @@ static object *_SXI_rep_ac_domain(object *argl)
  *                 - Usage:  (find-value array oper val indeces)
  */
 
-static object *_SXI_find_index(object *argl)
+static object *_SXI_find_index(SS_psides *si, object *argl)
    {int nx, no, ni;
     int *out, *in;
     double val;
@@ -1811,7 +1823,7 @@ object *SX_mk_polygon(PM_polygon *py)
  *                 - polygons may be open or closed
  */
 
-static object *_SXI_mk_polygon(object *argl)
+static object *_SXI_mk_polygon(SS_psides *si, object *argl)
    {long id, ip, nd, ne, np;
     double v;
     PM_polygon *py;
@@ -1930,7 +1942,7 @@ static object *_SX_combine_polygons(object *argl,
  *                        - form: (pm-intersect-polygon <py>*)
  */
 
-static object *_SXI_intersect_polygon(object *argl)
+static object *_SXI_intersect_polygon(SS_psides *si, object *argl)
    {object *rv;
 
     rv = _SX_combine_polygons(argl, PM_intersect_polygons);
@@ -1944,7 +1956,7 @@ static object *_SXI_intersect_polygon(object *argl)
  *                    - form: (pm-union-polygon <py>*)
  */
 
-static object *_SXI_union_polygon(object *argl)
+static object *_SXI_union_polygon(SS_psides *si, object *argl)
    {object *rv;
 
     rv = _SX_combine_polygons(argl, PM_union_polygons);
@@ -1975,7 +1987,7 @@ void SX_install_pml_funcs(void)
     SS_install("list->pm-array",
                "Returns a numeric array built from a list of numbers",
                SS_nargs,
-               SX_list_array, SS_PR_PROC);
+               _SXI_list_array, SS_PR_PROC);
 
     SS_install("pm-array->list",
                "Returns a list of numbers built from a numeric array",

@@ -118,11 +118,13 @@ static object *_SSI_pr_runp(object *obj)
 
 /* _SSI_OPN_PR - process-open in Scheme */
 
-static object *_SSI_opn_pr(object *argl)
-   {PROCESS *pp;
-    int n, i;
+static object *_SSI_opn_pr(SS_psides *si, object *argl)
+   {int n, i;
     char **argv, *mode;
-    object *obj = SS_null;
+    PROCESS *pp;
+    object *obj;
+
+    obj = SS_null;
 
 /* pull the mode off */
     mode = NULL;
@@ -172,7 +174,7 @@ static object *_SSI_opn_pr(object *argl)
 
 /* _SSI_BLCK_PR - process-block in Scheme */
 
-static object *_SSI_blck_pr(object *argl)
+static object *_SSI_blck_pr(SS_psides *si, object *argl)
    {PROCESS *pp;
     object *o, *r;
 
@@ -214,7 +216,7 @@ static object *_SSI_cls_pr(object *obj)
 
 /* _SSI_PR_RD_TRIES - process-read-tries in Scheme */
 
-static object *_SSI_pr_rd_tries(object *argl)
+static object *_SSI_pr_rd_tries(SS_psides *si, object *argl)
    {object *o;
 
     if (!SS_nullobjp(argl))
@@ -285,7 +287,7 @@ static object *_SSI_pr_rd_line(object *obj)
 
 /* _SSI_PR_SN_LINE - process-send-line at Scheme level */
 
-static object *_SSI_pr_sn_line(object *argl)
+static object *_SSI_pr_sn_line(SS_psides *si, object *argl)
    {int ret;
     char *s;
     PROCESS *pp;
@@ -308,7 +310,7 @@ static object *_SSI_pr_sn_line(object *argl)
 
 /* _SSI_GET_URL_FILE - grab a web page into a file */
 
-static object *_SSI_get_url_file(object *argl)
+static object *_SSI_get_url_file(SS_psides *si, object *argl)
    {int ret;
     char *url, *file, *vers;
     object *o;
@@ -333,7 +335,7 @@ static object *_SSI_get_url_file(object *argl)
 
 /* _SSI_GET_HOST_NAME - given a system type SYS return an available host */
 
-static object *_SSI_get_host_name(object *argl)
+static object *_SSI_get_host_name(SS_psides *si, object *argl)
    {int ret;
     char hst[MAXLINE];
     char *sys;
@@ -363,7 +365,7 @@ static object *_SSI_get_host_name(object *argl)
  *                     - array and the strings with SC_free_strings
  */
 
-static object *_SSI_get_host_types(object *argl)
+static object *_SSI_get_host_types(SS_psides *si, object *argl)
    {int i, all;
     char *t, *net, **strs;
     object *s, *strl;
@@ -397,7 +399,7 @@ static object *_SSI_get_host_types(object *argl)
 
 /* _SSI_RESOURCE_USAGE - return a list of available resource usage for PID */
 
-static object *_SSI_resource_usage(object *argl)
+static object *_SSI_resource_usage(SS_psides *si, object *argl)
    {int pid, err;
     SC_rusedes ru;
     object *o;

@@ -261,10 +261,10 @@ extern double
 extern object
  *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
 	      int nde, double **elem),
- *LR_var_plot(object *argl),
+ *LR_var_plot(SS_psides *si, object *argl),
  *LR_get_time_data(void),
  *LR_get_mesh_data(void),
- *LR_def_domain(object *argl);
+ *LR_def_domain(SS_psides *si, object *argl);
 
 #endif
 

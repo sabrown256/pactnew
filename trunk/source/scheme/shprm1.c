@@ -216,11 +216,8 @@ static object *_SSI_unq_spl(object *obj)
 
 /* _SSI_LAMBDA - lambda, the procedure making macro in Scheme */
 
-static object *_SSI_lambda(object *argl)
+static object *_SSI_lambda(SS_psides *si, object *argl)
    {object *lambda;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     lambda = SS_mk_procedure(SS_anon_proc, argl, si->env);
 
@@ -231,11 +228,8 @@ static object *_SSI_lambda(object *argl)
 
 /* _SSI_LAMBDAM - lambda-macro, the macro making macro in Scheme */
 
-static object *_SSI_lambdam(object *argl)
+static object *_SSI_lambdam(SS_psides *si, object *argl)
    {object *lambda;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     lambda = SS_mk_procedure(SS_anon_macro, argl, si->env);
 
@@ -259,12 +253,9 @@ static object *_SSI_lambdam(object *argl)
  *        - to be handed back to eval
  */
 
-static object *SS_let(object *let)
+static object *SS_let(SS_psides *si, object *let)
    {object *vlpair, *vr, *vl, *lst;
     object *prml, *argl, *bdy, *lambda;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SS_nullobjp(let) || !SS_consp(let))
        SS_error("BAD LET FORM", let);
@@ -310,12 +301,9 @@ static object *SS_let(object *let)
  *             - to be handed back to eval
  */
 
-static object *_SSI_letstr(object *lets)
+static object *_SSI_letstr(SS_psides *si, object *lets)
    {object *vlpair, *vr, *vl, *lst;
     object *prml, *asgn, *asnl, *bdy, *let, *this;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SS_nullobjp(lets) || !SS_consp(lets))
        SS_error("BAD LET* FORM", lets);
@@ -347,7 +335,7 @@ static object *_SSI_letstr(object *lets)
     let = SS_mk_cons(prml, bdy);
 
 /* process the let form */
-    SS_Assign(si->exn, SS_let(let));
+    SS_Assign(si->exn, SS_let(si, let));
 
     return(si->exn);}
 
@@ -367,12 +355,9 @@ static object *_SSI_letstr(object *lets)
  *             - to be handed back to eval
  */
 
-static object *_SSI_letstr(object *lets)
+static object *_SSI_letstr(SS_psides *si, object *lets)
    {object *vlpair, *vr, *vl, *lst, *frm;
     object *prml, *bdy, *asgn;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SS_nullobjp(lets) || !SS_consp(lets))
        SS_error("BAD LET* FORM", lets);
@@ -405,7 +390,7 @@ static object *_SSI_letstr(object *lets)
     SS_Assign(si->fun, frm);
 
 /* process the let form */
-    SS_Assign(si->exn, SS_let(si->fun));
+    SS_Assign(si->exn, SS_let(si, si->fun));
 
 /* clean up the mess */
     SS_Restore(si, si->fun);
@@ -428,11 +413,8 @@ static object *_SSI_letstr(object *lets)
  *             - to be handed back to eval
  */
 
-static object *_SSI_letstr(object *letr)
+static object *_SSI_letstr(SS_psides *si, object *letr)
    {object *vlpair, *vr, *vl, *lst, *frm;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SS_nullobjp(letr) || !SS_consp(letr))
        SS_error("BAD LET* FORM", letr);
@@ -465,7 +447,7 @@ static object *_SSI_letstr(object *letr)
     SS_Assign(si->fun, frm);
 
 /* process the let form */
-    SS_Assign(si->exn, SS_let(si->fun));
+    SS_Assign(si->exn, SS_let(si, si->fun));
 
 /* clean up the mess */
     SS_Restore(si, si->val);
@@ -519,12 +501,9 @@ static object *SS_lst_map(object *argl, int *Ex_flag)
 
 /* _SSI_MAP - map for Scheme */
 
-static object *_SSI_map(object *obj)
+static object *_SSI_map(SS_psides *si, object *obj)
    {object *proc, *argl, *expr, *args, *vl, *ret, *ret_nxt;
     int exf;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ret_nxt = SS_null;
 
@@ -564,12 +543,9 @@ static object *_SSI_map(object *obj)
 
 /* _SSI_FOREACH - for-each for Scheme */
 
-static object *_SSI_foreach(object *obj)
+static object *_SSI_foreach(SS_psides *si, object *obj)
    {int exf;
     object *proc, *argl, *expr, *args, *vl;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     proc = SS_car(obj);
     argl = SS_cdr(obj);
@@ -618,7 +594,7 @@ static object *_SSI_not(object *obj)
 
 /* SS_LIST - list in Scheme */
 
-object *SS_list(object *argl)
+object *SS_list(SS_psides *si, object *argl)
    {
 
     return(argl);}
@@ -657,7 +633,7 @@ static object *_SSI_unwatch(object *obj)
 
 /* _SSI_TRACE - set the trace field in the procedure structs to TRUE */
 
-static object *_SSI_trace(object *argl)
+static object *_SSI_trace(SS_psides *si, object *argl)
    {object *lst, *car;
 
     lst = argl;
@@ -674,7 +650,7 @@ static object *_SSI_trace(object *argl)
 
 /* _SSI_UNTRACE - set the trace field in the procedure structs to FALSE */
 
-static object *_SSI_untrace(object *argl)
+static object *_SSI_untrace(SS_psides *si, object *argl)
    {object *lst, *car;
 
     lst = argl;
@@ -752,7 +728,7 @@ static void _SS_check_bad_names(char *name, char *addr,
 
 /* _SSI_CHECK_OBJECTS - debugging object trace */
 
-static object *_SSI_check_objects(object *obj)
+static object *_SSI_check_objects(SS_psides *si, object *obj)
    {int kind;
     long nm;
     object *ret;
@@ -971,12 +947,9 @@ static object *_SSI_catch(object *obj)
 
 /* _SSI_CATCH_ERR - the entry part of err-catch */
 
-static object *_SSI_catch_err(object *argl)
+static object *_SSI_catch_err(SS_psides *si, object *argl)
    {object *err_proc, *proc_call, *err_ev, *ret;
     object *esc;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ret = SS_null;
 
@@ -1060,7 +1033,7 @@ static object *_SSI_time(SS_psides *si)
  *            -           maximum elapsed time measured in weeks
  */
 
-static object *_SSI_etime(object *argl)
+static object *_SSI_etime(SS_psides *si, object *argl)
    {int i;
     long r, dt[5];
     double since;
@@ -1123,7 +1096,7 @@ static object *_SSI_etime(object *argl)
  *             - return #t iff successful
  */
 
-static object *_SSI_unlink(object *argl)
+static object *_SSI_unlink(SS_psides *si, object *argl)
    {int ok;
     char *path;
     object *rv;

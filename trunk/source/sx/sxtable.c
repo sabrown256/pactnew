@@ -257,16 +257,13 @@ static int SX_find_text_table(FILE *fp, int n, int linelen, char *linein,
 
 /* _SXI_READ_TEXT_TABLE - read a table of numbers from an  ASCII input file */
 
-static object *_SXI_read_text_table(object *argl)
+static object *_SXI_read_text_table(SS_psides *si, object *argl)
    {int i, j, n, nc, nr, nl, fn, nlabel, linelen;
     long addrt, addrl;
     char *name, *token;
     char *label, *linein;
     FILE *fp;
     object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SX_current_table != NULL)
        {PM_destroy(SX_current_table);
@@ -556,7 +553,7 @@ static PM_set *_SX_table_set(object *specs)
  *              - <component> := (start [n-pts] [stride])
  */
 
-static object *SX_table_set(object *specs)
+static object *SX_table_set(SS_psides *si, object *specs)
    {object *rv;
     PM_set *set;
 
@@ -577,7 +574,7 @@ static object *SX_table_set(object *specs)
  *              - <component> := (start [stop] [stride])
  */
 
-static object *_SXI_table_map(object *argl)
+static object *_SXI_table_map(SS_psides *si, object *argl)
    {char *name, bf[MAXLINE];
     object *dmlst, *rnlst, *rv;
     PM_centering centering;
@@ -620,7 +617,7 @@ static object *_SXI_table_map(object *argl)
 
 /* SX_WRT_TEXT_TABLE - write mapping to an ASCII file */
 
-static object *SX_wrt_text_table(object *argl)
+static object *SX_wrt_text_table(SS_psides *si, object *argl)
    {long i, j, ne, ndd, nded, nder;
     int *maxes;
     object *outprt;
@@ -683,7 +680,7 @@ static object *SX_wrt_text_table(object *argl)
 
 /* SX_WRT_CURRENT_TABLE - write current table to an ASCII file */
 
-static object *SX_wrt_current_table(object *argl)
+static object *SX_wrt_current_table(SS_psides *si, object *argl)
    {char *fname;
     int i, j, k, nr, nc;
     double *ap;
@@ -701,7 +698,8 @@ static object *SX_wrt_current_table(object *argl)
     if (fname != NULL)
        {fp = io_open(fname, "w");
         if (fp == NULL)
-           SS_error("CAN'T OPEN FILE - TV_WRT_CURRENT_TABLE", SS_mk_string(fname));}
+           SS_error("CAN'T OPEN FILE - SX_WRT_CURRENT_TABLE",
+		    SS_mk_string(fname));}
 
 /* write the labels if any */
     if (SX_current_table_labels != NULL)
@@ -738,13 +736,10 @@ static object *SX_wrt_current_table(object *argl)
  *                 - assumes 0 based numbering
  */
 
-static object *SX_print_column(object *argl)
+static object *SX_print_column(SS_psides *si, object *argl)
    {long col, nr, nc, j;
     double *val;
     object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     rv = SS_null;
 
@@ -811,17 +806,14 @@ static int _SX_del_label(long *cols, long ncol)
 
 /* SX_DELETE_COLUMN - delete a column from the current table */
 
-static object *SX_delete_column(object *argl)
-   {int nr, nc, i, j;
-    int done = 0;
+static object *SX_delete_column(SS_psides *si, object *argl)
+   {int nr, nc, i, j, done;
     C_array *arr;
     long *data, *sdata, ncol, temp;
     object *rv;
-    SS_psides *si;
 
-    si = &_SS_si;
-
-    rv = SS_null;
+    done = 0;
+    rv   = SS_null;
 
     if (SX_current_table == NULL)
        SS_error("NO CURRENT TABLE EXISTS - USE read-table TO CREATE", argl);
@@ -876,12 +868,9 @@ static object *SX_delete_column(object *argl)
 
 /* SX_SORT_ON_COLUMN - sort the current table on a column */
 
-static object *SX_sort_on_column(object *argl)
+static object *SX_sort_on_column(SS_psides *si, object *argl)
    {int col, nr, nc;
     object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     rv = SS_null;
 

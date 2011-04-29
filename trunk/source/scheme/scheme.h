@@ -936,7 +936,7 @@ extern char
 /* SHARR.C declarations */
 
 extern object
- *SS_hash_dump(object *argl),
+ *SS_hash_dump(SS_psides *si, object *argl),
  *SS_mk_hasharr(hasharr *tb),
  *SS_mk_haelem(haelem *hp);
 
@@ -984,7 +984,7 @@ extern void
 /* SHPRM1.C declarations */
 
 extern object
- *SS_list(object *argl);
+ *SS_list(SS_psides *si, object *argl);
 
 extern void
  SS_bgn_trace(object *pfun, object *pargl),
@@ -1041,7 +1041,7 @@ extern void
 
 extern object
  *SS_trans_off(SS_psides *si),
- *SS_banner(object *obj);
+ *SS_banner(SS_psides *si, object *obj);
  
 extern int
  SS_puts(char *s, FILE *fp, PFfputs put),
@@ -1057,7 +1057,7 @@ extern object
  *SS_add_variable(char *name),
  *SS_read(object *str),
  *SS_gread(object *obj),
- *SS_load(object *argl);
+ *SS_load(SS_psides *si, object *argl);
 
 extern void
  SS_add_parser(char *ext, object *(*prs)(SS_psides *si)),

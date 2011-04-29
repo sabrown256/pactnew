@@ -13,12 +13,6 @@
 static PG_device
  *global_dev;
 
-extern object
- *LR_get_time_data(byte),
- *LR_get_mesh_data(byte),
- *LR_lrm_plot(object *argl),
- *LR_def_domain(object *argl);
-
 static PM_set
  *LR_mesh_set(char *name);
 
@@ -639,7 +633,7 @@ object *LR_int_plot(PG_device *dev, char *rname, PM_centering centering,
  *             - the domain should be specified first
  */
 
-object *LR_var_plot(object *argl)
+object *LR_var_plot(SS_psides *si, object *argl)
    {int color, style, id, space;
     int lcolor, lstyle;
     double width, lwidth;
@@ -980,7 +974,7 @@ int LR_get_domain_zone(PA_plot_request *pr)
  *               - supply that information.
  */
 
-object *LR_def_domain(object *argl)
+object *LR_def_domain(SS_psides *si, object *argl)
    {PM_set *dom;
     object *obj, *ret;
     int i, n, nmax, space;

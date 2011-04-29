@@ -27,7 +27,7 @@ static object *_SSI_charp(object *obj)
 
 /* _SSI_CHREQ - char=? for Scheme */
 
-static object *_SSI_chreq(object *argl)
+static object *_SSI_chreq(SS_psides *si, object *argl)
    {object *o1, *o2, *o;
 
     o2 = SS_null;
@@ -44,7 +44,7 @@ static object *_SSI_chreq(object *argl)
 
 /* _SSI_CHRGE - char>=? for Scheme */
 
-static object *_SSI_chrge(object *argl)
+static object *_SSI_chrge(SS_psides *si, object *argl)
    {object *o1, *o2, *o;
 
     o2 = SS_null;
@@ -61,7 +61,7 @@ static object *_SSI_chrge(object *argl)
 
 /* _SSI_CHRGT - char>? for Scheme */
 
-static object *_SSI_chrgt(object *argl)
+static object *_SSI_chrgt(SS_psides *si, object *argl)
    {object *o1, *o2, *o;
 
     o2 = SS_null;
@@ -78,7 +78,7 @@ static object *_SSI_chrgt(object *argl)
 
 /* _SSI_CHRLE - char<=? for Scheme */
 
-static object *_SSI_chrle(object *argl)
+static object *_SSI_chrle(SS_psides *si, object *argl)
    {object *o1, *o2, *o;
 
     o2 = SS_null;
@@ -95,7 +95,7 @@ static object *_SSI_chrle(object *argl)
 
 /* _SSI_CHRLT - char<? for Scheme */
 
-static object *_SSI_chrlt(object *argl)
+static object *_SSI_chrlt(SS_psides *si, object *argl)
    {object *o1, *o2, *o;
 
     o2 = SS_null;

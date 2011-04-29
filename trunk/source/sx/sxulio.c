@@ -869,7 +869,7 @@ static int SX_find_text_table(FILE *fp, int n, int *pfn, int *pnr, int *pnc,
 
 /* SX_READ_TEXT_TABLE - read a table of numbers from an  ASCII input file */
 
-object *SX_read_text_table(object *argl)
+object *SX_read_text_table(SS_psides *si, object *argl)
    {int i, j, n, nb, nc, nr, fn, nlabel, ok;
     long nl;
     int64_t addrt, addrl; 
@@ -877,9 +877,9 @@ object *SX_read_text_table(object *argl)
     char *bf, *pbf, *name, *token;
     FILE *fp;
     object *o;
-    SS_psides *si;
 
-    si = &_SS_si;
+/*    if (si == NULL)
+       si = &_SS_si; */
 
     memset(label, 0, MAXLINE);
 
@@ -998,7 +998,7 @@ static double *SX_extract_vector(PM_matrix *a, int o, int s, int n)
  *                -
  */
 
-object *SX_table_curve(object *argl)
+object *SX_table_curve(SS_psides *si, object *argl)
    {int k, na, yo, ys, xo, xs;
     double *xa, *ya;
     char label[MAXLINE];
@@ -1217,13 +1217,13 @@ static void SX_wrt_text(FILE *fp, object *argl)
 
 /* SX_WRITE_DATA - write out curves in specified format */
 
-object *SX_write_data(object *argl)
+object *SX_write_data(SS_psides *si, object *argl)
    {char *mode, *fname, *type;
     SC_file_type imode;
     object *fobj, *frst;
-    SS_psides *si;
 
-    si = &_SS_si;
+/*    if (si == NULL)
+       si = &_SS_si; */
 
     if (_SX.files == NULL)
        _SX.files = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);

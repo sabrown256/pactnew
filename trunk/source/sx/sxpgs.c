@@ -80,7 +80,7 @@ static object *_SXI_def_file_graph(object *obj)
  *                    - PM_mapping and return it
  */
 
-static object *_SXI_graph_pdbdata(object *argl)
+static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
    {PG_graph *g;
     PM_mapping *f;
     char *name;
@@ -283,7 +283,7 @@ SX_menu_item *_SX_get_menu_item(g_file *po, int i)
  *                    -    (pdbdata->pg_graph <file> <name>)
  */
 
-static object *_SXI_pdbdata_graph(object *argl)
+static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
    {object *obj;
     int i;
     char *name;
@@ -424,7 +424,7 @@ object *SX_mk_dev_attributes(PG_dev_attributes *da)
 
 /* _SXI_MENU_ITEM_TYPE - return the type of a menu item */
 
-static object *_SXI_menu_item_type(object *argl)
+static object *_SXI_menu_item_type(SS_psides *si, object *argl)
    {int indx;
     char bf[MAXLINE], *s;
     g_file *po;
@@ -458,7 +458,7 @@ static object *_SXI_menu_item_type(object *argl)
  *                          - return the image name as an object
  */
 
-static object *_SXI_get_text_image_name(object *argl)
+static object *_SXI_get_text_image_name(SS_psides *si, object *argl)
    {long i;
     char *name;
     SX_menu_item *mi;
@@ -489,7 +489,7 @@ static object *_SXI_get_text_image_name(object *argl)
  *                            - return the mapping name as an object
  */
 
-static object *_SXI_get_text_mapping_name(object *argl)
+static object *_SXI_get_text_mapping_name(SS_psides *si, object *argl)
    {long i;
     char *name;
     SX_menu_item *mi;
@@ -521,7 +521,7 @@ static object *_SXI_get_text_mapping_name(object *argl)
  *                    -    (pdbdata->pgs_image <file> <name>)
  */
 
-static object *_SXI_pdbdata_image(object *argl)
+static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
    {object *obj;
     int i;
     char *name;
@@ -631,7 +631,7 @@ object *SX_mk_image(PG_image *im)
  *                     - write the curve to the specified file
  */
 
-static object *_SXI_graph_pdbcurve(object *argl)
+static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
    {PM_mapping *f;
     g_file *po;
     PDBfile *file;
@@ -680,7 +680,7 @@ static object *_SXI_graph_pdbcurve(object *argl)
  *                    - Write the image to the file and return the data object.
  */
 
-static object *_SXI_image_pdbdata(object *argl)
+static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
    {long i;
     char *name;
     PG_image *f;
@@ -773,7 +773,7 @@ static object *_SXI_dev_attributesp(object *obj)
 
 /* _SXI_MAKE_DEVICE - SX level interface to PG_make_device */
 
-static object *_SXI_make_device(object *argl)
+static object *_SXI_make_device(SS_psides *si, object *argl)
    {int i;
     char *name, *type, *title;
     PG_device *dev;
@@ -823,7 +823,7 @@ static object *_SXI_make_device(object *argl)
  *                   - TITLE
  */
 
-static object *_SXI_device_props(object *argl)
+static object *_SXI_device_props(SS_psides *si, object *argl)
    {PG_device *dev;
     object *rv;
 
@@ -898,7 +898,7 @@ object *SX_mk_graphics_device(PG_device *dev)
  *                - for this file
  */
 
-object *SX_get_ref_map(g_file *po, int indx, char *dtype)
+object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
    {char type;
     object *argl, *ret;
     SX_menu_item *mi;
@@ -913,7 +913,7 @@ object *SX_get_ref_map(g_file *po, int indx, char *dtype)
 	         argl = SS_make_list(G_FILE, po,
 				     SC_INT_I, &indx,
 				     0);
-		 ret = _SXI_pdbdata_image(argl);
+		 ret = _SXI_pdbdata_image(si, argl);
 		 SS_GC(argl);
 		 break;
 
@@ -922,7 +922,7 @@ object *SX_get_ref_map(g_file *po, int indx, char *dtype)
 	         argl = SS_make_list(G_FILE, po,
 				     SC_INT_I, &indx,
 				     0);
-		 ret = _SXI_pdbdata_graph(argl);
+		 ret = _SXI_pdbdata_graph(si, argl);
 		 SS_GC(argl);
 		 break;};};
 
@@ -1049,7 +1049,7 @@ void SX_default_event_handler(PG_device *dev, PG_event *ev)
 
 /* _SXI_OPEN_DEVICE - SX level interface to PG_open_device */
 
-static object *_SXI_open_device(object *argl)
+static object *_SXI_open_device(SS_psides *si, object *argl)
    {PG_device *dev;
     double xf, yf, dxf, dyf;
 
@@ -1106,7 +1106,7 @@ static object *_SXI_open_device(object *argl)
 
 /* _SXI_CLOSE_DEVICE - SX level interface to PG_close_device */
 
-static object *_SXI_close_device(object *argl)
+static object *_SXI_close_device(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -1160,7 +1160,7 @@ int SX_next_color(PG_device *dev)
  *                     - mapping name
  */
 
-static object *_SXI_make_pgs_graph(object *argl)
+static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
    {int n, sid, color, style, clr;
     double width;
     char type[MAXLINE];
@@ -1332,7 +1332,7 @@ static object *_SX_get_extrema(PM_set *s)
 
 /* _SXI_DRAW_DOMAIN - main Scheme level domain plot control routine */
 
-static object *_SXI_draw_domain(object *argl)
+static object *_SXI_draw_domain(SS_psides *si, object *argl)
    {PG_device *dev;
     PM_set *data, *nxt, *p;
     PG_rendering pty;
@@ -1429,7 +1429,7 @@ static void _SX_attach_rendering_1d(PG_graph *data, PG_rendering pty,
 
 /* _SXI_DRAW_PLOT - main Scheme level plot control routine */
 
-static object *_SXI_draw_plot(object *argl)
+static object *_SXI_draw_plot(SS_psides *si, object *argl)
    {int domain_dim, range_dim;
     int *hsts;
     PG_rendering pty, apty;
@@ -1676,7 +1676,7 @@ static object *_SXI_draw_plot(object *argl)
  *                  -                        <zmn> <zmx>])
  */
 
-static object *_SXI_make_image(object *argl)
+static object *_SXI_make_image(SS_psides *si, object *argl)
    {int w, h;
     char *name;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
@@ -1731,7 +1731,7 @@ static object *_SXI_make_image(object *argl)
  *                  -                          <zmin> <zmax>])
  */
 
-static object *_SXI_build_image(object *argl)
+static object *_SXI_build_image(SS_psides *si, object *argl)
    {int w, h;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     char *name;
@@ -1787,7 +1787,7 @@ static object *_SXI_build_image(object *argl)
 
 /* _SXI_DRAW_IMAGE - Scheme level image plot control routine */
 
-static object *_SXI_draw_image(object *argl)
+static object *_SXI_draw_image(SS_psides *si, object *argl)
    {int vp;
     double xmn, xmx, ymn, ymx, *pv;
     PG_device *dev;
@@ -1911,7 +1911,7 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
  *                     -                         <name> <type> <value>)
  */
 
-static object *_SXI_set_attr_graph(object *argl)
+static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
    {PG_graph *g;
     char *name, *type;
     object *val;
@@ -2094,7 +2094,7 @@ static object *_SX_im_ran_extrema(PG_image *im)
  *                     -   (pg-set-domain-limits! <graph> (<x1_min> <x1_max> .... ))
  */
 
-static object *_SXI_set_dom_limits(object *argl)
+static object *_SXI_set_dom_limits(SS_psides *si, object *argl)
    {PM_set *s;
     object *obj;
 
@@ -2121,7 +2121,7 @@ static object *_SXI_set_dom_limits(object *argl)
  *                     -   (pg-set-range-limits! <graph> (<x1_min> <x1_max> .... ))
  */
 
-static object *_SXI_set_ran_limits(object *argl)
+static object *_SXI_set_ran_limits(SS_psides *si, object *argl)
    {PM_set *s;
     object *obj;
 
@@ -2292,7 +2292,7 @@ static object *_SXI_ran_limits(object *argl)
  *                - usage: (pg-set-label! <drawable> <label>)
  */
 
-static object *_SXI_set_label(object *argl)
+static object *_SXI_set_label(SS_psides *si, object *argl)
    {char *label;
     object *obj;
 
@@ -2757,7 +2757,7 @@ static object *_SX_image_info(object *obj, char *name, object *val)
  *                    - usage: (pg-drawable-info <obj> <name> [<value>])
  */
 
-static object *_SXI_drawable_info(object *argl)
+static object *_SXI_drawable_info(SS_psides *si, object *argl)
    {char *name;
     object *obj, *val, *ret;
 

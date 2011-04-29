@@ -36,11 +36,8 @@ void UL_init_hash(void)
 
 /* _ULI_DESCRIBE - the Ultra documentation function */
 
-object *_ULI_describe(object *argl)
+object *_ULI_describe(SS_psides *si, object *argl)
    {object *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_prep_arg(argl);
 

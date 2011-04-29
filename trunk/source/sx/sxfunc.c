@@ -87,7 +87,7 @@ static object *_SXI_quit(object *arg)
 
 /* _SXI_TOGGLE_LOG - toggle the command log file */
 
-static object *_SXI_toggle_log(object *argl)
+static object *_SXI_toggle_log(SS_psides *si, object *argl)
    {object *obj;
 
     if (SX_command_log != NULL)
@@ -95,7 +95,7 @@ static object *_SXI_toggle_log(object *argl)
 	SX_command_log = NULL;};
 
     if (SS_consp(argl))
-       {obj   = SS_car(argl);
+       {obj       = SS_car(argl);
         _SX.fname = SC_dsnprintf(FALSE, SS_get_string(obj));
         if (strcmp(_SX.fname, "off") == 0)
            *_SX.fname = '\0';
@@ -276,7 +276,7 @@ static void _SX_shift_set(PM_set *set, double val)
  *                   - return the mapping
  */
 
-static object *_SXI_shift_domain(object *argl)
+static object *_SXI_shift_domain(SS_psides *si, object *argl)
    {object *obj, *ret;
     PM_set *set;
     double val;
@@ -306,7 +306,7 @@ static object *_SXI_shift_domain(object *argl)
  *                  - return the mapping
  */
 
-static object *_SXI_shift_range(object *argl)
+static object *_SXI_shift_range(SS_psides *si, object *argl)
    {object *obj, *ret;
     PM_set *set;
     double val;
@@ -358,7 +358,7 @@ static void _SX_scale_set(PM_set *set, double val)
  *                   - return the mapping
  */
 
-static object *_SXI_scale_domain(object *argl)
+static object *_SXI_scale_domain(SS_psides *si, object *argl)
    {object *obj, *ret;
     PM_set *set;
     double val;
@@ -387,7 +387,7 @@ static object *_SXI_scale_domain(object *argl)
  *                  - return the mapping
  */
 
-static object *_SXI_scale_range(object *argl)
+static object *_SXI_scale_range(SS_psides *si, object *argl)
    {object *obj, *ret;
     PM_set *set;
     double val;
@@ -609,7 +609,7 @@ static PM_mapping *_SXI_integrate_mapping(PM_mapping *h)
  *          - usage: (hyper-plane c0 (c1 x1min x1max np1) ...)
  */
 
-object *SX_plane(object *argl)
+object *SX_plane(SS_psides *si, object *argl)
    {int i, j, nd, nde, plf;
     int *maxes, *pm;
     long ne;

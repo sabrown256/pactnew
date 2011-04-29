@@ -34,13 +34,10 @@ static void SS_clr_strm(object *str)
 
 /* _SSI_RD_LINE - read a line of text */
 
-static object *_SSI_rd_line(object *str)
+static object *_SSI_rd_line(SS_psides *si, object *str)
    {FILE *s;
     char *t, *t1;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SS_nullobjp(str))
        str = si->indev;
@@ -131,11 +128,8 @@ static object *SS_rd_vct(object *str)
 
 /* _SSI_RD_CHR - read-char for Scheme */
 
-static object *_SSI_rd_chr(object *arg)
+static object *_SSI_rd_chr(SS_psides *si, object *arg)
    {object *str, *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     o = SS_null;
 
@@ -460,11 +454,8 @@ object *SS_read(object *str)
 
 /* _SSI_READ - the Scheme level reader which invokes the C level reader */
 
-static object *_SSI_read(object *obj)
+static object *_SSI_read(SS_psides *si, object *obj)
    {object *op, *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     o = SS_null;
 
@@ -547,13 +538,10 @@ static object *_SSI_cls_in(object *obj)
 
 /* _SSI_CALL_IF - call-with-input-file in Scheme */
 
-static object *_SSI_call_if(object *argl)
+static object *_SSI_call_if(SS_psides *si, object *argl)
    {FILE *str;
     char *s;
     object *obj, *old_indev, *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     s   = NULL;
     obj = SS_car(argl);
@@ -826,13 +814,10 @@ object *_SSI_scheme_mode(SS_psides *si)
  *         - global environment if SS_t
  */
 
-object *SS_load(object *argl)
+object *SS_load(SS_psides *si, object *argl)
    {int c;
     object *fnm, *strm, *flag;
     PFPOprs prs;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     flag = SS_f;
     fnm  = SS_car(argl);

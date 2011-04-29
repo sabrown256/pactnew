@@ -49,7 +49,7 @@ static object *_SSI_mkvect(object *arg)
 
 /* _SSI_VECTOR - vector for Scheme */
 
-static object *_SSI_vector(object *argl)
+static object *_SSI_vector(SS_psides *si, object *argl)
    {object *o;
 
     o = SS_lstvct(argl);
@@ -79,7 +79,7 @@ static object *_SSI_vctlen(object *arg)
 
 /* _SSI_VCTREF - vector-ref for Scheme */
 
-static object *_SSI_vctref(object *argl)
+static object *_SSI_vctref(SS_psides *si, object *argl)
    {int i, n;
     object **va, *o;
     vector *vct;
@@ -106,7 +106,7 @@ static object *_SSI_vctref(object *argl)
 
 /* _SSI_VCTSET - vector-set! for Scheme */
 
-static object *_SSI_vctset(object *argl)
+static object *_SSI_vctset(SS_psides *si, object *argl)
    {int i, n;
     object *val, **va, *o;
     vector *vct;
@@ -180,12 +180,9 @@ object *SS_lstvct(object *arg)
 
 /* _SSI_DEFINE_GLOBAL - define a variable in the global environment frame */
 
-object *_SSI_define_global(object *argl)
+object *_SSI_define_global(SS_psides *si, object *argl)
    {object *obj, *val, *t;
     char *s;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     val = SS_null;
 
@@ -298,7 +295,7 @@ static object *_SSI_getenv(object *obj)
 
 /* _SSI_SETENV - return the value of the specified environment variable */
 
-static object *_SSI_setenv(object *obj)
+static object *_SSI_setenv(SS_psides *si, object *obj)
    {int ok;
     char s[MAXLINE];
     char *vr, *vl;
@@ -333,14 +330,11 @@ static object *_SSI_setenv(object *obj)
  *                        (printenv "HOME" "PWD")
  */
 
-static object *_SSI_printenv(object *argl)
+static object *_SSI_printenv(SS_psides *si, object *argl)
    {int i, n;
     char s[MAXLINE];
     char *vr, **vrs;
     object *l, *v, *vl, *lst, *pr;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* make a list of names from the global environment frame */
     if (SS_nullobjp(argl))
@@ -431,7 +425,7 @@ static object *_SSI_print_env(object *obj)
 
 /* _SSI_GET_PNAME - return the full path name of the program running as PID */
 
-static object *_SSI_get_pname(object *obj)
+static object *_SSI_get_pname(SS_psides *si, object *obj)
    {int id, rv;
     char path[PATH_MAX];
     object *s;
@@ -509,7 +503,7 @@ static object *_SSI_get_ncpu(SS_psides *si)
 
 /* _SSI_FOPEN - fopen in Scheme */
 
-object *_SSI_fopen(object *argl)
+object *_SSI_fopen(SS_psides *si, object *argl)
    {FILE *str;
     char *name, *mode;
     object *prt;
@@ -617,7 +611,7 @@ static object *_SSI_mem_map(object *arg)
 
 /* _SSI_MEM_MONITOR - wrapper around SC_mem_monitor */
 
-static object *_SSI_mem_monitor(object *arg)
+static object *_SSI_mem_monitor(SS_psides *si, object *arg)
    {int old, lev;
     long nb;
     char msg[MAXLINE], id[MAXLINE];
@@ -707,7 +701,7 @@ static object *_SSI_sizeof(object *arg)
 
 /* _SSI_ATTACH - wrapper around SC_ATTACH_DBG */
 
-static object *_SSI_attach(object *arg)
+static object *_SSI_attach(SS_psides *si, object *arg)
    {int pid;
     int64_t rv;
     object *o;
@@ -728,7 +722,7 @@ static object *_SSI_attach(object *arg)
 
 /* _SSI_RETRACE - wrapper around SC_RETRACE_DBG */
 
-static object *_SSI_retrace(object *arg)
+static object *_SSI_retrace(SS_psides *si, object *arg)
    {int pid, to;
     int64_t rv;
     object *o;
@@ -764,10 +758,8 @@ static object *_SSI_interactp(SS_psides *si)
  *               - global environment
  */
 
-static object *_SSI_load_env(object *arg)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *_SSI_load_env(SS_psides *si, object *arg)
+   {
 
     SS_env_vars(si, NULL, NULL);
 

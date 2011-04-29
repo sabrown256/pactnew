@@ -235,7 +235,7 @@ static int UL_expunge(int j)
  *                    - give the expunge that you really want.
  */
 
-static object *_ULI_expunge_macro(object *argl)
+static object *_ULI_expunge_macro(SS_psides *si, object *argl)
    {object *s, *t;
     int limit, j;
 
@@ -500,7 +500,7 @@ static PG_device *_UL_get_some_device(void)
 
 /* _ULI_RANGE - set the range of the plot */
 
-static object *_ULI_range(object *argl)
+static object *_ULI_range(SS_psides *si, object *argl)
    {double t;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -557,7 +557,7 @@ static object *_ULI_range(object *argl)
 
 /* _ULI_DOMAIN - set the domain of the plot */
 
-static object *_ULI_domain(object *argl)
+static object *_ULI_domain(SS_psides *si, object *argl)
    {double t;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -621,13 +621,10 @@ static object *_ULI_domain(object *argl)
  *                  -    DISPLAY_TITLE - a title for identification purposes
  */
 
-static object *_ULI_open_device(object *argl)
+static object *_ULI_open_device(SS_psides *si, object *argl)
    {int i;
     char *name, *type, *title;
     out_device *out;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_prep_arg(argl);
 
@@ -754,7 +751,7 @@ void _UL_quit(int sts)
 
 /* _ULI_QUIT - gracefully exit from Ultra */
 
-static object *_ULI_quit(object *arg)
+static object *_ULI_quit(SS_psides *si, object *arg)
    {int exit_val;
 
     exit_val = 0;
@@ -856,7 +853,7 @@ static object *UL_print_labels(int *indx, int nc,
 
 /* _ULI_MENU - display the menu of the available curves */
 
-static object *_ULI_menu(object *argl)
+static object *_ULI_menu(SS_psides *si, object *argl)
    {char *pr, *pf, *pn;
     object *ret;
 
@@ -883,14 +880,11 @@ static object *_ULI_menu(object *argl)
 
 /* _ULI_PREFIX - set or display menu prefixes */
 
-static object *_ULI_prefix(object *argl)
+static object *_ULI_prefix(SS_psides *si, object *argl)
    {int  mindex, i;
     char pre, prefix[MAXLINE];
     char *fname, *s;
     object *arg1, *arg2, *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ret    = SS_null;
     fname  = "";
@@ -961,7 +955,7 @@ static object *_ULI_prefix(object *argl)
 
 /* _ULI_LIST_CURVES - display the curve list */
 
-static object *_ULI_list_curves(object *argl)
+static object *_ULI_list_curves(SS_psides *si, object *argl)
    {char *pr, *pf;
     object *ret;
 
@@ -1234,7 +1228,7 @@ static object *UL_integrate(int j, double d1, double d2)
 
 /* _ULI_LABEL - change the label of the given curve */
 
-static object *_ULI_label(object *argl)
+static object *_ULI_label(SS_psides *si, object *argl)
    {int j;
     char *labl;
     object *o;
@@ -1295,14 +1289,11 @@ static void UL_restore_plot(void)
  *              - the curves specified
  */
 
-static object *_ULI_average(object *s)
+static object *_ULI_average(SS_psides *si, object *s)
    {int i;
     char *t, *lbl;
     object *c, *numtoks, *rv;
     C_procedure *cpp, *cpd;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_prep_arg(s);
     UL_plot_off();
@@ -1492,7 +1483,7 @@ static object *UL_filter_coef(int l, object *argl)
 
 /* _ULI_LNNORM - Calculate Ln norm of input curve */
 
-static object *_ULI_lnnorm(object *argl)
+static object *_ULI_lnnorm(SS_psides *si, object *argl)
    {int j, order, n;
     double lnnorm;
     object *o;
@@ -1674,7 +1665,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
                        SS_OBJECT_I, b,
                        0);
     SS_MARK(tmp);
-    c = _ULI_average(tmp);
+    c = _ULI_average(si, tmp);
     SS_GC(tmp);
 
 /* no overlap of curves */
@@ -1762,14 +1753,11 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
  *             - either curve
  */
 
-static object *_ULI_append(object *argl)
+static object *_ULI_append(SS_psides *si, object *argl)
    {int i, id;
     char local[MAXLINE];
     char *lbl;
     object *b, *acc, *target, *tmp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_prep_arg(argl);
     SX_autoplot = OFF;
@@ -1890,7 +1878,7 @@ object *_UL_make_ln(double slope, double interc,
 
 /* _ULI_MAKE_LN - draw a line with given slope and intercept */
 
-static object *_ULI_make_ln(object *argl)
+static object *_ULI_make_ln(SS_psides *si, object *argl)
    {int n;
     double first, last, slope, interc;
     object *o;
@@ -1917,7 +1905,7 @@ static object *_ULI_make_ln(object *argl)
 
 /* _ULI_MK_CURVE - make an ULTRA curve out of two lists of numbers */
 
-static object *_ULI_mk_curve(object *argl)
+static object *_ULI_mk_curve(SS_psides *si, object *argl)
    {int n;
     char *labls;
     double *x[PG_SPACEDM];
@@ -2247,7 +2235,7 @@ void UL_install_scheme_funcs(void)
     SS_install("make-filter",
                "Procedure: make an array of filter coefficients\n     Usage: make-filter <val1> ...",
                SS_nargs,
-               SX_list_array, SS_PR_PROC);
+               _SXI_list_array, SS_PR_PROC);
 
     SS_install("line",
                "Procedure: Generate a curve with y = mx + b\n     Usage: line <m> <b> <low-lim> <high-lim> [<no.-pts>]",

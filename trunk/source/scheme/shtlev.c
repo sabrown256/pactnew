@@ -311,7 +311,7 @@ void SS_end_scheme(int val)
 
 /* _SSI_QUIT - exit from Scheme */
 
-static object *_SSI_quit(object *arg)
+static object *_SSI_quit(SS_psides *si, object *arg)
    {
 
     _SS.exit_val = 0;
@@ -657,12 +657,9 @@ void SS_expand_stack(void)
 
 /* _SSI_SYNONYM - make synonyms for the given function */
 
-static object *_SSI_synonym(object *argl)
+static object *_SSI_synonym(SS_psides *si, object *argl)
    {object *func;
     char *synname;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     func = SS_exp_eval(si, SS_car(argl));
     if (!SS_procedurep(func))
@@ -671,7 +668,8 @@ static object *_SSI_synonym(object *argl)
     for (argl = SS_cdr(argl); SS_consp(argl); argl = SS_cdr(argl))
         {synname = SS_get_string(SS_car(argl));
          SC_hasharr_remove(si->symtab, synname);
-         SC_hasharr_install(si->symtab, synname, func, SS_OBJECT_S, TRUE, TRUE);};
+         SC_hasharr_install(si->symtab, synname, func,
+			    SS_OBJECT_S, TRUE, TRUE);};
 
     return(SS_t);}
 
@@ -876,12 +874,9 @@ static object *_SSI_reset(SS_psides *si)
  *             - GOTCHA: there are residual GC issues here
  */
 
-static object *_SSI_retlev(object *argl)
+static object *_SSI_retlev(SS_psides *si, object *argl)
    {int n;
     object *x, *expr, *val;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     x    = SS_car(argl);
     argl = SS_cdr(argl);
@@ -966,7 +961,7 @@ void SS_interrupt_handler(int sig)
 	     PRINT(stdout, "\nReturning %d frames\n\n", 2*nl);
 	     argl = SS_mk_cons(SS_mk_integer(nl),
 			       SS_mk_cons(SS_t, SS_null));
-	     _SSI_retlev(argl);
+	     _SSI_retlev(si, argl);
 	     break;
 
         default : 
@@ -1142,7 +1137,7 @@ char *SS_object_type_name(object *o, char *atype)
  *             - return the exit status of the command
  */
 
-static object *_SSI_system(object *argl)
+static object *_SSI_system(SS_psides *si, object *argl)
    {int rv, to;
     char *cmd;
     object *o;
@@ -1178,7 +1173,7 @@ static object *_SSI_system(object *argl)
  *              - output in a list
  */
 
-static object *_SSI_syscmnd(object *argl)
+static object *_SSI_syscmnd(SS_psides *si, object *argl)
    {int i, to;
     char *cmd, **output;
     object *lst;

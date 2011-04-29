@@ -216,7 +216,7 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
 
 /* _SXI_DISPLAY_DIFF - display a diff list object */
 
-object *_SXI_display_diff(object *argl)
+object *_SXI_display_diff(SS_psides *si, object *argl)
    {
 
     return(SS_f);}
@@ -920,7 +920,7 @@ static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb,
 
 /* _SXI_DIFF_VAR - two variables from different files */
 
-object *_SXI_diff_var(object *argl)
+object *_SXI_diff_var(SS_psides *si, object *argl)
    {int ret, samen;
     long sza, szb;
     object *obj;

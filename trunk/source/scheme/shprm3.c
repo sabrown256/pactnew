@@ -45,7 +45,7 @@ object *_SS_endcons(object *list, object *obj)
  *           - this is the Scheme version of cons
  */
 
-static object *_SSI_cons(object *argl)
+static object *_SSI_cons(SS_psides *si, object *argl)
    {object *x1, *x2, *o;
 
     x1 = SS_car(argl);
@@ -93,7 +93,7 @@ object *SS_setcdr(object *pair, object *cdr)
 
 /* _SSI_SETCAR - set-car! at Scheme level */
 
-static object *_SSI_setcar(object *argl)
+static object *_SSI_setcar(SS_psides *si, object *argl)
    {object *o;
 
     o = SS_setcar(SS_car(argl), SS_cadr(argl));
@@ -105,7 +105,7 @@ static object *_SSI_setcar(object *argl)
 
 /* _SSI_SETCDR - set-cdr! at Scheme level */
 
-static object *_SSI_setcdr(object *argl)
+static object *_SSI_setcdr(SS_psides *si, object *argl)
    {object *o;
 
     o = SS_setcdr(SS_car(argl), SS_cadr(argl));
@@ -320,7 +320,7 @@ object *SS_list_tail(object *lst, int n)
 
 /* _SSI_LST_TAIL - return the tail of the list omitting the first n elements */
 
-static object *_SSI_lst_tail(object *argl)
+static object *_SSI_lst_tail(SS_psides *si, object *argl)
    {int n;
     object *lst, *o;
 
@@ -338,7 +338,7 @@ static object *_SSI_lst_tail(object *argl)
 
 /* _SSI_LST_REF - return the nth element of the list */
 
-static object *_SSI_lst_ref(object *argl)
+static object *_SSI_lst_ref(SS_psides *si, object *argl)
    {int i, n, nl;
     object *lst, *o;
 
@@ -454,7 +454,7 @@ object *SS_append(object *list1, object *list2)
  *             - Scheme version of append
  */
 
-static object *_SSI_append(object *argl)
+static object *_SSI_append(SS_psides *si, object *argl)
    {int n;
     object *o, *r, *rv;
 
@@ -475,7 +475,7 @@ static object *_SSI_append(object *argl)
 
 /* _SSI_LENGTH - length primitive in Scheme */
 
-static object *_SSI_length(object *obj)
+static object *_SSI_length(SS_psides *si, object *obj)
    {object *o;
 
     obj = SS_car(obj);
@@ -677,7 +677,7 @@ static int _SS_filep(object *argl, char *dtype)
 
 /* _SSI_FILEP - file? predicate in Scheme */
 
-static object *_SSI_filep(object *argl)
+static object *_SSI_filep(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_filep(argl, NULL) ? SS_t : SS_f;
@@ -689,7 +689,7 @@ static object *_SSI_filep(object *argl)
 
 /* _SSI_TEXT_FILEP - ascii-file? predicate in Scheme */
 
-static object *_SSI_text_filep(object *argl)
+static object *_SSI_text_filep(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_filep(argl, "ascii") ? SS_t : SS_f;
@@ -818,7 +818,7 @@ static int _SS_eq(object *o1, object *o2)
 
 /* _SSI_EQ - eq? in Scheme */
 
-static object *_SSI_eq(object *obj)
+static object *_SSI_eq(SS_psides *si, object *obj)
    {object *o;
 
     o = _SS_eq(SS_car(obj), SS_cadr(obj)) ? SS_t : SS_f;
@@ -830,7 +830,7 @@ static object *_SSI_eq(object *obj)
 
 /* _SSI_EQV - eqv? in Scheme */
 
-static object *_SSI_eqv(object *obj)
+static object *_SSI_eqv(SS_psides *si, object *obj)
    {object *o;
 
     o = _SS_eqv(SS_car(obj), SS_cadr(obj)) ? SS_t : SS_f;
@@ -842,7 +842,7 @@ static object *_SSI_eqv(object *obj)
 
 /* _SSI_EQUAL - equal in Scheme */
 
-static object *_SSI_equal(object *obj)
+static object *_SSI_equal(SS_psides *si, object *obj)
    {object *o;
 
     o = _SS_equal(SS_car(obj), SS_cadr(obj)) ? SS_t : SS_f;
@@ -875,7 +875,7 @@ static object *_SS_memp(int (*pred)(object *, object *),
 
 /* _SSI_MEMQ - Scheme version of memq */
 
-static object *_SSI_memq(object *argl)
+static object *_SSI_memq(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
@@ -890,7 +890,7 @@ static object *_SSI_memq(object *argl)
 
 /* _SSI_MEMV - Scheme version of memv */
 
-static object *_SSI_memv(object *argl)
+static object *_SSI_memv(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
@@ -905,7 +905,7 @@ static object *_SSI_memv(object *argl)
 
 /* _SSI_MEMBER - Scheme version of member */
 
-static object *_SSI_member(object *argl)
+static object *_SSI_member(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
@@ -936,7 +936,7 @@ static object *_SS_assp(int (*pred)(object *, object *),
 
 /* _SSI_ASSQ - Scheme version of assq */
 
-static object *_SSI_assq(object *argl)
+static object *_SSI_assq(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
@@ -951,7 +951,7 @@ static object *_SSI_assq(object *argl)
 
 /* _SSI_ASSV - Scheme version of assv */
 
-static object *_SSI_assv(object *argl)
+static object *_SSI_assv(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
@@ -966,7 +966,7 @@ static object *_SSI_assv(object *argl)
 
 /* _SSI_ASSOC - Scheme version of assoc */
 
-static object *_SSI_assoc(object *argl)
+static object *_SSI_assoc(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);

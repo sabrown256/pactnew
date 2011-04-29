@@ -234,8 +234,10 @@ object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
 
 object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
+    object *(*f)(SS_psides *si, object *argl);
 
-    o = (*(PFSargs) cp->proc[0])(argl);
+    f = cp->proc[0];
+    o = f(si, argl);
 
     return(o);}
 
@@ -246,8 +248,10 @@ object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
 
 object *SS_znargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
+    object *(*f)(SS_psides *si, object *argl);
 
-    o = (*(PFSargs) cp->proc[0])(argl);
+    f = cp->proc[0];
+    o = f(si, argl);
 
     return(o);}
 

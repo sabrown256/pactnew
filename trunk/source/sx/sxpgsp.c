@@ -76,7 +76,7 @@ static void _SX_args_arr_3(object *argl, int *pn,
  
 /* _SXI_AXIS - draw a complete axis set */
 
-static object *_SXI_axis(object *argl)
+static object *_SXI_axis(SS_psides *si, object *argl)
    {int type;
     PG_device *dev;
 
@@ -99,7 +99,7 @@ static object *_SXI_axis(object *argl)
  
 /* _SXI_CLEAR_WINDOW - clear the screen */
 
-static object *_SXI_clear_window(object *argl)
+static object *_SXI_clear_window(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -119,7 +119,7 @@ static object *_SXI_clear_window(object *argl)
  
 /* _SXI_CLEAR_VIEWPORT - clear the viewport */
 
-static object *_SXI_clear_viewport(object *argl)
+static object *_SXI_clear_viewport(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -139,7 +139,7 @@ static object *_SXI_clear_viewport(object *argl)
  
 /* _SXI_SET_CLR_MODE - set the clear mode */
 
-static object *_SXI_set_clr_mode(object *argl)
+static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
    {int mode;
     PG_device *dev;
     object *rv;
@@ -165,7 +165,7 @@ static object *_SXI_set_clr_mode(object *argl)
  
 /* _SXI_CLR_MODE - return the clear mode */
 
-static object *_SXI_clr_mode(object *argl)
+static object *_SXI_clr_mode(SS_psides *si, object *argl)
    {int mode;
     PG_device *dev;
     object *o;
@@ -176,7 +176,7 @@ static object *_SXI_clr_mode(object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_CLR_MODE", SS_null);
+       SS_error("BAD DEVICE - _SXI_CLR_MODE", SS_null);
 
     PG_get_clear_mode(mode);
 
@@ -189,7 +189,7 @@ static object *_SXI_clr_mode(object *argl)
  
 /* _SXI_CLEAR_REGION - clear the region */
 
-static object *_SXI_clear_region(object *argl)
+static object *_SXI_clear_region(SS_psides *si, object *argl)
    {int n, nd, pad;
     double ndc[PG_BOXSZ];
     PG_device *dev;
@@ -226,7 +226,7 @@ static object *_SXI_clear_region(object *argl)
  
 /* _SXI_CENTER_LABEL - print a label centered in a line */
 
-static object *_SXI_center_label(object *argl)
+static object *_SXI_center_label(SS_psides *si, object *argl)
    {PG_device *dev;
     double sy;
     char *label;
@@ -258,7 +258,7 @@ static object *_SXI_center_label(object *argl)
  *              - form (define-marker <x1a> <y1a> <x2a> <y2a> ...)
  */
 
-static object *_SXI_def_mrk(object *argl)
+static object *_SXI_def_mrk(SS_psides *si, object *argl)
    {int i, ns, indx;
     double *x1, *y1, *x2, *y2;
     object *obj;
@@ -298,7 +298,7 @@ static object *_SXI_def_mrk(object *argl)
  *              - form (pg-draw-markers dev marker xlst ylst)
  */
 
-static object *_SXI_drw_mrk(object *argl)
+static object *_SXI_drw_mrk(SS_psides *si, object *argl)
    {int i, id, ns, nd, mrk;
     double **r;
     object *x[PG_SPACEDM], *obj;
@@ -347,7 +347,7 @@ static object *_SXI_drw_mrk(object *argl)
  
 /* _SXI_MRK_ORNT - get the marker orientation */
 
-static object *_SXI_mrk_ornt(object *argl)
+static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
    {double theta;
     PG_device *dev;
     object *o;
@@ -371,7 +371,7 @@ static object *_SXI_mrk_ornt(object *argl)
  
 /* _SXI_MRK_SCAL - get the marker scale */
 
-static object *_SXI_mrk_scal(object *argl)
+static object *_SXI_mrk_scal(SS_psides *si, object *argl)
    {double scale;
     PG_device *dev;
     object *o;
@@ -395,7 +395,7 @@ static object *_SXI_mrk_scal(object *argl)
  
 /* _SXI_SET_MRK_ORNT - set the marker orientation */
 
-static object *_SXI_set_mrk_ornt(object *argl)
+static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
    {double theta;
     PG_device *dev;
     object *o;
@@ -421,7 +421,7 @@ static object *_SXI_set_mrk_ornt(object *argl)
  
 /* _SXI_SET_MRK_SCAL - set the marker scale */
 
-static object *_SXI_set_mrk_scal(object *argl)
+static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
    {double scale;
     PG_device *dev;
     object *o;
@@ -489,7 +489,7 @@ static object *_SXI_show_mrk(SS_psides *si)
  
 /* _SXI_DRAW_ARC - draw a portion of an arc */
 
-static object *_SXI_draw_arc(object *argl)
+static object *_SXI_draw_arc(SS_psides *si, object *argl)
    {int unit;
     double a1, a2, r, x, y;
     PG_device *dev;
@@ -525,7 +525,7 @@ static object *_SXI_draw_arc(object *argl)
  
 /* _SXI_DRAW_AXIS - draw a axis */
 
-static object *_SXI_draw_axis(object *argl)
+static object *_SXI_draw_axis(SS_psides *si, object *argl)
    {int tt, lt, td;
     double sc;
     double tn[2], vw[2];
@@ -569,7 +569,7 @@ static object *_SXI_draw_axis(object *argl)
  
 /* _SXI_DRAW_BOX - draw a box */
 
-static object *_SXI_draw_box(object *argl)
+static object *_SXI_draw_box(SS_psides *si, object *argl)
    {int n, nd;
     double bx[PG_BOXSZ];
     PG_coord_sys cs;
@@ -606,7 +606,7 @@ static object *_SXI_draw_box(object *argl)
  
 /* _SXI_DDPN - draw a set of disjoint nd line segments */
 
-static object *_SXI_ddpn(object *argl)
+static object *_SXI_ddpn(SS_psides *si, object *argl)
    {int i, n, nd, clip;
     double *x[PG_SPACEDM];
     PG_coord_sys cs;
@@ -646,7 +646,7 @@ static object *_SXI_ddpn(object *argl)
  
 /* _SXI_DRAW_LINE - draw a line segment */
 
-static object *_SXI_draw_line(object *argl)
+static object *_SXI_draw_line(SS_psides *si, object *argl)
    {int n, nd;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     PG_device *dev;
@@ -684,7 +684,7 @@ static object *_SXI_draw_line(object *argl)
  
 /* _SXI_DRAW_PALETTE - draw a palette */
 
-static object *_SXI_draw_palette(object *argl)
+static object *_SXI_draw_palette(SS_psides *si, object *argl)
    {int ex;
     double w;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
@@ -720,7 +720,7 @@ static object *_SXI_draw_palette(object *argl)
  
 /* _SXI_DRAW_POLYLINE - draw a set of nd line segments */
 
-static object *_SXI_draw_polyline(object *argl)
+static object *_SXI_draw_polyline(SS_psides *si, object *argl)
    {int i, n, nd, clip;
     double *x[PG_SPACEDM];
     PM_polygon *py;
@@ -768,7 +768,7 @@ static object *_SXI_draw_polyline(object *argl)
  
 /* _SXI_DRAW_RAD - draw a radial line segment */
 
-static object *_SXI_draw_rad(object *argl)
+static object *_SXI_draw_rad(SS_psides *si, object *argl)
    {int unit;
     double a, rn, rx, x, y;
     PG_device *dev;
@@ -799,7 +799,7 @@ static object *_SXI_draw_rad(object *argl)
  
 /* _SXI_DRAW_TEXT - draw a text string */
 
-static object *_SXI_draw_text(object *argl)
+static object *_SXI_draw_text(SS_psides *si, object *argl)
    {int nd;
     double p[PG_SPACEDM];
     char *txt;
@@ -835,7 +835,7 @@ static object *_SXI_draw_text(object *argl)
  
 /* _SXI_FPLY - fill a polygon */
 
-static object *_SXI_fply(object *argl)
+static object *_SXI_fply(SS_psides *si, object *argl)
    {int n, clr;
     double *r[2];
     PM_polygon *py;
@@ -872,7 +872,7 @@ static object *_SXI_fply(object *argl)
  
 /* _SXI_FINISH_PLOT - finish the frame */
 
-static object *_SXI_finish_plot(object *argl)
+static object *_SXI_finish_plot(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -892,7 +892,7 @@ static object *_SXI_finish_plot(object *argl)
 
 /* _SXI_GCPW - return the character path */
 
-static object *_SXI_gcpw(object *argl)
+static object *_SXI_gcpw(SS_psides *si, object *argl)
    {double x1, y1;
     PG_device *dev;
     object *o;
@@ -918,7 +918,7 @@ static object *_SXI_gcpw(object *argl)
 
 /* _SXI_GCSS - return the character size in NDC */
 
-static object *_SXI_gcss(object *argl)
+static object *_SXI_gcss(SS_psides *si, object *argl)
    {double x[PG_SPACEDM];
     PG_device *dev;
     object *o;
@@ -944,7 +944,7 @@ static object *_SXI_gcss(object *argl)
 
 /* _SXI_GCUW - return the character up direction */
 
-static object *_SXI_gcuw(object *argl)
+static object *_SXI_gcuw(SS_psides *si, object *argl)
    {double x1, y1;
     PG_device *dev;
     object *o;
@@ -970,7 +970,7 @@ static object *_SXI_gcuw(object *argl)
  
 /* _SXI_GCLP - return the clipping state */
 
-static object *_SXI_gclp(object *argl)
+static object *_SXI_gclp(SS_psides *si, object *argl)
    {int clp;
     PG_device *dev;
     object *o;
@@ -994,7 +994,7 @@ static object *_SXI_gclp(object *argl)
  
 /* _SXI_GFIN - report the state of the finished flag */
 
-static object *_SXI_gfin(object *argl)
+static object *_SXI_gfin(SS_psides *si, object *argl)
    {int fl;
     PG_device *dev;
     object *o;
@@ -1018,7 +1018,7 @@ static object *_SXI_gfin(object *argl)
  
 /* _SXI_GLNC - get the line color */
 
-static object *_SXI_glnc(object *argl)
+static object *_SXI_glnc(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
     object *o;
@@ -1042,7 +1042,7 @@ static object *_SXI_glnc(object *argl)
  
 /* _SXI_GLOP - get the logical operation */
 
-static object *_SXI_glop(object *argl)
+static object *_SXI_glop(SS_psides *si, object *argl)
    {PG_device *dev;
     PG_logical_operation lop;
     object *o;
@@ -1066,7 +1066,7 @@ static object *_SXI_glop(object *argl)
  
 /* _SXI_GLNS - get the line style */
 
-static object *_SXI_glns(object *argl)
+static object *_SXI_glns(SS_psides *si, object *argl)
    {int s;
     PG_device *dev;
     object *o;
@@ -1090,7 +1090,7 @@ static object *_SXI_glns(object *argl)
  
 /* _SXI_GLNW - get the line width */
 
-static object *_SXI_glnw(object *argl)
+static object *_SXI_glnw(SS_psides *si, object *argl)
    {double w;
     PG_device *dev;
     object *o;
@@ -1114,7 +1114,7 @@ static object *_SXI_glnw(object *argl)
  
 /* _SXI_GMXI - get the maximum intensities */
 
-static object *_SXI_gmxi(object *argl)
+static object *_SXI_gmxi(SS_psides *si, object *argl)
    {double i, r, g, b;
     PG_device *dev;
     object *o;
@@ -1145,7 +1145,7 @@ static object *_SXI_gmxi(object *argl)
 
 /* _SXI_GTEW - return the text extent */
 
-static object *_SXI_gtew(object *argl)
+static object *_SXI_gtew(SS_psides *si, object *argl)
    {int nd;
     double x[PG_SPACEDM];
     char *s;
@@ -1182,7 +1182,7 @@ static object *_SXI_gtew(object *argl)
  
 /* _SXI_GTXC - get the text color */
 
-static object *_SXI_gtxc(object *argl)
+static object *_SXI_gtxc(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
     object *o;
@@ -1206,7 +1206,7 @@ static object *_SXI_gtxc(object *argl)
  
 /* _SXI_GTXF - get the text font */
 
-static object *_SXI_gtxf(object *argl)
+static object *_SXI_gtxf(SS_psides *si, object *argl)
    {int size;
     char *face, *style;
     PG_device *dev;
@@ -1237,7 +1237,7 @@ static object *_SXI_gtxf(object *argl)
  
 /* _SXI_GET_VIEWPORT - get the viewport */
 
-static object *_SXI_get_viewport(object *argl)
+static object *_SXI_get_viewport(SS_psides *si, object *argl)
    {PG_device *dev;
     double ndc[PG_BOXSZ];
     object *ret;
@@ -1265,7 +1265,7 @@ static object *_SXI_get_viewport(object *argl)
  
 /* _SXI_GET_FRAME - get the frame */
 
-static object *_SXI_get_frame(object *argl)
+static object *_SXI_get_frame(SS_psides *si, object *argl)
    {double frm[PG_BOXSZ];
     PG_device *dev;
     object *ret;
@@ -1293,7 +1293,7 @@ static object *_SXI_get_frame(object *argl)
  
 /* _SXI_GET_WINDOW - get the world coordinate system */
 
-static object *_SXI_get_window(object *argl)
+static object *_SXI_get_window(SS_psides *si, object *argl)
    {double wc[PG_BOXSZ];
     PG_device *dev;
     object *ret;
@@ -1321,7 +1321,7 @@ static object *_SXI_get_window(object *argl)
  
 /* _SXI_MDVC - make the device current */
 
-static object *_SXI_mdvc(object *argl)
+static object *_SXI_mdvc(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -1341,7 +1341,7 @@ static object *_SXI_mdvc(object *argl)
  
 /* _SXI_PTOS - convert from pixel to screen coordinates */
 
-static object *_SXI_ptos(object *argl)
+static object *_SXI_ptos(SS_psides *si, object *argl)
    {double x[PG_SPACEDM];
     PG_device *dev;
     object *rv;
@@ -1372,7 +1372,7 @@ static object *_SXI_ptos(object *argl)
  
 /* _SXI_QDEV - query the device */
 
-static object *_SXI_qdev(object *argl)
+static object *_SXI_qdev(SS_psides *si, object *argl)
    {int dx, dy, nc;
     PG_device *dev;
     object *ret;
@@ -1399,7 +1399,7 @@ static object *_SXI_qdev(object *argl)
  
 /* _SXI_QWIN - query the window */
 
-static object *_SXI_qwin(object *argl)
+static object *_SXI_qwin(SS_psides *si, object *argl)
    {int dx, dy, nc;
     PG_device *dev;
     object *ret;
@@ -1410,7 +1410,7 @@ static object *_SXI_qwin(object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_QDEV", SS_null);
+       SS_error("BAD DEVICE - _SXI_QWIN", SS_null);
 
     PG_query_device(dev, &dx, &dy, &nc);
 
@@ -1425,7 +1425,7 @@ static object *_SXI_qwin(object *argl)
  
 /* _SXI_RDVC - release the device */
 
-static object *_SXI_rdvc(object *argl)
+static object *_SXI_rdvc(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -1445,7 +1445,7 @@ static object *_SXI_rdvc(object *argl)
  
 /* _SXI_SADM - set the autodomain flag */
 
-static object *_SXI_sadm(object *argl)
+static object *_SXI_sadm(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1468,7 +1468,7 @@ static object *_SXI_sadm(object *argl)
  
 /* _SXI_SAPL - set the autoplot flag */
 
-static object *_SXI_sapl(object *argl)
+static object *_SXI_sapl(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1491,7 +1491,7 @@ static object *_SXI_sapl(object *argl)
  
 /* _SXI_SARN - set the autorange flag */
 
-static object *_SXI_sarn(object *argl)
+static object *_SXI_sarn(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1514,7 +1514,7 @@ static object *_SXI_sarn(object *argl)
  
 /* _SXI_SBWD - set the border width in pixels */
 
-static object *_SXI_sbwd(object *argl)
+static object *_SXI_sbwd(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1537,7 +1537,7 @@ static object *_SXI_sbwd(object *argl)
  
 /* _SXI_SCPW - set the character path */
 
-static object *_SXI_scpw(object *argl)
+static object *_SXI_scpw(SS_psides *si, object *argl)
    {PG_device *dev;
     double x1, y1;
 
@@ -1561,7 +1561,7 @@ static object *_SXI_scpw(object *argl)
  
 /* _SXI_SCUW - set the character up direction */
 
-static object *_SXI_scuw(object *argl)
+static object *_SXI_scuw(SS_psides *si, object *argl)
    {PG_device *dev;
     double x1, y1;
 
@@ -1585,7 +1585,7 @@ static object *_SXI_scuw(object *argl)
  
 /* _SXI_SCLP - set the clipping state */
 
-static object *_SXI_sclp(object *argl)
+static object *_SXI_sclp(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1608,7 +1608,7 @@ static object *_SXI_sclp(object *argl)
  
 /* _SXI_SDTI - set the data id flag */
 
-static object *_SXI_sdti(object *argl)
+static object *_SXI_sdti(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1631,7 +1631,7 @@ static object *_SXI_sdti(object *argl)
  
 /* _SXI_SFIC - set the fill color */
 
-static object *_SXI_sfic(object *argl)
+static object *_SXI_sfic(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1654,7 +1654,7 @@ static object *_SXI_sfic(object *argl)
  
 /* _SXI_SFIN - set the finish state */
 
-static object *_SXI_sfin(object *argl)
+static object *_SXI_sfin(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1677,7 +1677,7 @@ static object *_SXI_sfin(object *argl)
  
 /* _SXI_SGRD - set the grid flag */
 
-static object *_SXI_sgrd(object *argl)
+static object *_SXI_sgrd(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1700,7 +1700,7 @@ static object *_SXI_sgrd(object *argl)
  
 /* _SXI_SLNC - set the line color */
 
-static object *_SXI_slnc(object *argl)
+static object *_SXI_slnc(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1723,7 +1723,7 @@ static object *_SXI_slnc(object *argl)
  
 /* _SXI_SLOP - set the logical operation */
 
-static object *_SXI_slop(object *argl)
+static object *_SXI_slop(SS_psides *si, object *argl)
    {PG_logical_operation lop;
     PG_device *dev;
 
@@ -1746,7 +1746,7 @@ static object *_SXI_slop(object *argl)
  
 /* _SXI_SLNS - set the line style */
 
-static object *_SXI_slns(object *argl)
+static object *_SXI_slns(SS_psides *si, object *argl)
    {int s;
     PG_device *dev;
 
@@ -1769,7 +1769,7 @@ static object *_SXI_slns(object *argl)
  
 /* _SXI_SLNW - set the line width */
 
-static object *_SXI_slnw(object *argl)
+static object *_SXI_slnw(SS_psides *si, object *argl)
    {PG_device *dev;
     double w;
 
@@ -1792,7 +1792,7 @@ static object *_SXI_slnw(object *argl)
  
 /* _SXI_SMXI - set the maximum intensities */
 
-static object *_SXI_smxi(object *argl)
+static object *_SXI_smxi(SS_psides *si, object *argl)
    {PG_device *dev;
     double i, r, g, b;
 
@@ -1833,7 +1833,7 @@ static object *_SXI_smxi(object *argl)
  
 /* _SXI_SPAL - set the current palette */
 
-static object *_SXI_spal(object *argl)
+static object *_SXI_spal(SS_psides *si, object *argl)
    {char *txt;
     PG_device *dev;
     object *o;
@@ -1861,7 +1861,7 @@ static object *_SXI_spal(object *argl)
  
 /* _SXI_SRES_SF - set the resolution scale factor */
 
-static object *_SXI_sres_sf(object *argl)
+static object *_SXI_sres_sf(SS_psides *si, object *argl)
    {int sf;
     PG_device *dev;
 
@@ -1881,7 +1881,7 @@ static object *_SXI_sres_sf(object *argl)
  
 /* _SXI_SSCT - set the scatter flag */
 
-static object *_SXI_ssct(object *argl)
+static object *_SXI_ssct(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1902,7 +1902,7 @@ static object *_SXI_ssct(object *argl)
  
 /* _SXI_SWBK - set the white background flag */
 
-static object *_SXI_swbk(object *argl)
+static object *_SXI_swbk(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1923,7 +1923,7 @@ static object *_SXI_swbk(object *argl)
  
 /* _SXI_STXC - set the text color */
 
-static object *_SXI_stxc(object *argl)
+static object *_SXI_stxc(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
 
@@ -1944,7 +1944,7 @@ static object *_SXI_stxc(object *argl)
  
 /* _SXI_STXF - set the text font */
 
-static object *_SXI_stxf(object *argl)
+static object *_SXI_stxf(SS_psides *si, object *argl)
    {int size;
     char *face, *style;
     PG_device *dev;
@@ -1977,7 +1977,7 @@ static object *_SXI_stxf(object *argl)
  
 /* _SXI_SET_VIEWPORT - set the viewport */
 
-static object *_SXI_set_viewport(object *argl)
+static object *_SXI_set_viewport(SS_psides *si, object *argl)
    {int n, nd;
     double ndc[PG_BOXSZ];
     PG_device *dev;
@@ -2010,7 +2010,7 @@ static object *_SXI_set_viewport(object *argl)
  
 /* _SXI_SET_FRAME - set the frame */
 
-static object *_SXI_set_frame(object *argl)
+static object *_SXI_set_frame(SS_psides *si, object *argl)
    {int n, nd;
     double frm[PG_BOXSZ];
     PG_device *dev;
@@ -2043,7 +2043,7 @@ static object *_SXI_set_frame(object *argl)
  
 /* _SXI_SET_WINDOW - set the world coordinate system */
 
-static object *_SXI_set_window(object *argl)
+static object *_SXI_set_window(SS_psides *si, object *argl)
    {int n, nd;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -2076,7 +2076,7 @@ static object *_SXI_set_window(object *argl)
  
 /* _SXI_UPDATE_VS - update the view surface with a flush */
 
-static object *_SXI_update_vs(object *argl)
+static object *_SXI_update_vs(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -2096,7 +2096,7 @@ static object *_SXI_update_vs(object *argl)
  
 /* _SXI_STOP - convert from screen to pixel coordinates */
 
-static object *_SXI_stop(object *argl)
+static object *_SXI_stop(SS_psides *si, object *argl)
    {long xi[PG_SPACEDM];
     double x[PG_SPACEDM];
     PG_device *dev;
@@ -2131,7 +2131,7 @@ static object *_SXI_stop(object *argl)
  
 /* _SXI_STOW - convert from screen to world coordinates */
 
-static object *_SXI_stow(object *argl)
+static object *_SXI_stow(SS_psides *si, object *argl)
    {double x[PG_SPACEDM];
     PG_device *dev;
     object *rv;
@@ -2161,7 +2161,7 @@ static object *_SXI_stow(object *argl)
  
 /* _SXI_WTOS - convert from world to screen coordinates */
 
-static object *_SXI_wtos(object *argl)
+static object *_SXI_wtos(SS_psides *si, object *argl)
    {double x[PG_SPACEDM];
     PG_device *dev;
     object *rv;
@@ -2191,7 +2191,7 @@ static object *_SXI_wtos(object *argl)
  
 /* _SXI_SETVA - set the view angle */
 
-static object *_SXI_setva(object *argl)
+static object *_SXI_setva(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -2217,7 +2217,7 @@ static object *_SXI_setva(object *argl)
  
 /* _SXI_GETVA - get the view angle */
 
-static object *_SXI_getva(object *argl)
+static object *_SXI_getva(SS_psides *si, object *argl)
    {PG_device *dev;
     double theta, phi, chi;
     object *rv;
@@ -2230,7 +2230,7 @@ static object *_SXI_getva(object *argl)
     rv = SS_f;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SETVA", SS_car(argl));
+       SS_error("BAD DEVICE - _SXI_GETVA", SS_car(argl));
 
     else
        {PG_get_view_angle(dev, TRUE, &theta, &phi, &chi);
@@ -2246,7 +2246,7 @@ static object *_SXI_getva(object *argl)
  
 /* _SXI_SETLA - set the light angle */
 
-static object *_SXI_setla(object *argl)
+static object *_SXI_setla(SS_psides *si, object *argl)
    {PG_device *dev;
     double theta, phi;
 
@@ -2272,7 +2272,7 @@ static object *_SXI_setla(object *argl)
  
 /* _SXI_GETLA - get the light angle */
 
-static object *_SXI_getla(object *argl)
+static object *_SXI_getla(SS_psides *si, object *argl)
    {PG_device *dev;
     double theta, phi;
     object *rv;
@@ -2285,7 +2285,7 @@ static object *_SXI_getla(object *argl)
     rv = SS_f;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SETLA", SS_car(argl));
+       SS_error("BAD DEVICE - _SXI_GETLA", SS_car(argl));
 
     else
        {PG_get_light_angle(dev, TRUE, &theta, &phi);
@@ -2332,7 +2332,7 @@ SX_svpa(FIXNUM *devid, FIXNUM *pn)
  *               - RGB components will be normalized to unity
  */
 
-static object *_SXI_pal_list(object *argl)
+static object *_SXI_pal_list(SS_psides *si, object *argl)
    {int i, nc;
     object *lst;
     char *name;
@@ -2389,7 +2389,7 @@ static object *_SXI_pal_list(object *argl)
  *               - RGB components must be normalized to unity
  */
 
-static object *_SXI_list_pal(object *argl)
+static object *_SXI_list_pal(SS_psides *si, object *argl)
    {int i, n_pal_colors, n_dev_colors;
     char *name;
     PG_palette *pal;
@@ -2448,7 +2448,7 @@ static object *_SXI_list_pal(object *argl)
 
 /* _SXI_CURRENT_PAL - return the current palette for the given device */
 
-static object *_SXI_current_pal(object *argl)
+static object *_SXI_current_pal(SS_psides *si, object *argl)
    {object *obj;
     PG_device *dev;
 
@@ -2469,7 +2469,7 @@ static object *_SXI_current_pal(object *argl)
 
 /* _SXI_PALS - return a list of palettes available for the given device */
 
-static object *_SXI_pals(object *argl)
+static object *_SXI_pals(SS_psides *si, object *argl)
    {object *lst;
     PG_palette *pal;
     PG_device *dev;
@@ -2497,7 +2497,7 @@ static object *_SXI_pals(object *argl)
  *               - a background color flag is optional
  */
 
-static object *_SXI_show_pal(object *argl)
+static object *_SXI_show_pal(SS_psides *si, object *argl)
    {int wbck;
     PG_device *dev;
 
@@ -2519,7 +2519,7 @@ static object *_SXI_show_pal(object *argl)
  *             - make it the current palette
  */
 
-static object *_SXI_mk_pal(object *argl)
+static object *_SXI_mk_pal(SS_psides *si, object *argl)
    {int ndims, wbck;
     int dims[5];
     char *name;
@@ -2556,7 +2556,7 @@ static object *_SXI_mk_pal(object *argl)
  *             - make it the current palette
  */
 
-static object *_SXI_rd_pal(object *argl)
+static object *_SXI_rd_pal(SS_psides *si, object *argl)
    {char *name;
     PG_device *dev;
 
@@ -2578,7 +2578,7 @@ static object *_SXI_rd_pal(object *argl)
 
 /* _SXI_WR_PAL - write a palette to the specified file */
 
-static object *_SXI_wr_pal(object *argl)
+static object *_SXI_wr_pal(SS_psides *si, object *argl)
    {char *fname, *pname;
     PG_device *dev;
     PG_palette *pal;
@@ -2606,7 +2606,7 @@ static object *_SXI_wr_pal(object *argl)
 
 /* _SXI_SET_VECT_ATTR - set vector drawing attributes */
 
-static object *_SXI_set_vect_attr(object *argl)
+static object *_SXI_set_vect_attr(SS_psides *si, object *argl)
    {int attr;
     double val;
     PG_device *dev;
@@ -2651,7 +2651,7 @@ static object *_SXI_set_vect_attr(object *argl)
  
 /* _SXI_SET_COLOR_TYPE - set the color type for devices */
 
-static object *_SXI_set_color_type(object *argl)
+static object *_SXI_set_color_type(SS_psides *si, object *argl)
    {int i;
     char *dev_type, *color;
     PG_device *dev;
@@ -2689,7 +2689,7 @@ static object *_SXI_set_color_type(object *argl)
  
 /* _SXI_GATGL - wrapper for PG_get_attrs_glb */
 
-static object *_SXI_gatgl(object *argl)
+static object *_SXI_gatgl(SS_psides *si, object *argl)
    {int n, id;
     char *typ, *name;
     void *pvo;
@@ -2777,7 +2777,7 @@ static object *_SX_get_attrs_alist(pcons *alst, object *argl)
  
 /* _SXI_GATGR - wrapper for PG_get_attrs_graph */
 
-static object *_SXI_gatgr(object *argl)
+static object *_SXI_gatgr(SS_psides *si, object *argl)
    {PG_graph *g;
     object *rv;
 
@@ -2796,7 +2796,7 @@ static object *_SXI_gatgr(object *argl)
  
 /* _SXI_GATMP - wrapper for PG_get_attrs_mapping */
 
-static object *_SXI_gatmp(object *argl)
+static object *_SXI_gatmp(SS_psides *si, object *argl)
    {PM_mapping *f;
     object *rv;
 
@@ -2815,7 +2815,7 @@ static object *_SXI_gatmp(object *argl)
  
 /* _SXI_GATST - wrapper for PG_get_attrs_set */
 
-static object *_SXI_gatst(object *argl)
+static object *_SXI_gatst(SS_psides *si, object *argl)
    {PM_set *s;
     object *rv;
 
@@ -2837,7 +2837,7 @@ static object *_SXI_gatst(object *argl)
  
 /* _SXI_SATGL - wrapper for PG_set_attrs_glb */
 
-static object *_SXI_satgl(object *argl)
+static object *_SXI_satgl(SS_psides *si, object *argl)
    {int n, iv, id;
     double dv;
     char *typ, *name, *sv;
@@ -2990,7 +2990,7 @@ static pcons *_SX_set_attrs_alist(pcons *alst, object *argl)
  
 /* _SXI_SATGR - wrapper for PG_set_attrs_graph */
 
-static object *_SXI_satgr(object *argl)
+static object *_SXI_satgr(SS_psides *si, object *argl)
    {PG_graph *g;
 
     g = NULL;
@@ -3008,7 +3008,7 @@ static object *_SXI_satgr(object *argl)
  
 /* _SXI_SATMP - wrapper for PG_set_attrs_mapping */
 
-static object *_SXI_satmp(object *argl)
+static object *_SXI_satmp(SS_psides *si, object *argl)
    {PM_mapping *f;
 
     f = NULL;
@@ -3026,7 +3026,7 @@ static object *_SXI_satmp(object *argl)
  
 /* _SXI_SATST - wrapper for PG_set_attrs_set */
 
-static object *_SXI_satst(object *argl)
+static object *_SXI_satst(SS_psides *si, object *argl)
    {PM_set *s;
 
     s = NULL;
@@ -3058,7 +3058,7 @@ static object *_SXI_gbfsz(SS_psides *si)
  
 /* _SXI_SBFSZ - wrapper for PG_set_buffer_size */
 
-static object *_SXI_sbfsz(object *argl)
+static object *_SXI_sbfsz(SS_psides *si, object *argl)
    {object *rv;
     int64_t sz;
 

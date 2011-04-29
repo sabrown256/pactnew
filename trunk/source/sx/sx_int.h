@@ -218,7 +218,7 @@ extern SX_file_action
 
 extern object
  *_SX_call_args(int type, void *v),
- *_SXI_menu(object *argl);
+ *_SXI_menu(SS_psides *si, object *argl);
 
 extern void
  _SX_args(object *obj, void *v, int type),
@@ -370,8 +370,8 @@ extern int
  _SX_type_equal(PDBfile *file_a, PDBfile *file_b, char *typea, char *typeb);
 
 extern object
- *_SXI_diff_var(object *argl),
- *_SXI_display_diff(object *arg);
+ *_SXI_diff_var(SS_psides *si, object *argl),
+ *_SXI_display_diff(SS_psides *si, object *arg);
 
 
 /* SXPDBF.C declarations */
@@ -393,13 +393,19 @@ extern void
 		  long nitems, char *type, dimdes *dims);
 
 extern object
- *_SXI_read_numeric_data(object *argl);
+ *_SXI_read_numeric_data(SS_psides *si, object *argl);
 
 
 /* SXPGS.C declarations */
 
 extern SX_menu_item
  *_SX_get_menu_item(g_file *po, int i);
+
+
+/* SXPML.C declarations */
+
+extern object
+ *_SXI_list_array(SS_psides *si, object *argl);
 
 
 /* SXSET.C declarations */

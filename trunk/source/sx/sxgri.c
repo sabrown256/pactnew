@@ -229,7 +229,7 @@ static PG_interface_object *SX_add_text_ann(PG_device *dev, double *ndc,
  *               -    (copy-interface-objects dvd dvs rm)
  */
 
-static object *_SXI_copy_iob(object *argl)
+static object *_SXI_copy_iob(SS_psides *si, object *argl)
    {int rm;
     PG_device *dvd, *dvs;
 
@@ -254,7 +254,7 @@ static object *_SXI_copy_iob(object *argl)
 
 /* _SXI_ADD_ANNOT - add an annotation to the given device */
 
-static object *_SXI_add_annot(object *argl)
+static object *_SXI_add_annot(SS_psides *si, object *argl)
    {int clr;
     char *s;
     double ndc[PG_BOXSZ], ang;
