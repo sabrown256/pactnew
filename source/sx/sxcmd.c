@@ -26,11 +26,8 @@ static char
 
 /* _SXI_DESCRIBE - the SX documentation function */
 
-static object *_SXI_describe(object *argl)
+static object *_SXI_describe(SS_psides *si, object *argl)
    {object *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_prep_arg(argl);
 
@@ -149,12 +146,15 @@ void SX_init_view(void)
 static object *_SX_mapping_ref(char *fname, char *dtype, int indx)
    {g_file *po;
     object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (strcmp(fname, "#t") == 0)
        {for (po = SX_file_list; po != NULL; po = po->next)
             {_SX_get_menu(po);
 
-             ret = SX_get_ref_map(po, indx, dtype);
+             ret = SX_get_ref_map(si, po, indx, dtype);
              if (!SS_nullobjp(ret))
                 return(ret);}
 
@@ -165,7 +165,7 @@ static object *_SX_mapping_ref(char *fname, char *dtype, int indx)
        {po = SX_gvif;
         _SX_get_menu(po);
 
-        ret = SX_get_ref_map(po, indx, dtype);
+        ret = SX_get_ref_map(si, po, indx, dtype);
         if (!SS_nullobjp(ret))
           return(ret);}
 
@@ -179,7 +179,7 @@ static object *_SX_mapping_ref(char *fname, char *dtype, int indx)
 
         _SX_get_menu(po);
 
-        ret = SX_get_ref_map(po, indx, dtype);
+        ret = SX_get_ref_map(si, po, indx, dtype);
         if (!SS_nullobjp(ret))
            return(ret);};
 
@@ -190,7 +190,7 @@ static object *_SX_mapping_ref(char *fname, char *dtype, int indx)
 
 /* SXI_MAPPING_REF - give a SCHEME level reference to a mapping */
 
-static object *SXI_mapping_ref(object *argl)
+static object *SXI_mapping_ref(SS_psides *si, object *argl)
    {int indx;
     char *fname, *dtype;
     object *o;
@@ -343,13 +343,10 @@ object *SX_set_id(object *argl)
 
 /* _SXI_THRU - return an expanded list of mappings */
 
-static object *_SXI_thru(object *argl)
+static object *_SXI_thru(SS_psides *si, object *argl)
    {int n;
     object *ret;
     g_file *po;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ret = SS_null;
 

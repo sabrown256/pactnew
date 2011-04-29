@@ -15,7 +15,7 @@
 
 /* _SSI_MK_RECT - make-rectangularq for Scheme */
 
-static object *_SSI_mk_rectq(object *argl)
+static object *_SSI_mk_rectq(SS_psides *si, object *argl)
    {quaternion q;
     object *o;
 
@@ -45,7 +45,7 @@ static object *_SSI_mk_rectq(object *argl)
  *                -    k = m sin(th) sin(ph) sin(ch) 
  */
 
-static object *_SSI_mk_polarq(object *argl)
+static object *_SSI_mk_polarq(SS_psides *si, object *argl)
    {double m, th, ph, ch;
     double ms, msp;
     quaternion q;

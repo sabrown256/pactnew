@@ -519,7 +519,7 @@ void UL_init_curves(void)
 
 /* _ULI_SET_ID - change the data-id of the given curve */
 
-object *_ULI_set_id(object *argl)
+object *_ULI_set_id(SS_psides *si, object *argl)
    {char id[MAXLINE];
     int jo;
     object *obj;
@@ -603,8 +603,10 @@ object *_UL_dataid_seq(char *first, char *last)
 
 /* _ULI_THRU - return an expanded list of curves */
 
-object *_ULI_thru(object *argl)
-   {object *ret = SS_null;
+object *_ULI_thru(SS_psides *si, object *argl)
+   {object *ret;
+
+    ret = SS_null;
 
     SX_prep_arg(argl);
 
@@ -713,7 +715,7 @@ object *UL_copy_curve(int j)
  *                    - from xstart to xstop by xstep
  */
 
-object *_ULI_extract_curve(object *argl)
+object *_ULI_extract_curve(SS_psides *si, object *argl)
    {int i, j, k, l, n, irev;
     double xstart, xstop, xstep, xv, yv, ymn, ymx, tmp;
     double *xpi, *ypi, *xpj, *ypj, *xpjtmp, *ypjtmp;

@@ -15,7 +15,7 @@
 
 /* _SSI_MK_RECT - make-rectangular for Scheme */
 
-static object *_SSI_mk_rect(object *argl)
+static object *_SSI_mk_rect(SS_psides *si, object *argl)
    {double r, i;
     double _Complex z;
     object *o;
@@ -37,7 +37,7 @@ static object *_SSI_mk_rect(object *argl)
 
 /* _SSI_MK_POLAR - make-polar for Scheme */
 
-static object *_SSI_mk_polar(object *argl)
+static object *_SSI_mk_polar(SS_psides *si, object *argl)
    {double r, i, m, a;
     double _Complex z;
     object *o;

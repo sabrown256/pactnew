@@ -736,8 +736,8 @@ extern object
 	      char *label, char *filename, PFVoid fnc),
  *SX_set_crv_id(int i, char *id),
  *SX_re_id(SS_psides *si),
- *SX_get_data_domain(object *argl),
- *SX_get_data_range(object *argl),
+ *SX_get_data_domain(SS_psides *si, object *argl),
+ *SX_get_data_range(SS_psides *si, object *argl),
  *SX_rl_curve(int j);
 
 extern void
@@ -765,7 +765,7 @@ extern void
  SX_install_global_funcs(void);
 
 extern object
- *SX_plane(object *argl);
+ *SX_plane(SS_psides *si, object *argl);
 
 extern int
  SX_map_count(void);
@@ -877,7 +877,7 @@ extern object
  *SX_mk_image(PG_image *im),
  *SX_mk_graphics_device(PG_device *dev),
  *SX_mk_dev_attributes(PG_dev_attributes *da),
- *SX_get_ref_map(g_file *po, int indx, char *dtype);
+ *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype);
 
 extern pcons
  *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val);
@@ -926,11 +926,11 @@ extern int
 extern object
  *SX_read_data(object *obj),
  *SX_read_ver1(object *obj),
- *SX_read_text_table(object *argl),
- *SX_table_curve(object *argl),
+ *SX_read_text_table(SS_psides *si, object *argl),
+ *SX_table_curve(SS_psides *si, object *argl),
  *SX_table_attr(SS_psides *si),
  *SX_crv_file_info(object *obj),
- *SX_write_data(object *argl);
+ *SX_write_data(SS_psides *si, object *argl);
 
 extern void
  SX_cache_addpid(),

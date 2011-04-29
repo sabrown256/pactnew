@@ -198,7 +198,7 @@ static object *_SXI_package_name(object *obj)
  *                   -    tf - final time
  */
 
-static object *_SXI_pan_simulate(object *argl)
+static object *_SXI_pan_simulate(SS_psides *si, object *argl)
    {double t, ti, tf;
     double *pt, *pdt;
     int *pcy, *pnz;
@@ -247,7 +247,7 @@ static object *_SXI_pan_simulate(object *argl)
  *                  - in a cons
  */
 
-static object *_SXI_run_package(object *argl)
+static object *_SXI_run_package(SS_psides *si, object *argl)
    {int cycle;
     double t, dt;
     char *pck_name;
@@ -313,12 +313,12 @@ static object *_SXI_advance_name(object *obj)
  *                   - advance the cycle count
  */
 
-static object *_SXI_advance_time(object *argl)
-   {double dt, pck_dt, t1, t2, t3, tconv;
-    double *pt, *pdt;
+static object *_SXI_advance_time(SS_psides *si, object *argl)
+   {int nargs;
     int *pcy;
+    double dt, pck_dt, t1, t2, t3, tconv;
+    double *pt, *pdt;
     PA_package *pck;
-    int nargs;
 
     pt  = (double *) SS_var_reference("current-time");
     pdt = (double *) SS_var_reference("current-timestep");
@@ -449,7 +449,7 @@ static int *_SX_index_ptr(object **pargl, char *msg)
  *              -      RUNTIME, OPTL, REL, U_CENT, DYNAMIC
  */
  
-static object *_SXI_def_var(object *argl)
+static object *_SXI_def_var(SS_psides *si, object *argl)
    {int i, dm, *pv, *mini, *maxi, meth;
     int enough, at, vattr[N_ATTRIBUTES];
     char *vname, *vtype, *s;
@@ -626,7 +626,7 @@ static object *_SXI_def_var(object *argl)
 
 /* _SXI_RD_RESTART - read a restart dump from Scheme level */
 
-static object *_SXI_rd_restart(object *argl)
+static object *_SXI_rd_restart(SS_psides *si, object *argl)
    {int convs;
     char *name;
 
@@ -723,7 +723,7 @@ static object *_SXI_intern_packages(SS_psides *si)
  *                   - this should happen after the dump has been read
  */
 
-static object *_SXI_init_problem(object *argl)
+static object *_SXI_init_problem(SS_psides *si, object *argl)
    {int nc;
     double t, dt;
     char *edname, *ppname, *gfname;
@@ -768,7 +768,7 @@ static object *_SXI_inst_com(SS_psides *si)
 
 /* _SXI_READH - execute PA_readh at Scheme level */
 
-static object *_SXI_readh(object *argl)
+static object *_SXI_readh(SS_psides *si, object *argl)
    {char *name;
 
     name = NULL;
@@ -785,7 +785,7 @@ static object *_SXI_readh(object *argl)
 
 /* _SXI_PAN_CMMND - execute the command specified in the given string */
 
-static object *_SXI_pan_cmmnd(object *argl)
+static object *_SXI_pan_cmmnd(SS_psides *si, object *argl)
    {char *s, *token, *t;
     haelem *hp;
     PA_command *cp;
@@ -813,7 +813,7 @@ static object *_SXI_pan_cmmnd(object *argl)
 
 /* _SXI_FIN_SYSTEM - execute fin_system at Scheme level */
 
-static object *_SXI_fin_system(object *argl)
+static object *_SXI_fin_system(SS_psides *si, object *argl)
    {int nz, cy;
 
     nz = 0;
@@ -832,7 +832,7 @@ static object *_SXI_fin_system(object *argl)
 
 /* _SXI_DUMP_PP - execute PA_dump_pp and PA_file_mon at Scheme level */
 
-static object *_SXI_dump_pp(object *argl)
+static object *_SXI_dump_pp(SS_psides *si, object *argl)
    {double t, dt;
     int cy;
     char *ed, *pp, *gf;

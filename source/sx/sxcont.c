@@ -314,7 +314,7 @@ static object *_SX_list_vobjects(char *patt, g_file *po, int type)
 
 /* _SXI_MENU - print a menu of images, curves, and graphs */
 
-object *_SXI_menu(object *argl)
+object *_SXI_menu(SS_psides *si, object *argl)
    {char *patt, *type;
     g_file *po;
     object *ret;

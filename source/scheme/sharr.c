@@ -20,14 +20,11 @@
  *                   - (hash-install <name> <object> <table>)
  */
 
-static object *_SSI_hash_install(object *argl)
+static object *_SSI_hash_install(SS_psides *si, object *argl)
    {object *obj;
     char *name;
     haelem *hp;
     hasharr *tab;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     name = NULL;
     obj  = SS_null;
@@ -56,14 +53,11 @@ static object *_SSI_hash_install(object *argl)
 
 /* _SSI_HASH_LOOKUP - lookup at the Scheme level */
 
-static object *_SSI_hash_lookup(object *argl)
+static object *_SSI_hash_lookup(SS_psides *si, object *argl)
    {char *name;
     hasharr *tab;
     void *vr;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     name = NULL;
     tab  = si->symtab;
@@ -87,13 +81,10 @@ static object *_SSI_hash_lookup(object *argl)
 
 /* _SSI_HASH_REMOVE - remove at the Scheme level */
 
-static object *_SSI_hash_remove(object *argl)
+static object *_SSI_hash_remove(SS_psides *si, object *argl)
    {object *obj;
     char *name;
     hasharr *tab;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     name = NULL;
     tab  = si->symtab;
@@ -122,14 +113,11 @@ static object *_SSI_hash_remove(object *argl)
  *              - (hash-dump <table> <pattern> <sort>)
  */
 
-object *SS_hash_dump(object *argl)
+object *SS_hash_dump(SS_psides *si, object *argl)
    {int i, nnames;
     char **names, *name, *patt;
     object *obj, *sort, *to;
     hasharr *tab;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     tab  = si->symtab;
     patt = NULL;
@@ -402,7 +390,8 @@ void _SS_inst_hash(void)
 
 
     SS_scheme_symtab = SS_mk_hasharr(si->symtab);
-    SC_hasharr_install(si->symtab, "system-hash-table", SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(si->symtab, "system-hash-table",
+		       SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
     SS_UNCOLLECT(SS_scheme_symtab);
 
     return;}

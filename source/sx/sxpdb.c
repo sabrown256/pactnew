@@ -72,7 +72,7 @@ static void _SX_target(int data, int align)
  *             - never set, 0 is returned.
  */
 
-static object *_SXI_target(object *arg)
+static object *_SXI_target(SS_psides *si, object *arg)
    {int data, align;
     object *o;
 
@@ -99,7 +99,7 @@ static object *_SXI_target(object *arg)
 
 /* _SXI_OPEN_RAW_FILE - open a file as a binary input port */
 
-static object *_SXI_open_raw_file(object *argl)
+static object *_SXI_open_raw_file(SS_psides *si, object *argl)
    {int data, align;
     char *name, *mode, *type, *md;
     SC_udl *pu;
@@ -184,7 +184,7 @@ static object *_SXI_open_raw_file(object *argl)
 
 /* _SXI_SEEK_RAW_FILE - seek in a file */
 
-static object *_SXI_seek_raw_file(object *argl)
+static object *_SXI_seek_raw_file(SS_psides *si, object *argl)
    {int whence, ret;
     int64_t addr;
     PDBfile *file;
@@ -228,7 +228,7 @@ static object *_SXI_seek_raw_file(object *argl)
 
 /* _SXI_CLOSE_RAW_FILE - close a file as a binary input port */
 
-static object *_SXI_close_raw_file(object *argl)
+static object *_SXI_close_raw_file(SS_psides *si, object *argl)
    {PDBfile *file;
     g_file *po;
     FILE *fp;
@@ -260,7 +260,7 @@ static object *_SXI_close_raw_file(object *argl)
  *             -              <file-type> [<mem-type>])
  */
 
-static object *_SXI_rd_raw(object *argl)
+static object *_SXI_rd_raw(SS_psides *si, object *argl)
    {int ret;
     char *intype, *outtype;
     long nitems, ni;
@@ -354,7 +354,7 @@ static object *_SXI_rd_raw(object *argl)
  *             -               <file-type> [<mem-type>])
  */
 
-static object *_SXI_wr_raw(object *argl)
+static object *_SXI_wr_raw(SS_psides *si, object *argl)
    {int ret;
     long nitems;
     long long addr;
@@ -711,7 +711,7 @@ static object *_SXI_create_pdbfile(object *arg)
 
 /* _SXI_OPEN_PDBFILE - open up the named PDBFile */
 
-static object *_SXI_open_pdbfile(object *argl)
+static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
    {char mode[3], *md;
     object *obj, *o;
 
@@ -781,7 +781,7 @@ static object *_SXI_def_common_types(object *arg)
 
 /* _SXI_ENTRY_NUMBER - return the number of items for the named variable */
 
-static object *_SXI_entry_number(object *argl)
+static object *_SXI_entry_number(SS_psides *si, object *argl)
    {char *name;
     g_file *po;
     PDBfile *file;
@@ -813,7 +813,7 @@ static object *_SXI_entry_number(object *argl)
 
 /* _SXI_RESET_PTRS - call PD_reset_ptr_list */
 
-static object *_SXI_reset_ptrs(object *argl)
+static object *_SXI_reset_ptrs(SS_psides *si, object *argl)
    {PDBfile *file;
     g_file *po;
 
@@ -836,7 +836,7 @@ static object *_SXI_reset_ptrs(object *argl)
 
 /* _SXI_FAMILY_FILE - family the file */
 
-static object *_SXI_family_file(object *argl)
+static object *_SXI_family_file(SS_psides *si, object *argl)
    {int ifl;
     PDBfile *file;
     g_file *po;
@@ -868,7 +868,7 @@ static object *_SXI_family_file(object *argl)
  *                   - Usage: (file-content <file> [<outfile>] [<version>] [<chart>])
  */
 
-static object *_SXI_file_content(object *argl)
+static object *_SXI_file_content(SS_psides *si, object *argl)
    {int vers, chrt;
     g_file *po;
     PDBfile *file;
@@ -922,7 +922,7 @@ static object *_SXI_file_content(object *argl)
  *                -    previous_file (char *)         - previous file in family
  */
 
-static object *_SXI_file_info(object *argl)
+static object *_SXI_file_info(SS_psides *si, object *argl)
    {char *name;
     g_file *po;
     PDBfile *file;
@@ -1006,7 +1006,7 @@ static object *_SXI_file_info(object *argl)
 
 /* _SXI_DEFAULT_OFFSET - set the default offset for the given file */
 
-static object *_SXI_default_offset(object *arg)
+static object *_SXI_default_offset(SS_psides *si, object *arg)
    {int offset, nargs;
     g_file *po;
     PDBfile *file;
@@ -1035,7 +1035,7 @@ static object *_SXI_default_offset(object *arg)
 
 /* _SXI_MAJOR_ORDER - set the file to row or column major order */
 
-static object *_SXI_major_order(object *arg)
+static object *_SXI_major_order(SS_psides *si, object *arg)
    {char *order;
     g_file *po;
     PDBfile *file;
@@ -1068,7 +1068,7 @@ static object *_SXI_major_order(object *arg)
 
 /* _SXI_FILE_MODE - set the file mode */
 
-static object *_SXI_file_mode(object *arg)
+static object *_SXI_file_mode(SS_psides *si, object *arg)
    {char *mode;
     g_file *po;
     PDBfile *file;
@@ -1260,7 +1260,7 @@ static object *_SXI_pdb_to_list(object *arg)
  *                 - definition
  */
 
-static object *_SXI_parse_type(object *argl)
+static object *_SXI_parse_type(SS_psides *si, object *argl)
    {char *def;
     object *ret;
 
@@ -1397,7 +1397,7 @@ static object *_SXI_symp(object *obj)
 
 /* _SXI_LIST_SYMTAB - return a list of the symbol table entries */
 
-static object *_SXI_list_symtab(object *argl)
+static object *_SXI_list_symtab(SS_psides *si, object *argl)
    {object *args, *obj;
     char *patt;
     g_file *po;
@@ -1423,7 +1423,7 @@ static object *_SXI_list_symtab(object *argl)
                          SS_mk_cons(SS_mk_string(patt),
                                     SS_null));
 
-    obj = SS_hash_dump(args);
+    obj = SS_hash_dump(si, args);
     
     return(obj);}
 
@@ -1432,7 +1432,7 @@ static object *_SXI_list_symtab(object *argl)
 
 /* _SXI_LIST_VARIABLES - return a list of the variables in a file directory */
 
-static object *_SXI_list_variables(object *argl)
+static object *_SXI_list_variables(SS_psides *si, object *argl)
    {object *obj, *oall;
     char *patt;
     char *type;
@@ -1484,7 +1484,7 @@ static object *_SXI_list_variables(object *argl)
 
 /* _SXI_CHANGE_DIRECTORY - change the current working directory in a file */
 
-static object *_SXI_change_directory(object *argl)
+static object *_SXI_change_directory(SS_psides *si, object *argl)
    {char *dir;
     g_file *po;
     PDBfile *file;
@@ -1517,7 +1517,7 @@ static object *_SXI_change_directory(object *argl)
 
 /* _SXI_MAKE_DIRECTORY - make a directory in a file */
 
-static object *_SXI_make_directory(object *argl)
+static object *_SXI_make_directory(SS_psides *si, object *argl)
    {char *dir;
     g_file *po;
     PDBfile *file;
@@ -1554,7 +1554,7 @@ static object *_SXI_make_directory(object *argl)
  *                - could possibly refer to a directory in the given file
  */
 
-static object *_SXI_file_dirp(object *argl)
+static object *_SXI_file_dirp(SS_psides *si, object *argl)
    {char *dir;
     g_file *po;
     PDBfile *file;
@@ -1605,7 +1605,7 @@ static object *_SXI_current_directory(object *arg)
 
 /* _SXI_CREATE_LINK - create a link to a variable in a file */
 
-static object *_SXI_create_link(object *argl)
+static object *_SXI_create_link(SS_psides *si, object *argl)
    {char *oldname, *newname;
     g_file *po;
     PDBfile *file;
@@ -1637,7 +1637,7 @@ static object *_SXI_create_link(object *argl)
 
 /* _SXI_LIST_DEFSTRS - return a list of the derived data types in a file */
 
-static object *_SXI_list_defstrs(object *argl)
+static object *_SXI_list_defstrs(SS_psides *si, object *argl)
    {object *obj, *sort;
     g_file *po;
     PDBfile *strm;
@@ -1659,7 +1659,7 @@ static object *_SXI_list_defstrs(object *argl)
                        SS_OBJECT_I, sort,
                        0);
 
-    obj = SS_hash_dump(obj);
+    obj = SS_hash_dump(si, obj);
 
     return(obj);}
 
@@ -1674,7 +1674,7 @@ static object *_SXI_list_defstrs(object *argl)
  *               -                order-list expb mantb sbs sbe sbm hmb bias)
  */
  
-static object *_SXI_def_prim(object *argl)
+static object *_SXI_def_prim(SS_psides *si, object *argl)
    {int n;
     char *name, *type;
     long bytespitem;
@@ -1763,7 +1763,7 @@ static object *_SXI_def_prim(object *argl)
  *               -                        expb mantb sbs sbe sbm hmb bias)
  */
  
-static object *_SXI_chg_prim(object *argl)
+static object *_SXI_chg_prim(SS_psides *si, object *argl)
    {int i, id, ityp, nb, no, align;
     int *ordr;
     long fmt[7];
@@ -1819,7 +1819,7 @@ static object *_SXI_chg_prim(object *argl)
  *                  - Usage: (read-defstr file name)
  */
  
-static object *_SXI_read_defstr(object *argl)
+static object *_SXI_read_defstr(SS_psides *si, object *argl)
    {char *name;
     g_file *po;
     PDBfile *file;
@@ -1853,7 +1853,7 @@ static object *_SXI_read_defstr(object *argl)
  *                   - Usage: (write-defstr file defstr)
  */
  
-static object *_SXI_write_defstr(object *argl)
+static object *_SXI_write_defstr(SS_psides *si, object *argl)
    {g_file *po;
     PDBfile *file;
     memdes *desc;
@@ -1903,7 +1903,7 @@ static object *_SXI_write_defstr(object *argl)
  *                  - member = (type name dimension(s))
  */
  
-static object *_SXI_make_defstr(object *argl)
+static object *_SXI_make_defstr(SS_psides *si, object *argl)
    {char *name, *mname, *type, *memtemp;
     char member[MAXLINE];
     memdes *desc, *lst, *prev;
@@ -1984,7 +1984,7 @@ static object *_SXI_make_defstr(object *argl)
  *                   - (make-typedef file old new)
  */
  
-static object *_SXI_make_typedef(object *argl)
+static object *_SXI_make_typedef(SS_psides *si, object *argl)
    {char *ntype, *otype;
     PDBfile *file;
     g_file *po;
@@ -2016,7 +2016,7 @@ static object *_SXI_make_typedef(object *argl)
  *                - (make-cast file type member controller)
  */
  
-static object *_SXI_make_cast(object *argl)
+static object *_SXI_make_cast(SS_psides *si, object *argl)
    {char *type, *memb, *contr;
     PDBfile *file;
     g_file *po;
@@ -2049,7 +2049,7 @@ static object *_SXI_make_cast(object *argl)
  *                - could possibly refer to a variable in the given file
  */
 
-static object *_SXI_file_varp(object *argl)
+static object *_SXI_file_varp(SS_psides *si, object *argl)
    {int flag, ret;
     char *name;
     object *fobj, *o;
@@ -2130,7 +2130,7 @@ int _SX_file_varp(PDBfile *file, char *name, int flag)
  *                - a null object pointer is returned.
  */
 
-static object *_SXI_rd_syment(object *argl)
+static object *_SXI_rd_syment(SS_psides *si, object *argl)
    {char *name, *s;
     g_file *po;
     PDBfile *file;
@@ -2245,7 +2245,7 @@ static SC_array *_SX_make_blocks(object *alst, long numb)
  *                - The number of items is computed from the dimension.
  */
 
-static object *_SXI_wr_syment(object *argl)
+static object *_SXI_wr_syment(SS_psides *si, object *argl)
    {char *name, *type;
     char s[MAXLINE];
     long n;
@@ -2511,7 +2511,7 @@ static object *SX_write_filedata(object *argl)
  *                    - be used.
  */
 
-static object *_SXI_write_pdbdata(object *argl)
+static object *_SXI_write_pdbdata(SS_psides *si, object *argl)
    {object *rv;
 
     rv = SX_write_filedata(argl);
@@ -2555,7 +2555,7 @@ static object *SX_scatter_filedata(object *argl)
  *                      - be used.
  */
 
-static object *_SXI_scatter_pdbdata(object *argl)
+static object *_SXI_scatter_pdbdata(SS_psides *si, object *argl)
    {object *rv;
 
     rv = SX_scatter_filedata(argl);
@@ -2571,7 +2571,7 @@ static object *_SXI_scatter_pdbdata(object *argl)
  *                   -    (remove-entry file name)
  */
 
-static object *_SXI_remove_entry(object *argl)
+static object *_SXI_remove_entry(SS_psides *si, object *argl)
    {char *name;
     PDBfile *file;
     g_file *po;
@@ -2616,7 +2616,7 @@ static object *_SXI_remove_entry(object *argl)
  *                      - be used.
  */
 
-static object *_SXI_reserve_pdbdata(object *argl)
+static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
    {int wrfl;
     long number;
     char *type, *ntype;
@@ -2837,7 +2837,7 @@ static object *SX_read_filedata(object *argl)
  *                   - If file is nil, the internal virtual file will be used.
  */
 
-static object *_SXI_read_pdbdata(object *argl)
+static object *_SXI_read_pdbdata(SS_psides *si, object *argl)
    {object *o;
 
     o = SX_read_filedata(argl);
@@ -2851,7 +2851,7 @@ static object *_SXI_read_pdbdata(object *argl)
  *                      - arrays
  */
 
-static object *_SXI_wrt_ultra_curve(object *argl)
+static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
    {int npts;
     PDBfile *file;
     g_file *po;
@@ -2889,7 +2889,7 @@ static object *_SXI_wrt_ultra_curve(object *argl)
 
 /* _SXI_SIZEOF - return the size in bytes of the given type name */
 
-static object *_SXI_sizeof(object *argl)
+static object *_SXI_sizeof(SS_psides *si, object *argl)
    {int flg;
     long bytespitem;
     char *type;
@@ -3004,7 +3004,7 @@ static object *_SX_print_pdb(FILE *fp, object *argl)
 
 /* _SXI_PRINT_PDB - print contents of a pdb object */
 
-static object *_SXI_print_pdb(object *argl)
+static object *_SXI_print_pdb(SS_psides *si, object *argl)
    {object *rv;
     FILE *fp;
 
@@ -3026,7 +3026,7 @@ static object *_SXI_print_pdb(object *argl)
 
 /* _SXI_SHOW_PDB - display content of a pdb object */
 
-static object *_SXI_show_pdb(object *argl)
+static object *_SXI_show_pdb(SS_psides *si, object *argl)
    {object *rv;
 
     rv = _SX_print_pdb(stdout, argl);
@@ -3038,7 +3038,7 @@ static object *_SXI_show_pdb(object *argl)
 
 /* _SXI_TO_PDBDATA - return a pdbdata object from the arguments */
 
-static object *_SXI_to_pdbdata(object *argl)
+static object *_SXI_to_pdbdata(SS_psides *si, object *argl)
    {SC_address val;
     syment *ep;
     object *rv;
@@ -3158,7 +3158,7 @@ static object *_SXI_pdbdata_to_hash(object *arg)
  *                      - (hash->pdbdata hash-table file name)
  */
 
-static object *_SXI_hash_to_pdbdata(object *argl)
+static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
    {char *name;
     hasharr *tab;
     g_file *po;
@@ -3257,7 +3257,7 @@ object *SX_pdbdata_handler(PDBfile *file, char *name, char *type,
 
 /* _SXI_SET_SWITCH - set a switch */
 
-static object *_SXI_set_switch(object *argl)
+static object *_SXI_set_switch(SS_psides *si, object *argl)
    {int indx, val;
     object *rv;
 
@@ -3283,7 +3283,7 @@ static object *_SXI_set_switch(object *argl)
 
 /* _SXI_SET_BUFFER_SIZE - set the buffer_size */
 
-static object *_SXI_set_buffer_size(object *argl)
+static object *_SXI_set_buffer_size(SS_psides *si, object *argl)
    {int v;
 
     v = -1;
@@ -3328,7 +3328,7 @@ static object *_SXI_get_error(SS_psides *si)
 
 /* _SXI_SET_MAX_SIZE - set the file->maximum_size */
 
-static object *_SXI_set_max_size(object *argl)
+static object *_SXI_set_max_size(SS_psides *si, object *argl)
    {int v;
     g_file *po;
     PDBfile *file;
@@ -3354,7 +3354,7 @@ static object *_SXI_set_max_size(object *argl)
 
 /* _SXI_SET_TRACK_POINTERS - set the file->track_pointers */
 
-static object *_SXI_set_track_pointers(object *argl)
+static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
    {int v;
     g_file *po;
     PDBfile *file;
@@ -3380,7 +3380,7 @@ static object *_SXI_set_track_pointers(object *argl)
 
 /* _SXI_SET_ACTIVATE_CHECKSUM - set the file->use_cksum */
 
-static object *_SXI_set_activate_checksum(object *argl)
+static object *_SXI_set_activate_checksum(SS_psides *si, object *argl)
    {int rv;
     PD_checksum_mode v;
     PDBfile *file;
@@ -3459,7 +3459,7 @@ static object *_SX_set_user_format(int i, char *format, int whch)
 
 /* _SXI_SET_FORMAT - set a format */
 
-static object *_SXI_set_format(object *argl)
+static object *_SXI_set_format(SS_psides *si, object *argl)
    {int i, id, ok;
     char s1[MAXLINE], s2[MAXLINE];
     char *field, *format, *typ;
@@ -3588,7 +3588,7 @@ static object *_SXI_set_format(object *argl)
 
 /* _SXI_PDB_TYPE - make a type cons for make-pdbdata */
 
-static object *_SXI_pdb_type(object *argl)
+static object *_SXI_pdb_type(SS_psides *si, object *argl)
    {object *o;
 
     o = SS_mk_cons(SS_mk_string("type"), argl);
@@ -3611,7 +3611,7 @@ static object *_SXI_pdb_type(object *argl)
  *                  -            <pad> <field> <field> <field> ... <pad> ...
  */
 
-static object *_SXI_unp_bitstrm(object *argl)
+static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
    {int nbits, padsz, fpp;
     long anumb, offs, nitems;
     char *name, *type, *data;
@@ -3704,7 +3704,7 @@ void SX_type_container(char *dtype, char *stype)
  *                    - usage: (index->tuple-string <file> <name> <n>)
  */
 
-static object *_SXI_index_to_expr(object *argl)
+static object *_SXI_index_to_expr(SS_psides *si, object *argl)
    {long indx;
     char path[MAXLINE];
     char *name, *s;
@@ -3774,7 +3774,7 @@ void SX_install_pdb_funcs(void)
 
     SS_install("close-bin-file",
                "Close a binary file",
-	       SS_nargs,
+	       SS_sargs,
 	       _SXI_close_pdbfile, SS_PR_PROC);
 
     SS_install("close-pdbfile",

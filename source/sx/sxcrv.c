@@ -538,7 +538,7 @@ object *SX_re_id(SS_psides *si)
 
 /* SX_GET_DATA_DOMAIN - return the union of all curve domains */
 
-object *SX_get_data_domain(object *argl)
+object *SX_get_data_domain(SS_psides *si, object *argl)
    {int i;
     double xmn, xmx, xt;
     object *ch, *s, *o;
@@ -565,7 +565,7 @@ object *SX_get_data_domain(object *argl)
 
 /* SX_GET_DATA_RANGE - return the union of all curve ranges */
 
-object *SX_get_data_range(object *argl)
+object *SX_get_data_range(SS_psides *si, object *argl)
    {int i;
     double ymn, ymx, yt;
     object *ch, *s, *o;

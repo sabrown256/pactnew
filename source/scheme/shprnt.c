@@ -222,11 +222,8 @@ void dprint(object *obj)
 
 /* _SSI_WRITE - invoke at Scheme level the C level print function */
 
-static object *_SSI_write(object *obj)
+static object *_SSI_write(SS_psides *si, object *obj)
    {object *str;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     str = SS_cdr(obj);
     obj = SS_car(obj);
@@ -248,14 +245,11 @@ static object *_SSI_write(object *obj)
 
 /* _SSI_SPRINTF - a C type sprintf for SCHEME */
 
-static object *_SSI_sprintf(object *argl)
+static object *_SSI_sprintf(SS_psides *si, object *argl)
    {int odf;
     PFfprintf pr;
     PFfputs ps;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
@@ -278,13 +272,10 @@ static object *_SSI_sprintf(object *argl)
 
 /* _SSI_FPRINTF - a C type fprintf for SCHEME */
 
-static object *_SSI_fprintf(object *argl)
+static object *_SSI_fprintf(SS_psides *si, object *argl)
    {object *str;
     PFfprintf pr;
     PFfputs ps;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
@@ -517,7 +508,7 @@ int SS_puts(char *s, FILE *fp, PFfputs put)
 
 /* _SSI_DISPLAY - the human readable print function in Scheme */
 
-static object *_SSI_display(object *obj)
+static object *_SSI_display(SS_psides *si, object *obj)
    {PFfprintf pr;
     PFfputs ps;
 
@@ -527,7 +518,7 @@ static object *_SSI_display(object *obj)
     SC_set_put_string(SS_fputs);
 
     _SS.disp_flag = _SS.disp_flag_ext;
-    _SSI_write(obj);
+    _SSI_write(si, obj);
     _SS.disp_flag = FALSE;
 
     SC_set_put_line(pr);
@@ -660,13 +651,10 @@ static object *_SSI_cls_out(object *obj)
 
 /* _SSI_CALL_OF - call-with-output-file in Scheme */
 
-object *_SSI_call_of(object *argl)
+object *_SSI_call_of(SS_psides *si, object *argl)
    {FILE *str;
     char *s;
     object *obj, *old_outdev, *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     s   = NULL;
     obj = SS_car(argl);
@@ -736,7 +724,7 @@ void SS_wr_proc(object *obj, object *strm)
 
 /* SS_BANNER - print the banner */
 
-object *SS_banner(object *obj)
+object *SS_banner(SS_psides *si, object *obj)
    {char *s;
 
     SS_args(obj,
@@ -844,12 +832,9 @@ int SS_prim_des(object *strm, object *obj)
 
 /* _SSI_DESCRIBE - print out the documentation on the function */
 
-static object *_SSI_describe(object *argl)
+static object *_SSI_describe(SS_psides *si, object *argl)
    {int ok;
     object *obj, *strm;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     obj  = SS_null;
     strm = SS_null;
@@ -995,13 +980,10 @@ int SS_prim_apr(FILE *str, char *s)
  *              - string
  */
 
-static object *_SSI_apropos(object *argl)
+static object *_SSI_apropos(SS_psides *si, object *argl)
    {object *obj, *strm;
     char *token;
     FILE *str;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     obj  = SS_null;
     strm = SS_null;
@@ -1170,11 +1152,8 @@ void SS_wr_atm(object *obj, object *strm)
 
 /* _SSI_NEWLINE - Scheme newline function */
 
-static object *_SSI_newline(object *strm)
+static object *_SSI_newline(SS_psides *si, object *strm)
    {FILE *fp;
-    SS_psides *si;
-
-    si = &_SS_si;
    
     if (SS_nullobjp(strm))
        {fp = SS_OUTSTREAM(si->outdev);
@@ -1215,11 +1194,8 @@ object *_SSI_curr_op(SS_psides *si)
 
 /* _SSI_WR_CHR - write-char for Scheme */
 
-object *_SSI_wr_chr(object *argl)
+object *_SSI_wr_chr(SS_psides *si, object *argl)
    {object *str;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     str = SS_cdr(argl);
     if (!SS_charobjp(argl = SS_car(argl)))

@@ -101,7 +101,7 @@ extern void
  UL_pause(int pf);
 
 extern object
- *_ULI_describe(object *s),
+ *_ULI_describe(SS_psides *si, object *obj),
  *_ULI_apropos(object *obj);
 
 
@@ -161,10 +161,10 @@ extern object
  *UL_mode_graphics(SS_psides *si),
  *UL_plot(void),
  *_ULI_printscr(SS_psides *si),
- *_ULI_set_id(object *argl),
- *_ULI_thru(object *s),
+ *_ULI_set_id(SS_psides *si, object *argl),
+ *_ULI_thru(SS_psides *si, object *s),
  *UL_copy_curve(int j),
- *_ULI_extract_curve(object *argl),
+ *_ULI_extract_curve(SS_psides *si, object *argl),
  *UL_xindex_curve(int j);
 
 extern void

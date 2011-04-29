@@ -124,6 +124,9 @@ object *_SXI_find_types(object *arg)
     object *args, *obj;
     PDBfile *file;
     syment *ep;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (!SX_PDBDATAP(arg))
        SS_error("MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
@@ -143,7 +146,7 @@ object *_SXI_find_types(object *arg)
 
 /* convert table to list */
     args = SS_mk_cons(SS_mk_hasharr(tytab), SS_null);
-    obj = SS_hash_dump(args);
+    obj = SS_hash_dump(si, args);
 
 /* delete hash table */
     SC_free_hasharr(tytab, NULL, NULL);

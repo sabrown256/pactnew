@@ -134,7 +134,7 @@ static int _SS_strlt(char *s1, char *s2)
 
 /* _SSI_STREQ - string=? in Scheme */
 
-static object *_SSI_streq(object *argl)
+static object *_SSI_streq(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strcmp(argl, _SS_streq);
@@ -146,7 +146,7 @@ static object *_SSI_streq(object *argl)
 
 /* _SSI_STRGE - string>=? in Scheme */
 
-static object *_SSI_strge(object *argl)
+static object *_SSI_strge(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strcmp(argl, _SS_strge);
@@ -158,7 +158,7 @@ static object *_SSI_strge(object *argl)
 
 /* _SSI_STRGT - string>? in Scheme */
 
-static object *_SSI_strgt(object *argl)
+static object *_SSI_strgt(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strcmp(argl, _SS_strgt);
@@ -170,7 +170,7 @@ static object *_SSI_strgt(object *argl)
 
 /* _SSI_STRLE - string<=? in Scheme */
 
-static object *_SSI_strle(object *argl)
+static object *_SSI_strle(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strcmp(argl, _SS_strle);
@@ -182,7 +182,7 @@ static object *_SSI_strle(object *argl)
 
 /* _SSI_STRLT - string<? in Scheme */
 
-static object *_SSI_strlt(object *argl)
+static object *_SSI_strlt(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strcmp(argl, _SS_strlt);
@@ -194,7 +194,7 @@ static object *_SSI_strlt(object *argl)
 
 /* _SSI_CISTREQ - string-ci=? in Scheme */
 
-static object *_SSI_cistreq(object *argl)
+static object *_SSI_cistreq(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_cistrcmp(argl, _SS_streq);
@@ -206,7 +206,7 @@ static object *_SSI_cistreq(object *argl)
 
 /* _SSI_CISTRGE - string-ci>=? in Scheme */
 
-static object *_SSI_cistrge(object *argl)
+static object *_SSI_cistrge(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_cistrcmp(argl, _SS_strge);
@@ -218,7 +218,7 @@ static object *_SSI_cistrge(object *argl)
 
 /* _SSI_CISTRGT - string-ci>? in Scheme */
 
-static object *_SSI_cistrgt(object *argl)
+static object *_SSI_cistrgt(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_cistrcmp(argl, _SS_strgt);
@@ -230,7 +230,7 @@ static object *_SSI_cistrgt(object *argl)
 
 /* _SSI_CISTRLE - string-ci<=? in Scheme */
 
-static object *_SSI_cistrle(object *argl)
+static object *_SSI_cistrle(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_cistrcmp(argl, _SS_strle);
@@ -242,7 +242,7 @@ static object *_SSI_cistrle(object *argl)
 
 /* _SSI_CISTRLT - string-ci<? in Scheme */
 
-static object *_SSI_cistrlt(object *argl)
+static object *_SSI_cistrlt(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_cistrcmp(argl, _SS_strlt);
@@ -272,7 +272,7 @@ static object *_SSI_strlen(object *str)
 
 /* _SSI_STRREF - string-ref in Scheme */
 
-static object *_SSI_strref(object *argl)
+static object *_SSI_strref(SS_psides *si, object *argl)
    {int c, n;
     char *s;
     object *rv;
@@ -319,7 +319,7 @@ static object *_SSI_strcpy(object *argl)
 
 /* _SSI_STRFIL - string-fill! in Scheme */
 
-static object *_SSI_strfil(object *argl)
+static object *_SSI_strfil(SS_psides *si, object *argl)
    {int c;
     char *s;
     object *str;
@@ -341,7 +341,7 @@ static object *_SSI_strfil(object *argl)
 
 /* _SSI_STRSET - string-set! in Scheme */
 
-static object *_SSI_strset(object *argl)
+static object *_SSI_strset(SS_psides *si, object *argl)
    {int c, n;
     char *s;
     object *str;
@@ -365,7 +365,7 @@ static object *_SSI_strset(object *argl)
 
 /* _SSI_STRSUB - substring in Scheme */
 
-static object *_SSI_strsub(object *argl)
+static object *_SSI_strsub(SS_psides *si, object *argl)
    {int n, n1, n2;
     char *s;
     object *str;
@@ -398,7 +398,7 @@ static object *_SSI_strsub(object *argl)
 
 /* _SSI_STRING - string for Scheme */
 
-static object *_SSI_string(object *argl)
+static object *_SSI_string(SS_psides *si, object *argl)
    {int i, c, n;
     char *t;
     object *str;
@@ -422,7 +422,7 @@ static object *_SSI_string(object *argl)
 
 /* _SSI_STRAPP - string-append for Scheme */
 
-static object *_SSI_strapp(object *argl)
+static object *_SSI_strapp(SS_psides *si, object *argl)
    {int n;
     char *s, *t;
     object *ths;
@@ -471,7 +471,7 @@ static object *_SSI_strlst(object *str)
 
 /* _SSI_LSTSTR - list->string for Scheme */
 
-static object *_SSI_lststr(object *argl)
+static object *_SSI_lststr(SS_psides *si, object *argl)
    {int i, n;
     char *s;
     object *str, *ths;
@@ -623,7 +623,7 @@ static object *_SSI_strnum(object *argl)
 
 /* _SSI_STRCHR - do what the C standard library function strchr does */
 
-static object *_SSI_strchr(object *argl)
+static object *_SSI_strchr(SS_psides *si, object *argl)
    {char *text, *delim, *s;
     object *rv;
 
@@ -647,7 +647,7 @@ static object *_SSI_strchr(object *argl)
 
 /* _SSI_STRSTR - do what the C standard library function strstr does */
 
-static object *_SSI_strstr(object *argl)
+static object *_SSI_strstr(SS_psides *si, object *argl)
    {char *cs, *ct, *s;
     object *rv;
 
@@ -671,7 +671,7 @@ static object *_SSI_strstr(object *argl)
 
 /* _SSI_STRCASESTR - do what the C standard library function strcasestr does */
 
-static object *_SSI_strcasestr(object *argl)
+static object *_SSI_strcasestr(SS_psides *si, object *argl)
    {char *cs, *ct, *s;
     object *rv;
 
@@ -701,7 +701,7 @@ static object *_SSI_strcasestr(object *argl)
  *              - rather than the string which _SSI_strchr would
  */
 
-static object *_SSI_istrchr(object *argl)
+static object *_SSI_istrchr(SS_psides *si, object *argl)
    {int64_t ind;
     char *text, *delim, *s;
     object *rv;
@@ -731,7 +731,7 @@ static object *_SSI_istrchr(object *argl)
 
 /* _SSI_ISTRSTR - do what the C standard library function strstr does */
 
-static object *_SSI_istrstr(object *argl)
+static object *_SSI_istrstr(SS_psides *si, object *argl)
    {int64_t ind;
     char *cs, *ct, *s;
     object *rv;
@@ -761,7 +761,7 @@ static object *_SSI_istrstr(object *argl)
 
 /* _SSI_BLANKSTR - wrapper for SCORE */
 
-static object *_SSI_blankstr(object *argl)
+static object *_SSI_blankstr(SS_psides *si, object *argl)
    {int ok;
     char *cs, *ct;
     object *rv;
@@ -787,7 +787,7 @@ static object *_SSI_blankstr(object *argl)
 
 /* _SSI_TRIM - wrapper for SCORE trim functions */
 
-static object *_SSI_trim(object *argl)
+static object *_SSI_trim(SS_psides *si, object *argl)
    {int dir;
     char *s, *d, *r;
     object *rv;
@@ -888,7 +888,7 @@ static object *_SS_strtok(object *argl, char *(*fnc)(char *, char *))
 
 /* _SSI_STRTOK - tokenize the string via SC_firsttok */
 
-static object *_SSI_strtok(object *argl)
+static object *_SSI_strtok(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strtok(argl, SC_firsttok);
@@ -900,7 +900,7 @@ static object *_SSI_strtok(object *argl)
 
 /* _SSI_LASTTOK - tokenize the string via SC_lasttok */
 
-static object *_SSI_lasttok(object *argl)
+static object *_SSI_lasttok(SS_psides *si, object *argl)
    {object *o;
 
     o = _SS_strtok(argl, SC_lasttok);
