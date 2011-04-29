@@ -61,7 +61,7 @@ static object *_SSI_mk_polar(SS_psides *si, object *argl)
 
 /* _SSI_REAL_PART - real-part for Scheme */
 
-static object *_SSI_real_part(object *argl)
+static object *_SSI_real_part(SS_psides *si, object *argl)
    {double r;
     double _Complex z;
     object *o;
@@ -81,7 +81,7 @@ static object *_SSI_real_part(object *argl)
 
 /* _SSI_IMAG_PART - imag-part for Scheme */
 
-static object *_SSI_imag_part(object *argl)
+static object *_SSI_imag_part(SS_psides *si, object *argl)
    {double r;
     double _Complex z;
     object *o;
@@ -101,7 +101,7 @@ static object *_SSI_imag_part(object *argl)
 
 /* _SSI_MAGNITUDE - magnitude for Scheme */
 
-static object *_SSI_magnitude(object *argl)
+static object *_SSI_magnitude(SS_psides *si, object *argl)
    {double r, i, m;
     double _Complex z;
     object *o;
@@ -123,7 +123,7 @@ static object *_SSI_magnitude(object *argl)
 
 /* _SSI_ANGLE - angle for Scheme */
 
-static object *_SSI_angle(object *argl)
+static object *_SSI_angle(SS_psides *si, object *argl)
    {double r, i, a;
     double _Complex z;
     object *o;

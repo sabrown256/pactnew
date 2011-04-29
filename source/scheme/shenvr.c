@@ -24,7 +24,7 @@
         SC_ASSERT(_n != NULL);};}
 
 typedef object *(*PFZargs)(SS_psides *si);
-typedef object *(*PFSargs)(object *argl);
+typedef object *(*PFSargs)(SS_psides *si, object *argl);
 
 char
  *SS_OBJECT_P_S = "object *";
@@ -210,8 +210,10 @@ int SS_true(object *obj)
 
 object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
+    PFZargs f;
 
-    o = (*(PFZargs) cp->proc[0])(si);
+    f = (PFZargs) cp->proc[0];
+    o = f(si);
 
     return(o);}
 
@@ -222,8 +224,10 @@ object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
 
 object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
+    PFSargs f;
 
-    o = (*(PFSargs) cp->proc[0])(SS_car(argl));
+    f = (PFSargs) cp->proc[0];
+    o = f(si, SS_car(argl));
 
     return(o);}
 
@@ -234,9 +238,9 @@ object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
 
 object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
-    object *(*f)(SS_psides *si, object *argl);
+    PFSargs f;
 
-    f = cp->proc[0];
+    f = (PFSargs) cp->proc[0];
     o = f(si, argl);
 
     return(o);}
@@ -248,9 +252,9 @@ object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
 
 object *SS_znargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
-    object *(*f)(SS_psides *si, object *argl);
+    PFSargs f;
 
-    f = cp->proc[0];
+    f = (PFSargs) cp->proc[0];
     o = f(si, argl);
 
     return(o);}
@@ -692,13 +696,10 @@ object *SS_bind_env(object *vr, object *penv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_DEFP - defined? predicate in SCHEME */
+/* _SSI_DEFP - defined? predicate in SCHEME */
 
-object *SS_defp(object *vr)
+object *_SSI_defp(SS_psides *si, object *vr)
    {object *b, *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     b = SS_bind_env(vr, si->env);
     o = (b == NULL) ? SS_f : SS_t;

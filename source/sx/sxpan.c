@@ -21,7 +21,7 @@ PFInt
 
 /* _SXI_PACKAGEP - function version of SX_PACKAGEP macro */
 
-static object *_SXI_packagep(object *obj)
+static object *_SXI_packagep(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_PACKAGEP(obj) ? SS_t : SS_f;
@@ -33,7 +33,7 @@ static object *_SXI_packagep(object *obj)
 
 /* _SXI_PANVARP - function version of SX_PANVARP macro */
 
-static object *_SXI_panvarp(object *obj)
+static object *_SXI_panvarp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_PANVARP(obj) ? SS_t : SS_f;
@@ -45,7 +45,7 @@ static object *_SXI_panvarp(object *obj)
 
 /* _SXI_SRCVARP - function version of SX_SOURCE_VARIABLEP macro */
 
-static object *_SXI_srcvarp(object *obj)
+static object *_SXI_srcvarp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_SOURCE_VARIABLEP(obj) ? SS_t : SS_f;
@@ -57,7 +57,7 @@ static object *_SXI_srcvarp(object *obj)
 
 /* _SXI_IV_SPECP - function version of SX_IV_SPECIFICATIONP macro */
 
-static object *_SXI_iv_specp(object *obj)
+static object *_SXI_iv_specp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_IV_SPECIFICATIONP(obj) ? SS_t : SS_f;
@@ -177,7 +177,7 @@ static void _SX_wr_giv_specification(object *obj, object *strm)
 
 /* _SXI_PACKAGE_NAME - return the package name */
 
-static object *_SXI_package_name(object *obj)
+static object *_SXI_package_name(SS_psides *si, object *obj)
    {object *rv;
 
     rv = SS_null;
@@ -293,7 +293,7 @@ static object *_SXI_run_package(SS_psides *si, object *argl)
 
 /* _SXI_ADVANCE_NAME - advance the given file family name */
 
-static object *_SXI_advance_name(object *obj)
+static object *_SXI_advance_name(SS_psides *si, object *obj)
    {char *name;
 
     name = NULL;
@@ -866,7 +866,7 @@ static object *_SXI_dump_pp(SS_psides *si, object *argl)
  *                      - (pa-variable->pm-array name)
  */
 
-static object *_SXI_db_numeric_data(object *obj)
+static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
    {int id;
     long n;
     char *name, *type;
@@ -911,7 +911,7 @@ static object *_SXI_db_numeric_data(object *obj)
 
 /* _SXI_WR_RESTART - write a restart dump from Scheme level */
 
-static object *_SXI_wr_restart(object *argl)
+static object *_SXI_wr_restart(SS_psides *si, object *argl)
    {char *name;
 
     name = NULL;

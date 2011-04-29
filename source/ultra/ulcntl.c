@@ -58,7 +58,7 @@ object *_ULI_describe(SS_psides *si, object *argl)
  *              - name or description
  */
 
-object *_ULI_apropos(object *obj)
+object *_ULI_apropos(SS_psides *si, object *obj)
    {int flag;
     char *s;
 

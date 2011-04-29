@@ -297,7 +297,7 @@ static object *SS_c_mode(SS_psides *si)
 
 /* SS_C_ADD_TYPE - add a new C type (via typedef) */
 
-static object *SS_c_add_type(object *argl)
+static object *SS_c_add_type(SS_psides *si, object *argl)
    {char *name;
     object *typ;
 

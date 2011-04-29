@@ -71,7 +71,7 @@ void SX_quit(int i)
 
 /* _SXI_QUIT - gracefully exit from this session */
 
-static object *_SXI_quit(object *arg)
+static object *_SXI_quit(SS_psides *si, object *arg)
    {int rv;
 
     SS_args(arg,
@@ -123,7 +123,7 @@ static object *_SXI_toggle_log(SS_psides *si, object *argl)
  *                    - of the given mapping
  */
 
-static object *_SXI_get_dimension(object *obj)
+static object *_SXI_get_dimension(SS_psides *si, object *obj)
    {int ndd, ndr;
     PG_graph *g;
     PM_mapping *f;
@@ -156,7 +156,7 @@ static object *_SXI_get_dimension(object *obj)
 
 /* _SXI_GET_DOMAIN - return the domain of the mapping object as a set object */
 
-static object *_SXI_get_domain(object *arg)
+static object *_SXI_get_domain(SS_psides *si, object *arg)
    {PM_set *set;
     object *rv;
 
@@ -179,7 +179,7 @@ static object *_SXI_get_domain(object *arg)
 
 /* _SXI_GET_RANGE - return the range of the mapping object as a set object */
 
-static object *_SXI_get_range(object *arg)
+static object *_SXI_get_range(SS_psides *si, object *arg)
    {PM_mapping *f;
     object *rv;
 
@@ -204,7 +204,7 @@ static object *_SXI_get_range(object *arg)
  *                       - as a string object
  */
 
-static object *_SXI_get_mapping_name(object *arg)
+static object *_SXI_get_mapping_name(SS_psides *si, object *arg)
    {char *name;
     object *rv;
 
@@ -223,7 +223,7 @@ static object *_SXI_get_mapping_name(object *arg)
  *                 - of the given set
  */
 
-static object *_SXI_set_volume(object *arg)
+static object *_SXI_set_volume(SS_psides *si, object *arg)
    {int i, nd;
     double *extr, vol, mn, mx;
     PM_set *set;
@@ -838,8 +838,7 @@ static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
  *               - this should be generalized later
  */
 
-static object *_SXI_pp_names(argl)
-   object *argl;
+static object *_SXI_pp_names(SS_psides *si, object *argl)
    {int i, j, k, n, m, jo, nc, nchar, ncol, ncc, nrow, nfcl, nfrw;
     char bf[MAXLINE], **lst, *text, **slst;
     object *obj;

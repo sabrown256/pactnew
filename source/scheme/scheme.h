@@ -878,7 +878,6 @@ extern object
  *SS_znargs(SS_psides *si, C_procedure *cp, object *argl),
  *SS_bound_name(char *name),
  *SS_mk_new_frame(object *name, hasharr *tab),
- *SS_defp(object *vr),
  *SS_lk_var_val(SS_psides *si, object *vr),
  *SS_bind_env(object *vr, object *penv);
 
@@ -1088,7 +1087,7 @@ extern PFPrintErrMsg
  SS_get_print_err_func(void);
 
 extern object
- *SS_lookup_object(object *obj),
+ *SS_lookup_object(SS_psides *si, object *obj),
  *SS_pop_err(int n, int flag);
 
 extern int

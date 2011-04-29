@@ -254,7 +254,7 @@ static object *_SSI_cistrlt(SS_psides *si, object *argl)
 
 /* _SSI_STRLEN - string-length in Scheme */
 
-static object *_SSI_strlen(object *str)
+static object *_SSI_strlen(SS_psides *si, object *str)
    {int64_t ln;
     object *rv;
 
@@ -299,7 +299,7 @@ static object *_SSI_strref(SS_psides *si, object *argl)
 
 /* _SSI_STRCPY - string-copy in Scheme */
 
-static object *_SSI_strcpy(object *argl)
+static object *_SSI_strcpy(SS_psides *si, object *argl)
    {object *str;
     char *s;
 
@@ -449,7 +449,7 @@ static object *_SSI_strapp(SS_psides *si, object *argl)
 
 /* _SSI_STRLST - string->list in Scheme */
 
-static object *_SSI_strlst(object *str)
+static object *_SSI_strlst(SS_psides *si, object *str)
    {int i, n;
     char *s;
     object *ret, *o;
@@ -498,7 +498,7 @@ static object *_SSI_lststr(SS_psides *si, object *argl)
 
 /* _SSI_SYMSTR - symbol->string for Scheme */
 
-static object *_SSI_symstr(object *arg)
+static object *_SSI_symstr(SS_psides *si, object *arg)
    {char *s;
     object *rv;
 
@@ -515,7 +515,7 @@ static object *_SSI_symstr(object *arg)
 
 /* _SSI_STRSYM - string->symbol for Scheme */
 
-static object *_SSI_strsym(object *str)
+static object *_SSI_strsym(SS_psides *si, object *str)
    {char *s;
     object *rv;
 
@@ -532,7 +532,7 @@ static object *_SSI_strsym(object *str)
 
 /* _SSI_UPCASE - up-case for Scheme */
 
-static object *_SSI_upcase(object *str)
+static object *_SSI_upcase(SS_psides *si, object *str)
    {char *s;
     object *rv;
 
@@ -550,7 +550,7 @@ static object *_SSI_upcase(object *str)
 
 /* _SSI_DNCASE - down-case for Scheme */
 
-static object *_SSI_dncase(object *str)
+static object *_SSI_dncase(SS_psides *si, object *str)
    {char *s;
     object *rv;
 
@@ -568,7 +568,7 @@ static object *_SSI_dncase(object *str)
 
 /* _SSI_MK_STR - make a new string */
 
-static object *_SSI_mk_str(object *argl)
+static object *_SSI_mk_str(SS_psides *si, object *argl)
    {int n, c;
     char *s;
     object *o;
@@ -594,7 +594,7 @@ static object *_SSI_mk_str(object *argl)
 
 /* _SSI_STRNUM - return the number represented in the given string */
 
-static object *_SSI_strnum(object *argl)
+static object *_SSI_strnum(SS_psides *si, object *argl)
    {int64_t l;
     double r;
     char *text, *pt;

@@ -21,7 +21,7 @@ static object
 
 /* _SSI_NEWSYM - make-new-symbol, generate a new uninterned symbol */
 
-static object *_SSI_newsym(object *obj)
+static object *_SSI_newsym(SS_psides *si, object *obj)
    {char *token, name[MAXLINE];
     object *o;
 
@@ -45,7 +45,7 @@ static object *_SSI_newsym(object *obj)
 
 /* _SSI_QUOTE - quote macro in Scheme */
 
-static object *_SSI_quote(object *obj)
+static object *_SSI_quote(SS_psides *si, object *obj)
    {
 
     return(obj);}
@@ -168,10 +168,8 @@ static object *_SS_quasiq(object *obj, int nestl)
  *             - SS_unqspproc, name of unquote-splicing procedure
  */
 
-static object *_SSI_quasiq(object *obj)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *_SSI_quasiq(SS_psides *si, object *obj)
+   {
 
     _SS.nest_level++;
 
@@ -186,11 +184,8 @@ static object *_SSI_quasiq(object *obj)
 
 /* _SSI_UNQUOTE - unquote macro in Scheme */
 
-static object *_SSI_unquote(object *obj)
+static object *_SSI_unquote(SS_psides *si, object *obj)
    {object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     o = SS_exp_eval(si, obj);
 
@@ -201,11 +196,8 @@ static object *_SSI_unquote(object *obj)
 
 /* _SSI_UNQ_SPL - unquote-splicing macro in Scheme */
 
-static object *_SSI_unq_spl(object *obj)
+static object *_SSI_unq_spl(SS_psides *si, object *obj)
    {object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     o = SS_exp_eval(si, obj);
 
@@ -582,7 +574,7 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
 
 /* _SSI_NOT - not for Scheme */
 
-static object *_SSI_not(object *obj)
+static object *_SSI_not(SS_psides *si, object *obj)
    {object *o;
 
     o = (SS_true(obj)) ? SS_f : SS_t;
@@ -604,7 +596,7 @@ object *SS_list(SS_psides *si, object *argl)
 
 /* _SSI_WATCH - set a watch variable */
 
-static object *_SSI_watch(object *obj)
+static object *_SSI_watch(SS_psides *si, object *obj)
    {
 
     if (SS_variablep(obj))
@@ -620,7 +612,7 @@ static object *_SSI_watch(object *obj)
 
 /* _SSI_UNWATCH - unset a watch variable */
 
-static object *_SSI_unwatch(object *obj)
+static object *_SSI_unwatch(SS_psides *si, object *obj)
    {
 
     _SS.watch_var = NULL;
@@ -923,11 +915,8 @@ void SS_end_trace(void)
 
 /* _SSI_CATCH - the entry part of call-with-current-continuation */
 
-static object *_SSI_catch(object *obj)
+static object *_SSI_catch(SS_psides *si, object *obj)
    {object *escape, *ret, *lst;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     escape = SS_mk_esc_proc(si->errlev, SS_PROCEDURE_I);
 

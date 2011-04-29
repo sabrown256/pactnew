@@ -475,7 +475,7 @@ static object *_SSI_read(SS_psides *si, object *obj)
 
 /* _SSI_OPN_IN - open-input-file in Scheme */
 
-static object *_SSI_opn_in(object *obj)
+static object *_SSI_opn_in(SS_psides *si, object *obj)
    {char *s, *t, *msg;
     FILE *str;
     object *rv;
@@ -520,7 +520,7 @@ static object *_SSI_opn_in(object *obj)
 
 /* _SSI_CLS_IN - close-input-port in Scheme */
 
-static object *_SSI_cls_in(object *obj)
+static object *_SSI_cls_in(SS_psides *si, object *obj)
    {
 
     if (!SS_inportp(obj))
@@ -561,7 +561,7 @@ static object *_SSI_call_if(SS_psides *si, object *argl)
     si->indev  = SS_mk_inport(str, s);
     ret       = SS_exp_eval(si, SS_cdr(argl));
 
-    _SSI_cls_in(si->indev);
+    _SSI_cls_in(si, si->indev);
 
     si->indev = old_indev;
 
@@ -585,7 +585,7 @@ object *_SSI_curr_ip(SS_psides *si)
 
 /* _SSI_IPORTP - input-port? at Scheme level */
 
-static object *_SSI_iportp(object *obj)
+static object *_SSI_iportp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_inportp(obj) ? SS_t : SS_f;
@@ -597,7 +597,7 @@ static object *_SSI_iportp(object *obj)
 
 /* _SSI_STRPRT - string->port at the Scheme level */
 
-static object *_SSI_strprt(object *arg)
+static object *_SSI_strprt(SS_psides *si, object *arg)
    {object *port;
 
     if (!SS_stringp(arg))
@@ -828,7 +828,7 @@ object *SS_load(SS_psides *si, object *argl)
            {SS_Save(si, si->env);
             si->env = si->global_env;};};
 
-    strm = _SSI_opn_in(fnm);
+    strm = _SSI_opn_in(si, fnm);
 
 /* check for the first line starting with #! */
     c = SS_get_ch(strm, TRUE);
@@ -853,7 +853,7 @@ object *SS_load(SS_psides *si, object *argl)
            (*si->post_read)(strm);
 
         if (SS_eofobjp(si->rdobj))
-           {_SSI_cls_in(strm);
+           {_SSI_cls_in(si, strm);
 	    SS_GC(strm);
             break;};
         SS_Save(si, si->env);

@@ -189,6 +189,7 @@ extern void
 /* SHENVR.C declarations */
 
 extern object
+ *_SSI_defp(SS_psides *si, object *vr),
  *_SS_bind_envc(char *name, object *penv),
  *_SS_lk_var_valc(char *name, object *penv);
 

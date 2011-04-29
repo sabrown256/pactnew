@@ -86,7 +86,7 @@ object *SX_draw_grotrian(object *argl)
 
 /* _SXI_GROTRIAN_GRAPHP - return #t iff the object is a grotrian graph */
 
-object *_SXI_grotrian_graphp(object *obj)
+object *_SXI_grotrian_graphp(SS_psides *si, object *obj)
    {PG_graph *g;
     object *o;
 
@@ -103,7 +103,7 @@ object *_SXI_grotrian_graphp(object *obj)
 
 /* _SXI_GROTRIAN_MAPPINGP - return #t iff the object is a grotrian mapping */
 
-object *_SXI_grotrian_mappingp(object *obj)
+object *_SXI_grotrian_mappingp(SS_psides *si, object *obj)
    {PM_mapping *f;
     object *o;
 

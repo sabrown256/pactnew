@@ -48,7 +48,7 @@ static PG_rendering
  *                     - a PDB file thereby preparing it for mappings
  */
 
-static object *_SXI_def_file_graph(object *obj)
+static object *_SXI_def_file_graph(SS_psides *si, object *obj)
    {PDBfile *file;
     g_file *po;
 
@@ -725,7 +725,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
 
 /* _SXI_DEVICEP - function version of SX_DEVICEP macro */
 
-static object *_SXI_devicep(object *obj)
+static object *_SXI_devicep(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_DEVICEP(obj) ? SS_t : SS_f;
@@ -737,7 +737,7 @@ static object *_SXI_devicep(object *obj)
 
 /* _SXI_GRAPHP - function version of SX_GRAPHP macro */
 
-static object *_SXI_graphp(object *obj)
+static object *_SXI_graphp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_GRAPHP(obj) ? SS_t : SS_f;
@@ -749,7 +749,7 @@ static object *_SXI_graphp(object *obj)
 
 /* _SXI_IMAGEP - function version of SX_IMAGEP macro */
 
-static object *_SXI_imagep(object *obj)
+static object *_SXI_imagep(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_IMAGEP(obj) ? SS_t : SS_f;
@@ -761,7 +761,7 @@ static object *_SXI_imagep(object *obj)
 
 /* _SXI_DEV_ATTRIBUTESP - function version of SX_DEV_ATTRIBUTESP macro */
 
-static object *_SXI_dev_attributesp(object *obj)
+static object *_SXI_dev_attributesp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_DEV_ATTRIBUTESP(obj) ? SS_t : SS_f;
@@ -2152,7 +2152,7 @@ static object *_SXI_set_ran_limits(SS_psides *si, object *argl)
  *                  -   (pg-domain-extrema <drawable>)
  */
 
-static object *_SXI_dom_extrema(object *obj)
+static object *_SXI_dom_extrema(SS_psides *si, object *obj)
    {PM_set *s;
     PM_mapping *m;
     object *rv;
@@ -2190,7 +2190,7 @@ static object *_SXI_dom_extrema(object *obj)
  *                 -   (pg-domain-limits <drawable>)
  */
 
-static object *_SXI_dom_limits(object *argl)
+static object *_SXI_dom_limits(SS_psides *si, object *argl)
    {PM_set *s;
     object *obj, *rv;
 
@@ -2225,7 +2225,7 @@ static object *_SXI_dom_limits(object *argl)
  *                  -   (pg-range-extrema <drawable>)
  */
 
-static object *_SXI_ran_extrema(object *obj)
+static object *_SXI_ran_extrema(SS_psides *si, object *obj)
    {PM_set *s;
     PM_mapping *m;
     object *rv;
@@ -2261,7 +2261,7 @@ static object *_SXI_ran_extrema(object *obj)
  *                 -   (pg-range-extrema <drawable>)
  */
 
-static object *_SXI_ran_limits(object *argl)
+static object *_SXI_ran_limits(SS_psides *si, object *argl)
    {PM_set *s;
     object *obj, *rv;
 
@@ -2348,7 +2348,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
  *                - usage: (pg-get-label <drawable>)
  */
 
-static object *_SXI_get_label(object *obj)
+static object *_SXI_get_label(SS_psides *si, object *obj)
    {char *label;
     object *rv;
 

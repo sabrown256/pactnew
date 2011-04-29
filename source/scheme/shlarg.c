@@ -16,7 +16,7 @@
 
 /* _SSI_VECTP - function version of SS_vectorp macro */
 
-object *_SSI_vectp(object *obj)
+object *_SSI_vectp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_vectorp(obj) ? SS_t : SS_f;
@@ -31,7 +31,7 @@ object *_SSI_vectp(object *obj)
 
 /* _SSI_MKVECT - make-vector for Scheme */
 
-static object *_SSI_mkvect(object *arg)
+static object *_SSI_mkvect(SS_psides *si, object *arg)
    {int i;
     object *o;
 
@@ -61,7 +61,7 @@ static object *_SSI_vector(SS_psides *si, object *argl)
 
 /* _SSI_VCTLEN - vector-length for Scheme */
 
-static object *_SSI_vctlen(object *arg)
+static object *_SSI_vctlen(SS_psides *si, object *arg)
    {int i;
     object *o;
 
@@ -156,6 +156,18 @@ object *SS_vctlst(object *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_VCTLST - wrapper for SS_vctlst */
+
+static object *_SSI_vctlst(SS_psides *si, object *arg)
+   {object *o;
+
+    o = SS_vctlst(arg);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_LSTVCT - list->vector for Scheme */
 
 object *SS_lstvct(object *arg)
@@ -174,6 +186,18 @@ object *SS_lstvct(object *arg)
          arg = SS_cdr(arg);};
 
     return(vct);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_LSTVCT - wrapper for SS_lstvct */
+
+static object *_SSI_lstvct(SS_psides *si, object *arg)
+   {object *o;
+
+    o = SS_lstvct(arg);
+
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -233,7 +257,7 @@ object *_SSI_define_global(SS_psides *si, object *argl)
 
 /* _SSI_SLEEP - sleep for n milliseconds */
 
-static object *_SSI_sleep(object *obj)
+static object *_SSI_sleep(SS_psides *si, object *obj)
    {int n;
 
     n = 0;
@@ -268,7 +292,7 @@ static object *_SSI_getcwd(SS_psides *si)
 
 /* _SSI_GETENV - return the value of the specified environment variable */
 
-static object *_SSI_getenv(object *obj)
+static object *_SSI_getenv(SS_psides *si, object *obj)
    {char *vr, *vl;
     object *ev;
 
@@ -399,13 +423,10 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 
 /* _SSI_PRINT_ENV - print the specified environment frame */
 
-static object *_SSI_print_env(object *obj)
+static object *_SSI_print_env(SS_psides *si, object *obj)
    {int i, n;
     object *penv;
     char bf[MAXLINE];
-    SS_psides *si;
-
-    si = &_SS_si;
 
     n = 0;
     SS_args(obj,
@@ -538,7 +559,7 @@ object *_SSI_fopen(SS_psides *si, object *argl)
 
 /* _SSI_FCLOSE - fclose in Scheme */
 
-object *_SSI_fclose(object *obj)
+object *_SSI_fclose(SS_psides *si, object *obj)
    {FILE *str;
 
     str = NULL;
@@ -589,11 +610,8 @@ static object *_SSI_mem_usg(SS_psides *si)
 
 /* _SSI_MEM_MAP - wrapper around SC_mem_map */
 
-static object *_SSI_mem_map(object *arg)
+static object *_SSI_mem_map(SS_psides *si, object *arg)
    {FILE *fp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SS_nullobjp(arg))
        arg = si->outdev;
@@ -678,7 +696,7 @@ static object *_SSI_mem_chk(SS_psides *si)
 
 /* _SSI_SIZEOF - wrapper around SIZEOF */
 
-static object *_SSI_sizeof(object *arg)
+static object *_SSI_sizeof(SS_psides *si, object *arg)
    {int64_t nb;
     char *type;
     object *o;
@@ -851,7 +869,7 @@ void _SS_inst_lrg(void)
     SS_install("list->vector",
                "Procedure: Returns a vector whose elements are the same as the lists",
                SS_sargs,
-               SS_lstvct, SS_PR_PROC);
+               _SSI_lstvct, SS_PR_PROC);
 
     SS_install("load-ave",
                "Procedure: return the load averages of the current host",
@@ -931,7 +949,7 @@ void _SS_inst_lrg(void)
     SS_install("vector->list",
                "Procedure: Returns a list whose elements are the same as the vectors",
                SS_sargs,
-               SS_vctlst, SS_PR_PROC);
+               _SSI_vctlst, SS_PR_PROC);
 
     SS_install("vector-ref",
                "Procedure: Returns the nth element of the given vector",

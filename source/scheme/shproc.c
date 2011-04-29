@@ -88,7 +88,7 @@ void _SS_rl_process(object *obj)
 
 /* _SSI_PRP - process? at Scheme level */
 
-static object *_SSI_prp(object *obj)
+static object *_SSI_prp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_processp(obj) ? SS_t : SS_f;
@@ -100,7 +100,7 @@ static object *_SSI_prp(object *obj)
 
 /* _SSI_PR_RUNP - process-running? in Scheme */
 
-static object *_SSI_pr_runp(object *obj)
+static object *_SSI_pr_runp(SS_psides *si, object *obj)
     {object *o;
 
      if (!SS_processp(obj))
@@ -199,7 +199,7 @@ static object *_SSI_blck_pr(SS_psides *si, object *argl)
 
 /* _SSI_CLS_PR - process-close in Scheme */
 
-static object *_SSI_cls_pr(object *obj)
+static object *_SSI_cls_pr(SS_psides *si, object *obj)
    {PROCESS *pp;
 
     pp = NULL;
@@ -233,7 +233,7 @@ static object *_SSI_pr_rd_tries(SS_psides *si, object *argl)
 
 /* _SSI_PR_STAT - process-status at the Scheme level */
 
-static object *_SSI_pr_stat(object *obj)
+static object *_SSI_pr_stat(SS_psides *si, object *obj)
    {PROCESS *pp;
     int st, rs;
     object *ret;
@@ -263,7 +263,7 @@ static object *_SSI_pr_stat(object *obj)
 
 /* _SSI_PR_RD_LINE - process-read-line at Scheme level */
 
-static object *_SSI_pr_rd_line(object *obj)
+static object *_SSI_pr_rd_line(SS_psides *si, object *obj)
    {int i;
     char bf[MAX_BFSZ];
     PROCESS *pp;

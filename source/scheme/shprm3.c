@@ -369,7 +369,7 @@ static object *_SSI_lst_ref(SS_psides *si, object *argl)
 
 /* _SSI_LAST - return a pointer to the last element of a list */
 
-static object *_SSI_last(object *obj)
+static object *_SSI_last(SS_psides *si, object *obj)
    {object *t, *lst, *o;
 
     t = obj;
@@ -519,7 +519,7 @@ int SS_numbp(object *obj)
 
 /* _SSI_NUMBERP - number? predicate in Scheme */
 
-static object *_SSI_numberp(object *obj)
+static object *_SSI_numberp(SS_psides *si, object *obj)
    {object *o;
 
     o = (SS_integerp(obj) || SS_floatp(obj)) ? SS_t : SS_f;
@@ -531,7 +531,7 @@ static object *_SSI_numberp(object *obj)
 
 /* _SSI_INTP - R4 compliant integer? function */
 
-static object *_SSI_intp(object *obj)
+static object *_SSI_intp(SS_psides *si, object *obj)
    {double r;
     object *rv;
 
@@ -550,7 +550,7 @@ static object *_SSI_intp(object *obj)
 
 /* _SSI_REALP - R4 compliant real? function */
 
-static object *_SSI_realp(object *obj)
+static object *_SSI_realp(SS_psides *si, object *obj)
    {object *rv;
 
     rv = SS_numbp(obj) ? SS_t : SS_f;
@@ -562,7 +562,7 @@ static object *_SSI_realp(object *obj)
 
 /* _SSI_STRINGP - function version of SS_stringp macro */
 
-static object *_SSI_stringp(object *obj)
+static object *_SSI_stringp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_stringp(obj) ? SS_t : SS_f;
@@ -574,7 +574,7 @@ static object *_SSI_stringp(object *obj)
 
 /* _SSI_VARP - function version of SS_variablep macro */
 
-static object *_SSI_varp(object *obj)
+static object *_SSI_varp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_variablep(obj) ? SS_t : SS_f;
@@ -586,7 +586,7 @@ static object *_SSI_varp(object *obj)
 
 /* _SSI_BOOLP - function version of SS_booleanp macro */
 
-static object *_SSI_boolp(object *obj)
+static object *_SSI_boolp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_booleanp(obj) ? SS_t : SS_f;
@@ -598,7 +598,7 @@ static object *_SSI_boolp(object *obj)
 
 /* _SSI_PAIRP - function version of SS_consp macro */
 
-static object *_SSI_pairp(object *obj)
+static object *_SSI_pairp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_consp(obj) ? SS_t : SS_f;
@@ -610,7 +610,7 @@ static object *_SSI_pairp(object *obj)
 
 /* _SSI_PROCP - function version of SS_procedurep macro */
 
-static object *_SSI_procp(object *obj)
+static object *_SSI_procp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_procedurep(obj) ? SS_t : SS_f;
@@ -701,7 +701,7 @@ static object *_SSI_text_filep(SS_psides *si, object *argl)
 
 /* _SSI_EOFP - function version of SS_eofobjp macro */
 
-static object *_SSI_eofp(object *obj)
+static object *_SSI_eofp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_eofobjp(obj) ? SS_t : SS_f;
@@ -713,7 +713,7 @@ static object *_SSI_eofp(object *obj)
 
 /* _SSI_NULLP - null? for Scheme */
 
-static object *_SSI_nullp(object *obj)
+static object *_SSI_nullp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_nullobjp(obj) ? SS_t : SS_f;
@@ -977,6 +977,195 @@ static object *_SSI_assoc(SS_psides *si, object *argl)
     return(o);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                           INTERPRETER BINDINGS                           */
+
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CAR - return a pointer to the car of the object given */
+
+static object *_SSI_car(SS_psides *si, object *obj)
+   {object *o;
+
+    if (!SS_consp(obj))
+       SS_error("CAN'T TAKE CAR OF ATOM - CAR", obj);
+
+    o = SS_CAR_MACRO(obj);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDR - return a pointer to the cdr of the object given */
+
+static object *_SSI_cdr(SS_psides *si, object *obj)
+   {object *o;
+
+    if (!SS_consp(obj))
+       SS_error("CAN'T TAKE CDR OF ATOM - CDR", obj);
+
+    o = SS_CDR_MACRO(obj);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CAAR - return a pointer to the caar of the object given */
+
+static object *_SSI_caar(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_car(SS_car(obj));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CADR - return a pointer to the cadr of the object given */
+
+static object *_SSI_cadr(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_car(SS_cdr(obj));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDAR - return a pointer to the cdar of the object given */
+
+static object *_SSI_cdar(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_cdr(SS_car(obj));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDDR - return a pointer to the cddr of the object given */
+
+static object *_SSI_cddr(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_cdr(SS_cdr(obj));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CAAAR - return a pointer to the caaar of the object given */
+
+static object *_SSI_caaar(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_car(SS_car(SS_car(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CAADR - return a pointer to the caadr of the object given */
+
+static object *_SSI_caadr(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_car(SS_car(SS_cdr(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CADAR - return a pointer to the cadar of the object given */
+
+static object *_SSI_cadar(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_car(SS_cdr(SS_car(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDAAR - return a pointer to the cdaar of the object given */
+
+static object *_SSI_cdaar(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_cdr(SS_car(SS_car(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CADDR - return a pointer to the caddr of the object given */
+
+static object *_SSI_caddr(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_car(SS_cdr(SS_cdr(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDADR - return a pointer to the cdadr of the object given */
+
+static object *_SSI_cdadr(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_cdr(SS_car(SS_cdr(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDDAR - return a pointer to the cddar of the object given */
+
+static object *_SSI_cddar(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_cdr(SS_cdr(SS_car(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_CDDDR - return a pointer to the cdddr of the object given */
+
+static object *_SSI_cdddr(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_cdr(SS_cdr(SS_cdr(obj)));
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_REVERSE - reverse the list in place and return it */
+
+static object *_SSI_reverse(SS_psides *si, object *obj)
+   {object *o;
+
+    o = SS_reverse(obj);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SS_INST_PRM3 - install the Scheme primitives */
@@ -1017,72 +1206,72 @@ void _SS_inst_prm3(void)
     SS_install("car",
                "Return the car of the argument",
                SS_sargs, 
-               SS_car, SS_PR_PROC);
+               _SSI_car, SS_PR_PROC);
 
     SS_install("caaar",
                "Return the caaar of the argument",
                SS_sargs, 
-               SS_caaar, SS_PR_PROC);
+               _SSI_caaar, SS_PR_PROC);
 
     SS_install("caadr",
                "Return the caadr of the argument",
                SS_sargs, 
-               SS_caadr, SS_PR_PROC);
+               _SSI_caadr, SS_PR_PROC);
 
     SS_install("caar",
                "Return the caar of the argument",
                SS_sargs, 
-               SS_caar, SS_PR_PROC);
+               _SSI_caar, SS_PR_PROC);
 
     SS_install("cadar",
                "Return the cadar of the argument",
                SS_sargs, 
-               SS_cadar, SS_PR_PROC);
+               _SSI_cadar, SS_PR_PROC);
 
     SS_install("caddr",
                "Return the caddr of the argument",
                SS_sargs, 
-               SS_caddr, SS_PR_PROC);
+               _SSI_caddr, SS_PR_PROC);
 
     SS_install("cadr",
                "Return the cadr of the argument",
                SS_sargs, 
-               SS_cadr, SS_PR_PROC);
+               _SSI_cadr, SS_PR_PROC);
 
     SS_install("cdar",
                "Return the cdar of the argument",
                SS_sargs, 
-               SS_cdar, SS_PR_PROC);
+               _SSI_cdar, SS_PR_PROC);
 
     SS_install("cdaar",
                "Return the cdaar of the argument",
                SS_sargs, 
-               SS_cdaar, SS_PR_PROC);
+               _SSI_cdaar, SS_PR_PROC);
 
     SS_install("cdadr",
                "Return the cdadr of the argument",
                SS_sargs, 
-               SS_cdadr, SS_PR_PROC);
+               _SSI_cdadr, SS_PR_PROC);
 
     SS_install("cddar",
                "Return the cddar of the argument",
                SS_sargs, 
-               SS_cddar, SS_PR_PROC);
+               _SSI_cddar, SS_PR_PROC);
 
     SS_install("cdddr",
                "Return the cdddr of the argument",
                SS_sargs, 
-               SS_cdddr, SS_PR_PROC);
+               _SSI_cdddr, SS_PR_PROC);
 
     SS_install("cddr",
                "Return the cddr of the argument",
                SS_sargs, 
-               SS_cddr, SS_PR_PROC);
+               _SSI_cddr, SS_PR_PROC);
 
     SS_install("cdr",
                "Return the cdr of the argument",
                SS_sargs, 
-               SS_cdr, SS_PR_PROC);
+               _SSI_cdr, SS_PR_PROC);
 
     SS_install("cons",
                "Return a new cons whose car and cdr are the arguments",
@@ -1182,7 +1371,7 @@ void _SS_inst_prm3(void)
     SS_install("reverse",
                "Destructively reverse the list and return it",
                SS_sargs, 
-               SS_reverse, SS_PR_PROC);
+               _SSI_reverse, SS_PR_PROC);
 
     SS_install("set-car!",
                "Procedure: Replace the car of the first argument with the second and return the new car",

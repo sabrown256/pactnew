@@ -17,7 +17,7 @@ typedef int (*PF_int_dd)(double, double);
 
 /* _SXI_NUMERIC_ARRAYP - function version of SX_NUMERIC_ARRAYP macro */
 
-static object *_SXI_numeric_arrayp(object *obj)
+static object *_SXI_numeric_arrayp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_NUMERIC_ARRAYP(obj) ? SS_t : SS_f;
@@ -29,7 +29,7 @@ static object *_SXI_numeric_arrayp(object *obj)
 
 /* _SXI_MAPPINGP - function version of SX_MAPPINGP macro */
 
-static object *_SXI_mappingp(object *obj)
+static object *_SXI_mappingp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_MAPPINGP(obj) ? SS_t : SS_f;
@@ -41,7 +41,7 @@ static object *_SXI_mappingp(object *obj)
 
 /* _SXI_SETP - function version of SX_SETP macro */
 
-static object *_SXI_setp(object *obj)
+static object *_SXI_setp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_SETP(obj) ? SS_t : SS_f;
@@ -343,7 +343,7 @@ object *_SXI_list_array(SS_psides *si, object *argl)
 
 /* _SXI_ARRAY_LIST - turn a numeric array into a list of numbers */
 
-static object *_SXI_array_list(object *argl)
+static object *_SXI_array_list(SS_psides *si, object *argl)
    {long n;
     char type[MAXLINE];
     object *lst;
@@ -369,7 +369,7 @@ static object *_SXI_array_list(object *argl)
 
 /* _SXI_NUM_ARR_LEN - return the length of a numeric array */
 
-static object *_SXI_num_arr_len(object *obj)
+static object *_SXI_num_arr_len(SS_psides *si, object *obj)
    {long n;
     object *o;
 
@@ -387,7 +387,7 @@ static object *_SXI_num_arr_len(object *obj)
 
 /* _SXI_NUM_ARR_EXTR - return the extrema of a numeric array */
 
-static object *_SXI_num_arr_extr(object *arg)
+static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
    {int n, imin, imax;
     char *type;
     void *data;
@@ -796,7 +796,7 @@ object *SX_mk_set(PM_set *set)
  *                        - return the set name as an object
  */
 
-static object *_SXI_get_text_set_name(object *set)
+static object *_SXI_get_text_set_name(SS_psides *si, object *set)
    {PM_set *s;
     object *o;
 
@@ -1762,7 +1762,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
 
 /* _SXI_POLYGONP - function version of SX_POLYGONP macro */
 
-static object *_SXI_polygonp(object *obj)
+static object *_SXI_polygonp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_POLYGONP(obj) ? SS_t : SS_f;

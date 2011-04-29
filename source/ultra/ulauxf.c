@@ -297,14 +297,11 @@ object *UL_get_value(double *sp, double *vp, double val, int n, int id)
 
 /* UL_CURVE_EVAL - find the apropriate y value for the given x value */
 
-object *UL_curve_eval(object *arg)
+object *UL_curve_eval(SS_psides *si, object *arg)
    {int i;
     char *s;
     double value;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     s = SS_GET(procedure, si->fun)->name;
     i = SX_get_data_index(s);
@@ -675,7 +672,7 @@ static object *_ULI_mk_palette(SS_psides *si, object *argl)
 
 /* _ULI_RD_PALETTE - read a new palette */
 
-static object *_ULI_rd_palette(object *argl)
+static object *_ULI_rd_palette(SS_psides *si, object *argl)
    {char *name;
     PG_device *dev;
     PG_palette *pal;
@@ -977,12 +974,9 @@ object *UL_disp(int j, double xmin, double xmax)
 
 /* _ULI_CRV_LABEL - return the label for the given curve */
 
-static object *_ULI_crv_label(object *obj)
+static object *_ULI_crv_label(SS_psides *si, object *obj)
    {int i;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (!SX_curvep_a(obj))
        SS_error("BAD CURVE - _ULI_CRV_LABEL", obj);
@@ -1003,12 +997,9 @@ static object *_ULI_crv_label(object *obj)
  *                 - the given curve's domain
  */
 
-static object *_ULI_crv_domain(object *obj)
+static object *_ULI_crv_domain(SS_psides *si, object *obj)
    {int j;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     j = -1;
     SS_args(obj,
@@ -1036,12 +1027,9 @@ static object *_ULI_crv_domain(object *obj)
  *                - the given curve's range
  */
 
-static object *_ULI_crv_range(object *obj)
+static object *_ULI_crv_range(SS_psides *si, object *obj)
    {int j;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     j = -1;
     SS_args(obj,
@@ -1067,12 +1055,9 @@ static object *_ULI_crv_range(object *obj)
 
 /* _ULI_CRV_NPTS - return the number of points in the given curve */
 
-static object *_ULI_crv_npts(object *obj)
+static object *_ULI_crv_npts(SS_psides *si, object *obj)
    {int j;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     j = -1;
     SS_args(obj,
@@ -1096,14 +1081,11 @@ static object *_ULI_crv_npts(object *obj)
  *               -      (color width style)
  */
 
-static object *_ULI_crv_attr(object *obj)
+static object *_ULI_crv_attr(SS_psides *si, object *obj)
    {int j, lncol, lnsty, dfcol;
     double lnwid;
     pcons *info;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     j = -1;
     SS_args(obj,

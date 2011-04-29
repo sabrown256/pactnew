@@ -77,7 +77,7 @@ extern object
 extern object
  *UL_fft(int j),
  *UL_get_value(double *sp, double *vp, double val, int n, int id),
- *UL_curve_eval(object *arg),
+ *UL_curve_eval(SS_psides *si, object *arg),
  *UL_getx(object *obj, object *tok),
  *UL_gety(object *obj, object *tok),
  *UL_fit(object *obj, object *tok),
@@ -102,7 +102,7 @@ extern void
 
 extern object
  *_ULI_describe(SS_psides *si, object *obj),
- *_ULI_apropos(object *obj);
+ *_ULI_apropos(SS_psides *si, object *obj);
 
 
 /* ULFUNC.C declarations */

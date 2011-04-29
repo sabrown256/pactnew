@@ -15,7 +15,7 @@
 
 /* _SXI_DISPLAY_PAN_OBJECT - display a PANACEA object */
 
-object *_SXI_display_pan_object(object *obj)
+object *_SXI_display_pan_object(SS_psides *si, object *obj)
    {int id, ni;
     char *name;
     syment *ep;
@@ -248,7 +248,7 @@ static object *_SX_desc_pan_package(object *obj)
 
 /* _SXI_DESC_PAN - display the description of a PANACEA entity */
 
-object *_SXI_desc_pan(object *obj)
+object *_SXI_desc_pan(SS_psides *si, object *obj)
    {char *s;
     haelem *hp;
 
