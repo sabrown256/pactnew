@@ -17,13 +17,13 @@
 
 #ifdef STACK_FNC
 
-void SS_Save(object *obj)
+void SS_Save(SS_psides *si, object *obj)
    {
 
-    _SS_si.nsave++;
+    si->nsave++;
     SS_MARK(obj);
 
-    SC_array_push(_SS_si.stack, &obj);
+    SC_array_push(si->stack, &obj);
 
     return;}
 
@@ -36,15 +36,15 @@ void SS_Save(object *obj)
 
 #ifdef STACK_FNC
 
-void _SS_Restore(object **px)
-   {object *x;
+void _SS_Restore(SS_psides *si, object **po)
+   {object *o;
 
-    x = *px;
+    o = *po;
 
-    _SS_si.nrestore++;
-    SS_GC(x);
+    si->nrestore++;
+    SS_GC(o);
 
-    *px = *(object **) SC_array_pop(_SS_si.stack);
+    *po = *(object **) SC_array_pop(si->stack);
 
     return;}
 
@@ -99,7 +99,7 @@ self_ev:
 /* VAR_EV - evaluate variables */
 
 var_ev:
-    SS_Assign(si->val, SS_lk_var_val(&_SS_si, si->exn));
+    SS_Assign(si->val, SS_lk_var_val(si, si->exn));
     SS_go_cont;
 
 /*--------------------------------------------------------------------------*/
@@ -110,13 +110,13 @@ var_ev:
 proc_ev:
     SS_Assign(si->unev, SS_cdr(si->exn));
     SS_Assign(si->exn, SS_car(si->exn));
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, ev_args);
 
 ev_args:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     SS_Assign(si->fun, si->val);
     if (!SS_procedurep(si->fun))
        SS_error("ILLEGAL PROCEDURE OBJECT", si->fun);
@@ -132,7 +132,7 @@ ev_args:
 
 /* procedure with evaluated args and post-evaluated results */
         case SS_EE_MACRO :
-	     SS_Save(si->fun);
+	     SS_Save(si, si->fun);
 	     SS_Assign(si->this, SS_null);
 	     SS_Assign(si->argl, SS_null);
 	     SS_jump(eva_loop);
@@ -187,13 +187,13 @@ ev_set:
     if (!SS_variablep(si->unev))
        SS_error("CAN'T SET NON-VARIABLE OBJECT - SET", si->unev);
 
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, ev_seta);
 
 ev_seta:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     SS_set_var(si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
     SS_go_cont;
@@ -230,14 +230,14 @@ ev_define:
 
 /* define a variable */
     else if (SS_variablep(si->unev))
-       {SS_Save(si->unev);
-        SS_Save(si->env);
+       {SS_Save(si, si->unev);
+        SS_Save(si, si->env);
         SS_Assign(si->exn, SS_car(si->exn));
         SS_set_cont(eval_disp, ev_def);
 
 ev_def:
-        SS_Restore(si->env);
-        SS_Restore(si->unev);}
+        SS_Restore(si, si->env);
+        SS_Restore(si, si->unev);}
 
     else
        SS_error("CAN'T DEFINE NON-VARIABLE OBJECT - DEFINE", si->unev);
@@ -299,34 +299,34 @@ macro_ue:
 
 eva_loop:
     if (SS_nullobjp(si->unev))
-       {SS_Restore(si->fun);
+       {SS_Restore(si, si->fun);
         SS_Assign(si->argl, SS_null);
         SS_jump(apply_dis);};
 
-    SS_Save(si->argl);
+    SS_Save(si, si->argl);
     SS_Assign(si->exn, SS_car(si->unev));
     if (SS_nullobjp(SS_cdr(si->unev)))
-       {SS_Save(si->this);
+       {SS_Save(si, si->this);
         SS_set_cont(eval_disp, acc_last);
 
 acc_last:
-        SS_Restore(si->this);
-        SS_Restore(si->argl);
-        SS_Restore(si->fun);
+        SS_Restore(si, si->this);
+        SS_Restore(si, si->argl);
+        SS_Restore(si, si->fun);
         SS_end_cons_macro(si->argl, si->this, si->val);
         SS_Assign(si->this, SS_null);            /* done with si->this for now */
         SS_jump(apply_dis);}
     else
-       {SS_Save(si->unev);
-        SS_Save(si->this);
-        SS_Save(si->env);
+       {SS_Save(si, si->unev);
+        SS_Save(si, si->this);
+        SS_Save(si, si->env);
         SS_set_cont(eval_disp, acc_arg);
 
 acc_arg:
-        SS_Restore(si->env);
-        SS_Restore(si->this);
-        SS_Restore(si->unev);
-        SS_Restore(si->argl);
+        SS_Restore(si, si->env);
+        SS_Restore(si, si->this);
+        SS_Restore(si, si->unev);
+        SS_Restore(si, si->argl);
         SS_end_cons_macro(si->argl, si->this, si->val);
         SS_Assign(si->unev, SS_cdr(si->unev));
         SS_jump(eva_loop);};
@@ -420,15 +420,15 @@ ev_macro:
 
 ev_macro_ev:
     SS_bgn_trace(si->fun, si->unev);
-    SS_Save(si->env);
-    SS_Save(si->fun);
+    SS_Save(si, si->env);
+    SS_Save(si, si->fun);
     SS_Assign(si->env, SS_do_bindings(si->fun, si->unev));
     SS_Assign(si->unev, SS_proc_body(si->fun));
     SS_set_cont(ev_begin, ev_macro_evb);
 
 ev_macro_evb:
-    SS_Restore(si->fun);
-    SS_Restore(si->env);
+    SS_Restore(si, si->fun);
+    SS_Restore(si, si->env);
     SS_end_trace();
     SS_Assign(si->exn, si->val);
     SS_jump(eval_disp);
@@ -471,13 +471,13 @@ ev_begin:
     SS_Assign(si->exn, SS_car(si->unev));
     if (SS_nullobjp(SS_cdr(si->unev)))
        SS_jump(eval_disp);
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, evb_cont);
 
 evb_cont:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     SS_Assign(si->unev, SS_cdr(si->unev));
     SS_jump(ev_begin);
 
@@ -495,13 +495,13 @@ eva_iter:
     SS_Assign(si->exn, SS_car(si->unev));
     SS_Assign(si->unev, SS_cdr(si->unev));
 
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, eva_dec);
 
 eva_dec:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     if (!SS_true(si->val))
        SS_go_cont;
     else
@@ -526,13 +526,13 @@ ev_or:
        {SS_Assign(si->val, SS_f);
         SS_go_cont;};
 
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, evo_dec);
 
 evo_dec:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     if (SS_true(si->val))
        SS_go_cont;
     else
@@ -554,13 +554,13 @@ ev_cond:
         SS_go_cont;};
 
     SS_Assign(si->exn, SS_car(si->exn));
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, evc_dec);
 
 evc_dec:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     if (SS_true(si->val))
        {SS_Assign(si->unev, SS_cdar(si->unev));
         SS_jump(ev_begin);}
@@ -580,13 +580,13 @@ ev_if:
     SS_Assign(si->exn, SS_car(si->unev));
     SS_Assign(si->unev, SS_cdr(si->unev));
 
-    SS_Save(si->unev);
-    SS_Save(si->env);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->env);
     SS_set_cont(eval_disp, evi_dec);
 
 evi_dec:
-    SS_Restore(si->env);
-    SS_Restore(si->unev);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->unev);
     if (!SS_true(si->val))
        {SS_Assign(si->unev, SS_cdr(si->unev));
         if (SS_nullobjp(si->unev))
@@ -623,8 +623,11 @@ static object *_SS_ident(object *obj)
 
 static object *_SSI_exp_eval(object *obj)
    {object *rv;
+    SS_psides *si;
 
-    rv = SS_exp_eval(&_SS_si, obj);
+    si = &_SS_si;
+
+    rv = SS_exp_eval(si, obj);
 
     return(rv);}
 

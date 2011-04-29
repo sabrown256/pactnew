@@ -540,8 +540,8 @@ static int _SX_no_argsp(object *obj)
 /*--------------------------------------------------------------------------*/
 
 /* SX_PARSE - determine whether or not to reprocess the input for SX
- *          - this is the real worker for the _SS_si.post_eval
- *          - since this _SS_si.evobj is not the same as in SS_REPL
+ *          - this is the real worker for the si->post_eval
+ *          - since this si->evobj is not the same as in SS_REPL
  *          - it should be SS_MARK'd as being an additional pointer to its
  *          - respective object
  */
@@ -549,10 +549,13 @@ static int _SX_no_argsp(object *obj)
 void SX_parse(void (*replot)(void), char *(*reproc)(char *s),
 	      object *strm)
    {char *t, s[MAXLINE], line[MAXLINE], *ptr;
+    SS_psides *si;
 
-    if (SS_procedurep(_SS_si.evobj))
-       {strcpy(s, SS_PP(_SS_si.evobj, name));
-        if (_SX_no_argsp(_SS_si.evobj) || !EOE(strm))
+    si = &_SS_si;
+
+    if (SS_procedurep(si->evobj))
+       {strcpy(s, SS_PP(si->evobj, name));
+        if (_SX_no_argsp(si->evobj) || !EOE(strm))
            {ptr = SS_BUFFER(strm);
             if (_SX_isodd(SC_char_count(ptr, '\"')))
                {PRINT(stdout, "\nUNMATCHED QUOTE: %s\n\n", ptr);
@@ -563,11 +566,11 @@ void SX_parse(void (*replot)(void), char *(*reproc)(char *s),
                 while ((t = (*reproc)(line)) != NULL)
                   {strcpy(ptr, t);
                    SS_PTR(strm) = SS_BUFFER(strm);
-                   SS_Assign(_SS_si.rdobj, SS_read(strm));
-                   _SS_si.interactive = ON;
+                   SS_Assign(si->rdobj, SS_read(strm));
+                   si->interactive = ON;
                    SX_plot_flag   = TRUE;
-                   SS_Assign(_SS_si.evobj, SS_eval(&_SS_si, _SS_si.rdobj));
-                   _SS_si.interactive = OFF;};
+                   SS_Assign(si->evobj, SS_eval(si, si->rdobj));
+                   si->interactive = OFF;};
 
                 if (SX_plot_flag && (strcmp(s, "replot") != 0) &&
                     (SX_autoplot == ON) &&
@@ -1040,6 +1043,9 @@ void SX_install_global_vars(void)
     double *errcsz, *labsp, *labyo, *mrks;
     char **axslxf, **axslyf, **axstf, **txtfm;
     PG_rendering *ppty;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     PG_setup_attrs_glb();
 
@@ -1139,9 +1145,9 @@ void SX_install_global_vars(void)
     SX_GRI_type_style       = CSTRSAVE("medium");
     SX_GRI_type_size        = 12;
 
-    _SS_si.interactive = FALSE;
-    _SS_si.print_flag  = FALSE;
-    _SS_si.stat_flag   = FALSE;
+    si->interactive = FALSE;
+    si->print_flag  = FALSE;
+    si->stat_flag   = FALSE;
 
     for (i = 0; i < PG_SPACEDM; i++)
         SX_log_scale[i] = FALSE;
@@ -1155,7 +1161,7 @@ void SX_install_global_vars(void)
     SS_install_cf("answer-prompt",
                   "Variable: A string printed before the return value\n     Usage: answer-prompt <string>",
                   SS_acc_string,
-                  _SS_si.ans_prompt);
+                  si->ans_prompt);
 
     SS_install_cf("ascii-output-format",
                   "Variable: Controls format for ASCII output of floating point numbers\n     Usage: ascii-output-format <format>",
@@ -1282,7 +1288,7 @@ void SX_install_global_vars(void)
     SS_install_cf("bracket-flag",
                   "Variable: Remove blanks within square bracket enclosed fields\n     Usage: bracket-flag on | off",
                   SS_acc_int,
-                  &_SS_si.bracket_flag);
+                  &si->bracket_flag);
 
     SS_install_cf("chi",
                   "Variable: Default chi view angle\n     Usage: chi <real>",
@@ -1583,17 +1589,17 @@ void SX_install_global_vars(void)
     SS_install_cf("print-flag",
                   "Variable: Controls the interpreter value output\n     Usage: print-flag on | off",
                   SS_acc_int,
-                  &_SS_si.print_flag);
+                  &si->print_flag);
 
     SS_install_cf("print-stats",
                   "Variable: Controls the interpreter statistics output\n     Usage: print-flag on | off",
                   SS_acc_int,
-                  &_SS_si.stat_flag);
+                  &si->stat_flag);
 
     SS_install_cf("prompt",
                   "Variable: The prompt\n     Usage: prompt <string>",
                   SS_acc_string,
-                  _SS_si.prompt);
+                  si->prompt);
 
     SS_install_cf("promotion-type",
                   "Variable: Data type for promotion of sets and arrays (default none)\n     Usage: promotion-type <string>",

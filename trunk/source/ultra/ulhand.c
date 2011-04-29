@@ -63,12 +63,15 @@ int UL_curve_strp(object *obj)
  */
 
 void UL_check_order(double *p, int n, int i)
-   {double *p1, *p2;
-    int j;
+   {int j;
+    double *p1, *p2;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     for (p1 = p, p2 = p+1, j = 1; j < n; p1++, p2++, j++)
         {if (*p1 > *p2)                             /* sort if out of order */
-            {if (_SS_si.interactive == ON)
+            {if (si->interactive == ON)
                 {if ((SX_dataset[i].id >= 'A') &&
                      (SX_dataset[i].id <= 'Z'))
                     {PRINT(stdout, "\nSorting curve %c\n", SX_dataset[i].id);}
@@ -518,15 +521,18 @@ object *UL_bltoc(C_procedure *cp, object *argl)
  */
 
 object *UL_bltocnp(C_procedure *cp, object *argl)
-   {object *s, *tok, *ret, *t;
-    char *r;
+   {char *r;
+    object *s, *tok, *ret, *t;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_last_arg(tok, argl);
     if (!SS_numbp(tok))
        SS_error("BAD LAST ARGUMENT - BLTOCNP", tok);
 
-    if (_SS_si.interactive == ON)
-       {r  = SS_get_string(_SS_si.fun);
+    if (si->interactive == ON)
+       {r  = SS_get_string(si->fun);
 	*r = (char) toupper((int) *r);
 	PRINT(stdout, "\n     %s\n", r);};
 
@@ -638,6 +644,9 @@ object *UL_bc(C_procedure *cp, object *argl)
     char pbf2[MAXLINE];
     char *lbl;
     object *ch, *s, *tmp, *t;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     i = 0;
 
@@ -699,7 +708,7 @@ object *UL_bc(C_procedure *cp, object *argl)
 
                     i   = SX_get_crv_index_i(tmp);
                     lbl = SC_dsnprintf(FALSE, "%s %g",
-				       SS_get_string(_SS_si.fun),
+				       SS_get_string(si->fun),
 				       value);}
 
                 else if (SX_curvep_a(s))
@@ -707,11 +716,11 @@ object *UL_bc(C_procedure *cp, object *argl)
                     if ((SX_dataset[i].id >= 'A') &&
                         (SX_dataset[i].id <= 'Z'))
                        {lbl = SC_dsnprintf(FALSE, "%s %c",
-					   SS_get_string(_SS_si.fun),
+					   SS_get_string(si->fun),
 					   SX_dataset[i].id);}
                     else
                        {lbl = SC_dsnprintf(FALSE, "%s @%d",
-					   SS_get_string(_SS_si.fun),
+					   SS_get_string(si->fun),
 					   SX_dataset[i].id);};}
                 else
                    SS_error("BAD ARGUMENT - BC", s);
@@ -842,6 +851,9 @@ object *UL_bcxl(C_procedure *cp, object *argl)
     char local[MAXLINE], local2[MAXLINE];
     char *lbl;
     object *s, *ch, *t;
+    SS_psides *si;
+
+    si = &_SS_si;
         
     SX_prep_arg(argl);
     argl = SS_reverse(argl);
@@ -892,7 +904,7 @@ object *UL_bcxl(C_procedure *cp, object *argl)
              {x[1][j] = (double) (*(PFDoubleRi) cp->proc[0])(x[1][j], i);};};
 
     lbl = SC_dsnprintf(FALSE, "%s %s",
-		       SS_get_string(_SS_si.fun), SC_strrev(local));
+		       SS_get_string(si->fun), SC_strrev(local));
     ch = SX_mk_curve(n, x[0], x[1], lbl, NULL, (PFVoid) UL_plot);
 
     SS_Assign(argl, SS_null);

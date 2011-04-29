@@ -1001,6 +1001,9 @@ void SX_mouse_event_handler(PG_device *dev, PG_event *ev)
     double wc[PG_SPACEDM];
     PG_mouse_button button;
     object *loc, *fnc;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (dev != NULL)
        {PG_make_device_current(dev);
@@ -1018,7 +1021,7 @@ void SX_mouse_event_handler(PG_device *dev, PG_event *ev)
 			   SC_DOUBLE_I, &wc[1],
 			   0);
 
-	fnc = _SS_lk_var_valc("handle-mouse-event", _SS_si.env);
+	fnc = _SS_lk_var_valc("handle-mouse-event", si->env);
         if (SS_procedurep(fnc))
 	   SS_call_scheme("handle-mouse-event",
                           SC_INT_I, &type,

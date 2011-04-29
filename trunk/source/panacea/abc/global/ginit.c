@@ -355,7 +355,9 @@ int part_reg(char *s)
 /* B_INIT - install the B specific objects in the Scheme world */
 
 void B_init(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SX_init(CODE, VERSION);
 
@@ -397,7 +399,7 @@ void B_init(void)
     SX_pan_data_hook = (PFInt) LR_get_data;
 
     PRINT(stdout, "\n");
-    strcpy(_SS_si.prompt, "B-> ");
+    strcpy(si->prompt, "B-> ");
 
     return;}
 

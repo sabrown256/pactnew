@@ -145,10 +145,13 @@ object *_SS_make_cmpnd_stmnt(object *dcl, object *sl)
 
 object *_SS_del_var(object *var)
    {char *name;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     name = SS_VARIABLE_NAME(var);
 
-    _SS_rem_varc(name, _SS_si.env);
+    _SS_rem_varc(name, si->env);
 
     return(SS_f);}
 
@@ -224,10 +227,13 @@ object *_SS_make_cast(object *type, object *expr)
 int SS_lookup_identifier_c(char *txt, object **lval)
    {int type;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     *lval = SS_f;
 
-    o = (object *) SC_hasharr_def_lookup(_SS_si.types, txt);
+    o = (object *) SC_hasharr_def_lookup(si->types, txt);
     if (o != NULL)
        {*lval = o;
 	type  = SS_c_tokens[0];}
@@ -250,15 +256,18 @@ int SS_lookup_identifier_c(char *txt, object **lval)
 object *SS_syntax_c(object *str)
    {char *s;
     object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     s = SS_BUFFER(str);
     SC_ASSERT(s != NULL);
 
-    if (SETJMP(_SS_si.cpu))
+    if (SETJMP(si->cpu))
        ret = SS_eof;
 
     else
-       {_SS_si.character_stream   = str;
+       {si->character_stream   = str;
 	_SS_cps.cpp_directive = FALSE;
        
 	shgrc_parse();
@@ -273,11 +282,13 @@ object *SS_syntax_c(object *str)
 /* SS_C_MODE - switch to C syntax parsing */
 
 static object *SS_c_mode(void)
-   {
+   {SS_psides *si;
 
-    snprintf(_SS_si.prompt, MAXLINE, "C-> ");
-    _SS_si.read        = SS_syntax_c;
-    _SS_si.name_reproc = SS_name_map_synt;
+    si = &_SS_si;
+
+    snprintf(si->prompt, MAXLINE, "C-> ");
+    si->read        = SS_syntax_c;
+    si->name_reproc = SS_name_map_synt;
 
     SS_set_parser(SS_c_mode);
 
@@ -308,6 +319,9 @@ static object *SS_c_add_type(object *argl)
 
 void SS_init_c_syntax_mode(void)
    {int *ssdbg;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (_SS_cps.mode_init == FALSE)
        {_SS_cps.mode_init = TRUE;
@@ -385,7 +399,7 @@ void SS_init_c_syntax_mode(void)
 	SS_add_parser(".c", (PFPObject) SS_c_mode);
 	SS_add_parser(".h", (PFPObject) SS_c_mode);
 
-	_SS_si.eox                   = TRUE;
+	si->eox                   = TRUE;
 	_SS_cps.diagnose_grammar = FALSE;
 
 	ssdbg  = SS_parse_debug_c();

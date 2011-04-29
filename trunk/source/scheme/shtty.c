@@ -85,13 +85,16 @@ static int _SS_get_input(object *str)
 
 int SS_get_ch(object *str, int ign_ws)
    {int c, ok, st;
+    SS_psides *si;
 
-    if (_SS_si.pr_gets == NULL)
-       _SS_si.pr_gets = _SS_get_input;
+    si = &_SS_si;
+
+    if (si->pr_gets == NULL)
+       si->pr_gets = _SS_get_input;
 
     for (ok = TRUE; ok == TRUE; )
         {if (EOI(str))
-	    {st = _SS_si.pr_gets(str);
+	    {st = si->pr_gets(str);
 	     if (st == -1)
 	        {c = EOF;
 		 break;}
@@ -175,6 +178,9 @@ void SS_put_ch(int c, object *str)
 int SS_printf(FILE *fp, char *fmt, ...)
    {char *s;
     FILE *hp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_VA_START(fmt);
     s = _SS_vdsnprintf(TRUE, fmt, __a__);
@@ -188,8 +194,8 @@ int SS_printf(FILE *fp, char *fmt, ...)
 	   _SS.pr_print = io_printf;
 #endif
 
-	hp = SS_OUTSTREAM(_SS_si.histdev);
-	if ((_SS_si.hist_flag != NO_LOG) && (fp != hp))
+	hp = SS_OUTSTREAM(si->histdev);
+	if ((si->hist_flag != NO_LOG) && (fp != hp))
 	   PRIMITIVE_PRINT(hp, "%s", s);
 
 	PRIMITIVE_PRINT(fp, "%s", s);};
@@ -209,6 +215,9 @@ int SS_printf(FILE *fp, char *fmt, ...)
 int SS_fputs(char *s, FILE *fp)
    {int rv;
     FILE *hp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = 0;
     if (fp != NULL)
@@ -219,8 +228,8 @@ int SS_fputs(char *s, FILE *fp)
 	   _SS.pr_puts = io_puts;
 #endif
 
-	hp = SS_OUTSTREAM(_SS_si.histdev);
-	if ((_SS_si.hist_flag != NO_LOG) && (fp != hp))
+	hp = SS_OUTSTREAM(si->histdev);
+	if ((si->hist_flag != NO_LOG) && (fp != hp))
 	   rv = SS_puts(s, hp, _SS.pr_puts);
 
 	rv = SS_puts(s, fp, _SS.pr_puts);};

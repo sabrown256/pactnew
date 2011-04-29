@@ -177,11 +177,14 @@ static char *_SX_reproc_in(char *line)
 
 void SX_plot(void)
    {object *var, *fnc;
+    SS_psides *si;
 
-    var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "viewport-update");
+    si = &_SS_si;
+
+    var = (object *) SC_hasharr_def_lookup(si->symtab, "viewport-update");
     if (var != NULL)
-       {if (SS_bind_env(var, _SS_si.env) != NULL)
-	   {fnc = SS_lk_var_val(&_SS_si, var);
+       {if (SS_bind_env(var, si->env) != NULL)
+	   {fnc = SS_lk_var_val(si, var);
 	    if (SS_procedurep(fnc))
 	       SS_call_scheme("viewport-update", 0);};};
 
@@ -191,7 +194,7 @@ void SX_plot(void)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_PARSE - determine whether or not to reprocess the input for PDBView
- *           - this is the real worker for the _SS_si.post_eval
+ *           - this is the real worker for the si->post_eval
  */
 
 static void _SX_parse(object *strm)
@@ -204,7 +207,7 @@ static void _SX_parse(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_READ - this is the _SS_si.post_read function for PDBView
+/* _SX_READ - this is the si->post_read function for PDBView
  *          - trap implicit requests to print or change file variable
  *          - values and make them explicit
  */
@@ -213,9 +216,12 @@ static void _SX_read(object *strm)
    {char *s, *ptr, *t, *bf;
     g_file *po;
     PDBfile *file;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     s = NULL;
-    SS_args(_SS_si.rdobj,
+    SS_args(si->rdobj,
             SC_STRING_I, &s,
             0);
 
@@ -227,12 +233,12 @@ static void _SX_read(object *strm)
         strcpy(t, bf);
 
         SS_PTR(strm) = t;
-        SS_Assign(_SS_si.rdobj, SS_read(strm));}
+        SS_Assign(si->rdobj, SS_read(strm));}
 
 /* if it is an unbound variable check to see if it is a file variable
  * in which case print or change it
  */
-    else if (SS_variablep(_SS_si.rdobj) && !SS_bind_env(_SS_si.rdobj, _SS_si.env))
+    else if (SS_variablep(si->rdobj) && !SS_bind_env(si->rdobj, si->env))
        {SS_var_value("current-file", G_FILE, &po, TRUE);
 	if (po == NULL)
 	   file = SX_vif;
@@ -251,7 +257,7 @@ static void _SX_read(object *strm)
 
 	    strcpy(t, bf);
 	    SS_PTR(strm) = t;
-	    SS_Assign(_SS_si.rdobj, SS_read(strm));};};
+	    SS_Assign(si->rdobj, SS_read(strm));};};
 
     CFREE(s);
 
@@ -260,7 +266,7 @@ static void _SX_read(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_PRINT - the _SS_si.post_print function for PDBView */
+/* _SX_PRINT - the si->post_print function for PDBView */
 
 int _SX_print(void)
    {
@@ -280,6 +286,9 @@ int _SX_print(void)
 
 object *SX_mode_text(void)
    {object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (PG_console_device == NULL)
        PG_open_console("PDBView", SX_console_type, SX_background_color_white,
@@ -292,15 +301,15 @@ object *SX_mode_text(void)
         SX_graphics_device = NULL;
 
 /* give default values to the lisp package interface variables */
-        _SS_si.post_read  = NULL;
-        _SS_si.post_eval  = NULL;
-        _SS_si.post_print = NULL;
-	_SS_si.pr_gets         = _SX_get_input;
-        _SS_si.pr_ch_un        = SS_unget_ch;
-        _SS_si.pr_ch_out       = SS_put_ch;
-        _SS_si.post_read  = _SX_read;
-        _SS_si.post_eval  = _SX_parse;
-        _SS_si.post_print = _SX_print;
+        si->post_read  = NULL;
+        si->post_eval  = NULL;
+        si->post_print = NULL;
+	si->pr_gets    = _SX_get_input;
+        si->pr_ch_un   = SS_unget_ch;
+        si->pr_ch_out  = SS_put_ch;
+        si->post_read  = _SX_read;
+        si->post_eval  = _SX_parse;
+        si->post_print = _SX_print;
 
 #ifdef NO_SHELL
         SC_set_put_line(SX_fprintf);
@@ -394,6 +403,9 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 
 object *SX_mode_graphics(void)
    {object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (PG_console_device == NULL)
        {if (!PG_open_console("PDBView", SX_console_type,
@@ -405,12 +417,12 @@ object *SX_mode_graphics(void)
 
     if (SX_graphics_device == NULL)
        {SS_set_prompt("\n-> ");
-        strcpy(_SS_si.ans_prompt, "");
+        strcpy(si->ans_prompt, "");
 
-        _SS_si.post_read  = _SX_read;
-        _SS_si.post_eval  = _SX_parse;
-        _SS_si.post_print = _SX_print;
-	_SS_si.pr_gets         = _SX_get_input;
+        si->post_read  = _SX_read;
+        si->post_eval  = _SX_parse;
+        si->post_print = _SX_print;
+	si->pr_gets    = _SX_get_input;
 
 	SC_set_put_line(SX_fprintf);
 	SC_set_put_string(SX_fputs);

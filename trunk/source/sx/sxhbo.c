@@ -225,8 +225,11 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
 static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
    {char label[MAXLINE];
     PM_mapping *ph;
+    SS_psides *si;
 
-    snprintf(label, MAXLINE, "(%s %s", SS_get_string(_SS_si.fun), h->name);
+    si = &_SS_si;
+
+    snprintf(label, MAXLINE, "(%s %s", SS_get_string(si->fun), h->name);
 
 /* build up the label */
     for (ph = h->next; ph != NULL; ph = ph->next)
@@ -251,8 +254,11 @@ static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
 static void _SX_map_list_label(char *label, object *argl)
    {char t[MAXLINE];
     object *obj;
+    SS_psides *si;
 
-    snprintf(label, MAXLINE, "(%s", SS_get_string(_SS_si.fun));
+    si = &_SS_si;
+
+    snprintf(label, MAXLINE, "(%s", SS_get_string(si->fun));
 
 /* build up the label */
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))

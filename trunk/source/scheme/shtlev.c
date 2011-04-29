@@ -44,14 +44,16 @@ SS_state
 /* _SS_FPE_HANDLER - handle floating point exception signals */
 
 static void _SS_fpe_handler(int sig)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
 #ifdef SIGFPE
     SC_signal(SIGFPE, _SS_fpe_handler);
 #endif
 
     SS_error("FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
-	     SS_mk_cons(_SS_si.fun, _SS_si.argl));
+	     SS_mk_cons(si->fun, si->argl));
 
     return;}
 
@@ -62,6 +64,9 @@ static void _SS_fpe_handler(int sig)
 
 static void _SS_sig_handler(int sig)
    {char msg[MAXLINE];
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_signal(sig, SIG_IGN);
 
@@ -75,7 +80,7 @@ static void _SS_sig_handler(int sig)
 #else
     {object *o;
 
-     o = SS_mk_cons(_SS_si.fun, _SS_si.argl);
+     o = SS_mk_cons(si->fun, si->argl);
 
      SC_signal(sig, _SS_sig_handler);
 
@@ -94,12 +99,15 @@ static void _SS_sig_handler(int sig)
 static void _SS_print_err_msg(FILE *str, char *s, object *obj)
    {char atype[MAXLINE];
     char *p;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (obj == NULL)
-       PRINT(str, "(%d):  ERROR: %s\n", _SS_si.errlev, s);
+       PRINT(str, "(%d):  ERROR: %s\n", si->errlev, s);
 
     else
-       {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", _SS_si.errlev, s);
+       {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", si->errlev, s);
 
 	p = SS_object_type_name(obj, atype);
 	if (p == NULL)
@@ -115,7 +123,7 @@ static void _SS_print_err_msg(FILE *str, char *s, object *obj)
 
 	PRINT(str, atype);
 
-	SS_print(obj, "): ", "\n\n", _SS_si.outdev);};
+	SS_print(obj, "): ", "\n\n", si->outdev);};
 
     return;}
 
@@ -127,14 +135,18 @@ static void _SS_print_err_msg(FILE *str, char *s, object *obj)
  */
 
 static void _SS_print_err_msg_a(FILE *str, char *s, object *obj)
-   {PRINT(str, "ERROR : %s : ", s);
+   {SS_psides *si;
+
+    si = &_SS_si;
+
+    PRINT(str, "ERROR : %s : ", s);
 
     if (SC_arrtype(obj, -1) == 0)
        PRINT(str, "MEMORY PROBABLY CORRUPTED\n");
     else
-       SS_print(obj, "", "\n", _SS_si.outdev);
+       SS_print(obj, "", "\n", si->outdev);
 
-    SS_print(_SS_si.fun, "CURRENT FUNCTION: ", "\n\n", _SS_si.outdev);
+    SS_print(si->fun, "CURRENT FUNCTION: ", "\n\n", si->outdev);
 
     return;}
 
@@ -253,13 +265,16 @@ static int _SS_repl(SS_psides *si)
 
 void SS_repl(void)
    {char *t;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     while (TRUE)
-       {SS_err_catch(_SS_repl, &_SS_si, NULL);
+       {SS_err_catch(_SS_repl, si, NULL);
 
 /* reset the input buffer */
-        t = SS_BUFFER(_SS_si.indev);
-        SS_PTR(_SS_si.indev) = t;
+        t = SS_BUFFER(si->indev);
+        SS_PTR(si->indev) = t;
         *t = '\0';};}
 
 /*--------------------------------------------------------------------------*/
@@ -269,8 +284,11 @@ void SS_repl(void)
 
 void SS_end_scheme(int val)
    {int ev;
+    SS_psides *si;
 
-    if (!SS_nullobjp(_SS_si.histdev))
+    si = &_SS_si;
+
+    if (!SS_nullobjp(si->histdev))
        SS_trans_off();
 
     if (_SS.active_objects == TRUE)
@@ -374,6 +392,9 @@ void SS_scheme_path_err(char *path)
 void SS_init_scheme(char *code, char *vers)
    {object *fr;
     PFSignal_handler hnd;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     hnd = SC_which_signal_handler(SIGINT);
     SC_setup_sig_handlers(_SS_sig_handler, TRUE);
@@ -385,47 +406,47 @@ void SS_init_scheme(char *code, char *vers)
 #endif
 
 #ifdef LARGE
-    _SS_si.stack_size = 128;
+    si->stack_size = 128;
 #else
-    _SS_si.stack_size = 32;
+    si->stack_size = 32;
 #endif
-    _SS_si.stack_mask = _SS_si.stack_size - 1;
+    si->stack_mask = si->stack_size - 1;
 
     SS_register_types();
 
     SS_inst_prm();
     SS_inst_const();
 
-    _SS_si.trap_error = TRUE;
-    _SS_si.err_state  = SS_null;
-    _SS_si.env        = SS_null;
+    si->trap_error = TRUE;
+    si->err_state  = SS_null;
+    si->env        = SS_null;
 
     fr            = SS_mk_new_frame(SS_mk_string("global-environment"), NULL);
-    _SS_si.global_env = SS_mk_cons(fr, SS_null);
-    SS_UNCOLLECT(_SS_si.global_env);
+    si->global_env = SS_mk_cons(fr, SS_null);
+    SS_UNCOLLECT(si->global_env);
 
-    SS_Assign(_SS_si.env, _SS_si.global_env);
+    SS_Assign(si->env, si->global_env);
 
     SS_define_constant(1,
 		       "system-id", SC_STRING_I, SYSTEM_ID,
 		       "argv",      SS_OBJECT_I, SS_null,
 		       NULL);
 
-    _SS_si.this  = SS_null;
-    _SS_si.exn   = SS_null;
-    _SS_si.val   = SS_null;
-    _SS_si.unev  = SS_null;
-    _SS_si.argl  = SS_null;
-    _SS_si.fun   = SS_null;
-    _SS_si.rdobj = SS_null;
-    _SS_si.evobj = SS_null;
+    si->this  = SS_null;
+    si->exn   = SS_null;
+    si->val   = SS_null;
+    si->unev  = SS_null;
+    si->argl  = SS_null;
+    si->fun   = SS_null;
+    si->rdobj = SS_null;
+    si->evobj = SS_null;
 
 /* give default values to the lisp package interface variables  */
-    _SS_si.post_read  = NULL;
-    _SS_si.post_eval  = NULL;
-    _SS_si.post_print = NULL;
-    _SS_si.pr_ch_un        = SS_unget_ch;
-    _SS_si.pr_ch_out       = SS_put_ch;
+    si->post_read  = NULL;
+    si->post_eval  = NULL;
+    si->post_print = NULL;
+    si->pr_ch_un        = SS_unget_ch;
+    si->pr_ch_out       = SS_put_ch;
 
     SC_set_put_line(SS_printf);
     SC_set_put_string(SS_fputs);
@@ -436,14 +457,14 @@ void SS_init_scheme(char *code, char *vers)
     SC_set_get_line(io_gets);
 #endif
 
-    _SS_si.interactive = TRUE;
-    _SS_si.lines_page  = 50;
-    _SS_si.print_flag  = TRUE;
-    _SS_si.stat_flag   = TRUE;
-    _SS_si.nsave       = 0;
-    _SS_si.nrestore    = 0;
-    _SS_si.nsetc       = 0;
-    _SS_si.ngoc        = 0;
+    si->interactive = TRUE;
+    si->lines_page  = 50;
+    si->print_flag  = TRUE;
+    si->stat_flag   = TRUE;
+    si->nsave       = 0;
+    si->nrestore    = 0;
+    si->nsetc       = 0;
+    si->ngoc        = 0;
 
     SC_mem_stats_set(0L, 0L);
 
@@ -466,8 +487,11 @@ static object *SS_get_ext_ref(char *name)
    {char uname[MAXLINE];
     haelem *hp;
     object *o;
-   
-    hp = SC_hasharr_lookup(_SS_si.symtab, name);
+    SS_psides *si;
+
+    si = &_SS_si;
+
+    hp = SC_hasharr_lookup(si->symtab, name);
 
     if (hp == NULL)
        {strcpy(uname, name);
@@ -490,10 +514,13 @@ static object *SS_get_ext_ref(char *name)
 
 static object *SS_make_ext_boolean(char *name, int val)
    {object *o;
-   
+    SS_psides *si;
+
+    si = &_SS_si;
+
     o = SS_mk_boolean(name, val);
 
-    SC_hasharr_install(_SS_si.symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
 
     SS_UNCOLLECT(o);
 
@@ -505,7 +532,9 @@ static object *SS_make_ext_boolean(char *name, int val)
 /* SS_INST_CONST - install Scheme constants */
 
 void SS_inst_const(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SS_OBJECT_S  = CSTRSAVE("object");
     SS_POBJECT_S = CSTRSAVE("object *");
@@ -525,11 +554,11 @@ void SS_inst_const(void)
     SC_arrtype(SS_null, SS_NULL_I);
     SC_arrtype(SS_eof, SS_EOF_I);
     
-    _SS_si.histdev = SS_null;
-    _SS_si.indev   = SS_mk_inport(stdin, "stdin");
-    SS_UNCOLLECT(_SS_si.indev);
-    _SS_si.outdev  = SS_mk_outport(stdout, "stdout");
-    SS_UNCOLLECT(_SS_si.outdev);
+    si->histdev = SS_null;
+    si->indev   = SS_mk_inport(stdin, "stdin");
+    SS_UNCOLLECT(si->indev);
+    si->outdev  = SS_mk_outport(stdout, "stdout");
+    SS_UNCOLLECT(si->outdev);
 
     SS_anon_proc  = SS_mk_string("lambda");
     SS_UNCOLLECT(SS_anon_proc);
@@ -550,12 +579,14 @@ void SS_inst_const(void)
 /* SS_INIT_STACK - rewind the stack to the beginning */
 
 void SS_init_stack(void)
-   {
+   {SS_psides *si;
 
-    _SS_si.stack = CMAKE_ARRAY(object *, NULL, 0);
+    si = &_SS_si;
 
-    _SS_si.nsave    = 0;
-    _SS_si.nrestore = 0;
+    si->stack = CMAKE_ARRAY(object *, NULL, 0);
+
+    si->nsave    = 0;
+    si->nrestore = 0;
 
     return;}
 
@@ -566,27 +597,30 @@ void SS_init_stack(void)
 
 void SS_init_cont(void)
    {int i;
+    SS_psides *si;
 
-    _SS_si.nsetc = 0;
-    _SS_si.ngoc  = 0;
+    si = &_SS_si;
 
-    _SS_si.continue_int = CMAKE_N(continuation, _SS_si.stack_size);
-    if (_SS_si.continue_int == NULL)
+    si->nsetc = 0;
+    si->ngoc  = 0;
+
+    si->continue_int = CMAKE_N(continuation, si->stack_size);
+    if (si->continue_int == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
-    for (i = 0; i < _SS_si.stack_size; _SS_si.continue_int[i++].signal = SS_null);
-    _SS_si.cont_ptr = 0;
+    for (i = 0; i < si->stack_size; si->continue_int[i++].signal = SS_null);
+    si->cont_ptr = 0;
 
-    _SS_si.continue_err = CMAKE_N(err_continuation, _SS_si.stack_size);
-    if (_SS_si.continue_err == NULL)
+    si->continue_err = CMAKE_N(err_continuation, si->stack_size);
+    if (si->continue_err == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
-    for (i = 0; i < _SS_si.stack_size; _SS_si.continue_err[i++].signal = SS_null);
-    _SS_si.err_cont_ptr = 0;
+    for (i = 0; i < si->stack_size; si->continue_err[i++].signal = SS_null);
+    si->err_cont_ptr = 0;
 
-    _SS_si.err_stack = CMAKE_N(object *, _SS_si.stack_size);
-    if (_SS_si.err_stack == NULL)
+    si->err_stack = CMAKE_N(object *, si->stack_size);
+    if (si->err_stack == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
-    for (i = 0; i < _SS_si.stack_size; _SS_si.err_stack[i++] = NULL);
-    _SS_si.errlev = 0;
+    for (i = 0; i < si->stack_size; si->err_stack[i++] = NULL);
+    si->errlev = 0;
 
     return;}
 
@@ -597,18 +631,21 @@ void SS_init_cont(void)
 
 void SS_expand_stack(void)
    {int i, size;
+    SS_psides *si;
 
-    size = _SS_si.stack_size;
-    _SS_si.stack_size = 2*size;
+    si = &_SS_si;
 
-    CREMAKE(_SS_si.continue_int, continuation, _SS_si.stack_size);
-    for (i = size; i < _SS_si.stack_size; _SS_si.continue_int[i++].signal = SS_null);
+    size = si->stack_size;
+    si->stack_size = 2*size;
 
-    CREMAKE(_SS_si.continue_err, err_continuation, _SS_si.stack_size);
-    for (i = size; i < _SS_si.stack_size; _SS_si.continue_err[i++].signal = SS_null);
+    CREMAKE(si->continue_int, continuation, si->stack_size);
+    for (i = size; i < si->stack_size; si->continue_int[i++].signal = SS_null);
 
-    CREMAKE(_SS_si.err_stack, object *, _SS_si.stack_size);
-    for (i = size; i < _SS_si.stack_size; _SS_si.err_stack[i++] = NULL);
+    CREMAKE(si->continue_err, err_continuation, si->stack_size);
+    for (i = size; i < si->stack_size; si->continue_err[i++].signal = SS_null);
+
+    CREMAKE(si->err_stack, object *, si->stack_size);
+    for (i = size; i < si->stack_size; si->err_stack[i++] = NULL);
 
     return;}
 
@@ -623,15 +660,18 @@ void SS_expand_stack(void)
 static object *_SSI_synonym(object *argl)
    {object *func;
     char *synname;
+    SS_psides *si;
 
-    func = SS_exp_eval(&_SS_si, SS_car(argl));
+    si = &_SS_si;
+
+    func = SS_exp_eval(si, SS_car(argl));
     if (!SS_procedurep(func))
        SS_error("FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
 
     for (argl = SS_cdr(argl); SS_consp(argl); argl = SS_cdr(argl))
         {synname = SS_get_string(SS_car(argl));
-         SC_hasharr_remove(_SS_si.symtab, synname);
-         SC_hasharr_install(_SS_si.symtab, synname, func, SS_OBJECT_S, TRUE, TRUE);};
+         SC_hasharr_remove(si->symtab, synname);
+         SC_hasharr_install(si->symtab, synname, func, SS_OBJECT_S, TRUE, TRUE);};
 
     return(SS_t);}
 
@@ -645,6 +685,9 @@ static object *_SSI_synonym(object *argl)
 
 object *SS_lookup_object(object *obj)
    {char *name, *vnm;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* take anything that will give a name - procedure, string, variable ... */
     name = NULL;
@@ -658,7 +701,7 @@ object *SS_lookup_object(object *obj)
 
     if (SS_variablep(obj))
        {vnm = SS_VARIABLE_NAME(obj);
-	obj = _SS_lk_var_valc(vnm, _SS_si.env);
+	obj = _SS_lk_var_valc(vnm, si->env);
 	if (obj == NULL)
 	   obj = SS_null;};
 
@@ -674,14 +717,17 @@ object *SS_lookup_object(object *obj)
 
 void SS_push_err(int flag, int type)
    {object *x;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SS_save_registers(flag);
 
-    x = SS_mk_esc_proc(_SS_si.errlev, type);
+    x = SS_mk_esc_proc(si->errlev, type);
     SS_MARK(x);
-    _SS_si.err_stack[_SS_si.errlev] = x;
+    si->err_stack[si->errlev] = x;
 
-    _SS_si.errlev = (_SS_si.errlev + 1) & _SS_si.stack_mask;
+    si->errlev = (si->errlev + 1) & si->stack_mask;
 
     return;}
 
@@ -696,16 +742,19 @@ void SS_push_err(int flag, int type)
 
 object *SS_pop_err(int n, int flag)
    {object *x;
+    SS_psides *si;
 
-    if (_SS_si.errlev < 1)
+    si = &_SS_si;
+
+    if (si->errlev < 1)
        {PRINT(stdout, "\nERROR: ERROR STACK BLOWN - SS_POP_ERR\n\n");
         exit(SC_EXIT_CORRUPT);};
 
 /* GC the other error stack frames */
     while (TRUE)
-       {x = _SS_si.err_stack[--_SS_si.errlev];
-        _SS_si.err_stack[_SS_si.errlev] = NULL;
-        if (_SS_si.errlev <= n)
+       {x = si->err_stack[--si->errlev];
+        si->err_stack[si->errlev] = NULL;
+        if (si->errlev <= n)
            {_SS_restore_state(x);
             break;}
         else
@@ -725,36 +774,39 @@ object *SS_pop_err(int n, int flag)
 static void _SS_restore_state_prim(int ns, int nc, int ne)
    {int n;
     object *x, *esc;
+    SS_psides *si;
 
-    n = SC_array_get_n(_SS_si.stack) - 1;
+    si = &_SS_si;
+
+    n = SC_array_get_n(si->stack) - 1;
 
 /* restore the stack */
     if (n < ns)
        SS_error("CORRUPT STACK FRAME - _SS_RESTORE_STATE_PRIM", SS_null);
 
     for (; n > ns; n--)
-        {_SS_si.nrestore++;
+        {si->nrestore++;
 
-         x = SC_array_pop(_SS_si.stack);
+         x = SC_array_pop(si->stack);
 
          SS_GC(x);};
 
 /* restore the continuation stack */
-    if (_SS_si.cont_ptr < nc)
+    if (si->cont_ptr < nc)
        SS_error("CORRUPT CONTINUATION FRAME - _SS_RESTORE_STATE_PRIM",
                 SS_null);
 
-    for (; _SS_si.cont_ptr > nc; _SS_si.cont_ptr--)
-        {_SS_si.ngoc++;
-         SS_Assign(_SS_si.continue_int[_SS_si.cont_ptr].signal, SS_null);};
+    for (; si->cont_ptr > nc; si->cont_ptr--)
+        {si->ngoc++;
+         SS_Assign(si->continue_int[si->cont_ptr].signal, SS_null);};
 
 /* restore the error stack */
-    if (_SS_si.errlev < ne)
+    if (si->errlev < ne)
        SS_error("CORRUPT ERROR FRAME - _SS_RESTORE_STATE_PRIM", SS_null);
 
-    for (; _SS_si.errlev > ne; _SS_si.errlev--)
-        {esc = _SS_si.err_stack[_SS_si.errlev-1];
-         _SS_si.err_stack[_SS_si.errlev-1] = NULL;
+    for (; si->errlev > ne; si->errlev--)
+        {esc = si->err_stack[si->errlev-1];
+         si->err_stack[si->errlev-1] = NULL;
          SS_GC(esc);};
 
     _SS_set_ans_prompt();
@@ -788,15 +840,17 @@ void _SS_restore_state(object *esc_proc)
  */
 
 static object *_SSI_break(void)
-   {
+   {SS_psides *si;
 
-    SS_Save(_SS_si.evobj);
-    SS_Save(_SS_si.rdobj);
+    si = &_SS_si;
+
+    SS_Save(si, si->evobj);
+    SS_Save(si, si->rdobj);
 
     SS_push_err(TRUE, SS_ERROR_I);
     PRINT(stdout,"\n");
 
-    _SS_repl(&_SS_si);
+    _SS_repl(si);
 
     return(SS_t);}
 
@@ -806,13 +860,15 @@ static object *_SSI_break(void)
 /* _SSI_RESET - unwind the error/break stack and return to top level */
 
 static object *_SSI_reset(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     _SS_restore_state_prim(0, 1, 0);
     PRINT(stdout,"\n");
 
-    LONGJMP(_SS_si.continue_int[1].cont, ABORT);
-/*    LONGJMP(_SS_si.continue_int[1].cont, RETURN_OK); */
+    LONGJMP(si->continue_int[1].cont, ABORT);
+/*    LONGJMP(si->continue_int[1].cont, RETURN_OK); */
 
     return(SS_f);}
 
@@ -827,6 +883,9 @@ static object *_SSI_reset(void)
 static object *_SSI_retlev(object *argl)
    {int n;
     object *x, *expr, *val;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     x    = SS_car(argl);
     argl = SS_cdr(argl);
@@ -834,21 +893,21 @@ static object *_SSI_retlev(object *argl)
        SS_error("FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
 
     n = (int) SS_INTEGER_VALUE(x);
-    n = _SS_si.errlev - n;
+    n = si->errlev - n;
     n = max(1, n);
 
     if (!SS_consp(argl))
        SS_error("SECOND ARG MISSING - _SSI_RETLEV", x);
     val = SS_car(argl);    
 
-    if (_SS_si.errlev > 1)
+    if (si->errlev > 1)
        {x = SS_pop_err(n, TRUE);
 
-        SS_Restore(_SS_si.rdobj);
-        SS_Restore(_SS_si.evobj);
+        SS_Restore(si, si->rdobj);
+        SS_Restore(si, si->evobj);
 
 	expr = SS_make_form(x, SS_make_form(SS_quoteproc, val, LAST), LAST);
-        x    = SS_exp_eval(&_SS_si, expr);}
+        x    = SS_exp_eval(si, expr);}
 
     else
        x = SS_f;
@@ -864,10 +923,13 @@ void SS_interrupt_handler(int sig)
    {char bf[MAXLINE], *cmnd, *arg, *t;
     int nl;
     object *argl;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_signal(SIGINT, SS_interrupt_handler);
 
-    PRINT(stdout, "\n\nInterrupt (%d frames):\n", _SS_si.errlev - 1);
+    PRINT(stdout, "\n\nInterrupt (%d frames):\n", si->errlev - 1);
     PRINT(stdout, "  a     - Reset to starting frame\n");
     PRINT(stdout, "  b     - Enter SCHEME break\n");
     PRINT(stdout, "  r     - Resume from here\n");
@@ -897,8 +959,8 @@ void SS_interrupt_handler(int sig)
 
         case 'b' :
 	     PRINT(stdout, "\nEntering SCHEME break\n\n");
-	     t = SS_BUFFER(_SS_si.indev);
-	     SS_PTR(_SS_si.indev) = t;
+	     t = SS_BUFFER(si->indev);
+	     SS_PTR(si->indev) = t;
 	     *t = '\0';
 	     _SSI_break();
 	     break;
@@ -972,31 +1034,34 @@ void SS_error(char *s, object *obj)
     char *t;
     FILE *str;
     object *esc;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     t = CSTRSAVE(s);
 
-    SS_Assign(_SS_si.err_state, SS_make_list(SS_OBJECT_I, _SS_si.fun,
-					 SS_OBJECT_I, _SS_si.argl,
-					 SS_OBJECT_I, obj,
-					 SC_STRING_I, t,
-					 0));
+    SS_Assign(si->err_state, SS_make_list(SS_OBJECT_I, si->fun,
+					  SS_OBJECT_I, si->argl,
+					  SS_OBJECT_I, obj,
+					  SC_STRING_I, t,
+					  0));
 
-    str = SS_OUTSTREAM(_SS_si.outdev);
+    str = SS_OUTSTREAM(si->outdev);
     if (_SS.pr_err != NULL)
        SS_PRINT_ERR_MSG(str, t, obj);
 
     CFREE(t);
 
-    t = SS_BUFFER(_SS_si.indev);
-    SS_PTR(_SS_si.indev) = t;
+    t = SS_BUFFER(si->indev);
+    SS_PTR(si->indev) = t;
     *t = '\0';
 
-    esc = SS_pop_err(_SS_si.errlev - 1, FALSE);
+    esc = SS_pop_err(si->errlev - 1, FALSE);
     nc  = SS_ESCAPE_CONTINUATION(esc);
     SS_GC(esc);
 
-    if (_SS_si.trap_error)
-       LONGJMP(_SS_si.continue_int[nc].cont, ABORT);
+    if (si->trap_error)
+       LONGJMP(si->continue_int[nc].cont, ABORT);
 
     else
        LONGJMP(SC_gs.cpu, ABORT);
@@ -1158,10 +1223,12 @@ static object *_SSI_syscmnd(object *argl)
 /* SS_INST_PRM - install the Scheme primitives */
 
 void SS_inst_prm(void)
-   {
+   {SS_psides *si;
 
-    if (_SS_si.symtab == NULL)
-       _SS_si.symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
+    si = &_SS_si;
+
+    if (si->symtab == NULL)
+       si->symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
 
     SS_install("break",
                "Procedure: enter a Scheme break, return with return-level",

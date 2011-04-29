@@ -264,6 +264,9 @@ static object *_SXI_read_text_table(object *argl)
     char *label, *linein;
     FILE *fp;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (SX_current_table != NULL)
        {PM_destroy(SX_current_table);
@@ -338,7 +341,7 @@ static object *_SXI_read_text_table(object *argl)
 /* store column labels if available */
     _SX_setup_clabels(label, nc, linelen);
 
-    if (_SS_si.interactive == ON)
+    if (si->interactive == ON)
        {if (label[0] == '\0')
            PRINT(stdout,
                  "\n Table %d : %d rows and %d columns\n\n",
@@ -731,12 +734,17 @@ static object *SX_wrt_current_table(object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_PRINT_COLUMN - print a column from the current table--assumes 0 based numbering */
+/* SX_PRINT_COLUMN - print a column from the current table
+ *                 - assumes 0 based numbering
+ */
 
 static object *SX_print_column(object *argl)
    {long col, nr, nc, j;
     double *val;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = SS_null;
 
@@ -761,7 +769,7 @@ static object *SX_print_column(object *argl)
 	for (j = 0L; j < nr; j++)
 	    {PRINT(stdout, " %10.3e\n", val[j]);}
 
-	if (_SS_si.interactive == ON)
+	if (si->interactive == ON)
 	   PRINT(stdout,
                  "\n Column %ld : %ld values\n\n",
                  col, nr);
@@ -809,6 +817,9 @@ static object *SX_delete_column(object *argl)
     C_array *arr;
     long *data, *sdata, ncol, temp;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = SS_null;
 
@@ -849,7 +860,7 @@ static object *SX_delete_column(object *argl)
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;
 
-	if (_SS_si.interactive == ON)
+	if (si->interactive == ON)
 	   PRINT(stdout,
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
@@ -868,6 +879,9 @@ static object *SX_delete_column(object *argl)
 static object *SX_sort_on_column(object *argl)
    {int col, nr, nc;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = SS_null;
 
@@ -884,7 +898,7 @@ static object *SX_sort_on_column(object *argl)
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;
 
-	if (_SS_si.interactive == ON)
+	if (si->interactive == ON)
 	   PRINT(stdout,
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
@@ -903,6 +917,9 @@ static object *SX_sort_on_column(object *argl)
 static object *SX_cnormalize_table(object *argl)
    {int nr, nc;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = SS_null;
 
@@ -915,7 +932,7 @@ static object *SX_cnormalize_table(object *argl)
 	nr = SX_current_table->nrow;
 	nc = SX_current_table->ncol;
 
-	if (_SS_si.interactive == ON)
+	if (si->interactive == ON)
 	   PRINT(stdout,
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);

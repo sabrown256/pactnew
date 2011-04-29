@@ -38,6 +38,9 @@ char
 
 void dproc(object *pp)
    {object *name, *params, *penv, *bdy;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (SS_procedurep(pp))
        {name   = SS_proc_name(pp);
@@ -47,9 +50,9 @@ void dproc(object *pp)
 
 	SC_ASSERT(penv != NULL);
 
-	SS_print(name,   "Name: ", "\n", _SS_si.outdev);
-	SS_print(params, "Params: ", "\n", _SS_si.outdev);
-	SS_print(bdy,    "Body: ", "\n", _SS_si.outdev);};
+	SS_print(name,   "Name: ", "\n", si->outdev);
+	SS_print(params, "Params: ", "\n", si->outdev);
+	SS_print(bdy,    "Body: ", "\n", si->outdev);};
 
     return;}
 
@@ -66,9 +69,12 @@ void dpenv(object *penv)
     char *fname, **lines;
     hasharr *tab;
     object *b;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (penv == NULL)
-       penv = _SS_si.env;
+       penv = si->env;
 
     for (ie = 1; !SS_nullobjp(penv); penv = SS_cdr(penv), ie++)
         {GET_FRAME(fname, tab, penv);
@@ -84,18 +90,18 @@ void dpenv(object *penv)
 		 PRINT(stdout, "----------------------------------------\n");
 		 PRINT(stdout, "Frame %d: %s\n", ie, fname);
 
-		 n = min(nx, _SS_si.trace_env);
+		 n = min(nx, si->trace_env);
 		 for (i = 0; i < n; i++)
 		     {if ((i != (n-1)) || (lines[i] != NULL))
 			 {b = (object *) SC_hasharr_def_lookup(tab, lines[i]);
 			  snprintf(pre, MAXLINE, "%4d\t%s\t", i+1, lines[i]);
-			  SS_print(b, pre, "\n", _SS_si.outdev);};};
+			  SS_print(b, pre, "\n", si->outdev);};};
 
 		 if (n != nx)
 		    {PRINT(stdout, "\t...\n");
 		     b = (object *) SC_hasharr_def_lookup(tab, lines[nx-1]);
 		     snprintf(pre, MAXLINE, "%4d\t%s\t", nx, lines[nx-1]);
-		     SS_print(b, pre, "\n", _SS_si.outdev);};
+		     SS_print(b, pre, "\n", si->outdev);};
 
 		 CFREE(lines);};};};
 
@@ -107,9 +113,11 @@ void dpenv(object *penv)
 /* _SS_EVAL_ERR - handle error returns during an eval */
 
 void _SS_eval_err(void)
-   {
+   {SS_psides *si;
 
-    SS_Assign(_SS_si.val, SS_f);
+    si = &_SS_si;
+
+    SS_Assign(si->val, SS_f);
 
     return;}
 
@@ -151,17 +159,19 @@ object *SS_eval(SS_psides *si, object *obj)
 /* SS_SAVE_REGISTERS - save the Scheme register set on the stack */
 
 void SS_save_registers(int vp)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     if (vp)
-       {SS_Save(_SS_si.val);};
+       {SS_Save(si, si->val);};
 
-    SS_Save(_SS_si.exn);
-    SS_Save(_SS_si.env);
-    SS_Save(_SS_si.fun);
-    SS_Save(_SS_si.this);
-    SS_Save(_SS_si.unev);
-    SS_Save(_SS_si.argl);
+    SS_Save(si, si->exn);
+    SS_Save(si, si->env);
+    SS_Save(si, si->fun);
+    SS_Save(si, si->this);
+    SS_Save(si, si->unev);
+    SS_Save(si, si->argl);
 
     return;}
 
@@ -171,17 +181,19 @@ void SS_save_registers(int vp)
 /* SS_RESTORE_REGISTERS - restore the Scheme register set from the stack */
 
 void SS_restore_registers(int vp)
-   {
+   {SS_psides *si;
 
-    SS_Restore(_SS_si.argl);
-    SS_Restore(_SS_si.unev);
-    SS_Restore(_SS_si.this);
-    SS_Restore(_SS_si.fun);
-    SS_Restore(_SS_si.env);
-    SS_Restore(_SS_si.exn);
+    si = &_SS_si;
+
+    SS_Restore(si, si->argl);
+    SS_Restore(si, si->unev);
+    SS_Restore(si, si->this);
+    SS_Restore(si, si->fun);
+    SS_Restore(si, si->env);
+    SS_Restore(si, si->exn);
 
     if (vp)
-       {SS_Restore(_SS_si.val);};
+       {SS_Restore(si, si->val);};
 
     return;}
 
@@ -342,10 +354,13 @@ object *SS_mk_new_frame(object *name, hasharr *tab)
 static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
    {int nc, ok;
     char *s, *t;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_hasharr_install(tab, vr, vl, SS_OBJECT_P_S, TRUE, TRUE);
 
-    if ((_SS_si.know_env) && (vr[0] == '$'))
+    if ((si->know_env) && (vr[0] == '$'))
        {t = _SS_sprintf("%s", vl);
 
 	nc = strlen(vr) + strlen(t) + 2;
@@ -419,6 +434,9 @@ static object *SS_xtnd_env(object *fnm, object *vrs, object *vls, object *base)
 
 object *SS_do_bindings(object *pp, object *argp)
    {object *params, *penv, *nenv, *name;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (!SS_procedurep(pp))
        SS_error("BAD PROCEDURE TO DO-BINDINGS", pp);
@@ -428,7 +446,7 @@ object *SS_do_bindings(object *pp, object *argp)
     penv   = SS_proc_env(pp);
     nenv   = SS_xtnd_env(name, params, argp, penv);
 
-    if ((_SS_si.trace_env > 0) && (!SS_nullobjp(params)))
+    if ((si->trace_env > 0) && (!SS_nullobjp(params)))
        dpenv(nenv);
 
     return(nenv);}
@@ -447,9 +465,12 @@ char **SS_bound_vars(char *patt, object *penv)
    {int i;
     char *fname, **vrs;
     hasharr *tab;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (penv == NULL)
-       penv = _SS_si.env;
+       penv = si->env;
 
     GET_FRAME(fname, tab, penv);
 
@@ -470,10 +491,13 @@ char **SS_bound_vars(char *patt, object *penv)
 
 object *SS_bound_name(char *name)
    {object *obj;
+    SS_psides *si;
 
-    obj = _SS_bind_envc(name, _SS_si.env);
+    si = &_SS_si;
+
+    obj = _SS_bind_envc(name, si->env);
     if (obj == NULL)
-       obj = (object *) SC_hasharr_def_lookup(_SS_si.symtab, name);
+       obj = (object *) SC_hasharr_def_lookup(si->symtab, name);
 
     return(obj);}
 
@@ -488,6 +512,9 @@ object *SS_bound_name(char *name)
 static object *_SS_bound_var(char *name, hasharr *tab, char *under)
    {char s[MAXLINE], t[MAXLINE];
     object *b;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (under == NULL)
        under = t;
@@ -501,8 +528,8 @@ static object *_SS_bound_var(char *name, hasharr *tab, char *under)
  * even if posed in a different syntax mode
  * so a C mode define of foo_bar could replace an existing foo-bar
  */
-    if ((b == NULL) && (_SS_si.name_reproc != NULL))
-       {(*_SS_si.name_reproc)(s, name);
+    if ((b == NULL) && (si->name_reproc != NULL))
+       {(*si->name_reproc)(s, name);
 	strcpy(under, s);
 	b = (object *) SC_hasharr_def_lookup(tab, under);};
 
@@ -679,8 +706,11 @@ object *SS_bind_env(object *vr, object *penv)
 
 object *SS_defp(object *vr)
    {object *b, *o;
+    SS_psides *si;
 
-    b = SS_bind_env(vr, _SS_si.env);
+    si = &_SS_si;
+
+    b = SS_bind_env(vr, si->env);
     o = (b == NULL) ? SS_f : SS_t;
 
     return(o);}
@@ -731,8 +761,8 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
  * it's poison for C so in C-mode we could map the legal
  * for_each into for-each and do the lookup
  */
-    if ((obj == NULL) && (_SS_si.name_reproc != NULL))
-       {(*_SS_si.name_reproc)(s, name);
+    if ((obj == NULL) && (si->name_reproc != NULL))
+       {(*si->name_reproc)(s, name);
 	obj = _SS_lk_var_valc(s, penv);};
 
 /* if there is no variable complain */

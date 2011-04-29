@@ -51,10 +51,13 @@ object *_SS_make_funf(object *proto, object *body)
 int SS_lookup_identifier_f(char *txt, object **lval)
    {int type;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     *lval = SS_f;
 
-    o = (object *) SC_hasharr_def_lookup(_SS_si.types, txt);
+    o = (object *) SC_hasharr_def_lookup(si->types, txt);
     if (o != NULL)
        {*lval = o;
 	type  = SS_f_tokens[0];}
@@ -72,12 +75,15 @@ int SS_lookup_identifier_f(char *txt, object **lval)
 
 object *SS_syntax_f(object *str)
    {object *ret;
+    SS_psides *si;
 
-    if (SETJMP(_SS_si.cpu))
+    si = &_SS_si;
+
+    if (SETJMP(si->cpu))
        ret = SS_eof;
 
     else
-       {_SS_si.character_stream = str;
+       {si->character_stream = str;
 
 	shgrf_parse();
 
@@ -91,11 +97,13 @@ object *SS_syntax_f(object *str)
 /* SS_F_MODE - switch to Fortran syntax parsing */
 
 static object *SS_f_mode(void)
-   {
+   {SS_psides *si;
 
-    snprintf(_SS_si.prompt, MAXLINE, "F-> ");
-    _SS_si.read        = SS_syntax_f;
-    _SS_si.name_reproc = SS_name_map_synt;
+    si = &_SS_si;
+
+    snprintf(si->prompt, MAXLINE, "F-> ");
+    si->read        = SS_syntax_f;
+    si->name_reproc = SS_name_map_synt;
 
     SS_set_parser(SS_f_mode);
 
@@ -108,6 +116,9 @@ static object *SS_f_mode(void)
 
 void SS_init_f_syntax_mode(void)
    {int *ssdbg;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (_SS.f_mode_init == FALSE)
        {_SS.f_mode_init = TRUE;
@@ -161,7 +172,7 @@ void SS_init_f_syntax_mode(void)
 
 	SS_add_parser(".f", (PFPObject) SS_f_mode);
 
-	_SS_si.eox          = TRUE;
+	si->eox          = TRUE;
 	SS_diagnostic_f = FALSE;
 
 	ssdbg  = SS_parse_debug_f();

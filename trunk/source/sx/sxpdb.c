@@ -3671,11 +3671,14 @@ void SX_type_container(char *dtype, char *stype)
    {defstr *sp, *dp;
     PDBfile *file;
     g_file *po;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     dtype[0] = '\0';
 
     po = NULL;
-    SS_args(SS_lk_var_val(&_SS_si, SX_curfile),
+    SS_args(SS_lk_var_val(si, SX_curfile),
 	    G_FILE, &po,
 	    0);
 

@@ -183,6 +183,9 @@ object *SS_lstvct(object *arg)
 object *_SSI_define_global(object *argl)
    {object *obj, *val, *t;
     char *s;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     val = SS_null;
 
@@ -192,7 +195,7 @@ object *_SSI_define_global(object *argl)
     if (SS_consp(argl))
        {obj  = SS_mk_cons(SS_cdr(argl), obj);
         argl = SS_car(argl);
-        val  = SS_mk_procedure(argl, obj, _SS_si.global_env);
+        val  = SS_mk_procedure(argl, obj, si->global_env);
 
         s = SS_PROCEDURE_NAME(val);
         CFREE(s);
@@ -201,7 +204,7 @@ object *_SSI_define_global(object *argl)
 
     else if (SS_variablep(argl))
        {obj = SS_car(obj);
-        val = SS_exp_eval(&_SS_si, obj);
+        val = SS_exp_eval(si, obj);
 
 /* this preserves things for compound procedures (e.g. autoload) */
         if (SS_procedurep(val))
@@ -218,10 +221,10 @@ object *_SSI_define_global(object *argl)
     else
        SS_error("CAN'T DEFINE NON-VARIABLE OBJECT - _SSI_DEFINE_GLOBAL", argl);
 
-    if (strcmp(SS_PROCEDURE_NAME(_SS_si.fun), "define-global-macro") == 0)
+    if (strcmp(SS_PROCEDURE_NAME(si->fun), "define-global-macro") == 0)
        SS_PROCEDURE_TYPE(val) = SS_MACRO;
 
-    SS_def_var(argl, val, _SS_si.global_env);
+    SS_def_var(argl, val, si->global_env);
 
     return(argl);}
 
@@ -335,10 +338,13 @@ static object *_SSI_printenv(object *argl)
     char s[MAXLINE];
     char *vr, **vrs;
     object *l, *v, *vl, *lst, *pr;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* make a list of names from the global environment frame */
     if (SS_nullobjp(argl))
-       vrs = SS_bound_vars("$*", _SS_si.global_env);
+       vrs = SS_bound_vars("$*", si->global_env);
 
 /* make a list of names from the argument list */
     else
@@ -367,12 +373,12 @@ static object *_SSI_printenv(object *argl)
 
     for (i = 0; vrs[i] != NULL; i++)
         {vr = vrs[i];
-	 vl = _SS_lk_var_valc(vr, _SS_si.global_env);
+	 vl = _SS_lk_var_valc(vr, si->global_env);
 	 snprintf(s, MAXLINE, "%s = ", vr);
 	 if (vl == NULL)
-	    SS_print(SS_null, s, "\n", _SS_si.outdev);
+	    SS_print(SS_null, s, "\n", si->outdev);
 	 else
-	    SS_print(vl, s, "\n", _SS_si.outdev);};
+	    SS_print(vl, s, "\n", si->outdev);};
 
     SS_set_display_flag(dspo);
 
@@ -382,7 +388,7 @@ static object *_SSI_printenv(object *argl)
     SC_ptr_arr_len(n, vrs);
     for (i = n-1; i >= 0; i--)
         {vr = vrs[i];
-	 vl = _SS_lk_var_valc(vr, _SS_si.global_env);
+	 vl = _SS_lk_var_valc(vr, si->global_env);
 	 pr = SS_make_list(SC_STRING_I, vr,
 			   SS_OBJECT_I, vl,
 			   0);
@@ -403,17 +409,20 @@ static object *_SSI_print_env(object *obj)
    {int i, n;
     object *penv;
     char bf[MAXLINE];
+    SS_psides *si;
+
+    si = &_SS_si;
 
     n = 0;
     SS_args(obj,
             SC_INT_I, &n,
             0);
 
-    penv = _SS_si.env;
+    penv = si->env;
     for (i = 0; (i < n) && !SS_nullobjp(penv); i++, penv = SS_cdr(penv));
 
     snprintf(bf, MAXLINE, "Environment frame #%d:\n", n+1);
-    SS_print(penv, bf, "\n\n", _SS_si.outdev);
+    SS_print(penv, bf, "\n\n", si->outdev);
 
     return(SS_f);}
 
@@ -588,9 +597,12 @@ static object *_SSI_mem_usg(void)
 
 static object *_SSI_mem_map(object *arg)
    {FILE *fp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (SS_nullobjp(arg))
-       arg = _SS_si.outdev;
+       arg = si->outdev;
 
     else if (!SS_outportp(arg))
        SS_error("BAD PORT - SC_MEM_MAP", arg);
@@ -740,8 +752,11 @@ static object *_SSI_retrace(object *arg)
 
 static object *_SSI_interactp(void)
    {object *o;
+    SS_psides *si;
 
-    o = _SS_si.interactive ? SS_t : SS_f;
+    si = &_SS_si;
+
+    o = si->interactive ? SS_t : SS_f;
 
     return(o);}
 
@@ -770,7 +785,9 @@ static object *_SSI_load_env(object *arg)
 /* _SS_INST_LRG - install the primitives making up the LARGE Scheme */
 
 void _SS_inst_lrg(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SS_install("attach-debugger",
                "Procedure: attach a debugger to the specified pid",
@@ -940,17 +957,17 @@ void _SS_inst_lrg(void)
     SS_install_cf("interactive",
                   "Variable: Controls display of ouput data in functions\n     Usage: interactive <on|off>",
                   SS_acc_int,
-                  &_SS_si.interactive);
+                  &si->interactive);
 
     SS_install_cf("lines-page",
                   "Variable: Controls the number of lines per page for selected printing commands\n     Usage: lines-page <integer>",
                   SS_acc_int,
-                  &_SS_si.lines_page);
+                  &si->lines_page);
 
     SS_install_cf("trace-env",
                   "Variable: Show upto <n> variables in environment frames entering function calls\n     Usage: trace-env <n>",
                   SS_acc_int,
-                  &_SS_si.trace_env);
+                  &si->trace_env);
 
     _SS_inst_hash();
     _SS_inst_str();

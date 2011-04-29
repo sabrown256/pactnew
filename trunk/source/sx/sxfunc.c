@@ -784,6 +784,9 @@ static PM_mapping *_SXI_filter_coef(PM_mapping *h, object *argl)
 static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
    {int i, n, pts, ntimes;
     double *x[PG_SPACEDM];
+    SS_psides *si;
+
+    si = &_SS_si;
 
     GET_DATA_1D(h, n, x[0], x[1]);
 
@@ -813,7 +816,7 @@ static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
 			      SX_smooth_method);
 	    SS_error(bf, SS_null);};
 
-        SS_args(SS_lk_var_val(&_SS_si, obj),
+        SS_args(SS_lk_var_val(si, obj),
                 G_NUM_ARRAY, &arr,
 		0);
 

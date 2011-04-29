@@ -23,10 +23,12 @@ static int
 /* SS_SET_PROMPT - set the interpreter prompt string */
 
 void SS_set_prompt(char *fmt, ...)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SC_VA_START(fmt);
-    SC_VSNPRINTF(_SS_si.prompt, MAXLINE, fmt);
+    SC_VSNPRINTF(si->prompt, MAXLINE, fmt);
     SC_VA_END;
 
     return;}
@@ -37,9 +39,11 @@ void SS_set_prompt(char *fmt, ...)
 /* _SS_SET_ANS_PROMPT - set the answer "prompt" */
 
 void _SS_set_ans_prompt(void)
-   {
+   {SS_psides *si;
 
-    snprintf(_SS_si.ans_prompt, MAXLINE, "(%d): ", _SS_si.errlev - 1);
+    si = &_SS_si;
+
+    snprintf(si->ans_prompt, MAXLINE, "(%d): ", si->errlev - 1);
 
     return;}
 
@@ -179,19 +183,22 @@ static object *_SS_sprint(object *obj, char *fmt, object *strm)
 
 void dpreg(void)
    {FILE *str;
+    SS_psides *si;
 
-    str = SS_OUTSTREAM(_SS_si.outdev);
+    si = &_SS_si;
+
+    str = SS_OUTSTREAM(si->outdev);
     PRINT(str, "Scheme registers:\n");
 
-    SS_print(_SS_si.exn,   "   Exn  : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.argl,  "   Argl : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.fun,   "   Fun  : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.unev,  "   Unev : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.val,   "   Val  : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.this,  "   This : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.env,   "   Env  : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.rdobj, "   Read : ", "\n", _SS_si.outdev);
-    SS_print(_SS_si.evobj, "   Eval : ", "\n", _SS_si.outdev);
+    SS_print(si->exn,   "   Exn  : ", "\n", si->outdev);
+    SS_print(si->argl,  "   Argl : ", "\n", si->outdev);
+    SS_print(si->fun,   "   Fun  : ", "\n", si->outdev);
+    SS_print(si->unev,  "   Unev : ", "\n", si->outdev);
+    SS_print(si->val,   "   Val  : ", "\n", si->outdev);
+    SS_print(si->this,  "   This : ", "\n", si->outdev);
+    SS_print(si->env,   "   Env  : ", "\n", si->outdev);
+    SS_print(si->rdobj, "   Read : ", "\n", si->outdev);
+    SS_print(si->evobj, "   Eval : ", "\n", si->outdev);
 
     return;}
 
@@ -201,10 +208,12 @@ void dpreg(void)
 /* DPRINT - an easy to use debug time object printer */
 
 void dprint(object *obj)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     if (obj != NULL)
-       SS_print(obj, "", "\n", _SS_si.outdev);
+       SS_print(obj, "", "\n", si->outdev);
 
     return;}
 
@@ -215,11 +224,14 @@ void dprint(object *obj)
 
 static object *_SSI_write(object *obj)
    {object *str;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     str = SS_cdr(obj);
     obj = SS_car(obj);
     if (SS_nullobjp(str))
-       SS_print(obj, "", "", _SS_si.outdev);
+       SS_print(obj, "", "", si->outdev);
 
     else if (SS_consp(str))
        {str = SS_car(str);
@@ -241,6 +253,9 @@ static object *_SSI_sprintf(object *argl)
     PFfprintf pr;
     PFfputs ps;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
@@ -248,7 +263,7 @@ static object *_SSI_sprintf(object *argl)
     SC_set_put_string(_SS_push_string);
 
     odf = SS_set_display_flag(TRUE);
-    _SS_xprintf(_SS_si.outdev, argl);
+    _SS_xprintf(si->outdev, argl);
     SS_set_display_flag(odf);
 
     SC_set_put_line(pr);
@@ -267,6 +282,9 @@ static object *_SSI_fprintf(object *argl)
    {object *str;
     PFfprintf pr;
     PFfputs ps;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
@@ -274,7 +292,7 @@ static object *_SSI_fprintf(object *argl)
     str  = SS_car(argl);
     argl = SS_cdr(argl);
     if (SS_nullobjp(str))
-       str = _SS_si.outdev;
+       str = si->outdev;
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
@@ -524,10 +542,13 @@ static object *_SSI_display(object *obj)
 
 static object *_SSI_print_toggle(void)
    {object *rv;
+    SS_psides *si;
 
-    _SS_si.print_flag = !_SS_si.print_flag;
+    si = &_SS_si;
 
-    rv = (_SS_si.print_flag) ? SS_t : SS_f;
+    si->print_flag = !si->print_flag;
+
+    rv = (si->print_flag) ? SS_t : SS_f;
 
     return(rv);}
 
@@ -538,9 +559,12 @@ static object *_SSI_print_toggle(void)
 
 static object *_SSI_stats_toggle(void)
    {object *rv;
+    SS_psides *si;
 
-    _SS_si.stat_flag = !_SS_si.stat_flag;
-    rv = (_SS_si.stat_flag) ? SS_t : SS_f;
+    si = &_SS_si;
+
+    si->stat_flag = !si->stat_flag;
+    rv = (si->stat_flag) ? SS_t : SS_f;
 
     return(rv);}
 
@@ -550,11 +574,14 @@ static object *_SSI_stats_toggle(void)
 /* _SSI_TRANS_ON - turn on a transcript of the Scheme session */
 
 static object *_SSI_trans_on(object *obj)
-   {FILE *str;
-    char *s;
+   {char *s;
+    FILE *str;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     s = NULL;
-    if (!SS_nullobjp(_SS_si.histdev))
+    if (!SS_nullobjp(si->histdev))
        SS_error("TRANSCRIPT ALREADY ACTIVE - TRANSCRIPT-ON", obj);
 
     s = NULL;
@@ -566,8 +593,8 @@ static object *_SSI_trans_on(object *obj)
     if (str == NULL)
        SS_error("CAN'T OPEN FILE - TRANSCRIPT-ON", obj);
 
-    _SS_si.histdev = SS_mk_outport(str, s);
-    _SS_si.hist_flag = ALL;
+    si->histdev = SS_mk_outport(str, s);
+    si->hist_flag = ALL;
 
     return(SS_t);}
 
@@ -577,16 +604,18 @@ static object *_SSI_trans_on(object *obj)
 /* SS_TRANS_OFF - turn off the transcript of the Scheme session */
 
 object *SS_trans_off(void)
-   {
+   {SS_psides *si;
 
-    if (SS_nullobjp(_SS_si.histdev))
+    si = &_SS_si;
+
+    if (SS_nullobjp(si->histdev))
        return(SS_f);
 
-    io_close(SS_OUTSTREAM(_SS_si.histdev));
+    io_close(SS_OUTSTREAM(si->histdev));
 
-    SS_OBJECT_FREE(_SS_si.histdev);
-    _SS_si.histdev   = SS_null;
-    _SS_si.hist_flag = NO_LOG;
+    SS_OBJECT_FREE(si->histdev);
+    si->histdev   = SS_null;
+    si->hist_flag = NO_LOG;
 
     return(SS_t);}
 
@@ -642,6 +671,9 @@ object *_SSI_call_of(object *argl)
    {FILE *str;
     char *s;
     object *obj, *old_outdev, *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     s   = NULL;
     obj = SS_car(argl);
@@ -655,11 +687,11 @@ object *_SSI_call_of(object *argl)
     if (str == NULL)
        SS_error("CAN'T OPEN FILE - CALL-WITH-OUTPUT-FILE", obj);
 
-    old_outdev = _SS_si.outdev;
-    _SS_si.outdev  = SS_mk_outport(str, s);
-    ret        = SS_exp_eval(&_SS_si, SS_cdr(argl));
-    _SSI_cls_out(_SS_si.outdev);
-    _SS_si.outdev = old_outdev;
+    old_outdev = si->outdev;
+    si->outdev  = SS_mk_outport(str, s);
+    ret        = SS_exp_eval(si, SS_cdr(argl));
+    _SSI_cls_out(si->outdev);
+    si->outdev = old_outdev;
 
     CFREE(s);
 
@@ -735,6 +767,9 @@ int SS_prim_des(object *strm, object *obj)
     char *s;
     object *desc, *bdy;
     FILE *str;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     str = SS_OUTSTREAM(strm);
 
@@ -745,7 +780,7 @@ int SS_prim_des(object *strm, object *obj)
 
     if (!SS_procedurep(obj))
        {if (SS_variablep(obj))
-           {desc = SS_lk_var_val(&_SS_si, obj);
+           {desc = SS_lk_var_val(si, obj);
             if (SS_procedurep(desc))
                obj = desc;
 	    else
@@ -819,6 +854,9 @@ int SS_prim_des(object *strm, object *obj)
 static object *_SSI_describe(object *argl)
    {int ok;
     object *obj, *strm;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     obj  = SS_null;
     strm = SS_null;
@@ -828,7 +866,7 @@ static object *_SSI_describe(object *argl)
 	    0);
 
     if (SS_nullobjp(strm))
-       strm = _SS_si.outdev;
+       strm = si->outdev;
 
     if (!SS_outportp(strm))
        SS_error("LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
@@ -882,11 +920,14 @@ static int _SS_prim_apr(FILE *str, char *s, hasharr *tab)
     char bf[10];
     char *name;
     object *op, *obj;
+    SS_psides *si;
+
+    si = &_SS_si;
         
     flag  = 0;
     vcnt  = 0;
     nmore = 0;
-    nlp   = _SS_si.lines_page;
+    nlp   = si->lines_page;
     if (nlp == 0)
        nlp = INT_MAX;
 
@@ -937,10 +978,13 @@ int SS_prim_apr(FILE *str, char *s)
    {int i, flag;
     hasharr *tab;
     object *penv, *l, *v;
+    SS_psides *si;
 
-    flag = _SS_prim_apr(str, s, _SS_si.symtab);
+    si = &_SS_si;
 
-    penv = _SS_si.env;
+    flag = _SS_prim_apr(str, s, si->symtab);
+
+    penv = si->env;
     for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
         {l = SS_car(penv);
 	 v = SS_car(l);
@@ -962,6 +1006,9 @@ static object *_SSI_apropos(object *argl)
    {object *obj, *strm;
     char *token;
     FILE *str;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     obj  = SS_null;
     strm = SS_null;
@@ -971,7 +1018,7 @@ static object *_SSI_apropos(object *argl)
 	    0);
 
     if (SS_nullobjp(strm))
-       strm = _SS_si.outdev;
+       strm = si->outdev;
 
     if (!SS_outportp(strm))
        SS_error("LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
@@ -1132,9 +1179,12 @@ void SS_wr_atm(object *obj, object *strm)
 
 static object *_SSI_newline(object *strm)
    {FILE *fp;
+    SS_psides *si;
+
+    si = &_SS_si;
    
     if (SS_nullobjp(strm))
-       {fp = SS_OUTSTREAM(_SS_si.outdev);
+       {fp = SS_OUTSTREAM(si->outdev);
         if (fp == stdout)
            PRINT(fp,  "\n");
         else
@@ -1163,9 +1213,11 @@ static object *_SSI_newline(object *strm)
 /* _SSI_CURR_OP - current-output-port in Scheme */
 
 object *_SSI_curr_op(void)
-    {
+   {SS_psides *si;
 
-     return(_SS_si.outdev);}
+    si = &_SS_si;
+
+    return(si->outdev);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1174,13 +1226,16 @@ object *_SSI_curr_op(void)
 
 object *_SSI_wr_chr(object *argl)
    {object *str;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     str = SS_cdr(argl);
     if (!SS_charobjp(argl = SS_car(argl)))
        SS_error("BAD CHARACTER - WRITE-CHAR", argl);
 
     if (SS_nullobjp(str))
-       SS_print(argl, "", "", _SS_si.outdev);
+       SS_print(argl, "", "", si->outdev);
 
     else if (SS_outportp(str = SS_car(str)))
        SS_print(argl, "", "", str);

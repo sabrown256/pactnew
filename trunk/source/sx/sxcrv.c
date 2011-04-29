@@ -111,6 +111,9 @@ void SX_enlarge_dataset(PFVoid eval)
     char s[10], s1[10], t[10];
     procedure *pp;
     object *o, *v, *p;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     nc = SX_N_Curves;
 
@@ -179,13 +182,13 @@ void SX_enlarge_dataset(PFVoid eval)
          _SX.crv_varbl[i] = v;
 
          if (i < 26)
-            {if (SC_hasharr_install(_SS_si.symtab, s1, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
+            {if (SC_hasharr_install(si->symtab, s1, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
                 LONGJMP(SC_gs.cpu, ABORT);};
 
-         if (SC_hasharr_install(_SS_si.symtab, s, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
+         if (SC_hasharr_install(si->symtab, s, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
             LONGJMP(SC_gs.cpu, ABORT);
 
-         if (SC_hasharr_install(_SS_si.symtab, t, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
+         if (SC_hasharr_install(si->symtab, t, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
             LONGJMP(SC_gs.cpu, ABORT);};
 
     return;}

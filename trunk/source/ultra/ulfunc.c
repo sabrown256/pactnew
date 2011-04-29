@@ -775,6 +775,9 @@ static object *UL_print_labels(int *indx, int nc,
     char f[MAXLINE], *s;
     FILE *fp;
     object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     ret = SS_null;
 
@@ -786,10 +789,10 @@ static object *UL_print_labels(int *indx, int nc,
     else
        fp = stdout;
 
-    if (_SS_si.lines_page == 0)
+    if (si->lines_page == 0)
        nlp = INT_MAX;
     else
-       nlp = max(26, _SS_si.lines_page);
+       nlp = max(26, si->lines_page);
 
     np    = 0;
     nmore = 0;
@@ -816,7 +819,7 @@ static object *UL_print_labels(int *indx, int nc,
                 {SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));}
 
              if ((silent == FALSE) &&
-		 ((_SS_si.interactive == ON) || (fp != stdout)))
+		 ((si->interactive == ON) || (fp != stdout)))
 
 /* prep the label text */
 	        {_UL_print_label(i, j, md, s, id_flag, fp, f, id);
@@ -875,12 +878,13 @@ static object *_ULI_menu(object *argl)
 /* _ULI_PREFIX - set or display menu prefixes */
 
 static object *_ULI_prefix(object *argl)
-   {object *arg1;
-    object *arg2;
-    object *ret;
+   {int  mindex, i;
     char pre, prefix[MAXLINE];
-    int  mindex, i;
     char *fname, *s;
+    object *arg1, *arg2, *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     ret    = SS_null;
     fname  = "";
@@ -915,10 +919,10 @@ static object *_ULI_prefix(object *argl)
            {if ((mindex = SX_prefix_list[pre - 'a']) > 0)
                {if (mindex <= SX_n_curves_read)
                     fname = SX_dataset[SX_number[mindex]].file;
-                if (_SS_si.interactive == ON)
+                if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);}
             else
-               {if (_SS_si.interactive == ON)
+               {if (si->interactive == ON)
                    PRINT(stdout, " Prefix %c is not assigned\n", pre);};}
 
         {SS_Assign(ret,
@@ -933,12 +937,11 @@ static object *_ULI_prefix(object *argl)
                 fname = "";
                 if (mindex <= SX_n_curves_read)
                    fname = SX_dataset[SX_number[mindex]].file;
-                if (_SS_si.interactive == ON)
+                if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);
                 arg1 = SS_mk_char((int) pre);
                 {SS_Assign(ret,
-                           SS_mk_cons(
-                                      SS_mk_cons(arg1,
+                           SS_mk_cons(SS_mk_cons(arg1,
                                                  SS_mk_cons(SS_mk_integer(mindex),
                                                             SS_mk_cons(SS_mk_string(fname),
                                                                        SS_null))),
@@ -1118,6 +1121,9 @@ static object *UL_filter(int j, object *argl)
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
     object *dom_pred, *ran_pred, *xexpr, *yexpr, *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     dom_pred = SS_null;
     ran_pred = SS_null;
@@ -1149,8 +1155,8 @@ static object *UL_filter(int j, object *argl)
          SS_Assign(yexpr, SS_make_list(SS_OBJECT_I, ran_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
-         if ((SS_true(SS_exp_eval(&_SS_si, xexpr))) &&
-	     (SS_true(SS_exp_eval(&_SS_si, yexpr))))
+         if ((SS_true(SS_exp_eval(si, xexpr))) &&
+	     (SS_true(SS_exp_eval(si, yexpr))))
             {UL_buf1x[k] = x[0][i];
              UL_buf1y[k] = x[1][i];
              k++;};};
@@ -1505,6 +1511,9 @@ static object *UL_smooth(int l, object *argl)
    {int i, n, pts, ntimes;
     char *bf;
     object *obj;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     pts = 3;
     ntimes = 1;
@@ -1537,7 +1546,7 @@ static object *UL_smooth(int l, object *argl)
 			      SX_smooth_method);
 	    SS_error(bf, SS_null);};
 
-        SS_args(SS_lk_var_val(&_SS_si, obj),
+        SS_args(SS_lk_var_val(si, obj),
                 G_NUM_ARRAY, &arr,
 		0);
 

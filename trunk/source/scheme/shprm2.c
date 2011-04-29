@@ -606,10 +606,13 @@ static object *_SS_xor_pow(object *argl)
     int64_t i1, i2, iv;
     double d1, d2, dv;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = SS_null;
 
-    if (_SS_si.strict_c == TRUE)
+    if (si->strict_c == TRUE)
        {SS_GET_OPERAND(i1, argl, type);
 	SS_GET_OPERAND(i2, argl, type);
 	iv = PM_lxor(i1, i2);
@@ -762,7 +765,9 @@ static void _SS_install_homogeneous(void)
 /* _SS_INSTALL_MATH - install the SCHEME primitives for math */
 
 void _SS_install_math(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SS_install("&",
                "Procedure: Returns bitwise and of args (left associative)",
@@ -1072,7 +1077,7 @@ void _SS_install_math(void)
     SS_install_cf("strict-c", 
 		  "Variable: Strict C compliance for operators if 1\n     Usage: strict-c [0|1]",
 		  SS_acc_int,
-		  &_SS_si.strict_c);
+		  &si->strict_c);
 
 
     _SS_install_heterogeneous();

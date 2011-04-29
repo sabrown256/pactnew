@@ -361,10 +361,6 @@ struct s_SS_vect
 #define SS_GET(typ, obj)        ((typ *) SS_OBJECT(obj))
 #define SS_PP(fun, member)      ((procedure *) SS_OBJECT(fun))->member
 
-#define SS_READ_EXPR(x)                                                      \
-    ((_SS_si.read == NULL) ? SS_null : (*_SS_si.read)(x))
-
-
 /* OBJECT ACCESSORS */
 
 #define SS_INQUIRE_OBJECT(x)      ((object *) SC_hasharr_def_lookup(_SS_si.symtab, (x)))
@@ -761,25 +757,25 @@ struct s_SS_vect
 #ifdef STACK_FNC
 
 extern void
- SS_Save(object *obj);
+ SS_Save(SS_psides *si, object *obj);
 
 #else
 
 # ifdef SCHEME_DEBUG
 
-#  define SS_Save(obj)                                                       \
-   {if ((obj->val == NULL) || (obj->eval_type == NO_EV))                     \
-       SS_error("FREED OBJECT - SS_SAVE", SS_null);                          \
-    _SS_si.nsave++;                                                              \
-    SS_MARK(obj);                                                            \
-    SC_array_push(_SS_si.stack, &obj);}
+#  define SS_Save(_si, _o)                                                   \
+   {if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
+       SS_error("FREED _OECT - SS_SAVE", SS_null);                           \
+    (_si)->nsave++;                                                          \
+    SS_MARK(_o);                                                             \
+    SC_array_push((_si)->stack, &_o);}
 
 # else
 
-#  define SS_Save(obj)                                                       \
-   {_SS_si.nsave++;                                                              \
-    SS_MARK(obj);                                                            \
-    SC_array_push(_SS_si.stack, &obj);}
+#  define SS_Save(_si, _o)                                                   \
+   {(_si)->nsave++;                                                          \
+    SS_MARK(_o);                                                             \
+    SC_array_push((_si)->stack, &_o);}
 
 # endif
 #endif
@@ -792,27 +788,27 @@ extern void
 #ifdef STACK_FNC
 
 extern void
- _SS_Restore(object **px);
+ _SS_Restore(SS_psides *si, object **px);
 
-# define SS_Restore(x) _SS_Restore(&x)
+# define SS_Restore(_si, _o) _SS_Restore(_si, &_o)
 
 #else
 
 # ifdef SCHEME_DEBUG
 
-#  define SS_Restore(x)                                                      \
-   {_SS_si.nrestore++;                                                           \
-    SS_GC(x);                                                                \
-    x = *(object **) SC_array_pop(_SS_si.stack);                             \
-    if ((x->val == NULL) || (x->eval_type == NO_EV))                         \
+#  define SS_Restore(_si, _o)                                                \
+   {(_si)->nrestore++;                                                       \
+    SS_GC(_o);                                                               \
+    _o = *(object **) SC_array_pop((_si)->stack);                            \
+    if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
        SS_error("FREED OBJECT - SS_RESTORE", SS_null);}                       
 
 # else
 
-#  define SS_Restore(x)                                                      \
-   {_SS_si.nrestore++;                                                           \
-    SS_GC(x);                                                                \
-    x = *(object **) SC_array_pop(_SS_si.stack);}
+#  define SS_Restore(_si, _o)                                                \
+   {(_si)->nrestore++;                                                       \
+    SS_GC(_o);                                                               \
+    _o = *(object **) SC_array_pop((_si)->stack);}
 
 # endif
 #endif

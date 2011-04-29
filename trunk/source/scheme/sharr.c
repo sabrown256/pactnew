@@ -25,10 +25,13 @@ static object *_SSI_hash_install(object *argl)
     char *name;
     haelem *hp;
     hasharr *tab;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     name = NULL;
     obj  = SS_null;
-    tab  = _SS_si.symtab;
+    tab  = si->symtab;
     SS_args(argl,
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &obj,
@@ -58,9 +61,12 @@ static object *_SSI_hash_lookup(object *argl)
     hasharr *tab;
     void *vr;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     name = NULL;
-    tab  = _SS_si.symtab;
+    tab  = si->symtab;
     SS_args(argl,
 	    SC_STRING_I, &name,
 	    SS_HASHARR_I, &tab,
@@ -85,16 +91,19 @@ static object *_SSI_hash_remove(object *argl)
    {object *obj;
     char *name;
     hasharr *tab;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     name = NULL;
-    tab  = _SS_si.symtab;
+    tab  = si->symtab;
     SS_args(argl,
 	    SC_STRING_I, &name,
 	    SS_HASHARR_I, &tab,
 	    0);
 
 /* lookup up the object and do a SS_GC on it */
-    if (tab == _SS_si.symtab)
+    if (tab == si->symtab)
        {obj = (object *) SC_hasharr_def_lookup(tab, name);
 	if (obj != NULL)
 	   SS_GC(obj);};
@@ -118,8 +127,11 @@ object *SS_hash_dump(object *argl)
     char **names, *name, *patt;
     object *obj, *sort, *to;
     hasharr *tab;
+    SS_psides *si;
 
-    tab  = _SS_si.symtab;
+    si = &_SS_si;
+
+    tab  = si->symtab;
     patt = NULL;
     sort = SS_t;
 
@@ -168,8 +180,11 @@ static object *_SSI_hash_info(object *arg)
    {int64_t ne;
     object *obj, *flg;
     hasharr *tab;
+    SS_psides *si;
 
-    tab = _SS_si.symtab;
+    si = &_SS_si;
+
+    tab = si->symtab;
     SS_args(arg,
 	    SS_HASHARR_I, &tab,
 	    0);
@@ -341,7 +356,9 @@ static object *_SSI_haelemp(object *arg)
 /* _SS_INST_HASH - install the hasharr primitives for Scheme */
 
 void _SS_inst_hash(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SS_install("hash-dump",
                "Procedure: Return a list of the names in the given hash table",
@@ -384,8 +401,8 @@ void _SS_inst_hash(void)
                _SSI_make_hasharr, SS_PR_PROC);
 
 
-    SS_scheme_symtab = SS_mk_hasharr(_SS_si.symtab);
-    SC_hasharr_install(_SS_si.symtab, "system-hash-table", SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
+    SS_scheme_symtab = SS_mk_hasharr(si->symtab);
+    SC_hasharr_install(si->symtab, "system-hash-table", SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
     SS_UNCOLLECT(SS_scheme_symtab);
 
     return;}
