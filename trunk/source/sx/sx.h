@@ -924,12 +924,12 @@ extern int
 /* SXULIO.C declarations */
 
 extern object
- *SX_read_data(object *obj),
- *SX_read_ver1(object *obj),
+ *SX_read_data(SS_psides *si, object *obj),
+ *SX_read_ver1(SS_psides *si, object *obj),
  *SX_read_text_table(SS_psides *si, object *argl),
  *SX_table_curve(SS_psides *si, object *argl),
  *SX_table_attr(SS_psides *si),
- *SX_crv_file_info(object *obj),
+ *SX_crv_file_info(SS_psides *si, object *obj),
  *SX_write_data(SS_psides *si, object *argl);
 
 extern void

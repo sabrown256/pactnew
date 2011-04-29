@@ -666,7 +666,7 @@ int SX_curvep_b(object *obj)
 
 /* _SXI_CURVEOBJP - Scheme predicate testing for Ultra curves */
 
-object *_SXI_curveobjp(object *obj)
+object *_SXI_curveobjp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_curvep_a(obj) ? SS_t : SS_f;

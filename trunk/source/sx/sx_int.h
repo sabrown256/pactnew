@@ -229,7 +229,7 @@ extern void
 /* SXCRV.C declarations */
 
 extern object
- *_SXI_curveobjp(object *obj);
+ *_SXI_curveobjp(SS_psides *si, object *obj);
 
 
 /* SXEXT.C declarations */
@@ -266,8 +266,8 @@ extern int
  _SX_any_grotrianp(object *argl);
 
 extern object
- *_SXI_grotrian_mappingp(object *obj),
- *_SXI_grotrian_graphp(object *obj);
+ *_SXI_grotrian_mappingp(SS_psides *si, object *obj),
+ *_SXI_grotrian_graphp(SS_psides *si, object *obj);
 
 
 /* SXHAND.C declarations */
@@ -328,8 +328,8 @@ extern void
 /* SXPANW.C declarations */
 
 extern object
- *_SXI_display_pan_object(object *obj),
- *_SXI_desc_pan(object *obj);
+ *_SXI_display_pan_object(SS_psides *si, object *obj),
+ *_SXI_desc_pan(SS_psides *si, object *obj);
 
 
 /* SXPDB.C declarations */
@@ -377,7 +377,7 @@ extern object
 /* SXPDBF.C declarations */
 
 extern object
- *_SXI_find_types(object *arg);
+ *_SXI_find_types(SS_psides *si, object *arg);
 
 
 /* SXPDBL.C declarations */
@@ -429,7 +429,7 @@ extern void
 /* SXULIO.C declarations */
 
 extern object
- *_SXI_valid_ultra_filep(object *obj);
+ *_SXI_valid_ultra_filep(SS_psides *si, object *obj);
 
 
 #ifdef __cplusplus

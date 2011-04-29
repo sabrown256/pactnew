@@ -164,13 +164,10 @@ object *SS_hash_dump(SS_psides *si, object *argl)
 
 /* _SSI_HASH_INFO - hash-info at the Scheme level */
 
-static object *_SSI_hash_info(object *arg)
+static object *_SSI_hash_info(SS_psides *si, object *arg)
    {int64_t ne;
     object *obj, *flg;
     hasharr *tab;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     tab = si->symtab;
     SS_args(arg,
@@ -191,7 +188,7 @@ static object *_SSI_hash_info(object *arg)
 
 /* _SSI_MAKE_HASHARR - make-hash-table for Scheme */
 
-static object *_SSI_make_hasharr(object *arg)
+static object *_SSI_make_hasharr(SS_psides *si, object *arg)
    {int sz, typ;
     hasharr *tab;
     object *op;
@@ -319,7 +316,7 @@ object *SS_mk_haelem(haelem *hp)
 
 /* _SSI_HASHARRP - return #t if the given arg is a HASH_ARRAY */
 
-static object *_SSI_hasharrp(object *arg)
+static object *_SSI_hasharrp(SS_psides *si, object *arg)
    {object *o;
 
     o = (SS_hasharrp(arg)) ? SS_t : SS_f;
@@ -331,7 +328,7 @@ static object *_SSI_hasharrp(object *arg)
 
 /* _SSI_HAELEMP - return #t if the given arg is a HAELEM */
 
-static object *_SSI_haelemp(object *arg)
+static object *_SSI_haelemp(SS_psides *si, object *arg)
    {object *o;
 
     o = (SS_haelemp(arg)) ? SS_t : SS_f;

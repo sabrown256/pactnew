@@ -673,7 +673,7 @@ static object *_ULI_open_device(SS_psides *si, object *argl)
 
 /* _ULI_CLOSE_DEVICE - close the named graphics device for ULTRA */
 
-static object *_ULI_close_device(object *arg)
+static object *_ULI_close_device(SS_psides *si, object *arg)
    {int i;
     char *name;
     out_device *out;
@@ -1331,7 +1331,7 @@ static object *_ULI_average(SS_psides *si, object *s)
 
 /* _ULI_SYSTEM - exec a process */
 
-static object *_ULI_system(object *s)
+static object *_ULI_system(SS_psides *si, object *s)
    {char local[MAXLINE];
    
     strcpy(local, SS_get_string(s));
@@ -1346,7 +1346,7 @@ static object *_ULI_system(object *s)
 
 /* _ULI_SYSCMND - exec and process and return its output in a list */
 
-static object *_ULI_syscmnd(object *s)
+static object *_ULI_syscmnd(SS_psides *si, object *s)
    {char local[MAXLINE];
     int i;
     char **output = NULL;
@@ -1962,7 +1962,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
  *                 - y values from a given ULTRA curve
  */
 
-static object *_ULI_curve_list(object *arg)
+static object *_ULI_curve_list(SS_psides *si, object *arg)
    {int i, l, n;
     double *x[PG_SPACEDM];
     object *xvals, *yvals, *o;

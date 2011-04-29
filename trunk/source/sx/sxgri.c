@@ -304,7 +304,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
 
 /* _SXI_FREE_IOBS - remove all interface objects from the specified device */
 
-static object *_SXI_free_iobs(object *argl)
+static object *_SXI_free_iobs(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
@@ -395,7 +395,7 @@ object *SX_mk_iob(PG_interface_object *iob)
 
 /* _SXI_IOBP - function version of SX_INTERFACE_OBJECTP macro */
 
-static object *_SXI_iobp(object *obj)
+static object *_SXI_iobp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_INTERFACE_OBJECTP(obj) ? SS_t : SS_f;
@@ -407,7 +407,7 @@ static object *_SXI_iobp(object *obj)
 
 /* _SXI_TOGGLE_GRI - start the graphical interface window */
 
-static object *_SXI_toggle_gri(object *toggle)
+static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
    {int i, flag, sdx, sdy, nc;
     int *clrmd, *nlev, *mrki, *labcf, *labln, *labts;
     double ndc[PG_BOXSZ];
@@ -415,9 +415,6 @@ static object *_SXI_toggle_gri(object *toggle)
     double *axson, *axndec, *cntrat, *labsp, *mrks;
     char *s, *name, **axstf, **axslxf, **axslyf;
     out_device *out;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (PG_console_device == NULL)
        return(SS_f);

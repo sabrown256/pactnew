@@ -67,7 +67,7 @@ object *TR_read_bin(object *arg)
 
 /* TR_FILE_TYPE - return a string object containing the file type name */
 
-object *TR_file_type(object *arg)
+object *TR_file_type(SS_psides *si, object *arg)
    {g_file *po;
     PDBfile *file;
     object *o;
@@ -90,7 +90,7 @@ object *TR_file_type(object *arg)
 
 /* TR_SPOKEP - return #t iff the named spoke is present */
 
-static object *TR_spokep(object *arg)
+static object *TR_spokep(SS_psides *si, object *arg)
    {object *rv;
 
     rv = SS_f;

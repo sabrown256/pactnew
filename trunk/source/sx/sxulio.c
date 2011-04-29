@@ -275,7 +275,7 @@ static FILE *SX_open_for_reading(char *str, char *mode)
  *                        - input file
  */
 
-object *_SXI_valid_ultra_filep(object *obj)
+object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
    {FILE *fp;
     PDBfile *pfp;
     char fname[MAXLINE], *path;
@@ -523,7 +523,7 @@ static void SX_read_text(FILE *fp, char *fname)
  *              - and put it in the available space
  */
 
-object *SX_read_ver1(object *obj)
+object *SX_read_ver1(SS_psides *si, object *obj)
    {int j, k;
     char fname[MAXLINE], *path;
     FILE *fp;
@@ -611,9 +611,9 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_READ_DATA - Read data from file and put it in the available space */
+/* SX_READ_DATA - read data from file and put it in the available space */
 
-object *SX_read_data(object *obj)
+object *SX_read_data(SS_psides *si, object *obj)
    {int j, k;
     char fname[MAXLINE], *path;
     FILE *fp;
@@ -675,7 +675,7 @@ object *SX_read_data(object *obj)
 
 /* SX_CRV_FILE_INFO - report the basic info for a PDB file */
 
-object *SX_crv_file_info(object *obj)
+object *SX_crv_file_info(SS_psides *si, object *obj)
    {char fname[MAXLINE], *path;
     PDBfile *pfp;
     object *o;

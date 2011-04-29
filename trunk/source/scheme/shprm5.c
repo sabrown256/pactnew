@@ -79,7 +79,7 @@ static object *_SSI_mk_polarq(SS_psides *si, object *argl)
 
 /* _SSI_REAL_PARTQ - real-partq for Scheme */
 
-static object *_SSI_real_partq(object *argl)
+static object *_SSI_real_partq(SS_psides *si, object *argl)
    {quaternion q;
     object *o;
 
@@ -100,7 +100,7 @@ static object *_SSI_real_partq(object *argl)
 
 /* _SSI_IMAG_PARTQ - imag-partq for Scheme */
 
-static object *_SSI_imag_partq(object *argl)
+static object *_SSI_imag_partq(SS_psides *si, object *argl)
    {quaternion q;
     object *o;
 
@@ -121,7 +121,7 @@ static object *_SSI_imag_partq(object *argl)
 
 /* _SSI_JMAG_PART - jmag-partq for Scheme */
 
-static object *_SSI_jmag_partq(object *argl)
+static object *_SSI_jmag_partq(SS_psides *si, object *argl)
    {quaternion q;
     object *o;
 
@@ -142,7 +142,7 @@ static object *_SSI_jmag_partq(object *argl)
 
 /* _SSI_KMAG_PART - kmag-partq for Scheme */
 
-static object *_SSI_kmag_partq(object *argl)
+static object *_SSI_kmag_partq(SS_psides *si, object *argl)
    {quaternion q;
     object *o;
 
@@ -163,7 +163,7 @@ static object *_SSI_kmag_partq(object *argl)
 
 /* _SSI_MAGNITUDEQ - magnitudeq for Scheme */
 
-static object *_SSI_magnitudeq(object *argl)
+static object *_SSI_magnitudeq(SS_psides *si, object *argl)
    {double m;
     quaternion q;
     object *o;
@@ -189,7 +189,7 @@ static object *_SSI_magnitudeq(object *argl)
  *             -    ph = atan(sqrt(i*i + j*j + k*k)/s)
  */
 
-static object *_SSI_angleq(object *argl)
+static object *_SSI_angleq(SS_psides *si, object *argl)
    {double th;
     quaternion q;
     object *o;
@@ -215,7 +215,7 @@ static object *_SSI_angleq(object *argl)
  *             -    ph = atan(sqrt(j*j + k*k)/i)
  */
 
-static object *_SSI_colatq(object *argl)
+static object *_SSI_colatq(SS_psides *si, object *argl)
    {double ph;
     quaternion q;
     object *o;
@@ -241,7 +241,7 @@ static object *_SSI_colatq(object *argl)
  *            -    ch = atan(k/j)
  */
 
-static object *_SSI_longq(object *argl)
+static object *_SSI_longq(SS_psides *si, object *argl)
    {double ch;
     quaternion q;
     object *o;
@@ -264,7 +264,7 @@ static object *_SSI_longq(object *argl)
 
 /* _SSI_VERSORQ - versor operator for Scheme */
 
-static object *_SSI_versorq(object *argl)
+static object *_SSI_versorq(SS_psides *si, object *argl)
    {quaternion a, q;
     object *o;
 

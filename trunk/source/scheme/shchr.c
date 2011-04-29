@@ -15,7 +15,7 @@
 
 /* _SSI_CHARP - function version of SS_charobjp macro */
 
-static object *_SSI_charp(object *obj)
+static object *_SSI_charp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_charobjp(obj) ? SS_t : SS_f;
@@ -112,7 +112,7 @@ static object *_SSI_chrlt(SS_psides *si, object *argl)
 
 /* _SSI_CHRINT - char->integer for Scheme */
 
-static object *_SSI_chrint(object *chr)
+static object *_SSI_chrint(SS_psides *si, object *chr)
    {object *o;
 
     if (!SS_charobjp(chr))
@@ -127,7 +127,7 @@ static object *_SSI_chrint(object *chr)
 
 /* _SSI_INTCHR - integer->char for Scheme */
 
-static object *_SSI_intchr(object *obj)
+static object *_SSI_intchr(SS_psides *si, object *obj)
    {object *o;
 
     if (!SS_integerp(obj))

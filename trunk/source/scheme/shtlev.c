@@ -681,11 +681,8 @@ static object *_SSI_synonym(SS_psides *si, object *argl)
  *                  - Usage:  (string->object <string>)
  */
 
-object *SS_lookup_object(object *obj)
+object *SS_lookup_object(SS_psides *si, object *obj)
    {char *name, *vnm;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* take anything that will give a name - procedure, string, variable ... */
     name = NULL;
@@ -1239,7 +1236,7 @@ void SS_inst_prm(void)
     SS_install("defined?",
                "Special Form: returns #t if its argument has been defined in the current environment",
                SS_sargs,
-               SS_defp, SS_UR_MACRO);
+               _SSI_defp, SS_UR_MACRO);
 
     SS_install("display-object-table",
                "Procedure: Prints information about all known objects",

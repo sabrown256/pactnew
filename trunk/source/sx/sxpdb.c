@@ -647,7 +647,7 @@ object *_SX_open_file(object *arg, char *type, char *mode)
 
 /* _SXI_COLLECT_IO_INFO - return the file_io_desc stats */
 
-static object *_SXI_collect_io_info(object *arg)
+static object *_SXI_collect_io_info(SS_psides *si, object *arg)
    {int wh;
     object *o;
 
@@ -667,7 +667,7 @@ static object *_SXI_collect_io_info(object *arg)
 
 /* _SXI_GET_IO_INFO - return the file_io_desc stats */
 
-static object *_SXI_get_io_info(object *arg)
+static object *_SXI_get_io_info(SS_psides *si, object *arg)
    {int i;
     int *nh;
     double *ns;
@@ -699,7 +699,7 @@ static object *_SXI_get_io_info(object *arg)
 
 /* _SXI_CREATE_PDBFILE - create up the named PDBFile */
 
-static object *_SXI_create_pdbfile(object *arg)
+static object *_SXI_create_pdbfile(SS_psides *si, object *arg)
    {object *o;
 
     o = _SX_open_file(arg, PDBFILE_S, "w");
@@ -735,7 +735,7 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
 
 /* _SXI_FLUSH_PDBFILE - flush a PDBFile */
 
-static object *_SXI_flush_pdbfile(object *arg)
+static object *_SXI_flush_pdbfile(SS_psides *si, object *arg)
    {g_file *po;
     PDBfile *file;
     object *o;
@@ -758,7 +758,7 @@ static object *_SXI_flush_pdbfile(object *arg)
 
 /* _SXI_DEF_COMMON_TYPES - define common internal SX types to the file */
 
-static object *_SXI_def_common_types(object *arg)
+static object *_SXI_def_common_types(SS_psides *si, object *arg)
    {g_file *po;
     PDBfile *file;
 
@@ -1224,7 +1224,7 @@ object *_SX_pdbdata_to_list(char *name, void *vr, syment *ep, PDBfile *file)
  *                  -   pdbfile to (symtab chart headaddr symtaddr chrtaddr)
  */
 
-static object *_SXI_pdb_to_list(object *arg)
+static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
    {object *obj;
     g_pdbdata *pp;
 
@@ -1322,7 +1322,7 @@ static object *SX_close_file(object *arg)
  *                    - remove the object from SX_file_list
  */
 
-static object *_SXI_close_pdbfile(object *arg)
+static object *_SXI_close_pdbfile(SS_psides *si, object *arg)
    {object *o;
 
     o = SX_close_file(arg);
@@ -1349,7 +1349,7 @@ static object *_SXI_list_file(SS_psides *si)
 
 /* _SXI_PDBFP - Scheme level version of SX_pdbfilep function */
 
-static object *_SXI_pdbfp(object *obj)
+static object *_SXI_pdbfp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_pdbfilep(obj) ? SS_t : SS_f;
@@ -1361,7 +1361,7 @@ static object *_SXI_pdbfp(object *obj)
 
 /* _SXI_DEFP - function version of SX_DEFSTRP macro */
 
-static object *_SXI_defp(object *obj)
+static object *_SXI_defp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_DEFSTRP(obj) ? SS_t : SS_f;
@@ -1373,7 +1373,7 @@ static object *_SXI_defp(object *obj)
 
 /* _SXI_PDBDATAP - function version of SX_PDBDATAP macro */
 
-static object *_SXI_pdbdatap(object *obj)
+static object *_SXI_pdbdatap(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_PDBDATAP(obj) ? SS_t : SS_f;
@@ -1385,7 +1385,7 @@ static object *_SXI_pdbdatap(object *obj)
 
 /* _SXI_SYMP - function version of SX_SYMENTP macro */
 
-static object *_SXI_symp(object *obj)
+static object *_SXI_symp(SS_psides *si, object *obj)
    {object *o;
 
     o = SX_SYMENTP(obj) ? SS_t : SS_f;
@@ -1581,7 +1581,7 @@ static object *_SXI_file_dirp(SS_psides *si, object *argl)
 
 /* _SXI_CURRENT_DIRECTORY - return the current working directory in a file */
 
-static object *_SXI_current_directory(object *arg)
+static object *_SXI_current_directory(SS_psides *si, object *arg)
    {g_file *po;
     PDBfile *file;
     object *o;
@@ -3058,7 +3058,7 @@ static object *_SXI_to_pdbdata(SS_psides *si, object *argl)
  *                    - readable form.
  */
 
-static object *_SXI_desc_variable(object *obj)
+static object *_SXI_desc_variable(SS_psides *si, object *obj)
    {object *rv;
 
     if (!SX_PDBDATAP(obj))
@@ -3141,7 +3141,7 @@ object *_SX_make_dims_obj(dimdes *dims)
  *                      - (pdbdata->hash data)
  */
 
-static object *_SXI_pdbdata_to_hash(object *arg)
+static object *_SXI_pdbdata_to_hash(SS_psides *si, object *arg)
    {object *o;
 
     if (!SX_PDBDATAP(arg))

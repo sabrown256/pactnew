@@ -559,12 +559,9 @@ static object *_SSI_stats_toggle(SS_psides *si)
 
 /* _SSI_TRANS_ON - turn on a transcript of the Scheme session */
 
-static object *_SSI_trans_on(object *obj)
+static object *_SSI_trans_on(SS_psides *si, object *obj)
    {char *s;
     FILE *str;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     s = NULL;
     if (!SS_nullobjp(si->histdev))
@@ -608,7 +605,7 @@ object *SS_trans_off(SS_psides *si)
 
 /* _SSI_OPN_OUT - open-output-file in Scheme */
 
-static object *_SSI_opn_out(object *obj)
+static object *_SSI_opn_out(SS_psides *si, object *obj)
    {FILE *str;
     char *s;
     object *prt;
@@ -633,7 +630,7 @@ static object *_SSI_opn_out(object *obj)
 
 /* _SSI_CLS_OUT - close-output-file in Scheme */
 
-static object *_SSI_cls_out(object *obj)
+static object *_SSI_cls_out(SS_psides *si, object *obj)
    {
 
     if (!SS_outportp(obj))
@@ -671,7 +668,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
     old_outdev = si->outdev;
     si->outdev  = SS_mk_outport(str, s);
     ret        = SS_exp_eval(si, SS_cdr(argl));
-    _SSI_cls_out(si->outdev);
+    _SSI_cls_out(si, si->outdev);
     si->outdev = old_outdev;
 
     CFREE(s);
@@ -686,7 +683,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
 
 /* _SSI_OPORTP - output-port? at Scheme level */
 
-static object *_SSI_oportp(object *obj)
+static object *_SSI_oportp(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_outportp(obj) ? SS_t : SS_f;
@@ -757,7 +754,7 @@ int SS_prim_des(object *strm, object *obj)
     fmt = (SS_bound_name("format-expr") != SS_null);
 
 /* take anything that will give a name - procedure, string, variable ... */
-    obj = SS_lookup_object(obj);
+    obj = SS_lookup_object(si, obj);
 
     if (!SS_procedurep(obj))
        {if (SS_variablep(obj))

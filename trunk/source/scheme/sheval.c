@@ -635,7 +635,7 @@ ret_val:
 
 /* _SS_IDENT - dummy function necessary to make special forms work */
 
-static object *_SS_ident(object *obj)
+static object *_SS_ident(SS_psides *si, object *obj)
    {
 
     return(obj);}
@@ -645,11 +645,8 @@ static object *_SS_ident(object *obj)
 
 /* _SSI_EXP_EVAL - make an explicit interpreter level call to eval */
 
-static object *_SSI_exp_eval(object *obj)
+static object *_SSI_exp_eval(SS_psides *si, object *obj)
    {object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     rv = SS_exp_eval(si, obj);
 

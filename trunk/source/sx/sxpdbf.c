@@ -116,7 +116,7 @@ static void _SX_find_data(hasharr *tytab, PDBfile *file, void *vr,
 
 /* _SXI_FIND_TYPES - find all types used by this variable */
 
-object *_SXI_find_types(object *arg)
+object *_SXI_find_types(SS_psides *si, object *arg)
    {char *type;
     long nitems;
     void *vr;
@@ -124,9 +124,6 @@ object *_SXI_find_types(object *arg)
     object *args, *obj;
     PDBfile *file;
     syment *ep;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (!SX_PDBDATAP(arg))
        SS_error("MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
