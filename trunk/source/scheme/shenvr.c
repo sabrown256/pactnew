@@ -118,29 +118,32 @@ void _SS_eval_err(void)
 
 /* SS_EXP_EVAL - make an explicit interpreter level call to eval */
 
-object *SS_exp_eval(object *obj)
+object *SS_exp_eval(SS_psides *si, object *obj)
    {
 
-    SS_Assign(_SS_si.exn, obj);
+    SS_Assign(si->exn, obj);
 
-    _SS_eval();
+    _SS_eval(si);
 
-    return(_SS_si.val);}
+    return(si->val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SS_EVAL - make an implicit C level call to eval */
 
-object *SS_eval(object *obj)
+object *SS_eval(SS_psides *si, object *obj)
    {
 
-    SS_Assign(_SS_si.exn, obj);
-    SS_Assign(_SS_si.env, _SS_si.global_env);
+    if (si == NULL)
+       si = &_SS_si;
 
-    _SS_eval();
+    SS_Assign(si->exn, obj);
+    SS_Assign(si->env, si->global_env);
 
-    return(_SS_si.val);}
+    _SS_eval(si);
+
+    return(si->val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -713,11 +716,12 @@ object *_SS_lk_var_valc(char *name, object *penv)
 
 /* SS_LK_VAR_VAL - look up the variable in the environment */
 
-object *SS_lk_var_val(object *vr, object *penv)
+object *SS_lk_var_val(SS_psides *si, object *vr)
    {char *name;
     char s[MAXLINE];
-    object *obj;
+    object *obj, *penv;
 
+    penv = si->env;
     name = SS_VARIABLE_NAME(vr);
     obj  = _SS_lk_var_valc(name, penv);
 
@@ -804,17 +808,20 @@ void SS_def_var(object *vr, object *vl, object *penv)
  *             - to the environment frame PENV
  */
 
-void SS_env_vars(char **vrs, object *penv)
+void SS_env_vars(SS_psides *si, char **vrs, object *penv)
    {int i, nc;
     char *s, *p, *vr;
     object *vl;
+
+    if (si == NULL)
+       si = &_SS_si;
 
     if (vrs == NULL)
        vrs = SC_get_env();
 
     if (vrs != NULL)
        {if (penv == NULL)
-	   penv = _SS_si.global_env;
+	   penv = si->global_env;
 
 	for (i = 0; vrs[i] != NULL; i++)
 	    {s = vrs[i];
@@ -833,7 +840,7 @@ void SS_env_vars(char **vrs, object *penv)
 		 *p  = '=';
 		 CFREE(vr);};};};
 
-    _SS_si.know_env = TRUE;
+    si->know_env = TRUE;
 
     return;}
 

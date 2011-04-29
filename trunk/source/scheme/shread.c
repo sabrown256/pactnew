@@ -544,7 +544,7 @@ static object *_SSI_call_if(object *argl)
 
     old_indev = _SS_si.indev;
     _SS_si.indev  = SS_mk_inport(str, s);
-    ret       = SS_exp_eval(SS_cdr(argl));
+    ret       = SS_exp_eval(&_SS_si, SS_cdr(argl));
 
     _SSI_cls_in(_SS_si.indev);
 
@@ -831,7 +831,7 @@ object *SS_load(object *argl)
 	    SS_GC(strm);
             break;};
         SS_Save(_SS_si.env);
-        SS_Assign(_SS_si.evobj, SS_exp_eval(_SS_si.rdobj));
+        SS_Assign(_SS_si.evobj, SS_exp_eval(&_SS_si, _SS_si.rdobj));
         SS_Restore(_SS_si.env);
 
         if (_SS_si.post_eval != NULL)

@@ -42,6 +42,9 @@ int main(int c, char **v, char **env)
    {int i, lsch, ret;
     int rfl, cfl, qfl, trerr;
     char *cmnd;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_init("Aborting with error", SS_end_scheme,
             TRUE, SS_interrupt_handler,
@@ -55,7 +58,7 @@ int main(int c, char **v, char **env)
     SS_set_prompt("Scheme-> ");
     _SS_si.trap_error = FALSE;
 
-    SS_env_vars(env, NULL);
+    SS_env_vars(si, env, NULL);
 
 /* initialize the available syntax modes */
     DEF_SYNTAX_MODES();

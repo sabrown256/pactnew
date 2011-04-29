@@ -48,7 +48,7 @@ static char
 
 /* _UL_RD_SCM - do a SCHEME level rd with error protection */
 
-int _UL_rd_scm(void)
+int _UL_rd_scm(SS_psides *si)
    {
 
     SS_call_scheme("rd",
@@ -67,7 +67,7 @@ int UL_rd_scm(char *name)
 
     strcpy(_UL_bf, name);
 
-    rv = SS_err_catch(_UL_rd_scm, NULL);
+    rv = SS_err_catch(_UL_rd_scm, NULL, NULL);
 
     return(rv);}
 

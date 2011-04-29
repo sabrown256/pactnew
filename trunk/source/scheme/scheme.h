@@ -71,6 +71,13 @@ enum e_SS_eval_mode
 
 typedef enum e_SS_eval_mode SS_eval_mode;
 
+enum e_SS_io_logging
+   {STDIN_ONLY,
+    ALL,
+    NO_LOG};
+
+typedef enum e_SS_io_logging SS_io_logging;
+
 
 /* Generic object definition */
 
@@ -87,7 +94,6 @@ struct s_object
 FUNCTION_POINTER(object, (*PFObject));
 FUNCTION_POINTER(object, *(*PFPObject));
 
-typedef enum e_SS_io_logging SS_io_logging;
 typedef struct s_SS_input_port input_port;
 typedef struct s_SS_output_port output_port;
 typedef struct s_SS_cons cons;
@@ -101,6 +107,7 @@ typedef struct s_SS_C_proc C_procedure;
 typedef struct s_SS_S_proc S_procedure;
 typedef struct s_SS_proc procedure;
 typedef struct s_SS_vect vector;
+typedef struct s_SS_psides SS_psides;
 
 typedef object *(*PFPHand)(C_procedure *cp, object *argl);
 typedef void (*PFNameReproc)(char *s, char *name);
@@ -129,10 +136,72 @@ typedef object *(*PFCallArg)(int type, void *v);
        SS_error("COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT",        \
                 SS_null);}
 
-enum e_SS_io_logging
-   {STDIN_ONLY,
-    ALL,
-    NO_LOG};
+struct s_SS_psides
+   {int interactive;
+    int trace_env;
+    int know_env;
+    int trap_error;
+    int lines_page;
+    int print_flag;
+    int stat_flag;
+    int bracket_flag;
+    int nsave;
+    int nrestore;
+    int nsetc;
+    int ngoc;
+    int stack_size;
+    int stack_mask;
+    int cont_ptr;
+    int err_cont_ptr;
+    int errlev;
+    int eox;
+    int strict_c;
+
+    char prompt[MAXLINE];
+    char ans_prompt[MAXLINE];
+    char *lex_text;
+
+    continuation *continue_int;
+    err_continuation *continue_err;
+
+    SC_array *stack;
+
+    hasharr *symtab;
+    hasharr *types;
+
+    SS_io_logging hist_flag;
+
+    object *indev;
+    object *outdev;
+    object *histdev;
+    object *this;
+    object *val;
+    object *unev;
+    object *exn;
+    object *argl;
+    object *fun;
+    object *env;
+    object *global_env;
+    object *err_state;
+    object **err_stack;
+    object *rdobj;
+    object *evobj;
+    object *character_stream;
+
+    PFNameReproc name_reproc;
+    PFSSRead read;
+    PFCallArg call_arg;
+    PFPostRead post_read;
+    PFPostEval post_eval;
+    PFPostPrint post_print;
+    PFExtractArg get_arg;
+
+    PFPrGetS pr_gets;
+    PFPrChOut pr_ch_out;
+    PFPrChUn pr_ch_un;
+
+    JMP_BUF cpu;};
+
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -831,6 +900,7 @@ extern int
 /* SHENVR.C declarations */
 
 extern object
+ *SS_exp_eval(SS_psides *si, object *obj),
  *SS_zargs(C_procedure *cp, object *argl),
  *SS_sargs(C_procedure *cp, object *argl),
  *SS_nargs(C_procedure *cp, object *argl),
@@ -838,7 +908,7 @@ extern object
  *SS_bound_name(char *name),
  *SS_mk_new_frame(object *name, hasharr *tab),
  *SS_defp(object *vr),
- *SS_lk_var_val(object *vr, object *penv),
+ *SS_lk_var_val(SS_psides *si, object *vr),
  *SS_bind_env(object *vr, object *penv);
 
 extern char
@@ -849,14 +919,13 @@ extern void
  SS_restore_registers(int vp),
  SS_set_var(object *vr, object *vl, object *penv),
  SS_def_var(object *vr, object *vl, object *penv),
- SS_env_vars(char **vrs, object *penv);
+ SS_env_vars(SS_psides *si, char **vrs, object *penv);
 
 
 /* SHEVAL.C declarations */
 
 extern object
- *SS_exp_eval(object *obj),
- *SS_eval(object *obj),
+ *SS_eval(SS_psides *si, object *obj),
  *SS_params(object *fun),
  *SS_proc_body(object *fun),
  *SS_proc_env(object *fun),
@@ -1054,7 +1123,7 @@ extern object
 
 extern int
  SS_set_scheme_env(char *exepath, char *path),
- SS_err_catch(PFInt func, PFInt errf);
+ SS_err_catch(int (*fint)(SS_psides *si), SS_psides *si, PFInt errf);
 
 extern char
  *SS_object_type_name(object *o, char *atype);

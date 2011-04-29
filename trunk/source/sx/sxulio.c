@@ -1280,7 +1280,7 @@ object *SX_write_data(object *argl)
 /* flatten out the curve list */
     frst = SS_car(argl);
     if (strcmp(SS_get_string(frst), "thru") == 0)
-       argl = SS_exp_eval(argl);
+       argl = SS_exp_eval(&_SS_si, argl);
 
     switch (imode)
        {case SC_ASCII :

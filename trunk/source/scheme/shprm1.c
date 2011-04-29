@@ -58,7 +58,7 @@ static object *_SSI_quote(object *obj)
 static object *_SS_unquote(object *x)
    {
 
-    x = SS_exp_eval(SS_cadr(x));
+    x = SS_exp_eval(&_SS_si, SS_cadr(x));
 
     return(x);}
 
@@ -185,7 +185,7 @@ static object *_SSI_quasiq(object *obj)
 static object *_SSI_unquote(object *obj)
    {object *o;
 
-    o = SS_exp_eval(obj);
+    o = SS_exp_eval(&_SS_si, obj);
 
     return(o);}
 
@@ -197,7 +197,7 @@ static object *_SSI_unquote(object *obj)
 static object *_SSI_unq_spl(object *obj)
    {object *o;
 
-    o = SS_exp_eval(obj);
+    o = SS_exp_eval(&_SS_si, obj);
 
     return(o);}
 
@@ -517,7 +517,7 @@ static object *_SSI_map(object *obj)
              SS_Assign(expr, SS_mk_cons(proc, args));};
          SS_Assign(argl, SS_cdr(vl));
          SS_Save(_SS_si.env);
-         SS_end_cons(ret, ret_nxt, SS_exp_eval(expr));
+         SS_end_cons(ret, ret_nxt, SS_exp_eval(&_SS_si, expr));
          SS_Restore(_SS_si.env);};
 
 /* clean up the mess */
@@ -556,7 +556,7 @@ static object *_SSI_foreach(object *obj)
              SS_Assign(expr, SS_mk_cons(proc, args));};
          SS_Assign(argl, SS_cdr(vl));
          SS_Save(_SS_si.env);
-         SS_exp_eval(expr);
+         SS_exp_eval(&_SS_si, expr);
          SS_Restore(_SS_si.env);};
 
 /* clean up the mess */
@@ -917,7 +917,7 @@ static object *_SSI_catch(object *obj)
 /* Use the fact that SS_Assign(_SS_si.exn, obj) is done in SS_eval to provide the
  * only reference to lst so that GC is done properly
  */
-    ret = SS_exp_eval(lst);
+    ret = SS_exp_eval(&_SS_si, lst);
 
     return(ret);}
 
@@ -952,7 +952,7 @@ static object *_SSI_catch_err(object *argl)
 	     SS_set_print_err_func(_SS.oph, FALSE);
 
 	     err_ev = SS_mk_cons(err_proc, _SS_si.err_state);
-	     ret    = SS_exp_eval(err_ev);
+	     ret    = SS_exp_eval(&_SS_si, err_ev);
 	     break;
 
         case RETURN_OK :
@@ -960,7 +960,7 @@ static object *_SSI_catch_err(object *argl)
 	     break;
 
         default :
-	     ret = SS_exp_eval(proc_call);
+	     ret = SS_exp_eval(&_SS_si, proc_call);
 
         case ERR_FREE :
 	     esc = SS_pop_err(_SS_si.errlev - 1, FALSE);

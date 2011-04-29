@@ -657,7 +657,7 @@ object *_SSI_call_of(object *argl)
 
     old_outdev = _SS_si.outdev;
     _SS_si.outdev  = SS_mk_outport(str, s);
-    ret        = SS_exp_eval(SS_cdr(argl));
+    ret        = SS_exp_eval(&_SS_si, SS_cdr(argl));
     _SSI_cls_out(_SS_si.outdev);
     _SS_si.outdev = old_outdev;
 
@@ -745,7 +745,7 @@ int SS_prim_des(object *strm, object *obj)
 
     if (!SS_procedurep(obj))
        {if (SS_variablep(obj))
-           {desc = SS_lk_var_val(obj, _SS_si.env);
+           {desc = SS_lk_var_val(&_SS_si, obj);
             if (SS_procedurep(desc))
                obj = desc;
 	    else
