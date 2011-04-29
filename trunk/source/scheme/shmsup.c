@@ -137,10 +137,8 @@ object *SS_syntax_m(object *str)
 
 /* SS_M_MODE - switch to BASIS syntax parsing */
 
-static object *SS_m_mode(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *SS_m_mode(SS_psides *si)
+   {
 
     snprintf(si->prompt, MAXLINE, "M-> ");
     si->read        = SS_syntax_m;
@@ -217,8 +215,8 @@ void SS_init_m_syntax_mode(void)
 	SS_add_type_synt("indirect");
 	SS_add_type_synt("double precision");
 
-	SS_add_parser(".m", (PFPObject) SS_m_mode);
-	SS_add_parser(".v", (PFPObject) SS_m_mode);
+	SS_add_parser(".m", SS_m_mode);
+	SS_add_parser(".v", SS_m_mode);
 
 	si->eox                   = TRUE;
 	_SS_mps.diagnose_grammar = FALSE;

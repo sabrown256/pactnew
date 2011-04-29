@@ -1243,7 +1243,7 @@ static int _SC_process_lost(PROCESS *pp)
 
 	    idle = TRUE;
 
-/* do not worry until the job has run more than a minute */
+/* do not worry until the job has run more than a 60 seconds */
 	    if (ft < 0.0)
 	       {ft = SC_stof(getenv("SC_EXEC_LOST_TIME"));
 		if (ft == 0.0)
@@ -1251,7 +1251,7 @@ static int _SC_process_lost(PROCESS *pp)
 	    idle &= (t > ft);
 
 /* do not kill off shell scripts which are mostly idle
- * it must have run at least 10% of its lifetime to be considered lost
+ * it must have been idle more than 90% of its lifetime to be considered lost
  */
 	    if (fit < 0.0)
 	       {fit = SC_stof(getenv("SC_EXEC_LOST_IDLE"));
@@ -1259,18 +1259,18 @@ static int _SC_process_lost(PROCESS *pp)
 		   fit = 0.9;};
 	    idle &= (ift < fit);
 
-/* kill off process that has been idle for the last half of its life */
+/* kill off process that has been idle for the last 50% of its life */
 	    if (fis < 0.0)
 	       {fis = SC_stof(getenv("SC_EXEC_LOST_SINCE"));
 		if (fis == 0.0)
 		   fis = 0.5;};
 	    idle &= (ifs > fis);
 
-/* do not kill off servers unless they have greatly exceeded the heartbeat */
+/* do not kill off servers unless they have lost at least 5 heartbeats */
 	    if (fih < 0.0)
 	       {fih = SC_stof(getenv("SC_EXEC_LOST_BEATS"));
 		if (fih == 0.0)
-		   fih = 2.5;};
+		   fih = 5.0;};
 	    idle &= (ifh > fih);};};
 
 /* log lost processes which can be extremely hard to find without this info */

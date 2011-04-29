@@ -23,7 +23,7 @@
        {_n = SS_STRING_TEXT(_v);                                            \
         SC_ASSERT(_n != NULL);};}
 
-typedef object *(*PFZargs)(void);
+typedef object *(*PFZargs)(SS_psides *si);
 typedef object *(*PFSargs)(object *argl);
 
 char
@@ -36,11 +36,11 @@ char
  *       - this is a debugging aide solely
  */
 
-void dproc(object *pp)
+void dproc(SS_psides *si, object *pp)
    {object *name, *params, *penv, *bdy;
-    SS_psides *si;
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
     if (SS_procedurep(pp))
        {name   = SS_proc_name(pp);
@@ -63,15 +63,15 @@ void dproc(object *pp)
  *       - this is a debugging aide solely
  */
 
-void dpenv(object *penv)
+void dpenv(SS_psides *si, object *penv)
    {int i, ie, n, nx;
     char pre[MAXLINE];
     char *fname, **lines;
     hasharr *tab;
     object *b;
-    SS_psides *si;
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
     if (penv == NULL)
        penv = si->env;
@@ -104,20 +104,6 @@ void dpenv(object *penv)
 		     SS_print(b, pre, "\n", si->outdev);};
 
 		 CFREE(lines);};};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SS_EVAL_ERR - handle error returns during an eval */
-
-void _SS_eval_err(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
-
-    SS_Assign(si->val, SS_f);
 
     return;}
 
@@ -222,10 +208,10 @@ int SS_true(object *obj)
 
 /* SS_ZARGS - zero argument macro/procedure handler */
 
-object *SS_zargs(C_procedure *cp, object *argl)
+object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
 
-    o = (*(PFZargs) cp->proc[0])();
+    o = (*(PFZargs) cp->proc[0])(si);
 
     return(o);}
 
@@ -234,7 +220,7 @@ object *SS_zargs(C_procedure *cp, object *argl)
 
 /* SS_SARGS - single argument macro/procedure handler */
 
-object *SS_sargs(C_procedure *cp, object *argl)
+object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
 
     o = (*(PFSargs) cp->proc[0])(SS_car(argl));
@@ -246,7 +232,7 @@ object *SS_sargs(C_procedure *cp, object *argl)
 
 /* SS_NARGS - n argument macro/procedure handler */
 
-object *SS_nargs(C_procedure *cp, object *argl)
+object *SS_nargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
 
     o = (*(PFSargs) cp->proc[0])(argl);
@@ -258,7 +244,7 @@ object *SS_nargs(C_procedure *cp, object *argl)
 
 /* SS_ZNARGS - zero or more arguments macro/procedure handler */
 
-object *SS_znargs(C_procedure *cp, object *argl)
+object *SS_znargs(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
 
     o = (*(PFSargs) cp->proc[0])(argl);
@@ -447,7 +433,7 @@ object *SS_do_bindings(object *pp, object *argp)
     nenv   = SS_xtnd_env(name, params, argp, penv);
 
     if ((si->trace_env > 0) && (!SS_nullobjp(params)))
-       dpenv(nenv);
+       dpenv(si, nenv);
 
     return(nenv);}
 
@@ -722,6 +708,9 @@ object *SS_defp(object *vr)
 
 object *_SS_lk_var_valc(char *name, object *penv)
    {object *b, *obj;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     obj = SS_null;
     b   = _SS_bind_envc(name, penv);
@@ -732,7 +721,7 @@ object *_SS_lk_var_valc(char *name, object *penv)
  * procedure object
  */
     else
-       {b = SS_INQUIRE_OBJECT(name);
+       {b = SS_INQUIRE_OBJECT(si, name);
         if (b != NULL)
            obj = SS_VARIABLE_VALUE(b);
 
@@ -880,11 +869,13 @@ void SS_env_vars(SS_psides *si, char **vrs, object *penv)
 /* _SS_INIT_THREAD - init state SA for thread ID */
 
 static void _SS_init_thread(SS_smp_state *sa, int id)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     sa->parser = _SSI_scheme_mode;
 
-    _SSI_scheme_mode();
+    _SSI_scheme_mode(si);
 
     return;}
 

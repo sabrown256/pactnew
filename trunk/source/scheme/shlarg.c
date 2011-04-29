@@ -253,7 +253,7 @@ static object *_SSI_sleep(object *obj)
 
 /* _SSI_GETCWD - return the value of the current working directory */
 
-static object *_SSI_getcwd(void)
+static object *_SSI_getcwd(SS_psides *si)
    {char *vr;
     object *wd;
 
@@ -454,7 +454,7 @@ static object *_SSI_get_pname(object *obj)
 
 /* _SSI_LOAD_AVE - return the load averages for the current host */
 
-static object *_SSI_load_ave(void)
+static object *_SSI_load_ave(SS_psides *si)
    {int rv;
     double av[3];
     object *s;
@@ -475,7 +475,7 @@ static object *_SSI_load_ave(void)
 
 /* _SSI_FREE_MEM - return free memory info */
 
-static object *_SSI_free_mem(void)
+static object *_SSI_free_mem(SS_psides *si)
    {int rv;
     double mem[2];
     object *s;
@@ -495,7 +495,7 @@ static object *_SSI_free_mem(void)
 
 /* _SSI_GET_NCPU - return the number of cpus */
 
-static object *_SSI_get_ncpu(void)
+static object *_SSI_get_ncpu(SS_psides *si)
    {int rv;
     object *s;
 
@@ -565,7 +565,7 @@ object *_SSI_fclose(object *obj)
 
 /* _SSI_WALL_CLOCK_TIME - return the accumulated wall clock time in seconds */
 
-static object *_SSI_wall_clock_time(void)
+static object *_SSI_wall_clock_time(SS_psides *si)
    {object *ret;
 
     ret = SS_mk_float(SC_wall_clock_time());
@@ -577,7 +577,7 @@ static object *_SSI_wall_clock_time(void)
 
 /* _SSI_MEM_USG - return the memory usage info */
 
-static object *_SSI_mem_usg(void)
+static object *_SSI_mem_usg(SS_psides *si)
    {long a, f, d;
     object *ret;
 
@@ -651,7 +651,7 @@ static object *_SSI_mem_monitor(object *arg)
 
 /* _SSI_MEM_TRACE - wrapper around SC_mem_check */
 
-static object *_SSI_mem_trace(void)
+static object *_SSI_mem_trace(SS_psides *si)
    {int64_t nb;
     object *o;
 
@@ -665,7 +665,7 @@ static object *_SSI_mem_trace(void)
 
 /* _SSI_MEM_CHK - wrapper around SC_mem_check */
 
-static object *_SSI_mem_chk(void)
+static object *_SSI_mem_chk(SS_psides *si)
    {int64_t na, nf, nr;
     object *o;
 
@@ -750,11 +750,8 @@ static object *_SSI_retrace(object *arg)
 
 /* _SSI_INTERACTP - interactive mode predicate */
 
-static object *_SSI_interactp(void)
+static object *_SSI_interactp(SS_psides *si)
    {object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     o = si->interactive ? SS_t : SS_f;
 

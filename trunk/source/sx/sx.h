@@ -735,7 +735,7 @@ extern object
  *SX_mk_curve(int na, double *xa, double *ya, 
 	      char *label, char *filename, PFVoid fnc),
  *SX_set_crv_id(int i, char *id),
- *SX_re_id(void),
+ *SX_re_id(SS_psides *si),
  *SX_get_data_domain(object *argl),
  *SX_get_data_range(object *argl),
  *SX_rl_curve(int j);
@@ -928,7 +928,7 @@ extern object
  *SX_read_ver1(object *obj),
  *SX_read_text_table(object *argl),
  *SX_table_curve(object *argl),
- *SX_table_attr(void),
+ *SX_table_attr(SS_psides *si),
  *SX_crv_file_info(object *obj),
  *SX_write_data(object *argl);
 

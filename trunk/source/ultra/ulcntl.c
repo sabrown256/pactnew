@@ -137,7 +137,7 @@ static void _UL_print_out_device(int idev)
 
 /* _ULI_PRINTSCR - dump the screen to the printer */
 
-object *_ULI_printscr(void)
+object *_ULI_printscr(SS_psides *si)
    {int i;
 
     for (i = 0; i < N_OUTPUT_DEVICES; i++)
@@ -394,6 +394,9 @@ static void UL_draw_plot(PG_device *dev)
 
 object *UL_plot(void)
    {double labsp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     PG_get_attrs_glb(TRUE,
 		     "label-space", &labsp,
@@ -403,8 +406,8 @@ object *UL_plot(void)
        {if (_SX.last_state != labsp)
            {UL_window_height_factor = (1.0 + labsp)/(1.0 + _SX.last_state);
             _SX.last_state = labsp;
-            UL_mode_text();
-            UL_mode_graphics();};
+            UL_mode_text(si);
+            UL_mode_graphics(si);};
 
         UL_set_graphics_state(SX_graphics_device);
         UL_draw_plot(SX_graphics_device);};

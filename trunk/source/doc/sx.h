@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 04/06/2011
+MOD: 04/29/2011
 
 <CENTER>
 <P>
@@ -2604,7 +2604,7 @@ The following are available with the LARGE option (default):<p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD WIDTH="150">SS_set_cont(to_go, to_return)</TD>
+<TR><TD WIDTH="150">SS_set_cont(_si, _go, _return)</TD>
 <TD>setup a new continuation </TD></TR>
 <TR><TD>SS_go_cont</TD>
 <TD>go to the current continuation </TD></TR>
@@ -2622,7 +2622,7 @@ The following are available with the LARGE option (default):<p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD WIDTH="100">SS_Save(x)</TD>
+<TR><TD WIDTH="100">SS_Save(si, x)</TD>
 <TD>save x on the stack </TD></TR>
 <TR><TD>SS_Restore(x)</TD>
 <TD>pop an object off the stack into x and release
@@ -2644,10 +2644,6 @@ the stack entry </TD></TR>
 <TD>string containing &#147;object&#148; </TD></TR>
 <TR><TD>SS_POBJECT_S</TD>
 <TD>string containing &#147;object *&#148; </TD></TR>
-<TR><TD>_SS_si.prompt</TD>
-<TD>the prompt which is displayed by the interpreter </TD></TR>
-<TR><TD>_SS_si.ans_prompt</TD>
-<TD>the preamble to the interpreter&#146;s printing of the result </TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 
@@ -2660,11 +2656,11 @@ the stack entry </TD></TR>
 <TABLE>
 <TR><TD WIDTH="150">SS_quoteproc</TD>
 <TD>pointer to the quote procedure</TD></TR>
-<TR><TD>_SS_si.indev</TD>
+<TR><TD>si->indev</TD>
 <TD>pointer to the standard input port object (stdin equivalent)</TD></TR>
-<TR><TD>_SS_si.outdev</TD>
+<TR><TD>si->outdev</TD>
 <TD>pointer to the standard output port object (stdout equivalent)</TD></TR>
-<TR><TD>_SS_si.histdev</TD>
+<TR><TD>si->histdev</TD>
 <TD>pointer to the history output port object (see transcript)</TD></TR>
 <TR><TD>SS_null</TD>
 <TD>pointer to the () object</TD></TR>
@@ -2692,9 +2688,11 @@ interfacing compiled and interpreted code.<p>
 
 <B></B>
 <BLOCKQUOTE>
-object *SS_zargs(object *argl)
-<P>object *SS_sargs(object *argl)
-<P>object *SS_nargs(object *argl)
+object *SS_zargs(SS_psides *si, C_procedure *cp, object *argl)
+<P>
+object *SS_sargs(object *argl)
+<P>
+object *SS_nargs(object *argl)
 </BLOCKQUOTE>
 </B>
 

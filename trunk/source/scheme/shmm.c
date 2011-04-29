@@ -509,14 +509,6 @@ void SS_gc(object *obj)
 /*                                MONITORS                                  */
 
 /*--------------------------------------------------------------------------*/
-
-/* SS_PR_OBJ_MAP - dump the list of objects and associated info */
-
-object *SS_pr_obj_map(void)
-   {
-
-    return(SS_f);}
-
 /*--------------------------------------------------------------------------*/
 
 /*                                PRINTERS                                  */

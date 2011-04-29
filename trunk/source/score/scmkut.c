@@ -807,6 +807,11 @@ int main(int c, char **v, char **env)
 /* cleanup */
 	phase = 4;
 
+	if (SC_gs.assert_fail > 0)
+	   {io_printf(stdout, "***> %d internal assertions violated\n",
+		      SC_gs.assert_fail);
+/*	    st = 1; */};
+
 	CFREE(shell);
 	if (cmnds != NULL)
 	   SC_free_strings(cmnds);};

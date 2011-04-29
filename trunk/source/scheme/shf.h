@@ -121,7 +121,7 @@ extern object
  *SS_parse_token_val_f(void);
 
 extern void
- SS_init_f_syntax_mode(void);
+ SS_init_f_syntax_mode(SS_psides *si);
 
 extern int
  SS_lookup_identifier_f(char *txt, object **lval),

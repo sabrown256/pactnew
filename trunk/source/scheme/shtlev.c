@@ -289,7 +289,7 @@ void SS_end_scheme(int val)
     si = &_SS_si;
 
     if (!SS_nullobjp(si->histdev))
-       SS_trans_off();
+       SS_trans_off(si);
 
     if (_SS.active_objects == TRUE)
        _SS_object_map(stdout, TRUE);
@@ -839,10 +839,8 @@ void _SS_restore_state(object *esc_proc)
  *            - create a higher level REPL and push on
  */
 
-static object *_SSI_break(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *_SSI_break(SS_psides *si)
+   {
 
     SS_Save(si, si->evobj);
     SS_Save(si, si->rdobj);
@@ -859,10 +857,8 @@ static object *_SSI_break(void)
 
 /* _SSI_RESET - unwind the error/break stack and return to top level */
 
-static object *_SSI_reset(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *_SSI_reset(SS_psides *si)
+   {
 
     _SS_restore_state_prim(0, 1, 0);
     PRINT(stdout,"\n");
@@ -954,7 +950,7 @@ void SS_interrupt_handler(int sig)
 
         case 'a' :
 	     PRINT(stdout, "\nResetting\n\n");
-	     _SSI_reset();
+	     _SSI_reset(si);
 	     break;
 
         case 'b' :
@@ -962,7 +958,7 @@ void SS_interrupt_handler(int sig)
 	     t = SS_BUFFER(si->indev);
 	     SS_PTR(si->indev) = t;
 	     *t = '\0';
-	     _SSI_break();
+	     _SSI_break(si);
 	     break;
 
         case 'u' :
@@ -1220,6 +1216,16 @@ static object *_SSI_syscmnd(object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_PR_OBJ_MAP - dump the list of objects and associated info */
+
+static object *_SSI_pr_obj_map(SS_psides *si)
+   {
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_INST_PRM - install the Scheme primitives */
 
 void SS_inst_prm(void)
@@ -1243,7 +1249,7 @@ void SS_inst_prm(void)
     SS_install("display-object-table",
                "Procedure: Prints information about all known objects",
                SS_zargs,
-               SS_pr_obj_map, SS_PR_PROC);
+               _SSI_pr_obj_map, SS_PR_PROC);
 
     SS_install("list",
                "Return a new list made up of the arguments",
