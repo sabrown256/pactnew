@@ -27,12 +27,15 @@ typedef PM_mapping *(*PF_PPM_mapping_2)(PM_mapping *f, object **argl);
 int SX_have_display_list(void)
    {object *var, *pl;
     int plf;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     plf = FALSE;
 
-    var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "display-mapping*");
+    var = (object *) SC_hasharr_def_lookup(si->symtab, "display-mapping*");
     if (var != NULL)
-       {pl  = SS_lk_var_val(&_SS_si, var);
+       {pl  = SS_lk_var_val(si, var);
 	plf = SS_procedurep(pl);};
 
     return(plf);}
@@ -69,18 +72,21 @@ object *SX_display_map(object *mo)
 
 static object *_SX_resolve_mapping(object *argl)
    {object *obj, *fo, *var, *fnc;
+    SS_psides *si;
 
-    SS_Save(_SS_si.argl);
+    si = &_SS_si;
+
+    SS_Save(si, si->argl);
 
     obj = SS_car(argl);
     fo  = obj;
 
-    var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "map-resolve");
+    var = (object *) SC_hasharr_def_lookup(si->symtab, "map-resolve");
     if (var != NULL)
-       {fnc = SS_lk_var_val(&_SS_si, var);
+       {fnc = SS_lk_var_val(si, var);
 	if (SS_procedurep(fnc))
 
-/* NOTE: the way this is called argl will end up in _SS_si.this and will be
+/* NOTE: the way this is called argl will end up in si->this and will be
  * freed if this path is taken, so add the mark that tells it that
  * someone else it pointing at it
  */
@@ -90,7 +96,7 @@ static object *_SX_resolve_mapping(object *argl)
 				SS_OBJECT_I, obj,
 				0);};};
 
-    SS_Restore(_SS_si.argl);
+    SS_Restore(si, si->argl);
 
     return(fo);}
 

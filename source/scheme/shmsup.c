@@ -85,10 +85,13 @@ object *_SS_strip_call(object *expr, int paren)
 int SS_lookup_identifier_m(char *txt, object **lval)
    {int type;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     *lval = SS_f;
 
-    o = (object *) SC_hasharr_def_lookup(_SS_si.types, txt);
+    o = (object *) SC_hasharr_def_lookup(si->types, txt);
     if (o != NULL)
        {*lval = o;
 	type  = SS_m_tokens[0];}
@@ -113,12 +116,15 @@ int SS_lookup_identifier_m(char *txt, object **lval)
 
 object *SS_syntax_m(object *str)
    {object *ret;
+    SS_psides *si;
 
-    if (SETJMP(_SS_si.cpu))
+    si = &_SS_si;
+
+    if (SETJMP(si->cpu))
        ret = SS_eof;
 
     else
-       {_SS_si.character_stream = str;
+       {si->character_stream = str;
 
 	for (ret = SS_null; ret == SS_null; )
 	    {shgrm_parse();
@@ -132,11 +138,13 @@ object *SS_syntax_m(object *str)
 /* SS_M_MODE - switch to BASIS syntax parsing */
 
 static object *SS_m_mode(void)
-   {
+   {SS_psides *si;
 
-    snprintf(_SS_si.prompt, MAXLINE, "M-> ");
-    _SS_si.read        = SS_syntax_m;
-    _SS_si.name_reproc = SS_name_map_synt;
+    si = &_SS_si;
+
+    snprintf(si->prompt, MAXLINE, "M-> ");
+    si->read        = SS_syntax_m;
+    si->name_reproc = SS_name_map_synt;
 
     SS_set_parser(SS_m_mode);
 
@@ -149,6 +157,9 @@ static object *SS_m_mode(void)
 
 void SS_init_m_syntax_mode(void)
    {int *ssdbg;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (_SS_mps.mode_init == FALSE)
        {_SS_mps.mode_init = TRUE;
@@ -209,7 +220,7 @@ void SS_init_m_syntax_mode(void)
 	SS_add_parser(".m", (PFPObject) SS_m_mode);
 	SS_add_parser(".v", (PFPObject) SS_m_mode);
 
-	_SS_si.eox                   = TRUE;
+	si->eox                   = TRUE;
 	_SS_mps.diagnose_grammar = FALSE;
 
 	ssdbg  = SS_parse_debug_m();

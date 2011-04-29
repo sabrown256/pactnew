@@ -11,7 +11,7 @@
 #include "scheme_int.h"
 #include "syntax.h"
 
-#define PUSH_CHAR (*_SS_si.pr_ch_un)
+#define PUSH_CHAR si->pr_ch_un
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -35,9 +35,12 @@ static object *_SSI_rd_line(object *str)
    {FILE *s;
     char *t, *t1;
     object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (SS_nullobjp(str))
-       str = _SS_si.indev;
+       str = si->indev;
     else if (!SS_inportp(str = SS_car(str)))
        SS_error("ARGUMENT NOT INPUT-PORT - READ-LINE", str);
 
@@ -63,6 +66,9 @@ static object *_SSI_rd_line(object *str)
 static object *SS_rd_lst(object *str)
    {int c, ok;
     object *frst, *ths, *nxt, *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     frst = SS_null;
     ths  = SS_null;
@@ -124,12 +130,15 @@ static object *SS_rd_vct(object *str)
 
 static object *_SSI_rd_chr(object *arg)
    {object *str, *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     o = SS_null;
 
     if (SS_nullobjp(arg))
-       {*SS_PTR(_SS_si.indev) = '\0';
-        o = SS_mk_char((int) SS_get_ch(_SS_si.indev, FALSE));}
+       {*SS_PTR(si->indev) = '\0';
+        o = SS_mk_char((int) SS_get_ch(si->indev, FALSE));}
 
     else if (SS_inportp(str = SS_car(arg)))
        {*SS_PTR(str) = '\0';
@@ -239,6 +248,9 @@ static object *SS_rd_atm(object *str)
     int64_t iv;
     char token[MAXLINE], *pt;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     inbrackets = FALSE;
     pt         = token;
@@ -249,7 +261,7 @@ static object *SS_rd_atm(object *str)
                inbrackets = TRUE;
             if (c == ']')
                inbrackets = FALSE;}
-        else if ((_SS_si.bracket_flag) && (inbrackets) && (c == ' '))
+        else if ((si->bracket_flag) && (inbrackets) && (c == ' '))
            continue;
         else
            {if ((c == '(') || (c == ')') || (c == ';'))
@@ -333,6 +345,9 @@ static object *_SS_pr_read(object *str)
    {int c;
     input_port *prt;
     object *rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     prt = SS_GET(input_port, str);
 
@@ -415,19 +430,22 @@ static object *_SS_pr_read(object *str)
 
 object *SS_read(object *str)
    {object *obj;
+    SS_psides *si;
 
-    if (_SS_si.read == NULL)
-       _SS_si.read = _SS_pr_read;
+    si = &_SS_si;
+
+    if (si->read == NULL)
+       si->read = _SS_pr_read;
 
     obj = SS_READ_EXPR(str);
 
-    switch (_SS_si.hist_flag)
+    switch (si->hist_flag)
        {case STDIN_ONLY :
-	     if (str != _SS_si.indev)
+	     if (str != si->indev)
 	        break;
 
         case ALL :
-	     SS_print(obj, "", "\r\n", _SS_si.histdev);
+	     SS_print(obj, "", "\r\n", si->histdev);
 
         default :
 	     break;};
@@ -441,11 +459,14 @@ object *SS_read(object *str)
 
 static object *_SSI_read(object *obj)
    {object *op, *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     o = SS_null;
 
     if (SS_nullobjp(obj))
-       o = SS_read(_SS_si.indev);
+       o = SS_read(si->indev);
 
     else if (SS_inportp(op = SS_car(obj)))
        o = SS_read(op);
@@ -527,6 +548,9 @@ static object *_SSI_call_if(object *argl)
    {FILE *str;
     char *s;
     object *obj, *old_indev, *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     s   = NULL;
     obj = SS_car(argl);
@@ -542,13 +566,13 @@ static object *_SSI_call_if(object *argl)
     if (str == NULL)
        SS_error("CAN'T OPEN FILE - OPEN-INPUT-FILE", obj);
 
-    old_indev = _SS_si.indev;
-    _SS_si.indev  = SS_mk_inport(str, s);
-    ret       = SS_exp_eval(&_SS_si, SS_cdr(argl));
+    old_indev = si->indev;
+    si->indev  = SS_mk_inport(str, s);
+    ret       = SS_exp_eval(si, SS_cdr(argl));
 
-    _SSI_cls_in(_SS_si.indev);
+    _SSI_cls_in(si->indev);
 
-    _SS_si.indev = old_indev;
+    si->indev = old_indev;
 
     return(ret);}
 
@@ -558,9 +582,11 @@ static object *_SSI_call_if(object *argl)
 /* _SSI_CURR_IP - current-input-port in Scheme */
 
 object *_SSI_curr_ip(void)
-    {
+   {SS_psides *si;
 
-     return(_SS_si.indev);}
+    si = &_SS_si;
+
+    return(si->indev);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -601,14 +627,17 @@ static object *_SSI_strprt(object *arg)
 
 object *SS_add_variable(char *name)
    {object *op;
+    SS_psides *si;
 
-    op = (object *) SC_hasharr_def_lookup(_SS_si.symtab, name);
+    si = &_SS_si;
+
+    op = (object *) SC_hasharr_def_lookup(si->symtab, name);
     if (op != NULL)
        return(op);
 
     op = SS_mk_variable(name, SS_null);
     SS_UNCOLLECT(op);
-    if (SC_hasharr_install(_SS_si.symtab, name, op, SS_POBJECT_S, TRUE, TRUE) == NULL)
+    if (SC_hasharr_install(si->symtab, name, op, SS_POBJECT_S, TRUE, TRUE) == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
 
     return(op);}
@@ -762,6 +791,9 @@ void SS_set_parser(PFPObject op)
 
 object *_SSI_scheme_mode(void)
    {PFPObject cp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* if the current parser is already SCHEME mode assume that the prompt
  * is set to something the user intended and leave it alone
@@ -770,8 +802,8 @@ object *_SSI_scheme_mode(void)
     if (cp != _SSI_scheme_mode)
        SS_set_prompt("Scheme-> ");
 
-    _SS_si.read        = _SS_pr_read;
-    _SS_si.name_reproc = NULL;
+    si->read        = _SS_pr_read;
+    si->name_reproc = NULL;
 
     SS_set_parser(_SSI_scheme_mode);
 
@@ -792,6 +824,9 @@ object *SS_load(object *argl)
    {int c;
     object *fnm, *strm, *flag;
     PFPObject prs;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     flag = SS_f;
     fnm  = SS_car(argl);
@@ -799,8 +834,8 @@ object *SS_load(object *argl)
     if (SS_consp(argl))
        {flag = SS_car(argl);
         if (SS_true(flag))
-           {SS_Save(_SS_si.env);
-            _SS_si.env = _SS_si.global_env;};};
+           {SS_Save(si, si->env);
+            si->env = si->global_env;};};
 
     strm = _SSI_opn_in(fnm);
 
@@ -816,34 +851,34 @@ object *SS_load(object *argl)
     else
        PUSH_CHAR(c, strm);
 
-    SS_Save(_SS_si.rdobj);
-    SS_Save(_SS_si.evobj);
+    SS_Save(si, si->rdobj);
+    SS_Save(si, si->evobj);
 
     prs = SS_change_parser(fnm);
 
     while (TRUE)
-       {SS_Assign(_SS_si.rdobj, SS_read(strm));
-        if (_SS_si.post_read != NULL)
-           (*_SS_si.post_read)(strm);
+       {SS_Assign(si->rdobj, SS_read(strm));
+        if (si->post_read != NULL)
+           (*si->post_read)(strm);
 
-        if (SS_eofobjp(_SS_si.rdobj))
+        if (SS_eofobjp(si->rdobj))
            {_SSI_cls_in(strm);
 	    SS_GC(strm);
             break;};
-        SS_Save(_SS_si.env);
-        SS_Assign(_SS_si.evobj, SS_exp_eval(&_SS_si, _SS_si.rdobj));
-        SS_Restore(_SS_si.env);
+        SS_Save(si, si->env);
+        SS_Assign(si->evobj, SS_exp_eval(si, si->rdobj));
+        SS_Restore(si, si->env);
 
-        if (_SS_si.post_eval != NULL)
-           (*_SS_si.post_eval)(strm);};
+        if (si->post_eval != NULL)
+           (*si->post_eval)(strm);};
 
     SS_restore_parser(prs);
 
-    SS_Restore(_SS_si.evobj);
-    SS_Restore(_SS_si.rdobj);
+    SS_Restore(si, si->evobj);
+    SS_Restore(si, si->rdobj);
 
     if (SS_true(flag))
-       {SS_Restore(_SS_si.env);};
+       {SS_Restore(si, si->env);};
 
     return(SS_t);}
 

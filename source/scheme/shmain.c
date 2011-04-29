@@ -56,7 +56,7 @@ int main(int c, char **v, char **env)
     SS_init_scheme(CODE, VERSION);
 
     SS_set_prompt("Scheme-> ");
-    _SS_si.trap_error = FALSE;
+    si->trap_error = FALSE;
 
     SS_env_vars(si, env, NULL);
 
@@ -107,7 +107,7 @@ int main(int c, char **v, char **env)
                 {cmnd = SC_dstrcat(cmnd, v[i]);
                  cmnd = SC_dstrcat(cmnd, " ");};};
 
-    _SS_si.trap_error = trerr;
+    si->trap_error = trerr;
 
 /* load the full Scheme */
     if (rfl)
@@ -117,10 +117,10 @@ int main(int c, char **v, char **env)
     if (lsch != 0)
        SS_load_scm(v[lsch]);
 
-    _SS_si.nsave    = 0;
-    _SS_si.nrestore = 0;
-    _SS_si.nsetc    = 0;
-    _SS_si.ngoc     = 0;
+    si->nsave    = 0;
+    si->nrestore = 0;
+    si->nsetc    = 0;
+    si->ngoc     = 0;
 
     SC_mem_stats_set(0L, 0L);
 

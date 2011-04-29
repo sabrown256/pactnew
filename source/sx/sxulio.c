@@ -877,6 +877,9 @@ object *SX_read_text_table(object *argl)
     char *bf, *pbf, *name, *token;
     FILE *fp;
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     memset(label, 0, MAXLINE);
 
@@ -899,21 +902,21 @@ object *SX_read_text_table(object *argl)
 
     name = SC_search_file(NULL, _SX.table_name);
     if (name == NULL)
-       {if (_SS_si.interactive == ON)
+       {if (si->interactive == ON)
 	   PRINT(stdout, "\n No file name given\n");
 
 	return(SS_f);};
 
     fp = io_open(name, "r");
     if (fp == NULL)
-       {if (_SS_si.interactive == ON)
+       {if (si->interactive == ON)
 	   PRINT(stdout, "\n Can't open file %s\n", name);
 
 	return(SS_f);};
 
     ok = SX_find_text_table(fp, n, &fn, &nr, &nc, nl, &addrt, nlabel, &addrl);
     if (ok == FALSE)
-       {if (_SS_si.interactive == ON)
+       {if (si->interactive == ON)
 	   PRINT(stdout, "\n No table #%d in file %s\n", n, name);
 
 	return(SS_f);};
@@ -950,7 +953,7 @@ object *SX_read_text_table(object *argl)
 
     io_close(fp);
 
-    if (_SS_si.interactive == ON)
+    if (si->interactive == ON)
        {if (label[0] == '\0')
            PRINT(stdout,
                  "\n Table %d : %d rows and %d columns\n\n",
@@ -1044,6 +1047,9 @@ object *SX_table_curve(object *argl)
 object *SX_table_attr(void)
    {int nrows, ncols, table_n;
     object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (_SX.current_table == NULL)
        ret = SS_null;
@@ -1053,7 +1059,7 @@ object *SX_table_attr(void)
         ncols   = _SX.current_table->ncol;
         table_n = _SX.table_n;
 
-        if (_SS_si.interactive == ON)
+        if (si->interactive == ON)
            PRINT(stdout, "\n Table %d : %d rows and %d columns\n\n",
                  table_n, nrows, ncols);
 
@@ -1218,6 +1224,9 @@ object *SX_write_data(object *argl)
    {char *mode, *fname, *type;
     SC_file_type imode;
     object *fobj, *frst;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (_SX.files == NULL)
        _SX.files = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
@@ -1280,7 +1289,7 @@ object *SX_write_data(object *argl)
 /* flatten out the curve list */
     frst = SS_car(argl);
     if (strcmp(SS_get_string(frst), "thru") == 0)
-       argl = SS_exp_eval(&_SS_si, argl);
+       argl = SS_exp_eval(si, argl);
 
     switch (imode)
        {case SC_ASCII :

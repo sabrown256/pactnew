@@ -78,6 +78,9 @@ int UL_rd_scm(char *name)
 
 void UL_init_view(void)
    {int j;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_default_npts      = 100;
     SX_gr_mode           = TRUE;
@@ -117,9 +120,9 @@ void UL_init_view(void)
     UL_derivative_tolerance = 2.0e-2;
     UL_window_height_factor = 1.0;
 
-    _SS_si.interactive = FALSE;
-    _SS_si.print_flag  = FALSE;
-    _SS_si.stat_flag   = FALSE;
+    si->interactive = FALSE;
+    si->print_flag  = FALSE;
+    si->stat_flag   = FALSE;
 
     SX_command_log_name = CSTRSAVE("ultra.log");
 
@@ -349,14 +352,17 @@ static void _UL_del_intermediate(object *cla, ...)
 /*--------------------------------------------------------------------------*/
 
 /* _UL_PARSE - determine whether or not to reprocess the input for Ultra
- *           - this is the double worker for the _SS_si.post_eval
- *           - since this _SS_si.evobj is not the same as in SS_REPL
+ *           - this is the double worker for the si->post_eval
+ *           - since this si->evobj is not the same as in SS_REPL
  *           - it should be SS_MARK'd as being an additional pointer to its
  *           - respective object
  */
 
 static void _UL_parse(object *strm)
    {int na, nb, nr;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_parse((PFReplot) UL_plot, _UL_reproc_in, strm);
 
@@ -367,12 +373,12 @@ static void _UL_parse(object *strm)
     if (UL_save_intermediate == OFF)
        {na = SS_length(crva);
 	nb = SS_length(crvb);
-	nr = SS_length(_SS_si.evobj);
+	nr = SS_length(si->evobj);
 	if (na > nb+nr)
 	   {if (SS_consp(crvb) == TRUE)
-	       _UL_del_intermediate(crva, crvb, _SS_si.val, NULL);
+	       _UL_del_intermediate(crva, crvb, si->val, NULL);
 	    else
-	       _UL_del_intermediate(crva, _SS_si.val, NULL);};};
+	       _UL_del_intermediate(crva, si->val, NULL);};};
 
 /* free the curve lists */
     SS_Assign(crva, SS_null);
@@ -383,7 +389,7 @@ static void _UL_parse(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _UL_READ - this is the _SS_si.post_read function for Ultra */
+/* _UL_READ - this is the si->post_read function for Ultra */
 
 static void _UL_read(object *strm)
    {
@@ -396,7 +402,7 @@ static void _UL_read(object *strm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _UL_PRINT - the _SS_si.post_print function for Ultra */
+/* _UL_PRINT - the si->post_print function for Ultra */
 
 static int _UL_print(void)
    {
@@ -882,6 +888,9 @@ void UL_print_banner(void)
 static void UL_init_env(void)
    {int i;
     int *plot_type;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* initialize the prefix list */
     for (i = 0; i < NPREFIX; i++)
@@ -902,7 +911,7 @@ static void UL_init_env(void)
 
 /* these lisp package special variables are initialized in all modes */
     SS_set_print_err_func(NULL, TRUE);
-    _SS_si.get_arg  = _UL_args;
+    si->get_arg  = _UL_args;
     SX_plot_hook = (PFByte) UL_plot;
 
     SC_gs.atof   = SC_atof;
@@ -925,6 +934,9 @@ static void UL_init_env(void)
 
 object *UL_mode_text(void)
    {object *ret;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (PG_console_device == NULL)
        PG_open_console("ULTRA II", SX_console_type, SX_background_color_white,
@@ -944,11 +956,11 @@ object *UL_mode_text(void)
         ret = SS_f;
 
 /* give default values to the lisp package interface variables */
-    _SS_si.post_read  = NULL;
-    _SS_si.post_eval  = NULL;
-    _SS_si.post_print = NULL;
-    _SS_si.pr_ch_un        = SS_unget_ch;
-    _SS_si.pr_ch_out       = SS_put_ch;
+    si->post_read  = NULL;
+    si->post_eval  = NULL;
+    si->post_print = NULL;
+    si->pr_ch_un   = SS_unget_ch;
+    si->pr_ch_out  = SS_put_ch;
 
 #ifdef NO_SHELL
     SC_set_put_line(SX_fprintf);
@@ -974,7 +986,10 @@ object *UL_mode_text(void)
 
 object *UL_mode_graphics(void)
    {object *ret;
+    SS_psides *si;
     static object *scrwin = NULL;
+
+    si = &_SS_si;
 
     if (PG_console_device == NULL)
        {if (!PG_open_console("ULTRA II", SX_console_type,
@@ -985,12 +1000,12 @@ object *UL_mode_graphics(void)
 
     if (SX_graphics_device == NULL)
        {SS_set_prompt("U-> ");
-        strcpy(_SS_si.ans_prompt, "");
+        strcpy(si->ans_prompt, "");
 
-        _SS_si.post_read  =  _UL_read;
-        _SS_si.post_eval  =  _UL_parse;
-        _SS_si.post_print =  _UL_print;
-	_SS_si.pr_gets         = _SX_get_input;
+        si->post_read  =  _UL_read;
+        si->post_eval  =  _UL_parse;
+        si->post_print =  _UL_print;
+	si->pr_gets         = _SX_get_input;
 	SC_set_put_line(SX_fprintf);
 	SC_set_put_string(SX_fputs);
 	if (PG_console_device == NULL)
@@ -1170,6 +1185,9 @@ int main(int c, char **v)
     SIGNED int order[4096];
     char commnd[MAXLINE];
     double evalt;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
@@ -1240,7 +1258,7 @@ int main(int c, char **v)
         if (v[i][0] == '-')
            {switch (v[i][1])
                {case 'e' :
-		     _SS_si.trap_error = FALSE;
+		     si->trap_error = FALSE;
 		     break;
 		case 'h' :
 		     usage();
@@ -1340,10 +1358,10 @@ int main(int c, char **v)
 			  "   %s load time: (%10.3e)\n",
 			  v[n], evalt);};};};
 
-    _SS_si.nsave    = 0;
-    _SS_si.nrestore = 0;
-    _SS_si.nsetc    = 0;
-    _SS_si.ngoc     = 0;
+    si->nsave    = 0;
+    si->nrestore = 0;
+    si->nsetc    = 0;
+    si->ngoc     = 0;
 
     SC_mem_stats_set(0L, 0L);
 

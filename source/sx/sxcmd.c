@@ -28,13 +28,16 @@ static char
 
 static object *_SXI_describe(object *argl)
    {object *obj;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_prep_arg(argl);
 
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
          if (obj != NULL)
-            {if (!SS_prim_des(_SS_si.outdev, obj))
+            {if (!SS_prim_des(si->outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
     return(SS_f);}
@@ -87,7 +90,9 @@ int SX_rd_scm(char *name)
 /* SX_INIT_VIEW - initialize the plot parameters */
 
 void SX_init_view(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     PG_set_attrs_glb(TRUE,
 		     "numeric-data-id", TRUE,
@@ -123,9 +128,9 @@ void SX_init_view(void)
     SX_display_type  = CSTRSAVE("COLOR");
     SX_display_title = CSTRSAVE("PDBView");
 
-    _SS_si.interactive = FALSE;
-    _SS_si.print_flag  = FALSE;
-    _SS_si.stat_flag   = FALSE;
+    si->interactive = FALSE;
+    si->print_flag  = FALSE;
+    si->stat_flag   = FALSE;
 
     SX_command_log_name = CSTRSAVE("pdbview.log");
 
@@ -342,6 +347,9 @@ static object *_SXI_thru(object *argl)
    {int n;
     object *ret;
     g_file *po;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     ret = SS_null;
 
@@ -368,7 +376,7 @@ static object *_SXI_thru(object *argl)
 /* GOTCHA: in general, when processing something like "f1.1:4",
            f1 will not refer to the current input file */
 
-	SS_args(SS_lk_var_val(&_SS_si, SX_curfile),
+	SS_args(SS_lk_var_val(si, SX_curfile),
 		G_FILE, &po,
 		0);
 
@@ -520,6 +528,9 @@ void SX_init_env(void)
 int SX_command(char *file, char *cmd)
    {int ret, zsp;
     static int first = TRUE;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
@@ -563,7 +574,7 @@ int SX_command(char *file, char *cmd)
 	SX_background_color_white = TRUE;
 
 	SX_init(PCODE, VERSION);
-	_SS_si.trap_error = FALSE;
+	si->trap_error = FALSE;
 
 	SX_init_view();
 	SX_install_global_vars();
@@ -584,11 +595,11 @@ int SX_command(char *file, char *cmd)
 
 	PG_expose_device(PG_console_device);
 
-	_SS_si.nsave        = 0;
-	_SS_si.nrestore     = 0;
-	_SS_si.nsetc        = 0;
-	_SS_si.ngoc         = 0;
-	_SS_si.bracket_flag = TRUE;
+	si->nsave        = 0;
+	si->nrestore     = 0;
+	si->nsetc        = 0;
+	si->ngoc         = 0;
+	si->bracket_flag = TRUE;
 
 	SC_mem_stats_set(0L, 0L);};
 

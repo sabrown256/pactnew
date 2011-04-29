@@ -264,6 +264,9 @@ static void _SS_args(object *obj, void *v, int type)
    {void **pv;
     char *s;
     procedure *pp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     pv = (void **) v;
 
@@ -330,8 +333,8 @@ static void _SS_args(object *obj, void *v, int type)
 #endif
 
     else
-       {if (_SS_si.get_arg != NULL)
-	   (*_SS_si.get_arg)(obj, v, type);
+       {if (si->get_arg != NULL)
+	   si->get_arg(obj, v, type);
         else
 	   *pv = obj->val;};
 
@@ -394,6 +397,9 @@ object *SS_define_constant(int n, ...)
    {int type;
     char *name;
     object *vr, *val;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     vr  = SS_null;
     val = SS_null;
@@ -443,8 +449,8 @@ object *SS_define_constant(int n, ...)
        vr = SS_mk_variable(name, SS_null);
        SS_UNCOLLECT(vr);
 
-       SC_hasharr_install(_SS_si.symtab, name, vr, SS_POBJECT_S, TRUE, TRUE);
-       SS_def_var(vr, val, _SS_si.global_env);};
+       SC_hasharr_install(si->symtab, name, vr, SS_POBJECT_S, TRUE, TRUE);
+       SS_def_var(vr, val, si->global_env);};
 
     SC_VA_END;
 
@@ -462,11 +468,14 @@ object *SS_define_constant(int n, ...)
 
 void SS_var_value(char *s, int type, void *vr, int flag)
    {object *obj;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     obj = SS_INQUIRE_OBJECT(s);
 
     if (flag && SS_variablep(obj))
-       obj = SS_lk_var_val(&_SS_si, obj);
+       obj = SS_lk_var_val(si, obj);
 
     if ((obj == NULL) || SS_nullobjp(obj))
        DEREF(vr) = NULL;
@@ -486,11 +495,15 @@ void SS_var_value(char *s, int type, void *vr, int flag)
 
 void *SS_var_reference(char *s)
    {object *obj;
-    void *vr = NULL;
+    void *vr;
+    SS_psides *si;
+
+    si = &_SS_si;
+    vr = NULL;
 
     obj = SS_INQUIRE_OBJECT(s);
     if (SS_variablep(obj))
-       obj = SS_lk_var_val(&_SS_si, obj);
+       obj = SS_lk_var_val(si, obj);
 
     if (SS_integerp(obj) || SS_floatp(obj) || SS_charobjp(obj))
        vr = SS_OBJECT(obj);
@@ -533,6 +546,9 @@ static object *_SS_make_list(int n, int *type, void **ptr)
     char *s;
     void *vl;
     object *o, *lst;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     lst = SS_null;
     for (i = 0; i < n; i++)
@@ -591,8 +607,8 @@ static object *_SS_make_list(int n, int *type, void **ptr)
 #endif
  
 	 else
-	    {if (_SS_si.call_arg != NULL)
-	        {o   = (*_SS_si.call_arg)(type[i], vl);
+	    {if (si->call_arg != NULL)
+	        {o   = si->call_arg(type[i], vl);
 		 lst = SS_mk_cons(o, lst);}
 	     else
 	        lst = SS_mk_cons(SS_null, lst);};};
@@ -669,6 +685,9 @@ object *SS_eval_form(object *first, ...)
    {int i, type[MAXLINE];
     void *ptr[MAXLINE];
     object *expr, *res;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     type[0] = SS_OBJECT_I;
     ptr[0]  = first;
@@ -685,7 +704,7 @@ object *SS_eval_form(object *first, ...)
 
     expr = SS_null;
     SS_Assign(expr, _SS_make_list(i, type, ptr));
-    res = SS_exp_eval(&_SS_si, expr);
+    res = SS_exp_eval(si, expr);
     SS_Assign(expr, SS_null);
 
     return(res);}
@@ -702,12 +721,15 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     char func[80];
     SC_address ret;
     object *fnc, *expr;
+    SS_psides *si;
+
+    si = &_SS_si;
     
     SC_FORTRAN_STR_C(func, name, *pnc);
 
     SC_VA_START(name);
 
-    fnc = (object *) SC_hasharr_def_lookup(_SS_si.symtab, func);
+    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func);
     if (fnc == NULL)
        SS_error("UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(func));
 
@@ -725,11 +747,11 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     expr = SS_null;
     SS_Assign(expr, SS_mk_cons(fnc, _SS_make_list(i, type, ptr)));
 
-    SS_eval(&_SS_si, expr);
+    SS_eval(si, expr);
 
     SS_Assign(expr, SS_null);
 
-    ret.memaddr = (char *) _SS_si.val;
+    ret.memaddr = (char *) si->val;
 
     rv = ret.diskaddr;
 
@@ -746,11 +768,14 @@ object *SS_call_scheme(char *func, ...)
    {int i, type[MAXLINE];
     object *fnc, *expr;
     void *ptr[MAXLINE];
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_VA_START(func);
 
-    fnc = _SS_lk_var_valc(func, _SS_si.env);
-/*    fnc = (object *) SC_hasharr_def_lookup(_SS_si.symtab, func); */
+    fnc = _SS_lk_var_valc(func, si->env);
+/*    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func); */
     if (fnc == NULL)
        SS_error("UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(func));
 
@@ -770,18 +795,18 @@ object *SS_call_scheme(char *func, ...)
     expr = SS_mk_cons(fnc, _SS_make_list(i, type, ptr));
     SC_mark(expr, 1);
 
-    SS_eval(&_SS_si, expr);
+    SS_eval(si, expr);
 
     SS_GC(expr);
 
-    SS_Assign(_SS_si.env, _SS_si.global_env);
-    SS_Assign(_SS_si.this, SS_null);
-    SS_Assign(_SS_si.exn, SS_null);
-    SS_Assign(_SS_si.unev, SS_null);
-    SS_Assign(_SS_si.argl, SS_null);
-    SS_Assign(_SS_si.fun, SS_null);
+    SS_Assign(si->env, si->global_env);
+    SS_Assign(si->this, SS_null);
+    SS_Assign(si->exn, SS_null);
+    SS_Assign(si->unev, SS_null);
+    SS_Assign(si->argl, SS_null);
+    SS_Assign(si->fun, SS_null);
 
-    return(_SS_si.val);}
+    return(si->val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -793,12 +818,12 @@ object *SS_call_scheme(char *func, ...)
 static int _SS_run(SS_psides *si)
    {int iret;
     object *port, *ret;
-    
+
     port = SS_mk_inport(stdin, "stdin");
     SC_strncpy(SS_BUFFER(port), MAX_BFSZ, _SS.ibf, strlen(_SS.ibf));
     SS_PTR(port) = SS_BUFFER(port);
 
-    ret  = SS_eval(&_SS_si, SS_read(port));
+    ret  = SS_eval(si, SS_read(port));
     iret = FALSE;
     if (SS_numbp(ret))
        SS_args(ret,

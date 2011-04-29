@@ -415,6 +415,9 @@ static object *_SXI_toggle_gri(object *toggle)
     double *axson, *axndec, *cntrat, *labsp, *mrks;
     char *s, *name, **axstf, **axslxf, **axslyf;
     out_device *out;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (PG_console_device == NULL)
        return(SS_f);
@@ -609,9 +612,9 @@ static object *_SXI_toggle_gri(object *toggle)
 
 /* tty output controls */
 	PG_register_variable("answer_prompt", SC_STRING_S,
-			     _SS_si.ans_prompt, NULL, NULL);
+			     si->ans_prompt, NULL, NULL);
 	PG_register_variable("prompt", SC_STRING_S,
-			     _SS_si.prompt, NULL, NULL);
+			     si->prompt, NULL, NULL);
 
 	name = SC_search_file(NULL, SX_pui_file);
 	if (name == NULL)

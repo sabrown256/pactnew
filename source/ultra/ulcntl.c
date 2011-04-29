@@ -38,13 +38,16 @@ void UL_init_hash(void)
 
 object *_ULI_describe(object *argl)
    {object *obj;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_prep_arg(argl);
 
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
          if (obj != NULL)
-            {if (!SS_prim_des(_SS_si.outdev, obj))
+            {if (!SS_prim_des(si->outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
     UL_pause(TRUE);
@@ -528,10 +531,14 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
 /* UL_PAUSE - wait if apropriate before going on */
 
 void UL_pause(int pf)
-   {if (pf)
+   {SS_psides *si;
+
+    si = &_SS_si;
+
+    if (pf)
        SX_plot_flag = FALSE;
 
-    if (_SS_si.interactive == ON)
+    if (si->interactive == ON)
        PRINT(stdout, "\n");
 
     return;}

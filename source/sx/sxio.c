@@ -22,11 +22,14 @@ object *SX_print(argl)
     char *fmt, *le, *lb, *pt;
     FILE *stream;
     object *str, *obj, *format;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     str  = SS_car(argl);
     argl = SS_cdr(argl);
     if (SS_nullobjp(str))
-       str = _SS_si.outdev;
+       str = si->outdev;
 
     if (!SS_outportp(str))
        SS_error("BAD PORT - PRINT", str);

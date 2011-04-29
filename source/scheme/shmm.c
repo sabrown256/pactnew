@@ -149,6 +149,9 @@ void _SS_install(char* pname, char *pdoc, PFPHand phand,
    {object *op, *vp;
     procedure *pp;
     C_procedure *cp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* create the C level procedure */
     cp = _SS_mk_C_proc(phand, n, pr);
@@ -169,7 +172,7 @@ void _SS_install(char* pname, char *pdoc, PFPHand phand,
     vp = SS_mk_variable(pname, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(_SS_si.symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(si->symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
 
     return;}
 
@@ -640,9 +643,12 @@ object *SS_mk_esc_proc(int err, int type)
     procedure *pp;
     Esc_procedure *ep;
     object *op;
+    SS_psides *si;
 
-    cont = _SS_si.cont_ptr;
-    stck = SC_array_get_n(_SS_si.stack) - 1;
+    si = &_SS_si;
+
+    cont = si->cont_ptr;
+    stck = SC_array_get_n(si->stack) - 1;
 
     ep = CMAKE(Esc_procedure);
     ep->cont = cont;
@@ -871,6 +877,9 @@ int _SS_object_map(FILE *fp, int flag)
     mem_header *space;
     mem_descriptor *desc;
     obj_map *map;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     ph = _SC_tid_mm();
 
@@ -925,7 +934,7 @@ int _SS_object_map(FILE *fp, int flag)
 		 ityp = map[i].type;
 		 nr   = map[i].nref;
 		 snprintf(s, MAXLINE, " %p  %3d %3d : ", p, ityp, nr);
-		 SS_print(p, s, "\n", _SS_si.outdev);};};
+		 SS_print(p, s, "\n", si->outdev);};};
 
 	CFREE(map);
 
@@ -943,6 +952,9 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
 		     void (*release)(object *obj))
    {object *op;
     SC_mem_opt opt;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     opt.perm = FALSE;
     opt.na   = FALSE;
@@ -967,7 +979,7 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
 
     if (_SS.trace_object == op)
        {PRINT(stdout, "alloc> %p\n", op);
-        SS_print(op, "       ", "\n", _SS_si.outdev);};
+        SS_print(op, "       ", "\n", si->outdev);};
 
     return(op);}
 
