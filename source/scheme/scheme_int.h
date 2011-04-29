@@ -35,75 +35,6 @@
 typedef struct s_SS_state SS_state;
 typedef struct s_SS_smp_state SS_smp_state;
 
-typedef struct s_psides psides;
-
-struct s_psides
-   {int interactive;
-    int trace_env;
-    int know_env;
-    int trap_error;
-    int lines_page;
-    int print_flag;
-    int stat_flag;
-    int bracket_flag;
-    int nsave;
-    int nrestore;
-    int nsetc;
-    int ngoc;
-    int stack_size;
-    int stack_mask;
-    int cont_ptr;
-    int err_cont_ptr;
-    int errlev;
-    int eox;
-    int strict_c;
-
-    char prompt[MAXLINE];
-    char ans_prompt[MAXLINE];
-    char *lex_text;
-
-    continuation *continue_int;
-    err_continuation *continue_err;
-
-    SC_array *stack;
-
-    hasharr *symtab;
-    hasharr *types;
-
-    SS_io_logging hist_flag;
-
-    object *indev;
-    object *outdev;
-    object *histdev;
-    object *this;
-    object *val;
-    object *unev;
-    object *exn;
-    object *argl;
-    object *fun;
-    object *env;
-    object *global_env;
-    object *err_state;
-    object **err_stack;
-    object *rdobj;
-    object *evobj;
-    object *character_stream;
-
-    PFNameReproc name_reproc;
-    PFSSRead read;
-    PFCallArg call_arg;
-    PFPostRead post_read;
-    PFPostEval post_eval;
-    PFPostPrint post_print;
-    PFExtractArg get_arg;
-
-    PFPrGetS pr_gets;
-    PFPrChOut pr_ch_out;
-    PFPrChUn pr_ch_un;
-
-    JMP_BUF cpu;};
-
-
 struct s_SS_state
    {
 
@@ -230,7 +161,7 @@ extern "C" {
 extern SS_state
  _SS;
 
-extern psides
+extern SS_psides
  _SS_si;
 
 /*--------------------------------------------------------------------------*/
@@ -275,7 +206,7 @@ extern SS_smp_state
 /* SHEVAL.C declarations */
 
 extern void
- _SS_eval(void),
+ _SS_eval(SS_psides *si),
  _SS_inst_eval(void);
 
 

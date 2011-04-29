@@ -566,7 +566,7 @@ void SX_parse(void (*replot)(void), char *(*reproc)(char *s),
                    SS_Assign(_SS_si.rdobj, SS_read(strm));
                    _SS_si.interactive = ON;
                    SX_plot_flag   = TRUE;
-                   SS_Assign(_SS_si.evobj, SS_eval(_SS_si.rdobj));
+                   SS_Assign(_SS_si.evobj, SS_eval(&_SS_si, _SS_si.rdobj));
                    _SS_si.interactive = OFF;};
 
                 if (SX_plot_flag && (strcmp(s, "replot") != 0) &&

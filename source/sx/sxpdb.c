@@ -3675,7 +3675,7 @@ void SX_type_container(char *dtype, char *stype)
     dtype[0] = '\0';
 
     po = NULL;
-    SS_args(SS_lk_var_val(SX_curfile, _SS_si.env),
+    SS_args(SS_lk_var_val(&_SS_si, SX_curfile),
 	    G_FILE, &po,
 	    0);
 

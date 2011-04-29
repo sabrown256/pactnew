@@ -32,7 +32,7 @@ int SX_have_display_list(void)
 
     var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "display-mapping*");
     if (var != NULL)
-       {pl  = SS_lk_var_val(var, _SS_si.env);
+       {pl  = SS_lk_var_val(&_SS_si, var);
 	plf = SS_procedurep(pl);};
 
     return(plf);}
@@ -77,7 +77,7 @@ static object *_SX_resolve_mapping(object *argl)
 
     var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "map-resolve");
     if (var != NULL)
-       {fnc = SS_lk_var_val(var, _SS_si.env);
+       {fnc = SS_lk_var_val(&_SS_si, var);
 	if (SS_procedurep(fnc))
 
 /* NOTE: the way this is called argl will end up in _SS_si.this and will be

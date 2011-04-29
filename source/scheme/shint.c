@@ -466,7 +466,7 @@ void SS_var_value(char *s, int type, void *vr, int flag)
     obj = SS_INQUIRE_OBJECT(s);
 
     if (flag && SS_variablep(obj))
-       obj = SS_lk_var_val(obj, _SS_si.env);
+       obj = SS_lk_var_val(&_SS_si, obj);
 
     if ((obj == NULL) || SS_nullobjp(obj))
        DEREF(vr) = NULL;
@@ -490,7 +490,7 @@ void *SS_var_reference(char *s)
 
     obj = SS_INQUIRE_OBJECT(s);
     if (SS_variablep(obj))
-       obj = SS_lk_var_val(obj, _SS_si.env);
+       obj = SS_lk_var_val(&_SS_si, obj);
 
     if (SS_integerp(obj) || SS_floatp(obj) || SS_charobjp(obj))
        vr = SS_OBJECT(obj);
@@ -685,7 +685,7 @@ object *SS_eval_form(object *first, ...)
 
     expr = SS_null;
     SS_Assign(expr, _SS_make_list(i, type, ptr));
-    res = SS_exp_eval(expr);
+    res = SS_exp_eval(&_SS_si, expr);
     SS_Assign(expr, SS_null);
 
     return(res);}
@@ -725,7 +725,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     expr = SS_null;
     SS_Assign(expr, SS_mk_cons(fnc, _SS_make_list(i, type, ptr)));
 
-    SS_eval(expr);
+    SS_eval(&_SS_si, expr);
 
     SS_Assign(expr, SS_null);
 
@@ -770,7 +770,7 @@ object *SS_call_scheme(char *func, ...)
     expr = SS_mk_cons(fnc, _SS_make_list(i, type, ptr));
     SC_mark(expr, 1);
 
-    SS_eval(expr);
+    SS_eval(&_SS_si, expr);
 
     SS_GC(expr);
 
@@ -790,7 +790,7 @@ object *SS_call_scheme(char *func, ...)
  *         - as a string
  */
 
-static int _SS_run(void)
+static int _SS_run(SS_psides *si)
    {int iret;
     object *port, *ret;
     
@@ -798,7 +798,7 @@ static int _SS_run(void)
     SC_strncpy(SS_BUFFER(port), MAX_BFSZ, _SS.ibf, strlen(_SS.ibf));
     SS_PTR(port) = SS_BUFFER(port);
 
-    ret  = SS_eval(SS_read(port));
+    ret  = SS_eval(&_SS_si, SS_read(port));
     iret = FALSE;
     if (SS_numbp(ret))
        SS_args(ret,
@@ -823,7 +823,7 @@ int SS_run(char *s)
     while (strchr(" \t\n\r\f", *s++) != NULL);
     _SS_load_bf(--s);
 
-    rv = SS_err_catch(_SS_run, NULL);
+    rv = SS_err_catch(_SS_run, NULL, NULL);
 
     return(rv);}
 
@@ -832,7 +832,7 @@ int SS_run(char *s)
 
 /* _SS_LOAD_SCM - load an SCHEME file with error protection */
 
-static int _SS_load_scm(void)
+static int _SS_load_scm(SS_psides *si)
    {
 
     SS_call_scheme("load",
@@ -852,7 +852,7 @@ int SS_load_scm(char *name)
 
     _SS_load_bf(name);
 
-    rv = SS_err_catch(_SS_load_scm, NULL);
+    rv = SS_err_catch(_SS_load_scm, NULL, NULL);
 
     return(rv);}
 

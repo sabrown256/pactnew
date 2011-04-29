@@ -201,7 +201,7 @@ object *_SSI_define_global(object *argl)
 
     else if (SS_variablep(argl))
        {obj = SS_car(obj);
-        val = SS_exp_eval(obj);
+        val = SS_exp_eval(&_SS_si, obj);
 
 /* this preserves things for compound procedures (e.g. autoload) */
         if (SS_procedurep(val))
@@ -753,9 +753,11 @@ static object *_SSI_interactp(void)
  */
 
 static object *_SSI_load_env(object *arg)
-   {
+   {SS_psides *si;
 
-    SS_env_vars(NULL, NULL);
+    si = &_SS_si;
+
+    SS_env_vars(si, NULL, NULL);
 
     return(SS_f);}
 

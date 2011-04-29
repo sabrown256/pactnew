@@ -32,7 +32,7 @@ object
  *SS_f,
  *SS_else;
 
-psides
+SS_psides
  _SS_si;
 
 SS_state
@@ -176,71 +176,71 @@ PFPrintErrMsg SS_get_print_err_func(void)
 
 /* _SS_REPL - run a READ-EVAL-PRINT Loop */
 
-static int _SS_repl(void)
-   {long a, f, d;
+static int _SS_repl(SS_psides *si)
+   {long ba, bf, bd;
     double evalt;
 
-    SS_Assign(_SS_si.rdobj, SS_null);
-    SS_Assign(_SS_si.evobj, SS_null);
+    SS_Assign(si->rdobj, SS_null);
+    SS_Assign(si->evobj, SS_null);
 
     _SS_set_ans_prompt();
 
-    d = 0L;
+    bd = 0L;
     while (TRUE)
        {SC_mem_stats_set(0L, 0L);
-        _SS_si.ngoc       = 0;
-        _SS_si.nsetc      = 0;
-        _SS_si.nsave      = 0;
-        _SS_si.nrestore   = 0;
+        si->ngoc       = 0;
+        si->nsetc      = 0;
+        si->nsave      = 0;
+        si->nrestore   = 0;
 
 /* print the prompt call the Reader */
-	_SS.pr_prompt = _SS_si.prompt;
-        SS_Assign(_SS_si.rdobj, SS_read(_SS_si.indev));
+	_SS.pr_prompt = si->prompt;
+        SS_Assign(si->rdobj, SS_read(si->indev));
 
-        if (_SS_si.post_read != NULL)
-           (*_SS_si.post_read)(_SS_si.indev);
+        if (si->post_read != NULL)
+           (*si->post_read)(si->indev);
 
-        _SS_si.interactive = TRUE;
+        si->interactive = TRUE;
 
 /* eval the object returned by the Reader */
 	evalt = SC_cpu_time();
-        SS_Assign(_SS_si.evobj, SS_eval(_SS_si.rdobj));
+        SS_Assign(si->evobj, SS_eval(si, si->rdobj));
 	evalt = SC_cpu_time() - evalt;
 
-        if (_SS_si.post_eval != NULL)
-           (*_SS_si.post_eval)(_SS_si.indev);
+        if (si->post_eval != NULL)
+           (*si->post_eval)(si->indev);
 
 /* print the evaluated object */
-        if (_SS_si.print_flag)
-           SS_print(_SS_si.evobj, _SS_si.ans_prompt, "\n", _SS_si.outdev);
+        if (si->print_flag)
+           SS_print(si->evobj, si->ans_prompt, "\n", si->outdev);
 
-        SS_Assign(_SS_si.env,   _SS_si.global_env);
-        SS_Assign(_SS_si.this,  SS_null);
-        SS_Assign(_SS_si.exn,   SS_null);
-        SS_Assign(_SS_si.val,   SS_null);
-        SS_Assign(_SS_si.unev,  SS_null);
-        SS_Assign(_SS_si.argl,  SS_null);
-        SS_Assign(_SS_si.fun,   SS_null);
-        SS_Assign(_SS_si.rdobj, SS_null);
-        SS_Assign(_SS_si.evobj, SS_null);
+        SS_Assign(si->env,   si->global_env);
+        SS_Assign(si->this,  SS_null);
+        SS_Assign(si->exn,   SS_null);
+        SS_Assign(si->val,   SS_null);
+        SS_Assign(si->unev,  SS_null);
+        SS_Assign(si->argl,  SS_null);
+        SS_Assign(si->fun,   SS_null);
+        SS_Assign(si->rdobj, SS_null);
+        SS_Assign(si->evobj, SS_null);
 
 /* restore the global environment */
-	SC_mem_stats(&a, &f, NULL, NULL);
-        d += a - f;
-        if (_SS_si.stat_flag)
+	SC_mem_stats(&ba, &bf, NULL, NULL);
+        bd += ba - bf;
+        if (si->stat_flag)
            {PRINT(stdout, "Stack Usage (S/R): (%d/%d)",
-                  _SS_si.nsave, _SS_si.nrestore);
+                  si->nsave, si->nrestore);
             PRINT(stdout, "   Continuations (S/G): (%d/%d)\n",
-                  _SS_si.nsetc, _SS_si.ngoc);
+                  si->nsetc, si->ngoc);
             PRINT(stdout, "Memory Usage(A/F): (%ld/%ld)",
-                  a, f);
+                  ba, bf);
             PRINT(stdout, "   Net (A-F): (%ld)",
-		  d);
+		  bd);
             PRINT(stdout, "   Time: (%10.3e)\n",
 		  evalt);};
 
-        if (_SS_si.post_print != NULL)
-           (*_SS_si.post_print)();
+        if (si->post_print != NULL)
+           (*si->post_print)();
         else
            PRINT(stdout, "\n");}
 
@@ -255,7 +255,7 @@ void SS_repl(void)
    {char *t;
 
     while (TRUE)
-       {SS_err_catch(_SS_repl, NULL);
+       {SS_err_catch(_SS_repl, &_SS_si, NULL);
 
 /* reset the input buffer */
         t = SS_BUFFER(_SS_si.indev);
@@ -624,7 +624,7 @@ static object *_SSI_synonym(object *argl)
    {object *func;
     char *synname;
 
-    func = SS_exp_eval(SS_car(argl));
+    func = SS_exp_eval(&_SS_si, SS_car(argl));
     if (!SS_procedurep(func))
        SS_error("FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
 
@@ -796,7 +796,7 @@ static object *_SSI_break(void)
     SS_push_err(TRUE, SS_ERROR_I);
     PRINT(stdout,"\n");
 
-    _SS_repl();
+    _SS_repl(&_SS_si);
 
     return(SS_t);}
 
@@ -848,7 +848,7 @@ static object *_SSI_retlev(object *argl)
         SS_Restore(_SS_si.evobj);
 
 	expr = SS_make_form(x, SS_make_form(SS_quoteproc, val, LAST), LAST);
-        x    = SS_exp_eval(expr);}
+        x    = SS_exp_eval(&_SS_si, expr);}
 
     else
        x = SS_f;
@@ -928,13 +928,16 @@ void SS_interrupt_handler(int sig)
  *              - return TRUE if the ABORT branch is not taken
  */
 
-int SS_err_catch(PFInt func, PFInt errf)
+int SS_err_catch(int (*fint)(SS_psides *si), SS_psides *si, PFInt errf)
    {object *esc;
 
+    if (si == NULL)
+       si = &_SS_si;
+
     _SS.ret = TRUE;
-    _SS_si.cont_ptr++;
+    si->cont_ptr++;
     SS_push_err(FALSE, SS_ERROR_I);
-    switch (SETJMP(_SS_si.continue_int[_SS_si.cont_ptr].cont))
+    switch (SETJMP(si->continue_int[si->cont_ptr].cont))
        {case ABORT :
 	     if (errf != NULL)
 	        _SS.ret = (*errf)();
@@ -946,14 +949,14 @@ int SS_err_catch(PFInt func, PFInt errf)
 	     break;
 
         default :
-	     if (func != NULL)
-	        _SS.ret = (*func)();
+	     if (fint != NULL)
+	        _SS.ret = fint(si);
 
         case ERR_FREE :
-	     esc = SS_pop_err(_SS_si.errlev - 1, FALSE);
+	     esc = SS_pop_err(si->errlev - 1, FALSE);
 	     SS_GC(esc);};
 
-    _SS_si.cont_ptr--;
+    si->cont_ptr--;
 
     return(_SS.ret);}
 

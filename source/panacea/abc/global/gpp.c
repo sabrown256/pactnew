@@ -681,7 +681,7 @@ object *LR_var_plot(object *argl)
             name = SS_get_string(head);
 
             if (strcmp(name, "domain") == 0)
-               {val    = SS_eval(sobj);
+               {val    = SS_eval(NULL, sobj);
                 domain = SS_GET(PM_set, SS_cadr(val));
                 arr    = SS_GET(C_array, SS_cddr(val));}
 
@@ -732,7 +732,7 @@ object *LR_var_plot(object *argl)
            {name = SS_get_string(sobj);
             pp   = PA_INQUIRE_VARIABLE(name);
             if (pp == NULL)
-               {val  = SS_eval(sobj);
+               {val  = SS_eval(NULL, sobj);
                 head = SS_car(val);
                 name = SS_get_string(head);
                 if (strcmp(name, "domain") == 0)

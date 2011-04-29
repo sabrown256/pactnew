@@ -181,7 +181,7 @@ void SX_plot(void)
     var = (object *) SC_hasharr_def_lookup(_SS_si.symtab, "viewport-update");
     if (var != NULL)
        {if (SS_bind_env(var, _SS_si.env) != NULL)
-	   {fnc = SS_lk_var_val(var, _SS_si.env);
+	   {fnc = SS_lk_var_val(&_SS_si, var);
 	    if (SS_procedurep(fnc))
 	       SS_call_scheme("viewport-update", 0);};};
 

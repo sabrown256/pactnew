@@ -58,7 +58,7 @@ void SX_end(int val)
 
 /* _SX_RD_SCM - do a SCHEME level open with error protection */
 
-static int _SX_rd_scm(void)
+static int _SX_rd_scm(SS_psides *si)
    {
 
     SS_call_scheme("cf",
@@ -77,7 +77,7 @@ int SX_rd_scm(char *name)
 
     strcpy(_SX_bf, name);
 
-    rv = SS_err_catch(_SX_rd_scm, NULL);
+    rv = SS_err_catch(_SX_rd_scm, NULL, NULL);
 
     return(rv);}
 
@@ -368,7 +368,7 @@ static object *_SXI_thru(object *argl)
 /* GOTCHA: in general, when processing something like "f1.1:4",
            f1 will not refer to the current input file */
 
-	SS_args(SS_lk_var_val(SX_curfile, _SS_si.env),
+	SS_args(SS_lk_var_val(&_SS_si, SX_curfile),
 		G_FILE, &po,
 		0);
 

@@ -1149,7 +1149,8 @@ static object *UL_filter(int j, object *argl)
          SS_Assign(yexpr, SS_make_list(SS_OBJECT_I, ran_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
-         if ((SS_true(SS_exp_eval(xexpr))) && (SS_true(SS_exp_eval(yexpr))))
+         if ((SS_true(SS_exp_eval(&_SS_si, xexpr))) &&
+	     (SS_true(SS_exp_eval(&_SS_si, yexpr))))
             {UL_buf1x[k] = x[0][i];
              UL_buf1y[k] = x[1][i];
              k++;};};
@@ -1536,7 +1537,7 @@ static object *UL_smooth(int l, object *argl)
 			      SX_smooth_method);
 	    SS_error(bf, SS_null);};
 
-        SS_args(SS_lk_var_val(obj, _SS_si.env),
+        SS_args(SS_lk_var_val(&_SS_si, obj),
                 G_NUM_ARRAY, &arr,
 		0);
 

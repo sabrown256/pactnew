@@ -665,7 +665,7 @@ misc :
   | indevice inlist
       {object *lst;
 
-       if (SS_consp($2) && !SS_procedurep(SS_eval(SS_CAR_MACRO($2))))
+       if (SS_consp($2) && !SS_procedurep(SS_eval(&_SS_si, SS_CAR_MACRO($2))))
 	  lst = SS_reverse($2);
        else
 	  lst = SS_mk_cons($2, SS_null);
@@ -676,7 +676,7 @@ misc :
   | outdevice outlist
       {object *lst;
 
-       if (SS_consp($2) && !SS_procedurep(SS_eval(SS_CAR_MACRO($2))))
+       if (SS_consp($2) && !SS_procedurep(SS_eval(&_SS_si, SS_CAR_MACRO($2))))
 	  lst = SS_mk_cons(_SS_m_list, SS_reverse($2));
        else
 	  lst = SS_mk_cons(_SS_m_list, SS_mk_cons($2, SS_null));
