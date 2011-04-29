@@ -810,7 +810,7 @@ static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
 	char *bf;
 	object *obj;
 
-        obj = SS_INQUIRE_OBJECT(SX_smooth_method);
+        obj = SS_INQUIRE_OBJECT(si, SX_smooth_method);
         if (obj == NULL)
            {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - _SXI_SMOOTH",
 			      SX_smooth_method);

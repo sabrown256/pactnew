@@ -96,10 +96,8 @@ object *SS_syntax_f(object *str)
 
 /* SS_F_MODE - switch to Fortran syntax parsing */
 
-static object *SS_f_mode(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *SS_f_mode(SS_psides *si)
+   {
 
     snprintf(si->prompt, MAXLINE, "F-> ");
     si->read        = SS_syntax_f;
@@ -114,11 +112,8 @@ static object *SS_f_mode(void)
 
 /* SS_INIT_F_SYNTAX_MODE - setup for parsing Fortran syntax */
 
-void SS_init_f_syntax_mode(void)
+void SS_init_f_syntax_mode(SS_psides *si)
    {int *ssdbg;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (_SS.f_mode_init == FALSE)
        {_SS.f_mode_init = TRUE;
@@ -170,7 +165,7 @@ void SS_init_f_syntax_mode(void)
 	SS_add_type_synt("real");
 	SS_add_type_synt("double precision");
 
-	SS_add_parser(".f", (PFPObject) SS_f_mode);
+	SS_add_parser(".f", SS_f_mode);
 
 	si->eox          = TRUE;
 	SS_diagnostic_f = FALSE;

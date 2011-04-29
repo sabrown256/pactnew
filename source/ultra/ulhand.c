@@ -93,7 +93,7 @@ void UL_check_order(double *p, int n, int i)
  *       - expects Scheme objects back from them
  */
 
-object *UL_us(C_procedure *cp, object *argl)
+object *UL_us(SS_psides *si, C_procedure *cp, object *argl)
    {object *ret, *val, *t;
     PFSargs fun;
 
@@ -122,7 +122,7 @@ object *UL_us(C_procedure *cp, object *argl)
  *       - return a valid Scheme object
  */
 
-object *UL_uc(C_procedure *cp, object *argl)
+object *UL_uc(SS_psides *si, C_procedure *cp, object *argl)
    {int i;
     object *ret, *t;
 
@@ -150,7 +150,7 @@ object *UL_uc(C_procedure *cp, object *argl)
  *         - using a single scalar
  */
     
-object *UL_opxc(C_procedure *cp, object *argl)
+object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
    {object *tok, *ret, *t;
     double a;
     int i, l, n;
@@ -198,7 +198,7 @@ object *UL_opxc(C_procedure *cp, object *argl)
  *         - using a single scalar
  */
 
-object *UL_opyc(C_procedure *cp, object *argl)
+object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
    {object *tok, *ret, *t;
     double a;
     int i, l, n;
@@ -244,10 +244,10 @@ object *UL_opyc(C_procedure *cp, object *argl)
 
 /* UL_UL2TOC - unary applies last 2 args to curve */
 
-object *UL_ul2toc(C_procedure *cp, object *argl)
+object *UL_ul2toc(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
 
-    o = _UL_ul2toc(cp, argl, TRUE);
+    o = _UL_ul2toc(si, cp, argl, TRUE);
    
     return(o);}
    
@@ -258,10 +258,10 @@ object *UL_ul2toc(C_procedure *cp, object *argl)
  *             - and does not replot
  */
 
-object *UL_ul2tocnp(C_procedure *cp, object *argl)
+object *UL_ul2tocnp(SS_psides *si, C_procedure *cp, object *argl)
    {object *o;
 
-    o = _UL_ul2toc(cp, argl, FALSE);
+    o = _UL_ul2toc(si, cp, argl, FALSE);
 
     return(o);}
 
@@ -270,7 +270,7 @@ object *UL_ul2tocnp(C_procedure *cp, object *argl)
 
 /* _UL_UL2TOC - worker routine for UL_UL2TOC and UL_UL2TOCNP */
 
-object *_UL_ul2toc(C_procedure *cp, object *argl, int replot_flag)
+object *_UL_ul2toc(SS_psides *si, C_procedure *cp, object *argl, int replot_flag)
    {int i;
     double d1, d2;
     object *s, *t, *tok1, *tok2, *ret;
@@ -331,7 +331,7 @@ object *_UL_ul2toc(C_procedure *cp, object *argl, int replot_flag)
 
 /* UL_ULNTOC - unary applies last n args to curve */
 
-object *UL_ulntoc(C_procedure *cp, object *argl)
+object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
    {int i;
     object *tok, *crvs, *ret, *t, *u;
 
@@ -367,7 +367,7 @@ object *UL_ulntoc(C_procedure *cp, object *argl)
 
 /* UL_UOPXC - math handler applies the given unary function to the x values */
     
-object *UL_uopxc(C_procedure *cp, object *argl)
+object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
    {int i, l, n;
     double *xp;
     object *ret, *t;
@@ -402,7 +402,7 @@ object *UL_uopxc(C_procedure *cp, object *argl)
 
 /* UL_UOPYC - math handler applies the given unary function to the y values */
 
-object *UL_uopyc(C_procedure *cp, object *argl)
+object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
    {int i, l, n;
     double *yp, f;
     object *s, *ret, *tmp, *t;
@@ -450,7 +450,7 @@ object *UL_uopyc(C_procedure *cp, object *argl)
  *          - a parameter
  */
 
-object *UL_bftoc(C_procedure *cp, object *argl)
+object *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl)
    {int i;
     char *s1;
     object *s, *tok, *t;
@@ -485,7 +485,7 @@ object *UL_bftoc(C_procedure *cp, object *argl)
  *          - as a parameter
  */
 
-object *UL_bltoc(C_procedure *cp, object *argl)
+object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
    {object *s, *ret, *tok, *t;
 
     SX_last_arg(tok, argl);
@@ -520,12 +520,9 @@ object *UL_bltoc(C_procedure *cp, object *argl)
  *            - surpresses plotting
  */
 
-object *UL_bltocnp(C_procedure *cp, object *argl)
+object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
    {char *r;
     object *s, *tok, *ret, *t;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_last_arg(tok, argl);
     if (!SS_numbp(tok))
@@ -633,20 +630,17 @@ static int _UL_bc_operate(PFVoid basicf, double *xa, double *ya,
  *       - accumulates the result
  */
 
-object *UL_bc(C_procedure *cp, object *argl)
+object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
    {int i, j;
     int ic;
     int n1, n2, na;     /* number of elements in each array and accumulator */
     int temp_flag;                                /* flags for the pointers */
     double value, gxmin, gxmax, xt;
     double *xp1, *xp2, *yp1, *yp2;
-    double *xa, *af, *ya;                         /* pointers for accumulator */
+    double *xa, *af, *ya;                       /* pointers for accumulator */
     char pbf2[MAXLINE];
     char *lbl;
     object *ch, *s, *tmp, *t;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     i = 0;
 
@@ -694,7 +688,7 @@ object *UL_bc(C_procedure *cp, object *argl)
 /* the first non-number in the arg list */
             else
                {if (!SS_nullobjp(ch))
-                   {s = SS_binary_homogeneous(cp, SS_reverse(ch));
+                   {s = SS_binary_homogeneous(si, cp, SS_reverse(ch));
                     if (SS_integerp(s))
                        value = (double) SS_INTEGER_VALUE(s);
                     else if (SS_floatp(s))
@@ -735,7 +729,7 @@ object *UL_bc(C_procedure *cp, object *argl)
                {if (SS_nullobjp(ch))
                    ch = SS_null;
                 else
-		   ch = SS_binary_homogeneous(cp, SS_reverse(ch));
+		   ch = SS_binary_homogeneous(si, cp, SS_reverse(ch));
 
 		return(ch);};};
 
@@ -845,15 +839,12 @@ object *UL_bc(C_procedure *cp, object *argl)
  *         - applications.  cfm 2/18/87
  */
 
-object *UL_bcxl(C_procedure *cp, object *argl)
+object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
    {int i, j, n;
     double *x[PG_SPACEDM];
     char local[MAXLINE], local2[MAXLINE];
     char *lbl;
     object *s, *ch, *t;
-    SS_psides *si;
-
-    si = &_SS_si;
         
     SX_prep_arg(argl);
     argl = SS_reverse(argl);

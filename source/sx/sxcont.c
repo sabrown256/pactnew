@@ -519,19 +519,19 @@ static int _SX_no_argsp(object *obj)
        {case SS_MACRO : 
         case SS_PROC  :
 	     params = SS_params(obj);
-	     ret = !SS_consp(params) || (params == SS_null);
+	     ret    = (!SS_consp(params) || (params == SS_null));
 	     break;
 
         default :
 	     hand = SS_C_PROCEDURE_HANDLER(obj);
-	     ret  = (hand ==            SS_zargs)      ||
-	            (hand ==            SS_znargs)     ||
-		    (hand == (PFPHand) SS_acc_char)   ||
-		    (hand == (PFPHand) SS_acc_int)    ||
-		    (hand == (PFPHand) SS_acc_long)   ||
-		    (hand == (PFPHand) SS_acc_double)   ||
-		    (hand == (PFPHand) SS_acc_string) ||
-		    (hand == (PFPHand) SS_acc_ptr);
+	     ret  = (hand == SS_zargs)      ||
+	            (hand == SS_znargs)     ||
+		    (hand == SS_acc_char)   ||
+		    (hand == SS_acc_int)    ||
+		    (hand == SS_acc_long)   ||
+		    (hand == SS_acc_double) ||
+		    (hand == SS_acc_string) ||
+		    (hand == SS_acc_ptr);
 	     break;};
 
     return(ret);}
@@ -767,7 +767,7 @@ int SX_split_command(char *cmd, char *lst)
  *                      - for a device that actually exists
  */
 
-static object *_SX_no_device_support(void)
+static object *_SX_no_device_support(SS_psides *si)
    {object *rv;
 
     rv = SS_mk_integer(0);

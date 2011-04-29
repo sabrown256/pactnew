@@ -1334,7 +1334,7 @@ static object *_SXI_close_pdbfile(object *arg)
 
 /* _SXI_LIST_FILE - return a list of open files */
 
-static object *_SXI_list_file(void)
+static object *_SXI_list_file(SS_psides *si)
    {g_file *po;
     object *obj;
 
@@ -3300,7 +3300,7 @@ static object *_SXI_set_buffer_size(object *argl)
 
 /* _SXI_GET_BUFFER_SIZE - get the buffer_size */
 
-static object *_SXI_get_buffer_size(void)
+static object *_SXI_get_buffer_size(SS_psides *si)
    {long long v;
     object *o;
 
@@ -3314,7 +3314,7 @@ static object *_SXI_get_buffer_size(void)
 
 /* _SXI_GET_ERROR - get the PD_err */
 
-static object *_SXI_get_error(void)
+static object *_SXI_get_error(SS_psides *si)
    {char *v;
     object *o;
 

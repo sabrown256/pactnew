@@ -472,7 +472,7 @@ void SS_var_value(char *s, int type, void *vr, int flag)
 
     si = &_SS_si;
 
-    obj = SS_INQUIRE_OBJECT(s);
+    obj = SS_INQUIRE_OBJECT(si, s);
 
     if (flag && SS_variablep(obj))
        obj = SS_lk_var_val(si, obj);
@@ -501,7 +501,7 @@ void *SS_var_reference(char *s)
     si = &_SS_si;
     vr = NULL;
 
-    obj = SS_INQUIRE_OBJECT(s);
+    obj = SS_INQUIRE_OBJECT(si, s);
     if (SS_variablep(obj))
        obj = SS_lk_var_val(si, obj);
 

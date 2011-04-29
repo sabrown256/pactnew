@@ -649,14 +649,11 @@ static object *_SXI_rd_restart(object *argl)
 
 /* _SXI_LIST_PAN_PCK - return a list of PANACEA packages */
 
-static object *_SXI_list_pan_pck(void)
+static object *_SXI_list_pan_pck(SS_psides *si)
    {object *obj, *lst, *lst_nxt;
     PA_package *pck;
     char *name;
     haelem *hp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     lst     = SS_null;
     lst_nxt = SS_null;
@@ -689,14 +686,11 @@ static object *_SXI_list_pan_pck(void)
  *                      - package and return them in a list
  */
 
-static object *_SXI_intern_packages(void)
+static object *_SXI_intern_packages(SS_psides *si)
    {object *obj, *lst, *lst_nxt;
     PA_package *pck;
     char *name;
     haelem *hp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     lst     = SS_null;
     lst_nxt = SS_null;
@@ -762,7 +756,7 @@ static object *_SXI_init_problem(object *argl)
 
 /* _SXI_INST_COM - execute PA_inst_com at Scheme level */
 
-static object *_SXI_inst_com(void)
+static object *_SXI_inst_com(SS_psides *si)
    {
 
     PA_inst_com();

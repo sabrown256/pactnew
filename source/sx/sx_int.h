@@ -273,22 +273,22 @@ extern object
 /* SXHAND.C declarations */
 
 extern object
- *_SX_mh_u_s(C_procedure *cp, object *argl),
- *_SX_mh_u_s_nm(C_procedure *cp, object *argl),
- *_SX_m11_x(C_procedure *cp, object *argl),
- *_SX_m11_b_mds(C_procedure *cp, object *argl),
- *_SX_m11_b_mro(C_procedure *cp, object *argl),
- *_SX_m11_b_mrs(C_procedure *cp, object *argl),
- *_SX_mh_u_m(C_procedure *cp, object *argl),
- *_SX_mh_u_o(C_procedure *cp, object *argl),
- *_SX_mh_u_v(C_procedure *cp, object *argl),
- *_SX_ah_m(C_procedure *cp, object *argl);
+ *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_mh_u_s_nm(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_mh_u_o(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_mh_u_v(SS_psides *si, C_procedure *cp, object *argl),
+ *_SX_ah_m(SS_psides *si, C_procedure *cp, object *argl);
 
 
 /* SXHBO.C declarations */
 
 extern object
- *_SX_mh_b_s(C_procedure *cp, object *argl);
+ *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl);
 
 extern PM_mapping
  *_SXI_extract_mapping(PM_mapping *h, object *argl),

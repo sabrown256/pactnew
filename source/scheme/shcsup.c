@@ -281,10 +281,8 @@ object *SS_syntax_c(object *str)
 
 /* SS_C_MODE - switch to C syntax parsing */
 
-static object *SS_c_mode(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *SS_c_mode(SS_psides *si)
+   {
 
     snprintf(si->prompt, MAXLINE, "C-> ");
     si->read        = SS_syntax_c;
@@ -396,8 +394,8 @@ void SS_init_c_syntax_mode(void)
 	SS_add_type_synt(SC_DOUBLE_S);
 	SS_add_type_synt(SC_VOID_S);
 
-	SS_add_parser(".c", (PFPObject) SS_c_mode);
-	SS_add_parser(".h", (PFPObject) SS_c_mode);
+	SS_add_parser(".c", SS_c_mode);
+	SS_add_parser(".h", SS_c_mode);
 
 	si->eox                   = TRUE;
 	_SS_cps.diagnose_grammar = FALSE;

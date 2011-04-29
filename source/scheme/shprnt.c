@@ -97,8 +97,8 @@ void SS_print(object *obj, char *begin, char *end, object *strm)
 
     return;}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SS_VDSNPRINTF - so a vsnprintf operation
  *                - copy the result into _SS.vbf for later use
@@ -115,8 +115,8 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
 
     return(s);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SS_SPRINTF - takes an object, produces a printable representation, and
  *             - leaves it in _SS.vbf for later use
@@ -155,8 +155,8 @@ char *_SS_sprintf(char *fmt, object *obj)
 
     return(s);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SS_SPRINT - takes an object and produces a printable representation */
 
@@ -176,8 +176,8 @@ static object *_SS_sprint(object *obj, char *fmt, object *strm)
 
     return(SS_f);}
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* DPREG - print all of the SCHEME registers */
 
@@ -203,7 +203,7 @@ void dpreg(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* DPRINT - an easy to use debug time object printer */
 
@@ -540,11 +540,8 @@ static object *_SSI_display(object *obj)
 
 /* _SSI_PRINT_TOGGLE - toggle printing of values in Scheme */
 
-static object *_SSI_print_toggle(void)
+static object *_SSI_print_toggle(SS_psides *si)
    {object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     si->print_flag = !si->print_flag;
 
@@ -557,13 +554,11 @@ static object *_SSI_print_toggle(void)
 
 /* _SSI_STATS_TOGGLE - toggle printing of statistics in Scheme */
 
-static object *_SSI_stats_toggle(void)
+static object *_SSI_stats_toggle(SS_psides *si)
    {object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     si->stat_flag = !si->stat_flag;
+
     rv = (si->stat_flag) ? SS_t : SS_f;
 
     return(rv);}
@@ -603,10 +598,8 @@ static object *_SSI_trans_on(object *obj)
 
 /* SS_TRANS_OFF - turn off the transcript of the Scheme session */
 
-object *SS_trans_off(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+object *SS_trans_off(SS_psides *si)
+   {
 
     if (SS_nullobjp(si->histdev))
        return(SS_f);
@@ -1212,10 +1205,8 @@ static object *_SSI_newline(object *strm)
 
 /* _SSI_CURR_OP - current-output-port in Scheme */
 
-object *_SSI_curr_op(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+object *_SSI_curr_op(SS_psides *si)
+   {
 
     return(si->outdev);}
 

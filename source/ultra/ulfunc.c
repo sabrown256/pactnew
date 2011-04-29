@@ -289,7 +289,7 @@ object *UL_delete(object *s)
 
 /* _ULI_ERASE - erase all the currently displayed curves */
 
-static object *_ULI_erase(void)
+static object *_ULI_erase(SS_psides *si)
    {int j;
 
     for (j = 0; j < SX_N_Curves; j++)
@@ -346,9 +346,9 @@ static object *UL_fill(object *obj, object *flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_TOGGLE_LOGICAL_OP - toggle the logical op of the device */
+/* _ULI_TOGGLE_LOGICAL_OP - toggle the logical op of the device */
 
-static object *UL_toggle_logical_op(void)
+static object *_ULI_toggle_logical_op(SS_psides *si)
    {int i;
     PG_logical_operation lop;
     PG_device *dev;
@@ -625,6 +625,9 @@ static object *_ULI_open_device(object *argl)
    {int i;
     char *name, *type, *title;
     out_device *out;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_prep_arg(argl);
 
@@ -664,7 +667,7 @@ static object *_ULI_open_device(object *argl)
         SX_display_name = name;
 
         if (SX_gr_mode)
-           UL_mode_graphics();};
+           UL_mode_graphics(si);};
 
     return(SS_f);}
 
@@ -710,8 +713,11 @@ static object *_ULI_close_device(object *arg)
 void _UL_quit(int sts)
    {int i;
     out_device *out;
+    SS_psides *si;
 
-    UL_mode_text();
+    si = &_SS_si;
+
+    UL_mode_text(si);
 
 /* check the need to close the command log */
     if (SX_command_log != NULL)
@@ -1294,6 +1300,9 @@ static object *_ULI_average(object *s)
     char *t, *lbl;
     object *c, *numtoks, *rv;
     C_procedure *cpp, *cpd;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_prep_arg(s);
     UL_plot_off();
@@ -1302,10 +1311,10 @@ static object *_ULI_average(object *s)
     numtoks = SS_mk_integer(SS_length(s));
 
     cpp = _SS_mk_C_proc_va(UL_bc, 1, PM_fplus);
-    c   = UL_bc(cpp, s);
+    c   = UL_bc(si, cpp, s);
     if (SS_true(c))
        {cpd = _SS_mk_C_proc_va(UL_opyc, 1, PM_fdivide);
-        c   = UL_opyc(cpd,
+        c   = UL_opyc(si, cpd,
 		      SS_make_list(SS_OBJECT_I, c,
 				   SS_OBJECT_I, numtoks,
 				   0));
@@ -1540,7 +1549,7 @@ static object *UL_smooth(int l, object *argl)
     else
        {C_array *arr;
 
-        obj = SS_INQUIRE_OBJECT(SX_smooth_method);
+        obj = SS_INQUIRE_OBJECT(si, SX_smooth_method);
         if (obj == NULL)
            {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - UL_SMOOTH",
 			      SX_smooth_method);
@@ -1603,7 +1612,7 @@ object *UL_sort(int k)
  *               - not concern itself with overlaps
  */
 
-static object *UL_smp_append(object *a, object *b)
+static object *UL_smp_append(SS_psides *si, object *a, object *b)
    {int i, j, n, na, nb, l;
     double *x[PG_SPACEDM];
     char *lbl;
@@ -1654,7 +1663,7 @@ static object *UL_smp_append(object *a, object *b)
  *              - newly created curve
  */
 
-static object *UL_pr_append(object *a, object *b)
+static object *UL_pr_append(SS_psides *si, object *a, object *b)
    {int i, j, k, n, na, nb, nc, l;
     double xmn, xmx, xv, yv;
     double *x[PG_SPACEDM];
@@ -1758,6 +1767,9 @@ static object *_ULI_append(object *argl)
     char local[MAXLINE];
     char *lbl;
     object *b, *acc, *target, *tmp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SX_prep_arg(argl);
     SX_autoplot = OFF;
@@ -1789,9 +1801,9 @@ static object *_ULI_append(object *argl)
 
          if (SX_curvep_a(b))
             {if (UL_simple_append)
-	        tmp = UL_smp_append(acc, b);
+	        tmp = UL_smp_append(si, acc, b);
              else
-	        tmp = UL_pr_append(acc, b);
+	        tmp = UL_pr_append(si, acc, b);
              UL_delete(acc);
              acc = tmp;};};
 
@@ -1987,6 +1999,18 @@ static object *_ULI_curve_list(object *arg)
     return(o);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _ULI_PLOT - wrapper for UL_plot */
+
+static object *_ULI_plot(SS_psides *si)
+   {object *o;
+
+    o = UL_plot();
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            INSTALL FUNCTIONS                             */
 
@@ -2117,7 +2141,7 @@ void UL_install_scheme_funcs(void)
     SS_install("replot",
                "Macro: Replot curves in list\n     Usage: replot",
                SS_zargs,
-               UL_plot, SS_UR_MACRO);
+               _ULI_plot, SS_UR_MACRO);
 
     SS_install("text",
                "Macro: Enter text mode - no graphics are available\n     See graphics\n     Usage: text",
@@ -2253,7 +2277,7 @@ void UL_install_scheme_funcs(void)
     SS_install("toggle-logical-op",
                "Procedure: Switch the drawing state between XOR and COPY\n     Usage: toggle-logical-op",
                SS_zargs,
-               UL_toggle_logical_op, SS_PR_PROC);
+               _ULI_toggle_logical_op, SS_PR_PROC);
 
     SS_install("file-info",
                "Macro: Print the descriptive information for an ULTRA file\n     Usage: file-info <name>",

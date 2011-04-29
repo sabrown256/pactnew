@@ -11,7 +11,10 @@
 #include "scheme_int.h"
 #include "syntax.h"
 
-#define PUSH_CHAR si->pr_ch_un
+typedef object *(*PFPOprs)(SS_psides *si);
+
+#define PUSH_CHAR         si->pr_ch_un
+#define READ_EXPR(_o)     ((si->read == NULL) ? SS_null : si->read(_o))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -82,7 +85,7 @@ static object *SS_rd_lst(object *str)
 	     case '.' :
 	          c = SS_get_ch(str, FALSE);
 		  if (strchr(" \t\r\n", c) != NULL)
-		     {SS_setcdr(ths, SS_READ_EXPR(str));
+		     {SS_setcdr(ths, READ_EXPR(str));
 		      while ((c = SS_get_ch(str, TRUE)) != ')');
 		      ok = FALSE;
 		      o  = frst;
@@ -95,7 +98,7 @@ static object *SS_rd_lst(object *str)
 
 	     default :
 	          PUSH_CHAR(c, str);
-		  nxt = SS_READ_EXPR(str);
+		  nxt = READ_EXPR(str);
 		  if (SS_eofobjp(nxt))
 		     {if ((c = SS_get_ch(str, TRUE)) == EOF)
 			 {SS_clr_strm(str);
@@ -377,24 +380,24 @@ static object *_SS_pr_read(object *str)
 
         case '\'':
 	     rv = SS_mk_cons(SS_quoteproc,
-			     SS_mk_cons(SS_READ_EXPR(str),
+			     SS_mk_cons(READ_EXPR(str),
 					SS_null));
 	     break;
         case '`' :
 	     rv = SS_mk_cons(SS_quasiproc,
-			     SS_mk_cons(SS_READ_EXPR(str),
+			     SS_mk_cons(READ_EXPR(str),
 					SS_null));
 	     break;
         case ',' :
 	     c = SS_get_ch(str, TRUE);
 	     if (c == '@')
 	        rv = SS_mk_cons(SS_unqspproc,
-				SS_mk_cons(SS_READ_EXPR(str),
+				SS_mk_cons(READ_EXPR(str),
 					   SS_null));
 	     else
 	        {PUSH_CHAR(c, str);
 		 rv = SS_mk_cons(SS_unqproc,
-				 SS_mk_cons(SS_READ_EXPR(str),
+				 SS_mk_cons(READ_EXPR(str),
 					    SS_null));};
 	     break;
 #ifdef LARGE
@@ -437,7 +440,7 @@ object *SS_read(object *str)
     if (si->read == NULL)
        si->read = _SS_pr_read;
 
-    obj = SS_READ_EXPR(str);
+    obj = READ_EXPR(str);
 
     switch (si->hist_flag)
        {case STDIN_ONLY :
@@ -581,10 +584,8 @@ static object *_SSI_call_if(object *argl)
 
 /* _SSI_CURR_IP - current-input-port in Scheme */
 
-object *_SSI_curr_ip(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+object *_SSI_curr_ip(SS_psides *si)
+   {
 
     return(si->indev);}
 
@@ -652,7 +653,7 @@ object *SS_add_variable(char *name)
  *               - associated with a file extension
  */
 
-void SS_add_parser(char *ext, PFPObject fnc)
+void SS_add_parser(char *ext, object *(*prs)(SS_psides *si))
    {SC_address ad;
 
     if (_SS.parser_tab == NULL)
@@ -660,7 +661,7 @@ void SS_add_parser(char *ext, PFPObject fnc)
 
 	SS_add_parser(".scm", _SSI_scheme_mode);};
 
-    ad.funcaddr = (PFInt) fnc;
+    ad.funcaddr = (PFInt) prs;
     SC_hasharr_install(_SS.parser_tab, ext, ad.memaddr, "PFPObject", FALSE, TRUE);
 
     return;}
@@ -670,15 +671,15 @@ void SS_add_parser(char *ext, PFPObject fnc)
 
 /* SS_GET_PARSER - return the current syntax mode */
 
-static PFPObject SS_get_parser(int id)
+static PFPOprs SS_get_parser(int id)
    {SS_smp_state *sa;
-    PFPObject op;
+    PFPOprs prs;
 
     sa = _SS_get_state(id);
 
-    op = sa->parser;
+    prs = sa->parser;
 
-    return(op);}
+    return(prs);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -689,10 +690,13 @@ static PFPObject SS_get_parser(int id)
  *               -   "f"  Fortran parser
  */
 
-PFPObject SS_use_parser(char *sfx)
+PFPOprs SS_use_parser(char *sfx)
    {char t[MAXLINE];
-    PFPObject np, op;
+    PFPOprs np, op;
     SC_address ad;
+    SS_psides *si;
+
+    si = &_SS_si;
 
 /* NOTE: unconditionally get the current parser in case the file
  * has no extension at all
@@ -702,9 +706,9 @@ PFPObject SS_use_parser(char *sfx)
     snprintf(t, MAXLINE, ".%s", sfx);
     ad.memaddr = SC_hasharr_def_lookup(_SS.parser_tab, t);
 
-    np = (PFPObject) ad.funcaddr;
+    np = (PFPOprs) ad.funcaddr;
     if (np != NULL)
-       (*np)();
+       np(si);
 
     SS_set_parser(np);
 
@@ -719,10 +723,13 @@ PFPObject SS_use_parser(char *sfx)
  *                  - after the file is loaded
  */
 
-static PFPObject SS_change_parser(object *fnm)
+static PFPOprs SS_change_parser(object *fnm)
    {char *s, *t;
-    PFPObject np, op;
+    PFPOprs np, op;
     SC_address ad;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     op = NULL;
     s  = NULL;
@@ -744,9 +751,9 @@ static PFPObject SS_change_parser(object *fnm)
 	if (t != NULL)
 	   {ad.memaddr = SC_hasharr_def_lookup(_SS.parser_tab, t);
 
-	    np = (PFPObject) ad.funcaddr;
+	    np = (PFPOprs) ad.funcaddr;
 	    if (np != NULL)
-	       {(*np)();
+	       {np(si);
 		SS_set_parser(np);};};
 
 	CFREE(s);};
@@ -760,10 +767,12 @@ static PFPObject SS_change_parser(object *fnm)
  *                   - passed in
  */
 
-static void SS_restore_parser(PFPObject op)
-   {
+static void SS_restore_parser(PFPOprs op)
+   {SS_psides *si;
 
-    (*op)();
+    si = &_SS_si;
+
+    op(si);
     SS_set_parser(op);
 
     return;}
@@ -775,12 +784,12 @@ static void SS_restore_parser(PFPObject op)
  *               - passed in
  */
 
-void SS_set_parser(PFPObject op)
+void SS_set_parser(object *(*prs)(SS_psides *si))
    {SS_smp_state *sa;
 
     sa = _SS_get_state(-1);
 
-    sa->parser = op;
+    sa->parser = prs;
 
     return;}
 
@@ -789,11 +798,8 @@ void SS_set_parser(PFPObject op)
 
 /* _SSI_SCHEME_MODE - switch to native SCHEME parsing */
 
-object *_SSI_scheme_mode(void)
-   {PFPObject cp;
-    SS_psides *si;
-
-    si = &_SS_si;
+object *_SSI_scheme_mode(SS_psides *si)
+   {PFPOprs cp;
 
 /* if the current parser is already SCHEME mode assume that the prompt
  * is set to something the user intended and leave it alone
@@ -823,7 +829,7 @@ object *_SSI_scheme_mode(void)
 object *SS_load(object *argl)
    {int c;
     object *fnm, *strm, *flag;
-    PFPObject prs;
+    PFPOprs prs;
     SS_psides *si;
 
     si = &_SS_si;

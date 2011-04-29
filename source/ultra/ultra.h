@@ -130,21 +130,21 @@ extern int
  UL_curve_strp(object *obj);
 
 extern object
- *UL_us(C_procedure *cp, object *argl),
- *UL_uc(C_procedure *cp, object *argl),
- *UL_opxc(C_procedure *cp, object *argl),
- *UL_opyc(C_procedure *cp, object *argl),
- *UL_ul2toc(C_procedure *cp, object *argl),
- *UL_ul2tocnp(C_procedure *cp, object *argl),
- *_UL_ul2toc(C_procedure *cp, object *argl, int flag),
- *UL_ulntoc(C_procedure *cp, object *argl),
- *UL_uopxc(C_procedure *cp, object *argl),
- *UL_uopyc(C_procedure *cp, object *argl),
- *UL_bftoc(C_procedure *cp, object *argl),
- *UL_bltoc(C_procedure *cp, object *argl),
- *UL_bltocnp(C_procedure *cp, object *argl),
- *UL_bc(C_procedure *cp, object *argl),
- *UL_bcxl(C_procedure *cp, object *argl);
+ *UL_us(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_uc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_opxc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_opyc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_ul2toc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_ul2tocnp(SS_psides *si, C_procedure *cp, object *argl),
+ *_UL_ul2toc(SS_psides *si, C_procedure *cp, object *argl, int flag),
+ *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_bc(SS_psides *si, C_procedure *cp, object *argl),
+ *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl);
 
 
 /* ULTRA.C declarations */
@@ -157,10 +157,10 @@ extern int
 #endif
 
 extern object
- *UL_mode_text(void),
- *UL_mode_graphics(void),
+ *UL_mode_text(SS_psides *si),
+ *UL_mode_graphics(SS_psides *si),
  *UL_plot(void),
- *_ULI_printscr(void),
+ *_ULI_printscr(SS_psides *si),
  *_ULI_set_id(object *argl),
  *_ULI_thru(object *s),
  *UL_copy_curve(int j),

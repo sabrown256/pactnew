@@ -914,17 +914,15 @@ static object *SX_sort_on_column(object *argl)
 
 /* SX_CNORMALIZE_TABLE - normalize the current table columnwise */
 
-static object *SX_cnormalize_table(object *argl)
+static object *SX_cnormalize_table(SS_psides *si)
    {int nr, nc;
     object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     rv = SS_null;
 
     if (SX_current_table == NULL)
-       SS_error("NO CURRENT TABLE EXISTS - USE read-table TO CREATE", argl);
+       SS_error("NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
+		SS_null);
 
     else
        {_SX_cnormalize_table(SX_current_table);
@@ -948,7 +946,7 @@ static object *SX_cnormalize_table(object *argl)
 
 /* SX_COL_LABELS - return the column labels */
 
-static object *SX_col_labels(object *argl)
+static object *SX_col_labels(SS_psides *si)
    {int i, nc;
     object *obj, *lst;
 

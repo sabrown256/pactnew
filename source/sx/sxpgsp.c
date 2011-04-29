@@ -447,7 +447,7 @@ static object *_SXI_set_mrk_scal(object *argl)
  
 /* _SXI_SHOW_MRK - show the current set of markers */
 
-static object *_SXI_show_mrk(void)
+static object *_SXI_show_mrk(SS_psides *si)
    {int i, mi;
     PG_device *dev;
     double b, dx[PG_SPACEDM], x[PG_SPACEDM];
@@ -3044,7 +3044,7 @@ static object *_SXI_satst(object *argl)
  
 /* _SXI_GBFSZ - wrapper for PG_get_buffer_size */
 
-static object *_SXI_gbfsz(void)
+static object *_SXI_gbfsz(SS_psides *si)
    {object *rv;
     int64_t sz;
 

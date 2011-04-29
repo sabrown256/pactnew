@@ -13,6 +13,34 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SS_SET_CONT - set up a new continuation, execute the jumps
+ *             - and release the continuation on return
+ */
+
+#define SS_set_cont(_si, _go, _return)                                       \
+   {(_si)->nsetc++;                                                          \
+    (_si)->cont_ptr++;                                                       \
+    if ((_si)->cont_ptr >= (_si)->stack_size)                                \
+       SS_expand_stack();                                                    \
+    if (SETJMP((_si)->continue_int[(_si)->cont_ptr].cont))                   \
+       {SS_end_trace();                                                      \
+        (_si)->cont_ptr--;                                                   \
+        (_si)->ngoc++;                                                       \
+        SS_jump(_return);}                                                   \
+    else                                                                     \
+       {SS_jump(_go);};}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_GO_CONT - go (LONGJMP) to the current continuation */
+
+#define SS_go_cont(_si)                                                      \
+    LONGJMP((_si)->continue_int[(_si)->cont_ptr].cont, TRUE)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SS_SAVE - save the object on the Scheme stack */
 
 #ifdef STACK_FNC
@@ -61,9 +89,8 @@ void _SS_eval(SS_psides *si)
     C_procedure *cp;
     procedure *pf, *pg;
     SS_form pty;
-    PFPHand ph;
     
-    SS_set_cont(eval_disp, ret_val);
+    SS_set_cont(si, eval_disp, ret_val);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -91,7 +118,7 @@ eval_disp:
 
 self_ev:
     SS_Assign(si->val, si->exn);
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -100,7 +127,7 @@ self_ev:
 
 var_ev:
     SS_Assign(si->val, SS_lk_var_val(si, si->exn));
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -112,7 +139,7 @@ proc_ev:
     SS_Assign(si->exn, SS_car(si->exn));
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, ev_args);
+    SS_set_cont(si, eval_disp, ev_args);
 
 ev_args:
     SS_Restore(si, si->env);
@@ -189,14 +216,14 @@ ev_set:
 
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, ev_seta);
+    SS_set_cont(si, eval_disp, ev_seta);
 
 ev_seta:
     SS_Restore(si, si->env);
     SS_Restore(si, si->unev);
     SS_set_var(si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -233,7 +260,7 @@ ev_define:
        {SS_Save(si, si->unev);
         SS_Save(si, si->env);
         SS_Assign(si->exn, SS_car(si->exn));
-        SS_set_cont(eval_disp, ev_def);
+        SS_set_cont(si, eval_disp, ev_def);
 
 ev_def:
         SS_Restore(si, si->env);
@@ -245,7 +272,7 @@ ev_def:
     SS_def_var(si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
     SS_end_trace();
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -254,11 +281,10 @@ ev_def:
 
 pr_apply:
     cp = SS_GET_C_PROCEDURE(si->fun);
-    ph = cp->handler;
 
-    SS_Assign(si->val, (*ph)(cp, si->argl));
+    SS_Assign(si->val, cp->handler(si, cp, si->argl));
 
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -269,12 +295,11 @@ pr_apply:
 
 macro_ur:
     cp = SS_GET_C_PROCEDURE(si->fun);
-    ph = cp->handler;
 
     SS_bgn_trace(si->fun, si->unev);
-    SS_Assign(si->val, (*ph)(cp, si->unev));
+    SS_Assign(si->val, cp->handler(si, cp, si->unev));
 
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -285,10 +310,9 @@ macro_ur:
 
 macro_ue:
     cp = SS_GET_C_PROCEDURE(si->fun);
-    ph = cp->handler;
 
     SS_bgn_trace(si->fun, si->unev);
-    SS_Assign(si->exn, (*ph)(cp, si->unev));
+    SS_Assign(si->exn, cp->handler(si, cp, si->unev));
 
     SS_jump(eval_disp);
 
@@ -307,20 +331,20 @@ eva_loop:
     SS_Assign(si->exn, SS_car(si->unev));
     if (SS_nullobjp(SS_cdr(si->unev)))
        {SS_Save(si, si->this);
-        SS_set_cont(eval_disp, acc_last);
+        SS_set_cont(si, eval_disp, acc_last);
 
 acc_last:
         SS_Restore(si, si->this);
         SS_Restore(si, si->argl);
         SS_Restore(si, si->fun);
         SS_end_cons_macro(si->argl, si->this, si->val);
-        SS_Assign(si->this, SS_null);            /* done with si->this for now */
+        SS_Assign(si->this, SS_null);         /* done with si->this for now */
         SS_jump(apply_dis);}
     else
        {SS_Save(si, si->unev);
         SS_Save(si, si->this);
         SS_Save(si, si->env);
-        SS_set_cont(eval_disp, acc_arg);
+        SS_set_cont(si, eval_disp, acc_arg);
 
 acc_arg:
         SS_Restore(si, si->env);
@@ -424,7 +448,7 @@ ev_macro_ev:
     SS_Save(si, si->fun);
     SS_Assign(si->env, SS_do_bindings(si->fun, si->unev));
     SS_Assign(si->unev, SS_proc_body(si->fun));
-    SS_set_cont(ev_begin, ev_macro_evb);
+    SS_set_cont(si, ev_begin, ev_macro_evb);
 
 ev_macro_evb:
     SS_Restore(si, si->fun);
@@ -460,7 +484,7 @@ pr_throw:
 /* assign the return value */
     SS_Assign(si->val, SS_car(si->argl));
 
-    SS_go_cont;
+    SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -473,7 +497,7 @@ ev_begin:
        SS_jump(eval_disp);
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, evb_cont);
+    SS_set_cont(si, eval_disp, evb_cont);
 
 evb_cont:
     SS_Restore(si, si->env);
@@ -489,7 +513,7 @@ evb_cont:
 ev_and:
     if (SS_nullobjp(si->unev))
        {SS_Assign(si->val, SS_t);
-        SS_go_cont;};
+        SS_go_cont(si);};
 
 eva_iter:
     SS_Assign(si->exn, SS_car(si->unev));
@@ -497,16 +521,16 @@ eva_iter:
 
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, eva_dec);
+    SS_set_cont(si, eval_disp, eva_dec);
 
 eva_dec:
     SS_Restore(si, si->env);
     SS_Restore(si, si->unev);
     if (!SS_true(si->val))
-       SS_go_cont;
+       SS_go_cont(si);
     else
        {if (SS_nullobjp(si->unev))
-          SS_go_cont;
+          SS_go_cont(si);
         else
           SS_jump(eva_iter);};
 
@@ -518,23 +542,23 @@ eva_dec:
 ev_or:
     if (SS_nullobjp(si->unev))
        {SS_Assign(si->val, SS_f);
-        SS_go_cont;};
+        SS_go_cont(si);};
 
     SS_Assign(si->exn, SS_car(si->unev));
     SS_Assign(si->unev, SS_cdr(si->unev));
     if (SS_nullobjp(si->exn))
        {SS_Assign(si->val, SS_f);
-        SS_go_cont;};
+        SS_go_cont(si);};
 
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, evo_dec);
+    SS_set_cont(si, eval_disp, evo_dec);
 
 evo_dec:
     SS_Restore(si, si->env);
     SS_Restore(si, si->unev);
     if (SS_true(si->val))
-       SS_go_cont;
+       SS_go_cont(si);
     else
        SS_jump(ev_or);
 
@@ -546,17 +570,17 @@ evo_dec:
 ev_cond:
     if (SS_nullobjp(si->unev))
        {SS_Assign(si->val, SS_f);
-        SS_go_cont;};
+        SS_go_cont(si);};
 
     SS_Assign(si->exn, SS_car(si->unev));
     if (SS_nullobjp(si->exn))
        {SS_Assign(si->val, SS_f);
-        SS_go_cont;};
+        SS_go_cont(si);};
 
     SS_Assign(si->exn, SS_car(si->exn));
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, evc_dec);
+    SS_set_cont(si, eval_disp, evc_dec);
 
 evc_dec:
     SS_Restore(si, si->env);
@@ -582,7 +606,7 @@ ev_if:
 
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
-    SS_set_cont(eval_disp, evi_dec);
+    SS_set_cont(si, eval_disp, evi_dec);
 
 evi_dec:
     SS_Restore(si, si->env);
@@ -591,7 +615,7 @@ evi_dec:
        {SS_Assign(si->unev, SS_cdr(si->unev));
         if (SS_nullobjp(si->unev))
            {SS_Assign(si->val, SS_f);
-            SS_go_cont;};};
+            SS_go_cont(si);};};
 
     SS_Assign(si->exn, SS_car(si->unev));
     SS_jump(eval_disp);

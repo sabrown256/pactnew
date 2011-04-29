@@ -1044,12 +1044,9 @@ object *SX_table_curve(object *argl)
  *               - (n-rows n-cols table-#)
  */
 
-object *SX_table_attr(void)
+object *SX_table_attr(SS_psides *si)
    {int nrows, ncols, table_n;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (_SX.current_table == NULL)
        ret = SS_null;

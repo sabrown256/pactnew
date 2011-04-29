@@ -68,7 +68,7 @@ void SS_install_mf(char* pname, char *pdoc, PFPHand phand, ...)
 
 /* SS_UNARY_FLT - the unary operator handler returning floats */
 
-object *SS_unary_flt(C_procedure *cp, object *argl)
+object *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl)
    {int id;
     object *x, *rv;
 
@@ -116,7 +116,7 @@ object *SS_unary_flt(C_procedure *cp, object *argl)
 
 /* SS_UNARY_FIX - the unary operator handler returning fixed point numbers */
 
-object *SS_unary_fix(C_procedure *cp, object *argl)
+object *SS_unary_fix(SS_psides *si, C_procedure *cp, object *argl)
    {int type;
     int64_t iv;
     double operand;
@@ -143,7 +143,7 @@ object *SS_unary_fix(C_procedure *cp, object *argl)
 
 /* SS_UNARY_BIT - the unary operator handler for bit operations */
 
-static object *SS_unary_bit(C_procedure *cp, object *argl)
+static object *SS_unary_bit(SS_psides *si, C_procedure *cp, object *argl)
    {int type;
     int64_t iv, operand;
     PFInt64I fnc;
@@ -169,7 +169,7 @@ static object *SS_unary_bit(C_procedure *cp, object *argl)
 
 /* SS_BINARY_OPR - the binary arithmetic operator handler */
 
-static object *SS_binary_opr(C_procedure *cp, object *argl)
+static object *SS_binary_opr(SS_psides *si, C_procedure *cp, object *argl)
    {PFBINOBJ fnc;
     object *rv;
 
@@ -187,7 +187,7 @@ static object *SS_binary_opr(C_procedure *cp, object *argl)
 
 /* SS_BINARY_FIX - the binary fixed point arithmetic operator handler */
 
-object *SS_binary_fix(C_procedure *cp, object *argl)
+object *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl)
    {int64_t i1, i2, iv;
     PFInt64II fnc;
     object *x1, *x2, *rv;
@@ -360,7 +360,7 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
  *                       - when both arguments have the same type
  */
 
-object *SS_binary_homogeneous(C_procedure *cp, object *argl)
+object *SS_binary_homogeneous(SS_psides *si, C_procedure *cp, object *argl)
    {int ido;
     long ni;
     object *acc;
@@ -396,7 +396,7 @@ object *SS_binary_homogeneous(C_procedure *cp, object *argl)
  *                         - for Bessel functions and Legendre polynomials
  */
 
-object *SS_binary_heterogeneous(C_procedure *cp, object *argl)
+object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
    {int ido;
     long ni;
     double n;
@@ -466,7 +466,7 @@ object *SS_binary_heterogeneous(C_procedure *cp, object *argl)
 
 /* SS_UN_COMP - the unary comparison handler */
 
-object *SS_un_comp(C_procedure *cp, object *argl)
+object *SS_un_comp(SS_psides *si, C_procedure *cp, object *argl)
    {int type, lv;
     double operand;
     PFIntd fnc;
@@ -492,7 +492,7 @@ object *SS_un_comp(C_procedure *cp, object *argl)
 
 /* SS_BIN_COMP - the binary comparison handler */
 
-object *SS_bin_comp(C_procedure *cp, object *argl)
+object *SS_bin_comp(SS_psides *si, C_procedure *cp, object *argl)
    {int type, lv;
     double c1, c2;
     PFIntdd fnc;
@@ -586,7 +586,7 @@ static int _SS_odd(double f)
 
 /* _SS_MACHINE_PREC - function version of SC_machine_prec */
 
-static object *_SS_machine_prec(void)
+static object *_SS_machine_prec(SS_psides *si)
    {object *rv;
 
     rv = SS_mk_float(PM_machine_precision());

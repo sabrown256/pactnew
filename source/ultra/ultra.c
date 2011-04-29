@@ -932,11 +932,11 @@ static void UL_init_env(void)
  *              - else return "#f"
  */
 
-object *UL_mode_text(void)
+object *UL_mode_text(SS_psides *si)
    {object *ret;
-    SS_psides *si;
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
     if (PG_console_device == NULL)
        PG_open_console("ULTRA II", SX_console_type, SX_background_color_white,
@@ -984,12 +984,12 @@ object *UL_mode_text(void)
  *                  - else return "#f"
  */
 
-object *UL_mode_graphics(void)
+object *UL_mode_graphics(SS_psides *si)
    {object *ret;
-    SS_psides *si;
     static object *scrwin = NULL;
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
     if (PG_console_device == NULL)
        {if (!PG_open_console("ULTRA II", SX_console_type,
@@ -1329,9 +1329,9 @@ int main(int c, char **v)
 
     SX_autoplot = ON;
     if (SX_gr_mode)
-       UL_mode_graphics();
+       UL_mode_graphics(si);
     else
-       UL_mode_text();
+       UL_mode_text(si);
 
 #ifdef NO_SHELL
     if (!commnd_flag)

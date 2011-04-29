@@ -513,7 +513,7 @@ object *SX_set_crv_id(int j, char *id)
 
 /* SX_RE_ID - reassign curve id's in sequence with no skipping */
 
-object *SX_re_id(void)
+object *SX_re_id(SS_psides *si)
    {int i, j;
     char id[10];
     object *obj;

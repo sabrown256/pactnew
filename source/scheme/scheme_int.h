@@ -96,7 +96,7 @@ struct s_SS_state
     char str[MAXLINE];};
 
 struct s_SS_smp_state
-   {PFPObject parser;};
+   {object *(*parser)(SS_psides *si);};
 
 /*--------------------------------------------------------------------------*/
 
@@ -321,7 +321,7 @@ extern void
  _SS_inst_read(void);
 
 extern object
- *_SSI_scheme_mode(void);
+ *_SSI_scheme_mode(SS_psides *si);
 
 
 /* SHSTRG.C declarations */

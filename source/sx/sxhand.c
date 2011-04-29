@@ -206,7 +206,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
  *            - or elements of C_array
  */
 
-object *_SX_mh_u_s(C_procedure *cp, object *argl)
+object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
    {object *ret, *first, *obj;
     int id, ne, nde;
     char *type;
@@ -219,7 +219,7 @@ object *_SX_mh_u_s(C_procedure *cp, object *argl)
     ret   = SS_null;
     first = _SX_resolve_mapping(argl);
     if (SS_numbp(first))
-       ret = SS_unary_flt(cp, argl);
+       ret = SS_unary_flt(si, cp, argl);
 
     else
        {fn = (PFDoubleR) cp->proc[0];
@@ -272,7 +272,7 @@ object *_SX_mh_u_s(C_procedure *cp, object *argl)
  *           - this was UL_uopxc in ULTRA II
  */
 
-object *_SX_m11_x(C_procedure *cp, object *argl)
+object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
    {int i, n;
     double *xp;
     PFDoubleR fn;
@@ -312,7 +312,7 @@ object *_SX_m11_x(C_procedure *cp, object *argl)
  *               - using a single object
  */
 
-object *_SX_m11_b_mro(C_procedure *cp, object *argl)
+object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
    {PM_mapping *f;
     PF_PPM_mapping_1 op;
     object *al, *obj, *ret;
@@ -373,7 +373,7 @@ void _SX_cmp_b_set(PFVoid oper, PM_set *set, double a, int cmp)
  *               - using a single scalar
  */
 
-object *_SX_m11_b_mrs(C_procedure *cp, object *argl)
+object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
    {double a;
     PM_set *set;
     PM_mapping *f;
@@ -414,7 +414,7 @@ object *_SX_m11_b_mrs(C_procedure *cp, object *argl)
  *               - using a single scalar
  */
 
-object *_SX_m11_b_mds(C_procedure *cp, object *argl)
+object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
    {double a;
     object *obj, *ret;
     PM_set *set;
@@ -456,7 +456,7 @@ object *_SX_m11_b_mds(C_procedure *cp, object *argl)
  *               - the component(s) is specified
  */
 
-object *_SX_mij_b_mrs(C_procedure *cp, object *argl)
+object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
    {int i;
     double a;
     PM_set *set;
@@ -504,7 +504,7 @@ object *_SX_mij_b_mrs(C_procedure *cp, object *argl)
  *               - the component(s) is specified
  */
 
-object *_SX_mij_b_mds(C_procedure *cp, object *argl)
+object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
    {int i;
     double a;
     object *obj, *ret;
@@ -549,7 +549,7 @@ object *_SX_mij_b_mds(C_procedure *cp, object *argl)
 
 /* _SX_MH_U_M - handler for unary operation acting on a set of mappings */
 
-object *_SX_mh_u_m(C_procedure *cp, object *argl)
+object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
    {int plf;
     PM_mapping *f, *h;
     PF_PPM_mapping_2 op;

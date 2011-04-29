@@ -1028,7 +1028,7 @@ static object *_SSI_catch_err(object *argl)
  *           - (yy mm dd hh mm ss) all are ints
  */
 
-static object *_SSI_time(void)
+static object *_SSI_time(SS_psides *si)
    {struct tm safe, *loct;
     time_t syst;
     object *o;

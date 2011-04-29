@@ -23,7 +23,7 @@ double
  *                - first cut all arrays required to be same type
  */
 
-static object *_SX_binary_arr(C_procedure *cp, object *argl)
+static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
    {int n, id;
     char v[MAX_PRSZ];
     char *otyp;
@@ -643,7 +643,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
  *            - of the range set of the given list of mappings
  */
 
-object *_SX_mh_b_s(C_procedure *cp, object *argl)
+object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
    {int plf;
     char label[MAXLINE+1];
     PFVoid *proc;
@@ -652,10 +652,10 @@ object *_SX_mh_b_s(C_procedure *cp, object *argl)
 
     first = SS_car(argl);
     if (SS_floatp(first))
-       mo = SS_binary_homogeneous(cp, argl);
+       mo = SS_binary_homogeneous(si, cp, argl);
 
     else if (SX_NUMERIC_ARRAYP(first))
-       mo = _SX_binary_arr(cp, argl);
+       mo = _SX_binary_arr(si, cp, argl);
 
     else
        {proc = cp->proc;
