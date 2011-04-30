@@ -82,12 +82,9 @@ object *_SS_strip_call(object *expr, int paren)
 
 /* SS_LOOKUP_IDENTIFIER_M - lookup an identifier for LEX */
 
-int SS_lookup_identifier_m(char *txt, object **lval)
+int SS_lookup_identifier_m(SS_psides *si, char *txt, object **lval)
    {int type;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     *lval = SS_f;
 
@@ -97,7 +94,7 @@ int SS_lookup_identifier_m(char *txt, object **lval)
 	type  = SS_m_tokens[0];}
 
     else
-       {*lval = SS_add_variable(txt);
+       {*lval = SS_add_variable(si, txt);
 
 /* group names begin with upper case letter */
 	if (isupper((int) *txt))
@@ -156,43 +153,43 @@ void SS_init_m_syntax_mode(SS_psides *si)
     if (_SS_mps.mode_init == FALSE)
        {_SS_mps.mode_init = TRUE;
 
-	SS_load_scm("msynt.scm");
+	SS_load_scm(si, "msynt.scm");
 
-	_SS_m_defunc    = SS_lookup_variable("m/defun", TRUE);
-	_SS_m_defvar    = SS_lookup_variable("m/scalar", TRUE);
-	_SS_m_defarr    = SS_lookup_variable("m/array", TRUE);
-	_SS_m_set       = SS_lookup_variable("m/set!", TRUE);
-	_SS_m_loop_test = SS_lookup_variable("m/loop", TRUE);
-	_SS_m_arr_call  = SS_lookup_variable("m/ac", TRUE);
-	_SS_m_list      = SS_lookup_variable("list", TRUE);
-	_SS_m_block     = SS_lookup_variable("begin", TRUE);
-	_SS_m_if        = SS_lookup_variable("if", TRUE);
-	_SS_m_for       = SS_lookup_variable("for", TRUE);
-	_SS_m_while     = SS_lookup_variable("while", TRUE);
-	_SS_m_expt      = SS_lookup_variable("expt", TRUE);
-	_SS_m_plus      = SS_lookup_variable("+", TRUE);
-	_SS_m_minus     = SS_lookup_variable("-", TRUE);
-	_SS_m_times     = SS_lookup_variable("*", TRUE);
-	_SS_m_divide    = SS_lookup_variable("/", TRUE);
-	_SS_m_modulo    = SS_lookup_variable("quotient", TRUE);
-	_SS_m_bitand    = SS_lookup_variable("&", TRUE);
-	_SS_m_bitor     = SS_lookup_variable("|", TRUE);
-	_SS_m_bitcmp    = SS_lookup_variable("~", TRUE);
-	_SS_m_not       = SS_lookup_variable("not", TRUE);
-	_SS_m_and       = SS_lookup_variable("and", TRUE);
-	_SS_m_or        = SS_lookup_variable("or", TRUE);
-	_SS_m_equal     = SS_lookup_variable("=", TRUE);
-	_SS_m_lt        = SS_lookup_variable("<", TRUE);
-	_SS_m_gt        = SS_lookup_variable(">", TRUE);
-	_SS_m_le        = SS_lookup_variable("<=", TRUE);
-        _SS_m_ge        = SS_lookup_variable(">=", TRUE);
-	_SS_m_label     = SS_lookup_variable("m/label", TRUE);
-	_SS_m_load      = SS_lookup_variable("ld", TRUE);
-	_SS_m_output    = SS_lookup_variable("m/<<", TRUE);
-	_SS_m_input     = SS_lookup_variable("m/>>", TRUE);
+	_SS_m_defunc    = SS_lookup_variable(si, "m/defun", TRUE);
+	_SS_m_defvar    = SS_lookup_variable(si, "m/scalar", TRUE);
+	_SS_m_defarr    = SS_lookup_variable(si, "m/array", TRUE);
+	_SS_m_set       = SS_lookup_variable(si, "m/set!", TRUE);
+	_SS_m_loop_test = SS_lookup_variable(si, "m/loop", TRUE);
+	_SS_m_arr_call  = SS_lookup_variable(si, "m/ac", TRUE);
+	_SS_m_list      = SS_lookup_variable(si, "list", TRUE);
+	_SS_m_block     = SS_lookup_variable(si, "begin", TRUE);
+	_SS_m_if        = SS_lookup_variable(si, "if", TRUE);
+	_SS_m_for       = SS_lookup_variable(si, "for", TRUE);
+	_SS_m_while     = SS_lookup_variable(si, "while", TRUE);
+	_SS_m_expt      = SS_lookup_variable(si, "expt", TRUE);
+	_SS_m_plus      = SS_lookup_variable(si, "+", TRUE);
+	_SS_m_minus     = SS_lookup_variable(si, "-", TRUE);
+	_SS_m_times     = SS_lookup_variable(si, "*", TRUE);
+	_SS_m_divide    = SS_lookup_variable(si, "/", TRUE);
+	_SS_m_modulo    = SS_lookup_variable(si, "quotient", TRUE);
+	_SS_m_bitand    = SS_lookup_variable(si, "&", TRUE);
+	_SS_m_bitor     = SS_lookup_variable(si, "|", TRUE);
+	_SS_m_bitcmp    = SS_lookup_variable(si, "~", TRUE);
+	_SS_m_not       = SS_lookup_variable(si, "not", TRUE);
+	_SS_m_and       = SS_lookup_variable(si, "and", TRUE);
+	_SS_m_or        = SS_lookup_variable(si, "or", TRUE);
+	_SS_m_equal     = SS_lookup_variable(si, "=", TRUE);
+	_SS_m_lt        = SS_lookup_variable(si, "<", TRUE);
+	_SS_m_gt        = SS_lookup_variable(si, ">", TRUE);
+	_SS_m_le        = SS_lookup_variable(si, "<=", TRUE);
+        _SS_m_ge        = SS_lookup_variable(si, ">=", TRUE);
+	_SS_m_label     = SS_lookup_variable(si, "m/label", TRUE);
+	_SS_m_load      = SS_lookup_variable(si, "ld", TRUE);
+	_SS_m_output    = SS_lookup_variable(si, "m/<<", TRUE);
+	_SS_m_input     = SS_lookup_variable(si, "m/>>", TRUE);
 
-	_SS_m_return    = SS_lookup_variable("-return-", TRUE);
-	_SS_m_continue  = SS_lookup_variable("-continue-", TRUE);
+	_SS_m_return    = SS_lookup_variable(si, "-return-", TRUE);
+	_SS_m_continue  = SS_lookup_variable(si, "-continue-", TRUE);
 
 	SS_add_type_synt(si, "integer");
 	SS_add_type_synt(si, "real");

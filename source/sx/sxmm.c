@@ -79,10 +79,11 @@ static void _SX_wr_gpdbdata(object *obj, object *strm)
 object *_SX_mk_gpdbdata(char *name, void *data, syment *ep, PDBfile *file)
    {g_pdbdata *pp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     pp = _SX_mk_pdbdata(name, data, ep, file);
 
-    op = SS_mk_object(pp, G_PDBDATA, SELF_EV, pp->name,
+    op = SS_mk_object(si, pp, G_PDBDATA, SELF_EV, pp->name,
 		      _SX_wr_gpdbdata, _SX_rl_gpdbdata);
     SC_mark(pp, 1);
 
@@ -107,11 +108,12 @@ static void _SX_wr_gsyment(object *obj, object *strm)
 
 object *_SX_mk_gsyment(syment *ep)
    {object *op;
+    SS_psides *si = &_SS_si;
 
     if (ep == NULL)
        return(SS_null);
 
-    op = SS_mk_object(ep, G_SYMENT, SELF_EV, ep->type,
+    op = SS_mk_object(si, ep, G_SYMENT, SELF_EV, ep->type,
 		      _SX_wr_gsyment, SS_rl_object);
 
     return(op);}
@@ -135,11 +137,12 @@ static void _SX_wr_gdefstr(object *obj, object *strm)
 
 object *_SX_mk_gdefstr(defstr *dp)
    {object *op;
+    SS_psides *si = &_SS_si;
 
     if (dp == NULL)
        return(SS_null);
 
-    op = SS_mk_object(dp, G_DEFSTR, SELF_EV, dp->type,
+    op = SS_mk_object(si, dp, G_DEFSTR, SELF_EV, dp->type,
 		      _SX_wr_gdefstr, SS_rl_object);
 
     return(op);}
@@ -244,13 +247,14 @@ static void _SX_rl_file(g_file *po)
 
 object *SX_mk_gfile(g_file *po)
    {object *op;
+    SS_psides *si = &_SS_si;
 
     if (po == NULL)
        return(SS_null);
 
     SC_mark(po, 1);
 
-    op = SS_mk_object(po, G_FILE, SELF_EV, po->name,
+    op = SS_mk_object(si, po, G_FILE, SELF_EV, po->name,
 		      _SX_wr_gfile, SS_rl_object);
 
     return(op);}

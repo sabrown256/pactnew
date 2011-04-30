@@ -34,7 +34,7 @@ static object *_SXI_describe(SS_psides *si, object *argl)
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
          if (obj != NULL)
-            {if (!SS_prim_des(si->outdev, obj))
+            {if (!SS_prim_des(si, si->outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
     return(SS_f);}
@@ -581,7 +581,7 @@ int SX_command(char *file, char *cmd)
 	SX_init_mappings();
 	SX_init_env();
 
-	SS_load_scm("nature.scm");
+	SS_load_scm(si, "nature.scm");
 
 	PG_set_use_pixmap(TRUE);
 
@@ -603,9 +603,9 @@ int SX_command(char *file, char *cmd)
 
 	SC_mem_stats_set(0L, 0L);};
 
-    SS_load_scm(file);
+    SS_load_scm(si, file);
 
-    ret = SS_run(cmd);
+    ret = SS_run(si, cmd);
 
     return(ret);}
         

@@ -566,7 +566,7 @@ void SX_parse(void (*replot)(void), char *(*reproc)(char *s),
                 while ((t = (*reproc)(line)) != NULL)
                   {strcpy(ptr, t);
                    SS_PTR(strm) = SS_BUFFER(strm);
-                   SS_Assign(si->rdobj, SS_read(strm));
+                   SS_Assign(si->rdobj, SS_read(si, strm));
                    si->interactive = ON;
                    SX_plot_flag   = TRUE;
                    SS_Assign(si->evobj, SS_eval(si, si->rdobj));
@@ -981,6 +981,7 @@ void SX_register_devices(void)
 
 void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
    {char *s;
+    SS_psides *si = &_SS_si;
 
 /* figure out the runtime file */
     if (SC_query_file(ffn, "r", "ascii"))
@@ -994,7 +995,7 @@ void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
 	    SX_quit(ABORT);};};
 
 /* load the runtime file */
-    SS_load_scm(s);
+    SS_load_scm(si, s);
 
     CFREE(s);
 
@@ -1015,7 +1016,7 @@ void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
 		SX_quit(ABORT);};};
 
 /* load the init file */
-	SS_load_scm(s);
+	SS_load_scm(si, s);
 
 	CFREE(s);};
 

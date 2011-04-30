@@ -779,11 +779,12 @@ static void _SX_rl_gset(object *obj)
 
 object *SX_mk_set(PM_set *set)
    {object *op;
+    SS_psides *si = &_SS_si;
 
     if (set == NULL)
        op = SS_null;
     else
-       op = SS_mk_object(set, G_SET, SELF_EV, set->name,
+       op = SS_mk_object(si, set, G_SET, SELF_EV, set->name,
 			 _SX_wr_gset, _SX_rl_gset);
 
     return(op);}
@@ -1066,8 +1067,9 @@ static void _SX_rl_gmapping(object *obj)
 
 object *SX_mk_mapping(PM_mapping *f)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(f, G_MAPPING, SELF_EV, f->name,
+    op = SS_mk_object(si, f, G_MAPPING, SELF_EV, f->name,
 		      _SX_wr_gmapping, _SX_rl_gmapping);
 
     return(op);}
@@ -1536,8 +1538,9 @@ static void _SX_rl_gnum_array(object *obj)
 
 object *SX_mk_C_array(C_array *arr)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(arr, G_NUM_ARRAY, SELF_EV, arr->type,
+    op = SS_mk_object(si, arr, G_NUM_ARRAY, SELF_EV, arr->type,
 		      _SX_wr_gnum_array, _SX_rl_gnum_array);
 
     SC_mark(arr, 1);
@@ -1805,8 +1808,9 @@ static void _SX_rl_gpolygon(object *obj)
 
 object *SX_mk_polygon(PM_polygon *py)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(py, G_POLYGON, SELF_EV, "pm-polygon",
+    op = SS_mk_object(si, py, G_POLYGON, SELF_EV, "pm-polygon",
 		      _SX_wr_gpolygon, _SX_rl_gpolygon);
 
     SC_mark(py, 1);

@@ -20,17 +20,17 @@
 #define yywrap SS_wrap_input_synt
 
 #define DIAG_RETURN(x)                                                       \
-    return(_SS_diagnose_return_synt(x, #x, SS_parse_debug_c))
+    return(_SS_diagnose_return_synt(SI, x, #x, SS_parse_debug_c))
 
 #define IDENT_RETURN(x)                                                      \
-    return(_SS_diagnose_return_synt(x, "IDENTIFIER", SS_parse_debug_c))
+    return(_SS_diagnose_return_synt(SI, x, "IDENTIFIER", SS_parse_debug_c))
 
 #ifdef FLEX_SCANNER
 
 #undef YY_INPUT
 #define YY_INPUT(bf, res, szx)                                               \
    {int c;                                                                   \
-    c     = SS_input_synt((char *) yytext);                                  \
+    c     = SS_input_synt(SI, (char *) yytext);                              \
     res   = (c != EOF);                                                      \
     bf[0] = (char) c;}
 
@@ -39,8 +39,8 @@
 #undef input
 #undef unput
 
-#define input()  SS_input_synt((char *) yytext)
-#define unput(c) SS_unput_synt(c)
+#define input()  SS_input_synt(SI, (char *) yytext)
+#define unput(c) SS_unput_synt(SI, c)
 
 #endif
 
@@ -173,7 +173,7 @@ enum           {DIAG_RETURN(ENUM);}
 {DD}*\.?{DD}+({EXP})?      {yylval = SS_mk_float(STRTOD(yytext, NULL));
                             DIAG_RETURN(FLOAT);}
 
-{QUT}          {yylval = SS_parse_string_c();
+{QUT}          {yylval = SS_parse_string_c(SI);
                 DIAG_RETURN(STRING);}
 
 {DERS}         {DIAG_RETURN(DER);}
@@ -214,23 +214,23 @@ enum           {DIAG_RETURN(ENUM);}
 {OREQS}        {DIAG_RETURN(OREQ);}
 {XOREQS}       {DIAG_RETURN(XOREQ);}
 
-{CAROTS}       {if (_SS_si.strict_c == TRUE)
+{CAROTS}       {if (SI->strict_c == TRUE)
                    {DIAG_RETURN(XOR);}
                 else
                    {DIAG_RETURN(EXPT);};}
 
 {TYPE_QUALS}   {char func[MAXLINE];
                 sprintf(func, "c/%s", (char *) yytext);
-                yylval = SS_lookup_variable(func, TRUE);
+                yylval = SS_lookup_variable(SI, func, TRUE);
                 DIAG_RETURN(TYPE_QUALIFIER);}
 
 {STOR_CLAS}    {char func[MAXLINE];
                 sprintf(func, "c/%s", (char *) yytext);
-                yylval = SS_lookup_variable(func, TRUE);
+                yylval = SS_lookup_variable(SI, func, TRUE);
                 DIAG_RETURN(STORAGE_CLASS);}
 
-{TYPES}        {IDENT_RETURN(SS_lookup_identifier_c(&_SS_si, (char *) yytext, &yylval));}
-{IDENT}        {IDENT_RETURN(SS_lookup_identifier_c(&_SS_si, (char *) yytext, &yylval));}
+{TYPES}        {IDENT_RETURN(SS_lookup_identifier_c(SI, (char *) yytext, &yylval));}
+{IDENT}        {IDENT_RETURN(SS_lookup_identifier_c(SI, (char *) yytext, &yylval));}
 
 {WS}                    ;
 {BEGCMT}.*{ENDCMT}      ;

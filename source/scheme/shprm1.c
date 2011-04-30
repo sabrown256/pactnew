@@ -911,7 +911,7 @@ void _SS_end_trace(SS_psides *si)
 static object *_SSI_catch(SS_psides *si, object *obj)
    {object *escape, *ret, *lst;
 
-    escape = SS_mk_esc_proc(si->errlev, SS_PROCEDURE_I);
+    escape = SS_mk_esc_proc(si, si->errlev, SS_PROCEDURE_I);
 
     lst    = SS_make_list(SS_OBJECT_I, obj,
 			  SS_OBJECT_I, escape,
@@ -966,7 +966,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
 	     ret = SS_exp_eval(si, proc_call);
 
         case ERR_FREE :
-	     esc = SS_pop_err(si->errlev - 1, FALSE);
+	     esc = SS_pop_err(si, si->errlev - 1, FALSE);
 	     SS_GC(esc);
 	     ret = SS_null;};
 

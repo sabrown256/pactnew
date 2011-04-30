@@ -180,7 +180,7 @@ static int _SS_repl(SS_psides *si)
     SS_Assign(si->rdobj, SS_null);
     SS_Assign(si->evobj, SS_null);
 
-    _SS_set_ans_prompt();
+    _SS_set_ans_prompt(si);
 
     bd = 0L;
     while (TRUE)
@@ -192,7 +192,7 @@ static int _SS_repl(SS_psides *si)
 
 /* print the prompt call the Reader */
 	_SS.pr_prompt = si->prompt;
-        SS_Assign(si->rdobj, SS_read(si->indev));
+        SS_Assign(si->rdobj, SS_read(si, si->indev));
 
         if (si->post_read != NULL)
            (*si->post_read)(si->indev);
@@ -274,7 +274,7 @@ void SS_end_scheme(SS_psides *si, int val)
        SS_trans_off(si);
 
     if (_SS.active_objects == TRUE)
-       _SS_object_map(stdout, TRUE);
+       _SS_object_map(si, stdout, TRUE);
 
     switch (val)
        {case ERR_FREE :
@@ -681,7 +681,7 @@ void SS_push_err(SS_psides *si, int flag, int type)
 
     SS_save_registers(si, flag);
 
-    x = SS_mk_esc_proc(si->errlev, type);
+    x = SS_mk_esc_proc(si, si->errlev, type);
     SS_MARK(x);
     si->err_stack[si->errlev] = x;
 
@@ -698,11 +698,8 @@ void SS_push_err(SS_psides *si, int flag, int type)
  *            - correct error stack frame
  */
 
-object *SS_pop_err(int n, int flag)
+object *SS_pop_err(SS_psides *si, int n, int flag)
    {object *x;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (si->errlev < 1)
        {PRINT(stdout, "\nERROR: ERROR STACK BLOWN - SS_POP_ERR\n\n");
@@ -713,7 +710,7 @@ object *SS_pop_err(int n, int flag)
        {x = si->err_stack[--si->errlev];
         si->err_stack[si->errlev] = NULL;
         if (si->errlev <= n)
-           {_SS_restore_state(x);
+           {_SS_restore_state(si, x);
             break;}
         else
            SS_GC(x);};
@@ -729,12 +726,9 @@ object *SS_pop_err(int n, int flag)
  *                        - of the interpreter
  */
 
-static void _SS_restore_state_prim(int ns, int nc, int ne)
+static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
    {int n;
     object *x, *esc;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     n = SC_array_get_n(si->stack) - 1;
 
@@ -767,7 +761,7 @@ static void _SS_restore_state_prim(int ns, int nc, int ne)
          si->err_stack[si->errlev-1] = NULL;
          SS_GC(esc);};
 
-    _SS_set_ans_prompt();
+    _SS_set_ans_prompt(si);
 
     return;}
 
@@ -778,14 +772,14 @@ static void _SS_restore_state_prim(int ns, int nc, int ne)
  *                   - implied by the given escape procedure
  */
 
-void _SS_restore_state(object *esc_proc)
+void _SS_restore_state(SS_psides *si, object *esc_proc)
    {int ns, nc, ne;
 
     ns = SS_ESCAPE_STACK(esc_proc);
     nc = SS_ESCAPE_CONTINUATION(esc_proc);
     ne = SS_ESCAPE_ERROR(esc_proc);
 
-    _SS_restore_state_prim(ns, nc, ne);
+    _SS_restore_state_prim(si, ns, nc, ne);
 
     return;}
 
@@ -818,7 +812,7 @@ static object *_SSI_break(SS_psides *si)
 static object *_SSI_reset(SS_psides *si)
    {
 
-    _SS_restore_state_prim(0, 1, 0);
+    _SS_restore_state_prim(si, 0, 1, 0);
     PRINT(stdout,"\n");
 
     LONGJMP(si->continue_int[1].cont, ABORT);
@@ -852,7 +846,7 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
     val = SS_car(argl);    
 
     if (si->errlev > 1)
-       {x = SS_pop_err(n, TRUE);
+       {x = SS_pop_err(si, n, TRUE);
 
         SS_Restore(si, si->rdobj);
         SS_Restore(si, si->evobj);
@@ -963,7 +957,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 	        _SS.ret = fint(si);
 
         case ERR_FREE :
-	     esc = SS_pop_err(si->errlev - 1, FALSE);
+	     esc = SS_pop_err(si, si->errlev - 1, FALSE);
 	     SS_GC(esc);};
 
     si->cont_ptr--;
@@ -1004,7 +998,7 @@ void SS_error(char *s, object *obj)
     SS_PTR(si->indev) = t;
     *t = '\0';
 
-    esc = SS_pop_err(si->errlev - 1, FALSE);
+    esc = SS_pop_err(si, si->errlev - 1, FALSE);
     nc  = SS_ESCAPE_CONTINUATION(esc);
     SS_GC(esc);
 

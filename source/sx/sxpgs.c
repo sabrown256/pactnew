@@ -373,8 +373,9 @@ static void _SX_rl_ggraph(object *obj)
 
 object *SX_mk_graph(PG_graph *g)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(g, G_GRAPH, SELF_EV, g->f->name,
+    op = SS_mk_object(si, g, G_GRAPH, SELF_EV, g->f->name,
 		      _SX_wr_ggraph, _SX_rl_ggraph);
 
     return(op);}
@@ -413,8 +414,9 @@ static void _SX_rl_gdev_attr(object *obj)
 
 object *SX_mk_dev_attributes(PG_dev_attributes *da)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(da, G_DEV_ATTRIBUTES, SELF_EV, NULL,
+    op = SS_mk_object(si, da, G_DEV_ATTRIBUTES, SELF_EV, NULL,
 		      _SX_wr_gdev_attr, _SX_rl_gdev_attr);
 
     return(op);}
@@ -618,8 +620,9 @@ static void _SX_rl_gimage(object *obj)
 
 object *SX_mk_image(PG_image *im)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(im, G_IMAGE, SELF_EV, im->label,
+    op = SS_mk_object(si, im, G_IMAGE, SELF_EV, im->label,
 		      _SX_wr_gimage, _SX_rl_gimage);
 
     return(op);}
@@ -881,11 +884,12 @@ static void _SX_rl_gdevice(object *obj)
 
 object *SX_mk_graphics_device(PG_device *dev)
    {object *op;
+    SS_psides *si = &_SS_si;
 
     if (dev == NULL)
        op = SS_null;
     else
-       op = SS_mk_object(dev, G_DEVICE, SELF_EV, dev->title,
+       op = SS_mk_object(si, dev, G_DEVICE, SELF_EV, dev->title,
 			 _SX_wr_gdevice, _SX_rl_gdevice);
 
     return(op);}

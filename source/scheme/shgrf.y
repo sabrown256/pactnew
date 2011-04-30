@@ -28,7 +28,7 @@
 #define shgrf_lex   shlrf_lex
 #define shgrf_lval  shlrf_lval
 
-#define yyerror(x)  SS_parse_error_synt(x, SS_parse_token_f)
+#define yyerror(x)  SS_parse_error_synt(SI, x, SS_parse_token_f)
 
 /* assign X to yyval and _SS_f_val because in bison yyval is
  * a local variable in yyparse whereas in yacc it is file static

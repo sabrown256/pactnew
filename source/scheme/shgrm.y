@@ -28,7 +28,7 @@
 #define shgrm_lex   shlrm_lex
 #define shgrm_lval  shlrm_lval
 
-#define yyerror(x)  SS_parse_error_synt(x, SS_parse_token_m)
+#define yyerror(x)  SS_parse_error_synt(SI, x, SS_parse_token_m)
 
 /* assign X to yyval and _SS_m_val because in bison yyval is
  * a local variable in yyparse whereas in yacc it is file static
@@ -666,7 +666,7 @@ misc :
       {object *lst;
        SS_psides *si;
 
-       si = &_SS_si;
+       si = SI;
 
        if (SS_consp($2) && !SS_procedurep(SS_eval(si, SS_CAR_MACRO($2))))
 	  lst = SS_reverse($2);
@@ -680,7 +680,7 @@ misc :
       {object *lst;
        SS_psides *si;
 
-       si = &_SS_si;
+       si = SI;
 
        if (SS_consp($2) && !SS_procedurep(SS_eval(si, SS_CAR_MACRO($2))))
 	  lst = SS_mk_cons(_SS_m_list, SS_reverse($2));

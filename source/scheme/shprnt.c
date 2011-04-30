@@ -22,10 +22,8 @@ static int
 
 /* SS_SET_PROMPT - set the interpreter prompt string */
 
-void SS_set_prompt(char *fmt, ...)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_set_prompt(SS_psides *si, char *fmt, ...)
+   {
 
     SC_VA_START(fmt);
     SC_VSNPRINTF(si->prompt, MAXLINE, fmt);
@@ -38,10 +36,8 @@ void SS_set_prompt(char *fmt, ...)
 
 /* _SS_SET_ANS_PROMPT - set the answer "prompt" */
 
-void _SS_set_ans_prompt(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void _SS_set_ans_prompt(SS_psides *si)
+   {
 
     snprintf(si->ans_prompt, MAXLINE, "(%d): ", si->errlev - 1);
 
@@ -181,11 +177,11 @@ static object *_SS_sprint(object *obj, char *fmt, object *strm)
 
 /* DPREG - print all of the SCHEME registers */
 
-void dpreg(void)
+void dpreg(SS_psides *si)
    {FILE *str;
-    SS_psides *si;
-
-    si = &_SS_si;
+    
+    if (si == NULL)
+       si = &_SS_si;
 
     str = SS_OUTSTREAM(si->outdev);
     PRINT(str, "Scheme registers:\n");
@@ -207,10 +203,11 @@ void dpreg(void)
 
 /* DPRINT - an easy to use debug time object printer */
 
-void dprint(object *obj)
-   {SS_psides *si;
+void dprint(SS_psides *si, object *obj)
+   {
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
     if (obj != NULL)
        SS_print(obj, "", "\n", si->outdev);
@@ -740,14 +737,11 @@ object *SS_banner(SS_psides *si, object *obj)
 
 /* SS_PRIM_DES - primitive part of describe facility */
 
-int SS_prim_des(object *strm, object *obj)
+int SS_prim_des(SS_psides *si, object *strm, object *obj)
    {int fmt;
     char *s;
     object *desc, *bdy;
     FILE *str;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     str = SS_OUTSTREAM(strm);
 
@@ -846,7 +840,7 @@ static object *_SSI_describe(SS_psides *si, object *argl)
     if (!SS_outportp(strm))
        SS_error("LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
 
-    ok = SS_prim_des(strm, obj);
+    ok = SS_prim_des(si, strm, obj);
     SC_ASSERT(ok == TRUE);
 /*
     if (ok == FALSE)
@@ -889,15 +883,12 @@ static void _SS_apr_proc(FILE *str, char *s, object *op,
  *              - name or description
  */
 
-static int _SS_prim_apr(FILE *str, char *s, hasharr *tab)
+static int _SS_prim_apr(SS_psides *si, FILE *str, char *s, hasharr *tab)
    {int flag, nlp, nmore, vcnt;
     long i;
     char bf[10];
     char *name;
     object *op, *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
         
     flag  = 0;
     vcnt  = 0;
@@ -949,15 +940,12 @@ static int _SS_prim_apr(FILE *str, char *s, hasharr *tab)
  *             - name or description
  */
 
-int SS_prim_apr(FILE *str, char *s)
+int SS_prim_apr(SS_psides *si, FILE *str, char *s)
    {int i, flag;
     hasharr *tab;
     object *penv, *l, *v;
-    SS_psides *si;
 
-    si = &_SS_si;
-
-    flag = _SS_prim_apr(str, s, si->symtab);
+    flag = _SS_prim_apr(si, str, s, si->symtab);
 
     penv = si->env;
     for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
@@ -966,7 +954,7 @@ int SS_prim_apr(FILE *str, char *s)
 	 SC_ASSERT(v != NULL);
 
 	 tab = SS_GET(hasharr, SS_cadr(l));
-	 flag |= _SS_prim_apr(str, s, tab);};
+	 flag |= _SS_prim_apr(si, str, s, tab);};
 
     return(flag);}
 
@@ -1011,7 +999,7 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
        SS_error("BAD OBJECT - APROPOS", obj);
 
     PRINT(str, "\nApropos search string: %s\n\n", token);
-    if (!SS_prim_apr(str, token))
+    if (!SS_prim_apr(si, str, token))
        PRINT(str, "No documentation on %s\n\n", token);
 
     return(SS_f);}

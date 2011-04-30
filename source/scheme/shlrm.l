@@ -20,17 +20,17 @@
 #define yywrap SS_wrap_input_synt
 
 #define DIAG_RETURN(x)                                                       \
-    return(_SS_diagnose_return_synt(x, #x, SS_parse_debug_m))
+    return(_SS_diagnose_return_synt(SI, x, #x, SS_parse_debug_m))
 
 #define IDENT_RETURN(x)                                                      \
-    return(_SS_diagnose_return_synt(x, "IDENTIFIER", SS_parse_debug_m))
+    return(_SS_diagnose_return_synt(SI, x, "IDENTIFIER", SS_parse_debug_m))
 
 #ifdef FLEX_SCANNER
 
 #undef YY_INPUT
 #define YY_INPUT(bf, res, szx)                                               \
    {int c;                                                                   \
-    c     = SS_input_synt((char *) yytext);                                  \
+    c     = SS_input_synt(SI, (char *) yytext);                         \
     res   = (c != EOF);                                                      \
     bf[0] = (char) c;}
 
@@ -39,8 +39,8 @@
 #undef input
 #undef unput
 
-#define input()  SS_input_synt((char *) yytext)
-#define unput(c) SS_unput_synt(c)
+#define input()  SS_input_synt(SI, (char *) yytext)
+#define unput(c) SS_unput_synt(SI, c)
 
 #endif
 
@@ -191,7 +191,7 @@ call         {DIAG_RETURN(CALL);}
 {FCMTS}                 ;
 {MCMTS}                 ;
 
-{IDENT}    {IDENT_RETURN(SS_lookup_identifier_m((char *) yytext, &yylval));}
+{IDENT}    {IDENT_RETURN(SS_lookup_identifier_m(SI, (char *) yytext, &yylval));}
 {GROUPNS}  {DIAG_RETURN(GROUPNAME);}
 
 .          {return(yytext[0]);}

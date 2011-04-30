@@ -237,7 +237,7 @@ int SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval)
 	type  = SS_c_tokens[0];}
 
     else
-       {*lval = SS_add_variable(txt);
+       {*lval = SS_add_variable(si, txt);
 	type  = SS_c_tokens[1];};
 
     return(type);}
@@ -312,64 +312,64 @@ void SS_init_c_syntax_mode(SS_psides *si)
     if (_SS_cps.mode_init == FALSE)
        {_SS_cps.mode_init = TRUE;
 
-	SS_load_scm("csynt.scm");
+	SS_load_scm(si, "csynt.scm");
 
-        _SS_c_decl      = SS_lookup_variable("c/decl-spec", TRUE);
-	_SS_c_defunc    = SS_lookup_variable("c/defun", TRUE);
-	_SS_c_defvar    = SS_lookup_variable("c/scalar", TRUE);
-	_SS_c_defarr    = SS_lookup_variable("c/array", TRUE);
-	_SS_c_set       = SS_lookup_variable("c/set!", TRUE);
-	_SS_c_block     = SS_lookup_variable("let*", TRUE);
-	_SS_c_if        = SS_lookup_variable("c/if", TRUE);
-	_SS_c_for       = SS_lookup_variable("for", TRUE);
-	_SS_c_while     = SS_lookup_variable("while", TRUE);
-	_SS_c_plus      = SS_lookup_variable("+", TRUE);
-	_SS_c_minus     = SS_lookup_variable("-", TRUE);
-	_SS_c_times     = SS_lookup_variable("*", TRUE);
-	_SS_c_divide    = SS_lookup_variable("/", TRUE);
-	_SS_c_expt      = SS_lookup_variable("expt", TRUE);
-	_SS_c_modulo    = SS_lookup_variable("quotient", TRUE);
-	_SS_c_bitand    = SS_lookup_variable("&", TRUE);
-	_SS_c_bitor     = SS_lookup_variable("|", TRUE);
-	_SS_c_xor       = SS_lookup_variable("xor", TRUE);
-	_SS_c_xor_pow   = SS_lookup_variable("^", TRUE);
-	_SS_c_bitcmp    = SS_lookup_variable("~", TRUE);
-	_SS_c_lshft     = SS_lookup_variable("<<", TRUE);
-	_SS_c_rshft     = SS_lookup_variable(">>", TRUE);
-	_SS_c_not       = SS_lookup_variable("not", TRUE);
-	_SS_c_and       = SS_lookup_variable("and", TRUE);
-	_SS_c_or        = SS_lookup_variable("or", TRUE);
-	_SS_c_equal     = SS_lookup_variable("eqv?", TRUE);
-	_SS_c_lt        = SS_lookup_variable("<", TRUE);
-	_SS_c_gt        = SS_lookup_variable(">", TRUE);
-	_SS_c_le        = SS_lookup_variable("<=", TRUE);
-        _SS_c_ge        = SS_lookup_variable(">=", TRUE);
-        _SS_c_defined   = SS_lookup_variable("defined?", TRUE);
-	_SS_c_struct    = SS_lookup_variable("c/struct", TRUE);
-        _SS_c_union     = SS_lookup_variable("c/union", TRUE);
-        _SS_c_enum      = SS_lookup_variable("c/enum", TRUE);
-        _SS_c_derived   = SS_lookup_variable("c/derived", TRUE);
-	_SS_c_aref      = SS_lookup_variable("c/[]", TRUE);
-	_SS_c_mref      = SS_lookup_variable("c/->", TRUE);
-	_SS_c_preinc    = SS_lookup_variable("c/++x", TRUE);
-	_SS_c_predec    = SS_lookup_variable("c/--x", TRUE);
-	_SS_c_postinc   = SS_lookup_variable("c/x++", TRUE);
-	_SS_c_postdec   = SS_lookup_variable("c/x--", TRUE);
-	_SS_c_cond      = SS_lookup_variable("c/switch", TRUE);
-	_SS_c_label     = SS_lookup_variable("c/label", TRUE);
-	_SS_c_sizeof    = SS_lookup_variable("c/sizeof", TRUE);
-	_SS_c_cast      = SS_lookup_variable("c/cast", TRUE);
-	_SS_c_goto      = SS_lookup_variable("c/goto", TRUE);
-	_SS_c_strapp    = SS_lookup_variable("string-append", TRUE);
+        _SS_c_decl      = SS_lookup_variable(si, "c/decl-spec", TRUE);
+	_SS_c_defunc    = SS_lookup_variable(si, "c/defun", TRUE);
+	_SS_c_defvar    = SS_lookup_variable(si, "c/scalar", TRUE);
+	_SS_c_defarr    = SS_lookup_variable(si, "c/array", TRUE);
+	_SS_c_set       = SS_lookup_variable(si, "c/set!", TRUE);
+	_SS_c_block     = SS_lookup_variable(si, "let*", TRUE);
+	_SS_c_if        = SS_lookup_variable(si, "c/if", TRUE);
+	_SS_c_for       = SS_lookup_variable(si, "for", TRUE);
+	_SS_c_while     = SS_lookup_variable(si, "while", TRUE);
+	_SS_c_plus      = SS_lookup_variable(si, "+", TRUE);
+	_SS_c_minus     = SS_lookup_variable(si, "-", TRUE);
+	_SS_c_times     = SS_lookup_variable(si, "*", TRUE);
+	_SS_c_divide    = SS_lookup_variable(si, "/", TRUE);
+	_SS_c_expt      = SS_lookup_variable(si, "expt", TRUE);
+	_SS_c_modulo    = SS_lookup_variable(si, "quotient", TRUE);
+	_SS_c_bitand    = SS_lookup_variable(si, "&", TRUE);
+	_SS_c_bitor     = SS_lookup_variable(si, "|", TRUE);
+	_SS_c_xor       = SS_lookup_variable(si, "xor", TRUE);
+	_SS_c_xor_pow   = SS_lookup_variable(si, "^", TRUE);
+	_SS_c_bitcmp    = SS_lookup_variable(si, "~", TRUE);
+	_SS_c_lshft     = SS_lookup_variable(si, "<<", TRUE);
+	_SS_c_rshft     = SS_lookup_variable(si, ">>", TRUE);
+	_SS_c_not       = SS_lookup_variable(si, "not", TRUE);
+	_SS_c_and       = SS_lookup_variable(si, "and", TRUE);
+	_SS_c_or        = SS_lookup_variable(si, "or", TRUE);
+	_SS_c_equal     = SS_lookup_variable(si, "eqv?", TRUE);
+	_SS_c_lt        = SS_lookup_variable(si, "<", TRUE);
+	_SS_c_gt        = SS_lookup_variable(si, ">", TRUE);
+	_SS_c_le        = SS_lookup_variable(si, "<=", TRUE);
+        _SS_c_ge        = SS_lookup_variable(si, ">=", TRUE);
+        _SS_c_defined   = SS_lookup_variable(si, "defined?", TRUE);
+	_SS_c_struct    = SS_lookup_variable(si, "c/struct", TRUE);
+        _SS_c_union     = SS_lookup_variable(si, "c/union", TRUE);
+        _SS_c_enum      = SS_lookup_variable(si, "c/enum", TRUE);
+        _SS_c_derived   = SS_lookup_variable(si, "c/derived", TRUE);
+	_SS_c_aref      = SS_lookup_variable(si, "c/[]", TRUE);
+	_SS_c_mref      = SS_lookup_variable(si, "c/->", TRUE);
+	_SS_c_preinc    = SS_lookup_variable(si, "c/++x", TRUE);
+	_SS_c_predec    = SS_lookup_variable(si, "c/--x", TRUE);
+	_SS_c_postinc   = SS_lookup_variable(si, "c/x++", TRUE);
+	_SS_c_postdec   = SS_lookup_variable(si, "c/x--", TRUE);
+	_SS_c_cond      = SS_lookup_variable(si, "c/switch", TRUE);
+	_SS_c_label     = SS_lookup_variable(si, "c/label", TRUE);
+	_SS_c_sizeof    = SS_lookup_variable(si, "c/sizeof", TRUE);
+	_SS_c_cast      = SS_lookup_variable(si, "c/cast", TRUE);
+	_SS_c_goto      = SS_lookup_variable(si, "c/goto", TRUE);
+	_SS_c_strapp    = SS_lookup_variable(si, "string-append", TRUE);
 
-	_SS_c_return    = SS_lookup_variable("-return-", TRUE);
-	_SS_c_continue  = SS_lookup_variable("-continue-", TRUE);
+	_SS_c_return    = SS_lookup_variable(si, "-return-", TRUE);
+	_SS_c_continue  = SS_lookup_variable(si, "-continue-", TRUE);
 
 /* CPP syntax procedures */
-	_SS_c_load      = SS_lookup_variable("load", TRUE);
-	_SS_c_defmac    = SS_lookup_variable("c/macro", TRUE);
-	_SS_c_catvars   = SS_lookup_variable("c/cat-vars", TRUE);
-	_SS_c_strvar    = SS_lookup_variable("c/str-var", TRUE);
+	_SS_c_load      = SS_lookup_variable(si, "load", TRUE);
+	_SS_c_defmac    = SS_lookup_variable(si, "c/macro", TRUE);
+	_SS_c_catvars   = SS_lookup_variable(si, "c/cat-vars", TRUE);
+	_SS_c_strvar    = SS_lookup_variable(si, "c/str-var", TRUE);
 
 /* GOTHCA: work out adding C99 types
  * the space in types like "long double" will have to be sorted out

@@ -20,11 +20,8 @@ typedef object *objp;
 
 /* SS_INPUT_SYNT - get the next character from the stream for the lexer */
 
-int SS_input_synt(char *ltxt)
+int SS_input_synt(SS_psides *si, char *ltxt)
    {int c;
-    SS_psides *si;
-
-    si = &_SS_si;
     
     si->lex_text = ltxt;
 
@@ -47,13 +44,13 @@ int SS_input_synt(char *ltxt)
 
 /* _SS_PUSH_TOKEN - put string S back onto the stream for the lexer */
 
-void _SS_push_token(char *s)
+void _SS_push_token(SS_psides *si, char *s)
    {int i, n, c;
 
     n = strlen(s);
     for (i = n-1; i >= 0; i--)
         {c = s[i];
-	 SS_unput_synt(c);
+	 SS_unput_synt(si, c);
          s[i] = '\0';};
 
     return;}
@@ -63,10 +60,8 @@ void _SS_push_token(char *s)
 
 /* SS_UNPUT_SYNT - put C back onto the stream for the lexer */
 
-void SS_unput_synt(int c)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_unput_synt(SS_psides *si, int c)
+   {
 
     si->pr_ch_un(c, si->character_stream);
 
@@ -170,10 +165,10 @@ void SS_name_map_synt(char *d, char *s)
 
 /* SS_LOOKUP_VARIABLE - lookup a variable for LEX */
 
-object *SS_lookup_variable(char *txt, int verbose)
+object *SS_lookup_variable(SS_psides *si, char *txt, int verbose)
    {object *o;
 
-    o = SS_add_variable(txt);
+    o = SS_add_variable(si, txt);
 
     return(o);}
 
@@ -207,11 +202,8 @@ object *SS_add_type_synt(SS_psides *si, char *name)
  *                     - parser
  */
 
-void _SS_diagnostic_synt(object *expr, char *msg, int diag)
+void _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag)
    {char s[MAXLINE];
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (diag)
        {snprintf(s, MAXLINE, "%s: ", msg);
@@ -224,11 +216,8 @@ void _SS_diagnostic_synt(object *expr, char *msg, int diag)
 
 /* _SS_DIAGNOSE_RETURN_SYNT - print diagnostics for returns */
 
-int _SS_diagnose_return_synt(int x, char *y, PFPInt fnc)
+int _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc)
    {int dbg, *pdbg;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     pdbg = (*fnc)();
     dbg  = *pdbg;
@@ -255,12 +244,9 @@ void _SS_unsupported_syntax(char *msg)
 
 /* SS_PARSE_ERROR_SYNT - error handler for parser */
 
-int SS_parse_error_synt(char *s, PFPObject fnc)
+int SS_parse_error_synt(SS_psides *si, char *s, PFPObject fnc)
    {object *tok, *obj;
     char msg[MAXLINE];
-    SS_psides *si;
-
-    si = &_SS_si;
 
     tok = fnc();
 
@@ -283,12 +269,12 @@ int SS_parse_error_synt(char *s, PFPObject fnc)
 
 /* DBGST - debug aid - print the parser stack */
 
-void dbgst(objp *st)
+void dbgst(SS_psides *si, objp *st)
    {int i;
     char msg[MAXLINE];
-    SS_psides *si;
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
 /* count the number of things on the stack */
     for (i = 0;
