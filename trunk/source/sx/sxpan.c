@@ -83,8 +83,9 @@ static void _SX_wr_gpackage(object *obj, object *strm)
 
 object *SX_mk_package(PA_package *pck)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(pck, G_PACKAGE, SELF_EV, pck->name,
+    op = SS_mk_object(si, pck, G_PACKAGE, SELF_EV, pck->name,
 		      _SX_wr_gpackage, SS_rl_object);
 
     return(op);}
@@ -108,8 +109,9 @@ static void _SX_wr_gvariable(object *obj, object *strm)
 
 object *SX_mk_variable(PA_variable *pp)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(pp, G_PANVAR, SELF_EV, pp->name,
+    op = SS_mk_object(si, pp, G_PANVAR, SELF_EV, pp->name,
 		      _SX_wr_gvariable, SS_rl_object);
 
     return(op);}
@@ -124,8 +126,9 @@ object *SX_mk_variable(PA_variable *pp)
 
 static object *SX_mk_source_variable(PA_src_variable *sv)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(sv, G_SOURCE_VARIABLE, SELF_EV, sv->name,
+    op = SS_mk_object(si, sv, G_SOURCE_VARIABLE, SELF_EV, sv->name,
 		      _SX_wr_gsource_variable, SS_rl_object);
 
     return(op);}
@@ -150,8 +153,9 @@ static void _SX_wr_gsource_variable(object *obj, object *strm)
 
 static object *SX_mk_iv_specification(PA_iv_specification *iv)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(iv, G_IV_SPECIFICATION, SELF_EV, iv->name,
+    op = SS_mk_object(si, iv, G_IV_SPECIFICATION, SELF_EV, iv->name,
 		      _SX_wr_giv_specification, SS_rl_object);
 
     return(op);}

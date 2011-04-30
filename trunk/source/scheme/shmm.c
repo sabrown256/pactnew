@@ -580,8 +580,9 @@ static void _SS_wr_vector(object *obj, object *strm)
 
 object *SS_mk_proc_object(procedure *pp)
    {object *op;
-
-    op = SS_mk_object(pp, PROC_OBJ, SELF_EV, pp->name,
+    SS_psides *si = &_SS_si;
+    
+    op = SS_mk_object(si, pp, PROC_OBJ, SELF_EV, pp->name,
 		      SS_wr_proc, _SS_rl_procedure);
 
     return(op);}
@@ -630,14 +631,11 @@ object *SS_mk_procedure(object *name, object *lam_exp, object *penv)
 
 /* SS_MK_ESC_PROC - make an escape procedure object */
 
-object *SS_mk_esc_proc(int err, int type)
+object *SS_mk_esc_proc(SS_psides *si, int err, int type)
    {int cont, stck;
     procedure *pp;
     Esc_procedure *ep;
     object *op;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     cont = si->cont_ptr;
     stck = SC_array_get_n(si->stack) - 1;
@@ -665,12 +663,13 @@ object *SS_mk_esc_proc(int err, int type)
 object *SS_mk_variable(char *n, object *v)
    {variable *vp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     vp = CMAKE(variable);
     vp->name  = CSTRSAVE(n);
     vp->value = v;
 
-    op = SS_mk_object(vp, SS_VARIABLE_I, VAR_EV, vp->name,
+    op = SS_mk_object(si, vp, SS_VARIABLE_I, VAR_EV, vp->name,
 		      SS_wr_atm, _SS_rl_variable);
 
     return(op);}
@@ -683,13 +682,14 @@ object *SS_mk_variable(char *n, object *v)
 object *SS_mk_string(char *s)
    {string *sp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     if (s != NULL)
        {sp = CMAKE(string);
 	sp->length = strlen(s);
 	sp->string = CSTRSAVE(s);
 
-	op = SS_mk_object(sp, SC_STRING_I, SELF_EV, sp->string,
+	op = SS_mk_object(si, sp, SC_STRING_I, SELF_EV, sp->string,
 			  SS_wr_atm, _SS_rl_string);}
     else
        op = SS_null;
@@ -706,6 +706,7 @@ object *SS_mk_string(char *s)
 object *SS_mk_inport(FILE *str, char *name)
    {input_port *pp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     pp = CMAKE(input_port);
     pp->name = CSTRSAVE(name);
@@ -715,7 +716,7 @@ object *SS_mk_inport(FILE *str, char *name)
     pp->ptr  = pp->buffer;
     *pp->ptr = '\0';
 
-    op = SS_mk_object(pp, SS_INPUT_PORT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, pp, SS_INPUT_PORT_I, SELF_EV, NULL,
 		      _SS_wr_inport, _SS_rl_inport);
 
     return(op);}
@@ -730,6 +731,7 @@ object *SS_mk_inport(FILE *str, char *name)
 object *SS_mk_outport(FILE *str, char *name)
    {output_port *pp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     if (str != NULL)
        SC_setbuf(str, NULL);
@@ -738,7 +740,7 @@ object *SS_mk_outport(FILE *str, char *name)
     pp->name = CSTRSAVE(name);
     pp->str  = str;
 
-    op = SS_mk_object(pp, SS_OUTPUT_PORT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, pp, SS_OUTPUT_PORT_I, SELF_EV, NULL,
 		      _SS_wr_outport, _SS_rl_outport);
 
     return(op);}
@@ -751,11 +753,12 @@ object *SS_mk_outport(FILE *str, char *name)
 object *SS_mk_integer(int64_t i)
    {int64_t *lp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     lp  = CMAKE(int64_t);
     *lp = i;
 
-    op = SS_mk_object(lp, SC_INT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, lp, SC_INT_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_integer);
 
     return(op);}
@@ -768,11 +771,12 @@ object *SS_mk_integer(int64_t i)
 object *SS_mk_float(double d)
    {double *dp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     dp  = CMAKE(double);
     *dp = d;
 
-    op = SS_mk_object(dp, SC_FLOAT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, dp, SC_FLOAT_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_float);
 
     return(op);}
@@ -785,11 +789,12 @@ object *SS_mk_float(double d)
 object *SS_mk_complex(double _Complex d)
    {double _Complex *dp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     dp  = CMAKE(double _Complex);
     *dp = d;
 
-    op = SS_mk_object(dp, SC_DOUBLE_COMPLEX_I, SELF_EV, NULL,
+    op = SS_mk_object(si, dp, SC_DOUBLE_COMPLEX_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_complex);
 
     return(op);}
@@ -802,11 +807,12 @@ object *SS_mk_complex(double _Complex d)
 object *SS_mk_quaternion(quaternion q)
    {quaternion *qp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     qp  = CMAKE(quaternion);
     *qp = q;
 
-    op = SS_mk_object(qp, SC_QUATERNION_I, SELF_EV, NULL,
+    op = SS_mk_object(si, qp, SC_QUATERNION_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_quaternion);
 
     return(op);}
@@ -819,12 +825,13 @@ object *SS_mk_quaternion(quaternion q)
 object *SS_mk_boolean(char *s, int v)
    {SS_boolean *bp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     bp = CMAKE(SS_boolean);
     bp->name  = CSTRSAVE(s);
     bp->value = v;
 
-    op = SS_mk_object(bp, SC_BOOL_I, SELF_EV, bp->name,
+    op = SS_mk_object(si, bp, SC_BOOL_I, SELF_EV, bp->name,
 		      SS_wr_atm, _SS_rl_boolean);
 
     return(op);}
@@ -842,6 +849,7 @@ object *SS_mk_boolean(char *s, int v)
 object *SS_mk_cons(object *ca, object *cd)
    {cons *cp;
     object *op;
+    SS_psides *si = &_SS_si;
 
     cp = CMAKE(cons);
     SS_MARK(ca);
@@ -849,7 +857,7 @@ object *SS_mk_cons(object *ca, object *cd)
     cp->car = ca;
     cp->cdr = cd;
 
-    op = SS_mk_object(cp, SS_CONS_I, PROC_EV, NULL,
+    op = SS_mk_object(si, cp, SS_CONS_I, PROC_EV, NULL,
 		      SS_wr_lst, _SS_rl_cons);
 
     return(op);}
@@ -861,7 +869,7 @@ object *SS_mk_cons(object *ca, object *cd)
  *                - in the style of SC_mem_map
  */
 
-int _SS_object_map(FILE *fp, int flag)
+int _SS_object_map(SS_psides *si, FILE *fp, int flag)
    {int i, j, n, ni, no, nox, nr, ityp;
     char s[MAXLINE];
     object *p, *q, *ca, *cd;
@@ -869,9 +877,6 @@ int _SS_object_map(FILE *fp, int flag)
     mem_header *space;
     mem_descriptor *desc;
     obj_map *map;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ph = _SC_tid_mm();
 
@@ -939,14 +944,12 @@ int _SS_object_map(FILE *fp, int flag)
 
 /* SS_MK_OBJECT - make a new object and initialize its garbage collection */
 
-object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
+object *SS_mk_object(SS_psides *si,
+		     void *np, int type, SS_eval_mode evt, char *pname,
 		     void (*print)(object *obj, object *strm),
 		     void (*release)(object *obj))
    {object *op;
     SC_mem_opt opt;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     opt.perm = FALSE;
     opt.na   = FALSE;
@@ -986,11 +989,12 @@ object *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
 object *SS_mk_char(int i)
    {int *ip;
     object *op;
+    SS_psides *si = &_SS_si;
 
     ip  = CMAKE(int);
     *ip = i;
 
-    op = SS_mk_object(ip, SS_CHARACTER_I, SELF_EV, NULL,
+    op = SS_mk_object(si, ip, SS_CHARACTER_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_char);
 
     return(op);}
@@ -1005,6 +1009,7 @@ object *SS_mk_vector(int l)
     int i;
     object **va;
     object *op;
+    SS_psides *si = &_SS_si;
 
     vp = CMAKE(vector);
     va = CMAKE_N(object *, l);
@@ -1014,7 +1019,7 @@ object *SS_mk_vector(int l)
     vp->length = l;
     vp->vect   = va;
 
-    op = SS_mk_object(vp, SS_VECTOR_I, SELF_EV, NULL,
+    op = SS_mk_object(si, vp, SS_VECTOR_I, SELF_EV, NULL,
 		      _SS_wr_vector, _SS_rl_vector);
 
     return(op);}

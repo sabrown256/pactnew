@@ -233,7 +233,7 @@ static void _SX_read(object *strm)
         strcpy(t, bf);
 
         SS_PTR(strm) = t;
-        SS_Assign(si->rdobj, SS_read(strm));}
+        SS_Assign(si->rdobj, SS_read(si, strm));}
 
 /* if it is an unbound variable check to see if it is a file variable
  * in which case print or change it
@@ -258,7 +258,7 @@ static void _SX_read(object *strm)
 
 	    strcpy(t, bf);
 	    SS_PTR(strm) = t;
-	    SS_Assign(si->rdobj, SS_read(strm));};};
+	    SS_Assign(si->rdobj, SS_read(si, strm));};};
 
     CFREE(s);
 
@@ -329,7 +329,7 @@ object *SX_mode_text(void)
     else
         ret = SS_f;
 
-    SS_set_prompt("SX-> ");
+    SS_set_prompt(si, "SX-> ");
 
     return(ret);}
 
@@ -417,7 +417,7 @@ object *SX_mode_graphics(void)
                PRINT(STDOUT, "\nCannot connect to display\n");};}
 
     if (SX_graphics_device == NULL)
-       {SS_set_prompt("\n-> ");
+       {SS_set_prompt(si, "\n-> ");
         strcpy(si->ans_prompt, "");
 
         si->post_read  = _SX_read;

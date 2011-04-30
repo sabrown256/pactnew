@@ -162,7 +162,7 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
 
     CFREE(argv);
 
-    obj = SS_mk_object(pp, SS_PROCESS_I, SELF_EV, NULL,
+    obj = SS_mk_object(si, pp, SS_PROCESS_I, SELF_EV, NULL,
 		       _SS_wr_process, _SS_rl_process);
 
     SC_mark(pp, 1);

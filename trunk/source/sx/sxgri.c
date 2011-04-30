@@ -383,8 +383,9 @@ static void _SX_rl_giob(object *obj)
 
 object *SX_mk_iob(PG_interface_object *iob)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(iob, G_INTERFACE_OBJECT, SELF_EV, iob->name,
+    op = SS_mk_object(si, iob, G_INTERFACE_OBJECT, SELF_EV, iob->name,
 		      _SX_wr_giob, _SX_rl_giob);
     SC_mark(iob, 1);
 

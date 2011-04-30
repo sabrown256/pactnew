@@ -31,9 +31,11 @@
 #undef SIGNED
 #undef ECHO
 
+#define SI               (&_SS_si)
+
 #define CAPTURE(x)       (SS_MARK(x), x)
 
-#define DIAGNOSTIC(x, y) _SS_diagnostic_synt(x, y, _SS_mps.diagnose_grammar)
+#define DIAGNOSTIC(x, y) _SS_diagnostic_synt(SI, x, y, _SS_mps.diagnose_grammar)
 #define SYNTAX_ERR(x)    _SS_unsupported_syntax(x)
 
 /*--------------------------------------------------------------------------*/
@@ -121,7 +123,7 @@ extern void
  SS_init_m_syntax_mode(SS_psides *si);
 
 extern int
- SS_lookup_identifier_m(char *txt, object **lval),
+ SS_lookup_identifier_m(SS_psides *si, char *txt, object **lval),
  *SS_parse_debug_m(void);
 
 #endif

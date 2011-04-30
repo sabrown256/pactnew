@@ -61,14 +61,11 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_RD_LST - read a list or cons */
+/* _SS_RD_LST - read a list or cons */
 
-static object *SS_rd_lst(object *str)
+static object *_SS_rd_lst(SS_psides *si, object *str)
    {int c, ok;
     object *frst, *ths, *nxt, *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     frst = SS_null;
     ths  = SS_null;
@@ -111,12 +108,12 @@ static object *SS_rd_lst(object *str)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_RD_VCT - read a vector */
+/* _SS_RD_VCT - read a vector */
 
-static object *SS_rd_vct(object *str)
+static object *_SS_rd_vct(SS_psides *si, object *str)
    {object *lst, *vct;
 
-    lst = SS_rd_lst(str);
+    lst = _SS_rd_lst(si, str);
     SS_MARK(lst);
     vct = SS_lstvct(lst);
     SS_GC(lst);
@@ -238,16 +235,13 @@ static int _SS_intstrp(char *s, int64_t *piv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_RD_ATM - read and make an atomic object */
+/* _SS_RD_ATM - read and make an atomic object */
 
-static object *SS_rd_atm(object *str)
+static object *_SS_rd_atm(SS_psides *si, object *str)
    {int c, inbrackets;
     int64_t iv;
     char token[MAXLINE], *pt;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     inbrackets = FALSE;
     pt         = token;
@@ -278,7 +272,7 @@ static object *SS_rd_atm(object *str)
        o = SS_mk_float(ATOF(token));
 
     else
-       o = SS_add_variable(token);
+       o = SS_add_variable(si, token);
 
     return(o);}
 
@@ -362,7 +356,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 #endif
 
         case '(' :
-	     rv = SS_rd_lst(str);
+	     rv = _SS_rd_lst(si, str);
 	     break;
 
         case '\"':
@@ -395,11 +389,11 @@ static object *_SS_pr_read(SS_psides *si, object *str)
         case '#' :
 	     c = SS_get_ch(str, FALSE);
 	     if (c == '(')
-	        rv = SS_rd_vct(str);
+	        rv = _SS_rd_vct(si, str);
 	     else
 	        {PUSH_CHAR(c, str);
 		 PUSH_CHAR('#', str);
-		 rv = SS_rd_atm(str);};
+		 rv = _SS_rd_atm(si, str);};
 	     break;
 #endif
 
@@ -410,7 +404,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 
         default :
 	     PUSH_CHAR(c, str);
-	     rv = SS_rd_atm(str);
+	     rv = _SS_rd_atm(si, str);
 	     break;};
 
     return(rv);}
@@ -422,11 +416,8 @@ static object *_SS_pr_read(SS_psides *si, object *str)
  *         - this level is here to implement the transcript mechanism
  */
 
-object *SS_read(object *str)
+object *SS_read(SS_psides *si, object *str)
    {object *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (si->read == NULL)
        si->read = _SS_pr_read;
@@ -457,10 +448,10 @@ static object *_SSI_read(SS_psides *si, object *obj)
     o = SS_null;
 
     if (SS_nullobjp(obj))
-       o = SS_read(si->indev);
+       o = SS_read(si, si->indev);
 
     else if (SS_inportp(op = SS_car(obj)))
-       o = SS_read(op);
+       o = SS_read(si, op);
 
     else
        SS_error("ARGUMENT TO READ NOT INPUT-PORT", obj);
@@ -611,11 +602,8 @@ static object *_SSI_strprt(SS_psides *si, object *arg)
 
 /* SS_ADD_VARIABLE - add a symbol the the hash table at parse time */
 
-object *SS_add_variable(char *name)
+object *SS_add_variable(SS_psides *si, char *name)
    {object *op;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     op = (object *) SC_hasharr_def_lookup(si->symtab, name);
     if (op != NULL)
@@ -675,13 +663,10 @@ static PFPOprs SS_get_parser(int id)
  *               -   "f"  Fortran parser
  */
 
-PFPOprs SS_use_parser(char *sfx)
+PFPOprs SS_use_parser(SS_psides *si, char *sfx)
    {char t[MAXLINE];
     PFPOprs np, op;
     SC_address ad;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* NOTE: unconditionally get the current parser in case the file
  * has no extension at all
@@ -702,19 +687,16 @@ PFPOprs SS_use_parser(char *sfx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_CHANGE_PARSER - change the current read function to be consistent
- *                  - with the file being loaded
- *                  - return the current one so that it may be restored
- *                  - after the file is loaded
+/* _SS_CHANGE_PARSER - change the current read function to be consistent
+ *                   - with the file being loaded
+ *                   - return the current one so that it may be restored
+ *                   - after the file is loaded
  */
 
-static PFPOprs SS_change_parser(object *fnm)
+static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
    {char *s, *t;
     PFPOprs np, op;
     SC_address ad;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     op = NULL;
     s  = NULL;
@@ -748,14 +730,12 @@ static PFPOprs SS_change_parser(object *fnm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_RESTORE_PARSER - restore the current read function from the one
- *                   - passed in
+/* _SS_RESTORE_PARSER - restore the current read function from the one
+ *                    - passed in
  */
 
-static void SS_restore_parser(PFPOprs op)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static void _SS_restore_parser(SS_psides *si, PFPOprs op)
+   {
 
     op(si);
     SS_set_parser(op);
@@ -791,7 +771,7 @@ object *_SSI_scheme_mode(SS_psides *si)
  */
     cp = SS_get_parser(-1);
     if (cp != _SSI_scheme_mode)
-       SS_set_prompt("Scheme-> ");
+       SS_set_prompt(si, "Scheme-> ");
 
     si->read        = _SS_pr_read;
     si->name_reproc = NULL;
@@ -842,10 +822,10 @@ object *SS_load(SS_psides *si, object *argl)
     SS_Save(si, si->rdobj);
     SS_Save(si, si->evobj);
 
-    prs = SS_change_parser(fnm);
+    prs = _SS_change_parser(si, fnm);
 
     while (TRUE)
-       {SS_Assign(si->rdobj, SS_read(strm));
+       {SS_Assign(si->rdobj, SS_read(si, strm));
         if (si->post_read != NULL)
            (*si->post_read)(strm);
 
@@ -860,7 +840,7 @@ object *SS_load(SS_psides *si, object *argl)
         if (si->post_eval != NULL)
            (*si->post_eval)(strm);};
 
-    SS_restore_parser(prs);
+    _SS_restore_parser(si, prs);
 
     SS_Restore(si, si->evobj);
     SS_Restore(si, si->rdobj);

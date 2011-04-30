@@ -262,8 +262,9 @@ static void _SS_rl_hasharr(object *obj)
 
 object *SS_mk_hasharr(hasharr *tb)
    {object *op;
+    SS_psides *si = &_SS_si;
 
-    op = SS_mk_object(tb, SS_HASHARR_I, SELF_EV, NULL,
+    op = SS_mk_object(si, tb, SS_HASHARR_I, SELF_EV, NULL,
 		      _SS_wr_hasharr, _SS_rl_hasharr);
 
     return(op);}
@@ -303,10 +304,11 @@ static void _SS_rl_haelem(object *obj)
 
 object *SS_mk_haelem(haelem *hp)
    {object *op;
+    SS_psides *si = &_SS_si;
 
     SC_mark(hp, 1);
 
-    op = SS_mk_object(hp, SS_HAELEM_I, SELF_EV, hp->name,
+    op = SS_mk_object(si, hp, SS_HAELEM_I, SELF_EV, hp->name,
 		      _SS_wr_haelem, _SS_rl_haelem);
 
     return(op);}

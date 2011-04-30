@@ -243,7 +243,7 @@ extern procedure
                      C_procedure *cp);
 
 extern int
- _SS_object_map(FILE *fp, int flag),
+ _SS_object_map(SS_psides *si, FILE *fp, int flag),
  _SS_get_object_length(object *obj),
  _SS_object_to_numtype_id(int vid, void *p, long n, object *val),
  _SS_object_to_numtype(char *type, void *p, long n, object *val),
@@ -299,7 +299,7 @@ extern void
 /* SHPRNT.C declarations */
 
 extern void
- _SS_set_ans_prompt(void),
+ _SS_set_ans_prompt(SS_psides *si),
  _SS_inst_print(SS_psides *si);
 
 extern char
@@ -335,17 +335,17 @@ extern void
 /* SHSYNT.C declarations */
 
 extern int
- _SS_diagnose_return_synt(int x, char *y, PFPInt fnc);
+ _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc);
 
 extern void
- _SS_push_token(char *s),
- _SS_diagnostic_synt(object *expr, char *msg, int diag);
+ _SS_push_token(SS_psides *si, char *s),
+ _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag);
 
 
 /* SHTLEV.C declarations */
 
 extern void
- _SS_restore_state(object *esc_proc);
+ _SS_restore_state(SS_psides *si, object *esc_proc);
 
 
 #ifdef __cplusplus

@@ -965,9 +965,9 @@ extern object
 
 extern int
  SS_args(object *s, ...),
- SS_run(char *s),
+ SS_run(SS_psides *si, char *s),
  SS_text_data_filep(char *fname, int cmnt),
- SS_load_scm(char *name),
+ SS_load_scm(SS_psides *si, char *name),
  SS_define_argv(SS_psides *si, char *program, int c, char **v);
 
 extern void
@@ -1004,7 +1004,7 @@ extern object
 extern object
  *SS_mk_proc_object(procedure *pp),
  *SS_mk_procedure(object *name, object *lam_exp, object *penv),
- *SS_mk_esc_proc(int err, int type),
+ *SS_mk_esc_proc(SS_psides *si, int err, int type),
  *SS_mk_variable(char *n, object *v),
  *SS_mk_string(char *s),
  *SS_mk_inport(FILE *str, char *name),
@@ -1015,7 +1015,8 @@ extern object
  *SS_mk_quaternion(quaternion d),
  *SS_mk_boolean(char *s, int v),
  *SS_mk_cons(object *ca, object *cd),
- *SS_mk_object(void *np, int type, SS_eval_mode evt, char *pname,
+ *SS_mk_object(SS_psides *si,
+	       void *np, int type, SS_eval_mode evt, char *pname,
 	       void (*print)(object *obj, object *strm),
 	       void (*release)(object *obj)),
  *SS_mk_char(int i),
@@ -1076,7 +1077,7 @@ extern object
 /* SHPRNT.C declarations */
 
 extern void
- SS_set_prompt(char *fmt, ...),
+ SS_set_prompt(SS_psides *si, char *fmt, ...),
  SS_print(object *obj, char *begin, char *end, object *strm),
  SS_wr_lst(object *obj, object *strm),
  SS_wr_proc(object *obj, object *strm),
@@ -1088,8 +1089,8 @@ extern object
  
 extern int
  SS_puts(char *s, FILE *fp, PFfputs put),
- SS_prim_des(object *strm, object *obj),
- SS_prim_apr(FILE *str, char *s),
+ SS_prim_des(SS_psides *si, object *strm, object *obj),
+ SS_prim_apr(SS_psides *si, FILE *str, char *s),
  SS_get_display_flag(void),
  SS_set_display_flag(int flg);
 
@@ -1097,9 +1098,9 @@ extern int
 /* SHREAD.C declarations */
 
 extern object
- *SS_add_variable(char *name),
- *SS_read(object *str),
+ *SS_add_variable(SS_psides *si, char *name),
  *SS_gread(object *obj),
+ *SS_read(SS_psides *si, object *str),
  *SS_load(SS_psides *si, object *argl);
 
 extern void
@@ -1110,16 +1111,16 @@ extern void
 /* SHSYNT.C declarations */
 
 extern int
- SS_parse_error_synt(char *s, PFPObject fnc),
+ SS_parse_error_synt(SS_psides *si, char *s, PFPObject fnc),
  SS_wrap_input_synt(void),
- SS_input_synt(char *ltxt);
+ SS_input_synt(SS_psides *si, char *ltxt);
 
 extern void
- SS_unput_synt(int c),
+ SS_unput_synt(SS_psides *si, int c),
  SS_name_map_synt(char *d, char *s);
 
 extern object
- *SS_lookup_variable(char *txt, int verbose),
+ *SS_lookup_variable(SS_psides *si, char *txt, int verbose),
  *SS_mk_string_synt(char *s),
  *SS_add_type_synt(SS_psides *si, char *name);
 
@@ -1135,7 +1136,7 @@ extern PFPrintErrMsg
 
 extern object
  *SS_lookup_object(SS_psides *si, object *obj),
- *SS_pop_err(int n, int flag);
+ *SS_pop_err(SS_psides *si, int n, int flag);
 
 extern int
  SS_set_scheme_env(char *exepath, char *path),

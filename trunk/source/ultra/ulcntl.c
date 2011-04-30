@@ -44,7 +44,7 @@ object *_ULI_describe(SS_psides *si, object *argl)
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
          if (obj != NULL)
-            {if (!SS_prim_des(si->outdev, obj))
+            {if (!SS_prim_des(si, si->outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
     UL_pause(TRUE);
@@ -67,7 +67,7 @@ object *_ULI_apropos(SS_psides *si, object *obj)
     PRINT(stdout, "Apropos: %s\n\n", s);
 
 /* search SCHEME hash table */
-    flag = SS_prim_apr(stdout, s);
+    flag = SS_prim_apr(si, stdout, s);
     if (!flag)
        PRINT(stdout, "No documentation on %s\n", s);
 

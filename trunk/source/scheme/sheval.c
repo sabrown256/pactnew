@@ -477,7 +477,7 @@ comp_app:
 
 pr_throw:
     if (SS_ESCAPE_TYPE(si->fun) == SS_PROCEDURE_I)
-       _SS_restore_state(si->fun);
+       _SS_restore_state(si, si->fun);
     else
        {SS_GC(si->fun);};
 

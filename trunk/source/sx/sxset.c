@@ -151,28 +151,27 @@ void SX_init(char *code, char *vers)
  * give default values to the lisp package interface variables
  * set some default values for flags
  */
-    si->pr_ch_un   = SS_unget_ch;
-    si->pr_ch_out  = SS_put_ch;
-    si->print_flag = TRUE;
-    si->stat_flag  = TRUE;
+    si->pr_ch_un    = SS_unget_ch;
+    si->pr_ch_out   = SS_put_ch;
+    si->print_flag  = TRUE;
+    si->stat_flag   = TRUE;
+    si->get_arg     = _SX_args;
+    si->call_arg    = _SX_call_args;
+    si->interactive = TRUE;
 
-    SS_set_prompt("SX-> ");
+    SS_set_prompt(si, "SX-> ");
 
     SS_set_print_err_func(NULL, TRUE);
 
-    si->get_arg          = _SX_args;
-    si->call_arg     = _SX_call_args;
     SC_gs.atof           = SC_atof;
     SC_gs.strtod         = SC_strtod;
     SC_gs.type_container = SX_type_container;
-
-    si->interactive = TRUE;
 
     SX_file_exist_action = FAIL;
 
     return;}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SX_ARG_PREP - prepare the arg list by merging lists and

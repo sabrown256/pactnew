@@ -2892,7 +2892,7 @@ for extraction.<p>
 
 <B></B>
 <BLOCKQUOTE>
-int SS_run(char *s)
+int SS_run(SS_psides *si, char *s)
 </BLOCKQUOTE>
 </B>
 
@@ -2910,7 +2910,7 @@ return value is decided based on SCHEME return value as follows:
 
 <B></B>
 <BLOCKQUOTE>
-int SS_load_scm(char *name)
+int SS_load_scm(SS_psides *si, char *name)
 </BLOCKQUOTE>
 </B>
 

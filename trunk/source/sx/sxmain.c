@@ -192,7 +192,7 @@ int main(int c, char **v, char **env)
         si->trap_error = trap_error;};
 
     SS_env_vars(si, env, NULL);
-    SS_load_scm("nature.scm");
+    SS_load_scm(si, "nature.scm");
 
     PG_set_use_pixmap(upix);
 
@@ -224,7 +224,7 @@ int main(int c, char **v, char **env)
 	    SX_rd_scm(v[-n]);
 	 else
             {evalt = SC_cpu_time();
-	     SS_load_scm(v[n]);
+	     SS_load_scm(si, v[n]);
 	     evalt = SC_cpu_time() - evalt;
 
 	     if (tflag)
@@ -241,7 +241,7 @@ int main(int c, char **v, char **env)
     SC_mem_stats_set(0L, 0L);
 
     if (commnd_flag)
-       ret = !SS_run(cmd);
+       ret = !SS_run(si, cmd);
 
     else
        {if (SX_gr_mode && !SX_qflag)

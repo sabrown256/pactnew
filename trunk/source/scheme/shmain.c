@@ -55,7 +55,7 @@ int main(int c, char **v, char **env)
 /* initialize the Scheme system */
     si = SS_init_scheme(CODE, VERSION);
 
-    SS_set_prompt("Scheme-> ");
+    SS_set_prompt(si, "Scheme-> ");
     si->trap_error = FALSE;
 
     SS_env_vars(si, env, NULL);
@@ -111,11 +111,11 @@ int main(int c, char **v, char **env)
 
 /* load the full Scheme */
     if (rfl)
-       SS_load_scm("runt.scm");
+       SS_load_scm(si, "runt.scm");
 
 /* read the optionally specified load file */ 
     if (lsch != 0)
-       SS_load_scm(v[lsch]);
+       SS_load_scm(si, v[lsch]);
 
     si->nsave    = 0;
     si->nrestore = 0;
@@ -126,7 +126,7 @@ int main(int c, char **v, char **env)
 
     if (cfl)
        {PRINT(STDOUT, "\n\n");
-	ret = !SS_run(cmnd);
+	ret = !SS_run(si, cmnd);
 	PRINT(STDOUT, "\n\n");}
 
     else

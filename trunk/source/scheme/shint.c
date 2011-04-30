@@ -812,7 +812,7 @@ static int _SS_run(SS_psides *si)
     SC_strncpy(SS_BUFFER(port), MAX_BFSZ, _SS.ibf, strlen(_SS.ibf));
     SS_PTR(port) = SS_BUFFER(port);
 
-    ret  = SS_eval(si, SS_read(port));
+    ret  = SS_eval(si, SS_read(si, port));
     iret = FALSE;
     if (SS_numbp(ret))
        SS_args(ret,
@@ -831,11 +831,8 @@ static int _SS_run(SS_psides *si)
  *        - as a string
  */
 
-int SS_run(char *s)
+int SS_run(SS_psides *si, char *s)
    {int rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     while (strchr(" \t\n\r\f", *s++) != NULL);
     _SS_load_bf(--s);
@@ -864,11 +861,8 @@ static int _SS_load_scm(SS_psides *si)
 
 /* SS_LOAD_SCM - load a SCHEME file with error protection */
 
-int SS_load_scm(char *name)
+int SS_load_scm(SS_psides *si, char *name)
    {int rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     _SS_load_bf(name);
 
@@ -1017,10 +1011,10 @@ int SS_define_argv(SS_psides *si, char *program, int c, char **v)
 			   NULL);
 
 /* load the full Scheme */
-	SS_load_scm("runt.scm");
+	SS_load_scm(si, "runt.scm");
 
 /* load the script file - this might not return */
-	SS_load_scm(script);
+	SS_load_scm(si, script);
 
 	rv = TRUE;};
 

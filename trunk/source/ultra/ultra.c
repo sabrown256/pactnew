@@ -977,7 +977,7 @@ object *UL_mode_text(SS_psides *si)
     SC_set_get_line(io_gets);
 #endif
 
-    SS_set_prompt("S-> ");
+    SS_set_prompt(si, "S-> ");
 
     return(ret);}
 
@@ -1004,7 +1004,7 @@ object *UL_mode_graphics(SS_psides *si)
            {PRINT(STDOUT, "\nCannot connect to display\n\n");};}
 
     if (SX_graphics_device == NULL)
-       {SS_set_prompt("U-> ");
+       {SS_set_prompt(si, "U-> ");
         strcpy(si->ans_prompt, "");
 
         si->post_read  =  _UL_read;
@@ -1355,7 +1355,7 @@ int main(int c, char **v)
 	        UL_rd_scm(v[-n]);
 	     else
 	        {evalt = SC_cpu_time();
-		 SS_load_scm(v[n]);
+		 SS_load_scm(si, v[n]);
 		 evalt = SC_cpu_time() - evalt;
 
 		 if (tflag)
@@ -1371,7 +1371,7 @@ int main(int c, char **v)
     SC_mem_stats_set(0L, 0L);
 
     if (commnd_flag)
-       rv = !SS_run(commnd);
+       rv = !SS_run(si, commnd);
     else 
        {SS_repl(si);
 	rv = TRUE;};
