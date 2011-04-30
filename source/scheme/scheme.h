@@ -120,7 +120,7 @@ typedef void (*PFPrChOut)(int c, object *str);
 typedef void (*PFPrChUn)(int c, object *str);
 typedef void (*PFPrintErrMsg)(FILE *str, char *s, object *obj);
 typedef void (*PFExtractArg)(object *obj, void *v, int type);
-typedef object *(*PFSSRead)(object *str);
+typedef object *(*PFSSRead)(SS_psides *si, object *str);
 typedef object *(*PFCallArg)(int type, void *v);
 
 #define SS_DEFINE_OBJECT                                                    \
@@ -876,19 +876,19 @@ extern object
  *SS_sargs(SS_psides *si, C_procedure *cp, object *argl),
  *SS_nargs(SS_psides *si, C_procedure *cp, object *argl),
  *SS_znargs(SS_psides *si, C_procedure *cp, object *argl),
- *SS_bound_name(char *name),
+ *SS_bound_name(SS_psides *si, char *name),
  *SS_mk_new_frame(object *name, hasharr *tab),
  *SS_lk_var_val(SS_psides *si, object *vr),
- *SS_bind_env(object *vr, object *penv);
+ *SS_bind_env(SS_psides *si, object *vr, object *penv);
 
 extern char
- **SS_bound_vars(char *patt, object *penv);
+ **SS_bound_vars(SS_psides *si, char *patt, object *penv);
 
 extern void
- SS_save_registers(int vp),
- SS_restore_registers(int vp),
- SS_set_var(object *vr, object *vl, object *penv),
- SS_def_var(object *vr, object *vl, object *penv),
+ SS_save_registers(SS_psides *si, int vp),
+ SS_restore_registers(SS_psides *si, int vp),
+ SS_set_var(SS_psides *si, object *vr, object *vl, object *penv),
+ SS_def_var(SS_psides *si, object *vr, object *vl, object *penv),
  SS_env_vars(SS_psides *si, char **vrs, object *penv);
 
 
@@ -900,7 +900,7 @@ extern object
  *SS_proc_body(object *fun),
  *SS_proc_env(object *fun),
  *SS_proc_name(object *fun),
- *SS_do_bindings(object *pp, object *argp);
+ *SS_do_bindings(SS_psides *si, object *pp, object *argp);
 
 extern int
  SS_true(object *obj);
@@ -909,24 +909,24 @@ extern int
 /* SHINT.C declarations */
 
 extern object
- *SS_define_constant(int n, ...),
+ *SS_define_constant(SS_psides *si, int n, ...),
  *SS_make_list(int first, ...),
  *SS_make_form(object *first, ...),
- *SS_eval_form(object *first, ...),
- *SS_call_scheme(char *func, ...);
+ *SS_eval_form(SS_psides *si, object *first, ...),
+ *SS_call_scheme(SS_psides *si, char *func, ...);
 
 extern int
  SS_args(object *s, ...),
  SS_run(char *s),
  SS_text_data_filep(char *fname, int cmnt),
  SS_load_scm(char *name),
- SS_define_argv(char *program, int c, char **v);
+ SS_define_argv(SS_psides *si, char *program, int c, char **v);
 
 extern void
- SS_var_value(char *s, int type, void *vr, int flag);
+ SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag);
 
 extern void
- *SS_var_reference(char *s);
+ *SS_var_reference(SS_psides *si, char *s);
 
 extern char
  *SS_exe_script(int c, char **v);

@@ -221,7 +221,7 @@ ev_set:
 ev_seta:
     SS_Restore(si, si->env);
     SS_Restore(si, si->unev);
-    SS_set_var(si->unev, si->val, si->env);
+    SS_set_var(si, si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
     SS_go_cont(si);
 
@@ -269,7 +269,7 @@ ev_def:
     else
        SS_error("CAN'T DEFINE NON-VARIABLE OBJECT - DEFINE", si->unev);
 
-    SS_def_var(si->unev, si->val, si->env);
+    SS_def_var(si, si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
     SS_end_trace();
     SS_go_cont(si);
@@ -433,7 +433,7 @@ macro_ee:
 
 ev_macro:
     SS_bgn_trace(si->fun, si->unev);
-    SS_Assign(si->env, SS_do_bindings(si->fun, si->unev));
+    SS_Assign(si->env, SS_do_bindings(si, si->fun, si->unev));
     SS_Assign(si->unev, SS_proc_body(si->fun));
     SS_jump(ev_begin);
 
@@ -446,7 +446,7 @@ ev_macro_ev:
     SS_bgn_trace(si->fun, si->unev);
     SS_Save(si, si->env);
     SS_Save(si, si->fun);
-    SS_Assign(si->env, SS_do_bindings(si->fun, si->unev));
+    SS_Assign(si->env, SS_do_bindings(si, si->fun, si->unev));
     SS_Assign(si->unev, SS_proc_body(si->fun));
     SS_set_cont(si, ev_begin, ev_macro_evb);
 
@@ -463,7 +463,7 @@ ev_macro_evb:
 /* COMP_APP - compound apply (i.e. Scheme level) procedure applications */
 
 comp_app:
-    SS_Assign(si->env, SS_do_bindings(si->fun, si->argl));
+    SS_Assign(si->env, SS_do_bindings(si, si->fun, si->argl));
     SS_Assign(si->unev, SS_proc_body(si->fun));
     SS_jump(ev_begin);
 

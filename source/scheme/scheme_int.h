@@ -190,12 +190,11 @@ extern void
 
 extern object
  *_SSI_defp(SS_psides *si, object *vr),
- *_SS_bind_envc(char *name, object *penv),
- *_SS_lk_var_valc(char *name, object *penv);
+ *_SS_bind_envc(SS_psides *si, char *name, object *penv),
+ *_SS_lk_var_valc(SS_psides *si, char *name, object *penv);
 
 extern void
- _SS_rem_varc(char *name, object *penv),
- _SS_def_varc(char *name, object *vl, object *penv);
+ _SS_rem_varc(SS_psides *si, char *name, object *penv);
 
 extern char
  *_SS_get_print_name(object *o);

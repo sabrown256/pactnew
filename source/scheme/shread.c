@@ -14,7 +14,7 @@
 typedef object *(*PFPOprs)(SS_psides *si);
 
 #define PUSH_CHAR         si->pr_ch_un
-#define READ_EXPR(_o)     ((si->read == NULL) ? SS_null : si->read(_o))
+#define READ_EXPR(_o)     ((si->read == NULL) ? SS_null : si->read(si, _o))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -338,13 +338,10 @@ static object *SS_rd_str(object *str)
 
 /* _SS_PR_READ - the C level reader */
 
-static object *_SS_pr_read(object *str)
+static object *_SS_pr_read(SS_psides *si, object *str)
    {int c;
     input_port *prt;
     object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     prt = SS_GET(input_port, str);
 
@@ -356,11 +353,11 @@ static object *_SS_pr_read(object *str)
 
 #ifdef HAVE_C_SYNTAX
         case '{' :
-	     {extern object *SS_syntax_c(object *str);
+	     {extern object *SS_syntax_c(SS_psides *si, object *str);
 
 	      PUSH_CHAR(c, str);
 
-	      rv = SS_syntax_c(str);};
+	      rv = SS_syntax_c(si, str);};
 	     break;
 #endif
 

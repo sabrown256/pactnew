@@ -260,13 +260,10 @@ static void _SS_quaternion_arg(object *obj, void *v)
 
 /* _SS_ARGS - get a C level data item from a single SCHEME object */
 
-static void _SS_args(object *obj, void *v, int type)
+static void _SS_args(SS_psides *si, object *obj, void *v, int type)
    {void **pv;
     char *s;
     procedure *pp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     pv = (void **) v;
 
@@ -353,6 +350,9 @@ int SS_args(object *s, ...)
    {object *obj;
     void *v;
     int type, len;
+    SS_psides *si;    
+
+    si = &_SS_si;
 
     if (SS_nullobjp(s))
        return(0);
@@ -365,7 +365,7 @@ int SS_args(object *s, ...)
         type = SC_VA_ARG(int);
         if (type != 0)
            {v = SC_VA_ARG(void *);
-            _SS_args(obj, v, type);};}
+            _SS_args(si, obj, v, type);};}
     else
        {len = SS_length(s);
         while (SS_consp(s))
@@ -380,7 +380,7 @@ int SS_args(object *s, ...)
             if (v == (void *) LAST)
                break;
 
-            _SS_args(obj, v, type);};};
+            _SS_args(si, obj, v, type);};};
 
     SC_VA_END;
 
@@ -393,13 +393,10 @@ int SS_args(object *s, ...)
  *                    - a SCHEME variable of a specified type
  */
 
-object *SS_define_constant(int n, ...)
+object *SS_define_constant(SS_psides *si, int n, ...)
    {int type;
     char *name;
     object *vr, *val;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     vr  = SS_null;
     val = SS_null;
@@ -450,13 +447,13 @@ object *SS_define_constant(int n, ...)
        SS_UNCOLLECT(vr);
 
        SC_hasharr_install(si->symtab, name, vr, SS_POBJECT_S, TRUE, TRUE);
-       SS_def_var(vr, val, si->global_env);};
+       SS_def_var(si, vr, val, si->global_env);};
 
     SC_VA_END;
 
     return(vr);}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SS_VAR_VALUE - given the name of a current SCHEME object which
@@ -466,11 +463,8 @@ object *SS_define_constant(int n, ...)
  *              - binding in the current environment
  */
 
-void SS_var_value(char *s, int type, void *vr, int flag)
+void SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag)
    {object *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     obj = SS_INQUIRE_OBJECT(si, s);
 
@@ -493,12 +487,10 @@ void SS_var_value(char *s, int type, void *vr, int flag)
  *                  - return a pointer to its value
  */
 
-void *SS_var_reference(char *s)
+void *SS_var_reference(SS_psides *si, char *s)
    {object *obj;
     void *vr;
-    SS_psides *si;
 
-    si = &_SS_si;
     vr = NULL;
 
     obj = SS_INQUIRE_OBJECT(si, s);
@@ -541,14 +533,11 @@ void *SS_var_reference(char *s)
 
 /* _SS_MAKE_LIST - make a SCHEME list from a C arg list */
 
-static object *_SS_make_list(int n, int *type, void **ptr)
+static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
    {int i, c, ityp;
     char *s;
     void *vl;
     object *o, *lst;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     lst = SS_null;
     for (i = 0; i < n; i++)
@@ -626,6 +615,9 @@ object *SS_make_list(int first, ...)
    {int i, type[MAXLINE];
     void *ptr[MAXLINE];
     object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     SC_VA_START(first);
 
@@ -643,7 +635,7 @@ object *SS_make_list(int first, ...)
 
     SC_VA_END;
 
-    o = _SS_make_list(i, type, ptr);
+    o = _SS_make_list(si, i, type, ptr);
 
     return(o);}
 
@@ -656,35 +648,6 @@ object *SS_make_form(object *first, ...)
    {int i, type[MAXLINE];
     void *ptr[MAXLINE];
     object *expr;
-
-    type[0] = SS_OBJECT_I;
-    ptr[0]  = first;
-
-    SC_VA_START(first);
-
-    for (i = 1; i < MAXLINE; i++)
-        {type[i] = SS_OBJECT_I;
-         ptr[i]  = SC_VA_ARG(void *);
-         if ((ptr[i] == (void *) LAST) || (ptr[i] == NULL))
-            break;};
-
-    SC_VA_END;
-
-    expr = _SS_make_list(i, type, ptr);
-
-    return(expr);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SS_EVAL_FORM - make and evaluate a SCHEME form
- *              - which is a list of objects
- */
-
-object *SS_eval_form(object *first, ...)
-   {int i, type[MAXLINE];
-    void *ptr[MAXLINE];
-    object *expr, *res;
     SS_psides *si;
 
     si = &_SS_si;
@@ -702,8 +665,37 @@ object *SS_eval_form(object *first, ...)
 
     SC_VA_END;
 
+    expr = _SS_make_list(si, i, type, ptr);
+
+    return(expr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_EVAL_FORM - make and evaluate a SCHEME form
+ *              - which is a list of objects
+ */
+
+object *SS_eval_form(SS_psides *si, object *first, ...)
+   {int i, type[MAXLINE];
+    void *ptr[MAXLINE];
+    object *expr, *res;
+
+    type[0] = SS_OBJECT_I;
+    ptr[0]  = first;
+
+    SC_VA_START(first);
+
+    for (i = 1; i < MAXLINE; i++)
+        {type[i] = SS_OBJECT_I;
+         ptr[i]  = SC_VA_ARG(void *);
+         if ((ptr[i] == (void *) LAST) || (ptr[i] == NULL))
+            break;};
+
+    SC_VA_END;
+
     expr = SS_null;
-    SS_Assign(expr, _SS_make_list(i, type, ptr));
+    SS_Assign(expr, _SS_make_list(si, i, type, ptr));
     res = SS_exp_eval(si, expr);
     SS_Assign(expr, SS_null);
 
@@ -745,7 +737,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     SC_VA_END;
 
     expr = SS_null;
-    SS_Assign(expr, SS_mk_cons(fnc, _SS_make_list(i, type, ptr)));
+    SS_Assign(expr, SS_mk_cons(fnc, _SS_make_list(si, i, type, ptr)));
 
     SS_eval(si, expr);
 
@@ -764,17 +756,14 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
  *                - return the SCHEME result object
  */
 
-object *SS_call_scheme(char *func, ...)
+object *SS_call_scheme(SS_psides *si, char *func, ...)
    {int i, type[MAXLINE];
     object *fnc, *expr;
     void *ptr[MAXLINE];
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SC_VA_START(func);
 
-    fnc = _SS_lk_var_valc(func, si->env);
+    fnc = _SS_lk_var_valc(si, func, si->env);
 /*    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func); */
     if (fnc == NULL)
        SS_error("UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(func));
@@ -792,7 +781,7 @@ object *SS_call_scheme(char *func, ...)
 
     SC_mem_stats_set(0L, 0L);
 
-    expr = SS_mk_cons(fnc, _SS_make_list(i, type, ptr));
+    expr = SS_mk_cons(fnc, _SS_make_list(si, i, type, ptr));
     SC_mark(expr, 1);
 
     SS_eval(si, expr);
@@ -860,7 +849,7 @@ int SS_run(char *s)
 static int _SS_load_scm(SS_psides *si)
    {
 
-    SS_call_scheme("load",
+    SS_call_scheme(si, "load",
                    SC_STRING_I, _SS.ibf,
                    SS_OBJECT_I, SS_t,
                    0);
@@ -967,7 +956,7 @@ char *SS_exe_script(int c, char **v)
  *                - command line processing in the "main" routine
  */
 
-int SS_define_argv(char *program, int c, char **v)
+int SS_define_argv(SS_psides *si, char *program, int c, char **v)
    {int i, n, rv, t, after;
     int type[MAXLINE];
     long *lp;
@@ -1015,9 +1004,9 @@ int SS_define_argv(char *program, int c, char **v)
 	     n++;};
 
 /* make the arg list available in interpreted code */
-	argl = _SS_make_list(n, type, ptr);
+	argl = _SS_make_list(si, n, type, ptr);
 
-	SS_define_constant(1,
+	SS_define_constant(si, 1,
 			   "argv", SS_OBJECT_I, argl,
 			   NULL);
 

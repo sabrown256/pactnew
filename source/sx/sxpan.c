@@ -220,10 +220,10 @@ static object *_SXI_pan_simulate(SS_psides *si, object *argl)
     ti *= unit[SEC]/convrsn[SEC];
     tf *= unit[SEC]/convrsn[SEC];
 
-    pt  = (double *) SS_var_reference("current-time");
-    pdt = (double *) SS_var_reference("current-timestep");
-    pcy = (int *) SS_var_reference("current-cycle");
-    pnz = (int *) SS_var_reference("number-of-zones");
+    pt  = (double *) SS_var_reference(si, "current-time");
+    pdt = (double *) SS_var_reference(si, "current-timestep");
+    pcy = (int *) SS_var_reference(si, "current-cycle");
+    pnz = (int *) SS_var_reference(si, "number-of-zones");
 
     t = *pt;
 
@@ -320,9 +320,9 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
     double *pt, *pdt;
     PA_package *pck;
 
-    pt  = (double *) SS_var_reference("current-time");
-    pdt = (double *) SS_var_reference("current-timestep");
-    pcy = (int *) SS_var_reference("current-cycle");
+    pt  = (double *) SS_var_reference(si, "current-time");
+    pdt = (double *) SS_var_reference(si, "current-timestep");
+    pcy = (int *) SS_var_reference(si, "current-cycle");
 
     dt = *pdt;
 
@@ -377,7 +377,7 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
  *               - also return NULL on error
  */
 
-static int *_SX_index_ptr(object **pargl, char *msg)
+static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
    {int *rv;
     char *ds;
     object *obj;
@@ -401,7 +401,7 @@ static int *_SX_index_ptr(object **pargl, char *msg)
 	    else
 	       rv = NULL;}
 	else
-	   rv = (int *) SS_var_reference(ds);};
+	   rv = (int *) SS_var_reference(si, ds);};
 
     return(rv);}
 
@@ -535,18 +535,18 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 /* get the dimensions */
     vdims = NULL;
     while (TRUE)
-       {maxi = _SX_index_ptr(&argl, "BAD DIMENSION NAME - _SXI_DEF_VAR");
+       {maxi = _SX_index_ptr(si, &argl, "BAD DIMENSION NAME - _SXI_DEF_VAR");
         if (maxi == NULL)
            break;
 
         if (maxi == PA_DUL)
-           {mini = _SX_index_ptr(&argl, "BAD LOWER INDEX - _SXI_DEF_VAR");
-            maxi = _SX_index_ptr(&argl, "BAD UPPER INDEX - _SXI_DEF_VAR");
+           {mini = _SX_index_ptr(si, &argl, "BAD LOWER INDEX - _SXI_DEF_VAR");
+            maxi = _SX_index_ptr(si, &argl, "BAD UPPER INDEX - _SXI_DEF_VAR");
             meth = *PA_DUL;}
 
         else if (maxi == PA_DON)
-           {mini = _SX_index_ptr(&argl, "BAD OFFSET - _SXI_DEF_VAR");
-            maxi = _SX_index_ptr(&argl, "BAD NUMBER - _SXI_DEF_VAR");
+           {mini = _SX_index_ptr(si, &argl, "BAD OFFSET - _SXI_DEF_VAR");
+            maxi = _SX_index_ptr(si, &argl, "BAD NUMBER - _SXI_DEF_VAR");
             meth = *PA_DON;}
 
         else
@@ -671,7 +671,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
  * not the best place but si->env won't last through most expression
  * evaluations
  */
-         SS_def_var(obj,
+         SS_def_var(si, obj,
                     SX_mk_package(pck),
                     si->global_env);
 
@@ -708,7 +708,7 @@ static object *_SXI_intern_packages(SS_psides *si)
  * not the best place but si->env won't last through most expression
  * evaluations
  */
-         SS_def_var(obj,
+         SS_def_var(si, obj,
                     SX_mk_package(pck),
                     si->global_env);
 
@@ -932,7 +932,9 @@ static object *_SXI_wr_restart(SS_psides *si, object *argl)
 /* SX_INSTALL_PANACEA_FUNCS - install the PANACEA extensions to Scheme */
  
 void SX_install_panacea_funcs(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
     SS_install("pa-advance-name",
                "Advance the given file name",
@@ -1049,7 +1051,7 @@ void SX_install_panacea_funcs(void)
                SS_sargs,
                _SXI_wr_restart, SS_PR_PROC);
 
-    SS_define_constant(0,
+    SS_define_constant(si, 0,
                        "dimension",     SC_STRING_I, "dimension",
                        "upper-lower",   SC_STRING_I, "upper-lower",
                        "offset-number", SC_STRING_I, "offset-number",
@@ -1058,7 +1060,7 @@ void SX_install_panacea_funcs(void)
                        "attribute",     SC_INT_I, 102,
                        NULL);
 
-    SS_define_constant(0,
+    SS_define_constant(si, 0,
                        "scope",         SC_INT_I, 97,
                        "defn",          SC_INT_I, -1,
                        "restart",       SC_INT_I, -2,
@@ -1068,21 +1070,21 @@ void SX_install_panacea_funcs(void)
                        "scratch",       SC_INT_I, -6,
                        NULL);
 
-    SS_define_constant(0,
+    SS_define_constant(si, 0,
                        "class",         SC_INT_I, 98,
                        "required",      SC_INT_I, 1,
                        "optional",      SC_INT_I, 2,
                        "pseudo",        SC_INT_I, 3,
                        NULL);
 
-    SS_define_constant(0,
+    SS_define_constant(si, 0,
                        "persist",       SC_INT_I, 99,
                        "release",       SC_INT_I, -10,
                        "keep",          SC_INT_I, -11,
                        "cache",         SC_INT_I, -12,
                        NULL);
 
-    SS_define_constant(0,
+    SS_define_constant(si, 0,
                        "center",        SC_INT_I, 100,
                        "zone-centered", SC_INT_I, -1,
                        "node-centered", SC_INT_I, -2,
@@ -1091,7 +1093,7 @@ void SX_install_panacea_funcs(void)
                        "uncentered",    SC_INT_I, -5,
                        NULL);
 
-    SS_define_constant(0,
+    SS_define_constant(si, 0,
                        "allocation",    SC_INT_I, 101,
                        "static",        SC_INT_I, -100,
                        "dynamic",       SC_INT_I, -101,

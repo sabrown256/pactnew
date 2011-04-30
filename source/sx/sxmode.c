@@ -183,10 +183,10 @@ void SX_plot(void)
 
     var = (object *) SC_hasharr_def_lookup(si->symtab, "viewport-update");
     if (var != NULL)
-       {if (SS_bind_env(var, si->env) != NULL)
+       {if (SS_bind_env(si, var, si->env) != NULL)
 	   {fnc = SS_lk_var_val(si, var);
 	    if (SS_procedurep(fnc))
-	       SS_call_scheme("viewport-update", 0);};};
+	       SS_call_scheme(si, "viewport-update", 0);};};
 
     return;}
 
@@ -238,8 +238,9 @@ static void _SX_read(object *strm)
 /* if it is an unbound variable check to see if it is a file variable
  * in which case print or change it
  */
-    else if (SS_variablep(si->rdobj) && !SS_bind_env(si->rdobj, si->env))
-       {SS_var_value("current-file", G_FILE, &po, TRUE);
+    else if (SS_variablep(si->rdobj) &&
+	     !SS_bind_env(si, si->rdobj, si->env))
+       {SS_var_value(si, "current-file", G_FILE, &po, TRUE);
 	if (po == NULL)
 	   file = SX_vif;
 	else

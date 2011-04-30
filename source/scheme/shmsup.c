@@ -114,11 +114,8 @@ int SS_lookup_identifier_m(char *txt, object **lval)
 
 /* SS_SYNTAX_M - BASIS -> SCHEME syntax translation parser */
 
-object *SS_syntax_m(object *str)
+object *SS_syntax_m(SS_psides *si, object *str)
    {object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SETJMP(si->cpu))
        ret = SS_eof;

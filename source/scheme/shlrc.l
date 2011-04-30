@@ -229,8 +229,8 @@ enum           {DIAG_RETURN(ENUM);}
                 yylval = SS_lookup_variable(func, TRUE);
                 DIAG_RETURN(STORAGE_CLASS);}
 
-{TYPES}        {IDENT_RETURN(SS_lookup_identifier_c((char *) yytext, &yylval));}
-{IDENT}        {IDENT_RETURN(SS_lookup_identifier_c((char *) yytext, &yylval));}
+{TYPES}        {IDENT_RETURN(SS_lookup_identifier_c(&_SS_si, (char *) yytext, &yylval));}
+{IDENT}        {IDENT_RETURN(SS_lookup_identifier_c(&_SS_si, (char *) yytext, &yylval));}
 
 {WS}                    ;
 {BEGCMT}.*{ENDCMT}      ;

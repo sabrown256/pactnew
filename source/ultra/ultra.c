@@ -51,7 +51,7 @@ static char
 int _UL_rd_scm(SS_psides *si)
    {
 
-    SS_call_scheme("rd",
+    SS_call_scheme(si, "rd",
                    SC_STRING_I, _UL_bf,
                    0);
 
@@ -1343,7 +1343,7 @@ int main(int c, char **v)
     PG_expose_device(PG_console_device);
 
 /* if it is not a script then we have to process the files at this level */
-    if (SS_define_argv("ultra", c, v) == FALSE)
+    if (SS_define_argv(si, "ultra", c, v) == FALSE)
 
 /* read the optionally specified data/scheme files in order */
        {for (i = 0; i < n_files; i++)

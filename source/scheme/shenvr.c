@@ -129,9 +129,6 @@ object *SS_exp_eval(SS_psides *si, object *obj)
 object *SS_eval(SS_psides *si, object *obj)
    {
 
-    if (si == NULL)
-       si = &_SS_si;
-
     SS_Assign(si->exn, obj);
     SS_Assign(si->env, si->global_env);
 
@@ -144,13 +141,11 @@ object *SS_eval(SS_psides *si, object *obj)
 
 /* SS_SAVE_REGISTERS - save the Scheme register set on the stack */
 
-void SS_save_registers(int vp)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_save_registers(SS_psides *si, int vp)
+   {
 
     if (vp)
-       {SS_Save(si, si->val);};
+       SS_Save(si, si->val);
 
     SS_Save(si, si->exn);
     SS_Save(si, si->env);
@@ -166,10 +161,8 @@ void SS_save_registers(int vp)
 
 /* SS_RESTORE_REGISTERS - restore the Scheme register set from the stack */
 
-void SS_restore_registers(int vp)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_restore_registers(SS_psides *si, int vp)
+   {
 
     SS_Restore(si, si->argl);
     SS_Restore(si, si->unev);
@@ -179,7 +172,7 @@ void SS_restore_registers(int vp)
     SS_Restore(si, si->exn);
 
     if (vp)
-       {SS_Restore(si, si->val);};
+       SS_Restore(si, si->val);
 
     return;}
 
@@ -345,12 +338,9 @@ object *SS_mk_new_frame(object *name, hasharr *tab)
  *                 - of OS environment variables add it to the OS environment
  */
 
-static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
+static void SS_add_to_frame(SS_psides *si, char *vr, object *vl, hasharr *tab)
    {int nc, ok;
     char *s, *t;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SC_hasharr_install(tab, vr, vl, SS_OBJECT_P_S, TRUE, TRUE);
 
@@ -372,9 +362,10 @@ static void SS_add_to_frame(char *vr, object *vl, hasharr *tab)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MK_FRAME - make a new environmental frame */
+/* _SS_MK_FRAME - make a new environmental frame */
 
-static object *SS_mk_frame(object *fnm, object *vrs, object *vls)
+static object *_SS_mk_frame(SS_psides *si, object *fnm,
+			    object *vrs, object *vls)
    {object *fr, *var, *val;
     char *name;
     hasharr *tab;
@@ -383,7 +374,7 @@ static object *SS_mk_frame(object *fnm, object *vrs, object *vls)
 
     if (SS_variablep(vrs))
        {name = SS_VARIABLE_NAME(vrs);
-	SS_add_to_frame(name, vls, tab);}
+	SS_add_to_frame(si, name, vls, tab);}
 
     else
        {for (; SS_consp(vrs); vrs = SS_cdr(vrs))
@@ -396,12 +387,12 @@ static object *SS_mk_frame(object *fnm, object *vrs, object *vls)
              var  = SS_car(vrs);
 	     name = SS_VARIABLE_NAME(var);
 
-	     SS_add_to_frame(name, val, tab);};
+	     SS_add_to_frame(si, name, val, tab);};
 
 /* if end of vrs is not NULL we had dotted arg list */
         if (!SS_nullobjp(vrs))
 	   {name = SS_VARIABLE_NAME(vrs);
-	    SS_add_to_frame(name, vls, tab);};};
+	    SS_add_to_frame(si, name, vls, tab);};};
 
     fr = SS_mk_new_frame(fnm, tab);
 
@@ -410,12 +401,13 @@ static object *SS_mk_frame(object *fnm, object *vrs, object *vls)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_XTND_ENV - A and S environment control */
+/* _SS_XTND_ENV - A and S environment control */
 
-static object *SS_xtnd_env(object *fnm, object *vrs, object *vls, object *base)
+static object *_SS_xtnd_env(SS_psides *si, object *fnm,
+			    object *vrs, object *vls, object *base)
    {object *env;
-
-    env = SS_mk_cons(SS_mk_frame(fnm, vrs, vls), base);
+    
+    env = SS_mk_cons(_SS_mk_frame(si, fnm, vrs, vls), base);
 
     return(env);}
 
@@ -426,11 +418,8 @@ static object *SS_xtnd_env(object *fnm, object *vrs, object *vls, object *base)
  *                - and return the resulting environment
  */
 
-object *SS_do_bindings(object *pp, object *argp)
+object *SS_do_bindings(SS_psides *si, object *pp, object *argp)
    {object *params, *penv, *nenv, *name;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (!SS_procedurep(pp))
        SS_error("BAD PROCEDURE TO DO-BINDINGS", pp);
@@ -438,7 +427,7 @@ object *SS_do_bindings(object *pp, object *argp)
     name   = SS_proc_name(pp);
     params = SS_params(pp);
     penv   = SS_proc_env(pp);
-    nenv   = SS_xtnd_env(name, params, argp, penv);
+    nenv   = _SS_xtnd_env(si, name, params, argp, penv);
 
     if ((si->trace_env > 0) && (!SS_nullobjp(params)))
        dpenv(si, nenv);
@@ -455,13 +444,10 @@ object *SS_do_bindings(object *pp, object *argp)
  *               - which match PATT
  */
 
-char **SS_bound_vars(char *patt, object *penv)
+char **SS_bound_vars(SS_psides *si, char *patt, object *penv)
    {int i;
     char *fname, **vrs;
     hasharr *tab;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (penv == NULL)
        penv = si->env;
@@ -483,13 +469,10 @@ char **SS_bound_vars(char *patt, object *penv)
  *               - return the name under which it is found in UNDER
  */
 
-object *SS_bound_name(char *name)
+object *SS_bound_name(SS_psides *si, char *name)
    {object *obj;
-    SS_psides *si;
 
-    si = &_SS_si;
-
-    obj = _SS_bind_envc(name, si->env);
+    obj = _SS_bind_envc(si, name, si->env);
     if (obj == NULL)
        obj = (object *) SC_hasharr_def_lookup(si->symtab, name);
 
@@ -503,12 +486,10 @@ object *SS_bound_name(char *name)
  *               - return the name under which it is found in UNDER
  */
 
-static object *_SS_bound_var(char *name, hasharr *tab, char *under)
+static object *_SS_bound_var(SS_psides *si, char *name,
+			     hasharr *tab, char *under)
    {char s[MAXLINE], t[MAXLINE];
     object *b;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (under == NULL)
        under = t;
@@ -569,7 +550,7 @@ object *_SS_get_variable(char *name, object *penv)
  *                   - return the found object if any in A
  */
 
-static object *_SS_search_frames(char *name, object *penv,
+static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
 				 char *under, hasharr **ptab)
    {int i;
     char *fname;
@@ -584,7 +565,7 @@ static object *_SS_search_frames(char *name, object *penv,
     if (name != NULL)
        {for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
 	    {GET_FRAME(fname, tab, penv);
-	     b = _SS_bound_var(name, tab, under);
+	     b = _SS_bound_var(si, name, tab, under);
 	     if (b != NULL)
 	        {if (ptab != NULL)
 		    *ptab = tab;
@@ -599,10 +580,10 @@ static object *_SS_search_frames(char *name, object *penv,
  *               - in the given environment
  */
 
-object *_SS_bind_envc(char *name, object *penv)
+object *_SS_bind_envc(SS_psides *si, char *name, object *penv)
    {object *b;
 
-    b = _SS_search_frames(name, penv, NULL, NULL);
+    b = _SS_search_frames(si, name, penv, NULL, NULL);
 
     return(b);}
 
@@ -613,7 +594,7 @@ object *_SS_bind_envc(char *name, object *penv)
  *            - in the specified environment
  */
 
-void SS_set_var(object *vr, object *vl, object *penv)
+void SS_set_var(SS_psides *si, object *vr, object *vl, object *penv)
    {char under[MAXLINE];
     char *name;
     hasharr *tab;
@@ -621,11 +602,11 @@ void SS_set_var(object *vr, object *vl, object *penv)
 
     name = SS_VARIABLE_NAME(vr);
 
-    b = _SS_search_frames(name, penv, under, &tab);
+    b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
        {SS_GC(b);
-	SS_add_to_frame(under, vl, tab);}
+	SS_add_to_frame(si, under, vl, tab);}
 
     else
        SS_error("UNBOUND VARIABLE - SS_SET_VAR", vr);
@@ -640,12 +621,12 @@ void SS_set_var(object *vr, object *vl, object *penv)
  *              - NOTE: this is used in the C syntax mode if nowhere else
  */
 
-void _SS_rem_varc(char *name, object *penv)
+void _SS_rem_varc(SS_psides *si, char *name, object *penv)
    {char under[MAXLINE];
     hasharr *tab;
     object *b;
 
-    b = _SS_search_frames(name, penv, under, &tab);
+    b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
        {SS_GC(b);
@@ -660,19 +641,19 @@ void _SS_rem_varc(char *name, object *penv)
  *              - in the specified environment
  */
 
-void _SS_def_varc(char *name, object *vl, object *penv)
+static void _SS_def_varc(SS_psides *si, char *name, object *vl, object *penv)
    {char under[MAXLINE];
     object *b;
     hasharr *tab;
 
-    b = _SS_search_frames(name, penv, under, &tab);
+    b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
        {SS_GC(b);
-	SS_add_to_frame(under, vl, tab);}
+	SS_add_to_frame(si, under, vl, tab);}
 
     else
-       SS_add_to_frame(name, vl, tab);
+       SS_add_to_frame(si, name, vl, tab);
 
     return;}
 
@@ -683,13 +664,13 @@ void _SS_def_varc(char *name, object *vl, object *penv)
  *             - in the given environment
  */
 
-object *SS_bind_env(object *vr, object *penv)
+object *SS_bind_env(SS_psides *si, object *vr, object *penv)
    {char *name;
     object *o;
 
     name = SS_VARIABLE_NAME(vr);
 
-    o = _SS_bind_envc(name, penv);
+    o = _SS_bind_envc(si, name, penv);
 
     return(o);}
 
@@ -701,7 +682,7 @@ object *SS_bind_env(object *vr, object *penv)
 object *_SSI_defp(SS_psides *si, object *vr)
    {object *b, *o;
 
-    b = SS_bind_env(vr, si->env);
+    b = SS_bind_env(si, vr, si->env);
     o = (b == NULL) ? SS_f : SS_t;
 
     return(o);}
@@ -711,14 +692,11 @@ object *_SSI_defp(SS_psides *si, object *vr)
 
 /* _SS_LK_VAR_VALC - look up the variable in the environment */
 
-object *_SS_lk_var_valc(char *name, object *penv)
+object *_SS_lk_var_valc(SS_psides *si, char *name, object *penv)
    {object *b, *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     obj = SS_null;
-    b   = _SS_bind_envc(name, penv);
+    b   = _SS_bind_envc(si, name, penv);
     if (b != NULL)
        obj = b;
 
@@ -747,7 +725,7 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
 
     penv = si->env;
     name = SS_VARIABLE_NAME(vr);
-    obj  = _SS_lk_var_valc(name, penv);
+    obj  = _SS_lk_var_valc(si, name, penv);
 
 /* NOTE: get a second chance if one of the syntax modes has defined a
  * name mapping scheme
@@ -757,7 +735,7 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
  */
     if ((obj == NULL) && (si->name_reproc != NULL))
        {(*si->name_reproc)(s, name);
-	obj = _SS_lk_var_valc(s, penv);};
+	obj = _SS_lk_var_valc(si, s, penv);};
 
 /* if there is no variable complain */
     if (obj == NULL)
@@ -816,12 +794,12 @@ char *_SS_get_print_name(object *o)
  *            - in the specified environment
  */
 
-void SS_def_var(object *vr, object *vl, object *penv)
+void SS_def_var(SS_psides *si, object *vr, object *vl, object *penv)
    {char *name;
 
     name = SS_VARIABLE_NAME(vr);
 
-    _SS_def_varc(name, vl, penv);
+    _SS_def_varc(si, name, vl, penv);
 
     return;}
 
@@ -836,9 +814,6 @@ void SS_env_vars(SS_psides *si, char **vrs, object *penv)
    {int i, nc;
     char *s, *p, *vr;
     object *vl;
-
-    if (si == NULL)
-       si = &_SS_si;
 
     if (vrs == NULL)
        vrs = SC_get_env();
@@ -859,7 +834,7 @@ void SS_env_vars(SS_psides *si, char **vrs, object *penv)
 
 		 vl = SS_mk_string(p+1);
 
-		 _SS_def_varc(vr, vl, penv);
+		 _SS_def_varc(si, vr, vl, penv);
 
 		 *p  = '=';
 		 CFREE(vr);};};};

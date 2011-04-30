@@ -63,7 +63,7 @@ int main(int c, char **v, char **env)
 /* initialize the available syntax modes */
     DEF_SYNTAX_MODES();
 
-    SS_define_argv("scheme", c, v);
+    SS_define_argv(si, "scheme", c, v);
 
     cmnd  = NULL;
     qfl   = FALSE;

@@ -61,7 +61,7 @@ void SX_end(int val)
 static int _SX_rd_scm(SS_psides *si)
    {
 
-    SS_call_scheme("cf",
+    SS_call_scheme(si, "cf",
                    SC_STRING_I, _SX_bf,
                    0);
 

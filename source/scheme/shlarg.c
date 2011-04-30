@@ -245,7 +245,7 @@ object *_SSI_define_global(SS_psides *si, object *argl)
     if (strcmp(SS_PROCEDURE_NAME(si->fun), "define-global-macro") == 0)
        SS_PROCEDURE_TYPE(val) = SS_MACRO;
 
-    SS_def_var(argl, val, si->global_env);
+    SS_def_var(si, argl, val, si->global_env);
 
     return(argl);}
 
@@ -362,7 +362,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 
 /* make a list of names from the global environment frame */
     if (SS_nullobjp(argl))
-       vrs = SS_bound_vars("$*", si->global_env);
+       vrs = SS_bound_vars(si, "$*", si->global_env);
 
 /* make a list of names from the argument list */
     else
@@ -391,7 +391,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 
     for (i = 0; vrs[i] != NULL; i++)
         {vr = vrs[i];
-	 vl = _SS_lk_var_valc(vr, si->global_env);
+	 vl = _SS_lk_var_valc(si, vr, si->global_env);
 	 snprintf(s, MAXLINE, "%s = ", vr);
 	 if (vl == NULL)
 	    SS_print(SS_null, s, "\n", si->outdev);
@@ -406,7 +406,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
     SC_ptr_arr_len(n, vrs);
     for (i = n-1; i >= 0; i--)
         {vr = vrs[i];
-	 vl = _SS_lk_var_valc(vr, si->global_env);
+	 vl = _SS_lk_var_valc(si, vr, si->global_env);
 	 pr = SS_make_list(SC_STRING_I, vr,
 			   SS_OBJECT_I, vl,
 			   0);
