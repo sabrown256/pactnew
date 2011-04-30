@@ -215,7 +215,7 @@ int main(int c, char **v, char **env)
 
 #endif
 
-    SS_define_argv(prog, c, v);
+    SS_define_argv(si, prog, c, v);
 
 /* read the optionally specified data/scheme files in order */
     for (i = 0; i < n_files; i++)

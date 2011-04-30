@@ -73,11 +73,8 @@ int SS_lookup_identifier_f(char *txt, object **lval)
 
 /* SS_SYNTAX_F - Fortran -> SCHEME syntax translation parser */
 
-object *SS_syntax_f(object *str)
+object *SS_syntax_f(SS_psides *si, object *str)
    {object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SETJMP(si->cpu))
        ret = SS_eof;

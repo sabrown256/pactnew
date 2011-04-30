@@ -48,6 +48,9 @@ int SX_have_display_list(void)
 object *SX_display_map(object *mo)
    {PM_mapping *h;
     PG_graph *g;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if (SX_plot_flag && SX_autoplot)
        {h  = SS_GET(PM_mapping, mo);
@@ -57,7 +60,7 @@ object *SX_display_map(object *mo)
 	mo = SX_mk_graph(g);
 
 	SS_MARK(mo);
-	SS_call_scheme("display-mapping*",
+	SS_call_scheme(si, "display-mapping*",
 		       SS_OBJECT_I, mo,
 		       0);};
 
@@ -92,7 +95,7 @@ static object *_SX_resolve_mapping(object *argl)
  */
 	   {SS_MARK(argl);
 
-	    fo = SS_call_scheme("map-resolve",
+	    fo = SS_call_scheme(si, "map-resolve",
 				SS_OBJECT_I, obj,
 				0);};};
 

@@ -143,15 +143,12 @@ object *_SS_make_cmpnd_stmnt(object *dcl, object *sl)
  *             - NOTE: this is for CPP extention #undef
  */
 
-object *_SS_del_var(object *var)
+object *_SS_del_var(SS_psides *si, object *var)
    {char *name;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     name = SS_VARIABLE_NAME(var);
 
-    _SS_rem_varc(name, si->env);
+    _SS_rem_varc(si, name, si->env);
 
     return(SS_f);}
 
@@ -224,12 +221,9 @@ object *_SS_make_cast(object *type, object *expr)
 
 /* SS_LOOKUP_IDENTIFIER_C - lookup an identifier for LEX */
 
-int SS_lookup_identifier_c(char *txt, object **lval)
+int SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval)
    {int type;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     *lval = SS_f;
 
@@ -253,12 +247,9 @@ int SS_lookup_identifier_c(char *txt, object **lval)
 
 /* SS_SYNTAX_C - C -> SCHEME syntax translation parser */
 
-object *SS_syntax_c(object *str)
+object *SS_syntax_c(SS_psides *si, object *str)
    {char *s;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     s = SS_BUFFER(str);
     SC_ASSERT(s != NULL);

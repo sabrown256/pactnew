@@ -427,7 +427,7 @@ void SS_init_scheme(char *code, char *vers)
 
     SS_Assign(si->env, si->global_env);
 
-    SS_define_constant(1,
+    SS_define_constant(si, 1,
 		       "system-id", SC_STRING_I, SYSTEM_ID,
 		       "argv",      SS_OBJECT_I, SS_null,
 		       NULL);
@@ -690,13 +690,13 @@ object *SS_lookup_object(SS_psides *si, object *obj)
 	    SC_STRING_I, &name,
 	    0);
 
-    obj = SS_bound_name(name);
+    obj = SS_bound_name(si, name);
 
     CFREE(name);
 
     if (SS_variablep(obj))
        {vnm = SS_VARIABLE_NAME(obj);
-	obj = _SS_lk_var_valc(vnm, si->env);
+	obj = _SS_lk_var_valc(si, vnm, si->env);
 	if (obj == NULL)
 	   obj = SS_null;};
 
@@ -716,7 +716,7 @@ void SS_push_err(int flag, int type)
 
     si = &_SS_si;
 
-    SS_save_registers(flag);
+    SS_save_registers(si, flag);
 
     x = SS_mk_esc_proc(si->errlev, type);
     SS_MARK(x);
@@ -755,7 +755,7 @@ object *SS_pop_err(int n, int flag)
         else
            SS_GC(x);};
 
-    SS_restore_registers(flag);
+    SS_restore_registers(si, flag);
 
     return(x);}
 

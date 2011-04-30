@@ -116,7 +116,7 @@ extern int
 
 extern object
  *_SS_make_funf(object *proto, object *body),
- *SS_syntax_f(object *str),
+ *SS_syntax_f(SS_psides *si, object *str),
  *SS_parse_token_f(void),
  *SS_parse_token_val_f(void);
 

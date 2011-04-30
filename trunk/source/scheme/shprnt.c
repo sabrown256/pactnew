@@ -751,7 +751,7 @@ int SS_prim_des(object *strm, object *obj)
 
     str = SS_OUTSTREAM(strm);
 
-    fmt = (SS_bound_name("format-expr") != SS_null);
+    fmt = (SS_bound_name(si, "format-expr") != SS_null);
 
 /* take anything that will give a name - procedure, string, variable ... */
     obj = SS_lookup_object(si, obj);
@@ -780,7 +780,7 @@ int SS_prim_des(object *strm, object *obj)
                  PRINT(str, "     Compound procedure:\n");
 		 bdy = SS_make_form(SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
-		    SS_call_scheme("format-expr",
+		    SS_call_scheme(si, "format-expr",
 				   SS_OBJECT_I, strm,
 				   SS_OBJECT_I, bdy,
 				   SC_STRING_I, "     ",
@@ -801,7 +801,7 @@ int SS_prim_des(object *strm, object *obj)
                  PRINT(str, "     Compound macro:\n");
 		 bdy = SS_make_form(SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
-		    SS_call_scheme("format-expr",
+		    SS_call_scheme(si, "format-expr",
 				   SS_OBJECT_I, strm,
 				   SS_OBJECT_I, bdy,
 				   SC_STRING_I, "     ",

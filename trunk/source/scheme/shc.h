@@ -131,7 +131,7 @@ extern int
 
 extern object
  *_SS_make_func(object *proto, object *body),
- *_SS_del_var(object *var),
+ *_SS_del_var(SS_psides *si, object *var),
  *_SS_make_decl(object *ds, object *idl),
  *_SS_make_macr(object *proto, object *body),
  *_SS_make_mac_decl(object *ds, object *idl),
@@ -139,7 +139,7 @@ extern object
  *_SS_make_stmnt_lst(object *s, object *sl),
  *_SS_make_cmpnd_stmnt(object *dcl, object *sl),
  *_SS_make_cast(object *type, object *expr),
- *SS_syntax_c(object *str),
+ *SS_syntax_c(SS_psides *si, object *str),
  *SS_parse_token_c(void),
  *SS_parse_token_val_c(void);
 
@@ -147,7 +147,7 @@ extern void
  SS_init_c_syntax_mode(void);
 
 extern int
- SS_lookup_identifier_c(char *txt, object **lval),
+ SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval),
  *SS_parse_debug_c(void);
 
 #endif

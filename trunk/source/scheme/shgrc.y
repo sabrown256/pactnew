@@ -319,7 +319,7 @@ storage_class_specifier :
 
 type_specifier :
     TYPE_SPEC
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, SS_null, $1, SS_null, LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, SS_null, $1, SS_null, LAST));
        DIAGNOSTIC($$, "TYPE-SPEC");}
 
   | struct_or_union_specifier
@@ -349,19 +349,19 @@ type_qualifier :
 
 struct_or_union_specifier :
     struct_or_union VARNAME '{' struct_declaration_list '}'
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, $1, $2, SS_reverse($4), LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, $1, $2, SS_reverse($4), LAST));
        DIAGNOSTIC($$, "struct-or-union VARNAME { struct-declaration-list }");}
 
   | struct_or_union '{' struct_declaration_list '}'
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, $1, SS_null, SS_reverse($3), LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, $1, SS_null, SS_reverse($3), LAST));
        DIAGNOSTIC($$, "struct-or-union { struct-declaration-list }");}
 
   | struct_or_union VARNAME
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, $1, $2, SS_null, LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, $1, $2, SS_null, LAST));
        DIAGNOSTIC($$, "struct-or-union VARNAME");}
 
   | struct_or_union TYPE_SPEC
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, $1, $2, SS_null, LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, $1, $2, SS_null, LAST));
        DIAGNOSTIC($$, "struct-or-union TYPE-SPEC");}
   ;
 
@@ -503,15 +503,15 @@ struct_declarator :
 
 enum_specifier :
     ENUM VARNAME '{' enumerator_list '}'
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, _SS_c_enum, $2, SS_reverse($4), LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, _SS_c_enum, $2, SS_reverse($4), LAST));
        DIAGNOSTIC($$, "enum_specifier : VARNAME { enumerator_list }");}
 
   | ENUM '{' enumerator_list '}'
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, _SS_c_enum, SS_null, SS_reverse($3), LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, _SS_c_enum, SS_null, SS_reverse($3), LAST));
        DIAGNOSTIC($$, "enum_specifier : { enumerator_list }");}
 
   | ENUM VARNAME
-      {SS_GR_VAL(SS_eval_form(_SS_c_decl, _SS_c_enum, $2, SS_null, LAST));
+      {SS_GR_VAL(SS_eval_form(&_SS_si, _SS_c_decl, _SS_c_enum, $2, SS_null, LAST));
        DIAGNOSTIC($$, "enum_specifier : VARNAME");}
   ;
 
@@ -1597,7 +1597,7 @@ preprocessor_directive :
        DIAGNOSTIC($$, "DEFINE proc body");}
 
   | DER UNDEF VARNAME
-      {SS_GR_VAL(_SS_del_var($3));
+      {SS_GR_VAL(_SS_del_var(&_SS_si, $3));
        DIAGNOSTIC($$, "UNDEF var");}
 
   | DER IF primary_expression statement DER ENDIF

@@ -200,34 +200,34 @@ object *SS_install_cv(char *name, void *pval, int ityp)
     if (SC_is_type_char(ityp) == TRUE)
        {long long v;
 	v = *(char *) pval;
-	SS_def_var(var, SS_mk_integer(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_integer(v), si->global_env);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(var, SS_mk_integer(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_integer(v), si->global_env);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double v;
 	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(var, SS_mk_float(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_float(v), si->global_env);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(var, SS_mk_complex(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_complex(v), si->global_env);}
 
     else if (ityp == SC_STRING_I)
        {char *v;
 	v = (char *) pval;
-	SS_def_var(var, SS_mk_string(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_string(v), si->global_env);}
 
     else if (ityp == SS_OBJECT_I)
-       {SS_def_var(var, (object *) pval, si->global_env);
+       {SS_def_var(si, var, (object *) pval, si->global_env);
 	typ = SS_POBJECT_S;}
 
     else
