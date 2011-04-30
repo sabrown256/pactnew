@@ -75,17 +75,7 @@ static void _SS_sig_handler(int sig)
     PRINT(stdout, "\n%s\n", msg);
     SC_retrace_exe(NULL, -1, 120000);
 
-#if 1
-    SS_end_scheme(sig);
-#else
-    {object *o;
-
-     o = SS_mk_cons(si->fun, si->argl);
-
-     SC_signal(sig, _SS_sig_handler);
-
-     SS_error(msg, o);}
-#endif
+    SS_end_scheme(si, sig);
 
     return;}
 
@@ -96,12 +86,9 @@ static void _SS_sig_handler(int sig)
  *                   - _SS.pr_err
  */
 
-static void _SS_print_err_msg(FILE *str, char *s, object *obj)
+static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
    {char atype[MAXLINE];
     char *p;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (obj == NULL)
        PRINT(str, "(%d):  ERROR: %s\n", si->errlev, s);
@@ -134,10 +121,8 @@ static void _SS_print_err_msg(FILE *str, char *s, object *obj)
  *                     - _SS.pr_err
  */
 
-static void _SS_print_err_msg_a(FILE *str, char *s, object *obj)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static void _SS_print_err_msg_a(SS_psides *si, FILE *str, char *s, object *obj)
+   {
 
     PRINT(str, "ERROR : %s : ", s);
 
@@ -263,30 +248,27 @@ static int _SS_repl(SS_psides *si)
 
 /* SS_REPL - run a READ-EVAL-PRINT Loop */
 
-void SS_repl(void)
-   {char *t;
-    SS_psides *si;
+void SS_repl(SS_psides *si)
+   {int i;
+    char *t;
 
-    si = &_SS_si;
-
-    while (TRUE)
-       {SS_err_catch(_SS_repl, si, NULL);
+    for (i = 0; i < INT_MAX; i++)
+        {SS_err_catch(si, _SS_repl, NULL);
 
 /* reset the input buffer */
-        t = SS_BUFFER(si->indev);
-        SS_PTR(si->indev) = t;
-        *t = '\0';};}
+	 t = SS_BUFFER(si->indev);
+	 SS_PTR(si->indev) = t;
+	 *t = '\0';};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SS_END_SCHEME - gracefully exit from Scheme */
 
-void SS_end_scheme(int val)
+void SS_end_scheme(SS_psides *si, int val)
    {int ev;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (!SS_nullobjp(si->histdev))
        SS_trans_off(si);
@@ -389,7 +371,7 @@ void SS_scheme_path_err(char *path)
 
 /* SS_INIT_SCHEME - initialize the interpreter */
 
-void SS_init_scheme(char *code, char *vers)
+SS_psides *SS_init_scheme(char *code, char *vers)
    {object *fr;
     PFSignal_handler hnd;
     SS_psides *si;
@@ -414,8 +396,8 @@ void SS_init_scheme(char *code, char *vers)
 
     SS_register_types();
 
-    SS_inst_prm();
-    SS_inst_const();
+    SS_inst_prm(si);
+    SS_inst_const(si);
 
     si->trap_error = TRUE;
     si->err_state  = SS_null;
@@ -445,8 +427,8 @@ void SS_init_scheme(char *code, char *vers)
     si->post_read  = NULL;
     si->post_eval  = NULL;
     si->post_print = NULL;
-    si->pr_ch_un        = SS_unget_ch;
-    si->pr_ch_out       = SS_put_ch;
+    si->pr_ch_un   = SS_unget_ch;
+    si->pr_ch_out  = SS_put_ch;
 
     SC_set_put_line(SS_printf);
     SC_set_put_string(SS_fputs);
@@ -474,22 +456,19 @@ void SS_init_scheme(char *code, char *vers)
 
     SC_init_path(2, "HOME", "SCHEME");
 
-    return;}
+    return(si);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_GET_EXT_REF - get a reference to a SCHEME level function NAME out
- *                - at the C level
+/* _SS_GET_EXT_REF - get a reference to a SCHEME level function NAME out
+ *                 - at the C level
  */
 
-static object *SS_get_ext_ref(char *name)
+static object *_SS_get_ext_ref(SS_psides *si, char *name)
    {char uname[MAXLINE];
     haelem *hp;
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     hp = SC_hasharr_lookup(si->symtab, name);
 
@@ -508,15 +487,12 @@ static object *SS_get_ext_ref(char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_MAKE_EXT_BOOLEAN - install a boolean in the symbol table and
- *                     - get a reference at the C level
+/* _SS_MAKE_EXT_BOOLEAN - install a boolean in the symbol table and
+ *                      - get a reference at the C level
  */
 
-static object *SS_make_ext_boolean(char *name, int val)
+static object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
    {object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     o = SS_mk_boolean(name, val);
 
@@ -531,25 +507,23 @@ static object *SS_make_ext_boolean(char *name, int val)
 
 /* SS_INST_CONST - install Scheme constants */
 
-void SS_inst_const(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_inst_const(SS_psides *si)
+   {
 
     SS_OBJECT_S  = CSTRSAVE("object");
     SS_POBJECT_S = CSTRSAVE("object *");
 
-    SS_quoteproc = SS_get_ext_ref("quote");
-    SS_quasiproc = SS_get_ext_ref("quasiquote");
-    SS_unqproc   = SS_get_ext_ref("unquote");
-    SS_unqspproc = SS_get_ext_ref("unquote-splicing");
-    SS_setproc   = SS_get_ext_ref("set!");
+    SS_quoteproc = _SS_get_ext_ref(si, "quote");
+    SS_quasiproc = _SS_get_ext_ref(si, "quasiquote");
+    SS_unqproc   = _SS_get_ext_ref(si, "unquote");
+    SS_unqspproc = _SS_get_ext_ref(si, "unquote-splicing");
+    SS_setproc   = _SS_get_ext_ref(si, "set!");
 
-    SS_null = SS_make_ext_boolean("nil",  FALSE);
-    SS_eof  = SS_make_ext_boolean("#eof", TRUE);
-    SS_t    = SS_make_ext_boolean("#t",   TRUE);
-    SS_f    = SS_make_ext_boolean("#f",   FALSE);
-    SS_else = SS_make_ext_boolean("else", TRUE);
+    SS_null = _SS_make_ext_boolean(si, "nil",  FALSE);
+    SS_eof  = _SS_make_ext_boolean(si, "#eof", TRUE);
+    SS_t    = _SS_make_ext_boolean(si, "#t",   TRUE);
+    SS_f    = _SS_make_ext_boolean(si, "#f",   FALSE);
+    SS_else = _SS_make_ext_boolean(si, "else", TRUE);
 
     SC_arrtype(SS_null, SS_NULL_I);
     SC_arrtype(SS_eof, SS_EOF_I);
@@ -568,8 +542,8 @@ void SS_inst_const(void)
     SS_UNCOLLECT(SS_block_proc);
 
 /* initialize the stack and the continuation stack */
-    SS_init_stack();
-    SS_init_cont();
+    SS_init_stack(si);
+    SS_init_cont(si);
 
     return;}
 
@@ -578,10 +552,8 @@ void SS_inst_const(void)
 
 /* SS_INIT_STACK - rewind the stack to the beginning */
 
-void SS_init_stack(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_init_stack(SS_psides *si)
+   {
 
     si->stack = CMAKE_ARRAY(object *, NULL, 0);
 
@@ -595,11 +567,8 @@ void SS_init_stack(void)
 
 /* SS_INIT_CONT - rewind the continuation stack to the beginning */
 
-void SS_init_cont(void)
+void SS_init_cont(SS_psides *si)
    {int i;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     si->nsetc = 0;
     si->ngoc  = 0;
@@ -629,11 +598,8 @@ void SS_init_cont(void)
 
 /* SS_EXPAND_STACK - double the size of the continuation and err stacks */
 
-void SS_expand_stack(void)
+void SS_expand_stack(SS_psides *si)
    {int i, size;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     size = si->stack_size;
     si->stack_size = 2*size;
@@ -710,11 +676,8 @@ object *SS_lookup_object(SS_psides *si, object *obj)
 
 /* SS_PUSH_ERR - push an error stack frame */
 
-void SS_push_err(int flag, int type)
+void SS_push_err(SS_psides *si, int flag, int type)
    {object *x;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SS_save_registers(si, flag);
 
@@ -840,7 +803,7 @@ static object *_SSI_break(SS_psides *si)
     SS_Save(si, si->evobj);
     SS_Save(si, si->rdobj);
 
-    SS_push_err(TRUE, SS_ERROR_I);
+    SS_push_err(si, TRUE, SS_ERROR_I);
     PRINT(stdout,"\n");
 
     _SS_repl(si);
@@ -978,15 +941,12 @@ void SS_interrupt_handler(int sig)
  *              - return TRUE if the ABORT branch is not taken
  */
 
-int SS_err_catch(int (*fint)(SS_psides *si), SS_psides *si, PFInt errf)
+int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
    {object *esc;
-
-    if (si == NULL)
-       si = &_SS_si;
 
     _SS.ret = TRUE;
     si->cont_ptr++;
-    SS_push_err(FALSE, SS_ERROR_I);
+    SS_push_err(si, FALSE, SS_ERROR_I);
     switch (SETJMP(si->continue_int[si->cont_ptr].cont))
        {case ABORT :
 	     if (errf != NULL)
@@ -1036,7 +996,7 @@ void SS_error(char *s, object *obj)
 
     str = SS_OUTSTREAM(si->outdev);
     if (_SS.pr_err != NULL)
-       SS_PRINT_ERR_MSG(str, t, obj);
+       SS_PRINT_ERR_MSG(si, str, t, obj);
 
     CFREE(t);
 
@@ -1220,10 +1180,8 @@ static object *_SSI_pr_obj_map(SS_psides *si)
 
 /* SS_INST_PRM - install the Scheme primitives */
 
-void SS_inst_prm(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SS_inst_prm(SS_psides *si)
+   {
 
     if (si->symtab == NULL)
        si->symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
@@ -1284,18 +1242,18 @@ void SS_inst_prm(void)
                _SSI_system, SS_PR_PROC);
 
 #ifdef LARGE
-    _SS_inst_lrg();
-    _SS_inst_proc();
+    _SS_inst_lrg(si);
+    _SS_inst_proc(si);
 #endif
 
-    _SS_inst_eval();
-    _SS_inst_read();
-    _SS_inst_print();
-    _SS_inst_prm1();
-    _SS_install_math();
-    _SS_install_complex();
-    _SS_install_quaternion();
-    _SS_inst_prm3();
+    _SS_inst_eval(si);
+    _SS_inst_read(si);
+    _SS_inst_print(si);
+    _SS_inst_prm1(si);
+    _SS_install_math(si);
+    _SS_install_complex(si);
+    _SS_install_quaternion(si);
+    _SS_inst_prm3(si);
 
     return;}
 

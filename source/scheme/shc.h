@@ -144,7 +144,7 @@ extern object
  *SS_parse_token_val_c(void);
 
 extern void
- SS_init_c_syntax_mode(void);
+ SS_init_c_syntax_mode(SS_psides *si);
 
 extern int
  SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval),

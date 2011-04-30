@@ -10,7 +10,7 @@
 
 #include "scheme_int.h"
 
-typedef object         *(*PFBINOBJ)(object *argl);
+typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
 
 #define SS_GET_OPERAND(_oper, _arg, _typ)                                    \
     {int _ityp;                                                              \
@@ -167,18 +167,18 @@ static object *SS_unary_bit(SS_psides *si, C_procedure *cp, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_BINARY_OPR - the binary arithmetic operator handler */
+/* _SS_BINARY_OPR - the binary arithmetic operator handler */
 
-static object *SS_binary_opr(SS_psides *si, C_procedure *cp, object *argl)
+static object *_SS_binary_opr(SS_psides *si, C_procedure *cp, object *argl)
    {PFBINOBJ fnc;
     object *rv;
 
     if (SS_length(argl) != 2)
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_BINARY_OPR", argl);
+       SS_error("WRONG NUMBER OF ARGUMENTS - _SS_BINARY_OPR", argl);
 
     fnc = (PFBINOBJ) cp->proc[0];
 
-    rv = (*fnc)(argl);
+    rv = (*fnc)(si, argl);
 
     return(rv);}
 
@@ -601,14 +601,11 @@ static object *_SS_machine_prec(SS_psides *si)
  *             - NOTE: deviate from strict C and allow '^' to be exponentiation
  */
 
-static object *_SS_xor_pow(object *argl)
+static object *_SS_xor_pow(SS_psides *si, object *argl)
    {int type;
     int64_t i1, i2, iv;
     double d1, d2, dv;
     object *rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     rv = SS_null;
 
@@ -633,7 +630,7 @@ static object *_SS_xor_pow(object *argl)
 
 /* _SS_INSTALL_HETEROGENEOUS - binary heterogeneous functions */
 
-static void _SS_install_heterogeneous(void)
+static void _SS_install_heterogeneous(SS_psides *si)
    {
 
     SS_install_mf("in",
@@ -668,7 +665,7 @@ static void _SS_install_heterogeneous(void)
 
 /* _SS_INSTALL_HOMOGENEOUS - binary homogeneous functions */
 
-static void _SS_install_homogeneous(void)
+static void _SS_install_homogeneous(SS_psides *si)
    {
 
     SS_install("hypot",
@@ -764,10 +761,8 @@ static void _SS_install_homogeneous(void)
 
 /* _SS_INSTALL_MATH - install the SCHEME primitives for math */
 
-void _SS_install_math(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void _SS_install_math(SS_psides *si)
+   {
 
     SS_install("&",
                "Procedure: Returns bitwise and of args (left associative)",
@@ -1071,7 +1066,7 @@ void _SS_install_math(void)
 
     SS_install("^",
                "Procedure: Returns xor if strict C mode otherwise expt",
-               SS_binary_opr,
+               _SS_binary_opr,
                _SS_xor_pow, SS_PR_PROC);
 
     SS_install_cf("strict-c", 
@@ -1080,8 +1075,8 @@ void _SS_install_math(void)
 		  &si->strict_c);
 
 
-    _SS_install_heterogeneous();
-    _SS_install_homogeneous();
+    _SS_install_heterogeneous(si);
+    _SS_install_homogeneous(si);
 
     return;}
 

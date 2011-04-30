@@ -46,14 +46,14 @@ int main(int c, char **v, char **env)
 
     si = &_SS_si;
 
-    SC_init("Aborting with error", SS_end_scheme,
+    SS_init(si, "Aborting with error", SS_end_scheme,
             TRUE, SS_interrupt_handler,
             TRUE, NULL, 0);
 
     SS_set_scheme_env(v[0], NULL);
 
 /* initialize the Scheme system */
-    SS_init_scheme(CODE, VERSION);
+    si = SS_init_scheme(CODE, VERSION);
 
     SS_set_prompt("Scheme-> ");
     si->trap_error = FALSE;
@@ -61,7 +61,7 @@ int main(int c, char **v, char **env)
     SS_env_vars(si, env, NULL);
 
 /* initialize the available syntax modes */
-    DEF_SYNTAX_MODES();
+    DEF_SYNTAX_MODES(si);
 
     SS_define_argv(si, "scheme", c, v);
 
@@ -132,7 +132,7 @@ int main(int c, char **v, char **env)
     else
        {if (qfl == FALSE)
 	   SC_banner("");
-        SS_repl();
+        SS_repl(si);
 
         ret = 0;};
 

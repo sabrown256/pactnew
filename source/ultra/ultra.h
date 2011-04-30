@@ -108,7 +108,7 @@ extern object
 /* ULFUNC.C declarations */
 
 extern void
- _UL_quit(int i),
+ _UL_quit(SS_psides *si, int i),
  UL_install_scheme_funcs(void),
  UL_install_funcs(void);
 

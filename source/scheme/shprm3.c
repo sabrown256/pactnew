@@ -1170,7 +1170,7 @@ static object *_SSI_reverse(SS_psides *si, object *obj)
 
 /* _SS_INST_PRM3 - install the Scheme primitives */
 
-void _SS_inst_prm3(void)
+void _SS_inst_prm3(SS_psides *si)
    {
 
     SS_install("append",

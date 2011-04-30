@@ -142,7 +142,7 @@ static object *_SSI_intchr(SS_psides *si, object *obj)
 
 /* _SS_INST_CHR - install the character primitives */
 
-void _SS_inst_chr(void)
+void _SS_inst_chr(SS_psides *si)
    {
 
     SS_install("char?",

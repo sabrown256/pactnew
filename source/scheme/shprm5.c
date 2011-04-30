@@ -286,7 +286,7 @@ static object *_SSI_versorq(SS_psides *si, object *argl)
 
 /* _SS_INSTALL_QUATERNION - install the SCHEME primitives for quaternion math */
 
-void _SS_install_quaternion(void)
+void _SS_install_quaternion(SS_psides *si)
    {
 
     SS_install("make-rectangularq",

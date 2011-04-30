@@ -44,12 +44,12 @@ static object *_SXI_describe(SS_psides *si, object *argl)
 
 /* SX_END - gracefully exit from SX */
 
-void SX_end(int val)
+void SX_end(SS_psides *si, int val)
    {
 
     SC_exit_all();
 
-    SS_end_scheme(val);
+    SS_end_scheme(si, val);
 
     return;}
 
@@ -74,10 +74,13 @@ static int _SX_rd_scm(SS_psides *si)
 
 int SX_rd_scm(char *name)
    {int rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     strcpy(_SX_bf, name);
 
-    rv = SS_err_catch(_SX_rd_scm, NULL, NULL);
+    rv = SS_err_catch(si, _SX_rd_scm, NULL);
 
     return(rv);}
 
@@ -524,8 +527,8 @@ void SX_init_env(void)
 
 int SX_command(char *file, char *cmd)
    {int ret, zsp;
-    static int first = TRUE;
     SS_psides *si;
+    static int first = TRUE;
 
     si = &_SS_si;
 
@@ -543,7 +546,7 @@ int SX_command(char *file, char *cmd)
 
 	PG_IO_INTERRUPTS(FALSE);
 
-	SC_init("Aborting with error", SX_end,
+	SS_init(si, "Aborting with error", SX_end,
 		TRUE, SS_interrupt_handler,
 		TRUE, NULL, 0);
 
@@ -583,7 +586,7 @@ int SX_command(char *file, char *cmd)
 	PG_set_use_pixmap(TRUE);
 
 /* initialize the available syntax modes */
-	DEF_SYNTAX_MODES();
+	DEF_SYNTAX_MODES(si);
 
 	if (SX_gr_mode)
 	   SX_mode_graphics();

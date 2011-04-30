@@ -833,11 +833,14 @@ static int _SS_run(SS_psides *si)
 
 int SS_run(char *s)
    {int rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     while (strchr(" \t\n\r\f", *s++) != NULL);
     _SS_load_bf(--s);
 
-    rv = SS_err_catch(_SS_run, NULL, NULL);
+    rv = SS_err_catch(si, _SS_run, NULL);
 
     return(rv);}
 
@@ -863,10 +866,13 @@ static int _SS_load_scm(SS_psides *si)
 
 int SS_load_scm(char *name)
    {int rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     _SS_load_bf(name);
 
-    rv = SS_err_catch(_SS_load_scm, NULL, NULL);
+    rv = SS_err_catch(si, _SS_load_scm, NULL);
 
     return(rv);}
 

@@ -182,11 +182,8 @@ object *SS_lookup_variable(char *txt, int verbose)
 
 /* SS_ADD_TYPE_SYNT - add a new data type */
 
-object *SS_add_type_synt(char *name)
+object *SS_add_type_synt(SS_psides *si, char *name)
    {object *typ;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (si->types == NULL)
        si->types = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);

@@ -174,7 +174,7 @@ extern SS_psides
 /* SHARR.C declarations */
 
 extern void
- _SS_inst_hash(void);
+ _SS_inst_hash(SS_psides *si);
 
 extern object
  *SS_mk_hasharr(hasharr *tb);
@@ -183,7 +183,7 @@ extern object
 /* SHCHR.C declarations */
 
 extern void
- _SS_inst_chr(void);
+ _SS_inst_chr(SS_psides *si);
 
 
 /* SHENVR.C declarations */
@@ -207,7 +207,7 @@ extern SS_smp_state
 
 extern void
  _SS_eval(SS_psides *si),
- _SS_inst_eval(void);
+ _SS_inst_eval(SS_psides *si);
 
 
 /* SHINT.C declarations */
@@ -221,13 +221,13 @@ extern int
 /* SHLARG.C declarations */
 
 extern void
- _SS_inst_lrg(void);
+ _SS_inst_lrg(SS_psides *si);
 
 
 /* SHPROC.C declarations */
 
 extern void
- _SS_inst_proc(void);
+ _SS_inst_proc(SS_psides *si);
 
 #endif
 
@@ -264,13 +264,15 @@ extern object
 /* SHPRM1.C declarations */
 
 extern void
- _SS_inst_prm1(void);
+ _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl),
+ _SS_end_trace(SS_psides *si),
+ _SS_inst_prm1(SS_psides *si);
 
 
 /* SHPRM2.C declarations */
 
 extern void
- _SS_install_math(void);
+ _SS_install_math(SS_psides *si);
 
 
 /* SHPRM3.C declarations */
@@ -279,26 +281,26 @@ extern object
  *_SS_endcons(object *list, object *obj);
 
 extern void
- _SS_inst_prm3(void);
+ _SS_inst_prm3(SS_psides *si);
 
 
 /* SHPRM4.C declarations */
 
 extern void
- _SS_install_complex(void);
+ _SS_install_complex(SS_psides *si);
 
 
 /* SHPRM5.C declarations */
 
 extern void
- _SS_install_quaternion(void);
+ _SS_install_quaternion(SS_psides *si);
 
 
 /* SHPRNT.C declarations */
 
 extern void
  _SS_set_ans_prompt(void),
- _SS_inst_print(void);
+ _SS_inst_print(SS_psides *si);
 
 extern char
  *_SS_vdsnprintf(int cp, char *fmt, va_list __a__),
@@ -318,7 +320,7 @@ extern void
 /* SHREAD.C declarations */
 
 extern void
- _SS_inst_read(void);
+ _SS_inst_read(SS_psides *si);
 
 extern object
  *_SSI_scheme_mode(SS_psides *si);
@@ -327,7 +329,7 @@ extern object
 /* SHSTRG.C declarations */
 
 extern void
- _SS_inst_str(void);
+ _SS_inst_str(SS_psides *si);
 
 
 /* SHSYNT.C declarations */

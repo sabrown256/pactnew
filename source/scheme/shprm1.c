@@ -14,7 +14,7 @@
 #define Unqsplicing(x) ((x) == SS_unqspproc)
 
 static object
- *_SS_quasiq(object *obj, int nestl);
+ *_SS_quasiq(SS_psides *si, object *obj, int nestl);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -55,10 +55,8 @@ static object *_SSI_quote(SS_psides *si, object *obj)
 
 /* _SS_UNQUOTE - does the real work of the unquote macro */
 
-static object *_SS_unquote(object *x)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *_SS_unquote(SS_psides *si, object *x)
+   {
 
     x = SS_exp_eval(si, SS_cadr(x));
 
@@ -72,12 +70,12 @@ static object *_SS_unquote(object *x)
  *            - bash it all together and return the finished return list
  */
 
-static object *_SS_splice(object *ncns, object *item,
+static object *_SS_splice(SS_psides *si, object *ncns, object *item,
 			  object *lst, object *tcns)
    {object *rest;
 
 /* process the rest of the list */
-    rest = _SS_quasiq(lst, _SS.nest_level);
+    rest = _SS_quasiq(si, lst, _SS.nest_level);
 
 /* check the cases */
     if (SS_nullobjp(ncns))
@@ -115,7 +113,7 @@ static object *_SS_splice(object *ncns, object *item,
  *            - NOTE: this crock of a version doesn't nest
  */
 
-static object *_SS_quasiq(object *obj, int nestl)
+static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
    {object *lst, *car, *tcns, *ncns, *y;
 
 /* handle forms like (quasiquote atom) */
@@ -125,7 +123,7 @@ static object *_SS_quasiq(object *obj, int nestl)
 /* handle forms like (quasiquote (unqote expr)) */
     if (!SS_consp(tcns = SS_car(obj)))
        {if (SS_Unquoted(tcns))
-           {ncns = _SS_unquote(obj);
+           {ncns = _SS_unquote(si, obj);
             return(ncns);}
         else if (Unqsplicing(tcns))
            SS_error("MUST BE IMBEDDED IN LIST - _SS_QUASIQ", obj);};
@@ -142,16 +140,19 @@ static object *_SS_quasiq(object *obj, int nestl)
 
 /* is it an unquote form? */
              if (SS_Unquoted(car))
-                {SS_end_cons(ncns, y, _SS_unquote(tcns));}
+                {SS_end_cons(ncns, y, _SS_unquote(si, tcns));}
 
 /* is it an unquote-splicing form? */
              else if (Unqsplicing(car))
-                {ncns = _SS_splice(ncns, _SS_unquote(tcns), SS_cdr(lst), y);
+                {ncns = _SS_splice(si, ncns,
+				   _SS_unquote(si, tcns),
+				   SS_cdr(lst),
+				   y);
                  break;}
 
 /* any other list should be searched */
              else
-                {SS_end_cons(ncns, y, _SS_quasiq(tcns, nestl));};}
+                {SS_end_cons(ncns, y, _SS_quasiq(si, tcns, nestl));};}
 
 /* any non-list element should be added */
          else
@@ -173,7 +174,7 @@ static object *_SSI_quasiq(SS_psides *si, object *obj)
 
     _SS.nest_level++;
 
-    SS_Assign(si->val, _SS_quasiq(obj, _SS.nest_level));
+    SS_Assign(si->val, _SS_quasiq(si, obj, _SS.nest_level));
 
     _SS.nest_level--;
 
@@ -773,14 +774,11 @@ long dot(int kind)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_DO_WATCH - watch a variable for a change in value */
+/* _SS_DO_WATCH - watch a variable for a change in value */
 
-static void SS_do_watch(object *pfun, char *msg)
+static void _SS_do_watch(SS_psides *si, object *pfun, char *msg)
    {object *vl;
     FILE *fp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (_SS.watch_var != NULL)
        {vl = SS_VARIABLE_VALUE(_SS.watch_var);
@@ -800,14 +798,12 @@ static void SS_do_watch(object *pfun, char *msg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_BGN_TRACE - start a trace if the procedure is to be traced */
+/* _SS_BGN_TRACE - start a trace if the procedure is to be traced */
 
-void SS_bgn_trace(object *pfun, object *pargl)
-   {SS_psides *si;
+void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
+   {
 
-    si = &_SS_si;
-
-    SS_do_watch(pfun, "entering");
+    _SS_do_watch(si, pfun, "entering");
 
     switch (SS_PROCEDURE_TYPE(pfun))
        {case SS_PROC     :
@@ -856,17 +852,14 @@ void SS_bgn_trace(object *pfun, object *pargl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_END_TRACE - check a continuation on its return for a traced procedure */
+/* _SS_END_TRACE - check a continuation on return for a traced procedure */
 
-void SS_end_trace(void)
+void _SS_end_trace(SS_psides *si)
    {object *pfun;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     pfun = si->continue_int[si->cont_ptr].signal;
 
-    SS_do_watch(pfun, "leaving");
+    _SS_do_watch(si, pfun, "leaving");
 
     if (SS_procedurep(pfun))
        {switch (SS_PROCEDURE_TYPE(pfun))
@@ -956,7 +949,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
     SS_set_print_err_func(NULL, FALSE);
 
     si->cont_ptr++;
-    SS_push_err(FALSE, SS_ERROR_I);
+    SS_push_err(si, FALSE, SS_ERROR_I);
     switch (SETJMP(si->continue_int[si->cont_ptr].cont))
        {case ABORT :
 	     SS_set_print_err_func(_SS.oph, FALSE);
@@ -1108,7 +1101,7 @@ static object *_SSI_unlink(SS_psides *si, object *argl)
 
 /* _SS_INST_PRM1 - install the Scheme primitives */
 
-void _SS_inst_prm1(void)
+void _SS_inst_prm1(SS_psides *si)
    {
 
     SS_install("call-with-cc",

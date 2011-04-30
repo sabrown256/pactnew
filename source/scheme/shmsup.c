@@ -150,11 +150,8 @@ static object *SS_m_mode(SS_psides *si)
 
 /* SS_INIT_M_SYNTAX_MODE - setup for parsing BASIS syntax */
 
-void SS_init_m_syntax_mode(void)
+void SS_init_m_syntax_mode(SS_psides *si)
    {int *ssdbg;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (_SS_mps.mode_init == FALSE)
        {_SS_mps.mode_init = TRUE;
@@ -197,20 +194,20 @@ void SS_init_m_syntax_mode(void)
 	_SS_m_return    = SS_lookup_variable("-return-", TRUE);
 	_SS_m_continue  = SS_lookup_variable("-continue-", TRUE);
 
-	SS_add_type_synt("integer");
-	SS_add_type_synt("real");
-	SS_add_type_synt("logical");
-	SS_add_type_synt("complex");
-	SS_add_type_synt("double complex");
-	SS_add_type_synt("double");
-	SS_add_type_synt("chameleon");
-	SS_add_type_synt("character*");
-	SS_add_type_synt("character");
-	SS_add_type_synt("range");
-	SS_add_type_synt("real8");
-	SS_add_type_synt("complex8");
-	SS_add_type_synt("indirect");
-	SS_add_type_synt("double precision");
+	SS_add_type_synt(si, "integer");
+	SS_add_type_synt(si, "real");
+	SS_add_type_synt(si, "logical");
+	SS_add_type_synt(si, "complex");
+	SS_add_type_synt(si, "double complex");
+	SS_add_type_synt(si, "double");
+	SS_add_type_synt(si, "chameleon");
+	SS_add_type_synt(si, "character*");
+	SS_add_type_synt(si, "character");
+	SS_add_type_synt(si, "range");
+	SS_add_type_synt(si, "real8");
+	SS_add_type_synt(si, "complex8");
+	SS_add_type_synt(si, "indirect");
+	SS_add_type_synt(si, "double precision");
 
 	SS_add_parser(".m", SS_m_mode);
 	SS_add_parser(".v", SS_m_mode);

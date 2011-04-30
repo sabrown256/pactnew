@@ -64,10 +64,13 @@ int _UL_rd_scm(SS_psides *si)
 
 int UL_rd_scm(char *name)
    {int rv;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     strcpy(_UL_bf, name);
 
-    rv = SS_err_catch(_UL_rd_scm, NULL, NULL);
+    rv = SS_err_catch(si, _UL_rd_scm, NULL);
 
     return(rv);}
 
@@ -1206,7 +1209,7 @@ int main(int c, char **v)
  */
     PG_IO_INTERRUPTS(FALSE);
 
-    SC_init("Aborting with error", _UL_quit,
+    SS_init(si, "Aborting with error", _UL_quit,
             TRUE, SS_interrupt_handler,
             FALSE, NULL, 0);
 
@@ -1234,9 +1237,9 @@ int main(int c, char **v)
     SC_zero_space_n(zsp, -2);
 
     SS_set_scheme_env(v[0], NULL);
-    SS_init_scheme(CODE, VERSION);
-    SS_init_stack();
-    SS_init_cont();
+    si = SS_init_scheme(CODE, VERSION);
+    SS_init_stack(si);
+    SS_init_cont(si);
 
     SC_init_path(1, "ULTRA");
 
@@ -1253,7 +1256,7 @@ int main(int c, char **v)
     UL_init_env();
 
 /* initialize the available syntax modes */
-    DEF_SYNTAX_MODES();
+    DEF_SYNTAX_MODES(si);
 
 /* process the command line arguments */
     for (i = 1; i < c; i++)
@@ -1370,7 +1373,7 @@ int main(int c, char **v)
     if (commnd_flag)
        rv = !SS_run(commnd);
     else 
-       {SS_repl();
+       {SS_repl(si);
 	rv = TRUE;};
 
     return(rv);}

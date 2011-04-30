@@ -875,7 +875,7 @@ object *SS_load(SS_psides *si, object *argl)
 
 /* _SS_INST_READ - install the Scheme input primitives */
 
-void _SS_inst_read(void)
+void _SS_inst_read(SS_psides *si)
    {
 
     SS_install("close-input-file",

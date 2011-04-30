@@ -791,10 +791,8 @@ static object *_SSI_load_env(SS_psides *si, object *arg)
 
 /* _SS_INST_LRG - install the primitives making up the LARGE Scheme */
 
-void _SS_inst_lrg(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void _SS_inst_lrg(SS_psides *si)
+   {
 
     SS_install("attach-debugger",
                "Procedure: attach a debugger to the specified pid",
@@ -976,9 +974,9 @@ void _SS_inst_lrg(void)
                   SS_acc_int,
                   &si->trace_env);
 
-    _SS_inst_hash();
-    _SS_inst_str();
-    _SS_inst_chr();
+    _SS_inst_hash(si);
+    _SS_inst_str(si);
+    _SS_inst_chr(si);
 
     return;}
 

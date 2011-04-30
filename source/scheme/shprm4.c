@@ -145,7 +145,7 @@ static object *_SSI_angle(SS_psides *si, object *argl)
 
 /* _SS_INSTALL_COMPLEX - install the SCHEME primitives for complex math */
 
-void _SS_install_complex(void)
+void _SS_install_complex(SS_psides *si)
    {
 
     SS_install("make-rectangular",
