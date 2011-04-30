@@ -44,7 +44,7 @@ int main(int c, char **v, char **env)
 
     PG_IO_INTERRUPTS(FALSE);
 
-    SC_init("Aborting with error", SX_end,
+    SS_init(si, "Aborting with error", SX_end,
             TRUE, SS_interrupt_handler,
             TRUE, NULL, 0);
 
@@ -197,7 +197,7 @@ int main(int c, char **v, char **env)
     PG_set_use_pixmap(upix);
 
 /* initialize the available syntax modes */
-    DEF_SYNTAX_MODES();
+    DEF_SYNTAX_MODES(si);
 
     if (pvflag)
        {if (SX_gr_mode)
@@ -246,7 +246,7 @@ int main(int c, char **v, char **env)
     else
        {if (SX_gr_mode && !SX_qflag)
 	   SS_banner(si, SS_mk_string(SCODE));
-	SS_repl();
+	SS_repl(si);
 
         ret = TRUE;};
 

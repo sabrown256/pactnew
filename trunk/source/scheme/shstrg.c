@@ -912,7 +912,7 @@ static object *_SSI_lasttok(SS_psides *si, object *argl)
 
 /* _SS_INST_STR - install the string primitives */
 
-void _SS_inst_str(void)
+void _SS_inst_str(SS_psides *si)
    {
 
     SS_install("blank?",

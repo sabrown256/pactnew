@@ -21,9 +21,9 @@
    {(_si)->nsetc++;                                                          \
     (_si)->cont_ptr++;                                                       \
     if ((_si)->cont_ptr >= (_si)->stack_size)                                \
-       SS_expand_stack();                                                    \
+       SS_expand_stack(si);                                                  \
     if (SETJMP((_si)->continue_int[(_si)->cont_ptr].cont))                   \
-       {SS_end_trace();                                                      \
+       {_SS_end_trace(_si);                                                  \
         (_si)->cont_ptr--;                                                   \
         (_si)->ngoc++;                                                       \
         SS_jump(_return);}                                                   \
@@ -231,7 +231,7 @@ ev_seta:
 /* SS_DEFINE - define macro in Scheme */
 
 ev_define:
-    SS_bgn_trace(si->fun, si->unev);
+    _SS_bgn_trace(si, si->fun, si->unev);
     SS_Assign(si->exn, SS_cdr(si->unev));
     SS_Assign(si->unev, SS_car(si->unev));
 
@@ -271,7 +271,7 @@ ev_def:
 
     SS_def_var(si, si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
-    SS_end_trace();
+    _SS_end_trace(si);
     SS_go_cont(si);
 
 /*--------------------------------------------------------------------------*/
@@ -296,7 +296,7 @@ pr_apply:
 macro_ur:
     cp = SS_GET_C_PROCEDURE(si->fun);
 
-    SS_bgn_trace(si->fun, si->unev);
+    _SS_bgn_trace(si, si->fun, si->unev);
     SS_Assign(si->val, cp->handler(si, cp, si->unev));
 
     SS_go_cont(si);
@@ -311,7 +311,7 @@ macro_ur:
 macro_ue:
     cp = SS_GET_C_PROCEDURE(si->fun);
 
-    SS_bgn_trace(si->fun, si->unev);
+    _SS_bgn_trace(si, si->fun, si->unev);
     SS_Assign(si->exn, cp->handler(si, cp, si->unev));
 
     SS_jump(eval_disp);
@@ -363,7 +363,7 @@ acc_arg:
  */
 
 apply_dis:
-    SS_bgn_trace(si->fun, si->argl);
+    _SS_bgn_trace(si, si->fun, si->argl);
 
     pf  = SS_GET(procedure, si->fun);
     pty = pf->type;
@@ -432,7 +432,7 @@ macro_ee:
 /* EV_MACRO - set up the evaluation of a composite macro */
 
 ev_macro:
-    SS_bgn_trace(si->fun, si->unev);
+    _SS_bgn_trace(si, si->fun, si->unev);
     SS_Assign(si->env, SS_do_bindings(si, si->fun, si->unev));
     SS_Assign(si->unev, SS_proc_body(si->fun));
     SS_jump(ev_begin);
@@ -443,7 +443,7 @@ ev_macro:
 /* EV_MACRO_EV - set up the evaluation of a composite macro with post eval */
 
 ev_macro_ev:
-    SS_bgn_trace(si->fun, si->unev);
+    _SS_bgn_trace(si, si->fun, si->unev);
     SS_Save(si, si->env);
     SS_Save(si, si->fun);
     SS_Assign(si->env, SS_do_bindings(si, si->fun, si->unev));
@@ -453,7 +453,7 @@ ev_macro_ev:
 ev_macro_evb:
     SS_Restore(si, si->fun);
     SS_Restore(si, si->env);
-    SS_end_trace();
+    _SS_end_trace(si);
     SS_Assign(si->exn, si->val);
     SS_jump(eval_disp);
 
@@ -657,7 +657,7 @@ static object *_SSI_exp_eval(SS_psides *si, object *obj)
 
 /* _SS_INST_EVAL - install the Scheme special forms */
 
-void _SS_inst_eval(void)
+void _SS_inst_eval(SS_psides *si)
    {
 
     SS_install("and",

@@ -158,9 +158,9 @@ void SS_init_f_syntax_mode(SS_psides *si)
 	_SS_f_return    = SS_lookup_variable("-return-", TRUE);
 	_SS_f_continue  = SS_lookup_variable("-continue-", TRUE);
 
-	SS_add_type_synt("integer");
-	SS_add_type_synt("real");
-	SS_add_type_synt("double precision");
+	SS_add_type_synt(si, "integer");
+	SS_add_type_synt(si, "real");
+	SS_add_type_synt(si, "double precision");
 
 	SS_add_parser(".f", SS_f_mode);
 

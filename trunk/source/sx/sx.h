@@ -695,7 +695,7 @@ extern PG_device
 /* SXCMD.C declarations */
 
 extern void
- SX_end(int val),
+ SX_end(SS_psides *si, int val),
  SX_init_view(void),
  SX_init_mappings(void),
  SX_init_env(void);

@@ -340,10 +340,8 @@ static object *_SSI_haelemp(SS_psides *si, object *arg)
 
 /* _SS_INST_HASH - install the hasharr primitives for Scheme */
 
-void _SS_inst_hash(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void _SS_inst_hash(SS_psides *si)
+   {
 
     SS_install("hash-dump",
                "Procedure: Return a list of the names in the given hash table",

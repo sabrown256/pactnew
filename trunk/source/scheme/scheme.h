@@ -118,7 +118,7 @@ typedef int (*PFPrGetS)(object *str);
 typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrChOut)(int c, object *str);
 typedef void (*PFPrChUn)(int c, object *str);
-typedef void (*PFPrintErrMsg)(FILE *str, char *s, object *obj);
+typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
 typedef void (*PFExtractArg)(object *obj, void *v, int type);
 typedef object *(*PFSSRead)(SS_psides *si, object *str);
 typedef object *(*PFCallArg)(int type, void *v);
@@ -814,6 +814,54 @@ extern "C" {
 #endif
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_INIT - setup certain universal things for applications, i.e.
+ *         - interrupt handler
+ *         - top level longjump
+ *         - output buffering
+ *         - this must be a macro to circumvent implementations that
+ *         - won't let you LONGJMP back into function from which a
+ *         - return has been done
+ *         - Prototype arguments would be:
+ *         -   char *_msg;
+ *         -   void (*_ef)(int err);
+ *         -   int _sh;
+ *         -   void (*_sf)(int sig);
+ *         -   int _bh;
+ *         -   char *_bf;
+ *         -   int _bsz;
+ */
+
+#define SS_init(_si, _msg, _ef, _sh, _sf, _bh, _bf, _bsz)                    \
+   {void (*_lsf)(int sig);                                                   \
+    static void (*_lef)(SS_psides *si, int err) = NULL;                      \
+    switch (SETJMP(SC_gs.cpu))                                               \
+       {case ABORT :                                                         \
+             io_printf(STDOUT, "\n%s\n\n", _msg);                            \
+             if (_lef != NULL)                                               \
+                (*_lef)(_si, ABORT);                                         \
+             exit(1);                                                        \
+        case ERR_FREE :                                                      \
+             if (_lef != NULL)                                               \
+                (*_lef)(_si, ERR_FREE);                                      \
+             exit(0);                                                        \
+        default :                                                            \
+             _lef = _ef;                                                     \
+             break;};                                                        \
+    if (_sh == TRUE)                                                         \
+       {_lsf = _sf;                                                          \
+        if (_lsf != NULL)                                                    \
+           SC_signal(SIGINT, _lsf);                                          \
+        else                                                                 \
+           SC_signal(SIGINT, SC_interrupt_handler);};                        \
+    if (_bh == TRUE)                                                         \
+       {if ((_bf == NULL) || (_bsz <= 0))                                    \
+           {SC_setbuf(stdout, NULL);}                                        \
+        else                                                                 \
+           {io_setvbuf(stdout, _bf, _IOFBF, _bsz);};};}
+
+/*--------------------------------------------------------------------------*/
 
 /*                          VARIABLE DECLARATIONS                           */
 
@@ -985,10 +1033,6 @@ extern void
 extern object
  *SS_list(SS_psides *si, object *argl);
 
-extern void
- SS_bgn_trace(object *pfun, object *pargl),
- SS_end_trace(void);
-
 
 /* SHPRM2.C declarations */
 
@@ -1077,10 +1121,13 @@ extern void
 extern object
  *SS_lookup_variable(char *txt, int verbose),
  *SS_mk_string_synt(char *s),
- *SS_add_type_synt(char *name);
+ *SS_add_type_synt(SS_psides *si, char *name);
 
 
 /* SHTLEV.C declarations */
+
+extern SS_psides
+ *SS_init_scheme(char *code, char *vers);
 
 extern PFPrintErrMsg
  SS_set_print_err_func(PFPrintErrMsg fnc, int dflt),
@@ -1092,24 +1139,23 @@ extern object
 
 extern int
  SS_set_scheme_env(char *exepath, char *path),
- SS_err_catch(int (*fint)(SS_psides *si), SS_psides *si, PFInt errf);
+ SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf);
 
 extern char
  *SS_object_type_name(object *o, char *atype);
 
 extern void
- SS_scheme_path_err(char *path),
- SS_inst_prm(void),
- SS_repl(void),
- SS_end_scheme(int val),
- SS_init_scheme(char *code, char *vers),
- SS_init_path(void),
- SS_inst_const(void),
- SS_init_stack(void),
- SS_init_cont(void),
- SS_expand_stack(void),
  SS_interrupt_handler(int sig),
- SS_push_err(int flag, int type),
+ SS_scheme_path_err(char *path),
+ SS_init_path(void),
+ SS_inst_prm(SS_psides *si),
+ SS_repl(SS_psides *si),
+ SS_end_scheme(SS_psides *si, int val),
+ SS_inst_const(SS_psides *si),
+ SS_init_stack(SS_psides *si),
+ SS_init_cont(SS_psides *si),
+ SS_expand_stack(SS_psides *si),
+ SS_push_err(SS_psides *si, int flag, int type),
  SS_error(char *s, object *obj);
 
 

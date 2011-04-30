@@ -447,7 +447,7 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 
 /* _SS_INST_PROC - install the primitives for process control */
 
-void _SS_inst_proc(void)
+void _SS_inst_proc(SS_psides *si)
    {
 
     SS_install("process?",

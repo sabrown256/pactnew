@@ -1217,7 +1217,7 @@ object *_SSI_wr_chr(SS_psides *si, object *argl)
 
 /* _SS_INST_PRINT - install the Scheme output primitives */
 
-void _SS_inst_print(void)
+void _SS_inst_print(SS_psides *si)
    {
 
     SS_install_cf("suppress-quote", 

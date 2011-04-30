@@ -15,12 +15,9 @@
 
 /* _SS_EXA_VAR - examine and print the contents of the variable VR */
 
-static object *_SS_exa_var(void *vr, int type)
+static object *_SS_exa_var(SS_psides *si, void *vr, int type)
    {char cv, *sv, **pv;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ret = SS_f;
 
@@ -259,7 +256,7 @@ static object *_SS_acc_var(SS_psides *si, C_procedure *cp,
     ad.funcaddr = (PFInt) cp->proc[0];
 
     if (SS_nullobjp(argl))
-       ret = _SS_exa_var(ad.memaddr, type);
+       ret = _SS_exa_var(si, ad.memaddr, type);
 
     else
        {vl = SS_car(argl);

@@ -2759,7 +2759,7 @@ object *SS_mk_variable(char *name, object *v)
 <P>object *SS_mk_hasharr(HASHTAB *tb)
 <P>object *SS_mk_haelem(hashel *hp)
 <P><BR>
-<P>object *SS_mk_object(byte *p, int type, int ev_type, char *name)
+<P>object *SS_mk_object(void *p, int type, int ev_type, char *name)
 </BLOCKQUOTE>
 </B>
 
@@ -2924,15 +2924,23 @@ entering into read-eval-print loops.<p>
 
 <B></B>
 <BLOCKQUOTE>
-void SS_inst_prm(byte)
-<P>void SS_repl(byte)
-<P>void SS_end_scheme(int val)
-<P>void SS_init_scheme(char *Code, char *Vers)
-<P>void SS_init_path(byte)
-<P>void SS_inst_const(byte)
-<P>void SS_init_stack(byte)
-<P>void SS_init_cont(byte)
-<P>void SS_interrupt_handler(int sig)
+SS_psides *SS_init_scheme(char *Code, char *Vers)
+<P>
+void SS_end_scheme(SS_psides *si, int val)
+<P>
+void SS_inst_prm(void)
+<P>
+void SS_repl(SS_psides *si)
+<P>
+void SS_init_path(void)
+<P>
+void SS_inst_const(SS_psides *si)
+<P>
+void SS_init_stack(void)
+<P>
+void SS_init_cont(void)
+<P>
+void SS_interrupt_handler(int sig)
 </BLOCKQUOTE>
 </B>
 
@@ -2943,12 +2951,17 @@ These routines are for controlling error handling.<p>
 
 <B></B>
 <BLOCKQUOTE>
-int SS_err_catch(PFInt func, PFInt errf)
-<P>object *SS_pop_err(int n, int flag)
-<P>void SS_push_err(int flag, int type)
-<P>void SS_error(char *s, object *obj)
-<P>PFPrintErrMsg SS_set_print_err_func(PFPrintErrMsg *fnc, int dflt)
-<P>PFPrintErrMsg SS_get_print_err_func(void)
+int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
+<P>
+object *SS_pop_err(int n, int flag)
+<P>
+void SS_push_err(int flag, int type)
+<P>
+void SS_error(char *s, object *obj)
+<P>
+PFPrintErrMsg SS_set_print_err_func(PFPrintErrMsg *fnc, int dflt)
+<P>
+PFPrintErrMsg SS_get_print_err_func(void)
 </BLOCKQUOTE>
 </B>
 
@@ -2995,7 +3008,7 @@ documentation, doc. The handler, hand, must be one of those given in the
 
 <B>
 <BLOCKQUOTE>
-object *SS_install_cv(char *name, byte *pval, int type)
+object *SS_install_cv(char *name, void *pval, int type)
 </BLOCKQUOTE>
 </B>
 
@@ -4281,7 +4294,7 @@ These functions augment the I/O capabilities of the basic interpeter.<p>
 
 <B>
 <BLOCKQUOTE>
-void SX_parse(PFByte replot, PFPChar reproc)
+void SX_parse(PFVoid replot, PFPChar reproc)
 </BLOCKQUOTE>
 </B>
 

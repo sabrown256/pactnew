@@ -73,15 +73,15 @@ source $ldir/env-csh
 
        Note $STDOUT ""
 
-       Note $STDOUT "#define DEF_SYNTAX_MODES() "$BackSlash
+       Note $STDOUT "#define DEF_SYNTAX_MODES(_si) "$BackSlash
 
        set isyntx = $nsyntxs
        while (`expr $isyntx \> 0`)
           set Syntx  = $lsm[$isyntx]
           if ($isyntx == 1) then
-             Note $STDOUT "    SS_init_"$Syntx"_syntax_mode()"
+             Note $STDOUT "    SS_init_"$Syntx"_syntax_mode(_si)"
           else
-             Note $STDOUT "    SS_init_"$Syntx"_syntax_mode(); "$BackSlash
+             Note $STDOUT "    SS_init_"$Syntx"_syntax_mode(_si); "$BackSlash
           endif
           set isyntx = `expr $isyntx - 1`
        end
@@ -93,9 +93,9 @@ source $ldir/env-csh
        while (`expr $isyntx \> 0`)
           set Syntx  = $lsm[$isyntx]
           if ($isyntx == 1) then
-             Note $STDOUT " SS_init_"$Syntx"_syntax_mode(void);"
+             Note $STDOUT " SS_init_"$Syntx"_syntax_mode(SS_psides *si);"
           else
-             Note $STDOUT " SS_init_"$Syntx"_syntax_mode(void),"
+             Note $STDOUT " SS_init_"$Syntx"_syntax_mode(SS_psides *si),"
           endif
           set isyntx = `expr $isyntx - 1`
        end
