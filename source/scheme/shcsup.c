@@ -48,7 +48,7 @@ SS_c_parse_state
  *               - prototype and body
  */
 
-object *_SS_make_func(object *proto, object *body)
+object *_SS_make_func(SS_psides *si, object *proto, object *body)
    {int extra;
     object *rest, *frm;
 
@@ -62,7 +62,7 @@ object *_SS_make_func(object *proto, object *body)
             
     if (extra)
        {body = SS_CDR_MACRO(rest);
-        frm  = SS_append(SS_make_form(_SS_c_defunc, proto, 0), body);}
+        frm  = SS_append(si, SS_make_form(_SS_c_defunc, proto, 0), body);}
     else
        frm = SS_make_form(_SS_c_defunc, proto, body, 0);
 
@@ -94,17 +94,17 @@ object *_SS_make_macr(object *proto, object *body)
  *                    - by adding statement S to the statement list SL
  */
 
-object *_SS_make_stmnt_lst(object *s, object *sl)
+object *_SS_make_stmnt_lst(SS_psides *si, object *s, object *sl)
    {object *frm;
 
     if (SS_nullobjp(s))
        frm = sl;
 
     else if (SS_consp(SS_CAR_MACRO(s)))
-       frm = SS_append(s, sl);
+       frm = SS_append(si, s, sl);
 
     else
-       frm = SS_mk_cons(s, sl);
+       frm = SS_mk_cons(si, s, sl);
 
     return(frm);}
 
@@ -116,7 +116,7 @@ object *_SS_make_stmnt_lst(object *s, object *sl)
  *                      - a list of statements
  */
 
-object *_SS_make_cmpnd_stmnt(object *dcl, object *sl)
+object *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl)
    {object *frm, *bdy, *d, *dcls, *lst, *proto;
 
     if (SS_nullobjp(sl))
@@ -126,13 +126,13 @@ object *_SS_make_cmpnd_stmnt(object *dcl, object *sl)
        {dcls = SS_null;
 	for (lst = dcl; !SS_nullobjp(lst); lst = SS_cdr(lst))
 	    {d    = SS_cdar(lst);
-	     dcls = SS_append(dcls, d);};
+	     dcls = SS_append(si, dcls, d);};
 
         dcls = SS_reverse(dcls);};
 
     bdy   = SS_reverse(sl);
     proto = SS_make_form(_SS_c_block, dcls, 0);
-    frm   = SS_append(proto, bdy);
+    frm   = SS_append(si, proto, bdy);
 
     return(frm);}
 
@@ -163,10 +163,10 @@ object *_SS_del_var(SS_psides *si, object *var)
  *               -       these are of the form (<var> <init>) | <var>
  */
 
-object *_SS_make_decl(object *ds, object *idl)
+object *_SS_make_decl(SS_psides *si, object *ds, object *idl)
    {object *decl;
 
-    decl = SS_mk_cons(ds, idl);
+    decl = SS_mk_cons(si, ds, idl);
 
     return(decl);}
 
@@ -179,18 +179,18 @@ object *_SS_make_decl(object *ds, object *idl)
  *                   -   IDL the identifier_list
  */
 
-object *_SS_make_mac_decl(object *ds, object *idl)
+object *_SS_make_mac_decl(SS_psides *si, object *ds, object *idl)
    {object *f, *args, *decl;
 
     args = SS_reverse(idl);
     if (SS_consp(ds))
        {f = SS_CAR_MACRO(ds);
 	if (SS_consp(f))
-	   decl = SS_mk_cons(SS_append(f, args), SS_null);
+	   decl = SS_mk_cons(si, SS_append(si, f, args), SS_null);
 	else
-	   decl = SS_append(ds, args);}
+	   decl = SS_append(si, ds, args);}
     else
-       decl = SS_mk_cons(ds, args);
+       decl = SS_mk_cons(si, ds, args);
 
     return(decl);}
 
@@ -203,6 +203,7 @@ object *_SS_make_cast(object *type, object *expr)
    {char tname[MAXLINE];
     char *t, *p;
     object *typ, *cast;
+    SS_psides *si = &_SS_si;
 
     SS_args(type,
 	    SC_STRING_I, &t,
@@ -211,7 +212,7 @@ object *_SS_make_cast(object *type, object *expr)
     p = strstr(tname, "define-");
     t = (p != NULL) ? p + 7 : tname;
        
-    typ  = SS_mk_string(t);
+    typ  = SS_mk_string(si, t);
     cast = SS_make_form(_SS_c_cast, typ, expr, LAST);
 
     return(cast);}
@@ -233,7 +234,7 @@ int SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval)
 	type  = SS_c_tokens[0];}
 
     else if (txt[strlen(txt)-1] == '*')
-       {*lval = SS_mk_string(txt);
+       {*lval = SS_mk_string(si, txt);
 	type  = SS_c_tokens[0];}
 
     else

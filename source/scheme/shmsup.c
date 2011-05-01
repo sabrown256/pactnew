@@ -25,10 +25,10 @@ SS_m_parse_state
  *                - prototype and body
  */
 
-object *_SS_make_fun_m(object *proto, object *body)
+object *_SS_make_fun_m(SS_psides *si, object *proto, object *body)
    {object *o;
 
-    o = SS_append(SS_make_form(_SS_m_defunc, proto, 0), body);
+    o = SS_append(si, SS_make_form(_SS_m_defunc, proto, 0), body);
 
     return(o);}
 
@@ -39,11 +39,11 @@ object *_SS_make_fun_m(object *proto, object *body)
  *                      - a (begin ... ) form
  */
 
-object *_SS_make_comp_stmt_m(object *body)
+object *_SS_make_comp_stmt_m(SS_psides *si, object *body)
    {object *cmp;
 
     if (SS_consp(body) && SS_consp(SS_CAR_MACRO(body)))
-       cmp = SS_mk_cons(_SS_m_block, SS_reverse(body));
+       cmp = SS_mk_cons(si, _SS_m_block, SS_reverse(body));
     else
        cmp = body;
 
@@ -56,7 +56,7 @@ object *_SS_make_comp_stmt_m(object *body)
  *                - (x a1 a2 ...)
  */
 
-object *_SS_strip_call(object *expr, int paren)
+object *_SS_strip_call(SS_psides *si, object *expr, int paren)
    {object *frm, *xpr, *fnc, *args;
 
     fnc = SS_CAR_MACRO(expr);
@@ -65,12 +65,12 @@ object *_SS_strip_call(object *expr, int paren)
 	if (SS_consp(xpr))
 	   {fnc  = SS_CAR_MACRO(xpr);
 	    args = SS_CAR_MACRO(SS_CDR_MACRO(xpr));
-	    frm  = SS_mk_cons(fnc, args);}
+	    frm  = SS_mk_cons(si, fnc, args);}
 	else
-	   frm = SS_mk_cons(xpr, SS_null);}
+	   frm = SS_mk_cons(si, xpr, SS_null);}
 
     else if (paren)
-       frm = SS_mk_cons(expr, SS_null);
+       frm = SS_mk_cons(si, expr, SS_null);
 
     else
        frm = expr;

@@ -30,35 +30,35 @@ static object *_SS_exa_var(SS_psides *si, void *vr, int type)
 /* character types (proper) */
     if (SC_is_type_char(type) == TRUE)
        {cv = *(char *) vr;
-	ret = SS_mk_integer(cv);}
+	ret = SS_mk_integer(si, cv);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(type) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, type, vr, 0, 1, 1, FALSE);
-	ret = SS_mk_integer(v);}
+	ret = SS_mk_integer(si, v);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(type) == TRUE)
        {long double v;
 	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, type, vr, 0, 1, 1, FALSE);
-	ret = SS_mk_float(v);}
+	ret = SS_mk_float(si, v);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(type) == TRUE)
        {long double _Complex v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      type, vr, 0, 1, 1, FALSE);
-	ret = SS_mk_complex(v);}
+	ret = SS_mk_complex(si, v);}
 
     else if (type == SC_STRING_I)
        {sv  = (char *) vr;
-	ret = SS_mk_string(sv);}
+	ret = SS_mk_string(si, sv);}
 
     else if (type == SC_POINTER_I)
        {pv = (char **) vr;
 	if (*pv != NULL)
-	   ret = SS_mk_string(*pv);
+	   ret = SS_mk_string(si, *pv);
 	else
 	   ret = SS_f;}
 
@@ -162,10 +162,10 @@ object *SS_install_cf(char *name, char *doc, ...)
     cp = _SS_mk_C_proc_va(handler, 1, fnc);
     pp = _SS_mk_scheme_proc(name, doc, SS_PR_PROC, cp);
 
-    op = SS_mk_proc_object(pp);
+    op = SS_mk_proc_object(si, pp);
     SS_UNCOLLECT(op);
 
-    vp = SS_mk_variable(name, op);
+    vp = SS_mk_variable(si, name, op);
     SS_UNCOLLECT(vp);
 
     SC_hasharr_install(si->symtab, name, vp, SS_POBJECT_S, TRUE, TRUE);
@@ -190,38 +190,38 @@ object *SS_install_cv(char *name, void *pval, int ityp)
     si = &_SS_si;
 
     typ = SC_type_name(ityp);
-    var = SS_mk_variable(name, SS_null);
+    var = SS_mk_variable(si, name, SS_null);
     SS_UNCOLLECT(var);
 
 /* character types (proper) */
     if (SC_is_type_char(ityp) == TRUE)
        {long long v;
 	v = *(char *) pval;
-	SS_def_var(si, var, SS_mk_integer(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_integer(si, v), si->global_env);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(ityp) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(si, var, SS_mk_integer(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_integer(si, v), si->global_env);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(ityp) == TRUE)
        {long double v;
 	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(si, var, SS_mk_float(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_float(si, v), si->global_env);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(ityp) == TRUE)
        {long double _Complex v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      ityp, pval, 0, 1, 1, FALSE);
-	SS_def_var(si, var, SS_mk_complex(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_complex(si, v), si->global_env);}
 
     else if (ityp == SC_STRING_I)
        {char *v;
 	v = (char *) pval;
-	SS_def_var(si, var, SS_mk_string(v), si->global_env);}
+	SS_def_var(si, var, SS_mk_string(si, v), si->global_env);}
 
     else if (ityp == SS_OBJECT_I)
        {SS_def_var(si, var, (object *) pval, si->global_env);

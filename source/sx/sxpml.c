@@ -239,7 +239,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
             if (dp != NULL)
                strcpy(type, dp->type);};
 
-	o = _SS_numtype_to_object(type, arr->data, n);};
+	o = _SS_numtype_to_object(si, type, arr->data, n);};
 
     return(o);}
 
@@ -360,7 +360,7 @@ static object *_SXI_array_list(SS_psides *si, object *argl)
 
     PM_ARRAY_CONTENTS(arr, void, n, type, data);
 
-    lst = _SS_numtype_to_list(type, data, n);
+    lst = _SS_numtype_to_list(si, type, data, n);
 
     return(lst);}
 
@@ -378,7 +378,7 @@ static object *_SXI_num_arr_len(SS_psides *si, object *obj)
 
     n = NUMERIC_ARRAY_LENGTH(obj);
 
-    o = SS_mk_integer(n);
+    o = SS_mk_integer(si, n);
 
     return(o);}
 
@@ -409,14 +409,14 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
     CFREE(d);
 
     lst = SS_null;
-    obj = SS_mk_integer(imax);
-    lst = SS_mk_cons(obj, lst);
-    obj = SS_mk_integer(imin);
-    lst = SS_mk_cons(obj, lst);
-    obj = SS_mk_float(fmax);
-    lst = SS_mk_cons(obj, lst);
-    obj = SS_mk_float(fmin);
-    lst = SS_mk_cons(obj, lst);
+    obj = SS_mk_integer(si, imax);
+    lst = SS_mk_cons(si, obj, lst);
+    obj = SS_mk_integer(si, imin);
+    lst = SS_mk_cons(si, obj, lst);
+    obj = SS_mk_float(si, fmax);
+    lst = SS_mk_cons(si, obj, lst);
+    obj = SS_mk_float(si, fmin);
+    lst = SS_mk_cons(si, obj, lst);
 
     return(lst);}
 
@@ -804,7 +804,7 @@ static object *_SXI_get_text_set_name(SS_psides *si, object *set)
     o = SS_null;
     if (SX_SETP(set))
        {s = SS_GET(PM_set, set);
-        o = SS_mk_string(s->name);};
+        o = SS_mk_string(si, s->name);};
 
     return(o);}
 
@@ -1891,7 +1891,7 @@ static SC_array *_SX_polygon_pass(SC_array *a, PM_polygon *py,
  *                      - pm-union-polygon
  */
 
-static object *_SX_combine_polygons(object *argl,
+static object *_SX_combine_polygons(SS_psides *si, object *argl,
 				    SC_array *(*op)(SC_array *a,
 						    PM_polygon *pa,
 						    PM_polygon *pb))
@@ -1931,7 +1931,7 @@ static object *_SX_combine_polygons(object *argl,
 	for (ip = 0; ip < np; ip++)
 	    {pa = PM_polygon_get(a, ip);
 	     o  = SX_mk_polygon(pa);
-	     rv = SS_mk_cons(o, rv);};
+	     rv = SS_mk_cons(si, o, rv);};
 
 	PM_free_polygons(a, FALSE);
 
@@ -1949,7 +1949,7 @@ static object *_SX_combine_polygons(object *argl,
 static object *_SXI_intersect_polygon(SS_psides *si, object *argl)
    {object *rv;
 
-    rv = _SX_combine_polygons(argl, PM_intersect_polygons);
+    rv = _SX_combine_polygons(si, argl, PM_intersect_polygons);
 
     return(rv);}
 
@@ -1963,7 +1963,7 @@ static object *_SXI_intersect_polygon(SS_psides *si, object *argl)
 static object *_SXI_union_polygon(SS_psides *si, object *argl)
    {object *rv;
 
-    rv = _SX_combine_polygons(argl, PM_union_polygons);
+    rv = _SX_combine_polygons(si, argl, PM_union_polygons);
 
     return(rv);}
 

@@ -142,7 +142,7 @@ external_declaration :
        DIAGNOSTIC($$, "function-definition");}
 
   | declaration
-      {SS_GR_VAL(SS_mk_cons(_SS_f_defvar, $1));
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_f_defvar, $1));
        DIAGNOSTIC($$, "declaration");}
   ;
 
@@ -153,11 +153,11 @@ external_declaration :
 
 function_definition :
     SUBR declarator EOS compound_statement
-      {SS_GR_VAL(_SS_make_funf($2, $4));
+      {SS_GR_VAL(_SS_make_funf(SI, $2, $4));
        DIAGNOSTIC($$, "SUBR");}
 
   | declaration_specifiers FUNC declarator EOS compound_statement
-      {SS_GR_VAL(_SS_make_funf($2, $4));
+      {SS_GR_VAL(_SS_make_funf(SI, $2, $4));
        DIAGNOSTIC($$, "FUNC");}
   ;
 
@@ -177,7 +177,7 @@ declaration :
               {SS_GR_VAL(SS_make_form(_SS_f_typedef,
 				      SS_CAR_MACRO($2), type, 0));}
 	   else
-	      {SS_GR_VAL(SS_append($1, $2));};}
+	      {SS_GR_VAL(SS_append(SI, $1, $2));};}
 
        else
 	  {SS_GR_VAL($2);};
@@ -200,7 +200,7 @@ declaration_list :
        DIAGNOSTIC($$, "declaration");}
 
   | declaration_list declaration
-      {SS_GR_VAL(SS_append($2, $1));
+      {SS_GR_VAL(SS_append(SI, $2, $1));
        DIAGNOSTIC($$, "declaration-list declaration");}
   ;
 
@@ -215,7 +215,7 @@ declaration_specifiers :
        DIAGNOSTIC($1, "storage-class-specifier");}
 
   | storage_class_specifier declaration_specifiers
-      {SS_GR_VAL(SS_mk_cons($1, $2));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $2));
        DIAGNOSTIC($$, "storage-class-specifier declaration-specifiers");}
 
   | type_specifier
@@ -223,7 +223,7 @@ declaration_specifiers :
        DIAGNOSTIC($1, "type-specifier");}
 
   | type_specifier declaration_specifiers
-      {SS_GR_VAL(SS_mk_cons($1, $2));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $2));
        DIAGNOSTIC($$, "type-specifier declaration-specifiers");}
   ;
 
@@ -256,12 +256,12 @@ type_specifier :
 
 init_declarator_list :
     init_declarator
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));
 
        DIAGNOSTIC($$, "init-declarator");}
 
   | init_declarator_list ',' init_declarator
-      {SS_GR_VAL(SS_mk_cons($3, $1));
+      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));
        DIAGNOSTIC($$, "init-declarator , init-declarator");}
   ;
 
@@ -299,16 +299,16 @@ declarator :
 
            f = SS_CAR_MACRO($1);
 	   if (SS_consp(f))
-	      {SS_GR_VAL(SS_mk_cons(SS_append(f, args), SS_null));}
+	      {SS_GR_VAL(SS_mk_cons(SI, SS_append(SI, f, args), SS_null));}
 	   else
-	      {SS_GR_VAL(SS_append($1, args));};}
+	      {SS_GR_VAL(SS_append(SI, $1, args));};}
        else
-	  {SS_GR_VAL(SS_mk_cons($1, args));};
+	  {SS_GR_VAL(SS_mk_cons(SI, $1, args));};
 
        DIAGNOSTIC($$, "declarator ( identifier-list )");}
 
   | declarator '(' ')'
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));
        DIAGNOSTIC($$, "declarator ()");}
   ;
 
@@ -319,11 +319,11 @@ declarator :
 
 identifier_list :
     VARNAME
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));
        DIAGNOSTIC($$, "VARNAME");}
 
   | identifier_list ',' VARNAME
-      {SS_GR_VAL(SS_mk_cons($3, $1));
+      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));
        DIAGNOSTIC($$, "identifier-list , VARNAME");}
   ;
 
@@ -348,11 +348,11 @@ initializer :
 
 initializer_list :
     initializer
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));
        DIAGNOSTIC($$, "initializer");}
 
   | initializer_list ',' initializer
-      {SS_GR_VAL(SS_mk_cons($3, $1));
+      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));
        DIAGNOSTIC($$, "initializer-list , initializer");}
   ;
 
@@ -386,8 +386,8 @@ statement :
 expression_statement :
     expression
       {if (SS_consp($1) && (SS_consp(SS_CAR_MACRO($1))))
-	  {SS_GR_VAL(SS_mk_cons(_SS_f_block,
-				SS_mk_cons(SS_null,
+	  {SS_GR_VAL(SS_mk_cons(SI, _SS_f_block,
+				SS_mk_cons(SI, SS_null,
 					   SS_reverse($1))));}
        else
 	  {SS_GR_VAL(CAPTURE($1));};
@@ -401,14 +401,14 @@ expression_statement :
 
 compound_statement :
     declaration_list statement_list
-      {SS_GR_VAL(SS_mk_cons(_SS_f_block,
-			    SS_mk_cons(SS_reverse($1),
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_f_block,
+			    SS_mk_cons(SI, SS_reverse($1),
 				       SS_reverse($2))));
        DIAGNOSTIC($$, "{ declaration-list statement-list }");}
 
   | statement_list
-      {SS_GR_VAL(SS_mk_cons(_SS_f_block,
-			    SS_mk_cons(SS_null,
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_f_block,
+			    SS_mk_cons(SI, SS_null,
 				       SS_reverse($1))));
        DIAGNOSTIC($$, "{ statement-list }");}
   ;
@@ -423,14 +423,14 @@ statement_list :
       {if (SS_consp(SS_CAR_MACRO($1)))
 	  {SS_GR_VAL(CAPTURE($1));}
        else
-	  {SS_GR_VAL(SS_mk_cons($1, SS_null));};
+	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));};
        DIAGNOSTIC($$, "statement");}
 
   | statement_list EOS statement
       {if (SS_consp(SS_CAR_MACRO($2)))
-	  {SS_GR_VAL(SS_append($2, $1));}
+	  {SS_GR_VAL(SS_append(SI, $2, $1));}
        else
-	  {SS_GR_VAL(SS_mk_cons($2, $1));};
+	  {SS_GR_VAL(SS_mk_cons(SI, $2, $1));};
        DIAGNOSTIC($$, "statement-list statement");}
   ;
 
@@ -583,10 +583,10 @@ postfix_expression :
     primary_expression
 
   | postfix_expression '(' argument_expression_list ')'
-      {SS_GR_VAL(SS_mk_cons($1, SS_reverse($3)));}
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse($3)));}
 
   | postfix_expression '(' ')'
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));}
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -612,10 +612,10 @@ primary_expression :
 
 argument_expression_list :
     assignment_expression
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));}
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));}
 
   | argument_expression_list ',' assignment_expression
-      {SS_GR_VAL(SS_mk_cons($3, $1));}
+      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));}
   ;
 
 /*--------------------------------------------------------------------------*/

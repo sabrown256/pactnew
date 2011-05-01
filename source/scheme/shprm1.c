@@ -36,7 +36,7 @@ static object *_SSI_newsym(SS_psides *si, object *obj)
 
     snprintf(name, MAXLINE, "%s%-d", token, _SS.nsym++);
 
-    o = SS_mk_variable(name, SS_null);
+    o = SS_mk_variable(si, name, SS_null);
 
     return(o);}
 
@@ -79,12 +79,12 @@ static object *_SS_splice(SS_psides *si, object *ncns, object *item,
 
 /* check the cases */
     if (SS_nullobjp(ncns))
-       ncns = SS_mk_cons(item, rest);
+       ncns = SS_mk_cons(si, item, rest);
 
     else
 /* if there are no remaining elements */
        {if (SS_nullobjp(rest))
-           ncns = SS_append(ncns, item);
+           ncns = SS_append(si, ncns, item);
 
 /* if the remainder is not a list */
         else if (!SS_consp(rest))
@@ -95,11 +95,11 @@ static object *_SS_splice(SS_psides *si, object *ncns, object *item,
 
 /* if the item is non-null */
             else
-               ncns = SS_append(ncns, SS_mk_cons(item, rest));}
+               ncns = SS_append(si, ncns, SS_mk_cons(si, item, rest));}
 
 /* if the remainder is a list */
         else
-           ncns = SS_append(ncns, SS_append(item, rest));};
+           ncns = SS_append(si, ncns, SS_append(si, item, rest));};
 
     return(ncns);}
 
@@ -212,7 +212,7 @@ static object *_SSI_unq_spl(SS_psides *si, object *obj)
 static object *_SSI_lambda(SS_psides *si, object *argl)
    {object *lambda;
 
-    lambda = SS_mk_procedure(SS_anon_proc, argl, si->env);
+    lambda = SS_mk_procedure(si, SS_anon_proc, argl, si->env);
 
     return(lambda);}
 
@@ -224,7 +224,7 @@ static object *_SSI_lambda(SS_psides *si, object *argl)
 static object *_SSI_lambdam(SS_psides *si, object *argl)
    {object *lambda;
 
-    lambda = SS_mk_procedure(SS_anon_macro, argl, si->env);
+    lambda = SS_mk_procedure(si, SS_anon_macro, argl, si->env);
 
 /* NOTE: without this mark the environment ends up being GC'd
  * inappropriately
@@ -267,16 +267,16 @@ static object *SS_let(SS_psides *si, object *let)
             {vr = SS_car(vlpair);
              vl = SS_cadr(vlpair);};
 
-         prml = SS_mk_cons(vr, prml);
-         argl = SS_mk_cons(vl, argl);};
+         prml = SS_mk_cons(si, vr, prml);
+         argl = SS_mk_cons(si, vl, argl);};
 
 /* now make the procedure */
     bdy    = SS_cdr(let);
-    bdy    = SS_mk_cons(prml, bdy);
-    lambda = SS_mk_procedure(SS_block_proc, bdy, si->env);
+    bdy    = SS_mk_cons(si, prml, bdy);
+    lambda = SS_mk_procedure(si, SS_block_proc, bdy, si->env);
 
 /* now make the procedure call */
-    SS_Assign(si->exn, SS_mk_cons(lambda, argl));
+    SS_Assign(si->exn, SS_mk_cons(si, lambda, argl));
 
     return(si->exn);}
 
@@ -319,13 +319,13 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
 
          asgn = SS_make_form(SS_setproc, vr, vl, LAST);
          SS_end_cons_macro(asnl, this, asgn);
-         prml = SS_mk_cons(vr, prml);};
+         prml = SS_mk_cons(si, vr, prml);};
 
 /* append the assignment list to the body */
-    bdy = SS_append(asnl, SS_cdr(lets));
+    bdy = SS_append(si, asnl, SS_cdr(lets));
 
 /* complete the let form */
-    let = SS_mk_cons(prml, bdy);
+    let = SS_mk_cons(si, prml, bdy);
 
 /* process the let form */
     SS_Assign(si->exn, SS_let(si, let));
@@ -373,13 +373,13 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
 
          asgn = SS_make_form(SS_setproc, vr, vl, LAST);
          SS_end_cons_macro(si->argl, si->this, asgn);
-         prml = SS_mk_cons(vr, prml);};
+         prml = SS_mk_cons(si, vr, prml);};
 
 /* append the assignment list to the body */
-    bdy = SS_append(si->argl, SS_cdr(lets));
+    bdy = SS_append(si, si->argl, SS_cdr(lets));
 
 /* complete the transformation */
-    frm = SS_mk_cons(prml, bdy);
+    frm = SS_mk_cons(si, prml, bdy);
     SS_Assign(si->fun, frm);
 
 /* process the let form */
@@ -433,10 +433,10 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
          SS_Assign(si->val,
 		   SS_make_form(SS_setproc, vr, vl, LAST));
          SS_end_cons_macro(si->argl, si->this, si->val);
-         SS_Assign(si->unev, SS_mk_cons(vr, si->unev));};
+         SS_Assign(si->unev, SS_mk_cons(si, vr, si->unev));};
 
 /* complete the transformation */
-    frm = SS_mk_cons(si->unev, SS_append(si->argl, SS_cdr(letr)));
+    frm = SS_mk_cons(si, si->unev, SS_append(si, si->argl, SS_cdr(letr)));
     SS_Assign(si->fun, frm);
 
 /* process the let form */
@@ -458,13 +458,13 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
 
 /*--------------------------------------------------------------------------*/
 
-/* SS_LST_MAP - prepare the args to map or for-each for procedure calls
- *            - cdr down the ARGL's
- *            - replace the ARGL with the cdr'd version
- *            - return the ARGS for the application
+/* _SS_LST_MAP - prepare the args to map or for-each for procedure calls
+ *             - cdr down the ARGL's
+ *             - replace the ARGL with the cdr'd version
+ *             - return the ARGS for the application
  */
 
-static object *SS_lst_map(object *argl, int *Ex_flag)
+static object *_SS_lst_map(SS_psides *si, object *argl, int *Ex_flag)
    {object *args, *arg_nxt, *rest, *rest_nxt, *lst, *o;
 
     arg_nxt  = SS_null;
@@ -485,7 +485,7 @@ static object *SS_lst_map(object *argl, int *Ex_flag)
             *Ex_flag = TRUE;};
 
 /* if there are no more ARG Lists reset ARGL to the REST of the arguments */
-    o = SS_mk_cons(args, rest);
+    o = SS_mk_cons(si, args, rest);
 
     return(o);}
 
@@ -511,13 +511,15 @@ static object *_SSI_map(SS_psides *si, object *obj)
     args = SS_null;
     ret  = SS_null;
     for (exf = FALSE; !exf; )
-        {SS_Assign(vl, SS_lst_map(argl, &exf));
+        {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(vl)))
-            {SS_Assign(args, SS_mk_cons(SS_quoteproc, SS_car(vl)));
-             SS_Assign(expr, SS_mk_cons(proc, SS_mk_cons(args, SS_null)));}
+            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(vl)));
+             SS_Assign(expr, SS_mk_cons(si,
+					proc, SS_mk_cons(si,
+							 args, SS_null)));}
          else
             {SS_Assign(args, SS_car(vl));
-             SS_Assign(expr, SS_mk_cons(proc, args));};
+             SS_Assign(expr, SS_mk_cons(si, proc, args));};
          SS_Assign(argl, SS_cdr(vl));
          SS_Save(si, si->env);
          SS_end_cons(ret, ret_nxt, SS_exp_eval(si, expr));
@@ -550,13 +552,14 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
     vl   = SS_null;
     args = SS_null;
     for (exf = FALSE; !exf; )
-        {SS_Assign(vl, SS_lst_map(argl, &exf));
+        {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(vl)))
-            {SS_Assign(args, SS_mk_cons(SS_quoteproc, SS_car(vl)));
-             SS_Assign(expr, SS_mk_cons(proc, SS_mk_cons(args, SS_null)));}
+            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(vl)));
+             SS_Assign(expr, SS_mk_cons(si, proc,
+					SS_mk_cons(si, args, SS_null)));}
          else
             {SS_Assign(args, SS_car(vl));
-             SS_Assign(expr, SS_mk_cons(proc, args));};
+             SS_Assign(expr, SS_mk_cons(si, proc, args));};
          SS_Assign(argl, SS_cdr(vl));
          SS_Save(si, si->env);
          SS_exp_eval(si, expr);
@@ -744,7 +747,7 @@ static object *_SSI_check_objects(SS_psides *si, object *obj)
 				      _SS_check_bad_names);
 	     break;};
 
-    ret = SS_mk_integer(nm);
+    ret = SS_mk_integer(si, nm);
 
     return(ret);}
 
@@ -954,7 +957,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
        {case ABORT :
 	     SS_set_print_err_func(_SS.oph, FALSE);
 
-	     err_ev = SS_mk_cons(err_proc, si->err_state);
+	     err_ev = SS_mk_cons(si, err_proc, si->err_state);
 	     ret    = SS_exp_eval(si, err_ev);
 	     break;
 
@@ -1054,7 +1057,7 @@ static object *_SSI_etime(SS_psides *si, object *argl)
 
     if (SS_true(fl))
        {since = now - then;
-	rv = SS_mk_float(since);}
+	rv = SS_mk_float(si, since);}
 
     else
        {r = now - then;

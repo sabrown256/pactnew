@@ -94,7 +94,7 @@ int SS_wrap_input_synt(void)
  *                   - FACTOR/PARSE
  */
 
-object *SS_mk_string_synt(char *s)
+object *SS_mk_string_synt(SS_psides *si, char *s)
    {int i, m, n;
     char *pe, *pb;
     object *obj;
@@ -132,7 +132,7 @@ object *SS_mk_string_synt(char *s)
 	     default:
 		  break;};};
 
-    obj = SS_mk_string(s+1);
+    obj = SS_mk_string(si, s+1);
 
     return(obj);}
 
@@ -187,7 +187,7 @@ object *SS_add_type_synt(SS_psides *si, char *name)
        typ = SS_null;
 
     else
-       {typ = SS_mk_string(name);
+       {typ = SS_mk_string(si, name);
         SC_hasharr_install(si->types, name, typ, SS_POBJECT_S, TRUE, TRUE);};
 
     return(typ);}
@@ -233,9 +233,9 @@ int _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc)
 /* _SS_UNSUPPORTED_SYNTAX - barf on unsupported syntax */
 
 void _SS_unsupported_syntax(char *msg)
-   {
+   {SS_psides *si = &_SS_si;
 
-    SS_error("UNSUPPORTED SYNTAX", SS_mk_string(msg));
+    SS_error("UNSUPPORTED SYNTAX", SS_mk_string(si, msg));
 
     return;}
 

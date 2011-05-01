@@ -261,10 +261,12 @@ static int SX_ultra_binary_filep(FILE *fp)
 
 static FILE *SX_open_for_reading(char *str, char *mode)
    {FILE *fp;
+    SS_psides *si = &_SS_si;
 
     fp = io_open(str, mode);
     if (fp == NULL)
-       SS_error("CAN'T OPEN FILE - SX_OPEN_FOR_READING", SS_mk_string(str));
+       SS_error("CAN'T OPEN FILE - SX_OPEN_FOR_READING",
+		SS_mk_string(si, str));
 
     return(fp);}
 

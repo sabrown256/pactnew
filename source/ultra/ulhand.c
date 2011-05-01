@@ -106,7 +106,7 @@ object *UL_us(SS_psides *si, C_procedure *cp, object *argl)
     ret = SS_null;
     for (t = argl; !SS_nullobjp(t); t = SS_cdr(t))
         {val = (*fun)(SS_car(t));
-         SS_Assign(ret, SS_mk_cons(val, ret));};
+         SS_Assign(ret, SS_mk_cons(si, val, ret));};
 
     SS_Assign(argl, SS_null);
 
@@ -135,7 +135,7 @@ object *UL_uc(SS_psides *si, C_procedure *cp, object *argl)
     for (t = argl ; !SS_nullobjp(t); t = SS_cdr(t))
         {i = SX_get_crv_index_i(SS_car(t));
          if (i >= 0)
-            {SS_Assign(ret, SS_mk_cons((*(PFSargsI) cp->proc[0])(i), ret));};};
+            {SS_Assign(ret, SS_mk_cons(si, (*(PFSargsI) cp->proc[0])(i), ret));};};
          
     SS_Assign(argl, SS_null);
 
@@ -180,7 +180,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
                  *xp = (double) (*(PFDoubleRR) cp->proc[0])(*xp, a);
              SX_dataset[i].modified = TRUE;
 
-             SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));
+             SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
              UL_lmt(SX_dataset[i].x[0], n,
                     &SX_dataset[i].wc[0],
                     &SX_dataset[i].wc[1]);};};
@@ -228,7 +228,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
                  *yp = (double) (*(PFDoubleRR) cp->proc[0])(*yp, a);
              SX_dataset[i].modified = TRUE;
 
-             SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));
+             SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
              UL_lmt(SX_dataset[i].x[1], n,
                     &SX_dataset[i].wc[2],
                     &SX_dataset[i].wc[3]);};};
@@ -316,7 +316,7 @@ object *_UL_ul2toc(SS_psides *si, C_procedure *cp, object *argl, int replot_flag
 	     else
 	        d2 = SX_dataset[i].wc[1];
              SS_Assign(ret,
-                       SS_mk_cons((*(PFPObjectidd) cp->proc[0])(i, d1, d2), ret));};};
+                       SS_mk_cons(si, (*(PFPObjectidd) cp->proc[0])(i, d1, d2), ret));};};
 
     SX_plot_flag = replot_flag;
 
@@ -340,7 +340,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
     for (t = argl, crvs = SS_null; SS_consp(t); t = SS_cdr(t))
         {tok = SS_car(t);
          if (SX_curvep_a(tok))
-            {SS_Assign(crvs, SS_mk_cons(tok, crvs));}
+            {SS_Assign(crvs, SS_mk_cons(si, tok, crvs));}
          else
             break;};
 
@@ -352,7 +352,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
          if (SX_curvep_a(tok))
             {i = SX_get_crv_index_i(tok);
              SS_Assign(ret,
-                       SS_mk_cons((*(PFPObjectio) cp->proc[0])(i, t), ret));};};
+                       SS_mk_cons(si, (*(PFPObjectio) cp->proc[0])(i, t), ret));};};
 
     SS_Assign(crvs, SS_null);
     SS_Assign(argl, SS_null);
@@ -386,7 +386,7 @@ object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
                  *xp = (double) (*(PFDoubleR) cp->proc[0])(*xp);
              SX_dataset[i].modified = TRUE;
 
-             SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));
+             SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
              UL_lmt(SX_dataset[i].x[0], n,
                     &SX_dataset[i].wc[0],
                     &SX_dataset[i].wc[1]);};};
@@ -406,7 +406,10 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
    {int i, l, n;
     double *yp, f;
     object *s, *ret, *tmp, *t;
+    PFDoubleR r;
 
+    r = (PFDoubleR) cp->proc[0];
+	     
     SX_prep_arg(argl);
 
 /* set plot flag on so that for example (expx (lst)) causes replot */
@@ -420,20 +423,24 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
          if (i != -1)
             {n = SX_dataset[i].n;
              for (yp = SX_dataset[i].x[1], l = 0; l < n; yp++, l++)
-                 *yp = (double) (*(PFDoubleR) cp->proc[0])(*yp);
+                 *yp = (double) r(*yp);
              SX_dataset[i].modified = TRUE;
 
-             tmp = SS_mk_cons(SX_dataset[i].obj, ret);
+             tmp = SS_mk_cons(si, SX_dataset[i].obj, ret);
              UL_lmt(SX_dataset[i].x[1], n,
                     &SX_dataset[i].wc[2], &SX_dataset[i].wc[3]);}
 
          else if (SS_integerp(s))
-            {f   = (double) SS_INTEGER_VALUE(s);
-             tmp = SS_mk_cons(SS_mk_float((*(PFDoubleR) cp->proc[0])(f)), ret);}
+	    {f   = (double) SS_INTEGER_VALUE(s);
+             tmp = SS_mk_cons(si,
+			      SS_mk_float(si, r(f)),
+			      ret);}
 
          else if (SS_floatp(s))
             {f   = SS_FLOAT_VALUE(s);
-             tmp = SS_mk_cons(SS_mk_float((*(PFDoubleR) cp->proc[0])(f)), ret);};
+             tmp = SS_mk_cons(si,
+			      SS_mk_float(si, r(f)),
+			      ret);};
 
          SS_Assign(ret, tmp);};
 
@@ -502,7 +509,7 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
         {s = SS_car(t);
 
          if (SX_curvep_a(s))
-            SS_Assign(ret, SS_mk_cons((*(PFPObjectoo) cp->proc[0])(s, tok), ret));};
+            SS_Assign(ret, SS_mk_cons(si, (*(PFPObjectoo) cp->proc[0])(s, tok), ret));};
 
     SS_Assign(tok, SS_null);
     SS_Assign(argl, SS_null);
@@ -540,7 +547,7 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
         {s = SS_car(t);
 
          if (SX_curvep_a(s))
-            SS_Assign(ret, SS_mk_cons((*(PFPObjectoo) cp->proc[0])(s, tok), ret));};
+            SS_Assign(ret, SS_mk_cons(si, (*(PFPObjectoo) cp->proc[0])(s, tok), ret));};
          
     UL_pause(FALSE);
 
@@ -682,7 +689,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
         while (TRUE)
            {s = SS_car(t);
             if (SS_numbp(s))
-               {ch = SS_mk_cons(s, ch);
+               {ch = SS_mk_cons(si, s, ch);
                 t  = SS_cdr(t);}
 
 /* the first non-number in the arg list */

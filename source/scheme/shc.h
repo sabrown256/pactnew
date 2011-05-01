@@ -132,14 +132,14 @@ extern int
  shgrc_parse(void);
 
 extern object
- *_SS_make_func(object *proto, object *body),
+ *_SS_make_func(SS_psides *si, object *proto, object *body),
  *_SS_del_var(SS_psides *si, object *var),
- *_SS_make_decl(object *ds, object *idl),
+ *_SS_make_decl(SS_psides *si, object *ds, object *idl),
  *_SS_make_macr(object *proto, object *body),
- *_SS_make_mac_decl(object *ds, object *idl),
+ *_SS_make_mac_decl(SS_psides *si, object *ds, object *idl),
  *_SS_make_body(object *dcls, object *stmnts),
- *_SS_make_stmnt_lst(object *s, object *sl),
- *_SS_make_cmpnd_stmnt(object *dcl, object *sl),
+ *_SS_make_stmnt_lst(SS_psides *si, object *s, object *sl),
+ *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl),
  *_SS_make_cast(object *type, object *expr),
  *SS_syntax_c(SS_psides *si, object *str),
  *SS_parse_token_c(void),

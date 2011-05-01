@@ -53,7 +53,7 @@ static void _SS_fpe_handler(int sig)
 #endif
 
     SS_error("FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
-	     SS_mk_cons(si->fun, si->argl));
+	     SS_mk_cons(si, si->fun, si->argl));
 
     return;}
 
@@ -403,8 +403,9 @@ SS_psides *SS_init_scheme(char *code, char *vers)
     si->err_state  = SS_null;
     si->env        = SS_null;
 
-    fr            = SS_mk_new_frame(SS_mk_string("global-environment"), NULL);
-    si->global_env = SS_mk_cons(fr, SS_null);
+    fr            = SS_mk_new_frame(SS_mk_string(si, "global-environment"),
+				    NULL);
+    si->global_env = SS_mk_cons(si, fr, SS_null);
     SS_UNCOLLECT(si->global_env);
 
     SS_Assign(si->env, si->global_env);
@@ -494,7 +495,7 @@ static object *_SS_get_ext_ref(SS_psides *si, char *name)
 static object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
    {object *o;
 
-    o = SS_mk_boolean(name, val);
+    o = SS_mk_boolean(si, name, val);
 
     SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
 
@@ -529,16 +530,16 @@ void SS_inst_const(SS_psides *si)
     SC_arrtype(SS_eof, SS_EOF_I);
     
     si->histdev = SS_null;
-    si->indev   = SS_mk_inport(stdin, "stdin");
+    si->indev   = SS_mk_inport(si, stdin, "stdin");
     SS_UNCOLLECT(si->indev);
-    si->outdev  = SS_mk_outport(stdout, "stdout");
+    si->outdev  = SS_mk_outport(si, stdout, "stdout");
     SS_UNCOLLECT(si->outdev);
 
-    SS_anon_proc  = SS_mk_string("lambda");
+    SS_anon_proc  = SS_mk_string(si, "lambda");
     SS_UNCOLLECT(SS_anon_proc);
-    SS_anon_macro = SS_mk_string("lambda-macro");
+    SS_anon_macro = SS_mk_string(si, "lambda-macro");
     SS_UNCOLLECT(SS_anon_macro);
-    SS_block_proc = SS_mk_string("block");
+    SS_block_proc = SS_mk_string(si, "block");
     SS_UNCOLLECT(SS_block_proc);
 
 /* initialize the stack and the continuation stack */
@@ -913,8 +914,8 @@ void SS_interrupt_handler(int sig)
         case 'u' :
 	     nl = SC_stoi(arg);
 	     PRINT(stdout, "\nReturning %d frames\n\n", 2*nl);
-	     argl = SS_mk_cons(SS_mk_integer(nl),
-			       SS_mk_cons(SS_t, SS_null));
+	     argl = SS_mk_cons(si, SS_mk_integer(si, nl),
+			       SS_mk_cons(si, SS_t, SS_null));
 	     _SSI_retlev(si, argl);
 	     break;
 
@@ -1113,7 +1114,7 @@ static object *_SSI_system(SS_psides *si, object *argl)
 
     CFREE(cmd);
 
-    o = SS_mk_integer(rv);
+    o = SS_mk_integer(si, rv);
 
     return(o);}
 
@@ -1150,7 +1151,7 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
     lst = SS_null;
     if (output != NULL)
        {for (i = 0; output[i] != NULL; i++)
-            {SS_Assign(lst, SS_mk_cons(SS_mk_string(output[i]), lst));};
+            {SS_Assign(lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));};
 
         SS_Assign(lst, SS_reverse(lst));
 	SC_mark(lst, -1);

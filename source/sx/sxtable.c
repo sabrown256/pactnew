@@ -699,7 +699,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
        {fp = io_open(fname, "w");
         if (fp == NULL)
            SS_error("CAN'T OPEN FILE - SX_WRT_CURRENT_TABLE",
-		    SS_mk_string(fname));}
+		    SS_mk_string(si, fname));}
 
 /* write the labels if any */
     if (SX_current_table_labels != NULL)
@@ -949,8 +949,8 @@ static object *SX_col_labels(SS_psides *si)
 	   {for (i = nc-1; i >= 0; i--)
 	        {if (SX_current_table_labels[i] == NULL)
 		    break;
-		 obj = SS_mk_string(SX_current_table_labels[i]);
-		 lst = SS_mk_cons(obj, lst);};};};
+		 obj = SS_mk_string(si, SX_current_table_labels[i]);
+		 lst = SS_mk_cons(si, obj, lst);};};};
 
     return(lst);}
 

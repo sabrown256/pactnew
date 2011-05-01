@@ -116,10 +116,10 @@ struct s_SS_smp_state
     {object *x;                                                             \
      x = nxt;                                                               \
      if (SS_nullobjp(first))                                                \
-        {first = SS_mk_cons(x, SS_null);                                    \
+        {first = SS_mk_cons(si, x, SS_null);                                \
          ths = first;}                                                      \
      else                                                                   \
-        {SS_setcdr(ths, SS_mk_cons(x, SS_null));                            \
+        {SS_setcdr(ths, SS_mk_cons(si, x, SS_null));                        \
          ths = SS_cdr(ths);};}
 
 /*--------------------------------------------------------------------------*/
@@ -135,11 +135,11 @@ struct s_SS_smp_state
     {object *x;                                                             \
      x = nxt;                                                               \
      if (SS_nullobjp(first))                                                \
-        {first = SS_mk_cons(x, SS_null);                                    \
+        {first = SS_mk_cons(si, x, SS_null);                                \
          SS_MARK(first);                                                    \
          SS_Assign(ths, first);}                                            \
      else                                                                   \
-        {SS_setcdr(ths, SS_mk_cons(x, SS_null));                            \
+        {SS_setcdr(ths, SS_mk_cons(si, x, SS_null));                        \
          SS_Assign(ths, SS_cdr(ths));};}
 
 /*--------------------------------------------------------------------------*/
@@ -257,8 +257,8 @@ extern void
              int n, PFVoid *pr, SS_form ptype);
 
 extern object
- *_SS_numtype_to_object(char *type, void *p, long n),
- *_SS_numtype_to_list(char *type, void *p, long n);
+ *_SS_numtype_to_object(SS_psides *si, char *type, void *p, long n),
+ *_SS_numtype_to_list(SS_psides *si, char *type, void *p, long n);
 
 
 /* SHPRM1.C declarations */
@@ -278,7 +278,7 @@ extern void
 /* SHPRM3.C declarations */
 
 extern object
- *_SS_endcons(object *list, object *obj);
+ *_SS_endcons(SS_psides *si, object *list, object *obj);
 
 extern void
  _SS_inst_prm3(SS_psides *si);

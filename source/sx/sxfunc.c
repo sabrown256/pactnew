@@ -145,7 +145,7 @@ static object *_SXI_get_dimension(SS_psides *si, object *obj)
 	set = f->range;
 	ndr = (set == NULL) ? 0 : set->dimension_elem;
 
-	rv = SS_mk_cons(SS_mk_integer(ndd), SS_mk_integer(ndr));}
+	rv = SS_mk_cons(si, SS_mk_integer(si, ndd), SS_mk_integer(si, ndr));}
     else
        rv = SS_null;
 
@@ -212,7 +212,7 @@ static object *_SXI_get_mapping_name(SS_psides *si, object *arg)
        SS_error("BAD MAPPING - _SXI_GET_RANGE", arg);
 
     name = MAPPING_NAME(arg);
-    rv   = SS_mk_string(name);
+    rv   = SS_mk_string(si, name);
 
     return(rv);}
 
@@ -242,7 +242,7 @@ static object *_SXI_set_volume(SS_psides *si, object *arg)
          mx = *extr++;
          vol *= (mx - mn);};
     
-    o = SS_mk_float(vol);
+    o = SS_mk_float(si, vol);
 
     return(o);}
 

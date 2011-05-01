@@ -407,7 +407,7 @@ static object *_SS_xtnd_env(SS_psides *si, object *fnm,
 			    object *vrs, object *vls, object *base)
    {object *env;
     
-    env = SS_mk_cons(_SS_mk_frame(si, fnm, vrs, vls), base);
+    env = SS_mk_cons(si, _SS_mk_frame(si, fnm, vrs, vls), base);
 
     return(env);}
 
@@ -832,7 +832,7 @@ void SS_env_vars(SS_psides *si, char **vrs, object *penv)
 		 vr = CMAKE_N(char, nc);
 		 snprintf(vr, nc, "$%s", s);
 
-		 vl = SS_mk_string(p+1);
+		 vl = SS_mk_string(si, p+1);
 
 		 _SS_def_varc(si, vr, vl, penv);
 

@@ -160,17 +160,17 @@ union          {DIAG_RETURN(UNION);}
 enum           {DIAG_RETURN(ENUM);}
 \.\.\.         {DIAG_RETURN(DOTDOT);}
 
-{OCT_INTEGER}  {yylval = SS_mk_integer(STRTOL(yytext, NULL, 8));
+{OCT_INTEGER}  {yylval = SS_mk_integer(SI, STRTOL(yytext, NULL, 8));
                 DIAG_RETURN(INTEGER);}
 
-{DEC_INTEGER}  {yylval = SS_mk_integer(STRTOL(yytext, NULL, 10));
+{DEC_INTEGER}  {yylval = SS_mk_integer(SI, STRTOL(yytext, NULL, 10));
                 DIAG_RETURN(INTEGER);}
 
-{HEX_INTEGER}  {yylval = SS_mk_integer(STRTOL(yytext, NULL, 10));
+{HEX_INTEGER}  {yylval = SS_mk_integer(SI, STRTOL(yytext, NULL, 10));
                 DIAG_RETURN(INTEGER);}
 
 {DD}+\.?{DD}*({EXP})? |
-{DD}*\.?{DD}+({EXP})?      {yylval = SS_mk_float(STRTOD(yytext, NULL));
+{DD}*\.?{DD}+({EXP})?      {yylval = SS_mk_float(SI, STRTOD(yytext, NULL));
                             DIAG_RETURN(FLOAT);}
 
 {QUT}          {yylval = SS_parse_string_c(SI);

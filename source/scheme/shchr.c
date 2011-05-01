@@ -118,7 +118,7 @@ static object *_SSI_chrint(SS_psides *si, object *chr)
     if (!SS_charobjp(chr))
        SS_error("ARGUMENT NOT CHARACTER - CHAR->INTEGER", chr);
 
-    o = SS_mk_integer(SS_CHARACTER_VALUE(chr));
+    o = SS_mk_integer(si, SS_CHARACTER_VALUE(chr));
 
     return(o);}
 
@@ -133,7 +133,7 @@ static object *_SSI_intchr(SS_psides *si, object *obj)
     if (!SS_integerp(obj))
        SS_error("ARGUMENT NOT INTEGER - INTEGER->CHAR", obj);
 
-    o = SS_mk_char(SS_INTEGER_VALUE(obj));
+    o = SS_mk_char(si, SS_INTEGER_VALUE(obj));
 
     return(o);}
 

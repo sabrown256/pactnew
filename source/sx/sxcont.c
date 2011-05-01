@@ -80,7 +80,7 @@ static char
 
 /* _SX_ARGS - get a C level data item from a single Scheme object */
 
-void _SX_args(object *obj, void *v, int type)
+void _SX_args(SS_psides *si, object *obj, void *v, int type)
    {void **pv;
     char *s;
 
@@ -189,7 +189,7 @@ void _SX_args(object *obj, void *v, int type)
         case G_PLOT_REQUEST     :
 
         default :
-             SS_error("BAD TYPE - _SX_ARGS", SS_mk_integer(type));};
+             SS_error("BAD TYPE - _SX_ARGS", SS_mk_integer(si, type));};
 
     return;}
 
@@ -198,7 +198,7 @@ void _SX_args(object *obj, void *v, int type)
 
 /* _SX_CALL_ARGS - make a SCHEME level object from a C level one */
 
-object *_SX_call_args(int type, void *v)
+object *_SX_call_args(SS_psides *si, int type, void *v)
    {object *obj;
 
     obj = SS_null;
@@ -272,7 +272,7 @@ object *_SX_call_args(int type, void *v)
         case G_PLOT_REQUEST     :
 
         default                 :
-             SS_error("BAD TYPE - _SX_CALL_ARGS", SS_mk_integer(type));};
+             SS_error("BAD TYPE - _SX_CALL_ARGS", SS_mk_integer(si, type));};
 
     return(obj);}
 
@@ -283,7 +283,8 @@ object *_SX_call_args(int type, void *v)
  *                   - given pattern
  */
 
-static object *_SX_list_vobjects(char *patt, g_file *po, int type)
+static object *_SX_list_vobjects(SS_psides *si, char *patt,
+				 g_file *po, int type)
    {long i, n;
     int t;
     char *s;
@@ -303,7 +304,9 @@ static object *_SX_list_vobjects(char *patt, g_file *po, int type)
 	     t = mitem->type[3];
 	     if (((type == 0) || (t == type)) && SC_regx_match(s, patt))
 	        {PRINT(stdout, " %ld  %c  %s\n", i+1, t, s);
-		 SS_Assign(ret, SS_mk_cons(SS_mk_integer(i+1), ret));}};
+		 SS_Assign(ret, SS_mk_cons(si,
+					   SS_mk_integer(si, i+1),
+					   ret));}};
 
 	SS_Assign(ret, SS_reverse(ret));};
 
@@ -336,9 +339,9 @@ object *_SXI_menu(SS_psides *si, object *argl)
     _SX_get_menu(po);
 
     if (type != NULL)
-       ret = _SX_list_vobjects(patt, po, type[0]);
+       ret = _SX_list_vobjects(si, patt, po, type[0]);
     else
-       ret = _SX_list_vobjects(patt, po, 0);
+       ret = _SX_list_vobjects(si, patt, po, 0);
 
     return(ret);}
 
@@ -770,7 +773,7 @@ int SX_split_command(char *cmd, char *lst)
 static object *_SX_no_device_support(SS_psides *si)
    {object *rv;
 
-    rv = SS_mk_integer(0);
+    rv = SS_mk_integer(si, 0);
 
     return(rv);}
 

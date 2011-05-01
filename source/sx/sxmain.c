@@ -176,7 +176,7 @@ int main(int c, char **v, char **env)
 
 #ifndef NO_SHELL
         if (SX_gr_mode && !SX_qflag)
-	   SS_banner(si, SS_mk_string(PCODE));
+	   SS_banner(si, SS_mk_string(si, PCODE));
 #endif
 
 /* load the SCHEME level PDBView functionality */
@@ -211,7 +211,7 @@ int main(int c, char **v, char **env)
 
 /* connect the I/O functions */
     if (SX_gr_mode)
-        SS_banner(SS_mk_string(PCODE));
+        SS_banner(SS_mk_string(si, PCODE));
 
 #endif
 
@@ -245,7 +245,7 @@ int main(int c, char **v, char **env)
 
     else
        {if (SX_gr_mode && !SX_qflag)
-	   SS_banner(si, SS_mk_string(SCODE));
+	   SS_banner(si, SS_mk_string(si, SCODE));
 	SS_repl(si);
 
         ret = TRUE;};

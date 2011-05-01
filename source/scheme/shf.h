@@ -117,7 +117,7 @@ extern int
  shgrf_parse(void);
 
 extern object
- *_SS_make_funf(object *proto, object *body),
+ *_SS_make_funf(SS_psides *si, object *proto, object *body),
  *SS_syntax_f(SS_psides *si, object *str),
  *SS_parse_token_f(void),
  *SS_parse_token_val_f(void);

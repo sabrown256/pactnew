@@ -282,7 +282,7 @@ object *UL_get_value(double *sp, double *vp, double val, int n, int id)
                  PRINT(stdout, SX_text_output_format, y);
                  PRINT(stdout, "\n");};
                  
-             SS_Assign(ret, SS_mk_cons(SS_mk_float(y), ret));};};
+             SS_Assign(ret, SS_mk_cons(si, SS_mk_float(si, y), ret));};};
 
     if (!SS_nullobjp(ret))
        {SS_Assign(ret, SS_reverse(ret));
@@ -449,7 +449,7 @@ object *UL_fit(object *obj, object *tok)
 	    {PRINT(stdout, "    ");
 	     PRINT(stdout, SX_text_output_format, cf[i]);
 	     PRINT(stdout, " *x^%d\n", sgn*i);};
-         ret = SS_mk_cons(SS_mk_float(cf[i]), ret);};
+         ret = SS_mk_cons(si, SS_mk_float(si, cf[i]), ret);};
         
 /* create curve of fit */
     p = PM_lsq_polynomial(SX_default_npts, order, cf, wc);
@@ -460,7 +460,7 @@ object *UL_fit(object *obj, object *tok)
     else
         {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_dataset[j].id, order);}
 
-    ret = SS_mk_cons(SS_reverse(ret),
+    ret = SS_mk_cons(si, SS_reverse(ret),
                      SX_mk_curve(SX_default_npts, p[0], p[1],
 				 lbl, NULL, (PFVoid) UL_plot));
 
@@ -916,7 +916,7 @@ static object *_ULI_stats(SS_psides *si, object *argl)
     for ( ; SS_consp(argl); argl = SS_cdr(argl))
        {i = SX_get_crv_index_i(SS_car(argl));
         if (i != -1)
-           ret = SS_mk_cons(UL_stat(i), ret);};
+           ret = SS_mk_cons(si, UL_stat(i), ret);};
          
     UL_pause(FALSE);
    
@@ -986,7 +986,7 @@ static object *_ULI_crv_label(SS_psides *si, object *obj)
     if (i != -1)
        {if (si->interactive == ON)
            PRINT(stdout, "\n Label: %s\n\n", SX_dataset[i].text);
-        o = SS_mk_string(SX_dataset[i].text);};
+        o = SS_mk_string(si, SX_dataset[i].text);};
 
     return(o);}
 
@@ -1015,8 +1015,8 @@ static object *_ULI_crv_domain(SS_psides *si, object *obj)
             PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[1]);
             PRINT(stdout, ")\n\n");};
 
-        o = SS_mk_cons(SS_mk_float(SX_dataset[j].wc[0]),
-		       SS_mk_float(SX_dataset[j].wc[1]));};
+        o = SS_mk_cons(si, SS_mk_float(si, SX_dataset[j].wc[0]),
+		       SS_mk_float(si, SX_dataset[j].wc[1]));};
 
     return(o);}
 
@@ -1045,8 +1045,8 @@ static object *_ULI_crv_range(SS_psides *si, object *obj)
             PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[3]);
             PRINT(stdout, ")\n\n");};
 
-        o = SS_mk_cons(SS_mk_float(SX_dataset[j].wc[2]),
-		       SS_mk_float(SX_dataset[j].wc[3]));};
+        o = SS_mk_cons(si, SS_mk_float(si, SX_dataset[j].wc[2]),
+		       SS_mk_float(si, SX_dataset[j].wc[3]));};
 
     return(o);}
 
@@ -1070,7 +1070,7 @@ static object *_ULI_crv_npts(SS_psides *si, object *obj)
        {if (si->interactive == ON)
            PRINT(stdout, "\n Number of points: %ld\n\n", SX_dataset[j].n);
 
-        o = SS_mk_integer(SX_dataset[j].n);};
+        o = SS_mk_integer(si, SX_dataset[j].n);};
 
     return(o);}
 

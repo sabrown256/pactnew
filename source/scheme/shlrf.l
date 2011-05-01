@@ -123,20 +123,20 @@ sizeof       {DIAG_RETURN(SIZOF);}
 subroutine   {DIAG_RETURN(SUBR);}
 function     {DIAG_RETURN(FUNC);}
 
-{OCT_INTEGER}              {yylval = SS_mk_integer(STRTOL(yytext, NULL, 8));
+{OCT_INTEGER}              {yylval = SS_mk_integer(SI, STRTOL(yytext, NULL, 8));
                             DIAG_RETURN(INTEGER);}
 
-{DEC_INTEGER}              {yylval = SS_mk_integer(STRTOL(yytext, NULL, 10));
+{DEC_INTEGER}              {yylval = SS_mk_integer(SI, STRTOL(yytext, NULL, 10));
                             DIAG_RETURN(INTEGER);}
 
-{HEX_INTEGER}              {yylval = SS_mk_integer(STRTOL(yytext, NULL, 10));
+{HEX_INTEGER}              {yylval = SS_mk_integer(SI, STRTOL(yytext, NULL, 10));
                             DIAG_RETURN(INTEGER);}
 
 {DD}+\.?{DD}*({EXP})? |
-{DD}*\.?{DD}+({EXP})?      {yylval = SS_mk_float(STRTOD(yytext, NULL));
+{DD}*\.?{DD}+({EXP})?      {yylval = SS_mk_float(SI, STRTOD(yytext, NULL));
                             DIAG_RETURN(FLOAT);}
 
-{STR}      {yylval = SS_mk_string_synt((char *) yytext);
+{STR}      {yylval = SS_mk_string_synt(SI, (char *) yytext);
             DIAG_RETURN(STRING);}
 
 {EXPTS}    {DIAG_RETURN(EXPT);}

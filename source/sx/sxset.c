@@ -193,16 +193,16 @@ object *SX_arg_prep(object *argl)
 
 /* make a copy of the arg list other people may be pointing at it */
     for (lst = SS_null, acc = argl; !SS_nullobjp(acc); acc = SS_cdr(acc))
-        lst = SS_mk_cons(SS_car(acc), lst);
+        lst = SS_mk_cons(si, SS_car(acc), lst);
     SS_MARK(lst);
 
     acc = SS_null;
     while (!SS_nullobjp(lst))
        {obj = SS_car(lst);
         if (SS_consp(obj))
-           {SS_Assign(acc, SS_append(obj, acc));}
+           {SS_Assign(acc, SS_append(si, obj, acc));}
         else
-           {SS_Assign(acc, SS_append(SS_mk_cons(obj, SS_null), acc));};
+           {SS_Assign(acc, SS_append(si, SS_mk_cons(si, obj, SS_null), acc));};
 
 /* this frees the cons we made above */
         SS_Assign(lst, SS_cdr(lst));};

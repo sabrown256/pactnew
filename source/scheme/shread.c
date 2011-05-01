@@ -53,7 +53,7 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
     for (t1 = t; *t1 != '\n'; t1++);
     *t1 = '\0';
 
-    ret = SS_mk_string(t);
+    ret = SS_mk_string(si, t);
     *t = '\0';
 
     return(ret);}
@@ -115,7 +115,7 @@ static object *_SS_rd_vct(SS_psides *si, object *str)
 
     lst = _SS_rd_lst(si, str);
     SS_MARK(lst);
-    vct = SS_lstvct(lst);
+    vct = SS_lstvct(si, lst);
     SS_GC(lst);
 
     return(vct);}
@@ -132,11 +132,11 @@ static object *_SSI_rd_chr(SS_psides *si, object *arg)
 
     if (SS_nullobjp(arg))
        {*SS_PTR(si->indev) = '\0';
-        o = SS_mk_char((int) SS_get_ch(si->indev, FALSE));}
+        o = SS_mk_char(si, (int) SS_get_ch(si->indev, FALSE));}
 
     else if (SS_inportp(str = SS_car(arg)))
        {*SS_PTR(str) = '\0';
-        o = SS_mk_char((int) SS_get_ch(str, FALSE));}
+        o = SS_mk_char(si, (int) SS_get_ch(str, FALSE));}
 
     else
        SS_error("ARGUMENT TO READ NOT INPUT-PORT", arg);
@@ -261,15 +261,15 @@ static object *_SS_rd_atm(SS_psides *si, object *str)
     *pt = '\0';
 
     if (_SS_intstrp(token, &iv))
-       o = SS_mk_integer(iv);
+       o = SS_mk_integer(si, iv);
 
 #ifdef LARGE
     else if (strncmp(token, "#\\", 2) == 0)
-       o = SS_mk_char(token[2]);
+       o = SS_mk_char(si, token[2]);
 #endif
 
     else if (SC_fltstrp(token))
-       o = SS_mk_float(ATOF(token));
+       o = SS_mk_float(si, ATOF(token));
 
     else
        o = SS_add_variable(si, token);
@@ -279,9 +279,9 @@ static object *_SS_rd_atm(SS_psides *si, object *str)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_RD_STR - read and make an string object */
+/* _SS_RD_STR - read and make an string object */
 
-static object *SS_rd_str(object *str)
+static object *_SS_rd_str(SS_psides *si, object *str)
    {int i, c, nc, bfsz;
     int delta;
     char *pt, *bf;
@@ -318,7 +318,7 @@ static object *SS_rd_str(object *str)
 
     pt[i] = '\0';
     delta = SC_arrlen(bf);
-    ret   = SS_mk_string(bf);
+    ret   = SS_mk_string(si, bf);
 
     CFREE(bf);
 
@@ -360,29 +360,29 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 	     break;
 
         case '\"':
-	     rv = SS_rd_str(str);
+	     rv = _SS_rd_str(si, str);
 	     break;
 
         case '\'':
-	     rv = SS_mk_cons(SS_quoteproc,
-			     SS_mk_cons(READ_EXPR(str),
+	     rv = SS_mk_cons(si, SS_quoteproc,
+			     SS_mk_cons(si, READ_EXPR(str),
 					SS_null));
 	     break;
         case '`' :
-	     rv = SS_mk_cons(SS_quasiproc,
-			     SS_mk_cons(READ_EXPR(str),
+	     rv = SS_mk_cons(si, SS_quasiproc,
+			     SS_mk_cons(si, READ_EXPR(str),
 					SS_null));
 	     break;
         case ',' :
 	     c = SS_get_ch(str, TRUE);
 	     if (c == '@')
-	        rv = SS_mk_cons(SS_unqspproc,
-				SS_mk_cons(READ_EXPR(str),
+	        rv = SS_mk_cons(si, SS_unqspproc,
+				SS_mk_cons(si, READ_EXPR(str),
 					   SS_null));
 	     else
 	        {PUSH_CHAR(c, str);
-		 rv = SS_mk_cons(SS_unqproc,
-				 SS_mk_cons(READ_EXPR(str),
+		 rv = SS_mk_cons(si, SS_unqproc,
+				 SS_mk_cons(si, READ_EXPR(str),
 					    SS_null));};
 	     break;
 #ifdef LARGE
@@ -497,7 +497,7 @@ static object *_SSI_opn_in(SS_psides *si, object *obj)
 
 	CFREE(t);};
 
-    rv = SS_mk_inport(str, s);
+    rv = SS_mk_inport(si, str, s);
 
     CFREE(s);
 
@@ -546,7 +546,7 @@ static object *_SSI_call_if(SS_psides *si, object *argl)
        SS_error("CAN'T OPEN FILE - OPEN-INPUT-FILE", obj);
 
     old_indev = si->indev;
-    si->indev  = SS_mk_inport(str, s);
+    si->indev  = SS_mk_inport(si, str, s);
     ret       = SS_exp_eval(si, SS_cdr(argl));
 
     _SSI_cls_in(si, si->indev);
@@ -591,7 +591,7 @@ static object *_SSI_strprt(SS_psides *si, object *arg)
     if (!SS_stringp(arg))
        SS_error("BAD STRING TO STRING->PORT", arg);
 
-    port = SS_mk_inport(NULL, "string");
+    port = SS_mk_inport(si, NULL, "string");
     strcpy(SS_BUFFER(port), SS_STRING_TEXT(arg));
     SS_PTR(port) = SS_BUFFER(port);
 
@@ -604,14 +604,16 @@ static object *_SSI_strprt(SS_psides *si, object *arg)
 
 object *SS_add_variable(SS_psides *si, char *name)
    {object *op;
+    haelem *hp;
 
     op = (object *) SC_hasharr_def_lookup(si->symtab, name);
     if (op != NULL)
        return(op);
 
-    op = SS_mk_variable(name, SS_null);
+    op = SS_mk_variable(si, name, SS_null);
     SS_UNCOLLECT(op);
-    if (SC_hasharr_install(si->symtab, name, op, SS_POBJECT_S, TRUE, TRUE) == NULL)
+    hp = SC_hasharr_install(si->symtab, name, op, SS_POBJECT_S, TRUE, TRUE);
+    if (hp == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
 
     return(op);}

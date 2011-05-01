@@ -165,11 +165,11 @@ void _SS_install(char* pname, char *pdoc, PFPHand phand,
        {PRINT(ERRDEV, "\nError installing procedure %s\n", pname);
         LONGJMP(SC_gs.cpu, ABORT);};
 
-    op = SS_mk_proc_object(pp);
+    op = SS_mk_proc_object(si, pp);
     SS_UNCOLLECT(op);
 
 /* create the variable which puts it all together */
-    vp = SS_mk_variable(pname, op);
+    vp = SS_mk_variable(si, pname, op);
     SS_UNCOLLECT(vp);
 
     SC_hasharr_install(si->symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
@@ -557,8 +557,9 @@ static void _SS_wr_outport(object *obj, object *strm)
 
 static void _SS_wr_vector(object *obj, object *strm)
    {object *lst;
+    SS_psides *si = &_SS_si;
 
-    lst = SS_vctlst(obj);
+    lst = SS_vctlst(si, obj);
     SS_MARK(lst);
     PRINT(SS_OUTSTREAM(strm), "#");
     SS_wr_lst(lst, strm);
@@ -578,9 +579,8 @@ static void _SS_wr_vector(object *obj, object *strm)
 
 /* SS_MK_PROC_OBJECT - encapsulate a procedure as an object */
 
-object *SS_mk_proc_object(procedure *pp)
+object *SS_mk_proc_object(SS_psides *si, procedure *pp)
    {object *op;
-    SS_psides *si = &_SS_si;
     
     op = SS_mk_object(si, pp, PROC_OBJ, SELF_EV, pp->name,
 		      SS_wr_proc, _SS_rl_procedure);
@@ -595,7 +595,8 @@ object *SS_mk_proc_object(procedure *pp)
  *                 - to an S_procedure (compound or Scheme procedure)
  */
 
-object *SS_mk_procedure(object *name, object *lam_exp, object *penv)
+object *SS_mk_procedure(SS_psides *si, object *name,
+			object *lam_exp, object *penv)
    {S_procedure *sp;
     procedure *pp;
     object *op;
@@ -622,7 +623,7 @@ object *SS_mk_procedure(object *name, object *lam_exp, object *penv)
     pp->trace = FALSE;
     pp->proc  = (object *) sp;
 
-    op = SS_mk_proc_object(pp);
+    op = SS_mk_proc_object(si, pp);
 
     return(op);}
 
@@ -651,7 +652,7 @@ object *SS_mk_esc_proc(SS_psides *si, int err, int type)
     pp->proc = (object *) ep;
     pp->name = CSTRSAVE("escape");
 
-    op = SS_mk_proc_object(pp);
+    op = SS_mk_proc_object(si, pp);
 
     return(op);}
 
@@ -660,10 +661,9 @@ object *SS_mk_esc_proc(SS_psides *si, int err, int type)
 
 /* SS_MK_VARIABLE - encapsulate a VARIABLE in an object */
 
-object *SS_mk_variable(char *n, object *v)
+object *SS_mk_variable(SS_psides *si, char *n, object *v)
    {variable *vp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     vp = CMAKE(variable);
     vp->name  = CSTRSAVE(n);
@@ -679,10 +679,9 @@ object *SS_mk_variable(char *n, object *v)
 
 /* SS_MK_STRING - make a string and imbed it in an object */
 
-object *SS_mk_string(char *s)
+object *SS_mk_string(SS_psides *si, char *s)
    {string *sp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     if (s != NULL)
        {sp = CMAKE(string);
@@ -703,10 +702,9 @@ object *SS_mk_string(char *s)
  *              - a port struct with FILE pointer str
  */
 
-object *SS_mk_inport(FILE *str, char *name)
+object *SS_mk_inport(SS_psides *si, FILE *str, char *name)
    {input_port *pp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     pp = CMAKE(input_port);
     pp->name = CSTRSAVE(name);
@@ -728,10 +726,9 @@ object *SS_mk_inport(FILE *str, char *name)
  *               - a port struct with FILE pointer str
  */
 
-object *SS_mk_outport(FILE *str, char *name)
+object *SS_mk_outport(SS_psides *si, FILE *str, char *name)
    {output_port *pp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     if (str != NULL)
        SC_setbuf(str, NULL);
@@ -750,10 +747,9 @@ object *SS_mk_outport(FILE *str, char *name)
 
 /* SS_MK_INTEGER - make an integer object */
 
-object *SS_mk_integer(int64_t i)
+object *SS_mk_integer(SS_psides *si, int64_t i)
    {int64_t *lp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     lp  = CMAKE(int64_t);
     *lp = i;
@@ -768,10 +764,9 @@ object *SS_mk_integer(int64_t i)
 
 /* SS_MK_FLOAT - make an float object */
 
-object *SS_mk_float(double d)
+object *SS_mk_float(SS_psides *si, double d)
    {double *dp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     dp  = CMAKE(double);
     *dp = d;
@@ -786,10 +781,9 @@ object *SS_mk_float(double d)
 
 /* SS_MK_COMPLEX - make an complex object */
 
-object *SS_mk_complex(double _Complex d)
+object *SS_mk_complex(SS_psides *si, double _Complex d)
    {double _Complex *dp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     dp  = CMAKE(double _Complex);
     *dp = d;
@@ -804,10 +798,9 @@ object *SS_mk_complex(double _Complex d)
 
 /* SS_MK_QUATERNION - make an quaternion object */
 
-object *SS_mk_quaternion(quaternion q)
+object *SS_mk_quaternion(SS_psides *si, quaternion q)
    {quaternion *qp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     qp  = CMAKE(quaternion);
     *qp = q;
@@ -822,10 +815,9 @@ object *SS_mk_quaternion(quaternion q)
 
 /* SS_MK_BOOLEAN - encapsulate a BOOLEAN in an object */
 
-object *SS_mk_boolean(char *s, int v)
+object *SS_mk_boolean(SS_psides *si, char *s, int v)
    {SS_boolean *bp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     bp = CMAKE(SS_boolean);
     bp->name  = CSTRSAVE(s);
@@ -846,10 +838,9 @@ object *SS_mk_boolean(char *s, int v)
  *            - bookkeeping this is the C version of cons
  */
 
-object *SS_mk_cons(object *ca, object *cd)
+object *SS_mk_cons(SS_psides *si, object *ca, object *cd)
    {cons *cp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     cp = CMAKE(cons);
     SS_MARK(ca);
@@ -986,10 +977,9 @@ object *SS_mk_object(SS_psides *si,
 
 /* SS_MK_CHAR - make character object */
 
-object *SS_mk_char(int i)
+object *SS_mk_char(SS_psides *si, int i)
    {int *ip;
     object *op;
-    SS_psides *si = &_SS_si;
 
     ip  = CMAKE(int);
     *ip = i;
@@ -1004,12 +994,11 @@ object *SS_mk_char(int i)
 
 /* SS_MK_VECTOR - make a vector object */
 
-object *SS_mk_vector(int l)
+object *SS_mk_vector(SS_psides *si, int l)
    {vector *vp;
     int i;
     object **va;
     object *op;
-    SS_psides *si = &_SS_si;
 
     vp = CMAKE(vector);
     va = CMAKE_N(object *, l);
@@ -1116,43 +1105,43 @@ int _SS_get_object_length(object *obj)
  *                          - and type TYPE to an object
  */
 
-object *_SS_numtype_to_object_id(int id, void *p, long n)
+object *_SS_numtype_to_object_id(SS_psides *si, int id, void *p, long n)
    {object *o;
 
 /* character types (proper) */
     if (SC_is_type_char(id) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
-	o = SS_mk_integer(v);}
+	o = SS_mk_integer(si, v);}
 
 /* fixed point types (proper) */
     else if (SC_is_type_fix(id) == TRUE)
        {long long v;
 	SC_convert_id(SC_LONG_LONG_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
-	o = SS_mk_integer(v);}
+	o = SS_mk_integer(si, v);}
 
 /* floating point types (proper) */
     else if (SC_is_type_fp(id) == TRUE)
        {long double v;
 	SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1, id, p, n, 1, 1, FALSE);
-	o = SS_mk_float(v);}
+	o = SS_mk_float(si, v);}
 
 /* complex floating point types (proper) */
     else if (SC_is_type_cx(id) == TRUE)
        {long double _Complex v;
 	SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 		      id, p, n, 1, 1, FALSE);
-	o = SS_mk_complex(v);}
+	o = SS_mk_complex(si, v);}
 
     else if (id == SC_BOOL_I)
        {bool *v;
 	v = (bool *) p;
-	o = SS_mk_boolean("#boolean", v[n]);}
+	o = SS_mk_boolean(si, "#boolean", v[n]);}
 
     else if (id == SC_QUATERNION_I)
        {quaternion *v;
 	v = (quaternion *) p;
-	o = SS_mk_quaternion(v[n]);};
+	o = SS_mk_quaternion(si, v[n]);};
 
     return(o);}
 
@@ -1163,12 +1152,12 @@ object *_SS_numtype_to_object_id(int id, void *p, long n)
  *                       - and type TYPE to an object
  */
 
-object *_SS_numtype_to_object(char *type, void *p, long n)
+object *_SS_numtype_to_object(SS_psides *si, char *type, void *p, long n)
    {int id;
     object *o;
 
     id = SC_type_id(type, FALSE);
-    o  = _SS_numtype_to_object_id(id, p, n);
+    o  = _SS_numtype_to_object_id(si, id, p, n);
 
     return(o);}
 
@@ -1179,7 +1168,7 @@ object *_SS_numtype_to_object(char *type, void *p, long n)
  *                        - which has type TYPE into a list
  */
 
-object *_SS_numtype_to_list_id(int id, void *p, long n)
+object *_SS_numtype_to_list_id(SS_psides *si, int id, void *p, long n)
    {long i;
     object *o, *lst;
 
@@ -1187,8 +1176,8 @@ object *_SS_numtype_to_list_id(int id, void *p, long n)
 
     if (SC_is_type_num(id) == TRUE)
        {for (i = 0L; i < n; i++)
-	    {o   = _SS_numtype_to_object_id(id, p, i);
-	     lst = SS_mk_cons(o, lst);};}
+	    {o   = _SS_numtype_to_object_id(si, id, p, i);
+	     lst = SS_mk_cons(si, o, lst);};}
 
     else
        SS_error("DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
@@ -1205,12 +1194,12 @@ object *_SS_numtype_to_list_id(int id, void *p, long n)
  *                     - which has type TYPE into a list
  */
 
-object *_SS_numtype_to_list(char *type, void *p, long n)
+object *_SS_numtype_to_list(SS_psides *si, char *type, void *p, long n)
    {int id;
     object *lst;
 
     id  = SC_type_id(type, FALSE);
-    lst = _SS_numtype_to_list_id(id, p, n);
+    lst = _SS_numtype_to_list_id(si, id, p, n);
 
     return(lst);}
 

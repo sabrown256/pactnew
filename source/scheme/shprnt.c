@@ -260,7 +260,7 @@ static object *_SSI_sprintf(SS_psides *si, object *argl)
     SC_set_put_line(pr);
     SC_set_put_string(ps);
 
-    o = SS_mk_string(_SS.bf);
+    o = SS_mk_string(si, _SS.bf);
 
     return(o);}
 
@@ -573,7 +573,7 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
     if (str == NULL)
        SS_error("CAN'T OPEN FILE - TRANSCRIPT-ON", obj);
 
-    si->histdev = SS_mk_outport(str, s);
+    si->histdev = SS_mk_outport(si, str, s);
     si->hist_flag = ALL;
 
     return(SS_t);}
@@ -616,7 +616,7 @@ static object *_SSI_opn_out(SS_psides *si, object *obj)
     if (str == NULL)
        SS_error("CAN'T OPEN FILE - OPEN-OUTPUT-FILE", obj);
 
-    prt = SS_mk_outport(str, s);
+    prt = SS_mk_outport(si, str, s);
 
     CFREE(s);
 
@@ -663,7 +663,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
        SS_error("CAN'T OPEN FILE - CALL-WITH-OUTPUT-FILE", obj);
 
     old_outdev = si->outdev;
-    si->outdev  = SS_mk_outport(str, s);
+    si->outdev  = SS_mk_outport(si, str, s);
     ret        = SS_exp_eval(si, SS_cdr(argl));
     _SSI_cls_out(si, si->outdev);
     si->outdev = old_outdev;
@@ -769,7 +769,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
              if (SS_stringp(desc))
                 PRINT(str, "     %s", SS_STRING_TEXT(desc));
              else
-                {desc = SS_mk_cons(obj, bdy);
+                {desc = SS_mk_cons(si, obj, bdy);
                  SS_MARK(desc);
                  PRINT(str, "     Compound procedure:\n");
 		 bdy = SS_make_form(SS_quoteproc, bdy, LAST);
@@ -790,7 +790,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
              if (SS_stringp(desc))
                 PRINT(str, "     %s", SS_STRING_TEXT(desc));
              else
-                {desc = SS_mk_cons(obj, bdy);
+                {desc = SS_mk_cons(si, obj, bdy);
                  SS_MARK(desc);
                  PRINT(str, "     Compound macro:\n");
 		 bdy = SS_make_form(SS_quoteproc, bdy, LAST);

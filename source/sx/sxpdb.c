@@ -29,7 +29,7 @@ g_file
  *            - value is not changed.
  */
 
-static void _SX_target(int data, int align)
+static void _SX_target(SS_psides *si, int data, int align)
    {int data_max, align_max;
 
     data_max  = 0;
@@ -42,7 +42,7 @@ static void _SX_target(int data, int align)
        {while (PD_std_standards[data_max++]);
         if ((data < 1) || (data >= data_max))
            SS_error("UNKNOWN DATA STANDARD - _SX_TARGET",
-                    SS_mk_integer(data));};
+                    SS_mk_integer(si, data));};
         
     if (align == 0)
        {if (REQ_ALIGNMENT != NULL)
@@ -51,7 +51,7 @@ static void _SX_target(int data, int align)
        {while (PD_std_alignments[align_max++]);
        if ((align < 1) || (align >= align_max))
           SS_error("UNKNOWN DATA ALIGNMENT - _SX_TARGET",
-                   SS_mk_integer(align));};
+                   SS_mk_integer(si, align));};
 
     if (data != 0)
        REQ_STANDARD  = PD_std_standards[data - 1];
@@ -84,10 +84,10 @@ static object *_SXI_target(SS_psides *si, object *arg)
             SC_INT_I, &align,
             0);
 
-    _SX_target(data, align);
+    _SX_target(si, data, align);
 
-    o = SS_mk_cons(SS_mk_integer(data),
-		   SS_mk_integer(align));
+    o = SS_mk_cons(si, SS_mk_integer(si, data),
+		   SS_mk_integer(si, align));
 
     return(o);}
 
@@ -126,7 +126,7 @@ static object *_SXI_open_raw_file(SS_psides *si, object *argl)
     if (_SC_udlp(name) == TRUE)
        return(SS_null);
 
-    _SX_target(data, align);
+    _SX_target(si, data, align);
 
     pa = _PD_get_state(-1);
 
@@ -658,7 +658,7 @@ static object *_SXI_collect_io_info(SS_psides *si, object *arg)
 
     wh = SC_collect_io_info(wh);
 
-    o = SS_mk_integer(wh);
+    o = SS_mk_integer(si, wh);
 
     return(o);}
 
@@ -686,9 +686,9 @@ static object *_SXI_get_io_info(SS_psides *si, object *arg)
 	SC_get_io_info(file->stream, &nh, &ns);
 
 	for (i = 0; i < SC_N_IO_OPER; i++)
-	    {c = SS_mk_cons(SS_mk_integer(nh[i]),
-			    SS_mk_float(ns[i]));
-	     o = SS_mk_cons(c, o);};
+	    {c = SS_mk_cons(si, SS_mk_integer(si, nh[i]),
+			    SS_mk_float(si, ns[i]));
+	     o = SS_mk_cons(si, c, o);};
 
 	o = SS_reverse(o);};
 
@@ -804,7 +804,7 @@ static object *_SXI_entry_number(SS_psides *si, object *argl)
     if (name != NULL)
        {ep = _PD_effective_ep(file, name, TRUE, NULL);
         if (ep != NULL)
-	   obj = SS_mk_integer(PD_entry_number(ep));};
+	   obj = SS_mk_integer(si, PD_entry_number(ep));};
 
     return(obj);}
 
@@ -950,51 +950,51 @@ static object *_SXI_file_info(SS_psides *si, object *argl)
 	fp = file->stream;
 
         if (fp != NULL)
-           obj = SS_mk_integer(lio_tell(fp));
+           obj = SS_mk_integer(si, lio_tell(fp));
         else
-           obj = SS_mk_integer(-1);}
+           obj = SS_mk_integer(si, -1);}
 
     else if (strcmp(name, "name") == 0)
-       obj = SS_mk_string(file->name);
+       obj = SS_mk_string(si, file->name);
 
     else if (strcmp(name, "mode") == 0)
-       obj = SS_mk_integer(file->mode);    
+       obj = SS_mk_integer(si, file->mode);    
 
     else if (strcmp(name, "default-offset") == 0)
-       obj = SS_mk_integer(file->default_offset);    
+       obj = SS_mk_integer(si, file->default_offset);    
 
     else if (strcmp(name, "flushed") == 0)
-       obj = SS_mk_integer(file->flushed);    
+       obj = SS_mk_integer(si, file->flushed);    
 
     else if (strcmp(name, "virtual-internal") == 0)
-       obj = SS_mk_integer(file->virtual_internal);    
+       obj = SS_mk_integer(si, file->virtual_internal);    
 
     else if (strcmp(name, "system-version") == 0)
-       obj = SS_mk_integer(file->system_version);    
+       obj = SS_mk_integer(si, file->system_version);    
 
     else if (strcmp(name, "major-order") == 0)
-       obj = SS_mk_integer(file->major_order);    
+       obj = SS_mk_integer(si, file->major_order);    
 
     else if (strcmp(name, "maximum-size") == 0)
-       obj = SS_mk_integer(file->maximum_size);    
+       obj = SS_mk_integer(si, file->maximum_size);    
 
     else if (strcmp(name, "header-address") == 0)
-       obj = SS_mk_integer(file->headaddr);
+       obj = SS_mk_integer(si, file->headaddr);
 
     else if (strcmp(name, "chart-address") == 0)
-       obj = SS_mk_integer(file->chrtaddr);    
+       obj = SS_mk_integer(si, file->chrtaddr);    
 
     else if (strcmp(name, "symbol-table-address") == 0)
-       obj = SS_mk_integer(file->symtaddr);    
+       obj = SS_mk_integer(si, file->symtaddr);    
 
     else if (strcmp(name, "date") == 0)
-       obj = SS_mk_string(file->date);    
+       obj = SS_mk_string(si, file->date);    
 
     else if (strcmp(name, "previous-file") == 0)
-       obj = SS_mk_string(file->previous_file);    
+       obj = SS_mk_string(si, file->previous_file);    
 
     else if (strcmp(name, "track-pointers") == 0)
-       obj = SS_mk_integer(file->track_pointers);    
+       obj = SS_mk_integer(si, file->track_pointers);    
 
     else
        obj = SS_null;
@@ -1026,7 +1026,7 @@ static object *_SXI_default_offset(SS_psides *si, object *arg)
     if (nargs >= 2)
        file->default_offset = offset;
 
-    o = SS_mk_integer(file->default_offset);
+    o = SS_mk_integer(si, file->default_offset);
 
     return(o);}
 
@@ -1059,7 +1059,7 @@ static object *_SXI_major_order(SS_psides *si, object *arg)
         else
            file->major_order = COLUMN_MAJOR_ORDER;};
 
-    o = SS_mk_integer(file->major_order);
+    o = SS_mk_integer(si, file->major_order);
 
     return(o);}
 
@@ -1094,7 +1094,7 @@ static object *_SXI_file_mode(SS_psides *si, object *arg)
         else
            file->mode = PD_APPEND;}
 
-    o = SS_mk_integer(file->mode);
+    o = SS_mk_integer(si, file->mode);
 
     return(o);}
 
@@ -1108,25 +1108,25 @@ static object *_SXI_file_mode(SS_psides *si, object *arg)
  *  still needed by the pdbfile.
  */
 
-object *_SX_pdbfile_to_list(PDBfile *file)
+object *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file)
    {object *obj, *obj1;
 
     obj = SS_null;
-    obj = SS_mk_cons(SS_mk_integer(file->chrtaddr), obj);
-    obj = SS_mk_cons(SS_mk_integer(file->symtaddr), obj);
-    obj = SS_mk_cons(SS_mk_integer(file->headaddr), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, file->chrtaddr), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, file->symtaddr), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, file->headaddr), obj);
 
     obj1 = SS_mk_hasharr(file->chart);
     SS_UNCOLLECT(obj1);
-    obj = SS_mk_cons(obj1, obj);
+    obj = SS_mk_cons(si, obj1, obj);
 
     obj1 = SS_mk_hasharr(file->host_chart);
     SS_UNCOLLECT(obj1);
-    obj = SS_mk_cons(obj1, obj);
+    obj = SS_mk_cons(si, obj1, obj);
 
     obj1 = SS_mk_hasharr(file->symtab);
     SS_UNCOLLECT(obj1);
-    obj = SS_mk_cons(obj1, obj);
+    obj = SS_mk_cons(si, obj1, obj);
 
     return(obj);}
 
@@ -1137,12 +1137,12 @@ object *_SX_pdbfile_to_list(PDBfile *file)
  *                    - (type diskaddr dimensions)
  */
 
-object *_SX_syment_to_list(syment *ep)
+object *_SX_syment_to_list(SS_psides *si, syment *ep)
    {object *obj;
 
-    obj = _SX_make_dims_obj(PD_entry_dimensions(ep));
-    obj = SS_mk_cons(SS_mk_integer(PD_entry_address(ep)), obj);
-    obj = SS_mk_cons(SS_mk_string(PD_entry_type(ep)), obj);
+    obj = _SX_make_dims_obj(si, PD_entry_dimensions(ep));
+    obj = SS_mk_cons(si, SS_mk_integer(si, PD_entry_address(ep)), obj);
+    obj = SS_mk_cons(si, SS_mk_string(si, PD_entry_type(ep)), obj);
 
     return(obj);}
 
@@ -1154,12 +1154,12 @@ object *_SX_syment_to_list(syment *ep)
  *                    - members (type name dimensions)
  */
 
-object *_SX_defstr_to_list(defstr *dp)
+object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
    {object *obj, *obj1, *o;
     memdes *lst;
 
     obj = SS_null;
-    obj = SS_mk_cons(SS_mk_string(dp->type), obj);
+    obj = SS_mk_cons(si, SS_mk_string(si, dp->type), obj);
 
 /* convert to dimension from a dimdes to a cons list */
     for (lst = dp->members; lst != NULL; lst = lst->next)
@@ -1167,10 +1167,10 @@ object *_SX_defstr_to_list(defstr *dp)
                              SC_STRING_I, lst->name,
                              0);
 
-         obj1 = SS_mk_cons(obj1,
-                           _SX_make_dims_obj(lst->dimensions));
+         obj1 = SS_mk_cons(si, obj1,
+                           _SX_make_dims_obj(si, lst->dimensions));
 
-         obj = SS_mk_cons(obj1, obj);};
+         obj = SS_mk_cons(si, obj1, obj);};
 
     o = SS_reverse(obj);
 
@@ -1183,13 +1183,13 @@ object *_SX_defstr_to_list(defstr *dp)
  *                    - member := (type name dimensions)
  */
 
-static object *_SX_memdes_to_list(memdes *mp)
+static object *_SX_memdes_to_list(SS_psides *si, memdes *mp)
    {object *obj;
 
     obj = SS_make_list(SC_STRING_I, mp->type,
                        SC_STRING_I, mp->name,
                        SC_INT_I, &mp->number,
-                       SS_OBJECT_I, _SX_make_dims_obj(mp->dimensions),
+                       SS_OBJECT_I, _SX_make_dims_obj(si, mp->dimensions),
                        0);
 
     return(obj);}
@@ -1201,16 +1201,18 @@ static object *_SX_memdes_to_list(memdes *mp)
  *                     - (name (type dimension) data)
  */
 
-object *_SX_pdbdata_to_list(char *name, void *vr, syment *ep, PDBfile *file)
+object *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
+			    syment *ep, PDBfile *file)
    {object *obj, *obj1;
 
-    obj1 = _SX_make_dims_obj(PD_entry_dimensions(ep));
-    obj1 = SS_mk_cons(SS_mk_string(PD_entry_type(ep)), obj1);
-    obj1 = SS_mk_cons(SS_mk_string("type"), obj1);
+    obj1 = _SX_make_dims_obj(si, PD_entry_dimensions(ep));
+    obj1 = SS_mk_cons(si, SS_mk_string(si, PD_entry_type(ep)), obj1);
+    obj1 = SS_mk_cons(si, SS_mk_string(si, "type"), obj1);
 
-    obj = _SX_make_list_syment(file, vr, PD_entry_number(ep), PD_entry_type(ep));
-    obj = SS_mk_cons(obj1, obj);
-    obj = SS_mk_cons(SS_mk_string(name), obj);
+    obj = _SX_make_list_syment(si, file, vr,
+			       PD_entry_number(ep), PD_entry_type(ep));
+    obj = SS_mk_cons(si, obj1, obj);
+    obj = SS_mk_cons(si, SS_mk_string(si, name), obj);
 
     return(obj);}
 
@@ -1232,22 +1234,22 @@ static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
        {default     :
         case G_FILE :
 	     if (SX_ipdbfilep(arg))
-	        obj = _SX_pdbfile_to_list(FILE_STREAM(PDBfile, arg));
+	        obj = _SX_pdbfile_to_list(si, FILE_STREAM(PDBfile, arg));
 	     else
-	        obj = _SX_pdbfile_to_list(SX_vif);
+	        obj = _SX_pdbfile_to_list(si, SX_vif);
 	     break;
         case G_DEFSTR :
-	     obj = _SX_defstr_to_list(SS_GET(defstr, arg));
+	     obj = _SX_defstr_to_list(si, SS_GET(defstr, arg));
 	     break;
         case G_SYMENT :
-	     obj = _SX_syment_to_list(SS_GET(syment, arg));
+	     obj = _SX_syment_to_list(si, SS_GET(syment, arg));
              break;
         case G_MEMDES :
-	     obj = _SX_memdes_to_list(SS_GET(memdes, arg));
+	     obj = _SX_memdes_to_list(si, SS_GET(memdes, arg));
              break;
         case G_PDBDATA :
 	     pp = SS_GET(g_pdbdata, arg);
-	     obj = _SX_pdbdata_to_list(pp->name, pp->data,
+	     obj = _SX_pdbdata_to_list(si, pp->name, pp->data,
 				       pp->ep, pp->file);
              break;};
 
@@ -1275,7 +1277,7 @@ static object *_SXI_parse_type(SS_psides *si, object *argl)
        {memdes *desc;
 
         desc = _PD_mk_descriptor(def, 0);
-        ret  = _SX_memdes_to_list(desc);
+        ret  = _SX_memdes_to_list(si, desc);
         _PD_rl_descriptor(desc);};
 
     return(ret);}
@@ -1340,7 +1342,7 @@ static object *_SXI_list_file(SS_psides *si)
 
     obj = SS_null;
     for (po = SX_file_list; po != NULL; po = po->next)
-        obj = SS_mk_cons(po->file_object, obj);
+        obj = SS_mk_cons(si, po->file_object, obj);
 
     return(obj);}
 
@@ -1416,11 +1418,11 @@ static object *_SXI_list_symtab(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (patt == NULL)
-       args = SS_mk_cons(SS_mk_hasharr(file->symtab),
+       args = SS_mk_cons(si, SS_mk_hasharr(file->symtab),
                          SS_null);
     else
-       args = SS_mk_cons(SS_mk_hasharr(file->symtab),
-                         SS_mk_cons(SS_mk_string(patt),
+       args = SS_mk_cons(si, SS_mk_hasharr(file->symtab),
+                         SS_mk_cons(si, SS_mk_string(si, patt),
                                     SS_null));
 
     obj = SS_hash_dump(si, args);
@@ -1473,7 +1475,7 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
 
     obj = SS_null;
     for (i = num - 1; i >= 0; i--)
-        {SS_Assign(obj, SS_mk_cons(SS_mk_string(names[i]), obj));};
+        {SS_Assign(obj, SS_mk_cons(si, SS_mk_string(si, names[i]), obj));};
 
     CFREE(names);
 
@@ -1508,7 +1510,7 @@ static object *_SXI_change_directory(SS_psides *si, object *argl)
     if (!PD_cd(file, dir))
        SS_error("BAD DIRECTORY NAME - _SXI_CHANGE_DIRECTORY", argl);
 
-    o = SS_mk_string(dir);
+    o = SS_mk_string(si, dir);
 
     return(o);}
 
@@ -1543,7 +1545,7 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
            SS_error("UNABLE TO CREATE DIRECTORY - _SXI_MAKE_DIRECTORY",
 		    argl);};
 
-    o = SS_mk_string(dir);
+    o = SS_mk_string(si, dir);
 
     return(o);}
 
@@ -1596,7 +1598,7 @@ static object *_SXI_current_directory(SS_psides *si, object *arg)
     else
        file = FILE_FILE(PDBfile, po);
 
-    o = SS_mk_string(PD_pwd(file));
+    o = SS_mk_string(si, PD_pwd(file));
 
     return(o);}
 
@@ -1628,7 +1630,7 @@ static object *_SXI_create_link(SS_psides *si, object *argl)
     if (!PD_ln(file, oldname, newname))
        SS_error("UNABLE TO CREATE LINK - _SXI_CREATE_LINK", argl);
 
-    o = SS_mk_string(newname);
+    o = SS_mk_string(si, newname);
 
     return(o);}
 
@@ -1711,7 +1713,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
        {PD_byte_order ord;
         object *rest;
 
-        rest = SS_list_tail(argl, n);
+        rest = SS_list_tail(si, argl, n);
         SS_args(rest,
                 SC_ENUM_I, &ord,
                 0);
@@ -1723,7 +1725,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
         long i, no, expb, mantb, sbs, sbe, sbm, hmb, bias;
         object *rest, *ord;
 
-        rest = SS_list_tail(argl, n);
+        rest = SS_list_tail(si, argl, n);
         SS_args(rest,
                 SS_OBJECT_I, &ord,
                 SC_LONG_I, &expb,
@@ -1808,7 +1810,7 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
 
     id = PD_change_primitive(file, ityp, nb, align, fmt, ordr);
 
-    rv = SS_mk_integer(id);
+    rv = SS_mk_integer(si, id);
 
     return(rv);}
 
@@ -2394,20 +2396,20 @@ syment *_SX_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_WRITE_FILEDATA - write a pdbdata object from a PDB file obtained by
- *                   - the function passed in
- *                   -
- *                   - Syntax:
- *                   -    (write-filedata file name (type dimension) data)
- *                   - or
- *                   -    (write-filedata file name pdbdata)
- *                   -
- *                   - this routine will write a pdbdata object
- *                   - if file is missing, the internal virtual file will
- *                   - be used
+/* _SX_WRITE_FILEDATA - write a pdbdata object from a PDB file obtained by
+ *                    - the function passed in
+ *                    -
+ *                    - Syntax:
+ *                    -    (write-filedata file name (type dimension) data)
+ *                    - or
+ *                    -    (write-filedata file name pdbdata)
+ *                    -
+ *                    - this routine will write a pdbdata object
+ *                    - if file is missing, the internal virtual file will
+ *                    - be used
  */
 
-static object *SX_write_filedata(object *argl)
+static object *_SX_write_filedata(SS_psides *si, object *argl)
    {int wrfl, new;
     long number;
     char *type, *ntype, *vrin;
@@ -2450,7 +2452,7 @@ static object *SX_write_filedata(object *argl)
         if (file->virtual_internal == TRUE)
            {vrin         = addr.memaddr;
             addr.memaddr = _PD_alloc_entry(file, type, number);
-            _SX_copy_tree(file, vrin, addr.memaddr, number, type);
+            _SX_copy_tree(si, file, vrin, addr.memaddr, number, type);
             ep = _PD_mk_syment(type, number, addr.diskaddr, NULL, dims);
             SC_mark(addr.memaddr, 1);
 	    _PD_e_install(file, fullpath, ep, TRUE);}
@@ -2514,7 +2516,7 @@ static object *SX_write_filedata(object *argl)
 static object *_SXI_write_pdbdata(SS_psides *si, object *argl)
    {object *rv;
 
-    rv = SX_write_filedata(argl);
+    rv = _SX_write_filedata(si, argl);
 
     return(rv);}
 
@@ -2917,7 +2919,7 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
     else
        bytespitem = _PD_lookup_size(type, file->chart);
 
-    o = SS_mk_integer(bytespitem);
+    o = SS_mk_integer(si, bytespitem);
 
     return(o);}
 
@@ -3117,7 +3119,7 @@ dimdes *_SX_make_dims_dimdes(PDBfile *file, object *argl)
 
 /* _SX_MAKE_DIMS_OBJ - take an object and make a list of integers */
 
-object *_SX_make_dims_obj(dimdes *dims)
+object *_SX_make_dims_obj(SS_psides *si, dimdes *dims)
    {object *obj, *o;
 
 /* if not dimensions, return nothing */
@@ -3126,8 +3128,10 @@ object *_SX_make_dims_obj(dimdes *dims)
 
     else
        {for (obj = SS_null; dims != NULL; dims = dims->next)
-	    obj = SS_mk_cons(SS_mk_cons(SS_mk_integer(dims->index_min), 
-					SS_mk_integer(dims->index_max)),
+	    obj = SS_mk_cons(si,
+			     SS_mk_cons(si,
+					SS_mk_integer(si, dims->index_min), 
+					SS_mk_integer(si, dims->index_max)),
 			     obj);
 
 	o = SS_reverse(obj);};
@@ -3274,7 +3278,7 @@ static object *_SXI_set_switch(SS_psides *si, object *argl)
     if (val != -1)
        PD_print_controls[indx] = val;
 
-    rv = SS_mk_integer(PD_print_controls[indx]);
+    rv = SS_mk_integer(si, PD_print_controls[indx]);
 
     return(rv);}
 
@@ -3305,7 +3309,7 @@ static object *_SXI_get_buffer_size(SS_psides *si)
     object *o;
 
     v = PD_get_buffer_size();
-    o = SS_mk_integer(v);
+    o = SS_mk_integer(si, v);
 
     return(o);}
 
@@ -3319,7 +3323,7 @@ static object *_SXI_get_error(SS_psides *si)
     object *o;
 
     v = PD_get_error();
-    o = SS_mk_string(v);
+    o = SS_mk_string(si, v);
 
     return(o);}
 
@@ -3401,7 +3405,7 @@ static object *_SXI_set_activate_checksum(SS_psides *si, object *argl)
 
     rv = PD_activate_cksum(file, v);
 
-    ov = SS_mk_integer(rv);
+    ov = SS_mk_integer(si, rv);
 
     return(ov);}
 
@@ -3413,7 +3417,7 @@ static object *_SXI_set_activate_checksum(SS_psides *si, object *argl)
  *                     - for that type
  */
 
-static object *_SX_set_user_format(int i, char *format, int whch)
+static object *_SX_set_user_format(SS_psides *si, int i, char *format, int whch)
    {int h1, h2;
     object *rv;
     char **fmts, **fmta;
@@ -3439,15 +3443,15 @@ static object *_SX_set_user_format(int i, char *format, int whch)
 
     if (h1 == TRUE)
        {if (ufmts[i] != NULL)
-	   rv = SS_mk_string(ufmts[i]);
+	   rv = SS_mk_string(si, ufmts[i]);
         else
-	   rv = SS_mk_string(fmts[i]);}
+	   rv = SS_mk_string(si, fmts[i]);}
 
     else if (h2 == TRUE)
        {if (ufmta[i] != NULL)
-	   rv = SS_mk_string(ufmta[i]);
+	   rv = SS_mk_string(si, ufmta[i]);
         else
-	   rv = SS_mk_string(fmta[i]);}
+	   rv = SS_mk_string(si, fmta[i]);}
 
     else
        rv = SS_null;
@@ -3489,15 +3493,15 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(id, format, 3);
+	    {rv = _SX_set_user_format(si, id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(id, format, 1);
+	    {rv = _SX_set_user_format(si, id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(id, format, 2);
+	    {rv = _SX_set_user_format(si, id, format, 2);
 	     ok = TRUE;};};
 
 /* fixed point types (proper) */
@@ -3507,15 +3511,15 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(id, format, 3);
+	    {rv = _SX_set_user_format(si, id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(id, format, 1);
+	    {rv = _SX_set_user_format(si, id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(id, format, 2);
+	    {rv = _SX_set_user_format(si, id, format, 2);
 	     ok = TRUE;};};
 
 /* real floating point types (proper) */
@@ -3525,15 +3529,15 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(id, format, 3);
+	    {rv = _SX_set_user_format(si, id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(id, format, 1);
+	    {rv = _SX_set_user_format(si, id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(id, format, 2);
+	    {rv = _SX_set_user_format(si, id, format, 2);
 	     ok = TRUE;};};
 
 /* complex floating point types (proper) */
@@ -3543,29 +3547,29 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 	 snprintf(s1, MAXLINE, "%s1", typ);
 	 snprintf(s2, MAXLINE, "%s2", typ);
 	 if (strcmp(field, typ) == 0)
-	    {rv = _SX_set_user_format(id, format, 3);
+	    {rv = _SX_set_user_format(si, id, format, 3);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s1) == 0)
-	    {rv = _SX_set_user_format(id, format, 1);
+	    {rv = _SX_set_user_format(si, id, format, 1);
 	     ok = TRUE;}
 
 	 else if (strcmp(field, s2) == 0)
-	    {rv = _SX_set_user_format(id, format, 2);
+	    {rv = _SX_set_user_format(si, id, format, 2);
 	     ok = TRUE;};};
 
     if (ok == FALSE)
        {if (strcmp(field, SC_BOOL_S) == 0)
-	   rv = _SX_set_user_format(SC_BOOL_I, format, 3);
+	   rv = _SX_set_user_format(si, SC_BOOL_I, format, 3);
 
         else if (strcmp(field, "bool1") == 0)
-	   rv = _SX_set_user_format(SC_BOOL_I, format, 1);
+	   rv = _SX_set_user_format(si, SC_BOOL_I, format, 1);
 
 	else if (strcmp(field, "bool2") == 0)
-	   rv = _SX_set_user_format(SC_BOOL_I, format, 2);
+	   rv = _SX_set_user_format(si, SC_BOOL_I, format, 2);
 
 	else if (strcmp(field, "user-int") == 0)
-	   rv = _SX_set_user_format(SC_BIT_I, format, 3);
+	   rv = _SX_set_user_format(si, SC_BIT_I, format, 3);
 
 	else if (strcmp(field, "suppress-member") == 0)
 	   {if (_SC.types.suppress_member != NULL)
@@ -3591,7 +3595,7 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 static object *_SXI_pdb_type(SS_psides *si, object *argl)
    {object *o;
 
-    o = SS_mk_cons(SS_mk_string("type"), argl);
+    o = SS_mk_cons(si, SS_mk_string(si, "type"), argl);
 
     return(o);}
 
@@ -3747,7 +3751,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
 
 	    _PD_rl_syment_d(ep);};
 
-	rv = SS_mk_string(s);};
+	rv = SS_mk_string(si, s);};
 
     return(rv);}
 

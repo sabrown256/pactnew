@@ -30,7 +30,7 @@ static object *_SSI_mk_rectq(SS_psides *si, object *argl)
 	    SC_DOUBLE_I, &q.k,
 	    0);
 
-    o = SS_mk_quaternion(q);
+    o = SS_mk_quaternion(si, q);
 
     return(o);}
 
@@ -70,7 +70,7 @@ static object *_SSI_mk_polarq(SS_psides *si, object *argl)
     q.j = msp*cos(ch);
     q.k = msp*sin(ch);
 
-    o = SS_mk_quaternion(q);
+    o = SS_mk_quaternion(si, q);
 
     return(o);}
 
@@ -91,7 +91,7 @@ static object *_SSI_real_partq(SS_psides *si, object *argl)
 	    SC_QUATERNION_I, &q,
 	    0);
 
-    o = SS_mk_float(q.s);
+    o = SS_mk_float(si, q.s);
 
     return(o);}
 
@@ -112,7 +112,7 @@ static object *_SSI_imag_partq(SS_psides *si, object *argl)
 	    SC_QUATERNION_I, &q,
 	    0);
 
-    o = SS_mk_float(q.i);
+    o = SS_mk_float(si, q.i);
 
     return(o);}
 
@@ -133,7 +133,7 @@ static object *_SSI_jmag_partq(SS_psides *si, object *argl)
 	    SC_QUATERNION_I, &q,
 	    0);
 
-    o = SS_mk_float(q.j);
+    o = SS_mk_float(si, q.j);
 
     return(o);}
 
@@ -154,7 +154,7 @@ static object *_SSI_kmag_partq(SS_psides *si, object *argl)
 	    SC_QUATERNION_I, &q,
 	    0);
 
-    o = SS_mk_float(q.k);
+    o = SS_mk_float(si, q.k);
 
     return(o);}
 
@@ -177,7 +177,7 @@ static object *_SSI_magnitudeq(SS_psides *si, object *argl)
 	    0);
 
     m = PM_qnorm(q);
-    o = SS_mk_float(m);
+    o = SS_mk_float(si, m);
 
     return(o);}
 
@@ -203,7 +203,7 @@ static object *_SSI_angleq(SS_psides *si, object *argl)
 	    0);
 
     th = atan2(sqrt(q.i*q.i + q.j*q.j + q.k*q.k), q.s);
-    o  = SS_mk_float(th);
+    o  = SS_mk_float(si, th);
 
     return(o);}
 
@@ -229,7 +229,7 @@ static object *_SSI_colatq(SS_psides *si, object *argl)
 	    0);
 
     ph = atan2(sqrt(q.j*q.j + q.k*q.k), q.i);
-    o  = SS_mk_float(ph);
+    o  = SS_mk_float(si, ph);
 
     return(o);}
 
@@ -255,7 +255,7 @@ static object *_SSI_longq(SS_psides *si, object *argl)
 	    0);
 
     ch = atan2(q.k, q.j);
-    o  = SS_mk_float(ch);
+    o  = SS_mk_float(si, ch);
 
     return(o);}
 
@@ -277,7 +277,7 @@ static object *_SSI_versorq(SS_psides *si, object *argl)
 	    0);
 
     a = PM_qversor(q);
-    o = SS_mk_quaternion(a);
+    o = SS_mk_quaternion(si, a);
 
     return(o);}
 

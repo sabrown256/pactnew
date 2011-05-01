@@ -22,7 +22,7 @@
  *               - prototype and body
  */
 
-object *_SS_make_funf(object *proto, object *body)
+object *_SS_make_funf(SS_psides *si, object *proto, object *body)
    {int extra;
     object *rest, *o;
 
@@ -36,7 +36,7 @@ object *_SS_make_funf(object *proto, object *body)
             
     if (extra)
        {body = SS_CDR_MACRO(rest);
-	o = SS_append(SS_make_form(_SS_f_defunc, proto, 0),
+	o = SS_append(si, SS_make_form(_SS_f_defunc, proto, 0),
 		      body);}
     else
        o = SS_make_form(_SS_f_defunc, proto, body, 0);

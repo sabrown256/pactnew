@@ -217,11 +217,11 @@ extern SX_file_action
 /* SXCONT.C declarations */
 
 extern object
- *_SX_call_args(int type, void *v),
+ *_SX_call_args(SS_psides *si, int type, void *v),
  *_SXI_menu(SS_psides *si, object *argl);
 
 extern void
- _SX_args(object *obj, void *v, int type),
+ _SX_args(SS_psides *si, object *obj, void *v, int type),
  _SX_get_menu(g_file *po),
  _SX_push_menu_item(g_file *po, char *name, char *type);
 
@@ -343,11 +343,12 @@ extern void
 
 extern object
  *_SX_open_file(object *arg, char *type, char *mode),
- *_SX_pdbfile_to_list(PDBfile *file),
- *_SX_syment_to_list(syment *ep),
- *_SX_defstr_to_list(defstr *dp),
- *_SX_pdbdata_to_list(char *name, void *vr, syment *ep, PDBfile *file),
- *_SX_make_dims_obj(dimdes *dims);
+ *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file),
+ *_SX_syment_to_list(SS_psides *si, syment *ep),
+ *_SX_defstr_to_list(SS_psides *si, defstr *dp),
+ *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
+		      syment *ep, PDBfile *file),
+ *_SX_make_dims_obj(SS_psides *si, dimdes *dims);
 
 extern dimdes
  *_SX_make_dims_dimdes(PDBfile *file, object *argl);
@@ -360,7 +361,7 @@ extern syment
 /* SXPDBC.C declarations */
 
 extern void
- _SX_copy_tree(PDBfile *file, char *vrin, char *vrout,
+ _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 	       long nitems, char *type);
 
 
@@ -383,7 +384,8 @@ extern object
 /* SXPDBL.C declarations */
 
 extern object
- *_SX_make_list_syment(PDBfile *file, void *vr, long nitems, char *type);
+ *_SX_make_list_syment(SS_psides *si, PDBfile *file,
+		       void *vr, long nitems, char *type);
 
 
 /* SXPDBR.C declarations */

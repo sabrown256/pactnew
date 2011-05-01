@@ -73,10 +73,11 @@ void _SX_gc_leaf(PDBfile *file, char *vr, long nitems, char *type)
     defstr *defp;
     memdes *desc, *mem_lst;
     char *svr;
+    SS_psides *si = &_SS_si;
 
     if ((defp = PD_inquire_host_type(file, type)) == NULL)
        SS_error("VARIABLE NOT IN STRUCTURE CHART - _SX_GC_LEAF",
-                SS_mk_string(type));
+                SS_mk_string(si, type));
 
     else
        {mem_lst = defp->members;

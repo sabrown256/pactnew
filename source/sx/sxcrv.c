@@ -164,15 +164,15 @@ void SX_enlarge_dataset(PFVoid eval)
             {snprintf(s, 10, "@%d", i + 1);
              snprintf(t, 10, "@%d", i + 1);};
 
-         o = SS_mk_variable(s, SS_null);
+         o = SS_mk_variable(si, s, SS_null);
          SS_UNCOLLECT(o);
 
 	 pp = _SS_mk_scheme_proc(t, NULL, SS_PR_PROC, _SX.cproc);
 
-         p = SS_mk_proc_object(pp);
+         p = SS_mk_proc_object(si, pp);
          SS_UNCOLLECT(p);
 
-         v = SS_mk_variable(s, o);
+         v = SS_mk_variable(si, s, o);
          SS_UNCOLLECT(v);
 
          SS_GET(variable, o)->value = v;
@@ -556,7 +556,7 @@ object *SX_get_data_domain(SS_psides *si, object *argl)
 	     xt  = SX_dataset[i].wc[1];
 	     xmx = max(xmx, xt);};};
 
-    o = SS_mk_cons(SS_mk_float(xmn), SS_mk_float(xmx));
+    o = SS_mk_cons(si, SS_mk_float(si, xmn), SS_mk_float(si, xmx));
 
     return(o);}
 
@@ -583,7 +583,7 @@ object *SX_get_data_range(SS_psides *si, object *argl)
 	     yt  = SX_dataset[i].wc[3];
 	     ymx = max(ymx, yt);};};
 
-    o = SS_mk_cons(SS_mk_float(ymn), SS_mk_float(ymx));
+    o = SS_mk_cons(si, SS_mk_float(si, ymn), SS_mk_float(si, ymx));
 
     return(o);}
 
