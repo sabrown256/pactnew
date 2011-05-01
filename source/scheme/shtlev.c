@@ -403,7 +403,8 @@ SS_psides *SS_init_scheme(char *code, char *vers)
     si->err_state  = SS_null;
     si->env        = SS_null;
 
-    fr            = SS_mk_new_frame(SS_mk_string(si, "global-environment"),
+    fr            = SS_mk_new_frame(si,
+				    SS_mk_string(si, "global-environment"),
 				    NULL);
     si->global_env = SS_mk_cons(si, fr, SS_null);
     SS_UNCOLLECT(si->global_env);

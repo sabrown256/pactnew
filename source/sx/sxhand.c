@@ -12,7 +12,8 @@
 
 typedef double (*PFDoubleR)(double x);
 typedef double (*PFDoubleRR)(double x, double y);
-typedef PM_mapping *(*PF_PPM_mapping_1)(PM_mapping *f, object *argl);
+typedef PM_mapping *(*PF_PPM_mapping_1)(SS_psides *si, 
+					PM_mapping *f, object *argl);
 typedef PM_mapping *(*PF_PPM_mapping_2)(SS_psides *si,
 					PM_mapping *f, object **argl);
 
@@ -182,7 +183,7 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
 
 /* operate on the data */
     for (i = 0; i < n; i++)
-        w[i] = (*fn)(w[i]);
+        w[i] = fn(w[i]);
 
 /* convert the data back to the correct type in D */
     SC_convert_id(did, d, 0, 1, SC_DOUBLE_I, w, 0, 1, n, FALSE);
@@ -288,7 +289,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
             n  = set->n_elements;
             fn = (PFDoubleR) cp->proc[0];
             for (i = 0; i < n; xp++, i++)
-                *xp = (double) (*fn)(*xp);
+                *xp = fn(*xp);
 
 /* for later
             SX_dataset[j].modified = TRUE;
@@ -324,7 +325,7 @@ object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
        {obj = SS_car(argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
-           (*op)(f, al);
+           op(si, f, al);
 
 	SS_Assign(ret, SS_mk_cons(si, obj, ret));};
          
@@ -356,7 +357,7 @@ void _SX_cmp_b_set(PFVoid oper, PM_set *set, double a, int cmp)
          fnc = (PFDoubleRR) oper;
 	 yp = ya[id];
 	 for (i = 0; i < n; yp++, i++)
-	     *yp = (double) (*fnc)(*yp, a);};
+	     *yp = fnc(*yp, a);};
 
     PM_find_extrema(set);
 

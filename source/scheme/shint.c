@@ -586,12 +586,12 @@ static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	 else if (ityp == SS_HAELEM_I)
 	    {haelem *hp;
 	     hp  = (haelem *) vl;
-	     lst = SS_mk_cons(si, SS_mk_haelem(hp), lst);}
+	     lst = SS_mk_cons(si, SS_mk_haelem(si, hp), lst);}
  
 	 else if (ityp == SS_HASHARR_I)
 	    {hasharr *ht;
 	     ht  = (hasharr *) vl;
-	     lst = SS_mk_cons(si, SS_mk_hasharr(ht), lst);}
+	     lst = SS_mk_cons(si, SS_mk_hasharr(si, ht), lst);}
 
 #endif
  

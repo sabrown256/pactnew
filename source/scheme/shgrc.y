@@ -1314,7 +1314,7 @@ cast_expression :
     unary_expression
 
   | '(' type_name ')' cast_expression
-      {SS_GR_VAL(_SS_make_cast($2, $4));
+      {SS_GR_VAL(_SS_make_cast(SI, $2, $4));
        DIAGNOSTIC($$, "cast");}
   ;
 

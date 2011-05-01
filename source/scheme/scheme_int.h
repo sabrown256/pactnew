@@ -176,9 +176,6 @@ extern SS_psides
 extern void
  _SS_inst_hash(SS_psides *si);
 
-extern object
- *SS_mk_hasharr(hasharr *tb);
-
 
 /* SHCHR.C declarations */
 
@@ -339,6 +336,7 @@ extern int
 
 extern void
  _SS_push_token(SS_psides *si, char *s),
+ _SS_unsupported_syntax(SS_psides *si, char *msg),
  _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag);
 
 

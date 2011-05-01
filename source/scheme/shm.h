@@ -36,7 +36,7 @@
 #define CAPTURE(x)       (SS_MARK(x), x)
 
 #define DIAGNOSTIC(x, y) _SS_diagnostic_synt(SI, x, y, _SS_mps.diagnose_grammar)
-#define SYNTAX_ERR(x)    _SS_unsupported_syntax(x)
+#define SYNTAX_ERR(x)    _SS_unsupported_syntax(SI, x)
 
 /*--------------------------------------------------------------------------*/
 

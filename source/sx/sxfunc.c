@@ -756,7 +756,8 @@ void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
 
 /* _SXI_FILTER_COEF - the n point filter routine */
 
-static PM_mapping *_SXI_filter_coef(PM_mapping *h, object *argl)
+static PM_mapping *_SXI_filter_coef(SS_psides *si, PM_mapping *h,
+				    object *argl)
    {int n, ntimes;
     double *x[PG_SPACEDM];
     C_array *arr;
@@ -781,12 +782,10 @@ static PM_mapping *_SXI_filter_coef(PM_mapping *h, object *argl)
 
 /* _SXI_SMOOTH - the n point smoothing routine */
 
-static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
+static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
    {int i, n, pts, ntimes;
     double *x[PG_SPACEDM];
-    SS_psides *si;
 
-    si = &_SS_si;
 
     GET_DATA_1D(h, n, x[0], x[1]);
 

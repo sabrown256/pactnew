@@ -232,8 +232,8 @@ int _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc)
 
 /* _SS_UNSUPPORTED_SYNTAX - barf on unsupported syntax */
 
-void _SS_unsupported_syntax(char *msg)
-   {SS_psides *si = &_SS_si;
+void _SS_unsupported_syntax(SS_psides *si, char *msg)
+   {
 
     SS_error("UNSUPPORTED SYNTAX", SS_mk_string(si, msg));
 
@@ -274,7 +274,7 @@ void dbgst(SS_psides *si, objp *st)
     char msg[MAXLINE];
 
     if (si == NULL)
-       si = &_SS_si;
+       si = &_SS_si;       /* diagnostic default */
 
 /* count the number of things on the stack */
     for (i = 0;

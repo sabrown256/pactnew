@@ -393,7 +393,7 @@ object *UL_plot(SS_psides *si)
    {double labsp;
 
     if (si == NULL)
-       si = &_SS_si;
+       si = &_SS_si;       /* diagnostic default */
 
     PG_get_attrs_glb(TRUE,
 		     "label-space", &labsp,

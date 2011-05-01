@@ -36,7 +36,7 @@
 #define CAPTURE(x)       (SS_MARK(x), x)
 
 #define DIAGNOSTIC(x, y) _SS_diagnostic_synt(SI, x, y, _SS_cps.diagnose_grammar)
-#define SYNTAX_ERR(x)    _SS_unsupported_syntax(x)
+#define SYNTAX_ERR(x)    _SS_unsupported_syntax(SI, x)
 
 /*--------------------------------------------------------------------------*/
 
@@ -140,7 +140,7 @@ extern object
  *_SS_make_body(object *dcls, object *stmnts),
  *_SS_make_stmnt_lst(SS_psides *si, object *s, object *sl),
  *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl),
- *_SS_make_cast(object *type, object *expr),
+ *_SS_make_cast(SS_psides *si, object *type, object *expr),
  *SS_syntax_c(SS_psides *si, object *str),
  *SS_parse_token_c(void),
  *SS_parse_token_val_c(void);

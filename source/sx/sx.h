@@ -776,9 +776,6 @@ extern int
 
 /* SXGRI.C declarations */
 
-extern object
- *SX_mk_iob(PG_interface_object *iob);
-
 extern void
  SX_end_prog(void *d, PG_event *ev),
  SX_rem_iob(PG_interface_object *iob, int flag);

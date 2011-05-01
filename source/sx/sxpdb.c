@@ -1116,15 +1116,15 @@ object *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file)
     obj = SS_mk_cons(si, SS_mk_integer(si, file->symtaddr), obj);
     obj = SS_mk_cons(si, SS_mk_integer(si, file->headaddr), obj);
 
-    obj1 = SS_mk_hasharr(file->chart);
+    obj1 = SS_mk_hasharr(si, file->chart);
     SS_UNCOLLECT(obj1);
     obj = SS_mk_cons(si, obj1, obj);
 
-    obj1 = SS_mk_hasharr(file->host_chart);
+    obj1 = SS_mk_hasharr(si, file->host_chart);
     SS_UNCOLLECT(obj1);
     obj = SS_mk_cons(si, obj1, obj);
 
-    obj1 = SS_mk_hasharr(file->symtab);
+    obj1 = SS_mk_hasharr(si, file->symtab);
     SS_UNCOLLECT(obj1);
     obj = SS_mk_cons(si, obj1, obj);
 
@@ -1418,11 +1418,14 @@ static object *_SXI_list_symtab(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (patt == NULL)
-       args = SS_mk_cons(si, SS_mk_hasharr(file->symtab),
+       args = SS_mk_cons(si,
+			 SS_mk_hasharr(si, file->symtab),
                          SS_null);
     else
-       args = SS_mk_cons(si, SS_mk_hasharr(file->symtab),
-                         SS_mk_cons(si, SS_mk_string(si, patt),
+       args = SS_mk_cons(si,
+			 SS_mk_hasharr(si, file->symtab),
+                         SS_mk_cons(si,
+				    SS_mk_string(si, patt),
                                     SS_null));
 
     obj = SS_hash_dump(si, args);
@@ -1656,7 +1659,7 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
     else
        strm = FILE_FILE(PDBfile, po);
 
-    obj = SS_make_list(SS_OBJECT_I, SS_mk_hasharr(strm->chart),
+    obj = SS_make_list(SS_OBJECT_I, SS_mk_hasharr(si, strm->chart),
                        SS_OBJECT_I, SS_null,
                        SS_OBJECT_I, sort,
                        0);
@@ -3151,7 +3154,7 @@ static object *_SXI_pdbdata_to_hash(SS_psides *si, object *arg)
     if (!SX_PDBDATAP(arg))
        o = SS_null;
     else
-       o = SS_mk_hasharr(PDBDATA_DATA(arg));
+       o = SS_mk_hasharr(si, PDBDATA_DATA(arg));
 
     return(o);}
 
@@ -3669,9 +3672,9 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_TYPE_CONTAINER - function to hang on SC_contain_hook */
+/* _SX_TYPE_CONTAINER - function to hang on SC_contain_hook */
 
-void SX_type_container(char *dtype, char *stype)
+void _SX_type_container(char *dtype, char *stype)
    {defstr *sp, *dp;
     PDBfile *file;
     g_file *po;

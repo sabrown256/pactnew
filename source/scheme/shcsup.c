@@ -199,11 +199,10 @@ object *_SS_make_mac_decl(SS_psides *si, object *ds, object *idl)
 
 /* _SS_MAKE_CAST - make a cast from TYPE and EXPR */
 
-object *_SS_make_cast(object *type, object *expr)
+object *_SS_make_cast(SS_psides *si, object *type, object *expr)
    {char tname[MAXLINE];
     char *t, *p;
     object *typ, *cast;
-    SS_psides *si = &_SS_si;
 
     SS_args(type,
 	    SC_STRING_I, &t,

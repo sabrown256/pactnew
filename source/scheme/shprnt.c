@@ -181,7 +181,7 @@ void dpreg(SS_psides *si)
    {FILE *str;
     
     if (si == NULL)
-       si = &_SS_si;
+       si = &_SS_si;       /* diagnostic default */
 
     str = SS_OUTSTREAM(si->outdev);
     PRINT(str, "Scheme registers:\n");
@@ -207,7 +207,7 @@ void dprint(SS_psides *si, object *obj)
    {
 
     if (si == NULL)
-       si = &_SS_si;
+       si = &_SS_si;       /* diagnostic default */
 
     if (obj != NULL)
        SS_print(obj, "", "\n", si->outdev);

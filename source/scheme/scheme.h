@@ -915,7 +915,7 @@ extern object
  *SS_nargs(SS_psides *si, C_procedure *cp, object *argl),
  *SS_znargs(SS_psides *si, C_procedure *cp, object *argl),
  *SS_bound_name(SS_psides *si, char *name),
- *SS_mk_new_frame(object *name, hasharr *tab),
+ *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab),
  *SS_lk_var_val(SS_psides *si, object *vr),
  *SS_bind_env(SS_psides *si, object *vr, object *penv);
 
@@ -974,8 +974,8 @@ extern char
 
 extern object
  *SS_hash_dump(SS_psides *si, object *argl),
- *SS_mk_hasharr(hasharr *tb),
- *SS_mk_haelem(haelem *hp);
+ *SS_mk_hasharr(SS_psides *si, hasharr *tb),
+ *SS_mk_haelem(SS_psides *si, haelem *hp);
 
 
 /* SHLARG.C declarations */
