@@ -91,7 +91,7 @@ static object *_UL_fft(object *argl, char *type, int no, int flag, int ordr)
 
 /* UL_FFT - the main controlling routine for the FFT command */
 
-object *UL_fft(int j)
+object *UL_fft(SS_psides *si, int j)
    {int i, n;
     double xmn, xmx;
     double *y, *x;
@@ -243,17 +243,15 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_GET_VALUE - get a list of values from the given curve and return it */
+/* _UL_GET_VALUE - get a list of values from the given curve and return it */
 
-object *UL_get_value(double *sp, double *vp, double val, int n, int id)
+static object *_UL_get_value(SS_psides *si, double *sp, double *vp,
+			     double val, int n, int id)
    {int i;
     char flag;
     double test, y;
     double *z, *z1;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     flag = 'f';
 
@@ -313,11 +311,11 @@ object *UL_curve_eval(SS_psides *si, object *arg)
     else
        value = (double) *SS_GET(double, arg);
 
-    ret = UL_get_value(SX_dataset[i].x[0], SX_dataset[i].x[1], value,
-                       SX_dataset[i].n, SX_dataset[i].id);
+    ret = _UL_get_value(si, SX_dataset[i].x[0], SX_dataset[i].x[1], value,
+			SX_dataset[i].n, SX_dataset[i].id);
     SS_MARK(ret);
 
-    UL_pause(FALSE);
+    UL_pause(si, FALSE);
 
     if (SS_true(ret))
        {SX_prep_ret(ret);}
@@ -331,7 +329,7 @@ object *UL_curve_eval(SS_psides *si, object *arg)
 
 /* UL_GETX - return the x values associated with the given y value */
 
-object *UL_getx(object *obj, object *tok)
+object *UL_getx(SS_psides *si, object *obj, object *tok)
    {int i;
     double value;
     object *tmp, *o;
@@ -342,8 +340,8 @@ object *UL_getx(object *obj, object *tok)
     else
        value = (double) *SS_GET(double, tok);
 
-    tmp = UL_get_value(SX_dataset[i].x[1], SX_dataset[i].x[0], value,
-                       SX_dataset[i].n, SX_dataset[i].id);
+    tmp = _UL_get_value(si, SX_dataset[i].x[1], SX_dataset[i].x[0], value,
+			SX_dataset[i].n, SX_dataset[i].id);
 
     o = SS_make_list(SS_OBJECT_I, obj,
 		     SS_OBJECT_I, tok,
@@ -357,7 +355,7 @@ object *UL_getx(object *obj, object *tok)
 
 /* UL_GETY - return the y values associated with the given x value */
 
-object *UL_gety(object *obj, object *tok)
+object *UL_gety(SS_psides *si, object *obj, object *tok)
    {int i;
     double value;
     object *tmp, *o;
@@ -368,8 +366,8 @@ object *UL_gety(object *obj, object *tok)
     else
        value = (double) *SS_GET(double, tok);
 
-    tmp = UL_get_value(SX_dataset[i].x[0], SX_dataset[i].x[1], value,
-                       SX_dataset[i].n, SX_dataset[i].id);
+    tmp = _UL_get_value(si, SX_dataset[i].x[0], SX_dataset[i].x[1], value,
+			SX_dataset[i].n, SX_dataset[i].id);
 
     o = SS_make_list(SS_OBJECT_I, obj,
 		     SS_OBJECT_I, tok,
@@ -402,18 +400,15 @@ PM_matrix *UL_lsq(PM_matrix *a, PM_matrix *ay)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_FIT - curve fitting routine */
+/* _ULI_FIT - curve fitting routine */
 
-object *UL_fit(object *obj, object *tok)
+static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
    {int i, j, n, sgn, order, aord;
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
     double *cf, **p;
     char *lbl;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     order = 0;
 
@@ -421,7 +416,7 @@ object *UL_fit(object *obj, object *tok)
        order = SS_INTEGER_VALUE(tok);
 
     else
-       SS_error("FIT POWER MUST BE INTEGER - UL_FIT", tok);
+       SS_error("FIT POWER MUST BE INTEGER - _ULI_FIT", tok);
 
     aord = abs(order) + 1;
     j    = SX_get_crv_index_i(obj);
@@ -764,7 +759,7 @@ static void UL_mark_curve_points(double **x, int n, char *indx)
 
 /* _ULI_EDIT - graphically edit a curve */
 
-static object *_ULI_edit(int ie)
+static object *_ULI_edit(SS_psides *si, int ie)
    {int n, i, k, oldc;
     double *x[PG_SPACEDM];
     char *indx;
@@ -776,7 +771,7 @@ static object *_ULI_edit(int ie)
 
     ocv  = SX_dataset + ie;
 
-    crv  = SX_dataset + SX_get_crv_index_i(UL_copy_curve(ie));
+    crv  = SX_dataset + SX_get_crv_index_i(UL_copy_curve(si, ie));
     n    = crv->n;
     x[0]   = crv->x[0];
     x[1]   = crv->x[1];
@@ -844,7 +839,7 @@ static object *_ULI_edit(int ie)
 
 /* UL_DUPX - make a new curve consisting of x vs. x for the given curve */
 
-object *UL_dupx(int j)
+object *UL_dupx(SS_psides *si, int j)
    {char *lbl;
    object *o;
 
@@ -861,15 +856,12 @@ object *UL_dupx(int j)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_STAT - return a list of relevant statistics for the given curve */
+/* _UL_STAT - return a list of relevant statistics for the given curve */
 
-object *UL_stat(int j)
+static object *_UL_stat(SS_psides *si, int j)
    {int n;
     double xmean, xstd, ymean, ystd;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (si->interactive == ON)
        {if ((SX_dataset[j].id >= 'A') &&
@@ -916,9 +908,9 @@ static object *_ULI_stats(SS_psides *si, object *argl)
     for ( ; SS_consp(argl); argl = SS_cdr(argl))
        {i = SX_get_crv_index_i(SS_car(argl));
         if (i != -1)
-           ret = SS_mk_cons(si, UL_stat(i), ret);};
+           ret = SS_mk_cons(si, _UL_stat(si, i), ret);};
          
-    UL_pause(FALSE);
+    UL_pause(si, FALSE);
    
     if (SS_length(ret) == 1)
        o = SS_car(ret);
@@ -930,9 +922,9 @@ static object *_ULI_stats(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_DISP - display the curve points in the given domain */
+/* _ULI_DISP - display the curve points in the given domain */
 
-object *UL_disp(int j, double xmin, double xmax)
+static object *_ULI_disp(int j, double xmin, double xmax)
    {int n, i;
     double *x[PG_SPACEDM];
     object *o;
@@ -1145,7 +1137,7 @@ static object *_ULI_write_abs(SS_psides *si, object *argl)
 
 /* UL_INSTALL_AUX_FUNCS - install the functions defined in this file */
 
-void UL_install_aux_funcs(void)
+void UL_install_aux_funcs(SS_psides *si)
    {
 
     SS_install("cfft",
@@ -1239,7 +1231,7 @@ void UL_install_aux_funcs(void)
     SS_install_cf("fit",
                   "Procedure: Find least-squares fit to the specified curves for a polynomial of order n\n     Usage: fit <curve-list> n",
                   UL_bltocnp, 
-                  UL_fit);
+                  _ULI_fit);
     SS_install_cf("dupx",
                   "Procedure: Duplicate x values so that y = x for each of the specified curves\n     Usage: dupx <curve-list>",
                   UL_uc, 
@@ -1247,7 +1239,7 @@ void UL_install_aux_funcs(void)
     SS_install_cf("disp",
                   "Procedure: Display actual values in specified curves between min and max points\n     Usage: disp <curve-list> <xmin> <xmax>",
                   UL_ul2tocnp, 
-                  UL_disp);
+                  _ULI_disp);
 
     SS_install_cf("fft-order",
                   "Variable: Control the frequency space order of FFTs.\n     Usage: fft_order 0 | 1",

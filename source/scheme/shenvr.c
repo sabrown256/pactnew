@@ -504,7 +504,7 @@ static object *_SS_bound_var(SS_psides *si, char *name,
  * so a C mode define of foo_bar could replace an existing foo-bar
  */
     if ((b == NULL) && (si->name_reproc != NULL))
-       {(*si->name_reproc)(s, name);
+       {(*si->name_reproc)(si, s, name);
 	strcpy(under, s);
 	b = (object *) SC_hasharr_def_lookup(tab, under);};
 
@@ -734,7 +734,7 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
  * for_each into for-each and do the lookup
  */
     if ((obj == NULL) && (si->name_reproc != NULL))
-       {(*si->name_reproc)(s, name);
+       {(*si->name_reproc)(si, s, name);
 	obj = _SS_lk_var_valc(si, s, penv);};
 
 /* if there is no variable complain */

@@ -210,7 +210,7 @@ void SX_assign_next_id(int i, PFVoid fnc)
 	     return;};};
 
     if (fnc != NULL)
-       {(*fnc)();
+       {fnc();
 	SS_error("ALL 26 CURVE ID'S IN USE - SX_ASSIGN_NEXT_ID", SS_null);};
 
     return;}

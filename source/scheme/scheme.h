@@ -109,18 +109,8 @@ typedef struct s_SS_proc procedure;
 typedef struct s_SS_vect vector;
 typedef struct s_SS_psides SS_psides;
 
-typedef void (*PFNameReproc)(char *s, char *name);
-typedef void (*PFPostRead)(object *strm);
-typedef void (*PFPostEval)(object *strm);
-typedef int (*PFPostPrint)(void);
-typedef int (*PFPrGetS)(object *str);
 typedef int (*PFPrChIn)(object *str, int ign_ws);
-typedef void (*PFPrChOut)(int c, object *str);
-typedef void (*PFPrChUn)(int c, object *str);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
-typedef void (*PFExtractArg)(SS_psides *si, object *obj, void *v, int type);
-typedef object *(*PFCallArg)(SS_psides *si, int type, void *v);
-typedef object *(*PFSSRead)(SS_psides *si, object *str);
 typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
 
 #define SS_DEFINE_OBJECT                                                    \
@@ -188,17 +178,17 @@ struct s_SS_psides
     object *evobj;
     object *character_stream;
 
-    PFNameReproc name_reproc;
-    PFSSRead read;
-    PFPostRead post_read;
-    PFPostEval post_eval;
-    PFPostPrint post_print;
-    PFCallArg call_arg;
-    PFExtractArg get_arg;
+    int (*pr_gets)(object *str);
+    int (*post_print)(SS_psides *si);
+    void (*post_read)(SS_psides *si, object *strm);
+    void (*post_eval)(SS_psides *si, object *strm);
+    void (*name_reproc)(SS_psides *si, char *s, char *name);
+    void (*get_arg)(SS_psides *si, object *obj, void *v, int type);
+    object *(*read)(SS_psides *si, object *str);
+    object *(*call_arg)(SS_psides *si, int type, void *v);
 
-    PFPrGetS pr_gets;
-    PFPrChOut pr_ch_out;
-    PFPrChUn pr_ch_un;
+    void (*pr_ch_out)(int c, object *str);
+    void (*pr_ch_un)(int c, object *str);
 
     JMP_BUF cpu;};
 
@@ -1118,7 +1108,7 @@ extern int
 
 extern void
  SS_unput_synt(SS_psides *si, int c),
- SS_name_map_synt(char *d, char *s);
+ SS_name_map_synt(SS_psides *si, char *d, char *s);
 
 extern object
  *SS_lookup_variable(SS_psides *si, char *txt, int verbose),
