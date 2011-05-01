@@ -197,7 +197,7 @@ void SX_plot(void)
  *           - this is the real worker for the si->post_eval
  */
 
-static void _SX_parse(object *strm)
+static void _SX_parse(SS_psides *si, object *strm)
    {
 
     SX_parse(SX_plot, _SX_reproc_in, strm);
@@ -212,13 +212,10 @@ static void _SX_parse(object *strm)
  *          - values and make them explicit
  */
 
-static void _SX_read(object *strm)
+static void _SX_read(SS_psides *si, object *strm)
    {char *s, *ptr, *t, *bf;
     g_file *po;
     PDBfile *file;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     s = NULL;
     SS_args(si->rdobj,
@@ -269,7 +266,7 @@ static void _SX_read(object *strm)
 
 /* _SX_PRINT - the si->post_print function for PDBView */
 
-int _SX_print(void)
+int _SX_print(SS_psides *si)
    {
 
     if (PG_console_device != NULL)

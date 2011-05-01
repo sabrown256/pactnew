@@ -829,7 +829,7 @@ object *SS_load(SS_psides *si, object *argl)
     while (TRUE)
        {SS_Assign(si->rdobj, SS_read(si, strm));
         if (si->post_read != NULL)
-           (*si->post_read)(strm);
+           (*si->post_read)(si, strm);
 
         if (SS_eofobjp(si->rdobj))
            {_SSI_cls_in(si, strm);
@@ -840,7 +840,7 @@ object *SS_load(SS_psides *si, object *argl)
         SS_Restore(si, si->env);
 
         if (si->post_eval != NULL)
-           (*si->post_eval)(strm);};
+           (*si->post_eval)(si, strm);};
 
     _SS_restore_parser(si, prs);
 

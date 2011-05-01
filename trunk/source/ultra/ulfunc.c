@@ -10,7 +10,7 @@
  
 #include "ultra.h"
 
-#define UL_COPY_CURVE(x)     UL_copy_curve(SX_get_crv_index_i(x));
+#define UL_COPY_CURVE(_si, _x)  UL_copy_curve(_si, SX_get_crv_index_i(_x))
 #define advance(j)           (j < (SX_dataset[l].n-1)) ? j++ : j 
 
 #ifndef TOO_MANY_POINTS
@@ -28,7 +28,7 @@ char
 
 /* UL_SELECT - get the designated curve from the menu if it exists */
 
-static object *UL_select(object *s)
+static object *UL_select(SS_psides *si, object *s)
    {int i, j;
     object *ret;
 
@@ -50,7 +50,7 @@ static object *UL_select(object *s)
        SS_error("CURVE HAS < 2 POINTS - UL_SELECT", s);
 
 /* make a copy of the curve and read the data into the copy */
-    ret = UL_copy_curve(i);
+    ret = UL_copy_curve(si, i);
     i   = SX_get_crv_index_i(ret);
 
 /* fetch the curve data out of the cache wherever and however it is done */
@@ -135,7 +135,7 @@ static void _UL_print_label(int i, int j, int md, char *s, int id_flag,
 
 /* _ULI_MENUI - display the menu of the selected curves */
 
-static object *_ULI_menui(object *s)
+static object *_ULI_menui(SS_psides *si, object *s)
    {int i, j, md, id, id_flag;
     char *ss, f[MAXLINE];
     FILE *fp;
@@ -270,7 +270,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
  *           - of the curve label to itself
  */
 
-object *UL_delete(object *s)
+object *UL_delete(SS_psides *si, object *s)
    {int i;
     object *o;
 
@@ -301,9 +301,9 @@ static object *_ULI_erase(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_COLOR - set the color of the specified curve */
+/* _ULI_COLOR - set the color of the specified curve */
 
-static object *UL_color(object *obj, object *color)
+static object *_ULI_color(SS_psides *si, object *obj, object *color)
    {int i;
 
     i = SX_get_crv_index_i(obj);
@@ -316,9 +316,9 @@ static object *UL_color(object *obj, object *color)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_SCATTER - set the scatter attribute of the specified curve */
+/* _ULI_SCATTER - set the scatter attribute of the specified curve */
 
-static object *UL_scatter(object *obj, object *flag)
+static object *_ULI_scatter(SS_psides *si, object *obj, object *flag)
    {int i;
 
     i = SX_get_crv_index_i(obj);
@@ -331,9 +331,9 @@ static object *UL_scatter(object *obj, object *flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_FILL - set the fill attribute of the specified curve */
+/* _ULI_FILL - set the fill attribute of the specified curve */
 
-static object *UL_fill(object *obj, object *flag)
+static object *_ULI_fill(SS_psides *si, object *obj, object *flag)
    {int i;
 
     i = SX_get_crv_index_i(obj);
@@ -376,9 +376,9 @@ static object *_ULI_toggle_logical_op(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_MARKER - set the marker of the specified curve */
+/* _ULI_MARKER - set the marker of the specified curve */
 
-static object *UL_marker(object *obj, object *flag)
+static object *_ULI_marker(SS_psides *si, object *obj, object *flag)
    {int i, mrk, mi;
 
     i = SX_get_crv_index_i(obj);
@@ -389,7 +389,7 @@ static object *UL_marker(object *obj, object *flag)
 
     mrk  = SS_INTEGER_VALUE(flag);
     if ((mrk < 0) || (mrk >= mi))
-       SS_error("BAD MARKER VALUE - UL_MARKER", flag);
+       SS_error("BAD MARKER VALUE - _ULI_MARKER", flag);
 
     SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "MARKER-INDEX", mrk);
@@ -399,9 +399,9 @@ static object *UL_marker(object *obj, object *flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_HIST - set UL_plot the curve as a histogram */
+/* _ULI_HIST - set UL_plot the curve as a histogram */
 
-static object *UL_hist(object *obj, object *flag)
+static object *_ULI_hist(SS_psides *si, object *obj, object *flag)
    {int i, fl, side;
     pcons *info;
     PG_rendering pty;
@@ -438,9 +438,9 @@ static object *UL_hist(object *obj, object *flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_LNWIDTH - set line width of specified curve */
+/* _ULI_LNWIDTH - set line width of specified curve */
 
-static object *UL_lnwidth(object *obj, object *width)
+static object *_ULI_lnwidth(SS_psides *si, object *obj, object *width)
    {int i;
     double wd;
 
@@ -459,9 +459,9 @@ static object *UL_lnwidth(object *obj, object *width)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_LNSTYLE - set line style of specified curve */
+/* _ULI_LNSTYLE - set line style of specified curve */
 
-static object *UL_lnstyle(object *obj, object *style)
+static object *_ULI_lnstyle(SS_psides *si, object *obj, object *style)
    {int i;
 
     i = SX_get_crv_index_i(obj);
@@ -767,7 +767,7 @@ static object *_ULI_quit(SS_psides *si, object *arg)
  *                 - see print_curve_labels
  */
 
-static object *UL_print_labels(int *indx, int nc,
+static object *UL_print_labels(SS_psides *si, int *indx, int nc,
 			       char *regx, char *file, int id_flag,
 			       char *name, int silent)
    {int i, j, np, id, md, nmore, nlp;
@@ -775,9 +775,6 @@ static object *UL_print_labels(int *indx, int nc,
     char f[MAXLINE], *s;
     FILE *fp;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     ret = SS_null;
 
@@ -866,7 +863,7 @@ static object *_ULI_menu(SS_psides *si, object *argl)
             SC_STRING_I, &pn,
             0);
 
-    ret = UL_print_labels(SX_number, SX_N_Curves,
+    ret = UL_print_labels(si, SX_number, SX_N_Curves,
 			  pr, pf, 1, pn, FALSE);
     SX_plot_flag = FALSE;
 
@@ -969,7 +966,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
             SC_STRING_I, &pf,
             0);
 
-    ret = UL_print_labels(SX_data_index, SX_N_Curves,
+    ret = UL_print_labels(si, SX_data_index, SX_N_Curves,
 			  pr, pf, 2, NULL, FALSE);
     SX_plot_flag = FALSE;
 
@@ -980,10 +977,10 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
 
 /* UL_GET_CRV_LIST - return a list of currently plotted curves */
 
-object *UL_get_crv_list(void)
+object *UL_get_crv_list(SS_psides *si)
    {object *ret;
 
-    ret = UL_print_labels(SX_data_index, SX_N_Curves,
+    ret = UL_print_labels(si, SX_data_index, SX_N_Curves,
 			  NULL, NULL, 2, NULL, TRUE);
 
     return(ret);}
@@ -1030,7 +1027,7 @@ static double UL_compose(double a, int i)
 
 /* UL_DERIVATIVE - take the derivative of a list of curves */
 
-static object *UL_derivative(int j)
+static object *UL_derivative(SS_psides *si, int j)
    {int n;
     double *x[PG_SPACEDM];
     char *lbl;
@@ -1066,9 +1063,9 @@ static object *UL_derivative(int j)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_THIN - thin a curve */
+/* _ULI_THIN - thin a curve */
 
-static object *UL_thin(int j, object *argl)
+static object *_ULI_thin(SS_psides *si, int j, object *argl)
    {int n, m;
     double *x[PG_SPACEDM];
     double toler;
@@ -1095,7 +1092,7 @@ static object *UL_thin(int j, object *argl)
        m = PM_thin_1d_der(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
 
     if (m < 1)
-       SS_error("THIN FAILED - UL_THIN", argl);
+       SS_error("THIN FAILED - _ULI_THIN", argl);
 
     if ((SX_dataset[j].id >= 'A') &&
         (SX_dataset[j].id <= 'Z'))
@@ -1115,15 +1112,12 @@ static object *UL_thin(int j, object *argl)
 
 /* UL_FILTER - filter out points from curve that fail domain or range test */
 
-static object *UL_filter(int j, object *argl)
+static object *_ULI_filter(SS_psides *si, int j, object *argl)
    {int i, k, n;
     double xt;
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
     object *dom_pred, *ran_pred, *xexpr, *yexpr, *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     dom_pred = SS_null;
     ran_pred = SS_null;
@@ -1134,9 +1128,9 @@ static object *UL_filter(int j, object *argl)
             0);
 
     if (SS_nullobjp(dom_pred))
-       SS_error("BAD DOMAIN PREDICATE ARGUMENT - UL_FILTER", argl);
+       SS_error("BAD DOMAIN PREDICATE ARGUMENT - _ULI_FILTER", argl);
     if (SS_nullobjp(ran_pred))
-       SS_error("BAD RANGE PREDICATE ARGUMENT - UL_FILTER", argl);
+       SS_error("BAD RANGE PREDICATE ARGUMENT - _ULI_FILTER", argl);
 
     n  = SX_dataset[j].n;
     x[0] = SX_dataset[j].x[0];
@@ -1166,7 +1160,7 @@ static object *UL_filter(int j, object *argl)
     if (k < 2)
        {CFREE(UL_buf1x);
         CFREE(UL_buf1y);
-        SS_error("FEWER THAN TWO POINTS REMAIN - UL_FILTER", SS_null);};
+        SS_error("FEWER THAN TWO POINTS REMAIN - _ULI_FILTER", SS_null);};
 
     SX_dataset[j].n  = k;
     SX_dataset[j].x[0] = UL_buf1x;
@@ -1337,7 +1331,7 @@ static object *_ULI_system(SS_psides *si, object *s)
     strcpy(local, SS_get_string(s));
     SYSTEM(local);
 
-    UL_pause(FALSE);
+    UL_pause(si, FALSE);
 
     return(SS_t);}
 
@@ -1455,9 +1449,9 @@ static object *UL_xmm(int j, double d1, double d2)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_FILTER_COEF - the n point filter routine */
+/* _ULI_FILTER_COEF - the n point filter routine */
 
-static object *UL_filter_coef(int l, object *argl)
+static object *_ULI_filter_coef(SS_psides *si, int l, object *argl)
    {int ntimes;
     C_array *arr;
     object *o;
@@ -1505,15 +1499,12 @@ static object *_ULI_lnnorm(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_SMOOTH - the n point smoothing routine */
+/* _ULI_SMOOTH - the n point smoothing routine */
 
-static object *UL_smooth(int l, object *argl)
+static object *_ULI_smooth(SS_psides *si, int l, object *argl)
    {int i, n, pts, ntimes;
     char *bf;
     object *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     pts = 3;
     ntimes = 1;
@@ -1542,7 +1533,7 @@ static object *UL_smooth(int l, object *argl)
 
         obj = SS_INQUIRE_OBJECT(si, SX_smooth_method);
         if (obj == NULL)
-           {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - UL_SMOOTH",
+           {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - _ULI_SMOOTH",
 			      SX_smooth_method);
 	    SS_error(bf, SS_null);};
 
@@ -1551,7 +1542,7 @@ static object *UL_smooth(int l, object *argl)
 		0);
 
         if (arr == NULL)
-           {bf = SC_dsnprintf(FALSE, "%s IS NOT A FILTER - UL_SMOOTH",
+           {bf = SC_dsnprintf(FALSE, "%s IS NOT A FILTER - _ULI_SMOOTH",
 			      SX_smooth_method);
 	    SS_error(bf, SS_null);};
 
@@ -1569,7 +1560,7 @@ static object *UL_smooth(int l, object *argl)
 
 /* UL_REVERSE - interchange the x and y data for the given curve */
 
-static object *UL_reverse(int j)
+static object *UL_reverse(SS_psides *si, int j)
    {object *rv;
 
     SC_SWAP_VALUE(double *, SX_dataset[j].x[0], SX_dataset[j].x[1]);
@@ -1587,7 +1578,7 @@ static object *UL_reverse(int j)
 
 /* UL_SORT - order the points in a curve */
 
-object *UL_sort(int k)
+object *UL_sort(SS_psides *si, int k)
    {object *o;
 
     PM_val_sort(SX_dataset[k].n, SX_dataset[k].x[0], SX_dataset[k].x[1]);
@@ -1670,7 +1661,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
 
 /* no overlap of curves */
     if (!SX_curvep_a(c))
-       c = UL_COPY_CURVE(a);
+       c = UL_COPY_CURVE(si, a);
 
     i = SX_get_crv_index_i(a);
     j = SX_get_crv_index_i(b);
@@ -1730,7 +1721,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
              UL_buf1y[n] = yv;
              n++;};};
 
-    UL_delete(c);
+    UL_delete(si, c);
 
     if ((SX_dataset[i].id >= 'A') &&
         (SX_dataset[i].id <= 'Z'))
@@ -1774,8 +1765,8 @@ static object *_ULI_append(SS_psides *si, object *argl)
     if (!SX_curvep_a(acc))
        SS_error("BAD FIRST CURVE -  _ULI_APPEND", acc);
     strcpy(local, "Append");
-    target = UL_COPY_CURVE(acc);
-    acc = UL_COPY_CURVE(acc);
+    target = UL_COPY_CURVE(si, acc);
+    acc = UL_COPY_CURVE(si, acc);
     argl = SS_cdr(argl);
 
     for ( ; SS_consp(argl); argl = SS_cdr(argl))
@@ -1792,12 +1783,12 @@ static object *_ULI_append(SS_psides *si, object *argl)
 	        tmp = UL_smp_append(si, acc, b);
              else
 	        tmp = UL_pr_append(si, acc, b);
-             UL_delete(acc);
+             UL_delete(si, acc);
              acc = tmp;};};
 
-    UL_delete(target);
-    target = UL_COPY_CURVE(acc);
-    UL_delete(acc);
+    UL_delete(si, target);
+    target = UL_COPY_CURVE(si, acc);
+    UL_delete(si, acc);
 
     i = SX_get_crv_index_i(target);
     CFREE(SX_dataset[i].text);
@@ -1812,7 +1803,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
 
 /* UL_HIDE - suppress (hide) the plotting of the given curve */
 
-static object *UL_hide(int j)
+static object *UL_hide(SS_psides *si, int j)
    {object *o;
 
     SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INT_P_S,
@@ -1827,7 +1818,7 @@ static object *UL_hide(int j)
 
 /* UL_SHOW - undo a HIDE operation on the given curve */
 
-static object *UL_show(int j)
+static object *UL_show(SS_psides *si, int j)
    {object *o;
 
     SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INT_P_S,
@@ -2284,10 +2275,10 @@ void UL_install_scheme_funcs(SS_psides *si)
 
 /* INSTALL_FUNCS - install Ultra functions in the Ultra hash table */
 
-void UL_install_funcs(void)
+void UL_install_funcs(SS_psides *si)
    {
 
-    UL_install_aux_funcs();
+    UL_install_aux_funcs(si);
 
 /* US handled functions */
 
@@ -2757,31 +2748,31 @@ void UL_install_funcs(void)
     SS_install_cf("color",
                   "Procedure: Set the color of curves\n     Usage: color <curve-list> <color-number>",
                   UL_bltoc, 
-                  UL_color);
+                  _ULI_color);
     SS_install_cf("fill",
                   "Procedure: Fill the area under curves with the specified color\n     Usage: fill <curve-list> <color-number>",
                   UL_bltoc, 
-                  UL_fill);
+                  _ULI_fill);
     SS_install_cf("scatter",
                   "Procedure: Plot curves as scatter plots\n     Usage: scatter <curve-list> on | off",
                   UL_bltoc, 
-                  UL_scatter);
+                  _ULI_scatter);
     SS_install_cf("marker",
                   "Procedure: Set the marker of curves\n     Usage: marker <curve-list> plus | star | triangle",
                   UL_bltoc, 
-                  UL_marker);
+                  _ULI_marker);
     SS_install_cf("histogram",
                   "Procedure: Plot curves as histograms\n     Usage: histogram <curve-list> off | left | right | center",
                   UL_bltoc, 
-                  UL_hist);
+                  _ULI_hist);
     SS_install_cf("lnwidth",
                   "Procedure: Set the line widths of curves\n     Usage: lnwidth <curve-list> <width-number>",
                   UL_bltoc, 
-                  UL_lnwidth);
+                  _ULI_lnwidth);
     SS_install_cf("lnstyle",
                   "Procedure: Set the line styles of curves\n     Usage: lnstyle <curve-list> solid | dotted | dashed | dotdashed",
                   UL_bltoc, 
-                  UL_lnstyle);
+                  _ULI_lnstyle);
 
 /* UL2TOC handled functions */
 
@@ -2799,15 +2790,15 @@ void UL_install_funcs(void)
     SS_install_cf("filter",
                   "Procedure: Return a filtered curve\n     Usage: filter <curve-list> <dom-pred> <ran-pred>",
                   UL_ulntoc,
-                  UL_filter);
+                  _ULI_filter);
     SS_install_cf("filter-coef",
                   "Procedure: Return a curve filtered through coefficents\n     Usage: filter-coef <curve-list> <coeff-array> <ntimes>",
                   UL_ulntoc,
-                  UL_filter_coef);
+                  _ULI_filter_coef);
     SS_install_cf("smoothn",
                   "Procedure: Smooth curves using user specified smooth-method\n     Usage: smoothn <curve-list> <n> <ntimes>",
                   UL_ulntoc, 
-                  UL_smooth);
+                  _ULI_smooth);
 
 /* UC handled functions */
 
@@ -2846,7 +2837,7 @@ void UL_install_funcs(void)
     SS_install_cf("thin",
                   "Procedure: Represent a curve with fewer points\n     Usage: thin <curve-list> <mode> <val>",
                   UL_ulntoc,
-                  UL_thin);
+                  _ULI_thin);
 
     return;}
 

@@ -48,7 +48,7 @@ static char
 
 /* _UL_RD_SCM - do a SCHEME level rd with error protection */
 
-int _UL_rd_scm(SS_psides *si)
+static int _UL_rd_scm(SS_psides *si)
    {
 
     SS_call_scheme(si, "rd",
@@ -62,11 +62,8 @@ int _UL_rd_scm(SS_psides *si)
 
 /* UL_RD_SCM - do a SCHEME level rd with error protection */
 
-int UL_rd_scm(char *name)
+static int UL_rd_scm(SS_psides *si, char *name)
    {int rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     strcpy(_UL_bf, name);
 
@@ -79,11 +76,8 @@ int UL_rd_scm(char *name)
 
 /* UL_INIT_VIEW - initialize the plot parameters */
 
-void UL_init_view(void)
+void UL_init_view(SS_psides *si)
    {int j;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_default_npts      = 100;
     SX_gr_mode           = TRUE;
@@ -292,7 +286,7 @@ int _UL_re_id_crv(object *c)
  *                      - of the other arguments are intermediate results
  */
 
-static void _UL_del_intermediate(object *cla, ...)
+static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
    {int i, na;
     object *lsta, *lstb;
     object *cb, *clb, *clr, **oa;
@@ -335,7 +329,7 @@ static void _UL_del_intermediate(object *cla, ...)
 /* any non-NULL entry is an intermediate result which should now be deleteed */
     for (i = 0; i < na; i++)
         {if (oa[i] != NULL)
-	    UL_delete(oa[i]);};
+	    UL_delete(si, oa[i]);};
 
 /* reassign the ids of the final results */
 #if 0
@@ -361,16 +355,13 @@ static void _UL_del_intermediate(object *cla, ...)
  *           - respective object
  */
 
-static void _UL_parse(object *strm)
+static void _UL_parse(SS_psides *si, object *strm)
    {int na, nb, nr;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SX_parse((PFReplot) UL_plot, _UL_reproc_in, strm);
 
 /* get the list of curves after evaluating the latest expression */
-    SS_Assign(crva, UL_get_crv_list());
+    SS_Assign(crva, UL_get_crv_list(si));
 
 /* identify intermediate results for elimination */
     if (UL_save_intermediate == OFF)
@@ -379,9 +370,9 @@ static void _UL_parse(object *strm)
 	nr = SS_length(si->evobj);
 	if (na > nb+nr)
 	   {if (SS_consp(crvb) == TRUE)
-	       _UL_del_intermediate(crva, crvb, si->val, NULL);
+	       _UL_del_intermediate(si, crva, crvb, si->val, NULL);
 	    else
-	       _UL_del_intermediate(crva, si->val, NULL);};};
+	       _UL_del_intermediate(si, crva, si->val, NULL);};};
 
 /* free the curve lists */
     SS_Assign(crva, SS_null);
@@ -394,11 +385,11 @@ static void _UL_parse(object *strm)
 
 /* _UL_READ - this is the si->post_read function for Ultra */
 
-static void _UL_read(object *strm)
+static void _UL_read(SS_psides *si, object *strm)
    {
 
 /* get the list of curves before evaluating the latest expression */
-    SS_Assign(crvb, UL_get_crv_list());
+    SS_Assign(crvb, UL_get_crv_list(si));
 
     return;}
     
@@ -407,7 +398,7 @@ static void _UL_read(object *strm)
 
 /* _UL_PRINT - the si->post_print function for Ultra */
 
-static int _UL_print(void)
+static int _UL_print(SS_psides *si)
    {
 
     if (PG_console_device != NULL)
@@ -676,7 +667,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
  *               - and return the objectified curve label
  */
 
-object *UL_copy_curve(int j)
+object *UL_copy_curve(SS_psides *si, int j)
    {int i, k;
     double *xpi, *ypi, *xpj, *ypj;
     object *o;
@@ -837,7 +828,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
  *                 - and return the objectified curve
  */
 
-object *UL_xindex_curve(int j)
+object *UL_xindex_curve(SS_psides *si, int j)
    {int i, k, n;
     double *xpi, *ypi, *xpj, *ypj;
     object *o;
@@ -848,10 +839,10 @@ object *UL_xindex_curve(int j)
     SX_assign_next_id(i, (PFVoid) UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
-    SX_dataset[i].wc[0]      = 1.0;
-    SX_dataset[i].wc[1]      = (double) n;
-    SX_dataset[i].wc[2]      = SX_dataset[j].wc[2];
-    SX_dataset[i].wc[3]      = SX_dataset[j].wc[3];
+    SX_dataset[i].wc[0]     = 1.0;
+    SX_dataset[i].wc[1]     = (double) n;
+    SX_dataset[i].wc[2]     = SX_dataset[j].wc[2];
+    SX_dataset[i].wc[3]     = SX_dataset[j].wc[3];
     SX_dataset[i].n         = n;
     SX_dataset[i].file_info = SX_dataset[j].file_info;
     SX_dataset[i].file_type = SX_dataset[j].file_type;
@@ -900,12 +891,9 @@ void UL_print_banner(void)
 
 /* UL_INIT_ENV - setup the overall ULTRA environment */
 
-static void UL_init_env(void)
+static void UL_init_env(SS_psides *si)
    {int i;
     int *plot_type;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* initialize the prefix list */
     for (i = 0; i < NPREFIX; i++)
@@ -949,9 +937,6 @@ static void UL_init_env(void)
 
 object *UL_mode_text(SS_psides *si)
    {object *ret;
-
-    if (si == NULL)
-       si = &_SS_si;
 
     if (PG_console_device == NULL)
        PG_open_console("ULTRA II", SX_console_type, SX_background_color_white,
@@ -1003,9 +988,6 @@ object *UL_mode_graphics(SS_psides *si)
    {object *ret;
     static object *scrwin = NULL;
 
-    if (si == NULL)
-       si = &_SS_si;
-
     if (PG_console_device == NULL)
        {if (!PG_open_console("ULTRA II", SX_console_type,
                              SX_background_color_white,
@@ -1017,10 +999,10 @@ object *UL_mode_graphics(SS_psides *si)
        {SS_set_prompt(si, "U-> ");
         strcpy(si->ans_prompt, "");
 
-        si->post_read  =  _UL_read;
-        si->post_eval  =  _UL_parse;
-        si->post_print =  _UL_print;
-	si->pr_gets         = _SX_get_input;
+        si->post_read  = _UL_read;
+        si->post_eval  = _UL_parse;
+        si->post_print = _UL_print;
+	si->pr_gets    = _SX_get_input;
 	SC_set_put_line(SX_fprintf);
 	SC_set_put_string(SX_fputs);
 	if (PG_console_device == NULL)
@@ -1254,16 +1236,16 @@ int main(int c, char **v)
     SC_init_path(1, "ULTRA");
 
 /* ULTRA initializations not depending on scheme */
-    UL_init_view();
+    UL_init_view(si);
     UL_init_hash();
     UL_install_global_vars(si);
-    UL_install_funcs();
+    UL_install_funcs(si);
 
 /* ULTRA initializations depending on scheme */
     UL_install_scheme_funcs(si);
     UL_init_curves();
 
-    UL_init_env();
+    UL_init_env(si);
 
 /* initialize the available syntax modes */
     DEF_SYNTAX_MODES(si);
@@ -1362,7 +1344,7 @@ int main(int c, char **v)
        {for (i = 0; i < n_files; i++)
 	    {n = order[i];
 	     if (n < 0)
-	        UL_rd_scm(v[-n]);
+	        UL_rd_scm(si, v[-n]);
 	     else
 	        {evalt = SC_cpu_time();
 		 SS_load_scm(si, v[n]);

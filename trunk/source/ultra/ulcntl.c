@@ -47,7 +47,7 @@ object *_ULI_describe(SS_psides *si, object *argl)
             {if (!SS_prim_des(si, si->outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
 
-    UL_pause(TRUE);
+    UL_pause(si, TRUE);
 
     return(SS_f);}
 
@@ -71,7 +71,7 @@ object *_ULI_apropos(SS_psides *si, object *obj)
     if (!flag)
        PRINT(stdout, "No documentation on %s\n", s);
 
-    UL_pause(TRUE);
+    UL_pause(si, TRUE);
 
     return(SS_f);}
 
@@ -530,10 +530,8 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
 
 /* UL_PAUSE - wait if apropriate before going on */
 
-void UL_pause(int pf)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void UL_pause(SS_psides *si, int pf)
+   {
 
     if (pf)
        SX_plot_flag = FALSE;

@@ -195,7 +195,7 @@ static int _SS_repl(SS_psides *si)
         SS_Assign(si->rdobj, SS_read(si, si->indev));
 
         if (si->post_read != NULL)
-           (*si->post_read)(si->indev);
+           (*si->post_read)(si, si->indev);
 
         si->interactive = TRUE;
 
@@ -205,7 +205,7 @@ static int _SS_repl(SS_psides *si)
 	evalt = SC_cpu_time() - evalt;
 
         if (si->post_eval != NULL)
-           (*si->post_eval)(si->indev);
+           (*si->post_eval)(si, si->indev);
 
 /* print the evaluated object */
         if (si->print_flag)
@@ -237,7 +237,7 @@ static int _SS_repl(SS_psides *si)
 		  evalt);};
 
         if (si->post_print != NULL)
-           (*si->post_print)();
+           (*si->post_print)(si);
         else
            PRINT(stdout, "\n");}
 
