@@ -40,7 +40,7 @@ void dproc(SS_psides *si, object *pp)
    {object *name, *params, *penv, *bdy;
 
     if (si == NULL)
-       si = &_SS_si;
+       si = &_SS_si;       /* diagnostic default */
 
     if (SS_procedurep(pp))
        {name   = SS_proc_name(pp);
@@ -71,7 +71,7 @@ void dpenv(SS_psides *si, object *penv)
     object *b;
 
     if (si == NULL)
-       si = &_SS_si;
+       si = &_SS_si;       /* diagnostic default */
 
     if (penv == NULL)
        penv = si->env;
@@ -318,13 +318,13 @@ object *SS_proc_body(object *fun)
 
 /* SS_MK_NEW_FRAME - make a new environmental frame */
 
-object *SS_mk_new_frame(object *name, hasharr *tab)
+object *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab)
    {object *pt, *fr;
 
     if (tab == NULL)
        tab = SC_make_hasharr(HSZHUGE, NODOC, SC_HA_NAME_KEY);
 
-    pt = SS_mk_hasharr(tab);
+    pt = SS_mk_hasharr(si, tab);
 
     fr = SS_make_form(name, pt, LAST);
 
@@ -394,7 +394,7 @@ static object *_SS_mk_frame(SS_psides *si, object *fnm,
 	   {name = SS_VARIABLE_NAME(vrs);
 	    SS_add_to_frame(si, name, vls, tab);};};
 
-    fr = SS_mk_new_frame(fnm, tab);
+    fr = SS_mk_new_frame(si, fnm, tab);
 
     return(fr);}
 

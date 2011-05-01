@@ -246,11 +246,6 @@ extern void
 
 /* SXGC.C declarations */
 
-extern void
- _SX_gc_data(PDBfile *file, void *vr, long nitems, char *type),
- _SX_gc_indirection(PDBfile *file, char **vr, long nitems, char *type),
- _SX_gc_leaf(PDBfile *file, char *vr, long nitems, char *type);
-
 
 /* SXGRI.C declarations */
 
@@ -340,7 +335,7 @@ extern int
  _SX_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr);
 
 extern void
- SX_type_container(char *dtype, char *stype);
+ _SX_type_container(char *dtype, char *stype);
 
 extern object
  *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode),

@@ -258,17 +258,16 @@ static int SX_ultra_binary_filep(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_OPEN_FOR_READING - open a file so that it can be read AND have
- *                     - its pointer moved around
+/* _SX_OPEN_FOR_READING - open a file so that it can be read AND have
+ *                      - its pointer moved around
  */
 
-static FILE *SX_open_for_reading(char *str, char *mode)
+static FILE *_SX_open_for_reading(SS_psides *si, char *str, char *mode)
    {FILE *fp;
-    SS_psides *si = &_SS_si;
 
     fp = io_open(str, mode);
     if (fp == NULL)
-       SS_error("CAN'T OPEN FILE - SX_OPEN_FOR_READING",
+       SS_error("CAN'T OPEN FILE - _SX_OPEN_FOR_READING",
 		SS_mk_string(si, str));
 
     return(fp);}
@@ -320,7 +319,7 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
  * remake the name first because a strcpy in PD_open clobbers it
  */
 	else
-	   {fp = SX_open_for_reading(path, BINARY_MODE_R);
+	   {fp = _SX_open_for_reading(si, path, BINARY_MODE_R);
 	    if (SX_ultra_binary_filep(fp))
 	       {io_close(fp);
 		ret = SS_t;}
@@ -329,7 +328,7 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 	       {io_close(fp);
 
 		if (SC_isfile_text(path))
-		   {fp = SX_open_for_reading(path, "r");
+		   {fp = _SX_open_for_reading(si, path, "r");
 		    if (_SX_ultra_text_filep(fp, '#'))
 		       {io_close(fp);
 			ret = SS_t;};};};};
@@ -540,7 +539,7 @@ object *SX_read_ver1(SS_psides *si, object *obj)
     if (path == NULL)
        SS_error("CAN'T FIND FILE - SX_READ_VER1", obj);
 
-    fp = SX_open_for_reading(path, "r");
+    fp = _SX_open_for_reading(si, path, "r");
     if (fp == NULL)
        {SS_error("NON EXISTENT FILE - SX_READ_VER1", obj);}
 
@@ -648,7 +647,7 @@ object *SX_read_data(SS_psides *si, object *obj)
 /* test for other file types
  * remake the name first because a strcpy in PD_open clobbers it
  */
-       {fp = SX_open_for_reading(path, BINARY_MODE_R);
+       {fp = _SX_open_for_reading(si, path, BINARY_MODE_R);
 
 	if (SX_ultra_binary_filep(fp))
 	   {_SX_read_bin(si, fp, fname);
@@ -659,7 +658,7 @@ object *SX_read_data(SS_psides *si, object *obj)
 	else
 	   {io_close(fp);
 
-	     fp = SX_open_for_reading(path, "r");
+	     fp = _SX_open_for_reading(si, path, "r");
 	     if (_SX_ultra_text_filep(fp, '#'))
 	        {_SX_read_text(si, fp, fname);
 		 k = SX_next_prefix();
@@ -882,9 +881,6 @@ object *SX_read_text_table(SS_psides *si, object *argl)
     char *bf, *pbf, *name, *token;
     FILE *fp;
     object *o;
-
-/*    if (si == NULL)
-       si = &_SS_si; */
 
     memset(label, 0, MAXLINE);
 
@@ -1226,9 +1222,6 @@ object *SX_write_data(SS_psides *si, object *argl)
    {char *mode, *fname, *type;
     SC_file_type imode;
     object *fobj, *frst;
-
-/*    if (si == NULL)
-       si = &_SS_si; */
 
     if (_SX.files == NULL)
        _SX.files = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);

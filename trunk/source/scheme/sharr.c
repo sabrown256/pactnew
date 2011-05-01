@@ -42,7 +42,7 @@ static object *_SSI_hash_install(SS_psides *si, object *argl)
  */
     SC_mark(hp, 1);
 
-    obj = SS_mk_haelem(hp);
+    obj = SS_mk_haelem(si, hp);
 
     CFREE(name);
 
@@ -205,7 +205,7 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
        SS_error("BAD ARGUMENT - MAKE-HASH-TABLE", arg);
 
     tab = SC_make_hasharr(sz, NODOC, SC_HA_NAME_KEY);
-    op  = SS_mk_hasharr(tab);
+    op  = SS_mk_hasharr(si, tab);
 
     return(op);}
 
@@ -262,9 +262,8 @@ static void _SS_rl_hasharr(object *obj)
 
 /* SS_MK_HASHARR - make HASH_ARRAY object */
 
-object *SS_mk_hasharr(hasharr *tb)
+object *SS_mk_hasharr(SS_psides *si, hasharr *tb)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, tb, SS_HASHARR_I, SELF_EV, NULL,
 		      _SS_wr_hasharr, _SS_rl_hasharr);
@@ -304,9 +303,8 @@ static void _SS_rl_haelem(object *obj)
 
 /* SS_MK_HAELEM - make HAELEM object */
 
-object *SS_mk_haelem(haelem *hp)
+object *SS_mk_haelem(SS_psides *si, haelem *hp)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     SC_mark(hp, 1);
 
@@ -388,7 +386,7 @@ void _SS_inst_hash(SS_psides *si)
                _SSI_make_hasharr, SS_PR_PROC);
 
 
-    SS_scheme_symtab = SS_mk_hasharr(si->symtab);
+    SS_scheme_symtab = SS_mk_hasharr(si, si->symtab);
     SC_hasharr_install(si->symtab, "system-hash-table",
 		       SS_scheme_symtab, SS_POBJECT_S, TRUE, TRUE);
     SS_UNCOLLECT(SS_scheme_symtab);

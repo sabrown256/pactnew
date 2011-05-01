@@ -138,7 +138,7 @@ void SX_init(char *code, char *vers)
 /* PANACEA initializations */
     PA_def_str(SX_vif);
 
-    _SX_var_tab = SS_mk_hasharr(PA_variable_tab);
+    _SX_var_tab = SS_mk_hasharr(si, PA_variable_tab);
     SS_UNCOLLECT(_SX_var_tab);
     if (SC_hasharr_install(si->symtab, "pa-variable-table", _SX_var_tab,
 			   SS_POBJECT_S, TRUE, TRUE) == NULL)
@@ -165,7 +165,7 @@ void SX_init(char *code, char *vers)
 
     SC_gs.atof           = SC_atof;
     SC_gs.strtod         = SC_strtod;
-    SC_gs.type_container = SX_type_container;
+    SC_gs.type_container = _SX_type_container;
 
     SX_file_exist_action = FAIL;
 

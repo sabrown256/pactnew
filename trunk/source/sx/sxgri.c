@@ -28,6 +28,51 @@ double
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_WR_GIOB - print a g_interface_object */
+
+static void _SX_wr_giob(object *obj, object *strm)
+   {
+
+    PRINT(SS_OUTSTREAM(strm), "<INTERFACE_OBJECT|%s>",
+                              INTERFACE_OBJECT_NAME(obj));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_RL_GIOB - gc a interface_object */
+
+static void _SX_rl_giob(object *obj)
+   {int rc;
+    PG_interface_object *iob;
+
+    iob = INTERFACE_OBJECT(obj);
+    rc  = SC_mark(iob, -1);
+    if (rc < 1)
+       SX_rem_iob(iob, TRUE);
+
+    SS_rl_object(obj);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_MK_IOB - encapsulate a PG_interface_object as an object */
+
+static object *_SX_mk_iob(SS_psides *si, PG_interface_object *iob)
+   {object *op;
+
+    op = SS_mk_object(si, iob, G_INTERFACE_OBJECT, SELF_EV, iob->name,
+		      _SX_wr_giob, _SX_rl_giob);
+    SC_mark(iob, 1);
+
+    return(op);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SX_END_PROG - end the program */
 
 void SX_end_prog(void *d, PG_event *ev)
@@ -295,7 +340,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     iob = SX_add_text_ann(dev, ndc, s, clr, aln, ang*DEG_RAD);
 
     if (iob != NULL)
-       rv = SX_mk_iob(iob);
+       rv = _SX_mk_iob(si, iob);
 
     return(rv);}
 
@@ -344,52 +389,6 @@ void SX_rem_iob(PG_interface_object *iob, int flag)
              break;};};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GIOB - print a g_interface_object */
-
-static void _SX_wr_giob(object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<INTERFACE_OBJECT|%s>",
-                              INTERFACE_OBJECT_NAME(obj));
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_RL_GIOB - gc a interface_object */
-
-static void _SX_rl_giob(object *obj)
-   {int rc;
-    PG_interface_object *iob;
-
-    iob = INTERFACE_OBJECT(obj);
-    rc  = SC_mark(iob, -1);
-    if (rc < 1)
-       SX_rem_iob(iob, TRUE);
-
-    SS_rl_object(obj);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MK_IOB - encapsulate a PG_interface_object as an object */
-
-object *SX_mk_iob(PG_interface_object *iob)
-   {object *op;
-    SS_psides *si = &_SS_si;
-
-    op = SS_mk_object(si, iob, G_INTERFACE_OBJECT, SELF_EV, iob->name,
-		      _SX_wr_giob, _SX_rl_giob);
-    SC_mark(iob, 1);
-
-    return(op);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

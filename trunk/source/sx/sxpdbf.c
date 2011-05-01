@@ -142,7 +142,7 @@ object *_SXI_find_types(SS_psides *si, object *arg)
     _SX_find_data(tytab, file, vr, nitems, type);
 
 /* convert table to list */
-    args = SS_mk_cons(si, SS_mk_hasharr(tytab), SS_null);
+    args = SS_mk_cons(si, SS_mk_hasharr(si, tytab), SS_null);
     obj = SS_hash_dump(si, args);
 
 /* delete hash table */

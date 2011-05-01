@@ -10,21 +10,9 @@
  
 #include "sx_int.h"
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_GC_DATA - garbage collect a variable */
-
-void _SX_gc_data(PDBfile *file, void *vr, long nitems, char *type)
-   {
-
-/* if the type is an indirection, follow the pointer */
-    if (_PD_indirection(type))
-       _SX_gc_indirection(file, (char **) vr, nitems, type);
-    else
-       _SX_gc_leaf(file,  vr, nitems, type);
-
-    return;}
+static void
+ _SX_gc_data(SS_psides *si, PDBfile *file,
+	     void *vr, long nitems, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -33,7 +21,8 @@ void _SX_gc_data(PDBfile *file, void *vr, long nitems, char *type)
  *                    - i.e. a pointer
  */
 
-void _SX_gc_indirection(PDBfile *file, char **vr, long nitems, char *type)
+static void _SX_gc_indirection(SS_psides *si, PDBfile *file,
+			       char **vr, long nitems, char *type)
    {long i, ditems;
     char *dtype, *bf;
 
@@ -55,7 +44,7 @@ void _SX_gc_indirection(PDBfile *file, char **vr, long nitems, char *type)
              SS_error(bf, SS_null);};
 
 /* if the type is an indirection, follow the pointer */
-	 _SX_gc_data(file, (char **) DEREF(vr), ditems, dtype);
+	 _SX_gc_data(si, file, (char **) DEREF(vr), ditems, dtype);
 	 
 	 CFREE(DEREF(vr));};
 
@@ -68,12 +57,12 @@ void _SX_gc_indirection(PDBfile *file, char **vr, long nitems, char *type)
 
 /* _SX_GC_LEAF - GC indirect members of leaf */
 
-void _SX_gc_leaf(PDBfile *file, char *vr, long nitems, char *type)
+static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
+			char *vr, long nitems, char *type)
    {long ii, sz;
+    char *svr;
     defstr *defp;
     memdes *desc, *mem_lst;
-    char *svr;
-    SS_psides *si = &_SS_si;
 
     if ((defp = PD_inquire_host_type(file, type)) == NULL)
        SS_error("VARIABLE NOT IN STRUCTURE CHART - _SX_GC_LEAF",
@@ -90,11 +79,28 @@ void _SX_gc_leaf(PDBfile *file, char *vr, long nitems, char *type)
 
 		 for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {if (_PD_indirection(desc->type))
-			 _SX_gc_indirection(file,
+			 _SX_gc_indirection(si, file,
 					    (char **) (svr + desc->member_offs),
 					    desc->number, desc->type);};};};};
 
 /* CFREE(vr); */
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_GC_DATA - garbage collect a variable */
+
+static void _SX_gc_data(SS_psides *si, PDBfile *file,
+			void *vr, long nitems, char *type)
+   {
+
+/* if the type is an indirection, follow the pointer */
+    if (_PD_indirection(type))
+       _SX_gc_indirection(si, file, (char **) vr, nitems, type);
+    else
+       _SX_gc_leaf(si, file,  vr, nitems, type);
 
     return;}
 
