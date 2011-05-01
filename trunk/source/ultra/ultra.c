@@ -922,7 +922,7 @@ static void UL_init_env(void)
 			 plot_type, NULL, NULL);
 
 /* add the SX annotation stuff */
-    _SX_install_pgs_iob();
+    _SX_install_pgs_iob(si);
 
 /* these lisp package special variables are initialized in all modes */
     SS_set_print_err_func(NULL, TRUE);
@@ -1034,7 +1034,7 @@ object *UL_mode_graphics(SS_psides *si)
 
 	if (SX_graphics_device != NULL)
 	   {if (scrwin == NULL)
-	       {scrwin = SX_mk_graphics_device(SX_graphics_device);
+	       {scrwin = SX_mk_graphics_device(si, SX_graphics_device);
 		SS_install_cv("screen-window", scrwin, SS_OBJECT_I);
 		SS_UNCOLLECT(scrwin);}
  	    else
@@ -1256,11 +1256,11 @@ int main(int c, char **v)
 /* ULTRA initializations not depending on scheme */
     UL_init_view();
     UL_init_hash();
-    UL_install_global_vars();
+    UL_install_global_vars(si);
     UL_install_funcs();
 
 /* ULTRA initializations depending on scheme */
-    UL_install_scheme_funcs();
+    UL_install_scheme_funcs(si);
     UL_init_curves();
 
     UL_init_env();

@@ -771,7 +771,7 @@ object *LR_var_plot(SS_psides *si, object *argl)
 					   lwidth, 0.0, 0.0, 0.0,
 					   HUGE);
         
-        gr = SX_mk_graph(g);}
+        gr = SX_mk_graph(si, g);}
 
     else
        gr = SS_f;
@@ -1033,18 +1033,10 @@ object *LR_def_domain(SS_psides *si, object *argl)
 /* now make the domain map and the domain arrays */
     ret = SS_make_list(SC_STRING_I, "domain",
                        SC_INTEGER_I, &space,
-                       SS_OBJECT_I, SX_mk_set(dom),
-                       SS_OBJECT_I, SX_mk_C_array(arr),
+                       SS_OBJECT_I, SX_mk_set(si, dom),
+                       SS_OBJECT_I, SX_mk_C_array(si, arr),
                        0);
-/*
-    ret = SS_mk_cons(SS_mk_string("domain"),
-                     SS_mk_cons(SS_mk_integer(space),
-                                SS_mk_cons(SS_mk_guest(SS_mk_object(dom, G_SET),
-                                                       TRUE),
-                                           SS_mk_guest(SS_mk_object(arr,
-                                                                    G_NUM_ARRAY),
-                                                       TRUE))));
-*/
+
     return(ret);}
 
 /*--------------------------------------------------------------------------*/

@@ -208,57 +208,57 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
              if (v == NULL)
                 obj = SX_ovif;
              else
-                obj = SX_mk_gfile((g_file *) v);
+                obj = SX_mk_gfile(si, (g_file *) v);
              break;
 
         case G_DEVICE :
              if (v != NULL)
-                obj = SX_mk_graphics_device((PG_device *) v);
+                obj = SX_mk_graphics_device(si, (PG_device *) v);
              break;
 
         case G_SET :
              if (v != NULL)
-                obj = SX_mk_set((PM_set *) v);
+                obj = SX_mk_set(si, (PM_set *) v);
              break;
 
         case G_MAPPING :
              if (v != NULL)
-                obj = SX_mk_mapping((PM_mapping *) v);
+                obj = SX_mk_mapping(si, (PM_mapping *) v);
              break;
 
         case G_GRAPH :
              if (v != NULL)
-                obj = SX_mk_graph((PG_graph *) v);
+                obj = SX_mk_graph(si, (PG_graph *) v);
              break;
 
         case G_NUM_ARRAY :
              if (v != NULL)
-                obj = SX_mk_C_array((C_array *) v);
+                obj = SX_mk_C_array(si, (C_array *) v);
              break;
 
         case G_IMAGE :
              if (v != NULL)
-                obj = SX_mk_image((PG_image *) v);
+                obj = SX_mk_image(si, (PG_image *) v);
              break;
 
         case G_PACKAGE :
              if (v != NULL)
-                obj = SX_mk_package((PA_package *) v);
+                obj = SX_mk_package(si, (PA_package *) v);
              break;
 
         case G_PANVAR :
              if (v != NULL)
-                obj = SX_mk_variable((PA_variable *) v);
+                obj = SX_mk_variable(si, (PA_variable *) v);
              break;
 
         case G_DEFSTR :
              if (v != NULL)
-                obj = _SX_mk_gdefstr((defstr *) v);
+                obj = _SX_mk_gdefstr(si, (defstr *) v);
              break;
 
         case G_SYMENT :
              if (v != NULL)
-                obj = _SX_mk_gsyment((syment *) v);
+                obj = _SX_mk_gsyment(si, (syment *) v);
              break;
 
         case G_PDBDATA  :
@@ -1033,7 +1033,7 @@ void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
 
 /* SX_INSTALL_GLOBAL_VARS - install the global variables */
 
-void SX_install_global_vars(void)
+void SX_install_global_vars(SS_psides *si)
    {int i;
     int *sqzlab, *refm, *refmc, *hider;
     int *hsts, *nlev, *scat, *cmtex, *intf, *mrki;
@@ -1047,9 +1047,6 @@ void SX_install_global_vars(void)
     double *errcsz, *labsp, *labyo, *mrks;
     char **axslxf, **axslyf, **axstf, **txtfm;
     PG_rendering *ppty;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     PG_setup_attrs_glb();
 

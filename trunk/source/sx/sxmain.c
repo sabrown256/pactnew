@@ -170,7 +170,7 @@ int main(int c, char **v, char **env)
 	prog = "pdbview";
 
         SX_init_view();
-        SX_install_global_vars();
+        SX_install_global_vars(si);
         SX_init_mappings();
         SX_init_env();
 
@@ -201,9 +201,9 @@ int main(int c, char **v, char **env)
 
     if (pvflag)
        {if (SX_gr_mode)
-	   SX_mode_graphics();
+	   SX_mode_graphics(si);
         else
-           SX_mode_text();
+           SX_mode_text(si);
 
         PG_expose_device(PG_console_device);};
 

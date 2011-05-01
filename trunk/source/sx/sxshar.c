@@ -102,7 +102,7 @@ static object *TR_spokep(SS_psides *si, object *arg)
  
 /* SX_INSTALL_FILE_FUNCS - install the generic binary file functions */
  
-void SX_install_file_funcs(void)
+void SX_install_file_funcs(SS_psides *si)
    {
 
     SS_install("file-type",

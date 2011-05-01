@@ -81,9 +81,8 @@ static void _SX_wr_gpackage(object *obj, object *strm)
 
 /* SX_MK_PACKAGE - make and return a g_package */
 
-object *SX_mk_package(PA_package *pck)
+object *SX_mk_package(SS_psides *si, PA_package *pck)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, pck, G_PACKAGE, SELF_EV, pck->name,
 		      _SX_wr_gpackage, SS_rl_object);
@@ -107,9 +106,8 @@ static void _SX_wr_gvariable(object *obj, object *strm)
 
 /* SX_MK_VARIABLE - make and return a g_variable */
 
-object *SX_mk_variable(PA_variable *pp)
+object *SX_mk_variable(SS_psides *si, PA_variable *pp)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, pp, G_PANVAR, SELF_EV, pp->name,
 		      _SX_wr_gvariable, SS_rl_object);
@@ -124,9 +122,8 @@ object *SX_mk_variable(PA_variable *pp)
 
 /* SX_MK_SOURCE_VARIABLE - make and return a g_source_variable */
 
-static object *SX_mk_source_variable(PA_src_variable *sv)
+static object *SX_mk_source_variable(SS_psides *si, PA_src_variable *sv)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, sv, G_SOURCE_VARIABLE, SELF_EV, sv->name,
 		      _SX_wr_gsource_variable, SS_rl_object);
@@ -151,9 +148,8 @@ static void _SX_wr_gsource_variable(object *obj, object *strm)
 
 /* SX_MK_IV_SPECIFICATION - make and return a g_iv_specification */
 
-static object *SX_mk_iv_specification(PA_iv_specification *iv)
+static object *SX_mk_iv_specification(SS_psides *si, PA_iv_specification *iv)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, iv, G_IV_SPECIFICATION, SELF_EV, iv->name,
 		      _SX_wr_giv_specification, SS_rl_object);
@@ -621,7 +617,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
         PA_inst_c(vname, vaddr, itype, 0, (PFVoid) PA_pshand, PA_sargs);};
 
-    obj = SX_mk_variable(pp);
+    obj = SX_mk_variable(si, pp);
 
     return(obj);}
  
@@ -676,7 +672,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
  * evaluations
  */
          SS_def_var(si, obj,
-                    SX_mk_package(pck),
+                    SX_mk_package(si, pck),
                     si->global_env);
 
          SS_end_cons(lst, lst_nxt, obj);};
@@ -713,7 +709,7 @@ static object *_SXI_intern_packages(SS_psides *si)
  * evaluations
  */
          SS_def_var(si, obj,
-                    SX_mk_package(pck),
+                    SX_mk_package(si, pck),
                     si->global_env);
 
          SS_end_cons(lst, lst_nxt, obj);};
@@ -906,7 +902,7 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
 
 	    SC_convert_id(SC_DOUBLE_I, dp, 0, 1, id, pd, 0, 1, n, FALSE);};
 
-	rv = SX_mk_C_array(arr);};
+	rv = SX_mk_C_array(si, arr);};
 
     return(rv);}
 
@@ -935,10 +931,8 @@ static object *_SXI_wr_restart(SS_psides *si, object *argl)
  
 /* SX_INSTALL_PANACEA_FUNCS - install the PANACEA extensions to Scheme */
  
-void SX_install_panacea_funcs(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SX_install_panacea_funcs(SS_psides *si)
+   {
 
     SS_install("pa-advance-name",
                "Advance the given file name",

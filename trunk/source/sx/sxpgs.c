@@ -112,7 +112,8 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
 	    {f->domain->opers = NULL;
 	     f->range->opers  = NULL;};
 
-	rv = SX_pdbdata_handler(file, name, "PM_mapping *", &(g->f) , TRUE);};
+	rv = SX_pdbdata_handler(si, file, name,
+				"PM_mapping *", &(g->f) , TRUE);};
 
     CFREE(name);
 
@@ -123,7 +124,8 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
 
 /* _SX_PDBDATA_GRAPH - worker for mapping side of _SXI_pdbdata_graph */
 
-static object *_SX_pdbdata_graph(PDBfile *file, char *name, syment *ep)
+static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
+				 char *name, syment *ep)
    {int ndd, ndr, clr, ret;
     char dname[MAXLINE];
     char *info_type, *tail;
@@ -213,7 +215,7 @@ static object *_SX_pdbdata_graph(PDBfile *file, char *name, syment *ep)
     if (_SX.ig > 'Z')
        _SX.ig = 'A';
 
-    o = SX_mk_graph(g);
+    o = SX_mk_graph(si, g);
 
     return(o);}
 
@@ -222,7 +224,8 @@ static object *_SX_pdbdata_graph(PDBfile *file, char *name, syment *ep)
 
 /* _SX_PDBCURVE_GRAPH - worker for curve side of _SXI_pdbdata_graph */
 
-static object *_SX_pdbcurve_graph(PDBfile *file, char *name, syment *ep)
+static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
+				  char *name, syment *ep)
    {int n, clr;
     char label[MAXLINE];
     double *x, *y;
@@ -250,7 +253,7 @@ static object *_SX_pdbcurve_graph(PDBfile *file, char *name, syment *ep)
     if (_SX.icg > 1000)
        _SX.icg = 1;
 
-    o = SX_mk_graph(g);
+    o = SX_mk_graph(si, g);
 
     return(o);}
 
@@ -321,10 +324,10 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
        return(SS_null);
 
     if (strcmp(PD_entry_type(ep), "PM_mapping *") == 0)
-       return(_SX_pdbdata_graph(file, name, ep));
+       return(_SX_pdbdata_graph(si, file, name, ep));
 
     else if (SC_strstr(name, "curve") != NULL)
-       return(_SX_pdbcurve_graph(file, name, ep));
+       return(_SX_pdbcurve_graph(si, file, name, ep));
 
     else if (strcmp(PD_entry_type(ep), "PG_image *") == 0)
        /* GOTCHA: images are not currently handled */;
@@ -371,9 +374,8 @@ static void _SX_rl_ggraph(object *obj)
 
 /* SX_MK_GRAPH - encapsulate a PG_graph as an object */
 
-object *SX_mk_graph(PG_graph *g)
+object *SX_mk_graph(SS_psides *si, PG_graph *g)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, g, G_GRAPH, SELF_EV, g->f->name,
 		      _SX_wr_ggraph, _SX_rl_ggraph);
@@ -412,9 +414,8 @@ static void _SX_rl_gdev_attr(object *obj)
 
 /* SX_MK_DEV_ATTRIBUTES - encapsulate a PG_dev_attributes as an object */
 
-object *SX_mk_dev_attributes(PG_dev_attributes *da)
+object *SX_mk_dev_attributes(SS_psides *si, PG_dev_attributes *da)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, da, G_DEV_ATTRIBUTES, SELF_EV, NULL,
 		      _SX_wr_gdev_attr, _SX_rl_gdev_attr);
@@ -572,7 +573,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 	   {if (!PD_read(file, name, &im))
 	       SS_error(PD_err, obj);};
 
-	o = SX_mk_image(im);};
+	o = SX_mk_image(si, im);};
 
     return(o);}
 
@@ -618,9 +619,8 @@ static void _SX_rl_gimage(object *obj)
 
 /* SX_MK_IMAGE - encapsulate a PG_image as an object */
 
-object *SX_mk_image(PG_image *im)
+object *SX_mk_image(SS_psides *si, PG_image *im)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, im, G_IMAGE, SELF_EV, im->label,
 		      _SX_wr_gimage, _SX_rl_gimage);
@@ -716,7 +716,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
          if (PD_inquire_entry(strm, name, TRUE, NULL) == NULL)
             break;};
 
-    ret = SX_pdbdata_handler(strm, name, "PG_image *", &f , TRUE);
+    ret = SX_pdbdata_handler(si, strm, name, "PG_image *", &f , TRUE);
 
 /* add to menu */
     _SX_push_menu_item(file, name, "PG_image *");
@@ -811,7 +811,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
 
     dev->background_color_white = SX_background_color_white;
 
-    o = SX_mk_graphics_device(dev);
+    o = SX_mk_graphics_device(si, dev);
 
     CFREE(name);
     CFREE(type);
@@ -882,9 +882,8 @@ static void _SX_rl_gdevice(object *obj)
 
 /* SX_MK_GRAPHICS_DEVICE - encapsulate a PG_device as an object */
 
-object *SX_mk_graphics_device(PG_device *dev)
+object *SX_mk_graphics_device(SS_psides *si, PG_device *dev)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     if (dev == NULL)
        op = SS_null;
@@ -942,10 +941,6 @@ void SX_expose_event_handler(PG_device *dev, PG_event *ev)
 
     SX_motion_event_handler(dev, ev);
 
-/*
-    PRINT(stdout, ".");
-    SX_plot();
-*/
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -986,11 +981,7 @@ void SX_update_event_handler(PG_device *dev, PG_event *ev)
 	SX_window_height = SX_window_height_P/min_dim; 
 
 	SX_window_x[0] = SX_window_P[0]/min_dim;
-	SX_window_x[1] = SX_window_P[1]/min_dim;           
-
-/*  SX_plot(); */
-
-	 };
+	SX_window_x[1] = SX_window_P[1]/min_dim;};
 
     return;}
 
@@ -1229,7 +1220,7 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
 			 "EXISTENCE", SC_CHAR_I, TRUE, emap,
 			 NULL);
 
-    o = SX_mk_graph(g);
+    o = SX_mk_graph(si, g);
 
     return(o);}
 
@@ -1719,7 +1710,7 @@ static object *_SXI_make_image(SS_psides *si, object *argl)
     else
        {im = PG_make_image_n(name, arr->type, arr->data,
 			     2, WORLDC, dbx, rbx, w, h, 8, NULL);
-	rv = SX_mk_image(im);};
+	rv = SX_mk_image(si, im);};
 
     CFREE(name);
 
@@ -1780,7 +1771,7 @@ static object *_SXI_build_image(SS_psides *si, object *argl)
     else
        {im = PG_build_image(dev, name, arr->type, arr->data,
 			    w, h, 2, WORLDC, dbx, rbx);
-	rv = SX_mk_image(im);};
+	rv = SX_mk_image(si, im);};
 
     CFREE(name);
 
@@ -1844,7 +1835,8 @@ static object *_SXI_draw_image(SS_psides *si, object *argl)
 
 /* SX_SET_ATTR_ALIST - set an attribute on an alist */
 
-pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
+pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
+			 char *name, char *type, object *val)
    {int id, sid;
     void *v;
     object *obj;
@@ -1863,7 +1855,7 @@ pcons *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val)
        {char dtype[MAXLINE], stype[MAXLINE];
 
 	obj = SS_null;
-	SS_Assign(obj, SX_list_array(val));
+	SS_Assign(obj, SX_list_array(si, val));
 	SS_args(obj,
 		G_NUM_ARRAY, &arr,
 		0);
@@ -1946,7 +1938,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
         else
 	   inf = NULL;
 
-	g->info      = SX_set_attr_alist(inf, name, type, val);
+	g->info      = SX_set_attr_alist(si, inf, name, type, val);
 	g->info_type = SC_PCONS_P_S;};
 
     CFREE(name);
@@ -2482,7 +2474,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
 	   {SS_args(val, G_SET, &u);
 	    s->next = u;};
 
-	ret = SX_mk_set(u);};
+	ret = SX_mk_set(si, u);};
 
     return(ret);}
 
@@ -2524,7 +2516,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
 	   {SS_args(val, G_SET, &s);
 	    f->domain = s;};
 
-	ret = SX_mk_set(s);}
+	ret = SX_mk_set(si, s);}
 
     else if (strcmp(name, "range") == 0)
        {s = f->range;
@@ -2532,7 +2524,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
 	   {SS_args(val, G_SET, &s);
 	    f->range = s;};
 
-	ret = SX_mk_set(s);}
+	ret = SX_mk_set(si, s);}
 
     else if (strcmp(name, "next") == 0)
        {g = f->next;
@@ -2540,7 +2532,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
 	   {SS_args(val, G_MAPPING, &g);
 	    f->next = g;};
 
-	ret = SX_mk_mapping(f);}
+	ret = SX_mk_mapping(si, f);}
 
     else if (strcmp(name, "file-type") == 0)
        {v = f->file_type;
@@ -2608,7 +2600,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
            {SS_args(val, G_GRAPH, &h);
 	    g->next = h;};
 
-	ret = SX_mk_graph(h);}
+	ret = SX_mk_graph(si, h);}
 
     else if (strcmp(name, "f") == 0)
        {f = g->f;
@@ -2616,7 +2608,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
 	   {SS_args(val, G_MAPPING, &f);
 	    g->f = f;};
 
-	ret = SX_mk_mapping(f);}
+	ret = SX_mk_mapping(si, f);}
 
     else if (strcmp(name, "info-type") == 0)
        {t = g->info_type;
@@ -2803,9 +2795,9 @@ static object *_SXI_drawable_info(SS_psides *si, object *argl)
  
 /* SX_INSTALL_PGS_FUNCS - install the PGS extensions to Scheme */
  
-void SX_install_pgs_funcs(void)
+void SX_install_pgs_funcs(SS_psides *si)
    {double *labpy;
-    extern void _SX_install_pgs_primitives(void);
+    extern void _SX_install_pgs_primitives(SS_psides *si);
 
     labpy = PG_ptr_attr_glb("label-position-y");
 
@@ -2985,10 +2977,10 @@ void SX_install_pgs_funcs(void)
 		  labpy);
 
 /* low level PGS functions */
-    _SX_install_pgs_primitives();
+    _SX_install_pgs_primitives(si);
 
 /* interface object functions */
-    _SX_install_pgs_iob();
+    _SX_install_pgs_iob(si);
 
     return;}
 

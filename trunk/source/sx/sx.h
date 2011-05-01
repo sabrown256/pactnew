@@ -718,7 +718,7 @@ extern void
  SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb),
  SX_parse(void (*replot)(void), char *(*reproc)(char *s), object *strm),
  SX_init_device_vars(int idev, double xf, double yf, double wd, double hg),
- SX_install_global_vars(void);
+ SX_install_global_vars(SS_psides *si);
 
 extern out_device
  *SX_get_device(int idev),
@@ -762,7 +762,7 @@ extern int
 extern void
  SX_quit(int i),
  SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes),
- SX_install_global_funcs(void);
+ SX_install_global_funcs(SS_psides *si);
 
 extern object
  *SX_plane(SS_psides *si, object *argl);
@@ -790,15 +790,16 @@ extern object
 /* SXHAND.C declarations */
 
 extern object
- *SX_display_map(object *mo);
+ *SX_display_map(SS_psides *si, object *mo);
 
 extern void
- SX_determine_drw_obj(PM_mapping **pf, object **po, object **pargl),
- SX_determine_mapping(PM_mapping **pf, object **pargl),
- SX_mf_install(void);
+ SX_determine_drw_obj(SS_psides *si, PM_mapping **pf,
+		      object **po, object **pargl),
+ SX_determine_mapping(SS_psides *si, PM_mapping **pf, object **pargl),
+ SX_mf_install(SS_psides *si);
 
 extern int
- SX_have_display_list(void);
+ SX_have_display_list(SS_psides *si);
 
 
 /* SXHBO.C declarations */
@@ -818,13 +819,13 @@ extern int
 /* SXIO.C declarations */
 
 extern object
-*SX_print(object *argl);
+*SX_print(SS_psides *si, object *argl);
 
 
 /* SXMM.C declarations */
 
 extern object
- *SX_mk_gfile(g_file *po);
+ *SX_mk_gfile(SS_psides *si, g_file *po);
 
 
 /* SXMODE.C declarations */
@@ -833,24 +834,24 @@ extern void
  SX_setup_viewspace(PG_device *dev, double mh);
 
 extern object
- *SX_mode_text(void),
- *SX_mode_graphics(void);
+ *SX_mode_text(SS_psides *si),
+ *SX_mode_graphics(SS_psides *si);
 
 
 /* SXPAN.C declarations */
 
 extern void
- SX_install_panacea_funcs(void);
+ SX_install_panacea_funcs(SS_psides *si);
 
 extern object
- *SX_mk_package(PA_package *pck),
- *SX_mk_variable(PA_variable *pp);
+ *SX_mk_package(SS_psides *si, PA_package *pck),
+ *SX_mk_variable(SS_psides *si, PA_variable *pp);
 
 
 /* SXPDB.C declarations */
 
 extern void
- SX_install_pdb_funcs(void);
+ SX_install_pdb_funcs(SS_psides *si);
 
 extern int
  SX_pdbfilep(object *arg),
@@ -860,33 +861,34 @@ extern int
 extern object
  *SX_get_pdbfile(object *argl, PDBfile **pfile, g_file **gfile),
  *SX_get_file(object *argl, g_file **pfile),
- *SX_pdbdata_handler(PDBfile *file, char *name,
-		     char *type, void *vr, int flag);
+ *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
+		     char *name, char *type, void *vr, int flag);
 
 
 /* SXPDBA.C declarations */
 
 extern void
- SX_install_pdb_attr_funcs(void);
+ SX_install_pdb_attr_funcs(SS_psides *si);
 
 
 /* SXPGS.C declarations */
 
 extern object
- *SX_mk_graph(PG_graph *g),
- *SX_mk_image(PG_image *im),
- *SX_mk_graphics_device(PG_device *dev),
- *SX_mk_dev_attributes(PG_dev_attributes *da),
+ *SX_mk_graph(SS_psides *si, PG_graph *g),
+ *SX_mk_image(SS_psides *si, PG_image *im),
+ *SX_mk_graphics_device(SS_psides *si, PG_device *dev),
+ *SX_mk_dev_attributes(SS_psides *si, PG_dev_attributes *da),
  *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype);
 
 extern pcons
- *SX_set_attr_alist(pcons *inf, char *name, char *type, object *val);
+ *SX_set_attr_alist(SS_psides *si, pcons *inf,
+		    char *name, char *type, object *val);
 
 extern int
  SX_next_color(PG_device *dev);
 
 extern void
- SX_install_pgs_funcs(void),
+ SX_install_pgs_funcs(SS_psides *si),
  SX_expose_event_handler(PG_device *dev, PG_event *ev),
  SX_update_event_handler(PG_device *dev, PG_event *ev),
  SX_motion_event_handler(PG_device *dev, PG_event *ev),
@@ -897,14 +899,14 @@ extern void
 /* SXPML.C declarations */
 
 extern void
- SX_install_pml_funcs(void);
+ SX_install_pml_funcs(SS_psides *si);
 
 extern object
  *SX_setp(object *obj),
- *SX_list_array(object *argl),
- *SX_mk_set(PM_set *set),
- *SX_mk_mapping(PM_mapping *f),
- *SX_mk_C_array(C_array *arr);
+ *SX_list_array(SS_psides *si, object *argl),
+ *SX_mk_set(SS_psides *si, PM_set *set),
+ *SX_mk_mapping(SS_psides *si, PM_mapping *f),
+ *SX_mk_C_array(SS_psides *si, C_array *arr);
 
 
 /* SXSET.C declarations */
@@ -915,7 +917,7 @@ extern object
 extern void
  SX_init(char *code, char *vers),
  SX_reset_prefix(void),
- SX_install_funcs(void);
+ SX_install_funcs(SS_psides *si);
 
 extern int
  SX_next_prefix(void);
