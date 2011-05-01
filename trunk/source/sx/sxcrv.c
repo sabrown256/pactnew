@@ -106,14 +106,11 @@ int SX_curve_id(object *c)
  *                    - of curves
  */
 
-void SX_enlarge_dataset(PFVoid eval)
+void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
    {int i, nc;
     char s[10], s1[10], t[10];
     procedure *pp;
     object *o, *v, *p;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     nc = SX_N_Curves;
 
@@ -198,7 +195,7 @@ void SX_enlarge_dataset(PFVoid eval)
 
 /* SX_ASSIGN_NEXT_ID - assign next available curve id  */
 
-void SX_assign_next_id(int i, PFVoid fnc)
+void SX_assign_next_id(int i, object *(*plt)(SS_psides *si))
    {int j;
 
     for (j = 0; j < SX_N_Curves; j++)
@@ -209,8 +206,8 @@ void SX_assign_next_id(int i, PFVoid fnc)
 
 	     return;};};
 
-    if (fnc != NULL)
-       {fnc();
+    if (plt != NULL)
+       {plt(NULL);
 	SS_error("ALL 26 CURVE ID'S IN USE - SX_ASSIGN_NEXT_ID", SS_null);};
 
     return;}
@@ -220,7 +217,7 @@ void SX_assign_next_id(int i, PFVoid fnc)
 
 /* SX_NEXT_SPACE - return the index for the next available curve data slot */
 
-int SX_next_space(void)
+int SX_next_space(SS_psides *si)
    {int i;
 
     for (i = _SX.next_avail; i < SX_N_Curves; i++)
@@ -228,9 +225,9 @@ int SX_next_space(void)
            {_SX.next_avail = i + 1;
             return(i);};
 
-    SX_enlarge_dataset(NULL);
+    SX_enlarge_dataset(si, NULL);
 
-    i = SX_next_space();
+    i = SX_next_space(si);
 
     return(i);}
         
@@ -379,17 +376,18 @@ object *SX_mk_curve_proc(int i)
 
 /* SX_MK_CURVE - the C level function that creates a new curve object */
 
-object *SX_mk_curve(int na, double *xa, double *ya,
-		    char *label, char *filename, PFVoid fnc)
+object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
+		    char *label, char *filename,
+		    object *(*plt)(SS_psides *si))
    {int i, j, k;
     double tmp;
     double wc[PG_BOXSZ];
     double *xj[PG_SPACEDM], *xi[PG_SPACEDM], *x[PG_SPACEDM];
     object *o;
 
-    i = SX_next_space();
+    i = SX_next_space(si);
     SX_zero_curve(i);
-    SX_assign_next_id(i, fnc);
+    SX_assign_next_id(i, plt);
 
     SX_dataset[i].text     = CSTRSAVE(label);
     SX_dataset[i].modified = FALSE;

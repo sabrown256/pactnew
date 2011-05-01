@@ -72,11 +72,8 @@ static int _SX_rd_scm(SS_psides *si)
 
 /* SX_RD_SCM - do a SCHEME level rd with error protection */
 
-int SX_rd_scm(char *name)
+int SX_rd_scm(SS_psides *si, char *name)
    {int rv;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     strcpy(_SX_bf, name);
 
@@ -89,10 +86,8 @@ int SX_rd_scm(char *name)
 
 /* SX_INIT_VIEW - initialize the plot parameters */
 
-void SX_init_view(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+void SX_init_view(SS_psides *si)
+   {
 
     PG_set_attrs_glb(TRUE,
 		     "numeric-data-id", TRUE,
@@ -134,7 +129,7 @@ void SX_init_view(void)
 
     SX_command_log_name = CSTRSAVE("pdbview.log");
 
-    SX_enlarge_dataset(NULL);
+    SX_enlarge_dataset(si, NULL);
 
     return;}
 
@@ -146,12 +141,10 @@ void SX_init_view(void)
 
 /* _SX_MAPPING_REF - give a SCHEME level reference to a mapping */
 
-static object *_SX_mapping_ref(char *fname, char *dtype, int indx)
+static object *_SX_mapping_ref(SS_psides *si, char *fname,
+			       char *dtype, int indx)
    {g_file *po;
     object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (strcmp(fname, "#t") == 0)
        {for (po = SX_file_list; po != NULL; po = po->next)
@@ -207,7 +200,7 @@ static object *SXI_mapping_ref(SS_psides *si, object *argl)
             SC_INT_I, &indx,
             0);
 
-    o = _SX_mapping_ref(fname, dtype, indx);
+    o = _SX_mapping_ref(si, fname, dtype, indx);
 
     return(o);}
 
@@ -525,12 +518,9 @@ void SX_init_env(void)
  *            - return the exit status of the command
  */
 
-int SX_command(char *file, char *cmd)
+int SX_command(SS_psides *si, char *file, char *cmd)
    {int ret, zsp;
-    SS_psides *si;
     static int first = TRUE;
-
-    si = &_SS_si;
 
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
@@ -576,7 +566,7 @@ int SX_command(char *file, char *cmd)
 	SX_init(PCODE, VERSION);
 	si->trap_error = FALSE;
 
-	SX_init_view();
+	SX_init_view(si);
 	SX_install_global_vars(si);
 	SX_init_mappings();
 	SX_init_env();

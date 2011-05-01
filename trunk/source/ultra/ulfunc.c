@@ -1053,7 +1053,7 @@ static object *UL_derivative(SS_psides *si, int j)
 	UL_buf1x[1] = x[0][1];
 	UL_buf1y[1] = UL_buf1y[0];};
 
-    ch = SX_mk_curve(n-1, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, n-1, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);      
@@ -1100,7 +1100,7 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
     else
         {lbl = SC_dsnprintf(FALSE, "Thinned @%d", SX_dataset[j].id);}
 
-    ch = SX_mk_curve(m, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, m, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);      
@@ -1182,9 +1182,9 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_INTEGRATE - integrate a curve between the specified limits */
+/* _ULI_INTEGRATE - integrate a curve between the specified limits */
 
-static object *UL_integrate(int j, double d1, double d2)
+static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
    {int n;
     double *x[PG_SPACEDM];
     char *lbl;
@@ -1200,7 +1200,7 @@ static object *UL_integrate(int j, double d1, double d2)
 
 /* take care of some bad cases */
     if ((SX_dataset[j].wc[0] >= d2) || (SX_dataset[j].wc[1] <= d1))
-       SS_error("XMIN GREATER THAN XMAX - UL_INTEGRATE", SS_null);
+       SS_error("XMIN GREATER THAN XMAX - _UL__INTEGRATE", SS_null);
 
     PM_integrate_tzr(d1, d2, &n, x[0], x[1], UL_buf1x, UL_buf1y);
 
@@ -1210,7 +1210,7 @@ static object *UL_integrate(int j, double d1, double d2)
     else
         {lbl = SC_dsnprintf(FALSE, "Integrate @%d", SX_dataset[j].id);}
 
-    ch = SX_mk_curve(n, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);
@@ -1364,9 +1364,9 @@ static object *_ULI_syscmnd(SS_psides *si, object *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* UL_XMM - extract a portion of the given curve */
+/* _ULI_XMM - extract a portion of the given curve */
 
-static object *UL_xmm(int j, double d1, double d2)
+static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
    {int i, l, k, n, decreasing;
     double tempx, tempy;
     double *x[PG_SPACEDM], *xrev, *yrev;
@@ -1384,7 +1384,7 @@ static object *UL_xmm(int j, double d1, double d2)
 
 /* take care of dumb case */
     if ((SX_dataset[j].wc[0] >= d2) || (SX_dataset[j].wc[1] <= d1))
-       SS_error("XMIN GREATER THAN XMAX - UL_XMM", SS_null);
+       SS_error("XMIN GREATER THAN XMAX - _ULI_XMM", SS_null);
 
 /* check to see if x is decreasing */
     if (x[0][0] > x[0][1])
@@ -1435,7 +1435,7 @@ static object *UL_xmm(int j, double d1, double d2)
              UL_buf1x[k-l-1] = tempx;
              UL_buf1y[k-l-1] = tempy;};}
              
-    ch = SX_mk_curve(k, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, k, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);      
@@ -1630,7 +1630,7 @@ static object *UL_smp_append(SS_psides *si, object *a, object *b)
     else
        {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_dataset[i].id, SX_dataset[j].id);}
 
-    c = SX_mk_curve(n, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
+    c = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);      
@@ -1729,7 +1729,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     else
        {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_dataset[i].id, SX_dataset[j].id);}
 
-    c = SX_mk_curve(n, UL_buf1x, UL_buf1y, lbl, NULL, (PFVoid) UL_plot);
+    c = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);      
@@ -1836,7 +1836,7 @@ static object *UL_show(SS_psides *si, int j)
  *             - return a new curve
  */
 
-object *_UL_make_ln(double slope, double interc,
+object *_UL_make_ln(SS_psides *si, double slope, double interc,
 		    double first, double last, int n)
    {double *x[PG_SPACEDM];
     double step, xo;
@@ -1856,8 +1856,8 @@ object *_UL_make_ln(double slope, double interc,
     *(x[0] - 1) = last;
     *(x[1] - 1) = slope*last + interc;
 
-    ch = SX_mk_curve(i, UL_buf1x, UL_buf1y, "Straight line", NULL,
-		     (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, i, UL_buf1x, UL_buf1y,
+		     "Straight line", NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);      
@@ -1887,7 +1887,7 @@ static object *_ULI_make_ln(SS_psides *si, object *argl)
             SC_INT_I, &n,
             0);
 
-    o = _UL_make_ln(slope, interc, first, last, n);
+    o = _UL_make_ln(si, slope, interc, first, last, n);
 
     return(o);}
 
@@ -1939,7 +1939,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
          else
             *x[1]++ = SS_FLOAT_VALUE(yo);};
 
-    ch = SX_mk_curve(n, UL_buf1x, UL_buf1y, labls, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, labls, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);
@@ -1985,7 +1985,7 @@ static object *_ULI_curve_list(SS_psides *si, object *arg)
 static object *_ULI_plot(SS_psides *si)
    {object *o;
 
-    o = UL_plot();
+    o = UL_plot(si);
 
     return(o);}
 
@@ -2779,11 +2779,11 @@ void UL_install_funcs(SS_psides *si)
     SS_install_cf("integrate",
                   "Procedure: Integrate curves\n     Usage: integrate <curve-list> <low-lim> <high-lim>",
                   UL_ul2toc, 
-                  UL_integrate);
+                  _ULI_integrate);
     SS_install_cf("xmm",
                   "Procedure: Excerpt part of curves\n     Usage: xmm <curve-list> <low-lim> <high-lim>",
                   UL_ul2toc, 
-                  UL_xmm);
+                  _ULI_xmm);
 
 /* ULNTOC handled functions */
 

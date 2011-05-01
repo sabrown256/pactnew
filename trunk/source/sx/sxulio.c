@@ -47,9 +47,11 @@ static void
 
 /*--------------------------------------------------------------------------*/
 
-/* SX_NEXT_NUMBER - return the index for the next available curve menu slot */
+/* _SX_NEXT_NUMBER - return the index for the
+ *                 - next available curve menu slot
+ */
 
-static int SX_next_number(int flag)
+static int _SX_next_number(SS_psides *si, int flag)
    {int i;
 
     for (i = _SX_next_available_number; i < SX_N_Curves; i++)
@@ -58,20 +60,21 @@ static int SX_next_number(int flag)
                _SX_next_available_number = i + 1;
             return(i);};
 
-    SX_enlarge_dataset(NULL);
+    SX_enlarge_dataset(si, NULL);
 
-    i = SX_next_number(flag);
+    i = _SX_next_number(si, flag);
 
     return(i);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_TERMDATA - terminate one set of data and prepare for the next
- *             - return TRUE iff successful
+/* _SX_TERMDATA - terminate one set of data and prepare for the next
+ *              - return TRUE iff successful
  */
 
-static int SX_termdata(int *aryptr, double *xbuff, double *ybuff)
+static int _SX_termdata(SS_psides *si, int *aryptr,
+			double *xbuff, double *ybuff)
    {int i, j;
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
@@ -118,9 +121,9 @@ static int SX_termdata(int *aryptr, double *xbuff, double *ybuff)
     SX_cache_curve(&SX_dataset[j], SC_ASCII);
 
     _SX.dataptr  = 0;
-    i            = SX_next_number(TRUE);
+    i            = _SX_next_number(si, TRUE);
     SX_number[i] = j;
-    *aryptr      = SX_next_space();
+    *aryptr      = SX_next_space(si);
 
     return(TRUE);}
 
@@ -341,9 +344,9 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 
 /*--------------------------------------------------------------------------*/
 
-/* SX_READ_BIN - read a binary file */
+/* _SX_READ_BIN - read a binary file */
 
-static void SX_read_bin(FILE *fp, char *fname)
+static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
    {int n, nc, len, j, i, icurve;
     double wc[PG_BOXSZ];
     char c, bf[MAXLINE];
@@ -354,7 +357,7 @@ static void SX_read_bin(FILE *fp, char *fname)
 
     icurve = 0;
     while (!feof(fp))
-       {j = SX_next_space();
+       {j = SX_next_space(si);
         read_int(len, fp);
 	nc = min(len, MAXLINE);
         if (io_read(bf, sizeof(char), nc, fp) != len)
@@ -404,7 +407,7 @@ static void SX_read_bin(FILE *fp, char *fname)
 
         icurve++;
 
-        i = SX_next_number(TRUE);
+        i = _SX_next_number(si, TRUE);
         SX_number[i] = j;
         c = io_getc(fp);                                    /* look for eof */
         io_ungetc(c, fp);};
@@ -416,15 +419,15 @@ static void SX_read_bin(FILE *fp, char *fname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_READ_TEXT - read an ASCII input file */
+/* _SX_READ_TEXT - read an ASCII input file */
 
-static void SX_read_text(FILE *fp, char *fname)
+static void _SX_read_text(SS_psides *si, FILE *fp, char *fname)
    {int j, c, nb, icurve;
     unsigned int csz;                        /* current size of buffer */
     char *pin, *text, *s, *bf;
     double *xb[PG_SPACEDM], *x[PG_SPACEDM], xv[PG_SPACEDM];
 
-    j           = SX_next_space();
+    j           = SX_next_space(si);
     _SX.dataptr = 0;
     icurve      = 0;
 
@@ -449,7 +452,7 @@ static void SX_read_text(FILE *fp, char *fname)
 
 /* don't terminate the first one */
             {if (_SX.dataptr != 0)
-                {if (SX_termdata(&j, xb[0], xb[1]))
+                {if (_SX_termdata(si, &j, xb[0], xb[1]))
                     icurve++;};
 
 /* strip off leading whitespace from label */
@@ -504,7 +507,7 @@ static void SX_read_text(FILE *fp, char *fname)
 		      x[0] = xb[0] + _SX.dataptr;
 		      x[1] = xb[1] + _SX.dataptr;};};};};
 
-    if (SX_termdata(&j, xb[0], xb[1]))
+    if (_SX_termdata(si, &j, xb[0], xb[1]))
        icurve++;
     io_close(fp);
 
@@ -530,7 +533,7 @@ object *SX_read_ver1(SS_psides *si, object *obj)
     char fname[MAXLINE], *path;
     FILE *fp;
 
-    j = SX_next_number(FALSE);
+    j = _SX_next_number(si, FALSE);
 
     strcpy(fname, SS_get_string(obj));
     path = SC_search_file(NULL, fname);
@@ -548,7 +551,7 @@ object *SX_read_ver1(SS_psides *si, object *obj)
  * there is no safety net here - version 1 files are not to be supported
  * in perpetuity!
  */
-       {SX_read_bin(fp, path);
+       {_SX_read_bin(si, fp, path);
 	k = SX_next_prefix();
 	SX_prefix_list[k] = j;};
 
@@ -559,9 +562,9 @@ object *SX_read_ver1(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_READ_PDB - read the curves from a PDB file */
+/* _SX_READ_PDB - read the curves from a PDB file */
 
-static void SX_read_pdb(PDBfile *fp, char *fname)
+static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
    {int i, j, k, ne, icurve;
     char **names;
     pdb_info *ppi;
@@ -580,7 +583,7 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
        {for (i = 0; (names[i] != NULL) && (i < ne); i++)
 
 /* get the next open space */
-	    {j = SX_next_space();
+	    {j = SX_next_space(si);
 
 	     if (SX_read_pdb_curve(fp, fname, names[i],
 				   &SX_dataset[j], NOR_X_Y) == FALSE)
@@ -602,7 +605,7 @@ static void SX_read_pdb(PDBfile *fp, char *fname)
  */
 		 SX_cache_curve(&SX_dataset[j], SC_PDB);
 
-		 k = SX_next_number(TRUE);
+		 k = _SX_next_number(si, TRUE);
 		 SX_number[k] = j;};};
 
 	SX_n_curves_read += icurve;
@@ -627,12 +630,12 @@ object *SX_read_data(SS_psides *si, object *obj)
     if (path == NULL)
        SS_error("CAN'T FIND FILE - SX_READ_DATA", obj);
 
-    j = SX_next_number(FALSE);
+    j = _SX_next_number(si, FALSE);
 
 /* test for a PDB file */    
     pfp = PD_open(path, "r");
     if (pfp != NULL)
-       {SX_read_pdb(pfp, fname);
+       {_SX_read_pdb(si, pfp, fname);
         fp = pfp->stream;
         SX_push_open_file(fp);
         k = SX_next_prefix();
@@ -648,7 +651,7 @@ object *SX_read_data(SS_psides *si, object *obj)
        {fp = SX_open_for_reading(path, BINARY_MODE_R);
 
 	if (SX_ultra_binary_filep(fp))
-	   {SX_read_bin(fp, fname);
+	   {_SX_read_bin(si, fp, fname);
 	    k = SX_next_prefix();
 	    SX_prefix_list[k] = j;
 	    rv = SS_t;}
@@ -658,7 +661,7 @@ object *SX_read_data(SS_psides *si, object *obj)
 
 	     fp = SX_open_for_reading(path, "r");
 	     if (_SX_ultra_text_filep(fp, '#'))
-	        {SX_read_text(fp, fname);
+	        {_SX_read_text(si, fp, fname);
 		 k = SX_next_prefix();
 		 SX_prefix_list[k] = j;
 		 rv = SS_t;}
@@ -1031,7 +1034,7 @@ object *SX_table_curve(SS_psides *si, object *argl)
     snprintf(label, MAXLINE, "Table %d:%ld (%d:%d) vs (%d:%d)",
             _SX.table_n, _SX.table_ln, yo, ys, xo, xs);
 
-    ret = SX_mk_curve(na, xa, ya, label, _SX.table_name, NULL);
+    ret = SX_mk_curve(si, na, xa, ya, label, _SX.table_name, NULL);
 
     CFREE(ya);
     CFREE(xa);

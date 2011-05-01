@@ -24,8 +24,8 @@ double
  SX_console_width,
  SX_console_height;
 
-PFByte
- SX_plot_hook = NULL;
+object
+ *(*SX_plot_hook)(SS_psides *si);
 
 FILE
  *SX_command_log = NULL;
@@ -254,6 +254,9 @@ int _SX_get_input(object *str)
    {int rv;
     char *p;
     FILE *fp;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     rv = 0;
 
@@ -288,7 +291,7 @@ int _SX_get_input(object *str)
 /* the \r check is for the benefit of those non-UNIX systems who use it */
 	else if ((*p == '\n') || (*p == '\r'))
 	   {if ((SX_autoplot == ON) && (SX_plot_hook != NULL))
-	       SX_plot_hook();
+	       SX_plot_hook(si);
 	    rv = -1;};}
 
     else

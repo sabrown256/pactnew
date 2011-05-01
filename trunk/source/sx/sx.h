@@ -589,8 +589,8 @@ extern object
  *SX_curfile,
  *SX_ovif;
 
-extern PFVoid
- SX_plot_hook;
+extern object
+ *(*SX_plot_hook)(SS_psides *si);
 
 extern PFInt
  SX_pan_data_hook;
@@ -696,13 +696,13 @@ extern PG_device
 
 extern void
  SX_end(SS_psides *si, int val),
- SX_init_view(void),
+ SX_init_view(SS_psides *si),
  SX_init_mappings(void),
  SX_init_env(void);
 
 extern int
- SX_rd_scm(char *name),
- SX_command(char *file, char *cmd);
+ SX_rd_scm(SS_psides *si, char *name),
+ SX_command(SS_psides *si, char *file, char *cmd);
 
 
 /* SXCONT.C declarations */
@@ -715,8 +715,10 @@ extern char
  *SX_wrap_paren(char *open, char *form, char *close, size_t ln);
 
 extern void
- SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb),
- SX_parse(void (*replot)(void), char *(*reproc)(char *s), object *strm),
+ SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb),
+ SX_parse(SS_psides *si,
+	  object *(*replot)(SS_psides *si), char *(*reproc)(char *s),
+	  object *strm),
  SX_init_device_vars(int idev, double xf, double yf, double wd, double hg),
  SX_install_global_vars(SS_psides *si);
 
@@ -732,8 +734,9 @@ extern object
  *SX_get_curve_proc(int j),
  *SX_get_curve_var(int j),
  *SX_mk_curve_proc(int i),
- *SX_mk_curve(int na, double *xa, double *ya, 
-	      char *label, char *filename, PFVoid fnc),
+ *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
+	      char *label, char *filename,
+	      object *(*plt)(SS_psides *si)),
  *SX_set_crv_id(int i, char *id),
  *SX_re_id(SS_psides *si),
  *SX_get_data_domain(SS_psides *si, object *argl),
@@ -742,8 +745,8 @@ extern object
 
 extern void
  SX_zero_curve(int i),
- SX_assign_next_id(int i, PFVoid fnc),
- SX_enlarge_dataset(PFVoid eval);
+ SX_assign_next_id(int i, object *(*plt)(SS_psides *si)),
+ SX_enlarge_dataset(SS_psides *si, PFVoid eval);
 
 extern int
  SX_get_data_index(char *s),
@@ -751,7 +754,7 @@ extern int
  SX_get_curve_id(char *s),
  SX_get_crv_index_j(object *obj),
  SX_curvep(char *s),
- SX_next_space(void),
+ SX_next_space(SS_psides *si),
  SX_curve_id(object *c),
  SX_curvep_b(object *obj),
  SX_curvep_a(object *obj);
@@ -805,7 +808,7 @@ extern int
 /* SXHBO.C declarations */
 
 extern PM_mapping
- *SX_build_return_mapping(PM_mapping *h, char *label,
+ *SX_build_return_mapping(SS_psides *si, PM_mapping *h, char *label,
 			  PM_set *domain, int init, int wgt);
 
 

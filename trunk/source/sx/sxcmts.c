@@ -18,6 +18,7 @@
 int main(int c, char **v, char **env)
    {int i, rv;
     char *cmd, *file;
+    SS_psides *si = &_SS_si;
 
 /* process the command line arguments */
     for (i = 1; i < c; i++)
@@ -29,7 +30,7 @@ int main(int c, char **v, char **env)
                 {cmd = SC_dstrcat(cmd, v[i]);
                  cmd = SC_dstrcat(cmd, " ");};};};
 
-    rv = SX_command(file, cmd);
+    rv = SX_command(si, file, cmd);
 
     CFREE(cmd);
 

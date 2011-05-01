@@ -430,7 +430,7 @@ int SX_map_count(void)
  *                   - return a new mapping
  */
 
-static PM_mapping *_SXI_norm_mapping(PM_mapping *h)
+static PM_mapping *_SXI_norm_mapping(SS_psides *si, PM_mapping *h)
    {int i, j, nde, ne;
     char *lbl;
     double **sre, *dre, *pr, *ps, dx;
@@ -482,7 +482,7 @@ static PM_mapping *_SXI_norm_mapping(PM_mapping *h)
 
 /* _SXI_COPY_MAPPING - make a copy of the given mapping */
 
-static PM_mapping *_SXI_copy_mapping(PM_mapping *h)
+static PM_mapping *_SXI_copy_mapping(SS_psides *si, PM_mapping *h)
    {char *name, *cat;
     PM_centering centering;
     PM_set *domain, *range;
@@ -587,14 +587,14 @@ static void _SX_integrate_mapping(PM_mapping *f)
  *                        - return a new mapping
  */
 
-static PM_mapping *_SXI_integrate_mapping(PM_mapping *h)
+static PM_mapping *_SXI_integrate_mapping(SS_psides *si, PM_mapping *h)
    {PM_mapping *f;
     char *lbl;
 
     lbl = SC_dsnprintf(FALSE, "Integral(%s)", h->name);
 
 /* build the return mapping */
-    f = SX_build_return_mapping(h, lbl, NULL, TRUE, FALSE);
+    f = SX_build_return_mapping(si, h, lbl, NULL, TRUE, FALSE);
 
     _SX_integrate_mapping(f);
 
@@ -684,7 +684,7 @@ object *SX_plane(SS_psides *si, object *argl)
 
 /* _SXI_DERIVATIVE - take the derivative of a 1d mapping */
 
-static PM_mapping *_SXI_derivative(PM_mapping *h)
+static PM_mapping *_SXI_derivative(SS_psides *si, PM_mapping *h)
    {int n, m;
     double *x[PG_SPACEDM];
     double *bx, *by;

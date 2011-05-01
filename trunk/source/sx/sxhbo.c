@@ -222,12 +222,9 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
 
 /* _SX_ACC_LABEL - make a label for F which reflects the operands H */
 
-static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
+static void _SX_acc_label(SS_psides *si, PM_mapping *f, PM_mapping *h)
    {char label[MAXLINE];
     PM_mapping *ph;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     snprintf(label, MAXLINE, "(%s %s", SS_get_string(si->fun), h->name);
 
@@ -251,12 +248,9 @@ static void _SX_acc_label(PM_mapping *f, PM_mapping *h)
 
 /* _SX_MAP_LIST_LABEL - make a label for a mapping from the given list */
 
-static void _SX_map_list_label(char *label, object *argl)
+static void _SX_map_list_label(SS_psides *si, char *label, object *argl)
    {char t[MAXLINE];
     object *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     snprintf(label, MAXLINE, "(%s", SS_get_string(si->fun));
 
@@ -409,7 +403,8 @@ static double **_SX_accumulate_mapping(PM_mapping *dest, PM_mapping *source,
  *                               -       type!!!
  */
 
-static PM_mapping *_SX_build_accumulator_mapping(PM_set *domain,
+static PM_mapping *_SX_build_accumulator_mapping(SS_psides *si,
+						 PM_set *domain,
 						 PM_mapping *h)
    {int i, nd, nde, nbe, tnd, tnde, ne;
     int *maxes, *dm;
@@ -466,7 +461,7 @@ static PM_mapping *_SX_build_accumulator_mapping(PM_set *domain,
     lbl = SC_dsnprintf(FALSE, "%s", h->name);
     f   = PM_make_mapping(lbl, PM_LR_S, domain, set, N_CENT, NULL);
 
-    _SX_acc_label(f, h);
+    _SX_acc_label(si, f, h);
 
     return(f);}
 
@@ -531,7 +526,8 @@ static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
  *                         - the result of math operations
  */
 
-PM_mapping *SX_build_return_mapping(PM_mapping *h, char *label,
+PM_mapping *SX_build_return_mapping(SS_psides *si,
+				    PM_mapping *h, char *label,
 				    PM_set *domain, int init, int wgt)
    {PM_mapping *f;
 
@@ -541,7 +537,7 @@ PM_mapping *SX_build_return_mapping(PM_mapping *h, char *label,
 	if (domain == NULL)
 	   domain = _SX_build_common_domain(h);};
 
-    f = _SX_build_accumulator_mapping(domain, h);
+    f = _SX_build_accumulator_mapping(si, domain, h);
 
     if (label != NULL)
        {CFREE(f->name);
@@ -662,11 +658,11 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
        {proc = cp->proc;
 	plf  = SX_have_display_list(si);
 
-	_SX_map_list_label(label, argl);
+	_SX_map_list_label(si, label, argl);
 
 /* build the return mapping */
 	h = _SX_link_mappings(si, argl);
-	f = SX_build_return_mapping(h, label, NULL, FALSE, FALSE);
+	f = SX_build_return_mapping(si, h, label, NULL, FALSE, FALSE);
 	_SX_unlink_mappings(h);
 
 	_SX_accumulate_range(si, f, argl, proc);
@@ -761,7 +757,7 @@ PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
 
 /* build the return mapping */
     fd = SX_build_restricted_domain(hd, argl);
-    f  = SX_build_return_mapping(h, lbl, fd, TRUE, FALSE);
+    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
 
     PM_find_extrema(f->range);
 
@@ -831,13 +827,12 @@ static PM_set *SX_build_lr_domain(PM_set *hd, object *argl)
  *                     - interpolate the mapping H onto it
  */
 
-PM_mapping *_SXI_refine_mapping(PM_mapping *h, object **pargl)
+PM_mapping *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl)
    {int plf;
     char *lbl;
     PM_set *fd, *hd;
     PM_mapping *f;
     object *argl, *obj;
-    SS_psides *si = &_SS_si;
 
     plf = SX_have_display_list(si);
     SC_ASSERT(plf == TRUE);
@@ -853,7 +848,7 @@ PM_mapping *_SXI_refine_mapping(PM_mapping *h, object **pargl)
 
 /* build the return mapping */
     fd = SX_build_lr_domain(hd, obj);
-    f  = SX_build_return_mapping(h, lbl, fd, TRUE, FALSE);
+    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
 
     PM_find_extrema(f->range);
 
@@ -869,13 +864,12 @@ PM_mapping *_SXI_refine_mapping(PM_mapping *h, object **pargl)
  *                     - fill with the interpolation weights
  */
 
-PM_mapping *_SXI_interp_mapping(PM_mapping *h, object **pargl)
+PM_mapping *_SXI_interp_mapping(SS_psides *si, PM_mapping *h, object **pargl)
    {int plf;
     char *lbl;
     PM_set *fd, *hd;
     PM_mapping *f;
     object *argl, *obj;
-    SS_psides *si = &_SS_si;
 
     plf = SX_have_display_list(si);
     SC_ASSERT(plf == TRUE);
@@ -891,7 +885,7 @@ PM_mapping *_SXI_interp_mapping(PM_mapping *h, object **pargl)
 
 /* build the return mapping */
     fd = SX_build_lr_domain(hd, obj);
-    f  = SX_build_return_mapping(h, lbl, fd, TRUE, TRUE);
+    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, TRUE);
 
     PM_find_extrema(f->range);
 

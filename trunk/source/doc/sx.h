@@ -4305,7 +4305,7 @@ These functions augment the I/O capabilities of the basic interpeter.<p>
 
 <B>
 <BLOCKQUOTE>
-void SX_parse(PFVoid replot, PFPChar reproc)
+void SX_parse(SS_psides *si, PFVoid replot, PFPChar reproc)
 </BLOCKQUOTE>
 </B>
 
