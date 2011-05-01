@@ -170,7 +170,7 @@ static object *_SXI_get_domain(SS_psides *si, object *arg)
     else
        SS_error("BAD SET - _SXI_GET_DOMAIN", arg);
 
-    rv = SX_mk_set(set);
+    rv = SX_mk_set(si, set);
 
     return(rv);}
 
@@ -193,7 +193,7 @@ static object *_SXI_get_range(SS_psides *si, object *arg)
        SS_error("BAD MAPPING - _SXI_GET_RANGE", arg);
 
     else
-       rv = SX_mk_set(f->range);
+       rv = SX_mk_set(si, f->range);
 
     return(rv);}
 
@@ -621,7 +621,7 @@ object *SX_plane(SS_psides *si, object *argl)
     PM_set *dom, *ran;
     PM_mapping *f;
 
-    plf   = SX_have_display_list();
+    plf   = SX_have_display_list(si);
     nd    = SS_length(argl);
     coeff = pc = CMAKE_N(double, nd--);
 
@@ -673,9 +673,9 @@ object *SX_plane(SS_psides *si, object *argl)
     name = SC_dsnprintf(FALSE, "%s->%s", dom->name, ran->name);
     f    = PM_make_mapping(name, PM_LR_S, dom, ran, N_CENT, NULL);
 
-    mo = SX_mk_mapping(f);
+    mo = SX_mk_mapping(si, f);
     if (plf)
-       mo = SX_display_map(mo);
+       mo = SX_display_map(si, mo);
 
     return(mo);}
 
@@ -832,7 +832,7 @@ static PM_mapping *_SXI_smooth(PM_mapping *h, object *argl)
     return(h);}
 
 /*--------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SXI_PP_NAMES - pretty print a list of names
  *               - this should be generalized later
@@ -895,12 +895,12 @@ static object *_SXI_pp_names(SS_psides *si, object *argl)
 
     return(SS_f);}
 
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SX_INSTALL_GLOBAL_FUNCS - install some functions that everybody can use */
 
-void SX_install_global_funcs(void)
+void SX_install_global_funcs(SS_psides *si)
    {
 
     SS_install("command-log",
@@ -985,7 +985,7 @@ void SX_install_global_funcs(void)
 
 /* _SX_MF_INST_G - install math functions from this file scope */
 
-void _SX_mf_inst_g(void)
+void _SX_mf_inst_g(SS_psides *si)
    {
 
     SS_install("copy-map",

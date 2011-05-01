@@ -68,40 +68,40 @@ static INLINE int EOI(object *str)
  
 /* SX_INSTALL_FUNCS - install the extended Scheme functions */
  
-void SX_install_funcs(void)
+void SX_install_funcs(SS_psides *si)
    {
 
     PA_init_strings();
 
-    SX_install_global_vars();
+    SX_install_global_vars(si);
 
 /* PDBLib related functions */
-    SX_install_pdb_funcs();
+    SX_install_pdb_funcs(si);
 
 #ifndef SPDBX_ONLY
 
 /* PANACEA related functions */
-    SX_install_panacea_funcs();
+    SX_install_panacea_funcs(si);
 
 /* PGS related functions */
-    SX_install_pgs_funcs();
+    SX_install_pgs_funcs(si);
 
 /* PML related functions */
-    SX_install_pml_funcs();
+    SX_install_pml_funcs(si);
 
 /* install the SX math handled functions */
-    SX_mf_install();
+    SX_mf_install(si);
 
 /* pure SX functions */
-    SX_install_global_funcs();
+    SX_install_global_funcs(si);
 
 #endif
 
-    SX_install_ascii_funcs();
+    SX_install_ascii_funcs(si);
 
-    SX_install_file_funcs();
+    SX_install_file_funcs(si);
 
-    SX_install_ext_funcs();
+    SX_install_ext_funcs(si);
 
     return;}
 
@@ -119,11 +119,11 @@ void SX_init(char *code, char *vers)
     SS_init_cont(si);
     
 /* SX initializations depending on scheme */
-    SX_install_funcs();
+    SX_install_funcs(si);
 
     SX_vif  = PD_open_vif("SX_vif");
     SX_gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_vif);
-    SX_ovif = SX_mk_gfile(SX_gvif);
+    SX_ovif = SX_mk_gfile(si, SX_gvif);
 
 /* PDB initializations */
     pdb_wr_hook = _SX_hash_hook;

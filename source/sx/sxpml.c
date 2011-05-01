@@ -78,7 +78,7 @@ static object *_SXI_mk_array(SS_psides *si, object *argl)
 
 	arr = PM_make_array(type, size, NULL);
 
-	rv = SX_mk_C_array(arr);};
+	rv = SX_mk_C_array(si, arr);};
 
     return(rv);}
 
@@ -199,7 +199,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
 
     PM_sub_array(d, newarr->data, idims, ireg, bpi);
 
-    rv = SX_mk_C_array(newarr);
+    rv = SX_mk_C_array(si, newarr);
 
     return(rv);}
 
@@ -286,7 +286,7 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
 
 /* SX_LIST_ARRAY - turn a list of numbers into a numeric array */
 
-object *SX_list_array(object *argl)
+object *SX_list_array(SS_psides *si, object *argl)
    {int n, fixp;
     long *lp;
     double *fp;
@@ -322,7 +322,7 @@ object *SX_list_array(object *argl)
 		     SC_DOUBLE_I, fp,
 		     0);};};
 
-    rv = SX_mk_C_array(arr);
+    rv = SX_mk_C_array(si, arr);
 
     return(rv);}
 
@@ -334,7 +334,7 @@ object *SX_list_array(object *argl)
 object *_SXI_list_array(SS_psides *si, object *argl)
    {object *rv;
 
-    rv = SX_list_array(argl);
+    rv = SX_list_array(si, argl);
 
     return(rv);}
 
@@ -463,7 +463,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     if (s == NULL)
        SS_error("BAD ARGUMENT - _SXI_SET_PDBDATA", argl);
 
-    rv = SX_pdbdata_handler(file, set_name, "PM_set *", &s, TRUE);
+    rv = SX_pdbdata_handler(si, file, set_name, "PM_set *", &s, TRUE);
 
     return(rv);}
 
@@ -515,7 +515,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
 	if (s->info_type == NULL)
 	   s->info_type = SC_PCONS_P_S;
 
-	obj = SX_mk_set(s);};
+	obj = SX_mk_set(si, s);};
 
     return(obj);}
 
@@ -634,7 +634,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 			NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL);};
 
-    rv = SX_mk_set(set);
+    rv = SX_mk_set(si, set);
 
     return(rv);}
 
@@ -667,7 +667,7 @@ static object *_SXI_make_cp_set(SS_psides *si, object *argl)
 
     CFREE(sets);
 
-    obj = SX_mk_set(cp);
+    obj = SX_mk_set(si, cp);
 
     return(obj);}
 
@@ -735,7 +735,7 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
 			     "EXISTENCE", SC_CHAR_I, TRUE, emap,
 			     NULL);};
 
-    o = SX_mk_mapping(f);
+    o = SX_mk_mapping(si, f);
 
     return(o);}
 
@@ -777,9 +777,8 @@ static void _SX_rl_gset(object *obj)
 
 /* SX_MK_SET - encapsulate a PM_set as an object */
 
-object *SX_mk_set(PM_set *set)
+object *SX_mk_set(SS_psides *si, PM_set *set)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     if (set == NULL)
        op = SS_null;
@@ -847,7 +846,7 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
         else
 	   inf = NULL;
 
-	s->info      = SX_set_attr_alist(inf, name, type, val);
+	s->info      = SX_set_attr_alist(si, inf, name, type, val);
 	s->info_type = SC_PCONS_P_S;};
 
     return(SS_t);}
@@ -936,7 +935,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     if (PD_inquire_type(file, "PM_mapping") == NULL)
        PD_def_mapping(file);
 
-    ret = SX_pdbdata_handler(file, name, "PM_mapping *", &f , TRUE);
+    ret = SX_pdbdata_handler(si, file, name, "PM_mapping *", &f , TRUE);
 
 /* add to menu */
     _SX_push_menu_item(po, name, "PM_mapping *");
@@ -1029,7 +1028,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 	     if (ret == FALSE)
 	        SS_error("NO FIELD FOR TYPE - _SXI_PDBDATA_MAPPING", SS_null);};
 
-	rv = SX_mk_mapping(f);};
+	rv = SX_mk_mapping(si, f);};
 
     return(rv);}
 
@@ -1065,9 +1064,8 @@ static void _SX_rl_gmapping(object *obj)
 
 /* SX_MK_MAPPING - encapsulate a PM_mapping as an object */
 
-object *SX_mk_mapping(PM_mapping *f)
+object *SX_mk_mapping(SS_psides *si, PM_mapping *f)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, f, G_MAPPING, SELF_EV, f->name,
 		      _SX_wr_gmapping, _SX_rl_gmapping);
@@ -1173,7 +1171,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
 		    NULL, NULL, NULL, NULL, NULL, NULL,
 		    NULL);
 
-    obj = SX_mk_set(set);
+    obj = SX_mk_set(si, set);
 
     return(obj);}
 
@@ -1255,7 +1253,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 
 	    g = PM_make_mapping(f->name, PM_AC_S, ndom, nran, cent, NULL);
 
-	    rv = SX_mk_mapping(g);};};
+	    rv = SX_mk_mapping(si, g);};};
 
     return(rv);}
 
@@ -1349,7 +1347,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
 		    PM_MESH_TOPOLOGY_P_S, mt,
 		    NULL, NULL, NULL);
 
-    o = SX_mk_set(set);
+    o = SX_mk_set(si, set);
 
     return(o);}
 
@@ -1399,7 +1397,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
        {name = SC_dsnprintf(FALSE, mn);
         CFREE(mn);};
 
-    rv = SX_pdbdata_handler(file, name, "C_array", arr, TRUE);
+    rv = SX_pdbdata_handler(si, file, name, "C_array", arr, TRUE);
 
     return(rv);}
 
@@ -1456,7 +1454,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
 	pt = SC_firsttok(type, " *");
 	x  = arr->data;
 
-	rv = SX_pdbdata_handler(file, name, pt, x, TRUE);};
+	rv = SX_pdbdata_handler(si, file, name, pt, x, TRUE);};
 
     return(rv);}
 
@@ -1495,7 +1493,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
 	   arr = PM_make_array(PD_entry_type(ep), PD_entry_number(ep),
 			       pd->data);
 
-	rv = SX_mk_C_array(arr);};
+	rv = SX_mk_C_array(si, arr);};
 
     return(rv);}
 
@@ -1536,9 +1534,8 @@ static void _SX_rl_gnum_array(object *obj)
 
 /* SX_MK_C_ARRAY - encapsulate a C_array as an object */
 
-object *SX_mk_C_array(C_array *arr)
+object *SX_mk_C_array(SS_psides *si, C_array *arr)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, arr, G_NUM_ARRAY, SELF_EV, arr->type,
 		      _SX_wr_gnum_array, _SX_rl_gnum_array);
@@ -1698,7 +1695,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
 
 	s = SX_rep_to_ac(sname, rx, ry, n_nodes, n_zones, zones);
 
-	rv = SX_mk_set(s);};
+	rv = SX_mk_set(si, s);};
 
     return(rv);}
 
@@ -1753,7 +1750,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
 
 	iarr = PM_make_array(SC_INT_S, no, out);
 
-	rv = SX_mk_C_array(iarr);};
+	rv = SX_mk_C_array(si, iarr);};
 
     return(rv);}
         
@@ -1806,9 +1803,8 @@ static void _SX_rl_gpolygon(object *obj)
 
 /* SX_MK_POLYGON - encapsulate a PM_polygon as an object */
 
-object *SX_mk_polygon(PM_polygon *py)
+object *SX_mk_polygon(SS_psides *si, PM_polygon *py)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     op = SS_mk_object(si, py, G_POLYGON, SELF_EV, "pm-polygon",
 		      _SX_wr_gpolygon, _SX_rl_gpolygon);
@@ -1856,7 +1852,7 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
 
     py->nn = ip;
 
-    rv = SX_mk_polygon(py);
+    rv = SX_mk_polygon(si, py);
 
     return(rv);}
 
@@ -1930,7 +1926,7 @@ static object *_SX_combine_polygons(SS_psides *si, object *argl,
 	np = SC_array_get_n(a);
 	for (ip = 0; ip < np; ip++)
 	    {pa = PM_polygon_get(a, ip);
-	     o  = SX_mk_polygon(pa);
+	     o  = SX_mk_polygon(si, pa);
 	     rv = SS_mk_cons(si, o, rv);};
 
 	PM_free_polygons(a, FALSE);
@@ -1975,7 +1971,7 @@ static object *_SXI_union_polygon(SS_psides *si, object *argl)
  
 /* SX_INSTALL_PML_FUNCS - install the PML extensions to Scheme */
  
-void SX_install_pml_funcs(void)
+void SX_install_pml_funcs(SS_psides *si)
    {
 
     SS_install("find-index",

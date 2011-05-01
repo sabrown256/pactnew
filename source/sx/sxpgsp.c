@@ -3077,7 +3077,7 @@ static object *_SXI_sbfsz(SS_psides *si, object *argl)
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
-void _SX_install_pgs_primitives(void)
+void _SX_install_pgs_primitives(SS_psides *si)
    {
 
     SS_install("pg-axis",

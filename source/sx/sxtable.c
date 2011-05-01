@@ -558,7 +558,7 @@ static object *SX_table_set(SS_psides *si, object *specs)
     PM_set *set;
 
     set = _SX_table_set(specs);
-    rv  = SX_mk_set(set);
+    rv  = SX_mk_set(si, set);
 
     return(rv);}
 
@@ -605,7 +605,7 @@ static object *_SXI_table_map(SS_psides *si, object *argl)
 
     f = PM_make_mapping(name, PM_LR_S, domain, range, centering, NULL);
 
-    rv = SX_mk_mapping(f);
+    rv = SX_mk_mapping(si, f);
 
     return(rv);}
 
@@ -959,7 +959,7 @@ static object *SX_col_labels(SS_psides *si)
  
 /* SX_INSTALL_ASCII_FUNCS - install the ASCII extensions to Scheme */
  
-void SX_install_ascii_funcs(void)
+void SX_install_ascii_funcs(SS_psides *si)
    {
 
     SS_install("read-table*",

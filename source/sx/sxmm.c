@@ -76,10 +76,10 @@ static void _SX_wr_gpdbdata(object *obj, object *strm)
 
 /* _SX_MK_GPDBDATA - encapsulate a g_pdbdata as an object */
 
-object *_SX_mk_gpdbdata(char *name, void *data, syment *ep, PDBfile *file)
+object *_SX_mk_gpdbdata(SS_psides *si, char *name,
+			void *data, syment *ep, PDBfile *file)
    {g_pdbdata *pp;
     object *op;
-    SS_psides *si = &_SS_si;
 
     pp = _SX_mk_pdbdata(name, data, ep, file);
 
@@ -106,9 +106,8 @@ static void _SX_wr_gsyment(object *obj, object *strm)
 
 /* _SX_MK_GSYMENT - encapsulate a syment as an object */
 
-object *_SX_mk_gsyment(syment *ep)
+object *_SX_mk_gsyment(SS_psides *si, syment *ep)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     if (ep == NULL)
        return(SS_null);
@@ -135,9 +134,8 @@ static void _SX_wr_gdefstr(object *obj, object *strm)
 
 /* _SX_MK_GDEFSTR - encapsulate a defstr as an object */
 
-object *_SX_mk_gdefstr(defstr *dp)
+object *_SX_mk_gdefstr(SS_psides *si, defstr *dp)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     if (dp == NULL)
        return(SS_null);
@@ -245,9 +243,8 @@ static void _SX_rl_file(g_file *po)
 
 /* SX_MK_GFILE - make and return type g_file */
 
-object *SX_mk_gfile(g_file *po)
+object *SX_mk_gfile(SS_psides *si, g_file *po)
    {object *op;
-    SS_psides *si = &_SS_si;
 
     if (po == NULL)
        return(SS_null);
@@ -266,11 +263,10 @@ object *SX_mk_gfile(g_file *po)
  *                  - to it
  */
 
-g_file *_SX_mk_open_file(char *name, char *type, char *mode)
+g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
    {PDBfile *file;
     object *obj;
     g_file *po;
-    SS_psides *si = &_SS_si;
 
 /* open the file */
     file = PD_open(name, mode);
@@ -302,7 +298,7 @@ g_file *_SX_mk_open_file(char *name, char *type, char *mode)
     _PD_def_real(type, file);
 
     po  = _SX_mk_file(name, type, file);
-    obj = SX_mk_gfile(po);
+    obj = SX_mk_gfile(si, po);
     SS_UNCOLLECT(obj);
 
 /* GOTCHA: since po points to obj and obj points to po

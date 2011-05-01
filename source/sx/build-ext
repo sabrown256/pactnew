@@ -19,7 +19,7 @@ if (!(-d extensions)) then
    cat >&! sxext.c << EOF
 #include "cpyright.h"
 #include "sx_int.h"
-void SX_install_ext_funcs(void)
+void SX_install_ext_funcs(SS_psides *si)
    {return;}
 EOF
 

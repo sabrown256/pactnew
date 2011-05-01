@@ -2008,11 +2008,11 @@ static object *_ULI_plot(SS_psides *si)
  *                         - Scheme hash table
  */
 
-void UL_install_scheme_funcs(void)
-   {extern void _SX_install_pgs_primitives(void);
+void UL_install_scheme_funcs(SS_psides *si)
+   {extern void _SX_install_pgs_primitives(SS_psides *si);
 
-    SX_install_global_funcs();
-    _SX_install_pgs_primitives();
+    SX_install_global_funcs(si);
+    _SX_install_pgs_primitives(si);
 
     SS_install("curve->list",
                "Prodedure: Given a curve return a list of the lists of x and y values\n     Usage: curve->list <curve>",

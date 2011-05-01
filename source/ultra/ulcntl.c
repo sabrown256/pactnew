@@ -548,10 +548,10 @@ void UL_pause(int pf)
 
 /* UL_INSTALL_GLOBAL_VARS - install the global variables */
 
-void UL_install_global_vars(void)
+void UL_install_global_vars(SS_psides *si)
    {
 
-    SX_install_global_vars();
+    SX_install_global_vars(si);
 
     SS_install_cf("derivative-tolerance",
                   "Variable: Threshold for first derivative change.\n     Usage: derivative-tolerance <double>",

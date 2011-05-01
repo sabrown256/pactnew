@@ -235,13 +235,13 @@ extern object
 /* SXEXT.C declarations */
 
 extern void
- SX_install_ext_funcs(void);
+ SX_install_ext_funcs(SS_psides *si);
 
 
 /* SXFUNC.C declarations */
 
 extern void
- _SX_mf_inst_g(void);
+ _SX_mf_inst_g(SS_psides *si);
 
 
 /* SXGC.C declarations */
@@ -255,7 +255,7 @@ extern void
 /* SXGRI.C declarations */
 
 extern void
- _SX_install_pgs_iob(void);
+ _SX_install_pgs_iob(SS_psides *si);
 
 
 /* SXGROT.C declarations */
@@ -291,7 +291,7 @@ extern object
  *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl);
 
 extern PM_mapping
- *_SXI_extract_mapping(PM_mapping *h, object *argl),
+ *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl),
  *_SXI_refine_mapping(PM_mapping *h, object **pargl),
  *_SXI_interp_mapping(PM_mapping *h, object **pargl);
 
@@ -309,13 +309,14 @@ extern void
 /* SXMM.C declarations */
 
 extern object
- *_SX_mk_gpdbdata(char *name, void *data, syment *ep, PDBfile *file),
- *_SX_mk_gsyment(syment *ep),
- *_SX_mk_gdefstr(defstr *dp);
+ *_SX_mk_gpdbdata(SS_psides *si, char *name,
+		  void *data, syment *ep, PDBfile *file),
+ *_SX_mk_gsyment(SS_psides *si, syment *ep),
+ *_SX_mk_gdefstr(SS_psides *si, defstr *dp);
 
 extern g_file
  *_SX_mk_file(char *name, char *type, void *file),
- *_SX_mk_open_file(char *name, char *type, char *mode);
+ *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode);
 
 extern g_pdbdata
  *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file);
@@ -342,7 +343,7 @@ extern void
  SX_type_container(char *dtype, char *stype);
 
 extern object
- *_SX_open_file(object *arg, char *type, char *mode),
+ *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode),
  *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file),
  *_SX_syment_to_list(SS_psides *si, syment *ep),
  *_SX_defstr_to_list(SS_psides *si, defstr *dp),
@@ -419,13 +420,13 @@ extern int
 /* SXSHAR.C declarations */
 
 extern void
- SX_install_file_funcs(void);
+ SX_install_file_funcs(SS_psides *si);
 
 
 /* SXTABLE.C declarations */
 
 extern void
- SX_install_ascii_funcs(void);
+ SX_install_ascii_funcs(SS_psides *si);
 
 
 /* SXULIO.C declarations */

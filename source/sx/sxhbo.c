@@ -74,7 +74,7 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 
     PM_conv_array(reta, acc, TRUE);
 
-    rv = SX_mk_C_array(reta);
+    rv = SX_mk_C_array(si, reta);
 
     return(rv);}
 
@@ -85,12 +85,12 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
  *                   - return a pointer to the first link in the list
  */
 
-static PM_mapping *_SX_link_mappings(object *argl)
+static PM_mapping *_SX_link_mappings(SS_psides *si, object *argl)
    {PM_mapping *h, *ph, *pn;
 
     h = NULL;
     while (SS_consp(argl))
-       {SX_determine_mapping(&pn, &argl);
+       {SX_determine_mapping(si, &pn, &argl);
 	if (pn == NULL)
 	   continue;
 
@@ -559,7 +559,8 @@ PM_mapping *SX_build_return_mapping(PM_mapping *h, char *label,
  *                      - using the specified function
  */
 
-static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
+static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
+				 object *argl, PFVoid *proc)
    {int i, id, dnde, ne;
     char v[MAX_PRSZ];
     char *dty;
@@ -593,7 +594,7 @@ static void _SX_accumulate_range(PM_mapping *d, object *argl, PFVoid *proc)
 
 	 ps  = NULL;
 	 obj = NULL;
-	 SX_determine_drw_obj(&ps, &obj, &al);
+	 SX_determine_drw_obj(si, &ps, &obj, &al);
 
 	 if (ps != NULL)
 	    tre = _SX_accumulate_mapping(d, ps, FALSE);
@@ -659,22 +660,22 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
 
     else
        {proc = cp->proc;
-	plf  = SX_have_display_list();
+	plf  = SX_have_display_list(si);
 
 	_SX_map_list_label(label, argl);
 
 /* build the return mapping */
-	h = _SX_link_mappings(argl);
+	h = _SX_link_mappings(si, argl);
 	f = SX_build_return_mapping(h, label, NULL, FALSE, FALSE);
 	_SX_unlink_mappings(h);
 
-	_SX_accumulate_range(f, argl, proc);
+	_SX_accumulate_range(si, f, argl, proc);
 
 	SX_plot_flag = TRUE;
 
-	mo = SX_mk_mapping(f);
+	mo = SX_mk_mapping(si, f);
 	if (plf)
-	   mo = SX_display_map(mo);};
+	   mo = SX_display_map(si, mo);};
 
     return(mo);}
 
@@ -745,14 +746,14 @@ PM_set *SX_build_restricted_domain(PM_set *hd, object *argl)
  *                      - from xstart to xstop by xstep
  */
 
-PM_mapping *_SXI_extract_mapping(PM_mapping *h, object *argl)
+PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
    {int plf;
     char *lbl;
     PM_set *fd, *hd;
     PM_mapping *f;
     object *mo;
 
-    plf = SX_have_display_list();
+    plf = SX_have_display_list(si);
 
     hd = h->domain;
 
@@ -766,9 +767,9 @@ PM_mapping *_SXI_extract_mapping(PM_mapping *h, object *argl)
 
     SX_plot_flag = TRUE;
 
-    mo = SX_mk_mapping(f);
+    mo = SX_mk_mapping(si, f);
     if (plf)
-       mo = SX_display_map(mo);
+       mo = SX_display_map(si, mo);
 
     return(f);}
 
@@ -836,8 +837,9 @@ PM_mapping *_SXI_refine_mapping(PM_mapping *h, object **pargl)
     PM_set *fd, *hd;
     PM_mapping *f;
     object *argl, *obj;
+    SS_psides *si = &_SS_si;
 
-    plf = SX_have_display_list();
+    plf = SX_have_display_list(si);
     SC_ASSERT(plf == TRUE);
 
     hd = h->domain;
@@ -873,8 +875,9 @@ PM_mapping *_SXI_interp_mapping(PM_mapping *h, object **pargl)
     PM_set *fd, *hd;
     PM_mapping *f;
     object *argl, *obj;
+    SS_psides *si = &_SS_si;
 
-    plf = SX_have_display_list();
+    plf = SX_have_display_list(si);
     SC_ASSERT(plf == TRUE);
 
     hd = h->domain;

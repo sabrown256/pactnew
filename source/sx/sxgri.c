@@ -634,7 +634,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
  
 /* _SX_INSTALL_PGS_IOB - install the PGS interface object functions */
  
-void _SX_install_pgs_iob(void)
+void _SX_install_pgs_iob(SS_psides *si)
    {
 
     SS_install("pg-interface-object?",

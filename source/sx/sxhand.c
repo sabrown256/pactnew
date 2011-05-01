@@ -24,12 +24,9 @@ typedef PM_mapping *(*PF_PPM_mapping_2)(PM_mapping *f, object **argl);
  *                      - plotting mappings made by the handlers
  */
 
-int SX_have_display_list(void)
+int SX_have_display_list(SS_psides *si)
    {object *var, *pl;
     int plf;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     plf = FALSE;
 
@@ -45,19 +42,16 @@ int SX_have_display_list(void)
 
 /* SX_DISPLAY_MAP - do a display-mapping* on the mapping object MO */
 
-object *SX_display_map(object *mo)
+object *SX_display_map(SS_psides *si, object *mo)
    {PM_mapping *h;
     PG_graph *g;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (SX_plot_flag && SX_autoplot)
        {h  = SS_GET(PM_mapping, mo);
 	g  = PG_make_graph_from_mapping(h,
 					SC_PCONS_P_S, NULL,
 					1, NULL);
-	mo = SX_mk_graph(g);
+	mo = SX_mk_graph(si, g);
 
 	SS_MARK(mo);
 	SS_call_scheme(si, "display-mapping*",
@@ -73,11 +67,8 @@ object *SX_display_map(object *mo)
  *                     - something that can be tested as a mapping
  */
 
-static object *_SX_resolve_mapping(object *argl)
+static object *_SX_resolve_mapping(SS_psides *si, object *argl)
    {object *obj, *fo, *var, *fnc;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SS_Save(si, si->argl);
 
@@ -113,14 +104,15 @@ static object *_SX_resolve_mapping(object *argl)
  *                      - an object into a mapping call it
  */
 
-void SX_determine_drw_obj(PM_mapping **pf, object **po, object **pargl)
+void SX_determine_drw_obj(SS_psides *si, PM_mapping **pf,
+			  object **po, object **pargl)
    {PM_mapping *f;
     PG_graph *g;
     object *argl, *obj;
 
     argl = *pargl;
 
-    obj  = _SX_resolve_mapping(argl);
+    obj  = _SX_resolve_mapping(si, argl);
     argl = SS_cdr(argl);
 
     if (pf != NULL)
@@ -151,10 +143,10 @@ void SX_determine_drw_obj(PM_mapping **pf, object **po, object **pargl)
  *                      - an object into a mapping call it
  */
 
-void SX_determine_mapping(PM_mapping **pf, object **pargl)
+void SX_determine_mapping(SS_psides *si, PM_mapping **pf, object **pargl)
    {object *obj;
 
-    SX_determine_drw_obj(pf, &obj, pargl);
+    SX_determine_drw_obj(si, pf, &obj, pargl);
 /*
     if (*pf == NULL)
        SS_error("BAD MAPPING OR GRAPH - SX_DETERMINE_MAPPING",
@@ -220,7 +212,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret   = SS_null;
-    first = _SX_resolve_mapping(argl);
+    first = _SX_resolve_mapping(si, argl);
     if (SS_numbp(first))
        ret = SS_unary_flt(si, cp, argl);
 
@@ -229,7 +221,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
 	SS_Assign(ret, argl);
 
 	while (SS_consp(argl))
-	   {obj  = _SX_resolve_mapping(argl);
+	   {obj  = _SX_resolve_mapping(si, argl);
 	    argl = SS_cdr(argl);
 	    set  = NULL;
 	    if (SX_NUMERIC_ARRAYP(obj))
@@ -288,7 +280,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
     ret = SS_null;
     while (SS_consp(argl))
        {obj = SS_car(argl);
-        SX_determine_mapping(&f, &argl);
+        SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->domain;
             xp = *(double **) set->elements;
@@ -329,7 +321,7 @@ object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
     ret = SS_null;
     while (SS_consp(argl))
        {obj = SS_car(argl);
-        SX_determine_mapping(&f, &argl);
+        SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            (*op)(f, al);
 
@@ -395,7 +387,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
     ret  = SS_null;
     while (SS_consp(argl))
        {obj = SS_car(argl);
-        SX_determine_mapping(&f, &argl);
+        SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->range;
 	    _SX_cmp_b_set(cp->proc[0], set, a, -1);
@@ -436,7 +428,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
     ret  = SS_null;
     while (SS_consp(argl))
        {obj = SS_car(argl);
-        SX_determine_mapping(&f, &argl);
+        SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->domain;
 	    _SX_cmp_b_set(cp->proc[0], set, a, -1);
@@ -484,7 +476,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
     ret  = SS_null;
     while (SS_consp(argl))
        {obj = SS_car(argl);
-        SX_determine_mapping(&f, &argl);
+        SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->range;
 	    _SX_cmp_b_set(cp->proc[0], set, a, i);
@@ -532,7 +524,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
     ret  = SS_null;
     while (SS_consp(argl))
        {obj = SS_car(argl);
-        SX_determine_mapping(&f, &argl);
+        SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->domain;
 	    _SX_cmp_b_set(cp->proc[0], set, a, i);
@@ -561,16 +553,16 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     op  = (PF_PPM_mapping_2) cp->proc[0];
-    plf = SX_have_display_list();
+    plf = SX_have_display_list(si);
     ret = SS_null;
     while (SS_consp(argl))
-       {SX_determine_mapping(&f, &argl);
+       {SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
             {h  = (*op)(f, &argl);
-	     mo = SX_mk_mapping(h);
+	     mo = SX_mk_mapping(si, h);
 
 	     if (plf)
-	        mo = SX_display_map(mo);
+	        mo = SX_display_map(si, mo);
 
 	     SS_Assign(ret, SS_mk_cons(si, mo, ret));};};
          
@@ -586,10 +578,10 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
  *               - which version of "sin" to use, for example
  */
 
-void SX_mf_install(void)
+void SX_mf_install(SS_psides *si)
    {
 
-    _SX_mf_inst_g();
+    _SX_mf_inst_g(si);
 
     SS_install("hyper-plane",
                "Generate a hyper-plane sum(i=0,n; ci*xi)\nFORM hyper-plane c0 (c1 x1min x1max np1) ...)",

@@ -175,7 +175,7 @@ static object *_SXI_open_raw_file(SS_psides *si, object *argl)
 
     _PD_init_chrt(file, TRUE);
 
-    o  = SX_mk_gfile(_SX_mk_file(name, PDBFILE_S, file));
+    o  = SX_mk_gfile(si, _SX_mk_file(name, PDBFILE_S, file));
 
     return(o);}
 
@@ -342,7 +342,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 	ni = _PD_sys_read(file, ep, outtype, vr);
 	SC_ASSERT(ni >= 0);
 
-	rv = _SX_mk_gpdbdata("data", vr, ep, file);};
+	rv = _SX_mk_gpdbdata(si, "data", vr, ep, file);};
 
     return(rv);}
 
@@ -609,7 +609,7 @@ object *SX_get_file(object *argl, g_file **pfile)
  *               - cons its object to SX_file_list.
  */
 
-object *_SX_open_file(object *arg, char *type, char *mode)
+object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
    {char *name;
     g_file *po, *pn;
     object *o;
@@ -629,7 +629,7 @@ object *_SX_open_file(object *arg, char *type, char *mode)
              return(o);};};
 
 /* add to file_list */
-    pn = _SX_mk_open_file(name, type, mode);
+    pn = _SX_mk_open_file(si, name, type, mode);
 
 /* if file could not be opened return #f so Scheme spoke has a chance */
     if (pn == NULL)
@@ -702,7 +702,7 @@ static object *_SXI_get_io_info(SS_psides *si, object *arg)
 static object *_SXI_create_pdbfile(SS_psides *si, object *arg)
    {object *o;
 
-    o = _SX_open_file(arg, PDBFILE_S, "w");
+    o = _SX_open_file(si, arg, PDBFILE_S, "w");
 
     return(o);}
 
@@ -726,7 +726,7 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
     else
        obj = argl;
 
-    o = _SX_open_file(obj, PDBFILE_S, mode);
+    o = _SX_open_file(si, obj, PDBFILE_S, mode);
 
     return(o);}
 
@@ -857,7 +857,7 @@ static object *_SXI_family_file(SS_psides *si, object *argl)
     ifl  = SS_true(fl);
     file = PD_family(file, ifl);
 
-    o = SX_mk_gfile(_SX_mk_file(file->name, PDBFILE_S, file));
+    o = SX_mk_gfile(si, _SX_mk_file(file->name, PDBFILE_S, file));
 
     return(o);}
 
@@ -1751,7 +1751,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
         dp = PD_defloat(file, name, bytespitem, align, ordr,
                         expb, mantb, sbs, sbe, sbm, hmb, bias);};
 
-    rv = _SX_mk_gdefstr(dp);
+    rv = _SX_mk_gdefstr(si, dp);
 
     return(rv);}
 
@@ -1844,7 +1844,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
     if (dp == NULL)
        SS_error("BAD TYPE - _SXI_READ_DEFSTR", argl);
 
-    o = _SX_mk_gdefstr(dp);
+    o = _SX_mk_gdefstr(si, dp);
 
     return(o);}
 
@@ -1974,7 +1974,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
 			 NO_ORDER, NULL, NULL, FALSE);
-    o  = _SX_mk_gdefstr(dp);
+    o  = _SX_mk_gdefstr(si, dp);
 
     return(o);}
 
@@ -2006,7 +2006,7 @@ static object *_SXI_make_typedef(SS_psides *si, object *argl)
     else
        file = FILE_FILE(PDBfile, po);
 
-    o = _SX_mk_gdefstr(PD_typedef(file, otype, ntype));
+    o = _SX_mk_gdefstr(si, PD_typedef(file, otype, ntype));
 
     return(o);}
 
@@ -2182,7 +2182,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
  *         the error case above does not count!
  */
 
-    o = _SX_mk_gsyment(ep);
+    o = _SX_mk_gsyment(si, ep);
 
     return(o);}
 
@@ -2287,7 +2287,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
 
     _PD_block_switch(ep, bl);
 
-    o = _SX_mk_gsyment(ep);
+    o = _SX_mk_gsyment(si, ep);
 
     return(o);}
 
@@ -2494,7 +2494,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 	if (fp != file)
 	   PN_close(fp);};
 
-    rv = _SX_mk_gpdbdata(fullpath, addr.memaddr, ep, file);
+    rv = _SX_mk_gpdbdata(si, fullpath, addr.memaddr, ep, file);
 
     return(rv);}
 
@@ -2702,23 +2702,23 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 	if (fp != file)
 	   PN_close(fp);};
 
-    o = _SX_mk_gpdbdata(fullpath, addr.memaddr, ep, file);
+    o = _SX_mk_gpdbdata(si, fullpath, addr.memaddr, ep, file);
 
     return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_READ_FILEDATA - read a pdbdata object from a PDB file obtained by
- *                  - the function passed in
- *                  - Syntax: (read-filedata file name)
- *                  -
- *                  - this routine will make a pdbdata object
- *                  - if FILE is nil, the internal virtual file will be used.
- *                  - if there is no entry NAME return SS_null
+/* _SX_READ_FILEDATA - read a pdbdata object from a PDB file obtained by
+ *                   - the function passed in
+ *                   - Syntax: (read-filedata file name)
+ *                   -
+ *                   - this routine will make a pdbdata object
+ *                   - if FILE is nil, the internal virtual file will be used.
+ *                   - if there is no entry NAME return SS_null
  */
 
-static object *SX_read_filedata(object *argl)
+static object *_SX_read_filedata(SS_psides *si, object *argl)
    {int n, err, ie, valid;
     long number;
     char *name, *s, *type;
@@ -2824,7 +2824,7 @@ static object *SX_read_filedata(object *argl)
 	if (n < 0)
 	   s[0] = '\0';};
 
-    o = _SX_mk_gpdbdata(name, addr.memaddr, tep, file);
+    o = _SX_mk_gpdbdata(si, name, addr.memaddr, tep, file);
 
     return(o);}
 
@@ -2842,7 +2842,7 @@ static object *SX_read_filedata(object *argl)
 static object *_SXI_read_pdbdata(SS_psides *si, object *argl)
    {object *o;
 
-    o = SX_read_filedata(argl);
+    o = _SX_read_filedata(si, argl);
 
     return(o);}
 
@@ -3049,7 +3049,7 @@ static object *_SXI_to_pdbdata(SS_psides *si, object *argl)
 
     val.diskaddr = PD_entry_address(ep);
 
-    rv = _SX_mk_gpdbdata("none", val.memaddr, ep, NULL);
+    rv = _SX_mk_gpdbdata(si, "none", val.memaddr, ep, NULL);
 
     return(rv);}
 
@@ -3191,7 +3191,7 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
        SS_error("BAD HASH TABLE NAME - _SXI_HASH_TO_PDBDATA", argl);
 
     else
-       rv = SX_pdbdata_handler(file, name, "hasharr", tab, FALSE);
+       rv = SX_pdbdata_handler(si, file, name, "hasharr", tab, FALSE);
 
     return(rv);}
 
@@ -3204,8 +3204,8 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
  *                    - return a pointer to it
  */
 
-object *SX_pdbdata_handler(PDBfile *file, char *name, char *type,
-			   void *vr, int flag)
+object *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
+			   char *name, char *type, void *vr, int flag)
    {syment *ep;
     SC_address data;
     object *ret;
@@ -3252,7 +3252,7 @@ object *SX_pdbdata_handler(PDBfile *file, char *name, char *type,
         if (flag)
            PD_reset_ptr_list(file);};
     
-    ret = _SX_mk_gpdbdata(fullpath, data.memaddr, ep, file);
+    ret = _SX_mk_gpdbdata(si, fullpath, data.memaddr, ep, file);
 
     return(ret);}
 
@@ -3662,7 +3662,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
 
 	arr = PM_make_array(type, anumb, data);
 
-	rv = SX_mk_C_array(arr);};
+	rv = SX_mk_C_array(si, arr);};
 
     return(rv);}
 
@@ -3763,7 +3763,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
  
 /* SX_INSTALL_PDB_FUNCS - install the PDB extensions to Scheme */
  
-void SX_install_pdb_funcs(void)
+void SX_install_pdb_funcs(SS_psides *si)
    {
 
     SS_install("pd-get-buffer-size",
@@ -4225,7 +4225,7 @@ void SX_install_pdb_funcs(void)
 		  SS_acc_int,
                   &PD_default_format_version);
 
-    SX_install_pdb_attr_funcs();
+    SX_install_pdb_attr_funcs(si);
 
     return;}
  

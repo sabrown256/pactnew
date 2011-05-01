@@ -15,16 +15,12 @@
 
 /* SX_SPRINT - C's fprintf for Scheme */
 
-object *SX_print(argl)
-   object *argl;
+object *SX_print(SS_psides *si, object *argl)
    {int c;
     char forms[MAXLINE], local[MAXLINE], ce;
     char *fmt, *le, *lb, *pt;
     FILE *stream;
     object *str, *obj, *format;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     str  = SS_car(argl);
     argl = SS_cdr(argl);

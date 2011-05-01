@@ -228,7 +228,7 @@ static object *_SXI_get_attr_val(SS_psides *si, object *argl)
     else
        {SC_mark(data.memaddr, 1);
 	ep = _PD_mk_syment(attr_type, 1, data.diskaddr, NULL, NULL);
-	o  = _SX_mk_gpdbdata(at, data.memaddr, ep, file);};
+	o  = _SX_mk_gpdbdata(si, at, data.memaddr, ep, file);};
 
     return(o);}
 
@@ -300,7 +300,7 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
  *                           - in SX
  */
  
-void SX_install_pdb_attr_funcs(void)
+void SX_install_pdb_attr_funcs(SS_psides *si)
    {
 
     SS_install("def-attribute",

@@ -285,11 +285,8 @@ int _SX_print(void)
  *              - else return "#f"
  */
 
-object *SX_mode_text(void)
+object *SX_mode_text(SS_psides *si)
    {object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (PG_console_device == NULL)
        PG_open_console("PDBView", SX_console_type, SX_background_color_white,
@@ -402,11 +399,8 @@ void SX_setup_viewspace(PG_device *dev, double mh)
  *                  - else return "#f"
  */
 
-object *SX_mode_graphics(void)
+object *SX_mode_graphics(SS_psides *si)
    {object *ret;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (PG_console_device == NULL)
        {if (!PG_open_console("PDBView", SX_console_type,

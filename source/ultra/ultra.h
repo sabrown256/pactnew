@@ -96,7 +96,7 @@ extern PM_matrix
 
 extern void
  UL_init_hash(void),
- UL_install_global_vars(void),
+ UL_install_global_vars(SS_psides *si),
  UL_plot_limits(PG_device *dev, int pflg, double *wc),
  UL_pause(int pf);
 
@@ -109,7 +109,7 @@ extern object
 
 extern void
  _UL_quit(SS_psides *si, int i),
- UL_install_scheme_funcs(void),
+ UL_install_scheme_funcs(SS_psides *si),
  UL_install_funcs(void);
 
 extern object
