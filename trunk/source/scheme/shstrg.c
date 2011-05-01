@@ -263,7 +263,7 @@ static object *_SSI_strlen(SS_psides *si, object *str)
 
 /* when tokenizing strings this definition makes more sense */
     ln = strlen(SS_STRING_TEXT(str));
-    rv = SS_mk_integer(ln);
+    rv = SS_mk_integer(si, ln);
 
     return(rv);}
 
@@ -288,7 +288,7 @@ static object *_SSI_strref(SS_psides *si, object *argl)
        SS_error("INDEX PAST END OF STRING - STRING-REF", argl);
 
     c  = s[n];
-    rv = SS_mk_char(c);
+    rv = SS_mk_char(si, c);
 
     CFREE(s);
 
@@ -308,7 +308,7 @@ static object *_SSI_strcpy(SS_psides *si, object *argl)
             SC_STRING_I, &s,
             0);
 
-    str = SS_mk_string(s);
+    str = SS_mk_string(si, s);
 
     CFREE(s);
 
@@ -387,7 +387,7 @@ static object *_SSI_strsub(SS_psides *si, object *argl)
        n2 = n;
 
     s[n2] = '\0';
-    str   = SS_mk_string(&s[n1]);
+    str   = SS_mk_string(si, &s[n1]);
 
     CFREE(s);
 
@@ -412,7 +412,7 @@ static object *_SSI_string(SS_psides *si, object *argl)
 	     t[i] = c;};};
 
     t[i] = '\0';
-    str  = SS_mk_string(t);
+    str  = SS_mk_string(si, t);
     CFREE(t);
 
     return(str);}
@@ -439,7 +439,7 @@ static object *_SSI_strapp(SS_psides *si, object *argl)
              CFREE(t);
              t = s;};};
 
-    ths = SS_mk_string(t);
+    ths = SS_mk_string(si, t);
     CFREE(t);
 
     return(ths);}
@@ -460,7 +460,7 @@ static object *_SSI_strlst(SS_psides *si, object *str)
     s = SS_STRING_TEXT(str);
     n = SS_STRING_LENGTH(str);
     for (ret = SS_null, i = 0; i < n; i++)
-        ret = SS_mk_cons(SS_mk_char(s[i]), ret);
+        ret = SS_mk_cons(si, SS_mk_char(si, s[i]), ret);
 
     o = SS_reverse(ret);
 
@@ -488,7 +488,7 @@ static object *_SSI_lststr(SS_psides *si, object *argl)
             s[i++] = (char) SS_CHARACTER_VALUE(ths);};
     s[i] = '\0';
 
-    str = SS_mk_string(s);
+    str = SS_mk_string(si, s);
     CFREE(s);
 
     return(str);}
@@ -506,7 +506,7 @@ static object *_SSI_symstr(SS_psides *si, object *arg)
        SS_error("ARGUMENT NOT VARIABLE - SYMBOL->STRING", arg);
 
     s  = SS_VARIABLE_NAME(arg);
-    rv = SS_mk_string(s);
+    rv = SS_mk_string(si, s);
 
     return(rv);}
 
@@ -523,7 +523,7 @@ static object *_SSI_strsym(SS_psides *si, object *str)
        SS_error("ARGUMENT NOT STRING - STRING->SYMBOL", str);
 
     s  = SS_STRING_TEXT(str);
-    rv = SS_mk_variable(s, SS_null);
+    rv = SS_mk_variable(si, s, SS_null);
 
     return(rv);}
 
@@ -539,7 +539,7 @@ static object *_SSI_upcase(SS_psides *si, object *str)
     if (SS_stringp(str))
        {s  = SS_STRING_TEXT(str);
 	s  = SC_str_upper(s);
-	rv = SS_mk_string(s);}
+	rv = SS_mk_string(si, s);}
     else
        rv = SS_null;
 
@@ -557,7 +557,7 @@ static object *_SSI_dncase(SS_psides *si, object *str)
     if (SS_stringp(str))
        {s  = SS_STRING_TEXT(str);
 	s  = SC_str_lower(s);
-	rv = SS_mk_string(s);}
+	rv = SS_mk_string(si, s);}
     else
        rv = SS_null;
 
@@ -585,7 +585,7 @@ static object *_SSI_mk_str(SS_psides *si, object *argl)
     memset(s, c, n);
     s[n] = '\0';
 
-    o = SS_mk_string(s);
+    o = SS_mk_string(si, s);
 
     return(o);}
 
@@ -608,11 +608,11 @@ static object *_SSI_strnum(SS_psides *si, object *argl)
     rv = SS_f;
     if (SC_intstrp(text, SC_gs.radix))
        {l  = STRTOL(text, &pt, SC_gs.radix);
-	rv = SS_mk_integer(l);}
+	rv = SS_mk_integer(si, l);}
 
     else if (SC_fltstrp(text))
        {r  = ATOF(text);
-	rv = SS_mk_float(r);};
+	rv = SS_mk_float(si, r);};
 
     CFREE(text);
 
@@ -635,7 +635,7 @@ static object *_SSI_strchr(SS_psides *si, object *argl)
             0);
 
     s  = strchr(text, (int) delim[0]);
-    rv = (s == NULL) ? SS_null : SS_mk_string(s);
+    rv = (s == NULL) ? SS_null : SS_mk_string(si, s);
 
     CFREE(text);
     CFREE(delim);
@@ -659,7 +659,7 @@ static object *_SSI_strstr(SS_psides *si, object *argl)
             0);
 
     s  = strstr(cs, ct);
-    rv = (s == NULL) ? SS_null : SS_mk_string(s);
+    rv = (s == NULL) ? SS_null : SS_mk_string(si, s);
 
     CFREE(cs);
     CFREE(ct);
@@ -686,7 +686,7 @@ static object *_SSI_strcasestr(SS_psides *si, object *argl)
     ct = SC_str_lower(ct);
 
     s  = strstr(cs, ct);
-    rv = (s == NULL) ? SS_null : SS_mk_string(s);
+    rv = (s == NULL) ? SS_null : SS_mk_string(si, s);
 
     CFREE(cs);
     CFREE(ct);
@@ -719,7 +719,7 @@ static object *_SSI_istrchr(SS_psides *si, object *argl)
     else
        ind = s - text;
 
-    rv = SS_mk_integer(ind);
+    rv = SS_mk_integer(si, ind);
 
     CFREE(text);
     CFREE(delim);
@@ -749,7 +749,7 @@ static object *_SSI_istrstr(SS_psides *si, object *argl)
     else
        ind = s - cs;
 
-    rv = SS_mk_integer(ind);
+    rv = SS_mk_integer(si, ind);
 
     CFREE(cs);
     CFREE(ct);
@@ -808,7 +808,7 @@ static object *_SSI_trim(SS_psides *si, object *argl)
     else
        r = SC_trim_right(s, d);
 
-    rv = SS_mk_string(r);
+    rv = SS_mk_string(si, r);
 
     CFREE(s);
     CFREE(d);
@@ -823,7 +823,8 @@ static object *_SSI_trim(SS_psides *si, object *argl)
  *            - string (this is useful for quick one shot token grabbing)
  */
 
-static object *_SS_strtok(object *argl, char *(*fnc)(char *, char *))
+static object *_SS_strtok(SS_psides *si, object *argl,
+			  char *(*fnc)(char *, char *))
    {int c;
     char *text, *delim, t[MAXLINE], d[MAXLINE], *ps, *pt;
     object *obj, *flag, *rv, *str;
@@ -877,7 +878,7 @@ static object *_SS_strtok(object *argl, char *(*fnc)(char *, char *))
 
     ps = (*fnc)(text, d);
 
-    rv = (ps == NULL) ? SS_null : SS_mk_string(ps);
+    rv = (ps == NULL) ? SS_null : SS_mk_string(si, ps);
 
     CFREE(delim);
 
@@ -891,7 +892,7 @@ static object *_SS_strtok(object *argl, char *(*fnc)(char *, char *))
 static object *_SSI_strtok(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strtok(argl, SC_firsttok);
+    o = _SS_strtok(si, argl, SC_firsttok);
 
     return(o);}
 
@@ -903,7 +904,7 @@ static object *_SSI_strtok(SS_psides *si, object *argl)
 static object *_SSI_lasttok(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strtok(argl, SC_lasttok);
+    o = _SS_strtok(si, argl, SC_lasttok);
 
     return(o);}
 

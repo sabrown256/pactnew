@@ -301,7 +301,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
             SX_dataset[j].modified = TRUE;
  */
 
-            SS_Assign(ret, SS_mk_cons(obj, ret));
+            SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(ret);
@@ -333,7 +333,7 @@ object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
         if (f != NULL)
            (*op)(f, al);
 
-	SS_Assign(ret, SS_mk_cons(obj, ret));};
+	SS_Assign(ret, SS_mk_cons(si, obj, ret));};
          
     SX_prep_ret(ret);
 
@@ -403,7 +403,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(obj, ret));
+            SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(ret);
@@ -444,7 +444,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(obj, ret));
+            SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(ret);
@@ -492,7 +492,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(obj, ret));
+            SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(ret);
@@ -540,7 +540,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(obj, ret));
+            SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(ret);
@@ -572,7 +572,7 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
 	     if (plf)
 	        mo = SX_display_map(mo);
 
-	     SS_Assign(ret, SS_mk_cons(mo, ret));};};
+	     SS_Assign(ret, SS_mk_cons(si, mo, ret));};};
          
     SX_prep_ret(ret);
 

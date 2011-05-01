@@ -83,28 +83,28 @@ object *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl)
 	PFDoubled f;
 	f  = (PFDoubled) cp->proc[0];
 	y  = f(SS_INTEGER_VALUE(x));
-	rv = SS_mk_float(y);}
+	rv = SS_mk_float(si, y);}
 
     else if (id == SC_FLOAT_I)
        {double y;
 	PFDoubled f;
 	f  = (PFDoubled) cp->proc[0];
 	y  = f(SS_FLOAT_VALUE(x));
-	rv = SS_mk_float(y);}
+	rv = SS_mk_float(si, y);}
 
     else if (id == SC_DOUBLE_COMPLEX_I)
        {double _Complex y;
 	PFComplexc f;
 	f  = (PFComplexc) cp->proc[1];
 	y  = f(SS_COMPLEX_VALUE(x));
-	rv = SS_mk_complex(y);}
+	rv = SS_mk_complex(si, y);}
 
     else if (id == SC_QUATERNION_I)
        {quaternion y;
 	PFQuaternionq f;
 	f  = (PFQuaternionq) cp->proc[2];
 	y  = f(SS_QUATERNION_VALUE(x));
-	rv = SS_mk_quaternion(y);}
+	rv = SS_mk_quaternion(si, y);}
 
     else
        SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);
@@ -134,7 +134,7 @@ object *SS_unary_fix(SS_psides *si, C_procedure *cp, object *argl)
     SC_ASSERT(type != 0);
 
     iv = (*fnc)(operand);
-    rv = SS_mk_integer(iv);
+    rv = SS_mk_integer(si, iv);
 
     return(rv);}
 
@@ -160,7 +160,7 @@ static object *SS_unary_bit(SS_psides *si, C_procedure *cp, object *argl)
     SC_ASSERT(type != 0);
 
     iv = (*fnc)(operand);
-    rv = SS_mk_integer(iv);
+    rv = SS_mk_integer(si, iv);
 
     return(rv);}
 
@@ -201,13 +201,13 @@ object *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl)
 
     if (!SS_integerp(x1) || !SS_integerp(x2))
        SS_error("ARGUMENTS NOT BOTH INTEGERS - SS_BINARY_FIX",
-                SS_mk_cons(x1, x2));
+                SS_mk_cons(si, x1, x2));
 
     i1 = SS_INTEGER_VALUE(x1);
     i2 = SS_INTEGER_VALUE(x2);
 
     iv = (*fnc)(i1, i2);
-    rv = SS_mk_integer(iv);
+    rv = SS_mk_integer(si, iv);
 
     return(rv);}
 
@@ -218,7 +218,8 @@ object *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl)
  *             - with fixed point maximal type 
  */
 
-static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
+static object *_SS_bin_fix(SS_psides *si, long ni,
+			   object *argl, PFDoubledd op)
    {int idf, ident;
     long i, off;
     double accv, *v;
@@ -241,9 +242,9 @@ static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
         accv = op(accv, v[i]);
 
     if ((SC_is_type_fix(idf) == TRUE) && (accv < LONG_MAX))
-       acc = SS_mk_integer(accv);
+       acc = SS_mk_integer(si, accv);
     else
-       acc = SS_mk_float(accv);
+       acc = SS_mk_float(si, accv);
 
     CFREE(v);
 
@@ -256,7 +257,8 @@ static object *_SS_bin_fix(long ni, object *argl, PFDoubledd op)
  *               - with floating point maximal type 
  */
 
-static object *_SS_bin_float(long ni, object *argl, PFDoubledd op)
+static object *_SS_bin_float(SS_psides *si, long ni,
+			     object *argl, PFDoubledd op)
    {int ident;
     long i, off;
     double accv, *v;
@@ -276,7 +278,7 @@ static object *_SS_bin_float(long ni, object *argl, PFDoubledd op)
     for (i = off; i < ni; i++)
         accv = op(accv, v[i]);
 
-    acc = SS_mk_float(accv);
+    acc = SS_mk_float(si, accv);
 
     CFREE(v);
 
@@ -289,7 +291,8 @@ static object *_SS_bin_float(long ni, object *argl, PFDoubledd op)
  *                 - with complex floating point maximal type 
  */
 
-static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
+static object *_SS_bin_complex(SS_psides *si, long ni,
+			       object *argl, PFComplexcc op)
    {int ident;
     long i, off;
     double _Complex accv, *v;
@@ -309,7 +312,7 @@ static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
     for (i = off; i < ni; i++)
         accv = op(accv, v[i]);
 
-    acc = SS_mk_complex(accv);
+    acc = SS_mk_complex(si, accv);
 
     CFREE(v);
 
@@ -322,7 +325,8 @@ static object *_SS_bin_complex(long ni, object *argl, PFComplexcc op)
  *                    - with quaternion floating point maximal type 
  */
 
-static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
+static object *_SS_bin_quaternion(SS_psides *si, long ni,
+				  object *argl, PFQuaternionqq op)
    {int ident;
     long i, off;
     quaternion accv, *v;
@@ -346,7 +350,7 @@ static object *_SS_bin_quaternion(long ni, object *argl, PFQuaternionqq op)
     for (i = off; i < ni; i++)
         accv = op(accv, v[i]);
 
-    acc = SS_mk_quaternion(accv);
+    acc = SS_mk_quaternion(si, accv);
 
     CFREE(v);
 
@@ -371,19 +375,19 @@ object *SS_binary_homogeneous(SS_psides *si, C_procedure *cp, object *argl)
 
 /* fixed point operands */
     else if (SC_is_type_fix(ido) == TRUE)
-       acc = _SS_bin_fix(ni, argl, (PFDoubledd) cp->proc[0]);
+       acc = _SS_bin_fix(si, ni, argl, (PFDoubledd) cp->proc[0]);
 
 /* floating point operands */
     else if (SC_is_type_fp(ido) == TRUE)
-       acc = _SS_bin_float(ni, argl, (PFDoubledd) cp->proc[0]);
+       acc = _SS_bin_float(si, ni, argl, (PFDoubledd) cp->proc[0]);
 
 /* complex floating point operands */
     else if (SC_is_type_cx(ido) == TRUE)
-       acc = _SS_bin_complex(ni, argl, (PFComplexcc) cp->proc[1]);
+       acc = _SS_bin_complex(si, ni, argl, (PFComplexcc) cp->proc[1]);
 
 /* quaternion operands */
     else
-       acc = _SS_bin_quaternion(ni, argl, (PFQuaternionqq) cp->proc[2]);
+       acc = _SS_bin_quaternion(si, ni, argl, (PFQuaternionqq) cp->proc[2]);
 
     return(acc);}
 
@@ -418,7 +422,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
 
 	op   = (PFDoubledd) cp->proc[0];
 	accv = op(x, n);
-	acc  = SS_mk_float(accv);}
+	acc  = SS_mk_float(si, accv);}
 
 /* complex floating point operands */
     else if (SC_is_type_cx(ido) == TRUE)
@@ -432,7 +436,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
 
 	op   = (PFComplexcd) cp->proc[1];
 	accv = op(z, n);
-	acc  = SS_mk_complex(accv);}
+	acc  = SS_mk_complex(si, accv);}
 
 /* quaternion operands */
     else
@@ -446,7 +450,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
 
 	op   = (PFQuaternionqd) cp->proc[2];
 	accv = op(q, n);
-	acc  = SS_mk_quaternion(accv);};
+	acc  = SS_mk_quaternion(si, accv);};
 
     return(acc);}
 
@@ -589,7 +593,7 @@ static int _SS_odd(double f)
 static object *_SS_machine_prec(SS_psides *si)
    {object *rv;
 
-    rv = SS_mk_float(PM_machine_precision());
+    rv = SS_mk_float(si, PM_machine_precision());
 
     return(rv);}
 
@@ -613,13 +617,13 @@ static object *_SS_xor_pow(SS_psides *si, object *argl)
        {SS_GET_OPERAND(i1, argl, type);
 	SS_GET_OPERAND(i2, argl, type);
 	iv = PM_lxor(i1, i2);
-	rv = SS_mk_integer(iv);}
+	rv = SS_mk_integer(si, iv);}
 
     else
        {SS_GET_OPERAND(d1, argl, type);
 	SS_GET_OPERAND(d2, argl, type);
 	dv = pow(d1, d2);
-	rv = SS_mk_float(dv);};
+	rv = SS_mk_float(si, dv);};
 
     SC_ASSERT(type != 0);
 

@@ -186,7 +186,7 @@ static object *_SXI_package_name(SS_psides *si, object *obj)
 
     rv = SS_null;
     if (SX_PACKAGEP(obj))
-       rv = SS_mk_string(PACKAGE_NAME(obj));
+       rv = SS_mk_string(si, PACKAGE_NAME(obj));
     else
        SS_error("BAD PACKAGE - _SXI_PACKAGE_NAME", obj);
 
@@ -285,10 +285,10 @@ static object *_SXI_run_package(SS_psides *si, object *argl)
 /* reconnect the global controls */
     PA_control_set("global");
 
-    numdt = SS_mk_float(pck->dt);
-    zondt = SS_mk_integer(pck->dt_zone);
+    numdt = SS_mk_float(si, pck->dt);
+    zondt = SS_mk_integer(si, pck->dt_zone);
 
-    o = SS_mk_cons(numdt, zondt);
+    o = SS_mk_cons(si, numdt, zondt);
 
     return(o);}
 
@@ -666,7 +666,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
          if ((hp = SC_hasharr_lookup(si->symtab, name)) != NULL)
             obj = (object *) hp->def;
          else
-            {obj = SS_mk_variable(name, SS_null);
+            {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
              if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
                 SS_error("CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
@@ -703,7 +703,7 @@ static object *_SXI_intern_packages(SS_psides *si)
          if ((hp = SC_hasharr_lookup(si->symtab, name)) != NULL)
             obj = (object *) hp->def;
          else
-            {obj = SS_mk_variable(name, SS_null);
+            {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
              if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
                 SS_error("CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};

@@ -70,7 +70,7 @@ static object *_SSI_hash_lookup(SS_psides *si, object *argl)
     if (vr == NULL)
        o = SS_f;
     else
-       o = SS_mk_cons(SS_car(argl), vr);
+       o = SS_mk_cons(si, SS_car(argl), vr);
 
     CFREE(name);
 
@@ -151,7 +151,7 @@ object *SS_hash_dump(SS_psides *si, object *argl)
     obj = SS_null;
     for (i = nnames-1; i >= 0; i--)
         if ((name = names[i]) != NULL)
-           {SS_Assign(obj, SS_mk_cons(SS_mk_string(name), obj));};
+           {SS_Assign(obj, SS_mk_cons(si, SS_mk_string(si, name), obj));};
 
 /* release the pointers */
     CFREE(names);
@@ -177,9 +177,11 @@ static object *_SSI_hash_info(SS_psides *si, object *arg)
     flg = (tab->docp) ? SS_t : SS_f;
     ne  = SC_hasharr_get_n(tab);
 
-    obj = SS_mk_cons(SS_mk_integer(tab->size), 
-                     SS_mk_cons(SS_mk_integer(ne),
-                                SS_mk_cons(flg, SS_null)));
+    obj = SS_mk_cons(si,
+		     SS_mk_integer(si, tab->size), 
+                     SS_mk_cons(si,
+				SS_mk_integer(si, ne),
+                                SS_mk_cons(si, flg, SS_null)));
 
     return(obj);}
 

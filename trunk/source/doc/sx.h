@@ -2747,19 +2747,30 @@ the interpreter.<p>
 
 <B></B>
 <BLOCKQUOTE>
-object *SS_mk_variable(char *name, object *v)
-<P>object *SS_mk_string(char *s)
-<P>object *SS_mk_inport(FILE *str)
-<P>object *SS_mk_outport(FILE *str)
-<P>object *SS_mk_integer(long i)
-<P>object *SS_mk_float(double d)
-<P>object *SS_mk_cons(object *car, object *cdr)
-<P>object *SS_mk_char(int i)
-<P>object *SS_mk_vector(int l)
-<P>object *SS_mk_hasharr(HASHTAB *tb)
-<P>object *SS_mk_haelem(hashel *hp)
+object *SS_mk_variable(SS_psides *si, char *n, object *v)
+<P>
+object *SS_mk_string(SS_psides *si, char *s)
+<P>
+object *SS_mk_inport(SS_psides *si, FILE *str)
+<P>
+object *SS_mk_outport(SS_psides *si, FILE *str)
+<P>
+object *SS_mk_integer(SS_psides *si, long i)
+<P>
+object *SS_mk_float(SS_psides *si, double d)
+<P>
+object *SS_mk_cons(SS_psides *si, object *car, object *cdr)
+<P>
+object *SS_mk_char(SS_psides *si, int i)
+<P>
+object *SS_mk_vector(SS_psides *si, int l)
+<P>
+object *SS_mk_hasharr(SS_psides *si, hasharr *tb)
+<P>
+object *SS_mk_haelem(SS_psides *si, hashel *hp)
 <P><BR>
-<P>object *SS_mk_object(void *p, int type, int ev_type, char *name)
+<P>object *SS_mk_object(SS_psides *si, void *p,
+                        int type, int ev_type, char *name)
 </BLOCKQUOTE>
 </B>
 

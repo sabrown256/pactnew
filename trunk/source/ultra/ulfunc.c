@@ -548,7 +548,7 @@ static object *_ULI_range(SS_psides *si, object *argl)
 	    SX_gwc[3] = wc[3];
 	    SX_autorange = FALSE;};};
 
-    rv = SS_mk_cons(SS_mk_float(wc[2]), SS_mk_float(wc[3]));
+    rv = SS_mk_cons(si, SS_mk_float(si, wc[2]), SS_mk_float(si, wc[3]));
 
     return(rv);}
 
@@ -607,7 +607,7 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 	    SX_gwc[1] = wc[1];
 	    SX_autodomain = FALSE;};};
 
-    rv = SS_mk_cons(SS_mk_float(wc[0]), SS_mk_float(wc[1]));
+    rv = SS_mk_cons(si, SS_mk_float(si, wc[0]), SS_mk_float(si, wc[1]));
 
     return(rv);}
 
@@ -814,9 +814,9 @@ static object *UL_print_labels(int *indx, int nc,
                     continue;};
 
              if (id_flag == 1)
-                {SS_Assign(ret, SS_mk_cons(SS_mk_integer(j), ret));}
+                {SS_Assign(ret, SS_mk_cons(si, SS_mk_integer(si, j), ret));}
              else if (id_flag == 2)
-                {SS_Assign(ret, SS_mk_cons(SX_dataset[i].obj, ret));}
+                {SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));}
 
              if ((silent == FALSE) &&
 		 ((si->interactive == ON) || (fp != stdout)))
@@ -923,9 +923,9 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                    PRINT(stdout, " Prefix %c is not assigned\n", pre);};}
 
         {SS_Assign(ret,
-                   SS_mk_cons(arg1,
-                              SS_mk_cons(SS_mk_integer(mindex),
-                                         SS_mk_cons(SS_mk_string(fname),
+                   SS_mk_cons(si, arg1,
+                              SS_mk_cons(si, SS_mk_integer(si, mindex),
+                                         SS_mk_cons(si, SS_mk_string(si, fname),
                                                     ret))));};}
     else
        {for (i = 0; i < NPREFIX; i++)
@@ -936,11 +936,14 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                    fname = SX_dataset[SX_number[mindex]].file;
                 if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);
-                arg1 = SS_mk_char((int) pre);
+                arg1 = SS_mk_char(si, (int) pre);
                 {SS_Assign(ret,
-                           SS_mk_cons(SS_mk_cons(arg1,
-                                                 SS_mk_cons(SS_mk_integer(mindex),
-                                                            SS_mk_cons(SS_mk_string(fname),
+                           SS_mk_cons(si,
+				      SS_mk_cons(si, arg1,
+						 SS_mk_cons(si,
+							    SS_mk_integer(si, mindex),
+                                                            SS_mk_cons(si,
+								       SS_mk_string(si, fname),
                                                                        SS_null))),
                                       ret));};}
         {SS_Assign(ret, SS_reverse(ret));};}
@@ -1296,7 +1299,7 @@ static object *_ULI_average(SS_psides *si, object *s)
     UL_plot_off();
 
     rv      = SS_null;
-    numtoks = SS_mk_integer(SS_length(s));
+    numtoks = SS_mk_integer(si, SS_length(s));
 
     cpp = _SS_mk_C_proc_va(UL_bc, 1, PM_fplus);
     c   = UL_bc(si, cpp, s);
@@ -1356,7 +1359,7 @@ static object *_ULI_syscmnd(SS_psides *si, object *s)
     if (output != NULL)
        {i = 0;
         while (output[i] != NULL)
-           {SS_Assign(lst, SS_mk_cons(SS_mk_string(output[i]), lst));
+           {SS_Assign(lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));
             CFREE(output[i]);
             i++;}
         SS_Assign(lst, SS_reverse(lst));
@@ -1495,7 +1498,7 @@ static object *_ULI_lnnorm(SS_psides *si, object *argl)
     n = SX_dataset[j].n;
     lnnorm = PM_lnnorm(SX_dataset[j].x[1], SX_dataset[j].x[0], n, order);
 
-    o = SS_mk_float(lnnorm);
+    o = SS_mk_float(si, lnnorm);
 
     return(o);}
 
@@ -1974,8 +1977,8 @@ static object *_ULI_curve_list(SS_psides *si, object *arg)
     xvals = SS_null;
     yvals = SS_null;
     for (l = 0; l < n; l++)
-        {xvals = SS_mk_cons(SS_mk_float(x[0][l]), xvals);
-         yvals = SS_mk_cons(SS_mk_float(x[1][l]), yvals);};
+        {xvals = SS_mk_cons(si, SS_mk_float(si, x[0][l]), xvals);
+         yvals = SS_mk_cons(si, SS_mk_float(si, x[1][l]), yvals);};
 
     o = SS_make_list(SS_OBJECT_I, SS_reverse(xvals),
 		     SS_OBJECT_I, SS_reverse(yvals),

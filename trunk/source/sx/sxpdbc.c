@@ -11,8 +11,10 @@
 #include "sx_int.h"
 
 void
- _SX_copy_indirection(PDBfile *file, char **vrin, char **vrout, char *type), 
- _SX_copy_leaf(PDBfile *file, char *vrin, char*vrout, long nitems, char *type);
+ _SX_copy_indirection(SS_psides *si, PDBfile *file,
+		      char **vrin, char **vrout, char *type), 
+ _SX_copy_leaf(SS_psides *si, PDBfile *file,
+	       char *vrin, char*vrout, long nitems, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -24,19 +26,19 @@ void
  *               - how long it is until we look at the string.
  */
 
-void _SX_copy_tree(PDBfile *file, char *vrin, char *vrout,
+void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 		   long nitems, char *type)
    {long i;
     char **lvr, **lvo, *dtype;
 
     if (!_PD_indirection(type))
-       _SX_copy_leaf(file, vrin, vrout, nitems, type);
+       _SX_copy_leaf(si, file, vrin, vrout, nitems, type);
     else
        {lvr = (char **) vrin;
         lvo = (char **) vrout;
         dtype = PD_dereference(CSTRSAVE(type));
         for (i = 0L; i < nitems; i++)
-            _SX_copy_indirection(file, &lvr[i], &lvo[i], dtype);
+            _SX_copy_indirection(si, file, &lvr[i], &lvo[i], dtype);
         CFREE(dtype);};
 
     return;}
@@ -49,8 +51,8 @@ void _SX_copy_tree(PDBfile *file, char *vrin, char *vrout,
  *                      - read in the data
  */
 
-void _SX_copy_indirection(PDBfile *file, char **vrin, char **vrout,
-			  char *type)
+void _SX_copy_indirection(SS_psides *si, PDBfile *file,
+			  char **vrin, char **vrout, char *type)
    {long nitems, bpi, nbytes;
     char *pv;
 
@@ -60,14 +62,14 @@ void _SX_copy_indirection(PDBfile *file, char **vrin, char **vrout,
        {nbytes = (long) SC_arrlen(*vrin);
         if ((bpi = _PD_lookup_size(type, file->host_chart)) == -1)
            SS_error("CAN'T FIND NUMBER OF BYTES - _SX_COPY_INDIRECTION",
-                    SS_mk_string(type));
+                    SS_mk_string(si, type));
         nitems = nbytes / bpi;
 
         pv = CMAKE_N(char, nitems*bpi);
         DEREF(vrout) = pv;
 
         SC_arrtype(pv, SC_arrtype(*vrin, 0));
-        _SX_copy_tree(file, *vrin, pv, nitems, type);};
+        _SX_copy_tree(si, file, *vrin, pv, nitems, type);};
 
     return;}
 
@@ -81,7 +83,7 @@ void _SX_copy_indirection(PDBfile *file, char **vrin, char **vrout,
  *               - return the number of items successfully read
  */
 
-void _SX_copy_leaf(PDBfile *file, char *vrin, char *vrout,
+void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 		   long nitems, char *type)
    {long i, bpi, sz, member_offs;
     char *mtype, *dtype, *svrin, *svrout;
@@ -93,7 +95,7 @@ void _SX_copy_leaf(PDBfile *file, char *vrin, char *vrout,
     bpi = _PD_lookup_size(type, file->host_chart);
     if (bpi == -1)
        SS_error("CAN'T GET NUMBER OF BYTES - _SX_COPY_LEAF",
-                SS_mk_string(type));
+                SS_mk_string(si, type));
 
     memcpy(vrout, vrin, (int) nitems*bpi);
 
@@ -124,7 +126,7 @@ void _SX_copy_leaf(PDBfile *file, char *vrin, char *vrout,
 
 		      if (_PD_indirection(mtype))
 			 {dtype = PD_dereference(CSTRSAVE(mtype));
-			  _SX_copy_indirection(file,
+			  _SX_copy_indirection(si, file,
 					       (char **) (svrin + member_offs),
 					       (char **) (svrout + member_offs),
                                           dtype);

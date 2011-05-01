@@ -156,7 +156,7 @@ static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
 
     PG_set_clear_mode(mode);
 
-    rv = SS_mk_integer(mode);
+    rv = SS_mk_integer(si, mode);
 
     return(rv);}
 
@@ -180,7 +180,7 @@ static object *_SXI_clr_mode(SS_psides *si, object *argl)
 
     PG_get_clear_mode(mode);
 
-    o = SS_mk_integer(mode);
+    o = SS_mk_integer(si, mode);
 
     return(o);}
 
@@ -287,7 +287,7 @@ static object *_SXI_def_mrk(SS_psides *si, object *argl)
     CFREE(x2);
     CFREE(y2);
 
-    obj = SS_mk_integer(indx);
+    obj = SS_mk_integer(si, indx);
 
     return(obj);}
 
@@ -338,7 +338,7 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
 
     PM_free_vectors(nd, r);
 
-    obj = SS_mk_integer(ns);
+    obj = SS_mk_integer(si, ns);
 
     return(obj);}
 
@@ -362,7 +362,7 @@ static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
 
     PG_get_marker_orientation(dev, theta);
 
-    o = SS_mk_float(theta);
+    o = SS_mk_float(si, theta);
 
     return(o);}
 
@@ -386,7 +386,7 @@ static object *_SXI_mrk_scal(SS_psides *si, object *argl)
 
     PG_get_marker_scale(dev, scale);
 
-    o = SS_mk_float(scale);
+    o = SS_mk_float(si, scale);
 
     return(o);}
 
@@ -412,7 +412,7 @@ static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
 
     PG_set_marker_orientation(dev, theta);
 
-    o = SS_mk_float(theta);
+    o = SS_mk_float(si, theta);
 
     return(o);}
 
@@ -438,7 +438,7 @@ static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
 
     PG_set_marker_scale(dev, scale);
 
-    o = SS_mk_float(scale);
+    o = SS_mk_float(si, scale);
 
     return(o);}
 
@@ -1009,7 +1009,7 @@ static object *_SXI_gfin(SS_psides *si, object *argl)
 
     PG_get_finish_state(dev, fl);
 
-    o = SS_mk_integer(fl);
+    o = SS_mk_integer(si, fl);
 
     return(o);}
 
@@ -1033,7 +1033,7 @@ static object *_SXI_glnc(SS_psides *si, object *argl)
 
     PG_get_line_color(dev, &c);
 
-    o = SS_mk_integer(c);
+    o = SS_mk_integer(si, c);
 
     return(o);}
 
@@ -1057,7 +1057,7 @@ static object *_SXI_glop(SS_psides *si, object *argl)
 
     PG_get_logical_op(dev, &lop);
 
-    o = SS_mk_integer(lop);
+    o = SS_mk_integer(si, lop);
 
     return(o);}
 
@@ -1081,7 +1081,7 @@ static object *_SXI_glns(SS_psides *si, object *argl)
 
     PG_get_line_style(dev, &s);
 
-    o = SS_mk_integer(s);
+    o = SS_mk_integer(si, s);
 
     return(o);}
 
@@ -1105,7 +1105,7 @@ static object *_SXI_glnw(SS_psides *si, object *argl)
 
     PG_get_line_width(dev, &w);
 
-    o = SS_mk_float(w);
+    o = SS_mk_float(si, w);
 
     return(o);}
 
@@ -1197,7 +1197,7 @@ static object *_SXI_gtxc(SS_psides *si, object *argl)
 
     PG_get_text_color(dev, &c);
 
-    o = SS_mk_integer(c);
+    o = SS_mk_integer(si, c);
 
     return(o);}
 
@@ -2371,7 +2371,7 @@ static object *_SXI_pal_list(SS_psides *si, object *argl)
 	     red   = imp*cl.red;
 	     green = imp*cl.green;
 	     blue  = imp*cl.blue;
-	     lst   = SS_append(SS_make_list(SC_DOUBLE_I, &red,
+	     lst   = SS_append(si, SS_make_list(SC_DOUBLE_I, &red,
 					    SC_DOUBLE_I, &green,
 					    SC_DOUBLE_I, &blue,
 					    0),
@@ -2460,7 +2460,7 @@ static object *_SXI_current_pal(SS_psides *si, object *argl)
     if (dev == NULL)
        obj = SS_null;
     else
-       obj = SS_mk_string(dev->current_palette->name);
+       obj = SS_mk_string(si, dev->current_palette->name);
 
     return(obj);}
 
@@ -2486,7 +2486,7 @@ static object *_SXI_pals(SS_psides *si, object *argl)
         {first += (pal == dev->palettes);
          if (first > 1)
             break;
-         lst = SS_mk_cons(SS_mk_string(pal->name), lst);};
+         lst = SS_mk_cons(si, SS_mk_string(si, pal->name), lst);};
 
     return(lst);}
 
@@ -2717,14 +2717,14 @@ static object *_SXI_gatgl(SS_psides *si, object *argl)
 	     pvo = hp->def;
 	     id  = SC_type_id(typ, FALSE);
 	     if (id == SC_INT_I)
-	        {o = SS_mk_integer(*(int *) pvo);
-		 rv = SS_mk_cons(o, rv);}
+	        {o = SS_mk_integer(si, *(int *) pvo);
+		 rv = SS_mk_cons(si, o, rv);}
 	     else if (id == SC_DOUBLE_I)
-	        {o  = SS_mk_float(*(double *) pvo);
-		 rv = SS_mk_cons(o, rv);}
+	        {o  = SS_mk_float(si, *(double *) pvo);
+		 rv = SS_mk_cons(si, o, rv);}
 	     else if (id == SC_STRING_I)
-	        {o  = SS_mk_string((char *) pvo);
-		 rv = SS_mk_cons(o, rv);};};
+	        {o  = SS_mk_string(si, (char *) pvo);
+		 rv = SS_mk_cons(si, o, rv);};};
 
 	 CFREE(name);};
 
@@ -2743,7 +2743,7 @@ static object *_SXI_gatgl(SS_psides *si, object *argl)
  *                     - return the resulting list
  */
 
-static object *_SX_get_attrs_alist(pcons *alst, object *argl)
+static object *_SX_get_attrs_alist(SS_psides *si, pcons *alst, object *argl)
    {int i, ptr;
     char t[MAXLINE];
     char *name, *typ;
@@ -2765,8 +2765,8 @@ static object *_SX_get_attrs_alist(pcons *alst, object *argl)
 
 	 SC_strncpy(t, MAXLINE, pc->cdr_type, -1);
 	 typ = PD_dereference(t);
-	 o   = _SS_numtype_to_object(typ, pc->cdr, 1);
-	 rv  = SS_mk_cons(o, rv);
+	 o   = _SS_numtype_to_object(si, typ, pc->cdr, 1);
+	 rv  = SS_mk_cons(si, o, rv);
 
 	 CFREE(name);};
 
@@ -2787,7 +2787,7 @@ static object *_SXI_gatgr(SS_psides *si, object *argl)
 	    0);
     argl = SS_cdr(argl);
 
-    rv = _SX_get_attrs_alist(g->info, argl);
+    rv = _SX_get_attrs_alist(si, g->info, argl);
 
     return(rv);}
 
@@ -2806,7 +2806,7 @@ static object *_SXI_gatmp(SS_psides *si, object *argl)
 	    0);
     argl = SS_cdr(argl);
 
-    rv = _SX_get_attrs_alist(f->map, argl);
+    rv = _SX_get_attrs_alist(si, f->map, argl);
 
     return(rv);}
 
@@ -2825,7 +2825,7 @@ static object *_SXI_gatst(SS_psides *si, object *argl)
 	    0);
     argl = SS_cdr(argl);
 
-    rv = _SX_get_attrs_alist(s->info, argl);
+    rv = _SX_get_attrs_alist(si, s->info, argl);
 
     return(rv);}
 
@@ -3049,7 +3049,7 @@ static object *_SXI_gbfsz(SS_psides *si)
     int64_t sz;
 
     sz = PG_get_buffer_size();
-    rv = SS_mk_integer(sz);
+    rv = SS_mk_integer(si, sz);
 
     return(rv);}
 
@@ -3068,7 +3068,7 @@ static object *_SXI_sbfsz(SS_psides *si, object *argl)
 	    0);
 
     PG_set_buffer_size(sz);
-    rv = SS_mk_integer(sz);
+    rv = SS_mk_integer(si, sz);
 
     return(rv);}
 

@@ -18,18 +18,18 @@
 
 /* _SS_ENDCONS - C version of endcons */
 
-object *_SS_endcons(object *list, object *obj)
+object *_SS_endcons(SS_psides *si, object *list, object *obj)
    {object *op, *mlist, *o;
 
     mlist = list;
     if (SS_nullobjp(list))
-       o = SS_mk_cons(obj, SS_null);
+       o = SS_mk_cons(si, obj, SS_null);
 
     else if (!SS_consp(list))
-       o = SS_mk_cons(list, SS_mk_cons(obj, SS_null));
+       o = SS_mk_cons(si, list, SS_mk_cons(si, obj, SS_null));
 
     else
-       {op = SS_mk_cons(obj, SS_null);
+       {op = SS_mk_cons(si, obj, SS_null);
         while (SS_consp(mlist = SS_cdr(mlist)));
         SS_setcdr(mlist, op);
 	o = list;};
@@ -50,7 +50,7 @@ static object *_SSI_cons(SS_psides *si, object *argl)
 
     x1 = SS_car(argl);
     x2 = SS_cadr(argl);
-    o  = SS_mk_cons(x1, x2);
+    o  = SS_mk_cons(si, x1, x2);
 
     return(o);}
 
@@ -291,7 +291,7 @@ object *SS_cdddr(object *obj)
 
 /* SS_LIST_TAIL - return the tail of the list omitting the first n elements */
 
-object *SS_list_tail(object *lst, int n)
+object *SS_list_tail(SS_psides *si, object *lst, int n)
    {int i, nl;
     object *h, *nlst;
 
@@ -306,7 +306,7 @@ object *SS_list_tail(object *lst, int n)
 	       {for (i = 0; i < n; i++)
                    {h    = SS_car(lst);
 		    lst  = SS_cdr(lst);
-		    nlst = SS_mk_cons(h, nlst);};
+		    nlst = SS_mk_cons(si, h, nlst);};
 		nlst = SS_reverse(nlst);};}
 
 	else if ((0 <= n) && (n < SS_length(lst)))
@@ -329,7 +329,7 @@ static object *_SSI_lst_tail(SS_psides *si, object *argl)
 	    SC_INT_I, &n,
             0);
 
-    o = SS_list_tail(lst, n);
+    o = SS_list_tail(si, lst, n);
 
     return(o);}
 
@@ -417,7 +417,7 @@ object *SS_reverse(object *obj)
  *           - C version of append
  */
 
-object *SS_append(object *list1, object *list2)
+object *SS_append(SS_psides *si, object *list1, object *list2)
    {object *frst, *lst, *nxt, *cr;
 
     lst = SS_null;
@@ -466,7 +466,7 @@ static object *_SSI_append(SS_psides *si, object *argl)
        {rv = SS_car(argl);
 	for (r = SS_cdr(argl); r != SS_null; r = SS_cdr(r))
 	    {o  = SS_car(r);
-	     rv = SS_append(rv, o);};};
+	     rv = SS_append(si, rv, o);};};
 
     return(rv);}
 
@@ -482,7 +482,7 @@ static object *_SSI_length(SS_psides *si, object *obj)
     if (!SS_consp(obj))
        SS_error("OBJECT NOT A LIST - LENGTH", obj);
 
-    o = SS_mk_integer(SS_length(obj));
+    o = SS_mk_integer(si, SS_length(obj));
 
     return(o);}
 

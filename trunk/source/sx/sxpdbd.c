@@ -62,7 +62,7 @@ int
  SX_promote_float     = FALSE;
 
 static int
- _SX_diff_tree(char *nma, char *nmb, 
+ _SX_diff_tree(SS_psides *si, char *nma, char *nmb, 
 	       PDBfile *pfa, PDBfile *pfb, 
 	       syment *epa, syment *epb, int flag);
 
@@ -298,7 +298,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
  *                      - return TRUE iff they are the same
  */
 
-static int _SX_diff_indirection(char *nma, char *nmb, 
+static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb, 
 			        PDBfile *pfa, PDBfile *pfb)
    {int fla, flb, ret;
     long na, nb;
@@ -376,7 +376,7 @@ static int _SX_diff_indirection(char *nma, char *nmb,
         epa = _PD_mk_syment(ta, na, ada, NULL, NULL);
         epb = _PD_mk_syment(tb, nb, adb, NULL, NULL);
 
-        ret = _SX_diff_tree(nma, nmb, pfa, pfb, epa, epb, TRUE);
+        ret = _SX_diff_tree(si, nma, nmb, pfa, pfb, epa, epb, TRUE);
 
         _PD_rl_syment_d(epa);
         _PD_rl_syment_d(epb);
@@ -401,7 +401,8 @@ static int _SX_diff_indirection(char *nma, char *nmb,
  *                         - compare data based on type in tag itag, not cast
  */
 
-static int _SX_diff_leaf_indirects(PDBfile *pfa, PDBfile *pfb, 
+static int _SX_diff_leaf_indirects(SS_psides *si,
+				   PDBfile *pfa, PDBfile *pfb, 
 				   PDBfile *pfc, char *bfa, char *bfb, 
 				   long na, char *nma, char *nmb, 
 				   defstr *dp)
@@ -424,7 +425,7 @@ static int _SX_diff_leaf_indirects(PDBfile *pfa, PDBfile *pfb,
                            i + pfc->default_offset, desc->name);
                   snprintf(mnmb, MAXLINE, "%s[%ld].%s", nmb, 
                            i + pfc->default_offset, desc->name);
-                  ret &= _SX_diff_indirection(mnma, mnmb, 
+                  ret &= _SX_diff_indirection(si, mnma, mnmb, 
                                               pfa, pfb);};};
 
 	 sva += sz;
@@ -673,7 +674,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
 
 /* _SX_DIFF_LEAF - compare two arrays of numbers */
 
-static int _SX_diff_leaf(char *nma, char *nmb, 
+static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb, 
 			 PDBfile *pfa, PDBfile *pfb, 
 			 syment *epa, syment *epb)
    {int ret;
@@ -746,7 +747,7 @@ static int _SX_diff_leaf(char *nma, char *nmb,
     dp = PD_inquire_table_type(hc, tc);
     if (dp == NULL)
        SS_error("VARIABLE NOT IN STRUCTURE CHART - _SX_DIFF_LEAF", 
-		SS_mk_string(tc));
+		SS_mk_string(si, tc));
 
     else
        {mem_lst = dp->members;
@@ -758,7 +759,7 @@ static int _SX_diff_leaf(char *nma, char *nmb,
 				   bfa, bfb, ta, tb, na);
 
 	    if (dp->n_indirects)
-	       ret &= _SX_diff_leaf_indirects(pfa, pfb, pfc, 
+	       ret &= _SX_diff_leaf_indirects(si, pfa, pfb, pfc, 
 					      bfa, bfb, na, 
 					      nma, nmb, dp);};
 
@@ -776,7 +777,7 @@ static int _SX_diff_leaf(char *nma, char *nmb,
  *               - but their contents must compare)
  */
 
-static int _SX_diff_tree(char *nma, char *nmb, 
+static int _SX_diff_tree(SS_psides *si, char *nma, char *nmb, 
 			 PDBfile *pfa, PDBfile *pfb, 
 			 syment *epa, syment *epb, int flag)
    {long i, ni;
@@ -784,7 +785,7 @@ static int _SX_diff_tree(char *nma, char *nmb,
     int ret;
 
     if (!_PD_indirection(PD_entry_type(epa)))
-       ret = _SX_diff_leaf(nma, nmb, pfa, pfb, epa, epb);
+       ret = _SX_diff_leaf(si, nma, nmb, pfa, pfb, epa, epb);
 
     else
        {ni  = PD_entry_number(epa);
@@ -799,7 +800,7 @@ static int _SX_diff_tree(char *nma, char *nmb,
 		{snprintf(lnma, MAXLINE, "%s", nma);
 		 snprintf(lnmb, MAXLINE, "%s", nmb);};
 
-	     ret &= _SX_diff_indirection(lnma, lnmb, pfa, pfb);};};
+	     ret &= _SX_diff_indirection(si, lnma, lnmb, pfa, pfb);};};
 
 /* convert FALSE to CONTENTS_DIFFER to be absolutely clear */
     if (ret == FALSE)
@@ -825,7 +826,7 @@ static int _SX_diff_tree(char *nma, char *nmb,
  *              -   TRUE             variables are the same in all respects
  */
 
-static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb, 
+static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb, 
 		        char *nma, char *nmb, 
 			long *nia, long *nib)
    {int ret;
@@ -904,7 +905,7 @@ static int _SX_diff_var(PDBfile *pfa, PDBfile *pfb,
     _SC_set_format_defaults();
     _SC_set_user_formats();
 
-    ret = _SX_diff_tree(fullpatha, fullpathb, pfa, pfb, epa, epb, FALSE);
+    ret = _SX_diff_tree(si, fullpatha, fullpathb, pfa, pfb, epa, epb, FALSE);
     _PD_rl_syment_d(epa);
     _PD_rl_syment_d(epb);
 
@@ -978,7 +979,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
     else
        SX_promote_float = FALSE;
 
-    ret = _SX_diff_var(pfa, pfb, nma, nmb, &sza, &szb);
+    ret = _SX_diff_var(si, pfa, pfb, nma, nmb, &sza, &szb);
 
     samen = ((nma != NULL) && (nmb != NULL) && (strcmp(nma, nmb) == 0));
 
@@ -992,7 +993,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Variable not present: %s in File 1 or %s in File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case CANT_SEEK :
@@ -1004,7 +1005,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Can't seek variable: %s in File 1 or %s in File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case CANT_ALLOC :
@@ -1016,7 +1017,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Can't allocate variable: %s from File 1 or %s from File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case CANT_READ :
@@ -1028,7 +1029,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Can't read variable: %s in File 1 or %s in File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case NOT_SAME_TYPE :
@@ -1040,7 +1041,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Variable %s in File 1 not same type as %s in File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case NOT_SAME_SIZE :
@@ -1052,7 +1053,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Variables not same size: %s in File 1 is %ld and %s in File 2 is %ld", 
 				  nma, sza, nmb, szb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case NOT_PRIMITIVE :
@@ -1064,7 +1065,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Variable not primitive type: %s in File 1 or %s in File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case BAD_UNIT_SIZE :
@@ -1076,7 +1077,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Bad unit size for variable %s in File 1 or %s in File 2", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case BAD_NUMBERS :
@@ -1088,7 +1089,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 	        bf = SC_dsnprintf(FALSE, 
 				  "Variable %s in File 1 or %s in File 2 contains bad numbers", 
 				  nma, nmb);
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;
 
         case CONTENTS_DIFFER :
@@ -1101,7 +1102,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
 
         default :
 	     bf  = SC_dsnprintf(FALSE, "Internal error");
-	     obj = SS_mk_string(bf);
+	     obj = SS_mk_string(si, bf);
 	     break;};
 
     return(obj);}

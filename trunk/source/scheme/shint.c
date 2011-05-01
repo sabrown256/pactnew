@@ -331,7 +331,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 
     else
        {if (si->get_arg != NULL)
-	   si->get_arg(obj, v, type);
+	   si->get_arg(si, obj, v, type);
         else
 	   *pv = obj->val;};
 
@@ -411,30 +411,30 @@ object *SS_define_constant(SS_psides *si, int n, ...)
        if (SC_is_type_char(type) == TRUE)
 	  {long long v;
 	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
-	   val = SS_mk_integer(v);}
+	   val = SS_mk_integer(si, v);}
 
 /* fixed point types (proper) */
        else if (SC_is_type_fix(type) == TRUE)
 	  {long long v;
 	   SC_VA_ARG_FETCH(SC_LONG_LONG_I, &v, type);
-	   val = SS_mk_integer(v);}
+	   val = SS_mk_integer(si, v);}
 
 /* floating point types (proper) */
        else if (SC_is_type_fp(type) == TRUE)
 	  {long double v;
 	   SC_VA_ARG_FETCH(SC_LONG_DOUBLE_I, &v, type);
-	   val = SS_mk_float(v);}
+	   val = SS_mk_float(si, v);}
 
 /* complex floating point types (proper) */
        else if (SC_is_type_cx(type) == TRUE)
 	  {long double _Complex v;
 	   SC_VA_ARG_FETCH(SC_LONG_DOUBLE_COMPLEX_I, &v, type);
-	   val = SS_mk_complex(v);}
+	   val = SS_mk_complex(si, v);}
 
        else if (type == SC_STRING_I)
 	  {char *v;
 	   v   = SC_VA_ARG(char *);
-	   val = SS_mk_string(v);}
+	   val = SS_mk_string(si, v);}
 
        else if (type == SS_OBJECT_I)
 	  val = SC_VA_ARG(object *);
@@ -443,7 +443,7 @@ object *SS_define_constant(SS_psides *si, int n, ...)
 	  SS_error("UNSUPPORTED TYPE - SS_DEFINE_CONSTANT",
 		   SS_null);
 
-       vr = SS_mk_variable(name, SS_null);
+       vr = SS_mk_variable(si, name, SS_null);
        SS_UNCOLLECT(vr);
 
        SC_hasharr_install(si->symtab, name, vr, SS_POBJECT_S, TRUE, TRUE);
@@ -550,7 +550,7 @@ static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 
 	     SC_convert_id(SC_LONG_LONG_I, &v, 0, 1,
 			   ityp, vl, 0, 1, 1, FALSE);
-	     lst = SS_mk_cons(SS_mk_integer(v), lst);}
+	     lst = SS_mk_cons(si, SS_mk_integer(si, v), lst);}
 
 /* floating point types (proper) */
 	 else if (SC_is_type_fp(ityp) == TRUE)
@@ -558,7 +558,7 @@ static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 
 	     SC_convert_id(SC_LONG_DOUBLE_I, &v, 0, 1,
 			   ityp, vl, 0, 1, 1, FALSE);
-	     lst = SS_mk_cons(SS_mk_float(v), lst);}
+	     lst = SS_mk_cons(si, SS_mk_float(si, v), lst);}
 
 /* complex floating point types (proper) */
 	 else if (SC_is_type_cx(ityp) == TRUE)
@@ -566,41 +566,41 @@ static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 
 	     SC_convert_id(SC_LONG_DOUBLE_COMPLEX_I, &v, 0, 1,
 			   ityp, vl, 0, 1, 1, FALSE);
-	     lst = SS_mk_cons(SS_mk_complex(v), lst);}
+	     lst = SS_mk_cons(si, SS_mk_complex(si, v), lst);}
  
 	 else if (ityp == SC_STRING_I)
 	    {s   = (char *) vl;
-	     lst = SS_mk_cons(SS_mk_string(s), lst);}
+	     lst = SS_mk_cons(si, SS_mk_string(si, s), lst);}
  
 	 else if (ityp == SS_OBJECT_I)
 	    {o   = (object *) vl;
-	     lst = SS_mk_cons(o, lst);}
+	     lst = SS_mk_cons(si, o, lst);}
  
 #ifdef LARGE
  
 /* character types (proper) */
 	 else if (SC_is_type_char(ityp) == TRUE)
 	    {c   = *(int *) vl;
-	     lst = SS_mk_cons(SS_mk_char(c), lst);}
+	     lst = SS_mk_cons(si, SS_mk_char(si, c), lst);}
  
 	 else if (ityp == SS_HAELEM_I)
 	    {haelem *hp;
 	     hp  = (haelem *) vl;
-	     lst = SS_mk_cons(SS_mk_haelem(hp), lst);}
+	     lst = SS_mk_cons(si, SS_mk_haelem(hp), lst);}
  
 	 else if (ityp == SS_HASHARR_I)
 	    {hasharr *ht;
 	     ht  = (hasharr *) vl;
-	     lst = SS_mk_cons(SS_mk_hasharr(ht), lst);}
+	     lst = SS_mk_cons(si, SS_mk_hasharr(ht), lst);}
 
 #endif
  
 	 else
 	    {if (si->call_arg != NULL)
-	        {o   = si->call_arg(type[i], vl);
-		 lst = SS_mk_cons(o, lst);}
+	        {o   = si->call_arg(si, type[i], vl);
+		 lst = SS_mk_cons(si, o, lst);}
 	     else
-	        lst = SS_mk_cons(SS_null, lst);};};
+	        lst = SS_mk_cons(si, SS_null, lst);};};
 
     o = SS_reverse(lst);
 
@@ -723,7 +723,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
 
     fnc = (object *) SC_hasharr_def_lookup(si->symtab, func);
     if (fnc == NULL)
-       SS_error("UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(func));
+       SS_error("UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(si, func));
 
     for (i = 0; i < MAXLINE; i++)
         {type[i] = *SC_VA_ARG(int *);
@@ -737,7 +737,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     SC_VA_END;
 
     expr = SS_null;
-    SS_Assign(expr, SS_mk_cons(fnc, _SS_make_list(si, i, type, ptr)));
+    SS_Assign(expr, SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr)));
 
     SS_eval(si, expr);
 
@@ -766,7 +766,7 @@ object *SS_call_scheme(SS_psides *si, char *func, ...)
     fnc = _SS_lk_var_valc(si, func, si->env);
 /*    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func); */
     if (fnc == NULL)
-       SS_error("UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(func));
+       SS_error("UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(si, func));
 
     for (i = 0; i < MAXLINE; i++)
         {type[i] = SC_VA_ARG(int);
@@ -781,7 +781,7 @@ object *SS_call_scheme(SS_psides *si, char *func, ...)
 
     SC_mem_stats_set(0L, 0L);
 
-    expr = SS_mk_cons(fnc, _SS_make_list(si, i, type, ptr));
+    expr = SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr));
     SC_mark(expr, 1);
 
     SS_eval(si, expr);
@@ -808,7 +808,7 @@ static int _SS_run(SS_psides *si)
    {int iret;
     object *port, *ret;
 
-    port = SS_mk_inport(stdin, "stdin");
+    port = SS_mk_inport(si, stdin, "stdin");
     SC_strncpy(SS_BUFFER(port), MAX_BFSZ, _SS.ibf, strlen(_SS.ibf));
     SS_PTR(port) = SS_BUFFER(port);
 

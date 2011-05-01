@@ -141,9 +141,9 @@ stlist :
        else if (SS_nullobjp($1))
 	  {SS_GR_VAL(CAPTURE($2));}
        else if (SS_consp($1) && SS_consp(SS_CAR_MACRO($1)))
-	  {SS_GR_VAL(SS_mk_cons($2, $1));}
+	  {SS_GR_VAL(SS_mk_cons(SI, $2, $1));}
        else
-          {SS_GR_VAL(SS_mk_cons($2, SS_mk_cons($1, SS_null)));};
+          {SS_GR_VAL(SS_mk_cons(SI, $2, SS_mk_cons(SI, $1, SS_null)));};
        DIAGNOSTIC($$, "stlist stlist");}
   ;
 
@@ -154,7 +154,7 @@ stlist :
 
 nonnullstlist :
     nonnullstmt eos stlist
-      {SS_GR_VAL(SS_mk_cons($1, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $3));
        DIAGNOSTIC($$, "nonnullstmt");}
   ;
 
@@ -266,7 +266,7 @@ stmt :
 
 funcspec :
     FUNC funcdes eos stlist ENDF
-      {SS_GR_VAL(_SS_make_fun_m($2, SS_reverse($4)));
+      {SS_GR_VAL(_SS_make_fun_m(SI, $2, SS_reverse($4)));
        DIAGNOSTIC($$, "function");}
   ;
 
@@ -281,9 +281,9 @@ funcdes :
 
   | dname '(' paramlist ')'
       {if (SS_consp($3))
-          {SS_GR_VAL(SS_mk_cons($1, $3));}
+          {SS_GR_VAL(SS_mk_cons(SI, $1, $3));}
        else
-          {SS_GR_VAL(SS_mk_cons($1, SS_mk_cons($3, SS_null)));};
+          {SS_GR_VAL(SS_mk_cons(SI, $1, SS_mk_cons(SI, $3, SS_null)));};
        DIAGNOSTIC($$, "funcdes dname(paramlist)");}
   ;
 
@@ -318,16 +318,17 @@ dostmt :
     DO dospec eos stlist ENDDO
       {object *body;
 
-       body = _SS_make_comp_stmt_m($4);
-       $$   = SS_append(SS_mk_cons(_SS_m_for, $2),
-			SS_mk_cons(body, SS_null));
+       body = _SS_make_comp_stmt_m(SI, $4);
+       $$   = SS_append(SI,
+			SS_mk_cons(SI, _SS_m_for, $2),
+			SS_mk_cons(SI, body, SS_null));
 		       
        DIAGNOSTIC($$, "do dospec eos stlist enddo");}
 
   | DO eos stlist docontrol
       {object *body;
 
-       body = _SS_make_comp_stmt_m($3);
+       body = _SS_make_comp_stmt_m(SI, $3);
        $$   = SS_make_form(_SS_m_for, SS_null, SS_null, SS_null, body, 0);
 
        DIAGNOSTIC($$, "do eos stlist docontrol");}
@@ -346,7 +347,7 @@ dospec :
        test = SS_make_form(_SS_m_loop_test, $3, $1, $5, 0);
 
        if (SS_nullobjp($6))
-	  val = SS_mk_integer(1);
+	  val = SS_mk_integer(SI, 1);
        else
 	  val = $6;
 
@@ -420,9 +421,9 @@ docontrol :
 
 forstmt :
     FOR '(' forinit ',' forout ',' cstmt ')' stlist ENDFOR
-      {SS_GR_VAL(SS_make_form(_SS_m_for, _SS_make_comp_stmt_m($3),
-			 $5, _SS_make_comp_stmt_m($7),
-			 _SS_make_comp_stmt_m($9), 0));
+      {SS_GR_VAL(SS_make_form(_SS_m_for, _SS_make_comp_stmt_m(SI, $3),
+			 $5, _SS_make_comp_stmt_m(SI, $7),
+			 _SS_make_comp_stmt_m(SI, $9), 0));
        DIAGNOSTIC($$, "for");}
   ;
 
@@ -437,7 +438,7 @@ forinit :
 
   | assign eos forinit
       {if (SS_consp(SS_CAR_MACRO($1)))
-	  {SS_GR_VAL(SS_mk_cons($3, $1));}
+	  {SS_GR_VAL(SS_mk_cons(SI, $3, $1));}
        else
 	  {SS_GR_VAL(SS_make_form($3, $1, 0));}
        DIAGNOSTIC($$, "forinit list");}
@@ -477,9 +478,9 @@ cstmt :
        else if (SS_nullobjp($1))
 	  {SS_GR_VAL(CAPTURE($3));}
        else if (SS_consp($1) && SS_consp(SS_CAR_MACRO($1)))
-	  {SS_GR_VAL(SS_mk_cons($3, $1));}
+	  {SS_GR_VAL(SS_mk_cons(SI, $3, $1));}
        else
-          {SS_GR_VAL(SS_mk_cons($3, SS_mk_cons($1, SS_null)));}
+          {SS_GR_VAL(SS_mk_cons(SI, $3, SS_mk_cons(SI, $1, SS_null)));}
 
        DIAGNOSTIC($$, "cstmt stmt");}
   ;
@@ -495,7 +496,7 @@ cstmt :
 whilestmt :
     WHILE '(' lexp ')' stlist ENDWHILE
       {SS_GR_VAL(SS_make_form(_SS_m_while,
-			      SS_f, $3, _SS_make_comp_stmt_m($5), 0));
+			      SS_f, $3, _SS_make_comp_stmt_m(SI, $5), 0));
        DIAGNOSTIC($$, "whilestmt");}
   ;
 
@@ -559,11 +560,11 @@ lalt :
 
 thenlist :
     eos THEN stlist
-      {SS_GR_VAL(_SS_make_comp_stmt_m($3));
+      {SS_GR_VAL(_SS_make_comp_stmt_m(SI, $3));
        DIAGNOSTIC($$, "then eos");}
 
   | THEN stlist
-      {SS_GR_VAL(_SS_make_comp_stmt_m($2));
+      {SS_GR_VAL(_SS_make_comp_stmt_m(SI, $2));
        DIAGNOSTIC($$, "then stlist");}
   ;
 
@@ -581,7 +582,7 @@ thenlist :
 
 optelse :
     ELSE stlist
-      {SS_GR_VAL(_SS_make_comp_stmt_m($2));
+      {SS_GR_VAL(_SS_make_comp_stmt_m(SI, $2));
        DIAGNOSTIC($$, "optelse else");}
 
   | ELSEIF ifexp alt2 optelse
@@ -611,11 +612,11 @@ alt2 :
        DIAGNOSTIC($$, "alt2 eos");}
 
   | eos THEN stlist
-      {SS_GR_VAL(_SS_make_comp_stmt_m($3));
+      {SS_GR_VAL(_SS_make_comp_stmt_m(SI, $3));
        DIAGNOSTIC($$, "alt2 eos then");}
 
   | THEN stlist
-      {SS_GR_VAL(_SS_make_comp_stmt_m($2));
+      {SS_GR_VAL(_SS_make_comp_stmt_m(SI, $2));
        DIAGNOSTIC($$, "alt2 then");}
   ;
 
@@ -629,7 +630,7 @@ alt2 :
 
 misc :
     'read' filename
-      {SS_GR_VAL(SS_mk_cons(_SS_m_load, SS_mk_cons($2, SS_null)));
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_m_load, SS_mk_cons(SI, $2, SS_null)));
        DIAGNOSTIC($$, "misc read filename");}
 
   | 'forget' forgetlist
@@ -639,19 +640,19 @@ misc :
       {DIAGNOSTIC($1, "misc forget");}
 
   | CALL factor
-      {SS_GR_VAL(_SS_strip_call($2, TRUE));
+      {SS_GR_VAL(_SS_strip_call(SI, $2, TRUE));
 
        DIAGNOSTIC($$, "misc call factor");}
 
   | id COMMAND comlist
       {if (SS_consp($3))
-	  {SS_GR_VAL(SS_mk_cons($1, SS_reverse($3)));}
+	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse($3)));}
        else
-	  {SS_GR_VAL(SS_mk_cons($1, SS_mk_cons($3, SS_null)));};
+	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_mk_cons(SI, $3, SS_null)));};
        DIAGNOSTIC($$, "misc id command comlist");}
 
   | scope type varlist
-      {SS_GR_VAL(SS_mk_cons(_SS_m_defvar, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_m_defvar, $3));
        DIAGNOSTIC($$, "misc scope type varlist");}
 
   | BREAK optlevel
@@ -671,7 +672,7 @@ misc :
        if (SS_consp($2) && !SS_procedurep(SS_eval(si, SS_CAR_MACRO($2))))
 	  lst = SS_reverse($2);
        else
-	  lst = SS_mk_cons($2, SS_null);
+	  lst = SS_mk_cons(SI, $2, SS_null);
 	 
        SS_GR_VAL(SS_make_form(_SS_m_input, $1, lst, 0));
        DIAGNOSTIC($$, "misc indevice inlist");}
@@ -683,9 +684,9 @@ misc :
        si = SI;
 
        if (SS_consp($2) && !SS_procedurep(SS_eval(si, SS_CAR_MACRO($2))))
-	  lst = SS_mk_cons(_SS_m_list, SS_reverse($2));
+	  lst = SS_mk_cons(SI, _SS_m_list, SS_reverse($2));
        else
-	  lst = SS_mk_cons(_SS_m_list, SS_mk_cons($2, SS_null));
+	  lst = SS_mk_cons(SI, _SS_m_list, SS_mk_cons(SI, $2, SS_null));
 	 
        SS_GR_VAL(SS_make_form(_SS_m_output, $1, lst, 0));
        DIAGNOSTIC($$, "misc outdevice outlist");}
@@ -756,11 +757,11 @@ outlist :
   | outlist OUTPUTOP lexp
       {if (SS_consp($1))
 	  {if (SS_consp(SS_CAR_MACRO($1)))
-	      {SS_GR_VAL(SS_mk_cons($3, SS_mk_cons($1, SS_null)));}
+	      {SS_GR_VAL(SS_mk_cons(SI, $3, SS_mk_cons(SI, $1, SS_null)));}
 	   else
-	      {SS_GR_VAL(SS_mk_cons($3, $1));};}
+	      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));};}
        else
-	  {SS_GR_VAL(SS_mk_cons($3, SS_mk_cons($1, SS_null)));};
+	  {SS_GR_VAL(SS_mk_cons(SI, $3, SS_mk_cons(SI, $1, SS_null)));};
 
        DIAGNOSTIC($$, "outlist outlist << lexp");}
 
@@ -784,11 +785,11 @@ inlist :
   | inlist INPUTOP lhs
       {if (SS_consp($1))
 	  {if (SS_consp(SS_CAR_MACRO($1)))
-	      {SS_GR_VAL(SS_mk_cons($3, SS_mk_cons($1, SS_null)));}
+	      {SS_GR_VAL(SS_mk_cons(SI, $3, SS_mk_cons(SI, $1, SS_null)));}
 	   else
-	      {SS_GR_VAL(SS_mk_cons($3, $1));};}
+	      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));};}
        else
-	  {SS_GR_VAL(SS_mk_cons($3, SS_mk_cons($1, SS_null)));};
+	  {SS_GR_VAL(SS_mk_cons(SI, $3, SS_mk_cons(SI, $1, SS_null)));};
 
        DIAGNOSTIC($$, "inlist inlist >>");}
 
@@ -803,7 +804,7 @@ inlist :
 
 assign :
     lhs assigneq lexp
-      {SS_GR_VAL(SS_make_form(_SS_m_set, _SS_strip_call($1, FALSE), $3, 0));
+      {SS_GR_VAL(SS_make_form(_SS_m_set, _SS_strip_call(SI, $1, FALSE), $3, 0));
        DIAGNOSTIC($$, "lhs assigneq lexp");}
   ;
 
@@ -923,20 +924,20 @@ level :
 
 varlist :
     dvar
-      {SS_GR_VAL(SS_mk_cons(_SS_strip_call($1, FALSE), SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_strip_call(SI, $1, FALSE), SS_null));
        DIAGNOSTIC($$, "varlist dvar");}
 
   | dvar ASGN lexp
-      {SS_GR_VAL(SS_mk_cons(SS_make_form($1, $3, 0),
+      {SS_GR_VAL(SS_mk_cons(SI, SS_make_form($1, $3, 0),
 		       SS_null));
        DIAGNOSTIC($$, "varlist dvar = lexp");}
 
   | varlist ',' dvar
-      {SS_GR_VAL(SS_mk_cons(_SS_strip_call($3, FALSE), $1));
+      {SS_GR_VAL(SS_mk_cons(SI, _SS_strip_call(SI, $3, FALSE), $1));
        DIAGNOSTIC($$, "varlist varlist, dvar");}
 
   | varlist ',' dvar ASGN lexp
-      {SS_GR_VAL(SS_mk_cons(SS_make_form($3, $5, 0), $1));
+      {SS_GR_VAL(SS_mk_cons(SI, SS_make_form($3, $5, 0), $1));
        DIAGNOSTIC($$, "varlist varlist, dvar = lexp");}
   ;
 
@@ -948,14 +949,14 @@ varlist :
 display :
     ditem
       {if (SS_procedurep($1))   /* not the right test */
-	  {SS_GR_VAL(SS_mk_cons($1, SS_null));}
+	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));}
        else
           {SS_GR_VAL(CAPTURE($1));};
 
        DIAGNOSTIC($$, "display ditem");}
 
   | display ',' ditem
-      {SS_GR_VAL(SS_mk_cons($3, $1));
+      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));
        DIAGNOSTIC($$, "display display,ditem");}
   ;
 
@@ -966,11 +967,11 @@ display :
 
 forgetlist :
     id
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));
        DIAGNOSTIC($1, "forgetlist id");}
 
   | forgetlist ',' id
-      {SS_GR_VAL(SS_mk_cons($3, $1));
+      {SS_GR_VAL(SS_mk_cons(SI, $3, $1));
        DIAGNOSTIC($1, "forgetlist forgetlist,id");}
   ;
 
@@ -990,9 +991,9 @@ dvar :
 
   | dname args
       {if (SS_consp($1))
-	  {SS_GR_VAL(SS_append($1, SS_mk_cons($2, SS_null)));}
+	  {SS_GR_VAL(SS_append(SI, $1, SS_mk_cons(SI, $2, SS_null)));}
        else
-	  {SS_GR_VAL(SS_make_form($1, SS_mk_cons(_SS_m_defarr, $2), 0));};
+	  {SS_GR_VAL(SS_make_form($1, SS_mk_cons(SI, _SS_m_defarr, $2), 0));};
 
        DIAGNOSTIC($1, "dvar dname args");}
   ;
@@ -1134,10 +1135,10 @@ type :
 
 explist :
     lexp
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));}
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));}
 
   | lexp ',' explist
-      {SS_GR_VAL(SS_mk_cons($1, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $3));
        DIAGNOSTIC($$, "explist , lexp");}
   ;
 
@@ -1404,11 +1405,11 @@ args :
 
 arglist :
     argitem
-      {SS_GR_VAL(SS_mk_cons($1, SS_null));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));
 /*       DIAGNOSTIC($$, "arglist argitem"); */}
 
   | argitem ',' arglist
-      {SS_GR_VAL(SS_mk_cons($1, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $3));
 /*       DIAGNOSTIC($$, "arglist argitem,arglist"); */}
   ;
 
@@ -1423,15 +1424,15 @@ comlist :
        DIAGNOSTIC($$, "comlist comitem");}
 
   | comitem ',' comlist
-      {SS_GR_VAL(SS_mk_cons($1, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $3));
        DIAGNOSTIC($$, "comlist comitem,comlist");}
 
   | comitem '@' comlist
-      {SS_GR_VAL(SS_mk_cons($1, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $3));
        DIAGNOSTIC($$, "comlist comitem@comlist");}
 
   | comitem WS comlist
-      {SS_GR_VAL(SS_mk_cons($1, $3));
+      {SS_GR_VAL(SS_mk_cons(SI, $1, $3));
        DIAGNOSTIC($$, "comlist comitem WS comlist");}
   ;
 

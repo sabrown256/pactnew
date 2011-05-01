@@ -28,7 +28,7 @@ static object *_SSI_mk_rect(SS_psides *si, object *argl)
 	    0);
 
     z = r + i*I;
-    o = SS_mk_complex(z);
+    o = SS_mk_complex(si, z);
 
     return(o);}
 
@@ -52,7 +52,7 @@ static object *_SSI_mk_polar(SS_psides *si, object *argl)
     r = m*cos(a);
     i = m*sin(a);
     z = r + i*I;
-    o = SS_mk_complex(z);
+    o = SS_mk_complex(si, z);
 
     return(o);}
 
@@ -72,7 +72,7 @@ static object *_SSI_real_part(SS_psides *si, object *argl)
 	    0);
 
     r = creal(z);
-    o = SS_mk_float(r);
+    o = SS_mk_float(si, r);
 
     return(o);}
 
@@ -92,7 +92,7 @@ static object *_SSI_imag_part(SS_psides *si, object *argl)
 	    0);
 
     r = cimag(z);
-    o = SS_mk_float(r);
+    o = SS_mk_float(si, r);
 
     return(o);}
 
@@ -114,7 +114,7 @@ static object *_SSI_magnitude(SS_psides *si, object *argl)
     r = creal(z);
     i = cimag(z);
     m = sqrt(r*r + i*i);
-    o = SS_mk_float(m);
+    o = SS_mk_float(si, m);
 
     return(o);}
 
@@ -136,7 +136,7 @@ static object *_SSI_angle(SS_psides *si, object *argl)
     r = creal(z);
     i = cimag(z);
     a = atan2(i, r);
-    o = SS_mk_float(a);
+    o = SS_mk_float(si, a);
 
     return(o);}
 

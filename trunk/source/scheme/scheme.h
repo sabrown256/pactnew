@@ -109,7 +109,6 @@ typedef struct s_SS_proc procedure;
 typedef struct s_SS_vect vector;
 typedef struct s_SS_psides SS_psides;
 
-typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
 typedef void (*PFNameReproc)(char *s, char *name);
 typedef void (*PFPostRead)(object *strm);
 typedef void (*PFPostEval)(object *strm);
@@ -119,9 +118,10 @@ typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrChOut)(int c, object *str);
 typedef void (*PFPrChUn)(int c, object *str);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
-typedef void (*PFExtractArg)(object *obj, void *v, int type);
+typedef void (*PFExtractArg)(SS_psides *si, object *obj, void *v, int type);
+typedef object *(*PFCallArg)(SS_psides *si, int type, void *v);
 typedef object *(*PFSSRead)(SS_psides *si, object *str);
-typedef object *(*PFCallArg)(int type, void *v);
+typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
 
 #define SS_DEFINE_OBJECT                                                    \
    {defstr *dp;                                                             \
@@ -190,10 +190,10 @@ struct s_SS_psides
 
     PFNameReproc name_reproc;
     PFSSRead read;
-    PFCallArg call_arg;
     PFPostRead post_read;
     PFPostEval post_eval;
     PFPostPrint post_print;
+    PFCallArg call_arg;
     PFExtractArg get_arg;
 
     PFPrGetS pr_gets;
@@ -993,8 +993,8 @@ extern object
 #ifdef LARGE
 
 extern object
- *SS_vctlst(object *arg),
- *SS_lstvct(object *arg);
+ *SS_vctlst(SS_psides *si, object *arg),
+ *SS_lstvct(SS_psides *si, object *arg);
 
 #endif
 
@@ -1002,25 +1002,26 @@ extern object
 /* SHMM.C declarations */
 
 extern object
- *SS_mk_proc_object(procedure *pp),
- *SS_mk_procedure(object *name, object *lam_exp, object *penv),
+ *SS_mk_proc_object(SS_psides *si, procedure *pp),
+ *SS_mk_procedure(SS_psides *si, object *name,
+		  object *lam_exp, object *penv),
  *SS_mk_esc_proc(SS_psides *si, int err, int type),
- *SS_mk_variable(char *n, object *v),
- *SS_mk_string(char *s),
- *SS_mk_inport(FILE *str, char *name),
- *SS_mk_outport(FILE *str, char *name),
- *SS_mk_integer(int64_t i),
- *SS_mk_float(double d),
- *SS_mk_complex(double _Complex d),
- *SS_mk_quaternion(quaternion d),
- *SS_mk_boolean(char *s, int v),
- *SS_mk_cons(object *ca, object *cd),
+ *SS_mk_variable(SS_psides *si, char *n, object *v),
+ *SS_mk_string(SS_psides *si, char *s),
+ *SS_mk_inport(SS_psides *si, FILE *str, char *name),
+ *SS_mk_outport(SS_psides *si, FILE *str, char *name),
+ *SS_mk_integer(SS_psides *si, int64_t i),
+ *SS_mk_float(SS_psides *si, double d),
+ *SS_mk_complex(SS_psides *si, double _Complex d),
+ *SS_mk_quaternion(SS_psides *si, quaternion d),
+ *SS_mk_boolean(SS_psides *si, char *s, int v),
+ *SS_mk_cons(SS_psides *si, object *ca, object *cd),
  *SS_mk_object(SS_psides *si,
 	       void *np, int type, SS_eval_mode evt, char *pname,
 	       void (*print)(object *obj, object *strm),
 	       void (*release)(object *obj)),
- *SS_mk_char(int i),
- *SS_mk_vector(int l);
+ *SS_mk_char(SS_psides *si, int i),
+ *SS_mk_vector(SS_psides *si, int l);
 
 extern void
  SS_register_types(void),
@@ -1053,10 +1054,10 @@ extern int
  SS_numbp(object *obj);
 
 extern object
- *SS_append(object *list1, object *list2),
+ *SS_append(SS_psides *si, object *list1, object *list2),
  *SS_setcar(object *pair, object *car),
  *SS_setcdr(object *pair, object *cdr),
- *SS_list_tail(object *lst, int n),
+ *SS_list_tail(SS_psides *si, object *lst, int n),
  *SS_car(object *obj),
  *SS_cdr(object *obj),
  *SS_caar(object *obj),
@@ -1121,7 +1122,7 @@ extern void
 
 extern object
  *SS_lookup_variable(SS_psides *si, char *txt, int verbose),
- *SS_mk_string_synt(char *s),
+ *SS_mk_string_synt(SS_psides *si, char *s),
  *SS_add_type_synt(SS_psides *si, char *name);
 
 

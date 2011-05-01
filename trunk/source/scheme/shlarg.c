@@ -40,7 +40,7 @@ static object *_SSI_mkvect(SS_psides *si, object *arg)
 
     i = (int) SS_INTEGER_VALUE(arg);
 
-    o = SS_mk_vector(i);
+    o = SS_mk_vector(si, i);
 
     return(o);}
 
@@ -52,7 +52,7 @@ static object *_SSI_mkvect(SS_psides *si, object *arg)
 static object *_SSI_vector(SS_psides *si, object *argl)
    {object *o;
 
-    o = SS_lstvct(argl);
+    o = SS_lstvct(si, argl);
 
     return(o);}
 
@@ -70,7 +70,7 @@ static object *_SSI_vctlen(SS_psides *si, object *arg)
 
     i = SS_VECTOR_LENGTH(arg);
 
-    o = SS_mk_integer(i);
+    o = SS_mk_integer(si, i);
 
     return(o);}
 
@@ -136,7 +136,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
 
 /* SS_VCTLST - vector->list for Scheme */
 
-object *SS_vctlst(object *arg)
+object *SS_vctlst(SS_psides *si, object *arg)
    {int i, k;
     object **va, *ret, *o;
 
@@ -147,7 +147,7 @@ object *SS_vctlst(object *arg)
     va  = SS_VECTOR_ARRAY(arg);
     ret = SS_null;
     for (i = 0; i < k; i++)
-        ret = SS_mk_cons(va[i], ret);
+        ret = SS_mk_cons(si, va[i], ret);
 
     o = SS_reverse(ret);
 
@@ -161,7 +161,7 @@ object *SS_vctlst(object *arg)
 static object *_SSI_vctlst(SS_psides *si, object *arg)
    {object *o;
 
-    o = SS_vctlst(arg);
+    o = SS_vctlst(si, arg);
 
     return(o);}
 
@@ -170,7 +170,7 @@ static object *_SSI_vctlst(SS_psides *si, object *arg)
 
 /* SS_LSTVCT - list->vector for Scheme */
 
-object *SS_lstvct(object *arg)
+object *SS_lstvct(SS_psides *si, object *arg)
    {int i, k;
     object **va, *vct;
 
@@ -178,7 +178,7 @@ object *SS_lstvct(object *arg)
        SS_error("ARGUMENT NOT LIST - LIST->VECTOR", arg);
 
     k   = SS_length(arg);
-    vct = SS_mk_vector(k);
+    vct = SS_mk_vector(si, k);
     va  = SS_VECTOR_ARRAY(vct);
 
     for (i = 0; i < k; i++)
@@ -195,7 +195,7 @@ object *SS_lstvct(object *arg)
 static object *_SSI_lstvct(SS_psides *si, object *arg)
    {object *o;
 
-    o = SS_lstvct(arg);
+    o = SS_lstvct(si, arg);
 
     return(o);}
 
@@ -214,9 +214,9 @@ object *_SSI_define_global(SS_psides *si, object *argl)
     argl = SS_car(argl);
 
     if (SS_consp(argl))
-       {obj  = SS_mk_cons(SS_cdr(argl), obj);
+       {obj  = SS_mk_cons(si, SS_cdr(argl), obj);
         argl = SS_car(argl);
-        val  = SS_mk_procedure(argl, obj, si->global_env);
+        val  = SS_mk_procedure(si, argl, obj, si->global_env);
 
         s = SS_PROCEDURE_NAME(val);
         CFREE(s);
@@ -282,7 +282,7 @@ static object *_SSI_getcwd(SS_psides *si)
 
     vr = SC_getcwd();
     if (vr != NULL)
-       {wd = SS_mk_string(vr);
+       {wd = SS_mk_string(si, vr);
 	CFREE(vr);};
 
     return(wd);}
@@ -306,7 +306,7 @@ static object *_SSI_getenv(SS_psides *si, object *obj)
        vl = getenv(vr);
 
     if (vl != NULL)
-       ev = SS_mk_string(vl);
+       ev = SS_mk_string(si, vl);
     else
        ev = SS_null;
 
@@ -340,7 +340,7 @@ static object *_SSI_setenv(SS_psides *si, object *obj)
     CFREE(vr);
     CFREE(vl);
 
-    rv = SS_mk_integer(ok);
+    rv = SS_mk_integer(si, ok);
 
     return(rv);}
 
@@ -410,7 +410,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 	 pr = SS_make_list(SC_STRING_I, vr,
 			   SS_OBJECT_I, vl,
 			   0);
-	 SS_Assign(lst, SS_mk_cons(pr, lst));};
+	 SS_Assign(lst, SS_mk_cons(si, pr, lst));};
 
     SC_mark(lst, -1);
 
@@ -458,7 +458,7 @@ static object *_SSI_get_pname(SS_psides *si, object *obj)
 
     rv = SC_get_pname(path, PATH_MAX, id);
     if (rv == 0)
-       s = SS_mk_string(path);
+       s = SS_mk_string(si, path);
     else
        s = SS_null;
 
@@ -515,7 +515,7 @@ static object *_SSI_get_ncpu(SS_psides *si)
     object *s;
 
     rv = SC_get_ncpu();
-    s = SS_mk_integer(rv);
+    s = SS_mk_integer(si, rv);
 
     return(s);}
 
@@ -545,9 +545,9 @@ object *_SSI_fopen(SS_psides *si, object *argl)
        SS_error("CAN'T OPEN FILE - FOPEN", argl);
 
     if ((mode != NULL) && (mode[0] == 'r'))
-       prt = SS_mk_inport(str, name);
+       prt = SS_mk_inport(si, str, name);
     else
-       prt = SS_mk_outport(str, name);
+       prt = SS_mk_outport(si, str, name);
 
     CFREE(name);
     CFREE(mode);
@@ -583,7 +583,7 @@ object *_SSI_fclose(SS_psides *si, object *obj)
 static object *_SSI_wall_clock_time(SS_psides *si)
    {object *ret;
 
-    ret = SS_mk_float(SC_wall_clock_time());
+    ret = SS_mk_float(si, SC_wall_clock_time());
 
     return(ret);}
 
@@ -654,7 +654,7 @@ static object *_SSI_mem_monitor(SS_psides *si, object *arg)
     if ((old >= 0) && (msg[0] != '\0'))
        PRINT(stdout, "\n%s\n\n", msg);
 
-    o = SS_mk_integer(nb);
+    o = SS_mk_integer(si, nb);
 
     return(o);}
 
@@ -668,7 +668,7 @@ static object *_SSI_mem_trace(SS_psides *si)
     object *o;
 
     nb = SC_mem_chk(3);
-    o  = SS_mk_integer(nb);
+    o  = SS_mk_integer(si, nb);
 
     return(o);}
 
@@ -710,7 +710,7 @@ static object *_SSI_sizeof(SS_psides *si, object *arg)
 
     CFREE(type);
 
-    o = SS_mk_integer(nb);
+    o = SS_mk_integer(si, nb);
 
     return(o);}
 
@@ -731,7 +731,7 @@ static object *_SSI_attach(SS_psides *si, object *arg)
 
     rv = SC_attach_dbg(pid);
 
-    o = SS_mk_integer(rv);
+    o = SS_mk_integer(si, rv);
 
     return(o);}
 
@@ -753,7 +753,7 @@ static object *_SSI_retrace(SS_psides *si, object *arg)
 	    0);
 
     rv = SC_retrace_exe(NULL, pid, to);
-    o  = SS_mk_integer(rv);
+    o  = SS_mk_integer(si, rv);
 
     return(o);}
 

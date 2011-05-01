@@ -224,7 +224,7 @@ static object *_SSI_pr_rd_tries(SS_psides *si, object *argl)
                SC_INT_I, &_SS.n_tries,
                0);
 
-    o = SS_mk_integer((int64_t) _SS.n_tries);
+    o = SS_mk_integer(si, (int64_t) _SS.n_tries);
 
     return(o);}
 
@@ -277,7 +277,7 @@ static object *_SSI_pr_rd_line(SS_psides *si, object *obj)
     pp = SS_PROCESS_VALUE(obj);
     for (i = 0; i < _SS.n_tries; i++)
         {if (SC_gets(bf, MAX_BFSZ, pp) != NULL)
-	    {rv = SS_mk_string(bf);
+	    {rv = SS_mk_string(si, bf);
 	     break;};};
 
     return(rv);}
@@ -351,7 +351,7 @@ static object *_SSI_get_host_name(SS_psides *si, object *argl)
     CFREE(sys);
 
     if (ret)
-       rv = SS_mk_string(hst);
+       rv = SS_mk_string(si, hst);
     else
        rv = SS_null;
 
@@ -385,8 +385,8 @@ static object *_SSI_get_host_types(SS_psides *si, object *argl)
 	     if (t == NULL)
 	        break;
 	     else
-	        {s = SS_mk_string(t);
-		 SS_Assign(strl, SS_mk_cons(s, strl));};};
+	        {s = SS_mk_string(si, t);
+		 SS_Assign(strl, SS_mk_cons(si, s, strl));};};
 
 	SC_free_strings(strs);
 

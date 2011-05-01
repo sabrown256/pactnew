@@ -13,30 +13,34 @@
 #define	ARRAY_VECTOR(_o, _d, _fnc, _n, _off)                                 \
    {long _i;                                                                 \
     if ((_n == 1) && (_off == 0))                                            \
-       _o = _fnc(*_d);                                                       \
+       _o = _fnc(si, *_d);                                                   \
     else                                                                     \
        {_o = SS_null;                                                        \
 	for (_i = 0; _i < _n; _i++)                                          \
-	    _o = SS_mk_cons(_fnc(_d[_i]), _o);                               \
+	    _o = SS_mk_cons(si, _fnc(si, _d[_i]), _o);                       \
 	if (_o != SS_null)                                                   \
-	   _o = SS_lstvct(SS_reverse(_o));};}
+	   _o = SS_lstvct(si, SS_reverse(_o));};}
 
 object
- *_SX_make_list_indirection(PDBfile *file, char **vr, long nitems, char *type),
- *_SX_make_list_leaf(PDBfile *file, char *vr, long nitems, char *type),
- *_SX_make_list_io(PDBfile *file, char *vr, long nitems, char *type);
+ *_SX_make_list_indirection(SS_psides *si, PDBfile *file,
+			    char **vr, long nitems, char *type),
+ *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
+		     char *vr, long nitems, char *type),
+ *_SX_make_list_io(SS_psides *si, PDBfile *file,
+		   char *vr, long nitems, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SX_MAKE_LIST_SYMENT - convert a syment into a list */
 
-object *_SX_make_list_syment(PDBfile *file, void *vr, long ni, char *type)
+object *_SX_make_list_syment(SS_psides *si, PDBfile *file,
+			     void *vr, long ni, char *type)
    {object *obj;
 
 /* if the type is an indirection, follow the pointer */
     if (_PD_indirection(type))
-       obj = _SX_make_list_indirection(file, (char **) vr, ni, type);
+       obj = _SX_make_list_indirection(si, file, (char **) vr, ni, type);
 
     else
        {if ((strcmp(type, SC_CHAR_S) == 0) && (ni == 1))
@@ -44,9 +48,9 @@ object *_SX_make_list_syment(PDBfile *file, void *vr, long ni, char *type)
 
 	    s = CSTRSAVE("a");
 	    s[0] = *(char *) vr;
-	    obj  = _SX_make_list_leaf(file, s, ni, type);}
+	    obj  = _SX_make_list_leaf(si, file, s, ni, type);}
 	else
-	   obj = _SX_make_list_leaf(file, vr, ni, type);};
+	   obj = _SX_make_list_leaf(si, file, vr, ni, type);};
 
     return(obj);}
 
@@ -57,7 +61,7 @@ object *_SX_make_list_syment(PDBfile *file, void *vr, long ni, char *type)
  *                           - converting a syment into a list
  */
 
-object *_SX_make_list_indirection(PDBfile *file, char **vr,
+object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
 				  long ni, char *type)
    {long i, ditems;
     char *dtype;
@@ -75,12 +79,12 @@ object *_SX_make_list_indirection(PDBfile *file, char **vr,
 
 /* if the type is an indirection, follow the pointer */
         if (_PD_indirection(dtype))
-           obj1 = _SX_make_list_indirection(file, (char **) DEREF(vr),
+           obj1 = _SX_make_list_indirection(si, file, (char **) DEREF(vr),
                                             ditems, dtype);
         else
-           obj1 = _SX_make_list_leaf(file, DEREF(vr), ditems, dtype);
+           obj1 = _SX_make_list_leaf(si, file, DEREF(vr), ditems, dtype);
 
-        obj = SS_mk_cons(obj1, obj);};
+        obj = SS_mk_cons(si, obj1, obj);};
 
     CFREE(dtype);
 
@@ -95,7 +99,8 @@ object *_SX_make_list_indirection(PDBfile *file, char **vr,
  *                    - otherwise, lookup the type, and display each member.
  */
 
-object *_SX_make_list_leaf(PDBfile *file, char *vr, long ni, char *type)
+object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
+			   char *vr, long ni, char *type)
    {long ii, sz, member_offs;
     defstr *defp;
     memdes *desc, *mem_lst;
@@ -112,7 +117,7 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long ni, char *type)
        mem_lst = defp->members;
 
     if (mem_lst == NULL)
-       obj = _SX_make_list_io(file, vr, ni, type);
+       obj = _SX_make_list_io(si, file, vr, ni, type);
 
     else
        {obj = SS_null;                              /* cons of array elements */
@@ -126,13 +131,13 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long ni, char *type)
                  {member_offs = desc->member_offs;
 		  PD_CAST_TYPE(mtype, desc, svr + member_offs, svr, SS_error,
 			       "BAD CAST - _SX_MAKE_LIST_LEAF", SS_null);
-                  obj2 = _SX_make_list_syment(file,
+                  obj2 = _SX_make_list_syment(si, file,
 					      (char *) svr + member_offs,
                                               desc->number, mtype);
-                  obj1 = SS_mk_cons(obj2, obj1);};
+                  obj1 = SS_mk_cons(si, obj2, obj1);};
 
              obj1 = SS_reverse(obj1);
-	     obj = SS_mk_cons(obj1, obj);};
+	     obj = SS_mk_cons(si, obj1, obj);};
 
         if (ni > 1L)
            obj = SS_reverse(obj);};
@@ -144,7 +149,7 @@ object *_SX_make_list_leaf(PDBfile *file, char *vr, long ni, char *type)
 
 /* _SX_MK_BOOLEAN - wrapper to make Scheme boolean from C bool */
 
-static object *_SX_mk_boolean(bool b)
+static object *_SX_mk_boolean(SS_psides *si, bool b)
    {object *o;
 
     o = (b == true) ? SS_t : SS_f;
@@ -156,7 +161,8 @@ static object *_SX_mk_boolean(bool b)
 
 /* _SX_MAKE_LIST_IO - convert a primitive type into a list */
 
-object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
+object *_SX_make_list_io(SS_psides *si, PDBfile *file,
+			 char *vr, long ni, char *type)
    {int id, offset;
     object *obj;
 
@@ -180,7 +186,7 @@ object *_SX_make_list_io(PDBfile *file, char *vr, long ni, char *type)
        {if (vr == NULL)
 	   obj = SS_null;
         else
-	   obj = SS_mk_string(vr);}
+	   obj = SS_mk_string(si, vr);}
 
 /* fixed point types (proper) */
     else if (SC_fix_type_id(type, TRUE) != -1)

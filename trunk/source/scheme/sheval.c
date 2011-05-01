@@ -237,9 +237,9 @@ ev_define:
 
 /* define a compound procedure */
     if (SS_consp(si->unev))
-       {SS_Assign(si->exn, SS_mk_cons(SS_cdr(si->unev), si->exn));
+       {SS_Assign(si->exn, SS_mk_cons(si, SS_cdr(si->unev), si->exn));
         SS_Assign(si->unev, SS_car(si->unev));
-        SS_Assign(si->val, SS_mk_procedure(si->unev, si->exn, si->env));
+        SS_Assign(si->val, SS_mk_procedure(si, si->unev, si->exn, si->env));
 
 	pf = SS_GET(procedure, si->fun);
 	pg = SS_GET(procedure, si->val);
@@ -417,7 +417,7 @@ macro_ee:
         case SS_AND      :
         case SS_OR       :
 	     SS_Assign(si->exn,
-		       SS_mk_cons(si->fun, SS_cadr(si->unev)));
+		       SS_mk_cons(si, si->fun, SS_cadr(si->unev)));
 	     SS_jump(eval_disp);
 
         default :

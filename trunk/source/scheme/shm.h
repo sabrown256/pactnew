@@ -112,9 +112,9 @@ extern int
  shgrm_parse(void);
 
 extern object
- *_SS_make_fun_m(object *proto, object *body),
- *_SS_make_comp_stmt_m(object *body),
- *_SS_strip_call(object *expr, int paren),
+ *_SS_make_fun_m(SS_psides *si, object *proto, object *body),
+ *_SS_make_comp_stmt_m(SS_psides *si, object *body),
+ *_SS_strip_call(SS_psides *si, object *expr, int paren),
  *SS_syntax_m(SS_psides *si, object *str),
  *SS_parse_token_m(void),
  *SS_parse_token_val_m(void);

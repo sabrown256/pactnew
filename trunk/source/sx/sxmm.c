@@ -270,6 +270,7 @@ g_file *_SX_mk_open_file(char *name, char *type, char *mode)
    {PDBfile *file;
     object *obj;
     g_file *po;
+    SS_psides *si = &_SS_si;
 
 /* open the file */
     file = PD_open(name, mode);
@@ -283,7 +284,7 @@ g_file *_SX_mk_open_file(char *name, char *type, char *mode)
 /* complain about text file */
        {if (SC_isfile_text(name))
            SS_error("REQUESTED FILE IS ASCII - _SX_MK_OPEN_FILE",
-                     SS_mk_string(name));
+                     SS_mk_string(si, name));
 
 /* return NULL if file exists but could not be opened
  * so Scheme spoke can be tried
@@ -296,7 +297,7 @@ g_file *_SX_mk_open_file(char *name, char *type, char *mode)
            {file = PD_open(name, "w");
             if (file == NULL)
                SS_error("CAN'T OPEN FILE - _SX_MK_OPEN_FILE", 
-                        SS_mk_string(name));};};
+                        SS_mk_string(si, name));};};
 
     _PD_def_real(type, file);
 

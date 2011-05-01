@@ -81,7 +81,7 @@ object *TR_file_type(SS_psides *si, object *arg)
     if (po != NULL)
        file = FILE_FILE(PDBfile, po);
 
-    o = (file == NULL) ? SS_null : SS_mk_string(PDBFILE_S);
+    o = (file == NULL) ? SS_null : SS_mk_string(si, PDBFILE_S);
 
     return(o);}
 

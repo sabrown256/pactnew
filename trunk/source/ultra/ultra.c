@@ -139,7 +139,7 @@ void UL_init_view(void)
 
 /* _UL_ARGS - get a C level data item from a single Scheme object */
 
-static void _UL_args(object *obj, void *v, int type)
+static void _UL_args(SS_psides *si, object *obj, void *v, int type)
    {int *pi, len, i;
     char *s, *cptr;
 
@@ -179,7 +179,7 @@ static void _UL_args(object *obj, void *v, int type)
              break;
 #endif
         default :
-             _SX_args(obj, v, type);};
+             _SX_args(si, obj, v, type);};
 
     return;}
 
@@ -574,7 +574,9 @@ char *_UL_next_dataid(char *id, int inc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-object *_UL_dataid_seq(char *first, char *last)
+/* _UL_DATAID_SEQ - sequence the dataids */
+
+object *_UL_dataid_seq(SS_psides *si, char *first, char *last)
    {object *ret = SS_null;
     int i, ifirst, ilast, icur, num, inc;
     char next[MAXLINE], prev[MAXLINE];
@@ -589,14 +591,18 @@ object *_UL_dataid_seq(char *first, char *last)
        {num = ilast - ifirst + 1;
         inc = 1;}
 
-    SS_Assign(ret, SS_mk_cons(SX_get_curve_obj(ifirst), ret));
+    SS_Assign(ret, SS_mk_cons(si,
+			      SX_get_curve_obj(ifirst),
+			      ret));
     strcpy(prev, first);
 
     for (i = 1; i < num; i++)
         {strcpy(next, _UL_next_dataid(prev, inc));
          if (SX_curvep(next))
             {icur = SX_get_curve_id(next);
-             SS_Assign(ret, SS_mk_cons(SX_get_curve_obj(icur), ret));}
+             SS_Assign(ret, SS_mk_cons(si,
+				       SX_get_curve_obj(icur),
+				       ret));}
          strcpy(prev, next);}
 
     return(ret);}
@@ -629,10 +635,14 @@ object *_ULI_thru(SS_psides *si, object *argl)
 
         if (first <= last)
            {for (id = first; id <= last; id++)
-                SS_Assign(ret, SS_mk_cons(SS_mk_integer(id), ret));}
+                SS_Assign(ret, SS_mk_cons(si,
+					  SS_mk_integer(si, id),
+					  ret));}
         else
            {for (id = first; id >= last; id--)
-                SS_Assign(ret, SS_mk_cons(SS_mk_integer(id), ret));};}
+                SS_Assign(ret, SS_mk_cons(si,
+					  SS_mk_integer(si, id),
+					  ret));};}
 
     else
        {char first[MAXLINE], last[MAXLINE];
@@ -653,7 +663,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
             ((last[0] < 'A') || (last[0] > 'Z')))
            SS_error("SECOND ARGUMENT NOT A VALID DATA-ID - _ULI_THRU", argl);
 
-        ret = _UL_dataid_seq(first, last);}
+        ret = _UL_dataid_seq(si, first, last);}
 
     SX_prep_retl(ret);
 
