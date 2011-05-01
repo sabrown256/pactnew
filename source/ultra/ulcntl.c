@@ -389,11 +389,11 @@ static void UL_draw_plot(PG_device *dev)
  *         - before plotting
  */
 
-object *UL_plot(void)
+object *UL_plot(SS_psides *si)
    {double labsp;
-    SS_psides *si;
 
-    si = &_SS_si;
+    if (si == NULL)
+       si = &_SS_si;
 
     PG_get_attrs_glb(TRUE,
 		     "label-space", &labsp,

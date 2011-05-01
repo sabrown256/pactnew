@@ -175,11 +175,8 @@ static char *_SX_reproc_in(char *line)
 
 /* SX_PLOT - replot the requesite frames */
 
-void SX_plot(void)
+object *SX_plot(SS_psides *si)
    {object *var, *fnc;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     var = (object *) SC_hasharr_def_lookup(si->symtab, "viewport-update");
     if (var != NULL)
@@ -188,7 +185,7 @@ void SX_plot(void)
 	    if (SS_procedurep(fnc))
 	       SS_call_scheme(si, "viewport-update", 0);};};
 
-    return;}
+    return(SS_f);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -200,7 +197,7 @@ void SX_plot(void)
 static void _SX_parse(SS_psides *si, object *strm)
    {
 
-    SX_parse(SX_plot, _SX_reproc_in, strm);
+    SX_parse(si, SX_plot, _SX_reproc_in, strm);
 
     return;}
 

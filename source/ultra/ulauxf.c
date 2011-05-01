@@ -18,7 +18,8 @@
 
 /* _UL_FFT - work horse for complex FFT's in ULTRA */
 
-static object *_UL_fft(object *argl, char *type, int no, int flag, int ordr)
+static object *_UL_fft(SS_psides *si, object *argl,
+		       char *type, int no, int flag, int ordr)
    {int n, i, jr, ji, n0;
     double xmn, xmx;
     double *y, *x, *ypr, *ypi;
@@ -67,13 +68,13 @@ static object *_UL_fft(object *argl, char *type, int no, int flag, int ordr)
     for (i = 0; i < no; i++)
         y[i] = PM_REAL_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Real part %s %c %c", type, crvr->id, crvi->id);
-    ch1 = SX_mk_curve(no, x, y, lbl, NULL, (PFVoid) UL_plot);
+    ch1 = SX_mk_curve(si, no, x, y, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
     for (i = 0; i < no; i++)
         y[i] = PM_IMAGINARY_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Imaginary part %s %c %c", type, crvr->id, crvi->id);
-    ch2 = SX_mk_curve(no, x, y, lbl, NULL, (PFVoid) UL_plot);
+    ch2 = SX_mk_curve(si, no, x, y, lbl, NULL, UL_plot);
 
     CFREE(x);
     CFREE(y);
@@ -117,13 +118,13 @@ object *UL_fft(SS_psides *si, int j)
     for (i = 0; i < n; i++)
         y[i] = PM_REAL_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Real part FFT %c", crv->id);
-    cre = SX_mk_curve(n, x, y, lbl, NULL, (PFVoid) UL_plot);
+    cre = SX_mk_curve(si, n, x, y, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
     for (i = 0; i < n; i++)
         y[i] = PM_IMAGINARY_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Imaginary part FFT %c", crv->id);
-    cim = SX_mk_curve(n, x, y, lbl, NULL, (PFVoid) UL_plot);
+    cim = SX_mk_curve(si, n, x, y, lbl, NULL, UL_plot);
 
     CFREE(x);
     CFREE(y);
@@ -143,7 +144,7 @@ object *UL_fft(SS_psides *si, int j)
 static object *_ULI_ifft(SS_psides *si, object *argl)
    {object *rv;
 
-    rv = _UL_fft(argl, "IFFT", 0, -1, _SX.fft_order);
+    rv = _UL_fft(si, argl, "IFFT", 0, -1, _SX.fft_order);
 
     return(rv);}
 
@@ -155,7 +156,7 @@ static object *_ULI_ifft(SS_psides *si, object *argl)
 static object *_ULI_cfft(SS_psides *si, object *argl)
    {object *rv;
 
-    rv = _UL_fft(argl, "CFFT", 0, 1, _SX.fft_order);
+    rv = _UL_fft(si, argl, "CFFT", 0, 1, _SX.fft_order);
 
     return(rv);}
 
@@ -236,7 +237,7 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
     PM_convolve(gx, gy, gn, hx, hy, hn, dt, &x, &y, &n);
 
     lbl = SC_dsnprintf(FALSE, "Convolution %c %c", crvg->id, crvh->id);
-    ch = SX_mk_curve(n, x, y, lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, n, x, y, lbl, NULL, UL_plot);
 
     return(ch);}
 
@@ -456,8 +457,8 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
         {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_dataset[j].id, order);}
 
     ret = SS_mk_cons(si, SS_reverse(ret),
-                     SX_mk_curve(SX_default_npts, p[0], p[1],
-				 lbl, NULL, (PFVoid) UL_plot));
+                     SX_mk_curve(si, SX_default_npts, p[0], p[1],
+				 lbl, NULL, UL_plot));
 
     CFREE(cf);
 
@@ -564,8 +565,8 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     if (si->interactive == ON)
        PRINT(stdout, "\n");
 
-    ch = SX_mk_curve(SX_dataset[j].n, SX_dataset[j].x[0], UL_buf1y,
-		     local, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, SX_dataset[j].n, SX_dataset[j].x[0], UL_buf1y,
+		     local, NULL, UL_plot);
 
 /* clean up */
     PM_destroy(a);
@@ -793,7 +794,7 @@ static object *_ULI_edit(SS_psides *si, int ie)
 				   "SCATTER",    SC_INT_I, FALSE, TRUE,
 				   "LINE-COLOR", SC_INT_I, FALSE, dev->GREEN,
 				   NULL);
-    UL_plot();
+    UL_plot(si);
 
 /* mark the points to remove */
     UL_mark_curve_points(x, n, indx);
@@ -848,8 +849,8 @@ object *UL_dupx(SS_psides *si, int j)
     else
        lbl = SC_dsnprintf(FALSE, "Dupx @%d", SX_dataset[j].id);
 
-    o = SX_mk_curve(SX_dataset[j].n, SX_dataset[j].x[0],
-		    SX_dataset[j].x[0], lbl, NULL, (PFVoid) UL_plot);
+    o = SX_mk_curve(si, SX_dataset[j].n, SX_dataset[j].x[0],
+		    SX_dataset[j].x[0], lbl, NULL, UL_plot);
         
     return(o);}
 
@@ -924,7 +925,7 @@ static object *_ULI_stats(SS_psides *si, object *argl)
 
 /* _ULI_DISP - display the curve points in the given domain */
 
-static object *_ULI_disp(int j, double xmin, double xmax)
+static object *_ULI_disp(SS_psides *si, int j, double xmin, double xmax)
    {int n, i;
     double *x[PG_SPACEDM];
     object *o;

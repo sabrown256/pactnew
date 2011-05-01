@@ -292,8 +292,8 @@ extern object
 
 extern PM_mapping
  *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl),
- *_SXI_refine_mapping(PM_mapping *h, object **pargl),
- *_SXI_interp_mapping(PM_mapping *h, object **pargl);
+ *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl),
+ *_SXI_interp_mapping(SS_psides *si, PM_mapping *h, object **pargl);
 
 
 /* SXHOOK.C declarations */

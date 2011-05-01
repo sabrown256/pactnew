@@ -169,7 +169,7 @@ int main(int c, char **v, char **env)
 
 	prog = "pdbview";
 
-        SX_init_view();
+        SX_init_view(si);
         SX_install_global_vars(si);
         SX_init_mappings();
         SX_init_env();
@@ -181,7 +181,8 @@ int main(int c, char **v, char **env)
 
 /* load the SCHEME level PDBView functionality */
 	if (load_init)
-           SX_load_rc("pdbview.scm", load_rc, ".pdbviewrc", "pdbview.rc");}
+           SX_load_rc(si, "pdbview.scm",
+		      load_rc, ".pdbviewrc", "pdbview.rc");}
 
 /* run in vanilla SCHEME mode */
     else
@@ -221,7 +222,7 @@ int main(int c, char **v, char **env)
     for (i = 0; i < n_files; i++)
         {n = order[i];
 	 if (n < 0)
-	    SX_rd_scm(v[-n]);
+	    SX_rd_scm(si, v[-n]);
 	 else
             {evalt = SC_cpu_time();
 	     SS_load_scm(si, v[n]);

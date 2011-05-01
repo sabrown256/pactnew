@@ -16,7 +16,7 @@ typedef double (*PFDoubleR)(double x);
 typedef double (*PFDoubleRR)(double x, double y);
 typedef double (*PFDoubleRi)(double x, int i);
 typedef void (*PFVoidis)(int j, char *s);
-typedef object *(*PFPObjectidd)(int j, double d1, double d2);
+typedef object *(*PFPObjectidd)(SS_psides *si, int j, double d1, double d2);
 typedef object *(*PFPObjectio)(SS_psides *si, int j, object *argl);
 typedef object *(*PFPObjectoo)(SS_psides *si, object *s, object *tok);
 
@@ -300,7 +300,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
 	     else
 	        d2 = SX_dataset[i].wc[1];
              SS_Assign(ret,
-                       SS_mk_cons(si, fun(i, d1, d2), ret));};};
+                       SS_mk_cons(si, fun(si, i, d1, d2), ret));};};
 
     SX_plot_flag = replot_flag;
 
@@ -733,7 +733,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
                        value = (double) SS_FLOAT_VALUE(s);
 
                     temp_flag = TRUE;
-                    tmp = _UL_make_ln(0.0, value,
+                    tmp = _UL_make_ln(si, 0.0, value,
                                       gxmin,
                                       gxmax,
                                       SX_default_npts);
@@ -859,7 +859,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
        UL_delete(si, tmp);
 
 /* create new curve with data in the accumulator */
-    ch = SX_mk_curve(na, xa, ya, lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, na, xa, ya, lbl, NULL, UL_plot);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);
@@ -938,7 +938,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
 
     lbl = SC_dsnprintf(FALSE, "%s %s",
 		       SS_get_string(si->fun), SC_strrev(local));
-    ch = SX_mk_curve(n, x[0], x[1], lbl, NULL, (PFVoid) UL_plot);
+    ch = SX_mk_curve(si, n, x[0], x[1], lbl, NULL, UL_plot);
 
     SS_Assign(argl, SS_null);
 

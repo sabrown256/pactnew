@@ -112,7 +112,7 @@ extern object
  *UL_delete(SS_psides *si, object *s),
  *UL_sort(SS_psides *si, int k),
  *UL_get_crv_list(SS_psides *si),
- *_UL_make_ln(double slope, double interc, 
+ *_UL_make_ln(SS_psides *si, double slope, double interc,
 	      double first, double last, int n);
 
 
@@ -154,7 +154,7 @@ extern int
 extern object
  *UL_mode_text(SS_psides *si),
  *UL_mode_graphics(SS_psides *si),
- *UL_plot(void),
+ *UL_plot(SS_psides *si),
  *_ULI_printscr(SS_psides *si),
  *_ULI_set_id(SS_psides *si, object *argl),
  *_ULI_thru(SS_psides *si, object *s),

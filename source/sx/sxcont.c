@@ -549,13 +549,11 @@ static int _SX_no_argsp(object *obj)
  *          - respective object
  */
 
-void SX_parse(void (*replot)(void), char *(*reproc)(char *s),
+void SX_parse(SS_psides *si,
+	      object *(*replot)(SS_psides *si), char *(*reproc)(char *s),
 	      object *strm)
    {char *t, s[MAXLINE], line[MAXLINE], *ptr;
-    SS_psides *si;
-
-    si = &_SS_si;
-
+    
     if (SS_procedurep(si->evobj))
        {strcpy(s, SS_PP(si->evobj, name));
         if (_SX_no_argsp(si->evobj) || !EOE(strm))
@@ -578,7 +576,7 @@ void SX_parse(void (*replot)(void), char *(*reproc)(char *s),
                 if (SX_plot_flag && (strcmp(s, "replot") != 0) &&
                     (SX_autoplot == ON) &&
                     (replot != NULL))
-                   (*replot)();};};};
+                   replot(si);};};};
 
     if (PG_console_device != NULL)
        PG_console_device->gprint_flag = TRUE;
@@ -982,9 +980,8 @@ void SX_register_devices(void)
  *            - one of the init files IFNA or IFNB
  */
 
-void SX_load_rc(char *ffn, int ldrc, char *ifna, char *ifnb)
+void SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb)
    {char *s;
-    SS_psides *si = &_SS_si;
 
 /* figure out the runtime file */
     if (SC_query_file(ffn, "r", "ascii"))

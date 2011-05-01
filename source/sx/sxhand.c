@@ -13,7 +13,8 @@
 typedef double (*PFDoubleR)(double x);
 typedef double (*PFDoubleRR)(double x, double y);
 typedef PM_mapping *(*PF_PPM_mapping_1)(PM_mapping *f, object *argl);
-typedef PM_mapping *(*PF_PPM_mapping_2)(PM_mapping *f, object **argl);
+typedef PM_mapping *(*PF_PPM_mapping_2)(SS_psides *si,
+					PM_mapping *f, object **argl);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -558,7 +559,7 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
     while (SS_consp(argl))
        {SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
-            {h  = (*op)(f, &argl);
+            {h  = op(si, f, &argl);
 	     mo = SX_mk_mapping(si, h);
 
 	     if (plf)

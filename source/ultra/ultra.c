@@ -358,7 +358,7 @@ static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
 static void _UL_parse(SS_psides *si, object *strm)
    {int na, nb, nr;
 
-    SX_parse((PFReplot) UL_plot, _UL_reproc_in, strm);
+    SX_parse(si, UL_plot, _UL_reproc_in, strm);
 
 /* get the list of curves after evaluating the latest expression */
     SS_Assign(crva, UL_get_crv_list(si));
@@ -500,11 +500,11 @@ static void UL_default_event_handler(dev, ev)
 
 /* UL_INIT_CURVES - initialize the curve data and references */
 
-void UL_init_curves(void)
+void UL_init_curves(SS_psides *si)
    {
 
     SX_N_Curves = 0;
-    SX_enlarge_dataset((PFVoid) UL_curve_eval);
+    SX_enlarge_dataset(si, (PFVoid) UL_curve_eval);
 
     return;}
 
@@ -672,9 +672,9 @@ object *UL_copy_curve(SS_psides *si, int j)
     double *xpi, *ypi, *xpj, *ypj;
     object *o;
 
-    i = SX_next_space();
+    i = SX_next_space(si);
 
-    SX_assign_next_id(i, (PFVoid) UL_plot);
+    SX_assign_next_id(i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
     SX_dataset[i].wc[0]      = SX_dataset[j].wc[0];
@@ -739,7 +739,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
             0);
 
     j = SX_get_crv_index_i(crv);
-    i = SX_next_space();
+    i = SX_next_space(si);
     n = 1 + (1.0 + TOLERANCE)*ABS(xstop - xstart)/xstep;
 
     xpj = SX_dataset[j].x[0];
@@ -799,7 +799,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     snprintf(s, MAXLINE, "Extract %c (%e to %e by %e)",
             SX_dataset[j].id, xstart, xstop, xstep);
 
-    SX_assign_next_id(i, (PFVoid) UL_plot);
+    SX_assign_next_id(i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(s);
     SX_dataset[i].file      = NULL;
@@ -833,10 +833,10 @@ object *UL_xindex_curve(SS_psides *si, int j)
     double *xpi, *ypi, *xpj, *ypj;
     object *o;
 
-    i = SX_next_space();
+    i = SX_next_space(si);
     n = SX_dataset[j].n;
 
-    SX_assign_next_id(i, (PFVoid) UL_plot);
+    SX_assign_next_id(i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
     SX_dataset[i].wc[0]     = 1.0;
@@ -915,7 +915,7 @@ static void UL_init_env(SS_psides *si)
 /* these lisp package special variables are initialized in all modes */
     SS_set_print_err_func(NULL, TRUE);
     si->get_arg  = _UL_args;
-    SX_plot_hook = (PFByte) UL_plot;
+    SX_plot_hook = UL_plot;
 
     SC_gs.atof   = SC_atof;
     SC_gs.strtod = SC_strtod;
@@ -1243,7 +1243,7 @@ int main(int c, char **v)
 
 /* ULTRA initializations depending on scheme */
     UL_install_scheme_funcs(si);
-    UL_init_curves();
+    UL_init_curves(si);
 
     UL_init_env(si);
 
@@ -1319,7 +1319,7 @@ int main(int c, char **v)
 
     SX_autoplot = OFF;
     if (load_init)
-       SX_load_rc("ultra.scm", load_rc, ".ultrarc", "ultra.ini");
+       SX_load_rc(si, "ultra.scm", load_rc, ".ultrarc", "ultra.ini");
 
     if (track)
        SC_send_tracker("ultra", VERSION, 0, NULL);
