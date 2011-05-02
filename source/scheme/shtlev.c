@@ -47,7 +47,6 @@ static void _SS_fpe_handler(int sig)
    {SS_psides *si;
 
     si = SC_get_context(_SS_fpe_handler);
-    si = &_SS_si;
 
 #ifdef SIGFPE
     SC_signal(SIGFPE, _SS_fpe_handler);
@@ -68,7 +67,6 @@ static void _SS_sig_handler(int sig)
     SS_psides *si;
 
     si = SC_get_context(_SS_sig_handler);
-    si = &_SS_si;
 
     SC_signal(sig, SIG_IGN);
 
@@ -78,6 +76,32 @@ static void _SS_sig_handler(int sig)
     SC_retrace_exe(NULL, -1, 120000);
 
     SS_end_scheme(si, sig);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_SET_PUT_STRING - set the _SC_putstr method and register the context */
+
+void SS_set_put_string(SS_psides *si, PFfputs ps)
+   {
+    
+    SC_set_put_string(ps);
+    SC_register_context(ps, si);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_SET_PUT_LINE - set the _SC_putstr method and register the context */
+
+void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...))
+   {
+    
+    SC_set_put_line(pf);
+    SC_register_context(pf, si);
 
     return;}
 
@@ -383,7 +407,7 @@ SS_psides *SS_init_scheme(char *code, char *vers)
     hnd = SC_which_signal_handler(SIGINT);
     SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
     PM_enable_fpe(TRUE, (PFSignal_handler) _SS_fpe_handler);
-    SC_signal_n(SIGINT, si, hnd);
+    SC_signal_n(SIGINT, hnd, si);
 
 #ifdef SIGFPE
     SC_signal(SIGFPE, _SS_fpe_handler);
@@ -434,8 +458,8 @@ SS_psides *SS_init_scheme(char *code, char *vers)
     si->pr_ch_un   = SS_unget_ch;
     si->pr_ch_out  = SS_put_ch;
 
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
 
 #ifdef NO_SHELL
     SC_set_get_line(PG_wind_fgets);
@@ -855,7 +879,11 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
         SS_Restore(si, si->rdobj);
         SS_Restore(si, si->evobj);
 
-	expr = SS_make_form(si, x, SS_make_form(si, SS_quoteproc, val, LAST), LAST);
+	expr = SS_make_form(si, x,
+			    SS_make_form(si,
+					 SS_quoteproc, val,
+					 LAST),
+			    LAST);
         x    = SS_exp_eval(si, expr);}
 
     else
@@ -875,7 +903,6 @@ void SS_interrupt_handler(int sig)
     SS_psides *si;
 
     si = SC_get_context(SS_interrupt_handler);
-    si = &_SS_si;
 
     SC_signal_n(SIGINT, SS_interrupt_handler, si);
 

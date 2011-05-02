@@ -167,6 +167,8 @@ void SX_init(char *code, char *vers)
     SC_gs.strtod         = SC_strtod;
     SC_gs.type_container = _SX_type_container;
 
+    SC_register_context(_SX_type_container, si);
+
     SX_file_exist_action = FAIL;
 
     return;}

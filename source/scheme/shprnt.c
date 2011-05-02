@@ -12,7 +12,7 @@
 
 static int
  _SS_push_chars(FILE *fp, char *fmt, ...),
- _SS_push_string(char *s, FILE *fp);
+ _SS_push_string(const char *s, FILE *fp);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -133,13 +133,13 @@ char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
 
 	SC_get_put_line(pr);
 	SC_get_put_string(ps);
-	SC_set_put_line(SS_printf);
-	SC_set_put_string(SS_fputs);
+	SS_set_put_line(si, SS_printf);
+	SS_set_put_string(si, SS_fputs);
 
 	SS_OBJECT_PRINT(si, obj, SS_null);
 
-	SC_set_put_line(pr);
-	SC_set_put_string(ps);
+	SS_set_put_line(si, pr);
+	SS_set_put_string(si, ps);
 
 	s = CSTRSAVE(_SS.vbf);};
 
@@ -374,15 +374,15 @@ static object *_SSI_sprintf(SS_psides *si, object *argl)
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
-    SC_set_put_line(_SS_push_chars);
-    SC_set_put_string(_SS_push_string);
+    SS_set_put_line(si, _SS_push_chars);
+    SS_set_put_string(si, _SS_push_string);
 
     odf = SS_set_display_flag(TRUE);
     _SS_xprintf(si, si->outdev, argl);
     SS_set_display_flag(odf);
 
-    SC_set_put_line(pr);
-    SC_set_put_string(ps);
+    SS_set_put_line(si, pr);
+    SS_set_put_string(si, ps);
 
     o = SS_mk_string(si, _SS.bf);
 
@@ -408,13 +408,13 @@ static object *_SSI_fprintf(SS_psides *si, object *argl)
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
 
     _SS_xprintf(si, str, argl);
 
-    SC_set_put_line(pr);
-    SC_set_put_string(ps);
+    SS_set_put_line(si, pr);
+    SS_set_put_string(si, ps);
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_gs.io_interrupts_on);
@@ -458,7 +458,7 @@ static int _SS_push_chars(FILE *fp, char *fmt, ...)
  *                 - may exceed the static buffer size
  */
 
-static int _SS_push_string(char *s, FILE *fp)
+static int _SS_push_string(const char *s, FILE *fp)
    {int ns, nb;
 
     if (_SS.bf == NULL)
@@ -484,7 +484,7 @@ static int _SS_push_string(char *s, FILE *fp)
 
 /* SS_PUTS - C level string print routine */
 
-int SS_puts(char *s, FILE *fp, PFfputs put)
+int SS_puts(const char *s, FILE *fp, PFfputs put)
    {int rv;
 
     if (_SS.disp_flag == TRUE)
@@ -508,15 +508,15 @@ static object *_SSI_display(SS_psides *si, object *obj)
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
 
     _SS.disp_flag = _SS.disp_flag_ext;
     _SSI_write(si, obj);
     _SS.disp_flag = FALSE;
 
-    SC_set_put_line(pr);
-    SC_set_put_string(ps);
+    SS_set_put_line(si, pr);
+    SS_set_put_string(si, ps);
 
     return(SS_f);}
 

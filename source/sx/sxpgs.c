@@ -998,7 +998,7 @@ void SX_mouse_event_handler(PG_device *dev, PG_event *ev)
     object *loc, *fnc;
     SS_psides *si;
 
-    si = &_SS_si;
+    si = SC_get_context(SX_mouse_event_handler);
 
     if (dev != NULL)
        {PG_make_device_current(dev);
@@ -1079,8 +1079,8 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
 	if (dev == NULL)
 	   return(SS_f);
 
-	SC_set_put_line(SX_fprintf);
-	SC_set_put_string(SX_fputs);
+	SS_set_put_line(si, SX_fprintf);
+	SS_set_put_string(si, SX_fputs);
 	SC_set_get_line(PG_wind_fgets);
 
 	PG_make_device_current(dev);
@@ -1092,7 +1092,13 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
 	PG_set_mouse_up_event_handler(dev, SX_mouse_event_handler);
 	PG_set_motion_event_handler(dev, SX_motion_event_handler);
 	PG_set_expose_event_handler(dev, SX_expose_event_handler);
-	PG_set_update_event_handler(dev, SX_update_event_handler);};
+	PG_set_update_event_handler(dev, SX_update_event_handler);
+
+	SC_register_context(SX_mouse_event_handler,   si);
+	SC_register_context(SX_motion_event_handler,  si);
+	SC_register_context(SX_expose_event_handler,  si);
+	SC_register_context(SX_update_event_handler,  si);
+	SC_register_context(SX_default_event_handler, si);};
 
     return(SS_t);}
 
@@ -1605,8 +1611,8 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 
     data->rendering = pty;
 
-    SC_set_put_line(SX_fprintf);
-    SC_set_put_string(SX_fputs);
+    SS_set_put_line(si, SX_fprintf);
+    SS_set_put_string(si, SX_fputs);
 
     if ((domain != NULL) && (domain->info_type != NULL))
        {if (strcmp(domain->info_type, SC_PCONS_P_S) == 0)
@@ -1651,8 +1657,8 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 
     PG_draw_interface_objects(dev);
 
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
 
 /* unchain the list of graphs */
     while (data->next != NULL)
