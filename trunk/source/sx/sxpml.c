@@ -744,7 +744,7 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
 
 /* _SX_WR_GSET - print a g_set */
 
-static void _SX_wr_gset(object *obj, object *strm)
+static void _SX_wr_gset(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<SET|%s,%s>",
@@ -1037,7 +1037,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 
 /* _SX_WR_GMAPPING - print a g_mapping */
 
-static void _SX_wr_gmapping(object *obj, object *strm)
+static void _SX_wr_gmapping(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<MAPPING|%s>", MAPPING_NAME(obj));
@@ -1502,7 +1502,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
 
 /* _SX_WR_GNUM_ARRAY - print a g_num_array */
 
-static void _SX_wr_gnum_array(object *obj, object *strm)
+static void _SX_wr_gnum_array(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<ARRAY|%s>", NUMERIC_ARRAY_TYPE(obj));
@@ -1774,7 +1774,7 @@ static object *_SXI_polygonp(SS_psides *si, object *obj)
 
 /* _SX_WR_GPOLYGON - print a gpolygon */
 
-static void _SX_wr_gpolygon(object *obj, object *strm)
+static void _SX_wr_gpolygon(SS_psides *si, object *obj, object *strm)
    {PM_polygon *py;
 
     py = SS_GET(PM_polygon, obj);

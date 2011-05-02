@@ -16,7 +16,7 @@
 
 /* _SS_WR_PROCESS - print a process object */
 
-static void _SS_wr_process(object *obj, object *strm)
+static void _SS_wr_process(SS_psides *si, object *obj, object *strm)
    {PROCESS *pp;
     int flag;
     FILE *str;

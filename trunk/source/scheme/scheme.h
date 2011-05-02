@@ -81,19 +81,6 @@ typedef enum e_SS_io_logging SS_io_logging;
 
 /* Generic object definition */
 
-typedef struct s_object object;
-
-struct s_object
-   {char *print_name;            /* specific members */
-    void *val;
-
-    SS_eval_mode eval_type;      /* generic members */
-    void (*print)(object *obj, object *strm);
-    void (*release)(object *obj);};
-
-FUNCTION_POINTER(object, (*PFObject));
-FUNCTION_POINTER(object, *(*PFPObject));
-
 typedef struct s_SS_input_port input_port;
 typedef struct s_SS_output_port output_port;
 typedef struct s_SS_cons cons;
@@ -108,6 +95,18 @@ typedef struct s_SS_S_proc S_procedure;
 typedef struct s_SS_proc procedure;
 typedef struct s_SS_vect vector;
 typedef struct s_SS_psides SS_psides;
+typedef struct s_object object;
+
+struct s_object
+   {char *print_name;            /* specific members */
+    void *val;
+
+    SS_eval_mode eval_type;      /* generic members */
+    void (*print)(SS_psides *si, object *obj, object *strm);
+    void (*release)(object *obj);};
+
+FUNCTION_POINTER(object, (*PFObject));
+FUNCTION_POINTER(object, *(*PFPObject));
 
 typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
@@ -359,8 +358,8 @@ struct s_SS_vect
 #define SS_OBJECT_NAME(_o)         ((_o)->print_name)
 #define SS_OBJECT(_o)              ((_o)->val)
 #define SS_OBJECT_ETYPE(_o)        ((_o)->eval_type)
-#define SS_OBJECT_PRINT(_o, strm)  (*((_o)->print))(_o, strm)
 #define SS_OBJECT_FREE(_o)         (*((_o)->release))(_o)
+#define SS_OBJECT_PRINT(_si, _o, _s)  (*((_o)->print))(_si, _o, _s)
 
 #define SS_INQUIRE_OBJECT(_si, _o)                                          \
    ((object *) SC_hasharr_def_lookup((_si)->symtab, _o))
@@ -1008,7 +1007,7 @@ extern object
  *SS_mk_cons(SS_psides *si, object *ca, object *cd),
  *SS_mk_object(SS_psides *si,
 	       void *np, int type, SS_eval_mode evt, char *pname,
-	       void (*print)(object *obj, object *strm),
+	       void (*print)(SS_psides *si, object *obj, object *strm),
 	       void (*release)(object *obj)),
  *SS_mk_char(SS_psides *si, int i),
  *SS_mk_vector(SS_psides *si, int l);
@@ -1070,9 +1069,9 @@ extern object
 extern void
  SS_set_prompt(SS_psides *si, char *fmt, ...),
  SS_print(object *obj, char *begin, char *end, object *strm),
- SS_wr_lst(object *obj, object *strm),
- SS_wr_proc(object *obj, object *strm),
- SS_wr_atm(object *obj, object *strm);
+ SS_wr_lst(SS_psides *si, object *obj, object *strm),
+ SS_wr_proc(SS_psides *si, object *obj, object *strm),
+ SS_wr_atm(SS_psides *si, object *obj, object *strm);
 
 extern object
  *SS_trans_off(SS_psides *si),

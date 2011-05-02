@@ -30,7 +30,7 @@ double
 
 /* _SX_WR_GIOB - print a g_interface_object */
 
-static void _SX_wr_giob(object *obj, object *strm)
+static void _SX_wr_giob(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<INTERFACE_OBJECT|%s>",
