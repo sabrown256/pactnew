@@ -167,7 +167,7 @@ void SS_init_f_syntax_mode(SS_psides *si)
 	ssdbg  = SS_parse_debug_f();
 	*ssdbg = FALSE;
 
-	SS_install("f-mode",
+	SS_install(si, "f-mode",
 		   "Procedure: set Fortran syntax parsing mode",
 		   SS_zargs,
 		   SS_f_mode, SS_PR_PROC);

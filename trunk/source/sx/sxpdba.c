@@ -303,27 +303,27 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
 void SX_install_pdb_attr_funcs(SS_psides *si)
    {
 
-    SS_install("def-attribute",
+    SS_install(si, "def-attribute",
                "Define an attribute to a PDB file",
                SS_nargs,
                _SXI_def_attr, SS_PR_PROC);
 
-    SS_install("rem-attribute",
+    SS_install(si, "rem-attribute",
                "Remove the definition of an attribute from a PDB file",
                SS_nargs,
                _SXI_rem_attr, SS_PR_PROC);
 
-    SS_install("set-attribute-value!",
+    SS_install(si, "set-attribute-value!",
                "Set the value of attribute for a variable",
                SS_nargs,
                _SXI_set_attr_val, SS_PR_PROC);
 
-    SS_install("get-attribute-value",
+    SS_install(si, "get-attribute-value",
                "Get the value of attribute for a variable",
                SS_nargs,
                _SXI_get_attr_val, SS_PR_PROC);
 
-    SS_install("list-attributes",
+    SS_install(si, "list-attributes",
                "List the attributes known to the file",
                SS_nargs,
                _SXI_lst_attr, SS_PR_PROC);

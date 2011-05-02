@@ -1213,94 +1213,94 @@ void _SS_inst_print(SS_psides *si)
 		  SS_acc_int,
 		  &_SS.disp_flag_ext);
 
-    SS_install("apropos",
+    SS_install(si, "apropos",
                "Procedure: searches the symbol table for documentation",
                SS_nargs,
                _SSI_apropos, SS_PR_PROC);
 
-    SS_install("banner",
+    SS_install(si, "banner",
                "Procedure: print the code system banner",
                SS_nargs,
                SS_banner, SS_PR_PROC);
 
-    SS_install("close-output-file",
+    SS_install(si, "close-output-file",
                "Procedure: Close the specified output port and release the OUT_PORT object",
                SS_sargs,
                _SSI_cls_out, SS_PR_PROC);
 
-    SS_install("describe",
+    SS_install(si, "describe",
                "Procedure: prints the documentation for a procedure to the specified device",
                SS_nargs,
                _SSI_describe, SS_PR_PROC);
 
-    SS_install("display",
+    SS_install(si, "display",
                "Procedure: prints an object to the specified device in human readable form",
                SS_nargs,
                _SSI_display, SS_PR_PROC);
 
-    SS_install("newline",
+    SS_install(si, "newline",
                "Procedure: print a <CR><LF> or equivalent to the specified device",
                SS_nargs,
                _SSI_newline, SS_PR_PROC);
 
-    SS_install("open-output-file",
+    SS_install(si, "open-output-file",
                "Procedure: Open the specified file for output and return an OUT_PORT object",
                SS_sargs,
                _SSI_opn_out, SS_PR_PROC);
 
-    SS_install("output-port?",
+    SS_install(si, "output-port?",
                "Returns #t if the object is an output port (OUT_PORT), and #f otherwise",
                SS_sargs, 
                _SSI_oportp, SS_PR_PROC);
 
-    SS_install("printf",
+    SS_install(si, "printf",
                "C-like formatted print function: (printf port format . rest)",
                SS_nargs, 
                _SSI_fprintf, SS_PR_PROC);
 
-    SS_install("print-toggle",
+    SS_install(si, "print-toggle",
                "Procedure: Toggle printing of values",
                SS_zargs,
                _SSI_print_toggle, SS_PR_PROC);
 
-    SS_install("sprintf",
+    SS_install(si, "sprintf",
                "C style sprintf string builder function: (sprintf format . rest)",
                SS_nargs, 
                _SSI_sprintf, SS_PR_PROC);
 
-    SS_install("stats-toggle",
+    SS_install(si, "stats-toggle",
                "Procedure: Toggle printing of statistics",
                SS_zargs,
                _SSI_stats_toggle, SS_PR_PROC);
 
-    SS_install("transcript-off",
+    SS_install(si, "transcript-off",
                "Procedure: close the transcript file to stop recording a Scheme session",
                SS_zargs,
                SS_trans_off, SS_UR_MACRO);
 
-    SS_install("transcript-on",
+    SS_install(si, "transcript-on",
                "Procedure: open the specified transcript file to start recording a Scheme session",
                SS_sargs,
                _SSI_trans_on, SS_PR_PROC);
 
-    SS_install("write",
+    SS_install(si, "write",
                "Procedure: puts the printed representation of an object to the specified device",
                SS_nargs,
                _SSI_write, SS_PR_PROC);
 
 #ifdef LARGE
 
-    SS_install("call-with-output-file",
+    SS_install(si, "call-with-output-file",
                "Procedure: open the named file and eval a procedure using the port for output",
                SS_nargs,
                _SSI_call_of, SS_PR_PROC);
 
-    SS_install("current-output-port",
+    SS_install(si, "current-output-port",
                "Procedure: Returns the current default output port",
                SS_zargs,
                _SSI_curr_op, SS_PR_PROC);
 
-    SS_install("write-char",
+    SS_install(si, "write-char",
                "Procedure: Write a single character to the specified port",
                SS_nargs,
                _SSI_wr_chr, SS_PR_PROC);

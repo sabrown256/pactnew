@@ -962,57 +962,57 @@ static object *SX_col_labels(SS_psides *si)
 void SX_install_ascii_funcs(SS_psides *si)
    {
 
-    SS_install("read-table*",
+    SS_install(si, "read-table*",
                "Procedure: Read nth table that starts at or after specified line in ASCII file\n     Usage: read-table* <file> [<n> [<label-line> [<line>]]]",
                SS_nargs,
                _SXI_read_text_table, SS_PR_PROC);
 
-    SS_install("read-table",
+    SS_install(si, "read-table",
                "Macro: Read nth table that starts at or after specified line in ASCII file\n     Usage: read-table* <file> [<n> [<label-line> [<line>]]]",
                SS_nargs,
                _SXI_read_text_table, SS_UR_MACRO);
 
-    SS_install("table->pm-mapping",
+    SS_install(si, "table->pm-mapping",
                "Procedure: Extract a mapping from current table\n     Usage: table->pm-mapping <name> <domain-list> <range-list>",
                SS_nargs,
                _SXI_table_map, SS_PR_PROC);
 
-    SS_install("table->pm-set",
+    SS_install(si, "table->pm-set",
                "Procedure: Extract a set from current table\n     Usage: table->pm-set <name> <domain-list>",
                SS_nargs,
                SX_table_set, SS_PR_PROC);
 
-    SS_install("pm-mapping->table",
+    SS_install(si, "pm-mapping->table",
                "Procedure: Write a mapping to the given file\n     Usage: pm-mapping->table <file> [<mapping>]+",
                SS_nargs,
                SX_wrt_text_table, SS_PR_PROC);
 
-    SS_install("del-column",
+    SS_install(si, "del-column",
                "Procedure: Delete column n from the current table\n     Usage: del-column <n>",
                SS_nargs,
                SX_delete_column, SS_PR_PROC);
 
-    SS_install("sort-on-column",
+    SS_install(si, "sort-on-column",
                "Procedure: Sort the current table on a column\n     Usage: sort-on-column <n>",
                SS_nargs,
                SX_sort_on_column, SS_PR_PROC);
 
-    SS_install("print-column",
+    SS_install(si, "print-column",
                "Procedure: Print column n from the current table\n     Usage: print-column <n>",
                SS_nargs,
                SX_print_column, SS_PR_PROC);
 
-    SS_install("col-normalize",
+    SS_install(si, "col-normalize",
                "Procedure: Normalize the current table columnwise\n     Usage: col-normalize",
                SS_zargs,
                SX_cnormalize_table, SS_PR_PROC);
 
-    SS_install("col-labels",
+    SS_install(si, "col-labels",
                "Procedure: Return the column labels\n     Usage: col-labels",
                SS_zargs,
                SX_col_labels, SS_PR_PROC);
 
-    SS_install("write-table",
+    SS_install(si, "write-table",
                "Macro: Write the current table to the named file\n     Usage: write-table <fname>",
                SS_nargs,
                SX_wrt_current_table, SS_UR_MACRO);

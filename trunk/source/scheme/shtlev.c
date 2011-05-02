@@ -1182,57 +1182,57 @@ void SS_inst_prm(SS_psides *si)
     if (si->symtab == NULL)
        si->symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
 
-    SS_install("break",
+    SS_install(si, "break",
                "Procedure: enter a Scheme break, return with return-level",
                SS_zargs,
                _SSI_break, SS_PR_PROC);
 
-    SS_install("defined?",
+    SS_install(si, "defined?",
                "Special Form: returns #t if its argument has been defined in the current environment",
                SS_sargs,
                _SSI_defp, SS_UR_MACRO);
 
-    SS_install("display-object-table",
+    SS_install(si, "display-object-table",
                "Procedure: Prints information about all known objects",
                SS_zargs,
                _SSI_pr_obj_map, SS_PR_PROC);
 
-    SS_install("list",
+    SS_install(si, "list",
                "Return a new list made up of the arguments",
                SS_nargs, 
                SS_list, SS_PR_PROC);
 
-    SS_install("quit",
+    SS_install(si, "quit",
                "Procedure: Exit from Scheme",
                SS_znargs,
                _SSI_quit, SS_PR_PROC);
 
-    SS_install("reset",
+    SS_install(si, "reset",
                "Procedure: unwinds the Error/Break stack and returns to top level",
                SS_zargs,
                _SSI_reset, SS_PR_PROC);
 
-    SS_install("return-level",
+    SS_install(si, "return-level",
                "Procedure: pops n levels off the Error/Break stack and returns the second arg as value",
                SS_nargs,
                _SSI_retlev, SS_PR_PROC);
 
-    SS_install("string->object",
+    SS_install(si, "string->object",
                "Returns the object named by the given string",
                SS_sargs, 
                SS_lookup_object, SS_PR_PROC);
 
-    SS_install("synonym",
+    SS_install(si, "synonym",
                "Macro: Define synonyms for the given function",
                SS_nargs,
                _SSI_synonym, SS_UR_MACRO);
 
-    SS_install("syscmnd",
+    SS_install(si, "syscmnd",
                "Procedure: process the given string as a command line-return results in list",
                SS_nargs,
                _SSI_syscmnd, SS_PR_PROC);
 
-    SS_install("system",
+    SS_install(si, "system",
                "Procedure: invokes the operation system to process the given string as a command line",
                SS_nargs,
                _SSI_system, SS_PR_PROC);

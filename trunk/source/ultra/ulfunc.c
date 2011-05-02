@@ -2005,265 +2005,265 @@ void UL_install_scheme_funcs(SS_psides *si)
     SX_install_global_funcs(si);
     _SX_install_pgs_primitives(si);
 
-    SS_install("curve->list",
+    SS_install(si, "curve->list",
                "Prodedure: Given a curve return a list of the lists of x and y values\n     Usage: curve->list <curve>",
                SS_sargs,
                _ULI_curve_list, SS_PR_PROC);
 
-    SS_install("menu",
+    SS_install(si, "menu",
                "Macro: List the available curves\n     Usage: menu [<label-pattern> [<file-pattern>]]",
                SS_znargs,
                _ULI_menu, SS_UR_MACRO);
 
-    SS_install("menu*",
+    SS_install(si, "menu*",
                "Procedure: List the available curves\n     Usage: menu* [<label-pattern> [<file-pattern>]]",
                SS_znargs,
                _ULI_menu, SS_PR_PROC);
 
-    SS_install("lst",
+    SS_install(si, "lst",
                "Macro: Display curves in list\n     Usage: lst [<label-pattern> [<file-pattern>]]",
                SS_znargs,
                _ULI_list_curves, SS_UR_MACRO);
 
-    SS_install("lst*",
+    SS_install(si, "lst*",
                "Procedure: Display curves in list\n     Usage: lst* [<label-pattern> [<file-pattern>]]",
                SS_znargs,
                _ULI_list_curves, SS_PR_PROC);
 
-    SS_install("prefix",
+    SS_install(si, "prefix",
                "Macro: List or set menu prefixes\n     Usage: prefix [a | b | ... | z [<menu-index> | off]]",
                SS_znargs,
                _ULI_prefix, SS_UR_MACRO);
 
-    SS_install("prefix*",
+    SS_install(si, "prefix*",
                "Procedure: List or set menu prefixes\n     Usage: prefix* [a | b | ... | z [<menu-index> | off]]",
                SS_znargs,
                _ULI_prefix, SS_PR_PROC);
 
-    SS_install("thru",
+    SS_install(si, "thru",
                "Procedure: Return an ex[0]anded list of curves\n     Usage: thru <first-curve> <last-curve>",
                SS_nargs,
                _ULI_thru, SS_PR_PROC);
 
-    SS_install("lnnorm",
+    SS_install(si, "lnnorm",
                "Procedure: Calculate the Ln norm of curve\n     Usage: lnnorm <curve> [order]",
                SS_nargs,
                _ULI_lnnorm, SS_PR_PROC);
 
 
-    SS_install("open-device*",
+    SS_install(si, "open-device*",
                "Procedure: Open graphics display device\n     Usage: open-device* <name> <tx[1]e> <title>",
                SS_nargs,
                _ULI_open_device, SS_PR_PROC);
 
-    SS_install("open-device",
+    SS_install(si, "open-device",
                "Macro: Open graphics device\n     Usage: open-device <name> <tx[1]e> <title>",
                SS_nargs,
                _ULI_open_device, SS_UR_MACRO);
 
-    SS_install("close-device*",
+    SS_install(si, "close-device*",
                "Procedure: Close graphics device\n     Usage: close-device* ps | png | cgm | mpeg | jpeg | <name>",
                SS_sargs,
                _ULI_close_device, SS_PR_PROC);
 
-    SS_install("close-device",
+    SS_install(si, "close-device",
                "Macro: Close graphics device\n     Usage: close-device ps | png | cgm | mpeg | jpeg | <name>",
                SS_sargs,
                _ULI_close_device, SS_UR_MACRO);
 
-    SS_install("domain",
+    SS_install(si, "domain",
                "Procedure: Set the domain for plotting\n     Usage: domain <low-lim> <high-lim> or\n     Usage: domain de",
                SS_znargs,
                _ULI_domain, SS_PR_PROC);
 
-    SS_install("range",
+    SS_install(si, "range",
                "Procedure: Set the range for plotting\n     Usage: range <low-lim> <high-lim> or\n     Usage: range de",
                SS_znargs,
                _ULI_range, SS_PR_PROC);
 
-    SS_install("label",
+    SS_install(si, "label",
                "Procedure: Change the label displayed for a curve by lst command\n     Usage: label <curve> <new-label>",
                SS_nargs,
                _ULI_label, SS_PR_PROC);
 
-    SS_install("set-id",
+    SS_install(si, "set-id",
                "Procedure: Change the data-id of a curve\n     Usage: set-id <curve> a | b | ... | z",
                SS_nargs,
                _ULI_set_id, SS_PR_PROC);
 
 /* these are the no argument functions */
-    SS_install("end",
+    SS_install(si, "end",
                "Macro: Exit ULTRA with optional exit status value\n     Usage: end [<integer>]",
                SS_znargs,
                _ULI_quit, SS_PR_PROC);
 
-    SS_install("erase",
+    SS_install(si, "erase",
                "Macro: Erases all curves on the screen but leaves the limits untouched\n     Usage: erase",
                SS_zargs,
                _ULI_erase, SS_UR_MACRO);
 
-    SS_install("extract-curve",
+    SS_install(si, "extract-curve",
                "Procedure: Extracts a curve with the specified points\n     Usage: extract-curve <curve> <x-start> <x-stop> <x-step>",
                SS_nargs,
                _ULI_extract_curve, SS_PR_PROC);
 
-    SS_install("get-data-domain",
+    SS_install(si, "get-data-domain",
                "Procedure: Return the union domain for all curves in the list\n     Usage: get-data-domain <curve-list>",
                SS_nargs,
                SX_get_data_domain, SS_PR_PROC);
 
-    SS_install("get-data-range",
+    SS_install(si, "get-data-range",
                "Procedure: Return the union range for all curves in the list\n     Usage: get-data-range <curve-list>",
                SS_nargs,
                SX_get_data_range, SS_PR_PROC);
 
-    SS_install("replot",
+    SS_install(si, "replot",
                "Macro: Replot curves in list\n     Usage: replot",
                SS_zargs,
                _ULI_plot, SS_UR_MACRO);
 
-    SS_install("text",
+    SS_install(si, "text",
                "Macro: Enter text mode - no graphics are available\n     See graphics\n     Usage: text",
                SS_zargs,
                UL_mode_text, SS_UR_MACRO);
 
-    SS_install("graphics",
+    SS_install(si, "graphics",
                "Macro: Enter graphics mode\n     To enter text mode tx[1]e: text\n     Usage: graphics",
                SS_zargs,
                UL_mode_graphics, SS_UR_MACRO);
 
-    SS_install("print",
+    SS_install(si, "print",
                "Macro: Print the current plot.\n     Usage: print",
                SS_zargs,
                _ULI_printscr, SS_UR_MACRO);
 
-    SS_install("re-id",
+    SS_install(si, "re-id",
                "Macro: Reset data-ids to A, B, C, ... no skipping\n     Usage: re-id",
                SS_zargs,
                SX_re_id, SS_UR_MACRO);
 
 /* these are the former Ultra macros */
-    SS_install("kill",
+    SS_install(si, "kill",
                "Procedure: Delete entries from the menu.\n     Usage: kill <number-list> | all",
                SS_nargs,
                _ULI_expunge_macro, SS_PR_PROC);
 
-    SS_install("rd",
+    SS_install(si, "rd",
                "Macro: Read curve data file\n     Usage: rd <file-name>",
                SS_sargs,
                SX_read_data, SS_UR_MACRO);
 
-    SS_install("rd1",
+    SS_install(si, "rd1",
                "Macro: Read ULTRA I curve data file\n     Usage: rd1 <file-name>",
                SS_sargs,
                SX_read_ver1, SS_UR_MACRO);
 
-    SS_install("open",
+    SS_install(si, "open",
                "Procedure: Read curve data file\n     Usage: open <file-name>",
                SS_sargs,
                SX_read_data, SS_PR_PROC);
 
-    SS_install("open1",
+    SS_install(si, "open1",
                "Procedure: Read ULTRA I curve data file\n     Usage: open1 <file-name>",
                SS_sargs,
                SX_read_ver1, SS_PR_PROC);
 
-    SS_install("wrt",
+    SS_install(si, "wrt",
                "Procedure: Save curves to file\n     Usage: wrt [<tx[1]e>] <file-name> <curve-list>",
                SS_nargs,
                SX_write_data, SS_PR_PROC);
 
-    SS_install("save",
+    SS_install(si, "save",
                "Macro: Save curves to file\n     Usage: save [<tx[1]e>] <file-name> <curve-lst>",
                SS_nargs,
                SX_write_data, SS_UR_MACRO);
 
-    SS_install("average",
+    SS_install(si, "average",
                "Procedure: Average curves\n     Usage: average <curve-list>",
                SS_nargs,
                _ULI_average, SS_PR_PROC);
 
-    SS_install("system",
+    SS_install(si, "system",
                "Procedure: Pass command to the operating system\n     Usage: system <unix-command>",
                SS_sargs,
                _ULI_system, SS_PR_PROC);
 
-    SS_install("syscmnd",
+    SS_install(si, "syscmnd",
                "Procedure: Pass command to the operating system\n     Usage: syscmnd <unix-command>",
                SS_sargs,
                _ULI_syscmnd, SS_PR_PROC);
 
-    SS_install("append-curves",
+    SS_install(si, "append-curves",
                "Procedure: Merge curves over union of their domains \n     Where they overlap, take the average\n     Usage: append <curve-list>",
                SS_nargs,
                _ULI_append, SS_PR_PROC);
 
-    SS_install("describe*",
+    SS_install(si, "describe*",
                "Procedure: Describe an Ultra function or variable\n     Usage: describe* <function-list> <variable-list>",
                SS_nargs,
                _ULI_describe, SS_PR_PROC);
 
-    SS_install("describe",
+    SS_install(si, "describe",
                "Macro: Describe an Ultra function or variable\n     Usage: describe <function-list> <variable-list>",
                SS_nargs,
                _ULI_describe, SS_UR_MACRO);
 
-    SS_install("apropos",
+    SS_install(si, "apropos",
                "Macro: List all functions or variables containing the designated substring\n     Usage: apropos <string>",
                SS_sargs,
                _ULI_apropos, SS_UR_MACRO);
 
-    SS_install("make-curve*",
+    SS_install(si, "make-curve*",
                "Procedure: Make an Ultra curve from two lists of numbers\n     Usage: make-curve* '(<list of x-values>) '(<list of y-values>)",
                SS_nargs,
                _ULI_mk_curve, SS_PR_PROC);
 
-    SS_install("make-curve",
+    SS_install(si, "make-curve",
                "Macro: Make an Ultra curve from two lists of numbers\n     Usage: make-curve (<list of x-values>) (<list of y-values>)",
                SS_nargs,
                _ULI_mk_curve, SS_UR_MACRO);
 
-    SS_install("make-filter",
+    SS_install(si, "make-filter",
                "Procedure: make an array of filter coefficients\n     Usage: make-filter <val1> ...",
                SS_nargs,
                _SXI_list_array, SS_PR_PROC);
 
-    SS_install("line",
+    SS_install(si, "line",
                "Procedure: Generate a curve with y = mx + b\n     Usage: line <m> <b> <low-lim> <high-lim> [<no.-pts>]",
                SS_nargs,
                _ULI_make_ln, SS_PR_PROC);
 
-    SS_install("read-table*",
+    SS_install(si, "read-table*",
                "Procedure: Read nth table that starts at or after specified line in ASCII file\n     Usage: read-table* <file> [<n> [<label-line> [<line>]]]",
                SS_nargs,
                SX_read_text_table, SS_PR_PROC);
 
-    SS_install("read-table",
+    SS_install(si, "read-table",
                "Macro: Read nth table that starts at or after specified line in ASCII file\n     Usage: read-table <file> [<n> [<label-line> [<line>]]]",
                SS_nargs,
                SX_read_text_table, SS_UR_MACRO);
 
-    SS_install("table-curve",
+    SS_install(si, "table-curve",
                "Procedure: Extract curve from current table\n     Usage: table-curve <num-points> [<y-off> [<y-stride> [<x-off> [<x-stride>]]]]",
                SS_nargs,
                SX_table_curve, SS_PR_PROC);
 
-    SS_install("table-attributes",
+    SS_install(si, "table-attributes",
                "Procedure: Return the attributes of the current table\n     Usage: table-attributes",
                SS_zargs,
                SX_table_attr, SS_PR_PROC);
 
-    SS_install("toggle-logical-op",
+    SS_install(si, "toggle-logical-op",
                "Procedure: Switch the drawing state between XOR and COPY\n     Usage: toggle-logical-op",
                SS_zargs,
                _ULI_toggle_logical_op, SS_PR_PROC);
 
-    SS_install("file-info",
+    SS_install(si, "file-info",
                "Macro: Print the descriptive information for an ULTRA file\n     Usage: file-info <name>",
                SS_sargs,
                SX_crv_file_info, SS_UR_MACRO);
 
-    SS_install("file-info*",
+    SS_install(si, "file-info*",
                "Procedure: Print the descriptive information for an ULTRA file\n     Usage: file-info* <name>",
                SS_sargs,
                SX_crv_file_info, SS_PR_PROC);

@@ -1974,178 +1974,178 @@ static object *_SXI_union_polygon(SS_psides *si, object *argl)
 void SX_install_pml_funcs(SS_psides *si)
    {
 
-    SS_install("find-index",
+    SS_install(si, "find-index",
                "Returns the array of indeces for which a predicate it true",
                SS_nargs,
                _SXI_find_index, SS_PR_PROC);
 
-    SS_install("pm-array?",
+    SS_install(si, "pm-array?",
                "Returns #t if the object is a numeric array, and #f otherwise",
                SS_sargs,
                _SXI_numeric_arrayp, SS_PR_PROC);
 
-    SS_install("list->pm-array",
+    SS_install(si, "list->pm-array",
                "Returns a numeric array built from a list of numbers",
                SS_nargs,
                _SXI_list_array, SS_PR_PROC);
 
-    SS_install("pm-array->list",
+    SS_install(si, "pm-array->list",
                "Returns a list of numbers built from a numeric array",
                SS_sargs,
                _SXI_array_list, SS_PR_PROC);
 
-    SS_install("pm-make-array",
+    SS_install(si, "pm-make-array",
                "Allocate and return a pm-array of the specified type and size",
                SS_nargs,
                _SXI_mk_array, SS_PR_PROC);
 
-    SS_install("pm-resize-array",
+    SS_install(si, "pm-resize-array",
                "reallocate the given pm-array to the specified size",
                SS_nargs,
                _SXI_resz_array, SS_PR_PROC);
 
-    SS_install("pm-array-ref",
+    SS_install(si, "pm-array-ref",
                "Reference the nth element of a pm-array",
                SS_nargs,
                _SXI_array_ref, SS_PR_PROC);
 
-    SS_install("pm-array-set!",
+    SS_install(si, "pm-array-set!",
                "Set the nth element of a pm-array",
                SS_nargs,
                _SXI_array_set, SS_PR_PROC);
 
-    SS_install("pm-array-length",
+    SS_install(si, "pm-array-length",
                "Returns the length of the given numeric array",
                SS_sargs,
                _SXI_num_arr_len, SS_PR_PROC);
 
-    SS_install("pm-array-extrema",
+    SS_install(si, "pm-array-extrema",
                "Returns the extrema of the given numeric array",
                SS_sargs,
                _SXI_num_arr_extr, SS_PR_PROC);
 
-    SS_install("pm-sub-array",
+    SS_install(si, "pm-sub-array",
                "Return a sub-array of the given numeric array",
                SS_nargs,
                _SXI_sub_array, SS_PR_PROC);
 
-    SS_install("pm-set?",
+    SS_install(si, "pm-set?",
                "Returns #t if the object is a PML set, and #f otherwise",
                SS_sargs,
                _SXI_setp, SS_PR_PROC);
 
-    SS_install("pm-set-mapping-type",
+    SS_install(si, "pm-set-mapping-type",
                "Set the type of a mapping object to the given string",
                SS_nargs,
                _SXI_set_map_type, SS_PR_PROC);
 
-    SS_install("pm-mapping?",
+    SS_install(si, "pm-mapping?",
                "Returns #t if the object is a PML mapping, and #f otherwise",
                SS_sargs,
                _SXI_mappingp, SS_PR_PROC);
 
-    SS_install("pm-grotrian-mapping?",
+    SS_install(si, "pm-grotrian-mapping?",
                "Returns #t if the object is a PML grotrian mapping, and #f otherwise",
                SS_sargs,
                _SXI_grotrian_mappingp, SS_PR_PROC);
 
-    SS_install("pm-mapping->pdbdata",
+    SS_install(si, "pm-mapping->pdbdata",
                "Write a PML mapping object to a PDB file\nFORM (pm-mapping->pdbdata <mapping> <file> <name>)",
                SS_nargs,
                _SXI_mapping_pdbdata, SS_PR_PROC);
 
-    SS_install("pdbdata->pm-mapping",
+    SS_install(si, "pdbdata->pm-mapping",
                "Read a PML mapping object from a PDB file\nFORM (pdbdata->pm-mapping <file> <name>)",
                SS_nargs,
                _SXI_pdbdata_mapping, SS_PR_PROC);
 
-    SS_install("pm-set-name",
+    SS_install(si, "pm-set-name",
                "Return the name of the object iff it is a PM_set and () otherwise",
                SS_sargs,
                _SXI_get_text_set_name, SS_PR_PROC);
 
-    SS_install("pm-set->pdbdata",
+    SS_install(si, "pm-set->pdbdata",
                "Write a PML set object to a PDB file\nFORM (pm-set->pdbdata <set> <file> <name>)",
                SS_nargs,
                _SXI_set_pdbdata, SS_PR_PROC);
 
-    SS_install("pdbdata->pm-set",
+    SS_install(si, "pdbdata->pm-set",
                "Read a PML set object from a PDB file\nFORM (pdbdata->pm-set <file> <name>)",
                SS_nargs,
                _SXI_pdbdata_set, SS_PR_PROC);
 
-    SS_install("pdbdata->pm-array",
+    SS_install(si, "pdbdata->pm-array",
                "Convert a PDBDATA object to a numeric array object\nFORM (pdbdata->pm-array <pdbdata>)",
                SS_nargs,
                _SXI_pdbdata_array, SS_PR_PROC);
 
-    SS_install("pm-array->pdbdata",
+    SS_install(si, "pm-array->pdbdata",
                "Convert a numeric array object to a PDBDATA object\nFORM (pm-array->pdbdata <array>)",
                SS_nargs,
                _SXI_array_pdbdata, SS_PR_PROC);
 
-    SS_install("pm-array->pdbdata-i",
+    SS_install(si, "pm-array->pdbdata-i",
                "Inverse of pdbdata->pm-array\nFORM (pm-array->pdbdata-i <array> <file> [<name>])",
                SS_nargs,
                _SXI_array_pdbdata_i, SS_PR_PROC);
 
-    SS_install("pm-lr->ac",
+    SS_install(si, "pm-lr->ac",
                "Convert a logical rectangular mesh based mapping into an arbitrarily connected mesh base one\nFORM (pm-lr->ac <mapping>)",
                SS_nargs,
                _SXI_lr_ac, SS_PR_PROC);
 
-    SS_install("pm-make-ac-set",
+    SS_install(si, "pm-make-ac-set",
                "Construct an arbitrarily connected set",
                SS_nargs,
                _SXI_make_ac_set, SS_PR_PROC);
 
-    SS_install("pm-arrays->set",
+    SS_install(si, "pm-arrays->set",
                "Convert a list of numeric array objects to a set\nFORM (pm-arrays->set (<array> ...) ...)",
                SS_nargs,
                _SXI_arrays_set, SS_PR_PROC);
 
-    SS_install("pm-make-set",
+    SS_install(si, "pm-make-set",
                "Returns a PML set\nFORM (pm-make-set <name> <mesh-shape-list> <element-arrays>)",
                SS_nargs,
                _SXI_make_pml_set, SS_PR_PROC);
 
-    SS_install("pm-make-mapping",
+    SS_install(si, "pm-make-mapping",
                "Returns a PML mapping\nFORM (pm-make-mapping <domain> <range> [<centering> <category> <name> <emap> <next>])",
                SS_nargs,
                _SXI_make_pml_mapping, SS_PR_PROC);
 
-    SS_install("pm-make-cartesian-product-set",
+    SS_install(si, "pm-make-cartesian-product-set",
                "Returns a newly constructed set\nFORM (pm-make-cartesian-product-set [<set>]*)",
                SS_nargs,
                _SXI_make_cp_set, SS_PR_PROC);
 
-    SS_install("pm-set-set-attribute!",
+    SS_install(si, "pm-set-set-attribute!",
                "Set an attribute of the given set",
                SS_nargs,
                _SXI_set_attr_set, SS_PR_PROC);
 
-    SS_install("pm-connection->ac-domain",
+    SS_install(si, "pm-connection->ac-domain",
                "Build an Arbitrarily-Connected domain set from the given connectivity representation",
 	       SS_nargs,
 	       _SXI_rep_ac_domain, SS_PR_PROC);
 
 /* polygon routines */
-    SS_install("pm-polygon?",
+    SS_install(si, "pm-polygon?",
                "Returns #t if the object is a pm-polygon, and #f otherwise",
                SS_sargs,
                _SXI_polygonp, SS_PR_PROC);
 
-    SS_install("pm-make-polygon",
+    SS_install(si, "pm-make-polygon",
                "Allocate and return a pm-polygon of the specified type and size",
                SS_nargs,
                _SXI_mk_polygon, SS_PR_PROC);
 
-    SS_install("pm-intersect-polygon",
+    SS_install(si, "pm-intersect-polygon",
                "Return the intersection of the given pm-polygons",
                SS_nargs,
                _SXI_intersect_polygon, SS_PR_PROC);
 
-    SS_install("pm-union-polygon",
+    SS_install(si, "pm-union-polygon",
                "Return the union of the given pm-polygons",
                SS_nargs,
                _SXI_union_polygon, SS_PR_PROC);

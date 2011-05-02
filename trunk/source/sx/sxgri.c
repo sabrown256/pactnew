@@ -636,27 +636,27 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 void _SX_install_pgs_iob(SS_psides *si)
    {
 
-    SS_install("pg-interface-object?",
+    SS_install(si, "pg-interface-object?",
                "Returns #t if the object is a PGS interface object, and #f otherwise",
                SS_sargs,
                _SXI_iobp, SS_PR_PROC);
 
-    SS_install("copy-interface-objects",
+    SS_install(si, "copy-interface-objects",
                "Procedure: Copy the interface objects from one device to another\n     Usage: copy-interface-objects dst src [rm]",
                SS_nargs,
                _SXI_copy_iob, SS_PR_PROC);
 
-    SS_install("graphical-interface",
+    SS_install(si, "graphical-interface",
                "Procedure: Toggle the graphical interface\n     Usage: graphical-interface [on | off]",
                SS_sargs,
                _SXI_toggle_gri, SS_PR_PROC);
 
-    SS_install("add-annotation",
+    SS_install(si, "add-annotation",
                "Procedure: Add textual annotation to the specified device\n     Usage: add-annotation <device> [<text> [<color> [<xmin> <xmax> <ymin> <ymax> [<angle>]]]]",
                SS_nargs,
                _SXI_add_annot, SS_PR_PROC);
 
-    SS_install("rem-annotations",
+    SS_install(si, "rem-annotations",
                "Procedure: Remove all annotations\n     Usage: rem-annotations <device>",
                SS_sargs,
                _SXI_free_iobs, SS_PR_PROC);

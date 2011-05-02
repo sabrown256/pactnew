@@ -3769,439 +3769,439 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
 void SX_install_pdb_funcs(SS_psides *si)
    {
 
-    SS_install("pd-get-buffer-size",
+    SS_install(si, "pd-get-buffer-size",
                "Get the default buffer size for I/O files",
                SS_zargs,
                _SXI_get_buffer_size, SS_PR_PROC);
 
-    SS_install("change-directory",
+    SS_install(si, "change-directory",
                "Change current working directory in a file",
                SS_nargs,
                _SXI_change_directory, SS_PR_PROC);
 
-    SS_install("close-bin-file",
+    SS_install(si, "close-bin-file",
                "Close a binary file",
 	       SS_sargs,
 	       _SXI_close_pdbfile, SS_PR_PROC);
 
-    SS_install("close-pdbfile",
+    SS_install(si, "close-pdbfile",
                "Close a PDB file",
                SS_sargs,
                _SXI_close_pdbfile, SS_PR_PROC);
 
-    SS_install("close-raw-binary-file",
+    SS_install(si, "close-raw-binary-file",
                "Close a raw binary file",
                SS_nargs,
                _SXI_close_raw_file, SS_PR_PROC);
 
-    SS_install("collect-io-info",
+    SS_install(si, "collect-io-info",
                "Globally control collection of stats on I/O operations on files",
                SS_sargs,
                _SXI_collect_io_info, SS_PR_PROC);
 
-    SS_install("create-link",
+    SS_install(si, "create-link",
                "Create a link to a variable in a file",
                SS_nargs,
                _SXI_create_link, SS_PR_PROC);
 
-    SS_install("create-pdbfile",
+    SS_install(si, "create-pdbfile",
                "Create a PDB file, return PDBfile",
                SS_sargs,
                _SXI_create_pdbfile, SS_PR_PROC);
 
-    SS_install("current-directory",
+    SS_install(si, "current-directory",
                "Return the current working directory in a file",
                SS_sargs,
                _SXI_current_directory, SS_PR_PROC);
 
-    SS_install("def-common-types",
+    SS_install(si, "def-common-types",
                "Define some common internal SX data types to the given file",
                SS_sargs,
                _SXI_def_common_types, SS_PR_PROC);
 
-    SS_install("def-member",
+    SS_install(si, "def-member",
                "Create a member list",
                SS_nargs, 
                SS_list, SS_UR_MACRO);
 
-    SS_install("change-primitive",
+    SS_install(si, "change-primitive",
                "Change properties of a primitive type which",
                SS_nargs,
                _SXI_chg_prim, SS_PR_PROC);
 
-    SS_install("def-primitive",
+    SS_install(si, "def-primitive",
                "Define a new primitive type which is either: ncv, fix, fp",
                SS_nargs,
                _SXI_def_prim, SS_PR_PROC);
 
-    SS_install("default-offset",
+    SS_install(si, "default-offset",
                "Set the default offset for the given file",
                SS_nargs,
                _SXI_default_offset, SS_PR_PROC);
 
-    SS_install("defstr?",
+    SS_install(si, "defstr?",
                "Returns #t if the object is a defstr, and #f otherwise",
                SS_sargs, 
                _SXI_defp, SS_PR_PROC);
 
-    SS_install("desc-variable",
+    SS_install(si, "desc-variable",
                "Describe a pdb varible",
                SS_sargs, 
                _SXI_desc_variable, SS_PR_PROC);
 
-    SS_install("diff-variable",
+    SS_install(si, "diff-variable",
                "Compare an entry in two files\nFORM: (diff-variable <file1> <file2> <name>)",
                SS_nargs, 
                _SXI_diff_var, SS_PR_PROC);
 
-    SS_install("display-differences",
+    SS_install(si, "display-differences",
                "Display information returned by diff-variable",
                SS_nargs, 
                _SXI_display_diff, SS_PR_PROC);
 
-    SS_install("display-menu",
+    SS_install(si, "display-menu",
                "Display a menu of mappings, images, and curves",
                SS_nargs, 
                _SXI_menu, SS_PR_PROC);
 
-    SS_install("family-file",
+    SS_install(si, "family-file",
                "Check the file size and if necessary open the next family member",
                SS_nargs,
                _SXI_family_file, SS_PR_PROC);
 
-    SS_install("file-content",
+    SS_install(si, "file-content",
                "Print the metadata of the given file\nFORM: (file-content <file> [<outfile>] [<version>] [<chart>])",
                SS_nargs, 
                _SXI_file_content, SS_PR_PROC);
 
-    SS_install("file-info",
+    SS_install(si, "file-info",
                "Return the named information about the given file",
                SS_nargs, 
                _SXI_file_info, SS_PR_PROC);
 
-    SS_install("file-mode",
+    SS_install(si, "file-mode",
                "Set the mode of the given file",
                SS_nargs, 
                _SXI_file_mode, SS_PR_PROC);
 
-    SS_install("file-directory?",
+    SS_install(si, "file-directory?",
                "Return #t iff the named object is a directory in the given file",
                SS_nargs,
                _SXI_file_dirp, SS_PR_PROC);
 
-    SS_install("file-variable?",
+    SS_install(si, "file-variable?",
                "Return #t iff the named object is a variable in the given file",
                SS_nargs,
                _SXI_file_varp, SS_PR_PROC);
 
-    SS_install("find-types",
+    SS_install(si, "find-types",
                "Return a list of the derived data types in a variable",
                SS_sargs,
                _SXI_find_types, SS_PR_PROC);
 
-    SS_install("flush-pdbfile",
+    SS_install(si, "flush-pdbfile",
                "Flush a PDB file",
                SS_sargs,
                _SXI_flush_pdbfile, SS_PR_PROC);
 
-    SS_install("get-io-info",
+    SS_install(si, "get-io-info",
                "Return a list of stats on I/O operations on a PDB file",
                SS_sargs,
                _SXI_get_io_info, SS_PR_PROC);
 
-    SS_install("hash->pdbdata",
+    SS_install(si, "hash->pdbdata",
                "Convert a hash table to a pdbdata object",
                SS_nargs, 
                _SXI_hash_to_pdbdata, SS_PR_PROC);
 
-    SS_install("index->tuple-string",
+    SS_install(si, "index->tuple-string",
                "Return an index tuple string generated from a linear index",
                SS_nargs, 
                _SXI_index_to_expr, SS_PR_PROC);
 
-    SS_install("indirection",
+    SS_install(si, "indirection",
                "Create a type list",
                SS_nargs, 
                SS_list, SS_PR_PROC);
 
-    SS_install("list-defstrs",
+    SS_install(si, "list-defstrs",
                "Return a list of the data types in a file",
                SS_nargs,
                _SXI_list_defstrs, SS_PR_PROC);
 
-    SS_install("list-file",
+    SS_install(si, "list-file",
                "Return a list of open pdbfiles",
                SS_zargs,
                _SXI_list_file, SS_PR_PROC);
 
-    SS_install("list-symtab",
+    SS_install(si, "list-symtab",
                "Return a list of the symbol table entries",
                SS_nargs,
                _SXI_list_symtab, SS_PR_PROC);
 
-    SS_install("list-variables",
+    SS_install(si, "list-variables",
                "Return a list of the variables in a file directory",
                SS_nargs,
                _SXI_list_variables, SS_PR_PROC);
 
-    SS_install("make-cast",
+    SS_install(si, "make-cast",
                "Specify that the real type of a member comes from another member",
                SS_nargs,
                _SXI_make_cast, SS_UR_MACRO);
 
-    SS_install("make-cast*",
+    SS_install(si, "make-cast*",
                "Specify that the real type of a member comes from another member",
                SS_nargs,
                _SXI_make_cast, SS_PR_PROC);
 
-    SS_install("make-defstr",
+    SS_install(si, "make-defstr",
                "Create a DEFSTR from the list (macro version)",
                SS_nargs,
                _SXI_make_defstr, SS_UR_MACRO);
 
-    SS_install("make-defstr*",
+    SS_install(si, "make-defstr*",
                "Create a DEFSTR from the list (procedure version)",
                SS_nargs,
                _SXI_make_defstr, SS_PR_PROC);
 
-    SS_install("make-directory",
+    SS_install(si, "make-directory",
                "Create a directory in a file",
                SS_nargs,
                _SXI_make_directory, SS_PR_PROC);
 
-    SS_install("make-typedef",
+    SS_install(si, "make-typedef",
                "Create a type alias for the given type (macro version)",
                SS_nargs,
                _SXI_make_typedef, SS_UR_MACRO);
 
-    SS_install("make-typedef*",
+    SS_install(si, "make-typedef*",
                "Create a type alias for the given type (procedure version)",
                SS_nargs,
                _SXI_make_typedef, SS_PR_PROC);
 
-    SS_install("major-order",
+    SS_install(si, "major-order",
                "Set the given file to row or column major order",
                SS_nargs,
                _SXI_major_order, SS_PR_PROC);
 
-    SS_install("open-bin-file",
+    SS_install(si, "open-bin-file",
                "Open a binary file",
 	       SS_nargs,
 	       _SXI_open_pdbfile, SS_PR_PROC);
 
-    SS_install("open-pdbfile",
+    SS_install(si, "open-pdbfile",
                "Open a PDB file, return PDBfile",
                SS_nargs,
                _SXI_open_pdbfile, SS_PR_PROC);
 
-    SS_install("open-raw-binary-file",
+    SS_install(si, "open-raw-binary-file",
                "Open a binary file as an input port",
                SS_nargs,
                _SXI_open_raw_file, SS_PR_PROC);
 
-    SS_install("parse-declaration",
+    SS_install(si, "parse-declaration",
                "Parse a C style definition/declaration and return a list of elements",
                SS_nargs, 
                _SXI_parse_type, SS_PR_PROC);
 
-    SS_install("pd-error-message",
+    SS_install(si, "pd-error-message",
                "Get the last PDB error message",
                SS_zargs,
                _SXI_get_error, SS_PR_PROC);
 
-    SS_install("pd-entry-number",
+    SS_install(si, "pd-entry-number",
                "Return the number of items for the named variabled",
                SS_nargs, 
                _SXI_entry_number, SS_PR_PROC);
 
-    SS_install("pd-unpack-bitstream",
+    SS_install(si, "pd-unpack-bitstream",
                "Read a variable from a file as a bit stream and unpack it",
                SS_nargs, 
                _SXI_unp_bitstrm, SS_PR_PROC);
 
-    SS_install("pdb->list",
+    SS_install(si, "pdb->list",
                "Convert some pdb type to a list",
                SS_sargs, 
                _SXI_pdb_to_list, SS_PR_PROC);
 
-    SS_install("pdb-read-numeric-data",
+    SS_install(si, "pdb-read-numeric-data",
                "Read a numeric array from a PDB file",
                SS_nargs,
                _SXI_read_numeric_data, SS_PR_PROC);
 
-    SS_install("pdbdata",
+    SS_install(si, "pdbdata",
                "Convert arguments to a pdb variable",
                SS_nargs, 
                _SXI_to_pdbdata, SS_PR_PROC);
 
-    SS_install("pdbdata?",
+    SS_install(si, "pdbdata?",
                "Returns #t if the object is a pdbdata, and #f otherwise",
                SS_sargs, 
                _SXI_pdbdatap, SS_PR_PROC);
 
-    SS_install("pdbdata->hash",
+    SS_install(si, "pdbdata->hash",
                "Convert a pdbdata object to a hash object",
                SS_sargs, 
                _SXI_pdbdata_to_hash, SS_PR_PROC);
 
-    SS_install("pdbfile?",
+    SS_install(si, "pdbfile?",
                "Returns #t if the object is a pdb file, and #f otherwise",
                SS_sargs, 
                _SXI_pdbfp, SS_PR_PROC);
 
-    SS_install("print-pdb",
+    SS_install(si, "print-pdb",
                "Print the contents of a PDB variable",
                SS_nargs, 
                _SXI_print_pdb, SS_PR_PROC);
 
-    SS_install("read-binary",
+    SS_install(si, "read-binary",
                "Read binary data from a raw binary file",
                SS_nargs,
                _SXI_rd_raw, SS_PR_PROC);
 
-    SS_install("read-defstr",
+    SS_install(si, "read-defstr",
                "Read a DEFSTR from the given file (macro version)",
                SS_nargs,
                _SXI_read_defstr, SS_UR_MACRO);
 
-    SS_install("read-defstr*",
+    SS_install(si, "read-defstr*",
                "Read a DEFSTR from the given file (procedure version)",
                SS_nargs,
                _SXI_read_defstr, SS_PR_PROC);
 
-    SS_install("read-pdbdata",
+    SS_install(si, "read-pdbdata",
                "Read PDB data from a file and encapsulate is as a PDBDATA object",
                SS_nargs,
                _SXI_read_pdbdata, SS_PR_PROC);
 
-    SS_install("read-syment",
+    SS_install(si, "read-syment",
                "Get a syment from the specified file",
                SS_nargs,
                _SXI_rd_syment, SS_PR_PROC);
 
-    SS_install("remove-entry",
+    SS_install(si, "remove-entry",
                "Remove an entry from a PDB file",
                SS_nargs,
                _SXI_remove_entry, SS_PR_PROC);
 
-    SS_install("reserve-pdbdata",
+    SS_install(si, "reserve-pdbdata",
                "Reserve space for PDB data in a file",
                SS_nargs,
                _SXI_reserve_pdbdata, SS_PR_PROC);
 
-    SS_install("reset-pointer-list!",
+    SS_install(si, "reset-pointer-list!",
                "Reset the pointer lists for the given file",
                SS_nargs,
                _SXI_reset_ptrs, SS_PR_PROC);
 
-    SS_install("scatter-pdbdata",
+    SS_install(si, "scatter-pdbdata",
                "Scatter data to a file and encapsulate is as a PDBDATA object",
                SS_nargs,
                _SXI_scatter_pdbdata, SS_PR_PROC);
 
-    SS_install("seek-file",
+    SS_install(si, "seek-file",
                "Seek in a binary file",
                SS_nargs,
                _SXI_seek_raw_file, SS_PR_PROC);
 
-    SS_install("set-format",
+    SS_install(si, "set-format",
                "Set an edit format",
                SS_nargs, 
                _SXI_set_format, SS_PR_PROC);
 
-    SS_install("set-switch",
+    SS_install(si, "set-switch",
                "Set a code switch",
                SS_nargs, 
                _SXI_set_switch, SS_PR_PROC);
 
-    SS_install("pd-set-buffer-size!",
+    SS_install(si, "pd-set-buffer-size!",
                "Set the default file buffer size",
                SS_nargs, 
                _SXI_set_buffer_size, SS_PR_PROC);
 
-    SS_install("set-maximum-file-size!",
+    SS_install(si, "set-maximum-file-size!",
                "Set the maximum file size for a PDB file",
                SS_nargs, 
                _SXI_set_max_size, SS_PR_PROC);
 
-    SS_install("set-track-pointers!",
+    SS_install(si, "set-track-pointers!",
                "Set the track_pointers flag for a PDB file",
                SS_nargs, 
                _SXI_set_track_pointers, SS_PR_PROC);
 
-    SS_install("set-activate-checksum!",
+    SS_install(si, "set-activate-checksum!",
                "Set the checksum flag for a PDB file",
                SS_nargs, 
                _SXI_set_activate_checksum, SS_PR_PROC);
 
-    SS_install("sizeof",
+    SS_install(si, "sizeof",
                "Return the size in bytes of the specified type\nUsage: (sizeof <type> [<file> [1]])",
                SS_nargs, 
                _SXI_sizeof, SS_PR_PROC);
 
-    SS_install("show-pdb",
+    SS_install(si, "show-pdb",
                "Display the contents of a PDB variable",
                SS_nargs, 
                _SXI_show_pdb, SS_PR_PROC);
 
-    SS_install("syment?",
+    SS_install(si, "syment?",
                "Returns #t if the object is a syment, and #f otherwise",
                SS_sargs, 
                _SXI_symp, SS_PR_PROC);
 
-    SS_install("target",
+    SS_install(si, "target",
                "Set the data standard and alignment for the next file opened",
                SS_nargs,
                _SXI_target, SS_PR_PROC);
 
-    SS_install("type",
+    SS_install(si, "type",
                "Create a type list for make-pdbdata",
                SS_nargs, 
                _SXI_pdb_type, SS_PR_PROC);
 
-    SS_install("write-binary",
+    SS_install(si, "write-binary",
                "Write binary data to a raw binary file",
                SS_nargs,
                _SXI_wr_raw, SS_PR_PROC);
 
-    SS_install("write-defstr",
+    SS_install(si, "write-defstr",
                "Write a DEFSTR to the given file (macro version)",
                SS_nargs,
                _SXI_write_defstr, SS_UR_MACRO);
 
-    SS_install("write-defstr*",
+    SS_install(si, "write-defstr*",
                "Write a DEFSTR to the given file (procedure version)",
                SS_nargs,
                _SXI_write_defstr, SS_PR_PROC);
 
-    SS_install("write-pdbdata",
+    SS_install(si, "write-pdbdata",
                "Write PDB data to a file and encapsulate is as a PDBDATA object",
                SS_nargs,
                _SXI_write_pdbdata, SS_PR_PROC);
 
-    SS_install("write-syment",
+    SS_install(si, "write-syment",
                "Install a syment in the specified file",
                SS_nargs,
                _SXI_wr_syment, SS_PR_PROC);
 
-    SS_install("write-ultra-curve",
+    SS_install(si, "write-ultra-curve",
                "Create an ULTRA curve",
                SS_nargs,
                _SXI_wrt_ultra_curve, SS_PR_PROC);
 
 #if 0
 
-    SS_install("close-text-file",
+    SS_install(si, "close-text-file",
                "Close a text file",
                SS_nargs,
                _SXI_close_textfile, SS_PR_PROC);
 
-    SS_install("open-text-file",
+    SS_install(si, "open-text-file",
                "Open a text file",
                SS_nargs,
                _SXI_open_textfile, SS_PR_PROC);
 
-    SS_install("wr-to-textfile",
+    SS_install(si, "wr-to-textfile",
                "Write the contents of a PDB variable to a text file",
                SS_nargs,
                _SXI_wr_to_textfile, SS_PR_PROC);

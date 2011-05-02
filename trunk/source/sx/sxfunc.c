@@ -902,77 +902,77 @@ static object *_SXI_pp_names(SS_psides *si, object *argl)
 void SX_install_global_funcs(SS_psides *si)
    {
 
-    SS_install("command-log",
+    SS_install(si, "command-log",
                "Macro: Control command logging\n     Usage: command-log [on | off | <filename>]",
                SS_znargs,
                _SXI_toggle_log, SS_UR_MACRO);
 
-    SS_install("curve?",
+    SS_install(si, "curve?",
                "Prodedure: Return #t iff the argument is an Ultra curve object\n     Usage: curve? <object>",
                SS_sargs,
                _SXI_curveobjp, SS_PR_PROC);
 
-    SS_install("end",
+    SS_install(si, "end",
                "Procedure: End the session\n     Usage: end",
                SS_sargs,
                _SXI_quit, SS_PR_PROC);
 
-    SS_install("ld",
+    SS_install(si, "ld",
                "Macro: Read SCHEME forms from file\n     Usage: ld <file-name>",
                SS_nargs,
                SS_load, SS_UR_MACRO);
 
-    SS_install("pm-mapping-dimension",
+    SS_install(si, "pm-mapping-dimension",
                "Returns (d(domain). d(range)) of the given mapping",
                SS_sargs,
                _SXI_get_dimension, SS_PR_PROC);
 
-    SS_install("pm-mapping-domain",
+    SS_install(si, "pm-mapping-domain",
                "Returns the domain of the given mapping",
                SS_sargs,
                _SXI_get_domain, SS_PR_PROC);
 
-    SS_install("pm-mapping-range",
+    SS_install(si, "pm-mapping-range",
                "Returns the range of the given mapping",
                SS_sargs,
                _SXI_get_range, SS_PR_PROC);
 
-    SS_install("pm-mapping-name",
+    SS_install(si, "pm-mapping-name",
                "Returns the name of the given mapping",
                SS_sargs,
                _SXI_get_mapping_name, SS_PR_PROC);
 
-    SS_install("pm-set-volume",
+    SS_install(si, "pm-set-volume",
                "Return the product of the extrema of the given set",
                SS_sargs,
                _SXI_set_volume, SS_PR_PROC);
 
-    SS_install("pm-shift-domain",
+    SS_install(si, "pm-shift-domain",
                "Add a scalar value to all components of a mapping domain",
                SS_nargs,
                _SXI_shift_domain, SS_PR_PROC);
 
-    SS_install("pm-shift-range",
+    SS_install(si, "pm-shift-range",
                "Add a scalar value to all components of a mapping range",
                SS_nargs,
                _SXI_shift_range, SS_PR_PROC);
 
-    SS_install("pm-scale-domain",
+    SS_install(si, "pm-scale-domain",
                "Multiply all components of a mapping domain by a scalar value",
                SS_nargs,
                _SXI_scale_domain, SS_PR_PROC);
 
-    SS_install("pm-scale-range",
+    SS_install(si, "pm-scale-range",
                "Multiply all components of a mapping range by a scalar value",
                SS_nargs,
                _SXI_scale_range, SS_PR_PROC);
 
-    SS_install("pp",
+    SS_install(si, "pp",
                "Procedure: pretty print a list",
                SS_sargs,
                _SXI_pp_names, SS_PR_PROC);
 
-    SS_install("ultra-file?",
+    SS_install(si, "ultra-file?",
                "Procedure: Return #t iff the file is a valid ULTRA II file\n     Usage: ultra-file? <file-name>",
                SS_sargs,
                _SXI_valid_ultra_filep, SS_PR_PROC);
@@ -987,32 +987,32 @@ void SX_install_global_funcs(SS_psides *si)
 void _SX_mf_inst_g(SS_psides *si)
    {
 
-    SS_install("copy-map",
+    SS_install(si, "copy-map",
                "Copies a mapping\nFORM copy-mapping <graph-list>",
                _SX_mh_u_m,
 	       _SXI_copy_mapping, SS_PR_PROC);
 
-    SS_install("derivative",
+    SS_install(si, "derivative",
                "Take derivative of curves\nFORM derivative <graph-list>",
                _SX_mh_u_m,
 	       _SXI_derivative, SS_PR_PROC);
 
-    SS_install("filter-coef",
+    SS_install(si, "filter-coef",
 	       "Filter a mapping through a set of coefficents\nFORM: filter-coef (<coeff-array> <ntimes>) <mappings>*",
                _SX_m11_b_mro,
 	       _SXI_filter_coef, SS_PR_PROC);
 
-    SS_install("integrate",
+    SS_install(si, "integrate",
                "Integrate mappings\nFORM integrate <graph-list>",
                _SX_mh_u_m,
 	       _SXI_integrate_mapping, SS_PR_PROC);
 
-    SS_install("norm",
+    SS_install(si, "norm",
                "Euclidean norm of range elements\nFORM norm <graph-list>",
                _SX_mh_u_m,
 	       _SXI_norm_mapping, SS_PR_PROC);
 
-    SS_install("smooth",
+    SS_install(si, "smooth",
                "Smooth mapping using n point integral to average\nFORM smooth <graph-list> <n>",
                _SX_m11_b_mro,
 	       _SXI_smooth, SS_PR_PROC);

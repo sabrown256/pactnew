@@ -148,32 +148,32 @@ static object *_SSI_angle(SS_psides *si, object *argl)
 void _SS_install_complex(SS_psides *si)
    {
 
-    SS_install("make-rectangular",
+    SS_install(si, "make-rectangular",
                "Procedure: make a cartesian complex number from a real and imaginary part",
                SS_nargs,
                _SSI_mk_rect, SS_PR_PROC);
 
-    SS_install("make-polar",
+    SS_install(si, "make-polar",
                "Procedure: make a complex number from a magnitude and angle",
                SS_nargs,
                _SSI_mk_polar, SS_PR_PROC);
 
-    SS_install("real-part",
+    SS_install(si, "real-part",
                "Procedure: return the real part of a complex number",
                SS_sargs,
                _SSI_real_part, SS_PR_PROC);
 
-    SS_install("imag-part",
+    SS_install(si, "imag-part",
                "Procedure: return the imaginary part of a complex number",
                SS_sargs,
                _SSI_imag_part, SS_PR_PROC);
 
-    SS_install("magnitude",
+    SS_install(si, "magnitude",
                "Procedure: return the magnitude of a complex number",
                SS_sargs,
                _SSI_magnitude, SS_PR_PROC);
 
-    SS_install("angle",
+    SS_install(si, "angle",
                "Procedure: return the polar angle of a complex number",
                SS_sargs,
                _SSI_angle, SS_PR_PROC);

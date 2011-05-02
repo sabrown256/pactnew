@@ -393,12 +393,12 @@ void SS_init_c_syntax_mode(SS_psides *si)
 	ssdbg  = SS_parse_debug_c();
 	*ssdbg = FALSE;
 
-	SS_install("c-mode",
+	SS_install(si, "c-mode",
 		   "Procedure: set C syntax parsing mode",
 		   SS_zargs,
 		   SS_c_mode, SS_PR_PROC);
 
-	SS_install("c-add-type",
+	SS_install(si, "c-add-type",
 		   "Procedure: add a new C type",
 		   SS_sargs,
 		   SS_c_add_type, SS_PR_PROC);

@@ -105,12 +105,12 @@ static object *TR_spokep(SS_psides *si, object *arg)
 void SX_install_file_funcs(SS_psides *si)
    {
 
-    SS_install("file-type",
+    SS_install(si, "file-type",
                "Return the type of the given file as a string",
 	       SS_sargs,
 	       TR_file_type, SS_PR_PROC);
 
-    SS_install("have-spoke?",
+    SS_install(si, "have-spoke?",
                "Return the #t iff the argument names an available spoke",
 	       SS_sargs,
 	       TR_spokep, SS_PR_PROC);

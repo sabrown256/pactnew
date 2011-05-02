@@ -450,67 +450,67 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 void _SS_inst_proc(SS_psides *si)
    {
 
-    SS_install("process?",
+    SS_install(si, "process?",
                "Procedure: Returns #t if the object is a PROCESS object",
                SS_sargs,
                _SSI_prp, SS_PR_PROC);
 
-    SS_install("process-block",
+    SS_install(si, "process-block",
                "Procedure: Set process to be blocked if flag is #t and unblocked otherwise",
                SS_nargs,
                _SSI_blck_pr, SS_PR_PROC);
 
-    SS_install("process-close",
+    SS_install(si, "process-close",
                "Procedure: Terminate a process",
                SS_sargs,
                _SSI_cls_pr, SS_PR_PROC);
 
-    SS_install("process-open",
+    SS_install(si, "process-open",
                "Procedure: Exec a process and communicate with it",
                SS_nargs,
                _SSI_opn_pr, SS_PR_PROC);
 
-    SS_install("process-read-line",
+    SS_install(si, "process-read-line",
                "Procedure: Returns a string recieved from a process",
                SS_sargs,
                _SSI_pr_rd_line, SS_PR_PROC);
 
-    SS_install("process-read-tries",
+    SS_install(si, "process-read-tries",
                "Procedure: Get/Set number of attempts to read from unblocked process",
                SS_nargs,
                _SSI_pr_rd_tries, SS_PR_PROC);
 
-    SS_install("process-running?",
+    SS_install(si, "process-running?",
                "Procedure: Returns #t if the process is still running",
                SS_sargs,
                _SSI_pr_runp, SS_PR_PROC);
 
-    SS_install("process-send-line",
+    SS_install(si, "process-send-line",
                "Procedure: Send a string to a process",
                SS_nargs,
                _SSI_pr_sn_line, SS_PR_PROC);
 
-    SS_install("process-status",
+    SS_install(si, "process-status",
                "Procedure: Returns a list of the process id, in, out, status, reason",
                SS_sargs,
                _SSI_pr_stat, SS_PR_PROC);
 
-    SS_install("url->file",
+    SS_install(si, "url->file",
                "Procedure: Copy a web page to a file\nUsage: (url->file url [file] [vers])",
                SS_nargs,
                _SSI_get_url_file, SS_PR_PROC);
 
-    SS_install("get-host-name",
+    SS_install(si, "get-host-name",
                "Procedure: given a system type string SYS return an available host\nUsage: (get-host-name <sys>)",
                SS_nargs,
                _SSI_get_host_name, SS_PR_PROC);
 
-    SS_install("get-host-types",
+    SS_install(si, "get-host-types",
                "Procedure: return a list of all available hosts types\nUsage: (get-host-types)",
                SS_nargs,
                _SSI_get_host_types, SS_PR_PROC);
 
-    SS_install("resource-usage",
+    SS_install(si, "resource-usage",
                "Procedure: return a list of resource usage info for the given pid\nUsage: (resource-usage pid)",
                SS_nargs,
                _SSI_resource_usage, SS_PR_PROC);

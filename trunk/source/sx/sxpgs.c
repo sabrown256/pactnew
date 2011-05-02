@@ -2801,172 +2801,172 @@ void SX_install_pgs_funcs(SS_psides *si)
 
     labpy = PG_ptr_attr_glb("label-position-y");
 
-    SS_install("pdbdata->pg-graph",
+    SS_install(si, "pdbdata->pg-graph",
                "Read a PGS graph object from a PDB file\nFORM (pdbdata->pg-graph <file> <name>)",
                SS_nargs,
                _SXI_pdbdata_graph, SS_PR_PROC);
 
-    SS_install("pdbdata->pg-image",
+    SS_install(si, "pdbdata->pg-image",
                "Read a PGS image object from a PDB file\nFORM (pdbdata->pg-image <file> <name>)",
                SS_nargs,
                _SXI_pdbdata_image, SS_PR_PROC);
 
-    SS_install("pg-build-image",
+    SS_install(si, "pg-build-image",
                "Build a PGS image object\nFORM (pg-build-image <data> <kmax> <lmax> [<name> <xmin> <xmax> <ymin> <ymax> <zmin> zmax>])",
                SS_nargs,
                _SXI_build_image, SS_PR_PROC);
 
-    SS_install("pg-close-device",
+    SS_install(si, "pg-close-device",
                "Closes a PGS device",
                SS_nargs,
                _SXI_close_device, SS_PR_PROC);
 
-    SS_install("pg-def-graph-file",
+    SS_install(si, "pg-def-graph-file",
                "Set up a PDB file to recieve PGS graph objects",
                SS_sargs,
                _SXI_def_file_graph, SS_PR_PROC);
 
-    SS_install("pg-device?",
+    SS_install(si, "pg-device?",
                "Returns #t if the object is a PGS device, and #f otherwise",
                SS_sargs,
                _SXI_devicep, SS_PR_PROC);
 
-    SS_install("pg-device-attributes?",
+    SS_install(si, "pg-device-attributes?",
                "Returns #t if the object is a set of PGS device attributes, and #f otherwise",
                SS_sargs,
                _SXI_dev_attributesp, SS_PR_PROC);
 
-    SS_install("pg-device-properties",
+    SS_install(si, "pg-device-properties",
                "Return a list with NAME, TYPE, and TITLE of the given device",
                SS_nargs,
                _SXI_device_props, SS_PR_PROC);
 
-    SS_install("pg-domain-extrema",
+    SS_install(si, "pg-domain-extrema",
                "Return the domain extrema\nFORM (pg-domain-extrema <graph>)",
                SS_sargs,
                _SXI_dom_extrema, SS_PR_PROC);
 
-    SS_install("pg-domain-limits",
+    SS_install(si, "pg-domain-limits",
                "Return the domain plotting limits\nFORM (pg-domain-limits <graph>)",
                SS_sargs,
                _SXI_dom_limits, SS_PR_PROC);
 
-    SS_install("pg-draw-domain",
+    SS_install(si, "pg-draw-domain",
                "Draws the mesh specified by a PML set object\nFORM (pg-draw-domain <device> <set>)",
                SS_nargs,
                _SXI_draw_domain, SS_PR_PROC);
 
-    SS_install("pg-draw-graph",
+    SS_install(si, "pg-draw-graph",
                "Draws a PGS graph object\nFORM (pg-draw-graph <device> <graph> <rendering> [...])",
                SS_nargs,
                _SXI_draw_plot, SS_PR_PROC);
 
-    SS_install("pg-draw-image",
+    SS_install(si, "pg-draw-image",
                "Draws a PGS image object\nFORM (pg-draw-image <device> <image>)",
                SS_nargs,
                _SXI_draw_image, SS_PR_PROC);
 
-    SS_install("pg-get-label",
+    SS_install(si, "pg-get-label",
                "Return the label of the specified mapping/graph/image/set",
                SS_sargs,
                _SXI_get_label, SS_PR_PROC);
 
-    SS_install("pg-graph?",
+    SS_install(si, "pg-graph?",
                "Returns #t if the object is a PGS graph, and #f otherwise",
                SS_sargs,
                _SXI_graphp, SS_PR_PROC);
 
-    SS_install("pg-graph->pdbcurve",
+    SS_install(si, "pg-graph->pdbcurve",
                "Write an ULTRA curve object to a PDB file\nFORM (pg-graph->pdbcurve <curve> <file>)",
                SS_nargs,
                _SXI_graph_pdbcurve, SS_PR_PROC);
 
-    SS_install("pg-graph->pdbdata",
+    SS_install(si, "pg-graph->pdbdata",
                "Write a PGS graph object to a PDB file\nFORM (pg-graph->pdbdata <graph> <file>)",
                SS_nargs,
                _SXI_graph_pdbdata, SS_PR_PROC);
 
-    SS_install("pg-drawable-info",
+    SS_install(si, "pg-drawable-info",
                "Get/Set drawable object information\nFORM (pg-drawable-info <name> [<value>])",
                SS_nargs,
                _SXI_drawable_info, SS_PR_PROC);
 
-    SS_install("pg-grotrian-graph?",
+    SS_install(si, "pg-grotrian-graph?",
                "Returns #t if the object is a PGS grotrian graph, and #f otherwise",
                SS_sargs,
                _SXI_grotrian_graphp, SS_PR_PROC);
 
-    SS_install("pg-image?",
+    SS_install(si, "pg-image?",
                "Returns #t if the object is a PGS image, and #f otherwise",
                SS_sargs,
                _SXI_imagep, SS_PR_PROC);
 
-    SS_install("pg-image-name",
+    SS_install(si, "pg-image-name",
                "Return the image referenced by name or menu number",
                SS_nargs,
                _SXI_get_text_image_name, SS_PR_PROC);
 
-    SS_install("pg-image->pdbdata",
+    SS_install(si, "pg-image->pdbdata",
                "Write a PGS image object to a PDB file\nFORM (pg-image->pdbdata <image> <file>)",
                SS_nargs,
                _SXI_image_pdbdata, SS_PR_PROC);
 
-    SS_install("pg-make-device",
+    SS_install(si, "pg-make-device",
                "Returns a PGS device with NAME, TYPE, and TITLE",
                SS_nargs,
                _SXI_make_device, SS_PR_PROC);
 
-    SS_install("pg-make-graph",
+    SS_install(si, "pg-make-graph",
                "Return a PGS graph object\nFORM (pg-make-graph <domain> <range> [<color> <width> <style> <id>])",
                SS_nargs,
                _SXI_make_pgs_graph, SS_PR_PROC);
 
-    SS_install("pg-make-image",
+    SS_install(si, "pg-make-image",
                "Make a PGS image object\nFORM (pg-make-image <data> <kmax> <lmax> [<name> <xmin> <xmax> <ymin> <ymax> <zmin> zmax>])",
                SS_nargs,
                _SXI_make_image, SS_PR_PROC);
 
-    SS_install("pg-mapping-name",
+    SS_install(si, "pg-mapping-name",
                "Return the mapping referenced by name or menu number",
                SS_nargs,
                _SXI_get_text_mapping_name, SS_PR_PROC);
 
-    SS_install("pg-menu-item-type",
+    SS_install(si, "pg-menu-item-type",
                "Return the name of the type of the referenced menu item",
                SS_nargs,
                _SXI_menu_item_type, SS_PR_PROC);
 
-    SS_install("pg-open-device",
+    SS_install(si, "pg-open-device",
                "Opens a PGS device DEV at (X, Y) with (DX, DY)",
                SS_nargs,
                _SXI_open_device, SS_PR_PROC);
 
-    SS_install("pg-range-extrema",
+    SS_install(si, "pg-range-extrema",
                "Return the range extrema\nFORM (pg-range-extrema <graph>)",
                SS_sargs,
                _SXI_ran_extrema, SS_PR_PROC);
 
-    SS_install("pg-range-limits",
+    SS_install(si, "pg-range-limits",
                "Return the range plotting limits\nFORM (pg-range-limits <graph>)",
                SS_sargs,
                _SXI_ran_limits, SS_PR_PROC);
 
-    SS_install("pg-set-domain-limits!",
+    SS_install(si, "pg-set-domain-limits!",
                "Set the domain plotting limits for the given graph",
                SS_nargs,
                _SXI_set_dom_limits, SS_PR_PROC);
 
-    SS_install("pg-set-graph-attribute!",
+    SS_install(si, "pg-set-graph-attribute!",
                "Set an attribute of the given graph",
                SS_nargs,
                _SXI_set_attr_graph, SS_PR_PROC);
 
-    SS_install("pg-set-label!",
+    SS_install(si, "pg-set-label!",
                "Set the graph/mapping/image/set label to the given string",
                SS_nargs,
                _SXI_set_label, SS_PR_PROC);
 
-    SS_install("pg-set-range-limits!",
+    SS_install(si, "pg-set-range-limits!",
                "Set the range plotting limits for the given graph",
                SS_nargs,
                _SXI_set_ran_limits, SS_PR_PROC);
