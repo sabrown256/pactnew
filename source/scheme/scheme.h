@@ -948,8 +948,8 @@ extern int
 
 extern object
  *SS_define_constant(SS_psides *si, int n, ...),
- *SS_make_list(int first, ...),
- *SS_make_form(object *first, ...),
+ *SS_make_list(SS_psides *si, int first, ...),
+ *SS_make_form(SS_psides *si, object *first, ...),
  *SS_eval_form(SS_psides *si, object *first, ...),
  *SS_call_scheme(SS_psides *si, char *func, ...);
 
@@ -1169,8 +1169,8 @@ extern char
 /* SHVAR.C declarations */
 
 extern object
- *SS_install_cf(char *name, char *document, ...),
- *SS_install_cv(char *name, void *pval, int type),
+ *SS_install_cf(SS_psides *si, char *name, char *document, ...),
+ *SS_install_cv(SS_psides *si, char *name, void *pval, int type),
  *SS_acc_double(SS_psides *si, C_procedure *cp, object *argl),
  *SS_acc_int(SS_psides *si, C_procedure *cp, object *argl),
  *SS_acc_long(SS_psides *si, C_procedure *cp, object *argl),

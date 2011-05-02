@@ -249,7 +249,7 @@ static object *_SSI_pr_stat(SS_psides *si, object *obj)
     else
        rs = pp->reason;
 
-    ret = SS_make_list(SC_INT_I, &pp->id,
+    ret = SS_make_list(si, SC_INT_I, &pp->id,
                        SC_INT_I, &pp->in,
                        SC_INT_I, &pp->out,
                        SC_INT_I, &st,
@@ -411,7 +411,7 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 
     err = SC_resource_usage(&ru, pid);
     if (err == TRUE)
-       o = SS_make_list(SC_INT_I, &ru.pid,      /* process id */
+       o = SS_make_list(si, SC_INT_I, &ru.pid,      /* process id */
 			SC_INT_I, &ru.ppid,     /* process parent id */
 			SC_INT_I, &ru.uid,      /* process user id */
 			SC_INT_I, &ru.priority, /* process scheduling priority */

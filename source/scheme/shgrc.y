@@ -262,7 +262,7 @@ declaration :
 
 declaration_list :
     declaration
-      {SS_GR_VAL(SS_make_form($1, LAST));
+      {SS_GR_VAL(SS_make_form(SI, $1, LAST));
        DIAGNOSTIC($$, "declaration");}
 
   | declaration_list declaration
@@ -281,7 +281,7 @@ declaration_specifiers :
        DIAGNOSTIC($$, "storage-class-specifier");}
 
   | storage_class_specifier declaration_specifiers
-      {SS_GR_VAL(SS_make_form($1, $2, LAST));
+      {SS_GR_VAL(SS_make_form(SI, $1, $2, LAST));
        DIAGNOSTIC($$, "storage-class-specifier declaration-specifiers");}
 
   | type_specifier
@@ -289,7 +289,7 @@ declaration_specifiers :
        DIAGNOSTIC($$, "type-specifier");}
 
   | type_specifier declaration_specifiers
-      {SS_GR_VAL(SS_make_form($1, $2, LAST));
+      {SS_GR_VAL(SS_make_form(SI, $1, $2, LAST));
        DIAGNOSTIC($$, "type-specifier declaration-specifiers");}
 
   | type_qualifier
@@ -297,7 +297,7 @@ declaration_specifiers :
        DIAGNOSTIC($$, "type-qualifier");}
 
   | type_qualifier declaration_specifiers
-      {SS_GR_VAL(SS_make_form($1, $2, LAST));
+      {SS_GR_VAL(SS_make_form(SI, $1, $2, LAST));
        DIAGNOSTIC($$, "type-qualifier declaration-specifiers");}
   ;
 
@@ -421,7 +421,7 @@ init_declarator :
        DIAGNOSTIC($$, "declarator");}
 
   | declarator '=' initializer
-      {SS_GR_VAL(SS_make_form($1, $3, LAST));
+      {SS_GR_VAL(SS_make_form(SI, $1, $3, LAST));
        DIAGNOSTIC($$, "declarator = initializer");}
   ;
 
@@ -588,13 +588,13 @@ direct_declarator :
       {if (SS_consp($1))
 	  {SS_GR_VAL(SS_append(SI, $1, SS_mk_cons(SI, $3, SS_null)));}
        else
-	  {SS_GR_VAL(SS_make_form($1,
-				  SS_make_form(_SS_c_defarr, $3, LAST),
+	  {SS_GR_VAL(SS_make_form(SI, $1,
+				  SS_make_form(SI, _SS_c_defarr, $3, LAST),
 				  LAST));};
        DIAGNOSTIC($$, "direct-declarator [ constant-expression ]");}
 
   | direct_declarator '[' ']'
-      {SS_GR_VAL(SS_make_form($1, _SS_c_times, LAST));
+      {SS_GR_VAL(SS_make_form(SI, $1, _SS_c_times, LAST));
        DIAGNOSTIC($$, "direct-declarator []");}
 
   | direct_declarator '(' parameter_type_list ')'
@@ -651,11 +651,11 @@ pointer :
        DIAGNOSTIC($$, "*");}
 
   | '*' type_qualifier_list pointer
-      {SS_GR_VAL(SS_make_form(_SS_c_times, $2, $3, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_times, $2, $3, LAST));
        DIAGNOSTIC($$, "* type-qualifier-list pointer");}
 
   | '*' pointer
-      {SS_GR_VAL(SS_make_form(_SS_c_times, $2, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_times, $2, LAST));
        DIAGNOSTIC($$, "* pointer");}
   ;
 
@@ -887,13 +887,13 @@ labeled_statement :
 
   | CASE constant_expression ':' statement
       {SS_GR_VAL(SS_mk_cons(SI, $4,
-			    SS_mk_cons(SI, SS_make_form(_SS_c_label, $2, LAST),
+			    SS_mk_cons(SI, SS_make_form(SI, _SS_c_label, $2, LAST),
 				       SS_null)));
        DIAGNOSTIC($$, "CASE constant_expression : statement");}
 
   | DEFAULT ':' statement
       {SS_GR_VAL(SS_mk_cons(SI, $3,
-			    SS_mk_cons(SI, SS_make_form(_SS_c_label, SS_t, LAST),
+			    SS_mk_cons(SI, SS_make_form(SI, _SS_c_label, SS_t, LAST),
 				       SS_null)));
        DIAGNOSTIC($$, "DEFAULT : statement");}
   ;
@@ -963,23 +963,23 @@ statement_list :
 
 selection_statement :
     IF '(' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_if, $3, $5, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if, $3, $5, LAST));}
 
 /* GOTCHA: this adds one shift/reduce conflict to the grammar
  * it is included to allow interpreted C to mix 'if (<e>) <s>'
  * forms with declarations
  */
   | IF '(' expression ')' statement TYPE_SPEC
-      {SS_GR_VAL(SS_make_form(_SS_c_if, $3, $5, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if, $3, $5, LAST));}
 
 /* GOTCHA: this adds one shift/reduce conflict to the grammar
  * this is the canonical if/else conflict
  */
   | IF '(' expression ')' statement ELSE statement
-      {SS_GR_VAL(SS_make_form(_SS_c_if, $3, $5, $7, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if, $3, $5, $7, LAST));}
 
   | SWITCH '(' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_cond, $3, $5, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_cond, $3, $5, LAST));
        DIAGNOSTIC($$, "SWITCH (expression) statement");}
   ;
 
@@ -990,33 +990,33 @@ selection_statement :
 
 iteration_statement :
     WHILE '(' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_while, SS_f, $3, $5, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_while, SS_f, $3, $5, LAST));}
 
   | DO statement WHILE '(' expression ')' ';'
-      {SS_GR_VAL(SS_make_form(_SS_c_while, SS_t, $5, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_while, SS_t, $5, $2, LAST));}
 
   | FOR '(' expression ';' expression ';' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, $3, $5, $7, $9, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, $3, $5, $7, $9, LAST));}
 
   | FOR '(' ';' expression ';' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, SS_null, $4, $6, $8, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, SS_null, $4, $6, $8, LAST));}
 
   | FOR '(' expression ';' ';' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, $3, SS_null, $6, $8, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, $3, SS_null, $6, $8, LAST));}
 
   | FOR '(' expression ';' expression ';' ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, $3, $5, SS_null, $8, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, $3, $5, SS_null, $8, LAST));}
 
   | FOR '(' expression ';' ';' ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, $3, SS_null, SS_null, $7, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, $3, SS_null, SS_null, $7, LAST));}
 
   | FOR '(' ';' expression ';' ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, SS_null, $4, SS_null, $7, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, SS_null, $4, SS_null, $7, LAST));}
 
   | FOR '(' ';' ';' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, SS_null, SS_null, $5, $7, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, SS_null, SS_null, $5, $7, LAST));}
   | FOR '(' ';' ';' ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_c_for, SS_null, SS_null, SS_null, $6, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_for, SS_null, SS_null, SS_null, $6, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1026,23 +1026,23 @@ iteration_statement :
 
 jump_statement :
     GOTO variable ';'
-      {SS_GR_VAL(SS_make_form(_SS_c_goto, $2));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_goto, $2));
        DIAGNOSTIC($$, "GOTO variable");}
 
   | CONTINUE ';'
-      {SS_GR_VAL(SS_make_form(_SS_c_continue, SS_t, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_continue, SS_t, LAST));
        DIAGNOSTIC($$, "CONTINUE");}
 
   | BREAK ';'
-      {SS_GR_VAL(SS_make_form(_SS_c_continue, SS_f, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_continue, SS_f, LAST));
        DIAGNOSTIC($$, "BREAK");}
 
   | RETURN expression ';'
-      {SS_GR_VAL(SS_make_form(_SS_c_return, $2, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_return, $2, LAST));
        DIAGNOSTIC($$, "RETURN expression");}
 
   | RETURN ';'
-      {SS_GR_VAL(SS_make_form(_SS_c_return, SS_null, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_return, SS_null, LAST));
        DIAGNOSTIC($$, "RETURN");}
   ;
 
@@ -1060,7 +1060,7 @@ expression :
       {if (SS_consp(SS_CAR_MACRO($1)))
 	  {SS_GR_VAL(SS_mk_cons(SI, $3, $1));}
        else
-	  {SS_GR_VAL(SS_make_form($3, $1, LAST));};
+	  {SS_GR_VAL(SS_make_form(SI, $3, $1, LAST));};
        DIAGNOSTIC($$, "expression , assignment-expression");}
   ;
 
@@ -1073,47 +1073,47 @@ assignment_expression :
     conditional_expression
 
   | unary_expression '=' assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1, $3, LAST));}
 
   | unary_expression TIMESEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_times, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_times, $1, $3, LAST), LAST));}
 
   | unary_expression PLUSEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_plus, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_plus, $1, $3, LAST), LAST));}
 
   | unary_expression MINUSEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_minus, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_minus, $1, $3, LAST), LAST));}
 
   | unary_expression DIVEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_divide, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_divide, $1, $3, LAST), LAST));}
 
   | unary_expression MODEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_modulo, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_modulo, $1, $3, LAST), LAST));}
 
   | unary_expression LSEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_lshft, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_lshft, $1, $3, LAST), LAST));}
 
   | unary_expression RSEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_rshft, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_rshft, $1, $3, LAST), LAST));}
 
   | unary_expression ANDEQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_bitand, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_bitand, $1, $3, LAST), LAST));}
 
   | unary_expression XOREQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_bitcmp, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_bitcmp, $1, $3, LAST), LAST));}
 
   | unary_expression OREQ assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_set, $1,
-			      SS_make_form(_SS_c_bitor, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_set, $1,
+			      SS_make_form(SI, _SS_c_bitor, $1, $3, LAST), LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1125,7 +1125,7 @@ conditional_expression :
     logical_or_expression
 
   | logical_or_expression '?' expression ':' conditional_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_if, $1, $3, $5, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if, $1, $3, $5, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1146,7 +1146,7 @@ logical_or_expression :
     logical_and_expression
 
   | logical_or_expression OR logical_and_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_or, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_or, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1158,7 +1158,7 @@ logical_and_expression :
     inclusive_or_expression
 
   | logical_and_expression AND inclusive_or_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_and, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_and, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1170,7 +1170,7 @@ inclusive_or_expression :
     exclusive_or_expression
 
   | inclusive_or_expression '|' exclusive_or_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_bitor, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_bitor, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1187,7 +1187,7 @@ exclusive_or_expression :
     and_expression
 
   | exclusive_or_expression XOR and_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_xor, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_xor, $1, $3, LAST));}
 
   ;
 
@@ -1200,7 +1200,7 @@ and_expression :
     equality_expression
 
   | and_expression '&' equality_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_bitand, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_bitand, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1212,11 +1212,11 @@ equality_expression :
     relational_expression
 
   | equality_expression EQ relational_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_equal, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_equal, $1, $3, LAST));}
 
   | equality_expression NEQ relational_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_not,
-			      SS_make_form(_SS_c_equal, $1, $3, LAST), LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_not,
+			      SS_make_form(SI, _SS_c_equal, $1, $3, LAST), LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1228,16 +1228,16 @@ relational_expression :
     shift_expression
 
   | relational_expression '<' shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_lt, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_lt, $1, $3, LAST));}
 
   | relational_expression '>' shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_gt, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_gt, $1, $3, LAST));}
 
   | relational_expression LE shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_le, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_le, $1, $3, LAST));}
 
   | relational_expression GE shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_ge, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_ge, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1249,10 +1249,10 @@ shift_expression :
     additive_expression
 
   | shift_expression LS additive_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_lshft, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_lshft, $1, $3, LAST));}
 
   | shift_expression RS additive_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_rshft, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_rshft, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1264,10 +1264,10 @@ additive_expression :
     multiplicative_expression
 
   | additive_expression '+' multiplicative_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_plus, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_plus, $1, $3, LAST));}
 
   | additive_expression '-' multiplicative_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_minus, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_minus, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1279,13 +1279,13 @@ multiplicative_expression :
     exponentiation_expression
 
   | multiplicative_expression '*' exponentiation_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_times, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_times, $1, $3, LAST));}
 
   | multiplicative_expression '/' exponentiation_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_divide, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_divide, $1, $3, LAST));}
 
   | multiplicative_expression '%' exponentiation_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_modulo, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_modulo, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1302,7 +1302,7 @@ exponentiation_expression :
     cast_expression
 
   | exponentiation_expression EXPT cast_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_expt, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_expt, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1327,16 +1327,16 @@ unary_expression :
     postfix_expression
 
   | INC unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_preinc, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_preinc, $2, LAST));}
 
   | DEC unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_predec, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_predec, $2, LAST));}
 
   | SIZOF unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_sizeof, $2, SS_f, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_sizeof, $2, SS_f, LAST));}
 
   | SIZOF '(' TYPE_SPEC ')'
-      {SS_GR_VAL(SS_make_form(_SS_c_sizeof, $3, SS_t, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_sizeof, $3, SS_t, LAST));}
 
   | '&' cast_expression
       {DIAGNOSTIC($$, "&cast-expr");}
@@ -1345,16 +1345,16 @@ unary_expression :
       {DIAGNOSTIC($$, "*cast-expr");}
 
   | '+' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_plus, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_plus, $2, LAST));}
 
   | '-' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_minus, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_minus, $2, LAST));}
 
   | '!' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_not, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_not, $2, LAST));}
 
   | '~' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_c_bitcmp, $2, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_bitcmp, $2, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1366,7 +1366,7 @@ postfix_expression :
     primary_expression
 
   | postfix_expression '[' expression ']'
-      {SS_GR_VAL(SS_make_form(_SS_c_aref, $1, $3, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_aref, $1, $3, LAST));}
 
   | postfix_expression '(' argument_expression_list ')'
       {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse($3)));}
@@ -1377,18 +1377,18 @@ postfix_expression :
   | postfix_expression DOT variable
       {char t[MAXLINE];
        sprintf(t, "\"%s\"", SS_VARIABLE_NAME($3));
-       SS_GR_VAL(SS_make_form(_SS_c_mref, $1, CSTRSAVE(t), LAST));}
+       SS_GR_VAL(SS_make_form(SI, _SS_c_mref, $1, CSTRSAVE(t), LAST));}
 
   | postfix_expression ACC variable
       {char t[MAXLINE];
        sprintf(t, "\"%s\"", SS_VARIABLE_NAME($3));
-       SS_GR_VAL(SS_make_form(_SS_c_mref, $1, CSTRSAVE(t), LAST));}
+       SS_GR_VAL(SS_make_form(SI, _SS_c_mref, $1, CSTRSAVE(t), LAST));}
 
   | postfix_expression INC
-      {SS_GR_VAL(SS_make_form(_SS_c_postinc, $1, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_postinc, $1, LAST));}
 
   | postfix_expression DEC
-      {SS_GR_VAL(SS_make_form(_SS_c_postdec, $1, LAST));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_postdec, $1, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -1442,7 +1442,7 @@ variable :
 /* NOTE: CPP extension */
   | VARNAME CAT VARNAME
       {if (_SS_cps.cpp_define == TRUE)
-	  {SS_GR_VAL(SS_make_form(_SS_c_catvars, $1, $3, LAST));
+	  {SS_GR_VAL(SS_make_form(SI, _SS_c_catvars, $1, $3, LAST));
 	   DIAGNOSTIC($$, "VARNAME ## VARNAME");}
        else
           {SYNTAX_ERR("VARNAME ## VARNAME");};}
@@ -1469,7 +1469,7 @@ string :
  */
   | string string_unit
       {if (_SS_cps.cpp_define == TRUE)
-	  {SS_GR_VAL(SS_make_form(_SS_c_strapp, $1, $2, LAST));
+	  {SS_GR_VAL(SS_make_form(SI, _SS_c_strapp, $1, $2, LAST));
 	   DIAGNOSTIC($$, "string string_unit");}
        else
           {SYNTAX_ERR("string string_unit");};}
@@ -1520,7 +1520,7 @@ constant :
 pseudo_string :
     DER VARNAME
       {if (_SS_cps.cpp_define == TRUE)
-	  {SS_GR_VAL(SS_make_form(_SS_c_strvar, $2, LAST));
+	  {SS_GR_VAL(SS_make_form(SI, _SS_c_strvar, $2, LAST));
 	   DIAGNOSTIC($$, "# VARNAME");}
        else
           {SYNTAX_ERR("# VARNAME");};}
@@ -1588,11 +1588,11 @@ macro_body :
 
 preprocessor_directive :
     DER INCLUDE STRING
-      {SS_GR_VAL(SS_make_form(_SS_c_load, $3, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_load, $3, LAST));
        DIAGNOSTIC($$, "INCLUDE");}
 
   | DER DEFINE macro_declarator macro_body
-      {SS_GR_VAL(_SS_make_macr($3, $4));
+      {SS_GR_VAL(_SS_make_macr(SI, $3, $4));
        _SS_cps.cpp_define = FALSE;
        DIAGNOSTIC($$, "DEFINE proc body");}
 
@@ -1601,37 +1601,37 @@ preprocessor_directive :
        DIAGNOSTIC($$, "UNDEF var");}
 
   | DER IF primary_expression statement DER ENDIF
-      {SS_GR_VAL(SS_make_form(_SS_c_if, $3, $4, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if, $3, $4, LAST));
        DIAGNOSTIC($$, "IF ENDIF");}
 
   | DER IF primary_expression statement DER ELSE statement DER ENDIF
-      {SS_GR_VAL(SS_make_form(_SS_c_if, $3, $4, $7, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if, $3, $4, $7, LAST));
        DIAGNOSTIC($$, "IF ELSE ENDIF");}
 
   | DER IFDEF primary_expression statement DER ENDIF
-      {SS_GR_VAL(SS_make_form(_SS_c_if,
-			      SS_make_form(_SS_c_defined, $3, LAST), $4, LAST));
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if,
+			      SS_make_form(SI, _SS_c_defined, $3, LAST), $4, LAST));
        DIAGNOSTIC($$, "IFDEF ENDIF");}
 
   | DER IFDEF primary_expression statement DER ELSE statement DER ENDIF
-      {SS_GR_VAL(SS_make_form(_SS_c_if,
-			      SS_make_form(_SS_c_defined, $3, LAST),
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if,
+			      SS_make_form(SI, _SS_c_defined, $3, LAST),
 			      $4, $7,
 			      LAST));
        DIAGNOSTIC($$, "IFDEF ELSE ENDIF");}
 
   | DER IFNDEF primary_expression statement DER ENDIF
-      {SS_GR_VAL(SS_make_form(_SS_c_if,
-			      SS_make_form(_SS_c_not,
-					   SS_make_form(_SS_c_defined, $3, LAST),
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if,
+			      SS_make_form(SI, _SS_c_not,
+					   SS_make_form(SI, _SS_c_defined, $3, LAST),
 					   LAST),
 			      $4, LAST));
        DIAGNOSTIC($$, "IFNDEF ENDIF");}
 
   | DER IFNDEF primary_expression statement DER ELSE statement DER ENDIF
-      {SS_GR_VAL(SS_make_form(_SS_c_if,
-			      SS_make_form(_SS_c_not,
-					   SS_make_form(_SS_c_defined, $3, LAST),
+      {SS_GR_VAL(SS_make_form(SI, _SS_c_if,
+			      SS_make_form(SI, _SS_c_not,
+					   SS_make_form(SI, _SS_c_defined, $3, LAST),
 					   LAST),
 			      $4, $7, LAST));
        DIAGNOSTIC($$, "IFNDEF ELSE ENDIF");}

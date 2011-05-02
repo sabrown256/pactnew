@@ -697,8 +697,8 @@ extern PG_device
 extern void
  SX_end(SS_psides *si, int val),
  SX_init_view(SS_psides *si),
- SX_init_mappings(void),
- SX_init_env(void);
+ SX_init_mappings(SS_psides *si),
+ SX_init_env(SS_psides *si);
 
 extern int
  SX_rd_scm(SS_psides *si, char *name),

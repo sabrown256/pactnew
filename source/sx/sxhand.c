@@ -1079,27 +1079,27 @@ void SX_mf_install(SS_psides *si)
 
 
 
-    SS_install_cf("fft",
+    SS_install_cf(si, "fft",
                   "Procedure: Compute Fast Fourier Transform of double curve. Return double and imaginary parts.\n     Usage: fft <curve>",
                   _ULI_uc, 
                   _ULI_fft);
-    SS_install_cf("getx",
+    SS_install_cf(si, "getx",
                   "Procedure: Return x values for a given y\n     Usage: getx <curve-list> <value>",
                   _ULI_bltocnp, 
                   _ULI_getx);
-    SS_install_cf("gety",
+    SS_install_cf(si, "gety",
                   "Procedure: Return y values for a given x\n     Usage: gety <curve-list> <value>",
                   _ULI_bltocnp, 
                   _ULI_gety);
-    SS_install_cf("fit",
+    SS_install_cf(si, "fit",
                   "Procedure: Find least-squares fit to the specified curves for a polynomial of order n\n     Usage: fit <curve-list> n",
                   _ULI_bltocnp, 
                   _ULI_fit);
-    SS_install_cf("dupx",
+    SS_install_cf(si, "dupx",
                   "Procedure: Duplicate x values so that y = x for each of the specified curves\n     Usage: dupx <curve-list>",
                   _ULI_uc, 
                   _ULI_dupx);
-    SS_install_cf("disp",
+    SS_install_cf(si, "disp",
                   "Procedure: Display actual values in specified curves between min and max points\n     Usage: disp <curve-list> <xmin> <xmax>",
                   _ULI_ul2tocnp, 
                   _ULI_disp);

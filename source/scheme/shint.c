@@ -611,13 +611,10 @@ static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 
 /* SS_MAKE_LIST - make a SCHEME list at the C level */
 
-object *SS_make_list(int first, ...)
+object *SS_make_list(SS_psides *si, int first, ...)
    {int i, type[MAXLINE];
     void *ptr[MAXLINE];
     object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SC_VA_START(first);
 
@@ -644,13 +641,10 @@ object *SS_make_list(int first, ...)
 
 /* SS_MAKE_FORM - make a SCHEME form which is a list of objects */
 
-object *SS_make_form(object *first, ...)
+object *SS_make_form(SS_psides *si, object *first, ...)
    {int i, type[MAXLINE];
     void *ptr[MAXLINE];
     object *expr;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     type[0] = SS_OBJECT_I;
     ptr[0]  = first;

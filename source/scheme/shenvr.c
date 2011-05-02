@@ -326,7 +326,7 @@ object *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab)
 
     pt = SS_mk_hasharr(si, tab);
 
-    fr = SS_make_form(name, pt, LAST);
+    fr = SS_make_form(si, name, pt, LAST);
 
     return(fr);}
 

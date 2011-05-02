@@ -2867,7 +2867,7 @@ later in this manual.<p>
 
 <B></B>
 <BLOCKQUOTE>
-object *SS_make_list(int first, ...)
+object *SS_make_list(SS_psides *si, int first, ...)
 </BLOCKQUOTE>
 </B>
 
@@ -3008,7 +3008,7 @@ the <a href="#SXproccon">Procedure Type Constants</a> section above.<p>
 <BLOCKQUOTE>
 <TABLE>
 <TR><TD><B>object *SS_install_cf(</B></TD>
-<TD><B>char *name, char *doc,</B></TD></TR>
+<TD><B>SS_psides *si, char *name, char *doc,</B></TD></TR>
 <TR><TD></TD><TD><B>PFPObject handler, ...)</B></TD></TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -3019,7 +3019,7 @@ documentation, doc. The handler, hand, must be one of those given in the
 
 <B>
 <BLOCKQUOTE>
-object *SS_install_cv(char *name, void *pval, int type)
+object *SS_install_cv(SS_psides *si, char *name, void *pval, int type)
 </BLOCKQUOTE>
 </B>
 

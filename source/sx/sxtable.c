@@ -354,7 +354,7 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
     _SX_table_n = n;
     _SX_table_ln = nl;
 
-    rv = SS_make_list(SC_INT_I, &nr,
+    rv = SS_make_list(si, SC_INT_I, &nr,
 		      SC_INT_I, &nc,
 		      0);
 
@@ -769,7 +769,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
                  "\n Column %ld : %ld values\n\n",
                  col, nr);
 
-	rv = SS_make_list(SC_INT_I, &nr,
+	rv = SS_make_list(si, SC_INT_I, &nr,
 			  0);};
 
     return(rv);}
@@ -857,7 +857,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(SC_INT_I, &nr,
+	rv = SS_make_list(si, SC_INT_I, &nr,
 			  SC_INT_I, &nc,
 			  0);};
 
@@ -892,7 +892,7 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(SC_INT_I, &nr,
+	rv = SS_make_list(si, SC_INT_I, &nr,
 			  SC_INT_I, &nc,
 			  0);};
 
@@ -924,7 +924,7 @@ static object *SX_cnormalize_table(SS_psides *si)
                  "\n Current Table : %d rows and %d columns\n\n",
                  nr, nc);
 
-	rv = SS_make_list(SC_INT_I, &nr,
+	rv = SS_make_list(si, SC_INT_I, &nr,
 			  SC_INT_I, &nc,
 			  0);};
 

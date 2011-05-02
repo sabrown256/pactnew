@@ -1097,17 +1097,17 @@ void SX_install_panacea_funcs(SS_psides *si)
                        "dynamic",       SC_INT_I, -101,
                        NULL);
 
-    SS_install_cv("radian",    &PA_radian,          SC_INT_I);
-    SS_install_cv("steradian", &PA_steradian,       SC_INT_I);
-    SS_install_cv("mole",      &PA_mole,            SC_INT_I);
-    SS_install_cv("Q",         &PA_electric_charge, SC_INT_I);
-    SS_install_cv("cm",        &PA_cm,              SC_INT_I);
-    SS_install_cv("sec",       &PA_sec,             SC_INT_I);
-    SS_install_cv("g",         &PA_gram,            SC_INT_I);
-    SS_install_cv("eV",        &PA_eV,              SC_INT_I);
-    SS_install_cv("K",         &PA_kelvin,          SC_INT_I);
-    SS_install_cv("erg",       &PA_erg,             SC_INT_I);
-    SS_install_cv("cc",        &PA_cc,              SC_INT_I);
+    SS_install_cv(si, "radian",    &PA_radian,          SC_INT_I);
+    SS_install_cv(si, "steradian", &PA_steradian,       SC_INT_I);
+    SS_install_cv(si, "mole",      &PA_mole,            SC_INT_I);
+    SS_install_cv(si, "Q",         &PA_electric_charge, SC_INT_I);
+    SS_install_cv(si, "cm",        &PA_cm,              SC_INT_I);
+    SS_install_cv(si, "sec",       &PA_sec,             SC_INT_I);
+    SS_install_cv(si, "g",         &PA_gram,            SC_INT_I);
+    SS_install_cv(si, "eV",        &PA_eV,              SC_INT_I);
+    SS_install_cv(si, "K",         &PA_kelvin,          SC_INT_I);
+    SS_install_cv(si, "erg",       &PA_erg,             SC_INT_I);
+    SS_install_cv(si, "cc",        &PA_cc,              SC_INT_I);
 
     return;}
 

@@ -135,7 +135,7 @@ extern object
  *_SS_make_func(SS_psides *si, object *proto, object *body),
  *_SS_del_var(SS_psides *si, object *var),
  *_SS_make_decl(SS_psides *si, object *ds, object *idl),
- *_SS_make_macr(object *proto, object *body),
+ *_SS_make_macr(SS_psides *si, object *proto, object *body),
  *_SS_make_mac_decl(SS_psides *si, object *ds, object *idl),
  *_SS_make_body(object *dcls, object *stmnts),
  *_SS_make_stmnt_lst(SS_psides *si, object *s, object *sl),

@@ -772,7 +772,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
                 {desc = SS_mk_cons(si, obj, bdy);
                  SS_MARK(desc);
                  PRINT(str, "     Compound procedure:\n");
-		 bdy = SS_make_form(SS_quoteproc, bdy, LAST);
+		 bdy = SS_make_form(si, SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
 		    SS_call_scheme(si, "format-expr",
 				   SS_OBJECT_I, strm,
@@ -793,7 +793,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
                 {desc = SS_mk_cons(si, obj, bdy);
                  SS_MARK(desc);
                  PRINT(str, "     Compound macro:\n");
-		 bdy = SS_make_form(SS_quoteproc, bdy, LAST);
+		 bdy = SS_make_form(si, SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
 		    SS_call_scheme(si, "format-expr",
 				   SS_OBJECT_I, strm,
@@ -1208,7 +1208,7 @@ object *_SSI_wr_chr(SS_psides *si, object *argl)
 void _SS_inst_print(SS_psides *si)
    {
 
-    SS_install_cf("suppress-quote", 
+    SS_install_cf(si, "suppress-quote", 
 		  "Variable: Suppress display of double quotes iff on\n     Usage: suppress-quote [0|1]",
 		  SS_acc_int,
 		  &_SS.disp_flag_ext);

@@ -231,7 +231,7 @@ object *SX_rl_mapping(char *s)
 
 /* SX_INIT_MAPPINGS - initialize the mapping data and references */
 
-void SX_init_mappings(void)
+void SX_init_mappings(SS_psides *si)
    {
 
     return;}
@@ -477,7 +477,7 @@ char *SX_mapping_id(object *c)
 
 /* SX_INIT_ENV - initialize the SCHEME environment variables for PDBView */
 
-void SX_init_env(void)
+void SX_init_env(SS_psides *si)
    {
 
 /* initialize the prefix list */
@@ -487,7 +487,7 @@ void SX_init_env(void)
 
 /* initialize the some global objects */
 
-    SX_curfile = SS_install_cv("current-file", SS_null, SS_OBJECT_I);
+    SX_curfile = SS_install_cv(si, "current-file", SS_null, SS_OBJECT_I);
 
     SS_install("describe*",
                "Procedure: Describe an SX function or variable\n     Usage: describe* <function-list> <variable-list>",
@@ -568,8 +568,8 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 
 	SX_init_view(si);
 	SX_install_global_vars(si);
-	SX_init_mappings();
-	SX_init_env();
+	SX_init_mappings(si);
+	SX_init_env(si);
 
 	SS_load_scm(si, "nature.scm");
 

@@ -907,7 +907,7 @@ static object *_SXI_gcpw(SS_psides *si, object *argl)
 
     PG_get_char_path(dev, &x1, &y1);
 
-    o = SS_make_list(SC_DOUBLE_I, &x1,
+    o = SS_make_list(si, SC_DOUBLE_I, &x1,
 		     SC_DOUBLE_I, &y1,
 		     0);
 
@@ -933,7 +933,7 @@ static object *_SXI_gcss(SS_psides *si, object *argl)
 
     PG_get_char_size_n(dev, 2, NORMC, x);
 
-    o = SS_make_list(SC_DOUBLE_I, &x[0],
+    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		     SC_DOUBLE_I, &x[1],
 		     0);
 
@@ -959,7 +959,7 @@ static object *_SXI_gcuw(SS_psides *si, object *argl)
 
     PG_get_char_up(dev, &x1, &y1);
 
-    o = SS_make_list(SC_DOUBLE_I, &x1,
+    o = SS_make_list(si, SC_DOUBLE_I, &x1,
 		     SC_DOUBLE_I, &y1,
 		     0);
 
@@ -1132,7 +1132,7 @@ static object *_SXI_gmxi(SS_psides *si, object *argl)
     PG_get_max_green_intensity(dev, g);
     PG_get_max_blue_intensity(dev, b);
 
-    o = SS_make_list(SC_DOUBLE_I, &i,
+    o = SS_make_list(si, SC_DOUBLE_I, &i,
 		     SC_DOUBLE_I, &r,
 		     SC_DOUBLE_I, &g,
 		     SC_DOUBLE_I, &b,
@@ -1170,7 +1170,7 @@ static object *_SXI_gtew(SS_psides *si, object *argl)
 
     CFREE(s);
 
-    o = SS_make_list(SC_DOUBLE_I, &x[0],
+    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		     SC_DOUBLE_I, &x[1],
 		     SC_DOUBLE_I, &x[2],
 		     0);
@@ -1222,7 +1222,7 @@ static object *_SXI_gtxf(SS_psides *si, object *argl)
 
     PG_get_font(dev, &face, &style, &size);
 
-    ret = SS_make_list(SC_STRING_I, face,
+    ret = SS_make_list(si, SC_STRING_I, face,
                        SC_STRING_I, style,
                        SC_INT_I, &size,
                        0);
@@ -1252,7 +1252,7 @@ static object *_SXI_get_viewport(SS_psides *si, object *argl)
 
     PG_get_viewspace(dev, NORMC, ndc);
 
-    ret = SS_make_list(SC_DOUBLE_I, &ndc[0],
+    ret = SS_make_list(si, SC_DOUBLE_I, &ndc[0],
                        SC_DOUBLE_I, &ndc[1],
                        SC_DOUBLE_I, &ndc[2],
                        SC_DOUBLE_I, &ndc[3],
@@ -1280,7 +1280,7 @@ static object *_SXI_get_frame(SS_psides *si, object *argl)
 
     PG_get_viewspace(dev, FRAMEC, frm);
 
-    ret = SS_make_list(SC_DOUBLE_I, &frm[0],
+    ret = SS_make_list(si, SC_DOUBLE_I, &frm[0],
                        SC_DOUBLE_I, &frm[1],
                        SC_DOUBLE_I, &frm[2],
                        SC_DOUBLE_I, &frm[3],
@@ -1308,7 +1308,7 @@ static object *_SXI_get_window(SS_psides *si, object *argl)
 
     PG_get_viewspace(dev, WORLDC, wc);
 
-    ret = SS_make_list(SC_DOUBLE_I, &wc[0],
+    ret = SS_make_list(si, SC_DOUBLE_I, &wc[0],
                        SC_DOUBLE_I, &wc[1],
                        SC_DOUBLE_I, &wc[2],
                        SC_DOUBLE_I, &wc[3],
@@ -1361,7 +1361,7 @@ static object *_SXI_ptos(SS_psides *si, object *argl)
     else
        PG_trans_point(dev, 2, PIXELC, x, NORMC, x);
 
-    rv = SS_make_list(SC_DOUBLE_I, &x[0],
+    rv = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		      SC_DOUBLE_I, &x[1],
 		      0);
 
@@ -1387,7 +1387,7 @@ static object *_SXI_qdev(SS_psides *si, object *argl)
 
     PG_query_device(dev, &dx, &dy, &nc);
 
-    ret = SS_make_list(SC_INT_I, &dx,
+    ret = SS_make_list(si, SC_INT_I, &dx,
                        SC_INT_I, &dy,
                        SC_INT_I, &nc,
                        0);
@@ -1414,7 +1414,7 @@ static object *_SXI_qwin(SS_psides *si, object *argl)
 
     PG_query_device(dev, &dx, &dy, &nc);
 
-    ret = SS_make_list(SC_INT_I, &dx,
+    ret = SS_make_list(si, SC_INT_I, &dx,
                        SC_INT_I, &dy,
                        0);
 
@@ -2120,7 +2120,7 @@ static object *_SXI_stop(SS_psides *si, object *argl)
     xi[0] = x[0];
     xi[1] = x[1];
 
-    rv = SS_make_list(SC_INT_I, &xi[0],
+    rv = SS_make_list(si, SC_INT_I, &xi[0],
 		      SC_INT_I, &xi[1],
 		      0);
 
@@ -2150,7 +2150,7 @@ static object *_SXI_stow(SS_psides *si, object *argl)
     else
        PG_trans_point(dev, 2, NORMC, x, WORLDC, x);
 
-    rv = SS_make_list(SC_DOUBLE_I, &x[0],
+    rv = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		      SC_DOUBLE_I, &x[1],
 		      0);
 
@@ -2180,7 +2180,7 @@ static object *_SXI_wtos(SS_psides *si, object *argl)
     else
        PG_trans_point(dev, 2, WORLDC, x, NORMC, x);
 
-    rv = SS_make_list(SC_DOUBLE_I, &x[0],
+    rv = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		      SC_DOUBLE_I, &x[1],
 		      0);
 
@@ -2234,7 +2234,7 @@ static object *_SXI_getva(SS_psides *si, object *argl)
 
     else
        {PG_get_view_angle(dev, TRUE, &theta, &phi, &chi);
-        rv = SS_make_list(SC_DOUBLE_I, &theta,
+        rv = SS_make_list(si, SC_DOUBLE_I, &theta,
 			  SC_DOUBLE_I, &phi,
 			  SC_DOUBLE_I, &chi,
 			  0);};
@@ -2289,7 +2289,7 @@ static object *_SXI_getla(SS_psides *si, object *argl)
 
     else
        {PG_get_light_angle(dev, TRUE, &theta, &phi);
-        rv = SS_make_list(SC_DOUBLE_I, &theta,
+        rv = SS_make_list(si, SC_DOUBLE_I, &theta,
 			  SC_DOUBLE_I, &phi,
 			  0);};
 
@@ -2371,7 +2371,7 @@ static object *_SXI_pal_list(SS_psides *si, object *argl)
 	     red   = imp*cl.red;
 	     green = imp*cl.green;
 	     blue  = imp*cl.blue;
-	     lst   = SS_append(si, SS_make_list(SC_DOUBLE_I, &red,
+	     lst   = SS_append(si, SS_make_list(si, SC_DOUBLE_I, &red,
 					    SC_DOUBLE_I, &green,
 					    SC_DOUBLE_I, &blue,
 					    0),

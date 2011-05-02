@@ -62,9 +62,11 @@ object *_SS_make_func(SS_psides *si, object *proto, object *body)
             
     if (extra)
        {body = SS_CDR_MACRO(rest);
-        frm  = SS_append(si, SS_make_form(_SS_c_defunc, proto, 0), body);}
+        frm  = SS_append(si,
+			 SS_make_form(si, _SS_c_defunc, proto, LAST),
+			 body);}
     else
-       frm = SS_make_form(_SS_c_defunc, proto, body, 0);
+       frm = SS_make_form(si, _SS_c_defunc, proto, body, LAST);
 
     return(frm);}
 
@@ -76,14 +78,14 @@ object *_SS_make_func(SS_psides *si, object *proto, object *body)
  *               - NOTE: this is for CPP extention #define
  */
 
-object *_SS_make_macr(object *proto, object *body)
+object *_SS_make_macr(SS_psides *si, object *proto, object *body)
    {object *frm;
 
     if (SS_variablep(proto) && (proto == body))
-       frm = SS_make_form(_SS_c_defmac, proto, SS_null, 0);
+       frm = SS_make_form(si, _SS_c_defmac, proto, SS_null, LAST);
 
     else
-       frm = SS_make_form(_SS_c_defmac, proto, body, 0);
+       frm = SS_make_form(si, _SS_c_defmac, proto, body, LAST);
 
     return(frm);}
 
@@ -131,7 +133,7 @@ object *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl)
         dcls = SS_reverse(dcls);};
 
     bdy   = SS_reverse(sl);
-    proto = SS_make_form(_SS_c_block, dcls, 0);
+    proto = SS_make_form(si, _SS_c_block, dcls, LAST);
     frm   = SS_append(si, proto, bdy);
 
     return(frm);}
@@ -212,7 +214,7 @@ object *_SS_make_cast(SS_psides *si, object *type, object *expr)
     t = (p != NULL) ? p + 7 : tname;
        
     typ  = SS_mk_string(si, t);
-    cast = SS_make_form(_SS_c_cast, typ, expr, LAST);
+    cast = SS_make_form(si, _SS_c_cast, typ, expr, LAST);
 
     return(cast);}
 
@@ -401,11 +403,11 @@ void SS_init_c_syntax_mode(SS_psides *si)
 		   SS_sargs,
 		   SS_c_add_type, SS_PR_PROC);
 
-	SS_install_cf("diagnose-c-parse", 
+	SS_install_cf(si, "diagnose-c-parse", 
 		      "Variable: Flag to print detailed diagnostics of a C parse\n     Usage: diagnose-c-parse [0|1]",
 		      SS_acc_int,
 		      ssdbg);
-	SS_install_cf("diagnose-c-grammar", 
+	SS_install_cf(si, "diagnose-c-grammar", 
 		      "Variable: Flag to print diagnostics of C actions/reductions\n     Usage: diagnose-c-parse [0|1]",
 		      SS_acc_int,
 		      &_SS_cps.diagnose_grammar);};

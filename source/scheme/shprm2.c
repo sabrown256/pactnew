@@ -1073,7 +1073,7 @@ void _SS_install_math(SS_psides *si)
                _SS_binary_opr,
                _SS_xor_pow, SS_PR_PROC);
 
-    SS_install_cf("strict-c", 
+    SS_install_cf(si, "strict-c", 
 		  "Variable: Strict C compliance for operators if 1\n     Usage: strict-c [0|1]",
 		  SS_acc_int,
 		  &si->strict_c);
