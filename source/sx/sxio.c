@@ -81,7 +81,7 @@ object *SX_print(SS_psides *si, object *argl)
         switch (ce)
            {case 's' :
             case 'c' :
-	         SS_print(obj, "", "", str);
+	         SS_print(si, str, obj, "", "");
 		 break;
 
             case 'i' :

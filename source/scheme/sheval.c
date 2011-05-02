@@ -626,7 +626,7 @@ evi_dec:
 /* RET_VAL - finish up an eval */
 
 ret_val:
-/*    SS_print(si->val, "   ", "\n", si->outdev); */
+/*    SS_print(si, si->outdev, si->val, "   ", "\n"); */
 
     return;}
 

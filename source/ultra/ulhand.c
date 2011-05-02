@@ -95,7 +95,7 @@ object *UL_us(SS_psides *si, C_procedure *cp, object *argl)
     PFSargs fun;
 
     fun = (PFSargs) cp->proc[0];
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (select (menu)) causes replot */
     SX_plot_flag = TRUE;
@@ -126,7 +126,7 @@ object *UL_uc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFSargsI) cp->proc[0];
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (copy (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -160,7 +160,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
     fun = (PFDoubleRR) cp->proc[0];
         
     SX_last_arg(tok, argl);
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     a = HUGE;
     SS_args(tok,
@@ -211,7 +211,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
     fun = (PFDoubleRR) cp->proc[0];
         
     SX_last_arg(tok, argl);
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     a = HUGE;
     SS_args(tok,
@@ -280,7 +280,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
         tok2 = NULL;
     SS_Assign(argl, SS_reverse(argl));
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(t))
@@ -348,7 +348,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFPObjectio) cp->proc[0];
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     for (t = argl, crvs = SS_null; SS_consp(t); t = SS_cdr(t))
         {tok = SS_car(t);
@@ -388,7 +388,7 @@ object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFDoubleR) cp->proc[0];
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (expx (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -426,7 +426,7 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFDoubleR) cp->proc[0];
 	     
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (expx (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -481,7 +481,7 @@ object *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFVoidis) cp->proc[0];
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (op param (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -521,7 +521,7 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
     if (!SS_numbp(tok))
        SS_error("BAD LAST ARGUMENT - UL_BLTOC", tok);
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (color (lst) red) causes replot */
     SX_plot_flag = TRUE;
@@ -565,7 +565,7 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
 	*r = (char) toupper((int) *r);
 	PRINT(stdout, "\n     %s\n", r);};
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(t))
@@ -686,7 +686,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 
 /* set up initial pointers */
     temp_flag = FALSE;
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (+ (lst) red) causes replot */
     SX_plot_flag = TRUE;
@@ -888,7 +888,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFDoubleRi) cp->proc[0];
         
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
     argl = SS_reverse(argl);
     i    = -1;
     SS_args(argl,

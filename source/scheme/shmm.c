@@ -918,7 +918,7 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 		 ityp = map[i].type;
 		 nr   = map[i].nref;
 		 snprintf(s, MAXLINE, " %p  %3d %3d : ", p, ityp, nr);
-		 SS_print(p, s, "\n", si->outdev);};};
+		 SS_print(si, si->outdev, p, s, "\n");};};
 
 	CFREE(map);
 
@@ -961,7 +961,7 @@ object *SS_mk_object(SS_psides *si,
 
     if (_SS.trace_object == op)
        {PRINT(stdout, "alloc> %p\n", op);
-        SS_print(op, "       ", "\n", si->outdev);};
+        SS_print(si, si->outdev, op, "       ", "\n");};
 
     return(op);}
 

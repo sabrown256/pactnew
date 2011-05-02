@@ -10,9 +10,6 @@
 
 #include "scheme_int.h"
 
-static void
- _SS_xprintf(object *str, object *argl);
-
 static int
  _SS_push_chars(FILE *fp, char *fmt, ...),
  _SS_push_string(char *s, FILE *fp);
@@ -75,9 +72,8 @@ int SS_set_display_flag(int flg)
  *          - prints it
  */
 
-void SS_print(object *obj, char *begin, char *end, object *strm)
+void SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end)
    {FILE *str;
-    SS_psides *si = &_SS_si;
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
@@ -121,11 +117,10 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
  *             - such as "%10s"
  */
 
-char *_SS_sprintf(char *fmt, object *obj)
+char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
    {char *s;
     PFfprintf pr;
     PFfputs ps;
-    SS_psides *si = &_SS_si;
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
@@ -158,11 +153,11 @@ char *_SS_sprintf(char *fmt, object *obj)
 
 /* _SS_SPRINT - takes an object and produces a printable representation */
 
-static object *_SS_sprint(object *obj, char *fmt, object *strm)
+static object *_SS_sprint(SS_psides *si, object *obj, char *fmt, object *strm)
    {char *s;
     FILE *str;
 
-    s   = _SS_sprintf(fmt, obj);
+    s   = _SS_sprintf(si, fmt, obj);
     str = SS_OUTSTREAM(strm);
 
     PRINT(str, fmt, s);
@@ -188,15 +183,15 @@ void dpreg(SS_psides *si)
     str = SS_OUTSTREAM(si->outdev);
     PRINT(str, "Scheme registers:\n");
 
-    SS_print(si->exn,   "   Exn  : ", "\n", si->outdev);
-    SS_print(si->argl,  "   Argl : ", "\n", si->outdev);
-    SS_print(si->fun,   "   Fun  : ", "\n", si->outdev);
-    SS_print(si->unev,  "   Unev : ", "\n", si->outdev);
-    SS_print(si->val,   "   Val  : ", "\n", si->outdev);
-    SS_print(si->this,  "   This : ", "\n", si->outdev);
-    SS_print(si->env,   "   Env  : ", "\n", si->outdev);
-    SS_print(si->rdobj, "   Read : ", "\n", si->outdev);
-    SS_print(si->evobj, "   Eval : ", "\n", si->outdev);
+    SS_print(si, si->outdev, si->exn,   "   Exn  : ", "\n");
+    SS_print(si, si->outdev, si->argl,  "   Argl : ", "\n");
+    SS_print(si, si->outdev, si->fun,   "   Fun  : ", "\n");
+    SS_print(si, si->outdev, si->unev,  "   Unev : ", "\n");
+    SS_print(si, si->outdev, si->val,   "   Val  : ", "\n");
+    SS_print(si, si->outdev, si->this,  "   This : ", "\n");
+    SS_print(si, si->outdev, si->env,   "   Env  : ", "\n");
+    SS_print(si, si->outdev, si->rdobj, "   Read : ", "\n");
+    SS_print(si, si->outdev, si->evobj, "   Eval : ", "\n");
 
     return;}
 
@@ -212,7 +207,7 @@ void dprint(SS_psides *si, object *obj)
        si = &_SS_si;       /* diagnostic default */
 
     if (obj != NULL)
-       SS_print(obj, "", "\n", si->outdev);
+       SS_print(si, si->outdev, obj, "", "\n");
 
     return;}
 
@@ -227,75 +222,15 @@ static object *_SSI_write(SS_psides *si, object *obj)
     str = SS_cdr(obj);
     obj = SS_car(obj);
     if (SS_nullobjp(str))
-       SS_print(obj, "", "", si->outdev);
+       SS_print(si, si->outdev, obj, "", "");
 
     else if (SS_consp(str))
        {str = SS_car(str);
         if (SS_outportp(str))
-           SS_print(obj, "", "", str);}
+           SS_print(si, str, obj, "", "");}
 
     else
        SS_error("LAST ARGUMENT NOT OUTPUT-PORT - WRITE", str);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SSI_SPRINTF - a C type sprintf for SCHEME */
-
-static object *_SSI_sprintf(SS_psides *si, object *argl)
-   {int odf;
-    PFfprintf pr;
-    PFfputs ps;
-    object *o;
-
-    SC_get_put_line(pr);
-    SC_get_put_string(ps);
-    SC_set_put_line(_SS_push_chars);
-    SC_set_put_string(_SS_push_string);
-
-    odf = SS_set_display_flag(TRUE);
-    _SS_xprintf(si->outdev, argl);
-    SS_set_display_flag(odf);
-
-    SC_set_put_line(pr);
-    SC_set_put_string(ps);
-
-    o = SS_mk_string(si, _SS.bf);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SSI_FPRINTF - a C type fprintf for SCHEME */
-
-static object *_SSI_fprintf(SS_psides *si, object *argl)
-   {object *str;
-    PFfprintf pr;
-    PFfputs ps;
-
-/* turn off SIGIO handler */
-    SC_catch_io_interrupts(FALSE);
-
-    str  = SS_car(argl);
-    argl = SS_cdr(argl);
-    if (SS_nullobjp(str))
-       str = si->outdev;
-
-    SC_get_put_line(pr);
-    SC_get_put_string(ps);
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
-
-    _SS_xprintf(str, argl);
-
-    SC_set_put_line(pr);
-    SC_set_put_string(ps);
-
-/* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
 
     return(SS_f);}
 
@@ -307,7 +242,7 @@ static object *_SSI_fprintf(SS_psides *si, object *argl)
  *             - return a string with the result
  */
 
-static void _SS_xprintf(object *str, object *argl)
+static void _SS_xprintf(SS_psides *si, object *str, object *argl)
    {int c;
     char forms[MAXLINE], local[MAXLINE], ce;
     char *fmt, *le, *lb, *pt;
@@ -377,9 +312,9 @@ static void _SS_xprintf(object *str, object *argl)
            {case 's' :
                  _SS.disp_flag = _SS.disp_flag_ext;
 	         if (strlen(local) == 2)
-		    SS_print(obj, "", "", str);
+		    SS_print(si, str, obj, "", "");
                  else
-		    _SS_sprint(obj, local, str);
+		    _SS_sprint(si, obj, local, str);
 /*                 _SS.disp_flag = FALSE; */
                  break;
 
@@ -388,7 +323,7 @@ static void _SS_xprintf(object *str, object *argl)
                     PRINT(stream, local, SS_INTEGER_VALUE(obj));
                  else
                     {/* _SS.disp_flag = _SS.disp_flag_ext; */
-                     SS_print(obj, "", "", str);
+                     SS_print(si, str, obj, "", "");
                      /* _SS.disp_flag = FALSE; */};
                  break;
 
@@ -425,6 +360,66 @@ static void _SS_xprintf(object *str, object *argl)
                  break;};};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_SPRINTF - a C type sprintf for SCHEME */
+
+static object *_SSI_sprintf(SS_psides *si, object *argl)
+   {int odf;
+    PFfprintf pr;
+    PFfputs ps;
+    object *o;
+
+    SC_get_put_line(pr);
+    SC_get_put_string(ps);
+    SC_set_put_line(_SS_push_chars);
+    SC_set_put_string(_SS_push_string);
+
+    odf = SS_set_display_flag(TRUE);
+    _SS_xprintf(si, si->outdev, argl);
+    SS_set_display_flag(odf);
+
+    SC_set_put_line(pr);
+    SC_set_put_string(ps);
+
+    o = SS_mk_string(si, _SS.bf);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_FPRINTF - a C type fprintf for SCHEME */
+
+static object *_SSI_fprintf(SS_psides *si, object *argl)
+   {object *str;
+    PFfprintf pr;
+    PFfputs ps;
+
+/* turn off SIGIO handler */
+    SC_catch_io_interrupts(FALSE);
+
+    str  = SS_car(argl);
+    argl = SS_cdr(argl);
+    if (SS_nullobjp(str))
+       str = si->outdev;
+
+    SC_get_put_line(pr);
+    SC_get_put_string(ps);
+    SC_set_put_line(SS_printf);
+    SC_set_put_string(SS_fputs);
+
+    _SS_xprintf(si, str, argl);
+
+    SC_set_put_line(pr);
+    SC_set_put_string(ps);
+
+/* turn on SIGIO handler */
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+
+    return(SS_f);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -759,7 +754,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
                obj = desc;
 	    else
                {PRINT(str, "     Variable: %s\n", SS_VARIABLE_NAME(obj));
-                SS_print(desc, "     Value: ", "\n", strm);
+                SS_print(si, strm, desc, "     Value: ", "\n");
                 return(TRUE);};}
         else
            return(FALSE);};
@@ -1019,7 +1014,7 @@ void SS_wr_lst(SS_psides *si, object *obj, object *strm)
     PRINT(str, "(");
 
     while (TRUE)
-       {SS_print(SS_car(obj), "", "", strm);
+       {SS_print(si, strm, SS_car(obj), "", "");
 
         if (SS_nullobjp(cd = SS_cdr(obj)))
            {PRINT(str, ")");
@@ -1028,7 +1023,7 @@ void SS_wr_lst(SS_psides *si, object *obj, object *strm)
            {obj = cd;
             PRINT(str, " ");}
         else
-           {SS_print(cd, " . ", ")", strm);
+           {SS_print(si, strm, cd, " . ", ")");
             break;};};
 
     return;}
@@ -1189,10 +1184,10 @@ object *_SSI_wr_chr(SS_psides *si, object *argl)
        SS_error("BAD CHARACTER - WRITE-CHAR", argl);
 
     if (SS_nullobjp(str))
-       SS_print(argl, "", "", si->outdev);
+       SS_print(si, si->outdev, argl, "", "");
 
     else if (SS_outportp(str = SS_car(str)))
-       SS_print(argl, "", "", str);
+       SS_print(si, str, argl, "", "");
 
     else
        SS_error("LAST ARGUMENT NOT OUTPUT-PORT - WRITE-CHAR", str);

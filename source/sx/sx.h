@@ -912,7 +912,7 @@ extern object
 /* SXSET.C declarations */
 
 extern object
- *SX_arg_prep(object *argl);
+ *SX_arg_prep(SS_psides *si, object *argl);
 
 extern void
  SX_init(char *code, char *vers),

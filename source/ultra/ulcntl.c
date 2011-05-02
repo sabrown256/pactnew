@@ -39,7 +39,7 @@ void UL_init_hash(void)
 object *_ULI_describe(SS_psides *si, object *argl)
    {object *obj;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);

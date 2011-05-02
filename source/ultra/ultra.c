@@ -518,7 +518,7 @@ object *_ULI_set_id(SS_psides *si, object *argl)
     int jo;
     object *obj;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     jo    = -1;
     id[0] = '\0';
@@ -608,7 +608,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
 
     ret = SS_null;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     if (SS_numbp(SS_car(argl)))
        {int first = 0, last = 0, id;

@@ -177,17 +177,17 @@ struct s_SS_psides
     object *evobj;
     object *character_stream;
 
-    int (*pr_gets)(object *str);
+    int (*pr_gets)(SS_psides *si, object *fp);
     int (*post_print)(SS_psides *si);
-    void (*post_read)(SS_psides *si, object *strm);
-    void (*post_eval)(SS_psides *si, object *strm);
+    void (*post_read)(SS_psides *si, object *fp);
+    void (*post_eval)(SS_psides *si, object *fp);
     void (*name_reproc)(SS_psides *si, char *s, char *name);
     void (*get_arg)(SS_psides *si, object *obj, void *v, int type);
-    object *(*read)(SS_psides *si, object *str);
+    object *(*read)(SS_psides *si, object *fp);
     object *(*call_arg)(SS_psides *si, int type, void *v);
 
-    void (*pr_ch_out)(int c, object *str);
-    void (*pr_ch_un)(int c, object *str);
+    void (*pr_ch_out)(int c, object *fp);
+    void (*pr_ch_un)(int c, object *fp);
 
     JMP_BUF cpu;};
 
@@ -841,9 +841,9 @@ extern "C" {
     if (_sh == TRUE)                                                         \
        {_lsf = _sf;                                                          \
         if (_lsf != NULL)                                                    \
-           SC_signal(SIGINT, _lsf);                                          \
+           SC_signal_n(SIGINT, _lsf, _si);                                   \
         else                                                                 \
-           SC_signal(SIGINT, SC_interrupt_handler);};                        \
+           SC_signal_n(SIGINT, SC_interrupt_handler, _si);};                 \
     if (_bh == TRUE)                                                         \
        {if ((_bf == NULL) || (_bsz <= 0))                                    \
            {SC_setbuf(stdout, NULL);}                                        \
@@ -1068,7 +1068,7 @@ extern object
 
 extern void
  SS_set_prompt(SS_psides *si, char *fmt, ...),
- SS_print(object *obj, char *begin, char *end, object *strm),
+ SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end),
  SS_wr_lst(SS_psides *si, object *obj, object *strm),
  SS_wr_proc(SS_psides *si, object *obj, object *strm),
  SS_wr_atm(SS_psides *si, object *obj, object *strm);
@@ -1155,7 +1155,7 @@ extern void
 extern int
  SS_printf(FILE *fp, char *fmt, ...),
  SS_fputs(char *s, FILE *fp),
- SS_get_ch(object *str, int ign_ws);
+ SS_get_ch(SS_psides *si, object *str, int ign_ws);
 
 extern void
  SS_unget_ch(int c, object *str),

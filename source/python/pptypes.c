@@ -42,11 +42,6 @@ struct s_PP_getdescr {
 
 /*--------------------------------------------------------------------------*/
 
-/* GOTCHA - sab - move to score */
-char
-    *SC_INT_S,
-    *SC_INT_P_S;
-
 /****************/
 
 char
@@ -1130,7 +1125,7 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     
     descr = PP_make_descr(
         PP_INT_I,                       /* typecode */
-        SC_INT_S,                   /* type */
+        SC_INTEGER_S,                   /* type */
         sizeof(int)                     /* bpi */
         );
 
@@ -1297,12 +1292,6 @@ void PP_init_type_map_instance(PP_file *fileinfo, PP_class_descr *cdescr)
 
 void PP_init_type_map(void)
 {
-    /* XXX - sab - this should be in score */
-    SC_INT_S = CSTRSAVE("int");
-    SC_INT_P_S = CSTRSAVE("int *");
-    SC_mark(SC_INT_S, 1);
-    SC_mark(SC_INT_P_S, 1);
-
     XX_OBJECT_MAP_S = CSTRSAVE("PP_type_entry");
     SC_permanent(XX_OBJECT_MAP_S);
 

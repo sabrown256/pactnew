@@ -43,7 +43,7 @@ static INLINE int EOI(object *str)
  *               -         1 for further processing
  */
 
-static int _SS_get_input(object *str)
+static int _SS_get_input(SS_psides *si, object *str)
    {int rv;
     char *p;
     FILE *fp;
@@ -83,18 +83,15 @@ static int _SS_get_input(object *str)
  *           - must get the next character from the given stream
  */
 
-int SS_get_ch(object *str, int ign_ws)
+int SS_get_ch(SS_psides *si, object *str, int ign_ws)
    {int c, ok, st;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if (si->pr_gets == NULL)
        si->pr_gets = _SS_get_input;
 
     for (ok = TRUE; ok == TRUE; )
         {if (EOI(str))
-	    {st = si->pr_gets(str);
+	    {st = si->pr_gets(si, str);
 	     if (st == -1)
 	        {c = EOF;
 		 break;}

@@ -1226,7 +1226,7 @@ object *SX_write_data(SS_psides *si, object *argl)
     if (_SX.files == NULL)
        _SX.files = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
     mode  = NULL;
     fname = NULL;
     SS_args(argl,

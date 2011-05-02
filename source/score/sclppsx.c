@@ -57,7 +57,6 @@ static int _SC_posix_release(PROCESS *pp)
 /* check to see that the process has indeed exited */
 	    if (pp->ischild == FALSE)
 	       {ex = SC_child_status(pp->id, &cnd, &rsn);
-		SC_ASSERT(ex == pp->id);
 	        rv = (ex == pp->id);};
 
 	    if (SC_time_allow(1) == 0)
@@ -391,7 +390,7 @@ static int _SC_posix_close(PROCESS *pp)
  */
 	    if ((pid > 0) && (SC_status(pp) == SC_RUNNING))
 	       {st = SC_child_kill(pid);
-		SC_ASSERT(st == 0);
+		SC_ASSERT(st == TRUE);
 		SC_process_state(pp, SC_PROC_SIG);};
 
 /* close the communications pipe */

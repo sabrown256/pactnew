@@ -13,17 +13,24 @@
 # generate stubs if no extensions directory exists
 if (!(-d extensions)) then
    mkdir extensions
-   pushd extensions >>& /dev/null
+endif
+
+pushd extensions >>& /dev/null
 
 # write sxext.c
+if (!(-f sxext.c)) then
+   echo "Rebuilding extensions/sxext.c"
    cat >&! sxext.c << EOF
 #include "cpyright.h"
 #include "sx_int.h"
 void SX_install_ext_funcs(SS_psides *si)
    {return;}
 EOF
+endif
 
 # write pre-Make
+if (!(-f pre-Make)) then
+   echo "Rebuilding extensions/pre-Make"
    cat >&! pre-Make << EOF
 TGTLib = \${LibDir}/libsx.a
 UniFlags =
@@ -39,14 +46,12 @@ ArObjs = \${TGTLib}(sxext.o)
 \${Objs} : \${Hdrs}
 \${ArObjs} : \${Hdrs}
 EOF
-
-   popd >>& /dev/null
 endif
 
-# go and compile the extensions
-pushd extensions >>& /dev/null
-pact devlib
+# compile the extensions
+pact -na 1 devlib
 @ err = $status
+
 popd >>& /dev/null
 
 exit($err)

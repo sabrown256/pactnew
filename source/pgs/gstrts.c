@@ -1141,7 +1141,7 @@ void help(void)
 static void sig_handler(int sig)
    {
 
-    SC_setup_sig_handlers(sig_handler, FALSE);
+    SC_setup_sig_handlers(sig_handler, NULL, FALSE);
 
     SC_retrace_exe(NULL, -1, 60000);
 
@@ -1163,7 +1163,7 @@ int main(int c, char **v)
     dtest dev[N_DEV];
     testdes a;
 
-    SC_setup_sig_handlers(sig_handler, TRUE);
+    SC_setup_sig_handlers(sig_handler, NULL, TRUE);
 
 /* let's hear it for non-ANSI compilers */
     tst[0]  = test_1;

@@ -24,6 +24,12 @@
 
 /*--------------------------------------------------------------------------*/
 
+#ifndef SIGNAL_FUNCTION
+# define SIGNAL_FUNCTION signal
+#endif
+
+#define SIGNAL(sig, fnc)  SIGNAL_FUNCTION(sig, fnc)
+
 #undef MAKE
 #undef MAKE_N
 #undef REMAKE
@@ -159,6 +165,11 @@ extern "C" {
 /*                          FUNCTION DECLARATIONS                           */
 
 /*--------------------------------------------------------------------------*/
+
+/* former SCSIG.C declarations */
+
+extern PFSignal_handler
+ SC_signal(int sig, PFSignal_handler fnc);
 
 
 /* former SCMEMC.C declarations */

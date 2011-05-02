@@ -46,6 +46,7 @@ SS_state
 static void _SS_fpe_handler(int sig)
    {SS_psides *si;
 
+    si = SC_get_context(_SS_fpe_handler);
     si = &_SS_si;
 
 #ifdef SIGFPE
@@ -66,6 +67,7 @@ static void _SS_sig_handler(int sig)
    {char msg[MAXLINE];
     SS_psides *si;
 
+    si = SC_get_context(_SS_sig_handler);
     si = &_SS_si;
 
     SC_signal(sig, SIG_IGN);
@@ -110,7 +112,7 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 
 	PRINT(str, atype);
 
-	SS_print(obj, "): ", "\n\n", si->outdev);};
+	SS_print(si, si->outdev, obj, "): ", "\n\n");};
 
     return;}
 
@@ -129,9 +131,9 @@ static void _SS_print_err_msg_a(SS_psides *si, FILE *str, char *s, object *obj)
     if (SC_arrtype(obj, -1) == 0)
        PRINT(str, "MEMORY PROBABLY CORRUPTED\n");
     else
-       SS_print(obj, "", "\n", si->outdev);
+       SS_print(si, si->outdev, obj, "", "\n");
 
-    SS_print(si->fun, "CURRENT FUNCTION: ", "\n\n", si->outdev);
+    SS_print(si, si->outdev, si->fun, "CURRENT FUNCTION: ", "\n\n");
 
     return;}
 
@@ -209,7 +211,7 @@ static int _SS_repl(SS_psides *si)
 
 /* print the evaluated object */
         if (si->print_flag)
-           SS_print(si->evobj, si->ans_prompt, "\n", si->outdev);
+           SS_print(si, si->outdev, si->evobj, si->ans_prompt, "\n");
 
         SS_Assign(si->env,   si->global_env);
         SS_Assign(si->this,  SS_null);
@@ -379,9 +381,9 @@ SS_psides *SS_init_scheme(char *code, char *vers)
     si = &_SS_si;
 
     hnd = SC_which_signal_handler(SIGINT);
-    SC_setup_sig_handlers(_SS_sig_handler, TRUE);
+    SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
     PM_enable_fpe(TRUE, (PFSignal_handler) _SS_fpe_handler);
-    SC_signal(SIGINT, hnd);
+    SC_signal_n(SIGINT, si, hnd);
 
 #ifdef SIGFPE
     SC_signal(SIGFPE, _SS_fpe_handler);
@@ -872,9 +874,10 @@ void SS_interrupt_handler(int sig)
     object *argl;
     SS_psides *si;
 
+    si = SC_get_context(SS_interrupt_handler);
     si = &_SS_si;
 
-    SC_signal(SIGINT, SS_interrupt_handler);
+    SC_signal_n(SIGINT, SS_interrupt_handler, si);
 
     PRINT(stdout, "\n\nInterrupt (%d frames):\n", si->errlev - 1);
     PRINT(stdout, "  a     - Reset to starting frame\n");

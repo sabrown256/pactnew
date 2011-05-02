@@ -417,7 +417,7 @@ static void dmake_sig_handler(int sig)
    {int i, rv;
     char s[MAXLINE];
 
-    SC_setup_sig_handlers(dmake_sig_handler, FALSE);
+    SC_setup_sig_handlers(dmake_sig_handler, NULL, FALSE);
 
     SC_signal(SIGCHLD, SIG_IGN);
     SC_signal(SC_SIGIO, SIG_IGN);
@@ -448,13 +448,6 @@ static void dmake_sig_handler(int sig)
 	 io_printf(stdout, "%s ", argv[i]);};
     io_printf(stdout, "\n");
 
-#if 0
-{io_printf(stdout, "-> signalled pid %d\n", getpid());
- io_printf(stdout, "-> ");
- io_gets(s, MAXLINE, stdin);
- io_printf(stdout, "done\n");}
-#endif
-
 /* attach the debugger to this rascal if requested */
     if ((debug == TRUE) &&
 	((sig != SIGINT) && (sig != SIGTERM)))
@@ -470,8 +463,7 @@ static void dmake_sig_handler(int sig)
     if (rv == TRUE)
        exit(sig);
 
-    SC_setup_sig_handlers(dmake_sig_handler, TRUE);
-/*    SC_signal(sig, dmake_sig_handler); */
+    SC_setup_sig_handlers(dmake_sig_handler, NULL, TRUE);
 
     return;}
 
@@ -553,7 +545,7 @@ int main(int c, char **v, char **env)
     SC_get_resource_limits(&rmem, &rcpu, &rfsz, &rnfd, &rnprc);
     SC_set_resource_limits(-1, -1, -1, -1, -1);
 
-    SC_setup_sig_handlers(dmake_sig_handler, TRUE);
+    SC_setup_sig_handlers(dmake_sig_handler, NULL, TRUE);
 
     state = SC_make_state();
 

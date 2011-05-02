@@ -156,6 +156,10 @@ struct s_SC_state
 
 /* initializes to 0 bytes */
 
+/* SCCNTX.C */
+
+   hasharr *context_table;
+
 /* SCFIA.C */
    int ip;                                        /* pointer list variables */
    SC_array *ptr_lst;
@@ -272,6 +276,15 @@ extern SC_oscapdes
 /*                          FUNCTION DECLARATIONS                           */
 
 /*--------------------------------------------------------------------------*/
+
+
+/* SCCNTX.C declarations */
+
+extern int
+ SC_register_context(void *f, void *a);
+
+extern void
+ *SC_get_context(void *f);
 
 
 /* SCCTL.C declarations */

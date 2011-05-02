@@ -301,7 +301,7 @@ extern void
 
 extern char
  *_SS_vdsnprintf(int cp, char *fmt, va_list __a__),
- *_SS_sprintf(char *fmt, object *obj);
+ *_SS_sprintf(SS_psides *si, char *fmt, object *obj);
 
 
 #ifdef LARGE

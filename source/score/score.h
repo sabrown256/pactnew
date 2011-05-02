@@ -58,13 +58,6 @@
 # define ALARM alarm
 #endif
 
-#ifndef SIGNAL_FUNCTION
-# define SIGNAL_FUNCTION signal
-#endif
-
-#define SIGNAL(sig, fnc)  SIGNAL_FUNCTION(sig, fnc)
-
-
 #ifndef REMOVE
 #define REMOVE remove
 #endif
@@ -1158,8 +1151,9 @@ extern void
 /* SCSIG.C declarations */
 
 extern PFSignal_handler
- SC_signal(int sig, PFSignal_handler fnc),
- SC_signal_action(int sig, PFSignal_handler fnc, int flags, ...),
+ SC_signal_n(int sig, PFSignal_handler fnc, void *a),
+ SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
+		    int flags, ...),
  SC_which_signal_handler(int sig);
 
 extern SC_sigstate
@@ -1176,7 +1170,7 @@ extern char
 extern void
  SC_restore_signal_handlers(SC_sigstate *ss, int rel),
  SC_set_signal_handlers(PFSignal_handler hnd, int mn, int mx),
- SC_setup_sig_handlers(PFSignal_handler hand, int fl);
+ SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl);
 
 
 /* SCSYSA.C declarations */
