@@ -394,9 +394,9 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 	 vl = _SS_lk_var_valc(si, vr, si->global_env);
 	 snprintf(s, MAXLINE, "%s = ", vr);
 	 if (vl == NULL)
-	    SS_print(SS_null, s, "\n", si->outdev);
+	    SS_print(si, si->outdev, SS_null, s, "\n");
 	 else
-	    SS_print(vl, s, "\n", si->outdev);};
+	    SS_print(si, si->outdev, vl, s, "\n");};
 
     SS_set_display_flag(dspo);
 
@@ -437,7 +437,7 @@ static object *_SSI_print_env(SS_psides *si, object *obj)
     for (i = 0; (i < n) && !SS_nullobjp(penv); i++, penv = SS_cdr(penv));
 
     snprintf(bf, MAXLINE, "Environment frame #%d:\n", n+1);
-    SS_print(penv, bf, "\n\n", si->outdev);
+    SS_print(si, si->outdev, penv, bf, "\n\n");
 
     return(SS_f);}
 

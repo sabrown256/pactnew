@@ -28,7 +28,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
     curve *crvr, *crvi;
     object *ch1, *ch2, *rv;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     jr = -1;
     ji = -1;
@@ -204,7 +204,7 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
     curve *crvg, *crvh;
     object *ch;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     jg = -1;
     jh = -1;
@@ -904,7 +904,7 @@ static object *_ULI_stats(SS_psides *si, object *argl)
    {int i;
     object *ret, *o;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
     ret = SS_null;
     for ( ; SS_consp(argl); argl = SS_cdr(argl))
        {i = SX_get_crv_index_i(SS_car(argl));

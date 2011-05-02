@@ -178,11 +178,8 @@ void SX_init(char *code, char *vers)
  *             - delistifying one element lists
  */
 
-object *SX_arg_prep(object *argl)
+object *SX_arg_prep(SS_psides *si, object *argl)
    {object *acc, *lst, *obj;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* because argl might be si->argl and since it is passed as an argument to
  * a function instead of being SS_Assign'd in the usual manner we MUST
@@ -250,13 +247,10 @@ void SX_reset_prefix(void)
  *               -         1 for further processing
  */
 
-int _SX_get_input(object *str)
+int _SX_get_input(SS_psides *si, object *str)
    {int rv;
     char *p;
     FILE *fp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     rv = 0;
 

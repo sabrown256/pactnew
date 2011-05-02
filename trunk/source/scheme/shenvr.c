@@ -50,9 +50,9 @@ void dproc(SS_psides *si, object *pp)
 
 	SC_ASSERT(penv != NULL);
 
-	SS_print(name,   "Name: ", "\n", si->outdev);
-	SS_print(params, "Params: ", "\n", si->outdev);
-	SS_print(bdy,    "Body: ", "\n", si->outdev);};
+	SS_print(si, si->outdev, name,   "Name: ", "\n");
+	SS_print(si, si->outdev, params, "Params: ", "\n");
+	SS_print(si, si->outdev, bdy,    "Body: ", "\n");};
 
     return;}
 
@@ -95,13 +95,13 @@ void dpenv(SS_psides *si, object *penv)
 		     {if ((i != (n-1)) || (lines[i] != NULL))
 			 {b = (object *) SC_hasharr_def_lookup(tab, lines[i]);
 			  snprintf(pre, MAXLINE, "%4d\t%s\t", i+1, lines[i]);
-			  SS_print(b, pre, "\n", si->outdev);};};
+			  SS_print(si, si->outdev, b, pre, "\n");};};
 
 		 if (n != nx)
 		    {PRINT(stdout, "\t...\n");
 		     b = (object *) SC_hasharr_def_lookup(tab, lines[nx-1]);
 		     snprintf(pre, MAXLINE, "%4d\t%s\t", nx, lines[nx-1]);
-		     SS_print(b, pre, "\n", si->outdev);};
+		     SS_print(si, si->outdev, b, pre, "\n");};
 
 		 CFREE(lines);};};};
 
@@ -345,7 +345,7 @@ static void SS_add_to_frame(SS_psides *si, char *vr, object *vl, hasharr *tab)
     SC_hasharr_install(tab, vr, vl, SS_OBJECT_P_S, TRUE, TRUE);
 
     if ((si->know_env) && (vr[0] == '$'))
-       {t = _SS_sprintf("%s", vl);
+       {t = _SS_sprintf(si, "%s", vl);
 
 	nc = strlen(vr) + strlen(t) + 2;
 	s  = SC_permanent(CMAKE_N(char, nc));

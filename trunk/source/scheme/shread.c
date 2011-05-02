@@ -70,17 +70,17 @@ static object *_SS_rd_lst(SS_psides *si, object *str)
     frst = SS_null;
     ths  = SS_null;
     for (ok = TRUE; ok == TRUE; )
-        {switch (c = SS_get_ch(str, TRUE))
+        {switch (c = SS_get_ch(si, str, TRUE))
             {case ')' :
 	          ok = FALSE;
 	          o  = frst;
 		  break;
 
 	     case '.' :
-	          c = SS_get_ch(str, FALSE);
+	          c = SS_get_ch(si, str, FALSE);
 		  if (strchr(" \t\r\n", c) != NULL)
 		     {SS_setcdr(ths, READ_EXPR(str));
-		      while ((c = SS_get_ch(str, TRUE)) != ')');
+		      while ((c = SS_get_ch(si, str, TRUE)) != ')');
 		      ok = FALSE;
 		      o  = frst;
 		      break;}
@@ -94,7 +94,7 @@ static object *_SS_rd_lst(SS_psides *si, object *str)
 	          PUSH_CHAR(c, str);
 		  nxt = READ_EXPR(str);
 		  if (SS_eofobjp(nxt))
-		     {if ((c = SS_get_ch(str, TRUE)) == EOF)
+		     {if ((c = SS_get_ch(si, str, TRUE)) == EOF)
 			 {SS_clr_strm(str);
 			  SS_error("UNEXPECTED END OF FILE - READ-LIST",
 				   SS_null);}
@@ -132,11 +132,11 @@ static object *_SSI_rd_chr(SS_psides *si, object *arg)
 
     if (SS_nullobjp(arg))
        {*SS_PTR(si->indev) = '\0';
-        o = SS_mk_char(si, (int) SS_get_ch(si->indev, FALSE));}
+        o = SS_mk_char(si, (int) SS_get_ch(si, si->indev, FALSE));}
 
     else if (SS_inportp(str = SS_car(arg)))
        {*SS_PTR(str) = '\0';
-        o = SS_mk_char(si, (int) SS_get_ch(str, FALSE));}
+        o = SS_mk_char(si, (int) SS_get_ch(si, str, FALSE));}
 
     else
        SS_error("ARGUMENT TO READ NOT INPUT-PORT", arg);
@@ -245,7 +245,7 @@ static object *_SS_rd_atm(SS_psides *si, object *str)
 
     inbrackets = FALSE;
     pt         = token;
-    while ((c = SS_get_ch(str, FALSE)) != EOF)
+    while ((c = SS_get_ch(si, str, FALSE)) != EOF)
        {if (strchr(" \t\n\r();", c) == NULL)
            {*pt++ = c;
             if (c == '[')
@@ -292,9 +292,9 @@ static object *_SS_rd_str(SS_psides *si, object *str)
     while (TRUE)
        {pt = bf + bfsz - MAXLINE;
         for (i = 0; i < MAXLINE;)
-            {c = SS_get_ch(str, FALSE);
+            {c = SS_get_ch(si, str, FALSE);
              if (c == '\\')
-                {nc = SS_get_ch(str, FALSE);
+                {nc = SS_get_ch(si, str, FALSE);
                  if (nc == '\"')
                     pt[i++] = nc;
                  else if (nc == '\n')
@@ -339,7 +339,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 
     prt = SS_GET(input_port, str);
 
-    c = SS_get_ch(str, TRUE);
+    c = SS_get_ch(si, str, TRUE);
     switch (c)
        {case EOF :
 	     rv = SS_eof;
@@ -374,7 +374,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 					SS_null));
 	     break;
         case ',' :
-	     c = SS_get_ch(str, TRUE);
+	     c = SS_get_ch(si, str, TRUE);
 	     if (c == '@')
 	        rv = SS_mk_cons(si, SS_unqspproc,
 				SS_mk_cons(si, READ_EXPR(str),
@@ -387,7 +387,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 	     break;
 #ifdef LARGE
         case '#' :
-	     c = SS_get_ch(str, FALSE);
+	     c = SS_get_ch(si, str, FALSE);
 	     if (c == '(')
 	        rv = _SS_rd_vct(si, str);
 	     else
@@ -430,7 +430,7 @@ object *SS_read(SS_psides *si, object *str)
 	        break;
 
         case ALL :
-	     SS_print(obj, "", "\r\n", si->histdev);
+	     SS_print(si, si->histdev, obj, "", "\r\n");
 
         default :
 	     break;};
@@ -810,9 +810,9 @@ object *SS_load(SS_psides *si, object *argl)
     strm = _SSI_opn_in(si, fnm);
 
 /* check for the first line starting with #! */
-    c = SS_get_ch(strm, TRUE);
+    c = SS_get_ch(si, strm, TRUE);
     if (c == '#')
-       {c = SS_get_ch(strm, FALSE);
+       {c = SS_get_ch(si, strm, FALSE);
         if (c == '!')
            *SS_PTR(strm) = '\0';
         else

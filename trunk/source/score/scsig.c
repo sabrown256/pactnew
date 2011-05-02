@@ -25,11 +25,13 @@ int SC_send_signal(int pid, int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SIGNAL - portable wrapper for signal semantics
- *           - use sigaction if at all possible
+/* SC_SIGNAL_N - portable wrapper for signal semantics
+ *             - use sigaction if at all possible
+ *             - register context A with FNC so that it can
+ *             - be looked up when FNC is called
  */
 
-PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
+PFSignal_handler SC_signal_n(int sig, PFSignal_handler fnc, void *a)
    {PFSignal_handler rv;
 
 #ifdef USE_POSIX_SIGNALS
@@ -53,22 +55,26 @@ PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
 
 #endif
 
+    SC_register_context(fnc, a);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SIGNAL_ACTION - portable wrapper for sigaction semantics
- *                  - set FNC to handle SIG signals
- *                  - FLAGS modifies the signal handling process
- *                  - any remaining non-negative arguments are
- *                  - taken to be signals that are to be blocked during
- *                  - the execution of FNC
- *                  - terminate the list with negative integer
+/* SC_SIGNAL_ACTION_N - portable wrapper for sigaction semantics
+ *                    - set FNC to handle SIG signals
+ *                    - register context A with FNC so that it can
+ *                    - be looked up when FNC is called
+ *                    - FLAGS modifies the signal handling process
+ *                    - any remaining non-negative arguments are
+ *                    - taken to be signals that are to be blocked during
+ *                    - the execution of FNC
+ *                    - terminate the list with negative integer
  */
 
-PFSignal_handler SC_signal_action(int sig, PFSignal_handler fnc,
-				  int flags, ...)
+PFSignal_handler SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
+				    int flags, ...)
    {PFSignal_handler rv;
 
 #ifdef USE_POSIX_SIGNALS
@@ -111,6 +117,8 @@ PFSignal_handler SC_signal_action(int sig, PFSignal_handler fnc,
     rv = signal(sig, fnc);
 
 #endif
+
+    SC_register_context(fnc, a);
 
     return(rv);}
 
@@ -481,7 +489,7 @@ void SC_set_signal_handlers(PFSignal_handler hnd, int mn, int mx)
 
 /* SC_SETUP_SIG_HANDLERS - setup to handle a variety of signals */
 
-void SC_setup_sig_handlers(PFSignal_handler hand, int fl)
+void SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl)
    {PFSignal_handler hnd;
 
     if (fl == TRUE)
@@ -489,30 +497,30 @@ void SC_setup_sig_handlers(PFSignal_handler hand, int fl)
     else
        hnd = SIG_IGN;
 
-    SC_signal(SIGSEGV, hnd);
-    SC_signal(SIGBUS,  hnd);
-    SC_signal(SIGFPE,  hnd);
-    SC_signal(SIGILL,  hnd);
+    SC_signal_n(SIGSEGV, a, hnd);
+    SC_signal_n(SIGBUS,  a, hnd);
+    SC_signal_n(SIGFPE,  a, hnd);
+    SC_signal_n(SIGILL,  a, hnd);
 
-    SC_signal(SIGINT,  hnd);
-    SC_signal(SIGHUP,  hnd);
-    SC_signal(SIGQUIT, hnd);
-    SC_signal(SIGTERM, hnd);
+    SC_signal_n(SIGINT,  a, hnd);
+    SC_signal_n(SIGHUP,  a, hnd);
+    SC_signal_n(SIGQUIT, a, hnd);
+    SC_signal_n(SIGTERM, a, hnd);
 
-    SC_signal(SIGALRM, hnd);
+    SC_signal_n(SIGALRM, a, hnd);
 
-    SC_signal(SIGTRAP, hnd);
-    SC_signal(SIGABRT, hnd);
+    SC_signal_n(SIGTRAP, a, hnd);
+    SC_signal_n(SIGABRT, a, hnd);
 
 #ifdef SIGIOT
-    SC_signal(SIGIOT,  hnd);
+    SC_signal_n(SIGIOT,  a, hnd);
 #endif
 
-    SC_signal(SIGPIPE, hnd);
-    SC_signal(SIGSYS,  hnd);
+    SC_signal_n(SIGPIPE, a, hnd);
+    SC_signal_n(SIGSYS,  a, hnd);
 
-    SC_signal(SIGUSR1, hnd);
-    SC_signal(SIGUSR2, hnd);
+    SC_signal_n(SIGUSR1, a, hnd);
+    SC_signal_n(SIGUSR2, a, hnd);
 
     return;}
 

@@ -2833,7 +2833,7 @@ interpreter and the application.<p>
 <BLOCKQUOTE>
 void SS_unget_ch(int c, object *str)
 <P>void SS_put_ch(int c, object *str)
-<P>int SS_get_ch(object *str, int ign_ws)
+<P>int SS_get_ch(SS_psides *si, object *str, int ign_ws)
 </BLOCKQUOTE>
 </B>
 

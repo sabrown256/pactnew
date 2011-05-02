@@ -789,10 +789,10 @@ static void _SS_do_watch(SS_psides *si, object *pfun, char *msg)
 	   {fp = SS_OUTSTREAM(si->outdev);
 	    SC_ASSERT(fp != NULL);
 
-	    SS_print(_SS.watch_var, "Value of ", " changed", si->outdev);
-	    SS_print(pfun, msg, "\n", si->outdev);
-	    SS_print(_SS.watch_val, "   Old Value = ", "\n", si->outdev);
-	    SS_print(vl,            "   New Value = ", "\n", si->outdev);
+	    SS_print(si, si->outdev, _SS.watch_var, "Value of ", " changed");
+	    SS_print(si, si->outdev, pfun, msg, "\n");
+	    SS_print(si, si->outdev, _SS.watch_val, "   Old Value = ", "\n");
+	    SS_print(si, si->outdev, vl,            "   New Value = ", "\n");
 
 	    _SS.watch_val = vl;};};
 
@@ -816,7 +816,7 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 	        {PRINT(SS_OUTSTREAM(si->outdev),
 		       "Entering procedure %s with:\n  ",
 		       SS_PROCEDURE_NAME(pfun));
-		 SS_print(pargl, "", "\n", si->outdev);
+		 SS_print(si, si->outdev, pargl, "", "\n");
 		 SS_Assign(si->continue_int[si->cont_ptr].signal,
 			   pfun);};
 	     break;
@@ -826,7 +826,7 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 	        {PRINT(SS_OUTSTREAM(si->outdev),
 		       "Entering macro-ev %s with:\n  ",
 		       SS_PROCEDURE_NAME(pfun));
-		 SS_print(pargl, "", "\n", si->outdev);
+		 SS_print(si, si->outdev, pargl, "", "\n");
 		 SS_Assign(si->continue_int[si->cont_ptr].signal,
 			   pfun);};
 	     break;
@@ -844,7 +844,7 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 	        {PRINT(SS_OUTSTREAM(si->outdev),
 		       "Entering macro %s with:\n  ",
 		       SS_PROCEDURE_NAME(pfun));
-		 SS_print(pargl, "", "\n", si->outdev);
+		 SS_print(si, si->outdev, pargl, "", "\n");
 		 SS_Assign(si->continue_int[si->cont_ptr].signal,
 			   pfun);};
 	default :
@@ -873,7 +873,7 @@ void _SS_end_trace(SS_psides *si)
 		     {PRINT(SS_OUTSTREAM(si->outdev),
 			    "Leaving procedure %s with:\n  ",
 			    SS_PROCEDURE_NAME(pfun));
-		      SS_print(si->val, "", "\n", si->outdev);};
+		      SS_print(si, si->outdev, si->val, "", "\n");};
 		  break;
 
 	     case SS_MACRO_EV :
@@ -881,7 +881,7 @@ void _SS_end_trace(SS_psides *si)
 		     {PRINT(SS_OUTSTREAM(si->outdev),
 			    "Leaving macro-ev %s with:\n  ",
 			    SS_PROCEDURE_NAME(pfun));
-		      SS_print(si->val, "", "\n", si->outdev);};
+		      SS_print(si, si->outdev, si->val, "", "\n");};
 		  break;
 
              case SS_BEGIN    :
@@ -897,7 +897,7 @@ void _SS_end_trace(SS_psides *si)
 		     {PRINT(SS_OUTSTREAM(si->outdev),
 			    "Leaving macro %s with:\n  ",
 			    SS_PROCEDURE_NAME(pfun));
-		      SS_print(si->val, "", "\n", si->outdev);};
+		      SS_print(si, si->outdev, si->val, "", "\n");};
 
 	     default :
 	          break;};

@@ -327,3 +327,17 @@ int SC_zero_on_alloc(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_SIGNAL - portable wrapper for signal semantics
+ *           - use sigaction if at all possible
+ */
+
+PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
+   {PFSignal_handler rv;
+
+    rv = SC_signal_n(sig, fnc, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

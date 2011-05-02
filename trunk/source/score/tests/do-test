@@ -13,7 +13,7 @@ source ../../scripts/env-csh
 
 if ($?TestDir == 0) then
    pushd .. >& /dev/null
-   setenv System `../manager/cfgman use`
+   setenv System `../scripts/cfgman use`
    setenv TestDir $cwd/z-$System/test
    setenv TIMER timer
    popd >& /dev/null

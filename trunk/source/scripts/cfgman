@@ -183,17 +183,23 @@ switch ($Tgt)
 
 # check everybody on the current list
         else
+           set lok = FALSE
            foreach i ($lst)
               if ($i == current) continue
 
               if ("$i" == "$ent") then
-                 touch $i
-                 chmod 660 $i >& /dev/null
-                 rm -f current >& /dev/null
-                 ln -s $i current
+                 set lok = TRUE
                  break
               endif
            end
+           if ($lok == FALSE) then
+              touch $ent
+           endif
+           chmod 660 $ent >& /dev/null
+           rm -f current >& /dev/null
+           ln -s $ent current
+
+           unset lok
            unset ent
         endif
 
@@ -216,6 +222,10 @@ switch ($Tgt)
               set sid = $i
 
               if (("$ent" == "$i") || ("$ent" == "$sid")) then
+                 ls -l current |& grep $i >& /dev/null
+                 if ($status == 0) then
+                    rm -f current >& /dev/null
+                 endif
                  rm -f $i >& /dev/null
               endif
            end

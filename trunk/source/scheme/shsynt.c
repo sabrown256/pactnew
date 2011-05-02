@@ -25,7 +25,7 @@ int SS_input_synt(SS_psides *si, char *ltxt)
     
     si->lex_text = ltxt;
 
-    c = SS_get_ch(si->character_stream, FALSE);
+    c = SS_get_ch(si, si->character_stream, FALSE);
 
     _SS.have_eof = (c == EOF);
 
@@ -207,7 +207,7 @@ void _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag)
 
     if (diag)
        {snprintf(s, MAXLINE, "%s: ", msg);
-        SS_print(expr, s, "\n", si->outdev);};
+        SS_print(si, si->outdev, expr, s, "\n");};
 
     return;}
 
@@ -281,7 +281,7 @@ void dbgst(SS_psides *si, objp *st)
          (i > -20) && (st[i] != NULL) && (st[i] != (objp) 0x1000000);
          i--)
         {snprintf(msg, MAXLINE, "$%d = ", abs(i)+1);
-         SS_print(st[i], msg, "\n", si->outdev);};
+         SS_print(si, si->outdev, st[i], msg, "\n");};
 
     return;}
 

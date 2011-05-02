@@ -42,8 +42,8 @@ extern "C" {
  *             -       so that a simple assignment must be done here!!!
  */
 
-#define SX_prep_arg(argl)                                                    \
-    {argl = SX_arg_prep(argl);}
+#define SX_prep_arg(_si, _a)                                                 \
+    {_a = SX_arg_prep(_si, _a);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -409,7 +409,7 @@ extern object
 /* SXSET.C declarations */
 
 extern int
- _SX_get_input(object *str);
+ _SX_get_input(SS_psides *si, object *str);
 
 
 /* SXSHAR.C declarations */

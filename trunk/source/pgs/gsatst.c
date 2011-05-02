@@ -1669,7 +1669,7 @@ static void timeout_graphics(int sig)
 static void sig_handler(int sig)
    {
 
-    SC_setup_sig_handlers(sig_handler, FALSE);
+    SC_setup_sig_handlers(sig_handler, NULL, FALSE);
 
     SC_retrace_exe(NULL, -1, 60000);
 
@@ -1690,7 +1690,7 @@ int main(int c, char **v)
     dtest dev[N_DEV];
     char *name[N_DEV];
 
-    SC_setup_sig_handlers(sig_handler, TRUE);
+    SC_setup_sig_handlers(sig_handler, NULL, TRUE);
 
 /* let's hear it for non-ANSI compilers */
     tst[0]  = test_1;

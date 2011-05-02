@@ -132,10 +132,11 @@ static void _SC_server_handler(int sig)
     asyncstate *as;
     parstate *state;
 
-    as    = &_SC_server_state;
+    as    = SC_get_context(_SC_server_handler);
+/*    as    = &_SC_server_state; */
     state = as->server;
 
-    SC_setup_sig_handlers(_SC_server_handler, FALSE);
+    SC_setup_sig_handlers(_SC_server_handler, as, FALSE);
     si = SC_signal(SC_SIGIO, SIG_IGN);
 
     _SC_exec_printf(as,
@@ -156,7 +157,7 @@ static void _SC_server_handler(int sig)
 
     _SC_signal_server(sig);
 
-    SC_setup_sig_handlers(_SC_server_handler, TRUE);
+    SC_setup_sig_handlers(_SC_server_handler, as, TRUE);
 
     SC_signal(SC_SIGIO, si);
 
@@ -312,7 +313,7 @@ static int _SC_server_exit(parstate *state, int fl)
        ex = fl;
 
     if ((ex == TRUE) && (state->done == TRUE))
-       {SC_setup_sig_handlers(SIG_DFL, TRUE);
+       {SC_setup_sig_handlers(SIG_DFL, NULL, TRUE);
 	_SC_server_printf(as, state, _SC_EXEC_EXIT, "\n");
 	_SC_signal_server(SIGINT);
 
@@ -704,7 +705,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
     as = &_SC_server_state;
 
 /* re/set the signal handlers */
-    SC_setup_sig_handlers(_SC_server_handler, TRUE);
+    SC_setup_sig_handlers(_SC_server_handler, as, TRUE);
 
     _SC_setup_async_state(as,
 			  SC_get_sys_length_max(TRUE, FALSE));
@@ -825,7 +826,7 @@ int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
     for (ia = 0; ia < na; ia++)
 
 /* set the signal handlers each time */
-        {SC_setup_sig_handlers(_SC_server_handler, TRUE);
+        {SC_setup_sig_handlers(_SC_server_handler, as, TRUE);
 
 	 rst = SETJMP(_SC.srv_rstrt);
 	 if (rst == 0)

@@ -541,7 +541,7 @@ object *SX_get_data_domain(SS_psides *si, object *argl)
     double xmn, xmx, xt;
     object *ch, *s, *o;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     xmn = HUGE;
     xmx = -HUGE;
@@ -568,7 +568,7 @@ object *SX_get_data_range(SS_psides *si, object *argl)
     double ymn, ymx, yt;
     object *ch, *s, *o;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     ymn = HUGE;
     ymx = -HUGE;

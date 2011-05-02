@@ -30,9 +30,9 @@ void SC_catch_event_loop_interrupts(SC_evlpdes *pe, int flag)
    {
 
     if ((pe != NULL) && flag && SC_gs.io_interrupts_on)
-       SC_signal_action(SC_SIGIO, pe->sigio, 0,	BLOCK_WITH_SIGIO, -1);
+       SC_signal_action_n(SC_SIGIO, pe->sigio, NULL, 0, BLOCK_WITH_SIGIO, -1);
     else
-       SC_signal_action(SC_SIGIO, SIG_IGN, 0, -1);
+       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
     return;}
 
@@ -429,7 +429,8 @@ int SC_event_loop(SC_evlpdes *pe, void *a, int to)
     if (pe == NULL)
        pe = _SC.evloop;
 
-    osi = SC_signal_action(SC_SIGIO, pe->sigio, 0, BLOCK_WITH_SIGIO, -1);
+    osi = SC_signal_action_n(SC_SIGIO, pe->sigio, NULL,
+			     0, BLOCK_WITH_SIGIO, -1);
 
     exitf = pe->exitf;
 
@@ -451,7 +452,7 @@ int SC_event_loop(SC_evlpdes *pe, void *a, int to)
 	if (err < 0)
 	   rv = err;};
 
-    SC_signal_action(SC_SIGIO, osi, 0, -1);
+    SC_signal_action_n(SC_SIGIO, osi, NULL, 0, -1);
 
     return(rv);}
 
@@ -526,8 +527,8 @@ static int SC_set_fd_async_streams(int fd, int state)
 
 	if (state)
 	   {ONCE_SAFE(TRUE, NULL)
-	       errf = SC_signal_action(SC_SIGIO, _SC_event_loop_handler, 0,
-				       BLOCK_WITH_SIGIO, -1);
+	       errf = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
+					 0, BLOCK_WITH_SIGIO, -1);
 	       if (errf == SIG_ERR)
 	          SC_error(-1, "CAN'T SET SIGIO HANDLER - SC_SET_FD_ASYNC_STREAMS");
 	    END_SAFE;};
@@ -592,8 +593,8 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 /* set the signal handler */
 	if (state)
 	   {ONCE_SAFE(TRUE, NULL)
-	       errf = SC_signal_action(SC_SIGIO, _SC_event_loop_handler, 0,
-				       BLOCK_WITH_SIGIO, -1);
+	       errf = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
+					 0, BLOCK_WITH_SIGIO, -1);
 	       if (errf == SIG_ERR)
 	          SC_error(-1, "CAN'T SET SIGIO HANDLER - SC_SET_FD_ASYNC_FASYNC");
 	    END_SAFE;};
@@ -1111,10 +1112,10 @@ void SC_catch_io_interrupts(int flag)
        SC_catch_event_loop_interrupts(_SC.evloop, flag);
 
     else if (flag && SC_gs.io_interrupts_on)
-       SC_signal_action(SC_SIGIO, _SC_event_loop_handler, 0,
-			BLOCK_WITH_SIGIO,  -1);
+       SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
+			  0, BLOCK_WITH_SIGIO, -1);
     else
-       SC_signal_action(SC_SIGIO, SIG_IGN, 0, -1);
+       SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
     return;}
 

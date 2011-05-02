@@ -29,7 +29,7 @@ static char
 static object *_SXI_describe(SS_psides *si, object *argl)
    {object *obj;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {obj = SS_car(argl);
@@ -291,44 +291,13 @@ object *SX_mk_mapping_proc(int i)
 
 /* SX_SET_ID - change the data-id of the given mapping */
 
-object *SX_set_id(object *argl)
+object *SX_set_id(SS_psides *si, object *argl)
    {int iold;
     object *o;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     iold = -1;
-
-#if 0
-    iold    = -1;
-    id = '\0';
-    SS_args(argl,
-            SC_STRING_I, &iold,
-            SC_STRING_I, &id,
-            0);
-
-    if (iold < 0)
-       SS_error("BAD MAPPING ARGUMENT - SX_SET_ID", argl);
-
-    if ((id == '\0') || (id < 'A') || (id > 'Z'))
-       SS_error("BAD ID ARGUMENT - SX_SET_ID", argl);
-
-    if (_SX_mappingp(&id))
-       SS_error("SPECIFIED ID ALREADY IN USE - SX_SET_ID", argl);
-
-    jnew = id - 'A';
-    jold = SX_dataset[iold].id - 'A';
-
-/* sever the connection with the old mapping */
-    obj = SX_get_curve_obj(jold);
-    SS_VARIABLE_VALUE(obj) = varbl[jold];
-    SS_VARIABLE_NAME(obj)  = SS_VARIABLE_NAME(varbl[jold]);
-    SX_data_index[jold] = -1;
-
-/* make the connection with the new mapping */
-    SX_dataset[iold].id  = id;
-    SX_data_index[jnew] = iold;
-#endif
 
     o = SX_mk_mapping_proc(iold);
 
@@ -346,7 +315,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 
     ret = SS_null;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     if (SS_numbp(SS_car(argl)))
        {int first, last, id;

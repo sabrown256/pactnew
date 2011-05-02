@@ -239,7 +239,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
    {object *s, *t;
     int limit, j;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     limit = SX_n_curves_read;
     if (!SS_nullobjp(SS_car(argl)))
@@ -506,7 +506,7 @@ static object *_ULI_range(SS_psides *si, object *argl)
     PG_device *dev;
     object *s, *rv;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     dev = _UL_get_some_device();
 
@@ -563,7 +563,7 @@ static object *_ULI_domain(SS_psides *si, object *argl)
     PG_device *dev;
     object *s, *rv;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     dev = _UL_get_some_device();
 
@@ -626,7 +626,7 @@ static object *_ULI_open_device(SS_psides *si, object *argl)
     char *name, *type, *title;
     out_device *out;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     name  = NULL;
     type  = NULL;
@@ -852,7 +852,7 @@ static object *_ULI_menu(SS_psides *si, object *argl)
     object *ret;
 
     if (!SS_nullobjp(argl))
-       {SX_prep_arg(argl);};
+       {SX_prep_arg(si, argl);};
 
     pr = NULL;
     pf = NULL;
@@ -957,7 +957,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
     object *ret;
 
     if (!SS_nullobjp(argl))
-       {SX_prep_arg(argl);};
+       {SX_prep_arg(si, argl);};
 
     pr = NULL;
     pf = NULL;
@@ -1227,7 +1227,7 @@ static object *_ULI_label(SS_psides *si, object *argl)
     char *labl;
     object *o;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
 
     j    = -1;
     labl = NULL;
@@ -1289,7 +1289,7 @@ static object *_ULI_average(SS_psides *si, object *s)
     object *c, *numtoks, *rv;
     C_procedure *cpp, *cpd;
 
-    SX_prep_arg(s);
+    SX_prep_arg(si, s);
     UL_plot_off();
 
     rv      = SS_null;
@@ -1750,7 +1750,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
     char *lbl;
     object *b, *acc, *target, *tmp;
 
-    SX_prep_arg(argl);
+    SX_prep_arg(si, argl);
     SX_autoplot = OFF;
 
     if (SS_nullobjp(argl))
