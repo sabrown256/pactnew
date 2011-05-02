@@ -235,7 +235,7 @@ int _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc)
 void _SS_unsupported_syntax(SS_psides *si, char *msg)
    {
 
-    SS_error("UNSUPPORTED SYNTAX", SS_mk_string(si, msg));
+    SS_error_n(si, "UNSUPPORTED SYNTAX", SS_mk_string(si, msg));
 
     return;}
 
@@ -260,7 +260,7 @@ int SS_parse_error_synt(SS_psides *si, char *s, PFPObject fnc)
     else
        {snprintf(msg, MAXLINE, "BAD SYNTAX\n      TEXT:  %s", si->lex_text);
         obj = (tok == NULL) ? SS_f : tok;
-        SS_error(msg, obj);};
+        SS_error_n(si, msg, obj);};
 
     return(0);}
 

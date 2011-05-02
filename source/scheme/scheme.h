@@ -112,7 +112,7 @@ typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
 typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
 
-#define SS_DEFINE_OBJECT                                                    \
+#define SS_DEFINE_OBJECT(_si)                                               \
    {defstr *dp;                                                             \
     dp = PD_defstr(file, "object",                                          \
                    "char *print_name",                                      \
@@ -122,7 +122,7 @@ typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
                    "function release",                                      \
                    LAST);                                                   \
     if (dp == NULL)                                                         \
-       SS_error("COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT",        \
+       SS_error_n(_si, "COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT", \
                 SS_null);}
 
 struct s_SS_psides
@@ -638,50 +638,9 @@ struct s_SS_vect
 
 /*--------------------------------------------------------------------------*/
 
-/* SS_GC - garbage collection, incremental
- *       - each object has number of pointers to itself (except #t, #f, etc)
- *       - when the number of pointers is 1 then garbage collection means
- *       - freeing the space associated with the object
- *       - when the number is greater than 1 garbage collection means
- *       - decrementing the number of pointers to itself
- */
-
-#define SS_GC SS_gc
-
-#if 0
-#ifdef SCHEME_DEBUG
-
-#define SS_GC(obj)                                                           \
-   {object *x;                                                               \
-    x = obj;                                                                 \
-    if ((x->val == NULL) || (x->eval_type == NO_EV))                         \
-       SS_error("FREED OBJECT - SS_GC", SS_null);                            \
-    if (x != NULL)                                                           \
-       {if ((SS_OBJECT_GC(x) != 1) || (x->val == NULL))                      \
-           {CFREE(x);}                                                       \
-        else                                                                 \
-           x->release(x);};}
-
-#else
-
-#define SS_GC(obj)                                                           \
-   {object *x;                                                               \
-    x = obj;                                                                 \
-    if (x != NULL)                                                           \
-       {if ((SS_OBJECT_GC(x) != 1) || (x->val == NULL))                      \
-           {CFREE(x);}                                                       \
-        else                                                                 \
-           x->release(x);};}
-
-#endif
-#endif
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SS_MARK - increment the reference count of the object */
 
-#define SS_MARK(x)  SC_mark(x, 1)
+#define SS_MARK(_x)  SC_mark(_x, 1)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -693,23 +652,23 @@ struct s_SS_vect
 
 #ifdef SCHEME_DEBUG
 
-#define SS_Assign(obj, nval)                                                 \
-    {object *x;                                                              \
-     x = nval;                                                               \
-     if ((x->val == NULL) || (x->eval_type == NO_EV))                        \
+#define SS_Assign(_o, _v)                                                    \
+    {_oect *_x;                                                              \
+     _x = _v;                                                                \
+     if ((_x->val == NULL) || (_x->eval_type == NO_EV))                      \
         SS_error("FREED OBJECT - SS_ASSIGN", SS_null);                       \
-     SS_MARK(x);                                                             \
-     SS_GC(obj);                                                             \
-     obj = x;}
+     SS_MARK(_x);                                                            \
+     SS_gc(_o);                                                              \
+     _o = _x;}
 
 #else
 
-#define SS_Assign(obj, val)                                                  \
-    {object *x;                                                              \
-     x = val;                                                                \
-     SS_MARK(x);                                                             \
-     SS_GC(obj);                                                             \
-     obj = x;}
+#define SS_Assign(_o, _v)                                                    \
+    {object *_x;                                                             \
+     _x = _v;                                                                \
+     SS_MARK(_x);                                                            \
+     SS_gc(_o);                                                              \
+     _o = _x;}
 
 #endif
 
@@ -729,7 +688,7 @@ extern void
 
 #  define SS_Save(_si, _o)                                                   \
    {if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
-       SS_error("FREED _OECT - SS_SAVE", SS_null);                           \
+       SS_error_n(_si, "FREED _OECT - SS_SAVE", SS_null);                    \
     (_si)->nsave++;                                                          \
     SS_MARK(_o);                                                             \
     SC_array_push((_si)->stack, &_o);}
@@ -762,16 +721,16 @@ extern void
 
 #  define SS_Restore(_si, _o)                                                \
    {(_si)->nrestore++;                                                       \
-    SS_GC(_o);                                                               \
+    SS_gc(_o);                                                               \
     _o = *(object **) SC_array_pop((_si)->stack);                            \
     if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
-       SS_error("FREED OBJECT - SS_RESTORE", SS_null);}                       
+       SS_error_n(_si, "FREED OBJECT - SS_RESTORE", SS_null);}
 
 # else
 
 #  define SS_Restore(_si, _o)                                                \
    {(_si)->nrestore++;                                                       \
-    SS_GC(_o);                                                               \
+    SS_gc(_o);                                                               \
     _o = *(object **) SC_array_pop((_si)->stack);}
 
 # endif
@@ -1149,6 +1108,7 @@ extern void
  SS_init_cont(SS_psides *si),
  SS_expand_stack(SS_psides *si),
  SS_push_err(SS_psides *si, int flag, int type),
+ SS_error_n(SS_psides *si, char *s, object *obj),
  SS_error(char *s, object *obj);
 
 

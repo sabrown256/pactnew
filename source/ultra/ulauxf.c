@@ -38,7 +38,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
             0);
 
     if ((jr < 0) || (ji < 0))
-       SS_error("BAD CURVES - _UL_FFT", argl);
+       SS_error_n(si, "BAD CURVES - _UL_FFT", argl);
 
     crvr = &SX_dataset[jr];
     crvi = &SX_dataset[ji];
@@ -108,11 +108,11 @@ object *UL_fft(SS_psides *si, int j)
     n = PM_fft_sc_real_data(&cy, &x, crv->x[0], crv->x[1], crv->n,
                             xmn, xmx, _SX.fft_order);
     if (n == 0)
-       SS_error("FFT FAILED - UL_FFT", SS_null);
+       SS_error_n(si, "FFT FAILED - UL_FFT", SS_null);
 
     y = CMAKE_N(double, n);
     if (y == NULL)
-       SS_error("INSUFFICIENT MEMORY - UL_FFT", SS_null);
+       SS_error_n(si, "INSUFFICIENT MEMORY - UL_FFT", SS_null);
 
 /* extract the real part */
     for (i = 0; i < n; i++)
@@ -216,7 +216,7 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
             0);
 
     if ((jg < 0) || (jh < 0))
-       SS_error("BAD CURVES - _ULI_CONVLV", argl);
+       SS_error_n(si, "BAD CURVES - _ULI_CONVLV", argl);
 
     crvg = &SX_dataset[jg];
     crvh = &SX_dataset[jh];
@@ -305,7 +305,7 @@ object *UL_curve_eval(SS_psides *si, object *arg)
     s = SS_GET(procedure, si->fun)->name;
     i = SX_get_data_index(s);
     if (i < 0)
-       SS_error("CURVE DELETED, NO PROCEDURE - CURVE-EVAL", si->fun);
+       SS_error_n(si, "CURVE DELETED, NO PROCEDURE - CURVE-EVAL", si->fun);
 
     if (SS_integerp(arg))
        value = (double) *SS_GET(int64_t, arg);
@@ -321,7 +321,7 @@ object *UL_curve_eval(SS_psides *si, object *arg)
     if (SS_true(ret))
        {SX_prep_ret(ret);}
     else
-       SS_error("ARGUMENT OUT OF DOMAIN - CURVE-EVAL", arg);
+       SS_error_n(si, "ARGUMENT OUT OF DOMAIN - CURVE-EVAL", arg);
 
     return(ret);}
 
@@ -417,7 +417,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
        order = SS_INTEGER_VALUE(tok);
 
     else
-       SS_error("FIT POWER MUST BE INTEGER - _ULI_FIT", tok);
+       SS_error_n(si, "FIT POWER MUST BE INTEGER - _ULI_FIT", tok);
 
     aord = abs(order) + 1;
     j    = SX_get_crv_index_i(obj);
@@ -486,7 +486,7 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
             0);
 
     if (j < 0)
-       SS_error("BAD CURVE - _ULI_FIT_CURVE", argl);
+       SS_error_n(si, "BAD CURVE - _ULI_FIT_CURVE", argl);
     n = SX_dataset[j].n;
 
     argl  = SS_cdr(argl);
@@ -972,7 +972,7 @@ static object *_ULI_crv_label(SS_psides *si, object *obj)
     object *o;
 
     if (!SX_curvep_a(obj))
-       SS_error("BAD CURVE - _ULI_CRV_LABEL", obj);
+       SS_error_n(si, "BAD CURVE - _ULI_CRV_LABEL", obj);
 
     o = SS_null;
     i = SX_get_crv_index_i(obj);

@@ -184,7 +184,7 @@ static object *_SXI_package_name(SS_psides *si, object *obj)
     if (SX_PACKAGEP(obj))
        rv = SS_mk_string(si, PACKAGE_NAME(obj));
     else
-       SS_error("BAD PACKAGE - _SXI_PACKAGE_NAME", obj);
+       SS_error_n(si, "BAD PACKAGE - _SXI_PACKAGE_NAME", obj);
 
     return(rv);}
 
@@ -638,7 +638,7 @@ static object *_SXI_rd_restart(SS_psides *si, object *argl)
             0);
 
     if (name == NULL)
-       SS_error("BAD FILE NAME - _SXI_RD_RESTART", argl);
+       SS_error_n(si, "BAD FILE NAME - _SXI_RD_RESTART", argl);
 
     PA_rd_restart(name, convs);
 
@@ -665,7 +665,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
             {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
              if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
-                SS_error("CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
+                SS_error_n(si, "CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame
  * not the best place but si->env won't last through most expression
@@ -702,7 +702,7 @@ static object *_SXI_intern_packages(SS_psides *si)
             {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
              if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
-                SS_error("CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
+                SS_error_n(si, "CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame
  * not the best place but si->env won't last through most expression
@@ -885,7 +885,7 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
 /* if no other arguments, read the variable */
     pp = PA_INQUIRE_VARIABLE(name);
     if (pp == NULL)
-       SS_error("VARIABLE NOT FOUND - _SXI_DB_NUMERIC_DATA", obj);
+       SS_error_n(si, "VARIABLE NOT FOUND - _SXI_DB_NUMERIC_DATA", obj);
 
     else
        {PA_CONNECT(pd, name, FALSE);

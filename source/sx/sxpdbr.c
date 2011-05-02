@@ -169,7 +169,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     pa = _PD_get_state(-1);
 
     if (!SS_consp(argl))
-       SS_error("BAD ARGUMENT LIST - _SXI_READ_NUMERIC_DATA", argl);
+       SS_error_n(si, "BAD ARGUMENT LIST - _SXI_READ_NUMERIC_DATA", argl);
 
 /* see if the first object is a pdbfile, if so use it */
     argl = SX_get_pdbfile(argl, &file, &po);
@@ -197,7 +197,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     name_obj = SS_null;
     switch (SETJMP(pa->read_err))
        {case ABORT :
-             SS_error(PD_err, name_obj);
+             SS_error_n(si, PD_err, name_obj);
         default :
              memset(PD_err, 0, MAXLINE);
 	     cp = _SX_rd_data(file, name, ep, &addr, name_obj);

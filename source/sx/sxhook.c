@@ -99,13 +99,13 @@ void _SX_ins_mem(defstr *dp, char *member, int imem, PDBfile *file)
  *                      - add scheme types into a hash table.
  */
 
-void _SX_init_hash_objects(PDBfile *file)
+void _SX_init_hash_objects(SS_psides *si, PDBfile *file)
    {
 
 /* hash table types */
     PD_def_attr_str(file);
 
-    SS_DEFINE_OBJECT;
+    SS_DEFINE_OBJECT(si);
 
 /* PML types */
     PD_def_mapping(file);

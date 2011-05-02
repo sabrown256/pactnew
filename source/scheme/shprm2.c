@@ -12,7 +12,7 @@
 
 typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
 
-#define SS_GET_OPERAND(_oper, _arg, _typ)                                    \
+#define SS_GET_OPERAND(_si, _oper, _arg, _typ)                               \
     {int _ityp;                                                              \
      object *_num;                                                           \
      _oper = 0;                                                              \
@@ -25,7 +25,7 @@ typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
         {_oper = SS_FLOAT_VALUE(_num);                                       \
          _typ  = SC_FLOAT_I;}                                                \
      else                                                                    \
-        SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", _num);}
+        SS_error_n(_si, "ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", _num);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -73,7 +73,7 @@ object *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl)
     object *x, *rv;
 
     if (SS_nullobjp(argl))
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_FLT", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - SS_UNARY_FLT", argl);
 
     x  = SS_car(argl);
     id = SC_arrtype(x, -1);
@@ -107,7 +107,7 @@ object *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl)
 	rv = SS_mk_quaternion(si, y);}
 
     else
-       SS_error("ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);
+       SS_error_n(si, "ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", x);
 
     return(rv);}
 
@@ -126,10 +126,10 @@ object *SS_unary_fix(SS_psides *si, C_procedure *cp, object *argl)
     operand = 0.0;
 
     if (SS_nullobjp(argl))
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_FIX", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - SS_UNARY_FIX", argl);
 
     fnc = (PFDoubled) cp->proc[0];
-    SS_GET_OPERAND(operand, argl, type);
+    SS_GET_OPERAND(si, operand, argl, type);
 
     SC_ASSERT(type != 0);
 
@@ -152,10 +152,10 @@ static object *SS_unary_bit(SS_psides *si, C_procedure *cp, object *argl)
     operand = 0.0;
 
     if (SS_nullobjp(argl))
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_UNARY_BIT", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - SS_UNARY_BIT", argl);
 
     fnc = (PFInt64I) cp->proc[0];
-    SS_GET_OPERAND(operand, argl, type);
+    SS_GET_OPERAND(si, operand, argl, type);
 
     SC_ASSERT(type != 0);
 
@@ -174,7 +174,7 @@ static object *_SS_binary_opr(SS_psides *si, C_procedure *cp, object *argl)
     object *rv;
 
     if (SS_length(argl) != 2)
-       SS_error("WRONG NUMBER OF ARGUMENTS - _SS_BINARY_OPR", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - _SS_BINARY_OPR", argl);
 
     fnc = (PFBINOBJ) cp->proc[0];
 
@@ -193,14 +193,14 @@ object *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl)
     object *x1, *x2, *rv;
 
     if (SS_length(argl) != 2)
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_BINARY_FIX", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - SS_BINARY_FIX", argl);
 
     fnc = (PFInt64II) cp->proc[0];
     x1  = SS_car(argl);
     x2  = SS_cadr(argl);
 
     if (!SS_integerp(x1) || !SS_integerp(x2))
-       SS_error("ARGUMENTS NOT BOTH INTEGERS - SS_BINARY_FIX",
+       SS_error_n(si, "ARGUMENTS NOT BOTH INTEGERS - SS_BINARY_FIX",
                 SS_mk_cons(si, x1, x2));
 
     i1 = SS_INTEGER_VALUE(x1);
@@ -371,7 +371,7 @@ object *SS_binary_homogeneous(SS_psides *si, C_procedure *cp, object *argl)
 
     ido = _SS_max_numeric_type(argl, &ni);
     if (ido == -1)
-       SS_error("NON-NUMERIC OPERAND - SS_BINARY_HOMOGENEOUS", argl);
+       SS_error_n(si, "NON-NUMERIC OPERAND - SS_BINARY_HOMOGENEOUS", argl);
 
 /* fixed point operands */
     else if (SC_is_type_fix(ido) == TRUE)
@@ -408,7 +408,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
 
     ido = _SS_max_numeric_type(argl, &ni);
     if (ido == -1)
-       SS_error("NON-NUMERIC OPERAND - SS_BINARY_HETEROGENEOUS", argl);
+       SS_error_n(si, "NON-NUMERIC OPERAND - SS_BINARY_HETEROGENEOUS", argl);
 
 /* fixed point and floating point operands */
     else if ((SC_is_type_fix(ido) == TRUE) || (SC_is_type_fp(ido) == TRUE))
@@ -479,10 +479,10 @@ object *SS_un_comp(SS_psides *si, C_procedure *cp, object *argl)
     operand = 0.0;
 
     if (SS_nullobjp(argl))
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_UN_COMP", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - SS_UN_COMP", argl);
 
     fnc = (PFIntd) cp->proc[0];
-    SS_GET_OPERAND(operand, argl, type);
+    SS_GET_OPERAND(si, operand, argl, type);
 
     SC_ASSERT(type != 0);
 
@@ -506,11 +506,11 @@ object *SS_bin_comp(SS_psides *si, C_procedure *cp, object *argl)
     c2 = 0.0;
 
     if (SS_length(argl) != 2)
-       SS_error("WRONG NUMBER OF ARGUMENTS - SS_BIN_COMP", argl);
+       SS_error_n(si, "WRONG NUMBER OF ARGUMENTS - SS_BIN_COMP", argl);
 
     fnc = (PFIntdd) cp->proc[0];
-    SS_GET_OPERAND(c1, argl, type);
-    SS_GET_OPERAND(c2, argl, type);
+    SS_GET_OPERAND(si, c1, argl, type);
+    SS_GET_OPERAND(si, c2, argl, type);
 
     SC_ASSERT(type != 0);
 
@@ -614,14 +614,14 @@ static object *_SS_xor_pow(SS_psides *si, object *argl)
     rv = SS_null;
 
     if (si->strict_c == TRUE)
-       {SS_GET_OPERAND(i1, argl, type);
-	SS_GET_OPERAND(i2, argl, type);
+       {SS_GET_OPERAND(si, i1, argl, type);
+	SS_GET_OPERAND(si, i2, argl, type);
 	iv = PM_lxor(i1, i2);
 	rv = SS_mk_integer(si, iv);}
 
     else
-       {SS_GET_OPERAND(d1, argl, type);
-	SS_GET_OPERAND(d2, argl, type);
+       {SS_GET_OPERAND(si, d1, argl, type);
+	SS_GET_OPERAND(si, d2, argl, type);
 	dv = pow(d1, d2);
 	rv = SS_mk_float(si, dv);};
 

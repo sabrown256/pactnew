@@ -70,7 +70,7 @@ void _SS_Restore(SS_psides *si, object **po)
     o = *po;
 
     si->nrestore++;
-    SS_GC(o);
+    SS_gc(o);
 
     *po = *(object **) SC_array_pop(si->stack);
 
@@ -100,7 +100,7 @@ void _SS_eval(SS_psides *si)
 eval_disp:
     switch (si->exn->eval_type)
        {case NO_EV :
-             SS_error("ILLEGAL EVALUATION TYPE", si->exn);
+             SS_error_n(si, "ILLEGAL EVALUATION TYPE", si->exn);
 
 	case SELF_EV :
 	     SS_jump(self_ev);
@@ -146,7 +146,7 @@ ev_args:
     SS_Restore(si, si->unev);
     SS_Assign(si->fun, si->val);
     if (!SS_procedurep(si->fun))
-       SS_error("ILLEGAL PROCEDURE OBJECT", si->fun);
+       SS_error_n(si, "ILLEGAL PROCEDURE OBJECT", si->fun);
 
     pf  = SS_GET(procedure, si->fun);
     pty = pf->type;
@@ -200,7 +200,7 @@ ev_args:
 	     SS_jump(ev_cond);
 
         default :
-	     SS_error("BAD PROCEDURE TYPE", si->fun);};
+	     SS_error_n(si, "BAD PROCEDURE TYPE", si->fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -212,7 +212,7 @@ ev_set:
     SS_Assign(si->unev, SS_car(si->unev));
 
     if (!SS_variablep(si->unev))
-       SS_error("CAN'T SET NON-VARIABLE OBJECT - SET", si->unev);
+       SS_error_n(si, "CAN'T SET NON-VARIABLE OBJECT - SET", si->unev);
 
     SS_Save(si, si->unev);
     SS_Save(si, si->env);
@@ -267,7 +267,7 @@ ev_def:
         SS_Restore(si, si->unev);}
 
     else
-       SS_error("CAN'T DEFINE NON-VARIABLE OBJECT - DEFINE", si->unev);
+       SS_error_n(si, "CAN'T DEFINE NON-VARIABLE OBJECT - DEFINE", si->unev);
 
     SS_def_var(si, si->unev, si->val, si->env);
     SS_Assign(si->val, si->unev);
@@ -381,8 +381,8 @@ apply_dis:
 	     SS_jump(pr_apply);
 
         default :
-	     SS_error("UNKNOWN PROCEDURE TYPE - APPLY-DISP",
-		      si->fun);};
+	     SS_error_n(si, "UNKNOWN PROCEDURE TYPE - APPLY-DISP",
+			si->fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -424,7 +424,7 @@ macro_ee:
  	     snprintf(msg, MAXLINE,
 		      "UNKNOWN PROCEDURE TYPE %d (%c) - MACRO_EE",
 		     pty, pty);
-	     SS_error(msg, si->fun);};
+	     SS_error_n(si, msg, si->fun);};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -479,7 +479,7 @@ pr_throw:
     if (SS_ESCAPE_TYPE(si->fun) == SS_PROCEDURE_I)
        _SS_restore_state(si, si->fun);
     else
-       {SS_GC(si->fun);};
+       {SS_gc(si->fun);};
 
 /* assign the return value */
     SS_Assign(si->val, SS_car(si->argl));
@@ -599,7 +599,7 @@ evc_dec:
 
 ev_if:
     if (SS_nullobjp(si->unev))
-       SS_error("BAD IF FORM", si->unev);
+       SS_error_n(si, "BAD IF FORM", si->unev);
 
     SS_Assign(si->exn, SS_car(si->unev));
     SS_Assign(si->unev, SS_cdr(si->unev));

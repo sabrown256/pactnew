@@ -107,7 +107,7 @@ static object *_SXI_toggle_log(SS_psides *si, object *argl)
     if ((_SX.fname != NULL) && (*_SX.fname != '\0'))
        {SX_command_log = io_open(_SX.fname, "a");
         if (SX_command_log == NULL)
-           SS_error("CANNOT OPEN LOG FILE - _SXI_TOGGLE_LOG", SS_null);
+           SS_error_n(si, "CANNOT OPEN LOG FILE - _SXI_TOGGLE_LOG", SS_null);
         else
            SC_setbuf(SX_command_log, NULL);};
 
@@ -137,7 +137,7 @@ static object *_SXI_get_dimension(SS_psides *si, object *obj)
     else if (SX_MAPPINGP(obj))
        f = SS_GET(PM_mapping, obj);
     else
-       SS_error("BAD MAPPING - _SXI_GET_DIMENSION", obj);
+       SS_error_n(si, "BAD MAPPING - _SXI_GET_DIMENSION", obj);
 
     if (f != NULL)
        {set = f->domain;
@@ -168,7 +168,7 @@ static object *_SXI_get_domain(SS_psides *si, object *arg)
     else if (SX_SETP(arg))
        set = SS_GET(PM_set, arg);
     else
-       SS_error("BAD SET - _SXI_GET_DOMAIN", arg);
+       SS_error_n(si, "BAD SET - _SXI_GET_DOMAIN", arg);
 
     rv = SX_mk_set(si, set);
 
@@ -190,7 +190,7 @@ static object *_SXI_get_range(SS_psides *si, object *arg)
 
     rv = NULL;
     if (f == NULL)
-       SS_error("BAD MAPPING - _SXI_GET_RANGE", arg);
+       SS_error_n(si, "BAD MAPPING - _SXI_GET_RANGE", arg);
 
     else
        rv = SX_mk_set(si, f->range);
@@ -209,7 +209,7 @@ static object *_SXI_get_mapping_name(SS_psides *si, object *arg)
     object *rv;
 
     if (!SX_MAPPINGP(arg))
-       SS_error("BAD MAPPING - _SXI_GET_RANGE", arg);
+       SS_error_n(si, "BAD MAPPING - _SXI_GET_RANGE", arg);
 
     name = MAPPING_NAME(arg);
     rv   = SS_mk_string(si, name);
@@ -230,7 +230,7 @@ static object *_SXI_set_volume(SS_psides *si, object *arg)
     object *o;
 
     if (!SX_SETP(arg))
-       SS_error("BAD SET - _SXI_SET_VOLUME", arg);
+       SS_error_n(si, "BAD SET - _SXI_SET_VOLUME", arg);
 
     set = SS_GET(PM_set, arg);
     
@@ -292,7 +292,7 @@ static object *_SXI_shift_domain(SS_psides *si, object *argl)
                                "BAD FLOATING POINT VALUE - _SXI_SHIFT_DOMAIN");}
 
     else
-       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SHIFT_DOMAIN", argl);
+       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SHIFT_DOMAIN", argl);
 
     _SX_shift_set(set, val);
 
@@ -322,7 +322,7 @@ static object *_SXI_shift_range(SS_psides *si, object *argl)
                                "BAD FLOATING POINT VALUE - _SXI_SHIFT_RANGE");}
 
     else
-       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SHIFT_RANGE", argl);
+       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SHIFT_RANGE", argl);
 
     _SX_shift_set(set, val);
 
@@ -373,7 +373,7 @@ static object *_SXI_scale_domain(SS_psides *si, object *argl)
        {SX_GET_FLOAT_FROM_LIST(val, argl,
                                "BAD FLOATING POINT VALUE - _SXI_SCALE_DOMAIN");}
     else
-       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SCALE_DOMAIN", argl);
+       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SCALE_DOMAIN", argl);
 
     _SX_scale_set(set, val);
 
@@ -403,7 +403,7 @@ static object *_SXI_scale_range(SS_psides *si, object *argl)
                                "BAD FLOATING POINT VALUE - _SXI_SCALE_RANGE");}
 
     else
-       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SCALE_RANGE", argl);
+       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SCALE_RANGE", argl);
 
     _SX_scale_set(set, val);
 
@@ -813,7 +813,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
         if (obj == NULL)
            {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - _SXI_SMOOTH",
 			      SX_smooth_method);
-	    SS_error(bf, SS_null);};
+	    SS_error_n(si, bf, SS_null);};
 
         SS_args(SS_lk_var_val(si, obj),
                 G_NUM_ARRAY, &arr,
@@ -822,7 +822,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
         if (arr == NULL)
            {bf = SC_dsnprintf(FALSE, "%s IS NOT A FILTER - _SXI_SMOOTH",
 			      SX_smooth_method);
-	    SS_error(bf, SS_null);};
+	    SS_error_n(si, bf, SS_null);};
 
 	SX_filter_coeff(x[1], n, arr, ntimes);};
 

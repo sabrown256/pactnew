@@ -422,7 +422,7 @@ object *SS_do_bindings(SS_psides *si, object *pp, object *argp)
    {object *params, *penv, *nenv, *name;
 
     if (!SS_procedurep(pp))
-       SS_error("BAD PROCEDURE TO DO-BINDINGS", pp);
+       SS_error_n(si, "BAD PROCEDURE TO DO-BINDINGS", pp);
 
     name   = SS_proc_name(pp);
     params = SS_params(pp);
@@ -605,11 +605,11 @@ void SS_set_var(SS_psides *si, object *vr, object *vl, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_GC(b);
+       {SS_gc(b);
 	SS_add_to_frame(si, under, vl, tab);}
 
     else
-       SS_error("UNBOUND VARIABLE - SS_SET_VAR", vr);
+       SS_error_n(si, "UNBOUND VARIABLE - SS_SET_VAR", vr);
 
     return;}
 
@@ -629,7 +629,7 @@ void _SS_rem_varc(SS_psides *si, char *name, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_GC(b);
+       {SS_gc(b);
 	SC_hasharr_remove(tab, under);};
 
     return;}
@@ -649,7 +649,7 @@ static void _SS_def_varc(SS_psides *si, char *name, object *vl, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_GC(b);
+       {SS_gc(b);
 	SS_add_to_frame(si, under, vl, tab);}
 
     else
@@ -739,10 +739,10 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
 
 /* if there is no variable complain */
     if (obj == NULL)
-       SS_error("UNBOUND VARIABLE - SS_LK_VAR_VAL", vr);
+       SS_error_n(si, "UNBOUND VARIABLE - SS_LK_VAR_VAL", vr);
 
     else if ((obj->val == NULL) || (obj->eval_type == NO_EV))
-       SS_error("FREED OBJECT - SS_LK_VAR_VAL", SS_null);
+       SS_error_n(si, "FREED OBJECT - SS_LK_VAR_VAL", SS_null);
 
     return(obj);}
 

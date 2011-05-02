@@ -28,12 +28,12 @@ object *SX_print(SS_psides *si, object *argl)
        str = si->outdev;
 
     if (!SS_outportp(str))
-       SS_error("BAD PORT - PRINT", str);
+       SS_error_n(si, "BAD PORT - PRINT", str);
     stream = SS_OUTSTREAM(str);
 
     format = SS_car(argl);
     if (!SS_stringp(format))
-       SS_error("BAD FORMAT - PRINT", format);
+       SS_error_n(si, "BAD FORMAT - PRINT", format);
     strcpy(forms, SS_STRING_TEXT(format));
     fmt = forms;
 
@@ -91,8 +91,8 @@ object *SX_print(SS_psides *si, object *argl)
             case 'd' :
             case 'u' :
 	         if (!SS_integerp(obj))
-		    SS_error("NON-INTEGER FOR INTEGER FIELD - PRINT",
-			     obj);
+		    SS_error_n(si, "NON-INTEGER FOR INTEGER FIELD - PRINT",
+			       obj);
 		 PRINT(stream, local, SS_INTEGER_VALUE(obj));
 		 break;
 
@@ -102,8 +102,8 @@ object *SX_print(SS_psides *si, object *argl)
             case 'g' : 
             case 'G' :
 	         if (!SS_floatp(obj))
-		    SS_error("NON-FLOAT FOR REAL FIELD - PRINT",
-			     obj);
+		    SS_error_n(si, "NON-FLOAT FOR REAL FIELD - PRINT",
+			       obj);
 		 PRINT(stream, local, SS_FLOAT_VALUE(obj));
 		 break;
             case '%' :

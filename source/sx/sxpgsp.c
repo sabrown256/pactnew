@@ -88,7 +88,7 @@ static object *_SXI_axis(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_AXIS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_AXIS", SS_null);
 
     PG_axis(dev, type);
 
@@ -108,7 +108,7 @@ static object *_SXI_clear_window(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_CLEAR_WINDOW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_CLEAR_WINDOW", SS_null);
 
     PG_clear_window(dev);
 
@@ -128,7 +128,7 @@ static object *_SXI_clear_viewport(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_CLEAR_VIEWPORT", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_CLEAR_VIEWPORT", SS_null);
 
     PG_clear_viewport(dev);
 
@@ -152,7 +152,7 @@ static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_CLR_MODE", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SET_CLR_MODE", SS_null);
 
     PG_set_clear_mode(mode);
 
@@ -176,7 +176,7 @@ static object *_SXI_clr_mode(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_CLR_MODE", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_CLR_MODE", SS_null);
 
     PG_get_clear_mode(mode);
 
@@ -209,7 +209,7 @@ static object *_SXI_clear_region(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_CLEAR_REGION", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_CLEAR_REGION", SS_null);
 
     n = SS_length(argl);
     nd = (n - 2) >> 1;
@@ -241,7 +241,7 @@ static object *_SXI_center_label(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_CENTER_LABEL", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_CENTER_LABEL", SS_null);
 
     PG_center_label(dev, sy, label);
 
@@ -323,7 +323,7 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRW_MRK", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRW_MRK", SS_null);
 
     ns = SS_length(x[0]);
 
@@ -358,7 +358,7 @@ static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_MRK_ORNT", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_MRK_ORNT", SS_null);
 
     PG_get_marker_orientation(dev, theta);
 
@@ -382,7 +382,7 @@ static object *_SXI_mrk_scal(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_MRK_SCAL", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_MRK_SCAL", SS_null);
 
     PG_get_marker_scale(dev, scale);
 
@@ -408,7 +408,7 @@ static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_MRK_ORNT", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SET_MRK_ORNT", SS_null);
 
     PG_set_marker_orientation(dev, theta);
 
@@ -434,7 +434,7 @@ static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_MRK_SCAL", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SET_MRK_SCAL", SS_null);
 
     PG_set_marker_scale(dev, scale);
 
@@ -508,7 +508,7 @@ static object *_SXI_draw_arc(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_ARC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_ARC", SS_null);
 
     if (unit == 1)
        unit = DEGREE;
@@ -554,7 +554,7 @@ static object *_SXI_draw_axis(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_AXIS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_AXIS", SS_null);
 
     PG_draw_axis_n(dev, xl, xr, tn, vw,
 		   sc, fmt, tt, lt, FALSE,
@@ -594,7 +594,7 @@ static object *_SXI_draw_box(SS_psides *si, object *argl)
     nd = n >> 1;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_BOX", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_BOX", SS_null);
 
     PG_set_line_color(dev, dev->line_color);
     PG_draw_box_n(dev, nd, cs, bx);
@@ -624,7 +624,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DDP2", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_DDP2", SS_car(argl));
 
     argl = SS_cddr(SS_cddr(argl));
     if (nd == 2)
@@ -672,7 +672,7 @@ static object *_SXI_draw_line(SS_psides *si, object *argl)
 	SC_SWAP_VALUE(double, x2[1], x2[0]);};
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_LINE", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_LINE", SS_null);
 
     PG_set_line_color(dev, dev->line_color);
     PG_draw_line_n(dev, nd, WORLDC, x1, x2, dev->clipping);
@@ -709,7 +709,7 @@ static object *_SXI_draw_palette(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_PALETTE", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_PALETTE", SS_null);
 
     PG_draw_palette_n(dev, dbx, rbx, w, ex);
 
@@ -740,7 +740,7 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_POLYLINE", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_POLYLINE", SS_car(argl));
 
     argl = SS_cddr(SS_cddr(argl));
     o    = SS_car(argl);
@@ -787,7 +787,7 @@ static object *_SXI_draw_rad(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_RAD", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_RAD", SS_null);
 
     PG_set_line_color(dev, dev->line_color);
     PG_draw_rad(dev, rn, rx, a, x, y, unit);
@@ -821,7 +821,7 @@ static object *_SXI_draw_text(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_DRAW_TEXT_WC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_DRAW_TEXT_WC", SS_null);
 
     PG_set_text_color(dev, dev->text_color);
     PG_write_n(dev, nd, cs, p, "%s", txt);
@@ -850,7 +850,7 @@ static object *_SXI_fply(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_FPLY", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_FPLY", SS_car(argl));
 
     argl = SS_cddr(argl);
     o    = SS_car(argl);
@@ -881,7 +881,7 @@ static object *_SXI_finish_plot(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_FINISH_PLOT", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_FINISH_PLOT", SS_null);
 
     PG_finish_plot(dev);
 
@@ -903,7 +903,7 @@ static object *_SXI_gcpw(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GCPW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GCPW", SS_null);
 
     PG_get_char_path(dev, &x1, &y1);
 
@@ -929,7 +929,7 @@ static object *_SXI_gcss(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GCSS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GCSS", SS_null);
 
     PG_get_char_size_n(dev, 2, NORMC, x);
 
@@ -955,7 +955,7 @@ static object *_SXI_gcuw(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GCUW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GCUW", SS_null);
 
     PG_get_char_up(dev, &x1, &y1);
 
@@ -981,7 +981,7 @@ static object *_SXI_gclp(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GCLP", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GCLP", SS_null);
 
     PG_get_clipping(dev, &clp);
 
@@ -1005,7 +1005,7 @@ static object *_SXI_gfin(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GFIN", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GFIN", SS_null);
 
     PG_get_finish_state(dev, fl);
 
@@ -1029,7 +1029,7 @@ static object *_SXI_glnc(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GLNC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GLNC", SS_null);
 
     PG_get_line_color(dev, &c);
 
@@ -1053,7 +1053,7 @@ static object *_SXI_glop(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GLOP", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GLOP", SS_null);
 
     PG_get_logical_op(dev, &lop);
 
@@ -1077,7 +1077,7 @@ static object *_SXI_glns(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GLNS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GLNS", SS_null);
 
     PG_get_line_style(dev, &s);
 
@@ -1101,7 +1101,7 @@ static object *_SXI_glnw(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GLNW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GLNW", SS_null);
 
     PG_get_line_width(dev, &w);
 
@@ -1125,7 +1125,7 @@ static object *_SXI_gmxi(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GMXI", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GMXI", SS_null);
 
     PG_get_max_intensity(dev, i);
     PG_get_max_red_intensity(dev, r);
@@ -1164,7 +1164,7 @@ static object *_SXI_gtew(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GTEW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GTEW", SS_null);
 
     PG_get_text_ext_n(dev, nd, cs, s, x);
 
@@ -1193,7 +1193,7 @@ static object *_SXI_gtxc(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GTXC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GTXC", SS_null);
 
     PG_get_text_color(dev, &c);
 
@@ -1218,7 +1218,7 @@ static object *_SXI_gtxf(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GTXF", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GTXF", SS_null);
 
     PG_get_font(dev, &face, &style, &size);
 
@@ -1248,7 +1248,7 @@ static object *_SXI_get_viewport(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GET_VIEWPORT", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GET_VIEWPORT", SS_null);
 
     PG_get_viewspace(dev, NORMC, ndc);
 
@@ -1276,7 +1276,7 @@ static object *_SXI_get_frame(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GET_FRAME", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GET_FRAME", SS_null);
 
     PG_get_viewspace(dev, FRAMEC, frm);
 
@@ -1304,7 +1304,7 @@ static object *_SXI_get_window(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GET_WINDOW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_GET_WINDOW", SS_null);
 
     PG_get_viewspace(dev, WORLDC, wc);
 
@@ -1330,7 +1330,7 @@ static object *_SXI_mdvc(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_MDVC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_MDVC", SS_null);
 
     PG_make_device_current(dev);
 
@@ -1356,7 +1356,7 @@ static object *_SXI_ptos(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_PTOS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_PTOS", SS_null);
 
     else
        PG_trans_point(dev, 2, PIXELC, x, NORMC, x);
@@ -1383,7 +1383,7 @@ static object *_SXI_qdev(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_QDEV", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_QDEV", SS_null);
 
     PG_query_device(dev, &dx, &dy, &nc);
 
@@ -1410,7 +1410,7 @@ static object *_SXI_qwin(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_QWIN", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_QWIN", SS_null);
 
     PG_query_device(dev, &dx, &dy, &nc);
 
@@ -1434,7 +1434,7 @@ static object *_SXI_rdvc(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_RDVC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_RDVC", SS_null);
 
     PG_release_current_device(dev);
 
@@ -1457,7 +1457,7 @@ static object *_SXI_sadm(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SADM", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SADM", SS_null);
 
     PG_turn_autodomain(dev, c);
 
@@ -1480,7 +1480,7 @@ static object *_SXI_sapl(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SAPL", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SAPL", SS_null);
 
     PG_turn_autoplot(dev, c);
 
@@ -1503,7 +1503,7 @@ static object *_SXI_sarn(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SARN", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SARN", SS_null);
 
     PG_turn_autorange(dev, c);
 
@@ -1526,7 +1526,7 @@ static object *_SXI_sbwd(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SBWD", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SBWD", SS_null);
 
     PG_set_border_width(dev, c);
 
@@ -1550,7 +1550,7 @@ static object *_SXI_scpw(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SCPW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SCPW", SS_null);
 
     PG_set_char_path(dev, x1, y1);
 
@@ -1574,7 +1574,7 @@ static object *_SXI_scuw(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SCUW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SCUW", SS_null);
 
     PG_set_char_path(dev, x1, y1);
 
@@ -1597,7 +1597,7 @@ static object *_SXI_sclp(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SCLP", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SCLP", SS_null);
 
     PG_set_clipping(dev, c);
 
@@ -1620,7 +1620,7 @@ static object *_SXI_sdti(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SDTI", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SDTI", SS_null);
 
     PG_turn_data_id(dev, c);
 
@@ -1643,7 +1643,7 @@ static object *_SXI_sfic(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SFIC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SFIC", SS_null);
 
     PG_set_fill_color(dev, c);
 
@@ -1666,7 +1666,7 @@ static object *_SXI_sfin(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SFIN", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SFIN", SS_null);
 
     PG_set_finish_state(dev, c);
 
@@ -1689,7 +1689,7 @@ static object *_SXI_sgrd(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SGRD", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SGRD", SS_null);
 
     PG_turn_grid(dev, c);
 
@@ -1712,7 +1712,7 @@ static object *_SXI_slnc(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SLNC", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SLNC", SS_null);
 
     PG_set_line_color(dev, c);
 
@@ -1735,7 +1735,7 @@ static object *_SXI_slop(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SLOP", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SLOP", SS_null);
 
     PG_set_logical_op(dev, lop);
 
@@ -1758,7 +1758,7 @@ static object *_SXI_slns(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SLNS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SLNS", SS_null);
 
     PG_set_line_style(dev, s);
 
@@ -1781,7 +1781,7 @@ static object *_SXI_slnw(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SLNW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SLNW", SS_null);
 
     PG_set_line_width(dev, w);
 
@@ -1807,7 +1807,7 @@ static object *_SXI_smxi(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SMXI", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_SMXI", SS_car(argl));
 
     i = max(0.0, i);
     i = min(1.0, i);
@@ -1845,7 +1845,7 @@ static object *_SXI_spal(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SPAL", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SPAL", SS_null);
 
     if (!SX_OK_TO_DRAW(dev))
        o = SS_f;
@@ -1999,7 +1999,7 @@ static object *_SXI_set_viewport(SS_psides *si, object *argl)
     nd = n >> 1;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_VIEWPORT", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SET_VIEWPORT", SS_null);
 
     PG_set_viewspace(dev, nd, NORMC, ndc);
 
@@ -2032,7 +2032,7 @@ static object *_SXI_set_frame(SS_psides *si, object *argl)
     nd = n >> 1;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_FRAME", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SET_FRAME", SS_null);
 
     PG_set_viewspace(dev, nd, FRAMEC, frm);
 
@@ -2065,7 +2065,7 @@ static object *_SXI_set_window(SS_psides *si, object *argl)
     nd = n >> 1;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SET_WINDOW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_SET_WINDOW", SS_null);
 
     PG_set_viewspace(dev, nd, WORLDC, wc);
 
@@ -2085,7 +2085,7 @@ static object *_SXI_update_vs(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_UPDATE_VS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_UPDATE_VS", SS_null);
 
     PG_update_vs(dev);
 
@@ -2112,7 +2112,7 @@ static object *_SXI_stop(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_STOP", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_STOP", SS_null);
 
     else
        PG_trans_point(dev, 2, NORMC, x, PIXELC, x);
@@ -2146,7 +2146,7 @@ static object *_SXI_stow(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_STOW", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_STOW", SS_null);
     else
        PG_trans_point(dev, 2, NORMC, x, WORLDC, x);
 
@@ -2176,7 +2176,7 @@ static object *_SXI_wtos(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_WTOS", SS_null);
+       SS_error_n(si, "BAD DEVICE - _SXI_WTOS", SS_null);
     else
        PG_trans_point(dev, 2, WORLDC, x, NORMC, x);
 
@@ -2230,7 +2230,7 @@ static object *_SXI_getva(SS_psides *si, object *argl)
     rv = SS_f;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GETVA", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_GETVA", SS_car(argl));
 
     else
        {PG_get_view_angle(dev, TRUE, &theta, &phi, &chi);
@@ -2260,7 +2260,7 @@ static object *_SXI_setla(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_SETLA", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_SETLA", SS_car(argl));
 
     else
        PG_set_light_angle(dev, theta, phi);
@@ -2285,7 +2285,7 @@ static object *_SXI_getla(SS_psides *si, object *argl)
     rv = SS_f;
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - _SXI_GETLA", SS_car(argl));
+       SS_error_n(si, "BAD DEVICE - _SXI_GETLA", SS_car(argl));
 
     else
        {PG_get_light_angle(dev, TRUE, &theta, &phi);
@@ -2359,7 +2359,7 @@ static object *_SXI_pal_list(SS_psides *si, object *argl)
 
     lst = SS_null;
     if (pal == NULL)
-       SS_error("NO SUCH PALETTE FOR DEVICE - _SXI_PAL_LIST", argl);
+       SS_error_n(si, "NO SUCH PALETTE FOR DEVICE - _SXI_PAL_LIST", argl);
 
     else
        {cm = pal->true_colormap;

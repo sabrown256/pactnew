@@ -52,7 +52,7 @@ static void _SS_fpe_handler(int sig)
     SC_signal(SIGFPE, _SS_fpe_handler);
 #endif
 
-    SS_error("FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
+    SS_error_n(si, "FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
 	     SS_mk_cons(si, si->fun, si->argl));
 
     return;}
@@ -657,7 +657,7 @@ static object *_SSI_synonym(SS_psides *si, object *argl)
 
     func = SS_exp_eval(si, SS_car(argl));
     if (!SS_procedurep(func))
-       SS_error("FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
+       SS_error_n(si, "FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
 
     for (argl = SS_cdr(argl); SS_consp(argl); argl = SS_cdr(argl))
         {synname = SS_get_string(SS_car(argl));
@@ -741,7 +741,7 @@ object *SS_pop_err(SS_psides *si, int n, int flag)
            {_SS_restore_state(si, x);
             break;}
         else
-           SS_GC(x);};
+           SS_gc(x);};
 
     SS_restore_registers(si, flag);
 
@@ -762,19 +762,22 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
 /* restore the stack */
     if (n < ns)
-       SS_error("CORRUPT STACK FRAME - _SS_RESTORE_STATE_PRIM", SS_null);
+       SS_error_n(si,
+		  "CORRUPT STACK FRAME - _SS_RESTORE_STATE_PRIM",
+		  SS_null);
 
     for (; n > ns; n--)
         {si->nrestore++;
 
          x = SC_array_pop(si->stack);
 
-         SS_GC(x);};
+         SS_gc(x);};
 
 /* restore the continuation stack */
     if (si->cont_ptr < nc)
-       SS_error("CORRUPT CONTINUATION FRAME - _SS_RESTORE_STATE_PRIM",
-                SS_null);
+       SS_error_n(si,
+		  "CORRUPT CONTINUATION FRAME - _SS_RESTORE_STATE_PRIM",
+		  SS_null);
 
     for (; si->cont_ptr > nc; si->cont_ptr--)
         {si->ngoc++;
@@ -782,12 +785,14 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
 /* restore the error stack */
     if (si->errlev < ne)
-       SS_error("CORRUPT ERROR FRAME - _SS_RESTORE_STATE_PRIM", SS_null);
+       SS_error_n(si,
+		  "CORRUPT ERROR FRAME - _SS_RESTORE_STATE_PRIM",
+		  SS_null);
 
     for (; si->errlev > ne; si->errlev--)
         {esc = si->err_stack[si->errlev-1];
          si->err_stack[si->errlev-1] = NULL;
-         SS_GC(esc);};
+         SS_gc(esc);};
 
     _SS_set_ans_prompt(si);
 
@@ -863,14 +868,14 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
     x    = SS_car(argl);
     argl = SS_cdr(argl);
     if (!SS_integerp(x))
-       SS_error("FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
+       SS_error_n(si, "FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
 
     n = (int) SS_INTEGER_VALUE(x);
     n = si->errlev - n;
     n = max(1, n);
 
     if (!SS_consp(argl))
-       SS_error("SECOND ARG MISSING - _SSI_RETLEV", x);
+       SS_error_n(si, "SECOND ARG MISSING - _SSI_RETLEV", x);
     val = SS_car(argl);    
 
     if (si->errlev > 1)
@@ -990,7 +995,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 
         case ERR_FREE :
 	     esc = SS_pop_err(si, si->errlev - 1, FALSE);
-	     SS_GC(esc);};
+	     SS_gc(esc);};
 
     si->cont_ptr--;
 
@@ -999,18 +1004,15 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_ERROR - signal an error
- *          - create a higher level REPL and push on
+/* SS_ERROR_N - signal an error
+ *            - create a higher level REPL and push on
  */
 
-void SS_error(char *s, object *obj)
+void SS_error_n(SS_psides *si, char *s, object *obj)
    {int nc;
     char *t;
     FILE *str;
     object *esc;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     t = CSTRSAVE(s);
 
@@ -1032,13 +1034,28 @@ void SS_error(char *s, object *obj)
 
     esc = SS_pop_err(si, si->errlev - 1, FALSE);
     nc  = SS_ESCAPE_CONTINUATION(esc);
-    SS_GC(esc);
+    SS_gc(esc);
 
     if (si->trap_error)
        LONGJMP(si->continue_int[nc].cont, ABORT);
 
     else
        LONGJMP(SC_gs.cpu, ABORT);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SS_ERROR - signal an error
+ *          - create a higher level REPL and push on
+ */
+
+void SS_error(char *s, object *obj)
+   {SS_psides *si;
+
+    si = &_SS_si;
+    SS_error_n(si, s, obj);
 
     return;}
 

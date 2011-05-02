@@ -52,7 +52,7 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 	     break;};};
 
     if (otyp == NULL)
-       SS_error("NO ARRAY - _SX_BINARY_ARR", argl);
+       SS_error_n(si, "NO ARRAY - _SX_BINARY_ARR", argl);
 
 /* accumulate the results */
     acc = NULL;
@@ -70,7 +70,7 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 
 	 acc = PM_accumulate_oper(proc, acc, operand, id, v);
 	 if (acc == NULL)
-	    SS_error("OBJECT DRIVEN FAILURE - _SX_BINARY_ARR", obj);};
+	    SS_error_n(si, "OBJECT DRIVEN FAILURE - _SX_BINARY_ARR", obj);};
 
     PM_conv_array(reta, acc, TRUE);
 
@@ -302,7 +302,8 @@ static double **_SX_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
  *                   - allocated in this routine
  */
 
-static double **_SX_extract_range(PM_mapping *dest, PM_mapping *source,
+static double **_SX_extract_range(SS_psides *si,
+				  PM_mapping *dest, PM_mapping *source,
 				  int wgtfl)
    {int i, id;
     int dne, snre, dnde;
@@ -336,7 +337,7 @@ static double **_SX_extract_range(PM_mapping *dest, PM_mapping *source,
 
 	 for (id = 0; id < dne; id++)
 	     {if (id >= snre)
-		 SS_error("IMPROPER MAPPING - _SX_EXTRACT_RANGE", SS_null);
+		 SS_error_n(si, "IMPROPER MAPPING - _SX_EXTRACT_RANGE", SS_null);
 
 /* loop over neighborhood of id */
 	      trc[id] = sra[id];};};
@@ -365,7 +366,8 @@ static double **_SX_extract_range(PM_mapping *dest, PM_mapping *source,
  *                        - leaks into the interpolated values
  */
 
-static double **_SX_accumulate_mapping(PM_mapping *dest, PM_mapping *source,
+static double **_SX_accumulate_mapping(SS_psides *si,
+				       PM_mapping *dest, PM_mapping *source,
 				       int wgtfl)
    {double tol;
     double **tre;
@@ -377,7 +379,7 @@ static double **_SX_accumulate_mapping(PM_mapping *dest, PM_mapping *source,
 
 /* if the domains are the same just extract */
     if (PM_set_equal(srcm->domain, dest->domain, tol))
-       tre = _SX_extract_range(dest, srcm, wgtfl);
+       tre = _SX_extract_range(si, dest, srcm, wgtfl);
 
 /* otherwise interpolate */
     else
@@ -425,7 +427,7 @@ static PM_mapping *_SX_build_accumulator_mapping(SS_psides *si,
          tnd   = range->dimension;
          tnde  = range->dimension_elem;
          if ((tnd != nd) || (tnde != nde))
-            SS_error("INCOMMENSURATE RANGE SET - _SX_BUILD_ACCUMULATOR_MAPPING",
+            SS_error_n(si, "INCOMMENSURATE RANGE SET - _SX_BUILD_ACCUMULATOR_MAPPING",
                      SS_null);
 
 /* detect things like (+ a a) */
@@ -470,7 +472,8 @@ static PM_mapping *_SX_build_accumulator_mapping(SS_psides *si,
 
 /* _SX_INIT_RANGE - initialize the accumulator set */
 
-static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
+static void _SX_init_range(SS_psides *si,
+			   PM_mapping *d, PM_mapping *s, object *obj,
 			   int wgt)
    {int i, dnde, ne, ok;
     char *dty;
@@ -497,7 +500,7 @@ static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
     dst.type   = dty;
 
     if (s != NULL)
-       tre = _SX_accumulate_mapping(d, s, wgt);
+       tre = _SX_accumulate_mapping(si, d, s, wgt);
 
     for (i = 0; i < dnde; i++)
         {dst.data = dre[i];
@@ -508,7 +511,7 @@ static void _SX_init_range(PM_mapping *d, PM_mapping *s, object *obj,
 
 	 ok = PM_conv_array(&dst, &src, FALSE);
 	 if (!ok)
-	    SS_error("CAN'T INIT ACCUMULATOR - _SX_INIT_RANGE", obj);};
+	    SS_error_n(si, "CAN'T INIT ACCUMULATOR - _SX_INIT_RANGE", obj);};
 
 /* clean up the mess */
     if (tre != NULL)
@@ -544,7 +547,7 @@ PM_mapping *SX_build_return_mapping(SS_psides *si,
 	f->name = CSTRSAVE(label);};
 
     if (init)
-       _SX_init_range(f, h, SS_null, wgt);
+       _SX_init_range(si, f, h, SS_null, wgt);
 
     return(f);}
 
@@ -593,7 +596,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 	 SX_determine_drw_obj(si, &ps, &obj, &al);
 
 	 if (ps != NULL)
-	    tre = _SX_accumulate_mapping(d, ps, FALSE);
+	    tre = _SX_accumulate_mapping(si, d, ps, FALSE);
 
 	 else
 	    {id = SC_arrtype(obj, -1);
@@ -607,7 +610,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 
 	      acc[i] = PM_accumulate_oper(proc, acc[i], &operand, id, v);
 	      if (acc[i] == NULL)
-	         SS_error("OBJECT DRIVEN FAILURE - _SX_ACCUMULATE_RANGE",
+	         SS_error_n(si, "OBJECT DRIVEN FAILURE - _SX_ACCUMULATE_RANGE",
 			  obj);};
 
 	 if (ps != NULL)

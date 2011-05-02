@@ -418,7 +418,7 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
     xi[0] = SX_dataset[i].x[0] = CMAKE_N(double, na);
     xi[1] = SX_dataset[i].x[1] = CMAKE_N(double, na);
     if (xi[0] == NULL || xi[1] == NULL)
-       SS_error("OUT OF MEMORY - CREATE_CURVE", SS_null);
+       SS_error_n(si, "OUT OF MEMORY - CREATE_CURVE", SS_null);
 
 /* copy data */
     for (k = 0; k < na; k++)

@@ -146,7 +146,7 @@ static void _UL_args(SS_psides *si, object *obj, void *v, int type)
                 {pi = (int *) v;
                  *pi = SX_number[*SS_GET(int, obj)];}
              else
-                SS_error("OBJECT NOT CURVE - _UL_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT CURVE - _UL_ARGS", obj);
              break;
 
         case UL_CURVE_INDEX_J :
@@ -157,7 +157,7 @@ static void _UL_args(SS_psides *si, object *obj, void *v, int type)
                 {pi = (int *) v;
                  *pi = SX_number[*SS_GET(int, obj)];}
              else
-                SS_error("OBJECT NOT CURVE - _UL_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT CURVE - _UL_ARGS", obj);
              break;
 
         case UL_DATA_ID_I :
@@ -528,14 +528,14 @@ object *_ULI_set_id(SS_psides *si, object *argl)
             0);
 
     if (jo < 0)
-       SS_error("BAD CURVE ARGUMENT - _ULI_SET_ID", argl);
+       SS_error_n(si, "BAD CURVE ARGUMENT - _ULI_SET_ID", argl);
 
     if ((id[0] != '@') &&
         ((id[0] == '\0') || (id[0] < 'A') || (id[0] > 'Z')))
-       SS_error("BAD ID ARGUMENT - _ULI_SET_ID", argl);
+       SS_error_n(si, "BAD ID ARGUMENT - _ULI_SET_ID", argl);
 
     if (SX_curvep(id))
-       SS_error("SPECIFIED ID ALREADY IN USE - _ULI_SET_ID", argl);
+       SS_error_n(si, "SPECIFIED ID ALREADY IN USE - _ULI_SET_ID", argl);
 
     obj = SX_set_crv_id(jo, id);
 
@@ -619,10 +619,14 @@ object *_ULI_thru(SS_psides *si, object *argl)
                 0);
 
         if (first < 1)
-           SS_error("FIRST ARGUMENT NOT A VALID CURVE NUMBER - _ULI_THRU", argl);
+           SS_error_n(si,
+		      "FIRST ARGUMENT NOT A VALID CURVE NUMBER - _ULI_THRU",
+		      argl);
 
         if (last < 1)
-           SS_error("SECOND ARGUMENT NOT A VALID CURVE NUMBER - _ULI_THRU", argl);
+           SS_error_n(si,
+		      "SECOND ARGUMENT NOT A VALID CURVE NUMBER - _ULI_THRU",
+		      argl);
 
         if (first <= last)
            {for (id = first; id <= last; id++)
@@ -648,11 +652,13 @@ object *_ULI_thru(SS_psides *si, object *argl)
 /* replace this with a macro or function test */
         if ((first[0] != '@') &&
             ((first[0] < 'A') || (first[0] > 'Z')))
-           SS_error("FIRST ARGUMENT NOT A VALID DATA-ID - _ULI_THRU", argl);
+           SS_error_n(si, "FIRST ARGUMENT NOT A VALID DATA-ID - _ULI_THRU",
+		      argl);
 
         if ((last[0] != '@') &&
             ((last[0] < 'A') || (last[0] > 'Z')))
-           SS_error("SECOND ARGUMENT NOT A VALID DATA-ID - _ULI_THRU", argl);
+           SS_error_n(si, "SECOND ARGUMENT NOT A VALID DATA-ID - _ULI_THRU",
+		      argl);
 
         ret = _UL_dataid_seq(si, first, last);}
 
@@ -696,7 +702,7 @@ object *UL_copy_curve(SS_psides *si, int j)
     xpi = SX_dataset[i].x[0] = CMAKE_N(double, SX_dataset[j].n);
     ypi = SX_dataset[i].x[1] = CMAKE_N(double, SX_dataset[j].n);
     if (xpi == NULL || ypi == NULL)
-       SS_error("INSUFFICIENT MEMORY - UL_COPY_CURVE", SS_null);
+       SS_error_n(si, "INSUFFICIENT MEMORY - UL_COPY_CURVE", SS_null);
 
 /* copy data if it is already in memory */
     if ((xpj != NULL) && (ypj != NULL))
@@ -759,7 +765,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     xpi = SX_dataset[i].x[0] = CMAKE_N(double, n);
     ypi = SX_dataset[i].x[1] = CMAKE_N(double, n);
     if (xpi == NULL || ypi == NULL)
-       SS_error("INSUFFICIENT MEMORY - _ULI_EXTRACT_CURVE", SS_null);
+       SS_error_n(si, "INSUFFICIENT MEMORY - _ULI_EXTRACT_CURVE", SS_null);
 
     ymn = HUGE;
     ymx = -HUGE;
@@ -858,7 +864,7 @@ object *UL_xindex_curve(SS_psides *si, int j)
     xpi = SX_dataset[i].x[0] = CMAKE_N(double, n);
     ypi = SX_dataset[i].x[1] = CMAKE_N(double, n);
     if (xpi == NULL || ypi == NULL)
-       SS_error("INSUFFICIENT MEMORY - UL_XINDEX_CURVE", SS_null);
+       SS_error_n(si, "INSUFFICIENT MEMORY - UL_XINDEX_CURVE", SS_null);
 
 /* copy data if it is already in memory */
     if ((xpj != NULL) && (ypj != NULL))
