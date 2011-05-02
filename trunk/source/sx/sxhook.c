@@ -135,10 +135,10 @@ int SX_fprintf(FILE *fp, char *fmt, ...)
    {int rv;
     char *bf;
     FILE *hp;
-    extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
     SS_psides *si;
+    extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
 
-    si = &_SS_si;
+    si = SC_get_context(SX_fprintf);
 
     rv = FALSE;
 
@@ -171,13 +171,13 @@ int SX_fprintf(FILE *fp, char *fmt, ...)
  *          - for transcript logging
  */
 
-int SX_fputs(char *s, FILE *fp)
+int SX_fputs(const char *s, FILE *fp)
    {int rv;
     FILE *hp;
-    extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
     SS_psides *si;
+    extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
 
-    si = &_SS_si;
+    si = SC_get_context(SX_fputs);
 
     rv = FALSE;
 
@@ -192,10 +192,10 @@ int SX_fputs(char *s, FILE *fp)
 	if ((PG_console_device != NULL) && ((fp == stdout) || (fp == stdscr)))
 	   {if (PG_console_device->gprint_flag)
 	       {if (SS_get_display_flag() == TRUE)
-		   _PG_display_page(PG_console_device, fp, s);
+		   _PG_display_page(PG_console_device, fp, (char *) s);
 		else
 		   {_PG_display_page(PG_console_device, fp, "\"");
-		    _PG_display_page(PG_console_device, fp, s);
+		    _PG_display_page(PG_console_device, fp, (char *) s);
 		    _PG_display_page(PG_console_device, fp, "\"");};};}
 	else
 	   rv = SS_puts(s, fp, io_puts);}

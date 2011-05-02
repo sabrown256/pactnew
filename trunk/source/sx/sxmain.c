@@ -67,8 +67,8 @@ int main(int c, char **v, char **env)
     n_files = 0;
 
 /* connect the I/O functions */
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
     SC_set_get_line(io_gets);
 
 #ifndef AIX

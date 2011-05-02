@@ -1078,7 +1078,7 @@ extern object
  *SS_banner(SS_psides *si, object *obj);
  
 extern int
- SS_puts(char *s, FILE *fp, PFfputs put),
+ SS_puts(const char *s, FILE *fp, PFfputs put),
  SS_prim_des(SS_psides *si, object *strm, object *obj),
  SS_prim_apr(SS_psides *si, FILE *str, char *s),
  SS_get_display_flag(void),
@@ -1136,6 +1136,8 @@ extern char
  *SS_object_type_name(object *o, char *atype);
 
 extern void
+ SS_set_put_string(SS_psides *si, PFfputs ps),
+ SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...)),
  SS_interrupt_handler(int sig),
  SS_scheme_path_err(char *path),
  SS_init_path(void),
@@ -1154,7 +1156,7 @@ extern void
 
 extern int
  SS_printf(FILE *fp, char *fmt, ...),
- SS_fputs(char *s, FILE *fp),
+ SS_fputs(const char *s, FILE *fp),
  SS_get_ch(SS_psides *si, object *str, int ign_ws);
 
 extern void

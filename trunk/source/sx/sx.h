@@ -813,7 +813,7 @@ extern PM_mapping
 
 extern int
  SX_fprintf(FILE *fp, char *fmt, ...),
- SX_fputs(char *s, FILE *fp);
+ SX_fputs(const char *s, FILE *fp);
 
 
 /* SXIO.C declarations */

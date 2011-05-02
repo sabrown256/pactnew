@@ -963,12 +963,12 @@ object *UL_mode_text(SS_psides *si)
     si->pr_ch_out  = SS_put_ch;
 
 #ifdef NO_SHELL
-    SC_set_put_line(SX_fprintf);
-    SC_set_put_string(SX_fputs);
+    SS_set_put_line(si, SX_fprintf);
+    SS_set_put_string(si, SX_fputs);
     SC_set_get_line(PG_wind_fgets);
 #else
-    SC_set_put_line(SS_printf);
-    SC_set_put_string(SS_fputs);
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
     SC_set_get_line(io_gets);
 #endif
 
@@ -1003,8 +1003,8 @@ object *UL_mode_graphics(SS_psides *si)
         si->post_eval  = _UL_parse;
         si->post_print = _UL_print;
 	si->pr_gets    = _SX_get_input;
-	SC_set_put_line(SX_fprintf);
-	SC_set_put_string(SX_fputs);
+	SS_set_put_line(si, SX_fprintf);
+	SS_set_put_string(si, SX_fputs);
 	if (PG_console_device == NULL)
 	   SC_set_get_line(io_gets);
 	else

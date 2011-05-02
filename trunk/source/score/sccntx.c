@@ -60,7 +60,7 @@ void *SC_get_context(void *f)
 
     ha = _SC_init_context_table();
 
-    rv = SC_hasharr_lookup(ha, f);
+    rv = SC_hasharr_def_lookup(ha, f);
 
     return(rv);}
 

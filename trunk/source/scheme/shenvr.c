@@ -873,7 +873,7 @@ SS_smp_state *_SS_get_state(int id)
     if (_SS.ita < 0)
        {bpi     = sizeof(SS_smp_state);
 	_SS.ita = SC_register_thread_data("scheme-state", "SS_smp_state",
-				      1, bpi, (PFTinit) _SS_init_thread);};
+					  1, bpi, (PFTinit) _SS_init_thread);};
 
     if (id < 0)
        id = SC_current_thread();

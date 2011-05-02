@@ -3680,7 +3680,7 @@ void _SX_type_container(char *dtype, char *stype)
     g_file *po;
     SS_psides *si;
 
-    si = &_SS_si;
+    si = SC_get_context(_SX_type_container);
 
     dtype[0] = '\0';
 

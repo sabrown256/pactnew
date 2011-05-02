@@ -177,7 +177,7 @@ int SS_printf(FILE *fp, char *fmt, ...)
     FILE *hp;
     SS_psides *si;
 
-    si = &_SS_si;
+    si = SC_get_context(SS_printf);
 
     SC_VA_START(fmt);
     s = _SS_vdsnprintf(TRUE, fmt, __a__);
@@ -209,12 +209,12 @@ int SS_printf(FILE *fp, char *fmt, ...)
  *          - vsprintf based functions require
  */
 
-int SS_fputs(char *s, FILE *fp)
+int SS_fputs(const char *s, FILE *fp)
    {int rv;
     FILE *hp;
     SS_psides *si;
 
-    si = &_SS_si;
+    si = SC_get_context(SS_fputs);
 
     rv = 0;
     if (fp != NULL)
