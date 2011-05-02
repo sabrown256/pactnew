@@ -144,7 +144,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
             0);
 
     if (arr == NULL)
-       SS_error("NO ARRAY SPECIFIED - _SXI_SUB_ARRAY", argl);
+       SS_error_n(si, "NO ARRAY SPECIFIED - _SXI_SUB_ARRAY", argl);
     else
        {PM_ARRAY_CONTENTS(arr, void, n, typ, d);};
 
@@ -152,7 +152,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     nd    = 0;
     idims = NULL;
     if (SS_nullobjp(dims))
-       SS_error("NO ARRAY DIMENSIONS SPECIFIED - _SXI_SUB_ARRAY", argl);
+       SS_error_n(si, "NO ARRAY DIMENSIONS SPECIFIED - _SXI_SUB_ARRAY", argl);
 
     else
        {nd       = SS_length(dims);
@@ -165,7 +165,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
 /* extract the region specifications */
     ireg = NULL;
     if (SS_nullobjp(reg))
-       SS_error("NO REGION SPECIFIED - _SXI_SUB_ARRAY", argl);
+       SS_error_n(si, "NO REGION SPECIFIED - _SXI_SUB_ARRAY", argl);
 
     else
        {nr      = SS_length(reg);
@@ -187,10 +187,10 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
 	    rlength *= pr[2*i + 1] - pr[2*i] + 1;};
 
     if (length != n)
-       SS_error("BAD DIMENSIONS SPECIFIED FOR ARRAY - _SXI_SUB_ARRAY", argl);
+       SS_error_n(si, "BAD DIMENSIONS SPECIFIED FOR ARRAY - _SXI_SUB_ARRAY", argl);
 
     if ((rlength > length)  || (rlength < 0))
-       SS_error("BAD REGION SPECIFIED FOR ARRAY - _SXI_SUB_ARRAY", argl);
+       SS_error_n(si, "BAD REGION SPECIFIED FOR ARRAY - _SXI_SUB_ARRAY", argl);
     
 /* allocate the output array */
     newarr = PM_make_array(typ, rlength, NULL);
@@ -298,7 +298,7 @@ object *SX_list_array(SS_psides *si, object *argl)
     for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst))
         {num = SS_car(lst);
          if (!SS_numbp(num))
-            SS_error("LIST ELEMENT NOT A NUMBER - SX_LIST_ARRAY", num);
+            SS_error_n(si, "LIST ELEMENT NOT A NUMBER - SX_LIST_ARRAY", num);
 
          n++;};
 
@@ -374,7 +374,7 @@ static object *_SXI_num_arr_len(SS_psides *si, object *obj)
     object *o;
 
     if (!SX_NUMERIC_ARRAYP(obj))
-       SS_error("ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_LEN", obj);
+       SS_error_n(si, "ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_LEN", obj);
 
     n = NUMERIC_ARRAY_LENGTH(obj);
 
@@ -396,7 +396,7 @@ static object *_SXI_num_arr_extr(SS_psides *si, object *arg)
     double *d;
 
     if (!SX_NUMERIC_ARRAYP(arg))
-       SS_error("ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_EXTR", arg);
+       SS_error_n(si, "ARGUMENT NOT NUMERIC ARRAY - _SXI_NUM_ARR_EXTR", arg);
 
     n    = NUMERIC_ARRAY_LENGTH(arg);
     type = NUMERIC_ARRAY_TYPE(arg);
@@ -452,7 +452,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error("BAD FILE - _SXI_SET_PDBDATA", argl);
+       SS_error_n(si, "BAD FILE - _SXI_SET_PDBDATA", argl);
 
     if (mn == NULL)
        strcpy(set_name, s->name);
@@ -461,7 +461,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
         CFREE(mn);};
 
     if (s == NULL)
-       SS_error("BAD ARGUMENT - _SXI_SET_PDBDATA", argl);
+       SS_error_n(si, "BAD ARGUMENT - _SXI_SET_PDBDATA", argl);
 
     rv = SX_pdbdata_handler(si, file, set_name, "PM_set *", &s, TRUE);
 
@@ -486,7 +486,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
     object *obj;
 
     if (!SS_consp(argl))
-       SS_error("BAD ARGUMENT LIST - _SXI_PDBDATA_SET", argl);
+       SS_error_n(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_SET", argl);
 
 /* if the first object is a pdbfile, use it, otherwise, use default file */
     argl = SX_get_file(argl, &po);
@@ -509,7 +509,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
 	    s = *(PM_set **) data.memaddr;}
         else
 	   {if (!PD_read(file, name, &data.memaddr))
-	       SS_error(PD_err, obj);
+	       SS_error_n(si, PD_err, obj);
 	    s = (PM_set *) data.memaddr;};
 
 	if (s->info_type == NULL)
@@ -581,12 +581,12 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 
 /* extract the name */
     if (name == NULL)
-       SS_error("BAD NAME - _SXI_MAKE_PML_SET", argl);
+       SS_error_n(si, "BAD NAME - _SXI_MAKE_PML_SET", argl);
 
 /* extract the mesh shape */
     maxes = NULL;
     if (SS_nullobjp(shape))
-       SS_error("BAD MESH SHAPE - _SXI_MAKE_PML_SET", argl);
+       SS_error_n(si, "BAD MESH SHAPE - _SXI_MAKE_PML_SET", argl);
     else
        {nd    = SS_length(shape);
         maxes = CMAKE_N(int, nd);
@@ -606,7 +606,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 /* get the number of elements */
 	obj = SS_car(components);
 	if (!SX_NUMERIC_ARRAYP(obj))
-	   SS_error("OBJECT NOT NUMERIC ARRAY - _SXI_MAKE_PML_SET", obj);
+	   SS_error_n(si, "OBJECT NOT NUMERIC ARRAY - _SXI_MAKE_PML_SET", obj);
 
 	ne      = NUMERIC_ARRAY_LENGTH(obj);
 	type    = NUMERIC_ARRAY_TYPE(obj);
@@ -619,7 +619,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 	     if (SX_NUMERIC_ARRAYP(obj))
 	        arr = SS_GET(C_array, obj);
 	     else
-	        SS_error("BAD ELEMENT ARRAY - _SXI_MAKE_PML_SET", obj);
+	        SS_error_n(si, "BAD ELEMENT ARRAY - _SXI_MAKE_PML_SET", obj);
 
 	     if (arr != NULL)
 	        {if (strcmp(SX_promotion_type, "none") != 0)
@@ -833,7 +833,7 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
             0);
 
     if ((s == NULL) || (name == NULL) || (type == NULL))
-       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SET_ATTR_SET", argl);
+       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_ATTR_SET", argl);
 
     else
 
@@ -870,7 +870,7 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
             0);
 
     if ((f == NULL) || (name == NULL))
-       SS_error("INSUFFICIENT ARGUMENTS - _SXI_SET_MAP_TYPE", argl);
+       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_MAP_TYPE", argl);
 
     else
        f->map_type = CSTRSAVE(name);
@@ -911,10 +911,10 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error("BAD FILE - _SXI_MAPPING_PDBDATA", argl);
+       SS_error_n(si, "BAD FILE - _SXI_MAPPING_PDBDATA", argl);
 
     if (f == NULL)
-       SS_error("BAD ARGUMENT - _SXI_MAPPING_PDBDATA", argl);
+       SS_error_n(si, "BAD ARGUMENT - _SXI_MAPPING_PDBDATA", argl);
 
     if (mn == NULL)
        {_SX_get_menu(po);
@@ -966,7 +966,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
     rv = SS_null;
 
     if (!SS_consp(argl))
-       SS_error("BAD ARGUMENT LIST - _SXI_PDBDATA_MAPPING", argl);
+       SS_error_n(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_MAPPING", argl);
 
 /* if the first object is a pdbfile, use it, otherwise, use default file */
     argl = SX_get_file(argl, &po);
@@ -995,7 +995,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
         data.memaddr  = DEREF(data.memaddr);}
     else
        {if (!PD_read(file, name, &data.memaddr))
-           SS_error(PD_err, obj);};
+           SS_error_n(si, PD_err, obj);};
 
     PD_reset_ptr_list(file);
 
@@ -1007,7 +1007,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 	    PD_process_set_name(dname);
 
 	    if (!PD_read(file, dname, &data.memaddr))
-	       SS_error(PD_err, SS_null);
+	       SS_error_n(si, PD_err, SS_null);
 
 	    f->domain = (PM_set *) data.memaddr;};
 
@@ -1026,7 +1026,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 		    range->info_type = SC_PCONS_P_S;};
 
 	     if (ret == FALSE)
-	        SS_error("NO FIELD FOR TYPE - _SXI_PDBDATA_MAPPING", SS_null);};
+	        SS_error_n(si, "NO FIELD FOR TYPE - _SXI_PDBDATA_MAPPING", SS_null);};
 
 	rv = SX_mk_mapping(si, f);};
 
@@ -1107,7 +1107,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
 
 /* extract the name */
     if (name == NULL)
-       SS_error("BAD NAME - _SXI_ARRAYS_SET", argl);
+       SS_error_n(si, "BAD NAME - _SXI_ARRAYS_SET", argl);
 
 /* extract the mesh shape */
     if (SS_nullobjp(shape))
@@ -1128,13 +1128,13 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
         {if (lst == components)
             n = SS_length(SS_car(lst));
          else if (n != SS_length(SS_car(lst)))
-            SS_error("COMPONENT LISTS NOT SAME LENGTH - _SXI_ARRAYS_SET",
+            SS_error_n(si, "COMPONENT LISTS NOT SAME LENGTH - _SXI_ARRAYS_SET",
                      lst);};
 
 /* get the number of elements */
     lst = SS_caar(components);
     if (!SX_NUMERIC_ARRAYP(lst))
-       SS_error("OBJECT NOT NUMERIC ARRAY - _SXI_ARRAYS_SET", lst);
+       SS_error_n(si, "OBJECT NOT NUMERIC ARRAY - _SXI_ARRAYS_SET", lst);
 
     strcpy(type, NUMERIC_ARRAY_TYPE(lst));
     PD_dereference(type);
@@ -1201,7 +1201,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
             0);
 
     if (f == NULL)
-       SS_error("BAD MAPPING - _SXI_LR_AC", argl);
+       SS_error_n(si, "BAD MAPPING - _SXI_LR_AC", argl);
 
     else
        {odom = f->domain;
@@ -1214,7 +1214,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 			NULL);
 
 	if (odom->dimension != 2)
-	   SS_error("ONLY 2D MESHES CURRENTLY - _SXI_LR_AC", SS_null);
+	   SS_error_n(si, "ONLY 2D MESHES CURRENTLY - _SXI_LR_AC", SS_null);
 
 	else
 	   {int kmax, lmax;
@@ -1235,7 +1235,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
 	     nn = kmax*lmax;
 	     for (i = 0; i < nn; i++)
 	         {if ((x[i] != px[i]) || (y[i] != py[i]))
-		     SS_error("BAD CONVERSION - _SXI_LR_AC", SS_null);};};
+		     SS_error_n(si, "BAD CONVERSION - _SXI_LR_AC", SS_null);};};
 
 	    elements = CMAKE_N(void *, 2);
 	    elements[0] = (void *) x;
@@ -1286,14 +1286,14 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
 
     nd = SS_length(argl);
     if (nd < 1)
-       SS_error("NO DOMAIN INFO - _SXI_MAKE_AC_SET", argl);
+       SS_error_n(si, "NO DOMAIN INFO - _SXI_MAKE_AC_SET", argl);
 
     nodes = SS_car(argl);
     argl  = SS_cdr(argl);
 
     ne = SS_length(nodes);
     if (ne < 1)
-       SS_error("BAD NODE LIST - _SXI_MAKE_AC_SET", nodes);
+       SS_error_n(si, "BAD NODE LIST - _SXI_MAKE_AC_SET", nodes);
 
     nde = SS_length(SS_car(nodes));
 
@@ -1385,10 +1385,10 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error("BAD FILE - _SXI_ARRAY_PDBDATA", argl);
+       SS_error_n(si, "BAD FILE - _SXI_ARRAY_PDBDATA", argl);
 
     if (arr == NULL)
-       SS_error("INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA", argl);
+       SS_error_n(si, "INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA", argl);
 
     else if (mn == NULL)
        name = SC_dsnprintf(FALSE, "Pm-Array%d", _SX.ap++);
@@ -1437,10 +1437,10 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error("BAD FILE - _SXI_ARRAY_PDBDATA_I", argl);
+       SS_error_n(si, "BAD FILE - _SXI_ARRAY_PDBDATA_I", argl);
 
     if (arr == NULL)
-       SS_error("INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA_I", argl);
+       SS_error_n(si, "INVALID ARRAY OBJECT - _SXI_ARRAY_PDBDATA_I", argl);
 
     else if (mn == NULL)
        name = SC_dsnprintf(FALSE, "Pm-Array%d", _SX.api++);
@@ -1482,7 +1482,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
             0);
 
     if (pd == NULL)
-       SS_error("INVALID PDBDATA OBJECT - _SXI_PDBDATA_ARRAY", arg);
+       SS_error_n(si, "INVALID PDBDATA OBJECT - _SXI_PDBDATA_ARRAY", arg);
 
     else
        {ep = pd->ep;
@@ -1669,25 +1669,25 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error("BAD FILE - _SXI_REP_AC_DOMAIN", argl);
+       SS_error_n(si, "BAD FILE - _SXI_REP_AC_DOMAIN", argl);
 
     if (file != NULL)
        {if (!PD_read(file, nnname, &n_nodes))
-	   SS_error("CAN'T READ NUMBER OF NODES - _SXI_REP_AC_DOMAIN", argl);
+	   SS_error_n(si, "CAN'T READ NUMBER OF NODES - _SXI_REP_AC_DOMAIN", argl);
 
 	if (!PD_read(file, nzname, &n_zones))
-	   SS_error("CAN'T READ NUMBER OF ZONES - _SXI_REP_AC_DOMAIN", argl);
+	   SS_error_n(si, "CAN'T READ NUMBER OF ZONES - _SXI_REP_AC_DOMAIN", argl);
 
 	rx = CMAKE_N(double, n_nodes);
 	ry = CMAKE_N(double, n_nodes);
 
 	incr = PD_read(file, xname, rx);
 	if (incr != n_nodes)
-	   SS_error("READING X VALUES - _SXI_REP_AC_DOMAIN", argl);
+	   SS_error_n(si, "READING X VALUES - _SXI_REP_AC_DOMAIN", argl);
 
 	incr = PD_read(file, yname, ry);
 	if (incr != n_nodes)
-	   SS_error("READING Y VALUES - _SXI_REP_AC_DOMAIN", argl);
+	   SS_error_n(si, "READING Y VALUES - _SXI_REP_AC_DOMAIN", argl);
 
 	zones = (int *) connct->data;
 
@@ -1730,10 +1730,10 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
             0);
 
     if (pred == NULL)
-       SS_error("NO PREDICATE SPECIFIED - _SXI_FIND_INDEX", argl);
+       SS_error_n(si, "NO PREDICATE SPECIFIED - _SXI_FIND_INDEX", argl);
 
     else if (arr == NULL)
-       SS_error("NO ARRAY SPECIFIED - _SXI_FIND_INDEX", argl);
+       SS_error_n(si, "NO ARRAY SPECIFIED - _SXI_FIND_INDEX", argl);
 
     else
        {fnc = _SS_GET_C_PROCEDURE_N(PF_int_dd, pred, 0);

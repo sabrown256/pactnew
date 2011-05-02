@@ -2588,7 +2588,7 @@ The following are available with the LARGE option (default):<p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD WIDTH="150">SS_GC(x)</TD>
+<TR><TD WIDTH="150">SS_gc(x)</TD>
 <TD>decrement the reference count of x and release it if the count is zero </TD></TR>
 <TR><TD>SS_mark(x)</TD>
 <TD>increment the reference count of x </TD></TR>

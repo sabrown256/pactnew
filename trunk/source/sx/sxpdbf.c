@@ -126,7 +126,7 @@ object *_SXI_find_types(SS_psides *si, object *arg)
     syment *ep;
 
     if (!SX_PDBDATAP(arg))
-       SS_error("MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
+       SS_error_n(si, "MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
 
     file   = PDBDATA_FILE(arg);
     ep     = PDBDATA_EP(arg);

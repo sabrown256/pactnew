@@ -55,8 +55,8 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
        {name = SS_get_string(obj);
         pp   = PA_INQUIRE_VARIABLE(name);
         if (pp == NULL)
-           SS_error("VARIABLE NOT IN DATA BASE - _SXI_DISPLAY_PAN_OBJECT",
-                    obj);
+           SS_error_n(si, "VARIABLE NOT IN DATA BASE - _SXI_DISPLAY_PAN_OBJECT",
+		      obj);
 
         else if (pp->data != NULL)
            {ep = pp->desc;
@@ -262,7 +262,7 @@ object *_SXI_desc_pan(SS_psides *si, object *obj)
        {s  = SS_get_string(obj);
         hp = SC_hasharr_lookup(PA_variable_tab, s);
         if (hp == NULL)
-           SS_error("BAD ENTITY - _SXI_DESC_PAN", obj);
+           SS_error_n(si, "BAD ENTITY - _SXI_DESC_PAN", obj);
 
 	else if (hp->type[3] == 'p')
            _SX_desc_pan_package(obj);

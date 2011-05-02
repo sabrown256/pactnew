@@ -95,7 +95,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
     switch (type)
        {case G_FILE :
              if (!SS_nullobjp(obj) && !SX_FILEP(obj))
-                SS_error("OBJECT NOT FILE - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT FILE - _SX_ARGS", obj);
 
              if (SS_nullobjp(obj))
                 *pv = (void *) SX_gvif;
@@ -105,13 +105,13 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 
         case G_DEVICE :
              if (!SX_DEVICEP(obj))
-                SS_error("OBJECT NOT PG_DEVICE - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT PG_DEVICE - _SX_ARGS", obj);
              *pv = (void *) SS_GET(PG_device, obj);
              break;
 
         case G_SET :
              if (!SX_SETP(obj))
-                SS_error("OBJECT NOT PM_SET - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT PM_SET - _SX_ARGS", obj);
              *pv = (void *) SS_GET(PM_set, obj);
              break;
 
@@ -121,25 +121,25 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
              else if (SX_MAPPINGP(obj))
                 *pv = (void *) SS_GET(PM_mapping, obj);
              else
-                SS_error("OBJECT NOT PM_MAPPING - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT PM_MAPPING - _SX_ARGS", obj);
              break;
 
         case G_GRAPH :
              if (SX_GRAPHP(obj))
                 *pv = (void *) SS_GET(PG_graph, obj);
              else
-                SS_error("OBJECT NOT PG_GRAPH - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT PG_GRAPH - _SX_ARGS", obj);
              break;
 
         case G_NUM_ARRAY :
              if (!SX_NUMERIC_ARRAYP(obj))
-                SS_error("OBJECT NOT C_ARRAY - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT C_ARRAY - _SX_ARGS", obj);
              *pv = (void *) SS_GET(C_array, obj);
              break;
 
         case G_IMAGE :
              if (!SX_IMAGEP(obj))
-                SS_error("OBJECT NOT PG_IMAGE - _SX_ARGS", obj);
+                SS_error_n(si, "OBJECT NOT PG_IMAGE - _SX_ARGS", obj);
              *pv = (void *) SS_GET(PG_image, obj);
              break;
 
@@ -148,7 +148,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
                 {s   = SS_get_string(obj);
                  *pv = (void *) PA_INQUIRE_VARIABLE(s);
                  if (pv == NULL)
-                    SS_error("BAD PACKAGE - _SX_ARGS", obj);}
+                    SS_error_n(si, "BAD PACKAGE - _SX_ARGS", obj);}
              else
                 *pv = (void *) SS_GET(PA_package, obj);
              break;
@@ -158,7 +158,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
                 {s   = CSTRSAVE(SS_get_string(obj));
                  *pv = (void *) PA_INQUIRE_VARIABLE(s);
                  if (pv == NULL)
-                    SS_error("NOT PANACEA VARIABLE - _SX_ARGS",
+                    SS_error_n(si, "NOT PANACEA VARIABLE - _SX_ARGS",
                              obj);}
              else
                 *pv = (void *) SS_GET(PA_variable, obj);
@@ -166,14 +166,14 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 
         case G_PDBDATA :
              if (!SX_PDBDATAP(obj))
-                SS_error("NOT PDBDATA OBJECT - _SX_ARGS", obj);
+                SS_error_n(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
 
              *pv = (void *) SS_GET(g_pdbdata, obj);
              break;
 
         case G_DEFSTR :
              if (!SX_DEFSTRP(obj))
-                SS_error("NOT DEFSTR OBJECT - _SX_ARGS", obj);
+                SS_error_n(si, "NOT DEFSTR OBJECT - _SX_ARGS", obj);
 
              *pv = (void *) SS_GET(defstr, obj);
              break;
@@ -189,7 +189,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
         case G_PLOT_REQUEST     :
 
         default :
-             SS_error("BAD TYPE - _SX_ARGS", SS_mk_integer(si, type));};
+             SS_error_n(si, "BAD TYPE - _SX_ARGS", SS_mk_integer(si, type));};
 
     return;}
 
@@ -272,7 +272,7 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
         case G_PLOT_REQUEST     :
 
         default                 :
-             SS_error("BAD TYPE - _SX_CALL_ARGS", SS_mk_integer(si, type));};
+             SS_error_n(si, "BAD TYPE - _SX_CALL_ARGS", SS_mk_integer(si, type));};
 
     return(obj);}
 
@@ -426,10 +426,10 @@ void _SX_get_menu(g_file *po)
 /* _SX_PUSH_MENU_ITEM - add the given symbol table entry to the file menu */
 
 void _SX_push_menu_item(g_file *po, char *name, char *type)
-   {SX_menu_item mitem;
-    char s[MAXLINE];
+   {char s[MAXLINE];
     char *var, *lb;
     PDBfile *file;
+    SX_menu_item mitem;
 
     file = FILE_FILE(PDBfile, po);
 

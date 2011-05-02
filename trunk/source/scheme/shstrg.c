@@ -259,7 +259,7 @@ static object *_SSI_strlen(SS_psides *si, object *str)
     object *rv;
 
     if (!SS_stringp(str))
-       SS_error("ARGUMENT NOT STRING - STRING-LENGTH", str);
+       SS_error_n(si, "ARGUMENT NOT STRING - STRING-LENGTH", str);
 
 /* when tokenizing strings this definition makes more sense */
     ln = strlen(SS_STRING_TEXT(str));
@@ -285,7 +285,7 @@ static object *_SSI_strref(SS_psides *si, object *argl)
             0);
 
     if (n > strlen(s))
-       SS_error("INDEX PAST END OF STRING - STRING-REF", argl);
+       SS_error_n(si, "INDEX PAST END OF STRING - STRING-REF", argl);
 
     c  = s[n];
     rv = SS_mk_char(si, c);
@@ -455,7 +455,7 @@ static object *_SSI_strlst(SS_psides *si, object *str)
     object *ret, *o;
 
     if (!SS_stringp(str))
-       SS_error("ARGUMENT NOT STRING - STRING->LIST", str);
+       SS_error_n(si, "ARGUMENT NOT STRING - STRING->LIST", str);
 
     s = SS_STRING_TEXT(str);
     n = SS_STRING_LENGTH(str);
@@ -478,7 +478,7 @@ static object *_SSI_lststr(SS_psides *si, object *argl)
 
     argl = SS_car(argl);
     if (!SS_consp(argl))
-       SS_error("ARGUMENT MUST BE LIST - LIST->STRING", argl);
+       SS_error_n(si, "ARGUMENT MUST BE LIST - LIST->STRING", argl);
 
     n = SS_length(argl);
     s = CMAKE_N(char, n+1);
@@ -503,7 +503,7 @@ static object *_SSI_symstr(SS_psides *si, object *arg)
     object *rv;
 
     if (!SS_variablep(arg))
-       SS_error("ARGUMENT NOT VARIABLE - SYMBOL->STRING", arg);
+       SS_error_n(si, "ARGUMENT NOT VARIABLE - SYMBOL->STRING", arg);
 
     s  = SS_VARIABLE_NAME(arg);
     rv = SS_mk_string(si, s);
@@ -520,7 +520,7 @@ static object *_SSI_strsym(SS_psides *si, object *str)
     object *rv;
 
     if (!SS_stringp(str))
-       SS_error("ARGUMENT NOT STRING - STRING->SYMBOL", str);
+       SS_error_n(si, "ARGUMENT NOT STRING - STRING->SYMBOL", str);
 
     s  = SS_STRING_TEXT(str);
     rv = SS_mk_variable(si, s, SS_null);
@@ -848,7 +848,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
     else
        {obj = SS_car(argl);
         if (!SS_stringp(obj))
-           SS_error("BAD STRING - _SS_STRTOK", obj);
+           SS_error_n(si, "BAD STRING - _SS_STRTOK", obj);
 
         text = SS_STRING_TEXT(obj);};
 

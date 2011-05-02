@@ -127,7 +127,7 @@ void SX_init(char *code, char *vers)
 
 /* PDB initializations */
     pdb_wr_hook = _SX_hash_hook;
-    _SX_init_hash_objects(SX_vif);
+    _SX_init_hash_objects(si, SX_vif);
 
 /* default formats */
     _PD_set_digits(SX_vif);
@@ -142,7 +142,7 @@ void SX_init(char *code, char *vers)
     SS_UNCOLLECT(_SX_var_tab);
     if (SC_hasharr_install(si->symtab, "pa-variable-table", _SX_var_tab,
 			   SS_POBJECT_S, TRUE, TRUE) == NULL)
-       SS_error("CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
+       SS_error_n(si, "CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
                 _SX_var_tab);
 
 #endif

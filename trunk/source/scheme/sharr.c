@@ -93,11 +93,11 @@ static object *_SSI_hash_remove(SS_psides *si, object *argl)
 	    SS_HASHARR_I, &tab,
 	    0);
 
-/* lookup up the object and do a SS_GC on it */
+/* lookup up the object and do a SS_gc on it */
     if (tab == si->symtab)
        {obj = (object *) SC_hasharr_def_lookup(tab, name);
 	if (obj != NULL)
-	   SS_GC(obj);};
+	   SS_gc(obj);};
 
 /* now remove it */
     obj = (SC_hasharr_remove(tab, name)) ? SS_t : SS_f;
@@ -202,7 +202,7 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
     else if (typ == SC_FLOAT_I)
        sz = (int) SS_FLOAT_VALUE(arg);
     else
-       SS_error("BAD ARGUMENT - MAKE-HASH-TABLE", arg);
+       SS_error_n(si, "BAD ARGUMENT - MAKE-HASH-TABLE", arg);
 
     tab = SC_make_hasharr(sz, NODOC, SC_HA_NAME_KEY);
     op  = SS_mk_hasharr(si, tab);
@@ -236,7 +236,7 @@ static int _SS_rl_ha_elem(haelem *hp, void *a)
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &o);
     if (ok == TRUE)
-       {SS_GC(o);
+       {SS_gc(o);
 	hp->def = NULL;};
 
     return(TRUE);}

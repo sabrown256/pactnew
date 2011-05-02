@@ -47,7 +47,7 @@ static object *UL_select(SS_psides *si, object *s)
        return(SS_t);
 
     if (SX_dataset[i].n < 2)
-       SS_error("CURVE HAS < 2 POINTS - UL_SELECT", s);
+       SS_error_n(si, "CURVE HAS < 2 POINTS - UL_SELECT", s);
 
 /* make a copy of the curve and read the data into the copy */
     ret = UL_copy_curve(si, i);
@@ -253,7 +253,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
 	     if ((0 <= j) && (j <= limit))
 	        {if (!UL_expunge(j))
 		    {UL_compress_numbers();
-		     SS_error("INVALID CURVE NUMBER - _ULI_EXPUNGE_MACRO",
+		     SS_error_n(si, "INVALID CURVE NUMBER - _ULI_EXPUNGE_MACRO",
 			      argl);};};};
 
         UL_compress_numbers();}
@@ -277,7 +277,7 @@ object *UL_delete(SS_psides *si, object *s)
     o = SS_null;
     if (!SS_nullobjp(s))
        {if (!SX_curvep_a(s))
-	   SS_error("BAD CURVE - UL_DELETE", s);
+	   SS_error_n(si, "BAD CURVE - UL_DELETE", s);
 
 	i = SX_curve_id(s);
 	o = SX_rl_curve(i);};
@@ -389,7 +389,7 @@ static object *_ULI_marker(SS_psides *si, object *obj, object *flag)
 
     mrk  = SS_INTEGER_VALUE(flag);
     if ((mrk < 0) || (mrk >= mi))
-       SS_error("BAD MARKER VALUE - _ULI_MARKER", flag);
+       SS_error_n(si, "BAD MARKER VALUE - _ULI_MARKER", flag);
 
     SC_CHANGE_VALUE_ALIST(SX_dataset[i].info, int, SC_INT_P_S,
 			  "MARKER-INDEX", mrk);
@@ -524,20 +524,20 @@ static object *_ULI_range(SS_psides *si, object *argl)
 	       {SX_autorange = TRUE;
 		UL_plot_limits(dev, FALSE, wc);}
 	    else
-	       SS_error("BAD ARGUMENTS - _ULI_RANGE", s);}
+	       SS_error_n(si, "BAD ARGUMENTS - _ULI_RANGE", s);}
 	else
 	   {SS_args(argl,
 		    SC_DOUBLE_I, &wc[2],
 		    SC_DOUBLE_I, &wc[3],
 		    0);
 	    if (wc[2] == HUGE)
-	       SS_error("BAD NUMBER LOWER LIMIT - _ULI_RANGE", argl);
+	       SS_error_n(si, "BAD NUMBER LOWER LIMIT - _ULI_RANGE", argl);
 
 	    if (wc[3] == -HUGE)
-	       SS_error("BAD NUMBER UPPER LIMIT - _ULI_RANGE", argl);
+	       SS_error_n(si, "BAD NUMBER UPPER LIMIT - _ULI_RANGE", argl);
 
 	    if (wc[2] == wc[3])
-	       SS_error("LOWER LIMIT EQUALS UPPER LIMIT - _ULI_RANGE", argl);
+	       SS_error_n(si, "LOWER LIMIT EQUALS UPPER LIMIT - _ULI_RANGE", argl);
 
 	    if (wc[3] < wc[2])
 	       {t = wc[2];
@@ -583,20 +583,20 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 	       {SX_autodomain = TRUE;
 		UL_plot_limits(dev, FALSE, wc);}
 	    else
-	       SS_error("BAD ARGUMENTS - _ULI_DOMAIN", s);}
+	       SS_error_n(si, "BAD ARGUMENTS - _ULI_DOMAIN", s);}
 	else
 	   {SS_args(argl,
 		    SC_DOUBLE_I, &wc[0],
 		    SC_DOUBLE_I, &wc[1],
 		    0);
 	    if (wc[0] == HUGE)
-	       SS_error("BAD NUMBER LOWER LIMIT - _ULI_DOMAIN", argl);
+	       SS_error_n(si, "BAD NUMBER LOWER LIMIT - _ULI_DOMAIN", argl);
 
 	    if (wc[1] == -HUGE)
-	       SS_error("BAD NUMBER UPPER LIMIT - _ULI_DOMAIN", argl);
+	       SS_error_n(si, "BAD NUMBER UPPER LIMIT - _ULI_DOMAIN", argl);
 
 	    if (wc[0] == wc[1])
-	       SS_error("LOWER LIMIT EQUALS UPPER LIMIT - _ULI_DOMAIN", argl);
+	       SS_error_n(si, "LOWER LIMIT EQUALS UPPER LIMIT - _ULI_DOMAIN", argl);
 
 	    if (wc[1] < wc[0])
 	       {t = wc[0];
@@ -781,7 +781,7 @@ static object *UL_print_labels(SS_psides *si, int *indx, int nc,
     if (name != NULL)
        {fp = io_open(name, "w");
         if (fp == NULL)
-           SS_error("CANNOT OPEN FILE - UL_PRINT_LABELS", SS_null);
+           SS_error_n(si, "CANNOT OPEN FILE - UL_PRINT_LABELS", SS_null);
         PRINT(fp, "\n\n");}
     else
        fp = stdout;
@@ -889,11 +889,11 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
         argl = SS_cdr(argl);
         strcpy(prefix, SS_get_string(arg1));
         if (strlen(prefix) != 1)
-           SS_error("BAD PREFIX - _ULI_PREFIX", arg1);
+           SS_error_n(si, "BAD PREFIX - _ULI_PREFIX", arg1);
 
         pre = tolower((int) prefix[0]);
         if ((pre < 'a') || (pre > 'z'))
-           SS_error("BAD PREFIX - _ULI_PREFIX", arg1);
+           SS_error_n(si, "BAD PREFIX - _ULI_PREFIX", arg1);
 
         if (SS_consp(argl))
            {arg2 = SS_car(argl);
@@ -902,7 +902,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                mindex = atoi(s);
             else
                {if (strcmp(s, "off") != 0)
-                   SS_error("BAD INDEX - _ULI_PREFIX", arg2);};
+                   SS_error_n(si, "BAD INDEX - _ULI_PREFIX", arg2);};
 
 	    mindex = max(mindex, 0);
 	    mindex = min(mindex, SX_n_curves_read - 1);
@@ -1092,7 +1092,7 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
        m = PM_thin_1d_der(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
 
     if (m < 1)
-       SS_error("THIN FAILED - _ULI_THIN", argl);
+       SS_error_n(si, "THIN FAILED - _ULI_THIN", argl);
 
     if ((SX_dataset[j].id >= 'A') &&
         (SX_dataset[j].id <= 'Z'))
@@ -1128,9 +1128,9 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
             0);
 
     if (SS_nullobjp(dom_pred))
-       SS_error("BAD DOMAIN PREDICATE ARGUMENT - _ULI_FILTER", argl);
+       SS_error_n(si, "BAD DOMAIN PREDICATE ARGUMENT - _ULI_FILTER", argl);
     if (SS_nullobjp(ran_pred))
-       SS_error("BAD RANGE PREDICATE ARGUMENT - _ULI_FILTER", argl);
+       SS_error_n(si, "BAD RANGE PREDICATE ARGUMENT - _ULI_FILTER", argl);
 
     n  = SX_dataset[j].n;
     x[0] = SX_dataset[j].x[0];
@@ -1160,7 +1160,7 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     if (k < 2)
        {CFREE(UL_buf1x);
         CFREE(UL_buf1y);
-        SS_error("FEWER THAN TWO POINTS REMAIN - _ULI_FILTER", SS_null);};
+        SS_error_n(si, "FEWER THAN TWO POINTS REMAIN - _ULI_FILTER", SS_null);};
 
     SX_dataset[j].n  = k;
     SX_dataset[j].x[0] = UL_buf1x;
@@ -1200,7 +1200,7 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
 
 /* take care of some bad cases */
     if ((SX_dataset[j].wc[0] >= d2) || (SX_dataset[j].wc[1] <= d1))
-       SS_error("XMIN GREATER THAN XMAX - _UL__INTEGRATE", SS_null);
+       SS_error_n(si, "XMIN GREATER THAN XMAX - _UL__INTEGRATE", SS_null);
 
     PM_integrate_tzr(d1, d2, &n, x[0], x[1], UL_buf1x, UL_buf1y);
 
@@ -1237,10 +1237,10 @@ static object *_ULI_label(SS_psides *si, object *argl)
             0);
 
     if (j < 0)
-       SS_error("BAD CURVE ARGUMENT - _ULI_LABEL", argl);
+       SS_error_n(si, "BAD CURVE ARGUMENT - _ULI_LABEL", argl);
 
     if (labl == NULL)
-       SS_error("BAD LABEL ARGUMENT - _ULI_LABEL", argl);
+       SS_error_n(si, "BAD LABEL ARGUMENT - _ULI_LABEL", argl);
 
     CFREE(SX_dataset[j].text);
 
@@ -1384,7 +1384,7 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
 
 /* take care of dumb case */
     if ((SX_dataset[j].wc[0] >= d2) || (SX_dataset[j].wc[1] <= d1))
-       SS_error("XMIN GREATER THAN XMAX - _ULI_XMM", SS_null);
+       SS_error_n(si, "XMIN GREATER THAN XMAX - _ULI_XMM", SS_null);
 
 /* check to see if x is decreasing */
     if (x[0][0] > x[0][1])
@@ -1535,7 +1535,7 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
         if (obj == NULL)
            {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - _ULI_SMOOTH",
 			      SX_smooth_method);
-	    SS_error(bf, SS_null);};
+	    SS_error_n(si, bf, SS_null);};
 
         SS_args(SS_lk_var_val(si, obj),
                 G_NUM_ARRAY, &arr,
@@ -1544,7 +1544,7 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
         if (arr == NULL)
            {bf = SC_dsnprintf(FALSE, "%s IS NOT A FILTER - _ULI_SMOOTH",
 			      SX_smooth_method);
-	    SS_error(bf, SS_null);};
+	    SS_error_n(si, bf, SS_null);};
 
 	SX_filter_coeff(SX_dataset[l].x[1], SX_dataset[l].n, arr, ntimes);};
 
@@ -1657,7 +1657,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
                        0);
     SS_MARK(tmp);
     c = _ULI_average(si, tmp);
-    SS_GC(tmp);
+    SS_gc(tmp);
 
 /* no overlap of curves */
     if (!SX_curvep_a(c))
@@ -1763,7 +1763,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
  */
     acc = SS_car(argl);
     if (!SX_curvep_a(acc))
-       SS_error("BAD FIRST CURVE -  _ULI_APPEND", acc);
+       SS_error_n(si, "BAD FIRST CURVE -  _ULI_APPEND", acc);
     strcpy(local, "Append");
     target = UL_COPY_CURVE(si, acc);
     acc = UL_COPY_CURVE(si, acc);
@@ -1911,10 +1911,10 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
             0);
 
     if (!SS_consp(xvals))
-       SS_error("BAD LIST OF X-VALUES - _ULI_MK_CURVE", xvals);
+       SS_error_n(si, "BAD LIST OF X-VALUES - _ULI_MK_CURVE", xvals);
 
     if (!SS_consp(yvals))
-       SS_error("BAD LIST OF Y-VALUES - _ULI_MK_CURVE", yvals);
+       SS_error_n(si, "BAD LIST OF Y-VALUES - _ULI_MK_CURVE", yvals);
 
     n = min(SS_length(xvals), SS_length(yvals));
 
@@ -1925,7 +1925,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
          xvals = SS_cdr(xvals), yvals = SS_cdr(yvals))
         {xo = SS_car(xvals);
          if (!SS_numbp(xo))
-            SS_error("BAD X-VALUE - _ULI_MK_CURVE", xo);
+            SS_error_n(si, "BAD X-VALUE - _ULI_MK_CURVE", xo);
          if (SS_integerp(xo))
             *x[0]++ = SS_INTEGER_VALUE(xo);
          else
@@ -1933,7 +1933,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
 
          yo = SS_car(yvals);
          if (!SS_numbp(yo))
-            SS_error("BAD Y-VALUE - _ULI_MK_CURVE", yo);
+            SS_error_n(si, "BAD Y-VALUE - _ULI_MK_CURVE", yo);
          if (SS_integerp(yo))
             *x[1]++ = SS_INTEGER_VALUE(yo);
          else
@@ -1960,7 +1960,7 @@ static object *_ULI_curve_list(SS_psides *si, object *arg)
 
     i = SX_get_crv_index_i(arg);
     if (i < 0)
-       SS_error("BAD CURVE - _ULI_CURVE_LIST", arg);
+       SS_error_n(si, "BAD CURVE - _ULI_CURVE_LIST", arg);
 
     n  = SX_dataset[i].n;
     x[0] = SX_dataset[i].x[0];

@@ -327,7 +327,7 @@ static void _SS_rl_variable(object *obj)
 /*--------------------------------------------------------------------------*/
 
 /* _SS_RL_CONS - release a CONS object
- *             - since this also SS_GC's lists be careful of
+ *             - since this also SS_gc's lists be careful of
  *             - conses with multiple pointers
  */
 
@@ -356,11 +356,11 @@ static void _SS_rl_cons(object *obj)
 	    SS_rl_object(lst);
 
 /* deal with the car */
-	    SS_GC(car);
+	    SS_gc(car);
 
 /* deal with the cdr */
 	    if (SS_nullobjp(cdr) || !SS_consp(cdr))
-	       {SS_GC(cdr);
+	       {SS_gc(cdr);
 		lst = NULL;}
 	    else
 	       lst = cdr;};};
@@ -388,9 +388,9 @@ static void _SS_rl_procedure(object *obj)
        {case SS_MACRO :
         case SS_PROC  :
 	     sp = SS_COMPOUND_PROCEDURE(obj);
-	     SS_GC(sp->name);
-	     SS_GC(sp->lambda);
-/*	     SS_GC(sp->env); */
+	     SS_gc(sp->name);
+	     SS_gc(sp->lambda);
+/*	     SS_gc(sp->env); */
 	     CFREE(sp);
 
         case SS_PR_PROC  :
@@ -559,7 +559,7 @@ static void _SS_wr_vector(SS_psides *si, object *obj, object *strm)
     SS_MARK(lst);
     PRINT(SS_OUTSTREAM(strm), "#");
     SS_wr_lst(si, lst, strm);
-    SS_GC(lst);
+    SS_gc(lst);
 
     return;}
 
@@ -1176,7 +1176,7 @@ object *_SS_numtype_to_list_id(SS_psides *si, int id, void *p, long n)
 	     lst = SS_mk_cons(si, o, lst);};}
 
     else
-       SS_error("DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
+       SS_error_n(si, "DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
 
     if (lst != SS_null)
        lst = SS_reverse(lst);

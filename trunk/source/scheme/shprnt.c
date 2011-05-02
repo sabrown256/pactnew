@@ -230,7 +230,7 @@ static object *_SSI_write(SS_psides *si, object *obj)
            SS_print(si, str, obj, "", "");}
 
     else
-       SS_error("LAST ARGUMENT NOT OUTPUT-PORT - WRITE", str);
+       SS_error_n(si, "LAST ARGUMENT NOT OUTPUT-PORT - WRITE", str);
 
     return(SS_f);}
 
@@ -253,12 +253,12 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
     obj = SS_null;
 
     if (!SS_outportp(str))
-       SS_error("BAD PORT - _SS_XPRINTF", str);
+       SS_error_n(si, "BAD PORT - _SS_XPRINTF", str);
     stream = SS_OUTSTREAM(str);
 
     format = SS_car(argl);
     if (!SS_stringp(format))
-       SS_error("BAD FORMAT - _SS_XPRINTF", format);
+       SS_error_n(si, "BAD FORMAT - _SS_XPRINTF", format);
     strcpy(forms, SS_STRING_TEXT(format));
     fmt = forms;
 
@@ -334,8 +334,9 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
             case 'd' :
             case 'u' :
                  if (!SS_integerp(obj))
-                    SS_error("NON-INTEGER FOR INTEGER FIELD - _SS_XPRINTF",
-                             obj);
+                    SS_error_n(si,
+			       "NON-INTEGER FOR INTEGER FIELD - _SS_XPRINTF",
+			       obj);
                  PRINT(stream, local, (long) SS_INTEGER_VALUE(obj));
                  break;
 
@@ -350,8 +351,9 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
                  else if (SS_floatp(obj))
 		    dv = SS_FLOAT_VALUE(obj);
 		 else
-                    SS_error("NON-NUMERIC VALUE FOR REAL FIELD - _SS_XPRINTF",
-                             obj);
+                    SS_error_n(si,
+			       "NON-NUMERIC VALUE FOR REAL FIELD - _SS_XPRINTF",
+			       obj);
                  PRINT(stream, local, dv);
                  break;
 
@@ -559,7 +561,7 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
 
     s = NULL;
     if (!SS_nullobjp(si->histdev))
-       SS_error("TRANSCRIPT ALREADY ACTIVE - TRANSCRIPT-ON", obj);
+       SS_error_n(si, "TRANSCRIPT ALREADY ACTIVE - TRANSCRIPT-ON", obj);
 
     s = NULL;
     SS_args(obj,
@@ -568,7 +570,7 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
 
     str = io_open(s, "a");
     if (str == NULL)
-       SS_error("CAN'T OPEN FILE - TRANSCRIPT-ON", obj);
+       SS_error_n(si, "CAN'T OPEN FILE - TRANSCRIPT-ON", obj);
 
     si->histdev = SS_mk_outport(si, str, s);
     si->hist_flag = ALL;
@@ -611,7 +613,7 @@ static object *_SSI_opn_out(SS_psides *si, object *obj)
 
     str = io_open(s, "w");
     if (str == NULL)
-       SS_error("CAN'T OPEN FILE - OPEN-OUTPUT-FILE", obj);
+       SS_error_n(si, "CAN'T OPEN FILE - OPEN-OUTPUT-FILE", obj);
 
     prt = SS_mk_outport(si, str, s);
 
@@ -628,7 +630,7 @@ static object *_SSI_cls_out(SS_psides *si, object *obj)
    {
 
     if (!SS_outportp(obj))
-       SS_error("BAD OUTPUT-PORT TO CLOSE-OUTPUT-FILE", obj);
+       SS_error_n(si, "BAD OUTPUT-PORT TO CLOSE-OUTPUT-FILE", obj);
 
     io_close(SS_OUTSTREAM(obj));
 
@@ -657,7 +659,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
 
     str = io_open(s, BINARY_MODE_W);
     if (str == NULL)
-       SS_error("CAN'T OPEN FILE - CALL-WITH-OUTPUT-FILE", obj);
+       SS_error_n(si, "CAN'T OPEN FILE - CALL-WITH-OUTPUT-FILE", obj);
 
     old_outdev = si->outdev;
     si->outdev  = SS_mk_outport(si, str, s);
@@ -778,7 +780,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 				   0);
 		 else
 		    SS_wr_lst(si, desc, strm);
-                 SS_GC(desc);};
+                 SS_gc(desc);};
              break;
 
         case SS_MACRO :
@@ -799,7 +801,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 				   0);
 		 else
 		    SS_wr_lst(si, desc, strm);
-                 SS_GC(desc);};
+                 SS_gc(desc);};
              break;
 
         case SS_PR_PROC  : 
@@ -835,13 +837,13 @@ static object *_SSI_describe(SS_psides *si, object *argl)
        strm = si->outdev;
 
     if (!SS_outportp(strm))
-       SS_error("LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
+       SS_error_n(si, "LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
 
     ok = SS_prim_des(si, strm, obj);
     SC_ASSERT(ok == TRUE);
 /*
     if (ok == FALSE)
-       SS_error("DESCRIPTIONS ONLY AVAIBLE FOR PROCEDURES", obj);
+       SS_error_n(si, "DESCRIPTIONS ONLY AVAIBLE FOR PROCEDURES", obj);
 */
     return(SS_f);}
 
@@ -978,7 +980,7 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
        strm = si->outdev;
 
     if (!SS_outportp(strm))
-       SS_error("LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
+       SS_error_n(si, "LAST ARGUMENT NOT OUTPUT-PORT - DESCRIBE", strm);
 
     str   = SS_OUTSTREAM(strm);
     token = NULL;
@@ -993,7 +995,7 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
        token = SS_PROCEDURE_NAME(obj);
 
     else
-       SS_error("BAD OBJECT - APROPOS", obj);
+       SS_error_n(si, "BAD OBJECT - APROPOS", obj);
 
     PRINT(str, "\nApropos search string: %s\n\n", token);
     if (!SS_prim_apr(si, str, token))
@@ -1154,7 +1156,7 @@ static object *_SSI_newline(SS_psides *si, object *strm)
                PRINT(fp,  "\r\n");};}
 
     else
-       SS_error("BAD OUTPUT PORT - NEWLINE", strm);
+       SS_error_n(si, "BAD OUTPUT PORT - NEWLINE", strm);
 
     return(SS_f);}
 
@@ -1181,7 +1183,7 @@ object *_SSI_wr_chr(SS_psides *si, object *argl)
 
     str = SS_cdr(argl);
     if (!SS_charobjp(argl = SS_car(argl)))
-       SS_error("BAD CHARACTER - WRITE-CHAR", argl);
+       SS_error_n(si, "BAD CHARACTER - WRITE-CHAR", argl);
 
     if (SS_nullobjp(str))
        SS_print(si, si->outdev, argl, "", "");
@@ -1190,7 +1192,7 @@ object *_SSI_wr_chr(SS_psides *si, object *argl)
        SS_print(si, str, argl, "", "");
 
     else
-       SS_error("LAST ARGUMENT NOT OUTPUT-PORT - WRITE-CHAR", str);
+       SS_error_n(si, "LAST ARGUMENT NOT OUTPUT-PORT - WRITE-CHAR", str);
 
     return(SS_f);}
 

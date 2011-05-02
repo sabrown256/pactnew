@@ -111,7 +111,7 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
 
     defp = PD_inquire_host_type(file, type);
     if (defp == NULL)
-       SS_error("VARIABLE NOT IN STRUCTURE CHART - _SX_MAKE_LIST_LEAF",
+       SS_error_n(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_MAKE_LIST_LEAF",
                 SS_null);
     else
        mem_lst = defp->members;

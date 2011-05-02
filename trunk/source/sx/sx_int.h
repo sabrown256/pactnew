@@ -298,7 +298,7 @@ extern memdes
 
 extern void
  _SX_ins_mem(defstr *dp, char *member, int imem, PDBfile *File),
- _SX_init_hash_objects(PDBfile *file);
+ _SX_init_hash_objects(SS_psides *si, PDBfile *file);
 
 
 /* SXMM.C declarations */
