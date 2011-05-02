@@ -214,7 +214,7 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
 
 /* _SS_WR_HASHARR - print a HASH_ARRAY object */
 
-static void _SS_wr_hasharr(object *obj, object *strm)
+static void _SS_wr_hasharr(SS_psides *si, object *obj, object *strm)
    {long ne;
     hasharr *tab;
 
@@ -275,7 +275,7 @@ object *SS_mk_hasharr(SS_psides *si, hasharr *tb)
 
 /* _SS_WR_HAELEM - print a haelem object */
 
-static void _SS_wr_haelem(object *obj, object *strm)
+static void _SS_wr_haelem(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm),

@@ -69,7 +69,7 @@ static object *_SXI_iv_specp(SS_psides *si, object *obj)
 
 /* _SX_WR_GPACKAGE - print a g_package */
 
-static void _SX_wr_gpackage(object *obj, object *strm)
+static void _SX_wr_gpackage(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<PACKAGE|%s>", PACKAGE_NAME(obj));
@@ -94,7 +94,7 @@ object *SX_mk_package(SS_psides *si, PA_package *pck)
 
 /* _SX_WR_GVARIABLE - print a g_variable */
 
-static void _SX_wr_gvariable(object *obj, object *strm)
+static void _SX_wr_gvariable(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<PANVAR|%s>", PANVAR_NAME(obj));
@@ -120,6 +120,19 @@ object *SX_mk_variable(SS_psides *si, PA_variable *pp)
 
 /*--------------------------------------------------------------------------*/
 
+/* _SX_WR_GSOURCE_VARIABLE - print a g_source_variable */
+
+static void _SX_wr_gsource_variable(SS_psides *si, object *obj, object *strm)
+   {
+
+    PRINT(SS_OUTSTREAM(strm), "<SOURCE_VARIABLE|%s>",
+                              SOURCE_VARIABLE_NAME(obj));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SX_MK_SOURCE_VARIABLE - make and return a g_source_variable */
 
 static object *SX_mk_source_variable(SS_psides *si, PA_src_variable *sv)
@@ -133,13 +146,13 @@ static object *SX_mk_source_variable(SS_psides *si, PA_src_variable *sv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_WR_GSOURCE_VARIABLE - print a g_source_variable */
+/* _SX_WR_GIV_SPECIFICATION - print a g_iv_specification */
 
-static void _SX_wr_gsource_variable(object *obj, object *strm)
+static void _SX_wr_giv_specification(SS_psides *si, object *obj, object *strm)
    {
 
-    PRINT(SS_OUTSTREAM(strm), "<SOURCE_VARIABLE|%s>",
-                              SOURCE_VARIABLE_NAME(obj));
+    PRINT(SS_OUTSTREAM(strm), "<IV_SPECIFICATION|%s>",
+                              IV_SPECIFICATION_NAME(obj));
 
     return;}
 
@@ -155,19 +168,6 @@ static object *SX_mk_iv_specification(SS_psides *si, PA_iv_specification *iv)
 		      _SX_wr_giv_specification, SS_rl_object);
 
     return(op);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_WR_GIV_SPECIFICATION - print a g_iv_specification */
-
-static void _SX_wr_giv_specification(object *obj, object *strm)
-   {
-
-    PRINT(SS_OUTSTREAM(strm), "<IV_SPECIFICATION|%s>",
-                              IV_SPECIFICATION_NAME(obj));
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 

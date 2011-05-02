@@ -343,7 +343,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
 
 /* _SX_WR_GGRAPH - print a g_graph */
 
-static void _SX_wr_ggraph(object *obj, object *strm)
+static void _SX_wr_ggraph(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<GRAPH|%c>", GRAPH_IDENTIFIER(obj));
@@ -387,7 +387,7 @@ object *SX_mk_graph(SS_psides *si, PG_graph *g)
 
 /* _SX_WR_GDEV_ATTR - print a g_dev_attributes */
 
-static void _SX_wr_gdev_attr(object *obj, object *strm)
+static void _SX_wr_gdev_attr(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<DEV_ATTRIBUTES>");
@@ -582,7 +582,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 
 /* _SX_WR_GIMAGE - print a g_image */
 
-static void _SX_wr_gimage(object *obj, object *strm)
+static void _SX_wr_gimage(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<IMAGE|%s>",
@@ -852,7 +852,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
 
 /* _SX_WR_GDEVICE - print a g_device */
 
-static void _SX_wr_gdevice(object *obj, object *strm)
+static void _SX_wr_gdevice(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<GRAPHICS-DEVICE|%s,%s,%s>",

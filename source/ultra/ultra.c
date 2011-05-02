@@ -1184,7 +1184,8 @@ int main(int c, char **v)
     double evalt;
     SS_psides *si;
 
-    si = &_SS_si;
+    SS_set_scheme_env(v[0], NULL);
+    si = SS_init_scheme(CODE, VERSION);
 
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
@@ -1228,8 +1229,6 @@ int main(int c, char **v)
 
     SC_zero_space_n(zsp, -2);
 
-    SS_set_scheme_env(v[0], NULL);
-    si = SS_init_scheme(CODE, VERSION);
     SS_init_stack(si);
     SS_init_cont(si);
 

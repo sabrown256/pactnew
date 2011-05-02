@@ -77,6 +77,7 @@ int SS_set_display_flag(int flg)
 
 void SS_print(object *obj, char *begin, char *end, object *strm)
    {FILE *str;
+    SS_psides *si = &_SS_si;
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
@@ -84,7 +85,7 @@ void SS_print(object *obj, char *begin, char *end, object *strm)
     str = SS_OUTSTREAM(strm);
     PRINT(str, "%s", begin);
 
-    SS_OBJECT_PRINT(obj, strm);
+    SS_OBJECT_PRINT(si, obj, strm);
 
     PRINT(str, "%s", end);
 
@@ -124,6 +125,7 @@ char *_SS_sprintf(char *fmt, object *obj)
    {char *s;
     PFfprintf pr;
     PFfputs ps;
+    SS_psides *si = &_SS_si;
 
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
@@ -139,7 +141,7 @@ char *_SS_sprintf(char *fmt, object *obj)
 	SC_set_put_line(SS_printf);
 	SC_set_put_string(SS_fputs);
 
-	SS_OBJECT_PRINT(obj, SS_null);
+	SS_OBJECT_PRINT(si, obj, SS_null);
 
 	SC_set_put_line(pr);
 	SC_set_put_string(ps);
@@ -692,7 +694,7 @@ static object *_SSI_oportp(SS_psides *si, object *obj)
 
 /* SS_WR_PROC - print a procedure */
 
-void SS_wr_proc(object *obj, object *strm)
+void SS_wr_proc(SS_psides *si, object *obj, object *strm)
    {FILE *str;
     char *s;
 
@@ -780,7 +782,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 				   SC_STRING_I, "     ",
 				   0);
 		 else
-		    SS_wr_lst(desc, strm);
+		    SS_wr_lst(si, desc, strm);
                  SS_GC(desc);};
              break;
 
@@ -801,7 +803,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 				   SC_STRING_I, "     ",
 				   0);
 		 else
-		    SS_wr_lst(desc, strm);
+		    SS_wr_lst(si, desc, strm);
                  SS_GC(desc);};
              break;
 
@@ -1009,7 +1011,7 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
 
 /* SS_WR_LST - print a list */
 
-void SS_wr_lst(object *obj, object *strm)
+void SS_wr_lst(SS_psides *si, object *obj, object *strm)
    {FILE *str;
     object *cd;
 
@@ -1036,7 +1038,7 @@ void SS_wr_lst(object *obj, object *strm)
 
 /* SS_WR_ATM - print an atom or string */
 
-void SS_wr_atm(object *obj, object *strm)
+void SS_wr_atm(SS_psides *si, object *obj, object *strm)
    {int ityp;
     char t[MAXLINE];
     char *s;

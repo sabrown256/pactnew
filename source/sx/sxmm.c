@@ -64,7 +64,7 @@ static void _SX_rl_gpdbdata(object *obj)
 
 /* _SX_WR_GPDBDATA - print a g_pdbdata */
 
-static void _SX_wr_gpdbdata(object *obj, object *strm)
+static void _SX_wr_gpdbdata(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<PDBDATA|%s>", PDBDATA_NAME(obj));
@@ -94,7 +94,7 @@ object *_SX_mk_gpdbdata(SS_psides *si, char *name,
 
 /* _SX_WR_GSYMENT - print a g_syment */
 
-static void _SX_wr_gsyment(object *obj, object *strm)
+static void _SX_wr_gsyment(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<SYMENT|%s>", SYMENT_TYPE(obj));
@@ -122,7 +122,7 @@ object *_SX_mk_gsyment(SS_psides *si, syment *ep)
 
 /* _SX_WR_GDEFSTR - print a g_defstr */
 
-static void _SX_wr_gdefstr(object *obj, object *strm)
+static void _SX_wr_gdefstr(SS_psides *si, object *obj, object *strm)
    {
 
     PRINT(SS_OUTSTREAM(strm), "<DEFSTR|%s>", DEFSTR_TYPE(obj));
@@ -150,7 +150,7 @@ object *_SX_mk_gdefstr(SS_psides *si, defstr *dp)
 
 /* _SX_WR_GFILE - print a g_file */
 
-static void _SX_wr_gfile(object *obj, object *strm)
+static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
    {PDBfile *file;
      g_file *po;
 

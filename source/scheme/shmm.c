@@ -514,7 +514,7 @@ void SS_gc(object *obj)
 
 /* _SS_WR_INPORT - print an input port */
 
-static void _SS_wr_inport(object *obj, object *strm)
+static void _SS_wr_inport(SS_psides *si, object *obj, object *strm)
    {long loc;
     input_port *ip;
     FILE *fp;
@@ -532,7 +532,7 @@ static void _SS_wr_inport(object *obj, object *strm)
 
 /* _SS_WR_OUTPORT - print an output port */
 
-static void _SS_wr_outport(object *obj, object *strm)
+static void _SS_wr_outport(SS_psides *si, object *obj, object *strm)
    {output_port *op;
     FILE *fp;
 
@@ -552,14 +552,13 @@ static void _SS_wr_outport(object *obj, object *strm)
 
 /* _SS_WR_VECTOR - print a vector object */
 
-static void _SS_wr_vector(object *obj, object *strm)
+static void _SS_wr_vector(SS_psides *si, object *obj, object *strm)
    {object *lst;
-    SS_psides *si = &_SS_si;
 
     lst = SS_vctlst(si, obj);
     SS_MARK(lst);
     PRINT(SS_OUTSTREAM(strm), "#");
-    SS_wr_lst(lst, strm);
+    SS_wr_lst(si, lst, strm);
     SS_GC(lst);
 
     return;}
@@ -934,7 +933,7 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 
 object *SS_mk_object(SS_psides *si,
 		     void *np, int type, SS_eval_mode evt, char *pname,
-		     void (*print)(object *obj, object *strm),
+		     void (*print)(SS_psides *si, object *obj, object *strm),
 		     void (*release)(object *obj))
    {object *op;
     SC_mem_opt opt;
