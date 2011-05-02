@@ -345,42 +345,42 @@ static object *_SSI_haelemp(SS_psides *si, object *arg)
 void _SS_inst_hash(SS_psides *si)
    {
 
-    SS_install("hash-dump",
+    SS_install(si, "hash-dump",
                "Procedure: Return a list of the names in the given hash table",
                SS_nargs,
                SS_hash_dump, SS_PR_PROC);
 
-    SS_install("hash-info",
+    SS_install(si, "hash-info",
                "Procedure: Return (<size> <#-elements> <doc?>) for given hash table",
                SS_sargs,
                _SSI_hash_info, SS_PR_PROC);
 
-    SS_install("hash-element?",
+    SS_install(si, "hash-element?",
                "Procedure: Return #t if the object is a hash-element",
                SS_sargs,
                _SSI_haelemp, SS_PR_PROC);
 
-    SS_install("hash-install",
+    SS_install(si, "hash-install",
                "Procedure: Install the given object in the given hash table",
                SS_nargs,
                _SSI_hash_install, SS_PR_PROC);
 
-    SS_install("hash-lookup",
+    SS_install(si, "hash-lookup",
                "Procedure: Look up and return the named object in the given hash table",
                SS_nargs,
                _SSI_hash_lookup, SS_PR_PROC);
 
-    SS_install("hash-remove",
+    SS_install(si, "hash-remove",
                "Procedure: Remove the named object from the given hash table",
                SS_nargs,
                _SSI_hash_remove, SS_PR_PROC);
 
-    SS_install("hash-table?",
+    SS_install(si, "hash-table?",
                "Procedure: Return #t if the object is a hash-table",
                SS_sargs,
                _SSI_hasharrp, SS_PR_PROC);
 
-    SS_install("make-hash-table",
+    SS_install(si, "make-hash-table",
                "Procedure: Return a new hash table",
                SS_sargs,
                _SSI_make_hasharr, SS_PR_PROC);

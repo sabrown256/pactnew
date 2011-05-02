@@ -489,22 +489,22 @@ void SX_init_env(SS_psides *si)
 
     SX_curfile = SS_install_cv(si, "current-file", SS_null, SS_OBJECT_I);
 
-    SS_install("describe*",
+    SS_install(si, "describe*",
                "Procedure: Describe an SX function or variable\n     Usage: describe* <function-list> <variable-list>",
                SS_nargs,
                _SXI_describe, SS_PR_PROC);
 
-    SS_install("describe",
+    SS_install(si, "describe",
                "Macro: Describe an SX function or variable\n     Usage: describe <function-list> <variable-list>",
                SS_nargs,
                _SXI_describe, SS_UR_MACRO);
 
-    SS_install("thru",
+    SS_install(si, "thru",
                "Procedure: Return an expanded list of mappings\n     Usage: thru <first-mapping> <last-mapping>",
                SS_nargs,
                _SXI_thru, SS_PR_PROC);
 
-    SS_install("mapping-ref",
+    SS_install(si, "mapping-ref",
                "Find a mapping object.\nFORM (mapping-ref <file> <type> <index>)",
                SS_nargs,
                SXI_mapping_ref, SS_PR_PROC);

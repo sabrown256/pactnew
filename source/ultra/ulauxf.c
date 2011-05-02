@@ -1141,77 +1141,77 @@ static object *_ULI_write_abs(SS_psides *si, object *argl)
 void UL_install_aux_funcs(SS_psides *si)
    {
 
-    SS_install("cfft",
+    SS_install(si, "cfft",
                "Procedure: Compute Complex FFT. Return real and imaginary parts.\n     Usage: cfft <real-curve> <imaginary-curve>",
                SS_nargs,
                _ULI_cfft, SS_PR_PROC);
 
-    SS_install("convolve",
+    SS_install(si, "convolve",
                "Procedure: Convolve the two functions\n     Usage: convolve <curve> <curve> [<dt>]",
                SS_nargs,
                _ULI_convlv, SS_PR_PROC);
 
-    SS_install("edit",
+    SS_install(si, "edit",
                "Procedure: Graphically edit a curve\n     Usage: edit <curve>",
                UL_uc,
                _ULI_edit, SS_PR_PROC);
 
-    SS_install("error-bar",
+    SS_install(si, "error-bar",
                "Procedure: Do a scatter plot with error bars on the given curve\n     Usage: error-bar <curve> <y+curve> <y-curve> [<x+curve> [<x-curve>]]",
                SS_nargs,
                _ULI_error_plot, SS_PR_PROC);
 
-    SS_install("fitcurve",
+    SS_install(si, "fitcurve",
                "Procedure: Fit first curve to other curves\n     Usage: fitcurve <curve to fit> <curve-list for fit>",
                SS_nargs,
                _ULI_fit_curve, SS_PR_PROC);
 
-    SS_install("get-label",
+    SS_install(si, "get-label",
                "Procedure: Return the given curve's label\n     Usage: get-label <curve>",
                SS_sargs,
                _ULI_crv_label, SS_PR_PROC);
 
-    SS_install("get-domain",
+    SS_install(si, "get-domain",
                "Procedure: Return the given curve's domain\n     Usage: get-domain <curve>",
                SS_sargs,
                _ULI_crv_domain, SS_PR_PROC);
 
-    SS_install("get-range",
+    SS_install(si, "get-range",
                "Procedure: Return the given curve's range\n     Usage: get-range <curve>",
                SS_sargs,
                _ULI_crv_range, SS_PR_PROC);
 
-    SS_install("get-number-points",
+    SS_install(si, "get-number-points",
                "Procedure: Return the given curve's number of points\n     Usage: get-number-points <curve>",
                SS_sargs,
                _ULI_crv_npts, SS_PR_PROC);
 
-    SS_install("get-attributes",
+    SS_install(si, "get-attributes",
                "Procedure: Return the given curve's attributes, (color width style)\n     Usage: get-attributes <curve>",
                SS_sargs,
                _ULI_crv_attr, SS_PR_PROC);
 
-    SS_install("ifft",
+    SS_install(si, "ifft",
                "Procedure: Compute Inverse FFT. Return real and imaginary parts.\n     Usage: ifft <real-curve> <imaginary-curve>",
                SS_nargs,
                _ULI_ifft, SS_PR_PROC);
 
-    SS_install("mk-pal",
+    SS_install(si, "mk-pal",
                "Macro: Make a new palette and write it to a file\n     Usage: mk-pal <file-name> <integer> [on | off]",
                SS_nargs,
                _ULI_mk_palette, SS_UR_MACRO);
 
-    SS_install("rd-pal",
+    SS_install(si, "rd-pal",
                "Macro: Read palette file\n     Usage: rd-pal <file-name>",
                SS_sargs,
                _ULI_rd_palette, SS_UR_MACRO);
 
-    SS_install("stats",
+    SS_install(si, "stats",
                "Procedure: Calculate mean and standard deviation for curves\n     Usage: stats <curve-list>",
                SS_nargs,
                _ULI_stats, SS_PR_PROC);
 
-    SS_install("write-text",
+    SS_install(si, "write-text",
                "Procedure: Write text to screen\n     Usage: write_text <x> <y> <text>",
                SS_nargs,
                _ULI_write_abs, SS_PR_PROC);

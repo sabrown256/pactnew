@@ -3080,497 +3080,497 @@ static object *_SXI_sbfsz(SS_psides *si, object *argl)
 void _SX_install_pgs_primitives(SS_psides *si)
    {
 
-    SS_install("pg-axis",
+    SS_install(si, "pg-axis",
                "Draw a complete axis set on the given device",
                SS_nargs,
                _SXI_axis, SS_PR_PROC);
 
-    SS_install("pg-character-path",
+    SS_install(si, "pg-character-path",
                "Return a pair specifying the character path direction on the given device",
                SS_nargs,
                _SXI_gcpw, SS_PR_PROC);
 
-    SS_install("pg-character-size-ndc",
+    SS_install(si, "pg-character-size-ndc",
                "Return the character size in NDC for the given device",
                SS_nargs,
                _SXI_gcss, SS_PR_PROC);
 
-    SS_install("pg-character-up",
+    SS_install(si, "pg-character-up",
                "Return a pair specifying the character up direction on the given device",
                SS_nargs,
                _SXI_gcuw, SS_PR_PROC);
 
-    SS_install("pg-clear-mode",
+    SS_install(si, "pg-clear-mode",
                "Return the clear mode",
                SS_nargs,
                _SXI_clr_mode, SS_PR_PROC);
 
-    SS_install("pg-clipping?",
+    SS_install(si, "pg-clipping?",
                "Return #t iff clipping is on in the given device",
                SS_nargs,
                _SXI_gclp, SS_PR_PROC);
 
-    SS_install("pg-clear-window",
+    SS_install(si, "pg-clear-window",
                "Clear the screen and initialize a frame of the given device",
                SS_nargs,
                _SXI_clear_window, SS_PR_PROC);
 
-    SS_install("pg-clear-viewport",
+    SS_install(si, "pg-clear-viewport",
                "Clear the current viewport of the given device",
                SS_nargs,
                _SXI_clear_viewport, SS_PR_PROC);
 
-    SS_install("pg-clear-region",
+    SS_install(si, "pg-clear-region",
                "Clear the specified rectangular region of the given device",
                SS_nargs,
                _SXI_clear_region, SS_PR_PROC);
 
-    SS_install("pg-center-label",
+    SS_install(si, "pg-center-label",
                "Print a label string centered on a line at an NDC height",
                SS_nargs,
                _SXI_center_label, SS_PR_PROC);
 
-    SS_install("pg-current-palette",
+    SS_install(si, "pg-current-palette",
                "Return the current palette for the given device",
                SS_nargs,
                _SXI_current_pal, SS_PR_PROC);
 
-    SS_install("pg-define-marker",
+    SS_install(si, "pg-define-marker",
                "Define a new marker character",
                SS_nargs,
                _SXI_def_mrk, SS_PR_PROC);
 
-    SS_install("pg-draw-arc",
+    SS_install(si, "pg-draw-arc",
                "Draw a section of a circular arc on the given device",
                SS_nargs,
                _SXI_draw_arc, SS_PR_PROC);
 
-    SS_install("pg-draw-axis",
+    SS_install(si, "pg-draw-axis",
                "Draw a single axis on the given device",
                SS_nargs,
                _SXI_draw_axis, SS_PR_PROC);
 
-    SS_install("pg-draw-box",
+    SS_install(si, "pg-draw-box",
                "Draw a box on the given device",
                SS_nargs,
                _SXI_draw_box, SS_PR_PROC);
 
-    SS_install("pg-draw-disjoint-polyline-n",
+    SS_install(si, "pg-draw-disjoint-polyline-n",
                "Draw a set of disjoint ND line segments",
                SS_nargs,
                _SXI_ddpn, SS_PR_PROC);
 
-    SS_install("pg-draw-line",
+    SS_install(si, "pg-draw-line",
                "Draw a line on the given device",
                SS_nargs,
                _SXI_draw_line, SS_PR_PROC);
 
-    SS_install("pg-draw-markers",
+    SS_install(si, "pg-draw-markers",
                "Draw the specified marker at the given points",
                SS_nargs,
                _SXI_drw_mrk, SS_PR_PROC);
 
-    SS_install("pg-draw-palette",
+    SS_install(si, "pg-draw-palette",
                "Draw the current palette at the specified place on the given device",
                SS_nargs,
                _SXI_draw_palette, SS_PR_PROC);
 
-    SS_install("pg-draw-polyline-n",
+    SS_install(si, "pg-draw-polyline-n",
                "Draw a set of connected ND line segments",
                SS_nargs,
                _SXI_draw_polyline, SS_PR_PROC);
 
-    SS_install("pg-draw-radius",
+    SS_install(si, "pg-draw-radius",
                "Draw a radial line segment on the given device",
                SS_nargs,
                _SXI_draw_rad, SS_PR_PROC);
 
-    SS_install("pg-draw-text",
+    SS_install(si, "pg-draw-text",
                "Draw text at the given point on the given device",
                SS_nargs,
                _SXI_draw_text, SS_PR_PROC);
 
-    SS_install("pg-fill-polygon",
+    SS_install(si, "pg-fill-polygon",
                "Draw and fill a polygon on the specified device",
                SS_nargs,
                _SXI_fply, SS_PR_PROC);
 
-    SS_install("pg-finish-plot",
+    SS_install(si, "pg-finish-plot",
                "Finish the plot frame on the given device",
                SS_nargs,
                _SXI_finish_plot, SS_PR_PROC);
 
-    SS_install("pg-finish-state",
+    SS_install(si, "pg-finish-state",
                "Get the finish flag of the given device",
                SS_nargs,
                _SXI_gfin, SS_PR_PROC);
 
-    SS_install("pg-frame",
+    SS_install(si, "pg-frame",
                "Return a list of numbers defining the extent of the frame in NDC",
                SS_nargs,
                _SXI_get_frame, SS_PR_PROC);
 
-    SS_install("pg-get-attrs-global",
+    SS_install(si, "pg-get-attrs-global",
                "Get the global graphics attributes",
                SS_nargs,
                _SXI_gatgl, SS_PR_PROC);
 
-    SS_install("pg-get-attrs-graph",
+    SS_install(si, "pg-get-attrs-graph",
                "Get the specified attributes for the given graph",
                SS_nargs,
                _SXI_gatgr, SS_PR_PROC);
 
-    SS_install("pg-get-attrs-mapping",
+    SS_install(si, "pg-get-attrs-mapping",
                "Get the specified attributes for the given mapping",
                SS_nargs,
                _SXI_gatmp, SS_PR_PROC);
 
-    SS_install("pg-get-attrs-set",
+    SS_install(si, "pg-get-attrs-set",
                "Get the specified attributes for the given set",
                SS_nargs,
                _SXI_gatst, SS_PR_PROC);
 
-    SS_install("pg-get-buffer-size",
+    SS_install(si, "pg-get-buffer-size",
                "Get the I/O buffer size for graphics files",
                SS_zargs,
                _SXI_gbfsz, SS_PR_PROC);
 
-    SS_install("pg-line-color",
+    SS_install(si, "pg-line-color",
                "Get the line color on the given device",
                SS_nargs,
                _SXI_glnc, SS_PR_PROC);
 
-    SS_install("pg-logical-op",
+    SS_install(si, "pg-logical-op",
                "Get the logical operation on the given device",
                SS_nargs,
                _SXI_glop, SS_PR_PROC);
 
-    SS_install("pg-line-style",
+    SS_install(si, "pg-line-style",
                "Get the line style on the given device",
                SS_nargs,
                _SXI_glns, SS_PR_PROC);
 
-    SS_install("pg-line-width",
+    SS_install(si, "pg-line-width",
                "Get the line width on the given device",
                SS_nargs,
                _SXI_glnw, SS_PR_PROC);
 
-    SS_install("list->pg-palette",
+    SS_install(si, "list->pg-palette",
                "Convert a list of values into a palette and register it in the device",
                SS_nargs,
                _SXI_list_pal, SS_PR_PROC);
 
-    SS_install("pg-make-device-current",
+    SS_install(si, "pg-make-device-current",
                "Make the given device the current device for drawing",
                SS_nargs,
                _SXI_mdvc, SS_PR_PROC);
 
-    SS_install("pg-marker-orientation",
+    SS_install(si, "pg-marker-orientation",
                "Get the orientation angle for marker characters",
                SS_nargs,
                _SXI_mrk_ornt, SS_PR_PROC);
 
-    SS_install("pg-marker-scale",
+    SS_install(si, "pg-marker-scale",
                "Get the scale for marker characters",
                SS_nargs,
                _SXI_mrk_scal, SS_PR_PROC);
 
-    SS_install("pg-maximum-intensity",
+    SS_install(si, "pg-maximum-intensity",
                "Return the maximum fractional intensities for colors (0.0 to 1.0)",
                SS_nargs,
                _SXI_gmxi, SS_PR_PROC);
 
-    SS_install("pg-normalized->pixel",
+    SS_install(si, "pg-normalized->pixel",
                "Return a pair containing the PC version of the given NDC point",
                SS_nargs,
                _SXI_stop, SS_PR_PROC);
 
-    SS_install("pg-normalized->world",
+    SS_install(si, "pg-normalized->world",
                "Return a pair containing the WC version of the given NDC point",
                SS_nargs,
                _SXI_stow, SS_PR_PROC);
 
-    SS_install("pg-palette->list",
+    SS_install(si, "pg-palette->list",
                "Return the named palette as a list of values ( ... r g b ... )",
                SS_nargs,
                _SXI_pal_list, SS_PR_PROC);
 
-    SS_install("pg-palettes",
+    SS_install(si, "pg-palettes",
                "Return a list of palettes available for the given device",
                SS_nargs,
                _SXI_pals, SS_PR_PROC);
 
-    SS_install("pg-pixel->normalized",
+    SS_install(si, "pg-pixel->normalized",
                "Return a pair containing the NDC version of the given PC point",
                SS_nargs,
                _SXI_ptos, SS_PR_PROC);
 
-    SS_install("pg-query-device",
+    SS_install(si, "pg-query-device",
                "Return a list of device width, height, and number of colors",
                SS_nargs,
                _SXI_qdev, SS_PR_PROC);
 
-    SS_install("pg-query-window",
+    SS_install(si, "pg-query-window",
                "Return a list of window width and height",
                SS_nargs,
                _SXI_qwin, SS_PR_PROC);
 
-    SS_install("pg-release-current-device",
+    SS_install(si, "pg-release-current-device",
                "Release the given device as the current device",
                SS_nargs,
                _SXI_rdvc, SS_PR_PROC);
 
-    SS_install("pg-set-attrs-global!",
+    SS_install(si, "pg-set-attrs-global!",
                "Set the global graphics attributes",
                SS_nargs,
                _SXI_satgl, SS_PR_PROC);
 
-    SS_install("pg-set-attrs-graph!",
+    SS_install(si, "pg-set-attrs-graph!",
                "Set the specified attributes for the given graph",
                SS_nargs,
                _SXI_satgr, SS_PR_PROC);
 
-    SS_install("pg-set-attrs-mapping!",
+    SS_install(si, "pg-set-attrs-mapping!",
                "Set the specified attributes for the given mapping",
                SS_nargs,
                _SXI_satmp, SS_PR_PROC);
 
-    SS_install("pg-set-attrs-set!",
+    SS_install(si, "pg-set-attrs-set!",
                "Set the specified attributes for the given set",
                SS_nargs,
                _SXI_satst, SS_PR_PROC);
 
-    SS_install("pg-set-autodomain!",
+    SS_install(si, "pg-set-autodomain!",
                "Set the autodomain flag of the given device",
                SS_nargs,
                _SXI_sadm, SS_PR_PROC);
 
-    SS_install("pg-set-autoplot!",
+    SS_install(si, "pg-set-autoplot!",
                "Set the autoplot flag of the given device",
                SS_nargs,
                _SXI_sapl, SS_PR_PROC);
 
-    SS_install("pg-set-autorange!",
+    SS_install(si, "pg-set-autorange!",
                "Set the autorange flag of the given device",
                SS_nargs,
                _SXI_sarn, SS_PR_PROC);
 
-    SS_install("pg-set-border-width!",
+    SS_install(si, "pg-set-border-width!",
                "Set the device border width in pixels",
                SS_nargs,
                _SXI_sbwd, SS_PR_PROC);
 
-    SS_install("pg-set-buffer-size!",
+    SS_install(si, "pg-set-buffer-size!",
                "Set the I/O buffer size for graphics files",
                SS_sargs,
                _SXI_sbfsz, SS_PR_PROC);
 
-    SS_install("pg-set-char-path!",
+    SS_install(si, "pg-set-char-path!",
                "Set the character path direction for the given device",
                SS_nargs,
                _SXI_scpw, SS_PR_PROC);
 
-    SS_install("pg-set-char-up!",
+    SS_install(si, "pg-set-char-up!",
                "Set the character up direction for the given device",
                SS_nargs,
                _SXI_scuw, SS_PR_PROC);
 
-    SS_install("pg-set-clear-mode!",
+    SS_install(si, "pg-set-clear-mode!",
                "Set the clear mode",
                SS_nargs,
                _SXI_set_clr_mode, SS_PR_PROC);
 
-    SS_install("pg-set-clipping!",
+    SS_install(si, "pg-set-clipping!",
                "Set the clipping state of the given device",
                SS_nargs,
                _SXI_sclp, SS_PR_PROC);
 
-    SS_install("pg-set-data-id-flag!",
+    SS_install(si, "pg-set-data-id-flag!",
                "Set the data-id flag of the given device",
                SS_nargs,
                _SXI_sdti, SS_PR_PROC);
 
-    SS_install("pg-set-fill-color!",
+    SS_install(si, "pg-set-fill-color!",
                "Set the fill color on the given device",
                SS_nargs,
                _SXI_sfic, SS_PR_PROC);
 
-    SS_install("pg-set-finish-state!",
+    SS_install(si, "pg-set-finish-state!",
                "Set the finish flag of the given device",
                SS_nargs,
                _SXI_sfin, SS_PR_PROC);
 
-    SS_install("pg-set-grid-flag!",
+    SS_install(si, "pg-set-grid-flag!",
                "Set the grid flag on the given device",
                SS_nargs,
                _SXI_sgrd, SS_PR_PROC);
 
-    SS_install("pg-set-line-color!",
+    SS_install(si, "pg-set-line-color!",
                "Set the line color on the given device",
                SS_nargs,
                _SXI_slnc, SS_PR_PROC);
 
-    SS_install("pg-set-logical-op!",
+    SS_install(si, "pg-set-logical-op!",
                "Set the logical operation on the given device",
                SS_nargs,
                _SXI_slop, SS_PR_PROC);
 
-    SS_install("pg-set-line-style!",
+    SS_install(si, "pg-set-line-style!",
                "Set the line style on the given device",
                SS_nargs,
                _SXI_slns, SS_PR_PROC);
 
-    SS_install("pg-set-line-width!",
+    SS_install(si, "pg-set-line-width!",
                "Set the line width on the given device",
                SS_nargs,
                _SXI_slnw, SS_PR_PROC);
 
-    SS_install("pg-set-marker-orientation!",
+    SS_install(si, "pg-set-marker-orientation!",
                "Set the orientation angle for marker characters",
                SS_nargs,
                _SXI_set_mrk_ornt, SS_PR_PROC);
 
-    SS_install("pg-set-marker-scale!",
+    SS_install(si, "pg-set-marker-scale!",
                "Set the scale for marker characters",
                SS_nargs,
                _SXI_set_mrk_scal, SS_PR_PROC);
 
-    SS_install("pg-set-maximum-intensity!",
+    SS_install(si, "pg-set-maximum-intensity!",
                "Set the maximum fractional intensity for colors (0.0 to 1.0) and optionally for RGB too",
                SS_nargs,
                _SXI_smxi, SS_PR_PROC);
 
-    SS_install("pg-set-palette!",
+    SS_install(si, "pg-set-palette!",
                "Set the palette for the given device",
                SS_nargs,
                _SXI_spal, SS_PR_PROC);
 
-    SS_install("pg-set-resolution-scale-factor!",
+    SS_install(si, "pg-set-resolution-scale-factor!",
                "Set the resolution scale factor for the given device",
                SS_nargs,
                _SXI_sres_sf, SS_PR_PROC);
 
-    SS_install("pg-set-scatter-flag!",
+    SS_install(si, "pg-set-scatter-flag!",
                "Set the scatter plot flag on the given device",
                SS_nargs,
                _SXI_ssct, SS_PR_PROC);
 
-    SS_install("pg-set-text-color!",
+    SS_install(si, "pg-set-text-color!",
                "Set the text color on the given device",
                SS_nargs,
                _SXI_stxc, SS_PR_PROC);
 
-    SS_install("pg-set-text-font!",
+    SS_install(si, "pg-set-text-font!",
                "Set the text type face, type style, and point size on the given device",
                SS_nargs,
                _SXI_stxf, SS_PR_PROC);
 
-    SS_install("pg-set-white-background!",
+    SS_install(si, "pg-set-white-background!",
                "Set the white background flag on the given device",
                SS_nargs,
                _SXI_swbk, SS_PR_PROC);
 
-    SS_install("pg-set-frame!",
+    SS_install(si, "pg-set-frame!",
                "Set the frame for the given device",
                SS_nargs,
                _SXI_set_frame, SS_PR_PROC);
 
-    SS_install("pg-set-vector-attributes!",
+    SS_install(si, "pg-set-vector-attributes!",
                "Set the drawing properties for vectors",
                SS_nargs,
                _SXI_set_vect_attr, SS_PR_PROC);
 
-    SS_install("pg-set-viewport!",
+    SS_install(si, "pg-set-viewport!",
                "Set the viewport for the given device",
                SS_nargs,
                _SXI_set_viewport, SS_PR_PROC);
 
-    SS_install("pg-set-world-coordinate-system!",
+    SS_install(si, "pg-set-world-coordinate-system!",
                "Set the world coordinate system for the given device",
                SS_nargs,
                _SXI_set_window, SS_PR_PROC);
 
-    SS_install("pg-show-markers",
+    SS_install(si, "pg-show-markers",
                "Show the marker characters",
                SS_zargs,
                _SXI_show_mrk, SS_PR_PROC);
 
-    SS_install("pg-make-palette",
+    SS_install(si, "pg-make-palette",
                "Graphically make a palette and make it the current palette",
                SS_nargs,
                _SXI_mk_pal, SS_PR_PROC);
 
-    SS_install("pg-show-palettes",
+    SS_install(si, "pg-show-palettes",
                "Show the available palettes and make selected palette the current one",
                SS_nargs,
                _SXI_show_pal, SS_PR_PROC);
 
-    SS_install("pg-read-palette",
+    SS_install(si, "pg-read-palette",
                "Read a palette from the given file",
                SS_nargs,
                _SXI_rd_pal, SS_PR_PROC);
 
-    SS_install("pg-write-palette",
+    SS_install(si, "pg-write-palette",
                "Write a palette to the given file",
                SS_nargs,
                _SXI_wr_pal, SS_PR_PROC);
 
-    SS_install("pg-text-color",
+    SS_install(si, "pg-text-color",
                "Return the current text color on the given device",
                SS_nargs,
                _SXI_gtxc, SS_PR_PROC);
 
-    SS_install("pg-text-extent",
+    SS_install(si, "pg-text-extent",
                "Return a pair of numbers specifying the WC extent of the given string",
                SS_nargs,
                _SXI_gtew, SS_PR_PROC);
 
-    SS_install("pg-text-font",
+    SS_install(si, "pg-text-font",
                "Return a list of current font specifications on the given device",
                SS_nargs,
                _SXI_gtxf, SS_PR_PROC);
 
-    SS_install("pg-update-view-surface",
+    SS_install(si, "pg-update-view-surface",
                "Update the view surface for the given device",
                SS_nargs,
                _SXI_update_vs, SS_PR_PROC);
 
-    SS_install("pg-viewport",
+    SS_install(si, "pg-viewport",
                "Return a list of numbers defining the extent of the viewport in NDC",
                SS_nargs,
                _SXI_get_viewport, SS_PR_PROC);
 
-    SS_install("pg-view-angle",
+    SS_install(si, "pg-view-angle",
                "Return a list of Euler angles defining the view angle",
                SS_nargs,
                _SXI_getva, SS_PR_PROC);
 
-    SS_install("pg-light-angle",
+    SS_install(si, "pg-light-angle",
                "Return a list of Euler angles defining the lighting angle",
                SS_nargs,
                _SXI_getla, SS_PR_PROC);
 
-    SS_install("pg-set-view-angle!",
+    SS_install(si, "pg-set-view-angle!",
                "Set the Euler angles defining the view angle",
                SS_nargs,
                _SXI_setva, SS_PR_PROC);
 
-    SS_install("pg-set-light-angle!",
+    SS_install(si, "pg-set-light-angle!",
                "Set the Euler angles defining the lighting angle",
                SS_nargs,
                _SXI_setla, SS_PR_PROC);
 
-    SS_install("pg-world-coordinate-system",
+    SS_install(si, "pg-world-coordinate-system",
                "Return a list of numbers defining the WC system",
                SS_nargs,
                _SXI_get_window, SS_PR_PROC);
 
-    SS_install("pg-world->normalized",
+    SS_install(si, "pg-world->normalized",
                "Return a pair containing the NDC version of the given WC point",
                SS_nargs,
                _SXI_wtos, SS_PR_PROC);
 
-    SS_install("pg-set-color-type!",
+    SS_install(si, "pg-set-color-type!",
                "Set the color type on the given device",
                SS_nargs,
                _SXI_set_color_type, SS_PR_PROC);

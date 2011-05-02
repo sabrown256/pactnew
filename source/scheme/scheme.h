@@ -1015,7 +1015,7 @@ extern object
 
 extern void
  SS_register_types(void),
- SS_install(char *pname, char *pdoc, PFPHand phand, ...),
+ SS_install(SS_psides *si, char *pname, char *pdoc, PFPHand phand, ...),
  SS_rl_object(object *obj),
  SS_gc(object *obj);
 

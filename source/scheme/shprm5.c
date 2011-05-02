@@ -289,57 +289,57 @@ static object *_SSI_versorq(SS_psides *si, object *argl)
 void _SS_install_quaternion(SS_psides *si)
    {
 
-    SS_install("make-rectangularq",
+    SS_install(si, "make-rectangularq",
                "Procedure: make a quaternion from cartesian components",
                SS_nargs,
                _SSI_mk_rectq, SS_PR_PROC);
 
-    SS_install("make-polarq",
+    SS_install(si, "make-polarq",
                "Procedure: make a quaternion from a magnitude and angle",
                SS_nargs,
                _SSI_mk_polarq, SS_PR_PROC);
 
-    SS_install("real-partq",
+    SS_install(si, "real-partq",
                "Procedure: return the S part of a quaternion",
                SS_sargs,
                _SSI_real_partq, SS_PR_PROC);
 
-    SS_install("imag-partq",
+    SS_install(si, "imag-partq",
                "Procedure: return the I part of a quaternion",
                SS_sargs,
                _SSI_imag_partq, SS_PR_PROC);
 
-    SS_install("jmag-partq",
+    SS_install(si, "jmag-partq",
                "Procedure: return the J part of a quaternion",
                SS_sargs,
                _SSI_jmag_partq, SS_PR_PROC);
 
-    SS_install("kmag-partq",
+    SS_install(si, "kmag-partq",
                "Procedure: return the K part of a quaternion",
                SS_sargs,
                _SSI_kmag_partq, SS_PR_PROC);
 
-    SS_install("magnitudeq",
+    SS_install(si, "magnitudeq",
                "Procedure: return the magnitude of a quaternion",
                SS_sargs,
                _SSI_magnitudeq, SS_PR_PROC);
 
-    SS_install("angleq",
+    SS_install(si, "angleq",
                "Procedure: return the polar angle of a quaternion",
                SS_sargs,
                _SSI_angleq, SS_PR_PROC);
 
-    SS_install("colatitudeq",
+    SS_install(si, "colatitudeq",
                "Procedure: return the colatitude of a quaternion",
                SS_sargs,
                _SSI_colatq, SS_PR_PROC);
 
-    SS_install("longitudeq",
+    SS_install(si, "longitudeq",
                "Procedure: return the longitude of a quaternion",
                SS_sargs,
                _SSI_longq, SS_PR_PROC);
 
-    SS_install("versor",
+    SS_install(si, "versor",
                "Procedure: return the versor of a quaternion",
                SS_sargs,
                _SSI_versorq, SS_PR_PROC);

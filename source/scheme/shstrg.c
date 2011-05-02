@@ -916,177 +916,177 @@ static object *_SSI_lasttok(SS_psides *si, object *argl)
 void _SS_inst_str(SS_psides *si)
    {
 
-    SS_install("blank?",
+    SS_install(si, "blank?",
                "Procedure: Return #t if a string is blank or a comment",
                SS_nargs,
                _SSI_blankstr, SS_PR_PROC);
 
-    SS_install("down-case",
+    SS_install(si, "down-case",
                "Procedure: Return a string containing only lower case char made from input",
                SS_sargs,
                _SSI_dncase, SS_PR_PROC);
 
-    SS_install("lasttok",
+    SS_install(si, "lasttok",
                "Procedure: Extract the last token from the string ala SC_lasttok",
                SS_nargs,
                _SSI_lasttok, SS_PR_PROC);
 
-    SS_install("list->string",
+    SS_install(si, "list->string",
                "Procedure: Returns a string constructed from a list of characters",
                SS_nargs,
                _SSI_lststr, SS_PR_PROC);
 
-    SS_install("make-string",
+    SS_install(si, "make-string",
                "Procedure: Return a blank filled string of the given length",
                SS_sargs,
                _SSI_mk_str, SS_PR_PROC);
 
-    SS_install("strchr",
+    SS_install(si, "strchr",
                "Procedure: Like the C function",
                SS_nargs,
                _SSI_strchr, SS_PR_PROC);
 
-    SS_install("istrchr",
+    SS_install(si, "istrchr",
                "Procedure: Like strchr but return starting index in original string",
                SS_nargs,
                _SSI_istrchr, SS_PR_PROC);
 
-    SS_install("strstr",
+    SS_install(si, "strstr",
                "Procedure: Like the C function",
                SS_nargs,
                _SSI_strstr, SS_PR_PROC);
 
-    SS_install("strcasestr",
+    SS_install(si, "strcasestr",
                "Procedure: Like the C function",
                SS_nargs,
                _SSI_strcasestr, SS_PR_PROC);
 
-    SS_install("istrstr",
+    SS_install(si, "istrstr",
                "Procedure: Like strstr but return starting index in original string",
                SS_nargs,
                _SSI_istrstr, SS_PR_PROC);
 
-    SS_install("string",
+    SS_install(si, "string",
                "Procedure: Return a string from the given list of characters",
                SS_nargs,
                _SSI_string, SS_PR_PROC);
 
-    SS_install("string=?",
+    SS_install(si, "string=?",
                "Procedure: Returns #t iff the strings are the same (length too)",
                SS_nargs,
                _SSI_streq, SS_PR_PROC);
 
-    SS_install("string>=?",
+    SS_install(si, "string>=?",
                "Procedure: Returns #t iff the first string is 'greater than or equal to' the second",
                SS_nargs,
                _SSI_strge, SS_PR_PROC);
 
-    SS_install("string>?",
+    SS_install(si, "string>?",
                "Procedure: Returns #t iff the first string is 'greater than' the second",
                SS_nargs,
                _SSI_strgt, SS_PR_PROC);
 
-    SS_install("string<=?",
+    SS_install(si, "string<=?",
                "Procedure: Returns #t iff the first string is 'less than or equal to' the second",
                SS_nargs,
                _SSI_strle, SS_PR_PROC);
 
-    SS_install("string<?",
+    SS_install(si, "string<?",
                "Procedure: Returns #t iff the first string is 'less than' the second",
                SS_nargs,
                _SSI_strlt, SS_PR_PROC);
 
-    SS_install("string-ci=?",
+    SS_install(si, "string-ci=?",
                "Procedure: Returns #t iff the strings are the same (length too)",
                SS_nargs,
                _SSI_cistreq, SS_PR_PROC);
 
-    SS_install("string-ci>=?",
+    SS_install(si, "string-ci>=?",
                "Procedure: Returns #t iff the first string is 'greater than or equal to' the second",
                SS_nargs,
                _SSI_cistrge, SS_PR_PROC);
 
-    SS_install("string-ci>?",
+    SS_install(si, "string-ci>?",
                "Procedure: Returns #t iff the first string is 'greater than' the second",
                SS_nargs,
                _SSI_cistrgt, SS_PR_PROC);
 
-    SS_install("string-ci<=?",
+    SS_install(si, "string-ci<=?",
                "Procedure: Returns #t iff the first string is 'less than or equal to' the second",
                SS_nargs,
                _SSI_cistrle, SS_PR_PROC);
 
-    SS_install("string-ci<?",
+    SS_install(si, "string-ci<?",
                "Procedure: Returns #t iff the first string is 'less than' the second",
                SS_nargs,
                _SSI_cistrlt, SS_PR_PROC);
 
-    SS_install("string->list",
+    SS_install(si, "string->list",
                "Procedure: Construct a list of the characters in the given string",
                SS_sargs,
                _SSI_strlst, SS_PR_PROC);
 
-    SS_install("string->number",
+    SS_install(si, "string->number",
                "Procedure: Return the number represented by the given string",
                SS_sargs,
                _SSI_strnum, SS_PR_PROC);
 
-    SS_install("string->symbol",
+    SS_install(si, "string->symbol",
                "Procedure: Make a new variable with name given by the string",
                SS_sargs,
                _SSI_strsym, SS_PR_PROC);
 
-    SS_install("string-append",
+    SS_install(si, "string-append",
                "Procedure: Append the argument strings together into a new string and return it",
                SS_nargs,
                _SSI_strapp, SS_PR_PROC);
 
-    SS_install("string-copy",
+    SS_install(si, "string-copy",
                "Procedure: Return a copy of the given string",
                SS_sargs,
                _SSI_strcpy, SS_PR_PROC);
 
-    SS_install("string-fill!",
+    SS_install(si, "string-fill!",
                "Procedure: Fill the given string with the given character",
                SS_nargs,
                _SSI_strfil, SS_PR_PROC);
 
-    SS_install("string-length",
+    SS_install(si, "string-length",
                "Procedure: Returns the number of characters in the given string",
                SS_sargs,
                _SSI_strlen, SS_PR_PROC);
 
-    SS_install("string-ref",
+    SS_install(si, "string-ref",
                "Procedure: Returns the nth character in the given string",
                SS_nargs,
                _SSI_strref, SS_PR_PROC);
 
-    SS_install("string-set!",
+    SS_install(si, "string-set!",
                "Procedure: Set the Nth character of the string to the given character",
                SS_nargs,
                _SSI_strset, SS_PR_PROC);
 
-    SS_install("strtok",
+    SS_install(si, "strtok",
                "Procedure: Extract the next token from the string ala SC_firsttok",
                SS_nargs,
                _SSI_strtok, SS_PR_PROC);
 
-    SS_install("substring",
+    SS_install(si, "substring",
                "Procedure: Extract the substring zero-origin indexed by the last two args",
                SS_nargs,
                _SSI_strsub, SS_PR_PROC);
 
-    SS_install("symbol->string",
+    SS_install(si, "symbol->string",
                "Procedure: Make a new string out of the given variable name",
                SS_sargs,
                _SSI_symstr, SS_PR_PROC);
 
-    SS_install("string-trim",
+    SS_install(si, "string-trim",
                "Procedure: Trim characters off the front, back, or both of a string",
                SS_nargs,
                _SSI_trim, SS_PR_PROC);
 
-    SS_install("up-case",
+    SS_install(si, "up-case",
                "Procedure: Return a string containing only upper case char made from input",
                SS_sargs,
                _SSI_upcase, SS_PR_PROC);

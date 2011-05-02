@@ -660,57 +660,57 @@ static object *_SSI_exp_eval(SS_psides *si, object *obj)
 void _SS_inst_eval(SS_psides *si)
    {
 
-    SS_install("and",
+    SS_install(si, "and",
                "Special Form: (and <form> ... <form>), evaluates forms until FALSE is returned",
                SS_sargs,
                _SS_ident, SS_AND);
 
-    SS_install("apply",
+    SS_install(si, "apply",
                "Special Form: cons the procedure onto the args and eval the result",
                SS_sargs,
                _SS_ident, SS_EE_MACRO);
 
-    SS_install("begin",
+    SS_install(si, "begin",
                "Special Form: Evaluate a list of forms and returns the value of the last one",
                SS_sargs,
                _SS_ident, SS_BEGIN);
 
-    SS_install("cond",
+    SS_install(si, "cond",
                "Special Form: (cond (<clause1>) ... (<clausen>))",
                SS_sargs,
                _SS_ident, SS_COND);
 
-    SS_install("define",
+    SS_install(si, "define",
                "Special Form: defines variables and procedures in the current environment",
                SS_sargs,
                _SS_ident, SS_DEFINE);
 
-    SS_install("define-macro",
+    SS_install(si, "define-macro",
                "Special Form: defines special forms in the current environment",
                SS_sargs,
                _SS_ident, SS_DEFINE);
 
-    SS_install("define-macro-ev",
+    SS_install(si, "define-macro-ev",
                "Special Form: defines special forms which are post-evaluated in the current environment",
                SS_sargs,
                _SS_ident, SS_DEFINE);
 
-    SS_install("eval",
+    SS_install(si, "eval",
                "Procedure: Evaluates the given form and returns the value",
                SS_sargs,
                _SSI_exp_eval, SS_PR_PROC);
 
-    SS_install("if",
+    SS_install(si, "if",
                "Special Form: (if <pred> <consequent> <alternate>)",
                SS_sargs,
                _SS_ident, SS_IF);
 
-    SS_install("or",
+    SS_install(si, "or",
                "Special Form: (or <form> ... <form>), evaluates forms until TRUE is returned",
                SS_sargs,
                _SS_ident, SS_OR);
 
-    SS_install("set!",
+    SS_install(si, "set!",
                "Special Form: binds variable to value in current environment",
                SS_sargs,
                _SS_ident, SS_SET);

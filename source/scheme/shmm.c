@@ -144,14 +144,11 @@ procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
  *             -      typedef struct s_SS_C_proc C_procedure;
  */
 
-void _SS_install(char* pname, char *pdoc, PFPHand phand,
+void _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
 		 int n, PFVoid *pr, SS_form ptype)
    {object *op, *vp;
     procedure *pp;
     C_procedure *cp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
 /* create the C level procedure */
     cp = _SS_mk_C_proc(phand, n, pr);
@@ -186,7 +183,7 @@ void _SS_install(char* pname, char *pdoc, PFPHand phand,
  *            - purpose mechanism
  */
 
-void SS_install(char* pname, char *pdoc, PFPHand phand, ...)
+void SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand, ...)
 /*                PFVoid pproc, SS_form ptype */
    {SS_form ptype;
     PFVoid *pr;
@@ -198,7 +195,7 @@ void SS_install(char* pname, char *pdoc, PFPHand phand, ...)
     ptype = SC_VA_ARG(SS_form);
     SC_VA_END;
 
-    _SS_install(pname, pdoc, phand, 1, pr, ptype);
+    _SS_install(si, pname, pdoc, phand, 1, pr, ptype);
 
     return;}
 

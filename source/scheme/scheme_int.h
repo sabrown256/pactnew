@@ -250,7 +250,7 @@ extern int
 
 extern void
  _SS_rl_C_proc(C_procedure *cp),
- _SS_install(char* pname, char *pdoc, PFPHand phand,
+ _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
              int n, PFVoid *pr, SS_form ptype);
 
 extern object

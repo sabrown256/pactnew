@@ -934,117 +934,117 @@ static object *_SXI_wr_restart(SS_psides *si, object *argl)
 void SX_install_panacea_funcs(SS_psides *si)
    {
 
-    SS_install("pa-advance-name",
+    SS_install(si, "pa-advance-name",
                "Advance the given file name",
                SS_sargs,
                _SXI_advance_name, SS_PR_PROC);
 
-    SS_install("pa-advance-time",
+    SS_install(si, "pa-advance-time",
                "Sets the problem time and time step",
                SS_nargs,
                _SXI_advance_time, SS_PR_PROC);
 
-    SS_install("pa-command",
+    SS_install(si, "pa-command",
                "Process a command line string",
                SS_nargs,
                _SXI_pan_cmmnd, SS_PR_PROC);
 
-    SS_install("pa-define-variable",
+    SS_install(si, "pa-define-variable",
                "Define a new variable to the database",
                SS_nargs,
                _SXI_def_var, SS_PR_PROC);
 
-    SS_install("pa-describe-entity",
+    SS_install(si, "pa-describe-entity",
                "Displays a description of a panacea package or variable",
                SS_sargs,
                _SXI_desc_pan, SS_PR_PROC);
 
-    SS_install("pa-display",
+    SS_install(si, "pa-display",
                "Displays a panacea object in nice form",
                SS_sargs,
                _SXI_display_pan_object, SS_PR_PROC);
 
-    SS_install("pa-finish-simulation",
+    SS_install(si, "pa-finish-simulation",
                "Gracefully conclude a numerical simulation",
                SS_nargs,
                _SXI_fin_system, SS_PR_PROC);
 
-    SS_install("pa-init-simulation",
+    SS_install(si, "pa-init-simulation",
                "Initialize a numerical simulation",
                SS_nargs,
                _SXI_init_problem, SS_PR_PROC);
 
-    SS_install("pa-install-commands",
+    SS_install(si, "pa-install-commands",
                "Install the commands from all packages",
                SS_zargs,
                _SXI_inst_com, SS_PR_PROC);
 
-    SS_install("pa-intern-packages",
+    SS_install(si, "pa-intern-packages",
                "Returns a list of variables which are bound to the PANACEA packages",
                SS_zargs,
                _SXI_intern_packages, SS_PR_PROC);
 
-    SS_install("pa-iv-specification?",
+    SS_install(si, "pa-iv-specification?",
                "Returns #t if the object is a PANACEA initial value specification, and #f otherwise",
                SS_sargs,
                _SXI_iv_specp, SS_PR_PROC);
 
-    SS_install("pa-list-packages",
+    SS_install(si, "pa-list-packages",
                "List current panacea packages",
                SS_zargs,
                _SXI_list_pan_pck, SS_PR_PROC);
 
-    SS_install("pa-package?",
+    SS_install(si, "pa-package?",
                "Returns #t if the object is a PANACEA package, and #f otherwise",
                SS_sargs,
                _SXI_packagep, SS_PR_PROC);
 
-    SS_install("pa-package-name",
+    SS_install(si, "pa-package-name",
                "Returns a the name of the PANACEA package",
                SS_sargs,
                _SXI_package_name, SS_PR_PROC);
 
-    SS_install("pa-read-commands",
+    SS_install(si, "pa-read-commands",
                "Read the commands in the specified source file",
                SS_nargs,
                _SXI_readh, SS_PR_PROC);
 
-    SS_install("pa-read-state-file",
+    SS_install(si, "pa-read-state-file",
                "Reads the named state file and does the specified conversions",
                SS_nargs,
                _SXI_rd_restart, SS_PR_PROC);
 
-    SS_install("pa-run-package",
+    SS_install(si, "pa-run-package",
                "Executes the given package and returns its time step and controlling zone",
                SS_nargs,
                _SXI_run_package, SS_PR_PROC);
 
-    SS_install("pa-save-to-pp",
+    SS_install(si, "pa-save-to-pp",
                "Save the data for the output requests from this cycle",
                SS_nargs,
                _SXI_dump_pp, SS_PR_PROC);
 
-    SS_install("pa-simulate",
+    SS_install(si, "pa-simulate",
                "Runs a simulation from Ti to Tf",
                SS_nargs,
                _SXI_pan_simulate, SS_PR_PROC);
 
-    SS_install("pa-source-variable?",
+    SS_install(si, "pa-source-variable?",
                "Returns #t if the object is a PANACEA source variable, and #f otherwise",
                SS_sargs,
                _SXI_srcvarp, SS_PR_PROC);
 
-    SS_install("pa-variable?",
+    SS_install(si, "pa-variable?",
                "Returns #t if the object is a PANACEA variable, and #f otherwise",
                SS_sargs,
                _SXI_panvarp, SS_PR_PROC);
 
-    SS_install("pa-variable->pm-array",
+    SS_install(si, "pa-variable->pm-array",
                "Save the data for the output requests from this cycle",
                SS_sargs,
                _SXI_db_numeric_data, SS_PR_PROC);
 
-    SS_install("pa-write-state-file",
+    SS_install(si, "pa-write-state-file",
                "Write a state file",
                SS_sargs,
                _SXI_wr_restart, SS_PR_PROC);

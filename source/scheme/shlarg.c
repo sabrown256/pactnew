@@ -794,167 +794,167 @@ static object *_SSI_load_env(SS_psides *si, object *arg)
 void _SS_inst_lrg(SS_psides *si)
    {
 
-    SS_install("attach-debugger",
+    SS_install(si, "attach-debugger",
                "Procedure: attach a debugger to the specified pid",
                SS_nargs,
                _SSI_attach, SS_PR_PROC);
 
-    SS_install("call-stack-trace",
+    SS_install(si, "call-stack-trace",
                "Procedure: print out the call stack trace of the specified pid",
                SS_nargs,
                _SSI_retrace, SS_PR_PROC);
 
-    SS_install("wall-clock-time",
+    SS_install(si, "wall-clock-time",
                "Procedure: Returns the accumulated wall clock time in seconds",
                SS_zargs,
                _SSI_wall_clock_time, SS_PR_PROC);
 
-    SS_install("define-global",
+    SS_install(si, "define-global",
                "Special Form: defines variables and procedures in the global environment",
                SS_nargs,
                _SSI_define_global, SS_UE_MACRO);
 
-    SS_install("define-global-macro",
+    SS_install(si, "define-global-macro",
                "Special Form: defines variables and procedures in the global environment",
                SS_nargs,
                _SSI_define_global, SS_UE_MACRO);
 
-    SS_install("env",
+    SS_install(si, "env",
                "Procedure: print the specified environment frame",
                SS_sargs,
                _SSI_print_env, SS_PR_PROC);
 
-    SS_install("fopen",
+    SS_install(si, "fopen",
                "Procedure: C style file open",
                SS_nargs,
                _SSI_fopen, SS_PR_PROC);
 
-    SS_install("fclose",
+    SS_install(si, "fclose",
                "Procedure: C style file close",
                SS_sargs,
                _SSI_fclose, SS_PR_PROC);
 
-    SS_install("free-mem",
+    SS_install(si, "free-mem",
                "Procedure: return the memory and free memory of the current host",
                SS_zargs,
                _SSI_free_mem, SS_PR_PROC);
 
-    SS_install("getcwd",
+    SS_install(si, "getcwd",
                "Procedure: return the current working directory",
                SS_zargs,
                _SSI_getcwd, SS_PR_PROC);
 
-    SS_install("getenv",
+    SS_install(si, "getenv",
                "Procedure: return the value of the specified environment variable",
                SS_sargs,
                _SSI_getenv, SS_PR_PROC);
 
-    SS_install("get-ncpu",
+    SS_install(si, "get-ncpu",
                "Procedure: return the number of CPUs on the current host",
                SS_zargs,
                _SSI_get_ncpu, SS_PR_PROC);
 
-    SS_install("get-pid-name",
+    SS_install(si, "get-pid-name",
                "Procedure: return the name of the program running as the given process id",
                SS_nargs,
                _SSI_get_pname, SS_PR_PROC);
 
-    SS_install("interactive?",
+    SS_install(si, "interactive?",
 	       "Procedure: Return #t iff interactive mode is on\n",
 	       SS_zargs,
 	       _SSI_interactp, SS_PR_PROC);
 
-    SS_install("list->vector",
+    SS_install(si, "list->vector",
                "Procedure: Returns a vector whose elements are the same as the lists",
                SS_sargs,
                _SSI_lstvct, SS_PR_PROC);
 
-    SS_install("load-ave",
+    SS_install(si, "load-ave",
                "Procedure: return the load averages of the current host",
                SS_zargs,
                _SSI_load_ave, SS_PR_PROC);
 
-    SS_install("load-env",
+    SS_install(si, "load-env",
                "Procedure: load environment variables into the global environment",
                SS_znargs,
                _SSI_load_env, SS_PR_PROC);
 
-    SS_install("make-vector",
+    SS_install(si, "make-vector",
                "Procedure: Return a new vector whose length is specified by the argument",
                SS_sargs,
                _SSI_mkvect, SS_PR_PROC);
 
-    SS_install("memory-map",
+    SS_install(si, "memory-map",
                "Procedure: print a memory map to the given port",
                SS_sargs,
                _SSI_mem_map, SS_PR_PROC);
 
-    SS_install("memory-monitor",
+    SS_install(si, "memory-monitor",
                "Procedure: map out leaks from the heap",
                SS_nargs,
                _SSI_mem_monitor, SS_PR_PROC);
 
-    SS_install("memory-trace",
+    SS_install(si, "memory-trace",
                "Procedure: return the number of allocated memory blocks",
                SS_zargs,
                _SSI_mem_trace, SS_PR_PROC);
 
-    SS_install("memory-check",
+    SS_install(si, "memory-check",
                "Procedure: return the number of allocated, freed, and registered memory blocks",
                SS_zargs,
                _SSI_mem_chk, SS_PR_PROC);
 
-    SS_install("memory-usage",
+    SS_install(si, "memory-usage",
                "Procedure: Returns the number of bytes allocated, freed, and diff",
                SS_zargs,
                _SSI_mem_usg, SS_PR_PROC);
 
-    SS_install("printenv",
+    SS_install(si, "printenv",
                "Procedure: print the environment variables specified",
                SS_nargs,
                _SSI_printenv, SS_PR_PROC);
 
-    SS_install("setenv",
+    SS_install(si, "setenv",
                "Procedure: set the value of the specified environment variable",
                SS_nargs,
                _SSI_setenv, SS_PR_PROC);
 
-    SS_install("sizeof",
+    SS_install(si, "sizeof",
                "Procedure: Returns the byte size of the data type named by its argument",
                SS_sargs,
                _SSI_sizeof, SS_PR_PROC);
 
-    SS_install("sleep",
+    SS_install(si, "sleep",
                "Procedure: Sleep n milliseconds",
                SS_sargs,
                _SSI_sleep, SS_PR_PROC);
 
-    SS_install("vector?",
+    SS_install(si, "vector?",
                "Procedure: Returns #t iff the object is of type vector",
                SS_sargs,
                _SSI_vectp, SS_PR_PROC);
 
-    SS_install("vector",
+    SS_install(si, "vector",
                "Procedure: Analog to list procedure for vectors",
                SS_nargs,
                _SSI_vector, SS_PR_PROC);
 
-    SS_install("vector-length",
+    SS_install(si, "vector-length",
                "Procedure: Returns the number of elements in the specified vector",
                SS_sargs,
                _SSI_vctlen, SS_PR_PROC);
 
-    SS_install("vector->list",
+    SS_install(si, "vector->list",
                "Procedure: Returns a list whose elements are the same as the vectors",
                SS_sargs,
                _SSI_vctlst, SS_PR_PROC);
 
-    SS_install("vector-ref",
+    SS_install(si, "vector-ref",
                "Procedure: Returns the nth element of the given vector",
                SS_nargs,
                _SSI_vctref, SS_PR_PROC);
 
-    SS_install("vector-set!",
+    SS_install(si, "vector-set!",
                "Procedure: Sets the nth element of the given vector",
                SS_nargs,
                _SSI_vctset, SS_PR_PROC);

@@ -1173,222 +1173,222 @@ static object *_SSI_reverse(SS_psides *si, object *obj)
 void _SS_inst_prm3(SS_psides *si)
    {
 
-    SS_install("append",
+    SS_install(si, "append",
                "Return a new list made from a copy of the first and the second arguments",
                SS_nargs, 
                _SSI_append, SS_PR_PROC);
 
-    SS_install("ascii-file?",
+    SS_install(si, "ascii-file?",
                "Procedure: Returns #t if the object is an ascii file, and #f otherwise",
                SS_nargs,
                _SSI_text_filep, SS_PR_PROC);
 
-    SS_install("assoc",
+    SS_install(si, "assoc",
                "Procedure: Returns the first list whose car is equal? to the first arg",
                SS_nargs,
                _SSI_assoc, SS_PR_PROC);
 
-    SS_install("assq",
+    SS_install(si, "assq",
                "Procedure: Returns the first list whose car is eq? to the first arg",
                SS_nargs,
                _SSI_assq, SS_PR_PROC);
 
-    SS_install("assv",
+    SS_install(si, "assv",
                "Procedure: Returns the first list whose car is eqv? to the first arg",
                SS_nargs,
                _SSI_assv, SS_PR_PROC);
 
-    SS_install("boolean?",
+    SS_install(si, "boolean?",
                "Returns #t if the object is a boolean, and #f otherwise",
                SS_sargs, 
                _SSI_boolp, SS_PR_PROC);
 
-    SS_install("car",
+    SS_install(si, "car",
                "Return the car of the argument",
                SS_sargs, 
                _SSI_car, SS_PR_PROC);
 
-    SS_install("caaar",
+    SS_install(si, "caaar",
                "Return the caaar of the argument",
                SS_sargs, 
                _SSI_caaar, SS_PR_PROC);
 
-    SS_install("caadr",
+    SS_install(si, "caadr",
                "Return the caadr of the argument",
                SS_sargs, 
                _SSI_caadr, SS_PR_PROC);
 
-    SS_install("caar",
+    SS_install(si, "caar",
                "Return the caar of the argument",
                SS_sargs, 
                _SSI_caar, SS_PR_PROC);
 
-    SS_install("cadar",
+    SS_install(si, "cadar",
                "Return the cadar of the argument",
                SS_sargs, 
                _SSI_cadar, SS_PR_PROC);
 
-    SS_install("caddr",
+    SS_install(si, "caddr",
                "Return the caddr of the argument",
                SS_sargs, 
                _SSI_caddr, SS_PR_PROC);
 
-    SS_install("cadr",
+    SS_install(si, "cadr",
                "Return the cadr of the argument",
                SS_sargs, 
                _SSI_cadr, SS_PR_PROC);
 
-    SS_install("cdar",
+    SS_install(si, "cdar",
                "Return the cdar of the argument",
                SS_sargs, 
                _SSI_cdar, SS_PR_PROC);
 
-    SS_install("cdaar",
+    SS_install(si, "cdaar",
                "Return the cdaar of the argument",
                SS_sargs, 
                _SSI_cdaar, SS_PR_PROC);
 
-    SS_install("cdadr",
+    SS_install(si, "cdadr",
                "Return the cdadr of the argument",
                SS_sargs, 
                _SSI_cdadr, SS_PR_PROC);
 
-    SS_install("cddar",
+    SS_install(si, "cddar",
                "Return the cddar of the argument",
                SS_sargs, 
                _SSI_cddar, SS_PR_PROC);
 
-    SS_install("cdddr",
+    SS_install(si, "cdddr",
                "Return the cdddr of the argument",
                SS_sargs, 
                _SSI_cdddr, SS_PR_PROC);
 
-    SS_install("cddr",
+    SS_install(si, "cddr",
                "Return the cddr of the argument",
                SS_sargs, 
                _SSI_cddr, SS_PR_PROC);
 
-    SS_install("cdr",
+    SS_install(si, "cdr",
                "Return the cdr of the argument",
                SS_sargs, 
                _SSI_cdr, SS_PR_PROC);
 
-    SS_install("cons",
+    SS_install(si, "cons",
                "Return a new cons whose car and cdr are the arguments",
                SS_nargs, 
                _SSI_cons, SS_PR_PROC);
 
-    SS_install("eof-object?",
+    SS_install(si, "eof-object?",
                "Returns #t if the object is the EOF object, and #f otherwise",
                SS_sargs, 
                _SSI_eofp, SS_PR_PROC);
 
-    SS_install("eq?",
+    SS_install(si, "eq?",
                "Procedure: Returns #t iff the two objects are identical",
                SS_nargs,
                _SSI_eq, SS_PR_PROC);
 
-    SS_install("equal?",
+    SS_install(si, "equal?",
                "Procedure: Returns the result of recursively applying eqv? to thearguments",
                SS_nargs,
                _SSI_equal, SS_PR_PROC);
 
-    SS_install("eqv?",
+    SS_install(si, "eqv?",
                "Procedure: Returns #t iff the two objects are equivalent",
                SS_nargs,
                _SSI_eqv, SS_PR_PROC);
 
-    SS_install("file?",
+    SS_install(si, "file?",
                "Procedure: Returns #t if the object is a file, and #f otherwise",
                SS_nargs,
                _SSI_filep, SS_PR_PROC);
 
-    SS_install("integer?",
+    SS_install(si, "integer?",
                "Returns #t if the object is an integer number, and #f otherwise",
                SS_sargs, 
                _SSI_intp, SS_PR_PROC);
 
-    SS_install("last",
+    SS_install(si, "last",
                "Return the last element of a list or return any other object",
                SS_sargs, 
                _SSI_last, SS_PR_PROC);
 
-    SS_install("length",
+    SS_install(si, "length",
                "Return the number of elements in the given list",
                SS_nargs, 
                _SSI_length, SS_PR_PROC);
 
-    SS_install("list-ref",
+    SS_install(si, "list-ref",
                "Return the nth element of the list (0 based)",
                SS_nargs, 
                _SSI_lst_ref, SS_PR_PROC);
 
-    SS_install("list-tail",
+    SS_install(si, "list-tail",
                "Return the tail of the list omitting the first n elements",
                SS_nargs, 
                _SSI_lst_tail, SS_PR_PROC);
 
-    SS_install("member",
+    SS_install(si, "member",
                "Procedure: Returns the first sublist of the second arg whose car is equal? to the first arg",
                SS_nargs,
                _SSI_member, SS_PR_PROC);
 
-    SS_install("memq",
+    SS_install(si, "memq",
                "Procedure: Returns the first sublist of the second arg whose car is eq? to the first arg",
                SS_nargs,
                _SSI_memq, SS_PR_PROC);
 
-    SS_install("memv",
+    SS_install(si, "memv",
                "Procedure: Returns the first sublist of the second arg whose car is eqv? to the first arg",
                SS_nargs,
                _SSI_memv, SS_PR_PROC);
 
-    SS_install("null?",
+    SS_install(si, "null?",
                "Procedure: Returns #t iff the object is the empty list, ()",
                SS_sargs,
                _SSI_nullp, SS_PR_PROC);
 
-    SS_install("number?",
+    SS_install(si, "number?",
                "Procedure: Returns #t if the object is a number, and #f otherwise",
                SS_sargs,
                _SSI_numberp, SS_PR_PROC);
 
-    SS_install("pair?",
+    SS_install(si, "pair?",
                "Returns #t if the object is a cons or list, and #f otherwise",
                SS_sargs, 
                _SSI_pairp, SS_PR_PROC);
 
-    SS_install("procedure?",
+    SS_install(si, "procedure?",
                "Returns #t if the object is a procedure object, and #f otherwise",
                SS_sargs, 
                _SSI_procp, SS_PR_PROC);
 
-    SS_install("real?",
+    SS_install(si, "real?",
                "Returns #t if the object is a real number, and #f otherwise",
                SS_sargs, 
                _SSI_realp, SS_PR_PROC);
 
-    SS_install("reverse",
+    SS_install(si, "reverse",
                "Destructively reverse the list and return it",
                SS_sargs, 
                _SSI_reverse, SS_PR_PROC);
 
-    SS_install("set-car!",
+    SS_install(si, "set-car!",
                "Procedure: Replace the car of the first argument with the second and return the new car",
                SS_nargs,
                _SSI_setcar, SS_PR_PROC);
 
-    SS_install("set-cdr!",
+    SS_install(si, "set-cdr!",
                "Procedure: Replace the cdr of the first argument with the second and return the new cdr",
                SS_nargs,
                _SSI_setcdr, SS_PR_PROC);
 
-    SS_install("string?",
+    SS_install(si, "string?",
                "Returns #t if the object is a string, and #f otherwise",
                SS_sargs, 
                _SSI_stringp, SS_PR_PROC);
 
-    SS_install("symbol?",
+    SS_install(si, "symbol?",
                "Returns #t if the object is a variable, and #f otherwise",
                SS_sargs, 
                _SSI_varp, SS_PR_PROC);

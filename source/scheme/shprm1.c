@@ -1107,112 +1107,112 @@ static object *_SSI_unlink(SS_psides *si, object *argl)
 void _SS_inst_prm1(SS_psides *si)
    {
 
-    SS_install("call-with-cc",
+    SS_install(si, "call-with-cc",
                "Procedure: pass an escape procedure to the argument, a procedure of one argument",
                SS_sargs,
                _SSI_catch, SS_PR_PROC);
 
-    SS_install("check-objects",
+    SS_install(si, "check-objects",
                "Procedure: check objects: 1 - all, 2 - bad names",
                SS_nargs,
                _SSI_check_objects, SS_PR_PROC);
 
-    SS_install("err-catch",
+    SS_install(si, "err-catch",
                "Special Form: Calls the given error procedure if the procedure call fails",
                SS_nargs,
                _SSI_catch_err, SS_UR_MACRO);
 
-    SS_install("for-each",
+    SS_install(si, "for-each",
                "Special Form: applies a procedure over a set of lists",
                SS_nargs,
                _SSI_foreach, SS_PR_PROC);
 
-    SS_install("lambda",
+    SS_install(si, "lambda",
                "Special Form: (lambda (<parameters>) <exp1> ... <expn>)",
                SS_nargs,
                _SSI_lambda, SS_UR_MACRO);
 
-    SS_install("lambda-macro",
+    SS_install(si, "lambda-macro",
                "Special Form: (lambda-macro (<parameters>) <exp1> ... <expn>)",
                SS_nargs,
                _SSI_lambdam, SS_UR_MACRO);
 
-    SS_install("let",
+    SS_install(si, "let",
                "Special Form: define local variables using lambda binding",
                SS_nargs,
                SS_let, SS_UE_MACRO);
 
-    SS_install("let*",
+    SS_install(si, "let*",
                "Special Form: define local variables using lambda binding and maximal scoping",
                SS_nargs,
                _SSI_letstr, SS_UE_MACRO);
 
-    SS_install("make-new-symbol",
+    SS_install(si, "make-new-symbol",
                "Procedure: generate a new symbol",
                SS_sargs,
                _SSI_newsym, SS_PR_PROC);
 
-    SS_install("map",
+    SS_install(si, "map",
                "Special Form: maps a procedure over a set of lists",
                SS_nargs,
                _SSI_map, SS_PR_PROC);
 
-    SS_install("not",
+    SS_install(si, "not",
                "Procedure: Returns #t if object is #f and #f for any other object",
                SS_sargs,
                _SSI_not, SS_PR_PROC);
 
-    SS_install("quasiquote",
+    SS_install(si, "quasiquote",
                "Special Form: Like quote except that unquote and unquote-splicing forms are eval'd",
                SS_sargs,
                _SSI_quasiq, SS_UR_MACRO);
 
-    SS_install("quote",
+    SS_install(si, "quote",
                "Special Form: (quote x) -> x",
                SS_sargs,
                _SSI_quote, SS_UR_MACRO);
 
-    SS_install("time",
+    SS_install(si, "time",
                "Procedure: return current time as (yy mm dd hh mm ss)",
                SS_zargs,
                _SSI_time, SS_PR_PROC);
 
-    SS_install("time-elapsed",
+    SS_install(si, "time-elapsed",
                "Procedure: return time elapsed since the given time",
                SS_nargs,
                _SSI_etime, SS_PR_PROC);
 
-    SS_install("trace",
+    SS_install(si, "trace",
                "Procedure: 'trace's calls to the procedures in the list of arguments",
                SS_nargs,
                _SSI_trace, SS_PR_PROC);
 
-    SS_install("unlink",
+    SS_install(si, "unlink",
                "Procedure: remove or unlink the named file",
                SS_nargs,
                _SSI_unlink, SS_PR_PROC);
 
-    SS_install("unquote",
+    SS_install(si, "unquote",
                "Special Form: In a quasiquote'd form inserts the result of evaluating\n its argument",
                SS_sargs,
                _SSI_unquote, SS_UR_MACRO);
 
-    SS_install("unquote-splicing",
+    SS_install(si, "unquote-splicing",
                "Special Form: In a quasiquote'd form splices the eval'd list into the quoted form",
                SS_sargs,
                _SSI_unq_spl, SS_UR_MACRO);
 
-    SS_install("untrace",
+    SS_install(si, "untrace",
                "Procedure: removes the 'trace' from the procedures in the argument list",
                SS_nargs,
                _SSI_untrace, SS_PR_PROC);
 
-    SS_install("unwatch",
+    SS_install(si, "unwatch",
                "Procedure: remove a watch on the specified variable",
                SS_sargs,
                _SSI_unwatch, SS_PR_PROC);
 
-    SS_install("watch",
+    SS_install(si, "watch",
                "Procedure: put a watch on the specified variable",
                SS_sargs,
                _SSI_watch, SS_PR_PROC);

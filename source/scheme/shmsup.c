@@ -215,7 +215,7 @@ void SS_init_m_syntax_mode(SS_psides *si)
 	ssdbg  = SS_parse_debug_m();
 	*ssdbg = FALSE;
 
-	SS_install("m-mode",
+	SS_install(si, "m-mode",
 		   "Procedure: set BASIS language parsing mode",
 		   SS_zargs,
 		   SS_m_mode, SS_PR_PROC);

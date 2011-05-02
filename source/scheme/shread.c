@@ -860,59 +860,59 @@ object *SS_load(SS_psides *si, object *argl)
 void _SS_inst_read(SS_psides *si)
    {
 
-    SS_install("close-input-file",
+    SS_install(si, "close-input-file",
                "Procedure: Close the specified input port and release the IN_PORT object",
                SS_sargs,
                _SSI_cls_in, SS_PR_PROC);
 
-    SS_install("input-port?",
+    SS_install(si, "input-port?",
                "Returns #t if the object is an input port (IN_PORT), and #f otherwise",
                SS_sargs, 
                _SSI_iportp, SS_PR_PROC);
 
-    SS_install("load",
+    SS_install(si, "load",
                "Procedure: Open a file of Scheme forms and eval all the objects in it\n     Usage: (load <file> [#t])",
                SS_nargs,
                SS_load, SS_PR_PROC);
 
-    SS_install("open-input-file",
+    SS_install(si, "open-input-file",
                "Procedure: Open the specified file for input and return an IN_PORT object",
                SS_sargs,
                _SSI_opn_in, SS_PR_PROC);
 
-    SS_install("read",
+    SS_install(si, "read",
                "Procedure: reads an ASCII representation of an object and returns the object",
                SS_nargs,
                _SSI_read, SS_PR_PROC);
 
-    SS_install("read-char",
+    SS_install(si, "read-char",
                "Procedure: Read and return a single character",
                SS_nargs,
                _SSI_rd_chr, SS_PR_PROC);
 
-    SS_install("scheme-mode",
+    SS_install(si, "scheme-mode",
                "Procedure: set SCHEME syntax parsing mode",
                SS_zargs,
                _SSI_scheme_mode, SS_PR_PROC);
 
-    SS_install("string->port",
+    SS_install(si, "string->port",
                "Procedure: Encapsulate a string as a pseudo input-port for reading",
                SS_sargs,
                _SSI_strprt, SS_PR_PROC);
 
 #ifdef LARGE
 
-    SS_install("call-with-input-file",
+    SS_install(si, "call-with-input-file",
                "Procedure: open the named file and eval a procedure using the port for input",
                SS_nargs,
                _SSI_call_if, SS_PR_PROC);
 
-    SS_install("current-input-port",
+    SS_install(si, "current-input-port",
                "Procedure: Returns the current default input port",
                SS_zargs,
                _SSI_curr_ip, SS_PR_PROC);
 
-    SS_install("read-line",
+    SS_install(si, "read-line",
                "Procedure: Read a line of text and return a string",
                SS_nargs,
                _SSI_rd_line, SS_PR_PROC);
