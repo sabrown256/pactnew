@@ -1163,7 +1163,7 @@ object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
 
 /* convert to dimension from a dimdes to a cons list */
     for (lst = dp->members; lst != NULL; lst = lst->next)
-        {obj1 = SS_make_list(SC_STRING_I, lst->type,
+        {obj1 = SS_make_list(si, SC_STRING_I, lst->type,
                              SC_STRING_I, lst->name,
                              0);
 
@@ -1186,7 +1186,7 @@ object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
 static object *_SX_memdes_to_list(SS_psides *si, memdes *mp)
    {object *obj;
 
-    obj = SS_make_list(SC_STRING_I, mp->type,
+    obj = SS_make_list(si, SC_STRING_I, mp->type,
                        SC_STRING_I, mp->name,
                        SC_INT_I, &mp->number,
                        SS_OBJECT_I, _SX_make_dims_obj(si, mp->dimensions),
@@ -1659,7 +1659,7 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
     else
        strm = FILE_FILE(PDBfile, po);
 
-    obj = SS_make_list(SS_OBJECT_I, SS_mk_hasharr(si, strm->chart),
+    obj = SS_make_list(si, SS_OBJECT_I, SS_mk_hasharr(si, strm->chart),
                        SS_OBJECT_I, SS_null,
                        SS_OBJECT_I, sort,
                        0);
@@ -4208,22 +4208,22 @@ void SX_install_pdb_funcs(SS_psides *si)
 
 #endif
 
-    SS_install_cf("string-mode",
+    SS_install_cf(si, "string-mode",
                   "Variable: Mode for string reads - literal or nopadding",
                   SS_acc_int,
                   &_SX.string_mode);
 
-    SS_install_cf("comparison-precision",
+    SS_install_cf(si, "comparison-precision",
 		  "Variable: Comparison precision for floats",
 		  SS_acc_int,
 		  &_SC.types.max_digits);
 
-    SS_install_cf("display-individual-differences",
+    SS_install_cf(si, "display-individual-differences",
 		  "Variable: Difference display mode flag",
 		  SS_acc_int,
                   &SX_disp_individ_diff);
 
-    SS_install_cf("format-version",
+    SS_install_cf(si, "format-version",
 		  "Variable: PDB metadata format version",
 		  SS_acc_int,
                   &PD_default_format_version);

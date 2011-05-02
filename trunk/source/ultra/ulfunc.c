@@ -1142,11 +1142,11 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     yexpr = SS_null;
     for (i = 0, k = 0; i < n; i++)
         {xt = x[0][i];
-	 SS_Assign(xexpr, SS_make_list(SS_OBJECT_I, dom_pred,
+	 SS_Assign(xexpr, SS_make_list(si, SS_OBJECT_I, dom_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
 	 xt = x[1][i];
-         SS_Assign(yexpr, SS_make_list(SS_OBJECT_I, ran_pred,
+         SS_Assign(yexpr, SS_make_list(si, SS_OBJECT_I, ran_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
          if ((SS_true(SS_exp_eval(si, xexpr))) &&
@@ -1300,7 +1300,7 @@ static object *_ULI_average(SS_psides *si, object *s)
     if (SS_true(c))
        {cpd = _SS_mk_C_proc_va(UL_opyc, 1, PM_fdivide);
         c   = UL_opyc(si, cpd,
-		      SS_make_list(SS_OBJECT_I, c,
+		      SS_make_list(si, SS_OBJECT_I, c,
 				   SS_OBJECT_I, numtoks,
 				   0));
         i = SX_get_crv_index_i(c);
@@ -1652,7 +1652,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     char *lbl;
     object *c, *tmp;
 
-    tmp = SS_make_list(SS_OBJECT_I, a,
+    tmp = SS_make_list(si, SS_OBJECT_I, a,
                        SS_OBJECT_I, b,
                        0);
     SS_MARK(tmp);
@@ -1971,7 +1971,7 @@ static object *_ULI_curve_list(SS_psides *si, object *arg)
         {xvals = SS_mk_cons(si, SS_mk_float(si, x[0][l]), xvals);
          yvals = SS_mk_cons(si, SS_mk_float(si, x[1][l]), yvals);};
 
-    o = SS_make_list(SS_OBJECT_I, SS_reverse(xvals),
+    o = SS_make_list(si, SS_OBJECT_I, SS_reverse(xvals),
 		     SS_OBJECT_I, SS_reverse(yvals),
 		     0);
 
@@ -2282,15 +2282,15 @@ void UL_install_funcs(SS_psides *si)
 
 /* US handled functions */
 
-    SS_install_cf("select",
+    SS_install_cf(si, "select",
                   "Procedure: Select curves from the menu for plotting\n     Usage: select <list-of-menu-numbers>",
                   UL_us, 
                   UL_select);
-    SS_install_cf("menui",
+    SS_install_cf(si, "menui",
                   "Procedure: List selected curves\n     Usage: menui <list-of-menu-numbers>",
                   UL_us, 
                   _ULI_menui);
-    SS_install_cf("del",
+    SS_install_cf(si, "del",
                   "Procedure: Delete curves from list\n     Usage: del <curve-list>",
                   UL_us, 
                   UL_delete);
@@ -2298,411 +2298,411 @@ void UL_install_funcs(SS_psides *si)
 /* OPXC, OPYC handled functions */
 
 
-    SS_install_cf("beta",
+    SS_install_cf(si, "beta",
                   "Procedure: Take the beta function of y values of curves\n     Usage: beta <curve-list> <k>",
                   UL_opyc, 
                   PM_beta);
-    SS_install_cf("betax",
+    SS_install_cf(si, "betax",
                   "Procedure: Take the beta function of x values of curves\n     Usage: betax <curve-list> <k>",
                   UL_opxc, 
                   PM_beta);
 
-    SS_install_cf("cei3",
+    SS_install_cf(si, "cei3",
 		  "Procedure: Take the complete elliptic integral of the third kind of y values of curves\n     Usage: cei3 <curve-list> <k>",
                   UL_opyc, 
 		  PM_elliptic_integral_c3);
-    SS_install_cf("cei3x",
+    SS_install_cf(si, "cei3x",
 		  "Procedure: Take the complete elliptic integral of the third kind of x values of curves\n     Usage: cei3x <curve-list> <k>",
                   UL_opxc, 
 		  PM_elliptic_integral_c3);
 
-    SS_install_cf("cn",
+    SS_install_cf(si, "cn",
 		  "Procedure: Take the Jacobian elliptic function cn of y values of curves\n     Usage: cn <curve-list> <k>",
                   UL_opyc, 
 		  PM_cn);
-    SS_install_cf("cnx",
+    SS_install_cf(si, "cnx",
 		  "Procedure: Take the Jacobian elliptic function cn of x values of curves\n     Usage: cnx <curve-list> <k>",
                   UL_opxc, 
 		  PM_cn);
-    SS_install_cf("dn",
+    SS_install_cf(si, "dn",
 		  "Procedure: Take the Jacobian elliptic function dn of y values of curves\n     Usage: dn <curve-list> <k>",
                   UL_opyc, 
 		  PM_dn);
-    SS_install_cf("dnx",
+    SS_install_cf(si, "dnx",
 		  "Procedure: Take the Jacobian elliptic function dn of x values of curves\n     Usage: dnx <curve-list> <k>",
                   UL_opxc, 
 		  PM_dn);
-    SS_install_cf("dx",
+    SS_install_cf(si, "dx",
                   "Procedure: Shift x values of curves by a constant\n     Usage: dx <curve-list> <value>",
                   UL_opxc,
                   PM_fplus);
-    SS_install_cf("dy",
+    SS_install_cf(si, "dy",
                   "Procedure: Shift y values of curves by a constant\n     Usage: dy <curve-list> <value>",
                   UL_opyc, 
                   PM_fplus);
 
-    SS_install_cf("igamma-p",
+    SS_install_cf(si, "igamma-p",
 		  "Procedure: Take the incomplete gamma function P of y values of curves\n     Usage: igamma-p <curve-list> <k>",
                   UL_opyc, 
 		  PM_igamma_p);
-    SS_install_cf("igamma-px",
+    SS_install_cf(si, "igamma-px",
 		  "Procedure: Take the incomplete gamma function P of x values of curves\n     Usage: igamma-px <curve-list> <k>",
                   UL_opxc, 
 		  PM_igamma_p);
 
-    SS_install_cf("igamma-q",
+    SS_install_cf(si, "igamma-q",
 		  "Procedure: Take the incomplete gamma function P of y values of curves\n     Usage: igamma-p <curve-list> <k>",
                   UL_opyc, 
 		  PM_igamma_q);
-    SS_install_cf("igamma-qx",
+    SS_install_cf(si, "igamma-qx",
 		  "Procedure: Take the incomplete gamma function P of x values of curves\n     Usage: igamma-px <curve-list> <k>",
                   UL_opxc, 
 		  PM_igamma_q);
 
-    SS_install_cf("mx",
+    SS_install_cf(si, "mx",
                   "Procedure: Scale x values of curves by a constant\n     Usage: mx <curve-list> <value>",
                   UL_opxc, 
                   PM_ftimes);
-    SS_install_cf("my",
+    SS_install_cf(si, "my",
                   "Procedure: Scale y values of curves by a constant\n     Usage: my <curve-list> <value>",
                   UL_opyc, 
                   PM_ftimes);
-    SS_install_cf("divx",
+    SS_install_cf(si, "divx",
                   "Procedure: Divide x values of curves by a constant\n     Usage: divx <curve-list> <value>",
                   UL_opxc, 
                   PM_fdivide);
-    SS_install_cf("divy",
+    SS_install_cf(si, "divy",
                   "Procedure: Divide y values of curves by a constant\n     Usage: divy <curve-list> <value>",
                   UL_opyc, 
                   PM_fdivide);
-    SS_install_cf("in",
+    SS_install_cf(si, "in",
                   "Procedure: Take nth order modified Bessel function of the first kind of y values of curves\n     Usage: in <curve-list> <n>",
                   UL_opyc, 
                   PM_in);
-    SS_install_cf("inx",
+    SS_install_cf(si, "inx",
                   "Procedure: Take nth order modified Bessel function of the first kind of x values of curves\n     Usage: inx <curve-list> <n>",
                   UL_opxc, 
                   PM_in);
-    SS_install_cf("jn",
+    SS_install_cf(si, "jn",
                   "Procedure: Take nth order Bessel function of the first kind of y values of curves\n     Usage: jn <curve-list> <n>",
                   UL_opyc, 
                   PM_jn);
-    SS_install_cf("jnx",
+    SS_install_cf(si, "jnx",
                   "Procedure: Take nth order Bessel function of the first kind of x values of curves\n     Usage: jnx <curve-list> <n>",
                   UL_opxc, 
                   PM_jn);
-    SS_install_cf("kn",
+    SS_install_cf(si, "kn",
                   "Procedure: Take nth order modified Bessel function of the second kind of y values of curves\n     Usage: kn <curve-list> <n>",
                   UL_opyc, 
                   PM_kn);
-    SS_install_cf("knx",
+    SS_install_cf(si, "knx",
                   "Procedure: Take nth order modified Bessel function of the second kind of x values of curves\n     Usage: knx <curve-list> <n>",
                   UL_opxc, 
                   PM_kn);
-    SS_install_cf("lei1",
+    SS_install_cf(si, "lei1",
 		  "Procedure: Take the Legendre elliptic integral of the first kind of y values of curves\n     Usage: lei1 <curve-list> <k>",
                   UL_opyc, 
 		  PM_elliptic_integral_l1);
-    SS_install_cf("lei1x",
+    SS_install_cf(si, "lei1x",
 		  "Procedure: Take the Legendre elliptic integral of the first kind of x values of curves\n     Usage: lei1x <curve-list> <k>",
                   UL_opxc, 
 		  PM_elliptic_integral_l1);
-    SS_install_cf("lei2",
+    SS_install_cf(si, "lei2",
 		  "Procedure: Take the Legendre elliptic integral of the second kind of y values of curves\n     Usage: lei2 <curve-list> <k>",
                   UL_opyc, 
 		  PM_elliptic_integral_l2);
-    SS_install_cf("lei2x",
+    SS_install_cf(si, "lei2x",
 		  "Procedure: Take the Legendre elliptic integral of the second kind of x values of curves\n     Usage: lei2x <curve-list> <k>",
                   UL_opxc, 
 		  PM_elliptic_integral_l2);
 
-    SS_install_cf("powr",
+    SS_install_cf(si, "powr",
                   "Procedure: Raise y values of curves to a power, y=y^a\n     Usage: powr <curve-list> <a>",
                   UL_opyc, 
                   POW);
-    SS_install_cf("powrx",
+    SS_install_cf(si, "powrx",
                   "Procedure: Raise x values of curves to a power, x=x^a\n     Usage: powrx <curve-list> <a>",
                   UL_opxc, 
                   POW);
-    SS_install_cf("powa",
+    SS_install_cf(si, "powa",
                   "Procedure: Raise a to the power of the y values of curves, y=a^y\n     Usage: powa <curve-list> <a>",
                   UL_opyc, 
                   _UL_pow);
-    SS_install_cf("powax",
+    SS_install_cf(si, "powax",
                   "Procedure: Raise a to the power of the x values of curves, x=a^x\n     Usage: powax <curve-list> <a>",
                   UL_opxc, 
                   _UL_pow);
-    SS_install_cf("sn",
+    SS_install_cf(si, "sn",
 		  "Procedure: Take the Jacobian elliptic function sn of y values of curves\n     Usage: sn <curve-list> <k>",
                   UL_opyc, 
 		  PM_sn);
-    SS_install_cf("snx",
+    SS_install_cf(si, "snx",
 		  "Procedure: Take the Jacobian elliptic function sn of x values of curves\n     Usage: snx <curve-list> <k>",
                   UL_opxc, 
 		  PM_sn);
-    SS_install_cf("tchn",
+    SS_install_cf(si, "tchn",
                   "Procedure: Take nth order Tchebyshev function of y values of curves\n     Usage: in <curve-list> <n>",
                   UL_opyc, 
                   PM_tchn);
-    SS_install_cf("tchnx",
+    SS_install_cf(si, "tchnx",
                   "Procedure: Take nth order Tchebyshev function of x values of curves\n     Usage: in <curve-list> <n>",
                   UL_opxc,
                   PM_tchn);
-    SS_install_cf("yn",
+    SS_install_cf(si, "yn",
                   "Procedure: Take nth order Bessel function of the second kind of y values of curves\n     Usage: yn <curve-list> <n>",
                   UL_opyc, 
                   PM_yn);
-    SS_install_cf("ynx",
+    SS_install_cf(si, "ynx",
                   "Procedure: Take nth order Bessel function of the second kind of x values of curves\n     Usage: yn <curve-list> <n>",
                   UL_opxc, 
                   PM_yn);
 
 /* UOPXC, UOPYC handled functions */
 
-    SS_install_cf("cei1",
+    SS_install_cf(si, "cei1",
 		  "Procedure: Take the complete elliptic integral of the first kind of y values of curves\n     Usage: cei1 <curve-list>",
                   UL_uopyc, 
 		  PM_elliptic_integral_c1);
-    SS_install_cf("cei1x",
+    SS_install_cf(si, "cei1x",
 		  "Procedure: Take the complete elliptic integral of the first kind of x values of curves\n     Usage: cei1x <curve-list>",
                   UL_uopxc, 
 		  PM_elliptic_integral_c1);
 
-    SS_install_cf("cei2",
+    SS_install_cf(si, "cei2",
 		  "Procedure: Take the complete elliptic integral of the second kind of y values of curves\n     Usage: cei2 <curve-list>",
                   UL_uopyc, 
 		  PM_elliptic_integral_c2);
-    SS_install_cf("cei2x",
+    SS_install_cf(si, "cei2x",
 		  "Procedure: Take the complete elliptic integral of the second kind of x values of curves\n     Usage: cei2x <curve-list>",
                   UL_uopxc, 
 		  PM_elliptic_integral_c2);
 
-    SS_install_cf("erf",
+    SS_install_cf(si, "erf",
                   "Procedure: Take the error function of y values of curves\n     Usage: erf <curve-list>",
                   UL_uopyc, 
                   PM_erf);
-    SS_install_cf("erfx",
+    SS_install_cf(si, "erfx",
                   "Procedure: Take the error function of x values of curves\n     Usage: erfx <curve-list>",
                   UL_uopxc, 
                   PM_erf);
 
-    SS_install_cf("erfc",
+    SS_install_cf(si, "erfc",
                   "Procedure: Take the complementary error function of y values of curves\n     Usage: erfc <curve-list>",
                   UL_uopyc, 
                   PM_erfc);
-    SS_install_cf("erfcx",
+    SS_install_cf(si, "erfcx",
                   "Procedure: Take the complementary error function of x values of curves\n     Usage: erfcx <curve-list>",
                   UL_uopxc, 
                   PM_erfc);
 
-    SS_install_cf("ln",
+    SS_install_cf(si, "ln",
                   "Procedure: Take natural log of y values of curves\n     Usage: ln <curve-list>",
                   UL_uopyc, 
                   PM_ln);
-    SS_install_cf("lnx",
+    SS_install_cf(si, "lnx",
                   "Procedure: Take natural log of x values of curves\n     Usage: lnx <curve-list>",
                   UL_uopxc, 
                   PM_ln);
 
-    SS_install_cf("lngamma",
+    SS_install_cf(si, "lngamma",
                   "Procedure: Take log of the gamma function of y values of curves\n     Usage: lngamma <curve-list>",
                   UL_uopyc, 
                   PM_ln_gamma);
-    SS_install_cf("lngammax",
+    SS_install_cf(si, "lngammax",
                   "Procedure: Take log of the gamma function of x values of curves\n     Usage: lngammax <curve-list>",
                   UL_uopxc, 
                   PM_ln_gamma);
 
-    SS_install_cf("log10",
+    SS_install_cf(si, "log10",
                   "Procedure: Take base 10 log of y values of curves\n     Usage: log10 <curve-list>",
                   UL_uopyc, 
                   PM_log);
-    SS_install_cf("log10x",
+    SS_install_cf(si, "log10x",
                   "Procedure: Take base 10 log of x values of curves\n     Usage: log10x <curve-list>",
                   UL_uopxc, 
                   PM_log);
-    SS_install_cf("exp",
+    SS_install_cf(si, "exp",
                   "Procedure: Take exponential of y values of curves, y=e^y\n     Usage: exp <curve-list>",
                   UL_uopyc, 
                   exp);
-    SS_install_cf("expx",
+    SS_install_cf(si, "expx",
                   "Procedure: Take exponential of x values of curves, x=e^x\n     Usage: expx <curve-list>",
                   UL_uopxc, 
                   exp);
-    SS_install_cf("sqrt",
+    SS_install_cf(si, "sqrt",
                   "Procedure: Take square root of y values of curves\n     Usage: sqrt <curve-list>",
                   UL_uopyc, 
                   PM_sqrt);
-    SS_install_cf("sqrtx",
+    SS_install_cf(si, "sqrtx",
                   "Procedure: Take square root of x values of curves\n     Usage: sqrtx <curve-list>",
                   UL_uopxc, 
                   PM_sqrt);
-    SS_install_cf("sqr",
+    SS_install_cf(si, "sqr",
                   "Procedure: Square y values of curves\n     Usage: sqr <curve-list>",
                   UL_uopyc, 
                   PM_sqr);
-    SS_install_cf("sqrx",
+    SS_install_cf(si, "sqrx",
                   "Procedure: Square x values of curves\n     Usage: sqrx <curve-list>",
                   UL_uopxc, 
                   PM_sqr);
-    SS_install_cf("abs",
+    SS_install_cf(si, "abs",
                   "Procedure: Take absolute value of y values of curves\n     Usage: abs <curve-list>",
                   UL_uopyc, 
                   ABS);
-    SS_install_cf("absx",
+    SS_install_cf(si, "absx",
                   "Procedure: Take absolute value of x values of curves\n     Usage: absx <curve-list>",
                   UL_uopxc, 
                   ABS);
-    SS_install_cf("recip",
+    SS_install_cf(si, "recip",
                   "Procedure: Take reciprocal of y values of curves\n     Usage: recip <curve-list>",
                   UL_uopyc, 
                   PM_recip);
-    SS_install_cf("recipx",
+    SS_install_cf(si, "recipx",
                   "Procedure: Take reciprocal of x values of curves\n     Usage: recipx <curve-list>",
                   UL_uopxc, 
                   PM_recip);
-    SS_install_cf("random",
+    SS_install_cf(si, "random",
                   "Procedure: Generate random y values between -1 and 1 for curves\n     Usage: random <curve-list>",
                   UL_uopyc, 
                   PM_random);
-    SS_install_cf("cos",
+    SS_install_cf(si, "cos",
                   "Procedure: Take cosine of y values of curves\n     Usage: cos <curve-list>",
                   UL_uopyc, 
                   cos);
-    SS_install_cf("cosx",
+    SS_install_cf(si, "cosx",
                   "Procedure: Take cosine of x values of curves\n     Usage: cosx <curve-list>",
                   UL_uopxc, 
                   cos);
-    SS_install_cf("acos",
+    SS_install_cf(si, "acos",
                   "Procedure: Take ArcCos of y values of curves\n     Usage: acos <curve-list>",
                   UL_uopyc, 
                   acos);
-    SS_install_cf("acosx",
+    SS_install_cf(si, "acosx",
                   "Procedure: Take ArcCos of x values of curves\n     Usage: acosx <curve-list>",
                   UL_uopxc, 
                   acos);
-    SS_install_cf("cosh",
+    SS_install_cf(si, "cosh",
                   "Procedure: Take hx[1]erbolic cosine of y values of curves\n     Usage: cosh <curve-list>",
                   UL_uopyc, 
                   cosh);
-    SS_install_cf("coshx",
+    SS_install_cf(si, "coshx",
                   "Procedure: Take hx[1]erbolic cosine of x values of curves\n     Usage: coshx <curve-list>",
                   UL_uopxc, 
                   cosh);
-    SS_install_cf("sin",
+    SS_install_cf(si, "sin",
                   "Procedure: Take sine of y values of curves\n     Usage: sin <curve-list>",
                   UL_uopyc, 
                   sin);
-    SS_install_cf("sinx",
+    SS_install_cf(si, "sinx",
                   "Procedure: Take sine of x values of curves\n     Usage: sinx <curve-list>",
                   UL_uopxc, 
                   sin);
-    SS_install_cf("asin",
+    SS_install_cf(si, "asin",
                   "Procedure: Take ArcSin of y values of curves\n     Usage: asin <curve-list>",
                   UL_uopyc, 
                   asin);
-    SS_install_cf("asinx",
+    SS_install_cf(si, "asinx",
                   "Procedure: Take ArcSin of x values of curves\n     Usage: asinx <curve-list>",
                   UL_uopxc, 
                   asin);
-    SS_install_cf("sinh",
+    SS_install_cf(si, "sinh",
                   "Procedure: Take hx[1]erbolic sine of y values of curves\n     Usage: sinh <curve-list>",
                   UL_uopyc, 
                   sinh);
-    SS_install_cf("sinhx",
+    SS_install_cf(si, "sinhx",
                   "Take hx[1]erbolic sine of x values of curves\n     Usage: sinhx <curve-list>",
                   UL_uopxc, 
                   sinh);
-    SS_install_cf("tan",
+    SS_install_cf(si, "tan",
                   "Procedure: Take tangent of y values of curves\n     Usage: tan <curve-list>",
                   UL_uopyc, 
                   tan);
-    SS_install_cf("tanx",
+    SS_install_cf(si, "tanx",
                   "Procedure: Take tangent of x values of curves\n     Usage: tanx <curve-list>",
                   UL_uopxc, 
                   tan);
-    SS_install_cf("atan",
+    SS_install_cf(si, "atan",
                   "Procedure: Take ArcTan of y values of curves\n     Usage: atan <curve-list>",
                   UL_uopyc, 
                   atan);
-    SS_install_cf("atanx",
+    SS_install_cf(si, "atanx",
                   "Procedure: Take ArcTan of x values of curves\n     Usage: atanx <curve-list>",
                   UL_uopxc, 
                   atan);
-    SS_install_cf("tanh",
+    SS_install_cf(si, "tanh",
                   "Procedure: Take hx[1]erbolic tangent of y values of curves\n     Usage: tanh <curve-list>",
                   UL_uopyc, 
                   tanh);
-    SS_install_cf("tanhx",
+    SS_install_cf(si, "tanhx",
                   "Procedure: Take hx[1]erbolic tangent of x values of curves\n     Usage: tanhx <curve-list>",
                   UL_uopxc, 
                   tanh);
 
-    SS_install_cf("i0",
+    SS_install_cf(si, "i0",
                   "Procedure: Take zeroth order modified Bessel function of the first kind of y values of curves\n     Usage: i0 <curve-list>",
                   UL_uopyc, 
                   PM_i0);
-    SS_install_cf("i0x",
+    SS_install_cf(si, "i0x",
                   "Procedure: Take zeroth order modified Bessel function of the first kind of x values of curves\n     Usage: i0x <curve-list>",
                   UL_uopxc, 
                   PM_i0);
-    SS_install_cf("i1",
+    SS_install_cf(si, "i1",
                   "Procedure: Take first order modified Bessel function of the first kind of y values of curves\n     Usage: i1 <curve-list>",
                   UL_uopyc, 
                   PM_i1);
-    SS_install_cf("i1x",
+    SS_install_cf(si, "i1x",
                   "Procedure: Take first order modified Bessel function of the first kind of x values of curves\n     Usage: i1x <curve-list>",
                   UL_uopxc, 
                   PM_i1);
 
-    SS_install_cf("j0",
+    SS_install_cf(si, "j0",
                   "Procedure: Take zeroth order Bessel function of the first kind of y values of curves\n     Usage: j0 <curve-list>",
                   UL_uopyc, 
                   PM_j0);
-    SS_install_cf("j0x",
+    SS_install_cf(si, "j0x",
                   "Procedure: Take zeroth order Bessel function of the first kind of x values of curves\n     Usage: j0x <curve-list>",
                   UL_uopxc, 
                   PM_j0);
-    SS_install_cf("j1",
+    SS_install_cf(si, "j1",
                   "Procedure: Take first order Bessel function of the first kind of y values of curves\n     Usage: j1 <curve-list>",
                   UL_uopyc, 
                   PM_j1);
-    SS_install_cf("j1x",
+    SS_install_cf(si, "j1x",
                   "Procedure: Take first order Bessel function of the first kind of x values of curves\n     Usage: j1x <curve-list>",
                   UL_uopxc, 
                   PM_j1);
 
-    SS_install_cf("k0",
+    SS_install_cf(si, "k0",
                   "Procedure: Take zeroth order modified Bessel function of the second kind of y values of curves\n     Usage: k0 <curve-list>",
                   UL_uopyc, 
                   PM_k0);
-    SS_install_cf("k0x",
+    SS_install_cf(si, "k0x",
                   "Procedure: Take zeroth order modified Bessel function of the second kind of x values of curves\n     Usage: k0x <curve-list>",
                   UL_uopxc, 
                   PM_k0);
-    SS_install_cf("k1",
+    SS_install_cf(si, "k1",
                   "Procedure: Take first order modified Bessel function of the second kind of y values of curves\n     Usage: k1 <curve-list>",
                   UL_uopyc, 
                   PM_k1);
-    SS_install_cf("k1x",
+    SS_install_cf(si, "k1x",
                   "Procedure: Take first order modified Bessel function of the second kind of x values of curves\n     Usage: k1x <curve-list>",
                   UL_uopxc, 
                   PM_k1);
 
 
-    SS_install_cf("y0",
+    SS_install_cf(si, "y0",
                   "Procedure: Take zeroth order Bessel function of the second kind of y values of curves\n     Usage: y0 <curve-list>",
                   UL_uopyc, 
                   PM_y0);
-    SS_install_cf("y0x",
+    SS_install_cf(si, "y0x",
                   "Procedure: Take zeroth order Bessel function of the second kind of x values of curves\n     Usage: y0x <curve-list>",
                   UL_uopxc, 
                   PM_y0);
-    SS_install_cf("y1",
+    SS_install_cf(si, "y1",
                   "Procedure: Take first order Bessel function of the second kind of y values of curves\n     Usage: y1 <curve-list>",
                   UL_uopyc, 
                   PM_y1);
-    SS_install_cf("y1x",
+    SS_install_cf(si, "y1x",
                   "Procedure: Take first order Bessel function of the second kind of x values of curves\n     Usage: y1x <curve-list>",
                   UL_uopxc, 
                   PM_y1);
@@ -2710,131 +2710,131 @@ void UL_install_funcs(SS_psides *si)
 
 /* BC handled functions */
 
-    SS_install_cf("+",
+    SS_install_cf(si, "+",
                   "Procedure: Take sum of curves\n     Usage: + <curve-list>",
                   UL_bc, 
                   PM_fplus);
-    SS_install_cf("-",
+    SS_install_cf(si, "-",
                   "Procedure: Take difference of curves\n     Usage: - <curve-list>",
                   UL_bc, 
                   PM_fminus);
-    SS_install_cf("*",
+    SS_install_cf(si, "*",
                   "Procedure: Take product of curves\n     Usage: * <curve-list>",
                   UL_bc, 
                   PM_ftimes);
-    SS_install_cf("/",
+    SS_install_cf(si, "/",
                   "Procedure: Take quotient of curves\n     Usage: / <curve-list>",
                   UL_bc, 
                   PM_fdivide);
-    SS_install_cf("^",
+    SS_install_cf(si, "^",
 		  "Procedure: Take the y values of the curve to the power a\n     Usage: ^ <curve> <a>",
                   UL_bc,
 		  POW);
-    SS_install_cf("min",
+    SS_install_cf(si, "min",
                   "Procedure: Construct curve from minima of y values of curves\n     Usage: min <curve-list>",
                   UL_bc, 
                   PM_fmin);
-    SS_install_cf("max",
+    SS_install_cf(si, "max",
                   "Procedure: Construct curve from maxima of y values of curves\n     Usage: max <curve-list>",
                   UL_bc, 
                   PM_fmax);
-    SS_install_cf("hypot",
+    SS_install_cf(si, "hypot",
                   "Procedure: Calculate harmonic average of two curves, sqrt(a^2+b^2)\n     Usage: hypot <a> <b>",
                   UL_bc, 
                   HYPOT);
 
 /* BLTOC handled functions */
 
-    SS_install_cf("color",
+    SS_install_cf(si, "color",
                   "Procedure: Set the color of curves\n     Usage: color <curve-list> <color-number>",
                   UL_bltoc, 
                   _ULI_color);
-    SS_install_cf("fill",
+    SS_install_cf(si, "fill",
                   "Procedure: Fill the area under curves with the specified color\n     Usage: fill <curve-list> <color-number>",
                   UL_bltoc, 
                   _ULI_fill);
-    SS_install_cf("scatter",
+    SS_install_cf(si, "scatter",
                   "Procedure: Plot curves as scatter plots\n     Usage: scatter <curve-list> on | off",
                   UL_bltoc, 
                   _ULI_scatter);
-    SS_install_cf("marker",
+    SS_install_cf(si, "marker",
                   "Procedure: Set the marker of curves\n     Usage: marker <curve-list> plus | star | triangle",
                   UL_bltoc, 
                   _ULI_marker);
-    SS_install_cf("histogram",
+    SS_install_cf(si, "histogram",
                   "Procedure: Plot curves as histograms\n     Usage: histogram <curve-list> off | left | right | center",
                   UL_bltoc, 
                   _ULI_hist);
-    SS_install_cf("lnwidth",
+    SS_install_cf(si, "lnwidth",
                   "Procedure: Set the line widths of curves\n     Usage: lnwidth <curve-list> <width-number>",
                   UL_bltoc, 
                   _ULI_lnwidth);
-    SS_install_cf("lnstyle",
+    SS_install_cf(si, "lnstyle",
                   "Procedure: Set the line styles of curves\n     Usage: lnstyle <curve-list> solid | dotted | dashed | dotdashed",
                   UL_bltoc, 
                   _ULI_lnstyle);
 
 /* UL2TOC handled functions */
 
-    SS_install_cf("integrate",
+    SS_install_cf(si, "integrate",
                   "Procedure: Integrate curves\n     Usage: integrate <curve-list> <low-lim> <high-lim>",
                   UL_ul2toc, 
                   _ULI_integrate);
-    SS_install_cf("xmm",
+    SS_install_cf(si, "xmm",
                   "Procedure: Excerpt part of curves\n     Usage: xmm <curve-list> <low-lim> <high-lim>",
                   UL_ul2toc, 
                   _ULI_xmm);
 
 /* ULNTOC handled functions */
 
-    SS_install_cf("filter",
+    SS_install_cf(si, "filter",
                   "Procedure: Return a filtered curve\n     Usage: filter <curve-list> <dom-pred> <ran-pred>",
                   UL_ulntoc,
                   _ULI_filter);
-    SS_install_cf("filter-coef",
+    SS_install_cf(si, "filter-coef",
                   "Procedure: Return a curve filtered through coefficents\n     Usage: filter-coef <curve-list> <coeff-array> <ntimes>",
                   UL_ulntoc,
                   _ULI_filter_coef);
-    SS_install_cf("smoothn",
+    SS_install_cf(si, "smoothn",
                   "Procedure: Smooth curves using user specified smooth-method\n     Usage: smoothn <curve-list> <n> <ntimes>",
                   UL_ulntoc, 
                   _ULI_smooth);
 
 /* UC handled functions */
 
-    SS_install_cf("derivative",
+    SS_install_cf(si, "derivative",
                   "Procedure: Take derivative of curves\n     Usage: derivative <curve-list>",
                   UL_uc, 
                   UL_derivative);
-    SS_install_cf("rev",
+    SS_install_cf(si, "rev",
                   "Procedure: Swap x and y values for curves\n     You may want to sort after this\n     Usage: rev <curve-list>",
                   UL_uc, 
                   UL_reverse);
-    SS_install_cf("copy",
+    SS_install_cf(si, "copy",
                   "Procedure: Copy curves\n     Usage: copy <curve-list>",
                   UL_uc, 
                   UL_copy_curve);
-    SS_install_cf("xindex",
+    SS_install_cf(si, "xindex",
                   "Procedure: Create curves with y values vs integer index values\n     Usage: xindex <curve-list>",
                   UL_uc, 
                   UL_xindex_curve);
-    SS_install_cf("sort",
+    SS_install_cf(si, "sort",
                   "Procedure: Sort curves' points into ascending order based on x values\n     Usage: sort <curve-list>",
                   UL_uc, 
                   UL_sort);
-    SS_install_cf("compose",
+    SS_install_cf(si, "compose",
                   "Functional composition f(g(x))\n     Usage: compose <f> <g>",
                   UL_bcxl, 
                   UL_compose);
-    SS_install_cf("hide",
+    SS_install_cf(si, "hide",
                   "Procedure: Hide curves from view\n     Usage: hide <curve-list>",
                   UL_uc, 
                   UL_hide);
-    SS_install_cf("show",
+    SS_install_cf(si, "show",
                   "Procedure: Reveal curves hidden by hide command\n     Usage: show <curve-list>",
                   UL_uc, 
                   UL_show);
-    SS_install_cf("thin",
+    SS_install_cf(si, "thin",
                   "Procedure: Represent a curve with fewer points\n     Usage: thin <curve-list> <mode> <val>",
                   UL_ulntoc,
                   _ULI_thin);

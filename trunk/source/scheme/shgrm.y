@@ -329,7 +329,7 @@ dostmt :
       {object *body;
 
        body = _SS_make_comp_stmt_m(SI, $3);
-       $$   = SS_make_form(_SS_m_for, SS_null, SS_null, SS_null, body, 0);
+       $$   = SS_make_form(SI, _SS_m_for, SS_null, SS_null, SS_null, body, LAST);
 
        DIAGNOSTIC($$, "do eos stlist docontrol");}
   ;
@@ -343,17 +343,17 @@ dospec :
     lhs ASGN first ',' last incr
       {object *init, *test, *incr, *iter, *val;
 
-       init = SS_make_form(_SS_m_set, $1, $3, 0);
-       test = SS_make_form(_SS_m_loop_test, $3, $1, $5, 0);
+       init = SS_make_form(SI, _SS_m_set, $1, $3, LAST);
+       test = SS_make_form(SI, _SS_m_loop_test, $3, $1, $5, LAST);
 
        if (SS_nullobjp($6))
 	  val = SS_mk_integer(SI, 1);
        else
 	  val = $6;
 
-       incr = SS_make_form(_SS_m_plus, $1, val, 0);
-       iter = SS_make_form(_SS_m_set, $1, incr, 0);
-       $$   = SS_make_form(init, test, iter, 0);
+       incr = SS_make_form(SI, _SS_m_plus, $1, val, LAST);
+       iter = SS_make_form(SI, _SS_m_set, $1, incr, LAST);
+       $$   = SS_make_form(SI, init, test, iter, LAST);
 
        DIAGNOSTIC($$, "dospec");}
   ;
@@ -421,9 +421,13 @@ docontrol :
 
 forstmt :
     FOR '(' forinit ',' forout ',' cstmt ')' stlist ENDFOR
-      {SS_GR_VAL(SS_make_form(_SS_m_for, _SS_make_comp_stmt_m(SI, $3),
-			 $5, _SS_make_comp_stmt_m(SI, $7),
-			 _SS_make_comp_stmt_m(SI, $9), 0));
+      {SS_GR_VAL(SS_make_form(SI,
+			      _SS_m_for,
+			      _SS_make_comp_stmt_m(SI, $3),
+			      $5,
+			      _SS_make_comp_stmt_m(SI, $7),
+			      _SS_make_comp_stmt_m(SI, $9),
+			      LAST));
        DIAGNOSTIC($$, "for");}
   ;
 
@@ -440,7 +444,7 @@ forinit :
       {if (SS_consp(SS_CAR_MACRO($1)))
 	  {SS_GR_VAL(SS_mk_cons(SI, $3, $1));}
        else
-	  {SS_GR_VAL(SS_make_form($3, $1, 0));}
+	  {SS_GR_VAL(SS_make_form(SI, $3, $1, LAST));}
        DIAGNOSTIC($$, "forinit list");}
 
   |
@@ -495,8 +499,10 @@ cstmt :
 
 whilestmt :
     WHILE '(' lexp ')' stlist ENDWHILE
-      {SS_GR_VAL(SS_make_form(_SS_m_while,
-			      SS_f, $3, _SS_make_comp_stmt_m(SI, $5), 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_while,
+			      SS_f, $3,
+			      _SS_make_comp_stmt_m(SI, $5),
+			      LAST));
        DIAGNOSTIC($$, "whilestmt");}
   ;
 
@@ -516,14 +522,14 @@ whilestmt :
 
 ifstmt :
     IF ifexp lalt
-      {SS_GR_VAL(SS_make_form(_SS_m_if, $2, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_if, $2, $3, LAST));
        DIAGNOSTIC($$, "ifstmt");}
 
   | IF ifexp thenlist optelse ENDIF
       {if (SS_nullobjp($4))
-	  {SS_GR_VAL(SS_make_form(_SS_m_if, $2, $3, 0));}
+	  {SS_GR_VAL(SS_make_form(SI, _SS_m_if, $2, $3, LAST));}
        else
-	  {SS_GR_VAL(SS_make_form(_SS_m_if, $2, $3, $4, 0));};
+	  {SS_GR_VAL(SS_make_form(SI, _SS_m_if, $2, $3, $4, LAST));};
        DIAGNOSTIC($$, "ifendif");}
   ;
 
@@ -587,9 +593,9 @@ optelse :
 
   | ELSEIF ifexp alt2 optelse
       {if (SS_nullobjp($4))
-	  {SS_GR_VAL(SS_make_form(_SS_m_if, $2, $3, 0));}
+	  {SS_GR_VAL(SS_make_form(SI, _SS_m_if, $2, $3, LAST));}
        else
-	  {SS_GR_VAL(SS_make_form(_SS_m_if, $2, $3, $4, 0));};
+	  {SS_GR_VAL(SS_make_form(SI, _SS_m_if, $2, $3, $4, LAST));};
        DIAGNOSTIC($$, "optelse elsif");}
 
   |
@@ -656,11 +662,11 @@ misc :
        DIAGNOSTIC($$, "misc scope type varlist");}
 
   | BREAK optlevel
-      {SS_GR_VAL(SS_make_form(_SS_m_continue, SS_f, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_continue, SS_f, LAST));
        DIAGNOSTIC($$, "misc break optlevel");}
 
   | NEXT optlevel
-      {SS_GR_VAL(SS_make_form(_SS_m_continue, SS_t, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_continue, SS_t, LAST));
        DIAGNOSTIC($$, "misc next optlevel");}
 
   | indevice inlist
@@ -674,7 +680,7 @@ misc :
        else
 	  lst = SS_mk_cons(SI, $2, SS_null);
 	 
-       SS_GR_VAL(SS_make_form(_SS_m_input, $1, lst, 0));
+       SS_GR_VAL(SS_make_form(SI, _SS_m_input, $1, lst, LAST));
        DIAGNOSTIC($$, "misc indevice inlist");}
 
   | outdevice outlist
@@ -688,7 +694,7 @@ misc :
        else
 	  lst = SS_mk_cons(SI, _SS_m_list, SS_mk_cons(SI, $2, SS_null));
 	 
-       SS_GR_VAL(SS_make_form(_SS_m_output, $1, lst, 0));
+       SS_GR_VAL(SS_make_form(SI, _SS_m_output, $1, lst, LAST));
        DIAGNOSTIC($$, "misc outdevice outlist");}
 
   | RETURN optval
@@ -804,7 +810,7 @@ inlist :
 
 assign :
     lhs assigneq lexp
-      {SS_GR_VAL(SS_make_form(_SS_m_set, _SS_strip_call(SI, $1, FALSE), $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_set, _SS_strip_call(SI, $1, FALSE), $3, LAST));
        DIAGNOSTIC($$, "lhs assigneq lexp");}
   ;
 
@@ -928,7 +934,7 @@ varlist :
        DIAGNOSTIC($$, "varlist dvar");}
 
   | dvar ASGN lexp
-      {SS_GR_VAL(SS_mk_cons(SI, SS_make_form($1, $3, 0),
+      {SS_GR_VAL(SS_mk_cons(SI, SS_make_form(SI, $1, $3, LAST),
 		       SS_null));
        DIAGNOSTIC($$, "varlist dvar = lexp");}
 
@@ -937,7 +943,7 @@ varlist :
        DIAGNOSTIC($$, "varlist varlist, dvar");}
 
   | varlist ',' dvar ASGN lexp
-      {SS_GR_VAL(SS_mk_cons(SI, SS_make_form($3, $5, 0), $1));
+      {SS_GR_VAL(SS_mk_cons(SI, SS_make_form(SI, $3, $5, LAST), $1));
        DIAGNOSTIC($$, "varlist varlist, dvar = lexp");}
   ;
 
@@ -993,7 +999,7 @@ dvar :
       {if (SS_consp($1))
 	  {SS_GR_VAL(SS_append(SI, $1, SS_mk_cons(SI, $2, SS_null)));}
        else
-	  {SS_GR_VAL(SS_make_form($1, SS_mk_cons(SI, _SS_m_defarr, $2), 0));};
+	  {SS_GR_VAL(SS_make_form(SI, $1, SS_mk_cons(SI, _SS_m_defarr, $2), LAST));};
 
        DIAGNOSTIC($1, "dvar dname args");}
   ;
@@ -1149,7 +1155,7 @@ explist :
 
 lexp :
     lexp OR lterm
-      {SS_GR_VAL(SS_make_form(_SS_m_or, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_or, $1, $3, LAST));
        DIAGNOSTIC($$, "lexp .or. lterm");}
 
   | lterm
@@ -1163,7 +1169,7 @@ lexp :
 
 lterm :
     lterm AND lprimary
-      {SS_GR_VAL(SS_make_form(_SS_m_and, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_and, $1, $3, LAST));
        DIAGNOSTIC($$, "lterm .and. lprimary");}
 
   | lprimary
@@ -1180,7 +1186,7 @@ lprimary :
       {SS_GR_VAL(CAPTURE($1));}
 
   | NOT lfactor
-      {SS_GR_VAL(SS_make_form(_SS_m_not, $2, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_not, $2, LAST));
        DIAGNOSTIC($$, "lprimary ~ lfactor");}
   ;
 
@@ -1194,27 +1200,27 @@ lfactor :
       {SS_GR_VAL(CAPTURE($1));}
 
   | exp LT exp
-      {SS_GR_VAL(SS_make_form(_SS_m_lt, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_lt, $1, $3, LAST));
        DIAGNOSTIC($$, "lfactor exp LT exp");}
 
   | exp LE exp
-      {SS_GR_VAL(SS_make_form(_SS_m_le, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_le, $1, $3, LAST));
        DIAGNOSTIC($$, "lfactor exp LE exp");}
 
   | exp GT exp
-      {SS_GR_VAL(SS_make_form(_SS_m_gt, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_gt, $1, $3, LAST));
        DIAGNOSTIC($$, "lfactor exp GT exp");}
 
   | exp GE exp
-      {SS_GR_VAL(SS_make_form(_SS_m_ge, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_ge, $1, $3, LAST));
        DIAGNOSTIC($$, "lfactor exp GE exp");}
 
   | exp EQ exp
-      {SS_GR_VAL(SS_make_form(_SS_m_equal, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_equal, $1, $3, LAST));
        DIAGNOSTIC($$, "lfactor exp EQ exp");}
 
   | exp NEQ exp
-      {SS_GR_VAL(SS_make_form(_SS_m_not, SS_make_form(_SS_m_equal, $1, $3, 0)));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_not, SS_make_form(SI, _SS_m_equal, $1, $3, LAST)));
        DIAGNOSTIC($$, "lfactor exp NEQ exp");}
   ;
 
@@ -1230,15 +1236,15 @@ exp :
 /* NOTE: yacc is happy with these, bison is not
  * none of this is tested so we can't tell who to believe
   | ':'
-      {SS_GR_VAL(SS_make_form(SS_null, SS_null, 0));
+      {SS_GR_VAL(SS_make_form(SI, SS_null, SS_null, LAST));
        DIAGNOSTIC($$, "exp :");}
 
   | rexp ':' rexp
-      {SS_GR_VAL(SS_make_form($1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, $1, $3, LAST));
        DIAGNOSTIC($$, "exp rexp:rexp");}
 
   | rexp ':' rexp ':' rexp
-      {SS_GR_VAL(SS_make_form($1, $3, $5, 0));
+      {SS_GR_VAL(SS_make_form(SI, $1, $3, $5, LAST));
        DIAGNOSTIC($$, "exp rexp:rexp:rexp");}
 */
   ;
@@ -1260,19 +1266,19 @@ rexp :
 
 rterm :
     rterm '+' term
-      {SS_GR_VAL(SS_make_form(_SS_m_plus, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_plus, $1, $3, LAST));
        DIAGNOSTIC($$, "rterm + term");}
 
   | rterm '-' term
-      {SS_GR_VAL(SS_make_form(_SS_m_minus, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_minus, $1, $3, LAST));
        DIAGNOSTIC($$, "rterm - term");}
 
   | '+' term
-      {SS_GR_VAL(SS_make_form(_SS_m_plus, $2, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_plus, $2, LAST));
        DIAGNOSTIC($$, "rterm +term");}
 
   | '-' term
-      {SS_GR_VAL(SS_make_form(_SS_m_minus, $2, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_minus, $2, LAST));
        DIAGNOSTIC($$, "rterm -term");}
 
   | term
@@ -1286,14 +1292,14 @@ rterm :
 
 term :
     term '*' primry
-      {SS_GR_VAL(SS_make_form(_SS_m_times, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_times, $1, $3, LAST));
        DIAGNOSTIC($$, "term * primry");}
 
   | term '*' '!' primry
       {DIAGNOSTIC($$, "term *! primry");}
 
   | term '/' primry
-      {SS_GR_VAL(SS_make_form(_SS_m_divide, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_divide, $1, $3, LAST));
        DIAGNOSTIC($$, "term / primry");}
 
   | term '!' primry
@@ -1316,7 +1322,7 @@ term :
 
 primry :
     factor EXPT primry
-      {SS_GR_VAL(SS_make_form(_SS_m_expt, $1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_expt, $1, $3, LAST));
        DIAGNOSTIC($$, "primry factor **");}
 
   | factor
@@ -1349,7 +1355,7 @@ lhs :
       {SS_GR_VAL(CAPTURE($2));}
 
   | lhs args
-      {SS_GR_VAL(SS_make_form(_SS_m_arr_call, $1, $2, 0));
+      {SS_GR_VAL(SS_make_form(SI, _SS_m_arr_call, $1, $2, LAST));
        DIAGNOSTIC($$, "lhs args");}
 
   | '[' explist ']'

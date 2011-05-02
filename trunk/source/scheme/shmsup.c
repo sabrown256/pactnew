@@ -28,7 +28,7 @@ SS_m_parse_state
 object *_SS_make_fun_m(SS_psides *si, object *proto, object *body)
    {object *o;
 
-    o = SS_append(si, SS_make_form(_SS_m_defunc, proto, 0), body);
+    o = SS_append(si, SS_make_form(si, _SS_m_defunc, proto, LAST), body);
 
     return(o);}
 
@@ -220,11 +220,11 @@ void SS_init_m_syntax_mode(SS_psides *si)
 		   SS_zargs,
 		   SS_m_mode, SS_PR_PROC);
 
-	SS_install_cf("diagnose-m-parse", 
+	SS_install_cf(si, "diagnose-m-parse", 
 		      "Variable: Flag to print detailed diagnostics of a BASIS parse\n     Usage: diagnose-m-parse [0|1]",
 		      SS_acc_int,
 		      ssdbg);
-	SS_install_cf("diagnose-m-grammar", 
+	SS_install_cf(si, "diagnose-m-grammar", 
 		      "Variable: Flag to print diagnostics of BASIS actions/reductions\n     Usage: diagnose-m-parse [0|1]",
 		      SS_acc_int,
 		      &_SS_mps.diagnose_grammar);};

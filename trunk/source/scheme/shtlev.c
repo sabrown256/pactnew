@@ -853,7 +853,7 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
         SS_Restore(si, si->rdobj);
         SS_Restore(si, si->evobj);
 
-	expr = SS_make_form(x, SS_make_form(SS_quoteproc, val, LAST), LAST);
+	expr = SS_make_form(si, x, SS_make_form(si, SS_quoteproc, val, LAST), LAST);
         x    = SS_exp_eval(si, expr);}
 
     else
@@ -984,7 +984,7 @@ void SS_error(char *s, object *obj)
 
     t = CSTRSAVE(s);
 
-    SS_Assign(si->err_state, SS_make_list(SS_OBJECT_I, si->fun,
+    SS_Assign(si->err_state, SS_make_list(si, SS_OBJECT_I, si->fun,
 					  SS_OBJECT_I, si->argl,
 					  SS_OBJECT_I, obj,
 					  SC_STRING_I, t,

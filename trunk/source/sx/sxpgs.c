@@ -840,7 +840,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
        SS_error("BAD DEVICE - _SXI_DEVICE_PROPS", SS_null);
 
     else
-       rv = SS_make_list(SC_STRING_I, dev->name,
+       rv = SS_make_list(si, SC_STRING_I, dev->name,
 			 SC_STRING_I, dev->type,
 			 SC_STRING_I, dev->title,
 			 0);
@@ -913,7 +913,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
        {type = mi->type[3];
 	switch (type)
 	   {case 'i' :
-	         argl = SS_make_list(G_FILE, po,
+	         argl = SS_make_list(si, G_FILE, po,
 				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_image(si, argl);
@@ -922,7 +922,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
 
 	    case 'm' :
             default  :
-	         argl = SS_make_list(G_FILE, po,
+	         argl = SS_make_list(si, G_FILE, po,
 				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_graph(si, argl);
@@ -1012,7 +1012,7 @@ void SX_mouse_event_handler(PG_device *dev, PG_event *ev)
 
 	PG_trans_point(dev, 2, PIXELC, wc, WORLDC, wc);
 
-	loc = SS_make_list(SC_DOUBLE_I, &wc[0],
+	loc = SS_make_list(si, SC_DOUBLE_I, &wc[0],
 			   SC_DOUBLE_I, &wc[1],
 			   0);
 
@@ -2971,7 +2971,7 @@ void SX_install_pgs_funcs(SS_psides *si)
                SS_nargs,
                _SXI_set_ran_limits, SS_PR_PROC);
 
-    SS_install_cf("label-y-position",
+    SS_install_cf(si, "label-y-position",
                   "Internal variable for displaying mapping labels - do NOT set",
                   SS_acc_double,
 		  labpy);

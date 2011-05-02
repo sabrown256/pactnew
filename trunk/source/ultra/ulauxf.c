@@ -81,7 +81,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
     CFREE(icy);
     CFREE(cy);
 
-    rv = SS_make_list(SS_OBJECT_I, ch1,
+    rv = SS_make_list(si, SS_OBJECT_I, ch1,
 		      SS_OBJECT_I, ch2,
 		      0);
 
@@ -130,7 +130,7 @@ object *UL_fft(SS_psides *si, int j)
     CFREE(y);
     CFREE(cy);
 
-    rv = SS_make_list(SS_OBJECT_I, cre,
+    rv = SS_make_list(si, SS_OBJECT_I, cre,
 		      SS_OBJECT_I, cim,
 		      0);
 
@@ -344,7 +344,7 @@ object *UL_getx(SS_psides *si, object *obj, object *tok)
     tmp = _UL_get_value(si, SX_dataset[i].x[1], SX_dataset[i].x[0], value,
 			SX_dataset[i].n, SX_dataset[i].id);
 
-    o = SS_make_list(SS_OBJECT_I, obj,
+    o = SS_make_list(si, SS_OBJECT_I, obj,
 		     SS_OBJECT_I, tok,
 		     SS_OBJECT_I, tmp,
 		     0);
@@ -370,7 +370,7 @@ object *UL_gety(SS_psides *si, object *obj, object *tok)
     tmp = _UL_get_value(si, SX_dataset[i].x[0], SX_dataset[i].x[1], value,
 			SX_dataset[i].n, SX_dataset[i].id);
 
-    o = SS_make_list(SS_OBJECT_I, obj,
+    o = SS_make_list(si, SS_OBJECT_I, obj,
 		     SS_OBJECT_I, tok,
 		     SS_OBJECT_I, tmp,
 		     0);
@@ -875,7 +875,7 @@ static object *_UL_stat(SS_psides *si, int j)
     PM_stats_mean(n, SX_dataset[j].x[0], &xmean, NULL, NULL, &xstd);
     PM_stats_mean(n, SX_dataset[j].x[1], &ymean, NULL, NULL, &ystd);
 
-    ret = SS_make_list(SC_DOUBLE_I, &xmean,
+    ret = SS_make_list(si, SC_DOUBLE_I, &xmean,
                        SC_DOUBLE_I, &xstd,
                        SC_DOUBLE_I, &ymean,
                        SC_DOUBLE_I, &ystd,
@@ -1102,7 +1102,7 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
             PRINT(stdout, SX_text_output_format, lnwid);
             PRINT(stdout, " %ld)\n\n", lnsty);};
 
-        o = SS_make_list(SC_INT_I, &lncol,
+        o = SS_make_list(si, SC_INT_I, &lncol,
 			 SC_DOUBLE_I,  &lnwid,
 			 SC_INT_I, &lnsty,
 			 0);};
@@ -1217,32 +1217,32 @@ void UL_install_aux_funcs(SS_psides *si)
                _ULI_write_abs, SS_PR_PROC);
 
 
-    SS_install_cf("fft",
+    SS_install_cf(si, "fft",
                   "Procedure: Compute Fast Fourier Transform of real curve. Return real and imaginary parts.\n     Usage: fft <curve>",
                   UL_uc, 
                   UL_fft);
-    SS_install_cf("getx",
+    SS_install_cf(si, "getx",
                   "Procedure: Return x values for a given y\n     Usage: getx <curve-list> <value>",
                   UL_bltocnp, 
                   UL_getx);
-    SS_install_cf("gety",
+    SS_install_cf(si, "gety",
                   "Procedure: Return y values for a given x\n     Usage: gety <curve-list> <value>",
                   UL_bltocnp, 
                   UL_gety);
-    SS_install_cf("fit",
+    SS_install_cf(si, "fit",
                   "Procedure: Find least-squares fit to the specified curves for a polynomial of order n\n     Usage: fit <curve-list> n",
                   UL_bltocnp, 
                   _ULI_fit);
-    SS_install_cf("dupx",
+    SS_install_cf(si, "dupx",
                   "Procedure: Duplicate x values so that y = x for each of the specified curves\n     Usage: dupx <curve-list>",
                   UL_uc, 
                   UL_dupx);
-    SS_install_cf("disp",
+    SS_install_cf(si, "disp",
                   "Procedure: Display actual values in specified curves between min and max points\n     Usage: disp <curve-list> <xmin> <xmax>",
                   UL_ul2tocnp, 
                   _ULI_disp);
 
-    SS_install_cf("fft-order",
+    SS_install_cf(si, "fft-order",
                   "Variable: Control the frequency space order of FFTs.\n     Usage: fft_order 0 | 1",
                   SS_acc_int,
                   &_SX.fft_order);

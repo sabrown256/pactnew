@@ -551,12 +551,12 @@ void UL_install_global_vars(SS_psides *si)
 
     SX_install_global_vars(si);
 
-    SS_install_cf("derivative-tolerance",
+    SS_install_cf(si, "derivative-tolerance",
                   "Variable: Threshold for first derivative change.\n     Usage: derivative-tolerance <double>",
                   SS_acc_double,
                   &UL_derivative_tolerance);
 
-    SS_install_cf("igamma-tolerance",
+    SS_install_cf(si, "igamma-tolerance",
 		  "Procedure: Set the tolerance to which incomplete gamma functions are computed\n     Usage: igamma-tolerance <tol>",
                   SS_acc_double, 
 		  &_PM.igamma_tol);
@@ -567,12 +567,12 @@ void UL_install_global_vars(SS_psides *si)
 
 /* STUV */
 
-    SS_install_cf("save-intermediate",
+    SS_install_cf(si, "save-intermediate",
                   "Variable: Save intermediate curves iff ON\n     Usage: save-intermediate [ on | off]",
                   SS_acc_int,
                   &UL_save_intermediate);
 
-    SS_install_cf("simple-append",
+    SS_install_cf(si, "simple-append",
                   "Variable: Do simple concatenations with append-curves\n     Usage: simple-append [ on | off]",
                   SS_acc_int,
                   &UL_simple_append);

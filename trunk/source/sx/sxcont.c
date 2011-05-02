@@ -818,9 +818,9 @@ out_device *SX_match_device(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_INSTALL_DEVICE_VARS - install the device variables in the symtab */
+/* _SX_INSTALL_DEVICE_VARS - install the device variables in the symtab */
 
-static void SX_install_device_vars(void)
+static void _SX_install_device_vars(SS_psides *si)
    {int i;
     char dupp[MAXLINE];
     char *dname, *name, *doc;
@@ -845,17 +845,17 @@ static void SX_install_device_vars(void)
 	     doc  = SC_dsnprintf(TRUE, "Variable: When TRUE print will generate a plot in a %s file",
 				 dupp);
 	     name = SC_dsnprintf(FALSE, "%s-flag", dname);
-	     SS_install_cf(name, doc, SS_acc_int, &out->active);
+	     SS_install_cf(si, name, doc, SS_acc_int, &out->active);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: The background color to use for a %s file",
 				 dupp);
 	     name = SC_dsnprintf(FALSE, "%s-background-color-flag", dname);
-	     SS_install_cf(name, doc, SS_acc_int, &out->background_color);
+	     SS_install_cf(si, name, doc, SS_acc_int, &out->background_color);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s file name\n     Usage: %s-name <string>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "%s-name", dname);
-	     SS_install_cf(name, doc, SS_acc_ptr, &out->fname);
+	     SS_install_cf(si, name, doc, SS_acc_ptr, &out->fname);
 
              if (strcmp(dupp, "PS") == 0)
 	        doc = SC_dsnprintf(TRUE,  "Variable: %s file type (monochrome or color)\n     Usage: %s-type <string>",
@@ -864,45 +864,45 @@ static void SX_install_device_vars(void)
 	        doc = SC_dsnprintf(TRUE,  "Variable: %s file type (monochrome or rgb)\n     Usage: %s-type <string>",
 				   dupp, dname);
 	     name = SC_dsnprintf(FALSE, "%s-type", dname);
-	     SS_install_cf(name, doc, SS_acc_ptr, &out->type);
+	     SS_install_cf(si, name, doc, SS_acc_ptr, &out->type);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s window height in fraction of screen width\n     Usage: window-height-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-height-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_double, &out->height);
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->height);
 
 	     doc  = SC_dsnprintf(TRUE,  "Variable: %s X comp of window origin (frac of screen width)\n     Usage: window-origin-x-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-origin-x-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_double, &out->x0);
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->x0);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s Y comp of window origin (frac of screen width)\n     Usage: window-origin-y-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-origin-y-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_double, &out->y0);
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->y0);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s window width in fraction of screen width\n     Usage: window-width-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-width-%s", dname);
-	     SS_install_cf(name, doc, SS_acc_double, &out->width);}
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->width);}
 
 	 else
 	    {doc  = SC_dsnprintf(TRUE,  "%s-flag is not supported as configured",
 				 dname);
 	     name = SC_dsnprintf(FALSE, "%s-flag", dname);
-	     SS_install_cf(name, doc, SS_zargs,
+	     SS_install_cf(si, name, doc, SS_zargs,
 			   _SX_no_device_support, SS_PR_PROC);
 
 	     doc  = SC_dsnprintf(TRUE,  "%s-name is not supported as configured",
 				 dname);
 	     name = SC_dsnprintf(FALSE, "%s-name", dname);
-	     SS_install_cf(name, doc, SS_zargs,
+	     SS_install_cf(si, name, doc, SS_zargs,
 			   _SX_no_device_support, SS_PR_PROC);
 
 	     doc  = SC_dsnprintf(TRUE,  "%s-type is not supported as configured",
 				 dname);
 	     name = SC_dsnprintf(FALSE, "%s-type", dname);
-	     SS_install_cf(name, doc, SS_zargs,
+	     SS_install_cf(si, name, doc, SS_zargs,
 			   _SX_no_device_support, SS_PR_PROC);};};
 
     return;}
@@ -1156,392 +1156,392 @@ void SX_install_global_vars(SS_psides *si)
 
 /* A */
 
-    SS_install_cf("answer-prompt",
+    SS_install_cf(si, "answer-prompt",
                   "Variable: A string printed before the return value\n     Usage: answer-prompt <string>",
                   SS_acc_string,
                   si->ans_prompt);
 
-    SS_install_cf("ascii-output-format",
+    SS_install_cf(si, "ascii-output-format",
                   "Variable: Controls format for ASCII output of floating point numbers\n     Usage: ascii-output-format <format>",
                   SS_acc_ptr,
                   &SX_text_output_format);
 
-    SS_install_cf("autorange",
+    SS_install_cf(si, "autorange",
                   "Variable: Turns on or off autoranging\n     Usage: autorange on | off",
                   SS_acc_int,
                   &SX_autorange);
 
-    SS_install_cf("autodomain",
+    SS_install_cf(si, "autodomain",
                   "Variable: Turns on or off autodomain\n     Usage: autodomain on | off",
                   SS_acc_int,
                   &SX_autodomain);
 
-    SS_install_cf("autoplot",
+    SS_install_cf(si, "autoplot",
                   "Variable: Controls autoploting of graphs\n     Usage: autoplot on | off",
                   SS_acc_int,
                   &SX_autoplot);
 
-    SS_install_cf("axis",
+    SS_install_cf(si, "axis",
                   "Variable: Controls drawing the axes\n     Usage: axis on | off ",
                   SS_acc_int,
 		  axson);
 
-    SS_install_cf("axis-max-major-ticks",
+    SS_install_cf(si, "axis-max-major-ticks",
                   "Variable: Controls maximum number of major ticks\nUsage: axis-max-major-ticks <integer> ",
                   SS_acc_int,
 		  axsmjt);
 
-    SS_install_cf("axis-number-minor-ticks",
+    SS_install_cf(si, "axis-number-minor-ticks",
                   "Variable: Controls number of minor axis ticks\nUsage: axis-number-minor-ticks <integer> ",
                   SS_acc_int,
 		  axsmnt);
 
-    SS_install_cf("axis-number-minor-x-ticks",
+    SS_install_cf(si, "axis-number-minor-x-ticks",
                   "Variable: Controls number of minor X axis ticks\nUsage: axis-number-minor-x-ticks <integer> ",
                   SS_acc_int,
 		  axsmxt);
 
-    SS_install_cf("axis-number-minor-y-ticks",
+    SS_install_cf(si, "axis-number-minor-y-ticks",
                   "Variable: Controls number of minor Y axis ticks\nUsage: axis-number-minor-y-ticks <integer> ",
                   SS_acc_int,
 		  axsmyt);
 
-    SS_install_cf("axis-n-decades",
+    SS_install_cf(si, "axis-n-decades",
                   "Variable: Controls maximum number of log axis decades\nUsage: axis-n-decades <real> ",
                   SS_acc_double,
                   axndec);
 
-    SS_install_cf("axis-tick-type",
+    SS_install_cf(si, "axis-tick-type",
                   "Variable: Controls location of axis ticks\nUsage: axis-tick-type left-of-axis | right-of-axis | straddle-axis ",
                   SS_acc_int,
 		  axstt);
 
-    SS_install_cf("axis-char-size",
+    SS_install_cf(si, "axis-char-size",
                   "Variable: Controls character size for the axes\n     Usage: axis-char-size <integer> ",
                   SS_acc_int,
 		  axscs);
 
-    SS_install_cf("axis-char-angle",
+    SS_install_cf(si, "axis-char-angle",
                   "Variable: Controls angle at which characters are drawn\n     Usage: axis-char-angle <real> ",
                   SS_acc_double,
 		  axsca);
 
-    SS_install_cf("axis-grid-style",
+    SS_install_cf(si, "axis-grid-style",
                   "Variable: Controls line style for the axis grid\n     Usage: axis-grid-style solid | dotted | dashed | dotdashed ",
                   SS_acc_int,
 		  axsgs);
 
-    SS_install_cf("axis-labels",
+    SS_install_cf(si, "axis-labels",
                   "Variable: Controls axis labelling\n     Usage: axis-labels on | off",
                   SS_acc_int,
 		  axslb);
 
-    SS_install_cf("axis-line-style",
+    SS_install_cf(si, "axis-line-style",
                   "Variable: Controls line style for the axes\n     Usage: axis-line-style solid | dotted | dashed | dotdashed ",
                   SS_acc_int,
 		  axsls);
 
-    SS_install_cf("axis-line-width",
+    SS_install_cf(si, "axis-line-width",
                   "Variable: Controls line width for the axes\n     Usage: axis-line-width [<real>] ",
                    SS_acc_double,
                    axslw);
 
-    SS_install_cf("axis-tick-size",
+    SS_install_cf(si, "axis-tick-size",
                   "Variable: Controls major tick size for the axes\n     Usage: axis-tick-size <real>",
                   SS_acc_double,
 		  axsmts);
 
-    SS_install_cf("axis-type",
+    SS_install_cf(si, "axis-type",
                   "Variable: Controls axis type\n     Usage: axis-type cartesian | polar | insel",
                   SS_acc_int,
 		  axsty);
 
-    SS_install_cf("axis-x-format",
+    SS_install_cf(si, "axis-x-format",
                   "Variable: Controls format for x axis labels\n     Usage: axis-x-format <format>",
                   SS_acc_ptr,
                   axslxf);
 
-    SS_install_cf("axis-y-format",
+    SS_install_cf(si, "axis-y-format",
                   "Variable: Controls format for y axis labels\n     Usage: axis-y-format <format>",
                   SS_acc_ptr,
                   axslyf);
 
 /* BCD */
 
-    SS_install_cf("background-color-flag",
+    SS_install_cf(si, "background-color-flag",
                   "Variable: Background color - white or black\n     Usage: background-color-flag black | white",
                   SS_acc_int,
                   &SX_background_color_white);
 
-    SS_install_cf("border-width",
+    SS_install_cf(si, "border-width",
                   "Variable: Window border width in pixels\n     Usage: border-width <integer>",
                   SS_acc_int,
                   &SX_border_width);
 
-    SS_install_cf("botspace",
+    SS_install_cf(si, "botspace",
                   "Variable: Fractional space at bottom of screen\n     Usage: botspace <real>",
                   SS_acc_double,
                   &SX_gpad[2]);
 
-    SS_install_cf("bracket-flag",
+    SS_install_cf(si, "bracket-flag",
                   "Variable: Remove blanks within square bracket enclosed fields\n     Usage: bracket-flag on | off",
                   SS_acc_int,
                   &si->bracket_flag);
 
-    SS_install_cf("chi",
+    SS_install_cf(si, "chi",
                   "Variable: Default chi view angle\n     Usage: chi <real>",
                   SS_acc_double,
                   &SX_chi);
 
-    SS_install_cf("console-type",
+    SS_install_cf(si, "console-type",
                   "Variable: Controls console mode\n     Usage: console-type <string>",
                   SS_acc_ptr,
                   &SX_console_type);
 
-    SS_install_cf("console-origin-x",
+    SS_install_cf(si, "console-origin-x",
                   "Variable: X comp of console origin (frac of screen width)\n     Usage: console-origin-x <real>",
                   SS_acc_double,
                   &SX_console_x);
 
-    SS_install_cf("console-origin-y",
+    SS_install_cf(si, "console-origin-y",
                   "Variable: Y comp of console origin (frac of screen width)\n     Usage: console-origin-y <real>",
                   SS_acc_double,
                   &SX_console_y);
 
-    SS_install_cf("console-width",
+    SS_install_cf(si, "console-width",
                   "Variable: Console width in fraction of screen width\n     Usage: console-width <real>",
                   SS_acc_double,
                   &SX_console_width);
 
-    SS_install_cf("console-height",
+    SS_install_cf(si, "console-height",
                   "Variable: Console height in fraction of screen width\n     Usage: console-height <real>",
                   SS_acc_double,
                   &SX_console_height);
 
-    SS_install_cf("contour-n-levels",
+    SS_install_cf(si, "contour-n-levels",
                   "Variable: Default number of contour levels to plot\n     Usage: contour-n-levels <int>",
                   SS_acc_int,
                   nlev);
 
-    SS_install_cf("contour-ratio",
+    SS_install_cf(si, "contour-ratio",
                   "Variable: Default ratio for conntour levels spacing\n     Usage: contour-ratio <real>",
                   SS_acc_double,
                   cntrat);
 
-    SS_install_cf("data-directory",
+    SS_install_cf(si, "data-directory",
                   "Variable: Sets the default data directory\n     Usage: data-directory <path-name>",
                   SS_acc_string,
                   SX_data_directory);
 
-    SS_install_cf("data-id",
+    SS_install_cf(si, "data-id",
                   "Variable: Controls display of curve identifiers on graph\n     Usage: data-id on | off",
                   SS_acc_int,
                   &SX_data_id);
 
-    SS_install_cf("default-color",
+    SS_install_cf(si, "default-color",
                   "Variable: The default line color\n     Usage: default-color <color>",
                   SS_acc_int,
                   &SX_default_color);
 
-    SS_install_cf("default-npts",
+    SS_install_cf(si, "default-npts",
                   "Variable: The default number of points used to make new curves.\n     Used by SPAN, LINE, etc.",
                   SS_acc_int,
                   &SX_default_npts);
 
-    SS_install_cf("display-name",
+    SS_install_cf(si, "display-name",
                   "Variable: Display-name - <host>:<display>.<screen>\n     Usage: display-name <string>",
                   SS_acc_ptr,
                   &SX_display_name);
 
-    SS_install_cf("display-type",
+    SS_install_cf(si, "display-type",
                   "Variable: Controls display mode\n     Usage: display-type <string>",
                   SS_acc_ptr,
                   &SX_display_type);
 
-    SS_install_cf("display-title",
+    SS_install_cf(si, "display-title",
                   "Variable: Controls display title\n     Usage: display-title <string>",
                   SS_acc_ptr,
                   &SX_display_title);
 
 /* EFGHIJ */
 
-    SS_install_cf("error-bar-cap-size",
+    SS_install_cf(si, "error-bar-cap-size",
                   "Variable: Fractional size of error bar caps\n     Usage: error-bar-cap-size <real>",
                   SS_acc_double,
                   errcsz);
 
-    SS_install_cf("file-exist-action",
+    SS_install_cf(si, "file-exist-action",
                   "Variable: Control action when opening existing files for append\n     Usage: file-exist-action <integer>",
                   SS_acc_int,
                   (int *) &SX_file_exist_action);
 
-    SS_install_cf("graphics-mode",
+    SS_install_cf(si, "graphics-mode",
                   "Variable: Graphics mode\n     Usage: graphics-mode [on|off]",
                   SS_acc_int,
                   &SX_gr_mode);
 
-    SS_install_cf("gri-title",
+    SS_install_cf(si, "gri-title",
                   "Variable: Graphical interface window title\n     Usage: gri-title <string>",
                   SS_acc_ptr,
                   &SX_GRI_type_face);
 
-    SS_install_cf("gri-type-face",
+    SS_install_cf(si, "gri-type-face",
                   "Variable: Graphical interface type face\n     Usage: gri-type-face medium | italic | bold | bold-italic",
                   SS_acc_ptr,
                   &SX_GRI_type_face);
 
-    SS_install_cf("gri-type-size",
+    SS_install_cf(si, "gri-type-size",
                   "Variable: Graphical interface type size\n     Usage: gri-type-size [<integer>]",
                   SS_acc_int,
                   &SX_GRI_type_size);
 
-    SS_install_cf("gri-type-style",
+    SS_install_cf(si, "gri-type-style",
                   "Variable: Graphical interface type style\n     Usage: gri-type-style medium | italic | bold | bold-italic",
                   SS_acc_ptr,
                   &SX_GRI_type_style);
 
-    SS_install_cf("gri-x",
+    SS_install_cf(si, "gri-x",
                   "Variable: Graphical interface window x origin\n     Usage: gri-x <real>",
                   SS_acc_double,
                   &SX_GRI_x);
 
-    SS_install_cf("gri-y",
+    SS_install_cf(si, "gri-y",
                   "Variable: Graphical interface window y origin\n     Usage: gri-y <real>",
                   SS_acc_double,
                   &SX_GRI_y);
 
-    SS_install_cf("gri-width",
+    SS_install_cf(si, "gri-width",
                   "Variable: Graphical interface window width\n     Usage: gri-width <real>",
                   SS_acc_double,
                   &SX_GRI_dx);
 
-    SS_install_cf("gri-height",
+    SS_install_cf(si, "gri-height",
                   "Variable: Graphical interface window height\n     Usage: gri-height <real>",
                   SS_acc_double,
                   &SX_GRI_dy);
 
-    SS_install_cf("grid",
+    SS_install_cf(si, "grid",
                   "Variable: Controls display of grid lines in graph\n     Usage: grid on | off",
                   SS_acc_int,
                   &SX_grid);
 
-    SS_install_cf("hide-rescale",
+    SS_install_cf(si, "hide-rescale",
                   "Variable: Allows plot to rescale when hiding curves\n     Usage: hide-rescale on | off",
                   SS_acc_int,
                   hider);
 
-    SS_install_cf("histogram-start",
+    SS_install_cf(si, "histogram-start",
                   "Variable: Starting point for histogram plots\n     Usage: histogram-start left | center | right | off",
                   SS_acc_int,
                   hsts);
 
-    SS_install_cf("interpolation-flag",
+    SS_install_cf(si, "interpolation-flag",
                   "Variable: Control going from zone centered to node centered mappings\n     Usage: interpolation-flag on | off",
                   SS_acc_int,
                   intf);
 
-    SS_install_cf("interpolation-power",
+    SS_install_cf(si, "interpolation-power",
                   "Variable: exponent which defines distance measure used in interpolation\n     Usage: interpolation-power #",
                   SS_acc_double,
                   &SX_interp_power);
 
-    SS_install_cf("interpolation-scale",
+    SS_install_cf(si, "interpolation-scale",
                   "Variable: multiplier on scale ratio used in interpolation\n     Usage: interpolation-scale #",
                   SS_acc_double,
                   &SX_interp_scale);
 
-    SS_install_cf("interpolation-strength",
+    SS_install_cf(si, "interpolation-strength",
                   "Variable: power of distance used in interpolation\n     Usage: interpolation-strength #",
                   SS_acc_double,
                   &SX_interp_strength);
 
 /* KLMN */
-    SS_install_cf("labels",
+    SS_install_cf(si, "labels",
                   "Variable: Controls drawing plot labels\n    Usage: labels on | off ",
                   SS_acc_int,
 		  pltlb);
 
-    SS_install_cf("label-color-flag",
+    SS_install_cf(si, "label-color-flag",
                   "Variable: When TRUE print curve label same color as curve",
                   SS_acc_int,
                   labcf);
 
-    SS_install_cf("label-length",
+    SS_install_cf(si, "label-length",
                   "Variable: The length of the label shown by lst et al\n     Usage: label-length <integer> ",
                   SS_acc_int,
 		  labln);
 
-    SS_install_cf("label-space",
+    SS_install_cf(si, "label-space",
                   "Variable: Fractional space for curve labels\n     Usage: label-space <real>",
                   SS_acc_double,
                   labsp);
 
-    SS_install_cf("label-type-size",
+    SS_install_cf(si, "label-type-size",
                   "Variable: Label type size for plot\n     Usage: label-type-size [<integer>]",
                   SS_acc_int,
                   labts);
 
-    SS_install_cf("label-yoffset",
+    SS_install_cf(si, "label-yoffset",
                   "Variable: Fractional offset to start of curve labels\n     Usage: label-yoffset <real>",
                   SS_acc_double,
 		  labyo);
 
-    SS_install_cf("leftspace",
+    SS_install_cf(si, "leftspace",
                   "Variable: Fractional space at left of screen\n     Usage: leftspace <real>",
                   SS_acc_double,
                   &SX_gpad[0]);
 
-    SS_install_cf("line-color",
+    SS_install_cf(si, "line-color",
                   "Variable: Default line color for new curves\n     Usage: line-color [<integer>] ",
                    SS_acc_int,
                    lnclr);
 
-    SS_install_cf("line-style",
+    SS_install_cf(si, "line-style",
                   "Variable: Default line style for new curves\n     Usage: line-style [<integer>] ",
                    SS_acc_int,
                    lnsty);
 
-    SS_install_cf("line-width",
+    SS_install_cf(si, "line-width",
                   "Variable: Default line width for new curves\n     Usage: line-width [<real>] ",
                    SS_acc_double,
                    lnwid);
 
-    SS_install_cf("logical-plot",
+    SS_install_cf(si, "logical-plot",
                   "Variable: Controls plotting ranges vs indexes\n     Usage: logical-plot <on | off>",
                   SS_acc_int,
                   lgcp);
 
-    SS_install_cf("map-color-to-extrema",
+    SS_install_cf(si, "map-color-to-extrema",
                   "Variable: Map out of bounds values to max or min\n  Usage: map-color-to-extrema <on | off>",
                   SS_acc_int,
 		  cmtex);
 
-    SS_install_cf("marker-index",
+    SS_install_cf(si, "marker-index",
                   "Variable: Reference the nth marker\n     Usage: marker-index <integer>",
                   SS_acc_int,
                   mrki);
 
-    SS_install_cf("marker-scale",
+    SS_install_cf(si, "marker-scale",
                   "Variable: The marker scale factor\n     Usage: marker-scale <real>",
                   SS_acc_double,
                   mrks);
 
-    SS_install_cf("marker-orientation",
+    SS_install_cf(si, "marker-orientation",
                   "Variable: The marker orientation angle\n     Usage: marker-orientation <real>",
                   SS_acc_double,
                   &SX_marker_orientation);
 
-    SS_install_cf("n-curves",
+    SS_install_cf(si, "n-curves",
                   "Variable: Total number of curves in the system\n     Usage: n-curves",
                   SS_acc_int,
                   &SX_N_Curves);
 
-    SS_install_cf("n-curves-read",
+    SS_install_cf(si, "n-curves-read",
                   "Variable: Total number of curves read from files\n     Usage: n-curves-read",
                   SS_acc_int,
                   &SX_n_curves_read);
 
-    SS_install_cf("numeric-data-ids",
+    SS_install_cf(si, "numeric-data-ids",
                   "Variable: Flag for drawing numeric data ids\n     Usage: numeric-data-ids",
                   SS_acc_int,
                   ndi);
@@ -1549,102 +1549,102 @@ void SX_install_global_vars(SS_psides *si)
 
 /* OPQR */
 
-    SS_install_cf("palette-orientation",
+    SS_install_cf(si, "palette-orientation",
                   "Variable: Default palette orientation\n     Usage: palette-orientation horizontal | vertical",
                   SS_acc_int,
                   palor);
 
-    SS_install_cf("phi",
+    SS_install_cf(si, "phi",
                   "Variable: Default phi view angle\n     Usage: phi <real>",
                   SS_acc_double,
                   &SX_phi);
 
-    SS_install_cf("plot-date",
+    SS_install_cf(si, "plot-date",
                   "Variable: Print date and time on hardcopy if TRUE\n     Usage: plot-date on | off",
                   SS_acc_int,
 		  pltdt);
 
-    SS_install_cf("plot-flag",
+    SS_install_cf(si, "plot-flag",
                   "Variable: Flag that controls whether or not a handler plots\n     Usage: plot-flag on | off",
                   SS_acc_int,
                   &SX_plot_flag);
 
-    SS_install_cf("plot-labels",
+    SS_install_cf(si, "plot-labels",
                   "Variable: Print curve labels if TRUE\n     Usage: plot-labels on | off",
                   SS_acc_int,
                   pltlb);
 
-    SS_install_cf("plot-title",
+    SS_install_cf(si, "plot-title",
                   "Variable: Print plot title if TRUE\n     Usage: plot-title on | off",
                   SS_acc_int,
 		  plttl);
 
-    SS_install_cf("plot-type",
+    SS_install_cf(si, "plot-type",
                   "Variable: Controls plot type\n     Usage: plot-type cartesian | polar | insel",
                   SS_acc_int,
                   ppty);
 
-    SS_install_cf("print-flag",
+    SS_install_cf(si, "print-flag",
                   "Variable: Controls the interpreter value output\n     Usage: print-flag on | off",
                   SS_acc_int,
                   &si->print_flag);
 
-    SS_install_cf("print-stats",
+    SS_install_cf(si, "print-stats",
                   "Variable: Controls the interpreter statistics output\n     Usage: print-flag on | off",
                   SS_acc_int,
                   &si->stat_flag);
 
-    SS_install_cf("prompt",
+    SS_install_cf(si, "prompt",
                   "Variable: The prompt\n     Usage: prompt <string>",
                   SS_acc_string,
                   si->prompt);
 
-    SS_install_cf("promotion-type",
+    SS_install_cf(si, "promotion-type",
                   "Variable: Data type for promotion of sets and arrays (default none)\n     Usage: promotion-type <string>",
                   SS_acc_ptr,
                   &SX_promotion_type);
 
-    SS_install_cf("ps-dots-inch",
+    SS_install_cf(si, "ps-dots-inch",
                   "Variable: PostScript dots/inch for 8.5 x 11 page\n     Usage: ps-dots-inch <real>",
                   SS_acc_double,
                   psdpi);
 
-    SS_install_cf("ref-mesh",
+    SS_install_cf(si, "ref-mesh",
                   "Variable: Controls drawing a reference mesh\n     Usage: ref-mesh on | off ",
                   SS_acc_int,
                   refm);
 
-    SS_install_cf("ref-mesh-color",
+    SS_install_cf(si, "ref-mesh-color",
                   "Variable: Controls line color of a reference mesh\n     Usage: ref-mesh <int>",
                   SS_acc_int,
                   refmc);
 
-    SS_install_cf("render-1d-1d",
+    SS_install_cf(si, "render-1d-1d",
                   "Variable: Render 1D vs 1D plots\n     Usage: render-1d-1d <int>",
                   SS_acc_int,
                   &SX_render_1d_1d);
 
-    SS_install_cf("render-2d-1d",
+    SS_install_cf(si, "render-2d-1d",
                   "Variable: Render 2D vs 1D plots\n     Usage: render-2d-1d <int>",
                   SS_acc_int,
                   &SX_render_2d_1d);
 
-    SS_install_cf("render-2d-2d",
+    SS_install_cf(si, "render-2d-2d",
                   "Variable: Render 2D vs 2D plots\n     Usage: render-2d-2d <int>",
                   SS_acc_int,
                   &SX_render_2d_2d);
 
-    SS_install_cf("render-3d-1d",
+    SS_install_cf(si, "render-3d-1d",
                   "Variable: Render 3D vs 1D plots\n     Usage: render-3d-1d <int>",
                   SS_acc_int,
                   &SX_render_3d_1d);
 
-    SS_install_cf("restore-viewport",
+    SS_install_cf(si, "restore-viewport",
                   "Variable: Restore viewport after plots\n     Usage: restore-viewport <int>",
                   SS_acc_int,
                   rstvp);
 
-    SS_install_cf("rightspace",
+    SS_install_cf(si, "rightspace",
                   "Variable: Fractional space at right of screen\n     Usage: rightspace <real>",
                   SS_acc_double,
                   &SX_gpad[1]);
@@ -1652,92 +1652,92 @@ void SX_install_global_vars(SS_psides *si)
 
 /* STUV */
 
-    SS_install_cf("scatter-plot",
+    SS_install_cf(si, "scatter-plot",
                   "Variable: Controls scatter plotting\n     Usage: scatter-plot on | off",
                   SS_acc_int,
                   scat);
 
-    SS_install_cf("show-mouse-location",
+    SS_install_cf(si, "show-mouse-location",
                   "Variable: Controls display of mouse posision\n     Usage: show-mouse-location on | off",
                   SS_acc_int,
                   &SX_show_mouse_location);
 
-    SS_install_cf("show-mouse-location-x",
+    SS_install_cf(si, "show-mouse-location-x",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-x <real>",
                   SS_acc_double,
                   &SX_show_mouse_location_x);
 
-    SS_install_cf("show-mouse-location-y",
+    SS_install_cf(si, "show-mouse-location-y",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-y <real>",
                   SS_acc_double,
                   &SX_show_mouse_location_y);
 
-    SS_install_cf("smooth-method",
+    SS_install_cf(si, "smooth-method",
                   "Variable: Method for smooth functions\n     Usage: smooth-method \"fft\" | \"averaging\" | \"tchebyshev\" | \"least-sqr\"",
                   SS_acc_ptr,
                   &SX_smooth_method);
 
-    SS_install_cf("squeeze-labels",
+    SS_install_cf(si, "squeeze-labels",
                   "Variable: Controls squeezing of extra blanks from labels\n     Usage: squeeze-labels on | off",
                   SS_acc_int,
                   sqzlab);
 
-    SS_install_cf("text-color",
+    SS_install_cf(si, "text-color",
                   "Variable: Default text color\n     Usage: text-color [<integer>] ",
                    SS_acc_int,
                    txclr);
 
-    SS_install_cf("text-format",
+    SS_install_cf(si, "text-format",
                   "Variable: Controls format for various text\n     Usage: text-format <format>",
                   SS_acc_ptr,
 		  txtfm);
 
-    SS_install_cf("theta",
+    SS_install_cf(si, "theta",
                   "Variable: Default theta view angle\n     Usage: theta <real>",
                   SS_acc_double,
                   &SX_theta);
 
-    SS_install_cf("topspace",
+    SS_install_cf(si, "topspace",
                   "Variable: Fractional space at top of screen\n     Usage: topspace <real>",
                   SS_acc_double,
                   &SX_gpad[3]);
 
-    SS_install_cf("type-face",
+    SS_install_cf(si, "type-face",
                   "Variable: Font type face for plot\n     Usage: type-face helvetica | times | courier",
                   SS_acc_ptr,
                   axstf);
 
-    SS_install_cf("type-size",
+    SS_install_cf(si, "type-size",
                   "Variable: Font type size for plot\n     Usage: type-size <integer>",
                   SS_acc_int,
                   &SX_plot_type_size);
 
-    SS_install_cf("type-style",
+    SS_install_cf(si, "type-style",
                   "Variable: Font type style for plot\n     Usage: type-style medium | italic | bold | bold-italic",
                   SS_acc_ptr,
                   &SX_plot_type_style);
 
-    SS_install_cf("view-aspect",
+    SS_install_cf(si, "view-aspect",
                   "Variable: Viewport aspect ratio\n     Usage: view-aspect <real>",
                   SS_acc_double,
                   &SX_view_aspect);
 
-    SS_install_cf("view-height",
+    SS_install_cf(si, "view-height",
                   "Variable: Viewport height in fraction of screen height\n     Usage: view-height <real>",
                   SS_acc_double,
                   &SX_view_height);
 
-    SS_install_cf("view-origin-x",
+    SS_install_cf(si, "view-origin-x",
                   "Variable: X comp of viewport origin (frac of window width)\n     Usage: view-origin-x <real>",
                   SS_acc_double,
                   &SX_view_x[0]);
 
-    SS_install_cf("view-origin-y",
+    SS_install_cf(si, "view-origin-y",
                   "Variable: Y comp of viewport origin (frac of window width)\n     Usage: view-origin-y <real>",
                   SS_acc_double,
                   &SX_view_x[2]);
 
-    SS_install_cf("view-width",
+    SS_install_cf(si, "view-width",
                   "Variable: Viewport width in fraction of screen width\n     Usage: view-width <real>",
                   SS_acc_double,
                   &SX_view_width);
@@ -1745,38 +1745,38 @@ void SX_install_global_vars(SS_psides *si)
 
 /* UVWXYZ */
 
-    SS_install_cf("window-height",
+    SS_install_cf(si, "window-height",
                   "Variable: Window height in fraction of screen width\n     Usage: window-height <real>",
                   SS_acc_double,
                   &SX_window_height);
 
-    SS_install_cf("window-origin-x",
+    SS_install_cf(si, "window-origin-x",
                   "Variable: X comp of window origin (frac of screen width)\n     Usage: window-origin-x <real>",
                   SS_acc_double,
                   &SX_window_x[0]);
 
-    SS_install_cf("window-origin-y",
+    SS_install_cf(si, "window-origin-y",
                   "Variable: Y comp of window origin (frac of screen width)\n     Usage: window-origin-y <real>",
                   SS_acc_double,
                   &SX_window_x[1]);
 
-    SS_install_cf("window-width",
+    SS_install_cf(si, "window-width",
                   "Variable: Window width in fraction of screen width\n     Usage: window-width <real>",
                   SS_acc_double,
                   &SX_window_width);
 
-    SS_install_cf("x-log-scale",
+    SS_install_cf(si, "x-log-scale",
                   "Variable: Controls log scale on x axis\n     Usage: x-log-scale on | off",
                   SS_acc_int,
                   &SX_log_scale[0]);
 
-    SS_install_cf("y-log-scale",
+    SS_install_cf(si, "y-log-scale",
                   "Variable: Controls log scale on y axis\n     Usage: y-log-scale on | off",
                   SS_acc_int,
                   &SX_log_scale[1]);
 
     SX_register_devices();
-    SX_install_device_vars();
+    _SX_install_device_vars(si);
 
     return;}
 

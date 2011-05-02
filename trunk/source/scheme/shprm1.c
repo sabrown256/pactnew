@@ -317,7 +317,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
             {vr = SS_car(vlpair);
              vl = SS_cadr(vlpair);};
 
-         asgn = SS_make_form(SS_setproc, vr, vl, LAST);
+         asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
          SS_end_cons_macro(asnl, this, asgn);
          prml = SS_mk_cons(si, vr, prml);};
 
@@ -371,7 +371,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
             {vr = SS_car(vlpair);
              vl = SS_cadr(vlpair);};
 
-         asgn = SS_make_form(SS_setproc, vr, vl, LAST);
+         asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
          SS_end_cons_macro(si->argl, si->this, asgn);
          prml = SS_mk_cons(si, vr, prml);};
 
@@ -431,7 +431,7 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
              vl = SS_cadr(vlpair);};
 
          SS_Assign(si->val,
-		   SS_make_form(SS_setproc, vr, vl, LAST));
+		   SS_make_form(si, SS_setproc, vr, vl, LAST));
          SS_end_cons_macro(si->argl, si->this, si->val);
          SS_Assign(si->unev, SS_mk_cons(si, vr, si->unev));};
 
@@ -916,7 +916,7 @@ static object *_SSI_catch(SS_psides *si, object *obj)
 
     escape = SS_mk_esc_proc(si, si->errlev, SS_PROCEDURE_I);
 
-    lst    = SS_make_list(SS_OBJECT_I, obj,
+    lst    = SS_make_list(si, SS_OBJECT_I, obj,
 			  SS_OBJECT_I, escape,
 			  0);
 
@@ -997,7 +997,7 @@ static object *_SSI_time(SS_psides *si)
 /* make the month right */
     loct->tm_mon++;
 
-    o = SS_make_list(SC_INT_I, &loct->tm_year,
+    o = SS_make_list(si, SC_INT_I, &loct->tm_year,
 		     SC_INT_I, &loct->tm_mon,
 		     SC_INT_I, &loct->tm_mday,
 		     SC_INT_I, &loct->tm_hour,
@@ -1065,7 +1065,7 @@ static object *_SSI_etime(SS_psides *si, object *argl)
 	    {dt[i] = r / secsper[i];
 	     r    %= secsper[i];};
 
-	rv = SS_make_list(SC_INT_I, &dt[0],
+	rv = SS_make_list(si, SC_INT_I, &dt[0],
 			  SC_INT_I, &dt[1],
 			  SC_INT_I, &dt[2],
 			  SC_INT_I, &dt[3],

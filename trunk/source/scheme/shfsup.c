@@ -36,10 +36,10 @@ object *_SS_make_funf(SS_psides *si, object *proto, object *body)
             
     if (extra)
        {body = SS_CDR_MACRO(rest);
-	o = SS_append(si, SS_make_form(_SS_f_defunc, proto, 0),
+	o = SS_append(si, SS_make_form(si, _SS_f_defunc, proto, LAST),
 		      body);}
     else
-       o = SS_make_form(_SS_f_defunc, proto, body, 0);
+       o = SS_make_form(si, _SS_f_defunc, proto, body, LAST);
 
     return(o);}
 
@@ -172,11 +172,11 @@ void SS_init_f_syntax_mode(SS_psides *si)
 		   SS_zargs,
 		   SS_f_mode, SS_PR_PROC);
 
-	SS_install_cf("diagnose-f-parse", 
+	SS_install_cf(si, "diagnose-f-parse", 
 		      "Variable: Flag to print detailed diagnostics of a Fortran parse\n     Usage: diagnose-f-parse [0|1]",
 		      SS_acc_int,
 		      ssdbg);
-	SS_install_cf("diagnose-f-grammar", 
+	SS_install_cf(si, "diagnose-f-grammar", 
 		      "Variable: Flag to print diagnostics of Fortran actions/reductions\n     Usage: diagnose-f-parse [0|1]",
 		      SS_acc_int,
 		      &SS_diagnostic_f);};

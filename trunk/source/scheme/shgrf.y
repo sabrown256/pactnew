@@ -174,8 +174,8 @@ declaration :
            op   = SS_CAR_MACRO($1);
            type = SS_cadr($1);
            if (op == _SS_f_typedef)
-              {SS_GR_VAL(SS_make_form(_SS_f_typedef,
-				      SS_CAR_MACRO($2), type, 0));}
+              {SS_GR_VAL(SS_make_form(SI, _SS_f_typedef,
+				      SS_CAR_MACRO($2), type, LAST));}
 	   else
 	      {SS_GR_VAL(SS_append(SI, $1, $2));};}
 
@@ -276,7 +276,7 @@ init_declarator :
        DIAGNOSTIC($$, "declarator");}
 
   | declarator '=' initializer
-      {SS_GR_VAL(SS_make_form($1, $3, 0));
+      {SS_GR_VAL(SS_make_form(SI, $1, $3, LAST));
        DIAGNOSTIC($$, "declarator = initializer");}
   ;
 
@@ -369,13 +369,13 @@ statement :
       {DIAGNOSTIC($1, "compound-statement");}
 
   | IF '(' expression ')' statement
-      {SS_GR_VAL(SS_make_form(_SS_f_if, $3, $5, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_if, $3, $5, LAST));}
 
   | IF '(' expression ')' THEN statement
-      {SS_GR_VAL(SS_make_form(_SS_f_if, $3, $5, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_if, $3, $5, LAST));}
 
   | IF '(' expression ')' THEN statement ELSE statement
-      {SS_GR_VAL(SS_make_form(_SS_f_if, $3, $5, $7, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_if, $3, $5, $7, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -454,7 +454,7 @@ assignment_expression :
     logical_or_expression
 
   | unary_expression '=' assignment_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_set, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_set, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -466,7 +466,7 @@ logical_or_expression :
     logical_and_expression
 
   | logical_or_expression OR logical_and_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_or, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_or, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -478,7 +478,7 @@ logical_and_expression :
     equality_expression
 
   | logical_and_expression AND equality_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_and, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_and, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -490,10 +490,10 @@ equality_expression :
     relational_expression
 
   | equality_expression EQ relational_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_equal, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_equal, $1, $3, LAST));}
 
   | equality_expression NEQ relational_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_not, SS_make_form(_SS_f_equal, $1, $3, 0), 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_not, SS_make_form(SI, _SS_f_equal, $1, $3, LAST), LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -505,16 +505,16 @@ relational_expression :
     shift_expression
 
   | relational_expression LT shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_lt, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_lt, $1, $3, LAST));}
 
   | relational_expression GT shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_gt, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_gt, $1, $3, LAST));}
 
   | relational_expression LE shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_le, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_le, $1, $3, LAST));}
 
   | relational_expression GE shift_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_ge, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_ge, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -535,13 +535,13 @@ additive_expression :
     multiplicative_expression
 
   | additive_expression EXPT multiplicative_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_expt, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_expt, $1, $3, LAST));}
 
   | additive_expression '+' multiplicative_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_plus, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_plus, $1, $3, LAST));}
 
   | additive_expression '-' multiplicative_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_minus, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_minus, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -553,10 +553,10 @@ multiplicative_expression :
     unary_expression
 
   | multiplicative_expression '*' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_times, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_times, $1, $3, LAST));}
 
   | multiplicative_expression '/' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_divide, $1, $3, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_divide, $1, $3, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/
@@ -568,10 +568,10 @@ unary_expression :
     postfix_expression
 
   | '+' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_plus, $2, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_plus, $2, LAST));}
 
   | '-' unary_expression
-      {SS_GR_VAL(SS_make_form(_SS_f_minus, $2, 0));}
+      {SS_GR_VAL(SS_make_form(SI, _SS_f_minus, $2, LAST));}
   ;
 
 /*--------------------------------------------------------------------------*/

@@ -144,15 +144,12 @@ static object *_SS_set_var(void *vr, object *vl, int type)
  *               -   (foo)    - evaluates to value of foo
  */
 
-object *SS_install_cf(char *name, char *doc, ...)
+object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
    {object *op, *vp;
     PFPHand handler;
     PFVoid fnc;
     C_procedure *cp;
     procedure *pp;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     SC_VA_START(doc);
     handler = SC_VA_ARG(PFPHand);
@@ -182,12 +179,9 @@ object *SS_install_cf(char *name, char *doc, ...)
  *               -   foo           - evaluates to value of foo
  */
 
-object *SS_install_cv(char *name, void *pval, int ityp)
+object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
    {char *typ;
     object *var;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     typ = SC_type_name(ityp);
     var = SS_mk_variable(si, name, SS_null);

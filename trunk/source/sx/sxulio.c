@@ -967,7 +967,7 @@ object *SX_read_text_table(SS_psides *si, object *argl)
     _SX.table_n  = n;
     _SX.table_ln = nl;
 
-    o = SS_make_list(SC_INT_I, &nr,
+    o = SS_make_list(si, SC_INT_I, &nr,
 		     SC_INT_I, &nc,
 		     0);
 
@@ -1061,7 +1061,7 @@ object *SX_table_attr(SS_psides *si)
            PRINT(stdout, "\n Table %d : %d rows and %d columns\n\n",
                  table_n, nrows, ncols);
 
-        ret = SS_make_list(SC_INT_I, &nrows,
+        ret = SS_make_list(si, SC_INT_I, &nrows,
                            SC_INT_I, &ncols,
                            SC_INT_I, &table_n,
                            0);};

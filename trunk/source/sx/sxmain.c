@@ -171,8 +171,8 @@ int main(int c, char **v, char **env)
 
         SX_init_view(si);
         SX_install_global_vars(si);
-        SX_init_mappings();
-        SX_init_env();
+        SX_init_mappings(si);
+        SX_init_env(si);
 
 #ifndef NO_SHELL
         if (SX_gr_mode && !SX_qflag)

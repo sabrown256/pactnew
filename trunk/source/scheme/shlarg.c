@@ -407,7 +407,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
     for (i = n-1; i >= 0; i--)
         {vr = vrs[i];
 	 vl = _SS_lk_var_valc(si, vr, si->global_env);
-	 pr = SS_make_list(SC_STRING_I, vr,
+	 pr = SS_make_list(si, SC_STRING_I, vr,
 			   SS_OBJECT_I, vl,
 			   0);
 	 SS_Assign(lst, SS_mk_cons(si, pr, lst));};
@@ -476,7 +476,7 @@ static object *_SSI_load_ave(SS_psides *si)
 
     rv = SC_load_ave(av);
     if (rv == TRUE)
-       s = SS_make_list(SC_DOUBLE_I, av,
+       s = SS_make_list(si, SC_DOUBLE_I, av,
 			SC_DOUBLE_I, av+1,
 			SC_DOUBLE_I, av+2,
 			0);
@@ -497,7 +497,7 @@ static object *_SSI_free_mem(SS_psides *si)
 
     rv = SC_free_mem(mem);
     if (rv == TRUE)
-       s = SS_make_list(SC_DOUBLE_I, mem,
+       s = SS_make_list(si, SC_DOUBLE_I, mem,
 			SC_DOUBLE_I, mem+1,
 			0);
     else
@@ -598,7 +598,7 @@ static object *_SSI_mem_usg(SS_psides *si)
 
     SC_mem_stats(&a, &f, &d, NULL);
 
-    ret = SS_make_list(SC_INT_I, &a,
+    ret = SS_make_list(si, SC_INT_I, &a,
 		       SC_INT_I, &f,
 		       SC_INT_I, &d,
 		       0);
@@ -684,7 +684,7 @@ static object *_SSI_mem_chk(SS_psides *si)
     na = SC_mem_chk(1);
     nf = SC_mem_chk(2);
     nr = SC_mem_chk(4);
-    o  = SS_make_list(SC_INT_I, &na,
+    o  = SS_make_list(si, SC_INT_I, &na,
 		      SC_INT_I, &nf,
 		      SC_INT_I, &nr,
 		      0);
@@ -959,17 +959,17 @@ void _SS_inst_lrg(SS_psides *si)
                SS_nargs,
                _SSI_vctset, SS_PR_PROC);
 
-    SS_install_cf("interactive",
+    SS_install_cf(si, "interactive",
                   "Variable: Controls display of ouput data in functions\n     Usage: interactive <on|off>",
                   SS_acc_int,
                   &si->interactive);
 
-    SS_install_cf("lines-page",
+    SS_install_cf(si, "lines-page",
                   "Variable: Controls the number of lines per page for selected printing commands\n     Usage: lines-page <integer>",
                   SS_acc_int,
                   &si->lines_page);
 
-    SS_install_cf("trace-env",
+    SS_install_cf(si, "trace-env",
                   "Variable: Show upto <n> variables in environment frames entering function calls\n     Usage: trace-env <n>",
                   SS_acc_int,
                   &si->trace_env);
