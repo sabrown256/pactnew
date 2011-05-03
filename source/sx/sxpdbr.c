@@ -43,8 +43,8 @@ void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
     else
        {lvr = (char **) vr;
         dtype = PD_dereference(CSTRSAVE(type));
-        for (i = 0L; i < nitems; i++, obj = SS_cdr(obj))
-            _SX_rd_indirection_list(si, SS_car(obj), file, &lvr[i], dtype);
+        for (i = 0L; i < nitems; i++, obj = SS_cdr(si, obj))
+            _SX_rd_indirection_list(si, SS_car(si, obj), file, &lvr[i], dtype);
         CFREE(dtype);};
 
     return;}
@@ -62,7 +62,7 @@ static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
    {long bpi, nitems;
     char *pv;
 
-    nitems = _SS_get_object_length(obj);
+    nitems = _SS_get_object_length(si, obj);
 
     if (nitems == 0L)
        *vr = NULL;
@@ -119,20 +119,20 @@ static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
 	else
 	   {sz  = dp->size;
 	    svr = vr;
-	    for (i = 0L; i < nitems; i++, svr += sz, obj  = SS_cdr(obj))
-	        {obj1 = SS_car(obj);
+	    for (i = 0L; i < nitems; i++, svr += sz, obj  = SS_cdr(si, obj))
+	        {obj1 = SS_car(si, obj);
 	       
 		 for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {SX_CAST_TYPE(si, ttype, desc,
 				   svr+desc->member_offs, svr,
 				   "BAD CAST - _SX_RD_LEAF_LIST", obj1);
 
-		      _SX_rd_tree_list(si, SS_car(obj1), file,
+		      _SX_rd_tree_list(si, SS_car(si, obj1), file,
 				       svr + desc->member_offs,
 				       desc->number, ttype,
 				       desc->dimensions);
 
-		      obj1 = SS_cdr(obj1);};};};};
+		      obj1 = SS_cdr(si, obj1);};};};};
 
     return;}
 
@@ -179,7 +179,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
        SS_error(si, "BAD ARGUMENT LIST - _SXI_READ_NUMERIC_DATA", argl);
 
 /* see if the first object is a pdbfile, if so use it */
-    argl = SX_get_pdbfile(argl, &file, &po);
+    argl = SX_get_pdbfile(si, argl, &file, &po);
 
     name = NULL;
     SS_args(si, argl,

@@ -12,8 +12,8 @@
 
 #define GET_FRAME(_n, _t, _e)                                               \
    {object *_l, *_v;                                                        \
-    _l = SS_car(_e);                                                        \
-    _v = SS_car(_l);                                                        \
+    _l = SS_car(si, _e);                                                        \
+    _v = SS_car(si, _l);                                                        \
     _t = SS_GET(hasharr, SS_cadr(si, _l));                                  \
     _n = NULL;                                                              \
     if (SS_variablep(_v))                                                   \
@@ -43,10 +43,10 @@ void dproc(SS_psides *si, object *pp)
        si = &_SS_si;       /* diagnostic default */
 
     if (SS_procedurep(pp))
-       {name   = SS_proc_name(pp);
-	params = SS_params(pp);
-	penv   = SS_proc_env(pp);
-	bdy    = SS_proc_body(pp);
+       {name   = SS_proc_name(si, pp);
+	params = SS_params(si, pp);
+	penv   = SS_proc_env(si, pp);
+	bdy    = SS_proc_body(si, pp);
 
 	SC_ASSERT(penv != NULL);
 
@@ -76,7 +76,7 @@ void dpenv(SS_psides *si, object *penv)
     if (penv == NULL)
        penv = si->env;
 
-    for (ie = 1; !SS_nullobjp(penv); penv = SS_cdr(penv), ie++)
+    for (ie = 1; !SS_nullobjp(penv); penv = SS_cdr(si, penv), ie++)
         {GET_FRAME(fname, tab, penv);
 
 	 if ((fname != NULL) && (strcmp(fname, "global-environment") != 0))
@@ -220,7 +220,7 @@ object *SS_sargs(SS_psides *si, C_procedure *cp, object *argl)
     PFSargs f;
 
     f = (PFSargs) cp->proc[0];
-    o = f(si, SS_car(argl));
+    o = f(si, SS_car(si, argl));
 
     return(o);}
 
@@ -260,7 +260,7 @@ object *SS_znargs(SS_psides *si, C_procedure *cp, object *argl)
 
 /* SS_PROC_NAME - returns the name of the procedure */
 
-object *SS_proc_name(object *fun)
+object *SS_proc_name(SS_psides *si, object *fun)
    {object *rv;
     S_procedure *sp;
 
@@ -274,7 +274,7 @@ object *SS_proc_name(object *fun)
 
 /* SS_PROC_ENV - returns the environment frame index of the procedure */
 
-object *SS_proc_env(object *fun)
+object *SS_proc_env(SS_psides *si, object *fun)
    {object *rv;
     S_procedure *sp;
 
@@ -288,13 +288,13 @@ object *SS_proc_env(object *fun)
 
 /* SS_PARAMS - returns a list of the formal parameters of the procedure */
 
-object *SS_params(object *fun)
+object *SS_params(SS_psides *si, object *fun)
    {object *le, *rv;
     S_procedure *sp;
 
     sp = SS_COMPOUND_PROCEDURE(fun);
     le = sp->lambda;
-    rv = SS_car(le);
+    rv = SS_car(si, le);
 
     return(rv);}
 
@@ -303,13 +303,13 @@ object *SS_params(object *fun)
 
 /* SS_PROC_BODY - returns a list of the body or the procedure */
 
-object *SS_proc_body(object *fun)
+object *SS_proc_body(SS_psides *si, object *fun)
    {object *le, *rv;
     S_procedure *sp;
 
     sp = SS_COMPOUND_PROCEDURE(fun);
     le = sp->lambda;
-    rv = SS_cdr(le);
+    rv = SS_cdr(si, le);
 
     return(rv);}
 
@@ -377,14 +377,14 @@ static object *_SS_mk_frame(SS_psides *si, object *fnm,
 	SS_add_to_frame(si, name, vls, tab);}
 
     else
-       {for (; SS_consp(vrs); vrs = SS_cdr(vrs))
+       {for (; SS_consp(vrs); vrs = SS_cdr(si, vrs))
             {if (SS_consp(vls))
-                {val = SS_car(vls);
-                 vls = SS_cdr(vls);}
+                {val = SS_car(si, vls);
+                 vls = SS_cdr(si, vls);}
              else
                 val = SS_null;
 
-             var  = SS_car(vrs);
+             var  = SS_car(si, vrs);
 	     name = SS_VARIABLE_NAME(var);
 
 	     SS_add_to_frame(si, name, val, tab);};
@@ -424,9 +424,9 @@ object *SS_do_bindings(SS_psides *si, object *pp, object *argp)
     if (!SS_procedurep(pp))
        SS_error(si, "BAD PROCEDURE TO DO-BINDINGS", pp);
 
-    name   = SS_proc_name(pp);
-    params = SS_params(pp);
-    penv   = SS_proc_env(pp);
+    name   = SS_proc_name(si, pp);
+    params = SS_params(si, pp);
+    penv   = SS_proc_env(si, pp);
     nenv   = _SS_xtnd_env(si, name, params, argp, penv);
 
     if ((si->trace_env > 0) && (!SS_nullobjp(params)))
@@ -528,7 +528,7 @@ object *_SS_get_variable(SS_psides *si, char *name, object *penv)
 
     o = NULL;
     if (name != NULL)
-       {for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
+       {for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(si, penv), i++)
 	    {GET_FRAME(fname, tab, penv);
 	     o = (object *) SC_hasharr_def_lookup(tab, name);
 	     if (o != NULL)
@@ -563,7 +563,7 @@ static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
 
     b = NULL;
     if (name != NULL)
-       {for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
+       {for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(si, penv), i++)
 	    {GET_FRAME(fname, tab, penv);
 	     b = _SS_bound_var(si, name, tab, under);
 	     if (b != NULL)
@@ -605,7 +605,7 @@ void SS_set_var(SS_psides *si, object *vr, object *vl, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_gc(b);
+       {SS_gc(si, b);
 	SS_add_to_frame(si, under, vl, tab);}
 
     else
@@ -629,7 +629,7 @@ void _SS_rem_varc(SS_psides *si, char *name, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_gc(b);
+       {SS_gc(si, b);
 	SC_hasharr_remove(tab, under);};
 
     return;}
@@ -649,7 +649,7 @@ static void _SS_def_varc(SS_psides *si, char *name, object *vl, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_gc(b);
+       {SS_gc(si, b);
 	SS_add_to_frame(si, under, vl, tab);}
 
     else
@@ -751,7 +751,7 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
 
 /* _SS_GET_PRINT_NAME - return a good printing name for the object O */
 
-char *_SS_get_print_name(object *o)
+char *_SS_get_print_name(SS_psides *si, object *o)
    {char *s, *rv;
     procedure *pp;
 
@@ -764,7 +764,7 @@ char *_SS_get_print_name(object *o)
 	    switch (pp->type)
 	       {case SS_MACRO :
 		case SS_PROC  :
-		     s = SS_proc_name(o)->print_name;
+		     s = SS_proc_name(si, o)->print_name;
 		     break;
 
 		case SS_PR_PROC  :

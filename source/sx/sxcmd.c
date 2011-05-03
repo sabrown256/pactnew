@@ -31,8 +31,8 @@ static object *_SXI_describe(SS_psides *si, object *argl)
 
     SX_prep_arg(si, argl);
 
-    for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for ( ; !SS_nullobjp(argl); argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
          if (obj != NULL)
             {if (!SS_prim_des(si, si->outdev, obj))
                 PRINT(stdout, " Unknown function\n");};};
@@ -317,7 +317,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 
     SX_prep_arg(si, argl);
 
-    if (SS_numbp(SS_car(argl)))
+    if (SS_numbp(SS_car(si, argl)))
        {int first, last, id;
 
 	first = 0;
@@ -383,7 +383,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
                    SS_Assign(ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
 					     ret));};};
 #endif
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 

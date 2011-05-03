@@ -547,8 +547,8 @@ object *SX_get_data_domain(SS_psides *si, object *argl)
 
     xmn = HUGE;
     xmx = -HUGE;
-    for (ch = argl; !SS_nullobjp(ch); ch = SS_cdr(ch))
-        {s = SS_car(ch);
+    for (ch = argl; !SS_nullobjp(ch); ch = SS_cdr(si, ch))
+        {s = SS_car(si, ch);
 	 if (SX_curvep_a(s))
 	    {i   = SX_get_crv_index_i(s);
 	     xt  = SX_dataset[i].wc[0];
@@ -574,8 +574,8 @@ object *SX_get_data_range(SS_psides *si, object *argl)
 
     ymn = HUGE;
     ymx = -HUGE;
-    for (ch = argl; !SS_nullobjp(ch); ch = SS_cdr(ch))
-        {s = SS_car(ch);
+    for (ch = argl; !SS_nullobjp(ch); ch = SS_cdr(si, ch))
+        {s = SS_car(si, ch);
 	 if (SX_curvep_a(s))
 	    {i   = SX_get_crv_index_i(s);
 	     yt  = SX_dataset[i].wc[2];

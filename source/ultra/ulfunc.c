@@ -242,11 +242,11 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
     SX_prep_arg(si, argl);
 
     limit = SX_n_curves_read;
-    if (!SS_nullobjp(SS_car(argl)))
+    if (!SS_nullobjp(SS_car(si, argl)))
        {for (s = argl;
-             SS_consp(s) && !SS_nullobjp(SS_car(s));
-             s = SS_cdr(s))
-	    {t = SS_car(s);
+             SS_consp(s) && !SS_nullobjp(SS_car(si, s));
+             s = SS_cdr(si, s))
+	    {t = SS_car(si, s);
              SS_args(si, t,
 		     SC_INT_I, &j,
 		     0);
@@ -517,7 +517,7 @@ static object *_ULI_range(SS_psides *si, object *argl)
        UL_plot_limits(dev, FALSE, wc);
 
     else
-       {s = SS_car(argl);
+       {s = SS_car(si, argl);
 
 	if (!SS_numbp(s))
 	   {if (SC_str_icmp(SS_get_string(s), "de") == 0)
@@ -576,7 +576,7 @@ static object *_ULI_domain(SS_psides *si, object *argl)
        UL_plot_limits(dev, FALSE, wc);
 
     else
-       {s = SS_car(argl);
+       {s = SS_car(si, argl);
 
 	if (!SS_numbp(s))
 	   {if (SC_str_icmp(SS_get_string(s), "de") == 0)
@@ -885,8 +885,8 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
     mindex = 0;
 
     if (SS_consp(argl))
-       {arg1  = SS_car(argl);
-        argl = SS_cdr(argl);
+       {arg1  = SS_car(si, argl);
+        argl = SS_cdr(si, argl);
         strcpy(prefix, SS_get_string(arg1));
         if (strlen(prefix) != 1)
            SS_error(si, "BAD PREFIX - _ULI_PREFIX", arg1);
@@ -896,7 +896,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
            SS_error(si, "BAD PREFIX - _ULI_PREFIX", arg1);
 
         if (SS_consp(argl))
-           {arg2 = SS_car(argl);
+           {arg2 = SS_car(si, argl);
             s = SS_get_string(arg2);
             if (SC_intstrp(s, 10))
                mindex = atoi(s);
@@ -1247,7 +1247,7 @@ static object *_ULI_label(SS_psides *si, object *argl)
     SX_dataset[j].text     = labl;
     SX_dataset[j].modified = FALSE;
 
-    o = SS_car(argl);
+    o = SS_car(si, argl);
 
     return(o);}
 
@@ -1293,7 +1293,7 @@ static object *_ULI_average(SS_psides *si, object *s)
     UL_plot_off();
 
     rv      = SS_null;
-    numtoks = SS_mk_integer(si, SS_length(s));
+    numtoks = SS_mk_integer(si, SS_length(si, s));
 
     cpp = _SS_mk_C_proc_va(UL_bc, 1, PM_fplus);
     c   = UL_bc(si, cpp, s);
@@ -1658,7 +1658,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
                        0);
     SS_MARK(tmp);
     c = _ULI_average(si, tmp);
-    SS_gc(tmp);
+    SS_gc(si, tmp);
 
 /* no overlap of curves */
     if (!SX_curvep_a(c))
@@ -1762,16 +1762,16 @@ static object *_ULI_append(SS_psides *si, object *argl)
  * the first for the ultimate return curve; and
  * the second so that later deletions don't kill this first curve.
  */
-    acc = SS_car(argl);
+    acc = SS_car(si, argl);
     if (!SX_curvep_a(acc))
        SS_error(si, "BAD FIRST CURVE -  _ULI_APPEND", acc);
     strcpy(local, "Append");
     target = UL_COPY_CURVE(si, acc);
     acc = UL_COPY_CURVE(si, acc);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
-        {b = SS_car(argl);
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+        {b = SS_car(si, argl);
 
          id = SX_dataset[SX_get_crv_index_i(b)].id;
          if ((id >= 'A') && (id <= 'Z'))
@@ -1917,14 +1917,14 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
     if (!SS_consp(yvals))
        SS_error(si, "BAD LIST OF Y-VALUES - _ULI_MK_CURVE", yvals);
 
-    n = min(SS_length(xvals), SS_length(yvals));
+    n = min(SS_length(si, xvals), SS_length(si, yvals));
 
     UL_buf1x = CMAKE_N(double, n);
     UL_buf1y = CMAKE_N(double, n);
     for (x[0] = UL_buf1x, x[1] = UL_buf1y;
          SS_consp(xvals) && SS_consp(yvals);
-         xvals = SS_cdr(xvals), yvals = SS_cdr(yvals))
-        {xo = SS_car(xvals);
+         xvals = SS_cdr(si, xvals), yvals = SS_cdr(si, yvals))
+        {xo = SS_car(si, xvals);
          if (!SS_numbp(xo))
             SS_error(si, "BAD X-VALUE - _ULI_MK_CURVE", xo);
          if (SS_integerp(xo))
@@ -1932,7 +1932,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
          else
             *x[0]++ = SS_FLOAT_VALUE(xo);
 
-         yo = SS_car(yvals);
+         yo = SS_car(si, yvals);
          if (!SS_numbp(yo))
             SS_error(si, "BAD Y-VALUE - _ULI_MK_CURVE", yo);
          if (SS_integerp(yo))

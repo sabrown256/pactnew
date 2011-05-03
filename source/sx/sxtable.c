@@ -506,21 +506,21 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
        set = _SX_lr_zc_domain(name);
 
     else
-       {nd    = SS_length(dims);
+       {nd    = SS_length(si, dims);
 	maxes = CMAKE_N(int, nd);
-	for (i = 0; dims != SS_null; dims = SS_cdr(dims), i++)
+	for (i = 0; dims != SS_null; dims = SS_cdr(si, dims), i++)
 	    {SS_args(si, dims,
 		     SC_INT_I, &dv,
 		     0);
 	     maxes[i] = dv;};
 
 	comps = SS_cddr(si, specs);
-	nde   = SS_length(comps);
+	nde   = SS_length(si, comps);
 	elem  = CMAKE_N(double *, nde);
 	ne    = 0;
 
-	for (i = 0; comps != SS_null; comps = SS_cdr(comps), i++)
-	    {sp = SS_car(comps);
+	for (i = 0; comps != SS_null; comps = SS_cdr(si, comps), i++)
+	    {sp = SS_car(si, comps);
 	     start = 0L;
 	     npts  = SX_current_table->nrow;
 	     step  = SX_current_table->ncol;
@@ -627,12 +627,12 @@ static object *SX_wrt_text_table(SS_psides *si, object *argl)
     PM_mapping *f;
     FILE *fp;
 
-    outprt = SS_car(argl);
-    argl   = SS_cdr(argl);
+    outprt = SS_car(si, argl);
+    argl   = SS_cdr(si, argl);
 
     fp = SS_OUTSTREAM(outprt);
 
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
         {SS_args(si, argl,
 		 G_MAPPING, &f,
 		 0);

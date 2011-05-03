@@ -50,12 +50,12 @@ extern "C" {
 
 /* SX_PREP_RET - prepare the return value by delistifying one element lists */
 
-#define SX_prep_ret(ret)                                                     \
-    {if (SS_length(ret) == 1)                                                \
-        {SS_Assign(ret, SS_car(ret));}                                       \
+#define SX_prep_ret(_si, _rv)                                                \
+    {if (SS_length(_si, _rv) == 1)                                           \
+        {SS_Assign(_rv, SS_car(_si, _rv));}                                  \
      else                                                                    \
-        {SS_Assign(ret, SS_reverse(si, ret));};                              \
-     SC_mark(ret, -1);}
+        {SS_Assign(_rv, SS_reverse(_si, _rv));};                             \
+     SC_mark(_rv, -1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -64,10 +64,10 @@ extern "C" {
  *                this macro does NOT delistify one element lists
  */
 
-#define SX_prep_retl(ret)                                                    \
-    {if (SS_length(ret) > 1)                                                 \
-        {SS_Assign(ret, SS_reverse(si, ret));};                              \
-     SC_mark(ret, -1);}
+#define SX_prep_retl(_si, _rv)                                               \
+    {if (SS_length(_si, _rv) > 1)                                            \
+        {SS_Assign(_rv, SS_reverse(si, _rv));};                              \
+     SC_mark(_rv, -1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -76,12 +76,12 @@ extern "C" {
  *             - potential GC problem here
  */
 
-#define SX_last_arg(tok, argl)                                               \
-   {object *t;                                                               \
-    for (t = argl, tok = SS_null; SS_consp(t); t = SS_cdr(t))                \
-        {SS_Assign(tok, SS_cadr(si, t));                                         \
-         if (SS_nullobjp(SS_cddr(si, t)))                                        \
-            {SS_setcdr(t, SS_null);                                          \
+#define SX_last_arg(_si, _s, _a)                                             \
+   {object *_t;                                                              \
+    for (_t = _a, _s = SS_null; SS_consp(_t); _t = SS_cdr(si, _t))           \
+        {SS_Assign(_s, SS_cadr(si, _t));                                     \
+         if (SS_nullobjp(SS_cddr(si, _t)))                                   \
+            {SS_setcdr(_si, _t, SS_null);                                    \
 	     break;};};}
 
 /*--------------------------------------------------------------------------*/
@@ -269,7 +269,7 @@ extern void
 extern int
  _SX_grotrian_mappingp(PM_mapping *f),
  _SX_grotrian_graphp(PG_graph *g),
- _SX_any_grotrianp(object *argl);
+ _SX_any_grotrianp(SS_psides *si, object *argl);
 
 extern object
  *_SXI_grotrian_mappingp(SS_psides *si, object *obj),

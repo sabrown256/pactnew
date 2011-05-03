@@ -119,8 +119,8 @@ struct s_SS_smp_state
         {first = SS_mk_cons(si, x, SS_null);                                \
          ths = first;}                                                      \
      else                                                                   \
-        {SS_setcdr(ths, SS_mk_cons(si, x, SS_null));                        \
-         ths = SS_cdr(ths);};}
+        {SS_setcdr(si, ths, SS_mk_cons(si, x, SS_null));                    \
+         ths = SS_cdr(si, ths);};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -139,8 +139,8 @@ struct s_SS_smp_state
          SS_MARK(first);                                                    \
          SS_Assign(ths, first);}                                            \
      else                                                                   \
-        {SS_setcdr(ths, SS_mk_cons(si, x, SS_null));                        \
-         SS_Assign(ths, SS_cdr(ths));};}
+        {SS_setcdr(si, ths, SS_mk_cons(si, x, SS_null));                    \
+         SS_Assign(ths, SS_cdr(si, ths));};}
 
 /*--------------------------------------------------------------------------*/
 
@@ -194,7 +194,7 @@ extern void
  _SS_rem_varc(SS_psides *si, char *name, object *penv);
 
 extern char
- *_SS_get_print_name(object *o);
+ *_SS_get_print_name(SS_psides *si, object *o);
 
 extern SS_smp_state
  *_SS_get_state(int id);
@@ -241,12 +241,12 @@ extern procedure
 
 extern int
  _SS_object_map(SS_psides *si, FILE *fp, int flag),
- _SS_get_object_length(object *obj),
+ _SS_get_object_length(SS_psides *si, object *obj),
  _SS_object_to_numtype_id(int vid, void *p, long n, object *val),
  _SS_object_to_numtype(char *type, void *p, long n, object *val),
  _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o),
  _SS_list_to_numtype(SS_psides *si, char *type, void *p, long n, object *o),
- _SS_max_numeric_type(object *argl, long *pn);
+ _SS_max_numeric_type(SS_psides *si, object *argl, long *pn);
 
 extern void
  _SS_rl_C_proc(C_procedure *cp),
@@ -309,7 +309,7 @@ extern char
 /* SHPROC.C declarations */
 
 extern void
- _SS_rl_process(object *obj);
+ _SS_rl_process(SS_psides *si, object *obj);
 
 #endif
 

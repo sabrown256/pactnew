@@ -40,8 +40,8 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 /* figure out what size and type to make the accumulator */
     otyp = NULL;
     acc  = NULL;
-    for (al = argl; SS_consp(al); al = SS_cdr(al))
-        {obj = SS_car(al);
+    for (al = argl; SS_consp(al); al = SS_cdr(si, al))
+        {obj = SS_car(si, al);
 	 
 	 if (SX_NUMERIC_ARRAYP(obj))
 	    {otyp = NUMERIC_ARRAY_TYPE(obj);
@@ -56,8 +56,8 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 
 /* accumulate the results */
     acc = NULL;
-    for (al = argl; SS_consp(al); al = SS_cdr(al))
-        {obj = SS_car(al);
+    for (al = argl; SS_consp(al); al = SS_cdr(si, al))
+        {obj = SS_car(si, al);
 
 	 id      = -1;
 	 operand = NULL;
@@ -255,8 +255,8 @@ static void _SX_map_list_label(SS_psides *si, char *label, object *argl)
     snprintf(label, MAXLINE, "(%s", SS_get_string(si->fun));
 
 /* build up the label */
-    for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for ( ; !SS_nullobjp(argl); argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
 	 snprintf(t, MAXLINE, "%s", SS_get_string(obj));
 
 	 SC_vstrcat(label, MAXLINE, " %s", t);};
@@ -650,7 +650,7 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
     PM_mapping *f, *h;
     object *first, *mo;
 
-    first = SS_car(argl);
+    first = SS_car(si, argl);
     if (SS_floatp(first))
        mo = SS_binary_homogeneous(si, cp, argl);
 
@@ -698,7 +698,7 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
     nd  = hd->dimension;
     nde = hd->dimension_elem;
     dmx = hd->max_index;
-    ne  = SS_length(argl);
+    ne  = SS_length(si, argl);
     if (ne != 2*nd)
        SS_error(si,
 		  "DOMAIN DIMENSION MISMATCH - _SX_BUILD_RESTRICTED_DOMAIN",
@@ -791,7 +791,7 @@ static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
 
     nd  = hd->dimension;
     nde = hd->dimension_elem;
-    ne  = SS_length(argl);
+    ne  = SS_length(si, argl);
     if (ne != nd)
        SS_error(si, "DOMAIN DIMENSION MISMATCH - SX_BUILD_LR_DOMAIN",
 		  argl);
@@ -812,7 +812,7 @@ static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
 	 nc = strlen(name);
 	 snprintf(name+nc, MAXLINE-nc, "%d, ", maxes[i]);
 
-         argl = SS_cdr(argl);};
+         argl = SS_cdr(si, argl);};
 
     SC_NTH_LAST_CHAR(name, 1) = '\0';
     SC_strcat(name, MAXLINE, ")");
@@ -847,8 +847,8 @@ PM_mapping *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl)
     lbl = SC_dsnprintf(FALSE, "Refine(%s)", h->name);
 
     argl = *pargl;
-    obj  = SS_car(argl);
-    argl = SS_cdr(argl);
+    obj  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     *pargl = argl;
 
 /* build the return mapping */
@@ -884,8 +884,8 @@ PM_mapping *_SXI_interp_mapping(SS_psides *si, PM_mapping *h, object **pargl)
     lbl = SC_dsnprintf(FALSE, "Interpolate(%s)", h->name);
 
     argl = *pargl;
-    obj  = SS_car(argl);
-    argl = SS_cdr(argl);
+    obj  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     *pargl = argl;
 
 /* build the return mapping */

@@ -2798,8 +2798,8 @@ These functions set the value of the car or cdr of the specified cons object.<p>
 
 <B></B>
 <BLOCKQUOTE>
-object *SS_car(object *obj)
-<P>object *SS_cdr(object *obj)
+object *SS_car(si, object *obj)
+<P>object *SS_cdr(si, object *obj)
 <P>object *SS_caar(si, object *obj)
 <P>object *SS_cadr(si, object *obj)
 <P>object *SS_cdar(si, object *obj)

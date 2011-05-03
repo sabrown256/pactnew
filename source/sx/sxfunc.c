@@ -95,7 +95,7 @@ static object *_SXI_toggle_log(SS_psides *si, object *argl)
 	SX_command_log = NULL;};
 
     if (SS_consp(argl))
-       {obj       = SS_car(argl);
+       {obj       = SS_car(si, argl);
         _SX.fname = SC_dsnprintf(FALSE, SS_get_string(obj));
         if (strcmp(_SX.fname, "off") == 0)
            *_SX.fname = '\0';
@@ -624,20 +624,20 @@ object *SX_plane(SS_psides *si, object *argl)
     PM_mapping *f;
 
     plf   = SX_have_display_list(si);
-    nd    = SS_length(argl);
+    nd    = SS_length(si, argl);
     coeff = pc = CMAKE_N(double, nd--);
 
     SS_args(si, argl,
 	    SC_DOUBLE_I, pc++,
             0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
 /* organize the args into input to make the domain */
     ratio = pt = CMAKE_N(double, nd);
     maxes = pm = CMAKE_N(int, nd);
     extr  = px = CMAKE_N(double, 2*nd);
-    for (i = 0, ne = 0L; i < nd; i++, argl = SS_cdr(argl))
-        {lst = SS_car(argl);
+    for (i = 0, ne = 0L; i < nd; i++, argl = SS_cdr(si, argl))
+        {lst = SS_car(si, argl);
 	 
 	 ratio[i] = 1.0;
 	 SS_args(si, lst,
@@ -845,7 +845,7 @@ static object *_SXI_pp_names(SS_psides *si, object *argl)
     char bf[MAXLINE], **lst, *text, **slst;
     object *obj;
 
-    n   = SS_length(argl);
+    n   = SS_length(si, argl);
     lst = CMAKE_N(char *, n+1);
 
     nchar = 0;

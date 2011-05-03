@@ -39,7 +39,7 @@ g_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
 
 /* _SX_RL_GPDBDATA - release g_pdbdata */
 
-static void _SX_rl_gpdbdata(object *obj)
+static void _SX_rl_gpdbdata(SS_psides *si, object *obj)
    {g_pdbdata *pp;
 
     pp = SS_GET(g_pdbdata, obj);
@@ -55,7 +55,7 @@ static void _SX_rl_gpdbdata(object *obj)
 
     CFREE(pp);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 

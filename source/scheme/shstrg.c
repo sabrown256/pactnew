@@ -405,10 +405,10 @@ static object *_SSI_string(SS_psides *si, object *argl)
     char *t;
     object *str;
 
-    n = SS_length(argl);
+    n = SS_length(si, argl);
     t = CMAKE_N(char, n+2);
-    for (i = 0; i < n; i++, argl = SS_cdr(argl))
-        {str = SS_car(argl);
+    for (i = 0; i < n; i++, argl = SS_cdr(si, argl))
+        {str = SS_car(si, argl);
          if (SS_charobjp(str))
             {c = SS_CHARACTER_VALUE(str);
 	     t[i] = c;};};
@@ -431,8 +431,8 @@ static object *_SSI_strapp(SS_psides *si, object *argl)
 
     t = CMAKE(char);
     *t = '\0';
-    for (n = 1; SS_consp(argl); argl = SS_cdr(argl))
-        {ths = SS_car(argl);
+    for (n = 1; SS_consp(argl); argl = SS_cdr(si, argl))
+        {ths = SS_car(si, argl);
          if (SS_stringp(ths))
             {n += SS_STRING_LENGTH(ths);
              s  = CMAKE_N(char, n);
@@ -478,14 +478,14 @@ static object *_SSI_lststr(SS_psides *si, object *argl)
     char *s;
     object *str, *ths;
 
-    argl = SS_car(argl);
+    argl = SS_car(si, argl);
     if (!SS_consp(argl))
        SS_error(si, "ARGUMENT MUST BE LIST - LIST->STRING", argl);
 
-    n = SS_length(argl);
+    n = SS_length(si, argl);
     s = CMAKE_N(char, n+1);
-    for (i = 0; SS_consp(argl); argl = SS_cdr(argl))
-        {ths = SS_car(argl);
+    for (i = 0; SS_consp(argl); argl = SS_cdr(si, argl))
+        {ths = SS_car(si, argl);
          if (SS_charobjp(ths))
             s[i++] = (char) SS_CHARACTER_VALUE(ths);};
     s[i] = '\0';
@@ -848,7 +848,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
 
 /* this may look weird but it is correct!!!! */
     else
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         if (!SS_stringp(obj))
            SS_error(si, "BAD STRING - _SS_STRTOK", obj);
 

@@ -668,10 +668,10 @@ object *LR_var_plot(SS_psides *si, object *argl)
 
 /* get the various specifications */
     while (SS_consp(argl))
-       {sobj = SS_car(argl);
-        argl = SS_cdr(argl);
+       {sobj = SS_car(si, argl);
+        argl = SS_cdr(si, argl);
         if (SS_consp(sobj))
-           {head = SS_car(sobj);
+           {head = SS_car(si, sobj);
             name = SS_get_string(head);
 
             if (strcmp(name, "domain") == 0)
@@ -703,7 +703,7 @@ object *LR_var_plot(SS_psides *si, object *argl)
                 lcolor = color;
                 lstyle = style;
                 lwidth = width;
-                sobj   = SS_cdr(sobj);
+                sobj   = SS_cdr(si, sobj);
                 if (SS_consp(sobj))
                    SX_GET_INTEGER_FROM_LIST(si, lcolor, sobj,
                                             "BAD COLOR - LR_VAR_PLOT");
@@ -727,7 +727,7 @@ object *LR_var_plot(SS_psides *si, object *argl)
             pp   = PA_INQUIRE_VARIABLE(name);
             if (pp == NULL)
                {val  = SS_eval(NULL, sobj);
-                head = SS_car(val);
+                head = SS_car(si, val);
                 name = SS_get_string(head);
                 if (strcmp(name, "domain") == 0)
                    {space  = SS_INTEGER_VALUE(SS_cadr(si, val));
@@ -988,7 +988,7 @@ object *LR_def_domain(SS_psides *si, object *argl)
     C_array *arr;
     char dname[MAXLINE], numval[20];
 
-    nmax = SS_length(argl);
+    nmax = SS_length(si, argl);
     dmap = CMAKE_N(PA_set_index, nmax);
 
     arr         = CMAKE(C_array);
@@ -999,14 +999,14 @@ object *LR_def_domain(SS_psides *si, object *argl)
 /* make a list of names and indices suitable for C */
     i = 0;
     while (SS_consp(argl))
-       {obj  = SS_car(argl);
-        argl = SS_cdr(argl);
+       {obj  = SS_car(si, argl);
+        argl = SS_cdr(si, argl);
         dmap[i].name = CSTRSAVE(SS_get_string(obj));
         if (SS_consp(argl))
-           {obj = SS_car(argl);
+           {obj = SS_car(si, argl);
             if (SS_numbp(obj))
                {dmap[i].val = SS_FLOAT_VALUE(obj);
-                argl        = SS_cdr(argl);}
+                argl        = SS_cdr(si, argl);}
             else
                dmap[i].val = -HUGE;}
         else

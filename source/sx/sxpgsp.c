@@ -21,7 +21,7 @@ static void _SX_args_arr_2(SS_psides *si, object *argl,
     double *x, *y;
     object *obj;
 
-    n = SS_length(argl) >> 1;
+    n = SS_length(si, argl) >> 1;
 
     x = CMAKE_N(double, n);
     y = CMAKE_N(double, n);
@@ -49,7 +49,7 @@ static void _SX_args_arr_3(SS_psides *si, object *argl, int *pn,
     double *x, *y, *z;
     object *obj;
 
-    n = SS_length(argl)/3;
+    n = SS_length(si, argl)/3;
 
     x = CMAKE_N(double, n);
     y = CMAKE_N(double, n);
@@ -212,7 +212,7 @@ static object *_SXI_clear_region(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_CLEAR_REGION", SS_null);
 
-    n = SS_length(argl);
+    n = SS_length(si, argl);
     nd = (n - 2) >> 1;
 
     if (nd == 2)
@@ -264,7 +264,7 @@ static object *_SXI_def_mrk(SS_psides *si, object *argl)
     double *x1, *y1, *x2, *y2;
     object *obj;
 
-    ns = SS_length(argl) >> 2;
+    ns = SS_length(si, argl) >> 2;
 
     x1 = CMAKE_N(double, ns);
     y1 = CMAKE_N(double, ns);
@@ -326,7 +326,7 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DRW_MRK", SS_null);
 
-    ns = SS_length(x[0]);
+    ns = SS_length(si, x[0]);
 
     r = PM_make_vectors(nd, ns);
 
@@ -591,7 +591,7 @@ static object *_SXI_draw_box(SS_psides *si, object *argl)
             SC_DOUBLE_I, &bx[5],
             0);
 
-    n  = SS_length(argl) - 1;
+    n  = SS_length(si, argl) - 1;
     nd = n >> 1;
 
     if (dev == NULL)
@@ -625,7 +625,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_DDP2", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_DDP2", SS_car(si, argl));
 
     argl = SS_cddr(si, SS_cddr(si, argl));
     if (nd == 2)
@@ -665,7 +665,7 @@ static object *_SXI_draw_line(SS_psides *si, object *argl)
             SC_DOUBLE_I, &x2[2],
             0);
 
-    n  = SS_length(argl) - 1;
+    n  = SS_length(si, argl) - 1;
     nd = n >> 1;
 
     if (nd == 3)
@@ -741,10 +741,10 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_DRAW_POLYLINE", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_DRAW_POLYLINE", SS_car(si, argl));
 
     argl = SS_cddr(si, SS_cddr(si, argl));
-    o    = SS_car(argl);
+    o    = SS_car(si, argl);
     if (SX_POLYGONP(o))
        {py = SS_GET(PM_polygon, o);
 	PG_draw_polyline_n(dev, nd, cs, py->nn, py->x, clip);}
@@ -851,10 +851,10 @@ static object *_SXI_fply(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_FPLY", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_FPLY", SS_car(si, argl));
 
     argl = SS_cddr(si, argl);
-    o    = SS_car(argl);
+    o    = SS_car(si, argl);
     if (SX_POLYGONP(o))
        {py = SS_GET(PM_polygon, o);
 	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, py->nn, py->x);}
@@ -1808,7 +1808,7 @@ static object *_SXI_smxi(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SMXI", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_SMXI", SS_car(si, argl));
 
     i = max(0.0, i);
     i = min(1.0, i);
@@ -1996,7 +1996,7 @@ static object *_SXI_set_viewport(SS_psides *si, object *argl)
             SC_DOUBLE_I, &ndc[5],
             0);
 
-    n  = SS_length(argl) - 1;
+    n  = SS_length(si, argl) - 1;
     nd = n >> 1;
 
     if (dev == NULL)
@@ -2029,7 +2029,7 @@ static object *_SXI_set_frame(SS_psides *si, object *argl)
             SC_DOUBLE_I, &frm[5],
             0);
 
-    n  = SS_length(argl) - 1;
+    n  = SS_length(si, argl) - 1;
     nd = n >> 1;
 
     if (dev == NULL)
@@ -2062,7 +2062,7 @@ static object *_SXI_set_window(SS_psides *si, object *argl)
             SC_DOUBLE_I, &wc[5],
             0);
 
-    n  = SS_length(argl) - 1;
+    n  = SS_length(si, argl) - 1;
     nd = n >> 1;
 
     if (dev == NULL)
@@ -2196,11 +2196,11 @@ static object *_SXI_setva(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
-    if (SX_DEVICEP(SS_car(argl)) == TRUE)
+    if (SX_DEVICEP(SS_car(si, argl)) == TRUE)
        {SS_args(si, argl,
 		G_DEVICE, &dev,
 		0);
-        argl = SS_cdr(argl);};
+        argl = SS_cdr(si, argl);};
 
     SS_args(si, argl,
 	    SC_DOUBLE_I, &SX_theta,
@@ -2231,7 +2231,7 @@ static object *_SXI_getva(SS_psides *si, object *argl)
     rv = SS_f;
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GETVA", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_GETVA", SS_car(si, argl));
 
     else
        {PG_get_view_angle(dev, TRUE, &theta, &phi, &chi);
@@ -2261,7 +2261,7 @@ static object *_SXI_setla(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SETLA", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_SETLA", SS_car(si, argl));
 
     else
        PG_set_light_angle(dev, theta, phi);
@@ -2286,7 +2286,7 @@ static object *_SXI_getla(SS_psides *si, object *argl)
     rv = SS_f;
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GETLA", SS_car(argl));
+       SS_error(si, "BAD DEVICE - _SXI_GETLA", SS_car(si, argl));
 
     else
        {PG_get_light_angle(dev, TRUE, &theta, &phi);
@@ -2406,7 +2406,7 @@ static object *_SXI_list_pal(SS_psides *si, object *argl)
             0);
 
     colors       = SS_caddr(si, argl);
-    n_pal_colors = SS_length(colors)/3;
+    n_pal_colors = SS_length(si, colors)/3;
     n_dev_colors = dev->absolute_n_color;
 
     pal = CMAKE(PG_palette);
@@ -2429,12 +2429,12 @@ static object *_SXI_list_pal(SS_psides *si, object *argl)
 
 /* compute the color maps */
     for (i = 0; i < n_pal_colors; i++)
-        {cl.red   = MAXPIX*SS_FLOAT_VALUE(SS_car(colors));
-         colors   = SS_cdr(colors);
-         cl.green = MAXPIX*SS_FLOAT_VALUE(SS_car(colors));
-         colors   = SS_cdr(colors);
-         cl.blue  = MAXPIX*SS_FLOAT_VALUE(SS_car(colors));
-         colors   = SS_cdr(colors);
+        {cl.red   = MAXPIX*SS_FLOAT_VALUE(SS_car(si, colors));
+         colors   = SS_cdr(si, colors);
+         cl.green = MAXPIX*SS_FLOAT_VALUE(SS_car(si, colors));
+         colors   = SS_cdr(si, colors);
+         cl.blue  = MAXPIX*SS_FLOAT_VALUE(SS_car(si, colors));
+         colors   = SS_cdr(si, colors);
 
          *cm++    = cl;};
 
@@ -2619,7 +2619,7 @@ static object *_SXI_set_vect_attr(SS_psides *si, object *argl)
             0);
 
     
-    for (lst = SS_cdr(argl); lst != SS_null; lst = SS_cddr(si, lst))
+    for (lst = SS_cdr(si, argl); lst != SS_null; lst = SS_cddr(si, lst))
         {SS_args(si, lst,
                  SC_INT_I, &attr,
                  SC_DOUBLE_I, &val,
@@ -2643,7 +2643,7 @@ static object *_SXI_set_vect_attr(SS_psides *si, object *argl)
 
              default            : break;};};
 
-    o = SS_cdr(argl);
+    o = SS_cdr(si, argl);
 
     return(o);}
 
@@ -2705,7 +2705,7 @@ static object *_SXI_gatgl(SS_psides *si, object *argl)
 	 SS_args(si, argl,
 		 SC_STRING_I, &name,
 		 0);
-	 argl = SS_cdr(argl);
+	 argl = SS_cdr(si, argl);
 
 	 if (name == NULL)
 	    break;
@@ -2786,7 +2786,7 @@ static object *_SXI_gatgr(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    G_GRAPH, &g,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     rv = _SX_get_attrs_alist(si, g->info, argl);
 
@@ -2805,7 +2805,7 @@ static object *_SXI_gatmp(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    G_MAPPING, &f,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     rv = _SX_get_attrs_alist(si, f->map, argl);
 
@@ -2824,7 +2824,7 @@ static object *_SXI_gatst(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    G_SET, &s,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     rv = _SX_get_attrs_alist(si, s->info, argl);
 
@@ -2852,7 +2852,7 @@ static object *_SXI_satgl(SS_psides *si, object *argl)
 	 SS_args(si, argl,
 		 SC_STRING_I, &name,
 		 0);
-	 argl = SS_cdr(argl);
+	 argl = SS_cdr(si, argl);
 
 	 if (name == NULL)
 	    break;
@@ -2869,21 +2869,21 @@ static object *_SXI_satgl(SS_psides *si, object *argl)
 		 SS_args(si, argl,
 			 SC_INT_I, &iv,
 			 0);
-		 argl = SS_cdr(argl);
+		 argl = SS_cdr(si, argl);
 		 pvi  = &iv;}
 	     else if (id == SC_DOUBLE_I)
 	        {dv = 0.0;
 		 SS_args(si, argl,
 			 SC_DOUBLE_I, &dv,
 			 0);
-		 argl = SS_cdr(argl);
+		 argl = SS_cdr(si, argl);
 		 pvi  = &dv;}
 	     else if (id == SC_STRING_I)
 	        {sv = NULL;
 		 SS_args(si, argl,
 			 SC_STRING_I, &sv,
 			 0);
-		 argl = SS_cdr(argl);
+		 argl = SS_cdr(si, argl);
 		 pvi  = &sv;};
 
 	     _PG_ptr_attr_set(typ, pvo, pvi);};
@@ -2934,7 +2934,7 @@ static pcons *_SX_set_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 	    {SS_args(si, argl,
 		     SC_INT_I, &lv,
 		     0);
-	     argl = SS_cdr(argl);
+	     argl = SS_cdr(si, argl);
 	     if (ptr)
 	        {pv   = &lv;
 		 alst = SC_change_alist(alst, name, SC_STRING_S, pv);}
@@ -2948,7 +2948,7 @@ static pcons *_SX_set_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 	    {SS_args(si, argl,
 		     SC_LONG_I, &lv,
 		     0);
-	     argl = SS_cdr(argl);
+	     argl = SS_cdr(si, argl);
 	     if (ptr)
 	        {pv   = &lv;
 		 alst = SC_change_alist(alst, name, SC_LONG_P_S, pv);}
@@ -2961,7 +2961,7 @@ static pcons *_SX_set_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 	    {SS_args(si, argl,
 		     SC_DOUBLE_I, &dv,
 		     0);
-	     argl = SS_cdr(argl);
+	     argl = SS_cdr(si, argl);
 	     if (ptr)
 	        {pv   = &dv;
 		 alst = SC_change_alist(alst, name, SC_DOUBLE_P_S, pv);}
@@ -2973,7 +2973,7 @@ static pcons *_SX_set_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 	    {SS_args(si, argl,
 		     SC_INT_I, &lv,
 		     0);
-	     argl = SS_cdr(argl);
+	     argl = SS_cdr(si, argl);
 	     if (ptr)
 	        {pv   = &lv;
 		 alst = SC_change_alist(alst, name, SC_POINTER_S, pv);}
@@ -2998,7 +2998,7 @@ static object *_SXI_satgr(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    G_GRAPH, &g,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     g->info = _SX_set_attrs_alist(si, g->info, argl);
 
@@ -3016,7 +3016,7 @@ static object *_SXI_satmp(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    G_MAPPING, &f,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     f->map = _SX_set_attrs_alist(si, f->map, argl);
 
@@ -3034,7 +3034,7 @@ static object *_SXI_satst(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    G_SET, &s,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     s->info = _SX_set_attrs_alist(si, s->info, argl);
 

@@ -177,7 +177,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     SC_mark(data, 1);
     PD_set_attribute(file, vr, at, data);
 
-    obj = SS_car(SS_cdddr(si, argl));
+    obj = SS_car(si, SS_cdddr(si, argl));
 
     return(obj);}
 

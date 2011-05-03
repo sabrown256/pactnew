@@ -312,7 +312,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
 	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
-       {argl = SS_cdr(argl);
+       {argl = SS_cdr(si, argl);
         name = CSTRSAVE(SS_get_string(obj));};
 
     if (name == NULL)
@@ -355,7 +355,7 @@ static void _SX_wr_ggraph(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GGRAPH - gc a graph */
 
-static void _SX_rl_ggraph(object *obj)
+static void _SX_rl_ggraph(SS_psides *si, object *obj)
    {PG_graph *g;
 
     g = SS_GET(PG_graph, obj);
@@ -365,7 +365,7 @@ static void _SX_rl_ggraph(object *obj)
 
 /* GOTCHA: don't know if it is safe to GC the mapping or its sets */
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -399,13 +399,13 @@ static void _SX_wr_gdev_attr(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GDEV_ATTR - gc a dev_attributes */
 
-static void _SX_rl_gdev_attr(object *obj)
+static void _SX_rl_gdev_attr(SS_psides *si, object *obj)
    {PG_dev_attributes *da;
 
     da = SS_GET(PG_dev_attributes, obj);
     CFREE(da);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -468,8 +468,8 @@ static object *_SXI_get_text_image_name(SS_psides *si, object *argl)
     g_file *po;
     object *o;
 
-    argl = SX_get_file(argl, &po);
-    argl = SS_car(argl);
+    argl = SX_get_file(si, argl, &po);
+    argl = SS_car(si, argl);
     if (SS_integerp(argl))
        {i    = SS_INTEGER_VALUE(argl);
 	mi   = _SX_get_menu_item(si, po, i);
@@ -499,8 +499,8 @@ static object *_SXI_get_text_mapping_name(SS_psides *si, object *argl)
     g_file *po;
     object *o;
 
-    argl = SX_get_file(argl, &po);
-    argl = SS_car(argl);
+    argl = SX_get_file(si, argl, &po);
+    argl = SS_car(si, argl);
     if (SS_integerp(argl))
        {i    = SS_INTEGER_VALUE(argl);
 	mi   = _SX_get_menu_item(si, po, i);
@@ -540,16 +540,16 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
        SS_error(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_IMAGE", argl);
 
 /* if the first object is a pdbfile, use it, otherwise, use default file */
-    argl = SX_get_file(argl, &po);
+    argl = SX_get_file(si, argl, &po);
     file = (PDBfile *) po->file;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     if (SS_integerp(obj))
        {i    = SS_INTEGER_VALUE(obj);
 	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
-       {argl = SS_cdr(argl);
+       {argl = SS_cdr(si, argl);
         name = CSTRSAVE(SS_get_string(obj));};
 
     if (name == NULL)
@@ -595,7 +595,7 @@ static void _SX_wr_gimage(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GIMAGE - gc a image */
 
-static void _SX_rl_gimage(object *obj)
+static void _SX_rl_gimage(SS_psides *si, object *obj)
    {
 
 /* GOTCHA - don't know right thing to do here. See _SX_rl_ggraph.
@@ -610,7 +610,7 @@ static void _SX_rl_gimage(object *obj)
     CFREE(im);
 */
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -867,13 +867,13 @@ static void _SX_wr_gdevice(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GDEVICE - gc a device */
 
-static void _SX_rl_gdevice(object *obj)
+static void _SX_rl_gdevice(SS_psides *si, object *obj)
    {PG_device *dev;
 
     dev = SS_GET(PG_device, obj);
     PG_rl_device(dev);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -917,7 +917,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
 				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_image(si, argl);
-		 SS_gc(argl);
+		 SS_gc(si, argl);
 		 break;
 
 	    case 'm' :
@@ -926,7 +926,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
 				     SC_INT_I, &indx,
 				     0);
 		 ret = _SXI_pdbdata_graph(si, argl);
-		 SS_gc(argl);
+		 SS_gc(si, argl);
 		 break;};};
 
     return(ret);}
@@ -1353,7 +1353,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
 /* get the list of sets */
     data = nxt = NULL;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         if (SX_SETP(obj))
            {if (data == NULL)
                data = nxt = SS_GET(PM_set, obj);
@@ -1362,7 +1362,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
                 nxt = nxt->next;};}
         else
            break;
-        argl = SS_cdr(argl);};
+        argl = SS_cdr(si, argl);};
 
     pty  = PLOT_WIRE_MESH;
     extr = SS_null;
@@ -1454,8 +1454,8 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 
 /* get the list of graphs */
     data = nxt = NULL;
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
 	 if (SX_GRAPHP(obj))
             {if (data == NULL)
                 data = nxt = SS_GET(PG_graph, obj);
@@ -1879,7 +1879,7 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 	PM_rel_array(arr);
 
 	SC_mark(v, 1);
-	SS_gc(obj);
+	SS_gc(si, obj);
 	SC_mark(v, -1);}
 
     else if (id == SC_INT_P_I)
@@ -2102,7 +2102,7 @@ static object *_SXI_set_dom_limits(SS_psides *si, object *argl)
     object *obj;
 
     s = NULL;
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     if (SX_SETP(obj))
        s = SS_GET(PM_set, obj);
     else if (SX_MAPPINGP(obj))
@@ -2129,7 +2129,7 @@ static object *_SXI_set_ran_limits(SS_psides *si, object *argl)
     object *obj;
 
     s = NULL;
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
 
 /* use pg-set-domain-limits! for bare set
  * there is logic in vp-update-drawable that demands this
@@ -2199,7 +2199,7 @@ static object *_SXI_dom_limits(SS_psides *si, object *argl)
 
     rv  = SS_null;
     s   = NULL;
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
 
     if (SX_SETP(obj))
        s = SS_GET(PM_set, obj);
@@ -2270,7 +2270,7 @@ static object *_SXI_ran_limits(SS_psides *si, object *argl)
 
     s   = NULL;
     rv  = SS_null;
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
 
     if (SX_SETP(obj))
        s = SS_GET(PM_set, obj);
@@ -2340,7 +2340,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
     else
        SS_error(si, "BAD DRAWABLE - _SXI_SET_LABEL", obj);
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
 
     return(obj);}
 

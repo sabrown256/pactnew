@@ -288,7 +288,7 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
        _SS_quaternion_arg(si, obj, v);
 
     else if (type == SC_STRING_I)
-       {s = _SS_get_print_name(obj);
+       {s = _SS_get_print_name(si, obj);
 	DEREF(v) = s;}
 
     else if (type == SS_OBJECT_I)
@@ -364,10 +364,10 @@ int SS_args(SS_psides *si, object *s, ...)
            {v = SC_VA_ARG(void *);
             _SS_args(si, obj, v, type);};}
     else
-       {len = SS_length(s);
+       {len = SS_length(si, s);
         while (SS_consp(s))
-           {obj = SS_car(s);
-            s   = SS_cdr(s);
+           {obj = SS_car(si, s);
+            s   = SS_cdr(si, s);
 
             type = SC_VA_ARG(int);
             if (type == 0)
@@ -777,7 +777,7 @@ object *SS_call_scheme(SS_psides *si, char *func, ...)
 
     SS_eval(si, expr);
 
-    SS_gc(expr);
+    SS_gc(si, expr);
 
     SS_Assign(si->env, si->global_env);
     SS_Assign(si->this, SS_null);

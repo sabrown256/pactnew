@@ -22,8 +22,8 @@ object *SX_print(SS_psides *si, object *argl)
     FILE *stream;
     object *str, *obj, *format;
 
-    str  = SS_car(argl);
-    argl = SS_cdr(argl);
+    str  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     if (SS_nullobjp(str))
        str = si->outdev;
 
@@ -31,7 +31,7 @@ object *SX_print(SS_psides *si, object *argl)
        SS_error(si, "BAD PORT - PRINT", str);
     stream = SS_OUTSTREAM(str);
 
-    format = SS_car(argl);
+    format = SS_car(si, argl);
     if (!SS_stringp(format))
        SS_error(si, "BAD FORMAT - PRINT", format);
     strcpy(forms, SS_STRING_TEXT(format));
@@ -72,10 +72,10 @@ object *SX_print(SS_psides *si, object *argl)
 /* get the object now */
         if (SS_nullobjp(argl))
            return(SS_f);
-        argl = SS_cdr(argl);
+        argl = SS_cdr(si, argl);
         if (SS_nullobjp(argl))
            return(SS_f);
-        obj  = SS_car(argl);
+        obj  = SS_car(si, argl);
 
 /* jump on the type spec to pull the correct arg type off the stack */
         switch (ce)

@@ -219,13 +219,13 @@ void dprint(SS_psides *si, object *obj)
 static object *_SSI_write(SS_psides *si, object *obj)
    {object *str;
 
-    str = SS_cdr(obj);
-    obj = SS_car(obj);
+    str = SS_cdr(si, obj);
+    obj = SS_car(si, obj);
     if (SS_nullobjp(str))
        SS_print(si, si->outdev, obj, "", "");
 
     else if (SS_consp(str))
-       {str = SS_car(str);
+       {str = SS_car(si, str);
         if (SS_outportp(str))
            SS_print(si, str, obj, "", "");}
 
@@ -256,7 +256,7 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
        SS_error(si, "BAD PORT - _SS_XPRINTF", str);
     stream = SS_OUTSTREAM(str);
 
-    format = SS_car(argl);
+    format = SS_car(si, argl);
     if (!SS_stringp(format))
        SS_error(si, "BAD FORMAT - _SS_XPRINTF", format);
     strcpy(forms, SS_STRING_TEXT(format));
@@ -302,10 +302,10 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
         if (ce != '%')
            {if (SS_nullobjp(argl))
                return;
-            argl = SS_cdr(argl);
+            argl = SS_cdr(si, argl);
             if (SS_nullobjp(argl))
                return;
-            obj = SS_car(argl);};
+            obj = SS_car(si, argl);};
 
 /* jump on the type spec to pull the correct arg type off the stack */
         switch (ce)
@@ -403,8 +403,8 @@ static object *_SSI_fprintf(SS_psides *si, object *argl)
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
 
-    str  = SS_car(argl);
-    argl = SS_cdr(argl);
+    str  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     if (SS_nullobjp(str))
        str = si->outdev;
 
@@ -590,7 +590,7 @@ object *SS_trans_off(SS_psides *si)
 
     io_close(SS_OUTSTREAM(si->histdev));
 
-    SS_OBJECT_FREE(si->histdev);
+    SS_OBJECT_FREE(si, si->histdev);
     si->histdev   = SS_null;
     si->hist_flag = NO_LOG;
 
@@ -650,7 +650,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
     object *obj, *old_outdev, *ret;
 
     s   = NULL;
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
 
     s = NULL;
     SS_args(si, obj,
@@ -663,7 +663,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
 
     old_outdev = si->outdev;
     si->outdev  = SS_mk_outport(si, str, s);
-    ret        = SS_exp_eval(si, SS_cdr(argl));
+    ret        = SS_exp_eval(si, SS_cdr(si, argl));
     _SSI_cls_out(si, si->outdev);
     si->outdev = old_outdev;
 
@@ -763,7 +763,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 
     switch (SS_PROCEDURE_TYPE(obj))
        {case SS_PROC :
-             bdy  = SS_proc_body(obj);
+             bdy  = SS_proc_body(si, obj);
              desc = SS_CAR_MACRO(bdy);
              if (SS_stringp(desc))
                 PRINT(str, "     %s", SS_STRING_TEXT(desc));
@@ -780,11 +780,11 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 				   0);
 		 else
 		    SS_wr_lst(si, desc, strm);
-                 SS_gc(desc);};
+                 SS_gc(si, desc);};
              break;
 
         case SS_MACRO :
-             bdy  = SS_proc_body(obj);
+             bdy  = SS_proc_body(si, obj);
              desc = SS_CAR_MACRO(bdy);
              if (SS_stringp(desc))
                 PRINT(str, "     %s", SS_STRING_TEXT(desc));
@@ -801,7 +801,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
 				   0);
 		 else
 		    SS_wr_lst(si, desc, strm);
-                 SS_gc(desc);};
+                 SS_gc(si, desc);};
              break;
 
         case SS_PR_PROC  : 
@@ -947,9 +947,9 @@ int SS_prim_apr(SS_psides *si, FILE *str, char *s)
     flag = _SS_prim_apr(si, str, s, si->symtab);
 
     penv = si->env;
-    for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(penv), i++)
-        {l = SS_car(penv);
-	 v = SS_car(l);
+    for (i = 0; !SS_nullobjp(penv); penv = SS_cdr(si, penv), i++)
+        {l = SS_car(si, penv);
+	 v = SS_car(si, l);
 	 SC_ASSERT(v != NULL);
 
 	 tab = SS_GET(hasharr, SS_cadr(si, l));
@@ -1016,9 +1016,9 @@ void SS_wr_lst(SS_psides *si, object *obj, object *strm)
     PRINT(str, "(");
 
     while (TRUE)
-       {SS_print(si, strm, SS_car(obj), "", "");
+       {SS_print(si, strm, SS_car(si, obj), "", "");
 
-        if (SS_nullobjp(cd = SS_cdr(obj)))
+        if (SS_nullobjp(cd = SS_cdr(si, obj)))
            {PRINT(str, ")");
             break;}
         else if (SS_consp(cd))
@@ -1147,7 +1147,7 @@ static object *_SSI_newline(SS_psides *si, object *strm)
            PRINT(fp,  "\r\n");}
 
     else if (SS_consp(strm))
-       {strm = SS_car(strm);
+       {strm = SS_car(si, strm);
         if (SS_outportp(strm))
            {fp = SS_OUTSTREAM(strm);
             if (fp == stdout)
@@ -1181,14 +1181,14 @@ object *_SSI_curr_op(SS_psides *si)
 object *_SSI_wr_chr(SS_psides *si, object *argl)
    {object *str;
 
-    str = SS_cdr(argl);
-    if (!SS_charobjp(argl = SS_car(argl)))
+    str = SS_cdr(si, argl);
+    if (!SS_charobjp(argl = SS_car(si, argl)))
        SS_error(si, "BAD CHARACTER - WRITE-CHAR", argl);
 
     if (SS_nullobjp(str))
        SS_print(si, si->outdev, argl, "", "");
 
-    else if (SS_outportp(str = SS_car(str)))
+    else if (SS_outportp(str = SS_car(si, str)))
        SS_print(si, str, argl, "", "");
 
     else
