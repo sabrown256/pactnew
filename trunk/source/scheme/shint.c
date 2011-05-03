@@ -599,7 +599,7 @@ static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
 	     else
 	        lst = SS_mk_cons(si, SS_null, lst);};};
 
-    o = SS_reverse(lst);
+    o = SS_reverse(si, lst);
 
     return(o);}
 

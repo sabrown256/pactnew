@@ -46,7 +46,7 @@ object *_SS_make_comp_stmt_m(SS_psides *si, object *body)
    {object *cmp;
 
     if (SS_consp(body) && SS_consp(SS_CAR_MACRO(body)))
-       cmp = SS_mk_cons(si, _SS_m_block, SS_reverse(body));
+       cmp = SS_mk_cons(si, _SS_m_block, SS_reverse(si, body));
     else
        cmp = body;
 

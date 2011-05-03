@@ -464,7 +464,7 @@ static object *_SSI_strlst(SS_psides *si, object *str)
     for (ret = SS_null, i = 0; i < n; i++)
         ret = SS_mk_cons(si, SS_mk_char(si, s[i]), ret);
 
-    o = SS_reverse(ret);
+    o = SS_reverse(si, ret);
 
     return(o);}
 

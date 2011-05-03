@@ -51,10 +51,10 @@ extern "C" {
 /* SX_PREP_RET - prepare the return value by delistifying one element lists */
 
 #define SX_prep_ret(ret)                                                     \
-    {if (SS_length(ret) == 1)                                               \
+    {if (SS_length(ret) == 1)                                                \
         {SS_Assign(ret, SS_car(ret));}                                       \
      else                                                                    \
-        {SS_Assign(ret, SS_reverse(ret));};                                  \
+        {SS_Assign(ret, SS_reverse(si, ret));};                              \
      SC_mark(ret, -1);}
 
 /*--------------------------------------------------------------------------*/
@@ -65,8 +65,8 @@ extern "C" {
  */
 
 #define SX_prep_retl(ret)                                                    \
-    {if (SS_length(ret) > 1)                                                \
-        {SS_Assign(ret, SS_reverse(ret));};                                  \
+    {if (SS_length(ret) > 1)                                                 \
+        {SS_Assign(ret, SS_reverse(si, ret));};                              \
      SC_mark(ret, -1);}
 
 /*--------------------------------------------------------------------------*/
@@ -94,7 +94,7 @@ extern "C" {
         {t = DEREF(vl + d->cast_offs);                                       \
          if (t == NULL)                                                      \
             {if (DEREF(vg) != NULL)                                          \
-                SS_error(_si, _errm, _erra);                               \
+                SS_error(_si, _errm, _erra);                                 \
              else                                                            \
                 t = d->type;};};}
 

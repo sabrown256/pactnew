@@ -133,9 +133,9 @@ object *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl)
 	    {d    = SS_cdar(lst);
 	     dcls = SS_append(si, dcls, d);};
 
-        dcls = SS_reverse(dcls);};
+        dcls = SS_reverse(si, dcls);};
 
-    bdy   = SS_reverse(sl);
+    bdy   = SS_reverse(si, sl);
     proto = SS_make_form(si, _SS_c_block, dcls, LAST);
     frm   = SS_append(si, proto, bdy);
 
@@ -187,7 +187,7 @@ object *_SS_make_decl(SS_psides *si, object *ds, object *idl)
 object *_SS_make_mac_decl(SS_psides *si, object *ds, object *idl)
    {object *f, *args, *decl;
 
-    args = SS_reverse(idl);
+    args = SS_reverse(si, idl);
     if (SS_consp(ds))
        {f = SS_CAR_MACRO(ds);
 	if (SS_consp(f))

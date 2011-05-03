@@ -1020,7 +1020,7 @@ extern object
  *SS_cdadr(object *obj),
  *SS_cddar(object *obj),
  *SS_cdddr(object *obj),
- *SS_reverse(object *obj);
+ *SS_reverse(SS_psides *si, object *obj);
 
 
 /* SHPRNT.C declarations */

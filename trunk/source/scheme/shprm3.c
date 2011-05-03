@@ -309,7 +309,7 @@ object *SS_list_tail(SS_psides *si, object *lst, int n)
                    {h    = SS_car(lst);
 		    lst  = SS_cdr(lst);
 		    nlst = SS_mk_cons(si, h, nlst);};
-		nlst = SS_reverse(nlst);};}
+		nlst = SS_reverse(si, nlst);};}
 
 	else if ((0 <= n) && (n < SS_length(lst)))
            {for (i = 0; i < n; i++, lst = SS_cdr(lst));
@@ -392,9 +392,8 @@ static object *_SSI_last(SS_psides *si, object *obj)
 
 /* SS_REVERSE - reverse the list in place and return it */
 
-object *SS_reverse(object *obj)
+object *SS_reverse(SS_psides *si, object *obj)
    {object *ths, *nxt, *prv;
-    SS_psides *si = &_SS_si;
 
     if (SS_nullobjp(obj))
        return(obj);
@@ -1164,7 +1163,7 @@ static object *_SSI_cdddr(SS_psides *si, object *obj)
 static object *_SSI_reverse(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_reverse(obj);
+    o = SS_reverse(si, obj);
 
     return(o);}
 

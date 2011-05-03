@@ -149,7 +149,7 @@ object *SS_vctlst(SS_psides *si, object *arg)
     for (i = 0; i < k; i++)
         ret = SS_mk_cons(si, va[i], ret);
 
-    o = SS_reverse(ret);
+    o = SS_reverse(si, ret);
 
     return(o);}
 

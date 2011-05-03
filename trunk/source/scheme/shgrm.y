@@ -266,7 +266,7 @@ stmt :
 
 funcspec :
     FUNC funcdes eos stlist ENDF
-      {SS_GR_VAL(_SS_make_fun_m(SI, $2, SS_reverse($4)));
+      {SS_GR_VAL(_SS_make_fun_m(SI, $2, SS_reverse(SI, $4)));
        DIAGNOSTIC($$, "function");}
   ;
 
@@ -652,7 +652,7 @@ misc :
 
   | id COMMAND comlist
       {if (SS_consp($3))
-	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse($3)));}
+	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse(SI, $3)));}
        else
 	  {SS_GR_VAL(SS_mk_cons(SI, $1, SS_mk_cons(SI, $3, SS_null)));};
        DIAGNOSTIC($$, "misc id command comlist");}
@@ -676,7 +676,7 @@ misc :
        si = SI;
 
        if (SS_consp($2) && !SS_procedurep(SS_eval(si, SS_CAR_MACRO($2))))
-	  lst = SS_reverse($2);
+	  lst = SS_reverse(SI, $2);
        else
 	  lst = SS_mk_cons(SI, $2, SS_null);
 	 
@@ -690,7 +690,7 @@ misc :
        si = SI;
 
        if (SS_consp($2) && !SS_procedurep(SS_eval(si, SS_CAR_MACRO($2))))
-	  lst = SS_mk_cons(SI, _SS_m_list, SS_reverse($2));
+	  lst = SS_mk_cons(SI, _SS_m_list, SS_reverse(SI, $2));
        else
 	  lst = SS_mk_cons(SI, _SS_m_list, SS_mk_cons(SI, $2, SS_null));
 	 

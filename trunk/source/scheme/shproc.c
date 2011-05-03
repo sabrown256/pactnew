@@ -390,7 +390,7 @@ static object *_SSI_get_host_types(SS_psides *si, object *argl)
 
 	SC_free_strings(strs);
 
-	strl = SS_reverse(strl);};
+	strl = SS_reverse(si, strl);};
 
     return(strl);}
 

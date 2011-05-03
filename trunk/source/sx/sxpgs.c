@@ -1297,7 +1297,7 @@ static object *_SX_get_limits(SS_psides *si, PM_set *s)
 	CFREE(limits);
 
 	if (lst != SS_null)
-	   lst = SS_reverse(lst);};
+	   lst = SS_reverse(si, lst);};
 
     return(lst);}
 
@@ -1325,7 +1325,7 @@ static object *_SX_get_extrema(SS_psides *si, PM_set *s)
     CFREE(extr);
 
     if (lst != SS_null)
-       lst = SS_reverse(lst);
+       lst = SS_reverse(si, lst);
 
     return(lst);}
 
@@ -1991,7 +1991,7 @@ static object *_SX_map_ran_extrema(SS_psides *si, PM_mapping *m)
 	 lst = SS_mk_cons(si, obj, lst);};
     
     if (lst != SS_null)
-       lst = SS_reverse(lst);
+       lst = SS_reverse(si, lst);
 
     return(lst);}
 
@@ -2042,7 +2042,7 @@ static object *_SX_map_dom_extrema(SS_psides *si, PM_mapping *m)
 	 lst = SS_mk_cons(si, obj, lst);};
     
     if (lst != SS_null)
-       lst = SS_reverse(lst);
+       lst = SS_reverse(si, lst);
 
     CFREE(rextr);
     CFREE(extr);

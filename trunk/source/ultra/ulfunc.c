@@ -838,7 +838,7 @@ static object *UL_print_labels(SS_psides *si, int *indx, int nc,
     if (name != NULL)
        io_close(fp);
 
-    SS_Assign(ret, SS_reverse(ret));
+    SS_Assign(ret, SS_reverse(si, ret));
 
     return(ret);}
 
@@ -943,7 +943,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
 								       SS_mk_string(si, fname),
                                                                        SS_null))),
                                       ret));};}
-        {SS_Assign(ret, SS_reverse(ret));};}
+        {SS_Assign(ret, SS_reverse(si, ret));};}
 
     return(ret);}
 
@@ -1356,7 +1356,7 @@ static object *_ULI_syscmnd(SS_psides *si, object *s)
            {SS_Assign(lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));
             CFREE(output[i]);
             i++;}
-        SS_Assign(lst, SS_reverse(lst));
+        SS_Assign(lst, SS_reverse(si, lst));
         CFREE(output);}
 
     return(lst);}
@@ -1972,8 +1972,8 @@ static object *_ULI_curve_list(SS_psides *si, object *arg)
         {xvals = SS_mk_cons(si, SS_mk_float(si, x[0][l]), xvals);
          yvals = SS_mk_cons(si, SS_mk_float(si, x[1][l]), yvals);};
 
-    o = SS_make_list(si, SS_OBJECT_I, SS_reverse(xvals),
-		     SS_OBJECT_I, SS_reverse(yvals),
+    o = SS_make_list(si, SS_OBJECT_I, SS_reverse(si, xvals),
+		     SS_OBJECT_I, SS_reverse(si, yvals),
 		     0);
 
     return(o);}
