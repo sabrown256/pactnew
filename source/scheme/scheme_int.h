@@ -244,8 +244,8 @@ extern int
  _SS_get_object_length(object *obj),
  _SS_object_to_numtype_id(int vid, void *p, long n, object *val),
  _SS_object_to_numtype(char *type, void *p, long n, object *val),
- _SS_list_to_numtype_id(int vid, void *p, long n, object *o),
- _SS_list_to_numtype(char *type, void *p, long n, object *o),
+ _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o),
+ _SS_list_to_numtype(SS_psides *si, char *type, void *p, long n, object *o),
  _SS_max_numeric_type(object *argl, long *pn);
 
 extern void

@@ -127,6 +127,8 @@ void SX_init(char *code, char *vers)
 
 /* PDB initializations */
     pdb_wr_hook = _SX_hash_hook;
+    SC_register_context(_SX_hash_hook, si);
+
     _SX_init_hash_objects(si, SX_vif);
 
 /* default formats */

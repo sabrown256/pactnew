@@ -440,6 +440,50 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 
+/* SX_MAKE_DIMS_DIMDES - take a list of integers and make a dimension
+ *                     - descriptor
+ *                     - (type dimdes)
+ */
+
+static dimdes *_SX_make_dims_dimdes(SS_psides *si, PDBfile *file,
+				    object *argl)
+   {long mini, leng;
+    object *dim_obj;
+    dimdes *dims, *next, *prev;
+
+    mini = 0;
+    leng = 0;
+    dims = NULL;
+    for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
+        {dim_obj = SS_car(argl);
+         if (SS_integerp(dim_obj))
+            {mini = (long) file->default_offset;
+             leng = SS_INTEGER_VALUE(dim_obj);}
+         else if (SS_floatp(dim_obj))
+            {mini = (long) file->default_offset;
+             leng = SS_FLOAT_VALUE(dim_obj);}
+         else if (SS_consp(dim_obj))
+            {mini = SS_INTEGER_VALUE(SS_car(dim_obj));
+             leng = SS_INTEGER_VALUE(SS_cdr(dim_obj)) - mini + 1;}
+         else
+            SS_error_n(si,
+		       "DIMENSIONS MUST BE INTEGERS - _SX_MAKE_DIMS_DIMDES",
+		       dim_obj);
+
+         next = _PD_mk_dimensions(mini, leng);
+         if (dims == NULL)
+            dims = next;
+         else
+            {prev->next = next;
+	     SC_mark(next, 1);};
+
+         prev = next;};
+
+    return(dims);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_SPEC_INSTANCE - convert the data specification in the arg list to
  *                   - an instance in memory and return it
  *                   -
@@ -469,7 +513,8 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
  *                   -    "foo"  ("birdy")  (("small")) 24.0)))
  */
 
-static syment *_SX_spec_instance(PDBfile *file, int defent, object *argl)
+static syment *_SX_spec_instance(SS_psides *si, PDBfile *file,
+				 int defent, object *argl)
    {object *data;
     SC_address val;
     long number;
@@ -485,22 +530,23 @@ static syment *_SX_spec_instance(PDBfile *file, int defent, object *argl)
 	argl = SS_cdr(argl);
 
 	if (!SS_consp(data))
-	   SS_error("SHOULD BE LIST - _SX_SPEC_INSTANCE", data);
+	   SS_error_n(si, "SHOULD BE LIST - _SX_SPEC_INSTANCE", data);
 
 	label = CSTRSAVE(SS_get_string(SS_car(data)));
 	data  = SS_cdr(data);
 	if (strcmp(label, "type") == 0)
 	   {type        = CSTRSAVE(SS_get_string(SS_car(data)));
-	    dims        = _SX_make_dims_dimdes(file, SS_cdr(data));
+	    dims        = _SX_make_dims_dimdes(si, file, SS_cdr(data));
 	    number      = _PD_comp_num(dims);
 	    if (defent)
 	       val.memaddr = NULL;
 	    else
 	       {val.memaddr = _PD_alloc_entry(file, type, number);
 		if (val.memaddr == NULL)
-		   SS_error("CAN'T ALLOCATE TYPE - _SX_SPEC_INSTANCE", data);
+		   SS_error_n(si, "CAN'T ALLOCATE TYPE - _SX_SPEC_INSTANCE", data);
 
-		_SX_rd_tree_list(argl, file, val.memaddr, number, type, dims);
+		_SX_rd_tree_list(si, argl, file,
+				 val.memaddr, number, type, dims);
 		SC_mark(val.memaddr, 1);};
 
 	    PD_entry_type(ep)       = CSTRSAVE(type);
@@ -1285,11 +1331,11 @@ static object *_SXI_parse_type(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_CLOSE_FILE - close a G_FILE and
- *               - remove the object from SX_file_list
+/* _SX_CLOSE_FILE - close a G_FILE and
+ *                - remove the object from SX_file_list
  */
 
-static object *SX_close_file(object *arg)
+static object *_SX_close_file(SS_psides *si, object *arg)
    {g_file *po, *prev;
 
     po = NULL;
@@ -1313,7 +1359,7 @@ static object *SX_close_file(object *arg)
         if (prev != NULL)
            prev->next = po->next;};
 
-    _SX_rel_open_file(po);
+    _SX_rel_open_file(si, po);
 
     return(SS_t);}
 
@@ -1327,7 +1373,7 @@ static object *SX_close_file(object *arg)
 static object *_SXI_close_pdbfile(SS_psides *si, object *arg)
    {object *o;
 
-    o = SX_close_file(arg);
+    o = _SX_close_file(si, arg);
 
     return(o);}
 
@@ -1948,7 +1994,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 	 snprintf(member, MAXLINE, "%s %s", type, mname);
 	 dim_obj = SS_cddr(member_obj);
 	 if (!SS_nullobjp(dim_obj))
-	    {dims = _SX_make_dims_dimdes(file, dim_obj);
+	    {dims = _SX_make_dims_dimdes(si, file, dim_obj);
 	     memtemp = member + strlen(member);
 	     *memtemp++ = '(';
 	     for (; dims != NULL; dims = dim0)
@@ -2281,7 +2327,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
 /* get optional dimensions */
     argl = SS_cddr(SS_cddr(argl));
 
-    dims = _SX_make_dims_dimdes(file, argl);
+    dims = _SX_make_dims_dimdes(si, file, argl);
     n    = _PD_comp_num(dims);
     bl   = _SX_make_blocks(si, alst, n);
     ep   = _PD_mk_syment(type, n, 0L, NULL, dims);
@@ -2473,7 +2519,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
         
 /* otherwise the next thing should be a cons */
     else
-       {ep = _SX_spec_instance(file, FALSE, argl);
+       {ep = _SX_spec_instance(si, file, FALSE, argl);
 
 	addr.diskaddr = PD_entry_address(ep);
         if (addr.memaddr == NULL)
@@ -2672,7 +2718,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
         
 /* otherwise the next thing should be a cons */
     else
-       {ep            = _SX_spec_instance(file, TRUE, argl);
+       {ep            = _SX_spec_instance(si, file, TRUE, argl);
 	number        = PD_entry_number(ep);
 	addr.diskaddr = 0L;
 
@@ -3049,7 +3095,7 @@ static object *_SXI_to_pdbdata(SS_psides *si, object *argl)
     syment *ep;
     object *rv;
 
-    ep = _SX_spec_instance(SX_vif, FALSE, argl);
+    ep = _SX_spec_instance(si, SX_vif, FALSE, argl);
 
     val.diskaddr = PD_entry_address(ep);
 
@@ -3075,48 +3121,6 @@ static object *_SXI_desc_variable(SS_psides *si, object *obj)
 	rv = obj;};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SX_MAKE_DIMS_DIMDES - take a list of integers and make a dimension
- *                     - descriptor
- *                     - (type dimdes)
- */
-
-dimdes *_SX_make_dims_dimdes(PDBfile *file, object *argl)
-   {long mini, leng;
-    object *dim_obj;
-    dimdes *dims, *next, *prev;
-
-    mini = 0;
-    leng = 0;
-    dims = NULL;
-    for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
-        {dim_obj = SS_car(argl);
-         if (SS_integerp(dim_obj))
-            {mini = (long) file->default_offset;
-             leng = SS_INTEGER_VALUE(dim_obj);}
-         else if (SS_floatp(dim_obj))
-            {mini = (long) file->default_offset;
-             leng = SS_FLOAT_VALUE(dim_obj);}
-         else if (SS_consp(dim_obj))
-            {mini = SS_INTEGER_VALUE(SS_car(dim_obj));
-             leng = SS_INTEGER_VALUE(SS_cdr(dim_obj)) - mini + 1;}
-         else
-            SS_error("DIMENSIONS MUST BE INTEGERS - _SX_MAKE_DIMS_DIMDES",
-                     dim_obj);
-
-         next = _PD_mk_dimensions(mini, leng);
-         if (dims == NULL)
-            dims = next;
-         else
-            {prev->next = next;
-	     SC_mark(next, 1);};
-
-         prev = next;};
-
-    return(dims);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

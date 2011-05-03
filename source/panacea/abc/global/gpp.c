@@ -705,13 +705,13 @@ object *LR_var_plot(SS_psides *si, object *argl)
                 lwidth = width;
                 sobj   = SS_cdr(sobj);
                 if (SS_consp(sobj))
-                   SX_GET_INTEGER_FROM_LIST(lcolor, sobj,
+                   SX_GET_INTEGER_FROM_LIST(si, lcolor, sobj,
                                             "BAD COLOR - LR_VAR_PLOT");
                 if (SS_consp(sobj))
-                   SX_GET_FLOAT_FROM_LIST(lwidth, sobj,
+                   SX_GET_FLOAT_FROM_LIST(si, lwidth, sobj,
                                           "BAD WIDTH - LR_VAR_PLOT");
                 if (SS_consp(sobj))
-                   SX_GET_INTEGER_FROM_LIST(lstyle, sobj,
+                   SX_GET_INTEGER_FROM_LIST(si, lstyle, sobj,
                                             "BAD STYLE - LR_VAR_PLOT");
                 if (domain == NULL)
                    domain = LR_mesh_set(dname);
@@ -875,11 +875,13 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
 
 object *LR_get_time_data(void)
    {double tconv, tc, dtc;
+    SS_psides *si = &_SS_si;
 
     tconv = convrsn[SEC]/unit[SEC];
     tc    = tconv*t;
     dtc   = tconv*dt;
-    return(SS_make_list(SC_DOUBLE_I, &tc,
+    return(SS_make_list(si,
+			SC_DOUBLE_I, &tc,
                         SC_DOUBLE_I, &dtc,
                         SC_INTEGER_I, &cycle,
 			0));}
@@ -915,8 +917,10 @@ int LR_get_data(double *pnz, double *pnc, double *pt, double *pdt,
 
 object *LR_get_mesh_data(void)
    {object *th;
+    SS_psides *si = &_SS_si;
 
-    th = SS_make_list(SC_INTEGER_I, &N_zones,
+    th = SS_make_list(si,
+		      SC_INTEGER_I, &N_zones,
 		      SC_INTEGER_I, &frz,
 		      SC_INTEGER_I, &lrz,
 		      SC_INTEGER_I, &frn,
@@ -1031,7 +1035,7 @@ object *LR_def_domain(SS_psides *si, object *argl)
     arr->data   = (byte *) dmap;
 
 /* now make the domain map and the domain arrays */
-    ret = SS_make_list(SC_STRING_I, "domain",
+    ret = SS_make_list(si, SC_STRING_I, "domain",
                        SC_INTEGER_I, &space,
                        SS_OBJECT_I, SX_mk_set(si, dom),
                        SS_OBJECT_I, SX_mk_C_array(si, arr),

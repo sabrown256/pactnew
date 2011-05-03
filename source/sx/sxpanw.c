@@ -55,7 +55,8 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
        {name = SS_get_string(obj);
         pp   = PA_INQUIRE_VARIABLE(name);
         if (pp == NULL)
-           SS_error_n(si, "VARIABLE NOT IN DATA BASE - _SXI_DISPLAY_PAN_OBJECT",
+           SS_error_n(si,
+		      "VARIABLE NOT IN DATA BASE - _SXI_DISPLAY_PAN_OBJECT",
 		      obj);
 
         else if (pp->data != NULL)
@@ -82,7 +83,7 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
 
 /* _SX_DESC_PAN_VARIABLE - display the description of a PANACEA variable */
 
-static object *_SX_desc_pan_variable(object *obj)
+static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
    {PA_variable *pp;
     PA_dimens *pvd;
     syment *ep;
@@ -93,7 +94,7 @@ static object *_SX_desc_pan_variable(object *obj)
             0);
 
     if (pp == NULL)
-       SS_error("BAD PANACEA VARIABLE - _SX_DESC_PAN_VARIABLE", obj);
+       SS_error_n(si, "BAD PANACEA VARIABLE - _SX_DESC_PAN_VARIABLE", obj);
 
     else
  
@@ -207,7 +208,7 @@ static object *_SX_desc_pan_variable(object *obj)
 
 /* _SX_DESC_PAN_PACKAGE - display the description of a PANACEA package */
 
-static object *_SX_desc_pan_package(object *obj)
+static object *_SX_desc_pan_package(SS_psides *si, object *obj)
    {PA_package *pck;
 
     pck = NULL;
@@ -216,7 +217,7 @@ static object *_SX_desc_pan_package(object *obj)
             0);
 
     if (pck == NULL)
-       SS_error("BAD PANACEA PACKAGE - _SX_DESC_PAN_PACKAGE", obj);
+       SS_error_n(si, "BAD PANACEA PACKAGE - _SX_DESC_PAN_PACKAGE", obj);
 
     else
 
@@ -253,10 +254,10 @@ object *_SXI_desc_pan(SS_psides *si, object *obj)
     haelem *hp;
 
     if (SX_PACKAGEP(obj))
-       _SX_desc_pan_package(obj);
+       _SX_desc_pan_package(si, obj);
 
     else if (SX_PANVARP(obj))
-       _SX_desc_pan_variable(obj);
+       _SX_desc_pan_variable(si, obj);
 
     else
        {s  = SS_get_string(obj);
@@ -265,10 +266,10 @@ object *_SXI_desc_pan(SS_psides *si, object *obj)
            SS_error_n(si, "BAD ENTITY - _SXI_DESC_PAN", obj);
 
 	else if (hp->type[3] == 'p')
-           _SX_desc_pan_package(obj);
+           _SX_desc_pan_package(si, obj);
 
         else
-           _SX_desc_pan_variable(obj);};
+           _SX_desc_pan_variable(si, obj);};
 
     return(SS_f);}
 

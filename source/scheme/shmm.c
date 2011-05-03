@@ -1314,7 +1314,7 @@ int _SS_object_to_numtype(char *type, void *p, long n, object *val)
  *                        - return TRUE iff successful
  */
 
-int _SS_list_to_numtype_id(int vid, void *p, long n, object *o)
+int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
    {int ityp, rv;
     long no;
     char *msg;
@@ -1329,7 +1329,7 @@ int _SS_list_to_numtype_id(int vid, void *p, long n, object *o)
 	else if (ityp == SS_CONS_I)
 	   strncpy(p, SS_STRING_TEXT(SS_car(o)), n);
         else
-	   SS_error("EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
+	   SS_error_n(si, "EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
 
         return(rv);};
 
@@ -1339,9 +1339,10 @@ int _SS_list_to_numtype_id(int vid, void *p, long n, object *o)
  */
     no = _SS_get_object_length(o);
     if (n < no)
-       {msg = SC_dsnprintf(FALSE, "MORE DATA THAN EXPECTED %ld > %ld - _SS_LIST_TO_NUMTYPE",
+       {msg = SC_dsnprintf(FALSE,
+			   "MORE DATA THAN EXPECTED %ld > %ld - _SS_LIST_TO_NUMTYPE",
 			   no, n);
-        SS_error(msg, o);};
+        SS_error_n(si, msg, o);};
 
     if (SC_is_type_num(vid) == TRUE)
        {int oid;
@@ -1380,11 +1381,11 @@ int _SS_list_to_numtype_id(int vid, void *p, long n, object *o)
  *                     - return TRUE iff successful
  */
 
-int _SS_list_to_numtype(char *type, void *p, long n, object *o)
+int _SS_list_to_numtype(SS_psides *si, char *type, void *p, long n, object *o)
    {int vid, rv;
 
     vid = SC_type_id(type, FALSE);
-    rv  = _SS_list_to_numtype_id(vid, p, n, o);
+    rv  = _SS_list_to_numtype_id(si, vid, p, n, o);
 
     return(rv);}
 

@@ -230,7 +230,7 @@ static void _UL_expand_prefix(char *s)
  *               - the buffer
  */
 
-static char *_UL_reproc_in(char *line)
+static char *_UL_reproc_in(SS_psides *si, char *line)
    {char *rv;
     static char command[MAXLINE];
 
@@ -238,7 +238,7 @@ static char *_UL_reproc_in(char *line)
 
     if (SX_split_command(command, line))
        {if (!SX_expand_expr(command))
-           SS_error("SYNTAX ERROR - _UL_REPROC_IN", SS_null);
+           SS_error_n(si, "SYNTAX ERROR - _UL_REPROC_IN", SS_null);
 
         _UL_expand_prefix(command);
 
@@ -680,7 +680,7 @@ object *UL_copy_curve(SS_psides *si, int j)
 
     i = SX_next_space(si);
 
-    SX_assign_next_id(i, UL_plot);
+    SX_assign_next_id(si, i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
     SX_dataset[i].wc[0]      = SX_dataset[j].wc[0];
@@ -805,7 +805,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     snprintf(s, MAXLINE, "Extract %c (%e to %e by %e)",
             SX_dataset[j].id, xstart, xstop, xstep);
 
-    SX_assign_next_id(i, UL_plot);
+    SX_assign_next_id(si, i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(s);
     SX_dataset[i].file      = NULL;
@@ -842,7 +842,7 @@ object *UL_xindex_curve(SS_psides *si, int j)
     i = SX_next_space(si);
     n = SX_dataset[j].n;
 
-    SX_assign_next_id(i, UL_plot);
+    SX_assign_next_id(si, i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
     SX_dataset[i].wc[0]     = 1.0;

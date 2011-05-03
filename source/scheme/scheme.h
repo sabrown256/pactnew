@@ -656,7 +656,7 @@ struct s_SS_vect
     {_oect *_x;                                                              \
      _x = _v;                                                                \
      if ((_x->val == NULL) || (_x->eval_type == NO_EV))                      \
-        SS_error("FREED OBJECT - SS_ASSIGN", SS_null);                       \
+        SS_error_n(si, "FREED OBJECT - SS_ASSIGN", SS_null);                 \
      SS_MARK(_x);                                                            \
      SS_gc(_o);                                                              \
      _o = _x;}

@@ -83,7 +83,7 @@ object *_ULI_apropos(SS_psides *si, object *obj)
 
 /* _UL_PRINT_OUT_DEVICE - print to the specified output device */
 
-static void _UL_print_out_device(int idev)
+static void _UL_print_out_device(SS_psides *si, int idev)
    {int width, height;
     PG_device *dev;
     PG_dev_geometry *g;
@@ -95,19 +95,22 @@ static void _UL_print_out_device(int idev)
        {dev = out->dev;
 	if (dev == NULL)
            {if ((out->fname == NULL) || (strlen(out->fname) == 0))
-               SS_error("OUTPUT FILE NAME IS NULL - _UL_PRINT_OUT_DEVICE",
-			SS_null);
+	       SS_error_n(si,
+			  "OUTPUT FILE NAME IS NULL - _UL_PRINT_OUT_DEVICE",
+			  SS_null);
             if ((out->type == NULL) || (strlen(out->type) == 0))
-               SS_error("OUTPUT FILE TYPE IS NULL - _UL_PRINT_OUT_DEVICE",
-			SS_null);
+               SS_error_n(si,
+			  "OUTPUT FILE TYPE IS NULL - _UL_PRINT_OUT_DEVICE",
+			  SS_null);
             dev = PG_make_device(out->dupp, out->type, out->fname);
             UL_set_graphics_state(dev);
             dev = PG_open_device(dev, out->x0, out->y0,
 				 out->width, out->height);
 
             if (dev == NULL)
-               SS_error("CAN'T OPEN OUTPUT FILE - _UL_PRINT_OUT_DEVICE",
-			SS_null);
+               SS_error_n(si,
+			  "CAN'T OPEN OUTPUT FILE - _UL_PRINT_OUT_DEVICE",
+			  SS_null);
 
 	    out->dev = dev;};
 
@@ -138,7 +141,7 @@ object *_ULI_printscr(SS_psides *si)
    {int i;
 
     for (i = 0; i < N_OUTPUT_DEVICES; i++)
-        _UL_print_out_device(i);
+        _UL_print_out_device(si, i);
 
     return(SS_f);}
 

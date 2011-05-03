@@ -112,7 +112,7 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
     defp = PD_inquire_host_type(file, type);
     if (defp == NULL)
        SS_error_n(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_MAKE_LIST_LEAF",
-                SS_null);
+		  SS_null);
     else
        mem_lst = defp->members;
 
@@ -120,7 +120,7 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
        obj = _SX_make_list_io(si, file, vr, ni, type);
 
     else
-       {obj = SS_null;                              /* cons of array elements */
+       {obj = SS_null;                            /* cons of array elements */
 	sz  = defp->size;
 	svr = vr;
         for (ii = 0L; ii < ni; ii++, svr += sz)
@@ -129,8 +129,9 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
              obj1 = SS_null;
              for (desc = mem_lst; desc != NULL; desc = desc->next)
                  {member_offs = desc->member_offs;
-		  PD_CAST_TYPE(mtype, desc, svr + member_offs, svr, SS_error,
-			       "BAD CAST - _SX_MAKE_LIST_LEAF", SS_null);
+		  PD_CAST_TYPE(mtype, desc, svr + member_offs, svr,
+			       SS_error, "BAD CAST - _SX_MAKE_LIST_LEAF",
+			       SS_null);
                   obj2 = _SX_make_list_syment(si, file,
 					      (char *) svr + member_offs,
                                               desc->number, mtype);

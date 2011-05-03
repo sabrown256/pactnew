@@ -547,7 +547,8 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
  *                  - FALSE otherwise
  */
 
-static int _SX_diff_structs(PDBfile *pfa, PDBfile *pfb, 
+static int _SX_diff_structs(SS_psides *si,
+			    PDBfile *pfa, PDBfile *pfb, 
 			    char *nma, char *nmb, 
                             char *bfa, char *bfb, 
 			    char *typa, char *typb, long ni)
@@ -562,7 +563,7 @@ static int _SX_diff_structs(PDBfile *pfa, PDBfile *pfb,
     dpa = PD_inquire_table_type(pfa->host_chart, typa);
     dpb = PD_inquire_table_type(pfb->host_chart, typb);
     if ((dpa == NULL) || (dpb == NULL))
-       SS_error("BAD TYPE - _SX_DIFF_STRUCTS", SS_null);
+       SS_error_n(si, "BAD TYPE - _SX_DIFF_STRUCTS", SS_null);
 
     else
        {sza = dpa->size;
@@ -593,7 +594,7 @@ static int _SX_diff_structs(PDBfile *pfa, PDBfile *pfb,
 						tva, tvb, 
 						desca->type, mitems, mdims);
 		  else
-		     ret &= _SX_diff_structs(pfa, pfb, mnma, mnmb, 
+		     ret &= _SX_diff_structs(si, pfa, pfb, mnma, mnmb, 
 					     tva, tvb, 
 					     desca->type, descb->type, 
 					     mitems);};
@@ -751,7 +752,7 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
     dp = PD_inquire_table_type(hc, tc);
     if (dp == NULL)
        SS_error_n(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_DIFF_LEAF", 
-		SS_mk_string(si, tc));
+		  SS_mk_string(si, tc));
 
     else
        {mem_lst = dp->members;
@@ -759,7 +760,7 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
 	   ret = _SX_diff_primitives(pfc, nma, nmb, 
 				     bfa, bfb, tc, na, dims);
 	else
-	   {ret = _SX_diff_structs(pfa, pfb, nma, nmb, 
+	   {ret = _SX_diff_structs(si, pfa, pfb, nma, nmb, 
 				   bfa, bfb, ta, tb, na);
 
 	    if (dp->n_indirects)
@@ -936,14 +937,14 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
     nmb = NULL;
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SX_ipdbfilep(obj), pfa, 
+       {SX_GET_OBJECT_FROM_LIST(si, SX_ipdbfilep(obj), pfa, 
                                 FILE_STREAM(PDBfile, obj), argl, 
                                 "FIRST ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
     else
        SS_error_n(si, "BAD FIRST ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SX_ipdbfilep(obj), pfb, 
+       {SX_GET_OBJECT_FROM_LIST(si, SX_ipdbfilep(obj), pfb, 
                                 FILE_STREAM(PDBfile, obj), argl, 
                                 "SECOND ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
     else
@@ -962,15 +963,15 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
        SS_error_n(si, "BAD FOURTH ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
-       {SX_GET_INTEGER_FROM_LIST(_SC.types.max_digits, argl, 
+       {SX_GET_INTEGER_FROM_LIST(si, _SC.types.max_digits, argl, 
                                  "FIFTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
 
     if (SS_consp(argl))
-       {SX_GET_INTEGER_FROM_LIST(SX_disp_individ_diff, argl, 
+       {SX_GET_INTEGER_FROM_LIST(si, SX_disp_individ_diff, argl, 
                                  "SIXTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
 
     if (SS_consp(argl))
-       {SX_GET_INTEGER_FROM_LIST(SX_promote_flag, argl, 
+       {SX_GET_INTEGER_FROM_LIST(si, SX_promote_flag, argl, 
                                  "SEVENTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
     
     if ((SX_promote_flag == 1) || (SX_promote_flag == 3))

@@ -15,7 +15,8 @@
 
 /* _SX_ARGS_ARR_2 - map a list pairwise to numbers */
 
-static void _SX_args_arr_2(object *argl, int *pn, double **px, double **py)
+static void _SX_args_arr_2(SS_psides *si, object *argl,
+			   int *pn, double **px, double **py)
    {int i, n;
     double *x, *y;
     object *obj;
@@ -26,10 +27,10 @@ static void _SX_args_arr_2(object *argl, int *pn, double **px, double **py)
     y = CMAKE_N(double, n);
     for (i = 0; !SS_nullobjp(argl); i++)
         {if (SS_consp(argl))
-            SX_GET_FLOAT_FROM_LIST(x[i], argl,
+            SX_GET_FLOAT_FROM_LIST(si, x[i], argl,
                                    "CAN'T GET X VALUE - _SX_ARGS_ARR_2");
          if (SS_consp(argl))
-            SX_GET_FLOAT_FROM_LIST(y[i], argl,
+            SX_GET_FLOAT_FROM_LIST(si, y[i], argl,
                                    "CAN'T GET Y VALUE - _SX_ARGS_ARR_2");};
     *px = x;
     *py = y;
@@ -42,7 +43,7 @@ static void _SX_args_arr_2(object *argl, int *pn, double **px, double **py)
 
 /* _SX_ARGS_ARR_3 - map a list triple-wise to numbers */
 
-static void _SX_args_arr_3(object *argl, int *pn,
+static void _SX_args_arr_3(SS_psides *si, object *argl, int *pn,
                            double **px, double **py, double **pz)
    {int i, n;
     double *x, *y, *z;
@@ -55,13 +56,13 @@ static void _SX_args_arr_3(object *argl, int *pn,
     z = CMAKE_N(double, n);
     for (i = 0; !SS_nullobjp(argl); i++)
         {if (SS_consp(argl))
-            SX_GET_FLOAT_FROM_LIST(x[i], argl,
+            SX_GET_FLOAT_FROM_LIST(si, x[i], argl,
                                    "CAN'T GET X VALUE - _SX_ARGS_ARR_3");
          if (SS_consp(argl))
-            SX_GET_FLOAT_FROM_LIST(y[i], argl,
+            SX_GET_FLOAT_FROM_LIST(si, y[i], argl,
                                    "CAN'T GET Y VALUE - _SX_ARGS_ARR_3");
          if (SS_consp(argl))
-            SX_GET_FLOAT_FROM_LIST(z[i], argl,
+            SX_GET_FLOAT_FROM_LIST(si, z[i], argl,
                                    "CAN'T GET Z VALUE - _SX_ARGS_ARR_3");};
 
     *px = x;
@@ -271,13 +272,13 @@ static object *_SXI_def_mrk(SS_psides *si, object *argl)
     y2 = CMAKE_N(double, ns);
 
     for (i = 0; i < ns; i++)
-        {SX_GET_FLOAT_FROM_LIST(x1[i], argl,
+        {SX_GET_FLOAT_FROM_LIST(si, x1[i], argl,
 	                        "CAN'T GET FIRST X VALUE - _SXI_DEF_MRK");
-         SX_GET_FLOAT_FROM_LIST(y1[i], argl,
+         SX_GET_FLOAT_FROM_LIST(si, y1[i], argl,
 	                        "CAN'T GET FIRST Y VALUE - _SXI_DEF_MRK");
-         SX_GET_FLOAT_FROM_LIST(x2[i], argl,
+         SX_GET_FLOAT_FROM_LIST(si, x2[i], argl,
 	                        "CAN'T GET SECOND X VALUE - _SXI_DEF_MRK");
-         SX_GET_FLOAT_FROM_LIST(y2[i], argl,
+         SX_GET_FLOAT_FROM_LIST(si, y2[i], argl,
 	                        "CAN'T GET SECOND Y VALUE - _SXI_DEF_MRK");};
 
     indx = PG_def_marker(ns, x1, y1, x2, y2);
@@ -331,7 +332,7 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
 
     for (i = 0; i < ns; i++)
         {for (id = 0; id < nd; id++)
-	     {SX_GET_FLOAT_FROM_LIST(r[id][i], x[id],
+	     {SX_GET_FLOAT_FROM_LIST(si, r[id][i], x[id],
 				     "CAN'T GET COMPONENT - _SXI_DRW_MRK");};};
 
     PG_draw_markers_n(dev, nd, cs, ns, r, mrk);
@@ -628,9 +629,9 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
 
     argl = SS_cddr(SS_cddr(argl));
     if (nd == 2)
-       _SX_args_arr_2(argl, &n, &x[0], &x[1]);
+       _SX_args_arr_2(si, argl, &n, &x[0], &x[1]);
     else if (nd == 3)
-       _SX_args_arr_3(argl, &n, &x[0], &x[1], &x[2]);
+       _SX_args_arr_3(si, argl, &n, &x[0], &x[1], &x[2]);
 
     PG_set_line_color(dev, dev->line_color);
 
@@ -750,9 +751,9 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
 
     else
        {if (nd == 2)
-	   _SX_args_arr_2(argl, &n, &x[0], &x[1]);
+	   _SX_args_arr_2(si, argl, &n, &x[0], &x[1]);
         else if (nd == 3)
-	   _SX_args_arr_3(argl, &n, &x[0], &x[1], &x[2]);
+	   _SX_args_arr_3(si, argl, &n, &x[0], &x[1], &x[2]);
 
 	PG_set_line_color(dev, dev->line_color);
 
@@ -858,7 +859,7 @@ static object *_SXI_fply(SS_psides *si, object *argl)
        {py = SS_GET(PM_polygon, o);
 	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, py->nn, py->x);}
     else
-       {_SX_args_arr_2(argl, &n, &r[0], &r[1]);
+       {_SX_args_arr_2(si, argl, &n, &r[0], &r[1]);
 
 	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, n, r);
 

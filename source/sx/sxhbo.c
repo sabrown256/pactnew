@@ -681,12 +681,13 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_BUILD_RESTRICTED_DOMAIN - build a domain whose extent is the
- *                            - intersection of the list of values
- *                            - in ARGL and the extrema of HD
+/* _SX_BUILD_RESTRICTED_DOMAIN - build a domain whose extent is the
+ *                             - intersection of the list of values
+ *                             - in ARGL and the extrema of HD
  */
 
-PM_set *SX_build_restricted_domain(PM_set *hd, object *argl)
+static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
+					   object *argl)
    {int i, nd, ne, nde;
     int *maxes, *dmx;
     char *name;
@@ -699,8 +700,9 @@ PM_set *SX_build_restricted_domain(PM_set *hd, object *argl)
     dmx = hd->max_index;
     ne  = SS_length(argl);
     if (ne != 2*nd)
-       SS_error("DOMAIN DIMENSION MISMATCH - SX_BUILD_RESTRICTED_DOMAIN",
-		argl);
+       SS_error_n(si,
+		  "DOMAIN DIMENSION MISMATCH - _SX_BUILD_RESTRICTED_DOMAIN",
+		  argl);
 
     extr  = CMAKE_N(double, ne);
     maxes = CMAKE_N(int, nd);
@@ -759,7 +761,7 @@ PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
     lbl = SC_dsnprintf(FALSE, "Extract %s", h->name);
 
 /* build the return mapping */
-    fd = SX_build_restricted_domain(hd, argl);
+    fd = _SX_build_restricted_domain(si, hd, argl);
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
 
     PM_find_extrema(f->range);
@@ -775,12 +777,12 @@ PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_BUILD_LR_DOMAIN - given a mapping and a specification for the
- *                    - size of a new domain
- *                    - build and return a new LR domain
+/* _SX_BUILD_LR_DOMAIN - given a mapping and a specification for the
+ *                     - size of a new domain
+ *                     - build and return a new LR domain
  */
 
-static PM_set *SX_build_lr_domain(PM_set *hd, object *argl)
+static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
    {int i, nc, nd, ne, nde;
     int *maxes;
     char name[MAXLINE];
@@ -791,8 +793,8 @@ static PM_set *SX_build_lr_domain(PM_set *hd, object *argl)
     nde = hd->dimension_elem;
     ne  = SS_length(argl);
     if (ne != nd)
-       SS_error("DOMAIN DIMENSION MISMATCH - SX_BUILD_LR_DOMAIN",
-		argl);
+       SS_error_n(si, "DOMAIN DIMENSION MISMATCH - SX_BUILD_LR_DOMAIN",
+		  argl);
 
     ne = 2*nd;
 
@@ -850,7 +852,7 @@ PM_mapping *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl)
     *pargl = argl;
 
 /* build the return mapping */
-    fd = SX_build_lr_domain(hd, obj);
+    fd = _SX_build_lr_domain(si, hd, obj);
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
 
     PM_find_extrema(f->range);
@@ -887,7 +889,7 @@ PM_mapping *_SXI_interp_mapping(SS_psides *si, PM_mapping *h, object **pargl)
     *pargl = argl;
 
 /* build the return mapping */
-    fd = SX_build_lr_domain(hd, obj);
+    fd = _SX_build_lr_domain(si, hd, obj);
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, TRUE);
 
     PM_find_extrema(f->range);

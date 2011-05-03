@@ -76,7 +76,7 @@ static object *_SS_exa_var(SS_psides *si, void *vr, int type)
 
 /* _SS_SET_VAR - set the value of VR to the value of VL */
 
-static object *_SS_set_var(void *vr, object *vl, int type)
+static object *_SS_set_var(SS_psides *si, void *vr, object *vl, int type)
    {int ok;
 
     ok = _SS_object_to_numtype_id(type, vr, 0, vl);
@@ -121,7 +121,7 @@ static object *_SS_set_var(void *vr, object *vl, int type)
 		*((char **) vr) = CSTRSAVE(bf);};}
 
 	else
-	   SS_error("OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};
+	   SS_error_n(si, "OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};
 
     return(vl);}
 
@@ -223,7 +223,7 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 
     else
        SS_error_n(si, "BAD VARIABLE TYPE - SX_INSTALL_VARIABLE",
-		SS_null);
+		  SS_null);
 
 /* GOTCHA: the type, typ, is wrong! var is an object * and typ should be
  *         replaced by SS_POBJECT_S if one wants to conform to the rules
@@ -254,7 +254,7 @@ static object *_SS_acc_var(SS_psides *si, C_procedure *cp,
 
     else
        {vl = SS_car(argl);
-        ret = _SS_set_var(ad.memaddr, vl, type);};
+        ret = _SS_set_var(si, ad.memaddr, vl, type);};
 
     return(ret);}
 

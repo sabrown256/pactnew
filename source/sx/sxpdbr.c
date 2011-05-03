@@ -11,13 +11,16 @@
 #include "sx_int.h"
 
 static void
- _SX_rd_indirection_list(object *obj, PDBfile *file, char **vr, char *type), 
- _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp),
- _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
+ _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
+			 char **vr, char *type),
+ _SX_rd_io_list(SS_psides *si, object *obj,
+		char *vr, long nitems, defstr *dp),
+ _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
 		  long nitems, char *type, dimdes *dims);
 
 syment
- *_SX_rd_data(PDBfile *file, char *name, syment *ep, SC_address *addr,
+ *_SX_rd_data(SS_psides *si, PDBfile *file,
+	      char *name, syment *ep, SC_address *addr,
 	      object *name_obj);
 
 /*--------------------------------------------------------------------------*/
@@ -28,19 +31,20 @@ syment
  *                  - return the number of items successfully read
  */
 
-void _SX_rd_tree_list(object *obj, PDBfile *file, char *vr, long nitems,
+void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
+		      char *vr, long nitems,
 		      char *type, dimdes *dims)
    {long i;
     char **lvr;
     char *dtype;
 
     if (!_PD_indirection(type))
-       _SX_rd_leaf_list(obj, file, vr, nitems, type, dims);
+       _SX_rd_leaf_list(si, obj, file, vr, nitems, type, dims);
     else
        {lvr = (char **) vr;
         dtype = PD_dereference(CSTRSAVE(type));
         for (i = 0L; i < nitems; i++, obj = SS_cdr(obj))
-            _SX_rd_indirection_list(SS_car(obj), file, &lvr[i], dtype);
+            _SX_rd_indirection_list(si, SS_car(obj), file, &lvr[i], dtype);
         CFREE(dtype);};
 
     return;}
@@ -53,7 +57,7 @@ void _SX_rd_tree_list(object *obj, PDBfile *file, char *vr, long nitems,
  *                         - read in the data
  */
 
-static void _SX_rd_indirection_list(object *obj, PDBfile *file,
+static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
 				    char **vr, char *type)
    {long bpi, nitems;
     char *pv;
@@ -65,13 +69,14 @@ static void _SX_rd_indirection_list(object *obj, PDBfile *file,
     else
        {bpi = _PD_lookup_size(type, file->host_chart);
         if (bpi == -1)
-           SS_error("CAN'T FIND NUMBER OF BYTES - _SX_RD_INDIRECTION_LIST",
-                    SS_null);
+           SS_error_n(si,
+		      "CAN'T FIND NUMBER OF BYTES - _SX_RD_INDIRECTION_LIST",
+		      SS_null);
 
 	pv = CMAKE_N(char, nitems*bpi);
         DEREF(vr) = pv;
 
-        _SX_rd_tree_list(obj, file, pv, nitems, type, (dimdes *) NULL);};
+        _SX_rd_tree_list(si, obj, file, pv, nitems, type, (dimdes *) NULL);};
 
     return;}
 
@@ -85,8 +90,8 @@ static void _SX_rd_indirection_list(object *obj, PDBfile *file,
  *                  - return the number of items successfully read
  */
 
-static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
-			     long nitems, char *type, dimdes *dims)
+static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
+			     char *vr, long nitems, char *type, dimdes *dims)
    {long i, sz;
     defstr *dp;
     memdes *desc, *mem_lst;
@@ -100,7 +105,7 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
  */
     dp = PD_inquire_host_type(file, type);
     if (dp == NULL)
-       SS_error("BAD TYPE - _SX_RD_LEAF_LIST", SS_null);
+       SS_error_n(si, "BAD TYPE - _SX_RD_LEAF_LIST", SS_null);
 
     else
        {mem_lst = dp->members;
@@ -108,7 +113,7 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
 	if (mem_lst == NULL)
 
 /* use dp->type to get past typedef's */
-	   _SX_rd_io_list(obj, vr, nitems, dp);
+	   _SX_rd_io_list(si, obj, vr, nitems, dp);
 
 /* for an array of structs write the indirects for each array element */
 	else
@@ -119,9 +124,10 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
 	       
 		 for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {PD_CAST_TYPE(ttype, desc, svr+desc->member_offs, svr,
-				   SS_error, "BAD CAST - _SX_RD_LEAF_LIST", obj1);
+				   SS_error, "BAD CAST - _SX_RD_LEAF_LIST",
+				   obj1);
 
-		      _SX_rd_tree_list(SS_car(obj1), file,
+		      _SX_rd_tree_list(si, SS_car(obj1), file,
 				       svr + desc->member_offs,
 				       desc->number, ttype,
 				       desc->dimensions);
@@ -137,12 +143,13 @@ static void _SX_rd_leaf_list(object *obj, PDBfile *file, char *vr,
  *                - otherwise, lookup the type, and display each member
  */
 
-static void _SX_rd_io_list(object *obj, char *vr, long nitems, defstr *dp)
+static void _SX_rd_io_list(SS_psides *si, object *obj,
+			   char *vr, long nitems, defstr *dp)
    {char *type;
 
     type = dp->type;
 
-    _SS_list_to_numtype(type, vr, nitems, obj);
+    _SS_list_to_numtype(si, type, vr, nitems, obj);
 
     return;}
 
@@ -200,7 +207,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
              SS_error_n(si, PD_err, name_obj);
         default :
              memset(PD_err, 0, MAXLINE);
-	     cp = _SX_rd_data(file, name, ep, &addr, name_obj);
+	     cp = _SX_rd_data(si, file, name, ep, &addr, name_obj);
         case ERR_FREE :
 	     break;};
 
@@ -241,7 +248,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
 
 /* _SX_RD_DATA - grab some data from the specified file */
 
-syment *_SX_rd_data(PDBfile *file, char *name, syment *ep,
+syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
 		    SC_address *addr, object *name_obj)
    {long n;
     char *type, *dtype;
@@ -256,7 +263,7 @@ syment *_SX_rd_data(PDBfile *file, char *name, syment *ep,
     if (!_PD_indirection(type))
 
        {if (!_PD_prim_typep(type, file->host_chart, PD_READ))
-	   SS_error("MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
+	   SS_error_n(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
 	if (file == SX_vif)
 	   addr->diskaddr = PD_entry_address(cp);
@@ -283,7 +290,7 @@ syment *_SX_rd_data(PDBfile *file, char *name, syment *ep,
        {dtype = PD_dereference(CSTRSAVE(type));
 
 	if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))
-	   SS_error("MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
+	   SS_error_n(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
 	if (file == SX_vif)
 	   {addr->diskaddr = PD_entry_address(cp);
