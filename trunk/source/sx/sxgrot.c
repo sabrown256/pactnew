@@ -60,7 +60,7 @@ int _SX_any_grotrianp(object *argl)
 
 /* SX_DRAW_GROTRIAN - Scheme level Grotrian plot control routine */
 
-object *SX_draw_grotrian(object *argl)
+object *SX_draw_grotrian(SS_psides *si, object *argl)
    {PG_device *dev;
     PG_graph *g;
 
@@ -72,10 +72,10 @@ object *SX_draw_grotrian(object *argl)
             0);
 
     if (dev == NULL)
-       SS_error("BAD DEVICE - SX_DRAW_GROTRIAN", argl);
+       SS_error_n(si, "BAD DEVICE - SX_DRAW_GROTRIAN", argl);
 
     if (!_SX_grotrian_graphp(g))
-       SS_error("GRAPH IS NOT GROTRIAN - SX_DRAW_GROTRIAN", argl);
+       SS_error_n(si, "GRAPH IS NOT GROTRIAN - SX_DRAW_GROTRIAN", argl);
 
     PG_grotrian_plot(dev, g);
 

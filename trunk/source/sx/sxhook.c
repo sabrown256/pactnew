@@ -13,6 +13,40 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SX_INS_MEM - replace member number IMEM with MEMBER
+ *             - IMEM is 0 based
+ */
+
+static void _SX_ins_mem(SS_psides *si, defstr *dp,
+			char *member, int imem, PDBfile *file)
+   {memdes *lst, *prev, *desc;
+    int i;
+
+    for (prev = NULL, lst = dp->members,  i = 0;
+         lst != NULL;
+         lst = lst->next, i++)
+        {if (i == imem)
+            {desc = _PD_mk_descriptor(member, file->default_offset);
+	     desc->member_offs = lst->member_offs;
+             if (prev == NULL)
+                dp->members = desc;
+             else
+                prev->next = desc;
+
+             desc->next = lst->next;
+             _PD_rl_descriptor(lst);
+
+             return;};
+
+         prev = lst;};
+
+    SS_error_n(si, "HASK_HOOK FAILED - _SX_INS_MEM", SS_null);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_HASH_HOOK - write hook for pdblib to handle hash tables
  *               - pdb_wr_hook
  */
@@ -22,6 +56,9 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
     int c;
     char new_mem[MAXLINE];
     memdes *md;
+    SS_psides *si;
+
+    si = SC_get_context(_SX_hash_hook);
 
     type = dp->type;
 
@@ -53,44 +90,11 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 	else
 	   strcpy(new_mem, "unknown val");
 
-        _SX_ins_mem(dp, new_mem, 1, file);};
+        _SX_ins_mem(si, dp, new_mem, 1, file);};
 
     md = dp->members;
 
     return(md);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SX_INS_MEM - replace member number "imem" with "member".
- *             - imem is 0 based.
- */
-
-void _SX_ins_mem(defstr *dp, char *member, int imem, PDBfile *file)
-   {memdes *lst, *prev, *desc;
-    int i;
-
-    for (prev = NULL, lst = dp->members,  i = 0;
-         lst != NULL;
-         lst = lst->next, i++)
-        {if (i == imem)
-            {desc = _PD_mk_descriptor(member, file->default_offset);
-	     desc->member_offs = lst->member_offs;
-             if (prev == NULL)
-                dp->members = desc;
-             else
-                prev->next = desc;
-
-             desc->next = lst->next;
-             _PD_rl_descriptor(lst);
-
-             return;};
-
-         prev = lst;};
-
-    SS_error("HASK_HOOK FAILED - _SX_INS_MEM", SS_null);
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

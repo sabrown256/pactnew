@@ -121,8 +121,8 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 	        {for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {member_offs = desc->member_offs;
 		      PD_CAST_TYPE(mtype, desc, svrin + member_offs, svrin,
-				   SS_error,
-				   "BAD CAST - _SX_COPY_LEAF", SS_null);
+				   SS_error, "BAD CAST - _SX_COPY_LEAF",
+				   SS_null);
 
 		      if (_PD_indirection(mtype))
 			 {dtype = PD_dereference(CSTRSAVE(mtype));

@@ -317,15 +317,15 @@ g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
  *                   - include closing the file
  */
 
-void _SX_rel_open_file(g_file *po)
+void _SX_rel_open_file(SS_psides *si, g_file *po)
    {PDBfile *file;
 
     file = po->file;
 
 /* close the file */
     if (!PD_close(file))
-       SS_error("CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
-                po->file_object);
+       SS_error_n(si, "CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
+		  po->file_object);
 
     _SX_rl_file(po);
 

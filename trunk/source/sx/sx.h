@@ -35,7 +35,7 @@
 
 /* SX_GET_FLOAT_FROM_LIST - extract a double from the list and cdr the list */
 
-#define SX_GET_FLOAT_FROM_LIST(x, argl, s)                                   \
+#define SX_GET_FLOAT_FROM_LIST(_si, x, argl, s)                              \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
     if (SS_integerp(obj))                                                    \
@@ -43,20 +43,20 @@
     else if (SS_floatp(obj))                                                 \
        x = SS_FLOAT_VALUE(obj);                                              \
     else                                                                     \
-       SS_error(s, obj);}
+       SS_error_n(_si, s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SX_GET_INTEGER_FROM_LIST - extract an int from the list and cdr the list */
 
-#define SX_GET_INTEGER_FROM_LIST(x, argl, s)                                 \
+#define SX_GET_INTEGER_FROM_LIST(_si, x, argl, s)                            \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
     if (SS_integerp(obj))                                                    \
        x = SS_INTEGER_VALUE(obj);                                            \
     else                                                                     \
-       SS_error(s, obj);}
+       SS_error_n(_si, s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -77,13 +77,13 @@
  *                         - and cdr the list
  */
 
-#define SX_GET_OBJECT_FROM_LIST(predicate, x, value, argl, s)                \
+#define SX_GET_OBJECT_FROM_LIST(_si, predicate, x, value, argl, s)           \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
     if (predicate)                                                           \
        x = (value);                                                          \
     else                                                                     \
-       SS_error(s, obj);}
+       SS_error_n(_si, s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -92,13 +92,13 @@
  *                        - and cdr the list
  */
 
-#define SX_GET_ARRAY_FROM_LIST(x, argl, s)                                   \
+#define SX_GET_ARRAY_FROM_LIST(_si, x, argl, s)                              \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
     if (SX_NUMERIC_ARRAYP(obj))                                              \
        x = NUMERIC_ARRAY_DATA(obj);                                          \
     else                                                                     \
-       SS_error(s, obj);}
+       SS_error_n(_si, s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -107,13 +107,13 @@
  *                        - and cdr the list
  */
 
-#define SX_GET_GRAPH_FROM_LIST(x, argl, s)                                   \
+#define SX_GET_GRAPH_FROM_LIST(_si, x, argl, s)                              \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
     if (SX_GRAPHP(obj))                                                      \
        x = SS_GET(PG_graph, obj);                                            \
     else                                                                     \
-       SS_error(s, obj);}
+       SS_error_n(_si, s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -122,13 +122,13 @@
  *                      - and cdr the list
  */
 
-#define SX_GET_SET_FROM_LIST(x, argl, s)                                     \
+#define SX_GET_SET_FROM_LIST(_si, x, argl, s)                                \
    {obj  = SS_car(argl);                                                     \
     argl = SS_cdr(argl);                                                     \
     if (SX_SETP(obj))                                                        \
        x = SS_GET(PM_set, obj);                                              \
     else                                                                     \
-       SS_error(s, obj);}
+       SS_error_n(_si, s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -138,7 +138,7 @@
  *                          - if item is a graph extract the mapping from it
  */
 
-#define SX_GET_MAPPING_FROM_LIST(pn, argl)                                   \
+#define SX_GET_MAPPING_FROM_LIST(_si, pn, argl)                              \
     {PG_graph *g;                                                            \
      object *obj;                                                            \
      obj  = SS_car(argl);                                                    \
@@ -149,8 +149,8 @@
      else if (SX_MAPPINGP(obj))                                              \
         pn = SS_GET(PM_mapping, obj);                                        \
      else                                                                    \
-        SS_error("BAD MAPPING OR GRAPH - SX_GET_MAPPING_FROM_LIST",          \
-                 obj);}
+        SS_error_n(si, "BAD MAPPING OR GRAPH - SX_GET_MAPPING_FROM_LIST",    \
+		   obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -717,7 +717,8 @@ extern char
 extern void
  SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb),
  SX_parse(SS_psides *si,
-	  object *(*replot)(SS_psides *si), char *(*reproc)(char *s),
+	  object *(*replot)(SS_psides *si),
+	  char *(*reproc)(SS_psides *si, char *s),
 	  object *strm),
  SX_init_device_vars(int idev, double xf, double yf, double wd, double hg),
  SX_install_global_vars(SS_psides *si);
@@ -745,7 +746,7 @@ extern object
 
 extern void
  SX_zero_curve(int i),
- SX_assign_next_id(int i, object *(*plt)(SS_psides *si)),
+ SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si)),
  SX_enlarge_dataset(SS_psides *si, PFVoid eval);
 
 extern int
@@ -764,7 +765,8 @@ extern int
 
 extern void
  SX_quit(int i),
- SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes),
+ SX_filter_coeff(SS_psides *si, double *yp, int n,
+		 C_array *arr, int ntimes),
  SX_install_global_funcs(SS_psides *si);
 
 extern object
@@ -784,7 +786,7 @@ extern void
 /* SXGROT.C declarations */
 
 extern object
- *SX_draw_grotrian(object *argl);
+ *SX_draw_grotrian(SS_psides *si, object *argl);
 
 
 /* SXHAND.C declarations */
@@ -935,8 +937,8 @@ extern object
  *SX_write_data(SS_psides *si, object *argl);
 
 extern void
- SX_cache_addpid(),
- SX_uncache_curve(curve *crv),
+ SX_cache_addpid(void),
+ SX_uncache_curve(SS_psides *si, curve *crv),
  SX_push_open_file(FILE *fp),
  SX_close_open_files(void);
 

@@ -222,8 +222,8 @@ extern object
 
 extern void
  _SX_args(SS_psides *si, object *obj, void *v, int type),
- _SX_get_menu(g_file *po),
- _SX_push_menu_item(g_file *po, char *name, char *type);
+ _SX_get_menu(SS_psides *si, g_file *po),
+ _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type);
 
 
 /* SXCRV.C declarations */
@@ -297,7 +297,6 @@ extern memdes
  *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp);
 
 extern void
- _SX_ins_mem(defstr *dp, char *member, int imem, PDBfile *File),
  _SX_init_hash_objects(SS_psides *si, PDBfile *file);
 
 
@@ -318,7 +317,7 @@ extern g_pdbdata
 
 extern void
  _SX_free_menu(g_file *po, int re),
- _SX_rel_open_file(g_file *po);
+ _SX_rel_open_file(SS_psides *si, g_file *po);
 
 
 /* SXPANW.C declarations */
@@ -345,9 +344,6 @@ extern object
  *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
 		      syment *ep, PDBfile *file),
  *_SX_make_dims_obj(SS_psides *si, dimdes *dims);
-
-extern dimdes
- *_SX_make_dims_dimdes(PDBfile *file, object *argl);
 
 extern syment
  *_SX_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
@@ -387,7 +383,7 @@ extern object
 /* SXPDBR.C declarations */
 
 extern void
- _SX_rd_tree_list(object *obj, PDBfile *file, char *vr,
+ _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
 		  long nitems, char *type, dimdes *dims);
 
 extern object
@@ -397,7 +393,7 @@ extern object
 /* SXPGS.C declarations */
 
 extern SX_menu_item
- *_SX_get_menu_item(g_file *po, int i);
+ *_SX_get_menu_item(SS_psides *si, g_file *po, int i);
 
 
 /* SXPML.C declarations */

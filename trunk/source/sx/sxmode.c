@@ -149,7 +149,7 @@ static void _SX_expand_prefix(char *s, int nc)
  *               - the buffer
  */
 
-static char *_SX_reproc_in(char *line)
+static char *_SX_reproc_in(SS_psides *si, char *line)
    {char *rv;
 
     if (!SX_split_command(_SX.command, line))
@@ -157,7 +157,7 @@ static char *_SX_reproc_in(char *line)
 
     else
        {if (!SX_expand_expr(_SX.command))
-           SS_error("SYNTAX ERROR - _SX_REPROC_IN", SS_null);
+           SS_error_n(si, "SYNTAX ERROR - _SX_REPROC_IN", SS_null);
 
         _SX_expand_prefix(_SX.command, MAXLINE);
 

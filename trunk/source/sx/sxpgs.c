@@ -262,7 +262,7 @@ static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
 
 /* _SX_GET_MENU_ITEM - return the Ith menu item from PO */
 
-SX_menu_item *_SX_get_menu_item(g_file *po, int i)
+SX_menu_item *_SX_get_menu_item(SS_psides *si, g_file *po, int i)
    {int n;
     SX_menu_item *mi;
 
@@ -271,7 +271,7 @@ SX_menu_item *_SX_get_menu_item(g_file *po, int i)
     n = SC_array_get_n(po->menu_lst);
     if ((0 < i) && (i <= n))
        {if (po->menu_lst->array == NULL)
-	   _SX_get_menu(po);
+	   _SX_get_menu(si, po);
 
 	mi = SC_array_get(po->menu_lst, i-1);};
 
@@ -309,7 +309,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
 
     if (SS_integerp(obj))
        {i    = SS_INTEGER_VALUE(obj);
-	mi   = _SX_get_menu_item(po, i);
+	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        {argl = SS_cdr(argl);
@@ -441,9 +441,9 @@ static object *_SXI_menu_item_type(SS_psides *si, object *argl)
             SC_INT_I, &indx,
             0);
 
-    _SX_get_menu(po);
+    _SX_get_menu(si, po);
 
-    mi = _SX_get_menu_item(po, indx);
+    mi = _SX_get_menu_item(si, po, indx);
     if (mi == NULL)
        rv = SS_null;
 
@@ -472,7 +472,7 @@ static object *_SXI_get_text_image_name(SS_psides *si, object *argl)
     argl = SS_car(argl);
     if (SS_integerp(argl))
        {i    = SS_INTEGER_VALUE(argl);
-	mi   = _SX_get_menu_item(po, i);
+	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        name = CSTRSAVE(SS_get_string(argl));
@@ -503,7 +503,7 @@ static object *_SXI_get_text_mapping_name(SS_psides *si, object *argl)
     argl = SS_car(argl);
     if (SS_integerp(argl))
        {i    = SS_INTEGER_VALUE(argl);
-	mi   = _SX_get_menu_item(po, i);
+	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        name = CSTRSAVE(SS_get_string(argl));
@@ -546,7 +546,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
     obj = SS_car(argl);
     if (SS_integerp(obj))
        {i    = SS_INTEGER_VALUE(obj);
-	mi   = _SX_get_menu_item(po, i);
+	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        {argl = SS_cdr(argl);
@@ -660,7 +660,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
        SS_error_n(si, "BAD ARGUMENT - _SXI_GRAPH_PDBCURVE", argl);
 
     else
-       {_SX_get_menu(po);
+       {_SX_get_menu(si, po);
 	for (i = 0; TRUE; i++)
 	    {name = SC_dsnprintf(MAXLINE, "curve%04d", i);
 	     if (PD_inquire_entry(file, name, TRUE, NULL) == NULL)
@@ -671,7 +671,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
 			 *(double **) f->range->elements, i);
 
 /* add to menu */
-	_SX_push_menu_item(po, name, "PG_curve");};
+	_SX_push_menu_item(si, po, name, "PG_curve");};
 
     return(SS_f);}
 
@@ -710,7 +710,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     if (f == NULL)
        SS_error_n(si, "BAD ARGUMENT - _SXI_IMAGE_PDBDATA", argl);
 
-    _SX_get_menu(file);
+    _SX_get_menu(si, file);
     for (i = 0; TRUE; i++)
         {name = SC_dsnprintf(FALSE, "Image%ld", i);
          if (PD_inquire_entry(strm, name, TRUE, NULL) == NULL)
@@ -719,7 +719,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     ret = SX_pdbdata_handler(si, strm, name, "PG_image *", &f , TRUE);
 
 /* add to menu */
-    _SX_push_menu_item(file, name, "PG_image *");
+    _SX_push_menu_item(si, file, name, "PG_image *");
 
     return(ret);}
 
@@ -908,7 +908,7 @@ object *SX_get_ref_map(SS_psides *si, g_file *po, int indx, char *dtype)
 
     ret = SS_null;
 
-    mi = _SX_get_menu_item(po, indx-1);
+    mi = _SX_get_menu_item(si, po, indx-1);
     if (mi != NULL)
        {type = mi->type[3];
 	switch (type)
@@ -1343,7 +1343,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
     dev = NULL;
 
     if (SS_consp(argl))
-       SX_GET_OBJECT_FROM_LIST(SX_DEVICEP(obj), dev,
+       SX_GET_OBJECT_FROM_LIST(si, SX_DEVICEP(obj), dev,
                                SS_GET(PG_device, obj),
                                argl, "BAD DEVICE - _SXI_DRAW_DOMAIN");
 
@@ -1445,7 +1445,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     dev = NULL;
 
     if (SS_consp(argl))
-       SX_GET_OBJECT_FROM_LIST(SX_DEVICEP(obj), dev,
+       SX_GET_OBJECT_FROM_LIST(si, SX_DEVICEP(obj), dev,
                                SS_GET(PG_device, obj),
                                argl, "BAD DEVICE - _SXI_DRAW_PLOT");
 
@@ -1493,7 +1493,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
     info       = (pcons *) data->info;
 
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SS_integerp(obj), apty,
+       {SX_GET_OBJECT_FROM_LIST(si, SS_integerp(obj), apty,
                                 SS_INTEGER_VALUE(obj),
                                 argl, "BAD PLOT TYPE - _SXI_DRAW_PLOT");
 
@@ -1518,7 +1518,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 		     case PLOT_HISTOGRAM :
 		          hsts = PG_ptr_attr_glb("hist-start");
 		          if (SS_consp(argl))
-			     {SX_GET_INTEGER_FROM_LIST(*hsts, argl,
+			     {SX_GET_INTEGER_FROM_LIST(si, *hsts, argl,
 						       "BAD HISTOGRAM OPTION - _SXI_DRAW_PLOT");};
 			  _SX_attach_rendering_1d(data, PLOT_HISTOGRAM, CARTESIAN_2D, *hsts);
 			  break;
@@ -1569,7 +1569,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 			     {int *nlev;
 
 			      nlev = PG_ptr_attr_glb("contour-n-levels");
-			      SX_GET_OBJECT_FROM_LIST(SS_integerp(obj),
+			      SX_GET_OBJECT_FROM_LIST(si, SS_integerp(obj),
 						      *nlev,
 						      SS_INTEGER_VALUE(obj),
 						      argl,

@@ -228,7 +228,7 @@ static object *_SS_bin_fix(SS_psides *si, long ni,
     idf = ((op == PM_fdivide) || (op == HYPOT)) ? SC_FLOAT_I : SC_INT_I;
 
     v = CMAKE_N(double, ni);
-    _SS_list_to_numtype_id(SC_DOUBLE_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, SC_DOUBLE_I, v, ni, argl);
 
     if (ni < 2)
        {ident = ((op != PM_fplus) && (op != PM_fminus));
@@ -265,7 +265,7 @@ static object *_SS_bin_float(SS_psides *si, long ni,
     object *acc;
 
     v = CMAKE_N(double, ni);
-    _SS_list_to_numtype_id(SC_DOUBLE_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, SC_DOUBLE_I, v, ni, argl);
 
     if (ni < 2)
        {ident = ((op != PM_fplus) && (op != PM_fminus));
@@ -299,7 +299,7 @@ static object *_SS_bin_complex(SS_psides *si, long ni,
     object *acc;
 
     v = CMAKE_N(double _Complex, ni);
-    _SS_list_to_numtype_id(SC_DOUBLE_COMPLEX_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, SC_DOUBLE_COMPLEX_I, v, ni, argl);
 
     if (ni < 2)
        {ident = ((op != PM_plus_cc) && (op != PM_minus_cc));
@@ -333,7 +333,7 @@ static object *_SS_bin_quaternion(SS_psides *si, long ni,
     object *acc;
 
     v = CMAKE_N(quaternion, ni);
-    _SS_list_to_numtype_id(SC_QUATERNION_I, v, ni, argl);
+    _SS_list_to_numtype_id(si, SC_QUATERNION_I, v, ni, argl);
 
     accv.i = 0;
     accv.j = 0;

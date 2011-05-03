@@ -283,12 +283,13 @@ static object *_SXI_shift_domain(SS_psides *si, object *argl)
 
     ret = SS_null;
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SX_MAPPINGP(obj), set, MAPPING_DOMAIN(obj),
+       {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set,
+				MAPPING_DOMAIN(obj),
                                 argl, "BAD MAPPING - _SXI_SHIFT_DOMAIN");
         SS_Assign(ret, obj);};
 
     if (SS_consp(argl))
-       {SX_GET_FLOAT_FROM_LIST(val, argl,
+       {SX_GET_FLOAT_FROM_LIST(si, val, argl,
                                "BAD FLOATING POINT VALUE - _SXI_SHIFT_DOMAIN");}
 
     else
@@ -313,12 +314,12 @@ static object *_SXI_shift_range(SS_psides *si, object *argl)
 
     ret = SS_null;
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SX_MAPPINGP(obj), set, MAPPING_RANGE(obj),
+       {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set, MAPPING_RANGE(obj),
                                 argl, "BAD MAPPING - _SXI_SHIFT_RANGE");
         SS_Assign(ret, obj);};
 
     if (SS_consp(argl))
-       {SX_GET_FLOAT_FROM_LIST(val, argl,
+       {SX_GET_FLOAT_FROM_LIST(si, val, argl,
                                "BAD FLOATING POINT VALUE - _SXI_SHIFT_RANGE");}
 
     else
@@ -365,12 +366,13 @@ static object *_SXI_scale_domain(SS_psides *si, object *argl)
 
     ret = SS_null;
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SX_MAPPINGP(obj), set, MAPPING_DOMAIN(obj),
+       {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set,
+				MAPPING_DOMAIN(obj),
                                 argl, "BAD MAPPING - _SXI_SCALE_DOMAIN");
         SS_Assign(ret, obj);};
 
     if (SS_consp(argl))
-       {SX_GET_FLOAT_FROM_LIST(val, argl,
+       {SX_GET_FLOAT_FROM_LIST(si, val, argl,
                                "BAD FLOATING POINT VALUE - _SXI_SCALE_DOMAIN");}
     else
        SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SCALE_DOMAIN", argl);
@@ -394,12 +396,12 @@ static object *_SXI_scale_range(SS_psides *si, object *argl)
 
     ret = SS_null;
     if (SS_consp(argl))
-       {SX_GET_OBJECT_FROM_LIST(SX_MAPPINGP(obj), set, MAPPING_RANGE(obj),
+       {SX_GET_OBJECT_FROM_LIST(si, SX_MAPPINGP(obj), set, MAPPING_RANGE(obj),
                                 argl, "BAD MAPPING - _SXI_SCALE_RANGE");
         SS_Assign(ret, obj);};
 
     if (SS_consp(argl))
-       {SX_GET_FLOAT_FROM_LIST(val, argl,
+       {SX_GET_FLOAT_FROM_LIST(si, val, argl,
                                "BAD FLOATING POINT VALUE - _SXI_SCALE_RANGE");}
 
     else
@@ -722,7 +724,8 @@ static PM_mapping *_SXI_derivative(SS_psides *si, PM_mapping *h)
 
 /* SX_FILTER_COEFF - worker for coefficient based filters */
 
-void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
+void SX_filter_coeff(SS_psides *si, double *yp, int n,
+		     C_array *arr, int ntimes)
    {int i, ne, nc, nh, ne0, sid;
     char type[MAXLINE];
     double *coeff;
@@ -739,7 +742,7 @@ void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
         nh  = nc >> 1;
         ne0 = nc + nh*(3*nh + 1);
         if (ne != ne0)
-           SS_error("INCORRECT FILTER SIZE - _SX_FILTER_COEF", SS_null);
+           SS_error_n(si, "INCORRECT FILTER SIZE - _SX_FILTER_COEF", SS_null);
 
 	for (i = 0; i < ntimes; i++)
 	    PM_filter_coeff(yp, n, coeff + 1, nc);
@@ -747,7 +750,7 @@ void SX_filter_coeff(double *yp, int n, C_array *arr, int ntimes)
 	CFREE(coeff);}
 
     else
-       SS_error("BAD COEFFICIENT ARRAY - _SX_FILTER_COEF", SS_null);
+       SS_error_n(si, "BAD COEFFICIENT ARRAY - _SX_FILTER_COEF", SS_null);
 
     return;}
 
@@ -771,7 +774,7 @@ static PM_mapping *_SXI_filter_coef(SS_psides *si, PM_mapping *h,
 	    SC_INT_I, &ntimes,
 	    0);
 
-    SX_filter_coeff(x[1], n, arr, ntimes);
+    SX_filter_coeff(si, x[1], n, arr, ntimes);
 
     PM_find_extrema(h->range);
 
@@ -824,7 +827,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 			      SX_smooth_method);
 	    SS_error_n(si, bf, SS_null);};
 
-	SX_filter_coeff(x[1], n, arr, ntimes);};
+	SX_filter_coeff(si, x[1], n, arr, ntimes);};
 
     PM_find_extrema(h->range);
 

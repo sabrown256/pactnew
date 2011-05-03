@@ -159,7 +159,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
         idims    = CMAKE_N(long, nd + 1);
         idims[0] = nd/2;
         for (pd = idims + 1; !SS_nullobjp(dims); pd++)
-            SX_GET_INTEGER_FROM_LIST(*pd, dims,
+            SX_GET_INTEGER_FROM_LIST(si, *pd, dims,
                                      "BAD ARRAY DIMENSIONS - _SXI_SUB_ARRAY");};
 
 /* extract the region specifications */
@@ -172,7 +172,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
         ireg    = CMAKE_N(long, nr + 1);
         ireg[0] = nr/2;
         for (pr = ireg + 1; !SS_nullobjp(reg); pr++)
-            SX_GET_INTEGER_FROM_LIST(*pr, reg,
+            SX_GET_INTEGER_FROM_LIST(si, *pr, reg,
                                      "BAD REGION - _SXI_SUB_ARRAY");};
 
 /* do some error checking */
@@ -591,7 +591,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
        {nd    = SS_length(shape);
         maxes = CMAKE_N(int, nd);
         for (pm = maxes; !SS_nullobjp(shape); )
-            SX_GET_INTEGER_FROM_LIST(*pm++, shape,
+            SX_GET_INTEGER_FROM_LIST(si, *pm++, shape,
                                      "BAD MESH INDEX - _SXI_MAKE_PML_SET");};
 
 /* extract the set elements */
@@ -658,7 +658,7 @@ static object *_SXI_make_cp_set(SS_psides *si, object *argl)
     sets = CMAKE_N(PM_set *, n);
 
     for (i = 0; i < n; i++)
-        {SX_GET_SET_FROM_LIST(sets[i], argl,
+        {SX_GET_SET_FROM_LIST(si, sets[i], argl,
 			      "ARGUMENT NOT SET - _SXI_MAKE_CP_SET");};
 
     name = SC_dsnprintf(FALSE, "CP %d", n);
@@ -917,7 +917,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
        SS_error_n(si, "BAD ARGUMENT - _SXI_MAPPING_PDBDATA", argl);
 
     if (mn == NULL)
-       {_SX_get_menu(po);
+       {_SX_get_menu(si, po);
         for (i = 0; TRUE; i++)
             {name = SC_dsnprintf(FALSE, "Mapping%ld", i);
              if (PD_inquire_entry(file, name, TRUE, NULL) == NULL)
@@ -938,7 +938,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     ret = SX_pdbdata_handler(si, file, name, "PM_mapping *", &f , TRUE);
 
 /* add to menu */
-    _SX_push_menu_item(po, name, "PM_mapping *");
+    _SX_push_menu_item(si, po, name, "PM_mapping *");
 
     return(ret);}
 
@@ -975,7 +975,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
     obj = SS_car(argl);
     if (SS_integerp(obj))
        {i    = SS_INTEGER_VALUE(obj);
-	mi   = _SX_get_menu_item(po, i);
+	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
        {argl = SS_cdr(argl);
@@ -1118,7 +1118,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
        {nd    = SS_length(shape);
         maxes = CMAKE_N(int, nd);
         for (pm = maxes; !SS_nullobjp(shape); )
-            SX_GET_INTEGER_FROM_LIST(*pm++, shape,
+            SX_GET_INTEGER_FROM_LIST(si, *pm++, shape,
                                      "BAD MESH INDEX - _SXI_ARRAYS_SET");};
 
 /* each component is a list of arrays */
@@ -1149,7 +1149,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
          elem[j] = pe;
          lst = SS_car(components);
          for (i = 0; i < n; i++)
-             {SX_GET_ARRAY_FROM_LIST(data, lst,
+             {SX_GET_ARRAY_FROM_LIST(si, data, lst,
                                      "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
 
               SC_convert_id(SC_DOUBLE_I, pe, 0, 1,

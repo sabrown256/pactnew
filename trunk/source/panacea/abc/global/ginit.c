@@ -361,37 +361,37 @@ void B_init(void)
 
     SX_init(CODE, VERSION);
 
-    SS_install("def-cc-vars",
+    SS_install(si, "def-cc-vars",
                "Define compiled variables to interpreter",
 	       SS_zargs,
 	       B_variables, SS_PR_PROC);
 
-    SS_install("plot-var",
+    SS_install(si, "plot-var",
                "Plots the given variables",
 	       SS_nargs,
 	       LR_var_plot, SS_PR_PROC);
 
-    SS_install("files",
+    SS_install(si, "files",
                "Return a list of files: state, pp, PVA, ascii",
 	       SS_zargs,
 	       B_files, SS_PR_PROC);
 
-    SS_install("time-data",
+    SS_install(si, "time-data",
                "Return a list with t, dt, and cycle",
 	       SS_zargs,
 	       LR_get_time_data, SS_PR_PROC);
 
-    SS_install("mesh-data",
+    SS_install(si, "mesh-data",
                "Return a list with N_zones, frz, lrz, frn, lrn, and optionally kmax and lmax",
 	       SS_zargs,
 	       LR_get_mesh_data, SS_PR_PROC);
 
-    SS_install("domain",
+    SS_install(si, "domain",
                "Define a domain set on which to plot appropriate variables",
 	       SS_nargs,
 	       LR_def_domain, SS_UR_MACRO);
 
-    SS_install("domain*",
+    SS_install(si, "domain*",
                "Define a domain set on which to plot appropriate variables",
 	       SS_nargs,
 	       LR_def_domain, SS_PR_PROC);

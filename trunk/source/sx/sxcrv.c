@@ -195,7 +195,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 
 /* SX_ASSIGN_NEXT_ID - assign next available curve id  */
 
-void SX_assign_next_id(int i, object *(*plt)(SS_psides *si))
+void SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si))
    {int j;
 
     for (j = 0; j < SX_N_Curves; j++)
@@ -208,7 +208,9 @@ void SX_assign_next_id(int i, object *(*plt)(SS_psides *si))
 
     if (plt != NULL)
        {plt(NULL);
-	SS_error("ALL 26 CURVE ID'S IN USE - SX_ASSIGN_NEXT_ID", SS_null);};
+	SS_error_n(si,
+		   "ALL 26 CURVE ID'S IN USE - SX_ASSIGN_NEXT_ID",
+		   SS_null);};
 
     return;}
         
@@ -387,7 +389,7 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
 
     i = SX_next_space(si);
     SX_zero_curve(i);
-    SX_assign_next_id(i, plt);
+    SX_assign_next_id(si, i, plt);
 
     SX_dataset[i].text     = CSTRSAVE(label);
     SX_dataset[i].modified = FALSE;

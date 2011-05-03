@@ -336,7 +336,7 @@ object *_SXI_menu(SS_psides *si, object *argl)
     if (strcmp(po->type, PDBFILE_S) != 0)
        return(ret);
 
-    _SX_get_menu(po);
+    _SX_get_menu(si, po);
 
     if (type != NULL)
        ret = _SX_list_vobjects(si, patt, po, type[0]);
@@ -374,7 +374,7 @@ static void _SX_sort_lists(SX_menu_item *a, int n)
  *              - in the current directory of the given file
  */
 
-void _SX_get_menu(g_file *po)
+void _SX_get_menu(SS_psides *si, g_file *po)
    {int i, n;
     char *dir, **names;
     PDBfile *file;
@@ -394,18 +394,18 @@ void _SX_get_menu(g_file *po)
 
     names = PD_ls(file, dir, "PM_mapping *", &n);
     for (i = 0; i < n; i++)
-        _SX_push_menu_item(po, names[i], SX_MAPPING_S);
+        _SX_push_menu_item(si, po, names[i], SX_MAPPING_S);
     CFREE(names);
 
     names = PD_ls(file, dir, "PG_image *", &n);
     for (i = 0; i < n; i++)
-        _SX_push_menu_item(po, names[i], SX_IMAGE_S);
+        _SX_push_menu_item(si, po, names[i], SX_IMAGE_S);
     CFREE(names);
 
     names = PD_ls(file, dir, SC_CHAR_S, &n);
     for (i = 0; i < n; i++)
         if (SC_regx_match(names[i], "curve????"))
-	   _SX_push_menu_item(po, names[i], SX_CURVE_S);
+	   _SX_push_menu_item(si, po, names[i], SX_CURVE_S);
     CFREE(names);
 
     n      = SC_array_get_n(po->menu_lst);
@@ -425,7 +425,7 @@ void _SX_get_menu(g_file *po)
 
 /* _SX_PUSH_MENU_ITEM - add the given symbol table entry to the file menu */
 
-void _SX_push_menu_item(g_file *po, char *name, char *type)
+void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
    {char s[MAXLINE];
     char *var, *lb;
     PDBfile *file;
@@ -442,7 +442,8 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
     if (strcmp(type, SX_MAPPING_S) == 0)
        {var = SC_dsnprintf(FALSE, "%s[%d].name", s, file->default_offset);
         if (!PD_read(file, var, &lb))
- 	   SS_error("FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM", SS_null);
+ 	   SS_error_n(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
+		      SS_null);
 
 	mitem.label = CSTRSAVE(lb);
 
@@ -453,13 +454,13 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
        {char *u, t[MAXLINE], *pt;
 
         if (!PD_read(file, s, t))
-           SS_error("FAILED TO READ CURVE HEADER - _SX_PUSH_MENU_ITEM",
-		    SS_null);
+           SS_error_n(si, "FAILED TO READ CURVE HEADER - _SX_PUSH_MENU_ITEM",
+		      SS_null);
 
 /* extract the name of the label variable */
         lb = SC_strtok(t, "|", pt);
         if (lb == NULL)
-           SS_error("BAD CURVE HEADER - _SX_PUSH_MENU_ITEM", SS_null);
+           SS_error_n(si, "BAD CURVE HEADER - _SX_PUSH_MENU_ITEM", SS_null);
 
 /* get the label */
         else if (PD_has_directories(file))
@@ -470,7 +471,8 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
            strcpy(s, lb);
 
         if (!PD_read(file, s, t))
-           SS_error("FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM", SS_null);
+           SS_error_n(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
+		      SS_null);
         mitem.label = CSTRSAVE(t);
 
 	SC_array_push(po->menu_lst, &mitem);}
@@ -479,13 +481,14 @@ void _SX_push_menu_item(g_file *po, char *name, char *type)
     else if (strcmp(type, SX_IMAGE_S) == 0)
        {var = SC_dsnprintf(FALSE, "%s[%d].label", s, file->default_offset);
         if (!PD_read(file, var, &lb))
-           SS_error("FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM", SS_null);
+           SS_error_n(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
+		      SS_null);
 	mitem.label = CSTRSAVE(lb);
 
 	SC_array_push(po->menu_lst, &mitem);}
 
     else
-       SS_error("BAD OBJECT TYPE - _SX_PUSH_MENU_ITEM", SS_null);
+       SS_error_n(si, "BAD OBJECT TYPE - _SX_PUSH_MENU_ITEM", SS_null);
 
     return;}
 
@@ -550,7 +553,8 @@ static int _SX_no_argsp(object *obj)
  */
 
 void SX_parse(SS_psides *si,
-	      object *(*replot)(SS_psides *si), char *(*reproc)(char *s),
+	      object *(*replot)(SS_psides *si),
+	      char *(*reproc)(SS_psides *si, char *s),
 	      object *strm)
    {char *t, s[MAXLINE], line[MAXLINE], *ptr;
     
@@ -564,7 +568,7 @@ void SX_parse(SS_psides *si,
                 SS_PTR(strm) = SS_BUFFER(strm);}
             else
                {strcpy(line, ptr);
-                while ((t = (*reproc)(line)) != NULL)
+                while ((t = (*reproc)(si, line)) != NULL)
                   {strcpy(ptr, t);
                    SS_PTR(strm) = SS_BUFFER(strm);
                    SS_Assign(si->rdobj, SS_read(si, strm));

@@ -54,7 +54,7 @@ static object *UL_select(SS_psides *si, object *s)
     i   = SX_get_crv_index_i(ret);
 
 /* fetch the curve data out of the cache wherever and however it is done */
-    SX_uncache_curve(&SX_dataset[i]);
+    SX_uncache_curve(si, &SX_dataset[i]);
 
     return(ret);}
 
@@ -1463,7 +1463,7 @@ static object *_ULI_filter_coef(SS_psides *si, int l, object *argl)
 	    SC_INT_I, &ntimes,
 	    0);
 
-    SX_filter_coeff(SX_dataset[l].x[1], SX_dataset[l].n, arr, ntimes);
+    SX_filter_coeff(si, SX_dataset[l].x[1], SX_dataset[l].n, arr, ntimes);
 
     UL_lmt(SX_dataset[l].x[1], SX_dataset[l].n,
 	   &SX_dataset[l].wc[2], &SX_dataset[l].wc[3]);
@@ -1546,7 +1546,8 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
 			      SX_smooth_method);
 	    SS_error_n(si, bf, SS_null);};
 
-	SX_filter_coeff(SX_dataset[l].x[1], SX_dataset[l].n, arr, ntimes);};
+	SX_filter_coeff(si, SX_dataset[l].x[1], SX_dataset[l].n,
+			arr, ntimes);};
 
     UL_lmt(SX_dataset[l].x[0], n, &SX_dataset[l].wc[0], &SX_dataset[l].wc[1]);
     UL_lmt(SX_dataset[l].x[1], n, &SX_dataset[l].wc[2], &SX_dataset[l].wc[3]);

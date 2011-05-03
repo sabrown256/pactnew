@@ -148,7 +148,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
 
     if (strcmp(fname, "#t") == 0)
        {for (po = SX_file_list; po != NULL; po = po->next)
-            {_SX_get_menu(po);
+            {_SX_get_menu(si, po);
 
              ret = SX_get_ref_map(si, po, indx, dtype);
              if (!SS_nullobjp(ret))
@@ -159,7 +159,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
 
     else if ((strcmp(fname, "nil") == 0) || (strcmp(fname, "#f") == 0))
        {po = SX_gvif;
-        _SX_get_menu(po);
+        _SX_get_menu(si, po);
 
         ret = SX_get_ref_map(si, po, indx, dtype);
         if (!SS_nullobjp(ret))
@@ -173,7 +173,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
         if (po == NULL)
            return(SS_null);
 
-        _SX_get_menu(po);
+        _SX_get_menu(si, po);
 
         ret = SX_get_ref_map(si, po, indx, dtype);
         if (!SS_nullobjp(ret))
@@ -344,7 +344,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 		G_FILE, &po,
 		0);
 
-	_SX_get_menu(po);
+	_SX_get_menu(si, po);
 
 	n = SC_array_get_n(po->menu_lst);
         if (first <= last)

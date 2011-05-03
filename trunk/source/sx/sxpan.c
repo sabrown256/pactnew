@@ -501,27 +501,27 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
     vattr[4] = DYNAMIC;
     enough   = FALSE;
     while (!enough)
-       {SX_GET_INTEGER_FROM_LIST(at, argl,
+       {SX_GET_INTEGER_FROM_LIST(si, at, argl,
                                  "CAN'T GET ATTRIBUTE - _SXI_DEF_VAR");
         switch (at)
            {case SCOPE      :
-                 SX_GET_INTEGER_FROM_LIST(vattr[0], argl,
+                 SX_GET_INTEGER_FROM_LIST(si, vattr[0], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
             case CLASS      :
-                 SX_GET_INTEGER_FROM_LIST(vattr[1], argl,
+                 SX_GET_INTEGER_FROM_LIST(si, vattr[1], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
             case PERSIST    :
-                 SX_GET_INTEGER_FROM_LIST(vattr[2], argl,
+                 SX_GET_INTEGER_FROM_LIST(si, vattr[2], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
             case CENTER     :
-                 SX_GET_INTEGER_FROM_LIST(vattr[3], argl,
+                 SX_GET_INTEGER_FROM_LIST(si, vattr[3], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
             case ALLOCATION :
-                 SX_GET_INTEGER_FROM_LIST(vattr[4], argl,
+                 SX_GET_INTEGER_FROM_LIST(si, vattr[4], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
             case ATTRIBUTE  :
@@ -563,7 +563,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 /* get the units */
     nu = NULL;
     while (TRUE)
-       {SX_GET_INTEGER_FROM_LIST(dm, argl,
+       {SX_GET_INTEGER_FROM_LIST(si, dm, argl,
                                  "BAD UNIT - _SXI_DEF_VAR");
         if ((dm == PER) || (dm == UNITS))
            break;
@@ -579,7 +579,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
     du = NULL;
     if (dm != UNITS)
        while (TRUE)
-          {SX_GET_INTEGER_FROM_LIST(dm, argl,
+          {SX_GET_INTEGER_FROM_LIST(si, dm, argl,
                                     "BAD DENOMINATOR UNIT - _SXI_DEF_VAR");
            if (dm == UNITS)
               break;

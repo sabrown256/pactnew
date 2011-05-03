@@ -39,7 +39,7 @@ static char
  Ultra_Hdr[] = "ULTRA II - BINARY FILE";
 
 static void
- SX_cache_curve(curve *crv, SC_file_type type);
+ _SX_cache_curve(SS_psides *si, curve *crv, SC_file_type type);
 
 /*--------------------------------------------------------------------------*/
 
@@ -118,7 +118,7 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
  * about memory management and also to handle all curve sources the same
  * way
  */
-    SX_cache_curve(&SX_dataset[j], SC_ASCII);
+    _SX_cache_curve(si, &SX_dataset[j], SC_ASCII);
 
     _SX.dataptr  = 0;
     i            = _SX_next_number(si, TRUE);
@@ -171,16 +171,18 @@ static int SX_read_pdb_curve(PDBfile *fp, char *fname, char *cname,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_WRT_PDB_CURVE - write the specified curve out to the given file
- *                  - as the icurve'th curve in the file
+/* _SX_WRT_PDB_CURVE - write the specified curve out to the given file
+ *                   - as the icurve'th curve in the file
  */
 
-static void SX_wrt_pdb_curve(PDBfile *fp, curve *crv, int icurve)
+static void _SX_wrt_pdb_curve(SS_psides *si, PDBfile *fp,
+			      curve *crv, int icurve)
    {
 
     if (!PD_wrt_pdb_curve(fp, crv->text, crv->n, crv->x[0], crv->x[1], icurve))
        {PRINT(stdout, "%s\n", PD_err);
-        SS_error("CAN'T WRITE THE CURVE - WRT_PDB_CURVE", SS_null);};
+        SS_error_n(si, "CAN'T WRITE THE CURVE - _SX_WRT_PDB_CURVE",
+		   SS_null);};
 
     return;}
 
@@ -402,7 +404,7 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
 /* put this curve's data in a cache somewhere (let's us defer the question
  * about memory management) and also handle all curve sources the same way
  */
-        SX_cache_curve(&SX_dataset[j], SC_BINARY);
+        _SX_cache_curve(si, &SX_dataset[j], SC_BINARY);
 
         icurve++;
 
@@ -602,7 +604,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 /* put this curve's data in a cache somewhere (let's us defer the question
  * about memory management) and also handle all curve sources the same way
  */
-		 SX_cache_curve(&SX_dataset[j], SC_PDB);
+		 _SX_cache_curve(si, &SX_dataset[j], SC_PDB);
 
 		 k = _SX_next_number(si, TRUE);
 		 SX_number[k] = j;};};
@@ -1074,9 +1076,9 @@ object *SX_table_attr(SS_psides *si)
 
 /*--------------------------------------------------------------------------*/
 
-/* SX_WRT_PDB - write curves to a ULTRA PDB file */
+/* _SX_WRT_PDB - write curves to a ULTRA PDB file */
 
-static void SX_wrt_pdb(PDBfile *fp, object *argl)
+static void _SX_wrt_pdb(SS_psides *si, PDBfile *fp, object *argl)
    {int i, j, uncached;
     object *obj;
 
@@ -1092,12 +1094,12 @@ static void SX_wrt_pdb(PDBfile *fp, object *argl)
                 j = SX_number[i];
              if ((j != -1) && (SX_dataset[j].x[0] == NULL))
                 {uncached = TRUE;
-                 SX_uncache_curve(&SX_dataset[j]);};}
+                 SX_uncache_curve(si, &SX_dataset[j]);};}
          else
             j = SX_get_crv_index_i(obj);
 
          if (j >= 0)
-            SX_wrt_pdb_curve(fp, &SX_dataset[j], _SX.icw++);
+            _SX_wrt_pdb_curve(si, fp, &SX_dataset[j], _SX.icw++);
 
          if (uncached)
             {uncached = FALSE;
@@ -1112,16 +1114,16 @@ static void SX_wrt_pdb(PDBfile *fp, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_WRT_BIN - write curves to an ULTRA binary file
- *            - format for binary files:
- *            -        int i - length of id string
- *            -        id string
- *            -        int n - number of datapoints
- *            -        double n x's
- *            -        double n y's
+/* _SX_WRT_BIN - write curves to an ULTRA binary file
+ *             - format for binary files:
+ *             -        int i - length of id string
+ *             -        id string
+ *             -        int n - number of datapoints
+ *             -        double n x's
+ *             -        double n y's
  */
 
-static void SX_wrt_bin(FILE *fp, object *argl)
+static void _SX_wrt_bin(SS_psides *si, FILE *fp, object *argl)
    {int i, j, n, uncached, err;
     object *obj;
 
@@ -1137,7 +1139,7 @@ static void SX_wrt_bin(FILE *fp, object *argl)
                 j = SX_number[i];
              if ((j != -1) && (SX_dataset[j].x[0] == NULL))
                 {uncached = TRUE;
-                 SX_uncache_curve(&SX_dataset[j]);};}
+                 SX_uncache_curve(si, &SX_dataset[j]);};}
          else
             j = SX_get_crv_index_i(obj);
 
@@ -1165,9 +1167,9 @@ static void SX_wrt_bin(FILE *fp, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_WRT_TEXT - write curves to an ASCII file */
+/* _SX_WRT_TEXT - write curves to an ASCII file */
 
-static void SX_wrt_text(FILE *fp, object *argl)
+static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
    {int i, j, n, uncached;
     double *x, *y;
     object *obj;
@@ -1184,7 +1186,7 @@ static void SX_wrt_text(FILE *fp, object *argl)
                 j = SX_number[i];
              if ((j != -1) && (SX_dataset[j].x[0] == NULL))
                 {uncached = TRUE;
-                 SX_uncache_curve(&SX_dataset[j]);};}
+                 SX_uncache_curve(si, &SX_dataset[j]);};}
          else
             j = SX_get_crv_index_i(obj);
 
@@ -1278,8 +1280,9 @@ object *SX_write_data(SS_psides *si, object *argl)
 
     else
        {if (strcmp(type, mode) != 0)
-           SS_error_n(si, "FILE PREVIOUSLY OPENED WITH ANOTHER TYPE - SX_WRITE_DATA",
-		    fobj);};
+           SS_error_n(si,
+		      "FILE PREVIOUSLY OPENED WITH ANOTHER TYPE - SX_WRITE_DATA",
+		      fobj);};
 
 /* flatten out the curve list */
     frst = SS_car(argl);
@@ -1293,9 +1296,11 @@ object *SX_write_data(SS_psides *si, object *argl)
 /* check for request to write an ASCII file */
 	      fp = io_open(fname, "a");
 	      if (fp == NULL)
-                 SS_error_n(si, "CAN'T CREATE ASCII FILE - SX_WRITE_DATA", fobj);
+                 SS_error_n(si,
+			    "CAN'T CREATE ASCII FILE - SX_WRITE_DATA",
+			    fobj);
 
-	      SX_wrt_text(fp, argl);
+	      _SX_wrt_text(si, fp, argl);
 	      io_close(fp);};
 
 	     break;
@@ -1306,14 +1311,16 @@ object *SX_write_data(SS_psides *si, object *argl)
 /* check for request to write an ULTRA binary file */
 	      fp = io_open(fname, BINARY_MODE_APLUS);
 	      if (fp == NULL)
-                 SS_error_n(si, "CAN'T CREATE BINARY FILE - SX_WRITE_DATA", fobj);
+                 SS_error_n(si,
+			    "CAN'T CREATE BINARY FILE - SX_WRITE_DATA",
+			    fobj);
 
 /* if this is the first time with this file, put out the header */
 	      if (type == NULL)
 		 io_write(Ultra_Hdr, (size_t) sizeof(char),
 			  (size_t) (strlen(Ultra_Hdr) + 1), fp);
 
-	      SX_wrt_bin(fp, argl);
+	      _SX_wrt_bin(si, fp, argl);
 	      io_close(fp);};
 
 	     break;
@@ -1327,7 +1334,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 	      if (fp == NULL)
 		 SS_error_n(si, "CAN'T OPEN PDB FILE - SX_WRITE_DATA", fobj);
 
-	      SX_wrt_pdb(fp, argl);
+	      _SX_wrt_pdb(si, fp, argl);
 	      PD_close(fp);};
 
 	     break;};
@@ -1352,13 +1359,13 @@ void SX_cache_addpid()
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_CACHE_CURVE - figure out what/how to do with the curve data
- *                - in a uniform way for any curve source (ASCII, BINARY,
- *                - PDB) this will have to communicate with SX_SELECT when
- *                - the curves are called up
+/* _SX_CACHE_CURVE - figure out what/how to do with the curve data
+ *                 - in a uniform way for any curve source (ASCII, BINARY,
+ *                 - PDB) this will have to communicate with SX_SELECT when
+ *                 - the curves are called up
  */
 
-static void SX_cache_curve(curve *crv, SC_file_type type)
+static void _SX_cache_curve(SS_psides *si, curve *crv, SC_file_type type)
    {char bf[MAXLINE];
     pdb_info *ppi;
     FILE *fp;
@@ -1369,8 +1376,8 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
 	        {_SX.icc        = 0;
 		 _SX.cache_file = PD_create(_SX.cache_filename);
 		 if (_SX.cache_file == NULL)
-		    SS_error("CAN'T CREATE curves.a - SX_CACHE_CURVE",
-			     SS_null);
+		    SS_error_n(si, "CAN'T CREATE curves.a - _SX_CACHE_CURVE",
+			       SS_null);
 		 else
 		    {PD_close(_SX.cache_file);
 #ifdef LINUX
@@ -1381,8 +1388,9 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
 #endif
 		     _SX.cache_file = PD_open(_SX.cache_filename, "a");
 		     if (_SX.cache_file == NULL)
-		        SS_error("CAN'T OPEN curves.a - SX_CACHE_CURVE",
-				 SS_null);
+		        SS_error_n(si,
+				   "CAN'T OPEN curves.a - _SX_CACHE_CURVE",
+				   SS_null);
 		     else
 		        {fp = _SX.cache_file->stream;
 			 SX_push_open_file(fp);};};};
@@ -1396,7 +1404,7 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
 	     crv->file_info = (void *) ppi;
 	     crv->file_type = SC_PDB;
 
-	     SX_wrt_pdb_curve(_SX.cache_file, crv, _SX.icc++);
+	     _SX_wrt_pdb_curve(si, _SX.cache_file, crv, _SX.icc++);
 
         case SC_BINARY :
         case SC_PDB    :
@@ -1417,7 +1425,7 @@ static void SX_cache_curve(curve *crv, SC_file_type type)
  *                  - and connect it up to the curve
  */
 
-void SX_uncache_curve(curve *crv)
+void SX_uncache_curve(SS_psides *si, curve *crv)
    {int n;
     bin_info *pbi;
     pdb_info *ppi;
@@ -1443,8 +1451,8 @@ void SX_uncache_curve(curve *crv)
 	     file = ppi->file;
 	     if (SX_read_pdb_curve(file, (void *) NULL,
 				   ppi->curve_name, crv, X_AND_Y) == FALSE)
-	        SS_error("PDB READ FAILED - SX_UNCACHE-CURVE",
-			 SS_null);
+	        SS_error_n(si, "PDB READ FAILED - SX_UNCACHE-CURVE",
+			   SS_null);
 	     break;};
 
     return;}
