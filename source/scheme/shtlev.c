@@ -1182,7 +1182,7 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
        {for (i = 0; output[i] != NULL; i++)
             {SS_Assign(lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));};
 
-        SS_Assign(lst, SS_reverse(lst));
+        SS_Assign(lst, SS_reverse(si, lst));
 	SC_mark(lst, -1);
 
         SC_free_strings(output);}

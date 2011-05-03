@@ -308,7 +308,7 @@ static object *_SX_list_vobjects(SS_psides *si, char *patt,
 					   SS_mk_integer(si, i+1),
 					   ret));}};
 
-	SS_Assign(ret, SS_reverse(ret));};
+	SS_Assign(ret, SS_reverse(si, ret));};
 
     return(ret);}
 

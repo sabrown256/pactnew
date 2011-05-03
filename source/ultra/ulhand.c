@@ -262,7 +262,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
     tok1 = NULL;
     tok2 = NULL;
 
-    SS_Assign(argl, SS_reverse(argl));
+    SS_Assign(argl, SS_reverse(si, argl));
     tok2 = SS_car(argl);
     if (SS_numbp(tok2))
        {SS_Assign(argl, SS_cdr(argl));
@@ -278,7 +278,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
 	    tok2 = NULL;};}
     else
         tok2 = NULL;
-    SS_Assign(argl, SS_reverse(argl));
+    SS_Assign(argl, SS_reverse(si, argl));
 
     SX_prep_arg(si, argl);
 
@@ -369,7 +369,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
 
     SS_Assign(crvs, SS_null);
     SS_Assign(argl, SS_null);
-    SS_Assign(ret, SS_reverse(ret));
+    SS_Assign(ret, SS_reverse(si, ret));
 
     SX_prep_ret(ret);
 
@@ -726,7 +726,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 /* the first non-number in the arg list */
             else
                {if (!SS_nullobjp(ch))
-                   {s = SS_binary_homogeneous(si, cp, SS_reverse(ch));
+                   {s = SS_binary_homogeneous(si, cp, SS_reverse(si, ch));
                     if (SS_integerp(s))
                        value = (double) SS_INTEGER_VALUE(s);
                     else if (SS_floatp(s))
@@ -767,7 +767,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
                {if (SS_nullobjp(ch))
                    ch = SS_null;
                 else
-		   ch = SS_binary_homogeneous(si, cp, SS_reverse(ch));
+		   ch = SS_binary_homogeneous(si, cp, SS_reverse(si, ch));
 
 		return(ch);};};
 
@@ -889,14 +889,14 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
     fun = (PFDoubleRi) cp->proc[0];
         
     SX_prep_arg(si, argl);
-    argl = SS_reverse(argl);
+    argl = SS_reverse(si, argl);
     i    = -1;
     SS_args(si, argl,
             UL_CURVE_INDEX_I, &i,
             0);
 
     if (i < 0)
-       SS_error(si, "BAD LAST ARGUMENT - UL_BCXL", SS_reverse(argl));
+       SS_error(si, "BAD LAST ARGUMENT - UL_BCXL", SS_reverse(si, argl));
 
 /* set plot flag on so that for example (compose (lst)) causes replot */
     SX_plot_flag = TRUE;

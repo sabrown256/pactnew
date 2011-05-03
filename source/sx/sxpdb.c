@@ -736,7 +736,7 @@ static object *_SXI_get_io_info(SS_psides *si, object *arg)
 			    SS_mk_float(si, ns[i]));
 	     o = SS_mk_cons(si, c, o);};
 
-	o = SS_reverse(o);};
+	o = SS_reverse(si, o);};
 
     return(o);}
 
@@ -1218,7 +1218,7 @@ object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
 
          obj = SS_mk_cons(si, obj1, obj);};
 
-    o = SS_reverse(obj);
+    o = SS_reverse(si, obj);
 
     return(o);}
 
@@ -3142,7 +3142,7 @@ object *_SX_make_dims_obj(SS_psides *si, dimdes *dims)
 					SS_mk_integer(si, dims->index_max)),
 			     obj);
 
-	o = SS_reverse(obj);};
+	o = SS_reverse(si, obj);};
 
     return(o);}
 

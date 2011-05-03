@@ -284,7 +284,7 @@ static object *_UL_get_value(SS_psides *si, double *sp, double *vp,
              SS_Assign(ret, SS_mk_cons(si, SS_mk_float(si, y), ret));};};
 
     if (!SS_nullobjp(ret))
-       {SS_Assign(ret, SS_reverse(ret));
+       {SS_Assign(ret, SS_reverse(si, ret));
         SC_mark(ret, -1);}
     else
        ret = SS_f;
@@ -456,7 +456,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
     else
         {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_dataset[j].id, order);}
 
-    ret = SS_mk_cons(si, SS_reverse(ret),
+    ret = SS_mk_cons(si, SS_reverse(si, ret),
                      SX_mk_curve(si, SX_default_npts, p[0], p[1],
 				 lbl, NULL, UL_plot));
 

@@ -349,11 +349,13 @@ type_qualifier :
 
 struct_or_union_specifier :
     struct_or_union VARNAME '{' struct_declaration_list '}'
-      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, $1, $2, SS_reverse($4), LAST));
+      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, $1, $2,
+			      SS_reverse(SI, $4), LAST));
        DIAGNOSTIC($$, "struct-or-union VARNAME { struct-declaration-list }");}
 
   | struct_or_union '{' struct_declaration_list '}'
-      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, $1, SS_null, SS_reverse($3), LAST));
+      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, $1, SS_null,
+			      SS_reverse(SI, $3), LAST));
        DIAGNOSTIC($$, "struct-or-union { struct-declaration-list }");}
 
   | struct_or_union VARNAME
@@ -503,11 +505,13 @@ struct_declarator :
 
 enum_specifier :
     ENUM VARNAME '{' enumerator_list '}'
-      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, _SS_c_enum, $2, SS_reverse($4), LAST));
+      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, _SS_c_enum, $2,
+			      SS_reverse(SI, $4), LAST));
        DIAGNOSTIC($$, "enum_specifier : VARNAME { enumerator_list }");}
 
   | ENUM '{' enumerator_list '}'
-      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, _SS_c_enum, SS_null, SS_reverse($3), LAST));
+      {SS_GR_VAL(SS_eval_form(SI, _SS_c_decl, _SS_c_enum, SS_null,
+			      SS_reverse(SI, $3), LAST));
        DIAGNOSTIC($$, "enum_specifier : { enumerator_list }");}
 
   | ENUM VARNAME
@@ -600,7 +604,7 @@ direct_declarator :
   | direct_declarator '(' parameter_type_list ')'
       {object *args;
 
-       args = SS_reverse($3);
+       args = SS_reverse(SI, $3);
        if (SS_consp($1))
 	  {object *f;
 
@@ -617,7 +621,7 @@ direct_declarator :
   | direct_declarator '(' identifier_list ')'
       {object *args;
 
-       args = SS_reverse($3);
+       args = SS_reverse(SI, $3);
        if (SS_consp($1))
 	  {object *f;
 
@@ -752,11 +756,11 @@ initializer :
        DIAGNOSTIC($$, "assignment-expression");}
 
   | '{' initializer_list '}'
-      {SS_GR_VAL(SS_reverse($2));
+      {SS_GR_VAL(SS_reverse(SI, $2));
        DIAGNOSTIC($$, "{initializer-list}");}
 
   | '{' initializer_list ',' '}'
-      {SS_GR_VAL(SS_reverse($2));
+      {SS_GR_VAL(SS_reverse(SI, $2));
        DIAGNOSTIC($$, "{initializer-list ,}");}
   ;
 
@@ -908,7 +912,7 @@ expression_statement :
       {if (SS_consp($1) && (SS_consp(SS_CAR_MACRO($1))))
 	  {SS_GR_VAL(SS_mk_cons(SI, _SS_c_block,
 				SS_mk_cons(SI, SS_null,
-					   SS_reverse($1))));}
+					   SS_reverse(SI, $1))));}
        else
 	  {SS_GR_VAL(CAPTURE($1));};
        DIAGNOSTIC($$, "expression");}
@@ -1369,7 +1373,7 @@ postfix_expression :
       {SS_GR_VAL(SS_make_form(SI, _SS_c_aref, $1, $3, LAST));}
 
   | postfix_expression '(' argument_expression_list ')'
-      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse($3)));}
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse(SI, $3)));}
 
   | postfix_expression '(' ')'
       {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));}

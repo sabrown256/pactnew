@@ -1931,7 +1931,7 @@ static object *_SX_combine_polygons(SS_psides *si, object *argl,
 
 	PM_free_polygons(a, FALSE);
 
-	rv = SS_reverse(rv);};
+	rv = SS_reverse(si, rv);};
 
     return(rv);}
 

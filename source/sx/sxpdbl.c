@@ -19,7 +19,7 @@
 	for (_i = 0; _i < _n; _i++)                                          \
 	    _o = SS_mk_cons(si, _fnc(si, _d[_i]), _o);                       \
 	if (_o != SS_null)                                                   \
-	   _o = SS_lstvct(si, SS_reverse(_o));};}
+	   _o = SS_lstvct(si, SS_reverse(si, _o));};}
 
 object
  *_SX_make_list_indirection(SS_psides *si, PDBfile *file,
@@ -88,7 +88,7 @@ object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
 
     CFREE(dtype);
 
-    o = SS_reverse(obj);
+    o = SS_reverse(si, obj);
 
     return(o);}
 
@@ -136,11 +136,11 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
                                               desc->number, mtype);
                   obj1 = SS_mk_cons(si, obj2, obj1);};
 
-             obj1 = SS_reverse(obj1);
+             obj1 = SS_reverse(si, obj1);
 	     obj = SS_mk_cons(si, obj1, obj);};
 
         if (ni > 1L)
-           obj = SS_reverse(obj);};
+           obj = SS_reverse(si, obj);};
 
     return(obj);}
 

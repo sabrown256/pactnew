@@ -1179,7 +1179,7 @@ object *_SS_numtype_to_list_id(SS_psides *si, int id, void *p, long n)
        SS_error(si, "DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
 
     if (lst != SS_null)
-       lst = SS_reverse(lst);
+       lst = SS_reverse(si, lst);
 
     return(lst);}
 

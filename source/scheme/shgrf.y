@@ -293,7 +293,7 @@ declarator :
   | declarator '(' identifier_list ')'
       {object *args;
 
-       args = SS_reverse($3);
+       args = SS_reverse(SI, $3);
        if (SS_consp($1))
 	  {object *f;
 
@@ -388,7 +388,7 @@ expression_statement :
       {if (SS_consp($1) && (SS_consp(SS_CAR_MACRO($1))))
 	  {SS_GR_VAL(SS_mk_cons(SI, _SS_f_block,
 				SS_mk_cons(SI, SS_null,
-					   SS_reverse($1))));}
+					   SS_reverse(SI, $1))));}
        else
 	  {SS_GR_VAL(CAPTURE($1));};
        DIAGNOSTIC($$, "expression");}
@@ -402,14 +402,14 @@ expression_statement :
 compound_statement :
     declaration_list statement_list
       {SS_GR_VAL(SS_mk_cons(SI, _SS_f_block,
-			    SS_mk_cons(SI, SS_reverse($1),
-				       SS_reverse($2))));
+			    SS_mk_cons(SI, SS_reverse(SI, $1),
+				       SS_reverse(SI, $2))));
        DIAGNOSTIC($$, "{ declaration-list statement-list }");}
 
   | statement_list
       {SS_GR_VAL(SS_mk_cons(SI, _SS_f_block,
 			    SS_mk_cons(SI, SS_null,
-				       SS_reverse($1))));
+				       SS_reverse(SI, $1))));
        DIAGNOSTIC($$, "{ statement-list }");}
   ;
 
@@ -583,7 +583,7 @@ postfix_expression :
     primary_expression
 
   | postfix_expression '(' argument_expression_list ')'
-      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse($3)));}
+      {SS_GR_VAL(SS_mk_cons(SI, $1, SS_reverse(SI, $3)));}
 
   | postfix_expression '(' ')'
       {SS_GR_VAL(SS_mk_cons(SI, $1, SS_null));}
