@@ -17,7 +17,7 @@ set Root = $Here:h
 set Base = $Root:h
 set Base = $Base:h
 
-set System   = `$Base/scripts/cfgman use`
+set System   = `$Base/scripts/cfgman -d $Base/dev use`
 set PACTDir  = $Base/dev/$System
 set PACTBin  = $PACTDir/bin
 set PACTInc  = $PACTDir/include

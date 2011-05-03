@@ -29,33 +29,39 @@ int SC_send_signal(int pid, int sig)
  *             - use sigaction if at all possible
  *             - register context A with FNC so that it can
  *             - be looked up when FNC is called
+ *             - return the old context
  */
 
-PFSignal_handler SC_signal_n(int sig, PFSignal_handler fnc, void *a)
-   {PFSignal_handler rv;
+SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
+   {PFSignal_handler fo;
+    SC_contextdes rv;
+
+    rv.a = SC_get_context(fn);
 
 #ifdef USE_POSIX_SIGNALS
 
-    struct sigaction na, oa;
+    {struct sigaction na, oa;
      
-    rv = NULL;
+     fo = NULL;
 
-    if ((0 < sig) && (sig < SC_NSIG) &&
-	(sig != SIGKILL) && (sig != SIGSTOP))
-       {na.sa_flags   = SA_RESTART;
-	na.sa_handler = fnc;
-	sigemptyset(&na.sa_mask);
+     if ((0 < sig) && (sig < SC_NSIG) &&
+	 (sig != SIGKILL) && (sig != SIGSTOP))
+        {na.sa_flags   = SA_RESTART;
+	 na.sa_handler = fn;
+	 sigemptyset(&na.sa_mask);
 
-	if (sigaction(sig, &na, &oa) != -1)
-	   rv = oa.sa_handler;};
+	 if (sigaction(sig, &na, &oa) != -1)
+	    fo = oa.sa_handler;};}
 
 #else
 
-    rv = signal(sig, fnc);
+    fo = signal(sig, fn);
 
 #endif
 
-    SC_register_context(fnc, a);
+    rv.f = fo;
+
+    SC_register_context(fn, a);
 
     return(rv);}
 
@@ -71,11 +77,15 @@ PFSignal_handler SC_signal_n(int sig, PFSignal_handler fnc, void *a)
  *                    - taken to be signals that are to be blocked during
  *                    - the execution of FNC
  *                    - terminate the list with negative integer
+ *                    - return the old context
  */
 
-PFSignal_handler SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
-				    int flags, ...)
-   {PFSignal_handler rv;
+SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
+				 int flags, ...)
+   {PFSignal_handler fo;
+    SC_contextdes rv;
+
+    rv.a = SC_get_context(fn);
 
 #ifdef USE_POSIX_SIGNALS
 
@@ -83,19 +93,19 @@ PFSignal_handler SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
     struct sigaction na, oa;
     sigset_t *set;
 
-    rv = NULL;
+    fo = NULL;
 
     if ((0 < sig) && (sig < SC_NSIG) &&
 	(sig != SIGKILL) && (sig != SIGSTOP))
        {SC_MEM_INIT(struct sigaction, &oa);
 
 	if (sigaction(sig, NULL, &oa) == 0)
-	   rv = oa.sa_handler;
+	   fo = oa.sa_handler;
 
 /* do nothing if the handler is the same as what is already in place */
-	if (rv != fnc)
+	if (fo != fn)
 	   {na.sa_flags   = flags;
-	    na.sa_handler = fnc;
+	    na.sa_handler = fn;
 
 	    set = &na.sa_mask;
 	    sigemptyset(set);
@@ -114,11 +124,13 @@ PFSignal_handler SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
 
 #else
 
-    rv = signal(sig, fnc);
+    fo = signal(sig, fn);
 
 #endif
 
-    SC_register_context(fnc, a);
+    rv.f = fo;
+
+    SC_register_context(fn, a);
 
     return(rv);}
 
@@ -278,13 +290,14 @@ void dsigact(int sig)
  *                         - the signal SIG
  */
 
-PFSignal_handler SC_which_signal_handler(int sig)
-   {PFSignal_handler hnd;
+SC_contextdes SC_which_signal_handler(int sig)
+   {SC_contextdes rv;
 
-    hnd = SC_signal(sig, SIG_IGN);
-    SC_signal(sig, hnd);
+    rv = SC_signal_n(sig, SIG_IGN, NULL);
 
-    return(hnd);}
+    SC_signal_n(sig, rv.f, rv.a);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -375,7 +388,7 @@ char *SC_signal_name(int sig)
 void dsighnd(int sigmn, int sigmx)
    {int i;
     char *sn;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
 
     if (sigmn > sigmx)
        SC_SWAP_VALUE(int, sigmn, sigmx);
@@ -385,25 +398,25 @@ void dsighnd(int sigmn, int sigmx)
 
     for (i = sigmn; i <= sigmx; i++)
         {sn  = SC_signal_name(i);
-	 hnd = SC_signal(i, SIG_IGN);
-	 if (hnd != SIG_ERR)
-	    SC_signal(i, hnd);
+	 hnd = SC_signal_n(i, SIG_IGN, NULL);
+	 if (hnd.f != SIG_ERR)
+	    SC_signal_n(i, hnd.f, hnd.a);
 
-	 if (hnd == SIG_IGN)
+	 if (hnd.f == SIG_IGN)
 	    io_printf(stdout, "%12s(%2d) ignore     (SIG_IGN)\n", sn, i);
 
-	 else if (hnd == SIG_ERR)
+	 else if (hnd.f == SIG_ERR)
 	    io_printf(stdout, "%12s(%2d) error      (SIG_ERR)\n", sn, i);
 
-	 else if (hnd == SIG_DFL)
+	 else if (hnd.f == SIG_DFL)
 	    io_printf(stdout, "%12s(%2d) default    (SIG_DFL)\n", sn, i);
 
 	 else
 
 #if defined(AIX) || defined(SOLARIS)
-	    io_printf(stdout, "%12s(%2d) 0x%08p\n", sn, i, hnd);
+	    io_printf(stdout, "%12s(%2d) 0x%08p\n", sn, i, hnd.f);
 #else
-	    io_printf(stdout, "%12s(%2d) %08p\n", sn, i, hnd);
+	    io_printf(stdout, "%12s(%2d) %08p\n", sn, i, hnd.f);
 #endif
 
         };
@@ -419,7 +432,7 @@ void dsighnd(int sigmn, int sigmx)
 
 SC_sigstate *SC_save_signal_handlers(int sigmn, int sigmx)
    {int i;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
     SC_sigstate *ss;
 
     if (sigmn > sigmx)
@@ -439,12 +452,13 @@ SC_sigstate *SC_save_signal_handlers(int sigmn, int sigmx)
     ss->mn = sigmn;
     ss->mx = sigmx;
     for (i = 0; i < SC_NSIG; i++)
-	ss->hnd[i] = NULL;
+	{ss->hnd[i].f = NULL;
+	 ss->hnd[i].a = NULL;};
       
     for (i = sigmn; i <= sigmx; i++)
-        {hnd = SC_signal(i, SIG_IGN);
-	 if (hnd != SIG_ERR)
-	    SC_signal(i, hnd);
+        {hnd = SC_signal_n(i, SIG_IGN, NULL);
+	 if (hnd.f != SIG_ERR)
+	    SC_signal_n(i, hnd.f, hnd.a);
 
 	 ss->hnd[i] = hnd;};
 
@@ -457,14 +471,14 @@ SC_sigstate *SC_save_signal_handlers(int sigmn, int sigmx)
 
 void SC_restore_signal_handlers(SC_sigstate *ss, int rel)
    {int i, mn, mx;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
 
     mn = ss->mn;
     mx = ss->mx;
 
     for (i = mn; i <= mx; i++)
         {hnd = ss->hnd[i];
-	 SC_signal(i, hnd);};
+	 SC_signal_n(i, hnd.f, hnd.a);};
 
     if (rel == TRUE)
        {CFREE(ss);};
@@ -476,11 +490,11 @@ void SC_restore_signal_handlers(SC_sigstate *ss, int rel)
 
 /* SC_SET_SIGNAL_HANDLERS - restore all signal handlers from SS */
 
-void SC_set_signal_handlers(PFSignal_handler hnd, int mn, int mx)
+void SC_set_signal_handlers(PFSignal_handler f, void *a, int mn, int mx)
    {int i;
 
     for (i = mn; i <= mx; i++)
-        SC_signal(i, hnd);
+        SC_signal_n(i, f, a);
 
     return;}
 

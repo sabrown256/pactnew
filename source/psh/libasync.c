@@ -639,7 +639,7 @@ static void _timeout_error(int sig)
 /*--------------------------------------------------------------------------*/
 
 /* _JOB_TIMEOUT - process will timeout and call FNC in TO seconds if
- *              - a second call to SC_timeout isn't made with
+ *              - a second call to _job_timeout isn't made with
  *              - a value of TO = 0 before then
  */
 

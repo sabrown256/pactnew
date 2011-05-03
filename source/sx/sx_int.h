@@ -200,10 +200,6 @@ struct s_SX_state
     int table_n;
     char *table_name;
 
-/* SXPDBD.C */
-    int err_fpe;
-    JMP_BUF diff_err;
-
     out_device output_devices[N_OUTPUT_DEVICES];
     char command[MAXLINE];
     char line[MAX_BFSZ];

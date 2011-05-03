@@ -128,7 +128,7 @@ static void _SC_signal_server(int sig)
  */
 
 static void _SC_server_handler(int sig)
-   {PFSignal_handler si;
+   {SC_contextdes si;
     asyncstate *as;
     parstate *state;
 
@@ -137,7 +137,7 @@ static void _SC_server_handler(int sig)
     state = as->server;
 
     SC_setup_sig_handlers(_SC_server_handler, as, FALSE);
-    si = SC_signal(SC_SIGIO, SIG_IGN);
+    si = SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
 
     _SC_exec_printf(as,
 		    "EXEC SERVER: signal %s (%d) while doing %d\n",
@@ -159,7 +159,7 @@ static void _SC_server_handler(int sig)
 
     SC_setup_sig_handlers(_SC_server_handler, as, TRUE);
 
-    SC_signal(SC_SIGIO, si);
+    SC_signal_n(SC_SIGIO, si.f, si.a);
 
     return;}
 

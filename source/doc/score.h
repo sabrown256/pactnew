@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 04/06/2011
+MOD: 05/03/2011
 
 <CENTER>
 <P>
@@ -2071,8 +2071,8 @@ the application is responsible for releasing it with <tt>CFREE</tt>.
 <p>
 
 <pre>
-<I>C Binding: </I>void SC_init(char *msg, PFByte fnc, int sighand, PFByte sigfnc, int 
-bfhand, char *bf, int bfsize)
+<I>C Binding: </I>void SC_init(char *msg, PFByte fnc, int sighand, PFByte sigfnc,
+ void *sigctx, int bfhand, char *bf, int bfsize)
 <I>F77 Binding: </I>
 <I>SX Binding: </I>
 </pre>

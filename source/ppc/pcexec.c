@@ -334,12 +334,12 @@ int main(int argc, char **argv)
 /* trap the following signals to restore the terminal state */
 
 #ifdef UNIX
-    SC_signal(SIGSEGV, error_handler);
-    SC_signal(SIGABRT, error_handler);
-    SC_signal(SIGTERM, error_handler);
-    SC_signal(SIGQUIT, error_handler);
-    SC_signal(SIGILL, error_handler);
-    SC_signal(SIGINT, error_handler);
+    SC_signal_n(SIGSEGV, error_handler, NULL);
+    SC_signal_n(SIGABRT, error_handler, NULL);
+    SC_signal_n(SIGTERM, error_handler, NULL);
+    SC_signal_n(SIGQUIT, error_handler, NULL);
+    SC_signal_n(SIGILL, error_handler, NULL);
+    SC_signal_n(SIGINT, error_handler, NULL);
 #endif
 
     if (access_file)
@@ -361,7 +361,7 @@ int main(int argc, char **argv)
 	   PRINT(stdout, "\nRunning process: %s\n\n", argv[i]);
 
 /* set the alarm */
-        SC_timeout(to, error_handler);
+        SC_timeout(to, error_handler, NULL);
 
 	pp = PC_open(argv+i, NULL, mode);
 	if (pp == NULL)
@@ -371,12 +371,12 @@ int main(int argc, char **argv)
 	    error_handler(0);};
 
 /* reset the alarm */
-        SC_timeout(0, error_handler);
+        SC_timeout(0, error_handler, NULL);
 
 	SC_setbuf(stdout, NULL);
 
 /* set the alarm */
-        SC_timeout(to, error_handler);
+        SC_timeout(to, error_handler, NULL);
 
 	d.pp    = pp;
 	d.name  = argv[i];
@@ -389,7 +389,7 @@ int main(int argc, char **argv)
 	   ret = poll_mode(&d);
 
 /* reset the alarm */
-        SC_timeout(0, error_handler);
+        SC_timeout(0, error_handler, NULL);
 
 	if (!quiet)
 	   PRINT(stdout, "Process test %s ended\n\n", argv[i]);};

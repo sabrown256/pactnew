@@ -89,15 +89,17 @@ int _SC_reset_stdin(int wh)
  */
 
 static void _SC_signal_relay(int sig)
-   {
+   {PROCESS *pp;
 
     if (sig < 0)
        return;
 
-    if (SC_process_status(_SC.ex_pp) == SC_RUNNING)
-       SC_send_signal(_SC.ex_pp->id, sig);
+    pp = SC_get_context(_SC_signal_relay);
 
-    SC_signal(sig, _SC_signal_relay);
+    if (SC_process_status(pp) == SC_RUNNING)
+       SC_send_signal(pp->id, sig);
+
+    SC_signal_n(sig, _SC_signal_relay, pp);
 
     return;}
 
@@ -107,7 +109,9 @@ static void _SC_signal_relay(int sig)
 /* _SC_EX_INT_HND - special relay for SIGINT */
 
 static void _SC_ex_int_hnd(int sig)
-   {
+   {PROCESS *pp;
+
+    pp = SC_get_context(_SC_ex_int_hnd);
 
     SC_block_file(stdin);
 
@@ -115,7 +119,7 @@ static void _SC_ex_int_hnd(int sig)
 
     _SC_signal_relay(sig);
 
-    SC_signal(sig, _SC_ex_int_hnd);
+    SC_signal_n(sig, _SC_ex_int_hnd, pp);
 
     return;}
 
@@ -127,6 +131,9 @@ static void _SC_ex_int_hnd(int sig)
 static void _SC_ex_io_hnd(int sig)
    {int n;
     char bf[1024];
+    PROCESS *pp;
+
+    pp = SC_get_context(_SC_ex_io_hnd);
 
     n = SC_read_sigsafe(0, bf, 1024);
     if (n > 0)
@@ -143,20 +150,23 @@ static void _SC_ex_io_hnd(int sig)
  *                 - to the child
  */
 
-static void _SC_setup_relay(void)
+static void _SC_setup_relay(PROCESS *pp)
    {
 
-    SC_signal(SIGHUP,  _SC_signal_relay);
-    SC_signal(SIGINT,  _SC_signal_relay);
-    SC_signal(SIGQUIT, _SC_signal_relay);
+    SC_signal_n(SIGHUP,  _SC_signal_relay, pp);
+    SC_signal_n(SIGINT,  _SC_signal_relay, pp);
+    SC_signal_n(SIGQUIT, _SC_signal_relay, pp);
 #ifdef SIGIOT
-    SC_signal(SIGIOT,  _SC_signal_relay);
+    SC_signal_n(SIGIOT,  _SC_signal_relay, pp);
 #endif
-    SC_signal(SIGUSR1, _SC_signal_relay);
-    SC_signal(SIGUSR2, _SC_signal_relay);
-    SC_signal(SIGALRM, _SC_signal_relay);
-    SC_signal(SIGTERM, _SC_signal_relay);
-    SC_signal(SIGCONT, _SC_signal_relay);
+    SC_signal_n(SIGUSR1, _SC_signal_relay, pp);
+    SC_signal_n(SIGUSR2, _SC_signal_relay, pp);
+    SC_signal_n(SIGALRM, _SC_signal_relay, pp);
+    SC_signal_n(SIGTERM, _SC_signal_relay, pp);
+    SC_signal_n(SIGCONT, _SC_signal_relay, pp);
+
+    SC_signal_n(SIGINT,   _SC_ex_int_hnd, pp);
+    SC_signal_n(SC_SIGIO, _SC_ex_io_hnd, pp);
 
     return;}
 
@@ -454,6 +464,7 @@ int SC_exec_job(char **argv, char *mode, int flags,
 		PFFileCallback out, PFFileCallback orej)
    {int rv;
     SC_sigstate *ost;
+    PROCESS *pp;
 
     if (in == NULL)
        in = _SC_ex_trm_in;
@@ -471,34 +482,36 @@ int SC_exec_job(char **argv, char *mode, int flags,
 
     rv  = 0;
 
-    _SC_setup_relay();
-
-    SC_signal(SIGINT, _SC_ex_int_hnd);
-    SC_signal(SC_SIGIO, _SC_ex_io_hnd);
-
     SC_setbuf(stdout, NULL);
 
-    _SC.ex_pp = SC_open(argv, NULL, mode, NULL);
-    if (SC_process_alive(_SC.ex_pp))
+/* set handlers so that child gets them */
+    _SC_setup_relay(NULL);
+
+    pp = SC_open(argv, NULL, mode, NULL);
+
+/* set handlers with the process state */
+    _SC_setup_relay(pp);
+
+    if (SC_process_alive(pp))
        {
 
 /* set line at a time mode on input from the process */
         if (flags & 1)
-           SC_set_attr(_SC.ex_pp, SC_LINE, TRUE);
+           SC_set_attr(pp, SC_LINE, TRUE);
 
 /* set non-blocking mode on input from the process */
         if (flags & 2)
-           SC_set_attr(_SC.ex_pp, SC_NDELAY, TRUE);
+           SC_set_attr(pp, SC_NDELAY, TRUE);
 
 /* set asynchronous mode on input from the process */
         if (flags & 4)
-           SC_set_attr(_SC.ex_pp, SC_ASYNC, TRUE);
+           SC_set_attr(pp, SC_ASYNC, TRUE);
 
 	START_LOG;
 
-	rv = _SC_do_session(_SC.ex_pp, in, irej, out, orej);
+	rv = _SC_do_session(pp, in, irej, out, orej);
 
-	SC_close(_SC.ex_pp);
+	SC_close(pp);
 
 	END_LOG;}
 

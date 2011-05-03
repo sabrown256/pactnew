@@ -71,7 +71,7 @@
 
       (printf file "    SC_init(\"%s: Exit with error\", %s,\n"
 	      (up-case codename) term-hook)
-      (printf file "            TRUE, (PFSignal_handler) %s,\n"
+      (printf file "            TRUE, (PFSignal_handler) %s, NULL,\n"
 	      intr-handler-hook)
       (printf file "            TRUE, NULL, 0);\n")
       (printf file "\n")

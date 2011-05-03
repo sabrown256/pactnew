@@ -94,7 +94,7 @@ int main(int argc, char **argv)
     else
        argl = argv + 1;
 
-    SC_signal(SIGINT, error_handler);
+    SC_signal_n(SIGINT, error_handler, NULL);
 
     SC_setbuf(stdout, NULL);
 
@@ -110,7 +110,7 @@ int main(int argc, char **argv)
     PC_unblock(pp);
 
 /* set the alarm */
-    SC_timeout(to, error_handler);
+    SC_timeout(to, error_handler, NULL);
 
     while (TRUE)
        {while (PC_gets(s, MAXLINE, pp) != NULL)
@@ -136,7 +136,7 @@ int main(int argc, char **argv)
             break;};};
         
 /* reset the alarm */
-    SC_timeout(0, error_handler);
+    SC_timeout(0, error_handler, NULL);
 
     PC_block_file(stdin);
 

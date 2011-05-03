@@ -905,7 +905,7 @@ int main(argc, argv)
     SC_zero_space_n(0, -2);
 
     SC_init("PATHTS: Exit with error", NULL,
-            TRUE, NULL,
+            TRUE, NULL, NULL,
             TRUE, NULL, 0);
  
     debug_mode    = FALSE;

@@ -1624,21 +1624,21 @@ static void timeout_finpar(int sig)
 
 /* FIN_PARALLEL - do all parallel wrap ups */
 
-static void fin_parallel(int trm)
+static void fin_parallel(int sig)
    {int to;
 
     to = TIMEOUT_FIN_PARALLEL;
 
 /* set the alarm */
-    SC_timeout(to, timeout_finpar);
+    SC_timeout(to, timeout_finpar, NULL);
 
     if (strategy == 1)
        SC_fin_tpool();
 
-    PG_fin_parallel(trm);
+    PG_fin_parallel(sig);
 
 /* reset the alarm */
-    SC_timeout(0, timeout_finpar);
+    SC_timeout(0, timeout_finpar, NULL);
 
     return;}
 
@@ -1803,7 +1803,7 @@ int main(int c, char **v)
 			 break;};};};
 
 /* set the alarm */
-    SC_timeout(to, timeout_graphics);
+    SC_timeout(to, timeout_graphics, NULL);
 
     for (i = 0; i < nd; i++)
         {d = dev[i];
@@ -1812,7 +1812,7 @@ int main(int c, char **v)
 	    (*d)(n, color, debug_mode, nt, tst);};
 
 /* reset the alarm */
-    SC_timeout(0, timeout_graphics);
+    SC_timeout(0, timeout_graphics, NULL);
 
     fin_parallel(trm);
 

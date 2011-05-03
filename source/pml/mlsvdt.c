@@ -300,7 +300,7 @@ int main(int c, char **v)
     int tst[] = { TRUE, TRUE, TRUE };
     PFTFnc tf[] = { test_1, test_2, test_3 };
 
-    PM_enable_fpe(TRUE, catch_fpe);
+    PM_enable_fpe_n(TRUE, catch_fpe, NULL);
 
     nx = 5;
 

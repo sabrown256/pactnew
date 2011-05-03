@@ -13,7 +13,6 @@
 #include "scope_proc.h"
 
 typedef struct s_info info;
-typedef struct s_descriptor descriptor;
 
 struct s_info
    {int tc;
@@ -21,34 +20,21 @@ struct s_info
     int exit;
     long n_tries;
     long n_timeouts;
-    long n_failures;};
-
-struct s_descriptor
-   {PROCESS *pp;
-    info *facts;};
-
-static FILE
- *fp = NULL;
-
-static PROCESS
- *pp = NULL;
-
-static JMP_BUF
- run_instance;
-
-static info
- facts;
+    long n_failures;
+    FILE *fp;
+    PROCESS *pp;
+    JMP_BUF cpu;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* EXIT_DAEMON - finish off the session */
 
-static void exit_daemon(int status)
+static void exit_daemon(info *facts, int status)
    {
 
-    if ((fp != stdout) && (fp != stderr) && (fp != NULL))
-       io_close(fp);
+    if ((facts->fp != stdout) && (facts->fp != stderr) && (facts->fp != NULL))
+       io_close(facts->fp);
 
     exit(status);}
 
@@ -57,7 +43,7 @@ static void exit_daemon(int status)
 
 /* CLOSE_COMMAND - finish off the child command and clean up */
 
-static void close_command(void)
+static void close_command(PROCESS *pp)
    {
 
     if (SC_process_alive(pp))
@@ -71,11 +57,13 @@ static void close_command(void)
 /* INTERRUPT_HANDLER - handle interrupt signals */
 
 static void interrupt_handler(int sig)
-   {
+   {info *facts;
 
-    close_command();
+    facts = SC_get_context(interrupt_handler);
 
-    exit_daemon(1);
+    close_command(facts->pp);
+
+    exit_daemon(facts, 1);
 
     return;}
 
@@ -87,17 +75,20 @@ static void interrupt_handler(int sig)
 static void report_handler(int sig)
    {char *name;
     FILE *lf;
+    info *facts;
+
+    facts = SC_get_context(report_handler);
 
     name = SC_dsnprintf(FALSE, "%s/.log.dmnz", getenv("HOME"));
 
     lf = io_open(name, "a");
 
     io_printf(lf, "----------------------------------------------------\n");
-    io_printf(lf, "Time Interval: %d\n", facts.ti);
-    io_printf(lf, "Timeout:       %d\n", facts.tc);
-    io_printf(lf, "# runs:        %ld\n", facts.n_tries);
-    io_printf(lf, "# timeouts:    %ld\n", facts.n_timeouts);
-    io_printf(lf, "# failures:    %ld\n", facts.n_failures);
+    io_printf(lf, "Time Interval: %d\n", facts->ti);
+    io_printf(lf, "Timeout:       %d\n", facts->tc);
+    io_printf(lf, "# runs:        %ld\n", facts->n_tries);
+    io_printf(lf, "# timeouts:    %ld\n", facts->n_timeouts);
+    io_printf(lf, "# failures:    %ld\n", facts->n_failures);
 
     io_close(lf);
 
@@ -111,6 +102,9 @@ static void report_handler(int sig)
 static void io_handler(int sig)
    {int n;
     char bf[1024];
+    info *facts;
+
+    facts = SC_get_context(io_handler);
 
     n = SC_read_sigsafe(0, bf, 1024);
     if (n > 0)
@@ -129,14 +123,16 @@ static void io_handler(int sig)
  */
 
 static void timeout_handler(int sig)
-   {
+   {info *facts;
 
-    if (!facts.exit)
-       facts.n_timeouts++;
+    facts = SC_get_context(timeout_handler);
 
-    close_command();
+    if (!facts->exit)
+       facts->n_timeouts++;
 
-    LONGJMP(run_instance, 1);
+    close_command(facts->pp);
+
+    LONGJMP(facts->cpu, 1);
 
     return;}
 
@@ -148,10 +144,12 @@ static void timeout_handler(int sig)
 static void process_output(int fd, int mask, void *a)
    {char s[MAXLINE+1];
     PROCESS *pp;
-    descriptor *pd;
+    info *facts;
+    FILE *fp;
 
-    pd = (descriptor *) a;
-    pp = pd->pp;
+    facts = (info *) a;
+    pp = facts->pp;
+    fp = facts->fp;
 
     while (SC_gets(s, MAXLINE, pp) != NULL)
        io_printf(fp, "%s", s);
@@ -168,20 +166,18 @@ static void process_output(int fd, int mask, void *a)
 static int process_end(int *prv, void *a)
    {int ex, rv;
     PROCESS *pp;
-    descriptor *pd;
-    info *pf;
+    info *facts;
 
-    pd = (descriptor *) a;
-    pp = pd->pp;
-    pf = pd->facts;
+    facts = (info *) a;
+    pp    = facts->pp;
 
     ex = FALSE;
     if (SC_process_status(pp) != SC_RUNNING)
        {rv = pp->reason;
 
-	pf->exit = TRUE;
+	facts->exit = TRUE;
         if (rv != 0)
-           pf->n_failures++;
+           facts->n_failures++;
 
         *prv = rv;
 
@@ -197,18 +193,17 @@ static int process_end(int *prv, void *a)
 
 /* INTERRUPT_MODE - do interrupt driven I/O */
 
-static int interrupt_mode(void)
+static int interrupt_mode(info *facts)
    {int rv;
-    descriptor d;
+    PROCESS *pp;
 
     rv = 0;
 
+    pp = facts->pp;
+
     SC_unblock(pp);
 
-    d.pp    = pp;
-    d.facts = &facts;
-
-    rv = SC_process_event_loop(pp, &d, process_end, process_output, NULL);
+    rv = SC_process_event_loop(pp, facts, process_end, process_output, NULL);
 
     return(rv);}
 
@@ -219,15 +214,17 @@ static int interrupt_mode(void)
  *             - allowing upto TO seconds
  */
 
-static int run_command(char **cmnd, int to, int na)
+static int run_command(info *facts, char **cmnd, int to, int na)
    {int rv;
+    PROCESS *pp;
 
-    SC_timeout(to, timeout_handler);
+    SC_timeout(to, timeout_handler, facts);
 
     pp = SC_open(cmnd, NULL, "apo", NULL);
     if (SC_process_alive(pp))
-       {rv = interrupt_mode();
-	close_command();}
+       {facts->pp = pp;
+	rv = interrupt_mode(facts);
+	close_command(pp);}
 
     else
        rv = 1;
@@ -269,6 +266,10 @@ int main(int c, char **v)
    {int i, ia, na;
     int ti, tc, tr, rv;
     char **cmnd, *lf;
+    info facts;
+    FILE *fp;
+
+    memset(&facts, 0, sizeof(facts));
 
     rv = 0;
     ti = 60;
@@ -310,23 +311,24 @@ int main(int c, char **v)
     tc = min(tc, ti);
     tr = ti - tc;
 
-    facts.tc         = tc;
-    facts.ti         = ti;
-    facts.n_tries    = 0;
-    facts.n_timeouts = 0;
-    facts.n_failures = 0;
-
 /* start up the output logging */
     if (lf != NULL)
        fp = io_open(lf, "w");
     else
        fp = stdout;
 
+    facts.tc         = tc;
+    facts.ti         = ti;
+    facts.n_tries    = 0;
+    facts.n_timeouts = 0;
+    facts.n_failures = 0;
+    facts.fp         = fp;
+
     cmnd = v + i;
 
-    SC_signal(SIGINT, interrupt_handler);
-    SC_signal(SIGUSR1, report_handler);
-    SC_signal(SC_SIGIO, io_handler);
+    SC_signal_n(SIGINT, interrupt_handler, &facts);
+    SC_signal_n(SIGUSR1, report_handler, &facts);
+    SC_signal_n(SC_SIGIO, io_handler, &facts);
 
     SC_setbuf(stdout, NULL);
 
@@ -335,8 +337,8 @@ int main(int c, char **v)
 	 facts.exit = FALSE;
 
 /* setup the non-local return in case of timeout */
-	 if (SETJMP(run_instance) == 0)
-	    rv = run_command(cmnd, tc, na);
+	 if (SETJMP(facts.cpu) == 0)
+	    rv = run_command(&facts, cmnd, tc, na);
 
 /* sleep for TR seconds so that the next instance will be run
  * in exactly TI = (TC + TR) seconds
@@ -344,7 +346,7 @@ int main(int c, char **v)
 	 if ((tr > 0) && (ia < na-1))
 	    SC_sleep(1000*tr);};
 
-    exit_daemon(rv);
+    exit_daemon(&facts, rv);
 
     return(0);}
 

@@ -83,7 +83,7 @@
  */
 
 #define SC_time_allow(to)                                                    \
-   (SC_timeout(to, _SC_timeout_cont),                                        \
+   (SC_timeout(to, _SC_timeout_cont, NULL),                                  \
     (to > 0) ? SETJMP(*_SC_get_to_buf(-1)) : TRUE)
 
 /*--------------------------------------------------------------------------*/
@@ -146,7 +146,7 @@ struct s_SC_state
 
 /* SCFNCT.C */
     PFSignal_handler to_lst;
-    PFSignal_handler to_err;
+    SC_contextdes to_err;
 
 /* SCBIO.C */
     int64_t buffer_size;
@@ -175,7 +175,6 @@ struct s_SC_state
    hasharr *hosts;
 
 /* SCFNCA.C */
-   JMP_BUF ok_ptr;
    int64_t bmn;
    int64_t bmx;
 
@@ -228,7 +227,6 @@ struct s_SC_state
    int idln;
 
 /* SCSYSE.C */
-   PROCESS *ex_pp;
    int tty_n_rej;
    char *sqbf;
    char *ecbf;
@@ -249,9 +247,6 @@ struct s_SC_state
    SC_array *wait_list;
    SC_array *process_list;
 
-#ifndef MACOSX
-   JMP_BUF gtt;                                                 /* scterm.c */
-#endif
    JMP_BUF btt;                                                 /* scterm.c */
    JMP_BUF srv_rstrt;};                                         /* scsysb.c */
 

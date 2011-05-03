@@ -123,7 +123,7 @@ int main(int argc, char **argv)
        do_xpose = TRUE;
 
     SC_init("TOUL: Exit with error", NULL,
-            TRUE, NULL,
+            TRUE, NULL, NULL,
             TRUE, NULL, 0);
 
 /* print the banner */

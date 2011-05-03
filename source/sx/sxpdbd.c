@@ -55,6 +55,12 @@
 
 /*--------------------------------------------------------------------------*/
 
+typedef struct s_differr differr;
+
+struct s_differr
+   {int fpe;
+    JMP_BUF cpu;};
+
 int
  SX_disp_individ_diff = FALSE, 
  SX_promote_flag      = 0, 
@@ -72,11 +78,13 @@ static int
 /* _SX_DIFF_SIGNAL - handle signals during comparisons */
 
 static void _SX_diff_signal(int sig)
-   {
+   {differr *de;
 
-    _SX.err_fpe = TRUE;
+    de = SC_get_context(_SX_diff_signal);
 
-    LONGJMP(_SX.diff_err, ABORT);}
+    de->fpe = TRUE;
+
+    LONGJMP(de->cpu, ABORT);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -307,11 +315,14 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
     char *ta, *tb, *token, *s;
     FILE *fpa, *fpb;
     syment *epa, *epb;
+    differr *de;
 
     ret = FALSE;
 
     if ((pfa == NULL) || (pfb == NULL))
        return(ret);
+
+    de = SC_get_context(_SX_diff_signal);
 
     fpa = pfa->stream;
     fpb = pfb->stream;
@@ -347,7 +358,7 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
 
     else if (!_SX_type_equal(pfa, pfb, ta, tb))
        {PRINT(stdout, "\nType, %s, differs between the two files\n", ta);
-        LONGJMP(_SX.diff_err, ABORT);}
+        LONGJMP(de->cpu, ABORT);}
 
     else if ((ada != -1L) && (na != 0L))
        {oada = lio_tell(fpa);
@@ -690,6 +701,9 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
     dimdes *dims;
     hasharr *hc, *fa, *fb;
     PDBfile *pfc;
+    differr *de;
+
+    de = SC_get_context(_SX_diff_signal);
 
     ret = FALSE;
     na  = PD_entry_number(epa);
@@ -700,13 +714,13 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
     fb  = pfb->chart;
 
     if (!_SX_type_equal(pfa, pfb, ta, tb))
-       LONGJMP(_SX.diff_err, ABORT);
+       LONGJMP(de->cpu, ABORT);
  
 /* directories cannot be compared except via their name (SHORT-CIRCUIT) */
     if ((strcmp(ta, "Directory") == 0) &&
 	(strcmp(ta, tb) == 0) &&
 	(strcmp(nma, nmb) == 0))
-       {return(TRUE);}
+       return(TRUE);
 
 /* find the bytes per item */
     bpa = _PD_lookup_size(ta, fa);
@@ -839,8 +853,12 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
     syment *epa, *epb;
     char *s, *typa, *typb;
     char fullpatha[MAXLINE], fullpathb[MAXLINE];
+    differr de;
+    SC_contextdes oh;
 
-    switch (SETJMP(_SX.diff_err))
+    memset(&de, 0, sizeof(differr));
+
+    switch (SETJMP(de.cpu))
        {case ABORT :
 	     return(FALSE);
         case ERR_FREE :
@@ -849,7 +867,7 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
 	     memset(PD_err, 0, MAXLINE);
 	     break;};
 
-    SC_signal(SIGFPE, _SX_diff_signal);
+    oh = SC_signal_n(SIGFPE, _SX_diff_signal, &de);
 
     strcpy(fullpatha, _PD_fixname(pfa, nma));
     s = _PD_expand_hyper_name(pfa, fullpatha);
@@ -915,9 +933,11 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
     _PD_rl_syment_d(epb);
 
 /* check for FPEs which mean BAD_NUMBERS */
-    if (_SX.err_fpe == TRUE)
+    if (de.fpe == TRUE)
        {ret     = BAD_NUMBERS;
-	_SX.err_fpe = FALSE;};
+	de.fpe = FALSE;};
+
+    SC_signal_n(SIGFPE, oh.f, oh.a);
 
     return(ret);}
 

@@ -274,7 +274,7 @@ int main(int c, char **v)
 
     SC_mem_stats(&bytab, &bytfb, NULL, NULL);
 
-    PM_enable_fpe(TRUE, NULL);
+    PM_enable_fpe_n(TRUE, NULL, NULL);
 
     err = TRUE;
 

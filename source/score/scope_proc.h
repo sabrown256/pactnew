@@ -156,16 +156,6 @@
     -1)
 
 
-# define SC_DISABLE_SIGNAL(_sig)                                             \
-    {PFSignal_handler _sc ## _sig;                                           \
-     if (_sig > 0)                                                           \
-        _sc ## _sig = SC_signal(_sig, SIG_IGN)
-
-# define SC_ENABLE_SIGNAL(_sig)                                              \
-     if ((_sig > 0) && (_sc ## _sig != NULL))                                \
-	SC_signal(_sig, _sc ## _sig);}
-
-
 /* diagnostic aids - we have to help ourselves because some debuggers won't */
 
 #define SC_START_ACTIVITY(_s, _a)                                            \

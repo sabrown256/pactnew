@@ -10,16 +10,16 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#include "score_int.h"
 
 #define N_ITER   5
 #define N_ITEMS  3
 
-static JMP_BUF
- cpu;
+typedef struct s_statedes statedes;
 
-static int
- golp = FALSE;
+struct s_statedes
+   {int golp;
+    JMP_BUF cpu;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -75,13 +75,15 @@ int test_1(int nir, int nim)
 /* SIGH_2 - handle signals for test #2 */
 
 static void sigh_2(int sig)
-   {
+   {statedes *st;
 
-    SC_signal(SIGSEGV, sigh_2);
+    st = SC_get_context(sigh_2);
 
-    golp = FALSE;
+    SC_signal_n(SIGSEGV, sigh_2, st);
 
-    LONGJMP(cpu, TRUE);
+    st->golp = FALSE;
+
+    LONGJMP(st->cpu, TRUE);
 
     return;}
 
@@ -96,12 +98,13 @@ static void sigh_2(int sig)
 int test_2(int nir, int nim)
    {int i, j, jmx, ok, err;
     double **a;
+    statedes st;
 
     err = FALSE;
 
-    SC_signal(SIGSEGV, sigh_2);
+    SC_signal_n(SIGSEGV, sigh_2, &st);
 
-    if (SETJMP(cpu) == 0)
+    if (SETJMP(st.cpu) == 0)
        {io_printf(stdout, "\n-----------------------------\n");
 	io_printf(stdout, "\nSimple memory allocation test\n\n");
 
@@ -209,25 +212,29 @@ int test_3(int nir, int nim)
 
 #if 0
 
+    statedes st;
+
+    memset(&st, 0, sizeof(st));
+
 /* test over and under indexing the space */
     a = CMAKE_N(double, ne);
 
-    SC_signal(SIGSEGV, sigh_3);
-    SC_signal(SIGBUS,  sigh_3);
+    SC_signal_n(SIGSEGV, sigh_3, &st);
+    SC_signal_n(SIGBUS,  sigh_3, &st);
 
-    if (SETJMP(cpu) == 0)
-       {golp = TRUE;
+    if (SETJMP(st.cpu) == 0)
+       {st.golp = TRUE;
 	for (iu = ne-1L; golp; iu++)
 	    a[iu] = 1.0;};
 
 /* NOTE: curiously FREEBSD will get a SIGBUS instead of a SIGSEGV
  * in the next loop so put the handler on both signals
  */
-    SC_signal(SIGSEGV, sigh_3);
-    SC_signal(SIGBUS,  sigh_3);
+    SC_signal_n(SIGSEGV, sigh_3, &st);
+    SC_signal_n(SIGBUS,  sigh_3, &st);
 
-    if (SETJMP(cpu) == 0)
-       {golp = TRUE;
+    if (SETJMP(st.cpu) == 0)
+       {st.golp = TRUE;
 	for (il = 0L; ; il--)
 	    a[il] = -1.0;};
 
@@ -236,8 +243,8 @@ int test_3(int nir, int nim)
  * and we are through with the signal handler now
  * so revert to default signal handler
  */
-    SC_signal(SIGSEGV, SIG_DFL);
-    SC_signal(SIGBUS,  SIG_DFL);
+    SC_signal_n(SIGSEGV, SIG_DFL, NULL);
+    SC_signal_n(SIGBUS,  SIG_DFL, NULL);
 
     io_printf(stdout,
 	      "   Unprotected memory area: (%ld < i < %ld) and (%ld < i < %ld)\n",
@@ -265,13 +272,15 @@ int test_3(int nir, int nim)
 /* SIGH_4 - handle signals for test #4 */
 
 static void sigh_4(int sig)
-   {
+   {statedes *st;
 
-    SC_signal(SIGSEGV, sigh_4);
+    st = SC_get_context(sigh_4);
 
-    golp = FALSE;
+    SC_signal_n(SIGSEGV, sigh_4, st);
 
-    LONGJMP(cpu, TRUE);
+    st->golp = FALSE;
+
+    LONGJMP(st->cpu, TRUE);
 
     return;}
 
@@ -303,6 +312,7 @@ int test_4(int nir, int nim)
      int *ai;
      short *as;
      char *ac;
+     statedes st;
 
      SC_use_guarded_mem(TRUE);
 
@@ -338,22 +348,22 @@ int test_4(int nir, int nim)
 /* test over and under indexing the space */
      a = CMAKE_N(double, ne);
 
-     SC_signal(SIGSEGV, sigh_4);
-     SC_signal(SIGBUS,  sigh_4);
+     SC_signal_n(SIGSEGV, sigh_4, &st);
+     SC_signal_n(SIGBUS,  sigh_4, &st);
 
-     if (SETJMP(cpu) == 0)
-        {golp = TRUE;
-	 for (iu = ne-1L; golp; iu++)
+     if (SETJMP(st.cpu) == 0)
+        {st.golp = TRUE;
+	 for (iu = ne-1L; st.golp; iu++)
 	     a[iu] = 1.0;};
 
 /* NOTE: curiously FREEBSD will get a SIGBUS instead of a SIGSEGV
  * in the next loop so put the handler on both signals
  */
-     SC_signal(SIGSEGV, sigh_4);
-     SC_signal(SIGBUS,  sigh_4);
+     SC_signal_n(SIGSEGV, sigh_4, &st);
+     SC_signal_n(SIGBUS,  sigh_4, &st);
 
-     if (SETJMP(cpu) == 0)
-        {golp = TRUE;
+     if (SETJMP(st.cpu) == 0)
+        {st.golp = TRUE;
 	 for (il = 0L; ; il--)
 	     a[il] = -1.0;};
 
@@ -362,8 +372,8 @@ int test_4(int nir, int nim)
  * and we are through with the signal handler now
  * so revert to default signal handler
  */
-     SC_signal(SIGSEGV, SIG_DFL);
-     SC_signal(SIGBUS,  SIG_DFL);
+     SC_signal_n(SIGSEGV, SIG_DFL, NULL);
+     SC_signal_n(SIGBUS,  SIG_DFL, NULL);
 
 /* do not use io_printf because it may allocate memory and the heap
  * has been corrupted with overwrites

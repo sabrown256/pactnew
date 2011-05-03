@@ -57,7 +57,7 @@ static int unary_test(char *name, int to,
 
 /* do as many iterations as possible in TO seconds */
     if (SETJMP(cpu) == 0)
-       {SC_timeout(to, timeout);
+       {SC_timeout(to, timeout, NULL);
 
 	for (id = 0; TRUE; id++)
 	    {for (ad = amn; ad <= amx; ad += da, id++)
@@ -67,7 +67,7 @@ static int unary_test(char *name, int to,
 
 /* do as many iterations as possible in TO seconds */
     if (SETJMP(cpu) == 0)
-       {SC_timeout(to, timeout);
+       {SC_timeout(to, timeout, NULL);
 
 	for (il = 0; TRUE; il++)
 	    {for (al = amn; al <= amx; al += da, il++)

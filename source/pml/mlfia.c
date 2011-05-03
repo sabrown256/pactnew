@@ -315,7 +315,7 @@ void F77_FUNC(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
 
     flg = *pflg;
 
-    PM_enable_fpe(flg, hnd);
+    PM_enable_fpe_n(flg, hnd, NULL);
 
     return;}
 

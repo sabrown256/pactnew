@@ -53,7 +53,7 @@
 
       (printf file "    SC_init(\"%s: Exit with error\", %s,\n"
 	      codename term-hook)
-      (printf file "          TRUE, %s,\n" intr-handler-hook)
+      (printf file "          TRUE, %s, NULL,\n" intr-handler-hook)
       (printf file "          TRUE, NULL, 0);\n")
       (printf file "\n")
     

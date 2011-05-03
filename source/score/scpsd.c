@@ -121,11 +121,11 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
     char xrdb[PATH_MAX];
     char *rn, *s;
     FILE *fp;
-    void (*shnd)(int sig);
+    SC_contextdes hnd;
     static char *a[] = {"gs", "-sDEVICE=x11", NULL, "-", NULL};
 
 /* ignore SIGCHLD for the system call */
-    shnd = SC_signal(SIGCHLD, SIG_IGN);
+    hnd = SC_signal_n(SIGCHLD, SIG_IGN, NULL);
 
     pid = getpid();
     rn = SC_dsnprintf(TRUE, ".Xres-%d", pid);
@@ -155,7 +155,7 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
     CFREE(rn);
 
 /* restore the handler on SIGCHLD */
-    SC_signal(SIGCHLD, shnd);
+    SC_signal_n(SIGCHLD, hnd.f, hnd.a);
 
     a[2] = f;
 

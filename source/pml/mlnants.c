@@ -22,7 +22,7 @@ int dbl_test(void)
     char *ca, *msg;
     double d[N], dhuge;
 
-    PM_enable_fpe(FALSE, SIG_IGN);
+    PM_enable_fpe_n(FALSE, SIG_IGN, NULL);
 
     for (i = 0; i < N; i++)
         d[i] = 0.0;
@@ -161,7 +161,7 @@ int flt_test(void)
     char *ca, *msg;
     float f[N], fhuge;
 
-    PM_enable_fpe(FALSE, SIG_IGN);
+    PM_enable_fpe_n(FALSE, SIG_IGN, NULL);
 
     for (i = 0; i < N; i++)
         f[i] = 0.0;
