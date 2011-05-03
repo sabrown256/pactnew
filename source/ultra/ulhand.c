@@ -163,7 +163,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
     a = HUGE;
-    SS_args(tok,
+    SS_args(si, tok,
             SC_DOUBLE_I, &a,
             0);
     if (a == HUGE)
@@ -214,7 +214,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
     a = HUGE;
-    SS_args(tok,
+    SS_args(si, tok,
             SC_DOUBLE_I, &a,
             0);
     if (a == HUGE)
@@ -288,13 +288,13 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
          if (SX_curvep_a(s))
             {i = SX_get_crv_index_i(s);
 	     if (tok1 != NULL)
-	        SS_args(tok1,
+	        SS_args(si, tok1,
 			SC_DOUBLE_I, &d1,
 			0);
 	     else
 	        d1 = SX_dataset[i].wc[0];
 	     if (tok2 != NULL)
-	        SS_args(tok2,
+	        SS_args(si, tok2,
 			SC_DOUBLE_I, &d2,
 			0);
 	     else
@@ -891,7 +891,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
     argl = SS_reverse(argl);
     i    = -1;
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_I, &i,
             0);
 

@@ -215,7 +215,7 @@ static void _SX_read(SS_psides *si, object *strm)
     PDBfile *file;
 
     s = NULL;
-    SS_args(si->rdobj,
+    SS_args(si, si->rdobj,
             SC_STRING_I, &s,
             0);
 

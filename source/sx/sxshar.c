@@ -15,7 +15,7 @@
 
 /* TR_WRITE_BIN - write an entry to the specified binary file */
 
-object *TR_write_bin(object *arg)
+object *TR_write_bin(SS_psides *si, object *arg)
    {PFBinWrite fun;
     PDBfile *file;
     tr_layer *tr;
@@ -23,7 +23,7 @@ object *TR_write_bin(object *arg)
     object *o;
 
     po = NULL;
-    SS_args(arg,
+    SS_args(si, arg,
             G_FILE, &po,
             0);
     
@@ -41,7 +41,7 @@ object *TR_write_bin(object *arg)
 
 /* TR_READ_BIN - read an entry from the specified binary file */
 
-object *TR_read_bin(object *arg)
+object *TR_read_bin(SS_psides *si, object *arg)
    {PFBinRead fun;
     PDBfile *file;
     tr_layer *tr;
@@ -49,7 +49,7 @@ object *TR_read_bin(object *arg)
     object *o;
 
     po = NULL;
-    SS_args(arg,
+    SS_args(si, arg,
             G_FILE, &po,
             0);
     
@@ -74,7 +74,7 @@ object *TR_file_type(SS_psides *si, object *arg)
 
     po   = NULL;
     file = NULL;
-    SS_args(arg,
+    SS_args(si, arg,
             G_FILE, &po,
             0);
 

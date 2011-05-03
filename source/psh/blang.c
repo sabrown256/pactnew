@@ -820,7 +820,7 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
 
     if (voida == FALSE)
        {cs_decl_list(a, MAXLINE, dcl);
-        fprintf(fp, "    SS_args(argl,\n");
+        fprintf(fp, "    SS_args(si, argl,\n");
 	fprintf(fp, "%s", a);
 	fprintf(fp, "            0);\n");
 	fprintf(fp, "\n");};

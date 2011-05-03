@@ -194,7 +194,7 @@ static object *SXI_mapping_ref(SS_psides *si, object *argl)
     fname = NULL;
     dtype = NULL;
     indx  = -1;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &fname,
             SC_STRING_I, &dtype,
             SC_INT_I, &indx,
@@ -322,7 +322,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 
 	first = 0;
 	last  = 0;
-        SS_args(argl,
+        SS_args(si, argl,
                 SC_INT_I, &first,
                 SC_INT_I, &last,
                 0);
@@ -340,7 +340,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 /* GOTCHA: in general, when processing something like "f1.1:4",
            f1 will not refer to the current input file */
 
-	SS_args(SS_lk_var_val(si, SX_curfile),
+	SS_args(si, SS_lk_var_val(si, SX_curfile),
 		G_FILE, &po,
 		0);
 
@@ -359,7 +359,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
     else
        {char first = '\0', last = '\0', id;
 
-        SS_args(argl,
+        SS_args(si, argl,
                 SX_DATA_ID_I, &first,
                 SX_DATA_ID_I, &last,
                 0);

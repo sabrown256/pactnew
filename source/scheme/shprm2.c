@@ -415,7 +415,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
        {double x, accv;
 	PFDoubledd op;
 
-	SS_args(argl,
+	SS_args(si, argl,
 		SC_DOUBLE_I, &x,
 		SC_DOUBLE_I, &n,
 		0);
@@ -429,7 +429,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
        {double _Complex z, accv;
 	PFComplexcd op;
 
-	SS_args(argl,
+	SS_args(si, argl,
 		SC_DOUBLE_COMPLEX_I, &z,
 		SC_DOUBLE_I, &n,
 		0);
@@ -443,7 +443,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
        {quaternion q, accv;
 	PFQuaternionqd op;
 
-	SS_args(argl,
+	SS_args(si, argl,
 		SC_QUATERNION_I, &q,
 		SC_DOUBLE_I, &n,
 		0);

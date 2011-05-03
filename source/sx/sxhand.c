@@ -379,7 +379,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     a = HUGE;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
@@ -420,7 +420,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     a = HUGE;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
@@ -464,7 +464,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 
     i = -1;
     a = HUGE;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_INT_I, &i,
 	    SC_DOUBLE_I, &a,
 	    0);
@@ -512,7 +512,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 
     i = -1;
     a = HUGE;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_INT_I, &i,
 	    SC_DOUBLE_I, &a,
 	    0);

@@ -273,7 +273,7 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
     n      = 1;
     nl     = 1;
     nlabel = 0;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_INT_I, &n,
             SC_INT_I, &nlabel,
@@ -497,7 +497,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 
     name = NULL;
     dims = SS_null;
-    SS_args(specs,
+    SS_args(si, specs,
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &dims,
 	    0);
@@ -509,7 +509,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
        {nd    = SS_length(dims);
 	maxes = CMAKE_N(int, nd);
 	for (i = 0; dims != SS_null; dims = SS_cdr(dims), i++)
-	    {SS_args(dims,
+	    {SS_args(si, dims,
 		     SC_INT_I, &dv,
 		     0);
 	     maxes[i] = dv;};
@@ -524,7 +524,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 	     start = 0L;
 	     npts  = SX_current_table->nrow;
 	     step  = SX_current_table->ncol;
-	     SS_args(sp,
+	     SS_args(si, sp,
 		     SC_LONG_I, &start,
 		     SC_LONG_I, &npts,
 		     SC_LONG_I, &step,
@@ -585,7 +585,7 @@ static object *_SXI_table_map(SS_psides *si, object *argl)
     name      = NULL;
     centering = N_CENT;
 
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &dmlst,
 	    SS_OBJECT_I, &rnlst,
@@ -633,7 +633,7 @@ static object *SX_wrt_text_table(SS_psides *si, object *argl)
     fp = SS_OUTSTREAM(outprt);
 
     for ( ; SS_consp(argl); argl = SS_cdr(argl))
-        {SS_args(argl,
+        {SS_args(si, argl,
 		 G_MAPPING, &f,
 		 0);
 
@@ -692,7 +692,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
        return(SS_f);    
 
     fname = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &fname,
             0);
 
@@ -749,7 +749,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
 		  argl);
 
     else
-       {SS_args(argl,
+       {SS_args(si, argl,
 		SC_LONG_I, &col,
 		0);
  
@@ -823,7 +823,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
 		  argl);
 
     else
-       {SS_args(argl,
+       {SS_args(si, argl,
                 G_NUM_ARRAY, &arr,
 		0);
 
@@ -883,7 +883,7 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
 		  argl);
 
     else
-       {SS_args(argl,
+       {SS_args(si, argl,
 		SC_INT_I, &col,
 		0);
 

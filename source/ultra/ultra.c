@@ -522,7 +522,7 @@ object *_ULI_set_id(SS_psides *si, object *argl)
 
     jo    = -1;
     id[0] = '\0';
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_J, &jo,
             UL_DATA_ID_I, id,
             0);
@@ -613,7 +613,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
     if (SS_numbp(SS_car(argl)))
        {int first = 0, last = 0, id;
         
-        SS_args(argl,
+        SS_args(si, argl,
                 SC_INT_I, &first,
                 SC_INT_I, &last,
                 0);
@@ -644,7 +644,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
         first[0] = '\0';
         last[0]  = '\0';
 
-        SS_args(argl,
+        SS_args(si, argl,
                 UL_DATA_ID_I, first,
                 UL_DATA_ID_I, last,
                 0);
@@ -737,7 +737,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     xstart = 0.0;
     xstop  = 1.0;
     xstep  = 0.1;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &crv,
             SC_DOUBLE_I, &xstart,
             SC_DOUBLE_I, &xstop,

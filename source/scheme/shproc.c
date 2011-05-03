@@ -128,7 +128,7 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
 
 /* pull the mode off */
     mode = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &mode,
             0);
 
@@ -180,7 +180,7 @@ static object *_SSI_blck_pr(SS_psides *si, object *argl)
 
     pp = NULL;
     o  = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_PROCESS_I, &pp,
             SS_OBJECT_I, &o,
             0);
@@ -203,7 +203,7 @@ static object *_SSI_cls_pr(SS_psides *si, object *obj)
    {PROCESS *pp;
 
     pp = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             SS_PROCESS_I, &pp,
             0);
 
@@ -220,7 +220,7 @@ static object *_SSI_pr_rd_tries(SS_psides *si, object *argl)
    {object *o;
 
     if (!SS_nullobjp(argl))
-       SS_args(argl,
+       SS_args(si, argl,
                SC_INT_I, &_SS.n_tries,
                0);
 
@@ -295,7 +295,7 @@ static object *_SSI_pr_sn_line(SS_psides *si, object *argl)
 
     pp = NULL;
     s  = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_PROCESS_I, &pp,
             SC_STRING_I, &s,
             0);
@@ -318,7 +318,7 @@ static object *_SSI_get_url_file(SS_psides *si, object *argl)
     url  = NULL;
     file = NULL;
     vers = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &url,
             SC_STRING_I, &file,
             SC_STRING_I, &vers,
@@ -342,7 +342,7 @@ static object *_SSI_get_host_name(SS_psides *si, object *argl)
     object *rv;
 
     sys  = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &sys,
             0);
 
@@ -372,7 +372,7 @@ static object *_SSI_get_host_types(SS_psides *si, object *argl)
 
     all = TRUE;
     net = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_INT_I, &all,
             SC_STRING_I, &net,
             0);
@@ -405,7 +405,7 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
     object *o;
 
     pid = TRUE;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_INT_I, &pid,
             0);
 

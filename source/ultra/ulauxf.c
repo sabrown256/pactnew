@@ -32,7 +32,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
 
     jr = -1;
     ji = -1;
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_I, &jr,
             UL_CURVE_INDEX_I, &ji,
             0);
@@ -209,7 +209,7 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
     jg = -1;
     jh = -1;
     dt = HUGE;
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_I, &jg,
             UL_CURVE_INDEX_I, &jh,
             SC_DOUBLE_I, &dt,
@@ -481,7 +481,7 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     PM_matrix *ay, *a, *solution;
     object *ch;
 
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_I, &j,
             0);
 
@@ -592,7 +592,7 @@ static object *_ULI_error_plot(SS_psides *si, object *argl)
     xm[1] = NULL;
     xp[0] = NULL;
     xm[0] = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &c,
             SS_OBJECT_I, &xp[1],
             SS_OBJECT_I, &xm[1],
@@ -643,7 +643,7 @@ static object *_ULI_mk_palette(SS_psides *si, object *argl)
     name = NULL;
     nc   = 8;
     wbck = TRUE;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_INT_I, &nc,
             SC_INT_I, &wbck,
@@ -674,7 +674,7 @@ static object *_ULI_rd_palette(SS_psides *si, object *argl)
     PG_palette *pal;
 
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             0);
 
@@ -995,7 +995,7 @@ static object *_ULI_crv_domain(SS_psides *si, object *obj)
     object *o;
 
     j = -1;
-    SS_args(obj,
+    SS_args(si, obj,
             UL_CURVE_INDEX_I, &j,
             0);
 
@@ -1025,7 +1025,7 @@ static object *_ULI_crv_range(SS_psides *si, object *obj)
     object *o;
 
     j = -1;
-    SS_args(obj,
+    SS_args(si, obj,
             UL_CURVE_INDEX_I, &j,
             0);
 
@@ -1053,7 +1053,7 @@ static object *_ULI_crv_npts(SS_psides *si, object *obj)
     object *o;
 
     j = -1;
-    SS_args(obj,
+    SS_args(si, obj,
             UL_CURVE_INDEX_I, &j,
             0);
 
@@ -1081,7 +1081,7 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
     object *o;
 
     j = -1;
-    SS_args(obj,
+    SS_args(si, obj,
             UL_CURVE_INDEX_I, &j,
             0);
 
@@ -1123,7 +1123,7 @@ static object *_ULI_write_abs(SS_psides *si, object *argl)
     x[0] = 0.0;
     x[1] = 0.0;
     text = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_DOUBLE_I, &x[0],
             SC_DOUBLE_I, &x[1],
             SC_STRING_I, &text,

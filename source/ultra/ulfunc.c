@@ -33,7 +33,7 @@ static object *UL_select(SS_psides *si, object *s)
     object *ret;
 
     j = -1;
-    SS_args(s,
+    SS_args(si, s,
             SC_INT_I, &j,
             0);
 
@@ -141,7 +141,7 @@ static object *_ULI_menui(SS_psides *si, object *s)
     FILE *fp;
 
     j = -1;
-    SS_args(s,
+    SS_args(si, s,
             SC_INT_I, &j,
             0);
 
@@ -247,7 +247,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
              SS_consp(s) && !SS_nullobjp(SS_car(s));
              s = SS_cdr(s))
 	    {t = SS_car(s);
-             SS_args(t,
+             SS_args(si, t,
 		     SC_INT_I, &j,
 		     0);
 	     if ((0 <= j) && (j <= limit))
@@ -447,7 +447,7 @@ static object *_ULI_lnwidth(SS_psides *si, object *obj, object *width)
     i = SX_get_crv_index_i(obj);
 
     wd = 0.0;
-    SS_args(width,
+    SS_args(si, width,
 	    SC_DOUBLE_I, &wd,
 	    0);
 
@@ -526,7 +526,7 @@ static object *_ULI_range(SS_psides *si, object *argl)
 	    else
 	       SS_error(si, "BAD ARGUMENTS - _ULI_RANGE", s);}
 	else
-	   {SS_args(argl,
+	   {SS_args(si, argl,
 		    SC_DOUBLE_I, &wc[2],
 		    SC_DOUBLE_I, &wc[3],
 		    0);
@@ -585,7 +585,7 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 	    else
 	       SS_error(si, "BAD ARGUMENTS - _ULI_DOMAIN", s);}
 	else
-	   {SS_args(argl,
+	   {SS_args(si, argl,
 		    SC_DOUBLE_I, &wc[0],
 		    SC_DOUBLE_I, &wc[1],
 		    0);
@@ -631,7 +631,7 @@ static object *_ULI_open_device(SS_psides *si, object *argl)
     name  = NULL;
     type  = NULL;
     title = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SC_STRING_I, &title,
@@ -752,7 +752,7 @@ static object *_ULI_quit(SS_psides *si, object *arg)
    {int exit_val;
 
     exit_val = 0;
-    SS_args(arg,
+    SS_args(si, arg,
             SC_INT_I, &exit_val,
             0);
 
@@ -857,7 +857,7 @@ static object *_ULI_menu(SS_psides *si, object *argl)
     pr = NULL;
     pf = NULL;
     pn = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &pr,
             SC_STRING_I, &pf,
             SC_STRING_I, &pn,
@@ -961,7 +961,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
 
     pr = NULL;
     pf = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &pr,
             SC_STRING_I, &pf,
             0);
@@ -1074,7 +1074,7 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
 
     type  = NULL;
     toler = 0.02;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &type,
             SC_DOUBLE_I, &toler,
             0);
@@ -1122,7 +1122,7 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     dom_pred = SS_null;
     ran_pred = SS_null;
 
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &dom_pred,
             SS_OBJECT_I, &ran_pred,
             0);
@@ -1231,7 +1231,7 @@ static object *_ULI_label(SS_psides *si, object *argl)
 
     j    = -1;
     labl = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_I, &j,
             SC_STRING_I, &labl,
             0);
@@ -1458,7 +1458,7 @@ static object *_ULI_filter_coef(SS_psides *si, int l, object *argl)
 
     arr    = NULL;
     ntimes = 1;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
 	    SC_INT_I, &ntimes,
 	    0);
@@ -1484,7 +1484,7 @@ static object *_ULI_lnnorm(SS_psides *si, object *argl)
 
     j     = -1;
     order = 1;
-    SS_args(argl,
+    SS_args(si, argl,
             UL_CURVE_INDEX_I, &j,
 	    SC_INT_I, &order,
 	    0);
@@ -1509,7 +1509,7 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
     pts = 3;
     ntimes = 1;
 
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_INT_I, &pts,
 	    SC_INT_I, &ntimes,
 	    0);
@@ -1537,7 +1537,7 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
 			      SX_smooth_method);
 	    SS_error(si, bf, SS_null);};
 
-        SS_args(SS_lk_var_val(si, obj),
+        SS_args(si, SS_lk_var_val(si, obj),
                 G_NUM_ARRAY, &arr,
 		0);
 
@@ -1880,7 +1880,7 @@ static object *_ULI_make_ln(SS_psides *si, object *argl)
     first  = 0.0;
     last   = 1.0;
     n      = SX_default_npts;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_DOUBLE_I, &slope,
             SC_DOUBLE_I, &interc,
             SC_DOUBLE_I, &first,
@@ -1905,7 +1905,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
     object *ch;
 
     labls = "Curve";
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &xvals,
             SS_OBJECT_I, &yvals,
             SC_STRING_I, &labls,

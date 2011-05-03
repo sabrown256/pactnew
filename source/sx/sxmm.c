@@ -155,7 +155,7 @@ static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
      g_file *po;
 
     po = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             G_FILE, &po,
 	    0);
 

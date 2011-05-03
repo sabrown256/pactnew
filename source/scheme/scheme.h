@@ -912,7 +912,7 @@ extern object
  *SS_call_scheme(SS_psides *si, char *func, ...);
 
 extern int
- SS_args(object *s, ...),
+ SS_args(SS_psides *si, object *s, ...),
  SS_run(SS_psides *si, char *s),
  SS_text_data_filep(char *fname, int cmnt),
  SS_load_scm(SS_psides *si, char *name),

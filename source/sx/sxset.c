@@ -110,7 +110,7 @@ void SX_install_funcs(SS_psides *si)
 
 /* SX_INIT - initialize SX */
 
-void SX_init(char *code, char *vers)
+SS_psides *SX_init(char *code, char *vers)
    {SS_psides *si;
 
 /* scheme initializations */
@@ -173,7 +173,7 @@ void SX_init(char *code, char *vers)
 
     SX_file_exist_action = FAIL;
 
-    return;}
+    return(si);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -23,7 +23,7 @@ static object *_SSI_mk_rectq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, &q.s,
 	    SC_DOUBLE_I, &q.i,
 	    SC_DOUBLE_I, &q.j,
@@ -55,7 +55,7 @@ static object *_SSI_mk_polarq(SS_psides *si, object *argl)
     th = 0.0;
     ph = 0.0;
     ch = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, &m,
 	    SC_DOUBLE_I, &th,
 	    SC_DOUBLE_I, &ph,
@@ -87,7 +87,7 @@ static object *_SSI_real_partq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -108,7 +108,7 @@ static object *_SSI_imag_partq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -129,7 +129,7 @@ static object *_SSI_jmag_partq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -150,7 +150,7 @@ static object *_SSI_kmag_partq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -172,7 +172,7 @@ static object *_SSI_magnitudeq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -198,7 +198,7 @@ static object *_SSI_angleq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -224,7 +224,7 @@ static object *_SSI_colatq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -250,7 +250,7 @@ static object *_SSI_longq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 
@@ -272,7 +272,7 @@ static object *_SSI_versorq(SS_psides *si, object *argl)
     q.i = 0.0;
     q.j = 0.0;
     q.k = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_QUATERNION_I, &q,
 	    0);
 

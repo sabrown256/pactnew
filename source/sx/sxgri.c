@@ -281,7 +281,7 @@ static object *_SXI_copy_iob(SS_psides *si, object *argl)
     dvd = NULL;
     dvs = NULL;
     rm  = FALSE;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dvd,
             G_DEVICE, &dvs,
 	    SC_INT_I, &rm,
@@ -316,7 +316,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     clr = 5;
     aln = CENTER;
     ang = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE,     &dev,
             SC_STRING_I,  &s,
 	    SC_INT_I, &clr,
@@ -353,7 +353,7 @@ static object *_SXI_free_iobs(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             0);
 
@@ -419,7 +419,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
     if (PG_console_device == NULL)
        return(SS_f);
 
-    SS_args(toggle,
+    SS_args(si, toggle,
 	    SC_INT_I, &flag,
 	    0);
 

@@ -74,7 +74,7 @@ void SX_quit(int i)
 static object *_SXI_quit(SS_psides *si, object *arg)
    {int rv;
 
-    SS_args(arg,
+    SS_args(si, arg,
             SC_INT_I, &rv,
             0);
 
@@ -184,7 +184,7 @@ static object *_SXI_get_range(SS_psides *si, object *arg)
     object *rv;
 
     f = NULL;
-    SS_args(arg,
+    SS_args(si, arg,
             G_MAPPING, &f,
 	    0);
 
@@ -627,7 +627,7 @@ object *SX_plane(SS_psides *si, object *argl)
     nd    = SS_length(argl);
     coeff = pc = CMAKE_N(double, nd--);
 
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, pc++,
             0);
     argl = SS_cdr(argl);
@@ -640,7 +640,7 @@ object *SX_plane(SS_psides *si, object *argl)
         {lst = SS_car(argl);
 	 
 	 ratio[i] = 1.0;
-	 SS_args(lst,
+	 SS_args(si, lst,
 		 SC_DOUBLE_I, pc++,
 		 SC_DOUBLE_I, &xmn,
 		 SC_DOUBLE_I, &xmx,
@@ -769,7 +769,7 @@ static PM_mapping *_SXI_filter_coef(SS_psides *si, PM_mapping *h,
 
     arr    = NULL;
     ntimes = 1;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
 	    SC_INT_I, &ntimes,
 	    0);
@@ -794,7 +794,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 
     pts    = 3;
     ntimes = 1;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_INT_I, &pts,
 	    SC_INT_I, &ntimes,
 	    0);
@@ -818,7 +818,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 			      SX_smooth_method);
 	    SS_error(si, bf, SS_null);};
 
-        SS_args(SS_lk_var_val(si, obj),
+        SS_args(si, SS_lk_var_val(si, obj),
                 G_NUM_ARRAY, &arr,
 		0);
 

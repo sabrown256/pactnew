@@ -323,7 +323,7 @@ static object *_SSI_quit(SS_psides *si, object *arg)
    {
 
     _SS.exit_val = 0;
-    SS_args(arg,
+    SS_args(si, arg,
             SC_INT_I, &_SS.exit_val,
             0);
 
@@ -680,7 +680,7 @@ object *SS_lookup_object(SS_psides *si, object *obj)
 
 /* take anything that will give a name - procedure, string, variable ... */
     name = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_STRING_I, &name,
 	    0);
 
@@ -1130,7 +1130,7 @@ static object *_SSI_system(SS_psides *si, object *argl)
     rv  = -1;
     cmd = NULL;
     to  = -1;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I,  &cmd,
 	    SC_INT_I, &to,
 	    0);
@@ -1166,7 +1166,7 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
     output = NULL;
     cmd    = NULL;
     to     = -1;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I,  &cmd,
 	    SC_INT_I, &to,
 	    0);

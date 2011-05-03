@@ -31,7 +31,7 @@
 #undef SIGNED
 #undef ECHO
 
-#define SI               (&_SS_si)
+#define SI               _SS_isc
 
 #define CAPTURE(x)       (SS_MARK(x), x)
 
@@ -119,6 +119,9 @@ EXTERN_VAR object
 
 extern int
  SS_c_tokens[];
+
+extern SS_psides
+ *_SS_isc;
 
 /*--------------------------------------------------------------------------*/
 

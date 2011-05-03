@@ -205,7 +205,7 @@ static object *_SXI_pan_simulate(SS_psides *si, object *argl)
 
     ti = 0.0;
     tf = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_DOUBLE_I, &ti,
             SC_DOUBLE_I, &tf,
             SC_DOUBLE_I, &_SX.dtf_min,
@@ -255,7 +255,7 @@ static object *_SXI_run_package(SS_psides *si, object *argl)
     PFPkgMain pck_entry;
     object *numdt, *zondt, *o;
 
-    SS_args(argl,
+    SS_args(si, argl,
             G_PACKAGE, &pck,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
@@ -329,7 +329,7 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
     *pt += dt;
     (*pcy)++;
 
-    nargs = SS_args(argl,
+    nargs = SS_args(si, argl,
                     SC_DOUBLE_I, &t1,
                     SC_DOUBLE_I, &t2,
                     SC_DOUBLE_I, &t3,
@@ -467,7 +467,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
     vif = NULL;
     viv = NULL;
 
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &vname,
             SC_STRING_I, &vtype,
             SS_OBJECT_I, &oviv,
@@ -632,7 +632,7 @@ static object *_SXI_rd_restart(SS_psides *si, object *argl)
 
     name  = NULL;
     convs = NONE;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_INT_I, &convs,
             0);
@@ -734,7 +734,7 @@ static object *_SXI_init_problem(SS_psides *si, object *argl)
     edname = NULL;
     ppname = NULL;
     gfname = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
             SC_INT_I, &nc,
@@ -772,7 +772,7 @@ static object *_SXI_readh(SS_psides *si, object *argl)
    {char *name;
 
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             0);
 
@@ -792,7 +792,7 @@ static object *_SXI_pan_cmmnd(SS_psides *si, object *argl)
     object *o;
 
     s = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s,
             0);
 
@@ -818,7 +818,7 @@ static object *_SXI_fin_system(SS_psides *si, object *argl)
 
     nz = 0;
     cy = 0;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_INT_I, &nz,
             SC_INT_I, &cy,
             0);
@@ -843,7 +843,7 @@ static object *_SXI_dump_pp(SS_psides *si, object *argl)
     ed = NULL;
     pp = NULL;
     gf = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_DOUBLE_I, &t,
             SC_DOUBLE_I, &dt,
             SC_INT_I, &cy,
@@ -878,7 +878,7 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
 
     rv   = SS_null;
     name = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             SC_STRING_I, &name,
             0);
 
@@ -915,7 +915,7 @@ static object *_SXI_wr_restart(SS_psides *si, object *argl)
    {char *name;
 
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             0);
 

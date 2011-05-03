@@ -22,7 +22,7 @@ static object *_SSI_mk_rect(SS_psides *si, object *argl)
 
     r = 0.0;
     i = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, &r,
 	    SC_DOUBLE_I, &i,
 	    0);
@@ -44,7 +44,7 @@ static object *_SSI_mk_polar(SS_psides *si, object *argl)
 
     m = 0.0;
     a = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_I, &m,
 	    SC_DOUBLE_I, &a,
 	    0);
@@ -67,7 +67,7 @@ static object *_SSI_real_part(SS_psides *si, object *argl)
     object *o;
 
     z = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_COMPLEX_I, &z,
 	    0);
 
@@ -87,7 +87,7 @@ static object *_SSI_imag_part(SS_psides *si, object *argl)
     object *o;
 
     z = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_COMPLEX_I, &z,
 	    0);
 
@@ -107,7 +107,7 @@ static object *_SSI_magnitude(SS_psides *si, object *argl)
     object *o;
 
     z = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_COMPLEX_I, &z,
 	    0);
 
@@ -129,7 +129,7 @@ static object *_SSI_angle(SS_psides *si, object *argl)
     object *o;
 
     z = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_DOUBLE_COMPLEX_I, &z,
 	    0);
 

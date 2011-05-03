@@ -326,7 +326,7 @@ static object *_SSI_lst_tail(SS_psides *si, object *argl)
    {int n;
     object *lst, *o;
 
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_OBJECT_I, &lst,
 	    SC_INT_I, &n,
             0);
@@ -344,7 +344,7 @@ static object *_SSI_lst_ref(SS_psides *si, object *argl)
    {int i, n, nl;
     object *lst, *o;
 
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_OBJECT_I, &lst,
 	    SC_INT_I, &n,
             0);
@@ -540,7 +540,7 @@ static object *_SSI_intp(SS_psides *si, object *obj)
 
     rv = SS_f;
     if (SS_numbp(obj))
-       {SS_args(obj,
+       {SS_args(si, obj,
 		SC_DOUBLE_I, &r,
 		0);
 
@@ -625,7 +625,7 @@ static object *_SSI_procp(SS_psides *si, object *obj)
 
 /* _SS_FILEP - worker routine for file? and ascii-file? predicates */
 
-static int _SS_filep(object *argl, char *dtype)
+static int _SS_filep(SS_psides *si, object *argl, char *dtype)
    {int ret;
     char *name, *mode, *type, *scope;
     char **list;
@@ -636,7 +636,7 @@ static int _SS_filep(object *argl, char *dtype)
     type  = dtype;
     scope = NULL;
 
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    SC_STRING_I, &mode,
 	    SC_STRING_I, &type,
@@ -683,7 +683,7 @@ static int _SS_filep(object *argl, char *dtype)
 static object *_SSI_filep(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_filep(argl, NULL) ? SS_t : SS_f;
+    o = _SS_filep(si, argl, NULL) ? SS_t : SS_f;
 
     return(o);}
 
@@ -695,7 +695,7 @@ static object *_SSI_filep(SS_psides *si, object *argl)
 static object *_SSI_text_filep(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_filep(argl, "ascii") ? SS_t : SS_f;
+    o = _SS_filep(si, argl, "ascii") ? SS_t : SS_f;
 
     return(o);}
 
