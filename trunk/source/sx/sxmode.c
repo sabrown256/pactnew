@@ -157,7 +157,7 @@ static char *_SX_reproc_in(SS_psides *si, char *line)
 
     else
        {if (!SX_expand_expr(_SX.command))
-           SS_error_n(si, "SYNTAX ERROR - _SX_REPROC_IN", SS_null);
+           SS_error(si, "SYNTAX ERROR - _SX_REPROC_IN", SS_null);
 
         _SX_expand_prefix(_SX.command, MAXLINE);
 

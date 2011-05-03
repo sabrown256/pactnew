@@ -284,15 +284,15 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
 
     name = SC_search_file(NULL, SX_table_name);
     if (name == NULL)
-       SS_error_n(si, "CAN'T FIND FILE - _SXI_READ_TEXT_TABLE", argl);
+       SS_error(si, "CAN'T FIND FILE - _SXI_READ_TEXT_TABLE", argl);
 
     fp = io_open(name, "r");
     if (fp == NULL)
-       SS_error_n(si, "CAN'T OPEN FILE - _SXI_READ_TEXT_TABLE", argl);
+       SS_error(si, "CAN'T OPEN FILE - _SXI_READ_TEXT_TABLE", argl);
 
     linelen = _SX_get_line_length(fp);
     if (linelen <= 0)
-       SS_error_n(si, "CAN'T READ FILE - _SXI_READ_TEXT_TABLE", argl);
+       SS_error(si, "CAN'T READ FILE - _SXI_READ_TEXT_TABLE", argl);
 
     linelen += 10;
     label  = CMAKE_N(char, linelen);
@@ -304,7 +304,7 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
 			    nl, &addrt, nlabel, &addrl))
        {CFREE(linein);
         CFREE(label);
-        SS_error_n(si, "REQUESTED TABLE NOT FOUND - _SXI_READ_TEXT_TABLE",
+        SS_error(si, "REQUESTED TABLE NOT FOUND - _SXI_READ_TEXT_TABLE",
 		   argl);}
 
     SX_current_table = PM_create(nr, nc);
@@ -531,7 +531,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 		     0);
 
 	     if ((i > 0) && (npts != ne))
-	        SS_error_n(si, "BAD SPECIFICATION - _SX_TABLE_SET", sp);
+	        SS_error(si, "BAD SPECIFICATION - _SX_TABLE_SET", sp);
 
 	     elem[i] = SX_extract_vector(SX_current_table, start, step, npts);
 	     ne = npts;};
@@ -699,7 +699,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
     if (fname != NULL)
        {fp = io_open(fname, "w");
         if (fp == NULL)
-           SS_error_n(si, "CAN'T OPEN FILE - SX_WRT_CURRENT_TABLE",
+           SS_error(si, "CAN'T OPEN FILE - SX_WRT_CURRENT_TABLE",
 		      SS_mk_string(si, fname));}
 
 /* write the labels if any */
@@ -745,7 +745,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
     rv = SS_null;
 
     if (SX_current_table == NULL)
-       SS_error_n(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
+       SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  argl);
 
     else
@@ -757,7 +757,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
 	nc = SX_current_table->ncol;
 
 	if ((col < 0) || (col >= nc))
-	  SS_error_n(si,
+	  SS_error(si,
 		     "COLUMN NUMBER OUT OF RANGE--COLUMN NUMBERING IS 0 BASED",
 		     argl);
 
@@ -819,7 +819,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
     rv   = SS_null;
 
     if (SX_current_table == NULL)
-       SS_error_n(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
+       SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  argl);
 
     else
@@ -879,7 +879,7 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
     rv = SS_null;
 
     if (SX_current_table == NULL)
-       SS_error_n(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
+       SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  argl);
 
     else
@@ -915,7 +915,7 @@ static object *SX_cnormalize_table(SS_psides *si)
     rv = SS_null;
 
     if (SX_current_table == NULL)
-       SS_error_n(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
+       SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  SS_null);
 
     else

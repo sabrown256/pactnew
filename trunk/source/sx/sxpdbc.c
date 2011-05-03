@@ -61,7 +61,7 @@ void _SX_copy_indirection(SS_psides *si, PDBfile *file,
     else
        {nbytes = (long) SC_arrlen(*vrin);
         if ((bpi = _PD_lookup_size(type, file->host_chart)) == -1)
-           SS_error_n(si, "CAN'T FIND NUMBER OF BYTES - _SX_COPY_INDIRECTION",
+           SS_error(si, "CAN'T FIND NUMBER OF BYTES - _SX_COPY_INDIRECTION",
 		      SS_mk_string(si, type));
         nitems = nbytes / bpi;
 
@@ -94,7 +94,7 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 
     bpi = _PD_lookup_size(type, file->host_chart);
     if (bpi == -1)
-       SS_error_n(si, "CAN'T GET NUMBER OF BYTES - _SX_COPY_LEAF",
+       SS_error(si, "CAN'T GET NUMBER OF BYTES - _SX_COPY_LEAF",
 		  SS_mk_string(si, type));
 
     memcpy(vrout, vrin, (int) nitems*bpi);
@@ -104,7 +104,7 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
  */
     dp = PD_inquire_host_type(file, type);
     if (dp == NULL)
-       SS_error_n(si, "BAD TYPE - _SX_COPY_LEAF", SS_null);
+       SS_error(si, "BAD TYPE - _SX_COPY_LEAF", SS_null);
     else
        {mem_lst = dp->members;
 
@@ -120,9 +120,9 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 	    for (i = 0L; i < nitems; i++, svrin += sz, svrout += sz)
 	        {for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {member_offs = desc->member_offs;
-		      PD_CAST_TYPE(mtype, desc, svrin + member_offs, svrin,
-				   SS_error, "BAD CAST - _SX_COPY_LEAF",
-				   SS_null);
+		      SX_CAST_TYPE(si, mtype, desc,
+				   svrin + member_offs, svrin,
+				   "BAD CAST - _SX_COPY_LEAF", SS_null);
 
 		      if (_PD_indirection(mtype))
 			 {dtype = PD_dereference(CSTRSAVE(mtype));

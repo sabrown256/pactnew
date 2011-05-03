@@ -70,6 +70,7 @@ extern "C" {
      SC_mark(ret, -1);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* SX_LAST_ARG - strip off the last element of the arg list
  *             - potential GC problem here
@@ -82,6 +83,20 @@ extern "C" {
          if (SS_nullobjp(SS_cddr(t)))                                        \
             {SS_setcdr(t, SS_null);                                          \
 	     break;};};}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#define SX_CAST_TYPE(_si, t, d, vg, vl, _errm, _erra)                        \
+    {if (d->cast_offs < 0L)                                                  \
+        t = d->type;                                                         \
+     else                                                                    \
+        {t = DEREF(vl + d->cast_offs);                                       \
+         if (t == NULL)                                                      \
+            {if (DEREF(vg) != NULL)                                          \
+                SS_error(_si, _errm, _erra);                               \
+             else                                                            \
+                t = d->type;};};}
 
 /*--------------------------------------------------------------------------*/
 

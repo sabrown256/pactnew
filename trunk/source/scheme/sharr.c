@@ -202,7 +202,7 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
     else if (typ == SC_FLOAT_I)
        sz = (int) SS_FLOAT_VALUE(arg);
     else
-       SS_error_n(si, "BAD ARGUMENT - MAKE-HASH-TABLE", arg);
+       SS_error(si, "BAD ARGUMENT - MAKE-HASH-TABLE", arg);
 
     tab = SC_make_hasharr(sz, NODOC, SC_HA_NAME_KEY);
     op  = SS_mk_hasharr(si, tab);

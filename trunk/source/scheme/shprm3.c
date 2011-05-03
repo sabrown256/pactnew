@@ -119,9 +119,10 @@ static object *_SSI_setcdr(SS_psides *si, object *argl)
 
 object *SS_car(object *obj)
    {object *o;
+    SS_psides *si = &_SS_si;
 
     if (!SS_consp(obj))
-       SS_error("CAN'T TAKE CAR OF ATOM - CAR", obj);
+       SS_error(si, "CAN'T TAKE CAR OF ATOM - CAR", obj);
 
     o = SS_CAR_MACRO(obj);
 
@@ -134,9 +135,10 @@ object *SS_car(object *obj)
 
 object *SS_cdr(object *obj)
    {object *o;
+    SS_psides *si = &_SS_si;
 
     if (!SS_consp(obj))
-       SS_error("CAN'T TAKE CDR OF ATOM - CDR", obj);
+       SS_error(si, "CAN'T TAKE CDR OF ATOM - CDR", obj);
 
     o = SS_CDR_MACRO(obj);
 
@@ -392,12 +394,13 @@ static object *_SSI_last(SS_psides *si, object *obj)
 
 object *SS_reverse(object *obj)
    {object *ths, *nxt, *prv;
+    SS_psides *si = &_SS_si;
 
     if (SS_nullobjp(obj))
        return(obj);
 
     if (!SS_consp(obj))
-       SS_error("BAD LIST TO REVERSE", obj);
+       SS_error(si, "BAD LIST TO REVERSE", obj);
 
     for (ths = SS_null, nxt = obj; SS_consp(nxt); )
          {prv = ths;
@@ -423,7 +426,7 @@ object *SS_append(SS_psides *si, object *list1, object *list2)
     lst = SS_null;
 
     if (!SS_consp(list2) && !SS_nullobjp(list2))
-       SS_error_n(si, "BAD SECOND LIST - SS_APPEND", list2);
+       SS_error(si, "BAD SECOND LIST - SS_APPEND", list2);
 
     if (SS_nullobjp(list1))
        return(list2);
@@ -442,7 +445,7 @@ object *SS_append(SS_psides *si, object *list1, object *list2)
         return(frst);}
 
     else
-       SS_error_n(si, "BAD FIRST LIST - SS_APPEND", list1);
+       SS_error(si, "BAD FIRST LIST - SS_APPEND", list1);
 
     return(SS_null);}
 
@@ -480,7 +483,7 @@ static object *_SSI_length(SS_psides *si, object *obj)
 
     obj = SS_car(obj);
     if (!SS_consp(obj))
-       SS_error_n(si, "OBJECT NOT A LIST - LENGTH", obj);
+       SS_error(si, "OBJECT NOT A LIST - LENGTH", obj);
 
     o = SS_mk_integer(si, SS_length(obj));
 
@@ -988,7 +991,7 @@ static object *_SSI_car(SS_psides *si, object *obj)
    {object *o;
 
     if (!SS_consp(obj))
-       SS_error_n(si, "CAN'T TAKE CAR OF ATOM - CAR", obj);
+       SS_error(si, "CAN'T TAKE CAR OF ATOM - CAR", obj);
 
     o = SS_CAR_MACRO(obj);
 
@@ -1003,7 +1006,7 @@ static object *_SSI_cdr(SS_psides *si, object *obj)
    {object *o;
 
     if (!SS_consp(obj))
-       SS_error_n(si, "CAN'T TAKE CDR OF ATOM - CDR", obj);
+       SS_error(si, "CAN'T TAKE CDR OF ATOM - CDR", obj);
 
     o = SS_CDR_MACRO(obj);
 

@@ -42,7 +42,7 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
     if (SS_nullobjp(str))
        str = si->indev;
     else if (!SS_inportp(str = SS_car(str)))
-       SS_error_n(si, "ARGUMENT NOT INPUT-PORT - READ-LINE", str);
+       SS_error(si, "ARGUMENT NOT INPUT-PORT - READ-LINE", str);
 
     s = SS_INSTREAM(str);
     t = SS_BUFFER(str);
@@ -96,7 +96,7 @@ static object *_SS_rd_lst(SS_psides *si, object *str)
 		  if (SS_eofobjp(nxt))
 		     {if ((c = SS_get_ch(si, str, TRUE)) == EOF)
 			 {SS_clr_strm(str);
-			  SS_error_n(si,
+			  SS_error(si,
 				     "UNEXPECTED END OF FILE - READ-LIST",
 				     SS_null);}
 		      else
@@ -140,7 +140,7 @@ static object *_SSI_rd_chr(SS_psides *si, object *arg)
         o = SS_mk_char(si, (int) SS_get_ch(si, str, FALSE));}
 
     else
-       SS_error_n(si, "ARGUMENT TO READ NOT INPUT-PORT", arg);
+       SS_error(si, "ARGUMENT TO READ NOT INPUT-PORT", arg);
 
     return(o);}
 
@@ -401,7 +401,7 @@ static object *_SS_pr_read(SS_psides *si, object *str)
 	case ')' :
              PRINT(stdout, "SYNTAX ERROR: '%c' on line %d char %d in file %s\n",
 		   c, prt->iln, prt->ichr-1, prt->name);
-	     SS_error_n(si, "BAILING OUT ON READ - _SS_PR_READ", NULL);
+	     SS_error(si, "BAILING OUT ON READ - _SS_PR_READ", NULL);
 
         default :
 	     PUSH_CHAR(c, str);
@@ -455,7 +455,7 @@ static object *_SSI_read(SS_psides *si, object *obj)
        o = SS_read(si, op);
 
     else
-       SS_error_n(si, "ARGUMENT TO READ NOT INPUT-PORT", obj);
+       SS_error(si, "ARGUMENT TO READ NOT INPUT-PORT", obj);
 
     return(o);}
 
@@ -475,7 +475,7 @@ static object *_SSI_opn_in(SS_psides *si, object *obj)
 	    0);
 
     if (s == NULL)
-       SS_error_n(si, "BAD STRING TO OPEN-INPUT-FILE", obj);
+       SS_error(si, "BAD STRING TO OPEN-INPUT-FILE", obj);
 
 /* GOTCHA: this causes a memory leak as coded
     int st;
@@ -489,12 +489,12 @@ static object *_SSI_opn_in(SS_psides *si, object *obj)
        {t = SC_search_file(NULL, s);
         if (t == NULL)
 	   {msg = SC_dsnprintf(FALSE, "CAN'T FIND FILE '%s' - OPEN-INPUT-FILE", s);
-	    SS_error_n(si, msg, obj);};
+	    SS_error(si, msg, obj);};
 
         str = io_open(t, "r");
         if (str == NULL)
 	   {msg = SC_dsnprintf(FALSE, "CAN'T OPEN '%s' - OPEN-INPUT-FILE", t);
-	    SS_error_n(si, msg, obj);};
+	    SS_error(si, msg, obj);};
 
 	CFREE(t);};
 
@@ -513,7 +513,7 @@ static object *_SSI_cls_in(SS_psides *si, object *obj)
    {
 
     if (!SS_inportp(obj))
-       SS_error_n(si, "BAD INPUT-PORT TO CLOSE-INPUT-PORT", obj);
+       SS_error(si, "BAD INPUT-PORT TO CLOSE-INPUT-PORT", obj);
 
     io_close(SS_INSTREAM(obj));
 
@@ -540,11 +540,11 @@ static object *_SSI_call_if(SS_psides *si, object *argl)
     else if (SS_variablep(obj))
        s = SS_VARIABLE_NAME(obj);
     else
-       SS_error_n(si, "BAD STRING TO OPEN-INPUT-FILE", obj);
+       SS_error(si, "BAD STRING TO OPEN-INPUT-FILE", obj);
 
     str = io_open(s, BINARY_MODE_R);
     if (str == NULL)
-       SS_error_n(si, "CAN'T OPEN FILE - OPEN-INPUT-FILE", obj);
+       SS_error(si, "CAN'T OPEN FILE - OPEN-INPUT-FILE", obj);
 
     old_indev = si->indev;
     si->indev  = SS_mk_inport(si, str, s);
@@ -590,7 +590,7 @@ static object *_SSI_strprt(SS_psides *si, object *arg)
    {object *port;
 
     if (!SS_stringp(arg))
-       SS_error_n(si, "BAD STRING TO STRING->PORT", arg);
+       SS_error(si, "BAD STRING TO STRING->PORT", arg);
 
     port = SS_mk_inport(si, NULL, "string");
     strcpy(SS_BUFFER(port), SS_STRING_TEXT(arg));
@@ -708,7 +708,7 @@ static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
 	    0);
 
     if (s == NULL)
-       SS_error_n(si, "BAD STRING TO SS_CHANGE_PARSER", fnm);
+       SS_error(si, "BAD STRING TO SS_CHANGE_PARSER", fnm);
 
     else
 

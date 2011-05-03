@@ -37,7 +37,7 @@ static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
 /* print out the type */
     defp = PD_inquire_table_type(tab, type);
     if (defp == NULL)
-       SS_error_n(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_FIND_LEAF", SS_null);
+       SS_error(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_FIND_LEAF", SS_null);
 
     else
        {mem_lst = defp->members;
@@ -76,13 +76,13 @@ static void _SX_find_indirection(SS_psides *si, hasharr *tytab,
             {bf = SC_dsnprintf(FALSE,
 			       "CAN'T GET POINTER LENGTH ON %s - _SX_FIND_INDIRECTION", 
 			       dtype);
-             SS_error_n(si, bf, SS_null);};
+             SS_error(si, bf, SS_null);};
 
          if (ditems == -2L)
             {bf = SC_dsnprintf(FALSE,
 			       "UNKNOWN TYPE %s - _SX_FIND_INDIRECTION", 
 			       dtype);
-             SS_error_n(si, bf, SS_null);};
+             SS_error(si, bf, SS_null);};
 
 /* if the type is an indirection, follow the pointer */
          if (_PD_indirection(dtype))
@@ -127,7 +127,7 @@ object *_SXI_find_types(SS_psides *si, object *arg)
     syment *ep;
 
     if (!SX_PDBDATAP(arg))
-       SS_error_n(si, "MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
+       SS_error(si, "MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
 
     file   = PDBDATA_FILE(arg);
     ep     = PDBDATA_EP(arg);

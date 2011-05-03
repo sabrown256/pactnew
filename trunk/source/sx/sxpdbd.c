@@ -352,12 +352,12 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
     else if ((ada != -1L) && (na != 0L))
        {oada = lio_tell(fpa);
         if (oada == -1L)
-           SS_error_n(si, "CAN'T FIND ADDRESS A - _SX_DIFF_INDIRECTION",
+           SS_error(si, "CAN'T FIND ADDRESS A - _SX_DIFF_INDIRECTION",
 		      SS_null);
 
         oadb = lio_tell(fpb);
         if (oadb == -1L)
-           SS_error_n(si, "CAN'T FIND ADDRESS B - _SX_DIFF_INDIRECTION",
+           SS_error(si, "CAN'T FIND ADDRESS B - _SX_DIFF_INDIRECTION",
 		      SS_null);
 
         if (!fla)
@@ -369,10 +369,10 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
             _PD_rfgets(bfc, MAXLINE, fpb);};
 
         if ((ada = lio_tell(fpa)) == -1L)
-           SS_error_n(si, "CAN'T FIND NEW ADDRESS A - _SX_DIFF_INDIRECTION", 
+           SS_error(si, "CAN'T FIND NEW ADDRESS A - _SX_DIFF_INDIRECTION", 
 		      SS_null);
         if ((adb = lio_tell(fpb)) == -1L)
-           SS_error_n(si, "CAN'T FIND NEW ADDRESS B - _SX_DIFF_INDIRECTION", 
+           SS_error(si, "CAN'T FIND NEW ADDRESS B - _SX_DIFF_INDIRECTION", 
 		      SS_null);
 
         epa = _PD_mk_syment(ta, na, ada, NULL, NULL);
@@ -385,13 +385,13 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
 
         if (!fla)
            if (lio_seek(fpa, oada, SEEK_SET))
-              SS_error_n(si,
+              SS_error(si,
 			 "FAILED TO FIND OLD ADDRESS A - _SX_DIFF_INDIRECTION", 
 			 SS_null);
 
         if (!flb)
            if (lio_seek(fpb, oadb, SEEK_SET))
-              SS_error_n(si,
+              SS_error(si,
 			 "FAILED TO FIND OLD ADDRESS B - _SX_DIFF_INDIRECTION", 
 			 SS_null);};
 
@@ -563,7 +563,7 @@ static int _SX_diff_structs(SS_psides *si,
     dpa = PD_inquire_table_type(pfa->host_chart, typa);
     dpb = PD_inquire_table_type(pfb->host_chart, typb);
     if ((dpa == NULL) || (dpb == NULL))
-       SS_error_n(si, "BAD TYPE - _SX_DIFF_STRUCTS", SS_null);
+       SS_error(si, "BAD TYPE - _SX_DIFF_STRUCTS", SS_null);
 
     else
        {sza = dpa->size;
@@ -751,7 +751,7 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
 
     dp = PD_inquire_table_type(hc, tc);
     if (dp == NULL)
-       SS_error_n(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_DIFF_LEAF", 
+       SS_error(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_DIFF_LEAF", 
 		  SS_mk_string(si, tc));
 
     else
@@ -941,26 +941,26 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
                                 FILE_STREAM(PDBfile, obj), argl, 
                                 "FIRST ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
     else
-       SS_error_n(si, "BAD FIRST ARGUMENT - _SXI_DIFF_VAR", SS_null);
+       SS_error(si, "BAD FIRST ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SX_ipdbfilep(obj), pfb, 
                                 FILE_STREAM(PDBfile, obj), argl, 
                                 "SECOND ARGUMENT NOT PDBFILE - _SXI_DIFF_VAR");}
     else
-       SS_error_n(si, "BAD SECOND ARGUMENT - _SXI_DIFF_VAR", SS_null);
+       SS_error(si, "BAD SECOND ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
        {SX_GET_STRING_FROM_LIST(nma, argl, 
                                 "THIRD ARGUMENT NOT NAME - _SXI_DIFF_VAR");}
     else
-       SS_error_n(si, "BAD THIRD ARGUMENT - _SXI_DIFF_VAR", SS_null);
+       SS_error(si, "BAD THIRD ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
        {SX_GET_STRING_FROM_LIST(nmb, argl, 
                                 "FOURTH ARGUMENT NOT NAME - _SXI_DIFF_VAR");}
     else
-       SS_error_n(si, "BAD FOURTH ARGUMENT - _SXI_DIFF_VAR", SS_null);
+       SS_error(si, "BAD FOURTH ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
        {SX_GET_INTEGER_FROM_LIST(si, _SC.types.max_digits, argl, 

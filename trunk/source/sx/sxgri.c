@@ -288,7 +288,7 @@ static object *_SXI_copy_iob(SS_psides *si, object *argl)
             0);
 
     if ((dvd == NULL) || (dvs == NULL))
-       SS_error_n(si, "BAD DEVICE - _SXI_COPY_IOB", argl);
+       SS_error(si, "BAD DEVICE - _SXI_COPY_IOB", argl);
 
     PG_copy_interface_objects(dvd, dvs, rm);
 
@@ -332,7 +332,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
        dev = SX_graphics_device;
 
     if (dev == NULL)
-       SS_error_n(si, "BAD DEVICE - _SXI_ADD_ANNOT", SS_null);
+       SS_error(si, "BAD DEVICE - _SXI_ADD_ANNOT", SS_null);
 
     if ((SS_length(argl) < 7) || (ndc[0] == ndc[1]))
        PG_define_region(dev, NORMC, ndc);
@@ -361,7 +361,7 @@ static object *_SXI_free_iobs(SS_psides *si, object *argl)
        dev = SX_graphics_device;
 
     if (dev == NULL)
-       SS_error_n(si, "BAD DEVICE - _SXI_FREE_IOBS", argl);
+       SS_error(si, "BAD DEVICE - _SXI_FREE_IOBS", argl);
 
     PG_free_interface_objects(dev);
 

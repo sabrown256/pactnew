@@ -684,14 +684,14 @@ object *LR_var_plot(SS_psides *si, object *argl)
                 if (SX_DEVICEP(head))
                    dev = SS_GET(PG_device, head);
                 else
-                   SS_error("BAD DEVICE - LR_VAR_PLOT", head);}
+                   SS_error(si, "BAD DEVICE - LR_VAR_PLOT", head);}
 
             else if (strcmp(name, "file") == 0)
                {head = SS_cadr(sobj);
                 if (SX_pdbfilep(head))
                    file = FILE_STREAM(PDBfile, head);
                 else
-                   SS_error("BAD FILE - LR_VAR_PLOT", head);}
+                   SS_error(si, "BAD FILE - LR_VAR_PLOT", head);}
 
             else
                {range = LR_get_set(name, &centering, arr, space);
@@ -699,7 +699,7 @@ object *LR_var_plot(SS_psides *si, object *argl)
                    {snprintf(SX_err, MAXLINE,
 			     "CAN'T HANDLE %s - LR_VAR_PLOT",
 			     name);
-                    SS_error(SX_err, sobj);};
+                    SS_error(si, SX_err, sobj);};
                 lcolor = color;
                 lstyle = style;
                 lwidth = width;
@@ -734,14 +734,16 @@ object *LR_var_plot(SS_psides *si, object *argl)
                     domain = SS_GET(PM_set, SS_caddr(val));
                     arr    = SS_GET(C_array, SS_cdddr(val));}
                 else
-                   SS_error("BAD OBJECT IN CONTEXT - LR_VAR_PLOT", sobj);}
+                   SS_error(si,
+			    "BAD OBJECT IN CONTEXT - LR_VAR_PLOT",
+			    sobj);}
             else
                {range = LR_get_set(name, &centering, arr, space);
                 if (range == NULL)
                    {snprintf(SX_err, MAXLINE,
                             "CAN'T HANDLE %s - LR_VAR_PLOT",
                             name);
-                    SS_error(SX_err, sobj);};
+                    SS_error(si, SX_err, sobj);};
 
 /* check the domain */
                 if (domain == NULL)

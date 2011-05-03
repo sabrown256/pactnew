@@ -72,10 +72,10 @@ object *SX_draw_grotrian(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error_n(si, "BAD DEVICE - SX_DRAW_GROTRIAN", argl);
+       SS_error(si, "BAD DEVICE - SX_DRAW_GROTRIAN", argl);
 
     if (!_SX_grotrian_graphp(g))
-       SS_error_n(si, "GRAPH IS NOT GROTRIAN - SX_DRAW_GROTRIAN", argl);
+       SS_error(si, "GRAPH IS NOT GROTRIAN - SX_DRAW_GROTRIAN", argl);
 
     PG_grotrian_plot(dev, g);
 

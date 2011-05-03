@@ -95,11 +95,11 @@ static void _UL_print_out_device(SS_psides *si, int idev)
        {dev = out->dev;
 	if (dev == NULL)
            {if ((out->fname == NULL) || (strlen(out->fname) == 0))
-	       SS_error_n(si,
+	       SS_error(si,
 			  "OUTPUT FILE NAME IS NULL - _UL_PRINT_OUT_DEVICE",
 			  SS_null);
             if ((out->type == NULL) || (strlen(out->type) == 0))
-               SS_error_n(si,
+               SS_error(si,
 			  "OUTPUT FILE TYPE IS NULL - _UL_PRINT_OUT_DEVICE",
 			  SS_null);
             dev = PG_make_device(out->dupp, out->type, out->fname);
@@ -108,7 +108,7 @@ static void _UL_print_out_device(SS_psides *si, int idev)
 				 out->width, out->height);
 
             if (dev == NULL)
-               SS_error_n(si,
+               SS_error(si,
 			  "CAN'T OPEN OUTPUT FILE - _UL_PRINT_OUT_DEVICE",
 			  SS_null);
 

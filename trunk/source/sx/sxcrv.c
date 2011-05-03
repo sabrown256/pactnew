@@ -208,7 +208,7 @@ void SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si))
 
     if (plt != NULL)
        {plt(NULL);
-	SS_error_n(si,
+	SS_error(si,
 		   "ALL 26 CURVE ID'S IN USE - SX_ASSIGN_NEXT_ID",
 		   SS_null);};
 
@@ -420,7 +420,7 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
     xi[0] = SX_dataset[i].x[0] = CMAKE_N(double, na);
     xi[1] = SX_dataset[i].x[1] = CMAKE_N(double, na);
     if (xi[0] == NULL || xi[1] == NULL)
-       SS_error_n(si, "OUT OF MEMORY - CREATE_CURVE", SS_null);
+       SS_error(si, "OUT OF MEMORY - CREATE_CURVE", SS_null);
 
 /* copy data */
     for (k = 0; k < na; k++)

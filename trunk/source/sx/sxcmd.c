@@ -328,12 +328,12 @@ static object *_SXI_thru(SS_psides *si, object *argl)
                 0);
 
         if (first < 1)
-           SS_error_n(si,
+           SS_error(si,
 		      "FIRST ARGUMENT NOT A VALID MAPPING NUMBER - _SXI_THRU",
 		      argl);
 
         if (last < 1)
-           SS_error_n(si,
+           SS_error(si,
 		      "SECOND ARGUMENT NOT A VALID MAPPING NUMBER - _SXI_THRU",
 		      argl);
 
@@ -365,11 +365,11 @@ static object *_SXI_thru(SS_psides *si, object *argl)
                 0);
 
         if ((first < 'A') || (first > 'Z'))
-           SS_error_n(si, "FIRST ARGUMENT NOT A VALID DATA-ID - _SXI_THRU",
+           SS_error(si, "FIRST ARGUMENT NOT A VALID DATA-ID - _SXI_THRU",
 		      argl);
 
         if ((last < 'A') || (last > 'Z'))
-           SS_error_n(si, "SECOND ARGUMENT NOT A VALID DATA-ID - _SXI_THRU",
+           SS_error(si, "SECOND ARGUMENT NOT A VALID DATA-ID - _SXI_THRU",
 		      argl);
 
         if (first <= last)

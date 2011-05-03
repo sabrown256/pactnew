@@ -62,7 +62,7 @@ static void _SS_fix_arg(SS_psides *si, object *obj, void *v, int type)
 	    switch (SS_PROCEDURE_TYPE(obj))
 	       {case SS_MACRO : 
                 case SS_PROC  :
-		     SS_error_n(si, "CAN'T MAKE VALUE - _SS_FIX_ARG", obj);
+		     SS_error(si, "CAN'T MAKE VALUE - _SS_FIX_ARG", obj);
 		     break;
 
 		default :
@@ -77,10 +77,10 @@ static void _SS_fix_arg(SS_psides *si, object *obj, void *v, int type)
 		     else if (hand == (PFVoid) SS_acc_double)
 		        l = *(double *) u.memaddr;
 		     else
-		        SS_error_n(si, "BAD VARIABLE TYPE - _SS_FIX_ARG", obj);};}
+		        SS_error(si, "BAD VARIABLE TYPE - _SS_FIX_ARG", obj);};}
 
 	else
-	   SS_error_n(si, "BAD OBJECT - _SS_FIX_ARG", obj);
+	   SS_error(si, "BAD OBJECT - _SS_FIX_ARG", obj);
 
 	SC_convert_id(type, v, 0, 1, SC_LONG_LONG_I, &l, 0, 1, 1, FALSE);};
 
@@ -112,7 +112,7 @@ static void _SS_float_arg(SS_psides *si, object *obj, void *v, int type)
 	    switch (SS_PROCEDURE_TYPE(obj))
 	       {case SS_MACRO : 
 		case SS_PROC  :
-		     SS_error_n(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+		     SS_error(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
 		     break;
 
 		default :
@@ -127,10 +127,10 @@ static void _SS_float_arg(SS_psides *si, object *obj, void *v, int type)
 		     else if (hand == (PFVoid) SS_acc_double)
 		        d = *(double *) u.memaddr;
 		     else
-		        SS_error_n(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+		        SS_error(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
 
 	else
-	   SS_error_n(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
+	   SS_error(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
 
 	SC_convert_id(type, v, 0, 1, SC_LONG_DOUBLE_I, &d, 0, 1, 1, FALSE);};
 
@@ -162,7 +162,7 @@ static void _SS_complex_arg(SS_psides *si, object *obj, void *v)
 	    switch (SS_PROCEDURE_TYPE(obj))
 	       {case SS_MACRO : 
 		case SS_PROC  :
-		     SS_error_n(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+		     SS_error(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
 		     break;
 
 		default :
@@ -177,10 +177,10 @@ static void _SS_complex_arg(SS_psides *si, object *obj, void *v)
 		     else if (hand == (PFVoid) SS_acc_double)
 		        z = *(double *) u.memaddr;
 		     else
-		        SS_error_n(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+		        SS_error(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
 
 	else
-	   SS_error_n(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
+	   SS_error(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
 
 	zp  = (double _Complex *) v;
 	*zp = z;};
@@ -227,7 +227,7 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
         switch (SS_PROCEDURE_TYPE(obj))
            {case SS_MACRO : 
             case SS_PROC  :
-                 SS_error_n(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+                 SS_error(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
                  break;
 
             default :
@@ -242,13 +242,13 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
                  else if (hand == (PFVoid) SS_acc_double)
                     q.s = *(double *) u.memaddr;
                  else
-                    SS_error_n(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+                    SS_error(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
 
     else if (SS_nullobjp(obj))
        q.s = 0.0;
 
     else
-       SS_error_n(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
+       SS_error(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
 
     qp  = (quaternion *) v;
     *qp = q;
@@ -308,23 +308,23 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 
     else if (type == SS_HAELEM_I)
        {if (!SS_haelemp(obj))
-	   SS_error_n(si, "OBJECT NOT HASH_ELEMENT - _SS_ARGS", obj);
+	   SS_error(si, "OBJECT NOT HASH_ELEMENT - _SS_ARGS", obj);
 	*pv = obj->val;}
 
     else if (type == SS_HASHARR_I)
        {if (!SS_nullobjp(obj))
 	   {if (!SS_hasharrp(obj))
-	       SS_error_n(si, "OBJECT NOT HASH_ARRAY - _SS_ARGS", obj);
+	       SS_error(si, "OBJECT NOT HASH_ARRAY - _SS_ARGS", obj);
 	    *pv = obj->val;};}
 
     else if (type == SS_PROCESS_I)
        {if (!SS_processp(obj))
-	   SS_error_n(si, "OBJECT NOT PROCESS - _SS_ARGS", obj);
+	   SS_error(si, "OBJECT NOT PROCESS - _SS_ARGS", obj);
 	*pv = obj->val;}
 
     else if (type == SS_VECTOR_I)
        {if (!SS_vectorp(obj))
-	   SS_error_n(si, "OBJECT NOT VECTOR - _SS_ARGS", obj);
+	   SS_error(si, "OBJECT NOT VECTOR - _SS_ARGS", obj);
 	*pv = obj->val;}
 
 #endif
@@ -440,7 +440,7 @@ object *SS_define_constant(SS_psides *si, int n, ...)
 	  val = SC_VA_ARG(object *);
 
        else
-	  SS_error_n(si, "UNSUPPORTED TYPE - SS_DEFINE_CONSTANT",
+	  SS_error(si, "UNSUPPORTED TYPE - SS_DEFINE_CONSTANT",
 		   SS_null);
 
        vr = SS_mk_variable(si, name, SS_null);
@@ -510,7 +510,7 @@ void *SS_var_reference(SS_psides *si, char *s)
         switch (SS_PROCEDURE_TYPE(obj))
            {case SS_MACRO : 
             case SS_PROC  :
-                 SS_error_n(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+                 SS_error(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
                  break;
 
             default       :
@@ -522,9 +522,9 @@ void *SS_var_reference(SS_psides *si, char *s)
                      (hand == (PFVoid) SS_acc_double))
                     vr = u.memaddr;
                  else
-                    SS_error_n(si, "BAD VARIABLE TYPE - SS_VAR_REFERENCE", obj);};}
+                    SS_error(si, "BAD VARIABLE TYPE - SS_VAR_REFERENCE", obj);};}
     else
-       SS_error_n(si, "BAD OBJECT - SS_VAR_REFERENCE", obj);
+       SS_error(si, "BAD OBJECT - SS_VAR_REFERENCE", obj);
 
     return(vr);}
 
@@ -717,7 +717,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
 
     fnc = (object *) SC_hasharr_def_lookup(si->symtab, func);
     if (fnc == NULL)
-       SS_error_n(si, "UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(si, func));
+       SS_error(si, "UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(si, func));
 
     for (i = 0; i < MAXLINE; i++)
         {type[i] = *SC_VA_ARG(int *);
@@ -760,7 +760,7 @@ object *SS_call_scheme(SS_psides *si, char *func, ...)
     fnc = _SS_lk_var_valc(si, func, si->env);
 /*    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func); */
     if (fnc == NULL)
-       SS_error_n(si, "UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(si, func));
+       SS_error(si, "UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(si, func));
 
     for (i = 0; i < MAXLINE; i++)
         {type[i] = SC_VA_ARG(int);

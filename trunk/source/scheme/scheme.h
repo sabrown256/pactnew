@@ -122,7 +122,7 @@ typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
                    "function release",                                      \
                    LAST);                                                   \
     if (dp == NULL)                                                         \
-       SS_error_n(_si, "COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT", \
+       SS_error(_si, "COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT", \
                 SS_null);}
 
 struct s_SS_psides
@@ -656,7 +656,7 @@ struct s_SS_vect
     {_oect *_x;                                                              \
      _x = _v;                                                                \
      if ((_x->val == NULL) || (_x->eval_type == NO_EV))                      \
-        SS_error_n(si, "FREED OBJECT - SS_ASSIGN", SS_null);                 \
+        SS_error(si, "FREED OBJECT - SS_ASSIGN", SS_null);                 \
      SS_MARK(_x);                                                            \
      SS_gc(_o);                                                              \
      _o = _x;}
@@ -688,7 +688,7 @@ extern void
 
 #  define SS_Save(_si, _o)                                                   \
    {if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
-       SS_error_n(_si, "FREED _OECT - SS_SAVE", SS_null);                    \
+       SS_error(_si, "FREED _OECT - SS_SAVE", SS_null);                    \
     (_si)->nsave++;                                                          \
     SS_MARK(_o);                                                             \
     SC_array_push((_si)->stack, &_o);}
@@ -724,7 +724,7 @@ extern void
     SS_gc(_o);                                                               \
     _o = *(object **) SC_array_pop((_si)->stack);                            \
     if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
-       SS_error_n(_si, "FREED OBJECT - SS_RESTORE", SS_null);}
+       SS_error(_si, "FREED OBJECT - SS_RESTORE", SS_null);}
 
 # else
 
@@ -1108,8 +1108,7 @@ extern void
  SS_init_cont(SS_psides *si),
  SS_expand_stack(SS_psides *si),
  SS_push_err(SS_psides *si, int flag, int type),
- SS_error_n(SS_psides *si, char *s, object *obj),
- SS_error(char *s, object *obj);
+ SS_error(SS_psides *si, char *s, object *obj);
 
 
 /* SHTTY.C declarations */

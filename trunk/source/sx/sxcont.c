@@ -95,7 +95,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
     switch (type)
        {case G_FILE :
              if (!SS_nullobjp(obj) && !SX_FILEP(obj))
-                SS_error_n(si, "OBJECT NOT FILE - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
 
              if (SS_nullobjp(obj))
                 *pv = (void *) SX_gvif;
@@ -105,13 +105,13 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 
         case G_DEVICE :
              if (!SX_DEVICEP(obj))
-                SS_error_n(si, "OBJECT NOT PG_DEVICE - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT PG_DEVICE - _SX_ARGS", obj);
              *pv = (void *) SS_GET(PG_device, obj);
              break;
 
         case G_SET :
              if (!SX_SETP(obj))
-                SS_error_n(si, "OBJECT NOT PM_SET - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT PM_SET - _SX_ARGS", obj);
              *pv = (void *) SS_GET(PM_set, obj);
              break;
 
@@ -121,25 +121,25 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
              else if (SX_MAPPINGP(obj))
                 *pv = (void *) SS_GET(PM_mapping, obj);
              else
-                SS_error_n(si, "OBJECT NOT PM_MAPPING - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT PM_MAPPING - _SX_ARGS", obj);
              break;
 
         case G_GRAPH :
              if (SX_GRAPHP(obj))
                 *pv = (void *) SS_GET(PG_graph, obj);
              else
-                SS_error_n(si, "OBJECT NOT PG_GRAPH - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT PG_GRAPH - _SX_ARGS", obj);
              break;
 
         case G_NUM_ARRAY :
              if (!SX_NUMERIC_ARRAYP(obj))
-                SS_error_n(si, "OBJECT NOT C_ARRAY - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT C_ARRAY - _SX_ARGS", obj);
              *pv = (void *) SS_GET(C_array, obj);
              break;
 
         case G_IMAGE :
              if (!SX_IMAGEP(obj))
-                SS_error_n(si, "OBJECT NOT PG_IMAGE - _SX_ARGS", obj);
+                SS_error(si, "OBJECT NOT PG_IMAGE - _SX_ARGS", obj);
              *pv = (void *) SS_GET(PG_image, obj);
              break;
 
@@ -148,7 +148,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
                 {s   = SS_get_string(obj);
                  *pv = (void *) PA_INQUIRE_VARIABLE(s);
                  if (pv == NULL)
-                    SS_error_n(si, "BAD PACKAGE - _SX_ARGS", obj);}
+                    SS_error(si, "BAD PACKAGE - _SX_ARGS", obj);}
              else
                 *pv = (void *) SS_GET(PA_package, obj);
              break;
@@ -158,7 +158,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
                 {s   = CSTRSAVE(SS_get_string(obj));
                  *pv = (void *) PA_INQUIRE_VARIABLE(s);
                  if (pv == NULL)
-                    SS_error_n(si, "NOT PANACEA VARIABLE - _SX_ARGS",
+                    SS_error(si, "NOT PANACEA VARIABLE - _SX_ARGS",
                              obj);}
              else
                 *pv = (void *) SS_GET(PA_variable, obj);
@@ -166,14 +166,14 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
 
         case G_PDBDATA :
              if (!SX_PDBDATAP(obj))
-                SS_error_n(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
+                SS_error(si, "NOT PDBDATA OBJECT - _SX_ARGS", obj);
 
              *pv = (void *) SS_GET(g_pdbdata, obj);
              break;
 
         case G_DEFSTR :
              if (!SX_DEFSTRP(obj))
-                SS_error_n(si, "NOT DEFSTR OBJECT - _SX_ARGS", obj);
+                SS_error(si, "NOT DEFSTR OBJECT - _SX_ARGS", obj);
 
              *pv = (void *) SS_GET(defstr, obj);
              break;
@@ -189,7 +189,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
         case G_PLOT_REQUEST     :
 
         default :
-             SS_error_n(si, "BAD TYPE - _SX_ARGS", SS_mk_integer(si, type));};
+             SS_error(si, "BAD TYPE - _SX_ARGS", SS_mk_integer(si, type));};
 
     return;}
 
@@ -272,7 +272,7 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
         case G_PLOT_REQUEST     :
 
         default                 :
-             SS_error_n(si, "BAD TYPE - _SX_CALL_ARGS", SS_mk_integer(si, type));};
+             SS_error(si, "BAD TYPE - _SX_CALL_ARGS", SS_mk_integer(si, type));};
 
     return(obj);}
 
@@ -442,7 +442,7 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
     if (strcmp(type, SX_MAPPING_S) == 0)
        {var = SC_dsnprintf(FALSE, "%s[%d].name", s, file->default_offset);
         if (!PD_read(file, var, &lb))
- 	   SS_error_n(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
+ 	   SS_error(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
 		      SS_null);
 
 	mitem.label = CSTRSAVE(lb);
@@ -454,13 +454,13 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
        {char *u, t[MAXLINE], *pt;
 
         if (!PD_read(file, s, t))
-           SS_error_n(si, "FAILED TO READ CURVE HEADER - _SX_PUSH_MENU_ITEM",
+           SS_error(si, "FAILED TO READ CURVE HEADER - _SX_PUSH_MENU_ITEM",
 		      SS_null);
 
 /* extract the name of the label variable */
         lb = SC_strtok(t, "|", pt);
         if (lb == NULL)
-           SS_error_n(si, "BAD CURVE HEADER - _SX_PUSH_MENU_ITEM", SS_null);
+           SS_error(si, "BAD CURVE HEADER - _SX_PUSH_MENU_ITEM", SS_null);
 
 /* get the label */
         else if (PD_has_directories(file))
@@ -471,7 +471,7 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
            strcpy(s, lb);
 
         if (!PD_read(file, s, t))
-           SS_error_n(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
+           SS_error(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
 		      SS_null);
         mitem.label = CSTRSAVE(t);
 
@@ -481,14 +481,14 @@ void _SX_push_menu_item(SS_psides *si, g_file *po, char *name, char *type)
     else if (strcmp(type, SX_IMAGE_S) == 0)
        {var = SC_dsnprintf(FALSE, "%s[%d].label", s, file->default_offset);
         if (!PD_read(file, var, &lb))
-           SS_error_n(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
+           SS_error(si, "FAILED TO READ LABEL - _SX_PUSH_MENU_ITEM",
 		      SS_null);
 	mitem.label = CSTRSAVE(lb);
 
 	SC_array_push(po->menu_lst, &mitem);}
 
     else
-       SS_error_n(si, "BAD OBJECT TYPE - _SX_PUSH_MENU_ITEM", SS_null);
+       SS_error(si, "BAD OBJECT TYPE - _SX_PUSH_MENU_ITEM", SS_null);
 
     return;}
 

@@ -41,7 +41,7 @@ static void _SX_target(SS_psides *si, int data, int align)
     else
        {while (PD_std_standards[data_max++]);
         if ((data < 1) || (data >= data_max))
-           SS_error_n(si, "UNKNOWN DATA STANDARD - _SX_TARGET",
+           SS_error(si, "UNKNOWN DATA STANDARD - _SX_TARGET",
                     SS_mk_integer(si, data));};
         
     if (align == 0)
@@ -50,7 +50,7 @@ static void _SX_target(SS_psides *si, int data, int align)
     else
        {while (PD_std_alignments[align_max++]);
        if ((align < 1) || (align >= align_max))
-          SS_error_n(si, "UNKNOWN DATA ALIGNMENT - _SX_TARGET",
+          SS_error(si, "UNKNOWN DATA ALIGNMENT - _SX_TARGET",
                    SS_mk_integer(si, align));};
 
     if (data != 0)
@@ -161,7 +161,7 @@ static object *_SXI_open_raw_file(SS_psides *si, object *argl)
 
     file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, NULL);
     if (file == NULL)
-       SS_error_n(si, "CAN'T ALLOCATE PDBFILE - _SXI_OPEN_RAW_FILE", argl);
+       SS_error(si, "CAN'T ALLOCATE PDBFILE - _SXI_OPEN_RAW_FILE", argl);
 
 /* initialize the PDB file */
     file->chrtaddr = 0;
@@ -200,7 +200,7 @@ static object *_SXI_seek_raw_file(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       SS_error_n(si, "BAD FILE POINTER - _SXI_SEEK_RAW_FILE", argl);
+       SS_error(si, "BAD FILE POINTER - _SXI_SEEK_RAW_FILE", argl);
        
     else
        {file = FILE_FILE(PDBfile, po);
@@ -219,7 +219,7 @@ static object *_SXI_seek_raw_file(SS_psides *si, object *argl)
 	         break;};
 
 	if (ret != 0)
-	   SS_error_n(si, "CAN'T SEEK IN FILE - _SXI_SEEK_RAW_FILE", argl);};
+	   SS_error(si, "CAN'T SEEK IN FILE - _SXI_SEEK_RAW_FILE", argl);};
 
     return(SS_f);}
 
@@ -238,14 +238,14 @@ static object *_SXI_close_raw_file(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       SS_error_n(si, "BAD FILE POINTER - _SXI_CLOSE_RAW_FILE", argl);
+       SS_error(si, "BAD FILE POINTER - _SXI_CLOSE_RAW_FILE", argl);
        
     else
        {file = FILE_FILE(PDBfile, po);
 	fp   = file->stream;
 
 	if (lio_close(fp) != 0)
-	   SS_error_n(si, "CAN'T CLOSE FILE - _SXI_CLOSE_RAW_FILE", argl);
+	   SS_error(si, "CAN'T CLOSE FILE - _SXI_CLOSE_RAW_FILE", argl);
 
 /* free the space */
 	_PD_rl_pdb(file);};
@@ -296,7 +296,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
         outtype = intype;};
 
     if (po == NULL)
-       SS_error_n(si, "BAD FILE POINTER - _SXI_RD_RAW", argl);
+       SS_error(si, "BAD FILE POINTER - _SXI_RD_RAW", argl);
        
     else
        {file = FILE_FILE(PDBfile, po);
@@ -320,7 +320,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 	ep   = _PD_mk_syment(intype, nitems, addr, NULL, NULL);
 
 	if (ret)
-	   SS_error_n(si, "FSEEK FAILED TO FIND REQUESTED ADDRESS - _SXI_RD_RAW",
+	   SS_error(si, "FSEEK FAILED TO FIND REQUESTED ADDRESS - _SXI_RD_RAW",
 		    argl);
 
 /* pad char arrays with 2 null characters - for printing and SC_firsttok */
@@ -330,7 +330,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 	   vr = _PD_alloc_entry(file, outtype, nitems);
 
 	if (vr == NULL)
-	   SS_error_n(si, "CAN'T ALLOCATE MEMORY - _SXI_RD_RAW", SS_null);
+	   SS_error(si, "CAN'T ALLOCATE MEMORY - _SXI_RD_RAW", SS_null);
 
 	switch (SETJMP(pa->read_err))
 	   {case ABORT :
@@ -393,17 +393,17 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
     if (SX_PDBDATAP(obj))
        vr = (void *) PDBDATA_DATA(obj);
     else
-       SS_error_n(si, "CAN'T HANDLE THIS DATA - _SXI_WR_RAW", argl);
+       SS_error(si, "CAN'T HANDLE THIS DATA - _SXI_WR_RAW", argl);
 
     if (po == NULL)
-       SS_error_n(si, "BAD FILE POINTER - _SXI_WR_RAW", argl);
+       SS_error(si, "BAD FILE POINTER - _SXI_WR_RAW", argl);
        
     else
        {file = FILE_FILE(PDBfile, po);
 	fp   = file->stream;
 
 	if (lio_flush(fp))
-	   SS_error_n(si, "FFLUSH FAILED BEFORE READ - _SXI_WR_RAW", argl);
+	   SS_error(si, "FFLUSH FAILED BEFORE READ - _SXI_WR_RAW", argl);
 
 	switch (addr)
 	   {case -1 :
@@ -420,7 +420,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 		 break;};
 
 	if (ret)
-	   SS_error_n(si, "FSEEK FAILED TO FIND REQUESTED ADDRESS - _SXI_WR_RAW",
+	   SS_error(si, "FSEEK FAILED TO FIND REQUESTED ADDRESS - _SXI_WR_RAW",
 		    argl);
 
 	switch (SETJMP(pa->write_err))
@@ -466,7 +466,7 @@ static dimdes *_SX_make_dims_dimdes(SS_psides *si, PDBfile *file,
             {mini = SS_INTEGER_VALUE(SS_car(dim_obj));
              leng = SS_INTEGER_VALUE(SS_cdr(dim_obj)) - mini + 1;}
          else
-            SS_error_n(si,
+            SS_error(si,
 		       "DIMENSIONS MUST BE INTEGERS - _SX_MAKE_DIMS_DIMDES",
 		       dim_obj);
 
@@ -530,7 +530,7 @@ static syment *_SX_spec_instance(SS_psides *si, PDBfile *file,
 	argl = SS_cdr(argl);
 
 	if (!SS_consp(data))
-	   SS_error_n(si, "SHOULD BE LIST - _SX_SPEC_INSTANCE", data);
+	   SS_error(si, "SHOULD BE LIST - _SX_SPEC_INSTANCE", data);
 
 	label = CSTRSAVE(SS_get_string(SS_car(data)));
 	data  = SS_cdr(data);
@@ -543,7 +543,7 @@ static syment *_SX_spec_instance(SS_psides *si, PDBfile *file,
 	    else
 	       {val.memaddr = _PD_alloc_entry(file, type, number);
 		if (val.memaddr == NULL)
-		   SS_error_n(si, "CAN'T ALLOCATE TYPE - _SX_SPEC_INSTANCE", data);
+		   SS_error(si, "CAN'T ALLOCATE TYPE - _SX_SPEC_INSTANCE", data);
 
 		_SX_rd_tree_list(si, argl, file,
 				 val.memaddr, number, type, dims);
@@ -666,7 +666,7 @@ object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
             0);
 
     if (name == NULL)
-       SS_error_n(si, "BAD FILE NAME - _SX_OPEN_FILE", arg);
+       SS_error(si, "BAD FILE NAME - _SX_OPEN_FILE", arg);
 
 /* search for an existing file by this name */
     for (po = SX_file_list; po != NULL; po = po->next)
@@ -1557,7 +1557,7 @@ static object *_SXI_change_directory(SS_psides *si, object *argl)
        dir = "/";
 
     if (!PD_cd(file, dir))
-       SS_error_n(si, "BAD DIRECTORY NAME - _SXI_CHANGE_DIRECTORY", argl);
+       SS_error(si, "BAD DIRECTORY NAME - _SXI_CHANGE_DIRECTORY", argl);
 
     o = SS_mk_string(si, dir);
 
@@ -1591,7 +1591,7 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
     if (!PD_mkdir(file, dir))
        {PD_err[0] = '\0';
 	if (SS_true(errf))
-           SS_error_n(si, "UNABLE TO CREATE DIRECTORY - _SXI_MAKE_DIRECTORY",
+           SS_error(si, "UNABLE TO CREATE DIRECTORY - _SXI_MAKE_DIRECTORY",
 		    argl);};
 
     o = SS_mk_string(si, dir);
@@ -1677,7 +1677,7 @@ static object *_SXI_create_link(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (!PD_ln(file, oldname, newname))
-       SS_error_n(si, "UNABLE TO CREATE LINK - _SXI_CREATE_LINK", argl);
+       SS_error(si, "UNABLE TO CREATE LINK - _SXI_CREATE_LINK", argl);
 
     o = SS_mk_string(si, newname);
 
@@ -1787,11 +1787,11 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
                 0);
 
         if (SS_nullobjp(ord))
-           SS_error_n(si, "BAD BYTE ORDERING - _SXI_DEF_PRIM", ord);
+           SS_error(si, "BAD BYTE ORDERING - _SXI_DEF_PRIM", ord);
 
         no = SS_length(ord);
         if (no != bytespitem)
-           SS_error_n(si, "INCONSISTENT SIZE - _SXI_DEF_PRIM", ord);
+           SS_error(si, "INCONSISTENT SIZE - _SXI_DEF_PRIM", ord);
 
         ordr = CMAKE_N(int, no);
         for (i = 0L; i < no; i++, ord = SS_cdr(ord))
@@ -1847,11 +1847,11 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (SS_nullobjp(ord))
-       SS_error_n(si, "BAD BYTE ORDERING - _SXI_CHG_PRIM", ord);
+       SS_error(si, "BAD BYTE ORDERING - _SXI_CHG_PRIM", ord);
 
     no = SS_length(ord);
     if (no != nb)
-       SS_error_n(si, "INCONSISTENT SIZE - _SXI_CHG_PRIM", ord);
+       SS_error(si, "INCONSISTENT SIZE - _SXI_CHG_PRIM", ord);
 
     ordr = CMAKE_N(int, no);
     for (i = 0L; i < no; i++, ord = SS_cdr(ord))
@@ -1891,7 +1891,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
 
     dp = PD_inquire_type(file, name);
     if (dp == NULL)
-       SS_error_n(si, "BAD TYPE - _SXI_READ_DEFSTR", argl);
+       SS_error(si, "BAD TYPE - _SXI_READ_DEFSTR", argl);
 
     o = _SX_mk_gdefstr(si, dp);
 
@@ -1981,7 +1981,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
     for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {member_obj = SS_car(argl);
 	 if (!SS_consp(member_obj))
-	    SS_error_n(si, "MEMBER MUST BE A LIST - _SXI_MAKE_DEFSTR",
+	    SS_error(si, "MEMBER MUST BE A LIST - _SXI_MAKE_DEFSTR",
 		     member_obj);
 
          mname = NULL;
@@ -2215,7 +2215,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
 	if (SS_true(err))
 	   return(SS_null);
 	else
-	   SS_error_n(si, PD_err, SS_cadr(argl));}
+	   SS_error(si, PD_err, SS_cadr(argl));}
 
     else if (SC_LAST_CHAR(name) == ']')
        {dp = PD_entry_dimensions(ep);
@@ -2266,7 +2266,7 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
              alst = SS_cddr(alst);};
 
         if (tot != numb)
-           SS_error_n(si,
+           SS_error(si,
 		      "INCONSISTENT DISCONTIGUOUS ENTRY - _SX_MAKE_BLOCKS",
 		      alst);}
 
@@ -2474,7 +2474,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
     object *namo, *symo, *rv;
     
     if (!SS_consp(argl))
-       SS_error_n(si, "BAD ARGUMENT LIST - SX_WRITE_FILEDATA", argl);
+       SS_error(si, "BAD ARGUMENT LIST - SX_WRITE_FILEDATA", argl);
 
     argl = SX_get_pdbfile(argl, &file, &po);
 
@@ -2488,7 +2488,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 
 /* if no other arguments its an error */
     if (SS_nullobjp(argl))
-       SS_error_n(si, "INSUFFICIENT ARGUMENTS - SX_WRITE_FILEDATA", argl);
+       SS_error(si, "INSUFFICIENT ARGUMENTS - SX_WRITE_FILEDATA", argl);
 
 /* if the next item is a pdbdata, use its info */
     symo = SS_car(argl);
@@ -2515,7 +2515,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
             if (ep == NULL)
 	       {CFREE(type);
 		CFREE(dims);
-		SS_error_n(si, PD_err, namo);};};}
+		SS_error(si, PD_err, namo);};};}
         
 /* otherwise the next thing should be a cons */
     else
@@ -2523,7 +2523,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 
 	addr.diskaddr = PD_entry_address(ep);
         if (addr.memaddr == NULL)
-           SS_error_n(si, "UNKNOWN DATA - SX_WRITE_FILEDATA", argl);
+           SS_error(si, "UNKNOWN DATA - SX_WRITE_FILEDATA", argl);
 
 /* "write" to correct file */
 	wrfl = TRUE;
@@ -2533,13 +2533,13 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 
 	if (wrfl)
            {if (fp->mode == PD_OPEN)
-	       SS_error_n(si, "FILE OPENED READ-ONLY - SX_WRITE_FILEDATA", SS_null);
+	       SS_error(si, "FILE OPENED READ-ONLY - SX_WRITE_FILEDATA", SS_null);
 
             ep = wr(fp, fullpath, PD_entry_type(ep), PD_entry_type(ep),
 		    addr.memaddr, PD_entry_dimensions(ep),
 		    FALSE, &new);
             if (ep == NULL)
-	       SS_error_n(si, PD_err, namo);};
+	       SS_error(si, PD_err, namo);};
 
 	if (fp != file)
 	   PN_close(fp);};
@@ -2645,7 +2645,7 @@ static object *_SXI_remove_entry(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error_n(si, "BAD FILE - _SXI_REMOVE_ENTRY", argl);
+       SS_error(si, "BAD FILE - _SXI_REMOVE_ENTRY", argl);
 
     if (file != NULL)
        rv = (PD_remove_entry(file, name) == TRUE) ? SS_t : SS_f;
@@ -2682,7 +2682,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
     object *namo, *symo, *o;
     
     if (!SS_consp(argl))
-       SS_error_n(si, "BAD ARGUMENT LIST - _SXI_RESERVE_PDBDATA", argl);
+       SS_error(si, "BAD ARGUMENT LIST - _SXI_RESERVE_PDBDATA", argl);
 
     argl = SX_get_pdbfile(argl, &file, &po);
 
@@ -2693,7 +2693,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 
 /* if no other arguments its an error */
     if (SS_nullobjp(argl))
-       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_RESERVE_PDBDATA", argl);
+       SS_error(si, "INSUFFICIENT ARGUMENTS - _SXI_RESERVE_PDBDATA", argl);
 
 /* if the next item is a pdbdata, use its info */
     symo = SS_car(argl);
@@ -2712,7 +2712,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 	if (ep == NULL)
 	   {CFREE(type);
 	    CFREE(dims);
-	    SS_error_n(si, PD_err, namo);};
+	    SS_error(si, PD_err, namo);};
 
 	ep = PD_copy_syment(ep);}
         
@@ -2736,16 +2736,16 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 		wrfl = FALSE;}
 
 	    else
-	       SS_error_n(si, "NOT APPROPRIATE - _SXI_RESERVE_PDBDATA", SS_null);};
+	       SS_error(si, "NOT APPROPRIATE - _SXI_RESERVE_PDBDATA", SS_null);};
 
 	if (wrfl)
            {if (fp->mode == PD_OPEN)
-	       SS_error_n(si, "FILE OPENED READ-ONLY - _SXI_RESERVE_PDBDATA", SS_null);
+	       SS_error(si, "FILE OPENED READ-ONLY - _SXI_RESERVE_PDBDATA", SS_null);
 
             ep = _PD_defent(fp, fullpath, PD_entry_type(ep),
                             number, PD_entry_dimensions(ep));
             if (ep == NULL)
-	       SS_error_n(si, PD_err, namo);
+	       SS_error(si, PD_err, namo);
 
 	    ep = PD_copy_syment(ep);};
 
@@ -2784,7 +2784,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     pa = _PD_get_state(-1);
 
     if (!SS_consp(argl))
-       SS_error_n(si, "BAD ARGUMENT LIST - SX_READ_FILEDATA", argl);
+       SS_error(si, "BAD ARGUMENT LIST - SX_READ_FILEDATA", argl);
 
     argl = SX_get_pdbfile(argl, &file, &po);
 
@@ -2797,7 +2797,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     name = _PD_expand_hyper_name(file, s);
     CFREE(s);
     if (name == NULL)
-       SS_error_n(si, "BAD SUBSCRIPT EXPRESSION - SX_READ_FILEDATA", namo);
+       SS_error(si, "BAD SUBSCRIPT EXPRESSION - SX_READ_FILEDATA", namo);
 
     ep = _PD_effective_ep(file, name, FALSE, NULL);
 
@@ -2812,7 +2812,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
 	_PD_rl_dimensions(dimscheck);
 
 	if (!valid)
-	   SS_error_n(si, "Invalid dimension specifications - SX_READ_FILEDATA",
+	   SS_error(si, "Invalid dimension specifications - SX_READ_FILEDATA",
 		    namo);};
 
     type   = PD_entry_type(ep);
@@ -2845,7 +2845,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     else
        {switch (SETJMP(pa->read_err))
            {case ABORT :
-                 SS_error_n(si, "_PD_HYPER_READ FAILED - SX_READ_FILEDATA",
+                 SS_error(si, "_PD_HYPER_READ FAILED - SX_READ_FILEDATA",
                           namo);
             default :
                  memset(PD_err, 0, MAXLINE);
@@ -2855,7 +2855,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
 
 	err = rd(file, name, type, ep, addr.memaddr, -1, NULL);
         if (!err)
-           SS_error_n(si, "PROBLEMS READING DATA - SX_READ_FILEDATA", namo);};
+           SS_error(si, "PROBLEMS READING DATA - SX_READ_FILEDATA", namo);};
 
     if (SC_LAST_CHAR(name) == ']')
        {type = _PD_hyper_type(name, type);
@@ -3188,15 +3188,15 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       SS_error_n(si, "BAD FILE - _SXI_HASH_TO_PDBDATA", argl);
+       SS_error(si, "BAD FILE - _SXI_HASH_TO_PDBDATA", argl);
     else
        file = FILE_FILE(PDBfile, po);
 
     if (tab == NULL)
-       SS_error_n(si, "BAD HASH TABLE - _SXI_HASH_TO_PDBDATA", argl);
+       SS_error(si, "BAD HASH TABLE - _SXI_HASH_TO_PDBDATA", argl);
 
     else if (name == NULL)
-       SS_error_n(si, "BAD HASH TABLE NAME - _SXI_HASH_TO_PDBDATA", argl);
+       SS_error(si, "BAD HASH TABLE NAME - _SXI_HASH_TO_PDBDATA", argl);
 
     else
        rv = SX_pdbdata_handler(si, file, name, "hasharr", tab, FALSE);
@@ -3249,7 +3249,7 @@ object *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
        {ep = file->tr->write(file, fullpath, type, type,
 			     data.memaddr, NULL, FALSE, &new);
         if (ep == NULL)
-           SS_error_n(si, PD_err, SS_null);
+           SS_error(si, PD_err, SS_null);
 
 	if (_PD_IS_DP_INIT)
 	   lio_flush(file->stream);
@@ -3281,7 +3281,7 @@ static object *_SXI_set_switch(SS_psides *si, object *argl)
             0);
 
     if (indx < 0)
-       SS_error_n(si, "BAD INDEX - _SXI_SET_SWITCH", argl);
+       SS_error(si, "BAD INDEX - _SXI_SET_SWITCH", argl);
 
     if (val != -1)
        PD_print_controls[indx] = val;
@@ -3588,7 +3588,7 @@ static object *_SXI_set_format(SS_psides *si, object *argl)
 	   _SC_set_user_defaults();
 
 	else
-	   SS_error_n(si, "UNKNOWN TYPE - _SXI_SET_FORMAT", argl);};
+	   SS_error(si, "UNKNOWN TYPE - _SXI_SET_FORMAT", argl);};
 
     CFREE(field);
     CFREE(format);
@@ -3659,14 +3659,14 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error_n(si, "BAD FILE - _SXI_UNP_BITSTRM", argl);
+       SS_error(si, "BAD FILE - _SXI_UNP_BITSTRM", argl);
 
     if (file != NULL)
        {arr = NULL;
 	if (!_PD_rd_bits(file, name, type, nitems, FALSE,
 			 nbits, padsz, fpp, offs,
 			 &anumb, &data))
-	   SS_error_n(si, "_PD_RD_BITS FAILED - _SXI_UNP_BITSTRM", argl);
+	   SS_error(si, "_PD_RD_BITS FAILED - _SXI_UNP_BITSTRM", argl);
 
 	arr = PM_make_array(type, anumb, data);
 
@@ -3744,7 +3744,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     else
-       SS_error_n(si, "BAD FILE - _SXI_INDEX_TO_EXPR", argl);
+       SS_error(si, "BAD FILE - _SXI_INDEX_TO_EXPR", argl);
 
     if (file != NULL)
        {s = CMAKE_N(char, MAXLINE);

@@ -69,7 +69,7 @@ static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
     else
        {bpi = _PD_lookup_size(type, file->host_chart);
         if (bpi == -1)
-           SS_error_n(si,
+           SS_error(si,
 		      "CAN'T FIND NUMBER OF BYTES - _SX_RD_INDIRECTION_LIST",
 		      SS_null);
 
@@ -105,7 +105,7 @@ static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
  */
     dp = PD_inquire_host_type(file, type);
     if (dp == NULL)
-       SS_error_n(si, "BAD TYPE - _SX_RD_LEAF_LIST", SS_null);
+       SS_error(si, "BAD TYPE - _SX_RD_LEAF_LIST", SS_null);
 
     else
        {mem_lst = dp->members;
@@ -123,9 +123,9 @@ static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
 	        {obj1 = SS_car(obj);
 	       
 		 for (desc = mem_lst; desc != NULL; desc = desc->next)
-		     {PD_CAST_TYPE(ttype, desc, svr+desc->member_offs, svr,
-				   SS_error, "BAD CAST - _SX_RD_LEAF_LIST",
-				   obj1);
+		     {SX_CAST_TYPE(si, ttype, desc,
+				   svr+desc->member_offs, svr,
+				   "BAD CAST - _SX_RD_LEAF_LIST", obj1);
 
 		      _SX_rd_tree_list(si, SS_car(obj1), file,
 				       svr + desc->member_offs,
@@ -176,7 +176,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     pa = _PD_get_state(-1);
 
     if (!SS_consp(argl))
-       SS_error_n(si, "BAD ARGUMENT LIST - _SXI_READ_NUMERIC_DATA", argl);
+       SS_error(si, "BAD ARGUMENT LIST - _SXI_READ_NUMERIC_DATA", argl);
 
 /* see if the first object is a pdbfile, if so use it */
     argl = SX_get_pdbfile(argl, &file, &po);
@@ -204,7 +204,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     name_obj = SS_null;
     switch (SETJMP(pa->read_err))
        {case ABORT :
-             SS_error_n(si, PD_err, name_obj);
+             SS_error(si, PD_err, name_obj);
         default :
              memset(PD_err, 0, MAXLINE);
 	     cp = _SX_rd_data(si, file, name, ep, &addr, name_obj);
@@ -263,7 +263,7 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
     if (!_PD_indirection(type))
 
        {if (!_PD_prim_typep(type, file->host_chart, PD_READ))
-	   SS_error_n(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
+	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
 	if (file == SX_vif)
 	   addr->diskaddr = PD_entry_address(cp);
@@ -290,7 +290,7 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
        {dtype = PD_dereference(CSTRSAVE(type));
 
 	if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))
-	   SS_error_n(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
+	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
 	if (file == SX_vif)
 	   {addr->diskaddr = PD_entry_address(cp);
