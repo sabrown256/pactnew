@@ -101,13 +101,13 @@ object *UL_us(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl; !SS_nullobjp(t); t = SS_cdr(t))
-        {val = fun(si, SS_car(t));
+    for (t = argl; !SS_nullobjp(t); t = SS_cdr(si, t))
+        {val = fun(si, SS_car(si, t));
          SS_Assign(ret, SS_mk_cons(si, val, ret));};
 
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -132,14 +132,14 @@ object *UL_uc(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl ; !SS_nullobjp(t); t = SS_cdr(t))
-        {i = SX_get_crv_index_i(SS_car(t));
+    for (t = argl ; !SS_nullobjp(t); t = SS_cdr(si, t))
+        {i = SX_get_crv_index_i(SS_car(si, t));
          if (i >= 0)
             {SS_Assign(ret, SS_mk_cons(si, fun(si, i), ret));};};
          
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -159,7 +159,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFDoubleRR) cp->proc[0];
         
-    SX_last_arg(tok, argl);
+    SX_last_arg(si, tok, argl);
     SX_prep_arg(si, argl);
 
     a = HUGE;
@@ -175,8 +175,8 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {i = SX_get_crv_index_i(SS_car(t));
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {i = SX_get_crv_index_i(SS_car(si, t));
          if (i != -1)
             {n = SX_dataset[i].n;
              for (xp = SX_dataset[i].x[0], l = 0; l < n; xp++, l++)
@@ -190,7 +190,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
          
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -210,7 +210,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFDoubleRR) cp->proc[0];
         
-    SX_last_arg(tok, argl);
+    SX_last_arg(si, tok, argl);
     SX_prep_arg(si, argl);
 
     a = HUGE;
@@ -226,8 +226,8 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {i = SX_get_crv_index_i(SS_car(t));
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {i = SX_get_crv_index_i(SS_car(si, t));
          if (i != -1)
             {n = SX_dataset[i].n;
              for (yp = SX_dataset[i].x[1], l = 0; l < n; yp++, l++)
@@ -241,7 +241,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
 
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -263,13 +263,13 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
     tok2 = NULL;
 
     SS_Assign(argl, SS_reverse(si, argl));
-    tok2 = SS_car(argl);
+    tok2 = SS_car(si, argl);
     if (SS_numbp(tok2))
-       {SS_Assign(argl, SS_cdr(argl));
+       {SS_Assign(argl, SS_cdr(si, argl));
 	if (SS_consp(argl))
-	   {tok1 = SS_car(argl);
+	   {tok1 = SS_car(si, argl);
 	    if (SS_numbp(tok1))
-	       {SS_Assign(argl, SS_cdr(argl));}
+	       {SS_Assign(argl, SS_cdr(si, argl));}
 	    else
 	       {tok1 = tok2;
 		tok2 = NULL;};}
@@ -283,8 +283,8 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
     SX_prep_arg(si, argl);
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {s = SS_car(t);
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {s = SS_car(si, t);
          if (SX_curvep_a(s))
             {i = SX_get_crv_index_i(s);
 	     if (tok1 != NULL)
@@ -306,7 +306,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
 
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -350,8 +350,8 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
 
     SX_prep_arg(si, argl);
 
-    for (t = argl, crvs = SS_null; SS_consp(t); t = SS_cdr(t))
-        {tok = SS_car(t);
+    for (t = argl, crvs = SS_null; SS_consp(t); t = SS_cdr(si, t))
+        {tok = SS_car(si, t);
          if (SX_curvep_a(tok))
             {SS_Assign(crvs, SS_mk_cons(si, tok, crvs));}
          else
@@ -360,8 +360,8 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
 /* set plot flag on so that for example (filter (lst) dp rp) causes replot */
     SX_plot_flag = TRUE;
 
-    for (ret = SS_null, u = crvs; SS_consp(u); u = SS_cdr(u))
-        {tok = SS_car(u);
+    for (ret = SS_null, u = crvs; SS_consp(u); u = SS_cdr(si, u))
+        {tok = SS_car(si, u);
          if (SX_curvep_a(tok))
             {i = SX_get_crv_index_i(tok);
              SS_Assign(ret,
@@ -371,7 +371,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
     SS_Assign(argl, SS_null);
     SS_Assign(ret, SS_reverse(si, ret));
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -394,8 +394,8 @@ object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {i = SX_get_crv_index_i(SS_car(t));
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {i = SX_get_crv_index_i(SS_car(si, t));
          if (i != -1)
             {n = SX_dataset[i].n;
              for (xp = SX_dataset[i].x[0], l = 0; l < n; xp++, l++)
@@ -409,7 +409,7 @@ object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
          
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -432,8 +432,8 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {s   = SS_car(t);
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {s   = SS_car(si, t);
          i   = SX_get_crv_index_i(s);
 	 tmp = SS_null;
          if (i != -1)
@@ -462,7 +462,7 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
 
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -486,13 +486,13 @@ object *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl)
 /* set plot flag on so that for example (op param (lst)) causes replot */
     SX_plot_flag = TRUE;
 
-    tok  = SS_car(argl);
-    argl = SS_cdr(argl);
+    tok  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
 
     s1 = CSTRSAVE(SS_get_string(tok));
 
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {s = SS_car(t);
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {s = SS_car(si, t);
 
          if (SX_curvep_a(s))
             {i = SX_get_crv_index_i(s);
@@ -517,7 +517,7 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFPObjectoo) cp->proc[0];
 
-    SX_last_arg(tok, argl);
+    SX_last_arg(si, tok, argl);
     if (!SS_numbp(tok))
        SS_error(si, "BAD LAST ARGUMENT - UL_BLTOC", tok);
 
@@ -527,8 +527,8 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {s = SS_car(t);
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {s = SS_car(si, t);
 
          if (SX_curvep_a(s))
             SS_Assign(ret, SS_mk_cons(si, fun(si, s, tok), ret));};
@@ -536,7 +536,7 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
     SS_Assign(tok, SS_null);
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -556,7 +556,7 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
 
     fun = (PFPObjectoo) cp->proc[0];
 
-    SX_last_arg(tok, argl);
+    SX_last_arg(si, tok, argl);
     if (!SS_numbp(tok))
        SS_error(si, "BAD LAST ARGUMENT - BLTOCNP", tok);
 
@@ -568,8 +568,8 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
     ret = SS_null;
-    for (t = argl ; SS_consp(t); t = SS_cdr(t))
-        {s = SS_car(t);
+    for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
+        {s = SS_car(si, t);
 
          if (SX_curvep_a(s))
             SS_Assign(ret, SS_mk_cons(si, fun(si, s, tok), ret));};
@@ -579,7 +579,7 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
     SS_Assign(tok, SS_null);
     SS_Assign(argl, SS_null);
 
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -694,8 +694,8 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
     if (SS_nullobjp(argl))
        return(argl);
 
-    else if (SS_nullobjp(SS_cdr(argl)))
-       {ch = SS_car(argl);
+    else if (SS_nullobjp(SS_cdr(si, argl)))
+       {ch = SS_car(si, argl);
 	return(ch);}
 
     else
@@ -705,8 +705,8 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
  */
        {gxmin =  HUGE;
         gxmax = -HUGE;
-        for (ch = argl; !SS_nullobjp(ch); ch = SS_cdr(ch))
-            {s = SS_car(ch);
+        for (ch = argl; !SS_nullobjp(ch); ch = SS_cdr(si, ch))
+            {s = SS_car(si, ch);
              if (SX_curvep_a(s))
                 {i     = SX_get_crv_index_i(s);
                  xt    = SX_dataset[i].wc[0];
@@ -718,10 +718,10 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
         ch    = SS_null;
         t     = argl;
         while (TRUE)
-           {s = SS_car(t);
+           {s = SS_car(si, t);
             if (SS_numbp(s))
                {ch = SS_mk_cons(si, s, ch);
-                t  = SS_cdr(t);}
+                t  = SS_cdr(si, t);}
 
 /* the first non-number in the arg list */
             else
@@ -758,7 +758,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
                    SS_error(si, "BAD ARGUMENT - BC", s);
 
                 if (SS_nullobjp(ch))
-                   t = SS_cdr(t);
+                   t = SS_cdr(si, t);
 
                 break;};
 
@@ -799,8 +799,8 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
     af = NULL;
     strcpy(pbf2, lbl);
     
-    for ( ; SS_consp(t); t = SS_cdr(t))
-        {s = SS_car(t);
+    for ( ; SS_consp(t); t = SS_cdr(si, t))
+        {s = SS_car(si, t);
 
 /* combine a number with the accumulator */
          if (SS_numbp(s))
@@ -920,8 +920,8 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
     x[1] = UL_buf1y;
     strcpy(local2, local);
 
-    for (t = SS_cdr(argl); SS_consp(t); t = SS_cdr(t))
-        {s = SS_car(t);
+    for (t = SS_cdr(si, argl); SS_consp(t); t = SS_cdr(si, t))
+        {s = SS_car(si, t);
          if (!SX_curvep_a(s))
             SS_error(si, "BAD ARGUMENT - UL_BCXL", s);
          i = SX_get_crv_index_i(s);

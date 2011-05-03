@@ -514,7 +514,7 @@ static int _SX_isodd(int n)
  *              - may have zero arguments
  */
 
-static int _SX_no_argsp(object *obj)
+static int _SX_no_argsp(SS_psides *si, object *obj)
    {int ret;
     object *params;
     PFPHand hand;
@@ -524,7 +524,7 @@ static int _SX_no_argsp(object *obj)
     switch (SS_PROCEDURE_TYPE(obj))
        {case SS_MACRO : 
         case SS_PROC  :
-	     params = SS_params(obj);
+	     params = SS_params(si, obj);
 	     ret    = (!SS_consp(params) || (params == SS_null));
 	     break;
 
@@ -560,7 +560,7 @@ void SX_parse(SS_psides *si,
     
     if (SS_procedurep(si->evobj))
        {strcpy(s, SS_PP(si->evobj, name));
-        if (_SX_no_argsp(si->evobj) || !EOE(strm))
+        if (_SX_no_argsp(si, si->evobj) || !EOE(strm))
            {ptr = SS_BUFFER(strm);
             if (_SX_isodd(SC_char_count(ptr, '\"')))
                {PRINT(stdout, "\nUNMATCHED QUOTE: %s\n\n", ptr);

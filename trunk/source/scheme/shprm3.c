@@ -30,8 +30,8 @@ object *_SS_endcons(SS_psides *si, object *list, object *obj)
 
     else
        {op = SS_mk_cons(si, obj, SS_null);
-        while (SS_consp(mlist = SS_cdr(mlist)));
-        SS_setcdr(mlist, op);
+        while (SS_consp(mlist = SS_cdr(si, mlist)));
+        SS_setcdr(si, mlist, op);
 	o = list;};
 
     return(o);}
@@ -48,7 +48,7 @@ object *_SS_endcons(SS_psides *si, object *list, object *obj)
 static object *_SSI_cons(SS_psides *si, object *argl)
    {object *x1, *x2, *o;
 
-    x1 = SS_car(argl);
+    x1 = SS_car(si, argl);
     x2 = SS_cadr(si, argl);
     o  = SS_mk_cons(si, x1, x2);
 
@@ -61,13 +61,13 @@ static object *_SSI_cons(SS_psides *si, object *argl)
  *           - return value is the new car
  */
 
-object *SS_setcar(object *pair, object *car)
+object *SS_setcar(SS_psides *si, object *pair, object *car)
    {object *oldcar;
 
-    oldcar = SS_car(pair);
+    oldcar = SS_car(si, pair);
     SS_MARK(car);
     SS_CAR_MACRO(pair) = car;
-    SS_gc(oldcar);
+    SS_gc(si, oldcar);
 
     return(car);}
 
@@ -78,13 +78,13 @@ object *SS_setcar(object *pair, object *car)
  *           - return value is the new cdr
  */
 
-object *SS_setcdr(object *pair, object *cdr)
+object *SS_setcdr(SS_psides *si, object *pair, object *cdr)
    {object *oldcdr;
 
-    oldcdr = SS_cdr(pair);
+    oldcdr = SS_cdr(si, pair);
     SS_MARK(cdr);
     SS_CDR_MACRO(pair) = cdr;
-    SS_gc(oldcdr);
+    SS_gc(si, oldcdr);
 
     return(cdr);}
 
@@ -96,7 +96,7 @@ object *SS_setcdr(object *pair, object *cdr)
 static object *_SSI_setcar(SS_psides *si, object *argl)
    {object *o;
 
-    o = SS_setcar(SS_car(argl), SS_cadr(si, argl));
+    o = SS_setcar(si, SS_car(si, argl), SS_cadr(si, argl));
 
     return(o);}
 
@@ -108,7 +108,7 @@ static object *_SSI_setcar(SS_psides *si, object *argl)
 static object *_SSI_setcdr(SS_psides *si, object *argl)
    {object *o;
 
-    o = SS_setcdr(SS_car(argl), SS_cadr(si, argl));
+    o = SS_setcdr(si, SS_car(si, argl), SS_cadr(si, argl));
 
     return(o);}
 
@@ -117,9 +117,8 @@ static object *_SSI_setcdr(SS_psides *si, object *argl)
 
 /* SS_CAR - return a pointer to the car of the object given */
 
-object *SS_car(object *obj)
+object *SS_car(SS_psides *si, object *obj)
    {object *o;
-    SS_psides *si = &_SS_si;
 
     if (!SS_consp(obj))
        SS_error(si, "CAN'T TAKE CAR OF ATOM - CAR", obj);
@@ -133,9 +132,8 @@ object *SS_car(object *obj)
 
 /* SS_CDR - return a pointer to the cdr of the object given */
 
-object *SS_cdr(object *obj)
+object *SS_cdr(SS_psides *si, object *obj)
    {object *o;
-    SS_psides *si = &_SS_si;
 
     if (!SS_consp(obj))
        SS_error(si, "CAN'T TAKE CDR OF ATOM - CDR", obj);
@@ -152,7 +150,7 @@ object *SS_cdr(object *obj)
 object *SS_caar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_car(obj));
+    o = SS_car(si, SS_car(si, obj));
 
     return(o);}
 
@@ -164,7 +162,7 @@ object *SS_caar(SS_psides *si, object *obj)
 object *SS_cadr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_cdr(obj));
+    o = SS_car(si, SS_cdr(si, obj));
 
     return(o);}
 
@@ -176,7 +174,7 @@ object *SS_cadr(SS_psides *si, object *obj)
 object *SS_cdar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_car(obj));
+    o = SS_cdr(si, SS_car(si, obj));
 
     return(o);}
 
@@ -188,7 +186,7 @@ object *SS_cdar(SS_psides *si, object *obj)
 object *SS_cddr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_cdr(obj));
+    o = SS_cdr(si, SS_cdr(si, obj));
 
     return(o);}
 
@@ -200,7 +198,7 @@ object *SS_cddr(SS_psides *si, object *obj)
 object *SS_caaar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_car(SS_car(obj)));
+    o = SS_car(si, SS_car(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -212,7 +210,7 @@ object *SS_caaar(SS_psides *si, object *obj)
 object *SS_caadr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_car(SS_cdr(obj)));
+    o = SS_car(si, SS_car(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -224,7 +222,7 @@ object *SS_caadr(SS_psides *si, object *obj)
 object *SS_cadar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_cdr(SS_car(obj)));
+    o = SS_car(si, SS_cdr(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -236,7 +234,7 @@ object *SS_cadar(SS_psides *si, object *obj)
 object *SS_cdaar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_car(SS_car(obj)));
+    o = SS_cdr(si, SS_car(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -248,7 +246,7 @@ object *SS_cdaar(SS_psides *si, object *obj)
 object *SS_caddr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_cdr(SS_cdr(obj)));
+    o = SS_car(si, SS_cdr(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -260,7 +258,7 @@ object *SS_caddr(SS_psides *si, object *obj)
 object *SS_cdadr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_car(SS_cdr(obj)));
+    o = SS_cdr(si, SS_car(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -272,7 +270,7 @@ object *SS_cdadr(SS_psides *si, object *obj)
 object *SS_cddar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_cdr(SS_car(obj)));
+    o = SS_cdr(si, SS_cdr(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -284,7 +282,7 @@ object *SS_cddar(SS_psides *si, object *obj)
 object *SS_cdddr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_cdr(SS_cdr(obj)));
+    o = SS_cdr(si, SS_cdr(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -300,19 +298,19 @@ object *SS_list_tail(SS_psides *si, object *lst, int n)
     nlst = SS_null;
 
     if (!SS_nullobjp(lst))
-       {nl = SS_length(lst);
+       {nl = SS_length(si, lst);
 
 	if (n < 0)
 	   {n = nl + n;
 	    if ((0 <= n) && (n <= nl))
 	       {for (i = 0; i < n; i++)
-                   {h    = SS_car(lst);
-		    lst  = SS_cdr(lst);
+                   {h    = SS_car(si, lst);
+		    lst  = SS_cdr(si, lst);
 		    nlst = SS_mk_cons(si, h, nlst);};
 		nlst = SS_reverse(si, nlst);};}
 
-	else if ((0 <= n) && (n < SS_length(lst)))
-           {for (i = 0; i < n; i++, lst = SS_cdr(lst));
+	else if ((0 <= n) && (n < SS_length(si, lst)))
+           {for (i = 0; i < n; i++, lst = SS_cdr(si, lst));
 	    nlst = lst;};};
 
     return(nlst);}
@@ -352,17 +350,17 @@ static object *_SSI_lst_ref(SS_psides *si, object *argl)
     o = SS_null;
 
     if (!SS_nullobjp(lst))
-       {nl = SS_length(lst);
+       {nl = SS_length(si, lst);
 
 	if (n < 0)
 	   {n = nl + n;
 	    if ((0 <= n) && (n <= nl))
-	       {for (i = 0; i <= n; i++, lst  = SS_cdr(lst))
-                    o = SS_car(lst);};}
+	       {for (i = 0; i <= n; i++, lst  = SS_cdr(si, lst))
+                    o = SS_car(si, lst);};}
 
-	else if ((0 <= n) && (n < SS_length(lst)))
-           {for (i = 0; i < n; i++, lst = SS_cdr(lst));
-	    o = SS_car(lst);};};
+	else if ((0 <= n) && (n < SS_length(si, lst)))
+           {for (i = 0; i < n; i++, lst = SS_cdr(si, lst));
+	    o = SS_car(si, lst);};};
 
     return(o);}
 
@@ -375,13 +373,13 @@ static object *_SSI_last(SS_psides *si, object *obj)
    {object *t, *lst, *o;
 
     t = obj;
-    for (lst = obj; SS_consp(lst); lst = SS_cdr(lst))
+    for (lst = obj; SS_consp(lst); lst = SS_cdr(si, lst))
         t = lst;
 
     if (!SS_consp(t))
        o = t;
-    else if (SS_nullobjp(lst = SS_cdr(t)))
-       o = SS_car(t);
+    else if (SS_nullobjp(lst = SS_cdr(si, t)))
+       o = SS_car(si, t);
     else
        o = lst;
 
@@ -404,7 +402,7 @@ object *SS_reverse(SS_psides *si, object *obj)
     for (ths = SS_null, nxt = obj; SS_consp(nxt); )
          {prv = ths;
           ths = nxt;
-          nxt = SS_cdr(nxt);
+          nxt = SS_cdr(si, nxt);
           SS_CDR_MACRO(ths) = prv;
           SS_MARK(prv);
           SC_mark(nxt, -1);};
@@ -435,11 +433,11 @@ object *SS_append(SS_psides *si, object *list1, object *list2)
 	cr   = SS_null;
 	SS_Assign(cr, list1);
         while (SS_consp(cr))
-           {nxt = SS_car(cr);
+           {nxt = SS_car(si, cr);
             SS_end_cons(frst, lst, nxt);
-            SS_Assign(cr, SS_cdr(cr));};
+            SS_Assign(cr, SS_cdr(si, cr));};
 
-        SS_setcdr(lst, list2);
+        SS_setcdr(si, lst, list2);
 
         return(frst);}
 
@@ -460,14 +458,14 @@ static object *_SSI_append(SS_psides *si, object *argl)
    {int n;
     object *o, *r, *rv;
 
-    n = SS_length(argl);
+    n = SS_length(si, argl);
     if (n < 1)
        rv = argl;
 
     else
-       {rv = SS_car(argl);
-	for (r = SS_cdr(argl); r != SS_null; r = SS_cdr(r))
-	    {o  = SS_car(r);
+       {rv = SS_car(si, argl);
+	for (r = SS_cdr(si, argl); r != SS_null; r = SS_cdr(si, r))
+	    {o  = SS_car(si, r);
 	     rv = SS_append(si, rv, o);};};
 
     return(rv);}
@@ -480,11 +478,11 @@ static object *_SSI_append(SS_psides *si, object *argl)
 static object *_SSI_length(SS_psides *si, object *obj)
    {object *o;
 
-    obj = SS_car(obj);
+    obj = SS_car(si, obj);
     if (!SS_consp(obj))
        SS_error(si, "OBJECT NOT A LIST - LENGTH", obj);
 
-    o = SS_mk_integer(si, SS_length(obj));
+    o = SS_mk_integer(si, SS_length(si, obj));
 
     return(o);}
 
@@ -493,11 +491,11 @@ static object *_SSI_length(SS_psides *si, object *obj)
 
 /* SS_LENGTH - C usable version of length function in Scheme */
 
-int SS_length(object *obj)
+int SS_length(SS_psides *si, object *obj)
    {int i;
 
     for (i = 0; SS_consp(obj); i++)
-        obj = SS_cdr(obj);
+        obj = SS_cdr(si, obj);
 
     return(i);}
 
@@ -727,7 +725,7 @@ static object *_SSI_nullp(SS_psides *si, object *obj)
 
 /* _SS_EQV - eqv? at C level */
 
-static int _SS_eqv(object *o1, object *o2)
+static int _SS_eqv(SS_psides *si, object *o1, object *o2)
    {int ityp, rv;
 
     ityp = SC_arrtype(o1, -1);
@@ -771,35 +769,36 @@ static int _SS_eqv(object *o1, object *o2)
 
 /* _SS_EQUAL - equal? at C level */
 
-static int _SS_equal(object *o1, object *o2)
+static int _SS_equal(SS_psides *si, object *o1, object *o2)
    {int rv;
 
     rv = FALSE;
 
     if (SC_arrtype(o1, -1) == SC_arrtype(o2, -1))
        {if (SS_consp(o1))
-	   {if (SS_length(o1) == SS_length(o2))
+	   {if (SS_length(si, o1) == SS_length(si, o2))
 	       {while (TRUE)
 		   {if (!SS_consp(o1))
-		       {rv = _SS_eqv(o1, o2);
+		       {rv = _SS_eqv(si, o1, o2);
 			break;}
 
-		    else if (!_SS_equal(SS_car(o1), SS_car(o2)))
+		    else if (!_SS_equal(si, SS_car(si, o1), SS_car(si, o2)))
 		      break;
 
 		    else
-		       {o1 = SS_cdr(o1);
-			o2 = SS_cdr(o2);};};};}
+		       {o1 = SS_cdr(si, o1);
+			o2 = SS_cdr(si, o2);};};};}
 
         else if (SS_procedurep(o1))
 	   {if (((SS_PROCEDURE_TYPE(o1) == SS_PROC) &&
 		 (SS_PROCEDURE_TYPE(o2) == SS_PROC)) ||
 		((SS_PROCEDURE_TYPE(o1) == SS_MACRO) &&
 		 (SS_PROCEDURE_TYPE(o2) == SS_MACRO)))
-	       rv = _SS_equal(SS_proc_body(o1), SS_proc_body(o2));}
+	       rv = _SS_equal(si, SS_proc_body(si, o1),
+			      SS_proc_body(si, o2));}
 
 	else
-	   rv = _SS_eqv(o1, o2);};
+	   rv = _SS_eqv(si, o1, o2);};
 
     return(rv);}
 
@@ -808,7 +807,7 @@ static int _SS_equal(object *o1, object *o2)
 
 /* _SS_EQ - eq? in at C level */
 
-static int _SS_eq(object *o1, object *o2)
+static int _SS_eq(SS_psides *si, object *o1, object *o2)
    {int rv;
 
     rv = (o1->val == o2->val);
@@ -823,7 +822,7 @@ static int _SS_eq(object *o1, object *o2)
 static object *_SSI_eq(SS_psides *si, object *obj)
    {object *o;
 
-    o = _SS_eq(SS_car(obj), SS_cadr(si, obj)) ? SS_t : SS_f;
+    o = _SS_eq(si, SS_car(si, obj), SS_cadr(si, obj)) ? SS_t : SS_f;
 
     return(o);}
 
@@ -835,7 +834,7 @@ static object *_SSI_eq(SS_psides *si, object *obj)
 static object *_SSI_eqv(SS_psides *si, object *obj)
    {object *o;
 
-    o = _SS_eqv(SS_car(obj), SS_cadr(si, obj)) ? SS_t : SS_f;
+    o = _SS_eqv(si, SS_car(si, obj), SS_cadr(si, obj)) ? SS_t : SS_f;
 
     return(o);}
 
@@ -847,7 +846,7 @@ static object *_SSI_eqv(SS_psides *si, object *obj)
 static object *_SSI_equal(SS_psides *si, object *obj)
    {object *o;
 
-    o = _SS_equal(SS_car(obj), SS_cadr(si, obj)) ? SS_t : SS_f;
+    o = _SS_equal(si, SS_car(si, obj), SS_cadr(si, obj)) ? SS_t : SS_f;
 
     return(o);}
 
@@ -856,7 +855,8 @@ static object *_SSI_equal(SS_psides *si, object *obj)
 
 /* _SS_MEMP - C level handler for memq, memv, and member */
 
-static object *_SS_memp(int (*pred)(object *, object *),
+static object *_SS_memp(SS_psides *si,
+			int (*pred)(SS_psides *si, object *, object *),
 			object *obj, object *lst)
    {object *tmp;
 
@@ -864,11 +864,11 @@ static object *_SS_memp(int (*pred)(object *, object *),
        {if (!SS_consp(lst))
            break;
 
-        tmp = SS_car(lst);
-        if ((*pred)(obj, tmp))
+        tmp = SS_car(si, lst);
+        if ((*pred)(si, obj, tmp))
            return(lst);
 
-        lst = SS_cdr(lst);};
+        lst = SS_cdr(si, lst);};
 
     return(SS_f);}
 
@@ -880,10 +880,10 @@ static object *_SS_memp(int (*pred)(object *, object *),
 static object *_SSI_memq(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     lst = SS_cadr(si, argl);
 
-    o = _SS_memp(_SS_eq, obj, lst);
+    o = _SS_memp(si, _SS_eq, obj, lst);
 
     return(o);}
 
@@ -895,10 +895,10 @@ static object *_SSI_memq(SS_psides *si, object *argl)
 static object *_SSI_memv(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     lst = SS_cadr(si, argl);
 
-    o = _SS_memp(_SS_eqv, obj, lst);
+    o = _SS_memp(si, _SS_eqv, obj, lst);
 
     return(o);}
 
@@ -910,10 +910,10 @@ static object *_SSI_memv(SS_psides *si, object *argl)
 static object *_SSI_member(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     lst = SS_cadr(si, argl);
 
-    o = _SS_memp(_SS_equal, obj, lst);
+    o = _SS_memp(si, _SS_equal, obj, lst);
 
     return(o);}
 
@@ -922,13 +922,14 @@ static object *_SSI_member(SS_psides *si, object *argl)
 
 /* _SS_ASSP - C level handler for assq, assv, and assoc */
 
-static object *_SS_assp(int (*pred)(object *, object *),
+static object *_SS_assp(SS_psides *si,
+			int (*pred)(SS_psides *si, object *, object *),
 			object *obj, object *lst)
    {object *tmp;
 
-    for ( ; SS_consp(lst); lst = SS_cdr(lst))
-        {tmp = SS_car(lst);
-         if ((*pred)(obj, SS_car(tmp)))
+    for ( ; SS_consp(lst); lst = SS_cdr(si, lst))
+        {tmp = SS_car(si, lst);
+         if ((*pred)(si, obj, SS_car(si, tmp)))
             return(tmp);};
 
     return(SS_f);}
@@ -941,10 +942,10 @@ static object *_SS_assp(int (*pred)(object *, object *),
 static object *_SSI_assq(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     lst = SS_cadr(si, argl);
 
-    o = _SS_assp(_SS_eq, obj, lst);
+    o = _SS_assp(si, _SS_eq, obj, lst);
 
     return(o);}
 
@@ -956,10 +957,10 @@ static object *_SSI_assq(SS_psides *si, object *argl)
 static object *_SSI_assv(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     lst = SS_cadr(si, argl);
 
-    o = _SS_assp(_SS_eqv, obj, lst);
+    o = _SS_assp(si, _SS_eqv, obj, lst);
 
     return(o);}
 
@@ -971,10 +972,10 @@ static object *_SSI_assv(SS_psides *si, object *argl)
 static object *_SSI_assoc(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     lst = SS_cadr(si, argl);
 
-    o = _SS_assp(_SS_equal, obj, lst);
+    o = _SS_assp(si, _SS_equal, obj, lst);
 
     return(o);}
 
@@ -1019,7 +1020,7 @@ static object *_SSI_cdr(SS_psides *si, object *obj)
 static object *_SSI_caar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_car(obj));
+    o = SS_car(si, SS_car(si, obj));
 
     return(o);}
 
@@ -1031,7 +1032,7 @@ static object *_SSI_caar(SS_psides *si, object *obj)
 static object *_SSI_cadr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_cdr(obj));
+    o = SS_car(si, SS_cdr(si, obj));
 
     return(o);}
 
@@ -1043,7 +1044,7 @@ static object *_SSI_cadr(SS_psides *si, object *obj)
 static object *_SSI_cdar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_car(obj));
+    o = SS_cdr(si, SS_car(si, obj));
 
     return(o);}
 
@@ -1055,7 +1056,7 @@ static object *_SSI_cdar(SS_psides *si, object *obj)
 static object *_SSI_cddr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_cdr(obj));
+    o = SS_cdr(si, SS_cdr(si, obj));
 
     return(o);}
 
@@ -1067,7 +1068,7 @@ static object *_SSI_cddr(SS_psides *si, object *obj)
 static object *_SSI_caaar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_car(SS_car(obj)));
+    o = SS_car(si, SS_car(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -1079,7 +1080,7 @@ static object *_SSI_caaar(SS_psides *si, object *obj)
 static object *_SSI_caadr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_car(SS_cdr(obj)));
+    o = SS_car(si, SS_car(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -1091,7 +1092,7 @@ static object *_SSI_caadr(SS_psides *si, object *obj)
 static object *_SSI_cadar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_cdr(SS_car(obj)));
+    o = SS_car(si, SS_cdr(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -1103,7 +1104,7 @@ static object *_SSI_cadar(SS_psides *si, object *obj)
 static object *_SSI_cdaar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_car(SS_car(obj)));
+    o = SS_cdr(si, SS_car(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -1115,7 +1116,7 @@ static object *_SSI_cdaar(SS_psides *si, object *obj)
 static object *_SSI_caddr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_car(SS_cdr(SS_cdr(obj)));
+    o = SS_car(si, SS_cdr(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -1127,7 +1128,7 @@ static object *_SSI_caddr(SS_psides *si, object *obj)
 static object *_SSI_cdadr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_car(SS_cdr(obj)));
+    o = SS_cdr(si, SS_car(si, SS_cdr(si, obj)));
 
     return(o);}
 
@@ -1139,7 +1140,7 @@ static object *_SSI_cdadr(SS_psides *si, object *obj)
 static object *_SSI_cddar(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_cdr(SS_car(obj)));
+    o = SS_cdr(si, SS_cdr(si, SS_car(si, obj)));
 
     return(o);}
 
@@ -1151,7 +1152,7 @@ static object *_SSI_cddar(SS_psides *si, object *obj)
 static object *_SSI_cdddr(SS_psides *si, object *obj)
    {object *o;
 
-    o = SS_cdr(SS_cdr(SS_cdr(obj)));
+    o = SS_cdr(si, SS_cdr(si, SS_cdr(si, obj)));
 
     return(o);}
 

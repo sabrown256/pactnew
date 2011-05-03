@@ -211,11 +211,11 @@ void SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand, ...)
 
 /* _SS_RL_CHAR - release an char object */
 
-static void _SS_rl_char(object *obj)
+static void _SS_rl_char(SS_psides *si, object *obj)
    {
 
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -224,7 +224,7 @@ static void _SS_rl_char(object *obj)
 
 /* _SS_RL_VECTOR - release a vector object */
 
-static void _SS_rl_vector(object *obj)
+static void _SS_rl_vector(SS_psides *si, object *obj)
    {int i, k;
     object **va;
 
@@ -236,7 +236,7 @@ static void _SS_rl_vector(object *obj)
 
     CFREE(va);
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -248,11 +248,11 @@ static void _SS_rl_vector(object *obj)
 
 /* _SS_RL_INTEGER - release an integer object */
 
-static void _SS_rl_integer(object *obj)
+static void _SS_rl_integer(SS_psides *si, object *obj)
    {
 
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -261,11 +261,11 @@ static void _SS_rl_integer(object *obj)
 
 /* _SS_RL_FLOAT - release a float object */
 
-static void _SS_rl_float(object *obj)
+static void _SS_rl_float(SS_psides *si, object *obj)
    {
 
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -274,11 +274,11 @@ static void _SS_rl_float(object *obj)
 
 /* _SS_RL_COMPLEX - release a complex object */
 
-static void _SS_rl_complex(object *obj)
+static void _SS_rl_complex(SS_psides *si, object *obj)
    {
 
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -287,11 +287,11 @@ static void _SS_rl_complex(object *obj)
 
 /* _SS_RL_QUATERNION - release a quaternion object */
 
-static void _SS_rl_quaternion(object *obj)
+static void _SS_rl_quaternion(SS_psides *si, object *obj)
    {
 
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -300,12 +300,12 @@ static void _SS_rl_quaternion(object *obj)
 
 /* _SS_RL_STRING - release a string object */
 
-static void _SS_rl_string(object *obj)
+static void _SS_rl_string(SS_psides *si, object *obj)
    {
 
     CFREE(SS_STRING_TEXT(obj));
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -314,12 +314,12 @@ static void _SS_rl_string(object *obj)
 
 /* _SS_RL_VARIABLE - release a variable object */
 
-static void _SS_rl_variable(object *obj)
+static void _SS_rl_variable(SS_psides *si, object *obj)
    {
 
     CFREE(SS_VARIABLE_NAME(obj));
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -331,7 +331,7 @@ static void _SS_rl_variable(object *obj)
  *             - conses with multiple pointers
  */
 
-static void _SS_rl_cons(object *obj)
+static void _SS_rl_cons(SS_psides *si, object *obj)
    {int nr;
     object *lst, *cdr, *car;
     cons *cell;
@@ -345,22 +345,22 @@ static void _SS_rl_cons(object *obj)
            {CFREE(lst);}
 
 	else
-	   {cdr = SS_cdr(lst);
-	    car = SS_car(lst);
+	   {cdr = SS_cdr(si, lst);
+	    car = SS_car(si, lst);
 
 /* free the cons cell now that the car and cdr have been extracted */
 	    cell = SS_OBJECT(lst); 
 	    CFREE(cell);
 
 /* free the object that wrapped the cell */
-	    SS_rl_object(lst);
+	    SS_rl_object(si, lst);
 
 /* deal with the car */
-	    SS_gc(car);
+	    SS_gc(si, car);
 
 /* deal with the cdr */
 	    if (SS_nullobjp(cdr) || !SS_consp(cdr))
-	       {SS_gc(cdr);
+	       {SS_gc(si, cdr);
 		lst = NULL;}
 	    else
 	       lst = cdr;};};
@@ -372,7 +372,7 @@ static void _SS_rl_cons(object *obj)
 
 /* _SS_RL_PROCEDURE - release a procedure object */
 
-static void _SS_rl_procedure(object *obj)
+static void _SS_rl_procedure(SS_psides *si, object *obj)
    {object *pr;
     S_procedure *sp;
     procedure *pp;
@@ -388,9 +388,9 @@ static void _SS_rl_procedure(object *obj)
        {case SS_MACRO :
         case SS_PROC  :
 	     sp = SS_COMPOUND_PROCEDURE(obj);
-	     SS_gc(sp->name);
-	     SS_gc(sp->lambda);
-/*	     SS_gc(sp->env); */
+	     SS_gc(si, sp->name);
+	     SS_gc(si, sp->lambda);
+/*	     SS_gc(si, sp->env); */
 	     CFREE(sp);
 
         case SS_PR_PROC  :
@@ -408,7 +408,7 @@ static void _SS_rl_procedure(object *obj)
     CFREE(pp);
 
 /* free the object wrapper of the procedure */
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -419,14 +419,14 @@ static void _SS_rl_procedure(object *obj)
  *               - a port struct with FILE pointer str
  */
 
-static void _SS_rl_inport(object *obj)
+static void _SS_rl_inport(SS_psides *si, object *obj)
    {char *name;
 
     name = SS_IFILE_NAME(obj);
 
     CFREE(name);
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -437,14 +437,14 @@ static void _SS_rl_inport(object *obj)
  *                - a port struct with FILE pointer str
  */
 
-static void _SS_rl_outport(object *obj)
+static void _SS_rl_outport(SS_psides *si, object *obj)
    {char *name;
 
     name = SS_OFILE_NAME(obj);
 
     CFREE(name);
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -453,12 +453,12 @@ static void _SS_rl_outport(object *obj)
 
 /* _SS_RL_BOOLEAN - release a boolean object */
 
-static void _SS_rl_boolean(object *obj)
+static void _SS_rl_boolean(SS_psides *si, object *obj)
    {
 
     CFREE(SS_BOOLEAN_NAME(obj));
     CFREE(SS_OBJECT(obj));
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -467,7 +467,7 @@ static void _SS_rl_boolean(object *obj)
 
 /* SS_RL_OBJECT - release a SCHEME object */
 
-void SS_rl_object(object *obj)
+void SS_rl_object(SS_psides *si, object *obj)
    {
 
     if (_SS.trace_object == obj)
@@ -488,7 +488,7 @@ void SS_rl_object(object *obj)
  *       - decrementing the number of pointers to itself
  */
 
-void SS_gc(object *obj)
+void SS_gc(SS_psides *si, object *obj)
    {
 
     if (obj == NULL)
@@ -497,7 +497,7 @@ void SS_gc(object *obj)
     if ((SS_OBJECT_GC(obj) != 1) || (obj->val == NULL))
        {CFREE(obj);}
     else
-       SS_OBJECT_FREE(obj);
+       SS_OBJECT_FREE(si, obj);
 
     return;}
 
@@ -559,7 +559,7 @@ static void _SS_wr_vector(SS_psides *si, object *obj, object *strm)
     SS_MARK(lst);
     PRINT(SS_OUTSTREAM(strm), "#");
     SS_wr_lst(si, lst, strm);
-    SS_gc(lst);
+    SS_gc(si, lst);
 
     return;}
 
@@ -902,8 +902,8 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 	for (i = 0; i < no; i++)
 	    {p = map[i].p;
 	     if (SS_consp(p))
-	        {ca = SS_car(p);
-		 cd = SS_cdr(p);
+	        {ca = SS_car(si, p);
+		 cd = SS_cdr(si, p);
 		 for (j = 0; j < no; j++)
 		     {q = map[j].p;
 		      if ((q == ca) || (q == cd))
@@ -934,7 +934,7 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 object *SS_mk_object(SS_psides *si,
 		     void *np, int type, SS_eval_mode evt, char *pname,
 		     void (*print)(SS_psides *si, object *obj, object *strm),
-		     void (*release)(object *obj))
+		     void (*release)(SS_psides *si, object *obj))
    {object *op;
     SC_mem_opt opt;
 
@@ -1072,12 +1072,12 @@ void SS_register_types(void)
 
 /* _SS_GET_OBJECT_LENGTH - compute the number of items in a object */
 
-int _SS_get_object_length(object *obj)
+int _SS_get_object_length(SS_psides *si, object *obj)
    {int ni, ityp;
 
     ityp = SC_arrtype(obj, -1);
     if (ityp == SS_CONS_I)
-       ni = SS_length(obj);
+       ni = SS_length(si, obj);
 
     else if (ityp == SS_VECTOR_I)
        ni = SS_VECTOR_LENGTH(obj);
@@ -1327,7 +1327,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 	if (ityp == SC_STRING_I)
 	   strncpy(p, SS_STRING_TEXT(o), n);
 	else if (ityp == SS_CONS_I)
-	   strncpy(p, SS_STRING_TEXT(SS_car(o)), n);
+	   strncpy(p, SS_STRING_TEXT(SS_car(si, o)), n);
         else
 	   SS_error(si, "EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
 
@@ -1337,7 +1337,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
  * NOTE: the '\0' terminator on char strings cause the following
  *       test to fail unnecessarily (DRS.SCM for example)
  */
-    no = _SS_get_object_length(o);
+    no = _SS_get_object_length(si, o);
     if (n < no)
        {msg = SC_dsnprintf(FALSE,
 			   "MORE DATA THAN EXPECTED %ld > %ld - _SS_LIST_TO_NUMTYPE",
@@ -1351,12 +1351,12 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 
 	oid = SC_arrtype(o, -1);
 	if (oid == SS_CONS_I)
-	   {if (SS_consp(SS_car(o)))
-	       o = SS_car(o);
+	   {if (SS_consp(SS_car(si, o)))
+	       o = SS_car(si, o);
 	    for (i = 0; i < n; i++)
-	        {to = SS_car(o);
+	        {to = SS_car(si, o);
 		 _SS_object_to_numtype_id(vid, p, i, to);
-		 to = SS_cdr(o);
+		 to = SS_cdr(si, o);
 		 if (to != SS_null)
 		    o = to;};}
 
@@ -1398,14 +1398,14 @@ int _SS_list_to_numtype(SS_psides *si, char *type, void *p, long n, object *o)
  *                      - return -1 if non-numeric types are present
  */
 
-int _SS_max_numeric_type(object *argl, long *pn)
+int _SS_max_numeric_type(SS_psides *si, object *argl, long *pn)
    {int id, idx;
     long i;
     object *o;
 
     idx = -1;
-    for (i = 0; !SS_nullobjp(argl); argl = SS_cdr(argl), i++)
-        {o   = SS_car(argl);
+    for (i = 0; !SS_nullobjp(argl); argl = SS_cdr(si, argl), i++)
+        {o   = SS_car(si, argl);
 	 id  = SC_arrtype(o, -1);
 	 idx = max(idx, id);};
 

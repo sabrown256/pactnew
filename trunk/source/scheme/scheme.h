@@ -103,7 +103,7 @@ struct s_object
 
     SS_eval_mode eval_type;      /* generic members */
     void (*print)(SS_psides *si, object *obj, object *strm);
-    void (*release)(object *obj);};
+    void (*release)(SS_psides *si, object *obj);};
 
 FUNCTION_POINTER(object, (*PFObject));
 FUNCTION_POINTER(object, *(*PFPObject));
@@ -358,7 +358,7 @@ struct s_SS_vect
 #define SS_OBJECT_NAME(_o)         ((_o)->print_name)
 #define SS_OBJECT(_o)              ((_o)->val)
 #define SS_OBJECT_ETYPE(_o)        ((_o)->eval_type)
-#define SS_OBJECT_FREE(_o)         (*((_o)->release))(_o)
+#define SS_OBJECT_FREE(_si, _o)       (*((_o)->release))(_si, _o)
 #define SS_OBJECT_PRINT(_si, _o, _s)  (*((_o)->print))(_si, _o, _s)
 
 #define SS_INQUIRE_OBJECT(_si, _o)                                          \
@@ -656,9 +656,9 @@ struct s_SS_vect
     {_oect *_x;                                                              \
      _x = _v;                                                                \
      if ((_x->val == NULL) || (_x->eval_type == NO_EV))                      \
-        SS_error(si, "FREED OBJECT - SS_ASSIGN", SS_null);                 \
+        SS_error(si, "FREED OBJECT - SS_ASSIGN", SS_null);                   \
      SS_MARK(_x);                                                            \
-     SS_gc(_o);                                                              \
+     SS_gc(si, _o);                                                          \
      _o = _x;}
 
 #else
@@ -667,7 +667,7 @@ struct s_SS_vect
     {object *_x;                                                             \
      _x = _v;                                                                \
      SS_MARK(_x);                                                            \
-     SS_gc(_o);                                                              \
+     SS_gc(si, _o);                                                          \
      _o = _x;}
 
 #endif
@@ -721,7 +721,7 @@ extern void
 
 #  define SS_Restore(_si, _o)                                                \
    {(_si)->nrestore++;                                                       \
-    SS_gc(_o);                                                               \
+    SS_gc(_si, _o);                                                          \
     _o = *(object **) SC_array_pop((_si)->stack);                            \
     if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
        SS_error(_si, "FREED OBJECT - SS_RESTORE", SS_null);}
@@ -730,7 +730,7 @@ extern void
 
 #  define SS_Restore(_si, _o)                                                \
    {(_si)->nrestore++;                                                       \
-    SS_gc(_o);                                                               \
+    SS_gc(_si, _o);                                                          \
     _o = *(object **) SC_array_pop((_si)->stack);}
 
 # endif
@@ -892,10 +892,10 @@ extern void
 
 extern object
  *SS_eval(SS_psides *si, object *obj),
- *SS_params(object *fun),
- *SS_proc_body(object *fun),
- *SS_proc_env(object *fun),
- *SS_proc_name(object *fun),
+ *SS_params(SS_psides *si, object *fun),
+ *SS_proc_body(SS_psides *si, object *fun),
+ *SS_proc_env(SS_psides *si, object *fun),
+ *SS_proc_name(SS_psides *si, object *fun),
  *SS_do_bindings(SS_psides *si, object *pp, object *argp);
 
 extern int
@@ -967,15 +967,15 @@ extern object
  *SS_mk_object(SS_psides *si,
 	       void *np, int type, SS_eval_mode evt, char *pname,
 	       void (*print)(SS_psides *si, object *obj, object *strm),
-	       void (*release)(object *obj)),
+	       void (*release)(SS_psides *si, object *obj)),
  *SS_mk_char(SS_psides *si, int i),
  *SS_mk_vector(SS_psides *si, int l);
 
 extern void
  SS_register_types(void),
  SS_install(SS_psides *si, char *pname, char *pdoc, PFPHand phand, ...),
- SS_rl_object(object *obj),
- SS_gc(object *obj);
+ SS_rl_object(SS_psides *si, object *obj),
+ SS_gc(SS_psides *si, object *obj);
 
 
 /* SHPRM1.C declarations */
@@ -998,16 +998,16 @@ extern object
 /* SHPRM3.C declarations */
 
 extern int
- SS_length(object *obj),
+ SS_length(SS_psides *si, object *obj),
  SS_numbp(object *obj);
 
 extern object
  *SS_append(SS_psides *si, object *list1, object *list2),
- *SS_setcar(object *pair, object *car),
- *SS_setcdr(object *pair, object *cdr),
+ *SS_setcar(SS_psides *si, object *pair, object *car),
+ *SS_setcdr(SS_psides *si, object *pair, object *cdr),
  *SS_list_tail(SS_psides *si, object *lst, int n),
- *SS_car(object *obj),
- *SS_cdr(object *obj),
+ *SS_car(SS_psides *si, object *obj),
+ *SS_cdr(SS_psides *si, object *obj),
  *SS_caar(SS_psides *si, object *obj),
  *SS_cadr(SS_psides *si, object *obj),
  *SS_cdar(SS_psides *si, object *obj),

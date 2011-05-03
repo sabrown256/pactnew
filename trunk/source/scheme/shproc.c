@@ -70,7 +70,7 @@ static void _SS_wr_process(SS_psides *si, object *obj, object *strm)
 
 /* _SS_RL_PROCESS - this is need for the garbage collector */
 
-void _SS_rl_process(object *obj)
+void _SS_rl_process(SS_psides *si, object *obj)
    {PROCESS *pp;
 
     pp = SS_PROCESS_VALUE(obj);
@@ -133,18 +133,18 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
             0);
 
     if (strchr("rwa", mode[0]) == NULL)
-       SS_error(si, "BAD MODE - _SSI_OPN_PR", SS_car(argl));
+       SS_error(si, "BAD MODE - _SSI_OPN_PR", SS_car(si, argl));
 
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
 /* the rest of the args constitute the command line */
-    n = (int) SS_length(argl);
+    n = SS_length(si, argl);
 
 /* we need one extra for a NULL argument to terminate argv */
     argv = CMAKE_N(char *, n+1);
 
-    for (i = 0 ; i < n; argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for (i = 0 ; i < n; argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
 
          if (SS_stringp(obj))
             argv[i++] = SS_STRING_TEXT(obj);

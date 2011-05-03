@@ -43,7 +43,7 @@ static void _SX_wr_giob(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GIOB - gc a interface_object */
 
-static void _SX_rl_giob(object *obj)
+static void _SX_rl_giob(SS_psides *si, object *obj)
    {int rc;
     PG_interface_object *iob;
 
@@ -52,7 +52,7 @@ static void _SX_rl_giob(object *obj)
     if (rc < 1)
        SX_rem_iob(iob, TRUE);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -334,7 +334,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_ADD_ANNOT", SS_null);
 
-    if ((SS_length(argl) < 7) || (ndc[0] == ndc[1]))
+    if ((SS_length(si, argl) < 7) || (ndc[0] == ndc[1]))
        PG_define_region(dev, NORMC, ndc);
 
     iob = SX_add_text_ann(dev, ndc, s, clr, aln, ang*DEG_RAD);

@@ -70,7 +70,7 @@ static object *_SSI_hash_lookup(SS_psides *si, object *argl)
     if (vr == NULL)
        o = SS_f;
     else
-       o = SS_mk_cons(si, SS_car(argl), vr);
+       o = SS_mk_cons(si, SS_car(si, argl), vr);
 
     CFREE(name);
 
@@ -97,7 +97,7 @@ static object *_SSI_hash_remove(SS_psides *si, object *argl)
     if (tab == si->symtab)
        {obj = (object *) SC_hasharr_def_lookup(tab, name);
 	if (obj != NULL)
-	   SS_gc(obj);};
+	   SS_gc(si, obj);};
 
 /* now remove it */
     obj = (SC_hasharr_remove(tab, name)) ? SS_t : SS_f;
@@ -233,10 +233,13 @@ static void _SS_wr_hasharr(SS_psides *si, object *obj, object *strm)
 static int _SS_rl_ha_elem(haelem *hp, void *a)
    {int ok;
     object *o;
+    SS_psides *si;
+
+    si = (SS_psides *) a;
 
     ok = SC_haelem_data(hp, NULL, NULL, (void **) &o);
     if (ok == TRUE)
-       {SS_gc(o);
+       {SS_gc(si, o);
 	hp->def = NULL;};
 
     return(TRUE);}
@@ -246,14 +249,14 @@ static int _SS_rl_ha_elem(haelem *hp, void *a)
 
 /* _SS_RL_HASHARR - clean up a HASH_ARRAY */
 
-static void _SS_rl_hasharr(object *obj)
+static void _SS_rl_hasharr(SS_psides *si, object *obj)
    {hasharr *tab;
 
     tab = SS_GET(hasharr, obj);
 
-    SC_free_hasharr(tab, _SS_rl_ha_elem, NULL);
+    SC_free_hasharr(tab, _SS_rl_ha_elem, si);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -288,13 +291,13 @@ static void _SS_wr_haelem(SS_psides *si, object *obj, object *strm)
 
 /* _SS_RL_HAELEM - clean up a HAELEM */
 
-static void _SS_rl_haelem(object *obj)
+static void _SS_rl_haelem(SS_psides *si, object *obj)
    {haelem *hp;
 
     hp = SS_GET(haelem, obj);
     CFREE(hp);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 

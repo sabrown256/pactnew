@@ -74,7 +74,7 @@ static object *_SX_resolve_mapping(SS_psides *si, object *argl)
 
     SS_Save(si, si->argl);
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     fo  = obj;
 
     var = (object *) SC_hasharr_def_lookup(si->symtab, "map-resolve");
@@ -115,7 +115,7 @@ void SX_determine_drw_obj(SS_psides *si, PM_mapping **pf,
     argl = *pargl;
 
     obj  = _SX_resolve_mapping(si, argl);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     if (pf != NULL)
        {f = NULL;
@@ -224,7 +224,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
 
 	while (SS_consp(argl))
 	   {obj  = _SX_resolve_mapping(si, argl);
-	    argl = SS_cdr(argl);
+	    argl = SS_cdr(si, argl);
 	    set  = NULL;
 	    if (SX_NUMERIC_ARRAYP(obj))
 	       {pd   = (double *) NUMERIC_ARRAY_DATA(obj);
@@ -257,7 +257,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
 		CFREE(d);
 		PM_find_extrema(set);};};
 
-	SX_prep_ret(ret);};
+	SX_prep_ret(si, ret);};
 
     return(ret);}
 
@@ -281,7 +281,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
 
     ret = SS_null;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->domain;
@@ -298,7 +298,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
             SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -317,19 +317,19 @@ object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
     SX_plot_flag = TRUE;
 
     op   = (PF_PPM_mapping_1) cp->proc[0];
-    al   = SS_car(argl);
-    argl = SS_cdr(argl);
+    al   = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
 
     ret = SS_null;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            op(si, f, al);
 
 	SS_Assign(ret, SS_mk_cons(si, obj, ret));};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -385,10 +385,10 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
 
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
     ret  = SS_null;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->range;
@@ -400,7 +400,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
             SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -426,10 +426,10 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
 
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
     ret  = SS_null;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->domain;
@@ -441,7 +441,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
             SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -474,10 +474,10 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 /* NOTE: user specifies 1 for the first component so shitf */
     i--;
 
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
     ret  = SS_null;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->range;
@@ -489,7 +489,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
             SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -522,10 +522,10 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 /* NOTE: user specifies 1 for the first component so shitf */
     i--;
 
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
     ret  = SS_null;
     while (SS_consp(argl))
-       {obj = SS_car(argl);
+       {obj = SS_car(si, argl);
         SX_determine_mapping(si, &f, &argl);
         if (f != NULL)
            {set = f->domain;
@@ -537,7 +537,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
             SS_Assign(ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 
@@ -568,7 +568,7 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
 
 	     SS_Assign(ret, SS_mk_cons(si, mo, ret));};};
          
-    SX_prep_ret(ret);
+    SX_prep_ret(si, ret);
 
     return(ret);}
 

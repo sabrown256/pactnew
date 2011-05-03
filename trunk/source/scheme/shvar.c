@@ -253,7 +253,7 @@ static object *_SS_acc_var(SS_psides *si, C_procedure *cp,
        ret = _SS_exa_var(si, ad.memaddr, type);
 
     else
-       {vl = SS_car(argl);
+       {vl = SS_car(si, argl);
         ret = _SS_set_var(si, ad.memaddr, vl, type);};
 
     return(ret);}

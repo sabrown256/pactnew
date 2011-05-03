@@ -1084,8 +1084,8 @@ static void _SX_wrt_pdb(SS_psides *si, PDBfile *fp, object *argl)
 
     uncached = FALSE;
 
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
          j = -1;
 
          if (SS_numbp(obj))
@@ -1129,8 +1129,8 @@ static void _SX_wrt_bin(SS_psides *si, FILE *fp, object *argl)
 
     uncached = FALSE;
 
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
          j = -1;
 
          if (SS_numbp(obj))
@@ -1176,8 +1176,8 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
 
     uncached = FALSE;
 
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
-        {obj = SS_car(argl);
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+        {obj = SS_car(si, argl);
          j = -1;
 
          if (SS_numbp(obj))
@@ -1253,8 +1253,8 @@ object *SX_write_data(SS_psides *si, object *argl)
        {imode = SC_PDB;
 	fname = mode;
 	mode  = CSTRSAVE("pdb");
-        fobj  = SS_car(argl);
-        argl  = SS_cdr(argl);};
+        fobj  = SS_car(si, argl);
+        argl  = SS_cdr(si, argl);};
 
     if (strcmp(fname, "- no print name -") == 0)
        SS_error(si, "BAD FILE NAME - SX_WRITE_DATA", fobj);
@@ -1285,7 +1285,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 		      fobj);};
 
 /* flatten out the curve list */
-    frst = SS_car(argl);
+    frst = SS_car(si, argl);
     if (strcmp(SS_get_string(frst), "thru") == 0)
        argl = SS_exp_eval(si, argl);
 

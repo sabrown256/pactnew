@@ -41,13 +41,13 @@ int _SX_grotrian_mappingp(PM_mapping *f)
  *                   - are grotrian graphs
  */
 
-int _SX_any_grotrianp(object *argl)
+int _SX_any_grotrianp(SS_psides *si, object *argl)
    {object *obj;
     PM_mapping *f;
 
     while (SS_consp(argl))
-       {obj  = SS_car(argl);
-        argl = SS_cdr(argl);
+       {obj  = SS_car(si, argl);
+        argl = SS_cdr(si, argl);
         if (SX_MAPPINGP(obj))
            {f = SS_GET(PM_mapping, obj);
             if (_SX_grotrian_mappingp(f))

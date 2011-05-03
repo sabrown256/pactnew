@@ -41,7 +41,7 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
 
     if (SS_nullobjp(str))
        str = si->indev;
-    else if (!SS_inportp(str = SS_car(str)))
+    else if (!SS_inportp(str = SS_car(si, str)))
        SS_error(si, "ARGUMENT NOT INPUT-PORT - READ-LINE", str);
 
     s = SS_INSTREAM(str);
@@ -79,7 +79,7 @@ static object *_SS_rd_lst(SS_psides *si, object *str)
 	     case '.' :
 	          c = SS_get_ch(si, str, FALSE);
 		  if (strchr(" \t\r\n", c) != NULL)
-		     {SS_setcdr(ths, READ_EXPR(str));
+		     {SS_setcdr(si, ths, READ_EXPR(str));
 		      while ((c = SS_get_ch(si, str, TRUE)) != ')');
 		      ok = FALSE;
 		      o  = frst;
@@ -117,7 +117,7 @@ static object *_SS_rd_vct(SS_psides *si, object *str)
     lst = _SS_rd_lst(si, str);
     SS_MARK(lst);
     vct = SS_lstvct(si, lst);
-    SS_gc(lst);
+    SS_gc(si, lst);
 
     return(vct);}
 
@@ -135,7 +135,7 @@ static object *_SSI_rd_chr(SS_psides *si, object *arg)
        {*SS_PTR(si->indev) = '\0';
         o = SS_mk_char(si, (int) SS_get_ch(si, si->indev, FALSE));}
 
-    else if (SS_inportp(str = SS_car(arg)))
+    else if (SS_inportp(str = SS_car(si, arg)))
        {*SS_PTR(str) = '\0';
         o = SS_mk_char(si, (int) SS_get_ch(si, str, FALSE));}
 
@@ -451,7 +451,7 @@ static object *_SSI_read(SS_psides *si, object *obj)
     if (SS_nullobjp(obj))
        o = SS_read(si, si->indev);
 
-    else if (SS_inportp(op = SS_car(obj)))
+    else if (SS_inportp(op = SS_car(si, obj)))
        o = SS_read(si, op);
 
     else
@@ -533,7 +533,7 @@ static object *_SSI_call_if(SS_psides *si, object *argl)
     object *obj, *old_indev, *ret;
 
     s   = NULL;
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
 
     if (SS_stringp(obj))
        s = SS_STRING_TEXT(obj);
@@ -548,7 +548,7 @@ static object *_SSI_call_if(SS_psides *si, object *argl)
 
     old_indev = si->indev;
     si->indev  = SS_mk_inport(si, str, s);
-    ret       = SS_exp_eval(si, SS_cdr(argl));
+    ret       = SS_exp_eval(si, SS_cdr(si, argl));
 
     _SSI_cls_in(si, si->indev);
 
@@ -800,10 +800,10 @@ object *SS_load(SS_psides *si, object *argl)
     PFPOprs prs;
 
     flag = SS_f;
-    fnm  = SS_car(argl);
-    argl = SS_cdr(argl);
+    fnm  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     if (SS_consp(argl))
-       {flag = SS_car(argl);
+       {flag = SS_car(si, argl);
         if (SS_true(flag))
            {SS_Save(si, si->env);
             si->env = si->global_env;};};
@@ -834,7 +834,7 @@ object *SS_load(SS_psides *si, object *argl)
 
         if (SS_eofobjp(si->rdobj))
            {_SSI_cls_in(si, strm);
-	    SS_gc(strm);
+	    SS_gc(si, strm);
             break;};
         SS_Save(si, si->env);
         SS_Assign(si->evobj, SS_exp_eval(si, si->rdobj));

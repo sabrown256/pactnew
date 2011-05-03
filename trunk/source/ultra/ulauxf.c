@@ -319,7 +319,7 @@ object *UL_curve_eval(SS_psides *si, object *arg)
     UL_pause(si, FALSE);
 
     if (SS_true(ret))
-       {SX_prep_ret(ret);}
+       {SX_prep_ret(si, ret);}
     else
        SS_error(si, "ARGUMENT OUT OF DOMAIN - CURVE-EVAL", arg);
 
@@ -489,12 +489,12 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
        SS_error(si, "BAD CURVE - _ULI_FIT_CURVE", argl);
     n = SX_dataset[j].n;
 
-    argl  = SS_cdr(argl);
-    order = SS_length(argl);
+    argl  = SS_cdr(si, argl);
+    order = SS_length(si, argl);
     aord  = abs(order) + 1;
     curid = CMAKE_N(int, order);
-    for (i = 0; i < order; i++, argl = SS_cdr(argl))
-        curid[i] = SX_get_crv_index_i(SS_car(argl));
+    for (i = 0; i < order; i++, argl = SS_cdr(si, argl))
+        curid[i] = SX_get_crv_index_i(SS_car(si, argl));
         
     ay = PM_create(n, 1);
     a  = PM_create(n, order);
@@ -906,15 +906,15 @@ static object *_ULI_stats(SS_psides *si, object *argl)
 
     SX_prep_arg(si, argl);
     ret = SS_null;
-    for ( ; SS_consp(argl); argl = SS_cdr(argl))
-       {i = SX_get_crv_index_i(SS_car(argl));
+    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+       {i = SX_get_crv_index_i(SS_car(si, argl));
         if (i != -1)
            ret = SS_mk_cons(si, _UL_stat(si, i), ret);};
          
     UL_pause(si, FALSE);
    
-    if (SS_length(ret) == 1)
-       o = SS_car(ret);
+    if (SS_length(si, ret) == 1)
+       o = SS_car(si, ret);
     else
        o = ret;
 

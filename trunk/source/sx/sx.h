@@ -36,8 +36,8 @@
 /* SX_GET_FLOAT_FROM_LIST - extract a double from the list and cdr the list */
 
 #define SX_GET_FLOAT_FROM_LIST(_si, x, argl, s)                              \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     if (SS_integerp(obj))                                                    \
        x = (double) SS_INTEGER_VALUE(obj);                                   \
     else if (SS_floatp(obj))                                                 \
@@ -51,8 +51,8 @@
 /* SX_GET_INTEGER_FROM_LIST - extract an int from the list and cdr the list */
 
 #define SX_GET_INTEGER_FROM_LIST(_si, x, argl, s)                            \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     if (SS_integerp(obj))                                                    \
        x = SS_INTEGER_VALUE(obj);                                            \
     else                                                                     \
@@ -66,8 +66,8 @@
  */
 
 #define SX_GET_STRING_FROM_LIST(x, argl, s)                                  \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     x    = CSTRSAVE(SS_get_string(obj));}
 
 /*--------------------------------------------------------------------------*/
@@ -78,8 +78,8 @@
  */
 
 #define SX_GET_OBJECT_FROM_LIST(_si, predicate, x, value, argl, s)           \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     if (predicate)                                                           \
        x = (value);                                                          \
     else                                                                     \
@@ -93,8 +93,8 @@
  */
 
 #define SX_GET_ARRAY_FROM_LIST(_si, x, argl, s)                              \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     if (SX_NUMERIC_ARRAYP(obj))                                              \
        x = NUMERIC_ARRAY_DATA(obj);                                          \
     else                                                                     \
@@ -108,8 +108,8 @@
  */
 
 #define SX_GET_GRAPH_FROM_LIST(_si, x, argl, s)                              \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     if (SX_GRAPHP(obj))                                                      \
        x = SS_GET(PG_graph, obj);                                            \
     else                                                                     \
@@ -123,8 +123,8 @@
  */
 
 #define SX_GET_SET_FROM_LIST(_si, x, argl, s)                                \
-   {obj  = SS_car(argl);                                                     \
-    argl = SS_cdr(argl);                                                     \
+   {obj  = SS_car(si, argl);                                                     \
+    argl = SS_cdr(si, argl);                                                     \
     if (SX_SETP(obj))                                                        \
        x = SS_GET(PM_set, obj);                                              \
     else                                                                     \
@@ -141,8 +141,8 @@
 #define SX_GET_MAPPING_FROM_LIST(_si, pn, argl)                              \
     {PG_graph *g;                                                            \
      object *obj;                                                            \
-     obj  = SS_car(argl);                                                    \
-     argl = SS_cdr(argl);                                                    \
+     obj  = SS_car(si, argl);                                                    \
+     argl = SS_cdr(si, argl);                                                    \
      if (SX_GRAPHP(obj))                                                     \
         {g  = SS_GET(PG_graph, obj);                                         \
          pn = g->f;}                                                         \
@@ -861,8 +861,9 @@ extern int
  SX_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag);
 
 extern object
- *SX_get_pdbfile(object *argl, PDBfile **pfile, g_file **gfile),
- *SX_get_file(object *argl, g_file **pfile),
+ *SX_get_pdbfile(SS_psides *si, object *argl,
+		 PDBfile **pfile, g_file **gfile),
+ *SX_get_file(SS_psides *si, object *argl, g_file **pfile),
  *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
 		     char *name, char *type, void *vr, int flag);
 

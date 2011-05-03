@@ -177,13 +177,13 @@ object *SS_lstvct(SS_psides *si, object *arg)
     if (!SS_consp(arg))
        SS_error(si, "ARGUMENT NOT LIST - LIST->VECTOR", arg);
 
-    k   = SS_length(arg);
+    k   = SS_length(si, arg);
     vct = SS_mk_vector(si, k);
     va  = SS_VECTOR_ARRAY(vct);
 
     for (i = 0; i < k; i++)
-        {SS_Assign(va[i], SS_car(arg));
-         arg = SS_cdr(arg);};
+        {SS_Assign(va[i], SS_car(si, arg));
+         arg = SS_cdr(si, arg);};
 
     return(vct);}
 
@@ -210,12 +210,12 @@ object *_SSI_define_global(SS_psides *si, object *argl)
 
     val = SS_null;
 
-    obj  = SS_cdr(argl);
-    argl = SS_car(argl);
+    obj  = SS_cdr(si, argl);
+    argl = SS_car(si, argl);
 
     if (SS_consp(argl))
-       {obj  = SS_mk_cons(si, SS_cdr(argl), obj);
-        argl = SS_car(argl);
+       {obj  = SS_mk_cons(si, SS_cdr(si, argl), obj);
+        argl = SS_car(si, argl);
         val  = SS_mk_procedure(si, argl, obj, si->global_env);
 
         s = SS_PROCEDURE_NAME(val);
@@ -224,7 +224,7 @@ object *_SSI_define_global(SS_psides *si, object *argl)
         SS_PROCEDURE_NAME(val) = CSTRSAVE(s);}
 
     else if (SS_variablep(argl))
-       {obj = SS_car(obj);
+       {obj = SS_car(si, obj);
         val = SS_exp_eval(si, obj);
 
 /* this preserves things for compound procedures (e.g. autoload) */
@@ -233,11 +233,11 @@ object *_SSI_define_global(SS_psides *si, object *argl)
 
             ptype = SS_PROCEDURE_TYPE(val);
             if ((ptype == SS_PROC) || (ptype == SS_MACRO))
-	       {t = SS_proc_env(val);
+	       {t = SS_proc_env(si, val);
 		SS_MARK(t);
-		t = SS_proc_body(val);
+		t = SS_proc_body(si, val);
 		SS_MARK(t);
-		t = SS_params(val);};};}
+		t = SS_params(si, val);};};}
 
     else
        SS_error(si, "CAN'T DEFINE NON-VARIABLE OBJECT - _SSI_DEFINE_GLOBAL", argl);
@@ -366,12 +366,12 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 
 /* make a list of names from the argument list */
     else
-       {n   = SS_length(argl);
+       {n   = SS_length(si, argl);
 	vrs = CMAKE_N(char *, n+1);
 
 	n = 0;
-	for (l = argl; !SS_nullobjp(l); l = SS_cdr(l))
-	    {v = SS_car(l);
+	for (l = argl; !SS_nullobjp(l); l = SS_cdr(si, l))
+	    {v = SS_car(si, l);
 	     SS_args(si, v,
 		     SC_STRING_I, &vr,
 		     0);
@@ -434,7 +434,7 @@ static object *_SSI_print_env(SS_psides *si, object *obj)
             0);
 
     penv = si->env;
-    for (i = 0; (i < n) && !SS_nullobjp(penv); i++, penv = SS_cdr(penv));
+    for (i = 0; (i < n) && !SS_nullobjp(penv); i++, penv = SS_cdr(si, penv));
 
     snprintf(bf, MAXLINE, "Environment frame #%d:\n", n+1);
     SS_print(si, si->outdev, penv, bf, "\n\n");

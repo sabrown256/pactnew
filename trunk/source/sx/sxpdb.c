@@ -277,7 +277,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 
     rv = SS_null;
 
-    if (SS_length(argl) > 4)
+    if (SS_length(si, argl) > 4)
        SS_args(si, argl,
                G_FILE, &po,
                SC_LONG_LONG_I, &addr,
@@ -370,7 +370,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 
     vr = NULL;
 
-    if (SS_length(argl) > 5)
+    if (SS_length(si, argl) > 5)
        SS_args(si, argl,
                G_FILE, &po,
                SS_OBJECT_I, &obj,
@@ -454,8 +454,8 @@ static dimdes *_SX_make_dims_dimdes(SS_psides *si, PDBfile *file,
     mini = 0;
     leng = 0;
     dims = NULL;
-    for ( ; !SS_nullobjp(argl); argl = SS_cdr(argl))
-        {dim_obj = SS_car(argl);
+    for ( ; !SS_nullobjp(argl); argl = SS_cdr(si, argl))
+        {dim_obj = SS_car(si, argl);
          if (SS_integerp(dim_obj))
             {mini = (long) file->default_offset;
              leng = SS_INTEGER_VALUE(dim_obj);}
@@ -463,8 +463,8 @@ static dimdes *_SX_make_dims_dimdes(SS_psides *si, PDBfile *file,
             {mini = (long) file->default_offset;
              leng = SS_FLOAT_VALUE(dim_obj);}
          else if (SS_consp(dim_obj))
-            {mini = SS_INTEGER_VALUE(SS_car(dim_obj));
-             leng = SS_INTEGER_VALUE(SS_cdr(dim_obj)) - mini + 1;}
+            {mini = SS_INTEGER_VALUE(SS_car(si, dim_obj));
+             leng = SS_INTEGER_VALUE(SS_cdr(si, dim_obj)) - mini + 1;}
          else
             SS_error(si,
 		       "DIMENSIONS MUST BE INTEGERS - _SX_MAKE_DIMS_DIMDES",
@@ -526,17 +526,17 @@ static syment *_SX_spec_instance(SS_psides *si, PDBfile *file,
     if (ep != NULL)
        {val.memaddr = NULL;
 
-	data = SS_car(argl);
-	argl = SS_cdr(argl);
+	data = SS_car(si, argl);
+	argl = SS_cdr(si, argl);
 
 	if (!SS_consp(data))
 	   SS_error(si, "SHOULD BE LIST - _SX_SPEC_INSTANCE", data);
 
-	label = CSTRSAVE(SS_get_string(SS_car(data)));
-	data  = SS_cdr(data);
+	label = CSTRSAVE(SS_get_string(SS_car(si, data)));
+	data  = SS_cdr(si, data);
 	if (strcmp(label, "type") == 0)
-	   {type        = CSTRSAVE(SS_get_string(SS_car(data)));
-	    dims        = _SX_make_dims_dimdes(si, file, SS_cdr(data));
+	   {type        = CSTRSAVE(SS_get_string(SS_car(si, data)));
+	    dims        = _SX_make_dims_dimdes(si, file, SS_cdr(si, data));
 	    number      = _PD_comp_num(dims);
 	    if (defent)
 	       val.memaddr = NULL;
@@ -604,7 +604,8 @@ int SX_ipdbfilep(object *obj)
  *                - argument list
  */
 
-object *SX_get_pdbfile(object *argl, PDBfile **pfile, g_file **gfile)
+object *SX_get_pdbfile(SS_psides *si, object *argl,
+		       PDBfile **pfile, g_file **gfile)
    {PDBfile *pf;
     g_file *po;
     object *fo;
@@ -612,12 +613,12 @@ object *SX_get_pdbfile(object *argl, PDBfile **pfile, g_file **gfile)
     pf = SX_vif;
     po = SX_gvif;
 
-    fo = SS_car(argl);
+    fo = SS_car(si, argl);
     if (SX_FILEP(fo))
        {po = SS_GET(g_file, fo);
 	pf = FILE_FILE(PDBfile, po);};
 
-    argl   = SS_cdr(argl);
+    argl   = SS_cdr(si, argl);
     *pfile = pf;
     *gfile = po;
 
@@ -632,18 +633,18 @@ object *SX_get_pdbfile(object *argl, PDBfile **pfile, g_file **gfile)
  *             - argument list
  */
 
-object *SX_get_file(object *argl, g_file **pfile)
+object *SX_get_file(SS_psides *si, object *argl, g_file **pfile)
    {object *fo;
     g_file *po;
 
-    fo = SS_car(argl);
+    fo = SS_car(si, argl);
     if (SX_FILEP(fo))
        {po     = SS_GET(g_file, fo);
-        argl   = SS_cdr(argl);
+        argl   = SS_cdr(si, argl);
         *pfile = po;}
 
     else if (SS_nullobjp(fo))
-       {argl   = SS_cdr(argl);
+       {argl   = SS_cdr(si, argl);
         *pfile = SX_gvif;};
        
     return(argl);}
@@ -763,10 +764,10 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
 
     strcpy(mode, "r");
     if (SS_consp(argl))
-       {obj  = SS_car(argl);
-        argl = SS_cdr(argl);
+       {obj  = SS_car(si, argl);
+        argl = SS_cdr(si, argl);
         if (SS_consp(argl))
-           {md      = SS_get_string(SS_car(argl));
+           {md      = SS_get_string(SS_car(si, argl));
             mode[0] = *md;
             mode[1] = '\0';};}
     else
@@ -1789,13 +1790,13 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
         if (SS_nullobjp(ord))
            SS_error(si, "BAD BYTE ORDERING - _SXI_DEF_PRIM", ord);
 
-        no = SS_length(ord);
+        no = SS_length(si, ord);
         if (no != bytespitem)
            SS_error(si, "INCONSISTENT SIZE - _SXI_DEF_PRIM", ord);
 
         ordr = CMAKE_N(int, no);
-        for (i = 0L; i < no; i++, ord = SS_cdr(ord))
-            ordr[i] = SS_INTEGER_VALUE(SS_car(ord));
+        for (i = 0L; i < no; i++, ord = SS_cdr(si, ord))
+            ordr[i] = SS_INTEGER_VALUE(SS_car(si, ord));
 
         dp = PD_defloat(file, name, bytespitem, align, ordr,
                         expb, mantb, sbs, sbe, sbm, hmb, bias);};
@@ -1849,13 +1850,13 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
     if (SS_nullobjp(ord))
        SS_error(si, "BAD BYTE ORDERING - _SXI_CHG_PRIM", ord);
 
-    no = SS_length(ord);
+    no = SS_length(si, ord);
     if (no != nb)
        SS_error(si, "INCONSISTENT SIZE - _SXI_CHG_PRIM", ord);
 
     ordr = CMAKE_N(int, no);
-    for (i = 0L; i < no; i++, ord = SS_cdr(ord))
-        ordr[i] = SS_INTEGER_VALUE(SS_car(ord));
+    for (i = 0L; i < no; i++, ord = SS_cdr(si, ord))
+        ordr[i] = SS_INTEGER_VALUE(SS_car(si, ord));
 
     id = PD_change_primitive(file, ityp, nb, align, fmt, ordr);
 
@@ -1978,8 +1979,8 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 
     argl = SS_cddr(si, argl);
     lst  = NULL;
-    for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
-        {member_obj = SS_car(argl);
+    for (; !SS_nullobjp(argl); argl = SS_cdr(si, argl))
+        {member_obj = SS_car(si, argl);
 	 if (!SS_consp(member_obj))
 	    SS_error(si, "MEMBER MUST BE A LIST - _SXI_MAKE_DEFSTR",
 		     member_obj);
@@ -2250,7 +2251,7 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
     bl = NULL;
 
     if (SS_consp(alst))
-       {n   = SS_length(alst) >> 1;
+       {n   = SS_length(si, alst) >> 1;
 	bl  = _PD_block_make(n);
 	ni  = 0;
         tot = 0L;
@@ -2476,22 +2477,22 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
     if (!SS_consp(argl))
        SS_error(si, "BAD ARGUMENT LIST - SX_WRITE_FILEDATA", argl);
 
-    argl = SX_get_pdbfile(argl, &file, &po);
+    argl = SX_get_pdbfile(si, argl, &file, &po);
 
     wr = file->tr->write;
 
 /* get the name of the variable */
-    namo = SS_car(argl);
+    namo = SS_car(si, argl);
     strcpy(fullpath, _PD_fixname(file, SS_get_string(namo)));
 
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
 /* if no other arguments its an error */
     if (SS_nullobjp(argl))
        SS_error(si, "INSUFFICIENT ARGUMENTS - SX_WRITE_FILEDATA", argl);
 
 /* if the next item is a pdbdata, use its info */
-    symo = SS_car(argl);
+    symo = SS_car(si, argl);
     if (SX_PDBDATAP(symo))
        {SS_MARK(symo);
         ep           = PDBDATA_EP(symo);
@@ -2684,19 +2685,19 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
     if (!SS_consp(argl))
        SS_error(si, "BAD ARGUMENT LIST - _SXI_RESERVE_PDBDATA", argl);
 
-    argl = SX_get_pdbfile(argl, &file, &po);
+    argl = SX_get_pdbfile(si, argl, &file, &po);
 
 /* get the name of the variable */
-    namo = SS_car(argl);
+    namo = SS_car(si, argl);
     strcpy(fullpath, _PD_fixname(file, SS_get_string(namo)));
-    argl     = SS_cdr(argl);
+    argl     = SS_cdr(si, argl);
 
 /* if no other arguments its an error */
     if (SS_nullobjp(argl))
        SS_error(si, "INSUFFICIENT ARGUMENTS - _SXI_RESERVE_PDBDATA", argl);
 
 /* if the next item is a pdbdata, use its info */
-    symo = SS_car(argl);
+    symo = SS_car(si, argl);
     if (SX_PDBDATAP(symo))
        {SS_MARK(symo);
         ep           = PDBDATA_EP(symo);
@@ -2786,12 +2787,12 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     if (!SS_consp(argl))
        SS_error(si, "BAD ARGUMENT LIST - SX_READ_FILEDATA", argl);
 
-    argl = SX_get_pdbfile(argl, &file, &po);
+    argl = SX_get_pdbfile(si, argl, &file, &po);
 
     rd = file->tr->read;
 
 /* get the name of the variable */
-    namo = SS_car(argl);
+    namo = SS_car(si, argl);
     name = CSTRSAVE(_PD_fixname(file, SS_get_string(namo)));
     s    = name;
     name = _PD_expand_hyper_name(file, s);
@@ -2988,8 +2989,8 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
     object *obj;
 
     if (SS_consp(argl))
-       {obj  = SS_car(argl);
-	argl = SS_cdr(argl);}
+       {obj  = SS_car(si, argl);
+	argl = SS_cdr(si, argl);}
     else
        {obj  = argl;
 	argl = SS_null;};
@@ -3045,8 +3046,8 @@ static object *_SX_print_pdb(SS_psides *si, FILE *fp, object *argl)
 
     rv = SS_null;
 
-    for (; SS_consp(argl); argl = SS_cdr(argl))
-        {x  = SS_car(argl);
+    for (; SS_consp(argl); argl = SS_cdr(si, argl))
+        {x  = SS_car(si, argl);
 	 rv = _SX_write_pdb(si, fp, x);};
 
     return(rv);}
@@ -3064,7 +3065,7 @@ static object *_SXI_print_pdb(SS_psides *si, object *argl)
     SS_args(si, argl,
 	    SS_OUTPUT_PORT_I, &fp,
 	    0);
-    argl = SS_cdr(argl);
+    argl = SS_cdr(si, argl);
 
     if (fp == NULL)
        fp = stdout;

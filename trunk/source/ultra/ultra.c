@@ -291,11 +291,11 @@ static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
     object *lsta, *lstb;
     object *cb, *clb, *clr, **oa;
 
-    na = SS_length(cla);
+    na = SS_length(si, cla);
     oa = CMAKE_N(object *, na);
 
-    for (i = 0, lsta = cla; i < na; i++, lsta = SS_cdr(lsta))
-        oa[i] = SS_car(lsta);
+    for (i = 0, lsta = cla; i < na; i++, lsta = SS_cdr(si, lsta))
+        oa[i] = SS_car(si, lsta);
 
     SC_VA_START(cla);
 
@@ -310,8 +310,8 @@ static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
 	clb = clr;
 
 	if (SS_consp(clb) == TRUE)
-	   {for (lstb = clb; !SS_nullobjp(lstb); lstb = SS_cdr(lstb))
-	        {cb = SS_car(lstb);
+	   {for (lstb = clb; !SS_nullobjp(lstb); lstb = SS_cdr(si, lstb))
+	        {cb = SS_car(si, lstb);
 		 for (i = 0; i < na; i++)
 		     {if (cb == oa[i])
 			 {oa[i] = NULL;
@@ -334,7 +334,7 @@ static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
 /* reassign the ids of the final results */
 #if 0
     if (SS_consp(clr) == TRUE)
-       {for (lstb = clr; !SS_nullobjp(lstb); lstb = SS_cdr(lstb))
+       {for (lstb = clr; !SS_nullobjp(lstb); lstb = SS_cdr(si, lstb))
 	    _UL_re_id_crv(cb);}
 
     else
@@ -365,9 +365,9 @@ static void _UL_parse(SS_psides *si, object *strm)
 
 /* identify intermediate results for elimination */
     if (UL_save_intermediate == OFF)
-       {na = SS_length(crva);
-	nb = SS_length(crvb);
-	nr = SS_length(si->evobj);
+       {na = SS_length(si, crva);
+	nb = SS_length(si, crvb);
+	nr = SS_length(si, si->evobj);
 	if (na > nb+nr)
 	   {if (SS_consp(crvb) == TRUE)
 	       _UL_del_intermediate(si, crva, crvb, si->val, NULL);
@@ -610,7 +610,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
 
     SX_prep_arg(si, argl);
 
-    if (SS_numbp(SS_car(argl)))
+    if (SS_numbp(SS_car(si, argl)))
        {int first = 0, last = 0, id;
         
         SS_args(si, argl,
@@ -662,7 +662,7 @@ object *_ULI_thru(SS_psides *si, object *argl)
 
         ret = _UL_dataid_seq(si, first, last);}
 
-    SX_prep_retl(ret);
+    SX_prep_retl(si, ret);
 
     return(ret);}
 

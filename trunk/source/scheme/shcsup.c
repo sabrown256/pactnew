@@ -125,11 +125,11 @@ object *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl)
    {object *frm, *bdy, *d, *dcls, *lst, *proto;
 
     if (SS_nullobjp(sl))
-       dcls = SS_cdr(dcl);
+       dcls = SS_cdr(si, dcl);
 
     else
        {dcls = SS_null;
-	for (lst = dcl; !SS_nullobjp(lst); lst = SS_cdr(lst))
+	for (lst = dcl; !SS_nullobjp(lst); lst = SS_cdr(si, lst))
 	    {d    = SS_cdar(si, lst);
 	     dcls = SS_append(si, dcls, d);};
 

@@ -91,7 +91,7 @@ static object *_SS_splice(SS_psides *si, object *ncns, object *item,
 
 /* if the item is null */
            {if (SS_nullobjp(item))
-               SS_setcdr(tcns, rest);
+               SS_setcdr(si, tcns, rest);
 
 /* if the item is non-null */
             else
@@ -121,7 +121,7 @@ static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
        return(obj);
 
 /* handle forms like (quasiquote (unqote expr)) */
-    if (!SS_consp(tcns = SS_car(obj)))
+    if (!SS_consp(tcns = SS_car(si, obj)))
        {if (SS_Unquoted(tcns))
            {ncns = _SS_unquote(si, obj);
             return(ncns);}
@@ -131,12 +131,12 @@ static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
 /* look down a quasiquoted list */
     ncns = SS_null;
     y   = SS_null;
-    for (lst = obj; SS_consp(lst); lst = SS_cdr(lst))
-        {tcns = SS_car(lst);
+    for (lst = obj; SS_consp(lst); lst = SS_cdr(si, lst))
+        {tcns = SS_car(si, lst);
 
 /* if this element is a list */
          if (SS_consp(tcns))
-            {car = SS_car(tcns);
+            {car = SS_car(si, tcns);
 
 /* is it an unquote form? */
              if (SS_Unquoted(car))
@@ -146,7 +146,7 @@ static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
              else if (Unqsplicing(car))
                 {ncns = _SS_splice(si, ncns,
 				   _SS_unquote(si, tcns),
-				   SS_cdr(lst),
+				   SS_cdr(si, lst),
 				   y);
                  break;}
 
@@ -258,20 +258,20 @@ static object *SS_let(SS_psides *si, object *let)
  */
     prml = SS_null;
     argl = SS_null;
-    for (lst = SS_car(let); !SS_nullobjp(lst); lst = SS_cdr(lst))
-        {vlpair = SS_car(lst);
+    for (lst = SS_car(si, let); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
+        {vlpair = SS_car(si, lst);
          if (!SS_consp(vlpair))
 	    {vr = vlpair;
              vl = SS_null;}
          else
-            {vr = SS_car(vlpair);
+            {vr = SS_car(si, vlpair);
              vl = SS_cadr(si, vlpair);};
 
          prml = SS_mk_cons(si, vr, prml);
          argl = SS_mk_cons(si, vl, argl);};
 
 /* now make the procedure */
-    bdy    = SS_cdr(let);
+    bdy    = SS_cdr(si, let);
     bdy    = SS_mk_cons(si, prml, bdy);
     lambda = SS_mk_procedure(si, SS_block_proc, bdy, si->env);
 
@@ -308,13 +308,13 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
     this = SS_null;
     asnl = SS_null;
     prml = SS_null;
-    for (lst = SS_car(lets); !SS_nullobjp(lst); lst = SS_cdr(lst))
-        {vlpair = SS_car(lst);
+    for (lst = SS_car(si, lets); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
+        {vlpair = SS_car(si, lst);
          if (!SS_consp(vlpair))
             {vr = vlpair;
              vl = SS_null;}
          else
-            {vr = SS_car(vlpair);
+            {vr = SS_car(si, vlpair);
              vl = SS_cadr(si, vlpair);};
 
          asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
@@ -322,7 +322,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
          prml = SS_mk_cons(si, vr, prml);};
 
 /* append the assignment list to the body */
-    bdy = SS_append(si, asnl, SS_cdr(lets));
+    bdy = SS_append(si, asnl, SS_cdr(si, lets));
 
 /* complete the let form */
     let = SS_mk_cons(si, prml, bdy);
@@ -363,12 +363,12 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
     SS_Assign(si->this, SS_null);
     SS_Assign(si->argl, SS_null);
     prml = SS_null;
-    for (lst = SS_car(lets); !SS_nullobjp(lst); lst = SS_cdr(lst))
-        {if (!SS_consp(vlpair = SS_car(lst)))
+    for (lst = SS_car(si, lets); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
+        {if (!SS_consp(vlpair = SS_car(si, lst)))
             {vr = vlpair;
              vl = SS_null;}
          else
-            {vr = SS_car(vlpair);
+            {vr = SS_car(si, vlpair);
              vl = SS_cadr(si, vlpair);};
 
          asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
@@ -376,7 +376,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
          prml = SS_mk_cons(si, vr, prml);};
 
 /* append the assignment list to the body */
-    bdy = SS_append(si, si->argl, SS_cdr(lets));
+    bdy = SS_append(si, si->argl, SS_cdr(si, lets));
 
 /* complete the transformation */
     frm = SS_mk_cons(si, prml, bdy);
@@ -422,12 +422,12 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
     SS_Assign(si->this, SS_null);
     SS_Assign(si->argl, SS_null);
     SS_Assign(si->unev, SS_null);
-    for (lst = SS_car(letr); !SS_nullobjp(lst); lst = SS_cdr(lst))
-        {if (!SS_consp(vlpair = SS_car(lst)))
+    for (lst = SS_car(si, letr); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
+        {if (!SS_consp(vlpair = SS_car(si, lst)))
             {vr = vlpair;
              vl = SS_null;}
          else
-            {vr = SS_car(vlpair);
+            {vr = SS_car(si, vlpair);
              vl = SS_cadr(si, vlpair);};
 
          SS_Assign(si->val,
@@ -436,7 +436,7 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
          SS_Assign(si->unev, SS_mk_cons(si, vr, si->unev));};
 
 /* complete the transformation */
-    frm = SS_mk_cons(si, si->unev, SS_append(si, si->argl, SS_cdr(letr)));
+    frm = SS_mk_cons(si, si->unev, SS_append(si, si->argl, SS_cdr(si, letr)));
     SS_Assign(si->fun, frm);
 
 /* process the let form */
@@ -470,14 +470,14 @@ static object *_SS_lst_map(SS_psides *si, object *argl, int *Ex_flag)
     arg_nxt  = SS_null;
     rest_nxt = SS_null;
 
-    for (args = SS_null, rest = SS_null; SS_consp(argl); argl = SS_cdr(argl))
-        {lst = SS_car(argl);
+    for (args = SS_null, rest = SS_null; SS_consp(argl); argl = SS_cdr(si, argl))
+        {lst = SS_car(si, argl);
 
 /* taking the car of each arg LST make up the list of ARGS for proc */
-         SS_end_cons(args, arg_nxt, SS_car(lst));
+         SS_end_cons(args, arg_nxt, SS_car(si, lst));
 
 /* cons up a list with the REST of the argument lists */
-         if (!SS_nullobjp(lst = SS_cdr(lst)))
+         if (!SS_nullobjp(lst = SS_cdr(si, lst)))
             {SS_end_cons(rest, rest_nxt, lst);};
 
 /* if we're at the end of any arg LST signal to exit the loop */
@@ -500,8 +500,8 @@ static object *_SSI_map(SS_psides *si, object *obj)
 
     ret_nxt = SS_null;
 
-    proc = SS_car(obj);
-    argl = SS_cdr(obj);
+    proc = SS_car(si, obj);
+    argl = SS_cdr(si, obj);
     if (!SS_consp(argl))
        return(proc);
 
@@ -513,23 +513,23 @@ static object *_SSI_map(SS_psides *si, object *obj)
     for (exf = FALSE; !exf; )
         {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(si, vl)))
-            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(vl)));
+            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
              SS_Assign(expr, SS_mk_cons(si,
 					proc, SS_mk_cons(si,
 							 args, SS_null)));}
          else
-            {SS_Assign(args, SS_car(vl));
+            {SS_Assign(args, SS_car(si, vl));
              SS_Assign(expr, SS_mk_cons(si, proc, args));};
-         SS_Assign(argl, SS_cdr(vl));
+         SS_Assign(argl, SS_cdr(si, vl));
          SS_Save(si, si->env);
          SS_end_cons(ret, ret_nxt, SS_exp_eval(si, expr));
          SS_Restore(si, si->env);};
 
 /* clean up the mess */
-    SS_gc(expr);
-    SS_gc(argl);
-    SS_gc(args);
-    SS_gc(vl);
+    SS_gc(si, expr);
+    SS_gc(si, argl);
+    SS_gc(si, args);
+    SS_gc(si, vl);
 
     return(ret);}
 
@@ -542,8 +542,8 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
    {int exf;
     object *proc, *argl, *expr, *args, *vl;
 
-    proc = SS_car(obj);
-    argl = SS_cdr(obj);
+    proc = SS_car(si, obj);
+    argl = SS_cdr(si, obj);
     if (!SS_consp(argl))
        return(proc);
 
@@ -554,22 +554,22 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
     for (exf = FALSE; !exf; )
         {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(si, vl)))
-            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(vl)));
+            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
              SS_Assign(expr, SS_mk_cons(si, proc,
 					SS_mk_cons(si, args, SS_null)));}
          else
-            {SS_Assign(args, SS_car(vl));
+            {SS_Assign(args, SS_car(si, vl));
              SS_Assign(expr, SS_mk_cons(si, proc, args));};
-         SS_Assign(argl, SS_cdr(vl));
+         SS_Assign(argl, SS_cdr(si, vl));
          SS_Save(si, si->env);
          SS_exp_eval(si, expr);
          SS_Restore(si, si->env);};
 
 /* clean up the mess */
-    SS_gc(expr);
-    SS_gc(argl);
-    SS_gc(args);
-    SS_gc(vl);
+    SS_gc(si, expr);
+    SS_gc(si, argl);
+    SS_gc(si, args);
+    SS_gc(si, vl);
 
     return(SS_t);}
 
@@ -633,10 +633,10 @@ static object *_SSI_trace(SS_psides *si, object *argl)
    {object *lst, *car;
 
     lst = argl;
-    while ((car = SS_car(lst)) != NULL)
+    while ((car = SS_car(si, lst)) != NULL)
        {if (SS_procedurep(car))
            SS_PROCEDURE_TRACEDP(car) = TRUE;
-        if (SS_nullobjp(lst = SS_cdr(lst)))
+        if (SS_nullobjp(lst = SS_cdr(si, lst)))
            break;};
 
     return(argl);}
@@ -650,10 +650,10 @@ static object *_SSI_untrace(SS_psides *si, object *argl)
    {object *lst, *car;
 
     lst = argl;
-    while ((car = SS_car(lst)) != NULL)
+    while ((car = SS_car(si, lst)) != NULL)
        {if (SS_procedurep(car))
            SS_PROCEDURE_TRACEDP(car) = FALSE;
-        if (SS_nullobjp(lst = SS_cdr(lst)))
+        if (SS_nullobjp(lst = SS_cdr(si, lst)))
            break;};
 
     return(argl);}
@@ -970,7 +970,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
 
         case ERR_FREE :
 	     esc = SS_pop_err(si, si->errlev - 1, FALSE);
-	     SS_gc(esc);
+	     SS_gc(si, esc);
 	     ret = SS_null;};
 
     si->cont_ptr--;

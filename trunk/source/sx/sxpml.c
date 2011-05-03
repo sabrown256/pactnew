@@ -110,7 +110,7 @@ static object *_SXI_resz_array(SS_psides *si, object *argl)
         arr->length = size;
         arr->data   = CREMAKE(d, char, size*bpi);};
 
-    o = SS_car(argl);
+    o = SS_car(si, argl);
 
     return(o);}
 
@@ -155,7 +155,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
        SS_error(si, "NO ARRAY DIMENSIONS SPECIFIED - _SXI_SUB_ARRAY", argl);
 
     else
-       {nd       = SS_length(dims);
+       {nd       = SS_length(si, dims);
         idims    = CMAKE_N(long, nd + 1);
         idims[0] = nd/2;
         for (pd = idims + 1; !SS_nullobjp(dims); pd++)
@@ -168,7 +168,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
        SS_error(si, "NO REGION SPECIFIED - _SXI_SUB_ARRAY", argl);
 
     else
-       {nr      = SS_length(reg);
+       {nr      = SS_length(si, reg);
         ireg    = CMAKE_N(long, nr + 1);
         ireg[0] = nr/2;
         for (pr = ireg + 1; !SS_nullobjp(reg); pr++)
@@ -295,8 +295,8 @@ object *SX_list_array(SS_psides *si, object *argl)
 
     n    = 0;
     lst  = argl;
-    for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst))
-        {num = SS_car(lst);
+    for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(si, lst))
+        {num = SS_car(si, lst);
          if (!SS_numbp(num))
             SS_error(si, "LIST ELEMENT NOT A NUMBER - SX_LIST_ARRAY", num);
 
@@ -304,20 +304,20 @@ object *SX_list_array(SS_psides *si, object *argl)
 
 /* determine whether the list is all integers */
     fixp = TRUE;
-    for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst))
-        fixp &= SS_integerp(SS_car(lst));
+    for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(si, lst))
+        fixp &= SS_integerp(SS_car(si, lst));
 
     if (fixp)
        {arr = PM_make_array(SC_LONG_S, n, NULL);
 	lp  = (long *) arr->data;
-	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst), lp++)
+	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(si, lst), lp++)
 	    {SS_args(si, lst,
 		     SC_LONG_I, lp,
 		     0);};}
     else
        {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	fp  = (double *) arr->data;
-	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst), fp++)
+	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(si, lst), fp++)
 	    {SS_args(si, lst,
 		     SC_DOUBLE_I, fp,
 		     0);};};
@@ -489,11 +489,11 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
        SS_error(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_SET", argl);
 
 /* if the first object is a pdbfile, use it, otherwise, use default file */
-    argl = SX_get_file(argl, &po);
+    argl = SX_get_file(si, argl, &po);
     file = FILE_FILE(PDBfile, po);
 
-    obj  = SS_car(argl);
-    argl = SS_cdr(argl);
+    obj  = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     name = CSTRSAVE(SS_get_string(obj));
 
 /* check to see whether or not the variable is in the file */
@@ -588,7 +588,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
     if (SS_nullobjp(shape))
        SS_error(si, "BAD MESH SHAPE - _SXI_MAKE_PML_SET", argl);
     else
-       {nd    = SS_length(shape);
+       {nd    = SS_length(si, shape);
         maxes = CMAKE_N(int, nd);
         for (pm = maxes; !SS_nullobjp(shape); )
             SX_GET_INTEGER_FROM_LIST(si, *pm++, shape,
@@ -600,11 +600,11 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 				     maxes, NULL, NULL);
 
     else
-       {nde  = SS_length(components);
+       {nde  = SS_length(si, components);
 	elem = CMAKE_N(void *, nde);
 
 /* get the number of elements */
-	obj = SS_car(components);
+	obj = SS_car(si, components);
 	if (!SX_NUMERIC_ARRAYP(obj))
 	   SS_error(si, "OBJECT NOT NUMERIC ARRAY - _SXI_MAKE_PML_SET", obj);
 
@@ -614,8 +614,8 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 
 	for (pe = elem; !SS_nullobjp(components); )
 	    {arr        = NULL;
-	     obj        = SS_car(components);
-	     components = SS_cdr(components);
+	     obj        = SS_car(si, components);
+	     components = SS_cdr(si, components);
 	     if (SX_NUMERIC_ARRAYP(obj))
 	        arr = SS_GET(C_array, obj);
 	     else
@@ -654,7 +654,7 @@ static object *_SXI_make_cp_set(SS_psides *si, object *argl)
     PM_set **sets, *cp;
     object *obj;
 
-    n = SS_length(argl);
+    n = SS_length(si, argl);
     sets = CMAKE_N(PM_set *, n);
 
     for (i = 0; i < n; i++)
@@ -758,7 +758,7 @@ static void _SX_wr_gset(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GSET - gc a set */
 
-static void _SX_rl_gset(object *obj)
+static void _SX_rl_gset(SS_psides *si, object *obj)
    {
 
 /* you don't know whether a mapping is pointing to this
@@ -768,7 +768,7 @@ static void _SX_rl_gset(object *obj)
     PM_rel_set(set, FALSE);
 */
 
-    SS_rl_object(obj);;
+    SS_rl_object(si, obj);;
 
     return;}
 
@@ -969,16 +969,16 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
        SS_error(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_MAPPING", argl);
 
 /* if the first object is a pdbfile, use it, otherwise, use default file */
-    argl = SX_get_file(argl, &po);
+    argl = SX_get_file(si, argl, &po);
     file = FILE_FILE(PDBfile, po);
 
-    obj = SS_car(argl);
+    obj = SS_car(si, argl);
     if (SS_integerp(obj))
        {i    = SS_INTEGER_VALUE(obj);
 	mi   = _SX_get_menu_item(si, po, i);
 	name = (mi == NULL) ? NULL : mi->vname;}
     else
-       {argl = SS_cdr(argl);
+       {argl = SS_cdr(si, argl);
         name = CSTRSAVE(SS_get_string(obj));};
 
     if (name == NULL)
@@ -1049,13 +1049,13 @@ static void _SX_wr_gmapping(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GMAPPING - gc a mapping */
 
-static void _SX_rl_gmapping(object *obj)
+static void _SX_rl_gmapping(SS_psides *si, object *obj)
    {PM_mapping *f;
 
     f = SS_GET(PM_mapping, obj);
     PM_rel_mapping(f, TRUE, TRUE);
 
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -1111,23 +1111,23 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
 
 /* extract the mesh shape */
     if (SS_nullobjp(shape))
-       {nd    = SS_length(components) + tflag;
+       {nd    = SS_length(si, components) + tflag;
         maxes = CMAKE_N(int, nd);
-        maxes[nd-1] = SS_length(SS_car(components));}
+        maxes[nd-1] = SS_length(si, SS_car(si, components));}
     else
-       {nd    = SS_length(shape);
+       {nd    = SS_length(si, shape);
         maxes = CMAKE_N(int, nd);
         for (pm = maxes; !SS_nullobjp(shape); )
             SX_GET_INTEGER_FROM_LIST(si, *pm++, shape,
                                      "BAD MESH INDEX - _SXI_ARRAYS_SET");};
 
 /* each component is a list of arrays */
-    nde  = SS_length(components) + tflag;
+    nde  = SS_length(si, components) + tflag;
     elem = CMAKE_N(double *, nde);
-    for (lst = components; !SS_nullobjp(lst); lst = SS_cdr(lst))
+    for (lst = components; !SS_nullobjp(lst); lst = SS_cdr(si, lst))
         {if (lst == components)
-            n = SS_length(SS_car(lst));
-         else if (n != SS_length(SS_car(lst)))
+            n = SS_length(si, SS_car(si, lst));
+         else if (n != SS_length(si, SS_car(si, lst)))
             SS_error(si, "COMPONENT LISTS NOT SAME LENGTH - _SXI_ARRAYS_SET",
                      lst);};
 
@@ -1144,10 +1144,10 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
     nep  = NUMERIC_ARRAY_LENGTH(lst);
     ne   = nep*n;
 
-    for (j = 0; !SS_nullobjp(components); j++, components = SS_cdr(components))
+    for (j = 0; !SS_nullobjp(components); j++, components = SS_cdr(si, components))
         {pe = CMAKE_N(double, ne);
          elem[j] = pe;
-         lst = SS_car(components);
+         lst = SS_car(si, components);
          for (i = 0; i < n; i++)
              {SX_GET_ARRAY_FROM_LIST(si, data, lst,
                                      "BAD ELEMENT ARRAY - _SXI_ARRAYS_SET");
@@ -1284,27 +1284,27 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
     PM_set *set;
     PM_mesh_topology *mt;
 
-    nd = SS_length(argl);
+    nd = SS_length(si, argl);
     if (nd < 1)
        SS_error(si, "NO DOMAIN INFO - _SXI_MAKE_AC_SET", argl);
 
-    nodes = SS_car(argl);
-    argl  = SS_cdr(argl);
+    nodes = SS_car(si, argl);
+    argl  = SS_cdr(si, argl);
 
-    ne = SS_length(nodes);
+    ne = SS_length(si, nodes);
     if (ne < 1)
        SS_error(si, "BAD NODE LIST - _SXI_MAKE_AC_SET", nodes);
 
-    nde = SS_length(SS_car(nodes));
+    nde = SS_length(si, SS_car(si, nodes));
 
 /* construct the element arrays from the lists */
     elem = CMAKE_N(double *, nde);
     for (i = 0; i < nde; i++)
         elem[i] = CMAKE_N(double, ne);
 
-    for (i = 0; i < ne; i++, nodes = SS_cdr(nodes))
-        {node = SS_car(nodes);
-	 for (j = 0; j < nde; j++, node = SS_cdr(node))
+    for (i = 0; i < ne; i++, nodes = SS_cdr(si, nodes))
+        {node = SS_car(si, nodes);
+	 for (j = 0; j < nde; j++, node = SS_cdr(si, node))
              {SS_args(si, node,
 		      SC_DOUBLE_I, elem[j]+i,
 		      0);};};
@@ -1313,17 +1313,17 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
     bnd = CMAKE_N(long *, nd);
     ncs = CMAKE_N(int, nd);
     nbp = CMAKE_N(int, nd);
-    for (j = 1; j < nd; j++, argl = SS_cdr(argl))
-        {ncells = SS_car(argl);
-         ord = SS_length(SS_car(ncells));
-         nc  = SS_length(ncells);
+    for (j = 1; j < nd; j++, argl = SS_cdr(si, argl))
+        {ncells = SS_car(si, argl);
+         ord = SS_length(si, SS_car(si, ncells));
+         nc  = SS_length(si, ncells);
          pb  = CMAKE_N(long, ord*nc);
          bnd[j] = pb;
          ncs[j] = (ord == 1) ? nc - 1 : nc;
          nbp[j] = ord;
-         for (i = 0; i < nc; i++, ncells = SS_cdr(ncells))
-             {ncell = SS_car(ncells);
-	      for (k = 0; k < ord; k++, ncell = SS_cdr(ncell))
+         for (i = 0; i < nc; i++, ncells = SS_cdr(si, ncells))
+             {ncell = SS_car(si, ncells);
+	      for (k = 0; k < ord; k++, ncell = SS_cdr(si, ncell))
                   {SS_args(si, ncell,
 			   SC_LONG_I, pb++,
 			   0);};};};
@@ -1514,7 +1514,7 @@ static void _SX_wr_gnum_array(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GNUM_ARRAY - release g_num_array */
 
-static void _SX_rl_gnum_array(object *obj)
+static void _SX_rl_gnum_array(SS_psides *si, object *obj)
    {C_array *arr;
 
     arr = SS_GET(C_array, obj);
@@ -1525,7 +1525,7 @@ static void _SX_rl_gnum_array(object *obj)
  *  CFREE(arr->data);
  */
     CFREE(arr);
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -1788,13 +1788,13 @@ static void _SX_wr_gpolygon(SS_psides *si, object *obj, object *strm)
 
 /* _SX_RL_GPOLYGON - release g_polygon */
 
-static void _SX_rl_gpolygon(object *obj)
+static void _SX_rl_gpolygon(SS_psides *si, object *obj)
    {PM_polygon *py;
 
     py = SS_GET(PM_polygon, obj);
 
     PM_free_polygon(py);
-    SS_rl_object(obj);
+    SS_rl_object(si, obj);
 
     return;}
 
@@ -1835,13 +1835,13 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
             SC_LONG_I, &nd,
             0);
 
-    argl = SS_cdr(argl);
-    ne   = SS_length(argl);
+    argl = SS_cdr(si, argl);
+    ne   = SS_length(si, argl);
     np   = ne/nd;
 
     py = PM_init_polygon(nd, np);
 
-    for (id = 0, ip = 0; !SS_nullobjp(argl); argl = SS_cdr(argl))
+    for (id = 0, ip = 0; !SS_nullobjp(argl); argl = SS_cdr(si, argl))
 	{SS_args(si, argl,
 		 SC_DOUBLE_I, &v,
 		 0);
@@ -1898,19 +1898,19 @@ static object *_SX_combine_polygons(SS_psides *si, object *argl,
 
     rv = SS_null;
 
-    n = SS_length(argl);
+    n = SS_length(si, argl);
     if (n == 1)
-       rv = SS_car(argl);
+       rv = SS_car(si, argl);
 
     else if (n > 1)
-       {o  = SS_car(argl);
+       {o  = SS_car(si, argl);
 	pa = SS_GET(PM_polygon, o);
 
         a = PM_polygon_array();
 	PM_polygon_push(a, pa);
 
-	for (argl = SS_cdr(argl); !SS_nullobjp(argl); argl = SS_cdr(argl))
-	    {o  = SS_car(argl);
+	for (argl = SS_cdr(si, argl); !SS_nullobjp(argl); argl = SS_cdr(si, argl))
+	    {o  = SS_car(si, argl);
 	     pb = SS_GET(PM_polygon, o);
 
 /* combine PB with all polygons in A */

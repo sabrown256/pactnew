@@ -651,12 +651,12 @@ static object *_SSI_synonym(SS_psides *si, object *argl)
    {object *func;
     char *synname;
 
-    func = SS_exp_eval(si, SS_car(argl));
+    func = SS_exp_eval(si, SS_car(si, argl));
     if (!SS_procedurep(func))
        SS_error(si, "FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
 
-    for (argl = SS_cdr(argl); SS_consp(argl); argl = SS_cdr(argl))
-        {synname = SS_get_string(SS_car(argl));
+    for (argl = SS_cdr(si, argl); SS_consp(argl); argl = SS_cdr(si, argl))
+        {synname = SS_get_string(SS_car(si, argl));
          SC_hasharr_remove(si->symtab, synname);
          SC_hasharr_install(si->symtab, synname, func,
 			    SS_OBJECT_S, TRUE, TRUE);};
@@ -737,7 +737,7 @@ object *SS_pop_err(SS_psides *si, int n, int flag)
            {_SS_restore_state(si, x);
             break;}
         else
-           SS_gc(x);};
+           SS_gc(si, x);};
 
     SS_restore_registers(si, flag);
 
@@ -767,7 +767,7 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
          x = SC_array_pop(si->stack);
 
-         SS_gc(x);};
+         SS_gc(si, x);};
 
 /* restore the continuation stack */
     if (si->cont_ptr < nc)
@@ -788,7 +788,7 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
     for (; si->errlev > ne; si->errlev--)
         {esc = si->err_stack[si->errlev-1];
          si->err_stack[si->errlev-1] = NULL;
-         SS_gc(esc);};
+         SS_gc(si, esc);};
 
     _SS_set_ans_prompt(si);
 
@@ -861,8 +861,8 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
    {int n;
     object *x, *expr, *val;
 
-    x    = SS_car(argl);
-    argl = SS_cdr(argl);
+    x    = SS_car(si, argl);
+    argl = SS_cdr(si, argl);
     if (!SS_integerp(x))
        SS_error(si, "FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
 
@@ -872,7 +872,7 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
 
     if (!SS_consp(argl))
        SS_error(si, "SECOND ARG MISSING - _SSI_RETLEV", x);
-    val = SS_car(argl);    
+    val = SS_car(si, argl);    
 
     if (si->errlev > 1)
        {x = SS_pop_err(si, n, TRUE);
@@ -991,7 +991,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
 
         case ERR_FREE :
 	     esc = SS_pop_err(si, si->errlev - 1, FALSE);
-	     SS_gc(esc);};
+	     SS_gc(si, esc);};
 
     si->cont_ptr--;
 
@@ -1030,7 +1030,7 @@ void SS_error(SS_psides *si, char *s, object *obj)
 
     esc = SS_pop_err(si, si->errlev - 1, FALSE);
     nc  = SS_ESCAPE_CONTINUATION(esc);
-    SS_gc(esc);
+    SS_gc(si, esc);
 
     if (si->trap_error)
        LONGJMP(si->continue_int[nc].cont, ABORT);

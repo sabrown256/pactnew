@@ -474,7 +474,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
             SS_OBJECT_I, &ovif,
             0);
 
-    for (i = 0; i < 4; i++, argl = SS_cdr(argl));
+    for (i = 0; i < 4; i++, argl = SS_cdr(si, argl));
 
     if (!SS_nullobjp(oviv))
        {if (!SS_numbp(oviv))

@@ -16,8 +16,8 @@ typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
     {int _ityp;                                                              \
      object *_num;                                                           \
      _oper = 0;                                                              \
-     _num  = SS_car(_arg);                                                   \
-     _arg  = SS_cdr(_arg);                                                   \
+     _num  = SS_car(si, _arg);                                               \
+     _arg  = SS_cdr(si, _arg);                                               \
      _ityp = SC_arrtype(_num, -1);                                           \
      if (_ityp == SC_INT_I)                                                  \
         _oper = SS_INTEGER_VALUE(_num);                                      \
@@ -75,7 +75,7 @@ object *SS_unary_flt(SS_psides *si, C_procedure *cp, object *argl)
     if (SS_nullobjp(argl))
        SS_error(si, "WRONG NUMBER OF ARGUMENTS - SS_UNARY_FLT", argl);
 
-    x  = SS_car(argl);
+    x  = SS_car(si, argl);
     id = SC_arrtype(x, -1);
 
     if (id == SC_INT_I)
@@ -173,7 +173,7 @@ static object *_SS_binary_opr(SS_psides *si, C_procedure *cp, object *argl)
    {PFBINOBJ fnc;
     object *rv;
 
-    if (SS_length(argl) != 2)
+    if (SS_length(si, argl) != 2)
        SS_error(si, "WRONG NUMBER OF ARGUMENTS - _SS_BINARY_OPR", argl);
 
     fnc = (PFBINOBJ) cp->proc[0];
@@ -192,11 +192,11 @@ object *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl)
     PFInt64II fnc;
     object *x1, *x2, *rv;
 
-    if (SS_length(argl) != 2)
+    if (SS_length(si, argl) != 2)
        SS_error(si, "WRONG NUMBER OF ARGUMENTS - SS_BINARY_FIX", argl);
 
     fnc = (PFInt64II) cp->proc[0];
-    x1  = SS_car(argl);
+    x1  = SS_car(si, argl);
     x2  = SS_cadr(si, argl);
 
     if (!SS_integerp(x1) || !SS_integerp(x2))
@@ -369,7 +369,7 @@ object *SS_binary_homogeneous(SS_psides *si, C_procedure *cp, object *argl)
     long ni;
     object *acc;
 
-    ido = _SS_max_numeric_type(argl, &ni);
+    ido = _SS_max_numeric_type(si, argl, &ni);
     if (ido == -1)
        SS_error(si, "NON-NUMERIC OPERAND - SS_BINARY_HOMOGENEOUS", argl);
 
@@ -406,7 +406,7 @@ object *SS_binary_heterogeneous(SS_psides *si, C_procedure *cp, object *argl)
     double n;
     object *acc;
 
-    ido = _SS_max_numeric_type(argl, &ni);
+    ido = _SS_max_numeric_type(si, argl, &ni);
     if (ido == -1)
        SS_error(si, "NON-NUMERIC OPERAND - SS_BINARY_HETEROGENEOUS", argl);
 
@@ -505,7 +505,7 @@ object *SS_bin_comp(SS_psides *si, C_procedure *cp, object *argl)
     c1 = 0.0;
     c2 = 0.0;
 
-    if (SS_length(argl) != 2)
+    if (SS_length(si, argl) != 2)
        SS_error(si, "WRONG NUMBER OF ARGUMENTS - SS_BIN_COMP", argl);
 
     fnc = (PFIntdd) cp->proc[0];
